@@ -118,6 +118,7 @@ jobs:
             echo "$mark **$label**${last:+ — $last}" >> "$GITHUB_STEP_SUMMARY"
           }
           check "Resources (i18n keys, translations, XML layouts)" python3 tools/check_resources.py .
+          check "Remote link documents (Home Assistant discovery, state)" python3 tools/check_sync_json.py build/host-tests/sync
           check "compat.json generator" python3 tools/gen_compat.py . build/compat.json
           check "Python tools compile" python3 -m py_compile tools/*.py
           exit $status
