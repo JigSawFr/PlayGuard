@@ -27,6 +27,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 - 📱 **Companion app** — unlink it, even on a second-hand console.
 - ↩️ **History and backups** — every change is logged and can be undone.
 - 🔔 **Notifications** — a bell gathers what needs you (an alarm off, a clock drifting, changes made elsewhere), with the fix one press away.
+- 🏠 **Home Assistant (optional)** — over MQTT on your local network: the state and play time in Home Assistant, orders from it (extra time, limits, lock). Off by default. [Guide](docs/home-assistant.md).
 - 🌍 Every console language, light and dark themes.
 
 ## Compatibility
@@ -51,7 +52,7 @@ Forgotten PIN or second-hand console: [Locked out?](docs/troubleshooting.md#lock
 
 ## Documentation
 
-- **User guide:** [features](docs/features.md) · [install](docs/install.md) · [compatibility](docs/compatibility.md) · [troubleshooting](docs/troubleshooting.md)
+- **User guide:** [features](docs/features.md) · [install](docs/install.md) · [compatibility](docs/compatibility.md) · [troubleshooting](docs/troubleshooting.md) · [Home Assistant](docs/home-assistant.md)
 - **Reference:** [companion app](docs/companion-app.md) · [`config.json`](docs/config.md) · [how parental controls work](docs/parental-controls.md) · [recovery sysmodule](sysmodule/README.md)
 - **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md) · [roadmap](ROADMAP.md) · [changelog](CHANGELOG.md)
 

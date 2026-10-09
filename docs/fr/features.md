@@ -103,6 +103,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 - Vérification de l'horloge réseau au lancement (une notification si elle a plus d'une minute d'écart ; elle ne règle jamais l'horloge).
 - Un **rappel mensuel pour soutenir PlayGuard** (activé par défaut, jamais le premier mois ni juste après une mise à jour ; *Ne plus afficher* sur le rappel ou cet interrupteur le désactive pour de bon, mises à jour comprises).
 - Actions avancées.
+- **Accès à distance (MQTT / Home Assistant) :** le broker, le nom de la console, que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, l'état en direct, *Synchroniser maintenant* et le journal. Voir [le guide Home Assistant](../home-assistant.fr.md).
 
 ## Outils et À propos — historique, sauvegardes, infos console ; version, mises à jour, nouveautés, crédits
 
@@ -123,7 +124,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 
 **Plus de plantage en 22.5.** `pctl:a`, le service privilégié du contrôle parental, n'accepte **qu'une seule session**. Les anciennes versions de l'application d'origine la gardaient ouverte : l'écran PIN du menu HOME (ou l'applet PIN) ne pouvait pas l'obtenir et Atmosphère pouvait planter. PlayGuard ouvre la session pour chaque action et la libère aussitôt ; les rafraîchissements périodiques s'arrêtent quand l'application est en arrière-plan. *(Diagnostic du [fork d'anbingxi](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly).)*
 
-**Rien ne tourne en arrière-plan.** La limite, le code PIN, les avertissements et la suspension sont ceux de la console ; PlayGuard ne change que leurs réglages.
+**Rien ne tourne en arrière-plan.** La limite, le code PIN, les avertissements et la suspension sont ceux de la console ; PlayGuard ne change que leurs réglages. Le lien à distance facultatif ne fonctionne que tant que PlayGuard est ouvert, et exécute un ordre exactement comme un changement fait sur la console (même déverrouillage, reverrouillage, mode lecture seule et historique) ; il ne peut jamais supprimer le contrôle parental, délier l'appli mobile ni toucher au code PIN.
 
 ## Ce qui compte comme temps de jeu
 

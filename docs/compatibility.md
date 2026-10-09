@@ -49,7 +49,7 @@ Children love video games, and video games mean screens: a limit is part of look
 
 The few tools that existed did not do the job: activity reports that were barely maintained and not very detailed, parental controls that were rough and unfinished. And I did not want a custom replacement either, or a sysmodule always running in the background. The idea was to **reuse the console's own parental controls as much as possible**, with everything they already do — the limit, the PIN, the warnings, the suspension — and to bring their settings back onto the console. That is PlayGuard.
 
-Driving the console's own controls also opens the door to much more: reporting play time to a home server, taking orders from it, Home Assistant, automations. Where that could go is in the [roadmap's horizon](../ROADMAP.md#horizon).
+Driving the console's own controls also opens the door to much more: reporting play time to a home server, taking orders from it, Home Assistant, automations. The first step is here, an optional link to Home Assistant over MQTT ([guide](home-assistant.md)); where it could go next is in the [roadmap's horizon](../ROADMAP.md#horizon).
 
 ## PlayGuard or a replacement sysmodule?
 

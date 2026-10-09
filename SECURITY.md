@@ -35,6 +35,13 @@ The latest release. Fixes are not backported.
 - **The recovery screen** — reaching its actions (set a new PIN, delete everything) from a
   `rescue_report.txt` the console's state does not confirm, or without the recovery
   sysmodule installed.
+- **The remote link (MQTT, Home Assistant)** — an order doing more than its entity allows
+  (any order that deletes parental controls, unlinks the companion app or reads or changes
+  the PIN, a play-timer write while *Orders may change the play timer* is off, a write in
+  read-only mode, the play timer written while it counts down); an order carried out
+  without the console's confirmation under the *ask* policy; the broker's password, user
+  name or address reaching a log, the diagnostic report or an upload; a malformed message
+  from the broker crashing PlayGuard.
 
 ## What is not
 
@@ -45,5 +52,9 @@ The latest release. Fixes are not backported.
   child out of PlayGuard, not out of every homebrew. See [`sysmodule/README.md`](sysmodule/README.md).
 - **Custom firmware itself.** PlayGuard needs Atmosphère; a modded console can run any
   homebrew, including ones that change parental controls.
+- **Whoever can publish to the broker.** With the remote link on, the broker's users are
+  trusted to send orders (that is what the link is for): securing the broker and the local
+  network, and keeping *Orders may change the play timer* off when it is not needed, is the
+  owner's part. See [`docs/home-assistant.md`](docs/home-assistant.md).
 - **Nintendo's parental controls.** Behaviour of the system `pctl` service or the phone app
   belongs with Nintendo. PlayGuard is not affiliated with Nintendo.
