@@ -28,6 +28,7 @@
 #include "action/pt_log_flow.hpp"
 #include "action/rescue.hpp"
 #include "action/rollback_flow.hpp"
+#include "action/sync_flow.hpp"
 #include "activity/init_error_activity.hpp"
 #include "activity/loading_activity.hpp"
 #include "activity/lock_activity.hpp"
@@ -61,6 +62,7 @@
 #include "util/pctl_ops_c.hpp"
 #include "util/session_log.hpp"
 #include "util/startup.h"
+#include "util/sync_files.hpp"
 #include "view/cadran_digits.hpp"
 #include "view/cadran_icon.hpp"
 #include "view/cadran_week.hpp"
@@ -251,6 +253,8 @@ brls::Activity* choose_first()
     pin_lock::install();
     // ... and again after a while away, over whatever is open.
     pin_lock::watch_focus([]() { LockActivity::lock_again(); });
+    // The remote link (MQTT, Home Assistant), when sync.conf turns it on.
+    sync_flow::start();
     // The playguard-rescue sysmodule acted on a RESCUE file: show what it
     // did and let the parent finish, before (and instead of) the lock
     // screen — they are here because they forgot the PIN. Only when the
@@ -363,6 +367,7 @@ void shut_down()
     // "Turn back on and quit": locked now that the screen is gone (pt_flow.hpp).
     pt_flow::lock_at_exit_if_asked();
 
+    sync_flow::stop();   // the remote link: "offline" while the network is still up
     // Network tasks still running (an update check, a sign-in waiting for its
     // code): stopped, and waited for a moment, before what they use goes away.
     // The SD-card writes still queued (ui::write_later) are done first.
@@ -444,6 +449,9 @@ int main(int argc, char* argv[])
     // has read it (live_prefs::start).
     config::load();
     startup_mark(StartupStep_Preferences);
+    // Remote link: what the agent sysmodule needs of config.json follows
+    // every save (sync/nro_state.txt, only once the link was set up).
+    config::set_saved_hook(sync_files::export_nro_state);
 
     if (!brls::Application::init()) {
         brls::Logger::error("Unable to init borealis Application");

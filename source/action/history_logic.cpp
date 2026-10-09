@@ -92,7 +92,8 @@ const char* const KINDS[] = { "limits", "level", "custom", "org", "vr", "alarm",
                               "remove_forwarder", "protect_forwarder", "unprotect_forwarder" };
 const char* const SOURCES[] = { "uniform", "day", "per_day", "extra", "stop", "restore_extra", "bonus", "restore_bonus", "schedule_end",
                                 "remove", "backup", "undo", "first_steps", "overview", "console_lock", "notices",
-                                "rescue" };
+                                "rescue", "remote", "remote_extra", "remote_stop", "remote_console_lock",
+                                "remote_restore_extra" };
 
 bool listed(const std::vector<std::string>& list, const std::string& s)
 {

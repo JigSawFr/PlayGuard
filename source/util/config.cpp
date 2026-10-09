@@ -400,6 +400,13 @@ void load()
     sanitize(s_config);
 }
 
+static void (*s_saved_hook)() = nullptr;
+
+void set_saved_hook(void (*hook)())
+{
+    s_saved_hook = hook;
+}
+
 bool write(const Snapshot& snap)
 {
     // Both, even when the first fails.
@@ -492,6 +499,7 @@ bool snapshot(Snapshot& snap)
     st["schedule_prev"]     = s_config.schedule_prev;
     st["relock_pending"]    = s_config.relock_pending;
     snap.system = dump(st);
+    if (s_saved_hook) s_saved_hook();
     return true;
 }
 

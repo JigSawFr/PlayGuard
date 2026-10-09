@@ -86,6 +86,7 @@ struct Config
     bool        support_reminder = true;
     std::string support_reminded;
     std::string seen_version;
+
     // The newest crash file (logs/crashes/) the notification bell told about:
     // a newer one means PlayGuard closed unexpectedly since.
     std::string crash_seen;
@@ -205,6 +206,10 @@ struct Snapshot
 };
 bool    snapshot(Snapshot& snap);
 bool    write(const Snapshot& snap);
+// Runs at the end of every successful snapshot(), on its thread (the remote
+// link mirrors what the agent must know into sync/nro_state.txt). nullptr:
+// nothing.
+void    set_saved_hook(void (*hook)());
 // Puts every out-of-range value back to its default (load() calls it).
 void    sanitize(Config& c);
 

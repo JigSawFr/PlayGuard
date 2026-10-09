@@ -5,7 +5,8 @@
      notifications, the monthly "Support PlayGuard" reminder). A setting
      that shapes one feature sits with it (extra time in Play timer,
      relocking in PIN, the clock check in Console › Network clock); the
-     updates and Help & diagnostics are in About. -->
+     updates and Help & diagnostics are in About.
+     Last, the remote link's screen (MQTT, Home Assistant). -->
 
 <brls:Box
     width="auto"
@@ -39,6 +40,8 @@
             <brls:BooleanCell id="pf_notices_reminders"/>
             <brls:BooleanCell id="pf_notices_ack_remind"/>
             <brls:BooleanCell id="pf_support_reminder"/>
+            <brls:Header title="@i18n/playguard/prefs/section_remote" marginTop="24" marginBottom="8"/>
+            <brls:DetailCell id="pf_remote" title="@i18n/playguard/prefs/remote"/>
 
         </brls:Box>
 

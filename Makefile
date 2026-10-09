@@ -242,6 +242,11 @@ sim_backend_LIBS   := -pthread
 frame_stats_SRC   := source/util/paths.cpp source/util/frame_stats.cpp tests/frame_stats/test.cpp
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
 migrations_SRC   := source/util/paths.cpp source/util/date.cpp source/util/update.cpp source/util/migrations.cpp tests/migrations/test.cpp
+# The remote link's files on the SD card, with its C parts (built by $(CC):
+# g++ would build a .c as C++).
+sync_files_SRC   := source/util/date.cpp source/util/paths.cpp source/util/config.cpp source/util/profiles.cpp source/util/sync_files.cpp tests/sync_files/test.cpp
+sync_files_CSRC  := $(CALENDAR_C) source/sync/sync_conf.c source/sync/sync_records.c
+sync_files_CFLAGS := -std=gnu11 -Isource/sync -Isource/core
 
 # C: the remote link (source/sync/). sync_core writes the documents it builds
 # (_ARGS: where) for tools/check_sync_json.py.

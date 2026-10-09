@@ -7,6 +7,7 @@
 #include "action/error_hint_logic.hpp"
 #include "action/frame_stats_flow.hpp"
 #include "action/pt_log_flow.hpp"
+#include "action/sync_flow.hpp"
 #include "action/write_queue_logic.hpp"
 #include "activity/main_activity.hpp"
 #include "tab/tab_base.hpp"
@@ -226,6 +227,7 @@ void note_unlocked(bool valid, bool unlocked)
 {
     if (!valid || unlocked == s_unlocked) return;
     s_unlocked = unlocked;
+    sync_flow::changed();
     // Next frame: at start-up the first tab is read before the main screen is
     // on the activity stack.
     brls::sync([]() {
@@ -237,6 +239,7 @@ void on_mode_changed()
 {
     pt_log_flow::apply();       // the recorder and the frame statistics only run
     frame_stats_flow::apply();  // in developer mode
+    sync_flow::changed();   // read-only mode is in the remote link's state
     if (MainActivity* main = main_activity()) main->update_title();
     TabBase::refresh_shown();
 }
