@@ -40,6 +40,9 @@ SOURCE_DATE_EPOCH ?= $(shell git log -1 --format=%ct 2>/dev/null || echo 0)
 ZIP_TREE = find . -exec touch -h -d @$(SOURCE_DATE_EPOCH) {} + && find . -mindepth 1 | LC_ALL=C sort | TZ=UTC zip -X -@
 CMAKE_ARGS ?=
 JSON_HPP := extern/borealis/library/include/borealis/extern/nlohmann/json.hpp
+# The remote link's console-free C (source/sync/), shared by its host tests.
+SYNC_PURE := source/sync/sync_json.c source/sync/mqtt_packet.c source/sync/sync_conf.c source/sync/sync_apply.c \
+             source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c
 
 .PHONY: all clean dist nxlink desktop web web-serve test fuzz check rescue dist-rescue FORCE
 
@@ -102,7 +105,8 @@ web-serve: web
 # build/host-tests/). A suite is three variables: <name>_SRC (its sources,
 # the test last), <name>_FLAGS (the standard, defines, include paths; a C++
 # suite without one gets TEST_CXXFLAGS) and an optional <name>_LIBS; the test
-# source's suffix picks the compiler.
+# source's suffix picks the compiler. One more when needed: <name>_ARGS (what
+# the program is run with).
 # `make test` builds and runs every suite in parallel (JOBS) and keeps going
 # when one fails, so a run reports every failing suite, not the first: each
 # suite's output is in build/host-tests/<name>.log, and <name>.ok marks a
@@ -239,6 +243,16 @@ frame_stats_SRC   := source/util/paths.cpp source/util/frame_stats.cpp tests/fra
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
 migrations_SRC   := source/util/paths.cpp source/util/date.cpp source/util/update.cpp source/util/migrations.cpp tests/migrations/test.cpp
 
+# C: the remote link (source/sync/). sync_core writes the documents it builds
+# (_ARGS: where) for tools/check_sync_json.py.
+sync_core_SRC   := $(SYNC_PURE) tests/sync_core/test.c
+sync_core_FLAGS := -std=gnu11 -Isource/sync -Isource/core
+sync_core_ARGS  := $(TESTOUT)/sync
+sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c source/sync/sync_conf.c tests/sync_exec/test.c
+sync_exec_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -Isource/sync
+sync_engine_SRC   := $(SYNC_PURE) source/sync/mqtt_client.c source/sync/sync_engine.c tests/sync_engine/test.c
+sync_engine_FLAGS := -std=gnu11 -Isource/sync -Isource/core
+
 TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))
 TEST_PROGRAMS := $(addprefix $(TESTOUT)/,$(TESTS))
 TEST_OKS := $(addsuffix .ok,$(TEST_PROGRAMS))
@@ -271,11 +285,15 @@ $(TEST_PROGRAMS): $(TESTOUT)/%: $$($$*_SRC) $$(call test_csrc,$$*) $(TEST_HEADER
 	$(foreach c,$(call test_csrc,$*),$(CC) $(call test_cflags,$*) $(CWARN) -c $c -o $(call test_cobj,$*,$c) &&) true
 	$(if $(filter %.cpp,$($*_SRC)),$(CXX),$(CC)) $(call test_flags,$*) $(CWARN) $($*_SRC) $(call test_cobjs,$*) $($*_LIBS) -o $@
 
+$(TESTOUT)/sync:
+	@mkdir -p $@
+$(TESTOUT)/sync_core.ok: | $(TESTOUT)/sync
+
 # Running it: the output goes to <name>.log and the terminal; <name>.ok only
 # when it passed.
 $(TEST_OKS): $(TESTOUT)/%.ok: $(TESTOUT)/%
 	@rm -f $@
-	@$< > $<.log 2>&1; r=$$?; cat $<.log; if [ $$r -eq 0 ]; then touch $@; else echo "$*: exit status $$r" >&2; exit $$r; fi
+	@$< $($*_ARGS) > $<.log 2>&1; r=$$?; cat $<.log; if [ $$r -eq 0 ]; then touch $@; else echo "$*: exit status $$r" >&2; exit $$r; fi
 
 test:
 	@test -f $(JSON_HPP) || { echo "borealis is missing (nlohmann/json for the tests): run git submodule update --init"; exit 1; }
@@ -341,6 +359,7 @@ fuzz:
 
 check: test
 	python3 tools/check_resources.py .
+	python3 tools/check_sync_json.py $(TESTOUT)/sync
 	python3 tools/gen_compat.py . $(BUILD)/compat.json
 
 clean:
