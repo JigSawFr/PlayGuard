@@ -91,8 +91,9 @@ desktop:
 # object files, so gcov's .gcno/.gcda sit next to the program in
 # build/host-tests/). A suite is three variables: <name>_SRC (its sources,
 # the test last), <name>_FLAGS (the standard, defines, include paths) and an
-# optional <name>_LIBS; the test source's suffix picks the compiler. One more
-# when needed: <name>_ARGS (what the program is run with).
+# optional <name>_LIBS; the test source's suffix picks the compiler. Two more
+# when needed: <name>_OBJS (C objects a C++ suite links) and <name>_ARGS
+# (what the program is run with).
 # `make test` builds and runs every suite in parallel (JOBS) and keeps going
 # when one fails, so a run reports every failing suite, not the first: each
 # suite's output is in build/host-tests/<name>.log, and <name>.ok marks a
@@ -211,6 +212,11 @@ crash_dump_SRC   := source/util/crash_dump.c tests/crash_dump/test.c
 crash_dump_FLAGS := -std=c11 -Isource/util
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
 log_files_FLAGS := -std=c++17 -Isource
+# The remote link's files on the SD card; its C parts as objects (_OBJS), as
+# g++ would build a .c as C++.
+sync_files_SRC   := source/util/paths.cpp source/util/config.cpp source/util/profiles.cpp source/util/sync_files.cpp tests/sync_files/test.cpp
+sync_files_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+sync_files_OBJS  := $(TESTOUT)/c/sync_conf.o $(TESTOUT)/c/sync_records.o
 
 # C: the remote link (source/sync/). sync_core writes the documents it builds
 # (_ARGS: where) for tools/check_sync_json.py.
@@ -243,10 +249,16 @@ FORCE:
 # variables above.
 .SECONDEXPANSION:
 # An optional <name>_CSRC (one C file, with <name>_CFLAGS) is built by $(CC)
-# into <name>.c.o and linked into a C++ suite.
-$(TEST_PROGRAMS): $(TESTOUT)/%: $$($$*_SRC) $$($$*_CSRC) $(TEST_HEADERS) $(TEST_FLAGS_FILE) | $(TESTOUT)
+# into <name>.c.o and linked into a C++ suite; <name>_OBJS are C objects of
+# source/sync/ built by the rule below.
+$(TEST_PROGRAMS): $(TESTOUT)/%: $$($$*_SRC) $$($$*_CSRC) $$($$*_OBJS) $(TEST_HEADERS) $(TEST_FLAGS_FILE) | $(TESTOUT)
 	$(if $($*_CSRC),$(CC) $($*_CFLAGS) $(CWARN) -c $($*_CSRC) -o $@.c.o)
-	$(if $(filter %.cpp,$($*_SRC)),$(CXX),$(CC)) $($*_FLAGS) $(CWARN) $($*_SRC) $(if $($*_CSRC),$@.c.o) $($*_LIBS) -o $@
+	$(if $(filter %.cpp,$($*_SRC)),$(CXX),$(CC)) $($*_FLAGS) $(CWARN) $($*_SRC) $(if $($*_CSRC),$@.c.o) $($*_OBJS) $($*_LIBS) -o $@
+
+# A C source a C++ suite links (<name>_OBJS).
+$(TESTOUT)/c/%.o: source/sync/%.c $(TEST_HEADERS) $(TEST_FLAGS_FILE)
+	@mkdir -p $(@D)
+	$(CC) -std=gnu11 $(CWARN) -Isource/sync -Isource/core -c $< -o $@
 
 $(TESTOUT)/sync:
 	@mkdir -p $@

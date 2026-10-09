@@ -27,7 +27,7 @@ errors = []
 warnings = []
 # Names that read the same in every language.
 SAME_IN_EVERY_LANGUAGE = {"about/made_in_france", "tools/update_via_values/appstore", "update/appstore",
-                          "tools/storage_emummc", "tools/storage_sysmmc", "init_error/firmware"}
+                          "tools/storage_emummc", "tools/storage_sysmmc", "init_error/firmware", "prefs/remote"}
 
 
 def flatten(d, prefix=""):

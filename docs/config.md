@@ -9,7 +9,8 @@ set from the app; the file is only worth editing by hand to get back in (see
 [`pin_lock`](#pin_lock)) or to check what PlayGuard remembered.
 
 The code is the reference: `source/util/config.hpp` (fields and defaults) and
-`source/util/config.cpp` (reading, checks, writing).
+`source/util/config.cpp` (reading, checks, writing). The remote link's
+settings are not here but in `sync.conf` ([`sync-protocol.md`](sync-protocol.md)).
 
 ## How the file is read
 

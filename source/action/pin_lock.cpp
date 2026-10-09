@@ -25,12 +25,14 @@ std::chrono::steady_clock::time_point s_pin_at;        // when the PIN was last 
 std::chrono::steady_clock::time_point s_reveal_until;  // before_show_pin() just asked
 std::chrono::steady_clock::time_point s_away_since;    // out of focus since (s_away)
 bool s_away = false;
+bool s_remote_bypass = false;   // an order PlayGuard carries out for the remote link
 Result s_last_rc = 0;   // what the last ask() got
 
 // The service layer's change check (write_guard.h). Runs on the UI thread,
 // with no pctl session open.
 bool check()
 {
+    if (s_remote_bypass) return true;   // checked by the link's policy (sync_flow)
     using pin_lock_logic::Check;
     const Check c = pin_lock_logic::check(config::get().pin_lock, std::chrono::steady_clock::now(),
                                           s_confirmed_until, s_refused_until);
@@ -78,6 +80,16 @@ void watch_focus(std::function<void()> lock)
             if (pin_lock_logic::lock_again(config::get().pin_lock, since, now, s_pin_at)) lock();
         });
     });
+}
+
+void remote_bypass(bool on)
+{
+    s_remote_bypass = on;
+}
+
+bool allow_change()
+{
+    return check();
 }
 
 bool at_start()
