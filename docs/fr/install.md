@@ -38,6 +38,8 @@ Tous dans `sd:/config/playguard/` (l'application elle-même reste dans `sd:/swit
 - **`previous_build.json`**, **`boot_check.json`** — Après l'installation d'un build sur place : le nom du build remplacé (gardé à côté du `.nro` sous `playguard.nro.previous`), et le contrôle du lancement suivant (supprimé dès que son premier écran s'affiche)
 - **`rescue_report.txt`** — Laissé par le sysmodule de secours après son intervention, jusqu'à ce que PlayGuard l'affiche au démarrage (illisible, il est supprimé et PlayGuard le signale)
 - **`rescue_nonce`** — Un défi aléatoire auquel le sysmodule de secours répond dans son rapport, pour que PlayGuard distingue un rapport qu'il a écrit d'un rapport écrit à la main ([sysmodule/README.md](../../sysmodule/README.md)) ; un nouveau à chaque lancement
+- **`sync.conf`** — Seulement une fois l'*Accès à distance* configuré : les réglages du lien, mot de passe du broker compris (jamais dans un rapport ni un envoi)
+- **`sync/`** — Seulement avec l'*Accès à distance* : ce dont un futur module en arrière-plan aura besoin (enregistrements, profils, noms des jeux)
 - **`logs/`** — `reports/` les rapports de diagnostic enregistrés (jamais le code PIN ni le numéro de série) ; `crashes/` un fichier par plantage (ce qui a arrêté PlayGuard) ; `uploads/` un raccourci Internet (`.url`) par rapport envoyé en ligne ; `play_timer/` les fichiers du minuteur des outils développeur. Combien de rapports, de fichiers de plantage et de liens sont gardés : *À propos › Aide et diagnostic* (par nombre, âge ou taille ; le plus récent reste toujours)
 
 Plus de détails dans [packaging/README.md](../../packaging/README.md) (en anglais).

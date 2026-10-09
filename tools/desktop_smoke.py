@@ -87,7 +87,16 @@ The "loading" scenario stops the start-up on the loading screen
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge|forwarders]   (needs DISPLAY, xdotool, ImageMagick)
+The "sync" scenario starts a local Mosquitto (needs mosquitto and
+mosquitto-clients) and sets the remote link up in sync.conf: PlayGuard must
+come online, publish the Home Assistant discovery, the state, today's
+activity and the names, carry out a limit order (event, retained order
+cleared, new state, change history), refuse one out of range, publish the
+discovery again when Home Assistant says it restarted, show the link online
+in Preferences › Remote access, and leave "offline" behind at exit.
+
+Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge|forwarders|
+       sync]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -125,6 +134,7 @@ CADRANSTATES = SCENARIO == "cadranstates"
 CADRANUNLOCKED = SCENARIO == "cadranunlocked"
 CADRANLARGE = SCENARIO == "cadranlarge"
 FORWARDERS = SCENARIO == "forwarders"
+SYNC = SCENARIO == "sync"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
@@ -135,7 +145,7 @@ nand_dir = os.path.join(run_dir, "playguard_data", "nand", "sysmmc")
 games_cache = os.path.join(nand_dir, "cache", "games.bin")
 if os.path.exists(games_cache):
     os.remove(games_cache)   # Installed games: the first check is this run's
-if (GATE or ERRORS or DEVBUILD or UPDATE) and os.path.exists(config_file):
+if (GATE or ERRORS or DEVBUILD or UPDATE or SYNC) and os.path.exists(config_file):
     os.remove(config_file)   # no remembered choice, developer mode off
 if DEVBUILD:
     # The pull requests by number (Y on the builds' screen; the keyboard has no Y).
@@ -298,7 +308,35 @@ if UPDATE:
     open(installed_nro, "wb").write(b"the version before")
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
     json.dump({"schema": 1, "update_daily": True}, open(config_file, "w"))
-if not GATE and not ERRORS and not DEVBUILD and not UPDATE:
+sync_conf = os.path.join(run_dir, "playguard_data", "sync.conf")
+if os.path.exists(sync_conf):
+    os.remove(sync_conf)   # the link is off but in the "sync" scenario
+SYNC_ID = "5a0c3e11"
+mqtt_port = 0
+mqtt_broker = None
+if SYNC:
+    # A broker of its own, on a free port, anonymous (on 127.0.0.1 only).
+    import atexit
+    import socket
+    s = socket.socket()
+    s.bind(("127.0.0.1", 0))
+    mqtt_port = s.getsockname()[1]
+    s.close()
+    broker_conf = os.path.join(OUT, "mosquitto.conf")
+    open(broker_conf, "w").write(f"listener {mqtt_port} 127.0.0.1\nallow_anonymous true\npersistence false\n")
+    mqtt_broker = subprocess.Popen(["mosquitto", "-c", broker_conf], stdout=open(os.path.join(OUT, "mosquitto.log"), "w"),
+                                   stderr=subprocess.STDOUT)
+    atexit.register(mqtt_broker.terminate)
+    time.sleep(1)
+    os.makedirs(os.path.dirname(sync_conf), exist_ok=True)
+    open(sync_conf, "w").write(
+        "enabled=1\nhost=127.0.0.1\n"
+        f"port={mqtt_port}\nallow_anonymous=1\nconsole_id={SYNC_ID}\nconsole_name=Smoke\n"
+        "policy=auto\nremote_timer_writes=1\npoll_s=10\n")
+    history = os.path.join(nand_dir, "history.json")
+    if os.path.exists(history):
+        os.remove(history)   # the remote change must be the only entry
+if not GATE and not ERRORS and not DEVBUILD and not UPDATE and not SYNC:
     env.setdefault("PLAYGUARD_SIM_PASTE", "https://gist.github.com/smoke/ab12")   # what GitHub answers
     github_token = os.path.join(run_dir, "playguard_data", "github_token")
     if os.path.exists(github_token):
@@ -514,7 +552,9 @@ def have(tool):
 cmd = (["stdbuf", "-oL", "-eL"] if have("stdbuf") else []) + [APP]
 if have("dbus-run-session"):
     cmd = ["dbus-run-session", "--"] + cmd
-proc = subprocess.Popen(cmd, cwd=run_dir, env=env, stdout=log, stderr=subprocess.STDOUT)
+# A session of its own: finish() stops the app with its wrappers (stopping
+# only dbus-run-session would leave PlayGuard running).
+proc = subprocess.Popen(cmd, cwd=run_dir, env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
 
 
 def alive():
@@ -719,11 +759,14 @@ def steps(a, b):
 
 def finish(check=None):
     """Stops the app, then runs `check` (on its complete log)."""
-    proc.terminate()
+    import signal
     try:
+        os.killpg(proc.pid, signal.SIGTERM)
         proc.wait(5)
     except subprocess.TimeoutExpired:
-        proc.kill()
+        os.killpg(proc.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
     if check:
         check()
     contact_sheet()
@@ -1067,6 +1110,93 @@ if ERRORS:
         if len(clock_entries()) != clock_before + 1:
             fail("the network clock was not set to the console clock (no history entry)")
     finish(told_unlock_failed)
+if SYNC:
+    BASE = f"playguard/{SYNC_ID}"
+
+    def mqtt_get(topic, timeout=3):
+        """The retained message on `topic`, or None."""
+        r = subprocess.run(["mosquitto_sub", "-h", "127.0.0.1", "-p", str(mqtt_port), "-t", topic, "-C", "1",
+                            "-W", str(timeout)], capture_output=True, text=True)
+        return r.stdout.rstrip("\n") if r.returncode == 0 and r.stdout.strip() else None
+
+    def mqtt_pub(topic, payload, retain=True):
+        subprocess.run(["mosquitto_pub", "-h", "127.0.0.1", "-p", str(mqtt_port), "-t", topic, "-m", payload]
+                       + (["-r"] if retain else []), check=True)
+
+    def wait_for(what, check, timeout=30, running=True):
+        end = time.time() + timeout
+        while time.time() < end:
+            value = check()
+            if value:
+                return value
+            if running and not alive():
+                fail(f"app exited while waiting for {what}")
+            time.sleep(0.5)
+        fail(f"no {what} after {timeout} s")
+
+    def watch(topic, name):
+        """Every message on `topic` from now on, one per line, in OUT/<name>."""
+        path = os.path.join(OUT, name)
+        p = subprocess.Popen(["mosquitto_sub", "-h", "127.0.0.1", "-p", str(mqtt_port), "-v", "-t", topic],
+                             stdout=open(path, "w"), stderr=subprocess.STDOUT)
+        atexit.register(p.terminate)
+        time.sleep(0.5)
+        return lambda: [l for l in open(path, errors="replace").read().splitlines() if l.strip()]
+
+    def doc(topic):
+        text = mqtt_get(topic)
+        try:
+            return json.loads(text) if text else None
+        except ValueError:
+            fail(f"{topic} is not JSON: {text[:200]}")
+
+    wait_for("availability online", lambda: mqtt_get(f"{BASE}/availability") == "online")
+    discovery = wait_for("discovery", lambda: doc(f"homeassistant/device/playguard_{SYNC_ID}/config"))
+    if "limit_mon" not in discovery.get("cmps", {}) or discovery["dev"]["name"] != "Smoke":
+        fail("the discovery lacks the timer entities or the console's name")
+    state = wait_for("state", lambda: doc(f"{BASE}/state"))
+    if state.get("source") != "app" or state.get("local_date") != "2026-10-08":
+        fail(f"unexpected state: {json.dumps(state)[:300]}")
+    wait_for("today's activity", lambda: doc(f"{BASE}/activity"))
+    wait_for("names", lambda: doc(f"{BASE}/names"))
+
+    events = watch(f"{BASE}/event", "events.txt")
+    discoveries = watch(f"homeassistant/device/playguard_{SYNC_ID}/config", "discoveries.txt")
+
+    # A limit order: applied, answered, cleared, and the state follows.
+    mqtt_pub(f"{BASE}/limit_uniform/set", "90")
+    wait_for("the order's event", lambda: any('"command_applied"' in e and '"limit_uniform"' in e for e in events()))
+    wait_for("the order cleared", lambda: mqtt_get(f"{BASE}/limit_uniform/set", 1) is None)
+    wait_for("the new limits in the state",
+             lambda: (doc(f"{BASE}/state") or {}).get("timer", {}).get("limits_min") == [90] * 7)
+    # Out of range: refused with the reason, cleared too.
+    mqtt_pub(f"{BASE}/limit_mon/set", "5000")
+    wait_for("the refusal", lambda: any('"command_rejected"' in e and '"out_of_range"' in e for e in events()))
+    wait_for("the refused order cleared", lambda: mqtt_get(f"{BASE}/limit_mon/set", 1) is None)
+    # Home Assistant restarted: the discovery again.
+    before = len(discoveries())
+    mqtt_pub("homeassistant/status", "online", retain=False)
+    wait_for("the discovery again", lambda: len(discoveries()) > before)
+
+    shot("01_overview")        # the Overview after the remote change (1 h 30 every day)
+    key("Down", steps("dashboard", "preferences"))
+    key("Right")
+    key("Down", 12)            # Remote access, the last cell
+    shot("02_preferences_end")
+    key("Return")
+    shot("03_remote_access")   # the link online
+
+    def checked():
+        try:
+            entries = json.load(open(os.path.join(nand_dir, "history.json"))).get("entries", [])
+        except (OSError, ValueError) as e:
+            fail(f"no history written: {e}")
+        if not any(e.get("kind") == "limits" and e.get("source") == "remote" for e in entries):
+            fail("the remote change is not in the change history")
+        if not any(m.startswith("Remote order done:") for m in messages()):
+            fail("no toast for the remote order; messages: " + repr(messages()))
+        wait_for("availability offline at exit", lambda: mqtt_get(f"{BASE}/availability") == "offline", 15, False)
+    finish(checked)
 def main_opened():
     log.flush()
     return any("main screen opened" in l for l in open(os.path.join(OUT, "app.log"), errors="replace"))

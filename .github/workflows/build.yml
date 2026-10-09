@@ -389,6 +389,10 @@ jobs:
             scenarios: gate outside alarm cadranstates rollback
           - shard: developer
             scenarios: devbuild library update errors sysnotes forwarders
+          # The remote link against a real broker (Mosquitto).
+          - shard: link
+            scenarios: sync
+            packages: mosquitto mosquitto-clients
           # Every Cadran tab in the 15 languages, normal and larger text: no
           # text cut short (tools/cut_text_check.py, tests/cut_text/), five
           # languages a shard (about 3 minutes each).
@@ -432,7 +436,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install $archives -y --no-install-recommends libgl1-mesa-dev libgl1-mesa-dri \
             libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxkbcommon-dev libwayland-dev \
-            libdbus-1-dev libcurl4-openssl-dev zlib1g-dev xvfb xauth xdotool imagemagick dbus
+            libdbus-1-dev libcurl4-openssl-dev zlib1g-dev xvfb xauth xdotool imagemagick dbus \
+            ${{ matrix.packages }}
       # Each scenario writes its screenshots (and a contact sheet of them) to
       # smoke/ (the default one) or smoke-<scenario>/. Every scenario of the
       # shard runs; the step fails at the end if one did. smoke-results.tsv
@@ -496,6 +501,8 @@ jobs:
           path: |
             smoke*/*.png
             smoke*/app.log
+            smoke*/*.txt
+            smoke*/mosquitto.log
             smoke*/visual_diff/*.png
           retention-days: 14
       - name: Shard summary
