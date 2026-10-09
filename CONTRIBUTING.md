@@ -120,7 +120,7 @@ Each job writes a summary on the run page (`tools/ci_summary.py`): what is being
 | `sysmodule/` | The optional recovery boot sysmodule; shares `source/core/rescue.c` and the pctl calls of `pctl_ops_internal.h` with the app. See [`sysmodule/README.md`](sysmodule/README.md) |
 | `packaging/` | Store and sphaira entries. See [`packaging/README.md`](packaging/README.md) |
 | `branding/` | SVG sources of the icon and banners |
-| `docs/` | [`parental-controls.md`](docs/parental-controls.md): what is known of the parental-control service, the play-timer block and the clocks, and how sure each fact is; [`companion-app.md`](docs/companion-app.md): what PlayGuard covers of Nintendo's phone app, and the gaps still to close |
+| `docs/` | [`parental-controls.md`](docs/parental-controls.md): what is known of the parental-control service, the play-timer block and the clocks, and how sure each fact is; [`companion-app.md`](docs/companion-app.md): what PlayGuard covers of Nintendo's phone app, and the gaps still to close; [`sync-design.md`](docs/sync-design.md) and [`sync-protocol.md`](docs/sync-protocol.md): the design and the wire contract of the optional MQTT agent and Home Assistant link (not implemented yet) |
 
 **Branding:** `branding/*.svg` are rendered to `icon.jpg`, `images/store/*.png`, `images/social-preview.png` (the repository's social preview) and `resources/img/wordmark.png` (the loading screen's) by `node tools/render_branding.mjs` (Node + Playwright).
 
