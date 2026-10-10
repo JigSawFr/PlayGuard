@@ -112,6 +112,7 @@ Set in *About*.
 | `support_reminder` | boolean | *Support PlayGuard* once a month at start-up (Preferences) | `true` |
 | `support_reminded` | string | `"YYYY-MM-DD"` of the last reminder; anything else is cleared | `""` |
 | `seen_version` | string | the version whose *What's new* was shown; at most 32 characters | `""` |
+| `agent_update_skipped` | string | the SHA-256 of the remote link agent PlayGuard carries that the offer to update the installed one was answered *Later* to: not offered again at start-up for that build (*Tools › Optional modules* still offers it); at most 64 characters | `""` |
 | `notices_system` | boolean | the notification bell shows newer Atmosphère, hekate and firmware releases (*Preferences › Notifications*) | `true` |
 | `notices_summary` | boolean | the bell shows the week's play time and a limit passed on several days | `true` |
 | `notices_reminders` | boolean | the bell reminds of a settings backup to make, the other system's parental controls and a console lock on for a week | `true` |
@@ -223,6 +224,7 @@ line; the order does not matter when it reads them:
   "support_reminder": true,
   "support_reminded": "",
   "seen_version": "",
+  "agent_update_skipped": "",
   "crash_seen": "",
   "notices_system": true,
   "notices_summary": true,

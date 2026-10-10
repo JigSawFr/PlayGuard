@@ -139,6 +139,7 @@ void sanitize(Config& c)
         c.update_snooze_version.clear(), c.update_snooze_until.clear();
     if (!is_date(c.support_reminded)) c.support_reminded.clear();
     if (c.seen_version.size() > 32) c.seen_version.clear();
+    if (c.agent_update_skipped.size() > 64) c.agent_update_skipped.clear();
     if (c.crash_seen.size() > 64) c.crash_seen.clear();
     if (!is_date(c.summary_seen)) c.summary_seen.clear();
     if (!is_date(c.console_lock_since)) c.console_lock_since.clear();
@@ -276,6 +277,7 @@ static void load_shared()
     read_bool(j, "support_reminder", c.support_reminder);
     read_string(j, "support_reminded", c.support_reminded);
     read_string(j, "seen_version", c.seen_version);
+    read_string(j, "agent_update_skipped", c.agent_update_skipped);
     read_string(j, "crash_seen", c.crash_seen);
     read_bool(j, "notices_system", c.notices_system);
     read_bool(j, "notices_summary", c.notices_summary);
@@ -388,6 +390,7 @@ bool snapshot(Snapshot& snap)
     j["support_reminder"] = s_config.support_reminder;
     j["support_reminded"] = s_config.support_reminded;
     j["seen_version"]    = s_config.seen_version;
+    j["agent_update_skipped"] = s_config.agent_update_skipped;
     j["crash_seen"]      = s_config.crash_seen;
     j["notices_system"]    = s_config.notices_system;
     j["notices_summary"]   = s_config.notices_summary;

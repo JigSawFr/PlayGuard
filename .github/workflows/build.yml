@@ -195,7 +195,7 @@ jobs:
           # The remote link against a real broker (Mosquitto) and a simulated
           # agent sysmodule.
           - shard: link
-            scenarios: sync agent
+            scenarios: sync agent agent-update agent-rollback
             packages: mosquitto mosquitto-clients
           - shard: outside
             scenarios: outside sysnotes

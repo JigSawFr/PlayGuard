@@ -69,6 +69,10 @@ struct Config
     bool        support_reminder = true;
     std::string support_reminded;
     std::string seen_version;
+    // The agent sysmodule PlayGuard carries (its SHA-256) that the parent
+    // answered "Later" to at start-up: not offered again at start (Tools ›
+    // Optional modules still offers it).
+    std::string agent_update_skipped;
 
     // The newest crash file (logs/crashes/) the notification bell told about:
     // a newer one means PlayGuard closed unexpectedly since.

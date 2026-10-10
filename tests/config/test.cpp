@@ -242,6 +242,7 @@ static void test_preferences()
     CHECK(!d.update_daily && d.update_checked.empty() && !d.clock_check_at_start && d.pin_lock == "changes");
     CHECK(d.onboarding_at_start && d.intro && d.dev_builds_order == "newest");
     CHECK(d.support_reminder && d.support_reminded.empty() && d.seen_version.empty());
+    CHECK(d.agent_update_skipped.empty());
     write_config(R"({"support_reminder": false, "support_reminded": "2026-10-09", "seen_version": "1.1.0"})");
     config::load();
     CHECK(!config::get().support_reminder && config::get().support_reminded == "2026-10-09");
@@ -342,6 +343,7 @@ static void test_preferences()
     config::get().logs_keep_mb = 20;
     config::get().support_reminder = false;
     config::get().seen_version = "1.2.0";
+    config::get().agent_update_skipped = std::string(64, 'a');
     CHECK(config::save());
     config::get() = config::Config{};
     config::load();
@@ -349,6 +351,10 @@ static void test_preferences()
     CHECK(config::get().backup_keep == 20);
     CHECK(config::get().logs_keep == 50 && config::get().logs_keep_days == 365 && config::get().logs_keep_mb == 20);
     CHECK(!config::get().support_reminder && config::get().seen_version == "1.2.0");
+    CHECK(config::get().agent_update_skipped == std::string(64, 'a'));
+    write_config(R"({"agent_update_skipped": ")" + std::string(65, 'b') + R"("})");
+    config::load();
+    CHECK(config::get().agent_update_skipped.empty());
 }
 
 static void test_tmp_recovery()
