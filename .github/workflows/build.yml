@@ -191,7 +191,7 @@ jobs:
           - shard: states
             scenarios: gate errors rescue forged lock loading alarm
           - shard: developer
-            scenarios: devbuild update library rollback
+            scenarios: devbuild update library rollback modules
           # The remote link against a real broker (Mosquitto).
           - shard: link
             scenarios: sync
@@ -388,7 +388,9 @@ jobs:
           # PlayGuard's warnings as errors, as on the desktop: the libnx code
           # (source/core/*.c, the __SWITCH__ paths) is only built here.
           make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
-          # The optional recovery sysmodule, as its own asset (sysmodule/).
+          # make dist builds the optional sysmodules first and bundles them in
+          # the romfs (Tools › Optional modules); the recovery one is also its
+          # own asset (sysmodule/rescue/).
           make dist-rescue
           # This build's hit rate, for the summary (the second build below hits every time).
           ccache --print-stats > ccache-stats.txt
@@ -413,7 +415,7 @@ jobs:
             exit 1
           fi
           # The raw sysmodule next to its zip, for the rescue artifact.
-          cp sysmodule/out/playguard-rescue.nsp playguard-rescue.nsp
+          cp sysmodule/rescue/out/playguard-rescue.nsp playguard-rescue.nsp
       - name: Both builds, when they differ
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -435,7 +437,7 @@ jobs:
             exit 1
           fi
           # libnx's 21.0.0 marker (LNY2 after MOD0), which hbmenu checks.
-          python3 tools/check_nro.py playguard.nro sysmodule/out/playguard-rescue.elf
+          python3 tools/check_nro.py playguard.nro sysmodule/rescue/out/playguard-rescue.elf
       - name: compat.json
         run: python3 tools/gen_compat.py . compat.json
       - name: Build identity

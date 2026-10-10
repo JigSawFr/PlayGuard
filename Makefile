@@ -44,7 +44,9 @@ SYNC_PURE := source/sync/sync_json.c source/sync/mqtt_packet.c source/sync/sync_
 
 RENDERER := $(if $(GL),-DUSE_DEKO3D=OFF,-DUSE_DEKO3D=ON)
 
-all:
+# The optional sysmodules first: the .nro carries them in its romfs, so
+# Tools › Optional modules can install them (CMakeLists.txt, cmake/bundle_sysmodules.cmake).
+all: rescue
 	@cmake -B $(BUILD) -S . -DPLATFORM_SWITCH=ON $(RENDERER) $(CMAKE_ARGS)
 	@cmake --build $(BUILD) --target $(TARGET).nro -j $(JOBS)
 	@cp $(BUILD)/$(TARGET).nro  $(TARGET).nro
@@ -62,23 +64,25 @@ dist: all
 	@cp packaging/sphaira/$(TARGET).json out/config/sphaira/github/
 	@cd out && $(ZIP_TREE) ../$(TARGET).zip
 
-# The optional recovery sysmodule (sysmodule/), as its own asset so it is a
-# deliberate install, never part of the default one. The zip drops into the
-# SD-card root: Atmosphère runs 4200000000505247 at boot (the boot2.flag).
+# The optional recovery sysmodule (sysmodule/rescue/), as its own asset so it
+# is a deliberate install, never part of the default one. The zip drops into
+# the SD-card root: Atmosphère runs 4200000000505247 at boot (the boot2.flag).
 RESCUE_TID := 4200000000505247
 # playguard-rescue.txt next to the module: the PlayGuard version it comes
 # with and its revision (tools/rescue_rev.cmake), which the app compares with
 # its own to tell a module out of date (action/rescue.hpp).
 RESCUE_VERSION := $(shell sed -n 's/^set(VERSION_[A-Z]* "\([0-9]*\)").*/\1/p' CMakeLists.txt | paste -sd.)
 rescue:
-	@$(MAKE) --no-print-directory -C sysmodule
+	@$(MAKE) --no-print-directory -C sysmodule/rescue
 
 dist-rescue: rescue
 	@echo making rescue dist ...
 	@rm -rf out-rescue/ playguard-rescue.zip
 	@mkdir -p out-rescue/atmosphere/contents/$(RESCUE_TID)/flags
-	@cp sysmodule/out/playguard-rescue.nsp out-rescue/atmosphere/contents/$(RESCUE_TID)/exefs.nsp
+	@cp sysmodule/rescue/out/playguard-rescue.nsp out-rescue/atmosphere/contents/$(RESCUE_TID)/exefs.nsp
 	@touch out-rescue/atmosphere/contents/$(RESCUE_TID)/flags/boot2.flag
+	@printf '{\n  "name": "PlayGuard rescue",\n  "tid": "%s",\n  "requires_reboot": true\n}\n' $(RESCUE_TID) \
+		> out-rescue/atmosphere/contents/$(RESCUE_TID)/toolbox.json
 	@cp LICENSE out-rescue/atmosphere/contents/$(RESCUE_TID)/LICENSE.txt
 	@printf '%s %s\n' '$(RESCUE_VERSION)' "$$(cmake -DROOT=$(CURDIR) -P tools/rescue_rev.cmake)" > out-rescue/atmosphere/contents/$(RESCUE_TID)/playguard-rescue.txt
 	@cd out-rescue && $(ZIP_TREE) ../playguard-rescue.zip
@@ -212,6 +216,8 @@ crash_dump_SRC   := source/util/crash_dump.c tests/crash_dump/test.c
 crash_dump_FLAGS := -std=c11 -Isource/util
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
 log_files_FLAGS := -std=c++17 -Isource
+modules_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/modules.cpp tests/modules/test.cpp
+modules_FLAGS := -std=c++17 -Isource
 # The remote link's files on the SD card; its C parts as objects (_OBJS), as
 # g++ would build a .c as C++.
 sync_files_SRC   := source/util/paths.cpp source/util/config.cpp source/util/profiles.cpp source/util/sync_files.cpp tests/sync_files/test.cpp
@@ -283,7 +289,7 @@ check: test
 clean:
 	@echo clean ...
 	@rm -rf $(BUILD) $(DESKTOP) out out-rescue $(TARGET).zip playguard-rescue.zip $(TARGET).nro $(TARGET).nacp $(TARGET).elf
-	@$(MAKE) --no-print-directory -C sysmodule clean 2>/dev/null || true
+	@$(MAKE) --no-print-directory -C sysmodule/rescue clean 2>/dev/null || true
 
 nxlink: all
 	nxlink $(BUILD)/$(TARGET).nro

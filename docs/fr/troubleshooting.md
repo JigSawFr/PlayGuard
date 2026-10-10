@@ -18,7 +18,7 @@ Vous connaissez le code PIN, mais l'application mobile de l'ancien propriétaire
 
 ### Le minuteur bloque tout (limite à 0 min) et le code PIN est oublié
 
-PlayGuard lui-même ne peut pas démarrer. Installez **à l'avance** le module système de récupération optionnel (`playguard-rescue.zip`) ; une fois bloqué, déposez un fichier vide `config/playguard/RESCUE` sur la carte SD et démarrez — il déverrouille la console pour que PlayGuard puisse s'ouvrir. Voir [`sysmodule/README.md`](../../sysmodule/README.md) (en anglais).
+PlayGuard lui-même ne peut pas démarrer. Installez **à l'avance** le module système de récupération optionnel (*Outils › Modules facultatifs*, ou `playguard-rescue.zip` à la main) ; une fois bloqué, déposez un fichier vide `config/playguard/RESCUE` sur la carte SD et démarrez — il déverrouille la console pour que PlayGuard puisse s'ouvrir. Voir [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md) (en anglais).
 
 ### Console non modifiée
 

@@ -10,7 +10,7 @@ Pick one:
 - **sphaira › GitHub** — The release zip already contains the entry (`/config/sphaira/github/playguard.json`): after a first install, update from *GitHub* in sphaira.
 - **Manual** — Download `playguard.zip` from the [latest release](https://github.com/JigSawFr/PlayGuard/releases/latest) and extract it to the **root** of the SD card. The app lands in `sd:/switch/playguard/`, its files in `sd:/config/playguard/`.
 
-The optional **recovery sysmodule** (`playguard-rescue.zip`) is a separate download — see [Locked out?](troubleshooting.md#locked-out).
+The optional **recovery sysmodule** is installed from PlayGuard (*Tools › Optional modules*, or *Security & app › Locked out?*), or by hand from its own download (`playguard-rescue.zip`) — see [Locked out?](troubleshooting.md#locked-out).
 
 ## Files on the SD card
 

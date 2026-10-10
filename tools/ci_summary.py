@@ -618,7 +618,7 @@ def main():
     p.add_argument("--nro", default="playguard.nro")
     p.add_argument("--zip", default="playguard.zip")
     p.add_argument("--rescue-zip", default="playguard-rescue.zip")
-    p.add_argument("--rescue-nsp", default="sysmodule/out/playguard-rescue.nsp")
+    p.add_argument("--rescue-nsp", default="sysmodule/rescue/out/playguard-rescue.nsp")
     p.add_argument("--toolchain", default="toolchain.txt")
     p.add_argument("--build-info", default="build-info.txt")
     p.add_argument("--sums", default="SHA256SUMS.txt")

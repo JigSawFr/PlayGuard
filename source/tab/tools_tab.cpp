@@ -20,6 +20,7 @@
 #include "activity/firmware_gate_activity.hpp"
 #include "activity/game_check_activity.hpp"
 #include "activity/history_activity.hpp"
+#include "activity/modules_activity.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
@@ -88,6 +89,10 @@ ToolsTab::ToolsTab()
     });
     history->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new HistoryActivity());
+        return true;
+    });
+    modules_cell->registerClickAction([](brls::View*) {
+        brls::Application::pushActivity(new ModulesActivity());
         return true;
     });
 
@@ -276,6 +281,10 @@ void ToolsTab::refresh()
     backup_restore->setDetailText(backups ? brls::getStr("playguard/tools/backup_count", (int)backups) : "");
     const size_t changes = history_flow::load().size();
     history->setDetailText(changes ? brls::getStr("playguard/history/count", (int)changes) : "");
+    int installed = 0;
+    for (const auto& m : modules::all()) installed += modules::state(paths::sd_root(), m).installed ? 1 : 0;
+    modules_cell->setDetailText(installed ? brls::getStr("playguard/modules/count", installed)
+                                          : "playguard/modules/state/none"_i18n);
 
     SysInfo si;
     sysinfo_get(&si);
