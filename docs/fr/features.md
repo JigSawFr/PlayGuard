@@ -440,7 +440,7 @@ Sur une console sans Internet, *Régler l'horloge réseau sur l'horloge de la co
 - Les messages qu'il affiche :
   - Les types de notifications (voir [plus haut](#comportement-des-entrées)).
   - Un **rappel mensuel pour soutenir PlayGuard** (activé par défaut, jamais le premier mois ni juste après une mise à jour ; *Ne plus afficher* sur le rappel ou cet interrupteur le désactive pour de bon, mises à jour comprises).
-- **Accès à distance (MQTT / Home Assistant) :** le broker, le nom de la console, que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, l'état en direct, *Synchroniser maintenant* et le journal. Voir [le guide Home Assistant](../home-assistant.fr.md).
+- **Accès à distance (MQTT / Home Assistant) :** le broker et sa version MQTT, le nom de la console, que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, l'état en direct, *Synchroniser maintenant* et le journal. Voir [le guide Home Assistant](../home-assistant.fr.md).
 - Un réglage qui ne concerne qu'une fonction est à côté d'elle : le temps en plus dans *Temps de jeu*, la réactivation dans *Code PIN*, la vérification de l'horloge dans *Console › Horloge réseau*. Les mises à jour et *Aide et diagnostic* sont dans *À propos*.
 
 ## À propos
