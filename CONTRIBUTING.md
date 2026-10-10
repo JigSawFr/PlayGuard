@@ -15,6 +15,7 @@ Two minutes, if your console is still linked to the phone app: *Security & app �
 | `make` | `./playguard.nro` — drawn with deko3d (`GL=1` for OpenGL) | devkitPro `switch-dev`, `DEVKITPRO` set |
 | `make dist` | `./playguard.zip` (SD-card layout) | as above |
 | `make dist-rescue` | `./playguard-rescue.zip`, the optional recovery sysmodule (`make` also builds it and bundles it in the romfs, for *Tools › Optional modules*) | as above |
+| `make dist-agent` | `./playguard-agent.zip`, the optional remote-link agent (bundled the same way) | as above |
 | `./run.sh [ip]` | Builds in the `devkitpro/devkita64` Docker image, at the digest CI uses (read from `build.yml`), optionally `nxlink`s to a console | Docker |
 
 Clone with submodules (`git clone --recursive`, or `git submodule update --init`): borealis is pinned at `extern/borealis/`.
@@ -71,7 +72,7 @@ Game patches are read from `./playguard_data/sd/`, the simulated SD card root.
 
 ## Tests and CI
 
-- `make test` — host unit tests (`tests/`, see [`tests/README.md`](tests/README.md)), including the recovery sysmodule logic (`tests/rescue/`) and the remote link (`tests/sync_*`); every suite runs, in parallel, and leaves its output in `build/host-tests/<suite>.log`.
+- `make test` — host unit tests (`tests/`, see [`tests/README.md`](tests/README.md)), including the recovery sysmodule logic (`tests/rescue/`), the remote link (`tests/sync_*`) and the agent (`tests/agent/`); every suite runs, in parallel, and leaves its output in `build/host-tests/<suite>.log`.
 - `make check` — `make test`, then the resource check, the remote link's JSON documents (`tools/check_sync_json.py`) and `compat.json`.
 - `tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|update|library|outside|alarm|loading|sysnotes|sync|modules]` — clicks through every screen of the desktop build headlessly (needs `DISPLAY`, `xdotool`, ImageMagick) and saves screenshots. The `gate` scenario covers the firmware screen and developer mode on a simulated 24.0.0; `errors` covers a failed unlock and an unsettable clock; `rescue` the recovery screen, then quitting while still unlocked; `forged` a rescue report the console does not confirm (no action, the lock screen first); `lock` the lock screen of *Ask for the PIN › To open PlayGuard*; `library` a large library in Activity (its first 50 games, then *Show every game*); `devbuild` signing in to a simulated GitHub and installing a pull request's build in place out of its artifact; `alarm` the Overview and the Play timer tab past the limit while the console only warns; `sysnotes` the release notes of the firmware, Atmosphère and hekate from *Tools › Console*, against a simulated GitHub and switchbrew. `outside` the Overview's notices: changes made outside PlayGuard (a play time that started over, the clock, the limits) and, after 90 s on screen, a console that is not counting play time (it takes about two minutes). `sync` the remote link against a local Mosquitto (needs `mosquitto` and `mosquitto-clients`): what it publishes, an order applied and one refused, Home Assistant restarting, and `offline` at exit; `modules` installing, turning off at boot and removing the recovery module.
 - `tools/visual_check.py` — compares those screenshots with the references in `tests/visual/`. A screen that changed fails CI; see [`tests/visual/README.md`](tests/visual/README.md) to update them.
@@ -95,10 +96,10 @@ Each job writes a summary on the run page (`tools/ci_summary.py`): what is being
 | `source/sync/` | C, no allocation: the optional remote link (MQTT client, Home Assistant discovery, orders and their execution), shared with the agent sysmodule. See [`docs/sync-design.md`](docs/sync-design.md) |
 | `source/sim/` | The simulated console for the desktop build |
 | `resources/` | XML layouts and `i18n/<language>/playguard.json` |
-| `sysmodule/` | The optional sysmodules, built with `sysmodule/common.mk`: `rescue/` (recovery at boot; shares `source/core/rescue.c` with the app). See [`sysmodule/README.md`](sysmodule/README.md) |
+| `sysmodule/` | The optional sysmodules, built with `sysmodule/common.mk`: `rescue/` (recovery at boot; shares `source/core/rescue.c` with the app) and `agent/` (the remote link in the background; links `source/core/` and `source/sync/`). See [`sysmodule/README.md`](sysmodule/README.md) |
 | `packaging/` | Store and sphaira entries. See [`packaging/README.md`](packaging/README.md) |
 | `branding/` | SVG sources of the icon and banners |
-| `docs/` | [`parental-controls.md`](docs/parental-controls.md): what is known of the parental-control service, the play-timer block and the clocks, and how sure each fact is; [`companion-app.md`](docs/companion-app.md): what PlayGuard covers of Nintendo's phone app, and the gaps still to close; [`sync-design.md`](docs/sync-design.md) and [`sync-protocol.md`](docs/sync-protocol.md): the design and the wire contract of the optional remote link (MQTT, Home Assistant): PlayGuard's side is implemented, the agent sysmodule is not yet; [`home-assistant.md`](docs/home-assistant.md) (and `.fr.md`): the user guide |
+| `docs/` | [`parental-controls.md`](docs/parental-controls.md): what is known of the parental-control service, the play-timer block and the clocks, and how sure each fact is; [`companion-app.md`](docs/companion-app.md): what PlayGuard covers of Nintendo's phone app, and the gaps still to close; [`sync-design.md`](docs/sync-design.md) and [`sync-protocol.md`](docs/sync-protocol.md): the design and the wire contract of the optional remote link (MQTT, Home Assistant), PlayGuard's side and the agent sysmodule; [`home-assistant.md`](docs/home-assistant.md) (and `.fr.md`): the user guide |
 
 **Branding:** `branding/*.svg` are rendered to `icon.jpg`, `images/store/*.png`, `images/social-preview.png` (the repository's social preview) and `resources/img/wordmark.png` (the loading screen's) by `node tools/render_branding.mjs` (Node + Playwright).
 

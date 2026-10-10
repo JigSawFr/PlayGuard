@@ -57,7 +57,7 @@ PlayGuard pilote le contrôle parental intégré à la console (le service `pctl
 
 - **Limite de temps de jeu** — PlayGuard : Une pour la console (le minuteur de la console). Un sysmodule de remplacement : Une par compte utilisateur.
 - **Code PIN, avertissements, suspension** — PlayGuard : Ceux de la console. Un sysmodule de remplacement : Les siens.
-- **En arrière-plan** — PlayGuard : Rien (le module de récupération optionnel n'agit qu'au démarrage, quand un fichier `RESCUE` le demande). Un sysmodule de remplacement : Un sysmodule, dès le démarrage.
+- **En arrière-plan** — PlayGuard : Rien (le module de récupération optionnel n'agit qu'au démarrage, quand un fichier `RESCUE` le demande ; l'agent du lien Home Assistant, facultatif lui aussi, ne fonctionne qu'une fois installé). Un sysmodule de remplacement : Un sysmodule, dès le démarrage.
 - **Après une mise à jour du firmware** — PlayGuard : Le contrôle de la console continue de fonctionner ; PlayGuard s'ouvre en lecture seule jusqu'à une version qui prend le firmware en charge. Un sysmodule de remplacement : Le contrôle dépend du bon fonctionnement du sysmodule.
 - **Supprimé de la carte SD** — PlayGuard : Les limites restent sur la console. Un sysmodule de remplacement : Le contrôle disparaît avec lui.
 

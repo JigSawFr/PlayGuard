@@ -40,13 +40,13 @@ JSON_HPP := extern/borealis/library/include/borealis/extern/nlohmann/json.hpp
 SYNC_PURE := source/sync/sync_json.c source/sync/mqtt_packet.c source/sync/sync_conf.c source/sync/sync_apply.c \
              source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c
 
-.PHONY: all clean dist nxlink desktop test check rescue dist-rescue FORCE
+.PHONY: all clean dist nxlink desktop test check rescue dist-rescue agent dist-agent FORCE
 
 RENDERER := $(if $(GL),-DUSE_DEKO3D=OFF,-DUSE_DEKO3D=ON)
 
 # The optional sysmodules first: the .nro carries them in its romfs, so
 # Tools › Optional modules can install them (CMakeLists.txt, cmake/bundle_sysmodules.cmake).
-all: rescue
+all: rescue agent
 	@cmake -B $(BUILD) -S . -DPLATFORM_SWITCH=ON $(RENDERER) $(CMAKE_ARGS)
 	@cmake --build $(BUILD) --target $(TARGET).nro -j $(JOBS)
 	@cp $(BUILD)/$(TARGET).nro  $(TARGET).nro
@@ -86,6 +86,23 @@ dist-rescue: rescue
 	@cp LICENSE out-rescue/atmosphere/contents/$(RESCUE_TID)/LICENSE.txt
 	@printf '%s %s\n' '$(RESCUE_VERSION)' "$$(cmake -DROOT=$(CURDIR) -P tools/rescue_rev.cmake)" > out-rescue/atmosphere/contents/$(RESCUE_TID)/playguard-rescue.txt
 	@cd out-rescue && $(ZIP_TREE) ../playguard-rescue.zip
+
+# The optional remote-link agent (sysmodule/agent/): its own asset too. It
+# starts at boot (boot2.flag) and can be started or stopped without a reboot.
+AGENT_TID := 4200000000504741
+agent:
+	@$(MAKE) --no-print-directory -C sysmodule/agent
+
+dist-agent: agent
+	@echo making agent dist ...
+	@rm -rf out-agent/ playguard-agent.zip
+	@mkdir -p out-agent/atmosphere/contents/$(AGENT_TID)/flags
+	@cp sysmodule/agent/out/playguard-agent.nsp out-agent/atmosphere/contents/$(AGENT_TID)/exefs.nsp
+	@touch out-agent/atmosphere/contents/$(AGENT_TID)/flags/boot2.flag
+	@printf '{\n  "name": "PlayGuard agent",\n  "tid": "%s",\n  "requires_reboot": false\n}\n' $(AGENT_TID) \
+		> out-agent/atmosphere/contents/$(AGENT_TID)/toolbox.json
+	@cp LICENSE out-agent/atmosphere/contents/$(AGENT_TID)/LICENSE.txt
+	@cd out-agent && $(ZIP_TREE) ../playguard-agent.zip
 
 desktop:
 	@cmake -B $(DESKTOP) -S . -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release $(CMAKE_ARGS)
@@ -224,8 +241,8 @@ sync_files_SRC   := source/util/paths.cpp source/util/config.cpp source/util/pro
 sync_files_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 sync_files_OBJS  := $(TESTOUT)/c/sync_conf.o $(TESTOUT)/c/sync_records.o
 
-# C: the remote link (source/sync/). sync_core writes the documents it builds
-# (_ARGS: where) for tools/check_sync_json.py.
+# C: the remote link (source/sync/) and the agent sysmodule's core. sync_core
+# writes the documents it builds (_ARGS: where) for tools/check_sync_json.py.
 sync_core_SRC   := $(SYNC_PURE) tests/sync_core/test.c
 sync_core_FLAGS := -std=gnu11 -Isource/sync -Isource/core
 sync_core_ARGS  := $(TESTOUT)/sync
@@ -233,13 +250,15 @@ sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/write_g
 sync_exec_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -Isource/sync
 sync_engine_SRC   := $(SYNC_PURE) source/sync/mqtt_client.c source/sync/sync_engine.c tests/sync_engine/test.c
 sync_engine_FLAGS := -std=gnu11 -Isource/sync -Isource/core
+agent_SRC   := sysmodule/agent/source/agent_core.c source/sync/sync_conf.c source/sync/sync_records.c tests/agent/test.c
+agent_FLAGS := -std=gnu11 -Isource/sync -Isource/core -Isysmodule/agent/source
 
 TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))
 TEST_PROGRAMS := $(addprefix $(TESTOUT)/,$(TESTS))
 TEST_OKS := $(addsuffix .ok,$(TEST_PROGRAMS))
 # Every header: a suite is rebuilt when one changes (coarse, but a suite
 # compiles in seconds and CI always starts cold).
-TEST_HEADERS := $(wildcard tests/check.h tests/*/*.h source/*.hpp source/*/*.h source/*/*.hpp)
+TEST_HEADERS := $(wildcard tests/check.h tests/*/*.h source/*.hpp source/*/*.h source/*/*.hpp sysmodule/*/source/*.h)
 
 $(TESTOUT):
 	@mkdir -p $@
@@ -288,8 +307,9 @@ check: test
 
 clean:
 	@echo clean ...
-	@rm -rf $(BUILD) $(DESKTOP) out out-rescue $(TARGET).zip playguard-rescue.zip $(TARGET).nro $(TARGET).nacp $(TARGET).elf
+	@rm -rf $(BUILD) $(DESKTOP) out out-rescue out-agent $(TARGET).zip playguard-rescue.zip playguard-agent.zip $(TARGET).nro $(TARGET).nacp $(TARGET).elf
 	@$(MAKE) --no-print-directory -C sysmodule/rescue clean 2>/dev/null || true
+	@$(MAKE) --no-print-directory -C sysmodule/agent clean 2>/dev/null || true
 
 nxlink: all
 	nxlink $(BUILD)/$(TARGET).nro
