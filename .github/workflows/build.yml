@@ -192,9 +192,10 @@ jobs:
             scenarios: gate errors rescue forged lock loading alarm
           - shard: developer
             scenarios: devbuild update library rollback modules
-          # The remote link against a real broker (Mosquitto).
+          # The remote link against a real broker (Mosquitto) and a simulated
+          # agent sysmodule.
           - shard: link
-            scenarios: sync
+            scenarios: sync agent
             packages: mosquitto mosquitto-clients
           - shard: outside
             scenarios: outside sysnotes
