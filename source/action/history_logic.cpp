@@ -89,7 +89,7 @@ const char* const KINDS[] = { "limits", "level", "custom", "org", "vr", "alarm",
                               "console_lock", "bedtime", "config_reset", "outside_reset", "outside_clock",
                               "outside_limits", "new_account", "time_up", "countdown", "remove_game",
                               "remove_update", "remove_addon", "launch_version", "add_forwarder",
-                              "remove_forwarder", "protect_forwarder", "unprotect_forwarder" };
+                              "remove_forwarder", "protect_forwarder", "unprotect_forwarder", "module" };
 const char* const SOURCES[] = { "uniform", "day", "per_day", "extra", "stop", "restore_extra", "bonus", "restore_bonus", "schedule_end",
                                 "remove", "backup", "undo", "first_steps", "overview", "console_lock", "notices",
                                 "rescue", "remote", "remote_extra", "remote_stop", "remote_console_lock",

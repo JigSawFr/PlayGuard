@@ -389,9 +389,10 @@ jobs:
             scenarios: gate outside alarm cadranstates rollback
           - shard: developer
             scenarios: devbuild library update errors sysnotes forwarders
-          # The remote link against a real broker (Mosquitto).
+          # The remote link against a real broker (Mosquitto), and the optional
+          # modules.
           - shard: link
-            scenarios: sync
+            scenarios: sync modules
             packages: mosquitto mosquitto-clients
           # Every Cadran tab in the 15 languages, normal and larger text: no
           # text cut short (tools/cut_text_check.py, tests/cut_text/), five
@@ -609,7 +610,9 @@ jobs:
           # PlayGuard's warnings as errors, as on the desktop: the libnx code
           # (source/core/*.c, the __SWITCH__ paths) is only built here.
           make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
-          # The optional recovery sysmodule, as its own asset (sysmodule/).
+          # make dist builds the optional sysmodules first and bundles them in
+          # the romfs (Console › Optional modules); the recovery one is also its
+          # own asset (sysmodule/rescue/).
           make dist-rescue
           # This build's hit rate, for the summary (the second build below hits every time).
           ccache --print-stats > ccache-stats.txt
@@ -636,7 +639,7 @@ jobs:
             fi
           fi
           # The raw sysmodule next to its zip, for the rescue artifact.
-          cp sysmodule/out/playguard-rescue.nsp playguard-rescue.nsp
+          cp sysmodule/rescue/out/playguard-rescue.nsp playguard-rescue.nsp
           # Only what these builds used goes back to the cache (a hit refreshes
           # an object's date), not 350 MB of builds gone by.
           ccache --evict-older-than "$(( $(date +%s) - start + 60 ))s"
@@ -661,7 +664,7 @@ jobs:
             exit 1
           fi
           # libnx's 21.0.0 marker (LNY2 after MOD0), which hbmenu checks.
-          python3 tools/check_nro.py playguard.nro sysmodule/out/playguard-rescue.elf
+          python3 tools/check_nro.py playguard.nro sysmodule/rescue/out/playguard-rescue.elf
       - name: compat.json
         run: python3 tools/gen_compat.py . compat.json
       - name: Build identity

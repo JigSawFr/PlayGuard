@@ -95,8 +95,13 @@ cleared, new state, change history), refuse one out of range, publish the
 discovery again when Home Assistant says it restarted, show the link online
 in Preferences › Remote access, and leave "offline" behind at exit.
 
+The "modules" scenario carries a made-up recovery module
+(PLAYGUARD_SIM_BUNDLED): from PIN › Locked out?, it must be installed on
+the simulated SD card (exefs.nsp, boot2.flag, toolbox.json, version.txt), its
+start at boot turned off, then removed, each change in the history.
+
 Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge|forwarders|
-       sync]   (needs DISPLAY, xdotool, ImageMagick)
+       sync|modules]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -135,6 +140,7 @@ CADRANUNLOCKED = SCENARIO == "cadranunlocked"
 CADRANLARGE = SCENARIO == "cadranlarge"
 FORWARDERS = SCENARIO == "forwarders"
 SYNC = SCENARIO == "sync"
+MODULES = SCENARIO == "modules"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
@@ -145,7 +151,7 @@ nand_dir = os.path.join(run_dir, "playguard_data", "nand", "sysmmc")
 games_cache = os.path.join(nand_dir, "cache", "games.bin")
 if os.path.exists(games_cache):
     os.remove(games_cache)   # Installed games: the first check is this run's
-if (GATE or ERRORS or DEVBUILD or UPDATE or SYNC) and os.path.exists(config_file):
+if (GATE or ERRORS or DEVBUILD or UPDATE or SYNC or MODULES) and os.path.exists(config_file):
     os.remove(config_file)   # no remembered choice, developer mode off
 if DEVBUILD:
     # The pull requests by number (Y on the builds' screen; the keyboard has no Y).
@@ -336,7 +342,23 @@ if SYNC:
     history = os.path.join(nand_dir, "history.json")
     if os.path.exists(history):
         os.remove(history)   # the remote change must be the only entry
-if not GATE and not ERRORS and not DEVBUILD and not UPDATE and not SYNC:
+RESCUE_DIR = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "contents", "4200000000505247")
+if MODULES:
+    import hashlib
+    import shutil
+    # What a Switch build carries in its romfs (cmake/bundle_sysmodules.cmake).
+    bundle = os.path.join(OUT, "bundle")
+    nsp = b"PFS0" + b"made-up recovery module" * 64
+    os.makedirs(os.path.join(bundle, "rescue"), exist_ok=True)
+    open(os.path.join(bundle, "rescue", "exefs.nsp"), "wb").write(nsp)
+    open(os.path.join(bundle, "rescue", "version.txt"), "w").write(
+        f"version=9.8.7\ncommit=smoke00\nsha256={hashlib.sha256(nsp).hexdigest()}\n")
+    env.setdefault("PLAYGUARD_SIM_BUNDLED", bundle)
+    shutil.rmtree(RESCUE_DIR, ignore_errors=True)
+    history = os.path.join(nand_dir, "history.json")
+    if os.path.exists(history):
+        os.remove(history)
+if not GATE and not ERRORS and not DEVBUILD and not UPDATE and not SYNC and not MODULES:
     env.setdefault("PLAYGUARD_SIM_PASTE", "https://gist.github.com/smoke/ab12")   # what GitHub answers
     github_token = os.path.join(run_dir, "playguard_data", "github_token")
     if os.path.exists(github_token):
@@ -1197,6 +1219,50 @@ if SYNC:
             fail("no toast for the remote order; messages: " + repr(messages()))
         wait_for("availability offline at exit", lambda: mqtt_get(f"{BASE}/availability") == "offline", 15, False)
     finish(checked)
+if MODULES:
+    key("Down", steps("dashboard", "security"))
+    key("Right")
+    key("Down", 30, hold=0.05)   # Locked out? › Recovery module, the last cell
+    shot("01_security_end")
+    key("Return")
+    shot("02_modules")           # not installed; Install has the focus next
+    key("Down")                  # Install
+    key("Return")
+    shot("03_install")
+    key("Right")                 # Install (Cancel has the focus)
+    key("Return")
+    time.sleep(1)
+    shot("04_installed")
+    for f in ("exefs.nsp", "flags/boot2.flag", "toolbox.json", "version.txt"):
+        if not os.path.exists(os.path.join(RESCUE_DIR, f)):
+            fail("not installed: no " + f)
+    if "version=9.8.7" not in open(os.path.join(RESCUE_DIR, "version.txt")).read():
+        fail("version.txt is not the bundle's")
+    key("Up")                    # State
+    key("Down")                  # Start at boot (Install is gone)
+    key("Return")
+    time.sleep(1)
+    if os.path.exists(os.path.join(RESCUE_DIR, "flags", "boot2.flag")):
+        fail("boot2.flag still there after turning Start at boot off")
+    key("Down")                  # Remove
+    key("Return")
+    shot("05_remove")
+    key("Right")                 # Remove (Cancel has the focus)
+    key("Return")
+    time.sleep(1)
+    shot("06_removed")
+    if os.path.exists(RESCUE_DIR):
+        fail("the module's folder is still there after Remove")
+
+    def recorded():
+        try:
+            entries = json.load(open(os.path.join(nand_dir, "history.json"))).get("entries", [])
+        except (OSError, ValueError) as e:
+            fail(f"no history written: {e}")
+        kinds = [e.get("kind") for e in entries]
+        if kinds.count("module") != 3:
+            fail(f"expected 3 module entries in the history, got {kinds}")
+    finish(recorded)
 def main_opened():
     log.flush()
     return any("main screen opened" in l for l in open(os.path.join(OUT, "app.log"), errors="replace"))

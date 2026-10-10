@@ -128,8 +128,10 @@ static void store(history::Entry e)
     s_changes++;
     // A change PlayGuard made: what it reads next is not a change made
     // outside (the outside_* entries are those, and a new account; a refused
-    // change changed nothing).
-    if (!text::starts_with(e.kind, "outside_") && e.kind != "new_account" && e.result.empty()) outside_watch::own_change();
+    // change changed nothing). An optional module installed or removed
+    // changes nothing it watches.
+    if (!text::starts_with(e.kind, "outside_") && e.kind != "new_account" && e.kind != "module" && e.result.empty())
+        outside_watch::own_change();
     e.when = ui::now_stamp();
     e.version = app::version();
     s_last    = e;

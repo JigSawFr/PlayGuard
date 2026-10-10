@@ -302,10 +302,18 @@ DYNAMIC_KEYS = {
     "prefs/effects_values/": array_of("source/util/config.hpp", "EFFECTS"),
     "restrictions/org_where/": array_of("source/tab/restrictions_tab.cpp", "ORG_WHERE"),
     "tools/update_via_values/": array_of("source/action/update_flow.cpp", "METHODS"),
-    # The remote link (sync_activity.cpp, sync_orders.cpp).
+    # The remote link (sync_activity.cpp, sync_orders.cpp) and the optional
+    # modules (modules_activity.cpp).
     "sync/policies/": returned_by("source/sync/sync_conf.c", "sync_policy_name"),
     # "unknown": an enumerator out of range, never in an outcome.
     "sync/reasons/": [r for r in returned_by("source/sync/sync_apply.c", "sync_reason_name") if r != "unknown"],
+    "modules/": [f"{name}/{what}"
+                 for name in re.findall(r'\{\s*Id::\w+,\s*"(\w+)"', read(f"{ROOT}/source/util/modules.cpp"))
+                 for call in re.findall(r"\bkey\(m,\s*([^;)]*)\)", read(f"{ROOT}/source/activity/modules_activity.cpp"))
+                 for what in strings_of(call)],
+    "modules/done/": [v for path in ("source/activity/modules_activity.cpp",)
+                      for call in re.findall(r"\brecord\(([^;{]*?)\);", read(f"{ROOT}/{path}"))
+                      for v in strings_of(call)],
 }
 for prefix, values in sorted(DYNAMIC_KEYS.items()):
     values = [v for v in values if v]

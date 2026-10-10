@@ -334,6 +334,10 @@ Un interrupteur qui met la limite de chaque jour à 0, donc un code PIN est néc
 
 Deux confirmations, irréversible ; une sauvegarde des réglages est d'abord enregistrée.
 
+### Bloqué ?
+
+Installe le module de secours facultatif, pour un code PIN oublié avec une limite de 0 minute.
+
 ## Console — l'horloge réseau, les jeux installés, ce que fait tourner la console
 
 *[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=console)*
@@ -402,6 +406,10 @@ Sur une console sans Internet, *Régler l'horloge réseau sur l'horloge de la co
 - **Compatibilité**, puis **stockage** (emuMMC ou sysMMC, avec une icône d'information quand l'autre système a son propre contrôle parental : Ⓐ explique).
 - Le **masquage du numéro de série** par Atmosphère (en partie caché jusqu'à Ⓐ ; en emuMMC, s'il n'est pas masqué, une icône d'avertissement sur la ligne au-dessus, que Ⓐ explique).
 - **Patchs de jeux** (sys-patch ou fichiers sigpatches, avec une recommandation de sys-patch quand seuls des fichiers sont utilisés : une icône d'information, ou d'avertissement quand quelque chose est à vérifier, que Ⓐ explique).
+
+### Modules facultatifs
+
+*Modules facultatifs ›*, un écran à part, le dernier de l'onglet : installer, mettre à jour, lancer au démarrage ou supprimer le module de secours et l'agent du lien à distance, depuis les copies que contient PlayGuard (sans ordinateur). Chaque modification demande le code PIN quand *Protéger PlayGuard par le code PIN* le prévoit.
 
 ## Historique — modifications et sauvegardes
 

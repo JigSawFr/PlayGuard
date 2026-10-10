@@ -333,6 +333,10 @@ One switch that sets every day's limit to 0, so a PIN is needed to start a game 
 
 Two confirmations, irreversible; a backup of the settings is saved first.
 
+### Locked out?
+
+Installs the optional recovery module, for a forgotten PIN with a 0-minute limit.
+
 ## Console — the network clock, the installed games, what the console runs
 
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=console)*
@@ -401,6 +405,10 @@ On a console without Internet, *Set the network clock to the console clock* appe
 - **Compatibility**, then **storage** (emuMMC or sysMMC, with an info icon when the other system has its own parental controls: Ⓐ explains).
 - Whether Atmosphère **blanks the serial number** (partly hidden until Ⓐ; on emuMMC, when it is not, a warning icon on the row above, which Ⓐ explains).
 - **Game patches** (sys-patch or sigpatch files, recommending sys-patch when only files are used: an info icon, or a warning one when something needs a look, which Ⓐ explains).
+
+### Optional modules
+
+*Optional modules ›*, a screen of its own, last in the tab: install, update, start at boot or remove the recovery module and the remote link's agent, from the copies PlayGuard carries (no computer needed). Every change asks for the PIN when *Protect PlayGuard with the PIN* does.
 
 ## History — changes and backups
 

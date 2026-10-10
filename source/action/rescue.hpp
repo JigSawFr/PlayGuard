@@ -54,8 +54,8 @@ bool outdated();
 // module has run (it removes RESCUE_RESTART_PATH at boot).
 void note_version();
 
-// Whether this build carries its module (romfs:/rescue/exefs.nsp: Switch
-// builds; the desktop one does not).
+// Whether this build carries its module (romfs:/sysmodules/rescue/, the one
+// Console › Optional modules installs: Switch builds; the desktop one does not).
 bool bundled();
 // Replaces the installed module with the bundled one and writes its
 // playguard-rescue.txt (this version, revision()), as extracting the zip

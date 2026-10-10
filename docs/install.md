@@ -10,19 +10,20 @@ Pick one:
 - **sphaira › GitHub** — The release zip already contains the entry (`/config/sphaira/github/playguard.json`): after a first install, update from *GitHub* in sphaira.
 - **Manual** — Download `playguard.zip` from the [latest release](https://github.com/JigSawFr/PlayGuard/releases/latest) and extract it to the **root** of the SD card. The app lands in `sd:/switch/playguard/`, its files in `sd:/config/playguard/`.
 
-The optional **recovery sysmodule** (`playguard-rescue.zip`) is a separate download: extract it to the root of the SD card too, then restart the console. It lands in `atmosphere/contents/4200000000505247/` and only acts when a `RESCUE` file asks it to — see [Locked out?](troubleshooting.md#locked-out).
+The optional **recovery sysmodule** is installed from PlayGuard (*Console › Optional modules*, or *PIN › Locked out?*), or by hand from its own download (`playguard-rescue.zip`): extract it to the root of the SD card too, then restart the console. It lands in `atmosphere/contents/4200000000505247/` and only acts when a `RESCUE` file asks it to — see [Locked out?](troubleshooting.md#locked-out).
 
 Then open PlayGuard **over a game**, with a parent's user ([why](compatibility.md#launchers)).
 
 ## Updating
 
 - **In PlayGuard:** *About › Update with* picks how — in PlayGuard itself (it downloads the release, checks it, replaces itself and restarts), sphaira, the Homebrew App Store or by hand. With *Check for updates every day* on, PlayGuard opens on the new release when there is one.
-- **The recovery sysmodule** follows PlayGuard's version: after each update, extract that release's `playguard-rescue.zip` again (or *Update* on the bell's *The recovery sysmodule is out of date*), then restart the console.
+- **The recovery sysmodule** follows PlayGuard's version: after each update, extract that release's `playguard-rescue.zip` again (or *Update* on the bell's *The recovery sysmodule is out of date*, or in *Console › Optional modules*), then restart the console.
+- **The remote link's agent**, when installed, is offered at the next start when PlayGuard carries a newer one ([Home Assistant](home-assistant.md#keep-the-link-up-when-playguard-is-closed)).
 - Settings, history, profiles and backups stay: they are in `sd:/config/playguard/`, not next to the app.
 
 ## Removing it
 
-Delete `sd:/switch/playguard/` (the app) and, to remove its files too, `sd:/config/playguard/`; with the recovery sysmodule, also `sd:/atmosphere/contents/4200000000505247/`. The limits, the PIN and the restrictions are the console's own: they **stay on the console**. To remove them as well, use *PIN › Delete all parental controls* first.
+Delete `sd:/switch/playguard/` (the app) and, to remove its files too, `sd:/config/playguard/`; with the optional sysmodules, also `sd:/atmosphere/contents/4200000000505247/` (recovery) and `sd:/atmosphere/contents/4200000000504741/` (the agent), or remove them first in *Console › Optional modules*. The limits, the PIN and the restrictions are the console's own: they **stay on the console**. To remove them as well, use *PIN › Delete all parental controls* first.
 
 ## Files on the SD card
 

@@ -56,7 +56,7 @@ The whole walk-through, and the everyday tasks: [getting started](docs/getting-s
 
 - **Website:** [playguard.link](https://playguard.link/) — this documentation in the console's 15 languages, and [PlayGuard in your browser](https://playguard.link/simulator/) against a simulated console
 - **User guide:** [getting started](docs/getting-started.md) · [features](docs/features.md) · [install](docs/install.md) · [compatibility](docs/compatibility.md) · [troubleshooting](docs/troubleshooting.md) · [Home Assistant](docs/home-assistant.md)
-- **Reference:** [companion app](docs/companion-app.md) · [`config.json`](docs/config.md) · [how parental controls work](docs/parental-controls.md) · [recovery sysmodule](sysmodule/README.md)
+- **Reference:** [companion app](docs/companion-app.md) · [`config.json`](docs/config.md) · [how parental controls work](docs/parental-controls.md) · [optional sysmodules](sysmodule/README.md)
 - **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md) · [roadmap](ROADMAP.md) · [changelog](CHANGELOG.md)
 
 ## License and credits
