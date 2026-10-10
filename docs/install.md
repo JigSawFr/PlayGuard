@@ -39,7 +39,7 @@ All in `sd:/config/playguard/` (the app itself stays in `sd:/switch/playguard/`:
 - **`rescue_report.txt`** — Left by the recovery sysmodule after it acted, until PlayGuard shows it at start-up (one it cannot read is removed, and PlayGuard says so)
 - **`rescue_nonce`** — A random challenge the recovery sysmodule answers in its report, so PlayGuard can tell a report it wrote from one written by hand ([sysmodule/README.md](../sysmodule/README.md)); a new one at every start
 - **`sync.conf`** — Only once *Remote access* was set up: the link's settings, the broker's password included (never in a report or an upload)
-- **`sync/`** — Only with *Remote access*: what a future background module will need (records, profiles, game names)
+- **`sync/`** — Only with *Remote access*: what the optional agent reads (records, profiles, game names) and writes (what it changed, its events)
 - **`logs/`** — `reports/` the saved diagnostic reports (never contain the PIN or the serial number); `crashes/` one file per crash (what made PlayGuard stop); `uploads/` one Internet shortcut (`.url`) per report sent online; `play_timer/` the developer tools' play-timer files. How many reports, crash files and links are kept: *About › Help & diagnostics* (by number, age or size; the newest always stays)
 
 More in [packaging/README.md](../packaging/README.md).

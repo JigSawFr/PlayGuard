@@ -75,7 +75,7 @@ PlayGuard drives the parental controls built into the console (the `pctl` servic
 |---|---|---|
 | **Play-time limit** | One for the console (the console's own timer) | One per user account |
 | **PIN, warnings, suspension** | The console's | Its own |
-| **In the background** | Nothing (the optional recovery sysmodule only acts at boot, when a `RESCUE` file asks it to) | A sysmodule, from boot |
+| **In the background** | Nothing (the optional recovery sysmodule only acts at boot, when a `RESCUE` file asks it to; the Home Assistant link's agent, also optional, runs only once installed) | A sysmodule, from boot |
 | **After a firmware update** | The console's controls keep working; PlayGuard opens read-only until a version supports the firmware | The controls depend on the sysmodule still working |
 | **Deleted from the SD card** | The limits stay on the console | The controls go with it |
 

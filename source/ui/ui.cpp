@@ -10,10 +10,12 @@
 #include "action/sync_flow.hpp"
 #include "action/write_queue_logic.hpp"
 #include "activity/main_activity.hpp"
+#include "app.hpp"
 #include "tab/tab_base.hpp"
 #include "ui/cadran_modal.hpp"
 #include "ui/cadran_text.hpp"
 #include "util/config.hpp"
+#include "util/sync_files.hpp"
 #include "util/worker_threads.hpp"
 
 #include <atomic>
@@ -240,6 +242,14 @@ void on_mode_changed()
     pt_log_flow::apply();       // the recorder and the frame statistics only run
     frame_stats_flow::apply();  // in developer mode
     sync_flow::changed();   // read-only mode is in the remote link's state
+    {
+        SysInfo si;
+        sysinfo_get(&si);
+        char fw[16];
+        sysinfo_version_string(si.hos_version, fw, sizeof(fw));
+        sync_files::set_console(fw, app::read_only());   // and in what the agent may do
+        sync_files::export_nro_state();
+    }
     if (MainActivity* main = main_activity()) main->update_title();
     TabBase::refresh_shown();
 }

@@ -475,7 +475,7 @@ The credits, how to **support PlayGuard** ([GitHub Sponsors](https://github.com/
 
 **No more 22.5 crashes.** `pctl:a`, the privileged parental-control service, accepts a **single session**. Older builds of the original app kept it open, so the HOME-menu PIN prompt (or the PIN applet) could not get it and Atmosphère could crash. PlayGuard opens the session for each action and releases it immediately; periodic refreshes pause while the app is in the background. *(Diagnosis by [anbingxi's fork](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly).)*
 
-**Nothing runs in the background.** The limit, the PIN, the warnings and the suspension are the console's own; PlayGuard only changes their settings. The optional remote link runs only while PlayGuard is open, and carries out an order exactly like a change made on the console (the same unlock, relock, read-only mode and history); it can never delete parental controls, unlink the phone app or touch the PIN.
+**Nothing runs in the background.** The limit, the PIN, the warnings and the suspension are the console's own; PlayGuard only changes their settings. The optional remote link runs while PlayGuard is open, or all the time once its optional agent is installed, and carries out an order exactly like a change made on the console (the same unlock, relock, read-only mode and history); it can never delete parental controls, unlink the phone app or touch the PIN.
 
 ## What counts as play time
 

@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 33251c660faf -->
+<!-- translated from docs/compatibility.md, sha256 48781edfe562 -->
 # Compatibilité
 
 Firmwares, Atmosphère et lanceurs pris en charge, emuMMC et sysMMC, et la comparaison avec un sysmodule de remplacement. Retour au [README](../../README.fr.md).
@@ -76,7 +76,7 @@ PlayGuard pilote le contrôle parental intégré à la console (le service `pctl
 |---|---|---|
 | **Limite de temps de jeu** | Une pour la console (le minuteur de la console) | Une par compte utilisateur |
 | **Code PIN, avertissements, suspension** | Ceux de la console | Les siens |
-| **En arrière-plan** | Rien (le module de récupération optionnel n'agit qu'au démarrage, quand un fichier `RESCUE` le demande) | Un sysmodule, dès le démarrage |
+| **En arrière-plan** | Rien (le module de récupération optionnel n'agit qu'au démarrage, quand un fichier `RESCUE` le demande ; l'agent du lien Home Assistant, facultatif lui aussi, ne fonctionne qu'une fois installé) | Un sysmodule, dès le démarrage |
 | **Après une mise à jour du firmware** | Le contrôle de la console continue de fonctionner ; PlayGuard s'ouvre en lecture seule jusqu'à une version qui prend le firmware en charge | Le contrôle dépend du bon fonctionnement du sysmodule |
 | **Supprimé de la carte SD** | Les limites restent sur la console | Le contrôle disparaît avec lui |
 
