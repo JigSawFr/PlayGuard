@@ -132,7 +132,7 @@ static void store(history::Entry e)
     // changes nothing it watches.
     if (!text::starts_with(e.kind, "outside_") && e.kind != "new_account" && e.kind != "module" && e.result.empty())
         outside_watch::own_change();
-    e.when = ui::now_stamp();
+    if (e.when.empty()) e.when = ui::now_stamp();
     e.version = app::version();
     s_last    = e;
     s_last_at = std::chrono::steady_clock::now();
@@ -169,10 +169,11 @@ static void store(history::Entry e)
 }
 
 void record_values(const char* kind, std::vector<int> before, std::vector<int> after,
-                   const std::string& source, const std::string& detail)
+                   const std::string& source, const std::string& detail, const std::string& when)
 {
     if (before == after) return;
     history::Entry e;
+    e.when   = when;
     e.kind   = kind;
     e.source = source;
     e.detail = detail;
@@ -181,9 +182,10 @@ void record_values(const char* kind, std::vector<int> before, std::vector<int> a
     store(e);
 }
 
-void record_event(const char* kind, const std::string& source, const std::string& detail)
+void record_event(const char* kind, const std::string& source, const std::string& detail, const std::string& when)
 {
     history::Entry e;
+    e.when   = when;
     e.kind   = kind;
     e.source = source;
     e.detail = detail;

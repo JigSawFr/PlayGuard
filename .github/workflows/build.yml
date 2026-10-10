@@ -389,10 +389,10 @@ jobs:
             scenarios: gate outside alarm cadranstates rollback
           - shard: developer
             scenarios: devbuild library update errors sysnotes forwarders
-          # The remote link against a real broker (Mosquitto), and the optional
-          # modules.
+          # The remote link against a real broker (Mosquitto), a simulated agent
+          # sysmodule, and the optional modules.
           - shard: link
-            scenarios: sync modules
+            scenarios: sync agent modules
             packages: mosquitto mosquitto-clients
           # Every Cadran tab in the 15 languages, normal and larger text: no
           # text cut short (tools/cut_text_check.py, tests/cut_text/), five

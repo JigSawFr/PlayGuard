@@ -263,6 +263,10 @@ brls::Activity* choose_first()
     // ... and again after a while away, over whatever is open.
     pin_lock::watch_focus([]() { LockActivity::lock_again(); });
     // The remote link (MQTT, Home Assistant), when sync.conf turns it on.
+    // Before the relock below and the first screen: the agent's records
+    // (relock pending, console lock, extra time) are adopted first, and what
+    // it changed while PlayGuard was closed goes into the history as
+    // PlayGuard's own, not as a change made outside it.
     sync_flow::start();
     // The playguard-rescue sysmodule acted on a RESCUE file: show what it
     // did and let the parent finish, before (and instead of) the lock
