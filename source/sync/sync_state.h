@@ -7,15 +7,14 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include "../core/pctl_ops.h"
+#include "../core/sysinfo.h"
 #include "sync_conf.h"
 #include "sync_exec.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "../core/pctl_ops.h"
-#include "../core/sysinfo.h"
 
 #define SYNC_SCHEMA 1
 
@@ -46,6 +45,9 @@ typedef struct {
 
     bool               agent;           // the agent sysmodule runs (and publishes)
     const char        *last_result;     // "limit_mon: applied", NULL or "": none
+
+    const char       (*profiles)[SYNC_PROFILE_MAX];   // the saved profiles' names (the profile order's choices)
+    size_t             n_profiles;
 } SyncSnapshot;
 
 size_t sync_state_build(const SyncSnapshot *s, char *out, size_t cap);
