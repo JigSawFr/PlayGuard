@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 
+#include "action/agent_update.hpp"
 #include "action/clock_check.hpp"
 #include "action/data_notice.hpp"
 #include "action/fw_gate.hpp"
@@ -15,6 +16,7 @@
 #include "action/support_flow.hpp"
 #include "action/update_flow.hpp"
 #include "activity/loading_activity.hpp"
+#include "activity/modules_activity.hpp"
 #include "activity/notices_activity.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
@@ -183,6 +185,9 @@ void MainActivity::onContentAvailable()
     // Then, with nothing else in front: "What's new" after an update, else the
     // monthly "Support PlayGuard" reminder.
     support_flow::at_start(this);
+    // The agent sysmodule on the SD card is not the one this PlayGuard
+    // carries: the offer to update it.
+    agent_update::at_start(this, ModulesActivity::bundle_dir());
 
     // What the bell shows, read now and every minute after that: Today
     // reads the same every 5 s while it is shown.

@@ -103,13 +103,20 @@ activity and the names, carry out the order the agent hands it
 (PLAYGUARD_SIM_AGENT_ORDER) and answer it, show "through the agent" in
 Preferences › Remote access, and close its session at exit.
 
+The "agent-update" and "agent-rollback" scenarios start with an old agent
+on the simulated SD card (it speaks another protocol) and a new one carried
+by PlayGuard: the offer to update it must come at start-up; accepted, the
+new agent must be in place and answering ("agent-update"), or, when the new
+one never answers, the old one back after 10 s and running again
+("agent-rollback"), each in the history.
+
 The "modules" scenario carries a made-up recovery module
 (PLAYGUARD_SIM_BUNDLED): from PIN › Locked out?, it must be installed on
 the simulated SD card (exefs.nsp, boot2.flag, toolbox.json, version.txt), its
 start at boot turned off, then removed, each change in the history.
 
 Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge|forwarders|
-       sync|modules|agent]   (needs DISPLAY, xdotool, ImageMagick)
+       sync|modules|agent|agent-update|agent-rollback]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -150,6 +157,8 @@ FORWARDERS = SCENARIO == "forwarders"
 SYNC = SCENARIO == "sync"
 MODULES = SCENARIO == "modules"
 AGENT = SCENARIO == "agent"
+AGENT_UPDATE = SCENARIO in ("agent-update", "agent-rollback")
+AGENT_ROLLBACK = SCENARIO == "agent-rollback"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
@@ -160,7 +169,7 @@ nand_dir = os.path.join(run_dir, "playguard_data", "nand", "sysmmc")
 games_cache = os.path.join(nand_dir, "cache", "games.bin")
 if os.path.exists(games_cache):
     os.remove(games_cache)   # Installed games: the first check is this run's
-if (GATE or ERRORS or DEVBUILD or UPDATE or SYNC or AGENT or MODULES) and os.path.exists(config_file):
+if (GATE or ERRORS or DEVBUILD or UPDATE or SYNC or AGENT or AGENT_UPDATE or MODULES) and os.path.exists(config_file):
     os.remove(config_file)   # no remembered choice, developer mode off
 if DEVBUILD:
     # The pull requests by number (Y on the builds' screen; the keyboard has no Y).
@@ -351,10 +360,15 @@ if SYNC:
     history = os.path.join(nand_dir, "history.json")
     if os.path.exists(history):
         os.remove(history)   # the remote change must be the only entry
+AGENT_DIR = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "contents", "4200000000504741")
+if AGENT or AGENT_UPDATE:
+    import shutil
+    shutil.rmtree(AGENT_DIR, ignore_errors=True)
 if AGENT:
     # The simulated agent holds the link (it says it is online, no broker),
     # and hands PlayGuard one order once it said Hello.
     env.setdefault("PLAYGUARD_SIM_AGENT", "running")
+    env.setdefault("PLAYGUARD_SIM_MODULES", "agent:running")
     env.setdefault("PLAYGUARD_SIM_AGENT_ORDER", "limit_uniform=90")
     os.makedirs(os.path.dirname(sync_conf), exist_ok=True)
     open(sync_conf, "w").write(
@@ -369,6 +383,31 @@ if AGENT:
     os.makedirs(os.path.dirname(agent_events), exist_ok=True)
     open(agent_events, "w").write("1791460800\tlimit_mon\t45\t1\tnone\t1\t7\tremote\t"
                                   "60,60,60,60,60,60,60\t60,45,60,60,60,60,60\t-1\n")
+if AGENT_UPDATE:
+    import hashlib
+    # An old agent runs (another protocol); PlayGuard carries a new one, or one
+    # that never answers.
+    env.setdefault("PLAYGUARD_SIM_AGENT", "running")
+    env.setdefault("PLAYGUARD_SIM_MODULES", "agent:running")
+    os.makedirs(os.path.join(AGENT_DIR, "flags"), exist_ok=True)
+    OLD_NSP = b"PFS0 old agent build"
+    open(os.path.join(AGENT_DIR, "exefs.nsp"), "wb").write(OLD_NSP)
+    open(os.path.join(AGENT_DIR, "flags", "boot2.flag"), "w").close()
+    open(os.path.join(AGENT_DIR, "version.txt"), "w").write("version=0.9.0\n")
+    NEW_NSP = b"PFS0 broken agent build" if AGENT_ROLLBACK else b"PFS0 new agent build"
+    bundle = os.path.join(OUT, "bundle")
+    os.makedirs(os.path.join(bundle, "agent"), exist_ok=True)
+    open(os.path.join(bundle, "agent", "exefs.nsp"), "wb").write(NEW_NSP)
+    open(os.path.join(bundle, "agent", "version.txt"), "w").write(
+        f"version=9.9.9\ncommit=smoke00\nsha256={hashlib.sha256(NEW_NSP).hexdigest()}\n")
+    env.setdefault("PLAYGUARD_SIM_BUNDLED", bundle)
+    os.makedirs(os.path.dirname(sync_conf), exist_ok=True)
+    open(sync_conf, "w").write(
+        "enabled=1\nhost=127.0.0.1\nport=1\nallow_anonymous=1\n"
+        f"console_id={SYNC_ID}\nconsole_name=Smoke\npolicy=auto\npoll_s=10\n")
+    history = os.path.join(nand_dir, "history.json")
+    if os.path.exists(history):
+        os.remove(history)
 RESCUE_DIR = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "contents", "4200000000505247")
 if MODULES:
     import hashlib
@@ -385,7 +424,7 @@ if MODULES:
     history = os.path.join(nand_dir, "history.json")
     if os.path.exists(history):
         os.remove(history)
-if not GATE and not ERRORS and not DEVBUILD and not UPDATE and not SYNC and not AGENT and not MODULES:
+if not GATE and not ERRORS and not DEVBUILD and not UPDATE and not SYNC and not AGENT and not AGENT_UPDATE and not MODULES:
     env.setdefault("PLAYGUARD_SIM_PASTE", "https://gist.github.com/smoke/ab12")   # what GitHub answers
     github_token = os.path.join(run_dir, "playguard_data", "github_token")
     if os.path.exists(github_token):
@@ -1257,6 +1296,39 @@ def wait_log(what, text, timeout=30):
     fail(f"no {what} after {timeout} s (no '{text}' in the log)")
 
 
+if AGENT_UPDATE:
+    wait_log("the old agent's refusal", "sim agent: Hello -> refused (old agent)")
+    time.sleep(3)              # the offer comes 2.5 s after the main screen
+    shot("01_offer")           # the agent on the SD card is not the one PlayGuard carries
+    key("Right")               # Update (Later has the focus)
+    key("Return")
+    end_step = "rolled_back" if AGENT_ROLLBACK else "done"
+    wait_log("the end of the update", f"agent update: {end_step}", 40)
+    shot("02_after")
+    nsp = open(os.path.join(AGENT_DIR, "exefs.nsp"), "rb").read()
+    if nsp != (OLD_NSP if AGENT_ROLLBACK else NEW_NSP):
+        fail(f"unexpected agent on the SD card after the update: {nsp!r}")
+    if os.path.exists(os.path.join(AGENT_DIR, "exefs.nsp.bak")):
+        fail("the backup was left behind")
+    if AGENT_ROLLBACK:
+        wait_log("the old agent running again", "agent update: restart ok")
+        if not any("did not start" in m for m in messages()):
+            fail("no dialog for the update undone; messages: " + repr(messages()))
+    else:
+        if "version=9.9.9" not in open(os.path.join(AGENT_DIR, "version.txt")).read():
+            fail("version.txt is not the new agent's")
+        wait_log("the new agent's session", "sim agent: Hello -> accepted")
+
+    def recorded():
+        try:
+            entries = json.load(open(os.path.join(nand_dir, "history.json"))).get("entries", [])
+        except (OSError, ValueError) as e:
+            fail(f"no history written: {e}")
+        details = [e.get("detail", "") for e in entries if e.get("kind") == "module"]
+        want = "update undone" if AGENT_ROLLBACK else "updated"
+        if not any(want in d for d in details):
+            fail(f"no '{want}' module entry in the history: {details}")
+    finish(recorded)
 if AGENT:
     wait_log("the agent's session", "sim agent: Hello -> accepted")
     wait_log("the state pushed", "sim agent: push 2 (")

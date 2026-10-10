@@ -392,7 +392,7 @@ jobs:
           # The remote link against a real broker (Mosquitto), a simulated agent
           # sysmodule, and the optional modules.
           - shard: link
-            scenarios: sync agent modules
+            scenarios: sync agent agent-update agent-rollback modules
             packages: mosquitto mosquitto-clients
           # Every Cadran tab in the 15 languages, normal and larger text: no
           # text cut short (tools/cut_text_check.py, tests/cut_text/), five
