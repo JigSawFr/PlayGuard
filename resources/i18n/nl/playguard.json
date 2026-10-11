@@ -99,7 +99,10 @@
         "next_step": "Gebeurt dit opnieuw, verstuur dan een rapport: Tools › Rapport online versturen.",
         "pt_not_understood": "de speeltijdinstellingen van de console hebben een indeling die PlayGuard niet begrijpt, dus er is niets gewijzigd. Verstuur een rapport: Tools › Rapport online versturen.",
         "pctl_0132": "code 2142-0132, ook door anderen gemeld bij het schrijven van de speeltimer; de betekenis is nog niet bekend. Start de console opnieuw op en probeer het dan nog eens",
-        "clock_not_set": "de console meldt dat de netwerkklok geen geldige tijd heeft (misschien is die nooit ingesteld); zie het tabblad Netwerkklok"
+        "clock_not_set": "de console meldt dat de netwerkklok geen geldige tijd heeft (misschien is die nooit ingesteld); zie het tabblad Netwerkklok",
+        "no_internet": "de console is niet met internet verbonden: verbind hem en probeer het opnieuw",
+        "service_denied": "het systeem weigerde PlayGuard toegang tot een van zijn diensten; PlayGuard heeft een console met Atmosphère nodig",
+        "pdm_unavailable": "de speelgegevensdienst van de console is nu niet beschikbaar; probeer het zo opnieuw"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -418,7 +421,8 @@
         },
         "applet_cap": "Niet getoond, om geheugen te sparen in de appletmodus (geopend vanuit het album): nog {}. De export bevat alle games; open PlayGuard voor de volledige lijst door R ingedrukt te houden terwijl je een game start.",
         "account_nobody": "Zonder account (of een verwijderd account)",
-        "account_new": "Nieuw account sinds {}: {}"
+        "account_new": "Nieuw account sinds {}: {}",
+        "truncated": "Er kunnen maar {} games worden getoond: sommige die deze week niet zijn gespeeld ontbreken, ook in het totaal."
     },
     "restrictions": {
         "section_level": "Beperkingsniveau",
@@ -550,7 +554,7 @@
         "show_pin_title": "Huidige pincode",
         "show_pin_err": "Kan de pincode niet lezen",
         "unlock": "Tijdelijk ontgrendelen",
-        "unlock_body": "Het ouderlijk toezicht tijdelijk ontgrendelen?\n\nDe beperkingen blijven uit totdat je het ouderlijk toezicht weer vergrendelt (of de console opnieuw opstart).",
+        "unlock_body": "Het ouderlijk toezicht tijdelijk ontgrendelen?\n\nDe beperkingen blijven uit totdat je het ouderlijk toezicht weer vergrendelt (of de console opnieuw opstart). Wordt PlayGuard intussen via het HOME-menu gesloten, dan vergrendelt het bij de volgende start opnieuw.",
         "unlock_confirm": "Ontgrendelen",
         "unlocked": "Ouderlijk toezicht tijdelijk ontgrendeld.",
         "unlock_err": "Kan niet ontgrendelen",
@@ -883,7 +887,7 @@
         "diag_err": "Kan de diagnose niet opslaan",
         "relocked": "Ouderlijk toezicht weer vergrendeld.",
         "relock_err": "Kan het ouderlijk toezicht niet opnieuw vergrendelen",
-        "relocked_after_stop": "PlayGuard stopte vorige keer tijdens een wijziging: het ouderlijk toezicht is weer vergrendeld.",
+        "relocked_after_stop": "PlayGuard werd vorige keer gesloten terwijl het ouderlijk toezicht ontgrendeld was: het is weer vergrendeld.",
         "config_err": "Kan de voorkeuren niet op de SD-kaart opslaan"
     },
     "history": {

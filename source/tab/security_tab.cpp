@@ -6,6 +6,7 @@
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/pt_block_flow.hpp"
+#include "action/pt_flow.hpp"
 #include "action/rescue.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
@@ -92,7 +93,7 @@ SecurityTab::SecurityTab()
     unlock->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
         ui::confirm("playguard/security/unlock_body"_i18n, "playguard/security/unlock_confirm"_i18n, [this]() {
-            Result rc = pctl_unlock_restriction_temporarily();
+            Result rc = pt_flow::unlock_temporarily();
             if (R_SUCCEEDED(rc)) history_flow::record_event("unlock");
             ui::notify_result(rc, "playguard/security/unlocked"_i18n, "playguard/security/unlock_err"_i18n);
             this->refresh();

@@ -229,6 +229,18 @@ int extra_today_min(const ExtraRecord& rec, const std::string& today, int weekda
     return rec.value - rec.base;
 }
 
+bool pending_relock_needs_state(bool pending, bool this_run, bool read_only)
+{
+    return pending && !this_run && !read_only;
+}
+
+PendingRelock pending_relock(bool pending, bool this_run, bool read_only, bool state_read, bool unlocked)
+{
+    if (!pending_relock_needs_state(pending, this_run, read_only)) return PendingRelock::None;
+    if (!state_read) return PendingRelock::Keep;
+    return unlocked ? PendingRelock::Lock : PendingRelock::Forget;
+}
+
 bool alarm_off(const PtState& pt)
 {
     return pt.fw_supported && pt.enabled_valid && pt.enabled && pt.alarm_disabled_valid && pt.alarm_disabled;

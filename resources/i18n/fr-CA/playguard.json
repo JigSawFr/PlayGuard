@@ -99,7 +99,10 @@
         "next_step": "Si cela se reproduit, envoyez un rapport : Outils › Envoyer un rapport en ligne.",
         "pt_not_understood": "les réglages du temps de jeu de la console sont dans un format que PlayGuard ne comprend pas, rien n'a été modifié. Envoyez un rapport : Outils › Envoyer un rapport en ligne.",
         "pctl_0132": "code 2142-0132, également signalé par d'autres lors de l'écriture du minuteur; sa signification n'est pas encore connue. Redémarrez la console, puis réessayez",
-        "clock_not_set": "la console indique que son horloge réseau n'a pas d'heure valide (elle n'a peut-être jamais été réglée); voir l'onglet Horloge réseau"
+        "clock_not_set": "la console indique que son horloge réseau n'a pas d'heure valide (elle n'a peut-être jamais été réglée); voir l'onglet Horloge réseau",
+        "no_internet": "la console n'est pas connectée à Internet : connectez-la, puis réessayez",
+        "service_denied": "le système a refusé à PlayGuard l'accès à l'un de ses services; PlayGuard a besoin d'une console sous Atmosphère",
+        "pdm_unavailable": "le service des données de jeu de la console n'est pas disponible pour le moment; réessayez dans un instant"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -418,7 +421,8 @@
         },
         "applet_cap": "Non listés, pour économiser la mémoire en mode applet (ouvert depuis l'album) : {} de plus. L'export contient tous les jeux; pour la liste complète, ouvrez PlayGuard en maintenant R au lancement d'un jeu.",
         "account_nobody": "Sans compte (ou compte supprimé)",
-        "account_new": "Nouveau compte depuis le {} : {}"
+        "account_new": "Nouveau compte depuis le {} : {}",
+        "truncated": "Seuls {} jeux peuvent être listés : certains, pas joués cette semaine, manquent, et le total depuis toujours ne les compte pas."
     },
     "restrictions": {
         "section_level": "Niveau de restriction",
@@ -550,7 +554,7 @@
         "show_pin_title": "NIP actuel",
         "show_pin_err": "Impossible de lire le NIP",
         "unlock": "Déverrouiller temporairement",
-        "unlock_body": "Déverrouiller temporairement le contrôle parental?\n\nLes restrictions restent désactivées jusqu'au prochain verrouillage (ou au redémarrage de la console).",
+        "unlock_body": "Déverrouiller temporairement le contrôle parental?\n\nLes restrictions restent désactivées jusqu'au prochain verrouillage (ou au redémarrage de la console). Si PlayGuard est fermé entre-temps depuis le menu HOME, il le reverrouille à son prochain lancement.",
         "unlock_confirm": "Déverrouiller",
         "unlocked": "Contrôle parental déverrouillé temporairement.",
         "unlock_err": "Impossible de déverrouiller",
@@ -883,7 +887,7 @@
         "diag_err": "Impossible d'enregistrer le diagnostic",
         "relocked": "Contrôle parental de nouveau verrouillé.",
         "relock_err": "Impossible de verrouiller de nouveau le contrôle parental",
-        "relocked_after_stop": "PlayGuard s'est arrêté pendant une modification : le contrôle parental est de nouveau verrouillé.",
+        "relocked_after_stop": "PlayGuard a été fermé alors que le contrôle parental était déverrouillé : il est de nouveau verrouillé.",
         "config_err": "Impossible d'enregistrer les préférences sur la carte SD"
     },
     "history": {

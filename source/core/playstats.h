@@ -38,6 +38,7 @@ typedef struct {
     bool   windows_ok;  // today_s / week_s are meaningful
     bool   approximate; // the log was cut (PLAYSTATS_EVENTS_MAX: the clock set back months)
     u8     names_lang;  // the console language of the names (SetLanguage + 1), 0 unknown
+    bool   truncated;   // more games have play time than PLAYSTATS_MAX: some not played this week are left out
     u64    now;         // when the data was read (user clock)
     u8     day_wday[7]; // weekday (0 = Sunday) of day_s[k], when windows_ok
     u32    count;       // games with any play time, in no particular order

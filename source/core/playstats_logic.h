@@ -37,6 +37,15 @@ Result playstats_collect_events(PlayEventQuery query, s32 start, s32 total, u64 
 // was found before it is kept).
 size_t playstats_logged_games(PlayEventQuery query, s32 start, s32 total, u64 *ids, size_t max, Result *rc);
 
+// One game's all-time totals (pdm:qry, for every account or one) into `g`:
+// false when they could not be read, or the game was never played.
+typedef bool (*PlayTotalsQuery)(void *ctx, u64 app_id, GameStat *g);
+
+// Adds each game of `ids` not listed in `out` yet that `query` finds played,
+// while there is room (PLAYSTATS_MAX): the games already there (this week's)
+// are never pushed out. One more played game sets out->truncated.
+void playstats_add_played(PlayStats *out, const u64 *ids, size_t count, PlayTotalsQuery query, void *ctx);
+
 // `s` is valid UTF-8 for its first `len` bytes (no overlong form, surrogate
 // or code point above U+10FFFF).
 bool playstats_utf8_valid(const char *s, size_t len);
