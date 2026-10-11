@@ -37,23 +37,4 @@ bool succeeded(const Outcome& o, std::string* error);
 // *error otherwise.
 bool redirect_ok(long status, const std::string& target, std::string* error);
 
-// For a request on a connection of PlayGuard's own (util/tls_client.hpp),
-// which libcurl does not frame:
-
-// "https://host[:port]/path?query" -> its parts; the path is "/" when the URL
-// has none. False for any other scheme, an empty host or a bad port.
-bool split_url(const std::string& url, std::string* host, int* port, std::string* path);
-
-// The request as sent: HTTP/1.1, "Connection: close", `headers` as
-// request_headers() gives them (a header with nothing after its colon, such
-// as "Expect:", is libcurl's way of leaving it out: left out here too), and
-// `body` with its length when there is one (a POST).
-std::string request_text(const std::string& host, const std::string& path, const std::string& agent,
-                         const std::vector<std::string>& headers, const std::string* body);
-
-// A whole HTTP/1.1 response read until the connection closed: *status, and
-// *body undone from Content-Length or chunked transfer encoding. False and
-// *error when it is not one, or ends before its body does.
-bool parse_response(const std::string& raw, long* status, std::string* body, std::string* error);
-
 }   // namespace http_logic

@@ -1,8 +1,6 @@
 // http — a small HTTPS GET / POST / download on libcurl. On the Switch, devkitPro's switch-curl
 // does TLS through the console's ssl service, which verifies servers against
-// the system's built-in CA store; on desktop it is the system libcurl. When
-// that service refuses a server's certificate, get() and post() try again on
-// a TLS connection of PlayGuard's own (util/tls_client.hpp), as strict.
+// the system's built-in CA store; on desktop it is the system libcurl.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
