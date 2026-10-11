@@ -415,7 +415,8 @@
             "days_played_value": "{} van 7",
             "busiest": "Drukste dag",
             "session": "Gemiddelde sessie"
-        }
+        },
+        "applet_cap": "Niet getoond, om geheugen te sparen in de appletmodus (geopend vanuit het album): nog {}. De export bevat alle games; open PlayGuard voor de volledige lijst door R ingedrukt te houden terwijl je een game start."
     },
     "restrictions": {
         "section_level": "Beperkingsniveau",

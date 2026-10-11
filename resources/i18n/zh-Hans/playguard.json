@@ -415,7 +415,8 @@
             "days_played_value": "7 天中 {} 天",
             "busiest": "玩得最多的一天",
             "session": "平均每次时长"
-        }
+        },
+        "applet_cap": "为节省小程序模式（从相册打开）下的内存，另有{}款游戏未列出。导出文件包含所有游戏；如需完整列表，请在启动游戏时按住R键打开PlayGuard。"
     },
     "restrictions": {
         "section_level": "限制等级",

@@ -111,13 +111,24 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
 {
     std::vector<std::string> hosts = { server };
     for (auto& h : ntp::cross_check_servers(server)) hosts.push_back(h);
-    auto run = [hosts, done]() {
+    // In applet mode (opened from the album) borealis opens only two network
+    // sessions: a third query in parallel would wait for one anyway.
+    SysInfo si;
+    sysinfo_get(&si);
+    const bool in_series = si.applet_mode;
+    auto run = [hosts, done, in_series]() {
         // Query the servers in parallel so an unreachable one costs a single
-        // timeout (one after the other when no thread can be had).
+        // timeout (one after the other in applet mode, or when no thread can
+        // be had).
         std::vector<ntp::Reply> replies(hosts.size());
         // Each stops waiting when the app quits: it waits for this thread.
         std::vector<std::thread> workers;
         for (size_t i = 0; i < hosts.size(); i++) {
+            if (in_series) {
+                if (ui::quitting()) break;
+                replies[i] = ntp::fetch(hosts[i], 2500, 2, ui::quitting);
+                continue;
+            }
             try {
                 workers.emplace_back([&replies, &hosts, i]() { replies[i] = ntp::fetch(hosts[i], 2500, 2, ui::quitting); });
             } catch (const std::system_error& e) {

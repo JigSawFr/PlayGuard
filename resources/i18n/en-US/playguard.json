@@ -415,7 +415,8 @@
             "days_played_value": "{} of 7",
             "busiest": "Busiest day",
             "session": "Average session"
-        }
+        },
+        "applet_cap": "Not listed, to save memory in applet mode (opened from the album): {} more. The export has every game; for the full list, open PlayGuard while holding R as you start a game."
     },
     "restrictions": {
         "section_level": "Restriction level",
