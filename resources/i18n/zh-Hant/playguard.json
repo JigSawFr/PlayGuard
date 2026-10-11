@@ -801,6 +801,7 @@
         "available_toast": "PlayGuard {}已推出：請前往「關於 › 檢查更新」。",
         "available_no_fw": "此版本尚未支援韌體{}。",
         "up_to_date": "PlayGuard {}已是最新版本。",
+        "no_release": "PlayGuard 尚未發佈任何版本：{} 是開發版本。",
         "failed": "無法檢查更新（{}）。",
         "manual_body": "若要更新，請開啟sphaira（其GitHub選單已包含PlayGuard）或Homebrew App Store，或從{}下載playguard.nro，並複製到SD卡的/switch/playguard/。",
         "open_body": "PlayGuard將關閉並開啟{}。請在其中找到PlayGuard進行更新。",

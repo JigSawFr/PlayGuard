@@ -801,6 +801,7 @@
         "available_toast": "PlayGuard {}が公開されています：「情報 › アップデートを確認」",
         "available_no_fw": "ファームウェア{}にはまだ対応していません。",
         "up_to_date": "PlayGuard {}は最新バージョンです。",
+        "no_release": "PlayGuard のリリースはまだ公開されていません：{} は開発版です。",
         "failed": "アップデートを確認できませんでした（{}）。",
         "manual_body": "アップデートするには、sphaira（GitHubメニューにPlayGuardが登録済み）かHomebrew App Storeを開くか、{}からplayguard.nroをダウンロードしてSDカードの/switch/playguard/にコピーしてください。",
         "open_body": "PlayGuardを終了して{}を開きます。そこでPlayGuardを探してアップデートしてください。",

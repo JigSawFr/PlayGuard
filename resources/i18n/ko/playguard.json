@@ -801,6 +801,7 @@
         "available_toast": "PlayGuard {} 버전이 나왔습니다: 정보 › 업데이트 확인.",
         "available_no_fw": "이 버전은 아직 펌웨어 {} 버전을 지원하지 않습니다.",
         "up_to_date": "최신 버전(PlayGuard {})을 사용 중입니다.",
+        "no_release": "아직 공개된 PlayGuard 릴리스가 없습니다: {}은(는) 개발 버전입니다.",
         "failed": "업데이트를 확인할 수 없습니다({}).",
         "manual_body": "업데이트하려면 sphaira(GitHub 메뉴에 PlayGuard가 이미 등록되어 있습니다)나 Homebrew App Store를 열거나, {}에서 playguard.nro를 다운로드하여 SD 카드의 /switch/playguard/에 복사하세요.",
         "open_body": "PlayGuard를 닫고 {}를 엽니다. 그곳에서 PlayGuard를 찾아 업데이트하세요.",

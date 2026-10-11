@@ -197,11 +197,11 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
 }   // namespace
 
 bool get(const std::string& url, std::string* body, std::string* error, size_t max_bytes, long timeout_s,
-         const Headers& headers)
+         const Headers& headers, long* status)
 {
     Extra x;
     x.headers = &headers;
-    return perform(url, x, body, error, max_bytes, timeout_s, nullptr);
+    return perform(url, x, body, error, max_bytes, timeout_s, status);
 }
 
 bool post(const std::string& url, const std::string& data, const char* content_type, std::string* body,

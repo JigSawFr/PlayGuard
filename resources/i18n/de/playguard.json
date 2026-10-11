@@ -801,6 +801,7 @@
         "available_toast": "PlayGuard {} ist verfügbar: Info › Nach Updates suchen.",
         "available_no_fw": "Sie unterstützt Firmware {} noch nicht.",
         "up_to_date": "PlayGuard {} ist die neueste Version.",
+        "no_release": "Es wurde noch keine PlayGuard-Version veröffentlicht: {} ist eine Entwicklungsversion.",
         "failed": "Suche nach Updates fehlgeschlagen ({}).",
         "manual_body": "Zum Aktualisieren öffnen Sie sphaira (sein GitHub-Menü kennt PlayGuard bereits) oder den Homebrew App Store, oder laden Sie playguard.nro von {} herunter und kopieren Sie es nach /switch/playguard/ auf der SD-Karte.",
         "open_body": "PlayGuard wird geschlossen und {} geöffnet. Suchen Sie dort PlayGuard, um es zu aktualisieren.",
