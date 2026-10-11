@@ -7,9 +7,10 @@ body:
       value: |
         The quickest way to a fix is the **diagnostic report**: *Tools › Export a
         diagnostic report* saves a text file in `sd:/config/playguard/logs/reports/`, and
-        *Tools › Send a report online* sends it with the debug files and gives a link
-        (its QR code opens this form with the link filled in). It never contains the
-        PIN or the serial number.
+        *Tools › Send a report online* sends it with the latest crash reports and the
+        debug files and gives a link (its QR code opens this form with the link and
+        what the console knows filled in). It never contains the PIN or the serial
+        number.
 
   - type: textarea
     id: what
@@ -55,27 +56,23 @@ body:
     validations:
       required: true
 
-  - type: dropdown
+  # Text fields, not lists: GitHub fills only text fields from the link the
+  # QR code of *Send a report online* opens (source/util/log_upload.hpp).
+  - type: input
     id: launcher
     attributes:
       label: Launched from
-      options:
-        - hbmenu, over a game (title override)
-        - hbmenu, from the Album (applet)
-        - sphaira
-        - Homebrew App Store
-        - Other (say which below)
+      description: Over a game (title override) or from the Album (applet), and the menu.
+      placeholder: "over a game (title override), hbmenu / sphaira / Homebrew App Store"
     validations:
       required: true
 
-  - type: dropdown
+  - type: input
     id: storage
     attributes:
       label: System
-      options:
-        - sysMMC
-        - emuMMC
-        - Not sure
+      description: sysMMC, emuMMC, or not sure.
+      placeholder: sysMMC
     validations:
       required: true
 

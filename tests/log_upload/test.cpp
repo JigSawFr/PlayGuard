@@ -62,6 +62,48 @@ static void test_files()
     CHECK(reports.size() == 1 && reports[0] == "report_20261009_141203_1.txt");
 }
 
+static void test_crashes()
+{
+    // PlayGuard's own, newest first, at most the limit (test_files wrote the newest).
+    write(paths::crashes_dir() + "/crash_20261009_090000.txt", "old");
+    write(paths::crashes_dir() + "/crash_20261010_090000.txt", "a crash, not a report");
+    write(paths::crashes_dir() + "/notes.txt", "not a crash");
+    auto crashes = log_upload::crash_files();
+    CHECK(crashes.size() == 2 && crashes[0].name == "logs/crashes/crash_20261010_090000.txt" &&
+          crashes[0].content == "a crash, not a report" && crashes[1].content == "old");
+    CHECK(log_upload::crash_files(1).size() == 1);
+
+    // Atmosphère's: a homebrew's (hbloader) of the last days, newest first.
+    const std::time_t now = 1791569454;
+    CHECK(log_upload::atmosphere_crashes(now).empty());
+    const std::string dir = paths::sd_root() + "/atmosphere/crash_reports";
+    CHECK(paths::ensure_dir(dir));
+    const std::string hbl = "Atmosphère Crash Report (v1.1):\nCrashed Process Info:\n"
+                            "    Program ID:                      010000000000100d\n"
+                            "    Process Name:                    hbloader\n";
+    write(dir + "/01791569000_010000000000100d.log", hbl + "newest");
+    write(dir + "/01791500000_0100000000001000.log", hbl + "older");
+    write(dir + "/01791560000_0100000000001000.log",
+          "Crashed Process Info:\n    Process Name:                    qlaunch\n");   // not a homebrew
+    write(dir + "/01790000000_010000000000100d.log", hbl + "too old");
+    write(dir + "/01791600000_010000000000100d.log", hbl + "later than now");
+    write(dir + "/report.txt", hbl);
+    write(dir + "/x_010000000000100d.log", hbl);
+    auto ams = log_upload::atmosphere_crashes(now);
+    REQUIRE(ams.size() == 2);
+    CHECK(ams[0].name == "atmosphere/crash_reports/01791569000_010000000000100d.log" &&
+          ams[0].content == hbl + "newest");
+    CHECK(ams[1].content == hbl + "older");
+    CHECK(log_upload::atmosphere_crashes(now, 7, 1).size() == 1);
+    CHECK(log_upload::atmosphere_crashes(now, 0).empty());
+    // A large one: its start only, cut on a whole character.
+    write(dir + "/01791569400_010000000000100d.log", hbl + std::string(100000, 'x'));
+    ams = log_upload::atmosphere_crashes(now, 7, 1);
+    REQUIRE(ams.size() == 1);
+    CHECK(ams[0].content.size() <= log_upload::ATMOSPHERE_CRASH_BYTES &&
+          ams[0].content.find("(cut: too large to send whole)") != std::string::npos);
+}
+
 static void test_bundle()
 {
     bool cut = true;
@@ -210,11 +252,18 @@ static void test_urls()
     CHECK(log_upload::url_encode("aZ09-_.~") == "aZ09-_.~");
     CHECK(log_upload::url_encode("https://bpa.st/A b") == "https%3A%2F%2Fbpa.st%2FA%20b");
     CHECK(log_upload::url_encode("\xC3\xA8") == "%C3%A8");
-    CHECK(log_upload::issue_url("https://github.com/o/r", "https://bpa.st/ABCD", "1.2.0", "23.0.1", "1.12.0") ==
-           "https://github.com/o/r/issues/new?template=1-bug.yml&report=https%3A%2F%2Fbpa.st%2FABCD"
-           "&version=1.2.0&firmware=23.0.1&atmosphere=1.12.0");
-    CHECK(log_upload::issue_url("https://github.com/o/r", "https://gist.github.com/aa5a", "", "", "") ==
+    log_upload::IssueFields fields;
+    CHECK(log_upload::issue_url("https://github.com/o/r", "https://gist.github.com/aa5a", fields) ==
            "https://github.com/o/r/issues/new?template=1-bug.yml&report=https%3A%2F%2Fgist.github.com%2Faa5a");
+    fields.version = "1.2.0";
+    fields.firmware = "23.0.1";
+    fields.atmosphere = "1.12.0";
+    fields.launcher = "from the Album (applet)";
+    fields.storage = "emuMMC";
+    CHECK(log_upload::issue_url("https://github.com/o/r", "https://bpa.st/ABCD", fields) ==
+           "https://github.com/o/r/issues/new?template=1-bug.yml&report=https%3A%2F%2Fbpa.st%2FABCD"
+           "&version=1.2.0&firmware=23.0.1&atmosphere=1.12.0"
+           "&launcher=from%20the%20Album%20%28applet%29&storage=emuMMC");
     CHECK(log_upload::short_url("https://bpa.st/ABCD") == "bpa.st/ABCD");
     CHECK(log_upload::short_url("bpa.st/ABCD") == "bpa.st/ABCD");
 }
@@ -226,6 +275,7 @@ int main()
     REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
 
     test_files();
+    test_crashes();
     test_bundle();
     test_gist_files();
     test_reply();
