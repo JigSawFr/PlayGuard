@@ -164,6 +164,11 @@ get_target_property(BOREALIS_INCLUDES borealis INTERFACE_INCLUDE_DIRECTORIES)
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${BOREALIS_INCLUDES})
 # On the Switch: a linker map (build/borealis.map) to see what makes the .nro big.
 target_link_options(${PROJECT_NAME} PRIVATE ${APP_PLATFORM_LINK_OPTION})
+# On the Switch: borealis' userAppInit, which libnx calls before main, timed
+# for the diagnostic report's start-up section (source/core/startup_hook.c).
+if (PLATFORM_SWITCH)
+    target_link_options(${PROJECT_NAME} PRIVATE -Wl,--wrap=userAppInit)
+endif ()
 
 # Resources: borealis built-ins first, then ours on top. On the Switch the
 # bundled fonts and demo assets are dropped (the system shared font is used).

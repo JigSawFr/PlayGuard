@@ -105,6 +105,8 @@ ntp_SRC   := source/util/ntp_packet.c tests/ntp_packet/test.c
 ntp_FLAGS := -std=c11 -Isource/util
 playlog_SRC   := source/util/playlog.c tests/playlog/test.c
 playlog_FLAGS := -std=c11 -Isource/util
+startup_SRC   := source/util/startup.c tests/startup/test.c
+startup_FLAGS := -std=gnu11 -Isource/util
 playstats_SRC   := source/core/playstats_logic.c tests/playstats/test.c
 playstats_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/playstats -Isource/core
 playstats_LIBS  := -lz
