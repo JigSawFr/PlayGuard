@@ -4,6 +4,7 @@
 #include <fmt/format.h>
 
 #include "action/backup_flow.hpp"
+#include "action/cleanup_flow.hpp"
 #include "action/dev_build_flow.hpp"
 #include "action/github_login_flow.hpp"
 #include "action/fw_gate.hpp"
@@ -112,31 +113,52 @@ ToolsTab::ToolsTab()
     });
 
     // Developer tools.
-    dev_mode->init("playguard/dev/mode"_i18n, app::dev_mode(), [](bool on) {
-        app::set_dev_mode(on, true);
-        ui::on_mode_changed();
-    });
-    dev_read_only->init("playguard/dev/read_only"_i18n, app::read_only(), [this](bool on) {
-        if (on || !fw_gate::needed()) {
-            app::set_read_only(on);
+    // Turning a developer switch off asks first: the switch goes back on
+    // until it is confirmed. Turning one on does not ask.
+    dev_mode->init("playguard/dev/mode"_i18n, app::dev_mode(), [this](bool on) {
+        if (on) {
+            app::set_dev_mode(true, true);
             ui::on_mode_changed();
-            if (!on) pt_flow::relock_if_interrupted();   // kept while read-only
             return;
         }
-        // Untested firmware: same warning as "Continue at my own risk".
+        this->dev_mode->setOn(true, false);
+        ui::confirm("playguard/dev/mode_off_body"_i18n, "playguard/dev/mode_off_confirm"_i18n, []() {
+            app::set_dev_mode(false, true);
+            ui::on_mode_changed();
+        });
+    });
+    dev_read_only->init("playguard/dev/read_only"_i18n, app::read_only(), [this](bool on) {
+        if (on) {
+            app::set_read_only(true);
+            ui::on_mode_changed();
+            return;
+        }
         this->dev_read_only->setOn(true, false);
-        ui::confirm_danger(brls::getStr("playguard/fw_gate/risk_body", fw_gate::firmware()),
-                           "playguard/fw_gate/risk_confirm"_i18n, []() {
-                               app::set_read_only(false);
-                               ui::on_mode_changed();
-                               pt_flow::relock_if_interrupted();
-                           });
+        const auto allow = []() {
+            app::set_read_only(false);
+            ui::on_mode_changed();
+            pt_flow::relock_if_interrupted();   // kept while read-only
+        };
+        // Untested firmware: same warning as "Continue at my own risk".
+        if (fw_gate::needed())
+            ui::confirm_danger(brls::getStr("playguard/fw_gate/risk_body", fw_gate::firmware()),
+                               "playguard/fw_gate/risk_confirm"_i18n, allow);
+        else
+            ui::confirm("playguard/dev/read_only_off_body"_i18n, "playguard/dev/read_only_off_confirm"_i18n, allow);
     });
     dev_pt_log->init("playguard/dev/pt_log"_i18n, config::get().pt_log, [](bool on) {
         config::get().pt_log = on;
         ui::save_config();
         pt_log_flow::apply();
         if (on) ui::notify(brls::getStr("playguard/dev/pt_log_on", pt_log::path()));
+    });
+    dev_clear_cache->registerClickAction([](brls::View*) {
+        cleanup_flow::clear_cache();
+        return true;
+    });
+    dev_clear_logs->registerClickAction([](brls::View*) {
+        cleanup_flow::clear_logs();
+        return true;
     });
     dev_report->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new DiagnosticActivity());
@@ -159,8 +181,10 @@ ToolsTab::ToolsTab()
         return true;
     });
     dev_forget->registerClickAction([](brls::View*) {
-        fw_gate::forget();
-        ui::notify("playguard/dev/forgotten"_i18n);
+        ui::confirm("playguard/dev/forget_body"_i18n, "playguard/dev/forget_confirm"_i18n, []() {
+            fw_gate::forget();
+            ui::notify("playguard/dev/forgotten"_i18n);
+        });
         return true;
     });
 }
@@ -220,6 +244,8 @@ void ToolsTab::refresh()
                           { dev_read_only.getView(), dev },
                           { dev_pt_log.getView(), dev },
                           { dev_pt_log_note.getView(), dev },
+                          { dev_clear_cache.getView(), dev },
+                          { dev_clear_logs.getView(), dev },
                           { dev_report.getView(), dev },
                           { dev_pt_block.getView(), dev },
                           { dev_github.getView(), dev },

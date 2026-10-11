@@ -11,8 +11,9 @@ each screen are written to the output folder.
 The "gate" scenario starts on a firmware newer than the checked one, with a
 simulated release that supports it: the firmware screen, read-only mode,
 seven presses on About › Version for the developer mode, its report, a play-timer
-block reference, the firmware screen again and the hand-over of the update
-to sphaira (simulated hbloader).
+block reference, deleting the log files and clearing the cache (what goes and
+what stays checked on disk), the firmware screen again and the hand-over of
+the update to sphaira (simulated hbloader).
 
 The "devbuild" scenario turns the developer mode on, signs in to a simulated
 GitHub (PLAYGUARD_SIM_GITHUB_LOGIN) from the build list, then installs a pull
@@ -74,6 +75,18 @@ if (GATE or ERRORS or DEVBUILD) and os.path.exists(config_file):
 block_ref = os.path.join(run_dir, "playguard_data", "logs", "play_timer_block.json")
 if GATE and os.path.exists(block_ref):
     os.remove(block_ref)     # the developer tool must write a new one
+# What the developer tools' cleanup must remove, and what it must keep.
+logs_dir = os.path.join(run_dir, "playguard_data", "logs")
+cache_dir = os.path.join(run_dir, "playguard_data", "cache")
+old_logs = [os.path.join(logs_dir, n) for n in ("crash.txt", "20261008_120000.txt")]
+uploads = os.path.join(logs_dir, "uploads.txt")
+stale_cache = os.path.join(cache_dir, "stale.bin")
+if GATE:
+    os.makedirs(logs_dir, exist_ok=True)
+    os.makedirs(cache_dir, exist_ok=True)
+    for path in old_logs + [uploads, stale_cache]:
+        with open(path, "w") as f:
+            f.write("smoke test\n")
 
 env = dict(os.environ, LIBGL_ALWAYS_SOFTWARE="1")
 # ImageMagick 7 keeps the version 6 commands (import, convert, montage) as
@@ -367,7 +380,17 @@ if GATE:
     key("Right")
     key("Down", 50, hold=0.15) # the Developer section, down to its last cell
     shot("05_dev_tools")
-    key("Up", 5)               # past GitHub account, Install another build: Show the diagnostic report
+    # Turning a developer switch off asks first; B keeps it on (the end of
+    # the scenario checks developer mode was saved on).
+    key("Up", 9)               # past the cleanup cells and the recorder: Read-only mode
+    key("Return")
+    shot("06a_read_only_off")  # untested firmware: the "own risk" warning
+    key("Escape")
+    key("Up")                  # Developer mode
+    key("Return")
+    shot("06b_dev_mode_off")
+    key("Escape")
+    key("Down", 5)             # Read-only, the recorder, the two cleanup cells: Show the diagnostic report
     key("Return")
     shot("06_dev_report")
     key("Escape")
@@ -378,7 +401,43 @@ if GATE:
     key("Return")
     if not os.path.exists(block_ref):
         fail("no play-timer block reference in " + block_ref)
-    key("Down")                # Show the firmware screen again
+    time.sleep(4.5)            # its toast gone: the next screens are references
+    # The cleanup tools, just above the report (read-only mode allows them:
+    # nothing on the console changes): a confirmation, then a result screen.
+    # The log files go but uploads.txt and the block reference just saved;
+    # the cache's files go, its folder stays.
+    key("Up", 2)               # Delete the log files
+    key("Return")
+    shot("06c_clear_logs")     # how many files, what goes, what stays; Delete in red
+    key("Right")               # Delete
+    key("Return")
+    shot("06d_clear_logs_done")
+    key("Return")              # OK
+    if any(os.path.exists(p) for p in old_logs):
+        fail("Delete the log files left " + repr([p for p in old_logs if os.path.exists(p)]))
+    if not os.path.exists(uploads) or not os.path.exists(block_ref):
+        fail("Delete the log files removed uploads.txt or the block reference")
+    key("Up")                  # Clear the cache
+    key("Return")
+    shot("06e_clear_cache")
+    key("Right")               # Delete
+    key("Return")
+    shot("06f_clear_cache_done")
+    key("Return")              # OK
+    if os.path.exists(stale_cache) or not os.path.isdir(cache_dir):
+        fail("Clear the cache left " + stale_cache + " or removed the folder")
+    log.flush()
+    app_log = open(os.path.join(OUT, "app.log"), errors="replace").read()
+    if "cleanup (clear cache)" not in app_log or "cleanup (clear logs)" not in app_log:
+        fail("no cleanup line in the log; messages: " + repr(messages()))
+    key("Down", 5)             # the report, the block, the firmware screen: Forget the firmware choice
+    key("Return")
+    shot("06g_forget")
+    key("Right")               # Forget
+    key("Return")
+    if not any("firmware choice will be asked again" in m for m in messages()):
+        fail("Forget the firmware choice did not say so; messages: " + repr(messages()))
+    key("Up")                  # Show the firmware screen again
     key("Return")
     shot("07_gate_again")
     key("Return")              # How to update (it has the focus): open sphaira?

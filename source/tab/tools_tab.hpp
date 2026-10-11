@@ -1,6 +1,7 @@
 // ToolsTab — first steps, change history, settings backup / restore,
 // diagnostic export, the console (firmware, storage, serial, game patches)
-// and the developer tools (shown after seven presses on About › Version). The
+// and the developer tools (shown after seven presses on About › Version;
+// among them, clearing the cache and the log files). The
 // preferences are in PreferencesTab, the version, updates and changelog in AboutTab.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -44,6 +45,8 @@ class ToolsTab : public TabBase
     BRLS_BIND(brls::BooleanCell, dev_read_only, "tl_dev_read_only");
     BRLS_BIND(brls::BooleanCell, dev_pt_log,  "tl_dev_pt_log");
     BRLS_BIND(brls::Label,       dev_pt_log_note, "tl_dev_pt_log_note");
+    BRLS_BIND(brls::DetailCell,  dev_clear_cache, "tl_dev_clear_cache");
+    BRLS_BIND(brls::DetailCell,  dev_clear_logs, "tl_dev_clear_logs");
     BRLS_BIND(brls::DetailCell,  dev_report,  "tl_dev_report");
     BRLS_BIND(brls::DetailCell,  dev_pt_block,"tl_dev_pt_block");
     BRLS_BIND(brls::DetailCell,  dev_github,  "tl_dev_github");
