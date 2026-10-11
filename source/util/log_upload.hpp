@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cstddef>
+#include <ctime>
 #include <string>
 #include <vector>
 
@@ -60,6 +61,19 @@ constexpr size_t PT_LOG_BYTES = 48 * 1024;
 // token (github_auth.hpp keeps it in a file of its own).
 std::vector<Part> debug_files();
 
+// PlayGuard's own crash files (logs/crashes/crash_<date>.txt, main.cpp: an
+// exception nothing caught), newest first, at most `limit`.
+std::vector<Part> crash_files(size_t limit = 3);
+
+// Atmosphère's crash reports, sd:/atmosphere/crash_reports/<POSIX time>_<program id>.log,
+// of a homebrew: its process is hbloader, which PlayGuard runs as (over a
+// game or the Album), so another homebrew's crash can be one of them (the
+// confirmation lists them). Those of the `days` days before `now`, newest
+// first, at most `limit`, each cut to its first ATMOSPHERE_CRASH_BYTES (the
+// crashed thread comes first; the dumps of the other threads after).
+constexpr size_t ATMOSPHERE_CRASH_BYTES = 24 * 1024;
+std::vector<Part> atmosphere_crashes(std::time_t now, int days = 7, size_t limit = 2);
+
 // Names of the reports saved in logs/reports/ ("report_20261009_141203.txt",
 // util/log_files.hpp), newest first, at most `limit`.
 std::vector<std::string> saved_reports(size_t limit = 10);
@@ -93,10 +107,21 @@ bool parse_gist(const std::string& body, std::string* url);
 // RFC 3986 percent-encoding of everything but unreserved characters.
 std::string url_encode(const std::string& text);
 
+// What the console knows of the bug-report form's fields; empty ones are
+// left for the reporter.
+struct IssueFields
+{
+    std::string version;
+    std::string firmware;
+    std::string atmosphere;
+    std::string launcher;   // "over a game (title override)", "from the Album (applet)"
+    std::string storage;    // "sysMMC", "emuMMC"
+};
+
 // The repository's bug-report form (.github/ISSUE_TEMPLATE/1-bug.yml) with
-// the report's link and what the console knows already filled in.
-std::string issue_url(const std::string& repo_url, const std::string& paste_url, const std::string& version,
-                      const std::string& firmware, const std::string& atmosphere);
+// the report's link and `fields` filled in. GitHub fills only text fields
+// from the link, so the form asks these in text fields, not lists.
+std::string issue_url(const std::string& repo_url, const std::string& paste_url, const IssueFields& fields);
 
 // The form body sent to bpa.st (multipart/form-data, the text as is): the
 // text, plain text, the expiry. *content_type gets the type with its

@@ -66,9 +66,15 @@ void show_link(const log_upload::Result& r)
     sysinfo_get(&si);
     char fw[16];
     sysinfo_version_string(si.hos_version, fw, sizeof(fw));
-    const std::string ams =
-        si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : std::string();
-    const std::string issue = log_upload::issue_url(app::repo_url(), r.url, app::version(), fw, ams);
+    log_upload::IssueFields fields;
+    fields.version = app::version();
+    fields.firmware = fw;
+    if (si.ams_valid) fields.atmosphere = fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro);
+    // The menu it was started from is not known: the reporter adds it.
+    fields.launcher = si.applet_mode ? "from the Album (applet)" : "over a game (title override)";
+    const SysStorage storage = sysinfo_storage(&si);
+    if (storage != SysStorage_Unknown) fields.storage = storage == SysStorage_EmuMMC ? "emuMMC" : "sysMMC";
+    const std::string issue = log_upload::issue_url(app::repo_url(), r.url, fields);
 
     std::string text = brls::getStr("playguard/upload/done", log_upload::short_url(r.url));
 
@@ -139,10 +145,14 @@ void send(const std::vector<log_upload::Part>& parts)
     });
 }
 
+// The report, the latest crashes (PlayGuard's, then Atmosphère's: before the
+// debug files, so a cut takes the history first) and the debug files.
 std::vector<log_upload::Part> with_debug_files(const std::string& report)
 {
     std::vector<log_upload::Part> parts{ { "playguard/upload/part_report"_i18n, report } };
     ui::settle_writes();   // the files as they are once the writes asked for are done
+    for (auto& f : log_upload::crash_files()) parts.push_back(std::move(f));
+    for (auto& f : log_upload::atmosphere_crashes(std::time(nullptr))) parts.push_back(std::move(f));
     for (auto& f : log_upload::debug_files()) parts.push_back(std::move(f));
     return parts;
 }

@@ -3,6 +3,8 @@
 
 #include <algorithm>
 #include <cctype>
+#include <dirent.h>
+#include <utility>
 
 #include <borealis/extern/nlohmann/json.hpp>
 
@@ -28,6 +30,18 @@ std::vector<Part> debug_files()
     return out;
 }
 
+std::vector<Part> crash_files(size_t limit)
+{
+    std::vector<Part> out;
+    for (const std::string& name : log_files::list(paths::crashes_dir(), log_files::CRASH)) {
+        if (out.size() >= limit) break;
+        std::string content;
+        if (paths::read_file(paths::crashes_dir() + "/" + name, content))
+            out.push_back({ "logs/crashes/" + name, content });
+    }
+    return out;
+}
+
 std::vector<std::string> saved_reports(size_t limit)
 {
     std::vector<std::string> names = log_files::list(paths::reports_dir(), log_files::REPORT);
@@ -47,6 +61,14 @@ std::string cut_to(const std::string& text, size_t room)
     while (keep > 0 && ((unsigned char)text[keep] & 0xC0) == 0x80) keep--;
     return text.substr(0, keep) + CUT_NOTICE.substr(0, room - keep);
 }
+
+std::string trimmed(const std::string& s)
+{
+    size_t b = 0, e = s.size();
+    while (b < e && std::isspace((unsigned char)s[b])) b++;
+    while (e > b && std::isspace((unsigned char)s[e - 1])) e--;
+    return s.substr(b, e - b);
+}
 }   // namespace
 
 std::string bundle(const std::vector<Part>& parts, size_t max_bytes, bool* truncated)
@@ -61,6 +83,52 @@ std::string bundle(const std::vector<Part>& parts, size_t max_bytes, bool* trunc
     if (out.size() <= max_bytes) return out;
     if (truncated) *truncated = true;
     return cut_to(out, max_bytes);
+}
+
+namespace
+{
+// The process of an Atmosphère crash report: its "Process Name:" line
+// ("    Process Name:                    hbloader"), lower case.
+std::string process_name(const std::string& text)
+{
+    const size_t at = text.find("Process Name:");
+    if (at == std::string::npos) return "";
+    const size_t end = text.find('\n', at);
+    std::string name = trimmed(text.substr(at + 13, end == std::string::npos ? std::string::npos : end - at - 13));
+    std::transform(name.begin(), name.end(), name.begin(), [](unsigned char c) { return (char)std::tolower(c); });
+    return name;
+}
+}   // namespace
+
+std::vector<Part> atmosphere_crashes(std::time_t now, int days, size_t limit)
+{
+    const std::string dir = paths::sd_root() + (paths::sd_root().back() == '/' ? "" : "/") + "atmosphere/crash_reports";
+    // "01791569454_010000000000100d.log": the time, a program id.
+    std::vector<std::pair<long long, std::string>> found;
+    if (DIR* d = opendir(dir.c_str())) {
+        while (const dirent* e = readdir(d)) {
+            const std::string name = e->d_name;
+            const size_t sep = name.find('_');
+            if (sep == std::string::npos || sep == 0 || sep > 12 || name.size() < 4 ||
+                name.compare(name.size() - 4, 4, ".log") != 0 ||
+                !std::all_of(name.begin(), name.begin() + sep, [](char c) { return c >= '0' && c <= '9'; }))
+                continue;
+            const long long t = std::stoll(name.substr(0, sep));
+            if (t <= (long long)now && (long long)now - t <= (long long)days * 86400) found.push_back({ t, name });
+        }
+        closedir(d);
+    }
+    std::sort(found.begin(), found.end(),
+              [](const auto& a, const auto& b) { return a.first != b.first ? a.first > b.first : a.second > b.second; });
+    std::vector<Part> out;
+    for (const auto& f : found) {
+        if (out.size() >= limit) break;
+        std::string content;
+        if (!paths::read_file(dir + "/" + f.second, content) || process_name(content) != "hbloader") continue;
+        if (content.size() > ATMOSPHERE_CRASH_BYTES) content = cut_to(content, ATMOSPHERE_CRASH_BYTES);
+        out.push_back({ "atmosphere/crash_reports/" + f.second, content });
+    }
+    return out;
 }
 
 std::vector<Part> gist_files(const std::vector<Part>& parts, size_t max_bytes, bool* truncated)
@@ -110,14 +178,6 @@ bool link_with_id(const std::string& text, const std::string& prefix, bool (*ok)
 bool alnum(unsigned char c)
 {
     return std::isalnum(c) != 0;
-}
-
-std::string trimmed(const std::string& s)
-{
-    size_t b = 0, e = s.size();
-    while (b < e && std::isspace((unsigned char)s[b])) b++;
-    while (e > b && std::isspace((unsigned char)s[e - 1])) e--;
-    return s.substr(b, e - b);
 }
 
 // The value after "<label>:" on its own line of `body`, trimmed.
@@ -181,14 +241,18 @@ std::string url_encode(const std::string& text)
     return out;
 }
 
-std::string issue_url(const std::string& repo_url, const std::string& paste_url, const std::string& version,
-                      const std::string& firmware, const std::string& atmosphere)
+std::string issue_url(const std::string& repo_url, const std::string& paste_url, const IssueFields& fields)
 {
     // Issue forms take each field's id as a query parameter.
     std::string url = repo_url + "/issues/new?template=1-bug.yml&report=" + url_encode(paste_url);
-    if (!version.empty()) url += "&version=" + url_encode(version);
-    if (!firmware.empty()) url += "&firmware=" + url_encode(firmware);
-    if (!atmosphere.empty()) url += "&atmosphere=" + url_encode(atmosphere);
+    auto add = [&url](const char* id, const std::string& value) {
+        if (!value.empty()) url += std::string("&") + id + "=" + url_encode(value);
+    };
+    add("version", fields.version);
+    add("firmware", fields.firmware);
+    add("atmosphere", fields.atmosphere);
+    add("launcher", fields.launcher);
+    add("storage", fields.storage);
     return url;
 }
 
