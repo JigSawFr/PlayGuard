@@ -416,7 +416,9 @@
             "busiest": "Busiest day",
             "session": "Average session"
         },
-        "applet_cap": "Not listed, to save memory in applet mode (opened from the album): {} more. The export has every game; for the full list, open PlayGuard while holding R as you start a game."
+        "applet_cap": "Not listed, to save memory in applet mode (opened from the album): {} more. The export has every game; for the full list, open PlayGuard while holding R as you start a game.",
+        "account_nobody": "No account (or a deleted one)",
+        "account_new": "New account since {}: {}"
     },
     "restrictions": {
         "section_level": "Restriction level",
@@ -904,7 +906,8 @@
             "config_reset": "Settings reset (file unreadable)",
             "outside_reset": "Play time started over (seen by PlayGuard)",
             "outside_clock": "Console clock changed (seen by PlayGuard)",
-            "outside_limits": "Limits changed outside PlayGuard"
+            "outside_limits": "Limits changed outside PlayGuard",
+            "new_account": "New user account (seen by PlayGuard)"
         },
         "sources": {
             "uniform": "Same limit every day",

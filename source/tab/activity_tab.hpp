@@ -8,6 +8,8 @@
 // a spinner; Ⓧ reads it again with one. The chart marks each day's current
 // limit (every account only). A large library lists its first rows, then
 // every game on "Show every game" (kept across visits; capped in applet mode).
+// A user account new to PlayGuard is flagged under the account filter
+// (action/outside_watch).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -73,6 +75,7 @@ class ActivityTab : public TabBase
     BRLS_BIND(brls::DetailCell, week,        "ac_week");
     BRLS_BIND(brls::DetailCell, total,       "ac_total");
     BRLS_BIND(brls::DetailCell, account,     "ac_account");
+    BRLS_BIND(brls::Label,      new_account, "ac_new_account");
     BRLS_BIND(brls::DetailCell, sort,        "ac_period");
     BRLS_BIND(brls::DetailCell, per_day,     "ac_per_day");
     BRLS_BIND(brls::DetailCell, top,         "ac_top");

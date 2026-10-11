@@ -6,11 +6,13 @@
 #include <vector>
 
 #include "ui/ui.hpp"
+#include "util/activity_summary.hpp"
 
 using namespace brls::literals;
 
-GameActivity::GameActivity(GameStat game, std::shared_ptr<const PlayStats> stats, std::vector<unsigned char> icon)
-    : game(game), stats(std::move(stats)), icon_bytes(std::move(icon))
+GameActivity::GameActivity(GameStat game, std::shared_ptr<const PlayStats> stats, std::vector<unsigned char> icon,
+                           bool every_account)
+    : game(game), stats(std::move(stats)), icon_bytes(std::move(icon)), every_account(every_account)
 {
 }
 
@@ -63,6 +65,19 @@ void GameActivity::show_accounts(const std::vector<AccountPlay>& by_account, Res
         cell->setFocusable(false);
         cell->setText(a.nickname[0] ? std::string(a.nickname) : "?");
         cell->setDetailText(brls::getStr("playguard/activity/account_value", ui::fmt_play_time(a.total_s), (int)a.launches));
+        accounts->addView(cell);
+    }
+    // The game's own total less the accounts': time with no account chosen
+    // (some games never ask) or on an account deleted since. Only against
+    // every account's total (one account's is already its own), and the
+    // accounts read.
+    const bool comparable = this->every_account && g.totals_ok && R_SUCCEEDED(rc);
+    const uint64_t nobody = comparable ? activity_summary::unattributed_s(g.total_s, by_account.data(), by_account.size()) : 0;
+    if (nobody) {
+        auto* cell = new brls::DetailCell();
+        cell->setFocusable(false);
+        cell->setText("playguard/activity/account_nobody"_i18n);
+        cell->setDetailText(ui::fmt_play_time(nobody));
         accounts->addView(cell);
     }
     std::string note;

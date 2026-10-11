@@ -24,6 +24,7 @@ struct Entry
     //   "vr", "alarm"  1 value, 0/1 (VR restricted / alarm off)
     //   "pin", "pin_shown", "unlock", "relock", "unlink", "delete", "clock",
     //   "restore": no values
+    //   "new_account" (seen by PlayGuard, not made; detail: its name): no values
     std::string kind;
     // Where from: "uniform", "day", "per_day", "extra", "stop", "restore_extra",
     // "profile", "remove", "backup", "undo", "first_steps" … ("" when plain).

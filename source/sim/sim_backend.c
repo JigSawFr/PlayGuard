@@ -500,7 +500,8 @@ void time_format_local(u64 posix, char *buf, size_t size)
 }
 
 // ---------------------------------------------------------------- playstats
-// Two made-up accounts: Alice played 2/3 of everything, Léo 1/3.
+// Two made-up accounts: Alice played 2/3 of everything, Léo 1/3 (but the
+// time on no account, nobody_s()).
 static const PlayAccount SIM_ACCOUNTS[] = { { { 1, 1 }, "Alice" }, { { 2, 2 }, "Léo" } };
 
 size_t playstats_accounts(PlayAccount *out, size_t max, Result *rc)
@@ -516,6 +517,13 @@ static u64 share(u64 v, const PlayAccount *account)
 {
     if (!account) return v;
     return account->uid[0] == 1 ? v * 2 / 3 : v - v * 2 / 3;
+}
+
+// All-time seconds of a game played with no account chosen (a party mode
+// that never asks): in its total, in no account's.
+static u64 nobody_s(u64 app_id)
+{
+    return app_id == 0x0100A1B2C3D40000ULL ? 50 * 60 : 0;
 }
 
 void playstats_fetch(PlayStats *out)
@@ -569,7 +577,7 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
             given += g->day_s[k];
         }
         // One account: its share of every figure; a game it never played goes.
-        g->total_s  = share(g->total_s, account);
+        g->total_s  = account ? share(g->total_s - nobody_s(g->app_id), account) : g->total_s;
         g->launches = (u32)share(g->launches, account);
         g->today_s  = (u32)share(g->today_s, account);
         g->week_s   = (u32)share(g->week_s, account);
@@ -618,12 +626,13 @@ size_t playstats_by_account(u64 app_id, AccountPlay *out, size_t max, Result *rc
 {
     if (rc) *rc = getenv("PLAYGUARD_SIM_NO_PDM") ? (Result)0x1A0C : 0;
     if (getenv("PLAYGUARD_SIM_NO_PDM") || max < 2) return 0;
-    // Two made-up accounts sharing the play time 2:1 (none for a deleted game).
+    // Two made-up accounts sharing the play time 2:1 (none for a deleted game),
+    // less the time on no account.
     PlayStats all;
     playstats_fetch(&all);
     for (u32 i = 0; i < all.count; i++) {
         if (all.games[i].app_id != app_id || !all.games[i].totals_ok) continue;
-        const u64 t = all.games[i].total_s;
+        const u64 t = all.games[i].total_s - nobody_s(app_id);
         snprintf(out[0].nickname, sizeof(out[0].nickname), "Alice");
         out[0].total_s = t * 2 / 3;
         out[0].launches = all.games[i].launches * 2 / 3;

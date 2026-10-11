@@ -203,7 +203,8 @@ default.
 
 Next to `config.json`, in `sd:/switch/playguard/watch.json`: what PlayGuard
 last saw of the console, to tell the parent what changed outside it (the
-Overview's amber notice and the `outside_*` entries of the change history).
+Overview's amber notice, the `outside_*` and `new_account` entries of the
+change history, the Activity tab's new-account flag).
 The code: `source/action/outside_change_logic.cpp` (the rules),
 `source/action/outside_watch.cpp` (the readings).
 
@@ -224,6 +225,7 @@ PlayGuard opens again, goes unseen.
 | `notice` | integer | what the Overview says: `1` the play time started over, `2` the clock was changed, `4` the limits were changed outside PlayGuard (added up) |
 | `notice_date` | string | `"YYYY-MM-DD"` the notice belongs to: it goes the next day, or when dismissed |
 | `reset_at` | string | `"HH:MM"` the play time was seen starting over |
+| `accounts` | array of objects | the user accounts PlayGuard has seen, oldest first (32 at most): `id` (the account's 32 hex digits), `since` (`"YYYY-MM-DD"` first seen), `new` (`true`: it appeared after the first listing) |
 
 - **The play time started over:** `spent_s` went down by more than a minute
   on the same `date`. The console's own reset comes with a new day; when it
@@ -233,6 +235,11 @@ PlayGuard opens again, goes unseen.
 - **The clock was changed:** `offset_s` moved by more than 5 minutes. The
   automatic correction moves it by seconds only.
 - **The limits were changed outside PlayGuard:** they differ from `limits`.
+- **A new user account:** the console lists one that is not in `accounts`
+  (read once per start). It goes in the change history (`new_account`) and is
+  flagged under the Activity tab's account filter for 30 days after `since`,
+  not on the Overview. Without `accounts` (a first run, or a file from an
+  older version) the accounts listed are only recorded.
 - Every change PlayGuard makes itself (anything it records in the change
   history) makes it take what it reads next as is, so its own limit and clock
   changes are not reported.

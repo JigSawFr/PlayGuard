@@ -416,7 +416,9 @@
             "busiest": "いちばん遊んだ日",
             "session": "1回の平均プレイ時間"
         },
-        "applet_cap": "アプレットモード（アルバムから起動）ではメモリ節約のため、ほか{}本は表示されません。エクスポートにはすべてのゲームが含まれます。すべて表示するには、Rボタンを押しながらゲームを起動してPlayGuardを開いてください。"
+        "applet_cap": "アプレットモード（アルバムから起動）ではメモリ節約のため、ほか{}本は表示されません。エクスポートにはすべてのゲームが含まれます。すべて表示するには、Rボタンを押しながらゲームを起動してPlayGuardを開いてください。",
+        "account_nobody": "ユーザーなし（または削除したユーザー）",
+        "account_new": "新しいユーザー（{}から）：{}"
     },
     "restrictions": {
         "section_level": "制限レベル",
@@ -904,7 +906,8 @@
             "config_reset": "オプションをリセット（ファイルを読み込めず）",
             "outside_reset": "プレイ時間のリセット（PlayGuardが検出）",
             "outside_clock": "本体の時計の変更（PlayGuardが検出）",
-            "outside_limits": "PlayGuardの外での上限の変更"
+            "outside_limits": "PlayGuardの外での上限の変更",
+            "new_account": "新しいユーザー（PlayGuardが検出）"
         },
         "sources": {
             "uniform": "毎日同じ上限",

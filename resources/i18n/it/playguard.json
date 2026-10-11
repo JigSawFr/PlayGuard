@@ -416,7 +416,9 @@
             "busiest": "Giorno più intenso",
             "session": "Sessione media"
         },
-        "applet_cap": "Non elencati, per risparmiare memoria in modalità applet (aperto dall'album): altri {}. L'esportazione contiene tutti i giochi; per l'elenco completo, apri PlayGuard tenendo premuto R mentre avvii un gioco."
+        "applet_cap": "Non elencati, per risparmiare memoria in modalità applet (aperto dall'album): altri {}. L'esportazione contiene tutti i giochi; per l'elenco completo, apri PlayGuard tenendo premuto R mentre avvii un gioco.",
+        "account_nobody": "Senza utente (o un utente eliminato)",
+        "account_new": "Nuovo utente dal {}: {}"
     },
     "restrictions": {
         "section_level": "Livello limitazioni",
@@ -904,7 +906,8 @@
             "config_reset": "Preferenze ripristinate (file illeggibile)",
             "outside_reset": "Tempo di gioco ripartito da zero (visto da PlayGuard)",
             "outside_clock": "Orologio della console cambiato (visto da PlayGuard)",
-            "outside_limits": "Limiti cambiati al di fuori di PlayGuard"
+            "outside_limits": "Limiti cambiati al di fuori di PlayGuard",
+            "new_account": "Nuovo utente (visto da PlayGuard)"
         },
         "sources": {
             "uniform": "Stesso limite ogni giorno",

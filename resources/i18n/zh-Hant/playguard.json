@@ -416,7 +416,9 @@
             "busiest": "玩得最多的一天",
             "session": "平均每次時長"
         },
-        "applet_cap": "為節省Applet模式（從相簿開啟）下的記憶體，另有{}款遊戲未列出。匯出檔包含所有遊戲；若要完整清單，請在啟動遊戲時按住R來開啟PlayGuard。"
+        "applet_cap": "為節省Applet模式（從相簿開啟）下的記憶體，另有{}款遊戲未列出。匯出檔包含所有遊戲；若要完整清單，請在啟動遊戲時按住R來開啟PlayGuard。",
+        "account_nobody": "無帳號（或已刪除的帳號）",
+        "account_new": "新帳號（自{}起）：{}"
     },
     "restrictions": {
         "section_level": "限制等級",
@@ -904,7 +906,8 @@
             "config_reset": "偏好設定已重設（檔案無法讀取）",
             "outside_reset": "遊玩時間重新開始計算（PlayGuard發現）",
             "outside_clock": "主機時鐘被更改（PlayGuard發現）",
-            "outside_limits": "在PlayGuard之外更改的上限"
+            "outside_limits": "在PlayGuard之外更改的上限",
+            "new_account": "新使用者帳號（PlayGuard發現）"
         },
         "sources": {
             "uniform": "每天相同上限",

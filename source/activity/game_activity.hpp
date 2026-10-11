@@ -1,7 +1,8 @@
 // GameActivity — one game of the Activity tab on its own screen: icon and
 // name, the last seven days as bars, today / 7 days / all time, launches,
 // first and last play, and the all-time play time of each user account (read
-// in the background when the screen opens: a few requests for this game only).
+// in the background when the screen opens: a few requests for this game
+// only), with the time no account holds.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -18,8 +19,11 @@ class GameActivity : public brls::Activity
     CONTENT_FROM_XML_RES("activity/game.xml");
 
     // `stats` is the Activity tab's read (for the weekday names and whether
-    // the 7-day figures are meaningful); `icon` may be empty.
-    GameActivity(GameStat game, std::shared_ptr<const PlayStats> stats, std::vector<unsigned char> icon);
+    // the 7-day figures are meaningful); `icon` may be empty. `every_account`:
+    // `game` holds every account's figures (the time no account holds can be
+    // told), not one account's.
+    GameActivity(GameStat game, std::shared_ptr<const PlayStats> stats, std::vector<unsigned char> icon,
+                 bool every_account);
 
     void onContentAvailable() override;
 
@@ -30,6 +34,7 @@ class GameActivity : public brls::Activity
     GameStat game;
     std::shared_ptr<const PlayStats> stats;
     std::vector<unsigned char> icon_bytes;
+    bool every_account;
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);   // guards the accounts' read
 
     BRLS_BIND(brls::Image,      icon,     "ga_icon");

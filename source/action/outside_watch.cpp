@@ -6,6 +6,7 @@
 
 #include "action/history_flow.hpp"
 #include "action/outside_change_logic.hpp"
+#include "action/play_data.hpp"
 #include "action/timer_health_logic.hpp"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
@@ -35,6 +36,21 @@ void save()
     std::string err;
     if (!paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(file(), outside_change_logic::serialize(s_rec), &err))
         brls::Logger::warning("watch: not saved ({})", err);
+}
+
+// The console's accounts, as outside_change_logic knows them.
+std::vector<std::string> account_ids()
+{
+    std::vector<std::string> ids;
+    for (const PlayAccount& a : play_data::accounts()) ids.push_back(play_data::key_of(&a));
+    return ids;
+}
+
+std::string nickname_of(const std::string& id)
+{
+    for (const PlayAccount& a : play_data::accounts())
+        if (play_data::key_of(&a) == id) return a.nickname[0] ? std::string(a.nickname) : "?";
+    return "?";
 }
 
 std::string hex(const uint8_t* b, size_t n)
@@ -114,6 +130,30 @@ void dismiss()
     load_once();
     outside_change_logic::dismiss(s_rec);
     save();
+}
+
+void observe_accounts()
+{
+    static bool done = false;   // play_data lists them once per run
+    if (done) return;
+    done = true;
+    load_once();
+    bool changed = false;
+    const std::vector<std::string> added =
+        outside_change_logic::check_accounts(s_rec, account_ids(), ui::today_date(), &changed);
+    if (changed) save();
+    // Once each in the change history, with the name the HOME menu shows.
+    for (const std::string& id : added) history_flow::record_event("new_account", "", nickname_of(id));
+    if (!added.empty()) brls::Logger::info("watch: {} new user account(s)", added.size());
+}
+
+std::vector<std::string> new_account_lines()
+{
+    observe_accounts();
+    std::vector<std::string> out;
+    for (const auto& a : outside_change_logic::new_accounts(s_rec, account_ids(), ui::today_date()))
+        out.push_back(brls::getStr("playguard/activity/account_new", a.second, nickname_of(a.first)));
+    return out;
 }
 
 }   // namespace outside_watch

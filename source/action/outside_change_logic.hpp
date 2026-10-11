@@ -2,7 +2,8 @@
 // can see them from one reading to the next: today's play time starting over
 // (a clock change resets it, docs/parental-controls.md), the console clock
 // moved against the steady clock, the limits differing from the ones
-// PlayGuard last knew. Nothing runs in the background: only what changed
+// PlayGuard last knew, a user account it never saw before (a new account
+// starts with a clean play record: a known trick). Nothing runs in the background: only what changed
 // while PlayGuard was open, or since it last was, is seen. The record is
 // kept in watch.json next to config.json (docs/config.md). Plain C++ so the
 // host tests can run it (tests/outside_change_logic).
@@ -11,6 +12,8 @@
 
 #include <cstdint>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace outside_change_logic
 {
@@ -31,6 +34,18 @@ constexpr unsigned NOTICE_RESET  = 1;   // today's play time started over
 constexpr unsigned NOTICE_CLOCK  = 2;   // the console clock was changed
 constexpr unsigned NOTICE_LIMITS = 4;   // the limits were changed outside PlayGuard
 
+// A user account first seen this many days ago or less is flagged as new.
+constexpr int NEW_ACCOUNT_DAYS = 30;
+// Accounts remembered at most (the console holds 8; deleted ones go first).
+constexpr size_t KNOWN_ACCOUNTS_MAX = 32;
+
+struct KnownAccount
+{
+    std::string id;                 // AccountUid as 32 hex digits (play_data::key_of)
+    std::string since;              // "YYYY-MM-DD" first seen
+    bool        added = false;      // appeared after the first listing (false: there from the start)
+};
+
 struct Record
 {
     std::string date;               // the day spent_s belongs to, "YYYY-MM-DD"
@@ -44,6 +59,8 @@ struct Record
     unsigned    notice = 0;         // NOTICE_* bits shown on the Overview
     std::string notice_date;        // the day they were seen: cleared the next day
     std::string reset_at;           // "HH:MM" the play time started over
+    bool        accounts_known = false;   // the accounts were listed once
+    std::vector<KnownAccount> accounts;   // oldest first
 };
 
 struct Observation
@@ -78,6 +95,19 @@ void own_change(Record& rec);
 
 // The Overview's notice was dismissed.
 void dismiss(Record& rec);
+
+// The console's user accounts now (`ids`, as KnownAccount::id), on `date`:
+// returns those never seen before, and remembers them. The first listing
+// only records (the accounts there are not new); an empty one (the listing
+// failed) changes nothing. *save: the record changed.
+std::vector<std::string> check_accounts(Record& rec, const std::vector<std::string>& ids, const std::string& date,
+                                        bool* save);
+
+// Of `ids`, the accounts flagged as new on `today` (added, first seen
+// NEW_ACCOUNT_DAYS ago or less, or on a date after today: a clock set back),
+// each with the day it was first seen, in the order of `ids`.
+std::vector<std::pair<std::string, std::string>> new_accounts(const Record& rec, const std::vector<std::string>& ids,
+                                                              const std::string& today);
 
 // watch.json. parse() never fails: what is missing or out of range stays
 // unknown (a first reading), and a damaged file is a fresh record.
