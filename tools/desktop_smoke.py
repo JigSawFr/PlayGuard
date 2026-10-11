@@ -334,7 +334,17 @@ if GATE:
     key("Right")
     key("Down", 50, hold=0.15) # the Developer section, down to its last cell
     shot("05_dev_tools")
-    key("Up", 5)               # past GitHub account, Install another build: Show the diagnostic report
+    # Turning a developer switch off asks first, in the brand dialog; B
+    # keeps it on (the end of the scenario checks developer mode was saved on).
+    key("Up", 9)               # past the cleanup cells and the recorder: Read-only mode
+    key("Return")
+    shot("06a_read_only_off")  # untested firmware: the "own risk" warning, its confirm label in red
+    key("Escape")
+    key("Up")                  # Developer mode
+    key("Return")
+    shot("06b_dev_mode_off")
+    key("Escape")
+    key("Down", 5)             # Read-only, the recorder, the two cleanup cells: Show the diagnostic report
     key("Return")
     shot("06_dev_report")
     key("Escape")
@@ -345,32 +355,43 @@ if GATE:
     key("Return")
     if not os.path.exists(block_ref):
         fail("no play-timer block reference in " + block_ref)
+    time.sleep(4.5)            # its toast gone: the next screens are references
     # The cleanup tools, just above the report (read-only mode allows them:
-    # nothing on the console changes). The log files go but uploads.txt and
-    # the block reference just saved; the cache's files go, its folder stays.
+    # nothing on the console changes): a confirmation, then a result screen.
+    # The log files go but uploads.txt and the block reference just saved;
+    # the cache's files go, its folder stays.
     key("Up", 2)               # Delete the log files
     key("Return")
-    shot("06c_dev_clear_logs") # the confirmation: how many files, what stays
+    shot("06c_clear_logs")     # how many files, what goes, what stays; Delete in red
     key("Right")               # Delete
     key("Return")
-    time.sleep(1)
+    shot("06d_clear_logs_done")
+    key("Return")              # OK
     if any(os.path.exists(p) for p in old_logs):
         fail("Delete the log files left " + repr([p for p in old_logs if os.path.exists(p)]))
     if not os.path.exists(uploads) or not os.path.exists(block_ref):
         fail("Delete the log files removed uploads.txt or the block reference")
     key("Up")                  # Clear the cache
     key("Return")
+    shot("06e_clear_cache")
     key("Right")               # Delete
     key("Return")
-    time.sleep(1)
+    shot("06f_clear_cache_done")
+    key("Return")              # OK
     if os.path.exists(stale_cache) or not os.path.isdir(cache_dir):
         fail("Clear the cache left " + stale_cache + " or removed the folder")
     log.flush()
     app_log = open(os.path.join(OUT, "app.log"), errors="replace").read()
     if "cleanup (clear cache)" not in app_log or "cleanup (clear logs)" not in app_log:
         fail("no cleanup line in the log; messages: " + repr(messages()))
-    key("Down", 3)             # back to Compare the play-timer block
-    key("Down")                # Show the firmware screen again
+    key("Down", 5)             # the report, the block, the firmware screen: Forget the firmware choice
+    key("Return")
+    shot("06g_forget")
+    key("Right")               # Forget
+    key("Return")
+    if not any("firmware choice will be asked again" in m for m in messages()):
+        fail("Forget the firmware choice did not say so; messages: " + repr(messages()))
+    key("Up")                  # Show the firmware screen again
     key("Return")
     shot("07_gate_again")
     key("Return")              # How to update (it has the focus): open sphaira?

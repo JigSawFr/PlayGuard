@@ -113,25 +113,41 @@ ToolsTab::ToolsTab()
     });
 
     // Developer tools.
-    dev_mode->init("playguard/dev/mode"_i18n, app::dev_mode(), [](bool on) {
-        app::set_dev_mode(on, true);
-        ui::on_mode_changed();
-    });
-    dev_read_only->init("playguard/dev/read_only"_i18n, app::read_only(), [this](bool on) {
-        if (on || !fw_gate::needed()) {
-            app::set_read_only(on);
+    // Turning a developer switch off asks first (in the brand dialog): the
+    // switch goes back on until it is confirmed. Turning one on does not ask.
+    dev_mode->init("playguard/dev/mode"_i18n, app::dev_mode(), [this](bool on) {
+        if (on) {
+            app::set_dev_mode(true, true);
             ui::on_mode_changed();
-            if (!on) pt_flow::relock_if_interrupted();   // kept while read-only
             return;
         }
-        // Untested firmware: same warning as "Continue at my own risk".
+        this->dev_mode->setOn(true, false);
+        ui::brand_confirm("playguard/dev/mode"_i18n, "playguard/dev/mode_off_body"_i18n,
+                          "playguard/dev/mode_off_confirm"_i18n, []() {
+                              app::set_dev_mode(false, true);
+                              ui::on_mode_changed();
+                          });
+    });
+    dev_read_only->init("playguard/dev/read_only"_i18n, app::read_only(), [this](bool on) {
+        if (on) {
+            app::set_read_only(true);
+            ui::on_mode_changed();
+            return;
+        }
         this->dev_read_only->setOn(true, false);
-        ui::confirm_danger(brls::getStr("playguard/fw_gate/risk_body", fw_gate::firmware()),
-                           "playguard/fw_gate/risk_confirm"_i18n, []() {
-                               app::set_read_only(false);
-                               ui::on_mode_changed();
-                               pt_flow::relock_if_interrupted();
-                           });
+        const auto allow = []() {
+            app::set_read_only(false);
+            ui::on_mode_changed();
+            pt_flow::relock_if_interrupted();   // kept while read-only
+        };
+        // Untested firmware: same warning as "Continue at my own risk".
+        if (fw_gate::needed())
+            ui::brand_confirm("playguard/dev/read_only"_i18n,
+                              brls::getStr("playguard/fw_gate/risk_body", fw_gate::firmware()),
+                              "playguard/fw_gate/risk_confirm"_i18n, allow, nullptr, true);
+        else
+            ui::brand_confirm("playguard/dev/read_only"_i18n, "playguard/dev/read_only_off_body"_i18n,
+                              "playguard/dev/read_only_off_confirm"_i18n, allow);
     });
     dev_pt_log->init("playguard/dev/pt_log"_i18n, config::get().pt_log, [](bool on) {
         config::get().pt_log = on;
@@ -168,8 +184,11 @@ ToolsTab::ToolsTab()
         return true;
     });
     dev_forget->registerClickAction([](brls::View*) {
-        fw_gate::forget();
-        ui::notify("playguard/dev/forgotten"_i18n);
+        ui::brand_confirm("playguard/dev/forget"_i18n, "playguard/dev/forget_body"_i18n,
+                          "playguard/dev/forget_confirm"_i18n, []() {
+                              fw_gate::forget();
+                              ui::notify("playguard/dev/forgotten"_i18n);
+                          });
         return true;
     });
 }
