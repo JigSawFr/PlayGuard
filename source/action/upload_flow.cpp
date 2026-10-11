@@ -49,15 +49,14 @@ brls::Box* qr_card(const std::string& title, const std::string& url, const std::
     return card;
 }
 
-// Keeps the link in a file of its own, logs/uploads/upload_<date>.txt
-// (util/log_files.hpp): one can be found again after the dialog is closed.
-// bpa.st's removal link is kept too: it is the only way to delete the paste
-// before it expires.
+// Keeps the link in a file of its own, logs/uploads/upload_<date>.url
+// (util/log_files.hpp): an Internet shortcut, so one can be found again after
+// the dialog is closed, and opened from a computer. bpa.st's removal link is
+// kept in it too: it is the only way to delete the paste before it expires.
 void remember(const log_upload::Result& r)
 {
-    const std::string line =
-        ui::now_stamp() + "  " + r.url + (r.removal.empty() ? "" : "  (remove: " + r.removal + ")") + "\n";
-    log_files::save(paths::uploads_dir(), log_files::UPLOAD, line, std::time(nullptr));
+    log_files::save(paths::uploads_dir(), log_files::UPLOAD, log_files::shortcut(r.url, r.removal, ui::now_stamp()),
+                    std::time(nullptr));
 }
 
 void show_link(const log_upload::Result& r)

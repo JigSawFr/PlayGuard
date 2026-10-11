@@ -88,7 +88,7 @@ if GATE and os.path.exists(block_ref):
 logs_dir = os.path.join(run_dir, "playguard_data", "logs")
 cache_dir = os.path.join(run_dir, "playguard_data", "cache")
 old_logs = [os.path.join(logs_dir, n) for n in ("crashes/crash_20261008_120000.txt", "reports/report_20261008_120000.txt")]
-uploads = os.path.join(logs_dir, "uploads", "upload_20261008_120000.txt")
+uploads = os.path.join(logs_dir, "uploads", "upload_20261008_120000.url")
 stale_cache = os.path.join(cache_dir, "stale.bin")
 if GATE:
     for path in old_logs + [uploads, stale_cache]:
@@ -815,11 +815,11 @@ shot("27_back")
 # Send a report online: the confirmation, then the link and its QR codes.
 uploads = os.path.join(run_dir, "playguard_data", "logs", "uploads")
 def upload_count():
-    # One file per link (logs/uploads/upload_<date>.txt); a run pruned by the
+    # One file per link (logs/uploads/upload_<date>.url, an Internet shortcut); a run pruned by the
     # default limit (the 20 newest) counts the same.
     if not os.path.isdir(uploads):
         return 0
-    return sum(1 for f in os.listdir(uploads) if f.startswith("upload_") and f.endswith(".txt")
+    return sum(1 for f in os.listdir(uploads) if f.startswith("upload_") and f.endswith(".url")
                and "https://" in open(os.path.join(uploads, f)).read())
 uploads_before = upload_count()
 reports = os.path.join(run_dir, "playguard_data", "logs", "reports")

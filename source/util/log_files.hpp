@@ -2,8 +2,9 @@
 //
 //   logs/reports/report_20261011_142530.txt   saved diagnostic reports
 //   logs/crashes/crash_20261011_142530.txt     one file per crash (main.cpp)
-//   logs/uploads/upload_20261011_142530.txt    one per report sent online: its
-//                                              link (and bpa.st's removal link)
+//   logs/uploads/upload_20261011_142530.url    one per report sent online: an
+//                                              Internet shortcut to its link (and
+//                                              bpa.st's removal link: shortcut())
 //   logs/play_timer/log.csv, log.old.csv       Developer › record the play timer
 //   logs/play_timer/block.json                 Developer › play-timer block reference
 //
@@ -28,9 +29,19 @@ constexpr const char* REPORT = "report";
 constexpr const char* CRASH  = "crash";
 constexpr const char* UPLOAD = "upload";
 
+// The extension of `prefix`'s files: ".url" for the uploads, ".txt" for the others.
+const char* extension(const char* prefix);
+
 // "report_20261011_142530.txt", "report_20261011_142530_2.txt" for n = 2
-// (another one in the same second). `stamp` is "YYYYMMDD_HHMMSS".
+// (another one in the same second), "upload_20261011_142530.url". `stamp` is
+// "YYYYMMDD_HHMMSS".
 std::string name(const char* prefix, const std::string& stamp, unsigned n = 0);
+
+// An upload's file: an Internet shortcut to `url`, which a computer opens in
+// its browser (Windows, macOS, most Linux file managers), with when it was
+// sent ("2026-10-11 14:25") and bpa.st's removal link, when there is one, in a
+// section of its own. CRLF line ends, as Windows writes them.
+std::string shortcut(const std::string& url, const std::string& removal, const std::string& sent);
 
 // `t` as a name's stamp, in local time ("19700101_000000" when it cannot be
 // converted).
@@ -75,8 +86,10 @@ size_t prune(const std::string& dir, const char* prefix, const Limits& limits, s
 // Moves the files of the layout before the subfolders into them, in
 // `logs_dir`: <stamp>[_n].txt to reports/report_<stamp>[_n].txt, crash.txt to
 // crashes/crash_<date of its first line>.txt, uploads.txt to one
-// uploads/upload_<date of the line>.txt per line ("2026-10-11 14:25  <link>";
-// lines without a date together in one file), play_timer_log.csv,
+// uploads/upload_<date of the line>.url (shortcut()) per line
+// ("2026-10-11 14:25  <link>  (remove: <link>)"; a line without a link
+// dropped), the uploads/upload_<date>.txt of the version before (the same
+// lines) to .url files too, play_timer_log.csv,
 // play_timer_log.old.csv and play_timer_block.json to play_timer/. A file
 // whose new name is taken stays where it is. Returns how many were moved.
 size_t migrate(const std::string& logs_dir);

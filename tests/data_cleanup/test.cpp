@@ -82,8 +82,8 @@ void make_tree()
     write("logs/play_timer/block.json", 1000);
     write("logs/play_timer/block.json.tmp", 1100);
     dir("logs/uploads");
-    write("logs/uploads/upload_20261009_150000.txt", 150);
-    write("logs/uploads/upload_20261009_150000_1.txt.tmp", 160);
+    write("logs/uploads/upload_20261009_150000.url", 150);
+    write("logs/uploads/upload_20261009_150000_1.url.tmp", 160);
 }
 
 void remove_tree()
@@ -128,7 +128,7 @@ static void test_logs_plan()
     make_tree();
     dir("logs/old");   // kept by their path from logs/: elsewhere, the same names go
     dir("logs/old/uploads");
-    write("logs/old/uploads/upload_20261009_150000.txt", 10);
+    write("logs/old/uploads/upload_20261009_150000.url", 10);
     write("logs/block.json", 20);
     const dc::Plan p = dc::logs(g_root);
     CHECK(p.files.size() == 7);
@@ -137,11 +137,11 @@ static void test_logs_plan()
     CHECK(out.removed == 7 && out.failed == 0);
     CHECK(!there("logs/crashes/crash_20261009_141000.txt") && !there("logs/reports/report_20261009_141203.txt") &&
           !there("logs/play_timer/log.csv") && !there("logs/play_timer/log.old.csv"));
-    CHECK(!there("logs/old/uploads/upload_20261009_150000.txt") && !there("logs/block.json"));
+    CHECK(!there("logs/old/uploads/upload_20261009_150000.url") && !there("logs/block.json"));
     // The folders stay.
     CHECK(there("logs/crashes") && there("logs/reports") && there("logs/play_timer"));
     // Not logs: the removal links of reports sent online, the block reference.
-    CHECK(there("logs/uploads/upload_20261009_150000.txt") && there("logs/uploads/upload_20261009_150000_1.txt.tmp") &&
+    CHECK(there("logs/uploads/upload_20261009_150000.url") && there("logs/uploads/upload_20261009_150000_1.url.tmp") &&
           there("logs/play_timer/block.json") &&
           there("logs/play_timer/block.json.tmp"));
     CHECK(there("cache/activity_all.bin"));

@@ -75,6 +75,7 @@ static void test_names()
 {
     CHECK(lf::name(lf::REPORT, "20261011_142530") == "report_20261011_142530.txt");
     CHECK(lf::name(lf::CRASH, "20261011_142530", 2) == "crash_20261011_142530_2.txt");
+    CHECK(lf::name(lf::UPLOAD, "20261011_142530") == "upload_20261011_142530.url");
     CHECK(lf::stamp(NOW) == "20261011_120000");
     CHECK(lf::stamp(0) == "19700101_000000");
 
@@ -149,10 +150,21 @@ static void test_save()
     const std::string dir = g_root + "/logs/uploads";
     const std::string a = lf::save(dir, lf::UPLOAD, "a", NOW);
     const std::string b = lf::save(dir, lf::UPLOAD, "b", NOW);   // the same second
-    CHECK(a == dir + "/upload_20261011_120000.txt" && b == dir + "/upload_20261011_120000_1.txt");
-    CHECK(read("logs/uploads/upload_20261011_120000_1.txt") == "b");
+    CHECK(a == dir + "/upload_20261011_120000.url" && b == dir + "/upload_20261011_120000_1.url");
+    CHECK(read("logs/uploads/upload_20261011_120000_1.url") == "b");
     const auto names = lf::list(dir, lf::UPLOAD);
-    CHECK(names.size() == 2 && names[0] == "upload_20261011_120000_1.txt");
+    CHECK(names.size() == 2 && names[0] == "upload_20261011_120000_1.url");
+    // An upload is an Internet shortcut: a .txt beside it is not one of them,
+    // and a report never a .url.
+    write("logs/uploads/upload_20261011_130000.txt", "x");
+    CHECK(lf::list(dir, lf::UPLOAD).size() == 2);
+    CHECK(lf::parse("upload_20261011_130000.url", lf::UPLOAD) && !lf::parse("upload_20261011_130000.txt", lf::UPLOAD));
+    CHECK(!lf::parse("report_20261011_130000.url", lf::REPORT));
+    CHECK(lf::shortcut("https://bpa.st/AAAA", "https://bpa.st/remove/BBBB", "2026-10-11 14:25") ==
+          "[InternetShortcut]\r\nURL=https://bpa.st/AAAA\r\n\r\n[PlayGuard]\r\n"
+          "Sent=2026-10-11 14:25\r\nRemoval=https://bpa.st/remove/BBBB\r\n");
+    CHECK(lf::shortcut("https://gist.github.com/x/1", "", "") ==
+          "[InternetShortcut]\r\nURL=https://gist.github.com/x/1\r\n\r\n[PlayGuard]\r\n");
     remove_root();
 }
 
@@ -202,13 +214,28 @@ static void test_migrate_logs()
     CHECK(!there("logs/crash.txt") && read("logs/crashes/crash_20261008_091502.txt").find("uncaught x") != std::string::npos);
     CHECK(read("logs/play_timer/log.csv") == "csv" && read("logs/play_timer/log.old.csv") == "old csv");
     CHECK(read("logs/play_timer/block.json") == "{}" && !there("logs/play_timer_block.json"));
-    // One file per link, named after its line's date; the line without one apart.
+    // A shortcut per link, named after its line's date; a line without a link dropped.
     CHECK(!there("logs/uploads.txt"));
-    CHECK(read("logs/uploads/upload_20261008_092000.txt").find("bpa.st/remove/BBBB") != std::string::npos);
-    CHECK(read("logs/uploads/upload_20261008_092000_1.txt") == "2026-10-08 09:20  https://gist.github.com/x/1\n");
-    CHECK(read("logs/uploads/upload_19700101_000000.txt") == "no date\n");
-    CHECK(lf::list(g_root + "/logs/uploads", lf::UPLOAD).size() == 3);
+    CHECK(read("logs/uploads/upload_20261008_092000.url") ==
+          lf::shortcut("https://bpa.st/AAAA", "https://bpa.st/remove/BBBB", "2026-10-08 09:20"));
+    CHECK(read("logs/uploads/upload_20261008_092000_1.url") ==
+          lf::shortcut("https://gist.github.com/x/1", "", "2026-10-08 09:20"));
+    CHECK(read("logs/uploads/upload_20261008_092000_1.url").find("Removal=") == std::string::npos);
+    CHECK(lf::list(g_root + "/logs/uploads", lf::UPLOAD).size() == 2);
     // Done once: nothing left to move.
+    CHECK(lf::migrate(g_root + "/logs") == 0);
+
+    // The upload files of the version before the shortcuts, a .txt per link:
+    // a shortcut each; a name already taken, the next one.
+    write("logs/uploads/upload_20261009_100000.txt", "2026-10-09 10:00  https://bpa.st/CCCC  (remove: https://bpa.st/remove/DDDD)\n");
+    write("logs/uploads/upload_20261008_092000.txt", "2026-10-08 09:20  https://bpa.st/EEEE\n");
+    write("logs/uploads/notes.txt", "not an upload");
+    CHECK(lf::migrate(g_root + "/logs") == 2);
+    CHECK(!there("logs/uploads/upload_20261009_100000.txt") && !there("logs/uploads/upload_20261008_092000.txt"));
+    CHECK(read("logs/uploads/upload_20261009_100000.url") ==
+          lf::shortcut("https://bpa.st/CCCC", "https://bpa.st/remove/DDDD", "2026-10-09 10:00"));
+    CHECK(read("logs/uploads/upload_20261008_092000_2.url").find("URL=https://bpa.st/EEEE\r\n") != std::string::npos);
+    CHECK(there("logs/uploads/notes.txt") && lf::list(g_root + "/logs/uploads", lf::UPLOAD).size() == 4);
     CHECK(lf::migrate(g_root + "/logs") == 0);
 
     // A crash.txt without a date: its name says so, and a second one does not replace it.

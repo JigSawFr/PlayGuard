@@ -42,6 +42,46 @@ bool exists(const std::string& path)
     return stat(path.c_str(), &st) == 0;
 }
 
+// "2026-10-11 14:25[:30]" at the start of `line` as a stamp ("20261011_142500",
+// the seconds when there are some); false without one.
+bool line_stamp(const std::string& line, std::string* stamp)
+{
+    if (line.size() < 16 || !digits(line, 0, 4) || line[4] != '-' || !digits(line, 5, 2) || line[7] != '-' ||
+        !digits(line, 8, 2) || line[10] != ' ' || !digits(line, 11, 2) || line[13] != ':' || !digits(line, 14, 2))
+        return false;
+    const bool seconds = line.size() >= 19 && line[16] == ':' && digits(line, 17, 2);
+    *stamp = line.substr(0, 4) + line.substr(5, 2) + line.substr(8, 2) + "_" + line.substr(11, 2) +
+             line.substr(14, 2) + (seconds ? line.substr(17, 2) : std::string("00"));
+    return true;
+}
+
+// The lines of an upload file before the shortcuts ("2026-10-11 14:25  <link>
+// (remove: <link>)") as shortcut() files, named after their date or `stamp`
+// without one, in `dir`. False when one could not be written.
+bool save_shortcuts(const std::string& text, const std::string& stamp, const std::string& dir)
+{
+    size_t from = 0;
+    while (from < text.size()) {
+        size_t nl = text.find('\n', from);
+        if (nl == std::string::npos) nl = text.size();
+        const std::string line = text.substr(from, nl - from);
+        from = nl + 1;
+        const size_t at = line.find("https://");
+        if (at == std::string::npos) continue;   // nothing to open
+        const std::string url = line.substr(at, line.find_first_of(" \t\r)", at) - at);
+        std::string removal;
+        const size_t r = line.find("(remove: ");
+        if (r != std::string::npos) removal = line.substr(r + 9, line.find_first_of(" \t\r)", r + 9) - r - 9);
+        std::string st = stamp;
+        const bool dated = line_stamp(line, &st);
+        unsigned n = 0;
+        while (n < 1000 && exists(dir + "/" + name(UPLOAD, st, n))) n++;
+        if (!paths::atomic_write(dir + "/" + name(UPLOAD, st, n), shortcut(url, removal, dated ? line.substr(0, 16) : "")))
+            return false;
+    }
+    return true;
+}
+
 // `from` to `to` when `to` is free (FAT's rename would not replace it anyway).
 bool move(const std::string& from, const std::string& to)
 {
@@ -50,11 +90,24 @@ bool move(const std::string& from, const std::string& to)
 }
 }   // namespace
 
+const char* extension(const char* prefix)
+{
+    return std::strcmp(prefix, UPLOAD) == 0 ? ".url" : ".txt";
+}
+
 std::string name(const char* prefix, const std::string& stamp, unsigned n)
 {
     std::string out = std::string(prefix) + "_" + stamp;
     if (n > 0) out += "_" + std::to_string(n);
-    return out + ".txt";
+    return out + extension(prefix);
+}
+
+std::string shortcut(const std::string& url, const std::string& removal, const std::string& sent)
+{
+    std::string out = "[InternetShortcut]\r\nURL=" + url + "\r\n\r\n[PlayGuard]\r\n";
+    if (!sent.empty()) out += "Sent=" + sent + "\r\n";
+    if (!removal.empty()) out += "Removal=" + removal + "\r\n";
+    return out;
 }
 
 std::string stamp(std::time_t t)
@@ -75,7 +128,7 @@ bool parse(const std::string& name, const char* prefix, std::string* stamp)
     const size_t p = std::strlen(prefix);
     if (name.compare(0, p, prefix) != 0 || name.size() < p + 1 + 15 + 4 || name[p] != '_') return false;
     const size_t at = p + 1, end = at + 15;
-    if (!is_stamp(name, at) || name.compare(name.size() - 4, 4, ".txt") != 0) return false;
+    if (!is_stamp(name, at) || name.compare(name.size() - 4, 4, extension(prefix)) != 0) return false;
     const size_t rest = name.size() - 4 - end;   // "" or "_<n>"
     if (rest == 1 || (rest > 1 && (name[end] != '_' || !digits(name, end + 1, rest - 1)))) return false;
     if (stamp) *stamp = name.substr(at, 15);
@@ -85,7 +138,7 @@ bool parse(const std::string& name, const char* prefix, std::string* stamp)
 std::vector<std::string> list(const std::string& dir, const char* prefix)
 {
     std::vector<std::string> names;
-    for (const std::string& n : paths::list_files(dir, ".txt"))
+    for (const std::string& n : paths::list_files(dir, extension(prefix)))
         if (parse(n, prefix)) names.push_back(n);
     const size_t end = std::strlen(prefix) + 1 + 15;
     std::sort(names.begin(), names.end(), [end](const std::string& a, const std::string& b) {
@@ -162,11 +215,7 @@ size_t migrate(const std::string& logs_dir)
     std::string text;
     if (paths::read_file(crash, text)) {
         std::string st = "19700101_000000";
-        if (text.size() >= 19 && digits(text, 0, 4) && text[4] == '-' && digits(text, 5, 2) && text[7] == '-' &&
-            digits(text, 8, 2) && text[10] == ' ' && digits(text, 11, 2) && text[13] == ':' && digits(text, 14, 2) &&
-            text[16] == ':' && digits(text, 17, 2))
-            st = text.substr(0, 4) + text.substr(5, 2) + text.substr(8, 2) + "_" + text.substr(11, 2) +
-                 text.substr(14, 2) + text.substr(17, 2);
+        line_stamp(text, &st);
         if (paths::ensure_dir(crashes)) {
             for (unsigned i = 0; i < 100; i++)
                 if (!exists(crashes + "/" + name(CRASH, st, i))) {
@@ -176,39 +225,24 @@ size_t migrate(const std::string& logs_dir)
         }
     }
 
-    // uploads.txt held every link, one line each: "2026-10-11 14:25  https://…".
-    const std::string uploads = logs_dir + "/uploads.txt";
-    if (paths::read_file(uploads, text)) {
-        std::vector<std::pair<std::string, std::string>> files;   // stamp, lines
-        size_t from = 0;
-        while (from < text.size()) {
-            size_t nl = text.find('\n', from);
-            if (nl == std::string::npos) nl = text.size();
-            const std::string line = text.substr(from, nl - from);
-            from = nl + 1;
-            if (line.empty()) continue;
-            std::string st = "19700101_000000";
-            if (line.size() >= 16 && digits(line, 0, 4) && line[4] == '-' && digits(line, 5, 2) && line[7] == '-' &&
-                digits(line, 8, 2) && line[10] == ' ' && digits(line, 11, 2) && line[13] == ':' && digits(line, 14, 2))
-                st = line.substr(0, 4) + line.substr(5, 2) + line.substr(8, 2) + "_" + line.substr(11, 2) +
-                     line.substr(14, 2) + "00";
-            if (!files.empty() && files.back().first == st && st == "19700101_000000")
-                files.back().second += line + "\n";
-            else
-                files.push_back({ st, line + "\n" });
-        }
-        bool all = paths::ensure_dir(logs_dir + "/uploads");
-        for (size_t i = 0; all && i < files.size(); i++) {
-            unsigned n = 0;
-            while (n < 1000 && exists(logs_dir + "/uploads/" + name(UPLOAD, files[i].first, n))) n++;
-            all = paths::atomic_write(logs_dir + "/uploads/" + name(UPLOAD, files[i].first, n), files[i].second);
-        }
+    // uploads.txt held every link, one line each: "2026-10-11 14:25  https://…";
+    // then uploads/upload_<date>.txt, a file per link.
+    const std::string uploads = logs_dir + "/uploads.txt", uploads_dir = logs_dir + "/uploads";
+    if (paths::read_file(uploads, text) && paths::ensure_dir(uploads_dir) &&
+        save_shortcuts(text, "19700101_000000", uploads_dir)) {
         // Only once every line is in a file of its own.
-        if (all) {
-            std::remove(uploads.c_str());
-            std::remove((uploads + ".tmp").c_str());
-            moved++;
-        }
+        std::remove(uploads.c_str());
+        std::remove((uploads + ".tmp").c_str());
+        moved++;
+    }
+    for (const std::string& n : paths::list_files(uploads_dir, ".txt")) {
+        const std::string path = uploads_dir + "/" + n;
+        const std::string as_url = n.substr(0, n.size() - 4) + ".url";
+        std::string st;
+        if (!parse(as_url, UPLOAD, &st) || !paths::read_file(path, text) || !save_shortcuts(text, st, uploads_dir))
+            continue;
+        std::remove(path.c_str());
+        moved++;
     }
 
     static const char* const PT[][2] = { { "play_timer_log.csv", "log.csv" },
