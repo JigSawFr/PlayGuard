@@ -1,5 +1,6 @@
 // Host tests for source/action/pt_logic.cpp: when a play-timer write needs the
-// temporary unlock, how much was played today, extra time and putting it back.
+// temporary unlock, how much was played today, extra time and putting it back,
+// and what pt_flow's pickers start on.
 #include "check.h"
 #include <cstdio>
 #include <cstring>
@@ -235,6 +236,104 @@ static void test_bedtime()
     CHECK(!pt_logic::bedtime_end_every_day(pt, 7, 0, out));   // no bedtime on
 }
 
+// What the pickers start on (pt_flow's quick values, the per-day picker, the bedtimes).
+static void test_pickers()
+{
+    const auto& values = pt_logic::quick_values();
+    CHECK(values.size() == 8 && values.front() == 30 && values.back() == 0);
+
+    PtState pt = counting();                       // 2 h every day: in the list
+    pt_logic::UniformPick u = pt_logic::uniform_pick(pt);
+    CHECK(u.uniform && values[(size_t)u.selected] == 120 && u.seed == 120);
+    for (auto& d : pt.day_min) d = 100;            // the same, but not a quick value: "Custom…"
+    u = pt_logic::uniform_pick(pt);
+    CHECK(u.uniform && u.selected == (int)values.size() && u.seed == 100);
+    pt.day_min[6] = 0;                             // days differ: "Custom…", the pad starts on Sunday's
+    u = pt_logic::uniform_pick(pt);
+    CHECK(!u.uniform && u.selected == (int)values.size() && u.seed == 100);
+    for (auto& d : pt.day_min) d = PT_DAY_NOLIMIT; // no limit: the pad starts on 1 h
+    u = pt_logic::uniform_pick(pt);
+    CHECK(u.uniform && u.selected == (int)values.size() && u.seed == 60);
+    for (auto& d : pt.day_min) d = 0;              // 0 is a quick value (no play)
+    u = pt_logic::uniform_pick(pt);
+    CHECK(values[(size_t)u.selected] == 0 && u.seed == 0);
+    pt.valid = false;                              // unread: nothing pretends to be current
+    u = pt_logic::uniform_pick(pt);
+    CHECK(!u.uniform && u.selected == (int)values.size() && u.seed == 60);
+
+    pt_logic::LimitPick l = pt_logic::limit_pick(45);
+    CHECK(values[(size_t)l.selected] == 45);
+    CHECK(l.custom == (int)values.size() && l.no_limit == l.custom + 1);
+    CHECK(pt_logic::limit_pick(50).selected == l.custom);
+    CHECK(pt_logic::limit_pick(PT_DAY_NOLIMIT).selected == l.no_limit);
+    CHECK(values[(size_t)pt_logic::limit_pick(0).selected] == 0);
+    CHECK(pt_logic::limit_seed(50) == 50 && pt_logic::limit_seed(PT_DAY_NOLIMIT) == 60);
+
+    const std::vector<int> times = pt_logic::bedtime_times();
+    CHECK(times.size() == 33 && times[0] == -1 && times[1] == 16 * 60 && times.back() == 23 * 60 + 45);
+    pt = counting();
+    for (auto& b : pt.bed) b = bed(true, 21, 30, 7, 0);
+    CHECK(times[(size_t)pt_logic::bedtime_selected(pt, times)] == 21 * 60 + 30);
+    for (auto& b : pt.bed) b = bed(true, 15, 0, 7, 0);   // not in the list (set elsewhere): off
+    CHECK(pt_logic::bedtime_selected(pt, times) == 0);
+    for (auto& b : pt.bed) b = bed(false, 0, 0, 0, 0);
+    CHECK(pt_logic::bedtime_selected(pt, times) == 0);
+    pt.bed[5] = bed(true, 22, 0, 6, 0);                  // days differ: 21:00
+    CHECK(times[(size_t)pt_logic::bedtime_selected(pt, times)] == 21 * 60);
+    pt.valid = false;                                    // unread counts as differing
+    CHECK(times[(size_t)pt_logic::bedtime_selected(pt, times)] == 21 * 60);
+
+    const std::vector<int> ends = pt_logic::bedtime_end_times();
+    CHECK(ends.size() == 17 && ends.front() == 5 * 60 && ends.back() == 9 * 60);
+    pt = counting();
+    for (auto& b : pt.bed) b = bed(true, 21, 0, 7, 15);
+    CHECK(ends[(size_t)pt_logic::bedtime_end_selected(pt, ends)] == 7 * 60 + 15);
+    for (auto& b : pt.bed) b = bed(true, 21, 0, 10, 0);  // out of the list: 06:00
+    CHECK(ends[(size_t)pt_logic::bedtime_end_selected(pt, ends)] == 6 * 60);
+    pt.bed[2] = bed(true, 21, 0, 8, 0);                  // days differ: 06:00
+    CHECK(ends[(size_t)pt_logic::bedtime_end_selected(pt, ends)] == 6 * 60);
+}
+
+// The Overview's "+30 min" and the alarm notice.
+static void test_extra_today()
+{
+    pt_logic::ExtraRecord rec;
+    rec.weekday = 3;
+    rec.date    = "2026-10-07";
+    rec.base    = 120;
+    rec.value   = 150;
+    PtState pt = counting();
+    pt.day_min[3] = 150;
+    CHECK(pt_logic::recorded_today(rec, 3, "2026-10-07"));
+    CHECK(!pt_logic::recorded_today(rec, 4, "2026-10-07"));
+    CHECK(!pt_logic::recorded_today(rec, 3, "2026-10-14"));   // same weekday, a week later
+    CHECK(pt_logic::extra_today_min(rec, "2026-10-07", 3, pt) == 30);
+    CHECK(pt_logic::extra_today_min(rec, "2026-10-08", 3, pt) == 0);   // another day
+    CHECK(pt_logic::extra_today_min(rec, "2026-10-07", 4, pt) == 0);
+    CHECK(pt_logic::extra_today_min(rec, "2026-10-07", 9, pt) == 0);
+    pt.day_min[3] = 180;                                      // changed since
+    CHECK(pt_logic::extra_today_min(rec, "2026-10-07", 3, pt) == 0);
+    pt.day_min[3] = 0;                                        // "no more play" lowered it: no "+"
+    rec.value = 0;
+    CHECK(pt_logic::extra_today_min(rec, "2026-10-07", 3, pt) == 0);
+    rec.value = 150;
+    pt.day_min[3] = 150;
+    pt.valid = false;
+    CHECK(pt_logic::extra_today_min(rec, "2026-10-07", 3, pt) == 0);
+
+    pt = counting();
+    pt.alarm_disabled_valid = pt.alarm_disabled = true;
+    CHECK(pt_logic::alarm_off(pt));
+    pt.enabled = false;                                       // timer off: nothing to warn about
+    CHECK(!pt_logic::alarm_off(pt));
+    pt.enabled = true;
+    pt.alarm_disabled_valid = false;
+    CHECK(!pt_logic::alarm_off(pt));
+    pt.alarm_disabled_valid = true;
+    pt.fw_supported = false;
+    CHECK(!pt_logic::alarm_off(pt));
+}
+
 int main()
 {
     test_gate();
@@ -244,5 +343,7 @@ int main()
     test_stop();
     test_restore();
     test_bedtime();
-    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play and bedtime assertions passed");
+    test_pickers();
+    test_extra_today();
+    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, bedtime and picker assertions passed");
 }

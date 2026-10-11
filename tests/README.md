@@ -51,8 +51,10 @@ stops the program (a mock handed a bad pointer, a setup step everything needs).
 | `changelog/` | `source/util/changelog.cpp`: `CHANGELOG.md` as release-please writes it, read into the lines the About tab shows (sections, links, references, emoji). |
 | `launcher/` | `source/util/launcher.cpp` against a fake `core/platform.h`: which store is found on the SD card for each preference, and what reaches hbloader (an `sdmc:/` path, nothing when PlayGuard was not started by it). |
 | `profiles/` | `source/util/profiles.cpp`: display names with accents, the file name they give, collisions FAT would make, renames and damaged files. Needs the borealis submodule (nlohmann/json). |
+| `backup_logic/` | `source/action/backup_logic.cpp`: what a backup keeps of the console's answers (values not read or out of range left out, the limits, raw block and alarm together), the restore list's labels, and the tally of a restore's writes (the first error, what failed, whether anything went through). Needs the borealis submodule (nlohmann/json). |
+| `http_logic/` | `source/util/http_logic.cpp`: the response size limit, the headers a request sends, which error a failed transfer reports (the HTTP status first), and what counts as a redirect (3xx to an `https://` URL only). |
 | `pt_block/` | `source/util/pt_block.cpp`: the hex form the backups share, field names along `pure.h`'s layout, the diff and the reference file. Needs the borealis submodule (nlohmann/json). |
-| `pt_logic/` | `source/action/pt_logic.cpp`: when a play-timer write needs the temporary unlock, how much was played today, the suspend warning, extra time, *No more play today* and putting it back, the bedtime. |
+| `pt_logic/` | `source/action/pt_logic.cpp`: when a play-timer write needs the temporary unlock, how much was played today, the suspend warning, extra time, *No more play today* and putting it back, the bedtime, what `pt_flow`'s pickers start on (limits, bedtimes) and the Overview's extra-time and alarm lines. |
 | `support/` | `source/util/support.cpp`: when the main screen shows *What's new* or the monthly *Support PlayGuard* reminder. |
 | `ntp_packet/` | `source/util/ntp_packet.c`: every malformed / unsynchronised NTP reply is rejected; NTP era handling. |
 

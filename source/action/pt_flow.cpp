@@ -20,8 +20,7 @@ namespace pt_flow
 
 const std::vector<uint16_t>& quick_values()
 {
-    static const std::vector<uint16_t> values = { 30, 45, 60, 90, 120, 180, 240, 0 };
-    return values;
+    return pt_logic::quick_values();
 }
 
 int played_today_min(const PtState& pt)
@@ -277,22 +276,10 @@ void choose_bedtime(const PtState& pt, std::function<void()> refresh)
 {
     if (!bedtime_editable(pt)) return;
     // Off, then 16:00 to 23:45 every quarter of an hour.
-    std::vector<std::string> labels = { "playguard/common/off"_i18n };
-    std::vector<int> times = { -1 };
-    for (int t = 16 * 60; t < 24 * 60; t += 15) {
-        labels.push_back(hm(t / 60, t % 60));
-        times.push_back(t);
-    }
-    PtBedtime now;
-    int selected = 0;
-    if (pt_logic::bedtime_uniform(pt, &now) && now.on) {
-        selected = -1;
-        for (size_t i = 1; i < times.size(); i++)
-            if (times[i] == now.hour * 60 + now.minute) selected = (int)i;
-        if (selected < 0) selected = 0;
-    } else if (!pt_logic::bedtime_uniform(pt, nullptr)) {
-        selected = 21 * 4 - 16 * 4 + 1;   // days differ: start on 21:00
-    }
+    const std::vector<int> times = pt_logic::bedtime_times();
+    std::vector<std::string> labels;
+    for (int t : times) labels.push_back(t < 0 ? "playguard/common/off"_i18n : hm(t / 60, t % 60));
+    const int selected = pt_logic::bedtime_selected(pt, times);
     const PtState copy = pt;
     ui::pick("playguard/play_timer/bedtime_title"_i18n, labels, selected, [copy, times, refresh](int index) {
         const int t = times[(size_t)index];
@@ -314,17 +301,10 @@ void choose_bedtime_end(const PtState& pt, std::function<void()> refresh)
         return;
     }
     // 05:00 to 09:00 every quarter of an hour.
+    const std::vector<int> times = pt_logic::bedtime_end_times();
     std::vector<std::string> labels;
-    std::vector<int> times;
-    for (int t = 5 * 60; t <= 9 * 60; t += 15) {
-        labels.push_back(hm(t / 60, t % 60));
-        times.push_back(t);
-    }
-    PtBedtime now;
-    int selected = 4;   // 06:00
-    if (pt_logic::bedtime_uniform(pt, &now))
-        for (size_t i = 0; i < times.size(); i++)
-            if (times[i] == now.end_hour * 60 + now.end_minute) selected = (int)i;
+    for (int t : times) labels.push_back(hm(t / 60, t % 60));
+    const int selected = pt_logic::bedtime_end_selected(pt, times);
     const PtState copy = pt;
     ui::pick("playguard/play_timer/bedtime_end_title"_i18n, labels, selected, [copy, times, refresh](int index) {
         const int t = times[(size_t)index];
@@ -351,25 +331,15 @@ static void apply_uniform(uint16_t minutes, std::function<void()> refresh)
 
 void choose_uniform_limit(const PtState& pt, std::function<void()> refresh)
 {
-    bool uniform = pt.valid;
-    for (int i = 1; i < 7 && uniform; i++) uniform = pt.day_min[i] == pt.day_min[0];
-
-    const auto& values = quick_values();
+    const pt_logic::UniformPick pick = pt_logic::uniform_pick(pt);
     std::vector<std::string> labels;
-    int selected = -1;
-    for (size_t i = 0; i < values.size(); i++) {
-        labels.push_back(ui::fmt_minutes(values[i]));
-        if (uniform && pt.day_min[0] == values[i]) selected = (int)i;
-    }
+    for (uint16_t v : quick_values()) labels.push_back(ui::fmt_minutes(v));
     labels.push_back("playguard/common/custom"_i18n);
-    // Days that differ (or a value outside the list): start on "Custom…"
-    // rather than pretending the first value is the current one.
-    if (selected < 0) selected = (int)labels.size() - 1;
 
-    const std::string title = uniform ? "playguard/play_timer/quick_title"_i18n
-                                      : "playguard/play_timer/quick_title_varies"_i18n;
-    uint16_t seed = (pt.valid && pt.day_min[0] != PT_DAY_NOLIMIT) ? pt.day_min[0] : 60;
-    ui::pick(title, labels, selected, [refresh, seed](int index) {
+    const std::string title = pick.uniform ? "playguard/play_timer/quick_title"_i18n
+                                           : "playguard/play_timer/quick_title_varies"_i18n;
+    const uint16_t seed = pick.seed;
+    ui::pick(title, labels, pick.selected, [refresh, seed](int index) {
         const auto& values = quick_values();
         if ((size_t)index < values.size()) {
             apply_uniform(values[index], refresh);
@@ -384,26 +354,18 @@ void pick_limit(const std::string& title, uint16_t current, std::function<void(u
 {
     // Quick values first (as in "Same limit every day"), then any value, then
     // no limit; the current value is pre-selected.
-    const auto& values = quick_values();
+    const pt_logic::LimitPick pick = pt_logic::limit_pick(current);
     std::vector<std::string> options;
-    int selected = -1;
-    for (size_t i = 0; i < values.size(); i++) {
-        options.push_back(ui::fmt_minutes(values[i]));
-        if (values[i] == current) selected = (int)i;
-    }
-    const int custom_index  = (int)options.size();
-    const int nolimit_index = custom_index + 1;
+    for (uint16_t v : quick_values()) options.push_back(ui::fmt_minutes(v));
     options.push_back("playguard/play_timer/perday/pick_minutes"_i18n);
     options.push_back("playguard/play_timer/perday/pick_no_limit"_i18n);
-    if (current == PT_DAY_NOLIMIT) selected = nolimit_index;
-    else if (selected < 0) selected = custom_index;
 
-    ui::pick(title, options, selected, [title, current, on_value, custom_index, nolimit_index](int index) {
+    const int custom_index = pick.custom, nolimit_index = pick.no_limit;
+    ui::pick(title, options, pick.selected, [title, current, on_value, custom_index, nolimit_index](int index) {
         if (index == nolimit_index) {
             on_value(PT_DAY_NOLIMIT);
         } else if (index == custom_index) {
-            const uint16_t seed = current == PT_DAY_NOLIMIT ? 60 : current;
-            ui::prompt_minutes(title, seed, [on_value](uint16_t v) { on_value(v); });
+            ui::prompt_minutes(title, pt_logic::limit_seed(current), [on_value](uint16_t v) { on_value(v); });
         } else {
             on_value(quick_values()[index]);
         }
@@ -547,7 +509,7 @@ void add_extra_time(const PtState& pt, std::function<void()> refresh)
         const uint16_t extra = (uint16_t)amounts[index];
         // What gets put back later is the limit before any extra time today.
         const pt_logic::ExtraRecord rec = extra_record();
-        const bool again = rec.weekday == wd && rec.date == ui::today_date();
+        const bool again = pt_logic::recorded_today(rec, wd, ui::today_date());
         const pt_logic::ExtraPlan plan = pt_logic::plan_extra(base, extra, again, rec.base);
         const uint16_t value = plan.value, original = plan.original;
         const std::string body = brls::getStr(config::get().extra_auto_restore ? "playguard/dashboard/extra_body_auto"
@@ -585,7 +547,7 @@ static void stop_at(const PtState& pt, uint16_t value, std::function<void()> ref
     const int wd = ui::today_weekday();
     const uint16_t base = pt.day_min[wd];
     const pt_logic::ExtraRecord rec = extra_record();
-    const bool again = rec.weekday == wd && rec.date == ui::today_date();
+    const bool again = pt_logic::recorded_today(rec, wd, ui::today_date());
     const pt_logic::ExtraPlan plan = pt_logic::plan_stop(base, again, rec.base);
     const uint16_t original = plan.original;
     uint16_t new_days[7];
@@ -672,12 +634,8 @@ bool restore_pending(const PtState& pt)
 
 std::string extra_today_text(const PtState& pt)
 {
-    const pt_logic::ExtraRecord rec = extra_record();
-    const int wd = ui::today_weekday();
-    if (rec.weekday != wd || rec.date != ui::today_date() || !pt.valid || pt.day_min[wd] != rec.value ||
-        rec.value <= rec.base)
-        return "";
-    return "+" + ui::fmt_minutes((uint16_t)(rec.value - rec.base));
+    const int extra = pt_logic::extra_today_min(extra_record(), ui::today_date(), ui::today_weekday(), pt);
+    return extra > 0 ? "+" + ui::fmt_minutes((uint16_t)extra) : "";
 }
 
 std::string restore_label()
@@ -727,7 +685,7 @@ void offer_extra_time_restore(std::function<void()> refresh)
 
 bool alarm_off(const PtState& pt)
 {
-    return pt.fw_supported && pt.enabled_valid && pt.enabled && pt.alarm_disabled_valid && pt.alarm_disabled;
+    return pt_logic::alarm_off(pt);
 }
 
 Result write_alarm_disabled(bool disabled, const std::string& source)
