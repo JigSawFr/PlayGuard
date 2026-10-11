@@ -887,6 +887,7 @@
         "order_newest": "newest build first",
         "order_number": "by number",
         "sort": "Sort",
+        "next_tab": "Next list",
         "release": "Release {}",
         "main": "main · {} · {}",
         "pr": "PR #{} · {} · {}",
@@ -903,7 +904,7 @@
         "done_manual": "{} is installed. Close PlayGuard and open it again to use it.",
         "no_path": "PlayGuard does not know where its .nro file is (started without hbloader?), so it cannot replace it. Install the build by hand from GitHub.",
         "sign_in": "Sign in to GitHub for the builds of main and pull requests",
-        "refresh": "Refresh the list (checked {} min ago)"
+        "checked": "List checked {} min ago."
     },
     "github": {
         "account": "GitHub account",

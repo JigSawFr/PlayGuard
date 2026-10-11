@@ -887,6 +887,7 @@
         "order_newest": "新しいビルド順",
         "order_number": "番号順",
         "sort": "並べ替え",
+        "next_tab": "次のリスト",
         "release": "バージョン {}",
         "main": "main · {} · {}",
         "pr": "PR #{} · {} · {}",
@@ -903,7 +904,7 @@
         "done_manual": "{} をインストールしました。PlayGuard を閉じて、もう一度開いてください。",
         "no_path": "PlayGuard は自身の .nro ファイルの場所を把握していないため（hbloader を使わずに起動しましたか？）、置き換えられません。GitHub から手動でインストールしてください。",
         "sign_in": "main とプルリクエストのビルドを使うには GitHub にログイン",
-        "refresh": "リストを更新 ({} 分前に確認)"
+        "checked": "{} 分前にリストを確認。"
     },
     "github": {
         "account": "GitHub アカウント",

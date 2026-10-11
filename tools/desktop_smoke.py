@@ -19,7 +19,7 @@ The "devbuild" scenario turns the developer mode on, signs in to a simulated
 GitHub (PLAYGUARD_SIM_GITHUB_LOGIN) from the build list, then installs a pull
 request's build out of its artifact zip (PLAYGUARD_SIM_DEV_BUILDS): the file
 must replace the simulated playguard.nro and be handed to hbloader. On the
-way, the list must be kept (opened again at once) and Refresh fetch it again.
+way, the list must be kept (opened again at once) and X fetch it again.
 
 The "errors" scenario starts with today's limit reached, the temporary unlock
 failing and "Synchronise clock via Internet" off (PLAYGUARD_SIM_FAIL & co.):
@@ -264,6 +264,14 @@ def key(name, n=1, hold=0.02):
         time.sleep(0.2)
 
 
+def button_x():
+    """Ⓧ: the desktop build reads it from the middle mouse button (the
+    keyboard has none), clicked over the title, where nothing takes the focus."""
+    time.sleep(0.6)
+    subprocess.run(["xdotool", "mousemove", "640", "40", "mousedown", "2", "sleep", "0.05", "mouseup", "2"], env=env)
+    time.sleep(0.2)
+
+
 def shot(name):
     time.sleep(0.8)
     subprocess.run(IM + ["import", "-window", "root", os.path.join(OUT, name + ".png")], env=env)
@@ -498,24 +506,27 @@ if DEVBUILD:
     time.sleep(3)
     if not os.path.exists(token_file):
         fail("no GitHub token saved in " + token_file)
-    shot("03_dev_builds")      # the same screen filled: release, main ×2, the pull request, Refresh
+    shot("03_dev_builds")      # the same screen filled: the tabs, the release, how old the list is
     cache_file = os.path.join(run_dir, "playguard_data", "cache", "dev_builds.json")
     if not os.path.exists(cache_file) or len(json.load(open(cache_file))["builds"]) != 4:
         fail("the list was not kept in " + cache_file)
     loading = "Looking for builds..."
     fetched = messages().count(loading)
     key("Escape")              # closed, then opened again: the list kept is shown at once
+    key("Return")              # on the release's tab, its build focused
+    key("Up")                  # the tabs
+    key("Right", 2)            # Pull requests (the keyboard has no L / R)
     key("Return")
-    shot("03b_dev_builds_kept")  # under their headers, the pull requests by number
+    shot("03b_dev_builds_kept")  # the pull requests' tab, by number
     if messages().count(loading) != fetched:
         fail("a list fetched a moment ago was fetched again")
-    key("Down", 4)             # past the release, main ×2 and the pull request: Refresh the list
-    key("Return")
+    key("Down")                # the pull request
+    button_x()                 # Refresh
     time.sleep(2)
     if messages().count(loading) != fetched + 1:
-        fail("Refresh the list did not fetch it again")
-    key("Up")                  # the pull request, just above (the screen updated in place)
-    key("Return")
+        fail("X did not fetch the list again")
+    key("Down")                # back to the controller after the mouse (nothing below the pull request)
+    key("Return")              # the pull request, still focused (the screen updated in place)
     shot("04_dev_build_confirm")
     key("Right")               # Install
     key("Return")

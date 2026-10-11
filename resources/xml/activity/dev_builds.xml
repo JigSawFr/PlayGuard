@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Developer tools › Install another build: the latest release, main's last
-     commits and the open pull requests under their headers (Y sorts the pull
-     requests), then signing in and refreshing the list. The lists are built
+<!-- Developer tools › Install another build: a tab each for the latest
+     release, main's last commits and the open pull requests (L / R move from
+     one to the next, Y sorts the pull requests), the builds of the chosen one,
+     then signing in, and how old the list is (X fetches it again). The lists are built
      by source/activity/dev_builds_activity.cpp. -->
 
 <brls:AppletFrame
@@ -29,16 +30,14 @@
             paddingLeft="@style/brls/sidebar/padding_left">
 
             <brls:Label id="db_note" text="" fontSize="20" marginBottom="16" textColor="@theme/brand/note"/>
-            <brls:Header id="db_release_header" title=" " marginBottom="8"/>
-            <brls:Box id="db_release" width="auto" height="auto" axis="column" alignItems="stretch"/>
-            <brls:Header id="db_main_header" title=" " marginTop="24" marginBottom="8"/>
-            <brls:Box id="db_main" width="auto" height="auto" axis="column" alignItems="stretch"/>
-            <brls:Header id="db_pulls_header" title=" " marginTop="24" marginBottom="8"/>
-            <brls:Box id="db_pulls" width="auto" height="auto" axis="column" alignItems="stretch"/>
-            <brls:Box width="auto" height="auto" axis="column" alignItems="stretch" marginTop="24">
-                <brls:DetailCell id="db_sign_in" title="@i18n/playguard/dev_build/sign_in"/>
-                <brls:DetailCell id="db_refresh" title=" "/>
+            <brls:Box id="db_tabs" width="auto" height="auto" axis="row" marginBottom="16">
+                <brls:Button id="db_tab_release" style="default" text=" " marginRight="12"/>
+                <brls:Button id="db_tab_main" style="default" text=" " marginRight="12"/>
+                <brls:Button id="db_tab_pulls" style="default" text=" "/>
             </brls:Box>
+            <brls:Box id="db_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
+            <brls:DetailCell id="db_sign_in" title="@i18n/playguard/dev_build/sign_in" marginTop="24"/>
+            <brls:Label id="db_checked" text=" " fontSize="18" marginTop="16" textColor="@theme/brand/note"/>
 
         </brls:Box>
 

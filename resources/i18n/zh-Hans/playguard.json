@@ -887,6 +887,7 @@
         "order_newest": "最新构建在前",
         "order_number": "按编号",
         "sort": "排序",
+        "next_tab": "下一个列表",
         "release": "版本 {}",
         "main": "main · {} · {}",
         "pr": "PR #{} · {} · {}",
@@ -903,7 +904,7 @@
         "done_manual": "{} 已安装。关闭 PlayGuard 并重新打开即可使用。",
         "no_path": "PlayGuard 不知道自己的 .nro 文件位置（未通过 hbloader 启动？），因此无法替换。请从 GitHub 手动安装该构建。",
         "sign_in": "登录 GitHub 以获取 main 和拉取请求的构建",
-        "refresh": "刷新列表（{} 分钟前检查）"
+        "checked": "列表于 {} 分钟前检查。"
     },
     "github": {
         "account": "GitHub 账户",

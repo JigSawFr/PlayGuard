@@ -215,10 +215,10 @@ bool installed(const dev_builds::Build& b)
     return !app::commit().empty() && b.commit == app::commit();
 }
 
-std::string refresh_text(const dev_builds::Cache& cache)
+std::string checked_text(const dev_builds::Cache& cache)
 {
     const int64_t age = (int64_t)std::time(nullptr) - cache.fetched_at;
-    return brls::getStr("playguard/dev_build/refresh", (int)(age > 0 ? age / 60 : 0));
+    return brls::getStr("playguard/dev_build/checked", (int)(age > 0 ? age / 60 : 0));
 }
 
 void choose(const dev_builds::Build& b)

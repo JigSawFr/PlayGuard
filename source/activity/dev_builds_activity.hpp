@@ -1,10 +1,13 @@
 // DevBuildsActivity — Developer tools › Install another build
-// (action/dev_build_flow.hpp): the latest release, main's last commits and
-// the open pull requests, each kind under its own header, the installed
-// one marked. Ⓨ sorts the pull requests (the newest build first, or by
-// number), remembered in config.json. A on a build offers to install it;
-// below the lists, signing in to GitHub (signed out, only the release is
-// listed) and refreshing the list.
+// (action/dev_build_flow.hpp): a tab each for the latest release, main's
+// last commits and the open pull requests (a long list of one kind never
+// hides the next), the builds of the chosen one below, the installed one
+// marked. Ⓛ / Ⓡ move from one tab to the next; the tab opened first is the
+// installed build's, then the last one chosen in this run. Ⓨ sorts the pull
+// requests (the newest build first, or by number), remembered in
+// config.json. A on a build offers to install it; below the list, signing
+// in to GitHub (signed out, only the release is listed) and how old the list
+// is; Ⓧ fetches it again.
 // A list fetched again while this screen is open replaces its content in
 // place: the cells are reused, never freed (one of them may have the focus).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -29,21 +32,25 @@ class DevBuildsActivity : public brls::Activity
 
   private:
     void update(const dev_builds::Cache& cache);
-    // The lists from this->cache, in the order chosen.
+    // The tabs and the chosen one's builds from this->cache, in the order chosen.
     void fill();
-    // `builds` in the cells of `box`, reusing them; the extra ones hidden.
-    void fill(brls::Box* box, const std::vector<dev_builds::Build>& builds);
+    // The builds of `kind`, in the order chosen.
+    std::vector<dev_builds::Build> builds(dev_builds::Kind kind) const;
+    // Shows `kind`'s builds, the focus on the first one when `focus_list`.
+    void show_tab(dev_builds::Kind kind, bool focus_list);
+    // The next tab with builds, `step` 1 or -1 (Ⓡ, Ⓛ), the focus going along.
+    void next_tab(int step);
     void sort();
 
     dev_builds::Cache cache;
+    dev_builds::Kind  tab = dev_builds::Kind::Release;
 
     BRLS_BIND(brls::Label,      note,           "db_note");
-    BRLS_BIND(brls::Header,     release_header, "db_release_header");
-    BRLS_BIND(brls::Box,        release_list,   "db_release");
-    BRLS_BIND(brls::Header,     main_header,    "db_main_header");
-    BRLS_BIND(brls::Box,        main_list,      "db_main");
-    BRLS_BIND(brls::Header,     pulls_header,   "db_pulls_header");
-    BRLS_BIND(brls::Box,        pulls_list,     "db_pulls");
+    BRLS_BIND(brls::Box,        tabs,           "db_tabs");
+    BRLS_BIND(brls::Button,     tab_release,    "db_tab_release");
+    BRLS_BIND(brls::Button,     tab_main,       "db_tab_main");
+    BRLS_BIND(brls::Button,     tab_pulls,      "db_tab_pulls");
+    BRLS_BIND(brls::Box,        list,           "db_list");
     BRLS_BIND(brls::DetailCell, sign_in,        "db_sign_in");
-    BRLS_BIND(brls::DetailCell, refresh,        "db_refresh");
+    BRLS_BIND(brls::Label,      checked,        "db_checked");
 };
