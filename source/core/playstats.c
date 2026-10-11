@@ -397,12 +397,13 @@ size_t playstats_by_account(u64 app_id, AccountPlay *out, size_t max, Result *rc
         rc = accountListAllUsers(uids, PLAYSTATS_MAX_ACCOUNTS, &count);
         if (R_SUCCEEDED(rc)) rc = pdmqryInitialize();
         if (R_SUCCEEDED(rc)) {
+            Result first_failed = 0;
             for (s32 i = 0; i < count && n < max; i++) {
                 PdmPlayStatistics st;
                 memset(&st, 0, sizeof(st));
-                if (R_FAILED(pdmqryQueryPlayStatisticsByApplicationIdAndUserAccountId(app_id, uids[i], false, &st)) ||
-                    (st.playtime == 0 && st.total_launches == 0))
-                    continue;
+                const Result qrc = pdmqryQueryPlayStatisticsByApplicationIdAndUserAccountId(app_id, uids[i], false, &st);
+                if (R_FAILED(qrc) && R_SUCCEEDED(first_failed)) first_failed = qrc;
+                if (R_FAILED(qrc) || (st.playtime == 0 && st.total_launches == 0)) continue;
                 AccountPlay *a = &out[n];
                 memset(a, 0, sizeof(*a));
                 a->total_s  = st.playtime / 1000000000ULL;
@@ -416,6 +417,7 @@ size_t playstats_by_account(u64 app_id, AccountPlay *out, size_t max, Result *rc
                 }
                 n++;
             }
+            rc = first_failed;   // an account left out: its time is not "no account"
             pdmqryExit();
         }
         accountExit();

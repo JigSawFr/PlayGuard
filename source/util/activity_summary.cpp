@@ -84,4 +84,11 @@ std::vector<int> rediscover(const PlayStats& s, size_t max)
     return out;
 }
 
+uint64_t unattributed_s(uint64_t total_s, const AccountPlay* accounts, size_t count)
+{
+    uint64_t gap = total_s;
+    for (size_t i = 0; i < count && gap; i++) gap -= accounts[i].total_s < gap ? accounts[i].total_s : gap;
+    return gap >= UNATTRIBUTED_MIN_S ? gap : 0;
+}
+
 }   // namespace activity_summary

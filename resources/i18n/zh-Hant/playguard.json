@@ -415,7 +415,9 @@
             "days_played_value": "7 天中 {} 天",
             "busiest": "玩得最多的一天",
             "session": "平均每次時長"
-        }
+        },
+        "account_nobody": "無帳號（或已刪除的帳號）",
+        "account_new": "新帳號（自{}起）：{}"
     },
     "restrictions": {
         "section_level": "限制等級",
@@ -902,7 +904,8 @@
             "config_reset": "偏好設定已重設（檔案無法讀取）",
             "outside_reset": "遊玩時間重新開始計算（PlayGuard發現）",
             "outside_clock": "主機時鐘被更改（PlayGuard發現）",
-            "outside_limits": "在PlayGuard之外更改的上限"
+            "outside_limits": "在PlayGuard之外更改的上限",
+            "new_account": "新使用者帳號（PlayGuard發現）"
         },
         "sources": {
             "uniform": "每天相同上限",

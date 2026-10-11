@@ -415,7 +415,9 @@
             "days_played_value": "7일 중 {}일",
             "busiest": "가장 많이 한 날",
             "session": "평균 세션"
-        }
+        },
+        "account_nobody": "사용자 없음(또는 삭제한 사용자)",
+        "account_new": "새 사용자({}부터): {}"
     },
     "restrictions": {
         "section_level": "제한 레벨",
@@ -902,7 +904,8 @@
             "config_reset": "환경 설정 초기화(파일을 읽을 수 없음)",
             "outside_reset": "플레이 시간 초기화(PlayGuard가 감지)",
             "outside_clock": "본체 시계 변경(PlayGuard가 감지)",
-            "outside_limits": "PlayGuard 밖에서 제한 변경"
+            "outside_limits": "PlayGuard 밖에서 제한 변경",
+            "new_account": "새 사용자(PlayGuard가 감지)"
         },
         "sources": {
             "uniform": "매일 같은 제한",

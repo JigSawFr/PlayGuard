@@ -415,7 +415,9 @@
             "days_played_value": "{} van 7",
             "busiest": "Drukste dag",
             "session": "Gemiddelde sessie"
-        }
+        },
+        "account_nobody": "Zonder account (of een verwijderd account)",
+        "account_new": "Nieuw account sinds {}: {}"
     },
     "restrictions": {
         "section_level": "Beperkingsniveau",
@@ -902,7 +904,8 @@
             "config_reset": "Voorkeuren teruggezet (bestand onleesbaar)",
             "outside_reset": "Speeltijd opnieuw begonnen (gezien door PlayGuard)",
             "outside_clock": "Klok van de console gewijzigd (gezien door PlayGuard)",
-            "outside_limits": "Limieten buiten PlayGuard gewijzigd"
+            "outside_limits": "Limieten buiten PlayGuard gewijzigd",
+            "new_account": "Nieuw gebruikersaccount (gezien door PlayGuard)"
         },
         "sources": {
             "uniform": "Elke dag dezelfde limiet",

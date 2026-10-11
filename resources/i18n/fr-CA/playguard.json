@@ -415,7 +415,9 @@
             "days_played_value": "{} sur 7",
             "busiest": "Jour le plus occupé",
             "session": "Session moyenne"
-        }
+        },
+        "account_nobody": "Sans compte (ou compte supprimé)",
+        "account_new": "Nouveau compte depuis le {} : {}"
     },
     "restrictions": {
         "section_level": "Niveau de restriction",
@@ -902,7 +904,8 @@
             "config_reset": "Réglages réinitialisés (fichier illisible)",
             "outside_reset": "Temps de jeu reparti de zéro (vu par PlayGuard)",
             "outside_clock": "Horloge de la console changée (vu par PlayGuard)",
-            "outside_limits": "Limites modifiées en dehors de PlayGuard"
+            "outside_limits": "Limites modifiées en dehors de PlayGuard",
+            "new_account": "Nouveau compte utilisateur (vu par PlayGuard)"
         },
         "sources": {
             "uniform": "Même limite tous les jours",

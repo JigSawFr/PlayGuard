@@ -75,7 +75,8 @@ bool playstats_cancelled(void);
 
 // One game's all-time play time per user account on the console (pdm:qry by
 // account, acc:u0 for the nicknames). Accounts that never played it are left
-// out. Returns how many were written to `out`; *rc says why none when 0.
+// out. Returns how many were written to `out`; *rc says why none when 0, and
+// fails too when one account could not be read (the list misses it).
 #define PLAYSTATS_MAX_ACCOUNTS 8
 typedef struct {
     char nickname[0x21];   // UTF-8, as the HOME menu shows it

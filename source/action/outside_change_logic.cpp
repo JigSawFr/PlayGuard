@@ -2,6 +2,7 @@
 #include "action/outside_change_logic.hpp"
 
 #include <borealis/extern/nlohmann/json.hpp>
+#include <cstddef>
 #include <cstring>
 
 namespace outside_change_logic
@@ -29,6 +30,27 @@ bool is_hm(const std::string& s)
 }
 
 bool day_ok(int64_t v) { return (v >= 0 && v <= 1440) || v == 0xFFFF; }
+
+bool is_account_id(const std::string& s)
+{
+    if (s.size() != 32) return false;
+    for (char c : s)
+        if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F'))) return false;
+    return true;
+}
+
+// Days since 1970-01-01 of a "YYYY-MM-DD" (is_date), proleptic Gregorian.
+int64_t day_number(const std::string& d)
+{
+    int64_t y = std::stoi(d.substr(0, 4));
+    const int m = std::stoi(d.substr(5, 2)), day = std::stoi(d.substr(8, 2));
+    y -= m <= 2;
+    const int64_t era = (y >= 0 ? y : y - 399) / 400;
+    const int64_t yoe = y - era * 400;
+    const int64_t doy = (153 * (m + (m > 2 ? -3 : 9)) + 2) / 5 + day - 1;
+    const int64_t doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    return era * 146097 + doe - 719468;
+}
 }   // namespace
 
 Findings check(Record& rec, const Observation& ob)
@@ -114,6 +136,50 @@ void dismiss(Record& rec)
     rec.reset_at.clear();
 }
 
+std::vector<std::string> check_accounts(Record& rec, const std::vector<std::string>& ids, const std::string& date,
+                                        bool* save)
+{
+    std::vector<std::string> added;
+    *save = false;
+    if (ids.empty() || !is_date(date)) return added;
+    for (const std::string& id : ids) {
+        bool known = false;
+        for (const KnownAccount& k : rec.accounts) known = known || k.id == id;
+        if (known || !is_account_id(id)) continue;
+        rec.accounts.push_back({ id, date, rec.accounts_known });
+        if (rec.accounts_known) added.push_back(id);
+        *save = true;
+    }
+    if (!rec.accounts_known) {
+        rec.accounts_known = true;
+        *save = true;
+    }
+    // Over the cap: the oldest accounts the console no longer has go first.
+    for (size_t i = 0; rec.accounts.size() > KNOWN_ACCOUNTS_MAX && i < rec.accounts.size();) {
+        bool listed = false;
+        for (const std::string& id : ids) listed = listed || rec.accounts[i].id == id;
+        if (listed) {
+            i++;
+            continue;
+        }
+        rec.accounts.erase(rec.accounts.begin() + (std::ptrdiff_t)i);
+        *save = true;
+    }
+    return added;
+}
+
+std::vector<std::pair<std::string, std::string>> new_accounts(const Record& rec, const std::vector<std::string>& ids,
+                                                              const std::string& today)
+{
+    std::vector<std::pair<std::string, std::string>> out;
+    if (!is_date(today)) return out;
+    for (const std::string& id : ids)
+        for (const KnownAccount& k : rec.accounts)
+            if (k.id == id && k.added && day_number(today) - day_number(k.since) <= NEW_ACCOUNT_DAYS)
+                out.emplace_back(id, k.since);
+    return out;
+}
+
 Record parse(const std::string& text)
 {
     Record rec;
@@ -158,6 +224,21 @@ Record parse(const std::string& text)
         const std::string at = str("reset_at");
         if ((rec.notice & NOTICE_RESET) && is_hm(at)) rec.reset_at = at;
     }
+    // A damaged entry is left out (its account shows as new again); no list
+    // at all is a first listing.
+    const auto acc = j.find("accounts");
+    if (acc != j.end() && acc->is_array()) {
+        rec.accounts_known = true;
+        for (const auto& a : *acc) {
+            if (rec.accounts.size() == KNOWN_ACCOUNTS_MAX) break;
+            if (!a.is_object()) continue;
+            const auto id = a.find("id"), since = a.find("since"), added = a.find("new");
+            if (id == a.end() || !id->is_string() || !is_account_id(id->get<std::string>())) continue;
+            if (since == a.end() || !since->is_string() || !is_date(since->get<std::string>())) continue;
+            rec.accounts.push_back({ id->get<std::string>(), since->get<std::string>(),
+                                     added != a.end() && added->is_boolean() && added->get<bool>() });
+        }
+    }
     return rec;
 }
 
@@ -175,6 +256,15 @@ std::string serialize(const Record& rec)
         j["notice"] = rec.notice;
         j["notice_date"] = rec.notice_date;
         if (!rec.reset_at.empty()) j["reset_at"] = rec.reset_at;
+    }
+    if (rec.accounts_known) {
+        nlohmann::json list = nlohmann::json::array();
+        for (const KnownAccount& k : rec.accounts) {
+            nlohmann::json a = { { "id", k.id }, { "since", k.since } };
+            if (k.added) a["new"] = true;
+            list.push_back(a);
+        }
+        j["accounts"] = list;
     }
     return j.dump(2) + "\n";
 }

@@ -27,10 +27,11 @@ and the clock tab must say why the network clock cannot be set.
 
 The "outside" scenario starts with a watch.json from an earlier run that the
 console no longer matches (more time played, another clock offset, other
-limits) and a time left that does not go down (PLAYGUARD_SIM_NOT_COUNTING):
-the Overview must say what changed outside PlayGuard, record it in the
-change history, then, after 90 s on screen, that the console is not
-counting; the notice must go when dismissed.
+limits, one of the two accounts unknown) and a time left that does not go
+down (PLAYGUARD_SIM_NOT_COUNTING): the Overview must say what changed
+outside PlayGuard, record it in the change history, then, after 90 s on
+screen, that the console is not counting; the notice must go when
+dismissed, and the Activity tab flag the new account.
 
 Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|library|outside]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
@@ -178,12 +179,14 @@ if OUTSIDE:
     # What PlayGuard saw last time (outside_change_logic): 100 min played
     # today (the console says 80), a clock 15 min off the steady one (the
     # simulated steady clock's source is 16 bytes of 0x53), 1 h 30 on
-    # Saturday (the console has 3 h).
+    # Saturday (the console has 3 h), and only Alice of the two accounts
+    # (Léo is new).
     env.setdefault("PLAYGUARD_SIM_NOT_COUNTING", "1")
     watch_file = os.path.join(run_dir, "playguard_data", "watch.json")
     os.makedirs(os.path.dirname(watch_file), exist_ok=True)
     json.dump({"schema": 1, "date": "2026-10-08", "spent_s": 6000, "offset_s": 900, "steady_id": "53" * 16,
-               "limits": [180, 120, 120, 120, 120, 120, 90]}, open(watch_file, "w"))
+               "limits": [180, 120, 120, 120, 120, 120, 90],
+               "accounts": [{"id": "%016X%016X" % (1, 1), "since": "2026-09-01"}]}, open(watch_file, "w"))
     history_file = os.path.join(run_dir, "playguard_data", "history.json")
     if os.path.exists(history_file):
         os.remove(history_file)   # the outside_* entries must be this run's
@@ -460,7 +463,7 @@ if OUTSIDE:
         kinds = [e.get("kind") for e in json.load(open(history_file)).get("entries", [])]
     except (OSError, ValueError) as e:
         fail(f"no history written: {e}")
-    for kind in ("outside_reset", "outside_clock", "outside_limits"):
+    for kind in ("outside_reset", "outside_clock", "outside_limits", "new_account"):
         if kinds.count(kind) != 1:
             fail(f"{kind} recorded {kinds.count(kind)} times in the history: {kinds!r}")
     # The time left stays the same: after 90 s on screen, the Overview says
@@ -485,10 +488,17 @@ if OUTSIDE:
     key("Return")
     shot("04_dismissed")
     try:
-        if json.load(open(watch_file)).get("notice"):
-            fail("the notice was not dismissed in " + watch_file)
+        watch = json.load(open(watch_file))
     except (OSError, ValueError) as e:
         fail(f"watch.json unreadable: {e}")
+    if watch.get("notice"):
+        fail("the notice was not dismissed in " + watch_file)
+    if [a.get("new", False) for a in watch.get("accounts", [])] != [False, True]:
+        fail("Léo was not kept as a new account in " + watch_file)
+    key("Left")                # the sidebar, then Activity: Léo flagged under the account filter
+    key("Down", steps("dashboard", "activity"))
+    key("Right")
+    shot("05_new_account")
     finish()
 if LOCK:
     shot("01_unlocked")        # the PIN screen answered at once: the Overview
@@ -676,6 +686,8 @@ key("Right")               # Account (the simulated console has two; the totals 
 key("Down", 5)             # a scroll, then past Period, the game to rediscover and Export: the first game
 key("Return")
 shot("28_activity_game")   # its own screen: icon, seven days, figures, accounts
+key("Down", 8)             # scrolled to the accounts: Alice, Léo, and the time on no account
+shot("28b_activity_game_accounts")
 key("Escape")
 key("Up")                  # Export to the SD card…
 key("Return")

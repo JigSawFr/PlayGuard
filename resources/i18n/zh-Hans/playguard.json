@@ -415,7 +415,9 @@
             "days_played_value": "7 天中 {} 天",
             "busiest": "玩得最多的一天",
             "session": "平均每次时长"
-        }
+        },
+        "account_nobody": "无用户（或已删除的用户）",
+        "account_new": "新用户（自{}起）：{}"
     },
     "restrictions": {
         "section_level": "限制等级",
@@ -902,7 +904,8 @@
             "config_reset": "偏好设置已重置（文件无法读取）",
             "outside_reset": "游戏时间重新开始计算（PlayGuard发现）",
             "outside_clock": "主机时钟被更改（PlayGuard发现）",
-            "outside_limits": "在PlayGuard之外更改的限制"
+            "outside_limits": "在PlayGuard之外更改的限制",
+            "new_account": "新用户（PlayGuard发现）"
         },
         "sources": {
             "uniform": "每天相同的限制",

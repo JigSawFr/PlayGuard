@@ -1,7 +1,7 @@
 // Host tests for util/activity_summary.hpp: the Activity tab's summary over
 // each period (average per day, most played game, days played, busiest day,
-// average session), what is left out when a figure was not read, and the
-// games to rediscover.
+// average session), what is left out when a figure was not read, the
+// games to rediscover, and the play time no account holds.
 #include "check.h"
 #include <cstdio>
 #include <cstring>
@@ -157,10 +157,32 @@ static void test_rediscover()
     CHECK(rediscover(*s, 10).empty());
 }
 
+static void test_unattributed()
+{
+    AccountPlay a[3] = {};
+    a[0].total_s = 3000;
+    a[1].total_s = 1000;
+    // The game's 5000 s: 1000 s on no account.
+    CHECK(unattributed_s(5000, a, 2) == 1000);
+    // No account listed: all of it.
+    CHECK(unattributed_s(5000, a, 0) == 5000);
+    // A few seconds apart: nothing to show.
+    CHECK(unattributed_s(4000 + UNATTRIBUTED_MIN_S - 1, a, 2) == 0);
+    CHECK(unattributed_s(4000 + UNATTRIBUTED_MIN_S, a, 2) == UNATTRIBUTED_MIN_S);
+    // Two accounts open together count the same time twice: never negative.
+    CHECK(unattributed_s(3500, a, 2) == 0);
+    CHECK(unattributed_s(4000, a, 2) == 0);
+    CHECK(unattributed_s(0, a, 2) == 0);
+    // No overflow, whatever the figures.
+    a[2].total_s = UINT64_MAX;
+    CHECK(unattributed_s(UINT64_MAX, a, 3) == 0);
+}
+
 int main()
 {
     test_periods();
     test_edges();
     test_rediscover();
+    test_unattributed();
     return CHECK_DONE("activity_summary assertions passed");
 }

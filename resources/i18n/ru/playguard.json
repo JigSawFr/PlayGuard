@@ -415,7 +415,9 @@
             "days_played_value": "{} из 7",
             "busiest": "Самый активный день",
             "session": "Средний сеанс"
-        }
+        },
+        "account_nobody": "Без пользователя (или удалённый пользователь)",
+        "account_new": "Новый пользователь с {}: {}"
     },
     "restrictions": {
         "section_level": "Уровень ограничений",
@@ -902,7 +904,8 @@
             "config_reset": "Настройки сброшены (файл не читается)",
             "outside_reset": "Время игры обнулилось (замечено PlayGuard)",
             "outside_clock": "Часы консоли изменены (замечено PlayGuard)",
-            "outside_limits": "Лимиты изменены вне PlayGuard"
+            "outside_limits": "Лимиты изменены вне PlayGuard",
+            "new_account": "Новый пользователь (замечено PlayGuard)"
         },
         "sources": {
             "uniform": "Один лимит на все дни",

@@ -10,6 +10,7 @@
 #include <map>
 #include <set>
 
+#include "action/outside_watch.hpp"
 #include "action/play_data.hpp"
 #include "activity/game_activity.hpp"
 #include "ui/ui.hpp"
@@ -150,6 +151,12 @@ ActivityTab::ActivityTab()
     });
     // No account to choose between on a console with one (or none listed).
     ui::set_visible(account.getView(), play_data::accounts().size() > 1);
+    // An account not seen before (a fresh play record is a known trick).
+    new_account->setSingleLine(false);
+    std::string fresh;
+    for (const auto& l : outside_watch::new_account_lines()) fresh += (fresh.empty() ? "" : "\n") + l;
+    new_account->setText(fresh);
+    ui::set_visible(new_account, !fresh.empty());
     // Applet mode (opened from the album): a few MB for icons is too much.
     SysInfo si;
     sysinfo_get(&si);
@@ -404,12 +411,13 @@ void ActivityTab::show_summary(const std::shared_ptr<const PlayStats>& data)
 void ActivityTab::on_click(GameCell* cell, const GameStat& game, const std::shared_ptr<const PlayStats>& data)
 {
     const GameStat copy = game;
-    cell->registerClickAction([copy, data](brls::View*) {
+    const bool every = chosen_account() == nullptr;
+    cell->registerClickAction([copy, data, every](brls::View*) {
         // Its own screen: the seven days as bars, the figures, each account.
         std::vector<unsigned char> icon;
         const auto it = s_cache.icons.find(copy.app_id);
         if (it != s_cache.icons.end()) icon = it->second;
-        brls::Application::pushActivity(new GameActivity(copy, data, std::move(icon)));
+        brls::Application::pushActivity(new GameActivity(copy, data, std::move(icon), every));
         return true;
     });
 }

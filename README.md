@@ -168,6 +168,7 @@ The app is organised in tabs, like System Settings. Click a tab to expand it.
 - **To rediscover**: installed games under 3 h in all and not played for a month or more, the least played first (up to three).
 - Sort by period; the first games show their icon (not in applet mode, to spare memory). A large library lists its first 50 games, then *Show every game*; the export always holds them all.
 - Ⓐ on a game: its last seven days as bars, launches, first and last play, time per user account. Deleted games keep their all-time figures, and their name once PlayGuard has seen it.
+- **Time on no account and new accounts:** a game's time that no user account holds (some games never ask for one, or the account was deleted since) shows as *No account*, from a minute up; a user account PlayGuard never saw before is flagged in amber under *Account* for 30 days (*New account since …*, a fresh account is a known way to start over) and recorded in the change history; the accounts there when PlayGuard first lists them are not flagged.
 - **Export to the SD card** as CSV, JSON, XLSX (Excel) or PDF, one column per day.
 - Opens at once on the last figures read (kept on the SD card between runs), refreshed in the background when over a minute old; Ⓧ reads them again now, with a spinner.
 - Times are approximate if the console clock was changed.

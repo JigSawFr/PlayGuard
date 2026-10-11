@@ -415,7 +415,9 @@
             "days_played_value": "{} of 7",
             "busiest": "Busiest day",
             "session": "Average session"
-        }
+        },
+        "account_nobody": "No account (or a deleted one)",
+        "account_new": "New account since {}: {}"
     },
     "restrictions": {
         "section_level": "Restriction level",
@@ -902,7 +904,8 @@
             "config_reset": "Settings reset (file unreadable)",
             "outside_reset": "Play time started over (seen by PlayGuard)",
             "outside_clock": "Console clock changed (seen by PlayGuard)",
-            "outside_limits": "Limits changed outside PlayGuard"
+            "outside_limits": "Limits changed outside PlayGuard",
+            "new_account": "New user account (seen by PlayGuard)"
         },
         "sources": {
             "uniform": "Same limit every day",
