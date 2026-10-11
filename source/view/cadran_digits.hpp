@@ -16,6 +16,8 @@ class CadranDigits : public brls::View
     void setText(const std::string& text);
     void setFontSize(float size);
     void setTextColor(NVGcolor color);
+    // At most that wide: a longer text is drawn smaller to fit (0: never).
+    void setFitWidth(float width);
 
     void draw(NVGcontext* vg, float x, float y, float width, float height,
               brls::Style style, brls::FrameContext* ctx) override;
@@ -25,6 +27,8 @@ class CadranDigits : public brls::View
   private:
     std::string text;
     float fontSize = 32.0f;
+    float drawSize = 32.0f;   // fontSize, or less to fit fitWidth
+    float fitWidth = 0.0f;
     NVGcolor color;
     int font;
 

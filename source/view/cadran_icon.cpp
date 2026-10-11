@@ -121,6 +121,30 @@ void CadranIcon::draw(NVGcontext* vg, float x, float y, float width, float heigh
         nvgBezierTo(vg, 6, 19, 2, 12, 2, 12);
         nvgClosePath(vg); nvgStroke(vg);
         nvgBeginPath(vg); nvgCircle(vg, 12, 12, 3); nvgStroke(vg);
+    } else if (i == "moon") {
+        nvgBeginPath(vg);
+        nvgArc(vg, 12, 12, 9, 0.11f, 4.60f, NVG_CW);
+        nvgArc(vg, 16, 8, 7.07f, 3.93f, 0.785f, NVG_CCW);
+        nvgClosePath(vg); nvgStroke(vg);
+    } else if (i == "pause") {
+        nvgBeginPath(vg); nvgMoveTo(vg, 9, 5); nvgLineTo(vg, 9, 19); nvgMoveTo(vg, 15, 5); nvgLineTo(vg, 15, 19); nvgStroke(vg);
+    } else if (i == "list") {
+        nvgBeginPath(vg); nvgMoveTo(vg, 4, 6); nvgLineTo(vg, 20, 6); nvgMoveTo(vg, 4, 12); nvgLineTo(vg, 20, 12);
+        nvgMoveTo(vg, 4, 18); nvgLineTo(vg, 14, 18); nvgStroke(vg);
+    } else if (i == "lines") {
+        nvgBeginPath(vg); nvgMoveTo(vg, 3, 12); nvgLineTo(vg, 11, 12); nvgMoveTo(vg, 3, 6); nvgLineTo(vg, 21, 6);
+        nvgMoveTo(vg, 3, 18); nvgLineTo(vg, 15, 18); nvgStroke(vg);
+    } else if (i == "download") {
+        nvgBeginPath(vg); nvgMoveTo(vg, 12, 3); nvgLineTo(vg, 12, 15); nvgMoveTo(vg, 7, 10); nvgLineTo(vg, 12, 15); nvgLineTo(vg, 17, 10);
+        nvgMoveTo(vg, 4, 20); nvgLineTo(vg, 20, 20); nvgStroke(vg);
+    } else if (i == "chevron-down") {
+        nvgBeginPath(vg); nvgStrokeWidth(vg, 2.5f); nvgMoveTo(vg, 6, 9); nvgLineTo(vg, 12, 15); nvgLineTo(vg, 18, 9); nvgStroke(vg);
+    } else if (i == "chevron-right") {
+        nvgBeginPath(vg); nvgStrokeWidth(vg, 2.5f); nvgMoveTo(vg, 9, 6); nvgLineTo(vg, 15, 12); nvgLineTo(vg, 9, 18); nvgStroke(vg);
+    } else if (i == "caret-up") {
+        nvgBeginPath(vg); nvgStrokeWidth(vg, 3); nvgMoveTo(vg, 4, 15); nvgLineTo(vg, 12, 7); nvgLineTo(vg, 20, 15); nvgStroke(vg);
+    } else if (i == "caret-down") {
+        nvgBeginPath(vg); nvgStrokeWidth(vg, 3); nvgMoveTo(vg, 4, 9); nvgLineTo(vg, 12, 17); nvgLineTo(vg, 20, 9); nvgStroke(vg);
     } else if (i == "check") {
         nvgBeginPath(vg); nvgStrokeWidth(vg, 3);
         nvgMoveTo(vg, 4, 12); nvgLineTo(vg, 9, 17); nvgLineTo(vg, 20, 7); nvgStroke(vg);

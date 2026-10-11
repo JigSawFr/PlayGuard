@@ -27,6 +27,9 @@
 #include "app.hpp"
 #include "core/platform.h"
 #include "tab/about_tab.hpp"
+#include "tab/cadran_activity_tab.hpp"
+#include "tab/cadran_play_timer_tab.hpp"
+#include "tab/cadran_restrictions_tab.hpp"
 #include "tab/cadran_tab.hpp"
 #include "tab/activity_tab.hpp"
 #include "tab/console_tab.hpp"
@@ -60,6 +63,7 @@ extern "C" void nvgDebugGetStats(NVGcontext*, int*, int*, int*, int*) __attribut
 #endif
 #include "view/cadran_digits.hpp"
 #include "view/cadran_icon.hpp"
+#include "view/cadran_week.hpp"
 #include "view/made_in_france.hpp"
 #include "view/footer_hints.hpp"
 #include "view/header_settings.hpp"
@@ -360,6 +364,10 @@ void register_views()
     brls::Application::registerXMLView("LoadingBar",      LoadingBar::create);
     brls::Application::registerXMLView("CadranIcon",      CadranIcon::create);
     brls::Application::registerXMLView("CadranDigits",    CadranDigits::create);
+    brls::Application::registerXMLView("CadranRestrictionsTab", CadranRestrictionsTab::create);
+    brls::Application::registerXMLView("CadranPlayTimerTab", CadranPlayTimerTab::create);
+    brls::Application::registerXMLView("CadranActivityTab", CadranActivityTab::create);
+    brls::Application::registerXMLView("CadranWeekView",  CadranWeekView::create);
 
     // In place of borealis' brls:Hints: the footer's clock on one line.
     FooterHints::install();

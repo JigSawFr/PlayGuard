@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- "Cadran" prototype of Play timer (desktop simulation, PLAYGUARD_SIM_CADRAN=1):
+     the week as the editor, a live summary, the chips. Filled by
+     source/tab/cadran_play_timer_tab.cpp. Strings not localised. -->
+
+<brls:Box
+    width="auto"
+    height="auto"
+    axis="column"
+    alignItems="stretch"
+    paddingLeft="28"
+    paddingRight="48"
+    paddingTop="4">
+
+    <brls:Box axis="row" alignItems="flexEnd" marginBottom="14">
+        <brls:Box axis="column" alignItems="flexStart" grow="1.0">
+            <brls:Label text="LIMITES DE LA SEMAINE" fontSize="14" textColor="@theme/cadran/text3" marginBottom="6"/>
+            <CadranDigits id="pt_summary" text="—" fontSize="30" fitWidth="540"/>
+        </brls:Box>
+        <brls:Box id="pt_profile" focusable="true" shrink="0" axis="row" alignItems="center" height="46" paddingLeft="16" paddingRight="16" cornerRadius="23" backgroundColor="@theme/cadran/surf2" borderColor="@theme/cadran/line" borderThickness="1" marginRight="10">
+            <CadranIcon icon="list" width="18" height="18" marginRight="10"/>
+            <brls:Label id="pt_profile_name" text="Profil" fontSize="15"/>
+        </brls:Box>
+        <brls:Box id="pt_uniform" focusable="true" shrink="0" axis="row" alignItems="center" height="46" paddingLeft="16" paddingRight="16" cornerRadius="23" backgroundColor="@theme/cadran/surf2" borderColor="@theme/cadran/line" borderThickness="1">
+            <brls:Label text="Même limite tous les jours" fontSize="15"/>
+        </brls:Box>
+    </brls:Box>
+
+    <brls:Box axis="column" alignItems="stretch" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="24" paddingTop="12" paddingBottom="10" paddingLeft="16" paddingRight="16" marginBottom="10">
+        <CadranWeekView id="pt_week" width="auto" height="262" marginBottom="8"/>
+        <brls:Box axis="row" alignItems="center" paddingTop="8" lineColor="@theme/cadran/line" lineTop="1px">
+            <brls:Box axis="row" alignItems="center" marginRight="18">
+                <brls:Box axis="row" alignItems="center" justifyContent="center" width="36" height="26" cornerRadius="13" backgroundColor="@theme/cadran/key_bg" marginRight="8">
+                    <CadranIcon icon="caret-up" width="12" height="12" color="@theme/cadran/key_fg"/>
+                    <CadranIcon icon="caret-down" width="12" height="12" color="@theme/cadran/key_fg"/>
+                </brls:Box>
+                <brls:Label text="± 15 min" fontSize="15" textColor="@theme/cadran/text2"/>
+            </brls:Box>
+            <brls:Box axis="row" alignItems="center" marginRight="18">
+                <brls:Box axis="row" alignItems="center" justifyContent="center" width="36" height="26" cornerRadius="13" backgroundColor="@theme/cadran/key_bg" marginRight="8">
+                    <CadranIcon icon="chevron-right" width="12" height="12" color="@theme/cadran/key_fg"/>
+                </brls:Box>
+                <brls:Label text="changer de jour" fontSize="15" textColor="@theme/cadran/text2"/>
+            </brls:Box>
+            <brls:Box axis="row" alignItems="center" marginRight="18">
+                <brls:Box axis="row" alignItems="center" justifyContent="center" width="26" height="26" cornerRadius="13" backgroundColor="@theme/cadran/key_bg" marginRight="8">
+                    <CadranDigits text="L" fontSize="13" textColor="@theme/cadran/key_fg"/>
+                </brls:Box>
+                <brls:Label text="copier sur lun → ven" fontSize="15" textColor="@theme/cadran/text2"/>
+            </brls:Box>
+            <brls:Box axis="row" alignItems="center" marginRight="18">
+                <brls:Box axis="row" alignItems="center" justifyContent="center" width="26" height="26" cornerRadius="13" backgroundColor="@theme/cadran/key_bg" marginRight="8">
+                    <CadranDigits text="R" fontSize="13" textColor="@theme/cadran/key_fg"/>
+                </brls:Box>
+                <brls:Label text="copier sur sam · dim" fontSize="15" textColor="@theme/cadran/text2"/>
+            </brls:Box>
+            <brls:Box axis="row" alignItems="center">
+                <brls:Box axis="row" alignItems="center" justifyContent="center" width="26" height="26" cornerRadius="13" backgroundColor="@theme/cadran/key_bg" marginRight="8">
+                    <CadranDigits text="Y" fontSize="13" textColor="@theme/cadran/key_fg"/>
+                </brls:Box>
+                <brls:Label text="pas de limite" fontSize="15" textColor="@theme/cadran/text2"/>
+            </brls:Box>
+        </brls:Box>
+    </brls:Box>
+
+    <brls:Box axis="row" alignItems="center" marginBottom="12">
+        <brls:Rectangle id="pt_pending_dot" width="9" height="9" cornerRadius="4.5" color="@theme/cadran/amber_fill" marginRight="8"/>
+        <brls:Label id="pt_pending" text="" fontSize="15" textColor="@theme/cadran/text3"/>
+    </brls:Box>
+
+    <brls:Box axis="row" alignItems="center" justifyContent="spaceBetween">
+        <brls:Box id="pt_bed" focusable="true" shrink="0" axis="row" alignItems="center" height="46" paddingLeft="14" paddingRight="14" cornerRadius="23" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1">
+            <CadranIcon icon="moon" width="18" height="18" marginRight="10"/>
+            <brls:Label text="Coucher" fontSize="14" marginRight="8"/>
+            <CadranDigits id="pt_bed_value" text="—" fontSize="14" textColor="@theme/cadran/teal"/>
+            <CadranIcon id="pt_bed_arrow" icon="chevron-right" width="14" height="14" color="@theme/cadran/teal" marginLeft="4" marginRight="4"/>
+            <CadranDigits id="pt_bed_end" text="" fontSize="14" textColor="@theme/cadran/teal"/>
+        </brls:Box>
+        <brls:Box id="pt_pause" focusable="true" shrink="0" axis="row" alignItems="center" height="46" paddingLeft="14" paddingRight="14" cornerRadius="23" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1">
+            <CadranIcon icon="pause" width="18" height="18" marginRight="10"/>
+            <brls:Label id="pt_pause_text" text="Pause du décompte" fontSize="14"/>
+        </brls:Box>
+        <brls:Box id="pt_alarm" focusable="true" shrink="0" axis="row" alignItems="center" height="46" paddingLeft="14" paddingRight="14" cornerRadius="23" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1">
+            <CadranIcon icon="lines" width="18" height="18" marginRight="10"/>
+            <brls:Label text="Alarme « temps écoulé »" fontSize="14" marginRight="8"/>
+            <brls:Label id="pt_alarm_state" text="" fontSize="14" textColor="@theme/cadran/teal"/>
+        </brls:Box>
+        <brls:Box id="pt_remove" focusable="true" shrink="0" axis="row" alignItems="center" height="46" paddingLeft="14" paddingRight="14" cornerRadius="23" borderColor="@theme/cadran/coral_line" borderThickness="2">
+            <brls:Label text="Supprimer la limite" fontSize="14" textColor="@theme/cadran/coral"/>
+        </brls:Box>
+    </brls:Box>
+
+</brls:Box>

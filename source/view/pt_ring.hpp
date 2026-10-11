@@ -19,6 +19,11 @@ class PtRing : public brls::Box
     void setFraction(float used);
     void setValue(const std::string& text);     // the big figure ("40 min")
     void setCaption(const std::string& text);   // under it ("restantes")
+    // The arc shows what is left rather than what was played (the child
+    // screen); the colour still follows what was played.
+    void setShowLeft(bool left);
+    void setValueSize(float size);
+    void setCaptionSize(float size);
 
     void draw(NVGcontext* vg, float x, float y, float width, float height,
               brls::Style style, brls::FrameContext* ctx) override;
@@ -27,6 +32,7 @@ class PtRing : public brls::Box
 
   private:
     float used = -1.0f;
+    bool show_left = false;
     CadranDigits* value  = nullptr;
     brls::Label* caption = nullptr;
     NVGcolor track, teal, amber, coral;

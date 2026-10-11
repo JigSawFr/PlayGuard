@@ -20,15 +20,15 @@
         <brls:Separator/>
 
         <brls:Tab label="Temps de jeu">
-            <PlayTimerTab/>
+            <CadranPlayTimerTab/>
         </brls:Tab>
 
         <brls:Tab label="Activité">
-            <ActivityTab/>
+            <CadranActivityTab/>
         </brls:Tab>
 
         <brls:Tab label="Restrictions">
-            <RestrictionsTab/>
+            <CadranRestrictionsTab/>
         </brls:Tab>
 
         <brls:Tab label="Horloge">
