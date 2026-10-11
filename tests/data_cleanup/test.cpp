@@ -7,6 +7,7 @@
 #include "check.h"
 #include <cstdio>
 #include <cstdlib>
+#include <fcntl.h>
 #include <string>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -21,7 +22,9 @@ std::string g_root;
 
 void write(const std::string& rel, size_t size)
 {
-    FILE* f = std::fopen((g_root + "/" + rel).c_str(), "wb");
+    // 0644, not fopen's 0666.
+    const int fd = ::open((g_root + "/" + rel).c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    FILE* f = fd >= 0 ? ::fdopen(fd, "wb") : nullptr;
     REQUIRE(f);
     for (size_t i = 0; i < size; i++) std::fputc('x', f);
     std::fclose(f);

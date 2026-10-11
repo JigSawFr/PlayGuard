@@ -4,6 +4,7 @@
 #include "check.h"
 #include <cstdio>
 #include <cstdlib>
+#include <fcntl.h>
 #include <string>
 #include <unistd.h>
 
@@ -28,7 +29,9 @@ static void install(const std::string& sd_path)
 {
     const std::string full = paths::sd_root() + sd_path;
     CHECK(std::system(("mkdir -p '" + full.substr(0, full.rfind('/')) + "'").c_str()) == 0);
-    std::FILE* f = std::fopen(full.c_str(), "w");
+    // 0644, not fopen's 0666.
+    const int fd = ::open(full.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    std::FILE* f = fd >= 0 ? ::fdopen(fd, "w") : nullptr;
     if (!CHECK(f)) return;
     std::fputs("NRO0", f);
     std::fclose(f);

@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <cstring>
 #include <dirent.h>
+#include <fcntl.h>
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
@@ -72,8 +73,14 @@ bool atomic_write(const std::string& path, const std::string& content, std::stri
     struct stat st;
     if (stat(path.c_str(), &st) != 0 && stat(tmp.c_str(), &st) == 0)
         std::rename(tmp.c_str(), path.c_str());
-    FILE* f = std::fopen(tmp.c_str(), "wb");
-    if (!f) return fail("Could not open the file", errno);
+    // Created 0644 (as util/pt_log.cpp), not fopen's 0666.
+    const int fd = ::open(tmp.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    FILE* f = fd >= 0 ? ::fdopen(fd, "wb") : nullptr;
+    if (!f) {
+        const int err = errno;
+        if (fd >= 0) ::close(fd);
+        return fail("Could not open the file", err);
+    }
     bool ok = std::fwrite(content.data(), 1, content.size(), f) == content.size();
     int err = ok ? 0 : errno;
     if (ok && std::fflush(f) != 0) { ok = false; err = errno; }

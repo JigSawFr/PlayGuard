@@ -73,7 +73,8 @@ namespace
     }
     char when[32] = "?";
     const std::time_t now = std::time(nullptr);
-    if (const std::tm* t = std::localtime(&now)) std::strftime(when, sizeof(when), "%Y-%m-%d %H:%M:%S", t);
+    std::tm tmv{};
+    if (localtime_r(&now, &tmv)) std::strftime(when, sizeof(when), "%Y-%m-%d %H:%M:%S", &tmv);
     if (paths::ensure_dir(paths::logs_dir())) {
         // Created 0644 (as util/pt_log.cpp), not fopen's 0666.
         const int fd = ::open((paths::logs_dir() + "/crash.txt").c_str(), O_WRONLY | O_APPEND | O_CREAT, 0644);
