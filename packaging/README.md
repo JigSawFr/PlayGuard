@@ -15,7 +15,6 @@ app keeps them; a version that kept them in `switch/playguard/` has them moved a
 ```
 config/playguard/config.json             preferences (language, theme, NTP server, …)
 config/playguard/profiles/*.json         saved play-time limit profiles
-config/playguard/backups/*.json          settings backups (never contain the PIN)
 config/playguard/exports/activity_*      Activity exports (CSV, JSON, XLSX, PDF)
 config/playguard/logs/reports/report_<date>.txt   diagnostic reports (never contain the PIN)
 config/playguard/logs/crashes/crash_<date>.txt    one file per crash
@@ -23,13 +22,17 @@ config/playguard/logs/uploads/upload_<date>.txt   one per report sent online: it
                                          (all three pruned as Tools › Diagnostics says: number, age, size)
 config/playguard/logs/play_timer/log.csv          Developer tools › record the play timer (log.old.csv: the previous one)
 config/playguard/logs/play_timer/block.json       Developer tools › play-timer block reference
-config/playguard/history.json            the change history (the newest 200 changes)
-config/playguard/watch.json              what PlayGuard last saw of the console (today's play time, the clock, the limits,
-                                         the user accounts), to tell what changed outside it (docs/config.md)
 config/playguard/config.json.bad         a config.json that could not be read, kept aside rather than overwritten (.bad.1: the
-                                         previous one); history.json.bad the same for the change history
-config/playguard/cache/                  play data per account (activity_*.bin), the game icons (icons/, 16 MB at most),
-                                         the development build list (dev_builds.json)
+                                         previous one); history.json.bad and state.json.bad the same
+config/playguard/cache/                  the game icons (icons/, 16 MB at most), the development build list (dev_builds.json)
+config/playguard/nand/<system>/          what belongs to one system (util/nand.hpp): sysmmc/, or emummc-<path in
+                                         emuMMC/emummc.ini>/ for each emuMMC (emummc-sd00)
+config/playguard/nand/<system>/state.json     the console lock, the extra time, a pending relock, the firmware choice
+config/playguard/nand/<system>/history.json   the change history (the newest 200 changes)
+config/playguard/nand/<system>/watch.json     what PlayGuard last saw of the console (today's play time, the clock, the
+                                              limits, the user accounts), to tell what changed outside it (docs/config.md)
+config/playguard/nand/<system>/backups/*.json settings backups (never contain the PIN)
+config/playguard/nand/<system>/cache/         play data per account (activity_*.bin)
 config/playguard/github_token            GitHub sign-in of the developer tools: the token in plain text,
                                          treat it as a password (Disconnect deletes it)
 config/playguard/rescue_report.txt       left by the recovery sysmodule, read at start-up

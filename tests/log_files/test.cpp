@@ -3,7 +3,9 @@
 // remove (by count, age and size, any of them; never the newest), the move
 // of the logs/ layout before its subfolders, and the move of the data folder
 // from sd:/switch/playguard to sd:/config/playguard (the .nro stays, a file
-// already there is not replaced, a folder already there is merged).
+// already there is not replaced, a folder already there is merged), the
+// system's key (sysMMC, each emuMMC by where it is) and the move of one
+// system's files into its folder.
 #include "check.h"
 #include <cstdio>
 #include <cstdlib>
@@ -15,6 +17,7 @@
 
 #include "util/data_move.hpp"
 #include "util/log_files.hpp"
+#include "util/nand.hpp"
 #include "util/paths.hpp"
 
 namespace lf = log_files;
@@ -258,6 +261,58 @@ static void test_data_move()
     remove_root();
 }
 
+static void test_nand()
+{
+    using nand::Storage;
+    CHECK(nand::key(Storage::SysMMC, "[emummc]\nenabled=1\npath=emuMMC/SD00\n") == "sysmmc");
+    CHECK(nand::key(Storage::Unknown, "") == "unknown");
+    // hekate's file-based and partition-based emuMMCs: by their path.
+    CHECK(nand::key(Storage::EmuMMC, "[emummc]\nenabled=1\nsector=0x0\npath=emuMMC/SD00\nid=0x0000\n"
+                                     "nintendo_path=emuMMC/SD00/Nintendo\n") == "emummc-sd00");
+    CHECK(nand::key(Storage::EmuMMC, "[emummc]\r\nenabled=1\r\nsector=0x2\r\npath=emuMMC/RAW1\r\n") == "emummc-raw1");
+    CHECK(nand::key(Storage::EmuMMC, "[emummc]\npath=/emuMMC/SD 01/\n") == "emummc-sd_01");
+    CHECK(nand::key(Storage::EmuMMC, "[emummc]\npath=MyEmu\n") == "emummc-myemu");
+    // No path: the start sector.
+    CHECK(nand::key(Storage::EmuMMC, "[emummc]\nenabled=1\nsector=0x00080000\n") == "emummc-sector-80000");
+    CHECK(nand::key(Storage::EmuMMC, "[emummc]\nenabled=1\nsector=0x0\n") == "emummc");
+    CHECK(nand::key(Storage::EmuMMC, "") == "emummc");
+    CHECK(nand::key(Storage::EmuMMC, "[other]\npath=emuMMC/SD00\n") == "emummc");
+    // Never a separator or a dot in the folder name, and never too long.
+    CHECK(nand::emummc_where("[emummc]\npath=../../x\n") == "______x");
+    CHECK(nand::emummc_where("[emummc]\npath=" + std::string(80, 'a') + "\n").size() == 32);
+}
+
+static void test_to_nand()
+{
+    make_root();
+    const std::string data = g_root + "/config/playguard", sys = data + "/nand/sysmmc";
+    write("config/playguard/config.json", "{}");
+    write("config/playguard/history.json", "[]");
+    write("config/playguard/history.json.bad", "bad");
+    write("config/playguard/watch.json", "{}");
+    write("config/playguard/backups/20261010_100000.json", "b");
+    write("config/playguard/cache/activity_all.bin", "a");
+    write("config/playguard/cache/activity_0011223344556677.bin", "u");
+    write("config/playguard/cache/dev_builds.json", "shared");
+    write("config/playguard/cache/icons/0100.jpg", "shared");
+    write("config/playguard/profiles/school.json", "shared");
+
+    CHECK(data_move::to_nand(data, sys) == 6);
+    CHECK(read("config/playguard/nand/sysmmc/history.json") == "[]" && read("config/playguard/nand/sysmmc/history.json.bad") == "bad");
+    CHECK(read("config/playguard/nand/sysmmc/watch.json") == "{}");
+    CHECK(read("config/playguard/nand/sysmmc/backups/20261010_100000.json") == "b");
+    CHECK(read("config/playguard/nand/sysmmc/cache/activity_all.bin") == "a");
+    CHECK(there("config/playguard/nand/sysmmc/cache/activity_0011223344556677.bin"));
+    // Shared: the preferences, the profiles, the icons, the build list.
+    CHECK(there("config/playguard/config.json") && there("config/playguard/profiles/school.json"));
+    CHECK(there("config/playguard/cache/dev_builds.json") && there("config/playguard/cache/icons/0100.jpg"));
+    CHECK(!there("config/playguard/history.json") && !there("config/playguard/backups"));
+    // The next system finds nothing left to take.
+    CHECK(data_move::to_nand(data, data + "/nand/emummc-sd00") == 0);
+    CHECK(!there("config/playguard/nand/emummc-sd00"));
+    remove_root();
+}
+
 int main()
 {
     setenv("TZ", "UTC", 1);
@@ -269,5 +324,7 @@ int main()
     test_prune();
     test_migrate_logs();
     test_data_move();
-    return CHECK_DONE("log_files names, order, limits, migration and data_move tests passed");
+    test_nand();
+    test_to_nand();
+    return CHECK_DONE("log_files names, order, limits, migration, data_move and nand tests passed");
 }

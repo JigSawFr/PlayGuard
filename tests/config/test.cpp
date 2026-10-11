@@ -15,9 +15,12 @@
 #include "util/config.hpp"
 #include "util/paths.hpp"
 
+// config.json alone, as the versions before state.json left it: its
+// per-system fields are read from it.
 static void write_config(const std::string& text)
 {
     CHECK(paths::atomic_write(paths::config_file(), text));
+    std::remove(paths::state_file().c_str());
 }
 
 static void test_defaults()
@@ -387,6 +390,52 @@ static void test_tmp_recovery()
     CHECK(!paths::read_file(file, text));
 }
 
+// Each system (util/nand.hpp) has its own state.json: the console lock, the
+// extra-time record, a pending relock and the firmware choice of one never
+// act on another; the preferences are shared.
+static void test_systems()
+{
+    paths::set_nand("sysmmc");
+    // From a version before state.json: config.json holds this system's state.
+    write_config(R"({"theme": "dark", "console_lock": true, "relock_pending": true,
+                    "console_lock_prev": [60, 60, 60, 60, 60, 60, 60]})");
+    config::load();
+    CHECK(config::get().console_lock && config::get().relock_pending && config::get().theme == "dark");
+    CHECK(config::save());
+    std::string text;
+    CHECK(paths::read_file(paths::config_file(), text));
+    CHECK(text.find("console_lock") == std::string::npos && text.find("relock_pending") == std::string::npos);
+    CHECK(text.find("\"theme\": \"dark\"") != std::string::npos);
+    CHECK(paths::read_file(paths::state_file(), text) && text.find("\"console_lock\": true") != std::string::npos);
+    CHECK(paths::state_file() == paths::data_dir() + "/nand/sysmmc/state.json");
+
+    // Another system: the shared preferences, none of the first one's state.
+    paths::set_nand("emummc-sd00");
+    config::load();
+    CHECK(config::get().theme == "dark" && !config::get().console_lock && !config::get().relock_pending);
+    CHECK(config::get().console_lock_prev.empty());
+    config::get().fw_gate_fw = "24.0.0", config::get().fw_gate_app = "1.0.0", config::get().fw_gate_choice = "probe";
+    config::get().theme = "light";
+    CHECK(config::save());
+
+    // Back on the first: its own state, the preference changed on the other.
+    paths::set_nand("sysmmc");
+    config::load();
+    CHECK(config::get().console_lock && config::get().relock_pending && config::get().console_lock_prev.size() == 7);
+    CHECK(config::get().fw_gate_choice.empty() && config::get().theme == "light");
+
+    // A damaged state.json: put aside, said like config.json, this system's
+    // state from its defaults, the preferences kept.
+    CHECK(paths::atomic_write(paths::state_file(), "{ half"));
+    config::load();
+    CHECK(config::loaded() == config::Loaded::PutAside);
+    CHECK(!config::get().console_lock && config::get().theme == "light");
+    CHECK(paths::read_file(paths::state_file() + ".bad", text) && text == "{ half");
+    std::remove((paths::state_file() + ".bad").c_str());
+    std::system(("rm -rf '" + paths::data_dir() + "/nand'").c_str());
+    paths::set_nand("unknown");
+}
+
 int main()
 {
     char dir[] = "/tmp/playguard_config_XXXXXX";
@@ -400,8 +449,9 @@ int main()
     test_console_lock();
     test_preferences();
     test_tmp_recovery();
+    test_systems();
 
     const std::string cleanup = std::string("rm -rf '") + dir + "'";
     CHECK(std::system(cleanup.c_str()) == 0);
-    return CHECK_DONE("config fields, ranges, round trip, .tmp recovery and damaged-file assertions passed");
+    return CHECK_DONE("config fields, ranges, round trip, .tmp recovery, damaged-file and per-system state assertions passed");
 }

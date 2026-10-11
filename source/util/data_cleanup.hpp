@@ -20,7 +20,8 @@ struct Plan
     uint64_t bytes = 0;
 };
 
-// Every file under `data_dir`/cache, in its subfolders too: the last play
+// Every file under `data_dir`/cache and each system's
+// `data_dir`/nand/<key>/cache, in their subfolders too: the last play
 // activity read, the game icons and their language, the development build
 // list. All of it is read again from the console (or GitHub) when needed.
 Plan cache(const std::string& data_dir);

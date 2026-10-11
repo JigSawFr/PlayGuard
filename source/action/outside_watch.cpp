@@ -21,7 +21,7 @@ namespace
 outside_change_logic::Record s_rec;
 bool s_loaded = false;
 
-std::string file() { return paths::data_dir() + "/watch.json"; }
+std::string file() { return paths::nand_dir() + "/watch.json"; }
 
 void load_once()
 {

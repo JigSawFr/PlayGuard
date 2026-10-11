@@ -65,6 +65,11 @@ void make_tree()
     write("cache/icons/lang", 1);
     write("cache/icons/0100000000010000.jpg", 6000);
     write("cache/icons/0100000000020000.jpg", 7000);
+    dir("nand");
+    dir("nand/sysmmc");
+    dir("nand/sysmmc/cache");
+    write("nand/sysmmc/cache/activity_all.bin", 4000);
+    write("nand/sysmmc/history.json", 100);
     dir("logs");
     dir("logs/crashes");
     write("logs/crashes/crash_20261009_141000.txt", 200);
@@ -91,22 +96,23 @@ static void test_cache_plan()
 {
     make_tree();
     const dc::Plan p = dc::cache(g_root);
-    CHECK(p.files.size() == 6);
-    CHECK(p.bytes == 5000 + 3000 + 700 + 1 + 6000 + 7000);
-    // Sorted, full paths, the icons' folder walked.
-    if (CHECK(p.files.size() == 6)) {
+    CHECK(p.files.size() == 7);
+    CHECK(p.bytes == 5000 + 3000 + 700 + 1 + 6000 + 7000 + 4000);
+    // Sorted, full paths, the icons' folder walked, each system's cache too.
+    if (CHECK(p.files.size() == 7)) {
         CHECK(p.files[0] == g_root + "/cache/activity_0011223344556677.bin");
         CHECK(p.files[1] == g_root + "/cache/activity_all.bin");
         CHECK(p.files[2] == g_root + "/cache/dev_builds.json");
         CHECK(p.files[3] == g_root + "/cache/icons/0100000000010000.jpg");
         CHECK(p.files[5] == g_root + "/cache/icons/lang");
+        CHECK(p.files[6] == g_root + "/nand/sysmmc/cache/activity_all.bin");
     }
     const dc::Outcome out = dc::remove(p);
-    CHECK(out.removed == 6);
+    CHECK(out.removed == 7);
     CHECK(out.bytes == p.bytes);
     CHECK(out.failed == 0);
     // Only files went: the folders stay for the icon store, the rest is untouched.
-    CHECK(there("cache") && there("cache/icons"));
+    CHECK(there("cache") && there("cache/icons") && there("nand/sysmmc/cache") && there("nand/sysmmc/history.json"));
     CHECK(!there("cache/activity_all.bin") && !there("cache/icons/lang"));
     CHECK(there("config.json") && there("history.json") && there("watch.json") && there("github_token"));
     CHECK(there("backups/settings_20261010.json") && there("profiles/school.json") && there("exports/activity.csv"));
@@ -165,8 +171,8 @@ static void test_remove_counts()
     dir("cache/activity_all.bin");
     write("cache/activity_all.bin/x", 1);
     const dc::Outcome out = dc::remove(p);
-    CHECK(out.removed == 4);
-    CHECK(out.bytes == 3000 + 1 + 6000 + 7000);
+    CHECK(out.removed == 5);
+    CHECK(out.bytes == 3000 + 1 + 6000 + 7000 + 4000);
     CHECK(out.failed == 1);
     remove_tree();
 }

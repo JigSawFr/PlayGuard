@@ -1,4 +1,5 @@
-// config — small persistent settings in sd:/config/playguard/config.json.
+// config — small persistent settings in sd:/config/playguard/config.json, and
+// the part that belongs to one system in nand/<system>/state.json (Snapshot).
 // Every key, its values and default: docs/config.md (keep it in step).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -106,7 +107,8 @@ constexpr size_t MAX_CUSTOM_SERVERS = 10;
 
 // What the last load() found. A config.json that is there but cannot be read
 // or parsed (not one wrong field: those keep their default alone) is put
-// aside as config.json.bad (paths::put_aside: the previous .bad is kept as
+// aside as config.json.bad (state.json the same: state.json.bad, with the
+// same notice) (paths::put_aside: the previous .bad is kept as
 // .bad.1), and the defaults are used. When it cannot be moved, save() refuses
 // to write for the rest of the session rather than replace it.
 enum class Loaded { Missing, Read, PutAside, Stuck };
@@ -116,10 +118,18 @@ void    load();          // never throws; missing / broken file => defaults, per
 Loaded  loaded();
 bool    save();          // atomic write; false on failure (or Loaded::Stuck)
 // save() in two steps, so the write can be left to another thread: the
-// file's content now (false: Loaded::Stuck, nothing may be written), then
-// writing it. write() touches no config state: callable from any thread.
-bool    snapshot(std::string& text);
-bool    write(const std::string& text);
+// files' content now (false: Loaded::Stuck, nothing may be written), then
+// writing them. write() touches no config state: callable from any thread.
+// `shared` is config.json; `system` is this system's state.json
+// (paths::state_file(): the console lock, the extra-time record, a pending
+// relock, the firmware choice), so that one system's state never acts on
+// another (util/nand.hpp).
+struct Snapshot
+{
+    std::string shared, system;
+};
+bool    snapshot(Snapshot& snap);
+bool    write(const Snapshot& snap);
 // Puts every out-of-range value back to its default (load() calls it).
 void    sanitize(Config& c);
 

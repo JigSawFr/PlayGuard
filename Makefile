@@ -179,7 +179,7 @@ activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summar
 activity_summary_FLAGS := -std=c++17 -Isource
 pt_log_SRC   := source/util/paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp
 pt_log_FLAGS := -std=c++17 -Isource
-log_files_SRC   := source/util/paths.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
+log_files_SRC   := source/util/paths.cpp source/util/patches.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
 log_files_FLAGS := -std=c++17 -Isource
 
 TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))

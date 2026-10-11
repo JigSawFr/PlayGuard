@@ -157,32 +157,70 @@ void sanitize(Config& c)
     if (!prev_ok) c.console_lock_prev.clear();
 }
 
+// What belongs to the system PlayGuard runs on (state.json, util/nand.hpp):
+// the console lock, the extra-time record, a pending relock and the
+// firmware choice. Read from state.json, or from config.json when this
+// system has no state.json yet (the versions before it kept them there).
+static void clear_system(Config& c)
+{
+    c.console_lock = false;
+    c.console_lock_prev.clear();
+    c.relock_pending = false;
+    c.fw_gate_fw.clear(), c.fw_gate_app.clear(), c.fw_gate_choice.clear();
+    clear_extra(c);
+}
+
+static void read_system(const nlohmann::json& j, Config& c)
+{
+    read_bool(j, "console_lock", c.console_lock);
+    auto prev = j.find("console_lock_prev");
+    if (prev != j.end() && prev->is_array())
+        c.console_lock_prev = read_int_list(*prev);   // sanitize() keeps it only when it is seven valid limits
+    read_bool(j, "relock_pending", c.relock_pending);
+
+    // The firmware choice and the extra-time record are all-or-nothing. Every
+    // field is read (&=, no short circuit; clang warns about a bool `a & b`).
+    bool gate_ok = read_string(j, "fw_gate_fw", c.fw_gate_fw);
+    gate_ok &= read_string(j, "fw_gate_app", c.fw_gate_app);
+    gate_ok &= read_string(j, "fw_gate_choice", c.fw_gate_choice);
+    if (!gate_ok) c.fw_gate_fw.clear(), c.fw_gate_app.clear(), c.fw_gate_choice.clear();
+    bool extra_ok = read_int(j, "extra_weekday", c.extra_weekday);
+    extra_ok &= read_string(j, "extra_date", c.extra_date);
+    extra_ok &= read_int(j, "extra_base", c.extra_base);
+    extra_ok &= read_int(j, "extra_value", c.extra_value);
+    if (!extra_ok) clear_extra(c);
+}
+
+// The file as JSON, or null when it is not a JSON object.
+static nlohmann::json parse_object(const std::string& text)
+{
+    nlohmann::json j;
+    try {
+        j = nlohmann::json::parse(text);
+    } catch (...) {
+        return nullptr;   // not JSON at all
+    }
+    return j.is_object() ? j : nlohmann::json(nullptr);
+}
+
 // There but not readable as settings: defaults, and the file is put aside
 // before anything (support_flow, fw_gate save by themselves at start-up)
-// writes the defaults over relock_pending, the console lock's saved limits,
-// the extra-time record...
+// writes the defaults over it.
 static void damaged()
 {
     s_config = Config{};
     s_loaded = paths::put_aside(paths::config_file()) ? Loaded::PutAside : Loaded::Stuck;
 }
 
-void load()
+static void load_shared()
 {
-    s_config = Config{};
-    s_loaded = Loaded::Missing;
     std::string text;
     if (!paths::read_file(paths::config_file(), text)) {
         if (paths::exists(paths::config_file())) damaged();   // missing: a first run, silently
         return;
     }
-    nlohmann::json j;
-    try {
-        j = nlohmann::json::parse(text);
-    } catch (...) {
-        j = nullptr;   // not JSON at all
-    }
-    if (!j.is_object()) {
+    const nlohmann::json j = parse_object(text);
+    if (j.is_null()) {
         damaged();
         return;
     }
@@ -214,47 +252,67 @@ void load()
     read_bool(j, "support_reminder", c.support_reminder);
     read_string(j, "support_reminded", c.support_reminded);
     read_string(j, "seen_version", c.seen_version);
-    read_bool(j, "console_lock", c.console_lock);
-    auto prev = j.find("console_lock_prev");
-    if (prev != j.end() && prev->is_array())
-        c.console_lock_prev = read_int_list(*prev);   // sanitize() keeps it only when it is seven valid limits
     auto amounts = j.find("extra_amounts");
     if (amounts != j.end() && amounts->is_array())
         c.extra_amounts = read_int_list(*amounts);   // sanitize() keeps it only when it is one of EXTRA_SETS
-    read_bool(j, "relock_pending", c.relock_pending);
-
-    // The firmware choice and the extra-time record are all-or-nothing. Every
-    // field is read (&=, no short circuit; clang warns about a bool `a & b`).
-    bool gate_ok = read_string(j, "fw_gate_fw", c.fw_gate_fw);
-    gate_ok &= read_string(j, "fw_gate_app", c.fw_gate_app);
-    gate_ok &= read_string(j, "fw_gate_choice", c.fw_gate_choice);
-    if (!gate_ok) c.fw_gate_fw.clear(), c.fw_gate_app.clear(), c.fw_gate_choice.clear();
-    bool extra_ok = read_int(j, "extra_weekday", c.extra_weekday);
-    extra_ok &= read_string(j, "extra_date", c.extra_date);
-    extra_ok &= read_int(j, "extra_base", c.extra_base);
-    extra_ok &= read_int(j, "extra_value", c.extra_value);
-    if (!extra_ok) clear_extra(c);
     auto servers = j.find("custom_servers");
     if (servers != j.end() && servers->is_array())
         for (const auto& v : *servers)
             if (v.is_string()) c.custom_servers.push_back(v.get<std::string>());
-    sanitize(c);
+    read_system(j, c);   // the versions before state.json; replaced by it below
+}
+
+// state.json: missing keeps what config.json had (nothing, or what a version
+// before state.json kept there); damaged is put aside like config.json, with
+// the same notice, and this system's fields start from their defaults.
+static void load_state()
+{
+    std::string text;
+    if (!paths::read_file(paths::state_file(), text)) {
+        if (!paths::exists(paths::state_file())) return;
+    } else {
+        const nlohmann::json j = parse_object(text);
+        if (!j.is_null()) {
+            clear_system(s_config);
+            read_system(j, s_config);
+            return;
+        }
+    }
+    clear_system(s_config);
+    const bool aside = paths::put_aside(paths::state_file());
+    if (!aside) s_loaded = Loaded::Stuck;
+    else if (s_loaded != Loaded::Stuck) s_loaded = Loaded::PutAside;
+}
+
+void load()
+{
+    s_config = Config{};
+    s_loaded = Loaded::Missing;
+    load_shared();
+    load_state();
+    sanitize(s_config);
 }
 
 bool save()
 {
-    std::string text;
-    return snapshot(text) && write(text);
+    Snapshot snap;
+    return snapshot(snap) && write(snap);
 }
 
-bool write(const std::string& text)
+bool write(const Snapshot& snap)
 {
-    return paths::atomic_write(paths::config_file(), text);
+    // Both, even when the first fails.
+    const bool shared = paths::atomic_write(paths::config_file(), snap.shared);
+    const bool system = paths::atomic_write(paths::state_file(), snap.system);
+    return shared && system;
 }
 
-bool snapshot(std::string& text)
+bool snapshot(Snapshot& snap)
 {
     if (s_loaded == Loaded::Stuck) return false;   // it would overwrite the unreadable file
+    const auto dump = [](const nlohmann::json& j) {
+        return j.dump(2, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
+    };
     nlohmann::json j;
     j["schema"]          = SCHEMA;
     j["language"]        = s_config.language;
@@ -284,17 +342,21 @@ bool snapshot(std::string& text)
     j["support_reminder"] = s_config.support_reminder;
     j["support_reminded"] = s_config.support_reminded;
     j["seen_version"]    = s_config.seen_version;
-    j["console_lock"]    = s_config.console_lock;
-    j["console_lock_prev"] = s_config.console_lock_prev;
-    j["fw_gate_fw"]      = s_config.fw_gate_fw;
-    j["fw_gate_app"]     = s_config.fw_gate_app;
-    j["fw_gate_choice"]  = s_config.fw_gate_choice;
-    j["extra_weekday"]   = s_config.extra_weekday;
-    j["extra_date"]      = s_config.extra_date;
-    j["extra_base"]      = s_config.extra_base;
-    j["extra_value"]     = s_config.extra_value;
-    j["relock_pending"]  = s_config.relock_pending;
-    text = j.dump(2, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
+    snap.shared = dump(j);
+
+    nlohmann::json st;
+    st["schema"]            = SCHEMA;
+    st["console_lock"]      = s_config.console_lock;
+    st["console_lock_prev"] = s_config.console_lock_prev;
+    st["fw_gate_fw"]        = s_config.fw_gate_fw;
+    st["fw_gate_app"]       = s_config.fw_gate_app;
+    st["fw_gate_choice"]    = s_config.fw_gate_choice;
+    st["extra_weekday"]     = s_config.extra_weekday;
+    st["extra_date"]        = s_config.extra_date;
+    st["extra_base"]        = s_config.extra_base;
+    st["extra_value"]       = s_config.extra_value;
+    st["relock_pending"]    = s_config.relock_pending;
+    snap.system = dump(st);
     return true;
 }
 

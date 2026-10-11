@@ -20,10 +20,18 @@ std::string crashes_dir();
 std::string uploads_dir();
 std::string play_timer_dir();
 std::string profiles_dir();
-std::string backups_dir();
 std::string exports_dir();
 std::string config_file();
-std::string history_file();   // the change history (util/history.hpp)
+
+// The folder of the system PlayGuard runs on (util/nand.hpp):
+// data_dir()/nand/<key>. set_nand() once at start-up, before config::load();
+// "unknown" until then.
+void        set_nand(const std::string& key);
+std::string nand_key();
+std::string nand_dir();
+std::string backups_dir();    // in nand_dir()
+std::string history_file();   // the change history (util/history.hpp), in nand_dir()
+std::string state_file();     // config's per-system part (util/config.hpp), in nand_dir()
 
 // Root of the SD card: "/" on the console; ./playguard_data/sd on desktop,
 // so the simulated build can be given fake Atmosphère / sys-patch files.

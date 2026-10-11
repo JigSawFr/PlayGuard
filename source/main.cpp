@@ -41,6 +41,7 @@
 #include "util/http.hpp"
 #include "util/data_move.hpp"
 #include "util/log_files.hpp"
+#include "util/nand.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/startup.h"
@@ -199,8 +200,26 @@ int main(int argc, char* argv[])
     if (const size_t moved = data_move::run(data_move::old_dir(), paths::data_dir()))
         brls::Logger::info("start-up: {} entries moved from {} to {}", moved, data_move::old_dir(), paths::data_dir());
 #endif
-    // logs/ before its subfolders (reports/, crashes/, play_timer/).
+    // logs/ before its subfolders (reports/, crashes/, uploads/, play_timer/).
     log_files::migrate(paths::logs_dir());
+    // The system this is (sysMMC, which emuMMC): its own folder, nand/<key>,
+    // before config::load() reads its state.json. What the versions before
+    // it kept for every system goes to the first one started.
+    {
+        SysInfo si;
+        sysinfo_get(&si);
+        const SysStorage storage = sysinfo_storage(&si);
+        std::string ini;
+        const std::string root = paths::sd_root();
+        if (storage == SysStorage_EmuMMC)
+            paths::read_file(root + (root.back() == '/' ? "" : "/") + "emummc/emummc.ini", ini);
+        paths::set_nand(nand::key(storage == SysStorage_SysMMC   ? nand::Storage::SysMMC
+                                  : storage == SysStorage_EmuMMC ? nand::Storage::EmuMMC
+                                                                 : nand::Storage::Unknown,
+                                  ini));
+        if (const size_t moved = data_move::to_nand(paths::data_dir(), paths::nand_dir()))
+            brls::Logger::info("start-up: {} entries moved to {}", moved, paths::nand_dir());
+    }
 
     // Preferences first: the locale must be chosen before borealis loads i18n.
     config::load();

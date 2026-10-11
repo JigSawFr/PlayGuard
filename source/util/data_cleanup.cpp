@@ -50,6 +50,17 @@ Plan cache(const std::string& data_dir)
 {
     Plan plan;
     collect(data_dir + "/cache", plan, [](const std::string&) { return false; });
+    // Each system's play-data cache (util/nand.hpp).
+    if (DIR* d = opendir((data_dir + "/nand").c_str())) {
+        std::vector<std::string> systems;
+        while (dirent* e = readdir(d)) {
+            const std::string n = e->d_name;
+            if (n != "." && n != "..") systems.push_back(n);
+        }
+        closedir(d);
+        for (const std::string& n : systems)
+            collect(data_dir + "/nand/" + n + "/cache", plan, [](const std::string&) { return false; });
+    }
     return sorted(plan);
 }
 

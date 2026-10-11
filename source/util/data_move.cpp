@@ -5,6 +5,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <utility>
 #include <vector>
 
 #include "util/paths.hpp"
@@ -66,6 +67,27 @@ size_t run(const std::string& from, const std::string& to)
         if (!stat_of(from + "/" + n, &st)) continue;
         if (!paths::ensure_dir(to)) return moved;
         moved += move(from + "/" + n, to + "/" + n);
+    }
+    return moved;
+}
+
+size_t to_nand(const std::string& data_dir, const std::string& nand_dir)
+{
+    static const char* const FILES[] = { "history.json", "watch.json" };
+    static const char* const SUFFIXES[] = { "", ".tmp", ".bad", ".bad.1" };
+    std::vector<std::pair<std::string, std::string>> moves;   // from, to (relative)
+    for (const char* f : FILES)
+        for (const char* s : SUFFIXES) moves.push_back({ std::string(f) + s, std::string(f) + s });
+    moves.push_back({ "backups", "backups" });
+    for (const std::string& n : paths::list_files(data_dir + "/cache", ".bin"))
+        if (n.compare(0, 9, "activity_") == 0) moves.push_back({ "cache/" + n, "cache/" + n });
+    size_t moved = 0;
+    struct stat st;
+    for (const auto& m : moves) {
+        if (!stat_of(data_dir + "/" + m.first, &st)) continue;
+        const std::string to = nand_dir + "/" + m.second;
+        if (!paths::ensure_dir(to.substr(0, to.find_last_of('/')))) return moved;
+        moved += move(data_dir + "/" + m.first, to);
     }
     return moved;
 }

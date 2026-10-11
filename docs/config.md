@@ -1,6 +1,10 @@
-# `config.json`
+# `config.json` and `state.json`
 
-PlayGuard's settings, in `sd:/config/playguard/config.json`. Everything here is
+PlayGuard's settings, in `sd:/config/playguard/config.json`, shared by every
+system on the SD card; and what one system's parental controls need
+remembered (the console lock, the extra time, a pending relock, the firmware
+choice), in its own `sd:/config/playguard/nand/<system>/state.json`
+([below](#state-kept-between-launches)). Everything here is
 set from the app; the file is only worth editing by hand to get back in (see
 [`pin_lock`](#pin_lock)) or to check what PlayGuard remembered.
 
@@ -115,6 +119,18 @@ Set in *About*.
 Written by PlayGuard to finish what it started. Better left alone: a wrong
 value here can make PlayGuard put back a limit nobody asked for.
 
+These keys are in `state.json`, one per system: `nand/sysmmc/` for the
+sysMMC, `nand/emummc-<where>/` for an emuMMC, named after the `path` of
+`sd:/emuMMC/emummc.ini` (`emummc-sd00` for `emuMMC/SD00`), or its `sector`
+when it has no path (`emummc-sector-80000`); `nand/unknown/` when the system
+could not be told (`source/util/nand.hpp`). Each system has its own parental
+controls: the console lock turned on on the sysMMC must not put its limits
+back on an emuMMC. `state.json` is read like `config.json` (a damaged one is
+kept as `state.json.bad`, with the same notice); when a system has none yet,
+these keys are read from `config.json`, where the versions before it kept
+them, and leave it at the next save. `extra_auto_restore`, a preference,
+stays in `config.json`.
+
 ### Console lock
 
 *Security › Console lock*: every day's limit set to 0, so the PIN is needed to
@@ -158,8 +174,9 @@ version. The three keys go together.
 ## Example
 
 Every key with *Ask for the PIN* set to *To open PlayGuard*, in the order of
-this page. PlayGuard itself writes the keys in alphabetical order, with each
-array element on its own line; the order does not matter when it reads them:
+this page: `config.json`, then a system's `state.json`. PlayGuard itself
+writes the keys in alphabetical order, with each array element on its own
+line; the order does not matter when it reads them:
 
 ```json
 {
@@ -190,13 +207,19 @@ array element on its own line; the order does not matter when it reads them:
   "seen_version": "",
   "dev_mode": false,
   "pt_log": false,
+  "extra_auto_restore": false
+}
+```
+
+```json
+{
+  "schema": 1,
   "console_lock": false,
   "console_lock_prev": [],
   "extra_weekday": -1,
   "extra_date": "",
   "extra_base": 0,
   "extra_value": 0,
-  "extra_auto_restore": false,
   "fw_gate_fw": "",
   "fw_gate_app": "",
   "fw_gate_choice": "",
@@ -209,7 +232,8 @@ default.
 
 ## `watch.json`
 
-Next to `config.json`, in `sd:/config/playguard/watch.json`: what PlayGuard
+One per system, next to its `state.json`, in
+`sd:/config/playguard/nand/<system>/watch.json`: what PlayGuard
 last saw of the console, to tell the parent what changed outside it (the
 Overview's amber notice, the `outside_*` and `new_account` entries of the
 change history, the Activity tab's new-account flag).

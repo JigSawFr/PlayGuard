@@ -23,4 +23,12 @@ std::string old_dir();
 // already in `to` is not replaced. Returns how many entries were moved.
 size_t run(const std::string& from, const std::string& to);
 
+// What belongs to one system, from `data_dir` (where it was before the
+// per-system folders) to `nand_dir` (paths::nand_dir()): history.json and
+// watch.json (with their .tmp / .bad / .bad.1), backups/ and the play-data
+// cache (cache/activity_*.bin). The first system PlayGuard starts on takes
+// them; the others start without. Same rules as run(). Returns how many
+// entries were moved.
+size_t to_nand(const std::string& data_dir, const std::string& nand_dir);
+
 }   // namespace data_move

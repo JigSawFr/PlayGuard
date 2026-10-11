@@ -63,7 +63,9 @@ std::string current_report()
         si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : std::string("unknown"),
         si.is_atmosphere ? "detected" : "not detected",
         si.applet_mode ? "applet (album)" : "application",
-        storage == SysStorage_EmuMMC ? "emuMMC" : storage == SysStorage_SysMMC ? "sysMMC" : "unknown",
+        fmt::format("{} (data: nand/{})",
+                    storage == SysStorage_EmuMMC ? "emuMMC" : storage == SysStorage_SysMMC ? "sysMMC" : "unknown",
+                    paths::nand_key()),
         !si.blank_valid ? "unknown" : (si.blank ? "blanked" : "not blanked"),
         patch_line,
         (int)sysinfo_compat(&si));
