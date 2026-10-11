@@ -16,8 +16,9 @@ each failing screen, <shots-dir>/visual_diff/NAME.png shows the reference, the
 new screenshot and the changes (in red) side by side.
 
 Only screens that come out the same from one run to the next are kept as
-references: no toast, no held-key scrolling, no app version (a release would
-change it), no SD-card content that piles up between local runs.
+references: no toast, no held-key scrolling that can stop anywhere (held to
+the end of a list is fine), no app version (a release would change it), no
+SD-card content that piles up between local runs.
 
 A change to the UI that is meant: run the smoke test, then
   tools/visual_check.py <shots-dir> <reference-dir> --update

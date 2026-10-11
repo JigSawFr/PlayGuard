@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 
+#include "action/backup_logic.hpp"
 #include "action/history_flow.hpp"
 #include "action/pt_flow.hpp"
 #include "app.hpp"
@@ -125,15 +126,8 @@ void write_all(const backup::Snapshot& s, bool did_unlock, std::function<void()>
 {
     PctlStatus was;   // for the history: what each value was before
     pctl_status_fetch(&was);
-    Result first = 0;
-    std::vector<std::string> failed;
-    size_t tried = 0;
-    auto check = [&](Result rc, const std::string& what) {
-        tried++;
-        if (R_SUCCEEDED(rc)) return;
-        if (R_SUCCEEDED(first)) first = rc;
-        failed.push_back(what);
-    };
+    backup_logic::Tally tally;
+    auto check = [&](Result rc, const std::string& what) { tally.add(rc, what); };
     if (s.level_ok) {
         const Result rc = pctl_set_safety_level(s.level);
         check(rc, "playguard/restrictions/section_level"_i18n);
@@ -164,12 +158,10 @@ void write_all(const backup::Snapshot& s, bool did_unlock, std::function<void()>
         check(pt_flow::write_alarm_disabled(s.alarm_disabled, "backup"), "playguard/play_timer/alarm"_i18n);
     // Recorded only when something was restored: every write refused
     // changed nothing.
-    if (tried > failed.size()) history_flow::record_event("restore", "", s.created);
+    if (tally.any_written()) history_flow::record_event("restore", "", s.created);
 
-    std::string what;
-    for (const auto& f : failed) what += (what.empty() ? "" : ", ") + f;
-    pt_flow::finish_write(first, did_unlock, "playguard/backup/restored"_i18n,
-                          brls::getStr("playguard/backup/restore_err", what), refresh);
+    pt_flow::finish_write(tally.first, did_unlock, "playguard/backup/restored"_i18n,
+                          brls::getStr("playguard/backup/restore_err", tally.failed_list()), refresh);
 }
 
 void restore(const backup::Snapshot& s, std::function<void()> refresh)
@@ -219,35 +211,11 @@ size_t count()
 
 backup::Snapshot capture()
 {
-    backup::Snapshot s;
-
     PctlStatus st;
     pctl_status_fetch(&st);
-    s.level_ok        = st.safety_level_ok && st.safety_level <= PctlSafetyLevel_Teen;
-    s.level           = st.safety_level;
-    s.custom_ok       = st.settings_ok && st.settings.rating_age <= 21;
-    s.rating_age      = st.settings.rating_age;
-    s.sns_restricted  = st.settings.sns_post_restriction;
-    s.comm_restricted = st.settings.free_communication_restriction;
-    s.vr_ok           = st.stereo_vision_ok;
-    s.vr_restricted   = st.stereo_vision_restricted;
-    s.rating_org_ok   = st.rating_org_ok;
-    s.rating_org      = st.rating_org;
-
     PtState pt;
     pctl_play_timer_query(&pt);
-    s.days_ok = pt.fw_supported && pt.valid;
-    for (int d = 0; d < 7 && s.days_ok; d++) {
-        s.days[d] = pt.day_min[d];
-        if (s.days[d] != PT_DAY_NOLIMIT && s.days[d] > 1440) s.days_ok = false;
-    }
-    if (s.days_ok) {
-        pt_block::Block b;
-        std::copy(std::begin(pt.block), std::end(pt.block), b.begin());
-        s.raw_block = pt_block::to_hex(b);
-    }
-    s.alarm_ok       = s.days_ok && pt.alarm_disabled_valid;
-    s.alarm_disabled = pt.alarm_disabled;
+    backup::Snapshot s = backup_logic::snapshot_of(st, pt);
 
     SysInfo si;
     sysinfo_get(&si);
@@ -282,8 +250,7 @@ void choose_and_restore(std::function<void()> refresh)
         const bool ok = backup::load(name, s);
         loaded->emplace_back(ok, s);
         if (!ok) labels.push_back(brls::getStr("playguard/backup/unreadable", name));
-        else if (s.created.empty()) labels.push_back(name);
-        else labels.push_back(s.firmware.empty() ? s.created : s.created + " · " + s.firmware);
+        else labels.push_back(backup_logic::list_label(name, s));
     }
     ui::pick("playguard/backup/pick_title"_i18n, labels, 0, [loaded, refresh](int index) {
         const auto& entry = (*loaded)[(size_t)index];
