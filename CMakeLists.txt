@@ -30,15 +30,39 @@ endif ()
 # debug data). borealis prints its "Build Type:" line before project() picks
 # that default, so say what is actually used.
 # deko3d draws with precompiled shaders: borealis' nanovg loads them from
-# romfs:/shaders/, so compile them (uam, part of switch-dev) for the romfs.
+# romfs:/shaders/. uam (part of switch-dev) does not always give the same
+# bytes for the same GLSL (one scheduling word of fill_vsh differs from run to
+# run), which broke the reproducible zips, so the compiled shaders are kept in
+# shaders/ and copied as they are. shaders/glsl.sha256 is the GLSL they were
+# compiled from: after a borealis bump changes it, configure with
+# -DPLAYGUARD_UAM=ON, copy build/dksh/*.dksh to shaders/ and update the checksums.
+option(PLAYGUARD_UAM "Switch: compile the deko3d shaders with uam instead of using shaders/" OFF)
 set(PLAYGUARD_DKSH_DIR ${CMAKE_BINARY_DIR}/dksh)
+set(PLAYGUARD_SHADERS fill_vsh fill_fsh fill_aa_fsh)
 if (PLATFORM_SWITCH AND USE_DEKO3D)
-    gen_dksh(${PLAYGUARD_DKSH_DIR})
-    foreach (shader fill_vsh fill_fsh fill_aa_fsh)
-        if (NOT EXISTS ${PLAYGUARD_DKSH_DIR}/${shader}.dksh)
-            message(FATAL_ERROR "uam did not produce ${shader}.dksh")
-        endif ()
-    endforeach ()
+    if (PLAYGUARD_UAM)
+        gen_dksh(${PLAYGUARD_DKSH_DIR})
+        foreach (shader ${PLAYGUARD_SHADERS})
+            if (NOT EXISTS ${PLAYGUARD_DKSH_DIR}/${shader}.dksh)
+                message(FATAL_ERROR "uam did not produce ${shader}.dksh")
+            endif ()
+        endforeach ()
+    else ()
+        file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/shaders/glsl.sha256 PLAYGUARD_GLSL_SUMS)
+        foreach (line ${PLAYGUARD_GLSL_SUMS})
+            string(REGEX MATCH "^([0-9a-f]+)  (.+)$" _ "${line}")
+            file(SHA256 ${BOREALIS_LIBRARY}/lib/extern/nanovg/deko3d/shaders/${CMAKE_MATCH_2} PLAYGUARD_GLSL_SUM)
+            if (NOT PLAYGUARD_GLSL_SUM STREQUAL CMAKE_MATCH_1)
+                message(FATAL_ERROR "borealis' ${CMAKE_MATCH_2} changed since shaders/ was compiled: "
+                        "configure with -DPLAYGUARD_UAM=ON, copy build/dksh/*.dksh to shaders/ "
+                        "and update shaders/glsl.sha256")
+            endif ()
+        endforeach ()
+        file(REMOVE_RECURSE ${PLAYGUARD_DKSH_DIR})
+        foreach (shader ${PLAYGUARD_SHADERS})
+            file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shaders/${shader}.dksh DESTINATION ${PLAYGUARD_DKSH_DIR})
+        endforeach ()
+    endif ()
 endif ()
 if (PLATFORM_SWITCH)
     if (USE_DEKO3D)
