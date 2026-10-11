@@ -450,6 +450,13 @@ if LIBRARY:
     total = listed()[-1].split(" of ")[1].split()[0]
     if listed()[-1] != f"{total} of {total} games":
         fail("\"Show every game\" did not list them all: " + repr(listed()))
+    # Another tab and back (the sidebar makes the tab again): still every game.
+    built = len(listed())
+    key("Left")
+    key("Up")
+    key("Down")
+    if len(listed()) == built or listed()[-1] != f"{total} of {total} games":
+        fail("\"Show every game\" was not kept across tabs: " + repr(listed()))
     finish()
 if OUTSIDE:
     def log_text():

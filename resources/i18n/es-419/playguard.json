@@ -415,7 +415,8 @@
             "days_played_value": "{} de 7",
             "busiest": "Día con más juego",
             "session": "Sesión promedio"
-        }
+        },
+        "applet_cap": "No se muestran, para ahorrar memoria en modo applet (abierto desde el Álbum): {} más. La exportación incluye todos los juegos; para ver la lista completa, abra PlayGuard manteniendo presionado R al iniciar un juego."
     },
     "restrictions": {
         "section_level": "Nivel de restricción",

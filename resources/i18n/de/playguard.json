@@ -415,7 +415,8 @@
             "days_played_value": "{} von 7",
             "busiest": "Aktivster Tag",
             "session": "Durchschnittliche Sitzung"
-        }
+        },
+        "applet_cap": "Nicht aufgeführt, um im Applet-Modus (aus dem Album geöffnet) Speicher zu sparen: {} weitere. Der Export enthält alle Spiele; für die vollständige Liste öffnen Sie PlayGuard, indem Sie beim Starten eines Spiels R gedrückt halten."
     },
     "restrictions": {
         "section_level": "Einschränkungskategorie",

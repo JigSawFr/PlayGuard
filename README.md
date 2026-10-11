@@ -166,7 +166,7 @@ The app is organised in tabs, like System Settings. Click a tab to expand it.
 - A chart of the last seven days (today on the right, a legend under it), with this week's limit for each day as a line and the time over it in amber, marked !; today's, the week's and all-time totals.
 - A **summary** over the chosen period, for the account shown: average per day, the most played game, the days played and the busiest one (last 7 days), the average session (all time).
 - **To rediscover**: installed games under 3 h in all and not played for a month or more, the least played first (up to three).
-- Sort by period; the first games show their icon (not in applet mode, to spare memory). A large library lists its first 50 games, then *Show every game*; the export always holds them all.
+- Sort by period; the first games show their icon (not in applet mode, to spare memory). A large library lists its first 50 games, then *Show every game*, kept until another period or account (100 games at most in applet mode); the export always holds them all.
 - Ⓐ on a game: its last seven days as bars, launches, first and last play, time per user account. Deleted games keep their all-time figures, even one deleted before PlayGuard was installed as long as the console's play log still names it, and their name once PlayGuard has seen it (else *Deleted game* and its title ID).
 - **Export to the SD card** as CSV, JSON, XLSX (Excel) or PDF, one column per day.
 - Opens at once on the last figures read (kept on the SD card between runs), refreshed in the background when over a minute old; Ⓧ reads them again now, with a spinner.

@@ -415,7 +415,8 @@
             "days_played_value": "7 天中 {} 天",
             "busiest": "玩得最多的一天",
             "session": "平均每次時長"
-        }
+        },
+        "applet_cap": "為節省Applet模式（從相簿開啟）下的記憶體，另有{}款遊戲未列出。匯出檔包含所有遊戲；若要完整清單，請在啟動遊戲時按住R來開啟PlayGuard。"
     },
     "restrictions": {
         "section_level": "限制等級",
