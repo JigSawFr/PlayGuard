@@ -4,6 +4,12 @@
         "read_only": "唯讀",
         "unlocked": "已暫時解除"
     },
+    "loading": {
+        "tagline": "直接在主機上使用的家長監護",
+        "step_console": "正在檢查主機…",
+        "step_settings": "正在讀取設定…",
+        "step_screen": "正在開啟 PlayGuard…"
+    },
     "tabs": {
         "dashboard": "總覽",
         "play_timer": "遊玩時間限制",

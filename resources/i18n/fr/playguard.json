@@ -4,6 +4,12 @@
         "read_only": "lecture seule",
         "unlocked": "déverrouillé temporairement"
     },
+    "loading": {
+        "tagline": "Le contrôle parental, directement sur la console",
+        "step_console": "Vérification de la console...",
+        "step_settings": "Lecture des réglages...",
+        "step_screen": "Ouverture de PlayGuard..."
+    },
     "tabs": {
         "dashboard": "Vue d'ensemble",
         "play_timer": "Temps de jeu",

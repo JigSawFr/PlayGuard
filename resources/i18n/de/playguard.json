@@ -4,6 +4,12 @@
         "read_only": "schreibgeschützt",
         "unlocked": "vorübergehend aufgehoben"
     },
+    "loading": {
+        "tagline": "Altersbeschränkungen direkt auf der Konsole",
+        "step_console": "Konsole wird geprüft...",
+        "step_settings": "Einstellungen werden gelesen...",
+        "step_screen": "PlayGuard wird geöffnet..."
+    },
     "tabs": {
         "dashboard": "Übersicht",
         "play_timer": "Spielzeit",

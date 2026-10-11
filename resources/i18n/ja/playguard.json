@@ -4,6 +4,12 @@
         "read_only": "閲覧のみ",
         "unlocked": "一時解除中"
     },
+    "loading": {
+        "tagline": "本体だけで使える、みまもり設定",
+        "step_console": "本体を確認しています…",
+        "step_settings": "設定を読み込んでいます…",
+        "step_screen": "PlayGuardを開いています…"
+    },
     "tabs": {
         "dashboard": "概要",
         "play_timer": "プレイ時間",

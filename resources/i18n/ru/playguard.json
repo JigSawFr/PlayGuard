@@ -4,6 +4,12 @@
         "read_only": "только чтение",
         "unlocked": "временно разблокировано"
     },
+    "loading": {
+        "tagline": "Родительский контроль прямо на консоли",
+        "step_console": "Проверка консоли...",
+        "step_settings": "Чтение настроек...",
+        "step_screen": "Запуск PlayGuard..."
+    },
     "tabs": {
         "dashboard": "Обзор",
         "play_timer": "Таймер игры",

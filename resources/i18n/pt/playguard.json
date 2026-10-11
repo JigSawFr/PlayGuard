@@ -4,6 +4,12 @@
         "read_only": "só de leitura",
         "unlocked": "desbloqueado temporariamente"
     },
+    "loading": {
+        "tagline": "O controlo parental, diretamente na consola",
+        "step_console": "A verificar a consola...",
+        "step_settings": "A ler as definições...",
+        "step_screen": "A abrir o PlayGuard..."
+    },
     "tabs": {
         "dashboard": "Visão geral",
         "play_timer": "Tempo de jogo",

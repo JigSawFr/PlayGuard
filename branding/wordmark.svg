@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="176" viewBox="0 0 360 88">
+  <!-- The "PlayGuard" wordmark of the banner, alone on a transparent ground: the
+       loading screen draws it (resources/img/wordmark.png, at twice the size it
+       is shown, for the docked 1080p screen). -->
+  <text x="180" y="64" text-anchor="middle" font-family="Sora" font-weight="700" font-size="64" letter-spacing="-1.5" fill="#E8EEF7">Play<tspan fill="#2EC4A6">Guard</tspan></text>
+</svg>

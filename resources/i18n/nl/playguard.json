@@ -4,6 +4,12 @@
         "read_only": "alleen-lezen",
         "unlocked": "tijdelijk ontgrendeld"
     },
+    "loading": {
+        "tagline": "Ouderlijk toezicht, rechtstreeks op de console",
+        "step_console": "Console controleren...",
+        "step_settings": "Instellingen lezen...",
+        "step_screen": "PlayGuard openen..."
+    },
     "tabs": {
         "dashboard": "Overzicht",
         "play_timer": "Speeltijdtimer",
