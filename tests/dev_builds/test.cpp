@@ -167,6 +167,46 @@ static void test_artifacts()
     CHECK(!dev_builds::parse_pulls("{}", &no_pulls) && no_pulls.empty());
 }
 
+static void test_order()
+{
+    auto make = [](Kind kind, int pr, const char* commit, const char* date) {
+        dev_builds::Build b;
+        b.kind = kind;
+        b.pr = pr;
+        b.commit = commit;
+        b.date = date;
+        return b;
+    };
+    const std::vector<dev_builds::Build> all{
+        make(Kind::Release, 0, "", "2026-10-01T09:00:00Z"),
+        make(Kind::Main, 0, "aaaaaaa", "2026-10-08T12:00:00Z"),
+        make(Kind::Main, 0, "bbbbbbb", "2026-10-09T12:00:00Z"),
+        make(Kind::PullRequest, 41, "ccccccc", "2026-10-09T10:00:00Z"),
+        make(Kind::PullRequest, 45, "ddddddd", "2026-10-07T10:00:00Z"),
+        make(Kind::PullRequest, 43, "eeeeeee", "2026-10-09T11:00:00Z"),
+        make(Kind::PullRequest, 44, "fffffff", "2026-10-09T11:00:00Z"),   // built with #43
+    };
+    using dev_builds::Order;
+    auto commits = [](const std::vector<dev_builds::Build>& v) {
+        std::string s;
+        for (const auto& b : v) s += b.commit.empty() ? "r" : b.commit.substr(0, 1);
+        return s;
+    };
+    // Each kind apart: the newest build first; a tie keeps the listed order.
+    CHECK(commits(dev_builds::of_kind(all, Kind::Release, Order::Newest)) == "r");
+    CHECK(commits(dev_builds::of_kind(all, Kind::Main, Order::Newest)) == "ba");
+    CHECK(commits(dev_builds::of_kind(all, Kind::PullRequest, Order::Newest)) == "efcd");
+    // By number: the pull requests only, highest first; main stays newest first.
+    CHECK(commits(dev_builds::of_kind(all, Kind::PullRequest, Order::Number)) == "dfec");
+    CHECK(commits(dev_builds::of_kind(all, Kind::Main, Order::Number)) == "ba");
+    CHECK(dev_builds::of_kind({}, Kind::Main, Order::Newest).empty());
+
+    CHECK(dev_builds::order_named("number") == Order::Number && dev_builds::order_named("newest") == Order::Newest);
+    CHECK(dev_builds::order_named("") == Order::Newest && dev_builds::order_named("NUMBER") == Order::Newest);
+    CHECK(std::string(dev_builds::order_name(Order::Number)) == "number" &&
+          std::string(dev_builds::order_name(Order::Newest)) == "newest");
+}
+
 static void test_cache()
 {
     Build rel;
@@ -357,11 +397,12 @@ int main()
     test_names();
     test_release();
     test_artifacts();
+    test_order();
     test_cache();
     test_files();
     test_zip();
     test_auth();
 
     std::system((std::string("rm -rf '") + dir + "'").c_str());
-    return CHECK_DONE("sha256, release and artifact lists, the cached list, download checks, zip extraction, replacement and GitHub sign-in assertions passed");
+    return CHECK_DONE("sha256, release and artifact lists, the order of each kind, the cached list, download checks, zip extraction, replacement and GitHub sign-in assertions passed");
 }

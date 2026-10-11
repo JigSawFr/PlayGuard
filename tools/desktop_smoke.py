@@ -74,6 +74,10 @@ os.makedirs(run_dir, exist_ok=True)
 config_file = os.path.join(run_dir, "playguard_data", "config.json")
 if (GATE or ERRORS or DEVBUILD) and os.path.exists(config_file):
     os.remove(config_file)   # no remembered choice, developer mode off
+if DEVBUILD:
+    # The pull requests by number (Y on the builds' screen; the keyboard has no Y).
+    os.makedirs(os.path.dirname(config_file), exist_ok=True)
+    json.dump({"schema": 1, "dev_builds_order": "number"}, open(config_file, "w"))
 block_ref = os.path.join(run_dir, "playguard_data", "logs", "play_timer_block.json")
 if GATE and os.path.exists(block_ref):
     os.remove(block_ref)     # the developer tool must write a new one
@@ -492,7 +496,7 @@ if DEVBUILD:
     time.sleep(3)
     if not os.path.exists(token_file):
         fail("no GitHub token saved in " + token_file)
-    shot("03_dev_builds")      # the list again: release, main ×2, the pull request, Refresh
+    shot("03_dev_builds")      # the same screen filled: release, main ×2, the pull request, Refresh
     cache_file = os.path.join(run_dir, "playguard_data", "cache", "dev_builds.json")
     if not os.path.exists(cache_file) or len(json.load(open(cache_file))["builds"]) != 4:
         fail("the list was not kept in " + cache_file)
@@ -500,15 +504,15 @@ if DEVBUILD:
     fetched = messages().count(loading)
     key("Escape")              # closed, then opened again: the list kept is shown at once
     key("Return")
-    shot("03b_dev_builds_kept")
+    shot("03b_dev_builds_kept")  # under their headers, the pull requests by number
     if messages().count(loading) != fetched:
         fail("a list fetched a moment ago was fetched again")
-    key("Down", 4)             # Refresh the list: fetched again
+    key("Down", 4)             # past the release, main ×2 and the pull request: Refresh the list
     key("Return")
     time.sleep(2)
     if messages().count(loading) != fetched + 1:
         fail("Refresh the list did not fetch it again")
-    key("Down", 3)             # the pull request
+    key("Up")                  # the pull request, just above (the screen updated in place)
     key("Return")
     shot("04_dev_build_confirm")
     key("Right")               # Install
