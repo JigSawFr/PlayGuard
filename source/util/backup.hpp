@@ -61,6 +61,22 @@ struct Snapshot
     bool empty() const { return !level_ok && !custom_ok && !vr_ok && !days_ok && !rating_org_ok; }
 };
 
+// What a restore would do, value by value, as its summary compares them with
+// the console's: a value the console does not report counts as different,
+// and one the restore leaves out (the alarm with the advanced play-timer
+// actions off) writes nothing.
+struct RestoreTally
+{
+    int same    = 0;   // already as in the backup
+    int differ  = 0;   // listed as a change
+    int written = 0;   // of those, the ones the restore writes
+
+    void add(bool known, bool equal, bool restored = true);
+    // Nothing to write: the restore only says so (no unlock, no write, no
+    // history event).
+    bool nothing_to_write() const { return written == 0; }
+};
+
 std::string to_json(const Snapshot& s);
 
 // False when the text is not a backup of this format or a value is out of

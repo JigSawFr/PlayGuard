@@ -61,11 +61,16 @@ brls::Dialog* dialog(const std::string& text)
 }
 
 // The text (slightly smaller, so a chart fits under a long one) and `extra`.
+// At 20 px about 60 characters a line and 14 lines fit above a week chart;
+// a longer text (German, with every note) gets a smaller font rather than
+// pushing the dialog off the screen.
 static brls::Dialog* dialog_with(const std::string& text, brls::View* extra)
 {
+    int size = 20;
+    while (size > 16 && estimated_lines(text, (size_t)(60 * 20 / size)) > 14 * 20 / size) size -= 2;
     auto* label = new brls::Label();
     label->setText(text);
-    label->setFontSize(20);
+    label->setFontSize((float)size);
     label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     label->setSingleLine(false);
     auto* box = new brls::Box(brls::Axis::COLUMN);

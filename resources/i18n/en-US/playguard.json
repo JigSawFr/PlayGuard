@@ -515,13 +515,13 @@
     "pairing": {
         "section": "Nintendo Switch Parental Controls app",
         "active": "Linked to a phone",
-        "updated": "Last synchronised",
+        "updated": "Last synchronized",
         "unlink": "Unlink the companion app",
-        "unlink_body": "Unlink the Nintendo Switch Parental Controls companion app from this console?\n\nOtherwise its next synchronisation overwrites the limits set here.",
+        "unlink_body": "Unlink the Nintendo Switch Parental Controls companion app from this console?\n\nOtherwise its next synchronization overwrites the limits set here.",
         "unlink_confirm": "Unlink",
         "unlinked": "Companion app unlinked.",
         "unlink_err": "Could not unlink the companion app",
-        "note": "While the console stays linked, the companion app overwrites the settings made here at its next synchronisation.",
+        "note": "While the console stays linked, the companion app overwrites the settings made here at its next synchronization.",
         "decode": "Before unlinking: help decode two settings",
         "decode_note": "Before unlinking, this console can help decode \"alarm only\" and per-day bedtime (Security & app, 2 min): once unlinked, it no longer can."
     },
@@ -761,7 +761,8 @@
         "restore_err": "Not restored: {}",
         "before_delete_err": "No backup could be saved first ({}).\n\nDelete everything anyway?",
         "delete_anyway": "Delete anyway",
-        "bedtime_not_restored": "This backup had a bedtime alarm on: it is not restored, set it again in Play timer if needed."
+        "bedtime_not_restored": "This backup had a bedtime alarm on: it is not restored, set it again in Play timer if needed.",
+        "backed_up_on": "Settings backed up on {}."
     },
     "update": {
         "checking": "Checking for updates...",

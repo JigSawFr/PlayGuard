@@ -1,7 +1,7 @@
 // Host tests for source/core/playstats_logic.c: raw log entries as playlog
-// events, the bounded walk of the log, game names out of a control.nacp
-// (compressed titles included), the names kept between reads, and the icons
-// kept on the SD card.
+// events, the bounded walk of the log, the games the whole log names, game
+// names out of a control.nacp (compressed titles included), the names kept
+// between reads, and the icons kept on the SD card.
 #define _DEFAULT_SOURCE   // mkdtemp
 #include "check.h"
 #include <dirent.h>
@@ -172,6 +172,45 @@ static void test_log(void)
     // An empty log, or nothing wanted.
     CHECK(playstats_collect_events(fake_query, LOG_START, 0, 0, 10, &events, &count, &capped) == 0 && !events && !count);
     CHECK(playstats_collect_events(fake_query, LOG_START, 2000, 0, 0, &events, &count, &capped) == 0 && !events && !count);
+    free(s_log);
+    s_log = NULL;
+}
+
+// Every game the whole log names, for "all time" (deleted ones included).
+static void test_logged_games(void)
+{
+    const u64 A = 0x0100000000020000ULL, B = 0x0100000000030000ULL, C = 0x0100000000040000ULL;
+    u64 ids[8];
+    Result rc = 1;
+
+    // 600 entries (three chunks): A over and over, B once in the middle, C
+    // only in the last chunk. Launches, exits and the HOME menu name no game.
+    make_log(600, 1000);
+    for (s32 i = 0; i < 600; i++) s_log[i] = applet(AppletId_application, PdmAppletEventType_InFocus, A, 1000 + (u64)i);
+    s_log[1]   = applet(AppletId_application, PdmAppletEventType_Launch, 0x0100000000050000ULL, 1001);
+    s_log[2]   = applet(AppletId_SystemAppletMenu, PdmAppletEventType_InFocus, 0x0100000000001000ULL, 1002);
+    s_log[300] = applet(AppletId_application, PdmAppletEventType_InFocus, B, 1300);
+    s_log[301] = applet(AppletId_application, PdmAppletEventType_Exit, 0x0100000000060000ULL, 1301);
+    s_log[599] = applet(AppletId_application, PdmAppletEventType_InFocus, C, 1599);
+    size_t n = playstats_logged_games(fake_query, LOG_START, 600, ids, 8, &rc);
+    CHECK(rc == 0 && n == 3 && ids[0] == A && ids[1] == B && ids[2] == C);
+    CHECK(s_queries == 3);
+
+    // Full: stops reading once `max` games are found.
+    s_queries = 0;
+    n = playstats_logged_games(fake_query, LOG_START, 600, ids, 1, &rc);
+    CHECK(rc == 0 && n == 1 && ids[0] == A && s_queries == 1);
+
+    // A read that fails (a quitting app) keeps what was found before it.
+    s_queries = 0;
+    s_fail_after = 2;
+    n = playstats_logged_games(fake_query, LOG_START, 600, ids, 8, &rc);
+    CHECK(rc != 0 && n == 2 && ids[0] == A && ids[1] == B);
+
+    // An empty log, or nothing wanted.
+    s_fail_after = -1;
+    CHECK(playstats_logged_games(fake_query, LOG_START, 0, ids, 8, &rc) == 0 && rc == 0);
+    CHECK(playstats_logged_games(fake_query, LOG_START, 600, ids, 0, &rc) == 0 && rc == 0);
     free(s_log);
     s_log = NULL;
 }
@@ -447,9 +486,10 @@ int main(void)
 {
     test_convert();
     test_log();
+    test_logged_games();
     test_utf8();
     test_nacp();
     test_names();
     test_icons();
-    return CHECK_DONE("playstats convert, log, NACP name, name and icon cache assertions passed");
+    return CHECK_DONE("playstats convert, log, logged games, NACP name, name and icon cache assertions passed");
 }

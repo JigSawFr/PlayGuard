@@ -761,7 +761,8 @@
         "restore_err": "Não restaurado: {}",
         "before_delete_err": "Não foi possível fazer um backup antes ({}).\n\nExcluir tudo mesmo assim?",
         "delete_anyway": "Excluir mesmo assim",
-        "bedtime_not_restored": "Este backup tinha um alarme de hora de dormir ativo: ele não é restaurado; configure-o de novo em Tempo de jogo, se precisar."
+        "bedtime_not_restored": "Este backup tinha um alarme de hora de dormir ativo: ele não é restaurado; configure-o de novo em Tempo de jogo, se precisar.",
+        "backed_up_on": "Configurações salvas em {}."
     },
     "update": {
         "checking": "Procurando atualizações...",

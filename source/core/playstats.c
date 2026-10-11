@@ -27,6 +27,12 @@ static u32 s_unnamed_count;
 // The games of the earlier read, for the all-time totals.
 static u64 s_known[PLAYSTATS_MAX];
 static u32 s_known_count;
+// Every game the play log names, read once a run (the whole log): a game
+// deleted before PlayGuard first read the console is in no earlier read.
+#define LOGGED_MAX (4 * PLAYSTATS_MAX)
+static u64  s_logged[LOGGED_MAX];
+static u32  s_logged_count;
+static bool s_logged_read;
 
 static char s_icon_dir[sizeof(((IconStore *)0)->dir)];
 static IconStore s_icons;
@@ -51,6 +57,21 @@ static Result query_events(s32 index, PdmPlayEvent *events, s32 count, s32 *got)
 {
     if (playstats_cancelled()) return RC_CANCELLED;
     return pdmqryQueryPlayEvent(index, events, count, got);
+}
+
+// Adds `id` to the candidates for the all-time totals, once.
+static void add_candidate(u64 **ids, size_t *count, size_t *cap, u64 id)
+{
+    for (size_t i = 0; i < *count; i++)
+        if ((*ids)[i] == id) return;
+    if (*count == *cap) {
+        size_t grown = *cap ? *cap * 2 : 128;
+        u64 *bigger = (u64 *)realloc(*ids, grown * sizeof(u64));
+        if (!bigger) return;
+        *ids = bigger;
+        *cap = grown;
+    }
+    (*ids)[(*count)++] = id;
 }
 
 static GameStat *find_or_add(PlayStats *out, u64 id)
@@ -232,24 +253,20 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
     }
     // Then the games of the earlier read that are not installed any more
     // (pdm keeps their statistics), for "all time".
-    const size_t installed = id_count;
-    for (u32 k = 0; k < s_known_count; k++) {
-        bool listed = false;
-        for (size_t i = 0; i < installed && !listed; i++) listed = ids[i] == s_known[k];
-        if (listed) continue;
-        if (id_count == id_cap) {
-            size_t grown = id_cap ? id_cap * 2 : 128;
-            u64 *bigger = (u64 *)realloc(ids, grown * sizeof(u64));
-            if (!bigger) break;
-            ids = bigger;
-            id_cap = grown;
-        }
-        ids[id_count++] = s_known[k];
-    }
+    for (u32 k = 0; k < s_known_count; k++) add_candidate(&ids, &id_count, &id_cap, s_known[k]);
 
     out->stats_rc  = pdmqryInitialize();
     out->events_rc = out->stats_rc;
     if (R_SUCCEEDED(out->stats_rc)) {
+        // And every game the log still names, deleted before PlayGuard first
+        // read the console included (read once a run: the log holds years).
+        if (!s_logged_read && !playstats_cancelled()) {
+            s32 total = 0, start = 0, end = 0;
+            Result rc = pdmqryGetAvailablePlayEventRange(&total, &start, &end);
+            if (R_SUCCEEDED(rc)) s_logged_count = (u32)playstats_logged_games(query_events, start, total, s_logged, LOGGED_MAX, &rc);
+            s_logged_read = R_SUCCEEDED(rc);   // a failed or cancelled read: again next fetch
+        }
+        for (u32 k = 0; k < s_logged_count; k++) add_candidate(&ids, &id_count, &id_cap, s_logged[k]);
         // Today and the last 7 days. A session can start up to a day before
         // the window and still end inside it.
         // Midnights through the console's rule: a day with a daylight-saving

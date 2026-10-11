@@ -761,7 +761,8 @@
         "restore_err": "Non restauré : {}",
         "before_delete_err": "Aucune sauvegarde n'a pu être enregistrée avant ({}).\n\nTout supprimer quand même ?",
         "delete_anyway": "Supprimer quand même",
-        "bedtime_not_restored": "Cette sauvegarde avait une alarme du coucher activée : elle n'est pas restaurée, réglez-la de nouveau dans Temps de jeu si besoin."
+        "bedtime_not_restored": "Cette sauvegarde avait une alarme du coucher activée : elle n'est pas restaurée, réglez-la de nouveau dans Temps de jeu si besoin.",
+        "backed_up_on": "Réglages sauvegardés le {}."
     },
     "update": {
         "checking": "Recherche d'une mise à jour...",

@@ -761,7 +761,8 @@
         "restore_err": "No restaurado: {}",
         "before_delete_err": "No se ha podido guardar antes ninguna copia ({}).\n\n¿Eliminarlo todo de todos modos?",
         "delete_anyway": "Eliminar de todos modos",
-        "bedtime_not_restored": "Esta copia tenía activada una alarma de hora de dormir: no se restablece; vuelve a configurarla en Tiempo de juego si hace falta."
+        "bedtime_not_restored": "Esta copia tenía activada una alarma de hora de dormir: no se restablece; vuelve a configurarla en Tiempo de juego si hace falta.",
+        "backed_up_on": "Ajustes guardados el {}."
     },
     "update": {
         "checking": "Buscando actualizaciones...",
