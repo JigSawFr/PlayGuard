@@ -7,6 +7,13 @@ run (console time fixed, footer clock redrawn at the console's time, 16:00:00), 
 that changed. A changed screen fails the build, with the details in the job
 summary; the smoke test draws the focus without its moving glow
 (`PLAYGUARD_SIM_STILL_FOCUS`), so a screen nobody changed comes out the same.
+The screens are drawn by the runner image's software renderer (mesa's
+llvmpipe on `ubuntu-26.04`, the image `.github/workflows/build.yml` pins),
+so a new image can move every screen a little: moving to one is a pull
+request of its own, with the references regenerated. Each shard's screenshots
+are the `playguard-<version>-<ref>-<commit>-screenshots-<shard>` artifact of
+the run: every screen, a `contact-sheet.png` per scenario (every screen of it
+on one image) and `visual_diff/` for the screens that changed.
 
 A UI change that is meant:
 
