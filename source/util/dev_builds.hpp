@@ -4,10 +4,12 @@
 // build is never offered, nobody with write access has reviewed its code).
 //
 // The release is the playguard.nro of the latest GitHub release, readable
-// without an account. The others are the playguard_release artifact the
-// build workflow keeps for every run (.github/workflows/build.yml): a zip
-// holding playguard.nro, which GitHub only hands to a signed-in user, hence
-// the token of util/github_auth.hpp. Artifacts expire (90 days by default).
+// without an account. The others are the playguard-<version>-<ref>-<commit>-nro
+// artifact the build workflow keeps for every run (.github/workflows/build.yml
+// names each artifact of a run after its build and its component; the
+// recovery sysmodule is the -rescue one): a zip holding playguard.nro, which
+// GitHub only hands to a signed-in user, hence the token of
+// util/github_auth.hpp. Artifacts expire (90 days by default).
 //
 // The download is checked (size and the SHA-256 GitHub records; for an
 // artifact, the zip's, then the CRC-32 of playguard.nro inside it; the NRO
@@ -68,8 +70,13 @@ struct Pull
 // The latest release (GET /repos/…/releases/latest): its playguard.nro.
 // False for anything else (a pre-release, no such asset, malformed).
 bool parse_release(const std::string& json, Build* out);
-// The "playguard_release" artifacts that have not expired, newest first as listed.
-bool parse_artifacts(const std::string& json, std::vector<Artifact>* out);
+// The artifact holding playguard.nro: "playguard-<version>-<ref>-<commit>-nro",
+// or "playguard_release", the name the runs before that scheme gave it.
+bool is_build_artifact(const std::string& name);
+// The build artifacts (is_build_artifact) that have not expired, newest first
+// as listed. *listed (when given) is how many artifacts the page held, of
+// any name: a short page is the last one.
+bool parse_artifacts(const std::string& json, std::vector<Artifact>* out, size_t* listed = nullptr);
 bool parse_pulls(const std::string& json, std::vector<Pull>* out);
 
 // The builds: main's newest `keep_main` commits (pushed to this repository's

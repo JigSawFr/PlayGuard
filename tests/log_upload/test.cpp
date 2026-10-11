@@ -86,8 +86,10 @@ static void test_bundle()
         if (end == std::string::npos) continue;   // the notice itself was cut: nothing to check
         CHECK((end - body) % 2 == 0);
     }
-    // A limit smaller than the notice still holds.
-    CHECK(log_upload::bundle({ { "big", big } }, 10, &cut).size() <= 10 && cut);
+    // A limit smaller than the notice still holds. (Named: gcc 15 sees a
+    // dangling pointer in the temporary's .size() inside CHECK, -Werror.)
+    const std::string tiny = log_upload::bundle({ { "big", big } }, 10, &cut);
+    CHECK(tiny.size() <= 10 && cut);
 }
 
 static void test_reply()

@@ -48,12 +48,15 @@ CLOCK_SIZE = "21.5"                     # brls/hints/time fontSize
 CLOCK_FONT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",
                           "extern", "borealis", "resources", "font", "switch_font.ttf")
 INK = 60   # a pixel this far (sum of the RGB differences) from the background is text
+# ImageMagick 7 keeps the version 6 commands (convert, compare, …) as aliases
+# of `magick` that warn on every call; version 6 has no `magick`.
+IM = ["magick"] if shutil.which("magick") else []
 
 
 def area_pixels(src):
     """The clock area's pixels, {(x, y): (r, g, b)}, in area coordinates."""
     x, y, w, h = CLOCK_AREA
-    out = subprocess.run(["convert", src, "-crop", f"{w}x{h}+{x}+{y}", "+repage", "-depth", "8", "txt:-"],
+    out = subprocess.run(IM + ["convert", src, "-crop", f"{w}x{h}+{x}+{y}", "+repage", "-depth", "8", "txt:-"],
                          capture_output=True, text=True, check=True).stdout
     px = {}
     for line in out.splitlines()[1:]:   # "12,3: (235,235,235)  #EBEBEB  srgb(...)"
@@ -85,13 +88,13 @@ def masked(src, dst):
 
 
 def size(path):
-    out = subprocess.run(["identify", "-format", "%wx%h", path], capture_output=True, text=True, check=True)
+    out = subprocess.run(IM + ["identify", "-format", "%wx%h", path], capture_output=True, text=True, check=True)
     return out.stdout.strip()
 
 
 def changed_pixels(ref, new, fuzz, diff):
     """Pixels that differ by more than `fuzz` %, with the changes drawn in `diff`."""
-    out = subprocess.run(["compare", "-metric", "AE", "-fuzz", f"{fuzz}%", ref, new, diff],
+    out = subprocess.run(IM + ["compare", "-metric", "AE", "-fuzz", f"{fuzz}%", ref, new, diff],
                          capture_output=True, text=True)
     if out.returncode not in (0, 1):   # 2: compare itself failed
         raise RuntimeError(out.stderr.strip())
@@ -118,7 +121,7 @@ def main():
                 sys.exit(f"no {src}")
             # Stored with the footer clock at CLOCK_TEXT, never the host's time.
             masked(src, os.path.join(args.reference, name + ".png"))
-            subprocess.run(["mogrify", "-strip", os.path.join(args.reference, name + ".png")], check=True)
+            subprocess.run(IM + ["mogrify", "-strip", os.path.join(args.reference, name + ".png")], check=True)
             print("updated", name)
         return 0
     if not names:
@@ -149,7 +152,7 @@ def main():
             print(f"FAIL {name}: {n} pixels changed (at most {args.max_pixels})")
             failed.append(name)
             os.makedirs(diff_dir, exist_ok=True)
-            subprocess.run(["convert", ref_m, new_m, diff, "+append", os.path.join(diff_dir, name + ".png")], check=True)
+            subprocess.run(IM + ["convert", ref_m, new_m, diff, "+append", os.path.join(diff_dir, name + ".png")], check=True)
 
     if failed:
         print(f"\nvisual check: {len(failed)} screen(s) changed: {', '.join(failed)}")

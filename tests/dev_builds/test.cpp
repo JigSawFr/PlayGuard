@@ -88,10 +88,15 @@ static void test_release()
     for (const char* j : bad) CHECK(!dev_builds::parse_release(j, &b));
 }
 
+// The artifact holding playguard.nro, named after its build as the workflow
+// does (`name` for another one).
 static std::string artifact(const std::string& branch, const std::string& sha, const std::string& date,
-                            int64_t head_repo = 1, bool expired = false, const std::string& name = "playguard_release")
+                            int64_t head_repo = 1, bool expired = false, const std::string& name = "")
 {
-    return R"({"name": ")" + name + R"(", "size_in_bytes": 4000, "expired": )" + (expired ? "true" : "false") +
+    const std::string n = name.empty() ? "playguard-1.0.0-" + std::string(branch == "main" ? "main" : "pr41") + "-" +
+                                             sha.substr(0, 7) + "-nro"
+                                       : name;
+    return R"({"name": ")" + n + R"(", "size_in_bytes": 4000, "expired": )" + (expired ? "true" : "false") +
            R"(, "created_at": ")" + date + R"(", "digest": "sha256:)" + std::string(64, 'd') +
            R"(", "archive_download_url": "https://api.github.com/repos/o/r/actions/artifacts/)" + sha.substr(0, 3) +
            R"(/zip", "workflow_run": {"id": 9, "repository_id": 1, "head_repository_id": )" +
@@ -100,23 +105,39 @@ static std::string artifact(const std::string& branch, const std::string& sha, c
 
 static void test_artifacts()
 {
+    // The one holding playguard.nro, by the name the workflow gives it, or
+    // the name of the runs before; not a run's other artifacts.
+    CHECK(dev_builds::is_build_artifact("playguard-1.0.0-pr92-1f0a059-nro"));
+    CHECK(dev_builds::is_build_artifact("playguard-1.1.0-main-2bd4996-nro"));
+    CHECK(dev_builds::is_build_artifact("playguard_release"));
+    CHECK(!dev_builds::is_build_artifact("playguard-1.0.0-pr92-1f0a059-rescue"));
+    CHECK(!dev_builds::is_build_artifact("playguard-1.0.0-pr92-1f0a059-screenshots-default"));
+    CHECK(!dev_builds::is_build_artifact("playguard-1.0.0-pr92-1f0a059-nro.zip"));
+    CHECK(!dev_builds::is_build_artifact("playguard-nro") && !dev_builds::is_build_artifact("-nro") &&
+          !dev_builds::is_build_artifact("") && !dev_builds::is_build_artifact("playguard_packages"));
+
     const std::string a = "aaaaaaa" + std::string(33, '0'), b = "bbbbbbb" + std::string(33, '0'),
                       c = "ccccccc" + std::string(33, '0'), d = "ddddddd" + std::string(33, '0'),
                       e = "eeeeeee" + std::string(33, '0'), f = "fffffff" + std::string(33, '0');
-    const std::string json = R"({"total_count": 9, "artifacts": [)" +
+    const std::string json = R"({"total_count": 11, "artifacts": [)" +
                              artifact("main", b, "2026-10-09T12:00:00Z") + "," +
                              artifact("main", a, "2026-10-08T12:00:00Z") + "," +
-                             artifact("main", a, "2026-10-08T12:05:00Z") + "," +   // re-run: one per commit
+                             // Re-run (one per commit), under the name of the runs before.
+                             artifact("main", a, "2026-10-08T12:05:00Z", 1, false, "playguard_release") + "," +
                              artifact("feat/x", c, "2026-10-09T10:00:00Z") + "," +
                              artifact("feat/x", d, "2026-10-09T11:00:00Z") + "," +
                              artifact("main", e, "2026-10-09T13:00:00Z", 2) + "," +   // a fork's main: its PR
                              artifact("main", f, "2026-10-09T14:00:00Z", 1, true) + "," +   // expired
+                             // The run's other artifacts.
+                             artifact("main", f, "2026-10-09T14:00:00Z", 1, false, "playguard-1.0.0-main-fffffff-rescue") + "," +
+                             artifact("main", f, "2026-10-09T14:00:00Z", 1, false, "playguard-1.0.0-main-fffffff-linker-map") + "," +
                              artifact("main", f, "2026-10-09T14:00:00Z", 1, false, "playguard_linker_map") + "," +
                              R"({"name": "playguard_release", "size_in_bytes": 1, "expired": false, "archive_download_url": "https://x", "workflow_run": {}})" +
                              "]}";
     std::vector<dev_builds::Artifact> arts;
-    CHECK(dev_builds::parse_artifacts(json, &arts));
-    CHECK(arts.size() == 6);
+    size_t listed = 0;
+    CHECK(dev_builds::parse_artifacts(json, &arts, &listed));
+    CHECK(arts.size() == 6 && listed == 11);
     CHECK(arts[0].commit == "bbbbbbb" && arts[0].branch == "main" && arts[0].repo == 1 && arts[0].head_repo == 1 &&
            arts[0].size == 4000 && arts[0].sha256 == std::string(64, 'd'));
 
