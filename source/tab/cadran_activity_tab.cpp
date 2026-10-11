@@ -146,7 +146,8 @@ CadranActivityTab::CadranActivityTab()
                 std::vector<unsigned char> icon;
                 const auto it = s_icons.find(data->games[g].app_id);
                 if (it != s_icons.end()) icon = it->second;
-                brls::Application::pushActivity(new GameActivity(data->games[g], data, std::move(icon)));
+                // Every account's figures when no account is chosen (main's GameActivity says so).
+                brls::Application::pushActivity(new GameActivity(data->games[g], data, std::move(icon), this->account < 0));
                 break;
             }
             return true;
