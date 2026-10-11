@@ -85,8 +85,8 @@ bool save_config(const std::string& saved_text = "", const std::string& failed_t
 // before the console change it describes. False when it is not.
 bool save_config_now();
 // `next` in place of the current screen. Borealis never pops the first
-// activity, so a start screen (lock, rescue) gets `next` pushed over it
-// instead: popping it would silently do nothing.
+// activity (the loading screen, under every start screen): a screen that
+// cannot be popped gets `next` pushed over it instead.
 void replace_screen(brls::Activity* next);
 // Success: `ok_text` as a toast. Failure: `error_prefix — reason` as a dialog.
 void notify_result(Result rc, const std::string& ok_text, const std::string& error_prefix);

@@ -4,6 +4,12 @@
         "read_only": "somente leitura",
         "unlocked": "desbloqueado temporariamente"
     },
+    "loading": {
+        "tagline": "Controle dos pais direto no console",
+        "step_console": "Verificando o console...",
+        "step_settings": "Lendo as configurações...",
+        "step_screen": "Abrindo o PlayGuard..."
+    },
     "tabs": {
         "dashboard": "Visão geral",
         "play_timer": "Tempo de jogo",

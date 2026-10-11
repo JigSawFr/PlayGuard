@@ -50,7 +50,8 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_HBLOADER=1` | A homebrew loader that can hand an update over to a store |
 | `PLAYGUARD_SIM_NUMPAD=1:30` | What the system number pad returns |
 | `PLAYGUARD_SIM_NOW=<POSIX seconds>` | A frozen console time (with `TZ=` for its time zone) |
-| `PLAYGUARD_SIM_STILL_FOCUS=1` | Not the console: the focus highlight without its moving glow, for screenshots that compare |
+| `PLAYGUARD_SIM_STILL_FOCUS=1` | Not the console: the focus highlight without its moving glow, and the loading screen's ring still, for screenshots that compare |
+| `PLAYGUARD_SIM_HOLD_LOADING=1` | Not the console: the start-up stops on the loading screen, at its last step (the `loading` smoke scenario's screenshot) |
 
 Game patches are read from `./playguard_data/sd/`, the simulated SD card root.
 
@@ -70,8 +71,8 @@ CI runs all of the above plus the Switch build, the smoke scenarios in parallel 
 | `source/core/` | C, libnx: `pctl_ops`, `time_ops`, `sysinfo`, `playstats`, `platform`, `rescue`, `pure`, `calendar`, `write_guard` (the last four need no console and are shared with the simulator) |
 | `source/tab/` | One class per tab |
 | `source/action/` | Flows, one per thing a tab does, with their UI-free logic in `*_logic.cpp` where there is one: the play-timer write and its recorder, the clock (and a console no time server answers), the PIN prompt and the console lock, settings backups and restores, the change history and undo, changes seen outside PlayGuard and timer health, the firmware screen, the recovery screen, reports and sending them online, updates, GitHub sign-in and development builds, the SD-card write queue, clearing the cache and the log files |
-| `source/activity/` | Screens: per-day editor, profiles, a game, first steps, change history, firmware, recovery, the lock screen, the diagnostic report, what's new, the start-up error |
-| `source/view/` | Widgets: the week chart, the gauge, the play-timer state line, the day bars, the game cell, the QR codes and funding links, release notes, the scrolling frame |
+| `source/activity/` | Screens: per-day editor, profiles, a game, first steps, change history, firmware, recovery, the lock screen, the diagnostic report, what's new, the start-up error, the loading screen (the start-up runs one step per frame under it) |
+| `source/view/` | Widgets: the week chart, the gauge, the play-timer state line, the day bars, the game cell, the QR codes and funding links, release notes, the scrolling frame, the loading screen's icon and progress bar |
 | `source/ui/` | Dialogs, formatting, theme colours, the console's state as text, read-only greying and visibility |
 | `source/util/` | NTP, HTTP, config, profiles, settings backups, change history, play-log folding, the play-data cache, the Activity summary, table export, diagnostics, sending reports online, the play-timer recorder and block reference, update check, store launcher, GitHub sign-in and development builds (zip, SHA-256), game patches, the bundled changelog, the start-up reminders, the background threads (joined, never detached: the console cannot) and which files the cache and the logs are |
 | `source/sim/` | The simulated console for the desktop build |
@@ -81,7 +82,7 @@ CI runs all of the above plus the Switch build, the smoke scenarios in parallel 
 | `branding/` | SVG sources of the icon and banners |
 | `docs/` | [`parental-controls.md`](docs/parental-controls.md): what is known of the parental-control service, the play-timer block and the clocks, and how sure each fact is; [`companion-app.md`](docs/companion-app.md): what PlayGuard covers of Nintendo's phone app, and the gaps still to close |
 
-**Branding:** `branding/*.svg` are rendered to `icon.jpg`, `images/store/*.png` and `images/social-preview.png` (the repository's social preview) by `node tools/render_branding.mjs` (Node + Playwright).
+**Branding:** `branding/*.svg` are rendered to `icon.jpg`, `images/store/*.png`, `images/social-preview.png` (the repository's social preview) and `resources/img/wordmark.png` (the loading screen's) by `node tools/render_branding.mjs` (Node + Playwright).
 
 ## Pull requests and releases
 

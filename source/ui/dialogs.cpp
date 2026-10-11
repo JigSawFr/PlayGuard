@@ -52,9 +52,11 @@ brls::Dialog* dialog(const std::string& text)
     label->setFontSize(19);
     label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     label->setSingleLine(false);
-    auto* box = new brls::Box();
+    // A column that stretches the label: given the dialog's width, it wraps.
+    // In a row it got none and was drawn as one line across the screen.
+    auto* box = new brls::Box(brls::Axis::COLUMN);
     box->addView(label);
-    box->setAlignItems(brls::AlignItems::CENTER);
+    box->setAlignItems(brls::AlignItems::STRETCH);
     box->setJustifyContent(brls::JustifyContent::CENTER);
     box->setPadding(28, 40, 28, 40);
     return new brls::Dialog(box);

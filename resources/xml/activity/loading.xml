@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- The loading screen (activity/loading_activity.hpp), in the brand colours of
+     the store banner whatever the theme: the icon with its ring turning, the
+     wordmark, the tagline, and a progress bar over the start-up steps. -->
+
+<brls:Box
+    width="auto"
+    height="auto"
+    axis="column"
+    justifyContent="center"
+    alignItems="center"
+    backgroundColor="#0B1424">
+
+    <LoadingMark
+        width="168"
+        height="168"
+        marginBottom="40"/>
+
+    <brls:Image
+        image="@res/img/wordmark.png"
+        width="360"
+        height="88"/>
+
+    <brls:Label
+        text="@i18n/playguard/loading/tagline"
+        fontSize="22"
+        horizontalAlign="center"
+        textColor="#A9B6CC"
+        marginBottom="64"/>
+
+    <LoadingBar
+        id="loading_bar"
+        width="420"
+        height="8"
+        marginBottom="18"/>
+
+    <brls:Label
+        id="loading_step"
+        text=" "
+        fontSize="18"
+        horizontalAlign="center"
+        textColor="#A9B6CC"/>
+
+    <!-- Holds the focus while this screen is the top one (nothing to press
+         here): pushed over it, the first screen hands it back to a view of
+         this screen, which outlives every other start screen. -->
+    <brls:Rectangle
+        id="loading_anchor"
+        width="1"
+        height="1"
+        color="#0B1424"
+        focusable="true"
+        hideHighlight="true"/>
+
+</brls:Box>

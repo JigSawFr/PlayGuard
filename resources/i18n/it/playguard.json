@@ -4,6 +4,12 @@
         "read_only": "sola lettura",
         "unlocked": "sbloccato temporaneamente"
     },
+    "loading": {
+        "tagline": "Il filtro famiglia, direttamente sulla console",
+        "step_console": "Verifica della console...",
+        "step_settings": "Lettura delle impostazioni...",
+        "step_screen": "Apertura di PlayGuard..."
+    },
     "tabs": {
         "dashboard": "Panoramica",
         "play_timer": "Tempo di gioco",
