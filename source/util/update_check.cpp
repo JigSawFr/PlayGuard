@@ -19,9 +19,16 @@ Result check(uint32_t console_fw)
 {
     Result r;
     std::string body;
+    long status = 0;
 #ifndef __SWITCH__
-    // Desktop simulation: "1.1.0:24.0.0" (latest version : firmware it supports) or "offline".
+    // Desktop simulation: "1.1.0:24.0.0" (latest version : firmware it supports),
+    // "none" (no release published) or "offline".
     if (const char* sim = std::getenv("PLAYGUARD_SIM_LATEST")) {
+        if (std::strcmp(sim, "none") == 0) {
+            r.verdict = Verdict::NoRelease;
+            r.error = "HTTP 404";
+            return r;
+        }
         const char* colon = std::strchr(sim, ':');
         if (!colon) {
             r.error = "simulated: no connection";
@@ -31,7 +38,9 @@ Result check(uint32_t console_fw)
                std::string(colon + 1) + "\"}";
     } else
 #endif
-    if (!http::get(compat_url(), &body, &r.error)) {
+    if (!http::get(compat_url(), &body, &r.error, 64 * 1024, 10, {}, &status)) {
+        // GitHub answers 404 for releases/latest while none is published.
+        if (status == 404) r.verdict = Verdict::NoRelease;
         return r;
     }
     if (!parse_compat(body, &r.latest)) {

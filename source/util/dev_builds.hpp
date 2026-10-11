@@ -14,7 +14,8 @@
 // The download is checked (size and the SHA-256 GitHub records; for an
 // artifact, the zip's, then the CRC-32 of playguard.nro inside it; the NRO
 // header) before it replaces the running .nro, which hbloader loaded whole
-// into memory, so it can be overwritten; then hbloader starts it.
+// into memory, so it can be overwritten once romfs:/ lets go of it
+// (platform_romfs_release, dev_build_flow.cpp); then hbloader starts it.
 //
 // Everything but fetch() and download() is plain C++ for the host tests
 // (tests/dev_builds); those two are in dev_builds_net.cpp.

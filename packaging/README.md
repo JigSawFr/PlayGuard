@@ -18,7 +18,7 @@ config/playguard/profiles/*.json         saved play-time limit profiles
 config/playguard/exports/activity_*      Activity exports (CSV, JSON, XLSX, PDF)
 config/playguard/logs/reports/report_<date>.txt   diagnostic reports (never contain the PIN)
 config/playguard/logs/crashes/crash_<date>.txt    one file per crash
-config/playguard/logs/uploads/upload_<date>.txt   one per report sent online: its link (and bpa.st's removal link)
+config/playguard/logs/uploads/upload_<date>.url   one per report sent online: an Internet shortcut to its gist
                                          (all three pruned as Tools › Diagnostics says: number, age, size)
 config/playguard/logs/play_timer/log.csv          Developer tools › record the play timer (log.old.csv: the previous one)
 config/playguard/logs/play_timer/block.json       Developer tools › play-timer block reference

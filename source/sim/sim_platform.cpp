@@ -43,6 +43,9 @@ bool platform_set_next_load(const char* path)
     return true;
 }
 
+void platform_romfs_release(void) {}
+void platform_romfs_mount(void) {}
+
 bool platform_region(int* region)
 {
     const char* value = std::getenv("PLAYGUARD_SIM_REGION");

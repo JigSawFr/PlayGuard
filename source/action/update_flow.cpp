@@ -48,6 +48,9 @@ void show_result(const update::Result& r)
         case update::Verdict::UpToDate:
             ui::info(brls::getStr("playguard/update/up_to_date", app::version()));
             break;
+        case update::Verdict::NoRelease:
+            ui::info(brls::getStr("playguard/update/no_release", app::version()));
+            break;
         default:
             ui::info(brls::getStr("playguard/update/failed", r.error));
             break;
@@ -62,9 +65,7 @@ bool s_checking = false;   // one check at a time, whoever started it
 // Remembers the day of a check that reached the server.
 void record_check(const update::Result& r)
 {
-    if (r.verdict != update::Verdict::UpdateSupports && r.verdict != update::Verdict::UpdateNoSupport &&
-        r.verdict != update::Verdict::UpToDate)
-        return;
+    if (r.verdict == update::Verdict::Unknown) return;
     config::get().update_checked = ui::today_date();
     ui::save_config();
 }
@@ -130,6 +131,7 @@ std::string status_text(const update::Result& r, const std::string& firmware)
         case update::Verdict::UpdateNoSupport:
             return brls::getStr("playguard/fw_gate/status_no_support", r.latest.version, firmware);
         case update::Verdict::UpToDate:
+        case update::Verdict::NoRelease:
             return brls::getStr("playguard/fw_gate/status_latest", app::version());
         default:
             return brls::getStr("playguard/fw_gate/status_unknown", r.error);

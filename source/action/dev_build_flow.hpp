@@ -23,8 +23,8 @@ void open(bool force = false);
 bool installed(const dev_builds::Build& b);
 // "2026-10-09T12:03:00Z" -> "2026-10-09 12:03"
 std::string short_date(const std::string& iso);
-// "Refresh the list (checked 3 min ago)", for `cache`.
-std::string refresh_text(const dev_builds::Cache& cache);
+// "List checked 3 min ago.", for `cache`.
+std::string checked_text(const dev_builds::Cache& cache);
 // Asks to replace the running PlayGuard with `b`, then the PIN when one is
 // set, then installs it.
 void choose(const dev_builds::Build& b);

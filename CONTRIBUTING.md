@@ -44,7 +44,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_BACKGROUND=1` | PlayGuard out of focus |
 | `PLAYGUARD_SIM_REGION=2` | The console region |
 | `PLAYGUARD_SIM_LATEST=1.1.0:24.0.0` | The latest release and the newest firmware it supports, for the update check (`offline` for no network) |
-| `PLAYGUARD_SIM_PASTE=https://bpa.st/AbC1` | What bpa.st (or GitHub, signed in) answers to *Send a report online* (`offline` for no network) |
+| `PLAYGUARD_SIM_PASTE=https://gist.github.com/u/ab12` | What GitHub answers to *Send a report online* (`offline` for no network) |
 | `PLAYGUARD_SIM_DEV_BUILDS=<folder>` | What the GitHub API returns for *Install another build*: `latest.json` (the latest release), `artifacts.json`, `pulls.json`; `https://<local path>` download URLs are copied from disk (`offline` for no network) |
 | `PLAYGUARD_SIM_GITHUB_LOGIN=ok` | The GitHub device flow of *GitHub account*: `ok` approves at once, `denied` refuses, `offline` fails |
 | `PLAYGUARD_SIM_HBLOADER=1` | A homebrew loader that can hand an update over to a store |

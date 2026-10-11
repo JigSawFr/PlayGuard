@@ -2,6 +2,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "platform.h"
 
+#include <stdio.h>
+
 PlatformInput platform_numpad(const char *header, const char *guide, const char *initial, int max_len,
                               char *out, size_t out_size)
 {
@@ -47,6 +49,17 @@ bool platform_region(int *region)
     if (!region || R_FAILED(setGetRegionCode(&r))) return false;
     *region = (int)r;
     return true;
+}
+
+void platform_romfs_release(void)
+{
+    romfsExit();
+}
+
+void platform_romfs_mount(void)
+{
+    const Result rc = romfsInit();
+    if (R_FAILED(rc)) fprintf(stderr, "platform: romfs not mounted again (0x%X)\n", (unsigned)rc);
 }
 
 bool platform_random(void *buf, size_t size)

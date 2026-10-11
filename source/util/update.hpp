@@ -24,6 +24,7 @@ enum class Verdict
 {
     Unknown,           // could not tell (offline, release without compat.json, bad file)
     UpToDate,          // this is already the newest release
+    NoRelease,         // nothing at releases/latest (404): no release published yet
     UpdateSupports,    // a newer release supports this console's firmware
     UpdateNoSupport,   // a newer release exists, but not for this firmware yet
 };
@@ -50,7 +51,7 @@ Verdict  decide(uint32_t console_fw, const std::string& app_version, const Lates
 std::string compat_url();
 // Fetches compat.json of the latest release and decides. Blocking (network):
 // run it with brls::async. On the desktop build PLAYGUARD_SIM_LATEST
-// ("1.1.0:24.0.0" or "offline") replaces the network.
+// ("1.1.0:24.0.0", "none" or "offline") replaces the network.
 Result      check(uint32_t console_fw);
 
 }   // namespace update

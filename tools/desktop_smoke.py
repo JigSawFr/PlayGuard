@@ -19,7 +19,7 @@ The "devbuild" scenario turns the developer mode on, signs in to a simulated
 GitHub (PLAYGUARD_SIM_GITHUB_LOGIN) from the build list, then installs a pull
 request's build out of its artifact zip (PLAYGUARD_SIM_DEV_BUILDS): the file
 must replace the simulated playguard.nro and be handed to hbloader. On the
-way, the list must be kept (opened again at once) and Refresh fetch it again.
+way, the list must be kept (opened again at once) and X fetch it again.
 
 The "errors" scenario starts with today's limit reached, the temporary unlock
 failing and "Synchronise clock via Internet" off (PLAYGUARD_SIM_FAIL & co.):
@@ -88,7 +88,7 @@ if GATE and os.path.exists(block_ref):
 logs_dir = os.path.join(run_dir, "playguard_data", "logs")
 cache_dir = os.path.join(run_dir, "playguard_data", "cache")
 old_logs = [os.path.join(logs_dir, n) for n in ("crashes/crash_20261008_120000.txt", "reports/report_20261008_120000.txt")]
-uploads = os.path.join(logs_dir, "uploads", "upload_20261008_120000.txt")
+uploads = os.path.join(logs_dir, "uploads", "upload_20261008_120000.url")
 stale_cache = os.path.join(cache_dir, "stale.bin")
 if GATE:
     for path in old_logs + [uploads, stale_cache]:
@@ -168,10 +168,10 @@ if DEVBUILD:
     open(installed_nro, "wb").write(b"the build before")
 if not GATE and not ERRORS and not DEVBUILD:
     env.setdefault("PLAYGUARD_SIM_NUMPAD", "1:30")   # what the system number pad returns
-    env.setdefault("PLAYGUARD_SIM_PASTE", "https://bpa.st/SMOKE")   # what bpa.st (or GitHub) answers
+    env.setdefault("PLAYGUARD_SIM_PASTE", "https://gist.github.com/smoke/ab12")   # what GitHub answers
     github_token = os.path.join(run_dir, "playguard_data", "github_token")
     if os.path.exists(github_token):
-        os.remove(github_token)   # signed out: the first report goes to bpa.st
+        os.remove(github_token)   # signed out: Send a report online offers to sign in first
 if ERRORS:
     env.setdefault("PLAYGUARD_SIM_FAIL", "unlock")
     env.setdefault("PLAYGUARD_SIM_RESTRICTED", "1")
@@ -262,6 +262,14 @@ def key(name, n=1, hold=0.02):
         time.sleep(0.6)
         subprocess.run(["xdotool", "keydown", name, "sleep", str(hold), "keyup", name], env=env)
         time.sleep(0.2)
+
+
+def button_x():
+    """Ⓧ: the desktop build reads it from the middle mouse button (the
+    keyboard has none), clicked over the title, where nothing takes the focus."""
+    time.sleep(0.6)
+    subprocess.run(["xdotool", "mousemove", "640", "40", "mousedown", "2", "sleep", "0.05", "mouseup", "2"], env=env)
+    time.sleep(0.2)
 
 
 def shot(name):
@@ -498,24 +506,27 @@ if DEVBUILD:
     time.sleep(3)
     if not os.path.exists(token_file):
         fail("no GitHub token saved in " + token_file)
-    shot("03_dev_builds")      # the same screen filled: release, main ×2, the pull request, Refresh
+    shot("03_dev_builds")      # the same screen filled: the tabs, the release, how old the list is
     cache_file = os.path.join(run_dir, "playguard_data", "cache", "dev_builds.json")
     if not os.path.exists(cache_file) or len(json.load(open(cache_file))["builds"]) != 4:
         fail("the list was not kept in " + cache_file)
     loading = "Looking for builds..."
     fetched = messages().count(loading)
     key("Escape")              # closed, then opened again: the list kept is shown at once
+    key("Return")              # on the release's tab, its build focused
+    key("Up")                  # the tabs
+    key("Right", 2)            # Pull requests (the keyboard has no L / R)
     key("Return")
-    shot("03b_dev_builds_kept")  # under their headers, the pull requests by number
+    shot("03b_dev_builds_kept")  # the pull requests' tab, by number
     if messages().count(loading) != fetched:
         fail("a list fetched a moment ago was fetched again")
-    key("Down", 4)             # past the release, main ×2 and the pull request: Refresh the list
-    key("Return")
+    key("Down")                # the pull request
+    button_x()                 # Refresh
     time.sleep(2)
     if messages().count(loading) != fetched + 1:
-        fail("Refresh the list did not fetch it again")
-    key("Up")                  # the pull request, just above (the screen updated in place)
-    key("Return")
+        fail("X did not fetch the list again")
+    key("Down")                # back to the controller after the mouse (nothing below the pull request)
+    key("Return")              # the pull request, still focused (the screen updated in place)
     shot("04_dev_build_confirm")
     key("Right")               # Install
     key("Return")
@@ -801,14 +812,14 @@ shot("26_backup_restore")
 key("Escape")
 shot("27_back")
 
-# Send a report online: the confirmation, then the link and its QR codes.
+# Send a report online: signing in to GitHub first, the confirmation, then the link and its QR codes.
 uploads = os.path.join(run_dir, "playguard_data", "logs", "uploads")
 def upload_count():
-    # One file per link (logs/uploads/upload_<date>.txt); a run pruned by the
+    # One file per link (logs/uploads/upload_<date>.url, an Internet shortcut); a run pruned by the
     # default limit (the 20 newest) counts the same.
     if not os.path.isdir(uploads):
         return 0
-    return sum(1 for f in os.listdir(uploads) if f.startswith("upload_") and f.endswith(".txt")
+    return sum(1 for f in os.listdir(uploads) if f.startswith("upload_") and f.endswith(".url")
                and "https://" in open(os.path.join(uploads, f)).read())
 uploads_before = upload_count()
 reports = os.path.join(run_dir, "playguard_data", "logs", "reports")
@@ -819,25 +830,20 @@ key("Down", 3)             # past Keep, Export: Send a report online
 key("Return")
 if saved:                  # reports saved by an earlier local run: this report is the first choice
     key("Return")
+shot("27_upload_sign_in")  # signed out of GitHub: signing in comes first
+key("Escape")              # not now
+if upload_count() != uploads_before:
+    fail("a report was sent while signed out of GitHub")
+# Signed in: what goes to the secret gist, then its link and QR codes.
+open(github_token, "w").write("ghu_smoke")
+key("Return")              # Send a report online (still focused)
+if saved_reports():
+    key("Return")          # this report, the first choice
 shot("27_upload_confirm")
 key("Right")               # Send
 key("Return")
 shot("27_upload_link")
 if upload_count() != uploads_before + 1:
-    fail("the report link was not recorded in " + uploads)
-key("Return")              # OK
-# Signed in to GitHub: where to send it comes first, a secret gist by default.
-open(github_token, "w").write("ghu_smoke")
-key("Return")              # Send a report online (still focused)
-if saved_reports():
-    key("Return")          # this report, the first choice
-shot("27_upload_host")
-key("Return")              # Secret gist on GitHub
-shot("27_upload_gist_confirm")
-key("Right")               # Send
-key("Return")
-shot("27_upload_gist_link")
-if upload_count() != uploads_before + 2:
     fail("the gist link was not recorded in " + uploads)
 key("Return")              # OK
 os.remove(github_token)

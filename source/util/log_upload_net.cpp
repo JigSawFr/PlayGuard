@@ -32,25 +32,6 @@ bool simulated(Result* r)
 }
 }   // namespace
 
-Result upload_bpaste(const std::string& text)
-{
-    Result r;
-    if (simulated(&r)) return r;
-    std::string type, body;
-    long status = 0;
-    const std::string data = form(text, &type);
-    if (!http::post("https://bpa.st/curl", data, type.c_str(), &body, &r.error, &status)) {
-        r.error = "bpa.st: " + r.error;
-        return r;
-    }
-    if (!parse_bpaste(body, &r.url, &r.removal)) {
-        r.error = "unexpected answer from bpa.st (HTTP " + std::to_string(status) + ")";
-        return r;
-    }
-    r.ok = true;
-    return r;
-}
-
 Result upload_gist(const std::vector<Part>& files, const std::string& token, const std::string& version)
 {
     Result r;

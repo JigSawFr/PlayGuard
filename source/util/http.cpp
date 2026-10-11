@@ -4,18 +4,12 @@
 #include <algorithm>
 #include <atomic>
 #include <cstdio>
-#include <cstring>
 #include <curl/curl.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <mutex>
 
-#ifdef __SWITCH__
-#include <switch.h>
-#endif
-
 #include "app.hpp"
-#include "util/extra_ca.hpp"
 #include "util/http_logic.hpp"
 
 namespace http
@@ -71,22 +65,6 @@ size_t on_data(char* data, size_t size, size_t count, void* user)
     }
     return n;
 }
-
-#ifdef __SWITCH__
-// switch-curl hands its ssl-service context here before the handshake: the
-// roots the firmware's list lacks (util/extra_ca.hpp) are added to it. The
-// built-in list stays; a root the service refuses only leaves the servers
-// under it unverifiable, as before.
-CURLcode on_ssl_context(CURL*, void* context, void*)
-{
-    for (const char* pem : extra_ca::roots()) {
-        const Result rc = sslContextImportServerPki(static_cast<SslContext*>(context), pem,
-                                                    (u32)std::strlen(pem), SslCertificateFormat_Pem, nullptr);
-        if (R_FAILED(rc)) std::fprintf(stderr, "http: extra root refused (0x%X)\n", (unsigned)rc);
-    }
-    return CURLE_OK;
-}
-#endif
 }   // namespace
 
 namespace
@@ -149,9 +127,6 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
     // written out so that no build or backend change can turn them off).
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
-#ifdef __SWITCH__
-    curl_easy_setopt(curl, CURLOPT_SSL_CTX_FUNCTION, on_ssl_context);
-#endif
     curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, std::min(timeout_s, 30L));
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout_s);
     if (to_file) {   // a long transfer: give up on a stall rather than at the end
@@ -197,11 +172,11 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
 }   // namespace
 
 bool get(const std::string& url, std::string* body, std::string* error, size_t max_bytes, long timeout_s,
-         const Headers& headers)
+         const Headers& headers, long* status)
 {
     Extra x;
     x.headers = &headers;
-    return perform(url, x, body, error, max_bytes, timeout_s, nullptr);
+    return perform(url, x, body, error, max_bytes, timeout_s, status);
 }
 
 bool post(const std::string& url, const std::string& data, const char* content_type, std::string* body,

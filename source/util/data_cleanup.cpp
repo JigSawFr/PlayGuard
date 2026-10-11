@@ -14,7 +14,7 @@ namespace
 {
 // The files under `dir` and its subfolders, with their sizes. `keep(rel)`
 // leaves out a file by its path from the folder collect() started at
-// ("uploads/upload_….txt", "play_timer/block.json").
+// ("uploads/upload_….url", "play_timer/block.json").
 template <typename Keep>
 void collect(const std::string& dir, Plan& plan, Keep keep, const std::string& rel = "")
 {
