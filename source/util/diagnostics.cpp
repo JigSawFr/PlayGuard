@@ -10,6 +10,7 @@
 #include "util/patches.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
+#include "util/startup.h"
 
 namespace diagnostic
 {
@@ -66,7 +67,12 @@ std::string current_report()
         patch_line,
         (int)sysinfo_compat(&si));
 
+    // How long this run took to start, step by step (util/startup.h).
     std::vector<char> buf(4096);
+    startup_report(buf.data(), buf.size());
+    out += buf.data();
+    out += "\n";
+
     time_clock_dump(buf.data(), buf.size());
     out += buf.data();
 

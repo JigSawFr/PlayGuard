@@ -40,6 +40,7 @@
 #include "util/http.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
+#include "util/startup.h"
 #include "view/loading_bar.hpp"
 #include "view/loading_mark.hpp"
 #include "view/made_in_france.hpp"
@@ -93,23 +94,19 @@ namespace
 // screen moves along (brls::sync runs a task after the frame is drawn, and
 // one queued from a task waits for the next frame). It took a moment on the
 // console (the service probe, the SD-card reads, the main screen's build),
-// and the screen stayed black for it.
-using Clock = std::chrono::steady_clock;
-
-long long ms_since(Clock::time_point t)
-{
-    return std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - t).count();
-}
+// and the screen stayed black for it. Each step is timed for the diagnostic
+// report (util/startup.h).
 
 // The last step: `first` built and shown over the loading screen, which stays
 // under it (borealis' Application::clear() is private). It holds the focus
 // the first screen hands back, so nothing focused is ever freed under the
 // stack (ui::replace_screen pops a lock or recovery screen).
-void show_first(brls::Activity* first, Clock::time_point started)
+void show_first(brls::Activity* first)
 {
     brls::Application::pushActivity(first, brls::TransitionAnimation::NONE);
     pt_log_flow::apply();   // Developer › Record the play timer, when on (after fw_gate::prepare)
-    brls::Logger::info("start-up: first screen ready after {} ms", ms_since(started));
+    startup_mark(StartupStep_FirstScreen);
+    brls::Logger::info("start-up: first screen ready after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_FirstScreen));
 }
 
 // Which first screen, once the console is probed: the recovery report, the
@@ -139,17 +136,21 @@ brls::Activity* choose_first()
     return new MainActivity();
 }
 
-void start(LoadingActivity* loading, Clock::time_point started)
+void start(LoadingActivity* loading)
 {
-    brls::Logger::info("start-up: loading screen drawn after {} ms", ms_since(started));
-    if (!app::init()) {
+    startup_mark(StartupStep_LoadingDrawn);
+    brls::Logger::info("start-up: loading screen drawn after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_LoadingDrawn));
+    const bool probed = app::init();
+    startup_mark(StartupStep_Probed);
+    if (!probed) {
         brls::Logger::error("pctl probe failed (0x{:08X}) — showing InitErrorActivity", app::pctl_init_result());
-        show_first(new InitErrorActivity(), started);
+        show_first(new InitErrorActivity());
         return;
     }
     loading->show(LoadingActivity::Step::Settings);
-    brls::sync([loading, started]() {
+    brls::sync([loading]() {
         brls::Activity* first = choose_first();
+        startup_mark(StartupStep_Settings);
         loading->show(LoadingActivity::Step::Screen);
 #ifndef __SWITCH__
         // Desktop simulation, for a screenshot of the loading screen.
@@ -159,19 +160,20 @@ void start(LoadingActivity* loading, Clock::time_point started)
             return;
         }
 #endif
-        brls::sync([first, started]() { show_first(first, started); });
+        brls::sync([first]() { show_first(first); });
     });
 }
 }   // namespace
 
 int main(int argc, char* argv[])
 {
-    const Clock::time_point started = Clock::now();
+    startup_mark(StartupStep_Main);
     std::set_terminate(on_terminate);
     app::set_self_path(argc > 0 ? argv[0] : nullptr);
 
     // Preferences first: the locale must be chosen before borealis loads i18n.
     config::load();
+    startup_mark(StartupStep_Preferences);
     const auto& cfg = config::get();
     // config::sanitize() keeps the language to config::LANGUAGES.
     if (cfg.language != "system")
@@ -183,9 +185,11 @@ int main(int argc, char* argv[])
         brls::Logger::error("Unable to init borealis Application");
         return EXIT_FAILURE;
     }
+    startup_mark(StartupStep_Borealis);
 
     brls::Application::createWindow("playguard/title"_i18n);
     ui::use_latin_font();
+    startup_mark(StartupStep_Window);
 
     // Follows the console theme unless a preference says otherwise.
     if (cfg.theme == "dark")
@@ -229,7 +233,7 @@ int main(int argc, char* argv[])
     // runs from the end of that first frame.
     auto* loading = new LoadingActivity();
     brls::Application::pushActivity(loading, brls::TransitionAnimation::NONE);
-    brls::sync([loading, started]() { start(loading, started); });
+    brls::sync([loading]() { start(loading); });
 
     // Game icons kept between runs, next to the play data cache.
     playstats_set_icon_dir((paths::data_dir() + "/cache/icons").c_str());

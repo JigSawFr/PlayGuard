@@ -288,7 +288,7 @@ PlayGuard drives the parental controls built into the console (the `pctl` servic
 
 An error shows the system's code (such as `0x0001088E`) with what is known about it: what to do for the codes whose meaning is documented, otherwise a report helps.
 
-1. *Tools › Export a diagnostic report* saves a text file in `sd:/switch/playguard/logs/`: firmware, Atmosphère version, clocks, storage, serial-blanking and game-patch status, and the raw result of every parental-control query. **It never contains the PIN or the serial number.**
+1. *Tools › Export a diagnostic report* saves a text file in `sd:/switch/playguard/logs/`: firmware, Atmosphère version, how long the start-up took, clocks, storage, serial-blanking and game-patch status, and the raw result of every parental-control query. **It never contains the PIN or the serial number.**
 2. [Open an issue](https://github.com/JigSawFr/PlayGuard/issues/new) and attach it.
 
 Or, with the console online, *Tools › Send a report online* (Ⓧ on the diagnostic report in developer mode) sends it, with the debug files (the play-timer block reference, the end of the play-timer recording, the change history and PlayGuard's settings), to [bpa.st](https://bpa.st) or, when PlayGuard is signed in to GitHub (developer tools), to a secret gist in your account (offered first), after saying exactly what goes. It shows the link and two QR codes: the report, and the bug-report form with the link and your versions already filled in. Anyone with the link can read the report: for one month on bpa.st, which then deletes it, or until you delete the gist on GitHub. The links are kept in `logs/uploads.txt`, with bpa.st's removal link to delete a paste sooner. A report saved earlier in `logs/` can be sent the same way.
