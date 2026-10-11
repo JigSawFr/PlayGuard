@@ -185,6 +185,7 @@ int main(int argc, char* argv[])
 
     // Network tasks still running (an update check, a sign-in waiting for its
     // code): stopped, and waited for a moment, before what they use goes away.
+    // The SD-card writes still queued (ui::write_later) are done first.
     http::abort_all();
     ui::finish_background(std::chrono::seconds(3));
     pt_log_flow::stop();

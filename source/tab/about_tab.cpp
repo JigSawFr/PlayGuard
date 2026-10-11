@@ -94,8 +94,8 @@ void AboutTab::count_version_press()
         return;
     }
     this->version_presses = 0;
-    ui::notify(app::set_dev_mode(true, true) ? "playguard/dev/enabled"_i18n
-                                             : "playguard/dev/enabled"_i18n + " " + "playguard/toast/config_err"_i18n);
+    app::set_dev_mode(true, true, "playguard/dev/enabled"_i18n,
+                      "playguard/dev/enabled"_i18n + " " + "playguard/toast/config_err"_i18n);
     ui::on_mode_changed();
 }
 

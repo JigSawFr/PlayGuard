@@ -49,6 +49,8 @@ void at_start()
     else if (cfg == config::Loaded::Stuck) add("playguard/data_notice/config_stuck"_i18n);
 
     // Before the entry below, which would otherwise put it aside on its own.
+    // Not while a change is being written to it (ui::write_later).
+    ui::settle_writes();
     const history::Damage hist = history::check();
     if (hist == history::Damage::PutAside || s_history) add("playguard/data_notice/history_reset"_i18n);
     else if (hist == history::Damage::Stuck) add("playguard/data_notice/history_stuck"_i18n);

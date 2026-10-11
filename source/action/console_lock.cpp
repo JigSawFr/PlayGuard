@@ -45,7 +45,7 @@ void lock(std::function<void()> refresh)
         auto& cfg = config::get();
         cfg.console_lock_prev = prev;
         cfg.console_lock = true;
-        if (!ui::save_config()) {
+        if (!ui::save_config_now()) {
             cfg.console_lock_prev.clear();
             cfg.console_lock = false;
             pt_flow::finish_write(NXM_RC_NOT_SAVED, did_unlock, "", "playguard/play_timer/write_err"_i18n, refresh);

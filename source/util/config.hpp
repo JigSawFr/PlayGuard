@@ -104,6 +104,11 @@ Config& get();
 void    load();          // never throws; missing / broken file => defaults, per field
 Loaded  loaded();
 bool    save();          // atomic write; false on failure (or Loaded::Stuck)
+// save() in two steps, so the write can be left to another thread: the
+// file's content now (false: Loaded::Stuck, nothing may be written), then
+// writing it. write() touches no config state: callable from any thread.
+bool    snapshot(std::string& text);
+bool    write(const std::string& text);
 // Puts every out-of-range value back to its default (load() calls it).
 void    sanitize(Config& c);
 

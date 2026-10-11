@@ -120,10 +120,13 @@ static void store(history::Entry e)
     // outside (the outside_* entries are those, and a new account).
     if (e.kind.rfind("outside_", 0) != 0 && e.kind != "new_account") outside_watch::own_change();
     e.when = ui::now_stamp();
-    std::string err;
-    bool put_aside = false;
-    if (!history::append(e, &err, &put_aside)) brls::Logger::warning("history: not saved ({})", err);
-    if (put_aside) data_notice::history_put_aside();
+    // Off the UI thread: append() reads and rewrites the whole file.
+    ui::write_later("history", [e]() {
+        std::string err;
+        bool put_aside = false;
+        if (!history::append(e, &err, &put_aside)) brls::Logger::warning("history: not saved ({})", err);
+        if (put_aside) brls::sync([]() { data_notice::history_put_aside(); });
+    });
     // Developer › Record the play timer: a line marking the change.
     std::string event = e.kind;
     for (const std::string* part : { &e.source, &e.detail })
@@ -159,6 +162,12 @@ void record_event(const char* kind, const std::string& source, const std::string
     e.source = source;
     e.detail = detail;
     store(e);
+}
+
+std::vector<history::Entry> load()
+{
+    ui::settle_writes();
+    return history::load();
 }
 
 std::string title(const history::Entry& e)
