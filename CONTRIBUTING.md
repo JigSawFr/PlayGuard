@@ -26,6 +26,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_NOT_SET_UP=1` | Parental controls never set up (no PIN) |
 | `PLAYGUARD_SIM_TIMER_OFF=1` | No play-time limit |
 | `PLAYGUARD_SIM_RESTRICTED=1` | Today's limit reached |
+| `PLAYGUARD_SIM_NOT_COUNTING=1` | The time left not going down (a clock set back): the Overview says the console is not counting after 90 s on screen |
 | `PLAYGUARD_SIM_UNLOCKED=1` | Parental controls temporarily unlocked |
 | `PLAYGUARD_SIM_UNPAIRED=1` | No companion app linked |
 | `PLAYGUARD_SIM_ALARM_OFF=1` | The "time's up" alarm off |
@@ -70,11 +71,11 @@ Each job writes a summary on the run page (`tools/ci_summary.py`): what is being
 |---|---|
 | `source/core/` | C, libnx: `pctl_ops`, `time_ops`, `sysinfo`, `playstats`, `platform`, `rescue`, `pure`, `calendar`, `write_guard` (the last four need no console and are shared with the simulator) |
 | `source/tab/` | One class per tab |
-| `source/action/` | Flows: play-timer write, clock, settings restore, firmware screen, updates |
-| `source/activity/` | Screens: per-day editor, profiles, a game, first steps, change history, firmware |
-| `source/view/` | Widgets: the week chart, the gauge, the day bars, the game cell |
-| `source/ui/` | Dialogs, formatting, theme colours |
-| `source/util/` | NTP, config, profiles, settings backups, change history, play-log folding, the play-data cache, table export, diagnostics, sending reports online, update check, store launcher |
+| `source/action/` | Flows, one per thing a tab does, with their UI-free logic in `*_logic.cpp` where there is one: the play-timer write and its recorder, the clock (and a console no time server answers), the PIN prompt and the console lock, settings backups and restores, the change history and undo, changes seen outside PlayGuard and timer health, the firmware screen, the recovery screen, reports and sending them online, updates, GitHub sign-in and development builds, the SD-card write queue |
+| `source/activity/` | Screens: per-day editor, profiles, a game, first steps, change history, firmware, recovery, the lock screen, the diagnostic report, what's new, the start-up error |
+| `source/view/` | Widgets: the week chart, the gauge, the play-timer state line, the day bars, the game cell, the QR codes and funding links, release notes, the scrolling frame |
+| `source/ui/` | Dialogs, formatting, theme colours, the console's state as text, read-only greying and visibility |
+| `source/util/` | NTP, HTTP, config, profiles, settings backups, change history, play-log folding, the play-data cache, the Activity summary, table export, diagnostics, sending reports online, the play-timer recorder and block reference, update check, store launcher, GitHub sign-in and development builds (zip, SHA-256), game patches, the bundled changelog, the start-up reminders and the background threads (joined, never detached: the console cannot) |
 | `source/sim/` | The simulated console for the desktop build |
 | `resources/` | XML layouts and `i18n/<language>/playguard.json` |
 | `sysmodule/` | The optional recovery boot sysmodule; shares `source/core/rescue.c` with the app. See [`sysmodule/README.md`](sysmodule/README.md) |
@@ -91,6 +92,7 @@ Releases are automated with [release-please](https://github.com/googleapis/relea
 - Give each pull request a conventional title (`feat: …`, `fix: …`, `docs: …`, `feat!: …` for a breaking change); CI checks it.
 - **Squash-merge** pull requests, so each one lands as a single commit carrying that title. A plain merge commit makes release-please apply a PR's `BEGIN_COMMIT_OVERRIDE` block to every commit of the PR.
 - release-please keeps a `chore(main): release X.Y.Z` PR open; merging it tags the release and attaches the `.nro` / `.zip`.
+- **Before 1.0.0:** the work-in-progress notice at the top of [README.md](README.md) and [README.fr.md](README.fr.md) goes with the first release. Remove it (a `docs:` pull request) right before merging the `chore(main): release 1.0.0` PR, so the release's README no longer says there is none.
 
 **Development builds:** nothing is published for them. The developer tools install the `playguard-<version>-<ref>-<commit>-nro` artifact of a build run (a zip holding `playguard.nro`; the artifacts API only filters by an exact name, so the app lists a few pages of a run's artifacts and keeps that one): main's last commits and the newest run of each open pull request from a branch of this repository; pull requests from forks are left out, as their code is not reviewed yet (`source/util/dev_builds.hpp`, [SECURITY.md](SECURITY.md)). GitHub hands artifacts to signed-in users only, hence the GitHub sign-in (device flow, GitHub App client ID in `source/util/github_auth.hpp`; with the Device Flow enabled and token expiry off; the app's only permissions are Actions: read and Gists: write). For a pull request, `PLAYGUARD_COMMIT` makes the app report its head commit, as the artifacts API names the run.
 

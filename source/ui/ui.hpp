@@ -46,14 +46,15 @@ std::string rc_text(Result rc, bool next_step = true);
 // console with many games), or behind another request's timeout. Every
 // network task goes here; the play log and the icons stay on the queue, one
 // at a time on the console's services. Queued there when no thread can be
-// had. `what` names it in the log.
+// had. `what` names it in the log. The thread is never detached (the console
+// cannot: util/worker_threads.hpp); it is joined once the task is over.
 void in_background(const char* what, std::function<void()> task);
 // At exit, after the main loop: says the app is quitting (quitting() turns
 // true, for a task that waits or polls) and waits up to `max` for the tasks
 // of in_background still running, so none of them outlives the objects it
-// uses (brls::sync's queue, curl, statics). The writes of write_later are
-// finished first, and any asked for later run at once. False when some are
-// still running.
+// uses (brls::sync's queue, curl, statics), joining the threads of those
+// that ended. The writes of write_later are finished first, and any asked
+// for later run at once. False when some are still running.
 bool finish_background(std::chrono::milliseconds max);
 bool quitting();
 

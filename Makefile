@@ -135,6 +135,9 @@ icon_logic_FLAGS := -std=c++17 -Isource
 write_queue_logic_SRC   := source/action/write_queue_logic.cpp tests/write_queue_logic/test.cpp
 write_queue_logic_FLAGS := -std=c++17 -Isource
 write_queue_logic_LIBS  := -pthread
+worker_threads_SRC   := source/util/worker_threads.cpp tests/worker_threads/test.cpp
+worker_threads_FLAGS := -std=c++17 -Isource
+worker_threads_LIBS  := -pthread
 error_hint_logic_SRC   := source/action/error_hint_logic.cpp tests/error_hint_logic/test.cpp
 error_hint_logic_FLAGS := -std=c++17 -Isource
 outside_change_logic_SRC   := source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp
