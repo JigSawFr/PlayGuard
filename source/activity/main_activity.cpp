@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "activity/main_activity.hpp"
 
+#include <cstdlib>
+
 #include "action/clock_check.hpp"
 #include "action/data_notice.hpp"
 #include "action/fw_gate.hpp"
@@ -75,6 +77,14 @@ static void quit_or_relock()
     if (auto* button = dynamic_cast<brls::Button*>(dialog->getView("brls/dialog/button2")))
         button->setTextColor(ui::color_bad());
     dialog->open();
+}
+
+brls::View* MainActivity::createContentView()
+{
+#ifndef __SWITCH__
+    if (std::getenv("PLAYGUARD_SIM_CADRAN")) return brls::View::createFromXMLResource("activity/main_cadran.xml");
+#endif
+    return brls::View::createFromXMLResource("activity/main.xml");
 }
 
 void MainActivity::onContentAvailable()

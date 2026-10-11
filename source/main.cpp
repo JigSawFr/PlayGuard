@@ -27,6 +27,7 @@
 #include "app.hpp"
 #include "core/platform.h"
 #include "tab/about_tab.hpp"
+#include "tab/cadran_tab.hpp"
 #include "tab/activity_tab.hpp"
 #include "tab/console_tab.hpp"
 #include "tab/dashboard_tab.hpp"
@@ -50,6 +51,13 @@
 #include "util/startup.h"
 #include "view/loading_bar.hpp"
 #include "view/loading_mark.hpp"
+
+#ifndef __SWITCH__
+// Desktop measurement (tools/perf_frames.sh): nanovg's per-frame counters,
+// through the getter tools/perf_nanovg_stats.patch adds to the borealis tree.
+// Weak: without the patch, the frame time alone is recorded.
+extern "C" void nvgDebugGetStats(NVGcontext*, int*, int*, int*, int*) __attribute__((weak));
+#endif
 #include "view/made_in_france.hpp"
 #include "view/footer_hints.hpp"
 #include "view/header_settings.hpp"
@@ -58,6 +66,7 @@
 #include "view/scroll_view.hpp"
 #include "view/play_days.hpp"
 #include "view/pt_gauge.hpp"
+#include "view/pt_ring.hpp"
 #include "view/pt_state_header.hpp"
 #include "view/pt_week.hpp"
 
@@ -330,10 +339,12 @@ void register_views()
     brls::Application::registerXMLView("ScrollView",      ScrollView::create);
     brls::Application::registerXMLView("PtStateHeader",   PtStateHeader::create);
     brls::Application::registerXMLView("PtGauge",         PtGauge::create);
+    brls::Application::registerXMLView("PtRing",          PtRing::create);
     brls::Application::registerXMLView("PtWeekView",      PtWeekView::create);
     brls::Application::registerXMLView("PlayDaysView",    PlayDaysView::create);
     brls::Application::registerXMLView("MadeInFrance",    MadeInFrance::create);
     brls::Application::registerXMLView("DashboardTab",    DashboardTab::create);
+    brls::Application::registerXMLView("CadranTab",       CadranTab::create);
     brls::Application::registerXMLView("PlayTimerTab",    PlayTimerTab::create);
     brls::Application::registerXMLView("ActivityTab",     ActivityTab::create);
     brls::Application::registerXMLView("RestrictionsTab", RestrictionsTab::create);
@@ -426,6 +437,10 @@ int main(int argc, char* argv[])
 
     // PlayGuard status colours (light / dark variants), before any view exists.
     ui::register_theme_colors();
+#ifndef __SWITCH__
+    // The "Cadran" prototype's navy theme (desktop measurement).
+    if (std::getenv("PLAYGUARD_SIM_CADRAN")) cadran::install_theme();
+#endif
 
     // We own the quit path (B on the sidebar / error screen).
     brls::Application::setGlobalQuit(false);
@@ -445,11 +460,35 @@ int main(int argc, char* argv[])
     // or icon read running there stops now, not after every game is read.
     brls::Application::getExitEvent()->subscribe([]() { playstats_cancel(); });
 
+#ifndef __SWITCH__
+    // Desktop measurement (PLAYGUARD_SIM_STATS=<file>, tools/perf_frames.sh):
+    // one line per frame, "<time us> <frame us> <draw calls> <fill tris>
+    // <stroke tris> <text tris>", the counters from nanovg's own (zero without
+    // tools/perf_nanovg_stats.patch). The FPS limiter is turned off so the
+    // frame time is the work alone.
+    FILE* stats = nullptr;
+    if (const char* path = std::getenv("PLAYGUARD_SIM_STATS")) {
+        stats = std::fopen(path, "w");
+        brls::Application::setLimitedFPS(0);
+    }
+    brls::Time stats_last = brls::getCPUTimeUsec();
+#endif
     while (brls::Application::mainLoop()) {
         // The lines the session file waits for, written off the UI thread
         // once they waited long enough (util/session_log.hpp).
         if (session_log::due()) ui::write_later("session log", []() { session_log::flush(); }, "session_log");
+#ifndef __SWITCH__
+        if (!stats) continue;
+        int draws = 0, fill = 0, stroke = 0, text = 0;
+        if (nvgDebugGetStats) nvgDebugGetStats(brls::Application::getNVGContext(), &draws, &fill, &stroke, &text);
+        const brls::Time now = brls::getCPUTimeUsec();
+        std::fprintf(stats, "%lld %lld %d %d %d %d\n", (long long)now, (long long)(now - stats_last), draws, fill, stroke, text);
+        stats_last = now;
+#endif
     }
+#ifndef __SWITCH__
+    if (stats) std::fclose(stats);
+#endif
 
     shut_down();
     return EXIT_SUCCESS;
