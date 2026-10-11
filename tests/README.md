@@ -10,12 +10,18 @@ make test
 ```
 
 It needs gcc and g++ with AddressSanitizer and UndefinedBehaviorSanitizer
-(`SAN=` turns them off), the zlib headers (`zlib1g-dev`, for `dev_builds`), and
-the borealis submodule (`git submodule update --init`) for nlohmann/json:
-`make test` says so when it is missing. `make test CC=clang CXX=clang++` builds
-them with clang (its sanitizer runtime: `libclang-rt-dev`); `make test SAN=
-COV=--coverage` with gcc leaves the `.gcda` files for `gcovr` in
-`build/host-tests/`. CI runs all three.
+(`SAN=` turns them off), the zlib headers (`zlib1g-dev`, for `playstats` and
+`dev_builds`), and the borealis submodule (`git submodule update --init`) for
+nlohmann/json: `make test` says so when it is missing. `make test CC=clang
+CXX=clang++` builds them with clang (its sanitizer runtime: `libclang-rt-dev`);
+`make test SAN= COV=--coverage` with gcc leaves the `.gcda` files for `gcovr`
+in `build/host-tests/`. CI runs all three.
+
+The suites build and run in parallel (`JOBS=n` for fewer jobs), every one of
+them even when one fails: each leaves its output in `build/host-tests/<suite>.log`
+and a `<suite>.ok` when it passed, and `make` fails at the end if any did. A
+suite is three variables in the Makefile (`<name>_SRC`, `<name>_FLAGS`, an
+optional `<name>_LIBS`); a new one is three lines there, next to the others.
 
 The suites check with `CHECK(expr)` from [`check.h`](check.h), not `assert()`:
 the expression is always evaluated (also under `-DNDEBUG`), a failure prints

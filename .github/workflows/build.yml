@@ -5,6 +5,10 @@ on:
     branches: [ main ]
   pull_request:
   workflow_dispatch:
+  # Weekly, on main: a runner image or Docker Hub change shows up here before
+  # it fails a pull request (the visual check depends on the image's mesa).
+  schedule:
+    - cron: '17 5 * * 1'
   # Called by release-please.yml once a release (and its vX.Y.Z tag) exists.
   workflow_call:
     inputs:
@@ -23,57 +27,159 @@ concurrency:
   group: build-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: true
 
+# The runner image is pinned (ubuntu-26.04, not ubuntu-latest): the visual check
+# compares screenshots drawn by the image's mesa, so a new image can change
+# every screen. Moving to the next one is a pull request of its own, with a look
+# at the screenshots. Every job writes a summary on the run page
+# (tools/ci_summary.py), and names its artifacts after the build (the `meta` job).
+
 jobs:
+  # What is being built: the version (CMakeLists.txt), the commit (a pull
+  # request's head, as the artifacts API names the run), and a label for the
+  # artifact names, `<version>-<ref>-<commit>`: 1.0.0-pr92-1f0a059,
+  # 1.0.0-main-2bd4996, 1.0.0-release-2bd4996. Its summary heads the run page.
+  meta:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    outputs:
+      label: ${{ steps.label.outputs.label }}
+      version: ${{ steps.label.outputs.version }}
+      ref: ${{ steps.label.outputs.ref }}
+      sha: ${{ steps.label.outputs.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          sparse-checkout: |
+            CMakeLists.txt
+            tools/ci_summary.py
+            .github/workflows/build.yml
+          sparse-checkout-cone-mode: false
+      - name: Build label
+        id: label
+        env:
+          TAG: ${{ inputs.tag }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          version=$(sed -n 's/^set(VERSION_\(MAJOR\|MINOR\|ALTER\) "\([0-9]*\)").*/\2/p' CMakeLists.txt | paste -sd.)
+          if [ -n "$TAG" ]; then ref=release
+          elif [ -n "$PR" ]; then ref="pr$PR"
+          else ref=$(printf '%s' "$REF_NAME" | tr -c 'A-Za-z0-9._' '-' | tr -s '-' | cut -c1-40); fi
+          sha7=$(printf '%s' "$HEAD_SHA" | cut -c1-7)
+          { echo "version=$version"; echo "ref=$ref"; echo "sha=$HEAD_SHA"; echo "label=$version-$ref-$sha7"; } | tee -a "$GITHUB_OUTPUT"
+      - name: Run summary
+        env:
+          TITLE: ${{ github.event.pull_request.title || github.event.head_commit.message || inputs.tag }}
+          BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+          PR: ${{ github.event.pull_request.number }}
+          TAG: ${{ inputs.tag }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          python3 tools/ci_summary.py header --label "${{ steps.label.outputs.label }}" \
+            --version "${{ steps.label.outputs.version }}" --sha "${{ steps.label.outputs.sha }}" \
+            --branch "$BRANCH" --base "$BASE" --pr "$PR" --tag "$TAG" --title "${TITLE%%$'\n'*}" \
+            --event "${{ github.event_name }}" --repo-url "$REPO_URL" --runner ubuntu-26.04 \
+            --image "$(sed -n 's/^ *image: \(devkitpro\/devkita64@sha256:[0-9a-f]*\)$/\1/p' .github/workflows/build.yml)" \
+            >> "$GITHUB_STEP_SUMMARY"
+
   # Fast checks with no toolchain: C service layer unit tests (under
   # AddressSanitizer and UndefinedBehaviorSanitizer) + resources.
   host-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: true   # nlohmann/json (bundled with borealis) for the backup and export tests
+      # A compiler error or warning becomes an annotation on the file's line
+      # (.github/problem-matchers/gcc.json).
+      - name: Compiler messages as annotations
+        run: echo "::add-matcher::.github/problem-matchers/gcc.json"
+      - name: zlib headers (the playstats and dev_builds suites)
+        run: dpkg -s zlib1g-dev > /dev/null 2>&1 || { sudo apt-get update && sudo apt-get install -y --no-install-recommends zlib1g-dev; }
       - name: Unit tests (service layer — writable and read-only — and UI-free helpers)
         run: make test
-      - name: Resources (i18n keys, translations, XML layouts)
-        run: python3 tools/check_resources.py .
-      - name: compat.json generator
-        run: python3 tools/gen_compat.py . build/compat.json
-      - name: Python tools compile
-        run: python3 -m py_compile tools/*.py
+      - name: Test summary
+        if: always()
+        run: python3 tools/ci_summary.py host-tests build/host-tests --compiler "gcc $(gcc -dumpfullversion)" --flags "ASan + UBSan" >> "$GITHUB_STEP_SUMMARY"
+      - name: Resources (i18n keys, translations, XML layouts), compat.json generator, Python tools
+        run: |
+          status=0
+          # check <label> <command...>: runs it; its last line goes to the summary.
+          check() {
+            label=$1; shift
+            if out=$("$@" 2>&1); then mark=✅; else mark=❌; status=1; fi
+            printf '%s\n' "$out"
+            last=$(printf '%s\n' "$out" | tail -n 1)
+            echo "$mark **$label**${last:+ — $last}" >> "$GITHUB_STEP_SUMMARY"
+          }
+          check "Resources (i18n keys, translations, XML layouts)" python3 tools/check_resources.py .
+          check "compat.json generator" python3 tools/gen_compat.py . build/compat.json
+          check "Python tools compile" python3 -m py_compile tools/*.py
+          exit $status
 
   # The same host tests built by clang (other warnings, other sanitizer
   # runtime), then once more by gcc with --coverage for a line coverage
-  # summary on the run page. The coverage is a report, not a gate.
+  # summary on the run page, with the last build of main as a baseline. The
+  # coverage is a report, not a gate.
   host-tests-clang-coverage:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: true
-      - name: Dependencies (clang's sanitizer runtime, gcovr)
+      - name: Compiler messages as annotations
+        run: echo "::add-matcher::.github/problem-matchers/gcc.json"
+      - name: Dependencies (clang's sanitizer runtime, gcovr, zlib headers)
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang libclang-rt-dev gcovr
+          sudo apt-get install -y clang libclang-rt-dev gcovr zlib1g-dev
       - name: Unit tests (clang)
         run: make test CC=clang CXX=clang++
+      - name: Test summary (clang)
+        if: always()
+        run: python3 tools/ci_summary.py host-tests build/host-tests --compiler "clang $(clang -dumpversion)" --flags "ASan + UBSan" >> "$GITHUB_STEP_SUMMARY"
       - name: Unit tests (gcc, coverage)
         # Without the sanitizers: their instrumentation skews the counts.
         run: make test SAN= COV=--coverage CC=gcc CXX=g++
+      # The coverage of main's last build (a small JSON in the Actions cache,
+      # written by the pushes to main below) for the "vs main" column.
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: baseline-coverage
+          key: baseline-coverage-main-${{ github.sha }}
+          restore-keys: baseline-coverage-main-
       - name: Coverage summary
+        env:
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          { echo "### Host test coverage (source/)"; echo '```'
-            gcovr --root . --filter 'source/' --txt-summary build/host-tests
-            echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          gcovr --root . --filter 'source/' --txt-summary build/host-tests
+          gcovr --root . --filter 'source/' --json-summary-pretty --json-summary build/coverage.json build/host-tests
+          python3 tools/ci_summary.py coverage build/coverage.json --scope "host tests, gcc --coverage, source/" \
+            --baseline baseline-coverage/coverage.json --write-baseline baseline-coverage/coverage.json --sha "$SHA" \
+            >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && inputs.tag == ''
+        with:
+          path: baseline-coverage
+          key: baseline-coverage-main-${{ github.sha }}
 
   # Builds the UI on Linux against the simulated backend and clicks through
   # every screen headlessly: catches borealis XML / view errors without a console.
   # The scenarios run in parallel shards (under software GL the default one
-  # alone takes over 3 minutes); each shard builds with the shared ccache
-  # (about 12 s warm), and only the first saves it back. The desktop-smoke job
-  # below gathers them under one name for the release job and branch rules.
+  # alone takes close to 4 minutes, and `outside` waits 90 s on screen by
+  # design); each shard builds with the shared ccache (about 12 s warm), and
+  # only the first saves it back. The desktop-smoke job below gathers them
+  # under one name for the release job and branch rules.
   desktop-smoke-shard:
     name: desktop-smoke (${{ matrix.shard }})
-    runs-on: ubuntu-latest
+    needs: [ meta ]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -83,7 +189,9 @@ jobs:
           - shard: states
             scenarios: gate errors rescue forged lock
           - shard: developer
-            scenarios: devbuild library outside
+            scenarios: devbuild library
+          - shard: outside
+            scenarios: outside
     env:
       CMAKE_C_COMPILER_LAUNCHER: ccache
       CMAKE_CXX_COMPILER_LAUNCHER: ccache
@@ -91,6 +199,7 @@ jobs:
       CCACHE_BASEDIR: ${{ github.workspace }}
       CCACHE_COMPRESS: "1"
       CCACHE_MAXSIZE: 400M
+      ARTIFACT: playguard-${{ needs.meta.outputs.label }}-screenshots-${{ matrix.shard }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -98,12 +207,17 @@ jobs:
           submodules: true
       - name: Borealis GLFW fork
         run: git -C extern/borealis submodule update --init --depth 1 library/lib/extern/glfw
+      - name: Compiler messages as annotations
+        run: echo "::add-matcher::.github/problem-matchers/gcc.json"
+      # Without the recommended packages (ImageMagick's ghostscript and fonts,
+      # for one): xauth is what xvfb-run needs, libgl1-mesa-dri is llvmpipe
+      # (LIBGL_ALWAYS_SOFTWARE=1), dbus the session the app's portals ask for.
       - name: Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ccache libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev \
-            libxcursor-dev libxi-dev libxkbcommon-dev libwayland-dev wayland-protocols libdbus-1-dev \
-            libcurl4-openssl-dev xvfb xdotool imagemagick dbus
+          sudo apt-get install -y --no-install-recommends cmake ccache libgl1-mesa-dev libgl1-mesa-dri \
+            libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxkbcommon-dev libwayland-dev \
+            wayland-protocols libdbus-1-dev libcurl4-openssl-dev zlib1g-dev xvfb xauth xdotool imagemagick dbus
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .ccache
@@ -116,9 +230,10 @@ jobs:
         with:
           path: .ccache
           key: ccache-desktop-${{ github.sha }}
-      # Each scenario writes its screenshots to smoke/ (the default one) or
-      # smoke-<scenario>/. Every scenario of the shard runs; the step fails at
-      # the end if one did.
+      # Each scenario writes its screenshots (and a contact sheet of them) to
+      # smoke/ (the default one) or smoke-<scenario>/. Every scenario of the
+      # shard runs; the step fails at the end if one did. smoke-results.tsv
+      # (scenario, result, seconds, screens) feeds the summary.
       - name: Smoke test (${{ matrix.scenarios }})
         env:
           SCENARIOS: ${{ matrix.scenarios }}
@@ -127,7 +242,10 @@ jobs:
           for sc in $SCENARIOS; do
             if [ "$sc" = smoke ]; then out=smoke; arg=""; else out="smoke-$sc"; arg="$sc"; fi
             echo "::group::$sc"
-            xvfb-run -s "-screen 0 1280x720x24" python3 tools/desktop_smoke.py "$out" $arg || failed="$failed $sc"
+            start=$SECONDS
+            if xvfb-run -s "-screen 0 1280x720x24" python3 tools/desktop_smoke.py "$out" $arg; then result=ok; else result=fail; failed="$failed $sc"; fi
+            screens=$(ls "$out"/*.png 2>/dev/null | grep -vc contact-sheet || true)
+            printf '%s\t%s\t%s\t%s\n' "$sc" "$result" "$((SECONDS - start))" "$screens" >> smoke-results.tsv
             echo "::endgroup::"
           done
           if [ -n "$failed" ]; then echo "::error title=Smoke test::failed:$failed"; exit 1; fi
@@ -137,43 +255,61 @@ jobs:
       # simulator draws the focus without its moving glow
       # (PLAYGUARD_SIM_STILL_FOCUS), so a screen comes out the same in every
       # run: one that changed fails the job, with the side-by-side images in
-      # the shard's screenshots artifact and the details in the job summary.
+      # the shard's screenshots artifact and the details in the job summary
+      # (visual-results.tsv: scenario, result, screens compared, the changed
+      # ones, the check's output).
       - name: Visual check
         env:
           SCENARIOS: ${{ matrix.scenarios }}
-          ARTIFACT: desktop_smoke_screenshots_${{ matrix.shard }}
         run: |
           failed=""
           for sc in $SCENARIOS; do
             if [ "$sc" = smoke ]; then out=smoke; else out="smoke-$sc"; fi
-            [ -d "tests/visual/$sc" ] || continue   # no references for this scenario
+            if [ ! -d "tests/visual/$sc" ]; then   # no references for this scenario
+              printf '%s\tnone\t0\t\t\n' "$sc" >> visual-results.tsv
+              continue
+            fi
             if python3 tools/visual_check.py "$out" "tests/visual/$sc" > "$out-visual.txt" 2>&1; then
               tail -n 1 "$out-visual.txt"
+              printf '%s\tok\t%s\t\t\n' "$sc" "$(grep -c '^ok   \|^FAIL ' "$out-visual.txt" || true)" >> visual-results.tsv
             else
               cat "$out-visual.txt"
               summary=$(grep '^visual check:' "$out-visual.txt" || echo "visual check failed")
               echo "::error title=Visual check ($sc)::$summary — see the $ARTIFACT artifact (visual_diff/)"
-              { echo "### Visual check ($sc)"; echo '```'; cat "$out-visual.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+              changed=$(sed -n 's/^visual check: [0-9]* screen(s) changed: //p' "$out-visual.txt" | tr -d ' ')
+              printf '%s\tchanged\t%s\t%s\t%s\n' "$sc" "$(grep -c '^ok   \|^FAIL ' "$out-visual.txt" || true)" "$changed" "$out-visual.txt" >> visual-results.tsv
               failed="$failed $sc"
             fi
           done
           [ -z "$failed" ]
       - name: Upload screenshots
+        id: screenshots
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: desktop_smoke_screenshots_${{ matrix.shard }}
+          name: ${{ env.ARTIFACT }}
           path: |
             smoke*/*.png
+            smoke*/app.log
             smoke*/visual_diff/*.png
           retention-days: 14
+      - name: Shard summary
+        if: always()
+        env:
+          SCENARIOS: ${{ matrix.scenarios }}
+          ARTIFACT_URL: ${{ steps.screenshots.outputs.artifact-url }}
+        run: |
+          python3 tools/ci_summary.py smoke --shard "${{ matrix.shard }}" --scenarios $SCENARIOS \
+            --results smoke-results.tsv --visual visual-results.tsv --artifact "$ARTIFACT" --artifact-url "$ARTIFACT_URL" \
+            >> "$GITHUB_STEP_SUMMARY"
 
   # One result for the shards above, under the name the release job and the
   # branch rules wait for.
   desktop-smoke:
     if: ${{ !cancelled() }}
     needs: [ desktop-smoke-shard ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
     steps:
       - name: Every shard passed
         env:
@@ -184,10 +320,11 @@ jobs:
   # (what the app's update check reads from the latest release).
   # The image is pinned by digest so a release can be rebuilt with the same
   # toolchain. The `image:` line below is the only place the digest is
-  # written: "Build identity" and ./run.sh read it from this file. To move to
-  # a newer devkitPro, replace it (from
-  # `docker buildx imagetools inspect devkitpro/devkita64:latest`); the job
-  # then checks that its libnx is still recent enough.
+  # written: "Build identity", ./run.sh and toolchain-watch.yml read it from
+  # this file. To move to a newer devkitPro, replace it (from
+  # `docker buildx imagetools inspect devkitpro/devkita64:latest`; the monthly
+  # toolchain-watch.yml opens an issue when the image moved); the job then
+  # checks that its libnx is still recent enough.
   # The image is pulled before any step runs, and Docker Hub's anonymous limit
   # (per runner IP, shared with every other job on it) can refuse it. With the
   # DOCKERHUB_USERNAME and DOCKERHUB_TOKEN secrets (a read-only access token)
@@ -195,8 +332,11 @@ jobs:
   # Dependabot) it pulls anonymously as before. The workflow rejects an empty
   # username or password, so without both secrets credentials is an empty
   # mapping, and the runner skips the login when it has no username.
+  # The image has no bash: the steps are POSIX sh.
   switch:
-    runs-on: ubuntu-latest
+    needs: [ meta ]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
     container:
       image: devkitpro/devkita64@sha256:1fc388c3a0d34bd2045a6dadcb1020e069d5f876a187fd705de14b4440c00282
       credentials: ${{ (secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '') && fromJSON(format('{{"username":{0},"password":{1}}}', toJSON(secrets.DOCKERHUB_USERNAME), toJSON(secrets.DOCKERHUB_TOKEN))) || fromJSON('{}') }}
@@ -205,6 +345,7 @@ jobs:
       CMAKE_CXX_COMPILER_LAUNCHER: ccache
       CCACHE_COMPRESS: "1"
       CCACHE_MAXSIZE: 400M
+      LABEL: ${{ needs.meta.outputs.label }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -212,6 +353,8 @@ jobs:
           submodules: true
       - name: ccache
         run: apt-get update -qq && apt-get install -y -qq --no-install-recommends ccache
+      - name: Compiler messages as annotations
+        run: echo "::add-matcher::.github/problem-matchers/gcc.json"
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .ccache
@@ -229,11 +372,14 @@ jobs:
           # refuses it without this, and CMake reads the commit the app shows.
           git config --global --add safe.directory '*'
           export CCACHE_DIR="$GITHUB_WORKSPACE/.ccache" CCACHE_BASEDIR="$GITHUB_WORKSPACE"
+          ccache --zero-stats > /dev/null
           # PlayGuard's warnings as errors, as on the desktop: the libnx code
           # (source/core/*.c, the __SWITCH__ paths) is only built here.
           make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
           # The optional recovery sysmodule, as its own asset (sysmodule/).
           make dist-rescue
+          # This build's hit rate, for the summary (the second build below hits every time).
+          ccache --print-stats > ccache-stats.txt
           ccache --show-stats
           # The same commit gives the same zips (CONTRIBUTING.md, "Reproducible
           # zips"): build them once more and compare.
@@ -241,6 +387,8 @@ jobs:
           make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
           make dist-rescue
           sha256sum -c first-build.txt
+          # The raw sysmodule next to its zip, for the rescue artifact.
+          cp sysmodule/out/playguard-rescue.nsp playguard-rescue.nsp
       - name: Toolchain
         run: |
           dkp-pacman -Q devkitA64 libnx deko3d switch-tools switch-curl > toolchain.txt
@@ -273,31 +421,74 @@ jobs:
           cat build-info.txt
           unzip -l playguard.zip
           unzip -l playguard-rescue.zip
-      # Two artifacts so the .nro is not in the same one twice (raw, and again
-      # inside playguard.zip): playguard_release is what Developer tools ›
-      # Install another build downloads on the console (source/util/dev_builds.hpp),
-      # so it holds the raw .nro and the small text files only; the zips the
-      # release attaches are in playguard_packages.
+      # One artifact per component, named after the build (playguard-<label>-…):
+      # -nro is what Developer tools › Install another build downloads on the
+      # console (source/util/dev_builds.hpp: the raw .nro and the small text
+      # files only, never the zip too); -rescue the recovery sysmodule, as the
+      # zip the release attaches (SD-card layout) and the raw .nsp; -sdcard the
+      # store zip, only on a release build (the release job attaches it; a
+      # pull request's .nro is enough to try); -linker-map what makes the .nro big.
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        id: nro
         with:
-          name: playguard_release
+          name: playguard-${{ env.LABEL }}-nro
           path: |
             playguard.nro
             compat.json
             build-info.txt
             SHA256SUMS.txt
+          if-no-files-found: error
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        id: rescue
         with:
-          name: playguard_packages
+          name: playguard-${{ env.LABEL }}-rescue
           path: |
-            playguard.zip
             playguard-rescue.zip
+            playguard-rescue.nsp
+          if-no-files-found: error
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        id: sdcard
+        if: inputs.tag != ''
+        with:
+          name: playguard-${{ env.LABEL }}-sdcard
+          path: playguard.zip
+          compression-level: 0   # a zip already
+          if-no-files-found: error
       - name: Linker map (what makes the .nro big)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        id: map
         with:
-          name: playguard_linker_map
+          name: playguard-${{ env.LABEL }}-linker-map
           path: build/borealis.map
           retention-days: 14
+          if-no-files-found: error
+      # The .nro size of main's last build (a small JSON in the Actions cache,
+      # written by the pushes to main below) for the "vs main" column.
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: baseline-nro
+          key: baseline-nro-main-${{ github.sha }}
+          restore-keys: baseline-nro-main-
+      - name: Build summary
+        env:
+          NRO_URL: ${{ steps.nro.outputs.artifact-url }}
+          RESCUE_URL: ${{ steps.rescue.outputs.artifact-url }}
+          SDCARD_URL: ${{ steps.sdcard.outputs.artifact-url }}
+          MAP_URL: ${{ steps.map.outputs.artifact-url }}
+        run: |
+          set -- --artifact "playguard-$LABEL-nro|$NRO_URL|playguard.nro · compat.json · build-info.txt · SHA256SUMS.txt — what the console's *Install another build* downloads" \
+                 --artifact "playguard-$LABEL-rescue|$RESCUE_URL|playguard-rescue.zip (unzip at the SD-card root) · playguard-rescue.nsp"
+          if [ -n "$SDCARD_URL" ]; then set -- "$@" --artifact "playguard-$LABEL-sdcard|$SDCARD_URL|playguard.zip (the store package: unzip at the SD-card root)"; fi
+          set -- "$@" --artifact "playguard-$LABEL-linker-map|$MAP_URL|borealis.map (14 days)"
+          python3 tools/ci_summary.py build --version "${{ needs.meta.outputs.version }}" --ref "${{ needs.meta.outputs.ref }}" \
+            --sha "${{ needs.meta.outputs.sha }}" --ccache ccache-stats.txt --gcc "$(/opt/devkitpro/devkitA64/bin/aarch64-none-elf-gcc -dumpfullversion)" \
+            --map build/borealis.map --baseline baseline-nro/size.json --write-baseline baseline-nro/size.json "$@" \
+            >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && inputs.tag == ''
+        with:
+          path: baseline-nro
+          key: baseline-nro-main-${{ github.sha }}
 
   # Only when called by release-please.yml: check the NACP version matches the
   # tag, then attach the assets to the release. The raw .nro is what sphaira's
@@ -307,14 +498,17 @@ jobs:
   # the submodules and the toolchain the assets were built with.
   release:
     if: inputs.tag
-    runs-on: ubuntu-latest
-    needs: [ host-tests, host-tests-clang-coverage, switch, desktop-smoke ]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    needs: [ meta, host-tests, host-tests-clang-coverage, switch, desktop-smoke ]
     permissions:
       contents: write
       # Build provenance (below): a signed statement, kept by GitHub, that these files
       # were built by this workflow from this commit.
       id-token: write
       attestations: write
+    env:
+      LABEL: ${{ needs.meta.outputs.label }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -327,11 +521,15 @@ jobs:
           test "v$v" = "$TAG" || { echo "tag $TAG != CMake version $v"; exit 1; }
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: playguard_release
+          name: playguard-${{ env.LABEL }}-nro
           path: dist
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: playguard_packages
+          name: playguard-${{ env.LABEL }}-rescue
+          path: dist
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: playguard-${{ env.LABEL }}-sdcard
           path: dist
       # Anyone can then check that a download came from this repository's CI, unchanged:
       #   gh attestation verify playguard.nro -R JigSawFr/PlayGuard
@@ -344,14 +542,18 @@ jobs:
             dist/playguard.zip
             dist/playguard-rescue.zip
             dist/compat.json
+      # The release exists (release-please created it with the tag): the
+      # assets are added to it. --clobber: a re-run replaces its own files.
       - name: Attach to the GitHub release
-        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
-        with:
-          tag_name: ${{ inputs.tag }}
-          files: |
-            dist/playguard.nro
-            dist/playguard.zip
-            dist/playguard-rescue.zip
-            dist/compat.json
-            dist/build-info.txt
-            dist/SHA256SUMS.txt
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          gh release upload "$TAG" --clobber dist/playguard.nro dist/playguard.zip dist/playguard-rescue.zip \
+            dist/compat.json dist/build-info.txt dist/SHA256SUMS.txt
+      - name: Release summary
+        env:
+          TAG: ${{ inputs.tag }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: python3 tools/ci_summary.py release --tag "$TAG" --repo-url "$REPO_URL" --dir dist >> "$GITHUB_STEP_SUMMARY"

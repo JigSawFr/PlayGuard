@@ -40,8 +40,10 @@ Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ) and the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) unless set.
 """
+import glob
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -69,6 +71,9 @@ if GATE and os.path.exists(block_ref):
     os.remove(block_ref)     # the developer tool must write a new one
 
 env = dict(os.environ, LIBGL_ALWAYS_SOFTWARE="1")
+# ImageMagick 7 keeps the version 6 commands (import, convert, montage) as
+# aliases of `magick` that warn on every call; version 6 has no `magick`.
+IM = ["magick"] if shutil.which("magick") else []
 # One console time and time zone for every run, so the screenshots can be
 # compared with the reference ones (tools/visual_check.py): Thursday
 # 8 October 2026, 16:00 UTC. Only the footer clock follows the host.
@@ -109,7 +114,9 @@ if DEVBUILD:
         z.writestr("build-info.txt", "commit: ccccccc\n")
     zip_bytes = open(pr_zip, "rb").read()
     def artifact(branch, sha, date, path, size, digest=None, head_repo=1):
-        a = {"name": "playguard_release", "size_in_bytes": size, "expired": False, "created_at": date,
+        # Named as the build workflow names the artifact holding playguard.nro.
+        a = {"name": f"playguard-1.0.0-{'main' if branch == 'main' else 'pr38'}-{sha[:7]}-nro",
+             "size_in_bytes": size, "expired": False, "created_at": date,
              "archive_download_url": "https://" + path,
              "workflow_run": {"id": 1, "repository_id": 1, "head_repository_id": head_repo,
                               "head_branch": branch, "head_sha": sha}}
@@ -231,7 +238,7 @@ def key(name, n=1, hold=0.02):
 
 def shot(name):
     time.sleep(0.8)
-    subprocess.run(["import", "-window", "root", os.path.join(OUT, name + ".png")], env=env)
+    subprocess.run(IM + ["import", "-window", "root", os.path.join(OUT, name + ".png")], env=env)
     if not alive():
         fail(f"app exited while showing {name}")
 
@@ -268,8 +275,8 @@ else:
 # slow runner. Then a moment more for the first screen to settle.
 probe = os.path.join(OUT, "_first_frame.png")
 for _ in range(40):
-    subprocess.run(["import", "-window", "root", probe], env=env)
-    mean = subprocess.run(["convert", probe, "-format", "%[fx:mean]", "info:"], capture_output=True, text=True).stdout
+    subprocess.run(IM + ["import", "-window", "root", probe], env=env)
+    mean = subprocess.run(IM + ["convert", probe, "-format", "%[fx:mean]", "info:"], capture_output=True, text=True).stdout
     if mean and float(mean) > 0.05:
         break
     if not alive():
@@ -297,8 +304,22 @@ def finish(check=None):
         proc.kill()
     if check:
         check()
+    contact_sheet()
     print("desktop smoke test passed:", OUT)
     sys.exit(0)
+
+
+def contact_sheet():
+    """Every screen of the run on one image, contact-sheet.png, each under its
+    name: a whole scenario can be looked over at a glance (CI keeps it with
+    the screenshots). Not a screen: tools/visual_check.py only reads the
+    names of the references."""
+    shots = sorted(p for p in glob.glob(os.path.join(OUT, "*.png")) if not p.endswith("contact-sheet.png"))
+    if not shots:
+        return
+    subprocess.run(IM + ["montage", "-label", "%t", "-background", "#1f1f1f", "-fill", "white",
+                         "-tile", "4x", "-geometry", "320x180+6+6"] + shots + [os.path.join(OUT, "contact-sheet.png")],
+                   env=env, capture_output=True)
 
 
 if GATE:
