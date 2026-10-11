@@ -762,6 +762,7 @@
         "section_play_timer": "遊玩時間限制",
         "section_startup": "啟動時",
         "note": "備份、診斷報告及主機資訊位於「工具」，更新位於「關於」。",
+        "intro": "顯示開場畫面 2 秒",
         "support_reminder": "每月提醒一次支持 PlayGuard"
     },
     "backup": {

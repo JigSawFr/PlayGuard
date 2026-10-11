@@ -218,6 +218,7 @@ L'application est organisée en onglets, comme les paramètres de la console. Cl
 - L'onglet d'ouverture.
 - **Reverrouiller automatiquement après une modification** (activé par défaut).
 - Montants du temps en plus (+15/+30/+1 h, +10/+20/+30 min…) et remise de la limite habituelle le lendemain sans demander.
+- **L'intro** au lancement : l'écran de chargement pendant 2 secondes (activée par défaut ; Ⓐ ou Ⓑ la passe ; désactivée, PlayGuard s'ouvre dès qu'il est prêt).
 - Vérification de l'horloge réseau au lancement (une notification si elle a plus d'une minute d'écart ; elle ne règle jamais l'horloge).
 - Un **rappel mensuel pour soutenir PlayGuard** (activé par défaut, jamais le premier mois ni juste après une mise à jour ; *Ne plus afficher* sur le rappel ou cet interrupteur le désactive pour de bon, mises à jour comprises).
 - Actions avancées.

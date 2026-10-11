@@ -762,6 +762,7 @@
         "section_play_timer": "Play timer",
         "section_startup": "At start-up",
         "note": "Backups, the diagnostic report and the console are in Tools; updates are in About.",
+        "intro": "Show the intro for 2 seconds",
         "support_reminder": "Remind me once a month to support PlayGuard"
     },
     "backup": {

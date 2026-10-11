@@ -218,6 +218,7 @@ The app is organised in tabs, like System Settings. Click a tab to expand it.
 - The tab to start on.
 - **Lock again automatically after a change** (on by default).
 - Extra-time amounts (+15/+30/+1 h, +10/+20/+30 min …) and putting the usual limit back the next day by itself.
+- **The intro** at start-up: the loading screen for 2 seconds (on by default; Ⓐ or Ⓑ skips it; off, PlayGuard opens as soon as it is ready).
 - A network-clock check at start-up (a toast when it is more than a minute off; it never sets the clock).
 - A **monthly reminder to support PlayGuard** (on by default, never in the first month nor right after an update; *Don't show again* on the reminder or this switch turns it off for good, updates included).
 - Advanced actions.

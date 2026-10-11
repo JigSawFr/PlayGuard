@@ -58,6 +58,7 @@ static const char* const LABELS[StartupStep_Count] = {
     "loading screen, first frame",
     "parental-controls probe",
     "firmware choice, PIN, recovery report",
+    "intro (Preferences: Show the intro)",
     "first screen",
 };
 

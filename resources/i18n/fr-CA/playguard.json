@@ -762,6 +762,7 @@
         "section_play_timer": "Temps de jeu",
         "section_startup": "Au lancement",
         "note": "Les sauvegardes, le rapport de diagnostic et la console sont dans Outils ; les mises à jour dans À propos.",
+        "intro": "Afficher l'intro pendant 2 secondes",
         "support_reminder": "Me rappeler une fois par mois de soutenir PlayGuard"
     },
     "backup": {

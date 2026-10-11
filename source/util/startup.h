@@ -30,6 +30,7 @@ typedef enum {
     StartupStep_LoadingDrawn,    // the loading screen's first frame drawn
     StartupStep_Probed,          // app::init: the parental-controls service probed
     StartupStep_Settings,        // the firmware choice, the PIN, a recovery report read
+    StartupStep_Intro,           // the intro over (Preferences › Show the intro; at once when off)
     StartupStep_FirstScreen,     // the first screen built and shown
     StartupStep_Count
 } StartupStep;

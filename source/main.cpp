@@ -110,6 +110,17 @@ void show_first(brls::Activity* first)
     brls::Logger::info("start-up: first screen ready after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_FirstScreen));
 }
 
+// The first screen once the intro is over: checked once a frame.
+void after_intro(LoadingActivity* loading, brls::Activity* first)
+{
+    if (loading->inIntro()) {
+        brls::sync([loading, first]() { after_intro(loading, first); });
+        return;
+    }
+    startup_mark(StartupStep_Intro);
+    show_first(first);
+}
+
 // Which first screen, once the console is probed: the recovery report, the
 // lock screen or the main screen. Constructed only: show_first builds it.
 brls::Activity* choose_first()
@@ -141,6 +152,10 @@ void start(LoadingActivity* loading)
 {
     startup_mark(StartupStep_LoadingDrawn);
     brls::Logger::info("start-up: loading screen drawn after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_LoadingDrawn));
+    if (config::get().intro) {
+        loading->startIntro();
+        brls::Logger::info("start-up: intro, {} ms at least", LoadingActivity::INTRO_US / 1000);
+    }
     const bool probed = app::init();
     startup_mark(StartupStep_Probed);
     if (!probed) {
@@ -161,7 +176,7 @@ void start(LoadingActivity* loading)
             return;
         }
 #endif
-        brls::sync([first]() { show_first(first); });
+        brls::sync([loading, first]() { after_intro(loading, first); });
     });
 }
 }   // namespace

@@ -762,6 +762,7 @@
         "section_play_timer": "Tiempo de juego",
         "section_startup": "Al iniciar",
         "note": "Las copias de seguridad, el informe de diagnóstico y la consola están en Herramientas; las actualizaciones, en Acerca de.",
+        "intro": "Mostrar la intro durante 2 segundos",
         "support_reminder": "Recordarme una vez al mes que apoye PlayGuard"
     },
     "backup": {
