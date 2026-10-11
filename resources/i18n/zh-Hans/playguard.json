@@ -760,7 +760,8 @@
         "restore_err": "未恢复：{}",
         "before_delete_err": "无法事先保存备份（{}）。\n\n仍要删除全部内容吗？",
         "delete_anyway": "仍要删除",
-        "bedtime_not_restored": "此备份中开启了就寝提醒：不会恢复，如有需要请在“游戏时间”中重新设置。"
+        "bedtime_not_restored": "此备份中开启了就寝提醒：不会恢复，如有需要请在“游戏时间”中重新设置。",
+        "backed_up_on": "{}备份的设置。"
     },
     "update": {
         "checking": "正在检查更新…",

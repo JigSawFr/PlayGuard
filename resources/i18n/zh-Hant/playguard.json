@@ -760,7 +760,8 @@
         "restore_err": "未還原：{}",
         "before_delete_err": "無法事先儲存備份（{}）。\n\n仍要刪除所有設定嗎？",
         "delete_anyway": "仍要刪除",
-        "bedtime_not_restored": "此備份中開啟了就寢鬧鐘：不會復原，如有需要請在「遊玩時間限制」中重新設定。"
+        "bedtime_not_restored": "此備份中開啟了就寢鬧鐘：不會復原，如有需要請在「遊玩時間限制」中重新設定。",
+        "backed_up_on": "於{}備份的設定。"
     },
     "update": {
         "checking": "正在檢查更新…",

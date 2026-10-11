@@ -65,6 +65,17 @@ static void settle_failed_unlock()
     if (st.temp_unlocked_ok && !st.temp_unlocked) set_relock_pending(false);
 }
 
+std::string with_link_note(const std::string& body, const PctlStatus* st)
+{
+    PctlStatus read;
+    if (!st) {
+        pctl_status_fetch(&read);
+        st = &read;
+    }
+    if (!st->pairing_active_ok || !st->pairing_active) return body;
+    return body.empty() ? "playguard/pairing/note"_i18n : body + "\n\n" + "playguard/pairing/note"_i18n;
+}
+
 void confirm_write(const std::string& body_in, const std::string& confirm_label,
                    std::function<void(bool did_unlock)> write, const uint16_t* new_days, bool danger)
 {
@@ -92,6 +103,9 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
                                     " " + "playguard/play_timer/unsaved"_i18n;
         body = body.empty() ? warning : body + "\n\n" + warning;
     }
+    // Any dialog shown ends with the phone-app note, while it is linked.
+    const bool unlock = pt_logic::needs_unlock(pt);
+    if (!body.empty() || unlock) body = with_link_note(body);
 
     // The week as it will be: the days that change in amber.
     auto preview = [&pt, new_days]() -> brls::View* {
@@ -101,7 +115,7 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
         return week;
     };
 
-    if (!pt_logic::needs_unlock(pt)) {
+    if (!unlock) {
         if (body.empty()) write(false);
         else if (brls::View* week = preview()) ui::confirm_with(body, week, confirm_label, [write]() { write(false); }, nullptr, danger);
         else ui::confirm(body, confirm_label, [write]() { write(false); }, nullptr, danger);

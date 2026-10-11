@@ -760,7 +760,8 @@
         "restore_err": "Not restored: {}",
         "before_delete_err": "No backup could be saved first ({}).\n\nDelete everything anyway?",
         "delete_anyway": "Delete anyway",
-        "bedtime_not_restored": "This backup had a bedtime alarm on: it is not restored, set it again in Play timer if needed."
+        "bedtime_not_restored": "This backup had a bedtime alarm on: it is not restored, set it again in Play timer if needed.",
+        "backed_up_on": "Settings backed up on {}."
     },
     "update": {
         "checking": "Checking for updates...",
