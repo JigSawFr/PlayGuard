@@ -17,6 +17,7 @@
 #include "app.hpp"
 #include "util/extra_ca.hpp"
 #include "util/http_logic.hpp"
+#include "util/tls_client.hpp"
 
 namespace http
 {
@@ -100,6 +101,7 @@ struct Extra
     bool               follow = true;            // follow redirects (never for a POST)
     std::string*       location = nullptr;       // the redirect target, when not followed
     Sink*              to_file = nullptr;        // replaces the in-memory sink (download)
+    bool*              refused = nullptr;        // set when the server's certificate was refused
 };
 
 bool perform(const std::string& url, const Extra& x, std::string* body, std::string* error, size_t max_bytes,
@@ -185,6 +187,7 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
     curl_easy_cleanup(curl);
     curl_slist_free_all(headers);
     if (status_out) *status_out = status;
+    if (x.refused) *x.refused = rc == CURLE_PEER_FAILED_VERIFICATION;
 
     http_logic::Outcome outcome;
     outcome.status      = status;
@@ -194,6 +197,53 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
     if (rc != CURLE_OK) outcome.transfer_error = message[0] ? message : curl_easy_strerror(rc);
     return http_logic::succeeded(outcome, error);
 }
+
+#ifdef __SWITCH__
+// The request again on a TLS connection of PlayGuard's own (util/tls_client.hpp),
+// when the console's ssl service refused a certificate it cannot check
+// (Let's Encrypt's without Key Encipherment). The refusal comes before
+// anything is sent, so a POST is never sent twice. No redirects followed.
+bool own_connection(const std::string& url, const Extra& x, std::string* body, std::string* error, size_t max_bytes,
+                    long timeout_s, long* status_out)
+{
+    std::lock_guard<std::mutex> guard(s_lock);
+    const std::vector<std::string> headers = http_logic::request_headers(x.post ? x.content_type : nullptr, x.headers);
+    std::string raw, got;
+    if (!tls_client::request(url, x.post, headers, "PlayGuard/" + app::version(), max_bytes, timeout_s, s_abort, &raw,
+                             error))
+        return false;
+    long status = 0;
+    if (!http_logic::parse_response(raw, &status, &got, error)) return false;
+    if (status_out) *status_out = status;
+    if (!x.post && status >= 300 && status < 400) {
+        if (error) *error = "redirected (HTTP " + std::to_string(status) + "), not followed";
+        return false;
+    }
+    http_logic::Outcome outcome;
+    outcome.status   = status;
+    outcome.overflow = got.size() > max_bytes;
+    if (!http_logic::succeeded(outcome, error)) return false;
+    *body = std::move(got);
+    return true;
+}
+#endif
+
+// perform(), then own_connection() when the console refused the certificate.
+bool perform_or_own(const std::string& url, Extra x, std::string* body, std::string* error, size_t max_bytes,
+                    long timeout_s, long* status_out)
+{
+    bool refused = false;
+    x.refused = &refused;
+    if (perform(url, x, body, error, max_bytes, timeout_s, status_out)) return true;
+#ifdef __SWITCH__
+    if (refused) {
+        std::string why;
+        if (own_connection(url, x, body, &why, max_bytes, timeout_s, status_out)) return true;
+        if (error) *error = why;   // the console's refusal is known; this is the news
+    }
+#endif
+    return false;
+}
 }   // namespace
 
 bool get(const std::string& url, std::string* body, std::string* error, size_t max_bytes, long timeout_s,
@@ -201,7 +251,7 @@ bool get(const std::string& url, std::string* body, std::string* error, size_t m
 {
     Extra x;
     x.headers = &headers;
-    return perform(url, x, body, error, max_bytes, timeout_s, status);
+    return perform_or_own(url, x, body, error, max_bytes, timeout_s, status);
 }
 
 bool post(const std::string& url, const std::string& data, const char* content_type, std::string* body,
@@ -211,7 +261,7 @@ bool post(const std::string& url, const std::string& data, const char* content_t
     x.post = &data;
     x.content_type = content_type;
     x.headers = &headers;
-    return perform(url, x, body, error, max_bytes, timeout_s, status);
+    return perform_or_own(url, x, body, error, max_bytes, timeout_s, status);
 }
 
 bool redirect(const std::string& url, std::string* target, std::string* error, const Headers& headers)

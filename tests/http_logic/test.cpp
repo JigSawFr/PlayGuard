@@ -87,11 +87,58 @@ static void test_redirect()
     CHECK(!http_logic::redirect_ok(302, "", nullptr));
 }
 
+static void test_own_connection()
+{
+    std::string host, path;
+    int port = 0;
+    CHECK(http_logic::split_url("https://bpa.st/curl", &host, &port, &path) && host == "bpa.st" && port == 443 &&
+          path == "/curl");
+    CHECK(http_logic::split_url("https://example.org:8443", &host, &port, &path) && host == "example.org" &&
+          port == 8443 && path == "/");
+    CHECK(http_logic::split_url("https://a.b/x?y=1#frag", &host, &port, &path) && path == "/x?y=1");
+    CHECK(http_logic::split_url("https://a.b?q", &host, &port, &path) && host == "a.b" && path == "/?q");
+    CHECK(!http_logic::split_url("http://bpa.st/curl", &host, &port, &path));
+    CHECK(!http_logic::split_url("https:///x", &host, &port, &path));
+    CHECK(!http_logic::split_url("https://a.b:0/", &host, &port, &path));
+    CHECK(!http_logic::split_url("https://a.b:99999/", &host, &port, &path));
+    CHECK(!http_logic::split_url("https://a.b:x/", &host, &port, &path));
+    CHECK(!http_logic::split_url("https://user@a.b/", &host, &port, &path));
+
+    const std::string body = "raw=hello";
+    const std::vector<std::string> headers = http_logic::request_headers("text/plain", nullptr);
+    CHECK(http_logic::request_text("bpa.st", "/curl", "PlayGuard/1.0.0", headers, &body) ==
+          "POST /curl HTTP/1.1\r\nHost: bpa.st\r\nUser-Agent: PlayGuard/1.0.0\r\nAccept: */*\r\n"
+          "Connection: close\r\nContent-Type: text/plain\r\nContent-Length: 9\r\n\r\nraw=hello");
+    CHECK(http_logic::request_text("a.b", "/", "UA", {}, nullptr) ==
+          "GET / HTTP/1.1\r\nHost: a.b\r\nUser-Agent: UA\r\nAccept: */*\r\nConnection: close\r\n\r\n");
+
+    long status = 0;
+    std::string out, error;
+    CHECK(http_logic::parse_response("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nhello+extra", &status, &out, &error) &&
+          status == 200 && out == "hello");
+    CHECK(http_logic::parse_response("HTTP/1.1 201 Created\r\ntransfer-encoding: Chunked\r\n\r\n"
+                                     "4\r\nPast\r\n6;ext=1\r\ne URL:\r\n0\r\n\r\n",
+                                     &status, &out, &error) &&
+          status == 201 && out == "Paste URL:");
+    CHECK(http_logic::parse_response("HTTP/1.0 404 Not Found\r\nServer: x\r\n\r\nno such", &status, &out, &error) &&
+          status == 404 && out == "no such");
+    CHECK(!http_logic::parse_response("HTTP/1.1 200 OK\r\nContent-Length: 50\r\n\r\nshort", &status, &out, &error) &&
+          error == "the answer was cut short");
+    CHECK(!http_logic::parse_response("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n9\r\nabc", &status, &out,
+                                      &error));
+    CHECK(!http_logic::parse_response("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\nzz\r\n", &status, &out,
+                                      &error));
+    CHECK(!http_logic::parse_response("SSH-2.0-OpenSSH\r\n\r\n", &status, &out, &error) && error == "not an HTTP answer");
+    CHECK(!http_logic::parse_response("HTTP/1.1 200 OK\r\nno end of headers", &status, &out, &error));
+    CHECK(!http_logic::parse_response("HTTP/1.1 2x0 OK\r\n\r\n", &status, &out, &error));
+}
+
 int main()
 {
     test_fits();
     test_headers();
     test_outcome();
     test_redirect();
-    return CHECK_DONE("http_logic size limit, headers, outcome and redirect tests passed");
+    test_own_connection();
+    return CHECK_DONE("http_logic size limit, headers, outcome, redirect and own-connection tests passed");
 }

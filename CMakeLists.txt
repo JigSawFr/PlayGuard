@@ -101,9 +101,10 @@ list(APPEND APP_PLATFORM_LIB ${CMAKE_THREAD_LIBS_INIT})
 
 # libcurl for the update check (util/http.cpp). On the Switch: devkitPro's
 # switch-curl portlib (TLS through the console's ssl service), static, so its
-# own dependencies are listed after it.
+# own dependencies are listed after it; and switch-mbedtls for the servers
+# that service refuses (util/tls_client.hpp).
 if (PLATFORM_SWITCH)
-    list(APPEND APP_PLATFORM_LIB curl z nx)
+    list(APPEND APP_PLATFORM_LIB curl mbedtls mbedx509 mbedcrypto z nx)
 else ()
     find_package(CURL REQUIRED)
     find_package(ZLIB REQUIRED)   # util/zip_read.cpp (the Switch links z above)
