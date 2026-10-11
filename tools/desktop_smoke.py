@@ -72,19 +72,18 @@ os.makedirs(run_dir, exist_ok=True)
 config_file = os.path.join(run_dir, "playguard_data", "config.json")
 if (GATE or ERRORS or DEVBUILD) and os.path.exists(config_file):
     os.remove(config_file)   # no remembered choice, developer mode off
-block_ref = os.path.join(run_dir, "playguard_data", "logs", "play_timer_block.json")
+block_ref = os.path.join(run_dir, "playguard_data", "logs", "play_timer", "block.json")
 if GATE and os.path.exists(block_ref):
     os.remove(block_ref)     # the developer tool must write a new one
 # What the developer tools' cleanup must remove, and what it must keep.
 logs_dir = os.path.join(run_dir, "playguard_data", "logs")
 cache_dir = os.path.join(run_dir, "playguard_data", "cache")
-old_logs = [os.path.join(logs_dir, n) for n in ("crash.txt", "20261008_120000.txt")]
+old_logs = [os.path.join(logs_dir, n) for n in ("crashes/crash_20261008_120000.txt", "reports/report_20261008_120000.txt")]
 uploads = os.path.join(logs_dir, "uploads.txt")
 stale_cache = os.path.join(cache_dir, "stale.bin")
 if GATE:
-    os.makedirs(logs_dir, exist_ok=True)
-    os.makedirs(cache_dir, exist_ok=True)
     for path in old_logs + [uploads, stale_cache]:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w") as f:
             f.write("smoke test\n")
 
@@ -787,8 +786,10 @@ uploads = os.path.join(run_dir, "playguard_data", "logs", "uploads.txt")
 def upload_count():
     return open(uploads).read().count("https://bpa.st/SMOKE") if os.path.exists(uploads) else 0
 uploads_before = upload_count()
-logs = os.path.join(run_dir, "playguard_data", "logs")
-saved = [f for f in (os.listdir(logs) if os.path.isdir(logs) else []) if f[:8].isdigit() and f.endswith(".txt")]
+reports = os.path.join(run_dir, "playguard_data", "logs", "reports")
+def saved_reports():
+    return [f for f in (os.listdir(reports) if os.path.isdir(reports) else []) if f.startswith("report_") and f.endswith(".txt")]
+saved = saved_reports()
 key("Down", 3)             # past Keep, Export: Send a report online
 key("Return")
 if saved:                  # reports saved by an earlier local run: this report is the first choice
@@ -803,7 +804,7 @@ key("Return")              # OK
 # Signed in to GitHub: where to send it comes first, a secret gist by default.
 open(github_token, "w").write("ghu_smoke")
 key("Return")              # Send a report online (still focused)
-if any(f[:8].isdigit() and f.endswith(".txt") for f in os.listdir(logs)):
+if saved_reports():
     key("Return")          # this report, the first choice
 shot("27_upload_host")
 key("Return")              # Secret gist on GitHub

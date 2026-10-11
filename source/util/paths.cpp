@@ -18,13 +18,16 @@ namespace paths
 std::string data_dir()
 {
 #ifdef __SWITCH__
-    return "/switch/playguard";
+    return "/config/playguard";
 #else
     return "./playguard_data";
 #endif
 }
 
 std::string logs_dir()     { return data_dir() + "/logs"; }
+std::string reports_dir()  { return logs_dir() + "/reports"; }
+std::string crashes_dir()  { return logs_dir() + "/crashes"; }
+std::string play_timer_dir() { return logs_dir() + "/play_timer"; }
 std::string profiles_dir() { return data_dir() + "/profiles"; }
 std::string backups_dir()  { return data_dir() + "/backups"; }
 std::string exports_dir()  { return data_dir() + "/exports"; }

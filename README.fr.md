@@ -96,14 +96,14 @@ Au choix :
 |---|---|
 | **Homebrew App Store** / **App Store de sphaira** (même catalogue) | Cherchez *PlayGuard* une fois la fiche validée. Les nouvelles versions sont reprises automatiquement. |
 | **sphaira › GitHub** | Le zip de la version contient déjà l'entrée (`/config/sphaira/github/playguard.json`) : après une première installation, mettez à jour depuis *GitHub* dans sphaira. |
-| **Manuellement** | Téléchargez `playguard.zip` dans la [dernière version](https://github.com/JigSawFr/PlayGuard/releases/latest) et extrayez-le à la **racine** de la carte SD. L'application arrive dans `sd:/switch/playguard/`. |
+| **Manuellement** | Téléchargez `playguard.zip` dans la [dernière version](https://github.com/JigSawFr/PlayGuard/releases/latest) et extrayez-le à la **racine** de la carte SD. L'application arrive dans `sd:/switch/playguard/`, ses fichiers dans `sd:/config/playguard/`. |
 
 Le **module système de récupération** optionnel (`playguard-rescue.zip`) se télécharge à part — voir [Console bloquée ?](#console-bloquée--console-doccasion-code-pin-oublié).
 
 <details>
 <summary>Fichiers écrits par PlayGuard sur la carte SD</summary>
 
-Tous dans `sd:/switch/playguard/` :
+Tous dans `sd:/config/playguard/` (l'application elle-même reste dans `sd:/switch/playguard/` : la supprimer ou la réinstaller les conserve). Les versions qui les gardaient à côté de l'application les y ont déplacés à leur premier lancement.
 
 | Chemin | Contenu |
 |---|---|
@@ -116,7 +116,7 @@ Tous dans `sd:/switch/playguard/` :
 | `cache/` | La dernière activité de jeu lue (tous les comptes, et chaque compte consulté), affichée dès le lancement suivant pendant que le journal est relu ; les icônes des jeux (`icons/`, 16 Mo au plus, vidé quand la langue de la console change), pour ne pas relire le nom et l'icône de chaque jeu à chaque lancement ; en mode développeur, la liste d'*Installer un autre build* (`dev_builds.json`) |
 | `github_token` | Mode développeur uniquement : la connexion GitHub d'*Installer un autre build* (supprimé à la déconnexion) |
 | `rescue_report.txt` | Laissé par le sysmodule de secours après son intervention, jusqu'à ce que PlayGuard l'affiche au démarrage (illisible, il est supprimé et PlayGuard le signale) |
-| `logs/` | Rapports de diagnostic (jamais le code PIN ni le numéro de série), les fichiers des outils développeur, `uploads.txt` (les liens des rapports envoyés en ligne) et `crash.txt` (ce qui a arrêté PlayGuard, s'il a planté) |
+| `logs/` | `reports/` les rapports de diagnostic enregistrés (jamais le code PIN ni le numéro de série) ; `crashes/` un fichier par plantage (ce qui a arrêté PlayGuard) ; `play_timer/` les fichiers du minuteur des outils développeur ; `uploads.txt` les liens des rapports envoyés en ligne. Combien de rapports et de fichiers de plantage sont gardés : *Outils › Diagnostic* (par nombre, âge ou taille ; le plus récent reste toujours) |
 
 Plus de détails dans [packaging/README.md](packaging/README.md) (en anglais).
 </details>
@@ -229,7 +229,7 @@ L'application est organisée en onglets, comme les paramètres de la console. Cl
 - **Historique des modifications :** ce que PlayGuard a changé (limites, niveau de restriction, code PIN, déverrouillages, dissociation, horloge, restaurations…), quand et depuis où. Ⓐ sur une modification l'affiche et, pour une valeur, **remet la précédente** — avec le même déverrouillage et le même code PIN que toute modification, en signalant si elle a changé depuis.
 - **Sauvegarder / restaurer les réglages** sur la carte SD : niveau de restriction, réglages personnalisés, mode VR, organisme de classification, limites quotidiennes, alarme « temps écoulé » (avec les actions avancées activées), et pour mémoire le bloc brut du minuteur — jamais le code PIN. La restauration ne liste que ce qui changerait (rien à changer : elle le dit simplement, sans déverrouillage ni écriture), et signale quand la sauvegarde avait une alarme du coucher (elle n'est pas réécrite). Nombre de sauvegardes conservées au choix.
 - **Premiers pas** rouvre le guide (avec une étape *Dissocier l'application mobile* tant qu'elle est associée, une étape *Réactiver l'alarme « temps écoulé »* tant qu'elle est désactivée, une étape *Protéger PlayGuard* une fois le code PIN défini — le choix *Demander le code PIN* —, et un interrupteur pour qu'il ne s'ouvre plus au lancement). Sous *Fermer*, *Soutenir PlayGuard* affiche les QR codes de soutien.
-- **Exporter un rapport de diagnostic**, ou **l'envoyer en ligne** (voir [Signaler un bug](#signaler-un-bug)).
+- **Exporter un rapport de diagnostic**, ou **l'envoyer en ligne** (voir [Signaler un bug](#signaler-un-bug)) ; combien de rapports enregistrés et de fichiers de plantage sont gardés, par nombre, âge ou taille.
 - **Console :** firmware, Atmosphère, compatibilité, stockage (emuMMC ou sysMMC, avec une note quand l'autre système a son propre contrôle parental), **masquage du numéro de série** par Atmosphère (en partie caché jusqu'à Ⓐ ; avertissement en emuMMC s'il n'est pas masqué), **patchs de jeux** (sys-patch ou fichiers sigpatches, avec une recommandation de sys-patch quand seuls des fichiers sont utilisés).
 - **À propos** (son propre onglet) : version, mode de lancement et dossier des données ; **mises à jour** (recherche maintenant ou une fois par jour au lancement ; *Mettre à jour avec* sphaira, le Homebrew App Store ou à la main) ; les **nouveautés** de la version installée (son entrée du changelog intégré, en anglais) ; les crédits, comment **soutenir PlayGuard** ([GitHub Sponsors](https://github.com/sponsors/JigSawFr), [Ko-fi](https://ko-fi.com/jigsawfr), affichés en QR codes à scanner avec un téléphone), et un petit *Made in France* 🇫🇷. Après une mise à jour, PlayGuard s'ouvre une fois sur **Nouveautés de la X.Y.Z** (les mêmes notes, puis les QR codes).
 </details>
@@ -266,8 +266,8 @@ PlayGuard ne voit que le contrôle parental du système sur lequel il tourne : *
 | Situation | Que faire |
 |---|---|
 | **Console d'occasion :** vous connaissez le code PIN, mais l'application mobile de l'ancien propriétaire est toujours associée (la dissociation échoue, ou la réinitialisation demande son compte) | *Sécurité et appli › Dissocier l'application mobile*, puis, si vous ne voulez plus du tout de contrôle parental, *Supprimer tout le contrôle parental*. Les deux fonctionnent hors ligne, en emuMMC comme en sysMMC. |
-| **Code PIN oublié** | *Afficher le code PIN* demande lui-même le code PIN : il ne peut pas aider ici. Avec le module système de récupération installé (ci-dessous), déposez un fichier `RESCUE` et redémarrez : l'écran de récupération en définit alors un nouveau (il n'affiche jamais l'ancien). Sans lui, *Supprimer tout le contrôle parental* permet de repartir de zéro (une sauvegarde des réglages est d'abord enregistrée ; elle ne contient jamais le code PIN) : avec *Demander le code PIN* actif (par défaut, *Avant une modification*), mettez d'abord la carte SD dans un ordinateur et passez `"pin_lock"` à `"off"` dans `sd:/switch/playguard/config.json`. |
-| **Le minuteur bloque tout (limite à 0 min) et le code PIN est oublié** | PlayGuard lui-même ne peut pas démarrer. Installez **à l'avance** le module système de récupération optionnel (`playguard-rescue.zip`) ; une fois bloqué, déposez un fichier vide `switch/playguard/RESCUE` sur la carte SD et démarrez — il déverrouille la console pour que PlayGuard puisse s'ouvrir. Voir [`sysmodule/README.md`](sysmodule/README.md) (en anglais). |
+| **Code PIN oublié** | *Afficher le code PIN* demande lui-même le code PIN : il ne peut pas aider ici. Avec le module système de récupération installé (ci-dessous), déposez un fichier `RESCUE` et redémarrez : l'écran de récupération en définit alors un nouveau (il n'affiche jamais l'ancien). Sans lui, *Supprimer tout le contrôle parental* permet de repartir de zéro (une sauvegarde des réglages est d'abord enregistrée ; elle ne contient jamais le code PIN) : avec *Demander le code PIN* actif (par défaut, *Avant une modification*), mettez d'abord la carte SD dans un ordinateur et passez `"pin_lock"` à `"off"` dans `sd:/config/playguard/config.json`. |
+| **Le minuteur bloque tout (limite à 0 min) et le code PIN est oublié** | PlayGuard lui-même ne peut pas démarrer. Installez **à l'avance** le module système de récupération optionnel (`playguard-rescue.zip`) ; une fois bloqué, déposez un fichier vide `config/playguard/RESCUE` sur la carte SD et démarrez — il déverrouille la console pour que PlayGuard puisse s'ouvrir. Voir [`sysmodule/README.md`](sysmodule/README.md) (en anglais). |
 | **Console non modifiée** | PlayGuard ne peut rien faire : il nécessite Atmosphère. La procédure officielle passe par la clé maîtresse du service client de Nintendo. |
 
 ## PlayGuard ou un sysmodule de remplacement ?
@@ -288,7 +288,7 @@ PlayGuard pilote le contrôle parental intégré à la console (le service `pctl
 
 Une erreur affiche le code du système (par exemple `0x0001088E`) avec ce que l'on en sait : quoi faire pour les codes dont le sens est documenté, sinon un rapport aide.
 
-1. *Outils › Exporter un rapport de diagnostic* enregistre un fichier texte dans `sd:/switch/playguard/logs/` : firmware, version d'Atmosphère, durée du démarrage, horloges, stockage, masquage du numéro de série, état des patchs de jeux, et le résultat brut de chaque requête au contrôle parental. **Il ne contient jamais le code PIN ni le numéro de série.**
+1. *Outils › Exporter un rapport de diagnostic* enregistre un fichier texte dans `sd:/config/playguard/logs/reports/` : firmware, version d'Atmosphère, durée du démarrage, horloges, stockage, masquage du numéro de série, état des patchs de jeux, et le résultat brut de chaque requête au contrôle parental. **Il ne contient jamais le code PIN ni le numéro de série.**
 2. [Ouvrez un ticket](https://github.com/JigSawFr/PlayGuard/issues/new) (en anglais ou en français) et joignez-le.
 
 Ou, console connectée, *Outils › Envoyer un rapport en ligne* (Ⓧ sur le rapport de diagnostic en mode développeur) l'envoie, avec les fichiers de débogage (la référence du bloc du minuteur, la fin de l'enregistrement du minuteur, l'historique des modifications et les réglages de PlayGuard), sur [bpa.st](https://bpa.st) ou, quand PlayGuard est connecté à GitHub (outils développeur), dans un gist secret de votre compte (proposé en premier), après avoir indiqué exactement ce qui part. PlayGuard affiche le lien et deux QR codes : le rapport, et le formulaire de signalement de bug avec le lien et vos versions déjà remplis. Toute personne qui a le lien peut lire le rapport : pendant un mois sur bpa.st, qui le supprime ensuite, ou jusqu'à ce que vous supprimiez le gist sur GitHub. Les liens sont conservés dans `logs/uploads.txt`, avec le lien de suppression de bpa.st pour effacer une paste plus tôt. Un rapport enregistré plus tôt dans `logs/` peut être envoyé de la même façon.

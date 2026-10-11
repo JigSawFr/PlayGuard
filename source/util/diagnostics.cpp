@@ -7,6 +7,7 @@
 
 #include "action/fw_gate.hpp"
 #include "app.hpp"
+#include "util/log_files.hpp"
 #include "util/patches.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -85,19 +86,9 @@ std::string current_report()
 
 std::string save(const std::string& report, std::string* error)
 {
-    std::time_t now = std::time(nullptr);
-    std::tm tmv{};
-    char stamp[32] = "unknown";
-#ifdef _WIN32
-    localtime_s(&tmv, &now);
-#else
-    localtime_r(&now, &tmv);
-#endif
-    std::strftime(stamp, sizeof(stamp), "%Y%m%d_%H%M%S", &tmv);
-
+    const std::string stamp = log_files::stamp(std::time(nullptr));
     for (unsigned i = 0; i < 1000; ++i) {
-        std::string path = i == 0 ? fmt::format("{}/{}.txt", paths::logs_dir(), stamp)
-                                  : fmt::format("{}/{}_{}.txt", paths::logs_dir(), stamp, i);
+        std::string path = paths::reports_dir() + "/" + log_files::name(log_files::REPORT, stamp, i);
         std::string existing;
         if (paths::read_file(path, existing)) continue;
         if (paths::atomic_write(path, report, error)) return path;

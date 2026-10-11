@@ -25,11 +25,12 @@ struct Plan
 // list. All of it is read again from the console (or GitHub) when needed.
 Plan cache(const std::string& data_dir);
 
-// Every file under `data_dir`/logs (crash.txt, the saved diagnostic reports,
-// the play-timer recording) except the two that are not logs: uploads.txt
-// (the removal links of the reports sent online, the only way to delete
-// them) and play_timer_block.json (the reference a block comparison is made
-// against). Their ".tmp" (an interrupted write, read in their place) stays too.
+// Every file under `data_dir`/logs and its subfolders (crashes/, reports/,
+// the play-timer recording in play_timer/) except the two that are not logs:
+// uploads.txt (the removal links of the reports sent online, the only way to
+// delete them) and play_timer/block.json (the reference a block comparison is
+// made against). Their ".tmp" (an interrupted write, read in their place)
+// stays too.
 Plan logs(const std::string& data_dir);
 
 struct Outcome

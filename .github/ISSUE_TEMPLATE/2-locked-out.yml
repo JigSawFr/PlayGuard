@@ -44,5 +44,5 @@ body:
     attributes:
       label: Diagnostic report or rescue report
       description: |
-        If PlayGuard opens: the diagnostic report from `sd:/switch/playguard/logs/`. If the
-        recovery sysmodule ran: `sd:/switch/playguard/rescue_report.txt`.
+        If PlayGuard opens: the diagnostic report from `sd:/config/playguard/logs/reports/`. If the
+        recovery sysmodule ran: `sd:/config/playguard/rescue_report.txt`.

@@ -1,5 +1,5 @@
 // profiles — named sets of per-day limits saved on the SD card
-// (sd:/switch/playguard/profiles/<file>.json), e.g. "School week".
+// (sd:/config/playguard/profiles/<file>.json), e.g. "School week".
 //
 // A profile has a display name (any printable text, accents included) and a
 // file name derived from it (file_stem: letters, digits, space, '-', '_', or

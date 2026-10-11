@@ -121,6 +121,15 @@ void sanitize(Config& c)
     bool keep_ok = false;
     for (int k : BACKUP_KEEP) keep_ok |= c.backup_keep == k;
     if (!keep_ok) c.backup_keep = 0;
+    keep_ok = false;
+    for (int k : LOGS_KEEP) keep_ok |= c.logs_keep == k;
+    if (!keep_ok) c.logs_keep = 20;
+    keep_ok = false;
+    for (int k : LOGS_KEEP_DAYS) keep_ok |= c.logs_keep_days == k;
+    if (!keep_ok) c.logs_keep_days = 0;
+    keep_ok = false;
+    for (int k : LOGS_KEEP_MB) keep_ok |= c.logs_keep_mb == k;
+    if (!keep_ok) c.logs_keep_mb = 0;
     if (!is_date(c.update_checked)) c.update_checked.clear();
     if (!is_date(c.support_reminded)) c.support_reminded.clear();
     if (c.seen_version.size() > 32) c.seen_version.clear();
@@ -195,6 +204,9 @@ void load()
     read_int(j, "activity_period", c.activity_period);
     read_int(j, "export_format", c.export_format);
     read_int(j, "backup_keep", c.backup_keep);
+    read_int(j, "logs_keep", c.logs_keep);
+    read_int(j, "logs_keep_days", c.logs_keep_days);
+    read_int(j, "logs_keep_mb", c.logs_keep_mb);
     read_bool(j, "clock_check_at_start", c.clock_check_at_start);
     read_string(j, "pin_lock", c.pin_lock);
     read_bool(j, "onboarding_at_start", c.onboarding_at_start);
@@ -261,6 +273,9 @@ bool snapshot(std::string& text)
     j["activity_period"] = s_config.activity_period;
     j["export_format"]   = s_config.export_format;
     j["backup_keep"]     = s_config.backup_keep;
+    j["logs_keep"]       = s_config.logs_keep;
+    j["logs_keep_days"]  = s_config.logs_keep_days;
+    j["logs_keep_mb"]    = s_config.logs_keep_mb;
     j["clock_check_at_start"] = s_config.clock_check_at_start;
     j["pin_lock"]        = s_config.pin_lock;
     j["onboarding_at_start"] = s_config.onboarding_at_start;

@@ -1,4 +1,4 @@
-// config — small persistent settings in sd:/switch/playguard/config.json.
+// config — small persistent settings in sd:/config/playguard/config.json.
 // Every key, its values and default: docs/config.md (keep it in step).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -27,6 +27,12 @@ struct Config
     int  activity_period = 1;          // Activity's period: 0 today, 1 last 7 days, 2 all time
     int  export_format   = 0;          // last export format (table_export::Format)
     int  backup_keep     = 0;          // backups kept after a new one (0: all of them)
+    // The saved reports and the crash files kept, each folder on its own
+    // (util/log_files.hpp; 0: no limit): the newest logs_keep, those of the
+    // last logs_keep_days days, the newest that fit in logs_keep_mb MB.
+    int  logs_keep       = 20;
+    int  logs_keep_days  = 0;
+    int  logs_keep_mb    = 0;
     bool clock_check_at_start = false; // measure the network clock at start-up, say when it is off
     // Security › Ask for the PIN: "off", "changes" (before the first change,
     // then not for 5 min) or "open" (to open PlayGuard). See pin_lock.hpp.
@@ -90,6 +96,10 @@ constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "r
 // What extra_amounts may be (the Preferences picker offers these sets).
 constexpr int EXTRA_SETS[][3] = { { 15, 30, 60 }, { 10, 20, 30 }, { 30, 60, 90 }, { 5, 10, 15 } };
 constexpr int BACKUP_KEEP[]   = { 0, 5, 10, 20 };
+// What the Tools tab offers for the reports and crash files kept.
+constexpr int LOGS_KEEP[]      = { 0, 5, 10, 20, 50 };
+constexpr int LOGS_KEEP_DAYS[] = { 0, 7, 30, 90, 365 };
+constexpr int LOGS_KEEP_MB[]   = { 0, 1, 5, 20 };
 constexpr size_t MAX_HOST           = 253;  // longest DNS name
 constexpr size_t MAX_CUSTOM_SERVERS = 10;
 

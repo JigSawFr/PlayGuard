@@ -2,7 +2,7 @@
 // forgot the parental-control PIN while the play timer keeps every program
 // (PlayGuard included) from starting.
 //
-// At boot it looks for sd:/switch/playguard/RESCUE (see core/rescue.h). If it
+// At boot it looks for sd:/config/playguard/RESCUE (see core/rescue.h). If it
 // is there it removes it (used once; renamed RESCUE.done should that fail),
 // then, with the PIN the console stores:
 //   - unlocks parental controls temporarily (1208 reads the PIN, 1201 unlocks)
@@ -27,7 +27,7 @@
 
 #include "rescue.h"
 
-#define DATA_DIR    "sdmc:/switch/playguard"
+#define DATA_DIR    "sdmc:/config/playguard"
 #define PATH_REQ    DATA_DIR "/" RESCUE_REQUEST_NAME
 #define PATH_REQTXT DATA_DIR "/" RESCUE_REQUEST_NAME_TXT
 #define PATH_DONE   DATA_DIR "/" RESCUE_REQUEST_NAME_DONE

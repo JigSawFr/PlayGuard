@@ -1,7 +1,7 @@
 // Host tests for source/util/data_cleanup.cpp: what "Clear the cache" and
 // "Delete the log files" remove (every file of cache/ and its subfolders;
-// every file of logs/ but uploads.txt, play_timer_block.json and their
-// .tmp), that folders and the rest of the data folder stay, the removal's
+// every file of logs/ and its subfolders but uploads.txt,
+// play_timer/block.json and their .tmp), that folders and the rest of the data folder stay, the removal's
 // count (a file gone since the plan is neither removed nor failed, one that
 // cannot be removed is failed), and the size shown.
 #include "check.h"
@@ -66,14 +66,18 @@ void make_tree()
     write("cache/icons/0100000000010000.jpg", 6000);
     write("cache/icons/0100000000020000.jpg", 7000);
     dir("logs");
-    write("logs/crash.txt", 200);
-    write("logs/20261009_141203.txt", 3000);
-    write("logs/20261009_141203_1.txt", 3100);
-    write("logs/play_timer_log.csv", 9000);
-    write("logs/play_timer_log.old.csv", 8000);
+    dir("logs/crashes");
+    write("logs/crashes/crash_20261009_141000.txt", 200);
+    dir("logs/reports");
+    write("logs/reports/report_20261009_141203.txt", 3000);
+    write("logs/reports/report_20261009_141203_1.txt", 3100);
+    dir("logs/play_timer");
+    write("logs/play_timer/log.csv", 9000);
+    write("logs/play_timer/log.old.csv", 8000);
+    write("logs/play_timer/block.json", 1000);
+    write("logs/play_timer/block.json.tmp", 1100);
     write("logs/uploads.txt", 150);
     write("logs/uploads.txt.tmp", 160);
-    write("logs/play_timer_block.json", 1000);
 }
 
 void remove_tree()
@@ -105,7 +109,7 @@ static void test_cache_plan()
     CHECK(!there("cache/activity_all.bin") && !there("cache/icons/lang"));
     CHECK(there("config.json") && there("history.json") && there("watch.json") && there("github_token"));
     CHECK(there("backups/settings_20261010.json") && there("profiles/school.json") && there("exports/activity.csv"));
-    CHECK(there("logs/crash.txt"));
+    CHECK(there("logs/crashes/crash_20261009_141000.txt"));
     // Nothing left: an empty plan.
     const dc::Plan again = dc::cache(g_root);
     CHECK(again.files.empty() && again.bytes == 0);
@@ -115,17 +119,22 @@ static void test_cache_plan()
 static void test_logs_plan()
 {
     make_tree();
-    dir("logs/old");   // a subfolder's files go, whatever their name
+    dir("logs/old");   // kept by their path from logs/: elsewhere, the same names go
     write("logs/old/uploads.txt", 10);
+    write("logs/block.json", 20);
     const dc::Plan p = dc::logs(g_root);
-    CHECK(p.files.size() == 6);
-    CHECK(p.bytes == 200 + 3000 + 3100 + 9000 + 8000 + 10);
+    CHECK(p.files.size() == 7);
+    CHECK(p.bytes == 200 + 3000 + 3100 + 9000 + 8000 + 10 + 20);
     const dc::Outcome out = dc::remove(p);
-    CHECK(out.removed == 6 && out.failed == 0);
-    CHECK(!there("logs/crash.txt") && !there("logs/20261009_141203.txt") && !there("logs/play_timer_log.csv"));
-    CHECK(!there("logs/old/uploads.txt"));
+    CHECK(out.removed == 7 && out.failed == 0);
+    CHECK(!there("logs/crashes/crash_20261009_141000.txt") && !there("logs/reports/report_20261009_141203.txt") &&
+          !there("logs/play_timer/log.csv") && !there("logs/play_timer/log.old.csv"));
+    CHECK(!there("logs/old/uploads.txt") && !there("logs/block.json"));
+    // The folders stay.
+    CHECK(there("logs/crashes") && there("logs/reports") && there("logs/play_timer"));
     // Not logs: the removal links of reports sent online, the block reference.
-    CHECK(there("logs/uploads.txt") && there("logs/uploads.txt.tmp") && there("logs/play_timer_block.json"));
+    CHECK(there("logs/uploads.txt") && there("logs/uploads.txt.tmp") && there("logs/play_timer/block.json") &&
+          there("logs/play_timer/block.json.tmp"));
     CHECK(there("cache/activity_all.bin"));
     remove_tree();
 }

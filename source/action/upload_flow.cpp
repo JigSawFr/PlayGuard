@@ -164,11 +164,11 @@ void choose()
         }
         const std::string name = saved[(size_t)i - 1];
         std::string content;
-        if (!paths::read_file(paths::logs_dir() + "/" + name, content)) {
+        if (!paths::read_file(paths::reports_dir() + "/" + name, content)) {
             ui::info(brls::getStr("playguard/upload/failed", "cannot read " + name));
             return;
         }
-        send({ { "logs/" + name, content } });
+        send({ { "logs/reports/" + name, content } });
     });
 }
 

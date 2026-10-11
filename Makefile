@@ -168,7 +168,7 @@ launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/
 launcher_FLAGS := -std=c++17 -Isource
 history_SRC   := source/util/paths.cpp source/util/history.cpp tests/history/test.cpp
 history_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
-log_upload_SRC   := source/util/paths.cpp source/util/pt_log.cpp source/util/log_upload.cpp tests/log_upload/test.cpp
+log_upload_SRC   := source/util/paths.cpp source/util/pt_log.cpp source/util/pt_block.cpp source/util/log_files.cpp source/util/log_upload.cpp tests/log_upload/test.cpp
 log_upload_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 dev_builds_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/github_auth.cpp tests/dev_builds/test.cpp
 dev_builds_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
@@ -179,6 +179,8 @@ activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summar
 activity_summary_FLAGS := -std=c++17 -Isource
 pt_log_SRC   := source/util/paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp
 pt_log_FLAGS := -std=c++17 -Isource
+log_files_SRC   := source/util/paths.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
+log_files_FLAGS := -std=c++17 -Isource
 
 TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))
 TEST_PROGRAMS := $(addprefix $(TESTOUT)/,$(TESTS))

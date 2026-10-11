@@ -8,9 +8,15 @@
 namespace paths
 {
 
-// sd:/switch/playguard on the console; ./playguard_data on desktop.
+// sd:/config/playguard on the console (the .nro stays in sd:/switch/playguard:
+// util/data_move.hpp); ./playguard_data on desktop.
 std::string data_dir();
 std::string logs_dir();
+// Inside logs_dir() (util/log_files.hpp): the saved diagnostic reports, one
+// file per crash, and the developer tools' play-timer files.
+std::string reports_dir();
+std::string crashes_dir();
+std::string play_timer_dir();
 std::string profiles_dir();
 std::string backups_dir();
 std::string exports_dir();

@@ -110,8 +110,8 @@ std::string changed(const std::string& now, std::string* before)
 
 }   // namespace
 
-std::string path()     { return paths::logs_dir() + "/play_timer_log.csv"; }
-std::string old_path() { return paths::logs_dir() + "/play_timer_log.old.csv"; }
+std::string path()     { return paths::play_timer_dir() + "/log.csv"; }
+std::string old_path() { return paths::play_timer_dir() + "/log.old.csv"; }
 
 std::string header()
 {
@@ -181,7 +181,7 @@ std::string tail(const std::string& text, size_t max_bytes)
 bool append(const std::string& line, std::string* error)
 {
     const std::string p = path();
-    if (!paths::ensure_dir(paths::logs_dir())) {
+    if (!paths::ensure_dir(paths::play_timer_dir())) {
         if (error) *error = std::string("cannot create the logs folder: ") + std::strerror(errno);
         return false;
     }

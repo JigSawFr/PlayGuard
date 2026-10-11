@@ -96,14 +96,14 @@ Pick one:
 |---|---|
 | **Homebrew App Store** / **sphaira's App Store** (same catalogue) | Search for *PlayGuard* once the listing is approved. New releases are picked up automatically. |
 | **sphaira › GitHub** | The release zip already contains the entry (`/config/sphaira/github/playguard.json`): after a first install, update from *GitHub* in sphaira. |
-| **Manual** | Download `playguard.zip` from the [latest release](https://github.com/JigSawFr/PlayGuard/releases/latest) and extract it to the **root** of the SD card. The app lands in `sd:/switch/playguard/`. |
+| **Manual** | Download `playguard.zip` from the [latest release](https://github.com/JigSawFr/PlayGuard/releases/latest) and extract it to the **root** of the SD card. The app lands in `sd:/switch/playguard/`, its files in `sd:/config/playguard/`. |
 
 The optional **recovery sysmodule** (`playguard-rescue.zip`) is a separate download — see [Locked out?](#locked-out-second-hand-console-forgotten-pin).
 
 <details>
 <summary>Files PlayGuard writes on the SD card</summary>
 
-All in `sd:/switch/playguard/`:
+All in `sd:/config/playguard/` (the app itself stays in `sd:/switch/playguard/`: removing or reinstalling it keeps them). Versions that kept them next to the app had them moved there at their first start.
 
 | Path | Content |
 |---|---|
@@ -116,7 +116,7 @@ All in `sd:/switch/playguard/`:
 | `cache/` | The last play activity read (every account, and each account viewed), shown at once on the next start while the log is read again; the game icons (`icons/`, 16 MB at most, emptied when the console language changes), so names and icons are not read from each game again at every start; in developer mode, the list of *Install another build* (`dev_builds.json`) |
 | `github_token` | Developer mode only: the GitHub sign-in of *Install another build* (deleted by signing out) |
 | `rescue_report.txt` | Left by the recovery sysmodule after it acted, until PlayGuard shows it at start-up (one it cannot read is removed, and PlayGuard says so) |
-| `logs/` | Diagnostic reports (never contain the PIN or the serial number), the developer tools' files, `uploads.txt` (the links of the reports sent online) and `crash.txt` (what made PlayGuard stop, if it ever crashed) |
+| `logs/` | `reports/` the saved diagnostic reports (never contain the PIN or the serial number); `crashes/` one file per crash (what made PlayGuard stop); `play_timer/` the developer tools' play-timer files; `uploads.txt` the links of the reports sent online. How many reports and crash files are kept: *Tools › Diagnostics* (by number, age or size; the newest always stays) |
 
 More in [packaging/README.md](packaging/README.md).
 </details>
@@ -229,7 +229,7 @@ The app is organised in tabs, like System Settings. Click a tab to expand it.
 - **Change history:** what PlayGuard changed (limits, restriction level, PIN, unlocks, unlinking, the clock, restores …), when and from where. Ⓐ on a change shows it and, for a value, **puts the previous one back** — through the same unlock and PIN as any change, saying if it changed since.
 - **Back up / restore the settings** on the SD card: restriction level, custom settings, VR mode, rating organisation, daily limits, the "time's up" alarm (with the advanced actions on), and the raw play-timer block for the record — never the PIN. A restore lists only what would change (nothing to change: it just says so, with no unlock and nothing written), and says when the backup had a bedtime alarm on (it is not written back). Choose how many backups to keep.
 - **First steps** opens the guide again (with an *Unlink the companion app* step while linked, a *Turn the "Time's up" alarm back on* step while it is off, a *Protect PlayGuard* step once a PIN is set — the *Ask for the PIN* choice —, and a switch to stop it coming up at start-up). Below *Close*, *Support PlayGuard* shows the funding QR codes.
-- **Export a diagnostic report**, or **send one online** (see [Reporting a bug](#reporting-a-bug)).
+- **Export a diagnostic report**, or **send one online** (see [Reporting a bug](#reporting-a-bug)); how many saved reports and crash files are kept, by number, age or size.
 - **Console:** firmware, Atmosphère, compatibility, storage (emuMMC or sysMMC, and a note when the other system has its own parental controls), whether Atmosphère **blanks the serial number** (partly hidden until Ⓐ; a warning on emuMMC when it is not), **game patches** (sys-patch or sigpatch files, recommending sys-patch when only files are used).
 - **About** (its own tab): version, launch mode and data folder; **updates** (check now or once a day at start-up; *Update with* sphaira, Homebrew App Store or by hand); **what's new** in the running version (its entry of the bundled changelog, in English); the credits, how to **support PlayGuard** ([GitHub Sponsors](https://github.com/sponsors/JigSawFr), [Ko-fi](https://ko-fi.com/jigsawfr), shown as QR codes to scan with a phone), and a small *Made in France* 🇫🇷. After an update, PlayGuard opens once on **What's new in X.Y.Z** (the same notes, then the QR codes).
 </details>
@@ -266,8 +266,8 @@ PlayGuard only sees the parental controls of the system it runs on: **emuMMC and
 | Situation | What to do |
 |---|---|
 | **Second-hand console:** you know the PIN, but the previous owner's phone app is still linked (unlinking fails, or a factory reset asks for their account) | *Security & app › Unlink the companion app*, then, if you want no parental controls at all, *Delete all parental controls*. Both work offline, on emuMMC as on sysMMC. |
-| **PIN forgotten** | *Show the PIN* asks for the PIN itself, so it cannot help here. With the recovery sysmodule installed (below), drop a `RESCUE` file and restart: the recovery screen then sets a new one (it never shows the old one). Without it, *Delete all parental controls* starts again (a settings backup is saved first; it never contains the PIN): with *Ask for the PIN* on (the default, *Before a change*), put the SD card in a computer and set `"pin_lock"` to `"off"` in `sd:/switch/playguard/config.json` first. |
-| **The play timer blocks everything (0-minute limit) and the PIN is forgotten** | PlayGuard itself cannot start then. Install the optional recovery sysmodule (`playguard-rescue.zip`) **beforehand**; when locked out, drop an empty `switch/playguard/RESCUE` file on the SD card and boot — it unlocks the console so PlayGuard can open. See [`sysmodule/README.md`](sysmodule/README.md). |
+| **PIN forgotten** | *Show the PIN* asks for the PIN itself, so it cannot help here. With the recovery sysmodule installed (below), drop a `RESCUE` file and restart: the recovery screen then sets a new one (it never shows the old one). Without it, *Delete all parental controls* starts again (a settings backup is saved first; it never contains the PIN): with *Ask for the PIN* on (the default, *Before a change*), put the SD card in a computer and set `"pin_lock"` to `"off"` in `sd:/config/playguard/config.json` first. |
+| **The play timer blocks everything (0-minute limit) and the PIN is forgotten** | PlayGuard itself cannot start then. Install the optional recovery sysmodule (`playguard-rescue.zip`) **beforehand**; when locked out, drop an empty `config/playguard/RESCUE` file on the SD card and boot — it unlocks the console so PlayGuard can open. See [`sysmodule/README.md`](sysmodule/README.md). |
 | **Console not modded** | PlayGuard cannot help: it needs Atmosphère. Nintendo support's master-key procedure is the official way. |
 
 ## PlayGuard or a replacement sysmodule?
@@ -288,7 +288,7 @@ PlayGuard drives the parental controls built into the console (the `pctl` servic
 
 An error shows the system's code (such as `0x0001088E`) with what is known about it: what to do for the codes whose meaning is documented, otherwise a report helps.
 
-1. *Tools › Export a diagnostic report* saves a text file in `sd:/switch/playguard/logs/`: firmware, Atmosphère version, how long the start-up took, clocks, storage, serial-blanking and game-patch status, and the raw result of every parental-control query. **It never contains the PIN or the serial number.**
+1. *Tools › Export a diagnostic report* saves a text file in `sd:/config/playguard/logs/reports/`: firmware, Atmosphère version, how long the start-up took, clocks, storage, serial-blanking and game-patch status, and the raw result of every parental-control query. **It never contains the PIN or the serial number.**
 2. [Open an issue](https://github.com/JigSawFr/PlayGuard/issues/new) and attach it.
 
 Or, with the console online, *Tools › Send a report online* (Ⓧ on the diagnostic report in developer mode) sends it, with the debug files (the play-timer block reference, the end of the play-timer recording, the change history and PlayGuard's settings), to [bpa.st](https://bpa.st) or, when PlayGuard is signed in to GitHub (developer tools), to a secret gist in your account (offered first), after saying exactly what goes. It shows the link and two QR codes: the report, and the bug-report form with the link and your versions already filled in. Anyone with the link can read the report: for one month on bpa.st, which then deletes it, or until you delete the gist on GitHub. The links are kept in `logs/uploads.txt`, with bpa.st's removal link to delete a paste sooner. A report saved earlier in `logs/` can be sent the same way.

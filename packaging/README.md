@@ -8,26 +8,31 @@ switch/playguard/LICENSE.txt       the GPLv3 text
 config/sphaira/github/playguard.json     sphaira "GitHub" updater entry
 ```
 
-At runtime the app writes, next to itself:
+At runtime the app writes its files in `config/playguard/` (not next to itself: removing or reinstalling the
+app keeps them; a version that kept them in `switch/playguard/` has them moved at its first start,
+`source/util/data_move.hpp`):
 
 ```
-switch/playguard/config.json             preferences (language, theme, NTP server, …)
-switch/playguard/profiles/*.json         saved play-time limit profiles
-switch/playguard/backups/*.json          settings backups (never contain the PIN)
-switch/playguard/exports/activity_*      Activity exports (CSV, JSON, XLSX, PDF)
-switch/playguard/logs/*.txt              diagnostic reports (never contain the PIN), crash.txt, uploads.txt (links of reports sent online)
-switch/playguard/logs/play_timer_log.csv   Developer tools › record the play timer (.old.csv: the previous one)
-switch/playguard/logs/play_timer_block.json   Developer tools › play-timer block reference
-switch/playguard/history.json            the change history (the newest 200 changes)
-switch/playguard/watch.json              what PlayGuard last saw of the console (today's play time, the clock, the limits,
+config/playguard/config.json             preferences (language, theme, NTP server, …)
+config/playguard/profiles/*.json         saved play-time limit profiles
+config/playguard/backups/*.json          settings backups (never contain the PIN)
+config/playguard/exports/activity_*      Activity exports (CSV, JSON, XLSX, PDF)
+config/playguard/logs/reports/report_<date>.txt   diagnostic reports (never contain the PIN)
+config/playguard/logs/crashes/crash_<date>.txt    one file per crash
+                                         (both pruned as Tools › Diagnostics says: number, age, size)
+config/playguard/logs/play_timer/log.csv          Developer tools › record the play timer (log.old.csv: the previous one)
+config/playguard/logs/play_timer/block.json       Developer tools › play-timer block reference
+config/playguard/logs/uploads.txt        links of the reports sent online
+config/playguard/history.json            the change history (the newest 200 changes)
+config/playguard/watch.json              what PlayGuard last saw of the console (today's play time, the clock, the limits,
                                          the user accounts), to tell what changed outside it (docs/config.md)
-switch/playguard/config.json.bad         a config.json that could not be read, kept aside rather than overwritten (.bad.1: the
+config/playguard/config.json.bad         a config.json that could not be read, kept aside rather than overwritten (.bad.1: the
                                          previous one); history.json.bad the same for the change history
-switch/playguard/cache/                  play data per account (activity_*.bin), the game icons (icons/, 16 MB at most),
+config/playguard/cache/                  play data per account (activity_*.bin), the game icons (icons/, 16 MB at most),
                                          the development build list (dev_builds.json)
-switch/playguard/github_token            GitHub sign-in of the developer tools: the token in plain text,
+config/playguard/github_token            GitHub sign-in of the developer tools: the token in plain text,
                                          treat it as a password (Disconnect deletes it)
-switch/playguard/rescue_report.txt       left by the recovery sysmodule, read at start-up
+config/playguard/rescue_report.txt       left by the recovery sysmodule, read at start-up
 ```
 
 The optional recovery sysmodule (`playguard-rescue.zip`, a separate download) is also extracted at the root of the SD card:

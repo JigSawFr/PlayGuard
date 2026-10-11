@@ -1,7 +1,7 @@
 // pt_log — the play-timer recorder of the developer tools: every 30 s while
 // PlayGuard is open, one CSV line of what the play timer reports (pctl
 // PtSample: 1006, 1453, 1455, 1458, 1454, 1952, 1459, 1954/1956/1957, 1960 and
-// the 145601 block), in logs/play_timer_log.csv. Left running over midnight,
+// the 145601 block), in logs/play_timer/log.csv. Left running over midnight,
 // or until the time is up, it answers what one report cannot: when the time
 // spent resets, what 1459 says near the end (docs/parental-controls.md).
 // This part is plain C++ (no libnx, no UI) for the host tests
@@ -20,12 +20,12 @@ extern "C" {
 namespace pt_log
 {
 
-// Past this size the file becomes play_timer_log.old.csv (replacing the
+// Past this size the file becomes log.old.csv (replacing the
 // previous one) and a new one starts: two days at one line every 30 s.
 constexpr size_t MAX_BYTES = 2 * 1024 * 1024;
 
-std::string path();       // logs_dir()/play_timer_log.csv
-std::string old_path();   // logs_dir()/play_timer_log.old.csv
+std::string path();       // logs/play_timer/log.csv
+std::string old_path();   // logs/play_timer/log.old.csv
 
 // The first line of the file.
 std::string header();
