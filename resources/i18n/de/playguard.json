@@ -762,6 +762,7 @@
         "section_play_timer": "Spielzeit",
         "section_startup": "Beim Start",
         "note": "Sicherungen, der Diagnosebericht und die Konsole befinden sich unter Tools, Updates unter Info.",
+        "intro": "Intro 2 Sekunden lang zeigen",
         "support_reminder": "Einmal im Monat daran erinnern, PlayGuard zu unterstützen"
     },
     "backup": {

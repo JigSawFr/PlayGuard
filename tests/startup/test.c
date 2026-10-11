@@ -10,7 +10,7 @@ enum { MS = 1000000 };
 // A console start: every step reached, from userAppInit.
 static void console_times(int64_t at[StartupStep_Count])
 {
-    static const int ms[StartupStep_Count] = { 0, 412, 415, 423, 443, 823, 863, 983, 993, 1193 };
+    static const int ms[StartupStep_Count] = { 0, 412, 415, 423, 443, 823, 863, 983, 993, 2863, 2913 };
     const int64_t boot = 3600LL * 1000 * MS;   // the system tick counts from the console's boot
     for (int i = 0; i < StartupStep_Count; i++) at[i] = boot + (int64_t)ms[i] * MS;
 }
@@ -22,13 +22,14 @@ static void test_console(void)
     char out[2048];
     const size_t len = startup_format(at, out, sizeof(out));
     CHECK(len == strlen(out));
-    CHECK(strstr(out, "start-up    : first screen after 1193 ms (from userAppInit; hbloader's load of the .nro "
+    CHECK(strstr(out, "start-up    : first screen after 2913 ms (from userAppInit; hbloader's load of the .nro "
                       "before it is not measured)\n") == out);
     // Each step's own time, then the time since the first mark.
     CHECK(strstr(out, "  system services (userAppInit)               412     412\n"));
     CHECK(strstr(out, "  C++ static initialisation                     3     415\n"));
     CHECK(strstr(out, "  window: graphics, sounds, fonts             380     823\n"));
-    CHECK(strstr(out, "  first screen                                200    1193\n"));
+    CHECK(strstr(out, "  intro (Preferences: Show the intro)        1870    2863\n"));   // the intro: 2 s from the loading screen
+    CHECK(strstr(out, "  first screen                                 50    2913\n"));
     // The first mark is where the times start, not a step.
     CHECK(!strstr(out, "userAppInit called"));
     // One line per step reached after the first, the header and the column titles.
@@ -45,7 +46,7 @@ static void test_desktop(void)
     at[StartupStep_ServicesBegin] = at[StartupStep_Services] = -1;
     char out[2048];
     startup_format(at, out, sizeof(out));
-    CHECK(strstr(out, "start-up    : first screen after 778 ms (from main())\n") == out);
+    CHECK(strstr(out, "start-up    : first screen after 2498 ms (from main())\n") == out);
     CHECK(!strstr(out, "system services"));
     CHECK(!strstr(out, "C++ static initialisation"));
     CHECK(strstr(out, "  preferences (config.json)                     8       8\n"));
@@ -53,15 +54,16 @@ static void test_desktop(void)
 
 static void test_missing_steps(void)
 {
-    // The init-error screen: no settings step, and the first screen's time
-    // counts from the probe.
+    // The init-error screen: no settings step, no intro, and the first
+    // screen's time counts from the probe.
     int64_t at[StartupStep_Count];
     console_times(at);
-    at[StartupStep_Settings] = -1;
+    at[StartupStep_Settings] = at[StartupStep_Intro] = -1;
+    at[StartupStep_FirstScreen] = at[StartupStep_Probed] + 50LL * MS;
     char out[2048];
     startup_format(at, out, sizeof(out));
-    CHECK(!strstr(out, "firmware choice"));
-    CHECK(strstr(out, "  first screen                                210    1193\n"));
+    CHECK(!strstr(out, "firmware choice") && !strstr(out, "intro"));
+    CHECK(strstr(out, "  first screen                                 50    1033\n"));
 
     // Not there yet.
     console_times(at);

@@ -27,13 +27,30 @@ LoadingBar::LoadingBar()
 
 void LoadingBar::setProgress(float value)
 {
-    value = std::clamp(value, 0.0f, 1.0f);
+    this->moveTo(value, EASE_US, false);
+}
+
+void LoadingBar::fillOver(float value, brls::Time duration_us)
+{
+    this->moveTo(value, (float)duration_us, true);
+}
+
+void LoadingBar::moveTo(float value, float duration_us, bool steady)
+{
     // From where the fill is drawn now, not from the last value asked.
     const brls::Time now = brls::getCPUTimeUsec();
-    const float t = this->since ? std::min(1.0f, (float)(now - this->since) / EASE_US) : 1.0f;
-    this->from  = this->from + (this->to - this->from) * eased(t);
-    this->to    = value;
-    this->since = now;
+    this->from     = this->drawn(now);
+    this->to       = std::clamp(value, 0.0f, 1.0f);
+    this->since    = now;
+    this->duration = std::max(duration_us, 1.0f);
+    this->steady   = steady;
+}
+
+float LoadingBar::drawn(brls::Time now) const
+{
+    if (!this->since) return this->to;
+    const float t = std::min(1.0f, (float)(now - this->since) / this->duration);
+    return this->from + (this->to - this->from) * (this->steady ? t : eased(t));
 }
 
 void LoadingBar::draw(NVGcontext* vg, float x, float y, float width, float height,
@@ -47,8 +64,7 @@ void LoadingBar::draw(NVGcontext* vg, float x, float y, float width, float heigh
     nvgFillColor(vg, TRACK);
     nvgFill(vg);
 
-    const float t = this->since ? std::min(1.0f, (float)(brls::getCPUTimeUsec() - this->since) / EASE_US) : 1.0f;
-    const float value = this->from + (this->to - this->from) * eased(t);
+    const float value = this->drawn(brls::getCPUTimeUsec());
     if (value <= 0.0f) return;
     const float w = std::max(height, width * value);
     // Teal, lighter toward its end: the end that moves.

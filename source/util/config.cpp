@@ -196,6 +196,7 @@ void load()
     read_int(j, "export_format", c.export_format);
     read_int(j, "backup_keep", c.backup_keep);
     read_bool(j, "clock_check_at_start", c.clock_check_at_start);
+    read_bool(j, "intro", c.intro);
     read_string(j, "pin_lock", c.pin_lock);
     read_bool(j, "onboarding_at_start", c.onboarding_at_start);
     read_bool(j, "support_reminder", c.support_reminder);
@@ -262,6 +263,7 @@ bool snapshot(std::string& text)
     j["export_format"]   = s_config.export_format;
     j["backup_keep"]     = s_config.backup_keep;
     j["clock_check_at_start"] = s_config.clock_check_at_start;
+    j["intro"]           = s_config.intro;
     j["pin_lock"]        = s_config.pin_lock;
     j["onboarding_at_start"] = s_config.onboarding_at_start;
     j["support_reminder"] = s_config.support_reminder;

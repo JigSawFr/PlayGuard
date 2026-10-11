@@ -762,6 +762,7 @@
         "section_play_timer": "Temporizador de jogo",
         "section_startup": "Ao iniciar",
         "note": "As cópias de segurança, o relatório de diagnóstico e a consola estão em Ferramentas; as atualizações em Sobre.",
+        "intro": "Mostrar a introdução durante 2 segundos",
         "support_reminder": "Lembrar-me uma vez por mês de apoiar o PlayGuard"
     },
     "backup": {

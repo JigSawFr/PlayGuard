@@ -762,6 +762,7 @@
         "section_play_timer": "Speeltijdtimer",
         "section_startup": "Bij het opstarten",
         "note": "Back-ups, het diagnoserapport en de console staan onder Tools; updates onder Info.",
+        "intro": "De intro 2 seconden tonen",
         "support_reminder": "Herinner me één keer per maand om PlayGuard te steunen"
     },
     "backup": {
