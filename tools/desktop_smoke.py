@@ -35,7 +35,11 @@ outside PlayGuard, record it in the change history, then, after 90 s on
 screen, that the console is not counting; the notice must go when
 dismissed, and the Activity tab flag the new account.
 
-Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|library|outside]   (needs DISPLAY, xdotool, ImageMagick)
+The "loading" scenario stops the start-up on the loading screen
+(PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
+other scenario waits for the first screen after it.
+
+Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|library|outside|loading]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ) and the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) unless set.
@@ -58,6 +62,7 @@ LOCK = SCENARIO == "lock"
 DEVBUILD = SCENARIO == "devbuild"
 LIBRARY = SCENARIO == "library"
 OUTSIDE = SCENARIO == "outside"
+LOADING = SCENARIO == "loading"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
@@ -197,9 +202,11 @@ if OUTSIDE:
 if LOCK:
     # Security › Ask for the PIN › To open PlayGuard: the lock screen comes
     # first, and the right PIN (the simulated PIN screen accepts) opens the
-    # app. It is the first screen, which borealis never pops.
+    # app in its place.
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
     json.dump({"schema": 1, "pin_lock": "open"}, open(config_file, "w"))
+if LOADING:
+    env["PLAYGUARD_SIM_HOLD_LOADING"] = "1"
 log = open(os.path.join(OUT, "app.log"), "w")
 def have(tool):
     return subprocess.run(["which", tool], capture_output=True).returncode == 0
@@ -278,6 +285,24 @@ for _ in range(40):
 else:
     fail("the window stayed black for 20 s")
 os.remove(probe)
+
+
+def logged(text):
+    log.flush()
+    return any(text in l for l in open(os.path.join(OUT, "app.log"), errors="replace"))
+
+
+# What is drawn first is the loading screen: wait for the screen after it
+# (or, holding it, for its last step).
+started = "start-up: held on the loading screen" if LOADING else "start-up: first screen ready"
+for _ in range(60):
+    if logged(started):
+        break
+    if not alive():
+        fail("app exited during start-up")
+    time.sleep(0.5)
+else:
+    fail("no first screen after the loading screen in 30 s")
 time.sleep(2)
 
 tabs = ["dashboard", "play_timer", "activity", "restrictions", "clock", "security", "preferences", "tools", "about"]
@@ -532,6 +557,9 @@ if OUTSIDE:
     key("Down", steps("dashboard", "activity"))
     key("Right")
     shot("05_new_account")
+    finish()
+if LOADING:
+    shot("01_loading")         # the icon, the wordmark, the bar at its last step
     finish()
 if LOCK:
     shot("01_unlocked")        # the PIN screen answered at once: the Overview

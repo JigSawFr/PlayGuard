@@ -81,7 +81,7 @@ jobs:
           - shard: default
             scenarios: smoke
           - shard: states
-            scenarios: gate errors rescue forged lock
+            scenarios: gate errors rescue forged lock loading
           - shard: developer
             scenarios: devbuild library outside
     env:
