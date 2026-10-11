@@ -110,6 +110,8 @@ playstats_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/playstats -Isource/core
 playstats_LIBS  := -lz
 
 # C++: the UI-free helpers and flow logic (source/util, source/action).
+# borealis' headers (nlohmann/json) as system headers: their warnings are not
+# PlayGuard's (clang 22 deprecates json.hpp's literal operators, under -Werror).
 patches_SRC   := source/util/paths.cpp source/util/patches.cpp tests/patches/test.cpp
 patches_FLAGS := -std=c++17 -Isource
 duration_SRC   := source/util/duration.cpp tests/duration/test.cpp
@@ -141,31 +143,31 @@ worker_threads_LIBS  := -pthread
 error_hint_logic_SRC   := source/action/error_hint_logic.cpp tests/error_hint_logic/test.cpp
 error_hint_logic_FLAGS := -std=c++17 -Isource
 outside_change_logic_SRC   := source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp
-outside_change_logic_FLAGS := -std=c++17 -Isource -Iextern/borealis/library/include
+outside_change_logic_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 backup_SRC   := source/util/paths.cpp source/util/backup.cpp tests/backup/test.cpp
-backup_FLAGS := -std=c++17 -Isource -Iextern/borealis/library/include
+backup_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 backup_logic_SRC   := source/util/paths.cpp source/util/backup.cpp source/util/pt_block.cpp source/action/backup_logic.cpp tests/backup_logic/test.cpp
-backup_logic_FLAGS := -std=c++17 -Isource -Iextern/borealis/library/include
+backup_logic_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 http_logic_SRC   := source/util/http_logic.cpp tests/http_logic/test.cpp
 http_logic_FLAGS := -std=c++17 -Isource
 table_export_SRC   := source/util/paths.cpp source/util/table_export.cpp tests/table_export/test.cpp
-table_export_FLAGS := -std=c++17 -Isource -Iextern/borealis/library/include
+table_export_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 update_SRC   := source/util/update.cpp tests/update/test.cpp
-update_FLAGS := -std=c++17 -Isource -Iextern/borealis/library/include
+update_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 config_SRC   := source/util/paths.cpp source/util/config.cpp tests/config/test.cpp
-config_FLAGS := -std=c++17 -Isource -Iextern/borealis/library/include
+config_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 profiles_SRC   := source/util/paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
-profiles_FLAGS := -std=c++17 -Isource -Iextern/borealis/library/include
+profiles_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
-pt_block_FLAGS := -std=c++17 -Isource -Iextern/borealis/library/include
+pt_block_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
 launcher_FLAGS := -std=c++17 -Isource
 history_SRC   := source/util/paths.cpp source/util/history.cpp tests/history/test.cpp
-history_FLAGS := -std=c++17 -Isource -Iextern/borealis/library/include
+history_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 log_upload_SRC   := source/util/paths.cpp source/util/pt_log.cpp source/util/log_upload.cpp tests/log_upload/test.cpp
-log_upload_FLAGS := -std=c++17 -Isource -Iextern/borealis/library/include
+log_upload_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 dev_builds_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/github_auth.cpp tests/dev_builds/test.cpp
-dev_builds_FLAGS := -std=c++17 -Isource -Iextern/borealis/library/include
+dev_builds_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 dev_builds_LIBS  := -lz
 play_cache_SRC   := source/util/play_cache.cpp tests/play_cache/test.cpp
 play_cache_FLAGS := -std=c++17 -Isource
