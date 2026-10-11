@@ -770,6 +770,7 @@
         "section_play_timer": "游戏时间",
         "section_startup": "启动时",
         "note": "备份、诊断报告和主机信息位于“工具”中，更新位于“关于”中。",
+        "intro": "显示开场画面 2 秒",
         "support_reminder": "每月提醒一次支持 PlayGuard"
     },
     "backup": {

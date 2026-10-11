@@ -180,6 +180,7 @@ static void test_round_trip()
     c.extra_base = 120;
     c.extra_value = 150;
     c.extra_auto_restore = true;
+    c.intro = false;
     CHECK(config::save());
 
     std::string text;
@@ -189,6 +190,7 @@ static void test_round_trip()
     CHECK(c.language == "fr" && c.theme == "light" && c.ntp_server == "fr.pool.ntp.org");
     CHECK(c.custom_servers.size() == 1 && c.dev_mode && c.pt_log && c.relock_pending);
     CHECK(c.extra_weekday == 0 && c.extra_base == 120 && c.extra_value == 150 && c.extra_auto_restore);
+    CHECK(!c.intro);
 
     // Console lock: the flag and the seven saved limits round-trip.
     c = config::Config{};
@@ -234,7 +236,7 @@ static void test_preferences()
     CHECK(d.activity_period == 1 && d.export_format == 0 && d.backup_keep == 0);
     CHECK(d.logs_keep == 20 && d.logs_keep_days == 0 && d.logs_keep_mb == 0);
     CHECK(!d.update_daily && d.update_checked.empty() && !d.clock_check_at_start && d.pin_lock == "changes");
-    CHECK(d.onboarding_at_start);
+    CHECK(d.onboarding_at_start && d.intro);
     CHECK(d.support_reminder && d.support_reminded.empty() && d.seen_version.empty());
     write_config(R"({"support_reminder": false, "support_reminded": "2026-10-09", "seen_version": "1.1.0"})");
     config::load();
@@ -266,10 +268,11 @@ static void test_preferences()
     // Values from the lists are kept.
     write_config(R"({"start_tab": "activity", "extra_amounts": [30, 60, 90], "activity_period": 2,
                     "export_format": 3, "backup_keep": 10, "update_daily": true,
-                    "update_checked": "2026-10-07", "clock_check_at_start": true,
+                    "update_checked": "2026-10-07", "clock_check_at_start": true, "intro": false,
                     "logs_keep": 0, "logs_keep_days": 30, "logs_keep_mb": 5})");
     config::load();
     auto c = config::get();
+    CHECK(!c.intro);
     CHECK(c.logs_keep == 0 && c.logs_keep_days == 30 && c.logs_keep_mb == 5);
     CHECK(c.start_tab == "activity" && c.extra_amounts == std::vector<int>({ 30, 60, 90 }));
     CHECK(c.activity_period == 2 && c.export_format == 3 && c.backup_keep == 10);

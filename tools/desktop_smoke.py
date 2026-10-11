@@ -38,7 +38,8 @@ dismissed, and the Activity tab flag the new account.
 
 The "loading" scenario stops the start-up on the loading screen
 (PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
-other scenario waits for the first screen after it.
+other scenario waits for the first screen after it, at least 2 s later (the
+intro), but "lock", which turns the intro off in config.json.
 
 Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|library|outside|loading]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
@@ -48,6 +49,7 @@ the console time is fixed (PLAYGUARD_SIM_NOW, TZ) and the focus glow still
 import glob
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -221,9 +223,9 @@ if OUTSIDE:
 if LOCK:
     # Security › Ask for the PIN › To open PlayGuard: the lock screen comes
     # first, and the right PIN (the simulated PIN screen accepts) opens the
-    # app in its place.
+    # app in its place. And without the intro (Preferences): no 2 s hold.
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
-    json.dump({"schema": 1, "pin_lock": "open"}, open(config_file, "w"))
+    json.dump({"schema": 1, "pin_lock": "open", "intro": False}, open(config_file, "w"))
 if LOADING:
     env["PLAYGUARD_SIM_HOLD_LOADING"] = "1"
 log = open(os.path.join(OUT, "app.log"), "w")
@@ -323,6 +325,17 @@ for _ in range(60):
 else:
     fail("no first screen after the loading screen in 30 s")
 time.sleep(2)
+# The intro (Preferences, on by default): the loading screen stays 2 s.
+intro = logged("start-up: intro, 2000 ms at least")
+if LOCK and intro:
+    fail("the intro was shown with \"intro\": false in config.json")
+if not LOCK and not intro:
+    fail("no intro at start-up")
+if not LOADING and not LOCK:
+    ready = [l for l in open(os.path.join(OUT, "app.log"), errors="replace") if "start-up: first screen ready after" in l]
+    m = re.search(r"after (\d+) ms", ready[0]) if ready else None
+    if not m or int(m.group(1)) < 2000:
+        fail("the first screen came before the end of the intro: " + (ready[0].strip() if ready else "no line"))
 
 tabs = ["dashboard", "play_timer", "activity", "restrictions", "clock", "security", "preferences", "tools", "about"]
 

@@ -91,22 +91,27 @@ void send_to(const std::vector<log_upload::Part>& parts, log_upload::Host host)
 {
     const bool gist = host == log_upload::Host::Gist;
     bool cut = false;
-    const std::string text = log_upload::bundle(parts, log_upload::max_bytes(host), &cut);
-    // Too large (a long history): the start, with the report, is what matters.
+    // bpa.st: one text; a gist: a file each. Too large (a long history): the
+    // start, with the report, is what matters.
+    const std::string text = gist ? std::string() : log_upload::bundle(parts, log_upload::max_bytes(host), &cut);
+    const std::vector<log_upload::Part> files =
+        gist ? log_upload::gist_files(parts, log_upload::max_bytes(host), &cut) : std::vector<log_upload::Part>();
     std::string list;
     for (const auto& p : parts) list += "\n• " + p.name;
     if (cut) list += "\n" + "playguard/upload/partial"_i18n;
-    const int kb = (int)((text.size() + 1023) / 1024);
+    const size_t bytes = gist ? log_upload::total_bytes(files) : text.size();
+    const int kb = (int)((bytes + 1023) / 1024);
     const std::string where = gist ? "playguard/upload/where_gist"_i18n : std::string("bpa.st");
     const std::string body = brls::getStr("playguard/upload/confirm", where, kb) + "\n" + list + "\n\n" +
                              (gist ? "playguard/upload/confirm_gist"_i18n : "playguard/upload/confirm_public"_i18n);
     const std::string token = gist ? github_auth::token() : std::string();
-    ui::confirm(body, "playguard/upload/send"_i18n, [text, host, token]() {
+    ui::confirm(body, "playguard/upload/send"_i18n, [gist, text, files, token]() {
         ui::notify("playguard/upload/sending"_i18n);
         if (s_sending) return;
         s_sending = true;
-        ui::in_background("report upload", [text, host, token]() {
-            const log_upload::Result r = log_upload::upload(text, host, token, app::version());
+        ui::in_background("report upload", [gist, text, files, token]() {
+            const log_upload::Result r = gist ? log_upload::upload_gist(files, token, app::version())
+                                              : log_upload::upload_bpaste(text);
             brls::sync([r]() {
                 s_sending = false;
                 if (!r.ok) {

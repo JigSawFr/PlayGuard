@@ -1,6 +1,7 @@
 // Host tests for source/util/log_upload.cpp: which debug files and saved
-// reports are offered, the bundle and its cut on a whole UTF-8 character,
-// bpa.st and GitHub answers, the bodies sent, percent-encoding and the prefilled bug-report link.
+// reports are offered, the bundle and its cut on a whole UTF-8 character, a
+// gist's files, bpa.st and GitHub answers, the bodies sent, percent-encoding
+// and the prefilled bug-report link.
 #include "check.h"
 #include <cstdio>
 #include <cstdlib>
@@ -93,6 +94,54 @@ static void test_bundle()
     CHECK(tiny.size() <= 10 && cut);
 }
 
+static void test_gist_files()
+{
+    bool cut = true;
+    // One file each, numbered in order: the report (a name without an
+    // extension) as report.txt, the others by their last component.
+    const std::vector<log_upload::Part> parts{ { "diagnostic report", "report\n" },
+                                               { "logs/play_timer_block.json", "{}" },
+                                               { "logs/play_timer_log.csv", "" },
+                                               { "history.json", "[]" } };
+    const std::vector<log_upload::Part> f = log_upload::gist_files(parts, 1000, &cut);
+    CHECK(!cut);
+    REQUIRE(f.size() == 4);
+    CHECK(f[0].name == "1-report.txt" && f[0].content == "report\n");
+    CHECK(f[1].name == "2-play_timer_block.json" && f[1].content == "{}");
+    CHECK(f[2].name == "3-play_timer_log.csv" && f[2].content == "(empty)\n");   // GitHub refuses an empty file
+    CHECK(f[3].name == "4-history.json" && f[3].content == "[]");
+    CHECK(log_upload::total_bytes(f) == 7 + 2 + 8 + 2);
+    // A saved report keeps its own name; a translated label is still the report.
+    CHECK(log_upload::gist_files({ { "logs/20261009_141203.txt", "x" } }, 100, &cut)[0].name ==
+          "1-20261009_141203.txt");
+    CHECK(log_upload::gist_files({ { "rapport de diagnostic", "x" } }, 100, &cut)[0].name == "1-report.txt");
+    CHECK(log_upload::gist_files({}, 100, &cut).empty() && !cut);
+
+    // Too large: the part that does not fit is cut (with the notice), the
+    // ones after it left out, never more than the limit in all.
+    const std::string big(5000, 'x');
+    const std::vector<log_upload::Part> c =
+        log_upload::gist_files({ { "report", "abc" }, { "history.json", big }, { "config.json", "{}" } }, 200, &cut);
+    CHECK(cut);
+    REQUIRE(c.size() == 2);
+    CHECK(c[0].content == "abc");
+    CHECK(c[1].name == "2-history.json" && c[1].content.find("(cut: too large to send whole)") != std::string::npos);
+    CHECK(log_upload::total_bytes(c) <= 200);
+    // No room left for a cut part: left out.
+    const std::vector<log_upload::Part> d = log_upload::gist_files({ { "report", big }, { "config.json", "{}" } }, 5000, &cut);
+    CHECK(cut && d.size() == 1 && d[0].content == big);
+
+    // A cut never splits a character: "é" is two bytes.
+    std::string accents;
+    for (int i = 0; i < 200; i++) accents += "\xC3\xA9";
+    for (size_t limit = 60; limit < 120; limit++) {
+        const std::vector<log_upload::Part> e = log_upload::gist_files({ { "fr", accents } }, limit, &cut);
+        REQUIRE(cut && e.size() == 1);
+        CHECK(e[0].content.size() <= limit);
+        CHECK(e[0].content.find("\n\n(cut") % 2 == 0);
+    }
+}
+
 static void test_reply()
 {
     std::string url = "kept", removal = "kept";
@@ -147,10 +196,10 @@ static void test_bodies()
     log_upload::form("x --PlayGuardBoundary PlayGuardBoundary0", &type);
     CHECK(type == "multipart/form-data; boundary=PlayGuardBoundary1");
 
-    CHECK(log_upload::gist_body("a \"b\"\n\xC3\xA9", "1.2.0") ==
-           R"({"description":"PlayGuard 1.2.0 diagnostic report","files":{"playguard-report.txt":{"content":"a \"b\"\n)"
+    CHECK(log_upload::gist_body({ { "1-report.txt", "a \"b\"\n\xC3\xA9" }, { "2-config.json", "{}" } }, "1.2.0") ==
+           R"({"description":"PlayGuard 1.2.0 diagnostic report","files":{"1-report.txt":{"content":"a \"b\"\n)"
            "\xC3\xA9"
-           R"("}},"public":false})");
+           R"("},"2-config.json":{"content":"{}"}},"public":false})");
 
     CHECK(log_upload::max_bytes(log_upload::Host::Bpaste) == 128 * 1024);
     CHECK(log_upload::max_bytes(log_upload::Host::Gist) == 512 * 1024);
@@ -178,10 +227,11 @@ int main()
 
     test_files();
     test_bundle();
+    test_gist_files();
     test_reply();
     test_bodies();
     test_urls();
 
     std::system((std::string("rm -rf '") + dir + "'").c_str());
-    return CHECK_DONE("log upload files, bundle, bpa.st and gist answers and bodies, bug-report link assertions passed");
+    return CHECK_DONE("log upload files, bundle, gist files, bpa.st and gist answers and bodies, bug-report link assertions passed");
 }

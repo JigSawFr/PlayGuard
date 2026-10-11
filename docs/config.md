@@ -46,6 +46,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `auto_relock` | boolean | locks parental controls again right after a change that needed the temporary unlock | `true` | Preferences |
 | `onboarding_at_start` | boolean | *First steps* opens by itself at start-up while no PIN is set | `true` | First steps (*Show at start-up*) |
 | `clock_check_at_start` | boolean | measures the network clock at start-up and says when it is off | `false` | Preferences |
+| `intro` | boolean | the loading screen stays 2 seconds at start-up (Ⓐ or Ⓑ skips it); off, the first screen comes as soon as it is ready | `true` | Preferences (*Show the intro for 2 seconds*) |
 | `activity_period` | integer | Activity's period: `0` today, `1` last 7 days, `2` all time | `1` | Activity |
 | `export_format` | integer | the last export format: `0` CSV, `1` JSON, `2` XLSX, `3` PDF | `0` | Activity › Export |
 | `backup_keep` | integer | backups kept after a new one: `0` (all of them), `5`, `10`, `20` | `0` | Tools |
@@ -170,6 +171,7 @@ array element on its own line; the order does not matter when it reads them:
   "auto_relock": true,
   "onboarding_at_start": true,
   "clock_check_at_start": false,
+  "intro": true,
   "activity_period": 1,
   "export_format": 0,
   "backup_keep": 0,

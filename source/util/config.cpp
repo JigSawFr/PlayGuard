@@ -208,6 +208,7 @@ void load()
     read_int(j, "logs_keep_days", c.logs_keep_days);
     read_int(j, "logs_keep_mb", c.logs_keep_mb);
     read_bool(j, "clock_check_at_start", c.clock_check_at_start);
+    read_bool(j, "intro", c.intro);
     read_string(j, "pin_lock", c.pin_lock);
     read_bool(j, "onboarding_at_start", c.onboarding_at_start);
     read_bool(j, "support_reminder", c.support_reminder);
@@ -277,6 +278,7 @@ bool snapshot(std::string& text)
     j["logs_keep_days"]  = s_config.logs_keep_days;
     j["logs_keep_mb"]    = s_config.logs_keep_mb;
     j["clock_check_at_start"] = s_config.clock_check_at_start;
+    j["intro"]           = s_config.intro;
     j["pin_lock"]        = s_config.pin_lock;
     j["onboarding_at_start"] = s_config.onboarding_at_start;
     j["support_reminder"] = s_config.support_reminder;

@@ -109,6 +109,10 @@ PreferencesTab::PreferencesTab()
         config::get().support_reminder = on;
         ui::save_config();
     });
+    intro->init("playguard/prefs/intro"_i18n, config::get().intro, [](bool on) {
+        config::get().intro = on;
+        ui::save_config();
+    });
     clock_check->init("playguard/tools/clock_check"_i18n, config::get().clock_check_at_start, [](bool on) {
         config::get().clock_check_at_start = on;
         ui::save_config();
@@ -125,6 +129,7 @@ void PreferencesTab::refresh()
     extra_amounts->setDetailText(amounts_text(config::EXTRA_SETS[extra_set_index(cfg.extra_amounts)]));
     extra_auto->setOn(cfg.extra_auto_restore, false);
     advanced->setOn(cfg.advanced, false);
+    intro->setOn(cfg.intro, false);
     clock_check->setOn(cfg.clock_check_at_start, false);
     support_reminder->setOn(cfg.support_reminder, false);
     // Read-only: the play-timer preferences would change nothing; they stay

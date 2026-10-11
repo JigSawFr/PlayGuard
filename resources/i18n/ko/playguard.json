@@ -770,6 +770,7 @@
         "section_play_timer": "플레이 타이머",
         "section_startup": "시작할 때",
         "note": "백업, 진단 보고서, 본체 정보는 도구에, 업데이트는 정보에 있습니다.",
+        "intro": "인트로를 2초 동안 표시",
         "support_reminder": "한 달에 한 번 PlayGuard 후원 알림 표시"
     },
     "backup": {

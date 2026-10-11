@@ -34,6 +34,7 @@ struct Config
     int  logs_keep_days  = 0;
     int  logs_keep_mb    = 0;
     bool clock_check_at_start = false; // measure the network clock at start-up, say when it is off
+    bool intro = true;                 // the loading screen stays 2 s at start-up (activity/loading_activity.hpp)
     // Security › Ask for the PIN: "off", "changes" (before the first change,
     // then not for 5 min) or "open" (to open PlayGuard). See pin_lock.hpp.
     // "changes" by default, and when the value is missing or unknown: a
