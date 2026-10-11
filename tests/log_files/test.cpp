@@ -4,8 +4,8 @@
 // of the logs/ layout before its subfolders, and the move of the data folder
 // from sd:/switch/playguard to sd:/config/playguard (the .nro stays, a file
 // already there is not replaced, a folder already there is merged), the
-// system's key (sysMMC, each emuMMC by where it is) and the move of one
-// system's files into its folder.
+// system's key (sysMMC or emuMMC) and the move of one system's files into
+// its folder.
 #include "check.h"
 #include <cstdio>
 #include <cstdlib>
@@ -263,23 +263,9 @@ static void test_data_move()
 
 static void test_nand()
 {
-    using nand::Storage;
-    CHECK(nand::key(Storage::SysMMC, "[emummc]\nenabled=1\npath=emuMMC/SD00\n") == "sysmmc");
-    CHECK(nand::key(Storage::Unknown, "") == "unknown");
-    // hekate's file-based and partition-based emuMMCs: by their path.
-    CHECK(nand::key(Storage::EmuMMC, "[emummc]\nenabled=1\nsector=0x0\npath=emuMMC/SD00\nid=0x0000\n"
-                                     "nintendo_path=emuMMC/SD00/Nintendo\n") == "emummc-sd00");
-    CHECK(nand::key(Storage::EmuMMC, "[emummc]\r\nenabled=1\r\nsector=0x2\r\npath=emuMMC/RAW1\r\n") == "emummc-raw1");
-    CHECK(nand::key(Storage::EmuMMC, "[emummc]\npath=/emuMMC/SD 01/\n") == "emummc-sd_01");
-    CHECK(nand::key(Storage::EmuMMC, "[emummc]\npath=MyEmu\n") == "emummc-myemu");
-    // No path: the start sector.
-    CHECK(nand::key(Storage::EmuMMC, "[emummc]\nenabled=1\nsector=0x00080000\n") == "emummc-sector-80000");
-    CHECK(nand::key(Storage::EmuMMC, "[emummc]\nenabled=1\nsector=0x0\n") == "emummc");
-    CHECK(nand::key(Storage::EmuMMC, "") == "emummc");
-    CHECK(nand::key(Storage::EmuMMC, "[other]\npath=emuMMC/SD00\n") == "emummc");
-    // Never a separator or a dot in the folder name, and never too long.
-    CHECK(nand::emummc_where("[emummc]\npath=../../x\n") == "______x");
-    CHECK(nand::emummc_where("[emummc]\npath=" + std::string(80, 'a') + "\n").size() == 32);
+    CHECK(nand::key(nand::Storage::SysMMC) == "sysmmc");
+    CHECK(nand::key(nand::Storage::EmuMMC) == "emummc");
+    CHECK(nand::key(nand::Storage::Unknown) == "unknown");
 }
 
 static void test_to_nand()
@@ -308,8 +294,8 @@ static void test_to_nand()
     CHECK(there("config/playguard/cache/dev_builds.json") && there("config/playguard/cache/icons/0100.jpg"));
     CHECK(!there("config/playguard/history.json") && !there("config/playguard/backups"));
     // The next system finds nothing left to take.
-    CHECK(data_move::to_nand(data, data + "/nand/emummc-sd00") == 0);
-    CHECK(!there("config/playguard/nand/emummc-sd00"));
+    CHECK(data_move::to_nand(data, data + "/nand/emummc") == 0);
+    CHECK(!there("config/playguard/nand/emummc"));
     remove_root();
 }
 

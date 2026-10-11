@@ -121,10 +121,9 @@ Written by PlayGuard to finish what it started. Better left alone: a wrong
 value here can make PlayGuard put back a limit nobody asked for.
 
 These keys are in `state.json`, one per system: `nand/sysmmc/` for the
-sysMMC, `nand/emummc-<where>/` for an emuMMC, named after the `path` of
-`sd:/emuMMC/emummc.ini` (`emummc-sd00` for `emuMMC/SD00`), or its `sector`
-when it has no path (`emummc-sector-80000`); `nand/unknown/` when the system
-could not be told (`source/util/nand.hpp`). Each system has its own parental
+sysMMC, `nand/emummc/` for the emuMMC (every emuMMC of the SD card shares
+it), `nand/unknown/` when the system could not be told
+(`source/util/nand.hpp`). Each system has its own parental
 controls: the console lock turned on on the sysMMC must not put its limits
 back on an emuMMC. `state.json` is read like `config.json` (a damaged one is
 kept as `state.json.bad`, with the same notice); when a system has none yet,

@@ -411,7 +411,7 @@ static void test_systems()
     CHECK(paths::state_file() == paths::data_dir() + "/nand/sysmmc/state.json");
 
     // Another system: the shared preferences, none of the first one's state.
-    paths::set_nand("emummc-sd00");
+    paths::set_nand("emummc");
     config::load();
     CHECK(config::get().theme == "dark" && !config::get().console_lock && !config::get().relock_pending);
     CHECK(config::get().console_lock_prev.empty());

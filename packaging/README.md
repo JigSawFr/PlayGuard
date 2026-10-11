@@ -25,8 +25,7 @@ config/playguard/logs/play_timer/block.json       Developer tools › play-timer
 config/playguard/config.json.bad         a config.json that could not be read, kept aside rather than overwritten (.bad.1: the
                                          previous one); history.json.bad and state.json.bad the same
 config/playguard/cache/                  the game icons (icons/, 16 MB at most), the development build list (dev_builds.json)
-config/playguard/nand/<system>/          what belongs to one system (util/nand.hpp): sysmmc/, or emummc-<path in
-                                         emuMMC/emummc.ini>/ for each emuMMC (emummc-sd00)
+config/playguard/nand/<system>/          what belongs to one system (util/nand.hpp): sysmmc/ or emummc/
 config/playguard/nand/<system>/state.json     the console lock, the extra time, a pending relock, the firmware choice
 config/playguard/nand/<system>/history.json   the change history (the newest 200 changes)
 config/playguard/nand/<system>/watch.json     what PlayGuard last saw of the console (today's play time, the clock, the
