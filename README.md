@@ -9,6 +9,11 @@
 
 **English** · [Français](README.fr.md)
 
+> [!IMPORTANT]
+> **Work in progress: no release yet.** PlayGuard is being finished for its first release, 1.0.0. Until it is out, the install channels below do not exist yet (no store listing, no release zip) and what this page describes can still change. To try it now, build it from source ([CONTRIBUTING.md](CONTRIBUTING.md)) or download the `playguard_release` artifact of a [build run](https://github.com/JigSawFr/PlayGuard/actions/workflows/build.yml) (a GitHub account is needed).
+
+<!-- Remove this notice once v1.0.0 is published (see CONTRIBUTING.md, Pull requests and releases). -->
+
 **Nintendo Switch parental controls, right on the console — no phone app, no Nintendo account, no internet.**
 
 PlayGuard is a homebrew app that brings the settings of the [Nintendo Switch Parental Controls](https://apps.apple.com/app/id1190074407) phone app onto the console itself, for offline use: daily play-time limits, restrictions, PIN, network clock, play activity — and a way back in when you are locked out. What it covers of the phone app, and what is still missing: [docs/companion-app.md](docs/companion-app.md).
