@@ -71,20 +71,6 @@ std::string trimmed(const std::string& s)
 }
 }   // namespace
 
-std::string bundle(const std::vector<Part>& parts, size_t max_bytes, bool* truncated)
-{
-    std::string out;
-    for (const Part& p : parts) {
-        if (!out.empty()) out += "\n";
-        out += "===== " + p.name + " =====\n" + p.content;
-        if (!p.content.empty() && p.content.back() != '\n') out += "\n";
-    }
-    if (truncated) *truncated = false;
-    if (out.size() <= max_bytes) return out;
-    if (truncated) *truncated = true;
-    return cut_to(out, max_bytes);
-}
-
 namespace
 {
 // The process of an Atmosphère crash report: its "Process Name:" line
@@ -175,36 +161,7 @@ bool link_with_id(const std::string& text, const std::string& prefix, bool (*ok)
            std::all_of(id.begin(), id.end(), [ok](char c) { return ok((unsigned char)c); });
 }
 
-bool alnum(unsigned char c)
-{
-    return std::isalnum(c) != 0;
-}
-
-// The value after "<label>:" on its own line of `body`, trimmed.
-std::string field(const std::string& body, const std::string& label)
-{
-    size_t at = 0;
-    while (at < body.size()) {
-        size_t end = body.find('\n', at);
-        if (end == std::string::npos) end = body.size();
-        const std::string line = body.substr(at, end - at);
-        if (line.compare(0, label.size() + 1, label + ":") == 0) return trimmed(line.substr(label.size() + 1));
-        at = end + 1;
-    }
-    return "";
-}
 }   // namespace
-
-bool parse_bpaste(const std::string& body, std::string* url, std::string* removal)
-{
-    const std::string link = field(body, "Paste URL");
-    const std::string remove = field(body, "Removal URL");
-    if (!link_with_id(link, "https://bpa.st/", alnum) || !link_with_id(remove, "https://bpa.st/remove/", alnum))
-        return false;
-    *url = link;
-    *removal = remove;
-    return true;
-}
 
 bool parse_gist(const std::string& body, std::string* url)
 {
@@ -254,21 +211,6 @@ std::string issue_url(const std::string& repo_url, const std::string& paste_url,
     add("launcher", fields.launcher);
     add("storage", fields.storage);
     return url;
-}
-
-std::string form(const std::string& text, std::string* content_type)
-{
-    std::string boundary = "PlayGuardBoundary";
-    for (int n = 0; text.find(boundary) != std::string::npos; n++) boundary = "PlayGuardBoundary" + std::to_string(n);
-    *content_type = "multipart/form-data; boundary=" + boundary;
-    std::string out;
-    auto add = [&](const char* name, const std::string& value) {
-        out += "--" + boundary + "\r\nContent-Disposition: form-data; name=\"" + name + "\"\r\n\r\n" + value + "\r\n";
-    };
-    add("raw", text);
-    add("lexer", "text");   // shown as plain text, never highlighted as code
-    add("expiry", BPASTE_EXPIRY);
-    return out + "--" + boundary + "--\r\n";
 }
 
 std::string gist_body(const std::vector<Part>& files, const std::string& version)

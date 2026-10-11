@@ -3,8 +3,8 @@
 //   logs/reports/report_20261011_142530.txt   saved diagnostic reports
 //   logs/crashes/crash_20261011_142530.txt     one file per crash (main.cpp)
 //   logs/uploads/upload_20261011_142530.url    one per report sent online: an
-//                                              Internet shortcut to its link (and
-//                                              bpa.st's removal link: shortcut())
+//                                              Internet shortcut to its gist
+//                                              (shortcut())
 //   logs/play_timer/log.csv, log.old.csv       Developer › record the play timer
 //   logs/play_timer/block.json                 Developer › play-timer block reference
 //
@@ -39,8 +39,8 @@ std::string name(const char* prefix, const std::string& stamp, unsigned n = 0);
 
 // An upload's file: an Internet shortcut to `url`, which a computer opens in
 // its browser (Windows, macOS, most Linux file managers), with when it was
-// sent ("2026-10-11 14:25") and bpa.st's removal link, when there is one, in a
-// section of its own. CRLF line ends, as Windows writes them.
+// sent ("2026-10-11 14:25") and a removal link, when there is one (a bpa.st
+// paste sent by an earlier version), in a section of its own. CRLF line ends, as Windows writes them.
 std::string shortcut(const std::string& url, const std::string& removal, const std::string& sent);
 
 // `t` as a name's stamp, in local time ("19700101_000000" when it cannot be

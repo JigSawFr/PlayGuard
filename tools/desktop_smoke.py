@@ -168,10 +168,10 @@ if DEVBUILD:
     open(installed_nro, "wb").write(b"the build before")
 if not GATE and not ERRORS and not DEVBUILD:
     env.setdefault("PLAYGUARD_SIM_NUMPAD", "1:30")   # what the system number pad returns
-    env.setdefault("PLAYGUARD_SIM_PASTE", "https://bpa.st/SMOKE")   # what bpa.st (or GitHub) answers
+    env.setdefault("PLAYGUARD_SIM_PASTE", "https://gist.github.com/smoke/ab12")   # what GitHub answers
     github_token = os.path.join(run_dir, "playguard_data", "github_token")
     if os.path.exists(github_token):
-        os.remove(github_token)   # signed out: the first report goes to bpa.st
+        os.remove(github_token)   # signed out: Send a report online offers to sign in first
 if ERRORS:
     env.setdefault("PLAYGUARD_SIM_FAIL", "unlock")
     env.setdefault("PLAYGUARD_SIM_RESTRICTED", "1")
@@ -812,7 +812,7 @@ shot("26_backup_restore")
 key("Escape")
 shot("27_back")
 
-# Send a report online: the confirmation, then the link and its QR codes.
+# Send a report online: signing in to GitHub first, the confirmation, then the link and its QR codes.
 uploads = os.path.join(run_dir, "playguard_data", "logs", "uploads")
 def upload_count():
     # One file per link (logs/uploads/upload_<date>.url, an Internet shortcut); a run pruned by the
@@ -830,25 +830,20 @@ key("Down", 3)             # past Keep, Export: Send a report online
 key("Return")
 if saved:                  # reports saved by an earlier local run: this report is the first choice
     key("Return")
+shot("27_upload_sign_in")  # signed out of GitHub: signing in comes first
+key("Escape")              # not now
+if upload_count() != uploads_before:
+    fail("a report was sent while signed out of GitHub")
+# Signed in: what goes to the secret gist, then its link and QR codes.
+open(github_token, "w").write("ghu_smoke")
+key("Return")              # Send a report online (still focused)
+if saved_reports():
+    key("Return")          # this report, the first choice
 shot("27_upload_confirm")
 key("Right")               # Send
 key("Return")
 shot("27_upload_link")
 if upload_count() != uploads_before + 1:
-    fail("the report link was not recorded in " + uploads)
-key("Return")              # OK
-# Signed in to GitHub: where to send it comes first, a secret gist by default.
-open(github_token, "w").write("ghu_smoke")
-key("Return")              # Send a report online (still focused)
-if saved_reports():
-    key("Return")          # this report, the first choice
-shot("27_upload_host")
-key("Return")              # Secret gist on GitHub
-shot("27_upload_gist_confirm")
-key("Right")               # Send
-key("Return")
-shot("27_upload_gist_link")
-if upload_count() != uploads_before + 2:
     fail("the gist link was not recorded in " + uploads)
 key("Return")              # OK
 os.remove(github_token)

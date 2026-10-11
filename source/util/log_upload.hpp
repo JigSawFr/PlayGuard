@@ -1,11 +1,11 @@
-// log_upload — sends a diagnostic report, with the developer tools' debug
-// files, online and gives back a short link, so a report reaches whoever
-// helps (a bug report, a chat) without taking the SD card out. The link also
-// prefills the bug-report form of the repository. Two places:
-// - bpa.st, a public pastebin (pinnwand) that deletes it after one month;
-// - a secret gist in the parent's GitHub account, when PlayGuard is signed in
-//   to GitHub (github_auth.hpp): it stays until deleted on GitHub.
-// (dpaste.org, used before, sits behind Cloudflare, which refuses the Switch.)
+// log_upload — sends a diagnostic report, with the latest crash reports and
+// the developer tools' debug files, to a secret gist in the parent's GitHub
+// account (PlayGuard signed in to GitHub: github_auth.hpp) and gives back its
+// link, so a report reaches whoever helps (a bug report, a chat) without
+// taking the SD card out. The link also prefills the bug-report form of the
+// repository. The gist stays until deleted on GitHub.
+// (bpa.st, used before, moved to certificates the console's TLS refuses;
+// dpaste.org sits behind Cloudflare, which refuses the Switch.)
 //
 // What is sent is only what the parent picked, after a confirmation that
 // says where it goes: the diagnostic report never holds the PIN or the
@@ -25,24 +25,9 @@
 namespace log_upload
 {
 
-enum class Host
-{
-    Bpaste,   // bpa.st
-    Gist,     // a secret gist, with the GitHub token
-};
-
-// The most each place takes. bpa.st checks its page against 256 KiB: the
-// text as HTML with line numbers, about 1.5 times longer. A report is about
-// 30 KiB; the change history is what grows.
-constexpr size_t BPASTE_MAX_BYTES = 128 * 1024;
+// The most a gist takes from PlayGuard. A report is about 30 KiB; the change
+// history is what grows.
 constexpr size_t GIST_MAX_BYTES = 512 * 1024;
-inline size_t max_bytes(Host host)
-{
-    return host == Host::Gist ? GIST_MAX_BYTES : BPASTE_MAX_BYTES;
-}
-
-// How long bpa.st keeps a paste (one of the durations it accepts).
-constexpr const char* BPASTE_EXPIRY = "1month";
 
 struct Part
 {
@@ -78,11 +63,6 @@ std::vector<Part> atmosphere_crashes(std::time_t now, int days = 7, size_t limit
 // util/log_files.hpp), newest first, at most `limit`.
 std::vector<std::string> saved_reports(size_t limit = 10);
 
-// The parts one after the other, each under a "===== name =====" line (for
-// bpa.st, one text). Cut on a whole UTF-8 character to at most `max_bytes`
-// (a closing notice included), and *truncated set, when they do not fit.
-std::string bundle(const std::vector<Part>& parts, size_t max_bytes, bool* truncated = nullptr);
-
 // The parts as the files of a gist, one each, numbered in their order (GitHub
 // lists a gist's files by name): "1-report.txt" for a part named without an
 // extension (the report), else the number and its path under logs/ with "_"
@@ -94,11 +74,6 @@ std::vector<Part> gist_files(const std::vector<Part>& parts, size_t max_bytes, b
 
 // The bytes of the files' content, together.
 size_t total_bytes(const std::vector<Part>& files);
-
-// bpa.st's answer (its /curl endpoint):
-//   "Paste URL:   https://bpa.st/ABCD\nRaw URL: …\nRemoval URL: https://bpa.st/remove/EFGH\n".
-// True, and *url and *removal set, only for such links.
-bool parse_bpaste(const std::string& body, std::string* url, std::string* removal);
 
 // GitHub's answer to a new gist: true, and *url set, when its html_url is a
 // gist.github.com link.
@@ -123,31 +98,23 @@ struct IssueFields
 // from the link, so the form asks these in text fields, not lists.
 std::string issue_url(const std::string& repo_url, const std::string& paste_url, const IssueFields& fields);
 
-// The form body sent to bpa.st (multipart/form-data, the text as is): the
-// text, plain text, the expiry. *content_type gets the type with its
-// boundary, one the text does not hold.
-std::string form(const std::string& text, std::string* content_type);
-
 // The JSON body of a new secret gist holding `files` (gist_files()).
 std::string gist_body(const std::vector<Part>& files, const std::string& version);
 
-// "https://bpa.st/ABCD" -> "bpa.st/ABCD": what to type by hand.
+// "https://gist.github.com/u/abc" -> "gist.github.com/u/abc": what to type by hand.
 std::string short_url(const std::string& url);
 
 struct Result
 {
     bool        ok = false;
     std::string url;
-    std::string removal;           // bpa.st: the link that deletes the paste
     std::string error;             // why it failed, in English
     bool        relogin = false;   // GitHub refused the token: sign in again (the gist permission)
 };
 
-// Sends `text` to bpa.st, or `files` (gist_files()) to a secret gist with
-// `token`. Blocking (network): run them in the background. On the desktop
-// build PLAYGUARD_SIM_PASTE ("offline", or the link to answer) replaces the
-// network.
-Result upload_bpaste(const std::string& text);
+// Sends `files` (gist_files()) to a secret gist with `token`. Blocking
+// (network): run it in the background. On the desktop build
+// PLAYGUARD_SIM_PASTE ("offline", or the link to answer) replaces the network.
 Result upload_gist(const std::vector<Part>& files, const std::string& token, const std::string& version);
 
 }   // namespace log_upload
