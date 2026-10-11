@@ -200,6 +200,7 @@ session_log_CSRC  := source/util/crash_dump.c
 session_log_CFLAGS := -std=c11 -Isource/util
 crash_dump_SRC   := source/util/crash_dump.c tests/crash_dump/test.c
 crash_dump_FLAGS := -std=c11 -Isource/util
+frame_stats_SRC   := source/util/paths.cpp source/util/frame_stats.cpp tests/frame_stats/test.cpp
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
 
 TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))

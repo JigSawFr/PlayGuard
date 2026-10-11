@@ -16,6 +16,7 @@
 #include "action/log_prune_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/pt_flow.hpp"
+#include "action/frame_stats_flow.hpp"
 #include "action/pt_log_flow.hpp"
 #include "action/rescue.hpp"
 #include "action/rollback_flow.hpp"
@@ -55,15 +56,16 @@
 #include "view/loading_bar.hpp"
 #include "view/loading_mark.hpp"
 
-#ifndef __SWITCH__
-// Desktop measurement (tools/perf_frames.sh): nanovg's per-frame counters,
-// through the getter tools/perf_nanovg_stats.patch adds to the borealis tree.
-// Weak: without the patch, the frame time alone is recorded.
+// nanovg's per-frame counters, through the getter
+// tools/perf_nanovg_stats.patch adds to the borealis tree. Weak: without the
+// patch, the frame time alone is recorded.
 extern "C" void nvgDebugGetStats(NVGcontext*, int*, int*, int*, int*) __attribute__((weak));
-#endif
 #include "view/cadran_digits.hpp"
 #include "view/cadran_icon.hpp"
 #include "view/cadran_week.hpp"
+#include "util/startup.h"
+#include "view/loading_bar.hpp"
+#include "view/loading_mark.hpp"
 #include "view/made_in_france.hpp"
 #include "view/footer_hints.hpp"
 #include "view/header_settings.hpp"
@@ -220,6 +222,7 @@ void show_first(brls::Activity* first)
 {
     brls::Application::pushActivity(first, brls::TransitionAnimation::NONE);
     pt_log_flow::apply();   // Help & diagnostics › Developer › Record the play timer, when on (after fw_gate::prepare)
+    frame_stats_flow::apply();  // Help & diagnostics › Developer › Frame statistics, when on
     log_prune_flow::run();  // the reports and crashes past the limits of About › Help & diagnostics
     startup_mark(StartupStep_FirstScreen);
     rollback_flow::started();   // this build starts: nothing to go back from
@@ -392,6 +395,7 @@ void shut_down()
     http::abort_all();
     ui::finish_background(std::chrono::seconds(3));
     pt_log_flow::stop();
+    frame_stats_flow::stop();
     app::shutdown();
     http::cleanup();
     brls::Logger::info("quit: after {} s", session_log::uptime_s());
@@ -449,10 +453,9 @@ int main(int argc, char* argv[])
 
     // PlayGuard status colours (light / dark variants), before any view exists.
     ui::register_theme_colors();
-#ifndef __SWITCH__
-    // The "Cadran" prototype's navy theme (desktop measurement).
-    if (std::getenv("PLAYGUARD_SIM_CADRAN")) cadran::install_theme();
-#endif
+    // The "Cadran" prototype's navy theme (PLAYGUARD_SIM_CADRAN=1 on the
+    // desktop, Tools › Developer › Cadran prototype on the console).
+    if (cadran::enabled()) cadran::install_theme();
 
     // We own the quit path (B on the sidebar / error screen).
     brls::Application::setGlobalQuit(false);
@@ -494,6 +497,7 @@ int main(int argc, char* argv[])
         // The lines the session file waits for, written off the UI thread
         // once they waited long enough (util/session_log.hpp).
         if (session_log::due()) ui::write_later("session log", []() { session_log::flush(); }, "session_log");
+        frame_stats_flow::sample();   // Developer › Frame statistics, when on
 #ifndef __SWITCH__
         if (!stats) continue;
         int draws = 0, fill = 0, stroke = 0, text = 0;
