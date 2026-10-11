@@ -44,13 +44,22 @@ static void test_own_thread()
     std::atomic<int> runs{ 0 };
     std::mutex lock;
     std::set<std::thread::id> ids;
+    // The tasks stay at the gate until all three started: start() joins a
+    // finished thread before the next one, and a joined thread's id can be
+    // given to the next (glibc reuses it), so three tasks that end one after
+    // the other could show fewer than three ids.
+    Gate gate;
     for (int i = 0; i < 3; i++) {
         CHECK(w.start([&]() {
             runs++;
-            std::lock_guard<std::mutex> l(lock);
-            ids.insert(std::this_thread::get_id());
+            {
+                std::lock_guard<std::mutex> l(lock);
+                ids.insert(std::this_thread::get_id());
+            }
+            gate.wait();
         }));
     }
+    gate.release();
     CHECK(w.wait_all(5s));
     CHECK(runs == 3);
     CHECK(w.running() == 0);
