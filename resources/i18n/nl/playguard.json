@@ -512,7 +512,17 @@
         "guided_body": "De netwerkklok is onnauwkeurig, en de speeltijdtimer is ervan afhankelijk.\n\nNu de tijd meten met {}? (De console moet online zijn.) Daarna krijg je eerst nog de vraag of de klok mag worden ingesteld.",
         "guided_measure": "Nu meten",
         "guided_fine": "De netwerkklok is nauwkeurig: niets te doen.",
-        "confirm_apply_resets": "\n\nDe klok wijzigen zet de speeltijd van vandaag terug op nul: de hele daglimiet is weer beschikbaar."
+        "confirm_apply_resets": "\n\nDe klok wijzigen zet de speeltijd van vandaag terug op nul: de hele daglimiet is weer beschikbaar.",
+        "copy": "Netwerkklok instellen op de consoleklok",
+        "offline_hint": "Zonder internet kan de netwerkklok in plaats daarvan op de consoleklok worden ingesteld (\"Consoleklok\", bovenaan). Controleer eerst of die klopt: PlayGuard heeft niets anders om mee te vergelijken.",
+        "offline_guided": "Zonder internet kan PlayGuard de netwerkklok in plaats daarvan op de consoleklok instellen: nu {}. Doe dit alleen als die tijd klopt (vergelijk hem met een telefoon of een horloge).",
+        "guided_copy": "Consoleklok gebruiken",
+        "confirm_copy": "De netwerkklok instellen op de consoleklok, {} ({})?",
+        "confirm_copy_check": "\n\nGeen enkele tijdserver heeft geantwoord, dus de consoleklok is de enige bron: doe dit alleen als hij klopt. Vergelijk hem eerst met een telefoon of een horloge.",
+        "confirm_copy_follows": "\n\n\"Klok synchroniseren via internet\" staat aan, dus de consoleklok volgt de netwerkklok en kan net zo fout zijn. Zo ja: zet de instelling uit, stel datum en tijd in bij Systeeminstellingen › Systeem › Datum en tijd en kom dan hier terug.",
+        "confirm_copy_sync_after": "\n\n\"Klok synchroniseren via internet\" staat uit: de consoleklok blijft zoals hij is. Als je de instelling daarna aanzet, verspringt hij niet meer, omdat beide klokken dan dezelfde tijd tonen.",
+        "copied_sync_on": "\n\nJe kunt nu \"Klok synchroniseren via internet\" aanzetten (Systeeminstellingen › Systeem › Datum en tijd): de consoleklok verspringt niet.",
+        "copy_implausible": "De consoleklok geeft {} aan: hij lijkt niet ingesteld. Stel eerst datum en tijd in bij Systeeminstellingen › Systeem › Datum en tijd (met \"Klok synchroniseren via internet\" uit) en kom dan hier terug."
     },
     "pairing": {
         "section": "App Nintendo Switch Ouderlijk toezicht",

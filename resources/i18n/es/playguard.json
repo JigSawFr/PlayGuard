@@ -512,7 +512,17 @@
         "guided_body": "El reloj de red es impreciso, y el temporizador de juego depende de él.\n\n¿Medir la hora con {} ahora? (La consola debe estar conectada a Internet.) Después se le pedirá confirmación antes de ajustar el reloj.",
         "guided_measure": "Medir ahora",
         "guided_fine": "El reloj de red es preciso: no hay nada que hacer.",
-        "confirm_apply_resets": "\n\nCambiar el reloj pone a cero el tiempo de juego de hoy: vuelve a estar disponible todo el límite diario."
+        "confirm_apply_resets": "\n\nCambiar el reloj pone a cero el tiempo de juego de hoy: vuelve a estar disponible todo el límite diario.",
+        "copy": "Ajustar el reloj de red al reloj de la consola",
+        "offline_hint": "Sin Internet, se puede ajustar el reloj de red al reloj de la consola («Reloj de la consola», arriba). Compruebe antes que es correcto: PlayGuard no tiene con qué compararlo.",
+        "offline_guided": "Sin Internet, PlayGuard puede ajustar el reloj de red al reloj de la consola: ahora, {}. Hágalo solo si esa hora es correcta (compárela con un móvil o un reloj).",
+        "guided_copy": "Usar el reloj de la consola",
+        "confirm_copy": "¿Ajustar el reloj de red al reloj de la consola, {} ({})?",
+        "confirm_copy_check": "\n\nNingún servidor de hora ha respondido, así que el reloj de la consola es la única referencia: hágalo solo si es correcto. Compárelo antes con un móvil o un reloj.",
+        "confirm_copy_follows": "\n\n«Sincronizar el reloj por Internet» está activado: el reloj de la consola sigue al reloj de red y puede estar igual de mal. En ese caso, desactive la opción, ajuste la fecha y la hora en Configuración de la consola › Consola › Fecha y hora y vuelva aquí.",
+        "confirm_copy_sync_after": "\n\n«Sincronizar el reloj por Internet» está desactivado: el reloj de la consola se queda como está. Si lo activa después, ya no saltará, porque los dos relojes marcarán la misma hora.",
+        "copied_sync_on": "\n\nYa puede activar «Sincronizar el reloj por Internet» (Configuración de la consola › Consola › Fecha y hora): el reloj de la consola no saltará.",
+        "copy_implausible": "El reloj de la consola marca {}: no parece ajustado. Ajuste primero la fecha y la hora en Configuración de la consola › Consola › Fecha y hora (con «Sincronizar el reloj por Internet» desactivado) y vuelva aquí."
     },
     "pairing": {
         "section": "App Control parental de Nintendo Switch",

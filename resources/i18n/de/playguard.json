@@ -512,7 +512,17 @@
         "guided_body": "Die Netzwerkuhr ist ungenau, und die Spielzeitbegrenzung verlässt sich darauf.\n\nJetzt die Zeit mit {} messen? (Die Konsole muss online sein.) Bevor die Uhr gestellt wird, werden Sie gefragt.",
         "guided_measure": "Jetzt messen",
         "guided_fine": "Die Netzwerkuhr ist genau: nichts zu tun.",
-        "confirm_apply_resets": "\n\nDas Ändern der Uhrzeit setzt die heutige Spielzeit zurück: Das ganze Tageslimit steht wieder zur Verfügung."
+        "confirm_apply_resets": "\n\nDas Ändern der Uhrzeit setzt die heutige Spielzeit zurück: Das ganze Tageslimit steht wieder zur Verfügung.",
+        "copy": "Netzwerkuhr auf die Konsolenuhr stellen",
+        "offline_hint": "Ohne Internet kann die Netzwerkuhr stattdessen auf die Konsolenuhr gestellt werden („Konsolenuhr“ ganz oben). Prüfen Sie zuerst, ob sie richtig geht: PlayGuard hat nichts anderes zum Vergleich.",
+        "offline_guided": "Ohne Internet kann PlayGuard die Netzwerkuhr stattdessen auf die Konsolenuhr stellen: jetzt {}. Tun Sie das nur, wenn diese Uhrzeit stimmt (vergleichen Sie sie mit einem Handy oder einer Uhr).",
+        "guided_copy": "Konsolenuhr verwenden",
+        "confirm_copy": "Netzwerkuhr auf die Konsolenuhr stellen, {} ({})?",
+        "confirm_copy_check": "\n\nKein Zeitserver hat geantwortet, die Konsolenuhr ist also die einzige Quelle: Tun Sie das nur, wenn sie richtig geht. Vergleichen Sie sie vorher mit einem Handy oder einer Uhr.",
+        "confirm_copy_follows": "\n\n„Uhr mithilfe des Internets synchronisieren“ ist aktiviert: Die Konsolenuhr folgt der Netzwerkuhr und kann genauso falsch gehen. Wenn ja: Deaktivieren Sie die Einstellung, stellen Sie Datum und Uhrzeit unter Systemeinstellungen › Konsole › Datum und Uhrzeit ein und kommen Sie dann hierher zurück.",
+        "confirm_copy_sync_after": "\n\n„Uhr mithilfe des Internets synchronisieren“ ist deaktiviert: Die Konsolenuhr bleibt, wie sie ist. Wenn Sie die Einstellung danach aktivieren, springt sie nicht mehr, da beide Uhren dann dieselbe Zeit zeigen.",
+        "copied_sync_on": "\n\nSie können jetzt „Uhr mithilfe des Internets synchronisieren“ aktivieren (Systemeinstellungen › Konsole › Datum und Uhrzeit): Die Konsolenuhr springt dabei nicht.",
+        "copy_implausible": "Die Konsolenuhr zeigt {}: Sie scheint nicht gestellt zu sein. Stellen Sie zuerst Datum und Uhrzeit unter Systemeinstellungen › Konsole › Datum und Uhrzeit ein (mit deaktiviertem „Uhr mithilfe des Internets synchronisieren“) und kommen Sie dann hierher zurück."
     },
     "pairing": {
         "section": "App für die Nintendo Switch-Altersbeschränkungen",

@@ -19,6 +19,10 @@
 //   PLAYGUARD_SIM_NOT_COUNTING=1 the time left does not go down (a clock set back):
 //                               the Overview says so after 90 s on screen
 //   PLAYGUARD_SIM_AUTOSYNC_OFF=1 "Synchronise clock via Internet" is off
+//   PLAYGUARD_SIM_NETWORK_OFFSET=1411  the network clock is that many seconds
+//                               ahead of the console clock until it is set
+//                               (the console clock follows it while
+//                               "Synchronise" is on)
 //   PLAYGUARD_SIM_NOW=1791471600  the console's time, frozen (POSIX seconds):
 //                               the same screens at every run (visual check)
 //   PLAYGUARD_SIM_IDLE=1        no game running: the timer reports no time left
@@ -58,7 +62,9 @@ static struct {
     u32  rating_org;
     PctlCustomSettings custom;
     u16  block[PT_U16_COUNT];   // PlayTimerSettings, as 145601 returns it
-    s64  clock_offset;
+    s64  clock_offset;     // the console clock against base_now()
+    s64  network_offset;   // the network clock against the console clock, until set
+    bool network_set;      // PlayGuard set the network clock
 } S;
 
 // Minutes played today in the made-up activity log below (45 + 20 + 15): the
@@ -116,6 +122,8 @@ static void sim_init(void)
     S.limit_reached = getenv("PLAYGUARD_SIM_RESTRICTED") != NULL;
     S.autosync_off = getenv("PLAYGUARD_SIM_AUTOSYNC_OFF") != NULL;
     S.alarm_disabled = getenv("PLAYGUARD_SIM_ALARM_OFF") != NULL;
+    const char *net = getenv("PLAYGUARD_SIM_NETWORK_OFFSET");
+    if (net) S.network_offset = strtoll(net, NULL, 10);
     bool off = blank || getenv("PLAYGUARD_SIM_TIMER_OFF") != NULL;
     u16 days[7];
     for (int i = 0; i < 7; i++) days[i] = off ? PT_DAY_NOLIMIT : ((i == 0 || i == 6) ? 180 : 120);
@@ -408,31 +416,54 @@ void time_clock_snapshot(TimeSnapshot *o)
 {
     memset(o, 0, sizeof(*o));
     u64 now = base_now();
-    o->user_time = now + S.clock_offset;
-    o->network_time = now + S.clock_offset;
-    o->local_time = now;
     o->automatic = !S.autosync_off;
-    o->accuracy = S.clock_offset != 0 || getenv("PLAYGUARD_SIM_ACCURATE");
+    o->network_time = now + S.clock_offset + S.network_offset;
+    // With "Synchronise" on, the console clock follows the network clock.
+    o->user_time = o->automatic ? o->network_time : now + S.clock_offset;
+    o->local_time = now;
+    o->accuracy = S.network_set || getenv("PLAYGUARD_SIM_ACCURATE");
     snprintf(o->location, sizeof(o->location), "Europe/Paris");
+}
+// Both writes, once allowed: the network clock becomes `utc`, the console
+// clock with it while "Synchronise" is on.
+static void set_network(u64 utc, TimeApply *o)
+{
+    o->target = utc;
+    if (fails("clock")) {
+        o->write_attempted = true;
+        o->write_rc = SIM_FAIL_RC;
+        return;
+    }
+    const s64 network = (s64)utc - (s64)base_now();
+    if (!S.autosync_off) S.clock_offset = network;
+    S.network_offset = network - S.clock_offset;
+    S.network_set = true;
+    o->write_attempted = o->verify_attempted = o->verified = true;
+    o->readback = utc;
 }
 void time_clock_apply(u64 utc, TimeApply *o)
 {
     memset(o, 0, sizeof(*o));
     time_clock_snapshot(&o->before);
+    o->target = utc;
     const Result gate = core_change_allowed();
     if (R_FAILED(gate)) {
         o->open_rc = gate;
     } else if (!o->before.automatic) {
         o->refused_automatic = true;   // as time_ops.c: the user clock would not follow
-    } else if (fails("clock")) {
-        o->write_attempted = true;
-        o->write_rc = SIM_FAIL_RC;
     } else {
-        S.clock_offset = (s64)utc - (s64)base_now();
-        if (!S.clock_offset) S.clock_offset = 1;
-        o->write_attempted = o->verify_attempted = o->verified = true;
-        o->readback = utc;
+        set_network(utc, o);
     }
+    time_clock_snapshot(&o->after);
+}
+void time_clock_set_to_user(TimeApply *o)
+{
+    memset(o, 0, sizeof(*o));
+    time_clock_snapshot(&o->before);
+    o->target = o->before.user_time;
+    const Result gate = core_change_allowed();
+    if (R_FAILED(gate)) o->open_rc = gate;
+    else set_network(o->before.user_time, o);
     time_clock_snapshot(&o->after);
 }
 void time_clock_dump(char *buf, size_t n) { snprintf(buf, n, "=== System clocks (simulated) ===\n"); }
@@ -484,7 +515,9 @@ const TimeRule *time_console_rule(void)
 }
 bool time_local_now(u64 *posix, LocalTime *local)
 {
-    const u64 now = (u64)((s64)base_now() + S.clock_offset);   // the user clock, as the snapshot says
+    TimeSnapshot s;
+    time_clock_snapshot(&s);
+    const u64 now = s.user_time;   // the user clock, as the snapshot says
     if (posix) *posix = now;
     return local ? host_to_local(NULL, now, local) : true;
 }
