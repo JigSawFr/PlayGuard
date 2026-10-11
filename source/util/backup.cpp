@@ -180,6 +180,16 @@ bool load(const std::string& name, Snapshot& out)
     return paths::read_file(paths::backups_dir() + "/" + name, text) && from_json(text, out);
 }
 
+void RestoreTally::add(bool known, bool equal, bool restored)
+{
+    if (known && equal) {
+        same++;
+        return;
+    }
+    differ++;
+    if (restored) written++;
+}
+
 size_t prune(size_t keep, const std::string& keep_path)
 {
     if (keep == 0) return 0;

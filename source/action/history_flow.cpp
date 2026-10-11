@@ -55,7 +55,7 @@ std::string kind_label(const std::string& kind)
     static const char* known[] = { "limits", "level", "custom", "org", "vr", "alarm", "pin", "pin_shown",
                                    "unlock", "relock", "unlink", "delete", "clock", "restore", "rescue",
                                    "console_lock", "bedtime", "config_reset", "outside_reset", "outside_clock",
-                                   "outside_limits" };
+                                   "outside_limits", "new_account" };
     for (const char* k : known)
         if (kind == k) return brls::getStr(std::string("playguard/history/kinds/") + k);
     return kind;
@@ -117,8 +117,8 @@ std::vector<int> custom_values(const PctlCustomSettings& s)
 static void store(history::Entry e)
 {
     // A change PlayGuard made: what it reads next is not a change made
-    // outside (the outside_* entries are those).
-    if (e.kind.rfind("outside_", 0) != 0) outside_watch::own_change();
+    // outside (the outside_* entries are those, and a new account).
+    if (e.kind.rfind("outside_", 0) != 0 && e.kind != "new_account") outside_watch::own_change();
     e.when = ui::now_stamp();
     std::string err;
     bool put_aside = false;
@@ -233,7 +233,7 @@ void open(const history::Entry& e, std::function<void()> refresh)
         return;
     }
     const history::Entry entry = e;
-    ui::confirm(body, "playguard/history/undo_confirm"_i18n, [entry, now, refresh]() {
+    ui::confirm(pt_flow::with_link_note(body), "playguard/history/undo_confirm"_i18n, [entry, now, refresh]() {
         const Result rc = write_value(entry.kind, entry.before);
         if (R_SUCCEEDED(rc)) record_values(entry.kind.c_str(), history_logic::undo_replaces(entry, now), entry.before, "undo");
         ui::notify_result(rc, "playguard/history/undone"_i18n, "playguard/history/undo_err"_i18n);

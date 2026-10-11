@@ -27,6 +27,7 @@
 
             <brls:Header title="@i18n/playguard/activity/section_totals" marginBottom="8"/>
             <brls:DetailCell id="ac_account" title="@i18n/playguard/activity/account"/>
+            <brls:Label id="ac_new_account" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/warn"/>
             <PlayDaysView id="ac_days" width="auto" height="auto" marginTop="8" marginBottom="16"/>
             <brls:DetailCell id="ac_today" focusable="false" title="@i18n/playguard/activity/today"/>
             <brls:DetailCell id="ac_week" focusable="false" title="@i18n/playguard/activity/week"/>
@@ -50,6 +51,7 @@
                 <brls:Label text="@i18n/playguard/activity/loading" fontSize="20" grow="1.0" textColor="@theme/brand/note"/>
             </brls:Box>
             <brls:Box id="ac_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
+            <brls:Label id="ac_capped" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note" visibility="gone"/>
             <brls:Label id="ac_status" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
             <brls:Label id="ac_note" text="@i18n/playguard/activity/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
 

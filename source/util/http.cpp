@@ -10,6 +10,7 @@
 #include <mutex>
 
 #include "app.hpp"
+#include "util/http_logic.hpp"
 
 namespace http
 {
@@ -44,7 +45,7 @@ size_t on_data(char* data, size_t size, size_t count, void* user)
     if (s_abort) return 0;
     const size_t n = size * count;
     const size_t have = sink->file ? sink->written : sink->body->size();
-    if (have + n > sink->max) {
+    if (!http_logic::fits(have, n, sink->max)) {
         sink->overflow = true;
         return 0;   // aborts the transfer (CURLE_WRITE_ERROR)
     }
@@ -143,11 +144,9 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
         // Never followed (above): a redirect must not turn the POST into a GET elsewhere.
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post->data());
         curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE, (curl_off_t)post->size());
-        headers = curl_slist_append(headers, (std::string("Content-Type: ") + x.content_type).c_str());
-        headers = curl_slist_append(headers, "Expect:");   // no 100-continue round trip
     }
-    if (x.headers)
-        for (const std::string& h : *x.headers) headers = curl_slist_append(headers, h.c_str());
+    for (const std::string& h : http_logic::request_headers(post ? x.content_type : nullptr, x.headers))
+        headers = curl_slist_append(headers, h.c_str());
     if (headers) curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
     const CURLcode rc = curl_easy_perform(curl);
@@ -162,24 +161,13 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
     curl_slist_free_all(headers);
     if (status_out) *status_out = status;
 
-    // A refusal often comes as a large HTML page: say the status, not its size.
-    if (status >= 400) {
-        if (error) *error = "HTTP " + std::to_string(status);
-        return false;
-    }
-    if (sink.overflow) {
-        if (error) *error = "response too large";
-        return false;
-    }
-    if (sink.file_error) {
-        if (error) *error = "cannot write the file";
-        return false;
-    }
-    if (rc != CURLE_OK) {
-        if (error) *error = message[0] ? message : curl_easy_strerror(rc);
-        return false;
-    }
-    return true;
+    http_logic::Outcome outcome;
+    outcome.status      = status;
+    outcome.overflow    = sink.overflow;
+    outcome.file_error  = sink.file_error;
+    outcome.transfer_ok = rc == CURLE_OK;
+    if (rc != CURLE_OK) outcome.transfer_error = message[0] ? message : curl_easy_strerror(rc);
+    return http_logic::succeeded(outcome, error);
 }
 }   // namespace
 
@@ -210,11 +198,7 @@ bool redirect(const std::string& url, std::string* target, std::string* error, c
     std::string body;
     long status = 0;
     if (!perform(url, x, &body, error, 64 * 1024, 30, &status)) return false;
-    if (status < 300 || status >= 400 || target->compare(0, 8, "https://") != 0) {
-        if (error) *error = "no redirect (HTTP " + std::to_string(status) + ")";
-        return false;
-    }
-    return true;
+    return http_logic::redirect_ok(status, *target, error);
 }
 
 bool download(const std::string& url, const std::string& path, std::string* error, size_t max_bytes,

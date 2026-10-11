@@ -1,7 +1,8 @@
 // Host tests for source/action/outside_change_logic.cpp: a time spent that
-// starts over, a clock changed, limits changed outside PlayGuard, and the
-// watch.json record they are kept in.
+// starts over, a clock changed, limits changed outside PlayGuard, a user
+// account never seen before, and the watch.json record they are kept in.
 #include "check.h"
+#include <cstdio>
 #include <cstring>
 
 #include "action/outside_change_logic.hpp"
@@ -171,6 +172,73 @@ static void test_file()
     CHECK(r.notice == NOTICE_RESET && r.reset_at.empty());
 }
 
+static const std::string ALICE = "00000000000000010000000000000001", LEO = "00000000000000020000000000000002",
+                         SAM = "00000000000000030000000000000003";
+
+static void test_accounts()
+{
+    Record rec;
+    bool save = false;
+    // The first listing only records: nothing is new.
+    CHECK(check_accounts(rec, { ALICE, LEO }, "2026-09-01", &save).empty() && save);
+    CHECK(rec.accounts_known && rec.accounts.size() == 2 && !rec.accounts[0].added);
+    CHECK(new_accounts(rec, { ALICE, LEO }, "2026-09-01").empty());
+    // The same accounts again: nothing, and nothing to write.
+    CHECK(check_accounts(rec, { LEO, ALICE }, "2026-09-02", &save).empty() && !save);
+    // A listing that failed (none) changes nothing, not even "known".
+    Record fresh;
+    CHECK(check_accounts(fresh, {}, "2026-09-02", &save).empty() && !save && !fresh.accounts_known);
+    // An account created since: new once, flagged with the day it was seen.
+    std::vector<std::string> added = check_accounts(rec, { ALICE, LEO, SAM }, "2026-10-08", &save);
+    CHECK(added.size() == 1 && added[0] == SAM && save);
+    CHECK(check_accounts(rec, { ALICE, LEO, SAM }, "2026-10-09", &save).empty() && !save);
+    auto flagged = new_accounts(rec, { ALICE, LEO, SAM }, "2026-10-09");
+    CHECK(flagged.size() == 1 && flagged[0].first == SAM && flagged[0].second == "2026-10-08");
+    // Flagged for NEW_ACCOUNT_DAYS, across a month and a year end.
+    CHECK(new_accounts(rec, { SAM }, "2026-11-07").size() == 1);
+    CHECK(new_accounts(rec, { SAM }, "2026-11-08").empty());
+    Record y;
+    check_accounts(y, { ALICE }, "2026-12-20", &save);
+    check_accounts(y, { ALICE, SAM }, "2026-12-20", &save);
+    CHECK(new_accounts(y, { SAM }, "2027-01-19").size() == 1 && new_accounts(y, { SAM }, "2027-01-20").empty());
+    // A clock set back before the day it was seen: still flagged.
+    CHECK(new_accounts(rec, { SAM }, "2026-01-01").size() == 1);
+    // Deleted from the console: not listed, not flagged.
+    CHECK(new_accounts(rec, { ALICE }, "2026-10-09").empty());
+    // Ids that are not an AccountUid, or no date, are not taken.
+    CHECK(check_accounts(rec, { "", "xyz", "0000000000000004000000000000000g" }, "2026-10-09", &save).empty() && !save);
+    CHECK(check_accounts(rec, { "00000000000000040000000000000004" }, "", &save).empty() && !save);
+
+    // Kept in watch.json; PlayGuard's own changes and a dismissed notice do
+    // not forget them.
+    own_change(rec);
+    dismiss(rec);
+    Record back = parse(serialize(rec));
+    CHECK(back.accounts_known && back.accounts.size() == 3);
+    CHECK(back.accounts[2].id == SAM && back.accounts[2].since == "2026-10-08" && back.accounts[2].added);
+    CHECK(back.accounts[0].id == ALICE && !back.accounts[0].added);
+    CHECK(new_accounts(back, { ALICE, LEO, SAM }, "2026-10-09").size() == 1);
+    // A file from before (no list): a first listing again.
+    back = parse(R"({"schema": 1, "date": "2026-10-08"})");
+    CHECK(!back.accounts_known && back.accounts.empty());
+    CHECK(check_accounts(back, { ALICE, SAM }, "2026-10-09", &save).empty() && save);
+    // Damaged entries are left out; the list itself still counts.
+    back = parse(R"({"accounts": [5, {"id": "zz", "since": "2026-10-08"}, {"id": ")" + SAM +
+                 R"(", "since": "08/10"}, {"id": ")" + LEO + R"(", "since": "2026-10-08", "new": "yes"}]})");
+    CHECK(back.accounts_known && back.accounts.size() == 1 && back.accounts[0].id == LEO && !back.accounts[0].added);
+
+    // At most KNOWN_ACCOUNTS_MAX remembered: the oldest gone from the console first.
+    Record many;
+    check_accounts(many, { ALICE }, "2026-01-01", &save);
+    for (unsigned i = 0; i < KNOWN_ACCOUNTS_MAX + 4; i++) {
+        char id[40];
+        std::snprintf(id, sizeof id, "%016X%016X", 0x100u + i, 0x100u + i);
+        check_accounts(many, { ALICE, id }, "2026-01-02", &save);
+    }
+    CHECK(many.accounts.size() == KNOWN_ACCOUNTS_MAX && many.accounts[0].id == ALICE);
+    CHECK(parse(serialize(many)).accounts.size() == KNOWN_ACCOUNTS_MAX);
+}
+
 int main()
 {
     test_first_and_steady();
@@ -180,5 +248,6 @@ int main()
     test_own_change();
     test_dismiss();
     test_file();
+    test_accounts();
     return CHECK_DONE("outside_change_logic tests passed");
 }

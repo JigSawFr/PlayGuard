@@ -2,6 +2,7 @@
 #include "tab/restrictions_tab.hpp"
 
 #include "action/history_flow.hpp"
+#include "action/pt_flow.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 
@@ -42,6 +43,7 @@ RestrictionsTab::RestrictionsTab()
                          body += "\n\n" + "playguard/restrictions/custom_hint"_i18n;
                      else if (index == PctlSafetyLevel_None)   // say what goes
                          body += "\n\n" + "playguard/restrictions/none_body"_i18n;
+                     body = pt_flow::with_link_note(body, &this->st);
                      const int before = this->st.safety_level_ok ? (int)this->st.safety_level : -1;
                      ui::confirm(body, "playguard/play_timer/confirm_set"_i18n, [this, index, before]() {
                                      Result rc = pctl_set_safety_level((uint32_t)index);
@@ -96,7 +98,8 @@ RestrictionsTab::RestrictionsTab()
         ui::pick("playguard/restrictions/org"_i18n, names, this->st.rating_org_ok && this->st.rating_org < 13 ? (int)this->st.rating_org : 0,
                  [this](int index) {
                      if (this->st.rating_org_ok && (int)this->st.rating_org == index) return;
-                     ui::confirm(brls::getStr("playguard/restrictions/confirm_org", pctl_rating_org_name((uint32_t)index)),
+                     ui::confirm(pt_flow::with_link_note(brls::getStr("playguard/restrictions/confirm_org",
+                                                                      pctl_rating_org_name((uint32_t)index)), &this->st),
                                  "playguard/play_timer/confirm_set"_i18n, [this, index]() {
                                      Result rc = pctl_set_rating_org((uint32_t)index);
                                      if (R_SUCCEEDED(rc) && this->st.rating_org_ok)
@@ -131,7 +134,7 @@ std::string RestrictionsTab::settings_text(const PctlCustomSettings& s) const
 void RestrictionsTab::write_custom(const PctlCustomSettings& s, const std::string& loosens)
 {
     if (!loosens.empty()) {
-        ui::confirm(loosens, "playguard/play_timer/confirm_set"_i18n,
+        ui::confirm(pt_flow::with_link_note(loosens, &this->st), "playguard/play_timer/confirm_set"_i18n,
                     [this, s]() { this->write_custom(s); }, [this]() { this->refresh(); });
         return;
     }

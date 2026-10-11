@@ -415,7 +415,10 @@
             "days_played_value": "{} su 7",
             "busiest": "Giorno più intenso",
             "session": "Sessione media"
-        }
+        },
+        "applet_cap": "Non elencati, per risparmiare memoria in modalità applet (aperto dall'album): altri {}. L'esportazione contiene tutti i giochi; per l'elenco completo, apri PlayGuard tenendo premuto R mentre avvii un gioco.",
+        "account_nobody": "Senza utente (o un utente eliminato)",
+        "account_new": "Nuovo utente dal {}: {}"
     },
     "restrictions": {
         "section_level": "Livello limitazioni",
@@ -770,7 +773,8 @@
         "restore_err": "Non ripristinato: {}",
         "before_delete_err": "Non è stato possibile salvare prima un backup ({}).\n\nVuoi eliminare comunque tutto?",
         "delete_anyway": "Elimina comunque",
-        "bedtime_not_restored": "Questo backup aveva attivo Sogni d'oro: non viene ripristinato, impostalo di nuovo in Tempo di gioco se serve."
+        "bedtime_not_restored": "Questo backup aveva attivo Sogni d'oro: non viene ripristinato, impostalo di nuovo in Tempo di gioco se serve.",
+        "backed_up_on": "Impostazioni salvate il {}."
     },
     "update": {
         "checking": "Ricerca di aggiornamenti...",
@@ -912,7 +916,8 @@
             "config_reset": "Preferenze ripristinate (file illeggibile)",
             "outside_reset": "Tempo di gioco ripartito da zero (visto da PlayGuard)",
             "outside_clock": "Orologio della console cambiato (visto da PlayGuard)",
-            "outside_limits": "Limiti cambiati al di fuori di PlayGuard"
+            "outside_limits": "Limiti cambiati al di fuori di PlayGuard",
+            "new_account": "Nuovo utente (visto da PlayGuard)"
         },
         "sources": {
             "uniform": "Stesso limite ogni giorno",

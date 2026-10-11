@@ -48,4 +48,12 @@ constexpr uint64_t REDISCOVER_MAX_S   = 3 * 3600;
 constexpr uint64_t REDISCOVER_AFTER_S = 30 * 86400;
 std::vector<int> rediscover(const PlayStats& stats, size_t max);
 
+// A game's all-time play time that no user account holds (`total_s` is the
+// game's, every account): played without choosing an account (some games
+// never ask) or by an account deleted since. Never negative: several accounts
+// open together add up to more than the game. 0 under UNATTRIBUTED_MIN_S
+// (the two counts round apart by a few seconds).
+constexpr uint64_t UNATTRIBUTED_MIN_S = 60;
+uint64_t unattributed_s(uint64_t total_s, const AccountPlay* accounts, size_t count);
+
 }   // namespace activity_summary

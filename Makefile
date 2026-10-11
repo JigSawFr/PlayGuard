@@ -99,8 +99,11 @@ test:
 	$(CXX) -std=c++17 $(CWARN) -Isource source/action/history_logic.cpp tests/history_logic/test.cpp -o $(TESTOUT)/history_logic && $(TESTOUT)/history_logic
 	$(CXX) -std=c++17 $(CWARN) -Isource source/action/timer_health_logic.cpp tests/timer_health_logic/test.cpp -o $(TESTOUT)/timer_health_logic && $(TESTOUT)/timer_health_logic
 	$(CXX) -std=c++17 $(CWARN) -Isource source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp -o $(TESTOUT)/offline_clock_logic && $(TESTOUT)/offline_clock_logic
+	$(CXX) -std=c++17 $(CWARN) -Isource source/action/icon_logic.cpp tests/icon_logic/test.cpp -o $(TESTOUT)/icon_logic && $(TESTOUT)/icon_logic
 	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp -o $(TESTOUT)/outside_change_logic && $(TESTOUT)/outside_change_logic
 	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/paths.cpp source/util/backup.cpp tests/backup/test.cpp -o $(TESTOUT)/backup && $(TESTOUT)/backup
+	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/paths.cpp source/util/backup.cpp source/util/pt_block.cpp source/action/backup_logic.cpp tests/backup_logic/test.cpp -o $(TESTOUT)/backup_logic && $(TESTOUT)/backup_logic
+	$(CXX) -std=c++17 $(CWARN) -Isource source/util/http_logic.cpp tests/http_logic/test.cpp -o $(TESTOUT)/http_logic && $(TESTOUT)/http_logic
 	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/paths.cpp source/util/table_export.cpp tests/table_export/test.cpp -o $(TESTOUT)/table_export && $(TESTOUT)/table_export
 	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/update.cpp tests/update/test.cpp -o $(TESTOUT)/update && $(TESTOUT)/update
 	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/paths.cpp source/util/config.cpp tests/config/test.cpp -o $(TESTOUT)/config && $(TESTOUT)/config

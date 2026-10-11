@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include "util/pctl_ops_c.hpp"
 
@@ -90,5 +91,52 @@ void bedtime_every_day(const PtState& pt, bool on, uint8_t hour, uint8_t minute,
 // Play allowed again at hour:minute on every day whose bedtime is on. False
 // (out untouched) when none is.
 bool bedtime_end_every_day(const PtState& pt, uint8_t hour, uint8_t minute, PtBedtime out[7]);
+
+// What pt_flow's pickers start on.
+
+// Limits offered by the pickers, in minutes (0 = no play that day).
+const std::vector<uint16_t>& quick_values();
+
+// "Same limit every day": the row selected first (one of quick_values(), or
+// the "Custom…" row after them when the days differ or the value is not in
+// the list), and the number pad's first value.
+struct UniformPick
+{
+    bool     uniform;    // the seven limits were read and are the same
+    int      selected;
+    uint16_t seed;
+};
+UniformPick uniform_pick(const PtState& pt);
+
+// One day's picker: quick_values(), then "Enter a duration…" (`custom`),
+// then "No limit" (`no_limit`), with `current` selected.
+struct LimitPick
+{
+    int selected, custom, no_limit;
+};
+LimitPick limit_pick(uint16_t current);
+// The number pad's first value for that day.
+uint16_t limit_seed(uint16_t current);
+
+// The bedtime picker's times in minutes after midnight: -1 (off), then 16:00
+// to 23:45 every quarter of an hour; and the row selected first (the bedtime
+// when every day has the same, 21:00 when the days differ, else off).
+std::vector<int> bedtime_times();
+int bedtime_selected(const PtState& pt, const std::vector<int>& times);
+// The same for the allowed-again time: 05:00 to 09:00, 06:00 unless every day
+// has the same one in the list.
+std::vector<int> bedtime_end_times();
+int bedtime_end_selected(const PtState& pt, const std::vector<int>& times);
+
+// Extra time (or no more play) was recorded today, on `weekday`: a second
+// addition puts back what the first one recorded.
+bool recorded_today(const ExtraRecord& rec, int weekday, const std::string& today);
+
+// The minutes of extra time added today that `weekday`'s limit still holds
+// (the Overview's "+30 min"), else 0.
+int extra_today_min(const ExtraRecord& rec, const std::string& today, int weekday, const PtState& pt);
+
+// The timer is on and its "time's up" alarm is off.
+bool alarm_off(const PtState& pt);
 
 }   // namespace pt_logic

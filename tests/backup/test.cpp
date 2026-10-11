@@ -1,5 +1,6 @@
 // Host tests for source/util/backup.cpp: the JSON format, the validation that
-// keeps a damaged file away from the console, and save / list / load.
+// keeps a damaged file away from the console, save / list / load, and what a
+// restore would write.
 #include "check.h"
 #include <cstdio>
 #include <cstdlib>
@@ -169,10 +170,33 @@ static void test_files()
     CHECK(std::system(cleanup.c_str()) == 0);
 }
 
+// A restore that would change nothing writes nothing: no unlock, no
+// write, no history event.
+static void test_tally()
+{
+    backup::RestoreTally t;
+    CHECK(t.nothing_to_write());   // a backup with no value to compare
+    t.add(true, true);
+    t.add(true, true);
+    CHECK(t.same == 2 && t.differ == 0 && t.nothing_to_write());
+    // The alarm differs but is not restored (advanced actions off): listed,
+    // still nothing to write.
+    t.add(true, false, false);
+    CHECK(t.differ == 1 && t.written == 0 && t.nothing_to_write());
+    // A value the console does not report counts as different, and is written.
+    t.add(false, true);
+    CHECK(t.same == 2 && t.differ == 2 && t.written == 1 && !t.nothing_to_write());
+
+    backup::RestoreTally u;
+    u.add(true, false);
+    CHECK(u.same == 0 && u.differ == 1 && !u.nothing_to_write());
+}
+
 int main()
 {
     test_round_trip();
     test_validation();
     test_files();
-    return CHECK_DONE("backup format, validation and file assertions passed");
+    test_tally();
+    return CHECK_DONE("backup format, validation, file and restore tally assertions passed");
 }

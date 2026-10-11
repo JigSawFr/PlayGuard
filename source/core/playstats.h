@@ -1,13 +1,15 @@
 // PlayGuard — play time per game, read from the system play-data service
 // (pdm:qry) for every account on the console: all-time totals
-// (QueryPlayStatisticsByApplicationId) and today / last 7 days, folded from the
-// play-event log (QueryPlayEvent, see util/playlog.h). Names come from each
-// game's control data (ns). Read-only: nothing here changes the console.
+// (QueryPlayStatisticsByApplicationId, for every game installed, in an
+// earlier read or named in the play log: deleted ones too) and today / last
+// 7 days, folded from the play-event log (QueryPlayEvent, see
+// util/playlog.h). Names come from each game's control data (ns). Read-only:
+// nothing here changes the console.
 //
 // Like the pctl layer, every service is opened for the fetch and closed before
-// it returns. A fetch reads the last week of the event log and the name of
-// every game it does not know yet (up to ~0.5 s each on 20.0.0+), so the UI
-// runs it off the main thread.
+// it returns. A fetch reads the last week of the event log (the first one of a
+// run, the game IDs of all of it) and the name of every game it does not know
+// yet (up to ~0.5 s each on 20.0.0+), so the UI runs it off the main thread.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 #include "nx_types.h"
@@ -75,7 +77,8 @@ bool playstats_cancelled(void);
 
 // One game's all-time play time per user account on the console (pdm:qry by
 // account, acc:u0 for the nicknames). Accounts that never played it are left
-// out. Returns how many were written to `out`; *rc says why none when 0.
+// out. Returns how many were written to `out`; *rc says why none when 0, and
+// fails too when one account could not be read (the list misses it).
 #define PLAYSTATS_MAX_ACCOUNTS 8
 typedef struct {
     char nickname[0x21];   // UTF-8, as the HOME menu shows it

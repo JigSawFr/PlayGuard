@@ -152,6 +152,7 @@ void DashboardTab::refresh()
 
     // Changes seen outside PlayGuard, and whether the console counts at all.
     outside_watch::observe(pt);
+    outside_watch::observe_accounts();   // once per run; flagged in the Activity tab
     const std::vector<std::string> outside_lines = outside_watch::notice_lines();
     std::string outside_joined;
     for (const auto& l : outside_lines) outside_joined += (outside_joined.empty() ? "" : "\n") + l;

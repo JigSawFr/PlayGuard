@@ -415,7 +415,10 @@
             "days_played_value": "{} de 7",
             "busiest": "Dia mais intenso",
             "session": "Sessão média"
-        }
+        },
+        "applet_cap": "Não listados, para economizar memória no modo applet (aberto pelo álbum): mais {}. A exportação inclui todos os jogos; para a lista completa, abra o PlayGuard segurando R ao iniciar um jogo.",
+        "account_nobody": "Sem conta (ou uma conta excluída)",
+        "account_new": "Conta nova desde {}: {}"
     },
     "restrictions": {
         "section_level": "Nível de restrição",
@@ -770,7 +773,8 @@
         "restore_err": "Não restaurado: {}",
         "before_delete_err": "Não foi possível fazer um backup antes ({}).\n\nExcluir tudo mesmo assim?",
         "delete_anyway": "Excluir mesmo assim",
-        "bedtime_not_restored": "Este backup tinha um alarme de hora de dormir ativo: ele não é restaurado; configure-o de novo em Tempo de jogo, se precisar."
+        "bedtime_not_restored": "Este backup tinha um alarme de hora de dormir ativo: ele não é restaurado; configure-o de novo em Tempo de jogo, se precisar.",
+        "backed_up_on": "Configurações salvas em {}."
     },
     "update": {
         "checking": "Procurando atualizações...",
@@ -912,7 +916,8 @@
             "config_reset": "Preferências redefinidas (arquivo ilegível)",
             "outside_reset": "Tempo de jogo recomeçado (visto pelo PlayGuard)",
             "outside_clock": "Relógio do console alterado (visto pelo PlayGuard)",
-            "outside_limits": "Limites alterados fora do PlayGuard"
+            "outside_limits": "Limites alterados fora do PlayGuard",
+            "new_account": "Conta de usuário nova (vista pelo PlayGuard)"
         },
         "sources": {
             "uniform": "Mesmo limite todos os dias",

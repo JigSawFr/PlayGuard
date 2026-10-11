@@ -415,7 +415,10 @@
             "days_played_value": "{} van 7",
             "busiest": "Drukste dag",
             "session": "Gemiddelde sessie"
-        }
+        },
+        "applet_cap": "Niet getoond, om geheugen te sparen in de appletmodus (geopend vanuit het album): nog {}. De export bevat alle games; open PlayGuard voor de volledige lijst door R ingedrukt te houden terwijl je een game start.",
+        "account_nobody": "Zonder account (of een verwijderd account)",
+        "account_new": "Nieuw account sinds {}: {}"
     },
     "restrictions": {
         "section_level": "Beperkingsniveau",
@@ -770,7 +773,8 @@
         "restore_err": "Niet teruggezet: {}",
         "before_delete_err": "Er kon vooraf geen back-up worden opgeslagen ({}).\n\nToch alles verwijderen?",
         "delete_anyway": "Toch verwijderen",
-        "bedtime_not_restored": "In deze back-up stond een bedtijdalarm aan: dat wordt niet teruggezet. Stel het zo nodig opnieuw in bij Speeltijdtimer."
+        "bedtime_not_restored": "In deze back-up stond een bedtijdalarm aan: dat wordt niet teruggezet. Stel het zo nodig opnieuw in bij Speeltijdtimer.",
+        "backed_up_on": "Back-up van de instellingen van {}."
     },
     "update": {
         "checking": "Controleren op updates...",
@@ -912,7 +916,8 @@
             "config_reset": "Voorkeuren teruggezet (bestand onleesbaar)",
             "outside_reset": "Speeltijd opnieuw begonnen (gezien door PlayGuard)",
             "outside_clock": "Klok van de console gewijzigd (gezien door PlayGuard)",
-            "outside_limits": "Limieten buiten PlayGuard gewijzigd"
+            "outside_limits": "Limieten buiten PlayGuard gewijzigd",
+            "new_account": "Nieuw gebruikersaccount (gezien door PlayGuard)"
         },
         "sources": {
             "uniform": "Elke dag dezelfde limiet",
