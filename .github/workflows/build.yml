@@ -368,6 +368,9 @@ jobs:
           # merge commit checked out. Developer tools › Install another build
           # tells the installed build by it.
           PLAYGUARD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+          # A release (a vX.Y.Z tag, from release-please.yml): the header's
+          # version badge shows it as stable; every other build as a development one.
+          PLAYGUARD_RELEASE: ${{ inputs.tag && '1' || '0' }}
         run: |
           # The checkout belongs to another user than the container's root: git
           # refuses it without this, and CMake reads the commit the app shows.

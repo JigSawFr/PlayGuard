@@ -9,6 +9,9 @@
 #ifndef APP_VERSION
 #define APP_VERSION "0.0.0-dev"
 #endif
+#ifndef APP_RELEASE
+#define APP_RELEASE 0
+#endif
 
 namespace app
 {
@@ -35,6 +38,7 @@ void shutdown()
 uint32_t    pctl_init_result() { return s_init_result; }
 std::string version()          { return APP_VERSION; }
 std::string commit()           { return APP_COMMIT; }
+bool        is_release()       { return APP_RELEASE != 0; }
 
 namespace
 {

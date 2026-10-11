@@ -6,7 +6,8 @@ run (console time fixed, footer clock redrawn at the console's time, 16:00:00), 
 (`tools/visual_check.py`) and uploads the side-by-side images of any screen
 that changed. A changed screen fails the build, with the details in the job
 summary; the smoke test draws the focus without its moving glow
-(`PLAYGUARD_SIM_STILL_FOCUS`), so a screen nobody changed comes out the same.
+(`PLAYGUARD_SIM_STILL_FOCUS`) and the header's version badge on one made-up
+development build (`PLAYGUARD_SIM_VERSION`), so a screen nobody changed comes out the same.
 The screens are drawn by the runner image's software renderer (mesa's
 llvmpipe on `ubuntu-26.04`, the image `.github/workflows/build.yml` pins),
 so a new image can move every screen a little: moving to one is a pull

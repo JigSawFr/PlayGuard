@@ -48,6 +48,7 @@
 #include "view/loading_bar.hpp"
 #include "view/loading_mark.hpp"
 #include "view/made_in_france.hpp"
+#include "view/version_badge.hpp"
 #include "view/scroll_view.hpp"
 #include "view/play_days.hpp"
 #include "view/pt_gauge.hpp"
@@ -272,6 +273,10 @@ int main(int argc, char* argv[])
 
     brls::Application::registerXMLView("LoadingMark",     LoadingMark::create);
     brls::Application::registerXMLView("LoadingBar",      LoadingBar::create);
+
+    // The version (and, for a development build, its commit) at the right of
+    // every screen's header.
+    VersionBadge::install();
 
     // The loading screen first, with nothing slow before it, and drawn at once
     // (no fade: a frame at alpha 0 is a black one). The rest of the start-up

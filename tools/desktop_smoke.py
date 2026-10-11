@@ -43,8 +43,9 @@ intro), but "lock", which turns the intro off in config.json.
 
 Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|library|outside|loading]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
-the console time is fixed (PLAYGUARD_SIM_NOW, TZ) and the focus glow still
-(PLAYGUARD_SIM_STILL_FOCUS) unless set.
+the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
+(PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
+build (PLAYGUARD_SIM_VERSION) unless set.
 """
 import glob
 import json
@@ -107,6 +108,9 @@ env.setdefault("PLAYGUARD_SIM_NOW", "1791475200")
 env.setdefault("TZ", "UTC")
 # And the focus highlight without its moving glow (ui/theme.cpp).
 env.setdefault("PLAYGUARD_SIM_STILL_FOCUS", "1")
+# And the header's version badge on one made-up development build, not this
+# build's version and commit (view/version_badge.cpp).
+env.setdefault("PLAYGUARD_SIM_VERSION", "1.0.0:1a2b3c4")
 if GATE:
     env.setdefault("PLAYGUARD_SIM_FW", "24.0.0")
     env.setdefault("PLAYGUARD_SIM_LATEST", "1.1.0:24.0.0")
