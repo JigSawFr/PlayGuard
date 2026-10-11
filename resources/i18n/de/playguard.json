@@ -5,7 +5,10 @@
         "unlocked": "vorübergehend aufgehoben"
     },
     "loading": {
-        "hint": "Wird geladen..."
+        "tagline": "Altersbeschränkungen direkt auf der Konsole",
+        "step_console": "Konsole wird geprüft...",
+        "step_settings": "Einstellungen werden gelesen...",
+        "step_screen": "PlayGuard wird geöffnet..."
     },
     "tabs": {
         "dashboard": "Übersicht",

@@ -1,7 +1,8 @@
 // Renders branding/*.svg to the raster files the build and the stores use:
 //   icon.jpg (256x256, NRO icon), images/store/icon.png (256x150),
 //   images/store/banner.png (848x208), images/social-preview.png (1280x640, the
-//   repository's social preview, uploaded by hand in Settings › General).
+//   repository's social preview, uploaded by hand in Settings › General),
+//   resources/img/wordmark.png (720x176, transparent: the loading screen's).
 // Needs Node + Playwright (Chromium); loads the Sora font from Google Fonts.
 //   node tools/render_branding.mjs
 import { chromium } from 'playwright';
@@ -15,6 +16,7 @@ const jobs = [
   { svg: 'branding/store-icon.svg', out: 'images/store/icon.png',   w: 256, h: 150, type: 'png' },
   { svg: 'branding/banner.svg',     out: 'images/store/banner.png', w: 848, h: 208, type: 'png' },
   { svg: 'branding/social-preview.svg', out: 'images/social-preview.png', w: 1280, h: 640, type: 'png' },
+  { svg: 'branding/wordmark.svg',   out: 'resources/img/wordmark.png', w: 720, h: 176, type: 'png', transparent: true },
 ];
 
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
@@ -34,7 +36,7 @@ for (const job of jobs) {
   const ok = await page.evaluate(() => document.fonts.check('700 30px Sora'));
   if (!ok) throw new Error('Sora font did not load');
   await page.screenshot({ path: join(root, job.out), type: job.type, quality: job.type === 'jpeg' ? 95 : undefined,
-                          clip: { x: 0, y: 0, width: job.w, height: job.h } });
+                          omitBackground: !!job.transparent, clip: { x: 0, y: 0, width: job.w, height: job.h } });
   console.log(`${job.svg} -> ${job.out}`);
 }
 await browser.close();

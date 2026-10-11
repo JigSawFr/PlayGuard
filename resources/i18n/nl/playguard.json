@@ -5,7 +5,10 @@
         "unlocked": "tijdelijk ontgrendeld"
     },
     "loading": {
-        "hint": "Laden..."
+        "tagline": "Ouderlijk toezicht, rechtstreeks op de console",
+        "step_console": "Console controleren...",
+        "step_settings": "Instellingen lezen...",
+        "step_screen": "PlayGuard openen..."
     },
     "tabs": {
         "dashboard": "Overzicht",

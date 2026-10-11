@@ -5,7 +5,10 @@
         "unlocked": "temporarily unlocked"
     },
     "loading": {
-        "hint": "Loading..."
+        "tagline": "Parental controls, right on the console",
+        "step_console": "Checking the console...",
+        "step_settings": "Reading the settings...",
+        "step_screen": "Opening PlayGuard..."
     },
     "tabs": {
         "dashboard": "Overview",

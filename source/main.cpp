@@ -40,6 +40,8 @@
 #include "util/http.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
+#include "view/loading_bar.hpp"
+#include "view/loading_mark.hpp"
 #include "view/made_in_france.hpp"
 #include "view/scroll_view.hpp"
 #include "view/play_days.hpp"
@@ -87,17 +89,33 @@ namespace
     std::abort();
 }
 
-// The first real screen, once the console is probed and the start-up checks
-// are made: the recovery report, the lock screen or the main screen (or the
-// start-up error). Built after the loading screen was drawn once: the probe,
-// the SD-card reads and the main screen's build take a moment on the
-// console, and the screen stayed black for it.
-brls::Activity* first_screen()
+// The start-up after the loading screen, one step per frame so the loading
+// screen moves along (brls::sync runs a task after the frame is drawn, and
+// one queued from a task waits for the next frame). It took a moment on the
+// console (the service probe, the SD-card reads, the main screen's build),
+// and the screen stayed black for it.
+using Clock = std::chrono::steady_clock;
+
+long long ms_since(Clock::time_point t)
 {
-    if (!app::init()) {
-        brls::Logger::error("pctl probe failed (0x{:08X}) — showing InitErrorActivity", app::pctl_init_result());
-        return new InitErrorActivity();
-    }
+    return std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - t).count();
+}
+
+// The last step: `first` built and shown over the loading screen, which stays
+// under it (borealis' Application::clear() is private). It holds the focus
+// the first screen hands back, so nothing focused is ever freed under the
+// stack (ui::replace_screen pops a lock or recovery screen).
+void show_first(brls::Activity* first, Clock::time_point started)
+{
+    brls::Application::pushActivity(first, brls::TransitionAnimation::NONE);
+    pt_log_flow::apply();   // Developer › Record the play timer, when on (after fw_gate::prepare)
+    brls::Logger::info("start-up: first screen ready after {} ms", ms_since(started));
+}
+
+// Which first screen, once the console is probed: the recovery report, the
+// lock screen or the main screen. Constructed only: show_first builds it.
+brls::Activity* choose_first()
+{
     // Untested firmware: read-only (or the remembered choice) before any tab is built.
     fw_gate::prepare();
     // Security › Ask for the PIN: checked before every change from now on;
@@ -120,11 +138,35 @@ brls::Activity* first_screen()
     if (pin_lock::at_start()) return new LockActivity();
     return new MainActivity();
 }
+
+void start(LoadingActivity* loading, Clock::time_point started)
+{
+    brls::Logger::info("start-up: loading screen drawn after {} ms", ms_since(started));
+    if (!app::init()) {
+        brls::Logger::error("pctl probe failed (0x{:08X}) — showing InitErrorActivity", app::pctl_init_result());
+        show_first(new InitErrorActivity(), started);
+        return;
+    }
+    loading->show(LoadingActivity::Step::Settings);
+    brls::sync([loading, started]() {
+        brls::Activity* first = choose_first();
+        loading->show(LoadingActivity::Step::Screen);
+#ifndef __SWITCH__
+        // Desktop simulation, for a screenshot of the loading screen.
+        if (std::getenv("PLAYGUARD_SIM_HOLD_LOADING")) {
+            brls::Logger::info("start-up: held on the loading screen (PLAYGUARD_SIM_HOLD_LOADING)");
+            delete first;
+            return;
+        }
+#endif
+        brls::sync([first, started]() { show_first(first, started); });
+    });
+}
 }   // namespace
 
 int main(int argc, char* argv[])
 {
-    const auto started = std::chrono::steady_clock::now();
+    const Clock::time_point started = Clock::now();
     std::set_terminate(on_terminate);
     app::set_self_path(argc > 0 ? argv[0] : nullptr);
 
@@ -179,26 +221,15 @@ int main(int argc, char* argv[])
     brls::Application::registerXMLView("ToolsTab",        ToolsTab::create);
     brls::Application::registerXMLView("AboutTab",        AboutTab::create);
 
+    brls::Application::registerXMLView("LoadingMark",     LoadingMark::create);
+    brls::Application::registerXMLView("LoadingBar",      LoadingBar::create);
+
     // The loading screen first, with nothing slow before it, and drawn at once
-    // (no fade: a frame at alpha 0 would be a black one). The rest of the
-    // start-up runs at the end of that first frame (brls::sync runs after the
-    // frame is drawn), and the first screen takes the loading screen's place.
-    brls::Application::pushActivity(new LoadingActivity(), brls::TransitionAnimation::NONE);
-    brls::sync([started]() {
-        const auto since_start = [started]() {
-            return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started).count();
-        };
-        brls::Logger::info("start-up: loading screen drawn after {} ms", since_start());
-        brls::Activity* first = first_screen();
-        // In its place, not over it: borealis never pops the first activity
-        // (ui::replace_screen counts on it), and B on the lock screen or the
-        // main screen must quit, not uncover a loading screen. The loading
-        // screen has nothing focused, so nothing stale is left in the focus.
-        brls::Application::clear();
-        brls::Application::pushActivity(first, brls::TransitionAnimation::NONE);
-        pt_log_flow::apply();   // Developer › Record the play timer, when on (after fw_gate::prepare)
-        brls::Logger::info("start-up: first screen ready after {} ms", since_start());
-    });
+    // (no fade: a frame at alpha 0 is a black one). The rest of the start-up
+    // runs from the end of that first frame.
+    auto* loading = new LoadingActivity();
+    brls::Application::pushActivity(loading, brls::TransitionAnimation::NONE);
+    brls::sync([loading, started]() { start(loading, started); });
 
     // Game icons kept between runs, next to the play data cache.
     playstats_set_icon_dir((paths::data_dir() + "/cache/icons").c_str());

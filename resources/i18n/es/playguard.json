@@ -5,7 +5,10 @@
         "unlocked": "desbloqueado temporalmente"
     },
     "loading": {
-        "hint": "Cargando..."
+        "tagline": "El control parental, directamente en la consola",
+        "step_console": "Comprobando la consola...",
+        "step_settings": "Leyendo los ajustes...",
+        "step_screen": "Abriendo PlayGuard..."
     },
     "tabs": {
         "dashboard": "Resumen",
