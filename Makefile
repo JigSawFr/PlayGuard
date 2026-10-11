@@ -101,6 +101,7 @@ test:
 	$(CXX) -std=c++17 $(CWARN) -Isource source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp -o $(TESTOUT)/offline_clock_logic && $(TESTOUT)/offline_clock_logic
 	$(CXX) -std=c++17 $(CWARN) -Isource source/action/icon_logic.cpp tests/icon_logic/test.cpp -o $(TESTOUT)/icon_logic && $(TESTOUT)/icon_logic
 	$(CXX) -std=c++17 $(CWARN) -Isource source/action/write_queue_logic.cpp tests/write_queue_logic/test.cpp -pthread -o $(TESTOUT)/write_queue_logic && $(TESTOUT)/write_queue_logic
+	$(CXX) -std=c++17 $(CWARN) -Isource source/util/worker_threads.cpp tests/worker_threads/test.cpp -pthread -o $(TESTOUT)/worker_threads && $(TESTOUT)/worker_threads
 	$(CXX) -std=c++17 $(CWARN) -Isource source/action/error_hint_logic.cpp tests/error_hint_logic/test.cpp -o $(TESTOUT)/error_hint_logic && $(TESTOUT)/error_hint_logic
 	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp -o $(TESTOUT)/outside_change_logic && $(TESTOUT)/outside_change_logic
 	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/paths.cpp source/util/backup.cpp tests/backup/test.cpp -o $(TESTOUT)/backup && $(TESTOUT)/backup

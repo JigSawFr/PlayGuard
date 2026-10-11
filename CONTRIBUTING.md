@@ -73,7 +73,7 @@ CI runs all of the above plus the Switch build, the smoke scenarios in parallel 
 | `source/activity/` | Screens: per-day editor, profiles, a game, first steps, change history, firmware, recovery, the lock screen, the diagnostic report, what's new, the start-up error |
 | `source/view/` | Widgets: the week chart, the gauge, the play-timer state line, the day bars, the game cell, the QR codes and funding links, release notes, the scrolling frame |
 | `source/ui/` | Dialogs, formatting, theme colours, the console's state as text, read-only greying and visibility |
-| `source/util/` | NTP, HTTP, config, profiles, settings backups, change history, play-log folding, the play-data cache, the Activity summary, table export, diagnostics, sending reports online, the play-timer recorder and block reference, update check, store launcher, GitHub sign-in and development builds (zip, SHA-256), game patches, the bundled changelog and the start-up reminders |
+| `source/util/` | NTP, HTTP, config, profiles, settings backups, change history, play-log folding, the play-data cache, the Activity summary, table export, diagnostics, sending reports online, the play-timer recorder and block reference, update check, store launcher, GitHub sign-in and development builds (zip, SHA-256), game patches, the bundled changelog, the start-up reminders and the background threads (joined, never detached: the console cannot) |
 | `source/sim/` | The simulated console for the desktop build |
 | `resources/` | XML layouts and `i18n/<language>/playguard.json` |
 | `sysmodule/` | The optional recovery boot sysmodule; shares `source/core/rescue.c` with the app. See [`sysmodule/README.md`](sysmodule/README.md) |

@@ -9,13 +9,11 @@
 #include "activity/main_activity.hpp"
 #include "tab/tab_base.hpp"
 #include "util/config.hpp"
+#include "util/worker_threads.hpp"
 
 #include <atomic>
-#include <condition_variable>
+#include <chrono>
 #include <fmt/format.h>
-#include <mutex>
-#include <system_error>
-#include <thread>
 
 using namespace brls::literals;
 
@@ -46,35 +44,28 @@ std::string rc_text(Result rc, bool next_step)
 
 namespace
 {
-std::mutex s_bg_lock;
-std::condition_variable s_bg_done;
-int s_bg_running = 0;   // tasks of in_background on their own thread
 std::atomic<bool> s_quitting{ false };
 write_queue_logic::Queue s_writes;
 std::atomic<bool> s_config_saved{ true };   // the last config.json write went through
+
+// The threads of in_background, each joined once its task is over
+// (util/worker_threads.hpp: the console cannot detach a thread). Never
+// destroyed: a task still running when the app exits (finish_background gave
+// up waiting for it) would be waited for by the destructor, at exit, with no
+// screen to say why.
+WorkerThreads& workers()
+{
+    static WorkerThreads* const instance = new WorkerThreads();
+    return *instance;
+}
 }   // namespace
 
 void in_background(const char* what, std::function<void()> task)
 {
-    {
-        std::lock_guard<std::mutex> lock(s_bg_lock);
-        s_bg_running++;
-    }
-    try {
-        std::thread([task]() {
-            task();
-            std::lock_guard<std::mutex> lock(s_bg_lock);
-            s_bg_running--;
-            s_bg_done.notify_all();
-        }).detach();
-    } catch (const std::system_error& e) {
-        {
-            std::lock_guard<std::mutex> lock(s_bg_lock);
-            s_bg_running--;
-        }
-        brls::Logger::warning("{}: no thread ({}), queued instead", what, e.what());
-        brls::async(task);
-    }
+    std::string why;
+    if (workers().start(task, &why)) return;
+    brls::Logger::warning("{}: no thread ({}), queued instead", what, why);
+    brls::async(task);
 }
 
 bool quitting()
@@ -88,9 +79,10 @@ bool finish_background(std::chrono::milliseconds max)
     const auto until = std::chrono::steady_clock::now() + max;
     // The SD-card writes first: what the parent changed last is not lost.
     if (!s_writes.flush(max)) brls::Logger::warning("quitting with SD-card writes still running");
-    std::unique_lock<std::mutex> lock(s_bg_lock);
-    const bool done = s_bg_done.wait_until(lock, until, []() { return s_bg_running == 0; });
-    if (!done) brls::Logger::warning("quitting with {} background task(s) still running", s_bg_running);
+    // The rest of `max`, the writes' share taken off.
+    const auto left = std::chrono::duration_cast<std::chrono::milliseconds>(until - std::chrono::steady_clock::now());
+    const bool done = workers().wait_all(left > std::chrono::milliseconds(0) ? left : std::chrono::milliseconds(0));
+    if (!done) brls::Logger::warning("quitting with {} background task(s) still running", workers().running());
     return done;
 }
 
