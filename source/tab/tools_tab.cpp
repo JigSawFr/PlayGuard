@@ -4,6 +4,7 @@
 #include <fmt/format.h>
 
 #include "action/backup_flow.hpp"
+#include "action/cleanup_flow.hpp"
 #include "action/dev_build_flow.hpp"
 #include "action/github_login_flow.hpp"
 #include "action/fw_gate.hpp"
@@ -138,6 +139,14 @@ ToolsTab::ToolsTab()
         pt_log_flow::apply();
         if (on) ui::notify(brls::getStr("playguard/dev/pt_log_on", pt_log::path()));
     });
+    dev_clear_cache->registerClickAction([](brls::View*) {
+        cleanup_flow::clear_cache();
+        return true;
+    });
+    dev_clear_logs->registerClickAction([](brls::View*) {
+        cleanup_flow::clear_logs();
+        return true;
+    });
     dev_report->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new DiagnosticActivity());
         return true;
@@ -220,6 +229,8 @@ void ToolsTab::refresh()
                           { dev_read_only.getView(), dev },
                           { dev_pt_log.getView(), dev },
                           { dev_pt_log_note.getView(), dev },
+                          { dev_clear_cache.getView(), dev },
+                          { dev_clear_logs.getView(), dev },
                           { dev_report.getView(), dev },
                           { dev_pt_block.getView(), dev },
                           { dev_github.getView(), dev },

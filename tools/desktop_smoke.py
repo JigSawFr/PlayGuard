@@ -11,8 +11,9 @@ each screen are written to the output folder.
 The "gate" scenario starts on a firmware newer than the checked one, with a
 simulated release that supports it: the firmware screen, read-only mode,
 seven presses on About › Version for the developer mode, its report, a play-timer
-block reference, the firmware screen again and the hand-over of the update
-to sphaira (simulated hbloader).
+block reference, deleting the log files and clearing the cache (what goes and
+what stays checked on disk), the firmware screen again and the hand-over of
+the update to sphaira (simulated hbloader).
 
 The "devbuild" scenario turns the developer mode on, signs in to a simulated
 GitHub (PLAYGUARD_SIM_GITHUB_LOGIN) from the build list, then installs a pull
@@ -67,6 +68,18 @@ if (GATE or ERRORS or DEVBUILD) and os.path.exists(config_file):
 block_ref = os.path.join(run_dir, "playguard_data", "logs", "play_timer_block.json")
 if GATE and os.path.exists(block_ref):
     os.remove(block_ref)     # the developer tool must write a new one
+# What the developer tools' cleanup must remove, and what it must keep.
+logs_dir = os.path.join(run_dir, "playguard_data", "logs")
+cache_dir = os.path.join(run_dir, "playguard_data", "cache")
+old_logs = [os.path.join(logs_dir, n) for n in ("crash.txt", "20261008_120000.txt")]
+uploads = os.path.join(logs_dir, "uploads.txt")
+stale_cache = os.path.join(cache_dir, "stale.bin")
+if GATE:
+    os.makedirs(logs_dir, exist_ok=True)
+    os.makedirs(cache_dir, exist_ok=True)
+    for path in old_logs + [uploads, stale_cache]:
+        with open(path, "w") as f:
+            f.write("smoke test\n")
 
 env = dict(os.environ, LIBGL_ALWAYS_SOFTWARE="1")
 # One console time and time zone for every run, so the screenshots can be
@@ -332,6 +345,31 @@ if GATE:
     key("Return")
     if not os.path.exists(block_ref):
         fail("no play-timer block reference in " + block_ref)
+    # The cleanup tools, just above the report (read-only mode allows them:
+    # nothing on the console changes). The log files go but uploads.txt and
+    # the block reference just saved; the cache's files go, its folder stays.
+    key("Up", 2)               # Delete the log files
+    key("Return")
+    shot("06c_dev_clear_logs") # the confirmation: how many files, what stays
+    key("Right")               # Delete
+    key("Return")
+    time.sleep(1)
+    if any(os.path.exists(p) for p in old_logs):
+        fail("Delete the log files left " + repr([p for p in old_logs if os.path.exists(p)]))
+    if not os.path.exists(uploads) or not os.path.exists(block_ref):
+        fail("Delete the log files removed uploads.txt or the block reference")
+    key("Up")                  # Clear the cache
+    key("Return")
+    key("Right")               # Delete
+    key("Return")
+    time.sleep(1)
+    if os.path.exists(stale_cache) or not os.path.isdir(cache_dir):
+        fail("Clear the cache left " + stale_cache + " or removed the folder")
+    log.flush()
+    app_log = open(os.path.join(OUT, "app.log"), errors="replace").read()
+    if "cleanup (clear cache)" not in app_log or "cleanup (clear logs)" not in app_log:
+        fail("no cleanup line in the log; messages: " + repr(messages()))
+    key("Down", 3)             # back to Compare the play-timer block
     key("Down")                # Show the firmware screen again
     key("Return")
     shot("07_gate_again")

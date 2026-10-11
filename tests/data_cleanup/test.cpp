@@ -1,0 +1,180 @@
+// Host tests for source/util/data_cleanup.cpp: what "Clear the cache" and
+// "Delete the log files" remove (every file of cache/ and its subfolders;
+// every file of logs/ but uploads.txt, play_timer_block.json and their
+// .tmp), that folders and the rest of the data folder stay, the removal's
+// count (a file gone since the plan is neither removed nor failed, one that
+// cannot be removed is failed), and the size shown.
+#include "check.h"
+#include <cstdio>
+#include <cstdlib>
+#include <string>
+#include <sys/stat.h>
+#include <unistd.h>
+
+#include "util/data_cleanup.hpp"
+
+namespace dc = data_cleanup;
+
+namespace
+{
+std::string g_root;
+
+void write(const std::string& rel, size_t size)
+{
+    FILE* f = std::fopen((g_root + "/" + rel).c_str(), "wb");
+    REQUIRE(f);
+    for (size_t i = 0; i < size; i++) std::fputc('x', f);
+    std::fclose(f);
+}
+
+void dir(const std::string& rel)
+{
+    REQUIRE(mkdir((g_root + "/" + rel).c_str(), 0755) == 0);
+}
+
+bool there(const std::string& rel)
+{
+    struct stat st;
+    return stat((g_root + "/" + rel).c_str(), &st) == 0;
+}
+
+// A data folder as PlayGuard leaves it.
+void make_tree()
+{
+    char tmpl[] = "/tmp/playguard_cleanup_XXXXXX";
+    REQUIRE(mkdtemp(tmpl));
+    g_root = tmpl;
+    write("config.json", 300);
+    write("history.json", 400);
+    write("watch.json", 50);
+    write("github_token", 40);
+    dir("backups");
+    write("backups/settings_20261010.json", 900);
+    dir("profiles");
+    write("profiles/school.json", 120);
+    dir("exports");
+    write("exports/activity.csv", 2000);
+    dir("cache");
+    write("cache/activity_all.bin", 5000);
+    write("cache/activity_0011223344556677.bin", 3000);
+    write("cache/dev_builds.json", 700);
+    dir("cache/icons");
+    write("cache/icons/lang", 1);
+    write("cache/icons/0100000000010000.jpg", 6000);
+    write("cache/icons/0100000000020000.jpg", 7000);
+    dir("logs");
+    write("logs/crash.txt", 200);
+    write("logs/20261009_141203.txt", 3000);
+    write("logs/20261009_141203_1.txt", 3100);
+    write("logs/play_timer_log.csv", 9000);
+    write("logs/play_timer_log.old.csv", 8000);
+    write("logs/uploads.txt", 150);
+    write("logs/uploads.txt.tmp", 160);
+    write("logs/play_timer_block.json", 1000);
+}
+
+void remove_tree()
+{
+    std::system(("rm -rf '" + g_root + "'").c_str());
+}
+}   // namespace
+
+static void test_cache_plan()
+{
+    make_tree();
+    const dc::Plan p = dc::cache(g_root);
+    CHECK(p.files.size() == 6);
+    CHECK(p.bytes == 5000 + 3000 + 700 + 1 + 6000 + 7000);
+    // Sorted, full paths, the icons' folder walked.
+    if (CHECK(p.files.size() == 6)) {
+        CHECK(p.files[0] == g_root + "/cache/activity_0011223344556677.bin");
+        CHECK(p.files[1] == g_root + "/cache/activity_all.bin");
+        CHECK(p.files[2] == g_root + "/cache/dev_builds.json");
+        CHECK(p.files[3] == g_root + "/cache/icons/0100000000010000.jpg");
+        CHECK(p.files[5] == g_root + "/cache/icons/lang");
+    }
+    const dc::Outcome out = dc::remove(p);
+    CHECK(out.removed == 6);
+    CHECK(out.bytes == p.bytes);
+    CHECK(out.failed == 0);
+    // Only files went: the folders stay for the icon store, the rest is untouched.
+    CHECK(there("cache") && there("cache/icons"));
+    CHECK(!there("cache/activity_all.bin") && !there("cache/icons/lang"));
+    CHECK(there("config.json") && there("history.json") && there("watch.json") && there("github_token"));
+    CHECK(there("backups/settings_20261010.json") && there("profiles/school.json") && there("exports/activity.csv"));
+    CHECK(there("logs/crash.txt"));
+    // Nothing left: an empty plan.
+    const dc::Plan again = dc::cache(g_root);
+    CHECK(again.files.empty() && again.bytes == 0);
+    remove_tree();
+}
+
+static void test_logs_plan()
+{
+    make_tree();
+    dir("logs/old");   // a subfolder's files go, whatever their name
+    write("logs/old/uploads.txt", 10);
+    const dc::Plan p = dc::logs(g_root);
+    CHECK(p.files.size() == 6);
+    CHECK(p.bytes == 200 + 3000 + 3100 + 9000 + 8000 + 10);
+    const dc::Outcome out = dc::remove(p);
+    CHECK(out.removed == 6 && out.failed == 0);
+    CHECK(!there("logs/crash.txt") && !there("logs/20261009_141203.txt") && !there("logs/play_timer_log.csv"));
+    CHECK(!there("logs/old/uploads.txt"));
+    // Not logs: the removal links of reports sent online, the block reference.
+    CHECK(there("logs/uploads.txt") && there("logs/uploads.txt.tmp") && there("logs/play_timer_block.json"));
+    CHECK(there("cache/activity_all.bin"));
+    remove_tree();
+}
+
+static void test_missing_folders()
+{
+    char tmpl[] = "/tmp/playguard_cleanup_XXXXXX";
+    REQUIRE(mkdtemp(tmpl));
+    g_root = tmpl;
+    CHECK(dc::cache(g_root).files.empty());
+    CHECK(dc::logs(g_root).files.empty());
+    const dc::Outcome out = dc::remove(dc::Plan{});
+    CHECK(out.removed == 0 && out.failed == 0 && out.bytes == 0);
+    remove_tree();
+}
+
+static void test_remove_counts()
+{
+    make_tree();
+    dc::Plan p = dc::cache(g_root);
+    // Gone since the plan: neither removed nor failed.
+    REQUIRE(std::remove((g_root + "/cache/dev_builds.json").c_str()) == 0);
+    // Not removable: a non-empty folder where a file was listed.
+    REQUIRE(std::remove((g_root + "/cache/activity_all.bin").c_str()) == 0);
+    dir("cache/activity_all.bin");
+    write("cache/activity_all.bin/x", 1);
+    const dc::Outcome out = dc::remove(p);
+    CHECK(out.removed == 4);
+    CHECK(out.bytes == 3000 + 1 + 6000 + 7000);
+    CHECK(out.failed == 1);
+    remove_tree();
+}
+
+static void test_size_unit()
+{
+    uint64_t v = 99;
+    CHECK(dc::size_unit(0, &v) == dc::Unit::KB && v == 0);
+    CHECK(dc::size_unit(1, &v) == dc::Unit::KB && v == 1);          // never "0 KB" for a file
+    CHECK(dc::size_unit(1024, &v) == dc::Unit::KB && v == 1);
+    CHECK(dc::size_unit(1025, &v) == dc::Unit::KB && v == 2);
+    CHECK(dc::size_unit(1024 * 1024 - 1, &v) == dc::Unit::KB && v == 1024);
+    CHECK(dc::size_unit(1024 * 1024, &v) == dc::Unit::MB && v == 1);
+    CHECK(dc::size_unit(1024 * 1024 * 3 / 2, &v) == dc::Unit::MB && v == 2);   // 1.5 MB, rounded
+    CHECK(dc::size_unit(16ull * 1024 * 1024 + 100, &v) == dc::Unit::MB && v == 16);
+}
+
+int main()
+{
+    test_cache_plan();
+    test_logs_plan();
+    test_missing_folders();
+    test_remove_counts();
+    test_size_unit();
+    return CHECK_DONE("data_cleanup cache, logs, removal and size tests passed");
+}
