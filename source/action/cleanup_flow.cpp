@@ -29,32 +29,29 @@ std::string files_text(size_t count, uint64_t bytes)
 
 // Lists the files on the write queue (behind the writes asked before, and
 // off the UI thread: the icons are a few hundred files), then asks, then
-// says what went: all in the brand dialog, titled after the cell.
-void run(const char* what, std::function<data_cleanup::Plan()> make_plan, const std::string& title_key,
-         const std::string& body_key)
+// says what went.
+void run(const char* what, std::function<data_cleanup::Plan()> make_plan, const std::string& body_key)
 {
-    ui::write_later(what, [what, make_plan, title_key, body_key]() {
+    ui::write_later(what, [what, make_plan, body_key]() {
         auto plan = std::make_shared<data_cleanup::Plan>(make_plan());
-        brls::sync([what, plan, title_key, body_key]() {
-            const std::string title = brls::getStr(title_key);
+        brls::sync([what, plan, body_key]() {
             if (plan->files.empty()) {
-                ui::brand_info(title, "playguard/dev/clear_empty"_i18n);
+                ui::info("playguard/dev/clear_empty"_i18n);
                 return;
             }
-            ui::brand_confirm(title, brls::getStr(body_key, files_text(plan->files.size(), plan->bytes)),
-                              "playguard/common/delete"_i18n, [what, plan, title]() {
-                ui::write_later(what, [what, plan, title]() {
+            ui::confirm_danger(brls::getStr(body_key, files_text(plan->files.size(), plan->bytes)),
+                               "playguard/common/delete"_i18n, [what, plan]() {
+                ui::write_later(what, [what, plan]() {
                     const data_cleanup::Outcome out = data_cleanup::remove(*plan);
                     brls::Logger::info("cleanup ({}): {} file(s) removed, {} bytes, {} not removed", what, out.removed,
                                        out.bytes, out.failed);
-                    brls::sync([out, title]() {
+                    brls::sync([out]() {
                         const std::string done = files_text(out.removed, out.bytes);
-                        ui::brand_info(title, out.failed ? brls::getStr("playguard/dev/clear_failed", done,
-                                                                        std::to_string(out.failed))
-                                                         : brls::getStr("playguard/dev/cleared", done));
+                        ui::info(out.failed ? brls::getStr("playguard/dev/clear_failed", done, std::to_string(out.failed))
+                                            : brls::getStr("playguard/dev/cleared", done));
                     });
                 });
-            }, nullptr, true);
+            });
         });
     });
 }
@@ -62,14 +59,12 @@ void run(const char* what, std::function<data_cleanup::Plan()> make_plan, const 
 
 void clear_cache()
 {
-    run("clear cache", []() { return data_cleanup::cache(paths::data_dir()); }, "playguard/dev/clear_cache",
-        "playguard/dev/clear_cache_body");
+    run("clear cache", []() { return data_cleanup::cache(paths::data_dir()); }, "playguard/dev/clear_cache_body");
 }
 
 void clear_logs()
 {
-    run("clear logs", []() { return data_cleanup::logs(paths::data_dir()); }, "playguard/dev/clear_logs",
-        "playguard/dev/clear_logs_body");
+    run("clear logs", []() { return data_cleanup::logs(paths::data_dir()); }, "playguard/dev/clear_logs_body");
 }
 
 }   // namespace cleanup_flow

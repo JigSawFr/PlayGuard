@@ -113,8 +113,8 @@ ToolsTab::ToolsTab()
     });
 
     // Developer tools.
-    // Turning a developer switch off asks first (in the brand dialog): the
-    // switch goes back on until it is confirmed. Turning one on does not ask.
+    // Turning a developer switch off asks first: the switch goes back on
+    // until it is confirmed. Turning one on does not ask.
     dev_mode->init("playguard/dev/mode"_i18n, app::dev_mode(), [this](bool on) {
         if (on) {
             app::set_dev_mode(true, true);
@@ -122,11 +122,10 @@ ToolsTab::ToolsTab()
             return;
         }
         this->dev_mode->setOn(true, false);
-        ui::brand_confirm("playguard/dev/mode"_i18n, "playguard/dev/mode_off_body"_i18n,
-                          "playguard/dev/mode_off_confirm"_i18n, []() {
-                              app::set_dev_mode(false, true);
-                              ui::on_mode_changed();
-                          });
+        ui::confirm("playguard/dev/mode_off_body"_i18n, "playguard/dev/mode_off_confirm"_i18n, []() {
+            app::set_dev_mode(false, true);
+            ui::on_mode_changed();
+        });
     });
     dev_read_only->init("playguard/dev/read_only"_i18n, app::read_only(), [this](bool on) {
         if (on) {
@@ -142,12 +141,10 @@ ToolsTab::ToolsTab()
         };
         // Untested firmware: same warning as "Continue at my own risk".
         if (fw_gate::needed())
-            ui::brand_confirm("playguard/dev/read_only"_i18n,
-                              brls::getStr("playguard/fw_gate/risk_body", fw_gate::firmware()),
-                              "playguard/fw_gate/risk_confirm"_i18n, allow, nullptr, true);
+            ui::confirm_danger(brls::getStr("playguard/fw_gate/risk_body", fw_gate::firmware()),
+                               "playguard/fw_gate/risk_confirm"_i18n, allow);
         else
-            ui::brand_confirm("playguard/dev/read_only"_i18n, "playguard/dev/read_only_off_body"_i18n,
-                              "playguard/dev/read_only_off_confirm"_i18n, allow);
+            ui::confirm("playguard/dev/read_only_off_body"_i18n, "playguard/dev/read_only_off_confirm"_i18n, allow);
     });
     dev_pt_log->init("playguard/dev/pt_log"_i18n, config::get().pt_log, [](bool on) {
         config::get().pt_log = on;
@@ -184,11 +181,10 @@ ToolsTab::ToolsTab()
         return true;
     });
     dev_forget->registerClickAction([](brls::View*) {
-        ui::brand_confirm("playguard/dev/forget"_i18n, "playguard/dev/forget_body"_i18n,
-                          "playguard/dev/forget_confirm"_i18n, []() {
-                              fw_gate::forget();
-                              ui::notify("playguard/dev/forgotten"_i18n);
-                          });
+        ui::confirm("playguard/dev/forget_body"_i18n, "playguard/dev/forget_confirm"_i18n, []() {
+            fw_gate::forget();
+            ui::notify("playguard/dev/forgotten"_i18n);
+        });
         return true;
     });
 }

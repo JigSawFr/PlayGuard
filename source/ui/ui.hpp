@@ -103,12 +103,6 @@ void confirm_with(const std::string& body, brls::View* extra, const std::string&
 // "bad" colour so it never looks like an ordinary OK.
 void confirm_danger(const std::string& body, const std::string& confirm_label, std::function<void()> on_yes);
 void info(const std::string& body);
-// The same in the brand colours (the loading screen's: a navy card, the icon
-// and `title` over the text, teal buttons; a red confirm label when
-// `danger`), for the developer tools' confirmations and results.
-void brand_confirm(const std::string& title, const std::string& body, const std::string& confirm_label,
-                   std::function<void()> on_yes, std::function<void()> on_no = nullptr, bool danger = false);
-void brand_info(const std::string& title, const std::string& body);
 
 // Reads the stored PIN (pctl_get_pin) and shows it in large digits, or a
 // dialog with the error. The app's copies are wiped as soon as the label

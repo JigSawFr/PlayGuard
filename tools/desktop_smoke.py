@@ -334,11 +334,11 @@ if GATE:
     key("Right")
     key("Down", 50, hold=0.15) # the Developer section, down to its last cell
     shot("05_dev_tools")
-    # Turning a developer switch off asks first, in the brand dialog; B
-    # keeps it on (the end of the scenario checks developer mode was saved on).
+    # Turning a developer switch off asks first; B keeps it on (the end of
+    # the scenario checks developer mode was saved on).
     key("Up", 9)               # past the cleanup cells and the recorder: Read-only mode
     key("Return")
-    shot("06a_read_only_off")  # untested firmware: the "own risk" warning, its confirm label in red
+    shot("06a_read_only_off")  # untested firmware: the "own risk" warning
     key("Escape")
     key("Up")                  # Developer mode
     key("Return")
