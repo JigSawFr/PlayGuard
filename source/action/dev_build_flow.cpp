@@ -13,6 +13,7 @@
 #include "action/pin_lock.hpp"
 #include "activity/dev_builds_activity.hpp"
 #include "app.hpp"
+#include "core/platform.h"
 #include "ui/ui.hpp"
 #include "util/dev_builds.hpp"
 #include "util/github_auth.hpp"
@@ -188,11 +189,17 @@ void install(const dev_builds::Build& b)
         bool ok = dev_builds::download(b, fresh, &err, [progress](uint64_t done, uint64_t total) {
             progress->received(done, total);
         });
-        if (ok) {
-            ok = dev_builds::replace(target, fresh, &err);
-            if (!ok) std::remove(fresh.c_str());
-        }
-        brls::sync([b, ok, err, progress]() {
+        brls::sync([b, ok, err, target, fresh, progress]() mutable {
+            if (ok) {
+                // The running .nro is held open by romfs:/ (the app's
+                // resources), and the SD card will not rename an open file:
+                // released for the two renames, here on the UI thread so that
+                // nothing reads romfs:/ meanwhile, then mounted again.
+                platform_romfs_release();
+                ok = dev_builds::replace(target, fresh, &err);
+                platform_romfs_mount();
+                if (!ok) std::remove(fresh.c_str());
+            }
             s_busy = false;
             progress->close();
             if (!ok) ui::info(brls::getStr("playguard/dev_build/failed", err));

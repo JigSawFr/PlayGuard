@@ -36,6 +36,14 @@ bool platform_can_launch(void);
 // exits. False when it cannot.
 bool platform_set_next_load(const char *path);
 
+// romfs:/ (the app's own resources) is read from its .nro, which stays open
+// while it is mounted, and the SD card will not rename an open file. Released
+// around the replacement of that file (action/dev_build_flow.cpp), then
+// mounted again from the file then in place; nothing may read romfs:/ in
+// between. Nothing to do on desktop (the resources are plain files there).
+void platform_romfs_release(void);
+void platform_romfs_mount(void);
+
 // The console region (SetRegion: 0 Japan, 1 Americas, 2 Europe,
 // 3 Australia / New Zealand, 4 Hong Kong / Taiwan / Korea, 5 China).
 bool platform_region(int *region);
