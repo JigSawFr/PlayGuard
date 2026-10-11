@@ -99,7 +99,10 @@
         "next_step": "Si vuelve a ocurrir, envíe un informe: Herramientas › Enviar un informe en línea.",
         "pt_not_understood": "los ajustes del tiempo de juego de la consola están en un formato que PlayGuard no entiende, así que no se ha cambiado nada. Envíe un informe: Herramientas › Enviar un informe en línea.",
         "pctl_0132": "código 2142-0132, también notificado por otros al escribir el temporizador de juego; aún no se sabe qué significa. Reinicie la consola e inténtelo de nuevo",
-        "clock_not_set": "la consola indica que su reloj de red no tiene una hora válida (puede que nunca se haya ajustado); consulte la pestaña Reloj de red"
+        "clock_not_set": "la consola indica que su reloj de red no tiene una hora válida (puede que nunca se haya ajustado); consulte la pestaña Reloj de red",
+        "no_internet": "la consola no está conectada a internet: conéctela e inténtelo de nuevo",
+        "service_denied": "el sistema ha denegado a PlayGuard el acceso a uno de sus servicios; PlayGuard necesita una consola con Atmosphère",
+        "pdm_unavailable": "el servicio de datos de juego de la consola no está disponible ahora; inténtelo de nuevo dentro de un momento"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -418,7 +421,8 @@
         },
         "applet_cap": "No se muestran, para ahorrar memoria en modo applet (abierto desde el Álbum): {} más. La exportación incluye todos los juegos; para ver la lista completa, abra PlayGuard manteniendo pulsado R al iniciar un juego.",
         "account_nobody": "Sin cuenta (o una cuenta eliminada)",
-        "account_new": "Cuenta nueva desde el {}: {}"
+        "account_new": "Cuenta nueva desde el {}: {}",
+        "truncated": "Solo se pueden mostrar {} juegos: faltan algunos que no se han jugado esta semana, y el total desde siempre no los cuenta."
     },
     "restrictions": {
         "section_level": "Nivel de restricción",
@@ -550,7 +554,7 @@
         "show_pin_title": "PIN actual",
         "show_pin_err": "No se ha podido leer el PIN",
         "unlock": "Desbloquear temporalmente",
-        "unlock_body": "¿Desbloquear temporalmente el control parental?\n\nLas restricciones seguirán desactivadas hasta que vuelva a bloquearlo (o hasta que se reinicie la consola).",
+        "unlock_body": "¿Desbloquear temporalmente el control parental?\n\nLas restricciones seguirán desactivadas hasta que vuelva a bloquearlo (o hasta que se reinicie la consola). Si mientras tanto se cierra PlayGuard desde el menú HOME, lo volverá a bloquear la próxima vez que se inicie.",
         "unlock_confirm": "Desbloquear",
         "unlocked": "Control parental desbloqueado temporalmente.",
         "unlock_err": "No se ha podido desbloquear",
@@ -883,7 +887,7 @@
         "diag_err": "No se ha podido guardar el diagnóstico",
         "relocked": "Control parental bloqueado de nuevo.",
         "relock_err": "No se ha podido volver a bloquear el control parental",
-        "relocked_after_stop": "PlayGuard se detuvo durante un cambio la última vez: el control parental se ha vuelto a bloquear.",
+        "relocked_after_stop": "La última vez, PlayGuard se cerró con el control parental desbloqueado: se ha vuelto a bloquear.",
         "config_err": "No se han podido guardar las preferencias en la tarjeta SD"
     },
     "history": {

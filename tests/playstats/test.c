@@ -1,7 +1,8 @@
 // Host tests for source/core/playstats_logic.c: raw log entries as playlog
-// events, the bounded walk of the log, the games the whole log names, game
-// names out of a control.nacp (compressed titles included), the names kept
-// between reads, and the icons kept on the SD card.
+// events, the bounded walk of the log, the games the whole log names, the
+// all-time list and its cut, game names out of a control.nacp (compressed
+// titles included), the names kept between reads, and the icons kept on the
+// SD card.
 #define _DEFAULT_SOURCE   // mkdtemp
 #include "check.h"
 #include <dirent.h>
@@ -213,6 +214,71 @@ static void test_logged_games(void)
     CHECK(playstats_logged_games(fake_query, LOG_START, 600, ids, 0, &rc) == 0 && rc == 0);
     free(s_log);
     s_log = NULL;
+}
+
+// ---------------------------------------------------------------- played
+
+// Fake totals: a game is played when its ID is odd; 0xFFFF cannot be read.
+static int s_totals_asked;
+static bool fake_totals(void *ctx, u64 app_id, GameStat *g)
+{
+    (void)ctx;
+    s_totals_asked++;
+    if (app_id == 0xFFFF || !(app_id & 1)) return false;
+    g->totals_ok = true;
+    g->total_s = app_id * 60;
+    return true;
+}
+
+static void test_add_played(void)
+{
+    static PlayStats s;   // large: not on the stack
+    static u64 ids[PLAYSTATS_MAX + 8];
+
+    // Room enough: every played game once, unplayed and unreadable ones out,
+    // and one already listed (this week's) not added again nor asked.
+    memset(&s, 0, sizeof(s));
+    s.count = 1;
+    s.games[0].app_id = 3;
+    s.games[0].week_s = 120;
+    const u64 few[] = { 3, 5, 6, 0xFFFF, 7, 5 };
+    s_totals_asked = 0;
+    playstats_add_played(&s, few, 6, fake_totals, NULL);
+    CHECK(s.count == 3 && s.games[0].week_s == 120 && s.games[1].app_id == 5 && s.games[2].app_id == 7);
+    CHECK(s.games[1].totals_ok && s.games[1].total_s == 300);
+    CHECK(s_totals_asked == 4 && !s.truncated);
+
+    // Exactly full: not cut.
+    memset(&s, 0, sizeof(s));
+    for (u32 i = 0; i < PLAYSTATS_MAX; i++) ids[i] = 2 * (u64)i + 1;
+    playstats_add_played(&s, ids, PLAYSTATS_MAX, fake_totals, NULL);
+    CHECK(s.count == PLAYSTATS_MAX && !s.truncated);
+
+    // Full, then only games never played or unreadable: not cut either.
+    ids[PLAYSTATS_MAX] = 2;
+    ids[PLAYSTATS_MAX + 1] = 0xFFFF;
+    memset(&s, 0, sizeof(s));
+    playstats_add_played(&s, ids, PLAYSTATS_MAX + 2, fake_totals, NULL);
+    CHECK(s.count == PLAYSTATS_MAX && !s.truncated);
+
+    // One more played game: cut, and the games already there are kept.
+    ids[PLAYSTATS_MAX + 2] = 0x1001;
+    ids[PLAYSTATS_MAX + 3] = 0x1003;
+    memset(&s, 0, sizeof(s));
+    s.count = 1;
+    s.games[0].app_id = 0x2001;
+    s.games[0].today_s = 60;
+    s_totals_asked = 0;
+    playstats_add_played(&s, ids, PLAYSTATS_MAX + 4, fake_totals, NULL);
+    CHECK(s.count == PLAYSTATS_MAX && s.truncated);
+    CHECK(s.games[0].app_id == 0x2001 && s.games[0].today_s == 60);
+    CHECK(s.games[PLAYSTATS_MAX - 1].app_id == ids[PLAYSTATS_MAX - 2]);
+    CHECK(s_totals_asked == PLAYSTATS_MAX);   // stops at the first one left out
+
+    // Nothing to add.
+    memset(&s, 0, sizeof(s));
+    playstats_add_played(&s, ids, 0, fake_totals, NULL);
+    CHECK(s.count == 0 && !s.truncated);
 }
 
 // ---------------------------------------------------------------- names
@@ -487,9 +553,10 @@ int main(void)
     test_convert();
     test_log();
     test_logged_games();
+    test_add_played();
     test_utf8();
     test_nacp();
     test_names();
     test_icons();
-    return CHECK_DONE("playstats convert, log, logged games, NACP name, name and icon cache assertions passed");
+    return CHECK_DONE("playstats convert, log, logged games, played games cut, NACP name, name and icon cache assertions passed");
 }

@@ -208,6 +208,17 @@ static void set_totals(GameStat *g, const PdmPlayStatistics *st)
     g->last_played  = st->last_timestamp_user;
 }
 
+// PlayTotalsQuery for playstats_add_played: `ctx` is the account, or NULL.
+static bool played_totals(void *ctx, u64 app_id, GameStat *g)
+{
+    if (playstats_cancelled()) return false;
+    PdmPlayStatistics st;
+    if (R_FAILED(query_totals(app_id, (const PlayAccount *)ctx, &st))) return false;
+    if (st.playtime == 0 && st.total_launches == 0) return false;
+    set_totals(g, &st);
+    return true;
+}
+
 void playstats_fetch(PlayStats *out)
 {
     playstats_fetch_for(out, NULL);
@@ -287,9 +298,14 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         if (R_SUCCEEDED(out->events_rc) && account && event_count)
             event_count = playlog_for_account(events, event_count, account->uid, events, event_count);
         if (R_SUCCEEDED(out->events_rc)) {
-            static PlayLogTotal totals[PLAYSTATS_MAX];
-            const size_t n = playlog_fold_days(events, event_count, out->now, day_starts,
-                                               totals, PLAYSTATS_MAX);
+            // One more than the list holds: that one says it is cut.
+            static PlayLogTotal totals[PLAYSTATS_MAX + 1];
+            size_t n = playlog_fold_days(events, event_count, out->now, day_starts,
+                                         totals, PLAYSTATS_MAX + 1);
+            if (n > PLAYSTATS_MAX) {
+                out->truncated = true;
+                n = PLAYSTATS_MAX;
+            }
             for (size_t i = 0; i < n && !playstats_cancelled(); i++) {
                 GameStat *g = find_or_add(out, totals[i].app_id);   // also games deleted since
                 if (!g) break;
@@ -306,18 +322,7 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         // Then the all-time totals of every other installed game ever played,
         // while there is room: the games of this week come first, so a large
         // library never pushes today's play out of the list (PLAYSTATS_MAX).
-        for (size_t i = 0; i < id_count && !playstats_cancelled(); i++) {
-            bool seen = false;
-            for (u32 k = 0; k < out->count && !seen; k++) seen = out->games[k].app_id == ids[i];
-            if (seen) continue;
-            if (out->count == PLAYSTATS_MAX) break;
-            PdmPlayStatistics st;
-            if (R_FAILED(query_totals(ids[i], account, &st))) continue;
-            if (st.playtime == 0 && st.total_launches == 0) continue;
-            GameStat *g = find_or_add(out, ids[i]);
-            if (!g) break;
-            set_totals(g, &st);
-        }
+        playstats_add_played(out, ids, id_count, played_totals, (void *)account);
         free(events);
         pdmqryExit();
     }

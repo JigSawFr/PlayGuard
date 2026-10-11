@@ -168,6 +168,25 @@ size_t playstats_logged_games(PlayEventQuery query, s32 start, s32 total, u64 *i
     return n;
 }
 
+void playstats_add_played(PlayStats *out, const u64 *ids, size_t count, PlayTotalsQuery query, void *ctx)
+{
+    for (size_t i = 0; i < count; i++) {
+        bool seen = false;
+        for (u32 k = 0; k < out->count && !seen; k++) seen = out->games[k].app_id == ids[i];
+        if (seen) continue;
+        GameStat g;
+        memset(&g, 0, sizeof(g));
+        g.app_id = ids[i];
+        if (!query(ctx, ids[i], &g)) continue;
+        // Full: one more played game is enough to say the list is cut.
+        if (out->count == PLAYSTATS_MAX) {
+            out->truncated = true;
+            return;
+        }
+        out->games[out->count++] = g;
+    }
+}
+
 bool playstats_utf8_valid(const char *s, size_t len)
 {
     const unsigned char *p = (const unsigned char *)s;

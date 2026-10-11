@@ -99,7 +99,10 @@
         "next_step": "Se succede di nuovo, invia un rapporto: Strumenti › Invia un rapporto online.",
         "pt_not_understood": "le impostazioni del tempo di gioco della console sono in un formato che PlayGuard non comprende, quindi non è stato modificato nulla. Invia un rapporto: Strumenti › Invia un rapporto online.",
         "pctl_0132": "codice 2142-0132, segnalato anche da altri durante la scrittura del timer di gioco; il suo significato non è ancora noto. Riavvia la console, poi riprova",
-        "clock_not_set": "la console indica che il suo orologio di rete non ha un'ora valida (forse non è mai stato impostato); vedi la scheda Orologio di rete"
+        "clock_not_set": "la console indica che il suo orologio di rete non ha un'ora valida (forse non è mai stato impostato); vedi la scheda Orologio di rete",
+        "no_internet": "la console non è connessa a Internet: connettila, quindi riprova",
+        "service_denied": "il sistema ha negato a PlayGuard l'accesso a uno dei suoi servizi; PlayGuard richiede una console con Atmosphère",
+        "pdm_unavailable": "il servizio dei dati di gioco della console non è disponibile al momento; riprova tra poco"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -418,7 +421,8 @@
         },
         "applet_cap": "Non elencati, per risparmiare memoria in modalità applet (aperto dall'album): altri {}. L'esportazione contiene tutti i giochi; per l'elenco completo, apri PlayGuard tenendo premuto R mentre avvii un gioco.",
         "account_nobody": "Senza utente (o un utente eliminato)",
-        "account_new": "Nuovo utente dal {}: {}"
+        "account_new": "Nuovo utente dal {}: {}",
+        "truncated": "Si possono elencare solo {} giochi: ne mancano alcuni non giocati questa settimana, e il totale da sempre non li conta."
     },
     "restrictions": {
         "section_level": "Livello limitazioni",
@@ -550,7 +554,7 @@
         "show_pin_title": "PIN attuale",
         "show_pin_err": "Impossibile leggere il PIN",
         "unlock": "Sblocca temporaneamente",
-        "unlock_body": "Vuoi sbloccare temporaneamente il filtro famiglia?\n\nLe limitazioni restano disattivate finché non lo blocchi di nuovo (o fino al riavvio della console).",
+        "unlock_body": "Vuoi sbloccare temporaneamente il filtro famiglia?\n\nLe limitazioni restano disattivate finché non lo blocchi di nuovo (o fino al riavvio della console). Se nel frattempo PlayGuard viene chiuso dal menu HOME, lo blocca di nuovo al prossimo avvio.",
         "unlock_confirm": "Sblocca",
         "unlocked": "Filtro famiglia sbloccato temporaneamente.",
         "unlock_err": "Impossibile sbloccare",
@@ -883,7 +887,7 @@
         "diag_err": "Impossibile salvare la diagnostica",
         "relocked": "Filtro famiglia di nuovo bloccato.",
         "relock_err": "Impossibile bloccare di nuovo il filtro famiglia",
-        "relocked_after_stop": "L'ultima volta PlayGuard si è interrotto durante una modifica: il filtro famiglia è di nuovo bloccato.",
+        "relocked_after_stop": "L'ultima volta PlayGuard è stato chiuso con il filtro famiglia sbloccato: è di nuovo bloccato.",
         "config_err": "Impossibile salvare le preferenze sulla scheda SD"
     },
     "history": {

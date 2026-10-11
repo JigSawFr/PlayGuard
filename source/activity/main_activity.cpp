@@ -46,7 +46,10 @@ static void quit_or_relock()
     }
     brls::Logger::info("quitting while unlocked: asking to lock again");
     auto* dialog = ui::dialog("playguard/hints/exit_unlocked"_i18n);
-    dialog->addButton("playguard/hints/exit_leave"_i18n, []() { brls::Application::quit(); });
+    dialog->addButton("playguard/hints/exit_leave"_i18n, []() {
+        pt_flow::keep_unlocked();   // chosen: the next start does not lock again
+        brls::Application::quit();
+    });
     dialog->addButton("playguard/hints/exit_lock"_i18n, []() {
         const Result rc = pctl_relock();
         if (R_FAILED(rc)) {   // stay, and say why: quitting would leave it unlocked

@@ -99,7 +99,10 @@
         "next_step": "如果再次發生，請傳送報告：「工具 › 線上傳送報告」。",
         "pt_not_understood": "主機的遊玩時間設定格式PlayGuard無法識別，因此未變更任何設定。請傳送報告：「工具 › 線上傳送報告」。",
         "pctl_0132": "代碼2142-0132，其他人在寫入遊玩計時器時也遇過，其含義尚不清楚。請重新啟動主機後再試",
-        "clock_not_set": "主機回報其網路時鐘沒有有效時間（可能從未設定過）；請查看「網路時鐘」頁"
+        "clock_not_set": "主機回報其網路時鐘沒有有效時間（可能從未設定過）；請查看「網路時鐘」頁",
+        "no_internet": "主機未連線至網際網路：請連線後再試一次",
+        "service_denied": "系統拒絕PlayGuard存取其中一項服務；PlayGuard需要執行Atmosphère的主機",
+        "pdm_unavailable": "主機的遊玩資料服務目前無法使用；請稍後再試一次"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -418,7 +421,8 @@
         },
         "applet_cap": "為節省Applet模式（從相簿開啟）下的記憶體，另有{}款遊戲未列出。匯出檔包含所有遊戲；若要完整清單，請在啟動遊戲時按住R來開啟PlayGuard。",
         "account_nobody": "無帳號（或已刪除的帳號）",
-        "account_new": "新帳號（自{}起）：{}"
+        "account_new": "新帳號（自{}起）：{}",
+        "truncated": "最多只能列出{}款遊戲：部分本週未玩的遊戲未列出，也未計入全部期間的總計。"
     },
     "restrictions": {
         "section_level": "限制等級",
@@ -550,7 +554,7 @@
         "show_pin_title": "目前的PIN碼",
         "show_pin_err": "無法讀取PIN碼",
         "unlock": "暫時解除",
-        "unlock_body": "要暫時解除家長監護嗎？\n\n在重新鎖定（或主機重新啟動）之前，限制將保持關閉。",
+        "unlock_body": "要暫時解除家長監護嗎？\n\n在重新鎖定（或主機重新啟動）之前，限制將保持關閉。如果在此期間從HOME選單關閉PlayGuard，它會在下次啟動時重新鎖定。",
         "unlock_confirm": "解除",
         "unlocked": "已暫時解除家長監護。",
         "unlock_err": "無法解除",
@@ -883,7 +887,7 @@
         "diag_err": "無法儲存診斷報告",
         "relocked": "已重新鎖定家長監護。",
         "relock_err": "無法重新鎖定家長監護",
-        "relocked_after_stop": "上次PlayGuard在變更途中停止：已重新鎖定家長監護。",
+        "relocked_after_stop": "上次PlayGuard在家長監護解除期間被關閉：已重新鎖定家長監護。",
         "config_err": "無法將偏好設定儲存至SD卡"
     },
     "history": {
