@@ -3,13 +3,14 @@
 #   make              -> ./playguard.nro            (needs devkitPro, DEVKITPRO set)
 #   make dist         -> ./playguard.zip            (unzip onto the SD card root)
 #   make desktop      -> ./build-desktop/playguard  (UI with a simulated backend; needs GLFW)
-#   make test         -> host unit tests of the C service layer (plain gcc, ASan + UBSan)
+#   make test         -> host unit tests (plain gcc/g++, ASan + UBSan; parallel, all suites)
 #   make nxlink       -> push to a Switch running hbmenu (press Y there first)
 #
 # GL=1 builds the Switch .nro with OpenGL (mesa) instead of deko3d.
-# JOBS=n sets the parallel build jobs (default: every core). SAN= turns the
-# sanitizers of the host tests off (e.g. a compiler without them). COV=--coverage
-# builds them for gcov (CI: with gcc and SAN=, summarised by gcovr).
+# JOBS=n sets the parallel build (and host test) jobs (default: every core).
+# SAN= turns the sanitizers of the host tests off (e.g. a compiler without
+# them). COV=--coverage builds them for gcov (CI: with gcc and SAN=, summarised
+# by gcovr).
 # SOURCE_DATE_EPOCH (default: the last commit's time) dates every file of the
 # release zips, so the same commit gives the same zip.
 # CMAKE_C_COMPILER_LAUNCHER / CMAKE_CXX_COMPILER_LAUNCHER=ccache in the
@@ -36,7 +37,7 @@ ZIP_TREE = find . -exec touch -h -d @$(SOURCE_DATE_EPOCH) {} + && find . -mindep
 CMAKE_ARGS ?=
 JSON_HPP := extern/borealis/library/include/borealis/extern/nlohmann/json.hpp
 
-.PHONY: all clean dist nxlink desktop test check rescue dist-rescue
+.PHONY: all clean dist nxlink desktop test check rescue dist-rescue FORCE
 
 RENDERER := $(if $(GL),-DUSE_DEKO3D=OFF,-DUSE_DEKO3D=ON)
 
@@ -78,48 +79,138 @@ desktop:
 	@cmake -B $(DESKTOP) -S . -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release $(CMAKE_ARGS)
 	@cmake --build $(DESKTOP) -j $(JOBS)
 
+# Host tests: one program per suite, built straight from its sources (no
+# object files, so gcov's .gcno/.gcda sit next to the program in
+# build/host-tests/). A suite is three variables: <name>_SRC (its sources,
+# the test last), <name>_FLAGS (the standard, defines, include paths) and an
+# optional <name>_LIBS; the test source's suffix picks the compiler.
+# `make test` builds and runs every suite in parallel (JOBS) and keeps going
+# when one fails, so a run reports every failing suite, not the first: each
+# suite's output is in build/host-tests/<name>.log, and <name>.ok marks a
+# passed one (CI reads both for the job summary).
+
+# C: the service layer (source/core) against the fake <switch.h> of each
+# suite (-DNX_HOST_TEST), and the C helpers of source/util.
+pctl_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/write_guard.c tests/pctl_session/test.c
+pctl_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core
+time_SRC   := source/core/time_ops.c source/core/calendar.c source/core/write_guard.c tests/time_ops/test.c
+time_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/time_ops -Isource/core
+sysinfo_SRC   := source/core/sysinfo.c source/core/pure.c tests/sysinfo/test.c
+sysinfo_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/sysinfo -Isource/core
+calendar_SRC   := source/core/calendar.c tests/calendar/test.c
+calendar_FLAGS := -std=gnu11 -Isource/core
+rescue_SRC   := source/core/rescue.c tests/rescue/test.c
+rescue_FLAGS := -std=c11 -Isource/core
+ntp_SRC   := source/util/ntp_packet.c tests/ntp_packet/test.c
+ntp_FLAGS := -std=c11 -Isource/util
+playlog_SRC   := source/util/playlog.c tests/playlog/test.c
+playlog_FLAGS := -std=c11 -Isource/util
+playstats_SRC   := source/core/playstats_logic.c tests/playstats/test.c
+playstats_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/playstats -Isource/core
+playstats_LIBS  := -lz
+
+# C++: the UI-free helpers and flow logic (source/util, source/action).
+# borealis' headers (nlohmann/json) as system headers: their warnings are not
+# PlayGuard's (clang 22 deprecates json.hpp's literal operators, under -Werror).
+patches_SRC   := source/util/paths.cpp source/util/patches.cpp tests/patches/test.cpp
+patches_FLAGS := -std=c++17 -Isource
+duration_SRC   := source/util/duration.cpp tests/duration/test.cpp
+duration_FLAGS := -std=c++17 -Isource
+changelog_SRC   := source/util/changelog.cpp tests/changelog/test.cpp
+changelog_FLAGS := -std=c++17 -Isource
+support_SRC   := source/util/support.cpp tests/support/test.cpp
+support_FLAGS := -std=c++17 -Isource
+pt_logic_SRC   := source/action/pt_logic.cpp tests/pt_logic/test.cpp
+pt_logic_FLAGS := -std=c++17 -Isource
+pin_lock_logic_SRC   := source/action/pin_lock_logic.cpp tests/pin_lock_logic/test.cpp
+pin_lock_logic_FLAGS := -std=c++17 -Isource
+console_lock_logic_SRC   := source/action/console_lock_logic.cpp tests/console_lock_logic/test.cpp
+console_lock_logic_FLAGS := -std=c++17 -Isource
+history_logic_SRC   := source/action/history_logic.cpp tests/history_logic/test.cpp
+history_logic_FLAGS := -std=c++17 -Isource
+timer_health_logic_SRC   := source/action/timer_health_logic.cpp tests/timer_health_logic/test.cpp
+timer_health_logic_FLAGS := -std=c++17 -Isource
+offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
+offline_clock_logic_FLAGS := -std=c++17 -Isource
+icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp
+icon_logic_FLAGS := -std=c++17 -Isource
+write_queue_logic_SRC   := source/action/write_queue_logic.cpp tests/write_queue_logic/test.cpp
+write_queue_logic_FLAGS := -std=c++17 -Isource
+write_queue_logic_LIBS  := -pthread
+worker_threads_SRC   := source/util/worker_threads.cpp tests/worker_threads/test.cpp
+worker_threads_FLAGS := -std=c++17 -Isource
+worker_threads_LIBS  := -pthread
+data_cleanup_SRC   := source/util/data_cleanup.cpp tests/data_cleanup/test.cpp
+data_cleanup_FLAGS := -std=c++17 -Isource
+error_hint_logic_SRC   := source/action/error_hint_logic.cpp tests/error_hint_logic/test.cpp
+error_hint_logic_FLAGS := -std=c++17 -Isource
+outside_change_logic_SRC   := source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp
+outside_change_logic_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+backup_SRC   := source/util/paths.cpp source/util/backup.cpp tests/backup/test.cpp
+backup_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+backup_logic_SRC   := source/util/paths.cpp source/util/backup.cpp source/util/pt_block.cpp source/action/backup_logic.cpp tests/backup_logic/test.cpp
+backup_logic_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+http_logic_SRC   := source/util/http_logic.cpp tests/http_logic/test.cpp
+http_logic_FLAGS := -std=c++17 -Isource
+table_export_SRC   := source/util/paths.cpp source/util/table_export.cpp tests/table_export/test.cpp
+table_export_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+update_SRC   := source/util/update.cpp tests/update/test.cpp
+update_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+config_SRC   := source/util/paths.cpp source/util/config.cpp tests/config/test.cpp
+config_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+profiles_SRC   := source/util/paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
+profiles_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
+pt_block_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
+launcher_FLAGS := -std=c++17 -Isource
+history_SRC   := source/util/paths.cpp source/util/history.cpp tests/history/test.cpp
+history_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+log_upload_SRC   := source/util/paths.cpp source/util/pt_log.cpp source/util/log_upload.cpp tests/log_upload/test.cpp
+log_upload_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+dev_builds_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/github_auth.cpp tests/dev_builds/test.cpp
+dev_builds_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+dev_builds_LIBS  := -lz
+play_cache_SRC   := source/util/play_cache.cpp tests/play_cache/test.cpp
+play_cache_FLAGS := -std=c++17 -Isource
+activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summary/test.cpp
+activity_summary_FLAGS := -std=c++17 -Isource
+pt_log_SRC   := source/util/paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp
+pt_log_FLAGS := -std=c++17 -Isource
+
+TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))
+TEST_PROGRAMS := $(addprefix $(TESTOUT)/,$(TESTS))
+TEST_OKS := $(addsuffix .ok,$(TEST_PROGRAMS))
+# Every header: a suite is rebuilt when one changes (coarse, but a suite
+# compiles in seconds and CI always starts cold).
+TEST_HEADERS := $(wildcard tests/check.h tests/*/*.h source/*.hpp source/*/*.h source/*/*.hpp)
+
+$(TESTOUT):
+	@mkdir -p $@
+
+# make only compares dates: this file is rewritten when the compiler or the
+# flags change (CC=clang, SAN=, COV=--coverage), so the suites are rebuilt.
+TEST_FLAGS_FILE := $(TESTOUT)/flags
+$(TEST_FLAGS_FILE): FORCE | $(TESTOUT)
+	@echo "$(CC) $(CXX) $(CWARN)" | cmp -s - $@ || echo "$(CC) $(CXX) $(CWARN)" > $@
+FORCE:
+
+# The suite's program. Second expansion: the pattern's stem names the
+# variables above.
+.SECONDEXPANSION:
+$(TEST_PROGRAMS): $(TESTOUT)/%: $$($$*_SRC) $(TEST_HEADERS) $(TEST_FLAGS_FILE) | $(TESTOUT)
+	$(if $(filter %.cpp,$($*_SRC)),$(CXX),$(CC)) $($*_FLAGS) $(CWARN) $($*_SRC) $($*_LIBS) -o $@
+
+# Running it: the output goes to <name>.log and the terminal; <name>.ok only
+# when it passed.
+$(TEST_OKS): $(TESTOUT)/%.ok: $(TESTOUT)/%
+	@rm -f $@
+	@$< > $<.log 2>&1; r=$$?; cat $<.log; if [ $$r -eq 0 ]; then touch $@; else echo "$*: exit status $$r" >&2; exit $$r; fi
+
 test:
 	@test -f $(JSON_HPP) || { echo "borealis is missing (nlohmann/json for the tests): run git submodule update --init"; exit 1; }
-	@mkdir -p $(TESTOUT)
-	$(CC) -std=gnu11 $(CWARN) -DNX_HOST_TEST -Itests/pctl_session -Isource/core source/core/pctl_ops.c source/core/pure.c source/core/write_guard.c tests/pctl_session/test.c -o $(TESTOUT)/pctl && $(TESTOUT)/pctl
-	$(CC) -std=gnu11 $(CWARN) -DNX_HOST_TEST -Itests/time_ops -Isource/core source/core/time_ops.c source/core/calendar.c source/core/write_guard.c tests/time_ops/test.c -o $(TESTOUT)/time && $(TESTOUT)/time
-	$(CC) -std=gnu11 $(CWARN) -DNX_HOST_TEST -Itests/sysinfo -Isource/core source/core/sysinfo.c source/core/pure.c tests/sysinfo/test.c -o $(TESTOUT)/sysinfo && $(TESTOUT)/sysinfo
-	$(CC) -std=gnu11 $(CWARN) -Isource/core source/core/calendar.c tests/calendar/test.c -o $(TESTOUT)/calendar && $(TESTOUT)/calendar
-	$(CC) -std=c11 $(CWARN) -Isource/core source/core/rescue.c tests/rescue/test.c -o $(TESTOUT)/rescue && $(TESTOUT)/rescue
-	$(CC) -std=c11 $(CWARN) -Isource/util source/util/ntp_packet.c tests/ntp_packet/test.c -o $(TESTOUT)/ntp && $(TESTOUT)/ntp
-	$(CC) -std=c11 $(CWARN) -Isource/util source/util/playlog.c tests/playlog/test.c -o $(TESTOUT)/playlog && $(TESTOUT)/playlog
-	$(CC) -std=gnu11 $(CWARN) -DNX_HOST_TEST -Itests/playstats -Isource/core source/core/playstats_logic.c tests/playstats/test.c -lz -o $(TESTOUT)/playstats && $(TESTOUT)/playstats
-	$(CXX) -std=c++17 $(CWARN) -Isource source/util/paths.cpp source/util/patches.cpp tests/patches/test.cpp -o $(TESTOUT)/patches && $(TESTOUT)/patches
-	$(CXX) -std=c++17 $(CWARN) -Isource source/util/duration.cpp tests/duration/test.cpp -o $(TESTOUT)/duration && $(TESTOUT)/duration
-	$(CXX) -std=c++17 $(CWARN) -Isource source/util/changelog.cpp tests/changelog/test.cpp -o $(TESTOUT)/changelog && $(TESTOUT)/changelog
-	$(CXX) -std=c++17 $(CWARN) -Isource source/util/support.cpp tests/support/test.cpp -o $(TESTOUT)/support && $(TESTOUT)/support
-	$(CXX) -std=c++17 $(CWARN) -Isource source/action/pt_logic.cpp tests/pt_logic/test.cpp -o $(TESTOUT)/pt_logic && $(TESTOUT)/pt_logic
-	$(CXX) -std=c++17 $(CWARN) -Isource source/action/pin_lock_logic.cpp tests/pin_lock_logic/test.cpp -o $(TESTOUT)/pin_lock_logic && $(TESTOUT)/pin_lock_logic
-	$(CXX) -std=c++17 $(CWARN) -Isource source/action/console_lock_logic.cpp tests/console_lock_logic/test.cpp -o $(TESTOUT)/console_lock_logic && $(TESTOUT)/console_lock_logic
-	$(CXX) -std=c++17 $(CWARN) -Isource source/action/history_logic.cpp tests/history_logic/test.cpp -o $(TESTOUT)/history_logic && $(TESTOUT)/history_logic
-	$(CXX) -std=c++17 $(CWARN) -Isource source/action/timer_health_logic.cpp tests/timer_health_logic/test.cpp -o $(TESTOUT)/timer_health_logic && $(TESTOUT)/timer_health_logic
-	$(CXX) -std=c++17 $(CWARN) -Isource source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp -o $(TESTOUT)/offline_clock_logic && $(TESTOUT)/offline_clock_logic
-	$(CXX) -std=c++17 $(CWARN) -Isource source/action/icon_logic.cpp tests/icon_logic/test.cpp -o $(TESTOUT)/icon_logic && $(TESTOUT)/icon_logic
-	$(CXX) -std=c++17 $(CWARN) -Isource source/action/write_queue_logic.cpp tests/write_queue_logic/test.cpp -pthread -o $(TESTOUT)/write_queue_logic && $(TESTOUT)/write_queue_logic
-	$(CXX) -std=c++17 $(CWARN) -Isource source/util/worker_threads.cpp tests/worker_threads/test.cpp -pthread -o $(TESTOUT)/worker_threads && $(TESTOUT)/worker_threads
-	$(CXX) -std=c++17 $(CWARN) -Isource source/util/data_cleanup.cpp tests/data_cleanup/test.cpp -o $(TESTOUT)/data_cleanup && $(TESTOUT)/data_cleanup
-	$(CXX) -std=c++17 $(CWARN) -Isource source/action/error_hint_logic.cpp tests/error_hint_logic/test.cpp -o $(TESTOUT)/error_hint_logic && $(TESTOUT)/error_hint_logic
-	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp -o $(TESTOUT)/outside_change_logic && $(TESTOUT)/outside_change_logic
-	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/paths.cpp source/util/backup.cpp tests/backup/test.cpp -o $(TESTOUT)/backup && $(TESTOUT)/backup
-	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/paths.cpp source/util/backup.cpp source/util/pt_block.cpp source/action/backup_logic.cpp tests/backup_logic/test.cpp -o $(TESTOUT)/backup_logic && $(TESTOUT)/backup_logic
-	$(CXX) -std=c++17 $(CWARN) -Isource source/util/http_logic.cpp tests/http_logic/test.cpp -o $(TESTOUT)/http_logic && $(TESTOUT)/http_logic
-	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/paths.cpp source/util/table_export.cpp tests/table_export/test.cpp -o $(TESTOUT)/table_export && $(TESTOUT)/table_export
-	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/update.cpp tests/update/test.cpp -o $(TESTOUT)/update && $(TESTOUT)/update
-	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/paths.cpp source/util/config.cpp tests/config/test.cpp -o $(TESTOUT)/config && $(TESTOUT)/config
-	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/paths.cpp source/util/profiles.cpp tests/profiles/test.cpp -o $(TESTOUT)/profiles && $(TESTOUT)/profiles
-	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp -o $(TESTOUT)/pt_block && $(TESTOUT)/pt_block
-	$(CXX) -std=c++17 $(CWARN) -Isource source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp -o $(TESTOUT)/launcher && $(TESTOUT)/launcher
-	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/paths.cpp source/util/history.cpp tests/history/test.cpp -o $(TESTOUT)/history && $(TESTOUT)/history
-	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/paths.cpp source/util/pt_log.cpp source/util/log_upload.cpp tests/log_upload/test.cpp -o $(TESTOUT)/log_upload && $(TESTOUT)/log_upload
-	$(CXX) -std=c++17 $(CWARN) -Isource -Iextern/borealis/library/include source/util/paths.cpp source/util/sha256.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/github_auth.cpp tests/dev_builds/test.cpp -lz -o $(TESTOUT)/dev_builds && $(TESTOUT)/dev_builds
-	$(CXX) -std=c++17 $(CWARN) -Isource source/util/play_cache.cpp tests/play_cache/test.cpp -o $(TESTOUT)/play_cache && $(TESTOUT)/play_cache
-	$(CXX) -std=c++17 $(CWARN) -Isource source/util/activity_summary.cpp tests/activity_summary/test.cpp -o $(TESTOUT)/activity_summary && $(TESTOUT)/activity_summary
-	$(CXX) -std=c++17 $(CWARN) -Isource source/util/paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp -o $(TESTOUT)/pt_log && $(TESTOUT)/pt_log
+	@rm -f $(TEST_OKS)
+	@$(MAKE) --no-print-directory -k $(if $(findstring -j,$(MAKEFLAGS)),,-j$(JOBS)) -Otarget $(TEST_OKS)
 
 check: test
 	python3 tools/check_resources.py .

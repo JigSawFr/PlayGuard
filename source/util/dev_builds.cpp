@@ -91,12 +91,21 @@ bool parse_release(const std::string& text, Build* out)
     });
 }
 
-bool parse_artifacts(const std::string& text, std::vector<Artifact>* out)
+bool is_build_artifact(const std::string& name)
 {
-    return parse(text, [out](const json& j) {
+    if (name == "playguard_release") return true;
+    const std::string head = "playguard-", tail = "-nro";
+    return name.size() > head.size() + tail.size() && name.compare(0, head.size(), head) == 0 &&
+           name.compare(name.size() - tail.size(), tail.size(), tail) == 0;
+}
+
+bool parse_artifacts(const std::string& text, std::vector<Artifact>* out, size_t* listed)
+{
+    return parse(text, [out, listed](const json& j) {
         if (!j.is_object() || !j.contains("artifacts") || !j["artifacts"].is_array()) return false;
+        if (listed) *listed = j["artifacts"].size();
         for (const auto& a : j["artifacts"]) {
-            if (!a.is_object() || str(a, "name") != "playguard_release" || a.value("expired", true)) continue;
+            if (!a.is_object() || !is_build_artifact(str(a, "name")) || a.value("expired", true)) continue;
             if (!a.contains("workflow_run") || !a["workflow_run"].is_object()) continue;
             const auto& run = a["workflow_run"];
             Artifact x;
