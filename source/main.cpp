@@ -472,7 +472,12 @@ int main(int argc, char* argv[])
     // frame time is the work alone.
     FILE* stats = nullptr;
     if (const char* path = std::getenv("PLAYGUARD_SIM_STATS")) {
-        stats = std::fopen(path, "w");
+        // Created with an explicit mode (CodeQL: fopen's depends on the umask).
+        const int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+        if (fd >= 0) {
+            stats = fdopen(fd, "w");
+            if (!stats) close(fd);
+        }
         brls::Application::setLimitedFPS(0);
     }
     brls::Time stats_last = brls::getCPUTimeUsec();
