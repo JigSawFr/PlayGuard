@@ -20,6 +20,9 @@ std::string version();            // "1.0.0"
 // The commit this build comes from ("1a2b3c4"), empty when unknown (built
 // outside a git checkout). Tells which development build is installed.
 std::string commit();
+// True for a published release (built from its vX.Y.Z tag), false for any
+// other build (main, a pull request, a local one): a development build.
+bool        is_release();
 // Where the running .nro is, from the SD card root ("/switch/playguard/playguard.nro"),
 // as hbloader gave it in argv[0]; empty when unknown (nxlink, desktop).
 std::string self_path();

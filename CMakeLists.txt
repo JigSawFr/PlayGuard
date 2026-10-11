@@ -157,7 +157,16 @@ elseif (GIT_FOUND)
                     OUTPUT_VARIABLE APP_COMMIT OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 endif()
 message(STATUS "PlayGuard commit: ${APP_COMMIT}")
-target_compile_definitions(${PROJECT_NAME} PRIVATE APP_VERSION="${APP_VERSION}" APP_COMMIT="${APP_COMMIT}")
+# A published release (CI: the build release-please.yml calls for a vX.Y.Z tag,
+# PLAYGUARD_RELEASE=1). Anything else is a development build: the version
+# badge in the header (view/version_badge.hpp) says so, with the commit.
+set(APP_RELEASE 0)
+if ("$ENV{PLAYGUARD_RELEASE}" STREQUAL "1")
+    set(APP_RELEASE 1)
+endif ()
+message(STATUS "PlayGuard release build: ${APP_RELEASE}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE APP_VERSION="${APP_VERSION}" APP_COMMIT="${APP_COMMIT}"
+                           APP_RELEASE=${APP_RELEASE})
 target_link_libraries(${PROJECT_NAME} PRIVATE borealis ${APP_PLATFORM_LIB})
 # borealis' headers as system headers: their warnings are not PlayGuard's.
 get_target_property(BOREALIS_INCLUDES borealis INTERFACE_INCLUDE_DIRECTORIES)
