@@ -19,7 +19,12 @@ switch/playguard/logs/*.txt              diagnostic reports (never contain the P
 switch/playguard/logs/play_timer_log.csv   Developer tools › record the play timer (.old.csv: the previous one)
 switch/playguard/logs/play_timer_block.json   Developer tools › play-timer block reference
 switch/playguard/history.json            the change history (the newest 200 changes)
-switch/playguard/cache/                  play data per account (activity_*.bin), the development build list (dev_builds.json)
+switch/playguard/watch.json              what PlayGuard last saw of the console (today's play time, the clock, the limits,
+                                         the user accounts), to tell what changed outside it (docs/config.md)
+switch/playguard/config.json.bad         a config.json that could not be read, kept aside rather than overwritten (.bad.1: the
+                                         previous one); history.json.bad the same for the change history
+switch/playguard/cache/                  play data per account (activity_*.bin), the game icons (icons/, 16 MB at most),
+                                         the development build list (dev_builds.json)
 switch/playguard/github_token            GitHub sign-in of the developer tools: the token in plain text,
                                          treat it as a password (Disconnect deletes it)
 switch/playguard/rescue_report.txt       left by the recovery sysmodule, read at start-up
