@@ -4,6 +4,9 @@
         "read_only": "閲覧のみ",
         "unlocked": "一時解除中"
     },
+    "loading": {
+        "hint": "読み込み中…"
+    },
     "tabs": {
         "dashboard": "概要",
         "play_timer": "プレイ時間",

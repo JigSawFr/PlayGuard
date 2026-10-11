@@ -5,6 +5,7 @@
 // General Public License v3 or later; it comes with NO WARRANTY. See the
 // LICENSE file or <https://www.gnu.org/licenses/gpl-3.0.html> for details.
 #include <borealis.hpp>
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -19,6 +20,7 @@
 #include "action/pt_log_flow.hpp"
 #include "action/rescue.hpp"
 #include "activity/init_error_activity.hpp"
+#include "activity/loading_activity.hpp"
 #include "activity/lock_activity.hpp"
 #include "activity/main_activity.hpp"
 #include "activity/rescue_activity.hpp"
@@ -84,10 +86,45 @@ namespace
     platform_crash();
     std::abort();
 }
+
+// The first real screen, once the console is probed and the start-up checks
+// are made: the recovery report, the lock screen or the main screen (or the
+// start-up error). Built after the loading screen was drawn once: the probe,
+// the SD-card reads and the main screen's build take a moment on the
+// console, and the screen stayed black for it.
+brls::Activity* first_screen()
+{
+    if (!app::init()) {
+        brls::Logger::error("pctl probe failed (0x{:08X}) — showing InitErrorActivity", app::pctl_init_result());
+        return new InitErrorActivity();
+    }
+    // Untested firmware: read-only (or the remembered choice) before any tab is built.
+    fw_gate::prepare();
+    // Security › Ask for the PIN: checked before every change from now on;
+    // "To open PlayGuard" starts on the lock screen.
+    pin_lock::install();
+    // ... and again after a while away, over whatever is open.
+    pin_lock::watch_focus([]() { LockActivity::lock_again(); });
+    // The playguard-rescue sysmodule acted on a RESCUE file: show what it
+    // did and let the parent finish, before (and instead of) the lock
+    // screen — they are here because they forgot the PIN. Only when the
+    // console confirms it: anyone can write the report file, and an
+    // unconfirmed one leads to the lock screen like any start.
+    auto report = rescue::take();
+    const bool confirmed = report && rescue::confirmed(*report);
+    // Stopped in the middle of a change last time: lock again before any
+    // screen, so a lock screen left with B does not leave the console
+    // unlocked. Not after a confirmed recovery unlock: that one is wanted.
+    if (!(confirmed && report->mode == RescueMode_Unlock)) pt_flow::relock_if_interrupted();
+    if (report) return new RescueActivity(*report, confirmed);
+    if (pin_lock::at_start()) return new LockActivity();
+    return new MainActivity();
+}
 }   // namespace
 
 int main(int argc, char* argv[])
 {
+    const auto started = std::chrono::steady_clock::now();
     std::set_terminate(on_terminate);
     app::set_self_path(argc > 0 ? argv[0] : nullptr);
 
@@ -142,37 +179,26 @@ int main(int argc, char* argv[])
     brls::Application::registerXMLView("ToolsTab",        ToolsTab::create);
     brls::Application::registerXMLView("AboutTab",        AboutTab::create);
 
-    if (app::init()) {
-        // Untested firmware: read-only (or the remembered choice) before any tab is built.
-        fw_gate::prepare();
-        // Security › Ask for the PIN: checked before every change from now on;
-        // "To open PlayGuard" starts on the lock screen.
-        pin_lock::install();
-        // ... and again after a while away, over whatever is open.
-        pin_lock::watch_focus([]() { LockActivity::lock_again(); });
-        // The playguard-rescue sysmodule acted on a RESCUE file: show what it
-        // did and let the parent finish, before (and instead of) the lock
-        // screen — they are here because they forgot the PIN. Only when the
-        // console confirms it: anyone can write the report file, and an
-        // unconfirmed one leads to the lock screen like any start.
-        auto report = rescue::take();
-        const bool confirmed = report && rescue::confirmed(*report);
-        // Stopped in the middle of a change last time: lock again before any
-        // screen, so a lock screen left with B does not leave the console
-        // unlocked. Not after a confirmed recovery unlock: that one is wanted.
-        if (!(confirmed && report->mode == RescueMode_Unlock)) pt_flow::relock_if_interrupted();
-        if (report)
-            brls::Application::pushActivity(new RescueActivity(*report, confirmed));
-        else if (pin_lock::at_start())
-            brls::Application::pushActivity(new LockActivity());
-        else
-            brls::Application::pushActivity(new MainActivity());
-    } else {
-        brls::Logger::error("pctl probe failed (0x{:08X}) — showing InitErrorActivity", app::pctl_init_result());
-        brls::Application::pushActivity(new InitErrorActivity());
-    }
-
-    pt_log_flow::apply();   // Developer › Record the play timer, when on
+    // The loading screen first, with nothing slow before it, and drawn at once
+    // (no fade: a frame at alpha 0 would be a black one). The rest of the
+    // start-up runs at the end of that first frame (brls::sync runs after the
+    // frame is drawn), and the first screen takes the loading screen's place.
+    brls::Application::pushActivity(new LoadingActivity(), brls::TransitionAnimation::NONE);
+    brls::sync([started]() {
+        const auto since_start = [started]() {
+            return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started).count();
+        };
+        brls::Logger::info("start-up: loading screen drawn after {} ms", since_start());
+        brls::Activity* first = first_screen();
+        // In its place, not over it: borealis never pops the first activity
+        // (ui::replace_screen counts on it), and B on the lock screen or the
+        // main screen must quit, not uncover a loading screen. The loading
+        // screen has nothing focused, so nothing stale is left in the focus.
+        brls::Application::clear();
+        brls::Application::pushActivity(first, brls::TransitionAnimation::NONE);
+        pt_log_flow::apply();   // Developer › Record the play timer, when on (after fw_gate::prepare)
+        brls::Logger::info("start-up: first screen ready after {} ms", since_start());
+    });
 
     // Game icons kept between runs, next to the play data cache.
     playstats_set_icon_dir((paths::data_dir() + "/cache/icons").c_str());

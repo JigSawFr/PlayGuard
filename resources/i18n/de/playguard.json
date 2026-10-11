@@ -4,6 +4,9 @@
         "read_only": "schreibgeschützt",
         "unlocked": "vorübergehend aufgehoben"
     },
+    "loading": {
+        "hint": "Wird geladen..."
+    },
     "tabs": {
         "dashboard": "Übersicht",
         "play_timer": "Spielzeit",

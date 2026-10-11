@@ -4,6 +4,9 @@
         "read_only": "只读",
         "unlocked": "已暂时解除"
     },
+    "loading": {
+        "hint": "正在加载…"
+    },
     "tabs": {
         "dashboard": "概览",
         "play_timer": "游戏时间",

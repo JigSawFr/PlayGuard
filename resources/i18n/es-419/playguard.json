@@ -4,6 +4,9 @@
         "read_only": "solo lectura",
         "unlocked": "desbloqueado temporalmente"
     },
+    "loading": {
+        "hint": "Cargando..."
+    },
     "tabs": {
         "dashboard": "Resumen",
         "play_timer": "Tiempo de juego",

@@ -4,6 +4,9 @@
         "read_only": "읽기 전용",
         "unlocked": "일시 해제 중"
     },
+    "loading": {
+        "hint": "불러오는 중..."
+    },
     "tabs": {
         "dashboard": "개요",
         "play_timer": "플레이 타이머",

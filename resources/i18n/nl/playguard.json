@@ -4,6 +4,9 @@
         "read_only": "alleen-lezen",
         "unlocked": "tijdelijk ontgrendeld"
     },
+    "loading": {
+        "hint": "Laden..."
+    },
     "tabs": {
         "dashboard": "Overzicht",
         "play_timer": "Speeltijdtimer",

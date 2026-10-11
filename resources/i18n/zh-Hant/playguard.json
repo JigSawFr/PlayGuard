@@ -4,6 +4,9 @@
         "read_only": "唯讀",
         "unlocked": "已暫時解除"
     },
+    "loading": {
+        "hint": "正在載入…"
+    },
     "tabs": {
         "dashboard": "總覽",
         "play_timer": "遊玩時間限制",

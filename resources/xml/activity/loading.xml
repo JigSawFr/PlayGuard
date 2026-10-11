@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- The loading screen: drawn once before the rest of the start-up (main.cpp),
+     which takes a moment on the console (the service probe, the SD-card reads,
+     the main screen's build) and left the screen black until then. Nothing to
+     focus; B does nothing. The first screen takes its place within a second. -->
+
+<brls:AppletFrame
+    headerHidden="true"
+    footerHidden="true">
+
+    <brls:Box
+        width="auto"
+        height="auto"
+        axis="column"
+        justifyContent="center"
+        alignItems="center"
+        grow="1.0">
+
+        <brls:Image
+            image="@res/img/app_icon.jpg"
+            width="128"
+            height="128"
+            cornerRadius="24"
+            marginBottom="24"/>
+
+        <brls:Label
+            text="@i18n/playguard/title"
+            fontSize="36"
+            horizontalAlign="center"
+            marginBottom="36"/>
+
+        <brls:ProgressSpinner
+            size="large"
+            width="56"
+            height="56"
+            marginBottom="18"/>
+
+        <brls:Label
+            text="@i18n/playguard/loading/hint"
+            fontSize="20"
+            horizontalAlign="center"
+            textColor="@theme/brand/note"/>
+
+    </brls:Box>
+
+</brls:AppletFrame>

@@ -4,6 +4,9 @@
         "read_only": "read-only",
         "unlocked": "temporarily unlocked"
     },
+    "loading": {
+        "hint": "Loading..."
+    },
     "tabs": {
         "dashboard": "Overview",
         "play_timer": "Play timer",
