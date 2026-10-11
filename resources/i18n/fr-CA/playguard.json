@@ -416,6 +416,7 @@
             "busiest": "Jour le plus occupé",
             "session": "Session moyenne"
         },
+        "applet_cap": "Non listés, pour économiser la mémoire en mode applet (ouvert depuis l'album) : {} de plus. L'export contient tous les jeux; pour la liste complète, ouvrez PlayGuard en maintenant R au lancement d'un jeu.",
         "account_nobody": "Sans compte (ou compte supprimé)",
         "account_new": "Nouveau compte depuis le {} : {}"
     },
@@ -762,7 +763,8 @@
         "restore_err": "Non restauré : {}",
         "before_delete_err": "Aucune sauvegarde n'a pu être enregistrée avant ({}).\n\nTout supprimer quand même?",
         "delete_anyway": "Supprimer quand même",
-        "bedtime_not_restored": "Cette sauvegarde avait une alarme du coucher activée : elle n'est pas restaurée, réglez-la de nouveau dans Temps de jeu si besoin."
+        "bedtime_not_restored": "Cette sauvegarde avait une alarme du coucher activée : elle n'est pas restaurée, réglez-la de nouveau dans Temps de jeu si besoin.",
+        "backed_up_on": "Réglages sauvegardés le {}."
     },
     "update": {
         "checking": "Recherche d'une mise à jour...",

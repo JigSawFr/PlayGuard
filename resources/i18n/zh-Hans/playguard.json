@@ -416,6 +416,7 @@
             "busiest": "玩得最多的一天",
             "session": "平均每次时长"
         },
+        "applet_cap": "为节省小程序模式（从相册打开）下的内存，另有{}款游戏未列出。导出文件包含所有游戏；如需完整列表，请在启动游戏时按住R键打开PlayGuard。",
         "account_nobody": "无用户（或已删除的用户）",
         "account_new": "新用户（自{}起）：{}"
     },
@@ -762,7 +763,8 @@
         "restore_err": "未恢复：{}",
         "before_delete_err": "无法事先保存备份（{}）。\n\n仍要删除全部内容吗？",
         "delete_anyway": "仍要删除",
-        "bedtime_not_restored": "此备份中开启了就寝提醒：不会恢复，如有需要请在“游戏时间”中重新设置。"
+        "bedtime_not_restored": "此备份中开启了就寝提醒：不会恢复，如有需要请在“游戏时间”中重新设置。",
+        "backed_up_on": "{}备份的设置。"
     },
     "update": {
         "checking": "正在检查更新…",

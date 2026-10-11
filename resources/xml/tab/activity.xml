@@ -51,6 +51,7 @@
                 <brls:Label text="@i18n/playguard/activity/loading" fontSize="20" grow="1.0" textColor="@theme/brand/note"/>
             </brls:Box>
             <brls:Box id="ac_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
+            <brls:Label id="ac_capped" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note" visibility="gone"/>
             <brls:Label id="ac_status" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
             <brls:Label id="ac_note" text="@i18n/playguard/activity/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
 

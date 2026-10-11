@@ -416,6 +416,7 @@
             "busiest": "玩得最多的一天",
             "session": "平均每次時長"
         },
+        "applet_cap": "為節省Applet模式（從相簿開啟）下的記憶體，另有{}款遊戲未列出。匯出檔包含所有遊戲；若要完整清單，請在啟動遊戲時按住R來開啟PlayGuard。",
         "account_nobody": "無帳號（或已刪除的帳號）",
         "account_new": "新帳號（自{}起）：{}"
     },
@@ -762,7 +763,8 @@
         "restore_err": "未還原：{}",
         "before_delete_err": "無法事先儲存備份（{}）。\n\n仍要刪除所有設定嗎？",
         "delete_anyway": "仍要刪除",
-        "bedtime_not_restored": "此備份中開啟了就寢鬧鐘：不會復原，如有需要請在「遊玩時間限制」中重新設定。"
+        "bedtime_not_restored": "此備份中開啟了就寢鬧鐘：不會復原，如有需要請在「遊玩時間限制」中重新設定。",
+        "backed_up_on": "於{}備份的設定。"
     },
     "update": {
         "checking": "正在檢查更新…",

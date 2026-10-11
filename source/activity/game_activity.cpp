@@ -3,6 +3,7 @@
 
 #include <fmt/format.h>
 #include <string>
+#include <vector>
 
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
@@ -36,16 +37,34 @@ void GameActivity::onContentAvailable()
     first->setDetailText(g.totals_ok && g.first_played ? ui::time_text(g.first_played) : "—");
     last->setDetailText(g.totals_ok && g.last_played ? ui::time_text(g.last_played) : "—");
 
-    // All time per user account.
-    AccountPlay by_account[PLAYSTATS_MAX_ACCOUNTS];
-    Result rc = 0;
-    const size_t n = g.totals_ok ? playstats_by_account(g.app_id, by_account, PLAYSTATS_MAX_ACCOUNTS, &rc) : 0;
-    for (size_t i = 0; i < n; i++) {
+    // All time per user account: up to eight statistics and profile reads,
+    // off the UI thread (the screen is up meanwhile, the note says so).
+    accounts_note->setText("playguard/activity/loading"_i18n);
+    if (!g.totals_ok) {
+        this->show_accounts({}, 0);
+        return;
+    }
+    std::weak_ptr<bool> weak = this->alive;
+    const u64 app_id = g.app_id;
+    ui::in_background("account play", [this, weak, app_id]() {
+        auto found = std::make_shared<std::vector<AccountPlay>>(PLAYSTATS_MAX_ACCOUNTS);
+        Result rc = 0;
+        found->resize(playstats_by_account(app_id, found->data(), found->size(), &rc));
+        if (ui::quitting()) return;
+        brls::sync([this, weak, found, rc]() {
+            if (!weak.expired()) this->show_accounts(*found, rc);
+        });
+    });
+}
+
+void GameActivity::show_accounts(const std::vector<AccountPlay>& by_account, Result rc)
+{
+    const GameStat& g = this->game;
+    for (const AccountPlay& a : by_account) {
         auto* cell = new brls::DetailCell();
         cell->setFocusable(false);
-        cell->setText(by_account[i].nickname[0] ? std::string(by_account[i].nickname) : "?");
-        cell->setDetailText(brls::getStr("playguard/activity/account_value", ui::fmt_play_time(by_account[i].total_s),
-                                         (int)by_account[i].launches));
+        cell->setText(a.nickname[0] ? std::string(a.nickname) : "?");
+        cell->setDetailText(brls::getStr("playguard/activity/account_value", ui::fmt_play_time(a.total_s), (int)a.launches));
         accounts->addView(cell);
     }
     // The game's own total less the accounts': time with no account chosen
@@ -63,8 +82,8 @@ void GameActivity::onContentAvailable()
     }
     std::string note;
     if (!g.totals_ok) note = "playguard/activity/accounts_none"_i18n;
-    else if (n == 0 && R_FAILED(rc)) note = "playguard/activity/err_stats"_i18n + " — " + ui::rc_text(rc);
-    else if (n == 0) note = "playguard/activity/accounts_none"_i18n;
+    else if (by_account.empty() && R_FAILED(rc)) note = "playguard/activity/err_stats"_i18n + " — " + ui::rc_text(rc);
+    else if (by_account.empty()) note = "playguard/activity/accounts_none"_i18n;
     accounts_note->setText(note);
     ui::set_visible(accounts_note.getView(), !note.empty());
 }

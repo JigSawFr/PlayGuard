@@ -30,6 +30,13 @@ s32 playstats_first_recent_index(PlayEventQuery query, s32 start, s32 total, u64
 Result playstats_collect_events(PlayEventQuery query, s32 start, s32 total, u64 since, size_t max,
                                 PlayLogEvent **events, size_t *count, bool *capped);
 
+// Every game the log [start, start + total) still names (a game in focus),
+// once each, in the order first met: also a game deleted before PlayGuard
+// first read the console, whose all-time totals pdm still has. At most `max`
+// of them; returns how many were written to `ids`. *rc: a failed read (what
+// was found before it is kept).
+size_t playstats_logged_games(PlayEventQuery query, s32 start, s32 total, u64 *ids, size_t max, Result *rc);
+
 // `s` is valid UTF-8 for its first `len` bytes (no overlong form, surrogate
 // or code point above U+10FFFF).
 bool playstats_utf8_valid(const char *s, size_t len);

@@ -138,6 +138,36 @@ Result playstats_collect_events(PlayEventQuery query, s32 start, s32 total, u64 
     return rc;
 }
 
+// The whole log, a chunk at a time: only the IDs are kept, never the events.
+size_t playstats_logged_games(PlayEventQuery query, s32 start, s32 total, u64 *ids, size_t max, Result *rc)
+{
+    *rc = 0;
+    size_t n = 0;
+    if (total <= 0 || max == 0) return 0;
+    PdmPlayEvent *chunk = (PdmPlayEvent *)malloc(sizeof(PdmPlayEvent) * PLAYSTATS_EVENT_CHUNK);
+    if (!chunk) {
+        *rc = MAKERESULT(Module_Libnx, LibnxError_OutOfMemory);
+        return 0;
+    }
+    s32 index = start, remaining = total;
+    while (remaining > 0 && n < max) {
+        s32 got = 0;
+        *rc = query(index, chunk, remaining < PLAYSTATS_EVENT_CHUNK ? remaining : PLAYSTATS_EVENT_CHUNK, &got);
+        if (R_FAILED(*rc) || got <= 0) break;
+        index += got;
+        remaining -= got;
+        for (s32 i = 0; i < got && n < max; i++) {
+            PlayLogEvent e;
+            if (!playstats_convert(&chunk[i], &e) || e.kind != PlayLogEv_Focus || !e.app_id) continue;
+            bool seen = false;
+            for (size_t k = 0; k < n && !seen; k++) seen = ids[k] == e.app_id;
+            if (!seen) ids[n++] = e.app_id;
+        }
+    }
+    free(chunk);
+    return n;
+}
+
 bool playstats_utf8_valid(const char *s, size_t len)
 {
     const unsigned char *p = (const unsigned char *)s;
