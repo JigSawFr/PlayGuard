@@ -112,7 +112,7 @@ bool append(const Entry& e, std::string* error, bool* put_aside)
     for (size_t i = 0; i < entries.size(); i++)
         text += (i ? ",\n  " : "\n  ") + entries[i].dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);
     text += entries.empty() ? "]\n}\n" : "\n ]\n}\n";
-    if (!paths::ensure_dir(paths::data_dir())) {
+    if (!paths::ensure_dir(paths::nand_dir())) {
         if (error) *error = "cannot create the data folder";
         return false;
     }

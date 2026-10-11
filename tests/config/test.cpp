@@ -239,7 +239,7 @@ static void test_preferences()
     CHECK(d.activity_period == 1 && d.export_format == 0 && d.backup_keep == 0);
     CHECK(d.logs_keep == 20 && d.logs_keep_days == 0 && d.logs_keep_mb == 0);
     CHECK(!d.update_daily && d.update_checked.empty() && !d.clock_check_at_start && d.pin_lock == "changes");
-    CHECK(d.onboarding_at_start && d.intro);
+    CHECK(d.onboarding_at_start && d.intro && d.dev_builds_order == "newest");
     CHECK(d.support_reminder && d.support_reminded.empty() && d.seen_version.empty());
     write_config(R"({"support_reminder": false, "support_reminded": "2026-10-09", "seen_version": "1.1.0"})");
     config::load();
@@ -272,10 +272,10 @@ static void test_preferences()
     write_config(R"({"start_tab": "activity", "extra_amounts": [30, 60, 90], "activity_period": 2,
                     "export_format": 3, "backup_keep": 10, "update_daily": true,
                     "update_checked": "2026-10-07", "clock_check_at_start": true, "intro": false,
-                    "logs_keep": 0, "logs_keep_days": 30, "logs_keep_mb": 5})");
+                    "logs_keep": 0, "logs_keep_days": 30, "logs_keep_mb": 5, "dev_builds_order": "number"})");
     config::load();
     auto c = config::get();
-    CHECK(!c.intro);
+    CHECK(!c.intro && c.dev_builds_order == "number");
     CHECK(c.logs_keep == 0 && c.logs_keep_days == 30 && c.logs_keep_mb == 5);
     CHECK(c.start_tab == "activity" && c.extra_amounts == std::vector<int>({ 30, 60, 90 }));
     CHECK(c.activity_period == 2 && c.export_format == 3 && c.backup_keep == 10);
@@ -284,10 +284,11 @@ static void test_preferences()
     // Anything else goes back to the default: no 7-minute keep, no 999-minute
     // extra time, no tab that does not exist.
     write_config(R"({"start_tab": "hidden", "extra_amounts": [15, 30, 999], "activity_period": 5,
-                    "export_format": -1, "backup_keep": 7, "update_checked": "yesterday",
+                    "export_format": -1, "backup_keep": 7, "update_checked": "yesterday", "dev_builds_order": "size",
                     "logs_keep": 3, "logs_keep_days": -7, "logs_keep_mb": "5"})");
     config::load();
     c = config::get();
+    CHECK(c.dev_builds_order == "newest");
     CHECK(c.logs_keep == 20 && c.logs_keep_days == 0 && c.logs_keep_mb == 0);
     CHECK(c.start_tab == "dashboard" && c.extra_amounts == std::vector<int>({ 15, 30, 60 }));
     CHECK(c.activity_period == 1 && c.export_format == 0 && c.backup_keep == 0 && c.update_checked.empty());

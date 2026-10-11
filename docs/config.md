@@ -113,6 +113,7 @@ Set in *About*.
 |---|---|---|---|
 | `dev_mode` | boolean | the developer tools (seven presses on *About › Version*) | `false` |
 | `pt_log` | boolean | *Developer tools › Record the play timer* (`logs/play_timer/log.csv`) | `false` |
+| `dev_builds_order` | string | how *Developer tools › Install another build* orders the pull requests (Ⓨ there): `"newest"` (the newest build first) or `"number"` (the highest number first); main's commits are always newest first | `"newest"` |
 
 ## State kept between launches
 
@@ -207,6 +208,7 @@ line; the order does not matter when it reads them:
   "seen_version": "",
   "dev_mode": false,
   "pt_log": false,
+  "dev_builds_order": "newest",
   "extra_auto_restore": false
 }
 ```

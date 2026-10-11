@@ -38,7 +38,7 @@ void save()
     const std::string text = outside_change_logic::serialize(s_rec);
     ui::write_later("watch", [text]() {
         std::string err;
-        if (!paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(file(), text, &err))
+        if (!paths::ensure_dir(paths::nand_dir()) || !paths::atomic_write(file(), text, &err))
             brls::Logger::warning("watch: not saved ({})", err);
     }, "watch");
 }

@@ -106,6 +106,7 @@ void sanitize(Config& c)
     one_of(c.theme, { "system", "light", "dark" }, "system");
     one_of(c.update_via, { "auto", "sphaira", "appstore", "manual" }, "auto");
     one_of(c.pin_lock, { "off", "changes", "open" }, "changes");
+    one_of(c.dev_builds_order, { "newest", "number" }, "newest");
     one_of(c.fw_gate_choice, { "", "read_only", "probe", "risk" }, "");
     if (c.fw_gate_choice.empty()) c.fw_gate_fw.clear(), c.fw_gate_app.clear();
     if (c.ntp_server.size() > MAX_HOST) c.ntp_server.clear();
@@ -247,6 +248,7 @@ static void load_shared()
     read_int(j, "logs_keep_mb", c.logs_keep_mb);
     read_bool(j, "clock_check_at_start", c.clock_check_at_start);
     read_bool(j, "intro", c.intro);
+    read_string(j, "dev_builds_order", c.dev_builds_order);
     read_string(j, "pin_lock", c.pin_lock);
     read_bool(j, "onboarding_at_start", c.onboarding_at_start);
     read_bool(j, "support_reminder", c.support_reminder);
@@ -337,6 +339,7 @@ bool snapshot(Snapshot& snap)
     j["logs_keep_mb"]    = s_config.logs_keep_mb;
     j["clock_check_at_start"] = s_config.clock_check_at_start;
     j["intro"]           = s_config.intro;
+    j["dev_builds_order"] = s_config.dev_builds_order;
     j["pin_lock"]        = s_config.pin_lock;
     j["onboarding_at_start"] = s_config.onboarding_at_start;
     j["support_reminder"] = s_config.support_reminder;

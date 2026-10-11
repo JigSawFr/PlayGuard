@@ -85,6 +85,21 @@ bool parse_pulls(const std::string& json, std::vector<Pull>* out);
 std::vector<Build> combine(const std::vector<Artifact>& artifacts, const std::vector<Pull>& pulls,
                            size_t keep_main = 20);
 
+// How Developer tools › Install another build orders main's commits and the
+// pull requests (config.json "dev_builds_order").
+enum class Order
+{
+    Newest,   // the newest build first
+    Number,   // pull requests by number, the highest first (main: newest first)
+};
+// "newest" or "number"; anything else is Newest.
+Order order_named(const std::string& name);
+const char* order_name(Order order);
+
+// The builds of `kind` in `all`, in `order`; builds that tie keep the order
+// they are listed in.
+std::vector<Build> of_kind(const std::vector<Build>& all, Kind kind, Order order);
+
 // "sha256:<64 hex>" (GitHub's digest) -> the 64 hex digits, lower case;
 // empty when malformed.
 std::string digest_hex(const std::string& digest);
