@@ -12,7 +12,8 @@
 # nanovg's own counters (draw calls, triangles). The summary covers the last
 # 4 s, the steady state. Everything lands in build-desktop/perf/<name>/.
 #
-# Extra VAR=value pairs go to the app: PLAYGUARD_SIM_CADRAN=1 for the
+# PERF_THEME=light runs the light variant, PERF_KEYS the keys to press first
+# (see below). Extra VAR=value pairs go to the app: PLAYGUARD_SIM_CADRAN=1 for the
 # "Cadran" prototype of the Overview, PLAYGUARD_SIM_CADRAN_NOGLOW=1 and
 # PLAYGUARD_SIM_CADRAN_NORING=1 to leave out its two custom draws, any
 # PLAYGUARD_SIM_* knob of the simulated console.
@@ -29,8 +30,11 @@ NAME="${1:?usage: tools/perf_frames.sh <name> [VAR=value ...]}"; shift
 DIR="$ROOT/build-desktop/perf/$NAME"
 [ -x "$APP" ] || { echo "no desktop build: make desktop first"; exit 1; }
 rm -rf "$DIR"; mkdir -p "$DIR/run/playguard_data"
-# French, dark: the README's screenshots; change here for another look.
-echo '{"language":"fr","theme":"dark"}' > "$DIR/run/playguard_data/config.json"
+# French, dark (PERF_THEME=light for the other variant).
+echo "{\"language\":\"fr\",\"theme\":\"${PERF_THEME:-dark}\"}" > "$DIR/run/playguard_data/config.json"
+# The keys pressed before the screenshot, 0.6 s apart (xdotool names; Return
+# is A, Escape B): PERF_KEYS="Right Down Right Return" reaches a deeper screen.
+KEYS="${PERF_KEYS:-Right}"
 
 # The steps on the display, as a script: an exported function does not
 # survive xvfb-run and dbus-run-session.
@@ -42,10 +46,11 @@ export PLAYGUARD_SIM_STATS="$DIR/stats.txt"
 "$APP" > app.log 2>&1 &
 pid=\$!
 sleep 4
-xdotool keydown Right sleep 0.05 keyup Right
+for k in $KEYS; do xdotool keydown "\$k" sleep 0.05 keyup "\$k"; sleep 0.6; done
 sleep 6
 import -window root "$DIR/shot.png"
 kill -TERM \$pid; sleep 1; kill -KILL \$pid 2>/dev/null; wait \$pid 2>/dev/null
+KEYS="$KEYS"
 INNER
 BUS=""; command -v dbus-run-session > /dev/null && BUS="dbus-run-session --"
 env "$@" xvfb-run -a -s "-screen 0 1280x720x24" $BUS bash "$DIR/inner.sh"

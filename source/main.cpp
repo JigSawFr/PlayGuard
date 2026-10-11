@@ -28,6 +28,9 @@
 #include "app.hpp"
 #include "core/platform.h"
 #include "tab/about_tab.hpp"
+#include "tab/cadran_activity_tab.hpp"
+#include "tab/cadran_play_timer_tab.hpp"
+#include "tab/cadran_restrictions_tab.hpp"
 #include "tab/cadran_tab.hpp"
 #include "tab/activity_tab.hpp"
 #include "tab/clock_tab.hpp"
@@ -57,6 +60,7 @@ extern "C" void nvgDebugGetStats(NVGcontext*, int*, int*, int*, int*) __attribut
 #endif
 #include "view/cadran_digits.hpp"
 #include "view/cadran_icon.hpp"
+#include "view/cadran_week.hpp"
 #include "view/made_in_france.hpp"
 #include "view/version_badge.hpp"
 #include "view/scroll_view.hpp"
@@ -281,6 +285,10 @@ int main(int argc, char* argv[])
     brls::Application::registerXMLView("MadeInFrance",    MadeInFrance::create);
     brls::Application::registerXMLView("DashboardTab",    DashboardTab::create);
     brls::Application::registerXMLView("CadranTab",       CadranTab::create);
+    brls::Application::registerXMLView("CadranRestrictionsTab", CadranRestrictionsTab::create);
+    brls::Application::registerXMLView("CadranPlayTimerTab", CadranPlayTimerTab::create);
+    brls::Application::registerXMLView("CadranActivityTab", CadranActivityTab::create);
+    brls::Application::registerXMLView("CadranWeekView",  CadranWeekView::create);
     brls::Application::registerXMLView("PlayTimerTab",    PlayTimerTab::create);
     brls::Application::registerXMLView("ActivityTab",     ActivityTab::create);
     brls::Application::registerXMLView("RestrictionsTab", RestrictionsTab::create);

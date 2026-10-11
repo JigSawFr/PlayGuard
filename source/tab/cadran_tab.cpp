@@ -4,9 +4,11 @@
 #include <cctype>
 #include <cstdlib>
 #include <fmt/format.h>
+#include <utility>
 #include <vector>
 
 #include "action/clock_flow.hpp"
+#include "activity/cadran_child_activity.hpp"
 #include "action/pt_flow.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
@@ -16,49 +18,78 @@ using namespace brls::literals;
 
 void cadran::install_theme()
 {
-    const NVGcolor navy  = nvgRGB(0x0B, 0x14, 0x24);
-    const NVGcolor text  = nvgRGB(0xEE, 0xF2, 0xF8);
-    const NVGcolor teal  = nvgRGB(0x2E, 0xC4, 0xA6);
-    const NVGcolor surf  = nvgRGB(0x12, 0x1E, 0x33);
-    const NVGcolor surf2 = nvgRGB(0x1A, 0x2A, 0x45);
-    for (brls::Theme* t : { &brls::Theme::getDarkTheme(), &brls::Theme::getLightTheme() }) {
-        t->addColor("brls/background", navy);
-        t->addColor("brls/clear", navy);
-        t->addColor("brls/text", text);
-        t->addColor("brls/sidebar/background", navy);
-        t->addColor("brls/sidebar/separator", nvgRGBA(255, 255, 255, 20));
-        t->addColor("brls/sidebar/active_item", teal);
-        t->addColor("brls/applet_frame/separator", nvgRGBA(255, 255, 255, 20));
-        t->addColor("brls/header/border", nvgRGBA(255, 255, 255, 20));
-        t->addColor("brls/highlight/background", surf);
-        t->addColor("brls/highlight/color1", teal);
-        t->addColor("brls/highlight/color2", nvgRGB(0x9A, 0xF0, 0xDC));
+    const NVGcolor navy = nvgRGB(0x0B, 0x14, 0x24);
+    // Dark: the boards' navy. Light: the style board's cool white, the inks
+    // darkened to 4.5:1 (teal #0F8A74, amber #8A5200, coral #B71C1C).
+    struct P { NVGcolor bg, text, text2, text3, surf, surf2, line, teal, teal_fill, teal_soft, amber, amber_fill,
+               coral, coral_fill, coral_line, track, glow, glow_strong, amber_surf, amber_line, pill_ok, pill_ok_ink,
+               rail_active, key_bg, key_fg, hl1, hl2, border; };
+    const P dark = { navy, nvgRGB(0xEE, 0xF2, 0xF8), nvgRGB(0xA9, 0xB5, 0xC9), nvgRGB(0x7B, 0x8A, 0xA3),
+                     nvgRGB(0x12, 0x1E, 0x33), nvgRGB(0x1A, 0x2A, 0x45), nvgRGBA(255, 255, 255, 20),
+                     nvgRGB(0x2E, 0xC4, 0xA6), nvgRGB(0x2E, 0xC4, 0xA6), nvgRGBA(0x2E, 0xC4, 0xA6, 26),
+                     nvgRGB(0xFF, 0xB5, 0x47), nvgRGB(0xFF, 0xB5, 0x47),
+                     nvgRGB(0xFF, 0x7A, 0x7A), nvgRGB(0xFF, 0x7A, 0x7A), nvgRGBA(0xFF, 0x7A, 0x7A, 140),
+                     nvgRGBA(255, 255, 255, 23), nvgRGBA(0x2E, 0xC4, 0xA6, 31), nvgRGBA(0x2E, 0xC4, 0xA6, 51),
+                     nvgRGBA(0xFF, 0xB5, 0x47, 26), nvgRGBA(0xFF, 0xB5, 0x47, 90),
+                     nvgRGBA(0x2E, 0xC4, 0xA6, 41), nvgRGB(0x2E, 0xC4, 0xA6), nvgRGBA(0x2E, 0xC4, 0xA6, 36),
+                     nvgRGB(0xEE, 0xF2, 0xF8), navy, nvgRGB(0x2E, 0xC4, 0xA6), nvgRGB(0x9A, 0xF0, 0xDC), nvgRGBA(255, 255, 255, 60) };
+    const P light = { nvgRGB(0xED, 0xF0, 0xF4), navy, nvgRGB(0x3F, 0x4C, 0x63), nvgRGB(0x5F, 0x6E, 0x88),
+                      nvgRGB(0xFF, 0xFF, 0xFF), nvgRGB(0xF3, 0xF5, 0xF8), nvgRGBA(0x0B, 0x14, 0x24, 26),
+                      nvgRGB(0x0F, 0x8A, 0x74), nvgRGB(0x14, 0xA3, 0x8A), nvgRGBA(0x14, 0xA3, 0x8A, 26),
+                      nvgRGB(0x8A, 0x52, 0x00), nvgRGB(0xE0, 0x93, 0x1B),
+                      nvgRGB(0xB7, 0x1C, 0x1C), nvgRGB(0xE5, 0x48, 0x4D), nvgRGB(0xE3, 0x9A, 0x9A),
+                      nvgRGBA(0x0B, 0x14, 0x24, 26), nvgRGBA(0x2E, 0xC4, 0xA6, 41), nvgRGBA(0x2E, 0xC4, 0xA6, 56),
+                      nvgRGB(0xFF, 0xF3, 0xDF), nvgRGB(0xF3, 0xD5, 0x9C),
+                      nvgRGB(0xD8, 0xF3, 0xEC), nvgRGB(0x0A, 0x6E, 0x5C), nvgRGBA(0x14, 0xA3, 0x8A, 36),
+                      navy, nvgRGB(0xFF, 0xFF, 0xFF), nvgRGB(0x14, 0xA3, 0x8A), nvgRGB(0x4A, 0xD6, 0xBA), nvgRGBA(0x0B, 0x14, 0x24, 60) };
+    const std::pair<brls::Theme*, const P*> variants[] = { { &brls::Theme::getDarkTheme(), &dark }, { &brls::Theme::getLightTheme(), &light } };
+    for (const auto& [t, p] : variants) {
+        t->addColor("brls/background", p->bg);
+        t->addColor("brls/clear", p->bg);
+        t->addColor("brls/text", p->text);
+        t->addColor("brls/sidebar/background", p->bg);
+        t->addColor("brls/sidebar/separator", p->line);
+        t->addColor("brls/sidebar/active_item", p->teal);
+        t->addColor("brls/applet_frame/separator", p->line);
+        t->addColor("brls/header/border", p->line);
+        t->addColor("brls/highlight/background", p->surf);
+        t->addColor("brls/highlight/color1", p->hl1);
+        t->addColor("brls/highlight/color2", p->hl2);
         t->addColor("brls/click_pulse", nvgRGBA(0x2E, 0xC4, 0xA6, 38));
-        t->addColor("brls/button/primary_enabled_background", teal);
+        t->addColor("brls/button/primary_enabled_background", p->teal_fill);
         t->addColor("brls/button/primary_enabled_text", navy);
-        t->addColor("brls/button/default_enabled_background", surf2);
-        t->addColor("brls/button/default_enabled_text", text);
-        t->addColor("brls/button/enabled_border_color", nvgRGBA(255, 255, 255, 60));
-        t->addColor("brls/button/highlight_enabled_text", teal);
+        t->addColor("brls/button/default_enabled_background", p->surf2);
+        t->addColor("brls/button/default_enabled_text", p->text);
+        t->addColor("brls/button/enabled_border_color", p->border);
+        t->addColor("brls/button/highlight_enabled_text", p->teal);
         t->addColor("cadran/navy", navy);
-        t->addColor("cadran/text", text);
-        t->addColor("cadran/teal", teal);
-        t->addColor("cadran/amber", nvgRGB(0xFF, 0xB5, 0x47));
-        t->addColor("cadran/coral", nvgRGB(0xFF, 0x7A, 0x7A));
-        t->addColor("cadran/coral_line", nvgRGBA(0xFF, 0x7A, 0x7A, 140));
-        t->addColor("cadran/track", nvgRGBA(255, 255, 255, 23));
-        t->addColor("cadran/surf", surf);
-        t->addColor("cadran/surf2", surf2);
-        t->addColor("cadran/line", nvgRGBA(255, 255, 255, 20));
-        t->addColor("cadran/text2", nvgRGB(0xA9, 0xB5, 0xC9));
-        t->addColor("cadran/text3", nvgRGB(0x7B, 0x8A, 0xA3));
-        t->addColor("cadran/glow", nvgRGBA(0x2E, 0xC4, 0xA6, 31));
-        t->addColor("cadran/amber_surf", nvgRGBA(0xFF, 0xB5, 0x47, 26));
-        t->addColor("cadran/amber_line", nvgRGBA(0xFF, 0xB5, 0x47, 90));
-        t->addColor("cadran/pill_ok", nvgRGBA(0x2E, 0xC4, 0xA6, 41));
-        t->addColor("cadran/rail_active", nvgRGBA(0x2E, 0xC4, 0xA6, 36));
-        t->addColor("cadran/key_bg", text);
+        t->addColor("cadran/text", p->text);
+        t->addColor("cadran/text2", p->text2);
+        t->addColor("cadran/text3", p->text3);
+        t->addColor("cadran/teal", p->teal);
+        t->addColor("cadran/teal_fill", p->teal_fill);
+        t->addColor("cadran/teal_soft", p->teal_soft);
+        t->addColor("cadran/amber", p->amber);
+        t->addColor("cadran/amber_fill", p->amber_fill);
+        t->addColor("cadran/coral", p->coral);
+        t->addColor("cadran/coral_fill", p->coral_fill);
+        t->addColor("cadran/coral_line", p->coral_line);
+        t->addColor("cadran/track", p->track);
+        t->addColor("cadran/surf", p->surf);
+        t->addColor("cadran/surf2", p->surf2);
+        t->addColor("cadran/line", p->line);
+        t->addColor("cadran/glow", p->glow);
+        t->addColor("cadran/glow_strong", p->glow_strong);
+        t->addColor("cadran/amber_surf", p->amber_surf);
+        t->addColor("cadran/amber_line", p->amber_line);
+        t->addColor("cadran/pill_ok", p->pill_ok);
+        t->addColor("cadran/pill_ok_ink", p->pill_ok_ink);
+        t->addColor("cadran/rail_active", p->rail_active);
+        t->addColor("cadran/key_bg", p->key_bg);
+        t->addColor("cadran/key_fg", p->key_fg);
         t->addColor("cadran/none", nvgRGBA(0, 0, 0, 0));
+        t->addColor("cadran/bar", p == &dark ? nvgRGB(0x33, 0x48, 0x6B) : nvgRGB(0xB9, 0xC6, 0xDA));
+        t->addColor("cadran/bar_today", p == &dark ? nvgRGB(0x5A, 0x71, 0x96) : nvgRGB(0x7E, 0x90, 0xAE));
     }
     brls::Style style = brls::getStyle();
     style.addMetric("brls/applet_frame/header_height", 84.0f);
@@ -92,14 +123,11 @@ std::string date_text()
     return fmt::format("{} {} {}", ui::day_name_in_text(ui::today_weekday()), day, months[month - 1]);
 }
 
-// The soft glow of the boards, behind the whole screen (header and rail
-// included): one quad with a radial gradient, the only extra fill of the
-// design. PLAYGUARD_SIM_CADRAN_NOGLOW=1 leaves it out, to measure its cost.
 class Glow : public brls::View
 {
   public:
-    Glow()
-        : glow(brls::Application::getTheme()["cadran/glow"]), clear(nvgRGBA(0x2E, 0xC4, 0xA6, 0))
+    Glow(float cx, float cy, float radius, const char* color_key)
+        : cx(cx), cy(cy), radius(radius), glow(brls::Application::getTheme()[color_key]), clear(nvgRGBA(0x2E, 0xC4, 0xA6, 0))
     {
         this->setFocusable(false);
         this->setPositionType(brls::PositionType::ABSOLUTE);
@@ -112,7 +140,7 @@ class Glow : public brls::View
     {
         static const bool off = std::getenv("PLAYGUARD_SIM_CADRAN_NOGLOW") != nullptr;
         if (off) return;
-        const NVGpaint paint = nvgRadialGradient(vg, x + 300.0f, y - 80.0f, 0.0f, 640.0f, this->glow, this->clear);
+        const NVGpaint paint = nvgRadialGradient(vg, x + this->cx, y + this->cy, 0.0f, this->radius, this->glow, this->clear);
         nvgBeginPath(vg);
         nvgRect(vg, x, y, width, height);
         nvgFillPaint(vg, paint);
@@ -120,6 +148,7 @@ class Glow : public brls::View
     }
 
   private:
+    float cx, cy, radius;
     NVGcolor glow, clear;
 };
 
@@ -151,58 +180,83 @@ void tint_rail(const std::vector<brls::SidebarItem*>& items, brls::SidebarItem* 
 }
 }   // namespace
 
-void cadran::style_frame(brls::AppletFrame* frame, brls::View* tab_frame)
+namespace
 {
+// The main screen's pill (style_frame): its label, and the pill for hiding it.
+brls::Box*   s_main_pill = nullptr;
+brls::Label* s_main_pill_label = nullptr;
+}   // namespace
+
+void cadran::set_pill(const std::string& text)
+{
+    if (!s_main_pill || !s_main_pill_label) return;
+    s_main_pill_label->setText(text);
+    s_main_pill->setVisibility(text.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
+}
+
+brls::View* cadran::make_glow(float cx, float cy, float radius, const char* color_key)
+{
+    return new Glow(cx, cy, radius, color_key);
+}
+
+void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const std::string& pill_text, bool filled, bool with_date)
+{
+    if (!frame) return;
     brls::Theme theme = brls::Application::getTheme();
-
-    // The glow first, behind everything.
-    if (frame) frame->addView(new Glow(), 0);
-
-    // Header: the mark for the app icon, the title at 24, a status pill and
-    // the date at the right.
-    if (frame) {
-        brls::View* app_icon = frame->getView("brls/applet_frame/title_icon");
-        brls::Box* left = app_icon ? app_icon->getParent() : nullptr;
-        if (app_icon) app_icon->setVisibility(brls::Visibility::GONE);
-        if (left) {
-            left->setAlignItems(brls::AlignItems::CENTER);
-            left->setGrow(1.0f);
-            CadranIcon* mark = icon("mark", 38, theme["cadran/text"]);
-            mark->setMarginRight(14);
-            left->addView(mark, 0);
-        }
-        if (auto* title = dynamic_cast<brls::Label*>(frame->getView("brls/applet_frame/title_label"))) {
-            title->setFontSize(24);
-            title->setMarginTop(0);
-        }
-        auto* right = new brls::Box(brls::Axis::ROW);
-        right->setAlignItems(brls::AlignItems::CENTER);
-        auto* pill = new brls::Box(brls::Axis::ROW);
-        pill->setAlignItems(brls::AlignItems::CENTER);
-        pill->setHeight(32);
-        pill->setPaddingLeft(14);
-        pill->setPaddingRight(14);
-        pill->setCornerRadius(16);
+    brls::View* app_icon = frame->getView("brls/applet_frame/title_icon");
+    brls::Box* left = app_icon ? app_icon->getParent() : nullptr;
+    if (app_icon) app_icon->setVisibility(brls::Visibility::GONE);
+    if (left) {
+        left->setAlignItems(brls::AlignItems::CENTER);
+        left->setGrow(1.0f);
+        CadranIcon* mark = icon("mark", 38, theme["cadran/text"]);
+        mark->setMarginRight(14);
+        left->addView(mark, 0);
+    }
+    if (auto* title = dynamic_cast<brls::Label*>(frame->getView("brls/applet_frame/title_label"))) {
+        title->setFontSize(24);
+        title->setMarginTop(0);
+    }
+    auto* right = new brls::Box(brls::Axis::ROW);
+    right->setAlignItems(brls::AlignItems::CENTER);
+    const NVGcolor ink = filled ? theme["cadran/pill_ok_ink"] : theme["cadran/text2"];
+    auto* pill = new brls::Box(brls::Axis::ROW);
+    pill->setAlignItems(brls::AlignItems::CENTER);
+    pill->setHeight(32);
+    pill->setPaddingLeft(14);
+    pill->setPaddingRight(14);
+    pill->setCornerRadius(16);
+    if (filled) {
         pill->setBackgroundColor(theme["cadran/pill_ok"]);
-        CadranIcon* check = icon("check", 14, theme["cadran/teal"]);
-        check->setMarginRight(8);
-        pill->addView(check);
-        auto* pill_text = new brls::Label();
-        pill_text->setText("Contrôle parental actif");
-        pill_text->setFontSize(15);
-        pill_text->setTextColor(theme["cadran/teal"]);
-        pill->addView(pill_text);
-        right->addView(pill);
+    } else {
+        pill->setBorderColor(theme["cadran/line"]);
+        pill->setBorderThickness(1);
+    }
+    CadranIcon* glyph = icon(pill_icon, 14, ink);
+    glyph->setMarginRight(8);
+    pill->addView(glyph);
+    auto* pill_label = new brls::Label();
+    pill_label->setText(pill_text);
+    pill_label->setFontSize(15);
+    pill_label->setTextColor(ink);
+    pill->addView(pill_label);
+    right->addView(pill);
+    if (with_date) {   // the main screen: its pill is the one set_pill() changes
+        s_main_pill = pill;
+        s_main_pill_label = pill_label;
         auto* date = new brls::Label();
         date->setText(date_text());
         date->setFontSize(16);
         date->setTextColor(theme["cadran/text3"]);
         date->setMarginLeft(10);
         right->addView(date);
-        if (brls::Box* header = frame->getHeader()) header->addView(right, 1);
     }
+    if (brls::Box* header = frame->getHeader()) header->addView(right, 1);
+}
 
-    // Rail: an icon before each label, 52 px pills, the accent bar gone.
+void cadran::style_rail(brls::View* tab_frame)
+{
+    brls::Theme theme = brls::Application::getTheme();
     auto* sidebar = tab_frame ? dynamic_cast<brls::Sidebar*>(tab_frame->getView("brls/tab_frame/sidebar")) : nullptr;
     brls::SidebarItem* first = sidebar ? sidebar->getItem(0) : nullptr;
     brls::Box* list = first ? first->getParent() : nullptr;
@@ -249,6 +303,13 @@ void cadran::style_frame(brls::AppletFrame* frame, brls::View* tab_frame)
     if (!items.empty()) tint_rail(items, items[0]);   // the first tab is already active
 }
 
+void cadran::style_frame(brls::AppletFrame* frame, brls::View* tab_frame)
+{
+    if (frame) frame->addView(make_glow(300.0f, -80.0f, 640.0f, "cadran/glow"), 0);
+    style_header(frame, "check", "Contrôle parental actif", true, true);
+    style_rail(tab_frame);
+}
+
 CadranTab::CadranTab()
     : TabBase("xml/tab/cadran.xml")
 {
@@ -289,6 +350,10 @@ CadranTab::CadranTab()
         pt_flow::stop_today(this->pt, [this]() { this->refresh(); });
         return true;
     });
+    child->registerClickAction([](brls::View*) {
+        brls::Application::pushActivity(new CadranChildActivity());
+        return true;
+    });
     clock_card->registerClickAction([this](brls::View*) {
         if (this->clock_inaccurate && !app::read_only()) clock_flow::guided([this]() { this->refresh(); });
         return true;
@@ -309,6 +374,8 @@ void CadranTab::refresh()
     const bool unlocked = s.temp_unlocked_ok && s.temp_unlocked;
     const bool has_pin  = s.pin_length_ok && s.pin_length > 0;
     ui::note_unlocked(s.temp_unlocked_ok, s.temp_unlocked);
+    cadran::set_pill(!s.restriction_enabled_ok ? "" : unlocked ? "Déverrouillé temporairement"
+                     : s.restriction_enabled ? "Contrôle parental actif" : "Contrôle parental non configuré");
 
     // The ring: today's limit, what is left of it.
     const int today = ui::today_weekday();

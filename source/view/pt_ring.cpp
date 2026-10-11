@@ -10,9 +10,9 @@ PtRing::PtRing()
     // Looked up once (a theme change needs a restart; each lookup builds a key).
     brls::Theme theme = brls::Application::getTheme();
     this->track = theme["cadran/track"];
-    this->teal  = theme["cadran/teal"];
-    this->amber = theme["cadran/amber"];
-    this->coral = theme["cadran/coral"];
+    this->teal  = theme["cadran/teal_fill"];
+    this->amber = theme["cadran/amber_fill"];
+    this->coral = theme["cadran/coral_fill"];
 
     this->setAxis(brls::Axis::COLUMN);
     this->setJustifyContent(brls::JustifyContent::CENTER);
@@ -37,6 +37,9 @@ PtRing::PtRing()
 void PtRing::setFraction(float value) { this->used = value > 1.0f ? 1.0f : value; }
 void PtRing::setValue(const std::string& text) { this->value->setText(text); }
 void PtRing::setCaption(const std::string& text) { this->caption->setText(text); }
+void PtRing::setShowLeft(bool left) { this->show_left = left; }
+void PtRing::setValueSize(float size) { this->value->setFontSize(size); }
+void PtRing::setCaptionSize(float size) { this->caption->setFontSize(size); }
 
 void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
                   brls::Style style, brls::FrameContext* ctx)
@@ -44,7 +47,7 @@ void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
     // PLAYGUARD_SIM_CADRAN_NORING=1 draws the labels alone (cost of the arcs).
     static const bool no_ring = std::getenv("PLAYGUARD_SIM_CADRAN_NORING") != nullptr;
     if (no_ring) { brls::Box::draw(vg, x, y, width, height, style, ctx); return; }
-    const float stroke = 20.0f;
+    const float stroke = std::min(width, height) * 20.0f / 256.0f;   // the boards: 20 at 256, 26 at 340
     const float cx = x + width / 2.0f, cy = y + height / 2.0f;
     const float r = std::min(width, height) / 2.0f - stroke / 2.0f - 4.0f;
 
@@ -57,8 +60,10 @@ void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
     if (this->used > 0.0f) {
         const float f = this->used;
         const NVGcolor color = f >= 1.0f ? this->coral : f >= 0.75f ? this->amber : this->teal;
+        const float arc = this->show_left ? 1.0f - f : f;
+        if (arc <= 0.0f) { brls::Box::draw(vg, x, y, width, height, style, ctx); return; }
         nvgBeginPath(vg);
-        nvgArc(vg, cx, cy, r, -NVG_PI / 2.0f, -NVG_PI / 2.0f + f * 2.0f * NVG_PI, NVG_CW);
+        nvgArc(vg, cx, cy, r, -NVG_PI / 2.0f, -NVG_PI / 2.0f + arc * 2.0f * NVG_PI, NVG_CW);
         nvgLineCap(vg, NVG_ROUND);
         nvgStrokeWidth(vg, stroke);
         nvgStrokeColor(vg, color);

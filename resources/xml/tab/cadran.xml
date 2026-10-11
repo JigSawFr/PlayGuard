@@ -64,7 +64,7 @@
             <CadranDigits id="cad_clock_value" text="—" fontSize="32" marginTop="6" marginBottom="6"/>
             <brls:Box axis="row" alignItems="center">
                 <brls:Box id="cad_clock_key" axis="row" alignItems="center" justifyContent="center" width="22" height="22" cornerRadius="11" backgroundColor="@theme/cadran/key_bg" marginRight="8">
-                    <CadranDigits text="A" fontSize="12" textColor="@theme/cadran/navy"/>
+                    <CadranDigits text="A" fontSize="12" textColor="@theme/cadran/key_fg"/>
                 </brls:Box>
                 <brls:Label id="cad_clock_sub" text="" fontSize="15" textColor="@theme/cadran/text2"/>
             </brls:Box>
