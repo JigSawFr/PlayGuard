@@ -1,6 +1,6 @@
 // Host tests for source/action/pt_logic.cpp: when a play-timer write needs the
 // temporary unlock, how much was played today, extra time and putting it back,
-// and what pt_flow's pickers start on.
+// what pt_flow's pickers start on, and an unlock left on by an earlier run.
 #include "check.h"
 #include <cstdio>
 #include <cstring>
@@ -294,6 +294,26 @@ static void test_pickers()
     CHECK(ends[(size_t)pt_logic::bedtime_end_selected(pt, ends)] == 6 * 60);
 }
 
+// relock_pending at a start: an unlock left on by an earlier run (a change
+// cut short, or Security › Unlock temporarily and PlayGuard closed from the
+// HOME menu) is locked again; this run's own unlock is not.
+static void test_pending_relock()
+{
+    using P = pt_logic::PendingRelock;
+    CHECK(pt_logic::pending_relock_needs_state(true, false, false));
+    CHECK(pt_logic::pending_relock(true, false, false, true, true) == P::Lock);
+    CHECK(pt_logic::pending_relock(true, false, false, true, false) == P::Forget);   // locked meanwhile
+    CHECK(pt_logic::pending_relock(true, false, false, false, true) == P::Keep);     // state unknown
+    // No record, this run's own (the parent's unlock still in use), or
+    // read-only (the lock would be refused): nothing read, nothing done.
+    CHECK(!pt_logic::pending_relock_needs_state(false, false, false));
+    CHECK(!pt_logic::pending_relock_needs_state(true, true, false));
+    CHECK(!pt_logic::pending_relock_needs_state(true, false, true));
+    CHECK(pt_logic::pending_relock(false, false, false, true, true) == P::None);
+    CHECK(pt_logic::pending_relock(true, true, false, true, true) == P::None);
+    CHECK(pt_logic::pending_relock(true, false, true, true, true) == P::None);
+}
+
 // The Overview's "+30 min" and the alarm notice.
 static void test_extra_today()
 {
@@ -345,5 +365,6 @@ int main()
     test_bedtime();
     test_pickers();
     test_extra_today();
-    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, bedtime and picker assertions passed");
+    test_pending_relock();
+    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, bedtime, picker and pending-relock assertions passed");
 }

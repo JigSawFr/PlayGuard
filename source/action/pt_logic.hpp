@@ -75,6 +75,22 @@ enum class Restore
 };
 Restore restore_action(const ExtraRecord& rec, const std::string& today, const PtState& pt, bool read_only);
 
+// config relock_pending: PlayGuard unlocked parental controls (for a change,
+// or Security › Unlock temporarily) and may have stopped before locking them
+// again. What a start (or leaving read-only) does with that record:
+enum class PendingRelock
+{
+    None,     // no record, or this run's own (an unlock still in use), or read-only (kept for a start that can lock)
+    Keep,     // the console's state could not be read: try again next time
+    Forget,   // locked already (by the HOME menu, a restart): the record goes
+    Lock,     // still unlocked: lock again now
+};
+// `this_run`: the record was made since PlayGuard started. `state_read` and
+// `unlocked`: the console's temporary unlock (1006), which needs reading only
+// when pending_relock_needs_state().
+bool pending_relock_needs_state(bool pending, bool this_run, bool read_only);
+PendingRelock pending_relock(bool pending, bool this_run, bool read_only, bool state_read, bool unlocked);
+
 // Bedtime. Its place in the block is inferred (core/pure.h): it can be
 // changed only while what the block holds for today, or for the day before
 // (after midnight), is what the console reports (1954/1956/1957).

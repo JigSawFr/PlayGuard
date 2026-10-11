@@ -99,7 +99,10 @@
         "next_step": "Wenn das erneut passiert, senden Sie einen Bericht: Tools › Bericht online senden.",
         "pt_not_understood": "die Spielzeit-Einstellungen der Konsole liegen in einem Format vor, das PlayGuard nicht versteht, daher wurde nichts geändert. Senden Sie einen Bericht: Tools › Bericht online senden.",
         "pctl_0132": "Code 2142-0132, auch von anderen beim Schreiben des Spielzeit-Timers gemeldet; seine Bedeutung ist noch unbekannt. Starten Sie die Konsole neu und versuchen Sie es dann erneut",
-        "clock_not_set": "die Konsole meldet, dass ihre Netzwerkuhr keine gültige Zeit hat (sie wurde vielleicht nie gestellt); siehe den Tab Netzwerkuhr"
+        "clock_not_set": "die Konsole meldet, dass ihre Netzwerkuhr keine gültige Zeit hat (sie wurde vielleicht nie gestellt); siehe den Tab Netzwerkuhr",
+        "no_internet": "die Konsole ist nicht mit dem Internet verbunden: Verbinden Sie sie und versuchen Sie es dann erneut",
+        "service_denied": "das System hat PlayGuard den Zugriff auf einen seiner Dienste verweigert; PlayGuard benötigt eine Konsole mit Atmosphère",
+        "pdm_unavailable": "der Spieldaten-Dienst der Konsole ist gerade nicht verfügbar; versuchen Sie es gleich noch einmal"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -418,7 +421,8 @@
         },
         "applet_cap": "Nicht aufgeführt, um im Applet-Modus (aus dem Album geöffnet) Speicher zu sparen: {} weitere. Der Export enthält alle Spiele; für die vollständige Liste öffnen Sie PlayGuard, indem Sie beim Starten eines Spiels R gedrückt halten.",
         "account_nobody": "Ohne Nutzer (oder gelöschter Nutzer)",
-        "account_new": "Neuer Nutzer seit {}: {}"
+        "account_new": "Neuer Nutzer seit {}: {}",
+        "truncated": "Nur {} Spiele können aufgeführt werden: Einige, die diese Woche nicht gespielt wurden, fehlen, auch in der Gesamtzeit."
     },
     "restrictions": {
         "section_level": "Einschränkungskategorie",
@@ -550,7 +554,7 @@
         "show_pin_title": "Aktuelle Geheimzahl",
         "show_pin_err": "Geheimzahl konnte nicht gelesen werden",
         "unlock": "Vorübergehend aufheben",
-        "unlock_body": "Altersbeschränkungen vorübergehend aufheben?\n\nDie Einschränkungen bleiben aus, bis Sie sie wieder aktivieren (oder die Konsole neu startet).",
+        "unlock_body": "Altersbeschränkungen vorübergehend aufheben?\n\nDie Einschränkungen bleiben aus, bis Sie sie wieder aktivieren (oder die Konsole neu startet). Wird PlayGuard zwischendurch über das HOME-Menü beendet, aktiviert es sie beim nächsten Start wieder.",
         "unlock_confirm": "Aufheben",
         "unlocked": "Altersbeschränkungen vorübergehend aufgehoben.",
         "unlock_err": "Aufheben fehlgeschlagen",
@@ -883,7 +887,7 @@
         "diag_err": "Diagnose konnte nicht gespeichert werden",
         "relocked": "Altersbeschränkungen wieder aktiviert.",
         "relock_err": "Altersbeschränkungen konnten nicht wieder aktiviert werden",
-        "relocked_after_stop": "PlayGuard wurde letztes Mal während einer Änderung beendet: Die Altersbeschränkungen sind wieder aktiv.",
+        "relocked_after_stop": "PlayGuard wurde letztes Mal beendet, während die Altersbeschränkungen aufgehoben waren: Sie sind wieder aktiv.",
         "config_err": "Optionen konnten nicht auf der SD-Karte gespeichert werden"
     },
     "history": {

@@ -99,7 +99,10 @@
         "next_step": "Se acontecer de novo, envie um relatório: Ferramentas › Enviar um relatório online.",
         "pt_not_understood": "as configurações de tempo de jogo do console estão em um formato que o PlayGuard não entende, então nada foi alterado. Envie um relatório: Ferramentas › Enviar um relatório online.",
         "pctl_0132": "código 2142-0132, também relatado por outros ao gravar o temporizador de jogo; o significado ainda não é conhecido. Reinicie o console e tente novamente",
-        "clock_not_set": "o console indica que o relógio de rede não tem uma hora válida (talvez nunca tenha sido acertado); veja a aba Relógio de rede"
+        "clock_not_set": "o console indica que o relógio de rede não tem uma hora válida (talvez nunca tenha sido acertado); veja a aba Relógio de rede",
+        "no_internet": "o console não está conectado à internet: conecte-o e tente novamente",
+        "service_denied": "o sistema negou ao PlayGuard o acesso a um dos seus serviços; o PlayGuard precisa de um console com Atmosphère",
+        "pdm_unavailable": "o serviço de dados de jogo do console não está disponível no momento; tente novamente daqui a pouco"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -418,7 +421,8 @@
         },
         "applet_cap": "Não listados, para economizar memória no modo applet (aberto pelo álbum): mais {}. A exportação inclui todos os jogos; para a lista completa, abra o PlayGuard segurando R ao iniciar um jogo.",
         "account_nobody": "Sem conta (ou uma conta excluída)",
-        "account_new": "Conta nova desde {}: {}"
+        "account_new": "Conta nova desde {}: {}",
+        "truncated": "Só é possível listar {} jogos: faltam alguns que não foram jogados nesta semana, e o total desde sempre não os conta."
     },
     "restrictions": {
         "section_level": "Nível de restrição",
@@ -550,7 +554,7 @@
         "show_pin_title": "PIN atual",
         "show_pin_err": "Não foi possível ler o PIN",
         "unlock": "Desbloquear temporariamente",
-        "unlock_body": "Desbloquear temporariamente o controle dos pais?\n\nAs restrições ficam desativadas até você bloqueá-lo de novo (ou até o console reiniciar).",
+        "unlock_body": "Desbloquear temporariamente o controle dos pais?\n\nAs restrições ficam desativadas até você bloqueá-lo de novo (ou até o console reiniciar). Se o PlayGuard for fechado pelo menu HOME nesse meio-tempo, ele o bloqueia de novo na próxima vez que for aberto.",
         "unlock_confirm": "Desbloquear",
         "unlocked": "Controle dos pais desbloqueado temporariamente.",
         "unlock_err": "Não foi possível desbloquear",
@@ -883,7 +887,7 @@
         "diag_err": "Não foi possível salvar o diagnóstico",
         "relocked": "Controle dos pais bloqueado de novo.",
         "relock_err": "Não foi possível bloquear de novo o controle dos pais",
-        "relocked_after_stop": "Da última vez, o PlayGuard parou durante uma alteração: o controle dos pais foi bloqueado de novo.",
+        "relocked_after_stop": "Da última vez, o PlayGuard foi fechado com o controle dos pais desbloqueado: ele foi bloqueado de novo.",
         "config_err": "Não foi possível salvar as preferências no cartão SD"
     },
     "history": {

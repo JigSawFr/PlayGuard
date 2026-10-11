@@ -149,7 +149,7 @@ version. The three keys go together.
 
 | Key | Type | Values | Default |
 |---|---|---|---|
-| `relock_pending` | boolean | set right before PlayGuard unlocks parental controls for a change, cleared once it has locked them again. Still `true` at start-up: the app stopped in between, so it locks again then | `false` |
+| `relock_pending` | boolean | set right before PlayGuard unlocks parental controls (for a change, or *Security › Unlock temporarily*), cleared once they are locked again (or *Quit, still unlocked* is chosen on quitting). Still `true` at start-up: the app stopped in between (or was closed from the HOME menu), so it locks again then | `false` |
 
 ## Example
 

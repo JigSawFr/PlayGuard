@@ -299,8 +299,12 @@ void ActivityTab::rebuild()
     const size_t shown_n = std::min(rows.size(), s_cache.show_all ? s_cache.rows_max : ROWS_SHOWN);
     const bool more = !s_cache.show_all && shown_n < rows.size();
     const size_t left_out = s_cache.show_all ? rows.size() - shown_n : 0;
-    if (left_out) capped->setText(brls::getStr("playguard/activity/applet_cap", (int)left_out));
-    ui::set_visible(capped, left_out > 0);
+    // Under the list: rows not built (applet mode), and games the read itself
+    // could not hold (PLAYSTATS_MAX), which the totals above miss too.
+    std::string cap_text = left_out ? brls::getStr("playguard/activity/applet_cap", (int)left_out) : std::string();
+    if (s.truncated) cap_text += (cap_text.empty() ? "" : "\n") + brls::getStr("playguard/activity/truncated", PLAYSTATS_MAX);
+    capped->setText(cap_text);
+    ui::set_visible(capped, !cap_text.empty());
     // The cells there already are the first games, in order: kept (and the
     // rest added below them, after "Show every game").
     bool prefix = this->cells.size() <= shown_n;
@@ -556,6 +560,7 @@ void ActivityTab::export_to_sd() const
         table_export::Table t;
         t.title    = "PlayGuard — " + "playguard/tabs/activity"_i18n;
         t.subtitle = brls::getStr("playguard/activity/export_subtitle", ui::time_text(s.now), who);
+        if (s.truncated) t.subtitle += " · " + brls::getStr("playguard/activity/truncated", PLAYSTATS_MAX);
         t.sheet    = "playguard/tabs/activity"_i18n;
         t.columns  = {
             { "game", "playguard/activity/columns/game"_i18n, false },

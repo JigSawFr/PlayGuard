@@ -619,7 +619,9 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
     }
     // A large library: filler games, each played a little this week.
     const char *more = getenv("PLAYGUARD_SIM_GAMES");
-    for (int i = 0, n = more ? atoi(more) : 0; i < n && out->count < PLAYSTATS_MAX; i++) {
+    const int n = more ? atoi(more) : 0;
+    int i = 0;
+    for (; i < n && out->count < PLAYSTATS_MAX; i++) {
         GameStat *g = &out->games[out->count++];
         g->app_id = 0x0100B00000000000ULL + ((u64)i << 12);
         snprintf(g->name, sizeof(g->name), "Game %03d", i + 1);
@@ -630,6 +632,7 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         g->last_played = out->now - 86400;
         g->first_played = out->now - 30ULL * 86400;
     }
+    out->truncated = i < n;   // more than the list holds, as on a console
 }
 
 // The made-up games have their names already; no SD card icons either.

@@ -99,7 +99,10 @@
         "next_step": "如果再次发生，请发送报告：工具 › 在线发送报告。",
         "pt_not_understood": "主机的游戏时间设置格式PlayGuard无法识别，未进行任何更改。请发送报告：工具 › 在线发送报告。",
         "pctl_0132": "代码2142-0132，其他人在写入游玩计时器时也遇到过，其含义尚不清楚。请重启主机后再试",
-        "clock_not_set": "主机报告其网络时钟没有有效时间（可能从未设置过）；请查看“网络时钟”页"
+        "clock_not_set": "主机报告其网络时钟没有有效时间（可能从未设置过）；请查看“网络时钟”页",
+        "no_internet": "主机未连接到互联网：请连接后重试",
+        "service_denied": "系统拒绝PlayGuard访问其某项服务；PlayGuard需要运行Atmosphère的主机",
+        "pdm_unavailable": "主机的游玩数据服务目前不可用；请稍后重试"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -418,7 +421,8 @@
         },
         "applet_cap": "为节省小程序模式（从相册打开）下的内存，另有{}款游戏未列出。导出文件包含所有游戏；如需完整列表，请在启动游戏时按住R键打开PlayGuard。",
         "account_nobody": "无用户（或已删除的用户）",
-        "account_new": "新用户（自{}起）：{}"
+        "account_new": "新用户（自{}起）：{}",
+        "truncated": "最多只能列出{}款游戏：部分本周未玩的游戏未列出，也未计入累计时间。"
     },
     "restrictions": {
         "section_level": "限制等级",
@@ -550,7 +554,7 @@
         "show_pin_title": "当前PIN",
         "show_pin_err": "无法读取PIN",
         "unlock": "暂时解除",
-        "unlock_body": "要暂时解除家长控制吗？\n\n在重新启用（或主机重启）之前，限制将保持关闭。",
+        "unlock_body": "要暂时解除家长控制吗？\n\n在重新启用（或主机重启）之前，限制将保持关闭。如果在此期间从HOME菜单关闭PlayGuard，它会在下次启动时重新启用。",
         "unlock_confirm": "解除",
         "unlocked": "已暂时解除家长控制。",
         "unlock_err": "无法解除",
@@ -883,7 +887,7 @@
         "diag_err": "无法保存诊断报告",
         "relocked": "家长控制已重新启用。",
         "relock_err": "无法重新启用家长控制",
-        "relocked_after_stop": "上次PlayGuard在更改过程中中止：家长控制已重新启用。",
+        "relocked_after_stop": "上次PlayGuard在家长控制解除期间被关闭：家长控制已重新启用。",
         "config_err": "无法将偏好设置保存到SD卡"
     },
     "history": {

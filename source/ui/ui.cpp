@@ -3,6 +3,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
+#include "action/error_hint_logic.hpp"
 #include "action/pt_log_flow.hpp"
 #include "activity/main_activity.hpp"
 #include "tab/tab_base.hpp"
@@ -22,36 +23,8 @@ namespace ui
 
 static std::string hint_for(Result rc)
 {
-    if (NXM_IS_APP_RESULT(rc)) {
-        switch (NXM_RESULT_DESC(rc)) {
-            case 1: return "playguard/error/read_only"_i18n;
-            case 2: return "playguard/error/write_gated"_i18n;
-            case 3: return "playguard/error/fw_unsupported"_i18n;
-            case 4: return "playguard/error/unlock_not_effective"_i18n;
-            case 5: return "playguard/error/not_custom"_i18n;
-            case 6: return "playguard/error/invalid_argument"_i18n;
-            case 7: return "playguard/error/autocorrect_off"_i18n;
-            case 8: return "playguard/error/state_unknown"_i18n;
-            case 9: return "playguard/error/not_confirmed"_i18n;
-            case 10: return "playguard/error/no_pin"_i18n;
-            case 11: return "playguard/error/relock_failed"_i18n;
-            case 12: return "playguard/error/not_applied"_i18n;
-            case 13: return "playguard/error/not_saved"_i18n;
-            case 14: return "playguard/error/pt_not_understood"_i18n;
-            default: return "";
-        }
-    }
-    switch (rc) {
-        case 0xF601: return "playguard/error/session_closed"_i18n;
-        case 0xF80E: return "playguard/error/bad_pin_format"_i18n;
-        // 2142-0132: reported writing the play timer on 22.1 (NX-Pctl-Manager #5); meaning unknown.
-        case 0x1088E: return "playguard/error/pctl_0132"_i18n;
-        // 2116-0102 (switchbrew: OffsetInvalid): switch-time saw it reading a never-set network clock.
-        case 0xCC74: return "playguard/error/clock_not_set"_i18n;
-        default: break;
-    }
-    if ((rc & 0x1FF) == 142) return "playguard/error/pctl_refused"_i18n;   // pctl module
-    return "";
+    const std::string key = error_hint_logic::hint_key(rc);
+    return key.empty() ? std::string() : brls::getStr("playguard/error/" + key);
 }
 
 std::string rc_text(Result rc, bool next_step)

@@ -121,11 +121,19 @@ Result write_bedtime(const PtBedtime bed[7], const std::string& source);
 // "21:00, allowed again at 06:00", "Off", or "Varies by day".
 std::string bedtime_text(const PtState& pt);
 
-// At start-up, before the first screen (and again on the main screen): the
-// app stopped between an unlock made for a change and the lock that follows
-// it (config relock_pending) -> lock again now, with a toast.
-// The record stays until the console reads back as locked. Also called when
-// the app leaves read-only mode, which keeps the record.
+// At start-up, before the first screen (and again on the main screen): an
+// earlier run unlocked (for a change, or Security › Unlock temporarily) and
+// stopped before locking again (config relock_pending) -> lock again now,
+// with a toast. The record stays until the console reads back as locked.
+// Also called when the app leaves read-only mode, which keeps the record;
+// this run's own unlock is left alone (pt_logic::pending_relock).
 void relock_if_interrupted();
+
+// Security › Unlock temporarily: unlocks, recorded as above, so that closing
+// PlayGuard from the HOME menu (which asks nothing) locks again at the next
+// start.
+Result unlock_temporarily();
+// Quitting while unlocked, "Quit, still unlocked": a choice, so the record goes.
+void keep_unlocked();
 
 }   // namespace pt_flow
