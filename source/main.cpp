@@ -58,6 +58,8 @@
 // Weak: without the patch, the frame time alone is recorded.
 extern "C" void nvgDebugGetStats(NVGcontext*, int*, int*, int*, int*) __attribute__((weak));
 #endif
+#include "view/cadran_digits.hpp"
+#include "view/cadran_icon.hpp"
 #include "view/made_in_france.hpp"
 #include "view/footer_hints.hpp"
 #include "view/header_settings.hpp"
@@ -356,6 +358,8 @@ void register_views()
 
     brls::Application::registerXMLView("LoadingMark",     LoadingMark::create);
     brls::Application::registerXMLView("LoadingBar",      LoadingBar::create);
+    brls::Application::registerXMLView("CadranIcon",      CadranIcon::create);
+    brls::Application::registerXMLView("CadranDigits",    CadranDigits::create);
 
     // In place of borealis' brls:Hints: the footer's clock on one line.
     FooterHints::install();
