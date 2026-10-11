@@ -233,7 +233,7 @@ void open(const history::Entry& e, std::function<void()> refresh)
         return;
     }
     const history::Entry entry = e;
-    ui::confirm(body, "playguard/history/undo_confirm"_i18n, [entry, now, refresh]() {
+    ui::confirm(pt_flow::with_link_note(body), "playguard/history/undo_confirm"_i18n, [entry, now, refresh]() {
         const Result rc = write_value(entry.kind, entry.before);
         if (R_SUCCEEDED(rc)) record_values(entry.kind.c_str(), history_logic::undo_replaces(entry, now), entry.before, "undo");
         ui::notify_result(rc, "playguard/history/undone"_i18n, "playguard/history/undo_err"_i18n);

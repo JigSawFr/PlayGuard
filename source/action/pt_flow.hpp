@@ -24,11 +24,17 @@ const std::vector<uint16_t>& quick_values();
 // off, no limit today, or no game counted yet).
 int played_today_min(const PtState& pt);
 
+// `body`, then, while the console is linked to the phone app, the note that
+// its next synchronisation overwrites what is written here: every write
+// confirmation ends with it. `st`: a status already read, else it is read now.
+std::string with_link_note(const std::string& body, const PctlStatus* st = nullptr);
+
 // One dialog for the whole change. `body` asks the question ("Set 2 h for every
 // day?"); when the timer is counting down the same dialog explains the
 // temporary unlock and its button unlocks first. When `new_days` would put
 // today's limit below the time already played, the dialog says the game in
-// progress will be suspended. With nothing to say and no unlock needed,
+// progress will be suspended, and while the phone app is linked, that it can
+// overwrite the change (with_link_note). With nothing to say and no unlock needed,
 // `write` runs at once. `write(did_unlock)` only runs when it is safe to
 // write; otherwise the user has already been told why.
 // `danger`: the confirm button is drawn in the "bad" colour (removing or

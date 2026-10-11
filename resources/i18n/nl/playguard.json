@@ -760,7 +760,8 @@
         "restore_err": "Niet teruggezet: {}",
         "before_delete_err": "Er kon vooraf geen back-up worden opgeslagen ({}).\n\nToch alles verwijderen?",
         "delete_anyway": "Toch verwijderen",
-        "bedtime_not_restored": "In deze back-up stond een bedtijdalarm aan: dat wordt niet teruggezet. Stel het zo nodig opnieuw in bij Speeltijdtimer."
+        "bedtime_not_restored": "In deze back-up stond een bedtijdalarm aan: dat wordt niet teruggezet. Stel het zo nodig opnieuw in bij Speeltijdtimer.",
+        "backed_up_on": "Back-up van de instellingen van {}."
     },
     "update": {
         "checking": "Controleren op updates...",

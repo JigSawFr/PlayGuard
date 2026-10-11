@@ -760,7 +760,8 @@
         "restore_err": "Não restaurado: {}",
         "before_delete_err": "Não foi possível criar antes uma cópia de segurança ({}).\n\nEliminar tudo mesmo assim?",
         "delete_anyway": "Eliminar mesmo assim",
-        "bedtime_not_restored": "Esta cópia tinha um alarme de hora de dormir ativo: não é reposto; volte a defini-lo em Tempo de jogo, se necessário."
+        "bedtime_not_restored": "Esta cópia tinha um alarme de hora de dormir ativo: não é reposto; volte a defini-lo em Tempo de jogo, se necessário.",
+        "backed_up_on": "Definições guardadas em {}."
     },
     "update": {
         "checking": "A procurar atualizações...",

@@ -52,9 +52,10 @@ std::string days_text(const std::array<uint16_t, 7>& days)
 
 // What a restore will change: one "now → backup" line per value that differs
 // from the console's (a value the console does not report counts as
-// different), and how many are already the same. The limits are not listed:
-// the confirmation draws the week instead (pt_flow::confirm_write).
-std::string summary(const backup::Snapshot& s)
+// different), and how many are already the same, counted in *tally. The
+// limits are not listed: the confirmation draws the week instead
+// (pt_flow::confirm_write).
+std::string summary(const backup::Snapshot& s, backup::RestoreTally* tally)
 {
     PctlStatus st;
     pctl_status_fetch(&st);
@@ -62,12 +63,10 @@ std::string summary(const backup::Snapshot& s)
     pctl_play_timer_query(&pt);
     const std::string unknown = "?";
     std::string changes;
-    int same = 0;
-    auto compare = [&](const std::string& label, bool known, const std::string& now, const std::string& then) {
-        if (known && now == then) {
-            same++;
-            return;
-        }
+    auto compare = [&](const std::string& label, bool known, const std::string& now, const std::string& then,
+                       bool restored = true) {
+        tally->add(known, now == then, restored);
+        if (known && now == then) return;
         changes += "\n" + brls::getStr("playguard/backup/change_line", label, known ? now : unknown, then);
     };
 
@@ -92,15 +91,19 @@ std::string summary(const backup::Snapshot& s)
     // A debug-class command: written only with the advanced actions shown.
     if (s.alarm_ok) {
         auto on_off = [](bool disabled) { return disabled ? "playguard/common/off"_i18n : "playguard/common/on"_i18n; };
-        if (pt.alarm_disabled_valid && pt.alarm_disabled == s.alarm_disabled) same++;
+        const bool advanced = config::get().advanced;
+        if (pt.alarm_disabled_valid && pt.alarm_disabled == s.alarm_disabled) tally->add(true, true);
         else
             compare("playguard/play_timer/alarm"_i18n, pt.alarm_disabled_valid, on_off(pt.alarm_disabled),
-                    on_off(s.alarm_disabled) + (config::get().advanced ? "" : "playguard/backup/not_restored_advanced"_i18n));
+                    on_off(s.alarm_disabled) + (advanced ? "" : "playguard/backup/not_restored_advanced"_i18n), advanced);
     }
 
-    std::string out = brls::getStr("playguard/backup/restore_body", s.created.empty() ? "?" : s.created) + "\n";
+    // Nothing to write: a statement, not the restore question.
+    const std::string created = s.created.empty() ? "?" : s.created;
+    std::string out = brls::getStr(tally->nothing_to_write() ? "playguard/backup/backed_up_on" : "playguard/backup/restore_body",
+                                   created) + "\n";
     out += changes.empty() ? "\n" + "playguard/backup/nothing_differs"_i18n : changes;
-    if (same > 0 && !changes.empty()) out += "\n\n" + brls::getStr("playguard/backup/same_count", same);
+    if (tally->same > 0 && !changes.empty()) out += "\n\n" + brls::getStr("playguard/backup/same_count", tally->same);
     // The PIN is not in the backup (after "Delete all", there is none).
     if (st.pin_length_ok && st.pin_length == 0) out += "\n\n" + "playguard/backup/no_pin_note"_i18n;
     // The bedtime is kept in the backup's raw block, but not written back:
@@ -163,7 +166,14 @@ void write_all(const backup::Snapshot& s, bool did_unlock, std::function<void()>
 
 void restore(const backup::Snapshot& s, std::function<void()> refresh)
 {
-    const std::string body = summary(s);
+    backup::RestoreTally tally;
+    const std::string body = summary(s, &tally);
+    // The console already has these values: say so, and touch nothing (no
+    // unlock, no write, no "restored" in the history).
+    if (tally.nothing_to_write()) {
+        ui::info(body);
+        return;
+    }
     auto run = [s, refresh](bool did_unlock) { write_all(s, did_unlock, refresh); };
     // Limits to write: through the play-timer gate (unlock first when the
     // timer is counting down). Restrictions only: a plain confirmation, as in
@@ -173,7 +183,7 @@ void restore(const backup::Snapshot& s, std::function<void()> refresh)
     const bool timer = s.days_ok || (s.alarm_ok && config::get().advanced);
     if (timer) pt_flow::confirm_write(body, "playguard/backup/restore_confirm"_i18n, run, s.days_ok ? s.days.data() : nullptr, true);
     else if (app::read_only()) ui::notify(ui::rc_text(NXM_RC_READ_ONLY));
-    else ui::confirm(body, "playguard/backup/restore_confirm"_i18n, [run]() { run(false); }, nullptr, true);
+    else ui::confirm(pt_flow::with_link_note(body), "playguard/backup/restore_confirm"_i18n, [run]() { run(false); }, nullptr, true);
 }
 
 int s_count = -1;   // backups on the SD card, -1: not listed yet
