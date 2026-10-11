@@ -26,6 +26,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_NOT_SET_UP=1` | Parental controls never set up (no PIN) |
 | `PLAYGUARD_SIM_TIMER_OFF=1` | No play-time limit |
 | `PLAYGUARD_SIM_RESTRICTED=1` | Today's limit reached |
+| `PLAYGUARD_SIM_NOT_COUNTING=1` | The time left not going down (a clock set back): the Overview says the console is not counting after 90 s on screen |
 | `PLAYGUARD_SIM_UNLOCKED=1` | Parental controls temporarily unlocked |
 | `PLAYGUARD_SIM_UNPAIRED=1` | No companion app linked |
 | `PLAYGUARD_SIM_ALARM_OFF=1` | The "time's up" alarm off |
@@ -68,11 +69,11 @@ CI runs all of the above plus the Switch build, the smoke scenarios in parallel 
 |---|---|
 | `source/core/` | C, libnx: `pctl_ops`, `time_ops`, `sysinfo`, `playstats`, `platform`, `rescue`, `pure`, `calendar`, `write_guard` (the last four need no console and are shared with the simulator) |
 | `source/tab/` | One class per tab |
-| `source/action/` | Flows: play-timer write, clock, settings restore, firmware screen, updates |
-| `source/activity/` | Screens: per-day editor, profiles, a game, first steps, change history, firmware |
-| `source/view/` | Widgets: the week chart, the gauge, the day bars, the game cell |
-| `source/ui/` | Dialogs, formatting, theme colours |
-| `source/util/` | NTP, config, profiles, settings backups, change history, play-log folding, the play-data cache, table export, diagnostics, sending reports online, update check, store launcher |
+| `source/action/` | Flows, one per thing a tab does, with their UI-free logic in `*_logic.cpp` where there is one: the play-timer write and its recorder, the clock (and a console no time server answers), the PIN prompt and the console lock, settings backups and restores, the change history and undo, changes seen outside PlayGuard and timer health, the firmware screen, the recovery screen, reports and sending them online, updates, GitHub sign-in and development builds, the SD-card write queue |
+| `source/activity/` | Screens: per-day editor, profiles, a game, first steps, change history, firmware, recovery, the lock screen, the diagnostic report, what's new, the start-up error |
+| `source/view/` | Widgets: the week chart, the gauge, the play-timer state line, the day bars, the game cell, the QR codes and funding links, release notes, the scrolling frame |
+| `source/ui/` | Dialogs, formatting, theme colours, the console's state as text, read-only greying and visibility |
+| `source/util/` | NTP, HTTP, config, profiles, settings backups, change history, play-log folding, the play-data cache, the Activity summary, table export, diagnostics, sending reports online, the play-timer recorder and block reference, update check, store launcher, GitHub sign-in and development builds (zip, SHA-256), game patches, the bundled changelog and the start-up reminders |
 | `source/sim/` | The simulated console for the desktop build |
 | `resources/` | XML layouts and `i18n/<language>/playguard.json` |
 | `sysmodule/` | The optional recovery boot sysmodule; shares `source/core/rescue.c` with the app. See [`sysmodule/README.md`](sysmodule/README.md) |

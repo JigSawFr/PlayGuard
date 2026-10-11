@@ -104,6 +104,7 @@ All in `sd:/switch/playguard/`:
 |---|---|
 | `config.json` | Preferences (language, theme, NTP server, *Ask for the PIN* …); every key in [docs/config.md](docs/config.md). One that cannot be read is kept as `config.json.bad` (the previous one as `.bad.1`) and the settings start again from their defaults; PlayGuard says so once at start-up |
 | `history.json` | The change history (newest 200); one that cannot be read is kept as `history.json.bad` (the previous one as `.bad.1`) rather than overwritten, and PlayGuard says so once |
+| `watch.json` | What PlayGuard last saw of the console (today's play time, the clock, the limits, the user accounts), to tell what changed outside it; every key in [docs/config.md](docs/config.md#watchjson). Deleting it is harmless |
 | `profiles/` | Saved play-time limit profiles |
 | `backups/` | Settings backups (never contain the PIN) |
 | `exports/` | Activity exports |
