@@ -7,6 +7,8 @@
 #include <borealis.hpp>
 #include <string>
 
+#include "view/cadran_digits.hpp"
+
 class PtRing : public brls::Box
 {
   public:
@@ -25,7 +27,7 @@ class PtRing : public brls::Box
 
   private:
     float used = -1.0f;
-    brls::Label* value   = nullptr;
+    CadranDigits* value  = nullptr;
     brls::Label* caption = nullptr;
     NVGcolor track, teal, amber, coral;
 };

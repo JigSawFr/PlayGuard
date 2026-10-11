@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- "Cadran" prototype of the Overview (desktop simulation, PLAYGUARD_SIM_CADRAN=1):
-     the ring first, the two everyday actions, three state cards, "all fine"
-     pills. Filled by source/tab/cadran_tab.cpp. Strings not localised. -->
+<!-- "Cadran" prototype of the Overview (desktop simulation, PLAYGUARD_SIM_CADRAN=1),
+     after the design boards: the ring first, the two everyday actions, three
+     state cards, "all fine" pills. Filled by source/tab/cadran_tab.cpp.
+     Strings not localised. -->
 
 <brls:Box
     width="auto"
@@ -10,71 +11,82 @@
     axis="column"
     alignItems="stretch"
     paddingLeft="28"
-    paddingRight="44"
-    paddingTop="6">
+    paddingRight="48"
+    paddingTop="4">
 
-    <brls:Box axis="row" alignItems="center" marginBottom="16">
-        <PtRing id="cad_ring" width="236" height="236" marginRight="30"/>
+    <brls:Box axis="row" alignItems="center" marginBottom="18">
+        <PtRing id="cad_ring" width="256" height="256" marginRight="36"/>
         <brls:Box axis="column" alignItems="flexStart" grow="1.0">
-            <brls:Label id="cad_kicker" text="AUJOURD'HUI" fontSize="14" textColor="@theme/cadran/text3" marginBottom="8"/>
-            <brls:Label id="cad_played" text="—" fontSize="30" marginBottom="6"/>
-            <brls:Label text="Profil Semaine d'école · un jeu laissé sur le menu HOME continue d'être décompté." fontSize="17" textColor="@theme/cadran/text2" marginBottom="14" singleLine="false"/>
-            <brls:Box axis="row" alignItems="center" marginBottom="10">
-                <brls:Button id="cad_extra" style="primary" text="+  Temps en plus" fontSize="19" height="54" cornerRadius="27" paddingLeft="22" paddingRight="22" marginRight="12"/>
-                <brls:Button style="default" text="+15 min" fontSize="17" height="46" cornerRadius="23" paddingLeft="18" paddingRight="18" marginRight="8"/>
-                <brls:Button style="default" text="+30 min" fontSize="17" height="46" cornerRadius="23" paddingLeft="18" paddingRight="18" marginRight="8"/>
-                <brls:Button style="default" text="+1 h" fontSize="17" height="46" cornerRadius="23" paddingLeft="18" paddingRight="18"/>
+            <brls:Label id="cad_kicker" text="AUJOURD'HUI" fontSize="14" textColor="@theme/cadran/text3" marginBottom="12"/>
+            <CadranDigits id="cad_played" text="—" fontSize="34" marginBottom="12"/>
+            <brls:Label text="Profil Semaine d'école · un jeu laissé sur le menu HOME continue d'être décompté." fontSize="18" textColor="@theme/cadran/text2" marginBottom="16" singleLine="false"/>
+            <brls:Box axis="row" alignItems="center" marginBottom="12">
+                <brls:Button id="cad_extra" style="primary" text="Temps en plus" fontSize="19" height="56" cornerRadius="28" paddingLeft="22" paddingRight="22" marginRight="12"/>
+                <brls:Box id="cad_chip15" focusable="true" axis="row" alignItems="center" height="48" paddingLeft="18" paddingRight="18" cornerRadius="24" backgroundColor="@theme/cadran/surf2" borderColor="@theme/cadran/line" borderThickness="1" marginRight="12">
+                    <CadranDigits text="+15 min" fontSize="17"/>
+                </brls:Box>
+                <brls:Box id="cad_chip30" focusable="true" axis="row" alignItems="center" height="48" paddingLeft="18" paddingRight="18" cornerRadius="24" backgroundColor="@theme/cadran/surf2" borderColor="@theme/cadran/line" borderThickness="1" marginRight="12">
+                    <CadranDigits text="+30 min" fontSize="17"/>
+                </brls:Box>
+                <brls:Box id="cad_chip60" focusable="true" axis="row" alignItems="center" height="48" paddingLeft="18" paddingRight="18" cornerRadius="24" backgroundColor="@theme/cadran/surf2" borderColor="@theme/cadran/line" borderThickness="1">
+                    <CadranDigits text="+1 h" fontSize="17"/>
+                </brls:Box>
             </brls:Box>
             <brls:Box axis="row" alignItems="center">
-                <brls:Button id="cad_stop" style="bordered" text="Arrêter pour aujourd'hui" fontSize="17" height="46" cornerRadius="23" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/coral" borderColor="@theme/cadran/coral_line" marginRight="12"/>
-                <brls:Button style="bordered" text="Montrer à l'enfant" fontSize="17" height="46" cornerRadius="23" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line"/>
+                <brls:Button id="cad_stop" style="bordered" text="Arrêter pour aujourd'hui" fontSize="17" height="48" cornerRadius="24" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/coral" borderColor="@theme/cadran/coral_line" borderThickness="2" marginRight="12"/>
+                <brls:Button id="cad_child" style="bordered" text="Montrer à l'enfant" fontSize="17" height="48" cornerRadius="24" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line" borderThickness="2"/>
             </brls:Box>
         </brls:Box>
     </brls:Box>
 
-    <brls:Box axis="row" alignItems="stretch" marginBottom="14">
-        <brls:Box id="cad_bed_card" focusable="true" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="16" paddingBottom="16" paddingLeft="20" paddingRight="20" marginRight="14">
+    <brls:Box axis="row" alignItems="stretch" marginBottom="16">
+        <brls:Box id="cad_bed_card" focusable="true" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="18" paddingBottom="18" paddingLeft="20" paddingRight="20" marginRight="16">
             <brls:Box axis="row" justifyContent="spaceBetween" alignItems="center">
                 <brls:Label text="Alarme du coucher" fontSize="15" textColor="@theme/cadran/text3"/>
                 <brls:Label id="cad_bed_state" text="" fontSize="15" textColor="@theme/cadran/teal"/>
             </brls:Box>
-            <brls:Label id="cad_bed_value" text="—" fontSize="32" marginTop="6" marginBottom="4"/>
+            <CadranDigits id="cad_bed_value" text="—" fontSize="32" marginTop="6" marginBottom="6"/>
             <brls:Label id="cad_bed_sub" text="" fontSize="15" textColor="@theme/cadran/text2"/>
         </brls:Box>
-        <brls:Box id="cad_pc_card" focusable="true" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="16" paddingBottom="16" paddingLeft="20" paddingRight="20" marginRight="14">
+        <brls:Box id="cad_pc_card" focusable="true" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="18" paddingBottom="18" paddingLeft="20" paddingRight="20" marginRight="16">
             <brls:Box axis="row" justifyContent="spaceBetween" alignItems="center">
                 <brls:Label text="Contrôle parental" fontSize="15" textColor="@theme/cadran/text3"/>
                 <brls:Label id="cad_pc_state" text="" fontSize="15" textColor="@theme/cadran/teal"/>
             </brls:Box>
-            <brls:Label id="cad_pc_value" text="—" fontSize="32" marginTop="6" marginBottom="4"/>
+            <CadranDigits id="cad_pc_value" text="—" fontSize="32" marginTop="6" marginBottom="6"/>
             <brls:Label id="cad_pc_sub" text="" fontSize="15" textColor="@theme/cadran/text2"/>
         </brls:Box>
-        <brls:Box id="cad_clock_card" focusable="true" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="16" paddingBottom="16" paddingLeft="20" paddingRight="20">
+        <brls:Box id="cad_clock_card" focusable="true" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="18" paddingBottom="18" paddingLeft="20" paddingRight="20">
             <brls:Box axis="row" justifyContent="spaceBetween" alignItems="center">
                 <brls:Label id="cad_clock_title" text="Horloge réseau" fontSize="15" textColor="@theme/cadran/text3"/>
                 <brls:Label id="cad_clock_state" text="" fontSize="15" textColor="@theme/cadran/teal"/>
             </brls:Box>
-            <brls:Label id="cad_clock_value" text="—" fontSize="32" marginTop="6" marginBottom="4"/>
-            <brls:Label id="cad_clock_sub" text="" fontSize="15" textColor="@theme/cadran/text2"/>
+            <CadranDigits id="cad_clock_value" text="—" fontSize="32" marginTop="6" marginBottom="6"/>
+            <brls:Box axis="row" alignItems="center">
+                <brls:Box id="cad_clock_key" axis="row" alignItems="center" justifyContent="center" width="22" height="22" cornerRadius="11" backgroundColor="@theme/cadran/key_bg" marginRight="8">
+                    <CadranDigits text="A" fontSize="12" textColor="@theme/cadran/navy"/>
+                </brls:Box>
+                <brls:Label id="cad_clock_sub" text="" fontSize="15" textColor="@theme/cadran/text2"/>
+            </brls:Box>
         </brls:Box>
     </brls:Box>
 
-    <brls:Box axis="row" alignItems="center" marginBottom="10">
-        <brls:Box axis="row" alignItems="center" height="28" paddingLeft="12" paddingRight="12" cornerRadius="14" borderColor="@theme/cadran/line" borderThickness="1" marginRight="8">
-            <brls:Rectangle width="7" height="7" cornerRadius="3.5" color="@theme/cadran/teal" marginRight="7"/>
-            <brls:Label text="Firmware 22.5.0" fontSize="14" textColor="@theme/cadran/text3"/>
+    <brls:Box axis="row" alignItems="center" marginBottom="12">
+        <brls:Box axis="row" alignItems="center" height="28" paddingLeft="12" paddingRight="12" cornerRadius="14" borderColor="@theme/cadran/line" borderThickness="1" marginRight="10">
+            <brls:Rectangle width="7" height="7" cornerRadius="3.5" color="@theme/cadran/teal" marginRight="6"/>
+            <brls:Label text="Firmware 22.5.0 · compatible" fontSize="14" textColor="@theme/cadran/text3"/>
         </brls:Box>
-        <brls:Box axis="row" alignItems="center" height="28" paddingLeft="12" paddingRight="12" cornerRadius="14" borderColor="@theme/cadran/line" borderThickness="1" marginRight="8">
-            <brls:Rectangle width="7" height="7" cornerRadius="3.5" color="@theme/cadran/teal" marginRight="7"/>
+        <brls:Box axis="row" alignItems="center" height="28" paddingLeft="12" paddingRight="12" cornerRadius="14" borderColor="@theme/cadran/line" borderThickness="1" marginRight="10">
+            <brls:Rectangle width="7" height="7" cornerRadius="3.5" color="@theme/cadran/teal" marginRight="6"/>
             <brls:Label text="Appli mobile non associée" fontSize="14" textColor="@theme/cadran/text3"/>
         </brls:Box>
-        <brls:Box axis="row" alignItems="center" height="28" paddingLeft="12" paddingRight="12" cornerRadius="14" borderColor="@theme/cadran/line" borderThickness="1" marginRight="8">
-            <brls:Rectangle width="7" height="7" cornerRadius="3.5" color="@theme/cadran/teal" marginRight="7"/>
-            <brls:Label text="Série masqué" fontSize="14" textColor="@theme/cadran/text3"/>
+        <brls:Box axis="row" alignItems="center" height="28" paddingLeft="12" paddingRight="12" cornerRadius="14" borderColor="@theme/cadran/line" borderThickness="1" marginRight="10">
+            <brls:Rectangle width="7" height="7" cornerRadius="3.5" color="@theme/cadran/teal" marginRight="6"/>
+            <brls:Label text="Numéro de série masqué" fontSize="14" textColor="@theme/cadran/text3"/>
         </brls:Box>
         <brls:Box axis="row" alignItems="center" height="28" paddingLeft="12" paddingRight="12" cornerRadius="14" borderColor="@theme/cadran/line" borderThickness="1">
-            <brls:Rectangle width="7" height="7" cornerRadius="3.5" color="@theme/cadran/teal" marginRight="7"/>
-            <brls:Label text="Aucun patch" fontSize="14" textColor="@theme/cadran/text3"/>
+            <brls:Rectangle width="7" height="7" cornerRadius="3.5" color="@theme/cadran/teal" marginRight="6"/>
+            <brls:Label text="Aucun patch de jeu" fontSize="14" textColor="@theme/cadran/text3"/>
         </brls:Box>
     </brls:Box>
 

@@ -21,9 +21,8 @@ PtRing::PtRing()
     this->setHeight(256);
     this->setFocusable(false);
 
-    this->value = new brls::Label();
+    this->value = new CadranDigits();
     this->value->setFontSize(58);
-    this->value->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     this->value->setText("—");
     this->addView(this->value);
 
@@ -67,7 +66,7 @@ void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
         nvgLineCap(vg, NVG_BUTT);
     }
 
-    brls::Box::draw(vg, x, y, width, height, style, ctx);   // the two labels
+    brls::Box::draw(vg, x, y, width, height, style, ctx);   // the figure and its caption
 }
 
 brls::View* PtRing::create() { return new PtRing(); }

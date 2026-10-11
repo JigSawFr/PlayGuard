@@ -55,6 +55,8 @@
 // Weak: without the patch, the frame time alone is recorded.
 extern "C" void nvgDebugGetStats(NVGcontext*, int*, int*, int*, int*) __attribute__((weak));
 #endif
+#include "view/cadran_digits.hpp"
+#include "view/cadran_icon.hpp"
 #include "view/made_in_france.hpp"
 #include "view/version_badge.hpp"
 #include "view/scroll_view.hpp"
@@ -272,6 +274,8 @@ int main(int argc, char* argv[])
     brls::Application::registerXMLView("PtStateHeader",   PtStateHeader::create);
     brls::Application::registerXMLView("PtGauge",         PtGauge::create);
     brls::Application::registerXMLView("PtRing",          PtRing::create);
+    brls::Application::registerXMLView("CadranIcon",      CadranIcon::create);
+    brls::Application::registerXMLView("CadranDigits",    CadranDigits::create);
     brls::Application::registerXMLView("PtWeekView",      PtWeekView::create);
     brls::Application::registerXMLView("PlayDaysView",    PlayDaysView::create);
     brls::Application::registerXMLView("MadeInFrance",    MadeInFrance::create);

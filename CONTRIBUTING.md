@@ -53,7 +53,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_STILL_FOCUS=1` | Not the console: the focus highlight without its moving glow, and the loading screen's ring still, for screenshots that compare |
 | `PLAYGUARD_SIM_VERSION=1.0.0:1a2b3c4` | Not the console: the version and commit the header's badge shows (`1.0.0:` for a release), not the build's own, for screenshots that compare |
 | `PLAYGUARD_SIM_HOLD_LOADING=1` | Not the console: the start-up stops on the loading screen, at its last step (the `loading` smoke scenario's screenshot) |
-| `PLAYGUARD_SIM_CADRAN=1` | Not the console: the "Cadran" prototype of the Overview (`source/tab/cadran_tab.cpp`, navy theme, a ring for today's time), to look at and measure; `PLAYGUARD_SIM_CADRAN_NOGLOW=1` and `PLAYGUARD_SIM_CADRAN_NORING=1` leave out its two custom draws |
+| `PLAYGUARD_SIM_CADRAN=1` | Not the console: the "Cadran" prototype of the Overview after the design boards (`source/tab/cadran_tab.cpp`: navy theme, a ring for today's time, an icon rail, the figures in Sora from `resources/font/`, OFL), to look at and measure; `PLAYGUARD_SIM_CADRAN_NOGLOW=1` and `PLAYGUARD_SIM_CADRAN_NORING=1` leave out its two custom draws |
 | `PLAYGUARD_SIM_STATS=<file>` | Not the console: one line per frame (frame time with the FPS limiter off; nanovg's draw calls and triangles with `tools/perf_nanovg_stats.patch`), see `tools/perf_frames.sh` |
 
 Game patches are read from `./playguard_data/sd/`, the simulated SD card root.

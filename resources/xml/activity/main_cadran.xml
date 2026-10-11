@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Root screen with the "Cadran" prototype Overview (desktop simulation, PLAYGUARD_SIM_CADRAN=1). Each tab
+<!-- Root screen with the "Cadran" prototype Overview (desktop simulation, PLAYGUARD_SIM_CADRAN=1):
+     the tabs carry the boards' short French labels; cadran::style_frame adds the icons. Each tab
      is a custom view registered in main.cpp and implemented in source/tab/. -->
 
 <brls:AppletFrame
@@ -12,45 +13,45 @@
         title="@i18n/playguard/title"
         icon="@res/img/app_icon.jpg">
 
-        <brls:Tab label="@i18n/playguard/tabs/dashboard">
+        <brls:Tab label="Aujourd'hui">
             <CadranTab/>
         </brls:Tab>
 
         <brls:Separator/>
 
-        <brls:Tab label="@i18n/playguard/tabs/play_timer">
+        <brls:Tab label="Temps de jeu">
             <PlayTimerTab/>
         </brls:Tab>
 
-        <brls:Tab label="@i18n/playguard/tabs/activity">
+        <brls:Tab label="Activité">
             <ActivityTab/>
         </brls:Tab>
 
-        <brls:Tab label="@i18n/playguard/tabs/restrictions">
+        <brls:Tab label="Restrictions">
             <RestrictionsTab/>
         </brls:Tab>
 
-        <brls:Tab label="@i18n/playguard/tabs/clock">
+        <brls:Tab label="Horloge">
             <ClockTab/>
         </brls:Tab>
 
         <brls:Separator/>
 
-        <brls:Tab label="@i18n/playguard/tabs/security">
+        <brls:Tab label="Sécurité">
             <SecurityTab/>
         </brls:Tab>
 
         <brls:Separator/>
 
-        <brls:Tab label="@i18n/playguard/tabs/preferences">
+        <brls:Tab label="Préférences">
             <PreferencesTab/>
         </brls:Tab>
 
-        <brls:Tab label="@i18n/playguard/tabs/tools">
+        <brls:Tab label="Outils">
             <ToolsTab/>
         </brls:Tab>
 
-        <brls:Tab label="@i18n/playguard/tabs/about">
+        <brls:Tab label="À propos">
             <AboutTab/>
         </brls:Tab>
 

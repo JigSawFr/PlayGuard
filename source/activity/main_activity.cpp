@@ -12,6 +12,7 @@
 #include "action/update_flow.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
+#include "tab/cadran_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -78,6 +79,11 @@ void MainActivity::onContentAvailable()
     brls::Logger::info("main screen opened");
     this->update_title();
     compact_sidebar(this->getView("main_tabs"));
+#ifndef __SWITCH__
+    // The "Cadran" prototype: the frame after the design boards.
+    if (std::getenv("PLAYGUARD_SIM_CADRAN"))
+        cadran::style_frame(dynamic_cast<brls::AppletFrame*>(this->getContentView()), this->getView("main_tabs"));
+#endif
 
     // B on the sidebar quits (the tabs themselves send B back to the sidebar),
     // but only when pressed twice within 2 s: one stray B never closes the app.
