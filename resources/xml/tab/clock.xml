@@ -41,6 +41,7 @@
             <brls:Label id="ck_result" text="" marginTop="8" marginBottom="8" marginLeft="16" marginRight="16"/>
             <brls:Label id="ck_warning" text="" fontSize="20" marginBottom="8" marginLeft="16" marginRight="16" textColor="@theme/brand/warn"/>
             <brls:DetailCell id="ck_apply" title="@i18n/playguard/clock/apply"/>
+            <brls:DetailCell id="ck_copy" title="@i18n/playguard/clock/copy"/>
 
         </brls:Box>
 

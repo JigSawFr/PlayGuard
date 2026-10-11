@@ -79,6 +79,8 @@ Piloter le contrôle parental de la console ouvre aussi la porte à bien plus : 
 
 **Risque de bannissement ?** PlayGuard ne contacte jamais Nintendo : en ligne, il ne joint que des serveurs de temps publics, GitHub (mises à jour) et bpa.st (rapports). Ce qui fait bannir une console, c'est un firmware modifié ou une emuMMC qui se connecte à Nintendo ([FAQ switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), en anglais). Aucun bannissement lié à un changement du contrôle parental ou de l'horloge n'est documenté ; ce n'est pas une garantie.
 
+**Une console sans Internet ?** C'est la cible de PlayGuard, et le minuteur a quand même besoin d'une horloge réseau réglée. Sans serveur de temps à interroger, *Horloge réseau › Mesurer l'écart* propose de la régler sur l'horloge de la console à la place : vérifiez d'abord l'horloge de la console, avec *Synchroniser l'horloge via Internet* désactivé, et n'activez ce réglage qu'ensuite (voir [Horloge réseau](#les-fonctions-onglet-par-onglet)).
+
 **Notifications sur le téléphone.** Depuis 22.0.0, une console encore associée à l'application mobile peut prévenir le parent quand le code PIN est saisi sur la console ([switchbrew](https://switchbrew.org/wiki/22.0.0), en anglais). On ne sait pas si les déverrouillages de PlayGuard la déclenchent.
 
 ## Installation
@@ -118,7 +120,7 @@ Plus de détails dans [packaging/README.md](packaging/README.md) (en anglais).
 1. **Contrôle parental pas encore configuré ?** Ouvrez PlayGuard : le guide *Premiers pas* définit le code PIN (écran système), la limite quotidienne, et vérifie l'horloge réseau.
 2. **Associé à l'application mobile ?** *Sécurité et appli › Dissocier l'application mobile* — sinon sa prochaine synchronisation écrase vos réglages.
 3. Réglez la limite : *Temps de jeu › Même limite tous les jours* (ou *Limite différente selon le jour…*).
-4. **Horloge réseau imprécise** (indiqué dans la Vue d'ensemble) ? Activez *Synchroniser l'horloge via Internet* dans les paramètres de la console, puis *Horloge réseau › Mesurer l'écart* et *Régler l'horloge réseau*.
+4. **Horloge réseau imprécise** (indiqué dans la Vue d'ensemble) ? Activez *Synchroniser l'horloge via Internet* dans les paramètres de la console, puis *Horloge réseau › Mesurer l'écart* et *Régler l'horloge réseau*. **Pas d'Internet ?** Laissez ce réglage désactivé et vérifiez d'abord l'horloge de la console : quand aucun serveur ne répond, *Mesurer l'écart* propose *Régler l'horloge réseau sur l'horloge de la console* ; n'activez le réglage qu'ensuite (avant, l'horloge de la console saute vers l'horloge réseau fausse).
 
 **Commandes :** ↑/↓ déplacer · Ⓐ valider · Ⓑ retour ou annuler (deux fois sur la barre latérale pour quitter) · Ⓧ actualiser · **+** enregistre les limites par jour.
 
@@ -189,6 +191,7 @@ L'application est organisée en onglets, comme les paramètres de la console. Cl
 - Choix d'un serveur NTP public (≈ 50 intégrés, par région, ou le vôtre).
 - **Mesure** sur 3 serveurs (médiane ; alerte orange en cas de désaccord), puis **réglage de l'horloge réseau** — une mesure reste utilisable 2 minutes, avec un décompte. La confirmation le dit : changer l'horloge remet à zéro le temps de jeu du jour, toute la limite redevient donc disponible.
 - Une console qui n'atteint jamais les serveurs de Nintendo garde cette horloge imprécise, ce qui fausse le minuteur.
+- **Aucun serveur ne répond** (console sans Internet) : *Régler l'horloge réseau sur l'horloge de la console* apparaît sous le résultat (et depuis la ligne *Imprécise* de la Vue d'ensemble, quand sa mesure échoue), derrière la même confirmation. PlayGuard n'a rien d'autre pour comparer l'horloge de la console : la confirmation affiche son heure et demande de la vérifier d'abord avec un téléphone ou une montre, et une horloge de console antérieure à 2026 (jamais réglée) est refusée. Avec *Synchroniser l'horloge via Internet* désactivé, l'horloge de la console ne bouge pas, et activer le réglage ensuite ne la fait plus sauter ; s'il est activé, l'horloge de la console suit déjà l'horloge réseau, et la confirmation indique de le désactiver et de régler l'heure à la main si elle est fausse. Seule l'horloge est écrite, pas le contrôle parental : aucun déverrouillage n'est nécessaire (le code PIN de *Demander le code PIN* s'applique toujours) ; comme tout changement d'horloge, cela remet à zéro le temps de jeu du jour. Pas encore essayé sur une console.
 </details>
 
 <details>

@@ -302,7 +302,14 @@ The play timer counts per day, so the console's clocks matter.
   network clock and the local clock, in UTC POSIX seconds.
 - 100 `IsStandardUserSystemClockAutomaticCorrectionEnabled`: when it is off,
   the user clock does not follow the network clock. PlayGuard refuses to write
-  the network clock then, so the system's own setting stays in charge.
+  a measured time to the network clock then, so the system's own setting
+  stays in charge. The exception is a console no time server answers:
+  *Set the network clock to the console clock* (`time_clock_set_to_user`,
+  decided by `source/action/offline_clock_logic.cpp`) writes the user clock,
+  read in the same session, to the network clock, with correction off too.
+  The user clock is the source and does not move; turning correction on
+  afterwards should then leave it in place, both clocks being equal (inferred
+  from the jump below; not tried on a console yet).
 - 200 `IsStandardNetworkSystemClockAccuracySufficient`.
 - On the test console the network clock was 1411 s (23.5 min) ahead of the
   user clock, with automatic correction off and accuracy insufficient

@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <vector>
 
+#include "action/offline_clock_logic.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -61,6 +62,13 @@ ClockTab::ClockTab()
     measure_cell->registerClickAction([this](brls::View*) { this->measure(); return true; });
     apply_cell->registerClickAction([this](brls::View*) {
         if (!ui::refuse_read_only()) this->apply();
+        return true;
+    });
+    // A long title and no value: the title gets the whole width (an empty
+    // detail label still reserves its space).
+    copy_cell->detail->setVisibility(brls::Visibility::GONE);
+    copy_cell->registerClickAction([this](brls::View*) {
+        if (!ui::refuse_read_only()) this->copy();
         return true;
     });
     ui::set_visible(progress.getView(), false);
@@ -124,6 +132,9 @@ void ClockTab::refresh()
     // Measuring only reads: also in read-only mode, where setting is greyed.
     ui::set_visible(apply_cell.getView(), this->last.ok);
     ui::show_writable(apply_cell, !app::read_only());
+    // No server answered: the console clock instead (its time is at the top).
+    ui::set_visible(copy_cell.getView(), this->offline);
+    ui::show_writable(copy_cell, !app::read_only());
 }
 
 void ClockTab::set_server(const std::string& host, const std::string& reg)
@@ -131,6 +142,7 @@ void ClockTab::set_server(const std::string& host, const std::string& reg)
     this->server = host;
     this->region_id = reg;
     this->last = clock_flow::Measurement{};
+    this->offline = false;
     this->result->setText("");
     ui::set_visible(warning.getView(), false);
     auto& cfg = config::get();
@@ -195,7 +207,9 @@ void ClockTab::measure()
     }
     this->busy = true;
     this->last = clock_flow::Measurement{};
+    this->offline = false;
     ui::set_visible(apply_cell.getView(), false);
+    ui::set_visible(copy_cell.getView(), false);
     ui::set_visible(warning.getView(), false);
     this->result->setText("");
     // A spinner says it is working; the text says with whom.
@@ -208,7 +222,8 @@ void ClockTab::measure()
         this->busy = false;
         ui::set_visible(progress.getView(), false);
         this->last = m;
-        this->result->setText(m.report);
+        this->offline = offline_clock_logic::offer(m.ok, this->snap) != offline_clock_logic::Offer::None;
+        this->result->setText(this->offline ? m.report + "\n\n" + "playguard/clock/offline_hint"_i18n : m.report);
         // The servers disagreeing, and a write that would be refused, in amber.
         std::string warn = m.warning;
         if (m.ok && this->autosync_off) warn += (warn.empty() ? "" : "\n") + "playguard/clock/autosync_off_note"_i18n;
@@ -222,6 +237,17 @@ void ClockTab::apply()
 {
     clock_flow::apply(this->last, [this](const std::string& message) {
         this->last = clock_flow::Measurement{};
+        this->result->setText(message);
+        ui::set_visible(warning.getView(), false);
+        this->snap_ok = false;   // the network clock just changed: read it again
+        this->refresh();
+    });
+}
+
+void ClockTab::copy()
+{
+    clock_flow::apply_console_clock([this](const std::string& message) {
+        this->offline = false;
         this->result->setText(message);
         ui::set_visible(warning.getView(), false);
         this->snap_ok = false;   // the network clock just changed: read it again

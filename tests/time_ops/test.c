@@ -13,6 +13,7 @@ static struct {
     u32 fail_child_kind, fail_read_kind, fail_flag_command;
     bool fail_write, automatic, accuracy, use_readback;
     u64 clock_value, written, readback;
+    u64 user_live;            /* nonzero: the user clock read in the write session */
     bool fail_now;            /* timeGetCurrentTime fails */
     bool fail_steady;         /* timeGetStandardSteadyClockTimePoint fails */
     s64 steady;               /* what it returns */
@@ -118,6 +119,8 @@ Result mock_dispatch(Service *service, u32 command, void *out, size_t out_size,
     u64 value = model.clock_value;
     if (model.use_readback && handle->root_call == 2 && handle->kind == 1)
         value = model.readback;
+    if (model.user_live && handle->root_call == 2 && handle->kind == 0)
+        value = model.user_live;
     memcpy(out, &value, sizeof(value));
     return 0;
 }
@@ -309,6 +312,55 @@ static void test_read_only(void)
     assert_released();
 }
 
+/* No time server answered: the network clock is set to the user clock, read
+ * in the write session itself, whatever automatic correction says. */
+static void test_set_to_user(void)
+{
+    TimeApply apply;
+    for (unsigned automatic = 0; automatic < 2; automatic++) {
+        reset();
+        model.automatic = automatic != 0;
+        model.user_live = 1500;   /* the user clock went on during the confirmation */
+        time_clock_set_to_user(&apply);
+        CHECK(!apply.refused_automatic && apply.open_rc == 0);
+        CHECK(apply.write_attempted && apply.write_rc == 0 && apply.verified);
+        CHECK(model.writes == 1 && model.written == 1500 && apply.target == 1500);
+        CHECK(apply.before.user_time == 1000 && apply.after.network_time == 1500);
+        CHECK(model.root_calls == 3);   /* snapshot, write, snapshot */
+        assert_released();
+    }
+
+    /* Read-only, or the PIN refused: nothing opened beyond both snapshots. */
+    reset();
+    core_set_read_only(true);
+    time_clock_set_to_user(&apply);
+    CHECK(apply.open_rc == NXM_RC_READ_ONLY && !apply.write_attempted);
+    CHECK(model.writes == 0 && model.root_calls == 2);
+    assert_released();
+    core_set_read_only(false);
+
+    /* The user clock cannot be read: nothing written. */
+    reset();
+    model.fail_read_root = 2;
+    model.fail_read_kind = 0;
+    time_clock_set_to_user(&apply);
+    CHECK(apply.open_rc == MOCK_ERROR && !apply.write_attempted && model.writes == 0);
+    assert_released();
+
+    /* The write or its readback fails. */
+    for (unsigned scenario = 0; scenario < 3; scenario++) {
+        reset();
+        if (scenario == 0) model.fail_write = true;
+        if (scenario == 1) { model.fail_read_root = 2; model.fail_read_kind = 1; }
+        if (scenario == 2) { model.use_readback = true; model.readback = 994; }
+        time_clock_set_to_user(&apply);
+        CHECK(apply.write_attempted && model.writes == 1 && !apply.verified);
+        CHECK(apply.write_rc == (scenario == 0 ? MOCK_ERROR : 0));
+        CHECK(apply.verify_attempted == (scenario != 0));
+        assert_released();
+    }
+}
+
 Result timeToCalendarTimeWithMyRule(u64 timestamp, TimeCalendarTime *caltime, TimeCalendarAdditionalInfo *info)
 {
     if (timestamp == 0) return MOCK_ERROR;
@@ -453,6 +505,7 @@ int main(void)
     test_apply_failures();
     test_readback_and_accuracy();
     test_read_only();
+    test_set_to_user();
     test_dump_and_repetition();
     test_formatting();
     test_local_time();

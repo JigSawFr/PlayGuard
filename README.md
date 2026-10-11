@@ -79,6 +79,8 @@ Driving the console's own controls also opens the door to much more: reporting p
 
 **Can it get the console banned?** PlayGuard never contacts Nintendo: online, it only reaches public time servers, GitHub (updates) and bpa.st (reports). What gets consoles banned is custom firmware or an emuMMC going online to Nintendo ([switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)). No ban tied to parental-control or clock changes is documented; that is not a guarantee.
 
+**A console without Internet?** That is what PlayGuard is for, and the play timer still needs a network clock that has been set. With no time server to ask, *Network clock › Measure* offers to set it to the console clock instead: check the console clock first, with *Synchronize Clock via Internet* off, and turn that setting on only afterwards (see [Network clock](#features-tab-by-tab)).
+
 **Phone notifications.** Since 22.0.0, a console still linked to the phone app may notify the parent when the PIN is entered on the console ([switchbrew](https://switchbrew.org/wiki/22.0.0)). Whether PlayGuard's own unlocks trigger it is unknown.
 
 ## Install
@@ -118,7 +120,7 @@ More in [packaging/README.md](packaging/README.md).
 1. **Parental controls not set up yet?** Open PlayGuard: the *First steps* guide sets the PIN (system PIN screen), the daily limit, and checks the network clock.
 2. **Paired with the phone app?** *Security & app › Unlink the companion app* — otherwise its next sync overwrites what you set here.
 3. Set the limit: *Play timer › Same limit every day* (or *A different limit for each day…*).
-4. **Network clock inaccurate** (shown on the Overview)? Turn on *Synchronise Clock via Internet* in System Settings, then *Network clock › Measure* and *Set the network clock*.
+4. **Network clock inaccurate** (shown on the Overview)? Turn on *Synchronise Clock via Internet* in System Settings, then *Network clock › Measure* and *Set the network clock*. **No Internet?** Leave that setting off and check the console clock first: when no server answers, *Measure* offers *Set the network clock to the console clock*; turn the setting on only afterwards (before, the console clock jumps to the wrong network clock).
 
 **Controls:** ↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh · **+** saves per-day limits.
 
@@ -189,6 +191,7 @@ The app is organised in tabs, like System Settings. Click a tab to expand it.
 - Pick a public NTP server (≈ 50 built in, by region, or your own).
 - **Measure** against 3 servers (median; an amber warning when they disagree), then **set the network clock** — a measurement stays usable for 2 minutes, with a countdown. The confirmation says it: changing the clock starts today's play time over, so the whole limit is available again.
 - A console that never reaches Nintendo's servers keeps this clock inaccurate, which skews the play timer.
+- **No server answers** (a console without Internet): *Set the network clock to the console clock* appears under the result (and on the Overview's *Inaccurate* line, after its measurement fails), behind the same confirmation. PlayGuard has nothing else to compare the console clock with: the confirmation shows its time and asks you to check it against a phone or a watch first, and a console clock before 2026 (never set) is refused. With *Synchronize Clock via Internet* off, the console clock stays where it is, and turning the setting on afterwards no longer makes it jump; with it on, the console clock already follows the network clock, so the confirmation says to turn it off and set the time by hand if it is wrong. It writes the clock only, not the parental controls, so it needs no unlock (the PIN of *Ask for the PIN* still applies); like any clock change, it starts today's play time over. Not tried on a console yet.
 </details>
 
 <details>

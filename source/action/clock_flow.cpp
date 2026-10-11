@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "action/history_flow.hpp"
+#include "action/offline_clock_logic.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -47,6 +48,31 @@ int64_t elapsed_s(const Measurement& m)
     return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - m.at).count();
 }
 
+// The sentence for the user after a write (or a refusal).
+std::string result_message(const TimeApply& a)
+{
+    if (a.refused_automatic) return "playguard/clock/applied_refused"_i18n;
+    if (!a.write_attempted) return "playguard/clock/applied_err"_i18n + " — " + ui::rc_text(a.open_rc);
+    if (R_FAILED(a.write_rc)) return "playguard/clock/applied_err"_i18n + " — " + ui::rc_text(a.write_rc);
+    if (!a.verified) return "playguard/clock/applied_err"_i18n + " — " + ui::rc_text(a.verify_rc);
+    if (R_FAILED(a.after.accuracy_rc) || !a.after.accuracy) return "playguard/clock/applied_pending"_i18n;
+    return "playguard/clock/applied_ok"_i18n;
+}
+
+// The history entry and the "after" report, then `message` for the user.
+void written(const std::string& source, const TimeApply& a, const std::string& before, std::string message,
+             const std::function<void(const std::string&)>& done)
+{
+    if (a.write_attempted && R_SUCCEEDED(a.write_rc)) history_flow::record_event("clock", "", ui::time_text(a.target));
+    diagnostic::save(fmt::format(
+        "=== Network clock change ===\nserver={}\ntarget_utc={}\nopen_rc=0x{:08X} write_attempted={} write_rc=0x{:08X}\n"
+        "verify_attempted={} verify_rc=0x{:08X} verified={} readback={}\nrefused_automatic={}\n\n--- Before ---\n{}\n--- After ---\n{}",
+        source, a.target, (unsigned)a.open_rc, a.write_attempted, (unsigned)a.write_rc,
+        a.verify_attempted, (unsigned)a.verify_rc, a.verified, a.readback, a.refused_automatic,
+        before, diagnostic::current_report()));
+    done(message);
+}
+
 // After the confirmation: the write itself, with its reports.
 void write_clock(const Measurement& m, const std::string& before, std::function<void(const std::string&)> done)
 {
@@ -54,26 +80,37 @@ void write_clock(const Measurement& m, const std::string& before, std::function<
         done("playguard/clock/expired"_i18n);
         return;
     }
-    const uint64_t target = projected_now(m);
     TimeApply a;
-    time_clock_apply(target, &a);
+    time_clock_apply(projected_now(m), &a);
+    written(m.server, a, before, result_message(a), done);
+}
 
-    std::string message;
-    if (a.refused_automatic) message = "playguard/clock/applied_refused"_i18n;
-    else if (!a.write_attempted) message = "playguard/clock/applied_err"_i18n + " — " + ui::rc_text(a.open_rc);
-    else if (R_FAILED(a.write_rc)) message = "playguard/clock/applied_err"_i18n + " — " + ui::rc_text(a.write_rc);
-    else if (!a.verified) message = "playguard/clock/applied_err"_i18n + " — " + ui::rc_text(a.verify_rc);
-    else if (R_FAILED(a.after.accuracy_rc) || !a.after.accuracy) message = "playguard/clock/applied_pending"_i18n;
-    else message = "playguard/clock/applied_ok"_i18n;
-    if (a.write_attempted && R_SUCCEEDED(a.write_rc)) history_flow::record_event("clock", "", ui::time_text(target));
+// The same with no server: the network clock takes the console clock.
+void copy_clock(const std::string& before, std::function<void(const std::string&)> done)
+{
+    TimeApply a;
+    time_clock_set_to_user(&a);
+    std::string message = result_message(a);
+    // Set with "Synchronize" off: turning it on now no longer moves the console clock.
+    if (a.verified && (R_FAILED(a.after.automatic_rc) || !a.after.automatic))
+        message += "playguard/clock/copied_sync_on"_i18n;
+    written("console clock (no server answered)", a, before, message, done);
+}
 
-    diagnostic::save(fmt::format(
-        "=== Network clock change ===\nserver={}\ntarget_utc={}\nopen_rc=0x{:08X} write_attempted={} write_rc=0x{:08X}\n"
-        "verify_attempted={} verify_rc=0x{:08X} verified={} readback={}\nrefused_automatic={}\n\n--- Before ---\n{}\n--- After ---\n{}",
-        m.server, target, (unsigned)a.open_rc, a.write_attempted, (unsigned)a.write_rc,
-        a.verify_attempted, (unsigned)a.verify_rc, a.verified, a.readback, a.refused_automatic,
-        before, diagnostic::current_report()));
-    done(message);
+// A "before" report first, so the change can be analysed, then `write`. When
+// the SD card refuses it (full, read-only), ask rather than give up.
+void with_before_report(std::function<void(const std::string& before)> write)
+{
+    const std::string before = diagnostic::current_report();
+    std::string err;
+    if (diagnostic::save("=== Before network clock change ===\n" + before, &err).empty()) {
+        brls::sync([before, err, write]() {
+            ui::confirm(brls::getStr("playguard/clock/report_err_ask", err), "playguard/clock/apply_confirm"_i18n,
+                        [before, write]() { write(before); });
+        });
+        return;
+    }
+    write(before);
 }
 
 // A spinner and what is being asked; Cancel (or B) sets `cancelled`.
@@ -225,20 +262,70 @@ void apply(const Measurement& m, std::function<void(const std::string& message)>
         ui::info(message);
     };
     ui::confirm(body, "playguard/clock/apply_confirm"_i18n, [m, finish]() {
-        // A "before" report first, so the change can be analysed. When the SD
-        // card refuses it (full, read-only), ask rather than give up.
-        const std::string before = diagnostic::current_report();
-        std::string err;
-        if (diagnostic::save("=== Before network clock change ===\n" + before, &err).empty()) {
-            brls::sync([m, before, err, finish]() {
-                ui::confirm(brls::getStr("playguard/clock/report_err_ask", err), "playguard/clock/apply_confirm"_i18n,
-                            [m, before, finish]() { write_clock(m, before, finish); });
-            });
-            return;
-        }
-        write_clock(m, before, finish);
+        with_before_report([m, finish](const std::string& before) { write_clock(m, before, finish); });
     });
 }
+
+void apply_console_clock(std::function<void(const std::string& message)> done)
+{
+    TimeSnapshot s;
+    time_clock_snapshot(&s);
+    switch (offline_clock_logic::offer(false, s)) {
+        case offline_clock_logic::Offer::Unreadable:
+            ui::info("playguard/clock/applied_err"_i18n + " — " + ui::rc_text(R_FAILED(s.service_rc) ? s.service_rc : s.user_rc));
+            return;
+        case offline_clock_logic::Offer::Implausible:
+            ui::info(brls::getStr("playguard/clock/copy_implausible", ui::time_text(s.user_time)));
+            return;
+        default:
+            break;
+    }
+    // No server to check it against: the parent is the check. Say what will
+    // be written, and what "Synchronize" does to the console clock.
+    const auto notes = offline_clock_logic::notes(s);
+    char utc[48];
+    time_format_utc(s.user_time, utc, sizeof(utc));
+    std::string body = brls::getStr("playguard/clock/confirm_copy", ui::time_text(s.user_time), std::string(utc));
+    body += "playguard/clock/confirm_copy_check"_i18n;
+    if (notes.follows_network) body += "playguard/clock/confirm_copy_follows"_i18n;
+    if (notes.turn_sync_on) body += "playguard/clock/confirm_copy_sync_after"_i18n;
+    body += "playguard/clock/confirm_apply_resets"_i18n;
+
+    auto finish = [done](const std::string& message) {
+        if (done) done(message);
+        ui::info(message);
+    };
+    ui::confirm(body, "playguard/clock/apply_confirm"_i18n, [finish]() {
+        with_before_report([finish](const std::string& before) { copy_clock(before, finish); });
+    });
+}
+
+namespace
+{
+// No server answered on the guided path: the console clock instead, when
+// there is one worth copying.
+void offer_console_clock(const Measurement& m, std::function<void()> done)
+{
+    TimeSnapshot s;
+    time_clock_snapshot(&s);
+    const auto offer = offline_clock_logic::offer(false, s);
+    if (offer == offline_clock_logic::Offer::Implausible) {
+        ui::info(m.report + "\n\n" + brls::getStr("playguard/clock/copy_implausible", ui::time_text(s.user_time)));
+        return;
+    }
+    if (offer != offline_clock_logic::Offer::Copy) {
+        ui::info(m.report);
+        return;
+    }
+    auto* ask = ui::dialog(m.report + "\n\n" + brls::getStr("playguard/clock/offline_guided", ui::time_text(s.user_time)));
+    ask->addButton("hints/cancel"_i18n, []() {});
+    ask->addButton("playguard/clock/guided_copy"_i18n, [done]() {
+        brls::sync([done]() { apply_console_clock([done](const std::string&) { if (done) done(); }); });
+    });
+    ask->setCancelable(true);
+    ask->open();
+}
+}   // namespace
 
 void guided(std::function<void()> done)
 {
@@ -260,7 +347,7 @@ void guided(std::function<void()> done)
                 progress->close([m, done]() {
                     brls::sync([m, done]() {
                         if (!m.ok) {
-                            ui::info(m.report);
+                            offer_console_clock(m, done);
                             return;
                         }
                         apply(m, [done](const std::string&) { if (done) done(); });

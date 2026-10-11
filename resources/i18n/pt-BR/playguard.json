@@ -509,7 +509,17 @@
         "guided_body": "O relógio de rede está impreciso, e o limite de tempo de jogo depende dele.\n\nMedir o horário com {} agora? (O console precisa estar online.) Você vai confirmar antes de o relógio ser ajustado.",
         "guided_measure": "Medir agora",
         "guided_fine": "O relógio de rede está preciso: nada a fazer.",
-        "confirm_apply_resets": "\n\nMudar o relógio zera o tempo de jogo de hoje: todo o limite diário volta a ficar disponível."
+        "confirm_apply_resets": "\n\nMudar o relógio zera o tempo de jogo de hoje: todo o limite diário volta a ficar disponível.",
+        "copy": "Ajustar o relógio de rede pelo relógio do console",
+        "offline_hint": "Sem internet, o relógio de rede pode ser ajustado pelo relógio do console (\"Relógio do console\", no topo). Verifique antes se ele está certo: o PlayGuard não tem mais nada para comparar.",
+        "offline_guided": "Sem internet, o PlayGuard pode ajustar o relógio de rede pelo relógio do console: agora {}. Faça isso só se esse horário estiver certo (compare com um celular ou um relógio).",
+        "guided_copy": "Usar o relógio do console",
+        "confirm_copy": "Ajustar o relógio de rede pelo relógio do console, {} ({})?",
+        "confirm_copy_check": "\n\nNenhum servidor de horário respondeu, então o relógio do console é a única referência: faça isso só se ele estiver certo. Compare antes com um celular ou um relógio.",
+        "confirm_copy_follows": "\n\n\"Sincronizar relógio pela Internet\" está ativado: o relógio do console segue o relógio de rede e pode estar igualmente errado. Nesse caso: desative a opção, ajuste a data e a hora em Configurações do console › Console › Data e hora e volte aqui.",
+        "confirm_copy_sync_after": "\n\n\"Sincronizar relógio pela Internet\" está desativado: o relógio do console fica como está. Ativá-lo depois não vai mais fazê-lo pular, pois os dois relógios vão mostrar o mesmo horário.",
+        "copied_sync_on": "\n\nAgora você pode ativar \"Sincronizar relógio pela Internet\" (Configurações do console › Console › Data e hora): o relógio do console não vai pular.",
+        "copy_implausible": "O relógio do console mostra {}: parece não estar ajustado. Ajuste antes a data e a hora em Configurações do console › Console › Data e hora (com \"Sincronizar relógio pela Internet\" desativado) e volte aqui."
     },
     "pairing": {
         "section": "App Controle dos pais do Nintendo Switch",

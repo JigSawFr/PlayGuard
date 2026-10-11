@@ -78,10 +78,27 @@ Result time_network_accuracy(bool *accurate)
     return rc;
 }
 
+// Writes and reads back the network clock (`network` is open); fills the
+// write and verify fields of `out`.
+static void write_network(Service *network, u64 utc_seconds, TimeApply *out)
+{
+    out->target = utc_seconds;
+    out->write_attempted = true;
+    out->write_rc = serviceDispatchIn(network, 1, utc_seconds);
+    if (R_SUCCEEDED(out->write_rc)) {
+        out->verify_attempted = true;
+        out->verify_rc = serviceDispatchOut(network, 0, out->readback);
+        // Allow the small interval elapsed during IPC; never underflow.
+        out->verified = R_SUCCEEDED(out->verify_rc) && out->readback >= utc_seconds &&
+                        out->readback - utc_seconds <= 5;
+    }
+}
+
 void time_clock_apply(u64 utc_seconds, TimeApply *out)
 {
     memset(out, 0, sizeof(*out));
     time_clock_snapshot(&out->before);
+    out->target = utc_seconds;
     const Result gate = core_change_allowed();   // read-only, or the PIN asked first
     if (R_FAILED(gate)) {
         out->open_rc = gate;
@@ -96,17 +113,30 @@ void time_clock_apply(u64 utc_seconds, TimeApply *out)
     Service root = {0}, network = {0};
     out->open_rc = smGetService(&root, "time:s");
     if (R_SUCCEEDED(out->open_rc)) out->open_rc = open_sub(&root, &network, 1);
-    if (R_SUCCEEDED(out->open_rc)) {
-        out->write_attempted = true;
-        out->write_rc = serviceDispatchIn(&network, 1, utc_seconds);
-        if (R_SUCCEEDED(out->write_rc)) {
-            out->verify_attempted = true;
-            out->verify_rc = serviceDispatchOut(&network, 0, out->readback);
-            // Allow the small interval elapsed during IPC; never underflow.
-            out->verified = R_SUCCEEDED(out->verify_rc) && out->readback >= utc_seconds &&
-                            out->readback - utc_seconds <= 5;
-        }
+    if (R_SUCCEEDED(out->open_rc)) write_network(&network, utc_seconds, out);
+    serviceClose(&network);
+    serviceClose(&root);
+    time_clock_snapshot(&out->after);
+}
+
+void time_clock_set_to_user(TimeApply *out)
+{
+    memset(out, 0, sizeof(*out));
+    time_clock_snapshot(&out->before);
+    out->target = out->before.user_time;
+    const Result gate = core_change_allowed();   // read-only, or the PIN asked first
+    if (R_FAILED(gate)) {
+        out->open_rc = gate;
+        time_clock_snapshot(&out->after);
+        return;
     }
+    Service root = {0}, network = {0};
+    u64 user = 0;
+    out->open_rc = smGetService(&root, "time:s");
+    // Read now, not at the confirmation: the user clock went on meanwhile.
+    if (R_SUCCEEDED(out->open_rc)) out->open_rc = read_clock(&root, 0, &user);
+    if (R_SUCCEEDED(out->open_rc)) out->open_rc = open_sub(&root, &network, 1);
+    if (R_SUCCEEDED(out->open_rc)) write_network(&network, user, out);
     serviceClose(&network);
     serviceClose(&root);
     time_clock_snapshot(&out->after);

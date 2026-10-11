@@ -509,7 +509,17 @@
         "guided_body": "The network clock is inaccurate, and the play timer counts on it.\n\nMeasure the time against {} now? (The console must be online.) You will then be asked before the clock is set.",
         "guided_measure": "Measure now",
         "guided_fine": "The network clock is accurate: nothing to do.",
-        "confirm_apply_resets": "\n\nChanging the clock starts today's play time over: the whole daily limit is available again."
+        "confirm_apply_resets": "\n\nChanging the clock starts today's play time over: the whole daily limit is available again.",
+        "copy": "Set the network clock to the console clock",
+        "offline_hint": "Without Internet, the network clock can be set to the console clock instead (Console clock, at the top). Check first that it is right: PlayGuard has nothing else to compare it with.",
+        "offline_guided": "Without Internet, PlayGuard can set the network clock to the console clock instead: {} now. Do it only if that time is right (check it against a phone or a watch).",
+        "guided_copy": "Use the console clock",
+        "confirm_copy": "Set the network clock to the console clock, {} ({})?",
+        "confirm_copy_check": "\n\nNo time server answered, so the console clock is the only source: do this only if it is right. Check it against a phone or a watch first.",
+        "confirm_copy_follows": "\n\n\"Synchronize Clock via Internet\" is on, so the console clock follows the network clock and may be just as wrong. If it is: turn the setting off, set the date and time in System Settings › System › Date and Time, then come back here.",
+        "confirm_copy_sync_after": "\n\n\"Synchronize Clock via Internet\" is off: the console clock stays as it is. Turning it on afterwards will no longer make it jump, both clocks then showing the same time.",
+        "copied_sync_on": "\n\nYou can now turn on \"Synchronize Clock via Internet\" (System Settings › System › Date and Time): the console clock will not jump.",
+        "copy_implausible": "The console clock reads {}: it does not look set. Set the date and time in System Settings › System › Date and Time first (with \"Synchronize Clock via Internet\" off), then come back here."
     },
     "pairing": {
         "section": "Nintendo Switch Parental Controls app",

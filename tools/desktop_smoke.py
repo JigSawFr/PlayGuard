@@ -23,7 +23,9 @@ way, the list must be kept (opened again at once) and Refresh fetch it again.
 The "errors" scenario starts with today's limit reached, the temporary unlock
 failing and "Synchronise clock via Internet" off (PLAYGUARD_SIM_FAIL & co.):
 a limit change must end in the "could not unlock" dialog, with the app alive,
-and the clock tab must say why the network clock cannot be set.
+and the clock tab must say why the network clock cannot be set. With no time
+server answering (PLAYGUARD_SIM_NTP) and a network clock 1411 s ahead, the
+tab must then offer the console clock instead, and set it once confirmed.
 
 The "outside" scenario starts with a watch.json from an earlier run that the
 console no longer matches (more time played, another clock offset, other
@@ -140,6 +142,8 @@ if ERRORS:
     env.setdefault("PLAYGUARD_SIM_FAIL", "unlock")
     env.setdefault("PLAYGUARD_SIM_RESTRICTED", "1")
     env.setdefault("PLAYGUARD_SIM_AUTOSYNC_OFF", "1")
+    env.setdefault("PLAYGUARD_SIM_NTP", "offline")
+    env.setdefault("PLAYGUARD_SIM_NETWORK_OFFSET", "1411")
 if RESCUE:
     # The playguard-rescue sysmodule left a report: PlayGuard must show the
     # recovery screen at start-up and open the app when it is dismissed.
@@ -423,10 +427,32 @@ if ERRORS:
     key("Down", 3)             # Network clock
     key("Right")
     shot("05_clock_autosync_off")
+    # No time server answers: measuring offers the console clock instead,
+    # behind the same confirmation as a measured time.
+    history_file = os.path.join(run_dir, "playguard_data", "history.json")
+    def clock_entries():
+        try:
+            return [e for e in json.load(open(history_file)).get("entries", []) if e.get("kind") == "clock"]
+        except (OSError, ValueError):
+            return []
+    clock_before = len(clock_entries())
+    key("Down", 4)             # past Region, Server, Enter a server name: Measure
+    key("Return")
+    time.sleep(1)
+    key("Down")                # Set the network clock to the console clock
+    shot("06_clock_offline")   # "No server answered", then the console clock offered
+    key("Return")
+    shot("07_clock_copy_confirm")
+    key("Right")               # Set the clock
+    key("Return")
+    shot("08_clock_copied")
+    key("Return")              # OK
 
     def told_unlock_failed():
         if not any(t.startswith("Could not unlock parental controls") for t in messages()):
             fail("no 'could not unlock' dialog; messages: " + repr(messages()))
+        if len(clock_entries()) != clock_before + 1:
+            fail("the network clock was not set to the console clock (no history entry)")
     finish(told_unlock_failed)
 def main_opened():
     log.flush()

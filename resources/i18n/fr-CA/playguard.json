@@ -509,7 +509,17 @@
         "guided_body": "L'horloge réseau est imprécise, et la limite de temps de jeu s'appuie dessus.\n\nMesurer l'heure avec {} maintenant? (La console doit être connectée.) Le réglage de l'horloge vous sera ensuite proposé.",
         "guided_measure": "Mesurer maintenant",
         "guided_fine": "L'horloge réseau est précise : rien à faire.",
-        "confirm_apply_resets": "\n\nChanger l'horloge remet à zéro le temps de jeu du jour : toute la limite quotidienne redevient disponible."
+        "confirm_apply_resets": "\n\nChanger l'horloge remet à zéro le temps de jeu du jour : toute la limite quotidienne redevient disponible.",
+        "copy": "Régler l'horloge réseau sur l'horloge de la console",
+        "offline_hint": "Sans Internet, l'horloge réseau peut être réglée sur l'horloge de la console à la place (« Horloge de la console », en haut). Vérifiez d'abord qu'elle est juste : PlayGuard n'a rien d'autre pour la comparer.",
+        "offline_guided": "Sans Internet, PlayGuard peut régler l'horloge réseau sur l'horloge de la console à la place : {} en ce moment. Ne le faites que si cette heure est juste (comparez-la avec un cellulaire ou une montre).",
+        "guided_copy": "Utiliser l'horloge de la console",
+        "confirm_copy": "Régler l'horloge réseau sur l'horloge de la console, {} ({})?",
+        "confirm_copy_check": "\n\nAucun serveur de temps n'a répondu : l'horloge de la console est la seule référence, ne le faites que si elle est juste. Comparez-la d'abord avec un cellulaire ou une montre.",
+        "confirm_copy_follows": "\n\n« Synchroniser l'horloge par Internet » est activé : l'horloge de la console suit l'horloge réseau et peut être tout aussi fausse. Dans ce cas : désactivez ce réglage, réglez la date et l'heure dans Paramètres de la console › Console › Date et heure, puis revenez ici.",
+        "confirm_copy_sync_after": "\n\n« Synchroniser l'horloge par Internet » est désactivé : l'horloge de la console reste telle quelle. L'activer ensuite ne la fera plus sauter, les deux horloges indiquant alors la même heure.",
+        "copied_sync_on": "\n\nVous pouvez maintenant activer « Synchroniser l'horloge par Internet » (Paramètres de la console › Console › Date et heure) : l'horloge de la console ne sautera pas.",
+        "copy_implausible": "L'horloge de la console indique {} : elle ne semble pas réglée. Réglez d'abord la date et l'heure dans Paramètres de la console › Console › Date et heure (avec « Synchroniser l'horloge par Internet » désactivé), puis revenez ici."
     },
     "pairing": {
         "section": "Application Contrôle parental Nintendo Switch",

@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <cstdlib>
 #include <cstring>
 #include <memory>
 #include <netdb.h>
@@ -63,6 +64,14 @@ Reply fetch(const std::string& host, int timeout_ms, unsigned max_addresses, boo
         reply.error = "Enter an NTP hostname or IP address.";
         return reply;
     }
+#ifndef __SWITCH__
+    // Desktop simulation: PLAYGUARD_SIM_NTP=offline, a console without Internet.
+    if (const char* sim = std::getenv("PLAYGUARD_SIM_NTP"); sim && std::strcmp(sim, "offline") == 0) {
+        reply.kind = Error::Lookup;
+        reply.error = "simulated: no connection";
+        return reply;
+    }
+#endif
 
     addrinfo hints{};
     hints.ai_family = AF_UNSPEC;
