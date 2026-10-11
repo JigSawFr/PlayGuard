@@ -7,6 +7,7 @@
 #include "action/dev_build_flow.hpp"
 #include "action/github_login_flow.hpp"
 #include "action/fw_gate.hpp"
+#include "action/history_flow.hpp"
 #include "action/pt_block_flow.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_log_flow.hpp"
@@ -20,7 +21,6 @@
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
 #include "util/github_auth.hpp"
-#include "util/history.hpp"
 #include "util/patches.hpp"
 #include "util/pt_log.hpp"
 #include "util/paths.hpp"
@@ -113,7 +113,7 @@ ToolsTab::ToolsTab()
 
     // Developer tools.
     dev_mode->init("playguard/dev/mode"_i18n, app::dev_mode(), [](bool on) {
-        if (!app::set_dev_mode(on, true)) ui::notify("playguard/toast/config_err"_i18n);
+        app::set_dev_mode(on, true);
         ui::on_mode_changed();
     });
     dev_read_only->init("playguard/dev/read_only"_i18n, app::read_only(), [this](bool on) {
@@ -134,7 +134,7 @@ ToolsTab::ToolsTab()
     });
     dev_pt_log->init("playguard/dev/pt_log"_i18n, config::get().pt_log, [](bool on) {
         config::get().pt_log = on;
-        if (!config::save()) ui::notify("playguard/toast/config_err"_i18n);
+        ui::save_config();
         pt_log_flow::apply();
         if (on) ui::notify(brls::getStr("playguard/dev/pt_log_on", pt_log::path()));
     });
@@ -171,7 +171,7 @@ void ToolsTab::refresh()
     backup_keep->setDetailText(keep_text(cfg.backup_keep));
     const size_t backups = backup_flow::count();
     backup_restore->setDetailText(backups ? brls::getStr("playguard/tools/backup_count", (int)backups) : "");
-    const size_t changes = history::load().size();
+    const size_t changes = history_flow::load().size();
     history->setDetailText(changes ? brls::getStr("playguard/history/count", (int)changes) : "");
 
     SysInfo si;

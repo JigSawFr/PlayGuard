@@ -146,7 +146,7 @@ void choose(std::function<void()> done)
             return;
         }
         config::get().pin_lock = to;
-        if (ui::save_config()) ui::notify(brls::getStr("playguard/pin_lock/set", labels[index]));
+        ui::save_config(brls::getStr("playguard/pin_lock/set", labels[index]));
         if (done) done();
     });
 }

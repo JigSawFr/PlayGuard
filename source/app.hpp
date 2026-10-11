@@ -40,7 +40,8 @@ void        set_read_only(bool on);
 // Saved in the preferences, or on for this session only (firmware screen,
 // "read-only + developer mode").
 bool        dev_mode();
-bool        set_dev_mode(bool on, bool persist);   // false: the preference could not be saved
+// Saved off the UI thread, with ui::save_config's toasts.
+void        set_dev_mode(bool on, bool persist, const std::string& saved_text = "", const std::string& failed_text = "");
 
 // False while the app is in the background (HOME menu, system PIN prompt …):
 // periodic refreshes skip their pctl queries then, keeping the single

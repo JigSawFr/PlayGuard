@@ -2,6 +2,7 @@
 #include "app.hpp"
 
 #include "core/platform.h"
+#include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
 
@@ -66,14 +67,13 @@ void set_read_only(bool on) { core_set_read_only(on); }
 
 bool dev_mode() { return s_dev_session || config::get().dev_mode; }
 
-bool set_dev_mode(bool on, bool persist)
+void set_dev_mode(bool on, bool persist, const std::string& saved_text, const std::string& failed_text)
 {
     s_dev_session = on;
     if (persist || !on) {
         config::get().dev_mode = on;
-        return config::save();
+        ui::save_config(saved_text, failed_text);
     }
-    return true;
 }
 
 }   // namespace app

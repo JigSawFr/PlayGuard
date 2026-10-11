@@ -51,9 +51,21 @@ void in_background(const char* what, std::function<void()> task);
 // At exit, after the main loop: says the app is quitting (quitting() turns
 // true, for a task that waits or polls) and waits up to `max` for the tasks
 // of in_background still running, so none of them outlives the objects it
-// uses (brls::sync's queue, curl, statics). False when some are still running.
+// uses (brls::sync's queue, curl, statics). The writes of write_later are
+// finished first, and any asked for later run at once. False when some are
+// still running.
 bool finish_background(std::chrono::milliseconds max);
 bool quitting();
+
+// An SD-card write off the UI thread (a slow card must not hold a frame), on
+// one queue run by a task of in_background: the writes happen one at a time,
+// in the order asked. `key` names a file written whole: a write of it still
+// waiting is dropped for the newer one. `job` reports its own result (ui::
+// notify, ui::error). finish_background runs what is still queued at exit.
+void write_later(const char* what, std::function<void()> job, const std::string& key = "");
+// Until every write asked so far is on the SD card: before reading back a
+// file that write_later writes (history.json, the play-timer log).
+void settle_writes();
 
 // Deferred to the next frame (toasts fired right after a system applet returns
 // were dropped on fw 22.1.0).
@@ -62,8 +74,15 @@ void notify(const std::string& text);
 // toast (a toast is gone before "error 0x…" is read). Next frame, so it can
 // be called from a dialog button. Logged as "error: " for the smoke test.
 void error(const std::string& text);
-// config::save(), with a toast when the SD card refused the write.
-bool save_config();
+// config::save(), off the UI thread (write_later): `saved_text` as a toast
+// once it is on the SD card, `failed_text` (default: the config_err toast)
+// when the card refused it. False only when it cannot be saved at all (an
+// unreadable config.json kept: config::save refuses to overwrite it), said
+// at once.
+bool save_config(const std::string& saved_text = "", const std::string& failed_text = "");
+// The same, waiting for the write: for a record that must be on the SD card
+// before the console change it describes. False when it is not.
+bool save_config_now();
 // `next` in place of the current screen. Borealis never pops the first
 // activity, so a start screen (lock, rescue) gets `next` pushed over it
 // instead: popping it would silently do nothing.

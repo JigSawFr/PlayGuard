@@ -230,6 +230,17 @@ void load()
 
 bool save()
 {
+    std::string text;
+    return snapshot(text) && write(text);
+}
+
+bool write(const std::string& text)
+{
+    return paths::atomic_write(paths::config_file(), text);
+}
+
+bool snapshot(std::string& text)
+{
     if (s_loaded == Loaded::Stuck) return false;   // it would overwrite the unreadable file
     nlohmann::json j;
     j["schema"]          = SCHEMA;
@@ -266,8 +277,8 @@ bool save()
     j["extra_base"]      = s_config.extra_base;
     j["extra_value"]     = s_config.extra_value;
     j["relock_pending"]  = s_config.relock_pending;
-    return paths::atomic_write(paths::config_file(),
-                               j.dump(2, ' ', false, nlohmann::json::error_handler_t::replace) + "\n");
+    text = j.dump(2, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
+    return true;
 }
 
 }   // namespace config

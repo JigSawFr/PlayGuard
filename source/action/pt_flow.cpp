@@ -31,14 +31,15 @@ int played_today_min(const PtState& pt)
 // A record made by this run is an unlock still in use, not an interrupted one.
 static bool s_pending_this_run = false;
 
-// False when the record could not be saved to the SD card.
+// False when the record could not be saved to the SD card. Setting it waits
+// for the write: it must be on the card before the unlock it is for.
 static bool set_relock_pending(bool on)
 {
     auto& cfg = config::get();
     if (on) s_pending_this_run = true;
     if (cfg.relock_pending == on) return true;
     cfg.relock_pending = on;
-    return ui::save_config();
+    return on ? ui::save_config_now() : ui::save_config();
 }
 
 void relock_if_interrupted()
@@ -478,7 +479,7 @@ static bool save_extra_record(int wd, uint16_t base, uint16_t value)
     c.extra_date    = ui::today_date();
     c.extra_base    = base;
     c.extra_value   = value;
-    return ui::save_config();
+    return ui::save_config_now();
 }
 
 // The write failed: the record it was saved for goes back to what it was.

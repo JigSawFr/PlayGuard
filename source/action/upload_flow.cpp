@@ -137,6 +137,7 @@ void send(const std::vector<log_upload::Part>& parts)
 std::vector<log_upload::Part> with_debug_files(const std::string& report)
 {
     std::vector<log_upload::Part> parts{ { "playguard/upload/part_report"_i18n, report } };
+    ui::settle_writes();   // the files as they are once the writes asked for are done
     for (auto& f : log_upload::debug_files()) parts.push_back(std::move(f));
     return parts;
 }

@@ -31,11 +31,16 @@ void load_once()
     if (paths::read_file(file(), text)) s_rec = outside_change_logic::parse(text);
 }
 
+// Off the UI thread (it runs with every change PlayGuard records); only read
+// back at the next start.
 void save()
 {
-    std::string err;
-    if (!paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(file(), outside_change_logic::serialize(s_rec), &err))
-        brls::Logger::warning("watch: not saved ({})", err);
+    const std::string text = outside_change_logic::serialize(s_rec);
+    ui::write_later("watch", [text]() {
+        std::string err;
+        if (!paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(file(), text, &err))
+            brls::Logger::warning("watch: not saved ({})", err);
+    }, "watch");
 }
 
 // The console's accounts, as outside_change_logic knows them.

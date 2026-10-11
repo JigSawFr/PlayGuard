@@ -1,11 +1,13 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/pt_log_flow.hpp"
 
+#include <atomic>
 #include <borealis.hpp>
 #include <chrono>
 #include <fmt/format.h>
 
 #include "app.hpp"
+#include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/pt_log.hpp"
@@ -20,7 +22,7 @@ constexpr int PERIOD_MS = 30000;
 brls::RepeatingTimer* s_timer = nullptr;   // made at the first start: borealis must be up
 bool s_running = false;
 pt_log::Previous s_prev;
-bool s_warned = false;   // one log line when the SD card refuses, not one every 30 s
+std::atomic<bool> s_warned{ false };   // one log line when the SD card refuses, not one every 30 s
 pt_log::Clock s_clock;   // the last reading's clocks, to see the user clock move
 
 uint64_t steady_s()
@@ -42,12 +44,13 @@ void record(std::string event = "")
     if (!moved.empty()) event = event.empty() ? moved : event + "; " + moved;
     PtSample s;
     pctl_play_timer_sample(&s);
-    std::string error;
-    if (pt_log::append(pt_log::row(stamp, posix, s, &s_prev, event), &error)) s_warned = false;
-    else if (!s_warned) {
-        brls::Logger::warning("pt_log: {}", error);
-        s_warned = true;
-    }
+    // Read here, written off the UI thread (with the other SD-card writes, in order).
+    const std::string line = pt_log::row(stamp, posix, s, &s_prev, event);
+    ui::write_later("pt_log", [line]() {
+        std::string error;
+        if (pt_log::append(line, &error)) s_warned = false;
+        else if (!s_warned.exchange(true)) brls::Logger::warning("pt_log: {}", error);
+    });
 }
 
 void start()

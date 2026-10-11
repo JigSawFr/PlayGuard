@@ -41,7 +41,7 @@ void show_reminder()
     dialog->addButton("playguard/common/later"_i18n, []() {});
     dialog->addButton("playguard/about/reminder_never"_i18n, []() {
         config::get().support_reminder = false;
-        if (ui::save_config()) ui::notify("playguard/about/reminder_off"_i18n);
+        ui::save_config("playguard/about/reminder_off"_i18n);
     });
     dialog->open();
 }

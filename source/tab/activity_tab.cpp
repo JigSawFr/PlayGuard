@@ -599,10 +599,15 @@ void ActivityTab::export_to_sd() const
                 g->totals_ok && g->last_played ? ui::time_text(g->last_played) : "",
             });
         }
-        std::string err;
-        const std::string path = table_export::save(t, (table_export::Format)index, paths::exports_dir(), "activity", &err);
-        if (path.empty()) ui::error("playguard/activity/export_err"_i18n + ": " + err);
-        else ui::notify(brls::getStr("playguard/activity/exported", path));
+        // Encoded (a PDF, a zip for XLSX) and written off the UI thread.
+        const auto format = (table_export::Format)index;
+        const std::string failed = "playguard/activity/export_err"_i18n;
+        ui::write_later("export", [t, format, failed]() {
+            std::string err;
+            const std::string path = table_export::save(t, format, paths::exports_dir(), "activity", &err);
+            if (path.empty()) ui::error(failed + ": " + err);
+            else ui::notify(brls::getStr("playguard/activity/exported", path));
+        });
     });
 }
 
