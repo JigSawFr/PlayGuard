@@ -29,6 +29,7 @@ struct Config
     int  backup_keep     = 0;          // backups kept after a new one (0: all of them)
     bool clock_check_at_start = false; // measure the network clock at start-up, say when it is off
     bool intro = true;                 // the loading screen stays 2 s at start-up (activity/loading_activity.hpp)
+    std::string dev_builds_order = "newest";   // Install another build's pull requests: "newest" or "number"
     // Security › Ask for the PIN: "off", "changes" (before the first change,
     // then not for 5 min) or "open" (to open PlayGuard). See pin_lock.hpp.
     // "changes" by default, and when the value is missing or unknown: a

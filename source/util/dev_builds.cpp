@@ -185,6 +185,28 @@ std::vector<Build> combine(const std::vector<Artifact>& artifacts, const std::ve
     return out;
 }
 
+Order order_named(const std::string& name)
+{
+    return name == "number" ? Order::Number : Order::Newest;
+}
+
+const char* order_name(Order order)
+{
+    return order == Order::Number ? "number" : "newest";
+}
+
+std::vector<Build> of_kind(const std::vector<Build>& all, Kind kind, Order order)
+{
+    std::vector<Build> out;
+    for (const Build& b : all)
+        if (b.kind == kind) out.push_back(b);
+    if (order == Order::Number && kind == Kind::PullRequest)
+        std::stable_sort(out.begin(), out.end(), [](const Build& a, const Build& b) { return a.pr > b.pr; });
+    else   // ISO 8601 dates in UTC sort as text
+        std::stable_sort(out.begin(), out.end(), [](const Build& a, const Build& b) { return a.date > b.date; });
+    return out;
+}
+
 namespace
 {
 const char* kind_name(Kind k)
