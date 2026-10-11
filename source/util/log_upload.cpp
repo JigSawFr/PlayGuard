@@ -39,9 +39,22 @@ std::vector<std::string> saved_reports(size_t limit)
     return names;
 }
 
+namespace
+{
+const std::string CUT_NOTICE = "\n\n(cut: too large to send whole)\n";
+
+// The first `room` bytes of `text`, back to the start of a character (never
+// half of a UTF-8 sequence), and the notice, cut too when `room` is smaller.
+std::string cut_to(const std::string& text, size_t room)
+{
+    size_t keep = room > CUT_NOTICE.size() ? room - CUT_NOTICE.size() : 0;
+    while (keep > 0 && ((unsigned char)text[keep] & 0xC0) == 0x80) keep--;
+    return text.substr(0, keep) + CUT_NOTICE.substr(0, room - keep);
+}
+}   // namespace
+
 std::string bundle(const std::vector<Part>& parts, size_t max_bytes, bool* truncated)
 {
-    static const std::string NOTICE = "\n\n(cut: too large to send whole)\n";
     std::string out;
     for (const Part& p : parts) {
         if (!out.empty()) out += "\n";
@@ -51,11 +64,37 @@ std::string bundle(const std::vector<Part>& parts, size_t max_bytes, bool* trunc
     if (truncated) *truncated = false;
     if (out.size() <= max_bytes) return out;
     if (truncated) *truncated = true;
-    size_t keep = max_bytes > NOTICE.size() ? max_bytes - NOTICE.size() : 0;
-    // Back to the start of a character: never half of a UTF-8 sequence.
-    while (keep > 0 && ((unsigned char)out[keep] & 0xC0) == 0x80) keep--;
-    out.resize(keep);
-    return out + NOTICE.substr(0, max_bytes - keep);
+    return cut_to(out, max_bytes);
+}
+
+std::vector<Part> gist_files(const std::vector<Part>& parts, size_t max_bytes, bool* truncated)
+{
+    std::vector<Part> out;
+    size_t total = 0;
+    if (truncated) *truncated = false;
+    for (size_t i = 0; i < parts.size(); i++) {
+        const std::string& name = parts[i].name;
+        const std::string last = name.substr(name.find_last_of('/') + 1);
+        const std::string file =
+            std::to_string(i + 1) + "-" + (last.find('.') == std::string::npos ? std::string("report.txt") : last);
+        const std::string content = parts[i].content.empty() ? std::string("(empty)\n") : parts[i].content;
+        if (total + content.size() <= max_bytes) {
+            out.push_back({ file, content });
+            total += content.size();
+            continue;
+        }
+        if (truncated) *truncated = true;
+        if (max_bytes - total > CUT_NOTICE.size()) out.push_back({ file, cut_to(content, max_bytes - total) });
+        break;
+    }
+    return out;
+}
+
+size_t total_bytes(const std::vector<Part>& files)
+{
+    size_t n = 0;
+    for (const Part& f : files) n += f.content.size();
+    return n;
 }
 
 namespace
@@ -169,13 +208,14 @@ std::string form(const std::string& text, std::string* content_type)
     return out + "--" + boundary + "--\r\n";
 }
 
-std::string gist_body(const std::string& text, const std::string& version)
+std::string gist_body(const std::vector<Part>& files, const std::string& version)
 {
     nlohmann::json j;
     j["description"] = "PlayGuard " + version + " diagnostic report";
     j["public"] = false;
-    j["files"]["playguard-report.txt"]["content"] = text;
-    // A cut can never split a character (bundle()); anything else invalid is replaced.
+    j["files"] = nlohmann::json::object();
+    for (const Part& f : files) j["files"][f.name]["content"] = f.content;
+    // A cut can never split a character (gist_files()); anything else invalid is replaced.
     return j.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);
 }
 
