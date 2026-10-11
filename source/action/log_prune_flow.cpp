@@ -20,8 +20,9 @@ void run()
     ui::write_later("prune logs", [limits]() {
         const std::time_t now = std::time(nullptr);
         const size_t removed = log_files::prune(paths::reports_dir(), log_files::REPORT, limits, now) +
-                               log_files::prune(paths::crashes_dir(), log_files::CRASH, limits, now);
-        if (removed) brls::Logger::info("logs: {} old report or crash file(s) removed", removed);
+                               log_files::prune(paths::crashes_dir(), log_files::CRASH, limits, now) +
+                               log_files::prune(paths::uploads_dir(), log_files::UPLOAD, limits, now);
+        if (removed) brls::Logger::info("logs: {} old report, crash or upload file(s) removed", removed);
     });
 }
 

@@ -50,7 +50,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `activity_period` | integer | Activity's period: `0` today, `1` last 7 days, `2` all time | `1` | Activity |
 | `export_format` | integer | the last export format: `0` CSV, `1` JSON, `2` XLSX, `3` PDF | `0` | Activity › Export |
 | `backup_keep` | integer | backups kept after a new one: `0` (all of them), `5`, `10`, `20` | `0` | Tools |
-| `logs_keep` | integer | saved reports kept, and crash files kept (`logs/reports/`, `logs/crashes/`, each on its own): the newest `5`, `10`, `20` or `50`; `0` all of them. A file goes when any of the three `logs_keep*` says so, at start-up and when one changes; the newest file of each folder always stays | `20` | Tools › Diagnostics |
+| `logs_keep` | integer | saved reports kept, crash files kept and links of reports sent online kept (`logs/reports/`, `logs/crashes/`, `logs/uploads/`, each on its own): the newest `5`, `10`, `20` or `50`; `0` all of them. A file goes when any of the three `logs_keep*` says so, at start-up and when one changes; the newest file of each folder always stays | `20` | Tools › Diagnostics |
 | `logs_keep_days` | integer | the same, by age: those of the last `7`, `30`, `90` or `365` days (from the date in the file name); `0` no limit | `0` | Tools › Diagnostics |
 | `logs_keep_mb` | integer | the same, by size: the newest that fit in `1`, `5` or `20` MB together; `0` no limit | `0` | Tools › Diagnostics |
 | `extra_amounts` | array of 3 integers | the *Extra time today* choices, in minutes: `[15, 30, 60]`, `[10, 20, 30]`, `[30, 60, 90]` or `[5, 10, 15]` | `[15, 30, 60]` | Preferences |
@@ -108,7 +108,7 @@ Set in *About*.
 | Key | Type | Values | Default |
 |---|---|---|---|
 | `dev_mode` | boolean | the developer tools (seven presses on *About › Version*) | `false` |
-| `pt_log` | boolean | *Developer tools › Record the play timer* (`logs/play_timer_log.csv`) | `false` |
+| `pt_log` | boolean | *Developer tools › Record the play timer* (`logs/play_timer/log.csv`) | `false` |
 
 ## State kept between launches
 

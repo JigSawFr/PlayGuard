@@ -662,7 +662,7 @@
         "logs_days_never": "Nie",
         "logs_days_n": "{} Tagen",
         "logs_keep_mb": "Speicherplatz für Berichte",
-        "logs_note": "Gilt für die Diagnoseberichte und die Absturzdateien in {}, jeweils für sich, beim Start und wenn sich eine Grenze ändert. Der neueste bleibt immer erhalten.",
+        "logs_note": "Gilt für die Diagnoseberichte, die Absturzdateien und die Links der online gesendeten Berichte in {}, jeweils für sich, beim Start und wenn sich eine Grenze ändert. Der neueste bleibt immer erhalten.",
         "language": "Sprache",
         "languages": {
             "system": "Systemsprache",
@@ -850,7 +850,7 @@
         "pt_block_report": "Auf SD-Karte speichern",
         "pt_block_new": "Neue Referenz",
         "pt_log": "Spielzeit aufzeichnen",
-        "pt_log_note": "Alle 30 s, solange PlayGuard geöffnet ist, eine Zeile mit dem, was die Spielzeit meldet (verbleibende Zeit, verbrauchte Zeit, 1459, der Einstellungsblock), in logs/play_timer_log.csv, und eine weitere direkt nach jeder Änderung durch PlayGuard, mit Angabe welcher. Eine Uhr, die sich weiter bewegt hat als die verstrichene Zeit, wird ebenfalls vermerkt. Lassen Sie PlayGuard über Mitternacht oder bis zum Ende der Zeit geöffnet, um zu sehen, was die Konsole dann tut. Wird mit dem Diagnosebericht gesendet.",
+        "pt_log_note": "Alle 30 s, solange PlayGuard geöffnet ist, eine Zeile mit dem, was die Spielzeit meldet (verbleibende Zeit, verbrauchte Zeit, 1459, der Einstellungsblock), in logs/play_timer/log.csv, und eine weitere direkt nach jeder Änderung durch PlayGuard, mit Angabe welcher. Eine Uhr, die sich weiter bewegt hat als die verstrichene Zeit, wird ebenfalls vermerkt. Lassen Sie PlayGuard über Mitternacht oder bis zum Ende der Zeit geöffnet, um zu sehen, was die Konsole dann tut. Wird mit dem Diagnosebericht gesendet.",
         "clear_cache": "Cache leeren",
         "clear_logs": "Protokolldateien löschen",
         "clear_cache_body": "Cache löschen: {}?\n\nDie Namen und Symbole der Spiele, die letzten Zahlen der Aktivität und die Liste der Entwicklungs-Builds. PlayGuard liest sie bei Bedarf erneut von der Konsole: Beim nächsten Start braucht der Tab Aktivität etwas länger.",

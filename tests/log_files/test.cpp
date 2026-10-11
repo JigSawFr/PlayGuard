@@ -1,5 +1,5 @@
 // Host tests for source/util/log_files.cpp and source/util/data_move.cpp:
-// the names of the reports and crash files, their order, what the limits
+// the names of the reports, crash and upload files, their order, a new one, what the limits
 // remove (by count, age and size, any of them; never the newest), the move
 // of the logs/ layout before its subfolders, and the move of the data folder
 // from sd:/switch/playguard to sd:/config/playguard (the .nro stays, a file
@@ -140,6 +140,19 @@ static void test_to_prune()
     CHECK(lf::to_prune({}, lf::Limits{ 1, 1, 1 }, cutoff).empty());
 }
 
+static void test_save()
+{
+    make_root();
+    const std::string dir = g_root + "/logs/uploads";
+    const std::string a = lf::save(dir, lf::UPLOAD, "a", NOW);
+    const std::string b = lf::save(dir, lf::UPLOAD, "b", NOW);   // the same second
+    CHECK(a == dir + "/upload_20261011_120000.txt" && b == dir + "/upload_20261011_120000_1.txt");
+    CHECK(read("logs/uploads/upload_20261011_120000_1.txt") == "b");
+    const auto names = lf::list(dir, lf::UPLOAD);
+    CHECK(names.size() == 2 && names[0] == "upload_20261011_120000_1.txt");
+    remove_root();
+}
+
 static void test_prune()
 {
     make_root();
@@ -173,18 +186,25 @@ static void test_migrate_logs()
     write("logs/play_timer_log.csv", "csv");
     write("logs/play_timer_log.old.csv", "old csv");
     write("logs/play_timer_block.json", "{}");
-    write("logs/uploads.txt", "links");
+    write("logs/uploads.txt", "2026-10-08 09:20  https://bpa.st/AAAA  (remove: https://bpa.st/remove/BBBB)\n"
+                              "2026-10-08 09:20  https://gist.github.com/x/1\n"
+                              "no date\n");
     // Taken already in the new layout: the old file stays.
     write("logs/reports/report_20261009_141203_1.txt", "newer");
 
-    CHECK(lf::migrate(g_root + "/logs") == 5);   // not the report whose name is taken
+    CHECK(lf::migrate(g_root + "/logs") == 6);   // not the report whose name is taken
     CHECK(read("logs/reports/report_20261009_141203.txt") == "report a");
     CHECK(read("logs/reports/report_20261009_141203_1.txt") == "newer" && read("logs/20261009_141203_1.txt") == "report b");
     CHECK(there("logs/notes.txt") && there("logs/20261009_141203_x.txt"));
     CHECK(!there("logs/crash.txt") && read("logs/crashes/crash_20261008_091502.txt").find("uncaught x") != std::string::npos);
     CHECK(read("logs/play_timer/log.csv") == "csv" && read("logs/play_timer/log.old.csv") == "old csv");
     CHECK(read("logs/play_timer/block.json") == "{}" && !there("logs/play_timer_block.json"));
-    CHECK(read("logs/uploads.txt") == "links");
+    // One file per link, named after its line's date; the line without one apart.
+    CHECK(!there("logs/uploads.txt"));
+    CHECK(read("logs/uploads/upload_20261008_092000.txt").find("bpa.st/remove/BBBB") != std::string::npos);
+    CHECK(read("logs/uploads/upload_20261008_092000_1.txt") == "2026-10-08 09:20  https://gist.github.com/x/1\n");
+    CHECK(read("logs/uploads/upload_19700101_000000.txt") == "no date\n");
+    CHECK(lf::list(g_root + "/logs/uploads", lf::UPLOAD).size() == 3);
     // Done once: nothing left to move.
     CHECK(lf::migrate(g_root + "/logs") == 0);
 
@@ -245,6 +265,7 @@ int main()
     test_names();
     test_list();
     test_to_prune();
+    test_save();
     test_prune();
     test_migrate_logs();
     test_data_move();

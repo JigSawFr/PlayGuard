@@ -98,10 +98,10 @@ static void test_gist_files()
 {
     bool cut = true;
     // One file each, numbered in order: the report (a name without an
-    // extension) as report.txt, the others by their last component.
+    // extension) as report.txt, the others by their path under logs/.
     const std::vector<log_upload::Part> parts{ { "diagnostic report", "report\n" },
-                                               { "logs/play_timer_block.json", "{}" },
-                                               { "logs/play_timer_log.csv", "" },
+                                               { "logs/play_timer/block.json", "{}" },
+                                               { "logs/play_timer/log.csv", "" },
                                                { "history.json", "[]" } };
     const std::vector<log_upload::Part> f = log_upload::gist_files(parts, 1000, &cut);
     CHECK(!cut);
@@ -112,8 +112,8 @@ static void test_gist_files()
     CHECK(f[3].name == "4-history.json" && f[3].content == "[]");
     CHECK(log_upload::total_bytes(f) == 7 + 2 + 8 + 2);
     // A saved report keeps its own name; a translated label is still the report.
-    CHECK(log_upload::gist_files({ { "logs/20261009_141203.txt", "x" } }, 100, &cut)[0].name ==
-          "1-20261009_141203.txt");
+    CHECK(log_upload::gist_files({ { "logs/reports/report_20261009_141203.txt", "x" } }, 100, &cut)[0].name ==
+          "1-reports_report_20261009_141203.txt");
     CHECK(log_upload::gist_files({ { "rapport de diagnostic", "x" } }, 100, &cut)[0].name == "1-report.txt");
     CHECK(log_upload::gist_files({}, 100, &cut).empty() && !cut);
 

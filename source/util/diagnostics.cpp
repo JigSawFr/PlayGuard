@@ -86,16 +86,7 @@ std::string current_report()
 
 std::string save(const std::string& report, std::string* error)
 {
-    const std::string stamp = log_files::stamp(std::time(nullptr));
-    for (unsigned i = 0; i < 1000; ++i) {
-        std::string path = paths::reports_dir() + "/" + log_files::name(log_files::REPORT, stamp, i);
-        std::string existing;
-        if (paths::read_file(path, existing)) continue;
-        if (paths::atomic_write(path, report, error)) return path;
-        return "";
-    }
-    if (error) *error = "No free file name";
-    return "";
+    return log_files::save(paths::reports_dir(), log_files::REPORT, report, std::time(nullptr), error);
 }
 
 }   // namespace diagnostic

@@ -662,7 +662,7 @@
         "logs_days_never": "Nooit",
         "logs_days_n": "{} dagen",
         "logs_keep_mb": "Ruimte voor rapporten",
-        "logs_note": "Geldt voor de diagnoserapporten en de crashbestanden in {}, elk apart, bij het starten en wanneer een limiet verandert. Het nieuwste blijft altijd staan.",
+        "logs_note": "Geldt voor de diagnoserapporten, de crashbestanden en de links van de online verstuurde rapporten in {}, elk apart, bij het starten en wanneer een limiet verandert. Het nieuwste blijft altijd staan.",
         "language": "Taal",
         "languages": {
             "system": "Systeemtaal",
@@ -850,7 +850,7 @@
         "pt_block_report": "Opslaan op de SD-kaart",
         "pt_block_new": "Nieuwe referentie",
         "pt_log": "Speeltijdtimer vastleggen",
-        "pt_log_note": "Elke 30 s zolang PlayGuard open is, een regel met wat de speeltijdtimer meldt (resterende tijd, gebruikte tijd, 1459, het instellingenblok) in logs/play_timer_log.csv, en nog een direct na elke wijziging die PlayGuard maakt, met welke. Een klok die meer is verschoven dan de verstreken tijd wordt ook genoteerd. Laat PlayGuard open tot na middernacht, of tot de tijd op is, om te zien wat de console dan doet. Wordt meegestuurd met het diagnoserapport.",
+        "pt_log_note": "Elke 30 s zolang PlayGuard open is, een regel met wat de speeltijdtimer meldt (resterende tijd, gebruikte tijd, 1459, het instellingenblok) in logs/play_timer/log.csv, en nog een direct na elke wijziging die PlayGuard maakt, met welke. Een klok die meer is verschoven dan de verstreken tijd wordt ook genoteerd. Laat PlayGuard open tot na middernacht, of tot de tijd op is, om te zien wat de console dan doet. Wordt meegestuurd met het diagnoserapport.",
         "clear_cache": "Cache wissen",
         "clear_logs": "Logbestanden verwijderen",
         "clear_cache_body": "Cache verwijderen: {}?\n\nDe namen en pictogrammen van de games, de laatste cijfers van Activiteit en de lijst met ontwikkelbuilds. PlayGuard leest ze opnieuw van de console wanneer nodig: bij de volgende start duurt het tabblad Activiteit iets langer.",

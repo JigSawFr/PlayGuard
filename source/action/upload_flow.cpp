@@ -2,6 +2,7 @@
 #include "action/upload_flow.hpp"
 
 #include <borealis.hpp>
+#include <ctime>
 #include <fmt/format.h>
 #include <vector>
 
@@ -9,6 +10,7 @@
 #include "ui/ui.hpp"
 #include "util/diagnostics.hpp"
 #include "util/github_auth.hpp"
+#include "util/log_files.hpp"
 #include "util/log_upload.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -47,17 +49,15 @@ brls::Box* qr_card(const std::string& title, const std::string& url, const std::
     return card;
 }
 
-// Keeps the links in logs/uploads.txt, newest last: one can be found again
-// after the dialog is closed.
+// Keeps the link in a file of its own, logs/uploads/upload_<date>.txt
+// (util/log_files.hpp): one can be found again after the dialog is closed.
 // bpa.st's removal link is kept too: it is the only way to delete the paste
 // before it expires.
 void remember(const log_upload::Result& r)
 {
-    const std::string path = paths::logs_dir() + "/uploads.txt";
-    std::string list;
-    paths::read_file(path, list);
-    list += ui::now_stamp() + "  " + r.url + (r.removal.empty() ? "" : "  (remove: " + r.removal + ")") + "\n";
-    if (paths::ensure_dir(paths::logs_dir())) paths::atomic_write(path, list);
+    const std::string line =
+        ui::now_stamp() + "  " + r.url + (r.removal.empty() ? "" : "  (remove: " + r.removal + ")") + "\n";
+    log_files::save(paths::uploads_dir(), log_files::UPLOAD, line, std::time(nullptr));
 }
 
 void show_link(const log_upload::Result& r)

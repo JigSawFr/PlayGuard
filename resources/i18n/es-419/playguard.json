@@ -662,7 +662,7 @@
         "logs_days_never": "Nunca",
         "logs_days_n": "{} días",
         "logs_keep_mb": "Espacio para reportes",
-        "logs_note": "Se aplica a los reportes de diagnóstico y a los archivos de fallo en {}, cada uno por separado, al iniciar y al cambiar un límite. El más reciente siempre se conserva.",
+        "logs_note": "Se aplica a los reportes de diagnóstico, a los archivos de fallo y a los enlaces de los reportes enviados en línea en {}, cada uno por separado, al iniciar y al cambiar un límite. El más reciente siempre se conserva.",
         "language": "Idioma",
         "languages": {
             "system": "Idioma de la consola",
@@ -850,7 +850,7 @@
         "pt_block_report": "Guardar en la tarjeta SD",
         "pt_block_new": "Nueva referencia",
         "pt_log": "Registrar el temporizador de juego",
-        "pt_log_note": "Cada 30 s mientras PlayGuard está abierto, una línea con lo que indica el temporizador de juego (tiempo restante, tiempo usado, 1459, el bloque de configuración) en logs/play_timer_log.csv, y otra justo después de cada cambio que hace PlayGuard, indicando cuál. También se anota un reloj que se movió más que el tiempo transcurrido. Deja PlayGuard abierto pasada la medianoche, o hasta que se acabe el tiempo, para ver qué hace entonces la consola. Se envía con el informe de diagnóstico.",
+        "pt_log_note": "Cada 30 s mientras PlayGuard está abierto, una línea con lo que indica el temporizador de juego (tiempo restante, tiempo usado, 1459, el bloque de configuración) en logs/play_timer/log.csv, y otra justo después de cada cambio que hace PlayGuard, indicando cuál. También se anota un reloj que se movió más que el tiempo transcurrido. Deja PlayGuard abierto pasada la medianoche, o hasta que se acabe el tiempo, para ver qué hace entonces la consola. Se envía con el informe de diagnóstico.",
         "clear_cache": "Vaciar la caché",
         "clear_logs": "Eliminar los archivos de registro",
         "clear_cache_body": "¿Eliminar la caché: {}?\n\nLos nombres e íconos de los juegos, las últimas cifras de Actividad y la lista de compilaciones de desarrollo. PlayGuard los vuelve a leer de la consola cuando los necesita: en el próximo inicio, la pestaña Actividad tarda un poco más.",

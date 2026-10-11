@@ -69,10 +69,13 @@ std::vector<Part> gist_files(const std::vector<Part>& parts, size_t max_bytes, b
     size_t total = 0;
     if (truncated) *truncated = false;
     for (size_t i = 0; i < parts.size(); i++) {
-        const std::string& name = parts[i].name;
-        const std::string last = name.substr(name.find_last_of('/') + 1);
+        // Its path under logs/, its folders joined with "_" (a gist file
+        // name has no "/"): "logs/play_timer/block.json" is play_timer_block.json.
+        std::string name = parts[i].name;
+        if (name.compare(0, 5, "logs/") == 0) name.erase(0, 5);
+        std::replace(name.begin(), name.end(), '/', '_');
         const std::string file =
-            std::to_string(i + 1) + "-" + (last.find('.') == std::string::npos ? std::string("report.txt") : last);
+            std::to_string(i + 1) + "-" + (name.find('.') == std::string::npos ? std::string("report.txt") : name);
         const std::string content = parts[i].content.empty() ? std::string("(empty)\n") : parts[i].content;
         if (total + content.size() <= max_bytes) {
             out.push_back({ file, content });

@@ -19,10 +19,10 @@ config/playguard/backups/*.json          settings backups (never contain the PIN
 config/playguard/exports/activity_*      Activity exports (CSV, JSON, XLSX, PDF)
 config/playguard/logs/reports/report_<date>.txt   diagnostic reports (never contain the PIN)
 config/playguard/logs/crashes/crash_<date>.txt    one file per crash
-                                         (both pruned as Tools › Diagnostics says: number, age, size)
+config/playguard/logs/uploads/upload_<date>.txt   one per report sent online: its link (and bpa.st's removal link)
+                                         (all three pruned as Tools › Diagnostics says: number, age, size)
 config/playguard/logs/play_timer/log.csv          Developer tools › record the play timer (log.old.csv: the previous one)
 config/playguard/logs/play_timer/block.json       Developer tools › play-timer block reference
-config/playguard/logs/uploads.txt        links of the reports sent online
 config/playguard/history.json            the change history (the newest 200 changes)
 config/playguard/watch.json              what PlayGuard last saw of the console (today's play time, the clock, the limits,
                                          the user accounts), to tell what changed outside it (docs/config.md)

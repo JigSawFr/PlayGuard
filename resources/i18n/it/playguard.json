@@ -662,7 +662,7 @@
         "logs_days_never": "Mai",
         "logs_days_n": "{} giorni",
         "logs_keep_mb": "Spazio per i rapporti",
-        "logs_note": "Si applica ai rapporti di diagnostica e ai file di arresto anomalo in {}, ciascuno per conto proprio, all'avvio e quando cambia un limite. Il più recente resta sempre.",
+        "logs_note": "Si applica ai rapporti di diagnostica, ai file di arresto anomalo e ai link dei rapporti inviati online in {}, ciascuno per conto proprio, all'avvio e quando cambia un limite. Il più recente resta sempre.",
         "language": "Lingua",
         "languages": {
             "system": "Lingua della console",
@@ -850,7 +850,7 @@
         "pt_block_report": "Salva sulla scheda SD",
         "pt_block_new": "Nuovo riferimento",
         "pt_log": "Registra il tempo di gioco",
-        "pt_log_note": "Ogni 30 s mentre PlayGuard è aperto, una riga con ciò che riporta il tempo di gioco (tempo rimasto, tempo usato, 1459, il blocco delle impostazioni) in logs/play_timer_log.csv, e un'altra subito dopo ogni modifica fatta da PlayGuard, che dice quale. Viene annotato anche un orologio che si è spostato più del tempo trascorso. Lascia PlayGuard aperto oltre la mezzanotte, o fino alla fine del tempo, per vedere cosa fa allora la console. Inviato con il rapporto di diagnostica.",
+        "pt_log_note": "Ogni 30 s mentre PlayGuard è aperto, una riga con ciò che riporta il tempo di gioco (tempo rimasto, tempo usato, 1459, il blocco delle impostazioni) in logs/play_timer/log.csv, e un'altra subito dopo ogni modifica fatta da PlayGuard, che dice quale. Viene annotato anche un orologio che si è spostato più del tempo trascorso. Lascia PlayGuard aperto oltre la mezzanotte, o fino alla fine del tempo, per vedere cosa fa allora la console. Inviato con il rapporto di diagnostica.",
         "clear_cache": "Svuota la cache",
         "clear_logs": "Elimina i file di log",
         "clear_cache_body": "Eliminare la cache: {}?\n\nI nomi e le icone dei giochi, gli ultimi dati di Attività e l'elenco delle build di sviluppo. PlayGuard li rilegge dalla console quando servono: al prossimo avvio, la scheda Attività impiega un po' di più.",

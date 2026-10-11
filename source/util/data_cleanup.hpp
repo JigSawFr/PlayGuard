@@ -26,11 +26,11 @@ struct Plan
 Plan cache(const std::string& data_dir);
 
 // Every file under `data_dir`/logs and its subfolders (crashes/, reports/,
-// the play-timer recording in play_timer/) except the two that are not logs:
-// uploads.txt (the removal links of the reports sent online, the only way to
-// delete them) and play_timer/block.json (the reference a block comparison is
-// made against). Their ".tmp" (an interrupted write, read in their place)
-// stays too.
+// the play-timer recording in play_timer/) except what is not a log:
+// uploads/ (the links of the reports sent online, with bpa.st's removal
+// links, the only way to delete them; Tools › Diagnostics' limits prune it)
+// and play_timer/block.json (the reference a block comparison is made
+// against, and its ".tmp": an interrupted write, read in its place).
 Plan logs(const std::string& data_dir);
 
 struct Outcome

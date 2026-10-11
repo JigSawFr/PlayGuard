@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <cstring>
 #include <sys/stat.h>
+#include <utility>
 
 #include "util/paths.hpp"
 
@@ -111,6 +112,19 @@ std::vector<std::string> to_prune(const std::vector<File>& files, const Limits& 
     return out;
 }
 
+std::string save(const std::string& dir, const char* prefix, const std::string& content, std::time_t now,
+                 std::string* error)
+{
+    const std::string st = stamp(now);
+    for (unsigned i = 0; i < 1000; i++) {
+        const std::string path = dir + "/" + name(prefix, st, i);
+        if (paths::exists(path)) continue;
+        return paths::atomic_write(path, content, error) ? path : "";
+    }
+    if (error) *error = "No free file name";
+    return "";
+}
+
 size_t prune(const std::string& dir, const char* prefix, const Limits& limits, std::time_t now)
 {
     if (limits.count <= 0 && limits.days <= 0 && limits.mb <= 0) return 0;
@@ -159,6 +173,41 @@ size_t migrate(const std::string& logs_dir)
                     if (move(crash, crashes + "/" + name(CRASH, st, i))) moved++;
                     break;
                 }
+        }
+    }
+
+    // uploads.txt held every link, one line each: "2026-10-11 14:25  https://…".
+    const std::string uploads = logs_dir + "/uploads.txt";
+    if (paths::read_file(uploads, text)) {
+        std::vector<std::pair<std::string, std::string>> files;   // stamp, lines
+        size_t from = 0;
+        while (from < text.size()) {
+            size_t nl = text.find('\n', from);
+            if (nl == std::string::npos) nl = text.size();
+            const std::string line = text.substr(from, nl - from);
+            from = nl + 1;
+            if (line.empty()) continue;
+            std::string st = "19700101_000000";
+            if (line.size() >= 16 && digits(line, 0, 4) && line[4] == '-' && digits(line, 5, 2) && line[7] == '-' &&
+                digits(line, 8, 2) && line[10] == ' ' && digits(line, 11, 2) && line[13] == ':' && digits(line, 14, 2))
+                st = line.substr(0, 4) + line.substr(5, 2) + line.substr(8, 2) + "_" + line.substr(11, 2) +
+                     line.substr(14, 2) + "00";
+            if (!files.empty() && files.back().first == st && st == "19700101_000000")
+                files.back().second += line + "\n";
+            else
+                files.push_back({ st, line + "\n" });
+        }
+        bool all = paths::ensure_dir(logs_dir + "/uploads");
+        for (size_t i = 0; all && i < files.size(); i++) {
+            unsigned n = 0;
+            while (n < 1000 && exists(logs_dir + "/uploads/" + name(UPLOAD, files[i].first, n))) n++;
+            all = paths::atomic_write(logs_dir + "/uploads/" + name(UPLOAD, files[i].first, n), files[i].second);
+        }
+        // Only once every line is in a file of its own.
+        if (all) {
+            std::remove(uploads.c_str());
+            std::remove((uploads + ".tmp").c_str());
+            moved++;
         }
     }
 

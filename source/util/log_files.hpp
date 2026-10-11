@@ -2,12 +2,14 @@
 //
 //   logs/reports/report_20261011_142530.txt   saved diagnostic reports
 //   logs/crashes/crash_20261011_142530.txt     one file per crash (main.cpp)
+//   logs/uploads/upload_20261011_142530.txt    one per report sent online: its
+//                                              link (and bpa.st's removal link)
 //   logs/play_timer/log.csv, log.old.csv       Developer › record the play timer
 //   logs/play_timer/block.json                 Developer › play-timer block reference
-//   logs/uploads.txt                           links of the reports sent online
 //
-// The reports and the crashes are pruned with the limits of the Tools tab
-// (config: logs_keep, logs_keep_days, logs_keep_mb), each folder on its own.
+// The reports, the crashes and the uploads are pruned with the limits of the
+// Tools tab (config: logs_keep, logs_keep_days, logs_keep_mb), each folder on
+// its own.
 // The date in the name (local time, as the console shows it) is what counts,
 // not the file's date, which the SD card does not always keep.
 // Plain C++ (no borealis): host-tested (tests/log_files).
@@ -24,6 +26,7 @@ namespace log_files
 
 constexpr const char* REPORT = "report";
 constexpr const char* CRASH  = "crash";
+constexpr const char* UPLOAD = "upload";
 
 // "report_20261011_142530.txt", "report_20261011_142530_2.txt" for n = 2
 // (another one in the same second). `stamp` is "YYYYMMDD_HHMMSS".
@@ -60,13 +63,20 @@ struct File
 // the report just saved, the crash that just happened.
 std::vector<std::string> to_prune(const std::vector<File>& files, const Limits& limits, const std::string& cutoff);
 
+// Writes `content` as a new `prefix` file of `dir` dated `now` (the first
+// free name: _1, _2… within a second). Returns its path, or "" and *error.
+std::string save(const std::string& dir, const char* prefix, const std::string& content, std::time_t now,
+                 std::string* error = nullptr);
+
 // Removes the `prefix` files of `dir` that `limits` leave out at time `now`.
 // Returns how many were removed.
 size_t prune(const std::string& dir, const char* prefix, const Limits& limits, std::time_t now);
 
 // Moves the files of the layout before the subfolders into them, in
 // `logs_dir`: <stamp>[_n].txt to reports/report_<stamp>[_n].txt, crash.txt to
-// crashes/crash_<date of its first line>.txt, play_timer_log.csv,
+// crashes/crash_<date of its first line>.txt, uploads.txt to one
+// uploads/upload_<date of the line>.txt per line ("2026-10-11 14:25  <link>";
+// lines without a date together in one file), play_timer_log.csv,
 // play_timer_log.old.csv and play_timer_block.json to play_timer/. A file
 // whose new name is taken stays where it is. Returns how many were moved.
 size_t migrate(const std::string& logs_dir);

@@ -81,7 +81,7 @@ if GATE and os.path.exists(block_ref):
 logs_dir = os.path.join(run_dir, "playguard_data", "logs")
 cache_dir = os.path.join(run_dir, "playguard_data", "cache")
 old_logs = [os.path.join(logs_dir, n) for n in ("crashes/crash_20261008_120000.txt", "reports/report_20261008_120000.txt")]
-uploads = os.path.join(logs_dir, "uploads.txt")
+uploads = os.path.join(logs_dir, "uploads", "upload_20261008_120000.txt")
 stale_cache = os.path.join(cache_dir, "stale.bin")
 if GATE:
     for path in old_logs + [uploads, stale_cache]:
@@ -416,7 +416,7 @@ if GATE:
     time.sleep(4.5)            # its toast gone: the next screens are references
     # The cleanup tools, just above the report (read-only mode allows them:
     # nothing on the console changes): a confirmation, then a result screen.
-    # The log files go but uploads.txt and the block reference just saved;
+    # The log files go but the upload links and the block reference just saved;
     # the cache's files go, its folder stays.
     key("Up", 2)               # Delete the log files
     key("Return")
@@ -428,7 +428,7 @@ if GATE:
     if any(os.path.exists(p) for p in old_logs):
         fail("Delete the log files left " + repr([p for p in old_logs if os.path.exists(p)]))
     if not os.path.exists(uploads) or not os.path.exists(block_ref):
-        fail("Delete the log files removed uploads.txt or the block reference")
+        fail("Delete the log files removed an upload link or the block reference")
     key("Up")                  # Clear the cache
     key("Return")
     shot("06e_clear_cache")
@@ -795,9 +795,14 @@ key("Escape")
 shot("27_back")
 
 # Send a report online: the confirmation, then the link and its QR codes.
-uploads = os.path.join(run_dir, "playguard_data", "logs", "uploads.txt")
+uploads = os.path.join(run_dir, "playguard_data", "logs", "uploads")
 def upload_count():
-    return open(uploads).read().count("https://bpa.st/SMOKE") if os.path.exists(uploads) else 0
+    # One file per link (logs/uploads/upload_<date>.txt); a run pruned by the
+    # default limit (the 20 newest) counts the same.
+    if not os.path.isdir(uploads):
+        return 0
+    return sum(1 for f in os.listdir(uploads) if f.startswith("upload_") and f.endswith(".txt")
+               and "https://" in open(os.path.join(uploads, f)).read())
 uploads_before = upload_count()
 reports = os.path.join(run_dir, "playguard_data", "logs", "reports")
 def saved_reports():

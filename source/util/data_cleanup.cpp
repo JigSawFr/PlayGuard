@@ -14,7 +14,7 @@ namespace
 {
 // The files under `dir` and its subfolders, with their sizes. `keep(rel)`
 // leaves out a file by its path from the folder collect() started at
-// ("uploads.txt", "play_timer/block.json").
+// ("uploads/upload_….txt", "play_timer/block.json").
 template <typename Keep>
 void collect(const std::string& dir, Plan& plan, Keep keep, const std::string& rel = "")
 {
@@ -55,12 +55,10 @@ Plan cache(const std::string& data_dir)
 
 Plan logs(const std::string& data_dir)
 {
-    static const char* const KEEP[] = { "uploads.txt", "play_timer/block.json" };
     Plan plan;
-    collect(data_dir + "/logs", plan, [](const std::string& name) {
-        for (const char* k : KEEP)
-            if (name == k || name == std::string(k) + ".tmp") return true;
-        return false;
+    collect(data_dir + "/logs", plan, [](const std::string& rel) {
+        return rel.compare(0, 8, "uploads/") == 0 || rel == "play_timer/block.json" ||
+               rel == "play_timer/block.json.tmp";
     });
     return sorted(plan);
 }

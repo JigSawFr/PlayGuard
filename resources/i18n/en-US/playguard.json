@@ -662,7 +662,7 @@
         "logs_days_never": "Never",
         "logs_days_n": "{} days",
         "logs_keep_mb": "Space for reports",
-        "logs_note": "Applies to the diagnostic reports and to the crash files in {}, each on its own, at start-up and when a limit changes. The newest one always stays.",
+        "logs_note": "Applies to the diagnostic reports, the crash files and the links of the reports sent online in {}, each on its own, at start-up and when a limit changes. The newest one always stays.",
         "language": "Language",
         "languages": {
             "system": "System language",
@@ -850,7 +850,7 @@
         "pt_block_report": "Save to the SD card",
         "pt_block_new": "New reference",
         "pt_log": "Record the play timer",
-        "pt_log_note": "Every 30 s while PlayGuard is open, one line of what the play timer reports (time left, time spent, 1459, the settings block) in logs/play_timer_log.csv, and one more right after each change PlayGuard makes, saying which. A clock that moved more than the time that went by is noted too. Leave PlayGuard open over midnight, or until the time is up, to see what the console does then. Sent with the diagnostic report.",
+        "pt_log_note": "Every 30 s while PlayGuard is open, one line of what the play timer reports (time left, time spent, 1459, the settings block) in logs/play_timer/log.csv, and one more right after each change PlayGuard makes, saying which. A clock that moved more than the time that went by is noted too. Leave PlayGuard open over midnight, or until the time is up, to see what the console does then. Sent with the diagnostic report.",
         "clear_cache": "Clear the cache",
         "clear_logs": "Delete the log files",
         "clear_cache_body": "Delete the cache: {}?\n\nThe game names and icons, the Activity's last figures and the development build list. PlayGuard reads them again from the console when it needs them: at the next start, the Activity tab takes a moment longer.",

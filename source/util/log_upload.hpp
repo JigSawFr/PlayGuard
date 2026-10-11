@@ -71,8 +71,8 @@ std::string bundle(const std::vector<Part>& parts, size_t max_bytes, bool* trunc
 
 // The parts as the files of a gist, one each, numbered in their order (GitHub
 // lists a gist's files by name): "1-report.txt" for a part named without an
-// extension (the report), else the number and the name's last component
-// ("2-play_timer_block.json", "1-20261009_141203.txt"). An empty part reads
+// extension (the report), else the number and its path under logs/ with "_"
+// for "/" ("2-play_timer_block.json", "1-reports_report_20261009_141203.txt"). An empty part reads
 // "(empty)" (GitHub refuses an empty file). At most `max_bytes` in all: the
 // part that does not fit is cut on a whole UTF-8 character, with a closing
 // notice, the ones after it left out, and *truncated set.

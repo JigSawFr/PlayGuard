@@ -662,7 +662,7 @@
         "logs_days_never": "Jamais",
         "logs_days_n": "{} jours",
         "logs_keep_mb": "Place pour les rapports",
-        "logs_note": "S'applique aux rapports de diagnostic et aux fichiers de plantage dans {}, chacun de son côté, au démarrage et quand une limite change. Le plus récent est toujours gardé.",
+        "logs_note": "S'applique aux rapports de diagnostic, aux fichiers de plantage et aux liens des rapports envoyés en ligne dans {}, chacun de son côté, au démarrage et quand une limite change. Le plus récent est toujours gardé.",
         "language": "Langue",
         "languages": {
             "system": "Langue de la console",
@@ -850,7 +850,7 @@
         "pt_block_report": "Enregistrer sur la carte SD",
         "pt_block_new": "Nouvelle référence",
         "pt_log": "Enregistrer le temps de jeu",
-        "pt_log_note": "Toutes les 30 s tant que PlayGuard est ouvert, une ligne de ce que rapporte le temps de jeu (temps restant, temps écoulé, 1459, le bloc des réglages) dans logs/play_timer_log.csv, et une de plus juste après chaque modification faite par PlayGuard, qui dit laquelle. Une horloge qui a bougé plus que le temps écoulé est notée aussi. Laissez PlayGuard ouvert après minuit, ou jusqu'à la fin du temps, pour voir ce que fait alors la console. Envoyé avec le rapport de diagnostic.",
+        "pt_log_note": "Toutes les 30 s tant que PlayGuard est ouvert, une ligne de ce que rapporte le temps de jeu (temps restant, temps écoulé, 1459, le bloc des réglages) dans logs/play_timer/log.csv, et une de plus juste après chaque modification faite par PlayGuard, qui dit laquelle. Une horloge qui a bougé plus que le temps écoulé est notée aussi. Laissez PlayGuard ouvert après minuit, ou jusqu'à la fin du temps, pour voir ce que fait alors la console. Envoyé avec le rapport de diagnostic.",
         "clear_cache": "Vider le cache",
         "clear_logs": "Supprimer les fichiers journaux",
         "clear_cache_body": "Supprimer le cache : {} ?\n\nLes noms et icônes des jeux, les derniers chiffres de l'Activité et la liste des builds de développement. PlayGuard les relit sur la console quand il en a besoin : au prochain lancement, l'onglet Activité met un peu plus de temps.",
