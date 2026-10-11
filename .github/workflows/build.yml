@@ -383,13 +383,34 @@ jobs:
           ccache --print-stats > ccache-stats.txt
           ccache --show-stats
           # The same commit gives the same zips (CONTRIBUTING.md, "Reproducible
-          # zips"): build them once more and compare.
-          sha256sum playguard.zip playguard-rescue.zip > first-build.txt
+          # zips"): build them once more and compare. What each build packed
+          # is kept (the zips, the .nro, its NACP, the shaders, the checksum
+          # of every RomFS file): tools/repro_diff.py says what differs, down
+          # to the RomFS file, and a failed check uploads both builds.
+          keep() {
+            mkdir -p "$1/dksh"
+            cp playguard.zip playguard-rescue.zip build/playguard.nro build/playguard.nacp "$1/"
+            cp build/dksh/*.dksh "$1/dksh/"
+            (cd build/resources && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > "$1/resources.sha256"
+          }
+          keep repro/first
           make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
           make dist-rescue
-          sha256sum -c first-build.txt
+          keep repro/second
+          if ! python3 tools/repro_diff.py repro/first repro/second; then
+            echo "::error title=Reproducible zips::the second build differs from the first (what differs is above; both builds are in the repro-diff artifact)"
+            exit 1
+          fi
           # The raw sysmodule next to its zip, for the rescue artifact.
           cp sysmodule/out/playguard-rescue.nsp playguard-rescue.nsp
+      - name: Both builds, when they differ
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playguard-${{ env.LABEL }}-repro-diff
+          path: repro/
+          retention-days: 7
+          if-no-files-found: ignore
       - name: Toolchain
         run: |
           dkp-pacman -Q devkitA64 libnx deko3d switch-tools switch-curl > toolchain.txt
