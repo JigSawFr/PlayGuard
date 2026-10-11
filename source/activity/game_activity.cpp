@@ -72,7 +72,7 @@ void GameActivity::show_accounts(const std::vector<AccountPlay>& by_account, Res
     // every account's total (one account's is already its own), and the
     // accounts read.
     const bool comparable = this->every_account && g.totals_ok && R_SUCCEEDED(rc);
-    const uint64_t nobody = comparable ? activity_summary::unattributed_s(g.total_s, by_account, n) : 0;
+    const uint64_t nobody = comparable ? activity_summary::unattributed_s(g.total_s, by_account.data(), by_account.size()) : 0;
     if (nobody) {
         auto* cell = new brls::DetailCell();
         cell->setFocusable(false);
