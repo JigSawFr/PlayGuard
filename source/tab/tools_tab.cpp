@@ -9,6 +9,7 @@
 #include "action/github_login_flow.hpp"
 #include "action/fw_gate.hpp"
 #include "action/history_flow.hpp"
+#include "action/log_prune_flow.hpp"
 #include "action/pt_block_flow.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_log_flow.hpp"
@@ -33,6 +34,39 @@ namespace
 std::string keep_text(int keep)
 {
     return keep == 0 ? "playguard/tools/backup_keep_all"_i18n : brls::getStr("playguard/tools/backup_keep_n", keep);
+}
+
+// The limits of the reports and crash files kept (config logs_keep*).
+std::string logs_keep_text(int n)
+{
+    return n == 0 ? "playguard/tools/logs_keep_all"_i18n : brls::getStr("playguard/tools/logs_keep_n", n);
+}
+std::string logs_days_text(int n)
+{
+    return n == 0 ? "playguard/tools/logs_days_never"_i18n : brls::getStr("playguard/tools/logs_days_n", n);
+}
+std::string logs_mb_text(int n)
+{
+    return n == 0 ? "playguard/common/no_limit"_i18n : brls::getStr("playguard/dev/size_mb", n);
+}
+
+// A picker over `values` for `field`; the limits apply at once.
+template <size_t N>
+void pick_limit(const std::string& title, const int (&values)[N], int& field, std::string (*text)(int),
+                std::function<void()> done)
+{
+    std::vector<std::string> labels;
+    int selected = 0;
+    for (size_t i = 0; i < N; i++) {
+        labels.push_back(text(values[i]));
+        if (values[i] == field) selected = (int)i;
+    }
+    ui::pick(title, labels, selected, [&values, &field, done](int i) {
+        field = values[i];
+        ui::save_config();
+        log_prune_flow::run();
+        done();
+    });
 }
 }   // namespace
 
@@ -74,6 +108,25 @@ ToolsTab::ToolsTab()
     upload_note->setSingleLine(false);
     upload->registerClickAction([](brls::View*) {
         upload_flow::choose();
+        return true;
+    });
+
+    // Only the SD card: also offered in read-only mode.
+    logs_note->setSingleLine(false);
+    logs_note->setText(brls::getStr("playguard/tools/logs_note", paths::logs_dir()));
+    logs_keep->registerClickAction([this](brls::View*) {
+        pick_limit("playguard/tools/logs_keep"_i18n, config::LOGS_KEEP, config::get().logs_keep, logs_keep_text,
+                   [this]() { this->refresh(); });
+        return true;
+    });
+    logs_keep_days->registerClickAction([this](brls::View*) {
+        pick_limit("playguard/tools/logs_keep_days"_i18n, config::LOGS_KEEP_DAYS, config::get().logs_keep_days,
+                   logs_days_text, [this]() { this->refresh(); });
+        return true;
+    });
+    logs_keep_mb->registerClickAction([this](brls::View*) {
+        pick_limit("playguard/tools/logs_keep_mb"_i18n, config::LOGS_KEEP_MB, config::get().logs_keep_mb, logs_mb_text,
+                   [this]() { this->refresh(); });
         return true;
     });
 
@@ -193,6 +246,9 @@ void ToolsTab::refresh()
 {
     const auto& cfg = config::get();
     backup_keep->setDetailText(keep_text(cfg.backup_keep));
+    logs_keep->setDetailText(logs_keep_text(cfg.logs_keep));
+    logs_keep_days->setDetailText(logs_days_text(cfg.logs_keep_days));
+    logs_keep_mb->setDetailText(logs_mb_text(cfg.logs_keep_mb));
     const size_t backups = backup_flow::count();
     backup_restore->setDetailText(backups ? brls::getStr("playguard/tools/backup_count", (int)backups) : "");
     const size_t changes = history_flow::load().size();

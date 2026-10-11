@@ -124,12 +124,12 @@ void replace_screen(brls::Activity* next)
         brls::Application::pushActivity(next, none);
 }
 
-// config.json as it is now, queued (*ticket to wait for). False when it
+// config.json and state.json as they are now, queued (*ticket to wait for). False when it
 // cannot be saved at all.
 static bool queue_config(const std::string& saved_text, const std::string& failed_text, uint64_t* ticket)
 {
     const std::string failed = failed_text.empty() ? "playguard/toast/config_err"_i18n : failed_text;
-    std::string text;
+    config::Snapshot text;
     if (!config::snapshot(text)) {
         notify(failed);
         return false;

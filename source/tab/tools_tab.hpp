@@ -1,5 +1,5 @@
 // ToolsTab — first steps, change history, settings backup / restore,
-// diagnostic export, the console (firmware, storage, serial, game patches)
+// diagnostic export and how many reports and crash files are kept, the console (firmware, storage, serial, game patches)
 // and the developer tools (shown after seven presses on About › Version;
 // among them, clearing the cache and the log files). The
 // preferences are in PreferencesTab, the version, updates and changelog in AboutTab.
@@ -26,6 +26,10 @@ class ToolsTab : public TabBase
     BRLS_BIND(brls::Label,       export_note, "tl_export_note");
     BRLS_BIND(brls::DetailCell,  upload,      "tl_upload");
     BRLS_BIND(brls::Label,       upload_note, "tl_upload_note");
+    BRLS_BIND(brls::DetailCell,  logs_keep,   "tl_logs_keep");
+    BRLS_BIND(brls::DetailCell,  logs_keep_days, "tl_logs_keep_days");
+    BRLS_BIND(brls::DetailCell,  logs_keep_mb, "tl_logs_keep_mb");
+    BRLS_BIND(brls::Label,       logs_note,   "tl_logs_note");
     BRLS_BIND(brls::DetailCell,  backup_save, "tl_backup_save");
     BRLS_BIND(brls::DetailCell,  backup_restore, "tl_backup_restore");
     BRLS_BIND(brls::Label,       backup_note, "tl_backup_note");

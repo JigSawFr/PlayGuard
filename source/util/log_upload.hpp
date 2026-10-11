@@ -45,23 +45,23 @@ constexpr const char* BPASTE_EXPIRY = "1month";
 
 struct Part
 {
-    std::string name;      // "diagnostic report", "logs/play_timer_block.json"
+    std::string name;      // "diagnostic report", "logs/play_timer/block.json"
     std::string content;
 };
 
-// The end of logs/play_timer_log.csv sent, at most (util/pt_log.hpp).
+// The end of logs/play_timer/log.csv sent, at most (util/pt_log.hpp).
 constexpr size_t PT_LOG_BYTES = 48 * 1024;
 
 // The debug files found in the data directory, in a fixed order:
-// logs/play_timer_block.json (Developer tools › play-timer block),
-// logs/play_timer_log.csv (Developer tools › record the play timer: its last
+// logs/play_timer/block.json (Developer tools › play-timer block),
+// logs/play_timer/log.csv (Developer tools › record the play timer: its last
 // PT_LOG_BYTES, header kept), history.json (the change history) and config.json (PlayGuard's settings;
 // the PIN is not one of them). Missing ones are left out. Never the GitHub
 // token (github_auth.hpp keeps it in a file of its own).
 std::vector<Part> debug_files();
 
-// Names of the reports saved in logs/ ("20261009_141203.txt"), newest first,
-// at most `limit`.
+// Names of the reports saved in logs/reports/ ("report_20261009_141203.txt",
+// util/log_files.hpp), newest first, at most `limit`.
 std::vector<std::string> saved_reports(size_t limit = 10);
 
 // The parts one after the other, each under a "===== name =====" line (for
@@ -71,8 +71,8 @@ std::string bundle(const std::vector<Part>& parts, size_t max_bytes, bool* trunc
 
 // The parts as the files of a gist, one each, numbered in their order (GitHub
 // lists a gist's files by name): "1-report.txt" for a part named without an
-// extension (the report), else the number and the name's last component
-// ("2-play_timer_block.json", "1-20261009_141203.txt"). An empty part reads
+// extension (the report), else the number and its path under logs/ with "_"
+// for "/" ("2-play_timer_block.json", "1-reports_report_20261009_141203.txt"). An empty part reads
 // "(empty)" (GitHub refuses an empty file). At most `max_bytes` in all: the
 // part that does not fit is cut on a whole UTF-8 character, with a closing
 // notice, the ones after it left out, and *truncated set.

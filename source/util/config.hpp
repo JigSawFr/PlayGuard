@@ -1,4 +1,5 @@
-// config — small persistent settings in sd:/switch/playguard/config.json.
+// config — small persistent settings in sd:/config/playguard/config.json, and
+// the part that belongs to one system in nand/<system>/state.json (Snapshot).
 // Every key, its values and default: docs/config.md (keep it in step).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -27,6 +28,12 @@ struct Config
     int  activity_period = 1;          // Activity's period: 0 today, 1 last 7 days, 2 all time
     int  export_format   = 0;          // last export format (table_export::Format)
     int  backup_keep     = 0;          // backups kept after a new one (0: all of them)
+    // The saved reports and the crash files kept, each folder on its own
+    // (util/log_files.hpp; 0: no limit): the newest logs_keep, those of the
+    // last logs_keep_days days, the newest that fit in logs_keep_mb MB.
+    int  logs_keep       = 20;
+    int  logs_keep_days  = 0;
+    int  logs_keep_mb    = 0;
     bool clock_check_at_start = false; // measure the network clock at start-up, say when it is off
     bool intro = true;                 // the loading screen stays 2 s at start-up (activity/loading_activity.hpp)
     std::string dev_builds_order = "newest";   // Install another build's pull requests: "newest" or "number"
@@ -92,12 +99,17 @@ constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "r
 // What extra_amounts may be (the Preferences picker offers these sets).
 constexpr int EXTRA_SETS[][3] = { { 15, 30, 60 }, { 10, 20, 30 }, { 30, 60, 90 }, { 5, 10, 15 } };
 constexpr int BACKUP_KEEP[]   = { 0, 5, 10, 20 };
+// What the Tools tab offers for the reports and crash files kept.
+constexpr int LOGS_KEEP[]      = { 0, 5, 10, 20, 50 };
+constexpr int LOGS_KEEP_DAYS[] = { 0, 7, 30, 90, 365 };
+constexpr int LOGS_KEEP_MB[]   = { 0, 1, 5, 20 };
 constexpr size_t MAX_HOST           = 253;  // longest DNS name
 constexpr size_t MAX_CUSTOM_SERVERS = 10;
 
 // What the last load() found. A config.json that is there but cannot be read
 // or parsed (not one wrong field: those keep their default alone) is put
-// aside as config.json.bad (paths::put_aside: the previous .bad is kept as
+// aside as config.json.bad (state.json the same: state.json.bad, with the
+// same notice) (paths::put_aside: the previous .bad is kept as
 // .bad.1), and the defaults are used. When it cannot be moved, save() refuses
 // to write for the rest of the session rather than replace it.
 enum class Loaded { Missing, Read, PutAside, Stuck };
@@ -107,10 +119,18 @@ void    load();          // never throws; missing / broken file => defaults, per
 Loaded  loaded();
 bool    save();          // atomic write; false on failure (or Loaded::Stuck)
 // save() in two steps, so the write can be left to another thread: the
-// file's content now (false: Loaded::Stuck, nothing may be written), then
-// writing it. write() touches no config state: callable from any thread.
-bool    snapshot(std::string& text);
-bool    write(const std::string& text);
+// files' content now (false: Loaded::Stuck, nothing may be written), then
+// writing them. write() touches no config state: callable from any thread.
+// `shared` is config.json; `system` is this system's state.json
+// (paths::state_file(): the console lock, the extra-time record, a pending
+// relock, the firmware choice), so that one system's state never acts on
+// another (util/nand.hpp).
+struct Snapshot
+{
+    std::string shared, system;
+};
+bool    snapshot(Snapshot& snap);
+bool    write(const Snapshot& snap);
 // Puts every out-of-range value back to its default (load() calls it).
 void    sanitize(Config& c);
 

@@ -21,7 +21,7 @@ namespace
 outside_change_logic::Record s_rec;
 bool s_loaded = false;
 
-std::string file() { return paths::data_dir() + "/watch.json"; }
+std::string file() { return paths::nand_dir() + "/watch.json"; }
 
 void load_once()
 {
@@ -38,7 +38,7 @@ void save()
     const std::string text = outside_change_logic::serialize(s_rec);
     ui::write_later("watch", [text]() {
         std::string err;
-        if (!paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(file(), text, &err))
+        if (!paths::ensure_dir(paths::nand_dir()) || !paths::atomic_write(file(), text, &err))
             brls::Logger::warning("watch: not saved ({})", err);
     }, "watch");
 }

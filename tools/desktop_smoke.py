@@ -72,25 +72,27 @@ os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
 config_file = os.path.join(run_dir, "playguard_data", "config.json")
+# What belongs to the simulated system (a sysMMC: util/nand.hpp): its history,
+# watch.json, backups and play-data cache.
+nand_dir = os.path.join(run_dir, "playguard_data", "nand", "sysmmc")
 if (GATE or ERRORS or DEVBUILD) and os.path.exists(config_file):
     os.remove(config_file)   # no remembered choice, developer mode off
 if DEVBUILD:
     # The pull requests by number (Y on the builds' screen; the keyboard has no Y).
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
     json.dump({"schema": 1, "dev_builds_order": "number"}, open(config_file, "w"))
-block_ref = os.path.join(run_dir, "playguard_data", "logs", "play_timer_block.json")
+block_ref = os.path.join(run_dir, "playguard_data", "logs", "play_timer", "block.json")
 if GATE and os.path.exists(block_ref):
     os.remove(block_ref)     # the developer tool must write a new one
 # What the developer tools' cleanup must remove, and what it must keep.
 logs_dir = os.path.join(run_dir, "playguard_data", "logs")
 cache_dir = os.path.join(run_dir, "playguard_data", "cache")
-old_logs = [os.path.join(logs_dir, n) for n in ("crash.txt", "20261008_120000.txt")]
-uploads = os.path.join(logs_dir, "uploads.txt")
+old_logs = [os.path.join(logs_dir, n) for n in ("crashes/crash_20261008_120000.txt", "reports/report_20261008_120000.txt")]
+uploads = os.path.join(logs_dir, "uploads", "upload_20261008_120000.txt")
 stale_cache = os.path.join(cache_dir, "stale.bin")
 if GATE:
-    os.makedirs(logs_dir, exist_ok=True)
-    os.makedirs(cache_dir, exist_ok=True)
     for path in old_logs + [uploads, stale_cache]:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w") as f:
             f.write("smoke test\n")
 
@@ -189,7 +191,7 @@ if RESCUE:
     report = os.path.join(run_dir, "playguard_data", "rescue_report.txt")
     os.makedirs(os.path.dirname(report), exist_ok=True)
     open(report, "w").write("mode=unlock\nresult=ok\nrc=0x00000000\nunlocks=1\n")
-    history = os.path.join(run_dir, "playguard_data", "history.json")
+    history = os.path.join(nand_dir, "history.json")
     if os.path.exists(history):
         os.remove(history)   # a clean history: the rescue entry must be the only one
 if FORGED:
@@ -217,12 +219,12 @@ if OUTSIDE:
     # Saturday (the console has 3 h), and only Alice of the two accounts
     # (Léo is new).
     env.setdefault("PLAYGUARD_SIM_NOT_COUNTING", "1")
-    watch_file = os.path.join(run_dir, "playguard_data", "watch.json")
+    watch_file = os.path.join(nand_dir, "watch.json")
     os.makedirs(os.path.dirname(watch_file), exist_ok=True)
     json.dump({"schema": 1, "date": "2026-10-08", "spent_s": 6000, "offset_s": 900, "steady_id": "53" * 16,
                "limits": [180, 120, 120, 120, 120, 120, 90],
                "accounts": [{"id": "%016X%016X" % (1, 1), "since": "2026-09-01"}]}, open(watch_file, "w"))
-    history_file = os.path.join(run_dir, "playguard_data", "history.json")
+    history_file = os.path.join(nand_dir, "history.json")
     if os.path.exists(history_file):
         os.remove(history_file)   # the outside_* entries must be this run's
 if LOCK:
@@ -421,7 +423,7 @@ if GATE:
     time.sleep(4.5)            # its toast gone: the next screens are references
     # The cleanup tools, just above the report (read-only mode allows them:
     # nothing on the console changes): a confirmation, then a result screen.
-    # The log files go but uploads.txt and the block reference just saved;
+    # The log files go but the upload links and the block reference just saved;
     # the cache's files go, its folder stays.
     key("Up", 2)               # Delete the log files
     key("Return")
@@ -433,7 +435,7 @@ if GATE:
     if any(os.path.exists(p) for p in old_logs):
         fail("Delete the log files left " + repr([p for p in old_logs if os.path.exists(p)]))
     if not os.path.exists(uploads) or not os.path.exists(block_ref):
-        fail("Delete the log files removed uploads.txt or the block reference")
+        fail("Delete the log files removed an upload link or the block reference")
     key("Up")                  # Clear the cache
     key("Return")
     shot("06e_clear_cache")
@@ -554,7 +556,7 @@ if ERRORS:
     shot("05_clock_autosync_off")
     # No time server answers: measuring offers the console clock instead,
     # behind the same confirmation as a measured time.
-    history_file = os.path.join(run_dir, "playguard_data", "history.json")
+    history_file = os.path.join(nand_dir, "history.json")
     def clock_entries():
         try:
             return [e for e in json.load(open(history_file)).get("entries", []) if e.get("kind") == "clock"]
@@ -693,7 +695,7 @@ if RESCUE:
         fail("the rescue report was not removed after it was read")
 
     def recorded():
-        history = os.path.join(run_dir, "playguard_data", "history.json")
+        history = os.path.join(nand_dir, "history.json")
         try:
             entries = json.load(open(history)).get("entries", [])
         except (OSError, ValueError) as e:
@@ -785,7 +787,7 @@ key("Left")                # back to the sidebar
 key("Down", steps("play_timer", "tools"))
 key("Right")               # First steps…
 key("Down", 2)             # past the change history: Back up the settings
-backups = os.path.join(run_dir, "playguard_data", "backups")
+backups = os.path.join(nand_dir, "backups")
 before = len(os.listdir(backups)) if os.path.isdir(backups) else 0
 key("Return")              # Back up the settings
 shot("24_backup_saved")
@@ -800,12 +802,19 @@ key("Escape")
 shot("27_back")
 
 # Send a report online: the confirmation, then the link and its QR codes.
-uploads = os.path.join(run_dir, "playguard_data", "logs", "uploads.txt")
+uploads = os.path.join(run_dir, "playguard_data", "logs", "uploads")
 def upload_count():
-    return open(uploads).read().count("https://bpa.st/SMOKE") if os.path.exists(uploads) else 0
+    # One file per link (logs/uploads/upload_<date>.txt); a run pruned by the
+    # default limit (the 20 newest) counts the same.
+    if not os.path.isdir(uploads):
+        return 0
+    return sum(1 for f in os.listdir(uploads) if f.startswith("upload_") and f.endswith(".txt")
+               and "https://" in open(os.path.join(uploads, f)).read())
 uploads_before = upload_count()
-logs = os.path.join(run_dir, "playguard_data", "logs")
-saved = [f for f in (os.listdir(logs) if os.path.isdir(logs) else []) if f[:8].isdigit() and f.endswith(".txt")]
+reports = os.path.join(run_dir, "playguard_data", "logs", "reports")
+def saved_reports():
+    return [f for f in (os.listdir(reports) if os.path.isdir(reports) else []) if f.startswith("report_") and f.endswith(".txt")]
+saved = saved_reports()
 key("Down", 3)             # past Keep, Export: Send a report online
 key("Return")
 if saved:                  # reports saved by an earlier local run: this report is the first choice
@@ -820,7 +829,7 @@ key("Return")              # OK
 # Signed in to GitHub: where to send it comes first, a secret gist by default.
 open(github_token, "w").write("ghu_smoke")
 key("Return")              # Send a report online (still focused)
-if any(f[:8].isdigit() and f.endswith(".txt") for f in os.listdir(logs)):
+if saved_reports():
     key("Return")          # this report, the first choice
 shot("27_upload_host")
 key("Return")              # Secret gist on GitHub

@@ -15,7 +15,7 @@
 // The earlier OAuth app's tokens ("gho_…") are refused the artifacts: token()
 // reads one as none, so the next opening asks to sign in again.
 //
-// The token is kept in its own file, sd:/switch/playguard/github_token,
+// The token is kept in its own file, sd:/config/playguard/github_token,
 // never in config.json, which "Send a report online" sends.
 //
 // Parsing and the token file are plain C++ for the host tests

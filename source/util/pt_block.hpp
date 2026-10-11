@@ -1,6 +1,6 @@
 // pt_block — the raw PlayTimerSettings block (0x44 bytes, core/pure.h) as a
 // developer tool: written down once as a reference on the SD card
-// (sd:/switch/playguard/logs/play_timer_block.json), then compared with the
+// (sd:/config/playguard/logs/play_timer/block.json), then compared with the
 // block read later, after one setting was changed in the companion app. The
 // values that changed tell which field holds that setting ("alarm only" vs
 // "suspend the software"…, or confirm the bedtime fields, core/pure.h).

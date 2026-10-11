@@ -24,10 +24,10 @@ static void test_files()
 
     CHECK(paths::ensure_dir(paths::logs_dir()));
     write(paths::config_file(), "{\"pin_lock\": \"off\"}");
-    write(paths::logs_dir() + "/play_timer_block.json", "{}");
+    write(paths::play_timer_dir() + "/block.json", "{}");
     auto files = log_upload::debug_files();
     CHECK(files.size() == 2);
-    CHECK(files[0].name == "logs/play_timer_block.json" && files[0].content == "{}");
+    CHECK(files[0].name == "logs/play_timer/block.json" && files[0].content == "{}");
     CHECK(files[1].name == "config.json");
     write(paths::history_file(), "[]");
     files = log_upload::debug_files();
@@ -43,22 +43,23 @@ static void test_files()
     for (int i = 0; i < 5000; i++) csv += "2026-10-09 20:10:52,1791569454,0,1,0,0,1428,5772,7200,,\n";
     write(pt_log::path(), csv);
     files = log_upload::debug_files();
-    CHECK(files.size() == 4 && files[1].name == "logs/play_timer_log.csv" && files[2].name == "history.json");
+    CHECK(files.size() == 4 && files[1].name == "logs/play_timer/log.csv" && files[2].name == "history.json");
     CHECK(files[1].content.size() <= log_upload::PT_LOG_BYTES && files[1].content.size() > 40000);
     CHECK(files[1].content.compare(0, pt_log::header().size(), pt_log::header()) == 0);
     CHECK(std::remove(pt_log::path().c_str()) == 0);
 
-    write(paths::logs_dir() + "/20261008_090000.txt", "a");
-    write(paths::logs_dir() + "/20261009_141203.txt", "b");
-    write(paths::logs_dir() + "/20261009_141203_1.txt", "c");
-    write(paths::logs_dir() + "/notes.txt", "not a report");
-    write(paths::logs_dir() + "/2026100_x.txt", "not a report");
+    write(paths::reports_dir() + "/report_20261008_090000.txt", "a");
+    write(paths::reports_dir() + "/report_20261009_141203.txt", "b");
+    write(paths::reports_dir() + "/report_20261009_141203_1.txt", "c");
+    write(paths::reports_dir() + "/notes.txt", "not a report");
+    write(paths::reports_dir() + "/report_2026100_x.txt", "not a report");
+    write(paths::crashes_dir() + "/crash_20261010_090000.txt", "a crash, not a report");
     auto reports = log_upload::saved_reports();
     CHECK(reports.size() == 3);
-    CHECK(reports[0] == "20261009_141203_1.txt" && reports[1] == "20261009_141203.txt" &&
-           reports[2] == "20261008_090000.txt");
+    CHECK(reports[0] == "report_20261009_141203_1.txt" && reports[1] == "report_20261009_141203.txt" &&
+           reports[2] == "report_20261008_090000.txt");
     reports = log_upload::saved_reports(1);
-    CHECK(reports.size() == 1 && reports[0] == "20261009_141203_1.txt");
+    CHECK(reports.size() == 1 && reports[0] == "report_20261009_141203_1.txt");
 }
 
 static void test_bundle()
@@ -97,10 +98,10 @@ static void test_gist_files()
 {
     bool cut = true;
     // One file each, numbered in order: the report (a name without an
-    // extension) as report.txt, the others by their last component.
+    // extension) as report.txt, the others by their path under logs/.
     const std::vector<log_upload::Part> parts{ { "diagnostic report", "report\n" },
-                                               { "logs/play_timer_block.json", "{}" },
-                                               { "logs/play_timer_log.csv", "" },
+                                               { "logs/play_timer/block.json", "{}" },
+                                               { "logs/play_timer/log.csv", "" },
                                                { "history.json", "[]" } };
     const std::vector<log_upload::Part> f = log_upload::gist_files(parts, 1000, &cut);
     CHECK(!cut);
@@ -111,8 +112,8 @@ static void test_gist_files()
     CHECK(f[3].name == "4-history.json" && f[3].content == "[]");
     CHECK(log_upload::total_bytes(f) == 7 + 2 + 8 + 2);
     // A saved report keeps its own name; a translated label is still the report.
-    CHECK(log_upload::gist_files({ { "logs/20261009_141203.txt", "x" } }, 100, &cut)[0].name ==
-          "1-20261009_141203.txt");
+    CHECK(log_upload::gist_files({ { "logs/reports/report_20261009_141203.txt", "x" } }, 100, &cut)[0].name ==
+          "1-reports_report_20261009_141203.txt");
     CHECK(log_upload::gist_files({ { "rapport de diagnostic", "x" } }, 100, &cut)[0].name == "1-report.txt");
     CHECK(log_upload::gist_files({}, 100, &cut).empty() && !cut);
 

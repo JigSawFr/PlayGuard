@@ -33,7 +33,7 @@ body:
       label: The comparison
       description: |
         The values PlayGuard lists as changed: attach the file it saves in
-        `sd:/switch/playguard/logs/`, or paste its content.
+        `sd:/config/playguard/logs/reports/`, or paste its content.
     validations:
       required: true
 

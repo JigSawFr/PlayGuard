@@ -46,6 +46,6 @@ body:
     id: files
     attributes:
       label: Diagnostic report and play-timer comparison
-      description: Drag the files from `sd:/switch/playguard/logs/` here.
+      description: Drag the files from `sd:/config/playguard/logs/reports/` here.
     validations:
       required: true

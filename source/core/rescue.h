@@ -4,7 +4,7 @@
 //
 // A parent who forgot the PIN, while the play timer keeps every program from
 // starting (PlayGuard included), puts a file named RESCUE (or RESCUE.txt) in
-// sd:/switch/playguard/ from a computer and turns the console on:
+// sd:/config/playguard/ from a computer and turns the console on:
 //   - empty, or any text: the sysmodule unlocks parental controls temporarily
 //     with the stored PIN (as the PIN screen would), so PlayGuard can open;
 //   - a line that reads "delete" (any case, spaces around it ignored): the
@@ -33,7 +33,7 @@
 extern "C" {
 #endif
 
-// File names inside the data directory (sd:/switch/playguard/). The SD card's
+// File names inside the data directory (sd:/config/playguard/). The SD card's
 // file system ignores case, so "rescue.txt" is found too.
 #define RESCUE_REQUEST_NAME     "RESCUE"
 #define RESCUE_REQUEST_NAME_TXT "RESCUE.txt"

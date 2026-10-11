@@ -6,7 +6,9 @@
 
 #include <borealis/extern/nlohmann/json.hpp>
 
+#include "util/log_files.hpp"
 #include "util/paths.hpp"
+#include "util/pt_block.hpp"
 #include "util/pt_log.hpp"
 
 namespace log_upload
@@ -16,11 +18,11 @@ std::vector<Part> debug_files()
 {
     std::vector<Part> out;
     std::string content;
-    if (paths::read_file(paths::logs_dir() + "/play_timer_block.json", content))
-        out.push_back({ "logs/play_timer_block.json", content });
+    if (paths::read_file(pt_block::reference_path(), content))
+        out.push_back({ "logs/play_timer/block.json", content });
     // The recorder's file can reach megabytes: its last lines only.
     if (paths::read_file(pt_log::path(), content))
-        out.push_back({ "logs/play_timer_log.csv", pt_log::tail(content, PT_LOG_BYTES) });
+        out.push_back({ "logs/play_timer/log.csv", pt_log::tail(content, PT_LOG_BYTES) });
     if (paths::read_file(paths::history_file(), content)) out.push_back({ "history.json", content });
     if (paths::read_file(paths::config_file(), content)) out.push_back({ "config.json", content });
     return out;
@@ -28,13 +30,7 @@ std::vector<Part> debug_files()
 
 std::vector<std::string> saved_reports(size_t limit)
 {
-    // diagnostic::save names them by date ("20261009_141203[_n].txt"): the
-    // names sort by age. Other .txt files of logs/ are not reports.
-    std::vector<std::string> names;
-    for (const std::string& name : paths::list_files(paths::logs_dir(), ".txt"))
-        if (name.size() >= 19 && std::all_of(name.begin(), name.begin() + 8, ::isdigit) && name[8] == '_')
-            names.push_back(name);
-    std::sort(names.rbegin(), names.rend());
+    std::vector<std::string> names = log_files::list(paths::reports_dir(), log_files::REPORT);
     if (names.size() > limit) names.resize(limit);
     return names;
 }
@@ -73,10 +69,13 @@ std::vector<Part> gist_files(const std::vector<Part>& parts, size_t max_bytes, b
     size_t total = 0;
     if (truncated) *truncated = false;
     for (size_t i = 0; i < parts.size(); i++) {
-        const std::string& name = parts[i].name;
-        const std::string last = name.substr(name.find_last_of('/') + 1);
+        // Its path under logs/, its folders joined with "_" (a gist file
+        // name has no "/"): "logs/play_timer/block.json" is play_timer_block.json.
+        std::string name = parts[i].name;
+        if (name.compare(0, 5, "logs/") == 0) name.erase(0, 5);
+        std::replace(name.begin(), name.end(), '/', '_');
         const std::string file =
-            std::to_string(i + 1) + "-" + (last.find('.') == std::string::npos ? std::string("report.txt") : last);
+            std::to_string(i + 1) + "-" + (name.find('.') == std::string::npos ? std::string("report.txt") : name);
         const std::string content = parts[i].content.empty() ? std::string("(empty)\n") : parts[i].content;
         if (total + content.size() <= max_bytes) {
             out.push_back({ file, content });

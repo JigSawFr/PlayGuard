@@ -12,7 +12,7 @@ namespace diagnostic
 // never contains the PIN.
 std::string current_report();
 
-// Saves under sd:/switch/playguard/logs/<timestamp>.txt. Returns the
+// Saves as logs/reports/report_<timestamp>.txt (util/log_files.hpp). Returns the
 // saved path, or an empty string (and *error set) on failure.
 std::string save(const std::string& report, std::string* error = nullptr);
 

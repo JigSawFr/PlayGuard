@@ -14,7 +14,7 @@ the module leaves a report.
 ## What it does
 
 At boot the module looks for a file named `RESCUE` (or `RESCUE.txt`) in
-`sd:/switch/playguard/`:
+`sd:/config/playguard/` (where PlayGuard keeps its files):
 
 - **present, empty or any text** → it unlocks parental controls temporarily,
   using the PIN the console already stores, exactly as the system PIN screen
@@ -43,7 +43,7 @@ report is left.
 1. Install the module once: extract `playguard-rescue.zip` to the SD-card root
    (it lands in `atmosphere/contents/4200000000505247/`). Reboot.
 2. When you are locked out: put the SD card in a computer, create an empty file
-   `switch/playguard/RESCUE` (or `RESCUE.txt`; to delete everything instead,
+   `config/playguard/RESCUE` (or `RESCUE.txt`; to delete everything instead,
    write `delete` on a line of its own), put the card back, turn the
    console on. Open PlayGuard and finish from the recovery screen.
 3. Remove `atmosphere/contents/4200000000505247` when you no longer need it:

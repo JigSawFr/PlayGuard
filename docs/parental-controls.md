@@ -439,7 +439,7 @@ From the same 20:10 report:
    changed.
    For what changes over time (the time spent, 1459, a reset at midnight),
    turn on *Developer tools › Record the play timer* instead: one CSV line
-   every 30 s in `logs/play_timer_log.csv` while PlayGuard is open (its own
+   every 30 s in `logs/play_timer/log.csv` while PlayGuard is open (its own
    time counts, so the time runs down with PlayGuard alone). The two hex
    columns are written only when they change. The last column, `event`, says
    why a line was written off the 30 s tick: `recording started`, each change

@@ -1,5 +1,5 @@
 // history — what PlayGuard changed on the console, kept on the SD card
-// (sd:/switch/playguard/history.json, the newest 200 changes), so a parent
+// (sd:/config/playguard/history.json, the newest 200 changes), so a parent
 // can see who-did-what from this app and put a value back. Values are stored
 // raw (minutes, levels, 0/1) and worded by the UI when shown, in the language
 // of the moment. No UI and no console calls: host-tested (tests/history).
