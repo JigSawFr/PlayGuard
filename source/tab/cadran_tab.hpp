@@ -1,5 +1,6 @@
-// CadranTab — "Cadran" prototype of the Overview (desktop simulation only, with
-// PLAYGUARD_SIM_CADRAN=1), after the design boards: today's time left as a
+// CadranTab — "Cadran" prototype of the Overview (PLAYGUARD_SIM_CADRAN=1 on
+// the desktop, Tools › Developer › Cadran prototype on the console), after
+// the design boards: today's time left as a
 // ring, the two everyday actions under it, three state cards, a line of
 // "all fine" pills; the navy theme, an icon rail for a sidebar, the mark and
 // a status pill in the header, a glow behind the whole screen. Same readings as DashboardTab, refreshed every
@@ -15,6 +16,10 @@
 
 namespace cadran
 {
+// Whether the prototype replaces the current screens: PLAYGUARD_SIM_CADRAN=1
+// on the desktop; config cadran (Tools › Developer) while the developer
+// mode is on. Read at start-up: a change takes effect at the next launch.
+bool enabled();
 // The boards' two palettes on borealis' two variants (dark: navy; light:
 // cool white), the rail's metrics and the display font: before any view.
 void install_theme();

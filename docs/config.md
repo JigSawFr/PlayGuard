@@ -117,6 +117,8 @@ Set in *About*.
 | `dev_mode` | boolean | the developer tools (seven presses on *About › Version*) | `false` |
 | `pt_log` | boolean | *Developer tools › Record the play timer* (`logs/play_timer/log.csv`) | `false` |
 | `dev_builds_order` | string | how *Developer tools › Install another build* orders the pull requests (Ⓨ there): `"newest"` (the newest build first) or `"number"` (the highest number first); main's commits are always newest first | `"newest"` |
+| `frame_stats` | boolean | *Developer tools › Frame statistics* (`logs/frame_stats.txt`: one line per second, the UI thread's time per frame and the late frames, to weigh one screen against another on the console) | `false` |
+| `cadran` | boolean | *Developer tools › Cadran prototype*: the screens after the design boards instead of the current ones, read at start-up, only while the developer tools are on | `false` |
 
 ## State kept between launches
 
@@ -213,6 +215,8 @@ line; the order does not matter when it reads them:
   "seen_version": "",
   "dev_mode": false,
   "pt_log": false,
+  "frame_stats": false,
+  "cadran": false,
   "dev_builds_order": "newest",
   "extra_auto_restore": false
 }

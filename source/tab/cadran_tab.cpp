@@ -12,9 +12,18 @@
 #include "action/pt_flow.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
+#include "util/config.hpp"
 #include "view/cadran_icon.hpp"
 
 using namespace brls::literals;
+
+bool cadran::enabled()
+{
+#ifndef __SWITCH__
+    if (std::getenv("PLAYGUARD_SIM_CADRAN")) return true;
+#endif
+    return app::dev_mode() && config::get().cadran;
+}
 
 void cadran::install_theme()
 {

@@ -19,6 +19,9 @@ class ToolsTab : public TabBase
 
   private:
     bool serial_revealed = false;   // until the tab is left (tabs are rebuilt when reopened)
+    brls::RepeatingTimer stats_timer;   // the frame statistics' last line, every second while they run
+
+    void update_frame_stats();
 
     BRLS_BIND(brls::DetailCell,  first_steps, "tl_first_steps");
     BRLS_BIND(brls::DetailCell,  history, "tl_history");
@@ -49,6 +52,11 @@ class ToolsTab : public TabBase
     BRLS_BIND(brls::BooleanCell, dev_read_only, "tl_dev_read_only");
     BRLS_BIND(brls::BooleanCell, dev_pt_log,  "tl_dev_pt_log");
     BRLS_BIND(brls::Label,       dev_pt_log_note, "tl_dev_pt_log_note");
+    BRLS_BIND(brls::BooleanCell, dev_frame_stats, "tl_dev_frame_stats");
+    BRLS_BIND(brls::Label,       dev_frame_stats_note, "tl_dev_frame_stats_note");
+    BRLS_BIND(brls::Label,       dev_frame_stats_last, "tl_dev_frame_stats_last");
+    BRLS_BIND(brls::BooleanCell, dev_cadran,  "tl_dev_cadran");
+    BRLS_BIND(brls::Label,       dev_cadran_note, "tl_dev_cadran_note");
     BRLS_BIND(brls::DetailCell,  dev_clear_cache, "tl_dev_clear_cache");
     BRLS_BIND(brls::DetailCell,  dev_clear_logs, "tl_dev_clear_logs");
     BRLS_BIND(brls::DetailCell,  dev_report,  "tl_dev_report");

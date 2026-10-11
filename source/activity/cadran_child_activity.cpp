@@ -3,11 +3,13 @@
 
 #include <fmt/format.h>
 
+#include "action/frame_stats_flow.hpp"
 #include "tab/cadran_tab.hpp"
 #include "ui/ui.hpp"
 
 void CadranChildActivity::onContentAvailable()
 {
+    frame_stats_flow::set_screen("activity/cadran_child");
     auto* frame = dynamic_cast<brls::AppletFrame*>(this->getContentView());
     if (frame) frame->addView(cadran::make_glow(640.0f, 330.0f, 330.0f, "cadran/glow_strong"), 0);
     cadran::style_header(frame, "lock", "Écran enfant · code PIN pour revenir", false, false);

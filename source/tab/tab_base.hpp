@@ -31,6 +31,7 @@ class TabBase : public brls::Box
 
   private:
     brls::RepeatingTimer auto_timer;
+    std::string screen;   // "tab/overview": how the frame statistics name this tab
 
     void update_ro_note();
 };
