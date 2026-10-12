@@ -62,5 +62,6 @@ Actions › **release-page** › Run workflow, with its tag (empty: the latest):
 the page as the release job would lay it out, on the run page only; tick
 *apply* to update the release. A way to try the key, the model or the prompt,
 to lay out a release published before this existed, or to add a summary
-merged after its release. A page already laid out (a `<details>` block) is
-left as it is: to redo it, put release-please's notes back first.
+merged after its release. A page laid out before is laid out again from its
+folded lists, with the file's summary if there is one, else the one already
+on the page (no second call to OpenRouter); the same page is not edited.
