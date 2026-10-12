@@ -69,7 +69,8 @@ static void test_names()
 static void test_release()
 {
     Build b;
-    const std::string rel = R"({"tag_name": "v1.2.0", "prerelease": false, "draft": false, "assets": [
+    const std::string rel = R"({"tag_name": "v1.2.0", "prerelease": false, "draft": false,
+        "body": "## [1.2.0](x) (2026-10-01)\n\n### Features\n\n* in place", "assets": [
         {"name": "playguard.zip", "size": 9, "updated_at": "x", "browser_download_url": "https://x/z"},
         {"name": "playguard.nro", "size": 1000, "updated_at": "2026-10-01T00:00:00Z",
          "browser_download_url": "https://github.com/o/r/releases/download/v1.2.0/playguard.nro",
@@ -77,6 +78,14 @@ static void test_release()
     CHECK(dev_builds::parse_release(rel, &b));
     CHECK(b.kind == Kind::Release && !b.artifact && b.version == "1.2.0" && b.size == 1000 &&
            b.sha256 == std::string(64, 'c') && b.url.find("playguard.nro") != std::string::npos);
+    CHECK(b.notes == "## [1.2.0](x) (2026-10-01)\n\n### Features\n\n* in place");
+    // Long notes are cut on a whole line.
+    std::string body;
+    while (body.size() <= 2 * dev_builds::MAX_NOTES) body += "* a line of notes\\n";
+    std::string longer = rel;
+    longer.replace(longer.find("## [1.2.0]"), 0, body);
+    CHECK(dev_builds::parse_release(longer, &b));
+    CHECK(b.notes.size() <= dev_builds::MAX_NOTES && !b.notes.empty() && b.notes.back() == 's');   // "…notes", not half a line
     const char* bad[] = {
         R"({"tag_name": "v1", "prerelease": true, "draft": false, "assets": [{"name": "playguard.nro", "size": 1, "browser_download_url": "https://x"}]})",
         R"({"tag_name": "v1", "prerelease": false, "draft": true, "assets": [{"name": "playguard.nro", "size": 1, "browser_download_url": "https://x"}]})",

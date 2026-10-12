@@ -45,7 +45,7 @@ int main()
 
     using launcher::Store;
     // Nothing installed: no store, whatever the preference.
-    for (const char* pref : { "auto", "sphaira", "appstore", "manual" }) CHECK(launcher::find(pref).store == Store::None);
+    for (const char* pref : { "", "auto", "sphaira", "appstore", "manual", "inplace" }) CHECK(launcher::find(pref).store == Store::None);
 
     // A folder under a store's name is not the store.
     CHECK(std::system("mkdir -p playguard_data/sd/switch/appstore/appstore.nro") == 0);
@@ -54,6 +54,8 @@ int main()
 
     install("/switch/appstore/appstore.nro");
     CHECK(launcher::find("auto").store == Store::AppStore);
+    CHECK(launcher::find("").store == Store::AppStore);          // not chosen yet: as auto
+    CHECK(launcher::find("inplace").store == Store::None);       // PlayGuard itself, not a store
     CHECK(launcher::find("sphaira").store == Store::None);
     install("/switch/sphaira.nro");   // sphaira's second place
     CHECK(launcher::find("auto").path == "/switch/sphaira.nro");

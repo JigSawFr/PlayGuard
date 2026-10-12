@@ -731,10 +731,12 @@
         "source": "Código fuente",
         "update_via": "Actualizar con",
         "update_via_values": {
+            "inplace": "En PlayGuard (descarga y reinicia)",
             "auto": "Automático (sphaira o App Store)",
             "sphaira": "sphaira",
             "appstore": "Homebrew App Store",
-            "manual": "A mano"
+            "manual": "A mano",
+            "unset": "Aún sin elegir"
         },
         "update": "Buscar actualizaciones",
         "update_daily": "Buscar actualizaciones cada día",
@@ -797,8 +799,6 @@
     },
     "update": {
         "checking": "Buscando actualizaciones...",
-        "available": "PlayGuard {} está disponible (versión actual: {}).",
-        "available_toast": "PlayGuard {} está disponible: Acerca de › Buscar actualizaciones.",
         "available_no_fw": "Aún no es compatible con el firmware {}.",
         "up_to_date": "PlayGuard {} es la versión más reciente.",
         "no_release": "Todavía no se ha publicado ninguna versión de PlayGuard: {} es una versión de desarrollo.",
@@ -808,7 +808,23 @@
         "open_confirm": "Abrir {}",
         "update_with": "Actualizar con {}",
         "update_manual": "Cómo actualizar",
-        "appstore": "Homebrew App Store"
+        "appstore": "Homebrew App Store",
+        "title": "Actualización disponible",
+        "headline": "PlayGuard {} está disponible",
+        "running": "Tienes PlayGuard {}.",
+        "released": "Publicada el {}.",
+        "notes_none": "No se pudieron leer las notas de esta versión. Todas las versiones: {}",
+        "update": "Actualizar",
+        "update_now": "Actualizar ahora",
+        "recommended": "{} (recomendado)",
+        "method_title": "¿Cómo debe actualizarse PlayGuard?",
+        "later_title": "Recordármelo en",
+        "later_day": "1 día",
+        "later_week": "1 semana",
+        "later_days": "{} días",
+        "later_done": "Recordatorio aplazado al {}.",
+        "inplace_body": "PlayGuard descargará la versión {}, la comprobará, la pondrá en lugar de esta y se reiniciará con ella. Tus ajustes se conservan.",
+        "inplace_confirm": "Actualizar"
     },
     "upload": {
         "pick": "Qué enviar",

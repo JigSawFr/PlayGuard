@@ -731,10 +731,12 @@
         "source": "Broncode",
         "update_via": "Bijwerken met",
         "update_via_values": {
+            "inplace": "In PlayGuard (downloadt en herstart)",
             "auto": "Automatisch (sphaira, anders App Store)",
             "sphaira": "sphaira",
             "appstore": "Homebrew App Store",
-            "manual": "Handmatig"
+            "manual": "Handmatig",
+            "unset": "Nog niet gekozen"
         },
         "update": "Op updates controleren",
         "update_daily": "Elke dag op updates controleren",
@@ -797,8 +799,6 @@
     },
     "update": {
         "checking": "Controleren op updates...",
-        "available": "PlayGuard {} is beschikbaar (je hebt {}).",
-        "available_toast": "PlayGuard {} is beschikbaar: Info › Op updates controleren.",
         "available_no_fw": "Die versie ondersteunt firmware {} nog niet.",
         "up_to_date": "PlayGuard {} is de nieuwste versie.",
         "no_release": "Er is nog geen PlayGuard-versie gepubliceerd: {} is een ontwikkelversie.",
@@ -808,7 +808,23 @@
         "open_confirm": "{} openen",
         "update_with": "Bijwerken met {}",
         "update_manual": "Zo werk je bij",
-        "appstore": "Homebrew App Store"
+        "appstore": "Homebrew App Store",
+        "title": "Update beschikbaar",
+        "headline": "PlayGuard {} is beschikbaar",
+        "running": "Je hebt PlayGuard {}.",
+        "released": "Uitgebracht op {}.",
+        "notes_none": "De notities van deze versie konden niet worden gelezen. Alle versies: {}",
+        "update": "Bijwerken",
+        "update_now": "Nu bijwerken",
+        "recommended": "{} (aanbevolen)",
+        "method_title": "Hoe moet PlayGuard worden bijgewerkt?",
+        "later_title": "Herinner me over",
+        "later_day": "1 dag",
+        "later_week": "1 week",
+        "later_days": "{} dagen",
+        "later_done": "Herinnering uitgesteld tot {}.",
+        "inplace_body": "PlayGuard downloadt versie {}, controleert die, zet die in de plaats van deze en herstart ermee. Je instellingen blijven behouden.",
+        "inplace_confirm": "Bijwerken"
     },
     "upload": {
         "pick": "Wat versturen",

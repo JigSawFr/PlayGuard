@@ -731,10 +731,12 @@
         "source": "Código-fonte",
         "update_via": "Atualizar com",
         "update_via_values": {
+            "inplace": "No PlayGuard (baixa e reinicia)",
             "auto": "Automático (sphaira, senão App Store)",
             "sphaira": "sphaira",
             "appstore": "Homebrew App Store",
-            "manual": "Manualmente"
+            "manual": "Manualmente",
+            "unset": "Ainda não escolhido"
         },
         "update": "Procurar atualizações",
         "update_daily": "Procurar atualizações todos os dias",
@@ -797,8 +799,6 @@
     },
     "update": {
         "checking": "Procurando atualizações...",
-        "available": "O PlayGuard {} está disponível (você tem a {}).",
-        "available_toast": "O PlayGuard {} está disponível: Sobre › Procurar atualizações.",
         "available_no_fw": "Ele ainda não é compatível com o firmware {}.",
         "up_to_date": "O PlayGuard {} é a versão mais recente.",
         "no_release": "Nenhuma versão do PlayGuard foi publicada ainda: {} é uma versão de desenvolvimento.",
@@ -808,7 +808,23 @@
         "open_confirm": "Abrir {}",
         "update_with": "Atualizar com {}",
         "update_manual": "Como atualizar",
-        "appstore": "Homebrew App Store"
+        "appstore": "Homebrew App Store",
+        "title": "Atualização disponível",
+        "headline": "O PlayGuard {} está disponível",
+        "running": "Você tem o PlayGuard {}.",
+        "released": "Publicada em {}.",
+        "notes_none": "Não foi possível ler as notas desta versão. Todas as versões: {}",
+        "update": "Atualizar",
+        "update_now": "Atualizar agora",
+        "recommended": "{} (recomendado)",
+        "method_title": "Como o PlayGuard deve ser atualizado?",
+        "later_title": "Lembrar daqui a",
+        "later_day": "1 dia",
+        "later_week": "1 semana",
+        "later_days": "{} dias",
+        "later_done": "Lembrete adiado para {}.",
+        "inplace_body": "O PlayGuard vai baixar a versão {}, verificá-la, colocá-la no lugar desta e reiniciar com ela. Suas configurações são mantidas.",
+        "inplace_confirm": "Atualizar"
     },
     "upload": {
         "pick": "O que enviar",

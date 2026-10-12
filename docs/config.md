@@ -95,9 +95,12 @@ Set in *About*.
 
 | Key | Type | Values | Default |
 |---|---|---|---|
-| `update_via` | string | how an update is installed: `"auto"` (Sphaira if installed, else the Homebrew App Store), `"sphaira"`, `"appstore"`, `"manual"` (only say an update exists) | `"auto"` |
+| `update_via` | string | how an update is installed: `""` (not chosen yet: asked on the first update), `"inplace"` (PlayGuard downloads the release, checks it, replaces itself and restarts), `"auto"` (Sphaira if installed, else the Homebrew App Store), `"sphaira"`, `"appstore"`, `"manual"` (only say how) | `""` |
 | `update_daily` | boolean | checks for an update at start-up, once a day | `false` |
 | `update_checked` | string | `"YYYY-MM-DD"` of the last check; anything else is cleared | `""` |
+| `update_latest` | string | the latest release the last check found; while newer than the running version, start-up checks again and opens the update screen | `""` |
+| `update_snooze_version` | string | the release whose screen *Later* postponed (cleared with `update_snooze_until` when either is malformed) | `""` |
+| `update_snooze_until` | string | `"YYYY-MM-DD"`: that release is offered again from that day (30 days at most; a farther date is ignored) | `""` |
 
 ## Reminders
 
@@ -199,9 +202,12 @@ line; the order does not matter when it reads them:
   "pin_lock": "open",
   "ntp_server": "",
   "custom_servers": [],
-  "update_via": "auto",
+  "update_via": "",
   "update_daily": false,
   "update_checked": "",
+  "update_latest": "",
+  "update_snooze_version": "",
+  "update_snooze_until": "",
   "support_reminder": true,
   "support_reminded": "",
   "seen_version": "",

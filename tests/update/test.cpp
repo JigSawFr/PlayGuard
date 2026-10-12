@@ -84,10 +84,43 @@ static void test_decide()
     CHECK(update::decide(0, "1.0.0", l) == Verdict::UpdateNoSupport);           // unknown console firmware
 }
 
+static void test_snooze()
+{
+    CHECK(update::add_days("2026-10-12", 7) == "2026-10-19");
+    CHECK(update::add_days("2026-10-12", 30) == "2026-11-11");
+    CHECK(update::add_days("2026-12-25", 10) == "2027-01-04");
+    CHECK(update::add_days("2028-02-28", 1) == "2028-02-29");   // leap year
+    CHECK(update::add_days("2026-02-28", 1) == "2026-03-01");
+    CHECK(update::add_days("2026-03-01", -1) == "2026-02-28");
+    CHECK(update::add_days("2026-02-30", 1).empty());
+    CHECK(update::add_days("2026-1-01", 1).empty());
+    CHECK(update::add_days("", 1).empty());
+
+    const update::Snooze none;
+    CHECK(update::offer_at_start("1.2.0", "1.1.0", none, "2026-10-12"));
+    CHECK(!update::offer_at_start("1.1.0", "1.1.0", none, "2026-10-12"));    // already running it
+    CHECK(!update::offer_at_start("1.0.0", "1.1.0", none, "2026-10-12"));
+    CHECK(!update::offer_at_start("", "1.1.0", none, "2026-10-12"));         // never checked
+    CHECK(!update::offer_at_start("garbage", "1.1.0", none, "2026-10-12"));
+    CHECK(update::offer_at_start("1.0.0", "1.0.0-dev", none, "2026-10-12"));   // a dev build of it
+
+    const update::Snooze week{ "1.2.0", "2026-10-19" };
+    CHECK(!update::offer_at_start("1.2.0", "1.1.0", week, "2026-10-12"));
+    CHECK(!update::offer_at_start("1.2.0", "1.1.0", week, "2026-10-18"));
+    CHECK(update::offer_at_start("1.2.0", "1.1.0", week, "2026-10-19"));      // the day it ends
+    CHECK(update::offer_at_start("1.3.0", "1.1.0", week, "2026-10-12"));      // a newer release
+    CHECK(!update::offer_at_start("1.2.0", "1.1.0", { "1.2.0", "2026-11-11" }, "2026-10-12"));   // 30 days
+    CHECK(update::offer_at_start("1.2.0", "1.1.0", { "1.2.0", "2026-11-12" }, "2026-10-12"));   // 31: ignored
+    CHECK(update::offer_at_start("1.2.0", "1.1.0", { "1.2.0", "2027-10-12" }, "2026-10-12"));   // clock set back
+    CHECK(update::offer_at_start("1.2.0", "1.1.0", { "1.2.0", "bad" }, "2026-10-12"));
+    CHECK(update::offer_at_start("1.2.0", "1.1.0", week, ""));
+}
+
 int main()
 {
     test_versions();
     test_compat();
     test_decide();
-    return CHECK_DONE("update version, compat.json and decision assertions passed");
+    test_snooze();
+    return CHECK_DONE("update version, compat.json, decision and postponement assertions passed");
 }

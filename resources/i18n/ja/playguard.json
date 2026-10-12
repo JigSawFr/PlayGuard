@@ -731,10 +731,12 @@
         "source": "ソースコード",
         "update_via": "アップデート方法",
         "update_via_values": {
+            "inplace": "PlayGuard 内で(ダウンロードして再起動)",
             "auto": "自動（sphaira、なければApp Store）",
             "sphaira": "sphaira",
             "appstore": "Homebrew App Store",
-            "manual": "手動"
+            "manual": "手動",
+            "unset": "未選択"
         },
         "update": "アップデートを確認",
         "update_daily": "毎日アップデートを確認",
@@ -797,8 +799,6 @@
     },
     "update": {
         "checking": "アップデートを確認しています…",
-        "available": "PlayGuard {}が公開されています（現在は{}）。",
-        "available_toast": "PlayGuard {}が公開されています：「情報 › アップデートを確認」",
         "available_no_fw": "ファームウェア{}にはまだ対応していません。",
         "up_to_date": "PlayGuard {}は最新バージョンです。",
         "no_release": "PlayGuard のリリースはまだ公開されていません：{} は開発版です。",
@@ -808,7 +808,23 @@
         "open_confirm": "{}を開く",
         "update_with": "{}でアップデート",
         "update_manual": "アップデートの方法",
-        "appstore": "Homebrew App Store"
+        "appstore": "Homebrew App Store",
+        "title": "アップデートがあります",
+        "headline": "PlayGuard {} が利用できます",
+        "running": "現在のバージョン:PlayGuard {}。",
+        "released": "公開日:{}。",
+        "notes_none": "このバージョンのノートを読み込めませんでした。すべてのバージョン:{}",
+        "update": "アップデート",
+        "update_now": "今すぐアップデート",
+        "recommended": "{}(おすすめ)",
+        "method_title": "PlayGuard のアップデート方法は?",
+        "later_title": "あとで通知",
+        "later_day": "1日後",
+        "later_week": "1週間後",
+        "later_days": "{}日後",
+        "later_done": "{} まで通知を延期しました。",
+        "inplace_body": "PlayGuard はバージョン {} をダウンロードして確認し、このバージョンと置き換えて再起動します。設定はそのまま残ります。",
+        "inplace_confirm": "アップデート"
     },
     "upload": {
         "pick": "送信する内容",

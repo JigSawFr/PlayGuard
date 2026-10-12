@@ -731,10 +731,12 @@
         "source": "소스 코드",
         "update_via": "업데이트 방법",
         "update_via_values": {
+            "inplace": "PlayGuard에서 (다운로드 후 재시작)",
             "auto": "자동 (sphaira, 없으면 App Store)",
             "sphaira": "sphaira",
             "appstore": "Homebrew App Store",
-            "manual": "수동"
+            "manual": "수동",
+            "unset": "아직 선택 안 함"
         },
         "update": "업데이트 확인",
         "update_daily": "매일 업데이트 확인",
@@ -797,8 +799,6 @@
     },
     "update": {
         "checking": "업데이트 확인 중...",
-        "available": "PlayGuard {} 버전이 나왔습니다(현재 버전: {}).",
-        "available_toast": "PlayGuard {} 버전이 나왔습니다: 정보 › 업데이트 확인.",
         "available_no_fw": "이 버전은 아직 펌웨어 {} 버전을 지원하지 않습니다.",
         "up_to_date": "최신 버전(PlayGuard {})을 사용 중입니다.",
         "no_release": "아직 공개된 PlayGuard 릴리스가 없습니다: {}은(는) 개발 버전입니다.",
@@ -808,7 +808,23 @@
         "open_confirm": "{} 열기",
         "update_with": "{}로 업데이트",
         "update_manual": "업데이트 방법",
-        "appstore": "Homebrew App Store"
+        "appstore": "Homebrew App Store",
+        "title": "업데이트 가능",
+        "headline": "PlayGuard {} 사용 가능",
+        "running": "현재 버전: PlayGuard {}.",
+        "released": "출시일: {}.",
+        "notes_none": "이 버전의 노트를 읽을 수 없습니다. 모든 버전: {}",
+        "update": "업데이트",
+        "update_now": "지금 업데이트",
+        "recommended": "{} (권장)",
+        "method_title": "PlayGuard를 어떻게 업데이트할까요?",
+        "later_title": "다시 알림",
+        "later_day": "1일 후",
+        "later_week": "1주 후",
+        "later_days": "{}일 후",
+        "later_done": "{}까지 알림을 미뤘습니다.",
+        "inplace_body": "PlayGuard가 버전 {}을(를) 다운로드하고 확인한 뒤 현재 버전을 교체하고 다시 시작합니다. 설정은 유지됩니다.",
+        "inplace_confirm": "업데이트"
     },
     "upload": {
         "pick": "보낼 내용",

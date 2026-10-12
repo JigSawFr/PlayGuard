@@ -50,6 +50,7 @@ struct Build
     std::string url;       // the download (an artifact's archive_download_url needs the token)
     uint64_t    size = 0;
     std::string sha256;    // 64 hex digits; empty when GitHub gave no digest
+    std::string notes;     // Release: its notes (the release's Markdown body); not kept in the cache
 };
 
 // One run's artifact, as GET /repos/…/actions/artifacts lists it.
@@ -68,8 +69,10 @@ struct Pull
     int64_t     head_repo = 0;
 };
 
-// The latest release (GET /repos/…/releases/latest): its playguard.nro.
-// False for anything else (a pre-release, no such asset, malformed).
+// The latest release (GET /repos/…/releases/latest): its playguard.nro and
+// its notes (at most MAX_NOTES bytes, cut on a line). False for anything
+// else (a pre-release, no such asset, malformed).
+constexpr size_t MAX_NOTES = 16 * 1024;
 bool parse_release(const std::string& json, Build* out);
 // The artifact holding playguard.nro: "playguard-<version>-<ref>-<commit>-nro",
 // or "playguard_release", the name the runs before that scheme gave it.
@@ -146,6 +149,10 @@ bool cache_fresh(const Cache& cache, int64_t now, bool needs_login);
 // On the desktop build PLAYGUARD_SIM_DEV_BUILDS ("offline", or a folder
 // holding latest.json, artifacts.json and pulls.json) replaces the network.
 bool fetch(std::vector<Build>* out, bool* needs_login, std::string* error);
+
+// The latest release alone (no account needed): what Update in place
+// installs. Blocking (network); simulated like fetch().
+bool fetch_release(Build* out, std::string* error);
 
 // Downloads `b` to `path` (playguard.nro itself, out of the zip for an
 // artifact) and verifies it. Blocking. On the desktop build, with

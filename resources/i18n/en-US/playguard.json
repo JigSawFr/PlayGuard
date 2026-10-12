@@ -731,10 +731,12 @@
         "source": "Source code",
         "update_via": "Update with",
         "update_via_values": {
+            "inplace": "In PlayGuard (downloads and restarts)",
             "auto": "Automatic (sphaira, else App Store)",
             "sphaira": "sphaira",
             "appstore": "Homebrew App Store",
-            "manual": "By hand"
+            "manual": "By hand",
+            "unset": "Not chosen yet"
         },
         "update": "Check for updates",
         "update_daily": "Check for updates every day",
@@ -797,8 +799,6 @@
     },
     "update": {
         "checking": "Checking for updates...",
-        "available": "PlayGuard {} is available (you have {}).",
-        "available_toast": "PlayGuard {} is available: About › Check for updates.",
         "available_no_fw": "It does not support firmware {} yet.",
         "up_to_date": "PlayGuard {} is the latest version.",
         "no_release": "No PlayGuard release is published yet: {} is a development build.",
@@ -808,7 +808,23 @@
         "open_confirm": "Open {}",
         "update_with": "Update with {}",
         "update_manual": "How to update",
-        "appstore": "Homebrew App Store"
+        "appstore": "Homebrew App Store",
+        "title": "Update available",
+        "headline": "PlayGuard {} is available",
+        "running": "You have PlayGuard {}.",
+        "released": "Released on {}.",
+        "notes_none": "No notes could be read for this version. All versions: {}",
+        "update": "Update",
+        "update_now": "Update now",
+        "recommended": "{} (recommended)",
+        "method_title": "How should PlayGuard update?",
+        "later_title": "Remind me in",
+        "later_day": "1 day",
+        "later_week": "1 week",
+        "later_days": "{} days",
+        "later_done": "Reminder postponed to {}.",
+        "inplace_body": "PlayGuard will download version {}, check it, put it in place of this one and restart on it. Your settings are kept.",
+        "inplace_confirm": "Update"
     },
     "upload": {
         "pick": "What to send",

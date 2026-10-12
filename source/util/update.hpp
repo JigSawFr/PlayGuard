@@ -47,6 +47,26 @@ uint32_t parse_firmware(const std::string& text);
 bool     parse_compat(const std::string& json, Latest* out);
 Verdict  decide(uint32_t console_fw, const std::string& app_version, const Latest& latest);
 
+// The start-up screen that offers a newer release (action/update_flow):
+// "Later" postpones it for a version, at most SNOOZE_MAX_DAYS days.
+constexpr int SNOOZE_MAX_DAYS = 30;
+
+struct Snooze
+{
+    std::string version;   // the release postponed
+    std::string until;     // "YYYY-MM-DD": offered again from that day
+};
+
+// "2026-10-12" + 7 -> "2026-10-19" (months and leap years included);
+// empty when `date` is malformed.
+std::string add_days(const std::string& date, int days);
+// Whether start-up offers `latest`: a version newer than `running`, not
+// postponed. A postponement is for its version only (a newer release is
+// offered at once), and ignored when its day is over SNOOZE_MAX_DAYS away
+// (the clock was set back, or a hand-edited file).
+bool offer_at_start(const std::string& latest, const std::string& running, const Snooze& snooze,
+                    const std::string& today);
+
 // <repository>/releases/latest/download/compat.json
 std::string compat_url();
 // Fetches compat.json of the latest release and decides. Blocking (network):

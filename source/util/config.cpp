@@ -104,7 +104,7 @@ void sanitize(Config& c)
     for (const char* l : LANGUAGES) language_ok |= c.language == l;
     if (!language_ok) c.language = "system";
     one_of(c.theme, { "system", "light", "dark" }, "system");
-    one_of(c.update_via, { "auto", "sphaira", "appstore", "manual" }, "auto");
+    one_of(c.update_via, { "", "inplace", "auto", "sphaira", "appstore", "manual" }, "");
     one_of(c.pin_lock, { "off", "changes", "open" }, "changes");
     one_of(c.dev_builds_order, { "newest", "number" }, "newest");
     one_of(c.fw_gate_choice, { "", "read_only", "probe", "risk" }, "");
@@ -132,6 +132,9 @@ void sanitize(Config& c)
     for (int k : LOGS_KEEP_MB) keep_ok |= c.logs_keep_mb == k;
     if (!keep_ok) c.logs_keep_mb = 0;
     if (!is_date(c.update_checked)) c.update_checked.clear();
+    if (c.update_latest.size() > 32) c.update_latest.clear();
+    if (c.update_snooze_version.size() > 32 || !is_date(c.update_snooze_until))
+        c.update_snooze_version.clear(), c.update_snooze_until.clear();
     if (!is_date(c.support_reminded)) c.support_reminded.clear();
     if (c.seen_version.size() > 32) c.seen_version.clear();
 
@@ -239,6 +242,9 @@ static void load_shared()
     read_string(j, "update_via", c.update_via);
     read_bool(j, "update_daily", c.update_daily);
     read_string(j, "update_checked", c.update_checked);
+    read_string(j, "update_latest", c.update_latest);
+    read_string(j, "update_snooze_version", c.update_snooze_version);
+    read_string(j, "update_snooze_until", c.update_snooze_until);
     read_string(j, "start_tab", c.start_tab);
     read_int(j, "activity_period", c.activity_period);
     read_int(j, "export_format", c.export_format);
@@ -329,6 +335,9 @@ bool snapshot(Snapshot& snap)
     j["update_via"]      = s_config.update_via;
     j["update_daily"]    = s_config.update_daily;
     j["update_checked"]  = s_config.update_checked;
+    j["update_latest"]   = s_config.update_latest;
+    j["update_snooze_version"] = s_config.update_snooze_version;
+    j["update_snooze_until"]   = s_config.update_snooze_until;
     j["start_tab"]       = s_config.start_tab;
     j["extra_amounts"]   = s_config.extra_amounts;
     j["activity_period"] = s_config.activity_period;

@@ -234,15 +234,18 @@ void choose(const dev_builds::Build& b)
     if (!app::commit().empty()) running += " (" + app::commit() + ")";
     std::string body = brls::getStr("playguard/dev_build/confirm", running, label(b));
     if (b.sha256.empty()) body += "\n\n" + "playguard/dev_build/no_digest"_i18n;
-    ui::confirm(body, "playguard/dev_build/install"_i18n, [b]() {
-        // Replacing PlayGuard can undo everything it guards: the PIN is
-        // asked whenever one is set, whatever Security › Ask for the PIN says.
-        if (!pin_lock::ask()) {
-            ui::notify(pin_lock::refusal_text());
-            return;
-        }
-        install(b);
-    });
+    ui::confirm(body, "playguard/dev_build/install"_i18n, [b]() { install_now(b); });
+}
+
+void install_now(const dev_builds::Build& b)
+{
+    // Replacing PlayGuard can undo everything it guards: the PIN is asked
+    // whenever one is set, whatever Security › Ask for the PIN says.
+    if (!pin_lock::ask()) {
+        ui::notify(pin_lock::refusal_text());
+        return;
+    }
+    install(b);
 }
 
 void sign_in()

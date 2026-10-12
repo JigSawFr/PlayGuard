@@ -21,6 +21,13 @@ request's build out of its artifact zip (PLAYGUARD_SIM_DEV_BUILDS): the file
 must replace the simulated playguard.nro and be handed to hbloader. On the
 way, the list must be kept (opened again at once) and X fetch it again.
 
+The "update" scenario starts with Check for updates every day on and a
+simulated release 1.1.0 (PLAYGUARD_SIM_LATEST, its notes and playguard.nro
+in PLAYGUARD_SIM_DEV_BUILDS): its screen must come up at start-up; Later ›
+1 week must postpone it; About › Check for updates must show it again;
+Update must ask how to update (none chosen yet), then, in PlayGuard, put
+the release in place of the simulated playguard.nro and hand it to hbloader.
+
 The "errors" scenario starts with today's limit reached, the temporary unlock
 failing and "Synchronise clock via Internet" off (PLAYGUARD_SIM_FAIL & co.):
 a limit change must end in the "could not unlock" dialog, with the app alive,
@@ -41,7 +48,7 @@ The "loading" scenario stops the start-up on the loading screen
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|library|outside|loading]   (needs DISPLAY, xdotool, ImageMagick)
+Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|update|library|outside|loading]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -66,6 +73,7 @@ RESCUE = SCENARIO == "rescue"
 FORGED = SCENARIO == "forged"
 LOCK = SCENARIO == "lock"
 DEVBUILD = SCENARIO == "devbuild"
+UPDATE = SCENARIO == "update"
 LIBRARY = SCENARIO == "library"
 OUTSIDE = SCENARIO == "outside"
 LOADING = SCENARIO == "loading"
@@ -76,7 +84,7 @@ config_file = os.path.join(run_dir, "playguard_data", "config.json")
 # What belongs to the simulated system (a sysMMC: util/nand.hpp): its history,
 # watch.json, backups and play-data cache.
 nand_dir = os.path.join(run_dir, "playguard_data", "nand", "sysmmc")
-if (GATE or ERRORS or DEVBUILD) and os.path.exists(config_file):
+if (GATE or ERRORS or DEVBUILD or UPDATE) and os.path.exists(config_file):
     os.remove(config_file)   # no remembered choice, developer mode off
 if DEVBUILD:
     # The pull requests by number (Y on the builds' screen; the keyboard has no Y).
@@ -170,7 +178,33 @@ if DEVBUILD:
     installed_nro = os.path.join(run_dir, "playguard_data", "sd", "switch", "playguard", "playguard.nro")
     os.makedirs(os.path.dirname(installed_nro), exist_ok=True)
     open(installed_nro, "wb").write(b"the build before")
-if not GATE and not ERRORS and not DEVBUILD:
+if UPDATE:
+    # A newer release than the simulated 1.0.0, found by the daily check at
+    # start-up; its file is a local one (PLAYGUARD_SIM_DEV_BUILDS).
+    import hashlib
+    env.setdefault("PLAYGUARD_SIM_LATEST", "1.1.0:24.0.0")
+    env.setdefault("PLAYGUARD_SIM_HBLOADER", "1")
+    sim = os.path.join(run_dir, "sim_github")
+    os.makedirs(sim, exist_ok=True)
+    release_content = b"\0" * 16 + b"NRO0" + b"release 1.1.0" * 100
+    release_nro = os.path.join(sim, "playguard.nro")
+    open(release_nro, "wb").write(release_content)
+    json.dump({"tag_name": "v1.1.0", "prerelease": False, "draft": False,
+               "body": "## [1.1.0](https://github.com/o/r/compare/v1.0.0...v1.1.0) (2026-10-07)\n\n"
+                       "### Features\n\n* **update:** update in place from the update screen\n"
+                       "* **about:** a screen at start-up for a new version\n\n"
+                       "### Bug Fixes\n\n* **ui:** a long link no longer crashes the app\n",
+               "assets": [{"name": "playguard.nro", "size": len(release_content),
+                           "updated_at": "2026-10-07T10:00:00Z", "browser_download_url": "https://" + release_nro,
+                           "digest": "sha256:" + hashlib.sha256(release_content).hexdigest()}]},
+              open(os.path.join(sim, "latest.json"), "w"))
+    env.setdefault("PLAYGUARD_SIM_DEV_BUILDS", sim)
+    installed_nro = os.path.join(run_dir, "playguard_data", "sd", "switch", "playguard", "playguard.nro")
+    os.makedirs(os.path.dirname(installed_nro), exist_ok=True)
+    open(installed_nro, "wb").write(b"the version before")
+    os.makedirs(os.path.dirname(config_file), exist_ok=True)
+    json.dump({"schema": 1, "update_daily": True}, open(config_file, "w"))
+if not GATE and not ERRORS and not DEVBUILD and not UPDATE:
     env.setdefault("PLAYGUARD_SIM_NUMPAD", "1:30")   # what the system number pad returns
     env.setdefault("PLAYGUARD_SIM_PASTE", "https://gist.github.com/smoke/ab12")   # what GitHub answers
     github_token = os.path.join(run_dir, "playguard_data", "github_token")
@@ -471,8 +505,11 @@ if GATE:
     key("Up")                  # Show the firmware screen again
     key("Return")
     shot("07_gate_again")
-    key("Return")              # How to update (it has the focus): open sphaira?
-    shot("08_open_store")
+    key("Return")              # Update (it has the focus): how? (none chosen yet)
+    shot("07b_update_method")  # In PlayGuard first, recommended
+    key("Down")                # Automatic (sphaira, else the App Store)
+    key("Return")
+    shot("08_open_store")      # open sphaira?
     key("Right")               # Open sphaira: PlayGuard hands over to hbloader and quits
     key("Return")
     for _ in range(20):
@@ -550,6 +587,52 @@ if DEVBUILD:
     for leftover in (".old", ".new", ".new.zip"):
         if os.path.exists(installed_nro + leftover):
             fail("a %s file was left next to %s" % (leftover, installed_nro))
+    finish()
+if UPDATE:
+    for _ in range(20):
+        if logged("update: offering 1.1.0"):
+            break
+        time.sleep(0.5)
+    else:
+        fail("no update screen at start-up")
+    shot("01_update_offer")    # 1.1.0, its date and notes; Update focused
+    key("Down", 2)             # Later
+    key("Return")
+    shot("02_update_later")    # 1 day, 1 week, 30 days
+    key("Down")                # 1 week
+    key("Return")
+    time.sleep(1)
+    cfg = json.load(open(config_file))
+    # The simulated console date is 2026-10-08.
+    if cfg.get("update_snooze_version") != "1.1.0" or cfg.get("update_snooze_until") != "2026-10-15":
+        fail("Later › 1 week was not saved: " + repr({k: v for k, v in cfg.items() if k.startswith("update")}))
+    # About › Check for updates shows it again, postponed or not.
+    key("Down", steps("dashboard", "about"))
+    key("Right")
+    key("Down")                # Check for updates
+    key("Return")
+    time.sleep(2)
+    if sum("update: offering 1.1.0" in l for l in open(os.path.join(OUT, "app.log"), errors="replace")) < 2:
+        fail("Check for updates did not show the update screen")
+    key("Return")              # Update: how? (none chosen yet)
+    shot("03_update_method")   # In PlayGuard (recommended) first
+    key("Return")              # In PlayGuard
+    shot("04_update_confirm")  # downloads, checks, replaces, restarts
+    key("Right")               # Update
+    key("Return")
+    for _ in range(20):
+        if not alive():
+            break
+        time.sleep(0.5)
+    else:
+        fail("still running after updating in place")
+    log.flush()
+    if "next load: sdmc:/switch/playguard/playguard.nro" not in open(os.path.join(OUT, "app.log"), errors="replace").read():
+        fail("the new version was not set as the next homebrew")
+    if open(installed_nro, "rb").read() != release_content:
+        fail("the release did not replace " + installed_nro)
+    if json.load(open(config_file)).get("update_via") != "inplace":
+        fail("the way to update was not saved")
     finish()
 if ERRORS:
     shot("01_limit_reached")   # Overview: today's limit reached
