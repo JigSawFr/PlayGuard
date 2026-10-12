@@ -7,8 +7,8 @@ name: release-page
 # release. By default it only shows it on the run page, a way to try the
 # OpenRouter key, the model or the prompt; with "apply", it updates the
 # release (one laid out before this existed, or after adding its
-# .github/release-notes/<version>.md). A release already laid out is left as
-# it is.
+# .github/release-notes/<version>.md). A release laid out before is laid out
+# again, keeping its summary when there is no file for it.
 on:
   workflow_dispatch:
     inputs:

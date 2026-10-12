@@ -34,9 +34,11 @@ The console reads the notes under the version's heading and stops at the next
 (source/util/changelog.cpp). It keeps their first 16 KB only, hence the
 summary first.
 
-Notes that already hold a <details> block come out unchanged: a re-run of the
-release job edits nothing. A summary already in the notes (inserted before
-this layout existed) is moved, not doubled. Standard library only.
+Notes laid out before are laid out again from the lists in their <details>
+blocks, keeping their summary unless another is given: the same input gives
+the same page, so a re-run edits nothing. A summary inserted in the notes
+before this layout existed (its own "### Highlights" section) is dropped from
+the lists. Standard library only.
 """
 import argparse
 import json
@@ -119,18 +121,53 @@ def screens(compare: dict, repo_slug: str, prev: str, tag: str):
     return sorted(rows)
 
 
+def unlayout(notes: str):
+    """(release-please's notes, the summary on the page) of notes this laid
+    out before; notes it did not lay out come back as they are, with no
+    summary. The lists are taken back out of their <details> blocks."""
+    lines = notes.splitlines()
+    if "<details>" not in lines:
+        return notes, ""
+    at = next((i for i, line in enumerate(lines) if line.startswith("## ")), -1)
+    end = next((i for i in range(at + 1, len(lines)) if lines[i].startswith("## ")), len(lines))
+    first = next((i for i in range(at + 1, end) if lines[i].startswith(("<p", "<details>"))), end)
+    summary = "\n".join(lines[at + 1 : first]).strip()
+    lists, inside = [], None
+    for line in lines[first:end]:
+        if line.startswith("<summary>"):
+            inside = []
+        elif line == "</details>":
+            if inside is not None:
+                lists.append("\n".join(inside).strip("\n"))
+            inside = None
+        elif inside is not None:
+            inside.append(line)
+    head = "\n".join(lines[: at + 1]) if at >= 0 else ""
+    return head + "\n\n" + "\n\n".join(lists) + "\n", summary
+
+
+def airy(summary: str) -> str:
+    """A blank line between two top-level bullets: on GitHub, a list that
+    breathes. (The console reads it the same.)"""
+    out = []
+    for line in summary.splitlines():
+        if line.startswith(("* ", "- ")) and out and out[-1].strip() and not out[-1].startswith("#"):
+            out.append("")
+        out.append(line)
+    return "\n".join(out)
+
+
 def layout(notes: str, version: str, repo: str, summary: str = "", firmware: str = "",
            assets=None, compare=None, run_url: str = "") -> str:
-    if "\n<details>" in "\n" + notes:
-        return notes
-    summary = summary.strip()
+    notes, existing = unlayout(notes)
+    summary = airy((summary or existing).strip())
     lines = notes.splitlines(keepends=True)
     at = next((i for i, line in enumerate(lines) if line.startswith("## ")), None)
     head = "".join(lines[: at + 1]).rstrip("\n") if at is not None else f"## {version}"
     rest = "".join(lines[at + 1 :] if at is not None else lines)
-    if summary:
-        rest = rest.replace(summary, "")
-    parts = sections(rest.strip("\n"))
+    # An older summary inserted in the notes (its own "### Highlights") goes:
+    # the page has one summary, above the lists.
+    parts = [(t, b) for t, b in sections(rest.strip("\n")) if t != "Highlights"]
     users = [(t, b) for t, b in parts if t not in CONTRIBUTOR_SECTIONS]
     contributors = [(t, b) for t, b in parts if t in CONTRIBUTOR_SECTIONS]
 
@@ -150,7 +187,7 @@ def layout(notes: str, version: str, repo: str, summary: str = "", firmware: str
     if prev:
         figures.append(f'<a href="{repo}/compare/{prev}...{tag}">Full diff {prev}…{tag}</a>')
     if figures:
-        out.append("<p>" + " · ".join(figures) + "</p>")
+        out.append('<p align="center">' + " · ".join(figures) + "</p>")
     if users:
         out.append(folded(f"📜 Every change in {version}", plural(sum(items(b) for _, b in users), "change"), "\n\n".join(b for _, b in users)))
     if contributors:
@@ -219,7 +256,13 @@ def main() -> int:
     ap.add_argument("--assets", help="gh release view --json assets, for the sizes")
     ap.add_argument("--compare", help="the API's compare of the previous tag, for the screens and contributors")
     ap.add_argument("--run-url", default="", help="the run that built the release, for the build report")
+    ap.add_argument("--raw", action="store_true", help="only print release-please's notes, out of a laid-out page")
+    ap.add_argument("--existing-summary", action="store_true", help="only print the summary a laid-out page has")
     a = ap.parse_args()
+    if a.raw or a.existing_summary:
+        raw, existing = unlayout(sys.stdin.read())
+        sys.stdout.write(raw if a.raw else (existing + "\n" if existing else ""))
+        return 0
     summary = ""
     if a.summary:
         with open(a.summary, encoding="utf-8") as f:

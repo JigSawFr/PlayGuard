@@ -15,7 +15,9 @@
 # summary in Actions). Needs gh (GH_TOKEN, GH_REPO); run from the repository's
 # root. The build report is this run when it is release-please's (the release
 # job), else the last release-please run started before the release was
-# created. A release already laid out (a <details> block) is left as it is.
+# created. A release laid out before is laid out again from its lists (a
+# changed summary file, a new layout), keeping its summary when there is no
+# file for it: no second call to OpenRouter. The same page is not edited.
 # Nothing here fails a release: a part that cannot be had is left out.
 set -euo pipefail
 tag=${1:?usage: tools/release_page.sh vX.Y.Z [--apply]}
@@ -27,19 +29,19 @@ work=$(mktemp -d)
 here=$(cd "$(dirname "$0")" && pwd)
 
 gh release view "$tag" --json body --jq .body > "$work/notes.md"
-if grep -q '^<details>' "$work/notes.md"; then
-  echo "$tag is already laid out: nothing to do."
-  echo "ℹ️ **Release page** — $tag already laid out" >> "$summary_out"
-  exit 0
-fi
+# release-please's notes, also out of a page laid out before (a re-run).
+python3 "$here/release_notes.py" --version "$version" --repo-url "$repo_url" --raw < "$work/notes.md" > "$work/raw.md"
+python3 "$here/release_notes.py" --version "$version" --repo-url "$repo_url" --existing-summary < "$work/notes.md" > "$work/existing.md"
 
 args=()
 summary=".github/release-notes/$version.md"
 if [ -f "$summary" ]; then
   args=(--summary "$summary"); how="the hand-written summary ($summary)"
+elif [ -s "$work/existing.md" ]; then
+  how="the summary already on the page"
 elif [ -z "${OPENROUTER_API_KEY:-}" ]; then
   how="no summary (no $summary, no OpenRouter key)"
-elif python3 "$here/summarize_release.py" "$version" .github/release-notes resources/img/emoji < "$work/notes.md" > "$work/summary.md"; then
+elif python3 "$here/summarize_release.py" "$version" .github/release-notes resources/img/emoji < "$work/raw.md" > "$work/summary.md"; then
   args=(--summary "$work/summary.md"); how="a summary by ${OPENROUTER_MODEL:-the default model} through OpenRouter"
 else
   echo "::warning title=Release page::no summary: OpenRouter gave none (see the log above)"
@@ -63,11 +65,14 @@ fi
 [ -z "$run_url" ] || args+=(--run-url "$run_url")
 python3 "$here/release_notes.py" --version "$version" --repo-url "$repo_url" "${args[@]}" < "$work/notes.md" > "$work/new.md"
 
-if [ "$apply" = --apply ]; then
+if [ "$apply" = --apply ] && cmp -s "$work/notes.md" "$work/new.md"; then
+  echo "$tag already has this page: nothing to edit."
+  echo "ℹ️ **Release page** — $tag already has this page" >> "$summary_out"
+elif [ "$apply" = --apply ]; then
   gh release edit "$tag" --title "PlayGuard $version" --notes-file "$work/new.md"
   echo "✅ **Release page** — $tag laid out, with $how" >> "$summary_out"
   category=${RELEASE_DISCUSSION_CATEGORY:-Announcements}
-  if [ "$category" != none ]; then
+  if [ "$category" != none ] && [ -z "$(gh api "repos/$GH_REPO/releases/tags/$tag" --jq '.discussion_url // empty' 2>/dev/null)" ]; then
     if gh release edit "$tag" --discussion-category "$category" > /dev/null; then
       echo "✅ **Release page** — a discussion in $category" >> "$summary_out"
     else
