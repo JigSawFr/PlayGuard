@@ -7,7 +7,8 @@
 # language model writes through OpenRouter when OPENROUTER_API_KEY is set
 # (tools/summarize_release.py), else none. With --apply, the release also gets
 # a discussion in the RELEASE_DISCUSSION_CATEGORY category (default
-# Announcements; "none" for none).
+# Announcements; "none" for none), and the discussion's post kept the same
+# as the page.
 #
 #   tools/release_page.sh vX.Y.Z [--apply]
 #
@@ -67,21 +68,48 @@ fi
 [ -z "$run_url" ] || args+=(--run-url "$run_url")
 python3 "$here/release_notes.py" --version "$version" --repo-url "$repo_url" "${args[@]}" < "$work/notes.md" > "$work/new.md"
 
-if [ "$apply" = --apply ] && cmp -s "$work/notes.md" "$work/new.md"; then
-  echo "$tag already has this page: nothing to edit."
-  echo "ℹ️ **Release page** — $tag already has this page" >> "$summary_out"
-elif [ "$apply" = --apply ]; then
-  gh release edit "$tag" --title "PlayGuard $version" --notes-file "$work/new.md"
-  echo "✅ **Release page** — $tag laid out, with $how" >> "$summary_out"
-  category=${RELEASE_DISCUSSION_CATEGORY:-Announcements}
-  if [ "$category" != none ] && [ -z "$(gh api "repos/$GH_REPO/releases/tags/$tag" --jq '.discussion_url // empty' 2>/dev/null)" ]; then
-    if gh release edit "$tag" --discussion-category "$category" > /dev/null; then
-      echo "✅ **Release page** — a discussion in $category" >> "$summary_out"
-    else
-      echo "::warning title=Release page::no discussion: is there a \"$category\" category (RELEASE_DISCUSSION_CATEGORY)?"
-    fi
-  fi
-else
+if [ "$apply" != --apply ]; then
   cat "$work/new.md"
   { echo "## $tag laid out, with $how (not published)"; echo; cat "$work/new.md"; } >> "$summary_out"
+  exit 0
+fi
+
+if cmp -s "$work/notes.md" "$work/new.md"; then
+  echo "$tag already has this page: nothing to edit."
+  echo "ℹ️ **Release page** — $tag already has this page" >> "$summary_out"
+else
+  gh release edit "$tag" --title "PlayGuard $version" --notes-file "$work/new.md"
+  echo "✅ **Release page** — $tag laid out, with $how" >> "$summary_out"
+fi
+
+# The release's discussion: opened from the notes, but GitHub does not
+# follow later edits of the release, so its post is kept the same as the
+# page here (a GraphQL updateDiscussion; skipped when it already is).
+discussion=$(gh api "repos/$GH_REPO/releases/tags/$tag" --jq '.discussion_url // empty' 2>/dev/null || true)
+category=${RELEASE_DISCUSSION_CATEGORY:-Announcements}
+if [ -z "$discussion" ] && [ "$category" != none ]; then
+  if gh release edit "$tag" --discussion-category "$category" > /dev/null; then
+    echo "✅ **Release page** — a discussion in $category" >> "$summary_out"
+  else
+    echo "::warning title=Release page::no discussion: is there a \"$category\" category (RELEASE_DISCUSSION_CATEGORY)?"
+  fi
+elif [ -n "$discussion" ]; then
+  query='query($owner: String!, $repo: String!, $number: Int!) {
+    repository(owner: $owner, name: $repo) { discussion(number: $number) { id body } } }'
+  if gh api graphql -f query="$query" -F owner="${GH_REPO%%/*}" -F repo="${GH_REPO#*/}" -F number="${discussion##*/}" \
+       --jq '.data.repository.discussion' > "$work/discussion.json" 2>/dev/null && [ -s "$work/discussion.json" ]; then
+    python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["body"], end="")' "$work/discussion.json" > "$work/discussion.md"
+    if [ "$(cat "$work/discussion.md")" = "$(cat "$work/new.md")" ]; then
+      echo "ℹ️ **Release page** — its discussion already has this page" >> "$summary_out"
+    elif gh api graphql -f query='mutation($id: ID!, $body: String!) {
+             updateDiscussion(input: {discussionId: $id, body: $body}) { discussion { url } } }' \
+           -F id="$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["id"])' "$work/discussion.json")" \
+           -F body=@"$work/new.md" > /dev/null; then
+      echo "✅ **Release page** — its [discussion]($discussion) updated" >> "$summary_out"
+    else
+      echo "::warning title=Release page::the discussion ($discussion) could not be updated"
+    fi
+  else
+    echo "::warning title=Release page::the discussion ($discussion) could not be read"
+  fi
 fi
