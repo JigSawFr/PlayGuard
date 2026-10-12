@@ -84,7 +84,9 @@ fi
 
 # The release's discussion: opened from the notes, but GitHub does not
 # follow later edits of the release, so its post is kept the same as the
-# page here (a GraphQL updateDiscussion; skipped when it already is).
+# page here (a GraphQL updateDiscussion; skipped when it already is). Only
+# its author can edit it: the app that published the release, whose token is
+# DISCUSSION_TOKEN (GITHUB_TOKEN when unset).
 discussion=$(gh api "repos/$GH_REPO/releases/tags/$tag" --jq '.discussion_url // empty' 2>/dev/null || true)
 category=${RELEASE_DISCUSSION_CATEGORY:-Announcements}
 if [ -z "$discussion" ] && [ "$category" != none ]; then
@@ -101,13 +103,13 @@ elif [ -n "$discussion" ]; then
     python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["body"], end="")' "$work/discussion.json" > "$work/discussion.md"
     if [ "$(cat "$work/discussion.md")" = "$(cat "$work/new.md")" ]; then
       echo "ℹ️ **Release page** — its discussion already has this page" >> "$summary_out"
-    elif gh api graphql -f query='mutation($id: ID!, $body: String!) {
+    elif GH_TOKEN="${DISCUSSION_TOKEN:-$GH_TOKEN}" gh api graphql -f query='mutation($id: ID!, $body: String!) {
              updateDiscussion(input: {discussionId: $id, body: $body}) { discussion { url } } }' \
            -F id="$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["id"])' "$work/discussion.json")" \
            -F body=@"$work/new.md" > /dev/null; then
       echo "✅ **Release page** — its [discussion]($discussion) updated" >> "$summary_out"
     else
-      echo "::warning title=Release page::the discussion ($discussion) could not be updated"
+      echo "::warning title=Release page::the discussion ($discussion) could not be updated: its author, the release's (the PlayGuard Release app), can edit it; give the app the Discussions (read and write) permission"
     fi
   else
     echo "::warning title=Release page::the discussion ($discussion) could not be read"
