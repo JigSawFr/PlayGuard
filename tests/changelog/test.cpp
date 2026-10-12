@@ -100,6 +100,34 @@ int main()
     CHECK(hl[4].title.empty() && hl[4].text == "Every language, two themes" && hl[4].icon == "1f30d");
     CHECK(hl[5].title.empty() && hl[5].text == "nested: kept as is" && hl[5].depth == 1 && hl[5].icon.empty());
 
+    // A release's notes as the release job lays them out: the summary, the
+    // commit list folded in <details>, then an install section for a computer.
+    const char* release =
+        "## [1.2.0](https://github.com/x/y/compare/v1.1.0...v1.2.0) (2026-11-01)\n"
+        "\n"
+        "### \xF0\x9F\x8C\x9F Highlights\n"   // 🌟
+        "\n"
+        "A short release.\n"
+        "\n"
+        "<details>\n"
+        "<summary><b>Every change in 1.2.0</b> (1 change)</summary>\n"
+        "\n"
+        "### Bug Fixes\n"
+        "\n"
+        "* a fix ([#9](https://github.com/x/y/issues/9))\n"
+        "\n"
+        "</details>\n"
+        "\n"
+        "## Install\n"
+        "\n"
+        "| File | What it is for |\n";
+    const auto rel = changelog::release_notes(release, "1.2.0", &date);
+    CHECK(date == "2026-11-01" && rel.size() == 4);
+    CHECK(rel[0].kind == Line::Section && rel[0].text == "Highlights");
+    CHECK(rel[1].kind == Line::Text && rel[1].text == "A short release.");
+    CHECK(rel[2].kind == Line::Section && rel[2].text == "Bug Fixes");
+    CHECK(rel[3].kind == Line::Item && rel[3].text == "a fix");
+
     CHECK(changelog::parse("", 0).empty());
     CHECK(changelog::parse("# Changelog\n", 0).empty());
 

@@ -33,7 +33,8 @@ struct Line
 // section or an item opens on is its `icon`) and the "**" / "`" marks. A
 // top-level item that opens on a bold lead-in ("* **Activity**: play time per
 // game", "* **ui:** text") has it as its `title`, the rest as its text. The
-// "# Changelog" title is left out.
+// "# Changelog" title is left out, and so are HTML lines ("<details>",
+// "<summary>…</summary>": a release's notes fold the commit list).
 std::vector<Line> parse(const std::string& md, int max_releases);
 
 // The sections and items under the "## " heading of `version` ("1.1.0", a
