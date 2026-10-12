@@ -23,7 +23,9 @@ Once a release exists, the build's release job lays out its page
 
 It also opens the release's discussion, in the category the
 `RELEASE_DISCUSSION_CATEGORY` variable names (default `Announcements`;
-`none`: no discussion).
+`none`: no discussion), and keeps the discussion's post the same as the page:
+GitHub copies the notes once, when it opens it, and does not follow later
+edits (a run of *release-page* updates both).
 
 The console's update screen shows the summary and the lists: it skips HTML
 lines and comments and stops at the screens, and reads the release page's
