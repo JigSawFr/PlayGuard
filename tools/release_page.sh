@@ -54,6 +54,8 @@ gh release view "$tag" --json assets > "$work/assets.json" 2>/dev/null && args+=
 prev=$(sed -n '1,/^## /s|.*/compare/\([^/ ]*\)\.\.\..*|\1|p' "$work/notes.md" | head -n 1)
 if [ -n "$prev" ] && gh api "repos/$GH_REPO/compare/$prev...$tag" > "$work/compare.json" 2>/dev/null; then
   args+=(--compare "$work/compare.json")
+elif [ -z "$prev" ] && gh api "repos/$GH_REPO/contributors" --jq '[.[] | select(.type == "User") | .login]' > "$work/contributors.json" 2>/dev/null; then
+  args+=(--contributors "$work/contributors.json")   # a first release: everyone so far
 fi
 if [ "${GITHUB_WORKFLOW:-}" = release-please ] && [ -n "${GITHUB_RUN_ID:-}" ]; then
   run_url="$repo_url/actions/runs/$GITHUB_RUN_ID"

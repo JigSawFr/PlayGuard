@@ -2,28 +2,37 @@
 
 Once a release exists, the build's release job lays out its page
 (`tools/release_page.sh`, `tools/release_notes.py`): the title
-`PlayGuard X.Y.Z`, then under the `## X.Y.Z` heading release-please writes
+`PlayGuard X.Y.Z`, then under the heading `## X.Y.Z · <date>`
 
-1. the **figures**: features, fixes, polish, and the full diff;
+1. a **download line** (`playguard.zip`, the app alone, how to install) and
+   the **figures**: breaking changes, features, fixes, polish, the commits;
 2. a **summary**: `<version>.md` from this folder (`1.1.0.md`, no `v`), else
-   one written by a language model (below), else none;
-3. **every change** a user notices (features, changes, fixes, polish), then
-   **for contributors** (build, tests, docs): release-please's lists, folded;
+   one written by a language model (below), else none. On the page, each
+   bullet's bold lead-in sits on a line of its own, its text under it, and a
+   paragraph after the last bullet becomes an *Important* box;
+3. **what changed**: what a user notices (features, changes, fixes, polish),
+   then **for contributors** (build, tests, docs): release-please's lists,
+   folded;
 4. **🖼️ On screen**: the screens whose visual-check reference
    (`tests/visual/`) changed since the previous release, before and after;
-5. **📦 Install**: the assets, their size and what each is for, the firmware
-   checked (from `compat.json`);
+5. **📦 Install**: three steps (new install, update, locked out) with the
+   assets and their size, the firmware checked (from `compat.json`);
 6. **🔍 Build**: the build's report (the run page: the `.nro` size, the tests
-   and coverage, the smoke screenshots, the toolchain, the checksums), how to
-   check a download, the contributors.
+   and coverage, the smoke screenshots, the toolchain), the checksums and
+   the attestation, the contributors.
 
 It also opens the release's discussion, in the category the
 `RELEASE_DISCUSSION_CATEGORY` variable names (default `Announcements`;
 `none`: no discussion).
 
-The console's update screen shows the summary and the lists (it skips the
-HTML lines and stops at the screens) and keeps the first 16 KB only: the
-summary is what it shows for sure. The build also bundles the file: About and
+The console's update screen shows the summary and the lists: it skips HTML
+lines and comments and stops at the screens, and reads the release page's
+own comments (`source/util/changelog.cpp`): `<!-- console: a line -->` is
+shown there only, the lines of a `<!-- console:only` … `-->` comment too, and
+those between `<!-- console:hide -->` and `<!-- /console -->` are not (the
+*Important* box: the console shows its words as a plain line). It keeps the
+first 16 KB only: the summary is what it shows for sure. Version 1.0.0 knows
+none of this: its update screen shows these lines as they are. The build also bundles the file: About and
 the "What's new" screen after an update show this summary alone, with a *Full
 list of changes* cell to the release's `CHANGELOG.md` entry (no summary: that
 entry, as before).
