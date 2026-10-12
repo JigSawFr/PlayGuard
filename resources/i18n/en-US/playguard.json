@@ -751,6 +751,7 @@
     "about": {
         "section_changelog": "What's new in {}",
         "changelog_note": "Earlier versions: {}",
+        "changelog_full": "Full list of changes",
         "changelog_none": "No notes for this version (a development build?). Every release: {}",
         "section_credits": "Credits",
         "credit_author": "Developer",

@@ -751,6 +751,7 @@
     "about": {
         "section_changelog": "Neu in {}",
         "changelog_note": "Frühere Versionen: {}",
+        "changelog_full": "Alle Änderungen",
         "changelog_none": "Keine Hinweise zu dieser Version (ein Entwicklungs-Build?). Alle Versionen: {}",
         "section_credits": "Mitwirkende",
         "credit_author": "Entwickler",

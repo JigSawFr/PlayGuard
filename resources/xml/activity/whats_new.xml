@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- What's new: shown once at start-up after an update (action/support_flow),
-     the running version's notes from the bundled CHANGELOG.md, then how to
-     support PlayGuard. Filled by whats_new_activity.cpp. -->
+     the running version's highlights and a cell to the full list (or the
+     full list when it has none), then how to support PlayGuard. Filled by whats_new_activity.cpp. -->
 
 <brls:AppletFrame
     iconInterpolation="linear">
@@ -27,6 +27,7 @@
 
             <brls:Header id="wn_header" marginBottom="8"/>
             <brls:Box id="wn_notes" width="auto" height="auto" axis="column" alignItems="stretch"/>
+            <brls:DetailCell id="wn_full" title="@i18n/playguard/about/changelog_full" marginTop="12"/>
             <brls:DetailCell id="wn_close" title="@i18n/playguard/about/whats_new_close" marginTop="24"/>
             <brls:Header title="@i18n/playguard/about/section_support" marginTop="32" marginBottom="8"/>
             <brls:Label text="@i18n/playguard/about/support_note" id="wn_support_note" fontSize="20" marginBottom="6" textColor="@theme/brand/note"/>

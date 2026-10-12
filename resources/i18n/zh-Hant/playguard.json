@@ -751,6 +751,7 @@
     "about": {
         "section_changelog": "{} 更新內容",
         "changelog_note": "早期版本：{}",
+        "changelog_full": "完整更新列表",
         "changelog_none": "此版本沒有更新說明（開發版本？）。所有版本：{}",
         "section_credits": "致謝",
         "credit_author": "開發者",
