@@ -116,8 +116,9 @@ env.setdefault("PLAYGUARD_SIM_NOW", "1791475200")
 env.setdefault("TZ", "UTC")
 # And the focus highlight without its moving glow (ui/theme.cpp).
 env.setdefault("PLAYGUARD_SIM_STILL_FOCUS", "1")
-# And the header's version badge on one made-up development build, not this
-# build's version and commit (view/version_badge.cpp).
+# And one made-up development build, not this build's version and commit
+# (app.cpp): the header's version badge, and the update offers (1.1.0 below)
+# stay the same once this build is 1.1.0 or later.
 env.setdefault("PLAYGUARD_SIM_VERSION", "1.0.0:1a2b3c4")
 if GATE:
     env.setdefault("PLAYGUARD_SIM_FW", "24.0.0")
