@@ -187,7 +187,7 @@ def layout(notes: str, version: str, repo: str, summary: str = "", firmware: str
     if prev:
         figures.append(f'<a href="{repo}/compare/{prev}...{tag}">Full diff {prev}…{tag}</a>')
     if figures:
-        out.append('<p align="center">' + " · ".join(figures) + "</p>")
+        out.append("<p>" + " · ".join(figures) + "</p>")
     if summary:
         out.append(summary)
     if users:
