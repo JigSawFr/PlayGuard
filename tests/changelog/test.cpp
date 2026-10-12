@@ -128,6 +128,59 @@ int main()
     CHECK(rel[2].kind == Line::Section && rel[2].text == "Bug Fixes");
     CHECK(rel[3].kind == Line::Item && rel[3].text == "a fix");
 
+    // The release page as the release job lays it out now: the heading with
+    // a "·", the figures and rules in HTML, two-line bullets, a GitHub-only
+    // block hidden here, a line for the console only, comments skipped.
+    const char* page =
+        "## [1.3.0](https://github.com/x/y/compare/v1.2.0...v1.3.0) \xC2\xB7 2026-12-01\n"   // ·
+        "\n"
+        "<p>\xE2\xAC\x87\xEF\xB8\x8F <a href=\"u\"><b>Download</b></a></p>\n"
+        "\n"
+        "<hr>\n"
+        "\n"
+        "### \xF0\x9F\x8C\x9F Highlights\n"
+        "\n"
+        "* \xF0\x9F\x93\x8A **Activity**:  \n"
+        "  A month at a glance.\n"
+        "\n"
+        "* **Clock**: on time\n"
+        "\n"
+        "<!-- console:hide -->\n"
+        "> [!IMPORTANT]\n"
+        "> **Moved?** Read this.\n"
+        "<!-- /console -->\n"
+        "<!-- console: Moved? Read this. -->\n"
+        "<!-- a note for the maintainers,\n"
+        "     on two lines -->\n"
+        "<!-- console:only\n"
+        "* only here\n"
+        "-->\n"
+        "<!-- console:hide -->\n"
+        "### What changed\n"
+        "<!-- /console -->\n"
+        "<details>\n"
+        "<summary><b>Every change</b> (1 change)</summary>\n"
+        "\n"
+        "### Bug Fixes\n"
+        "\n"
+        "* a fix\n"
+        "\n"
+        "</details>\n"
+        "\n"
+        "## Install\n";
+    const auto pg = changelog::release_notes(page, "1.3.0", &date);
+    CHECK(date == "2026-12-01" && pg.size() == 7);
+    CHECK(pg[0].kind == Line::Section && pg[0].text == "Highlights");
+    CHECK(pg[1].kind == Line::Item && pg[1].title == "Activity" && pg[1].text == "A month at a glance." && pg[1].icon == "1f4ca");
+    CHECK(pg[2].kind == Line::Item && pg[2].title == "Clock" && pg[2].text == "on time");
+    CHECK(pg[3].kind == Line::Text && pg[3].text == "Moved? Read this.");
+    CHECK(pg[4].kind == Line::Item && pg[4].text == "only here");
+    CHECK(pg[5].kind == Line::Section && pg[5].text == "Bug Fixes");
+    CHECK(pg[6].kind == Line::Item && pg[6].text == "a fix");
+    // An unclosed hide block hides the rest; an unclosed comment too.
+    CHECK(changelog::parse("<!-- console:hide -->\n* gone\n", 0).empty());
+    CHECK(changelog::parse("<!-- open\n* gone\n", 0).empty());
+
     CHECK(changelog::parse("", 0).empty());
     CHECK(changelog::parse("# Changelog\n", 0).empty());
 

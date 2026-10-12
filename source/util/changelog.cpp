@@ -156,19 +156,22 @@ std::vector<Line> parse(const std::string& md, int max_releases)
     std::string raw;
     int  releases = 0;
     bool in_item  = false;   // an indented line continues the last item
-    while (std::getline(in, raw)) {
-        if (!raw.empty() && raw.back() == '\r') raw.pop_back();
-        const std::string t = trim(raw);
+    bool stop     = false;   // past `max_releases`
+    // One line of Markdown; `raw` keeps its indentation, `t` is trimmed.
+    auto line = [&](const std::string& raw, const std::string& t) {
         if (t.empty()) {
             in_item = false;
-            continue;
+            return;
         }
         if (t.front() == '<' && t.back() == '>') {
-            in_item = false;   // an HTML line: the release page's <details> around the commit list
-            continue;
+            in_item = false;   // an HTML line: the release page's <details>, its figures
+            return;
         }
         if (starts_with(t, "## ")) {
-            if (max_releases > 0 && ++releases > max_releases) break;
+            if (max_releases > 0 && ++releases > max_releases) {
+                stop = true;
+                return;
+            }
             lines.push_back({ Line::Release, release_title(clean(t.substr(3))) });
             in_item = false;
         } else if (starts_with(t, "# ")) {
@@ -187,12 +190,55 @@ std::vector<Line> parse(const std::string& md, int max_releases)
             lines.push_back(std::move(item));
             in_item = true;
         } else if (in_item && raw[0] == ' ') {
-            lines.back().text += " " + clean(t);
+            // "* **Title**:" then its text on the next line (the release page's
+            // two-line bullets): no leading space.
+            std::string& text = lines.back().text;
+            text += (text.empty() ? "" : " ") + clean(t);
         } else {
             lines.push_back({ Line::Text, clean(t) });
             in_item = false;
         }
         if (!lines.empty() && lines.back().text.empty() && lines.back().title.empty()) lines.pop_back();
+    };
+
+    // HTML comments, invisible on GitHub: skipped, except the console's own
+    //   <!-- console: a line -->              that line, read here only;
+    //   <!-- console:only  …  -->             the lines between, here only;
+    //   <!-- console:hide --> … <!-- /console -->   the lines between, not here.
+    enum { Plain, Comment, Hide, Only } block = Plain;
+    while (!stop && std::getline(in, raw)) {
+        if (!raw.empty() && raw.back() == '\r') raw.pop_back();
+        const std::string t = trim(raw);
+        if (block == Comment) {
+            if (t.find("-->") != std::string::npos) block = Plain;
+            continue;
+        }
+        if (block == Hide) {
+            if (t == "<!-- /console -->") block = Plain;
+            continue;
+        }
+        if (block == Only && t == "-->") {
+            block = Plain;
+            in_item = false;
+            continue;
+        }
+        if (block == Plain && starts_with(t, "<!--")) {
+            in_item = false;
+            const bool closed = t.size() >= 7 && t.compare(t.size() - 3, 3, "-->") == 0;
+            if (t == "<!-- console:hide -->") {
+                block = Hide;
+            } else if (t == "<!-- console:only") {
+                block = Only;
+            } else if (closed && starts_with(t, "<!-- console:")) {
+                const std::string inner = trim(t.substr(13, t.size() - 16));
+                line(inner, inner);
+                in_item = false;
+            } else if (!closed) {
+                block = Comment;
+            }
+            continue;
+        }
+        line(raw, t);
     }
     return lines;
 }

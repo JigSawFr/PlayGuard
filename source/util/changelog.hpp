@@ -34,7 +34,11 @@ struct Line
 // top-level item that opens on a bold lead-in ("* **Activity**: play time per
 // game", "* **ui:** text") has it as its `title`, the rest as its text. The
 // "# Changelog" title is left out, and so are HTML lines ("<details>",
-// "<summary>…</summary>": a release's notes fold the commit list).
+// "<summary>…</summary>": a release's notes fold the commit list) and HTML
+// comments, but for the console's own: "<!-- console: a line -->" is read as
+// that line, the lines of a "<!-- console:only" … "-->" comment are read, and
+// those between "<!-- console:hide -->" and "<!-- /console -->" are not (the
+// release page's GitHub-only Markdown).
 std::vector<Line> parse(const std::string& md, int max_releases);
 
 // The sections and items under the "## " heading of `version` ("1.1.0", a
