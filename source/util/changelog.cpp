@@ -163,6 +163,10 @@ std::vector<Line> parse(const std::string& md, int max_releases)
             in_item = false;
             continue;
         }
+        if (t.front() == '<' && t.back() == '>') {
+            in_item = false;   // an HTML line: the release page's <details> around the commit list
+            continue;
+        }
         if (starts_with(t, "## ")) {
             if (max_releases > 0 && ++releases > max_releases) break;
             lines.push_back({ Line::Release, release_title(clean(t.substr(3))) });
