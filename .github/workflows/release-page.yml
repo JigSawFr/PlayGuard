@@ -40,6 +40,16 @@ jobs:
             tools/release_page.sh
             tools/summarize_release.py
           sparse-checkout-cone-mode: false
+      # A token of the "PlayGuard Release" app, for the release's discussion:
+      # the app published the release, so it is the discussion's author, and
+      # GITHUB_TOKEN cannot edit another author's post. Optional: without it
+      # (or without the app's Discussions permission) the post is left as is.
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app-token
+        continue-on-error: true
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
       - name: Release page
         env:
           GH_TOKEN: ${{ github.token }}
@@ -49,6 +59,7 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
           RELEASE_DISCUSSION_CATEGORY: ${{ vars.RELEASE_DISCUSSION_CATEGORY }}
+          DISCUSSION_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           [ -n "$TAG" ] || TAG=$(gh release view --json tagName --jq .tagName)
           tools/release_page.sh "$TAG" $APPLY
