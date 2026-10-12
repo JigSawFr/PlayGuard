@@ -731,10 +731,12 @@
         "source": "Исходный код",
         "update_via": "Обновлять через",
         "update_via_values": {
+            "inplace": "В PlayGuard (скачает и перезапустится)",
             "auto": "Авто (sphaira, иначе App Store)",
             "sphaira": "sphaira",
             "appstore": "Homebrew App Store",
-            "manual": "Вручную"
+            "manual": "Вручную",
+            "unset": "Ещё не выбран"
         },
         "update": "Проверить обновления",
         "update_daily": "Проверять обновления ежедневно",
@@ -797,8 +799,6 @@
     },
     "update": {
         "checking": "Проверка обновлений...",
-        "available": "Доступен PlayGuard {} (у вас {}).",
-        "available_toast": "Доступен PlayGuard {}: «О программе» › «Проверить обновления».",
         "available_no_fw": "Он пока не поддерживает прошивку {}.",
         "up_to_date": "PlayGuard {} — последняя версия.",
         "no_release": "Ни одна версия PlayGuard ещё не опубликована: {} — сборка для разработки.",
@@ -808,7 +808,23 @@
         "open_confirm": "Открыть {}",
         "update_with": "Обновить через {}",
         "update_manual": "Как обновить",
-        "appstore": "Homebrew App Store"
+        "appstore": "Homebrew App Store",
+        "title": "Доступно обновление",
+        "headline": "Доступен PlayGuard {}",
+        "running": "Установлен PlayGuard {}.",
+        "released": "Выпущена {}.",
+        "notes_none": "Не удалось прочитать заметки к этой версии. Все версии: {}",
+        "update": "Обновить",
+        "update_now": "Обновить сейчас",
+        "recommended": "{} (рекомендуется)",
+        "method_title": "Как обновлять PlayGuard?",
+        "later_title": "Напомнить через",
+        "later_day": "1 день",
+        "later_week": "1 неделю",
+        "later_days": "{} дней",
+        "later_done": "Напоминание отложено до {}.",
+        "inplace_body": "PlayGuard скачает версию {}, проверит её, заменит ею текущую и перезапустится. Настройки сохранятся.",
+        "inplace_confirm": "Обновить"
     },
     "upload": {
         "pick": "Что отправить",

@@ -28,6 +28,9 @@ std::string checked_text(const dev_builds::Cache& cache);
 // Asks to replace the running PlayGuard with `b`, then the PIN when one is
 // set, then installs it.
 void choose(const dev_builds::Build& b);
+// Asks for the PIN when one is set, then installs `b` (already confirmed:
+// the update screen's Update in place).
+void install_now(const dev_builds::Build& b);
 // Signs in to GitHub, then lists the builds again.
 void sign_in();
 

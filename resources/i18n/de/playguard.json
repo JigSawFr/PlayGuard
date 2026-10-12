@@ -731,10 +731,12 @@
         "source": "Quellcode",
         "update_via": "Aktualisieren mit",
         "update_via_values": {
+            "inplace": "In PlayGuard (lädt herunter und startet neu)",
             "auto": "Automatisch (sphaira, sonst App Store)",
             "sphaira": "sphaira",
             "appstore": "Homebrew App Store",
-            "manual": "Manuell"
+            "manual": "Manuell",
+            "unset": "Noch nicht gewählt"
         },
         "update": "Nach Updates suchen",
         "update_daily": "Täglich nach Updates suchen",
@@ -797,8 +799,6 @@
     },
     "update": {
         "checking": "Suche nach Updates...",
-        "available": "PlayGuard {} ist verfügbar (installiert: {}).",
-        "available_toast": "PlayGuard {} ist verfügbar: Info › Nach Updates suchen.",
         "available_no_fw": "Sie unterstützt Firmware {} noch nicht.",
         "up_to_date": "PlayGuard {} ist die neueste Version.",
         "no_release": "Es wurde noch keine PlayGuard-Version veröffentlicht: {} ist eine Entwicklungsversion.",
@@ -808,7 +808,23 @@
         "open_confirm": "{} öffnen",
         "update_with": "Mit {} aktualisieren",
         "update_manual": "Anleitung zum Update",
-        "appstore": "Homebrew App Store"
+        "appstore": "Homebrew App Store",
+        "title": "Update verfügbar",
+        "headline": "PlayGuard {} ist verfügbar",
+        "running": "Installiert ist PlayGuard {}.",
+        "released": "Veröffentlicht am {}.",
+        "notes_none": "Die Hinweise zu dieser Version konnten nicht gelesen werden. Alle Versionen: {}",
+        "update": "Aktualisieren",
+        "update_now": "Jetzt aktualisieren",
+        "recommended": "{} (empfohlen)",
+        "method_title": "Wie soll PlayGuard aktualisiert werden?",
+        "later_title": "Erinnern in",
+        "later_day": "1 Tag",
+        "later_week": "1 Woche",
+        "later_days": "{} Tagen",
+        "later_done": "Erinnerung verschoben auf den {}.",
+        "inplace_body": "PlayGuard lädt Version {} herunter, prüft sie, ersetzt diese Version damit und startet sie neu. Deine Einstellungen bleiben erhalten.",
+        "inplace_confirm": "Aktualisieren"
     },
     "upload": {
         "pick": "Was senden?",

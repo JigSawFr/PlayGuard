@@ -105,8 +105,9 @@ void MainActivity::onContentAvailable()
         pt_flow::relock_if_interrupted();
         pt_flow::offer_extra_time_restore();
     });
-    // Opt-in background checks (Tools): a newer version, a network clock off.
-    update_flow::check_daily();
+    // Background checks: a newer version (daily when opted in, and while one
+    // is known and not installed: its screen), a network clock off (opt-in).
+    update_flow::at_start(this);
     clock_check::at_start();
 
     // Firmware newer than the verified one: the firmware screen (or the remembered choice).

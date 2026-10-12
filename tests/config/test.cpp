@@ -31,6 +31,7 @@ static void test_defaults()
     CHECK(c.language == "system" && c.theme == "system" && c.auto_relock && !c.dev_mode && !c.pt_log);
     CHECK(!c.extra_auto_restore);
     CHECK(c.extra_weekday == -1 && !c.relock_pending && c.fw_gate_choice.empty());
+    CHECK(c.update_via.empty() && c.update_latest.empty());   // the update method: asked the first time
 
     CHECK(config::loaded() == config::Loaded::Missing);   // a first run: nothing to tell
     for (const char* bad : { "", "not json", "[1, 2]", "42", "{\"language\": " }) {
@@ -126,7 +127,7 @@ static void test_fields()
                     "fw_gate_app": "1.0.0", "fw_gate_choice": "maybe"})");
     config::load();
     c = config::get();
-    CHECK(c.language == "system" && c.theme == "system" && c.update_via == "auto");
+    CHECK(c.language == "system" && c.theme == "system" && c.update_via.empty());
     CHECK(c.fw_gate_choice.empty() && c.fw_gate_fw.empty() && c.fw_gate_app.empty());
 
     // The extra-time record is all or nothing: a base of -1 would otherwise
@@ -272,9 +273,13 @@ static void test_preferences()
     write_config(R"({"start_tab": "activity", "extra_amounts": [30, 60, 90], "activity_period": 2,
                     "export_format": 3, "backup_keep": 10, "update_daily": true,
                     "update_checked": "2026-10-07", "clock_check_at_start": true, "intro": false,
-                    "logs_keep": 0, "logs_keep_days": 30, "logs_keep_mb": 5, "dev_builds_order": "number"})");
+                    "logs_keep": 0, "logs_keep_days": 30, "logs_keep_mb": 5, "dev_builds_order": "number",
+                    "update_via": "inplace", "update_latest": "1.2.0", "update_snooze_version": "1.2.0",
+                    "update_snooze_until": "2026-11-01"})");
     config::load();
     auto c = config::get();
+    CHECK(c.update_via == "inplace" && c.update_latest == "1.2.0");
+    CHECK(c.update_snooze_version == "1.2.0" && c.update_snooze_until == "2026-11-01");
     CHECK(!c.intro && c.dev_builds_order == "number");
     CHECK(c.logs_keep == 0 && c.logs_keep_days == 30 && c.logs_keep_mb == 5);
     CHECK(c.start_tab == "activity" && c.extra_amounts == std::vector<int>({ 30, 60, 90 }));
@@ -285,9 +290,11 @@ static void test_preferences()
     // extra time, no tab that does not exist.
     write_config(R"({"start_tab": "hidden", "extra_amounts": [15, 30, 999], "activity_period": 5,
                     "export_format": -1, "backup_keep": 7, "update_checked": "yesterday", "dev_builds_order": "size",
-                    "logs_keep": 3, "logs_keep_days": -7, "logs_keep_mb": "5"})");
+                    "logs_keep": 3, "logs_keep_days": -7, "logs_keep_mb": "5",
+                    "update_snooze_version": "1.2.0", "update_snooze_until": "soon"})");
     config::load();
     c = config::get();
+    CHECK(c.update_snooze_version.empty() && c.update_snooze_until.empty());   // a postponement needs its day
     CHECK(c.dev_builds_order == "newest");
     CHECK(c.logs_keep == 20 && c.logs_keep_days == 0 && c.logs_keep_mb == 0);
     CHECK(c.start_tab == "dashboard" && c.extra_amounts == std::vector<int>({ 15, 30, 60 }));

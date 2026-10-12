@@ -101,6 +101,18 @@ bool fetch(std::vector<Build>* out, bool* needs_login, std::string* error)
     return false;
 }
 
+bool fetch_release(Build* out, std::string* error)
+{
+    std::string body, err;
+    if (!api_get("/releases/latest", "latest.json", github_auth::token(), &body, &err, 512 * 1024)) {
+        if (error) *error = err;
+        return false;
+    }
+    if (parse_release(body, out)) return true;
+    if (error) *error = "no playguard.nro in the latest release";
+    return false;
+}
+
 bool download(const Build& b, const std::string& path, std::string* error,
               std::function<void(uint64_t done, uint64_t total)> progress)
 {

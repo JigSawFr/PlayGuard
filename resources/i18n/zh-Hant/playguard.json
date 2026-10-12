@@ -731,10 +731,12 @@
         "source": "原始碼",
         "update_via": "更新方式",
         "update_via_values": {
+            "inplace": "在 PlayGuard 內(下載並重新啟動)",
             "auto": "自動（sphaira，若無則用App Store）",
             "sphaira": "sphaira",
             "appstore": "Homebrew App Store",
-            "manual": "手動"
+            "manual": "手動",
+            "unset": "尚未選擇"
         },
         "update": "檢查更新",
         "update_daily": "每天檢查更新",
@@ -797,8 +799,6 @@
     },
     "update": {
         "checking": "正在檢查更新…",
-        "available": "PlayGuard {}已推出（目前版本為{}）。",
-        "available_toast": "PlayGuard {}已推出：請前往「關於 › 檢查更新」。",
         "available_no_fw": "此版本尚未支援韌體{}。",
         "up_to_date": "PlayGuard {}已是最新版本。",
         "no_release": "PlayGuard 尚未發佈任何版本：{} 是開發版本。",
@@ -808,7 +808,23 @@
         "open_confirm": "開啟{}",
         "update_with": "使用{}更新",
         "update_manual": "更新方式",
-        "appstore": "Homebrew App Store"
+        "appstore": "Homebrew App Store",
+        "title": "有可用更新",
+        "headline": "PlayGuard {} 已發布",
+        "running": "目前版本:PlayGuard {}。",
+        "released": "發布於 {}。",
+        "notes_none": "無法讀取此版本的說明。所有版本:{}",
+        "update": "更新",
+        "update_now": "立即更新",
+        "recommended": "{}(建議)",
+        "method_title": "PlayGuard 要如何更新?",
+        "later_title": "多久後提醒",
+        "later_day": "1 天",
+        "later_week": "1 週",
+        "later_days": "{} 天",
+        "later_done": "提醒已延後至 {}。",
+        "inplace_body": "PlayGuard 將下載版本 {},檢查後取代目前版本並重新啟動。你的設定會保留。",
+        "inplace_confirm": "更新"
     },
     "upload": {
         "pick": "傳送內容",

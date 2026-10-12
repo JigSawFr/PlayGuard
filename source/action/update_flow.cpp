@@ -1,9 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/update_flow.hpp"
 
-#include <borealis.hpp>
-#include <functional>
-
+#include "action/dev_build_flow.hpp"
+#include "activity/update_activity.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -14,8 +13,18 @@ using namespace brls::literals;
 namespace update_flow
 {
 
+const std::vector<std::string> METHODS = { "inplace", "auto", "sphaira", "appstore", "manual" };
+
 namespace
 {
+// The start-up screen waits for what is in front of the main screen (first
+// steps, What's new, a question) to close: tried every 2 s, for a minute.
+constexpr long WAIT_STEP_MS = 2000;
+constexpr int  WAIT_STEPS   = 30;
+
+bool  s_checking = false;   // one check at a time, whoever started it
+Offer s_offer;              // the last check's, for update_now()
+
 std::string store_name(launcher::Store store)
 {
     switch (store) {
@@ -25,26 +34,24 @@ std::string store_name(launcher::Store store)
     }
 }
 
-std::string firmware_string()
+bool newer(const update::Result& r)
 {
-    SysInfo si;
-    sysinfo_get(&si);
-    char fw[16];
-    sysinfo_version_string(si.hos_version, fw, sizeof(fw));
-    return fw;
+    return r.verdict == update::Verdict::UpdateSupports || r.verdict == update::Verdict::UpdateNoSupport;
 }
 
-void show_result(const update::Result& r)
+update::Snooze snooze()
 {
-    switch (r.verdict) {
+    const auto& cfg = config::get();
+    return update::Snooze{ cfg.update_snooze_version, cfg.update_snooze_until };
+}
+
+void show_result(const Offer& o)
+{
+    switch (o.result.verdict) {
         case update::Verdict::UpdateSupports:
-        case update::Verdict::UpdateNoSupport: {
-            std::string body = brls::getStr("playguard/update/available", r.latest.version, app::version());
-            if (r.verdict == update::Verdict::UpdateNoSupport)
-                body += "\n\n" + brls::getStr("playguard/update/available_no_fw", firmware_string());
-            ui::confirm(body, update_label(), []() { open_store(); });
+        case update::Verdict::UpdateNoSupport:
+            UpdateActivity::show(o);
             break;
-        }
         case update::Verdict::UpToDate:
             ui::info(brls::getStr("playguard/update/up_to_date", app::version()));
             break;
@@ -52,61 +59,93 @@ void show_result(const update::Result& r)
             ui::info(brls::getStr("playguard/update/no_release", app::version()));
             break;
         default:
-            ui::info(brls::getStr("playguard/update/failed", r.error));
+            ui::info(brls::getStr("playguard/update/failed", o.result.error));
             break;
     }
 }
-}   // namespace
 
-namespace
-{
-bool s_checking = false;   // one check at a time, whoever started it
-
-// Remembers the day of a check that reached the server.
+// Remembers the day of a check that reached the server, and what it found.
 void record_check(const update::Result& r)
 {
     if (r.verdict == update::Verdict::Unknown) return;
-    config::get().update_checked = ui::today_date();
+    auto& cfg = config::get();
+    cfg.update_checked = ui::today_date();
+    cfg.update_latest  = r.verdict == update::Verdict::NoRelease ? "" : r.latest.version;
     ui::save_config();
 }
 
-void run_check(std::function<void(const update::Result&)> done)
+void run_check(std::function<void(const Offer&)> done)
 {
     s_checking = true;
     SysInfo si;
     sysinfo_get(&si);
     const uint32_t fw = si.hos_version;
     ui::in_background("update check", [fw, done]() {
-        const update::Result r = update::check(fw);
-        brls::sync([r, done]() {
+        Offer o;
+        o.result = update::check(fw);
+        // The newer release's file and notes, for the update screen and an
+        // update in place (shown without its notes when they cannot be read).
+        if (newer(o.result)) {
+            std::string err;
+            o.has_release = dev_builds::fetch_release(&o.release, &err) &&
+                            update::compare_versions(o.release.version, o.result.latest.version) == 0;
+            if (!o.has_release && !err.empty()) brls::Logger::warning("update: no release details ({})", err);
+        }
+        brls::sync([o, done]() {
             s_checking = false;
-            record_check(r);
-            done(r);
+            s_offer = o;
+            record_check(o.result);
+            done(o);
         });
     });
 }
-}   // namespace
 
-void check_now()
+// Shows the start-up screen once `main` is on top, waiting for what is in
+// front of it to close.
+void show_when_free(brls::Activity* main, const Offer& o, int steps_left)
 {
-    // Pressing again while it runs says so, instead of starting another
-    // request and stacking a second result dialog.
-    ui::notify("playguard/update/checking"_i18n);
-    if (s_checking) return;
-    run_check([](const update::Result& r) { show_result(r); });
+    auto stack = brls::Application::getActivitiesStack();
+    if (!stack.empty() && stack.back() == main) {
+        UpdateActivity::show(o);
+        return;
+    }
+    if (steps_left <= 0) return;   // still busy: the next start-up
+    brls::delay(WAIT_STEP_MS, [main, o, steps_left]() { show_when_free(main, o, steps_left - 1); });
 }
 
-void check_daily()
+void install_in_place(const dev_builds::Build& b)
 {
-    const auto& cfg = config::get();
-    if (!cfg.update_daily || s_checking || cfg.update_checked == ui::today_date()) return;
-    // Quietly: only a newer version is worth a word (no network, no news).
-    run_check([](const update::Result& r) {
-        if (r.verdict == update::Verdict::UpdateSupports || r.verdict == update::Verdict::UpdateNoSupport)
-            ui::notify(brls::getStr("playguard/update/available_toast", r.latest.version));
+    ui::confirm(brls::getStr("playguard/update/inplace_body", b.version), "playguard/update/inplace_confirm"_i18n,
+                [b]() { dev_build_flow::install_now(b); });
+}
+
+void update_in_place()
+{
+    if (s_offer.has_release && newer(s_offer.result)) {
+        install_in_place(s_offer.release);
+        return;
+    }
+    // From the firmware screen (its own check), or the details could not be
+    // read during the check: fetched now.
+    if (s_checking) return;
+    s_checking = true;
+    ui::notify("playguard/update/checking"_i18n);
+    ui::in_background("update release", []() {
+        dev_builds::Build b;
+        std::string err;
+        const bool ok = dev_builds::fetch_release(&b, &err);
+        brls::sync([ok, b, err]() {
+            s_checking = false;
+            if (!ok) ui::info(brls::getStr("playguard/update/failed", err));
+            else if (update::compare_versions(b.version, app::version()) <= 0)
+                ui::info(brls::getStr("playguard/update/up_to_date", app::version()));
+            else install_in_place(b);
+        });
     });
 }
 
+// Hands over to sphaira or the App Store; explains how to update by hand
+// when neither can be opened.
 void open_store()
 {
     const launcher::Target target = launcher::find(config::get().update_via);
@@ -121,6 +160,80 @@ void open_store()
                     if (launcher::launch(target)) brls::Application::quit();
                     else ui::info(manual);
                 });
+}
+}   // namespace
+
+void check_now()
+{
+    // Pressing again while it runs says so, instead of starting another
+    // request and stacking a second result dialog.
+    ui::notify("playguard/update/checking"_i18n);
+    if (s_checking) return;
+    run_check([](const Offer& o) { show_result(o); });
+}
+
+void at_start(brls::Activity* main)
+{
+    const auto& cfg = config::get();
+    const std::string today = ui::today_date();
+    const bool pending = update::offer_at_start(cfg.update_latest, app::version(), snooze(), today);
+    const bool due = cfg.update_daily && cfg.update_checked != today;
+    if (s_checking || !(pending || due)) return;
+    // Quietly: only a newer version, not postponed, is worth a word.
+    run_check([main, today](const Offer& o) {
+        if (newer(o.result) && update::offer_at_start(o.result.latest.version, app::version(), snooze(), today))
+            show_when_free(main, o, WAIT_STEPS);
+    });
+}
+
+void update_now()
+{
+    const std::string& via = config::get().update_via;
+    if (via.empty()) choose_method([]() { update_now(); }, true);
+    else if (via == "inplace") update_in_place();
+    else open_store();
+}
+
+void choose_method(std::function<void()> then, bool first)
+{
+    std::vector<std::string> labels;
+    for (const std::string& m : METHODS) {
+        std::string label = brls::getStr("playguard/tools/update_via_values/" + m);
+        if (first && m == METHODS[0]) label = brls::getStr("playguard/update/recommended", label);
+        labels.push_back(label);
+    }
+    int selected = 0;
+    for (size_t i = 0; i < METHODS.size(); i++)
+        if (METHODS[i] == config::get().update_via) selected = (int)i;
+    ui::pick(first ? "playguard/update/method_title"_i18n : "playguard/tools/update_via"_i18n, labels, selected,
+             [then](int i) {
+                 config::get().update_via = METHODS[i];
+                 ui::save_config();
+                 if (then) then();
+             });
+}
+
+std::string method_text()
+{
+    const std::string& via = config::get().update_via;
+    return via.empty() ? "playguard/tools/update_via_values/unset"_i18n
+                       : brls::getStr("playguard/tools/update_via_values/" + via);
+}
+
+void postpone(const std::string& version, std::function<void()> done)
+{
+    static const int DAYS[] = { 1, 7, update::SNOOZE_MAX_DAYS };
+    const std::vector<std::string> labels = { "playguard/update/later_day"_i18n, "playguard/update/later_week"_i18n,
+                                              brls::getStr("playguard/update/later_days", update::SNOOZE_MAX_DAYS) };
+    ui::pick("playguard/update/later_title"_i18n, labels, 0, [version, done](int i) {
+        const std::string until = update::add_days(ui::today_date(), DAYS[i]);
+        if (until.empty()) return;   // no date on the console clock: nothing to count from
+        auto& cfg = config::get();
+        cfg.update_snooze_version = version;
+        cfg.update_snooze_until   = until;
+        ui::save_config(brls::getStr("playguard/update/later_done", until));
+        if (done) done();
+    });
 }
 
 std::string status_text(const update::Result& r, const std::string& firmware)
@@ -140,7 +253,10 @@ std::string status_text(const update::Result& r, const std::string& firmware)
 
 std::string update_label()
 {
-    const launcher::Target target = launcher::find(config::get().update_via);
+    const std::string& via = config::get().update_via;
+    if (via.empty()) return "playguard/update/update"_i18n;
+    if (via == "inplace") return "playguard/update/update_now"_i18n;
+    const launcher::Target target = launcher::find(via);
     if (target.store == launcher::Store::None || !launcher::can_launch()) return "playguard/update/update_manual"_i18n;
     return brls::getStr("playguard/update/update_with", store_name(target.store));
 }

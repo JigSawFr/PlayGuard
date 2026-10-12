@@ -1,30 +1,61 @@
-// update_flow — "Check for updates" and handing over to a homebrew store
-// (Tools › Update with: sphaira, Homebrew App Store, or by hand).
+// update_flow — "Check for updates", the screen that offers a newer release
+// (activity/update_activity.hpp) and installing it the way About › Update
+// with says: in place (PlayGuard downloads the release, checks it, replaces
+// itself and restarts, as Developer tools › Install another build does),
+// through sphaira or the Homebrew App Store, or by hand. While no way is
+// chosen, the first update asks for one.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <borealis.hpp>
+#include <functional>
 #include <string>
+#include <vector>
 
+#include "util/dev_builds.hpp"
 #include "util/update.hpp"
 
 namespace update_flow
 {
 
-// Checks in the background, then says what it found and offers to update.
+// What a check found: the verdict, and the latest release's file and notes
+// when it is newer (has_release false when they could not be read).
+struct Offer
+{
+    update::Result    result;
+    bool              has_release = false;
+    dev_builds::Build release;
+};
+
+// The values of About › Update with, in the order listed ("" is none chosen).
+extern const std::vector<std::string> METHODS;
+
+// Checks in the background, then shows the update screen when there is a
+// newer version, else says what it found.
 void check_now();
 
-// At start-up, with Tools › Check for updates every day on: checks at most
-// once a day, and only says something when a newer version is out.
-void check_daily();
+// At start-up: checks when Check for updates every day is on (at most once a
+// day) or when the last check found a newer version; the update screen comes
+// up on `main` once nothing else is in front of it, unless postponed.
+void at_start(brls::Activity* main);
 
-// Says which store opens, then closes PlayGuard and starts it; explains how
-// to update by hand when no store can be opened.
-void open_store();
+// Installs the newer version the way About › Update with says, asking for
+// that way first when none is chosen.
+void update_now();
+
+// The list of About › Update with; `then` runs once one is picked and saved.
+// `first`: the update screen's question (the recommended way marked).
+void choose_method(std::function<void()> then, bool first = false);
+// "In PlayGuard", "sphaira"…, "Not chosen yet".
+std::string method_text();
+
+// "Later": 1 day, 1 week or 30 days for `version`, then `done`.
+void postpone(const std::string& version, std::function<void()> done);
 
 // "PlayGuard 1.1.0 supports firmware 24.0.0 …" for the firmware screen.
 std::string status_text(const update::Result& result, const std::string& firmware);
 
-// "Update with sphaira" / "Update…" (label of the update actions).
+// "Update now" / "Update with sphaira" / "How to update" (label of the update actions).
 std::string update_label();
 
 }   // namespace update_flow

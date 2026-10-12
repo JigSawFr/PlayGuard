@@ -190,7 +190,7 @@ jobs:
           - shard: states
             scenarios: gate errors rescue forged lock loading
           - shard: developer
-            scenarios: devbuild library
+            scenarios: devbuild update library
           - shard: outside
             scenarios: outside
     env:

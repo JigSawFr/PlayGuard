@@ -20,7 +20,7 @@ void FirmwareGateActivity::onContentAvailable()
     // Shown once the check finds a newer release.
     update->setText(update_flow::update_label());
     update->registerClickAction([](brls::View*) {
-        update_flow::open_store();
+        update_flow::update_now();
         return true;
     });
     ui::set_visible(update.getView(), false);

@@ -81,6 +81,11 @@ bool parse_release(const std::string& text, Build* out)
             b.url = str(a, "browser_download_url");
             b.date = str(a, "updated_at");
             b.sha256 = digest_hex(str(a, "digest"));
+            b.notes = str(r, "body");
+            if (b.notes.size() > MAX_NOTES) {
+                const size_t cut = b.notes.rfind('\n', MAX_NOTES);
+                b.notes.resize(cut == std::string::npos ? 0 : cut);
+            }
             const int64_t size = integer(a, "size");
             if (b.version.empty() || !https(b.url) || size <= 0) return false;
             b.size = (uint64_t)size;

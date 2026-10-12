@@ -35,7 +35,7 @@ Target first_existing(Store store, const char* const (&candidates)[N])
 
 Target find(const std::string& preference)
 {
-    if (preference == "manual") return Target{};
+    if (preference == "manual" || preference == "inplace") return Target{};
     if (preference == "sphaira") return first_existing(Store::Sphaira, SPHAIRA);
     if (preference == "appstore") return first_existing(Store::AppStore, APPSTORE);
     Target t = first_existing(Store::Sphaira, SPHAIRA);

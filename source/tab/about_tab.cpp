@@ -13,15 +13,6 @@ using namespace brls::literals;
 
 namespace
 {
-const char* UPDATE_VIA[] = { "auto", "sphaira", "appstore", "manual" };
-
-template <size_t N>
-int index_of(const char* const (&list)[N], const std::string& value)
-{
-    for (size_t i = 0; i < N; i++)
-        if (value == list[i]) return (int)i;
-    return 0;
-}
 }   // namespace
 
 AboutTab::AboutTab()
@@ -39,13 +30,7 @@ AboutTab::AboutTab()
         ui::save_config();
     });
     update_via->registerClickAction([this](brls::View*) {
-        std::vector<std::string> labels;
-        for (const char* u : UPDATE_VIA) labels.push_back(brls::getStr(std::string("playguard/tools/update_via_values/") + u));
-        ui::pick("playguard/tools/update_via"_i18n, labels, index_of(UPDATE_VIA, config::get().update_via), [this](int i) {
-            config::get().update_via = UPDATE_VIA[i];
-            ui::save_config();
-            this->refresh();
-        });
+        update_flow::choose_method([this]() { this->refresh(); });
         return true;
     });
     update_cell->registerClickAction([](brls::View*) {
@@ -104,8 +89,7 @@ void AboutTab::refresh()
     const auto& cfg = config::get();
     update_daily->setOn(cfg.update_daily, false);
     update_cell->setDetailText(cfg.update_checked.empty() ? "" : brls::getStr("playguard/tools/update_last", cfg.update_checked));
-    update_via->setDetailText(brls::getStr("playguard/tools/update_via_values/" +
-                                           std::string(UPDATE_VIA[index_of(UPDATE_VIA, cfg.update_via)])));
+    update_via->setDetailText(update_flow::method_text());
 
     SysInfo si;
     sysinfo_get(&si);

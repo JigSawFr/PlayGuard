@@ -20,9 +20,19 @@ struct Config
     bool auto_relock = true;           // lock again right after a change that needed an unlock
     bool dev_mode = false;             // developer tools (7 presses on About > Version)
     bool pt_log = false;               // Developer › record the play timer (action/pt_log_flow)
-    std::string update_via = "auto";   // "auto", "sphaira", "appstore", "manual"
+    // How an update is installed: "" (not chosen yet: asked on the first
+    // update), "inplace" (PlayGuard downloads it and replaces itself),
+    // "auto", "sphaira", "appstore", "manual".
+    std::string update_via;
     bool update_daily = false;         // check for updates at start-up, once a day
     std::string update_checked;        // "YYYY-MM-DD" of the last check, any kind
+    // The latest release the last check found ("1.2.0"): a newer one than the
+    // running version is offered at each start-up (action/update_flow) until
+    // installed or postponed. update_snooze_version / _until: "Later" on that
+    // screen, for that version until that day ("YYYY-MM-DD", 30 days at most).
+    std::string update_latest;
+    std::string update_snooze_version;
+    std::string update_snooze_until;
     std::string start_tab = "dashboard";   // tab shown at start-up (main.xml order: START_TABS)
     std::vector<int> extra_amounts = { 15, 30, 60 };   // "Extra time today" choices, minutes
     int  activity_period = 1;          // Activity's period: 0 today, 1 last 7 days, 2 all time
