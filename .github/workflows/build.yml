@@ -577,6 +577,34 @@ jobs:
         run: |
           gh release upload "$TAG" --clobber dist/playguard.nro dist/playguard.zip dist/playguard-rescue.zip \
             dist/compat.json dist/build-info.txt dist/SHA256SUMS.txt
+      # The hand-written summary of this version (.github/release-notes/<version>.md,
+      # see its README) at the top of the notes release-please wrote. Read from
+      # the commit this run is for (main), not the tag: a summary merged after
+      # the release pull request still counts when the release is created later
+      # (a re-run of release-please after a failed one).
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: current
+          sparse-checkout: |
+            .github/release-notes
+            tools/release_notes.py
+          sparse-checkout-cone-mode: false
+      - name: Summary at the top of the release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ inputs.tag }}
+          VERSION: ${{ needs.meta.outputs.version }}
+        run: |
+          summary="current/.github/release-notes/$VERSION.md"
+          if [ ! -f "$summary" ]; then
+            echo "No $summary: the notes stay as release-please wrote them."
+            exit 0
+          fi
+          gh release view "$TAG" --json body --jq .body > notes.md
+          python3 current/tools/release_notes.py "$summary" < notes.md > notes-new.md
+          if cmp -s notes.md notes-new.md; then echo "The notes already start with the summary."
+          else gh release edit "$TAG" --notes-file notes-new.md; fi
       - name: Release summary
         env:
           TAG: ${{ inputs.tag }}
