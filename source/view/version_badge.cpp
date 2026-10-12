@@ -1,8 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/version_badge.hpp"
 
-#include <cstdlib>
-
 #include "app.hpp"
 #include "ui/ui.hpp"
 
@@ -17,20 +15,9 @@ VersionBadge::VersionBadge()
     this->setAlignSelf(brls::AlignSelf::CENTER);
     this->setMarginLeft(20);
 
-    std::string version = app::version(), commit = app::commit();
-    bool release = app::is_release();
-#ifndef __SWITCH__
-    // Desktop simulation: the smoke test's screenshots must not change with
-    // each version and commit (PLAYGUARD_SIM_VERSION="1.0.0:abcdef0", or
-    // "1.0.0:" for a release).
-    if (const char* sim = std::getenv("PLAYGUARD_SIM_VERSION")) {
-        const std::string s = sim;
-        const size_t colon  = s.find(':');
-        version             = s.substr(0, colon);
-        commit              = colon == std::string::npos ? "" : s.substr(colon + 1);
-        release             = commit.empty();
-    }
-#endif
+    // On the desktop, one made-up build (PLAYGUARD_SIM_VERSION, see app.cpp).
+    const std::string version = app::version(), commit = app::commit();
+    const bool release = app::is_release();
 
     auto* text = new brls::Label();
     text->setFontSize(18);
