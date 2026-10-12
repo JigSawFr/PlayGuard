@@ -4,9 +4,9 @@ Once a release exists, the build's release job lays out its page
 (`tools/release_page.sh`, `tools/release_notes.py`): the title
 `PlayGuard X.Y.Z`, then under the `## X.Y.Z` heading release-please writes
 
-1. a **summary**: `<version>.md` from this folder (`1.1.0.md`, no `v`), else
+1. the **figures**: features, fixes, polish, and the full diff;
+2. a **summary**: `<version>.md` from this folder (`1.1.0.md`, no `v`), else
    one written by a language model (below), else none;
-2. the **figures**: features, fixes, polish, and the full diff;
 3. **every change** a user notices (features, changes, fixes, polish), then
    **for contributors** (build, tests, docs): release-please's lists, folded;
 4. **🖼️ On screen**: the screens whose visual-check reference
