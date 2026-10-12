@@ -3,9 +3,8 @@ name: release-please
 # On every push to main, release-please keeps a "chore(main): release X.Y.Z"
 # pull request up to date (CHANGELOG.md, version in CMakeLists.txt) from the
 # conventional commits. Merging that PR creates the vX.Y.Z tag and the GitHub
-# release; the build below then attaches the .nro / .zip to it. A tag created
-# with GITHUB_TOKEN does not trigger other workflows, hence the direct call
-# instead of a personal access token.
+# release; the build below then attaches the .nro / .zip to it. build.yml
+# does not run on tags, hence the direct call.
 on:
   push:
     branches: [ main ]
@@ -25,9 +24,19 @@ jobs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
+      # A token of the "PlayGuard Release" GitHub App, not GITHUB_TOKEN: the
+      # app is on the tag ruleset's bypass list (GITHUB_TOKEN cannot create
+      # the vX.Y.Z tag), and its pushes to the release PR trigger the other
+      # workflows, so the required checks report on it.
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app-token
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
       - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         id: release
         with:
+          token: ${{ steps.app-token.outputs.token }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
