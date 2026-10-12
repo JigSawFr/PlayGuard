@@ -10,9 +10,9 @@ release-please writes the release's notes from the conventional commits: a
 keeps the heading and lays out:
 
   under the heading (what the console's update screen reads)
+    a line of figures (features, fixes, … and the full diff), in HTML;
     the summary (.github/release-notes/<version>.md, or one written by
     tools/summarize_release.py), when there is one;
-    a line of figures (features, fixes, … and the full diff), in HTML;
     "Every change in X.Y.Z": the sections a user notices, folded;
     "For contributors": build, tests, documentation, folded;
   then, for a computer
@@ -130,8 +130,10 @@ def unlayout(notes: str):
         return notes, ""
     at = next((i for i, line in enumerate(lines) if line.startswith("## ")), -1)
     end = next((i for i in range(at + 1, len(lines)) if lines[i].startswith("## ")), len(lines))
-    first = next((i for i in range(at + 1, end) if lines[i].startswith(("<p", "<details>"))), end)
-    summary = "\n".join(lines[at + 1 : first]).strip()
+    first = next((i for i in range(at + 1, end) if lines[i] == "<details>"), end)
+    # The summary: what stands before the lists, the figures line aside
+    # (above or below it, as this laid it out before).
+    summary = "\n".join(l for l in lines[at + 1 : first] if not l.startswith("<p")).strip()
     lists, inside = [], None
     for line in lines[first:end]:
         if line.startswith("<summary>"):
@@ -177,8 +179,6 @@ def layout(notes: str, version: str, repo: str, summary: str = "", firmware: str
     prev = m.group(1) if m else ""
 
     out = [head]
-    if summary:
-        out.append(summary)
     figures = []
     for title, (emoji, one, many) in FIGURES.items():
         n = sum(items(b) for t, b in users if t == title)
@@ -188,6 +188,8 @@ def layout(notes: str, version: str, repo: str, summary: str = "", firmware: str
         figures.append(f'<a href="{repo}/compare/{prev}...{tag}">Full diff {prev}…{tag}</a>')
     if figures:
         out.append('<p align="center">' + " · ".join(figures) + "</p>")
+    if summary:
+        out.append(summary)
     if users:
         out.append(folded(f"📜 Every change in {version}", plural(sum(items(b) for _, b in users), "change"), "\n\n".join(b for _, b in users)))
     if contributors:
