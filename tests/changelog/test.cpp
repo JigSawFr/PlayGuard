@@ -38,11 +38,13 @@ int main()
     const auto all = changelog::parse(MD, 0);
     CHECK(all.size() == 11);
     CHECK(all[0].kind == Line::Release && all[0].text == "1.1.0 · 2026-10-10");
-    CHECK(all[1].kind == Line::Section && all[1].text == "Features");
-    CHECK(all[2].kind == Line::Item && all[2].text == "ui: an About tab with the changelog" && all[2].depth == 0);
+    CHECK(all[1].kind == Line::Section && all[1].text == "Features" && all[1].icon == "1f680");
+    CHECK(all[2].kind == Line::Item && all[2].title == "ui" && all[2].text == "an About tab with the changelog" && all[2].depth == 0);
+    CHECK(all[2].icon.empty() && all[3].title.empty());
     CHECK(all[3].kind == Line::Item && all[3].text == "a long item that goes on");
     CHECK(all[4].kind == Line::Item && all[4].text == "a nested one" && all[4].depth == 1);
-    CHECK(all[5].kind == Line::Section && all[5].text == "Changes");
+    CHECK(all[5].kind == Line::Section && all[5].text == "Changes" && all[5].icon == "26a0");
+    CHECK(all[10].icon.empty());
     CHECK(all[6].kind == Line::Item && all[6].text == "uses romfs and borealis");
     CHECK(all[7].kind == Line::Release && all[7].text == "1.0.0 · 2026-09-01");
     CHECK(all[8].kind == Line::Text && all[8].text == "First release.");
@@ -68,6 +70,35 @@ int main()
     CHECK(changelog::release_notes(MD, "1.2.0", &date).empty() && date == "unchanged");
     CHECK(changelog::release_notes(MD, "1.1", nullptr).empty());
     CHECK(changelog::release_notes(MD, "", nullptr).empty());
+
+    // A release's hand-written summary (.github/release-notes/<version>.md):
+    // the highlights About shows, without a "## " heading of its own.
+    const auto summary = changelog::parse("### \xF0\x9F\x8C\x9F Highlights\n"   // 🌟
+                                          "\n"
+                                          "The first release.\n"
+                                          "\n"
+                                          "* **Play-time limit**: one per day, in\n"
+                                          "  `sd:/switch/playguard/`.\n", 0);
+    CHECK(summary.size() == 3);
+    CHECK(summary[0].kind == Line::Section && summary[0].text == "Highlights" && summary[0].icon == "1f31f");
+    CHECK(summary[1].kind == Line::Text && summary[1].text == "The first release.");
+    CHECK(summary[2].kind == Line::Item && summary[2].title == "Play-time limit" &&
+          summary[2].text == "one per day, in sd:/switch/playguard/.");
+
+    // The bold lead-ins as titles, either way round the colon, and the emoji
+    // an item opens on as its icon.
+    const auto hl = changelog::parse("### Highlights\n\n"
+                                          "* \xF0\x9F\x93\x8A **Activity**: per game,\n  per day.\n"
+                                          "* \xE2\x8F\xB1\xEF\xB8\x8F **Safe:** backed up\n"
+                                          "* a **bold** word\n"
+                                          "* \xF0\x9F\x8C\x8D **Every language**, two themes\n"
+                                          "  * **nested**: kept as is\n", 0);
+    CHECK(hl.size() == 6);
+    CHECK(hl[1].title == "Activity" && hl[1].text == "per game, per day." && hl[1].icon == "1f4ca");
+    CHECK(hl[2].title == "Safe" && hl[2].text == "backed up" && hl[2].icon == "23f1");
+    CHECK(hl[3].title.empty() && hl[3].text == "a bold word" && hl[3].icon.empty());
+    CHECK(hl[4].title.empty() && hl[4].text == "Every language, two themes" && hl[4].icon == "1f30d");
+    CHECK(hl[5].title.empty() && hl[5].text == "nested: kept as is" && hl[5].depth == 1 && hl[5].icon.empty());
 
     CHECK(changelog::parse("", 0).empty());
     CHECK(changelog::parse("# Changelog\n", 0).empty());

@@ -2,6 +2,7 @@
 #include "tab/about_tab.hpp"
 
 #include "action/update_flow.hpp"
+#include "activity/changelog_activity.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -51,15 +52,24 @@ AboutTab::AboutTab()
 
 void AboutTab::fill_changelog()
 {
-    // This version's notes only: the earlier ones are on the releases page.
+    // This version's highlights, the full list a press away; the full list
+    // itself when there are none. The earlier versions are on the releases page.
     std::string date;
-    const auto lines = release_notes::current(&date);
+    const auto lines      = release_notes::current(&date);
+    const auto highlights = release_notes::highlights();
     changelog_header->setTitle(brls::getStr("playguard/about/section_changelog", app::version()));
     if (!date.empty()) changelog_header->setSubtitle(date);
     const std::string releases = std::string(app::repo_url()) + "/releases";
-    changelog_note->setText(lines.empty() ? brls::getStr("playguard/about/changelog_none", releases)
-                                          : brls::getStr("playguard/about/changelog_note", releases));
-    release_notes::fill(changelog, lines);
+    changelog_note->setText(lines.empty() && highlights.empty() ? brls::getStr("playguard/about/changelog_none", releases)
+                                                                : brls::getStr("playguard/about/changelog_note", releases));
+    const bool short_form = !highlights.empty() && !lines.empty();
+    if (highlights.empty()) release_notes::fill(changelog, lines);
+    else release_notes::fill_highlights(changelog, highlights);
+    changelog_full->setVisibility(short_form ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    changelog_full->registerClickAction([](brls::View*) {
+        brls::Application::pushActivity(new ChangelogActivity());
+        return true;
+    });
 }
 
 void AboutTab::count_version_press()

@@ -751,6 +751,7 @@
     "about": {
         "section_changelog": "Nieuw in {}",
         "changelog_note": "Eerdere versies: {}",
+        "changelog_full": "Volledige lijst met wijzigingen",
         "changelog_none": "Geen notities voor deze versie (een ontwikkelversie?). Alle versies: {}",
         "section_credits": "Met dank aan",
         "credit_author": "Ontwikkelaar",

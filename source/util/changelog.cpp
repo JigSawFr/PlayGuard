@@ -3,6 +3,7 @@
 
 #include <cctype>
 #include <cstdint>
+#include <cstdio>
 #include <sstream>
 
 namespace changelog
@@ -27,17 +28,40 @@ bool starts_with(const std::string& s, const char* prefix)
 bool is_emoji(uint32_t cp)
 {
     return cp >= 0x1F000 || (cp >= 0x2600 && cp <= 0x27BF) || (cp >= 0x2B00 && cp <= 0x2BFF) ||
+           (cp >= 0x231A && cp <= 0x231B) || (cp >= 0x23E9 && cp <= 0x23FA) ||   // ⌚ ⏱ ⏳ …
            cp == 0x200D || (cp >= 0xFE00 && cp <= 0xFE0F);
+}
+
+// The UTF-8 sequence at `s[i]`: its length and code point.
+size_t decode(const std::string& s, size_t i, uint32_t* cp)
+{
+    const unsigned char c = s[i];
+    const size_t n = c < 0x80 ? 1 : (c >> 5) == 0x6 ? 2 : (c >> 4) == 0xE ? 3 : (c >> 3) == 0x1E ? 4 : 1;
+    *cp = n == 1 ? c : n == 2 ? c & 0x1F : n == 3 ? c & 0x0F : c & 0x07;
+    for (size_t k = 1; k < n && i + k < s.size(); k++) *cp = (*cp << 6) | (s[i + k] & 0x3F);
+    return n;
+}
+
+// The emoji `s` opens on (after spaces and "**"), as its first code point in
+// hex: "1f680" for "🚀 Features". Empty when it opens on anything else.
+std::string leading_icon(const std::string& s)
+{
+    size_t i = s.find_first_not_of(" *");
+    if (i == std::string::npos) return "";
+    uint32_t cp = 0;
+    decode(s, i, &cp);
+    if (!is_emoji(cp) || cp == 0x200D || (cp >= 0xFE00 && cp <= 0xFE0F)) return "";
+    char hex[9];
+    std::snprintf(hex, sizeof hex, "%x", (unsigned)cp);
+    return hex;
 }
 
 std::string drop_emoji(const std::string& s)
 {
     std::string out;
     for (size_t i = 0; i < s.size();) {
-        const unsigned char c = s[i];
-        const size_t n = c < 0x80 ? 1 : (c >> 5) == 0x6 ? 2 : (c >> 4) == 0xE ? 3 : (c >> 3) == 0x1E ? 4 : 1;
-        uint32_t cp = n == 1 ? c : n == 2 ? c & 0x1F : n == 3 ? c & 0x0F : c & 0x07;
-        for (size_t k = 1; k < n && i + k < s.size(); k++) cp = (cp << 6) | (s[i + k] & 0x3F);
+        uint32_t     cp = 0;
+        const size_t n  = decode(s, i, &cp);
         if (!is_emoji(cp)) out.append(s, i, n);
         i += n;
     }
@@ -104,6 +128,25 @@ std::string release_title(std::string s)
         s = s.substr(0, open) + " · " + s.substr(open + 2, s.size() - open - 3);
     return s;
 }
+
+// "**Title**: text" or "**Title:** text" → "Title" and "text"; false when
+// `item` does not open on a bold lead-in.
+bool split_title(const std::string& item, std::string* title, std::string* text)
+{
+    const size_t open = item.find("**");   // after the emoji, if any
+    if (open == std::string::npos || !trim(drop_emoji(item.substr(0, open))).empty()) return false;
+    const size_t close = item.find("**", open + 2);
+    if (close == std::string::npos) return false;
+    std::string head = clean(item.substr(open + 2, close - open - 2));
+    std::string rest = item.substr(close + 2);
+    if (!head.empty() && head.back() == ':') head.pop_back();
+    else if (starts_with(rest, ":")) rest.erase(0, 1);
+    else return false;   // bold words inside a sentence
+    *title = trim(head);
+    *text  = clean(rest);
+    return !title->empty();
+}
+
 }   // namespace
 
 std::vector<Line> parse(const std::string& md, int max_releases)
@@ -128,10 +171,16 @@ std::vector<Line> parse(const std::string& md, int max_releases)
             in_item = false;   // the document's title
         } else if (starts_with(t, "### ")) {
             lines.push_back({ Line::Section, clean(t.substr(4)) });
+            lines.back().icon = leading_icon(t.substr(4));
             in_item = false;
         } else if (starts_with(t, "* ") || starts_with(t, "- ")) {
             const size_t indent = raw.find_first_not_of(' ');
-            lines.push_back({ Line::Item, clean(t.substr(2)), (int)(indent / 2) });
+            Line item{ Line::Item, clean(t.substr(2)), (int)(indent / 2) };
+            if (item.depth == 0) {
+                split_title(t.substr(2), &item.title, &item.text);
+                item.icon = leading_icon(t.substr(2));
+            }
+            lines.push_back(std::move(item));
             in_item = true;
         } else if (in_item && raw[0] == ' ') {
             lines.back().text += " " + clean(t);
@@ -139,7 +188,7 @@ std::vector<Line> parse(const std::string& md, int max_releases)
             lines.push_back({ Line::Text, clean(t) });
             in_item = false;
         }
-        if (!lines.empty() && lines.back().text.empty()) lines.pop_back();
+        if (!lines.empty() && lines.back().text.empty() && lines.back().title.empty()) lines.pop_back();
     }
     return lines;
 }

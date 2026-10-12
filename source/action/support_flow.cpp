@@ -55,8 +55,8 @@ void at_start(brls::Activity* main)
 
         auto& cfg = config::get();
         const support::State state{ cfg.support_reminder, cfg.support_reminded, cfg.seen_version };
-        const support::Decision d =
-            support::decide(state, app::version(), ui::today_date(), !release_notes::current().empty());
+        const bool has_notes = !release_notes::current().empty() || !release_notes::highlights().empty();
+        const support::Decision d = support::decide(state, app::version(), ui::today_date(), has_notes);
         if (d.next.reminded != state.reminded || d.next.seen_version != state.seen_version) {
             cfg.support_reminded = d.next.reminded;
             cfg.seen_version     = d.next.seen_version;
