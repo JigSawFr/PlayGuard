@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstring>
 #include <dirent.h>
+#include <map>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -118,13 +119,49 @@ Bundle bundled(const std::string& bundle_dir, const Module& m)
     return b;
 }
 
+namespace
+{
+// The SHA-256 of the files state() read, by path, with their size and date
+// then: read and hashed again only when either changed (the PIN tab asks
+// each time it appears), and forgotten whenever this file changes a module (a
+// copy of the same size within the card's 2-second dates would not show).
+struct Seen
+{
+    off_t size = -1;
+    time_t mtime = 0;
+    std::string sha256;
+};
+std::map<std::string, Seen> s_seen;
+
+bool file_sha256(const std::string& file, std::string* out)
+{
+    std::map<std::string, Seen>& seen = s_seen;
+    struct stat st;
+    if (stat(file.c_str(), &st) != 0) {
+        seen.erase(file);
+        return false;
+    }
+    Seen& s = seen[file];
+    if (s.size != st.st_size || s.mtime != st.st_mtime || s.sha256.empty()) {
+        std::string bytes;
+        if (!paths::read_file(file, bytes)) {
+            seen.erase(file);
+            return false;
+        }
+        s.size = st.st_size;
+        s.mtime = st.st_mtime;
+        s.sha256 = sha256_of(bytes);
+    }
+    *out = s.sha256;
+    return true;
+}
+}   // namespace
+
 State state(const std::string& sd_root, const Module& m)
 {
     State s;
     const std::string d = dir(sd_root, m);
-    std::string bytes;
-    s.installed = paths::read_file(d + "/exefs.nsp", bytes);
-    if (s.installed) s.sha256 = sha256_of(bytes);
+    s.installed = file_sha256(d + "/exefs.nsp", &s.sha256);
     s.at_boot = exists(d + "/flags/boot2.flag");
     s.backup = exists(d + "/exefs.nsp.bak");
     std::string text;
@@ -153,6 +190,7 @@ std::string toolbox_json(const Module& m)
 
 bool install(const std::string& sd_root, const Module& m, const Bundle& b, bool keep_backup, std::string* error)
 {
+    s_seen.clear();
     errno = 0;
     if (!b.present) return fail(error, "this build carries no copy of the module");
     std::string bytes;
@@ -198,11 +236,13 @@ bool install(const std::string& sd_root, const Module& m, const Bundle& b, bool 
 
 void confirm(const std::string& sd_root, const Module& m)
 {
+    s_seen.clear();
     std::remove((dir(sd_root, m) + "/exefs.nsp.bak").c_str());
 }
 
 bool rollback(const std::string& sd_root, const Module& m, std::string* error)
 {
+    s_seen.clear();
     errno = 0;
     const std::string d = dir(sd_root, m), target = d + "/exefs.nsp", old = target + ".bak";
     if (!exists(old)) return fail(error, "no previous module to put back");
@@ -238,6 +278,7 @@ bool set_at_boot(const std::string& sd_root, const Module& m, bool on, std::stri
 
 bool uninstall(const std::string& sd_root, const Module& m, std::string* error)
 {
+    s_seen.clear();
     errno = 0;
     const std::string d = dir(sd_root, m);
     if (!exists(d)) return true;

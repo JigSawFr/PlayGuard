@@ -33,9 +33,11 @@ struct Outcome
 void run(const std::string& bundle_dir, std::function<void(const Outcome&)> done);
 bool running();
 
-// Once the main screen is up, with nothing in front of it: the agent
-// installed is another build than the one PlayGuard carries (or speaks
-// another protocol), and the parent did not answer "Later" to this one.
+// Once the main screen is up, with nothing in front of it (tried every 2 s
+// for a minute): the agent installed is another build than the one
+// PlayGuard carries (or speaks another protocol), and the parent did not
+// answer "Later" to this one. Not while a newer PlayGuard waits
+// (update_flow::pending_at_start()): it carries a newer agent.
 void at_start(brls::Activity* main, const std::string& bundle_dir);
 
 // The toast or dialog for an outcome of run().

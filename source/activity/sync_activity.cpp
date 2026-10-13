@@ -289,24 +289,40 @@ void SyncActivity::onContentAvailable()
     this->status_timer.start(1000);
 }
 
+SyncActivity::~SyncActivity()
+{
+    *alive = false;
+}
+
 bool SyncActivity::commit(SyncConf next)
 {
     // The link can change the console: the same PIN as a console change.
     if (!pin_lock::allow_change()) {
-        ui::notify(ui::rc_text(NXM_RC_NOT_CONFIRMED));
-        this->refresh();
-        return false;
-    }
-    std::string error;
-    if (!sync_files::save(next, &error)) {
-        ui::error("playguard/sync/save_err"_i18n + " — " + error);
+        ui::notify(pin_lock::refusal_text());
         this->refresh();
         return false;
     }
     this->conf = next;
-    sync_files::export_nro_state();
-    sync_flow::reload();
     this->refresh();
+    // Written off the UI thread, then the link (and the agent) read it again.
+    std::shared_ptr<bool> alive = this->alive;
+    ui::write_later("sync.conf", [this, alive, next]() {
+        std::string error;
+        const bool saved = sync_files::save(next, &error);
+        brls::sync([this, alive, saved, error]() {
+            if (!saved) {
+                ui::error("playguard/sync/save_err"_i18n + " — " + error);
+                if (*alive) {
+                    this->conf = sync_files::load();
+                    this->refresh();
+                }
+                return;
+            }
+            sync_files::export_nro_state();
+            sync_flow::reload();
+            if (*alive) this->refresh();
+        });
+    }, "sync.conf");
     return true;
 }
 

@@ -124,18 +124,22 @@ void ModulesActivity::bind(Row& row)
     if (row.run) {
         row.run->registerClickAction([this, id](brls::View*) {
             const modules::Module& m = modules::get(id);
-            Result rc = 0;
-            const bool running = module_running(m.tid, &rc);
+            const bool running = module_running(m.tid, nullptr);
             if (!allowed()) return true;
-            if (running) sync_flow::agent_stopping();
-            rc = running ? module_terminate(m.tid) : module_launch(m.tid);
-            ui::notify_result(rc, running ? "playguard/modules/stopped"_i18n : "playguard/modules/started"_i18n,
-                              "playguard/modules/error"_i18n);
-            if (R_SUCCEEDED(rc)) record(m, running ? "stopped" : "started");
-            // The link follows: the agent's, or PlayGuard's own.
-            if (running || R_FAILED(rc)) sync_flow::reload();
-            else sync_flow::agent_started();
-            this->refresh();
+            std::shared_ptr<bool> alive = this->alive;
+            const auto act = [this, alive, id, running]() {
+                const modules::Module& m = modules::get(id);
+                const Result rc = running ? module_terminate(m.tid) : module_launch(m.tid);
+                ui::notify_result(rc, running ? "playguard/modules/stopped"_i18n : "playguard/modules/started"_i18n,
+                                  "playguard/modules/error"_i18n);
+                if (R_SUCCEEDED(rc)) record(m, running ? "stopped" : "started");
+                // The link follows: the agent's, or PlayGuard's own.
+                if (running || R_FAILED(rc)) sync_flow::reload();
+                else sync_flow::agent_started();
+                if (*alive) this->refresh();
+            };
+            if (running) sync_flow::agent_stopping(act);
+            else act();
             return true;
         });
     }
@@ -199,19 +203,25 @@ void ModulesActivity::uninstall(const Row& row)
     ui::confirm_danger(brls::getStr(key(m, "remove_body")), "playguard/modules/remove"_i18n, [this, id]() {
         const modules::Module& m = modules::get(id);
         if (!allowed()) return;
-        if (m.resident && module_running(m.tid, nullptr)) {
-            sync_flow::agent_stopping();
-            module_terminate(m.tid);
-            sync_flow::reload();
-        }
-        std::string err;
-        if (!modules::uninstall(paths::sd_root(), m, &err)) {
-            ui::error("playguard/modules/error"_i18n + " — " + err);
-        } else {
-            record(m, "removed");
-            ui::notify("playguard/modules/removed"_i18n);
-        }
-        this->refresh();
+        std::shared_ptr<bool> alive = this->alive;
+        const bool running = m.resident && module_running(m.tid, nullptr);
+        const auto remove = [this, alive, id, running]() {
+            const modules::Module& m = modules::get(id);
+            if (running) {
+                module_terminate(m.tid);
+                sync_flow::reload();
+            }
+            std::string err;
+            if (!modules::uninstall(paths::sd_root(), m, &err)) {
+                ui::error("playguard/modules/error"_i18n + " — " + err);
+            } else {
+                record(m, "removed");
+                ui::notify("playguard/modules/removed"_i18n);
+            }
+            if (*alive) this->refresh();
+        };
+        if (running) sync_flow::agent_stopping(remove);
+        else remove();
     });
 }
 

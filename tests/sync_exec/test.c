@@ -175,7 +175,7 @@ static const char *today = "2026-10-05";   // a Monday
 
 static SyncExecCtx ctx_with(bool timer_writes)
 {
-    SyncExecCtx c = { timer_writes, 1, today, &rec, NULL, NULL };
+    SyncExecCtx c = { timer_writes, 1, today, &rec, NULL, NULL, NULL };
     return c;
 }
 
@@ -533,6 +533,93 @@ static void test_profiles_and_unlock(void)
     assert(out.applied && !model.unlocked && out.change == SyncChange_Relock);
 }
 
+// The host's save_records: what the records become, on the SD card before
+// the console changes (logged as command 1 among the writes).
+static struct {
+    int calls, fail_at;
+    SyncRecords last;
+} saved;
+
+static bool save_hook(void *ctx, const SyncRecords *r)
+{
+    (void)ctx;
+    saved.calls++;
+    log_cmd(1);
+    saved.last = *r;
+    return saved.calls != saved.fail_at;
+}
+
+static void run_saving(const char *entity, const char *payload, SyncOutcome *out)
+{
+    SyncExecCtx c = ctx_with(true);
+    c.save_records = save_hook;
+    SyncIntent in = order(entity, payload);
+    sync_exec(&in, &c, out);
+    assert(model.refs == 0);
+}
+
+static void start_saving(void)
+{
+    reset();
+    sync_records_clear(&rec);
+    memset(&saved, 0, sizeof(saved));
+}
+
+static void test_records_saved_first(void)
+{
+    SyncOutcome out;
+    u16 d[7];
+    // Extra time: the time to put back and the unlock's record are on the
+    // card before the unlock and the write.
+    start_saving();
+    run_saving("add_bonus_time_30", "PRESS", &out);
+    assert(out.applied && out.did_unlock && saved.calls == 1);
+    const u32 first[] = { 1, 1201, 195101, 1007 };
+    assert(cmds_are(first, 4));
+    assert(saved.last.relock_pending && saved.last.extra_weekday == 1 && saved.last.extra_base == 120 &&
+           saved.last.extra_value == 150 && !strcmp(saved.last.extra_date, today));
+    assert(!rec.relock_pending && rec.extra_value == 150);
+
+    // Not saved: refused, nothing sent to the console, the records as they were.
+    start_saving();
+    saved.fail_at = 1;
+    run_saving("add_bonus_time_30", "PRESS", &out);
+    assert(!out.applied && out.rc == NXM_RC_NOT_SAVED);
+    const u32 none[] = { 1 };
+    assert(cmds_are(none, 1));
+    assert(rec.extra_weekday == -1 && !rec.relock_pending);
+    days_now(d);
+    assert(d[1] == 120);
+
+    // The write fails: locked again, and the previous records saved again.
+    start_saving();
+    model.fail_command = 195101;
+    run_saving("stop_today", "PRESS", &out);
+    assert(!out.applied && saved.calls == 2);
+    const u32 put_back[] = { 1, 1201, 195101, 1007, 1 };
+    assert(cmds_are(put_back, 5));
+    assert(rec.extra_weekday == -1 && !rec.relock_pending && saved.last.extra_weekday == -1 && !saved.last.relock_pending);
+
+    // The console lock: the limits it replaces are saved before the zeros.
+    start_saving();
+    run_saving("console_lock", "ON", &out);
+    assert(out.applied && saved.calls == 1 && saved.last.console_lock && saved.last.console_lock_prev_ok);
+    assert(saved.last.console_lock_prev[0] == 180 && saved.last.console_lock_prev[1] == 120);
+    assert(rec.console_lock && !rec.relock_pending);
+    // A limit order replaces it: the lock's record goes before the write.
+    saved.calls = 0;
+    model.n_cmds = 0;
+    run_saving("limit_mon", "90", &out);
+    assert(out.applied && out.console_lock_after == 0 && saved.calls == 1 && !saved.last.console_lock);
+    assert(!rec.console_lock && !rec.console_lock_prev_ok);
+
+    // Nothing to put back (a restriction, the timer off): saved only for an unlock.
+    start_saving();
+    model.enabled = false;
+    run_saving("vr_restricted", "OFF", &out);
+    assert(saved.calls == 0);
+}
+
 int main(void)
 {
     test_limit_with_unlock();
@@ -543,6 +630,7 @@ int main(void)
     test_restrictions();
     test_alarm_and_bedtime();
     test_profiles_and_unlock();
+    test_records_saved_first();
     puts("sync_exec: all tests passed");
     return 0;
 }
