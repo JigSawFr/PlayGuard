@@ -1,7 +1,8 @@
 // CadranRestrictionsTab — "Cadran" prototype of Restrictions, after the
 // board: the level as four tiles that say what they impose (the console's
-// own presets), the other settings as three cards. Desktop simulation only
-// (PLAYGUARD_SIM_CADRAN=1); strings not localised.
+// own presets), the other settings as three cards. PLAYGUARD_SIM_CADRAN=1 on
+// the desktop, Tools › Developer › Cadran prototype on the console; strings
+// not localised.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 

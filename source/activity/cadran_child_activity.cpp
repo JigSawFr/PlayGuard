@@ -4,6 +4,7 @@
 #include <fmt/format.h>
 
 #include "action/frame_stats_flow.hpp"
+#include "action/pin_lock.hpp"
 #include "tab/cadran_tab.hpp"
 #include "ui/ui.hpp"
 
@@ -24,7 +25,12 @@ void CadranChildActivity::onContentAvailable()
         root->setHideHighlight(true);
         brls::Application::giveFocus(root);
     }
+    // Back to the parent's screens only with the PIN (none on the console: at once).
     this->getContentView()->registerAction("Retour parent · code PIN", brls::BUTTON_A, [](brls::View*) {
+        if (!pin_lock::ask()) {
+            ui::notify(pin_lock::refusal_text());
+            return true;
+        }
         brls::Application::popActivity();
         return true;
     });

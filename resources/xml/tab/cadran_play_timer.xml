@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- "Cadran" prototype of Play timer (desktop simulation, PLAYGUARD_SIM_CADRAN=1):
+<!-- "Cadran" prototype of Play timer (PLAYGUARD_SIM_CADRAN=1 on the desktop, Tools › Developer › Cadran prototype on the console):
      the week as the editor, a live summary, the chips. Filled by
      source/tab/cadran_play_timer_tab.cpp. Strings not localised. -->
 

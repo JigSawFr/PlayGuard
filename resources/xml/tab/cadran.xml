@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- "Cadran" prototype of the Overview (desktop simulation, PLAYGUARD_SIM_CADRAN=1),
+<!-- "Cadran" prototype of the Overview (PLAYGUARD_SIM_CADRAN=1 on the desktop, Tools › Developer › Cadran prototype on the console),
      after the design boards: the ring first, the two everyday actions, three
      state cards, "all fine" pills. Filled by source/tab/cadran_tab.cpp.
      Strings not localised. -->

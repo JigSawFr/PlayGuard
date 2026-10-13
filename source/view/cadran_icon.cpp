@@ -148,6 +148,147 @@ void CadranIcon::draw(NVGcontext* vg, float x, float y, float width, float heigh
     } else if (i == "check") {
         nvgBeginPath(vg); nvgStrokeWidth(vg, 3);
         nvgMoveTo(vg, 4, 12); nvgLineTo(vg, 9, 17); nvgLineTo(vg, 20, 7); nvgStroke(vg);
+    } else if (i == "key") {
+        nvgBeginPath(vg); nvgCircle(vg, 7.5f, 15.5f, 4); nvgStroke(vg);
+        nvgBeginPath(vg); nvgMoveTo(vg, 10.5f, 12.5f); nvgLineTo(vg, 20, 3);
+        nvgMoveTo(vg, 16.5f, 6.5f); nvgLineTo(vg, 19.5f, 9.5f); nvgMoveTo(vg, 14, 9); nvgLineTo(vg, 16, 11); nvgStroke(vg);
+    } else if (i == "unlock") {
+        nvgBeginPath(vg); nvgRoundedRect(vg, 5, 11, 14, 10, 2); nvgStroke(vg);
+        nvgBeginPath(vg); nvgMoveTo(vg, 8, 11); nvgLineTo(vg, 8, 8);
+        nvgArc(vg, 12, 8, 4, NVG_PI, NVG_PI * 1.82f, NVG_CW); nvgStroke(vg);
+    } else if (i == "phone") {
+        nvgBeginPath(vg); nvgRoundedRect(vg, 7, 2, 10, 20, 2.5f); nvgStroke(vg);
+        nvgBeginPath(vg); nvgCircle(vg, 12, 18, 1.1f); nvgFill(vg);
+    } else if (i == "trash") {
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, 4, 7); nvgLineTo(vg, 20, 7);
+        nvgMoveTo(vg, 9, 7); nvgLineTo(vg, 9, 4); nvgLineTo(vg, 15, 4); nvgLineTo(vg, 15, 7);
+        nvgMoveTo(vg, 6, 7); nvgLineTo(vg, 7, 20); nvgLineTo(vg, 17, 20); nvgLineTo(vg, 18, 7);
+        nvgMoveTo(vg, 10, 11); nvgLineTo(vg, 10, 16); nvgMoveTo(vg, 14, 11); nvgLineTo(vg, 14, 16);
+        nvgStroke(vg);
+    } else if (i == "server") {
+        nvgBeginPath(vg); nvgRoundedRect(vg, 3, 4, 18, 7, 2); nvgRoundedRect(vg, 3, 13, 18, 7, 2); nvgStroke(vg);
+        nvgBeginPath(vg); nvgCircle(vg, 7, 7.5f, 1.1f); nvgCircle(vg, 7, 16.5f, 1.1f); nvgFill(vg);
+    } else if (i == "pin") {
+        nvgBeginPath(vg); nvgMoveTo(vg, 12, 21);
+        nvgBezierTo(vg, 8, 17, 5, 13.5f, 5, 10); nvgArc(vg, 12, 10, 7, NVG_PI, 2.0f * NVG_PI, NVG_CW);
+        nvgBezierTo(vg, 19, 13.5f, 16, 17, 12, 21); nvgClosePath(vg); nvgStroke(vg);
+        nvgBeginPath(vg); nvgCircle(vg, 12, 10, 2.6f); nvgStroke(vg);
+    } else if (i == "refresh" || i == "history" || i == "restore") {
+        // An arc around the clock face, its arrow at the top: forward
+        // (refresh) or back (history, restore); history adds the hands.
+        const bool back = i != "refresh";
+        nvgBeginPath(vg);
+        if (back) {
+            nvgArc(vg, 12, 12, 9, NVG_PI, -NVG_PI / 2.0f, NVG_CCW);
+            nvgBezierTo(vg, 9.5f, 3, 7.1f, 4, 5.3f, 5.7f); nvgLineTo(vg, 3, 8);
+            nvgMoveTo(vg, 3, 3); nvgLineTo(vg, 3, 8); nvgLineTo(vg, 8, 8);
+        } else {
+            nvgArc(vg, 12, 12, 9, 0, 1.5f * NVG_PI, NVG_CW);
+            nvgBezierTo(vg, 14.5f, 3, 16.9f, 4, 18.7f, 5.7f); nvgLineTo(vg, 21, 8);
+            nvgMoveTo(vg, 21, 3); nvgLineTo(vg, 21, 8); nvgLineTo(vg, 16, 8);
+        }
+        if (i == "history") { nvgMoveTo(vg, 12, 7); nvgLineTo(vg, 12, 12); nvgLineTo(vg, 15.5f, 14); }
+        nvgStroke(vg);
+    } else if (i == "save") {
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, 5, 3); nvgLineTo(vg, 16, 3); nvgLineTo(vg, 21, 8); nvgLineTo(vg, 21, 19);
+        nvgQuadTo(vg, 21, 21, 19, 21); nvgLineTo(vg, 5, 21); nvgQuadTo(vg, 3, 21, 3, 19); nvgLineTo(vg, 3, 5);
+        nvgQuadTo(vg, 3, 3, 5, 3); nvgClosePath(vg);
+        nvgMoveTo(vg, 7, 21); nvgLineTo(vg, 7, 14); nvgLineTo(vg, 17, 14); nvgLineTo(vg, 17, 21);
+        nvgMoveTo(vg, 7, 3); nvgLineTo(vg, 7, 8); nvgLineTo(vg, 15, 8);
+        nvgStroke(vg);
+    } else if (i == "upload") {
+        nvgBeginPath(vg); nvgMoveTo(vg, 12, 15); nvgLineTo(vg, 12, 3); nvgMoveTo(vg, 7, 8); nvgLineTo(vg, 12, 3); nvgLineTo(vg, 17, 8);
+        nvgMoveTo(vg, 4, 20); nvgLineTo(vg, 20, 20); nvgStroke(vg);
+    } else if (i == "language") {
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, 5, 8); nvgLineTo(vg, 11, 14);
+        nvgMoveTo(vg, 4, 14); nvgLineTo(vg, 10, 8); nvgLineTo(vg, 12, 5);
+        nvgMoveTo(vg, 2, 5); nvgLineTo(vg, 14, 5); nvgMoveTo(vg, 7, 2); nvgLineTo(vg, 8, 2);
+        nvgMoveTo(vg, 22, 22); nvgLineTo(vg, 17, 12); nvgLineTo(vg, 12, 22);
+        nvgMoveTo(vg, 14, 18); nvgLineTo(vg, 20, 18);
+        nvgStroke(vg);
+    } else if (i == "contrast") {
+        nvgBeginPath(vg); nvgCircle(vg, 12, 12, 9); nvgStroke(vg);
+        nvgBeginPath(vg); nvgArc(vg, 12, 12, 9, -NVG_PI / 2.0f, NVG_PI / 2.0f, NVG_CW); nvgClosePath(vg); nvgFill(vg);
+    } else if (i == "home") {
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, 3, 10); nvgLineTo(vg, 12, 3); nvgLineTo(vg, 21, 10); nvgLineTo(vg, 21, 20);
+        nvgQuadTo(vg, 21, 21, 20, 21); nvgLineTo(vg, 4, 21); nvgQuadTo(vg, 3, 21, 3, 20); nvgClosePath(vg);
+        nvgMoveTo(vg, 9, 21); nvgLineTo(vg, 9, 14); nvgLineTo(vg, 15, 14); nvgLineTo(vg, 15, 21);
+        nvgStroke(vg);
+    } else if (i == "bolt") {
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, 13, 2); nvgLineTo(vg, 4, 14); nvgLineTo(vg, 12, 14); nvgLineTo(vg, 11, 22);
+        nvgLineTo(vg, 20, 10); nvgLineTo(vg, 12, 10); nvgClosePath(vg); nvgStroke(vg);
+    } else if (i == "sparkle") {
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, 12, 3); nvgLineTo(vg, 13.8f, 10.2f); nvgLineTo(vg, 21, 12); nvgLineTo(vg, 13.8f, 13.8f);
+        nvgLineTo(vg, 12, 21); nvgLineTo(vg, 10.2f, 13.8f); nvgLineTo(vg, 3, 12); nvgLineTo(vg, 10.2f, 10.2f);
+        nvgClosePath(vg); nvgStroke(vg);
+    } else if (i == "bell") {
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, 6, 9); nvgArc(vg, 12, 9, 6, NVG_PI, 2.0f * NVG_PI, NVG_CW);
+        nvgBezierTo(vg, 18, 15, 21, 17, 21, 17); nvgLineTo(vg, 3, 17); nvgBezierTo(vg, 3, 17, 6, 15, 6, 9);
+        nvgMoveTo(vg, 10, 20.5f); nvgBezierTo(vg, 11, 21.8f, 13, 21.8f, 14, 20.5f);
+        nvgStroke(vg);
+    } else if (i == "chip") {
+        nvgBeginPath(vg); nvgRoundedRect(vg, 6, 6, 12, 12, 2); nvgStroke(vg);
+        nvgBeginPath(vg); nvgRect(vg, 9.5f, 9.5f, 5, 5); nvgFill(vg);
+        nvgBeginPath(vg);
+        for (float p : { 9.0f, 15.0f }) {
+            nvgMoveTo(vg, p, 2); nvgLineTo(vg, p, 6); nvgMoveTo(vg, p, 18); nvgLineTo(vg, p, 22);
+            nvgMoveTo(vg, 2, p); nvgLineTo(vg, 6, p); nvgMoveTo(vg, 18, p); nvgLineTo(vg, 22, p);
+        }
+        nvgStroke(vg);
+    } else if (i == "code") {
+        nvgBeginPath(vg); nvgMoveTo(vg, 16, 18); nvgLineTo(vg, 22, 12); nvgLineTo(vg, 16, 6);
+        nvgMoveTo(vg, 8, 6); nvgLineTo(vg, 2, 12); nvgLineTo(vg, 8, 18); nvgStroke(vg);
+    } else if (i == "heart") {
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, 12, 21); nvgLineTo(vg, 5, 14); nvgBezierTo(vg, 3.5f, 12.5f, 2, 10.8f, 2, 8.5f);
+        nvgBezierTo(vg, 2, 5.5f, 4.5f, 3, 7.5f, 3); nvgBezierTo(vg, 9.3f, 3, 10.5f, 3.5f, 12, 5);
+        nvgBezierTo(vg, 13.5f, 3.5f, 14.7f, 3, 16.5f, 3); nvgBezierTo(vg, 19.5f, 3, 22, 5.5f, 22, 8.5f);
+        nvgBezierTo(vg, 22, 10.8f, 20.5f, 12.5f, 19, 14); nvgClosePath(vg); nvgStroke(vg);
+    } else if (i == "folder") {
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, 4, 20); nvgLineTo(vg, 20, 20); nvgQuadTo(vg, 22, 20, 22, 18); nvgLineTo(vg, 22, 9);
+        nvgQuadTo(vg, 22, 7, 20, 7); nvgLineTo(vg, 12, 7); nvgLineTo(vg, 10, 4); nvgLineTo(vg, 4, 4);
+        nvgQuadTo(vg, 2, 4, 2, 6); nvgLineTo(vg, 2, 18); nvgQuadTo(vg, 2, 20, 4, 20); nvgClosePath(vg); nvgStroke(vg);
+    } else if (i == "file") {
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, 14, 2); nvgLineTo(vg, 6, 2); nvgQuadTo(vg, 4, 2, 4, 4); nvgLineTo(vg, 4, 20);
+        nvgQuadTo(vg, 4, 22, 6, 22); nvgLineTo(vg, 18, 22); nvgQuadTo(vg, 20, 22, 20, 20); nvgLineTo(vg, 20, 8); nvgClosePath(vg);
+        nvgMoveTo(vg, 14, 2); nvgLineTo(vg, 14, 8); nvgLineTo(vg, 20, 8);
+        nvgMoveTo(vg, 8, 13); nvgLineTo(vg, 16, 13); nvgMoveTo(vg, 8, 17); nvgLineTo(vg, 14, 17);
+        nvgStroke(vg);
+    } else if (i == "flag") {
+        nvgBeginPath(vg); nvgMoveTo(vg, 4, 22); nvgLineTo(vg, 4, 3);
+        nvgQuadTo(vg, 8, 1, 12, 3); nvgQuadTo(vg, 16, 5, 20, 3); nvgLineTo(vg, 20, 15);
+        nvgQuadTo(vg, 16, 17, 12, 15); nvgQuadTo(vg, 8, 13, 4, 15); nvgStroke(vg);
+    } else if (i == "gamepad") {
+        nvgBeginPath(vg); nvgRoundedRect(vg, 2, 7, 20, 11, 5.5f); nvgStroke(vg);
+        nvgBeginPath(vg); nvgMoveTo(vg, 6, 12.5f); nvgLineTo(vg, 10, 12.5f); nvgMoveTo(vg, 8, 10.5f); nvgLineTo(vg, 8, 14.5f); nvgStroke(vg);
+        nvgBeginPath(vg); nvgCircle(vg, 15.5f, 13.5f, 1.1f); nvgCircle(vg, 18, 11, 1.1f); nvgFill(vg);
+    } else if (i == "calendar") {
+        nvgBeginPath(vg); nvgRoundedRect(vg, 3, 5, 18, 16, 2); nvgStroke(vg);
+        nvgBeginPath(vg); nvgMoveTo(vg, 3, 10); nvgLineTo(vg, 21, 10);
+        nvgMoveTo(vg, 8, 3); nvgLineTo(vg, 8, 7); nvgMoveTo(vg, 16, 3); nvgLineTo(vg, 16, 7); nvgStroke(vg);
+    } else if (i == "alert") {
+        nvgBeginPath(vg); nvgMoveTo(vg, 12, 3); nvgLineTo(vg, 22, 20); nvgLineTo(vg, 2, 20); nvgClosePath(vg); nvgStroke(vg);
+        nvgBeginPath(vg); nvgMoveTo(vg, 12, 9); nvgLineTo(vg, 12, 14); nvgStroke(vg);
+        nvgBeginPath(vg); nvgCircle(vg, 12, 17, 1.1f); nvgFill(vg);
+    } else if (i == "pencil") {
+        nvgBeginPath(vg); nvgMoveTo(vg, 4, 20); nvgLineTo(vg, 8, 20); nvgLineTo(vg, 19, 9); nvgLineTo(vg, 15, 5);
+        nvgLineTo(vg, 4, 16); nvgClosePath(vg); nvgMoveTo(vg, 13, 7); nvgLineTo(vg, 17, 11); nvgStroke(vg);
+    } else if (i == "tag") {
+        nvgBeginPath(vg); nvgMoveTo(vg, 3, 3); nvgLineTo(vg, 11, 3); nvgLineTo(vg, 21, 13); nvgLineTo(vg, 13, 21);
+        nvgLineTo(vg, 3, 11); nvgClosePath(vg); nvgStroke(vg);
+        nvgBeginPath(vg); nvgCircle(vg, 7.5f, 7.5f, 1.5f); nvgFill(vg);
+    } else if (i == "user") {
+        nvgBeginPath(vg); nvgCircle(vg, 12, 8, 4); nvgStroke(vg);
+        nvgBeginPath(vg); nvgMoveTo(vg, 4, 21); nvgQuadTo(vg, 4, 14, 12, 14); nvgQuadTo(vg, 20, 14, 20, 21); nvgStroke(vg);
     }
     nvgRestore(vg);
 }

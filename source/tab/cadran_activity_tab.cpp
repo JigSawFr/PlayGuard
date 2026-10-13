@@ -7,9 +7,12 @@
 
 #include "action/play_data.hpp"
 #include "activity/game_activity.hpp"
+#include "tab/activity_tab.hpp"
+#include "tab/cadran_list.hpp"
 #include "tab/cadran_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
+#include "util/config.hpp"
 
 using namespace brls::literals;
 
@@ -154,12 +157,23 @@ CadranActivityTab::CadranActivityTab()
         });
     }
 
-    period_chip->registerClickAction([](brls::View*) {
-        ui::notify("Prototype : la période reste sur 7 jours.");
+    // The period and the export: the Activity tab's own (same setting, same files).
+    this->period = std::clamp(config::get().activity_period, 0, 2);
+    period_chip->registerClickAction([this](brls::View*) {
+        std::vector<std::string> labels;
+        for (int p = 0; p < 3; p++) labels.push_back(brls::getStr(fmt::format("playguard/activity/periods/{}", p)));
+        ui::pick("playguard/activity/period"_i18n, labels, this->period, [this](int index) {
+            this->period = index;
+            config::get().activity_period = index;
+            ui::save_config();
+            this->refresh();
+        });
         return true;
     });
-    export_chip->registerClickAction([](brls::View*) {
-        ui::notify("Prototype : l'export est celui de l'onglet actuel.");
+    export_chip->registerClickAction([this](brls::View*) {
+        const auto& accounts = play_data::accounts();
+        const PlayAccount* acc = this->account >= 0 && this->account < (int)accounts.size() ? &accounts[this->account] : nullptr;
+        ActivityTab::export_stats(this->stats(), this->period, acc);
         return true;
     });
 
@@ -282,12 +296,19 @@ void CadranActivityTab::refresh()
     total_value->setText(all.known ? ui::fmt_play_time(all.total_s) : "—");
     total_sub->setText(all.top >= 0 && s.games[all.top].name[0] ? std::string("le plus joué · ") + s.games[all.top].name : "");
 
-    // The games of the week, most played first.
+    // The games of the period, most played first.
+    const int p = this->period;
+    const std::string period_name = brls::getStr(fmt::format("playguard/activity/periods/{}", p));
+    period_label->setText(period_name);
+    games_title->setText("JEUX · " + cadran::upper(period_name));
     std::vector<const GameStat*> games;
     for (uint32_t g = 0; g < s.count; g++)
-        if (s.games[g].week_s > 0) games.push_back(&s.games[g]);
-    std::sort(games.begin(), games.end(), [](const GameStat* a, const GameStat* b) { return a->week_s > b->week_s; });
-    games_note->setText(games.empty() ? "Aucun jeu joué ces 7 derniers jours." : "");
+        if (activity_summary::value(s.games[g], p) > 0) games.push_back(&s.games[g]);
+    std::sort(games.begin(), games.end(), [p](const GameStat* a, const GameStat* b) {
+        return activity_summary::value(*a, p) > activity_summary::value(*b, p);
+    });
+    static const char* none[] = { "Aucun jeu joué aujourd'hui.", "Aucun jeu joué ces 7 derniers jours.", "Aucun jeu joué." };
+    games_note->setText(games.empty() ? none[p] : "");
     for (size_t i = 0; i < this->cards.size(); i++) {
         Card& c = this->cards[i];
         const bool shown = i < games.size();
@@ -298,7 +319,9 @@ void CadranActivityTab::refresh()
         c.name->setText(g.name[0] ? g.name : brls::getStr("playguard/activity/deleted_game", fmt::format("{:016X}", g.app_id)));
         c.today->setText(g.today_s ? ui::fmt_play_time(g.today_s) : "—");
         c.today->setTextColor(g.today_s ? theme["cadran/text"] : theme["cadran/text3"]);
-        c.rest->setText("aujourd'hui · " + ui::fmt_play_time(g.week_s) + " sur 7 jours");
+        c.rest->setText(p == activity_summary::Today  ? std::string("aujourd'hui")
+                        : p == activity_summary::Week ? "aujourd'hui · " + ui::fmt_play_time(g.week_s) + " sur 7 jours"
+                                                      : "aujourd'hui · " + ui::fmt_play_time(g.total_s) + " en tout");
         uint32_t gmax = 0;
         for (int k = 0; k < 7; k++) gmax = std::max(gmax, g.day_s[k]);
         for (int k = 0; k < 7; k++) {

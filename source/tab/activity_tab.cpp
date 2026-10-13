@@ -544,15 +544,18 @@ void ActivityTab::load_icons()
 // numbers, so a spreadsheet can add them up.
 void ActivityTab::export_to_sd() const
 {
-    const std::shared_ptr<const PlayStats> data = shown_stats();
+    export_stats(shown_stats(), this->period, chosen_account());
+}
+
+void ActivityTab::export_stats(std::shared_ptr<const PlayStats> data, int p, const PlayAccount* account)
+{
     if (!data) {
         ui::notify("playguard/activity/export_not_ready"_i18n);
         return;
     }
     std::vector<std::string> labels;
     for (int f = 0; f < 4; f++) labels.push_back(brls::getStr(fmt::format("playguard/activity/formats/{}", f)));
-    const int p = this->period;
-    const std::string who = account_label(chosen_account());
+    const std::string who = account_label(account);
     ui::pick("playguard/activity/export_title"_i18n, labels, config::get().export_format, [data, p, who](int index) {
         config::get().export_format = index;
         ui::save_config();

@@ -71,6 +71,13 @@ void cadran::install_theme()
         t->addColor("brls/button/default_enabled_text", p->text);
         t->addColor("brls/button/enabled_border_color", p->border);
         t->addColor("brls/button/highlight_enabled_text", p->teal);
+        // The app's status colours and plain values in the boards' inks, so the
+        // list screens (cadran::List) take them as they are.
+        t->addColor("brand/ok", p->teal);
+        t->addColor("brand/warn", p->amber);
+        t->addColor("brand/bad", p->coral);
+        t->addColor("brand/note", p->text3);
+        t->addColor("brls/list/listItem_value_color", p->text2);
         t->addColor("cadran/navy", navy);
         t->addColor("cadran/text", p->text);
         t->addColor("cadran/text2", p->text2);
@@ -191,15 +198,25 @@ void tint_rail(const std::vector<brls::SidebarItem*>& items, brls::SidebarItem* 
 
 namespace
 {
-// The main screen's pill (style_frame): its label, and the pill for hiding it.
+// The main screen's pill (style_frame): its label and icon, and the pill for
+// hiding and colouring it.
 brls::Box*   s_main_pill = nullptr;
 brls::Label* s_main_pill_label = nullptr;
+CadranIcon*  s_main_pill_icon = nullptr;
 }   // namespace
 
-void cadran::set_pill(const std::string& text)
+void cadran::set_pill(const std::string& text, const char* glyph, bool warn)
 {
-    if (!s_main_pill || !s_main_pill_label) return;
+    if (!s_main_pill || !s_main_pill_label || !s_main_pill_icon) return;
+    brls::Theme theme = brls::Application::getTheme();
+    const NVGcolor ink = warn ? theme["cadran/amber"] : theme["cadran/pill_ok_ink"];
     s_main_pill_label->setText(text);
+    s_main_pill_label->setTextColor(ink);
+    s_main_pill_icon->setIcon(glyph);
+    s_main_pill_icon->setColor(ink);
+    s_main_pill->setBackgroundColor(warn ? theme["cadran/amber_surf"] : theme["cadran/pill_ok"]);
+    s_main_pill->setBorderColor(theme["cadran/amber_line"]);
+    s_main_pill->setBorderThickness(warn ? 1 : 0);
     s_main_pill->setVisibility(text.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
 }
 
@@ -253,6 +270,7 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
     if (with_date) {   // the main screen: its pill is the one set_pill() changes
         s_main_pill = pill;
         s_main_pill_label = pill_label;
+        s_main_pill_icon = glyph;
         auto* date = new brls::Label();
         date->setText(date_text());
         date->setFontSize(16);
@@ -383,8 +401,10 @@ void CadranTab::refresh()
     const bool unlocked = s.temp_unlocked_ok && s.temp_unlocked;
     const bool has_pin  = s.pin_length_ok && s.pin_length > 0;
     ui::note_unlocked(s.temp_unlocked_ok, s.temp_unlocked);
-    cadran::set_pill(!s.restriction_enabled_ok ? "" : unlocked ? "Déverrouillé temporairement"
-                     : s.restriction_enabled ? "Contrôle parental actif" : "Contrôle parental non configuré");
+    if (!s.restriction_enabled_ok) cadran::set_pill("");
+    else if (unlocked) cadran::set_pill("Déverrouillé temporairement", "unlock", true);
+    else if (s.restriction_enabled) cadran::set_pill("Contrôle parental actif");
+    else cadran::set_pill("Contrôle parental non configuré", "alert", true);
 
     // The ring: today's limit, what is left of it.
     const int today = ui::today_weekday();

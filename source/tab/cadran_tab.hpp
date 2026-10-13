@@ -33,8 +33,9 @@ void style_rail(brls::View* tab_frame);
 // Both, for the main screen.
 void style_frame(brls::AppletFrame* frame, brls::View* tab_frame);
 // The main screen's header pill: its text, or hidden when empty (each
-// screen says what it has to: "Contrôle parental actif", "Minuteur actif"…).
-void set_pill(const std::string& text);
+// screen says what it has to: "Contrôle parental actif", "Minuteur actif"…),
+// its icon, and amber for a state that needs the parent ("Pas de code PIN").
+void set_pill(const std::string& text, const char* icon = "check", bool warn = false);
 // The soft glow of the boards, an absolute full-screen view to add first in
 // a frame: a radial gradient of `color_key` centred on (cx, cy), `radius`
 // wide. PLAYGUARD_SIM_CADRAN_NOGLOW=1 draws nothing.

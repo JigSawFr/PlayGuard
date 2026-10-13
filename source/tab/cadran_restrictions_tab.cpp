@@ -162,7 +162,9 @@ void CadranRestrictionsTab::refresh()
     const std::string na = "playguard/common/unavailable"_i18n;
     pctl_status_fetch(&this->st);
     const PctlStatus& st = this->st;
-    cadran::set_pill(st.pin_length_ok ? (st.pin_length ? "PIN défini" : "Pas de code PIN") : "");
+    if (!st.pin_length_ok) cadran::set_pill("");
+    else if (st.pin_length) cadran::set_pill("PIN défini", "key");
+    else cadran::set_pill("Pas de code PIN", "key", true);
     const std::string org = st.rating_org_ok ? pctl_rating_org_name(st.rating_org) : "";
 
     level_value->setText(st.safety_level_ok ? ui::level_name(st.safety_level) : na);

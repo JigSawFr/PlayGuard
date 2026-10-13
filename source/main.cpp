@@ -31,6 +31,7 @@
 #include "tab/about_tab.hpp"
 #include "tab/cadran_activity_tab.hpp"
 #include "tab/cadran_play_timer_tab.hpp"
+#include "tab/cadran_lists.hpp"
 #include "tab/cadran_restrictions_tab.hpp"
 #include "tab/cadran_tab.hpp"
 #include "tab/activity_tab.hpp"
@@ -288,6 +289,11 @@ int main(int argc, char* argv[])
     brls::Application::registerXMLView("CadranPlayTimerTab", CadranPlayTimerTab::create);
     brls::Application::registerXMLView("CadranActivityTab", CadranActivityTab::create);
     brls::Application::registerXMLView("CadranWeekView",  CadranWeekView::create);
+    brls::Application::registerXMLView("CadranClockTab",  CadranClockTab::create);
+    brls::Application::registerXMLView("CadranSecurityTab", CadranSecurityTab::create);
+    brls::Application::registerXMLView("CadranPreferencesTab", CadranPreferencesTab::create);
+    brls::Application::registerXMLView("CadranToolsTab",  CadranToolsTab::create);
+    brls::Application::registerXMLView("CadranAboutTab",  CadranAboutTab::create);
     brls::Application::registerXMLView("PlayTimerTab",    PlayTimerTab::create);
     brls::Application::registerXMLView("ActivityTab",     ActivityTab::create);
     brls::Application::registerXMLView("RestrictionsTab", RestrictionsTab::create);

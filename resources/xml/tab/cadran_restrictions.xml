@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- "Cadran" prototype of Restrictions (desktop simulation, PLAYGUARD_SIM_CADRAN=1):
+<!-- "Cadran" prototype of Restrictions (PLAYGUARD_SIM_CADRAN=1 on the desktop, Tools › Developer › Cadran prototype on the console):
      the level as four tiles (built by source/tab/cadran_restrictions_tab.cpp),
      the other settings as three cards. Strings not localised. -->
 
