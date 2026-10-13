@@ -4,7 +4,7 @@
 // will, the discovery, the state and activity, orders applied, refused,
 // merged, taken by the host or kept waiting, Home Assistant restarting,
 // the broker refusing or dropping the connection, oversized messages.
-#include <assert.h>
+#include "check.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -77,7 +77,7 @@ static void broker_reset(void)
 
 static void emit(const uint8_t *b, size_t n)
 {
-    assert(broker.out_len + n <= sizeof(broker.out));
+    REQUIRE(broker.out_len + n <= sizeof(broker.out));
     memcpy(broker.out + broker.out_len, b, n);
     broker.out_len += n;
 }
@@ -87,7 +87,7 @@ static void emit_publish(const char *topic, const char *payload, size_t len, boo
     uint8_t head[256];
     const size_t h = mqtt_encode_publish_head(head, sizeof(head), broker.version ? broker.version : MQTT_V311, topic, len,
                                               qos, retain, false, qos ? broker.next_id++ : 0);
-    assert(h);
+    REQUIRE(h);
     emit(head, h);
     emit((const uint8_t *)payload, len);
 }
@@ -119,7 +119,7 @@ static void broker_publish(const char *topic, const char *payload, size_t len, b
             if (m) *m = broker.retained[--broker.n_retained];
         } else {
             if (!m) {
-                assert(broker.n_retained < MAX_RETAINED);
+                REQUIRE(broker.n_retained < MAX_RETAINED);
                 m = &broker.retained[broker.n_retained++];
             }
             snprintf(m->topic, sizeof(m->topic), "%s", topic);
@@ -155,7 +155,7 @@ static void broker_kick(uint8_t code, const char *reason)
 static void read_str(const uint8_t **p, char *out, size_t cap)
 {
     const size_t n = ((size_t)(*p)[0] << 8) | (*p)[1];
-    assert(n < cap);
+    REQUIRE(n < cap);
     memcpy(out, *p + 2, n);
     out[n] = '\0';
     *p += 2 + n;
@@ -243,12 +243,12 @@ static void broker_handle(const MqttPacket *pk)
     }
     case MQTT_PUBLISH: {
         MqttPublish m;
-        assert(mqtt_decode_publish(pk, broker.version, &m) == MQTT_OK);
-        assert(m.qos == 0);   // the client publishes QoS 0 only
+        CHECK(mqtt_decode_publish(pk, broker.version, &m) == MQTT_OK);
+        CHECK(m.qos == 0);   // the client publishes QoS 0 only
         char topic[160];
         memcpy(topic, m.topic, m.topic_len);
         topic[m.topic_len] = '\0';
-        assert(broker.n_log < MAX_LOG);
+        REQUIRE(broker.n_log < MAX_LOG);
         Message *l = &broker.log[broker.n_log++];
         snprintf(l->topic, sizeof(l->topic), "%s", topic);
         memcpy(l->payload, m.payload, m.payload_len);
@@ -308,7 +308,7 @@ static void broker_handle(const MqttPacket *pk)
         broker_drop(false);
         break;
     default:
-        assert(!"unexpected packet from the client");
+        CHECK(!"unexpected packet from the client");
     }
 }
 
@@ -331,8 +331,8 @@ static int io_open(void *ctx, const char *host, uint16_t port, int timeout_ms, c
 {
     (void)ctx;
     (void)timeout_ms;
-    assert(!strcmp(host, "broker.lan") || !strcmp(host, "other.lan"));
-    assert(port == 1883);
+    CHECK(!strcmp(host, "broker.lan") || !strcmp(host, "other.lan"));
+    CHECK(port == 1883);
     if (!broker.up) {
         snprintf(err, err_size, "connection refused");
         return -1;
@@ -347,7 +347,7 @@ static int io_write(void *ctx, const void *buf, size_t len, int timeout_ms)
     (void)ctx;
     (void)timeout_ms;
     if (!broker.open) return -1;
-    assert(broker.in_len + len <= sizeof(broker.in));
+    REQUIRE(broker.in_len + len <= sizeof(broker.in));
     memcpy(broker.in + broker.in_len, buf, len);
     broker.in_len += len;
     broker_feed();
@@ -433,7 +433,7 @@ static size_t h_profiles(void *ctx, char (*names)[SYNC_PROFILE_MAX], size_t max)
 {
     (void)ctx;
     host.profiles_asked++;
-    assert(max >= 2);
+    REQUIRE(max >= 2);
     strcpy(names[0], "School week");
     strcpy(names[1], "Holidays");
     return 2;
@@ -535,38 +535,38 @@ static void test_connect_and_publish(void)
 {
     setup(false, SyncPolicy_Auto);
     turns(3);
-    assert(sync_engine_online(&engine) && engine.status.state == SyncLink_Online);
-    assert(!strcmp(broker.client_id, "pg-a1b2c3d4-app"));
-    assert(!strcmp(broker.username, "parent") && !strcmp(broker.password, "secret"));
-    assert(broker.has_will && !strcmp(broker.will.topic, "playguard/a1b2c3d4/availability") &&
+    CHECK(sync_engine_online(&engine) && engine.status.state == SyncLink_Online);
+    CHECK(!strcmp(broker.client_id, "pg-a1b2c3d4-app"));
+    CHECK(!strcmp(broker.username, "parent") && !strcmp(broker.password, "secret"));
+    CHECK(broker.has_will && !strcmp(broker.will.topic, "playguard/a1b2c3d4/availability") &&
            !strcmp(broker.will.payload, "offline") && broker.will.retain);
     const Message *avail = find_retained("playguard/a1b2c3d4/availability");
-    assert(avail && !strcmp(avail->payload, "online"));
-    assert(broker.n_subs == 2 && !strcmp(broker.subs[0], "playguard/a1b2c3d4/+/set") && broker.sub_qos[0] == 1 &&
+    CHECK(avail && !strcmp(avail->payload, "online"));
+    CHECK(broker.n_subs == 2 && !strcmp(broker.subs[0], "playguard/a1b2c3d4/+/set") && broker.sub_qos[0] == 1 &&
            !strcmp(broker.subs[1], "homeassistant/status"));
     const Message *disc = find_retained("homeassistant/device/playguard_a1b2c3d4/config");
-    assert(disc && strstr(disc->payload, "\"cmps\":{") && !strstr(disc->payload, "limit_mon"));
-    assert(host.profiles_asked >= 1);
+    CHECK(disc && strstr(disc->payload, "\"cmps\":{") && !strstr(disc->payload, "limit_mon"));
+    CHECK(host.profiles_asked >= 1);
     const Message *st = find_retained("playguard/a1b2c3d4/state");
-    assert(st && strstr(st->payload, "\"schema\":1"));
-    assert(find_retained("playguard/a1b2c3d4/activity"));
+    CHECK(st && strstr(st->payload, "\"schema\":1"));
+    CHECK(find_retained("playguard/a1b2c3d4/activity"));
 
     // The state again after poll_s, not before.
     const unsigned states = host.states;
     now += 10000;
     turns(1);
-    assert(host.states == states);
+    CHECK(host.states == states);
     now += 25000;
     turns(1);
-    assert(host.states == states + 1);
+    CHECK(host.states == states + 1);
 
     // Today's activity: every minute, or at once when the host says it changed.
     const size_t acts = count_on("playguard/a1b2c3d4/activity");
     turns(1);
-    assert(count_on("playguard/a1b2c3d4/activity") == acts);
+    CHECK(count_on("playguard/a1b2c3d4/activity") == acts);
     sync_engine_activity_changed(&engine);
     turns(1);
-    assert(count_on("playguard/a1b2c3d4/activity") == acts + 1);
+    CHECK(count_on("playguard/a1b2c3d4/activity") == acts + 1);
 }
 
 static void test_orders_applied_and_refused(void)
@@ -577,39 +577,39 @@ static void test_orders_applied_and_refused(void)
     const unsigned states = host.states;
     ha_order("vr_restricted", "ON");
     turns(2);
-    assert(host.orders == 1 && host.last_intent.kind == SyncIntent_Vr && host.last_intent.on);
-    assert(strstr(last_event(), "\"event_type\":\"command_applied\"") && strstr(last_event(), "\"entity\":\"vr_restricted\""));
-    assert(!retained_order("vr_restricted"));
+    CHECK(host.orders == 1 && host.last_intent.kind == SyncIntent_Vr && host.last_intent.on);
+    CHECK(strstr(last_event(), "\"event_type\":\"command_applied\"") && strstr(last_event(), "\"entity\":\"vr_restricted\""));
+    CHECK(!retained_order("vr_restricted"));
     now += 400;
     turns(1);
-    assert(host.states > states);
-    assert(!strcmp(engine.status.last_result, "vr_restricted: applied"));
+    CHECK(host.states > states);
+    CHECK(!strcmp(engine.status.last_result, "vr_restricted: applied"));
 
     // Out of range: refused without asking the host.
     ha_order("restriction_level", "adult");
     turns(2);
-    assert(host.orders == 1 && strstr(last_event(), "command_rejected") && strstr(last_event(), "\"reason\":\"invalid\""));
-    assert(!retained_order("restriction_level"));
+    CHECK(host.orders == 1 && strstr(last_event(), "command_rejected") && strstr(last_event(), "\"reason\":\"invalid\""));
+    CHECK(!retained_order("restriction_level"));
 
     // A play-timer order while remote_timer_writes is off.
     ha_order("limit_mon", "90");
     now += 2000;
     turns(2);
-    assert(host.orders == 1 && strstr(last_event(), "timer_writes_disabled") && !retained_order("limit_mon"));
+    CHECK(host.orders == 1 && strstr(last_event(), "timer_writes_disabled") && !retained_order("limit_mon"));
 
     // Refused by the host (the console said no).
     host.answer = SyncReason_NotCustom;
     ha_order("sns_post_restricted", "OFF");
     turns(2);
-    assert(host.orders == 2 && strstr(last_event(), "\"reason\":\"not_custom\"") && !retained_order("sns_post_restricted"));
-    assert(engine.status.rejected == 3);
+    CHECK(host.orders == 2 && strstr(last_event(), "\"reason\":\"not_custom\"") && !retained_order("sns_post_restricted"));
+    CHECK(engine.status.rejected == 3);
 
     // Read-only: refused before the host.
     host.read_only = true;
     host.answer = SyncReason_None;
     ha_order("vr_restricted", "OFF");
     turns(2);
-    assert(host.orders == 2 && strstr(last_event(), "read_only"));
+    CHECK(host.orders == 2 && strstr(last_event(), "read_only"));
     host.read_only = false;
 
     // An order that was there before the console came back: RETAIN 1.
@@ -617,7 +617,7 @@ static void test_orders_applied_and_refused(void)
     ha_order("vr_restricted", "ON");
     now += 10000;
     turns(3);
-    assert(host.orders == 3 && host.last_retained && !retained_order("vr_restricted"));
+    CHECK(host.orders == 3 && host.last_retained && !retained_order("vr_restricted"));
 }
 
 static void test_policy_off(void)
@@ -626,17 +626,17 @@ static void test_policy_off(void)
     turns(3);
     ha_order("lock_now", "PRESS");
     turns(2);
-    assert(host.orders == 0 && strstr(last_event(), "policy_off"));
+    CHECK(host.orders == 0 && strstr(last_event(), "policy_off"));
     // Harmless orders still work.
     const size_t before = count_on("homeassistant/device/playguard_a1b2c3d4/config");
     ha_order("sync_now", "PRESS");
     turns(2);
-    assert(strstr(last_event(), "command_applied"));
-    assert(count_on("homeassistant/device/playguard_a1b2c3d4/config") == before + 1);
+    CHECK(strstr(last_event(), "command_applied"));
+    CHECK(count_on("homeassistant/device/playguard_a1b2c3d4/config") == before + 1);
     ha_order("export_report", "PRESS");
     turns(2);
-    assert(host.reports == 1 && strstr(last_event(), "command_applied"));
-    assert(!find_retained("playguard/a1b2c3d4/report"));   // publish_report is off
+    CHECK(host.reports == 1 && strstr(last_event(), "command_applied"));
+    CHECK(!find_retained("playguard/a1b2c3d4/report"));   // publish_report is off
 }
 
 static void test_limits_merged(void)
@@ -647,29 +647,29 @@ static void test_limits_merged(void)
     ha_order("limit_mon", "90");
     ha_order("limit_tue", "60");
     turns(1);
-    assert(host.orders == 0);
+    CHECK(host.orders == 0);
     ha_order("limit_mon", "100");   // the newest replaces the queued one, and the pause starts again
     now += 1000;
     turns(1);
-    assert(host.orders == 0);
+    CHECK(host.orders == 0);
     now += 600;
     turns(1);
-    assert(host.orders == 0);
+    CHECK(host.orders == 0);
     now += 1000;
     turns(2);
-    assert(host.orders == 1);
+    CHECK(host.orders == 1);
     const SyncIntent *in = &host.last_intent;
-    assert(in->kind == SyncIntent_LimitsWeek && in->mask == 0x06 && in->days[1] == 100 && in->days[2] == 60);
-    assert(!retained_order("limit_mon") && !retained_order("limit_tue"));
+    CHECK(in->kind == SyncIntent_LimitsWeek && in->mask == 0x06 && in->days[1] == 100 && in->days[2] == 60);
+    CHECK(!retained_order("limit_mon") && !retained_order("limit_tue"));
     // Two events, one per order.
     size_t applied = 0;
     for (size_t i = 0; i < broker.n_log; i++)
         if (!strcmp(broker.log[i].topic, "playguard/a1b2c3d4/event") && strstr(broker.log[i].payload, "command_applied"))
             applied++;
-    assert(applied == 2);
+    CHECK(applied == 2);
     // The discovery announces the timer entities and the profiles.
     const Message *disc = find_retained("homeassistant/device/playguard_a1b2c3d4/config");
-    assert(strstr(disc->payload, "limit_mon") && strstr(disc->payload, "\"ops\":[\"School week\",\"Holidays\"]"));
+    CHECK(strstr(disc->payload, "limit_mon") && strstr(disc->payload, "\"ops\":[\"School week\",\"Holidays\"]"));
 }
 
 static void test_async_and_waiting(void)
@@ -679,14 +679,14 @@ static void test_async_and_waiting(void)
     host.async = true;
     ha_order("console_lock", "ON");
     turns(2);
-    assert(host.orders == 1 && host.taken_id != 0 && sync_engine_pending(&engine) == 1);
-    assert(retained_order("console_lock"));   // nothing reported yet
+    CHECK(host.orders == 1 && host.taken_id != 0 && sync_engine_pending(&engine) == 1);
+    CHECK(retained_order("console_lock"));   // nothing reported yet
     SyncOutcome out;
     sync_outcome_init(&out);
     out.applied = true;
     sync_engine_order_done(&engine, host.taken_id, &out);
-    assert(sync_engine_pending(&engine) == 0 && !retained_order("console_lock"));
-    assert(strstr(last_event(), "command_applied"));
+    CHECK(sync_engine_pending(&engine) == 0 && !retained_order("console_lock"));
+    CHECK(strstr(last_event(), "command_applied"));
 
     // Kept waiting (nobody at the console to confirm): stays on the broker,
     // reported once even when the broker sends it again.
@@ -694,16 +694,16 @@ static void test_async_and_waiting(void)
     host.answer = SyncReason_Waiting;
     ha_order("stop_today", "PRESS");
     turns(2);
-    assert(retained_order("stop_today") && strstr(last_event(), "command_waiting"));
+    CHECK(retained_order("stop_today") && strstr(last_event(), "command_waiting"));
     const size_t events = count_on("playguard/a1b2c3d4/event");
     sync_engine_replay_orders(&engine);
     turns(2);
-    assert(host.orders == 3 && count_on("playguard/a1b2c3d4/event") == events);
+    CHECK(host.orders == 3 && count_on("playguard/a1b2c3d4/event") == events);
     // Confirmed later.
     host.answer = SyncReason_None;
     sync_engine_replay_orders(&engine);
     turns(2);
-    assert(!retained_order("stop_today") && strstr(last_event(), "command_applied"));
+    CHECK(!retained_order("stop_today") && strstr(last_event(), "command_applied"));
 }
 
 static void test_home_assistant_restart_and_discovery_switch(void)
@@ -713,23 +713,23 @@ static void test_home_assistant_restart_and_discovery_switch(void)
     const size_t before = count_on("homeassistant/device/playguard_a1b2c3d4/config");
     broker_publish("homeassistant/status", "online", 6, false);
     turns(2);
-    assert(count_on("homeassistant/device/playguard_a1b2c3d4/config") == before + 1);
+    CHECK(count_on("homeassistant/device/playguard_a1b2c3d4/config") == before + 1);
     // "offline" changes nothing.
     broker_publish("homeassistant/status", "offline", 7, false);
     turns(2);
-    assert(count_on("homeassistant/device/playguard_a1b2c3d4/config") == before + 1);
+    CHECK(count_on("homeassistant/device/playguard_a1b2c3d4/config") == before + 1);
 
     // The integration takes over: the native discovery is cleared and saved off.
     ha_order("discovery", "off");
     turns(2);
-    assert(!find_retained("homeassistant/device/playguard_a1b2c3d4/config"));
-    assert(host.conf_changes == 1 && !host.saved.ha_discovery);
+    CHECK(!find_retained("homeassistant/device/playguard_a1b2c3d4/config"));
+    CHECK(host.conf_changes == 1 && !host.saved.ha_discovery);
     broker_publish("homeassistant/status", "online", 6, false);
     turns(2);
-    assert(!find_retained("homeassistant/device/playguard_a1b2c3d4/config"));
+    CHECK(!find_retained("homeassistant/device/playguard_a1b2c3d4/config"));
     ha_order("discovery", "on");
     turns(2);
-    assert(find_retained("homeassistant/device/playguard_a1b2c3d4/config") && host.saved.ha_discovery);
+    CHECK(find_retained("homeassistant/device/playguard_a1b2c3d4/config") && host.saved.ha_discovery);
 }
 
 static void test_connection_failures(void)
@@ -738,28 +738,28 @@ static void test_connection_failures(void)
     setup(false, SyncPolicy_Auto);
     broker.refuse_code = 4;
     turns(1);
-    assert(!sync_engine_online(&engine) && engine.status.state == SyncLink_Waiting);
-    assert(strstr(engine.status.error, "bad user name or password"));
+    CHECK(!sync_engine_online(&engine) && engine.status.state == SyncLink_Waiting);
+    CHECK(strstr(engine.status.error, "bad user name or password"));
     const unsigned attempts = broker.connects;
     sync_engine_step(&engine, 50);
-    assert(broker.connects == attempts);   // not before the pause
+    CHECK(broker.connects == attempts);   // not before the pause
     broker.refuse_code = 0;
     now += 5000;
     turns(2);
-    assert(sync_engine_online(&engine));
+    CHECK(sync_engine_online(&engine));
 
     // The broker drops the connection: its last will says offline, then the
     // engine reconnects and says online again.
     broker_drop(true);
     turns(1);
     const Message *avail = find_retained("playguard/a1b2c3d4/availability");
-    assert(avail && !strcmp(avail->payload, "offline"));
-    assert(!sync_engine_online(&engine));
+    CHECK(avail && !strcmp(avail->payload, "offline"));
+    CHECK(!sync_engine_online(&engine));
     now += 6000;
     turns(3);
-    assert(sync_engine_online(&engine));
+    CHECK(sync_engine_online(&engine));
     avail = find_retained("playguard/a1b2c3d4/availability");
-    assert(!strcmp(avail->payload, "online"));
+    CHECK(!strcmp(avail->payload, "online"));
 
     // Unreachable: the pause doubles, up to 5 minutes.
     broker_drop(false);
@@ -769,18 +769,18 @@ static void test_connection_failures(void)
         now += 400000;
         turns(1);
     }
-    assert(engine.backoff_ms == 300000);
+    CHECK(engine.backoff_ms == 300000);
     broker.up = true;
     now += 400000;
     turns(3);
-    assert(sync_engine_online(&engine) && engine.backoff_ms == 0);
+    CHECK(sync_engine_online(&engine) && engine.backoff_ms == 0);
 
     // A clean stop: offline, DISCONNECT, no last will.
     const unsigned disconnects = broker.disconnects;
     sync_engine_stop(&engine);
-    assert(broker.disconnects == disconnects + 1);
+    CHECK(broker.disconnects == disconnects + 1);
     avail = find_retained("playguard/a1b2c3d4/availability");
-    assert(!strcmp(avail->payload, "offline"));
+    CHECK(!strcmp(avail->payload, "offline"));
 }
 
 static void test_keepalive(void)
@@ -793,14 +793,14 @@ static void test_keepalive(void)
         now += 1000;
         sync_engine_step(&engine, 0);
     }
-    assert(broker.pings == pings + 1 && sync_engine_online(&engine));
+    CHECK(broker.pings == pings + 1 && sync_engine_online(&engine));
     // The broker stops answering: closed after the keep-alive.
     broker.answer_pings = false;
     for (int i = 0; i < 90 && sync_engine_online(&engine); i++) {
         now += 1000;
         sync_engine_step(&engine, 0);
     }
-    assert(!sync_engine_online(&engine) && strstr(engine.status.error, "stopped answering"));
+    CHECK(!sync_engine_online(&engine) && strstr(engine.status.error, "stopped answering"));
 }
 
 static void test_oversized_and_reconfigure(void)
@@ -814,10 +814,10 @@ static void test_oversized_and_reconfigure(void)
     big[sizeof(big) - 1] = '\0';
     ha_order("vr_restricted", big);
     turns(3);
-    assert(sync_engine_online(&engine) && engine.mqtt.dropped == 1 && host.orders == 0);
+    CHECK(sync_engine_online(&engine) && engine.mqtt.dropped == 1 && host.orders == 0);
     ha_order("vr_restricted", "ON");
     turns(2);
-    assert(host.orders == 1);
+    CHECK(host.orders == 1);
 
     // The same sync.conf on an emuMMC: a device of its own (its id's first
     // digit's top bit flipped), so the console's device is cleared and left
@@ -827,19 +827,19 @@ static void test_oversized_and_reconfigure(void)
     unsigned connects = broker.connects;
     sync_engine_reconfigure(&engine, &emu);
     turns(3);
-    assert(sync_engine_online(&engine) && broker.connects == connects + 1);
-    assert(!strcmp(broker.client_id, "pg-21b2c3d4-app"));
+    CHECK(sync_engine_online(&engine) && broker.connects == connects + 1);
+    CHECK(!strcmp(broker.client_id, "pg-21b2c3d4-app"));
     const Message *cleared = find_retained("homeassistant/device/playguard_a1b2c3d4/config");
-    assert(!cleared || !cleared->payload[0]);
-    assert(find_retained("homeassistant/device/playguard_21b2c3d4/config"));
+    CHECK(!cleared || !cleared->payload[0]);
+    CHECK(find_retained("homeassistant/device/playguard_21b2c3d4/config"));
     const Message *avail = find_retained("playguard/21b2c3d4/availability");
-    assert(avail && !strcmp(avail->payload, "online"));
+    CHECK(avail && !strcmp(avail->payload, "online"));
     avail = find_retained("playguard/a1b2c3d4/availability");
-    assert(avail && !strcmp(avail->payload, "offline"));
-    assert(find_retained("playguard/21b2c3d4/state"));
+    CHECK(avail && !strcmp(avail->payload, "offline"));
+    CHECK(find_retained("playguard/21b2c3d4/state"));
     sync_engine_reconfigure(&engine, &conf);
     turns(3);
-    assert(sync_engine_online(&engine) && !strcmp(broker.client_id, "pg-a1b2c3d4-app"));
+    CHECK(sync_engine_online(&engine) && !strcmp(broker.client_id, "pg-a1b2c3d4-app"));
 
     // Another broker: reconnects there.
     SyncConf other = conf;
@@ -847,18 +847,18 @@ static void test_oversized_and_reconfigure(void)
     connects = broker.connects;
     sync_engine_reconfigure(&engine, &other);
     turns(3);
-    assert(sync_engine_online(&engine) && broker.connects == connects + 1);
+    CHECK(sync_engine_online(&engine) && broker.connects == connects + 1);
     // Turned off: disconnects and stays off.
     other.enabled = false;
     sync_engine_reconfigure(&engine, &other);
     turns(2);
-    assert(!sync_engine_online(&engine) && engine.status.state == SyncLink_Off);
+    CHECK(!sync_engine_online(&engine) && engine.status.state == SyncLink_Off);
     // Not configured: off, with the reason.
     other.enabled = true;
     other.host[0] = '\0';
     sync_engine_reconfigure(&engine, &other);
     turns(1);
-    assert(engine.status.state == SyncLink_Off && strstr(engine.status.error, "host"));
+    CHECK(engine.status.state == SyncLink_Off && strstr(engine.status.error, "host"));
 }
 
 // MQTT 5.0 by default; "auto" falls back to 3.1.1 when the broker refuses
@@ -868,13 +868,13 @@ static void test_mqtt_versions(void)
 {
     setup(false, SyncPolicy_Auto);
     turns(3);
-    assert(sync_engine_online(&engine) && broker.version == MQTT_V5 && engine.status.protocol == MQTT_V5);
-    assert(broker.client_max_packet == SYNC_RX_SIZE);
-    assert(find_retained("playguard/a1b2c3d4/state") && find_retained("homeassistant/device/playguard_a1b2c3d4/config"));
+    CHECK(sync_engine_online(&engine) && broker.version == MQTT_V5 && engine.status.protocol == MQTT_V5);
+    CHECK(broker.client_max_packet == SYNC_RX_SIZE);
+    CHECK(find_retained("playguard/a1b2c3d4/state") && find_retained("homeassistant/device/playguard_a1b2c3d4/config"));
     // Orders and their answers work the same.
     ha_order("vr_restricted", "ON");
     turns(2);
-    assert(host.orders == 1 && strstr(last_event(), "command_applied") && !retained_order("vr_restricted"));
+    CHECK(host.orders == 1 && strstr(last_event(), "command_applied") && !retained_order("vr_restricted"));
 
     // A 3.1.1 broker: refused, then 3.1.1 at once.
     for (int closes = 0; closes < 2; closes++) {
@@ -882,14 +882,14 @@ static void test_mqtt_versions(void)
         broker.max_version = MQTT_V311;
         broker.close_on_unknown = closes;
         turns(3);
-        assert(sync_engine_online(&engine) && broker.version == MQTT_V311 && engine.status.protocol == MQTT_V311);
-        assert(broker.refused_versions == 1 && broker.connects == 1);
+        CHECK(sync_engine_online(&engine) && broker.version == MQTT_V311 && engine.status.protocol == MQTT_V311);
+        CHECK(broker.refused_versions == 1 && broker.connects == 1);
         // Reconnecting: straight to 3.1.1.
         broker_drop(true);
         turns(1);
         now += 6000;
         turns(3);
-        assert(sync_engine_online(&engine) && broker.refused_versions == 1 && broker.version == MQTT_V311);
+        CHECK(sync_engine_online(&engine) && broker.refused_versions == 1 && broker.version == MQTT_V311);
     }
 
     // 5.0 asked for: no fallback, the reason said.
@@ -898,13 +898,13 @@ static void test_mqtt_versions(void)
     conf.mqtt_version = SyncMqtt_V5;
     sync_engine_reconfigure(&engine, &conf);
     turns(1);
-    assert(!sync_engine_online(&engine) && strstr(engine.status.error, "does not speak this MQTT version"));
-    assert(broker.refused_versions == 1 && broker.connects == 0);
+    CHECK(!sync_engine_online(&engine) && strstr(engine.status.error, "does not speak this MQTT version"));
+    CHECK(broker.refused_versions == 1 && broker.connects == 0);
     // "auto" again: the fallback.
     conf.mqtt_version = SyncMqtt_Auto;
     sync_engine_reconfigure(&engine, &conf);
     turns(3);
-    assert(sync_engine_online(&engine) && broker.version == MQTT_V311);
+    CHECK(sync_engine_online(&engine) && broker.version == MQTT_V311);
 
     // A 5.0-only broker: 3.1.1 asked for is refused; "auto" uses 5.0 again
     // once the settings change (what worked is forgotten).
@@ -913,11 +913,11 @@ static void test_mqtt_versions(void)
     conf.mqtt_version = SyncMqtt_V311;
     sync_engine_reconfigure(&engine, &conf);
     turns(1);
-    assert(!sync_engine_online(&engine) && strstr(engine.status.error, "does not speak this MQTT version"));
+    CHECK(!sync_engine_online(&engine) && strstr(engine.status.error, "does not speak this MQTT version"));
     conf.mqtt_version = SyncMqtt_Auto;
     sync_engine_reconfigure(&engine, &conf);
     turns(3);
-    assert(sync_engine_online(&engine) && broker.version == MQTT_V5 && engine.proto_ok == MQTT_V5);
+    CHECK(sync_engine_online(&engine) && broker.version == MQTT_V5 && engine.proto_ok == MQTT_V5);
 }
 
 // What a 5.0 broker says in its CONNACK and DISCONNECT.
@@ -927,43 +927,43 @@ static void test_mqtt5_properties(void)
     setup(false, SyncPolicy_Auto);
     broker.server_keepalive = 10;
     turns(3);
-    assert(sync_engine_online(&engine) && engine.mqtt.keepalive_s == 10);
+    CHECK(sync_engine_online(&engine) && engine.mqtt.keepalive_s == 10);
     const unsigned pings = broker.pings;
     for (int i = 0; i < 9 && broker.pings == pings; i++) {
         now += 1000;
         sync_engine_step(&engine, 0);
     }
-    assert(broker.pings == pings + 1);
+    CHECK(broker.pings == pings + 1);
 
     // A refusal with its reason string.
     setup(false, SyncPolicy_Auto);
     broker.refuse_code = 5;
     strcpy(broker.reason, "acl denies pg-a1b2c3d4-app");
     turns(1);
-    assert(!sync_engine_online(&engine) && strstr(engine.status.error, "not authorised (acl denies pg-a1b2c3d4-app)"));
-    assert(broker.refused_versions == 0);   // not a version problem: no 3.1.1 attempt
+    CHECK(!sync_engine_online(&engine) && strstr(engine.status.error, "not authorised (acl denies pg-a1b2c3d4-app)"));
+    CHECK(broker.refused_versions == 0);   // not a version problem: no 3.1.1 attempt
 
     // No retained messages: the link cannot work.
     setup(false, SyncPolicy_Auto);
     broker.no_retain = true;
     turns(1);
-    assert(!sync_engine_online(&engine) && strstr(engine.status.error, "retained messages"));
+    CHECK(!sync_engine_online(&engine) && strstr(engine.status.error, "retained messages"));
 
     // A small maximum packet size: the discovery (about 13 KiB) is not sent,
     // the rest is.
     setup(false, SyncPolicy_Auto);
     broker.max_packet = 2048;
     turns(3);
-    assert(sync_engine_online(&engine) && engine.mqtt.too_large >= 1);
-    assert(!find_retained("homeassistant/device/playguard_a1b2c3d4/config") && find_retained("playguard/a1b2c3d4/state"));
+    CHECK(sync_engine_online(&engine) && engine.mqtt.too_large >= 1);
+    CHECK(!find_retained("homeassistant/device/playguard_a1b2c3d4/config") && find_retained("playguard/a1b2c3d4/state"));
 
     // The broker ends the session, saying why.
     setup(false, SyncPolicy_Auto);
     turns(3);
     broker_kick(0x8E, "taken");
     turns(1);
-    assert(!sync_engine_online(&engine));
-    assert(strstr(engine.status.error, "session taken over by another client (taken)"));
+    CHECK(!sync_engine_online(&engine));
+    CHECK(strstr(engine.status.error, "session taken over by another client (taken)"));
 }
 
 int main(void)
@@ -981,6 +981,5 @@ int main(void)
     test_oversized_and_reconfigure();
     test_mqtt_versions();
     test_mqtt5_properties();
-    puts("sync_engine: all tests passed");
-    return 0;
+    return CHECK_DONE("sync_engine: all tests passed");
 }
