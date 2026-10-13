@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <exception>
+#include <functional>
 #include <typeinfo>
 
 #include "action/fw_gate.hpp"
@@ -318,8 +319,12 @@ int main(int argc, char* argv[])
     // Preferences first: the locale must be chosen before borealis loads i18n.
     config::load();
     startup_mark(StartupStep_Preferences);
-    // Remote link: what the agent sysmodule needs of config.json follows
-    // every save (sync/nro_state.txt, only once the link was set up).
+    // Remote link: what the agent sysmodule needs of the settings follows
+    // every save (nro_state.txt, only once the link was set up), its files
+    // written off the UI thread as the settings are.
+    sync_files::set_writer([](const std::string& file, std::function<void()> write) {
+        ui::write_later("remote link file", std::move(write), file);
+    });
     config::set_saved_hook(sync_files::export_nro_state);
     const auto& cfg = config::get();
     // config::sanitize() keeps the language to config::LANGUAGES.

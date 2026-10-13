@@ -176,8 +176,8 @@ static void test_lists()
     assert(n.find("01000A10041EA000=Line break\n") != std::string::npos);
     assert(n.find("0100000000000001") == std::string::npos);
 
-    assert(sync_files::write_profiles({ school }));
-    assert(sync_files::write_names({ { 0x0100000000010000ULL, "Super Mario Odyssey" } }));
+    sync_files::write_profiles({ school });
+    sync_files::write_names({ { 0x0100000000010000ULL, "Super Mario Odyssey" } });
     std::string read;
     assert(paths::read_file(sync_files::dir() + "/profiles.txt", read) && read.find("=Semaine d'école") != std::string::npos);
     assert(paths::read_file(sync_files::system_dir() + "/names.txt", read) && read.find("Super Mario Odyssey") != std::string::npos);

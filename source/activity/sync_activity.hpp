@@ -7,6 +7,7 @@
 #pragma once
 
 #include <borealis.hpp>
+#include <memory>
 #include <string>
 
 #include "sync/sync_conf.h"
@@ -17,16 +18,20 @@ class SyncActivity : public brls::Activity
     CONTENT_FROM_XML_RES("activity/sync.xml");
 
     void onContentAvailable() override;
+    ~SyncActivity() override;
 
   private:
     SyncConf conf{};
+    // False once the screen is gone: a save finishing after it touches nothing.
+    std::shared_ptr<bool> alive = std::make_shared<bool>(true);
     brls::RepeatingTimer status_timer;
     std::string status_line;   // what the status cell says
 
     void refresh();
     void refresh_status();
-    // Saves sync.conf after the PIN check, applies it, refreshes. False when
-    // refused or not saved (the settings on screen go back).
+    // After the PIN check: shows `next`, saves sync.conf off the UI thread
+    // (ui::write_later), then applies it. False when refused (the settings on
+    // screen go back); a save that fails says so and shows the file again.
     bool commit(SyncConf next);
 
     BRLS_BIND(brls::Label,       intro,     "sy_intro");

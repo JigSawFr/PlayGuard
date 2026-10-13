@@ -8,6 +8,7 @@
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/sync_flow.hpp"
+#include "action/update_flow.hpp"
 #include "ui/ui.hpp"
 #include "util/agent_client.hpp"
 #include "util/config.hpp"
@@ -22,6 +23,8 @@ namespace agent_update
 namespace
 {
 constexpr long START_DELAY_MS = 2500;   // after support_flow's offers (1.5 s)
+constexpr long FREE_STEP_MS = 2000;
+constexpr int  FREE_STEPS = 30;
 constexpr long CHECK_EVERY_MS = 500;
 constexpr int  CHECK_TRIES = 20;        // 10 s
 
@@ -105,8 +108,8 @@ void go(std::shared_ptr<Run> r)
     std::string err;
     switch (r->step) {
         case S::Shutdown:
-            sync_flow::agent_stopping();   // "offline" from the agent itself
-            advance(r, true);
+            // "offline" from the agent itself, then the next step.
+            sync_flow::agent_stopping([r]() { advance(r, true); });
             return;
         case S::Stop:
         case S::StopNew: {
@@ -192,36 +195,51 @@ void tell(const Outcome& o)
     }
 }
 
+namespace
+{
+// The offer, once `main` is on top: tried every 2 s for a minute (What's new,
+// a question, the update screen in front of it first), then left for the
+// next start.
+void offer_when_free(brls::Activity* main, const std::string& bundle_dir, int tries_left)
+{
+    auto stack = brls::Application::getActivitiesStack();
+    if (stack.empty() || stack.back() != main || s_running) {
+        if (tries_left > 0)
+            brls::delay(FREE_STEP_MS, [main, bundle_dir, tries_left]() { offer_when_free(main, bundle_dir, tries_left - 1); });
+        return;
+    }
+    // A newer PlayGuard first (found meanwhile too): it carries a newer agent.
+    if (update_flow::pending_at_start()) return;
+    const modules::Module& m = agent();
+    const modules::Bundle b = modules::bundled(bundle_dir, m);
+    if (modules::offer(modules::state(paths::sd_root(), m), b) != modules::Offer::Update) return;
+    if (config::get().agent_update_skipped == b.sha256) return;
+    std::string body = brls::getStr("playguard/modules/agent/offer_body", b.version);
+    if (sync_flow::status().agent_refused) body += "\n\n" + "playguard/modules/agent/offer_refused"_i18n;
+    const std::string sha = b.sha256;
+    brls::Dialog* dialog = ui::dialog(body);
+    dialog->addButton("playguard/common/later"_i18n, [sha]() {
+        // Not at start again for this build (Tools › Optional modules
+        // still offers it).
+        config::get().agent_update_skipped = sha;
+        ui::save_config();
+    });
+    dialog->addButton("playguard/modules/update"_i18n, [bundle_dir]() {
+        if (!pin_lock::allow_change()) {
+            ui::notify(pin_lock::refusal_text());
+            return;
+        }
+        ui::notify("playguard/modules/agent/updating"_i18n);
+        run(bundle_dir, [](const Outcome& o) { tell(o); });
+    });
+    dialog->setCancelable(true);
+    dialog->open();
+}
+}   // namespace
+
 void at_start(brls::Activity* main, const std::string& bundle_dir)
 {
-    brls::delay(START_DELAY_MS, [main, bundle_dir]() {
-        auto stack = brls::Application::getActivitiesStack();
-        if (stack.empty() || stack.back() != main || s_running) return;   // something else first: next start
-        const modules::Module& m = agent();
-        const modules::Bundle b = modules::bundled(bundle_dir, m);
-        if (modules::offer(modules::state(paths::sd_root(), m), b) != modules::Offer::Update) return;
-        if (config::get().agent_update_skipped == b.sha256) return;
-        std::string body = brls::getStr("playguard/modules/agent/offer_body", b.version);
-        if (sync_flow::status().agent_refused) body += "\n\n" + "playguard/modules/agent/offer_refused"_i18n;
-        const std::string sha = b.sha256;
-        auto* dialog = new brls::Dialog(body);
-        dialog->addButton("playguard/common/later"_i18n, [sha]() {
-            // Not at start again for this build (Tools › Optional modules
-            // still offers it).
-            config::get().agent_update_skipped = sha;
-            ui::save_config();
-        });
-        dialog->addButton("playguard/modules/update"_i18n, [bundle_dir]() {
-            if (!pin_lock::allow_change()) {
-                ui::notify(pin_lock::refusal_text());
-                return;
-            }
-            ui::notify("playguard/modules/agent/updating"_i18n);
-            run(bundle_dir, [](const Outcome& o) { tell(o); });
-        });
-        dialog->setCancelable(true);
-        dialog->open();
-    });
+    brls::delay(START_DELAY_MS, [main, bundle_dir]() { offer_when_free(main, bundle_dir, FREE_STEPS); });
 }
 
 }   // namespace agent_update

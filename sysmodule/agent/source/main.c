@@ -522,6 +522,16 @@ static void append_event(const char *entity, const char *payload, const SyncOutc
     fclose(f);
 }
 
+// The records on the SD card before the console changes (sync_exec's
+// save_records): agent_state.txt.
+static bool save_records_first(void *ctx, const SyncRecords *r)
+{
+    (void)ctx;
+    char out[512];
+    const size_t n = sync_records_write(r, out, sizeof(out));
+    return n && write_file(AGENT_STATE, out, n);
+}
+
 static void exec_order(const SyncIntent *in, const char *entity, const char *payload, SyncOutcome *out)
 {
     char today[11];
@@ -534,6 +544,7 @@ static void exec_order(const SyncIntent *in, const char *entity, const char *pay
     ctx.today = today;
     ctx.rec = &g_records;
     ctx.profile_days = profile_days;
+    ctx.save_records = save_records_first;
     core_set_read_only(!may_write());
     sync_exec(in, &ctx, out);
     if (out->records_changed) save_records();

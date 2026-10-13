@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cstddef>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -26,11 +27,14 @@
 namespace sync_flow
 {
 
-// At start-up, once the first screen is up: reads sync.conf and starts the
-// link when it is on.
+// At start-up, before the first screen (main.cpp's choose_first(), after
+// the PIN check is installed): reads sync.conf and starts the link when it is
+// on; the agent's records are adopted then.
 void start();
-// At exit, after the main loop: "offline", then the worker ends (waited for
-// a few seconds at most).
+// At exit, after the main loop and before the background tasks are waited
+// for: "offline", then the worker ends and is joined (waited for a few
+// seconds; one still in a connection then is left running, never detached:
+// the console cannot).
 void stop();
 
 // sync.conf changed (the Sync screen saved it): start, reconnect or stop.
@@ -42,10 +46,11 @@ void sync_now();
 void changed();
 
 // Tools › Optional modules, around the agent: before it is stopped (PlayGuard
-// ends its session, the agent says "offline"; reload() afterwards hands the
-// link to PlayGuard's own), and once started (waits a moment for its service,
-// then the agent's session takes the link over).
-void agent_stopping();
+// ends its session, the agent says "offline"; `then` once it did, or after
+// 2 s; reload() afterwards hands the link to PlayGuard's own), and once
+// started (its service looked for every 100 ms for 3 s, then the agent's
+// session takes the link over). Neither waits on the UI thread.
+void agent_stopping(std::function<void()> then);
 void agent_started();
 // While an update of the agent runs (action/agent_update): the link does not
 // look for the agent, which comes and goes.

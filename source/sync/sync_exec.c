@@ -96,11 +96,28 @@ static Result do_write(const Write *w)
     return NXM_RC_INVALID_ARGUMENT;
 }
 
+static bool save_first(const SyncExecCtx *ctx, const SyncRecords *r)
+{
+    return !ctx->save_records || ctx->save_records(ctx->ctx, r);
+}
+
+// The records as they were before the write (`relock_pending` as given),
+// saved again.
+static void put_back(const SyncExecCtx *ctx, const SyncRecords *prev, bool relock_pending)
+{
+    *ctx->rec = *prev;
+    ctx->rec->relock_pending = relock_pending;
+    save_first(ctx, ctx->rec);
+}
+
 // As pt_flow::confirm_write + finish_write with "lock again automatically":
 // unlock when the timer counts down, write, lock again even when the write
 // failed. The unlock is recorded until the lock succeeded, so the next start
-// of either process locks again after a crash.
-static Result gated(const SyncExecCtx *ctx, SyncOutcome *out, const Write *w)
+// of either process locks again after a crash. `next`, when not NULL, is
+// what the records become with this write: saved with the unlock's record
+// before anything changes (ctx->save_records), and put back when the write
+// does not go through.
+static Result gated(const SyncExecCtx *ctx, SyncOutcome *out, const Write *w, const SyncRecords *next)
 {
     PtState pt;
     pctl_play_timer_query(&pt);
@@ -110,15 +127,22 @@ static Result gated(const SyncExecCtx *ctx, SyncOutcome *out, const Write *w)
     const Result allowed = core_change_allowed();
     if (R_FAILED(allowed)) return allowed;
     const bool unlock = needs_unlock(&pt);
-    if (unlock) {
-        ctx->rec->relock_pending = true;
+    const SyncRecords prev = *ctx->rec;
+    if (unlock || next) {
+        SyncRecords want = next ? *next : prev;
+        if (unlock) want.relock_pending = true;
+        if (!save_first(ctx, &want)) return NXM_RC_NOT_SAVED;
+        *ctx->rec = want;
         out->records_changed = true;
+    }
+    if (unlock) {
         const Result rc = pctl_unlock_restriction_temporarily();
         if (R_FAILED(rc)) {
             // Not unlocked, or locked again by the service layer: the record
             // goes only when the console reads back as locked.
             bool unlocked = true;
-            if (R_SUCCEEDED(pctl_lock_state(NULL, &unlocked)) && !unlocked) ctx->rec->relock_pending = false;
+            const bool locked = R_SUCCEEDED(pctl_lock_state(NULL, &unlocked)) && !unlocked;
+            put_back(ctx, &prev, locked ? prev.relock_pending : true);
             return rc == NXM_RC_WRITE_GATED ? NXM_RC_UNLOCK_NOT_EFFECTIVE : rc;
         }
         out->did_unlock = true;
@@ -128,6 +152,7 @@ static Result gated(const SyncExecCtx *ctx, SyncOutcome *out, const Write *w)
         if (R_SUCCEEDED(pctl_relock())) ctx->rec->relock_pending = false;
         else out->relock_failed = true;
     }
+    if (R_FAILED(rc) && next) put_back(ctx, &prev, ctx->rec->relock_pending);
     return rc;
 }
 
@@ -136,8 +161,10 @@ static void days_values(const uint16_t days[7], int out[7])
     for (int d = 0; d < 7; d++) out[d] = days[d];
 }
 
-// Writes `days` (all seven) when they differ from what the console has.
-static void write_limits(const SyncExecCtx *ctx, SyncOutcome *out, const PtState *pt, const uint16_t days[7])
+// Writes `days` (all seven) when they differ from what the console has;
+// `next`: what the records become with it (gated()).
+static void write_limits(const SyncExecCtx *ctx, SyncOutcome *out, const PtState *pt, const uint16_t days[7],
+                         const SyncRecords *next)
 {
     out->change = SyncChange_Limits;
     out->n = 7;
@@ -151,7 +178,7 @@ static void write_limits(const SyncExecCtx *ctx, SyncOutcome *out, const PtState
     memset(&w, 0, sizeof(w));
     w.kind = W_DAYS;
     memcpy(w.days, days, sizeof(w.days));
-    const Result rc = gated(ctx, out, &w);
+    const Result rc = gated(ctx, out, &w, next);
     done(out, rc, true);
 }
 
@@ -170,17 +197,6 @@ static bool read_timer(SyncOutcome *out, PtState *pt)
     return true;
 }
 
-// Limits written by anything but the console lock replace it.
-static void forget_console_lock(const SyncExecCtx *ctx, SyncOutcome *out)
-{
-    SyncRecords *r = ctx->rec;
-    if (!r->console_lock && !r->console_lock_prev_ok) return;
-    r->console_lock = false;
-    r->console_lock_prev_ok = false;
-    out->records_changed = true;
-    out->console_lock_after = 0;
-}
-
 static void exec_limits(const SyncIntent *in, const SyncExecCtx *ctx, SyncOutcome *out, uint8_t mask)
 {
     PtState pt;
@@ -189,8 +205,13 @@ static void exec_limits(const SyncIntent *in, const SyncExecCtx *ctx, SyncOutcom
     memcpy(days, pt.day_min, sizeof(days));
     for (int d = 0; d < 7; d++)
         if (mask & (1u << d)) days[d] = in->days[d];
-    write_limits(ctx, out, &pt, days);
-    if (out->applied && out->changed) forget_console_lock(ctx, out);
+    // Limits written by anything but the console lock replace it.
+    SyncRecords next = *ctx->rec;
+    const bool had_lock = next.console_lock || next.console_lock_prev_ok;
+    next.console_lock = false;
+    next.console_lock_prev_ok = false;
+    write_limits(ctx, out, &pt, days, had_lock ? &next : NULL);
+    if (had_lock && out->applied && out->changed) out->console_lock_after = 0;
 }
 
 static void exec_console_lock(const SyncIntent *in, const SyncExecCtx *ctx, SyncOutcome *out)
@@ -204,22 +225,24 @@ static void exec_console_lock(const SyncIntent *in, const SyncExecCtx *ctx, Sync
     PtState pt;
     if (!read_timer(out, &pt)) return;
     uint16_t days[7];
+    // The limits to put back are on the SD card before the console changes.
+    SyncRecords next = *r;
     if (in->on) {
         memset(days, 0, sizeof(days));
-        write_limits(ctx, out, &pt, days);
-        if (!out->applied) return;
-        r->console_lock = true;
-        r->console_lock_prev_ok = true;
-        memcpy(r->console_lock_prev, pt.day_min, sizeof(pt.day_min));
+        next.console_lock = true;
+        next.console_lock_prev_ok = true;
+        memcpy(next.console_lock_prev, pt.day_min, sizeof(pt.day_min));
     } else {
         bool any = false;
         for (int d = 0; d < 7; d++) any = any || (r->console_lock_prev_ok && r->console_lock_prev[d] != NOLIMIT);
         for (int d = 0; d < 7; d++) days[d] = any ? r->console_lock_prev[d] : (uint16_t)NOLIMIT;
-        write_limits(ctx, out, &pt, days);
-        if (!out->applied) return;
-        r->console_lock = false;
-        r->console_lock_prev_ok = false;
+        next.console_lock = false;
+        next.console_lock_prev_ok = false;
     }
+    write_limits(ctx, out, &pt, days, &next);
+    if (!out->applied) return;
+    next.relock_pending = r->relock_pending;   // as the write left it
+    *r = next;   // also when the console already had those limits (nothing written)
     out->records_changed = true;
     out->console_lock_after = in->on ? 1 : 0;
 }
@@ -229,14 +252,15 @@ static bool extra_again(const SyncExecCtx *ctx, int wd)
     return ctx->rec->extra_weekday == wd && ctx->today && !strcmp(ctx->rec->extra_date, ctx->today);
 }
 
-static void record_extra(const SyncExecCtx *ctx, SyncOutcome *out, int wd, uint16_t base, uint16_t value)
+// What the records become with extra time on weekday `wd`: what to put back.
+static SyncRecords with_extra(const SyncExecCtx *ctx, int wd, uint16_t base, uint16_t value)
 {
-    SyncRecords *r = ctx->rec;
-    r->extra_weekday = (int8_t)wd;
-    snprintf(r->extra_date, sizeof(r->extra_date), "%s", ctx->today ? ctx->today : "");
-    r->extra_base = base;
-    r->extra_value = value;
-    out->records_changed = true;
+    SyncRecords r = *ctx->rec;
+    r.extra_weekday = (int8_t)wd;
+    snprintf(r.extra_date, sizeof(r.extra_date), "%s", ctx->today ? ctx->today : "");
+    r.extra_base = base;
+    r.extra_value = value;
+    return r;
 }
 
 static void exec_bonus(const SyncIntent *in, const SyncExecCtx *ctx, SyncOutcome *out)
@@ -260,8 +284,8 @@ static void exec_bonus(const SyncIntent *in, const SyncExecCtx *ctx, SyncOutcome
     uint16_t days[7];
     memcpy(days, pt.day_min, sizeof(days));
     days[wd] = value;
-    write_limits(ctx, out, &pt, days);
-    if (out->applied && out->changed) record_extra(ctx, out, wd, original, value);
+    const SyncRecords next = with_extra(ctx, wd, original, value);
+    write_limits(ctx, out, &pt, days, &next);
 }
 
 static void exec_stop_today(const SyncExecCtx *ctx, SyncOutcome *out)
@@ -283,8 +307,8 @@ static void exec_stop_today(const SyncExecCtx *ctx, SyncOutcome *out)
     uint16_t days[7];
     memcpy(days, pt.day_min, sizeof(days));
     days[wd] = 0;
-    write_limits(ctx, out, &pt, days);
-    if (out->applied && out->changed) record_extra(ctx, out, wd, original, 0);
+    const SyncRecords next = with_extra(ctx, wd, original, 0);
+    write_limits(ctx, out, &pt, days, &next);
 }
 
 static void exec_bedtime(const SyncIntent *in, const SyncExecCtx *ctx, SyncOutcome *out)
@@ -359,7 +383,7 @@ static void exec_bedtime(const SyncIntent *in, const SyncExecCtx *ctx, SyncOutco
     w.kind = W_BEDTIME;
     memcpy(w.bed, bed, sizeof(w.bed));
     w.weekday = ctx->weekday;
-    done(out, gated(ctx, out, &w), true);
+    done(out, gated(ctx, out, &w, NULL), true);
 }
 
 static void exec_alarm(const SyncIntent *in, const SyncExecCtx *ctx, SyncOutcome *out)
@@ -383,7 +407,7 @@ static void exec_alarm(const SyncIntent *in, const SyncExecCtx *ctx, SyncOutcome
     memset(&w, 0, sizeof(w));
     w.kind = W_ALARM;
     w.alarm_disabled = disabled;
-    done(out, gated(ctx, out, &w), true);
+    done(out, gated(ctx, out, &w, NULL), true);
 }
 
 static void exec_restrictions(const SyncIntent *in, SyncOutcome *out)
@@ -560,7 +584,7 @@ bool sync_exec_restore_extra(const SyncExecCtx *ctx, SyncOutcome *out)
     uint16_t days[7];
     memcpy(days, pt.day_min, sizeof(days));
     days[wd] = r->extra_base;
-    write_limits(ctx, out, &pt, days);
+    write_limits(ctx, out, &pt, days, NULL);
     if (out->applied) {
         r->extra_weekday = -1;
         r->extra_date[0] = '\0';

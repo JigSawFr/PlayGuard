@@ -42,6 +42,7 @@ constexpr size_t REPORT_MAX = 128 * 1024;
 constexpr auto FETCH_EVERY = std::chrono::minutes(5);
 constexpr auto ACCOUNTS_FRESH = std::chrono::minutes(15);
 constexpr auto EXIT_WAIT = std::chrono::seconds(4);
+constexpr int AGENT_POLL_MS = 100;
 constexpr auto PROBE_EVERY = std::chrono::seconds(5);
 
 // What the UI thread and the worker share. The worker never calls into
@@ -759,8 +760,11 @@ void pump()
     if (saved) {
         // Only what an order may change: Home Assistant's discovery switch.
         s_conf.ha_discovery = conf.ha_discovery;
-        std::string error;
-        if (!sync_files::save(s_conf, &error)) brls::Logger::warning("sync: sync.conf not saved: {}", error);
+        const SyncConf c = s_conf;
+        ui::write_later("sync.conf", [c]() {
+            std::string error;
+            if (!sync_files::save(c, &error)) brls::Logger::warning("sync: sync.conf not saved: {}", error);
+        }, "sync.conf");
     }
     for (auto& o : orders) s_queue.push_back(std::move(o));
     next_order();
@@ -855,8 +859,12 @@ void launch()
     on_play_data();
 }
 
-// Stops the worker: "offline" and DISCONNECT, waited for a few seconds; a
-// worker still stuck in a connection after that is left to end on its own.
+// Stops the worker: "offline" and DISCONNECT, waited for a few seconds,
+// then joined. One still in a connection after that is left running: never
+// detached (on the console detach() throws and ends PlayGuard) nor left
+// joinable in s_worker (its destruction would), but moved to a thread
+// object that is never destroyed; it ends on its own (the shared state is
+// its own) or with the process.
 void halt()
 {
     if (!s_shared) return;
@@ -869,8 +877,12 @@ void halt()
     const bool ended = sh->cv.wait_for(lk, EXIT_WAIT, [&]() { return sh->finished; });
     lk.unlock();
     if (s_worker.joinable()) {
-        if (ended) s_worker.join();
-        else s_worker.detach();
+        if (ended) {
+            s_worker.join();
+        } else {
+            brls::Logger::warning("sync: the remote link's worker did not end in time; left running");
+            (void)new std::thread(std::move(s_worker));
+        }
     }
     // Orders not carried out stay retained on the broker: the next session
     // gets them again.
@@ -1055,19 +1067,45 @@ void changed()
     s_dirty = true;
 }
 
-void agent_stopping()
+namespace
 {
-    if (!s_agent) return;
-    if (agent_ok(agent_client::prepare_shutdown(), "shutdown")) {
-        // A clean "offline" before the process ends (else the broker's last
-        // will says it).
-        AgentStatus st;
-        for (int i = 0; i < 20 && s_agent; i++) {
-            if (!agent_ok(agent_client::status(&st), "status") || st.link.state != SyncLink_Online) break;
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
+// The agent said "offline" (or 2 s went by): PlayGuard's session on it ends.
+void wait_offline(int left, std::function<void()> then)
+{
+    AgentStatus st;
+    if (left > 0 && s_agent && agent_ok(agent_client::status(&st), "status") && st.link.state == SyncLink_Online) {
+        brls::delay(AGENT_POLL_MS, [left, then]() { wait_offline(left - 1, then); });
+        return;
     }
     agent_leave();
+    if (then) then();
+}
+
+// pg:agent registered (or 3 s went by): the link moves to the agent.
+void wait_agent(int left)
+{
+    if (left > 0 && !agent_client::available()) {
+        brls::delay(AGENT_POLL_MS, [left]() { wait_agent(left - 1); });
+        return;
+    }
+    reload();
+}
+}   // namespace
+
+void agent_stopping(std::function<void()> then)
+{
+    if (!s_agent) {
+        if (then) then();
+        return;
+    }
+    // A clean "offline" before the process ends (else the broker's last
+    // will says it).
+    if (agent_ok(agent_client::prepare_shutdown(), "shutdown")) {
+        wait_offline(20, std::move(then));
+        return;
+    }
+    agent_leave();
+    if (then) then();
 }
 
 void hold(bool on)
@@ -1078,9 +1116,7 @@ void hold(bool on)
 void agent_started()
 {
     // pg:agent is there once the agent is up, a moment after its start.
-    for (int i = 0; i < 30 && !agent_client::available(); i++)
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    reload();
+    wait_agent(30);
 }
 
 Status status()

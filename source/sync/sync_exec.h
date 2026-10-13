@@ -48,6 +48,13 @@ typedef struct {
     SyncRecords *rec;            // read and updated
     // A saved profile's limits (Sunday first, PT_DAY_NOLIMIT for none).
     bool (*profile_days)(void *ctx, const char *name, uint16_t days[7]);
+    // Saves the records on the SD card before a write that needs them there
+    // first (an unlock to lock again, the extra time to put back, the console
+    // lock and its saved limits), as PlayGuard's own changes do: false
+    // refuses the order (NXM_RC_NOT_SAVED), nothing written; a write that
+    // then fails has the previous records saved again. NULL: the host saves
+    // `rec` after (it is updated either way).
+    bool (*save_records)(void *ctx, const SyncRecords *rec);
     void *ctx;
 } SyncExecCtx;
 

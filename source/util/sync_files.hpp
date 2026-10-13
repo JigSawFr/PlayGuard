@@ -12,6 +12,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -37,6 +38,14 @@ bool save(const SyncConf& c, std::string* error = nullptr);
 // none. True when it changed.
 bool ensure_id(SyncConf& c, const uint8_t random[4]);
 
+// How the files the agent reads are written (nro_state.txt, profiles.txt,
+// names.txt): their text is made at the call, on the caller's thread; the
+// write itself at once by default (the host tests), or handed to `writer`
+// (PlayGuard: ui::write_later, off the UI thread; a write of the same file
+// still waiting is replaced by the newer one).
+using Writer = void (*)(const std::string& file, std::function<void()> write);
+void set_writer(Writer writer);
+
 // config.json's records <-> the shared form sync_exec updates.
 SyncRecords records_from(const config::Config& c);
 // True when something changed.
@@ -46,7 +55,8 @@ bool records_into(const SyncRecords& r, config::Config& c);
 // the PIN lock, and what the agent needs to know before it changes anything:
 // whether PlayGuard is read-only and the firmware it last ran on (the agent
 // refuses writes on another one). Written after every config save while
-// sync.conf exists (config::set_saved_hook), and when read-only mode changes.
+// sync.conf exists (config::set_saved_hook, at the end of config::snapshot()
+// on the UI thread), and when read-only mode changes.
 // set_console() says the firmware and the mode (main.cpp, ui::on_mode_changed).
 void set_console(const std::string& firmware, bool read_only);
 std::string nro_state_text(const config::Config& c);
@@ -55,11 +65,11 @@ void export_nro_state();
 // sync/profiles.txt: one "60,90,120,120,120,180,180=School week" line per
 // profile (minutes Sunday first, 65535 no limit).
 std::string profiles_text(const std::vector<profiles::Profile>& list);
-bool write_profiles(const std::vector<profiles::Profile>& list);
+void write_profiles(const std::vector<profiles::Profile>& list);
 
 // nand/<system>/sync/names.txt: one "0100000000010000=Super Mario Odyssey" line per game.
 std::string names_text(const std::vector<std::pair<uint64_t, std::string>>& names);
-bool write_names(const std::vector<std::pair<uint64_t, std::string>>& names);
+void write_names(const std::vector<std::pair<uint64_t, std::string>>& names);
 
 // nand/<system>/sync/agent_state.txt (what the agent changed itself) is at
 // least as recent as nro_state.txt next to it (what PlayGuard saved last): the agent's records are

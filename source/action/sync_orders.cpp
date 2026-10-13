@@ -93,6 +93,15 @@ void record(const Order& o, const SyncOutcome& out, const PtState* before, const
                                     "remote", "", when);
 }
 
+// What must be put back later (an unlock, the extra time, the console lock's
+// limits) on the SD card before the console changes, as PlayGuard's own
+// changes do (pt_flow, console_lock): state.json written now, not queued.
+bool save_records(void*, const SyncRecords* r)
+{
+    if (!sync_files::records_into(*r, config::get())) return true;
+    return ui::save_config_now();
+}
+
 SyncOutcome execute(const Order& o, bool remote_timer_writes)
 {
     auto& cfg = config::get();
@@ -104,6 +113,7 @@ SyncOutcome execute(const Order& o, bool remote_timer_writes)
     ctx.today = today.c_str();
     ctx.rec = &rec;
     ctx.profile_days = profile_days;
+    ctx.save_records = save_records;
     ctx.ctx = nullptr;
 
     PtState before{};
@@ -200,8 +210,10 @@ void tell(const Order& o, const SyncOutcome& out)
         ui::notify(brls::getStr("playguard/sync/done", what));
         return;
     }
-    if (out.reason == SyncReason_NotConfirmed) return;   // declined here: nothing to say
-    std::string why = brls::getStr(std::string("playguard/sync/reasons/") + sync_reason_name(out.reason));
+    if (out.reason == SyncReason_NotConfirmed && !out.rc) return;   // declined here: nothing to say
+    std::string why = out.reason == SyncReason_NotConfirmed
+                          ? pin_lock::refusal_text()   // the PIN screen's answer
+                          : brls::getStr(std::string("playguard/sync/reasons/") + sync_reason_name(out.reason));
     if (out.reason == SyncReason_PctlError && out.rc) why += " — " + ui::rc_text(out.rc);
     ui::notify(brls::getStr("playguard/sync/refused", what, why));
 }

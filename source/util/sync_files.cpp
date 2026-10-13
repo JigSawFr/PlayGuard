@@ -11,6 +11,29 @@
 namespace sync_files
 {
 
+namespace
+{
+Writer s_writer = nullptr;
+
+// `text` to `dir`/`name`: at once, or through the writer.
+void write(const std::string& dir, const char* name, std::string text)
+{
+    const std::string file = dir + "/" + name;
+    auto job = [dir, file, text]() {
+        paths::ensure_dir(dir);
+        std::string err;
+        paths::atomic_write(file, text, &err);
+    };
+    if (s_writer) s_writer(file, job);
+    else job();
+}
+}   // namespace
+
+void set_writer(Writer writer)
+{
+    s_writer = writer;
+}
+
 std::string conf_file()
 {
     return paths::data_dir() + "/sync.conf";
@@ -140,10 +163,10 @@ std::string nro_state_text(const config::Config& c)
 
 void export_nro_state()
 {
-    if (!exists()) return;
-    paths::ensure_dir(system_dir());
-    std::string err;
-    paths::atomic_write(system_dir() + "/nro_state.txt", nro_state_text(config::get()), &err);
+    // Not while the settings cannot be saved either (a damaged config.json
+    // that could not be put aside): the agent keeps what it last read.
+    if (!exists() || config::loaded() == config::Loaded::Stuck) return;
+    write(system_dir(), "nro_state.txt", nro_state_text(config::get()));
 }
 
 std::string profiles_text(const std::vector<profiles::Profile>& list)
@@ -158,10 +181,9 @@ std::string profiles_text(const std::vector<profiles::Profile>& list)
     return out;
 }
 
-bool write_profiles(const std::vector<profiles::Profile>& list)
+void write_profiles(const std::vector<profiles::Profile>& list)
 {
-    paths::ensure_dir(dir());
-    return paths::atomic_write(dir() + "/profiles.txt", profiles_text(list));
+    write(dir(), "profiles.txt", profiles_text(list));
 }
 
 std::string names_text(const std::vector<std::pair<uint64_t, std::string>>& names)
@@ -177,10 +199,9 @@ std::string names_text(const std::vector<std::pair<uint64_t, std::string>>& name
     return out;
 }
 
-bool write_names(const std::vector<std::pair<uint64_t, std::string>>& names)
+void write_names(const std::vector<std::pair<uint64_t, std::string>>& names)
 {
-    paths::ensure_dir(system_dir());
-    return paths::atomic_write(system_dir() + "/names.txt", names_text(names));
+    write(system_dir(), "names.txt", names_text(names));
 }
 
 namespace

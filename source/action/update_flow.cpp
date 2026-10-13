@@ -205,6 +205,11 @@ void at_start(brls::Activity* main)
     });
 }
 
+bool pending_at_start()
+{
+    return update::offer_at_start(config::get().update_latest, app::version(), snooze(), ui::today_date());
+}
+
 void update_now()
 {
     const std::string& via = config::get().update_via;
