@@ -68,6 +68,9 @@ discovery again when Home Assistant says it restarted, show the link online
 in Preferences › Remote access, and leave "offline" behind at exit. It
 connects in MQTT 5.0 ("auto"); "sync-311" runs the same with
 mqtt_version=3.1.1 (Mosquitto's log says which version the client spoke).
+The broker runs from a copy of its binary (Ubuntu's AppArmor profile for
+/usr/sbin/mosquitto only lets it read /etc/mosquitto) and must listen
+within 10 s.
 
 The "agent" scenario runs with a simulated agent sysmodule
 (PLAYGUARD_SIM_AGENT=running, no broker): PlayGuard must hand the link to it
@@ -316,11 +319,32 @@ if SYNC:
     mqtt_port = s.getsockname()[1]
     s.close()
     broker_conf = os.path.join(OUT, "mosquitto.conf")
+    broker_log = os.path.join(OUT, "mosquitto.log")
     open(broker_conf, "w").write(f"listener {mqtt_port} 127.0.0.1\nallow_anonymous true\npersistence false\n")
-    mqtt_broker = subprocess.Popen(["mosquitto", "-c", broker_conf], stdout=open(os.path.join(OUT, "mosquitto.log"), "w"),
-                                   stderr=subprocess.STDOUT)
+    # A copy of the binary, not /usr/sbin/mosquitto itself: Ubuntu's AppArmor
+    # profile for that path only lets it read /etc/mosquitto, so it would
+    # stop at once on this config (the runners enforce it, a container not).
+    found = shutil.which("mosquitto") or "/usr/sbin/mosquitto"
+    broker_bin = os.path.join(OUT, "bin", "mosquitto")
+    os.makedirs(os.path.dirname(broker_bin), exist_ok=True)
+    shutil.copy2(found, broker_bin)
+    mqtt_broker = subprocess.Popen([broker_bin, "-c", broker_conf], stdout=open(broker_log, "w"), stderr=subprocess.STDOUT)
     atexit.register(mqtt_broker.terminate)
-    time.sleep(1)
+    # Listening within 10 s, else why not.
+    for _ in range(40):
+        if mqtt_broker.poll() is not None:
+            break
+        try:
+            socket.create_connection(("127.0.0.1", mqtt_port), timeout=1).close()
+            break
+        except OSError:
+            time.sleep(0.25)
+    else:
+        mqtt_broker.terminate()
+    if mqtt_broker.poll() is not None:
+        tail = open(broker_log, errors="replace").read()[-2000:]
+        print(f"SMOKE FAILED: mosquitto ({found}) did not start (exit {mqtt_broker.returncode}):\n{tail}")
+        sys.exit(1)
     os.makedirs(os.path.dirname(sync_conf), exist_ok=True)
     open(sync_conf, "w").write(
         "enabled=1\nhost=127.0.0.1\n"
