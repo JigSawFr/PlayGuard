@@ -32,19 +32,31 @@ config/playguard/nand/<system>/watch.json     what PlayGuard last saw of the con
                                               limits, the user accounts), to tell what changed outside it (docs/config.md)
 config/playguard/nand/<system>/backups/*.json settings backups (never contain the PIN)
 config/playguard/nand/<system>/cache/         play data per account (activity_*.bin)
+config/playguard/nand/<system>/sync/          with Remote access: the records the optional agent needs (nro_state.txt),
+                                              the game names (names.txt), and what the agent wrote (agent_state.txt,
+                                              agent_events.log)
+config/playguard/sync.conf               Remote access: the link's settings, the broker's password included (plain text;
+                                         never in a report or an upload); shared by every system
+config/playguard/sync/profiles.txt       Remote access: the saved profiles, for the optional agent
 config/playguard/github_token            GitHub sign-in of the developer tools: the token in plain text,
                                          treat it as a password (Disconnect deletes it)
 config/playguard/rescue_report.txt       left by the recovery sysmodule, read at start-up
 config/playguard/rescue_nonce            the challenge the recovery sysmodule answers in its report
 ```
 
-The optional recovery sysmodule (`playguard-rescue.zip`, a separate download) is also extracted at the root of the SD card:
+The optional sysmodules (`playguard-rescue.zip` and `playguard-agent.zip`, separate downloads; PlayGuard also
+installs them from *Console › Optional modules*) are extracted at the root of the SD card too:
 
 ```
-atmosphere/contents/4200000000505247/exefs.nsp          the sysmodule (see sysmodule/README.md)
+atmosphere/contents/4200000000505247/exefs.nsp          the recovery sysmodule (see sysmodule/rescue/README.md)
 atmosphere/contents/4200000000505247/flags/boot2.flag   started by Atmosphère at boot
+atmosphere/contents/4200000000505247/toolbox.json       its name for sysmodule managers
 atmosphere/contents/4200000000505247/LICENSE.txt        the GPLv3 text
+atmosphere/contents/4200000000504741/…                  the remote link's agent, the same files (see sysmodule/agent/README.md)
 ```
+
+Installed from PlayGuard, each folder also has a `version.txt` (the build it is), and an update keeps the previous
+`exefs.nsp` as `exefs.nsp.bak` until the new one answers.
 
 ## Channels
 

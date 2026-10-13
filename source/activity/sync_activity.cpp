@@ -276,9 +276,11 @@ void SyncActivity::onContentAvailable()
     });
 
     id->registerClickAction([this](brls::View*) {
-        if (!sync_conf_id_valid(conf.console_id)) return true;
-        ui::info(brls::getStr("playguard/sync/id_body", conf.console_id,
-                              fmt::format("{}/{}", conf.topic_prefix, conf.console_id)));
+        // This system's (an emuMMC is a device of its own: sync_conf_device_id).
+        char device[SYNC_ID_LEN + 1];
+        sync_conf_device_id(&conf, device);
+        if (!device[0]) return true;
+        ui::info(brls::getStr("playguard/sync/id_body", device, fmt::format("{}/{}", conf.topic_prefix, device)));
         return true;
     });
 
@@ -325,7 +327,9 @@ void SyncActivity::refresh()
     timer->setOn(conf.remote_timer_writes, false);
     discovery->setOn(conf.ha_discovery, false);
     report->setOn(conf.publish_report, false);
-    id->setDetailText(sync_conf_id_valid(conf.console_id) ? std::string(conf.console_id) : "playguard/sync/none"_i18n);
+    char device[SYNC_ID_LEN + 1];
+    sync_conf_device_id(&conf, device);
+    id->setDetailText(device[0] ? std::string(device) : "playguard/sync/none"_i18n);
     note->setText("playguard/sync/note"_i18n);
     this->refresh_status();
 }

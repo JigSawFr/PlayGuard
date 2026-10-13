@@ -9,11 +9,14 @@
 // stays the only MQTT client, publishes what PlayGuard pushes, and hands it
 // the orders; in the foreground PlayGuard is the only one to read pctl.
 //
-// Files (sd:/switch/playguard/): sync.conf (the settings, PlayGuard's Sync
-// screen), sync/nro_state.txt (what PlayGuard last saved: records, read-only),
-// sync/profiles.txt; written here: sync/agent_state.txt (the records of what
-// the agent changed), sync/agent_events.log (its orders, imported into
-// PlayGuard's history), logs/agent_*.txt (reports asked for).
+// Files (sd:/config/playguard/, as PlayGuard's): sync.conf (the settings,
+// PlayGuard's Remote access screen) and sync/profiles.txt, shared by every
+// system on the SD card; in this system's own folder, nand/<system>/sync/
+// (core/nand_key.h): nro_state.txt (what PlayGuard last saved: records,
+// read-only) and names.txt, and, written here, agent_state.txt (the records of
+// what the agent changed) and agent_events.log (its orders, imported into
+// PlayGuard's history); logs/reports/report_*.txt (reports asked for, named
+// and pruned as PlayGuard's).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include <fcntl.h>
 #include <stdio.h>
@@ -25,6 +28,7 @@
 
 #include "agent_core.h"
 #include "calendar.h"
+#include "nand_key.h"
 #include "pctl_ops.h"
 #include "playstats.h"
 #include "sync_engine.h"
@@ -39,15 +43,16 @@
 #define AGENT_VERSION "0.0.0"
 #endif
 
-#define DATA_DIR     "sdmc:/switch/playguard"
+#define DATA_DIR     "sdmc:/config/playguard"
 #define CONF_PATH    DATA_DIR "/sync.conf"
 #define SYNC_DIR     DATA_DIR "/sync"
-#define NRO_STATE    SYNC_DIR "/nro_state.txt"
-#define AGENT_STATE  SYNC_DIR "/agent_state.txt"
-#define AGENT_EVENTS SYNC_DIR "/agent_events.log"
 #define PROFILES     SYNC_DIR "/profiles.txt"
-#define NAMES        SYNC_DIR "/names.txt"
-#define LOGS_DIR     DATA_DIR "/logs"
+#define REPORTS_DIR  DATA_DIR "/logs/reports"
+
+// This system's (nand/<key>/sync/), once the system is known (system_paths()).
+static char g_system_dir[64];
+static char NRO_STATE[96], AGENT_STATE[96], AGENT_EVENTS[96], NAMES[96];
+static bool g_emummc;
 
 #define ACTIVITY_EVERY_MS (5 * 60 * 1000ULL)
 #define CONF_CHECK_MS     (30 * 1000ULL)
@@ -66,6 +71,8 @@ void __libnx_initheap(void)
     fake_heap_start = g_heap;
     fake_heap_end   = g_heap + INNER_HEAP_SIZE;
 }
+
+static bool s_sd_mounted;
 
 void __appInit(void)
 {
@@ -88,7 +95,7 @@ void __appInit(void)
     }
     rc = fsInitialize();
     if (R_FAILED(rc)) diagAbortWithResult(rc);
-    fsdevMountSdmc();
+    s_sd_mounted = R_SUCCEEDED(fsdevMountSdmc());
     timeInitialize();
 }
 
@@ -144,7 +151,9 @@ static bool write_file(const char *path, const char *text, size_t len)
     snprintf(tmp, sizeof(tmp), "%s.tmp", path);
     FILE *f = open_write(tmp, false);
     if (!f) return false;
-    const bool ok = fwrite(text, 1, len, f) == len;
+    // On the card before the old file goes (as PlayGuard's paths::atomic_write):
+    // a power loss cannot leave an empty one.
+    const bool ok = fwrite(text, 1, len, f) == len && fflush(f) == 0 && fsync(fileno(f)) == 0;
     if (fclose(f) != 0 || !ok) {
         remove(tmp);
         return false;
@@ -157,6 +166,51 @@ static uint64_t mtime_of(const char *path)
 {
     struct stat st;
     return stat(path, &st) == 0 ? (uint64_t)st.st_mtime : 0;
+}
+
+static bool exists(const char *path)
+{
+    struct stat st;
+    return stat(path, &st) == 0;
+}
+
+// The SD card at boot may come a moment after the agent: retried for about
+// 10 s (as the recovery sysmodule does), then again by the main loop.
+static bool wait_for_sd(int tries)
+{
+    for (int i = 0; i < tries && !s_sd_mounted; i++) {
+        svcSleepThread(250000000ULL);
+        s_sd_mounted = R_SUCCEEDED(fsdevMountSdmc());
+    }
+    return s_sd_mounted;
+}
+
+// The folders, each level in turn (mkdir makes one).
+static void make_dirs(void)
+{
+    mkdir("sdmc:/config", 0777);
+    mkdir(DATA_DIR, 0777);
+    mkdir(SYNC_DIR, 0777);
+    mkdir(DATA_DIR "/nand", 0777);
+    mkdir(g_system_dir, 0777);
+    char sync_dir[80];
+    snprintf(sync_dir, sizeof(sync_dir), "%s/sync", g_system_dir);
+    mkdir(sync_dir, 0777);
+}
+
+// This system's folder, named as PlayGuard names it (util/nand.hpp).
+static void system_paths(void)
+{
+    static SysInfo si;
+    sysinfo_get(&si);
+    const SysStorage storage = sysinfo_storage(&si);
+    g_emummc = storage == SysStorage_EmuMMC;
+    snprintf(g_system_dir, sizeof(g_system_dir), DATA_DIR "/nand/%s",
+             nand_key_name(storage != SysStorage_Unknown, g_emummc));
+    snprintf(NRO_STATE, sizeof(NRO_STATE), "%s/sync/nro_state.txt", g_system_dir);
+    snprintf(AGENT_STATE, sizeof(AGENT_STATE), "%s/sync/agent_state.txt", g_system_dir);
+    snprintf(AGENT_EVENTS, sizeof(AGENT_EVENTS), "%s/sync/agent_events.log", g_system_dir);
+    snprintf(NAMES, sizeof(NAMES), "%s/sync/names.txt", g_system_dir);
 }
 
 // ---- the agent's state ----
@@ -192,6 +246,7 @@ static void load_conf(void)
     sync_conf_defaults(&g_conf);
     const size_t n = read_file(CONF_PATH, g_text, sizeof(g_text));
     g_conf_ok = n > 0 && sync_conf_parse(&g_conf, g_text, n);
+    g_conf.emummc = g_emummc;   // this system's device (sync_conf_device_id)
     g_conf_mtime = mtime_of(CONF_PATH);
 }
 
@@ -529,12 +584,22 @@ static size_t host_report(void *ctx, char *out, size_t cap)
     at += (int)strlen(out + at);
     if ((size_t)at < cap - 1) pctl_dump(out + at, cap - (size_t)at);
     const size_t n = strlen(out);
-    // Kept on the SD card as PlayGuard's reports are.
-    mkdir(LOGS_DIR, 0777);
-    char path[128];
+    // Kept on the SD card as PlayGuard's reports are, named as they are
+    // (util/log_files.hpp: report_YYYYMMDD_HHMMSS[_n].txt, local time), so
+    // About › Help & diagnostics lists, sends and prunes it with them.
+    mkdir(DATA_DIR "/logs", 0777);
+    mkdir(REPORTS_DIR, 0777);
     u64 now = 0;
     time_local_now(&now, NULL);
-    snprintf(path, sizeof(path), LOGS_DIR "/agent_%llu.txt", (unsigned long long)now);
+    LocalTime lt;
+    const TimeRule *rule = time_console_rule();
+    if (!rule->to_local(rule->ctx, now, &lt)) memset(&lt, 0, sizeof(lt));
+    char stamp[24], path[128];
+    snprintf(stamp, sizeof(stamp), "%04u%02u%02u_%02u%02u%02u", lt.year ? lt.year : 1970, lt.month ? lt.month : 1,
+             lt.day ? lt.day : 1, lt.hour, lt.minute, lt.second);
+    snprintf(path, sizeof(path), REPORTS_DIR "/report_%s.txt", stamp);
+    for (unsigned k = 2; exists(path) && k < 100; k++)
+        snprintf(path, sizeof(path), REPORTS_DIR "/report_%s_%u.txt", stamp, k);
     write_file(path, out, n);
     return n;
 }
@@ -624,7 +689,7 @@ static void engine_start(void)
     sync_engine_init(&g_engine, &g_conf, io, &HOST, sync_now_ms, "agent", AGENT_VERSION);
     g_engine_on = true;
     mutexLock(&g_lock);
-    snprintf(g_shared.console_id, sizeof(g_shared.console_id), "%s", g_conf.console_id);
+    sync_conf_device_id(&g_conf, g_shared.console_id);   // this system's
     mutexUnlock(&g_lock);
     slog("link started (%.64s)%s", g_conf.host, NULL);
 }
@@ -638,6 +703,11 @@ static void engine_stop(void)
 
 static void reload(bool force)
 {
+    if (!s_sd_mounted) {   // not there at boot: tried again here
+        if (!wait_for_sd(1)) return;
+        make_dirs();
+        force = true;
+    }
     const bool conf_changed = force || mtime_of(CONF_PATH) != g_conf_mtime;
     const SyncConf before = g_conf;
     if (conf_changed) load_conf();
@@ -815,7 +885,9 @@ int main(int argc, char **argv)
         sysinfo_version_string(hosversionGet(), fw, sizeof(fw));
         snprintf(g_firmware, sizeof(g_firmware), "%s", fw);
     }
-    mkdir(SYNC_DIR, 0777);
+    system_paths();
+    wait_for_sd(40);
+    make_dirs();
     load_conf();
     load_records();
     agent_ipc_start();

@@ -819,10 +819,32 @@ static void test_oversized_and_reconfigure(void)
     turns(2);
     assert(host.orders == 1);
 
+    // The same sync.conf on an emuMMC: a device of its own (its id's first
+    // digit's top bit flipped), so the console's device is cleared and left
+    // offline under its own id.
+    SyncConf emu = conf;
+    emu.emummc = true;
+    unsigned connects = broker.connects;
+    sync_engine_reconfigure(&engine, &emu);
+    turns(3);
+    assert(sync_engine_online(&engine) && broker.connects == connects + 1);
+    assert(!strcmp(broker.client_id, "pg-21b2c3d4-app"));
+    const Message *cleared = find_retained("homeassistant/device/playguard_a1b2c3d4/config");
+    assert(!cleared || !cleared->payload[0]);
+    assert(find_retained("homeassistant/device/playguard_21b2c3d4/config"));
+    const Message *avail = find_retained("playguard/21b2c3d4/availability");
+    assert(avail && !strcmp(avail->payload, "online"));
+    avail = find_retained("playguard/a1b2c3d4/availability");
+    assert(avail && !strcmp(avail->payload, "offline"));
+    assert(find_retained("playguard/21b2c3d4/state"));
+    sync_engine_reconfigure(&engine, &conf);
+    turns(3);
+    assert(sync_engine_online(&engine) && !strcmp(broker.client_id, "pg-a1b2c3d4-app"));
+
     // Another broker: reconnects there.
     SyncConf other = conf;
     strcpy(other.host, "other.lan");
-    const unsigned connects = broker.connects;
+    connects = broker.connects;
     sync_engine_reconfigure(&engine, &other);
     turns(3);
     assert(sync_engine_online(&engine) && broker.connects == connects + 1);

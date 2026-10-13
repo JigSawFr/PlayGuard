@@ -61,10 +61,16 @@ static void version(SyncJson *j, const char *key, const SysInfo *sys, bool ams)
 
 static void console(SyncJson *j, const SyncSnapshot *s)
 {
+    // This system's id and name (sync_conf_device_id): an emuMMC is a device of its own.
+    char id[SYNC_ID_LEN + 1] = "", name[SYNC_DEVICE_NAME_MAX] = "";
+    if (s->conf) {
+        sync_conf_device_id(s->conf, id);
+        if (s->conf->console_name[0] || s->conf->emummc) sync_conf_device_name(s->conf, name, sizeof(name));
+    }
     sync_json_key(j, "console");
     sync_json_obj(j);
-    sync_json_kstr_or_null(j, "id", s->conf ? s->conf->console_id : NULL);
-    sync_json_kstr_or_null(j, "name", s->conf ? s->conf->console_name : NULL);
+    sync_json_kstr_or_null(j, "id", id[0] ? id : NULL);
+    sync_json_kstr_or_null(j, "name", name[0] ? name : NULL);
     version(j, "firmware", s->sys, false);
     version(j, "atmosphere", s->sys, true);
     sync_json_kstr_or_null(j, "app_version", s->app_version);

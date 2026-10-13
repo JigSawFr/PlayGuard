@@ -1607,7 +1607,7 @@
         },
         "rescue": {
             "title": "Module de secours (code PIN oublié)",
-            "about": "Si une limite de 0 minute empêche tout de démarrer et que le code PIN est oublié, un fichier vide nommé RESCUE dans switch/playguard sur la carte SD fait déverrouiller la console par ce module au démarrage suivant. Il ne fait rien d'autre, et s'arrête aussitôt.",
+            "about": "Si une limite de 0 minute empêche tout de démarrer et que le code PIN est oublié, un fichier vide nommé RESCUE dans config/playguard sur la carte SD fait déverrouiller la console par ce module au démarrage suivant. Il ne fait rien d'autre, et s'arrête aussitôt.",
             "install_body": "Installer le module de secours (version {}) ? Il se lance à chaque démarrage et n'agit que si un fichier RESCUE est sur la carte SD.",
             "update_body": "Mettre à jour le module de secours en version {} ?",
             "installed": "Module de secours installé. Il agit au prochain démarrage si un fichier RESCUE est là.",

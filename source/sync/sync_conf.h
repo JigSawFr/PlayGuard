@@ -1,4 +1,4 @@
-// sync_conf — the remote link's settings (sd:/switch/playguard/sync.conf)
+// sync_conf — the remote link's settings (sd:/config/playguard/sync.conf)
 // and the small flat files PlayGuard and the agent exchange: "key=value",
 // one per line, '#' starts a comment. Read by both processes with this one
 // parser (the agent has no JSON library). PlayGuard's Sync screen writes
@@ -61,6 +61,10 @@ typedef struct {
     char       discovery_prefix[SYNC_PREFIX_MAX];  // "homeassistant"
     int        log_level;               // 0 errors, 1 info, 2 debug
     char       extra[SYNC_EXTRA_MAX];   // lines with unknown keys, as read
+    // Not in the file: set by the host, which runs on an emuMMC. sync.conf is
+    // shared by every system on the SD card, and each has its own parental
+    // controls: an emuMMC is a device of its own (sync_conf_device_id).
+    bool       emummc;
 } SyncConf;
 
 void sync_conf_defaults(SyncConf *c);
@@ -75,6 +79,16 @@ size_t sync_conf_write(const SyncConf *c, char *out, size_t cap);
 const char *sync_conf_problem(const SyncConf *c);
 // 8 lower-case hex digits.
 bool sync_conf_id_valid(const char *id);
+// The id this system goes by on the broker and in Home Assistant (topics,
+// client id, discovery): console_id, or on an emuMMC the same id with its
+// first digit's top bit flipped ("5a0c3e11" -> "da0c3e11"), still 8 hex
+// digits, so that a sysMMC and an emuMMC sharing one sync.conf are two
+// devices. Empty when console_id is not valid yet.
+void sync_conf_device_id(const SyncConf *c, char out[SYNC_ID_LEN + 1]);
+// Its name: console_name ("Nintendo Switch" when empty), " (emuMMC)" added
+// on an emuMMC. `cap` of SYNC_DEVICE_NAME_MAX is always enough.
+#define SYNC_DEVICE_NAME_MAX (SYNC_NAME_MAX + 16)
+void sync_conf_device_name(const SyncConf *c, char *out, size_t cap);
 // "ask" / "auto" / "off".
 const char *sync_policy_name(SyncPolicy p);
 // "auto" / "5" / "3.1.1", as sync.conf writes it.

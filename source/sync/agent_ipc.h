@@ -26,7 +26,10 @@ extern "C" {
 #endif
 
 #define AGENT_SERVICE_NAME "pg:agent"
-#define AGENT_PROTOCOL     1
+// 2: the 1.0.0 layout (sd:/config/playguard, each system's files in
+// nand/<system>/sync/). An agent of another protocol is refused, and
+// PlayGuard offers the one it carries.
+#define AGENT_PROTOCOL     2
 #define AGENT_VERSION_MAX  24
 #define AGENT_ORDERS_MAX   SYNC_QUEUE_MAX
 #define AGENT_LOG_LINES    200

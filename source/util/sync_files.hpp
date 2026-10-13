@@ -1,11 +1,13 @@
 // sync_files — the remote link's files on the SD card, from PlayGuard's side:
-// sync.conf (the link's settings, written by the Sync screen), and what the
-// agent sysmodule reads in sync/ to act on PlayGuard's behalf while it is
-// closed: nro_state.txt (the records of config.json it needs), profiles.txt
-// (the saved profiles, for profile orders) and names.txt (game names, for
-// "now playing"). One writer per file, flat "key=value" text the agent's C
-// parser reads (source/sync/sync_conf.h). No UI and no console calls:
-// host-tested (tests/sync_files).
+// sync.conf (the link's settings, written by the Sync screen) and sync/
+// (profiles.txt, the saved profiles for profile orders), shared by every
+// system on the SD card like the preferences and the profiles; and, in each
+// system's own folder (nand/<system>/sync/, util/nand.hpp), what the agent
+// sysmodule reads to act on PlayGuard's behalf while it is closed:
+// nro_state.txt (the records of state.json it needs) and names.txt (game
+// names, for "now playing"), and what it writes there. One writer per file,
+// flat "key=value" text the agent's C parser reads (source/sync/sync_conf.h).
+// No UI and no console calls: host-tested (tests/sync_files).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -22,11 +24,13 @@
 namespace sync_files
 {
 
-std::string conf_file();   // data_dir()/sync.conf
-std::string dir();         // data_dir()/sync
-bool exists();             // sync.conf is there: the link was set up once
+std::string conf_file();    // data_dir()/sync.conf
+std::string dir();          // data_dir()/sync: shared by every system
+std::string system_dir();   // nand_dir()/sync: this system's
+bool exists();              // sync.conf is there: the link was set up once
 
-// The defaults, then what sync.conf holds.
+// The defaults, then what sync.conf holds; `emummc` set from the system
+// PlayGuard runs on (paths::nand_key()), for its own device id.
 SyncConf load();
 bool save(const SyncConf& c, std::string* error = nullptr);
 // Gives the console its id ("a1b2c3d4", from 4 random bytes) when it has
@@ -38,7 +42,7 @@ SyncRecords records_from(const config::Config& c);
 // True when something changed.
 bool records_into(const SyncRecords& r, config::Config& c);
 
-// sync/nro_state.txt: the records, extra_auto_restore, the firmware choice,
+// nand/<system>/sync/nro_state.txt: the records, extra_auto_restore, the firmware choice,
 // the PIN lock, and what the agent needs to know before it changes anything:
 // whether PlayGuard is read-only and the firmware it last ran on (the agent
 // refuses writes on another one). Written after every config save while
@@ -53,17 +57,17 @@ void export_nro_state();
 std::string profiles_text(const std::vector<profiles::Profile>& list);
 bool write_profiles(const std::vector<profiles::Profile>& list);
 
-// sync/names.txt: one "0100000000010000=Super Mario Odyssey" line per game.
+// nand/<system>/sync/names.txt: one "0100000000010000=Super Mario Odyssey" line per game.
 std::string names_text(const std::vector<std::pair<uint64_t, std::string>>& names);
 bool write_names(const std::vector<std::pair<uint64_t, std::string>>& names);
 
-// sync/agent_state.txt (what the agent changed itself) is at least as recent
-// as sync/nro_state.txt (what PlayGuard saved last): the agent's records are
+// nand/<system>/sync/agent_state.txt (what the agent changed itself) is at
+// least as recent as nro_state.txt next to it (what PlayGuard saved last): the agent's records are
 // then the newer ones, for PlayGuard to adopt. False when the agent never
 // wrote any (its records are PlayGuard's).
 bool agent_records_newer();
 
-// sync/agent_events.log: the orders the agent carried out itself while
+// nand/<system>/sync/agent_events.log: the orders the agent carried out itself while
 // PlayGuard was closed, one tab-separated line each (docs/sync-protocol.md),
 // for PlayGuard's change history.
 struct AgentEvent

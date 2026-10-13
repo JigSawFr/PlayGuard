@@ -167,8 +167,11 @@ are) stays under both.
 ### Secrets and defaults
 
 - Everything about the link, broker password included, lives in one flat
-  file, `sd:/switch/playguard/sync.conf`, written by PlayGuard's Sync screen
-  and read by both processes. Nothing goes into `config.json`.
+  file, `sd:/config/playguard/sync.conf`, written by PlayGuard's *Remote
+  access* screen and read by both processes. Nothing goes into `config.json`.
+  It is shared by every system on the SD card; a sysMMC and an emuMMC are
+  still two devices, each with its own id and its own files
+  (`nand/<system>/sync/`), as their parental controls are their own.
 - `remote_timer_writes` is **off by default**: with it off, the link is
   monitoring plus *Lock now* plus the restrictions; with it on, a remote order
   may unlock parental controls for a moment with the stored PIN, write, and

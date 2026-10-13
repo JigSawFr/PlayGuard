@@ -25,7 +25,7 @@ typedef struct {
 size_t sync_discovery_topic(const SyncConf *conf, char *out, size_t cap);
 size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap);
 
-// `<topic_prefix>/<console_id>` (no trailing slash).
+// `<topic_prefix>/<device id>` (sync_conf_device_id; no trailing slash).
 size_t sync_topic_base(const SyncConf *conf, char *out, size_t cap);
 
 #ifdef __cplusplus
