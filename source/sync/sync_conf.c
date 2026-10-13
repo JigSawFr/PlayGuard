@@ -69,6 +69,23 @@ bool sync_conf_id_valid(const char *id)
     return true;
 }
 
+void sync_conf_device_id(const SyncConf *c, char out[SYNC_ID_LEN + 1])
+{
+    out[0] = '\0';
+    if (!sync_conf_id_valid(c->console_id)) return;
+    memcpy(out, c->console_id, SYNC_ID_LEN + 1);
+    if (!c->emummc) return;
+    const char d = out[0];
+    const int v = (d >= '0' && d <= '9' ? d - '0' : d - 'a' + 10) ^ 8;
+    out[0] = (char)(v < 10 ? '0' + v : 'a' + v - 10);
+}
+
+void sync_conf_device_name(const SyncConf *c, char *out, size_t cap)
+{
+    if (!cap) return;
+    snprintf(out, cap, "%s%s", c->console_name[0] ? c->console_name : "Nintendo Switch", c->emummc ? " (emuMMC)" : "");
+}
+
 // A topic level we put our own names under: letters, digits, '_' and '-'.
 static bool prefix_valid(const char *s)
 {

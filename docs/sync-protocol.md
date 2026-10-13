@@ -11,7 +11,11 @@ integration. The design and its reasons are in
 `schema`.
 
 Conventions: `<id>` is the console id (8 lowercase hex characters, random,
-generated once, never the serial number). Times are POSIX seconds from the
+generated once, never the serial number). `sync.conf` is shared by every
+system on the SD card, and a sysMMC and an emuMMC each have their own parental
+controls: on an emuMMC, `<id>` is the console id with its first digit's top
+bit flipped (`5a0c3e11` becomes `da0c3e11`), so the two are two devices, each
+with its own orders, and its name gets ` (emuMMC)`. Times are POSIX seconds from the
 console's user clock. Minutes are integers. A value the console could not read
 is `null`, never a default. JSON consumers ignore unknown fields.
 
@@ -267,17 +271,19 @@ creates its own entities with the same object ids.
 
 | File | Written by | Content |
 |---|---|---|
-| `switch/playguard/sync.conf` | PlayGuard (Sync screen); hand-editable | The link's settings, `key=value`, one per line (below). |
-| `switch/playguard/sync/ca.pem` | the user | Optional CA certificate for a private broker. |
-| `switch/playguard/sync/nro_state.txt` | PlayGuard, after every `config.json` save once `sync.conf` exists, and when read-only mode changes | The extra-time record, the console lock and its saved limits, `relock_pending`, `extra_auto_restore`, the firmware choice (`fw_gate_*`), `pin_lock`, `read_only` and `firmware` (the one PlayGuard last ran on): what the agent must know to act on PlayGuard's behalf. The agent changes nothing when `read_only=1`, when the key is missing, or when the console's firmware is no longer `firmware` (a system update PlayGuard has not seen). A line break in a value is written as a space. |
-| `switch/playguard/sync/profiles.txt` | PlayGuard, when the link starts and when the profiles change | `60,90,120,120,120,180,180=School week`: minutes Sunday first (65535 no limit), then the name. |
-| `switch/playguard/sync/names.txt` | PlayGuard, after a read of the play log | `0100000000010000=Super Mario Odyssey`: the agent's "now playing". |
-| `switch/playguard/sync/agent_state.txt` | the agent | The same records, for what the agent changed itself. At start the agent takes the newer of this file and `nro_state.txt`; PlayGuard adopts the agent's records (`GetRecords`) when it opens. |
-| `switch/playguard/sync/agent_events.log` | the agent | One line per order the agent carried out itself, tab-separated: time (POSIX), entity, payload, applied (0/1), reason, change kind (`SyncChange`), number of values, source (`remote`, `remote_extra`…), values before (comma-separated), values after, the console lock afterwards (-1 unchanged, 0, 1). PlayGuard imports them into `history.json`, with the agent's time, when it opens a session, and removes the file. |
-| `switch/playguard/logs/agent_<time>.txt` | the agent | A report asked for by `export_report` while PlayGuard is closed (clocks and parental controls, as PlayGuard's report has them). |
+| `config/playguard/sync.conf` | PlayGuard (*Remote access*); hand-editable | The link's settings, `key=value`, one per line (below). Shared by every system on the SD card. |
+| `config/playguard/sync/ca.pem` | the user | Optional CA certificate for a private broker. |
+| `config/playguard/sync/profiles.txt` | PlayGuard, when the link starts and when the profiles change | `60,90,120,120,120,180,180=School week`: minutes Sunday first (65535 no limit), then the name. Shared, as the profiles are. |
+| `config/playguard/nand/<system>/sync/nro_state.txt` | PlayGuard, after every settings save (`config.json`, this system's `state.json`) once `sync.conf` exists, and when read-only mode changes | The extra-time record, the console lock and its saved limits, `relock_pending`, `extra_auto_restore`, the firmware choice (`fw_gate_*`), `pin_lock`, `read_only` and `firmware` (the one PlayGuard last ran on): what the agent must know to act on PlayGuard's behalf. The agent changes nothing when `read_only=1`, when the key is missing, or when the console's firmware is no longer `firmware` (a system update PlayGuard has not seen). A line break in a value is written as a space. |
+| `config/playguard/nand/<system>/sync/names.txt` | PlayGuard, after a read of the play log | `0100000000010000=Super Mario Odyssey`: the agent's "now playing". |
+| `config/playguard/nand/<system>/sync/agent_state.txt` | the agent | The same records, for what the agent changed itself. At start the agent takes the newer of this file and `nro_state.txt`; PlayGuard adopts the agent's records (`GetRecords`) when it opens. |
+| `config/playguard/nand/<system>/sync/agent_events.log` | the agent | One line per order the agent carried out itself, tab-separated: time (POSIX), entity, payload, applied (0/1), reason, change kind (`SyncChange`), number of values, source (`remote`, `remote_extra`…), values before (comma-separated), values after, the console lock afterwards (-1 unchanged, 0, 1). PlayGuard imports them into `history.json`, with the agent's time, when it opens a session, and removes the file. |
+| `config/playguard/logs/reports/report_<date>_<time>.txt` | the agent | A report asked for by `export_report` while PlayGuard is closed (clocks and parental controls, as PlayGuard's report has them). Named as PlayGuard's reports, so *Tools › Diagnostics* lists, sends and prunes it with them. |
 | `atmosphere/contents/<tid>/{exefs.nsp, flags/boot2.flag, toolbox.json, version.txt}` | *Tools › Optional modules*, or the user | The installed module (`4200000000505247` recovery, `4200000000504741` agent). |
 
-Each file has one writer — but for `sync.conf`, which the agent rewrites when
+`<system>` is `sysmmc`, `emummc` or `unknown`, as for the rest of PlayGuard's
+per-system files (`util/nand.hpp`; the agent names it the same way,
+`core/nand_key.h`). Each file has one writer — but for `sync.conf`, which the agent rewrites when
 Home Assistant switches the native discovery (`discovery/set`) while
 PlayGuard is closed. The IPC service is the live channel, the files the cold
 one. `sync.conf` is never included in a diagnostic report or

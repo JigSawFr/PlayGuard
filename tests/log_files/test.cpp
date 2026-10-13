@@ -265,17 +265,20 @@ static void test_data_move()
     write("switch/playguard/backups/20261010_100000.json", "b");
     write("switch/playguard/cache/icons/0100.jpg", "i");
     write("switch/playguard/logs/crash.txt", "c");
+    write("switch/playguard/sync.conf", "enabled=1");
+    write("switch/playguard/sync/profiles.txt", "60=P");
     // Already in the new folder: the file is kept, the folder merged.
     write("config/playguard/watch.json", "newer");
     write("config/playguard/logs/reports/report_20261011_100000.txt", "r");
 
-    CHECK(data_move::run(from, to) == 9);   // not watch.json; logs/ merged: its one file
+    CHECK(data_move::run(from, to) == 11);   // not watch.json; logs/ merged: its one file
     CHECK(read("config/playguard/config.json") == "{\"a\": 1}" && read("config/playguard/config.json.bad") == "bad");
     CHECK(read("config/playguard/history.json") == "[]" && read("config/playguard/github_token") == "ghu");
     CHECK(there("config/playguard/RESCUE") && read("config/playguard/profiles/school.json") == "p");
     CHECK(read("config/playguard/backups/20261010_100000.json") == "b");
     CHECK(read("config/playguard/cache/icons/0100.jpg") == "i");
     CHECK(read("config/playguard/logs/crash.txt") == "c" && there("config/playguard/logs/reports/report_20261011_100000.txt"));
+    CHECK(read("config/playguard/sync.conf") == "enabled=1" && read("config/playguard/sync/profiles.txt") == "60=P");
     CHECK(!there("switch/playguard/logs") && !there("switch/playguard/profiles"));
     CHECK(read("config/playguard/watch.json") == "newer" && read("switch/playguard/watch.json") == "{}");
     // The app and what is not PlayGuard's data stay.
@@ -310,13 +313,20 @@ static void test_to_nand()
     write("config/playguard/cache/dev_builds.json", "shared");
     write("config/playguard/cache/icons/0100.jpg", "shared");
     write("config/playguard/profiles/school.json", "shared");
+    write("config/playguard/sync/nro_state.txt", "read_only=0");
+    write("config/playguard/sync/agent_events.log", "e");
+    write("config/playguard/sync/profiles.txt", "shared");
 
-    CHECK(data_move::to_nand(data, sys) == 6);
+    CHECK(data_move::to_nand(data, sys) == 8);
     CHECK(read("config/playguard/nand/sysmmc/history.json") == "[]" && read("config/playguard/nand/sysmmc/history.json.bad") == "bad");
     CHECK(read("config/playguard/nand/sysmmc/watch.json") == "{}");
     CHECK(read("config/playguard/nand/sysmmc/backups/20261010_100000.json") == "b");
     CHECK(read("config/playguard/nand/sysmmc/cache/activity_all.bin") == "a");
     CHECK(there("config/playguard/nand/sysmmc/cache/activity_0011223344556677.bin"));
+    // The remote link's: this system's records and agent files; the profiles shared.
+    CHECK(read("config/playguard/nand/sysmmc/sync/nro_state.txt") == "read_only=0");
+    CHECK(read("config/playguard/nand/sysmmc/sync/agent_events.log") == "e");
+    CHECK(read("config/playguard/sync/profiles.txt") == "shared");
     // Shared: the preferences, the profiles, the icons, the build list.
     CHECK(there("config/playguard/config.json") && there("config/playguard/profiles/school.json"));
     CHECK(there("config/playguard/cache/dev_builds.json") && there("config/playguard/cache/icons/0100.jpg"));

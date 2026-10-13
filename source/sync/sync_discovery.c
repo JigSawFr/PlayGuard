@@ -11,13 +11,17 @@
 
 size_t sync_topic_base(const SyncConf *conf, char *out, size_t cap)
 {
-    const int n = snprintf(out, cap, "%s/%s", conf->topic_prefix, conf->console_id);
+    char id[SYNC_ID_LEN + 1];
+    sync_conf_device_id(conf, id);
+    const int n = snprintf(out, cap, "%s/%s", conf->topic_prefix, id);
     return n < 0 || (size_t)n >= cap ? 0 : (size_t)n;
 }
 
 size_t sync_discovery_topic(const SyncConf *conf, char *out, size_t cap)
 {
-    const int n = snprintf(out, cap, "%s/device/playguard_%s/config", conf->discovery_prefix, conf->console_id);
+    char id[SYNC_ID_LEN + 1];
+    sync_conf_device_id(conf, id);
+    const int n = snprintf(out, cap, "%s/device/playguard_%s/config", conf->discovery_prefix, id);
     return n < 0 || (size_t)n >= cap ? 0 : (size_t)n;
 }
 
@@ -33,8 +37,10 @@ static bool announced(const SyncEntity *e, const SyncDiscovery *d)
 size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
 {
     const SyncConf *c = d->conf;
-    char base[96], topic[160], uid[96];
+    char base[96], topic[160], uid[96], id[SYNC_ID_LEN + 1], name[SYNC_DEVICE_NAME_MAX];
     if (!sync_topic_base(c, base, sizeof(base))) return 0;
+    sync_conf_device_id(c, id);
+    sync_conf_device_name(c, name, sizeof(name));
     const char *version = d->sw_version && *d->sw_version ? d->sw_version : "unknown";
 
     SyncJson j;
@@ -43,12 +49,12 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
 
     sync_json_key(&j, "dev");
     sync_json_obj(&j);
-    snprintf(uid, sizeof(uid), "playguard_%s", c->console_id);
+    snprintf(uid, sizeof(uid), "playguard_%s", id);
     sync_json_key(&j, "ids");
     sync_json_arr(&j);
     sync_json_str(&j, uid);
     sync_json_arr_end(&j);
-    sync_json_kstr(&j, "name", c->console_name[0] ? c->console_name : "Nintendo Switch");
+    sync_json_kstr(&j, "name", name);
     sync_json_kstr(&j, "mf", "PlayGuard");
     sync_json_kstr(&j, "mdl", "Nintendo Switch");
     sync_json_kstr(&j, "sw", version);
@@ -75,7 +81,7 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
         sync_json_obj(&j);
         sync_json_kstr(&j, "p", e->platform);
         sync_json_kstr(&j, "name", e->name);
-        snprintf(uid, sizeof(uid), "playguard_%s_%s", c->console_id, e->id);
+        snprintf(uid, sizeof(uid), "playguard_%s_%s", id, e->id);
         sync_json_kstr(&j, "uniq_id", uid);
         if (!strcmp(e->platform, "event")) {
             snprintf(topic, sizeof(topic), "%s/event", base);

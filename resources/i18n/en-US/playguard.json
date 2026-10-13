@@ -1483,7 +1483,7 @@
         },
         "rescue": {
             "title": "Recovery module (forgotten PIN)",
-            "about": "If a 0-minute limit keeps everything from starting and the PIN is forgotten, an empty file named RESCUE in switch/playguard on the SD card makes this module unlock the console at the next boot. It does nothing else, and stops at once.",
+            "about": "If a 0-minute limit keeps everything from starting and the PIN is forgotten, an empty file named RESCUE in config/playguard on the SD card makes this module unlock the console at the next boot. It does nothing else, and stops at once.",
             "install_body": "Install the recovery module (version {})? It runs at each boot and acts only when a RESCUE file is on the SD card.",
             "update_body": "Update the recovery module to version {}?",
             "installed": "Recovery module installed. It acts at the next boot when a RESCUE file is there.",

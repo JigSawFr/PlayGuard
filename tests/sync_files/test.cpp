@@ -52,6 +52,22 @@ static void test_conf()
     assert(sync_files::save(back));
     assert(paths::read_file(sync_files::conf_file(), text));
     assert(text.find("future_key=42") != std::string::npos);
+
+    // One sync.conf for every system on the SD card; each system's files in
+    // its own folder, and on an emuMMC a device of its own: the id and the
+    // name differ, the file keeps the console's.
+    assert(sync_files::dir() == paths::data_dir() + "/sync");
+    assert(sync_files::system_dir() == paths::nand_dir() + "/sync" && !back.emummc);
+    paths::set_nand("emummc");
+    SyncConf emu = sync_files::load();
+    assert(emu.emummc && !std::strcmp(emu.console_id, "a102c30d"));
+    char id[SYNC_ID_LEN + 1];
+    sync_conf_device_id(&emu, id);
+    assert(!std::strcmp(id, "2102c30d"));
+    assert(sync_files::save(emu));
+    assert(paths::read_file(sync_files::conf_file(), text) && text.find("console_id=a102c30d\n") != std::string::npos);
+    paths::set_nand("unknown");
+    assert(!sync_files::load().emummc);
 }
 
 static void test_records()
@@ -130,7 +146,7 @@ static void test_nro_state()
     assert(keys.find("pin_lock=changes;") != std::string::npos);
 
     // Written only while sync.conf exists.
-    const std::string file = sync_files::dir() + "/nro_state.txt";
+    const std::string file = sync_files::system_dir() + "/nro_state.txt";
     std::remove(file.c_str());
     std::remove(sync_files::conf_file().c_str());
     sync_files::export_nro_state();
@@ -164,7 +180,7 @@ static void test_lists()
     assert(sync_files::write_names({ { 0x0100000000010000ULL, "Super Mario Odyssey" } }));
     std::string read;
     assert(paths::read_file(sync_files::dir() + "/profiles.txt", read) && read.find("=Semaine d'école") != std::string::npos);
-    assert(paths::read_file(sync_files::dir() + "/names.txt", read) && read.find("Super Mario Odyssey") != std::string::npos);
+    assert(paths::read_file(sync_files::system_dir() + "/names.txt", read) && read.find("Super Mario Odyssey") != std::string::npos);
 }
 
 void test_agent_events()
@@ -186,7 +202,7 @@ void test_agent_events()
 
     // Whose records are newer: the agent's only once it wrote some, and not
     // before PlayGuard's last save.
-    const std::string agent_state = sync_files::dir() + "/agent_state.txt", nro = sync_files::dir() + "/nro_state.txt";
+    const std::string agent_state = sync_files::system_dir() + "/agent_state.txt", nro = sync_files::system_dir() + "/nro_state.txt";
     std::remove(agent_state.c_str());
     assert(!sync_files::agent_records_newer());
     assert(paths::atomic_write(agent_state, "schema=1\n"));
@@ -200,13 +216,13 @@ void test_agent_events()
     assert(sync_files::agent_records_newer());
 
     // Taken once: renamed, read, removed.
-    assert(paths::ensure_dir(sync_files::dir()));
-    assert(paths::atomic_write(sync_files::dir() + "/agent_events.log", text));
+    assert(paths::ensure_dir(sync_files::system_dir()));
+    assert(paths::atomic_write(sync_files::system_dir() + "/agent_events.log", text));
     assert(sync_files::take_agent_events().size() == 3);
     assert(sync_files::take_agent_events().empty());
     struct stat st;
-    assert(stat((sync_files::dir() + "/agent_events.log").c_str(), &st) != 0);
-    assert(stat((sync_files::dir() + "/agent_events.log.read").c_str(), &st) != 0);
+    assert(stat((sync_files::system_dir() + "/agent_events.log").c_str(), &st) != 0);
+    assert(stat((sync_files::system_dir() + "/agent_events.log.read").c_str(), &st) != 0);
 }
 
 int main()

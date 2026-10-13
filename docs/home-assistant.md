@@ -183,15 +183,22 @@ Entity ids depend on the console's name; check them on the device's page.
 - Anyone who can publish on `playguard/<id>/…/set` can send orders. Keep the
   broker on your local network, and leave *Orders may change the play timer*
   off unless you need it.
-- The settings, password included, are in `sd:/switch/playguard/sync.conf`,
+- The settings, password included, are in `sd:/config/playguard/sync.conf`,
   in plain text. That file is never in a diagnostic report or an online
   upload; the report's *Remote link* section only has the switches and the
   counters.
 - **TLS**: port 8883 and *Encrypted connection*. The console checks the
   broker's certificate against its own certificate store; for a private
   certificate authority, put its PEM file on the SD card and set
-  `ca_file=/switch/playguard/sync/ca.pem` in `sync.conf`. TLS has not been
+  `ca_file=/config/playguard/sync/ca.pem` in `sync.conf`. TLS has not been
   tried on a console yet.
+
+- **sysMMC and emuMMC**: both use the same `sync.conf` (set up once), but
+  each has its own parental controls, so each is a device of its own in Home
+  Assistant: the emuMMC's id differs from the console id by its first digit
+  (*Remote access › Console id* shows the one in use) and its name ends in
+  *(emuMMC)*. An order reaches only the system it was sent to, when that
+  system next runs.
 
 ## When it does not connect
 

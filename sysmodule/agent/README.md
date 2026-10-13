@@ -22,9 +22,11 @@ started again (`source/action/agent_update.cpp`, the steps host-tested in
 
 ## What it does
 
-- Connects to the broker set in `sd:/switch/playguard/sync.conf` (the same
+- Connects to the broker set in `sd:/config/playguard/sync.conf` (the same
   settings as PlayGuard, same session engine: `source/sync/sync_engine.c`),
-  as the client `pg-<id>-agent`, with `offline` as its last will.
+  as the client `pg-<id>-agent`, with `offline` as its last will. `<id>` is
+  this system's: on an emuMMC it differs from the sysMMC's, so the two are
+  two devices ([`docs/sync-protocol.md`](../../docs/sync-protocol.md)).
 - Every `poll_s` seconds, reads the parental controls and the play timer
   through PlayGuard's own service layer (`source/core/`), and the play log of
   the last 7 days (`pdm:qry`, no game names: those come from `names.txt`,
@@ -37,7 +39,7 @@ started again (`source/action/agent_update.cpp`, the steps host-tested in
   as PlayGuard does when it opens.
 - Changes nothing when PlayGuard was in read-only mode, or when the firmware
   is not the one PlayGuard last ran on (a system update PlayGuard has not
-  checked): `sync/nro_state.txt`.
+  checked): `nro_state.txt`.
 
 ## With PlayGuard open
 
@@ -55,11 +57,15 @@ PlayGuard's own session at once.
 
 ## Files
 
-In `sd:/switch/playguard/`: it reads `sync.conf`, `sync/nro_state.txt`,
-`sync/profiles.txt` and `sync/names.txt`; it writes `sync/agent_state.txt`
-(what it changed: extra time, console lock, a relock pending),
-`sync/agent_events.log` (the orders it carried out, imported into PlayGuard's
-history) and `logs/agent_<time>.txt` (a report asked for from Home Assistant).
+In `sd:/config/playguard/`, as PlayGuard's: it reads `sync.conf` and
+`sync/profiles.txt`, shared by every system on the SD card; in this system's
+folder, `nand/<system>/sync/` (`sysmmc`, `emummc` or `unknown`, as PlayGuard
+names it), it reads `nro_state.txt` and `names.txt` and writes
+`agent_state.txt` (what it changed: extra time, console lock, a relock
+pending) and `agent_events.log` (the orders it carried out, imported into
+PlayGuard's history); a report asked for from Home Assistant goes to
+`logs/reports/` with PlayGuard's. At boot it waits up to 10 s for the SD card,
+then tries again every 30 s.
 Details: [`docs/sync-protocol.md`](../../docs/sync-protocol.md).
 
 ## Build

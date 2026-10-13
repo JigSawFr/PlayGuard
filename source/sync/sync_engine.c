@@ -34,8 +34,10 @@ static void on_message(void *user, const MqttPublish *msg);
 
 static void identity(SyncEngine *e)
 {
-    snprintf(e->base, sizeof(e->base), "%s/%s", e->conf.topic_prefix, e->conf.console_id);
-    snprintf(e->client_id, sizeof(e->client_id), "pg-%s-%s", e->conf.console_id, e->source);
+    char id[SYNC_ID_LEN + 1];
+    sync_conf_device_id(&e->conf, id);   // this system's: a sysMMC and an emuMMC are two devices
+    snprintf(e->base, sizeof(e->base), "%s/%s", e->conf.topic_prefix, id);
+    snprintf(e->client_id, sizeof(e->client_id), "pg-%s-%s", id, e->source);
 }
 
 void sync_engine_init(SyncEngine *e, const SyncConf *conf, SyncIo io, const SyncHost *host, uint64_t (*now_ms)(void),
@@ -132,7 +134,7 @@ void sync_engine_reconfigure(SyncEngine *e, const SyncConf *conf)
     const bool reconnect = strcmp(conf->host, e->conf.host) || conf->port != e->conf.port || conf->tls != e->conf.tls ||
                            strcmp(conf->ca_file, e->conf.ca_file) || strcmp(conf->username, e->conf.username) ||
                            strcmp(conf->password, e->conf.password) || strcmp(conf->console_id, e->conf.console_id) ||
-                           strcmp(conf->topic_prefix, e->conf.topic_prefix) ||
+                           conf->emummc != e->conf.emummc || strcmp(conf->topic_prefix, e->conf.topic_prefix) ||
                            strcmp(conf->discovery_prefix, e->conf.discovery_prefix) ||
                            conf->allow_anonymous != e->conf.allow_anonymous || conf->enabled != e->conf.enabled ||
                            conf->mqtt_version != e->conf.mqtt_version;
@@ -141,6 +143,7 @@ void sync_engine_reconfigure(SyncEngine *e, const SyncConf *conf)
         // Clear the old discovery while still connected under the old identity.
         if (e->mqtt.connected && e->conf.ha_discovery && (discovery_off || !conf->enabled ||
                                                           strcmp(conf->console_id, e->conf.console_id) ||
+                                                          conf->emummc != e->conf.emummc ||
                                                           strcmp(conf->discovery_prefix, e->conf.discovery_prefix))) {
             char topic[160];
             if (sync_discovery_topic(&e->conf, topic, sizeof(topic))) mqtt_client_publish(&e->mqtt, topic, "", 0, true);

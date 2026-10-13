@@ -197,14 +197,22 @@ la page de l'appareil.
   Gardez le broker sur votre réseau local, et laissez *Les ordres peuvent
   changer le temps de jeu* désactivé si vous n'en avez pas besoin.
 - Les réglages, mot de passe compris, sont dans
-  `sd:/switch/playguard/sync.conf`, en clair. Ce fichier n'est jamais dans un
+  `sd:/config/playguard/sync.conf`, en clair. Ce fichier n'est jamais dans un
   rapport de diagnostic ni dans un envoi en ligne ; la section *Remote link* du
   rapport ne contient que les interrupteurs et les compteurs.
 - **TLS** : port 8883 et *Connexion chiffrée*. La console vérifie le
   certificat du broker avec son propre magasin de certificats ; pour une
   autorité de certification privée, copiez son fichier PEM sur la carte SD et
-  ajoutez `ca_file=/switch/playguard/sync/ca.pem` dans `sync.conf`. TLS n'a
+  ajoutez `ca_file=/config/playguard/sync/ca.pem` dans `sync.conf`. TLS n'a
   pas encore été essayé sur une console.
+
+- **sysMMC et emuMMC** : les deux utilisent le même `sync.conf` (réglé une
+  fois), mais chacun a son propre contrôle parental, donc chacun est un
+  appareil distinct dans Home Assistant : l'identifiant de l'emuMMC diffère de
+  celui de la console par son premier chiffre (*Accès à distance ›
+  Identifiant de la console* montre celui utilisé) et son nom se termine par
+  *(emuMMC)*. Un ordre n'atteint que le système auquel il a été envoyé, quand
+  ce système démarre.
 
 ## Quand la connexion échoue
 

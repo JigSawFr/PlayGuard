@@ -651,6 +651,32 @@ static void test_discovery(void)
     assert(n > 0 && !contains(buf, "cmd_t"));
     // Too small a buffer: 0.
     assert(sync_discovery_build(&d, buf, 512) == 0);
+
+
+    // On an emuMMC (one sync.conf for every system on the SD card): a device
+    // of its own, its id's first digit's top bit flipped, its name marked.
+    c.emummc = true;
+    d.read_only = false;
+    char id[SYNC_ID_LEN + 1], name[SYNC_DEVICE_NAME_MAX];
+    sync_conf_device_id(&c, id);
+    assert(!strcmp(id, "21b2c3d4") && !strcmp(c.console_id, "a1b2c3d4"));
+    sync_conf_device_name(&c, name, sizeof(name));
+    assert(!strcmp(name, "Salon \"Léa\" (emuMMC)"));
+    assert(sync_discovery_topic(&c, topic, sizeof(topic)) > 0);
+    assert(!strcmp(topic, "homeassistant/device/playguard_21b2c3d4/config"));
+    n = sync_discovery_build(&d, buf, sizeof(buf));
+    assert(n > 0 && contains(buf, "\"ids\":[\"playguard_21b2c3d4\"]") && !contains(buf, "a1b2c3d4"));
+    assert(contains(buf, "\"name\":\"Salon \\\"Léa\\\" (emuMMC)\""));
+    assert(contains(buf, "\"cmd_t\":\"playguard/21b2c3d4/lock_now/set\""));
+    strcpy(c.console_id, "f0000000");   // every digit flips both ways
+    sync_conf_device_id(&c, id);
+    assert(!strcmp(id, "70000000"));
+    c.console_name[0] = '\0';
+    sync_conf_device_name(&c, name, sizeof(name));
+    assert(!strcmp(name, "Nintendo Switch (emuMMC)"));
+    c.console_id[0] = '\0';   // no id yet: none
+    sync_conf_device_id(&c, id);
+    assert(!id[0]);
 }
 
 // ---------------------------------------------------------------- state
@@ -748,6 +774,12 @@ static void test_state(void)
     assert(contains(buf, "\"activity_today\":{\"used_min\":74"));
     assert(contains(buf, "\"link\":{\"policy\":\"ask\""));
     assert(contains(buf, "\"profiles\":[\"School week\",\"Vacances d'été\"]}"));
+    assert(contains(buf, "\"console\":{\"id\":\"a1b2c3d4\",\"name\":\"Salon\""));
+    // On an emuMMC: this system's device, its own id and name.
+    c.emummc = true;
+    n = sync_state_build(&s, buf, sizeof(buf));
+    assert(contains(buf, "\"console\":{\"id\":\"21b2c3d4\",\"name\":\"Salon (emuMMC)\""));
+    c.emummc = false;
 
     // Nothing counted yet today (1454 reads 0): the whole limit is left, the
     // time played is unknown.

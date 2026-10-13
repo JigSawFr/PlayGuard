@@ -349,7 +349,7 @@ if AGENT:
         os.remove(history)
     # What the agent did while PlayGuard was closed: Monday's limit at noon
     # (UTC) on 8 October 2026.
-    agent_events = os.path.join(run_dir, "playguard_data", "sync", "agent_events.log")
+    agent_events = os.path.join(nand_dir, "sync", "agent_events.log")
     os.makedirs(os.path.dirname(agent_events), exist_ok=True)
     open(agent_events, "w").write("1791460800\tlimit_mon\t45\t1\tnone\t1\t7\tremote\t"
                                   "60,60,60,60,60,60,60\t60,45,60,60,60,60,60\t-1\n")

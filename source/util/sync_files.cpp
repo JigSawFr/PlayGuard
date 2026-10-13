@@ -21,6 +21,11 @@ std::string dir()
     return paths::data_dir() + "/sync";
 }
 
+std::string system_dir()
+{
+    return paths::nand_dir() + "/sync";
+}
+
 bool exists()
 {
     struct stat st;
@@ -33,6 +38,7 @@ SyncConf load()
     sync_conf_defaults(&c);
     std::string text;
     if (paths::read_file(conf_file(), text)) sync_conf_parse(&c, text.data(), text.size());
+    c.emummc = paths::nand_key() == "emummc";
     return c;
 }
 
@@ -135,9 +141,9 @@ std::string nro_state_text(const config::Config& c)
 void export_nro_state()
 {
     if (!exists()) return;
-    paths::ensure_dir(dir());
+    paths::ensure_dir(system_dir());
     std::string err;
-    paths::atomic_write(dir() + "/nro_state.txt", nro_state_text(config::get()), &err);
+    paths::atomic_write(system_dir() + "/nro_state.txt", nro_state_text(config::get()), &err);
 }
 
 std::string profiles_text(const std::vector<profiles::Profile>& list)
@@ -173,8 +179,8 @@ std::string names_text(const std::vector<std::pair<uint64_t, std::string>>& name
 
 bool write_names(const std::vector<std::pair<uint64_t, std::string>>& names)
 {
-    paths::ensure_dir(dir());
-    return paths::atomic_write(dir() + "/names.txt", names_text(names));
+    paths::ensure_dir(system_dir());
+    return paths::atomic_write(system_dir() + "/names.txt", names_text(names));
 }
 
 namespace
@@ -217,8 +223,8 @@ bool parse_values(const std::string& s, size_t n, std::vector<int>* out)
 bool agent_records_newer()
 {
     struct stat agent, nro;
-    if (stat((dir() + "/agent_state.txt").c_str(), &agent) != 0) return false;
-    if (stat((dir() + "/nro_state.txt").c_str(), &nro) != 0) return true;
+    if (stat((system_dir() + "/agent_state.txt").c_str(), &agent) != 0) return false;
+    if (stat((system_dir() + "/nro_state.txt").c_str(), &nro) != 0) return true;
     return agent.st_mtime >= nro.st_mtime;
 }
 
@@ -253,7 +259,7 @@ std::vector<AgentEvent> parse_agent_events(const std::string& text)
 
 std::vector<AgentEvent> take_agent_events()
 {
-    const std::string file = dir() + "/agent_events.log", taken = file + ".read";
+    const std::string file = system_dir() + "/agent_events.log", taken = file + ".read";
     struct stat st;
     // A file left by a run that stopped before removing it comes first.
     if (stat(taken.c_str(), &st) != 0 && std::rename(file.c_str(), taken.c_str()) != 0) return {};
