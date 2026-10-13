@@ -29,6 +29,11 @@ class ActivityTab : public TabBase
     ~ActivityTab() override;
     static brls::View* create();
 
+    // Asks for a format, then writes every game of `data` (most played over
+    // `period` first) to the exports folder; `account` says whose figures
+    // they are (nullptr: every account). Also the Cadran prototype's Export.
+    static void export_stats(std::shared_ptr<const PlayStats> data, int period, const PlayAccount* account);
+
   protected:
     void refresh() override;
 

@@ -11,6 +11,10 @@
 #include <ctime>
 #include <exception>
 #include <typeinfo>
+#ifndef __SWITCH__
+#include <fcntl.h>
+#include <unistd.h>
+#endif
 
 #include "action/fw_gate.hpp"
 #include "action/log_prune_flow.hpp"
@@ -30,6 +34,7 @@
 #include "tab/about_tab.hpp"
 #include "tab/cadran_activity_tab.hpp"
 #include "tab/cadran_play_timer_tab.hpp"
+#include "tab/cadran_lists.hpp"
 #include "tab/cadran_restrictions_tab.hpp"
 #include "tab/cadran_tab.hpp"
 #include "tab/activity_tab.hpp"
@@ -371,6 +376,10 @@ void register_views()
     brls::Application::registerXMLView("CadranPlayTimerTab", CadranPlayTimerTab::create);
     brls::Application::registerXMLView("CadranActivityTab", CadranActivityTab::create);
     brls::Application::registerXMLView("CadranWeekView",  CadranWeekView::create);
+    brls::Application::registerXMLView("CadranClockTab",  CadranClockTab::create);
+    brls::Application::registerXMLView("CadranSecurityTab", CadranSecurityTab::create);
+    brls::Application::registerXMLView("CadranPreferencesTab", CadranPreferencesTab::create);
+    brls::Application::registerXMLView("CadranAboutTab",  CadranAboutTab::create);
 
     // In place of borealis' brls:Hints: the footer's clock on one line.
     FooterHints::install();
@@ -454,7 +463,7 @@ int main(int argc, char* argv[])
     // PlayGuard status colours (light / dark variants), before any view exists.
     ui::register_theme_colors();
     // The "Cadran" prototype's navy theme (PLAYGUARD_SIM_CADRAN=1 on the
-    // desktop, Tools › Developer › Cadran prototype on the console).
+    // desktop, About › Help & diagnostics › Developer › Cadran prototype on the console).
     if (cadran::enabled()) cadran::install_theme();
 
     // We own the quit path (B on the sidebar / error screen).

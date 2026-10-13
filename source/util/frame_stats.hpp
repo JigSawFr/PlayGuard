@@ -1,5 +1,5 @@
 // frame_stats — the per-second frame statistics of the developer tools
-// (Tools › Developer › Frame statistics): how long PlayGuard's own thread
+// (About › Help & diagnostics › Developer › Frame statistics): how long PlayGuard's own thread
 // works for each frame, how far apart the frames come and how many come late,
 // so one screen can be weighed against another on the console, docked and
 // handheld (the current Overview against the "Cadran" prototype), in

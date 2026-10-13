@@ -1,8 +1,8 @@
 // CadranPlayTimerTab — "Cadran" prototype of Play timer, after the board: the
 // week is the editor (CadranWeekView, the stick sets each day), a live
 // summary, the profile and "same limit every day" chips, bedtime / pause /
-// alarm / remove chips, + saves. Desktop simulation only
-// (PLAYGUARD_SIM_CADRAN=1); strings not localised.
+// alarm / remove chips, + saves. PLAYGUARD_SIM_CADRAN=1 on the desktop,
+// About › Help & diagnostics › Developer › Cadran prototype on the console; strings not localised.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 

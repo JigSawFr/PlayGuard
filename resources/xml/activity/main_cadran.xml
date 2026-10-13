@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Root screen with the "Cadran" prototype Overview (desktop simulation, PLAYGUARD_SIM_CADRAN=1):
+<!-- Root screen with the "Cadran" prototype Overview (PLAYGUARD_SIM_CADRAN=1 on the desktop, About › Help & diagnostics › Developer › Cadran prototype on the console):
      the tabs carry the boards' short French labels; cadran::style_frame adds the icons. Each tab
-     is a custom view registered in main.cpp and implemented in source/tab/. -->
+     is a custom view registered in main.cpp and implemented in source/tab/: the first four
+     drawn anew, PIN, Preferences and About the current tabs restyled (source/tab/cadran_lists.cpp),
+     Console and History as they are. The same order as main.xml. -->
 
 <brls:AppletFrame
     iconInterpolation="linear"
@@ -31,28 +33,28 @@
             <CadranRestrictionsTab/>
         </brls:Tab>
 
-        <brls:Tab label="Horloge">
-            <ClockTab/>
+        <brls:Tab label="Code PIN">
+            <CadranSecurityTab/>
         </brls:Tab>
 
         <brls:Separator/>
 
-        <brls:Tab label="Sécurité">
-            <SecurityTab/>
+        <brls:Tab label="Console">
+            <ConsoleTab/>
         </brls:Tab>
 
         <brls:Separator/>
+
+        <brls:Tab label="Historique">
+            <HistoryTab/>
+        </brls:Tab>
 
         <brls:Tab label="Préférences">
-            <PreferencesTab/>
-        </brls:Tab>
-
-        <brls:Tab label="Outils">
-            <ToolsTab/>
+            <CadranPreferencesTab/>
         </brls:Tab>
 
         <brls:Tab label="À propos">
-            <AboutTab/>
+            <CadranAboutTab/>
         </brls:Tab>
 
     </brls:TabFrame>

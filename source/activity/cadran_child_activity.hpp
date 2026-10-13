@@ -1,8 +1,9 @@
 // CadranChildActivity — "Cadran" prototype, the child screen: what the parent
 // shows before handing the console over. One big ring of the time left
-// today, the bedtime, nothing to change. A goes back to the parent (the PIN,
-// in the real thing), B leaves PlayGuard so the child can play. Desktop
-// simulation only (PLAYGUARD_SIM_CADRAN=1); strings not localised.
+// today, the bedtime, nothing to change. A goes back to the parent once the
+// PIN is entered (at once without a PIN on the console), B leaves PlayGuard
+// so the child can play. PLAYGUARD_SIM_CADRAN=1 on the desktop, Tools ›
+// Developer › Cadran prototype on the console; strings not localised.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 

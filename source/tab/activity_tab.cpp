@@ -331,13 +331,16 @@ void ActivityTab::show_summary(const std::shared_ptr<const PlayStats>& data)
 // numbers, so a spreadsheet can add them up.
 void ActivityTab::export_to_sd() const
 {
-    const std::shared_ptr<const PlayStats> data = shown_stats();
+    export_stats(shown_stats(), this->period, chosen_account());
+}
+
+void ActivityTab::export_stats(std::shared_ptr<const PlayStats> data, int p, const PlayAccount* account)
+{
     if (!data) {
         ui::notify("playguard/activity/export_not_ready"_i18n);
         return;
     }
-    const int p = this->period;
-    const std::string who = account_label(chosen_account());
+    const std::string who = account_label(account);
     export_flow::choose("export", "activity", [data, p, who]() {
         const PlayStats& s = *data;
         activity_summary::ExportText text;

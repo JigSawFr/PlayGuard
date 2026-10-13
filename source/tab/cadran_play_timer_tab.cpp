@@ -130,7 +130,8 @@ void CadranPlayTimerTab::refresh()
     pctl_play_timer_query(&this->live);
     if (this->live.valid && !keep)
         for (int d = 0; d < 7; d++) this->pending[d] = this->live.day_min[d];
-    cadran::set_pill(this->live.enabled_valid && this->live.enabled ? "Minuteur actif" : "Minuteur en pause");
+    if (this->live.enabled_valid && this->live.enabled) cadran::set_pill("Minuteur actif", "timer");
+    else cadran::set_pill("Minuteur en pause", "pause", true);
     this->rerender();
 }
 
