@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Root screen with the "Cadran" prototype Overview (PLAYGUARD_SIM_CADRAN=1 on the desktop, Tools › Developer › Cadran prototype on the console):
+     the tabs carry the boards' short French labels; cadran::style_frame adds the icons. Each tab
+     is a custom view registered in main.cpp and implemented in source/tab/: the first four
+     drawn anew, the last five the current tabs restyled (source/tab/cadran_lists.cpp). -->
+
+<brls:AppletFrame
+    iconInterpolation="linear"
+    footerHidden="false">
+
+    <brls:TabFrame
+        id="main_tabs"
+        title="@i18n/playguard/title"
+        icon="@res/img/app_icon.jpg">
+
+        <brls:Tab label="Aujourd'hui">
+            <CadranTab/>
+        </brls:Tab>
+
+        <brls:Separator/>
+
+        <brls:Tab label="Temps de jeu">
+            <CadranPlayTimerTab/>
+        </brls:Tab>
+
+        <brls:Tab label="Activité">
+            <CadranActivityTab/>
+        </brls:Tab>
+
+        <brls:Tab label="Restrictions">
+            <CadranRestrictionsTab/>
+        </brls:Tab>
+
+        <brls:Tab label="Horloge">
+            <CadranClockTab/>
+        </brls:Tab>
+
+        <brls:Separator/>
+
+        <brls:Tab label="Sécurité">
+            <CadranSecurityTab/>
+        </brls:Tab>
+
+        <brls:Separator/>
+
+        <brls:Tab label="Préférences">
+            <CadranPreferencesTab/>
+        </brls:Tab>
+
+        <brls:Tab label="Outils">
+            <CadranToolsTab/>
+        </brls:Tab>
+
+        <brls:Tab label="À propos">
+            <CadranAboutTab/>
+        </brls:Tab>
+
+    </brls:TabFrame>
+
+</brls:AppletFrame>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- "Cadran" prototype of Activity (PLAYGUARD_SIM_CADRAN=1 on the desktop, Tools › Developer › Cadran prototype on the console):
+     accounts as chips, the period and the export, three figures, the games
+     of the period as cards, the games to rediscover. Filled by source/tab/cadran_activity_tab.cpp.
+     Strings not localised. -->
+
+<brls:Box
+    width="auto"
+    height="auto"
+    axis="column"
+    alignItems="stretch"
+    paddingLeft="28"
+    paddingRight="48"
+    paddingTop="4">
+
+    <brls:Box axis="row" alignItems="center" marginBottom="14">
+        <brls:Box id="ac_accounts" axis="row" alignItems="center" grow="1.0"/>
+        <brls:Box id="ac_period" focusable="true" axis="row" alignItems="center" height="44" paddingLeft="16" paddingRight="16" cornerRadius="22" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" marginRight="10">
+            <brls:Label id="ac_period_label" text="7 derniers jours" fontSize="16" marginRight="8"/>
+            <CadranIcon icon="chevron-down" width="16" height="16"/>
+        </brls:Box>
+        <brls:Box id="ac_export" focusable="true" axis="row" alignItems="center" height="44" paddingLeft="16" paddingRight="16" cornerRadius="22" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1">
+            <CadranIcon icon="download" width="18" height="18" marginRight="10"/>
+            <brls:Label text="Exporter" fontSize="16"/>
+        </brls:Box>
+    </brls:Box>
+
+    <brls:Box axis="row" alignItems="stretch" marginBottom="14">
+        <brls:Box axis="column" alignItems="flexStart" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="16" paddingBottom="16" paddingLeft="20" paddingRight="20" marginRight="14">
+            <brls:Label text="Aujourd'hui" fontSize="15" textColor="@theme/cadran/text3"/>
+            <CadranDigits id="ac_today" text="—" fontSize="36" marginTop="6" marginBottom="6"/>
+            <brls:Label id="ac_today_sub" text="" fontSize="14" textColor="@theme/cadran/text2" singleLine="true"/>
+        </brls:Box>
+        <brls:Box axis="row" alignItems="flexEnd" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="16" paddingBottom="16" paddingLeft="20" paddingRight="20" marginRight="14">
+            <brls:Box axis="column" alignItems="flexStart" grow="1.0">
+                <brls:Label text="7 derniers jours" fontSize="15" textColor="@theme/cadran/text3"/>
+                <CadranDigits id="ac_week" text="—" fontSize="36" marginTop="6" marginBottom="6"/>
+                <brls:Label id="ac_week_sub" text="" fontSize="14" textColor="@theme/cadran/text2" singleLine="true"/>
+            </brls:Box>
+            <brls:Box id="ac_week_bars" axis="row" alignItems="flexEnd" height="56" marginLeft="12">
+                <brls:Box width="10" height="3" cornerRadius="4" marginRight="4"/>
+                <brls:Box width="10" height="3" cornerRadius="4" marginRight="4"/>
+                <brls:Box width="10" height="3" cornerRadius="4" marginRight="4"/>
+                <brls:Box width="10" height="3" cornerRadius="4" marginRight="4"/>
+                <brls:Box width="10" height="3" cornerRadius="4" marginRight="4"/>
+                <brls:Box width="10" height="3" cornerRadius="4" marginRight="4"/>
+                <brls:Box width="10" height="3" cornerRadius="4"/>
+            </brls:Box>
+        </brls:Box>
+        <brls:Box axis="column" alignItems="flexStart" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="16" paddingBottom="16" paddingLeft="20" paddingRight="20">
+            <brls:Label text="Depuis toujours" fontSize="15" textColor="@theme/cadran/text3"/>
+            <CadranDigits id="ac_total" text="—" fontSize="36" marginTop="6" marginBottom="6"/>
+            <brls:Label id="ac_total_sub" text="" fontSize="14" textColor="@theme/cadran/text2" singleLine="true"/>
+        </brls:Box>
+    </brls:Box>
+
+    <brls:Label id="ac_games_title" text="JEUX · 7 DERNIERS JOURS" fontSize="14" textColor="@theme/cadran/text3" marginBottom="10"/>
+    <brls:Label id="ac_games_note" text="" fontSize="16" textColor="@theme/cadran/text2" marginBottom="6"/>
+    <brls:Box id="ac_games" axis="column" alignItems="stretch"/>
+
+    <brls:Box id="ac_rediscover" axis="row" alignItems="center"/>
+
+</brls:Box>

@@ -448,7 +448,7 @@ if GATE:
     shot("05_dev_tools")
     # Turning a developer switch off asks first; B keeps it on (the end of
     # the scenario checks developer mode was saved on).
-    key("Up", 9)               # past the cleanup cells and the recorder: Read-only mode
+    key("Up", 11)              # past the cleanup cells, the Cadran and statistics switches and the recorder: Read-only mode
     key("Return")
     shot("06a_read_only_off")  # untested firmware: the "own risk" warning
     key("Escape")
@@ -456,7 +456,7 @@ if GATE:
     key("Return")
     shot("06b_dev_mode_off")
     key("Escape")
-    key("Down", 5)             # Read-only, the recorder, the two cleanup cells: Show the diagnostic report
+    key("Down", 7)             # Read-only, the recorder, the statistics and Cadran switches, the two cleanup cells: Show the diagnostic report
     key("Return")
     shot("06_dev_report")
     key("Escape")

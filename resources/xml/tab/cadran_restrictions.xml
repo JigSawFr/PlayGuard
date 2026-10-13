@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- "Cadran" prototype of Restrictions (PLAYGUARD_SIM_CADRAN=1 on the desktop, Tools › Developer › Cadran prototype on the console):
+     the level as four tiles (built by source/tab/cadran_restrictions_tab.cpp),
+     the other settings as three cards. Strings not localised. -->
+
+<brls:Box
+    width="auto"
+    height="auto"
+    axis="column"
+    alignItems="stretch"
+    paddingLeft="28"
+    paddingRight="48"
+    paddingTop="4">
+
+    <brls:Label text="NIVEAU DE RESTRICTION" fontSize="14" textColor="@theme/cadran/text3" marginBottom="8"/>
+    <brls:Box axis="row" alignItems="center" marginBottom="16">
+        <CadranDigits id="rs_level" text="—" fontSize="32"/>
+        <brls:Label text="· les mêmes réglages que Paramètres de la console › Contrôle parental" fontSize="18" textColor="@theme/cadran/text2" marginLeft="12"/>
+    </brls:Box>
+
+    <brls:Box id="rs_tiles" axis="row" alignItems="stretch" marginBottom="18"/>
+
+    <brls:Label text="AUTRES" fontSize="14" textColor="@theme/cadran/text3" marginBottom="10"/>
+    <brls:Box axis="row" alignItems="stretch">
+        <brls:Box id="rs_vr" focusable="true" axis="row" alignItems="center" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="18" paddingTop="14" paddingBottom="14" paddingLeft="18" paddingRight="18" marginRight="14">
+            <brls:Box axis="column" alignItems="flexStart" grow="1.0">
+                <brls:Label text="Mode VR" fontSize="17"/>
+                <brls:Label id="rs_vr_sub" text="" fontSize="14" textColor="@theme/cadran/text2" marginTop="3"/>
+            </brls:Box>
+            <brls:Box id="rs_vr_toggle" axis="row" alignItems="center" justifyContent="flexEnd" width="46" height="28" cornerRadius="14" paddingLeft="3" paddingRight="3" backgroundColor="@theme/cadran/teal_fill">
+                <brls:Box id="rs_vr_knob" width="22" height="22" cornerRadius="11" backgroundColor="@theme/cadran/navy"/>
+            </brls:Box>
+        </brls:Box>
+        <brls:Box id="rs_org" focusable="true" axis="row" alignItems="center" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="18" paddingTop="14" paddingBottom="14" paddingLeft="18" paddingRight="18" marginRight="14">
+            <brls:Box axis="column" alignItems="flexStart" grow="1.0">
+                <brls:Label text="Organisme de classification" fontSize="17"/>
+                <brls:Label id="rs_org_sub" text="" fontSize="14" textColor="@theme/cadran/text2" marginTop="3"/>
+            </brls:Box>
+            <CadranIcon icon="chevron-right" width="18" height="18" color="@theme/cadran/text3"/>
+        </brls:Box>
+        <brls:Box id="rs_comm" focusable="true" axis="row" alignItems="center" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="18" paddingTop="14" paddingBottom="14" paddingLeft="18" paddingRight="18">
+            <brls:Box axis="column" alignItems="flexStart" grow="1.0">
+                <brls:Label text="Logiciels autorisés" fontSize="17"/>
+                <brls:Label id="rs_comm_sub" text="" fontSize="14" textColor="@theme/cadran/text2" marginTop="3"/>
+            </brls:Box>
+            <CadranIcon icon="chevron-right" width="18" height="18" color="@theme/cadran/text3"/>
+        </brls:Box>
+    </brls:Box>
+
+</brls:Box>

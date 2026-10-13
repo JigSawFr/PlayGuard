@@ -12,6 +12,7 @@
 #include "action/log_prune_flow.hpp"
 #include "action/pt_block_flow.hpp"
 #include "action/pt_flow.hpp"
+#include "action/frame_stats_flow.hpp"
 #include "action/pt_log_flow.hpp"
 #include "action/upload_flow.hpp"
 #include "activity/diagnostic_activity.hpp"
@@ -24,6 +25,7 @@
 #include "util/diagnostics.hpp"
 #include "util/github_auth.hpp"
 #include "util/patches.hpp"
+#include "util/frame_stats.hpp"
 #include "util/pt_log.hpp"
 #include "util/paths.hpp"
 
@@ -205,6 +207,21 @@ ToolsTab::ToolsTab()
         pt_log_flow::apply();
         if (on) ui::notify(brls::getStr("playguard/dev/pt_log_on", pt_log::path()));
     });
+    dev_frame_stats->init("playguard/dev/frame_stats"_i18n, config::get().frame_stats, [this](bool on) {
+        config::get().frame_stats = on;
+        ui::save_config();
+        frame_stats_flow::apply();
+        if (on) ui::notify(brls::getStr("playguard/dev/frame_stats_on", frame_stats::path()));
+        this->update_frame_stats();
+    });
+    dev_frame_stats_last->setSingleLine(false);
+    this->stats_timer.setPeriod(1000);
+    this->stats_timer.setCallback([this]() { this->update_frame_stats(); });
+    dev_cadran->init("playguard/dev/cadran"_i18n, config::get().cadran, [](bool on) {
+        config::get().cadran = on;
+        ui::save_config();
+        ui::offer_restart();
+    });
     dev_clear_cache->registerClickAction([](brls::View*) {
         cleanup_flow::clear_cache();
         return true;
@@ -263,6 +280,9 @@ void ToolsTab::refresh()
     dev_mode->setOn(dev, false);
     dev_read_only->setOn(ro, false);
     dev_pt_log->setOn(cfg.pt_log, false);
+    dev_frame_stats->setOn(cfg.frame_stats, false);
+    dev_cadran->setOn(cfg.cadran, false);
+    this->update_frame_stats();
     fw->setDetailText(fwv);
     ams->setDetailText(si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro)
                                     : "playguard/common/unavailable"_i18n);
@@ -300,6 +320,11 @@ void ToolsTab::refresh()
                           { dev_read_only.getView(), dev },
                           { dev_pt_log.getView(), dev },
                           { dev_pt_log_note.getView(), dev },
+                          { dev_frame_stats.getView(), dev },
+                          { dev_frame_stats_note.getView(), dev },
+                          { dev_frame_stats_last.getView(), dev && frame_stats_flow::running() },
+                          { dev_cadran.getView(), dev },
+                          { dev_cadran_note.getView(), dev },
                           { dev_clear_cache.getView(), dev },
                           { dev_clear_logs.getView(), dev },
                           { dev_report.getView(), dev },
@@ -317,4 +342,16 @@ void ToolsTab::refresh()
 brls::View* ToolsTab::create()
 {
     return new ToolsTab();
+}
+
+// The last second's line under the switch, while the statistics run (hidden
+// otherwise); refreshed every second while this tab is on screen.
+void ToolsTab::update_frame_stats()
+{
+    const bool on = app::dev_mode() && frame_stats_flow::running();
+    if (on && !this->stats_timer.isRunning()) this->stats_timer.start();
+    else if (!on && this->stats_timer.isRunning()) this->stats_timer.stop();
+    const std::string last = on ? frame_stats_flow::last() : std::string();
+    dev_frame_stats_last->setText(last.empty() ? "playguard/dev/frame_stats_wait"_i18n : last);
+    ui::set_visible(dev_frame_stats_last.getView(), on);
 }

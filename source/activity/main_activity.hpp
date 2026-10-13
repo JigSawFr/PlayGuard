@@ -8,7 +8,9 @@
 class MainActivity : public brls::Activity
 {
   public:
-    CONTENT_FROM_XML_RES("activity/main.xml");
+    // activity/main.xml; on desktop, PLAYGUARD_SIM_CADRAN=1 swaps the Overview
+    // for the "Cadran" prototype (activity/main_cadran.xml).
+    brls::View* createContentView() override;
 
     void onContentAvailable() override;
 

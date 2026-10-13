@@ -4,6 +4,7 @@
 #include "ui/ui.hpp"
 
 #include "action/error_hint_logic.hpp"
+#include "action/frame_stats_flow.hpp"
 #include "action/pt_log_flow.hpp"
 #include "action/write_queue_logic.hpp"
 #include "activity/main_activity.hpp"
@@ -181,7 +182,8 @@ void note_unlocked(bool valid, bool unlocked)
 
 void on_mode_changed()
 {
-    pt_log_flow::apply();   // the recorder only runs in developer mode
+    pt_log_flow::apply();       // the recorder and the frame statistics only run
+    frame_stats_flow::apply();  // in developer mode
     for (brls::Activity* activity : brls::Application::getActivitiesStack())
         if (auto* main = dynamic_cast<MainActivity*>(activity)) main->update_title();
     TabBase::refresh_shown();

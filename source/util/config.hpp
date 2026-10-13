@@ -20,6 +20,8 @@ struct Config
     bool auto_relock = true;           // lock again right after a change that needed an unlock
     bool dev_mode = false;             // developer tools (7 presses on About > Version)
     bool pt_log = false;               // Developer › record the play timer (action/pt_log_flow)
+    bool frame_stats = false;          // Developer › frame statistics (action/frame_stats_flow)
+    bool cadran = false;               // Developer › the "Cadran" prototype screens (tab/cadran_tab)
     // How an update is installed: "" (not chosen yet: asked on the first
     // update), "inplace" (PlayGuard downloads it and replaces itself),
     // "auto", "sphaira", "appstore", "manual".

@@ -18,6 +18,7 @@
 #include "action/log_prune_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/pt_flow.hpp"
+#include "action/frame_stats_flow.hpp"
 #include "action/pt_log_flow.hpp"
 #include "action/rescue.hpp"
 #include "activity/init_error_activity.hpp"
@@ -28,6 +29,11 @@
 #include "app.hpp"
 #include "core/platform.h"
 #include "tab/about_tab.hpp"
+#include "tab/cadran_activity_tab.hpp"
+#include "tab/cadran_play_timer_tab.hpp"
+#include "tab/cadran_lists.hpp"
+#include "tab/cadran_restrictions_tab.hpp"
+#include "tab/cadran_tab.hpp"
 #include "tab/activity_tab.hpp"
 #include "tab/clock_tab.hpp"
 #include "tab/dashboard_tab.hpp"
@@ -44,6 +50,14 @@
 #include "util/nand.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
+
+// nanovg's per-frame counters, through the getter
+// tools/perf_nanovg_stats.patch adds to the borealis tree. Weak: without the
+// patch, the frame time alone is recorded.
+extern "C" void nvgDebugGetStats(NVGcontext*, int*, int*, int*, int*) __attribute__((weak));
+#include "view/cadran_digits.hpp"
+#include "view/cadran_icon.hpp"
+#include "view/cadran_week.hpp"
 #include "util/startup.h"
 #include "view/loading_bar.hpp"
 #include "view/loading_mark.hpp"
@@ -52,6 +66,7 @@
 #include "view/scroll_view.hpp"
 #include "view/play_days.hpp"
 #include "view/pt_gauge.hpp"
+#include "view/pt_ring.hpp"
 #include "view/pt_state_header.hpp"
 #include "view/pt_week.hpp"
 
@@ -113,7 +128,8 @@ namespace
 void show_first(brls::Activity* first)
 {
     brls::Application::pushActivity(first, brls::TransitionAnimation::NONE);
-    pt_log_flow::apply();   // Developer › Record the play timer, when on (after fw_gate::prepare)
+    pt_log_flow::apply();       // Developer › Record the play timer, when on (after fw_gate::prepare)
+    frame_stats_flow::apply();  // Developer › Frame statistics, when on
     log_prune_flow::run();  // the reports and crashes past the limits of Tools › Diagnostics
     startup_mark(StartupStep_FirstScreen);
     brls::Logger::info("start-up: first screen ready after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_FirstScreen));
@@ -251,6 +267,9 @@ int main(int argc, char* argv[])
 
     // PlayGuard status colours (light / dark variants), before any view exists.
     ui::register_theme_colors();
+    // The "Cadran" prototype's navy theme (PLAYGUARD_SIM_CADRAN=1 on the
+    // desktop, Tools › Developer › Cadran prototype on the console).
+    if (cadran::enabled()) cadran::install_theme();
 
     // We own the quit path (B on the sidebar / error screen).
     brls::Application::setGlobalQuit(false);
@@ -258,10 +277,23 @@ int main(int argc, char* argv[])
     brls::Application::registerXMLView("ScrollView",      ScrollView::create);
     brls::Application::registerXMLView("PtStateHeader",   PtStateHeader::create);
     brls::Application::registerXMLView("PtGauge",         PtGauge::create);
+    brls::Application::registerXMLView("PtRing",          PtRing::create);
+    brls::Application::registerXMLView("CadranIcon",      CadranIcon::create);
+    brls::Application::registerXMLView("CadranDigits",    CadranDigits::create);
     brls::Application::registerXMLView("PtWeekView",      PtWeekView::create);
     brls::Application::registerXMLView("PlayDaysView",    PlayDaysView::create);
     brls::Application::registerXMLView("MadeInFrance",    MadeInFrance::create);
     brls::Application::registerXMLView("DashboardTab",    DashboardTab::create);
+    brls::Application::registerXMLView("CadranTab",       CadranTab::create);
+    brls::Application::registerXMLView("CadranRestrictionsTab", CadranRestrictionsTab::create);
+    brls::Application::registerXMLView("CadranPlayTimerTab", CadranPlayTimerTab::create);
+    brls::Application::registerXMLView("CadranActivityTab", CadranActivityTab::create);
+    brls::Application::registerXMLView("CadranWeekView",  CadranWeekView::create);
+    brls::Application::registerXMLView("CadranClockTab",  CadranClockTab::create);
+    brls::Application::registerXMLView("CadranSecurityTab", CadranSecurityTab::create);
+    brls::Application::registerXMLView("CadranPreferencesTab", CadranPreferencesTab::create);
+    brls::Application::registerXMLView("CadranToolsTab",  CadranToolsTab::create);
+    brls::Application::registerXMLView("CadranAboutTab",  CadranAboutTab::create);
     brls::Application::registerXMLView("PlayTimerTab",    PlayTimerTab::create);
     brls::Application::registerXMLView("ActivityTab",     ActivityTab::create);
     brls::Application::registerXMLView("RestrictionsTab", RestrictionsTab::create);
@@ -291,8 +323,38 @@ int main(int argc, char* argv[])
     // or icon read running there stops now, not after every game is read.
     brls::Application::getExitEvent()->subscribe([]() { playstats_cancel(); });
 
-    while (brls::Application::mainLoop())
-        ;
+#ifndef __SWITCH__
+    // Desktop measurement (PLAYGUARD_SIM_STATS=<file>, tools/perf_frames.sh):
+    // one line per frame, "<time us> <frame us> <draw calls> <fill tris>
+    // <stroke tris> <text tris>", the counters from nanovg's own (zero without
+    // tools/perf_nanovg_stats.patch). The FPS limiter is turned off so the
+    // frame time is the work alone.
+    FILE* stats = nullptr;
+    if (const char* path = std::getenv("PLAYGUARD_SIM_STATS")) {
+        // Created with an explicit mode (CodeQL: fopen's depends on the umask).
+        const int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+        if (fd >= 0) {
+            stats = fdopen(fd, "w");
+            if (!stats) close(fd);
+        }
+        brls::Application::setLimitedFPS(0);
+    }
+    brls::Time stats_last = brls::getCPUTimeUsec();
+#endif
+    while (brls::Application::mainLoop()) {
+        frame_stats_flow::sample();   // Developer › Frame statistics, when on
+#ifndef __SWITCH__
+        if (!stats) continue;
+        int draws = 0, fill = 0, stroke = 0, text = 0;
+        if (nvgDebugGetStats) nvgDebugGetStats(brls::Application::getNVGContext(), &draws, &fill, &stroke, &text);
+        const brls::Time now = brls::getCPUTimeUsec();
+        std::fprintf(stats, "%lld %lld %d %d %d %d\n", (long long)now, (long long)(now - stats_last), draws, fill, stroke, text);
+        stats_last = now;
+#endif
+    }
+#ifndef __SWITCH__
+    if (stats) std::fclose(stats);
+#endif
 
     // Network tasks still running (an update check, a sign-in waiting for its
     // code): stopped, and waited for a moment, before what they use goes away.
@@ -300,6 +362,7 @@ int main(int argc, char* argv[])
     http::abort_all();
     ui::finish_background(std::chrono::seconds(3));
     pt_log_flow::stop();
+    frame_stats_flow::stop();
     app::shutdown();
     http::cleanup();
     return EXIT_SUCCESS;

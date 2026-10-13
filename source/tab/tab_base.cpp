@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/tab_base.hpp"
 
+#include "action/frame_stats_flow.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 
@@ -12,6 +13,10 @@ static TabBase* s_shown = nullptr;
 TabBase::TabBase(const std::string& xml_res)
 {
     this->inflateFromXMLRes(xml_res);
+    // "xml/tab/overview.xml" -> "tab/overview"
+    this->screen = xml_res.substr(xml_res.rfind("xml/") == 0 ? 4 : 0);
+    if (this->screen.size() > 4 && this->screen.compare(this->screen.size() - 4, 4, ".xml") == 0)
+        this->screen.resize(this->screen.size() - 4);
     this->registerAction("playguard/hints/refresh"_i18n, brls::BUTTON_X, [this](brls::View*) {
         this->refresh();
         return true;
@@ -33,6 +38,7 @@ void TabBase::willAppear(bool resetState)
 {
     brls::Box::willAppear(resetState);
     s_shown = this;
+    frame_stats_flow::set_screen(this->screen);
     this->update_ro_note();
     this->refresh();
 }

@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "activity/main_activity.hpp"
 
+#include <cstdlib>
+
 #include "action/clock_check.hpp"
 #include "action/data_notice.hpp"
 #include "action/history_flow.hpp"
@@ -10,6 +12,7 @@
 #include "action/update_flow.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
+#include "tab/cadran_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -62,12 +65,21 @@ static void quit_or_relock()
     dialog->open();
 }
 
+brls::View* MainActivity::createContentView()
+{
+    if (cadran::enabled()) return brls::View::createFromXMLResource("activity/main_cadran.xml");
+    return brls::View::createFromXMLResource("activity/main.xml");
+}
+
 void MainActivity::onContentAvailable()
 {
     // For the desktop smoke test: the start screens (lock, rescue) lead here.
     brls::Logger::info("main screen opened");
     this->update_title();
     compact_sidebar(this->getView("main_tabs"));
+    // The "Cadran" prototype: the frame after the design boards.
+    if (cadran::enabled())
+        cadran::style_frame(dynamic_cast<brls::AppletFrame*>(this->getContentView()), this->getView("main_tabs"));
 
     // B on the sidebar quits (the tabs themselves send B back to the sidebar),
     // but only when pressed twice within 2 s: one stray B never closes the app.

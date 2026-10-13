@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- "Cadran" prototype, the child screen (desktop simulation,
+     PLAYGUARD_SIM_CADRAN=1): the time left today as one big ring, the
+     bedtime, nothing to change. Filled by source/activity/cadran_child_activity.cpp.
+     Strings not localised. -->
+
+<brls:AppletFrame
+    iconInterpolation="linear">
+
+    <brls:Box
+        id="child_root"
+        title="@i18n/playguard/title"
+        icon="@res/img/app_icon.jpg"
+        focusable="true"
+        width="auto"
+        height="auto"
+        axis="column"
+        alignItems="center"
+        justifyContent="center"
+        grow="1.0">
+
+        <brls:Label text="Il te reste aujourd'hui" fontSize="30" textColor="@theme/cadran/text2" marginBottom="22"/>
+        <PtRing id="child_ring" width="340" height="340" marginBottom="22"/>
+        <brls:Box axis="row" alignItems="center" marginBottom="18">
+            <brls:Box id="child_bed_chip" axis="row" alignItems="center" height="48" paddingLeft="20" paddingRight="20" cornerRadius="24" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" marginRight="12">
+                <CadranIcon icon="moon" width="20" height="20" color="@theme/cadran/amber" marginRight="10"/>
+                <brls:Label text="Au lit à" fontSize="18" marginRight="8"/>
+                <CadranDigits id="child_bedtime" text="21:00" fontSize="18" textColor="@theme/cadran/amber"/>
+            </brls:Box>
+            <brls:Box axis="row" alignItems="center" height="48" paddingLeft="20" paddingRight="20" cornerRadius="24" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1">
+                <brls:Label text="La console s'arrête toute seule quand le temps est écoulé" fontSize="18" textColor="@theme/cadran/text2"/>
+            </brls:Box>
+        </brls:Box>
+        <brls:Label text="Bonne partie !" fontSize="16" textColor="@theme/cadran/text3"/>
+
+    </brls:Box>
+
+</brls:AppletFrame>
