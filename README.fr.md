@@ -31,7 +31,7 @@ PlayGuard ramène sur une console modifiée les réglages de l'application mobil
 ## Compatibilité
 
 - **Testé sur console :** firmware 22.0.0 → 22.5.0, Atmosphère 1.11.x
-- **Devrait fonctionner, non testé :** firmware 21.x et 23.x, tout Atmosphère qui démarre votre firmware ; hekate n'est pas nécessaire
+- **Devrait fonctionner, non testé :** firmware 21.x et 23.x ; avant 21.0.0, tout sauf le temps de jeu ; tout Atmosphère qui démarre votre firmware
 - **Lanceurs :** hbmenu, sphaira, Homebrew App Store
 
 Le firmware 23.x et au-delà s'ouvre en lecture seule tant qu'aucune version ne le prend en charge. Pas de Switch 2 (Atmosphère n'existe pas pour elle). Détails : [compatibilité](docs/fr/compatibility.md).

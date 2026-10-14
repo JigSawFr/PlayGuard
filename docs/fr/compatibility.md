@@ -4,30 +4,23 @@ Firmwares, Atmosphère et lanceurs pris en charge, emuMMC et sysMMC, et la compa
 
 ## Versions prises en charge
 
-Deux niveaux : **testé** signifie lancé sur une console avec PlayGuard ; **devrait fonctionner** signifie que rien dans PlayGuard ne l'empêche, mais que personne ne l'a encore signalé ([retours bienvenus](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)).
+**Testé sur console** — PlayGuard a tourné sur :
 
-| | Testé sur console | Devrait fonctionner, non testé |
-|---|---|---|
-| **Firmware** | 22.0.0, 22.1.0, 22.5.0 | 21.0.0 → 21.2.0 : toutes les fonctions. 23.0.x : mêmes commandes dans la table de [switchbrew](https://switchbrew.org/wiki/Parental_Control_services), s'ouvre par l'écran [firmware plus récent](#firmware-plus-recent). Avant 21.0.0 : tout sauf le temps de jeu. |
-| **Atmosphère** | 1.11.x (22.1.0 avec 1.11.1) | Toute version qui démarre votre firmware. PlayGuard vérifie seulement qu'Atmosphère tourne, pas sa version. |
-| **hekate** | Pas nécessaire | PlayGuard ne lui parle jamais. Si vous démarrez par hekate, il doit seulement prendre en charge votre firmware. |
-| **Lanceurs** | hbmenu, sphaira, Homebrew App Store | — |
+- les firmwares 22.0.0, 22.1.0 et 22.5.0
+- Atmosphère 1.11.x
+- hbmenu, sphaira et le Homebrew App Store
 
-**Quel Atmosphère et quel hekate pour quel firmware.** Ce sont les versions minimales pour démarrer ce firmware, pas des exigences de PlayGuard :
+**Devrait fonctionner, non testé** — rien dans PlayGuard ne l'empêche, mais personne ne l'a encore signalé ([retours bienvenus](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)) :
 
-| Firmware | Atmosphère | hekate |
-|---|---|---|
-| 21.0.0 | 1.10.0 | 6.4.0 |
-| 21.1.0 | 1.10.1 | 6.4.0 |
-| 21.2.0 | 1.10.2 | 6.5.0 |
-| 22.0.0 / 22.1.0 | 1.11.0 / 1.11.1 | 6.5.2 |
-| 22.5.0 | 1.11.2 | 6.5.3 |
-| 23.0.x | 1.12.0 | 6.5.4 |
+- **Firmware 21.0.0 → 21.2.0** — toutes les fonctions.
+- **Firmware antérieur à 21.0.0** — tout sauf le temps de jeu : restrictions, code PIN, déverrouillage temporaire, activité, horloge réseau, application mobile, historique. Le bloc de réglages du minuteur (0x44 octets) n'a cette structure que depuis 21.0.0, donc PlayGuard désactive ce qui en dépend : les limites quotidiennes, l'alarme du coucher, le temps en plus et le verrou de console.
+- **Firmware antérieur à 4.0.0** — sans non plus l'affichage du code PIN, la restriction 3D ni le module de récupération.
+- **Firmware 23.0.x** — mêmes commandes dans la table de [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) ; s'ouvre par l'écran [firmware plus récent](#firmware-plus-recent).
+- **Atmosphère** — toute version qui démarre votre firmware. PlayGuard vérifie qu'Atmosphère tourne, pas sa version ; *Outils* affiche celle qu'il détecte.
 
-- **Firmware antérieur à 21.0.0.** La structure de la limite de temps de jeu (0x44 octets) existe depuis 21.0.0 : le minuteur y est désactivé ; les autres onglets fonctionnent, mais personne ne les a essayés.
-- **Lanceurs.** Le lancement par-dessus un jeu (title override) est recommandé. L'application indique si elle tourne en application ou en applet (album). Par-dessus un jeu, la console compte le temps passé dans PlayGuard comme celui de ce jeu. Dans l'activité, il va au compte choisi au lancement : ouvrez-le avec le compte d'un parent, pas celui d'un enfant. Le minuteur est celui de la console, le même pour tous les comptes : il compte ce temps quel que soit le compte (sauf minuteur désactivé).
-- **L'application affiche** le firmware et la version d'Atmosphère détectés dans *Outils*.
-- **Nintendo Switch 2** — Non prise en charge. Atmosphère n'existe pas pour elle.
+**Lanceurs.** Le lancement par-dessus un jeu (title override) est recommandé. L'application indique si elle tourne en application ou en applet (album). Par-dessus un jeu, la console compte le temps passé dans PlayGuard comme celui de ce jeu. Dans l'activité, il va au compte choisi au lancement : ouvrez-le avec le compte d'un parent, pas celui d'un enfant. Le minuteur est celui de la console, le même pour tous les comptes : il compte ce temps quel que soit le compte (sauf minuteur désactivé).
+
+**Nintendo Switch 2.** Non prise en charge : Atmosphère n'existe pas pour elle.
 
 <a id="firmware-plus-recent"></a>**Firmware plus récent ?** Au-delà du plus récent firmware testé sur console, PlayGuard s'ouvre **en lecture seule** et vérifie si une version plus récente le prend en charge. Si c'est le cas, il propose de mettre à jour (dans PlayGuard même, avec sphaira ou le Homebrew App Store). Sinon, vous choisissez : lecture seule, lecture seule avec les outils développeur (pour diagnostiquer le firmware), ou toutes les fonctions à vos risques. Le choix peut être mémorisé pour ce firmware et cette version de l'application ; *Outils › Compatibilité* rouvre l'écran.
 
