@@ -13,7 +13,7 @@
 
 PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.apple.com/app/id1190074407) phone app onto a modded console. It drives the console's own controls (the limit, the PIN, the warnings, the suspension), so nothing runs in the background.
 
-![Overview](images/screenshots/dashboard.png)
+[![Watch the 30-second tour](images/video/playguard-tour.png)](images/video/playguard-tour.mp4)
 
 > [!WARNING]
 > **Requires custom firmware (Atmosphère).** PlayGuard uses the restricted `pctl` service, some of it through `*ForDebug` commands. **Use at your own risk.**
