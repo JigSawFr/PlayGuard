@@ -5,7 +5,8 @@
 # the install section with the assets' sizes, the build report and the
 # contributors. The summary is .github/release-notes/<version>.md, else one a
 # language model writes through OpenRouter when OPENROUTER_API_KEY is set
-# (tools/summarize_release.py), else none. With --apply, the release also gets
+# (tools/summarize_release.py) when the release has something to highlight,
+# else none. With --apply, the release also gets
 # a discussion in the RELEASE_DISCUSSION_CATEGORY category (default
 # Announcements; "none" for none), and the discussion's post kept the same
 # as the page.
@@ -42,11 +43,19 @@ elif [ -s "$work/existing.md" ]; then
   how="the summary already on the page"
 elif [ -z "${OPENROUTER_API_KEY:-}" ]; then
   how="no summary (no $summary, no OpenRouter key)"
-elif python3 "$here/summarize_release.py" "$version" .github/release-notes resources/img/emoji < "$work/raw.md" > "$work/summary.md"; then
-  args=(--summary "$work/summary.md"); how="a summary by ${OPENROUTER_MODEL:-the default model} through OpenRouter"
 else
-  echo "::warning title=Release page::no summary: OpenRouter gave none (see the log above)"
-  how="no summary (OpenRouter gave none)"
+  # Exit 3: nothing in the release to highlight (no change a user notices, or
+  # the model said so). Not a failure: the page goes on with the lists alone.
+  rc=0
+  python3 "$here/summarize_release.py" "$version" .github/release-notes resources/img/emoji < "$work/raw.md" > "$work/summary.md" || rc=$?
+  if [ "$rc" = 0 ]; then
+    args=(--summary "$work/summary.md"); how="a summary by ${OPENROUTER_MODEL:-the default model} through OpenRouter"
+  elif [ "$rc" = 3 ]; then
+    how="no summary (nothing to highlight)"
+  else
+    echo "::warning title=Release page::no summary: OpenRouter gave none (see the log above)"
+    how="no summary (OpenRouter gave none)"
+  fi
 fi
 
 gh release download "$tag" -p compat.json -D "$work" 2>/dev/null && args+=(--compat "$work/compat.json") || true
