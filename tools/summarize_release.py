@@ -14,6 +14,11 @@ version's own), a sensible length. Anything else (no key, a network error, a
 refusal, an answer of the wrong shape) prints nothing and exits 1 with the
 reason on stderr: the caller keeps the notes as they are.
 
+A release may have nothing to highlight: notes with no section a user
+notices (only build, tests, docs) are not sent, and the model may answer
+NONE when what is there is too small for a summary (a typo, a minor fix).
+Either prints nothing and exits 3: no summary, and nothing went wrong.
+
 OPENROUTER_MODEL picks the model (default below). Standard library only.
 """
 import glob
@@ -23,10 +28,13 @@ import sys
 import urllib.error
 import urllib.request
 
+from release_notes import CONTRIBUTOR_SECTIONS, items, sections
+
 URL = "https://openrouter.ai/api/v1/chat/completions"
 DEFAULT_MODEL = "anthropic/claude-sonnet-5.5"
 MAX_NOTES = 120_000   # characters of notes sent; 1.0.0's are about 28 000
 MAX_SUMMARY = 3_000   # characters of summary accepted
+NOTHING = 3           # the exit code when there is nothing to highlight
 
 PROMPT = """You write the summary at the top of the release notes of PlayGuard {version}.
 
@@ -34,10 +42,12 @@ PlayGuard is a Nintendo Switch homebrew app (Atmosphère custom firmware) that b
 
 Readers are parents and homebrew users, on the GitHub release page and on the console's update screen. The full list of changes follows your summary, so do not repeat it: say what a user notices.
 
-Form, exactly:
+A release may have nothing worth a summary: a typo, a minor fix, changes a user does not notice. Then answer exactly NONE, nothing else: the list alone is better than a summary that pads. Never invent or inflate a change to fill the form.
+
+Otherwise, the form, exactly:
 - First line: "### 🌟 Highlights", then a blank line.
 - One or two plain sentences on what this release is about.
-- Then 3 to 8 bullets, "* <emoji> **Topic**: what changed for the user." Open each bullet on one emoji{emoji_list}. Group related changes; leave out tests, CI, refactoring and documentation unless a user would notice.
+- Then 1 to 8 bullets, one per change a user notices (one bullet for a release with one such change), "* <emoji> **Topic**: what changed for the user." Open each bullet on one emoji{emoji_list}. Group related changes; leave out tests, CI, refactoring and documentation unless a user would notice.
 - If an item breaks something or asks the user to act (a moved folder, a setting reset), end with one plain line saying so. Do not say that a full list follows.
 - English, no other heading, no links, no commit or pull-request numbers, no closing remark. Under 2000 characters.
 
@@ -68,6 +78,17 @@ def emoji_list(folder: str) -> str:
     return f", one of these (the console has an icon for them only): {' '.join(chars)}" if chars else ""
 
 
+def noticeable(notes: str) -> bool:
+    """Whether the notes have a change a user notices: a bullet outside the
+    sections for contributors (build, tests, docs)."""
+    return any(title and title not in CONTRIBUTOR_SECTIONS and items(block)
+               for title, block in sections(notes))
+
+
+def nothing(answer: str) -> bool:
+    return answer.strip().strip("`*.\"' ").upper() == "NONE"
+
+
 def check(summary: str) -> str:
     summary = summary.strip()
     if summary.startswith("```"):   # a fenced answer
@@ -86,11 +107,14 @@ def main() -> int:
         print(__doc__.strip().splitlines()[3].strip(), file=sys.stderr)
         return 2
     version = sys.argv[1].lstrip("v")
+    notes = sys.stdin.read()[:MAX_NOTES]
+    if not noticeable(notes):
+        print("nothing a user notices in the notes: no summary", file=sys.stderr)
+        return NOTHING
     key = os.environ.get("OPENROUTER_API_KEY", "")
     if not key:
         print("no OPENROUTER_API_KEY", file=sys.stderr)
         return 1
-    notes = sys.stdin.read()[:MAX_NOTES]
     prompt = PROMPT.format(version=version, notes=notes,
                            examples=examples(sys.argv[2], version) if len(sys.argv) >= 3 else "",
                            emoji_list=emoji_list(sys.argv[3]) if len(sys.argv) == 4 else "")
@@ -109,7 +133,11 @@ def main() -> int:
     try:
         with urllib.request.urlopen(req, timeout=120) as r:
             answer = json.load(r)
-        summary = check(answer["choices"][0]["message"]["content"] or "")
+        content = answer["choices"][0]["message"]["content"] or ""
+        if nothing(content):
+            print(f"{answer.get('model', body['model'])} found nothing to highlight: no summary", file=sys.stderr)
+            return NOTHING
+        summary = check(content)
     except urllib.error.HTTPError as e:
         print(f"OpenRouter: HTTP {e.code} {e.read()[:300]!r}", file=sys.stderr)
         return 1

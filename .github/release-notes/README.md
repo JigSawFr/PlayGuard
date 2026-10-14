@@ -70,6 +70,14 @@ shows it. It goes on the release page only: the app bundles a file from here,
 not this. No key, an error or an answer of the wrong shape: no summary, a
 warning on the run, and the release goes on. A hand-written file always wins.
 
+A release need not have a summary. Notes with no change a user notices
+(only build, tests, docs) are not sent to the model, and the model answers
+`NONE` when the rest is too small to summarise (a typo, a minor fix); it
+writes one bullet per change a user notices, from one to eight, never
+padding. Either way: no summary and no warning. The page then goes from the
+figures to the lists, the console shows the lists, and About and "What's
+new" show the `CHANGELOG.md` entry, as with no file.
+
 ## An existing release
 
 Actions › **release-page** › Run workflow, with its tag (empty: the latest):
