@@ -1,0 +1,162 @@
+<!doctype html>
+<!-- PlayGuard 30-second tour: window.render(t) draws the frame at t seconds; tools/render_tour.mjs turns it into images/video/playguard-tour.mp4. -->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0B1424; --ink:#E8EEF7; --mute:#A9B6CC; --teal:#2EC4A6; --amber:#FFB547; --track:#1F3355; }
+  html,body { margin:0; width:1920px; height:1080px; overflow:hidden; background:var(--bg); font-family:Sora, sans-serif; color:var(--ink); }
+  #bar { position:absolute; left:0; top:0; height:10px; width:1920px; background:var(--amber); transform-origin:left; }
+  .glow { position:absolute; width:1400px; height:1400px; border-radius:50%; filter:blur(40px);
+          background:radial-gradient(circle, rgba(46,196,166,.16), rgba(46,196,166,0) 60%); }
+  .layer { position:absolute; inset:0; opacity:0; }
+  /* intro */
+  #mark { position:absolute; left:50%; top:330px; width:300px; height:300px; margin-left:-150px; }
+  #word { position:absolute; width:100%; top:640px; text-align:center; font-weight:700; font-size:132px; letter-spacing:-4px; }
+  #word span { color:var(--teal); }
+  #tag { position:absolute; width:100%; top:820px; text-align:center; font-size:40px; color:var(--mute); }
+  /* hook */
+  .hook { position:absolute; width:100%; text-align:center; font-weight:700; font-size:92px; letter-spacing:-2px; }
+  .hook s { text-decoration:none; color:var(--amber); }
+  #hooksub { position:absolute; width:100%; top:760px; text-align:center; font-size:40px; color:var(--mute); }
+  /* feature scenes */
+  .cap { position:absolute; left:0; right:0; top:56px; text-align:center; }
+  .cap h2 { margin:0; font-size:66px; font-weight:700; letter-spacing:-1.5px; }
+  .cap h2 em { font-style:normal; color:var(--teal); }
+  .cap p { margin:14px 0 0; font-size:32px; color:var(--mute); }
+  .shot { position:absolute; left:50%; top:262px; width:1280px; height:720px; margin-left:-640px; border-radius:26px; overflow:hidden;
+          box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 0 10px #1a2438, 0 0 0 12px #2a3854; }
+  .shot img { width:100%; height:100%; display:block; transform-origin:var(--ox,50%) var(--oy,50%); }
+  .step { position:absolute; left:64px; bottom:40px; font-size:26px; color:var(--track); font-weight:600; }
+  /* outro */
+  #omark { position:absolute; left:50%; top:200px; width:220px; height:220px; margin-left:-110px; }
+  #oword { position:absolute; width:100%; top:440px; text-align:center; font-weight:700; font-size:110px; letter-spacing:-3px; }
+  #oword span { color:var(--teal); }
+  #oline1 { position:absolute; width:100%; top:610px; text-align:center; font-size:42px; color:var(--ink); }
+  #ourl { position:absolute; left:50%; top:700px; transform:translateX(-50%); padding:18px 40px; border-radius:16px; background:#14213a;
+          border:2px solid var(--teal); font-size:40px; font-weight:600; color:var(--teal); white-space:nowrap; }
+  #onote { position:absolute; width:100%; top:850px; text-align:center; font-size:28px; color:var(--mute); }
+  #onote b { color:var(--amber); font-weight:600; }
+</style></head>
+<body>
+<div class="glow" id="glow"></div>
+<div id="bar"></div>
+
+<div class="layer" id="intro">
+  <svg id="mark" viewBox="0 0 256 256">
+    <circle cx="128" cy="128" r="62" fill="none" stroke="#1F3355" stroke-width="16"/>
+    <circle id="ring" cx="128" cy="128" r="62" fill="none" stroke="#2EC4A6" stroke-width="16" stroke-linecap="round" stroke-dasharray="0 390" transform="rotate(-90 128 128)"/>
+    <path id="play" d="M112 100 L160 128 L112 156 Z" fill="#E8EEF7" stroke="#E8EEF7" stroke-width="8" stroke-linejoin="round" style="transform-origin:136px 128px"/>
+  </svg>
+  <div id="word">Play<span>Guard</span></div>
+  <div id="tag">Nintendo Switch parental controls, right on the console.</div>
+</div>
+
+<div class="layer" id="hook">
+  <div class="hook" id="h1" style="top:300px">No <s>phone app</s>.</div>
+  <div class="hook" id="h2" style="top:430px">No <s>Nintendo account</s>.</div>
+  <div class="hook" id="h3" style="top:560px">No <s>internet</s>.</div>
+  <div id="hooksub">It drives the console's own parental controls. Nothing runs in the background.</div>
+</div>
+
+<div id="scenes"></div>
+
+<div class="layer" id="outro">
+  <svg id="omark" viewBox="0 0 256 256">
+    <circle cx="128" cy="128" r="62" fill="none" stroke="#1F3355" stroke-width="16"/>
+    <circle cx="128" cy="128" r="62" fill="none" stroke="#2EC4A6" stroke-width="16" stroke-linecap="round" stroke-dasharray="292 390" transform="rotate(-90 128 128)"/>
+    <path d="M112 100 L160 128 L112 156 Z" fill="#E8EEF7" stroke="#E8EEF7" stroke-width="8" stroke-linejoin="round"/>
+  </svg>
+  <div id="oword">Play<span>Guard</span></div>
+  <div id="oline1">Free &amp; open source · GPLv3</div>
+  <div id="ourl">github.com/JigSawFr/PlayGuard</div>
+  <div id="onote">Homebrew App Store · sphaira · <b>Requires Atmosphère CFW</b></div>
+</div>
+
+<script>
+const SCENES = [
+  { img:'dashboard.png',        h:'Today, <em>at a glance</em>',        p:'Time played, time left, extra time, bedtime alarm',          ox:'60%', oy:'35%' },
+  { img:'play_timer.png',       h:'<em>Play-time</em> limits',          p:'The same every day, or one per day of the week',              ox:'65%', oy:'35%' },
+  { img:'activity.png',         h:'See the <em>activity</em>',          p:'Per game & per account · export CSV, JSON, XLSX or PDF',      ox:'65%', oy:'40%' },
+  { img:'restrictions.png',     h:'Restrictions & <em>PIN</em>',        p:'Age rating, social posting, console lock in one switch',      ox:'65%', oy:'30%' },
+  { img:'clock.png',            h:'A <em>network clock</em> that’s right', p:'Set from public NTP servers, so the timer counts true offline', ox:'65%', oy:'55%' },
+  { img:'dashboard_fr_dark.png',h:'Every <em>language</em>, light & dark', p:'All the console’s languages · every change logged & undoable', ox:'50%', oy:'50%' },
+];
+const T_INTRO = 3.6, T_HOOK = 3.6, T_SCENE = 3.4, T_OUTRO = 4.6;
+const T_SCENES0 = T_INTRO + T_HOOK;
+const T_OUTRO0 = T_SCENES0 + SCENES.length * T_SCENE;
+window.DURATION = T_OUTRO0 + T_OUTRO;
+
+const box = document.getElementById('scenes');
+const els = SCENES.map((s, i) => {
+  const d = document.createElement('div');
+  d.className = 'layer';
+  d.innerHTML = `<div class="cap"><h2>${s.h}</h2><p>${s.p}</p></div>
+    <div class="shot"><img src="../images/screenshots/${s.img}" style="--ox:${s.ox};--oy:${s.oy}"></div>
+    <div class="step">${String(i+1).padStart(2,'0')} / ${String(SCENES.length).padStart(2,'0')}</div>`;
+  box.appendChild(d);
+  return d;
+});
+
+const clamp = (x, a=0, b=1) => Math.min(b, Math.max(a, x));
+const ease = x => { x = clamp(x); return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x+2, 3)/2; };
+const out = x => 1 - Math.pow(1 - clamp(x), 3);
+const ramp = (t, a, b) => clamp((t - a) / (b - a));
+// fade in over [a, a+fi], hold, fade out over [b-fo, b]
+const win = (t, a, b, fi=.35, fo=.35) => Math.min(ramp(t, a, a+fi), 1 - ramp(t, b-fo, b));
+
+const $ = id => document.getElementById(id);
+window.render = function (t) {
+  // background accents
+  $('bar').style.transform = `scaleX(${out(ramp(t, 0, 1.2))})`;
+  $('glow').style.left = (260 + 200*Math.sin(t*0.25)) + 'px';
+  $('glow').style.top = (-300 + 120*Math.cos(t*0.2)) + 'px';
+
+  // intro
+  const ti = $('intro');
+  ti.style.opacity = 1 - ramp(t, T_INTRO - .4, T_INTRO);
+  $('ring').setAttribute('stroke-dasharray', `${292*ease(ramp(t, .1, 1.5))} 390`);
+  const ps = out(ramp(t, .5, 1.1));
+  $('play').style.transform = `scale(${ps})`;
+  $('word').style.opacity = out(ramp(t, .9, 1.5));
+  $('word').style.transform = `translateY(${40*(1-out(ramp(t, .9, 1.5)))}px)`;
+  $('tag').style.opacity = out(ramp(t, 1.4, 2.0));
+  $('tag').style.transform = `translateY(${30*(1-out(ramp(t, 1.4, 2.0)))}px)`;
+
+  // hook
+  const h0 = T_INTRO;
+  $('hook').style.opacity = win(t, h0, h0 + T_HOOK, .2, .4);
+  ['h1','h2','h3'].forEach((id, i) => {
+    const k = out(ramp(t, h0 + .15 + i*.5, h0 + .6 + i*.5));
+    $(id).style.opacity = k;
+    $(id).style.transform = `translateX(${-80*(1-k)}px)`;
+  });
+  const ks = out(ramp(t, h0 + 1.8, h0 + 2.3));
+  $('hooksub').style.opacity = ks;
+
+  // features
+  els.forEach((el, i) => {
+    const a = T_SCENES0 + i*T_SCENE, b = a + T_SCENE;
+    const o = win(t, a, b, .35, .3);
+    el.style.opacity = o;
+    if (o <= 0) return;
+    const k = out(ramp(t, a, a + .6));
+    el.querySelector('.cap').style.transform = `translateY(${-30*(1-k)}px)`;
+    el.querySelector('.shot').style.transform = `translateY(${60*(1-k)}px) scale(${.94 + .06*k})`;
+    el.querySelector('img').style.transform = `scale(${1 + .07*ease(ramp(t, a + .6, b))})`;
+  });
+
+  // outro
+  const o0 = T_OUTRO0;
+  $('outro').style.opacity = ramp(t, o0, o0 + .4);
+  const seq = [['omark',0],['oword',.2],['oline1',.6],['ourl',.9],['onote',1.3]];
+  seq.forEach(([id, d]) => {
+    const k = out(ramp(t, o0 + d, o0 + d + .5));
+    const el = $(id);
+    el.style.opacity = k;
+    const base = id === 'ourl' ? 'translateX(-50%) ' : '';
+    el.style.transform = base + `translateY(${30*(1-k)}px)`;
+  });
+};
+window.render(0);
+</script>
+</body></html>
