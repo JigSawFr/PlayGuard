@@ -867,11 +867,15 @@ key("Right")               # Discard
 key("Return")
 shot("23_back")
 
-# When the time is up: its two choices (on "Suspend the software"), left as is.
+# When the time is up: its two choices (on "Suspend the software"), and the
+# confirmation of the other one, cancelled.
 key("Down", 3)             # past Remove and Profiles…: When the time is up
 key("Return")
 shot("23_time_up_picker")
-key("Escape")
+key("Down")                # Warning only: a long confirmation, with the unlock
+key("Return")
+shot("23_time_up_confirm") # the text wraps inside the dialog (ui::dialog measures it)
+key("Escape")              # cancelled: nothing written
 
 # Bedtime: the alarm picker (on 21:00), 21:30, confirmed with the unlock the
 # running timer needs; the tab must then show it.

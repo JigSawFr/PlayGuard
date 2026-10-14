@@ -125,6 +125,7 @@ brls::Dialog* progress_dialog(const std::string& text, std::shared_ptr<std::atom
     label->setFontSize(22);
     label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     label->setSingleLine(false);
+    label->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the box's width (ui::dialog)
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setJustifyContent(brls::JustifyContent::CENTER);

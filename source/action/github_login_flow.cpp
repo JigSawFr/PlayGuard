@@ -28,6 +28,7 @@ brls::Label* centered(const std::string& text, int size, NVGcolor color)
     label->setTextColor(color);
     label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     label->setSingleLine(false);
+    label->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the box's width (ui::dialog)
     label->setText(text);
     return label;
 }
