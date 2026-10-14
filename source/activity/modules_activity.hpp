@@ -24,7 +24,8 @@ class ModulesActivity : public brls::Activity
     // Where PlayGuard's copies are (the romfs; PLAYGUARD_SIM_BUNDLED on the
     // desktop build).
     static std::string bundle_dir();
-    // "Installed", "Not installed" … for the cells that open this screen.
+    // "Installed", "Update available" … short enough to share one line with
+    // the title of a cell that opens this screen.
     static std::string summary(modules::Id id);
 
   private:

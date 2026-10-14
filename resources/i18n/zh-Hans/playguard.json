@@ -1463,6 +1463,10 @@
             "stopped": "stopped",
             "none": "None installed"
         },
+        "short": {
+            "installed": "Installed",
+            "update": "Update available"
+        },
         "details": {
             "where": "Folder: {}",
             "installed": "Installed: version {} ({})",
@@ -1488,7 +1492,8 @@
             "update_body": "Update the recovery module to version {}?",
             "installed": "Recovery module installed. It acts at the next boot when a RESCUE file is there.",
             "updated": "Recovery module updated.",
-            "remove_body": "Remove the recovery module? Without it, a forgotten PIN with a 0-minute limit needs a computer to fix."
+            "remove_body": "Remove the recovery module? Without it, a forgotten PIN with a 0-minute limit needs a computer to fix.",
+            "short_title": "Recovery module"
         },
         "agent": {
             "title": "Remote link agent",

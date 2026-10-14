@@ -1463,6 +1463,10 @@
             "stopped": "arrêté",
             "none": "Aucun installé"
         },
+        "short": {
+            "installed": "Installé",
+            "update": "Mise à jour disponible"
+        },
         "details": {
             "where": "Dossier : {}",
             "installed": "Installé : version {} ({})",
@@ -1488,7 +1492,8 @@
             "update_body": "Mettre à jour le module de secours en version {} ?",
             "installed": "Module de secours installé. Il agit au prochain démarrage si un fichier RESCUE est là.",
             "updated": "Module de secours mis à jour.",
-            "remove_body": "Supprimer le module de secours ? Sans lui, un code PIN oublié avec une limite de 0 minute demande un ordinateur."
+            "remove_body": "Supprimer le module de secours ? Sans lui, un code PIN oublié avec une limite de 0 minute demande un ordinateur.",
+            "short_title": "Module de secours"
         },
         "agent": {
             "title": "Agent du lien à distance",
