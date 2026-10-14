@@ -5,6 +5,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include "util/history.hpp"
@@ -29,5 +30,14 @@ bool changed_since(const history::Entry& e, const std::vector<int>& now);
 // What an undo records as the value it replaced: the console's now, or the
 // entry's `after` when that could not be read.
 std::vector<int> undo_replaces(const history::Entry& e, const std::vector<int>& now);
+
+// The days (0 = Sunday) a "limits" entry changed, in week order; {} for
+// another kind or a damaged entry.
+std::vector<int> changed_days(const history::Entry& e);
+
+// When the History screen dates an entry (`when`: "2026-10-08 18:30")
+// relative to `today` and `yesterday` ("2026-10-08").
+enum class Day { Today, Yesterday, Other };
+Day day_of(const std::string& when, const std::string& today, const std::string& yesterday);
 
 }   // namespace history_logic

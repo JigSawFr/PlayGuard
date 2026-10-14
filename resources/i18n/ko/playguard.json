@@ -963,6 +963,13 @@
         "section": "변경 내용 (최신순)",
         "custom_value": "연령 {}, 게시 제한: {}, 커뮤니케이션 제한: {}",
         "title_change": "{}: {} → {}",
+        "title_day_change": "{} ({}): {} → {}",
+        "unknown_kind": "기타 변경 ({})",
+        "unknown_note": "더 새로운 버전의 PlayGuard가 기록했습니다. 자세히 보려면 PlayGuard를 업데이트하세요.",
+        "days_changed": "변경된 요일:",
+        "day_change": "{}: {} → {}",
+        "today_at": "오늘 {}",
+        "yesterday_at": "어제 {}",
         "kinds": {
             "limits": "플레이 시간 제한",
             "level": "제한 레벨",

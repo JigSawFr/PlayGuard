@@ -963,6 +963,13 @@
         "section": "Wijzigingen, nieuwste eerst",
         "custom_value": "leeftijd {}, berichten beperkt: {}, communicatie beperkt: {}",
         "title_change": "{}: {} → {}",
+        "title_day_change": "{} ({}): {} → {}",
+        "unknown_kind": "Andere wijziging ({})",
+        "unknown_note": "Vastgelegd door een nieuwere versie van PlayGuard: werk PlayGuard bij om hem volledig te zien.",
+        "days_changed": "Gewijzigde dagen:",
+        "day_change": "{}: {} → {}",
+        "today_at": "Vandaag, {}",
+        "yesterday_at": "Gisteren, {}",
         "kinds": {
             "limits": "Speeltijdlimieten",
             "level": "Beperkingsniveau",

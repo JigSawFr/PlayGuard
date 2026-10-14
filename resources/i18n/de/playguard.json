@@ -963,6 +963,13 @@
         "section": "Änderungen, neueste zuerst",
         "custom_value": "Alter {}, Posten gesperrt: {}, Kommunikation gesperrt: {}",
         "title_change": "{}: {} → {}",
+        "title_day_change": "{} ({}): {} → {}",
+        "unknown_kind": "Andere Änderung ({})",
+        "unknown_note": "Von einer neueren PlayGuard-Version gespeichert: Aktualisiere PlayGuard, um sie vollständig zu sehen.",
+        "days_changed": "Geänderte Tage:",
+        "day_change": "{}: {} → {}",
+        "today_at": "Heute, {}",
+        "yesterday_at": "Gestern, {}",
         "kinds": {
             "limits": "Spielzeitlimits",
             "level": "Einschränkungskategorie",

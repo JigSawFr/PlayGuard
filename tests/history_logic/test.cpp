@@ -1,5 +1,6 @@
 // Host tests for source/action/history_logic.cpp: what an undoable entry's
-// dialog offers given the console's value now, and what the undo records.
+// dialog offers given the console's value now, what the undo records, the
+// days a limits change touched and the relative day of an entry.
 #include "check.h"
 #include <cstdio>
 #include <vector>
@@ -61,10 +62,37 @@ static void test_replaces()
     CHECK((history_logic::undo_replaces(custom, {}) == std::vector<int>{ 16, 0, 0 }));
 }
 
+static void test_changed_days()
+{
+    std::vector<int> before(7, 195), after(7, 195);
+    after[3] = 180;   // Wednesday only
+    CHECK((history_logic::changed_days(entry("limits", before, after)) == std::vector<int>{ 3 }));
+    after[0] = 0;
+    CHECK((history_logic::changed_days(entry("outside_limits", before, after)) == std::vector<int>{ 0, 3 }));
+    CHECK(history_logic::changed_days(entry("limits", before, before)).empty());
+    // Not a week of limits: none.
+    CHECK(history_logic::changed_days(entry("level", { 1 }, { 3 })).empty());
+    CHECK(history_logic::changed_days(entry("limits", { 1, 2 }, after)).empty());
+}
+
+static void test_day_of()
+{
+    using history_logic::Day;
+    CHECK(history_logic::day_of("2026-10-14 21:29", "2026-10-14", "2026-10-13") == Day::Today);
+    CHECK(history_logic::day_of("2026-10-13 01:25", "2026-10-14", "2026-10-13") == Day::Yesterday);
+    CHECK(history_logic::day_of("2026-10-12 02:10", "2026-10-14", "2026-10-13") == Day::Other);
+    // An unknown date (the clock unread) or a damaged stamp: no relative day.
+    CHECK(history_logic::day_of("2026-10-14 21:29", "", "") == Day::Other);
+    CHECK(history_logic::day_of("", "2026-10-14", "2026-10-13") == Day::Other);
+    CHECK(history_logic::day_of("2026-10", "2026-10-14", "2026-10-13") == Day::Other);
+}
+
 int main()
 {
     test_action();
     test_changed_since();
     test_replaces();
-    return CHECK_DONE("history_logic undo offer, changed-since and recorded-value assertions passed");
+    test_changed_days();
+    test_day_of();
+    return CHECK_DONE("history_logic undo offer, changed-since, recorded-value, changed-day and day assertions passed");
 }

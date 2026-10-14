@@ -963,6 +963,13 @@
         "section": "変更（新しい順）",
         "custom_value": "年齢 {}、投稿の制限：{}、コミュニケーションの制限：{}",
         "title_change": "{}：{} → {}",
+        "title_day_change": "{}（{}）：{} → {}",
+        "unknown_kind": "その他の変更（{}）",
+        "unknown_note": "新しいバージョンの PlayGuard で記録されました。詳しく見るには PlayGuard を更新してください。",
+        "days_changed": "変更された曜日：",
+        "day_change": "{}：{} → {}",
+        "today_at": "今日 {}",
+        "yesterday_at": "昨日 {}",
         "kinds": {
             "limits": "プレイ時間の上限",
             "level": "制限レベル",

@@ -34,7 +34,7 @@ void HistoryActivity::rebuild()
         }
         const history::Entry e = all[i];
         cell->setText(history_flow::title(e));
-        cell->setDetailText(e.when);
+        cell->setDetailText(history_flow::when_text(e));
         cell->registerClickAction([this, e](brls::View*) {
             history_flow::open(e, [this]() { this->rebuild(); });
             return true;

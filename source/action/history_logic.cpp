@@ -22,4 +22,23 @@ std::vector<int> undo_replaces(const history::Entry& e, const std::vector<int>& 
     return now.empty() ? e.after : now;
 }
 
+std::vector<int> changed_days(const history::Entry& e)
+{
+    std::vector<int> days;
+    if ((e.kind != "limits" && e.kind != "outside_limits") || e.before.size() != 7 || e.after.size() != 7) return days;
+    for (int d = 0; d < 7; d++)
+        if (e.before[d] != e.after[d]) days.push_back(d);
+    return days;
+}
+
+Day day_of(const std::string& when, const std::string& today, const std::string& yesterday)
+{
+    // The date is the stamp's first ten characters; a shorter one is no date.
+    if (when.size() < 10) return Day::Other;
+    const std::string date = when.substr(0, 10);
+    if (!today.empty() && date == today) return Day::Today;
+    if (!yesterday.empty() && date == yesterday) return Day::Yesterday;
+    return Day::Other;
+}
+
 }   // namespace history_logic
