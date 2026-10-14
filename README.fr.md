@@ -30,9 +30,9 @@ PlayGuard ramène sur une console modifiée les réglages de l'application mobil
 
 ## Compatibilité
 
-| Firmware | Atmosphère | Lanceurs |
-|---|---|---|
-| 21.0.0 → 22.5.0 | 1.11.x → 1.12.0 | hbmenu, sphaira, Homebrew App Store |
+- **Firmware :** 21.0.0 → 22.5.0
+- **Atmosphère :** 1.11.x → 1.12.0
+- **Lanceurs :** hbmenu, sphaira, Homebrew App Store
 
 Un firmware plus récent s'ouvre en lecture seule tant qu'aucune version ne le prend en charge. Pas de Switch 2 (Atmosphère n'existe pas pour elle). Détails : [compatibilité](docs/fr/compatibility.md).
 

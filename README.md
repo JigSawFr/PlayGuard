@@ -30,9 +30,9 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 
 ## Compatibility
 
-| Firmware | Atmosphère | Launchers |
-|---|---|---|
-| 21.0.0 → 22.5.0 | 1.11.x → 1.12.0 | hbmenu, sphaira, Homebrew App Store |
+- **Firmware:** 21.0.0 → 22.5.0
+- **Atmosphère:** 1.11.x → 1.12.0
+- **Launchers:** hbmenu, sphaira, Homebrew App Store
 
 A newer firmware opens read-only until a release supports it. No Switch 2 support (there is no Atmosphère for it). Details: [compatibility](docs/compatibility.md).
 

@@ -118,12 +118,10 @@ The app is organised in tabs, like System Settings; each has its section below.
 
 The play timer is the console's: PlayGuard reads it, it does not count anything itself. What is known, and how sure it is ([parental-controls.md](parental-controls.md#time-spent-and-time-left) has the measurements):
 
-| Situation | Counts? | How sure |
-|---|---|---|
-| A game running | Yes | measured (22.0.0) |
-| **A game left open on the HOME menu** (suspended in the background) | **Yes**: close it, or put the console in sleep mode | reported by parents ([Arqade](https://gaming.stackexchange.com/questions/398954/)); fits the measurements (the console counts while an application is open) |
-| Sleep mode | No | reported ([Arqade](https://gaming.stackexchange.com/questions/398954/)); not measured by PlayGuard |
-| **PlayGuard opened over a game** (as an application) | **Yes**, as that game | measured (22.0.0): open it with a parent's user, or from the album for a quick look |
-| PlayGuard opened from the album (applet mode) | No | inferred: it is not an application, and time outside applications did not seem to count |
-| While parental controls are temporarily unlocked | Maybe not | not measured: still open |
-| After the clock was changed | The day starts over; after a jump back the count stops until the clock passes the old time | observed (22.0.0); the Overview says when the console is not counting |
+- A game running — Yes *(measured (22.0.0))*
+- **A game left open on the HOME menu** (suspended in the background) — **Yes**: close it, or put the console in sleep mode *(reported by parents ([Arqade](https://gaming.stackexchange.com/questions/398954/)); fits the measurements (the console counts while an application is open))*
+- Sleep mode — No *(reported ([Arqade](https://gaming.stackexchange.com/questions/398954/)); not measured by PlayGuard)*
+- **PlayGuard opened over a game** (as an application) — **Yes**, as that game *(measured (22.0.0): open it with a parent's user, or from the album for a quick look)*
+- PlayGuard opened from the album (applet mode) — No *(inferred: it is not an application, and time outside applications did not seem to count)*
+- While parental controls are temporarily unlocked — Maybe not *(not measured: still open)*
+- After the clock was changed — The day starts over; after a jump back the count stops until the clock passes the old time *(observed (22.0.0); the Overview says when the console is not counting)*

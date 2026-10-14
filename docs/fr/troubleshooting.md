@@ -6,12 +6,23 @@ Reprendre la main sur une console bloquée, signaler un bug, et le mode dévelop
 
 PlayGuard ne voit que le contrôle parental du système sur lequel il tourne : **l'emuMMC et la sysMMC ont chacune le leur** (un code PIN supprimé sur l'une est toujours là sur l'autre). Lancez-le sur chacune de celles à corriger.
 
-| Situation | Que faire |
-|---|---|
-| **Console d'occasion :** vous connaissez le code PIN, mais l'application mobile de l'ancien propriétaire est toujours associée (la dissociation échoue, ou la réinitialisation demande son compte) | *Sécurité et appli › Dissocier l'application mobile*, puis, si vous ne voulez plus du tout de contrôle parental, *Supprimer tout le contrôle parental*. Les deux fonctionnent hors ligne, en emuMMC comme en sysMMC. |
-| **Code PIN oublié** | *Afficher le code PIN* demande lui-même le code PIN : il ne peut pas aider ici. Avec le module système de récupération installé (ci-dessous), déposez un fichier `RESCUE` et redémarrez : l'écran de récupération en définit alors un nouveau (il n'affiche jamais l'ancien). Sans lui, *Supprimer tout le contrôle parental* permet de repartir de zéro (une sauvegarde des réglages est d'abord enregistrée ; elle ne contient jamais le code PIN) : avec *Demander le code PIN* actif (par défaut, *Avant une modification*), mettez d'abord la carte SD dans un ordinateur et passez `"pin_lock"` à `"off"` dans `sd:/config/playguard/config.json`. |
-| **Le minuteur bloque tout (limite à 0 min) et le code PIN est oublié** | PlayGuard lui-même ne peut pas démarrer. Installez **à l'avance** le module système de récupération optionnel (`playguard-rescue.zip`) ; une fois bloqué, déposez un fichier vide `config/playguard/RESCUE` sur la carte SD et démarrez — il déverrouille la console pour que PlayGuard puisse s'ouvrir. Voir [`sysmodule/README.md`](../../sysmodule/README.md) (en anglais). |
-| **Console non modifiée** | PlayGuard ne peut rien faire : il nécessite Atmosphère. La procédure officielle passe par la clé maîtresse du service client de Nintendo. |
+### Console d'occasion
+
+Vous connaissez le code PIN, mais l'application mobile de l'ancien propriétaire est toujours associée (la dissociation échoue, ou la réinitialisation demande son compte).
+
+*Sécurité et appli › Dissocier l'application mobile*, puis, si vous ne voulez plus du tout de contrôle parental, *Supprimer tout le contrôle parental*. Les deux fonctionnent hors ligne, en emuMMC comme en sysMMC.
+
+### Code PIN oublié
+
+*Afficher le code PIN* demande lui-même le code PIN : il ne peut pas aider ici. Avec le module système de récupération installé (ci-dessous), déposez un fichier `RESCUE` et redémarrez : l'écran de récupération en définit alors un nouveau (il n'affiche jamais l'ancien). Sans lui, *Supprimer tout le contrôle parental* permet de repartir de zéro (une sauvegarde des réglages est d'abord enregistrée ; elle ne contient jamais le code PIN) : avec *Demander le code PIN* actif (par défaut, *Avant une modification*), mettez d'abord la carte SD dans un ordinateur et passez `"pin_lock"` à `"off"` dans `sd:/config/playguard/config.json`.
+
+### Le minuteur bloque tout (limite à 0 min) et le code PIN est oublié
+
+PlayGuard lui-même ne peut pas démarrer. Installez **à l'avance** le module système de récupération optionnel (`playguard-rescue.zip`) ; une fois bloqué, déposez un fichier vide `config/playguard/RESCUE` sur la carte SD et démarrez — il déverrouille la console pour que PlayGuard puisse s'ouvrir. Voir [`sysmodule/README.md`](../../sysmodule/README.md) (en anglais).
+
+### Console non modifiée
+
+PlayGuard ne peut rien faire : il nécessite Atmosphère. La procédure officielle passe par la clé maîtresse du service client de Nintendo.
 
 ## Signaler un bug
 

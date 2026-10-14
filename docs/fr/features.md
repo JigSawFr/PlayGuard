@@ -118,12 +118,10 @@ L'application est organisée en onglets, comme les paramètres de la console ; c
 
 Le minuteur est celui de la console : PlayGuard le lit, il ne décompte rien lui-même. Ce que l'on sait, et avec quelle certitude ([parental-controls.md](../parental-controls.md#time-spent-and-time-left), en anglais, donne les mesures) :
 
-| Situation | Décompté ? | Certitude |
-|---|---|---|
-| Un jeu en cours | Oui | mesuré (22.0.0) |
-| **Un jeu laissé ouvert sur le menu HOME** (suspendu en arrière-plan) | **Oui** : fermez-le, ou mettez la console en veille | rapporté par des parents ([Arqade](https://gaming.stackexchange.com/questions/398954/)) ; cohérent avec les mesures (la console décompte tant qu'une application est ouverte) |
-| Mode veille | Non | rapporté ([Arqade](https://gaming.stackexchange.com/questions/398954/)) ; pas mesuré par PlayGuard |
-| **PlayGuard ouvert par-dessus un jeu** (en application) | **Oui**, comme ce jeu | mesuré (22.0.0) : ouvrez-le avec un utilisateur parent, ou depuis l'album pour un coup d'œil |
-| PlayGuard ouvert depuis l'album (mode applet) | Non | déduit : ce n'est pas une application, et le temps hors des applications ne semblait pas décompté |
-| Pendant un déverrouillage temporaire du contrôle parental | Peut-être pas | pas mesuré : question ouverte |
-| Après un changement d'horloge | La journée repart de zéro ; après un retour en arrière, le décompte s'arrête jusqu'à ce que l'horloge dépasse l'ancienne heure | observé (22.0.0) ; la Vue d'ensemble indique quand la console ne décompte pas |
+- Un jeu en cours — Oui *(mesuré (22.0.0))*
+- **Un jeu laissé ouvert sur le menu HOME** (suspendu en arrière-plan) — **Oui** : fermez-le, ou mettez la console en veille *(rapporté par des parents ([Arqade](https://gaming.stackexchange.com/questions/398954/)) ; cohérent avec les mesures (la console décompte tant qu'une application est ouverte))*
+- Mode veille — Non *(rapporté ([Arqade](https://gaming.stackexchange.com/questions/398954/)) ; pas mesuré par PlayGuard)*
+- **PlayGuard ouvert par-dessus un jeu** (en application) — **Oui**, comme ce jeu *(mesuré (22.0.0) : ouvrez-le avec un utilisateur parent, ou depuis l'album pour un coup d'œil)*
+- PlayGuard ouvert depuis l'album (mode applet) — Non *(déduit : ce n'est pas une application, et le temps hors des applications ne semblait pas décompté)*
+- Pendant un déverrouillage temporaire du contrôle parental — Peut-être pas *(pas mesuré : question ouverte)*
+- Après un changement d'horloge — La journée repart de zéro ; après un retour en arrière, le décompte s'arrête jusqu'à ce que l'horloge dépasse l'ancienne heure *(observé (22.0.0) ; la Vue d'ensemble indique quand la console ne décompte pas)*
