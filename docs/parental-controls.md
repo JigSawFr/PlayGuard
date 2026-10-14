@@ -78,8 +78,8 @@ Public reference: [switchbrew, Parental Control services](https://switchbrew.org
 | Command | What | Notes |
 |---|---|---|
 | 1453 `IsPlayTimerEnabled` | timer on | `true` even with an all-zero block and no PIN; `false` while temporarily unlocked (observed, 22.0.0) |
-| 1455 `IsRestrictedByPlayTimer` | the timer is blocking play now | stays `false` past the limit while the console only warns (`ALARM`, observed, 2026-10-14) |
-| 1454 `GetPlayTimerRemainingTime` | TimeSpan, **nanoseconds**, signed | today's limit minus the time spent; 0 when today has no limit; **below 0** past the limit while the console only warns: minus the time over it (observed, 2026-10-14: a 0-minute day played 2 min) |
+| 1455 `IsRestrictedByPlayTimer` | the timer is blocking play now | stays `false` past the limit while the console only warns (`ALARM`); `true` past it when suspending, even while temporarily unlocked (observed, 2026-10-14) |
+| 1454 `GetPlayTimerRemainingTime` | TimeSpan, **nanoseconds**, signed | today's limit minus the time spent; 0 when today has no limit; **below 0** once more was played than the limit (the console only warning, or parental controls unlocked): minus the time over it, 1454 + 1952 still the limit (observed, 22.0.0, 2026-10-14: -224 s and 224 s on a 0-minute day) |
 | 1952 `GetPlayTimerSpentTimeForTest` | TimeSpan, nanoseconds | time spent today, see below |
 | 1459 `GetPlayTimerRemainingTimeDisplayInfo` [20.0.0+] | 0x20 bytes | layout partly known, see below |
 | 1458 / 1953 alarm disabled (get / set for debug) | bool | while set, the "time's up" alarm does not show |
@@ -151,9 +151,9 @@ One day (8 bytes):
 
 | Byte | Field | Status |
 |---|---|---|
-| +0 | bedtime on | inferred |
-| +1, +2 | bedtime alarm hour, minute | inferred |
-| +3, +4 | play allowed again, hour, minute (06:00 by default) | inferred; the `06` is always there |
+| +0 | bedtime on | **verified, 22.0.0** |
+| +1, +2 | bedtime alarm hour, minute | **verified, 22.0.0** |
+| +3, +4 | play allowed again, hour, minute (06:00 by default) | **verified, 22.0.0** |
 | +5 | "this day has a limit" flag | verified |
 | +6, +7 | that day's limit in minutes, u16 LE | **verified, 22.0.0** |
 
@@ -164,9 +164,12 @@ One day (8 bytes):
   PlayGuard writes all zeros for "no limit on any day", the one "off" block
   seen working. 1453 still reads `true` with that block (observed, 22.0.0).
 - The bedtime bytes match the companion app's daily settings
-  (`timeToPlayInOneDay`, `bedtime.enabled`, `endingTime`, `startingTime`), but
-  were never seen with a bedtime on. A bedtime write is checked against
-  1954 / 1956 / 1957 and undone when the console disagrees.
+  (`timeToPlayInOneDay`, `bedtime.enabled`, `endingTime`, `startingTime`).
+  Verified on 22.0.0 (2026-10-14): with 22:30, play allowed again at 09:00,
+  set by PlayGuard, every day reads `01 16 1E 09 00` (on, 22, 30, 9, 0) and
+  1954 / 1956 / 1957 / 1958 / 1959 report on, 22:30 and 09:00. A bedtime
+  write is still checked against 1954 / 1956 / 1957 and undone when the
+  console disagrees.
 
 What PlayGuard accepts as this layout (`pt_plausible`, `source/core/pure.c`):
 in each day and in the daily rule `04..0B`, the bedtime and limit
@@ -398,11 +401,11 @@ One day, field by field (Sunday above):
 00   00   00   06   00   01   B4 00
 │    │    │    │    │    │    └───┴── limit, minutes, u16 LE: 0x00B4 = 180   verified
 │    │    │    │    │    └─────────── limit flag: 1 = this day has a limit    verified
-│    │    │    │    └──────────────── play allowed again, minute: 00          inferred
-│    │    │    └───────────────────── play allowed again, hour: 06            inferred
-│    │    └────────────────────────── bedtime alarm, minute                   inferred
-│    └─────────────────────────────── bedtime alarm, hour                     inferred
-└──────────────────────────────────── bedtime on                              inferred
+│    │    │    │    └──────────────── play allowed again, minute: 00          verified
+│    │    │    └───────────────────── play allowed again, hour: 06            verified
+│    │    └────────────────────────── bedtime alarm, minute                   verified
+│    └─────────────────────────────── bedtime alarm, hour                     verified
+└──────────────────────────────────── bedtime on                              verified
 ```
 
 The code (`source/core/pure.h`) reads the same block as 34 u16 instead of
@@ -438,7 +441,8 @@ From the same 20:10 report:
 - 1406 `GetSettingsLastUpdated` fails with `0x0001188E`: why?
 - A console in `DAILY` mode, to confirm byte `02` on hardware (it comes from
   the sysmodule, not from a block PlayGuard has seen).
-- The bedtime bytes with a bedtime actually on.
+- Bedtimes that differ from day to day, set from the companion app (the
+  console's answer was only checked for today's).
 - 1459's first byte; 1460's layout (23.0.0+).
 - When the time spent resets on its own; how long it stays frozen after the
   clock goes back (until the clock passes the old time?).

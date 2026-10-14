@@ -23,12 +23,12 @@ bool needs_unlock(const PtState& pt);
 
 // Minutes already played today (`weekday` 0 = Sunday), or -1 when the system
 // does not say (timer off, no limit today, or no game counted yet). Past the
-// limit while the console only warns: the limit plus the time over it.
+// limit (the time left below 0): the limit plus the time over it.
 int played_today_min(const PtState& pt, int weekday);
 
-// Minutes played past today's limit while the console only warns (the time
-// left reads below 0, alarm_only), else -1: suspending, the game stops at
-// the limit (restricted) instead.
+// Minutes played past today's limit, else -1: the time left reads below 0
+// once more was played than the limit, which the console lets happen when it
+// only warns (alarm_only) or while parental controls are unlocked.
 int over_limit_min(const PtState& pt, int weekday);
 
 // The minutes already played when `new_days` puts today's limit below them

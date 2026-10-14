@@ -25,7 +25,7 @@ std::string failed(Result rc)
 std::string flag(Result rc, bool v) { return R_FAILED(rc) ? failed(rc) : v ? "1" : "0"; }
 
 // Nanoseconds as seconds: "1428", or "1428.5" when not whole (to the ms);
-// "-120" for a time below 0 (1454 past the limit, a warning only).
+// "-120" for a time below 0 (1454 once played past the limit).
 std::string seconds(uint64_t ns);
 std::string seconds(int64_t ns)
 {

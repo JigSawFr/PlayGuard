@@ -21,9 +21,11 @@ int played_today_min(const PtState& pt, int weekday)
     if (!pt.valid || !pt.enabled_valid || !pt.enabled || weekday < 0 || weekday > 6) return -1;
     const uint16_t limit = pt.day_min[weekday];
     if (limit == PT_DAY_NOLIMIT) return -1;
-    if (pt.restricted_valid && pt.restricted) return limit;
+    // The time over the limit first: restricted can read true with it (a
+    // limit passed while unlocked).
     const int over = over_limit_min(pt, weekday);
     if (over >= 0) return limit + over;
+    if (pt.restricted_valid && pt.restricted) return limit;
     // The remaining time reads 0 until a game has been counted today.
     if (!pt.remaining_valid || pt.remaining_ns <= 0) return -1;
     const uint64_t left = (uint64_t)pt.remaining_ns / 60000000000ULL;

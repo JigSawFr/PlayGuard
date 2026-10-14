@@ -115,8 +115,10 @@ typedef struct {
     bool   enabled_valid;         Result enabled_rc;     bool enabled;     // 1453
     bool   restricted_valid;      Result restricted_rc;  bool restricted;  // 1455
     bool   temporary_unlocked_valid; Result temporary_unlocked_rc; bool temporary_unlocked; // 1006
-    // 1454, a TimeSpan: below 0 once the limit is passed while the console
-    // only warns (alarm_only): minus the time played over it (observed).
+    // 1454, a TimeSpan: below 0 once more was played than today's limit
+    // (the console only warning, alarm_only, or parental controls unlocked):
+    // minus the time over it. 1454 + 1952 still make the limit (observed,
+    // 22.0.0: -224 s and 224 s on a 0-minute day).
     bool   remaining_valid;       Result remaining_rc;   s64  remaining_ns;// 1454
     bool   alarm_disabled_valid;  bool alarm_disabled;                     // 1458
     bool   bedtime_valid;         bool bedtime_enabled;  u8 bedtime_hour, bedtime_minute; // 1954/1956/1957

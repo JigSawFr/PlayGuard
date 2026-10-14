@@ -41,7 +41,7 @@ void PtStateHeader::show(const PtState& pt)
 {
     std::vector<std::string> parts;
     // Reached: the console restricts (suspending), or the time left went
-    // below 0 (a warning only: the game goes on, the time over it counted).
+    // below 0 (played past the limit: a warning only, or while unlocked).
     const int over = pt.fw_supported ? pt_logic::over_limit_min(pt, ui::today_weekday()) : -1;
     const bool reached = pt.fw_supported && ((pt.restricted_valid && pt.restricted) || over >= 0);
     if (pt.fw_supported && pt.enabled_valid) {
