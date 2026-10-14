@@ -12,11 +12,11 @@ Supported firmware, Atmosphère and launchers, emuMMC and sysMMC, and how PlayGu
 
 **Should work, untested** — nothing in PlayGuard rules these out, but no one has reported them yet ([reports welcome](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)):
 
-- **Firmware 21.0.0 → 21.2.0** — every feature.
-- **Firmware before 21.0.0** — everything but the play timer: restrictions, PIN, temporary unlock, activity, network clock, companion app, history. The play timer's settings block (0x44 bytes) only has this layout since 21.0.0, so PlayGuard turns off what lives in it: the daily limits, the bedtime alarm, extra time and the console lock.
-- **Firmware before 4.0.0** — also without showing the PIN, the 3D restriction and the recovery sysmodule.
-- **Firmware 23.0.x** — same commands in the [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) table; opens through the [newer firmware](#newer-firmware) screen.
-- **Atmosphère** — any version that boots your firmware. PlayGuard checks that Atmosphère runs, not which version; *Tools* shows the one it detects.
+- **Atmosphère 1.12.0 (firmware 23.0.x)** — same commands in the [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) table; opens through the [newer firmware](#newer-firmware) screen.
+- **Atmosphère 1.10.x (firmware 21.0.0 → 21.2.0)** — every feature.
+- **Atmosphère 1.9.x and older (firmware 20.5.0 and older)** — everything but the play timer: restrictions, PIN, temporary unlock, activity, network clock, companion app, history. The play timer's settings block (0x44 bytes) only has this layout since 21.0.0, so PlayGuard turns off what lives in it: the daily limits, the bedtime alarm, extra time and the console lock.
+
+PlayGuard checks that Atmosphère runs, not which version: what counts is the firmware it boots. *Tools* shows both.
 
 **Launchers.** Launching over a game (title override) is recommended. The app says whether it runs as an application or as an applet (album). Over a game, the console counts PlayGuard's time as that game's. In the activity, it goes to the user picked at launch: open it with a parent's user, not a child's. The play timer is the console's, the same for every user: it counts that time whoever opened PlayGuard (unless the timer is off).
 

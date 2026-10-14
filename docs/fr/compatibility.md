@@ -12,11 +12,11 @@ Firmwares, Atmosphère et lanceurs pris en charge, emuMMC et sysMMC, et la compa
 
 **Devrait fonctionner, non testé** — rien dans PlayGuard ne l'empêche, mais personne ne l'a encore signalé ([retours bienvenus](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)) :
 
-- **Firmware 21.0.0 → 21.2.0** — toutes les fonctions.
-- **Firmware antérieur à 21.0.0** — tout sauf le temps de jeu : restrictions, code PIN, déverrouillage temporaire, activité, horloge réseau, application mobile, historique. Le bloc de réglages du minuteur (0x44 octets) n'a cette structure que depuis 21.0.0, donc PlayGuard désactive ce qui en dépend : les limites quotidiennes, l'alarme du coucher, le temps en plus et le verrou de console.
-- **Firmware antérieur à 4.0.0** — sans non plus l'affichage du code PIN, la restriction 3D ni le module de récupération.
-- **Firmware 23.0.x** — mêmes commandes dans la table de [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) ; s'ouvre par l'écran [firmware plus récent](#firmware-plus-recent).
-- **Atmosphère** — toute version qui démarre votre firmware. PlayGuard vérifie qu'Atmosphère tourne, pas sa version ; *Outils* affiche celle qu'il détecte.
+- **Atmosphère 1.12.0 (firmware 23.0.x)** — mêmes commandes dans la table de [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) ; s'ouvre par l'écran [firmware plus récent](#firmware-plus-recent).
+- **Atmosphère 1.10.x (firmware 21.0.0 → 21.2.0)** — toutes les fonctions.
+- **Atmosphère 1.9.x et antérieur (firmware 20.5.0 et antérieur)** — tout sauf le temps de jeu : restrictions, code PIN, déverrouillage temporaire, activité, horloge réseau, application mobile, historique. Le bloc de réglages du minuteur (0x44 octets) n'a cette structure que depuis 21.0.0, donc PlayGuard désactive ce qui en dépend : les limites quotidiennes, l'alarme du coucher, le temps en plus et le verrou de console.
+
+PlayGuard vérifie qu'Atmosphère tourne, pas sa version : c'est le firmware qu'il démarre qui compte. *Outils* affiche les deux.
 
 **Lanceurs.** Le lancement par-dessus un jeu (title override) est recommandé. L'application indique si elle tourne en application ou en applet (album). Par-dessus un jeu, la console compte le temps passé dans PlayGuard comme celui de ce jeu. Dans l'activité, il va au compte choisi au lancement : ouvrez-le avec le compte d'un parent, pas celui d'un enfant. Le minuteur est celui de la console, le même pour tous les comptes : il compte ce temps quel que soit le compte (sauf minuteur désactivé).
 
