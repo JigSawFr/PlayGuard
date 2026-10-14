@@ -6,6 +6,7 @@
 //   PLAYGUARD_SIM_NUMPAD=1:30   the number pad returns "1:30" ("cancel": B)
 //   PLAYGUARD_SIM_BACKGROUND=1  PlayGuard is not in focus (HOME menu)
 //   PLAYGUARD_SIM_HBLOADER=1    started through hbloader: a store can be launched
+//   PLAYGUARD_SIM_APPLET=1      applet (album) mode: no game to close on exit
 //   PLAYGUARD_SIM_REGION=2      the console region (SetRegion, 2 = Europe)
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -35,6 +36,10 @@ bool platform_can_launch(void);
 // hbloader starts `path` (an "sdmc:/…" path; also its argv[0]) when PlayGuard
 // exits. False when it cannot.
 bool platform_set_next_load(const char *path);
+// PlayGuard's exit closes the game it was started over (title override) and
+// returns to the HOME menu, rather than to hbloader's next homebrew (hbmenu).
+// Nothing in applet (album) mode, where there is no game to close.
+void platform_exit_to_home(void);
 
 // romfs:/ (the app's own resources) is read from its .nro, which stays open
 // while it is mounted, and the SD card will not rename an open file. Released

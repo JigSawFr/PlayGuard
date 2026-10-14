@@ -43,6 +43,13 @@ bool platform_set_next_load(const char* path)
     return true;
 }
 
+void platform_exit_to_home(void)
+{
+    if (std::getenv("PLAYGUARD_SIM_APPLET")) return;
+    std::printf("exit to HOME\n");
+    std::fflush(stdout);
+}
+
 void platform_romfs_release(void) {}
 void platform_romfs_mount(void) {}
 

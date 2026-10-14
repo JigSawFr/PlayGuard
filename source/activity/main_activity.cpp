@@ -10,6 +10,7 @@
 #include "action/update_flow.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
+#include "core/platform.h"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -37,6 +38,9 @@ static void compact_sidebar(brls::View* tab_frame)
 // Quits, but first asks to lock again when parental controls are still
 // temporarily unlocked (Security › Unlock temporarily): leaving them so means
 // no limit at all until a restart, which is easy to forget on the way out.
+// Locking again closes the game PlayGuard runs over too: left running, the
+// console would ask for the PIN for it at once, and that game would then go
+// back to hbmenu, unlocked by that PIN.
 static void quit_or_relock()
 {
     bool unlocked = false;
@@ -57,6 +61,7 @@ static void quit_or_relock()
             return;
         }
         history_flow::record_event("relock");
+        platform_exit_to_home();
         brls::Application::quit();
     });
     dialog->open();
