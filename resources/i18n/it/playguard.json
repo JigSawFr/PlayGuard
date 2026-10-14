@@ -237,7 +237,9 @@
             "inactive": "Timer disattivato",
             "remaining_short": "Ancora {} oggi",
             "unlocked_short": "sbloccato temporaneamente, forse non conteggiato",
-            "reached_alert": "Il limite di oggi è stato raggiunto: la console mostra \"Tempo scaduto\". Se sospende anche il gioco dipende da un'impostazione che PlayGuard non può ancora leggere.",
+            "reached_alert": "Il limite di oggi è stato raggiunto: la console mostra \"Tempo scaduto\".",
+            "reached_alert_suspend": "Il limite di oggi è stato raggiunto: la console mostra \"Tempo scaduto\" e sospende il gioco.",
+            "reached_alert_alarm": "Il limite di oggi è stato raggiunto: la console mostra \"Tempo scaduto\", solo come avviso (il gioco non viene sospeso).",
             "not_set": "Nessun limite",
             "every_day": "{} ogni giorno",
             "today_per_day": "{} oggi (varia in base al giorno)",
@@ -262,6 +264,13 @@
         "profiles_section_saved": "Profili salvati",
         "profiles_section_new": "Nuovo profilo",
         "profiles_hint": "Premi A su un profilo per applicarlo, modificarne i limiti, rinominarlo o eliminarlo.",
+        "time_up": "Quando il tempo è scaduto",
+        "time_up_title": "Quando il tempo è scaduto",
+        "time_up_suspend": "Sospendi il software",
+        "time_up_alarm": "Solo avviso",
+        "time_up_suspend_body": "Sospendere il software quando il tempo è scaduto?\n\nAl limite la console mostra \"Tempo scaduto\" e sospende il gioco. I progressi non salvati possono andare persi.",
+        "time_up_alarm_body": "Solo avvisare quando il tempo è scaduto?\n\nAl limite la console mostra \"Tempo scaduto\", ma il gioco non viene sospeso: può continuare.",
+        "time_up_needs_limit": "Imposta prima un limite di tempo di gioco o un orario per andare a letto: cosa succede quando il tempo è scaduto conta solo quando ce n'è uno.",
         "profile_current": "{} (attuale)",
         "profile_range": "Da {} a {}",
         "profile_saved": "Profilo \"{}\" salvato.",
@@ -282,7 +291,7 @@
         "bedtime_value_on": "{} (attivato)",
         "bedtime_value_off": "{} (disattivato)",
         "bedtime_reset": "Si può giocare di nuovo dalle",
-        "bedtime_note": "Vale per ogni giorno. All'ora di andare a letto la console mostra l'avviso, e potrebbe anche sospendere il software (un'impostazione dell'app per smartphone che PlayGuard non può ancora leggere), finché non si può giocare di nuovo. PlayGuard verifica che la console indichi il nuovo orario e, in caso contrario, ripristina le impostazioni precedenti.",
+        "bedtime_note": "Vale per ogni giorno. All'ora di andare a letto la console mostra l'avviso, e potrebbe anche sospendere il software (vedi \"Quando il tempo è scaduto\"), finché non si può giocare di nuovo. PlayGuard verifica che la console indichi il nuovo orario e, in caso contrario, ripristina le impostazioni precedenti.",
         "bedtime_title": "Sogni d'oro, ogni giorno",
         "bedtime_end_title": "Si può giocare di nuovo dalle (ogni giorno)",
         "bedtime_summary": "{}, si può giocare di nuovo dalle {}",
@@ -356,7 +365,7 @@
         "removed": "Limite di tempo di gioco rimosso.",
         "remove_err": "Impossibile rimuovere il limite di tempo di gioco",
         "not_counting": "La console non sta conteggiando il tempo di gioco in questo momento. Cause probabili: l'orologio è stato portato indietro (riprenderà a contare più tardi), l'orologio di rete non è mai stato impostato (scheda Orologio di rete), oppure è appena stato scritto un limite (avvia un gioco per un minuto, poi controlla).",
-        "limit_note": "Al limite la console mostra \"Tempo scaduto\". Sulla console su cui è stato provato PlayGuard ha anche sospeso il gioco. Se l'app per smartphone è stata impostata almeno una volta su \"solo avviso\", la console potrebbe limitarsi ad avvisare: PlayGuard non può ancora leggere né modificare questa impostazione.",
+        "limit_note": "Al limite la console mostra \"Tempo scaduto\", poi sospende il gioco o si limita ad avvisare, secondo \"Quando il tempo è scaduto\".",
         "unsaved": "I progressi non salvati potrebbero andare persi: lascia prima salvare il bambino."
     },
     "activity": {
@@ -976,7 +985,8 @@
             "outside_reset": "Tempo di gioco ripartito da zero (visto da PlayGuard)",
             "outside_clock": "Orologio della console cambiato (visto da PlayGuard)",
             "outside_limits": "Limiti cambiati al di fuori di PlayGuard",
-            "new_account": "Nuovo utente (visto da PlayGuard)"
+            "new_account": "Nuovo utente (visto da PlayGuard)",
+            "time_up": "Quando il tempo è scaduto"
         },
         "sources": {
             "uniform": "Stesso limite ogni giorno",

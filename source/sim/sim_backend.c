@@ -295,6 +295,7 @@ void pctl_play_timer_query(PtState *o)
         o->valid = true;
         pt_decode(S.block, o->day_min);
         pt_bedtime_decode(S.block, o->bed);
+        o->alarm_only = !pt_suspends(S.block);
         memcpy(o->block, S.block, sizeof(o->block));
     }
     o->enabled_valid = true;  o->enabled = timer_enabled();
@@ -382,6 +383,17 @@ Result pctl_play_timer_set_bedtime(const PtBedtime bed[7], int today)
     if (fails("bedtime")) return NXM_RC_NOT_APPLIED;
     pt_bedtime_encode(S.block, bed);
     return 0;
+}
+
+Result pctl_play_timer_set_alarm_only(bool alarm_only)
+{
+    RO_GUARD();
+    sim_init();
+    if (S.hos < PCTL_FW_MIN_PLAYTIMER) return NXM_RC_FW_UNSUPPORTED;
+    if ((timer_enabled() || S.limit_reached) && !S.temp_unlocked) return NXM_RC_WRITE_GATED;
+    FAIL_IF("write");
+    if (fails("timer")) return NXM_RC_STATE_UNKNOWN;
+    return pt_set_suspends(S.block, !alarm_only) ? 0 : NXM_RC_INVALID_ARGUMENT;
 }
 
 Result pctl_play_timer_set_uniform(u16 m) { u16 d[7]; for (int i = 0; i < 7; i++) d[i] = m; return pctl_play_timer_set_days(d); }

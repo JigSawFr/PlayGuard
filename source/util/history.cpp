@@ -17,7 +17,7 @@ size_t values_for(const std::string& kind)
 {
     if (kind == "limits") return 7;
     if (kind == "custom") return 3;
-    if (kind == "level" || kind == "org" || kind == "vr" || kind == "alarm") return 1;
+    if (kind == "level" || kind == "org" || kind == "vr" || kind == "alarm" || kind == "time_up") return 1;
     return 0;
 }
 
@@ -50,7 +50,7 @@ bool values_ok(const std::string& kind, const std::vector<int>& v)
         else if (kind == "level") ok = in(v[i], 0, backup::MAX_LEVEL);
         else if (kind == "org") ok = in(v[i], 0, backup::MAX_RATING_ORG);
         else if (kind == "custom") ok = i == 0 ? in(v[i], 0, backup::MAX_RATING_AGE) : in(v[i], 0, 1);
-        else if (kind == "vr" || kind == "alarm") ok = in(v[i], 0, 1);
+        else if (kind == "vr" || kind == "alarm" || kind == "time_up") ok = in(v[i], 0, 1);
         if (!ok) return false;
     }
     return true;

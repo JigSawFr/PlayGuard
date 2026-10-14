@@ -867,9 +867,15 @@ key("Right")               # Discard
 key("Return")
 shot("23_back")
 
+# When the time is up: its two choices (on "Suspend the software"), left as is.
+key("Down", 3)             # past Remove and Profiles…: When the time is up
+key("Return")
+shot("23_time_up_picker")
+key("Escape")
+
 # Bedtime: the alarm picker (on 21:00), 21:30, confirmed with the unlock the
 # running timer needs; the tab must then show it.
-key("Down", 3)             # past Remove and Profiles…: Bedtime alarm
+key("Down")                # Bedtime alarm
 key("Return")
 shot("23_bedtime_picker")
 key("Down", 2)             # 21:30

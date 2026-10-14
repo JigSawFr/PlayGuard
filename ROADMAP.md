@@ -21,9 +21,9 @@ while linked, for everyone) or *Developer tools › Compare the play-timer
 block*. A report attached to an issue is the most useful contribution right
 now.
 
-- **Alarm only, or suspend the software** when the time is up. The setting
-  parents ask for most after the limit itself; its byte in the block's header
-  is not located yet.
+- **Alarm only seen on a console.** *When the time is up* sets it from the
+  layout reversed from the `pctl` sysmodule; a block from a console set to
+  "alarm only" in the phone app would confirm it on hardware.
   ([details](docs/companion-app.md#1-alarm-only-or-suspend-the-software))
 - **Bedtime and start time per day of the week.** PlayGuard sets one bedtime
   for every day; the per-day bytes have never been seen with a bedtime on.

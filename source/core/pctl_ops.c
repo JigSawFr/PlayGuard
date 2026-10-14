@@ -466,6 +466,7 @@ static void pt_read_core(Service *srv, PtState *out)
         out->valid = true;
         pt_decode(c, out->day_min);
         pt_bedtime_decode(c, out->bed);
+        out->alarm_only = !pt_suspends(c);
     }
 
     bool be = false;
@@ -675,6 +676,60 @@ Result pctl_play_timer_set_bedtime(const PtBedtime bed[7], int today)
     rc = serviceDispatchIn(srv, 195101, before);
     pctl_ops_exit();
     return R_FAILED(rc) ? rc : NXM_RC_NOT_APPLIED;
+}
+
+Result pctl_play_timer_set_alarm_only(bool alarm_only)
+{
+    pctl_ops_exit();   // nothing held while the PIN check may show its applet
+    Result gate = core_change_allowed();
+    if (R_FAILED(gate)) return gate;
+    if (!pt_fw_supported()) return NXM_RC_FW_UNSUPPORTED;
+
+    Result rc = pctl_ops_reinit();
+    if (R_FAILED(rc)) return rc;
+    Service *srv = pctlGetServiceSession_Service();
+    rc = pt_write_gate(srv, NULL);
+    if (R_FAILED(rc)) {
+        pctl_ops_exit();
+        return rc;
+    }
+
+    // Only ever from the block as it is: a zeroed one would wipe the limits.
+    u16 before[PT_U16_COUNT], c[PT_U16_COUNT];
+    memset(before, 0, sizeof(before));
+    if (R_FAILED(serviceDispatchOut(srv, 145601, before))) {
+        pctl_ops_exit();
+        return NXM_RC_STATE_UNKNOWN;
+    }
+    if (!pt_plausible(before)) {
+        pctl_ops_exit();
+        return NXM_RC_PT_NOT_UNDERSTOOD;
+    }
+    memcpy(c, before, sizeof(c));
+    if (!pt_set_suspends(c, !alarm_only)) {
+        pctl_ops_exit();
+        return NXM_RC_INVALID_ARGUMENT;
+    }
+    if (memcmp(c, before, sizeof(c)) == 0) {
+        pctl_ops_exit();
+        return 0;
+    }
+    rc = serviceDispatchIn(srv, 195101, c);
+    if (R_FAILED(rc)) {
+        pctl_ops_exit();
+        return rc;
+    }
+
+    // A debug command: read back, as the other play-timer writes. An
+    // unreadable block proves nothing either way: the write stands.
+    u16 back[PT_U16_COUNT];
+    if (R_SUCCEEDED(serviceDispatchOut(srv, 145601, back)) && pt_suspends(back) == alarm_only) {
+        rc = serviceDispatchIn(srv, 195101, before);
+        pctl_ops_exit();
+        return R_FAILED(rc) ? rc : NXM_RC_NOT_APPLIED;
+    }
+    pctl_ops_exit();
+    return 0;
 }
 
 Result pctl_play_timer_set_alarm_disabled(bool disabled)

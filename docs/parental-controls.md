@@ -138,7 +138,11 @@ days are ignored by the console). A write that changes such a block moves it
 to `EACH_DAY_OF_THE_WEEK` first, each day given the daily rule (all-zero days
 when it has nothing on), so the console does the same as before but for the
 change; writing back what was read leaves it as it is. `restrictionMode` is
-kept as read, and shown in the diagnostic report.
+kept as read by those writes; *Play timer › When the time is up* shows it
+and changes it, byte `01` alone, once a limit or a bedtime is set (the "off"
+block is all zeros, and the next limit gives it the observed `01 01 01 00`).
+The write is read back, and the block put back when the console does not
+keep it.
 
 The byte-by-byte reading of a real block is under
 [Reading a diagnostic report](#reading-a-diagnostic-report).
@@ -285,11 +289,11 @@ controls* (the second asks for the PIN).
 
 - No "continue" choice: the suspend behaviour (`FORCED_TERMINATION`), which
   byte `01` of that block (`01`) says.
-- So PlayGuard says what the console does at the limit without promising the
-  suspension: "Time's up" always; the game suspended on the console it was
-  tested on; with a phone app once set to "alarm only", maybe a warning only,
-  a setting PlayGuard reads (byte `01`, in the diagnostic report) but does
-  not change yet. Suspending can lose unsaved
+- So PlayGuard says what the console does at the limit from that byte:
+  "Time's up" always, then the game suspended, or a warning only once set to
+  "alarm only" (in the phone app, or *When the time is up*; a limit below the
+  time already played then warns of no suspension). The `ALARM` value has not
+  been seen on a console yet. Suspending can lose unsaved
   progress (Nintendo: [time limit settings](https://www.nintendo.com/sg/parents/switch/time/settings.html)),
   so its confirmations say so, and *No more play today* can wait 5 minutes.
 - The PIN prompt behind *Disable parental controls* is the system's: a child

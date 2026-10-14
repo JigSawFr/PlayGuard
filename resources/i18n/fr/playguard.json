@@ -237,7 +237,9 @@
             "inactive": "Minuteur désactivé",
             "remaining_short": "reste {} aujourd'hui",
             "unlocked_short": "déverrouillé temporairement, peut-être non décompté",
-            "reached_alert": "La limite du jour est atteinte : la console affiche « temps écoulé ». Qu'elle suspende aussi le jeu dépend d'un réglage que PlayGuard ne peut pas encore lire.",
+            "reached_alert": "La limite du jour est atteinte : la console affiche « temps écoulé ».",
+            "reached_alert_suspend": "La limite du jour est atteinte : la console affiche « temps écoulé » et suspend le jeu.",
+            "reached_alert_alarm": "La limite du jour est atteinte : la console affiche « temps écoulé », un simple avertissement (le jeu n'est pas suspendu).",
             "not_set": "Pas de limite",
             "every_day": "{} tous les jours",
             "today_per_day": "{} aujourd'hui (varie selon le jour)",
@@ -262,6 +264,13 @@
         "profiles_section_saved": "Profils enregistrés",
         "profiles_section_new": "Nouveau profil",
         "profiles_hint": "A sur un profil : l'appliquer, modifier ses limites, le renommer ou le supprimer.",
+        "time_up": "Quand le temps est écoulé",
+        "time_up_title": "Quand le temps est écoulé",
+        "time_up_suspend": "Suspendre le logiciel",
+        "time_up_alarm": "Avertir seulement",
+        "time_up_suspend_body": "Suspendre le logiciel quand le temps est écoulé ?\n\nÀ la limite, la console affiche « temps écoulé » et suspend le jeu. La progression non sauvegardée peut être perdue.",
+        "time_up_alarm_body": "Seulement avertir quand le temps est écoulé ?\n\nÀ la limite, la console affiche « temps écoulé », mais le jeu n'est pas suspendu : il peut continuer.",
+        "time_up_needs_limit": "Réglez d'abord une limite de temps de jeu ou une heure du coucher : ce qui se passe quand le temps est écoulé ne compte qu'une fois l'une d'elles réglée.",
         "profile_current": "{} (actuel)",
         "profile_range": "{} à {}",
         "profile_saved": "Profil « {} » enregistré.",
@@ -282,7 +291,7 @@
         "bedtime_value_on": "{} (activée)",
         "bedtime_value_off": "{} (désactivée)",
         "bedtime_reset": "Jeu de nouveau permis à",
-        "bedtime_note": "S'applique à tous les jours. À l'heure du coucher, la console affiche l'alarme, et peut aussi suspendre le logiciel (un réglage de l'application mobile que PlayGuard ne peut pas encore lire), jusqu'à ce que le jeu soit de nouveau permis. PlayGuard vérifie que la console indique la nouvelle heure, et remet les réglages précédents sinon.",
+        "bedtime_note": "S'applique à tous les jours. À l'heure du coucher, la console affiche l'alarme, et peut aussi suspendre le logiciel (voir « Quand le temps est écoulé »), jusqu'à ce que le jeu soit de nouveau permis. PlayGuard vérifie que la console indique la nouvelle heure, et remet les réglages précédents sinon.",
         "bedtime_title": "Alarme du coucher, tous les jours",
         "bedtime_end_title": "Jeu de nouveau permis à (tous les jours)",
         "bedtime_summary": "{}, jeu de nouveau permis à {}",
@@ -356,7 +365,7 @@
         "removed": "Limite de temps de jeu supprimée.",
         "remove_err": "Impossible de supprimer la limite de temps de jeu",
         "not_counting": "La console ne décompte pas le temps de jeu en ce moment. Causes probables : l'horloge a été reculée (le décompte reprendra plus tard), l'horloge réseau n'a jamais été réglée (onglet Horloge réseau), ou une limite vient d'être écrite (lancez un jeu une minute, puis vérifiez).",
-        "limit_note": "À la limite, la console affiche « temps écoulé ». Sur la console où PlayGuard a été testé, elle a aussi suspendu le jeu. Si l'application mobile a déjà été réglée sur « alarme seulement », la console peut se contenter de prévenir : PlayGuard ne peut pas encore lire ni modifier ce réglage.",
+        "limit_note": "À la limite, la console affiche « temps écoulé », puis suspend le jeu ou se contente de prévenir, selon « Quand le temps est écoulé ».",
         "unsaved": "La progression non sauvegardée peut être perdue : laissez l'enfant sauvegarder d'abord."
     },
     "activity": {
@@ -976,7 +985,8 @@
             "outside_reset": "Temps de jeu reparti de zéro (vu par PlayGuard)",
             "outside_clock": "Horloge de la console changée (vu par PlayGuard)",
             "outside_limits": "Limites modifiées en dehors de PlayGuard",
-            "new_account": "Nouveau compte utilisateur (vu par PlayGuard)"
+            "new_account": "Nouveau compte utilisateur (vu par PlayGuard)",
+            "time_up": "Quand le temps est écoulé"
         },
         "sources": {
             "uniform": "Même limite tous les jours",

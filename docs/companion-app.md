@@ -22,6 +22,7 @@ How the settings are stored on the console is in
 |---|---|---|
 | Daily play-time limit, the same every day or one per day | *Play timer* | Plus saved profiles, and the week chart as the editor |
 | "Extend today's play time" (+5 min … +1 h, added in 2.4.0 for +1 h); undo today's changes | *Extra time today*, *No more play today*; the usual limit comes back the next day | Amounts in *Preferences*, including +5/+10/+15 |
+| Alarm only, or suspend the software, when the time is up | *Play timer › When the time is up* | Shown once a limit or a bedtime is set (see gap 1) |
 | Bedtime alarm and the time play is allowed again (2.1.0) | *Play timer › Bedtime alarm* | Partly: one time for every day (see gap 2) |
 | Restriction level, age rating, rating organisation, posting to social media, communicating with other players, VR mode (1.10.0) | *Restrictions* | |
 | Play history per game | *Activity* | Plus per user account, all-time totals and export (CSV, JSON, XLSX, PDF) |
@@ -34,20 +35,16 @@ Most useful first. Each says what blocks it.
 
 ### 1. Alarm only, or suspend the software
 
-When the time is up, the companion app either sounds an alarm or suspends
-the software. This is the setting parents care about most after the limit
-itself.
+**Covered** by *Play timer › When the time is up*; left here so the numbers
+of the gaps below stay the same.
 
 - In the app's API it is `restrictionMode`: `ALARM` or `FORCED_TERMINATION`.
 - On the console it is byte `01` of the play-timer block's header (`0`
   `ALARM`, `1` `FORCED_TERMINATION`), as reversed from the 22.5.0 `pctl`
-  sysmodule (see [the header](parental-controls.md#the-header-is-the-modes-plus-a-daily-rule));
-  the `ALARM` value has not been seen on a console yet.
-- **Needs:** a console still linked to the companion app. Save the play-timer
-  block as a reference (*Security & app › Before unlinking: help decode…*
-  while linked, or *Developer tools › Compare the play-timer block*),
-  switch the mode in the app, let it sync, compare. Attach the result to an
-  issue.
+  sysmodule (see [the header](parental-controls.md#the-header-is-the-modes-plus-a-daily-rule)).
+- **Still useful:** a block from a console set to "alarm only" in the app
+  (*Security & app › Before unlinking: help decode…* while linked), to see
+  the `ALARM` value on hardware.
 
 ### 2. Bedtime and start time per day of the week
 

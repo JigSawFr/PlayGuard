@@ -108,6 +108,16 @@ Result write_alarm_disabled(bool disabled, const std::string& source);
 // through confirm_write.
 void set_countdown(bool running, std::function<void()> refresh);
 
+// What the console does when the time is up: suspend the software, or a
+// warning only (pctl_play_timer_set_alarm_only). time_up_text: the current
+// choice, "" when the block is not read. choose_time_up: the two choices,
+// then confirm_write and write_alarm_only; refused, with the reason, while no
+// limit and no bedtime is set.
+std::string time_up_text(const PtState& pt);
+void choose_time_up(const PtState& pt, std::function<void()> refresh);
+// Writes the choice and records it in the history ("time_up") with `source`.
+Result write_alarm_only(bool alarm_only, const std::string& source);
+
 // Bedtime, for every day. choose_bedtime: the alarm (16:00 to 23:45, or
 // off); choose_bedtime_end: when play is allowed again (05:00 to 09:00), on
 // the days whose alarm is on. Both refuse while the block's bedtime is not

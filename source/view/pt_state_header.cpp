@@ -53,7 +53,11 @@ void PtStateHeader::show(const PtState& pt)
     for (const auto& p : parts) text += (text.empty() ? "" : " · ") + p;
     summary->setText(text);
 
-    alert->setText(reached ? "playguard/play_timer/state/reached_alert"_i18n : "");
+    // What the console does at the limit, once the block says (pure.h).
+    alert->setText(!reached    ? ""
+                   : !pt.valid ? "playguard/play_timer/state/reached_alert"_i18n
+                   : pt.alarm_only ? "playguard/play_timer/state/reached_alert_alarm"_i18n
+                                   : "playguard/play_timer/state/reached_alert_suspend"_i18n);
     ui::set_visible(alert, reached);
     ui::set_visible(health, timer_health::observe(pt));
 }
