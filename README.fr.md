@@ -13,7 +13,7 @@
 
 PlayGuard ramène sur une console modifiée les réglages de l'application mobile [Contrôle parental Nintendo Switch](https://apps.apple.com/fr/app/contr%C3%B4le-parental-nintendo-sw/id1190074407). Il pilote le contrôle parental de la console elle-même (la limite, le code PIN, les avertissements, la suspension) : rien ne tourne en arrière-plan.
 
-[![Visite guidée en 30 secondes](images/video/playguard-tour.png)](images/video/playguard-tour.mp4)
+[![PlayGuard en 30 secondes](images/video/playguard-tour.gif)](images/video/playguard-tour.mp4)
 
 > [!WARNING]
 > **Nécessite un firmware personnalisé (Atmosphère).** PlayGuard utilise le service restreint `pctl`, en partie via des commandes `*ForDebug`. **À utiliser à vos risques.**
