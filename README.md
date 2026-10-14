@@ -20,19 +20,8 @@ PlayGuard is a homebrew app that brings the settings of the [Nintendo Switch Par
 
 ## Contents
 
-- [Why PlayGuard](#why-playguard)
-- [Highlights](#highlights)
-- [Compatibility](#compatibility)
-- [Install](#install)
-- [Quick start](#quick-start)
-- [Features, tab by tab](#features-tab-by-tab)
-- [Safety by design](#safety-by-design)
-- [What counts as play time](#what-counts-as-play-time)
-- [Locked out?](#locked-out-second-hand-console-forgotten-pin)
-- [PlayGuard or a replacement sysmodule?](#playguard-or-a-replacement-sysmodule)
-- [Reporting a bug](#reporting-a-bug)
-- [Contributing](#contributing)
-- [License and credits](#license-and-credits)
+- [Why PlayGuard](#why-playguard) · [Highlights](#highlights) · [Compatibility](#compatibility) · [Install](#install) · [Quick start](#quick-start)
+- [Locked out?](#locked-out-second-hand-console-forgotten-pin) · [Documentation](#documentation) · [Contributing](#contributing) · [License and credits](#license-and-credits)
 
 ## Why PlayGuard
 
@@ -67,21 +56,13 @@ Driving the console's own controls also opens the door to much more: reporting p
 
 | | Supported | Notes |
 |---|---|---|
-| **Firmware** | **21.0.0 → 22.5.0** | The play-time limit layout (0x44 bytes) exists since 21.0.0; below that, every tab works except the play timer. 23.x goes through the [newer firmware](#newer-firmware) screen until it is tested on a console. |
+| **Firmware** | **21.0.0 → 22.5.0** | The play-time limit layout (0x44 bytes) exists since 21.0.0; below that, every tab works except the play timer. 23.x goes through the [newer firmware](docs/compatibility.md#newer-firmware) screen until it is tested on a console. |
 | **Atmosphère** | **1.11.x → 1.12.0** | 1.12.0 adds 23.0.0 support. The app shows the detected version. |
-| **Launchers** | hbmenu, **sphaira**, **Homebrew App Store** | Launching over a game (title override) is recommended. The app says whether it runs as an application or as an applet (album). Over a game, the console counts PlayGuard's time as that game's. In the activity, it goes to the user picked at launch: open it with a parent's user, not a child's. The play timer is the console's, the same for every user: it counts that time whoever opened PlayGuard (unless the timer is off). |
-| **Tested on hardware** | 22.0.0, 22.1.0, 22.5.0 | 23.0.1 / 1.12.0: the command table ([switchbrew](https://switchbrew.org/wiki/Parental_Control_services)) has the same commands, but nothing was run on a console yet, so PlayGuard asks first (read-only until you choose) — reports are welcome. |
+| **Launchers** | hbmenu, **sphaira**, **Homebrew App Store** | Launch it over a game (title override), with a parent's user: the console counts PlayGuard's time as that game's ([details](docs/compatibility.md#supported-versions)). |
+| **Tested on hardware** | 22.0.0, 22.1.0, 22.5.0 | 23.0.1 / 1.12.0 has the same commands but was not run on a console yet: PlayGuard asks first (read-only until you choose) — reports are welcome. |
 | **Nintendo Switch 2** | Not supported | There is no Atmosphère for it. |
 
-<a id="newer-firmware"></a>**Newer firmware?** Above the newest firmware tested on a console, PlayGuard opens **read-only** and checks whether a newer release supports it. If one does, it offers to update (in PlayGuard itself, through sphaira or the Homebrew App Store). Otherwise you choose: read-only, read-only with the developer tools (to investigate the firmware), or every feature at your own risk. The choice can be remembered for that firmware and app version; *Tools › Compatibility* brings the screen back.
-
-**emuMMC and sysMMC.** Each has its own parental controls, and PlayGuard only sees those of the system it runs on. On emuMMC, *Tools* and *First steps* say so; on sysMMC too, when an emuMMC is set up on the SD card. Set the controls on both, or hide the hekate boot menu so that a child cannot pick the other system. PlayGuard keeps each system's history, backups and state apart (the sysMMC and the emuMMC, in `nand/`); the preferences and profiles are shared.
-
-**Can it get the console banned?** PlayGuard never contacts Nintendo: online, it only reaches public time servers, GitHub (updates, and the reports you send). What gets consoles banned is custom firmware or an emuMMC going online to Nintendo ([switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)). No ban tied to parental-control or clock changes is documented; that is not a guarantee.
-
-**A console without Internet?** That is what PlayGuard is for, and the play timer still needs a network clock that has been set. With no time server to ask, *Network clock › Measure* offers to set it to the console clock instead: check the console clock first, with *Synchronize Clock via Internet* off, and turn that setting on only afterwards (see [Network clock](#features-tab-by-tab)).
-
-**Phone notifications.** Since 22.0.0, a console still linked to the phone app may notify the parent when the PIN is entered on the console ([switchbrew](https://switchbrew.org/wiki/22.0.0)). Whether PlayGuard's own unlocks trigger it is unknown.
+Newer firmware, emuMMC and sysMMC, ban risk, consoles without Internet, and how PlayGuard compares with a replacement sysmodule: **[docs/compatibility.md](docs/compatibility.md)**.
 
 ## Install
 
@@ -95,24 +76,7 @@ Pick one:
 
 The optional **recovery sysmodule** (`playguard-rescue.zip`) is a separate download — see [Locked out?](#locked-out-second-hand-console-forgotten-pin).
 
-<details>
-<summary>Files PlayGuard writes on the SD card</summary>
-
-All in `sd:/config/playguard/` (the app itself stays in `sd:/switch/playguard/`: removing or reinstalling it keeps them). Versions that kept them next to the app had them moved there at their first start.
-
-| Path | Content |
-|---|---|
-| `config.json` | Preferences (language, theme, NTP server, *Ask for the PIN* …); every key in [docs/config.md](docs/config.md). One that cannot be read is kept as `config.json.bad` (the previous one as `.bad.1`) and the settings start again from their defaults; PlayGuard says so once at start-up |
-| `profiles/` | Saved play-time limit profiles |
-| `exports/` | Activity exports |
-| `nand/<system>/` | What belongs to one system, each with its own parental controls: `sysmmc/` for the sysMMC, `emummc/` for the emuMMC. Inside: `history.json` the change history (newest 200; one that cannot be read is kept as `history.json.bad`, the previous one as `.bad.1`, rather than overwritten, and PlayGuard says so once); `state.json` what the console lock, the extra time, a pending relock and the firmware choice need remembered ([docs/config.md](docs/config.md#state-kept-between-launches)); `watch.json` what PlayGuard last saw of the console, to tell what changed outside it ([docs/config.md](docs/config.md#watchjson); deleting it is harmless); `backups/` the settings backups (never contain the PIN); `cache/` the last play activity read (every account, and each account viewed), shown at once on the next start while the log is read again. The files of a version before these folders go to the first system PlayGuard starts on |
-| `cache/` | The game icons (`icons/`, 16 MB at most, emptied when the console language changes), shared by every system, so names and icons are not read from each game again at every start; in developer mode, the list of *Install another build* (`dev_builds.json`) |
-| `github_token` | Developer mode only: the GitHub sign-in of *Install another build* (deleted by signing out) |
-| `rescue_report.txt` | Left by the recovery sysmodule after it acted, until PlayGuard shows it at start-up (one it cannot read is removed, and PlayGuard says so) |
-| `logs/` | `reports/` the saved diagnostic reports (never contain the PIN or the serial number); `crashes/` one file per crash (what made PlayGuard stop); `uploads/` one Internet shortcut (`.url`) per report sent online; `play_timer/` the developer tools' play-timer files. How many reports, crash files and links are kept: *Tools › Diagnostics* (by number, age or size; the newest always stays) |
-
-More in [packaging/README.md](packaging/README.md).
-</details>
+The files PlayGuard writes on the SD card: [docs/install.md](docs/install.md#files-on-the-sd-card).
 
 ## Quick start
 
@@ -123,135 +87,7 @@ More in [packaging/README.md](packaging/README.md).
 
 **Controls:** ↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh · **+** saves per-day limits.
 
-What failed is said in a dialog, what worked in a toast. The title says when the app is read-only or while parental controls are temporarily unlocked; in read-only mode, actions stay in place, greyed, and say why when pressed.
-
-## Features, tab by tab
-
-The app is organised in tabs, like System Settings. Click a tab to expand it.
-
-<details>
-<summary><b>Overview</b> — today at a glance</summary>
-
-- **Today first:** a gauge of today's play time (while no game is running, the time from the activity log, marked ≈), today's limit, time left, bedtime alarm. The "time's up" alarm shows in amber while it is off — Ⓐ turns it back on. Under the gauge, a reminder: a game left open on the HOME menu keeps counting (see [What counts as play time](#what-counts-as-play-time)).
-- **Is the console counting?** PlayGuard's own time counts while it runs as an application, so with a limit today the time left should go down while it is open. When it has not moved for about 90 s on screen (timer on, a limit today, not unlocked, not opened from the album), an amber line says *The console is not counting play time right now*, with the likely causes: the clock was set back (it counts again later), the network clock was never set (*Network clock* tab), or a limit was just written (start a game for a minute, then check). It goes as soon as the time left moves again. The Play timer's state line says it too.
-- **Changed outside PlayGuard:** today's play time starting over on the same day (a clock change does that), the console clock moved by more than 5 minutes, limits that differ from the ones PlayGuard last saw (the phone app, another tool). An amber notice until dismissed or the next day, and an entry in the change history. PlayGuard does not run in the background: it only sees what changed while it was open, or since it last was, when it reads the console again.
-- **At the limit** the console shows "Time's up", then suspends the game (no "continue") or only warns: *When the time is up* shows which and changes it, once a limit or a bedtime is set ([details](docs/parental-controls.md#when-the-time-runs-out)).
-- **Then the state:** parental controls, PIN (*Set* or *Not set*, never its length), restriction level.
-- **Then what needs attention:** network-clock accuracy, companion-app link (amber while linked), firmware / compatibility only when there is a problem, serial blanking and game patches warnings.
-- Lines that open another tab end with a chevron (›). Ⓐ on *Today's limit* changes it in place; Ⓐ on *Network clock › Inaccurate* measures and sets the clock on the spot.
-- **Extra time today** (+15 min, +30 min, +1 h by default) and **No more play today** (limit 0 for today only, *now* or *in 5 minutes* when the time played is known: the limit then becomes the time played + 5 min, time to save; at the lock the console's "Time's up" comes up, and unsaved progress may be lost — the confirmation says so). The next day — at start-up, or at midnight if the app is open — PlayGuard offers to put the usual limit back, or does it by itself (*Preferences › Put the usual limit back the next day by itself*).
-- A **Lock now** banner while parental controls are temporarily unlocked.
-- While no PIN is set, a **First steps** line opens the three-step guide, which also comes up at start-up.
-- Refreshes every 5 s, with the time of the last refresh (Ⓧ refreshes now).
-</details>
-
-<details>
-<summary><b>Play timer</b> — the week chart is the editor</summary>
-
-- A state line: active, time left, today's limit, the matching profile (red while the limit is reached).
-- **The week chart:** ←/→ pick a day, Ⓐ changes its limit.
-- **Same limit every day:** a quick list or any value, typed in minutes (`90`, `90 min`) or hours (`1:30`, `1h30`).
-- **A different limit for each day:** unsaved days in amber and marked \*, quick values, Monday–Friday / weekend presets, "no limit" per day; **+** saves from anywhere.
-- **Remove the limit**, **extra time today**, **no more play today** (as on the Overview).
-- A note under the daily limit says what the console does at the limit (as on the Overview). While parental controls are temporarily unlocked, play time *may* not be counted: that is still open ([docs](docs/parental-controls.md#still-open)).
-- **Profiles** saved on the SD card: apply, edit, rename or delete one; save the current limits or make a new one. Any name, in any script (*École*, *周末*, *Выходные* …) — a name without Latin letters gets a file name of its own, and two names that would map to the same file are caught.
-- Every confirmation draws the week as it will be, with the days that change in amber.
-- **Bedtime alarm**: the alarm time (16:00 to 23:45, or off) and when play is allowed again (05:00 to 09:00), the same every day. Its place in the play-timer settings was worked out from the companion app's settings, not read on a console with a bedtime set: PlayGuard changes it only once the console reports what PlayGuard reads there, checks the console's answer after the change and puts the previous settings back if it differs. Advanced, opt-in: "time's up" alarm on/off, pause / resume the countdown.
-- `0` minutes means *no play that day*; *Remove the play-time limit* turns the timer off.
-</details>
-
-<details>
-<summary><b>Activity</b> — who played what, and how long</summary>
-
-- Time per game **today**, in the **last 7 days** and **in all**, from the console's own activity log — for every account or **one user account** (*Account*, when the console has several).
-- A chart of the last seven days (today on the right, a legend under it), with this week's limit for each day as a line and the time over it in amber, marked !; today's, the week's and all-time totals.
-- A **summary** over the chosen period, for the account shown: average per day, the most played game, the days played and the busiest one (last 7 days), the average session (all time).
-- **To rediscover**: installed games under 3 h in all and not played for a month or more, the least played first (up to three).
-- Sort by period; the first games show their icon (not in applet mode, to spare memory). A large library lists its first 50 games, then *Show every game*, kept until another period or account (100 games at most in applet mode); the export always holds them all. PlayGuard reads 256 games at most (this week's first): beyond that, the list and the export (not CSV) say that some are missing, and the all-time total leaves them out.
-- Ⓐ on a game: its last seven days as bars, launches, first and last play, time per user account. Deleted games keep their all-time figures, even one deleted before PlayGuard was installed as long as the console's play log still names it, and their name once PlayGuard has seen it (else *Deleted game* and its title ID).
-- **Time on no account and new accounts:** a game's time that no user account holds (some games never ask for one, or the account was deleted since) shows as *No account*, from a minute up; a user account PlayGuard never saw before is flagged in amber under *Account* for 30 days (*New account since …*, a fresh account is a known way to start over) and recorded in the change history; the accounts there when PlayGuard first lists them are not flagged.
-- **Export to the SD card** as CSV, JSON, XLSX (Excel) or PDF, one column per day.
-- Opens at once on the last figures read (kept on the SD card between runs), refreshed in the background when over a minute old; Ⓧ reads them again now, with a spinner.
-- Times are approximate if the console clock was changed.
-</details>
-
-<details>
-<summary><b>Restrictions</b> — level, age rating, communication</summary>
-
-- Restriction level: None, Young child, Child, Teen, Custom. What a preset restricts (age limit, posting, communication) is shown read-only, and said before you pick it.
-- In Custom: age rating, social-media posting, communication with others.
-- VR mode, **rating organisation** (PEGI, ESRB, USK, CERO …).
-- The number of games allowed to communicate (the list itself is in the diagnostic report, raw, until its layout is known).
-</details>
-
-<details>
-<summary><b>Network clock</b> — the clock the play timer relies on</summary>
-
-- Console and network clocks, time zone, accuracy.
-- Pick a public NTP server (≈ 50 built in, by region, or your own).
-- **Measure** against 3 servers (median; an amber warning when they disagree), then **set the network clock** — a measurement stays usable for 2 minutes, with a countdown. The confirmation says it: changing the clock starts today's play time over, so the whole limit is available again.
-- A console that never reaches Nintendo's servers keeps this clock inaccurate, which skews the play timer.
-- **No server answers** (a console without Internet): *Set the network clock to the console clock* appears under the result (and on the Overview's *Inaccurate* line, after its measurement fails), behind the same confirmation. PlayGuard has nothing else to compare the console clock with: the confirmation shows its time and asks you to check it against a phone or a watch first, and a console clock before 2026 (never set) is refused. With *Synchronize Clock via Internet* off, the console clock stays where it is, and turning the setting on afterwards no longer makes it jump; with it on, the console clock already follows the network clock, so the confirmation says to turn it off and set the time by hand if it is wrong. It writes the clock only, not the parental controls, so it needs no unlock (the PIN of *Ask for the PIN* still applies); like any clock change, it starts today's play time over. Not tried on a console yet.
-</details>
-
-<details>
-<summary><b>Security & app</b> — PIN, locks, companion app</summary>
-
-- **Set / change the PIN** (system PIN screen), **show the PIN** (after a warning and the PIN itself, asked every time; recorded in the history, then a new PIN is offered), **unlock temporarily**, **lock now**.
-- **Ask for the PIN** in PlayGuard itself: *Never*, *Before a change* (the default: anyone can look, only the parent changes something; asked again after 5 min) or *To open PlayGuard* (a lock screen at start, and again when PlayGuard comes back after 5 min or more out of focus). Checked in the service layer, so no change skips it; locking again never asks. *Show the PIN* asks for it every time, in every mode and even within the 5 minutes, and a missing or damaged `config.json` counts as *Before a change*. Quitting while parental controls are still unlocked asks whether to lock them again; closed from the HOME menu instead, PlayGuard locks them again the next time it starts.
-- **Console lock:** one switch that sets every day's limit to 0, so a PIN is needed to start a game — a light lock without age ratings or communication limits. It blocks starting games, not the HOME menu, and needs a PIN. The previous limits come back when it is turned off. While it is on, *extra time* and *no more play today* are refused, and limits set another way (a profile, a backup, the history…) replace it.
-- **Companion app:** whether the Nintendo Switch Parental Controls app is linked, its last sync, and **unlink** (otherwise its next sync overwrites the limits set here: while it is linked, every change PlayGuard asks to confirm says so). While it is linked, *Before unlinking: help decode…* opens the block comparison (see [Contributing](#contributing)).
-- **Delete all parental controls:** two confirmations, irreversible; a backup of the settings is saved first.
-</details>
-
-<details>
-<summary><b>Preferences</b></summary>
-
-- Language (every console language, or the console's own) and theme (light / dark, with an offer to restart).
-- The tab to start on.
-- **Lock again automatically after a change** (on by default).
-- Extra-time amounts (+15/+30/+1 h, +10/+20/+30 min …) and putting the usual limit back the next day by itself.
-- **The intro** at start-up: the loading screen for 2 seconds (on by default; Ⓐ or Ⓑ skips it; off, PlayGuard opens as soon as it is ready).
-- A network-clock check at start-up (a toast when it is more than a minute off; it never sets the clock).
-- A **monthly reminder to support PlayGuard** (on by default, never in the first month nor right after an update; *Don't show again* on the reminder or this switch turns it off for good, updates included).
-- Advanced actions.
-</details>
-
-<details>
-<summary><b>Tools</b> and <b>About</b> — history, backups, console info; version, updates, what's new, credits</summary>
-
-- **Change history:** what PlayGuard changed (limits, restriction level, PIN, unlocks, unlinking, the clock, restores …), when and from where. Ⓐ on a change shows it and, for a value, **puts the previous one back** — through the same unlock and PIN as any change, saying if it changed since.
-- **Back up / restore the settings** on the SD card: restriction level, custom settings, VR mode, rating organisation, daily limits, the "time's up" alarm (with the advanced actions on), and the raw play-timer block for the record — never the PIN. A restore lists only what would change (nothing to change: it just says so, with no unlock and nothing written), and says when the backup had a bedtime alarm on (it is not written back). Choose how many backups to keep.
-- **First steps** opens the guide again (with an *Unlink the companion app* step while linked, a *Turn the "Time's up" alarm back on* step while it is off, a *Protect PlayGuard* step once a PIN is set — the *Ask for the PIN* choice —, and a switch to stop it coming up at start-up). Below *Close*, *Support PlayGuard* shows the funding QR codes.
-- **Export a diagnostic report**, or **send one online** (see [Reporting a bug](#reporting-a-bug)); how many saved reports, crash files and links of reports sent online are kept, by number, age or size.
-- **Console:** firmware, Atmosphère, compatibility, storage (emuMMC or sysMMC, and a note when the other system has its own parental controls), whether Atmosphère **blanks the serial number** (partly hidden until Ⓐ; a warning on emuMMC when it is not), **game patches** (sys-patch or sigpatch files, recommending sys-patch when only files are used).
-- **About** (its own tab): version, launch mode and data folder; **updates** (check now or once a day at start-up; *Update with*: in PlayGuard, which downloads the release, checks it, replaces itself and restarts, or sphaira, Homebrew App Store or by hand; asked on the first update when none is chosen). While a newer release is known, PlayGuard opens on **PlayGuard X.Y.Z is available** (its date and notes): *Update*, or *Later* for 1 day, 1 week or 30 days at most; **what's new** in the running version (its highlights, in English, and *Full list of changes* for its entry of the bundled changelog); the credits, how to **support PlayGuard** ([GitHub Sponsors](https://github.com/sponsors/JigSawFr), [Ko-fi](https://ko-fi.com/jigsawfr), shown as QR codes to scan with a phone), and a small *Made in France* 🇫🇷. After an update, PlayGuard opens once on **What's new in X.Y.Z** (the same highlights, then the QR codes).
-</details>
-
-## Safety by design
-
-**Writing the play-time limit safely.** Overwriting the timer's configuration while it counts down destabilises Atmosphère. So PlayGuard checks the state first; if the timer is active, the confirmation says parental controls will be unlocked temporarily — with the stored PIN, **you don't need to remember it**. One press then unlocks, checks that the system really reports the unlock, writes, and **locks again right away** (or offers to, if *Lock again automatically after a change* is off). The service layer re-checks the state just before writing, so no screen can skip the safeguard.
-
-> [!CAUTION]
-> A limit below the time already played today suspends the game as soon as parental controls are locked again. The confirmation says so when that would happen.
-
-**No more 22.5 crashes.** `pctl:a`, the privileged parental-control service, accepts a **single session**. Older builds of the original app kept it open, so the HOME-menu PIN prompt (or the PIN applet) could not get it and Atmosphère could crash. PlayGuard opens the session for each action and releases it immediately; periodic refreshes pause while the app is in the background. *(Diagnosis by [anbingxi's fork](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly).)*
-
-**Nothing runs in the background.** The limit, the PIN, the warnings and the suspension are the console's own; PlayGuard only changes their settings.
-
-## What counts as play time
-
-The play timer is the console's: PlayGuard reads it, it does not count anything itself. What is known, and how sure it is ([docs/parental-controls.md](docs/parental-controls.md#time-spent-and-time-left) has the measurements):
-
-| Situation | Counts? | How sure |
-|---|---|---|
-| A game running | Yes | measured (22.0.0) |
-| **A game left open on the HOME menu** (suspended in the background) | **Yes**: close it, or put the console in sleep mode | reported by parents ([Arqade](https://gaming.stackexchange.com/questions/398954/)); fits the measurements (the console counts while an application is open) |
-| Sleep mode | No | reported ([Arqade](https://gaming.stackexchange.com/questions/398954/)); not measured by PlayGuard |
-| **PlayGuard opened over a game** (as an application) | **Yes**, as that game | measured (22.0.0): open it with a parent's user, or from the album for a quick look |
-| PlayGuard opened from the album (applet mode) | No | inferred: it is not an application, and time outside applications did not seem to count |
-| While parental controls are temporarily unlocked | Maybe not | not measured: still open |
-| After the clock was changed | The day starts over; after a jump back the count stops until the clock passes the old time | observed (22.0.0); the Overview says when the console is not counting |
+Every tab in detail, the safeguards around writing the limit, and what the console counts as play time: **[docs/features.md](docs/features.md)**.
 
 ## Locked out? (second-hand console, forgotten PIN)
 
@@ -264,41 +100,20 @@ PlayGuard only sees the parental controls of the system it runs on: **emuMMC and
 | **The play timer blocks everything (0-minute limit) and the PIN is forgotten** | PlayGuard itself cannot start then. Install the optional recovery sysmodule (`playguard-rescue.zip`) **beforehand**; when locked out, drop an empty `config/playguard/RESCUE` file on the SD card and boot — it unlocks the console so PlayGuard can open. See [`sysmodule/README.md`](sysmodule/README.md). |
 | **Console not modded** | PlayGuard cannot help: it needs Atmosphère. Nintendo support's master-key procedure is the official way. |
 
-## PlayGuard or a replacement sysmodule?
+Reporting a bug (diagnostic report, sending one online) and the developer mode: [docs/troubleshooting.md](docs/troubleshooting.md).
 
-PlayGuard drives the parental controls built into the console (the `pctl` service), offline. The other approach replaces them with a sysmodule, for instance [NS Parental Control](https://github.com/TristanIsrael/NSParentalControl) (a sysmodule and a Tesla / Ultrahand overlay).
+## Documentation
 
-| | PlayGuard | A replacement sysmodule |
-|---|---|---|
-| Play-time limit | One for the console (the console's own timer) | One per user account |
-| PIN, warnings, suspension | The console's | Its own |
-| In the background | Nothing (the optional recovery sysmodule only acts at boot, when a `RESCUE` file asks it to) | A sysmodule, from boot |
-| After a firmware update | The console's controls keep working; PlayGuard opens read-only until a version supports the firmware | The controls depend on the sysmodule still working |
-| Deleted from the SD card | The limits stay on the console | The controls go with it |
-
-**Need a different limit for each child?** Pick a replacement sysmodule — the console's timer has one limit for the whole console. Otherwise, PlayGuard keeps Nintendo's controls and just brings their settings to the console.
-
-## Reporting a bug
-
-An error shows the system's code (such as `0x0001088E`) with what is known about it: what to do for the codes whose meaning is documented, otherwise a report helps.
-
-1. *Tools › Export a diagnostic report* saves a text file in `sd:/config/playguard/logs/reports/`: firmware, Atmosphère version, how long the start-up took, clocks, storage, serial-blanking and game-patch status, and the raw result of every parental-control query. **It never contains the PIN or the serial number.**
-2. [Open an issue](https://github.com/JigSawFr/PlayGuard/issues/new) and attach it.
-
-Or, with the console online, *Tools › Send a report online* (Ⓧ on the diagnostic report in developer mode) sends it, with the latest crash reports (PlayGuard's last 3 in `logs/crashes/`, and Atmosphère's last 2 of a homebrew from the past week, in `sd:/atmosphere/crash_reports/`: another homebrew's crash can be one of them, the list shown before sending says which) and the debug files (the play-timer block reference, the end of the play-timer recording, the change history and PlayGuard's settings), to a secret gist in your GitHub account (the report and each file as a file of its own; signed out, PlayGuard offers to sign in first, as *GitHub account* in the developer tools does), after saying exactly what goes. It shows the link and two QR codes: the report, and the bug-report form with the link, your versions, how PlayGuard was started (over a game or from the Album; add the menu) and the system (sysMMC or emuMMC) already filled in. Anyone with the link can read the report, until you delete the gist on GitHub. Each link is kept in `logs/uploads/` as an Internet shortcut (`.url`) that a computer opens in its browser. A report saved earlier in `logs/reports/` can be sent the same way.
-
-<details>
-<summary>Developer mode (investigating a new firmware)</summary>
-
-Press *About › Version* seven times; the developer tools appear at the end of *Tools*. It adds:
-
-- a **read-only** switch — with it on, the app cannot change anything: the safe way to investigate a new firmware (the firmware screen offers it directly);
-- the diagnostic report on screen (Ⓨ saves it, Ⓧ sends it online), and a shortcut to export it from the Play timer tab;
-- **Install another build** in place, to test a fix before it is released: the latest release, one of the last 20 commits of `main`, or the newest build of an open pull request from a branch of this repository (never from a fork: its code has not been reviewed yet), each kind in a tab of its own (Ⓛ / Ⓡ go from one to the next; the screen opens on the installed build's), the installed one marked; Ⓨ sorts the pull requests (newest build first, or by number). The release needs nothing; the others are the build workflow's artifacts, which GitHub hands to signed-in users only: **GitHub account** signs in with a code and a QR code to scan with a phone (the only permissions asked are to read the build workflow's files (Actions) and to create gists, for *Send a report online*; otherwise the token can only read what is public; it is kept in `github_token`, never sent with a report, and *GitHub account* signs out). PlayGuard downloads the build, checks it (size, the SHA-256 GitHub records, the NRO header), puts it in place of its own `.nro` and restarts on it (the PIN is asked first whenever one is set). The list is kept for 10 minutes and shown at once, with how old it is (Ⓧ fetches it again). The same list goes back to the release at any time; *About › Version* shows the commit in developer mode. Every screen's header shows the running version at the right: a release as a plain grey `v1.2.0`, any other build with an amber **DEV** tag, its version and its commit, so a test build is never taken for the release. Artifacts expire after 90 days;
-- **Compare the play-timer block** (also in *Security & app* while the phone app is linked), to decode settings PlayGuard does not show yet: save the raw block as a reference, change one setting in the phone app, come back — PlayGuard lists the values that changed (saved in `logs/reports/` on request). The bedtime fields could be confirmed this way. Attach that file to an issue, or send it with the report (*Send a report online*).
-- **Record the play timer**: every 30 s while PlayGuard is open, one line of what the play timer reports (time left, time spent, the raw settings block…) in `logs/play_timer/log.csv`, a spreadsheet-ready file, plus a line right after each change PlayGuard makes, saying which (its last column, `event`), and a note when the clock moved more than the time that went by. Left open over midnight, or until the time is up, it shows what one report cannot: when the time spent resets, what the console says near the end. The switch is remembered; it only records in developer mode. What is known so far is in [docs/parental-controls.md](docs/parental-controls.md).
-- **Clear the cache** and **Delete the log files**, each after a confirmation saying how many files and how much space: the cache (`cache/` and each system's `nand/<system>/cache/`: game names and icons, the Activity's last figures, the build list) is read again from the console when needed; the log files are the crash files, the saved reports and the play-timer recording, while `uploads/` (the removal links of the reports sent online) and the block reference stay. Settings, history, backups, profiles and exports are never touched.
-</details>
+| Page | What is in it |
+|---|---|
+| [Features](docs/features.md) | Every tab, the controls, safety by design, what counts as play time |
+| [Install](docs/install.md) | Install channels, the files written on the SD card |
+| [Compatibility](docs/compatibility.md) | Firmware, Atmosphère, launchers, emuMMC / sysMMC, ban risk, PlayGuard vs a replacement sysmodule |
+| [Troubleshooting](docs/troubleshooting.md) | Reporting a bug, the diagnostic report, developer mode |
+| [Companion app](docs/companion-app.md) | What PlayGuard covers of Nintendo's phone app, and what is missing |
+| [`config.json`](docs/config.md) | Every preference key and the state kept between launches |
+| [How parental controls work](docs/parental-controls.md) | The `pctl` service, the play timer and the clocks, as measured on hardware |
+| [Recovery sysmodule](sysmodule/README.md) | The optional `RESCUE` boot sysmodule |
 
 ## Contributing
 

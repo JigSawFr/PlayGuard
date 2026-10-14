@@ -103,7 +103,7 @@ Each release also publishes `compat.json` (`tools/gen_compat.py`: the version an
 
 **Reproducible zips:** `make dist` and `make dist-rescue` give every file in the zip the date `SOURCE_DATE_EPOCH` (POSIX seconds; default: the last commit's time, `git log -1 --format=%ct`) and add the files in a fixed order without extra attributes, so the same commit and `.nro` give a byte-identical zip. The deko3d shaders are not compiled at build time (uam does not always give the same bytes): `shaders/` keeps them, with the checksums of the borealis GLSL they come from, and configure stops when that GLSL changes; then rebuild them with `-DPLAYGUARD_UAM=ON`, copy `build/dksh/*.dksh` to `shaders/` and update `shaders/glsl.sha256`. Set `SOURCE_DATE_EPOCH=<seconds>` to rebuild one from another checkout. CI builds the zips twice and compares them; when they differ, `tools/repro_diff.py` says where (a zip entry, a segment of the `.nro`, a RomFS file, a shader) and the run keeps both builds as an artifact.
 
-When a change is visible to users, update **both** [README.md](README.md) and [README.fr.md](README.fr.md).
+When a change is visible to users, update the English and French pages **both**. The READMEs ([README.md](README.md), [README.fr.md](README.fr.md)) stay short: the pitch, compatibility, install, quick start and *Locked out?*; the details go to the user guide in [`docs/`](docs/) — `features.md`, `install.md`, `compatibility.md`, `troubleshooting.md` — with its French version in [`docs/fr/`](docs/fr/). The reference pages (`config.md`, `parental-controls.md`, `companion-app.md`) are in English only.
 
 ## Translating PlayGuard
 
