@@ -78,7 +78,7 @@ void observe(const PtState& pt)
     // docs/parental-controls.md), while the time left means something: the
     // same readings as the timer health check, whatever the applet mode.
     if (timer_health_logic::should_count(pt, wd, false)) {
-        const int64_t spent = (int64_t)pt.day_min[wd] * 60 - (int64_t)((pt.remaining_ns + 500000000ULL) / 1000000000ULL);
+        const int64_t spent = (int64_t)pt.day_min[wd] * 60 - (pt.remaining_ns + 500000000LL) / 1000000000LL;
         ob.spent_known = spent >= 0;
         ob.spent_s = spent;
     }

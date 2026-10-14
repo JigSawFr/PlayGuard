@@ -13,6 +13,7 @@ bool should_count(const PtState& pt, int weekday, bool applet_mode)
     if (!pt.restricted_valid || pt.restricted) return false;
     const uint16_t limit = pt.day_min[weekday];
     if (limit == PT_DAY_NOLIMIT || limit == 0) return false;
+    // Below 0 (past the limit, a warning only): counting up, not checked.
     return pt.remaining_valid && pt.remaining_ns > 0;
 }
 

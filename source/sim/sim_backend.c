@@ -133,6 +133,7 @@ static void sim_init(void)
         for (int i = 0; i < 7; i++) bed[i] = (PtBedtime){ true, 21, 0, 6, 0 };
         pt_bedtime_encode(S.block, bed);
     }
+    if (getenv("PLAYGUARD_SIM_ALARM_ONLY")) pt_set_suspends(S.block, false);
 }
 
 // The time left goes down as on a console that counts PlayGuard's own time,
@@ -308,8 +309,16 @@ void pctl_play_timer_query(PtState *o)
     const bool reached = o->enabled && (S.limit_reached || (limit != PT_DAY_NOLIMIT && limit <= SIM_PLAYED_TODAY_MIN));
     o->remaining_valid = true;
     o->remaining_ns = o->enabled && !reached && limit != PT_DAY_NOLIMIT && !getenv("PLAYGUARD_SIM_IDLE")
-                          ? (u64)(limit - SIM_PLAYED_TODAY_MIN) * 60 * 1000000000ULL + 20000000000ULL - counting_ns() : 0;
-    o->restricted_valid = true; o->restricted = reached;
+                          ? (s64)(limit - SIM_PLAYED_TODAY_MIN) * 60 * 1000000000LL + 20000000000LL - (s64)counting_ns() : 0;
+    // A warning only: the console does not restrict, and 1454 goes below 0
+    // by the time played over the limit (as observed; 2 min when the limit is
+    // only said to be reached).
+    const bool warn_only = !pt_suspends(S.block);
+    if (reached && warn_only) {
+        const int over = limit != PT_DAY_NOLIMIT && SIM_PLAYED_TODAY_MIN > limit ? SIM_PLAYED_TODAY_MIN - limit : 2;
+        o->remaining_ns = -(s64)over * 60 * 1000000000LL;
+    }
+    o->restricted_valid = true; o->restricted = reached && !warn_only;
     o->alarm_disabled_valid = true; o->alarm_disabled = S.alarm_disabled;
     // 1954..1959 answer today's bedtime from the block, as the console is
     // taken to (pure.h).
@@ -352,7 +361,7 @@ void pctl_play_timer_sample(PtSample *o)
         memcpy(o->display + 0x10, &o->remaining_ns, sizeof(o->remaining_ns));
     }
     // 1454 + 1952 = today's limit, as observed (docs/parental-controls.md).
-    o->spent_ns = pt.remaining_ns ? (u64)pt.day_min[wd] * 60 * 1000000000ULL - pt.remaining_ns
+    o->spent_ns = pt.remaining_ns ? (u64)((s64)pt.day_min[wd] * 60 * 1000000000LL - pt.remaining_ns)
                                   : (u64)SIM_PLAYED_TODAY_MIN * 60 * 1000000000ULL;
 }
 

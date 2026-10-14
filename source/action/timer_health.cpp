@@ -25,7 +25,7 @@ bool observe(const PtState& pt)
     const uint64_t now_ms = (uint64_t)std::chrono::duration_cast<std::chrono::milliseconds>(
                                 std::chrono::steady_clock::now().time_since_epoch()).count();
     const bool was = s_state.stalled;
-    const bool stalled = timer_health_logic::step(s_state, should, pt.remaining_ns, should ? pt.day_min[wd] : 0,
+    const bool stalled = timer_health_logic::step(s_state, should, should ? (uint64_t)pt.remaining_ns : 0, should ? pt.day_min[wd] : 0,
                                                   now_ms, app::in_focus());
     if (stalled != was) brls::Logger::info("timer health: {}", stalled ? "not counting" : "counting");
     return stalled;

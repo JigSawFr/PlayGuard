@@ -68,6 +68,29 @@ static void test_played()
     CHECK(pt_logic::played_today_min(pt, 3) == -1);
     CHECK(pt_logic::played_today_min(counting(), 7) == -1);
     CHECK(pt_logic::played_today_min(counting(), -1) == -1);
+
+    // Past the limit, a warning only: the time left reads below 0, by the
+    // time over it (as on 22.5.0, a 0-minute day played 2 min).
+    pt = counting();
+    CHECK(pt_logic::over_limit_min(pt, 3) == -1);
+    pt.alarm_only = true;
+    pt.remaining_ns = -(int64_t)(2 * MIN_NS);
+    CHECK(pt_logic::over_limit_min(pt, 3) == 2 && pt_logic::played_today_min(pt, 3) == 122);
+    pt.day_min[3] = 0;
+    CHECK(pt_logic::over_limit_min(pt, 3) == 2 && pt_logic::played_today_min(pt, 3) == 2);
+    pt.remaining_ns = -(int64_t)(MIN_NS / 2 - 1);   // under half a minute over: 0, still over
+    CHECK(pt_logic::over_limit_min(pt, 3) == 0);
+    pt.remaining_ns = INT64_MIN;                    // whatever it reads, at most a day
+    CHECK(pt_logic::over_limit_min(pt, 3) == 1440);
+    pt.remaining_ns = -(int64_t)MIN_NS;
+    pt.day_min[3] = PT_DAY_NOLIMIT;
+    CHECK(pt_logic::over_limit_min(pt, 3) == -1);
+    pt.day_min[3] = 0;
+    pt.remaining_valid = false;
+    CHECK(pt_logic::over_limit_min(pt, 3) == -1);
+    pt.remaining_valid = true;
+    pt.enabled = false;
+    CHECK(pt_logic::over_limit_min(pt, 3) == -1);
 }
 
 static void test_suspend_warning()

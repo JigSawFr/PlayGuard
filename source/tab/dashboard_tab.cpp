@@ -173,6 +173,7 @@ void DashboardTab::refresh()
         today_limit->setDetailText(na);
     } else {
         const uint16_t limit = pt.day_min[today];
+        const int over = pt_logic::over_limit_min(pt, today);
         today_limit->setDetailText(ui::fmt_minutes(limit));
         if (limit != PT_DAY_NOLIMIT && unlocked) {
             show_gauge = false;   // the countdown may be off while unlocked (docs: open)
@@ -184,8 +185,13 @@ void DashboardTab::refresh()
         } else if (pt.restricted_valid && pt.restricted) {
             gauge->setFraction(1);
             gauge_text->setText("playguard/dashboard/gauge_reached"_i18n);
+        } else if (over >= 0) {
+            // Past the limit, the console only warning: the time over it.
+            gauge->setFraction(1);
+            gauge_text->setText(brls::getStr("playguard/dashboard/gauge_over", ui::fmt_played((uint16_t)(limit + over)),
+                                             ui::fmt_minutes(limit), ui::fmt_played((uint16_t)over)));
         } else if (pt.remaining_valid && pt.remaining_ns > 0 && limit > 0) {
-            uint64_t left = pt.remaining_ns / 60000000000ULL;
+            uint64_t left = (uint64_t)pt.remaining_ns / 60000000000ULL;
             uint16_t used = left >= limit ? 0 : (uint16_t)(limit - left);
             gauge->setFraction((float)used / (float)limit);
             gauge_text->setText(brls::getStr("playguard/dashboard/gauge_known",
@@ -211,8 +217,11 @@ void DashboardTab::refresh()
         linked(remaining, "playguard/common/no_limit"_i18n);
     else if (pt.restricted_valid && pt.restricted)   // as the gauge says: nothing left
         linked(remaining, ui::fmt_played(0));
+    else if (pt_logic::over_limit_min(pt, today) >= 0)
+        linked(remaining, brls::getStr("playguard/dashboard/remaining_over",
+                                       ui::fmt_played((uint16_t)pt_logic::over_limit_min(pt, today))));
     else if (pt.remaining_valid && pt.remaining_ns > 0)
-        linked(remaining, ui::fmt_duration_ns(pt.remaining_ns));
+        linked(remaining, ui::fmt_duration_ns((uint64_t)pt.remaining_ns));
     else if (log_ok)
         linked(remaining, brls::getStr("playguard/dashboard/remaining_log",
                                        ui::fmt_played((uint16_t)(pt.day_min[today] > log_played_min ? pt.day_min[today] - log_played_min : 0))));

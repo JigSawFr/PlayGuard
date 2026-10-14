@@ -78,8 +78,8 @@ Public reference: [switchbrew, Parental Control services](https://switchbrew.org
 | Command | What | Notes |
 |---|---|---|
 | 1453 `IsPlayTimerEnabled` | timer on | `true` even with an all-zero block and no PIN; `false` while temporarily unlocked (observed, 22.0.0) |
-| 1455 `IsRestrictedByPlayTimer` | the timer is blocking play now | |
-| 1454 `GetPlayTimerRemainingTime` | TimeSpan, **nanoseconds** | today's limit minus the time spent; 0 when today has no limit |
+| 1455 `IsRestrictedByPlayTimer` | the timer is blocking play now | stays `false` past the limit while the console only warns (`ALARM`, observed, 2026-10-14) |
+| 1454 `GetPlayTimerRemainingTime` | TimeSpan, **nanoseconds**, signed | today's limit minus the time spent; 0 when today has no limit; **below 0** past the limit while the console only warns: minus the time over it (observed, 2026-10-14: a 0-minute day played 2 min) |
 | 1952 `GetPlayTimerSpentTimeForTest` | TimeSpan, nanoseconds | time spent today, see below |
 | 1459 `GetPlayTimerRemainingTimeDisplayInfo` [20.0.0+] | 0x20 bytes | layout partly known, see below |
 | 1458 / 1953 alarm disabled (get / set for debug) | bool | while set, the "time's up" alarm does not show |
@@ -121,8 +121,8 @@ The header, from the 22.5.0 `pctl` sysmodule as reversed by
 [NX-Pctl-Manager](https://github.com/tailiang2008/NX-Pctl-Manager/blob/main/docs/pctl-reverse-engineering.md)
 (its own settings file's field table, `enabled`, `mode`, `weekUsed`, then
 the rules, and the server-sync serializer's names for bytes 1 and 2). It
-matches every block PlayGuard has seen (`01 01 01 00`), but PlayGuard has not
-yet seen a console in `DAILY` or `ALARM`:
+matches every block PlayGuard has seen (`01 01 01 00`); byte `01` at `0`
+(`ALARM`) was verified on a console (2026-10-14), `DAILY` not yet:
 
 | Byte | Observed | Meaning |
 |---|---|---|
@@ -292,8 +292,10 @@ controls* (the second asks for the PIN).
 - So PlayGuard says what the console does at the limit from that byte:
   "Time's up" always, then the game suspended, or a warning only once set to
   "alarm only" (in the phone app, or *When the time is up*; a limit below the
-  time already played then warns of no suspension). The `ALARM` value has not
-  been seen on a console yet. Suspending can lose unsaved
+  time already played then warns of no suspension). `ALARM` verified on a
+  console (2026-10-14): at the limit the console warned and the game went
+  on; 1455 stayed `false` and 1454 went below 0, by the time over the limit,
+  which the Overview and the Play timer tab show. Suspending can lose unsaved
   progress (Nintendo: [time limit settings](https://www.nintendo.com/sg/parents/switch/time/settings.html)),
   so its confirmations say so, and *No more play today* can wait 5 minutes.
 - The PIN prompt behind *Disable parental controls* is the system's: a child
@@ -434,8 +436,8 @@ From the same 20:10 report:
 ## Still open
 
 - 1406 `GetSettingsLastUpdated` fails with `0x0001188E`: why?
-- A console in `DAILY` or `ALARM` mode, to confirm the header on hardware
-  (it comes from the sysmodule, not from a block PlayGuard has seen).
+- A console in `DAILY` mode, to confirm byte `02` on hardware (it comes from
+  the sysmodule, not from a block PlayGuard has seen).
 - The bedtime bytes with a bedtime actually on.
 - 1459's first byte; 1460's layout (23.0.0+).
 - When the time spent resets on its own; how long it stays frozen after the

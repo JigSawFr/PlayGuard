@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "action/pt_logic.hpp"
 #include "action/timer_health.hpp"
 #include "ui/ui.hpp"
 #include "util/profiles.hpp"
@@ -39,11 +40,17 @@ std::string PtStateHeader::configured_text(const PtState& pt)
 void PtStateHeader::show(const PtState& pt)
 {
     std::vector<std::string> parts;
-    const bool reached = pt.fw_supported && pt.restricted_valid && pt.restricted;
+    // Reached: the console restricts (suspending), or the time left went
+    // below 0 (a warning only: the game goes on, the time over it counted).
+    const int over = pt.fw_supported ? pt_logic::over_limit_min(pt, ui::today_weekday()) : -1;
+    const bool reached = pt.fw_supported && ((pt.restricted_valid && pt.restricted) || over >= 0);
     if (pt.fw_supported && pt.enabled_valid) {
         parts.push_back(pt.enabled ? "playguard/play_timer/state/active"_i18n : "playguard/play_timer/state/inactive"_i18n);
         if (pt.enabled && !reached && pt.remaining_valid && pt.remaining_ns > 0)
-            parts.push_back(brls::getStr("playguard/play_timer/state/remaining_short", ui::fmt_duration_ns(pt.remaining_ns)));
+            parts.push_back(brls::getStr("playguard/play_timer/state/remaining_short",
+                                         ui::fmt_duration_ns((uint64_t)pt.remaining_ns)));
+        if (over >= 0)
+            parts.push_back(brls::getStr("playguard/play_timer/state/over_short", ui::fmt_played((uint16_t)over)));
     }
     parts.push_back(configured_text(pt));
     if (pt.fw_supported && pt.temporary_unlocked_valid && pt.temporary_unlocked)

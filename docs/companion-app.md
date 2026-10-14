@@ -42,9 +42,9 @@ of the gaps below stay the same.
 - On the console it is byte `01` of the play-timer block's header (`0`
   `ALARM`, `1` `FORCED_TERMINATION`), as reversed from the 22.5.0 `pctl`
   sysmodule (see [the header](parental-controls.md#the-header-is-the-modes-plus-a-daily-rule)).
-- **Still useful:** a block from a console set to "alarm only" in the app
-  (*Security & app › Before unlinking: help decode…* while linked), to see
-  the `ALARM` value on hardware.
+- Verified on a console (2026-10-14): set to a warning only by PlayGuard, the
+  console warned at the limit and the game went on, the time over it
+  counted (1454 below 0).
 
 ### 2. Bedtime and start time per day of the week
 

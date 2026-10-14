@@ -48,6 +48,8 @@ static void test_should_count()
     pt = counting();
     pt.remaining_ns = 0;
     CHECK(!should_count(pt, 3, false));
+    pt.remaining_ns = -10 * (int64_t)S_NS;   // past the limit, a warning only: counting up
+    CHECK(!should_count(pt, 3, false));
     pt.remaining_valid = false;
     pt.remaining_ns = 10 * S_NS;
     CHECK(!should_count(pt, 3, false));
