@@ -4,11 +4,33 @@ Firmwares, Atmosphère et lanceurs pris en charge, emuMMC et sysMMC, et la compa
 
 ## Versions prises en charge
 
-- **Firmware** — **21.0.0 → 22.5.0**. La structure de la limite de temps de jeu (0x44 octets) existe depuis 21.0.0 ; en dessous, tous les onglets fonctionnent sauf le temps de jeu. 23.x passe par l'écran [firmware plus récent](#firmware-plus-recent) tant qu'il n'a pas été testé sur console.
-- **Atmosphère** — **1.11.x → 1.12.0**. 1.12.0 ajoute 23.0.0. L'application affiche la version détectée.
-- **Lanceurs** — hbmenu, **sphaira**, **Homebrew App Store**. Le lancement par-dessus un jeu (title override) est recommandé. L'application indique si elle tourne en application ou en applet (album). Par-dessus un jeu, la console compte le temps passé dans PlayGuard comme celui de ce jeu. Dans l'activité, il va au compte choisi au lancement : ouvrez-le avec le compte d'un parent, pas celui d'un enfant. Le minuteur est celui de la console, le même pour tous les comptes : il compte ce temps quel que soit le compte (sauf minuteur désactivé).
-- **Testé sur console** — 22.0.0, 22.1.0, 22.5.0. 23.0.1 / 1.12.0 : la table des commandes ([switchbrew](https://switchbrew.org/wiki/Parental_Control_services)) a les mêmes commandes, mais rien n'a encore tourné sur console, donc PlayGuard demande d'abord (lecture seule tant que vous n'avez pas choisi) — vos retours sont bienvenus.
-- **Nintendo Switch 2** — Non prise en charge. Atmosphère n'existe pas pour elle.
+**Testé sur console** — PlayGuard a tourné sur :
+
+- **Firmware 22.0.0, 22.1.0, 22.5.0** — Atmosphère 1.11.x
+- hbmenu, sphaira et le Homebrew App Store
+
+**Devrait fonctionner, non testé** — rien dans PlayGuard ne l'empêche, mais personne ne l'a encore signalé ([retours bienvenus](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)). Chaque firmware demande un Atmosphère qui le démarre : celui indiqué ou un plus récent.
+
+- **Firmware 23.0.x** — Atmosphère 1.12.0. Mêmes commandes dans la table de [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) ; s'ouvre par l'écran [firmware plus récent](#firmware-plus-recent).
+- **Firmware 21.0.0 → 21.2.0** — Atmosphère 1.10.x. Toutes les fonctions.
+
+**Avant 21.0.0, tout sauf le temps de jeu** — restrictions, code PIN, déverrouillage temporaire, activité, horloge réseau, application mobile et historique fonctionnent. Le bloc de réglages du minuteur (0x44 octets) n'a cette structure que depuis 21.0.0, donc PlayGuard désactive ce qui en dépend : les limites quotidiennes, l'alarme du coucher, le temps en plus et le verrou de console.
+
+- **Firmware 20.0.0 → 20.5.0** — Atmosphère 1.9.x
+- **Firmware 19.0.x** — Atmosphère 1.8.0
+- **Firmware 18.0.0 → 18.1.0** — Atmosphère 1.7.x
+- **Firmware 17.0.x** — Atmosphère 1.6.x
+- **Firmware 16.0.0 → 16.1.0** — Atmosphère 1.5.x
+- **Firmware 15.0.x** — Atmosphère 1.4.x
+- **Firmware 14.x** — Atmosphère 1.3.x
+- **Firmware 13.x** — Atmosphère 1.1.0 → 1.2.6
+- **Firmware 12.x et antérieur** — Atmosphère 1.0.0 et antérieur
+
+PlayGuard vérifie qu'Atmosphère tourne, pas sa version : c'est le firmware qu'il démarre qui compte. *Outils* affiche les deux.
+
+**Lanceurs.** Le lancement par-dessus un jeu (title override) est recommandé. L'application indique si elle tourne en application ou en applet (album). Par-dessus un jeu, la console compte le temps passé dans PlayGuard comme celui de ce jeu. Dans l'activité, il va au compte choisi au lancement : ouvrez-le avec le compte d'un parent, pas celui d'un enfant. Le minuteur est celui de la console, le même pour tous les comptes : il compte ce temps quel que soit le compte (sauf minuteur désactivé).
+
+**Nintendo Switch 2.** Non prise en charge : Atmosphère n'existe pas pour elle.
 
 <a id="firmware-plus-recent"></a>**Firmware plus récent ?** Au-delà du plus récent firmware testé sur console, PlayGuard s'ouvre **en lecture seule** et vérifie si une version plus récente le prend en charge. Si c'est le cas, il propose de mettre à jour (dans PlayGuard même, avec sphaira ou le Homebrew App Store). Sinon, vous choisissez : lecture seule, lecture seule avec les outils développeur (pour diagnostiquer le firmware), ou toutes les fonctions à vos risques. Le choix peut être mémorisé pour ce firmware et cette version de l'application ; *Outils › Compatibilité* rouvre l'écran.
 
