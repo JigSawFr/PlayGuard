@@ -1439,6 +1439,7 @@
         "title": "Optional modules",
         "open": "Optional modules",
         "section": "Optional modules",
+        "overview": "Panoramica",
         "count": "{} installed",
         "intro": "Two small background programs (sysmodules) PlayGuard can put on the SD card. Neither is needed, and each does one thing. PlayGuard carries the version made with it and installs or updates it from here, without a computer. Every change asks for the PIN when Security asks for it before a change.",
         "status": "State",
@@ -1487,6 +1488,7 @@
         },
         "rescue": {
             "title": "Recovery module (forgotten PIN)",
+            "tab": "Recovery module",
             "about": "If a 0-minute limit keeps everything from starting and the PIN is forgotten, an empty file named RESCUE in config/playguard on the SD card makes this module unlock the console at the next boot. It does nothing else, and stops at once.",
             "install_body": "Install the recovery module (version {})? It runs at each boot and acts only when a RESCUE file is on the SD card.",
             "update_body": "Update the recovery module to version {}?",

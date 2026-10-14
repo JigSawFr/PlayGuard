@@ -90,7 +90,8 @@ one never answers, the old one back after 10 s and running again
 The "modules" scenario carries a made-up recovery module
 (PLAYGUARD_SIM_BUNDLED): from Security › Locked out?, it must be installed on
 the simulated SD card (exefs.nsp, boot2.flag, toolbox.json, version.txt), its
-start at boot turned off, then removed, each change in the history.
+start at boot turned off, then removed, each change in the history; then
+the screen's Overview tab, from which Ⓐ opens a module's tab.
 
 Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|update|library|outside|loading|alarm|sysnotes|
        sync|sync-311|agent|agent-update|agent-rollback|modules]   (needs DISPLAY, xdotool, ImageMagick)
@@ -1231,7 +1232,8 @@ if MODULES:
     key("Right")
     key("Down", 30, hold=0.05)   # Locked out? › Recovery module, the last cell
     shot("01_security_end")
-    key("Return")
+    key("Return")                # opens on the recovery module's tab, the sidebar focused
+    key("Right")                 # State
     shot("02_modules")           # not installed; Install has the focus next
     key("Down")                  # Install
     key("Return")
@@ -1260,6 +1262,13 @@ if MODULES:
     shot("06_removed")
     if os.path.exists(RESCUE_DIR):
         fail("the module's folder is still there after Remove")
+    key("Escape")                # back to the sidebar
+    key("Up")                    # Overview
+    key("Right")                 # its first module
+    shot("07_overview")          # the intro, each module's state
+    key("Return")                # Ⓐ opens that module's tab
+    time.sleep(0.5)
+    shot("08_rescue_tab")
 
     def recorded():
         try:

@@ -112,7 +112,7 @@ SecurityTab::SecurityTab()
     });
     rescue_about->setSingleLine(false);
     rescue->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new ModulesActivity());
+        brls::Application::pushActivity(new ModulesActivity(ModulesActivity::Tab::Rescue));
         return true;
     });
     del->registerClickAction([this](brls::View*) {

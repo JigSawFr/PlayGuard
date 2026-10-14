@@ -2,50 +2,40 @@
 // which it carries in its romfs and installs on the SD card
 // (util/modules.hpp): the recovery module (acts once at boot when a RESCUE
 // file asks it to) and the remote-link agent (keeps the link up while
-// PlayGuard is closed). For each: its state, Install / Update, At boot,
-// Start / Stop now (the agent), Remove. Every change asks for the PIN as a
-// console change does: the recovery module can unlock the console.
+// PlayGuard is closed). A sidebar, as on the main screen: an overview (what
+// they are, each one's state; Ⓐ opens its tab), then a tab per module with
+// its state, Install / Update, At boot, Start / Stop now (the agent), Remove.
+// Every change asks for the PIN as a console change does: the recovery
+// module can unlock the console.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
 #include <borealis.hpp>
-#include <memory>
 
 #include "util/modules.hpp"
 
 class ModulesActivity : public brls::Activity
 {
   public:
+    // The tab opened first: the overview, or a module's.
+    enum class Tab { Overview, Rescue, Agent };
+
+    explicit ModulesActivity(Tab start = Tab::Overview);
+
     CONTENT_FROM_XML_RES("activity/modules.xml");
 
-    ~ModulesActivity() override;
     void onContentAvailable() override;
 
     // Where PlayGuard's copies are (the romfs; PLAYGUARD_SIM_BUNDLED on the
     // desktop build).
     static std::string bundle_dir();
     // "Installed", "Update available" … short enough to share one line with
-    // the title of a cell that opens this screen.
-    static std::string summary(modules::Id id);
+    // the title of a cell that opens this screen (and the overview's), and
+    // its colour when `color` is given.
+    static std::string summary(modules::Id id, NVGcolor* color = nullptr);
 
   private:
-    struct Row
-    {
-        modules::Id       id;
-        brls::DetailCell* status;
-        brls::DetailCell* action;
-        brls::BooleanCell* boot;
-        brls::DetailCell* run;      // nullptr: the module only acts at boot
-        brls::DetailCell* remove;
-    };
-    Row rows[2];
-    // False once the screen is closed: an agent update ends later.
-    std::shared_ptr<bool> alive = std::make_shared<bool>(true);
+    Tab start;
 
-    void bind(Row& row);
-    void refresh();
-    void install(const Row& row);
-    void uninstall(const Row& row);
-
-    BRLS_BIND(brls::Label, intro, "md_intro");
+    BRLS_BIND(brls::TabFrame, tabs, "md_tabs");
 };

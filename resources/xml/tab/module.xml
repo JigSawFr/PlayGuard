@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Optional modules › one module: what it does, its state, Install / Update,
+     At boot, Start / Stop now (the agent only), Remove. The title and the
+     text are the module's, set by source/activity/modules_activity.cpp. -->
+
+<brls:Box
+    width="auto"
+    height="auto">
+
+    <ScrollView
+        width="auto"
+        height="auto"
+        grow="1.0">
+
+        <brls:Box
+            width="auto"
+            height="auto"
+            axis="column"
+            alignItems="stretch"
+            paddingLeft="@style/brls/tab_frame/content_padding_sides"
+            paddingRight="@style/brls/tab_frame/content_padding_sides"
+            paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
+            paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
+
+            <brls:Header id="md_header" title=" " marginBottom="8"/>
+            <brls:Label id="md_about" text=" " fontSize="20" marginBottom="10" textColor="@theme/brand/note"/>
+            <brls:DetailCell id="md_status" title="@i18n/playguard/modules/status"/>
+            <brls:DetailCell id="md_action" title="@i18n/playguard/modules/install"/>
+            <brls:BooleanCell id="md_boot"/>
+            <brls:DetailCell id="md_run" title="@i18n/playguard/modules/start"/>
+            <brls:DetailCell id="md_remove" title="@i18n/playguard/modules/remove"/>
+
+        </brls:Box>
+
+    </ScrollView>
+
+</brls:Box>
