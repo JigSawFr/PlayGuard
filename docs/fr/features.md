@@ -409,7 +409,7 @@ Sur une console sans Internet, *Régler l'horloge réseau sur l'horloge de la co
 
 ### Modules facultatifs
 
-*Modules facultatifs ›*, un écran à part, le dernier de l'onglet : installer, mettre à jour, lancer au démarrage ou supprimer le module de secours et l'agent du lien à distance, depuis les copies que contient PlayGuard (sans ordinateur). Chaque modification demande le code PIN quand *Protéger PlayGuard par le code PIN* le prévoit.
+*Modules facultatifs ›*, un écran à part, le dernier de l'onglet : installer, mettre à jour, lancer au démarrage ou supprimer le module de secours et l'agent du lien à distance, chacun dans son onglet, depuis les copies que contient PlayGuard (sans ordinateur). Chaque modification demande le code PIN quand *Protéger PlayGuard par le code PIN* le prévoit.
 
 ## Historique — modifications et sauvegardes
 

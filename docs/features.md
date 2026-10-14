@@ -408,7 +408,7 @@ On a console without Internet, *Set the network clock to the console clock* appe
 
 ### Optional modules
 
-*Optional modules ›*, a screen of its own, last in the tab: install, update, start at boot or remove the recovery module and the remote link's agent, from the copies PlayGuard carries (no computer needed). Every change asks for the PIN when *Protect PlayGuard with the PIN* does.
+*Optional modules ›*, a screen of its own, last in the tab: install, update, start at boot or remove the recovery module and the remote link's agent, each in its own tab, from the copies PlayGuard carries (no computer needed). Every change asks for the PIN when *Protect PlayGuard with the PIN* does.
 
 ## History — changes and backups
 

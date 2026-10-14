@@ -3,11 +3,13 @@
 
 #include <cstdlib>
 #include <fmt/format.h>
+#include <memory>
 
 #include "action/agent_update.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/sync_flow.hpp"
+#include "tab/tab_base.hpp"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -38,63 +40,112 @@ void record(const modules::Module& m, const char* what)
 {
     history_flow::record_event("module", "", brls::getStr(std::string("playguard/modules/done/") + what, m.title));
 }
-}   // namespace
 
-ModulesActivity::~ModulesActivity()
-{
-    *alive = false;
-}
-
-std::string ModulesActivity::bundle_dir()
-{
-#ifndef __SWITCH__
-    if (const char* sim = std::getenv("PLAYGUARD_SIM_BUNDLED")) return sim;
-#endif
-    return BRLS_ASSET("sysmodules");
-}
-
-std::string ModulesActivity::summary(modules::Id id)
+// The module's state: in full (its tab), or short enough to share one line
+// with the title of a cell that opens this screen; its colour in `color`.
+std::string state_text(modules::Id id, bool brief, NVGcolor* color)
 {
     const modules::Module& m = modules::get(id);
     const modules::State s = modules::state(paths::sd_root(), m);
-    if (!s.installed) return "playguard/modules/state/not_installed"_i18n;
-    if (modules::offer(s, modules::bundled(bundle_dir(), m)) == modules::Offer::Update)
-        return "playguard/modules/short/update"_i18n;
-    return "playguard/modules/short/installed"_i18n;
+    const modules::Bundle b = modules::bundled(ModulesActivity::bundle_dir(), m);
+    std::string text;
+    NVGcolor c = ui::color_neutral();
+    if (!s.installed) {
+        text = b.present ? "playguard/modules/state/not_installed"_i18n : "playguard/modules/state/not_bundled"_i18n;
+    } else if (modules::offer(s, b) == modules::Offer::Update) {
+        text = brief ? "playguard/modules/short/update"_i18n : "playguard/modules/state/update"_i18n;
+        c = ui::color_warn();
+    } else {
+        text = brief ? "playguard/modules/short/installed"_i18n : "playguard/modules/state/installed"_i18n;
+        c = ui::color_ok();
+    }
+    if (!brief && m.resident && s.installed)
+        text += " · " + (module_running(m.tid, nullptr) ? "playguard/modules/state/running"_i18n
+                                                        : "playguard/modules/state/stopped"_i18n);
+    if (color) *color = c;
+    return text;
 }
 
-void ModulesActivity::onResume()
+// One module's tab: what it does, then its cells. Tabs are deleted when
+// another one is opened: `alive` tells an agent update that ends later.
+class ModuleTab : public TabBase
 {
-    ui::keep_focus(this);   // after a dialog whose opener went (ui.hpp)
-}
+  public:
+    explicit ModuleTab(modules::Id id);
+    ~ModuleTab() override { *alive = false; }
 
-void ModulesActivity::onContentAvailable()
+  protected:
+    void refresh() override;
+
+  private:
+    modules::Id id;
+    std::shared_ptr<bool> alive = std::make_shared<bool>(true);
+
+    void install();
+    void uninstall();
+
+    BRLS_BIND(brls::Header,      header, "md_header");
+    BRLS_BIND(brls::Label,       about,  "md_about");
+    BRLS_BIND(brls::DetailCell,  status, "md_status");
+    BRLS_BIND(brls::DetailCell,  action, "md_action");
+    BRLS_BIND(brls::BooleanCell, boot,   "md_boot");
+    BRLS_BIND(brls::DetailCell,  run,    "md_run");
+    BRLS_BIND(brls::DetailCell,  remove, "md_remove");
+};
+
+// The overview: what the modules are, and each one's state (Ⓐ opens its tab).
+class ModulesOverview : public TabBase
+{
+  public:
+    ModulesOverview();
+
+  protected:
+    void refresh() override;
+
+  private:
+    BRLS_BIND(brls::Label,      intro,  "md_intro");
+    BRLS_BIND(brls::DetailCell, rescue, "md_rescue");
+    BRLS_BIND(brls::DetailCell, agent,  "md_agent");
+};
+
+// Sidebar positions (the separator counts).
+constexpr int TAB_OVERVIEW = 0;
+constexpr int TAB_RESCUE   = 2;
+constexpr int TAB_AGENT    = 3;
+
+ModulesOverview::ModulesOverview() : TabBase("xml/tab/modules_overview.xml")
 {
     intro->setSingleLine(false);
-    intro->setText("playguard/modules/intro"_i18n);
-    const modules::Id ids[2] = { modules::Id::Rescue, modules::Id::Agent };
-    for (int i = 0; i < 2; i++) {
-        Row& row = rows[i];
-        row.id = ids[i];
-        const std::string p = std::string("md_") + modules::get(ids[i]).name + "_";
-        row.status = dynamic_cast<brls::DetailCell*>(this->getView(p + "status"));
-        row.action = dynamic_cast<brls::DetailCell*>(this->getView(p + "action"));
-        row.boot = dynamic_cast<brls::BooleanCell*>(this->getView(p + "boot"));
-        row.run = modules::get(ids[i]).resident ? dynamic_cast<brls::DetailCell*>(this->getView(p + "run")) : nullptr;
-        row.remove = dynamic_cast<brls::DetailCell*>(this->getView(p + "remove"));
-        if (auto* about = dynamic_cast<brls::Label*>(this->getView(p + "about"))) about->setSingleLine(false);
-        this->bind(row);
-    }
-    this->refresh();
+    rescue->registerClickAction([this](brls::View*) {
+        ui::go_to_tab(this, TAB_RESCUE);
+        return true;
+    });
+    agent->registerClickAction([this](brls::View*) {
+        ui::go_to_tab(this, TAB_AGENT);
+        return true;
+    });
 }
 
-void ModulesActivity::bind(Row& row)
+void ModulesOverview::refresh()
 {
-    const modules::Id id = row.id;
-    row.status->registerClickAction([id](brls::View*) {
+    NVGcolor color;
+    rescue->setDetailText(ModulesActivity::summary(modules::Id::Rescue, &color));
+    rescue->setDetailTextColor(color);
+    agent->setDetailText(ModulesActivity::summary(modules::Id::Agent, &color));
+    agent->setDetailTextColor(color);
+}
+
+ModuleTab::ModuleTab(modules::Id id) : TabBase("xml/tab/module.xml"), id(id)
+{
+    const modules::Module& m = modules::get(id);
+    header->setTitle(brls::getStr(key(m, "title")));
+    about->setSingleLine(false);
+    about->setText(brls::getStr(key(m, "about")));
+
+    status->registerClickAction([id](brls::View*) {
         const modules::Module& m = modules::get(id);
         const modules::State s = modules::state(paths::sd_root(), m);
-        const modules::Bundle b = modules::bundled(bundle_dir(), m);
+        const modules::Bundle b = modules::bundled(ModulesActivity::bundle_dir(), m);
         std::string text = brls::getStr(key(m, "title")) + "\n";
         text += "\n" + brls::getStr("playguard/modules/details/where", modules::dir(paths::sd_root(), m));
         if (s.installed)
@@ -106,13 +157,12 @@ void ModulesActivity::bind(Row& row)
         ui::info(text);
         return true;
     });
-    row.action->registerClickAction([this, id](brls::View*) {
-        for (const Row& r : rows)
-            if (r.id == id) this->install(r);
+    action->registerClickAction([this](brls::View*) {
+        this->install();
         return true;
     });
-    row.boot->init("playguard/modules/at_boot"_i18n, false, [this, id](bool on) {
-        const modules::Module& m = modules::get(id);
+    boot->init("playguard/modules/at_boot"_i18n, false, [this](bool on) {
+        const modules::Module& m = modules::get(this->id);
         std::string err;
         if (!allowed() || !modules::set_at_boot(paths::sd_root(), m, on, &err)) {
             if (!err.empty()) ui::error("playguard/modules/error"_i18n + " — " + err);
@@ -121,39 +171,37 @@ void ModulesActivity::bind(Row& row)
         }
         this->refresh();
     });
-    if (row.run) {
-        row.run->registerClickAction([this, id](brls::View*) {
+    run->registerClickAction([this](brls::View*) {
+        const modules::Module& m = modules::get(this->id);
+        const bool running = module_running(m.tid, nullptr);
+        if (!allowed()) return true;
+        std::shared_ptr<bool> alive = this->alive;
+        const modules::Id id = this->id;
+        const auto act = [this, alive, id, running]() {
             const modules::Module& m = modules::get(id);
-            const bool running = module_running(m.tid, nullptr);
-            if (!allowed()) return true;
-            std::shared_ptr<bool> alive = this->alive;
-            const auto act = [this, alive, id, running]() {
-                const modules::Module& m = modules::get(id);
-                const Result rc = running ? module_terminate(m.tid) : module_launch(m.tid);
-                ui::notify_result(rc, running ? "playguard/modules/stopped"_i18n : "playguard/modules/started"_i18n,
-                                  "playguard/modules/error"_i18n);
-                if (R_SUCCEEDED(rc)) record(m, running ? "stopped" : "started");
-                // The link follows: the agent's, or PlayGuard's own.
-                if (running || R_FAILED(rc)) sync_flow::reload();
-                else sync_flow::agent_started();
-                if (*alive) this->refresh();
-            };
-            if (running) sync_flow::agent_stopping(act);
-            else act();
-            return true;
-        });
-    }
-    row.remove->registerClickAction([this, id](brls::View*) {
-        for (const Row& r : rows)
-            if (r.id == id) this->uninstall(r);
+            const Result rc = running ? module_terminate(m.tid) : module_launch(m.tid);
+            ui::notify_result(rc, running ? "playguard/modules/stopped"_i18n : "playguard/modules/started"_i18n,
+                              "playguard/modules/error"_i18n);
+            if (R_SUCCEEDED(rc)) record(m, running ? "stopped" : "started");
+            // The link follows: the agent's, or PlayGuard's own.
+            if (running || R_FAILED(rc)) sync_flow::reload();
+            else sync_flow::agent_started();
+            if (*alive) this->refresh();
+        };
+        if (running) sync_flow::agent_stopping(act);
+        else act();
+        return true;
+    });
+    remove->registerClickAction([this](brls::View*) {
+        this->uninstall();
         return true;
     });
 }
 
-void ModulesActivity::install(const Row& row)
+void ModuleTab::install()
 {
-    const modules::Module& m = modules::get(row.id);
-    const modules::Bundle b = modules::bundled(bundle_dir(), m);
+    const modules::Module& m = modules::get(id);
+    const modules::Bundle b = modules::bundled(ModulesActivity::bundle_dir(), m);
     if (!b.present) {
         ui::info("playguard/modules/details/not_bundled"_i18n);
         return;
@@ -161,8 +209,9 @@ void ModulesActivity::install(const Row& row)
     const modules::State s = modules::state(paths::sd_root(), m);
     const bool update = s.installed;
     const std::string body = brls::getStr(key(m, update ? "update_body" : "install_body"), b.version);
-    const modules::Id id = row.id;
-    ui::confirm(body, update ? "playguard/modules/update"_i18n : "playguard/modules/install"_i18n, [this, id, b, update]() {
+    std::shared_ptr<bool> alive = this->alive;
+    const modules::Id id = this->id;
+    ui::confirm(body, update ? "playguard/modules/update"_i18n : "playguard/modules/install"_i18n, [this, alive, id, b, update]() {
         const modules::Module& m = modules::get(id);
         if (!allowed()) return;
         if (m.resident) {
@@ -173,8 +222,7 @@ void ModulesActivity::install(const Row& row)
                 return;
             }
             ui::notify(update ? "playguard/modules/agent/updating"_i18n : "playguard/modules/agent/installing"_i18n);
-            std::shared_ptr<bool> alive = this->alive;
-            agent_update::run(bundle_dir(), [this, alive](const agent_update::Outcome& o) {
+            agent_update::run(ModulesActivity::bundle_dir(), [this, alive](const agent_update::Outcome& o) {
                 agent_update::tell(o);
                 if (*alive) this->refresh();
             });
@@ -183,27 +231,27 @@ void ModulesActivity::install(const Row& row)
         // The recovery module only acts at boot: nothing to stop or start.
         const std::string sd = paths::sd_root();
         std::string err;
-        if (!modules::install(sd, m, b, false, &err)) {
+        const bool ok = modules::install(sd, m, b, false, &err);
+        if (!ok) {
             ui::error("playguard/modules/error"_i18n + " — " + err);
-            this->refresh();
-            return;
+        } else {
+            modules::confirm(sd, m);
+            record(m, update ? "updated" : "installed");
+            ui::notify(brls::getStr(key(m, update ? "updated" : "installed")));
         }
-        modules::confirm(sd, m);
-        record(m, update ? "updated" : "installed");
-        ui::notify(brls::getStr(key(m, update ? "updated" : "installed")));
-        this->refresh();
+        if (*alive) this->refresh();
     });
 }
 
-void ModulesActivity::uninstall(const Row& row)
+void ModuleTab::uninstall()
 {
-    const modules::Module& m = modules::get(row.id);
+    const modules::Module& m = modules::get(id);
     if (!modules::state(paths::sd_root(), m).installed) return;
-    const modules::Id id = row.id;
-    ui::confirm_danger(brls::getStr(key(m, "remove_body")), "playguard/modules/remove"_i18n, [this, id]() {
+    std::shared_ptr<bool> alive = this->alive;
+    const modules::Id id = this->id;
+    ui::confirm_danger(brls::getStr(key(m, "remove_body")), "playguard/modules/remove"_i18n, [this, alive, id]() {
         const modules::Module& m = modules::get(id);
         if (!allowed()) return;
-        std::shared_ptr<bool> alive = this->alive;
         const bool running = m.resident && module_running(m.tid, nullptr);
         const auto remove = [this, alive, id, running]() {
             const modules::Module& m = modules::get(id);
@@ -225,42 +273,64 @@ void ModulesActivity::uninstall(const Row& row)
     });
 }
 
-void ModulesActivity::refresh()
+void ModuleTab::refresh()
 {
-    const std::string sd = paths::sd_root();
-    for (const Row& row : rows) {
-        const modules::Module& m = modules::get(row.id);
-        const modules::State s = modules::state(sd, m);
-        const modules::Bundle b = modules::bundled(bundle_dir(), m);
-        const modules::Offer offer = modules::offer(s, b);
-        bool running = false;
-        if (m.resident && s.installed) running = module_running(m.tid, nullptr);
+    const modules::Module& m = modules::get(id);
+    const modules::State s = modules::state(paths::sd_root(), m);
+    const modules::Bundle b = modules::bundled(ModulesActivity::bundle_dir(), m);
+    const modules::Offer offer = modules::offer(s, b);
+    const bool running = m.resident && s.installed && module_running(m.tid, nullptr);
 
-        std::string status;
-        NVGcolor color = ui::color_neutral();
-        if (!s.installed) {
-            status = b.present ? "playguard/modules/state/not_installed"_i18n : "playguard/modules/state/not_bundled"_i18n;
-        } else if (offer == modules::Offer::Update) {
-            status = "playguard/modules/state/update"_i18n;
-            color = ui::color_warn();
-        } else {
-            status = "playguard/modules/state/installed"_i18n;
-            color = ui::color_ok();
-        }
-        if (m.resident && s.installed)
-            status += " · " + (running ? "playguard/modules/state/running"_i18n : "playguard/modules/state/stopped"_i18n);
-        row.status->setDetailText(status);
-        row.status->setDetailTextColor(color);
+    NVGcolor color;
+    status->setDetailText(state_text(id, false, &color));
+    status->setDetailTextColor(color);
 
-        row.action->setText(offer == modules::Offer::Update ? "playguard/modules/update"_i18n : "playguard/modules/install"_i18n);
-        row.action->setDetailText(b.present ? b.version : "");
-        ui::set_visible(row.action, offer != modules::Offer::None);
-        row.boot->setOn(s.at_boot, false);
-        ui::set_visible(row.boot, s.installed);
-        if (row.run) {
-            row.run->setText(running ? "playguard/modules/stop"_i18n : "playguard/modules/start"_i18n);
-            ui::set_visible(row.run, s.installed);
-        }
-        ui::set_visible(row.remove, s.installed);
+    action->setText(offer == modules::Offer::Update ? "playguard/modules/update"_i18n : "playguard/modules/install"_i18n);
+    action->setDetailText(b.present ? b.version : "");
+    ui::set_visible(action, offer != modules::Offer::None);
+    boot->setOn(s.at_boot, false);
+    ui::set_visible(boot, s.installed);
+    // The recovery module only acts at boot: no Start / Stop.
+    run->setText(running ? "playguard/modules/stop"_i18n : "playguard/modules/start"_i18n);
+    ui::set_visible(run, m.resident && s.installed);
+    ui::set_visible(remove, s.installed);
+}
+}   // namespace
+
+ModulesActivity::ModulesActivity(Tab start) : start(start)
+{
+}
+
+std::string ModulesActivity::bundle_dir()
+{
+#ifndef __SWITCH__
+    if (const char* sim = std::getenv("PLAYGUARD_SIM_BUNDLED")) return sim;
+#endif
+    return BRLS_ASSET("sysmodules");
+}
+
+std::string ModulesActivity::summary(modules::Id id, NVGcolor* color)
+{
+    return state_text(id, true, color);
+}
+
+void ModulesActivity::onResume()
+{
+    ui::keep_focus(this);   // after a dialog whose opener went (ui.hpp)
+}
+
+void ModulesActivity::onContentAvailable()
+{
+    tabs->addTab("playguard/modules/overview"_i18n, []() { return new ModulesOverview(); });
+    tabs->addSeparator();
+    tabs->addTab("playguard/modules/rescue/tab"_i18n, []() { return new ModuleTab(modules::Id::Rescue); });
+    tabs->addTab("playguard/modules/agent/title"_i18n, []() { return new ModuleTab(modules::Id::Agent); });
+
+    if (start != Tab::Overview) {
+        const int position = start == Tab::Rescue ? TAB_RESCUE : TAB_AGENT;
+        brls::sync([this, position]() {
+            auto stack = brls::Application::getActivitiesStack();
+            if (!stack.empty() && stack.back() == this) tabs->focusTab(position);
+        });
     }
 }

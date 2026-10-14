@@ -1562,7 +1562,8 @@
         "title": "Modules facultatifs",
         "open": "Modules facultatifs",
         "section": "Modules facultatifs",
-        "count": "{} installé(s)",
+        "overview": "Vue d'ensemble",
+        "count": "{} installés",
         "count_one": "1 installé",
         "intro": "Deux petits programmes en arrière-plan (sysmodules) que PlayGuard peut installer sur la carte SD. Aucun n'est nécessaire, et chacun fait une seule chose. PlayGuard contient la version faite avec lui et l'installe ou la met à jour d'ici, sans ordinateur. Chaque changement demande le code PIN quand Code PIN › Protéger PlayGuard par le code PIN le demande avant un changement.",
         "status": "État",
@@ -1611,6 +1612,7 @@
         },
         "rescue": {
             "title": "Module de secours (code PIN oublié)",
+            "tab": "Module de secours",
             "about": "Si une limite de 0 minute empêche tout de démarrer et que le code PIN est oublié, un fichier vide nommé RESCUE dans config/playguard sur la carte SD fait déverrouiller la console par ce module au démarrage suivant. Il ne fait rien d'autre, et s'arrête aussitôt.",
             "install_body": "Installer le module de secours (version {}) ? Il se lance à chaque démarrage et n'agit que si un fichier RESCUE est sur la carte SD.",
             "update_body": "Mettre à jour le module de secours en version {} ?",
