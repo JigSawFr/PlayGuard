@@ -867,6 +867,96 @@ static void test_bedtime(void)
     CHECK(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_FW_UNSUPPORTED && model.ipc_calls == 0);
 }
 
+/* timerMode DAILY (byte 2 = 0): the console applies the daily rule (bytes
+ * 04..0B) every day and ignores the seven others. Read through it; a write
+ * that changes the block moves it to EACH_DAY_OF_THE_WEEK first, each day
+ * starting from the daily rule, restrictionMode kept. */
+static void daily_block(u16 header0, u16 rule2, u16 rule3, u16 rule4, u16 rule5)
+{
+    reset();   /* the seven days keep the observed limits: 30 * n minutes */
+    model.pt_block[0] = header0;
+    model.pt_block[1] = 0;   /* timerMode DAILY */
+    model.pt_block[2] = rule2; model.pt_block[3] = rule3;
+    model.pt_block[4] = rule4; model.pt_block[5] = rule5;
+}
+
+static void test_daily_mode(void)
+{
+    u16 expect[34];
+    PtState st;
+
+    /* The observed block reads as each day of the week, suspending. */
+    reset();
+    CHECK(!pt_daily(model.pt_block) && pt_suspends(model.pt_block));
+
+    /* 90 minutes every day, suspending. */
+    daily_block(0x0101, 0, 0x0600, 0x0100, 90);
+    CHECK(pt_daily(model.pt_block) && pt_suspends(model.pt_block) && pt_plausible(model.pt_block));
+    memcpy(expect, model.pt_block, sizeof(expect));
+    pctl_play_timer_query(&st);
+    CHECK(st.valid);
+    for (int n = 0; n < 7; n++) CHECK(st.day_min[n] == 90 && !st.bed[n].on);
+
+    /* The same limits back: the same block, byte for byte, still DAILY. */
+    CHECK(pctl_play_timer_set_days(st.day_min) == 0 && model.refs == 0);
+    CHECK(memcmp(model.last_write, expect, sizeof(expect)) == 0);
+
+    /* Monday changes: each day of the week, every day from the daily rule. */
+    u16 days[7] = {90, 45, 90, 90, 90, 90, 90};
+    CHECK(pctl_play_timer_set_days(days) == 0 && model.refs == 0);
+    CHECK(!pt_daily(model.pt_block) && model.pt_block[0] == 0x0101 && model.pt_block[1] == 1);
+    for (int i = 2; i <= 5; i++) CHECK(model.pt_block[i] == expect[i]);   /* the daily rule kept */
+    CHECK(model.pt_block[6] == 0);
+    for (int n = 0; n < 7; n++) {
+        const u16 *g = &model.pt_block[7 + 4 * n];
+        CHECK(g[0] == 0x0600 && g[1] == 0x0100 && g[2] == days[n]);
+        if (n < 6) CHECK(g[3] == 0);
+    }
+    pctl_play_timer_query(&st);
+    for (int n = 0; n < 7; n++) CHECK(st.day_min[n] == days[n]);
+
+    /* An alarm only (restrictionMode 0) stays one. */
+    daily_block(0x0001, 0, 0x0600, 0x0100, 60);
+    CHECK(!pt_suspends(model.pt_block));
+    u16 sun[7] = {120, 60, 60, 60, 60, 60, 60};
+    CHECK(pctl_play_timer_set_days(sun) == 0);
+    CHECK(model.pt_block[0] == 0x0001 && model.pt_block[1] == 1 && model.pt_block[9] == 120);
+
+    /* A daily rule with nothing on: no limit any day, whatever the ignored
+     * days hold; a change makes them all-zero but the one set. */
+    daily_block(0x0101, 0, 0x0600, 0, 0);
+    pctl_play_timer_query(&st);
+    for (int n = 0; n < 7; n++) CHECK(st.day_min[n] == PT_DAY_NOLIMIT);
+    u16 mon[7] = {PT_DAY_NOLIMIT, 45, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT};
+    CHECK(pctl_play_timer_set_days(mon) == 0);
+    pctl_play_timer_query(&st);
+    for (int n = 0; n < 7; n++) CHECK(st.day_min[n] == mon[n]);
+    CHECK(model.pt_block[1] == 1 && model.pt_block[11] == 0x0600 && model.pt_block[12] == 0x0100);
+    for (int i = 6; i < 34; i++) if (i < 11 || i > 13) CHECK(model.pt_block[i] == 0);
+
+    /* The bedtime of the daily rule (21:00, allowed again at 07:00, 60
+     * minutes) is every day's. */
+    PtBedtime bt[7];
+    daily_block(0x0101, 0x1501, 0x0700, 0x0100, 60);
+    model.bed_live = true;
+    model.bed_day = 1;
+    CHECK(pt_plausible(model.pt_block));
+    pctl_play_timer_query(&st);
+    for (int n = 0; n < 7; n++)
+        CHECK(st.day_min[n] == 60 && st.bed[n].on && st.bed[n].hour == 21 && st.bed[n].end_hour == 7);
+    /* The same bedtimes: nothing written, still DAILY. */
+    memcpy(bt, st.bed, sizeof(bt));
+    CHECK(pctl_play_timer_set_bedtime(bt, 1) == 0 && model.writes == 0 && pt_daily(model.pt_block));
+    /* Sunday's turned off: each day of the week, the others' kept. */
+    bt[0] = bed(false, 0, 0, 7, 0);
+    CHECK(pctl_play_timer_set_bedtime(bt, 1) == 0 && model.writes == 1 && model.refs == 0);
+    CHECK(!pt_daily(model.pt_block));
+    pctl_play_timer_query(&st);
+    CHECK(!st.bed[0].on && st.bed[0].end_hour == 7);
+    for (int n = 0; n < 7; n++) CHECK(st.day_min[n] == 60);
+    for (int n = 1; n < 7; n++) CHECK(st.bed[n].on && st.bed[n].hour == 21 && st.bed[n].end_hour == 7);
+}
+
 static void test_unlock_and_relock(void)
 {
     reset();
@@ -1173,6 +1263,7 @@ int main(void)
     test_command_gate();
     test_block_preserved();
     test_block_not_understood();
+    test_daily_mode();
     test_bedtime();
     test_unlock_and_relock();
     test_lock_state();
