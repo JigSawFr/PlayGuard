@@ -6,15 +6,25 @@ Firmwares, Atmosphère et lanceurs pris en charge, emuMMC et sysMMC, et la compa
 
 **Testé sur console** — PlayGuard a tourné sur :
 
-- les firmwares 22.0.0, 22.1.0 et 22.5.0
-- Atmosphère 1.11.x
+- **Firmware 22.0.0, 22.1.0, 22.5.0** — Atmosphère 1.11.x
 - hbmenu, sphaira et le Homebrew App Store
 
-**Devrait fonctionner, non testé** — rien dans PlayGuard ne l'empêche, mais personne ne l'a encore signalé ([retours bienvenus](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)) :
+**Devrait fonctionner, non testé** — rien dans PlayGuard ne l'empêche, mais personne ne l'a encore signalé ([retours bienvenus](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)). Chaque firmware demande un Atmosphère qui le démarre ; dans une série, prenez la dernière version.
 
-- **Atmosphère 1.12.0 (firmware 23.0.x)** — mêmes commandes dans la table de [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) ; s'ouvre par l'écran [firmware plus récent](#firmware-plus-recent).
-- **Atmosphère 1.10.x (firmware 21.0.0 → 21.2.0)** — toutes les fonctions.
-- **Atmosphère 1.9.x et antérieur (firmware 20.5.0 et antérieur)** — tout sauf le temps de jeu : restrictions, code PIN, déverrouillage temporaire, activité, horloge réseau, application mobile, historique. Le bloc de réglages du minuteur (0x44 octets) n'a cette structure que depuis 21.0.0, donc PlayGuard désactive ce qui en dépend : les limites quotidiennes, l'alarme du coucher, le temps en plus et le verrou de console.
+- **Firmware 23.0.x** — Atmosphère 1.12.0. Mêmes commandes dans la table de [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) ; s'ouvre par l'écran [firmware plus récent](#firmware-plus-recent).
+- **Firmware 21.0.0 → 21.2.0** — Atmosphère 1.10.x. Toutes les fonctions.
+
+**Avant 21.0.0, tout sauf le temps de jeu** — restrictions, code PIN, déverrouillage temporaire, activité, horloge réseau, application mobile et historique fonctionnent. Le bloc de réglages du minuteur (0x44 octets) n'a cette structure que depuis 21.0.0, donc PlayGuard désactive ce qui en dépend : les limites quotidiennes, l'alarme du coucher, le temps en plus et le verrou de console.
+
+- **Firmware 20.0.0 → 20.5.0** — Atmosphère 1.9.x
+- **Firmware 19.0.x** — Atmosphère 1.8.0
+- **Firmware 18.0.0 → 18.1.0** — Atmosphère 1.7.x
+- **Firmware 17.0.x** — Atmosphère 1.6.x
+- **Firmware 16.0.0 → 16.1.0** — Atmosphère 1.5.x
+- **Firmware 15.0.x** — Atmosphère 1.4.x
+- **Firmware 14.x** — Atmosphère 1.3.x
+- **Firmware 13.x** — Atmosphère 1.1.0 → 1.2.6
+- **Firmware 12.x et antérieur** — Atmosphère 1.0.0 et antérieur
 
 PlayGuard vérifie qu'Atmosphère tourne, pas sa version : c'est le firmware qu'il démarre qui compte. *Outils* affiche les deux.
 
