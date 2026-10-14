@@ -4,10 +4,29 @@ Supported firmware, Atmosphère and launchers, emuMMC and sysMMC, and how PlayGu
 
 ## Supported versions
 
-- **Firmware** — **21.0.0 → 22.5.0**. The play-time limit layout (0x44 bytes) exists since 21.0.0; below that, every tab works except the play timer. 23.x goes through the [newer firmware](#newer-firmware) screen until it is tested on a console.
-- **Atmosphère** — **1.11.x → 1.12.0**. 1.12.0 adds 23.0.0 support. The app shows the detected version.
-- **Launchers** — hbmenu, **sphaira**, **Homebrew App Store**. Launching over a game (title override) is recommended. The app says whether it runs as an application or as an applet (album). Over a game, the console counts PlayGuard's time as that game's. In the activity, it goes to the user picked at launch: open it with a parent's user, not a child's. The play timer is the console's, the same for every user: it counts that time whoever opened PlayGuard (unless the timer is off).
-- **Tested on hardware** — 22.0.0, 22.1.0, 22.5.0. 23.0.1 / 1.12.0: the command table ([switchbrew](https://switchbrew.org/wiki/Parental_Control_services)) has the same commands, but nothing was run on a console yet, so PlayGuard asks first (read-only until you choose) — reports are welcome.
+Two levels: **tested** means run on a console with PlayGuard; **should work** means nothing in PlayGuard rules it out, but nobody has reported it yet ([reports welcome](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)).
+
+| | Tested on a console | Should work, untested |
+|---|---|---|
+| **Firmware** | 22.0.0, 22.1.0, 22.5.0 | 21.0.0 → 21.2.0: every feature. 23.0.x: same commands in the [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) table, opens through the [newer firmware](#newer-firmware) screen. Below 21.0.0: everything except the play timer. |
+| **Atmosphère** | 1.11.x (22.1.0 with 1.11.1) | Any version that boots your firmware. PlayGuard only checks that Atmosphère is running, not its version. |
+| **hekate** | Not needed | PlayGuard never talks to it. If you boot through hekate, it only has to support your firmware. |
+| **Launchers** | hbmenu, sphaira, Homebrew App Store | — |
+
+**Which Atmosphère and hekate for which firmware.** These are the minimum versions to boot that firmware, not PlayGuard's requirements:
+
+| Firmware | Atmosphère | hekate |
+|---|---|---|
+| 21.0.0 | 1.10.0 | 6.4.0 |
+| 21.1.0 | 1.10.1 | 6.4.0 |
+| 21.2.0 | 1.10.2 | 6.5.0 |
+| 22.0.0 / 22.1.0 | 1.11.0 / 1.11.1 | 6.5.2 |
+| 22.5.0 | 1.11.2 | 6.5.3 |
+| 23.0.x | 1.12.0 | 6.5.4 |
+
+- **Firmware below 21.0.0.** The play-time limit layout (0x44 bytes) exists since 21.0.0, so the play timer is turned off there; the other tabs work, but no one has tried them.
+- **Launchers.** Launching over a game (title override) is recommended. The app says whether it runs as an application or as an applet (album). Over a game, the console counts PlayGuard's time as that game's. In the activity, it goes to the user picked at launch: open it with a parent's user, not a child's. The play timer is the console's, the same for every user: it counts that time whoever opened PlayGuard (unless the timer is off).
+- **The app shows** the detected firmware and Atmosphère version in *Tools*.
 - **Nintendo Switch 2** — Not supported. There is no Atmosphère for it.
 
 <a id="newer-firmware"></a>**Newer firmware?** Above the newest firmware tested on a console, PlayGuard opens **read-only** and checks whether a newer release supports it. If one does, it offers to update (in PlayGuard itself, through sphaira or the Homebrew App Store). Otherwise you choose: read-only, read-only with the developer tools (to investigate the firmware), or every feature at your own risk. The choice can be remembered for that firmware and app version; *Tools › Compatibility* brings the screen back.
