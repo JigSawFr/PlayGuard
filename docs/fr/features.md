@@ -2,6 +2,16 @@
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Retour au [README](../../README.fr.md).
 
+| Temps de jeu | Limites par jour |
+|---|---|
+| ![Temps de jeu](../../images/screenshots/play_timer.png) | ![Limites par jour](../../images/screenshots/per_day.png) |
+| **Activité** | **Un jeu** |
+| ![Activité](../../images/screenshots/activity.png) | ![Un jeu](../../images/screenshots/activity_game.png) |
+| **Restrictions** | **Horloge réseau** |
+| ![Restrictions](../../images/screenshots/restrictions.png) | ![Horloge réseau](../../images/screenshots/clock.png) |
+| **Sécurité et appli** | **Préférences** |
+| ![Sécurité et appli](../../images/screenshots/security.png) | ![Préférences](../../images/screenshots/preferences.png) |
+
 ## Commandes
 
 ↑/↓ déplacer · Ⓐ valider · Ⓑ retour ou annuler (deux fois sur la barre latérale pour quitter) · Ⓧ actualiser · **+** enregistre les limites par jour.
@@ -70,7 +80,7 @@ L'application est organisée en onglets, comme les paramètres de la console ; c
 - **Définir ou changer le code PIN** (écran système), **afficher le code PIN** (après un avertissement et le code PIN lui-même, demandé à chaque fois ; noté dans l'historique, puis un nouveau code PIN est proposé), **déverrouiller temporairement**, **verrouiller maintenant**.
 - **Demander le code PIN** dans PlayGuard lui-même : *Jamais*, *Avant une modification* (par défaut : tout le monde peut regarder, seul le parent modifie ; redemandé après 5 min) ou *Pour ouvrir PlayGuard* (un écran verrouillé au lancement, et de nouveau quand PlayGuard revient après 5 min ou plus hors de l'écran). Vérifié dans la couche service, donc aucune modification n'y échappe ; reverrouiller ne le demande jamais. *Afficher le code PIN* le demande à chaque fois, dans tous les modes et même pendant les 5 minutes, et un `config.json` absent ou abîmé compte comme *Avant une modification*. Quitter alors que le contrôle parental est encore déverrouillé propose de le reverrouiller ; fermé depuis le menu HOME à la place, PlayGuard le reverrouille à son prochain lancement.
 - **Verrou de console :** un interrupteur qui met la limite de chaque jour à 0, donc un code PIN est nécessaire pour lancer un jeu — un verrou léger, sans classification par âge ni limite de communication. Il bloque le lancement des jeux, pas le menu HOME, et nécessite un code PIN. Les limites précédentes reviennent quand on le désactive. Tant qu'il est activé, *temps en plus* et *arrêter le jeu pour aujourd'hui* sont refusés, et des limites réglées autrement (un profil, une sauvegarde, l'historique…) le remplacent.
-- **Application mobile :** association de l'application Contrôle parental Nintendo Switch, dernière synchronisation, et **dissociation** (sinon sa prochaine synchronisation écrase les limites réglées ici : tant qu'elle est associée, chaque modification que PlayGuard fait confirmer le rappelle). Tant qu'elle est associée, *Avant de dissocier : aidez à décoder…* ouvre la comparaison du bloc (voir [Contribuer](../../README.fr.md#contribuer)).
+- **Application mobile :** association de l'application Contrôle parental Nintendo Switch, dernière synchronisation, et **dissociation** (sinon sa prochaine synchronisation écrase les limites réglées ici : tant qu'elle est associée, chaque modification que PlayGuard fait confirmer le rappelle). Tant qu'elle est associée, *Avant de dissocier : aidez à décoder…* ouvre la comparaison du bloc (voir [CONTRIBUTING.md](../../CONTRIBUTING.md#no-code-needed), en anglais).
 - **Supprimer tout le contrôle parental :** deux confirmations, irréversible ; une sauvegarde des réglages est d'abord enregistrée.
 
 ## Préférences
@@ -108,12 +118,10 @@ L'application est organisée en onglets, comme les paramètres de la console ; c
 
 Le minuteur est celui de la console : PlayGuard le lit, il ne décompte rien lui-même. Ce que l'on sait, et avec quelle certitude ([parental-controls.md](../parental-controls.md#time-spent-and-time-left), en anglais, donne les mesures) :
 
-| Situation | Décompté ? | Certitude |
-|---|---|---|
-| Un jeu en cours | Oui | mesuré (22.0.0) |
-| **Un jeu laissé ouvert sur le menu HOME** (suspendu en arrière-plan) | **Oui** : fermez-le, ou mettez la console en veille | rapporté par des parents ([Arqade](https://gaming.stackexchange.com/questions/398954/)) ; cohérent avec les mesures (la console décompte tant qu'une application est ouverte) |
-| Mode veille | Non | rapporté ([Arqade](https://gaming.stackexchange.com/questions/398954/)) ; pas mesuré par PlayGuard |
-| **PlayGuard ouvert par-dessus un jeu** (en application) | **Oui**, comme ce jeu | mesuré (22.0.0) : ouvrez-le avec un utilisateur parent, ou depuis l'album pour un coup d'œil |
-| PlayGuard ouvert depuis l'album (mode applet) | Non | déduit : ce n'est pas une application, et le temps hors des applications ne semblait pas décompté |
-| Pendant un déverrouillage temporaire du contrôle parental | Peut-être pas | pas mesuré : question ouverte |
-| Après un changement d'horloge | La journée repart de zéro ; après un retour en arrière, le décompte s'arrête jusqu'à ce que l'horloge dépasse l'ancienne heure | observé (22.0.0) ; la Vue d'ensemble indique quand la console ne décompte pas |
+- Un jeu en cours — Oui *(mesuré (22.0.0))*
+- **Un jeu laissé ouvert sur le menu HOME** (suspendu en arrière-plan) — **Oui** : fermez-le, ou mettez la console en veille *(rapporté par des parents ([Arqade](https://gaming.stackexchange.com/questions/398954/)) ; cohérent avec les mesures (la console décompte tant qu'une application est ouverte))*
+- Mode veille — Non *(rapporté ([Arqade](https://gaming.stackexchange.com/questions/398954/)) ; pas mesuré par PlayGuard)*
+- **PlayGuard ouvert par-dessus un jeu** (en application) — **Oui**, comme ce jeu *(mesuré (22.0.0) : ouvrez-le avec un utilisateur parent, ou depuis l'album pour un coup d'œil)*
+- PlayGuard ouvert depuis l'album (mode applet) — Non *(déduit : ce n'est pas une application, et le temps hors des applications ne semblait pas décompté)*
+- Pendant un déverrouillage temporaire du contrôle parental — Peut-être pas *(pas mesuré : question ouverte)*
+- Après un changement d'horloge — La journée repart de zéro ; après un retour en arrière, le décompte s'arrête jusqu'à ce que l'horloge dépasse l'ancienne heure *(observé (22.0.0) ; la Vue d'ensemble indique quand la console ne décompte pas)*
