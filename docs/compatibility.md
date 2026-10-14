@@ -9,7 +9,7 @@ Supported firmware, Atmosphère and launchers, emuMMC and sysMMC, and how PlayGu
 - **Firmware 22.0.0, 22.1.0, 22.5.0** — Atmosphère 1.11.x
 - hbmenu, sphaira and the Homebrew App Store
 
-**Should work, untested** — nothing in PlayGuard rules these out, but no one has reported them yet ([reports welcome](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)). Each firmware needs an Atmosphère that boots it; within a series, take its latest release.
+**Should work, untested** — nothing in PlayGuard rules these out, but no one has reported them yet ([reports welcome](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)). Each firmware needs an Atmosphère that boots it: the one listed or any newer one.
 
 - **Firmware 23.0.x** — Atmosphère 1.12.0. Same commands in the [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) table; opens through the [newer firmware](#newer-firmware) screen.
 - **Firmware 21.0.0 → 21.2.0** — Atmosphère 1.10.x. Every feature.
