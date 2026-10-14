@@ -39,9 +39,10 @@ the software. This is the setting parents care about most after the limit
 itself.
 
 - In the app's API it is `restrictionMode`: `ALARM` or `FORCED_TERMINATION`.
-- On the console it most likely sits in the play-timer block's header, bytes
-  `00..03`, but which byte and which value is **unknown**
-  (see [the header hypothesis](parental-controls.md#hypothesis-the-header-is-the-modes-plus-a-daily-rule)).
+- On the console it is byte `01` of the play-timer block's header (`0`
+  `ALARM`, `1` `FORCED_TERMINATION`), as reversed from the 22.5.0 `pctl`
+  sysmodule (see [the header](parental-controls.md#the-header-is-the-modes-plus-a-daily-rule));
+  the `ALARM` value has not been seen on a console yet.
 - **Needs:** a console still linked to the companion app. Save the play-timer
   block as a reference (*Security & app › Before unlinking: help decode…*
   while linked, or *Developer tools › Compare the play-timer block*),
