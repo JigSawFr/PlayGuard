@@ -35,6 +35,20 @@ static bool pt_any_bedtime(const u16 c[PT_U16_COUNT])
     return false;
 }
 
+bool pt_configured(const u16 c[PT_U16_COUNT])
+{
+    for (int n = 0; n < 7; n++)
+        if (pt_byte(c, pt_rule(c, n) + PT_LIMIT_ON)) return true;
+    return pt_any_bedtime(c);
+}
+
+bool pt_set_suspends(u16 c[PT_U16_COUNT], bool suspends)
+{
+    if (!pt_configured(c)) return false;
+    pt_set_byte(c, PT_MODE_RESTRICTION, suspends ? 1 : 0);
+    return true;
+}
+
 // The limit flag alone: the low half of [+1] is the bedtime's allowed-again
 // minute.
 static bool pt_has_limit(const u16 c[PT_U16_COUNT], int n)

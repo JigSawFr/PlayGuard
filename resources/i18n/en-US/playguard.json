@@ -237,7 +237,9 @@
             "inactive": "Timer off",
             "remaining_short": "{} left today",
             "unlocked_short": "temporarily unlocked, may not be counting",
-            "reached_alert": "Today's limit is reached: the console shows \"Time's up\". Whether it also suspends the game depends on a setting PlayGuard cannot read yet.",
+            "reached_alert": "Today's limit is reached: the console shows \"Time's up\".",
+            "reached_alert_suspend": "Today's limit is reached: the console shows \"Time's up\" and suspends the game.",
+            "reached_alert_alarm": "Today's limit is reached: the console shows \"Time's up\", a warning only (the game is not suspended).",
             "not_set": "No limit",
             "every_day": "{} every day",
             "today_per_day": "{} today (varies by day)",
@@ -262,6 +264,13 @@
         "profiles_section_saved": "Saved profiles",
         "profiles_section_new": "New profile",
         "profiles_hint": "A on a profile: apply it, edit its limits, rename or delete it.",
+        "time_up": "When the time is up",
+        "time_up_title": "When the time is up",
+        "time_up_suspend": "Suspend the software",
+        "time_up_alarm": "Warning only",
+        "time_up_suspend_body": "Suspend the software when the time is up?\n\nAt the limit the console shows \"Time's up\" and suspends the game. Unsaved progress can be lost.",
+        "time_up_alarm_body": "Only warn when the time is up?\n\nAt the limit the console shows \"Time's up\", but the game is not suspended: it can go on.",
+        "time_up_needs_limit": "Set a play-time limit or a bedtime first: what happens when the time is up only matters once one is set.",
         "profile_current": "{} (current)",
         "profile_range": "{} to {}",
         "profile_saved": "Profile \"{}\" saved.",
@@ -282,7 +291,7 @@
         "bedtime_value_on": "{} (on)",
         "bedtime_value_off": "{} (off)",
         "bedtime_reset": "Play allowed again at",
-        "bedtime_note": "Applies to every day. At bedtime the console shows the alarm, and may also suspend the software (a phone-app setting PlayGuard cannot read yet), until play is allowed again. PlayGuard checks that the console reports the new time, and puts the previous settings back if it does not.",
+        "bedtime_note": "Applies to every day. At bedtime the console shows the alarm, and may also suspend the software (see \"When the time is up\"), until play is allowed again. PlayGuard checks that the console reports the new time, and puts the previous settings back if it does not.",
         "bedtime_title": "Bedtime alarm, every day",
         "bedtime_end_title": "Play allowed again at (every day)",
         "bedtime_summary": "{}, play allowed again at {}",
@@ -356,7 +365,7 @@
         "removed": "Play-time limit removed.",
         "remove_err": "Could not remove the play-time limit",
         "not_counting": "The console is not counting play time right now. Likely causes: the clock was set back (it counts again later), the network clock was never set (Network clock tab), or a limit was just written (start a game for a minute, then check).",
-        "limit_note": "At the limit the console shows \"Time's up\". On the console PlayGuard was tested on, it also suspended the game. If the phone app was ever set to \"alarm only\", the console may only warn: PlayGuard cannot read or change that setting yet.",
+        "limit_note": "At the limit the console shows \"Time's up\", then suspends the game or only warns, as set in \"When the time is up\".",
         "unsaved": "Unsaved progress may be lost: let the child save first."
     },
     "activity": {
@@ -976,7 +985,8 @@
             "outside_reset": "Play time started over (seen by PlayGuard)",
             "outside_clock": "Console clock changed (seen by PlayGuard)",
             "outside_limits": "Limits changed outside PlayGuard",
-            "new_account": "New user account (seen by PlayGuard)"
+            "new_account": "New user account (seen by PlayGuard)",
+            "time_up": "When the time is up"
         },
         "sources": {
             "uniform": "Same limit every day",

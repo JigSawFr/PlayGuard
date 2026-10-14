@@ -867,6 +867,69 @@ static void test_bedtime(void)
     CHECK(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_FW_UNSUPPORTED && model.ipc_calls == 0);
 }
 
+/* restrictionMode (byte 1): a warning only, or the software suspended.
+ * Only that byte is written, behind the gate, and read back. */
+static void test_alarm_only(void)
+{
+    PtState st;
+    u16 orig[34];
+
+    /* The observed block suspends. */
+    reset();
+    pctl_play_timer_query(&st);
+    CHECK(st.valid && !st.alarm_only);
+    memcpy(orig, model.pt_block, sizeof(orig));
+
+    /* A warning only: byte 1 cleared, nothing else. */
+    CHECK(pctl_play_timer_set_alarm_only(true) == 0 && model.refs == 0 && model.writes == 1);
+    CHECK(model.pt_block[0] == 0x0001);
+    for (int i = 1; i < 34; i++) CHECK(model.pt_block[i] == orig[i]);
+    pctl_play_timer_query(&st);
+    CHECK(st.alarm_only && st.day_min[3] == 90);
+    /* Already so: nothing written. */
+    CHECK(pctl_play_timer_set_alarm_only(true) == 0 && model.writes == 1);
+    /* Back to suspending: the block as it was. */
+    CHECK(pctl_play_timer_set_alarm_only(false) == 0 && model.writes == 2);
+    CHECK(memcmp(model.pt_block, orig, sizeof(orig)) == 0);
+
+    /* A bedtime alone is enough to have a meaning. */
+    reset();
+    for (int i = 0; i < 34; i++) model.pt_block[i] = 0;
+    PtBedtime bt[7];
+    for (int n = 0; n < 7; n++) bt[n] = bed(n == 2, 21, 0, 6, 0);
+    model.bed_live = true;
+    model.bed_day = 2;
+    CHECK(pctl_play_timer_set_bedtime(bt, 2) == 0);
+    CHECK(pctl_play_timer_set_alarm_only(true) == 0 && model.pt_block[0] == 0x0001);
+
+    /* Nothing set (the all-zero block): refused, nothing written. */
+    reset();
+    for (int i = 0; i < 34; i++) model.pt_block[i] = 0;
+    CHECK(pctl_play_timer_set_alarm_only(true) == NXM_RC_INVALID_ARGUMENT && model.writes == 0 && model.refs == 0);
+
+    /* Not kept by the console: the block read before is written back. */
+    reset();
+    model.pt_ignored = true;
+    CHECK(pctl_play_timer_set_alarm_only(true) == NXM_RC_NOT_APPLIED && model.writes == 2 && model.refs == 0);
+    CHECK(memcmp(model.last_write, model.pt_block, 0x44) == 0);
+
+    /* Refused before writing: the block unreadable or not understood, the
+     * timer counting down; below 21.0.0 nothing sent. */
+    reset();
+    model.fail_command = 145601;
+    CHECK(pctl_play_timer_set_alarm_only(true) == NXM_RC_STATE_UNKNOWN && model.writes == 0 && model.refs == 0);
+    reset();
+    model.pt_block[9] = 1441;
+    CHECK(pctl_play_timer_set_alarm_only(true) == NXM_RC_PT_NOT_UNDERSTOOD && model.writes == 0 && model.refs == 0);
+    reset();
+    model.enabled = true;
+    CHECK(pctl_play_timer_set_alarm_only(true) == NXM_RC_WRITE_GATED && model.writes == 0 && model.refs == 0);
+    model.unlocked = true;
+    CHECK(pctl_play_timer_set_alarm_only(true) == 0 && model.writes == 1);
+    reset_with(MAKEHOSVERSION(20, 5, 0));
+    CHECK(pctl_play_timer_set_alarm_only(true) == NXM_RC_FW_UNSUPPORTED && model.ipc_calls == 0);
+}
+
 /* timerMode DAILY (byte 2 = 0): the console applies the daily rule (bytes
  * 04..0B) every day and ignores the seven others. Read through it; a write
  * that changes the block moves it to EACH_DAY_OF_THE_WEEK first, each day
@@ -1264,6 +1327,7 @@ int main(void)
     test_block_preserved();
     test_block_not_understood();
     test_daily_mode();
+    test_alarm_only();
     test_bedtime();
     test_unlock_and_relock();
     test_lock_state();

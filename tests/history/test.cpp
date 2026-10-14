@@ -89,6 +89,7 @@ static void test_value_ranges()
     CHECK(one("org", { 12 }, { 0 }) && !one("org", { 13 }, { 0 }));
     CHECK(one("vr", { 1 }, { 0 }) && !one("vr", { 2 }, { 0 }));
     CHECK(one("alarm", { 0 }, { 1 }) && !one("alarm", { 0 }, { -1 }));
+    CHECK(one("time_up", { 0 }, { 1 }) && !one("time_up", { 2 }, { 1 }) && !one("time_up", { 0 }, { 0, 1 }));
     CHECK(one("custom", { 21, 1, 0 }, { 0, 0, 1 }) && !one("custom", { 22, 0, 0 }, { 0, 0, 0 }));
     CHECK(!one("custom", { 12, 2, 0 }, { 0, 0, 0 }));
     CHECK(undoable_limits(1440, 0xFFFF) && !undoable_limits(1441, 60) && !undoable_limits(60, -1));

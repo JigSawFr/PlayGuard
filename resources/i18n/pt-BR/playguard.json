@@ -237,7 +237,9 @@
             "inactive": "Limite desativado",
             "remaining_short": "Tempo restante hoje: {}",
             "unlocked_short": "desbloqueado temporariamente, talvez sem contagem",
-            "reached_alert": "O limite de hoje foi atingido: o console mostra \"Tempo esgotado\". Se ele também suspende o jogo depende de uma configuração que o PlayGuard ainda não consegue ler.",
+            "reached_alert": "O limite de hoje foi atingido: o console mostra \"Tempo esgotado\".",
+            "reached_alert_suspend": "O limite de hoje foi atingido: o console mostra \"Tempo esgotado\" e suspende o jogo.",
+            "reached_alert_alarm": "O limite de hoje foi atingido: o console mostra \"Tempo esgotado\", só como aviso (o jogo não é suspenso).",
             "not_set": "Sem limite",
             "every_day": "{} todos os dias",
             "today_per_day": "{} hoje (varia por dia)",
@@ -262,6 +264,13 @@
         "profiles_section_saved": "Perfis salvos",
         "profiles_section_new": "Novo perfil",
         "profiles_hint": "A em um perfil: aplicar, editar os limites, renomear ou excluir.",
+        "time_up": "Quando o tempo acabar",
+        "time_up_title": "Quando o tempo acabar",
+        "time_up_suspend": "Suspender o software",
+        "time_up_alarm": "Só avisar",
+        "time_up_suspend_body": "Suspender o software quando o tempo acabar?\n\nNo limite, o console mostra \"Tempo esgotado\" e suspende o jogo. O progresso não salvo pode ser perdido.",
+        "time_up_alarm_body": "Só avisar quando o tempo acabar?\n\nNo limite, o console mostra \"Tempo esgotado\", mas o jogo não é suspenso: ele pode continuar.",
+        "time_up_needs_limit": "Defina primeiro um limite de tempo de jogo ou um horário de dormir: o que acontece quando o tempo acaba só conta quando há um.",
         "profile_current": "{} (atual)",
         "profile_range": "{} a {}",
         "profile_saved": "Perfil \"{}\" salvo.",
@@ -282,7 +291,7 @@
         "bedtime_value_on": "{} (ativado)",
         "bedtime_value_off": "{} (desativado)",
         "bedtime_reset": "Pode voltar a jogar às",
-        "bedtime_note": "Vale para todos os dias. Na hora de dormir, o console mostra o alarme, e pode também suspender o software (uma configuração do aplicativo do celular que o PlayGuard ainda não consegue ler), até que se possa voltar a jogar. O PlayGuard verifica se o console informa o novo horário e, se não, restaura as configurações anteriores.",
+        "bedtime_note": "Vale para todos os dias. Na hora de dormir, o console mostra o alarme, e pode também suspender o software (veja \"Quando o tempo acabar\"), até que se possa voltar a jogar. O PlayGuard verifica se o console informa o novo horário e, se não, restaura as configurações anteriores.",
         "bedtime_title": "Alarme de hora de dormir, todos os dias",
         "bedtime_end_title": "Pode voltar a jogar às (todos os dias)",
         "bedtime_summary": "{}, pode voltar a jogar às {}",
@@ -356,7 +365,7 @@
         "removed": "Limite de tempo de jogo removido.",
         "remove_err": "Não foi possível remover o limite de tempo de jogo",
         "not_counting": "O console não está contando o tempo de jogo agora. Causas prováveis: o relógio foi atrasado (volta a contar mais tarde), o relógio de rede nunca foi ajustado (aba Relógio de rede) ou um limite acabou de ser gravado (abra um jogo por um minuto e verifique de novo).",
-        "limit_note": "No limite, o console mostra \"Tempo esgotado\". No console em que o PlayGuard foi testado, ele também suspendeu o jogo. Se o aplicativo do celular já foi configurado para \"só alarme\", o console pode apenas avisar: o PlayGuard ainda não consegue ler nem alterar essa configuração.",
+        "limit_note": "No limite, o console mostra \"Tempo esgotado\" e depois suspende o jogo ou apenas avisa, conforme \"Quando o tempo acabar\".",
         "unsaved": "O progresso não salvo pode ser perdido: deixe a criança salvar antes."
     },
     "activity": {
@@ -976,7 +985,8 @@
             "outside_reset": "Tempo de jogo recomeçado (visto pelo PlayGuard)",
             "outside_clock": "Relógio do console alterado (visto pelo PlayGuard)",
             "outside_limits": "Limites alterados fora do PlayGuard",
-            "new_account": "Conta de usuário nova (vista pelo PlayGuard)"
+            "new_account": "Conta de usuário nova (vista pelo PlayGuard)",
+            "time_up": "Quando o tempo acabar"
         },
         "sources": {
             "uniform": "Mesmo limite todos os dias",

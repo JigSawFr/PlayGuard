@@ -21,7 +21,8 @@ struct Entry
     //   "limits"  before/after: 7 values, Sun..Sat minutes (65535 no limit)
     //   "level"   1 value (PctlSafetyLevel)        "org" 1 value (rating body)
     //   "custom"  3 values: age, posting restricted, communication restricted
-    //   "vr", "alarm"  1 value, 0/1 (VR restricted / alarm off)
+    //   "vr", "alarm", "time_up"  1 value, 0/1 (VR restricted / alarm off /
+    //            a warning only when the time is up, not suspending)
     //   "pin", "pin_shown", "unlock", "relock", "unlink", "delete", "clock",
     //   "restore": no values
     //   "new_account" (seen by PlayGuard, not made; detail: its name): no values

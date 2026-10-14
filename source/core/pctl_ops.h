@@ -110,6 +110,8 @@ typedef struct {
     u16    day_min[7];            // Sun..Sat minutes or PT_DAY_NOLIMIT; meaningful only when valid
     u16    block[PT_U16_COUNT];   // the 0x44 block as read (backups keep it; pure.h)
     PtBedtime bed[7];             // Sun..Sat bedtimes decoded from it; meaningful only when valid
+    bool   alarm_only;            // restrictionMode ALARM: at the limit a warning only, the software
+                                  // not suspended (pure.h); meaningful only when valid
     bool   enabled_valid;         Result enabled_rc;     bool enabled;     // 1453
     bool   restricted_valid;      Result restricted_rc;  bool restricted;  // 1455
     bool   temporary_unlocked_valid; Result temporary_unlocked_rc; bool temporary_unlocked; // 1006
@@ -154,6 +156,15 @@ Result pctl_play_timer_clear(void);
 // be read, NXM_RC_INVALID_ARGUMENT outside pt_bedtime_ok. Nothing is written
 // when the bedtimes already are these.
 Result pctl_play_timer_set_bedtime(const PtBedtime bed[7], int today);
+
+// What the console does when the time is up (restrictionMode, pure.h):
+// suspend the software, or show a warning only. Written into the block read
+// with 145601 (only that byte changes), behind the same gate, then read back:
+// a block the console does not keep is written back, NXM_RC_NOT_APPLIED.
+// Refuses (NXM_RC_STATE_UNKNOWN) when the block cannot be read,
+// NXM_RC_INVALID_ARGUMENT while no limit and no bedtime is set (pt_set_suspends).
+// Nothing is written when it already is that.
+Result pctl_play_timer_set_alarm_only(bool alarm_only);
 
 // Advanced (debug-class commands; exposed behind the "advanced" switch). Gated
 // as above.

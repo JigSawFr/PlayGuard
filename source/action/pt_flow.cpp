@@ -354,6 +354,52 @@ void choose_bedtime_end(const PtState& pt, std::function<void()> refresh)
     });
 }
 
+std::string time_up_text(const PtState& pt)
+{
+    if (!pt.valid) return "";
+    return pt.alarm_only ? "playguard/play_timer/time_up_alarm"_i18n : "playguard/play_timer/time_up_suspend"_i18n;
+}
+
+Result write_alarm_only(bool alarm_only, const std::string& source)
+{
+    PtState before;
+    pctl_play_timer_query(&before);
+    const Result rc = pctl_play_timer_set_alarm_only(alarm_only);
+    if (R_SUCCEEDED(rc) && before.valid && before.alarm_only != alarm_only)
+        history_flow::record_values("time_up", { before.alarm_only ? 1 : 0 }, { alarm_only ? 1 : 0 }, source);
+    return rc;
+}
+
+void choose_time_up(const PtState& pt, std::function<void()> refresh)
+{
+    if (ui::refuse_read_only()) return;
+    if (!pt.fw_supported) {
+        ui::notify(ui::rc_text(NXM_RC_FW_UNSUPPORTED));
+        return;
+    }
+    if (!pt.valid) {
+        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN));
+        return;
+    }
+    if (!pt_configured(pt.block)) {
+        ui::info("playguard/play_timer/time_up_needs_limit"_i18n);
+        return;
+    }
+    const std::vector<std::string> labels = { "playguard/play_timer/time_up_suspend"_i18n,
+                                              "playguard/play_timer/time_up_alarm"_i18n };
+    const bool now = pt.alarm_only;
+    ui::pick("playguard/play_timer/time_up_title"_i18n, labels, now ? 1 : 0, [now, refresh](int index) {
+        const bool alarm_only = index == 1;
+        if (alarm_only == now) return;   // already so
+        const std::string body = alarm_only ? "playguard/play_timer/time_up_alarm_body"_i18n
+                                            : "playguard/play_timer/time_up_suspend_body"_i18n;
+        confirm_write(body, "playguard/play_timer/confirm_set"_i18n, [alarm_only, refresh](bool did_unlock) {
+            const Result rc = write_alarm_only(alarm_only, "");
+            finish_write(rc, did_unlock, "playguard/common/applied"_i18n, "playguard/play_timer/write_err"_i18n, refresh);
+        });
+    });
+}
+
 static void apply_uniform(uint16_t minutes, std::function<void()> refresh)
 {
     std::string body = minutes == 0 ? "playguard/play_timer/confirm_uniform_zero"_i18n

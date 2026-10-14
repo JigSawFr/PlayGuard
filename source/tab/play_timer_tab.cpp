@@ -71,6 +71,10 @@ PlayTimerTab::PlayTimerTab()
         brls::Application::pushActivity(new ProfilesActivity());
         return true;
     });
+    time_up->registerClickAction([this](brls::View*) {
+        pt_flow::choose_time_up(this->pt, [this]() { this->refresh(); });
+        return true;
+    });
     bedtime->registerClickAction([this](brls::View*) {
         pt_flow::choose_bedtime(this->pt, [this]() { this->refresh(); });
         return true;
@@ -122,13 +126,17 @@ void PlayTimerTab::refresh()
                            (brls::View*)per_day.getView(), (brls::View*)remove.getView(),
                            (brls::View*)profiles_cell.getView(), (brls::View*)limit_note.getView() })
         ui::set_visible(v, fw_ok);
+    // When the time is up: only with something set (pt_configured), the
+    // only time the choice means anything.
+    ui::set_visible(time_up.getView(), fw_ok && this->pt.valid && pt_configured(this->pt.block));
     const int wd = ui::today_weekday();
     ui::set_visible(extra.getView(), pt_logic::can_add_extra_time(this->pt, wd, false));
     ui::set_visible(stop.getView(), pt_logic::can_stop_today(this->pt, wd, false));
     for (brls::DetailCell* c : { (brls::DetailCell*)quick.getView(), (brls::DetailCell*)extra.getView(),
                                  (brls::DetailCell*)stop.getView(), (brls::DetailCell*)remove.getView(),
                                  (brls::DetailCell*)pause.getView(), (brls::DetailCell*)resume.getView(),
-                                 (brls::DetailCell*)bedtime.getView(), (brls::DetailCell*)bedtime_reset.getView() })
+                                 (brls::DetailCell*)bedtime.getView(), (brls::DetailCell*)bedtime_reset.getView(),
+                                 (brls::DetailCell*)time_up.getView() })
         ui::show_writable(c, writable);
     extra->setDetailText(pt_flow::extra_today_text(this->pt));
     for (brls::View* v : { (brls::View*)bedtime_header.getView(), (brls::View*)bedtime.getView(),
@@ -153,6 +161,7 @@ void PlayTimerTab::refresh()
     const size_t saved = current.empty() ? profiles::count() : 0;
     profiles_cell->setDetailText(!current.empty() ? current
                                  : saved ? brls::getStr("playguard/play_timer/profiles_count", (int)saved) : "");
+    time_up->setDetailText(pt_flow::time_up_text(this->pt));
 
     // "Same limit every day": the value when all days agree, else that they
     // differ, as the bedtime row says it (a range such as "1 h to 3 h" read

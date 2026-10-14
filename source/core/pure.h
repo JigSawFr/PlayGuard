@@ -55,6 +55,13 @@ enum { PT_MODE_ENABLED = 0, PT_MODE_RESTRICTION = 1, PT_MODE_TIMER = 2 };
 bool pt_suspends(const u16 c[PT_U16_COUNT]);
 // timerMode is DAILY: one rule (byte 4) for every day.
 bool pt_daily(const u16 c[PT_U16_COUNT]);
+// A limit or a bedtime is on, on some day: the play timer has something to
+// do, and restrictionMode a meaning.
+bool pt_configured(const u16 c[PT_U16_COUNT]);
+// Sets restrictionMode (byte 1), nothing else; refused (false, the block
+// unchanged) while nothing is configured: the "off" block is all zeros, and
+// the next limit gives it the observed header (FORCED_TERMINATION).
+bool pt_set_suspends(u16 c[PT_U16_COUNT], bool suspends);
 
 // Per-day value: no configured limit that day (pctl_ops.h uses the same).
 #ifndef PT_DAY_NOLIMIT

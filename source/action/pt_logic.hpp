@@ -26,7 +26,8 @@ bool needs_unlock(const PtState& pt);
 int played_today_min(const PtState& pt, int weekday);
 
 // The minutes already played when `new_days` puts today's limit below them
-// (the game in progress is then suspended at the lock), else -1.
+// (the game in progress is then suspended at the lock), else -1; -1 too when
+// the console only warns at the limit (alarm_only).
 int suspend_warning_min(const PtState& pt, int weekday, const uint16_t new_days[7]);
 
 // "Extra time today…" can be offered: writable, a limit applies today and it

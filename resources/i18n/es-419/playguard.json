@@ -237,7 +237,9 @@
             "inactive": "Temporizador desactivado",
             "remaining_short": "Tiempo restante hoy: {}",
             "unlocked_short": "desbloqueado temporalmente, puede que no se cuente",
-            "reached_alert": "Se alcanzó el límite de hoy: la consola muestra “Se acabó el tiempo”. Que también suspenda el juego depende de una configuración que PlayGuard todavía no puede leer.",
+            "reached_alert": "Se alcanzó el límite de hoy: la consola muestra “Se acabó el tiempo”.",
+            "reached_alert_suspend": "Se alcanzó el límite de hoy: la consola muestra “Se acabó el tiempo” y suspende el juego.",
+            "reached_alert_alarm": "Se alcanzó el límite de hoy: la consola muestra “Se acabó el tiempo”, solo como aviso (el juego no se suspende).",
             "not_set": "Sin límite",
             "every_day": "{} todos los días",
             "today_per_day": "{} hoy (varía según el día)",
@@ -262,6 +264,13 @@
         "profiles_section_saved": "Perfiles guardados",
         "profiles_section_new": "Nuevo perfil",
         "profiles_hint": "A en un perfil: aplicarlo, editar sus límites, cambiarle el nombre o eliminarlo.",
+        "time_up": "Cuando se acabe el tiempo",
+        "time_up_title": "Cuando se acabe el tiempo",
+        "time_up_suspend": "Suspender el programa",
+        "time_up_alarm": "Solo avisar",
+        "time_up_suspend_body": "¿Suspender el programa cuando se acabe el tiempo?\n\nAl llegar al límite, la consola muestra “Se acabó el tiempo” y suspende el juego. Se puede perder el progreso no guardado.",
+        "time_up_alarm_body": "¿Solo avisar cuando se acabe el tiempo?\n\nAl llegar al límite, la consola muestra “Se acabó el tiempo”, pero no suspende el juego: se puede seguir jugando.",
+        "time_up_needs_limit": "Configura primero un límite de tiempo de juego o una hora de dormir: lo que pasa cuando se acaba el tiempo solo cuenta cuando hay uno.",
         "profile_current": "{} (actual)",
         "profile_range": "De {} a {}",
         "profile_saved": "Perfil “{}” guardado.",
@@ -282,7 +291,7 @@
         "bedtime_value_on": "{} (activada)",
         "bedtime_value_off": "{} (desactivada)",
         "bedtime_reset": "Se puede volver a jugar a las",
-        "bedtime_note": "Se aplica a todos los días. A la hora de dormir, la consola muestra la alarma, y puede que también suspenda el programa (una configuración de la aplicación del celular que PlayGuard todavía no puede leer), hasta que se pueda volver a jugar. PlayGuard verifica que la consola indique la nueva hora y, si no, restablece la configuración anterior.",
+        "bedtime_note": "Se aplica a todos los días. A la hora de dormir, la consola muestra la alarma, y puede que también suspenda el programa (ver “Cuando se acabe el tiempo”), hasta que se pueda volver a jugar. PlayGuard verifica que la consola indique la nueva hora y, si no, restablece la configuración anterior.",
         "bedtime_title": "Alarma de hora de dormir, todos los días",
         "bedtime_end_title": "Se puede volver a jugar a las (todos los días)",
         "bedtime_summary": "{}, se puede volver a jugar a las {}",
@@ -356,7 +365,7 @@
         "removed": "Límite de tiempo de juego quitado.",
         "remove_err": "No se pudo quitar el límite de tiempo de juego",
         "not_counting": "La consola no está contando el tiempo de juego en este momento. Causas probables: el reloj se atrasó (volverá a contar más tarde), el reloj de red nunca se ajustó (pestaña Reloj de red) o se acaba de escribir un límite (inicia un juego un minuto y vuelve a revisar).",
-        "limit_note": "Al llegar al límite, la consola muestra “Se acabó el tiempo”. En la consola en la que se probó PlayGuard, además suspendió el juego. Si la aplicación del celular se configuró alguna vez como “solo alarma”, es posible que la consola solo avise: PlayGuard todavía no puede leer ni cambiar esa configuración.",
+        "limit_note": "Al llegar al límite, la consola muestra “Se acabó el tiempo” y luego suspende el juego o solo avisa, según “Cuando se acabe el tiempo”.",
         "unsaved": "Se puede perder el progreso no guardado: deja que el niño guarde antes."
     },
     "activity": {
@@ -976,7 +985,8 @@
             "outside_reset": "Tiempo de juego reiniciado (detectado por PlayGuard)",
             "outside_clock": "Reloj de la consola cambiado (detectado por PlayGuard)",
             "outside_limits": "Límites cambiados fuera de PlayGuard",
-            "new_account": "Cuenta de usuario nueva (detectada por PlayGuard)"
+            "new_account": "Cuenta de usuario nueva (detectada por PlayGuard)",
+            "time_up": "Cuando se acabe el tiempo"
         },
         "sources": {
             "uniform": "Mismo límite todos los días",

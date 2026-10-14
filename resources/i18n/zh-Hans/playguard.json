@@ -237,7 +237,9 @@
             "inactive": "未计时",
             "remaining_short": "今天剩余{}",
             "unlocked_short": "已暂时解除，可能不计时",
-            "reached_alert": "已达到今天的限制：主机会显示“时间到”。是否同时中断游戏，取决于一项PlayGuard目前还无法读取的设置。",
+            "reached_alert": "已达到今天的限制：主机会显示“时间到”。",
+            "reached_alert_suspend": "已达到今天的限制：主机会显示“时间到”并中断游戏。",
+            "reached_alert_alarm": "已达到今天的限制：主机会显示“时间到”，仅作提醒（不会中断游戏）。",
             "not_set": "无限制",
             "every_day": "每天{}",
             "today_per_day": "今天{}（每天不同）",
@@ -262,6 +264,13 @@
         "profiles_section_saved": "已保存的配置",
         "profiles_section_new": "新建配置",
         "profiles_hint": "在配置上按A：应用、编辑限制、重命名或删除。",
+        "time_up": "时间到时",
+        "time_up_title": "时间到时",
+        "time_up_suspend": "中断软件",
+        "time_up_alarm": "仅提醒",
+        "time_up_suspend_body": "时间到时中断软件？\n\n达到限制时，主机会显示“时间到”并中断游戏。未保存的进度可能会丢失。",
+        "time_up_alarm_body": "时间到时仅提醒？\n\n达到限制时，主机会显示“时间到”，但不会中断游戏，可以继续游玩。",
+        "time_up_needs_limit": "请先设置游戏时间限制或就寝时间：时间到时的处理方式只有在设置了其中之一后才有意义。",
         "profile_current": "{}（当前）",
         "profile_range": "{}至{}",
         "profile_saved": "已保存配置“{}”。",
@@ -282,7 +291,7 @@
         "bedtime_value_on": "{}（开启）",
         "bedtime_value_off": "{}（关闭）",
         "bedtime_reset": "可再次游玩的时间",
-        "bedtime_note": "适用于每一天。到就寝时间时，主机会显示提醒，也可能中断软件（这是PlayGuard目前还无法读取的手机应用设置），直到可以再次游玩。PlayGuard 会检查主机是否报告新的时间，否则会恢复之前的设置。",
+        "bedtime_note": "适用于每一天。到就寝时间时，主机会显示提醒，也可能中断软件（见“时间到时”），直到可以再次游玩。PlayGuard 会检查主机是否报告新的时间，否则会恢复之前的设置。",
         "bedtime_title": "就寝提醒（每天）",
         "bedtime_end_title": "可再次游玩的时间（每天）",
         "bedtime_summary": "{}，{} 起可再次游玩",
@@ -356,7 +365,7 @@
         "removed": "已取消游戏时间限制。",
         "remove_err": "无法取消游戏时间限制",
         "not_counting": "主机目前没有计算游戏时间。可能的原因：时钟被调回（之后会重新计时）、网络时钟从未设置（“网络时钟”标签页），或刚刚写入了限制（启动一个游戏玩一分钟后再查看）。",
-        "limit_note": "达到限制时，主机会显示“时间到”。在测试PlayGuard的主机上，它还中断了游戏。如果手机应用曾设置为“仅提醒”，主机可能只会提醒：PlayGuard目前还无法读取或更改这项设置。",
+        "limit_note": "达到限制时，主机会显示“时间到”，然后按照“时间到时”的设置中断游戏或仅提醒。",
         "unsaved": "未保存的进度可能会丢失：请先让孩子存档。"
     },
     "activity": {
@@ -976,7 +985,8 @@
             "outside_reset": "游戏时间重新开始计算（PlayGuard发现）",
             "outside_clock": "主机时钟被更改（PlayGuard发现）",
             "outside_limits": "在PlayGuard之外更改的限制",
-            "new_account": "新用户（PlayGuard发现）"
+            "new_account": "新用户（PlayGuard发现）",
+            "time_up": "时间到时"
         },
         "sources": {
             "uniform": "每天相同的限制",

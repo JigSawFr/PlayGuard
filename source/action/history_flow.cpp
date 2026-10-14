@@ -43,6 +43,7 @@ std::string value_text(const std::string& kind, const std::vector<int>& v)
         if (kind == "org") return pctl_rating_org_name((uint32_t)v[0]);
         if (kind == "vr") return yes_no(v[0]);
         if (kind == "alarm") return v[0] ? "playguard/common/off"_i18n : "playguard/common/on"_i18n;
+        if (kind == "time_up") return v[0] ? "playguard/play_timer/time_up_alarm"_i18n : "playguard/play_timer/time_up_suspend"_i18n;
         if (kind == "console_lock") return v[0] ? "playguard/common/on"_i18n : "playguard/common/off"_i18n;
     }
     if (kind == "custom" && v.size() == 3)
@@ -55,7 +56,7 @@ std::string kind_label(const std::string& kind)
     static const char* known[] = { "limits", "level", "custom", "org", "vr", "alarm", "pin", "pin_shown",
                                    "unlock", "relock", "unlink", "delete", "clock", "restore", "rescue",
                                    "console_lock", "bedtime", "config_reset", "outside_reset", "outside_clock",
-                                   "outside_limits", "new_account" };
+                                   "outside_limits", "new_account", "time_up" };
     for (const char* k : known)
         if (kind == k) return brls::getStr(std::string("playguard/history/kinds/") + k);
     return kind;
@@ -74,10 +75,11 @@ std::string source_label(const history::Entry& e)
 // The console's value of `kind` now, as recorded values ({} when unread).
 std::vector<int> current(const std::string& kind)
 {
-    if (kind == "limits" || kind == "alarm") {
+    if (kind == "limits" || kind == "alarm" || kind == "time_up") {
         PtState pt;
         pctl_play_timer_query(&pt);
         if (kind == "limits") return pt.valid ? days_values(pt.day_min) : std::vector<int>{};
+        if (kind == "time_up") return pt.valid ? std::vector<int>{ pt.alarm_only ? 1 : 0 } : std::vector<int>{};
         return pt.alarm_disabled_valid ? std::vector<int>{ pt.alarm_disabled ? 1 : 0 } : std::vector<int>{};
     }
     PctlStatus st;
@@ -89,8 +91,8 @@ std::vector<int> current(const std::string& kind)
     return {};
 }
 
-// Writes `v` for `kind` (not the limits or the alarm: they go through the
-// play-timer gate).
+// Writes `v` for `kind` (not the limits, the alarm or the time-up choice:
+// they go through the play-timer gate).
 Result write_value(const std::string& kind, const std::vector<int>& v)
 {
     if (kind == "level") return pctl_set_safety_level((uint32_t)v[0]);
@@ -237,6 +239,14 @@ void open(const history::Entry& e, std::function<void()> refresh)
         const bool disabled = e.before[0] != 0;
         pt_flow::confirm_write(body, "playguard/history/undo_confirm"_i18n, [disabled, refresh](bool did_unlock) {
             const Result rc = pt_flow::write_alarm_disabled(disabled, "undo");
+            pt_flow::finish_write(rc, did_unlock, "playguard/history/undone"_i18n, "playguard/history/undo_err"_i18n, refresh);
+        });
+        return;
+    }
+    if (e.kind == "time_up") {
+        const bool alarm_only = e.before[0] != 0;
+        pt_flow::confirm_write(body, "playguard/history/undo_confirm"_i18n, [alarm_only, refresh](bool did_unlock) {
+            const Result rc = pt_flow::write_alarm_only(alarm_only, "undo");
             pt_flow::finish_write(rc, did_unlock, "playguard/history/undone"_i18n, "playguard/history/undo_err"_i18n, refresh);
         });
         return;

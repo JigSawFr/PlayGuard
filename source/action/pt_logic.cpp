@@ -30,7 +30,7 @@ int played_today_min(const PtState& pt, int weekday)
 
 int suspend_warning_min(const PtState& pt, int weekday, const uint16_t new_days[7])
 {
-    if (!new_days || weekday < 0 || weekday > 6) return -1;
+    if (!new_days || weekday < 0 || weekday > 6 || pt.alarm_only) return -1;
     const int played = played_today_min(pt, weekday);
     const uint16_t next = new_days[weekday];
     return played > 0 && next != PT_DAY_NOLIMIT && next < played ? played : -1;

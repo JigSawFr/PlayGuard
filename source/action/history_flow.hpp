@@ -19,10 +19,10 @@ namespace history_flow
 std::vector<int> days_values(const uint16_t days[7]);
 std::vector<int> custom_values(const PctlCustomSettings& s);
 
-// A value change ("limits", "level", "custom", "org", "vr", "alarm"); nothing
-// is recorded when `before` equals `after`. Written off the UI thread
-// (ui::write_later); a failed SD write is only logged: the change itself
-// went through.
+// A value change ("limits", "level", "custom", "org", "vr", "alarm",
+// "time_up"); nothing is recorded when `before` equals `after`. Written off
+// the UI thread (ui::write_later); a failed SD write is only logged: the
+// change itself went through.
 void record_values(const char* kind, std::vector<int> before, std::vector<int> after,
                    const std::string& source = "", const std::string& detail = "");
 // An action with no value to put back ("pin", "unlock", "unlink", …).

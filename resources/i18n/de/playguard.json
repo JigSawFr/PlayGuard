@@ -237,7 +237,9 @@
             "inactive": "Timer aus",
             "remaining_short": "Heute noch {}",
             "unlocked_short": "vorübergehend aufgehoben, wird evtl. nicht gezählt",
-            "reached_alert": "Das heutige Limit ist erreicht: Die Konsole zeigt „Zeit ist um“ an. Ob sie das Spiel auch unterbricht, hängt von einer Einstellung ab, die PlayGuard noch nicht lesen kann.",
+            "reached_alert": "Das heutige Limit ist erreicht: Die Konsole zeigt „Zeit ist um“ an.",
+            "reached_alert_suspend": "Das heutige Limit ist erreicht: Die Konsole zeigt „Zeit ist um“ an und unterbricht das Spiel.",
+            "reached_alert_alarm": "Das heutige Limit ist erreicht: Die Konsole zeigt „Zeit ist um“ an, nur als Warnung (das Spiel wird nicht unterbrochen).",
             "not_set": "Kein Limit",
             "every_day": "{} täglich",
             "today_per_day": "Heute {} (je nach Tag)",
@@ -262,6 +264,13 @@
         "profiles_section_saved": "Gespeicherte Profile",
         "profiles_section_new": "Neues Profil",
         "profiles_hint": "Mit A auf einem Profil: anwenden, Limits bearbeiten, umbenennen oder löschen.",
+        "time_up": "Wenn die Zeit um ist",
+        "time_up_title": "Wenn die Zeit um ist",
+        "time_up_suspend": "Software unterbrechen",
+        "time_up_alarm": "Nur warnen",
+        "time_up_suspend_body": "Die Software unterbrechen, wenn die Zeit um ist?\n\nBeim Limit zeigt die Konsole „Zeit ist um“ an und unterbricht das Spiel. Nicht gespeicherter Fortschritt kann verloren gehen.",
+        "time_up_alarm_body": "Nur warnen, wenn die Zeit um ist?\n\nBeim Limit zeigt die Konsole „Zeit ist um“ an, unterbricht das Spiel aber nicht: Es kann weitergehen.",
+        "time_up_needs_limit": "Lege zuerst ein Spielzeitlimit oder eine Schlafenszeit fest: Was passiert, wenn die Zeit um ist, zählt erst dann.",
         "profile_current": "{} (aktuell)",
         "profile_range": "{} bis {}",
         "profile_saved": "Profil „{}“ gespeichert.",
@@ -282,7 +291,7 @@
         "bedtime_value_on": "{} (an)",
         "bedtime_value_off": "{} (aus)",
         "bedtime_reset": "Spielen wieder erlaubt ab",
-        "bedtime_note": "Gilt für jeden Tag. Zur Schlafenszeit zeigt die Konsole den Alarm an und unterbricht womöglich auch die Software (eine Einstellung der Smartphone-App, die PlayGuard noch nicht lesen kann), bis das Spielen wieder erlaubt ist. PlayGuard prüft, ob die Konsole die neue Uhrzeit meldet, und stellt sonst die vorherigen Einstellungen wieder her.",
+        "bedtime_note": "Gilt für jeden Tag. Zur Schlafenszeit zeigt die Konsole den Alarm an und unterbricht womöglich auch die Software (siehe „Wenn die Zeit um ist“), bis das Spielen wieder erlaubt ist. PlayGuard prüft, ob die Konsole die neue Uhrzeit meldet, und stellt sonst die vorherigen Einstellungen wieder her.",
         "bedtime_title": "Gute-Nacht-Alarm, jeden Tag",
         "bedtime_end_title": "Spielen wieder erlaubt ab (jeden Tag)",
         "bedtime_summary": "{}, Spielen wieder erlaubt ab {}",
@@ -356,7 +365,7 @@
         "removed": "Spielzeitlimit entfernt.",
         "remove_err": "Spielzeitlimit konnte nicht entfernt werden",
         "not_counting": "Die Konsole zählt die Spielzeit gerade nicht. Mögliche Ursachen: Die Uhr wurde zurückgestellt (sie zählt später wieder), die Netzwerkuhr wurde nie gestellt (Tab „Netzwerkuhr“), oder ein Limit wurde gerade geschrieben (starten Sie ein Spiel für eine Minute und prüfen Sie dann erneut).",
-        "limit_note": "Beim Limit zeigt die Konsole „Zeit ist um“ an. Auf der Konsole, auf der PlayGuard getestet wurde, hat sie das Spiel außerdem unterbrochen. Wurde die Smartphone-App einmal auf „nur Alarm“ gestellt, warnt die Konsole möglicherweise nur: Diese Einstellung kann PlayGuard noch nicht lesen oder ändern.",
+        "limit_note": "Beim Limit zeigt die Konsole „Zeit ist um“ an und unterbricht dann das Spiel oder warnt nur, je nach „Wenn die Zeit um ist“.",
         "unsaved": "Nicht gespeicherter Fortschritt kann verloren gehen: Lassen Sie das Kind zuerst speichern."
     },
     "activity": {
@@ -976,7 +985,8 @@
             "outside_reset": "Spielzeit neu begonnen (von PlayGuard bemerkt)",
             "outside_clock": "Uhr der Konsole geändert (von PlayGuard bemerkt)",
             "outside_limits": "Limits außerhalb von PlayGuard geändert",
-            "new_account": "Neuer Nutzer (von PlayGuard bemerkt)"
+            "new_account": "Neuer Nutzer (von PlayGuard bemerkt)",
+            "time_up": "Wenn die Zeit um ist"
         },
         "sources": {
             "uniform": "Jeden Tag gleiches Limit",

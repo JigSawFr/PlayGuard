@@ -83,6 +83,10 @@ static void test_suspend_warning()
     days[3] = 0;
     CHECK(pt_logic::suspend_warning_min(pt, 3, days) == 75);
     CHECK(pt_logic::suspend_warning_min(pt, 3, nullptr) == -1);
+    // A warning only at the limit: nothing is suspended.
+    PtState alarm = pt;
+    alarm.alarm_only = true;
+    CHECK(pt_logic::suspend_warning_min(alarm, 3, days) == -1);
 }
 
 static void test_extra()

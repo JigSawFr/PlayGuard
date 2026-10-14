@@ -237,7 +237,9 @@
             "inactive": "計時器已關閉",
             "remaining_short": "今天剩餘{}",
             "unlocked_short": "已暫時解除，可能不計時",
-            "reached_alert": "已達今天的上限：主機會顯示「時間到」。是否同時中斷遊戲，取決於一項PlayGuard目前還無法讀取的設定。",
+            "reached_alert": "已達今天的上限：主機會顯示「時間到」。",
+            "reached_alert_suspend": "已達今天的上限：主機會顯示「時間到」並中斷遊戲。",
+            "reached_alert_alarm": "已達今天的上限：主機會顯示「時間到」，僅作提醒（不會中斷遊戲）。",
             "not_set": "無限制",
             "every_day": "每天{}",
             "today_per_day": "今天{}（依星期而異）",
@@ -262,6 +264,13 @@
         "profiles_section_saved": "已儲存的設定檔",
         "profiles_section_new": "新增設定檔",
         "profiles_hint": "在設定檔上按A：套用、編輯上限、重新命名或刪除。",
+        "time_up": "時間到時",
+        "time_up_title": "時間到時",
+        "time_up_suspend": "中斷軟體",
+        "time_up_alarm": "僅提醒",
+        "time_up_suspend_body": "時間到時中斷軟體？\n\n達到上限時，主機會顯示「時間到」並中斷遊戲。未儲存的進度可能會遺失。",
+        "time_up_alarm_body": "時間到時僅提醒？\n\n達到上限時，主機會顯示「時間到」，但不會中斷遊戲，可以繼續遊玩。",
+        "time_up_needs_limit": "請先設定遊戲時間上限或就寢時間：時間到時的處理方式只有在設定了其中之一後才有意義。",
         "profile_current": "{}（目前）",
         "profile_range": "{}～{}",
         "profile_saved": "已儲存設定檔「{}」。",
@@ -282,7 +291,7 @@
         "bedtime_value_on": "{}（開啟）",
         "bedtime_value_off": "{}（關閉）",
         "bedtime_reset": "可再次遊玩的時間",
-        "bedtime_note": "適用於每一天。到就寢時間時，主機會顯示鬧鐘，也可能中斷軟體（這是PlayGuard目前還無法讀取的手機應用程式設定），直到可以再次遊玩。PlayGuard 會檢查主機是否回報新的時間，否則會還原先前的設定。",
+        "bedtime_note": "適用於每一天。到就寢時間時，主機會顯示鬧鐘，也可能中斷軟體（見「時間到時」），直到可以再次遊玩。PlayGuard 會檢查主機是否回報新的時間，否則會還原先前的設定。",
         "bedtime_title": "就寢鬧鐘（每天）",
         "bedtime_end_title": "可再次遊玩的時間（每天）",
         "bedtime_summary": "{}，{} 起可再次遊玩",
@@ -356,7 +365,7 @@
         "removed": "已移除遊玩時間限制。",
         "remove_err": "無法移除遊玩時間限制",
         "not_counting": "主機目前沒有計算遊玩時間。可能的原因：時鐘被調回（之後會重新計時）、網路時鐘從未設定（「網路時鐘」分頁），或剛寫入上限（啟動遊戲玩一分鐘後再查看）。",
-        "limit_note": "達到上限時，主機會顯示「時間到」。在測試PlayGuard的主機上，它也中斷了遊戲。若手機應用程式曾設為「僅提醒」，主機可能只會提醒：PlayGuard目前還無法讀取或變更這項設定。",
+        "limit_note": "達到上限時，主機會顯示「時間到」，然後依照「時間到時」的設定中斷遊戲或僅提醒。",
         "unsaved": "未儲存的進度可能會遺失：請先讓孩子存檔。"
     },
     "activity": {
@@ -976,7 +985,8 @@
             "outside_reset": "遊玩時間重新開始計算（PlayGuard發現）",
             "outside_clock": "主機時鐘被更改（PlayGuard發現）",
             "outside_limits": "在PlayGuard之外更改的上限",
-            "new_account": "新使用者帳號（PlayGuard發現）"
+            "new_account": "新使用者帳號（PlayGuard發現）",
+            "time_up": "時間到時"
         },
         "sources": {
             "uniform": "每天相同上限",
