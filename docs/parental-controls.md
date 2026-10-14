@@ -104,24 +104,41 @@ restricting and not temporarily unlocked.
 
 ### The settings block (145601 / 195101)
 
-0x44 bytes: a 12-byte header and seven 8-byte days, Sunday to Saturday.
+0x44 bytes: four mode bytes, the daily rule and seven 8-byte days, Sunday
+to Saturday.
 
 ```
 offset  size  field
-0x00    12    header
+0x00     4    modes
+0x04     8    daily rule (timerMode DAILY)
 0x0C     8    Sunday
 0x14     8    Monday
  ...
 0x3C     8    Saturday
 ```
 
-Header, as seen so far:
+The header, from the 22.5.0 `pctl` sysmodule as reversed by
+[NX-Pctl-Manager](https://github.com/tailiang2008/NX-Pctl-Manager/blob/main/docs/pctl-reverse-engineering.md)
+(its own settings file's field table, `enabled`, `mode`, `weekUsed`, then
+the rules, and the server-sync serializer's names for bytes 1 and 2). It
+matches every block PlayGuard has seen (`01 01 01 00`), but PlayGuard has not
+yet seen a console in `DAILY` or `ALARM`:
 
-| Bytes | Value | Meaning |
+| Byte | Observed | Meaning |
 |---|---|---|
-| `00 01` | `01 01` | non-zero while a limit or a bedtime is set (observed) |
-| `02 03` | `01 00` | unknown, constant |
-| `04..0B` | `00 00 00 06 00 00 00 00` | the same format as a day; probably the `DAILY` rule (hypothesis below). Its `06` (byte `07`) stays in the "off" block, but was seen turn to `00` with the limits kept (observed, 22.0.0, between 20:10 and 20:44 on 2026-10-09; what changed it is not known) |
+| `00` | `01` | `enabled`: pctl clears it on a 195101 write, and sets it again only when the network clock gives the time |
+| `01` | `01` | `restrictionMode`: `0` `ALARM` (a warning only), `1` `FORCED_TERMINATION` (the software is suspended) |
+| `02` | `01` | `timerMode`: `0` `DAILY` (the daily rule, every day), `1` `EACH_DAY_OF_THE_WEEK` (the seven days) |
+| `03` | `00` | reserved |
+| `04..0B` | `00 00 00 06 00 00 00 00` | the daily rule, in a day's format. Its `06` (byte `07`) stays in the "off" block, but was seen turn to `00` with the limits kept (observed, 22.0.0, between 20:10 and 20:44 on 2026-10-09; what changed it is not known) |
+
+What PlayGuard does with them (`source/core/pure.c`): in `DAILY` mode the
+limits and bedtimes shown are the daily rule's, for every day (the seven
+days are ignored by the console). A write that changes such a block moves it
+to `EACH_DAY_OF_THE_WEEK` first, each day given the daily rule (all-zero days
+when it has nothing on), so the console does the same as before but for the
+change; writing back what was read leaves it as it is. `restrictionMode` is
+kept as read, and shown in the diagnostic report.
 
 The byte-by-byte reading of a real block is under
 [Reading a diagnostic report](#reading-a-diagnostic-report).
@@ -148,10 +165,10 @@ One day (8 bytes):
   1954 / 1956 / 1957 and undone when the console disagrees.
 
 What PlayGuard accepts as this layout (`pt_plausible`, `source/core/pure.c`):
-in each day and in the header's rule `04..0B`, the bedtime and limit
+in each day and in the daily rule `04..0B`, the bedtime and limit
 switches `0` or `1`, hours below 24, minutes below 60, the limit 0 to 1440
-minutes (or `FFFF`). The header's four mode bytes are not decoded, so any
-value passes there. Only what the
+minutes (or `FFFF`). The four mode bytes are not checked, so any value
+passes there (a non-zero mode is read as `1`). Only what the
 layout cannot hold is refused, so an unseen companion-app setting does not
 block PlayGuard. A block that fails (a firmware that changed the layout, or
 garbage) is not shown, and every play-timer write refuses it without writing
@@ -164,9 +181,10 @@ changed from 120 to 180 minutes in PlayGuard, then the block was read again.
 Only two bytes changed: `0x12` and `0x42`, both `78` → `B4`. The header, the
 flags and the bedtime bytes stayed as they were.
 
-### Hypothesis: the header is the modes plus a "daily" rule
+### The header is the modes plus a "daily" rule
 
-**Not verified.** The companion app's API, as reproduced by open-source
+This was a hypothesis, now confirmed by the sysmodule (above). The companion
+app's API, as reproduced by open-source
 clients ([pynintendoparental](https://github.com/pantherale0/pynintendoparental),
 used by Home Assistant, and
 [switch-parental-controls](https://github.com/udondan/switch-parental-controls)),
@@ -188,17 +206,15 @@ That is exactly eight rules and a few modes, and the block holds:
   also seen turn to `00` while every limit stayed: a value that can change,
   as an "allowed again" hour of a rule nobody uses might.
 
-So the guess is: bytes `00..03` hold the modes (among them most likely
-`timerMode`, `01` = each day of the week, since every observed block uses the
-per-day rules, and `restrictionMode`), and bytes `04..0B` hold the `DAILY`
-rule. Which mode sits in which byte is open.
+So the guess was: bytes `00..03` hold the modes and bytes `04..0B` the
+`DAILY` rule. The sysmodule places them: byte `01` is `restrictionMode`,
+byte `02` `timerMode`.
 
-How to test it, once a tool can write single bytes while the console is
-temporarily unlocked (with the block saved first and put back after):
-put a limit in the `04..0B` rule, set the byte that looks like `timerMode` to
-0, then read 1454 / 1459: the remaining time should follow the daily rule.
-For `restrictionMode`, let the time run out once with each value and note
-whether the software is suspended.
+Still worth checking on a console (with the block saved first and put back
+after): put a limit in the `04..0B` rule, set byte `02` to 0, then read
+1454 / 1459: the remaining time should follow the daily rule. For
+`restrictionMode`, let the time run out once with each value of byte `01`
+and note whether the software is suspended.
 
 ### Time spent and time left
 
@@ -267,13 +283,13 @@ full-screen "time limit reached, no more play today" message (in French:
 aujourd'hui*), with two choices only: *Sleep mode* and *Disable parental
 controls* (the second asks for the PIN).
 
-- No "continue" choice: this looks like the suspend behaviour
-  (`FORCED_TERMINATION`) rather than an alarm only (inferred; which header
-  byte selects it is still open).
+- No "continue" choice: the suspend behaviour (`FORCED_TERMINATION`), which
+  byte `01` of that block (`01`) says.
 - So PlayGuard says what the console does at the limit without promising the
   suspension: "Time's up" always; the game suspended on the console it was
   tested on; with a phone app once set to "alarm only", maybe a warning only,
-  a setting PlayGuard cannot read or change yet. Suspending can lose unsaved
+  a setting PlayGuard reads (byte `01`, in the diagnostic report) but does
+  not change yet. Suspending can lose unsaved
   progress (Nintendo: [time limit settings](https://www.nintendo.com/sg/parents/switch/time/settings.html)),
   so its confirmations say so, and *No more play today* can wait 5 minutes.
 - The PIN prompt behind *Disable parental controls* is the system's: a child
@@ -359,8 +375,8 @@ Cut into its fields instead of rows of 16:
 
 ```
 offset  bytes                     field
-0x00    01 01 01 00               header: four mode bytes (see the hypothesis below)
-0x04    00 00 00 06 00 00 00 00   an eighth rule? same format as a day, see below
+0x00    01 01 01 00               modes: enabled, FORCED_TERMINATION, EACH_DAY_OF_THE_WEEK
+0x04    00 00 00 06 00 00 00 00   the daily rule (unused in this mode)
 0x0C    00 00 00 06 00 01 B4 00   Sunday     limit on, 0x00B4 = 180 min
 0x14    00 00 00 06 00 01 00 00   Monday     limit on, 0 min: no play
 0x1C    00 00 00 06 00 01 00 00   Tuesday    limit on, 0 min
@@ -414,8 +430,8 @@ From the same 20:10 report:
 ## Still open
 
 - 1406 `GetSettingsLastUpdated` fails with `0x0001188E`: why?
-- The header: which of bytes `00..03` is `timerMode`, which
-  `restrictionMode`; whether `04..0B` is the `DAILY` rule (hypothesis above).
+- A console in `DAILY` or `ALARM` mode, to confirm the header on hardware
+  (it comes from the sysmodule, not from a block PlayGuard has seen).
 - The bedtime bytes with a bedtime actually on.
 - 1459's first byte; 1460's layout (23.0.0+).
 - When the time spent resets on its own; how long it stays frozen after the

@@ -17,15 +17,21 @@ static void pt_set_byte(u16 c[PT_U16_COUNT], int at, u8 v)
     c[at / 2] = at & 1 ? (u16)((c[at / 2] & 0x00FF) | (v << 8)) : (u16)((c[at / 2] & 0xFF00) | v);
 }
 
-// Byte offsets inside a day (pure.h).
-enum { PT_DAY0 = 12, PT_DAYSZ = 8, PT_BED_ON = 0, PT_BED_H, PT_BED_M, PT_END_H, PT_END_M, PT_LIMIT_ON };
+// Byte offsets inside a rule (pure.h).
+enum { PT_DAILY = 4, PT_DAY0 = 12, PT_DAYSZ = 8, PT_BED_ON = 0, PT_BED_H, PT_BED_M, PT_END_H, PT_END_M, PT_LIMIT_ON };
 
 static int pt_day(int n) { return PT_DAY0 + PT_DAYSZ * n; }
+
+bool pt_suspends(const u16 c[PT_U16_COUNT]) { return pt_byte(c, PT_MODE_RESTRICTION) != 0; }
+bool pt_daily(const u16 c[PT_U16_COUNT]) { return pt_byte(c, PT_MODE_TIMER) == 0; }
+
+// The rule the console applies on day n: the daily one in DAILY mode.
+static int pt_rule(const u16 c[PT_U16_COUNT], int n) { return pt_daily(c) ? PT_DAILY : pt_day(n); }
 
 static bool pt_any_bedtime(const u16 c[PT_U16_COUNT])
 {
     for (int n = 0; n < 7; n++)
-        if (pt_byte(c, pt_day(n) + PT_BED_ON)) return true;
+        if (pt_byte(c, pt_rule(c, n) + PT_BED_ON)) return true;
     return false;
 }
 
@@ -38,8 +44,26 @@ static bool pt_has_limit(const u16 c[PT_U16_COUNT], int n)
 
 void pt_decode(const u16 c[PT_U16_COUNT], u16 days_min[7])
 {
+    for (int n = 0; n < 7; n++) {
+        const int r = pt_rule(c, n);
+        days_min[n] = pt_byte(c, r + PT_LIMIT_ON) ? (u16)(pt_byte(c, r + 6) | (pt_byte(c, r + 7) << 8))
+                                                  : PT_DAY_NOLIMIT;
+    }
+}
+
+// A DAILY block about to change per day: timerMode set to
+// EACH_DAY_OF_THE_WEEK, the seven days given the daily rule (the console
+// ignored what they held), so the block says the same thing in the mode
+// PlayGuard writes. A daily rule with nothing on gives all-zero days instead,
+// the "off" days seen working (the timer-off block is DAILY). The daily rule
+// itself is kept.
+static void pt_to_each_day(u16 c[PT_U16_COUNT])
+{
+    if (!pt_daily(c)) return;
+    const bool on = pt_byte(c, PT_DAILY + PT_BED_ON) || pt_byte(c, PT_DAILY + PT_LIMIT_ON);
     for (int n = 0; n < 7; n++)
-        days_min[n] = pt_has_limit(c, n) ? c[7 + 4 * n + 2] : PT_DAY_NOLIMIT;
+        for (int i = 0; i < PT_DAYSZ; i++) pt_set_byte(c, pt_day(n) + i, on ? pt_byte(c, PT_DAILY + i) : 0);
+    pt_set_byte(c, PT_MODE_TIMER, 1);
 }
 
 // One 8-byte rule at byte `d` (a day, or the header's): see pure.h.
@@ -68,6 +92,12 @@ void pt_encode(u16 c[PT_U16_COUNT], const u16 days_min[7])
     if (!any && !pt_any_bedtime(c)) {
         memset(c, 0, PT_U16_COUNT * sizeof(u16));
         return;
+    }
+    if (pt_daily(c)) {
+        u16 now[7];
+        pt_decode(c, now);
+        if (memcmp(now, days_min, sizeof(now)) == 0) return;   // unchanged: left exactly as read
+        pt_to_each_day(c);
     }
     if (c[0] == 0) {
         c[0] = 0x0101;
@@ -108,7 +138,7 @@ bool pt_bedtime_ok(const PtBedtime *b)
 void pt_bedtime_decode(const u16 c[PT_U16_COUNT], PtBedtime out[7])
 {
     for (int n = 0; n < 7; n++) {
-        const int d = pt_day(n);
+        const int d = pt_rule(c, n);
         out[n].on         = pt_byte(c, d + PT_BED_ON) != 0;
         out[n].hour       = pt_byte(c, d + PT_BED_H);
         out[n].minute     = pt_byte(c, d + PT_BED_M);
@@ -117,16 +147,24 @@ void pt_bedtime_decode(const u16 c[PT_U16_COUNT], PtBedtime out[7])
     }
 }
 
+// Whether two bedtimes are the same (the times only matter while it is on).
+static bool pt_bedtime_same(const PtBedtime *a, const PtBedtime *b)
+{
+    return a->on == b->on && (!a->on || (a->hour == b->hour && a->minute == b->minute &&
+                                         a->end_hour == b->end_hour && a->end_minute == b->end_minute));
+}
+
 void pt_bedtime_encode(u16 c[PT_U16_COUNT], const PtBedtime in[7])
 {
     PtBedtime now[7];
     pt_bedtime_decode(c, now);
+    bool same = true;
+    for (int n = 0; n < 7; n++) if (!pt_bedtime_same(&in[n], &now[n])) same = false;
+    if (same && pt_daily(c)) return;   // unchanged: left exactly as read
+    pt_to_each_day(c);
     for (int n = 0; n < 7; n++) {
         const int d = pt_day(n);
-        if (in[n].on == now[n].on && (!in[n].on || (in[n].hour == now[n].hour && in[n].minute == now[n].minute &&
-                                                    in[n].end_hour == now[n].end_hour &&
-                                                    in[n].end_minute == now[n].end_minute)))
-            continue;   // unchanged: left exactly as read
+        if (pt_bedtime_same(&in[n], &now[n])) continue;   // unchanged: left exactly as read
         pt_set_byte(c, d + PT_BED_ON, in[n].on ? 1 : 0);
         pt_set_byte(c, d + PT_BED_H, in[n].on ? in[n].hour : 0);
         pt_set_byte(c, d + PT_BED_M, in[n].on ? in[n].minute : 0);

@@ -914,6 +914,8 @@ void pctl_dump(char *buf, size_t bufsz)
               else rep(&p, e, " -");
           }
           rep(&p, e, "   header=%04X %04X\n", c[0], c[1]);
+          rep(&p, e, "modes: timerMode=%s restrictionMode=%s\n",
+              pt_daily(c) ? "DAILY" : "EACH_DAY_OF_THE_WEEK", pt_suspends(c) ? "FORCED_TERMINATION" : "ALARM");
           PtBedtime bt[7];
           pt_bedtime_decode(c, bt);
           rep(&p, e, "decoded bedtime Sun..Sat (alarm/allowed again):");
