@@ -647,7 +647,10 @@ static void stop_at(const PtState& pt, uint16_t value, std::function<void()> ref
                        ui::day_name_in_text(wd), ui::fmt_minutes(value), ui::fmt_minutes(original));
     // Said once: confirm_write adds it to its own warning when the time
     // played is known.
-    if (value == 0 && pt_logic::suspend_warning_min(pt, wd, new_days) < 0) body += " " + "playguard/play_timer/unsaved"_i18n;
+    // A warning only at the limit: nothing is stopped, the console warns.
+    if (pt.alarm_only) body += "\n\n" + "playguard/dashboard/stop_alarm_only"_i18n;
+    else if (value == 0 && pt_logic::suspend_warning_min(pt, wd, new_days) < 0)
+        body += " " + "playguard/play_timer/unsaved"_i18n;
     confirm_write(body, "playguard/dashboard/stop_confirm"_i18n, [refresh, wd, base, original, value](bool did_unlock) {
         PtState now;
         pctl_play_timer_query(&now);

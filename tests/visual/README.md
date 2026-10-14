@@ -2,7 +2,7 @@
 
 What `tools/desktop_smoke.py` shows on screens that come out the same in every
 run (console time fixed, footer clock redrawn at the console's time, 16:00:00), one folder per scenario:
-`smoke/`, `errors/`, `gate/`, `rescue/`, `forged/`, `lock/`, `outside/`, `library/`, `devbuild/`. CI compares each new run with them
+`smoke/`, `errors/`, `gate/`, `rescue/`, `forged/`, `lock/`, `outside/`, `library/`, `devbuild/`, `alarm/`. CI compares each new run with them
 (`tools/visual_check.py`) and uploads the side-by-side images of any screen
 that changed. A changed screen fails the build, with the details in the job
 summary; the smoke test draws the focus without its moving glow
@@ -24,7 +24,7 @@ xvfb-run -s "-screen 0 1280x720x24" python3 tools/desktop_smoke.py smoke
 python3 tools/visual_check.py smoke tests/visual/smoke --update
 ```
 
-(`smoke-errors … errors`, `smoke-gate … gate`, `smoke-rescue … rescue`, `smoke-forged … forged`, `smoke-lock … lock`, `smoke-outside … outside`, `smoke-library … library` and `smoke-devbuild … devbuild` the same way), then look at
+(`smoke-errors … errors`, `smoke-gate … gate`, `smoke-rescue … rescue`, `smoke-forged … forged`, `smoke-lock … lock`, `smoke-outside … outside`, `smoke-library … library`, `smoke-devbuild … devbuild` and `smoke-alarm … alarm` the same way), then look at
 the new images before committing them. `--add NAME …` adds a screen to a set;
 keep out screens with a toast, a held-key scroll that can stop anywhere
 (one held to the end of a list stops on its last row: `library/`), the app

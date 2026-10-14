@@ -21,13 +21,6 @@ while linked, for everyone) or *Developer tools › Compare the play-timer
 block*. A report attached to an issue is the most useful contribution right
 now.
 
-- **Alarm only seen on a console.** *When the time is up* sets it from the
-  layout reversed from the `pctl` sysmodule; a block from a console set to
-  "alarm only" in the phone app would confirm it on hardware.
-  ([details](docs/companion-app.md#1-alarm-only-or-suspend-the-software))
-- **Bedtime and start time per day of the week.** PlayGuard sets one bedtime
-  for every day; the per-day bytes have never been seen with a bedtime on.
-  ([details](docs/companion-app.md#2-bedtime-and-start-time-per-day-of-the-week))
 - **Exceptions for specific software**: show the games on the
   free-communication list by name, then add and remove them, once the list's
   entries are decoded.
@@ -40,6 +33,10 @@ now.
 
 No unknown left; only code.
 
+- **Bedtime and start time per day of the week.** PlayGuard sets one bedtime
+  for every day; the bytes of each day's are verified on a console, so the
+  per-day editor can set them one by one.
+  ([details](docs/companion-app.md#2-bedtime-and-start-time-per-day-of-the-week))
 - **A month in Activity**: per game, per account and per day over a month,
   with the same export, the offline counterpart of the phone app's monthly
   report. ([details](docs/companion-app.md#5-monthly-report))

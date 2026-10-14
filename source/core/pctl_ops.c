@@ -450,7 +450,7 @@ static void pt_read_core(Service *srv, PtState *out)
     out->enabled_valid = R_SUCCEEDED(out->enabled_rc);
     out->restricted_rc = rd_bool(srv, 1455, &out->restricted);
     out->restricted_valid = R_SUCCEEDED(out->restricted_rc);
-    out->remaining_rc = rd_u64(srv, 1454, &out->remaining_ns);
+    out->remaining_rc = rd_u64(srv, 1454, (u64 *)&out->remaining_ns);   // a TimeSpan: signed
     out->remaining_valid = R_SUCCEEDED(out->remaining_rc);
 
     u16 c[PT_U16_COUNT];
@@ -767,7 +767,7 @@ void pctl_play_timer_sample(PtSample *out)
     out->enabled_rc    = rd_bool(srv, 1453, &out->enabled);
     out->restricted_rc = rd_bool(srv, 1455, &out->restricted);
     out->alarm_off_rc  = rd_bool(srv, 1458, &out->alarm_off);
-    out->remaining_rc  = rd_u64(srv, 1454, &out->remaining_ns);
+    out->remaining_rc  = rd_u64(srv, 1454, (u64 *)&out->remaining_ns);   // signed
     out->block_rc      = serviceDispatchOut(srv, 145601, out->block);
     out->bedtime_rc    = rd_bool(srv, 1954, &out->bedtime_on);
     if (R_SUCCEEDED(out->bedtime_rc)) out->bedtime_rc = rd_u8(srv, 1956, &out->bedtime_hour);

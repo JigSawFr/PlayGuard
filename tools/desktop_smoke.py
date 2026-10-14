@@ -43,12 +43,16 @@ outside PlayGuard, record it in the change history, then, after 90 s on
 screen, that the console is not counting; the notice must go when
 dismissed, and the Activity tab flag the new account.
 
+The "alarm" scenario starts with "When the time is up" on a warning only and
+today's limit passed (PLAYGUARD_SIM_ALARM_ONLY, PLAYGUARD_SIM_RESTRICTED):
+the Overview and the Play timer tab must show the time over the limit.
+
 The "loading" scenario stops the start-up on the loading screen
 (PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|update|library|outside|loading]   (needs DISPLAY, xdotool, ImageMagick)
+Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|update|library|outside|loading|alarm]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -77,6 +81,7 @@ UPDATE = SCENARIO == "update"
 LIBRARY = SCENARIO == "library"
 OUTSIDE = SCENARIO == "outside"
 LOADING = SCENARIO == "loading"
+ALARM = SCENARIO == "alarm"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
@@ -211,6 +216,11 @@ if not GATE and not ERRORS and not DEVBUILD and not UPDATE:
     github_token = os.path.join(run_dir, "playguard_data", "github_token")
     if os.path.exists(github_token):
         os.remove(github_token)   # signed out: Send a report online offers to sign in first
+if ALARM:
+    # "When the time is up" on a warning only, today's limit passed: the
+    # console does not restrict, and its time left reads below 0.
+    env.setdefault("PLAYGUARD_SIM_ALARM_ONLY", "1")
+    env.setdefault("PLAYGUARD_SIM_RESTRICTED", "1")
 if ERRORS:
     env.setdefault("PLAYGUARD_SIM_FAIL", "unlock")
     env.setdefault("PLAYGUARD_SIM_RESTRICTED", "1")
@@ -755,6 +765,11 @@ if OUTSIDE:
     key("Down", steps("dashboard", "activity"))
     key("Right")
     shot("05_new_account")
+    finish()
+if ALARM:
+    shot("01_overview_over")   # Overview: the time over the limit, not a time left
+    key("Down")                # Play timer: the state line and the banner say so
+    shot("02_play_timer_over")
     finish()
 if LOADING:
     shot("01_loading")         # the icon, the wordmark, the bar at its last step

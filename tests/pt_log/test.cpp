@@ -81,6 +81,13 @@ static void test_rows()
     CHECK(third.find(",1.5,!0x0001188E,,") != std::string::npos);
     CHECK(third.find(",!0x0000F601,") != std::string::npos);
 
+    // Past the limit, a warning only: 1454 below 0, the sum still the limit.
+    PtSample over = s;
+    over.remaining_ns = -120000000000LL;
+    over.spent_ns = 7320000000000ULL;
+    const std::string over_row = pt_log::row("y", 2, over, &prev);
+    CHECK(over_row.find(",-120,7320,7200,") != std::string::npos);
+
     // No session at all: every cell says why, the columns stay aligned.
     PtSample none;
     std::memset(&none, 0, sizeof(none));
