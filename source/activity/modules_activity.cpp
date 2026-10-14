@@ -59,8 +59,8 @@ std::string ModulesActivity::summary(modules::Id id)
     const modules::State s = modules::state(paths::sd_root(), m);
     if (!s.installed) return "playguard/modules/state/not_installed"_i18n;
     if (modules::offer(s, modules::bundled(bundle_dir(), m)) == modules::Offer::Update)
-        return "playguard/modules/state/update"_i18n;
-    return "playguard/modules/state/installed"_i18n;
+        return "playguard/modules/short/update"_i18n;
+    return "playguard/modules/short/installed"_i18n;
 }
 
 void ModulesActivity::onResume()
