@@ -963,6 +963,13 @@
         "section": "Changes, newest first",
         "custom_value": "age {}, posting restricted: {}, communication restricted: {}",
         "title_change": "{}: {} → {}",
+        "title_day_change": "{} ({}): {} → {}",
+        "unknown_kind": "Other change ({})",
+        "unknown_note": "Recorded by a newer version of PlayGuard: update PlayGuard to see it in full.",
+        "days_changed": "Days changed:",
+        "day_change": "{}: {} → {}",
+        "today_at": "Today, {}",
+        "yesterday_at": "Yesterday, {}",
         "kinds": {
             "limits": "Play-time limits",
             "level": "Restriction level",

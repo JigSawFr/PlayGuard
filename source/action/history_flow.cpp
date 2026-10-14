@@ -12,6 +12,7 @@
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/update.hpp"
 
 using namespace brls::literals;
 
@@ -51,15 +52,23 @@ std::string value_text(const std::string& kind, const std::vector<int>& v)
     return "";
 }
 
-std::string kind_label(const std::string& kind)
+bool known_kind(const std::string& kind)
 {
     static const char* known[] = { "limits", "level", "custom", "org", "vr", "alarm", "pin", "pin_shown",
                                    "unlock", "relock", "unlink", "delete", "clock", "restore", "rescue",
                                    "console_lock", "bedtime", "config_reset", "outside_reset", "outside_clock",
                                    "outside_limits", "new_account", "time_up" };
     for (const char* k : known)
-        if (kind == k) return brls::getStr(std::string("playguard/history/kinds/") + k);
-    return kind;
+        if (kind == k) return true;
+    return false;
+}
+
+std::string kind_label(const std::string& kind)
+{
+    // A kind this version does not know (written by a newer one): said as
+    // such, with its name for a bug report.
+    if (!known_kind(kind)) return brls::getStr("playguard/history/unknown_kind", kind);
+    return brls::getStr("playguard/history/kinds/" + kind);
 }
 
 std::string source_label(const history::Entry& e)
@@ -174,6 +183,13 @@ std::vector<history::Entry> load()
 
 std::string title(const history::Entry& e)
 {
+    // One day of the week changed: that day alone, not the week's range.
+    const std::vector<int> days = history_logic::changed_days(e);
+    if (days.size() == 1) {
+        const int d = days[0];
+        return brls::getStr("playguard/history/title_day_change", kind_label(e.kind), ui::day_name_in_text(d),
+                            ui::fmt_minutes((uint16_t)e.before[d]), ui::fmt_minutes((uint16_t)e.after[d]));
+    }
     const std::string before = value_text(e.kind, e.before), after = value_text(e.kind, e.after);
     if (!before.empty() && !after.empty())
         return brls::getStr("playguard/history/title_change", kind_label(e.kind), before, after);
@@ -191,7 +207,29 @@ std::string details(const history::Entry& e)
     const std::string before = value_text(e.kind, e.before), after = value_text(e.kind, e.after);
     if (!before.empty()) out += "\n" + brls::getStr("playguard/common/line", "playguard/history/before"_i18n, before);
     if (!after.empty()) out += "\n" + brls::getStr("playguard/common/line", "playguard/history/after"_i18n, after);
+    // The week's limits: each day that changed, as it was and became.
+    const std::vector<int> days = history_logic::changed_days(e);
+    if (!days.empty()) {
+        out += "\n\n" + "playguard/history/days_changed"_i18n;
+        for (int d : days)
+            out += "\n" + brls::getStr("playguard/history/day_change", ui::day_name(d), ui::fmt_minutes((uint16_t)e.before[d]),
+                                        ui::fmt_minutes((uint16_t)e.after[d]));
+    }
+    if (!known_kind(e.kind)) out += "\n\n" + "playguard/history/unknown_note"_i18n;
     return out;
+}
+
+std::string when_text(const history::Entry& e)
+{
+    if (e.when.size() < 16) return e.when.empty() ? "?" : e.when;
+    const std::string today = ui::today_date();
+    using history_logic::Day;
+    switch (history_logic::day_of(e.when, today, update::add_days(today, -1))) {
+    case Day::Today: return brls::getStr("playguard/history/today_at", e.when.substr(11, 5));
+    case Day::Yesterday: return brls::getStr("playguard/history/yesterday_at", e.when.substr(11, 5));
+    case Day::Other: break;
+    }
+    return e.when;
 }
 
 void open(const history::Entry& e, std::function<void()> refresh)

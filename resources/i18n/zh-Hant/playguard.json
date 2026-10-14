@@ -963,6 +963,13 @@
         "section": "變更（由新到舊）",
         "custom_value": "年齡{}，限制發文：{}，限制交流：{}",
         "title_change": "{}：{} → {}",
+        "title_day_change": "{}（{}）：{} → {}",
+        "unknown_kind": "其他變更（{}）",
+        "unknown_note": "由較新版本的 PlayGuard 記錄：請更新 PlayGuard 以查看詳情。",
+        "days_changed": "變更的日期：",
+        "day_change": "{}：{} → {}",
+        "today_at": "今天 {}",
+        "yesterday_at": "昨天 {}",
         "kinds": {
             "limits": "遊玩時間上限",
             "level": "限制等級",

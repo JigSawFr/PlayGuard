@@ -34,6 +34,8 @@ std::vector<history::Entry> load();
 // The History screen's wording: one line, and the details for its dialog.
 std::string title(const history::Entry& e);
 std::string details(const history::Entry& e);
+// When it was made: "Today, 21:29", "Yesterday, 01:25", else the stamp.
+std::string when_text(const history::Entry& e);
 
 // A on a History line: its details, and when the value can be put back, the
 // offer to (through the same gates as the change itself), recorded as an

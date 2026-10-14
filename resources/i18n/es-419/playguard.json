@@ -963,6 +963,13 @@
         "section": "Cambios, del más reciente al más antiguo",
         "custom_value": "edad {}, publicación restringida: {}, comunicación restringida: {}",
         "title_change": "{}: {} → {}",
+        "title_day_change": "{} ({}): {} → {}",
+        "unknown_kind": "Otro cambio ({})",
+        "unknown_note": "Registrado por una versión más reciente de PlayGuard: actualiza PlayGuard para verlo en detalle.",
+        "days_changed": "Días cambiados:",
+        "day_change": "{}: {} → {}",
+        "today_at": "Hoy, {}",
+        "yesterday_at": "Ayer, {}",
         "kinds": {
             "limits": "Límites de tiempo de juego",
             "level": "Nivel de restricción",
