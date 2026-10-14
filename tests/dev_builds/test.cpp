@@ -1,5 +1,6 @@
 // Host tests for source/util/sha256.cpp, dev_builds.cpp, zip_read.cpp and
-// github_auth.cpp: the SHA-256 test vectors, digests, the latest release, the
+// github_auth.cpp: the SHA-256 test vectors, digests, the latest release and
+// the list of releases, the
 // artifact and pull-request lists and how they combine (main's commits, each
 // open pull request's newest build, forks included), the cached list, the download checks
 // (size, SHA-256, NRO header), zip extraction (deflated, stored, a changed
@@ -95,6 +96,42 @@ static void test_release()
         R"({"message": "Not Found"})", "[]", "not json", "",
     };
     for (const char* j : bad) CHECK(!dev_builds::parse_release(j, &b));
+}
+
+// One release of GET /releases.
+static std::string release_json(const std::string& tag, bool prerelease, bool draft, const std::string& asset = "playguard.nro")
+{
+    return R"({"tag_name": ")" + tag + R"(", "prerelease": )" + (prerelease ? "true" : "false") +
+           R"(, "draft": )" + (draft ? "true" : "false") + R"(, "body": "notes", "assets": [{"name": ")" + asset +
+           R"(", "size": 1000, "updated_at": "2026-10-01T00:00:00Z", "browser_download_url": "https://github.com/o/r/releases/download/)" +
+           tag + R"(/playguard.nro"}]})";
+}
+
+static void test_releases()
+{
+    std::vector<Build> out;
+    const std::string list = "[" + release_json("v1.3.0-rc.1", true, false) + "," + release_json("v1.2.0", false, false) +
+                             "," + release_json("v1.2.1", false, true) + "," +   // a draft
+                             release_json("v1.1.0", false, false, "playguard.zip") + "," +   // no .nro
+                             release_json("v1.2.0", false, false) + "," +   // the same version again
+                             R"("not a release", {"tag_name": "v0.9.0"},)" + release_json("v1.0.0", false, false) + "]";
+    CHECK(dev_builds::parse_releases(list, &out));
+    if (!CHECK(out.size() == 3)) return;
+    CHECK(out[0].version == "1.3.0-rc.1" && out[0].prerelease && out[0].kind == Kind::Release && !out[0].artifact);
+    CHECK(out[1].version == "1.2.0" && !out[1].prerelease && out[1].size == 1000 && out[1].notes.empty());
+    CHECK(out[2].version == "1.0.0");
+    // At most `keep`, the newest.
+    out.clear();
+    CHECK(dev_builds::parse_releases(list, &out, 2) && out.size() == 2 && out[1].version == "1.2.0");
+    // Not a list.
+    out.clear();
+    CHECK(!dev_builds::parse_releases(R"({"message": "Not Found"})", &out) && out.empty());
+    CHECK(!dev_builds::parse_releases("not json", &out) && out.empty());
+    CHECK(dev_builds::parse_releases("[]", &out) && out.empty());
+    // The latest release alone still never takes a pre-release.
+    Build b;
+    CHECK(!dev_builds::parse_release(release_json("v1.3.0-rc.1", true, false), &b));
+    CHECK(dev_builds::parse_release(release_json("v1.2.0", false, false), &b) && !b.prerelease);
 }
 
 // The artifact holding playguard.nro, named after its build as the workflow
@@ -224,6 +261,7 @@ static void test_cache()
     rel.url = "https://github.com/o/r/releases/download/v1.2.0/playguard.nro";
     rel.size = 5000;
     rel.sha256 = std::string(64, 'a');
+    rel.prerelease = true;
     Build pr;
     pr.kind = Kind::PullRequest;
     pr.artifact = true;
@@ -249,10 +287,11 @@ static void test_cache()
     CHECK(dev_builds::decode_cache(dev_builds::encode_cache(c), &back));
     CHECK(back.fetched_at == 1000000 && !back.needs_login && back.builds.size() == 2);
     CHECK(back.builds[0].kind == Kind::Release && back.builds[0].version == "1.2.0" && !back.builds[0].artifact &&
-           back.builds[0].size == 5000 && back.builds[0].sha256 == rel.sha256 && back.builds[0].url == rel.url);
+           back.builds[0].size == 5000 && back.builds[0].sha256 == rel.sha256 && back.builds[0].url == rel.url &&
+           back.builds[0].prerelease);
     CHECK(back.builds[1].kind == Kind::PullRequest && back.builds[1].artifact && back.builds[1].pr == 48 &&
            back.builds[1].title == pr.title && back.builds[1].commit == "abc1234" && back.builds[1].date == pr.date &&
-           back.builds[1].sha256.empty());
+           back.builds[1].sha256.empty() && !back.builds[1].prerelease);
 
     // Fresh: under ten minutes old, not from the future, same sign-in state, not empty.
     CHECK(dev_builds::cache_fresh(back, 1000000 + 599, false));
@@ -405,6 +444,7 @@ int main()
     test_sha256();
     test_names();
     test_release();
+    test_releases();
     test_artifacts();
     test_order();
     test_cache();

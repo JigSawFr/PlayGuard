@@ -1,10 +1,10 @@
 // dev_builds — install another build of PlayGuard in place, from the
-// developer tools: the latest release, one of the last commits of main, or
+// developer tools: one of the last releases, one of the last commits of main, or
 // the newest build of an open pull request (from this repository: a fork's
 // build is never offered, nobody with write access has reviewed its code).
 //
-// The release is the playguard.nro of the latest GitHub release, readable
-// without an account. The others are the playguard-<version>-<ref>-<commit>-nro
+// A release is the playguard.nro of a GitHub release (pre-releases included,
+// marked), readable without an account. The others are the playguard-<version>-<ref>-<commit>-nro
 // artifact the build workflow keeps for every run (.github/workflows/build.yml
 // names each artifact of a run after its build and its component; the
 // recovery sysmodule is the -rescue one): a zip holding playguard.nro, which
@@ -33,7 +33,7 @@ namespace dev_builds
 
 enum class Kind
 {
-    Release,       // the latest release (playguard.nro)
+    Release,       // a release (its playguard.nro)
     Main,          // a commit of main
     PullRequest,   // the newest build of an open pull request
 };
@@ -43,6 +43,7 @@ struct Build
     Kind        kind = Kind::Main;
     bool        artifact = false;   // url, size and sha256 are those of a zip holding playguard.nro
     std::string version;   // Release: "1.2.0"
+    bool        prerelease = false;   // Release: marked a pre-release on GitHub
     int         pr = 0;    // PullRequest: its number
     std::string title;     // PullRequest: its title
     std::string commit;    // Main / PullRequest: 7 hex digits
@@ -74,6 +75,12 @@ struct Pull
 // else (a pre-release, no such asset, malformed).
 constexpr size_t MAX_NOTES = 16 * 1024;
 bool parse_release(const std::string& json, Build* out);
+// The releases (GET /repos/…/releases), newest first as listed: each one with
+// a playguard.nro, pre-releases included (Build::prerelease), drafts left
+// out, at most `keep`, one per version, without their notes. False when the
+// answer is not a list.
+constexpr size_t MAX_RELEASES = 20;
+bool parse_releases(const std::string& json, std::vector<Build>* out, size_t keep = MAX_RELEASES);
 // The artifact holding playguard.nro: "playguard-<version>-<ref>-<commit>-nro",
 // or "playguard_release", the name the runs before that scheme gave it.
 bool is_build_artifact(const std::string& name);
@@ -143,11 +150,12 @@ bool decode_cache(const std::string& json, Cache* out);
 // the clock was set back), in the same sign-in state.
 bool cache_fresh(const Cache& cache, int64_t now, bool needs_login);
 
-// The builds that can be installed: the release, then (with a token) main
-// and the pull requests. Blocking (network): run it with brls::async.
-// *needs_login is set when there is no token, so only the release is listed.
+// The builds that can be installed: the last releases, then (with a token)
+// main and the pull requests. Blocking (network): run it with brls::async.
+// *needs_login is set when there is no token, so only the releases are listed.
 // On the desktop build PLAYGUARD_SIM_DEV_BUILDS ("offline", or a folder
-// holding latest.json, artifacts.json and pulls.json) replaces the network.
+// holding releases.json, artifacts.json and pulls.json; latest.json for
+// fetch_release) replaces the network.
 bool fetch(std::vector<Build>* out, bool* needs_login, std::string* error);
 
 // The latest release alone (no account needed): what Update in place

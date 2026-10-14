@@ -910,7 +910,7 @@
     "dev_build": {
         "open": "安裝其他建置",
         "note": "目前執行：{}。在此安裝的建置會取而代之，PlayGuard 將以它重新啟動。",
-        "section_release": "最新版本",
+        "section_release": "版本 ({})",
         "section_main": "main ({})",
         "section_pulls": "拉取請求（{}）· {}",
         "order_newest": "最新建置在前",
@@ -918,6 +918,7 @@
         "sort": "排序",
         "next_tab": "下一個列表",
         "release": "版本 {}",
+        "prerelease": "預先發布",
         "main": "main · {} · {}",
         "pr": "PR #{} · {} · {}",
         "installed": "已安裝",

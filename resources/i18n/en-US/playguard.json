@@ -910,7 +910,7 @@
     "dev_build": {
         "open": "Install another build",
         "note": "Running: {}. A build installed from here takes its place, and PlayGuard restarts on it.",
-        "section_release": "Latest release",
+        "section_release": "Releases ({})",
         "section_main": "main ({})",
         "section_pulls": "Pull requests ({}) · {}",
         "order_newest": "newest build first",
@@ -918,6 +918,7 @@
         "sort": "Sort",
         "next_tab": "Next list",
         "release": "Release {}",
+        "prerelease": "pre-release",
         "main": "main · {} · {}",
         "pr": "PR #{} · {} · {}",
         "installed": "installed",

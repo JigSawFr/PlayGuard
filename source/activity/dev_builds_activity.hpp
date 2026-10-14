@@ -1,12 +1,12 @@
 // DevBuildsActivity — Developer tools › Install another build
-// (action/dev_build_flow.hpp): a tab each for the latest release, main's
+// (action/dev_build_flow.hpp): a tab each for the last releases, main's
 // last commits and the open pull requests (a long list of one kind never
 // hides the next), the builds of the chosen one below, the installed one
 // marked. Ⓛ / Ⓡ move from one tab to the next; the tab opened first is the
 // installed build's, then the last one chosen in this run. Ⓨ sorts the pull
 // requests (the newest build first, or by number), remembered in
 // config.json. A on a build offers to install it; below the list, signing
-// in to GitHub (signed out, only the release is listed) and how old the list
+// in to GitHub (signed out, only the releases are listed) and how old the list
 // is; Ⓧ fetches it again.
 // A list fetched again while this screen is open replaces its content in
 // place: the cells are reused, never freed (one of them may have the focus).

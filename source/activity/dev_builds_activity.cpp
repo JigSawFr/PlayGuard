@@ -111,7 +111,7 @@ std::vector<dev_builds::Build> DevBuildsActivity::builds(dev_builds::Kind kind) 
 
 void DevBuildsActivity::fill()
 {
-    // A tab without builds is left out (signed out: the release only, and
+    // A tab without builds is left out (signed out: the releases only, and
     // then no tabs at all); the one shown always has some, when any has.
     if (this->builds(this->tab).empty())
         for (dev_builds::Kind k : KINDS)
@@ -119,9 +119,10 @@ void DevBuildsActivity::fill()
                 this->tab = k;
                 break;
             }
+    const size_t releases = this->builds(dev_builds::Kind::Release).size();
     const size_t mains = this->builds(dev_builds::Kind::Main).size();
     const size_t pulls = this->builds(dev_builds::Kind::PullRequest).size();
-    tab_release->setText("playguard/dev_build/section_release"_i18n);
+    tab_release->setText(brls::getStr("playguard/dev_build/section_release", (int)releases));
     tab_main->setText(brls::getStr("playguard/dev_build/section_main", (int)mains));
     tab_pulls->setText(brls::getStr("playguard/dev_build/section_pulls", (int)pulls,
                                     order() == dev_builds::Order::Number ? "playguard/dev_build/order_number"_i18n
@@ -129,7 +130,7 @@ void DevBuildsActivity::fill()
     tab_release->setStyle(this->tab == dev_builds::Kind::Release ? &brls::BUTTONSTYLE_PRIMARY : &brls::BUTTONSTYLE_DEFAULT);
     tab_main->setStyle(this->tab == dev_builds::Kind::Main ? &brls::BUTTONSTYLE_PRIMARY : &brls::BUTTONSTYLE_DEFAULT);
     tab_pulls->setStyle(this->tab == dev_builds::Kind::PullRequest ? &brls::BUTTONSTYLE_PRIMARY : &brls::BUTTONSTYLE_DEFAULT);
-    ui::set_visible(tab_release.getView(), !this->builds(dev_builds::Kind::Release).empty());
+    ui::set_visible(tab_release.getView(), releases > 0);
     ui::set_visible(tab_main.getView(), mains > 0);
     ui::set_visible(tab_pulls.getView(), pulls > 0);
     brls::View* focus = brls::Application::getCurrentFocus();
@@ -149,7 +150,7 @@ void DevBuildsActivity::fill()
         const dev_builds::Build b = shown[i];
         switch (b.kind) {
             case dev_builds::Kind::Release:
-                cell->setText(brls::getStr("playguard/dev_build/release", b.version));
+                cell->setText(dev_build_flow::release_text(b));
                 cell->setDetailText(dev_build_flow::short_date(b.date));
                 break;
             case dev_builds::Kind::Main:
@@ -175,7 +176,7 @@ void DevBuildsActivity::fill()
     // Never the focus left on a tab that went with its row.
     if (tabs_go && focus && focus->getParent() == tabs.getView() && !shown.empty())
         brls::Application::giveFocus(cells[0]);
-    // Without a token GitHub hands out the release only: a line signs in.
+    // Without a token GitHub hands out the releases only: a line signs in.
     ui::set_visible(sign_in.getView(), cache.needs_login);
     checked->setText(dev_build_flow::checked_text(cache));
 }

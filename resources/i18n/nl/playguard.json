@@ -910,7 +910,7 @@
     "dev_build": {
         "open": "Andere build installeren",
         "note": "Actief: {}. Een build die je hier installeert, neemt zijn plaats in en PlayGuard start ermee opnieuw.",
-        "section_release": "Nieuwste versie",
+        "section_release": "Versies ({})",
         "section_main": "main ({})",
         "section_pulls": "Pull requests ({}) · {}",
         "order_newest": "nieuwste build eerst",
@@ -918,6 +918,7 @@
         "sort": "Sorteren",
         "next_tab": "Volgende lijst",
         "release": "Versie {}",
+        "prerelease": "voorlopige versie",
         "main": "main · {} · {}",
         "pr": "PR #{} · {} · {}",
         "installed": "geïnstalleerd",

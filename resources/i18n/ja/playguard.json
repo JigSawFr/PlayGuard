@@ -910,7 +910,7 @@
     "dev_build": {
         "open": "別のビルドをインストール",
         "note": "実行中: {}。ここからインストールしたビルドが置き換わり、PlayGuard はそのビルドで再起動します。",
-        "section_release": "最新バージョン",
+        "section_release": "バージョン ({})",
         "section_main": "main ({})",
         "section_pulls": "プルリクエスト ({}) · {}",
         "order_newest": "新しいビルド順",
@@ -918,6 +918,7 @@
         "sort": "並べ替え",
         "next_tab": "次のリスト",
         "release": "バージョン {}",
+        "prerelease": "プレリリース",
         "main": "main · {} · {}",
         "pr": "PR #{} · {} · {}",
         "installed": "インストール済み",

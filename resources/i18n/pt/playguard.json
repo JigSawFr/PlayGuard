@@ -910,7 +910,7 @@
     "dev_build": {
         "open": "Instalar outra compilação",
         "note": "Em uso: {}. Uma compilação instalada aqui toma o seu lugar e o PlayGuard reinicia com ela.",
-        "section_release": "Versão mais recente",
+        "section_release": "Versões ({})",
         "section_main": "main ({})",
         "section_pulls": "Pull requests ({}) · {}",
         "order_newest": "compilação mais recente primeiro",
@@ -918,6 +918,7 @@
         "sort": "Ordenar",
         "next_tab": "Lista seguinte",
         "release": "Versão {}",
+        "prerelease": "pré-lançamento",
         "main": "main · {} · {}",
         "pr": "PR #{} · {} · {}",
         "installed": "instalada",

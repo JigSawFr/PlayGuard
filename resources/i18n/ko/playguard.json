@@ -910,7 +910,7 @@
     "dev_build": {
         "open": "다른 빌드 설치",
         "note": "실행 중: {}. 여기서 설치한 빌드가 이를 대체하고 PlayGuard가 그 빌드로 다시 시작됩니다.",
-        "section_release": "최신 버전",
+        "section_release": "버전 ({})",
         "section_main": "main ({})",
         "section_pulls": "풀 리퀘스트 ({}) · {}",
         "order_newest": "최신 빌드 순",
@@ -918,6 +918,7 @@
         "sort": "정렬",
         "next_tab": "다음 목록",
         "release": "버전 {}",
+        "prerelease": "사전 릴리스",
         "main": "main · {} · {}",
         "pr": "PR #{} · {} · {}",
         "installed": "설치됨",

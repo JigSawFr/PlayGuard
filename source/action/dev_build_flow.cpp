@@ -78,7 +78,7 @@ std::string label(const dev_builds::Build& b)
     std::string text;
     switch (b.kind) {
         case dev_builds::Kind::Release:
-            text = brls::getStr("playguard/dev_build/release", b.version);
+            text = release_text(b);
             break;
         case dev_builds::Kind::Main:
             text = brls::getStr("playguard/dev_build/main", b.commit, short_date(b.date));
@@ -219,8 +219,16 @@ std::string short_date(const std::string& iso)
 
 bool installed(const dev_builds::Build& b)
 {
-    if (b.kind == dev_builds::Kind::Release) return false;   // a release is told by its version
+    // A release is told by its version (a release build has no commit).
+    if (b.kind == dev_builds::Kind::Release) return app::is_release() && b.version == app::version();
     return !app::commit().empty() && b.commit == app::commit();
+}
+
+std::string release_text(const dev_builds::Build& b)
+{
+    std::string text = brls::getStr("playguard/dev_build/release", b.version);
+    if (b.prerelease) text += " · " + "playguard/dev_build/prerelease"_i18n;
+    return text;
 }
 
 std::string checked_text(const dev_builds::Cache& cache)

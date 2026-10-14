@@ -67,32 +67,59 @@ bool parse(const std::string& text, F f)
 }
 }   // namespace
 
+namespace
+{
+// A release's playguard.nro, with its notes. False when it has none (or a
+// malformed one), or is a draft; a pre-release only when `prerelease_ok`.
+bool release_build(const json& r, bool prerelease_ok, Build* out)
+{
+    if (!r.is_object() || r.value("draft", true)) return false;
+    const bool prerelease = r.value("prerelease", true);
+    if (prerelease && !prerelease_ok) return false;
+    if (!r.contains("assets") || !r["assets"].is_array()) return false;
+    const std::string tag = str(r, "tag_name");
+    for (const auto& a : r["assets"]) {
+        if (!a.is_object() || str(a, "name") != "playguard.nro") continue;
+        Build b;
+        b.kind = Kind::Release;
+        b.prerelease = prerelease;
+        b.version = tag.size() > 1 && tag[0] == 'v' ? tag.substr(1) : tag;
+        b.url = str(a, "browser_download_url");
+        b.date = str(a, "updated_at");
+        b.sha256 = digest_hex(str(a, "digest"));
+        b.notes = str(r, "body");
+        if (b.notes.size() > MAX_NOTES) {
+            const size_t cut = b.notes.rfind('\n', MAX_NOTES);
+            b.notes.resize(cut == std::string::npos ? 0 : cut);
+        }
+        const int64_t size = integer(a, "size");
+        if (b.version.empty() || !https(b.url) || size <= 0) return false;
+        b.size = (uint64_t)size;
+        *out = b;
+        return true;
+    }
+    return false;
+}
+}   // namespace
+
 bool parse_release(const std::string& text, Build* out)
 {
-    return parse(text, [out](const json& r) {
-        if (!r.is_object() || r.value("prerelease", true) || r.value("draft", true)) return false;
-        if (!r.contains("assets") || !r["assets"].is_array()) return false;
-        const std::string tag = str(r, "tag_name");
-        for (const auto& a : r["assets"]) {
-            if (!a.is_object() || str(a, "name") != "playguard.nro") continue;
+    return parse(text, [out](const json& r) { return release_build(r, false, out); });
+}
+
+bool parse_releases(const std::string& text, std::vector<Build>* out, size_t keep)
+{
+    return parse(text, [out, keep](const json& j) {
+        if (!j.is_array()) return false;
+        std::set<std::string> seen;
+        for (const auto& r : j) {
+            if (out->size() >= keep) break;
             Build b;
-            b.kind = Kind::Release;
-            b.version = tag.size() > 1 && tag[0] == 'v' ? tag.substr(1) : tag;
-            b.url = str(a, "browser_download_url");
-            b.date = str(a, "updated_at");
-            b.sha256 = digest_hex(str(a, "digest"));
-            b.notes = str(r, "body");
-            if (b.notes.size() > MAX_NOTES) {
-                const size_t cut = b.notes.rfind('\n', MAX_NOTES);
-                b.notes.resize(cut == std::string::npos ? 0 : cut);
-            }
-            const int64_t size = integer(a, "size");
-            if (b.version.empty() || !https(b.url) || size <= 0) return false;
-            b.size = (uint64_t)size;
-            *out = b;
-            return true;
+            if (!release_build(r, true, &b) || !seen.insert(b.version).second) continue;
+            b.notes.clear();   // only Update in place shows them, from the latest release
+            out->push_back(b);
         }
-        return false;
+        return true;
     });
 }
 
@@ -230,6 +257,7 @@ std::string encode_cache(const Cache& cache)
     json list = json::array();
     for (const Build& b : cache.builds)
         list.push_back({ { "kind", kind_name(b.kind) }, { "artifact", b.artifact }, { "version", b.version },
+                         { "prerelease", b.prerelease },
                          { "pr", b.pr }, { "title", b.title }, { "commit", b.commit }, { "date", b.date },
                          { "url", b.url }, { "size", b.size }, { "sha256", b.sha256 } });
     const json j = { { "version", 1 }, { "fetched_at", cache.fetched_at }, { "needs_login", cache.needs_login },
@@ -254,6 +282,7 @@ bool decode_cache(const std::string& text, Cache* out)
             else continue;
             b.artifact = x.value("artifact", false);
             b.version = str(x, "version");
+            b.prerelease = b.kind == Kind::Release && x.value("prerelease", false);
             b.pr = (int)integer(x, "pr");
             b.title = str(x, "title");
             b.commit = str(x, "commit");

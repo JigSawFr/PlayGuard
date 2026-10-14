@@ -65,10 +65,12 @@ bool fetch(std::vector<Build>* out, bool* needs_login, std::string* error)
     std::string body, err;
     bool reached = false;
 
-    Build release;
-    if (api_get("/releases/latest", "latest.json", token, &body, &err, 512 * 1024)) {
+    // The last releases, newest first (each one's notes come along: a few
+    // KB apiece).
+    if (api_get("/releases?per_page=" + std::to_string(MAX_RELEASES), "releases.json", token, &body, &err,
+                4 * 1024 * 1024)) {
         reached = true;
-        if (parse_release(body, &release)) out->push_back(release);
+        parse_releases(body, out);
     }
     if (!token.empty()) {
         // The artifacts of the last runs, newest first, 100 a page: the API

@@ -1,5 +1,5 @@
-// dev_build_flow — Developer tools › Install another build: lists the latest
-// release, the last commits of main and the open pull requests
+// dev_build_flow — Developer tools › Install another build: lists the last
+// releases, the last commits of main and the open pull requests
 // (util/dev_builds.hpp), downloads the one picked, checks it, puts it in
 // place of the running .nro and restarts PlayGuard on it through hbloader.
 // The list is kept (memory and cache/dev_builds.json) and shown at once for
@@ -19,8 +19,11 @@ namespace dev_build_flow
 void open(bool force = false);
 
 // For the list's screen:
-// Whether `b` is the running build (a commit of main or of a pull request).
+// Whether `b` is the running build: a release by its version (when this one
+// is a release build), a commit of main or of a pull request by its commit.
 bool installed(const dev_builds::Build& b);
+// "Release 1.2.0", "· pre-release" after it for one.
+std::string release_text(const dev_builds::Build& b);
 // "2026-10-09T12:03:00Z" -> "2026-10-09 12:03"
 std::string short_date(const std::string& iso);
 // "List checked 3 min ago.", for `cache`.
