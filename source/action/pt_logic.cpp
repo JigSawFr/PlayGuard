@@ -36,7 +36,9 @@ int over_limit_min(const PtState& pt, int weekday)
 {
     if (!pt.valid || !pt.enabled_valid || !pt.enabled || weekday < 0 || weekday > 6) return -1;
     if (pt.day_min[weekday] == PT_DAY_NOLIMIT || !pt.remaining_valid || pt.remaining_ns >= 0) return -1;
-    return (int)std::min<uint64_t>(1440, ((uint64_t)-pt.remaining_ns + 30000000000ULL) / 60000000000ULL);
+    // Negated as unsigned: INT64_MIN has no positive s64.
+    const uint64_t over_ns = (uint64_t)0 - (uint64_t)pt.remaining_ns;
+    return (int)std::min<uint64_t>(1440, (over_ns + 30000000000ULL) / 60000000000ULL);
 }
 
 int suspend_warning_min(const PtState& pt, int weekday, const uint16_t new_days[7])
