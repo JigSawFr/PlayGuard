@@ -69,7 +69,7 @@ INSTALL = """## 📦 Install
 
 2. **Already installed?** Update from PlayGuard itself (*About › Update*), sphaira or the Homebrew App Store. The app alone: [`playguard.nro`]({dl}/playguard.nro){size_nro}.
 
-3. **Locked out?** [`playguard-rescue.zip`]({dl}/playguard-rescue.zip){size_rescue} is the optional recovery sysmodule, for a [forgotten PIN]({repo}#locked-out-second-hand-console-forgotten-pin).
+3. **Locked out?** [`playguard-rescue.zip`]({dl}/playguard-rescue.zip){size_rescue} is the optional recovery sysmodule, for a [forgotten PIN]({repo}/blob/main/docs/troubleshooting.md#locked-out).
 
 > [!NOTE]
 > Requires custom firmware (**Atmosphère**).{firmware} [Compatibility]({repo}#compatibility)"""

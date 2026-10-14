@@ -2,9 +2,16 @@
 
 Getting back into a locked console, reporting a bug, and the developer mode. Back to the [README](../README.md).
 
-## Locked out? (second-hand console, forgotten PIN)
+## Locked out?
 
-Second-hand console, forgotten PIN, a 0-minute limit that blocks everything: what to do is in the README's [Locked out?](../README.md#locked-out-second-hand-console-forgotten-pin) section, kept there so it is the first thing found. The recovery sysmodule itself: [`sysmodule/README.md`](../sysmodule/README.md).
+PlayGuard only sees the parental controls of the system it runs on: **emuMMC and sysMMC each have their own** (a PIN removed on one is still there on the other). Run it on each one that needs fixing.
+
+| Situation | What to do |
+|---|---|
+| **Second-hand console:** you know the PIN, but the previous owner's phone app is still linked (unlinking fails, or a factory reset asks for their account) | *Security & app › Unlink the companion app*, then, if you want no parental controls at all, *Delete all parental controls*. Both work offline, on emuMMC as on sysMMC. |
+| **PIN forgotten** | *Show the PIN* asks for the PIN itself, so it cannot help here. With the recovery sysmodule installed (below), drop a `RESCUE` file and restart: the recovery screen then sets a new one (it never shows the old one). Without it, *Delete all parental controls* starts again (a settings backup is saved first; it never contains the PIN): with *Ask for the PIN* on (the default, *Before a change*), put the SD card in a computer and set `"pin_lock"` to `"off"` in `sd:/config/playguard/config.json` first. |
+| **The play timer blocks everything (0-minute limit) and the PIN is forgotten** | PlayGuard itself cannot start then. Install the optional recovery sysmodule (`playguard-rescue.zip`) **beforehand**; when locked out, drop an empty `config/playguard/RESCUE` file on the SD card and boot — it unlocks the console so PlayGuard can open. See [`sysmodule/README.md`](../sysmodule/README.md). |
+| **Console not modded** | PlayGuard cannot help: it needs Atmosphère. Nintendo support's master-key procedure is the official way. |
 
 ## Reporting a bug
 

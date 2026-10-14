@@ -2,6 +2,16 @@
 
 What each tab does, how PlayGuard writes safely, and what the console counts as play time. Back to the [README](../README.md).
 
+| Play timer | Per-day limits |
+|---|---|
+| ![Play timer](../images/screenshots/play_timer.png) | ![Per-day limits](../images/screenshots/per_day.png) |
+| **Activity** | **A game** |
+| ![Activity](../images/screenshots/activity.png) | ![A game](../images/screenshots/activity_game.png) |
+| **Restrictions** | **Network clock** |
+| ![Restrictions](../images/screenshots/restrictions.png) | ![Network clock](../images/screenshots/clock.png) |
+| **Security & app** | **Preferences** |
+| ![Security & app](../images/screenshots/security.png) | ![Preferences](../images/screenshots/preferences.png) |
+
 ## Controls
 
 ↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh · **+** saves per-day limits.
@@ -70,7 +80,7 @@ The app is organised in tabs, like System Settings; each has its section below.
 - **Set / change the PIN** (system PIN screen), **show the PIN** (after a warning and the PIN itself, asked every time; recorded in the history, then a new PIN is offered), **unlock temporarily**, **lock now**.
 - **Ask for the PIN** in PlayGuard itself: *Never*, *Before a change* (the default: anyone can look, only the parent changes something; asked again after 5 min) or *To open PlayGuard* (a lock screen at start, and again when PlayGuard comes back after 5 min or more out of focus). Checked in the service layer, so no change skips it; locking again never asks. *Show the PIN* asks for it every time, in every mode and even within the 5 minutes, and a missing or damaged `config.json` counts as *Before a change*. Quitting while parental controls are still unlocked asks whether to lock them again; closed from the HOME menu instead, PlayGuard locks them again the next time it starts.
 - **Console lock:** one switch that sets every day's limit to 0, so a PIN is needed to start a game — a light lock without age ratings or communication limits. It blocks starting games, not the HOME menu, and needs a PIN. The previous limits come back when it is turned off. While it is on, *extra time* and *no more play today* are refused, and limits set another way (a profile, a backup, the history…) replace it.
-- **Companion app:** whether the Nintendo Switch Parental Controls app is linked, its last sync, and **unlink** (otherwise its next sync overwrites the limits set here: while it is linked, every change PlayGuard asks to confirm says so). While it is linked, *Before unlinking: help decode…* opens the block comparison (see [Contributing](../README.md#contributing)).
+- **Companion app:** whether the Nintendo Switch Parental Controls app is linked, its last sync, and **unlink** (otherwise its next sync overwrites the limits set here: while it is linked, every change PlayGuard asks to confirm says so). While it is linked, *Before unlinking: help decode…* opens the block comparison (see [CONTRIBUTING.md](../CONTRIBUTING.md#no-code-needed)).
 - **Delete all parental controls:** two confirmations, irreversible; a backup of the settings is saved first.
 
 ## Preferences
