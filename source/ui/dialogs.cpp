@@ -6,6 +6,7 @@
 #include "util/duration.hpp"
 
 #include <memory>
+#include <yoga/Yoga.h>
 
 using namespace brls::literals;
 
@@ -24,62 +25,85 @@ void on_cancel(brls::Dialog* dialog, std::function<void()> on_cancel)
         false, false, brls::SOUND_BACK);
 }
 
-// Lines `text` takes at `per_line` characters a line (a rough count: the
-// font is proportional, but the paragraphs are what makes a text tall).
-static int estimated_lines(const std::string& text, size_t per_line)
+// A dialog's text has to fit: borealis' Label stops wrapping when the height
+// it is offered is below what its wrapped text needs, and draws the whole
+// text on one line across the screen instead (label.cpp, labelMeasureFunc).
+// So the font size is chosen from the text's real wrapped height, measured
+// the way the Label measures it, never from a character count (French and
+// German lines hold fewer characters than English ones).
+
+// Height of the dialog's content above its button row (72 px).
+static float content_height() { return brls::Application::contentHeight - 72; }
+
+// Wrapped height of `text` at `size` in `width`, as labelMeasureFunc does it.
+static float text_height(brls::Label* label, const std::string& text, float size, float width)
 {
-    int lines = 0;
-    size_t start = 0;
-    while (start <= text.size()) {
-        size_t end = text.find('\n', start);
-        if (end == std::string::npos) end = text.size();
-        // UTF-8 continuation bytes are not characters.
-        size_t chars = 0;
-        for (size_t i = start; i < end; i++) chars += ((unsigned char)text[i] & 0xC0) != 0x80;
-        lines += chars == 0 ? 1 : (int)((chars + per_line - 1) / per_line);
-        start = end + 1;
-    }
-    return lines;
+    NVGcontext* vg = brls::Application::getNVGContext();
+    nvgFontSize(vg, size);
+    nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+    nvgFontFaceId(vg, label->getFont());
+    nvgTextLineHeight(vg, label->getLineHeight());
+    float bounds[4];
+    nvgTextBoxBounds(vg, 0, 0, width, text.c_str(), nullptr, bounds);
+    return bounds[3] - bounds[1];
+}
+
+// The largest of `sizes` at which `text` fits `height` in `width` (a few
+// pixels spare), else the smallest, with a warning in the log.
+static float fitting_size(brls::Label* label, const std::string& text, std::initializer_list<float> sizes,
+                          float width, float height)
+{
+    for (float size : sizes)
+        if (text_height(label, text, size, width) + 4 <= height) return size;
+    brls::Logger::warning("dialog: text too long even at {} px ({} bytes)", *(sizes.end() - 1), text.size());
+    return *(sizes.end() - 1);
+}
+
+static brls::Label* wrapping_label(const std::string& text)
+{
+    auto* label = new brls::Label();
+    label->setText(text);
+    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    label->setSingleLine(false);
+    return label;
 }
 
 brls::Dialog* dialog(const std::string& text)
 {
-    // borealis' layout (720 px wide, 115 px side margins, 24 px font) holds
-    // about 40 characters a line and 13 lines above the buttons.
-    if (estimated_lines(text, 40) <= 13) return new brls::Dialog(text);
-    auto* label = new brls::Label();
-    label->setText(text);
-    label->setFontSize(19);
-    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    label->setSingleLine(false);
-    // A column that stretches the label: given the dialog's width, it wraps.
-    // In a row it got none and was drawn as one line across the screen.
+    // borealis' own layout first (24 px, 65 / 115 px margins, as
+    // brls::Dialog(text)); a longer text gets narrower margins and a
+    // smaller font. Never brls::Dialog(text) itself: its label sits in a
+    // row, which Yoga may measure at a width of 0.
+    auto* label = wrapping_label(text);
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->addView(label);
-    box->setAlignItems(brls::AlignItems::STRETCH);
+    box->setAlignItems(brls::AlignItems::STRETCH);   // the dialog's width: the label wraps
     box->setJustifyContent(brls::JustifyContent::CENTER);
-    box->setPadding(28, 40, 28, 40);
+    const float h = content_height();
+    if (text_height(label, text, 24, 720 - 2 * 115) + 4 <= h - 2 * 65) {
+        label->setFontSize(24);
+        box->setPadding(65, 115, 65, 115);
+    } else {
+        label->setFontSize(fitting_size(label, text, { 21, 19, 17, 15, 14 }, 720 - 2 * 40, h - 2 * 28));
+        box->setPadding(28, 40, 28, 40);
+    }
     return new brls::Dialog(box);
 }
 
-// The text (slightly smaller, so a chart fits under a long one) and `extra`.
-// At 20 px about 60 characters a line and 14 lines fit above a week chart;
-// a longer text (German, with every note) gets a smaller font rather than
-// pushing the dialog off the screen.
+// The text and `extra` (a week chart) under it, the font as large as fits
+// (20 px down to 14: German, with every note), `extra` measured first.
 static brls::Dialog* dialog_with(const std::string& text, brls::View* extra)
 {
-    int size = 20;
-    while (size > 16 && estimated_lines(text, (size_t)(60 * 20 / size)) > 14 * 20 / size) size -= 2;
-    auto* label = new brls::Label();
-    label->setText(text);
-    label->setFontSize((float)size);
-    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    label->setSingleLine(false);
+    const float width = 720 - 2 * 40;
+    extra->setMarginTop(18);
+    YGNodeCalculateLayout(extra->getYGNode(), width, YGUndefined, YGDirectionLTR);
+    const float extra_h = YGNodeLayoutGetHeight(extra->getYGNode()) + 18;
+    auto* label = wrapping_label(text);
+    label->setFontSize(fitting_size(label, text, { 20, 18, 16, 15, 14 }, width, content_height() - 26 - 18 - extra_h));
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::STRETCH);
     box->setPadding(26, 40, 18, 40);
     box->addView(label);
-    extra->setMarginTop(18);
     box->addView(extra);
     return new brls::Dialog(box);
 }
@@ -173,7 +197,7 @@ void prompt_text(const std::string& header, const std::string& initial, int max_
 
 void offer_restart()
 {
-    auto* dialog = new brls::Dialog("playguard/common/restart_body"_i18n);
+    auto* dialog = ui::dialog("playguard/common/restart_body"_i18n);
     dialog->addButton("playguard/common/later"_i18n, []() {});
     dialog->addButton("playguard/common/quit"_i18n, []() { brls::Application::quit(); });
     dialog->setCancelable(true);
@@ -211,6 +235,8 @@ bool show_pin_dialog(std::function<void()> on_close)
     title->setFontSize(22);
     title->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     title->setTextColor(color_note());
+    title->setSingleLine(false);
+    title->setAlignSelf(brls::AlignSelf::STRETCH);   // the dialog's width, not a guess (dialog())
     auto* digits = new brls::Label();
     digits->setText(spaced);
     digits->setFontSize(56);
