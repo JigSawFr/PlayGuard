@@ -850,7 +850,6 @@
         "launch_reset": "{}：インストール済みのバージョンを再び許可しました",
         "content_err": "削除できませんでした",
         "launch_err": "起動バージョンを変更できませんでした",
-        "verifying": "{}をチェック中… {} %",
         "verify_ok": "{}：破損したデータは見つかりませんでした。",
         "verify_bad": "{}：破損したデータが見つかりました。ゲームを削除して再インストールしてください。",
         "verify_err": "データをチェックできませんでした",
@@ -874,7 +873,15 @@
         "check_again": "もう一度チェック",
         "checked_now": "たった今チェックしました。",
         "checked_min": "{}分前にチェックしました。",
-        "checked_h": "{}時間前にチェックしました。"
+        "checked_h": "{}時間前にチェックしました。",
+        "verify_title": "データをチェック中",
+        "verify_preparing": "準備中…",
+        "verify_amount": "{} / {}",
+        "verify_left_less": "残り1分未満",
+        "verify_left_min": "残り約{}分",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": "."
     },
     "about": {
         "section_changelog": "{}の更新内容",

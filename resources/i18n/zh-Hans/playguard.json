@@ -850,7 +850,6 @@
         "launch_reset": "{}：已重新接受已安装的版本",
         "content_err": "无法删除",
         "launch_err": "无法更改启动版本",
-        "verifying": "正在检查{}… {} %",
         "verify_ok": "{}：未发现损坏的数据。",
         "verify_bad": "{}：发现损坏的数据。请删除游戏后重新安装。",
         "verify_err": "无法检查数据",
@@ -874,7 +873,15 @@
         "check_again": "重新检查",
         "checked_now": "刚刚检查。",
         "checked_min": "{}分钟前检查。",
-        "checked_h": "{}小时前检查。"
+        "checked_h": "{}小时前检查。",
+        "verify_title": "正在检查数据",
+        "verify_preparing": "正在准备…",
+        "verify_amount": "{} / {}",
+        "verify_left_less": "剩余不到1分钟",
+        "verify_left_min": "剩余约{}分钟",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": "."
     },
     "about": {
         "section_changelog": "{} 更新内容",

@@ -850,7 +850,6 @@
         "launch_reset": "{}: de geïnstalleerde versie wordt weer geaccepteerd",
         "content_err": "Kon niet worden verwijderd",
         "launch_err": "De startversie kon niet worden gewijzigd",
-        "verifying": "{} wordt gecontroleerd… {} %",
         "verify_ok": "{}: geen beschadigde data gevonden.",
         "verify_bad": "{}: beschadigde data gevonden. Verwijder de game en installeer hem opnieuw.",
         "verify_err": "De data konden niet worden gecontroleerd",
@@ -874,7 +873,15 @@
         "check_again": "Opnieuw controleren",
         "checked_now": "Zojuist gecontroleerd.",
         "checked_min": "{} min geleden gecontroleerd.",
-        "checked_h": "{} u geleden gecontroleerd."
+        "checked_h": "{} u geleden gecontroleerd.",
+        "verify_title": "Data worden gecontroleerd",
+        "verify_preparing": "Voorbereiden…",
+        "verify_amount": "{} van {}",
+        "verify_left_less": "minder dan een minuut",
+        "verify_left_min": "nog ongeveer {} min",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ","
     },
     "about": {
         "section_changelog": "Nieuw in {}",

@@ -850,7 +850,6 @@
         "launch_reset": "{}: se vuelve a aceptar la versión instalada",
         "content_err": "No se pudo eliminar",
         "launch_err": "No se pudo cambiar la versión de inicio",
-        "verifying": "Comprobando {}… {} %",
         "verify_ok": "{}: no se han encontrado datos dañados.",
         "verify_bad": "{}: se han encontrado datos dañados. Elimina el juego y vuelve a instalarlo.",
         "verify_err": "No se pudieron comprobar los datos",
@@ -874,7 +873,15 @@
         "check_again": "Comprobar de nuevo",
         "checked_now": "Comprobado ahora mismo.",
         "checked_min": "Comprobado hace {} min.",
-        "checked_h": "Comprobado hace {} h."
+        "checked_h": "Comprobado hace {} h.",
+        "verify_title": "Comprobando los datos",
+        "verify_preparing": "Preparando…",
+        "verify_amount": "{} de {}",
+        "verify_left_less": "queda menos de un minuto",
+        "verify_left_min": "quedan unos {} min",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ","
     },
     "about": {
         "section_changelog": "Novedades de la {}",

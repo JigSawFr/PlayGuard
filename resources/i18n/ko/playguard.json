@@ -850,7 +850,6 @@
         "launch_reset": "{}: 설치된 버전이 다시 허용됨",
         "content_err": "삭제할 수 없습니다",
         "launch_err": "실행 버전을 변경할 수 없습니다",
-        "verifying": "{} 확인 중… {} %",
         "verify_ok": "{}: 손상된 데이터가 없습니다.",
         "verify_bad": "{}: 손상된 데이터가 있습니다. 게임을 삭제한 뒤 다시 설치하세요.",
         "verify_err": "데이터를 확인할 수 없습니다",
@@ -874,7 +873,15 @@
         "check_again": "다시 확인",
         "checked_now": "방금 확인했습니다.",
         "checked_min": "{}분 전에 확인했습니다.",
-        "checked_h": "{}시간 전에 확인했습니다."
+        "checked_h": "{}시간 전에 확인했습니다.",
+        "verify_title": "데이터 확인 중",
+        "verify_preparing": "준비 중…",
+        "verify_amount": "{} / {}",
+        "verify_left_less": "1분 미만 남음",
+        "verify_left_min": "약 {}분 남음",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": "."
     },
     "about": {
         "section_changelog": "{}의 새로운 기능",

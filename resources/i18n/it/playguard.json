@@ -850,7 +850,6 @@
         "launch_reset": "{}: la versione installata è di nuovo accettata",
         "content_err": "Impossibile rimuoverlo",
         "launch_err": "Impossibile cambiare la versione di avvio",
-        "verifying": "Controllo di {}… {} %",
         "verify_ok": "{}: nessun dato danneggiato.",
         "verify_bad": "{}: dati danneggiati. Rimuovi il gioco e reinstallalo.",
         "verify_err": "Impossibile controllare i dati",
@@ -874,7 +873,15 @@
         "check_again": "Controlla di nuovo",
         "checked_now": "Controllato ora.",
         "checked_min": "Controllato {} min fa.",
-        "checked_h": "Controllato {} h fa."
+        "checked_h": "Controllato {} h fa.",
+        "verify_title": "Controllo dei dati",
+        "verify_preparing": "Preparazione…",
+        "verify_amount": "{} di {}",
+        "verify_left_less": "meno di un minuto",
+        "verify_left_min": "circa {} min rimanenti",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ","
     },
     "about": {
         "section_changelog": "Novità della {}",

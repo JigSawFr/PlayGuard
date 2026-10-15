@@ -850,7 +850,6 @@
         "launch_reset": "{}: a versão instalada volta a ser aceite",
         "content_err": "Não foi possível remover",
         "launch_err": "Não foi possível mudar a versão de arranque",
-        "verifying": "A verificar {}… {} %",
         "verify_ok": "{}: nenhum dado danificado.",
         "verify_bad": "{}: dados danificados. Remova o jogo e volte a instalá-lo.",
         "verify_err": "Não foi possível verificar os dados",
@@ -874,7 +873,15 @@
         "check_again": "Verificar de novo",
         "checked_now": "Verificado agora mesmo.",
         "checked_min": "Verificado há {} min.",
-        "checked_h": "Verificado há {} h."
+        "checked_h": "Verificado há {} h.",
+        "verify_title": "A verificar os dados",
+        "verify_preparing": "A preparar…",
+        "verify_amount": "{} de {}",
+        "verify_left_less": "menos de um minuto",
+        "verify_left_min": "cerca de {} min restantes",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ","
     },
     "about": {
         "section_changelog": "Novidades da {}",

@@ -850,7 +850,6 @@
         "launch_reset": "{}: the installed version is accepted again",
         "content_err": "Could not remove it",
         "launch_err": "Could not change the launch version",
-        "verifying": "Checking {}… {} %",
         "verify_ok": "{}: no corrupt data found.",
         "verify_bad": "{}: corrupt data found. Remove the game and install it again.",
         "verify_err": "Could not check the data",
@@ -874,7 +873,15 @@
         "check_again": "Check again",
         "checked_now": "Checked just now.",
         "checked_min": "Checked {} min ago.",
-        "checked_h": "Checked {} h ago."
+        "checked_h": "Checked {} h ago.",
+        "verify_title": "Checking the data",
+        "verify_preparing": "Getting ready…",
+        "verify_amount": "{} of {}",
+        "verify_left_less": "less than a minute left",
+        "verify_left_min": "about {} min left",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": "."
     },
     "about": {
         "section_changelog": "What's new in {}",

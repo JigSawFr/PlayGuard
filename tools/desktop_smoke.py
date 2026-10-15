@@ -1018,6 +1018,7 @@ key("Up", 6)
 key("Down", 4)             # past Garden, Hedgehog, Ocean, Castle
 key("Return")
 key("Return")              # Check the data for corruption (the fix)
+time.sleep(2.6)            # past the first seconds: the time left shows
 shot("27_games_verifying")
 time.sleep(3)
 shot("27_games_verified")  # corrupt data found

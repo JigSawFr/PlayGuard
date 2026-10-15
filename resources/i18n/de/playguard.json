@@ -850,7 +850,6 @@
         "launch_reset": "{}: die installierte Version wird wieder zugelassen",
         "content_err": "Konnte nicht entfernt werden",
         "launch_err": "Die Startversion konnte nicht geändert werden",
-        "verifying": "{} wird geprüft… {} %",
         "verify_ok": "{}: keine beschädigten Daten gefunden.",
         "verify_bad": "{}: beschädigte Daten gefunden. Entferne das Spiel und installiere es erneut.",
         "verify_err": "Die Daten konnten nicht geprüft werden",
@@ -874,7 +873,15 @@
         "check_again": "Erneut prüfen",
         "checked_now": "Gerade geprüft.",
         "checked_min": "Vor {} Min. geprüft.",
-        "checked_h": "Vor {} Std. geprüft."
+        "checked_h": "Vor {} Std. geprüft.",
+        "verify_title": "Daten werden geprüft",
+        "verify_preparing": "Wird vorbereitet…",
+        "verify_amount": "{} von {}",
+        "verify_left_less": "weniger als eine Minute",
+        "verify_left_min": "noch etwa {} Min.",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ","
     },
     "about": {
         "section_changelog": "Neu in {}",

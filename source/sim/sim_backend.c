@@ -788,7 +788,7 @@ static void sim_games(GameCheck *out)
         { 0x0100A1B2C3D4B000ULL, "Ocean Explorer",   GC_FILES_MISSING },
         { 0x0100A1B2C3D4C000ULL, "Castle Siege",     GC_TICKET_MISSING },
         { 0x0100A1B2C3D4D000ULL, "Moon Racer",       GC_LAUNCH_VERSION },
-        { 0x0100A1B2C3D4E000ULL, "Forest Tales",     GC_NEEDS_VERIFY },
+        { 0x0100A1B2C3D4E000ULL, "Forest Tales: Legends of the Ancient Grove for Nintendo Switch™",     GC_NEEDS_VERIFY },
         { 0x0100A1B2C3D4F000ULL, "Star Pilots",      GC_KEY_TOO_NEW },
     };
     for (size_t i = 0; i < sizeof(broken) / sizeof(broken[0]); i++) {
@@ -885,13 +885,14 @@ Result gamecheck_reset_launch_version(u64 app_id, u32 version)
     return 0;
 }
 
-// Two seconds or so of progress; "Forest Tales" has corrupt data.
+// Four seconds or so of progress over 3.8 GB; "Forest Tales" has corrupt data.
 Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt)
 {
     *corrupt = false;
     if (fails("verify")) return SIM_FAIL_RC;
-    for (u64 step = 0; step <= 4; step++) {
-        if (progress && !progress(ctx, step * 256ULL << 20, 1024ULL << 20)) return NXM_RC_CANCELLED;
+    const u64 total = 3891ULL << 20;
+    for (u64 step = 0; step <= 8; step++) {
+        if (progress && !progress(ctx, total * step / 8, step ? total : 0)) return NXM_RC_CANCELLED;
         const struct timespec pause = { 0, 500000000L };
         nanosleep(&pause, NULL);
     }

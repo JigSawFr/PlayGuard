@@ -850,7 +850,6 @@
         "launch_reset": "{}：已重新接受已安裝的版本",
         "content_err": "無法刪除",
         "launch_err": "無法變更啟動版本",
-        "verifying": "正在檢查{}… {} %",
         "verify_ok": "{}：未發現損壞的資料。",
         "verify_bad": "{}：發現損壞的資料。請刪除遊戲後重新安裝。",
         "verify_err": "無法檢查資料",
@@ -874,7 +873,15 @@
         "check_again": "重新檢查",
         "checked_now": "剛剛檢查。",
         "checked_min": "{}分鐘前檢查。",
-        "checked_h": "{}小時前檢查。"
+        "checked_h": "{}小時前檢查。",
+        "verify_title": "正在檢查資料",
+        "verify_preparing": "正在準備…",
+        "verify_amount": "{} / {}",
+        "verify_left_less": "剩餘不到1分鐘",
+        "verify_left_min": "剩餘約{}分鐘",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": "."
     },
     "about": {
         "section_changelog": "{} 更新內容",

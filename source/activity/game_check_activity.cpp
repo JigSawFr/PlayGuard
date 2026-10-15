@@ -2,6 +2,7 @@
 #include "activity/game_check_activity.hpp"
 
 #include <atomic>
+#include <chrono>
 #include <fmt/format.h>
 #include <functional>
 #include <string>
@@ -216,22 +217,97 @@ std::vector<unsigned char> icon_of(u64 app_id)
 }
 
 // The integrity check's dialog and what its thread shares with it.
+// A plain progress bar: the track, then the part done in the icon's teal.
+class ProgressBar : public brls::View
+{
+  public:
+    ProgressBar()
+        : track(ui::color_track()), done(ui::color_ok())
+    {
+        this->setHeight(12);
+        this->setFocusable(false);
+    }
+
+    void set(float fraction)
+    {
+        this->fraction = fraction < 0 ? 0 : fraction > 1 ? 1 : fraction;
+    }
+
+    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style, brls::FrameContext*) override
+    {
+        const float radius = height / 2.0f;
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, x, y, width, height, radius);
+        nvgFillColor(vg, this->track);
+        nvgFill(vg);
+        if (this->fraction <= 0) return;
+        float w = width * this->fraction;
+        if (w < height) w = height;
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, x, y, w, height, radius);
+        nvgFillColor(vg, this->done);
+        nvgFill(vg);
+    }
+
+  private:
+    float fraction = 0;
+    NVGcolor track, done;
+};
+
+// "850 MB", "3.8 GB" (the language's decimal mark).
+std::string size_text(u64 bytes)
+{
+    const u64 mb = bytes >> 20;
+    if (mb < 1024) return brls::getStr("playguard/games/size_mb", (int)mb);
+    std::string gb = fmt::format("{:.1f}", (double)bytes / (double)(1ULL << 30));
+    const std::string mark = "playguard/games/decimal_mark"_i18n;
+    const size_t dot = gb.find('.');
+    if (dot != std::string::npos) gb.replace(dot, 1, mark);
+    return brls::getStr("playguard/games/size_gb", gb);
+}
+
+// The integrity check's dialog and what its thread shares with it.
 struct VerifyState
 {
     std::atomic<bool> cancel{ false };
     bool open = true;   // the dialog is on screen (main thread only)
     brls::Dialog* dialog = nullptr;
-    brls::Label* label = nullptr;
+    ProgressBar* bar = nullptr;
+    brls::Label* percent = nullptr;
+    brls::Label* detail = nullptr;
     std::string name;
+    std::chrono::steady_clock::time_point started = std::chrono::steady_clock::now();
 };
+
+// What the dialog says at `current` of `total` bytes: the share done, how
+// much, and the time left once it can be told (a few seconds in).
+void show_progress(VerifyState* s, u64 current, u64 total)
+{
+    if (!total) {
+        s->bar->set(0);
+        s->percent->setText("playguard/games/verify_preparing"_i18n);
+        s->detail->setText("");
+        return;
+    }
+    if (current > total) current = total;
+    s->bar->set((float)((double)current / (double)total));
+    s->percent->setText(fmt::format("{} %", (int)(current * 100 / total)));
+    std::string detail = brls::getStr("playguard/games/verify_amount", size_text(current), size_text(total));
+    const double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now() - s->started).count();
+    if (current > 0 && elapsed >= 3) {
+        const double left = elapsed * (double)(total - current) / (double)current;
+        detail += " · " + (left < 60 ? "playguard/games/verify_left_less"_i18n
+                                      : brls::getStr("playguard/games/verify_left_min", (int)(left / 60 + 0.5)));
+    }
+    s->detail->setText(detail);
+}
 
 bool on_verify_progress(void* ctx, u64 current, u64 total)
 {
     auto* state = (std::shared_ptr<VerifyState>*)ctx;
     const std::shared_ptr<VerifyState> s = *state;
-    const int percent = total ? (int)(current * 100 / total) : 0;
-    brls::sync([s, percent]() {
-        if (s->open) s->label->setText(brls::getStr("playguard/games/verifying", s->name, percent > 100 ? 100 : percent));
+    brls::sync([s, current, total]() {
+        if (s->open) show_progress(s.get(), current, total);
     });
     return !s->cancel.load();
 }
@@ -622,19 +698,59 @@ void GameCheckActivity::verify(const GameFacts& g)
     }
     this->verifying = true;
 
-    // A dialog of its own: the progress, and Cancel (B too).
+    // A dialog of its own: the game (icon, name on one line), the bar, the
+    // share done with how much and the time left, and Cancel (B too).
     auto state = std::make_shared<VerifyState>();
     state->name = game_name(g);
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::STRETCH);
-    box->setPadding(30, 40, 22, 40);
-    state->label = text_label(brls::getStr("playguard/games/verifying", state->name, 0), 24, ui::color_text());
-    state->label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    box->addView(state->label);
-    auto* hint_label = text_label("playguard/games/verify_note"_i18n, 18, ui::color_note());
-    hint_label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    hint_label->setMarginTop(14);
-    box->addView(hint_label);
+    box->setPadding(26, 36, 20, 36);
+
+    auto* head = new brls::Box(brls::Axis::ROW);
+    head->setAlignItems(brls::AlignItems::CENTER);
+    const std::vector<unsigned char> icon = icon_of(g.app_id);
+    if (!icon.empty()) {
+        auto* image = new brls::Image();
+        image->setImageFromMem(icon.data(), (int)icon.size());
+        image->setScalingType(brls::ImageScalingType::FIT);
+        image->setWidth(56);
+        image->setHeight(56);
+        image->setMarginRight(16);
+        head->addView(image);
+    }
+    auto* titles = new brls::Box(brls::Axis::COLUMN);
+    titles->setGrow(1.0f);
+    titles->setShrink(1.0f);
+    titles->addView(text_label("playguard/games/verify_title"_i18n, 18, ui::color_note()));
+    auto* name_label = text_label(state->name, 22, ui::color_text());
+    name_label->setSingleLine(true);   // a long name is cut, not wrapped over the dialog
+    name_label->setMarginTop(2);
+    titles->addView(name_label);
+    head->addView(titles);
+    box->addView(head);
+
+    state->bar = new ProgressBar();
+    state->bar->setMarginTop(22);
+    box->addView(state->bar);
+    auto* numbers = new brls::Box(brls::Axis::ROW);
+    numbers->setAlignItems(brls::AlignItems::CENTER);
+    numbers->setMarginTop(10);
+    state->percent = text_label("", 22, ui::color_text());
+    state->percent->setSingleLine(true);
+    state->percent->setMarginRight(14);
+    numbers->addView(state->percent);
+    state->detail = text_label("", 17, ui::color_note());
+    state->detail->setSingleLine(true);
+    state->detail->setGrow(1.0f);
+    state->detail->setShrink(1.0f);
+    state->detail->setHorizontalAlign(brls::HorizontalAlign::RIGHT);
+    numbers->addView(state->detail);
+    box->addView(numbers);
+    show_progress(state.get(), 0, 0);
+
+    auto* note_label = text_label("playguard/games/verify_note"_i18n, 16, ui::color_note());
+    note_label->setMarginTop(16);
+    box->addView(note_label);
     state->dialog = new brls::Dialog(box);
     auto cancel = [state]() {
         state->cancel = true;
