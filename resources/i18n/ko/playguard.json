@@ -1095,5 +1095,33 @@
         "history_reset": "변경 기록을 읽을 수 없어 새 기록을 시작했습니다. 손상된 파일은 history.json.bad로 보관했습니다.",
         "history_stuck": "변경 기록을 읽을 수도, 따로 옮겨 둘 수도 없었습니다. 당분간 변경 사항이 기록되지 않습니다. SD 카드를 확인하세요.",
         "rescue_unreadable": "복구 sysmodule의 보고서를 찾았지만 읽을 수 없어, PlayGuard는 무엇이 실행되었는지 알 수 없습니다. PIN과 플레이 타이머를 확인하세요."
+    },
+    "notices": {
+        "title": "알림",
+        "hint": "알림",
+        "hint_count": "알림 ({})",
+        "none": "확인이 필요한 항목이 없습니다.",
+        "section_todo": "할 일",
+        "section_info": "참고",
+        "seen": "읽음으로 표시",
+        "open_tab": "{} 열기",
+        "pin_missing": "자녀 보호 기능이 설정되지 않았습니다",
+        "pin_missing_detail": "아직 PIN이 없습니다. 본체가 보호되지 않습니다.",
+        "alarm_off": "\"시간 종료\" 알람: 꺼짐",
+        "alarm_off_detail": "시간이 다 되어도 플레이어에게 알려 주는 것이 없습니다.",
+        "alarm_on": "켜기",
+        "outside": "PlayGuard 밖에서 이루어진 변경",
+        "not_counting": "본체가 플레이 시간을 세지 않고 있습니다",
+        "clock": "네트워크 시계가 정확하지 않습니다",
+        "clock_detail": "플레이 타이머는 이 시계를 기준으로 합니다. 시간 서버로 맞추세요.",
+        "clock_fix": "맞추기",
+        "pairing": "스마트폰 앱이 연동되어 있습니다",
+        "pairing_detail": "다음 동기화 때 여기서 설정한 내용을 덮어씁니다.",
+        "compat": "이 버전에서 테스트되지 않은 펌웨어",
+        "serial": "시리얼 번호가 가려지지 않음 (emuMMC)",
+        "serial_detail": "emuMMC에서는 Atmosphère로 가릴 수 있습니다. 도구 탭을 참고하세요.",
+        "patches": "게임 패치를 확인해야 합니다",
+        "data": "PlayGuard 파일이 손상되었습니다",
+        "data_toast": "PlayGuard 파일 중 하나가 손상되었습니다. 알림(Y)을 확인하세요."
     }
 }

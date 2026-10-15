@@ -14,11 +14,20 @@ What each tab does, how PlayGuard writes safely, and what the console counts as 
 
 ## Controls
 
-↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh · **+** saves per-day limits.
+↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh · Ⓨ notifications · **+** saves per-day limits.
 
 What failed is said in a dialog, what worked in a toast. The title says when the app is read-only or while parental controls are temporarily unlocked; in read-only mode, actions stay in place, greyed, and say why when pressed.
 
 The app is organised in tabs, like System Settings; each has its section below.
+
+## Notifications — what needs you, from any tab
+
+A bell in the header, left of the version, gathers what needs the parent; Ⓨ opens the list from any tab (the footer says *Notifications (2)* when two things are to do).
+
+- **To do**, counted on the bell in amber, stays until it is fixed: no PIN yet, the "time's up" alarm off, changes made outside PlayGuard, the console not counting play time, an inaccurate network clock, game patches that need a look, one of PlayGuard's own files that could not be put aside.
+- **For information**, a dot on the bell, can be marked as read: the companion app linked, a firmware not tested with this version, the serial number not blanked on emuMMC, a newer version of PlayGuard, the network clock found off at start-up, one of PlayGuard's own files found damaged and put aside (a toast at start-up points to it).
+- Ⓐ on an entry does the fix (*Turn it on*, *Set it*, *Update*…) or opens the tab where it is made. An entry goes by itself once what it says is fixed.
+- The state behind it is read when PlayGuard starts, every minute on the main screen, and every 5 s while the Overview is shown.
 
 ## Overview — today at a glance
 

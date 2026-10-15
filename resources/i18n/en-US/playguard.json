@@ -1095,5 +1095,33 @@
         "history_reset": "The change history could not be read, so a new one was started; the damaged file was kept as history.json.bad.",
         "history_stuck": "The change history could not be read, nor put aside: no change will be recorded in it for now. Check the SD card.",
         "rescue_unreadable": "A report from the recovery sysmodule was found but could not be read, so PlayGuard cannot tell what it did. Check the PIN and the play timer."
+    },
+    "notices": {
+        "title": "Notifications",
+        "hint": "Notifications",
+        "hint_count": "Notifications ({})",
+        "none": "Nothing needs your attention.",
+        "section_todo": "To do",
+        "section_info": "For information",
+        "seen": "Mark as read",
+        "open_tab": "Open {}",
+        "pin_missing": "Parental controls are not set up",
+        "pin_missing_detail": "No PIN yet: the console is not protected.",
+        "alarm_off": "\"Time's up\" alarm: off",
+        "alarm_off_detail": "Nothing tells the player when time is up.",
+        "alarm_on": "Turn it on",
+        "outside": "Changes made outside PlayGuard",
+        "not_counting": "The console is not counting play time",
+        "clock": "The network clock is not accurate",
+        "clock_detail": "The play timer counts on it: set it from a time server.",
+        "clock_fix": "Set it",
+        "pairing": "The companion app is linked",
+        "pairing_detail": "Its next sync overwrites what is set here.",
+        "compat": "Firmware not tested with this version",
+        "serial": "Serial number not blanked (emuMMC)",
+        "serial_detail": "Atmosphère can blank it on emuMMC: see the Tools tab.",
+        "patches": "Game patches need a look",
+        "data": "A PlayGuard file was damaged",
+        "data_toast": "PlayGuard found one of its files damaged: see the notifications (Y)."
     }
 }

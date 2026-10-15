@@ -1095,5 +1095,33 @@
         "history_reset": "De wijzigingsgeschiedenis kon niet worden gelezen, dus er is een nieuwe begonnen. Het beschadigde bestand is bewaard als history.json.bad.",
         "history_stuck": "De wijzigingsgeschiedenis kon niet worden gelezen of opzijgezet: er worden voorlopig geen wijzigingen in vastgelegd. Controleer de SD-kaart.",
         "rescue_unreadable": "Er is een rapport van de herstel-sysmodule gevonden, maar het kon niet worden gelezen, dus PlayGuard weet niet wat die heeft gedaan. Controleer de pincode en de speeltijdtimer."
+    },
+    "notices": {
+        "title": "Meldingen",
+        "hint": "Meldingen",
+        "hint_count": "Meldingen ({})",
+        "none": "Niets vraagt je aandacht.",
+        "section_todo": "Te doen",
+        "section_info": "Ter informatie",
+        "seen": "Markeren als gelezen",
+        "open_tab": "{} openen",
+        "pin_missing": "Ouderlijk toezicht is niet ingesteld",
+        "pin_missing_detail": "Nog geen pincode: de console is niet beschermd.",
+        "alarm_off": "Alarm \"Tijd is om\": uit",
+        "alarm_off_detail": "Niets laat de speler weten wanneer de tijd om is.",
+        "alarm_on": "Inschakelen",
+        "outside": "Wijzigingen buiten PlayGuard",
+        "not_counting": "De console telt de speeltijd niet",
+        "clock": "De netwerkklok is niet nauwkeurig",
+        "clock_detail": "De speeltijdtimer rekent op haar: stel haar in via een tijdserver.",
+        "clock_fix": "Instellen",
+        "pairing": "De smartphone-app is gekoppeld",
+        "pairing_detail": "De volgende synchronisatie overschrijft wat hier is ingesteld.",
+        "compat": "Firmware niet getest met deze versie",
+        "serial": "Serienummer niet verborgen (emuMMC)",
+        "serial_detail": "Atmosphère kan het op emuMMC verbergen: zie het tabblad Hulpmiddelen.",
+        "patches": "De gamepatches moeten worden nagekeken",
+        "data": "Een bestand van PlayGuard was beschadigd",
+        "data_toast": "PlayGuard vond een beschadigd bestand: zie de meldingen (Y)."
     }
 }

@@ -1095,5 +1095,33 @@
         "history_reset": "Der Änderungsverlauf konnte nicht gelesen werden, daher wurde ein neuer begonnen. Die beschädigte Datei wurde als history.json.bad aufbewahrt.",
         "history_stuck": "Der Änderungsverlauf konnte weder gelesen noch beiseitegelegt werden: Vorerst werden darin keine Änderungen aufgezeichnet. Prüfen Sie die SD-Karte.",
         "rescue_unreadable": "Ein Bericht des Wiederherstellungs-Sysmoduls wurde gefunden, konnte aber nicht gelesen werden, daher weiß PlayGuard nicht, was es getan hat. Prüfen Sie die Geheimzahl und die Spielzeit."
+    },
+    "notices": {
+        "title": "Benachrichtigungen",
+        "hint": "Benachrichtigungen",
+        "hint_count": "Benachrichtigungen ({})",
+        "none": "Nichts erfordert deine Aufmerksamkeit.",
+        "section_todo": "Zu erledigen",
+        "section_info": "Zur Information",
+        "seen": "Als gelesen markieren",
+        "open_tab": "{} öffnen",
+        "pin_missing": "Die Jugendschutzeinstellungen sind nicht eingerichtet",
+        "pin_missing_detail": "Noch keine PIN: Die Konsole ist nicht geschützt.",
+        "alarm_off": "Alarm „Zeit ist um“: aus",
+        "alarm_off_detail": "Nichts sagt dem Spieler, wann die Zeit um ist.",
+        "alarm_on": "Einschalten",
+        "outside": "Änderungen außerhalb von PlayGuard",
+        "not_counting": "Die Konsole zählt die Spielzeit nicht",
+        "clock": "Die Netzwerkuhr ist ungenau",
+        "clock_detail": "Der Spielzeit-Timer richtet sich nach ihr: Stelle sie über einen Zeitserver.",
+        "clock_fix": "Stellen",
+        "pairing": "Die Smart-Geräte-App ist verknüpft",
+        "pairing_detail": "Ihre nächste Synchronisierung überschreibt, was hier eingestellt ist.",
+        "compat": "Firmware mit dieser Version nicht getestet",
+        "serial": "Seriennummer nicht ausgeblendet (emuMMC)",
+        "serial_detail": "Atmosphère kann sie im emuMMC ausblenden: siehe Tab Werkzeuge.",
+        "patches": "Die Spiel-Patches sollten geprüft werden",
+        "data": "Eine Datei von PlayGuard war beschädigt",
+        "data_toast": "PlayGuard hat eine beschädigte Datei gefunden: siehe Benachrichtigungen (Y)."
     }
 }

@@ -1095,5 +1095,33 @@
         "history_reset": "Não foi possível ler o histórico de alterações, por isso foi iniciado um novo. O ficheiro danificado foi guardado como history.json.bad.",
         "history_stuck": "Não foi possível ler nem pôr de lado o histórico de alterações: por agora, nenhuma alteração será registada nele. Verifique o cartão SD.",
         "rescue_unreadable": "Foi encontrado um relatório do sysmodule de recuperação, mas não foi possível lê-lo, por isso o PlayGuard não sabe o que ele fez. Verifique o PIN e o tempo de jogo."
+    },
+    "notices": {
+        "title": "Notificações",
+        "hint": "Notificações",
+        "hint_count": "Notificações ({})",
+        "none": "Nada precisa da sua atenção.",
+        "section_todo": "A fazer",
+        "section_info": "Para informação",
+        "seen": "Marcar como lida",
+        "open_tab": "Abrir {}",
+        "pin_missing": "O controlo parental não está configurado",
+        "pin_missing_detail": "Ainda sem PIN: a consola não está protegida.",
+        "alarm_off": "Alarme \"Tempo esgotado\": desligado",
+        "alarm_off_detail": "Nada avisa o jogador quando o tempo acaba.",
+        "alarm_on": "Ligá-lo",
+        "outside": "Alterações feitas fora do PlayGuard",
+        "not_counting": "A consola não está a contar o tempo de jogo",
+        "clock": "O relógio de rede não é preciso",
+        "clock_detail": "O temporizador depende dele: acerte-o a partir de um servidor de hora.",
+        "clock_fix": "Acertá-lo",
+        "pairing": "A aplicação móvel está associada",
+        "pairing_detail": "A próxima sincronização substitui o que é definido aqui.",
+        "compat": "Firmware não testado com esta versão",
+        "serial": "Número de série não ocultado (emuMMC)",
+        "serial_detail": "O Atmosphère pode ocultá-lo no emuMMC: veja o separador Ferramentas.",
+        "patches": "Os patches de jogos precisam de verificação",
+        "data": "Um ficheiro do PlayGuard estava danificado",
+        "data_toast": "O PlayGuard encontrou um dos seus ficheiros danificado: veja as notificações (Y)."
     }
 }

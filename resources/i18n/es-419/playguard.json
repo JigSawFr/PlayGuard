@@ -1095,5 +1095,33 @@
         "history_reset": "No se pudo leer el historial de cambios, así que se empezó uno nuevo. El archivo dañado se guardó como history.json.bad.",
         "history_stuck": "No se pudo leer el historial de cambios ni apartarlo: por ahora no se registrará en él ningún cambio. Revise la tarjeta SD.",
         "rescue_unreadable": "Se encontró un informe del sysmodule de recuperación, pero no se pudo leer, así que PlayGuard no puede saber qué hizo. Revise el PIN y el tiempo de juego."
+    },
+    "notices": {
+        "title": "Notificaciones",
+        "hint": "Notificaciones",
+        "hint_count": "Notificaciones ({})",
+        "none": "Nada requiere tu atención.",
+        "section_todo": "Pendiente",
+        "section_info": "Para tu información",
+        "seen": "Marcar como leída",
+        "open_tab": "Abrir {}",
+        "pin_missing": "El control parental no está configurado",
+        "pin_missing_detail": "Aún no hay PIN: la consola no está protegida.",
+        "alarm_off": "Alarma de “Se acabó el tiempo”: desactivada",
+        "alarm_off_detail": "Nada le avisa al jugador cuando se acaba el tiempo.",
+        "alarm_on": "Activarla",
+        "outside": "Cambios hechos fuera de PlayGuard",
+        "not_counting": "La consola no está contando el tiempo de juego",
+        "clock": "El reloj de red es impreciso",
+        "clock_detail": "El temporizador depende de él: ajústalo con un servidor de hora.",
+        "clock_fix": "Ajustarlo",
+        "pairing": "La app para celular está vinculada",
+        "pairing_detail": "Su próxima sincronización sobrescribe lo que se configure aquí.",
+        "compat": "Firmware no probado con esta versión",
+        "serial": "Número de serie no ocultado (emuMMC)",
+        "serial_detail": "Atmosphère puede ocultarlo en emuMMC: consulta la pestaña Herramientas.",
+        "patches": "Hay que revisar los parches de juegos",
+        "data": "Un archivo de PlayGuard estaba dañado",
+        "data_toast": "PlayGuard encontró uno de sus archivos dañado: consulta las notificaciones (Y)."
     }
 }

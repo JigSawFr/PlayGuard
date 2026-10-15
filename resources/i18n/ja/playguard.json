@@ -1095,5 +1095,33 @@
         "history_reset": "変更履歴を読み込めなかったため、新しい履歴を開始しました。破損したファイルはhistory.json.badとして残してあります。",
         "history_stuck": "変更履歴を読み込めず、退避もできませんでした。当面、変更は履歴に記録されません。SDカードを確認してください。",
         "rescue_unreadable": "復旧用sysmoduleのレポートが見つかりましたが、読み込めませんでした。何が行われたかPlayGuardでは分かりません。暗証番号とプレイ時間を確認してください。"
+    },
+    "notices": {
+        "title": "お知らせ",
+        "hint": "お知らせ",
+        "hint_count": "お知らせ（{}）",
+        "none": "対応が必要なことはありません。",
+        "section_todo": "対応が必要",
+        "section_info": "お知らせ",
+        "seen": "既読にする",
+        "open_tab": "{}を開く",
+        "pin_missing": "みまもり設定がされていません",
+        "pin_missing_detail": "暗証番号がまだありません。本体は保護されていません。",
+        "alarm_off": "「時間です」アラーム：オフ",
+        "alarm_off_detail": "時間になっても、プレイヤーに知らせるものがありません。",
+        "alarm_on": "オンにする",
+        "outside": "PlayGuard の外で行われた変更",
+        "not_counting": "本体がプレイ時間を数えていません",
+        "clock": "ネットワーク時計が不正確です",
+        "clock_detail": "プレイタイマーはこの時計に基づきます。時刻サーバーから合わせてください。",
+        "clock_fix": "合わせる",
+        "pairing": "スマホアプリと連携しています",
+        "pairing_detail": "次の同期で、ここでの設定は上書きされます。",
+        "compat": "このバージョンで未検証のファームウェア",
+        "serial": "シリアル番号が隠されていません（emuMMC）",
+        "serial_detail": "emuMMC では Atmosphère で隠せます。「ツール」タブをご覧ください。",
+        "patches": "ゲームパッチの確認が必要です",
+        "data": "PlayGuard のファイルが破損していました",
+        "data_toast": "PlayGuard のファイルが破損していました。お知らせ（Y）をご覧ください。"
     }
 }

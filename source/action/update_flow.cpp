@@ -2,6 +2,7 @@
 #include "action/update_flow.hpp"
 
 #include "action/dev_build_flow.hpp"
+#include "action/notices.hpp"
 #include "activity/update_activity.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
@@ -64,10 +65,24 @@ void show_result(const Offer& o)
     }
 }
 
+// The notification bell's entry for a newer version `latest` ("" or not
+// newer: none). Information: Later on the update screen does not hide it.
+void note_latest(const std::string& latest)
+{
+    if (latest.empty() || update::compare_versions(latest, app::version()) <= 0) {
+        notices::clear("update");
+        return;
+    }
+    notices::set("update", notices::Level::Info, brls::getStr("playguard/update/headline", latest),
+                 brls::getStr("playguard/update/running", app::version()), "playguard/update/update"_i18n,
+                 []() { update_now(); });
+}
+
 // Remembers the day of a check that reached the server, and what it found.
 void record_check(const update::Result& r)
 {
     if (r.verdict == update::Verdict::Unknown) return;
+    note_latest(r.verdict == update::Verdict::NoRelease ? "" : r.latest.version);
     auto& cfg = config::get();
     cfg.update_checked = ui::today_date();
     cfg.update_latest  = r.verdict == update::Verdict::NoRelease ? "" : r.latest.version;
@@ -178,6 +193,7 @@ void at_start(brls::Activity* main)
     const std::string today = ui::today_date();
     const bool pending = update::offer_at_start(cfg.update_latest, app::version(), snooze(), today);
     const bool due = cfg.update_daily && cfg.update_checked != today;
+    note_latest(cfg.update_latest);   // what the last check found, until the next one
     if (s_checking || !(pending || due)) return;
     // Quietly: only a newer version, not postponed, is worth a word.
     run_check([main, today](const Offer& o) {
