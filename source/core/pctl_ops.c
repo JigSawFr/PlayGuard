@@ -419,6 +419,18 @@ static Result pt_write_gate(Service *srv, bool *active)
     return ((enabled || restricted) && !unlocked) ? NXM_RC_WRITE_GATED : 0;
 }
 
+// 195101 with no PIN registered: pctl skips the write and still returns 0
+// (the 22.5.0 sysmodule, NX-Pctl-Manager's docs/pctl-reverse-engineering.md).
+// Say so before writing instead of a "not applied" after it. A failed 1206
+// proves nothing: the write goes ahead, its read-back still catches a skip.
+static Result pt_block_write_gate(Service *srv, bool *active)
+{
+    Result rc = pt_write_gate(srv, active);
+    if (R_FAILED(rc)) return rc;
+    u32 pin_length = 0;
+    return R_SUCCEEDED(rd_u32(srv, 1206, &pin_length)) && pin_length == 0 ? NXM_RC_NO_PIN : 0;
+}
+
 // A play-timer command (no argument, or the one byte `arg` points to) behind
 // the change check and the gate above, in one session.
 static Result pt_gated_command(u32 cmd, const u8 *arg)
@@ -547,7 +559,7 @@ Result pctl_play_timer_set_days(const u16 days_min[7])
     Service *srv = pctlGetServiceSession_Service();
 
     bool active = false;
-    rc = pt_write_gate(srv, &active);
+    rc = pt_block_write_gate(srv, &active);
     if (R_FAILED(rc)) {
         pctl_ops_exit();
         return rc;
@@ -636,7 +648,7 @@ Result pctl_play_timer_set_bedtime(const PtBedtime bed[7], int today)
     Result rc = pctl_ops_reinit();
     if (R_FAILED(rc)) return rc;
     Service *srv = pctlGetServiceSession_Service();
-    rc = pt_write_gate(srv, NULL);
+    rc = pt_block_write_gate(srv, NULL);
     if (R_FAILED(rc)) {
         pctl_ops_exit();
         return rc;
@@ -688,7 +700,7 @@ Result pctl_play_timer_set_alarm_only(bool alarm_only)
     Result rc = pctl_ops_reinit();
     if (R_FAILED(rc)) return rc;
     Service *srv = pctlGetServiceSession_Service();
-    rc = pt_write_gate(srv, NULL);
+    rc = pt_block_write_gate(srv, NULL);
     if (R_FAILED(rc)) {
         pctl_ops_exit();
         return rc;

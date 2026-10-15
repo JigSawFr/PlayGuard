@@ -47,7 +47,7 @@ Public reference: [switchbrew, Parental Control services](https://switchbrew.org
 | 1403 `IsPairingActive` | companion app paired | |
 | 1043 `DeleteSettings` | wipes the PIN and every restriction | **cannot be undone** |
 | 1941 `DeletePairing` | unlinks the companion app | |
-| 1601 / 1602 / 1603 | | return `0x00010A8E` on a normal console: not usable |
+| 1601 / 1602 / 1603 | | return `0x00010A8E` on a normal console: not usable (the 22.5.0 sysmodule returns that code when the session lacks a capability bit, as reversed by [NX-Pctl-Manager](https://github.com/tailiang2008/NX-Pctl-Manager/blob/main/docs/pctl-reverse-engineering.md)) |
 
 ## PIN and temporary unlock
 
@@ -60,6 +60,11 @@ Public reference: [switchbrew, Parental Control services](https://switchbrew.org
     buffer, makes the service drop the session (`0xF601`);
   - the PIN must be passed NUL-terminated (`length + 1` bytes); the bare digits
     are refused with `0xF80E`.
+  - From the 22.5.0 sysmodule, as reversed by
+    [NX-Pctl-Manager](https://github.com/tailiang2008/NX-Pctl-Manager/blob/main/docs/pctl-reverse-engineering.md):
+    its PIN check answers `0x0000F08E` (2142-0120) for a wrong PIN or one
+    that is not 4 to 8 digits, and `0x0001088E` (2142-0132) when no PIN is
+    registered. PlayGuard names both, not checked on a console yet.
 - 1006 `IsRestrictionTemporaryUnlocked` confirms the unlock. 1201 can succeed
   while 1006 still reads `false`: PlayGuard checks, and locks again with 1007
   `RevertRestrictionTemporaryUnlocked` when it cannot tell.
@@ -101,6 +106,14 @@ Writing the settings while the timer counts down destabilises Atmosphère.
 Every PlayGuard play-timer write re-reads 1453 / 1455 / 1006 in its own
 session right before writing, and refuses while the timer is enabled or
 restricting and not temporarily unlocked.
+
+With no PIN registered, 195101 writes nothing and still answers OK (the
+22.5.0 sysmodule, as reversed by
+[NX-Pctl-Manager](https://github.com/tailiang2008/NX-Pctl-Manager/blob/main/docs/pctl-reverse-engineering.md)):
+the limit, bedtime and "when the time is up" writes read 1206 first and
+refuse with "no PIN" (a 1206 that cannot be read lets the write go ahead;
+its read-back still catches a skipped write). The same sysmodule answers
+`0x00010E8E` (2142-0135) while its settings manager is not set up yet.
 
 ### The settings block (145601 / 195101)
 
