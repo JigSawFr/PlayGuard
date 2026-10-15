@@ -1,6 +1,7 @@
 // ToolsTab — first steps, change history, settings backup / restore,
-// diagnostic export, the installed games check, the console (firmware, storage, serial, game patches)
-// and the developer tools (shown after seven presses on About › Version). The
+// diagnostic export, the installed games check and how many reports and crash files are kept, the console (firmware, storage, serial, game patches)
+// and the developer tools (shown after seven presses on About › Version;
+// among them, clearing the cache and the log files). The
 // preferences are in PreferencesTab, the version, updates and changelog in AboutTab.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -26,6 +27,10 @@ class ToolsTab : public TabBase
     BRLS_BIND(brls::Label,       export_note, "tl_export_note");
     BRLS_BIND(brls::DetailCell,  upload,      "tl_upload");
     BRLS_BIND(brls::Label,       upload_note, "tl_upload_note");
+    BRLS_BIND(brls::DetailCell,  logs_keep,   "tl_logs_keep");
+    BRLS_BIND(brls::DetailCell,  logs_keep_days, "tl_logs_keep_days");
+    BRLS_BIND(brls::DetailCell,  logs_keep_mb, "tl_logs_keep_mb");
+    BRLS_BIND(brls::Label,       logs_note,   "tl_logs_note");
     BRLS_BIND(brls::DetailCell,  backup_save, "tl_backup_save");
     BRLS_BIND(brls::DetailCell,  backup_restore, "tl_backup_restore");
     BRLS_BIND(brls::Label,       backup_note, "tl_backup_note");
@@ -34,6 +39,7 @@ class ToolsTab : public TabBase
     BRLS_BIND(brls::DetailCell,  ams,         "tl_ams");
     BRLS_BIND(brls::DetailCell,  compat,      "tl_compat");
     BRLS_BIND(brls::DetailCell,  storage,     "tl_storage");
+    BRLS_BIND(brls::Label,       storage_note, "tl_storage_note");
     BRLS_BIND(brls::DetailCell,  blank,       "tl_blank");
     BRLS_BIND(brls::DetailCell,  serial,      "tl_serial");
     BRLS_BIND(brls::Label,       serial_note, "tl_serial_note");
@@ -44,6 +50,8 @@ class ToolsTab : public TabBase
     BRLS_BIND(brls::BooleanCell, dev_read_only, "tl_dev_read_only");
     BRLS_BIND(brls::BooleanCell, dev_pt_log,  "tl_dev_pt_log");
     BRLS_BIND(brls::Label,       dev_pt_log_note, "tl_dev_pt_log_note");
+    BRLS_BIND(brls::DetailCell,  dev_clear_cache, "tl_dev_clear_cache");
+    BRLS_BIND(brls::DetailCell,  dev_clear_logs, "tl_dev_clear_logs");
     BRLS_BIND(brls::DetailCell,  dev_report,  "tl_dev_report");
     BRLS_BIND(brls::DetailCell,  dev_pt_block,"tl_dev_pt_block");
     BRLS_BIND(brls::DetailCell,  dev_github,  "tl_dev_github");

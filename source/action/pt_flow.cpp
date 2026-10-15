@@ -20,8 +20,7 @@ namespace pt_flow
 
 const std::vector<uint16_t>& quick_values()
 {
-    static const std::vector<uint16_t> values = { 30, 45, 60, 90, 120, 180, 240, 0 };
-    return values;
+    return pt_logic::quick_values();
 }
 
 int played_today_min(const PtState& pt)
@@ -29,25 +28,36 @@ int played_today_min(const PtState& pt)
     return pt_logic::played_today_min(pt, ui::today_weekday());
 }
 
-static void set_relock_pending(bool on)
+// A record made by this run is an unlock still in use, not an interrupted one.
+static bool s_pending_this_run = false;
+
+// False when the record could not be saved to the SD card. Setting it waits
+// for the write: it must be on the card before the unlock it is for.
+static bool set_relock_pending(bool on)
 {
     auto& cfg = config::get();
-    if (cfg.relock_pending == on) return;
+    if (on) s_pending_this_run = true;
+    if (cfg.relock_pending == on) return true;
     cfg.relock_pending = on;
-    ui::save_config();
+    return on ? ui::save_config_now() : ui::save_config();
 }
 
 void relock_if_interrupted()
 {
     // Read-only refuses every write, the lock too: keep the record for a
     // start that can lock.
-    if (!config::get().relock_pending || app::read_only()) return;
+    const bool pending = config::get().relock_pending;
+    if (!pt_logic::pending_relock_needs_state(pending, s_pending_this_run, app::read_only())) return;
     PctlStatus st;
     pctl_status_fetch(&st);
-    if (!st.temp_unlocked_ok) return;   // state unknown: keep the record, try again next time
-    if (!st.temp_unlocked) {
-        set_relock_pending(false);
-        return;
+    switch (pt_logic::pending_relock(pending, s_pending_this_run, app::read_only(), st.temp_unlocked_ok, st.temp_unlocked)) {
+        case pt_logic::PendingRelock::Forget:
+            set_relock_pending(false);
+            return;
+        case pt_logic::PendingRelock::Lock:
+            break;
+        default:
+            return;   // state unknown: keep the record, try again next time
     }
     Result rc = pctl_relock();
     // The record goes only once the console is locked again.
@@ -62,6 +72,33 @@ static void settle_failed_unlock()
     PctlStatus st;
     pctl_status_fetch(&st);
     if (st.temp_unlocked_ok && !st.temp_unlocked) set_relock_pending(false);
+}
+
+Result unlock_temporarily()
+{
+    // Recorded first, as for a change: closed from the HOME menu (no
+    // question then), PlayGuard locks again at its next start. A record that
+    // cannot be saved (config_err) does not stop a parent's unlock.
+    set_relock_pending(true);
+    Result rc = pctl_unlock_restriction_temporarily();
+    if (R_FAILED(rc)) settle_failed_unlock();
+    return rc;
+}
+
+void keep_unlocked()
+{
+    set_relock_pending(false);
+}
+
+std::string with_link_note(const std::string& body, const PctlStatus* st)
+{
+    PctlStatus read;
+    if (!st) {
+        pctl_status_fetch(&read);
+        st = &read;
+    }
+    if (!st->pairing_active_ok || !st->pairing_active) return body;
+    return body.empty() ? "playguard/pairing/note"_i18n : body + "\n\n" + "playguard/pairing/note"_i18n;
 }
 
 void confirm_write(const std::string& body_in, const std::string& confirm_label,
@@ -87,9 +124,13 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
     std::string body = body_in;
     const int played = pt_logic::suspend_warning_min(pt, ui::today_weekday(), new_days);
     if (played > 0) {
-        const std::string warning = brls::getStr("playguard/play_timer/suspend_warning", ui::fmt_minutes((uint16_t)played));
+        const std::string warning = brls::getStr("playguard/play_timer/suspend_warning", ui::fmt_minutes((uint16_t)played)) +
+                                    " " + "playguard/play_timer/unsaved"_i18n;
         body = body.empty() ? warning : body + "\n\n" + warning;
     }
+    // Any dialog shown ends with the phone-app note, while it is linked.
+    const bool unlock = pt_logic::needs_unlock(pt);
+    if (!body.empty() || unlock) body = with_link_note(body);
 
     // The week as it will be: the days that change in amber.
     auto preview = [&pt, new_days]() -> brls::View* {
@@ -99,7 +140,7 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
         return week;
     };
 
-    if (!pt_logic::needs_unlock(pt)) {
+    if (!unlock) {
         if (body.empty()) write(false);
         else if (brls::View* week = preview()) ui::confirm_with(body, week, confirm_label, [write]() { write(false); }, nullptr, danger);
         else ui::confirm(body, confirm_label, [write]() { write(false); }, nullptr, danger);
@@ -111,8 +152,13 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
             (config::get().auto_relock ? "playguard/play_timer/gate/relock_auto"_i18n
                                        : "playguard/play_timer/gate/relock_manual"_i18n);
     auto unlock_and_write = [write]() {
-        // Should the app stop before finish_write, the next start locks again.
-        set_relock_pending(true);
+        // Should the app stop before finish_write, the next start locks again:
+        // without that record saved, no unlock (as for the extra time).
+        if (!set_relock_pending(true)) {
+            config::get().relock_pending = false;   // not on the card: not in memory either
+            ui::error("playguard/play_timer/gate/failed"_i18n + " — " + ui::rc_text(NXM_RC_NOT_SAVED));
+            return;
+        }
         Result rc = pctl_unlock_restriction_temporarily();
         if (R_FAILED(rc)) {
             settle_failed_unlock();   // not unlocked, or locked again by the service layer
@@ -160,7 +206,7 @@ Result clear_days(const std::string& source)
 
 static void offer_relock(std::function<void()> after)
 {
-    auto* dialog = ui::dialog("playguard/play_timer/relock/body"_i18n);
+    auto* dialog = ui::dialog("playguard/play_timer/relock/body"_i18n + " " + "playguard/play_timer/unsaved"_i18n);
     // "Later" is a choice to stay unlocked: the record goes. Closed before
     // an answer, it stays, and the next start locks again.
     auto later = [after]() {
@@ -270,22 +316,10 @@ void choose_bedtime(const PtState& pt, std::function<void()> refresh)
 {
     if (!bedtime_editable(pt)) return;
     // Off, then 16:00 to 23:45 every quarter of an hour.
-    std::vector<std::string> labels = { "playguard/common/off"_i18n };
-    std::vector<int> times = { -1 };
-    for (int t = 16 * 60; t < 24 * 60; t += 15) {
-        labels.push_back(hm(t / 60, t % 60));
-        times.push_back(t);
-    }
-    PtBedtime now;
-    int selected = 0;
-    if (pt_logic::bedtime_uniform(pt, &now) && now.on) {
-        selected = -1;
-        for (size_t i = 1; i < times.size(); i++)
-            if (times[i] == now.hour * 60 + now.minute) selected = (int)i;
-        if (selected < 0) selected = 0;
-    } else if (!pt_logic::bedtime_uniform(pt, nullptr)) {
-        selected = 21 * 4 - 16 * 4 + 1;   // days differ: start on 21:00
-    }
+    const std::vector<int> times = pt_logic::bedtime_times();
+    std::vector<std::string> labels;
+    for (int t : times) labels.push_back(t < 0 ? "playguard/common/off"_i18n : hm(t / 60, t % 60));
+    const int selected = pt_logic::bedtime_selected(pt, times);
     const PtState copy = pt;
     ui::pick("playguard/play_timer/bedtime_title"_i18n, labels, selected, [copy, times, refresh](int index) {
         const int t = times[(size_t)index];
@@ -307,23 +341,62 @@ void choose_bedtime_end(const PtState& pt, std::function<void()> refresh)
         return;
     }
     // 05:00 to 09:00 every quarter of an hour.
+    const std::vector<int> times = pt_logic::bedtime_end_times();
     std::vector<std::string> labels;
-    std::vector<int> times;
-    for (int t = 5 * 60; t <= 9 * 60; t += 15) {
-        labels.push_back(hm(t / 60, t % 60));
-        times.push_back(t);
-    }
-    PtBedtime now;
-    int selected = 4;   // 06:00
-    if (pt_logic::bedtime_uniform(pt, &now))
-        for (size_t i = 0; i < times.size(); i++)
-            if (times[i] == now.end_hour * 60 + now.end_minute) selected = (int)i;
+    for (int t : times) labels.push_back(hm(t / 60, t % 60));
+    const int selected = pt_logic::bedtime_end_selected(pt, times);
     const PtState copy = pt;
     ui::pick("playguard/play_timer/bedtime_end_title"_i18n, labels, selected, [copy, times, refresh](int index) {
         const int t = times[(size_t)index];
         std::array<PtBedtime, 7> bed;
         pt_logic::bedtime_end_every_day(copy, (uint8_t)(t / 60), (uint8_t)(t % 60), bed.data());
         apply_bedtime(bed, brls::getStr("playguard/play_timer/bedtime_end_confirm", hm(t / 60, t % 60)), refresh);
+    });
+}
+
+std::string time_up_text(const PtState& pt)
+{
+    if (!pt.valid) return "";
+    return pt.alarm_only ? "playguard/play_timer/time_up_alarm"_i18n : "playguard/play_timer/time_up_suspend"_i18n;
+}
+
+Result write_alarm_only(bool alarm_only, const std::string& source)
+{
+    PtState before;
+    pctl_play_timer_query(&before);
+    const Result rc = pctl_play_timer_set_alarm_only(alarm_only);
+    if (R_SUCCEEDED(rc) && before.valid && before.alarm_only != alarm_only)
+        history_flow::record_values("time_up", { before.alarm_only ? 1 : 0 }, { alarm_only ? 1 : 0 }, source);
+    return rc;
+}
+
+void choose_time_up(const PtState& pt, std::function<void()> refresh)
+{
+    if (ui::refuse_read_only()) return;
+    if (!pt.fw_supported) {
+        ui::notify(ui::rc_text(NXM_RC_FW_UNSUPPORTED));
+        return;
+    }
+    if (!pt.valid) {
+        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN));
+        return;
+    }
+    if (!pt_configured(pt.block)) {
+        ui::info("playguard/play_timer/time_up_needs_limit"_i18n);
+        return;
+    }
+    const std::vector<std::string> labels = { "playguard/play_timer/time_up_suspend"_i18n,
+                                              "playguard/play_timer/time_up_alarm"_i18n };
+    const bool now = pt.alarm_only;
+    ui::pick("playguard/play_timer/time_up_title"_i18n, labels, now ? 1 : 0, [now, refresh](int index) {
+        const bool alarm_only = index == 1;
+        if (alarm_only == now) return;   // already so
+        const std::string body = alarm_only ? "playguard/play_timer/time_up_alarm_body"_i18n
+                                            : "playguard/play_timer/time_up_suspend_body"_i18n;
+        confirm_write(body, "playguard/play_timer/confirm_set"_i18n, [alarm_only, refresh](bool did_unlock) {
+            const Result rc = write_alarm_only(alarm_only, "");
+            finish_write(rc, did_unlock, "playguard/common/applied"_i18n, "playguard/play_timer/write_err"_i18n, refresh);
+        });
     });
 }
 
@@ -344,25 +417,15 @@ static void apply_uniform(uint16_t minutes, std::function<void()> refresh)
 
 void choose_uniform_limit(const PtState& pt, std::function<void()> refresh)
 {
-    bool uniform = pt.valid;
-    for (int i = 1; i < 7 && uniform; i++) uniform = pt.day_min[i] == pt.day_min[0];
-
-    const auto& values = quick_values();
+    const pt_logic::UniformPick pick = pt_logic::uniform_pick(pt);
     std::vector<std::string> labels;
-    int selected = -1;
-    for (size_t i = 0; i < values.size(); i++) {
-        labels.push_back(ui::fmt_minutes(values[i]));
-        if (uniform && pt.day_min[0] == values[i]) selected = (int)i;
-    }
+    for (uint16_t v : quick_values()) labels.push_back(ui::fmt_minutes(v));
     labels.push_back("playguard/common/custom"_i18n);
-    // Days that differ (or a value outside the list): start on "Custom…"
-    // rather than pretending the first value is the current one.
-    if (selected < 0) selected = (int)labels.size() - 1;
 
-    const std::string title = uniform ? "playguard/play_timer/quick_title"_i18n
-                                      : "playguard/play_timer/quick_title_varies"_i18n;
-    uint16_t seed = (pt.valid && pt.day_min[0] != PT_DAY_NOLIMIT) ? pt.day_min[0] : 60;
-    ui::pick(title, labels, selected, [refresh, seed](int index) {
+    const std::string title = pick.uniform ? "playguard/play_timer/quick_title"_i18n
+                                           : "playguard/play_timer/quick_title_varies"_i18n;
+    const uint16_t seed = pick.seed;
+    ui::pick(title, labels, pick.selected, [refresh, seed](int index) {
         const auto& values = quick_values();
         if ((size_t)index < values.size()) {
             apply_uniform(values[index], refresh);
@@ -377,26 +440,18 @@ void pick_limit(const std::string& title, uint16_t current, std::function<void(u
 {
     // Quick values first (as in "Same limit every day"), then any value, then
     // no limit; the current value is pre-selected.
-    const auto& values = quick_values();
+    const pt_logic::LimitPick pick = pt_logic::limit_pick(current);
     std::vector<std::string> options;
-    int selected = -1;
-    for (size_t i = 0; i < values.size(); i++) {
-        options.push_back(ui::fmt_minutes(values[i]));
-        if (values[i] == current) selected = (int)i;
-    }
-    const int custom_index  = (int)options.size();
-    const int nolimit_index = custom_index + 1;
+    for (uint16_t v : quick_values()) options.push_back(ui::fmt_minutes(v));
     options.push_back("playguard/play_timer/perday/pick_minutes"_i18n);
     options.push_back("playguard/play_timer/perday/pick_no_limit"_i18n);
-    if (current == PT_DAY_NOLIMIT) selected = nolimit_index;
-    else if (selected < 0) selected = custom_index;
 
-    ui::pick(title, options, selected, [title, current, on_value, custom_index, nolimit_index](int index) {
+    const int custom_index = pick.custom, nolimit_index = pick.no_limit;
+    ui::pick(title, options, pick.selected, [title, current, on_value, custom_index, nolimit_index](int index) {
         if (index == nolimit_index) {
             on_value(PT_DAY_NOLIMIT);
         } else if (index == custom_index) {
-            const uint16_t seed = current == PT_DAY_NOLIMIT ? 60 : current;
-            ui::prompt_minutes(title, seed, [on_value](uint16_t v) { on_value(v); });
+            ui::prompt_minutes(title, pt_logic::limit_seed(current), [on_value](uint16_t v) { on_value(v); });
         } else {
             on_value(quick_values()[index]);
         }
@@ -429,6 +484,9 @@ void change_day_limit(int day, uint16_t current, std::function<void()> refresh)
     });
 }
 
+// "No more play today" can wait this long, for a save.
+static constexpr int STOP_SOON_MIN = 5;
+
 // Extra time and "no more play" are for one day of the usual limits: with
 // every day at 0 they would open a hole in the console lock.
 static bool refuse_console_lock()
@@ -457,6 +515,72 @@ static pt_logic::ExtraRecord extra_record()
     return rec;
 }
 
+// What to put back later, saved *before* the write it describes: should the
+// app stop between the two, the limit still comes back. False when it could
+// not be saved, and then nothing must be written (it would never be put back).
+static bool save_extra_record(int wd, uint16_t base, uint16_t value)
+{
+    auto& c = config::get();
+    c.extra_weekday = wd;
+    c.extra_date    = ui::today_date();
+    c.extra_base    = base;
+    c.extra_value   = value;
+    return ui::save_config_now();
+}
+
+// The write failed: the record it was saved for goes back to what it was.
+static void put_back_extra_record(const pt_logic::ExtraRecord& prev)
+{
+    auto& c = config::get();
+    c.extra_weekday = prev.weekday;
+    c.extra_date    = prev.date;
+    c.extra_base    = prev.base;
+    c.extra_value   = prev.value;
+    ui::save_config();
+}
+
+// A list of actions, not of values: no row is checked as the current one
+// (borealis' Dropdown checks one, ui::pick the `selected`). The first row
+// takes the focus.
+class ActionList : public brls::Dropdown
+{
+  public:
+    ActionList(const std::string& title, const std::vector<std::string>& values, std::function<void(int)> on_pick)
+        : brls::Dropdown(
+              title, values, [this](int index) { this->chosen = index; }, 0,
+              [this, on_pick](int) {
+                  if (this->chosen >= 0 && on_pick) {
+                      const int index = this->chosen;
+                      brls::sync([on_pick, index]() { on_pick(index); });
+                  }
+              }),
+          labels(values)
+    {
+        // The rows Dropdown's constructor already made used its own
+        // cellForRow (this one did not exist yet): unchecked here.
+        uncheck(this);
+    }
+
+  private:
+    std::vector<std::string> labels;
+    int chosen = -1;
+
+    static void uncheck(brls::View* view)
+    {
+        if (auto* cell = dynamic_cast<brls::RadioCell*>(view)) cell->setSelected(false);
+        if (auto* box = dynamic_cast<brls::Box*>(view))
+            for (brls::View* child : box->getChildren()) uncheck(child);
+    }
+
+    brls::RecyclerCell* cellForRow(brls::RecyclerFrame* recycler, brls::IndexPath index) override
+    {
+        auto* cell = (brls::RadioCell*)recycler->dequeueReusableCell("Cell");
+        cell->title->setText(this->labels[index.row]);
+        cell->setSelected(false);
+        return cell;
+    }
+};
+
 void add_extra_time(const PtState& pt, std::function<void()> refresh)
 {
     if (refuse_console_lock()) return;
@@ -467,11 +591,11 @@ void add_extra_time(const PtState& pt, std::function<void()> refresh)
     std::vector<std::string> labels;
     for (int e : amounts) labels.push_back("+" + ui::fmt_minutes((uint16_t)e));
     const uint16_t base = pt.day_min[wd];
-    ui::pick("playguard/dashboard/extra_title"_i18n, labels, 0, [refresh, wd, base, amounts](int index) {
+    auto* list = new ActionList("playguard/dashboard/extra_title"_i18n, labels, [refresh, wd, base, amounts](int index) {
         const uint16_t extra = (uint16_t)amounts[index];
         // What gets put back later is the limit before any extra time today.
         const pt_logic::ExtraRecord rec = extra_record();
-        const bool again = rec.weekday == wd && rec.date == ui::today_date();
+        const bool again = pt_logic::recorded_today(rec, wd, ui::today_date());
         const pt_logic::ExtraPlan plan = pt_logic::plan_extra(base, extra, again, rec.base);
         const uint16_t value = plan.value, original = plan.original;
         const std::string body = brls::getStr(config::get().extra_auto_restore ? "playguard/dashboard/extra_body_auto"
@@ -488,38 +612,46 @@ void add_extra_time(const PtState& pt, std::function<void()> refresh)
             uint16_t days[7];
             for (int i = 0; i < 7; i++) days[i] = now.day_min[i];
             days[wd] = value;
-            Result rc = write_days(days, "extra");
-            if (R_SUCCEEDED(rc)) {
-                auto& c = config::get();
-                c.extra_weekday = wd;
-                c.extra_date    = ui::today_date();
-                c.extra_base    = original;
-                c.extra_value   = value;
-                ui::save_config();
+            const pt_logic::ExtraRecord prev = extra_record();
+            if (!save_extra_record(wd, original, value)) {
+                finish_write(NXM_RC_NOT_SAVED, did_unlock, "", "playguard/play_timer/write_err"_i18n, refresh);
+                return;
             }
+            Result rc = write_days(days, "extra");
+            if (R_FAILED(rc)) put_back_extra_record(prev);
             finish_write(rc, did_unlock, brls::getStr("playguard/dashboard/extra_done", ui::fmt_minutes(value)),
                          "playguard/play_timer/write_err"_i18n, refresh);
         });
     });
+    brls::Application::pushActivity(new brls::Activity(list));
 }
 
-void stop_today(const PtState& pt, std::function<void()> refresh)
+// Today's limit to `value`: 0 (no more play now) or a few minutes more than
+// played (pt_logic::stop_soon_limit). Put back the next day like extra time.
+static void stop_at(const PtState& pt, uint16_t value, std::function<void()> refresh)
 {
-    if (refuse_console_lock()) return;
     const int wd = ui::today_weekday();
-    if (!pt.valid) return;
     const uint16_t base = pt.day_min[wd];
     const pt_logic::ExtraRecord rec = extra_record();
-    const bool again = rec.weekday == wd && rec.date == ui::today_date();
+    const bool again = pt_logic::recorded_today(rec, wd, ui::today_date());
     const pt_logic::ExtraPlan plan = pt_logic::plan_stop(base, again, rec.base);
     const uint16_t original = plan.original;
     uint16_t new_days[7];
     for (int i = 0; i < 7; i++) new_days[i] = pt.day_min[i];
-    new_days[wd] = 0;
-    const std::string body = brls::getStr(config::get().extra_auto_restore ? "playguard/dashboard/stop_body_auto"
-                                                                           : "playguard/dashboard/stop_body",
-                                          ui::day_name_in_text(wd), ui::fmt_minutes(original));
-    confirm_write(body, "playguard/dashboard/stop_confirm"_i18n, [refresh, wd, base, original](bool did_unlock) {
+    new_days[wd] = value;
+    const bool auto_restore = config::get().extra_auto_restore;
+    std::string body = value == 0
+        ? brls::getStr(auto_restore ? "playguard/dashboard/stop_body_auto" : "playguard/dashboard/stop_body",
+                       ui::day_name_in_text(wd), ui::fmt_minutes(original))
+        : brls::getStr(auto_restore ? "playguard/dashboard/stop_soon_body_auto" : "playguard/dashboard/stop_soon_body",
+                       ui::day_name_in_text(wd), ui::fmt_minutes(value), ui::fmt_minutes(original));
+    // Said once: confirm_write adds it to its own warning when the time
+    // played is known.
+    // A warning only at the limit: nothing is stopped, the console warns.
+    if (pt.alarm_only) body += "\n\n" + "playguard/dashboard/stop_alarm_only"_i18n;
+    else if (value == 0 && pt_logic::suspend_warning_min(pt, wd, new_days) < 0)
+        body += " " + "playguard/play_timer/unsaved"_i18n;
+    confirm_write(body, "playguard/dashboard/stop_confirm"_i18n, [refresh, wd, base, original, value](bool did_unlock) {
         PtState now;
         pctl_play_timer_query(&now);
         if (!now.valid || now.day_min[wd] != base) {   // changed meanwhile: write nothing
@@ -528,18 +660,35 @@ void stop_today(const PtState& pt, std::function<void()> refresh)
         }
         uint16_t days[7];
         for (int i = 0; i < 7; i++) days[i] = now.day_min[i];
-        days[wd] = 0;
-        Result rc = write_days(days, "stop");
-        if (R_SUCCEEDED(rc)) {
-            auto& c = config::get();
-            c.extra_weekday = wd;
-            c.extra_date    = ui::today_date();
-            c.extra_base    = original;
-            c.extra_value   = 0;
-            ui::save_config();
+        days[wd] = value;
+        const pt_logic::ExtraRecord prev = extra_record();
+        if (!save_extra_record(wd, original, value)) {
+            finish_write(NXM_RC_NOT_SAVED, did_unlock, "", "playguard/play_timer/write_err"_i18n, refresh);
+            return;
         }
-        finish_write(rc, did_unlock, "playguard/dashboard/stop_done"_i18n, "playguard/play_timer/write_err"_i18n, refresh);
+        Result rc = write_days(days, "stop");
+        if (R_FAILED(rc)) put_back_extra_record(prev);
+        finish_write(rc, did_unlock, value == 0 ? "playguard/dashboard/stop_done"_i18n : "playguard/dashboard/stop_soon_done"_i18n,
+                     "playguard/play_timer/write_err"_i18n, refresh);
     }, new_days, true);
+}
+
+void stop_today(const PtState& pt, std::function<void()> refresh)
+{
+    if (refuse_console_lock()) return;
+    if (!pt.valid) return;
+    // Suspending can lose unsaved progress: when the time played is known,
+    // "in 5 minutes" leaves time to save.
+    const int soon = pt_logic::stop_soon_limit(pt, ui::today_weekday(), STOP_SOON_MIN);
+    if (soon < 0) {
+        stop_at(pt, 0, refresh);
+        return;
+    }
+    const PtState copy = pt;
+    auto* list = new ActionList("playguard/dashboard/stop"_i18n,
+                                { "playguard/dashboard/stop_now"_i18n, "playguard/dashboard/stop_soon"_i18n },
+                                [copy, soon, refresh](int index) { stop_at(copy, index == 0 ? 0 : (uint16_t)soon, refresh); });
+    brls::Application::pushActivity(new brls::Activity(list));
 }
 
 // Puts `base` back on weekday `wd`, if it still holds the extra time (`value`).
@@ -549,7 +698,9 @@ static void restore_extra(int wd, uint16_t base, uint16_t value, std::function<v
         PtState now;
         pctl_play_timer_query(&now);
         if (!now.valid || now.day_min[wd] != value) {
-            clear_extra_record();
+            // Changed meanwhile: nothing left to put back. Unreadable: the
+            // record stays, to try again (pt_logic::restore_action says Later).
+            if (now.valid) clear_extra_record();
             finish_write(NXM_RC_STATE_UNKNOWN, did_unlock, "", "playguard/play_timer/write_err"_i18n, refresh);
             return;
         }
@@ -572,12 +723,8 @@ bool restore_pending(const PtState& pt)
 
 std::string extra_today_text(const PtState& pt)
 {
-    const pt_logic::ExtraRecord rec = extra_record();
-    const int wd = ui::today_weekday();
-    if (rec.weekday != wd || rec.date != ui::today_date() || !pt.valid || pt.day_min[wd] != rec.value ||
-        rec.value <= rec.base)
-        return "";
-    return "+" + ui::fmt_minutes((uint16_t)(rec.value - rec.base));
+    const int extra = pt_logic::extra_today_min(extra_record(), ui::today_date(), ui::today_weekday(), pt);
+    return extra > 0 ? "+" + ui::fmt_minutes((uint16_t)extra) : "";
 }
 
 std::string restore_label()
@@ -627,7 +774,7 @@ void offer_extra_time_restore(std::function<void()> refresh)
 
 bool alarm_off(const PtState& pt)
 {
-    return pt.fw_supported && pt.enabled_valid && pt.enabled && pt.alarm_disabled_valid && pt.alarm_disabled;
+    return pt_logic::alarm_off(pt);
 }
 
 Result write_alarm_disabled(bool disabled, const std::string& source)

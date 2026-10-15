@@ -2,6 +2,7 @@
 #include "util/http.hpp"
 
 #include <algorithm>
+#include <atomic>
 #include <cstdio>
 #include <curl/curl.h>
 #include <fcntl.h>
@@ -9,12 +10,14 @@
 #include <mutex>
 
 #include "app.hpp"
+#include "util/http_logic.hpp"
 
 namespace http
 {
 
 static std::mutex s_lock;   // one request at a time; also guards the global init
 static bool       s_ready = false;
+static std::atomic<bool> s_abort{ false };   // abort_all(): the app is quitting
 
 namespace
 {
@@ -30,12 +33,19 @@ struct Sink
     CURL*        curl = nullptr;
 };
 
+// Called by curl about once a second, even while waiting for the server.
+int on_progress(void*, curl_off_t, curl_off_t, curl_off_t, curl_off_t)
+{
+    return s_abort ? 1 : 0;   // non-zero aborts the transfer
+}
+
 size_t on_data(char* data, size_t size, size_t count, void* user)
 {
     auto* sink = static_cast<Sink*>(user);
+    if (s_abort) return 0;
     const size_t n = size * count;
     const size_t have = sink->file ? sink->written : sink->body->size();
-    if (have + n > sink->max) {
+    if (!http_logic::fits(have, n, sink->max)) {
         sink->overflow = true;
         return 0;   // aborts the transfer (CURLE_WRITE_ERROR)
     }
@@ -78,6 +88,10 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
     std::lock_guard<std::mutex> guard(s_lock);
     body->clear();
     if (status_out) *status_out = 0;
+    if (s_abort) {
+        if (error) *error = "PlayGuard is quitting";
+        return false;
+    }
     if (!s_ready) {
         // On the Switch this starts the ssl and csrng services (switch-curl's libnx backend).
         if (curl_global_init(CURL_GLOBAL_DEFAULT) != CURLE_OK) {
@@ -109,6 +123,10 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
     curl_easy_setopt(curl, CURLOPT_PROTOCOLS, (long)CURLPROTO_HTTPS);
     curl_easy_setopt(curl, CURLOPT_REDIR_PROTOCOLS, (long)CURLPROTO_HTTPS);
 #endif
+    // The server's certificate and name are checked (libcurl's defaults,
+    // written out so that no build or backend change can turn them off).
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, std::min(timeout_s, 30L));
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout_s);
     if (to_file) {   // a long transfer: give up on a stall rather than at the end
@@ -116,6 +134,8 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
         curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 30L);
     }
     curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, on_progress);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, agent.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, on_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &sink);
@@ -124,11 +144,9 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
         // Never followed (above): a redirect must not turn the POST into a GET elsewhere.
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post->data());
         curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE, (curl_off_t)post->size());
-        headers = curl_slist_append(headers, (std::string("Content-Type: ") + x.content_type).c_str());
-        headers = curl_slist_append(headers, "Expect:");   // no 100-continue round trip
     }
-    if (x.headers)
-        for (const std::string& h : *x.headers) headers = curl_slist_append(headers, h.c_str());
+    for (const std::string& h : http_logic::request_headers(post ? x.content_type : nullptr, x.headers))
+        headers = curl_slist_append(headers, h.c_str());
     if (headers) curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
     const CURLcode rc = curl_easy_perform(curl);
@@ -143,33 +161,22 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
     curl_slist_free_all(headers);
     if (status_out) *status_out = status;
 
-    // A refusal often comes as a large HTML page: say the status, not its size.
-    if (status >= 400) {
-        if (error) *error = "HTTP " + std::to_string(status);
-        return false;
-    }
-    if (sink.overflow) {
-        if (error) *error = "response too large";
-        return false;
-    }
-    if (sink.file_error) {
-        if (error) *error = "cannot write the file";
-        return false;
-    }
-    if (rc != CURLE_OK) {
-        if (error) *error = message[0] ? message : curl_easy_strerror(rc);
-        return false;
-    }
-    return true;
+    http_logic::Outcome outcome;
+    outcome.status      = status;
+    outcome.overflow    = sink.overflow;
+    outcome.file_error  = sink.file_error;
+    outcome.transfer_ok = rc == CURLE_OK;
+    if (rc != CURLE_OK) outcome.transfer_error = message[0] ? message : curl_easy_strerror(rc);
+    return http_logic::succeeded(outcome, error);
 }
 }   // namespace
 
 bool get(const std::string& url, std::string* body, std::string* error, size_t max_bytes, long timeout_s,
-         const Headers& headers)
+         const Headers& headers, long* status)
 {
     Extra x;
     x.headers = &headers;
-    return perform(url, x, body, error, max_bytes, timeout_s, nullptr);
+    return perform(url, x, body, error, max_bytes, timeout_s, status);
 }
 
 bool post(const std::string& url, const std::string& data, const char* content_type, std::string* body,
@@ -191,11 +198,7 @@ bool redirect(const std::string& url, std::string* target, std::string* error, c
     std::string body;
     long status = 0;
     if (!perform(url, x, &body, error, 64 * 1024, 30, &status)) return false;
-    if (status < 300 || status >= 400 || target->compare(0, 8, "https://") != 0) {
-        if (error) *error = "no redirect (HTTP " + std::to_string(status) + ")";
-        return false;
-    }
-    return true;
+    return http_logic::redirect_ok(status, *target, error);
 }
 
 bool download(const std::string& url, const std::string& path, std::string* error, size_t max_bytes,
@@ -221,6 +224,11 @@ bool download(const std::string& url, const std::string& path, std::string* erro
         ok = false;
     }
     return ok;
+}
+
+void abort_all()
+{
+    s_abort = true;
 }
 
 void cleanup()

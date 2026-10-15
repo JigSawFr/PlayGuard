@@ -30,15 +30,39 @@ endif ()
 # debug data). borealis prints its "Build Type:" line before project() picks
 # that default, so say what is actually used.
 # deko3d draws with precompiled shaders: borealis' nanovg loads them from
-# romfs:/shaders/, so compile them (uam, part of switch-dev) for the romfs.
+# romfs:/shaders/. uam (part of switch-dev) does not always give the same
+# bytes for the same GLSL (one scheduling word of fill_vsh differs from run to
+# run), which broke the reproducible zips, so the compiled shaders are kept in
+# shaders/ and copied as they are. shaders/glsl.sha256 is the GLSL they were
+# compiled from: after a borealis bump changes it, configure with
+# -DPLAYGUARD_UAM=ON, copy build/dksh/*.dksh to shaders/ and update the checksums.
+option(PLAYGUARD_UAM "Switch: compile the deko3d shaders with uam instead of using shaders/" OFF)
 set(PLAYGUARD_DKSH_DIR ${CMAKE_BINARY_DIR}/dksh)
+set(PLAYGUARD_SHADERS fill_vsh fill_fsh fill_aa_fsh)
 if (PLATFORM_SWITCH AND USE_DEKO3D)
-    gen_dksh(${PLAYGUARD_DKSH_DIR})
-    foreach (shader fill_vsh fill_fsh fill_aa_fsh)
-        if (NOT EXISTS ${PLAYGUARD_DKSH_DIR}/${shader}.dksh)
-            message(FATAL_ERROR "uam did not produce ${shader}.dksh")
-        endif ()
-    endforeach ()
+    if (PLAYGUARD_UAM)
+        gen_dksh(${PLAYGUARD_DKSH_DIR})
+        foreach (shader ${PLAYGUARD_SHADERS})
+            if (NOT EXISTS ${PLAYGUARD_DKSH_DIR}/${shader}.dksh)
+                message(FATAL_ERROR "uam did not produce ${shader}.dksh")
+            endif ()
+        endforeach ()
+    else ()
+        file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/shaders/glsl.sha256 PLAYGUARD_GLSL_SUMS)
+        foreach (line ${PLAYGUARD_GLSL_SUMS})
+            string(REGEX MATCH "^([0-9a-f]+)  (.+)$" _ "${line}")
+            file(SHA256 ${BOREALIS_LIBRARY}/lib/extern/nanovg/deko3d/shaders/${CMAKE_MATCH_2} PLAYGUARD_GLSL_SUM)
+            if (NOT PLAYGUARD_GLSL_SUM STREQUAL CMAKE_MATCH_1)
+                message(FATAL_ERROR "borealis' ${CMAKE_MATCH_2} changed since shaders/ was compiled: "
+                        "configure with -DPLAYGUARD_UAM=ON, copy build/dksh/*.dksh to shaders/ "
+                        "and update shaders/glsl.sha256")
+            endif ()
+        endforeach ()
+        file(REMOVE_RECURSE ${PLAYGUARD_DKSH_DIR})
+        foreach (shader ${PLAYGUARD_SHADERS})
+            file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shaders/${shader}.dksh DESTINATION ${PLAYGUARD_DKSH_DIR})
+        endforeach ()
+    endif ()
 endif ()
 if (PLATFORM_SWITCH)
     if (USE_DEKO3D)
@@ -53,7 +77,7 @@ message(STATUS "PlayGuard build type: ${CMAKE_BUILD_TYPE}; C++ flags: ${CMAKE_CX
 # App metadata. The NACP version must match the release tag (CI checks it).
 # release-please bumps these three lines (see release-please-config.json).
 set(VERSION_MAJOR "1") # x-release-please-major
-set(VERSION_MINOR "0") # x-release-please-minor
+set(VERSION_MINOR "1") # x-release-please-minor
 set(VERSION_ALTER "0") # x-release-please-patch
 set(APP_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_ALTER}")
 set(PROJECT_TITLEID "")
@@ -112,7 +136,15 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 target_include_directories(${PROJECT_NAME} PRIVATE source extern/qrcodegen ${APP_PLATFORM_INCLUDE})
 # -ffunction-sections / -fdata-sections come from borealis (PUBLIC) and
 # --gc-sections from libnx's switch.specs.
-target_compile_options(${PROJECT_NAME} PRIVATE ${APP_PLATFORM_OPTION})
+# Warnings on PlayGuard's own sources (not borealis, not the vendored
+# qrcodegen); CI turns them into errors with -DPLAYGUARD_WERROR=ON.
+option(PLAYGUARD_WERROR "Treat PlayGuard's compiler warnings as errors" OFF)
+set(PLAYGUARD_WARNINGS -Wall -Wextra)
+if (PLAYGUARD_WERROR)
+    list(APPEND PLAYGUARD_WARNINGS -Werror)
+endif ()
+target_compile_options(${PROJECT_NAME} PRIVATE ${APP_PLATFORM_OPTION} ${PLAYGUARD_WARNINGS})
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/qrcodegen/qrcodegen.cpp PROPERTIES COMPILE_OPTIONS "-w")
 # The commit built (at configure time): development builds are told apart by
 # it (util/dev_builds.hpp). PLAYGUARD_COMMIT (CI: a pull request's head)
 # wins over the checkout's. Empty outside a git checkout.
@@ -126,15 +158,33 @@ elseif (GIT_FOUND)
                     OUTPUT_VARIABLE APP_COMMIT OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 endif()
 message(STATUS "PlayGuard commit: ${APP_COMMIT}")
-target_compile_definitions(${PROJECT_NAME} PRIVATE APP_VERSION="${APP_VERSION}" APP_COMMIT="${APP_COMMIT}")
+# A published release (CI: the build release-please.yml calls for a vX.Y.Z tag,
+# PLAYGUARD_RELEASE=1). Anything else is a development build: the version
+# badge in the header (view/version_badge.hpp) says so, with the commit.
+set(APP_RELEASE 0)
+if ("$ENV{PLAYGUARD_RELEASE}" STREQUAL "1")
+    set(APP_RELEASE 1)
+endif ()
+message(STATUS "PlayGuard release build: ${APP_RELEASE}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE APP_VERSION="${APP_VERSION}" APP_COMMIT="${APP_COMMIT}"
+                           APP_RELEASE=${APP_RELEASE})
 target_link_libraries(${PROJECT_NAME} PRIVATE borealis ${APP_PLATFORM_LIB})
+# borealis' headers as system headers: their warnings are not PlayGuard's.
+get_target_property(BOREALIS_INCLUDES borealis INTERFACE_INCLUDE_DIRECTORIES)
+target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${BOREALIS_INCLUDES})
 # On the Switch: a linker map (build/borealis.map) to see what makes the .nro big.
 target_link_options(${PROJECT_NAME} PRIVATE ${APP_PLATFORM_LINK_OPTION})
+# On the Switch: borealis' userAppInit, which libnx calls before main, timed
+# for the diagnostic report's start-up section (source/core/startup_hook.c).
+if (PLATFORM_SWITCH)
+    target_link_options(${PROJECT_NAME} PRIVATE -Wl,--wrap=userAppInit)
+endif ()
 
 # Resources: borealis built-ins first, then ours on top. On the Switch the
 # bundled fonts and demo assets are dropped (the system shared font is used).
 # en-GB reuses the English strings, already in British spelling (borealis looks
-# the locale up verbatim).
+# the locale up verbatim), except the quoted system menu labels, spelt as on a
+# US console ("Synchronize Clock via Internet").
 set(BOREALIS_RESOURCES ${BOREALIS_LIBRARY}/../resources)
 set(MERGED_RESOURCES ${CMAKE_BINARY_DIR}/resources)
 set(ASSEMBLE_RESOURCES
@@ -148,6 +198,10 @@ set(ASSEMBLE_RESOURCES
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_RESOURCES}/i18n/en-US ${MERGED_RESOURCES}/i18n/en-GB
     # About shows the latest releases from it (util/changelog.cpp).
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/CHANGELOG.md ${MERGED_RESOURCES}/CHANGELOG.md
+    # ... and the highlights of the running version from its summary
+    # (view/release_notes.cpp), the full list a press away.
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/.github/release-notes ${MERGED_RESOURCES}/release-notes
+    COMMAND ${CMAKE_COMMAND} -E remove -f ${MERGED_RESOURCES}/release-notes/README.md ${MERGED_RESOURCES}/img/emoji/README.md
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_ICON} ${MERGED_RESOURCES}/img/app_icon.jpg)
 
 set(PLAYGUARD_COPY_SHADERS)

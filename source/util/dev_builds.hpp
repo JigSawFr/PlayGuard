@@ -1,22 +1,28 @@
 // dev_builds — install another build of PlayGuard in place, from the
 // developer tools: the latest release, one of the last commits of main, or
-// the newest build of an open pull request (forks included).
+// the newest build of an open pull request (from this repository: a fork's
+// build is never offered, nobody with write access has reviewed its code).
 //
 // The release is the playguard.nro of the latest GitHub release, readable
-// without an account. The others are the playguard_release artifact the
-// build workflow keeps for every run (.github/workflows/build.yml): a zip
-// holding playguard.nro, which GitHub only hands to a signed-in user, hence
-// the token of util/github_auth.hpp. Artifacts expire (90 days by default).
+// without an account. The others are the playguard-<version>-<ref>-<commit>-nro
+// artifact the build workflow keeps for every run (.github/workflows/build.yml
+// names each artifact of a run after its build and its component; the
+// recovery sysmodule is the -rescue one): a zip holding playguard.nro, which
+// GitHub only hands to a signed-in user, hence the token of
+// util/github_auth.hpp. Artifacts expire (90 days by default).
 //
 // The download is checked (size and the SHA-256 GitHub records; for an
 // artifact, the zip's, then the CRC-32 of playguard.nro inside it; the NRO
 // header) before it replaces the running .nro, which hbloader loaded whole
-// into memory, so it can be overwritten; then hbloader starts it.
+// into memory, so it can be overwritten once romfs:/ lets go of it
+// (platform_romfs_release, dev_build_flow.cpp); then hbloader starts it.
 //
 // Everything but fetch() and download() is plain C++ for the host tests
 // (tests/dev_builds); those two are in dev_builds_net.cpp.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
+
+#include <functional>
 
 #include <cstdint>
 #include <string>
@@ -44,6 +50,7 @@ struct Build
     std::string url;       // the download (an artifact's archive_download_url needs the token)
     uint64_t    size = 0;
     std::string sha256;    // 64 hex digits; empty when GitHub gave no digest
+    std::string notes;     // Release: its notes (the release's Markdown body); not kept in the cache
 };
 
 // One run's artifact, as GET /repos/…/actions/artifacts lists it.
@@ -62,18 +69,40 @@ struct Pull
     int64_t     head_repo = 0;
 };
 
-// The latest release (GET /repos/…/releases/latest): its playguard.nro.
-// False for anything else (a pre-release, no such asset, malformed).
+// The latest release (GET /repos/…/releases/latest): its playguard.nro and
+// its notes (at most MAX_NOTES bytes, cut on a line). False for anything
+// else (a pre-release, no such asset, malformed).
+constexpr size_t MAX_NOTES = 16 * 1024;
 bool parse_release(const std::string& json, Build* out);
-// The "playguard_release" artifacts that have not expired, newest first as listed.
-bool parse_artifacts(const std::string& json, std::vector<Artifact>* out);
+// The artifact holding playguard.nro: "playguard-<version>-<ref>-<commit>-nro",
+// or "playguard_release", the name the runs before that scheme gave it.
+bool is_build_artifact(const std::string& name);
+// The build artifacts (is_build_artifact) that have not expired, newest first
+// as listed. *listed (when given) is how many artifacts the page held, of
+// any name: a short page is the last one.
+bool parse_artifacts(const std::string& json, std::vector<Artifact>* out, size_t* listed = nullptr);
 bool parse_pulls(const std::string& json, std::vector<Pull>* out);
 
 // The builds: main's newest `keep_main` commits (pushed to this repository's
-// main), then for each open pull request the newest artifact of its branch
-// in its repository. Newest first within each kind; one per commit.
+// main), then for each open pull request from a branch of this repository
+// the newest artifact of that branch (pull requests from forks are left out). Newest first within each kind; one per commit.
 std::vector<Build> combine(const std::vector<Artifact>& artifacts, const std::vector<Pull>& pulls,
                            size_t keep_main = 20);
+
+// How Developer tools › Install another build orders main's commits and the
+// pull requests (config.json "dev_builds_order").
+enum class Order
+{
+    Newest,   // the newest build first
+    Number,   // pull requests by number, the highest first (main: newest first)
+};
+// "newest" or "number"; anything else is Newest.
+Order order_named(const std::string& name);
+const char* order_name(Order order);
+
+// The builds of `kind` in `all`, in `order`; builds that tie keep the order
+// they are listed in.
+std::vector<Build> of_kind(const std::vector<Build>& all, Kind kind, Order order);
 
 // "sha256:<64 hex>" (GitHub's digest) -> the 64 hex digits, lower case;
 // empty when malformed.
@@ -107,7 +136,8 @@ constexpr int64_t CACHE_MAX_AGE_S = 10 * 60;
 
 std::string encode_cache(const Cache& cache);
 // False for anything else (damaged, another layout); a build that does not
-// look like one (no https URL, a malformed commit or digest) is left out.
+// look like one (a URL not on https://github.com/ or https://api.github.com/,
+// a malformed commit or digest) is left out.
 bool decode_cache(const std::string& json, Cache* out);
 // Fresh: fetched less than CACHE_MAX_AGE_S before `now` (not in the future:
 // the clock was set back), in the same sign-in state.
@@ -120,9 +150,16 @@ bool cache_fresh(const Cache& cache, int64_t now, bool needs_login);
 // holding latest.json, artifacts.json and pulls.json) replaces the network.
 bool fetch(std::vector<Build>* out, bool* needs_login, std::string* error);
 
+// The latest release alone (no account needed): what Update in place
+// installs. Blocking (network); simulated like fetch().
+bool fetch_release(Build* out, std::string* error);
+
 // Downloads `b` to `path` (playguard.nro itself, out of the zip for an
 // artifact) and verifies it. Blocking. On the desktop build, with
 // PLAYGUARD_SIM_DEV_BUILDS set, a URL "https://<path>" is a local file.
-bool download(const Build& b, const std::string& path, std::string* error);
+// `progress` (when set) gets the bytes received and the total, from the
+// calling thread.
+bool download(const Build& b, const std::string& path, std::string* error,
+              std::function<void(uint64_t done, uint64_t total)> progress = nullptr);
 
 }   // namespace dev_builds

@@ -3,8 +3,10 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstdlib>
 #include <vector>
 
+#include "action/offline_clock_logic.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -62,6 +64,13 @@ ClockTab::ClockTab()
         if (!ui::refuse_read_only()) this->apply();
         return true;
     });
+    // A long title and no value: the title gets the whole width (an empty
+    // detail label still reserves its space).
+    copy_cell->detail->setVisibility(brls::Visibility::GONE);
+    copy_cell->registerClickAction([this](brls::View*) {
+        if (!ui::refuse_read_only()) this->copy();
+        return true;
+    });
     ui::set_visible(progress.getView(), false);
     ui::set_visible(warning.getView(), false);
     // Clocks tick and a measurement expires: keep the screen current.
@@ -83,7 +92,12 @@ void ClockTab::refresh()
         this->snap_ok = true;
     }
     const TimeSnapshot& s = this->snap;
-    const uint64_t ticked = (uint64_t)std::chrono::duration_cast<std::chrono::seconds>(now - this->snap_at).count();
+    uint64_t ticked = (uint64_t)std::chrono::duration_cast<std::chrono::seconds>(now - this->snap_at).count();
+#ifndef __SWITCH__
+    // Desktop simulation: a console time frozen by PLAYGUARD_SIM_NOW stays
+    // frozen here too, or a screenshot would depend on when it was taken.
+    if (std::getenv("PLAYGUARD_SIM_NOW")) ticked = 0;
+#endif
     const std::string na = "playguard/common/unavailable"_i18n;
     user->setDetailText(R_SUCCEEDED(s.user_rc) ? ui::time_text(s.user_time + ticked) : na);
     network->setDetailText(R_SUCCEEDED(s.network_rc) ? ui::time_text(s.network_time + ticked) : na);
@@ -118,6 +132,9 @@ void ClockTab::refresh()
     // Measuring only reads: also in read-only mode, where setting is greyed.
     ui::set_visible(apply_cell.getView(), this->last.ok);
     ui::show_writable(apply_cell, !app::read_only());
+    // No server answered: the console clock instead (its time is at the top).
+    ui::set_visible(copy_cell.getView(), this->offline);
+    ui::show_writable(copy_cell, !app::read_only());
 }
 
 void ClockTab::set_server(const std::string& host, const std::string& reg)
@@ -125,6 +142,7 @@ void ClockTab::set_server(const std::string& host, const std::string& reg)
     this->server = host;
     this->region_id = reg;
     this->last = clock_flow::Measurement{};
+    this->offline = false;
     this->result->setText("");
     ui::set_visible(warning.getView(), false);
     auto& cfg = config::get();
@@ -189,7 +207,9 @@ void ClockTab::measure()
     }
     this->busy = true;
     this->last = clock_flow::Measurement{};
+    this->offline = false;
     ui::set_visible(apply_cell.getView(), false);
+    ui::set_visible(copy_cell.getView(), false);
     ui::set_visible(warning.getView(), false);
     this->result->setText("");
     // A spinner says it is working; the text says with whom.
@@ -202,7 +222,8 @@ void ClockTab::measure()
         this->busy = false;
         ui::set_visible(progress.getView(), false);
         this->last = m;
-        this->result->setText(m.report);
+        this->offline = offline_clock_logic::offer(m.ok, this->snap) != offline_clock_logic::Offer::None;
+        this->result->setText(this->offline ? m.report + "\n\n" + "playguard/clock/offline_hint"_i18n : m.report);
         // The servers disagreeing, and a write that would be refused, in amber.
         std::string warn = m.warning;
         if (m.ok && this->autosync_off) warn += (warn.empty() ? "" : "\n") + "playguard/clock/autosync_off_note"_i18n;
@@ -216,6 +237,17 @@ void ClockTab::apply()
 {
     clock_flow::apply(this->last, [this](const std::string& message) {
         this->last = clock_flow::Measurement{};
+        this->result->setText(message);
+        ui::set_visible(warning.getView(), false);
+        this->snap_ok = false;   // the network clock just changed: read it again
+        this->refresh();
+    });
+}
+
+void ClockTab::copy()
+{
+    clock_flow::apply_console_clock([this](const std::string& message) {
+        this->offline = false;
         this->result->setText(message);
         ui::set_visible(warning.getView(), false);
         this->snap_ok = false;   // the network clock just changed: read it again

@@ -23,28 +23,37 @@ QrView::QrView(const std::string& text, float side)
     }
 }
 
+QrView::~QrView()
+{
+    if (this->image) nvgDeleteImage(brls::Application::getNVGContext(), this->image);
+}
+
 void QrView::draw(NVGcontext* vg, float x, float y, float width, float height,
                   brls::Style, brls::FrameContext*)
 {
     if (this->size == 0) return;
-    const float side   = std::fmin(width, height);
     const int   quiet  = 4;
-    const float module = std::floor(side / (this->size + 2 * quiet));
+    const int   pixels = this->size + 2 * quiet;   // the texture: one pixel per module, quiet zone included
+    const float side   = std::fmin(width, height);
+    const float module = std::floor(side / pixels);
     if (module < 1) return;
-    const float code = module * (this->size + 2 * quiet);
-    const float left = std::round(x + (width - code) / 2), top = std::round(y + (height - code) / 2);
 
+    if (!this->image) {
+        std::vector<unsigned char> rgba((size_t)pixels * pixels * 4, 0xFF);   // white, opaque
+        for (int r = 0; r < this->size; r++)
+            for (int c = 0; c < this->size; c++)
+                if (this->modules[(size_t)r * this->size + c]) {
+                    unsigned char* p = &rgba[(((size_t)(quiet + r) * pixels) + quiet + c) * 4];
+                    p[0] = p[1] = p[2] = 0x00;
+                }
+        this->image = nvgCreateImageRGBA(vg, pixels, pixels, NVG_IMAGE_NEAREST, rgba.data());
+        if (!this->image) return;
+    }
+
+    const float code = module * pixels;
+    const float left = std::round(x + (width - code) / 2), top = std::round(y + (height - code) / 2);
     nvgBeginPath(vg);
     nvgRect(vg, left, top, code, code);
-    nvgFillColor(vg, nvgRGB(0xFF, 0xFF, 0xFF));
-    nvgFill(vg);
-
-    // One path for every dark module: a single fill call.
-    nvgBeginPath(vg);
-    for (int r = 0; r < this->size; r++)
-        for (int c = 0; c < this->size; c++)
-            if (this->modules[(size_t)r * this->size + c])
-                nvgRect(vg, left + (quiet + c) * module, top + (quiet + r) * module, module, module);
-    nvgFillColor(vg, nvgRGB(0x00, 0x00, 0x00));
+    nvgFillPaint(vg, nvgImagePattern(vg, left, top, code, code, 0, this->image, 1.0f));
     nvgFill(vg);
 }

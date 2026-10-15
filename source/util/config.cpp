@@ -11,8 +11,10 @@ namespace config
 {
 
 static Config s_config;
+static Loaded s_loaded = Loaded::Missing;
 
 Config& get() { return s_config; }
+Loaded loaded() { return s_loaded; }
 
 namespace
 {
@@ -58,14 +60,14 @@ bool read_int(const nlohmann::json& j, const char* key, int& out)
     return small_int(*it, out);
 }
 
-// A list of integers; one value out of range refuses the whole list (left
-// empty, which sanitize() never keeps).
+// A list of integers; one value of another type (30.5, "30") or out of range
+// refuses the whole list (left empty, which sanitize() never keeps), as for
+// a single value: skipping it would turn [15, 30.5, 30, 60] into a valid set.
 std::vector<int> read_int_list(const nlohmann::json& list)
 {
     std::vector<int> v;
     for (const auto& a : list) {
         int n;
-        if (!a.is_number_integer()) continue;
         if (!small_int(a, n)) return {};
         v.push_back(n);
     }
@@ -102,8 +104,9 @@ void sanitize(Config& c)
     for (const char* l : LANGUAGES) language_ok |= c.language == l;
     if (!language_ok) c.language = "system";
     one_of(c.theme, { "system", "light", "dark" }, "system");
-    one_of(c.update_via, { "auto", "sphaira", "appstore", "manual" }, "auto");
-    one_of(c.pin_lock, { "off", "changes", "open" }, "off");
+    one_of(c.update_via, { "", "inplace", "auto", "sphaira", "appstore", "manual" }, "");
+    one_of(c.pin_lock, { "off", "changes", "open" }, "changes");
+    one_of(c.dev_builds_order, { "newest", "number" }, "newest");
     one_of(c.fw_gate_choice, { "", "read_only", "probe", "risk" }, "");
     if (c.fw_gate_choice.empty()) c.fw_gate_fw.clear(), c.fw_gate_app.clear();
     if (c.ntp_server.size() > MAX_HOST) c.ntp_server.clear();
@@ -119,7 +122,19 @@ void sanitize(Config& c)
     bool keep_ok = false;
     for (int k : BACKUP_KEEP) keep_ok |= c.backup_keep == k;
     if (!keep_ok) c.backup_keep = 0;
-    if (!c.update_checked.empty() && c.update_checked.size() != 10) c.update_checked.clear();
+    keep_ok = false;
+    for (int k : LOGS_KEEP) keep_ok |= c.logs_keep == k;
+    if (!keep_ok) c.logs_keep = 20;
+    keep_ok = false;
+    for (int k : LOGS_KEEP_DAYS) keep_ok |= c.logs_keep_days == k;
+    if (!keep_ok) c.logs_keep_days = 0;
+    keep_ok = false;
+    for (int k : LOGS_KEEP_MB) keep_ok |= c.logs_keep_mb == k;
+    if (!keep_ok) c.logs_keep_mb = 0;
+    if (!is_date(c.update_checked)) c.update_checked.clear();
+    if (c.update_latest.size() > 32) c.update_latest.clear();
+    if (c.update_snooze_version.size() > 32 || !is_date(c.update_snooze_until))
+        c.update_snooze_version.clear(), c.update_snooze_until.clear();
     if (!is_date(c.support_reminded)) c.support_reminded.clear();
     if (c.seen_version.size() > 32) c.seen_version.clear();
 
@@ -146,18 +161,74 @@ void sanitize(Config& c)
     if (!prev_ok) c.console_lock_prev.clear();
 }
 
-void load()
+// What belongs to the system PlayGuard runs on (state.json, util/nand.hpp):
+// the console lock, the extra-time record, a pending relock and the
+// firmware choice. Read from state.json, or from config.json when this
+// system has no state.json yet (the versions before it kept them there).
+static void clear_system(Config& c)
 {
-    s_config = Config{};
-    std::string text;
-    if (!paths::read_file(paths::config_file(), text)) return;
+    c.console_lock = false;
+    c.console_lock_prev.clear();
+    c.relock_pending = false;
+    c.fw_gate_fw.clear(), c.fw_gate_app.clear(), c.fw_gate_choice.clear();
+    clear_extra(c);
+}
+
+static void read_system(const nlohmann::json& j, Config& c)
+{
+    read_bool(j, "console_lock", c.console_lock);
+    auto prev = j.find("console_lock_prev");
+    if (prev != j.end() && prev->is_array())
+        c.console_lock_prev = read_int_list(*prev);   // sanitize() keeps it only when it is seven valid limits
+    read_bool(j, "relock_pending", c.relock_pending);
+
+    // The firmware choice and the extra-time record are all-or-nothing. Every
+    // field is read (&=, no short circuit; clang warns about a bool `a & b`).
+    bool gate_ok = read_string(j, "fw_gate_fw", c.fw_gate_fw);
+    gate_ok &= read_string(j, "fw_gate_app", c.fw_gate_app);
+    gate_ok &= read_string(j, "fw_gate_choice", c.fw_gate_choice);
+    if (!gate_ok) c.fw_gate_fw.clear(), c.fw_gate_app.clear(), c.fw_gate_choice.clear();
+    bool extra_ok = read_int(j, "extra_weekday", c.extra_weekday);
+    extra_ok &= read_string(j, "extra_date", c.extra_date);
+    extra_ok &= read_int(j, "extra_base", c.extra_base);
+    extra_ok &= read_int(j, "extra_value", c.extra_value);
+    if (!extra_ok) clear_extra(c);
+}
+
+// The file as JSON, or null when it is not a JSON object.
+static nlohmann::json parse_object(const std::string& text)
+{
     nlohmann::json j;
     try {
         j = nlohmann::json::parse(text);
     } catch (...) {
-        return;   // not JSON at all: defaults
+        return nullptr;   // not JSON at all
     }
-    if (!j.is_object()) return;
+    return j.is_object() ? j : nlohmann::json(nullptr);
+}
+
+// There but not readable as settings: defaults, and the file is put aside
+// before anything (support_flow, fw_gate save by themselves at start-up)
+// writes the defaults over it.
+static void damaged()
+{
+    s_config = Config{};
+    s_loaded = paths::put_aside(paths::config_file()) ? Loaded::PutAside : Loaded::Stuck;
+}
+
+static void load_shared()
+{
+    std::string text;
+    if (!paths::read_file(paths::config_file(), text)) {
+        if (paths::exists(paths::config_file())) damaged();   // missing: a first run, silently
+        return;
+    }
+    const nlohmann::json j = parse_object(text);
+    if (j.is_null()) {
+        damaged();
+        return;
+    }
+    s_loaded = Loaded::Read;
 
     Config& c = s_config;
     read_string(j, "language", c.language);
@@ -171,44 +242,85 @@ void load()
     read_string(j, "update_via", c.update_via);
     read_bool(j, "update_daily", c.update_daily);
     read_string(j, "update_checked", c.update_checked);
+    read_string(j, "update_latest", c.update_latest);
+    read_string(j, "update_snooze_version", c.update_snooze_version);
+    read_string(j, "update_snooze_until", c.update_snooze_until);
     read_string(j, "start_tab", c.start_tab);
     read_int(j, "activity_period", c.activity_period);
     read_int(j, "export_format", c.export_format);
     read_int(j, "backup_keep", c.backup_keep);
+    read_int(j, "logs_keep", c.logs_keep);
+    read_int(j, "logs_keep_days", c.logs_keep_days);
+    read_int(j, "logs_keep_mb", c.logs_keep_mb);
     read_bool(j, "clock_check_at_start", c.clock_check_at_start);
+    read_bool(j, "intro", c.intro);
+    read_string(j, "dev_builds_order", c.dev_builds_order);
     read_string(j, "pin_lock", c.pin_lock);
     read_bool(j, "onboarding_at_start", c.onboarding_at_start);
     read_bool(j, "support_reminder", c.support_reminder);
     read_string(j, "support_reminded", c.support_reminded);
     read_string(j, "seen_version", c.seen_version);
-    read_bool(j, "console_lock", c.console_lock);
-    auto prev = j.find("console_lock_prev");
-    if (prev != j.end() && prev->is_array())
-        c.console_lock_prev = read_int_list(*prev);   // sanitize() keeps it only when it is seven valid limits
     auto amounts = j.find("extra_amounts");
     if (amounts != j.end() && amounts->is_array())
         c.extra_amounts = read_int_list(*amounts);   // sanitize() keeps it only when it is one of EXTRA_SETS
-    read_bool(j, "relock_pending", c.relock_pending);
-
-    // The firmware choice and the extra-time record are all-or-nothing.
-    const bool gate_ok = read_string(j, "fw_gate_fw", c.fw_gate_fw) &
-                         read_string(j, "fw_gate_app", c.fw_gate_app) &
-                         read_string(j, "fw_gate_choice", c.fw_gate_choice);
-    if (!gate_ok) c.fw_gate_fw.clear(), c.fw_gate_app.clear(), c.fw_gate_choice.clear();
-    const bool extra_ok = read_int(j, "extra_weekday", c.extra_weekday) &
-                          read_string(j, "extra_date", c.extra_date) &
-                          read_int(j, "extra_base", c.extra_base) &
-                          read_int(j, "extra_value", c.extra_value);
-    if (!extra_ok) clear_extra(c);
     auto servers = j.find("custom_servers");
     if (servers != j.end() && servers->is_array())
         for (const auto& v : *servers)
             if (v.is_string()) c.custom_servers.push_back(v.get<std::string>());
-    sanitize(c);
+    read_system(j, c);   // the versions before state.json; replaced by it below
+}
+
+// state.json: missing keeps what config.json had (nothing, or what a version
+// before state.json kept there); damaged is put aside like config.json, with
+// the same notice, and this system's fields start from their defaults.
+static void load_state()
+{
+    std::string text;
+    if (!paths::read_file(paths::state_file(), text)) {
+        if (!paths::exists(paths::state_file())) return;
+    } else {
+        const nlohmann::json j = parse_object(text);
+        if (!j.is_null()) {
+            clear_system(s_config);
+            read_system(j, s_config);
+            return;
+        }
+    }
+    clear_system(s_config);
+    const bool aside = paths::put_aside(paths::state_file());
+    if (!aside) s_loaded = Loaded::Stuck;
+    else if (s_loaded != Loaded::Stuck) s_loaded = Loaded::PutAside;
+}
+
+void load()
+{
+    s_config = Config{};
+    s_loaded = Loaded::Missing;
+    load_shared();
+    load_state();
+    sanitize(s_config);
 }
 
 bool save()
 {
+    Snapshot snap;
+    return snapshot(snap) && write(snap);
+}
+
+bool write(const Snapshot& snap)
+{
+    // Both, even when the first fails.
+    const bool shared = paths::atomic_write(paths::config_file(), snap.shared);
+    const bool system = paths::atomic_write(paths::state_file(), snap.system);
+    return shared && system;
+}
+
+bool snapshot(Snapshot& snap)
+{
+    if (s_loaded == Loaded::Stuck) return false;   // it would overwrite the unreadable file
+    const auto dump = [](const nlohmann::json& j) {
+        return j.dump(2, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
+    };
     nlohmann::json j;
     j["schema"]          = SCHEMA;
     j["language"]        = s_config.language;
@@ -223,29 +335,41 @@ bool save()
     j["update_via"]      = s_config.update_via;
     j["update_daily"]    = s_config.update_daily;
     j["update_checked"]  = s_config.update_checked;
+    j["update_latest"]   = s_config.update_latest;
+    j["update_snooze_version"] = s_config.update_snooze_version;
+    j["update_snooze_until"]   = s_config.update_snooze_until;
     j["start_tab"]       = s_config.start_tab;
     j["extra_amounts"]   = s_config.extra_amounts;
     j["activity_period"] = s_config.activity_period;
     j["export_format"]   = s_config.export_format;
     j["backup_keep"]     = s_config.backup_keep;
+    j["logs_keep"]       = s_config.logs_keep;
+    j["logs_keep_days"]  = s_config.logs_keep_days;
+    j["logs_keep_mb"]    = s_config.logs_keep_mb;
     j["clock_check_at_start"] = s_config.clock_check_at_start;
+    j["intro"]           = s_config.intro;
+    j["dev_builds_order"] = s_config.dev_builds_order;
     j["pin_lock"]        = s_config.pin_lock;
     j["onboarding_at_start"] = s_config.onboarding_at_start;
     j["support_reminder"] = s_config.support_reminder;
     j["support_reminded"] = s_config.support_reminded;
     j["seen_version"]    = s_config.seen_version;
-    j["console_lock"]    = s_config.console_lock;
-    j["console_lock_prev"] = s_config.console_lock_prev;
-    j["fw_gate_fw"]      = s_config.fw_gate_fw;
-    j["fw_gate_app"]     = s_config.fw_gate_app;
-    j["fw_gate_choice"]  = s_config.fw_gate_choice;
-    j["extra_weekday"]   = s_config.extra_weekday;
-    j["extra_date"]      = s_config.extra_date;
-    j["extra_base"]      = s_config.extra_base;
-    j["extra_value"]     = s_config.extra_value;
-    j["relock_pending"]  = s_config.relock_pending;
-    return paths::atomic_write(paths::config_file(),
-                               j.dump(2, ' ', false, nlohmann::json::error_handler_t::replace) + "\n");
+    snap.shared = dump(j);
+
+    nlohmann::json st;
+    st["schema"]            = SCHEMA;
+    st["console_lock"]      = s_config.console_lock;
+    st["console_lock_prev"] = s_config.console_lock_prev;
+    st["fw_gate_fw"]        = s_config.fw_gate_fw;
+    st["fw_gate_app"]       = s_config.fw_gate_app;
+    st["fw_gate_choice"]    = s_config.fw_gate_choice;
+    st["extra_weekday"]     = s_config.extra_weekday;
+    st["extra_date"]        = s_config.extra_date;
+    st["extra_base"]        = s_config.extra_base;
+    st["extra_value"]       = s_config.extra_value;
+    st["relock_pending"]    = s_config.relock_pending;
+    snap.system = dump(st);
+    return true;
 }
 
 }   // namespace config

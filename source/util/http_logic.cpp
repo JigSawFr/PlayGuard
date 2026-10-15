@@ -1,0 +1,44 @@
+// Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
+#include "util/http_logic.hpp"
+
+namespace http_logic
+{
+
+bool fits(size_t have, size_t n, size_t max)
+{
+    return have + n <= max;
+}
+
+std::vector<std::string> request_headers(const char* content_type, const std::vector<std::string>* extra)
+{
+    std::vector<std::string> out;
+    if (content_type) {
+        out.push_back(std::string("Content-Type: ") + content_type);
+        out.push_back("Expect:");
+    }
+    if (extra) out.insert(out.end(), extra->begin(), extra->end());
+    return out;
+}
+
+bool succeeded(const Outcome& o, std::string* error)
+{
+    std::string why;
+    if (o.status >= 400) why = "HTTP " + std::to_string(o.status);
+    else if (o.overflow) why = "response too large";
+    else if (o.file_error) why = "cannot write the file";
+    else if (!o.transfer_ok) why = o.transfer_error;
+    else return true;
+    if (error) *error = why;
+    return false;
+}
+
+bool redirect_ok(long status, const std::string& target, std::string* error)
+{
+    if (status < 300 || status >= 400 || target.compare(0, 8, "https://") != 0) {
+        if (error) *error = "no redirect (HTTP " + std::to_string(status) + ")";
+        return false;
+    }
+    return true;
+}
+
+}   // namespace http_logic

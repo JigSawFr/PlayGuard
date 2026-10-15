@@ -1,5 +1,5 @@
 // history — what PlayGuard changed on the console, kept on the SD card
-// (sd:/switch/playguard/history.json, the newest 200 changes), so a parent
+// (sd:/config/playguard/history.json, the newest 200 changes), so a parent
 // can see who-did-what from this app and put a value back. Values are stored
 // raw (minutes, levels, 0/1) and worded by the UI when shown, in the language
 // of the moment. No UI and no console calls: host-tested (tests/history).
@@ -21,10 +21,13 @@ struct Entry
     //   "limits"  before/after: 7 values, Sun..Sat minutes (65535 no limit)
     //   "level"   1 value (PctlSafetyLevel)        "org" 1 value (rating body)
     //   "custom"  3 values: age, posting restricted, communication restricted
-    //   "vr", "alarm"  1 value, 0/1 (VR restricted / alarm off)
-    //   "pin", "unlock", "relock", "unlink", "delete", "clock", "restore",
-//   "remove_game", "remove_update", "remove_addon", "launch_version"
-//   (detail: the game's name and ID, and the add-on's): no values
+    //   "vr", "alarm", "time_up"  1 value, 0/1 (VR restricted / alarm off /
+    //            a warning only when the time is up, not suspending)
+    //   "pin", "pin_shown", "unlock", "relock", "unlink", "delete", "clock",
+    //   "restore": no values
+    //   "new_account" (seen by PlayGuard, not made; detail: its name): no values
+    //   "remove_game", "remove_update", "remove_addon", "launch_version"
+    //   (detail: the game's name and ID, and the add-on's): no values
     std::string kind;
     // Where from: "uniform", "day", "per_day", "extra", "stop", "restore_extra",
     // "profile", "remove", "backup", "undo", "first_steps" … ("" when plain).
@@ -33,9 +36,17 @@ struct Entry
     std::vector<int> before, after;
 };
 
+// A history.json that is there but cannot be read or parsed is put aside as
+// history.json.bad (paths::put_aside: the previous .bad is kept as .bad.1)
+// and a new history starts. check() does it now (at start-up, so the parent
+// can be told); Stuck: it could not be moved, and nothing is written over it.
+enum class Damage { None, PutAside, Stuck };
+Damage check();
+
 // Adds `e` (newest) and keeps the newest MAX_ENTRIES. False when the SD card
-// refused the write (*error says why).
-bool append(const Entry& e, std::string* error = nullptr);
+// refused the write (*error says why). *put_aside: a damaged file found then
+// was put aside first (as check()).
+bool append(const Entry& e, std::string* error = nullptr, bool* put_aside = nullptr);
 
 // Every entry, newest first. A missing or damaged file is an empty history;
 // a damaged entry is skipped.

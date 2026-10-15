@@ -27,7 +27,7 @@ int s_next_id = 1;
 
 std::string cache_file(const Key& key)
 {
-    return paths::data_dir() + "/cache/activity_" + (key.empty() ? std::string("all") : key) + ".bin";
+    return paths::nand_dir() + "/cache/activity_" + (key.empty() ? std::string("all") : key) + ".bin";
 }
 
 // Local days between two user-clock times, or 0 when the time zone cannot say.
@@ -62,7 +62,7 @@ void save(const Key& key, const PlayStats& stats)
 {
     if (R_FAILED(stats.rc)) return;   // nothing worth keeping
     std::string error;
-    if (!paths::ensure_dir(paths::data_dir() + "/cache") ||
+    if (!paths::ensure_dir(paths::nand_dir() + "/cache") ||
         !paths::atomic_write(cache_file(key), play_cache::encode(stats), &error))
         brls::Logger::warning("play_data: cache not saved: {}", error);
 }
@@ -100,15 +100,24 @@ void fetch(const PlayAccount* account)
     e.busy = true;
     const bool one = account != nullptr;
     const PlayAccount who = one ? *account : PlayAccount{};
-    brls::async([key, one, who]() {
+    // The last read (this run's, or the SD card's): the names it holds are
+    // not read from each game again.
+    const std::shared_ptr<const PlayStats> known = e.stats;
+    brls::async([key, one, who, known]() {
         auto data = std::make_shared<PlayStats>();
+        playstats_remember(known.get());
         playstats_fetch_for(data.get(), one ? &who : nullptr);
+        // Quitting: cut short, so neither kept nor shown.
+        if (playstats_cancelled()) return;
+        if (data->approximate) brls::Logger::info("play_data: only the newest part of the log was read (clock set back?)");
+        // Kept for the next run from here, off the UI thread: a slow SD card
+        // must not hold a frame (one file per account, one read at a time).
+        save(key, *data);
         brls::sync([key, data]() {
             Entry& done = s_entries[key];
             done.busy    = false;
             done.stats   = data;
             done.read_at = std::chrono::steady_clock::now();
-            save(key, *data);
             // A copy: a listener may unlisten (its tab closed) while called.
             const auto listeners = s_listeners;
             for (const auto& l : listeners) l.second();

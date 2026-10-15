@@ -24,11 +24,17 @@ const std::vector<uint16_t>& quick_values();
 // off, no limit today, or no game counted yet).
 int played_today_min(const PtState& pt);
 
+// `body`, then, while the console is linked to the phone app, the note that
+// its next synchronisation overwrites what is written here: every write
+// confirmation ends with it. `st`: a status already read, else it is read now.
+std::string with_link_note(const std::string& body, const PctlStatus* st = nullptr);
+
 // One dialog for the whole change. `body` asks the question ("Set 2 h for every
 // day?"); when the timer is counting down the same dialog explains the
 // temporary unlock and its button unlocks first. When `new_days` would put
 // today's limit below the time already played, the dialog says the game in
-// progress will be suspended. With nothing to say and no unlock needed,
+// progress will be suspended, and while the phone app is linked, that it can
+// overwrite the change (with_link_note). With nothing to say and no unlock needed,
 // `write` runs at once. `write(did_unlock)` only runs when it is safe to
 // write; otherwise the user has already been told why.
 // `danger`: the confirm button is drawn in the "bad" colour (removing or
@@ -102,6 +108,16 @@ Result write_alarm_disabled(bool disabled, const std::string& source);
 // through confirm_write.
 void set_countdown(bool running, std::function<void()> refresh);
 
+// What the console does when the time is up: suspend the software, or a
+// warning only (pctl_play_timer_set_alarm_only). time_up_text: the current
+// choice, "" when the block is not read. choose_time_up: the two choices,
+// then confirm_write and write_alarm_only; refused, with the reason, while no
+// limit and no bedtime is set.
+std::string time_up_text(const PtState& pt);
+void choose_time_up(const PtState& pt, std::function<void()> refresh);
+// Writes the choice and records it in the history ("time_up") with `source`.
+Result write_alarm_only(bool alarm_only, const std::string& source);
+
 // Bedtime, for every day. choose_bedtime: the alarm (16:00 to 23:45, or
 // off); choose_bedtime_end: when play is allowed again (05:00 to 09:00), on
 // the days whose alarm is on. Both refuse while the block's bedtime is not
@@ -115,10 +131,19 @@ Result write_bedtime(const PtBedtime bed[7], const std::string& source);
 // "21:00, allowed again at 06:00", "Off", or "Varies by day".
 std::string bedtime_text(const PtState& pt);
 
-// At start-up: the app stopped between an unlock made for a change and the
-// lock that follows it (config relock_pending) -> lock again now, with a toast.
-// The record stays until the console reads back as locked. Also called when
-// the app leaves read-only mode, which keeps the record.
+// At start-up, before the first screen (and again on the main screen): an
+// earlier run unlocked (for a change, or Security › Unlock temporarily) and
+// stopped before locking again (config relock_pending) -> lock again now,
+// with a toast. The record stays until the console reads back as locked.
+// Also called when the app leaves read-only mode, which keeps the record;
+// this run's own unlock is left alone (pt_logic::pending_relock).
 void relock_if_interrupted();
+
+// Security › Unlock temporarily: unlocks, recorded as above, so that closing
+// PlayGuard from the HOME menu (which asks nothing) locks again at the next
+// start.
+Result unlock_temporarily();
+// Quitting while unlocked, "Quit, still unlocked": a choice, so the record goes.
+void keep_unlocked();
 
 }   // namespace pt_flow

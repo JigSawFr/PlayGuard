@@ -1,7 +1,8 @@
 // clock_flow — measuring the network clock against public NTP servers and
-// setting it, shared by the Network clock tab, the Overview's "Inaccurate"
-// line and the first-steps screen (one implementation of the measurement,
-// the 2-minute validity and the write with its before / after report).
+// setting it (or, with no server, setting it to the console clock), shared
+// by the Network clock tab, the Overview's "Inaccurate" line and the
+// first-steps screen (one implementation of the measurement, the 2-minute
+// validity and the write with its before / after report).
 // NTP sampling and the time:s write are adapted from anbingxi's fork.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -43,10 +44,18 @@ uint64_t projected_now(const Measurement& m);  // the server time, now
 // sentence for the user (also shown in a dialog); nothing when cancelled.
 void apply(const Measurement& m, std::function<void(const std::string& message)> done);
 
+// For a console no server answers (offline_clock_logic): asks "Set the
+// network clock to the console clock, …?" with what the parent must check
+// first, then the same reports and write as apply(), from the console clock.
+// Also with "Synchronize" off: set first, turning it on no longer moves the
+// console clock. Writes the clock only, not the parental controls.
+void apply_console_clock(std::function<void(const std::string& message)> done);
+
 // The guided path from the Overview and the first steps: offers to measure
 // with the current server (a spinner while it runs, which Cancel or B
 // closes, the late result then dropped), then to set the clock
-// from the result. `done` runs after the clock changed (to refresh).
+// from the result, or from the console clock when no server answered.
+// `done` runs after the clock changed (to refresh).
 void guided(std::function<void()> done);
 
 }   // namespace clock_flow

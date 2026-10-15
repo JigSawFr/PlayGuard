@@ -96,7 +96,7 @@ std::string report(const Reference& ref, const Block& now, const std::string& no
 
 std::string reference_path()
 {
-    return paths::logs_dir() + "/play_timer_block.json";
+    return paths::play_timer_dir() + "/block.json";
 }
 
 bool save_reference(const Reference& ref, std::string* error)

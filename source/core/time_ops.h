@@ -18,6 +18,7 @@ typedef struct {
     TimeSnapshot before, after;
     bool   refused_automatic, write_attempted, verify_attempted, verified;
     Result open_rc, write_rc, verify_rc;
+    u64    target;     // what was written (or would have been)
     u64    readback;
 } TimeApply;
 
@@ -29,10 +30,22 @@ Result time_network_accuracy(bool *accurate);
 // when automatic correction is disabled or unknown: the user clock would then
 // not follow, and the user asked for the system's own setting to stay in charge.
 void time_clock_apply(u64 utc_seconds, TimeApply *out);
+// Sets the network clock to the user clock, read in the same session just
+// before the write: for a console no time server answers. No refusal when
+// automatic correction is off: the user clock is the source and stays where
+// it is, and turning correction on afterwards no longer moves it. The user
+// clock read fails: open_rc, nothing written.
+void time_clock_set_to_user(TimeApply *out);
 void time_clock_dump(char *buf, size_t size);
 
 // The console's time-zone rule (Settings > Time Zone), daylight saving included.
 const TimeRule *time_console_rule(void);
+
+// The standard steady clock: seconds since the console's RTC was set up,
+// kept through sleep mode and restarts; changing the console clock does not
+// move it. `source_id` (16 bytes, may be NULL) names its source: values from
+// two sources do not compare. Read only.
+Result time_steady_now(u64 *seconds, u8 source_id[16]);
 
 // The user clock now (what the HOME menu shows), read live, and the same in
 // local time. False when the local time is unknown (`posix` is still set).

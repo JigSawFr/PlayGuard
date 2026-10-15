@@ -2,7 +2,7 @@
 
 PlayGuard brings the settings of Nintendo's companion app,
 **Nintendo Switch Parental Controls**
-([App Store](https://apps.apple.com/fr/app/contr%C3%B4le-parental-nintendo-sw/id1190074407),
+([App Store](https://apps.apple.com/app/id1190074407),
 [Google Play](https://play.google.com/store/apps/details?id=com.nintendo.znma)),
 onto the console itself. A console running Atmosphère is usually kept away
 from Nintendo's servers, so the companion app can no longer reach it: every
@@ -20,12 +20,13 @@ How the settings are stored on the console is in
 
 | Companion app | PlayGuard | Notes |
 |---|---|---|
-| Daily play-time limit, the same every day or one per day | *Play time* | Plus saved profiles, and the week chart as the editor |
+| Daily play-time limit, the same every day or one per day | *Play timer* | Plus saved profiles, and the week chart as the editor |
 | "Extend today's play time" (+5 min … +1 h, added in 2.4.0 for +1 h); undo today's changes | *Extra time today*, *No more play today*; the usual limit comes back the next day | Amounts in *Preferences*, including +5/+10/+15 |
-| Bedtime alarm and the time play is allowed again (2.1.0) | *Play time › Bedtime alarm* | Partly: one time for every day (see gap 2) |
+| Alarm only, or suspend the software, when the time is up | *Play timer › When the time is up* | Shown once a limit or a bedtime is set (see gap 1) |
+| Bedtime alarm and the time play is allowed again (2.1.0) | *Play timer › Bedtime alarm* | Partly: one time for every day (see gap 2) |
 | Restriction level, age rating, rating organisation, posting to social media, communicating with other players, VR mode (1.10.0) | *Restrictions* | |
 | Play history per game | *Activity* | Plus per user account, all-time totals and export (CSV, JSON, XLSX, PDF) |
-| Parental-controls PIN | *Security & app* | Plus showing a forgotten PIN, and a PIN to open PlayGuard itself |
+| Parental-controls PIN | *Security & app* | Plus showing the PIN (asked first) and a PIN to open PlayGuard itself; for a forgotten PIN, the recovery sysmodule |
 | Linking the app to a console | *Security & app › Unlink the companion app* | PlayGuard can only unlink, which is what a console kept offline needs |
 
 ## Missing
@@ -34,18 +35,16 @@ Most useful first. Each says what blocks it.
 
 ### 1. Alarm only, or suspend the software
 
-When the time is up, the companion app either sounds an alarm or suspends
-the software. This is the setting parents care about most after the limit
-itself.
+**Covered** by *Play timer › When the time is up*; left here so the numbers
+of the gaps below stay the same.
 
 - In the app's API it is `restrictionMode`: `ALARM` or `FORCED_TERMINATION`.
-- On the console it most likely sits in the play-timer block's header, bytes
-  `00..03`, but which byte and which value is **unknown**
-  (see [the header hypothesis](parental-controls.md#hypothesis-the-header-is-the-modes-plus-a-daily-rule)).
-- **Needs:** a console still linked to the companion app. Save the play-timer
-  block as a reference (*Developer tools › Compare the play-timer block*),
-  switch the mode in the app, let it sync, compare. Attach the result to an
-  issue.
+- On the console it is byte `01` of the play-timer block's header (`0`
+  `ALARM`, `1` `FORCED_TERMINATION`), as reversed from the 22.5.0 `pctl`
+  sysmodule (see [the header](parental-controls.md#the-header-is-the-modes-plus-a-daily-rule)).
+- Verified on a console (2026-10-14): set to a warning only by PlayGuard, the
+  console warned at the limit and the game went on, the time over it
+  counted (1454 below 0).
 
 ### 2. Bedtime and start time per day of the week
 
@@ -53,11 +52,13 @@ Since 2.4.0 the companion app sets a different start time for each day
 (*Detailed end-of-day settings*), and each day's rule has its own bedtime.
 PlayGuard writes one bedtime, the same every day.
 
-- The per-day bedtime bytes are inferred from the app's API but were **never
-  seen with a bedtime on**; PlayGuard checks every bedtime write against what
-  the console reports and reverts it otherwise.
-- **Needs:** the same comparison as gap 1, with a different bedtime on two
-  days. Then the per-day editor can show and set a bedtime per day.
+- The per-day bedtime bytes are **verified** on 22.0.0 (2026-10-14: a
+  bedtime set by PlayGuard, read back from the block and from 1954–1959);
+  PlayGuard still checks every bedtime write against what the console
+  reports and reverts it otherwise.
+- **Needs:** only code: the per-day editor showing and setting a bedtime per
+  day. A block from the companion app with different bedtimes on two days
+  would confirm that the console takes each day's own.
 
 ### 3. Exceptions for specific software
 

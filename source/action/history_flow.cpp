@@ -4,11 +4,15 @@
 #include <borealis.hpp>
 #include <fmt/format.h>
 
+#include "action/data_notice.hpp"
+#include "action/history_logic.hpp"
+#include "action/outside_watch.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_log_flow.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/update.hpp"
 
 using namespace brls::literals;
 
@@ -30,7 +34,7 @@ std::string age_text(int age)
 // One recorded value set, worded for its kind ("" when it does not fit).
 std::string value_text(const std::string& kind, const std::vector<int>& v)
 {
-    if (kind == "limits" && v.size() == 7) {
+    if ((kind == "limits" || kind == "outside_limits") && v.size() == 7) {
         uint16_t days[7];
         for (int i = 0; i < 7; i++) days[i] = (uint16_t)v[i];
         return ui::days_summary(days);
@@ -40,6 +44,7 @@ std::string value_text(const std::string& kind, const std::vector<int>& v)
         if (kind == "org") return pctl_rating_org_name((uint32_t)v[0]);
         if (kind == "vr") return yes_no(v[0]);
         if (kind == "alarm") return v[0] ? "playguard/common/off"_i18n : "playguard/common/on"_i18n;
+        if (kind == "time_up") return v[0] ? "playguard/play_timer/time_up_alarm"_i18n : "playguard/play_timer/time_up_suspend"_i18n;
         if (kind == "console_lock") return v[0] ? "playguard/common/on"_i18n : "playguard/common/off"_i18n;
     }
     if (kind == "custom" && v.size() == 3)
@@ -47,15 +52,24 @@ std::string value_text(const std::string& kind, const std::vector<int>& v)
     return "";
 }
 
+bool known_kind(const std::string& kind)
+{
+    static const char* known[] = { "limits", "level", "custom", "org", "vr", "alarm", "pin", "pin_shown",
+                                   "unlock", "relock", "unlink", "delete", "clock", "restore", "rescue",
+                                   "console_lock", "bedtime", "config_reset", "outside_reset", "outside_clock",
+                                   "outside_limits", "new_account", "time_up", "remove_game", "remove_update",
+                                   "remove_addon", "launch_version" };
+    for (const char* k : known)
+        if (kind == k) return true;
+    return false;
+}
+
 std::string kind_label(const std::string& kind)
 {
-    static const char* known[] = { "limits", "level", "custom", "org", "vr", "alarm", "pin",
-                                   "unlock", "relock", "unlink", "delete", "clock", "restore", "rescue",
-                                   "console_lock", "bedtime", "remove_game", "remove_update", "remove_addon",
-                                   "launch_version" };
-    for (const char* k : known)
-        if (kind == k) return brls::getStr(std::string("playguard/history/kinds/") + k);
-    return kind;
+    // A kind this version does not know (written by a newer one): said as
+    // such, with its name for a bug report.
+    if (!known_kind(kind)) return brls::getStr("playguard/history/unknown_kind", kind);
+    return brls::getStr("playguard/history/kinds/" + kind);
 }
 
 std::string source_label(const history::Entry& e)
@@ -71,10 +85,11 @@ std::string source_label(const history::Entry& e)
 // The console's value of `kind` now, as recorded values ({} when unread).
 std::vector<int> current(const std::string& kind)
 {
-    if (kind == "limits" || kind == "alarm") {
+    if (kind == "limits" || kind == "alarm" || kind == "time_up") {
         PtState pt;
         pctl_play_timer_query(&pt);
         if (kind == "limits") return pt.valid ? days_values(pt.day_min) : std::vector<int>{};
+        if (kind == "time_up") return pt.valid ? std::vector<int>{ pt.alarm_only ? 1 : 0 } : std::vector<int>{};
         return pt.alarm_disabled_valid ? std::vector<int>{ pt.alarm_disabled ? 1 : 0 } : std::vector<int>{};
     }
     PctlStatus st;
@@ -86,8 +101,8 @@ std::vector<int> current(const std::string& kind)
     return {};
 }
 
-// Writes `v` for `kind` (not the limits or the alarm: they go through the
-// play-timer gate).
+// Writes `v` for `kind` (not the limits, the alarm or the time-up choice:
+// they go through the play-timer gate).
 Result write_value(const std::string& kind, const std::vector<int>& v)
 {
     if (kind == "level") return pctl_set_safety_level((uint32_t)v[0]);
@@ -113,9 +128,17 @@ std::vector<int> custom_values(const PctlCustomSettings& s)
 
 static void store(history::Entry e)
 {
+    // A change PlayGuard made: what it reads next is not a change made
+    // outside (the outside_* entries are those, and a new account).
+    if (e.kind.rfind("outside_", 0) != 0 && e.kind != "new_account") outside_watch::own_change();
     e.when = ui::now_stamp();
-    std::string err;
-    if (!history::append(e, &err)) brls::Logger::warning("history: not saved ({})", err);
+    // Off the UI thread: append() reads and rewrites the whole file.
+    ui::write_later("history", [e]() {
+        std::string err;
+        bool put_aside = false;
+        if (!history::append(e, &err, &put_aside)) brls::Logger::warning("history: not saved ({})", err);
+        if (put_aside) brls::sync([]() { data_notice::history_put_aside(); });
+    });
     // Developer › Record the play timer: a line marking the change.
     std::string event = e.kind;
     for (const std::string* part : { &e.source, &e.detail })
@@ -153,8 +176,21 @@ void record_event(const char* kind, const std::string& source, const std::string
     store(e);
 }
 
+std::vector<history::Entry> load()
+{
+    ui::settle_writes();
+    return history::load();
+}
+
 std::string title(const history::Entry& e)
 {
+    // One day of the week changed: that day alone, not the week's range.
+    const std::vector<int> days = history_logic::changed_days(e);
+    if (days.size() == 1) {
+        const int d = days[0];
+        return brls::getStr("playguard/history/title_day_change", kind_label(e.kind), ui::day_name_in_text(d),
+                            ui::fmt_minutes((uint16_t)e.before[d]), ui::fmt_minutes((uint16_t)e.after[d]));
+    }
     const std::string before = value_text(e.kind, e.before), after = value_text(e.kind, e.after);
     if (!before.empty() && !after.empty())
         return brls::getStr("playguard/history/title_change", kind_label(e.kind), before, after);
@@ -172,7 +208,29 @@ std::string details(const history::Entry& e)
     const std::string before = value_text(e.kind, e.before), after = value_text(e.kind, e.after);
     if (!before.empty()) out += "\n" + brls::getStr("playguard/common/line", "playguard/history/before"_i18n, before);
     if (!after.empty()) out += "\n" + brls::getStr("playguard/common/line", "playguard/history/after"_i18n, after);
+    // The week's limits: each day that changed, as it was and became.
+    const std::vector<int> days = history_logic::changed_days(e);
+    if (!days.empty()) {
+        out += "\n\n" + "playguard/history/days_changed"_i18n;
+        for (int d : days)
+            out += "\n" + brls::getStr("playguard/history/day_change", ui::day_name(d), ui::fmt_minutes((uint16_t)e.before[d]),
+                                        ui::fmt_minutes((uint16_t)e.after[d]));
+    }
+    if (!known_kind(e.kind)) out += "\n\n" + "playguard/history/unknown_note"_i18n;
     return out;
+}
+
+std::string when_text(const history::Entry& e)
+{
+    if (e.when.size() < 16) return e.when.empty() ? "?" : e.when;
+    const std::string today = ui::today_date();
+    using history_logic::Day;
+    switch (history_logic::day_of(e.when, today, update::add_days(today, -1))) {
+    case Day::Today: return brls::getStr("playguard/history/today_at", e.when.substr(11, 5));
+    case Day::Yesterday: return brls::getStr("playguard/history/yesterday_at", e.when.substr(11, 5));
+    case Day::Other: break;
+    }
+    return e.when;
 }
 
 void open(const history::Entry& e, std::function<void()> refresh)
@@ -183,20 +241,22 @@ void open(const history::Entry& e, std::function<void()> refresh)
         return;
     }
     const std::vector<int> now = current(e.kind);
-    if (!now.empty() && now == e.before) {
+    using history_logic::Undo;
+    switch (history_logic::undo_action(e, now, app::read_only(), config::get().advanced)) {
+    case Undo::AlreadyBack:
         ui::info(body + "\n\n" + "playguard/history/already_back"_i18n);
         return;
-    }
     // Nothing to offer: the details alone, with the reason.
-    if (app::read_only()) {
+    case Undo::ReadOnly:
         ui::info(body + "\n\n" + "playguard/common/read_only_note"_i18n);
         return;
-    }
-    if (e.kind == "alarm" && !config::get().advanced) {
+    case Undo::NeedsAdvanced:
         ui::info(body + "\n\n" + "playguard/history/needs_advanced"_i18n);
         return;
+    case Undo::Offer:
+        break;
     }
-    if (!now.empty() && now != e.after)
+    if (history_logic::changed_since(e, now))
         body += "\n\n" + brls::getStr("playguard/history/changed_since", value_text(e.kind, now));
     body += "\n\n" + brls::getStr("playguard/history/undo_body", value_text(e.kind, e.before));
 
@@ -222,10 +282,18 @@ void open(const history::Entry& e, std::function<void()> refresh)
         });
         return;
     }
+    if (e.kind == "time_up") {
+        const bool alarm_only = e.before[0] != 0;
+        pt_flow::confirm_write(body, "playguard/history/undo_confirm"_i18n, [alarm_only, refresh](bool did_unlock) {
+            const Result rc = pt_flow::write_alarm_only(alarm_only, "undo");
+            pt_flow::finish_write(rc, did_unlock, "playguard/history/undone"_i18n, "playguard/history/undo_err"_i18n, refresh);
+        });
+        return;
+    }
     const history::Entry entry = e;
-    ui::confirm(body, "playguard/history/undo_confirm"_i18n, [entry, now, refresh]() {
+    ui::confirm(pt_flow::with_link_note(body), "playguard/history/undo_confirm"_i18n, [entry, now, refresh]() {
         const Result rc = write_value(entry.kind, entry.before);
-        if (R_SUCCEEDED(rc)) record_values(entry.kind.c_str(), now.empty() ? entry.after : now, entry.before, "undo");
+        if (R_SUCCEEDED(rc)) record_values(entry.kind.c_str(), history_logic::undo_replaces(entry, now), entry.before, "undo");
         ui::notify_result(rc, "playguard/history/undone"_i18n, "playguard/history/undo_err"_i18n);
         if (refresh) refresh();
     });

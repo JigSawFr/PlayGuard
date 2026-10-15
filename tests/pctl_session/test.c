@@ -1,7 +1,7 @@
 // Host tests for source/core/pctl_ops.c: session ownership, firmware gating,
 // the play-timer write gate, the unlock verification and read-only mode.
 // Based on the lifecycle tests from anbingxi/NX-Pctl-Manager (diag/fw22-5-readonly).
-#include <assert.h>
+#include "check.h"
 #include <stdio.h>
 #include <string.h>
 #include "pctl_ops.h"
@@ -34,12 +34,13 @@ static struct {
     bool saw_1904;
     bool bed_live;            /* 1954/1956/1957 answer bed_day of pt_block, which 195101 replaces */
     bool bed_ignored;         /* ... except that 195101 leaves the bedtime they report as it was */
+    bool pt_ignored;          /* 195101 answers OK but 145601 keeps returning the block as it was */
     int bed_day;
 } model;
 
 static void reset_with(u32 hos)
 {
-    assert(model.refs == 0); /* a test must release before the next one */
+    CHECK(model.refs == 0); /* a test must release before the next one */
     memset(&model, 0, sizeof(model));
     model.hos = hos;
     model.unlock_effective = true;
@@ -64,41 +65,41 @@ Result pctlInitialize(void)
 {
     model.init_calls++;
     if (model.init_calls == model.fail_init_call) return MOCK_ERROR;
-    assert(model.refs == 0); /* duplicate acquisition is a lifecycle defect */
+    CHECK(model.refs == 0); /* duplicate acquisition is a lifecycle defect */
     model.refs++;
     return 0;
 }
 
 void pctlExit(void)
 {
-    assert(model.refs == 1); /* exit without ownership / double release */
+    CHECK(model.refs == 1); /* exit without ownership / double release */
     model.refs--;
     model.exit_calls++;
 }
 
 Service *pctlGetServiceSession_Service(void)
 {
-    assert(model.refs == 1);
+    CHECK(model.refs == 1);
     return &service;
 }
 
 Result pctlauthRegisterPasscode(void)
 {
-    assert(model.refs == 0); /* the OS applet needs the privileged slot free */
+    CHECK(model.refs == 0); /* the OS applet needs the privileged slot free */
     model.applets++;
     return MOCK_ERROR;
 }
 
 Result pctlauthShowForConfiguration(void)
 {
-    assert(model.refs == 0); /* the OS applet needs the privileged slot free */
+    CHECK(model.refs == 0); /* the OS applet needs the privileged slot free */
     model.auth_applets++;
     return model.auth_result;
 }
 
 static Result put(void *out, size_t out_size, const void *value, size_t size)
 {
-    assert(out_size == size);
+    CHECK(out_size == size);
     memcpy(out, value, size);
     return 0;
 }
@@ -106,9 +107,9 @@ static Result put(void *out, size_t out_size, const void *value, size_t size)
 Result mock_dispatch(Service *srv, u32 command, void *out, size_t out_size,
                      const void *in, size_t in_size, SfDispatchParams params)
 {
-    assert(srv == &service);
-    assert(model.refs == 1);
-    assert(command != 1456 && command != 1951); /* close the session on 21.0.0+ */
+    CHECK(srv == &service);
+    CHECK(model.refs == 1);
+    CHECK(command != 1456 && command != 1951); /* close the session on 21.0.0+ */
     model.ipc_calls++;
 
     /* Inputs that only select what to read: the level (1034), the offset (1044). */
@@ -125,26 +126,26 @@ Result mock_dispatch(Service *srv, u32 command, void *out, size_t out_size,
         return MOCK_ERROR;
     }
     if (is_write && in != NULL) {
-        assert(in_size <= sizeof(model.last_write));
+        CHECK(in_size <= sizeof(model.last_write));
         memcpy(model.last_write, in, in_size);
         model.last_write_size = in_size;
         switch (command) {
             case 195101:
-                assert(in_size == 0x44);
-                if (model.bed_live) memcpy(model.pt_block, in, in_size);
+                CHECK(in_size == 0x44);
+                if (!model.pt_ignored) memcpy(model.pt_block, in, in_size);
                 break;
-            case 1033:   assert(in_size == 4); model.safety_level = *(const u32 *)in; break;
-            case 1036:   assert(in_size == 3); break;
-            case 1063: case 1953: assert(in_size == 1); break;
-            case 1038:   assert(in_size == 4); model.rating_org = *(const u32 *)in; break;
-            default: assert(!"unexpected input command");
+            case 1033:   CHECK(in_size == 4); model.safety_level = *(const u32 *)in; break;
+            case 1036:   CHECK(in_size == 3); break;
+            case 1063: case 1953: CHECK(in_size == 1); break;
+            case 1038:   CHECK(in_size == 4); model.rating_org = *(const u32 *)in; break;
+            default: CHECK(!"unexpected input command");
         }
         return 0;
     }
     if (command == 1201) {
         /* The PIN arrives NUL-terminated in an In|HipcPointer buffer. */
-        assert(params.buffer_attrs[0] == (SfBufferAttr_HipcPointer | SfBufferAttr_In));
-        assert(params.buffers[0].ptr != NULL && params.buffers[0].size <= sizeof(model.got_pin));
+        CHECK(params.buffer_attrs[0] == (SfBufferAttr_HipcPointer | SfBufferAttr_In));
+        REQUIRE(params.buffers[0].ptr != NULL && params.buffers[0].size <= sizeof(model.got_pin));
         memcpy(model.got_pin, params.buffers[0].ptr, params.buffers[0].size);
         model.got_pin_size = params.buffers[0].size;
         model.unlocked = model.unlock_effective;
@@ -177,8 +178,8 @@ Result mock_dispatch(Service *srv, u32 command, void *out, size_t out_size,
         case 1032: w = model.safety_level; return put(out, out_size, &w, 4);
         case 1206: w = model.no_pin ? 0 : 6; return put(out, out_size, &w, 4);
         case 1208:
-            assert(params.buffer_attrs[0] == (SfBufferAttr_HipcPointer | SfBufferAttr_Out));
-            assert(params.buffers[0].ptr != NULL && params.buffers[0].size > strlen(model.pin));
+            CHECK(params.buffer_attrs[0] == (SfBufferAttr_HipcPointer | SfBufferAttr_Out));
+            REQUIRE(params.buffers[0].ptr != NULL && params.buffers[0].size > strlen(model.pin));
             memcpy((void *)params.buffers[0].ptr, model.pin, strlen(model.pin) + 1);
             w = (u32)strlen(model.pin);
             return put(out, out_size, &w, 4);
@@ -190,54 +191,54 @@ Result mock_dispatch(Service *srv, u32 command, void *out, size_t out_size,
         case 1960: q = 0; return put(out, out_size, &q, 8);
         case 1035: { u8 raw[3] = {12, 1, 0}; return put(out, out_size, raw, 3); }
         case 1034: {   /* the presets: 7 / 13 / 16 years, posting restricted below Teen */
-            assert(in_size == 4);
+            CHECK(in_size == 4);
             const u32 level = *(const u32 *)in;
             u8 raw[3] = { (u8)(level == 2 ? 7 : level == 3 ? 13 : level == 4 ? 16 : 0), (u8)(level >= 2 && level < 4), (u8)(level >= 2) };
             return put(out, out_size, raw, 3);
         }
         case 1044:
-            assert(in_size == 4 && params.buffer_attrs[0] == (SfBufferAttr_HipcMapAlias | SfBufferAttr_Out));
-            assert(params.buffers[0].ptr != NULL && params.buffers[0].size >= 0x20);
+            CHECK(in_size == 4 && params.buffer_attrs[0] == (SfBufferAttr_HipcMapAlias | SfBufferAttr_Out));
+            REQUIRE(params.buffers[0].ptr != NULL && params.buffers[0].size >= 0x20);
             memset((void *)params.buffers[0].ptr, 0xAB, 0x20);
             w = 1; return put(out, out_size, &w, 4);
         case 1903: w = model.exempt; return put(out, out_size, &w, 4);
         case 1904:
             model.saw_1904 = true;
-            assert(in_size == 4 && params.buffer_attrs[0] == (SfBufferAttr_HipcMapAlias | SfBufferAttr_Out));
-            assert(params.buffers[0].ptr != NULL && params.buffers[0].size >= 8 * model.exempt);
+            CHECK(in_size == 4 && params.buffer_attrs[0] == (SfBufferAttr_HipcMapAlias | SfBufferAttr_Out));
+            REQUIRE(params.buffers[0].ptr != NULL && params.buffers[0].size >= 8 * model.exempt);
             memset((void *)params.buffers[0].ptr, 0xCD, 8 * model.exempt);
             w = model.exempt; return put(out, out_size, &w, 4);
-        case 1459: model.saw_1459 = true; assert(out_size == 0x20); return 0;
-        case 1460: model.saw_1460 = true; assert(out_size == 0x18 && in_size == 1); return 0;
+        case 1459: model.saw_1459 = true; CHECK(out_size == 0x20); return 0;
+        case 1460: model.saw_1460 = true; CHECK(out_size == 0x18 && in_size == 1); return 0;
         case 145601: return put(out, out_size, model.pt_block, sizeof(model.pt_block));
-        default: assert(!"unexpected output command");
+        default: CHECK(!"unexpected output command");
     }
     return 0;
 }
 
 static void assert_released(void)
 {
-    assert(model.refs == 0);
-    assert(model.init_calls == model.exit_calls + (model.fail_init_call && model.fail_init_call <= model.init_calls ? 1u : 0u));
+    CHECK(model.refs == 0);
+    CHECK(model.init_calls == model.exit_calls + (model.fail_init_call && model.fail_init_call <= model.init_calls ? 1u : 0u));
 }
 
 static void test_ownership(void)
 {
     reset();
     model.fail_init_call = 1;
-    assert(pctl_ops_init() == MOCK_ERROR);
+    CHECK(pctl_ops_init() == MOCK_ERROR);
     pctl_ops_exit();
-    assert(model.exit_calls == 0 && model.refs == 0);
+    CHECK(model.exit_calls == 0 && model.refs == 0);
 
     reset();
-    assert(pctl_ops_init() == 0);
-    assert(pctl_ops_init() == 0);
-    assert(model.init_calls == 1 && model.refs == 1);
-    assert(pctl_ops_reinit() == 0);
-    assert(model.init_calls == 2 && model.exit_calls == 1 && model.refs == 1);
+    CHECK(pctl_ops_init() == 0);
+    CHECK(pctl_ops_init() == 0);
+    CHECK(model.init_calls == 1 && model.refs == 1);
+    CHECK(pctl_ops_reinit() == 0);
+    CHECK(model.init_calls == 2 && model.exit_calls == 1 && model.refs == 1);
     pctl_ops_exit();
     pctl_ops_exit();
-    assert(model.exit_calls == 2 && model.refs == 0);
+    CHECK(model.exit_calls == 2 && model.refs == 0);
 }
 
 /* The Overview's read: one session, 1006 once, nothing it does not show. */
@@ -249,50 +250,50 @@ static void test_overview(void)
     reset();
     model.unlocked = true;
     pctl_overview_fetch(&s, &st);
-    assert(model.init_calls == 1 && model.exit_calls == 1 && model.refs == 0 && model.writes == 0);
-    assert(s.session_rc == 0 && s.safety_level_ok && s.pin_length_ok && s.restriction_enabled_ok);
-    assert(s.temp_unlocked_ok && s.temp_unlocked && s.pairing_active_ok);
-    assert(!s.rating_org_ok && !s.free_comm_count_ok && !s.last_updated_ok && !s.settings_ok && !s.stereo_vision_ok);
-    assert(st.fw_supported && st.session_valid && st.valid && st.enabled_valid && st.restricted_valid);
-    assert(st.temporary_unlocked_valid && st.temporary_unlocked && st.remaining_valid);
-    assert(st.day_min[0] == 0 && st.day_min[6] == 180 && st.bedtime_valid && st.bedtime_hour == 21);
-    assert(st.alarm_disabled_valid && st.alarm_disabled && !st.bedtime_reset_valid);
+    CHECK(model.init_calls == 1 && model.exit_calls == 1 && model.refs == 0 && model.writes == 0);
+    CHECK(s.session_rc == 0 && s.safety_level_ok && s.pin_length_ok && s.restriction_enabled_ok);
+    CHECK(s.temp_unlocked_ok && s.temp_unlocked && s.pairing_active_ok);
+    CHECK(!s.rating_org_ok && !s.free_comm_count_ok && !s.last_updated_ok && !s.settings_ok && !s.stereo_vision_ok);
+    CHECK(st.fw_supported && st.session_valid && st.valid && st.enabled_valid && st.restricted_valid);
+    CHECK(st.temporary_unlocked_valid && st.temporary_unlocked && st.remaining_valid);
+    CHECK(st.day_min[0] == 0 && st.day_min[6] == 180 && st.bedtime_valid && st.bedtime_hour == 21);
+    CHECK(st.alarm_disabled_valid && st.alarm_disabled && !st.bedtime_reset_valid);
     /* status 5 + play timer 3 + 145601 + bedtime 3 + alarm, against 10 + 1 + 13 in two sessions */
-    assert(model.ipc_calls == 13);
+    CHECK(model.ipc_calls == 13);
 
     /* The same values as the two full reads. */
     PctlStatus full_s;
     PtState full_pt;
     pctl_status_fetch(&full_s);
     pctl_play_timer_query(&full_pt);
-    assert(full_s.safety_level == s.safety_level && full_s.pin_length == s.pin_length);
-    assert(full_pt.remaining_ns == st.remaining_ns && memcmp(full_pt.day_min, st.day_min, sizeof(st.day_min)) == 0);
-    assert(full_pt.temporary_unlocked == st.temporary_unlocked && model.refs == 0);
-    assert(full_pt.alarm_disabled == st.alarm_disabled);
+    CHECK(full_s.safety_level == s.safety_level && full_s.pin_length == s.pin_length);
+    CHECK(full_pt.remaining_ns == st.remaining_ns && memcmp(full_pt.day_min, st.day_min, sizeof(st.day_min)) == 0);
+    CHECK(full_pt.temporary_unlocked == st.temporary_unlocked && model.refs == 0);
+    CHECK(full_pt.alarm_disabled == st.alarm_disabled);
 
     /* Below 21.0.0: the status only, no play-timer IPC. */
     reset_with(MAKEHOSVERSION(20, 5, 0));
     pctl_overview_fetch(&s, &st);
-    assert(s.safety_level_ok && !st.fw_supported && !st.session_valid && model.ipc_calls == 5 && model.refs == 0);
+    CHECK(s.safety_level_ok && !st.fw_supported && !st.session_valid && model.ipc_calls == 5 && model.refs == 0);
 
     /* No session: nothing read, nothing left open. */
     reset();
     model.fail_init_call = 1;
     pctl_overview_fetch(&s, &st);
-    assert(s.session_rc == MOCK_ERROR && st.session_rc == MOCK_ERROR && !st.session_valid);
-    assert(model.ipc_calls == 0 && model.refs == 0);
+    CHECK(s.session_rc == MOCK_ERROR && st.session_rc == MOCK_ERROR && !st.session_valid);
+    CHECK(model.ipc_calls == 0 && model.refs == 0);
 
     /* 1006 failing: neither copy claims to know. */
     reset();
     model.fail_command = 1006;
     pctl_overview_fetch(&s, &st);
-    assert(!s.temp_unlocked_ok && !st.temporary_unlocked_valid && st.valid && model.refs == 0);
+    CHECK(!s.temp_unlocked_ok && !st.temporary_unlocked_valid && st.valid && model.refs == 0);
 
     /* 1458 failing: the alarm is not claimed off, the rest is read. */
     reset();
     model.fail_command = 1458;
     pctl_overview_fetch(&s, &st);
-    assert(!st.alarm_disabled_valid && st.valid && st.enabled_valid && model.refs == 0);
+    CHECK(!st.alarm_disabled_valid && st.valid && st.enabled_valid && model.refs == 0);
 }
 
 /* The recorder's reading: two sessions, both released, nothing written. */
@@ -304,43 +305,43 @@ static void test_sample(void)
     model.unlocked = true;
     model.enabled = true;
     pctl_play_timer_sample(&smp);
-    assert(smp.session_rc == 0 && model.init_calls == 2 && model.exit_calls == 2 && model.refs == 0);
-    assert(model.writes == 0 && model.saw_1459 && model.saw_1952 && !model.saw_1460);
-    assert(smp.unlocked_rc == 0 && smp.unlocked && smp.enabled_rc == 0 && smp.enabled);
-    assert(smp.restricted_rc == 0 && !smp.restricted && smp.alarm_off_rc == 0 && smp.alarm_off);
-    assert(smp.remaining_rc == 0 && smp.remaining_ns == 3600000000000ULL);
-    assert(smp.spent_rc == 0 && smp.spent_ns == 60 && smp.extra_rc == 0 && smp.display_rc == 0);
-    assert(smp.block_rc == 0 && memcmp(smp.block, model.pt_block, sizeof(smp.block)) == 0);
-    assert(smp.bedtime_rc == 0 && smp.bedtime_on && smp.bedtime_hour == 21 && smp.bedtime_minute == 30);
+    CHECK(smp.session_rc == 0 && model.init_calls == 2 && model.exit_calls == 2 && model.refs == 0);
+    CHECK(model.writes == 0 && model.saw_1459 && model.saw_1952 && !model.saw_1460);
+    CHECK(smp.unlocked_rc == 0 && smp.unlocked && smp.enabled_rc == 0 && smp.enabled);
+    CHECK(smp.restricted_rc == 0 && !smp.restricted && smp.alarm_off_rc == 0 && smp.alarm_off);
+    CHECK(smp.remaining_rc == 0 && smp.remaining_ns == 3600000000000ULL);
+    CHECK(smp.spent_rc == 0 && smp.spent_ns == 60 && smp.extra_rc == 0 && smp.display_rc == 0);
+    CHECK(smp.block_rc == 0 && memcmp(smp.block, model.pt_block, sizeof(smp.block)) == 0);
+    CHECK(smp.bedtime_rc == 0 && smp.bedtime_on && smp.bedtime_hour == 21 && smp.bedtime_minute == 30);
     /* 1006..1454 5 + 145601 + bedtime 3, then 1459 1952 1960 */
-    assert(model.ipc_calls == 12);
+    CHECK(model.ipc_calls == 12);
 
     /* One command failing leaves the others read. */
     reset();
     model.fail_command = 1454;
     model.fail_command2 = 1956;
     pctl_play_timer_sample(&smp);
-    assert(smp.remaining_rc == MOCK_ERROR && smp.bedtime_rc == MOCK_ERROR);
-    assert(smp.block_rc == 0 && smp.spent_rc == 0 && smp.enabled_rc == 0 && model.refs == 0);
+    CHECK(smp.remaining_rc == MOCK_ERROR && smp.bedtime_rc == MOCK_ERROR);
+    CHECK(smp.block_rc == 0 && smp.spent_rc == 0 && smp.enabled_rc == 0 && model.refs == 0);
 
     /* No first session: nothing read. No second one: its three reads say why. */
     reset();
     model.fail_init_call = 1;
     pctl_play_timer_sample(&smp);
-    assert(smp.session_rc == MOCK_ERROR && model.ipc_calls == 0 && model.refs == 0);
-    assert(smp.enabled_rc == MOCK_ERROR && smp.block_rc == MOCK_ERROR && smp.spent_rc == MOCK_ERROR);
+    CHECK(smp.session_rc == MOCK_ERROR && model.ipc_calls == 0 && model.refs == 0);
+    CHECK(smp.enabled_rc == MOCK_ERROR && smp.block_rc == MOCK_ERROR && smp.spent_rc == MOCK_ERROR);
     reset();
     model.fail_init_call = 2;
     pctl_play_timer_sample(&smp);
-    assert(smp.session_rc == MOCK_ERROR && smp.block_rc == 0 && !model.saw_1952);
-    assert(smp.display_rc == MOCK_ERROR && smp.spent_rc == MOCK_ERROR && smp.extra_rc == MOCK_ERROR);
-    assert(model.refs == 0);
+    CHECK(smp.session_rc == MOCK_ERROR && smp.block_rc == 0 && !model.saw_1952);
+    CHECK(smp.display_rc == MOCK_ERROR && smp.spent_rc == MOCK_ERROR && smp.extra_rc == MOCK_ERROR);
+    CHECK(model.refs == 0);
 
     /* Below 21.0.0: no play-timer IPC, as the report. */
     reset_with(MAKEHOSVERSION(20, 5, 0));
     pctl_play_timer_sample(&smp);
-    assert(smp.session_rc == NXM_RC_FW_UNSUPPORTED && model.ipc_calls == 0 && model.init_calls == 0);
-    assert(smp.enabled_rc == NXM_RC_FW_UNSUPPORTED && smp.display_rc == NXM_RC_FW_UNSUPPORTED);
+    CHECK(smp.session_rc == NXM_RC_FW_UNSUPPORTED && model.ipc_calls == 0 && model.init_calls == 0);
+    CHECK(smp.enabled_rc == NXM_RC_FW_UNSUPPORTED && smp.display_rc == NXM_RC_FW_UNSUPPORTED);
 }
 
 static void test_reads(void)
@@ -352,45 +353,46 @@ static void test_reads(void)
     reset();
     for (unsigned i = 0; i < 10; ++i) {
         pctl_play_timer_query(&st);
-        assert(st.fw_supported && st.session_valid && st.valid);
-        assert(st.enabled_valid && st.restricted_valid && st.temporary_unlocked_valid && st.remaining_valid);
-        assert(st.day_min[0] == 0 && st.day_min[6] == 180);
-        assert(st.bedtime_valid && st.bedtime_hour == 21 && st.bedtime_minute == 30);
-        assert(st.bedtime_reset_valid && st.bedtime_reset_hour == 7);
-        assert(model.refs == 0);
+        CHECK(st.fw_supported && st.session_valid && st.valid);
+        CHECK(st.enabled_valid && st.restricted_valid && st.temporary_unlocked_valid && st.remaining_valid);
+        CHECK(st.day_min[0] == 0 && st.day_min[6] == 180);
+        CHECK(st.bedtime_valid && st.bedtime_hour == 21 && st.bedtime_minute == 30);
+        CHECK(st.bedtime_reset_valid && st.bedtime_reset_hour == 7);
+        CHECK(model.refs == 0);
         pctl_status_fetch(&s);
-        assert(s.safety_level_ok && s.pin_length_ok && s.restriction_enabled_ok && s.temp_unlocked_ok);
-        assert(s.settings_ok && s.settings.rating_age == 12 && s.settings.sns_post_restriction);
-        assert(s.rating_org_ok && s.rating_org == 6 && s.stereo_vision_ok && s.pairing_active_ok);
-        assert(s.last_updated_ok && s.free_comm_count_ok && s.free_comm_count == 2);
-        assert(model.refs == 0);
+        CHECK(s.safety_level_ok && s.pin_length_ok && s.restriction_enabled_ok && s.temp_unlocked_ok);
+        CHECK(s.settings_ok && s.settings.rating_age == 12 && s.settings.sns_post_restriction);
+        CHECK(s.rating_org_ok && s.rating_org == 6 && s.stereo_vision_ok && s.pairing_active_ok);
+        CHECK(s.last_updated_ok && s.free_comm_count_ok && s.free_comm_count == 2);
+        CHECK(model.refs == 0);
         pctl_dump(report, sizeof(report));
-        assert(strstr(report, "content=not recorded") != NULL);
-        assert(strstr(report, model.pin) == NULL);
-        assert(strstr(report, "Tool-owned pctl session released.") != NULL);
-        assert(model.refs == 0 && model.writes == 0);
+        CHECK(strstr(report, "content=not recorded") != NULL);
+        CHECK(strstr(report, model.pin) == NULL);
+        CHECK(strstr(report, "set (length not recorded)") != NULL);   /* whether, not how long */
+        CHECK(strstr(report, "Tool-owned pctl session released.") != NULL);
+        CHECK(model.refs == 0 && model.writes == 0);
     }
-    assert(model.saw_1459 && model.saw_1460 && model.saw_1952);
-    assert(strcmp(pctl_rating_org_name(6), "PEGI") == 0);
+    CHECK(model.saw_1459 && model.saw_1460 && model.saw_1952);
+    CHECK(strcmp(pctl_rating_org_name(6), "PEGI") == 0);
 
     /* The exemption list is listed only when 1903 counts an entry. */
-    assert(!model.saw_1904 && strstr(report, "GetExemptApplicationListCountForDebug") != NULL);
+    CHECK(!model.saw_1904 && strstr(report, "GetExemptApplicationListCountForDebug") != NULL);
     reset();
     model.exempt = 2;
     pctl_dump(report, sizeof(report));
-    assert(model.saw_1904 && strstr(report, "count=2\nCD CD CD CD") != NULL && model.refs == 0 && model.writes == 0);
+    CHECK(model.saw_1904 && strstr(report, "count=2\nCD CD CD CD") != NULL && model.refs == 0 && model.writes == 0);
 
     /* 1460 exists only on 23.0.0+, 1459 only on 20.0.0+. */
     reset_with(MAKEHOSVERSION(22, 1, 0));
     pctl_dump(report, sizeof(report));
-    assert(model.saw_1459 && !model.saw_1460 && model.refs == 0);
+    CHECK(model.saw_1459 && !model.saw_1460 && model.refs == 0);
 
     /* Below 21.0.0 the 0x44-byte layout is unknown: no play-timer IPC at all. */
     reset_with(MAKEHOSVERSION(20, 5, 0));
     pctl_play_timer_query(&st);
-    assert(!st.fw_supported && !st.session_valid && model.ipc_calls == 0);
+    CHECK(!st.fw_supported && !st.session_valid && model.ipc_calls == 0);
     pctl_dump(report, sizeof(report));
-    assert(strstr(report, "below 21.0.0") != NULL && !model.saw_1952 && model.refs == 0);
+    CHECK(strstr(report, "below 21.0.0") != NULL && !model.saw_1952 && model.refs == 0);
 
     /* Every reconnect in the dump can fail; the session is still released. */
     reset();
@@ -400,8 +402,8 @@ static void test_reads(void)
         reset();
         model.fail_init_call = fail_at;
         pctl_dump(report, sizeof(report));
-        assert(strstr(report, "failed") != NULL);
-        assert(model.init_calls == fail_at && model.exit_calls == fail_at - 1 && model.refs == 0);
+        CHECK(strstr(report, "failed") != NULL);
+        CHECK(model.init_calls == fail_at && model.exit_calls == fail_at - 1 && model.refs == 0);
     }
 
     const u32 commands[] = {1453, 1455, 1006, 1454, 145601};
@@ -409,30 +411,30 @@ static void test_reads(void)
         reset();
         model.fail_command = commands[i];
         pctl_play_timer_query(&st);
-        assert(model.refs == 0);
+        CHECK(model.refs == 0);
         switch (commands[i]) {
-            case 1453: assert(!st.enabled_valid && st.enabled_rc == MOCK_ERROR); break;
-            case 1455: assert(!st.restricted_valid && st.restricted_rc == MOCK_ERROR); break;
-            case 1006: assert(!st.temporary_unlocked_valid && st.temporary_unlocked_rc == MOCK_ERROR); break;
-            case 1454: assert(!st.remaining_valid && st.remaining_rc == MOCK_ERROR); break;
-            case 145601: assert(!st.valid && st.config_rc == MOCK_ERROR && st.day_min[3] == PT_DAY_NOLIMIT); break;
+            case 1453: CHECK(!st.enabled_valid && st.enabled_rc == MOCK_ERROR); break;
+            case 1455: CHECK(!st.restricted_valid && st.restricted_rc == MOCK_ERROR); break;
+            case 1006: CHECK(!st.temporary_unlocked_valid && st.temporary_unlocked_rc == MOCK_ERROR); break;
+            case 1454: CHECK(!st.remaining_valid && st.remaining_rc == MOCK_ERROR); break;
+            case 145601: CHECK(!st.valid && st.config_rc == MOCK_ERROR && st.day_min[3] == PT_DAY_NOLIMIT); break;
         }
     }
 
     reset();
     model.fail_init_call = 1;
     pctl_status_fetch(&s);
-    assert(s.session_rc == MOCK_ERROR && !s.restriction_enabled_ok && model.ipc_calls == 0);
+    CHECK(s.session_rc == MOCK_ERROR && !s.restriction_enabled_ok && model.ipc_calls == 0);
 
     reset();
     model.fail_command = 1208;
     pctl_dump(report, sizeof(report));
-    assert(strstr(report, "content=not recorded") != NULL && model.refs == 0 && model.writes == 0);
+    CHECK(strstr(report, "content=not recorded") != NULL && model.refs == 0 && model.writes == 0);
 
     reset();
-    assert(pctl_ops_init() == 0);
+    CHECK(pctl_ops_init() == 0);
     pctl_dump(report, 0);
-    assert(model.refs == 0 && model.ipc_calls == 0);
+    CHECK(model.refs == 0 && model.ipc_calls == 0);
 }
 
 static Result write_variant(unsigned variant)
@@ -451,34 +453,34 @@ static void test_read_only(void)
     core_set_read_only(true);
     for (unsigned variant = 0; variant < 3; ++variant) {
         reset();
-        assert(pctl_ops_init() == 0);
-        assert(write_variant(variant) == NXM_RC_READ_ONLY);
-        assert(model.refs == 0 && model.writes == 0);
+        CHECK(pctl_ops_init() == 0);
+        CHECK(write_variant(variant) == NXM_RC_READ_ONLY);
+        CHECK(model.refs == 0 && model.writes == 0);
     }
     reset();
-    assert(pctl_delete_parental_controls() == NXM_RC_READ_ONLY);
-    assert(pctl_delete_pairing() == NXM_RC_READ_ONLY);
-    assert(pctl_set_pin() == NXM_RC_READ_ONLY);
-    assert(pctl_unlock_restriction_temporarily() == NXM_RC_READ_ONLY);
+    CHECK(pctl_delete_parental_controls() == NXM_RC_READ_ONLY);
+    CHECK(pctl_delete_pairing() == NXM_RC_READ_ONLY);
+    CHECK(pctl_set_pin() == NXM_RC_READ_ONLY);
+    CHECK(pctl_unlock_restriction_temporarily() == NXM_RC_READ_ONLY);
     char pin[16];
     memset(pin, 'x', sizeof(pin));
-    assert(pctl_get_pin(pin, sizeof(pin)) == NXM_RC_READ_ONLY);
-    for (unsigned i = 0; i < sizeof(pin); ++i) assert(pin[i] == 0);
-    assert(pctl_relock() == NXM_RC_READ_ONLY);
-    assert(pctl_set_safety_level(PctlSafetyLevel_Teen) == NXM_RC_READ_ONLY);
-    assert(pctl_set_custom_settings(&cs) == NXM_RC_READ_ONLY);
-    assert(pctl_set_stereo_vision_restricted(true) == NXM_RC_READ_ONLY);
-    assert(pctl_play_timer_set_alarm_disabled(true) == NXM_RC_READ_ONLY);
-    assert(pctl_play_timer_start() == NXM_RC_READ_ONLY);
-    assert(pctl_play_timer_stop() == NXM_RC_READ_ONLY);
-    assert(model.init_calls == 0 && model.applets == 0 && model.writes == 0);
+    CHECK(pctl_get_pin(pin, sizeof(pin)) == NXM_RC_READ_ONLY);
+    for (unsigned i = 0; i < sizeof(pin); ++i) CHECK(pin[i] == 0);
+    CHECK(pctl_relock() == NXM_RC_READ_ONLY);
+    CHECK(pctl_set_safety_level(PctlSafetyLevel_Teen) == NXM_RC_READ_ONLY);
+    CHECK(pctl_set_custom_settings(&cs) == NXM_RC_READ_ONLY);
+    CHECK(pctl_set_stereo_vision_restricted(true) == NXM_RC_READ_ONLY);
+    CHECK(pctl_play_timer_set_alarm_disabled(true) == NXM_RC_READ_ONLY);
+    CHECK(pctl_play_timer_start() == NXM_RC_READ_ONLY);
+    CHECK(pctl_play_timer_stop() == NXM_RC_READ_ONLY);
+    CHECK(model.init_calls == 0 && model.applets == 0 && model.writes == 0);
 
     /* Leaving read-only mode makes the same calls write again. */
     reset();
     core_set_read_only(false);
-    assert(pctl_relock() == 0 && model.writes == 1 && model.last_write_cmd == 1007);
-    assert(write_variant(1) == 0 && model.writes == 2);
-    assert(model.refs == 0);
+    CHECK(pctl_relock() == 0 && model.writes == 1 && model.last_write_cmd == 1007);
+    CHECK(write_variant(1) == 0 && model.writes == 2);
+    CHECK(model.refs == 0);
 }
 
 static void test_write_gate(void)
@@ -492,30 +494,30 @@ static void test_write_gate(void)
             model.restricted = (states & 2) != 0;
             model.unlocked = (states & 4) != 0;
             Result rc = write_variant(variant);
-            assert(R_SUCCEEDED(rc) == permitted[states]);
-            if (!permitted[states]) assert(rc == NXM_RC_WRITE_GATED);
-            assert(model.writes == (permitted[states] ? 1u : 0u));
-            assert(model.refs == 0 && model.init_calls == model.exit_calls);
+            CHECK(R_SUCCEEDED(rc) == permitted[states]);
+            if (!permitted[states]) CHECK(rc == NXM_RC_WRITE_GATED);
+            CHECK(model.writes == (permitted[states] ? 1u : 0u));
+            CHECK(model.refs == 0 && model.init_calls == model.exit_calls);
             if (permitted[states] && variant == 2)
-                for (unsigned i = 0; i < 0x44; ++i) assert(model.last_write[i] == 0);
+                for (unsigned i = 0; i < 0x44; ++i) CHECK(model.last_write[i] == 0);
             if (permitted[states] && variant == 0) {
                 u16 c[34];
                 memcpy(c, model.last_write, sizeof(c));
-                assert(c[0] == 0x0101 && c[8] == 0x0100 && c[9] == 0 && c[33] == 60);
+                CHECK(c[0] == 0x0101 && c[8] == 0x0100 && c[9] == 0 && c[33] == 60);
             }
         }
         const u32 fails[] = {1453, 1455, 1006, 195101};
         for (unsigned i = 0; i < 4; ++i) {
             reset();
             model.fail_command = fails[i];
-            assert(write_variant(variant) == MOCK_ERROR);
-            assert(model.writes == (fails[i] == 195101 ? 1u : 0u));
-            assert(model.refs == 0 && model.init_calls == 1 && model.exit_calls == 1);
+            CHECK(write_variant(variant) == MOCK_ERROR);
+            CHECK(model.writes == (fails[i] == 195101 ? 1u : 0u));
+            CHECK(model.refs == 0 && model.init_calls == 1 && model.exit_calls == 1);
         }
         reset();
         model.fail_init_call = 1;
-        assert(write_variant(variant) == MOCK_ERROR);
-        assert(model.ipc_calls == 0 && model.writes == 0 && model.refs == 0);
+        CHECK(write_variant(variant) == MOCK_ERROR);
+        CHECK(model.ipc_calls == 0 && model.writes == 0 && model.refs == 0);
     }
 
     /* GetPlayTimerSettings failing while the timer is off does not block the
@@ -523,11 +525,11 @@ static void test_write_gate(void)
      * always did. */
     reset();
     model.fail_command = 145601;
-    assert(write_variant(0) == 0 && model.writes == 1 && model.refs == 0);
+    CHECK(write_variant(0) == 0 && model.writes == 1 && model.refs == 0);
     {
         u16 c[34];
         memcpy(c, model.last_write, sizeof(c));
-        assert(c[0] == 0x0101 && c[1] == 1 && c[7] == 0x0600 && c[8] == 0x0100 && c[9] == 0 && c[33] == 60);
+        CHECK(c[0] == 0x0101 && c[1] == 1 && c[7] == 0x0600 && c[8] == 0x0100 && c[9] == 0 && c[33] == 60);
     }
     /* While it is active (unlocked, so past the gate), the block holds what the
      * companion app set: a write built on zeros would wipe it, so refused —
@@ -541,21 +543,46 @@ static void test_write_gate(void)
             model.fail_command = 145601;
             const Result rc = write_variant(variant);
             if (variant == 2) {
-                assert(rc == 0 && model.writes == 1);
-                for (unsigned i = 0; i < 0x44; ++i) assert(model.last_write[i] == 0);
+                CHECK(rc == 0 && model.writes == 1);
+                for (unsigned i = 0; i < 0x44; ++i) CHECK(model.last_write[i] == 0);
             } else {
-                assert(rc == NXM_RC_STATE_UNKNOWN && model.writes == 0);
+                CHECK(rc == NXM_RC_STATE_UNKNOWN && model.writes == 0);
             }
-            assert(model.refs == 0 && model.init_calls == model.exit_calls);
+            CHECK(model.refs == 0 && model.init_calls == model.exit_calls);
         }
     }
+
+    /* Unlocked, 1453 reads false even with a limit set (hardware): the
+     * unlock alone counts as active, so a failed read still refuses. */
+    for (unsigned variant = 0; variant < 2; ++variant) {
+        reset();
+        model.unlocked = true;
+        model.fail_command = 145601;
+        CHECK(write_variant(variant) == NXM_RC_STATE_UNKNOWN && model.writes == 0);
+        CHECK(model.refs == 0 && model.init_calls == model.exit_calls);
+    }
+
+    /* The limits are read back: a write the console answers OK but does not
+     * take is reported, and the block as it was is written again. */
+    reset();
+    model.pt_ignored = true;
+    {
+        u16 before[34];
+        memcpy(before, model.pt_block, sizeof(before));
+        CHECK(write_variant(0) == NXM_RC_NOT_APPLIED);
+        CHECK(model.writes == 2 && memcmp(model.last_write, before, sizeof(before)) == 0);
+        CHECK(model.refs == 0 && model.init_calls == model.exit_calls);
+    }
+    /* Taken: one write, read back once. */
+    reset();
+    CHECK(write_variant(0) == 0 && model.writes == 1);
 
     /* Out-of-range minutes and old firmware are refused before any IPC. */
     reset();
     u16 bad[7] = {0, 0, 0, 1441, 0, 0, 0};
-    assert(pctl_play_timer_set_days(bad) == NXM_RC_INVALID_ARGUMENT && model.init_calls == 0);
+    CHECK(pctl_play_timer_set_days(bad) == NXM_RC_INVALID_ARGUMENT && model.init_calls == 0);
     reset_with(MAKEHOSVERSION(20, 5, 0));
-    assert(pctl_play_timer_clear() == NXM_RC_FW_UNSUPPORTED && model.init_calls == 0);
+    CHECK(pctl_play_timer_clear() == NXM_RC_FW_UNSUPPORTED && model.init_calls == 0);
 }
 
 /* The other play-timer writes (alarm, start, stop) go through the same gate. */
@@ -580,33 +607,33 @@ static void test_command_gate(void)
             model.restricted = (states & 2) != 0;
             model.unlocked = (states & 4) != 0;
             Result rc = command_variant(variant);
-            assert(R_SUCCEEDED(rc) == permitted[states]);
-            if (!permitted[states]) assert(rc == NXM_RC_WRITE_GATED);
-            assert(model.writes == (permitted[states] ? 1u : 0u));
-            if (permitted[states]) assert(model.last_write_cmd == cmds[variant]);
-            assert(model.refs == 0 && model.init_calls == 1 && model.exit_calls == 1);
+            CHECK(R_SUCCEEDED(rc) == permitted[states]);
+            if (!permitted[states]) CHECK(rc == NXM_RC_WRITE_GATED);
+            CHECK(model.writes == (permitted[states] ? 1u : 0u));
+            if (permitted[states]) CHECK(model.last_write_cmd == cmds[variant]);
+            CHECK(model.refs == 0 && model.init_calls == 1 && model.exit_calls == 1);
         }
         /* A gate read failing: refused with that error, nothing written. */
         const u32 fails[] = {1453, 1455, 1006};
         for (unsigned i = 0; i < 3; ++i) {
             reset();
             model.fail_command = fails[i];
-            assert(command_variant(variant) == MOCK_ERROR);
-            assert(model.writes == 0 && model.refs == 0 && model.init_calls == 1 && model.exit_calls == 1);
+            CHECK(command_variant(variant) == MOCK_ERROR);
+            CHECK(model.writes == 0 && model.refs == 0 && model.init_calls == 1 && model.exit_calls == 1);
         }
         /* The session held by the caller is released first, then reopened. */
         reset();
-        assert(pctl_ops_init() == 0);
-        assert(command_variant(variant) == 0 && model.refs == 0 && model.init_calls == model.exit_calls);
+        CHECK(pctl_ops_init() == 0);
+        CHECK(command_variant(variant) == 0 && model.refs == 0 && model.init_calls == model.exit_calls);
         reset();
         model.fail_init_call = 1;
-        assert(command_variant(variant) == MOCK_ERROR && model.ipc_calls == 0 && model.refs == 0);
+        CHECK(command_variant(variant) == MOCK_ERROR && model.ipc_calls == 0 && model.refs == 0);
     }
     /* The byte 1953 receives. */
     reset();
-    assert(pctl_play_timer_set_alarm_disabled(false) == 0 && model.last_write_size == 1 && model.last_write[0] == 0);
-    assert(pctl_play_timer_set_alarm_disabled(true) == 0 && model.last_write[0] == 1);
-    assert(model.refs == 0);
+    CHECK(pctl_play_timer_set_alarm_disabled(false) == 0 && model.last_write_size == 1 && model.last_write[0] == 0);
+    CHECK(pctl_play_timer_set_alarm_disabled(true) == 0 && model.last_write[0] == 1);
+    CHECK(model.refs == 0);
 }
 
 /* The write starts from what 145601 returns and changes only flag + minutes. */
@@ -617,51 +644,109 @@ static void test_block_preserved(void)
     /* Fields the limits do not use: an odd header, [2..6], [+0] and [+3] of
      * every group, and a day (Monday) without a limit whose [+0] is set. The
      * [+3] (the next day's bedtime switch, low byte) stay off: pt_encode
-     * keeps a day's times while its bedtime is on (test_bedtime). */
+     * keeps a day's times while its bedtime is on (test_bedtime). Every
+     * value stays one the layout can hold (pt_plausible). */
     reset();
     for (int i = 0; i < 34; i++) model.pt_block[i] = 0;
     model.pt_block[0] = 0x0103; model.pt_block[1] = 0x0002;
-    for (int i = 2; i < 7; i++) model.pt_block[i] = (u16)(0xA000 + i);
+    model.pt_block[2] = 0x1100; model.pt_block[3] = 0x0607; model.pt_block[4] = 0x0005;
+    model.pt_block[5] = 80;     model.pt_block[6] = 0x1400;
     for (int n = 0; n < 7; n++) {
         u16 *g = &model.pt_block[7 + 4 * n];
         g[0] = (u16)(0x0700 + n);
         if (n != 1) { g[1] = 0x0100; g[2] = (u16)(60 + n); }
-        if (n < 6) g[3] = (u16)(0xB000 + (n << 8));
+        if (n < 6) g[3] = (u16)(0x1000 + (n << 8));
     }
     memcpy(expect, model.pt_block, sizeof(expect));
 
     /* Writing back the limits just read: the same block, byte for byte. */
     PtState st;
     pctl_play_timer_query(&st);
-    assert(st.valid && st.day_min[1] == PT_DAY_NOLIMIT && st.day_min[0] == 60);
-    assert(pctl_play_timer_set_days(st.day_min) == 0 && model.refs == 0);
-    assert(model.last_write_cmd == 195101 && memcmp(model.last_write, expect, sizeof(expect)) == 0);
+    CHECK(st.valid && st.day_min[1] == PT_DAY_NOLIMIT && st.day_min[0] == 60);
+    CHECK(pctl_play_timer_set_days(st.day_min) == 0 && model.refs == 0);
+    CHECK(model.last_write_cmd == 195101 && memcmp(model.last_write, expect, sizeof(expect)) == 0);
 
     /* Sunday changes, Monday gains a limit, Tuesday loses its own, the rest
      * keeps theirs. */
     u16 days[7] = {90, 45, PT_DAY_NOLIMIT, 63, 64, 65, 66};
-    assert(pctl_play_timer_set_days(days) == 0);
+    CHECK(pctl_play_timer_set_days(days) == 0);
     memcpy(c, model.last_write, sizeof(c));
     expect[9] = 90;                                             /* Sunday: minutes only */
     expect[11] = 0x0600; expect[12] = 0x0100; expect[13] = 45;  /* Monday: [+3] kept */
     expect[15] = 0; expect[16] = 0; expect[17] = 0;             /* Tuesday: [+3] kept */
-    assert(memcmp(c, expect, sizeof(c)) == 0);
+    CHECK(memcmp(c, expect, sizeof(c)) == 0);
 
     /* Timer off (all zeros): the observed header and per-day values. */
     reset();
     for (int i = 0; i < 34; i++) model.pt_block[i] = 0;
     u16 one[7] = {PT_DAY_NOLIMIT, 30, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT};
-    assert(pctl_play_timer_set_days(one) == 0);
+    CHECK(pctl_play_timer_set_days(one) == 0);
     memcpy(c, model.last_write, sizeof(c));
-    assert(c[0] == 0x0101 && c[1] == 1 && c[11] == 0x0600 && c[12] == 0x0100 && c[13] == 30);
-    for (int i = 0; i < 34; i++) if (i != 0 && i != 1 && (i < 11 || i > 13)) assert(c[i] == 0);
+    CHECK(c[0] == 0x0101 && c[1] == 1 && c[11] == 0x0600 && c[12] == 0x0100 && c[13] == 30);
+    for (int i = 0; i < 34; i++) if (i != 0 && i != 1 && (i < 11 || i > 13)) CHECK(c[i] == 0);
 
     /* No limit on any day: all zeros, whatever was read. */
     reset();
-    model.pt_block[2] = 0xFFFF;
-    assert(pctl_play_timer_clear() == 0);
-    for (unsigned i = 0; i < 0x44; ++i) assert(model.last_write[i] == 0);
-    assert(model.refs == 0);
+    model.pt_block[5] = 0xFFFF;   /* the header rule's minutes: "no limit" */
+    CHECK(pctl_play_timer_clear() == 0);
+    for (unsigned i = 0; i < 0x44; ++i) CHECK(model.last_write[i] == 0);
+    CHECK(model.refs == 0);
+}
+
+/* A block the known layout cannot hold (pt_plausible): the read is not
+ * valid, with its own result, and every play-timer write refuses it without
+ * writing. */
+static void test_block_not_understood(void)
+{
+    /* The observed blocks pass: the 22.0.0 one of the docs, timer off, all zero. */
+    reset();
+    CHECK(pt_plausible(model.pt_block));
+    u16 off[34];
+    memset(off, 0, sizeof(off));
+    CHECK(pt_plausible(off));
+    off[3] = 0x0600;   /* "only the 06 is left" */
+    CHECK(pt_plausible(off));
+    off[3] = 0;
+    off[9] = PT_DAY_NOLIMIT;   /* minutes "no limit" */
+    CHECK(pt_plausible(off));
+    off[9] = 0;
+    off[0] = 0x0704;   /* mode bytes are not decoded: any value passes */
+    off[1] = 0xFF02;
+    CHECK(pt_plausible(off));
+
+    struct { int at; u16 v; } bad[] = {
+        { 9, 1441 },     /* Sunday: more than a day */
+        { 33, 3000 },    /* Saturday */
+        { 5, 2000 },     /* the header rule's minutes */
+        { 8, 0x0200 },   /* Sunday's limit flag 2 */
+        { 6, 0x0002 },   /* Sunday's bedtime switch 2 */
+        { 6, 0x1801 },   /* Sunday's alarm at 24 h */
+        { 7, 0x063C },   /* Sunday's alarm at :60 */
+        { 7, 0x1800 },   /* allowed again at 24 h */
+        { 8, 0x013C },   /* allowed again at :60 */
+        { 2, 0x0002 },   /* the header rule's bedtime switch */
+    };
+    for (unsigned i = 0; i < sizeof(bad) / sizeof(bad[0]); i++) {
+        reset();
+        model.pt_block[bad[i].at] = bad[i].v;
+        CHECK(!pt_plausible(model.pt_block));
+        PtState st;
+        pctl_play_timer_query(&st);
+        CHECK(!st.valid && st.config_rc == NXM_RC_PT_NOT_UNDERSTOOD && model.refs == 0);
+        CHECK(st.block[bad[i].at] == bad[i].v);   /* kept as read, for the reports */
+        PctlStatus status;
+        pctl_overview_fetch(&status, &st);
+        CHECK(!st.valid && st.config_rc == NXM_RC_PT_NOT_UNDERSTOOD);
+
+        const unsigned writes = model.writes;
+        u16 days[7] = {60, 60, 60, 60, 60, 60, 60};
+        CHECK(pctl_play_timer_set_days(days) == NXM_RC_PT_NOT_UNDERSTOOD);
+        CHECK(pctl_play_timer_clear() == NXM_RC_PT_NOT_UNDERSTOOD);
+        PtBedtime bt[7];
+        for (int n = 0; n < 7; n++) { bt[n].on = true; bt[n].hour = 21; bt[n].minute = 0; bt[n].end_hour = 7; bt[n].end_minute = 0; }
+        CHECK(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_PT_NOT_UNDERSTOOD);
+        CHECK(model.writes == writes && model.refs == 0);
+    }
 }
 
 static PtBedtime bed(bool on, u8 h, u8 m, u8 eh, u8 em)
@@ -683,63 +768,63 @@ static void test_bedtime(void)
     model.bed_day = 2;
     memcpy(orig, model.pt_block, sizeof(orig));
     for (int n = 0; n < 7; n++) bt[n] = bed(true, 21, 0, 7, 30);
-    assert(pctl_play_timer_set_bedtime(bt, 2) == 0 && model.refs == 0 && model.writes == 1);
+    CHECK(pctl_play_timer_set_bedtime(bt, 2) == 0 && model.refs == 0 && model.writes == 1);
     for (int n = 0; n < 7; n++) {
-        assert(model.pt_block[6 + 4 * n] == 0x1501);   /* on, 21 h */
-        assert(model.pt_block[7 + 4 * n] == 0x0700);   /* :00, 07 h */
-        assert(model.pt_block[8 + 4 * n] == 0x011E);   /* :30, the limit flag kept */
-        assert(model.pt_block[9 + 4 * n] == 30 * n);   /* the limit kept */
+        CHECK(model.pt_block[6 + 4 * n] == 0x1501);   /* on, 21 h */
+        CHECK(model.pt_block[7 + 4 * n] == 0x0700);   /* :00, 07 h */
+        CHECK(model.pt_block[8 + 4 * n] == 0x011E);   /* :30, the limit flag kept */
+        CHECK(model.pt_block[9 + 4 * n] == 30 * n);   /* the limit kept */
     }
-    assert(model.pt_block[0] == 0x0101 && model.pt_block[1] == 1);
+    CHECK(model.pt_block[0] == 0x0101 && model.pt_block[1] == 1);
     PtState st;
     pctl_play_timer_query(&st);
-    assert(st.valid && st.bed[4].on && st.bed[4].hour == 21 && st.bed[4].end_minute == 30);
-    assert(st.day_min[3] == 90 && st.bedtime_enabled && st.bedtime_hour == 21 && st.bedtime_minute == 0);
+    CHECK(st.valid && st.bed[4].on && st.bed[4].hour == 21 && st.bed[4].end_minute == 30);
+    CHECK(st.day_min[3] == 90 && st.bedtime_enabled && st.bedtime_hour == 21 && st.bedtime_minute == 0);
 
     /* The same bedtimes again: nothing written. */
-    assert(pctl_play_timer_set_bedtime(bt, 2) == 0 && model.writes == 1);
+    CHECK(pctl_play_timer_set_bedtime(bt, 2) == 0 && model.writes == 1);
 
     /* A limit changed meanwhile keeps the times; one removed too. */
     u16 days[7] = {10, PT_DAY_NOLIMIT, 20, 30, 40, 50, 60};
-    assert(pctl_play_timer_set_days(days) == 0);
-    assert(model.pt_block[7 + 4] == 0x0700 && model.pt_block[8 + 4] == 0x001E && model.pt_block[9 + 4] == 0);
+    CHECK(pctl_play_timer_set_days(days) == 0);
+    CHECK(model.pt_block[7 + 4] == 0x0700 && model.pt_block[8 + 4] == 0x001E && model.pt_block[9 + 4] == 0);
     pctl_play_timer_query(&st);
-    assert(st.day_min[1] == PT_DAY_NOLIMIT && st.day_min[0] == 10 && st.bed[1].on && st.bed[1].end_hour == 7);
+    CHECK(st.day_min[1] == PT_DAY_NOLIMIT && st.day_min[0] == 10 && st.bed[1].on && st.bed[1].end_hour == 7);
     /* Every limit removed: the block stays while a bedtime is on. */
-    assert(pctl_play_timer_clear() == 0);
+    CHECK(pctl_play_timer_clear() == 0);
     pctl_play_timer_query(&st);
-    for (int n = 0; n < 7; n++) assert(st.day_min[n] == PT_DAY_NOLIMIT && st.bed[n].on);
-    assert(model.pt_block[0] == 0x0101);
+    for (int n = 0; n < 7; n++) CHECK(st.day_min[n] == PT_DAY_NOLIMIT && st.bed[n].on);
+    CHECK(model.pt_block[0] == 0x0101);
     /* A limit back on a day whose bedtime is on: its times stay. */
     u16 sat[7] = {PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, 45};
-    assert(pctl_play_timer_set_days(sat) == 0);
-    assert(model.pt_block[31] == 0x0700 && model.pt_block[32] == 0x011E && model.pt_block[33] == 45);
+    CHECK(pctl_play_timer_set_days(sat) == 0);
+    CHECK(model.pt_block[31] == 0x0700 && model.pt_block[32] == 0x011E && model.pt_block[33] == 45);
 
     /* Off everywhere but the limit kept: switch and alarm cleared, the
      * allowed-again time kept (as the companion app does). */
     for (int n = 0; n < 7; n++) bt[n] = bed(false, 0, 0, 0, 0);
-    assert(pctl_play_timer_set_bedtime(bt, 2) == 0);
+    CHECK(pctl_play_timer_set_bedtime(bt, 2) == 0);
     pctl_play_timer_query(&st);
-    assert(st.day_min[6] == 45 && !st.bed[6].on && st.bed[6].hour == 0 && st.bed[6].end_hour == 7);
+    CHECK(st.day_min[6] == 45 && !st.bed[6].on && st.bed[6].hour == 0 && st.bed[6].end_hour == 7);
     /* Then no limit either: all zeros, as for the limits. */
-    assert(pctl_play_timer_clear() == 0);
-    for (int i = 0; i < 34; i++) assert(model.pt_block[i] == 0);
+    CHECK(pctl_play_timer_clear() == 0);
+    for (int i = 0; i < 34; i++) CHECK(model.pt_block[i] == 0);
 
     /* Timer off: one evening on, the observed header added. */
     for (int n = 0; n < 7; n++) bt[n] = bed(false, 0, 0, 0, 0);
     bt[2] = bed(true, 20, 45, 6, 0);
-    assert(pctl_play_timer_set_bedtime(bt, 2) == 0);
-    assert(model.pt_block[0] == 0x0101 && model.pt_block[1] == 1);
-    assert(model.pt_block[14] == 0x1401 && model.pt_block[15] == 0x062D && model.pt_block[16] == 0);
-    for (int i = 2; i < 34; i++) if (i < 14 || i > 16) assert(model.pt_block[i] == 0);
+    CHECK(pctl_play_timer_set_bedtime(bt, 2) == 0);
+    CHECK(model.pt_block[0] == 0x0101 && model.pt_block[1] == 1);
+    CHECK(model.pt_block[14] == 0x1401 && model.pt_block[15] == 0x062D && model.pt_block[16] == 0);
+    for (int i = 2; i < 34; i++) if (i < 14 || i > 16) CHECK(model.pt_block[i] == 0);
 
     /* After midnight the console may still report the evening before. */
     model.bed_day = 2;
     bt[2] = bed(true, 22, 0, 6, 0);
-    assert(pctl_play_timer_set_bedtime(bt, 3) == 0);
+    CHECK(pctl_play_timer_set_bedtime(bt, 3) == 0);
     model.bed_day = 4;
     bt[4] = bed(true, 23, 0, 6, 0);
-    assert(pctl_play_timer_set_bedtime(bt, 3) == NXM_RC_NOT_APPLIED);   /* 23:00 is neither day 3's nor day 2's */
+    CHECK(pctl_play_timer_set_bedtime(bt, 3) == NXM_RC_NOT_APPLIED);   /* 23:00 is neither day 3's nor day 2's */
 
     /* Not reported: the block read before is written back. */
     reset();
@@ -747,89 +832,242 @@ static void test_bedtime(void)
     model.bed_ignored = true;
     memcpy(orig, model.pt_block, sizeof(orig));
     for (int n = 0; n < 7; n++) bt[n] = bed(true, 21, 0, 7, 0);
-    assert(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_NOT_APPLIED && model.refs == 0);
-    assert(model.writes == 2 && memcmp(model.pt_block, orig, sizeof(orig)) == 0);
+    CHECK(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_NOT_APPLIED && model.refs == 0);
+    CHECK(model.writes == 2 && memcmp(model.pt_block, orig, sizeof(orig)) == 0);
     /* ... and when the bedtime cannot be read back. */
     model.writes = 0;
     model.fail_command = 1957;
-    assert(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_NOT_APPLIED && model.writes == 2);
-    assert(memcmp(model.pt_block, orig, sizeof(orig)) == 0);
+    CHECK(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_NOT_APPLIED && model.writes == 2);
+    CHECK(memcmp(model.pt_block, orig, sizeof(orig)) == 0);
 
     /* Refused before writing: out of range, today out of range, the block
      * unreadable, the timer counting down. */
     reset();
     for (int n = 0; n < 7; n++) bt[n] = bed(true, 21, 0, 7, 0);
     bt[3] = bed(true, 15, 59, 7, 0);
-    assert(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_INVALID_ARGUMENT);
+    CHECK(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_INVALID_ARGUMENT);
     bt[3] = bed(true, 21, 0, 9, 1);
-    assert(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_INVALID_ARGUMENT);
+    CHECK(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_INVALID_ARGUMENT);
     bt[3] = bed(true, 21, 0, 4, 59);
-    assert(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_INVALID_ARGUMENT);
+    CHECK(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_INVALID_ARGUMENT);
     bt[3] = bed(false, 99, 99, 99, 99);   /* off: the times do not matter */
-    assert(pctl_play_timer_set_bedtime(bt, 7) == NXM_RC_INVALID_ARGUMENT);
-    assert(model.ipc_calls == 0);
+    CHECK(pctl_play_timer_set_bedtime(bt, 7) == NXM_RC_INVALID_ARGUMENT);
+    CHECK(model.ipc_calls == 0);
     model.fail_command = 145601;
-    assert(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_STATE_UNKNOWN && model.writes == 0 && model.refs == 0);
+    CHECK(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_STATE_UNKNOWN && model.writes == 0 && model.refs == 0);
     model.fail_command = 0;
     model.enabled = true;
-    assert(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_WRITE_GATED && model.writes == 0 && model.refs == 0);
+    CHECK(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_WRITE_GATED && model.writes == 0 && model.refs == 0);
     model.unlocked = true;
-    assert(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_NOT_APPLIED);   /* the mock's fixed 21:30 */
-    assert(model.writes == 2 && model.refs == 0);
+    CHECK(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_NOT_APPLIED);   /* the mock's fixed 21:30 */
+    CHECK(model.writes == 2 && model.refs == 0);
 
     /* Below 21.0.0: nothing sent. */
     reset_with(MAKEHOSVERSION(20, 5, 0));
-    assert(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_FW_UNSUPPORTED && model.ipc_calls == 0);
+    CHECK(pctl_play_timer_set_bedtime(bt, 0) == NXM_RC_FW_UNSUPPORTED && model.ipc_calls == 0);
+}
+
+/* restrictionMode (byte 1): a warning only, or the software suspended.
+ * Only that byte is written, behind the gate, and read back. */
+static void test_alarm_only(void)
+{
+    PtState st;
+    u16 orig[34];
+
+    /* The observed block suspends. */
+    reset();
+    pctl_play_timer_query(&st);
+    CHECK(st.valid && !st.alarm_only);
+    memcpy(orig, model.pt_block, sizeof(orig));
+
+    /* A warning only: byte 1 cleared, nothing else. */
+    CHECK(pctl_play_timer_set_alarm_only(true) == 0 && model.refs == 0 && model.writes == 1);
+    CHECK(model.pt_block[0] == 0x0001);
+    for (int i = 1; i < 34; i++) CHECK(model.pt_block[i] == orig[i]);
+    pctl_play_timer_query(&st);
+    CHECK(st.alarm_only && st.day_min[3] == 90);
+    /* Already so: nothing written. */
+    CHECK(pctl_play_timer_set_alarm_only(true) == 0 && model.writes == 1);
+    /* Back to suspending: the block as it was. */
+    CHECK(pctl_play_timer_set_alarm_only(false) == 0 && model.writes == 2);
+    CHECK(memcmp(model.pt_block, orig, sizeof(orig)) == 0);
+
+    /* A bedtime alone is enough to have a meaning. */
+    reset();
+    for (int i = 0; i < 34; i++) model.pt_block[i] = 0;
+    PtBedtime bt[7];
+    for (int n = 0; n < 7; n++) bt[n] = bed(n == 2, 21, 0, 6, 0);
+    model.bed_live = true;
+    model.bed_day = 2;
+    CHECK(pctl_play_timer_set_bedtime(bt, 2) == 0);
+    CHECK(pctl_play_timer_set_alarm_only(true) == 0 && model.pt_block[0] == 0x0001);
+
+    /* Nothing set (the all-zero block): refused, nothing written. */
+    reset();
+    for (int i = 0; i < 34; i++) model.pt_block[i] = 0;
+    CHECK(pctl_play_timer_set_alarm_only(true) == NXM_RC_INVALID_ARGUMENT && model.writes == 0 && model.refs == 0);
+
+    /* Not kept by the console: the block read before is written back. */
+    reset();
+    model.pt_ignored = true;
+    CHECK(pctl_play_timer_set_alarm_only(true) == NXM_RC_NOT_APPLIED && model.writes == 2 && model.refs == 0);
+    CHECK(memcmp(model.last_write, model.pt_block, 0x44) == 0);
+
+    /* Refused before writing: the block unreadable or not understood, the
+     * timer counting down; below 21.0.0 nothing sent. */
+    reset();
+    model.fail_command = 145601;
+    CHECK(pctl_play_timer_set_alarm_only(true) == NXM_RC_STATE_UNKNOWN && model.writes == 0 && model.refs == 0);
+    reset();
+    model.pt_block[9] = 1441;
+    CHECK(pctl_play_timer_set_alarm_only(true) == NXM_RC_PT_NOT_UNDERSTOOD && model.writes == 0 && model.refs == 0);
+    reset();
+    model.enabled = true;
+    CHECK(pctl_play_timer_set_alarm_only(true) == NXM_RC_WRITE_GATED && model.writes == 0 && model.refs == 0);
+    model.unlocked = true;
+    CHECK(pctl_play_timer_set_alarm_only(true) == 0 && model.writes == 1);
+    reset_with(MAKEHOSVERSION(20, 5, 0));
+    CHECK(pctl_play_timer_set_alarm_only(true) == NXM_RC_FW_UNSUPPORTED && model.ipc_calls == 0);
+}
+
+/* timerMode DAILY (byte 2 = 0): the console applies the daily rule (bytes
+ * 04..0B) every day and ignores the seven others. Read through it; a write
+ * that changes the block moves it to EACH_DAY_OF_THE_WEEK first, each day
+ * starting from the daily rule, restrictionMode kept. */
+static void daily_block(u16 header0, u16 rule2, u16 rule3, u16 rule4, u16 rule5)
+{
+    reset();   /* the seven days keep the observed limits: 30 * n minutes */
+    model.pt_block[0] = header0;
+    model.pt_block[1] = 0;   /* timerMode DAILY */
+    model.pt_block[2] = rule2; model.pt_block[3] = rule3;
+    model.pt_block[4] = rule4; model.pt_block[5] = rule5;
+}
+
+static void test_daily_mode(void)
+{
+    u16 expect[34];
+    PtState st;
+
+    /* The observed block reads as each day of the week, suspending. */
+    reset();
+    CHECK(!pt_daily(model.pt_block) && pt_suspends(model.pt_block));
+
+    /* 90 minutes every day, suspending. */
+    daily_block(0x0101, 0, 0x0600, 0x0100, 90);
+    CHECK(pt_daily(model.pt_block) && pt_suspends(model.pt_block) && pt_plausible(model.pt_block));
+    memcpy(expect, model.pt_block, sizeof(expect));
+    pctl_play_timer_query(&st);
+    CHECK(st.valid);
+    for (int n = 0; n < 7; n++) CHECK(st.day_min[n] == 90 && !st.bed[n].on);
+
+    /* The same limits back: the same block, byte for byte, still DAILY. */
+    CHECK(pctl_play_timer_set_days(st.day_min) == 0 && model.refs == 0);
+    CHECK(memcmp(model.last_write, expect, sizeof(expect)) == 0);
+
+    /* Monday changes: each day of the week, every day from the daily rule. */
+    u16 days[7] = {90, 45, 90, 90, 90, 90, 90};
+    CHECK(pctl_play_timer_set_days(days) == 0 && model.refs == 0);
+    CHECK(!pt_daily(model.pt_block) && model.pt_block[0] == 0x0101 && model.pt_block[1] == 1);
+    for (int i = 2; i <= 5; i++) CHECK(model.pt_block[i] == expect[i]);   /* the daily rule kept */
+    CHECK(model.pt_block[6] == 0);
+    for (int n = 0; n < 7; n++) {
+        const u16 *g = &model.pt_block[7 + 4 * n];
+        CHECK(g[0] == 0x0600 && g[1] == 0x0100 && g[2] == days[n]);
+        if (n < 6) CHECK(g[3] == 0);
+    }
+    pctl_play_timer_query(&st);
+    for (int n = 0; n < 7; n++) CHECK(st.day_min[n] == days[n]);
+
+    /* An alarm only (restrictionMode 0) stays one. */
+    daily_block(0x0001, 0, 0x0600, 0x0100, 60);
+    CHECK(!pt_suspends(model.pt_block));
+    u16 sun[7] = {120, 60, 60, 60, 60, 60, 60};
+    CHECK(pctl_play_timer_set_days(sun) == 0);
+    CHECK(model.pt_block[0] == 0x0001 && model.pt_block[1] == 1 && model.pt_block[9] == 120);
+
+    /* A daily rule with nothing on: no limit any day, whatever the ignored
+     * days hold; a change makes them all-zero but the one set. */
+    daily_block(0x0101, 0, 0x0600, 0, 0);
+    pctl_play_timer_query(&st);
+    for (int n = 0; n < 7; n++) CHECK(st.day_min[n] == PT_DAY_NOLIMIT);
+    u16 mon[7] = {PT_DAY_NOLIMIT, 45, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT};
+    CHECK(pctl_play_timer_set_days(mon) == 0);
+    pctl_play_timer_query(&st);
+    for (int n = 0; n < 7; n++) CHECK(st.day_min[n] == mon[n]);
+    CHECK(model.pt_block[1] == 1 && model.pt_block[11] == 0x0600 && model.pt_block[12] == 0x0100);
+    for (int i = 6; i < 34; i++) if (i < 11 || i > 13) CHECK(model.pt_block[i] == 0);
+
+    /* The bedtime of the daily rule (21:00, allowed again at 07:00, 60
+     * minutes) is every day's. */
+    PtBedtime bt[7];
+    daily_block(0x0101, 0x1501, 0x0700, 0x0100, 60);
+    model.bed_live = true;
+    model.bed_day = 1;
+    CHECK(pt_plausible(model.pt_block));
+    pctl_play_timer_query(&st);
+    for (int n = 0; n < 7; n++)
+        CHECK(st.day_min[n] == 60 && st.bed[n].on && st.bed[n].hour == 21 && st.bed[n].end_hour == 7);
+    /* The same bedtimes: nothing written, still DAILY. */
+    memcpy(bt, st.bed, sizeof(bt));
+    CHECK(pctl_play_timer_set_bedtime(bt, 1) == 0 && model.writes == 0 && pt_daily(model.pt_block));
+    /* Sunday's turned off: each day of the week, the others' kept. */
+    bt[0] = bed(false, 0, 0, 7, 0);
+    CHECK(pctl_play_timer_set_bedtime(bt, 1) == 0 && model.writes == 1 && model.refs == 0);
+    CHECK(!pt_daily(model.pt_block));
+    pctl_play_timer_query(&st);
+    CHECK(!st.bed[0].on && st.bed[0].end_hour == 7);
+    for (int n = 0; n < 7; n++) CHECK(st.day_min[n] == 60);
+    for (int n = 1; n < 7; n++) CHECK(st.bed[n].on && st.bed[n].hour == 21 && st.bed[n].end_hour == 7);
 }
 
 static void test_unlock_and_relock(void)
 {
     reset();
     model.enabled = true;
-    assert(pctl_unlock_restriction_temporarily() == 0);
-    assert(model.unlocked && model.refs == 0 && model.init_calls == model.exit_calls);
-    assert(model.got_pin_size == 7 && strcmp(model.got_pin, "123456") == 0);
+    CHECK(pctl_unlock_restriction_temporarily() == 0);
+    CHECK(model.unlocked && model.refs == 0 && model.init_calls == model.exit_calls);
+    CHECK(model.got_pin_size == 7 && strcmp(model.got_pin, "123456") == 0);
     /* After a verified unlock the gate lets the write through. */
-    assert(pctl_play_timer_set_uniform(45) == 0);
-    assert(pctl_relock() == 0 && !model.unlocked && model.last_write_cmd == 1007);
-    assert(model.refs == 0);
+    CHECK(pctl_play_timer_set_uniform(45) == 0);
+    CHECK(pctl_relock() == 0 && !model.unlocked && model.last_write_cmd == 1007);
+    CHECK(model.refs == 0);
 
     reset();
     model.unlock_effective = false;
-    assert(pctl_unlock_restriction_temporarily() == NXM_RC_UNLOCK_NOT_EFFECTIVE);
-    assert(model.refs == 0);
+    CHECK(pctl_unlock_restriction_temporarily() == NXM_RC_UNLOCK_NOT_EFFECTIVE);
+    CHECK(model.refs == 0);
 
     reset();
     model.fail_command = 1208;
-    assert(pctl_unlock_restriction_temporarily() == MOCK_ERROR);
-    assert(model.writes == 0 && model.refs == 0); /* no 1201 without a PIN */
+    CHECK(pctl_unlock_restriction_temporarily() == MOCK_ERROR);
+    CHECK(model.writes == 0 && model.refs == 0); /* no 1201 without a PIN */
 
     reset();
     model.fail_command = 1201;
-    assert(pctl_unlock_restriction_temporarily() == MOCK_ERROR && model.refs == 0);
-    assert(model.last_write_cmd == 1201);   /* nothing unlocked: nothing to undo */
+    CHECK(pctl_unlock_restriction_temporarily() == MOCK_ERROR && model.refs == 0);
+    CHECK(model.last_write_cmd == 1201);   /* nothing unlocked: nothing to undo */
 
     /* Unlocked, but the check cannot be read: locked again before returning. */
     reset();
     model.fail_command = 1006;
-    assert(pctl_unlock_restriction_temporarily() == MOCK_ERROR);
-    assert(model.last_write_cmd == 1007 && !model.unlocked);
-    assert(model.refs == 0 && model.init_calls == model.exit_calls);
+    CHECK(pctl_unlock_restriction_temporarily() == MOCK_ERROR);
+    CHECK(model.last_write_cmd == 1007 && !model.unlocked);
+    CHECK(model.refs == 0 && model.init_calls == model.exit_calls);
 
     /* ... and when locking again fails too, the caller learns it may still be
      * unlocked. */
     reset();
     model.fail_command = 1006;
     model.fail_command2 = 1007;
-    assert(pctl_unlock_restriction_temporarily() == NXM_RC_RELOCK_FAILED);
-    assert(model.last_write_cmd == 1007 && model.unlocked);
-    assert(model.refs == 0 && model.init_calls == model.exit_calls);
+    CHECK(pctl_unlock_restriction_temporarily() == NXM_RC_RELOCK_FAILED);
+    CHECK(model.last_write_cmd == 1007 && model.unlocked);
+    CHECK(model.refs == 0 && model.init_calls == model.exit_calls);
 
     /* Not effective: nothing to undo either. */
     reset();
     model.unlock_effective = false;
-    assert(pctl_unlock_restriction_temporarily() == NXM_RC_UNLOCK_NOT_EFFECTIVE);
-    assert(model.last_write_cmd == 1201);
+    CHECK(pctl_unlock_restriction_temporarily() == NXM_RC_UNLOCK_NOT_EFFECTIVE);
+    CHECK(model.last_write_cmd == 1201);
 }
 
 /* The rescue sysmodule's light read: 1206 and 1006 in one session, nothing written. */
@@ -839,24 +1077,24 @@ static void test_lock_state(void)
     bool unlocked = true;
 
     reset();
-    assert(pctl_lock_state(&len, &unlocked) == 0);
-    assert(len == 6 && !unlocked && model.ipc_calls == 2 && model.writes == 0);
-    assert(model.refs == 0 && model.init_calls == 1 && model.exit_calls == 1);
+    CHECK(pctl_lock_state(&len, &unlocked) == 0);
+    CHECK(len == 6 && !unlocked && model.ipc_calls == 2 && model.writes == 0);
+    CHECK(model.refs == 0 && model.init_calls == 1 && model.exit_calls == 1);
 
     reset();
     model.no_pin = true;
     model.unlocked = true;
-    assert(pctl_lock_state(&len, NULL) == 0 && len == 0 && model.ipc_calls == 1);
-    assert(pctl_lock_state(NULL, &unlocked) == 0 && unlocked);
-    assert(model.refs == 0);
+    CHECK(pctl_lock_state(&len, NULL) == 0 && len == 0 && model.ipc_calls == 1);
+    CHECK(pctl_lock_state(NULL, &unlocked) == 0 && unlocked);
+    CHECK(model.refs == 0);
 
     reset();
     model.fail_command = 1206;
-    assert(pctl_lock_state(&len, &unlocked) == MOCK_ERROR && model.ipc_calls == 1 && model.refs == 0);
+    CHECK(pctl_lock_state(&len, &unlocked) == MOCK_ERROR && model.ipc_calls == 1 && model.refs == 0);
 
     reset();
     model.fail_init_call = 1;
-    assert(pctl_lock_state(&len, &unlocked) == MOCK_ERROR && model.refs == 0);
+    CHECK(pctl_lock_state(&len, &unlocked) == MOCK_ERROR && model.refs == 0);
 }
 
 static void test_get_pin(void)
@@ -866,20 +1104,20 @@ static void test_get_pin(void)
     reset();
     model.enabled = true;   /* a read: no unlock needed, nothing written */
     memset(pin, 'x', sizeof(pin));
-    assert(pctl_get_pin(pin, sizeof(pin)) == 0);
-    assert(strcmp(pin, "123456") == 0);
-    assert(model.writes == 0 && !model.unlocked && model.refs == 0 && model.init_calls == model.exit_calls);
+    CHECK(pctl_get_pin(pin, sizeof(pin)) == 0);
+    CHECK(strcmp(pin, "123456") == 0);
+    CHECK(model.writes == 0 && !model.unlocked && model.refs == 0 && model.init_calls == model.exit_calls);
 
     reset();
     model.pin = "1234";
-    assert(pctl_get_pin(pin, 5) == 0 && strcmp(pin, "1234") == 0 && model.refs == 0);
+    CHECK(pctl_get_pin(pin, 5) == 0 && strcmp(pin, "1234") == 0 && model.refs == 0);
 
     /* Too small for the PIN + NUL: refused and wiped. */
     reset();
     memset(pin, 'x', sizeof(pin));
-    assert(pctl_get_pin(pin, 6) == NXM_RC_INVALID_ARGUMENT);
-    for (unsigned i = 0; i < 6; ++i) assert(pin[i] == 0);
-    assert(model.refs == 0);
+    CHECK(pctl_get_pin(pin, 6) == NXM_RC_INVALID_ARGUMENT);
+    for (unsigned i = 0; i < 6; ++i) CHECK(pin[i] == 0);
+    CHECK(model.refs == 0);
 
     /* Not 4-8 digits: never shown. */
     const char *bad[] = {"", "123", "123456789", "12a4"};
@@ -887,22 +1125,22 @@ static void test_get_pin(void)
         reset();
         model.pin = bad[i];
         memset(pin, 'x', sizeof(pin));
-        assert(pctl_get_pin(pin, sizeof(pin)) == NXM_RC_STATE_UNKNOWN);
-        for (unsigned j = 0; j < sizeof(pin); ++j) assert(pin[j] == 0);
-        assert(model.refs == 0);
+        CHECK(pctl_get_pin(pin, sizeof(pin)) == NXM_RC_STATE_UNKNOWN);
+        for (unsigned j = 0; j < sizeof(pin); ++j) CHECK(pin[j] == 0);
+        CHECK(model.refs == 0);
     }
 
     reset();
     model.fail_command = 1208;
     memset(pin, 'x', sizeof(pin));
-    assert(pctl_get_pin(pin, sizeof(pin)) == MOCK_ERROR && pin[0] == 0 && model.refs == 0);
+    CHECK(pctl_get_pin(pin, sizeof(pin)) == MOCK_ERROR && pin[0] == 0 && model.refs == 0);
 
     reset();
     model.fail_init_call = 1;
-    assert(pctl_get_pin(pin, sizeof(pin)) == MOCK_ERROR && model.ipc_calls == 0 && model.refs == 0);
+    CHECK(pctl_get_pin(pin, sizeof(pin)) == MOCK_ERROR && model.ipc_calls == 0 && model.refs == 0);
 
     reset();
-    assert(pctl_get_pin(NULL, 8) == NXM_RC_INVALID_ARGUMENT && model.init_calls == 0);
+    CHECK(pctl_get_pin(NULL, 8) == NXM_RC_INVALID_ARGUMENT && model.init_calls == 0);
 }
 
 static void test_other_writes(void)
@@ -911,36 +1149,36 @@ static void test_other_writes(void)
 
     reset();
     model.safety_level = PctlSafetyLevel_Teen;
-    assert(pctl_set_custom_settings(&cs) == NXM_RC_NOT_CUSTOM && model.writes == 0 && model.refs == 0);
+    CHECK(pctl_set_custom_settings(&cs) == NXM_RC_NOT_CUSTOM && model.writes == 0 && model.refs == 0);
 
     reset();
-    assert(pctl_set_custom_settings(&cs) == 0 && model.last_write_cmd == 1036);
-    assert(model.last_write[0] == 16 && model.last_write[1] == 1 && model.last_write[2] == 0);
-    assert(model.refs == 0);
+    CHECK(pctl_set_custom_settings(&cs) == 0 && model.last_write_cmd == 1036);
+    CHECK(model.last_write[0] == 16 && model.last_write[1] == 1 && model.last_write[2] == 0);
+    CHECK(model.refs == 0);
     cs.rating_age = 99;
-    assert(pctl_set_custom_settings(&cs) == NXM_RC_INVALID_ARGUMENT);
+    CHECK(pctl_set_custom_settings(&cs) == NXM_RC_INVALID_ARGUMENT);
 
     reset();
-    assert(pctl_set_safety_level(7) == NXM_RC_INVALID_ARGUMENT && model.init_calls == 0);
-    assert(pctl_set_safety_level(PctlSafetyLevel_Child) == 0 && model.safety_level == PctlSafetyLevel_Child);
-    assert(pctl_set_stereo_vision_restricted(true) == 0 && model.last_write_cmd == 1063);
-    assert(pctl_play_timer_set_alarm_disabled(true) == 0 && model.last_write_cmd == 1953);
-    assert(pctl_play_timer_stop() == 0 && model.last_write_cmd == 1452);
-    assert(pctl_play_timer_start() == 0 && model.last_write_cmd == 1451);
-    assert(model.refs == 0 && model.init_calls == model.exit_calls);
+    CHECK(pctl_set_safety_level(7) == NXM_RC_INVALID_ARGUMENT && model.init_calls == 0);
+    CHECK(pctl_set_safety_level(PctlSafetyLevel_Child) == 0 && model.safety_level == PctlSafetyLevel_Child);
+    CHECK(pctl_set_stereo_vision_restricted(true) == 0 && model.last_write_cmd == 1063);
+    CHECK(pctl_play_timer_set_alarm_disabled(true) == 0 && model.last_write_cmd == 1953);
+    CHECK(pctl_play_timer_stop() == 0 && model.last_write_cmd == 1452);
+    CHECK(pctl_play_timer_start() == 0 && model.last_write_cmd == 1451);
+    CHECK(model.refs == 0 && model.init_calls == model.exit_calls);
 
     reset();
-    assert(pctl_ops_init() == 0);
-    assert(pctl_set_pin() == MOCK_ERROR);
-    assert(model.applets == 1 && model.refs == 0);
+    CHECK(pctl_ops_init() == 0);
+    CHECK(pctl_set_pin() == MOCK_ERROR);
+    CHECK(model.applets == 1 && model.refs == 0);
 
     const u32 deletes[] = {1043, 1941};
     for (unsigned i = 0; i < 2; ++i) {
         reset();
         model.fail_command = deletes[i];
         Result rc = i == 0 ? pctl_delete_parental_controls() : pctl_delete_pairing();
-        assert(rc == MOCK_ERROR && model.writes == 1 && model.refs == 0);
-        assert(model.init_calls == 1 && model.exit_calls == 1);
+        CHECK(rc == MOCK_ERROR && model.writes == 1 && model.refs == 0);
+        CHECK(model.init_calls == 1 && model.exit_calls == 1);
     }
 }
 
@@ -950,54 +1188,54 @@ static void test_level_settings_and_rating_org(void)
     reset();
     PctlCustomSettings s;
     memset(&s, 0xFF, sizeof(s));
-    assert(pctl_get_level_settings(PctlSafetyLevel_Child, &s) == 0);
-    assert(s.rating_age == 13 && s.sns_post_restriction && s.free_communication_restriction);
-    assert(pctl_get_level_settings(PctlSafetyLevel_Teen, &s) == 0 && s.rating_age == 16 && !s.sns_post_restriction);
-    assert(pctl_get_level_settings(5, &s) == NXM_RC_INVALID_ARGUMENT);
-    assert(pctl_get_level_settings(PctlSafetyLevel_Child, NULL) == NXM_RC_INVALID_ARGUMENT);
-    assert(model.writes == 0 && model.refs == 0);
+    CHECK(pctl_get_level_settings(PctlSafetyLevel_Child, &s) == 0);
+    CHECK(s.rating_age == 13 && s.sns_post_restriction && s.free_communication_restriction);
+    CHECK(pctl_get_level_settings(PctlSafetyLevel_Teen, &s) == 0 && s.rating_age == 16 && !s.sns_post_restriction);
+    CHECK(pctl_get_level_settings(5, &s) == NXM_RC_INVALID_ARGUMENT);
+    CHECK(pctl_get_level_settings(PctlSafetyLevel_Child, NULL) == NXM_RC_INVALID_ARGUMENT);
+    CHECK(model.writes == 0 && model.refs == 0);
     /* Read-only mode does not stop a read. */
     core_set_read_only(true);
-    assert(pctl_get_level_settings(PctlSafetyLevel_Teen, &s) == 0);
+    CHECK(pctl_get_level_settings(PctlSafetyLevel_Teen, &s) == 0);
     core_set_read_only(false);
 
     /* 1038: a change, the value checked first. */
     reset();
-    assert(pctl_set_rating_org(6) == 0 && model.writes == 1 && model.last_write_cmd == 1038 && model.rating_org == 6);
-    assert(pctl_set_rating_org(13) == NXM_RC_INVALID_ARGUMENT && model.writes == 1);
+    CHECK(pctl_set_rating_org(6) == 0 && model.writes == 1 && model.last_write_cmd == 1038 && model.rating_org == 6);
+    CHECK(pctl_set_rating_org(13) == NXM_RC_INVALID_ARGUMENT && model.writes == 1);
     core_set_read_only(true);
-    assert(pctl_set_rating_org(3) == NXM_RC_READ_ONLY && model.writes == 1);
+    CHECK(pctl_set_rating_org(3) == NXM_RC_READ_ONLY && model.writes == 1);
     core_set_read_only(false);
-    assert(model.refs == 0);
+    CHECK(model.refs == 0);
 }
 
 static void test_ask_pin(void)
 {
     /* The PIN screen: shown with the session released, only when a PIN exists. */
     reset();
-    assert(pctl_ask_pin() == 0 && model.auth_applets == 1 && model.writes == 0);
+    CHECK(pctl_ask_pin() == 0 && model.auth_applets == 1 && model.writes == 0);
     model.auth_result = MOCK_ERROR;   /* cancelled */
-    assert(pctl_ask_pin() == MOCK_ERROR && model.auth_applets == 2);
-    assert(model.refs == 0);
+    CHECK(pctl_ask_pin() == MOCK_ERROR && model.auth_applets == 2);
+    CHECK(model.refs == 0);
 
     reset();
     model.no_pin = true;
-    assert(pctl_ask_pin() == NXM_RC_NO_PIN && model.auth_applets == 0);
-    assert(model.refs == 0);
+    CHECK(pctl_ask_pin() == NXM_RC_NO_PIN && model.auth_applets == 0);
+    CHECK(model.refs == 0);
 
     /* Read-only mode changes nothing about it: it writes nothing. */
     reset();
     core_set_read_only(true);
-    assert(pctl_ask_pin() == 0 && model.auth_applets == 1);
+    CHECK(pctl_ask_pin() == 0 && model.auth_applets == 1);
     core_set_read_only(false);
-    assert(model.refs == 0);
+    CHECK(model.refs == 0);
 }
 
 /* The UI's change check: runs before any session is opened (it may show the
    PIN applet), refuses every change but locking again. */
 static bool change_check(void)
 {
-    assert(model.refs == 0);
+    CHECK(model.refs == 0);
     model.checks++;
     return model.check_answer;
 }
@@ -1010,35 +1248,72 @@ static void test_change_check(void)
     u16 days[7] = { 60, 60, 60, 60, 60, 60, 60 };
     char pin[16];
     PctlCustomSettings cs = { 12, true, false };
-    assert(pctl_play_timer_set_days(days) == NXM_RC_NOT_CONFIRMED);
-    assert(pctl_unlock_restriction_temporarily() == NXM_RC_NOT_CONFIRMED);
-    assert(pctl_get_pin(pin, sizeof(pin)) == NXM_RC_NOT_CONFIRMED && pin[0] == '\0');
-    assert(pctl_set_safety_level(PctlSafetyLevel_Teen) == NXM_RC_NOT_CONFIRMED);
-    assert(pctl_set_custom_settings(&cs) == NXM_RC_NOT_CONFIRMED);
-    assert(pctl_set_stereo_vision_restricted(true) == NXM_RC_NOT_CONFIRMED);
-    assert(pctl_delete_parental_controls() == NXM_RC_NOT_CONFIRMED);
-    assert(pctl_delete_pairing() == NXM_RC_NOT_CONFIRMED);
-    assert(pctl_play_timer_set_alarm_disabled(true) == NXM_RC_NOT_CONFIRMED);
-    assert(pctl_play_timer_start() == NXM_RC_NOT_CONFIRMED);
-    assert(pctl_play_timer_stop() == NXM_RC_NOT_CONFIRMED);
-    assert(pctl_set_pin() == NXM_RC_NOT_CONFIRMED && model.applets == 0);
-    assert(model.writes == 0 && model.ipc_calls == 0 && model.checks == 12);
+    CHECK(pctl_play_timer_set_days(days) == NXM_RC_NOT_CONFIRMED);
+    CHECK(pctl_unlock_restriction_temporarily() == NXM_RC_NOT_CONFIRMED);
+    CHECK(pctl_get_pin(pin, sizeof(pin)) == NXM_RC_NOT_CONFIRMED && pin[0] == '\0');
+    CHECK(pctl_set_safety_level(PctlSafetyLevel_Teen) == NXM_RC_NOT_CONFIRMED);
+    CHECK(pctl_set_custom_settings(&cs) == NXM_RC_NOT_CONFIRMED);
+    CHECK(pctl_set_stereo_vision_restricted(true) == NXM_RC_NOT_CONFIRMED);
+    CHECK(pctl_delete_parental_controls() == NXM_RC_NOT_CONFIRMED);
+    CHECK(pctl_delete_pairing() == NXM_RC_NOT_CONFIRMED);
+    CHECK(pctl_play_timer_set_alarm_disabled(true) == NXM_RC_NOT_CONFIRMED);
+    CHECK(pctl_play_timer_start() == NXM_RC_NOT_CONFIRMED);
+    CHECK(pctl_play_timer_stop() == NXM_RC_NOT_CONFIRMED);
+    CHECK(pctl_set_pin() == NXM_RC_NOT_CONFIRMED && model.applets == 0);
+    CHECK(model.writes == 0 && model.ipc_calls == 0 && model.checks == 12);
     /* Locking again is never refused for want of a PIN. */
-    assert(pctl_relock() == 0 && model.writes == 1 && model.checks == 12);
+    CHECK(pctl_relock() == 0 && model.writes == 1 && model.checks == 12);
     /* Reads never ask. */
     PctlStatus st;
     pctl_status_fetch(&st);
-    assert(model.checks == 12);
+    CHECK(model.checks == 12);
 
     /* Confirmed: the change goes through. */
     model.check_answer = true;
-    assert(pctl_set_safety_level(PctlSafetyLevel_Teen) == 0 && model.checks == 13);
+    CHECK(pctl_set_safety_level(PctlSafetyLevel_Teen) == 0 && model.checks == 13);
     /* Read-only still wins, without asking. */
     core_set_read_only(true);
-    assert(pctl_set_safety_level(PctlSafetyLevel_Teen) == NXM_RC_READ_ONLY && model.checks == 13);
+    CHECK(pctl_set_safety_level(PctlSafetyLevel_Teen) == NXM_RC_READ_ONLY && model.checks == 13);
     core_set_read_only(false);
     core_set_change_check(NULL);
-    assert(model.refs == 0);
+    CHECK(model.refs == 0);
+}
+
+/* The UI's reveal check: asks before every read of the PIN, whatever the
+   change check would let through (its grace, a recovery that turned it off). */
+static int reveals;
+static bool reveal_answer;
+static bool reveal_check(void)
+{
+    CHECK(model.refs == 0);
+    reveals++;
+    return reveal_answer;
+}
+
+static void test_reveal_check(void)
+{
+    reset();
+    char pin[16];
+    model.check_answer = true;   /* changes go ahead without asking (a grace) */
+    core_set_change_check(change_check);
+    core_set_reveal_check(reveal_check);
+    reveals = 0;
+    reveal_answer = false;
+    CHECK(pctl_get_pin(pin, sizeof(pin)) == NXM_RC_NOT_CONFIRMED && pin[0] == '\0');
+    CHECK(reveals == 1 && model.checks == 0 && model.ipc_calls == 0);
+    /* Changes still go through the change check only. */
+    CHECK(pctl_set_safety_level(PctlSafetyLevel_Teen) == 0 && model.checks == 1 && reveals == 1);
+    /* No change check at all (a confirmed recovery): the PIN is still asked. */
+    core_set_change_check(NULL);
+    CHECK(pctl_get_pin(pin, sizeof(pin)) == NXM_RC_NOT_CONFIRMED && reveals == 2);
+    reveal_answer = true;
+    CHECK(pctl_get_pin(pin, sizeof(pin)) == 0 && reveals == 3);
+    /* Read-only still wins, without asking. */
+    core_set_read_only(true);
+    CHECK(pctl_get_pin(pin, sizeof(pin)) == NXM_RC_READ_ONLY && reveals == 3);
+    core_set_read_only(false);
+    core_set_reveal_check(NULL);
+    CHECK(model.refs == 0);
 }
 
 int main(void)
@@ -1050,6 +1325,9 @@ int main(void)
     test_write_gate();
     test_command_gate();
     test_block_preserved();
+    test_block_not_understood();
+    test_daily_mode();
+    test_alarm_only();
     test_bedtime();
     test_unlock_and_relock();
     test_lock_state();
@@ -1059,7 +1337,7 @@ int main(void)
     test_level_settings_and_rating_org();
     test_ask_pin();
     test_change_check();
-    puts("pctl_ops lifecycle, gating, write and read-only assertions passed");
+    test_reveal_check();
     (void)assert_released;
-    return 0;
+    return CHECK_DONE("pctl_ops lifecycle, gating, write and read-only assertions passed");
 }

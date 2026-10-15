@@ -1,7 +1,8 @@
 // ClockTab — shows the system clocks and sets the network clock from a public
 // NTP server (the play timer relies on the network clock). The measurement
 // and the write are clock_flow's; this screen adds the server choice, the
-// result text, the 2-minute countdown and a spinner while measuring.
+// result text, the 2-minute countdown, a spinner while measuring and, when
+// no server answers, "Set the network clock to the console clock".
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -26,6 +27,7 @@ class ClockTab : public TabBase
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
     bool busy = false;
     bool autosync_off = false;   // "Synchronise Clock via Internet" read as off
+    bool offline = false;        // the last measurement: no server answered
     // The tab ticks every second; the clocks are read every SNAPSHOT_EVERY and
     // moved forward by the steady clock in between (a snapshot is ~16 IPCs).
     TimeSnapshot snap = {};
@@ -41,6 +43,7 @@ class ClockTab : public TabBase
     void set_server(const std::string& host, const std::string& region);
     void measure();
     void apply();
+    void copy();
 
     BRLS_BIND(brls::DetailCell, user,     "ck_user");
     BRLS_BIND(brls::DetailCell, network,  "ck_network");
@@ -57,4 +60,5 @@ class ClockTab : public TabBase
     BRLS_BIND(brls::Label,      result,   "ck_result");
     BRLS_BIND(brls::Label,      warning,  "ck_warning");
     BRLS_BIND(brls::DetailCell, apply_cell, "ck_apply");
+    BRLS_BIND(brls::DetailCell, copy_cell, "ck_copy");
 };

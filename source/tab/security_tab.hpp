@@ -15,9 +15,13 @@ class SecurityTab : public TabBase
     void refresh() override;
 
   private:
+    // Set or change the PIN (the system PIN screen), recorded in the history.
+    void change_pin();
+
     BRLS_BIND(brls::DetailCell, pin,            "sc_pin");
     BRLS_BIND(brls::DetailCell, restrictions,   "sc_restrictions");
     BRLS_BIND(brls::DetailCell, temp,           "sc_temp");
+    BRLS_BIND(brls::Label,      rescue_note,    "sc_rescue_note");
     BRLS_BIND(brls::Header,     actions_header, "sc_actions_header");
     BRLS_BIND(brls::DetailCell, set_pin,        "sc_set_pin");
     BRLS_BIND(brls::DetailCell, pin_lock_cell,  "sc_pin_lock");
@@ -30,6 +34,7 @@ class SecurityTab : public TabBase
     BRLS_BIND(brls::Label,      console_lock_note, "sc_console_lock_note");
     BRLS_BIND(brls::DetailCell, pr_active,      "pr_active");
     BRLS_BIND(brls::DetailCell, pr_updated,     "pr_updated");
+    BRLS_BIND(brls::DetailCell, pr_decode,      "pr_decode");
     BRLS_BIND(brls::DetailCell, pr_unlink,      "pr_unlink");
     BRLS_BIND(brls::Label,      pr_note,        "pr_note");
     BRLS_BIND(brls::Header,     danger_header,  "sc_danger_header");

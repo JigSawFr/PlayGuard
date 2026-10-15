@@ -5,8 +5,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Before filing: the [Locked out?](https://github.com/JigSawFr/PlayGuard#locked-out-second-hand-console-forgotten-pin)
-        section of the README covers the usual cases, including the optional recovery
+        Before filing: the [Locked out?](https://github.com/JigSawFr/PlayGuard/blob/main/docs/troubleshooting.md#locked-out)
+        section of the troubleshooting guide covers the usual cases, including the optional recovery
         sysmodule for a limit that blocks every program.
 
         **Never post the PIN or the console's serial number here.** This issue is public.
@@ -27,7 +27,7 @@ body:
     id: tried
     attributes:
       label: What you tried
-      description: The README steps you followed, and where they stopped working.
+      description: The troubleshooting steps you followed, and where they stopped working.
     validations:
       required: true
 
@@ -44,5 +44,5 @@ body:
     attributes:
       label: Diagnostic report or rescue report
       description: |
-        If PlayGuard opens: the diagnostic report from `sd:/switch/playguard/logs/`. If the
-        recovery sysmodule ran: `sd:/switch/playguard/rescue_report.txt`.
+        If PlayGuard opens: the diagnostic report from `sd:/config/playguard/logs/reports/`. If the
+        recovery sysmodule ran: `sd:/config/playguard/rescue_report.txt`.

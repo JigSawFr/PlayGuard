@@ -1,5 +1,6 @@
 // PlayTimerTab — daily limit (same for every day / extra time today / per day /
-// remove), saved profiles, the bedtime alarm and the advanced
+// remove), saved profiles, what happens when the time is up, the bedtime
+// alarm and the advanced
 // (debug-class) actions.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -34,6 +35,8 @@ class PlayTimerTab : public TabBase
     BRLS_BIND(brls::DetailCell,  per_day,         "pt_per_day");
     BRLS_BIND(brls::DetailCell,  remove,          "pt_remove");
     BRLS_BIND(brls::DetailCell,  profiles_cell,   "pt_profiles");
+    BRLS_BIND(brls::DetailCell,  time_up,         "pt_time_up");
+    BRLS_BIND(brls::Label,       limit_note,      "pt_limit_note");
     BRLS_BIND(brls::Header,      bedtime_header,  "pt_bedtime_header");
     BRLS_BIND(brls::DetailCell,  bedtime,         "pt_bedtime");
     BRLS_BIND(brls::DetailCell,  bedtime_reset,   "pt_bedtime_reset");

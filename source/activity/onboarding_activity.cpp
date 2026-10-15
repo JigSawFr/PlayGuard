@@ -4,6 +4,7 @@
 #include "action/clock_flow.hpp"
 #include "action/history_flow.hpp"
 #include "action/fw_gate.hpp"
+#include "action/pin_lock.hpp"
 #include "action/pt_flow.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
@@ -25,13 +26,22 @@ void OnboardingActivity::onContentAvailable()
 {
     headline->setSingleLine(false);
     note->setSingleLine(false);
+    // Not a step: the other system's controls are out of reach from here.
+    SysInfo si;
+    sysinfo_get(&si);
+    const std::string other = ui::other_storage_note(si);
+    storage_note->setSingleLine(false);
+    storage_note->setText(other);
+    ui::set_visible(storage_note.getView(), !other.empty());
     at_start->init("playguard/onboarding/at_start"_i18n, config::get().onboarding_at_start, [](bool on) {
         config::get().onboarding_at_start = on;
         ui::save_config();
     });
     unlink->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
-        ui::confirm_danger("playguard/pairing/unlink_body"_i18n, "playguard/pairing/unlink_confirm"_i18n, [this]() {
+        // The block comparison needs the link: last chance to help decode the settings.
+        const std::string body = "playguard/pairing/unlink_body"_i18n + "\n\n" + "playguard/pairing/decode_note"_i18n;
+        ui::confirm_danger(body, "playguard/pairing/unlink_confirm"_i18n, [this]() {
             Result rc = pctl_delete_pairing();
             if (R_SUCCEEDED(rc)) history_flow::record_event("unlink", "first_steps");
             ui::notify_result(rc, "playguard/pairing/unlinked"_i18n, "playguard/pairing/unlink_err"_i18n);
@@ -43,6 +53,13 @@ void OnboardingActivity::onContentAvailable()
     alarm->setDetailTextColor(ui::color_warn());
     alarm->registerClickAction([this](brls::View*) {
         pt_flow::turn_alarm_on("first_steps", [this]() { this->refresh(); });
+        return true;
+    });
+
+    // Security's own choice: the PIN is the console's, this keeps a child out
+    // of PlayGuard itself.
+    protect->registerClickAction([this](brls::View*) {
+        pin_lock::choose([this]() { this->refresh(); });
         return true;
     });
 
@@ -102,7 +119,7 @@ void OnboardingActivity::refresh()
 
     const bool has_pin = s.pin_length_ok && s.pin_length > 0;
     pin->setDetailText(!s.pin_length_ok ? "playguard/common/unavailable"_i18n
-                       : has_pin ? brls::getStr("playguard/dashboard/pin_set", (int)s.pin_length) : todo);
+                       : has_pin ? "playguard/dashboard/pin_set"_i18n : todo);
     pin->setDetailTextColor(has_pin ? ui::color_ok() : ui::color_warn());
 
     bool any_limit = false;
@@ -134,7 +151,14 @@ void OnboardingActivity::refresh()
     alarm->setText(brls::getStr("playguard/onboarding/step_alarm", paired ? 5 : 4));
     ui::set_visible(alarm.getView(), alarm_off);
 
+    // Last, once a PIN is set: Ask for the PIN (any mode but "Never").
+    const bool protected_ = config::get().pin_lock != "off";
+    protect->setText(brls::getStr("playguard/onboarding/step_protect", 4 + (paired ? 1 : 0) + (alarm_off ? 1 : 0)));
+    protect->setDetailText(protected_ ? pin_lock::mode_text() : todo);
+    protect->setDetailTextColor(protected_ ? ui::color_ok() : ui::color_warn());
+    ui::set_visible(protect.getView(), has_pin);
+
     const bool done = has_pin && (!pt.fw_supported || any_limit) && (R_FAILED(accuracy_rc) || accurate) && !paired
-                      && !alarm_off;
+                      && !alarm_off && protected_;
     headline->setText(done ? "playguard/onboarding/all_done"_i18n : "playguard/onboarding/headline"_i18n);
 }

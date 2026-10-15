@@ -1,0 +1,45 @@
+# Dépannage
+
+Reprendre la main sur une console bloquée, signaler un bug, et le mode développeur. Retour au [README](../../README.fr.md).
+
+## Console bloquée ?
+
+PlayGuard ne voit que le contrôle parental du système sur lequel il tourne : **l'emuMMC et la sysMMC ont chacune le leur** (un code PIN supprimé sur l'une est toujours là sur l'autre). Lancez-le sur chacune de celles à corriger.
+
+### Console d'occasion
+
+Vous connaissez le code PIN, mais l'application mobile de l'ancien propriétaire est toujours associée (la dissociation échoue, ou la réinitialisation demande son compte).
+
+*Sécurité et appli › Dissocier l'application mobile*, puis, si vous ne voulez plus du tout de contrôle parental, *Supprimer tout le contrôle parental*. Les deux fonctionnent hors ligne, en emuMMC comme en sysMMC.
+
+### Code PIN oublié
+
+*Afficher le code PIN* demande lui-même le code PIN : il ne peut pas aider ici. Avec le module système de récupération installé (ci-dessous), déposez un fichier `RESCUE` et redémarrez : l'écran de récupération en définit alors un nouveau (il n'affiche jamais l'ancien). Sans lui, *Supprimer tout le contrôle parental* permet de repartir de zéro (une sauvegarde des réglages est d'abord enregistrée ; elle ne contient jamais le code PIN) : avec *Demander le code PIN* actif (par défaut, *Avant une modification*), mettez d'abord la carte SD dans un ordinateur et passez `"pin_lock"` à `"off"` dans `sd:/config/playguard/config.json`.
+
+### Le minuteur bloque tout (limite à 0 min) et le code PIN est oublié
+
+PlayGuard lui-même ne peut pas démarrer. Installez **à l'avance** le module système de récupération optionnel (`playguard-rescue.zip`) ; une fois bloqué, déposez un fichier vide `config/playguard/RESCUE` sur la carte SD et démarrez — il déverrouille la console pour que PlayGuard puisse s'ouvrir. Voir [`sysmodule/README.md`](../../sysmodule/README.md) (en anglais).
+
+### Console non modifiée
+
+PlayGuard ne peut rien faire : il nécessite Atmosphère. La procédure officielle passe par la clé maîtresse du service client de Nintendo.
+
+## Signaler un bug
+
+Une erreur affiche le code du système (par exemple `0x0001088E`) avec ce que l'on en sait : quoi faire pour les codes dont le sens est documenté, sinon un rapport aide.
+
+1. *Outils › Exporter un rapport de diagnostic* enregistre un fichier texte dans `sd:/config/playguard/logs/reports/` : firmware, version d'Atmosphère, durée du démarrage, horloges, stockage, masquage du numéro de série, état des patchs de jeux, et le résultat brut de chaque requête au contrôle parental. **Il ne contient jamais le code PIN ni le numéro de série.**
+2. [Ouvrez un ticket](https://github.com/JigSawFr/PlayGuard/issues/new) (en anglais ou en français) et joignez-le.
+
+Ou, console connectée, *Outils › Envoyer un rapport en ligne* (Ⓧ sur le rapport de diagnostic en mode développeur) l'envoie, avec les derniers rapports de crash (les 3 derniers de PlayGuard dans `logs/crashes/`, et les 2 derniers d'Atmosphère d'un homebrew de la semaine passée, dans `sd:/atmosphere/crash_reports/` : le crash d'un autre homebrew peut en faire partie, la liste affichée avant l'envoi dit lesquels) et les fichiers de débogage (la référence du bloc du minuteur, la fin de l'enregistrement du minuteur, l'historique des modifications et les réglages de PlayGuard), dans un gist secret de votre compte GitHub (le rapport et chaque fichier dans un fichier à part ; déconnecté, PlayGuard propose d'abord de se connecter, comme *Compte GitHub* dans les outils développeur), après avoir indiqué exactement ce qui part. PlayGuard affiche le lien et deux QR codes : le rapport, et le formulaire de signalement de bug avec le lien, vos versions, la façon dont PlayGuard a été lancé (par-dessus un jeu ou depuis l'Album ; ajoutez le menu) et le système (sysMMC ou emuMMC) déjà remplis. Toute personne qui a le lien peut lire le rapport, jusqu'à ce que vous supprimiez le gist sur GitHub. Chaque lien est conservé dans `logs/uploads/` sous forme de raccourci Internet (`.url`) qu'un ordinateur ouvre dans son navigateur. Un rapport enregistré plus tôt dans `logs/reports/` peut être envoyé de la même façon.
+
+## Mode développeur (examiner un nouveau firmware)
+
+Appuyez sept fois sur *À propos › Version* ; les outils développeur apparaissent à la fin d'*Outils*. Il ajoute :
+
+- un interrupteur **lecture seule** — activé, l'application ne peut rien modifier : c'est la façon sûre d'examiner un nouveau firmware (l'écran firmware le propose directement) ;
+- le rapport de diagnostic à l'écran (Ⓨ l'enregistre, Ⓧ l'envoie en ligne), et un raccourci pour l'exporter depuis l'onglet Temps de jeu ;
+- **Installer un autre build** sur place, pour tester un correctif avant sa publication : la dernière version publiée, l'un des 20 derniers commits de `main`, ou le dernier build d'une pull request ouverte depuis une branche de ce dépôt (jamais depuis un fork : son code n'a pas encore été relu), chaque catégorie dans un onglet à part (Ⓛ / Ⓡ passent de l'un à l'autre ; l'écran s'ouvre sur celui du build installé), le build installé signalé ; Ⓨ trie les pull requests (build le plus récent d'abord, ou par numéro). La version publiée ne demande rien ; les autres sont les artefacts du workflow de build, que GitHub ne donne qu'aux utilisateurs connectés : **Compte GitHub** connecte PlayGuard avec un code et un QR code à scanner avec un téléphone (seules autorisations demandées : lire les fichiers du workflow de build (Actions) et créer des gists, pour *Envoyer un rapport en ligne* ; sinon le jeton ne peut lire que ce qui est public ; il est gardé dans `github_token`, jamais envoyé avec un rapport, et *Compte GitHub* permet de se déconnecter). PlayGuard télécharge le build, le vérifie (taille, empreinte SHA-256 enregistrée par GitHub, en-tête NRO), le met à la place de son propre `.nro` et redémarre dessus (le code PIN est d'abord demandé dès qu'il y en a un). La liste est gardée 10 minutes et s'affiche aussitôt, avec son ancienneté (Ⓧ la recharge). La même liste permet de revenir à la version publiée à tout moment ; *À propos › Version* affiche le commit en mode développeur. L'en-tête de chaque écran affiche la version en cours à droite : une version publiée en gris, `v1.2.0`, tout autre build avec une étiquette **DEV** orange, sa version et son commit, pour ne jamais confondre un build de test avec la version publiée. Les artefacts expirent au bout de 90 jours ;
+- **Comparer le bloc du temps de jeu** (aussi dans *Sécurité et appli* tant que l'application mobile est associée), pour décoder les réglages que PlayGuard n'affiche pas encore : enregistrez le bloc brut comme référence, changez un réglage dans l'application mobile, revenez — PlayGuard liste les valeurs qui ont changé (enregistrées dans `logs/reports/` sur demande). Des heures du coucher différentes selon les jours, réglées depuis l'application mobile, pourraient être confirmées ainsi. Joignez ce fichier à un ticket, ou envoyez-le avec le rapport (*Envoyer un rapport en ligne*).
+- **Enregistrer le temps de jeu** : toutes les 30 s tant que PlayGuard est ouvert, une ligne de ce que rapporte le minuteur (temps restant, temps écoulé, bloc brut des réglages…) dans `logs/play_timer/log.csv`, un fichier qui s'ouvre dans un tableur, plus une ligne juste après chaque modification faite par PlayGuard, qui dit laquelle (la dernière colonne, `event`), et une note quand l'horloge a bougé plus que le temps écoulé. Laissé ouvert après minuit, ou jusqu'à la fin du temps, il montre ce qu'un seul rapport ne peut pas montrer : quand le temps écoulé repart à zéro, ce que dit la console vers la fin. L'interrupteur est mémorisé ; il n'enregistre qu'en mode développeur. Ce qu'on sait déjà est dans [parental-controls.md](../parental-controls.md) (en anglais).
+- **Vider le cache** et **Supprimer les fichiers journaux**, chacun après une confirmation qui indique combien de fichiers et quelle place : le cache (`cache/` et le `nand/<système>/cache/` de chaque système : noms et icônes des jeux, derniers chiffres de l'Activité, liste des builds) est relu sur la console au besoin ; les fichiers journaux sont les fichiers de plantage, les rapports enregistrés et l'enregistrement du temps de jeu, tandis que `uploads/` (les liens de suppression des rapports envoyés en ligne) et la référence du bloc restent. Les réglages, l'historique, les sauvegardes, les profils et les exports ne sont jamais touchés.

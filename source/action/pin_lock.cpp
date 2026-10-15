@@ -5,6 +5,7 @@
 #include <chrono>
 #include <vector>
 
+#include "action/pin_lock_logic.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -16,38 +17,67 @@ namespace pin_lock
 
 namespace
 {
-constexpr auto GRACE = std::chrono::minutes(5);
-// One action can make several changes (a restore): after a refusal, the
-// next ones are refused too instead of asking once per change.
-constexpr auto REFUSAL_HOLDS = std::chrono::seconds(3);
-std::chrono::steady_clock::time_point s_confirmed_until, s_refused_until;
-Result s_last_rc = 0;   // what the last ask() got
-const char* MODES[] = { "off", "changes", "open" };
+using pin_lock_logic::MODES;
+using pin_lock_logic::rank;
 
-int rank(const std::string& mode)
-{
-    for (int i = 0; i < 3; i++)
-        if (mode == MODES[i]) return i;
-    return 0;
-}
+std::chrono::steady_clock::time_point s_confirmed_until, s_refused_until;
+std::chrono::steady_clock::time_point s_pin_at;        // when the PIN was last entered
+std::chrono::steady_clock::time_point s_reveal_until;  // before_show_pin() just asked
+std::chrono::steady_clock::time_point s_away_since;    // out of focus since (s_away)
+bool s_away = false;
+Result s_last_rc = 0;   // what the last ask() got
 
 // The service layer's change check (write_guard.h). Runs on the UI thread,
 // with no pctl session open.
 bool check()
 {
-    if (config::get().pin_lock != "changes") return true;
-    const auto now = std::chrono::steady_clock::now();
-    if (now < s_confirmed_until) return true;
-    if (now < s_refused_until) return false;
+    using pin_lock_logic::Check;
+    const Check c = pin_lock_logic::check(config::get().pin_lock, std::chrono::steady_clock::now(),
+                                          s_confirmed_until, s_refused_until);
+    if (c == Check::Allow) return true;
+    if (c == Check::Refuse) return false;
     if (ask()) return true;
-    s_refused_until = std::chrono::steady_clock::now() + REFUSAL_HOLDS;
+    // Held from the end of the PIN screen, not from when it opened.
+    s_refused_until = std::chrono::steady_clock::now() + pin_lock_logic::REFUSAL_HOLDS;
     return false;
+}
+
+// The service layer's reveal check: the PIN every time, whatever the mode,
+// the grace or the lock screen let through. Whoever may see the PIN knows it.
+bool reveal_check()
+{
+    const auto now = std::chrono::steady_clock::now();
+    if (now < s_reveal_until) {   // asked by before_show_pin() a moment ago: once
+        s_reveal_until = {};
+        return true;
+    }
+    return ask();
 }
 }   // namespace
 
 void install()
 {
     core_set_change_check(check);
+    core_set_reveal_check(reveal_check);
+}
+
+void watch_focus(std::function<void()> lock)
+{
+    brls::Application::getWindowFocusChangedEvent()->subscribe([lock](bool focused) {
+        const auto now = std::chrono::steady_clock::now();
+        if (!focused) {
+            if (!s_away) s_away_since = now;
+            s_away = true;
+            return;
+        }
+        if (!s_away) return;
+        s_away = false;
+        const auto since = s_away_since;
+        // After this frame: a PIN screen that took the focus has returned by then.
+        brls::sync([lock, since, now]() {
+            if (pin_lock_logic::lock_again(config::get().pin_lock, since, now, s_pin_at)) lock();
+        });
+    });
 }
 
 bool at_start()
@@ -61,10 +91,22 @@ bool ask()
     s_last_rc = rc;
     brls::Logger::info("pctl_ask_pin returned 0x{:08X}", (unsigned)rc);
     if (R_SUCCEEDED(rc)) {
-        s_confirmed_until = std::chrono::steady_clock::now() + GRACE;
+        s_pin_at = std::chrono::steady_clock::now();
+        s_confirmed_until = s_pin_at + pin_lock_logic::GRACE;
         return true;
     }
     return rc == NXM_RC_NO_PIN;   // nothing to ask for
+}
+
+bool before_show_pin()
+{
+    if (!ask()) {
+        ui::notify(refusal_text());
+        return false;
+    }
+    // The read that follows at once does not ask a second time.
+    s_reveal_until = std::chrono::steady_clock::now() + std::chrono::seconds(3);
+    return true;
 }
 
 std::string refusal_text()
@@ -94,17 +136,17 @@ void choose(std::function<void()> done)
         PctlStatus st;
         pctl_status_fetch(&st);
         const bool has_pin = st.pin_length_ok && st.pin_length > 0;
-        if (index > 0 && !has_pin) {   // nothing to ask for: it would protect nothing
+        const pin_lock_logic::Change change = pin_lock_logic::change(from, index, has_pin);
+        if (change == pin_lock_logic::Change::NoPin) {
             ui::notify("playguard/pin_lock/no_pin"_i18n);
             return;
         }
-        // Less protection than now: only the parent may choose it.
-        if (index < rank(from) && has_pin && !ask()) {
+        if (change == pin_lock_logic::Change::AskPin && !ask()) {
             ui::notify(refusal_text());
             return;
         }
         config::get().pin_lock = to;
-        if (ui::save_config()) ui::notify(brls::getStr("playguard/pin_lock/set", labels[index]));
+        ui::save_config(brls::getStr("playguard/pin_lock/set", labels[index]));
         if (done) done();
     });
 }

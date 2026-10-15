@@ -13,8 +13,10 @@
  * Command IDs for IParentalControlService.
  * Reference: https://switchbrew.org/wiki/Parental_Control_services
  * What was found on hardware is gathered in docs/parental-controls.md.
- * Checked against the command table up to 23.0.1 (no ID used here changed
- * between 21.0.0 and 23.0.1; 23.0.0 only *added* 1023/1412/1460/2025-2027/9407).
+ * Checked against the command table up to 23.0.1 (PCTL_FW_TABLE_CHECKED: no ID
+ * used here changed between 21.0.0 and 23.0.1; 23.0.0 only *added*
+ * 1023/1412/1460/2025-2027/9407). Verified on a console up to 22.5.0
+ * (PCTL_FW_TESTED_MAX): newer goes through the firmware gate.
  *
  *   1006 IsRestrictionTemporaryUnlocked   -> bool
  *   1007 RevertRestrictionTemporaryUnlocked (no args)
@@ -280,7 +282,7 @@ Result pctl_get_pin(char *out, size_t out_size)
 {
     if (out && out_size) secure_zero(out, out_size);
     pctl_ops_exit();   // nothing held while the PIN check may show its applet
-    Result gate = core_change_allowed();   // showing the PIN counts as a change
+    Result gate = core_reveal_allowed();   // asked every time (write_guard.h)
     if (R_FAILED(gate)) return gate;
     if (!out || out_size == 0) return NXM_RC_INVALID_ARGUMENT;
     // Same session handling as the unlock above, where 1208 was validated.
@@ -409,7 +411,11 @@ static Result pt_write_gate(Service *srv, bool *active)
     if (R_SUCCEEDED(rc)) rc = rd_bool(srv, 1455, &restricted);
     if (R_SUCCEEDED(rc)) rc = rd_bool(srv, 1006, &unlocked);
     if (R_FAILED(rc)) return rc;
-    if (active) *active = enabled || restricted;
+    // Temporarily unlocked, 1453 reads false even with a limit set
+    // (docs/parental-controls.md), and every write while the timer counts
+    // goes through that unlock: count it as active too, or a failed read of
+    // the block would let a zeroed one through.
+    if (active) *active = enabled || restricted || unlocked;
     return ((enabled || restricted) && !unlocked) ? NXM_RC_WRITE_GATED : 0;
 }
 
@@ -444,17 +450,23 @@ static void pt_read_core(Service *srv, PtState *out)
     out->enabled_valid = R_SUCCEEDED(out->enabled_rc);
     out->restricted_rc = rd_bool(srv, 1455, &out->restricted);
     out->restricted_valid = R_SUCCEEDED(out->restricted_rc);
-    out->remaining_rc = rd_u64(srv, 1454, &out->remaining_ns);
+    out->remaining_rc = rd_u64(srv, 1454, (u64 *)&out->remaining_ns);   // a TimeSpan: signed
     out->remaining_valid = R_SUCCEEDED(out->remaining_rc);
 
     u16 c[PT_U16_COUNT];
     memset(c, 0, sizeof(c));
     out->config_rc = serviceDispatchOut(srv, 145601, c);
     if (R_SUCCEEDED(out->config_rc)) {
+        memcpy(out->block, c, sizeof(out->block));
+        // Not the known layout: nothing decoded from it is shown or reused
+        // (the block itself is kept, as read).
+        if (!pt_plausible(c)) out->config_rc = NXM_RC_PT_NOT_UNDERSTOOD;
+    }
+    if (R_SUCCEEDED(out->config_rc)) {
         out->valid = true;
         pt_decode(c, out->day_min);
         pt_bedtime_decode(c, out->bed);
-        memcpy(out->block, c, sizeof(out->block));
+        out->alarm_only = !pt_suspends(c);
     }
 
     bool be = false;
@@ -550,6 +562,12 @@ Result pctl_play_timer_set_days(const u16 days_min[7])
     u16 c[PT_U16_COUNT];
     memset(c, 0, sizeof(c));
     const bool have_current = R_SUCCEEDED(serviceDispatchOut(srv, 145601, c));
+    // Read, but not a layout this app knows: writing from it could break what
+    // it holds, and a zeroed block would wipe it.
+    if (have_current && !pt_plausible(c)) {
+        pctl_ops_exit();
+        return NXM_RC_PT_NOT_UNDERSTOOD;
+    }
     if (!have_current) {
         memset(c, 0, sizeof(c));
         bool any = false;
@@ -559,10 +577,30 @@ Result pctl_play_timer_set_days(const u16 days_min[7])
             return NXM_RC_STATE_UNKNOWN;
         }
     }
+    u16 before[PT_U16_COUNT];
+    memcpy(before, c, sizeof(before));
     pt_encode(c, days_min);
     rc = serviceDispatchIn(srv, 195101, c);
+    if (R_FAILED(rc)) {
+        pctl_ops_exit();
+        return rc;
+    }
+
+    // 195101 is a debug command: read the block back, as the bedtime write
+    // does, so "written" is never said of limits the console did not take.
+    // An unreadable block proves nothing either way: the write stands.
+    u16 back[PT_U16_COUNT], want[7], got[7];
+    if (R_SUCCEEDED(serviceDispatchOut(srv, 145601, back))) {
+        pt_decode(c, want);
+        pt_decode(back, got);
+        if (memcmp(want, got, sizeof(want)) != 0) {
+            if (have_current) rc = serviceDispatchIn(srv, 195101, before);
+            pctl_ops_exit();
+            return R_FAILED(rc) ? rc : NXM_RC_NOT_APPLIED;
+        }
+    }
     pctl_ops_exit();
-    return rc;
+    return 0;
 }
 
 Result pctl_play_timer_set_uniform(u16 minutes)
@@ -611,6 +649,10 @@ Result pctl_play_timer_set_bedtime(const PtBedtime bed[7], int today)
         pctl_ops_exit();
         return NXM_RC_STATE_UNKNOWN;
     }
+    if (!pt_plausible(before)) {
+        pctl_ops_exit();
+        return NXM_RC_PT_NOT_UNDERSTOOD;
+    }
     memcpy(c, before, sizeof(c));
     pt_bedtime_encode(c, bed);
     if (memcmp(c, before, sizeof(c)) == 0) {
@@ -634,6 +676,60 @@ Result pctl_play_timer_set_bedtime(const PtBedtime bed[7], int today)
     rc = serviceDispatchIn(srv, 195101, before);
     pctl_ops_exit();
     return R_FAILED(rc) ? rc : NXM_RC_NOT_APPLIED;
+}
+
+Result pctl_play_timer_set_alarm_only(bool alarm_only)
+{
+    pctl_ops_exit();   // nothing held while the PIN check may show its applet
+    Result gate = core_change_allowed();
+    if (R_FAILED(gate)) return gate;
+    if (!pt_fw_supported()) return NXM_RC_FW_UNSUPPORTED;
+
+    Result rc = pctl_ops_reinit();
+    if (R_FAILED(rc)) return rc;
+    Service *srv = pctlGetServiceSession_Service();
+    rc = pt_write_gate(srv, NULL);
+    if (R_FAILED(rc)) {
+        pctl_ops_exit();
+        return rc;
+    }
+
+    // Only ever from the block as it is: a zeroed one would wipe the limits.
+    u16 before[PT_U16_COUNT], c[PT_U16_COUNT];
+    memset(before, 0, sizeof(before));
+    if (R_FAILED(serviceDispatchOut(srv, 145601, before))) {
+        pctl_ops_exit();
+        return NXM_RC_STATE_UNKNOWN;
+    }
+    if (!pt_plausible(before)) {
+        pctl_ops_exit();
+        return NXM_RC_PT_NOT_UNDERSTOOD;
+    }
+    memcpy(c, before, sizeof(c));
+    if (!pt_set_suspends(c, !alarm_only)) {
+        pctl_ops_exit();
+        return NXM_RC_INVALID_ARGUMENT;
+    }
+    if (memcmp(c, before, sizeof(c)) == 0) {
+        pctl_ops_exit();
+        return 0;
+    }
+    rc = serviceDispatchIn(srv, 195101, c);
+    if (R_FAILED(rc)) {
+        pctl_ops_exit();
+        return rc;
+    }
+
+    // A debug command: read back, as the other play-timer writes. An
+    // unreadable block proves nothing either way: the write stands.
+    u16 back[PT_U16_COUNT];
+    if (R_SUCCEEDED(serviceDispatchOut(srv, 145601, back)) && pt_suspends(back) == alarm_only) {
+        rc = serviceDispatchIn(srv, 195101, before);
+        pctl_ops_exit();
+        return R_FAILED(rc) ? rc : NXM_RC_NOT_APPLIED;
+    }
+    pctl_ops_exit();
+    return 0;
 }
 
 Result pctl_play_timer_set_alarm_disabled(bool disabled)
@@ -671,7 +767,7 @@ void pctl_play_timer_sample(PtSample *out)
     out->enabled_rc    = rd_bool(srv, 1453, &out->enabled);
     out->restricted_rc = rd_bool(srv, 1455, &out->restricted);
     out->alarm_off_rc  = rd_bool(srv, 1458, &out->alarm_off);
-    out->remaining_rc  = rd_u64(srv, 1454, &out->remaining_ns);
+    out->remaining_rc  = rd_u64(srv, 1454, (u64 *)&out->remaining_ns);   // signed
     out->block_rc      = serviceDispatchOut(srv, 145601, out->block);
     out->bedtime_rc    = rd_bool(srv, 1954, &out->bedtime_on);
     if (R_SUCCEEDED(out->bedtime_rc)) out->bedtime_rc = rd_u8(srv, 1956, &out->bedtime_hour);
@@ -765,7 +861,11 @@ void pctl_dump(char *buf, size_t bufsz)
     rep_u32 (&p, e, srv, 1032, "GetSafetyLevel");
     rep_bool(&p, e, srv, 1031, "IsRestrictionEnabled");
     rep_bool(&p, e, srv, 1006, "IsRestrictionTemporaryUnlocked");
-    rep_u32 (&p, e, srv, 1206, "GetPinCodeLength");
+    // Whether a PIN is set, not its length: a report may be posted online,
+    // and the length narrows the guessing.
+    { u32 len = 0; Result r = rd_u32(srv, 1206, &len);
+      rep(&p, e, "%6u %-38s rc=0x%08X  %s\n", 1206u, "GetPinCodeLength", (unsigned)r,
+          R_SUCCEEDED(r) ? (len ? "set (length not recorded)" : "none") : "-"); }
     rep_u32 (&p, e, srv, 1037, "GetDefaultRatingOrganization");
     rep_u32 (&p, e, srv, 1039, "GetFreeCommunicationApplicationListCount");
     rep_bool(&p, e, srv, 1403, "IsPairingActive");
@@ -869,6 +969,8 @@ void pctl_dump(char *buf, size_t bufsz)
               else rep(&p, e, " -");
           }
           rep(&p, e, "   header=%04X %04X\n", c[0], c[1]);
+          rep(&p, e, "modes: timerMode=%s restrictionMode=%s\n",
+              pt_daily(c) ? "DAILY" : "EACH_DAY_OF_THE_WEEK", pt_suspends(c) ? "FORCED_TERMINATION" : "ALARM");
           PtBedtime bt[7];
           pt_bedtime_decode(c, bt);
           rep(&p, e, "decoded bedtime Sun..Sat (alarm/allowed again):");

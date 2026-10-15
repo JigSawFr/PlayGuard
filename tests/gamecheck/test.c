@@ -6,7 +6,7 @@
 // removals (the whole game, an update or an add-on with the HOME menu entry
 // rebuilt), the launch version reset and the integrity check, each behind
 // the read-only and PIN gates; the system-version and key-generation tables.
-#include <assert.h>
+#include "check.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -169,14 +169,14 @@ Result nsInitialize(void)
 
 void nsExit(void)
 {
-    assert(C.ns_open > 0);
-    assert(C.am_open == 0 && C.async_open == 0);   // what hangs off ns first
+    REQUIRE(C.ns_open > 0);
+    REQUIRE(C.am_open == 0 && C.async_open == 0);   // what hangs off ns first
     C.ns_open--;
 }
 
 Result nsListApplicationRecord(NsApplicationRecord *records, s32 count, s32 entry_offset, s32 *out)
 {
-    assert(C.ns_open == 1);
+    REQUIRE(C.ns_open == 1);
     if (C.list_rc) return C.list_rc;
     s32 n = 0;
     for (s32 i = entry_offset; i < C.count && n < count; i++, n++) {
@@ -191,7 +191,7 @@ Result nsListApplicationRecord(NsApplicationRecord *records, s32 count, s32 entr
 Result nsGetApplicationControlData(NsApplicationControlSource source, u64 id, NsApplicationControlData *buffer, size_t size,
                                    u64 *actual)
 {
-    assert(C.ns_open == 1 && source == NsApplicationControlSource_Storage && size == sizeof(*buffer));
+    REQUIRE(C.ns_open == 1 && source == NsApplicationControlSource_Storage && size == sizeof(*buffer));
     const FakeGame *g = find(id);
     if (!g || !g->name) return 0x1234;
     memset(&buffer->nacp, 0, sizeof(buffer->nacp));
@@ -210,7 +210,7 @@ Result nacpGetLanguageEntry(NacpStruct *nacp, NacpLanguageEntry **entry)
 
 Result nsListApplicationContentMetaStatus(u64 id, s32 index, NsApplicationContentMetaStatus *list, s32 count, s32 *out)
 {
-    assert(C.ns_open == 1);
+    REQUIRE(C.ns_open == 1);
     const FakeGame *g = find(id);
     if (!g) return 0x2345;
     s32 n = 0, seen = 0;
@@ -231,14 +231,14 @@ Result nsListApplicationContentMetaStatus(u64 id, s32 index, NsApplicationConten
 
 Result nsCheckApplicationLaunchVersion(u64 id)
 {
-    assert(C.ns_open == 1);
+    REQUIRE(C.ns_open == 1);
     const FakeGame *g = find(id);
     return g ? g->launch_rc : 0x3456;
 }
 
 Result nsDeleteApplicationCompletely(u64 id)
 {
-    assert(C.ns_open == 1);
+    REQUIRE(C.ns_open == 1);
     if (C.delete_rc) return C.delete_rc;
     C.deleted = id;
     FakeGame *g = find(id);
@@ -251,7 +251,7 @@ Result nsDeleteApplicationCompletely(u64 id)
 
 Result nsGetApplicationView(NsApplicationView *views, const u64 *ids, s32 count)
 {
-    assert(C.ns_open == 1 && count == 1);
+    REQUIRE(C.ns_open == 1 && count == 1);
     if (C.view_rc) return C.view_rc;
     const FakeGame *g = find(ids[0]);
     memset(views, 0, sizeof(*views));
@@ -265,7 +265,7 @@ Result nsGetApplicationView(NsApplicationView *views, const u64 *ids, s32 count)
 
 Result nsGetApplicationManagerInterface(Service *out)
 {
-    assert(C.ns_open == 1);
+    REQUIRE(C.ns_open == 1);
     out->id = SRV_AM;
     out->open = true;
     C.am_open++;
@@ -274,13 +274,13 @@ Result nsGetApplicationManagerInterface(Service *out)
 
 Service *nsGetServiceSession_ApplicationManagerInterface(void)
 {
-    assert(!"pre-3.0.0 only");
+    REQUIRE(!"pre-3.0.0 only");
     return NULL;
 }
 
 Result smGetService(Service *out, const char *name)
 {
-    assert(strcmp(name, "es") == 0);
+    REQUIRE(strcmp(name, "es") == 0);
     if (C.es_rc) return C.es_rc;
     out->id = SRV_ES;
     out->open = true;
@@ -290,7 +290,7 @@ Result smGetService(Service *out, const char *name)
 
 void serviceClose(Service *srv)
 {
-    assert(srv->open);
+    REQUIRE(srv->open);
     srv->open = false;
     if (srv->id == SRV_ES) C.es_open--;
     if (srv->id == SRV_AM) C.am_open--;
@@ -302,31 +302,31 @@ void serviceClose(Service *srv)
 Result mock_dispatch(Service *srv, u32 command, void *out, size_t out_size, const void *in, size_t in_size,
                      SfDispatchParams p)
 {
-    assert(srv && srv->open);
+    REQUIRE(srv && srv->open);
     if (srv->id == SRV_ES) {
-        assert(C.es_open == 1);
+        REQUIRE(C.es_open == 1);
         if (command == 9 || command == 10) {
-            assert(out_size == sizeof(u32));
+            REQUIRE(out_size == sizeof(u32));
             *(u32 *)out = command == 9 ? (u32)C.ticket_count : 0;
             return 0;
         }
         if (command == 11 || command == 12) {
-            assert(out_size == sizeof(u32) && (p.buffer_attrs[0] & SfBufferAttr_Out));
+            REQUIRE(out_size == sizeof(u32) && (p.buffer_attrs[0] & SfBufferAttr_Out));
             const u32 room = (u32)(p.buffers[0].size / sizeof(FsRightsId));
             const u32 n = command == 11 ? ((u32)C.ticket_count < room ? (u32)C.ticket_count : room) : 0;
             memcpy((void *)p.buffers[0].ptr, C.tickets, n * sizeof(FsRightsId));
             *(u32 *)out = n;
             return 0;
         }
-        assert(!"unexpected es command");
+        REQUIRE(!"unexpected es command");
     }
-    assert(srv->id == SRV_AM && C.am_open == 1);
+    REQUIRE(srv->id == SRV_AM && C.am_open == 1);
     if (command == 17) {
-        assert(in_size == 16 && out_size == sizeof(s32) && (p.buffer_attrs[0] & SfBufferAttr_Out));
+        REQUIRE(in_size == 16 && out_size == sizeof(s32) && (p.buffer_attrs[0] & SfBufferAttr_Out));
         u64 args[2];
         memcpy(args, in, sizeof(args));
         const FakeGame *g = find(args[1]);
-        assert(args[0] == 0 && g && g->record);
+        REQUIRE(args[0] == 0 && g && g->record);
         RecordMetaWire *w = (RecordMetaWire *)p.buffers[0].ptr;
         const s32 room = (s32)(p.buffers[0].size / sizeof(RecordMetaWire));
         s32 n = 0;
@@ -344,7 +344,7 @@ Result mock_dispatch(Service *srv, u32 command, void *out, size_t out_size, cons
         return 0;
     }
     if (command == 27) {
-        assert(in_size == sizeof(u64));
+        REQUIRE(in_size == sizeof(u64));
         u64 id;
         memcpy(&id, in, sizeof(id));
         FakeGame *g = find(id);
@@ -354,20 +354,20 @@ Result mock_dispatch(Service *srv, u32 command, void *out, size_t out_size, cons
         return 0;
     }
     if (command == 16) {
-        assert(in_size == 16 && (p.buffer_attrs[0] & SfBufferAttr_In));
+        REQUIRE(in_size == 16 && (p.buffer_attrs[0] & SfBufferAttr_In));
         const u8 *bytes = (const u8 *)in;
-        assert(bytes[0] == 3);   // Present
+        REQUIRE(bytes[0] == 3);   // Present
         u64 id;
         memcpy(&id, bytes + 8, sizeof(id));
         FakeGame *g = find(id);
-        assert(g && !g->record);   // deleted first
+        REQUIRE(g && !g->record);   // deleted first
         g->record = true;
         C.pushes++;
         C.pushed_count = (int)(p.buffers[0].size / sizeof(RecordMetaWire));
         memcpy(C.pushed, p.buffers[0].ptr, p.buffers[0].size);
         return 0;
     }
-    assert(!"unexpected application manager command");
+    REQUIRE(!"unexpected application manager command");
     return 1;
 }
 
@@ -382,14 +382,14 @@ Result ncmInitialize(void)
 
 void ncmExit(void)
 {
-    assert(C.ncm_open > 0 && C.db_open == 0 && C.cs_open == 0);   // the storages first
+    REQUIRE(C.ncm_open > 0 && C.db_open == 0 && C.cs_open == 0);   // the storages first
     C.ncm_open--;
 }
 
 static Result open_storage(NcmStorageId id)
 {
-    assert(C.ncm_open == 1);
-    assert(id == NcmStorageId_BuiltInUser || id == NcmStorageId_SdCard);   // never the game card
+    REQUIRE(C.ncm_open == 1);
+    REQUIRE(id == NcmStorageId_BuiltInUser || id == NcmStorageId_SdCard);   // never the game card
     return id == NcmStorageId_SdCard && C.sd_unopenable ? 0x4567 : 0;
 }
 
@@ -415,21 +415,21 @@ Result ncmOpenContentStorage(NcmContentStorage *out, NcmStorageId id)
 
 void ncmContentMetaDatabaseClose(NcmContentMetaDatabase *db)
 {
-    assert(db->open);
+    REQUIRE(db->open);
     db->open = false;
     C.db_open--;
 }
 
 void ncmContentStorageClose(NcmContentStorage *cs)
 {
-    assert(cs->open);
+    REQUIRE(cs->open);
     cs->open = false;
     C.cs_open--;
 }
 
 Result ncmContentMetaDatabaseHas(NcmContentMetaDatabase *db, bool *out, const NcmContentMetaKey *key)
 {
-    assert(db->open);
+    REQUIRE(db->open);
     const FakeMeta *m = meta_of(db->storage, key);
     *out = m && m->registered;
     return 0;
@@ -437,7 +437,7 @@ Result ncmContentMetaDatabaseHas(NcmContentMetaDatabase *db, bool *out, const Nc
 
 Result ncmContentMetaDatabaseGetRequiredSystemVersion(NcmContentMetaDatabase *db, u32 *out, const NcmContentMetaKey *key)
 {
-    assert(db->open);
+    REQUIRE(db->open);
     const FakeMeta *m = meta_of(db->storage, key);
     if (!m || !m->registered) return 0x5678;
     *out = m->required_sysver;
@@ -447,7 +447,7 @@ Result ncmContentMetaDatabaseGetRequiredSystemVersion(NcmContentMetaDatabase *db
 Result ncmContentMetaDatabaseListContentInfo(NcmContentMetaDatabase *db, s32 *written, NcmContentInfo *info, s32 count,
                                              const NcmContentMetaKey *key, s32 start)
 {
-    assert(db->open);
+    REQUIRE(db->open);
     FakeMeta *m = meta_of(db->storage, key);
     if (!m || !m->registered) return 0x5678;
     s32 n = 0;
@@ -461,7 +461,7 @@ Result ncmContentMetaDatabaseListContentInfo(NcmContentMetaDatabase *db, s32 *wr
 
 Result ncmContentStorageHas(NcmContentStorage *cs, bool *out, const NcmContentId *id)
 {
-    assert(cs->open);
+    REQUIRE(cs->open);
     int file;
     const FakeMeta *m = meta_of_content(id, &file);
     *out = file < m->files_present && file >= m->files_deleted;
@@ -471,7 +471,7 @@ Result ncmContentStorageHas(NcmContentStorage *cs, bool *out, const NcmContentId
 Result ncmContentStorageGetRightsIdFromContentId(NcmContentStorage *cs, NcmRightsId *out, const NcmContentId *id,
                                                  FsContentAttributes attr)
 {
-    assert(cs->open && attr == FsContentAttributes_All);
+    REQUIRE(cs->open && attr == FsContentAttributes_All);
     int file;
     const FakeMeta *m = meta_of_content(id, &file);
     memset(out, 0, sizeof(*out));
@@ -482,19 +482,19 @@ Result ncmContentStorageGetRightsIdFromContentId(NcmContentStorage *cs, NcmRight
 
 Result ncmContentStorageDelete(NcmContentStorage *cs, const NcmContentId *id)
 {
-    assert(cs->open);
+    REQUIRE(cs->open);
     int file;
     FakeMeta *m = meta_of_content(id, &file);
-    assert(file == m->files_deleted);   // each file once, in order
+    REQUIRE(file == m->files_deleted);   // each file once, in order
     m->files_deleted++;
     return 0;
 }
 
 Result ncmContentMetaDatabaseRemove(NcmContentMetaDatabase *db, const NcmContentMetaKey *key)
 {
-    assert(db->open);
+    REQUIRE(db->open);
     FakeMeta *m = meta_of(db->storage, key);
-    assert(m && m->files_deleted == m->files_present);   // the files first
+    REQUIRE(m && m->files_deleted == m->files_present);   // the files first
     m->registered = false;
     m->installed = false;
     return 0;
@@ -502,7 +502,7 @@ Result ncmContentMetaDatabaseRemove(NcmContentMetaDatabase *db, const NcmContent
 
 Result ncmContentMetaDatabaseCommit(NcmContentMetaDatabase *db)
 {
-    assert(db->open);
+    REQUIRE(db->open);
     C.commits++;
     return 0;
 }
@@ -511,7 +511,7 @@ Result ncmContentMetaDatabaseCommit(NcmContentMetaDatabase *db)
 
 Result avmInitialize(void)
 {
-    assert(hosversionAtLeast(6, 0, 0));
+    REQUIRE(hosversionAtLeast(6, 0, 0));
     if (C.avm_init_rc) return C.avm_init_rc;
     C.avm_open++;
     return 0;
@@ -519,13 +519,13 @@ Result avmInitialize(void)
 
 void avmExit(void)
 {
-    assert(C.avm_open > 0);
+    REQUIRE(C.avm_open > 0);
     C.avm_open--;
 }
 
 Result avmGetLaunchRequiredVersion(u64 id, u32 *version)
 {
-    assert(C.avm_open == 1);
+    REQUIRE(C.avm_open == 1);
     const FakeGame *g = find(id);
     if (!g || !g->launch_known) return 0x6789;
     *version = g->launch_required;
@@ -534,7 +534,7 @@ Result avmGetLaunchRequiredVersion(u64 id, u32 *version)
 
 Result avmPushLaunchVersion(u64 id, u32 version)
 {
-    assert(C.avm_open == 1);
+    REQUIRE(C.avm_open == 1);
     C.avm_pushes++;
     FakeGame *g = find(id);
     if (g && !C.avm_ignores_push) {
@@ -548,8 +548,8 @@ Result avmPushLaunchVersion(u64 id, u32 version)
 
 Result nsRequestVerifyApplication(NsProgressAsyncResult *a, u64 id, u32 unk, void *buffer, size_t size)
 {
-    assert(C.ns_open == 1 && unk == 0x7 && buffer && size == 0x100000 && ((uintptr_t)buffer & 0xFFF) == 0);
-    assert(find(id));
+    REQUIRE(C.ns_open == 1 && unk == 0x7 && buffer && size == 0x100000 && ((uintptr_t)buffer & 0xFFF) == 0);
+    REQUIRE(find(id));
     if (C.verify_rc) return C.verify_rc;
     a->open = true;
     C.async_open++;
@@ -558,13 +558,13 @@ Result nsRequestVerifyApplication(NsProgressAsyncResult *a, u64 id, u32 unk, voi
 
 Result nsProgressAsyncResultWait(NsProgressAsyncResult *a, u64 timeout)
 {
-    assert(a->open && timeout > 0);
+    REQUIRE(a->open && timeout > 0);
     return ++C.verify_waits < 4 ? KERNELRESULT(TimedOut) : 0;
 }
 
 Result nsProgressAsyncResultGetProgress(NsProgressAsyncResult *a, void *buffer, size_t size)
 {
-    assert(a->open && size == sizeof(NsSystemUpdateProgress));
+    REQUIRE(a->open && size == sizeof(NsSystemUpdateProgress));
     NsSystemUpdateProgress *p = (NsSystemUpdateProgress *)buffer;
     p->current_size = C.verify_waits * 100;
     p->total_size = C.verify_waits == 1 ? 0 : 400;
@@ -573,26 +573,26 @@ Result nsProgressAsyncResultGetProgress(NsProgressAsyncResult *a, void *buffer, 
 
 Result nsProgressAsyncResultGet(NsProgressAsyncResult *a)
 {
-    assert(a->open);
+    REQUIRE(a->open);
     return 0;
 }
 
 Result nsProgressAsyncResultGetDetailResult(NsProgressAsyncResult *a)
 {
-    assert(a->open);
+    REQUIRE(a->open);
     return C.verify_corrupt ? 0x2E02 : 0;
 }
 
 Result nsProgressAsyncResultCancel(NsProgressAsyncResult *a)
 {
-    assert(a->open);
+    REQUIRE(a->open);
     C.verify_cancels++;
     return 0;
 }
 
 void nsProgressAsyncResultClose(NsProgressAsyncResult *a)
 {
-    assert(a->open);
+    REQUIRE(a->open);
     a->open = false;
     C.async_open--;
 }
@@ -607,15 +607,15 @@ static GameCheck R;
 
 static void all_closed(void)
 {
-    assert(C.ns_open == 0 && C.ncm_open == 0 && C.db_open == 0 && C.cs_open == 0);
-    assert(C.avm_open == 0 && C.es_open == 0 && C.am_open == 0 && C.async_open == 0);
+    CHECK(C.ns_open == 0 && C.ncm_open == 0 && C.db_open == 0 && C.cs_open == 0);
+    CHECK(C.avm_open == 0 && C.es_open == 0 && C.am_open == 0 && C.async_open == 0);
 }
 
 static const GameFacts *facts(u64 id)
 {
     for (u32 i = 0; i < R.count; i++)
         if (R.games[i].app_id == id) return &R.games[i];
-    assert(!"game not scanned");
+    REQUIRE(!"game not scanned");
     return NULL;
 }
 
@@ -634,23 +634,23 @@ static void scan(void)
 
 static void test_tables(void)
 {
-    assert(gamecheck_sysver_to_hos(0) == 0);
-    assert(gamecheck_sysver_to_hos(SYSVER(1, 0, 0)) == HOS(1, 0, 0));
-    assert(gamecheck_sysver_to_hos(SYSVER(20, 0, 0)) == HOS(20, 0, 0));
-    assert(gamecheck_sysver_to_hos(SYSVER(21, 2, 1)) == HOS(21, 2, 1));
-    assert(gamecheck_sysver_to_hos(SYSVER(19, 0, 1) | 0x1A) == HOS(19, 0, 1));   // the relstep ignored
-    assert(gamecheck_sysver_to_hos(0x50000000u) == HOS(20, 0, 0));
+    CHECK(gamecheck_sysver_to_hos(0) == 0);
+    CHECK(gamecheck_sysver_to_hos(SYSVER(1, 0, 0)) == HOS(1, 0, 0));
+    CHECK(gamecheck_sysver_to_hos(SYSVER(20, 0, 0)) == HOS(20, 0, 0));
+    CHECK(gamecheck_sysver_to_hos(SYSVER(21, 2, 1)) == HOS(21, 2, 1));
+    CHECK(gamecheck_sysver_to_hos(SYSVER(19, 0, 1) | 0x1A) == HOS(19, 0, 1));   // the relstep ignored
+    CHECK(gamecheck_sysver_to_hos(0x50000000u) == HOS(20, 0, 0));
 
-    assert(gamecheck_max_key_generation(HOS(9, 0, 0)) == 0x0A);
-    assert(gamecheck_max_key_generation(HOS(12, 0, 3)) == 0x0B);   // 12.1.0 brought 0x0C
-    assert(gamecheck_max_key_generation(HOS(21, 2, 0)) == 0x15);
-    assert(gamecheck_max_key_generation(HOS(22, 1, 0)) == 0x16);
-    assert(gamecheck_max_key_generation(HOS(23, 0, 1)) == 0x17);
-    assert(gamecheck_max_key_generation(HOS(24, 0, 0)) == 0);   // newer than the table: not judged
-    assert(gamecheck_max_key_generation(0) == 0);
-    assert(gamecheck_key_generation_firmware(0x0A) == HOS(9, 0, 0));
-    assert(gamecheck_key_generation_firmware(0x17) == HOS(23, 0, 0));
-    assert(gamecheck_key_generation_firmware(0x30) == 0);
+    CHECK(gamecheck_max_key_generation(HOS(9, 0, 0)) == 0x0A);
+    CHECK(gamecheck_max_key_generation(HOS(12, 0, 3)) == 0x0B);   // 12.1.0 brought 0x0C
+    CHECK(gamecheck_max_key_generation(HOS(21, 2, 0)) == 0x15);
+    CHECK(gamecheck_max_key_generation(HOS(22, 1, 0)) == 0x16);
+    CHECK(gamecheck_max_key_generation(HOS(23, 0, 1)) == 0x17);
+    CHECK(gamecheck_max_key_generation(HOS(24, 0, 0)) == 0);   // newer than the table: not judged
+    CHECK(gamecheck_max_key_generation(0) == 0);
+    CHECK(gamecheck_key_generation_firmware(0x0A) == HOS(9, 0, 0));
+    CHECK(gamecheck_key_generation_firmware(0x17) == HOS(23, 0, 0));
+    CHECK(gamecheck_key_generation_firmware(0x30) == 0);
 }
 
 static void test_rules(void)
@@ -658,7 +658,7 @@ static void test_rules(void)
     // The order: the first that applies explains the others.
     GameFacts g;
     memset(&g, 0, sizeof(g));
-    assert(gamecheck_classify(&g, CURRENT) == GC_ARCHIVED);
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_ARCHIVED);
     g.meta_count = 1;
     g.files_missing = true;
     g.control_ok = false;
@@ -670,41 +670,41 @@ static void test_rules(void)
     g.launch_checked = true;
     g.launch_required = 0x20000;
     g.launch_rc = 1;
-    assert(gamecheck_classify(&g, CURRENT) == GC_NO_BASE);
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_NO_BASE);
     g.has_base = true;
-    assert(gamecheck_classify(&g, CURRENT) == GC_FILES_MISSING);
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_FILES_MISSING);
     g.files_missing = false;
-    assert(gamecheck_classify(&g, CURRENT) == GC_NEEDS_VERIFY);
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_NEEDS_VERIFY);
     g.view_flags = GC_VIEW_CAN_LAUNCH;
-    assert(gamecheck_classify(&g, CURRENT) == GC_KEY_TOO_NEW);
-    assert(gamecheck_classify(&g, HOS(23, 0, 0)) == GC_FIRMWARE_TOO_OLD);   // that firmware has the key
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_KEY_TOO_NEW);
+    CHECK(gamecheck_classify(&g, HOS(23, 0, 0)) == GC_FIRMWARE_TOO_OLD);   // that firmware has the key
     g.key_generation = 0x16;
-    assert(gamecheck_classify(&g, CURRENT) == GC_FIRMWARE_TOO_OLD);
-    assert(gamecheck_classify(&g, 0) == GC_TICKET_MISSING);   // the console's version unknown: not judged
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_FIRMWARE_TOO_OLD);
+    CHECK(gamecheck_classify(&g, 0) == GC_TICKET_MISSING);   // the console's version unknown: not judged
     g.patch_required_hos = 0;
     g.base_required_hos = HOS(22, 1, 0);   // exactly the console's: fine
-    assert(gamecheck_classify(&g, CURRENT) == GC_TICKET_MISSING);
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_TICKET_MISSING);
     g.ticket_missing = false;
-    assert(gamecheck_classify(&g, CURRENT) == GC_LAUNCH_VERSION);
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_LAUNCH_VERSION);
     g.launch_rc = 0;   // wanted, but the console starts it anyway: no problem from it
     g.control_ok = true;
-    assert(gamecheck_classify(&g, CURRENT) == GC_OK);
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_OK);
     g.control_ok = false;
     g.launch_rc = 1;
     g.has_patch = true;
     g.patch_version = 0x20000;
-    assert(gamecheck_installed_version(&g) == 0x20000);
-    assert(gamecheck_classify(&g, CURRENT) == GC_LAUNCH_REFUSED);
+    CHECK(gamecheck_installed_version(&g) == 0x20000);
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_LAUNCH_REFUSED);
     g.launch_rc = 0;
-    assert(gamecheck_classify(&g, CURRENT) == GC_NO_CONTROL);
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_NO_CONTROL);
     g.control_ok = true;
-    assert(gamecheck_classify(&g, CURRENT) == GC_OK);
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_OK);
     g.storage_unavailable = true;
-    assert(gamecheck_classify(&g, CURRENT) == GC_STORAGE_UNAVAILABLE);
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_STORAGE_UNAVAILABLE);
     g.storage_unavailable = false;
     g.card_only = true;
     g.files_missing = true;
-    assert(gamecheck_classify(&g, CURRENT) == GC_OK);
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_OK);
 }
 
 static void test_actions(void)
@@ -717,54 +717,54 @@ static void test_actions(void)
     g.contents[1] = (GameContent){ 0x0100000000010800ULL, 0x10000, GC_META_PATCH, GC_STORAGE_SD };
     g.contents[2] = (GameContent){ 0x0100000000011001ULL, 0, GC_META_ADDON, GC_STORAGE_NAND };
     g.patch_version = 0x10000;
-    assert(gamecheck_actions(&g, GC_OK) == 0);
-    assert(gamecheck_actions(&g, GC_STORAGE_UNAVAILABLE) == 0);
-    assert(gamecheck_actions(&g, GC_ISSUE_COUNT) == 0);
-    assert(gamecheck_actions(&g, GC_FIRMWARE_TOO_OLD) == (GA_REMOVE | GA_REMOVE_UPDATE | GA_REMOVE_ADDON | GA_VERIFY));
+    CHECK(gamecheck_actions(&g, GC_OK) == 0);
+    CHECK(gamecheck_actions(&g, GC_STORAGE_UNAVAILABLE) == 0);
+    CHECK(gamecheck_actions(&g, GC_ISSUE_COUNT) == 0);
+    CHECK(gamecheck_actions(&g, GC_FIRMWARE_TOO_OLD) == (GA_REMOVE | GA_REMOVE_UPDATE | GA_REMOVE_ADDON | GA_VERIFY));
     g.launch_checked = true;
     g.launch_required = 0x30000;
-    assert(!(gamecheck_actions(&g, GC_NO_CONTROL) & GA_RESET_LAUNCH));   // the console starts it anyway
+    CHECK(!(gamecheck_actions(&g, GC_NO_CONTROL) & GA_RESET_LAUNCH));   // the console starts it anyway
     g.launch_rc = 0xC0DE;
-    assert(gamecheck_actions(&g, GC_LAUNCH_VERSION) & GA_RESET_LAUNCH);
+    CHECK(gamecheck_actions(&g, GC_LAUNCH_VERSION) & GA_RESET_LAUNCH);
     g.launch_required = 0x10000;
-    assert(!(gamecheck_actions(&g, GC_LAUNCH_REFUSED) & GA_RESET_LAUNCH));
+    CHECK(!(gamecheck_actions(&g, GC_LAUNCH_REFUSED) & GA_RESET_LAUNCH));
     g.launch_rc = 0;
     // On a game card: neither the update nor the add-on.
     g.contents[1].storage = GC_STORAGE_GAMECARD;
     g.contents[2].storage = GC_STORAGE_GAMECARD;
-    assert(gamecheck_actions(&g, GC_NO_CONTROL) == (GA_REMOVE | GA_VERIFY));
+    CHECK(gamecheck_actions(&g, GC_NO_CONTROL) == (GA_REMOVE | GA_VERIFY));
     // What is recommended: the action that fixes it, when there is one.
     g.has_base = true;
     g.contents[1].storage = GC_STORAGE_SD;
     g.contents[2].storage = GC_STORAGE_SD;
     g.launch_rc = 0xC0DE;
     g.launch_required = 0x30000;
-    assert(gamecheck_recommended(&g, GC_LAUNCH_VERSION, CURRENT) == GA_RESET_LAUNCH);
+    CHECK(gamecheck_recommended(&g, GC_LAUNCH_VERSION, CURRENT) == GA_RESET_LAUNCH);
     g.launch_rc = 0;
     g.base_required_hos = HOS(19, 0, 0);
     g.patch_required_hos = HOS(24, 0, 0);
-    assert(gamecheck_recommended(&g, GC_FIRMWARE_TOO_OLD, CURRENT) == GA_REMOVE_UPDATE);
+    CHECK(gamecheck_recommended(&g, GC_FIRMWARE_TOO_OLD, CURRENT) == GA_REMOVE_UPDATE);
     g.base_required_hos = HOS(24, 0, 0);   // the game too: nothing fixes it here
-    assert(gamecheck_recommended(&g, GC_FIRMWARE_TOO_OLD, CURRENT) == 0);
-    assert(gamecheck_recommended(&g, GC_NEEDS_VERIFY, CURRENT) == GA_VERIFY);
-    assert(gamecheck_recommended(&g, GC_NO_CONTROL, CURRENT) == GA_VERIFY);
-    assert(gamecheck_recommended(&g, GC_FILES_MISSING, CURRENT) == GA_REMOVE);
-    assert(gamecheck_recommended(&g, GC_TICKET_MISSING, CURRENT) == 0);
-    assert(gamecheck_recommended(&g, GC_KEY_TOO_NEW, CURRENT) == 0);
-    assert(gamecheck_recommended(&g, GC_LAUNCH_REFUSED, CURRENT) == 0);
-    assert(gamecheck_recommended(&g, GC_OK, CURRENT) == 0);
-    assert(gamecheck_recommended(&g, GC_STORAGE_UNAVAILABLE, CURRENT) == 0);
+    CHECK(gamecheck_recommended(&g, GC_FIRMWARE_TOO_OLD, CURRENT) == 0);
+    CHECK(gamecheck_recommended(&g, GC_NEEDS_VERIFY, CURRENT) == GA_VERIFY);
+    CHECK(gamecheck_recommended(&g, GC_NO_CONTROL, CURRENT) == GA_VERIFY);
+    CHECK(gamecheck_recommended(&g, GC_FILES_MISSING, CURRENT) == GA_REMOVE);
+    CHECK(gamecheck_recommended(&g, GC_TICKET_MISSING, CURRENT) == 0);
+    CHECK(gamecheck_recommended(&g, GC_KEY_TOO_NEW, CURRENT) == 0);
+    CHECK(gamecheck_recommended(&g, GC_LAUNCH_REFUSED, CURRENT) == 0);
+    CHECK(gamecheck_recommended(&g, GC_OK, CURRENT) == 0);
+    CHECK(gamecheck_recommended(&g, GC_STORAGE_UNAVAILABLE, CURRENT) == 0);
     g.contents[1].storage = GC_STORAGE_GAMECARD;   // the update on a card: not offered, not recommended
     g.base_required_hos = HOS(19, 0, 0);
-    assert(gamecheck_recommended(&g, GC_FIRMWARE_TOO_OLD, CURRENT) == 0);
+    CHECK(gamecheck_recommended(&g, GC_FIRMWARE_TOO_OLD, CURRENT) == 0);
 
     // Without the game: removing all of it is the cleaning, nothing to check.
     g.has_base = false;
     g.contents[1].storage = GC_STORAGE_SD;
-    assert(gamecheck_actions(&g, GC_NO_BASE) == GA_REMOVE);
-    assert(gamecheck_actions(&g, GC_ARCHIVED) == GA_REMOVE);
-    assert(gamecheck_recommended(&g, GC_NO_BASE, CURRENT) == GA_REMOVE);
-    assert(gamecheck_recommended(&g, GC_ARCHIVED, CURRENT) == GA_REMOVE);
+    CHECK(gamecheck_actions(&g, GC_NO_BASE) == GA_REMOVE);
+    CHECK(gamecheck_actions(&g, GC_ARCHIVED) == GA_REMOVE);
+    CHECK(gamecheck_recommended(&g, GC_NO_BASE, CURRENT) == GA_REMOVE);
+    CHECK(gamecheck_recommended(&g, GC_ARCHIVED, CURRENT) == GA_REMOVE);
 }
 
 static void test_every_problem(void)
@@ -823,42 +823,42 @@ static void test_every_problem(void)
     g->view_flags = GC_VIEW_NEEDS_VERIFY;
 
     scan();
-    assert(R_SUCCEEDED(R.rc) && R_SUCCEEDED(R.tickets_rc) && R.count == (u32)C.count && !R.truncated);
+    CHECK(R_SUCCEEDED(R.rc) && R_SUCCEEDED(R.tickets_rc) && R.count == (u32)C.count && !R.truncated);
 
     const GameFacts *f = facts(0x0100000000010000ULL);
-    assert(f->control_ok && strcmp(f->name, "Fine") == 0 && strcmp(f->display_version, "1.4.0") == 0 && f->record_event == 3);
-    assert(f->meta_count == 3 && f->content_count == 3 && f->has_base && f->has_patch && f->patch_version == 0x30000);
-    assert(f->contents[1].type == GC_META_PATCH && f->contents[1].id == 0x0100000000010800ULL &&
+    CHECK(f->control_ok && strcmp(f->name, "Fine") == 0 && strcmp(f->display_version, "1.4.0") == 0 && f->record_event == 3);
+    CHECK(f->meta_count == 3 && f->content_count == 3 && f->has_base && f->has_patch && f->patch_version == 0x30000);
+    CHECK(f->contents[1].type == GC_META_PATCH && f->contents[1].id == 0x0100000000010800ULL &&
            f->contents[1].version == 0x30000 && f->contents[1].storage == GC_STORAGE_SD);
-    assert(!f->card_only && !f->meta_missing && !f->files_missing && !f->storage_unavailable);
-    assert(f->base_required_hos == HOS(12, 0, 0) && f->patch_required_hos == HOS(20, 0, 0));
-    assert(f->key_generation == 0x14 && f->needs_ticket && !f->ticket_missing);
-    assert(f->view_ok && f->view_flags == (GC_VIEW_HAS_MAIN_CONTENTS | GC_VIEW_CAN_LAUNCH));
-    assert(f->launch_checked && f->launch_required == 0x40000);
-    assert(issue_of(0x0100000000010000ULL) == GC_OK);
+    CHECK(!f->card_only && !f->meta_missing && !f->files_missing && !f->storage_unavailable);
+    CHECK(f->base_required_hos == HOS(12, 0, 0) && f->patch_required_hos == HOS(20, 0, 0));
+    CHECK(f->key_generation == 0x14 && f->needs_ticket && !f->ticket_missing);
+    CHECK(f->view_ok && f->view_flags == (GC_VIEW_HAS_MAIN_CONTENTS | GC_VIEW_CAN_LAUNCH));
+    CHECK(f->launch_checked && f->launch_required == 0x40000);
+    CHECK(issue_of(0x0100000000010000ULL) == GC_OK);
 
-    assert(facts(0x0100000000020000ULL)->meta_count == 0 && facts(0x0100000000020000ULL)->record_event == 11);
-    assert(issue_of(0x0100000000020000ULL) == GC_ARCHIVED);
-    assert(issue_of(0x0100000000030000ULL) == GC_NO_BASE);
-    assert(facts(0x0100000000040000ULL)->files_missing && issue_of(0x0100000000040000ULL) == GC_FILES_MISSING);
-    assert(facts(0x0100000000050000ULL)->meta_missing && issue_of(0x0100000000050000ULL) == GC_FILES_MISSING);
+    CHECK(facts(0x0100000000020000ULL)->meta_count == 0 && facts(0x0100000000020000ULL)->record_event == 11);
+    CHECK(issue_of(0x0100000000020000ULL) == GC_ARCHIVED);
+    CHECK(issue_of(0x0100000000030000ULL) == GC_NO_BASE);
+    CHECK(facts(0x0100000000040000ULL)->files_missing && issue_of(0x0100000000040000ULL) == GC_FILES_MISSING);
+    CHECK(facts(0x0100000000050000ULL)->meta_missing && issue_of(0x0100000000050000ULL) == GC_FILES_MISSING);
     f = facts(0x0100000000060000ULL);
-    assert(f->base_required_hos == HOS(20, 0, 0) && f->patch_required_hos == HOS(23, 0, 0));
-    assert(issue_of(0x0100000000060000ULL) == GC_FIRMWARE_TOO_OLD);
-    assert(facts(0x0100000000070000ULL)->launch_rc == 0xABCD && issue_of(0x0100000000070000ULL) == GC_LAUNCH_REFUSED);
+    CHECK(f->base_required_hos == HOS(20, 0, 0) && f->patch_required_hos == HOS(23, 0, 0));
+    CHECK(issue_of(0x0100000000060000ULL) == GC_FIRMWARE_TOO_OLD);
+    CHECK(facts(0x0100000000070000ULL)->launch_rc == 0xABCD && issue_of(0x0100000000070000ULL) == GC_LAUNCH_REFUSED);
     f = facts(0x0100000000080000ULL);
-    assert(!f->control_ok && f->name[0] == '\0' && f->display_version[0] == '\0' && issue_of(0x0100000000080000ULL) == GC_NO_CONTROL);
-    assert(facts(0x0100000000090000ULL)->card_only && issue_of(0x0100000000090000ULL) == GC_OK);
+    CHECK(!f->control_ok && f->name[0] == '\0' && f->display_version[0] == '\0' && issue_of(0x0100000000080000ULL) == GC_NO_CONTROL);
+    CHECK(facts(0x0100000000090000ULL)->card_only && issue_of(0x0100000000090000ULL) == GC_OK);
     f = facts(0x01000000000A0000ULL);
-    assert(!f->card_only && f->has_base && issue_of(0x01000000000A0000ULL) == GC_OK);   // the card is not read
+    CHECK(!f->card_only && f->has_base && issue_of(0x01000000000A0000ULL) == GC_OK);   // the card is not read
     f = facts(0x01000000000B0000ULL);
-    assert(f->needs_ticket && f->ticket_missing && issue_of(0x01000000000B0000ULL) == GC_TICKET_MISSING);
+    CHECK(f->needs_ticket && f->ticket_missing && issue_of(0x01000000000B0000ULL) == GC_TICKET_MISSING);
     f = facts(0x01000000000C0000ULL);
-    assert(f->key_generation == 0x17 && issue_of(0x01000000000C0000ULL) == GC_KEY_TOO_NEW);
+    CHECK(f->key_generation == 0x17 && issue_of(0x01000000000C0000ULL) == GC_KEY_TOO_NEW);
     f = facts(0x01000000000D0000ULL);
-    assert(issue_of(0x01000000000D0000ULL) == GC_LAUNCH_VERSION);
-    assert(gamecheck_actions(f, GC_LAUNCH_VERSION) & GA_RESET_LAUNCH);
-    assert(issue_of(0x01000000000E0000ULL) == GC_NEEDS_VERIFY);
+    CHECK(issue_of(0x01000000000D0000ULL) == GC_LAUNCH_VERSION);
+    CHECK(gamecheck_actions(f, GC_LAUNCH_VERSION) & GA_RESET_LAUNCH);
+    CHECK(issue_of(0x01000000000E0000ULL) == GC_NEEDS_VERIFY);
 }
 
 static void test_sd_card_unreadable(void)
@@ -870,10 +870,10 @@ static void test_sd_card_unreadable(void)
     add_meta(g, NcmContentMetaType_Application, NcmStorageId_BuiltInUser, 0);
     C.sd_unopenable = true;
     scan();
-    assert(facts(0x0100000000010000ULL)->storage_unavailable);
-    assert(issue_of(0x0100000000010000ULL) == GC_STORAGE_UNAVAILABLE);
-    assert(gamecheck_actions(facts(0x0100000000010000ULL), GC_STORAGE_UNAVAILABLE) == 0);
-    assert(issue_of(0x0100000000020000ULL) == GC_OK);
+    CHECK(facts(0x0100000000010000ULL)->storage_unavailable);
+    CHECK(issue_of(0x0100000000010000ULL) == GC_STORAGE_UNAVAILABLE);
+    CHECK(gamecheck_actions(facts(0x0100000000010000ULL), GC_STORAGE_UNAVAILABLE) == 0);
+    CHECK(issue_of(0x0100000000020000ULL) == GC_OK);
 }
 
 static void test_without_services(void)
@@ -890,9 +890,9 @@ static void test_without_services(void)
     C.ncm_init_rc = 0x9999;
     scan();
     const GameFacts *f = facts(0x0100000000010000ULL);
-    assert(!f->storage_unavailable && !f->files_missing && !f->meta_missing && !f->needs_ticket && !f->key_generation);
-    assert(issue_of(0x0100000000010000ULL) == GC_OK);
-    assert(issue_of(0x0100000000020000ULL) == GC_NO_BASE);
+    CHECK(!f->storage_unavailable && !f->files_missing && !f->meta_missing && !f->needs_ticket && !f->key_generation);
+    CHECK(issue_of(0x0100000000010000ULL) == GC_OK);
+    CHECK(issue_of(0x0100000000020000ULL) == GC_NO_BASE);
 
     // No es: tickets not judged. No avm, no view: nothing from them.
     reset();
@@ -907,9 +907,9 @@ static void test_without_services(void)
     C.view_rc = 0x3B3;
     scan();
     f = facts(0x0100000000010000ULL);
-    assert(R.tickets_rc == 0x1E5 && f->needs_ticket && !f->ticket_missing);
-    assert(!f->view_ok && !f->launch_checked);
-    assert(issue_of(0x0100000000010000ULL) == GC_LAUNCH_REFUSED);   // not explained without avm
+    CHECK(R.tickets_rc == 0x1E5 && f->needs_ticket && !f->ticket_missing);
+    CHECK(!f->view_ok && !f->launch_checked);
+    CHECK(issue_of(0x0100000000010000ULL) == GC_LAUNCH_REFUSED);   // not explained without avm
 
     // Before 6.0.0 there is no avm: never opened.
     reset();
@@ -919,7 +919,7 @@ static void test_without_services(void)
     g->launch_known = true;
     g->launch_required = 0x50000;
     scan();
-    assert(!facts(0x0100000000010000ULL)->launch_checked);
+    CHECK(!facts(0x0100000000010000ULL)->launch_checked);
 }
 
 static void test_list_failures(void)
@@ -927,13 +927,13 @@ static void test_list_failures(void)
     reset();
     C.ns_init_rc = 0x1111;
     gamecheck_scan(&R);
-    assert(R.rc == 0x1111 && R.count == 0 && C.ns_open == 0);
+    CHECK(R.rc == 0x1111 && R.count == 0 && C.ns_open == 0);
 
     reset();
     add_game(0x0100000000010000ULL, "A");
     C.list_rc = 0x2222;
     scan();
-    assert(R.rc == 0x2222 && R.count == 0);
+    CHECK(R.rc == 0x2222 && R.count == 0);
 }
 
 static void test_paging(void)
@@ -948,15 +948,15 @@ static void test_paging(void)
     FakeGame *many = &C.games[0];
     for (int i = 0; i < 20; i++) add_meta(many, NcmContentMetaType_AddOnContent, NcmStorageId_SdCard, 0);
     scan();
-    assert(R_SUCCEEDED(R.rc) && R.count == GAMECHECK_MAX && R.truncated);
-    assert(R.games[GAMECHECK_MAX - 1].app_id == C.games[GAMECHECK_MAX - 1].id);
-    assert(facts(many->id)->meta_count == 21 && facts(many->id)->content_count == GAMECHECK_MAX_CONTENTS);
-    for (u32 i = 0; i < R.count; i++) assert(gamecheck_classify(&R.games[i], CURRENT) == GC_OK);
+    CHECK(R_SUCCEEDED(R.rc) && R.count == GAMECHECK_MAX && R.truncated);
+    CHECK(R.games[GAMECHECK_MAX - 1].app_id == C.games[GAMECHECK_MAX - 1].id);
+    CHECK(facts(many->id)->meta_count == 21 && facts(many->id)->content_count == GAMECHECK_MAX_CONTENTS);
+    for (u32 i = 0; i < R.count; i++) CHECK(gamecheck_classify(&R.games[i], CURRENT) == GC_OK);
 
     reset();
     for (int i = 0; i < 64; i++) add_game(0x0100000000000000ULL + ((u64)(i + 1) << 16), "Game");   // exactly one chunk
     scan();
-    assert(R.count == 64 && !R.truncated);
+    CHECK(R.count == 64 && !R.truncated);
 }
 
 static bool s_confirm;
@@ -967,8 +967,8 @@ static void test_remove(void)
     reset();
     FakeGame *g = add_game(0x0100000000010000ULL, "A");
     add_meta(g, NcmContentMetaType_Application, NcmStorageId_SdCard, 0);
-    assert(gamecheck_remove(0x0100000000010000ULL) == 0 && C.deleted == 0x0100000000010000ULL);
-    assert(C.record_deletes == 0);   // nothing left to clean
+    CHECK(gamecheck_remove(0x0100000000010000ULL) == 0 && C.deleted == 0x0100000000010000ULL);
+    CHECK(C.record_deletes == 0);   // nothing left to clean
     all_closed();
 
     // The deletion fails with nothing installed (the dotted frame): the
@@ -976,7 +976,7 @@ static void test_remove(void)
     reset();
     add_game(0x0100000000010000ULL, "Archived");
     C.delete_rc = 0x7777;
-    assert(gamecheck_remove(0x0100000000010000ULL) == 0 && C.record_deletes == 1 && !find(0x0100000000010000ULL)->record);
+    CHECK(gamecheck_remove(0x0100000000010000ULL) == 0 && C.record_deletes == 1 && !find(0x0100000000010000ULL)->record);
     all_closed();
 
     // … but never while something is installed.
@@ -984,25 +984,25 @@ static void test_remove(void)
     g = add_game(0x0100000000010000ULL, "A");
     add_meta(g, NcmContentMetaType_Application, NcmStorageId_SdCard, 0);
     C.delete_rc = 0x7777;
-    assert(gamecheck_remove(0x0100000000010000ULL) == 0x7777 && C.record_deletes == 0 && g->record);
+    CHECK(gamecheck_remove(0x0100000000010000ULL) == 0x7777 && C.record_deletes == 0 && g->record);
     all_closed();
 
     // Read-only, the PIN refused: no session opened.
     reset();
     core_set_read_only(true);
-    assert(gamecheck_remove(0x0100000000010000ULL) == NXM_RC_READ_ONLY && C.ns_inits == 0 && C.deleted == 0);
+    CHECK(gamecheck_remove(0x0100000000010000ULL) == NXM_RC_READ_ONLY && C.ns_inits == 0 && C.deleted == 0);
     core_set_read_only(false);
     core_set_change_check(confirm);
     s_confirm = false;
-    assert(gamecheck_remove(0x0100000000010000ULL) == NXM_RC_NOT_CONFIRMED && C.ns_inits == 0 && C.deleted == 0);
+    CHECK(gamecheck_remove(0x0100000000010000ULL) == NXM_RC_NOT_CONFIRMED && C.ns_inits == 0 && C.deleted == 0);
     s_confirm = true;
     add_game(0x0100000000010000ULL, "A");
-    assert(gamecheck_remove(0x0100000000010000ULL) == 0 && C.deleted == 0x0100000000010000ULL);
+    CHECK(gamecheck_remove(0x0100000000010000ULL) == 0 && C.deleted == 0x0100000000010000ULL);
     core_set_change_check(NULL);
 
     reset();
     C.ns_init_rc = 0x1111;
-    assert(gamecheck_remove(0x0100000000010000ULL) == 0x1111 && C.deleted == 0);
+    CHECK(gamecheck_remove(0x0100000000010000ULL) == 0x1111 && C.deleted == 0);
 }
 
 static GameContent content_of(const FakeMeta *m)
@@ -1023,30 +1023,30 @@ static void test_remove_content(void)
     g->launch_known = true;
     g->launch_required = 0x40000;
     GameContent c = content_of(patch);
-    assert(gamecheck_remove_content(g->id, &c) == 0);
+    CHECK(gamecheck_remove_content(g->id, &c) == 0);
     all_closed();
-    assert(patch->files_deleted == 2 && !patch->registered && !patch->installed && C.commits == 1);
-    assert(base->installed && base->files_deleted == 0 && addon->installed);
-    assert(C.record_deletes == 1 && C.pushes == 1 && g->record && C.pushed_count == 2);
-    for (int i = 0; i < C.pushed_count; i++) assert(C.pushed[i].id != patch->id);
-    assert(C.avm_pushes == 1 && g->launch_required == 0);
+    CHECK(patch->files_deleted == 2 && !patch->registered && !patch->installed && C.commits == 1);
+    CHECK(base->installed && base->files_deleted == 0 && addon->installed);
+    CHECK(C.record_deletes == 1 && C.pushes == 1 && g->record && C.pushed_count == 2);
+    for (int i = 0; i < C.pushed_count; i++) CHECK(C.pushed[i].id != patch->id);
+    CHECK(C.avm_pushes == 1 && g->launch_required == 0);
     // The game is fine again.
     scan();
-    assert(issue_of(g->id) == GC_OK && !facts(g->id)->has_patch);
+    CHECK(issue_of(g->id) == GC_OK && !facts(g->id)->has_patch);
 
     // An add-on: no launch version change.
     c = content_of(addon);
-    assert(gamecheck_remove_content(g->id, &c) == 0);
+    CHECK(gamecheck_remove_content(g->id, &c) == 0);
     all_closed();
-    assert(!addon->installed && C.avm_pushes == 1 && C.pushed_count == 1 && C.pushed[0].id == base->id);
+    CHECK(!addon->installed && C.avm_pushes == 1 && C.pushed_count == 1 && C.pushed[0].id == base->id);
 
     // The last content of an entry: deleted, nothing pushed back.
     reset();
     g = add_game(0x0100000000020000ULL, "Update only");
     patch = add_meta(g, NcmContentMetaType_Patch, NcmStorageId_SdCard, 0x10000);
     c = content_of(patch);
-    assert(gamecheck_remove_content(g->id, &c) == 0);
-    assert(C.record_deletes == 1 && C.pushes == 0 && !g->record);
+    CHECK(gamecheck_remove_content(g->id, &c) == 0);
+    CHECK(C.record_deletes == 1 && C.pushes == 0 && !g->record);
     all_closed();
 
     // Not in the entry: nothing deleted.
@@ -1056,30 +1056,30 @@ static void test_remove_content(void)
     patch = add_meta(g, NcmContentMetaType_Patch, NcmStorageId_SdCard, 0x10000);
     c = content_of(patch);
     c.version = 0x20000;
-    assert(gamecheck_remove_content(g->id, &c) == NXM_RC_STATE_UNKNOWN);
-    assert(patch->files_deleted == 0 && patch->installed && C.record_deletes == 0);
+    CHECK(gamecheck_remove_content(g->id, &c) == NXM_RC_STATE_UNKNOWN);
+    CHECK(patch->files_deleted == 0 && patch->installed && C.record_deletes == 0);
     all_closed();
 
     // Never the game itself, nothing on a game card, nothing with no content.
     const int inits = C.ns_inits;
     c = content_of(&g->metas[0]);
-    assert(gamecheck_remove_content(g->id, &c) == NXM_RC_INVALID_ARGUMENT);
+    CHECK(gamecheck_remove_content(g->id, &c) == NXM_RC_INVALID_ARGUMENT);
     c = content_of(patch);
     c.storage = GC_STORAGE_GAMECARD;
-    assert(gamecheck_remove_content(g->id, &c) == NXM_RC_INVALID_ARGUMENT);
-    assert(gamecheck_remove_content(g->id, NULL) == NXM_RC_INVALID_ARGUMENT);
-    assert(C.ns_inits == inits);
+    CHECK(gamecheck_remove_content(g->id, &c) == NXM_RC_INVALID_ARGUMENT);
+    CHECK(gamecheck_remove_content(g->id, NULL) == NXM_RC_INVALID_ARGUMENT);
+    CHECK(C.ns_inits == inits);
 
     // The gates, before any session.
     c = content_of(patch);
     core_set_read_only(true);
-    assert(gamecheck_remove_content(g->id, &c) == NXM_RC_READ_ONLY && C.ns_inits == inits);
+    CHECK(gamecheck_remove_content(g->id, &c) == NXM_RC_READ_ONLY && C.ns_inits == inits);
     core_set_read_only(false);
     core_set_change_check(confirm);
     s_confirm = false;
-    assert(gamecheck_remove_content(g->id, &c) == NXM_RC_NOT_CONFIRMED && C.ns_inits == inits);
+    CHECK(gamecheck_remove_content(g->id, &c) == NXM_RC_NOT_CONFIRMED && C.ns_inits == inits);
     core_set_change_check(NULL);
-    assert(patch->installed);
+    CHECK(patch->installed);
 }
 
 static void test_reset_launch_version(void)
@@ -1089,29 +1089,29 @@ static void test_reset_launch_version(void)
     add_meta(g, NcmContentMetaType_Application, NcmStorageId_SdCard, 0);
     g->launch_known = true;
     g->launch_required = 0x30000;
-    assert(gamecheck_reset_launch_version(g->id, 0) == 0 && g->launch_required == 0);
+    CHECK(gamecheck_reset_launch_version(g->id, 0) == 0 && g->launch_required == 0);
     all_closed();
 
     // Pushed, the console still wants more: said so.
     g->launch_required = 0x30000;
     C.avm_ignores_push = true;
-    assert(gamecheck_reset_launch_version(g->id, 0) == NXM_RC_NOT_APPLIED);
+    CHECK(gamecheck_reset_launch_version(g->id, 0) == NXM_RC_NOT_APPLIED);
     all_closed();
 
     C.avm_ignores_push = false;
     core_set_read_only(true);
-    assert(gamecheck_reset_launch_version(g->id, 0) == NXM_RC_READ_ONLY && C.avm_pushes == 2);
+    CHECK(gamecheck_reset_launch_version(g->id, 0) == NXM_RC_READ_ONLY && C.avm_pushes == 2);
     core_set_read_only(false);
 
     C.hos = HOS(5, 1, 0);
-    assert(gamecheck_reset_launch_version(g->id, 0) == NXM_RC_FW_UNSUPPORTED);
+    CHECK(gamecheck_reset_launch_version(g->id, 0) == NXM_RC_FW_UNSUPPORTED);
 }
 
 static int s_progress_calls, s_cancel_after;
 static u64 s_last_current, s_last_total;
 static bool on_progress(void *ctx, u64 current, u64 total)
 {
-    assert(ctx == &s_progress_calls);
+    CHECK(ctx == &s_progress_calls);
     s_progress_calls++;
     s_last_current = current;
     s_last_total = total;
@@ -1126,8 +1126,8 @@ static void test_verify(void)
     bool corrupt = true;
     s_progress_calls = 0;
     s_cancel_after = 0;
-    assert(gamecheck_verify(g->id, on_progress, &s_progress_calls, &corrupt) == 0 && !corrupt);
-    assert(s_progress_calls == 3 && s_last_current == 300 && s_last_total == 400 && C.verify_cancels == 0);
+    CHECK(gamecheck_verify(g->id, on_progress, &s_progress_calls, &corrupt) == 0 && !corrupt);
+    CHECK(s_progress_calls == 3 && s_last_current == 300 && s_last_total == 400 && C.verify_cancels == 0);
     all_closed();
 
     // Cancelled from the progress: stopped, closed, nothing reported corrupt.
@@ -1136,28 +1136,28 @@ static void test_verify(void)
     C.verify_corrupt = true;
     s_progress_calls = 0;
     s_cancel_after = 2;
-    assert(gamecheck_verify(g->id, on_progress, &s_progress_calls, &corrupt) == NXM_RC_CANCELLED && !corrupt);
-    assert(s_progress_calls == 2 && C.verify_cancels == 1);
+    CHECK(gamecheck_verify(g->id, on_progress, &s_progress_calls, &corrupt) == NXM_RC_CANCELLED && !corrupt);
+    CHECK(s_progress_calls == 2 && C.verify_cancels == 1);
     all_closed();
     s_cancel_after = 0;
 
     reset();
     g = add_game(0x0100000000010000ULL, "A");
     C.verify_corrupt = true;
-    assert(gamecheck_verify(g->id, NULL, NULL, &corrupt) == 0 && corrupt);
+    CHECK(gamecheck_verify(g->id, NULL, NULL, &corrupt) == 0 && corrupt);
     all_closed();
 
     // Only reads: also in read-only mode.
     reset();
     g = add_game(0x0100000000010000ULL, "A");
     core_set_read_only(true);
-    assert(gamecheck_verify(g->id, NULL, NULL, &corrupt) == 0 && !corrupt);
+    CHECK(gamecheck_verify(g->id, NULL, NULL, &corrupt) == 0 && !corrupt);
     core_set_read_only(false);
 
     reset();
     g = add_game(0x0100000000010000ULL, "A");
     C.verify_rc = 0x5A5A;
-    assert(gamecheck_verify(g->id, NULL, NULL, &corrupt) == 0x5A5A && !corrupt);
+    CHECK(gamecheck_verify(g->id, NULL, NULL, &corrupt) == 0x5A5A && !corrupt);
     all_closed();
 }
 
@@ -1175,6 +1175,5 @@ int main(void)
     test_remove_content();
     test_reset_launch_version();
     test_verify();
-    puts("gamecheck assertions passed");
-    return 0;
+    return CHECK_DONE("gamecheck assertions passed");
 }

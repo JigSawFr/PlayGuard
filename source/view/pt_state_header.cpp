@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "action/pt_logic.hpp"
+#include "action/timer_health.hpp"
 #include "ui/ui.hpp"
 #include "util/profiles.hpp"
 
@@ -13,6 +15,8 @@ PtStateHeader::PtStateHeader()
     this->inflateFromXMLRes("xml/view/pt_state_header.xml");
     summary->setSingleLine(false);
     alert->setSingleLine(false);
+    health->setSingleLine(false);
+    ui::set_visible(health, false);   // until a reading says so
 }
 
 std::string PtStateHeader::configured_text(const PtState& pt)
@@ -36,11 +40,17 @@ std::string PtStateHeader::configured_text(const PtState& pt)
 void PtStateHeader::show(const PtState& pt)
 {
     std::vector<std::string> parts;
-    const bool reached = pt.fw_supported && pt.restricted_valid && pt.restricted;
+    // Reached: the console restricts (suspending), or the time left went
+    // below 0 (played past the limit: a warning only, or while unlocked).
+    const int over = pt.fw_supported ? pt_logic::over_limit_min(pt, ui::today_weekday()) : -1;
+    const bool reached = pt.fw_supported && ((pt.restricted_valid && pt.restricted) || over >= 0);
     if (pt.fw_supported && pt.enabled_valid) {
         parts.push_back(pt.enabled ? "playguard/play_timer/state/active"_i18n : "playguard/play_timer/state/inactive"_i18n);
         if (pt.enabled && !reached && pt.remaining_valid && pt.remaining_ns > 0)
-            parts.push_back(brls::getStr("playguard/play_timer/state/remaining_short", ui::fmt_duration_ns(pt.remaining_ns)));
+            parts.push_back(brls::getStr("playguard/play_timer/state/remaining_short",
+                                         ui::fmt_duration_ns((uint64_t)pt.remaining_ns)));
+        if (over >= 0)
+            parts.push_back(brls::getStr("playguard/play_timer/state/over_short", ui::fmt_played((uint16_t)over)));
     }
     parts.push_back(configured_text(pt));
     if (pt.fw_supported && pt.temporary_unlocked_valid && pt.temporary_unlocked)
@@ -50,8 +60,13 @@ void PtStateHeader::show(const PtState& pt)
     for (const auto& p : parts) text += (text.empty() ? "" : " · ") + p;
     summary->setText(text);
 
-    alert->setText(reached ? "playguard/play_timer/state/reached_alert"_i18n : "");
+    // What the console does at the limit, once the block says (pure.h).
+    alert->setText(!reached    ? ""
+                   : !pt.valid ? "playguard/play_timer/state/reached_alert"_i18n
+                   : pt.alarm_only ? "playguard/play_timer/state/reached_alert_alarm"_i18n
+                                   : "playguard/play_timer/state/reached_alert_suspend"_i18n);
     ui::set_visible(alert, reached);
+    ui::set_visible(health, timer_health::observe(pt));
 }
 
 brls::View* PtStateHeader::create()

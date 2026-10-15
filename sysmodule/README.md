@@ -14,12 +14,12 @@ the module leaves a report.
 ## What it does
 
 At boot the module looks for a file named `RESCUE` (or `RESCUE.txt`) in
-`sd:/switch/playguard/`:
+`sd:/config/playguard/` (where PlayGuard keeps its files):
 
 - **present, empty or any text** → it unlocks parental controls temporarily,
   using the PIN the console already stores, exactly as the system PIN screen
   would. Everything can start again, so you can open PlayGuard and fix things
-  properly (see or change the PIN, adjust the limit, or remove the controls).
+  properly (set a new PIN, adjust the limit, or remove the controls).
 - **a line that reads just `delete`** (any case; spaces around it and a
   byte-order mark are ignored) → it deletes every parental control (PIN and all
   restrictions). Irreversible; use it only if you are giving up on the PIN.
@@ -33,16 +33,25 @@ boot) while an unlock still is — and PlayGuard's recovery screen tells you to
 remove the file from a computer. The outcome is written to
 `rescue_report.txt`. The next time PlayGuard opens it
 shows what happened, lets you finish, records it in the change history, and
-removes the report.
+removes the report. A report it cannot read is removed too, and PlayGuard says
+so (check the PIN and the play timer yourself). Should the SD card not be
+mounted at boot (the module retries for about 10 s), nothing is done and no
+report is left.
 
 ## How to use it
 
 1. Install the module once: extract `playguard-rescue.zip` to the SD-card root
    (it lands in `atmosphere/contents/4200000000505247/`). Reboot.
 2. When you are locked out: put the SD card in a computer, create an empty file
-   `switch/playguard/RESCUE` (or `RESCUE.txt`; to delete everything instead,
+   `config/playguard/RESCUE` (or `RESCUE.txt`; to delete everything instead,
    write `delete` on a line of its own), put the card back, turn the
    console on. Open PlayGuard and finish from the recovery screen.
+3. Remove `atmosphere/contents/4200000000505247` when you no longer need it:
+   while it is installed, anyone who can edit the SD card can use it.
+
+Prefer the empty `RESCUE` file, then *Delete all parental controls* on the
+recovery screen, to the `delete` request: PlayGuard saves a backup of the
+settings first, while `delete` erases everything at boot with no backup.
 
 ## What it is not
 

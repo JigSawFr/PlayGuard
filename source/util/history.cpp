@@ -3,6 +3,7 @@
 
 #include <borealis/extern/nlohmann/json.hpp>
 #include <climits>
+#include <cstdio>
 
 #include "util/backup.hpp"
 #include "util/paths.hpp"
@@ -16,7 +17,7 @@ size_t values_for(const std::string& kind)
 {
     if (kind == "limits") return 7;
     if (kind == "custom") return 3;
-    if (kind == "level" || kind == "org" || kind == "vr" || kind == "alarm") return 1;
+    if (kind == "level" || kind == "org" || kind == "vr" || kind == "alarm" || kind == "time_up") return 1;
     return 0;
 }
 
@@ -49,28 +50,54 @@ bool values_ok(const std::string& kind, const std::vector<int>& v)
         else if (kind == "level") ok = in(v[i], 0, backup::MAX_LEVEL);
         else if (kind == "org") ok = in(v[i], 0, backup::MAX_RATING_ORG);
         else if (kind == "custom") ok = i == 0 ? in(v[i], 0, backup::MAX_RATING_AGE) : in(v[i], 0, 1);
-        else if (kind == "vr" || kind == "alarm") ok = in(v[i], 0, 1);
+        else if (kind == "vr" || kind == "alarm" || kind == "time_up") ok = in(v[i], 0, 1);
         if (!ok) return false;
     }
     return true;
 }
 
-nlohmann::json load_array()
+// The entries in the file, and whether there is a file at all: one that is
+// there but cannot be read or parsed is damaged, which is not the same as
+// none (a new history must not silently replace it).
+bool load_array(nlohmann::json& entries)
 {
+    entries = nlohmann::json::array();
     std::string text;
-    if (!paths::read_file(paths::history_file(), text)) return nlohmann::json::array();
+    if (!paths::read_file(paths::history_file(), text)) return !paths::exists(paths::history_file());   // missing: fine
     try {
         nlohmann::json j = nlohmann::json::parse(text);
-        if (j.is_object() && j.contains("entries") && j["entries"].is_array()) return j["entries"];
+        if (j.is_object() && j.contains("entries") && j["entries"].is_array()) {
+            entries = j["entries"];
+            return true;
+        }
     } catch (...) {
     }
-    return nlohmann::json::array();   // damaged: start again
+    return false;
 }
 }   // namespace
 
-bool append(const Entry& e, std::string* error)
+Damage check()
 {
-    nlohmann::json entries = load_array();
+    nlohmann::json entries;
+    if (load_array(entries)) return Damage::None;
+    // Damaged or unreadable: put it aside as history.json.bad (its undo
+    // values can still be read by hand; the previous .bad is kept as .bad.1)
+    // and start again.
+    return paths::put_aside(paths::history_file()) ? Damage::PutAside : Damage::Stuck;
+}
+
+bool append(const Entry& e, std::string* error, bool* put_aside)
+{
+    if (put_aside) *put_aside = false;
+    nlohmann::json entries;
+    if (!load_array(entries)) {
+        // Should putting it aside fail, write nothing: it would overwrite the old file.
+        if (check() != Damage::PutAside) {
+            if (error) *error = "the change history could not be read, nor put aside";
+            return false;
+        }
+        if (put_aside) *put_aside = true;
+    }
     nlohmann::json j;
     j["when"]   = e.when;
     j["kind"]   = e.kind;
@@ -85,7 +112,7 @@ bool append(const Entry& e, std::string* error)
     for (size_t i = 0; i < entries.size(); i++)
         text += (i ? ",\n  " : "\n  ") + entries[i].dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);
     text += entries.empty() ? "]\n}\n" : "\n ]\n}\n";
-    if (!paths::ensure_dir(paths::data_dir())) {
+    if (!paths::ensure_dir(paths::nand_dir())) {
         if (error) *error = "cannot create the data folder";
         return false;
     }
@@ -95,7 +122,8 @@ bool append(const Entry& e, std::string* error)
 std::vector<Entry> load()
 {
     std::vector<Entry> out;
-    const nlohmann::json entries = load_array();
+    nlohmann::json entries;
+    load_array(entries);   // damaged: shown empty; the next change puts it aside
     for (auto it = entries.rbegin(); it != entries.rend(); ++it) {   // newest first
         const nlohmann::json& j = *it;
         if (!j.is_object()) continue;

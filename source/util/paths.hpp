@@ -8,14 +8,30 @@
 namespace paths
 {
 
-// sd:/switch/playguard on the console; ./playguard_data on desktop.
+// sd:/config/playguard on the console (the .nro stays in sd:/switch/playguard:
+// util/data_move.hpp); ./playguard_data on desktop.
 std::string data_dir();
 std::string logs_dir();
+// Inside logs_dir() (util/log_files.hpp): the saved diagnostic reports, one
+// file per crash, one per report sent online, and the developer tools'
+// play-timer files.
+std::string reports_dir();
+std::string crashes_dir();
+std::string uploads_dir();
+std::string play_timer_dir();
 std::string profiles_dir();
-std::string backups_dir();
 std::string exports_dir();
 std::string config_file();
-std::string history_file();   // the change history (util/history.hpp)
+
+// The folder of the system PlayGuard runs on (util/nand.hpp):
+// data_dir()/nand/<key>. set_nand() once at start-up, before config::load();
+// "unknown" until then.
+void        set_nand(const std::string& key);
+std::string nand_key();
+std::string nand_dir();
+std::string backups_dir();    // in nand_dir()
+std::string history_file();   // the change history (util/history.hpp), in nand_dir()
+std::string state_file();     // config's per-system part (util/config.hpp), in nand_dir()
 
 // Root of the SD card: "/" on the console; ./playguard_data/sd on desktop,
 // so the simulated build can be given fake Atmosphère / sys-patch files.
@@ -32,6 +48,16 @@ bool atomic_write(const std::string& path, const std::string& content, std::stri
 // Whole file. When `path` is missing but `path`.tmp exists (atomic_write
 // stopped between its remove and its rename), reads that one instead.
 bool read_file(const std::string& path, std::string& out);
+
+// Whether `path` or its ".tmp" (see read_file) is there at all: one that is
+// there but cannot be read is damaged, which is not the same as none.
+bool exists(const std::string& path);
+
+// Moves a damaged `path` (or its ".tmp", when only that one is left) to
+// `path`.bad, so no later write replaces it. A `path`.bad already there
+// becomes `path`.bad.1 (an older .bad.1 is dropped): the two most recent
+// damaged copies are kept. False when it could not be moved.
+bool put_aside(const std::string& path);
 
 // Names (not paths) of regular files in `dir` ending with `suffix`, sorted.
 std::vector<std::string> list_files(const std::string& dir, const std::string& suffix);

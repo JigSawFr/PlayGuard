@@ -17,10 +17,11 @@ namespace http
 using Headers = std::vector<std::string>;
 
 // Follows redirects. False (and *error set, in English) on a network error,
-// an HTTP status >= 400, a timeout or a body larger than `max_bytes`.
-// Blocking: call it from brls::async.
+// an HTTP status >= 400, a timeout or a body larger than `max_bytes`;
+// *status gets the HTTP status when the server answered (a 404 tells
+// "nothing there" from a network failure). Blocking: call it from brls::async.
 bool get(const std::string& url, std::string* body, std::string* error,
-         size_t max_bytes = 64 * 1024, long timeout_s = 10, const Headers& headers = {});
+         size_t max_bytes = 64 * 1024, long timeout_s = 10, const Headers& headers = {}, long* status = nullptr);
 
 // POSTs `data` as `content_type` (no redirects followed). Same failures as
 // get(); *status gets the HTTP status when the server answered (a 2xx other
@@ -41,6 +42,11 @@ bool redirect(const std::string& url, std::string* target, std::string* error, c
 // behind on failure: the caller removes it.
 bool download(const std::string& url, const std::string& path, std::string* error, size_t max_bytes,
               long timeout_s = 600, std::function<void(uint64_t done, uint64_t total)> progress = nullptr);
+
+// At exit: a request still running stops at its next progress tick (about a
+// second), and a new one fails at once, so the threads they run on can end
+// before the app does.
+void abort_all();
 
 // Releases libcurl's global state (and the Switch ssl service). At exit;
 // does nothing while a request is still running.

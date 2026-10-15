@@ -78,8 +78,8 @@ Public reference: [switchbrew, Parental Control services](https://switchbrew.org
 | Command | What | Notes |
 |---|---|---|
 | 1453 `IsPlayTimerEnabled` | timer on | `true` even with an all-zero block and no PIN; `false` while temporarily unlocked (observed, 22.0.0) |
-| 1455 `IsRestrictedByPlayTimer` | the timer is blocking play now | |
-| 1454 `GetPlayTimerRemainingTime` | TimeSpan, **nanoseconds** | today's limit minus the time spent; 0 when today has no limit |
+| 1455 `IsRestrictedByPlayTimer` | the timer is blocking play now | stays `false` past the limit while the console only warns (`ALARM`); `true` past it when suspending, even while temporarily unlocked (observed, 2026-10-14) |
+| 1454 `GetPlayTimerRemainingTime` | TimeSpan, **nanoseconds**, signed | today's limit minus the time spent; 0 when today has no limit; **below 0** once more was played than the limit (the console only warning, or parental controls unlocked): minus the time over it, 1454 + 1952 still the limit (observed, 22.0.0, 2026-10-14: -224 s and 224 s on a 0-minute day) |
 | 1952 `GetPlayTimerSpentTimeForTest` | TimeSpan, nanoseconds | time spent today, see below |
 | 1459 `GetPlayTimerRemainingTimeDisplayInfo` [20.0.0+] | 0x20 bytes | layout partly known, see below |
 | 1458 / 1953 alarm disabled (get / set for debug) | bool | while set, the "time's up" alarm does not show |
@@ -104,24 +104,45 @@ restricting and not temporarily unlocked.
 
 ### The settings block (145601 / 195101)
 
-0x44 bytes: a 12-byte header and seven 8-byte days, Sunday to Saturday.
+0x44 bytes: four mode bytes, the daily rule and seven 8-byte days, Sunday
+to Saturday.
 
 ```
 offset  size  field
-0x00    12    header
+0x00     4    modes
+0x04     8    daily rule (timerMode DAILY)
 0x0C     8    Sunday
 0x14     8    Monday
  ...
 0x3C     8    Saturday
 ```
 
-Header, as seen so far:
+The header, from the 22.5.0 `pctl` sysmodule as reversed by
+[NX-Pctl-Manager](https://github.com/tailiang2008/NX-Pctl-Manager/blob/main/docs/pctl-reverse-engineering.md)
+(its own settings file's field table, `enabled`, `mode`, `weekUsed`, then
+the rules, and the server-sync serializer's names for bytes 1 and 2). It
+matches every block PlayGuard has seen (`01 01 01 00`); byte `01` at `0`
+(`ALARM`) was verified on a console (2026-10-14), `DAILY` not yet:
 
-| Bytes | Value | Meaning |
+| Byte | Observed | Meaning |
 |---|---|---|
-| `00 01` | `01 01` | non-zero while a limit or a bedtime is set (observed) |
-| `02 03` | `01 00` | unknown, constant |
-| `04..0B` | `00 00 00 06 00 00 00 00` | the same format as a day; probably the `DAILY` rule (hypothesis below). Its `06` (byte `07`) stays in the "off" block, but was seen turn to `00` with the limits kept (observed, 22.0.0, between 20:10 and 20:44 on 2026-10-09; what changed it is not known) |
+| `00` | `01` | `enabled`: pctl clears it on a 195101 write, and sets it again only when the network clock gives the time |
+| `01` | `01` | `restrictionMode`: `0` `ALARM` (a warning only), `1` `FORCED_TERMINATION` (the software is suspended) |
+| `02` | `01` | `timerMode`: `0` `DAILY` (the daily rule, every day), `1` `EACH_DAY_OF_THE_WEEK` (the seven days) |
+| `03` | `00` | reserved |
+| `04..0B` | `00 00 00 06 00 00 00 00` | the daily rule, in a day's format. Its `06` (byte `07`) stays in the "off" block, but was seen turn to `00` with the limits kept (observed, 22.0.0, between 20:10 and 20:44 on 2026-10-09; what changed it is not known) |
+
+What PlayGuard does with them (`source/core/pure.c`): in `DAILY` mode the
+limits and bedtimes shown are the daily rule's, for every day (the seven
+days are ignored by the console). A write that changes such a block moves it
+to `EACH_DAY_OF_THE_WEEK` first, each day given the daily rule (all-zero days
+when it has nothing on), so the console does the same as before but for the
+change; writing back what was read leaves it as it is. `restrictionMode` is
+kept as read by those writes; *Play timer › When the time is up* shows it
+and changes it, byte `01` alone, once a limit or a bedtime is set (the "off"
+block is all zeros, and the next limit gives it the observed `01 01 01 00`).
+The write is read back, and the block put back when the console does not
+keep it.
 
 The byte-by-byte reading of a real block is under
 [Reading a diagnostic report](#reading-a-diagnostic-report).
@@ -130,9 +151,9 @@ One day (8 bytes):
 
 | Byte | Field | Status |
 |---|---|---|
-| +0 | bedtime on | inferred |
-| +1, +2 | bedtime alarm hour, minute | inferred |
-| +3, +4 | play allowed again, hour, minute (06:00 by default) | inferred; the `06` is always there |
+| +0 | bedtime on | **verified, 22.0.0** |
+| +1, +2 | bedtime alarm hour, minute | **verified, 22.0.0** |
+| +3, +4 | play allowed again, hour, minute (06:00 by default) | **verified, 22.0.0** |
 | +5 | "this day has a limit" flag | verified |
 | +6, +7 | that day's limit in minutes, u16 LE | **verified, 22.0.0** |
 
@@ -143,9 +164,23 @@ One day (8 bytes):
   PlayGuard writes all zeros for "no limit on any day", the one "off" block
   seen working. 1453 still reads `true` with that block (observed, 22.0.0).
 - The bedtime bytes match the companion app's daily settings
-  (`timeToPlayInOneDay`, `bedtime.enabled`, `endingTime`, `startingTime`), but
-  were never seen with a bedtime on. A bedtime write is checked against
-  1954 / 1956 / 1957 and undone when the console disagrees.
+  (`timeToPlayInOneDay`, `bedtime.enabled`, `endingTime`, `startingTime`).
+  Verified on 22.0.0 (2026-10-14): with 22:30, play allowed again at 09:00,
+  set by PlayGuard, every day reads `01 16 1E 09 00` (on, 22, 30, 9, 0) and
+  1954 / 1956 / 1957 / 1958 / 1959 report on, 22:30 and 09:00. A bedtime
+  write is still checked against 1954 / 1956 / 1957 and undone when the
+  console disagrees.
+
+What PlayGuard accepts as this layout (`pt_plausible`, `source/core/pure.c`):
+in each day and in the daily rule `04..0B`, the bedtime and limit
+switches `0` or `1`, hours below 24, minutes below 60, the limit 0 to 1440
+minutes (or `FFFF`). The four mode bytes are not checked, so any value
+passes there (a non-zero mode is read as `1`). Only what the
+layout cannot hold is refused, so an unseen companion-app setting does not
+block PlayGuard. A block that fails (a firmware that changed the layout, or
+garbage) is not shown, and every play-timer write refuses it without writing
+(*the console's play-timer settings are in a format PlayGuard does not
+understand*); the diagnostic report still has it, byte for byte.
 
 How the minutes field was confirmed (22.0.0, 2026-10-09): the block was saved
 as a reference (Developer tools › play-timer block), Sunday and Saturday were
@@ -153,9 +188,10 @@ changed from 120 to 180 minutes in PlayGuard, then the block was read again.
 Only two bytes changed: `0x12` and `0x42`, both `78` → `B4`. The header, the
 flags and the bedtime bytes stayed as they were.
 
-### Hypothesis: the header is the modes plus a "daily" rule
+### The header is the modes plus a "daily" rule
 
-**Not verified.** The companion app's API, as reproduced by open-source
+This was a hypothesis, now confirmed by the sysmodule (above). The companion
+app's API, as reproduced by open-source
 clients ([pynintendoparental](https://github.com/pantherale0/pynintendoparental),
 used by Home Assistant, and
 [switch-parental-controls](https://github.com/udondan/switch-parental-controls)),
@@ -177,17 +213,15 @@ That is exactly eight rules and a few modes, and the block holds:
   also seen turn to `00` while every limit stayed: a value that can change,
   as an "allowed again" hour of a rule nobody uses might.
 
-So the guess is: bytes `00..03` hold the modes (among them most likely
-`timerMode`, `01` = each day of the week, since every observed block uses the
-per-day rules, and `restrictionMode`), and bytes `04..0B` hold the `DAILY`
-rule. Which mode sits in which byte is open.
+So the guess was: bytes `00..03` hold the modes and bytes `04..0B` the
+`DAILY` rule. The sysmodule places them: byte `01` is `restrictionMode`,
+byte `02` `timerMode`.
 
-How to test it, once a tool can write single bytes while the console is
-temporarily unlocked (with the block saved first and put back after):
-put a limit in the `04..0B` rule, set the byte that looks like `timerMode` to
-0, then read 1454 / 1459: the remaining time should follow the daily rule.
-For `restrictionMode`, let the time run out once with each value and note
-whether the software is suspended.
+Still worth checking on a console (with the block saved first and put back
+after): put a limit in the `04..0B` rule, set byte `02` to 0, then read
+1454 / 1459: the remaining time should follow the daily rule. For
+`restrictionMode`, let the time run out once with each value of byte `01`
+and note whether the software is suspended.
 
 ### Time spent and time left
 
@@ -230,6 +264,23 @@ Observed on 22.0.0, 2026-10-09 (a Friday, limit 120 minutes):
 When the time spent resets on its own (midnight local time, or the "allowed
 again" time) is not confirmed yet.
 
+What PlayGuard does with this:
+
+- **Timer health** (`source/action/timer_health_logic.cpp`): since its own
+  time counts while it runs as an application, the time left must go down
+  while it is on screen. With the timer on, a limit above 0 today, not
+  reached, not temporarily unlocked and PlayGuard not opened from the album,
+  a time left that has not moved by 5 s over about 90 s on screen makes the
+  Overview and the Play timer say the console is not counting. The likely
+  causes it gives come from above (a clock set back) and from other tools'
+  users ([NX-Pctl-Manager #2](https://github.com/tailiang2008/NX-Pctl-Manager/issues/2),
+  a network clock never set; #3 and #7, a limit just written). Not seen on a
+  console yet: inferred from the table above.
+- **Changes made outside PlayGuard** ([config.md](config.md#watchjson)): the
+  time spent, taken as today's limit minus the time left (they add up to the
+  limit), going down on the same day; the user clock moving against the
+  steady clock; limits that differ from the ones PlayGuard last saw.
+
 ### When the time runs out
 
 **A limit written by PlayGuard is enforced by the console** (verified,
@@ -239,9 +290,17 @@ full-screen "time limit reached, no more play today" message (in French:
 aujourd'hui*), with two choices only: *Sleep mode* and *Disable parental
 controls* (the second asks for the PIN).
 
-- No "continue" choice: this looks like the suspend behaviour
-  (`FORCED_TERMINATION`) rather than an alarm only (inferred; which header
-  byte selects it is still open).
+- No "continue" choice: the suspend behaviour (`FORCED_TERMINATION`), which
+  byte `01` of that block (`01`) says.
+- So PlayGuard says what the console does at the limit from that byte:
+  "Time's up" always, then the game suspended, or a warning only once set to
+  "alarm only" (in the phone app, or *When the time is up*; a limit below the
+  time already played then warns of no suspension). `ALARM` verified on a
+  console (2026-10-14): at the limit the console warned and the game went
+  on; 1455 stayed `false` and 1454 went below 0, by the time over the limit,
+  which the Overview and the Play timer tab show. Suspending can lose unsaved
+  progress (Nintendo: [time limit settings](https://www.nintendo.com/sg/parents/switch/time/settings.html)),
+  so its confirmations say so, and *No more play today* can wait 5 minutes.
 - The PIN prompt behind *Disable parental controls* is the system's: a child
   who knows the PIN gets past the limit there.
 
@@ -268,7 +327,14 @@ The play timer counts per day, so the console's clocks matter.
   network clock and the local clock, in UTC POSIX seconds.
 - 100 `IsStandardUserSystemClockAutomaticCorrectionEnabled`: when it is off,
   the user clock does not follow the network clock. PlayGuard refuses to write
-  the network clock then, so the system's own setting stays in charge.
+  a measured time to the network clock then, so the system's own setting
+  stays in charge. The exception is a console no time server answers:
+  *Set the network clock to the console clock* (`time_clock_set_to_user`,
+  decided by `source/action/offline_clock_logic.cpp`) writes the user clock,
+  read in the same session, to the network clock, with correction off too.
+  The user clock is the source and does not move; turning correction on
+  afterwards should then leave it in place, both clocks being equal (inferred
+  from the jump below; not tried on a console yet).
 - 200 `IsStandardNetworkSystemClockAccuracySufficient`.
 - On the test console the network clock was 1411 s (23.5 min) ahead of the
   user clock, with automatic correction off and accuracy insufficient
@@ -318,8 +384,8 @@ Cut into its fields instead of rows of 16:
 
 ```
 offset  bytes                     field
-0x00    01 01 01 00               header: four mode bytes (see the hypothesis below)
-0x04    00 00 00 06 00 00 00 00   an eighth rule? same format as a day, see below
+0x00    01 01 01 00               modes: enabled, FORCED_TERMINATION, EACH_DAY_OF_THE_WEEK
+0x04    00 00 00 06 00 00 00 00   the daily rule (unused in this mode)
 0x0C    00 00 00 06 00 01 B4 00   Sunday     limit on, 0x00B4 = 180 min
 0x14    00 00 00 06 00 01 00 00   Monday     limit on, 0 min: no play
 0x1C    00 00 00 06 00 01 00 00   Tuesday    limit on, 0 min
@@ -335,11 +401,11 @@ One day, field by field (Sunday above):
 00   00   00   06   00   01   B4 00
 │    │    │    │    │    │    └───┴── limit, minutes, u16 LE: 0x00B4 = 180   verified
 │    │    │    │    │    └─────────── limit flag: 1 = this day has a limit    verified
-│    │    │    │    └──────────────── play allowed again, minute: 00          inferred
-│    │    │    └───────────────────── play allowed again, hour: 06            inferred
-│    │    └────────────────────────── bedtime alarm, minute                   inferred
-│    └─────────────────────────────── bedtime alarm, hour                     inferred
-└──────────────────────────────────── bedtime on                              inferred
+│    │    │    │    └──────────────── play allowed again, minute: 00          verified
+│    │    │    └───────────────────── play allowed again, hour: 06            verified
+│    │    └────────────────────────── bedtime alarm, minute                   verified
+│    └─────────────────────────────── bedtime alarm, hour                     verified
+└──────────────────────────────────── bedtime on                              verified
 ```
 
 The code (`source/core/pure.h`) reads the same block as 34 u16 instead of
@@ -373,15 +439,20 @@ From the same 20:10 report:
 ## Still open
 
 - 1406 `GetSettingsLastUpdated` fails with `0x0001188E`: why?
-- The header: which of bytes `00..03` is `timerMode`, which
-  `restrictionMode`; whether `04..0B` is the `DAILY` rule (hypothesis above).
-- The bedtime bytes with a bedtime actually on.
+- A console in `DAILY` mode, to confirm byte `02` on hardware (it comes from
+  the sysmodule, not from a block PlayGuard has seen).
+- Bedtimes that differ from day to day, set from the companion app (the
+  console's answer was only checked for today's).
 - 1459's first byte; 1460's layout (23.0.0+).
 - When the time spent resets on its own; how long it stays frozen after the
   clock goes back (until the clock passes the old time?).
 - What turned the header's byte `07` from `06` to `00`.
 - The `01` byte of each free-communication list entry.
-- Whether time spent counts while temporarily unlocked.
+- Whether time spent counts while temporarily unlocked (the app says it
+  *may* not).
+- Whether a game left open on the HOME menu counts (parents report it does;
+  it fits "while an application is open") and sleep mode does not: not
+  measured by PlayGuard.
 - Whether a PIN entered from the HOME menu is logged anywhere PlayGuard can
   read (the companion app shows it since 2.5.0; see
   [companion-app.md](companion-app.md)).
@@ -394,7 +465,7 @@ From the same 20:10 report:
    changed.
    For what changes over time (the time spent, 1459, a reset at midnight),
    turn on *Developer tools › Record the play timer* instead: one CSV line
-   every 30 s in `logs/play_timer_log.csv` while PlayGuard is open (its own
+   every 30 s in `logs/play_timer/log.csv` while PlayGuard is open (its own
    time counts, so the time runs down with PlayGuard alone). The two hex
    columns are written only when they change. The last column, `event`, says
    why a line was written off the 30 s tick: `recording started`, each change

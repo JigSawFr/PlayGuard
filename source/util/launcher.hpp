@@ -22,8 +22,9 @@ struct Target
     std::string path;   // from the SD card root: "/switch/sphaira/sphaira.nro"
 };
 
-// `preference`: "auto" (sphaira, else the App Store), "sphaira", "appstore"
-// or "manual" (never a store). Store::None when nothing usable is installed.
+// `preference`: "auto" or "" (sphaira, else the App Store), "sphaira",
+// "appstore", "manual" or "inplace" (never a store: PlayGuard updates
+// itself, action/update_flow). Store::None when nothing usable is installed.
 Target find(const std::string& preference);
 
 // The loader can start another homebrew after this one (false on desktop and

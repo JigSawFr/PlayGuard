@@ -49,6 +49,13 @@ std::string short_commit(const std::string& sha)
 
 bool https(const std::string& url) { return url.compare(0, 8, "https://") == 0; }
 
+// Where fetch() finds builds: a release asset on github.com, an artifact on
+// the API. A list kept on the SD card can be edited: nothing else is taken.
+bool github_url(const std::string& url)
+{
+    return url.compare(0, 19, "https://github.com/") == 0 || url.compare(0, 23, "https://api.github.com/") == 0;
+}
+
 template <typename F>
 bool parse(const std::string& text, F f)
 {
@@ -74,6 +81,11 @@ bool parse_release(const std::string& text, Build* out)
             b.url = str(a, "browser_download_url");
             b.date = str(a, "updated_at");
             b.sha256 = digest_hex(str(a, "digest"));
+            b.notes = str(r, "body");
+            if (b.notes.size() > MAX_NOTES) {
+                const size_t cut = b.notes.rfind('\n', MAX_NOTES);
+                b.notes.resize(cut == std::string::npos ? 0 : cut);
+            }
             const int64_t size = integer(a, "size");
             if (b.version.empty() || !https(b.url) || size <= 0) return false;
             b.size = (uint64_t)size;
@@ -84,12 +96,21 @@ bool parse_release(const std::string& text, Build* out)
     });
 }
 
-bool parse_artifacts(const std::string& text, std::vector<Artifact>* out)
+bool is_build_artifact(const std::string& name)
 {
-    return parse(text, [out](const json& j) {
+    if (name == "playguard_release") return true;
+    const std::string head = "playguard-", tail = "-nro";
+    return name.size() > head.size() + tail.size() && name.compare(0, head.size(), head) == 0 &&
+           name.compare(name.size() - tail.size(), tail.size(), tail) == 0;
+}
+
+bool parse_artifacts(const std::string& text, std::vector<Artifact>* out, size_t* listed)
+{
+    return parse(text, [out, listed](const json& j) {
         if (!j.is_object() || !j.contains("artifacts") || !j["artifacts"].is_array()) return false;
+        if (listed) *listed = j["artifacts"].size();
         for (const auto& a : j["artifacts"]) {
-            if (!a.is_object() || str(a, "name") != "playguard_release" || a.value("expired", true)) continue;
+            if (!a.is_object() || !is_build_artifact(str(a, "name")) || a.value("expired", true)) continue;
             if (!a.contains("workflow_run") || !a["workflow_run"].is_object()) continue;
             const auto& run = a["workflow_run"];
             Artifact x;
@@ -153,7 +174,11 @@ std::vector<Build> combine(const std::vector<Artifact>& artifacts, const std::ve
     std::vector<Pull> by_number = pulls;
     std::sort(by_number.begin(), by_number.end(), [](const Pull& a, const Pull& b) { return a.number > b.number; });
     for (const Pull& p : by_number) {
+        // Only branches of this repository: a fork's build runs code nobody
+        // with write access has reviewed yet, and installing it replaces
+        // PlayGuard itself.
         for (const Artifact& a : sorted) {
+            if (a.head_repo != a.repo) continue;
             if (a.branch != p.branch || a.head_repo != p.head_repo) continue;
             Build b = build(a, Kind::PullRequest);
             b.pr = p.number;
@@ -162,6 +187,28 @@ std::vector<Build> combine(const std::vector<Artifact>& artifacts, const std::ve
             break;   // the newest only
         }
     }
+    return out;
+}
+
+Order order_named(const std::string& name)
+{
+    return name == "number" ? Order::Number : Order::Newest;
+}
+
+const char* order_name(Order order)
+{
+    return order == Order::Number ? "number" : "newest";
+}
+
+std::vector<Build> of_kind(const std::vector<Build>& all, Kind kind, Order order)
+{
+    std::vector<Build> out;
+    for (const Build& b : all)
+        if (b.kind == kind) out.push_back(b);
+    if (order == Order::Number && kind == Kind::PullRequest)
+        std::stable_sort(out.begin(), out.end(), [](const Build& a, const Build& b) { return a.pr > b.pr; });
+    else   // ISO 8601 dates in UTC sort as text
+        std::stable_sort(out.begin(), out.end(), [](const Build& a, const Build& b) { return a.date > b.date; });
     return out;
 }
 
@@ -216,7 +263,7 @@ bool decode_cache(const std::string& text, Cache* out)
             const int64_t size = integer(x, "size");
             const bool commit_ok = b.kind == Kind::Release ? b.commit.empty() : short_commit(b.commit) == b.commit;
             const bool sha_ok = b.sha256.empty() || (b.sha256.size() == 64 && is_hex(b.sha256) && lower(b.sha256) == b.sha256);
-            if (!https(b.url) || size <= 0 || !commit_ok || !sha_ok) continue;
+            if (!github_url(b.url) || size <= 0 || !commit_ok || !sha_ok) continue;
             if (b.kind == Kind::Release ? b.version.empty() : !b.artifact) continue;
             if (b.kind == Kind::PullRequest && b.pr <= 0) continue;
             b.size = (uint64_t)size;

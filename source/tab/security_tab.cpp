@@ -5,9 +5,11 @@
 #include "action/console_lock.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
+#include "action/pt_block_flow.hpp"
+#include "action/pt_flow.hpp"
+#include "action/rescue.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
-#include "util/config.hpp"
 
 using namespace brls::literals;
 
@@ -16,6 +18,9 @@ SecurityTab::SecurityTab()
 {
     this->enable_auto_refresh(5000);
     pr_note->setSingleLine(false);
+    rescue_note->setSingleLine(false);
+    // Checked once: the sysmodule only comes and goes with the SD card out.
+    ui::set_visible(rescue_note.getView(), rescue::installed());
     pin_lock_note->setSingleLine(false);
     console_lock_note->setSingleLine(false);
     console_lock_cell->registerClickAction([this](brls::View*) {
@@ -41,9 +46,18 @@ SecurityTab::SecurityTab()
         pin_lock::choose([this]() { this->refresh(); });
         return true;
     });
+    // While linked, anyone can save the block before and after a change made
+    // in the phone app: the data ROADMAP.md waits for (Developer tools has it too).
+    pr_decode->setDetailText(ui::fmt_played(2));   // how long it takes
+    pr_decode->registerClickAction([](brls::View*) {
+        pt_block_flow::open();
+        return true;
+    });
     pr_unlink->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
-        ui::confirm_danger("playguard/pairing/unlink_body"_i18n, "playguard/pairing/unlink_confirm"_i18n, [this]() {
+        // The block comparison needs the link: last chance to help decode the settings.
+        const std::string body = "playguard/pairing/unlink_body"_i18n + "\n\n" + "playguard/pairing/decode_note"_i18n;
+        ui::confirm_danger(body, "playguard/pairing/unlink_confirm"_i18n, [this]() {
             Result rc = pctl_delete_pairing();
             if (R_SUCCEEDED(rc)) history_flow::record_event("unlink");
             ui::notify_result(rc, "playguard/pairing/unlinked"_i18n, "playguard/pairing/unlink_err"_i18n);
@@ -53,24 +67,33 @@ SecurityTab::SecurityTab()
     });
     set_pin->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
-        // Blocks while the system PIN applet is shown; the session is released first.
-        Result rc = pctl_set_pin();
-        brls::Logger::info("pctl_set_pin returned 0x{:08X}", (unsigned)rc);
-        if (R_SUCCEEDED(rc)) history_flow::record_event("pin");
-        ui::notify_result(rc, "playguard/security/pin_ok"_i18n, "playguard/security/pin_err"_i18n);
-        this->refresh();
+        this->change_pin();
         return true;
     });
-    show_pin->registerClickAction([](brls::View*) {
+    show_pin->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
-        ui::confirm("playguard/security/show_pin_body"_i18n, "playguard/security/show_pin_confirm"_i18n,
-                    []() { brls::sync([]() { ui::show_pin_dialog(); }); });
+        ui::confirm("playguard/security/show_pin_body"_i18n, "playguard/security/show_pin_confirm"_i18n, [this]() {
+            brls::sync([this]() {
+                // The PIN every time (pin_lock.hpp); then, as it may have been
+                // seen over a shoulder, a new one is offered.
+                if (!pin_lock::before_show_pin()) return;
+                const bool shown = ui::show_pin_dialog([this]() {
+                    brls::sync([this]() {
+                        ui::confirm("playguard/security/show_pin_change_body"_i18n,
+                                    "playguard/security/show_pin_change_confirm"_i18n, [this]() {
+                                        brls::sync([this]() { this->change_pin(); });
+                                    });
+                    });
+                });
+                if (shown) history_flow::record_event("pin_shown");
+            });
+        });
         return true;
     });
     unlock->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
         ui::confirm("playguard/security/unlock_body"_i18n, "playguard/security/unlock_confirm"_i18n, [this]() {
-            Result rc = pctl_unlock_restriction_temporarily();
+            Result rc = pt_flow::unlock_temporarily();
             if (R_SUCCEEDED(rc)) history_flow::record_event("unlock");
             ui::notify_result(rc, "playguard/security/unlocked"_i18n, "playguard/security/unlock_err"_i18n);
             this->refresh();
@@ -105,6 +128,16 @@ SecurityTab::SecurityTab()
     });
 }
 
+void SecurityTab::change_pin()
+{
+    // Blocks while the system PIN applet is shown; the session is released first.
+    Result rc = pctl_set_pin();
+    brls::Logger::info("pctl_set_pin returned 0x{:08X}", (unsigned)rc);
+    if (R_SUCCEEDED(rc)) history_flow::record_event("pin");
+    ui::notify_result(rc, "playguard/security/pin_ok"_i18n, "playguard/security/pin_err"_i18n);
+    this->refresh();
+}
+
 void SecurityTab::refresh()
 {
     PctlStatus s;
@@ -114,7 +147,7 @@ void SecurityTab::refresh()
 
     if (!s.pin_length_ok) pin->setDetailText(na);
     else if (s.pin_length == 0) pin->setDetailText("playguard/common/not_set"_i18n);
-    else pin->setDetailText(brls::getStr("playguard/dashboard/pin_set", (int)s.pin_length));
+    else pin->setDetailText("playguard/dashboard/pin_set"_i18n);   // not its length: it narrows a guess
 
     restrictions->setDetailText(ui::bool_text(s.restriction_enabled_ok, s.restriction_enabled,
                                               "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
@@ -146,7 +179,8 @@ void SecurityTab::refresh()
                           { unlock.getView(), has_pin && !unlocked },
                           { relock.getView(), unlocked },
                           // Nothing to unlink when the read says not linked.
-                          { pr_unlink.getView(), !s.pairing_active_ok || paired } });
+                          { pr_unlink.getView(), !s.pairing_active_ok || paired },
+                          { pr_decode.getView(), paired } });
     for (brls::DetailCell* c : { (brls::DetailCell*)set_pin.getView(), (brls::DetailCell*)show_pin.getView(),
                                  (brls::DetailCell*)unlock.getView(), (brls::DetailCell*)relock.getView(),
                                  (brls::DetailCell*)console_lock_cell.getView(), (brls::DetailCell*)pr_unlink.getView() })

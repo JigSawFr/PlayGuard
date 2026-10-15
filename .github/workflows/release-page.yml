@@ -1,0 +1,67 @@
+name: release-page
+
+# By hand (Actions › release-page › Run workflow): the page the release job
+# lays out (tools/release_page.sh: "PlayGuard X.Y.Z", a summary, the
+# figures, the commit list folded, the screens that changed, the install
+# section, the build report; with "apply", a discussion) for an existing
+# release. By default it only shows it on the run page, a way to try the
+# OpenRouter key, the model or the prompt; with "apply", it updates the
+# release (one laid out before this existed, or after adding its
+# .github/release-notes/<version>.md). A release laid out before is laid out
+# again, keeping its summary when there is no file for it.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release (vX.Y.Z; empty for the latest)
+        type: string
+        required: false
+      apply:
+        description: Update the release (else only show the result)
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  discussions: write
+  actions: read   # the release-please run that built it, for the build report
+
+jobs:
+  page:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: |
+            .github/release-notes
+            resources/img/emoji
+            tools/release_notes.py
+            tools/release_page.sh
+            tools/summarize_release.py
+          sparse-checkout-cone-mode: false
+      # A token of the "PlayGuard Release" app, for the release's discussion:
+      # the app published the release, so it is the discussion's author, and
+      # GITHUB_TOKEN cannot edit another author's post. Optional: without it
+      # (or without the app's Discussions permission) the post is left as is.
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app-token
+        continue-on-error: true
+        with:
+          # The app's client ID (or, until RELEASE_APP_CLIENT_ID is set, its app ID:
+          # GitHub takes either as the JWT's issuer); "app-id" is deprecated.
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID || vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+      - name: Release page
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ inputs.tag }}
+          APPLY: ${{ inputs.apply && '--apply' || '' }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
+          RELEASE_DISCUSSION_CATEGORY: ${{ vars.RELEASE_DISCUSSION_CATEGORY }}
+          DISCUSSION_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          [ -n "$TAG" ] || TAG=$(gh release view --json tagName --jq .tagName)
+          tools/release_page.sh "$TAG" $APPLY

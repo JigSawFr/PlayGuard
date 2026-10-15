@@ -3,9 +3,8 @@ name: release-please
 # On every push to main, release-please keeps a "chore(main): release X.Y.Z"
 # pull request up to date (CHANGELOG.md, version in CMakeLists.txt) from the
 # conventional commits. Merging that PR creates the vX.Y.Z tag and the GitHub
-# release; the build below then attaches the .nro / .zip to it. A tag created
-# with GITHUB_TOKEN does not trigger other workflows, hence the direct call
-# instead of a personal access token.
+# release; the build below then attaches the .nro / .zip to it. build.yml
+# does not run on tags, hence the direct call.
 on:
   push:
     branches: [ main ]
@@ -17,7 +16,7 @@ permissions:
 
 jobs:
   release-please:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
       pull-requests: write
@@ -25,9 +24,21 @@ jobs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
+      # A token of the "PlayGuard Release" GitHub App, not GITHUB_TOKEN: the
+      # app is on the tag ruleset's bypass list (GITHUB_TOKEN cannot create
+      # the vX.Y.Z tag), and its pushes to the release PR trigger the other
+      # workflows, so the required checks report on it.
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app-token
+        with:
+          # The app's client ID (or, until RELEASE_APP_CLIENT_ID is set, its app ID:
+          # GitHub takes either as the JWT's issuer); "app-id" is deprecated.
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID || vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
       - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         id: release
         with:
+          token: ${{ steps.app-token.outputs.token }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
@@ -35,11 +46,13 @@ jobs:
     needs: release-please
     if: needs.release-please.outputs.release_created == 'true'
     # A called workflow gets at most what its caller grants: the build's release job
-    # needs these three to attach the assets and attest their provenance.
+    # needs these three to attach the assets and attest their provenance, and
+    # discussions to open the release's discussion.
     permissions:
       contents: write
       id-token: write
       attestations: write
+      discussions: write
     uses: ./.github/workflows/build.yml
     # The Docker Hub login for the switch job's image (see build.yml).
     secrets: inherit

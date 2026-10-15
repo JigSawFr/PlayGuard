@@ -6,9 +6,11 @@
 #include <cstdio>
 #include <cstring>
 #include <dirent.h>
+#include <fcntl.h>
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
+#include <unistd.h>
 
 namespace paths
 {
@@ -16,18 +18,31 @@ namespace paths
 std::string data_dir()
 {
 #ifdef __SWITCH__
-    return "/switch/playguard";
+    return "/config/playguard";
 #else
     return "./playguard_data";
 #endif
 }
 
 std::string logs_dir()     { return data_dir() + "/logs"; }
+std::string reports_dir()  { return logs_dir() + "/reports"; }
+std::string crashes_dir()  { return logs_dir() + "/crashes"; }
+std::string uploads_dir()  { return logs_dir() + "/uploads"; }
+std::string play_timer_dir() { return logs_dir() + "/play_timer"; }
 std::string profiles_dir() { return data_dir() + "/profiles"; }
-std::string backups_dir()  { return data_dir() + "/backups"; }
 std::string exports_dir()  { return data_dir() + "/exports"; }
 std::string config_file()  { return data_dir() + "/config.json"; }
-std::string history_file() { return data_dir() + "/history.json"; }
+
+namespace
+{
+std::string s_nand = "unknown";
+}
+void        set_nand(const std::string& key) { s_nand = key.empty() ? "unknown" : key; }
+std::string nand_key()     { return s_nand; }
+std::string nand_dir()     { return data_dir() + "/nand/" + s_nand; }
+std::string backups_dir()  { return nand_dir() + "/backups"; }
+std::string history_file() { return nand_dir() + "/history.json"; }
+std::string state_file()   { return nand_dir() + "/state.json"; }
 
 std::string sd_root()
 {
@@ -71,11 +86,20 @@ bool atomic_write(const std::string& path, const std::string& content, std::stri
     struct stat st;
     if (stat(path.c_str(), &st) != 0 && stat(tmp.c_str(), &st) == 0)
         std::rename(tmp.c_str(), path.c_str());
-    FILE* f = std::fopen(tmp.c_str(), "wb");
-    if (!f) return fail("Could not open the file", errno);
+    // Created 0644 (as util/pt_log.cpp), not fopen's 0666.
+    const int fd = ::open(tmp.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    FILE* f = fd >= 0 ? ::fdopen(fd, "wb") : nullptr;
+    if (!f) {
+        const int err = errno;
+        if (fd >= 0) ::close(fd);
+        return fail("Could not open the file", err);
+    }
     bool ok = std::fwrite(content.data(), 1, content.size(), f) == content.size();
     int err = ok ? 0 : errno;
     if (ok && std::fflush(f) != 0) { ok = false; err = errno; }
+    // On the card before the old file is removed: else a power loss after
+    // the rename can leave an empty file in its place.
+    if (ok && fsync(fileno(f)) != 0) { ok = false; err = errno; }
     if (std::fclose(f) != 0 && ok) { ok = false; err = errno; }
     if (!ok) {
         std::remove(tmp.c_str());
@@ -109,6 +133,24 @@ bool read_file(const std::string& path, std::string& out)
     struct stat st;
     if (stat(path.c_str(), &st) == 0) return false;
     return read_whole(path + ".tmp", out);
+}
+
+bool exists(const std::string& path)
+{
+    struct stat st;
+    return stat(path.c_str(), &st) == 0 || stat((path + ".tmp").c_str(), &st) == 0;
+}
+
+bool put_aside(const std::string& path)
+{
+    struct stat st;
+    const std::string bad = path + ".bad", older = bad + ".1";
+    if (stat(bad.c_str(), &st) == 0) {
+        std::remove(older.c_str());   // FAT rename does not replace an existing file
+        if (std::rename(bad.c_str(), older.c_str()) != 0) return false;
+    }
+    const std::string from = stat(path.c_str(), &st) == 0 ? path : path + ".tmp";
+    return std::rename(from.c_str(), bad.c_str()) == 0;
 }
 
 std::vector<std::string> list_files(const std::string& dir, const std::string& suffix)

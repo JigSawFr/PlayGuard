@@ -24,7 +24,14 @@ std::string failed(Result rc)
 
 std::string flag(Result rc, bool v) { return R_FAILED(rc) ? failed(rc) : v ? "1" : "0"; }
 
-// Nanoseconds as seconds: "1428", or "1428.5" when not whole (to the ms).
+// Nanoseconds as seconds: "1428", or "1428.5" when not whole (to the ms);
+// "-120" for a time below 0 (1454 once played past the limit).
+std::string seconds(uint64_t ns);
+std::string seconds(int64_t ns)
+{
+    return ns < 0 ? "-" + seconds((uint64_t)0 - (uint64_t)ns) : seconds((uint64_t)ns);
+}
+
 std::string seconds(uint64_t ns)
 {
     char buf[32];
@@ -40,6 +47,7 @@ std::string seconds(uint64_t ns)
 }
 
 std::string time_cell(Result rc, uint64_t ns) { return R_FAILED(rc) ? failed(rc) : seconds(ns); }
+std::string time_cell(Result rc, int64_t ns) { return R_FAILED(rc) ? failed(rc) : seconds(ns); }
 
 std::string hex(const void* data, size_t n)
 {
@@ -110,8 +118,8 @@ std::string changed(const std::string& now, std::string* before)
 
 }   // namespace
 
-std::string path()     { return paths::logs_dir() + "/play_timer_log.csv"; }
-std::string old_path() { return paths::logs_dir() + "/play_timer_log.old.csv"; }
+std::string path()     { return paths::play_timer_dir() + "/log.csv"; }
+std::string old_path() { return paths::play_timer_dir() + "/log.old.csv"; }
 
 std::string header()
 {
@@ -123,7 +131,7 @@ std::string header()
 std::string row(const std::string& local, uint64_t posix, const PtSample& s, Previous* prev,
                 const std::string& event)
 {
-    std::string sum = R_SUCCEEDED(s.remaining_rc) && R_SUCCEEDED(s.spent_rc) ? seconds(s.remaining_ns + s.spent_ns) : "";
+    std::string sum = R_SUCCEEDED(s.remaining_rc) && R_SUCCEEDED(s.spent_rc) ? seconds((int64_t)(s.remaining_ns + (int64_t)s.spent_ns)) : "";
     std::string disp0, disp_left, disp_hex;
     if (R_FAILED(s.display_rc)) disp0 = disp_left = failed(s.display_rc);
     else {
@@ -181,7 +189,7 @@ std::string tail(const std::string& text, size_t max_bytes)
 bool append(const std::string& line, std::string* error)
 {
     const std::string p = path();
-    if (!paths::ensure_dir(paths::logs_dir())) {
+    if (!paths::ensure_dir(paths::play_timer_dir())) {
         if (error) *error = std::string("cannot create the logs folder: ") + std::strerror(errno);
         return false;
     }
@@ -191,7 +199,9 @@ bool append(const std::string& line, std::string* error)
     if (f && must_roll(f, &size)) {
         std::fclose(f);
         std::remove(old_path().c_str());
-        std::rename(p.c_str(), old_path().c_str());
+        // Should the rename fail, start the file again rather than let it
+        // grow past its limit at every tick.
+        if (std::rename(p.c_str(), old_path().c_str()) != 0) std::remove(p.c_str());
         f = open_append(p);
         if (f) must_roll(f, &size);
     }

@@ -1,5 +1,6 @@
-// The running version's notes from the bundled CHANGELOG.md, as views: in
-// About and on the "What's new" screen shown once after an update.
+// release_notes — the running version's notes, as views: in About and on the
+// "What's new" screen shown once after an update, the hand-written highlights
+// when there are some, the full list (the bundled CHANGELOG.md) a press away.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -16,8 +17,20 @@ namespace release_notes
 // receives the release date when there is one.
 std::vector<changelog::Line> current(std::string* date = nullptr);
 
-// Adds `lines` to `box`: section titles, then their items with the bullet in
-// its own column (wrapped lines stay under the text).
+// This version's highlights: the summary written by hand for its release
+// (.github/release-notes/<version>.md, bundled as release-notes/<version>.md).
+// Empty when there is none.
+std::vector<changelog::Line> highlights();
+
+// Adds `lines` to `box`: section titles (their emoji as an icon, over a
+// rule), then their items with the bullet (or their emoji) in its own column,
+// wrapped lines staying under the text, and their lead-in ("activity") as a tag.
 void fill(brls::Box* box, const std::vector<changelog::Line>& lines);
+
+// Adds the highlights to `box`: their opening line, the items as cards two
+// by two (its emoji as an icon, its "**Title**:" in the accent colour over
+// its text; with no title, the item itself in the accent colour), then the
+// closing lines as a note.
+void fill_highlights(brls::Box* box, const std::vector<changelog::Line>& lines);
 
 }   // namespace release_notes

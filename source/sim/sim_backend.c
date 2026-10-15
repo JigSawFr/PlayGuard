@@ -12,10 +12,17 @@
 //   PLAYGUARD_SIM_EMUMMC=1      running on emuMMC (default: sysMMC)
 //   PLAYGUARD_SIM_BLANK=1       PRODINFO blanked (serial XAW00000000000)
 //   PLAYGUARD_SIM_NO_PDM=1      the play-data service (Activity tab) fails
+//   PLAYGUARD_SIM_GAMES=200     that many more games played this week (a large library)
 //   PLAYGUARD_SIM_NOT_SET_UP=1  parental controls never set up (no PIN, no restriction)
 //   PLAYGUARD_SIM_APPLET=1      started from the album (applet mode)
-//   PLAYGUARD_SIM_RESTRICTED=1  today's limit is reached (the game is suspended)
+//   PLAYGUARD_SIM_RESTRICTED=1  today's limit is reached (the console says "Time's up")
+//   PLAYGUARD_SIM_NOT_COUNTING=1 the time left does not go down (a clock set back):
+//                               the Overview says so after 90 s on screen
 //   PLAYGUARD_SIM_AUTOSYNC_OFF=1 "Synchronise clock via Internet" is off
+//   PLAYGUARD_SIM_NETWORK_OFFSET=1411  the network clock is that many seconds
+//                               ahead of the console clock until it is set
+//                               (the console clock follows it while
+//                               "Synchronise" is on)
 //   PLAYGUARD_SIM_NOW=1791471600  the console's time, frozen (POSIX seconds):
 //                               the same screens at every run (visual check)
 //   PLAYGUARD_SIM_IDLE=1        no game running: the timer reports no time left
@@ -35,6 +42,7 @@
 // Game patches are read from ./playguard_data/sd/ (the simulated SD card root).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #define _POSIX_C_SOURCE 200809L
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -59,7 +67,9 @@ static struct {
     u32  rating_org;
     PctlCustomSettings custom;
     u16  block[PT_U16_COUNT];   // PlayTimerSettings, as 145601 returns it
-    s64  clock_offset;
+    s64  clock_offset;     // the console clock against base_now()
+    s64  network_offset;   // the network clock against the console clock, until set
+    bool network_set;      // PlayGuard set the network clock
 } S;
 
 // Minutes played today in the made-up activity log below (45 + 20 + 15): the
@@ -101,7 +111,7 @@ static void sim_init(void)
 {
     if (S.init) return;
     S.init = true;
-    S.hos = MAKEHOSVERSION(23, 0, 1);
+    S.hos = PCTL_FW_TESTED_MAX;   // the newest verified one: no firmware gate
     const char *fw = getenv("PLAYGUARD_SIM_FW");
     unsigned a, b, c;
     if (fw && sscanf(fw, "%u.%u.%u", &a, &b, &c) == 3) S.hos = MAKEHOSVERSION(a, b, c);
@@ -117,6 +127,8 @@ static void sim_init(void)
     S.limit_reached = getenv("PLAYGUARD_SIM_RESTRICTED") != NULL;
     S.autosync_off = getenv("PLAYGUARD_SIM_AUTOSYNC_OFF") != NULL;
     S.alarm_disabled = getenv("PLAYGUARD_SIM_ALARM_OFF") != NULL;
+    const char *net = getenv("PLAYGUARD_SIM_NETWORK_OFFSET");
+    if (net) S.network_offset = strtoll(net, NULL, 10);
     bool off = blank || getenv("PLAYGUARD_SIM_TIMER_OFF") != NULL;
     u16 days[7];
     for (int i = 0; i < 7; i++) days[i] = off ? PT_DAY_NOLIMIT : ((i == 0 || i == 6) ? 180 : 120);
@@ -126,6 +138,19 @@ static void sim_init(void)
         for (int i = 0; i < 7; i++) bed[i] = (PtBedtime){ true, 21, 0, 6, 0 };
         pt_bedtime_encode(S.block, bed);
     }
+    if (getenv("PLAYGUARD_SIM_ALARM_ONLY")) pt_set_suspends(S.block, false);
+}
+
+// The time left goes down as on a console that counts PlayGuard's own time,
+// but only by 1 to 20 s around the minute it starts on, then back up: the
+// screens show the same minutes at every run (visual check) and the timer
+// health check (action/timer_health_logic) sees it count.
+static u64 counting_ns(void)
+{
+    if (getenv("PLAYGUARD_SIM_NOT_COUNTING")) return 0;
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (u64)(ts.tv_sec % 20) * 1000000000ULL;
 }
 
 static int sim_weekday(void)
@@ -203,7 +228,8 @@ Result pctl_unlock_restriction_temporarily(void)
 Result pctl_get_pin(char *out, size_t out_size)
 {
     if (out && out_size) memset(out, 0, out_size);
-    RO_GUARD();
+    Result g = core_reveal_allowed();
+    if (R_FAILED(g)) return g;
     FAIL_IF("pin");
     if (!out || out_size < 5) return NXM_RC_INVALID_ARGUMENT;
     if (!S.pin_length) return NXM_RC_STATE_UNKNOWN;
@@ -268,10 +294,14 @@ void pctl_play_timer_query(PtState *o)
     o->session_valid = true;
     if (fails("timer")) {
         o->config_rc = SIM_FAIL_RC;
+    } else if (!pt_plausible(S.block)) {   // as pctl_ops.c (only pt_encode writes it here)
+        o->config_rc = NXM_RC_PT_NOT_UNDERSTOOD;
+        memcpy(o->block, S.block, sizeof(o->block));
     } else {
         o->valid = true;
         pt_decode(S.block, o->day_min);
         pt_bedtime_decode(S.block, o->bed);
+        o->alarm_only = !pt_suspends(S.block);
         memcpy(o->block, S.block, sizeof(o->block));
     }
     o->enabled_valid = true;  o->enabled = timer_enabled();
@@ -284,8 +314,16 @@ void pctl_play_timer_query(PtState *o)
     const bool reached = o->enabled && (S.limit_reached || (limit != PT_DAY_NOLIMIT && limit <= SIM_PLAYED_TODAY_MIN));
     o->remaining_valid = true;
     o->remaining_ns = o->enabled && !reached && limit != PT_DAY_NOLIMIT && !getenv("PLAYGUARD_SIM_IDLE")
-                          ? (u64)(limit - SIM_PLAYED_TODAY_MIN) * 60 * 1000000000ULL : 0;
-    o->restricted_valid = true; o->restricted = reached;
+                          ? (s64)(limit - SIM_PLAYED_TODAY_MIN) * 60 * 1000000000LL + 20000000000LL - (s64)counting_ns() : 0;
+    // A warning only: the console does not restrict, and 1454 goes below 0
+    // by the time played over the limit (as observed; 2 min when the limit is
+    // only said to be reached).
+    const bool warn_only = !pt_suspends(S.block);
+    if (reached && warn_only) {
+        const int over = limit != PT_DAY_NOLIMIT && SIM_PLAYED_TODAY_MIN > limit ? SIM_PLAYED_TODAY_MIN - limit : 2;
+        o->remaining_ns = -(s64)over * 60 * 1000000000LL;
+    }
+    o->restricted_valid = true; o->restricted = reached && !warn_only;
     o->alarm_disabled_valid = true; o->alarm_disabled = S.alarm_disabled;
     // 1954..1959 answer today's bedtime from the block, as the console is
     // taken to (pure.h).
@@ -327,7 +365,9 @@ void pctl_play_timer_sample(PtSample *o)
         o->display[0] = 2;
         memcpy(o->display + 0x10, &o->remaining_ns, sizeof(o->remaining_ns));
     }
-    o->spent_ns = (u64)SIM_PLAYED_TODAY_MIN * 60 * 1000000000ULL;
+    // 1454 + 1952 = today's limit, as observed (docs/parental-controls.md).
+    o->spent_ns = pt.remaining_ns ? (u64)((s64)pt.day_min[wd] * 60 * 1000000000LL - pt.remaining_ns)
+                                  : (u64)SIM_PLAYED_TODAY_MIN * 60 * 1000000000ULL;
 }
 
 Result pctl_play_timer_set_days(const u16 d[7])
@@ -359,14 +399,25 @@ Result pctl_play_timer_set_bedtime(const PtBedtime bed[7], int today)
     return 0;
 }
 
+Result pctl_play_timer_set_alarm_only(bool alarm_only)
+{
+    RO_GUARD();
+    sim_init();
+    if (S.hos < PCTL_FW_MIN_PLAYTIMER) return NXM_RC_FW_UNSUPPORTED;
+    if ((timer_enabled() || S.limit_reached) && !S.temp_unlocked) return NXM_RC_WRITE_GATED;
+    FAIL_IF("write");
+    if (fails("timer")) return NXM_RC_STATE_UNKNOWN;
+    return pt_set_suspends(S.block, !alarm_only) ? 0 : NXM_RC_INVALID_ARGUMENT;
+}
+
 Result pctl_play_timer_set_uniform(u16 m) { u16 d[7]; for (int i = 0; i < 7; i++) d[i] = m; return pctl_play_timer_set_days(d); }
 Result pctl_play_timer_clear(void)        { u16 d[7]; for (int i = 0; i < 7; i++) d[i] = PT_DAY_NOLIMIT; return pctl_play_timer_set_days(d); }
 
 void pctl_dump(char *buf, size_t n)
 {
     int used = snprintf(buf, n, "=== pctl state (simulated desktop backend) ===\n"
-                        "safety_level=%u pin_length=%u enabled=%d temp_unlocked=%d\n145601 block:",
-                        (unsigned)S.safety_level, (unsigned)S.pin_length, (int)S.restriction_enabled, (int)S.temp_unlocked);
+                        "safety_level=%u pin=%s enabled=%d temp_unlocked=%d\n145601 block:",
+                        (unsigned)S.safety_level, S.pin_length ? "set" : "none", (int)S.restriction_enabled, (int)S.temp_unlocked);
     for (int i = 0; i < PT_U16_COUNT && used > 0 && (size_t)used < n; i++)
         used += snprintf(buf + used, n - (size_t)used, " %04X", S.block[i]);
     if (used > 0 && (size_t)used < n) snprintf(buf + used, n - (size_t)used, "\n");
@@ -391,34 +442,66 @@ void time_clock_snapshot(TimeSnapshot *o)
 {
     memset(o, 0, sizeof(*o));
     u64 now = base_now();
-    o->user_time = now + S.clock_offset;
-    o->network_time = now + S.clock_offset;
-    o->local_time = now;
     o->automatic = !S.autosync_off;
-    o->accuracy = S.clock_offset != 0 || getenv("PLAYGUARD_SIM_ACCURATE");
+    o->network_time = now + S.clock_offset + S.network_offset;
+    // With "Synchronise" on, the console clock follows the network clock.
+    o->user_time = o->automatic ? o->network_time : now + S.clock_offset;
+    o->local_time = now;
+    o->accuracy = S.network_set || getenv("PLAYGUARD_SIM_ACCURATE");
     snprintf(o->location, sizeof(o->location), "Europe/Paris");
+}
+// Both writes, once allowed: the network clock becomes `utc`, the console
+// clock with it while "Synchronise" is on.
+static void set_network(u64 utc, TimeApply *o)
+{
+    o->target = utc;
+    if (fails("clock")) {
+        o->write_attempted = true;
+        o->write_rc = SIM_FAIL_RC;
+        return;
+    }
+    const s64 network = (s64)utc - (s64)base_now();
+    if (!S.autosync_off) S.clock_offset = network;
+    S.network_offset = network - S.clock_offset;
+    S.network_set = true;
+    o->write_attempted = o->verify_attempted = o->verified = true;
+    o->readback = utc;
 }
 void time_clock_apply(u64 utc, TimeApply *o)
 {
     memset(o, 0, sizeof(*o));
     time_clock_snapshot(&o->before);
+    o->target = utc;
     const Result gate = core_change_allowed();
     if (R_FAILED(gate)) {
         o->open_rc = gate;
     } else if (!o->before.automatic) {
         o->refused_automatic = true;   // as time_ops.c: the user clock would not follow
-    } else if (fails("clock")) {
-        o->write_attempted = true;
-        o->write_rc = SIM_FAIL_RC;
     } else {
-        S.clock_offset = (s64)utc - (s64)base_now();
-        if (!S.clock_offset) S.clock_offset = 1;
-        o->write_attempted = o->verify_attempted = o->verified = true;
-        o->readback = utc;
+        set_network(utc, o);
     }
     time_clock_snapshot(&o->after);
 }
+void time_clock_set_to_user(TimeApply *o)
+{
+    memset(o, 0, sizeof(*o));
+    time_clock_snapshot(&o->before);
+    o->target = o->before.user_time;
+    const Result gate = core_change_allowed();
+    if (R_FAILED(gate)) o->open_rc = gate;
+    else set_network(o->before.user_time, o);
+    time_clock_snapshot(&o->after);
+}
 void time_clock_dump(char *buf, size_t n) { snprintf(buf, n, "=== System clocks (simulated) ===\n"); }
+
+// The steady clock: the console's time before any clock change, so the user
+// clock moves against it only when the simulated network clock is set.
+Result time_steady_now(u64 *seconds, u8 source_id[16])
+{
+    if (seconds) *seconds = base_now();
+    if (source_id) memset(source_id, 0x53, 16);
+    return 0;
+}
 
 // The host's time zone stands in for the console's (TZ= changes it).
 static bool host_to_local(void *ctx, u64 posix, LocalTime *out)
@@ -458,7 +541,9 @@ const TimeRule *time_console_rule(void)
 }
 bool time_local_now(u64 *posix, LocalTime *local)
 {
-    const u64 now = (u64)((s64)base_now() + S.clock_offset);   // the user clock, as the snapshot says
+    TimeSnapshot s;
+    time_clock_snapshot(&s);
+    const u64 now = s.user_time;   // the user clock, as the snapshot says
     if (posix) *posix = now;
     return local ? host_to_local(NULL, now, local) : true;
 }
@@ -474,7 +559,8 @@ void time_format_local(u64 posix, char *buf, size_t size)
 }
 
 // ---------------------------------------------------------------- playstats
-// Two made-up accounts: Alice played 2/3 of everything, Léo 1/3.
+// Two made-up accounts: Alice played 2/3 of everything, Léo 1/3 (but the
+// time on no account, nobody_s()).
 static const PlayAccount SIM_ACCOUNTS[] = { { { 1, 1 }, "Alice" }, { { 2, 2 }, "Léo" } };
 
 size_t playstats_accounts(PlayAccount *out, size_t max, Result *rc)
@@ -492,6 +578,13 @@ static u64 share(u64 v, const PlayAccount *account)
     return account->uid[0] == 1 ? v * 2 / 3 : v - v * 2 / 3;
 }
 
+// All-time seconds of a game played with no account chosen (a party mode
+// that never asks): in its total, in no account's.
+static u64 nobody_s(u64 app_id)
+{
+    return app_id == 0x0100A1B2C3D40000ULL ? 50 * 60 : 0;
+}
+
 void playstats_fetch(PlayStats *out)
 {
     playstats_fetch_for(out, NULL);
@@ -505,7 +598,8 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         out->stats_rc = out->events_rc = (Result)0x1A0C;
         return;
     }
-    // Made-up games; the last one was deleted since (no name, no totals).
+    // Made-up games; one was deleted since (no name, no totals), the last one is
+    // to rediscover (little played, left aside for months).
     static const struct {
         u64 id; const char *name; u32 total_min, launches, today_min, week_min, days_ago;
     } games[] = {
@@ -515,6 +609,7 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         { 0x0100A1B2C3D43000ULL, "Dragon Valley Legends", 6100, 120,  0,   0, 12 },
         { 0x0100A1B2C3D44000ULL, "Puzzle Garden",          380,  52,  0,  30, 5 },
         { 0x0100A1B2C3D45000ULL, "",                          0,   0, 15,  15, 0 },
+        { 0x0100A1B2C3D46000ULL, "Space Farm Tales",        95,   4,  0,   0, 75 },
     };
     out->windows_ok = true;
     LocalTime today;
@@ -541,14 +636,37 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
             given += g->day_s[k];
         }
         // One account: its share of every figure; a game it never played goes.
-        g->total_s  = share(g->total_s, account);
+        g->total_s  = account ? share(g->total_s - nobody_s(g->app_id), account) : g->total_s;
         g->launches = (u32)share(g->launches, account);
         g->today_s  = (u32)share(g->today_s, account);
         g->week_s   = (u32)share(g->week_s, account);
         for (int k = 0; k < 7; k++) g->day_s[k] = (u32)share(g->day_s[k], account);
         if (account && !g->week_s && !g->total_s) out->count--;
     }
+    // A large library: filler games, each played a little this week.
+    const char *more = getenv("PLAYGUARD_SIM_GAMES");
+    const int n = more ? atoi(more) : 0;
+    int i = 0;
+    for (; i < n && out->count < PLAYSTATS_MAX; i++) {
+        GameStat *g = &out->games[out->count++];
+        g->app_id = 0x0100B00000000000ULL + ((u64)i << 12);
+        snprintf(g->name, sizeof(g->name), "Game %03d", i + 1);
+        g->totals_ok = true;
+        g->week_s = g->day_s[1] = (u32)(60 * (n - i));
+        g->total_s = g->week_s * 10;
+        g->launches = 3;
+        g->last_played = out->now - 86400;
+        g->first_played = out->now - 30ULL * 86400;
+    }
+    out->truncated = i < n;   // more than the list holds, as on a console
 }
+
+// The made-up games have their names already; no SD card icons either.
+void playstats_remember(const PlayStats *known) { (void)known; }
+void playstats_set_icon_dir(const char *dir) { (void)dir; }
+static atomic_bool s_cancel;
+void playstats_cancel(void) { atomic_store(&s_cancel, true); }
+bool playstats_cancelled(void) { return atomic_load(&s_cancel); }
 
 void playstats_icons(PlayIcon *icons, size_t count)
 {
@@ -574,12 +692,13 @@ size_t playstats_by_account(u64 app_id, AccountPlay *out, size_t max, Result *rc
 {
     if (rc) *rc = getenv("PLAYGUARD_SIM_NO_PDM") ? (Result)0x1A0C : 0;
     if (getenv("PLAYGUARD_SIM_NO_PDM") || max < 2) return 0;
-    // Two made-up accounts sharing the play time 2:1 (none for a deleted game).
+    // Two made-up accounts sharing the play time 2:1 (none for a deleted game),
+    // less the time on no account.
     PlayStats all;
     playstats_fetch(&all);
     for (u32 i = 0; i < all.count; i++) {
         if (all.games[i].app_id != app_id || !all.games[i].totals_ok) continue;
-        const u64 t = all.games[i].total_s;
+        const u64 t = all.games[i].total_s - nobody_s(app_id);
         snprintf(out[0].nickname, sizeof(out[0].nickname), "Alice");
         out[0].total_s = t * 2 / 3;
         out[0].launches = all.games[i].launches * 2 / 3;

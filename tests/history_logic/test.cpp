@@ -1,0 +1,98 @@
+// Host tests for source/action/history_logic.cpp: what an undoable entry's
+// dialog offers given the console's value now, what the undo records, the
+// days a limits change touched and the relative day of an entry.
+#include "check.h"
+#include <cstdio>
+#include <vector>
+
+#include "action/history_logic.hpp"
+
+using history_logic::Undo;
+
+static history::Entry entry(const char* kind, std::vector<int> before, std::vector<int> after)
+{
+    history::Entry e;
+    e.when = "2026-10-08 18:30";
+    e.kind = kind;
+    e.before = std::move(before);
+    e.after = std::move(after);
+    return e;
+}
+
+static void test_action()
+{
+    const history::Entry level = entry("level", { 1 }, { 3 });
+    CHECK(history_logic::undo_action(level, { 3 }, false, false) == Undo::Offer);
+    CHECK(history_logic::undo_action(level, { 1 }, false, false) == Undo::AlreadyBack);
+    // The console's value unread: still offered.
+    CHECK(history_logic::undo_action(level, {}, false, false) == Undo::Offer);
+    // Read-only: nothing to offer, but "already back" says more and comes first.
+    CHECK(history_logic::undo_action(level, { 3 }, true, false) == Undo::ReadOnly);
+    CHECK(history_logic::undo_action(level, {}, true, false) == Undo::ReadOnly);
+    CHECK(history_logic::undo_action(level, { 1 }, true, false) == Undo::AlreadyBack);
+
+    // The alarm only in advanced mode; read-only is said first.
+    const history::Entry alarm = entry("alarm", { 0 }, { 1 });
+    CHECK(history_logic::undo_action(alarm, { 1 }, false, false) == Undo::NeedsAdvanced);
+    CHECK(history_logic::undo_action(alarm, { 1 }, false, true) == Undo::Offer);
+    CHECK(history_logic::undo_action(alarm, { 1 }, true, false) == Undo::ReadOnly);
+    CHECK(history_logic::undo_action(alarm, { 0 }, false, false) == Undo::AlreadyBack);
+
+    const history::Entry limits = entry("limits", std::vector<int>(7, 120), std::vector<int>(7, 60));
+    CHECK(history_logic::undo_action(limits, std::vector<int>(7, 60), false, false) == Undo::Offer);
+    CHECK(history_logic::undo_action(limits, std::vector<int>(7, 120), false, false) == Undo::AlreadyBack);
+    std::vector<int> other(7, 120);
+    other[3] = 90;                                         // one day differs: not back
+    CHECK(history_logic::undo_action(limits, other, false, false) == Undo::Offer);
+}
+
+static void test_changed_since()
+{
+    const history::Entry level = entry("level", { 1 }, { 3 });
+    CHECK(!history_logic::changed_since(level, { 3 }));   // still the entry's value
+    CHECK(history_logic::changed_since(level, { 2 }));    // changed again since
+    CHECK(!history_logic::changed_since(level, {}));      // unread: nothing said
+}
+
+static void test_replaces()
+{
+    const history::Entry custom = entry("custom", { 12, 1, 0 }, { 16, 0, 0 });
+    // The undo records the value it replaced: the console's when it was read.
+    CHECK((history_logic::undo_replaces(custom, { 18, 1, 1 }) == std::vector<int>{ 18, 1, 1 }));
+    CHECK((history_logic::undo_replaces(custom, {}) == std::vector<int>{ 16, 0, 0 }));
+}
+
+static void test_changed_days()
+{
+    std::vector<int> before(7, 195), after(7, 195);
+    after[3] = 180;   // Wednesday only
+    CHECK((history_logic::changed_days(entry("limits", before, after)) == std::vector<int>{ 3 }));
+    after[0] = 0;
+    CHECK((history_logic::changed_days(entry("outside_limits", before, after)) == std::vector<int>{ 0, 3 }));
+    CHECK(history_logic::changed_days(entry("limits", before, before)).empty());
+    // Not a week of limits: none.
+    CHECK(history_logic::changed_days(entry("level", { 1 }, { 3 })).empty());
+    CHECK(history_logic::changed_days(entry("limits", { 1, 2 }, after)).empty());
+}
+
+static void test_day_of()
+{
+    using history_logic::Day;
+    CHECK(history_logic::day_of("2026-10-14 21:29", "2026-10-14", "2026-10-13") == Day::Today);
+    CHECK(history_logic::day_of("2026-10-13 01:25", "2026-10-14", "2026-10-13") == Day::Yesterday);
+    CHECK(history_logic::day_of("2026-10-12 02:10", "2026-10-14", "2026-10-13") == Day::Other);
+    // An unknown date (the clock unread) or a damaged stamp: no relative day.
+    CHECK(history_logic::day_of("2026-10-14 21:29", "", "") == Day::Other);
+    CHECK(history_logic::day_of("", "2026-10-14", "2026-10-13") == Day::Other);
+    CHECK(history_logic::day_of("2026-10", "2026-10-14", "2026-10-13") == Day::Other);
+}
+
+int main()
+{
+    test_action();
+    test_changed_since();
+    test_replaces();
+    test_changed_days();
+    test_day_of();
+    return CHECK_DONE("history_logic undo offer, changed-since, recorded-value, changed-day and day assertions passed");
+}

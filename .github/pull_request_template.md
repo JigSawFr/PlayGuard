@@ -16,5 +16,5 @@ squash merge makes it the commit subject that release-please writes the changelo
 - [ ] `make test` and `python3 tools/check_resources.py .` pass
 - [ ] New strings are in every `resources/i18n/*/playguard.json` (English is fine as a placeholder)
 - [ ] A screen that changes on purpose has its `tests/visual` reference updated
-- [ ] A change users can see is in both README.md and README.fr.md
+- [ ] A change users can see is in the README or the user guide (`docs/`), in English and French (`docs/fr/`)
 - [ ] Nothing writes the play timer while it counts down

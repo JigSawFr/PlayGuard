@@ -1,12 +1,18 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "app.hpp"
 
+#include <cstdlib>
+
 #include "core/platform.h"
+#include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
 
 #ifndef APP_VERSION
 #define APP_VERSION "0.0.0-dev"
+#endif
+#ifndef APP_RELEASE
+#define APP_RELEASE 0
 #endif
 
 namespace app
@@ -31,10 +37,28 @@ void shutdown()
     s_ok = false;
 }
 
-bool        pctl_available()   { return s_ok; }
 uint32_t    pctl_init_result() { return s_init_result; }
+#ifndef __SWITCH__
+// Desktop simulation: the smoke test runs as one made-up build, whatever this
+// build's version and commit (PLAYGUARD_SIM_VERSION="1.0.0:abcdef0", or "1.0.0:"
+// for a release), so its screenshots and its update offer (a simulated 1.1.0)
+// do not change with each release.
+static const char* sim_version() { return std::getenv("PLAYGUARD_SIM_VERSION"); }
+static std::string sim_part(bool want_commit)
+{
+    const std::string s = sim_version();
+    const size_t colon  = s.find(':');
+    if (!want_commit) return s.substr(0, colon);
+    return colon == std::string::npos ? "" : s.substr(colon + 1);
+}
+std::string version()    { return sim_version() ? sim_part(false) : APP_VERSION; }
+std::string commit()     { return sim_version() ? sim_part(true) : APP_COMMIT; }
+bool        is_release() { return sim_version() ? commit().empty() : APP_RELEASE != 0; }
+#else
 std::string version()          { return APP_VERSION; }
 std::string commit()           { return APP_COMMIT; }
+bool        is_release()       { return APP_RELEASE != 0; }
+#endif
 
 namespace
 {
@@ -67,14 +91,13 @@ void set_read_only(bool on) { core_set_read_only(on); }
 
 bool dev_mode() { return s_dev_session || config::get().dev_mode; }
 
-bool set_dev_mode(bool on, bool persist)
+void set_dev_mode(bool on, bool persist, const std::string& saved_text, const std::string& failed_text)
 {
     s_dev_session = on;
     if (persist || !on) {
         config::get().dev_mode = on;
-        return config::save();
+        ui::save_config(saved_text, failed_text);
     }
-    return true;
 }
 
 }   // namespace app

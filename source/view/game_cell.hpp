@@ -5,16 +5,16 @@
 #pragma once
 
 #include <borealis.hpp>
-#include <vector>
 
 class GameCell : public brls::DetailCell
 {
   public:
     explicit GameCell(bool with_icon);
 
-    // A JPEG or PNG as the control data holds it; nothing happens without an
-    // icon slot or with an empty image.
-    void set_icon(const std::vector<unsigned char>& image);
+    // An NVG image (decoded small by the Activity tab): `owned`, this cell
+    // frees it; otherwise someone else owns and keeps it (the tab's icon
+    // cache). Nothing happens without an icon slot or with no image.
+    void set_icon_texture(int texture, bool owned);
 
   private:
     brls::Image* icon = nullptr;

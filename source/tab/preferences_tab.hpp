@@ -26,6 +26,7 @@ class PreferencesTab : public TabBase
     BRLS_BIND(brls::DetailCell,  extra_amounts, "pf_extra_amounts");
     BRLS_BIND(brls::BooleanCell, extra_auto,    "pf_extra_auto");
     BRLS_BIND(brls::BooleanCell, advanced,      "pf_advanced");
+    BRLS_BIND(brls::BooleanCell, intro,         "pf_intro");
     BRLS_BIND(brls::BooleanCell, clock_check,   "pf_clock_check");
     BRLS_BIND(brls::BooleanCell, support_reminder, "pf_support_reminder");
     BRLS_BIND(brls::Label,       note,          "pf_note");

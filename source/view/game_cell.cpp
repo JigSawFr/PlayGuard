@@ -13,8 +13,11 @@ GameCell::GameCell(bool with_icon)
     this->addView(this->icon, 0);   // before the title
 }
 
-void GameCell::set_icon(const std::vector<unsigned char>& image)
+void GameCell::set_icon_texture(int texture, bool owned)
 {
-    if (!this->icon || image.empty()) return;
-    this->icon->setImageFromMem(image.data(), (int)image.size());
+    if (!this->icon || texture == 0) return;
+    // The one shown before is freed only if it was this cell's own: the flag
+    // still says so while it is replaced.
+    this->icon->innerSetImage(texture);
+    this->icon->setFreeTexture(owned);
 }

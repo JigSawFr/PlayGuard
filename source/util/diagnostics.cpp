@@ -7,9 +7,11 @@
 
 #include "action/fw_gate.hpp"
 #include "app.hpp"
+#include "util/log_files.hpp"
 #include "util/patches.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
+#include "util/startup.h"
 
 namespace diagnostic
 {
@@ -61,12 +63,19 @@ std::string current_report()
         si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : std::string("unknown"),
         si.is_atmosphere ? "detected" : "not detected",
         si.applet_mode ? "applet (album)" : "application",
-        storage == SysStorage_EmuMMC ? "emuMMC" : storage == SysStorage_SysMMC ? "sysMMC" : "unknown",
+        fmt::format("{} (data: nand/{})",
+                    storage == SysStorage_EmuMMC ? "emuMMC" : storage == SysStorage_SysMMC ? "sysMMC" : "unknown",
+                    paths::nand_key()),
         !si.blank_valid ? "unknown" : (si.blank ? "blanked" : "not blanked"),
         patch_line,
         (int)sysinfo_compat(&si));
 
+    // How long this run took to start, step by step (util/startup.h).
     std::vector<char> buf(4096);
+    startup_report(buf.data(), buf.size());
+    out += buf.data();
+    out += "\n";
+
     time_clock_dump(buf.data(), buf.size());
     out += buf.data();
 
@@ -79,26 +88,7 @@ std::string current_report()
 
 std::string save(const std::string& report, std::string* error)
 {
-    std::time_t now = std::time(nullptr);
-    std::tm tmv{};
-    char stamp[32] = "unknown";
-#ifdef _WIN32
-    localtime_s(&tmv, &now);
-#else
-    localtime_r(&now, &tmv);
-#endif
-    std::strftime(stamp, sizeof(stamp), "%Y%m%d_%H%M%S", &tmv);
-
-    for (unsigned i = 0; i < 1000; ++i) {
-        std::string path = i == 0 ? fmt::format("{}/{}.txt", paths::logs_dir(), stamp)
-                                  : fmt::format("{}/{}_{}.txt", paths::logs_dir(), stamp, i);
-        std::string existing;
-        if (paths::read_file(path, existing)) continue;
-        if (paths::atomic_write(path, report, error)) return path;
-        return "";
-    }
-    if (error) *error = "No free file name";
-    return "";
+    return log_files::save(paths::reports_dir(), log_files::REPORT, report, std::time(nullptr), error);
 }
 
 }   // namespace diagnostic

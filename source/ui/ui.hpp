@@ -3,6 +3,7 @@
 #pragma once
 
 #include <borealis.hpp>
+#include <chrono>
 #include <cstdint>
 #include <functional>
 #include <initializer_list>
@@ -34,8 +35,10 @@ NVGcolor color_text();      // plain label text colour
 
 // "error 0x00001234" followed by a human explanation when one is known.
 // PlayGuard's own results (read-only, invalid value …) are just the sentence:
-// there is no code to look up.
-std::string rc_text(Result rc);
+// there is no code to look up. A system code gets, in a paragraph of its own,
+// what to do if it happens again (send a report); `next_step` false leaves it
+// out (the start-up error and recovery screens say what to do themselves).
+std::string rc_text(Result rc, bool next_step = true);
 
 // Runs `task` on a thread of its own, rather than brls::async: that single
 // queue runs one task after the other, so a network request queued there
@@ -43,8 +46,27 @@ std::string rc_text(Result rc);
 // console with many games), or behind another request's timeout. Every
 // network task goes here; the play log and the icons stay on the queue, one
 // at a time on the console's services. Queued there when no thread can be
-// had. `what` names it in the log.
+// had. `what` names it in the log. The thread is never detached (the console
+// cannot: util/worker_threads.hpp); it is joined once the task is over.
 void in_background(const char* what, std::function<void()> task);
+// At exit, after the main loop: says the app is quitting (quitting() turns
+// true, for a task that waits or polls) and waits up to `max` for the tasks
+// of in_background still running, so none of them outlives the objects it
+// uses (brls::sync's queue, curl, statics), joining the threads of those
+// that ended. The writes of write_later are finished first, and any asked
+// for later run at once. False when some are still running.
+bool finish_background(std::chrono::milliseconds max);
+bool quitting();
+
+// An SD-card write off the UI thread (a slow card must not hold a frame), on
+// one queue run by a task of in_background: the writes happen one at a time,
+// in the order asked. `key` names a file written whole: a write of it still
+// waiting is dropped for the newer one. `job` reports its own result (ui::
+// notify, ui::error). finish_background runs what is still queued at exit.
+void write_later(const char* what, std::function<void()> job, const std::string& key = "");
+// Until every write asked so far is on the SD card: before reading back a
+// file that write_later writes (history.json, the play-timer log).
+void settle_writes();
 
 // Deferred to the next frame (toasts fired right after a system applet returns
 // were dropped on fw 22.1.0).
@@ -53,11 +75,18 @@ void notify(const std::string& text);
 // toast (a toast is gone before "error 0x…" is read). Next frame, so it can
 // be called from a dialog button. Logged as "error: " for the smoke test.
 void error(const std::string& text);
-// config::save(), with a toast when the SD card refused the write.
-bool save_config();
+// config::save(), off the UI thread (write_later): `saved_text` as a toast
+// once it is on the SD card, `failed_text` (default: the config_err toast)
+// when the card refused it. False only when it cannot be saved at all (an
+// unreadable config.json kept: config::save refuses to overwrite it), said
+// at once.
+bool save_config(const std::string& saved_text = "", const std::string& failed_text = "");
+// The same, waiting for the write: for a record that must be on the SD card
+// before the console change it describes. False when it is not.
+bool save_config_now();
 // `next` in place of the current screen. Borealis never pops the first
-// activity, so a start screen (lock, rescue) gets `next` pushed over it
-// instead: popping it would silently do nothing.
+// activity (the loading screen, under every start screen): a screen that
+// cannot be popped gets `next` pushed over it instead.
 void replace_screen(brls::Activity* next);
 // Success: `ok_text` as a toast. Failure: `error_prefix — reason` as a dialog.
 void notify_result(Result rc, const std::string& ok_text, const std::string& error_prefix);
@@ -77,8 +106,9 @@ void info(const std::string& body);
 
 // Reads the stored PIN (pctl_get_pin) and shows it in large digits, or a
 // dialog with the error. The app's copies are wiped as soon as the label
-// holds the text. Used by Security › Show the PIN and the recovery screen.
-void show_pin_dialog();
+// holds the text. True when it was shown; `on_close` then runs once it is
+// closed (OK or B). Used by Security › Show the PIN.
+bool show_pin_dialog(std::function<void()> on_close = nullptr);
 
 // A dialog showing `text`. borealis' own text dialog does not scroll: a text
 // taller than the screen collapses into one cut line. A long one is laid out
@@ -123,6 +153,9 @@ std::string level_name(uint32_t level);                    // localised restrict
 // Console section (Tools) and Overview warnings.
 std::string storage_text(const SysInfo& info);             // "emuMMC (Atmosphère)"
 std::string storage_short(const SysInfo& info);            // "emuMMC" / "sysMMC" / "—"
+// The other system (sysMMC from emuMMC, or an emuMMC set up on the card from
+// sysMMC) has its own parental controls, out of PlayGuard's sight; "" if none.
+std::string other_storage_note(const SysInfo& info);
 // The serial-number warning only applies on emuMMC: on sysMMC the real serial
 // is normal (online play), blanking it would cut Nintendo's services.
 bool        serial_warning(const SysInfo& info);

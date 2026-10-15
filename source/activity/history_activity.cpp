@@ -21,7 +21,7 @@ void HistoryActivity::rebuild()
     // The cells are reused in place: one of them has the focus when this runs
     // after a change, and borealis would keep a pointer to a deleted cell.
     // The list only grows (up to history::MAX_ENTRIES), so none is removed.
-    const auto all = history::load();
+    const auto all = history_flow::load();
     auto& cells = list->getChildren();
     for (size_t i = 0; i < all.size(); i++) {
         brls::DetailCell* cell;
@@ -34,7 +34,7 @@ void HistoryActivity::rebuild()
         }
         const history::Entry e = all[i];
         cell->setText(history_flow::title(e));
-        cell->setDetailText(e.when);
+        cell->setDetailText(history_flow::when_text(e));
         cell->registerClickAction([this, e](brls::View*) {
             history_flow::open(e, [this]() { this->rebuild(); });
             return true;

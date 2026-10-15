@@ -2,7 +2,7 @@
 // forgot the parental-control PIN while the play timer keeps every program
 // (PlayGuard included) from starting.
 //
-// At boot it looks for sd:/switch/playguard/RESCUE (see core/rescue.h). If it
+// At boot it looks for sd:/config/playguard/RESCUE (see core/rescue.h). If it
 // is there it removes it (used once; renamed RESCUE.done should that fail),
 // then, with the PIN the console stores:
 //   - unlocks parental controls temporarily (1208 reads the PIN, 1201 unlocks)
@@ -19,13 +19,15 @@
 // pctl_ops.c, proven on hardware.
 //
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
+#include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <switch.h>
 
 #include "rescue.h"
 
-#define DATA_DIR    "sdmc:/switch/playguard"
+#define DATA_DIR    "sdmc:/config/playguard"
 #define PATH_REQ    DATA_DIR "/" RESCUE_REQUEST_NAME
 #define PATH_REQTXT DATA_DIR "/" RESCUE_REQUEST_NAME_TXT
 #define PATH_DONE   DATA_DIR "/" RESCUE_REQUEST_NAME_DONE
@@ -46,13 +48,17 @@ void __libnx_initheap(void)
     fake_heap_end   = g_heap + sizeof(g_heap);
 }
 
+// Whether sdmc: is mounted. Not an abort when it is not: without the SD card
+// there is no request to read and no report to leave, so main() does nothing.
+static bool s_sd_mounted;
+
 void __appInit(void)
 {
     Result rc = smInitialize();
     if (R_FAILED(rc)) diagAbortWithResult(rc);
     rc = fsInitialize();
     if (R_FAILED(rc)) diagAbortWithResult(rc);
-    fsdevMountSdmc();
+    s_sd_mounted = R_SUCCEEDED(fsdevMountSdmc());
 }
 
 void __appExit(void)
@@ -164,13 +170,35 @@ static void write_report(const RescueReport* r)
     char buf[128];
     size_t n = rescue_report_format(r, buf, sizeof(buf));
     if (n == 0) return;
-    FILE* f = fopen(PATH_REPORT, "wb");
-    if (!f) return;
-    fwrite(buf, 1, n, f);
-    fclose(f);
+    // Through a ".tmp" sibling, as the app's own files: a report cut short
+    // (power off, SD card full) is never read as a whole one. PlayGuard reads
+    // the ".tmp" when the report itself is missing (paths::read_file).
+    // Owner-writable only (fopen would ask for 0666).
+    const int fd = open(PATH_REPORT ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    FILE* f = fd >= 0 ? fdopen(fd, "wb") : NULL;
+    if (!f) {
+        if (fd >= 0) close(fd);
+        return;
+    }
+    const bool written = fwrite(buf, 1, n, f) == n;
+    if (fclose(f) != 0 || !written) {
+        remove(PATH_REPORT ".tmp");
+        return;
+    }
+    remove(PATH_REPORT);
+    rename(PATH_REPORT ".tmp", PATH_REPORT);
 }
 
 // pctl can take a moment to come up at boot; the SD card too. Try for a while.
+static bool wait_for_sd(void)
+{
+    for (int i = 0; i < 40 && !s_sd_mounted; i++) {   // ~10 s
+        svcSleepThread(250000000ULL);
+        s_sd_mounted = R_SUCCEEDED(fsdevMountSdmc());
+    }
+    return s_sd_mounted;
+}
+
 static bool wait_for_pctl(void)
 {
     for (int i = 0; i < 40; i++) {   // ~10 s
@@ -216,7 +244,7 @@ int main(int argc, char* argv[])
     (void)argv;
 
     RescueMode mode;
-    if (take_request(&mode)) {
+    if (wait_for_sd() && take_request(&mode)) {
         // Take the request away first: it is acted on once, present or not next
         // boot. A delete still there would run again at every boot, so it is
         // not done; an unlock is (the parent needs PlayGuard to open), and the

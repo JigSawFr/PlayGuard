@@ -4,6 +4,12 @@
         "read_only": "alleen-lezen",
         "unlocked": "tijdelijk ontgrendeld"
     },
+    "loading": {
+        "tagline": "Ouderlijk toezicht, rechtstreeks op de console",
+        "step_console": "Console controleren...",
+        "step_settings": "Instellingen lezen...",
+        "step_screen": "PlayGuard openen..."
+    },
     "tabs": {
         "dashboard": "Overzicht",
         "play_timer": "Speeltijdtimer",
@@ -18,7 +24,10 @@
     "hints": {
         "refresh": "Vernieuwen",
         "open": "Openen",
-        "exit_again": "Druk nogmaals op B om af te sluiten"
+        "exit_again": "Druk nogmaals op B om af te sluiten",
+        "exit_unlocked": "Ouderlijk toezicht is nog tijdelijk ontgrendeld: er kan zonder limiet worden gespeeld tot het weer wordt vergrendeld of de console opnieuw start.\n\nVergrendelen voor het afsluiten?",
+        "exit_lock": "Vergrendelen en afsluiten",
+        "exit_leave": "Afsluiten zonder vergrendelen"
     },
     "common": {
         "yes": "Ja",
@@ -91,7 +100,15 @@
         "bad_pin_format": "het systeem heeft de opmaak van de pincode geweigerd",
         "pctl_refused": "geweigerd door de dienst voor ouderlijk toezicht",
         "relock_failed": "de console is ontgrendeld maar kon niet opnieuw worden vergrendeld: vergrendel hem nu (Beveiliging & app › Nu vergrendelen)",
-        "not_applied": "de console heeft de wijziging niet overgenomen, dus de vorige instellingen zijn teruggezet"
+        "not_applied": "de console heeft de wijziging niet overgenomen, dus de vorige instellingen zijn teruggezet",
+        "not_saved": "PlayGuard kon niet op de SD-kaart opslaan wat het later moet terugzetten, dus er is niets weggeschreven",
+        "next_step": "Gebeurt dit opnieuw, verstuur dan een rapport: Tools › Rapport online versturen.",
+        "pt_not_understood": "de speeltijdinstellingen van de console hebben een indeling die PlayGuard niet begrijpt, dus er is niets gewijzigd. Verstuur een rapport: Tools › Rapport online versturen.",
+        "pctl_0132": "code 2142-0132, ook door anderen gemeld bij het schrijven van de speeltimer; de betekenis is nog niet bekend. Start de console opnieuw op en probeer het dan nog eens",
+        "clock_not_set": "de console meldt dat de netwerkklok geen geldige tijd heeft (misschien is die nooit ingesteld); zie het tabblad Netwerkklok",
+        "no_internet": "de console is niet met internet verbonden: verbind hem en probeer het opnieuw",
+        "service_denied": "het systeem weigerde PlayGuard toegang tot een van zijn diensten; PlayGuard heeft een console met Atmosphère nodig",
+        "pdm_unavailable": "de speelgegevensdienst van de console is nu niet beschikbaar; probeer het zo opnieuw"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -102,7 +119,7 @@
     "fw_gate": {
         "title": "Firmware nog niet ondersteund",
         "headline": "Firmware {} wordt nog niet ondersteund",
-        "body": "PlayGuard {} is gecontroleerd tot en met firmware {}. Voor de veiligheid wordt er niets gewijzigd totdat je kiest hoe je verdergaat. Alles kan nog wel worden bekeken.",
+        "body": "PlayGuard {} is op een console getest tot en met firmware {}. Voor de veiligheid wordt er niets gewijzigd totdat je kiest hoe je verdergaat. Alles kan nog wel worden bekeken.",
         "status_checking": "Zoeken naar een PlayGuard-versie die deze firmware ondersteunt...",
         "status_supports": "PlayGuard {} ondersteunt firmware {}: werk bij om alle functies veilig te gebruiken.",
         "status_no_support": "PlayGuard {} is beschikbaar, maar ondersteunt firmware {} nog niet.",
@@ -129,21 +146,23 @@
         "pc_off": "Niet ingesteld",
         "pc_pin_only": "Pincode ingesteld, geen beperking",
         "pin": "Pincode",
-        "pin_set": "Ingesteld ({} cijfers)",
+        "pin_set": "Ingesteld",
         "level": "Beperkingsniveau",
         "today_limit": "Limiet vandaag ({})",
         "remaining": "Resterende tijd vandaag",
         "remaining_idle": "Getoond tijdens het spelen",
-        "remaining_unlocked": "Niet geteld",
+        "remaining_unlocked": "Telt mogelijk niet",
         "gauge_known": "{} van {} gespeeld",
         "gauge_none": "Vandaag geen speeltijdlimiet",
         "gauge_none_played": "Vandaag geen speeltijdlimiet · {} gespeeld",
         "gauge_log": "≈ {} van {} gespeeld (activiteitenlog)",
         "remaining_log": "≈ {}",
+        "remaining_over": "{} erover",
         "gauge_unknown": "Speeltijd niet beschikbaar",
         "gauge_reached": "De limiet van vandaag is bereikt",
+        "gauge_over": "{} van {} gespeeld, {} erover (alleen een waarschuwing)",
         "gauge_idle": "De resterende tijd wordt getoond terwijl er een game draait.",
-        "gauge_unlocked": "Speeltijd wordt niet geteld zolang het ouderlijk toezicht ontgrendeld is.",
+        "gauge_unlocked": "Speeltijd wordt mogelijk niet geteld zolang het ouderlijk toezicht ontgrendeld is.",
         "bedtime": "Bedtijdalarm",
         "alarm_off": "Uit",
         "clock": "Netwerkklok",
@@ -176,7 +195,18 @@
         "stop_done": "Er wordt vandaag niet meer gespeeld.",
         "stop_restore_body": "Op {} is de limiet voor {} alleen voor die dag op {} gezet. Terugzetten naar {}?",
         "applet": "PlayGuard draait als applet (geopend vanuit het album), met weinig geheugen: een export of een lange activiteitenlijst kan mislukken. Open PlayGuard voor de volledige app door R ingedrukt te houden terwijl je een game start.",
-        "counted": "Over een spel geopend telt PlayGuard als dat spel: de console telt de tijd mee voor de speeltimer en de activiteit van de gebruiker die bij het starten is gekozen (het tabblad Activiteit van PlayGuard laat die weg). Open PlayGuard met de gebruiker van een ouder, of via het Album voor een snelle blik."
+        "counted": "Over een spel geopend telt PlayGuard als dat spel: de console telt de tijd mee voor de speeltimer en de activiteit van de gebruiker die bij het starten is gekozen. Open PlayGuard met de gebruiker van een ouder, of via het Album voor een snelle blik.",
+        "home_counts": "Een game die open blijft in het HOME-menu, telt gewoon door.",
+        "stop_now": "Nu",
+        "stop_soon": "Over 5 minuten",
+        "stop_soon_body": "Over 5 minuten stoppen?\n\nDe limiet voor {} wordt vandaag {}: nog ongeveer 5 minuten, tijd om op te slaan. Vanaf de volgende dag stelt PlayGuard voor om deze terug te zetten naar {}.",
+        "stop_soon_body_auto": "Over 5 minuten stoppen?\n\nDe limiet voor {} wordt vandaag {}: nog ongeveer 5 minuten, tijd om op te slaan. Vanaf de volgende dag zet PlayGuard deze vanzelf terug naar {}.",
+        "stop_soon_done": "Het spelen stopt over ongeveer 5 minuten.",
+        "stop_alarm_only": "De console waarschuwt alleen als de tijd om is (zie \"Als de tijd om is\"): de lopende game wordt niet gestopt.",
+        "outside_reset": "De speeltijd van vandaag begon rond {} opnieuw (klok gewijzigd?).",
+        "outside_clock": "De klok van de console is gewijzigd.",
+        "outside_limits": "De limieten zijn buiten PlayGuard gewijzigd, bijvoorbeeld via de app op de telefoon.",
+        "outside_dismiss": "Deze melding verbergen"
     },
     "onboarding": {
         "title": "Eerste stappen",
@@ -193,7 +223,8 @@
         "step_alarm": "{}. Alarm \"Tijd is om\" weer inschakelen (niets waarschuwt als de tijd om is)",
         "at_start": "Bij het opstarten tonen zolang er geen pincode is",
         "note": "De pincode is die van de console zelf; de limiet wordt gecontroleerd met de netwerkklok, die dus nauwkeurig moet zijn. Open PlayGuard met de gebruiker van een ouder: over een spel geopend telt de tijd als speeltijd.",
-        "close": "Sluiten"
+        "close": "Sluiten",
+        "step_protect": "{}. PlayGuard beveiligen: om pincode vragen"
     },
     "compat": {
         "ok": "Gecontroleerd",
@@ -208,8 +239,11 @@
             "active": "Timer actief",
             "inactive": "Timer uit",
             "remaining_short": "Nog {} vandaag",
-            "unlocked_short": "tijdelijk ontgrendeld, telt niet mee",
-            "reached_alert": "De limiet van vandaag is bereikt: de game is onderbroken.",
+            "over_short": "limiet {} overschreden",
+            "unlocked_short": "tijdelijk ontgrendeld, telt mogelijk niet mee",
+            "reached_alert": "De limiet van vandaag is bereikt: de console toont \"Tijd is om\".",
+            "reached_alert_suspend": "De limiet van vandaag is bereikt: de console toont \"Tijd is om\" en onderbreekt de game.",
+            "reached_alert_alarm": "De limiet van vandaag is bereikt: de console toont \"Tijd is om\", alleen als waarschuwing (de game wordt niet onderbroken).",
             "not_set": "Geen limiet",
             "every_day": "{} elke dag",
             "today_per_day": "{} vandaag (verschilt per dag)",
@@ -234,12 +268,18 @@
         "profiles_section_saved": "Opgeslagen profielen",
         "profiles_section_new": "Nieuw profiel",
         "profiles_hint": "A op een profiel: toepassen, limieten bewerken, hernoemen of verwijderen.",
+        "time_up": "Als de tijd om is",
+        "time_up_title": "Als de tijd om is",
+        "time_up_suspend": "Software onderbreken",
+        "time_up_alarm": "Alleen waarschuwen",
+        "time_up_suspend_body": "De software onderbreken als de tijd om is?\n\nBij de limiet toont de console \"Tijd is om\" en onderbreekt hij de game. Niet-opgeslagen voortgang kan verloren gaan.",
+        "time_up_alarm_body": "Alleen waarschuwen als de tijd om is?\n\nBij de limiet toont de console \"Tijd is om\", maar de game wordt niet onderbroken: er kan doorgespeeld worden.",
+        "time_up_needs_limit": "Stel eerst een speeltijdlimiet of een bedtijd in: wat er gebeurt als de tijd om is, telt pas als er een is.",
         "profile_current": "{} (huidig)",
         "profile_range": "{} tot {}",
         "profile_saved": "Profiel \"{}\" opgeslagen.",
         "profile_renamed": "Profiel hernoemd: {}.",
         "profile_save_err": "Kan het profiel niet opslaan",
-        "profile_bad_name": "De naam moet minstens één Latijnse letter of cijfer bevatten.",
         "profile_replace": "Er bestaat al een profiel met de naam \"{}\". Vervangen?",
         "profile_replace_confirm": "Vervangen",
         "profile_deleted": "Profiel \"{}\" verwijderd.",
@@ -255,7 +295,7 @@
         "bedtime_value_on": "{} (aan)",
         "bedtime_value_off": "{} (uit)",
         "bedtime_reset": "Weer spelen vanaf",
-        "bedtime_note": "Geldt voor elke dag. Op bedtijd toont de console het alarm, of onderbreekt hij de software als de app zo is ingesteld, totdat er weer gespeeld mag worden. PlayGuard controleert of de console de nieuwe tijd meldt, en zet anders de vorige instellingen terug.",
+        "bedtime_note": "Geldt voor elke dag. Op bedtijd toont de console het alarm, en onderbreekt hij misschien ook de software (zie \"Als de tijd om is\"), totdat er weer gespeeld mag worden. PlayGuard controleert of de console de nieuwe tijd meldt, en zet anders de vorige instellingen terug.",
         "bedtime_title": "Bedtijdalarm, elke dag",
         "bedtime_end_title": "Weer spelen vanaf (elke dag)",
         "bedtime_summary": "{}, weer spelen vanaf {}",
@@ -272,7 +312,7 @@
         "alarm_on_body": "Alarm \"Tijd is om\" weer inschakelen?\n\nAls de speeltijdlimiet is bereikt, toont de console het alarm weer, zoals standaard.",
         "alarm_on_confirm": "Inschakelen",
         "alarm_on_done": "Alarm \"Tijd is om\" ingeschakeld.",
-        "alarm_off_body": "Het alarm 'Tijd is om' uitschakelen?\n\nAls de speeltijdlimiet is bereikt, meldt de console dat niet meer: het spel wordt pas bij de volgende vergrendeling onderbroken.",
+        "alarm_off_body": "Het alarm 'Tijd is om' uitschakelen?\n\nAls de speeltijdlimiet is bereikt, meldt de console dat niet meer. Is hij ingesteld om de game te onderbreken, dan doet hij dat zonder waarschuwing.",
         "alarm_off_confirm": "Uitschakelen",
         "pause": "Aftellen pauzeren",
         "resume": "Aftellen hervatten",
@@ -327,7 +367,10 @@
         "written_days": "Limieten per dag toegepast.",
         "write_err": "Kan de speeltijdlimiet niet toepassen",
         "removed": "Speeltijdlimiet verwijderd.",
-        "remove_err": "Kan de speeltijdlimiet niet verwijderen"
+        "remove_err": "Kan de speeltijdlimiet niet verwijderen",
+        "not_counting": "De console telt op dit moment geen speeltijd. Waarschijnlijke oorzaken: de klok is teruggezet (later telt hij weer), de netwerkklok is nooit ingesteld (tabblad Netwerkklok), of er is net een limiet geschreven (start een game voor een minuut en kijk dan opnieuw).",
+        "limit_note": "Bij de limiet toont de console \"Tijd is om\" en onderbreekt hij daarna de game of waarschuwt hij alleen, volgens \"Als de tijd om is\".",
+        "unsaved": "Niet-opgeslagen voortgang kan verloren gaan: laat het kind eerst opslaan."
     },
     "activity": {
         "section_totals": "Speeltijd",
@@ -381,7 +424,24 @@
         "first": "Voor het eerst gespeeld",
         "last": "Laatst gespeeld",
         "less_than_minute": "< 1 min",
-        "note": "Gelezen uit het activiteitenlogboek van de console, voor alle gebruikers. De tijden zijn bij benadering als de klok van de console is gewijzigd. PlayGuard geopend over een spel telt als dat spel voor de gebruiker die bij het starten is gekozen: open het met de gebruiker van een ouder."
+        "note": "Gelezen uit het activiteitenlogboek van de console, voor alle gebruikers. De tijden zijn bij benadering als de klok van de console is gewijzigd. PlayGuard geopend over een spel telt als dat spel voor de gebruiker die bij het starten is gekozen: open het met de gebruiker van een ouder.",
+        "show_all": "Alle games tonen",
+        "section_summary": "Samenvatting",
+        "section_rediscover": "Herontdekken",
+        "rediscover_note": "Geïnstalleerd, in totaal minder dan 3 u en al een maand of langer niet gespeeld: een nieuwe kans waard?",
+        "summary": {
+            "per_day": "Gemiddeld per dag",
+            "per_day_over": "{} over {} dagen",
+            "top": "Meest gespeeld",
+            "days_played": "Speeldagen",
+            "days_played_value": "{} van 7",
+            "busiest": "Drukste dag",
+            "session": "Gemiddelde sessie"
+        },
+        "applet_cap": "Niet getoond, om geheugen te sparen in de appletmodus (geopend vanuit het album): nog {}. De export bevat alle games; open PlayGuard voor de volledige lijst door R ingedrukt te houden terwijl je een game start.",
+        "account_nobody": "Zonder account (of een verwijderd account)",
+        "account_new": "Nieuw account sinds {}: {}",
+        "truncated": "Er kunnen maar {} games worden getoond: sommige die deze week niet zijn gespeeld ontbreken, ook in het totaal."
     },
     "restrictions": {
         "section_level": "Beperkingsniveau",
@@ -411,7 +471,11 @@
         "free_comm_value": "{} titel(s)",
         "note": "Dit zijn dezelfde instellingen als in Systeeminstellingen › Ouderlijk toezicht.",
         "saved": "Beperking opgeslagen.",
-        "save_err": "Kan de beperking niet opslaan"
+        "save_err": "Kan de beperking niet opslaan",
+        "none_body": "Er wordt niets meer beperkt: software van elke leeftijd kan worden gespeeld, en berichten op sociale media en communicatie met anderen zijn toegestaan. De dagelijkse speeltijdlimieten blijven gelden.",
+        "confirm_age": "De leeftijdsgrens wijzigen in \"{}\"? Dan kan software met een hogere leeftijdsclassificatie dan nu worden gespeeld.",
+        "confirm_sns_off": "Berichten op sociale media niet meer beperken? Dan kunnen schermafbeeldingen en video's vanaf de console worden geplaatst.",
+        "confirm_comm_off": "Communicatie met anderen niet meer beperken? Dan kan software het kind laten chatten en inhoud laten delen met andere spelers."
     },
     "clock": {
         "section_now": "Klokken",
@@ -459,7 +523,7 @@
         "seconds": "{} s",
         "busy": "Wacht tot het huidige verzoek klaar is.",
         "autosync_off_note": "Zet eerst \"Klok synchroniseren via internet\" aan in de systeeminstellingen om de netwerkklok hiermee in te stellen.",
-        "auto_how": "PlayGuard can only read this setting: it belongs to System Settings, which only the HOME menu can open.\n\nTo change it: HOME menu › System Settings › System › Date and Time › Synchronise Clock via Internet.\n\nWhen it is on, the console clock follows the network clock. Note: when the clock was moved, the console was seen to start today's play time over.",
+        "auto_how": "PlayGuard kan deze instelling alleen lezen: ze hoort bij de systeeminstellingen, die alleen het HOME-menu kan openen.\n\nOm haar te wijzigen: HOME-menu › Systeeminstellingen › Systeem › Datum en tijd › Klok synchroniseren via internet.\n\nAls ze aan staat, volgt de klok van de console de netwerkklok. Let op: toen de klok werd verzet, begon de console de speeltijd van vandaag opnieuw.",
         "ntp_err": {
             "bad_host": "geen geldige servernaam",
             "lookup": "server niet gevonden (geen internetverbinding?)",
@@ -470,7 +534,18 @@
         "start_off": "De netwerkklok wijkt {} af (gecontroleerd met {}). De speeltijdtimer is ervan afhankelijk: zie het tabblad Netwerkklok.",
         "guided_body": "De netwerkklok is onnauwkeurig, en de speeltijdtimer is ervan afhankelijk.\n\nNu de tijd meten met {}? (De console moet online zijn.) Daarna krijg je eerst nog de vraag of de klok mag worden ingesteld.",
         "guided_measure": "Nu meten",
-        "guided_fine": "De netwerkklok is nauwkeurig: niets te doen."
+        "guided_fine": "De netwerkklok is nauwkeurig: niets te doen.",
+        "confirm_apply_resets": "\n\nDe klok wijzigen zet de speeltijd van vandaag terug op nul: de hele daglimiet is weer beschikbaar.",
+        "copy": "Netwerkklok instellen op de consoleklok",
+        "offline_hint": "Zonder internet kan de netwerkklok in plaats daarvan op de consoleklok worden ingesteld (\"Consoleklok\", bovenaan). Controleer eerst of die klopt: PlayGuard heeft niets anders om mee te vergelijken.",
+        "offline_guided": "Zonder internet kan PlayGuard de netwerkklok in plaats daarvan op de consoleklok instellen: nu {}. Doe dit alleen als die tijd klopt (vergelijk hem met een telefoon of een horloge).",
+        "guided_copy": "Consoleklok gebruiken",
+        "confirm_copy": "De netwerkklok instellen op de consoleklok, {} ({})?",
+        "confirm_copy_check": "\n\nGeen enkele tijdserver heeft geantwoord, dus de consoleklok is de enige bron: doe dit alleen als hij klopt. Vergelijk hem eerst met een telefoon of een horloge.",
+        "confirm_copy_follows": "\n\n\"Klok synchroniseren via internet\" staat aan, dus de consoleklok volgt de netwerkklok en kan net zo fout zijn. Zo ja: zet de instelling uit, stel datum en tijd in bij Systeeminstellingen › Systeem › Datum en tijd en kom dan hier terug.",
+        "confirm_copy_sync_after": "\n\n\"Klok synchroniseren via internet\" staat uit: de consoleklok blijft zoals hij is. Als je de instelling daarna aanzet, verspringt hij niet meer, omdat beide klokken dan dezelfde tijd tonen.",
+        "copied_sync_on": "\n\nJe kunt nu \"Klok synchroniseren via internet\" aanzetten (Systeeminstellingen › Systeem › Datum en tijd): de consoleklok verspringt niet.",
+        "copy_implausible": "De consoleklok geeft {} aan: hij lijkt niet ingesteld. Stel eerst datum en tijd in bij Systeeminstellingen › Systeem › Datum en tijd (met \"Klok synchroniseren via internet\" uit) en kom dan hier terug."
     },
     "pairing": {
         "section": "App Nintendo Switch Ouderlijk toezicht",
@@ -481,7 +556,9 @@
         "unlink_confirm": "Ontkoppelen",
         "unlinked": "Smartphone-app ontkoppeld.",
         "unlink_err": "Kan de smartphone-app niet ontkoppelen",
-        "note": "Zolang de console gekoppeld blijft, overschrijft de smartphone-app bij de volgende synchronisatie de instellingen die hier zijn gemaakt."
+        "note": "Zolang de console gekoppeld blijft, overschrijft de smartphone-app bij de volgende synchronisatie de instellingen die hier zijn gemaakt.",
+        "decode": "Vóór het ontkoppelen: twee instellingen ontcijferen",
+        "decode_note": "Vóór het ontkoppelen kan deze console helpen 'alleen alarm' en bedtijd per dag te ontcijferen (Beveiliging & app, 2 min): na het ontkoppelen kan dat niet meer."
     },
     "security": {
         "section_status": "Status",
@@ -496,7 +573,7 @@
         "show_pin_title": "Huidige pincode",
         "show_pin_err": "Kan de pincode niet lezen",
         "unlock": "Tijdelijk ontgrendelen",
-        "unlock_body": "Het ouderlijk toezicht tijdelijk ontgrendelen?\n\nDe beperkingen blijven uit totdat je het ouderlijk toezicht weer vergrendelt (of de console opnieuw opstart).",
+        "unlock_body": "Het ouderlijk toezicht tijdelijk ontgrendelen?\n\nDe beperkingen blijven uit totdat je het ouderlijk toezicht weer vergrendelt (of de console opnieuw opstart). Wordt PlayGuard intussen via het HOME-menu gesloten, dan vergrendelt het bij de volgende start opnieuw.",
         "unlock_confirm": "Ontgrendelen",
         "unlocked": "Ouderlijk toezicht tijdelijk ontgrendeld.",
         "unlock_err": "Kan niet ontgrendelen",
@@ -512,7 +589,10 @@
         "deleted": "Ouderlijk toezicht verwijderd.",
         "delete_err": "Kan het ouderlijk toezicht niet verwijderen",
         "pin_ok": "Pincode bijgewerkt.",
-        "pin_err": "Kan de pincode niet bijwerken"
+        "pin_err": "Kan de pincode niet bijwerken",
+        "rescue_note": "De herstel-sysmodule is geïnstalleerd: iedereen die de SD-kaart kan bewerken, kan daarmee bij de volgende start de console ontgrendelen of het ouderlijk toezicht volledig wissen. Verwijder hem wanneer u hem niet meer nodig hebt (map atmosphere/contents/4200000000505247).",
+        "show_pin_change_body": "Pincode nu wijzigen?\n\nIemand anders kan hem hebben gezien.",
+        "show_pin_change_confirm": "Wijzigen"
     },
     "pin_lock": {
         "title": "Om pincode vragen",
@@ -522,9 +602,9 @@
             "open": "Om PlayGuard te openen"
         },
         "notes": {
-            "off": "Iedereen die de console vasthoudt, kan hier de instellingen wijzigen.",
+            "off": "Iedereen die de console vasthoudt, kan hier de instellingen wijzigen. Voor het tonen van de pincode wordt er nog steeds om gevraagd.",
             "changes": "Iedereen kan kijken; alleen de ouder kan iets wijzigen (na 5 minuten wordt opnieuw gevraagd). Voor opnieuw vergrendelen is nooit een pincode nodig.",
-            "open": "Een vergrendelscherm totdat de pincode is ingevoerd. Voor opnieuw vergrendelen is nooit een pincode nodig."
+            "open": "Een vergrendelscherm totdat de pincode is ingevoerd, en opnieuw na 5 minuten buiten PlayGuard. Voor opnieuw vergrendelen is nooit een pincode nodig."
         },
         "no_pin": "Stel eerst een pincode in (Pincode instellen of wijzigen).",
         "set": "Om pincode vragen: {}",
@@ -553,8 +633,8 @@
         "reset_pin": "Nieuwe pincode instellen",
         "continue": "PlayGuard openen",
         "note": "U bent hier gekomen via het RESCUE-bestand, dus hier wordt geen pincode gevraagd. Stel een nieuwe pincode in of verwijder het ouderlijk toezicht en open daarna PlayGuard.",
-        "note_failed": "Het herstel is niet vanzelf voltooid. U kunt het hier opnieuw proberen, of de SD-kaart verwijderen en de instellingen op een computer aanpassen.",
-        "note_refused": "Alle ouderlijk toezicht zou zijn verwijderd, maar het verzoekbestand kon niet van de SD-kaart worden verwijderd en zou bij elke start opnieuw worden uitgevoerd. Verwijder het via een computer en probeer het opnieuw, of gebruik de acties hieronder.",
+        "note_failed": "Het herstel is niet voltooid, dus zonder de pincode kan hier niets worden gewijzigd. Probeer het opnieuw met het RESCUE-bestand, of verwijder de SD-kaart en pas de instellingen op een computer aan.",
+        "note_refused": "Alle ouderlijk toezicht zou zijn verwijderd, maar het verzoekbestand kon niet van de SD-kaart worden verwijderd en zou bij elke start opnieuw worden uitgevoerd. Verwijder het via een computer en probeer het opnieuw.",
         "request_kept": "Het bestand {} kon niet van de SD-kaart worden verwijderd: zolang het er staat, wordt de console bij elke start opnieuw ontgrendeld. Verwijder het via een computer.",
         "note_deleted": "Het ouderlijk toezicht is volledig verwijderd, inclusief de pincode. Open PlayGuard: daar kunt u het op elk moment opnieuw instellen.",
         "note_no_pin": "Er was geen pincode voor ouderlijk toezicht ingesteld, dus er was niets te ontgrendelen. U kunt er hier een instellen en daarna PlayGuard openen.",
@@ -564,13 +644,14 @@
             "deleted": "Het ouderlijk toezicht is volledig verwijderd.",
             "no_pin": "Er was geen pincode om te herstellen: er is geen pincode voor ouderlijk toezicht ingesteld.",
             "failed": "Het herstel kon niet worden voltooid.",
-            "refused": "Er is niets verwijderd: het RESCUE-bestand kon niet van de SD-kaart worden verwijderd."
+            "refused": "Er is niets verwijderd: het RESCUE-bestand kon niet van de SD-kaart worden verwijderd.",
+            "unconfirmed": "De console toont het herstel dat dit rapport beschrijft niet."
         },
         "hint": {
-            "show_pin": "als u hem vergeten bent",
             "reset_pin": "een nieuwe kiezen",
             "delete": "alles verwijderen"
-        }
+        },
+        "note_unconfirmed": "Zonder de pincode kan hier niets worden gewijzigd, en PlayGuard opent zoals gewoonlijk. Buitengesloten? Zet het RESCUE-bestand terug op de SD-kaart, met de herstel-sysmodule geïnstalleerd, en start de console opnieuw."
     },
     "tools": {
         "section_diag": "Diagnose",
@@ -587,6 +668,14 @@
         "backup_keep_n": "De {} nieuwste",
         "backup_count": "{} op de SD-kaart",
         "backup_note": "Slaat het beperkingsniveau, de aangepaste instellingen, de VR-modus en de dagelijkse speeltijdlimieten op in {}. De pincode wordt niet opgeslagen.",
+        "logs_keep": "Bewaarde rapporten",
+        "logs_keep_all": "Alle",
+        "logs_keep_n": "De {} nieuwste",
+        "logs_keep_days": "Rapporten verwijderen na",
+        "logs_days_never": "Nooit",
+        "logs_days_n": "{} dagen",
+        "logs_keep_mb": "Ruimte voor rapporten",
+        "logs_note": "Geldt voor de diagnoserapporten, de crashbestanden en de links van de online verstuurde rapporten in {}, elk apart, bij het starten en wanneer een limiet verandert. Het nieuwste blijft altijd staan.",
         "language": "Taal",
         "languages": {
             "system": "Systeemtaal",
@@ -655,10 +744,12 @@
         "source": "Broncode",
         "update_via": "Bijwerken met",
         "update_via_values": {
+            "inplace": "In PlayGuard (downloadt en herstart)",
             "auto": "Automatisch (sphaira, anders App Store)",
             "sphaira": "sphaira",
             "appstore": "Homebrew App Store",
-            "manual": "Handmatig"
+            "manual": "Handmatig",
+            "unset": "Nog niet gekozen"
         },
         "update": "Op updates controleren",
         "update_daily": "Elke dag op updates controleren",
@@ -666,7 +757,9 @@
         "flag_read_only": "alleen-lezen",
         "flag_dev": "ontwikkelaar",
         "upload": "Rapport online versturen",
-        "upload_note": "Verstuurt een rapport naar bpa.st, of naar een geheime gist als je bij GitHub bent aangemeld, en toont de link met een QR-code: geef hem aan wie je helpt, of open er een bugmelding mee."
+        "upload_note": "Stuurt een rapport naar een geheime gist in je GitHub-account (eerst inloggen indien nodig) en toont de link met een QR-code: geef die aan wie je helpt, of open er een bugmelding mee.",
+        "storage_note_emummc": "Dit is de emuMMC: de sysMMC heeft een eigen ouderlijk toezicht, dat PlayGuard van hieruit niet kan zien. Stel het daar ook in, of verberg het opstartmenu van hekate.",
+        "storage_note_sysmmc": "Dit is de sysMMC, en op deze SD-kaart is een emuMMC ingesteld: die heeft een eigen ouderlijk toezicht, dat PlayGuard van hieruit niet kan zien. Stel het daar ook in, of verberg het opstartmenu van hekate."
     },
     "games": {
         "open": "Geïnstalleerde games controleren",
@@ -781,6 +874,7 @@
     "about": {
         "section_changelog": "Nieuw in {}",
         "changelog_note": "Eerdere versies: {}",
+        "changelog_full": "Volledige lijst met wijzigingen",
         "changelog_none": "Geen notities voor deze versie (een ontwikkelversie?). Alle versies: {}",
         "section_credits": "Met dank aan",
         "credit_author": "Ontwikkelaar",
@@ -802,6 +896,7 @@
         "section_play_timer": "Speeltijdtimer",
         "section_startup": "Bij het opstarten",
         "note": "Back-ups, het diagnoserapport en de console staan onder Tools; updates onder Info.",
+        "intro": "De intro 2 seconden tonen",
         "support_reminder": "Herinner me één keer per maand om PlayGuard te steunen"
     },
     "backup": {
@@ -822,21 +917,38 @@
         "restored": "Instellingen teruggezet.",
         "restore_err": "Niet teruggezet: {}",
         "before_delete_err": "Er kon vooraf geen back-up worden opgeslagen ({}).\n\nToch alles verwijderen?",
-        "delete_anyway": "Toch verwijderen"
+        "delete_anyway": "Toch verwijderen",
+        "bedtime_not_restored": "In deze back-up stond een bedtijdalarm aan: dat wordt niet teruggezet. Stel het zo nodig opnieuw in bij Speeltijdtimer.",
+        "backed_up_on": "Back-up van de instellingen van {}."
     },
     "update": {
         "checking": "Controleren op updates...",
-        "available": "PlayGuard {} is beschikbaar (je hebt {}).",
-        "available_toast": "PlayGuard {} is beschikbaar: Info › Op updates controleren.",
         "available_no_fw": "Die versie ondersteunt firmware {} nog niet.",
         "up_to_date": "PlayGuard {} is de nieuwste versie.",
+        "no_release": "Er is nog geen PlayGuard-versie gepubliceerd: {} is een ontwikkelversie.",
         "failed": "Kan niet op updates controleren ({}).",
         "manual_body": "Om bij te werken open je sphaira (het GitHub-menu daarvan kent PlayGuard al) of de Homebrew App Store, of download je playguard.nro van {} en kopieer je het naar /switch/playguard/ op de SD-kaart.",
         "open_body": "PlayGuard wordt gesloten en {} wordt geopend. Zoek daar PlayGuard op om het bij te werken.",
         "open_confirm": "{} openen",
         "update_with": "Bijwerken met {}",
         "update_manual": "Zo werk je bij",
-        "appstore": "Homebrew App Store"
+        "appstore": "Homebrew App Store",
+        "title": "Update beschikbaar",
+        "headline": "PlayGuard {} is beschikbaar",
+        "running": "Je hebt PlayGuard {}.",
+        "released": "Uitgebracht op {}.",
+        "notes_none": "De notities van deze versie konden niet worden gelezen. Alle versies: {}",
+        "update": "Bijwerken",
+        "update_now": "Nu bijwerken",
+        "recommended": "{} (aanbevolen)",
+        "method_title": "Hoe moet PlayGuard worden bijgewerkt?",
+        "later_title": "Herinner me over",
+        "later_day": "1 dag",
+        "later_week": "1 week",
+        "later_days": "{} dagen",
+        "later_done": "Herinnering uitgesteld tot {}.",
+        "inplace_body": "PlayGuard downloadt versie {}, controleert die, zet die in de plaats van deze en herstart ermee. Je instellingen blijven behouden.",
+        "inplace_confirm": "Bijwerken"
     },
     "upload": {
         "pick": "Wat versturen",
@@ -844,13 +956,11 @@
         "saved": "Opgeslagen rapport {}",
         "part_report": "Diagnoserapport",
         "confirm": "Naar {} versturen ({} KB)?",
-        "confirm_public": "Iedereen met de link kan het een maand lezen, daarna verwijdert bpa.st het. Het bevat nooit de pincode of het serienummer.",
         "confirm_gist": "Een geheime gist in je GitHub-account: iedereen met de link kan hem lezen, tot je hem op GitHub verwijdert. Hij bevat nooit de pincode of het serienummer.",
         "where_gist": "een geheime gist op GitHub",
-        "host": "Waarheen versturen?",
-        "host_gist": "Geheime gist op GitHub (je account)",
-        "host_bpaste": "bpa.st (na een maand verwijderd)",
-        "relogin": "GitHub heeft de gist geweigerd. Meld je af en weer aan (GitHub-account, in de ontwikkelaarstools) om gists toe te staan, of verstuur het naar bpa.st.",
+        "relogin": "GitHub heeft de gist geweigerd. Log uit en opnieuw in (GitHub-account, in de ontwikkelaarstools) om gists toe te staan.",
+        "needs_github": "Het rapport gaat naar een geheime gist in je GitHub-account: iedereen met de link kan het lezen, tot je het op GitHub verwijdert. PlayGuard is nog niet bij GitHub ingelogd. Nu inloggen?",
+        "sign_in": "Inloggen",
         "send": "Versturen",
         "sending": "Versturen...",
         "failed": "Kon het rapport niet versturen: {}",
@@ -878,12 +988,29 @@
         "pt_block_changed": "{} waarden veranderd sinds de referentie van {}:",
         "pt_block_report": "Opslaan op de SD-kaart",
         "pt_block_new": "Nieuwe referentie",
-        "pt_log": "Record the play timer",
-        "pt_log_note": "Every 30 s while PlayGuard is open, one line of what the play timer reports (time left, time spent, 1459, the settings block) in logs/play_timer_log.csv, and one more right after each change PlayGuard makes, saying which. A clock that moved more than the time that went by is noted too. Leave PlayGuard open over midnight, or until the time is up, to see what the console does then. Sent with the diagnostic report.",
-        "pt_log_on": "Recording every 30 s in {}",
+        "pt_log": "Speeltijdtimer vastleggen",
+        "pt_log_note": "Elke 30 s zolang PlayGuard open is, een regel met wat de speeltijdtimer meldt (resterende tijd, gebruikte tijd, 1459, het instellingenblok) in logs/play_timer/log.csv, en nog een direct na elke wijziging die PlayGuard maakt, met welke. Een klok die meer is verschoven dan de verstreken tijd wordt ook genoteerd. Laat PlayGuard open tot na middernacht, of tot de tijd op is, om te zien wat de console dan doet. Wordt meegestuurd met het diagnoserapport.",
+        "clear_cache": "Cache wissen",
+        "clear_logs": "Logbestanden verwijderen",
+        "clear_cache_body": "Cache verwijderen: {}?\n\nDe namen en pictogrammen van de games, de laatste cijfers van Activiteit en de lijst met ontwikkelbuilds. PlayGuard leest ze opnieuw van de console wanneer nodig: bij de volgende start duurt het tabblad Activiteit iets langer.",
+        "clear_logs_body": "Logbestanden verwijderen: {}?\n\nHet crashlog, de opgeslagen diagnoserapporten en de opname van de speeltijdtimer. Bewaard: de links van online verstuurde rapporten (de enige manier om ze te verwijderen) en de referentie van het speeltijdblok.",
+        "clear_empty": "Niets te verwijderen.",
+        "cleared": "Verwijderd: {}.",
+        "clear_failed": "Verwijderd: {}.\n\nNiet verwijderd, geweigerd door de SD-kaart: {}.",
+        "files": "{} bestanden ({})",
+        "files_one": "1 bestand ({})",
+        "size_kb": "{} KB",
+        "size_mb": "{} MB",
+        "pt_log_on": "Elke 30 s vastgelegd in {}",
         "gate": "Firmwarescherm opnieuw tonen",
         "forget": "Firmwarekeuze vergeten",
         "forgotten": "Bij de volgende start wordt opnieuw naar de firmwarekeuze gevraagd.",
+        "forget_body": "De keuze op het firmwarescherm vergeten? Die wordt bij de volgende start opnieuw gevraagd.",
+        "forget_confirm": "Vergeten",
+        "mode_off_body": "Ontwikkelaarsmodus uitschakelen? De tools verdwijnen van het einde van Tools en het vastleggen van de speeltijdtimer stopt. Zeven keer drukken op Info › Versie brengt ze terug.",
+        "mode_off_confirm": "Uitschakelen",
+        "read_only_off_body": "Alleen-lezenmodus verlaten? PlayGuard kan dan het ouderlijk toezicht en de klok van de console weer wijzigen.",
+        "read_only_off_confirm": "Wijzigingen toestaan",
         "already_on": "De ontwikkelaarsmodus staat al aan.",
         "enabled": "De ontwikkelaarsmodus staat aan: zie het einde van Tools.",
         "presses_left": "Nog {} keer drukken om de ontwikkelaarsmodus aan te zetten.",
@@ -892,7 +1019,14 @@
     },
     "dev_build": {
         "open": "Andere build installeren",
-        "pick": "Te installeren build",
+        "note": "Actief: {}. Een build die je hier installeert, neemt zijn plaats in en PlayGuard start ermee opnieuw.",
+        "section_release": "Nieuwste versie",
+        "section_main": "main ({})",
+        "section_pulls": "Pull requests ({}) · {}",
+        "order_newest": "nieuwste build eerst",
+        "order_number": "op nummer",
+        "sort": "Sorteren",
+        "next_tab": "Volgende lijst",
         "release": "Versie {}",
         "main": "main · {} · {}",
         "pr": "PR #{} · {} · {}",
@@ -904,12 +1038,12 @@
         "busy": "Al bezig...",
         "list_failed": "Kon de builds niet ophalen: {}",
         "list_stale": "Kan de lijst niet vernieuwen ({}): de laatste wordt getoond.",
-        "downloading": "Downloaden ({} MB)...",
+        "downloading": "Build downloaden...\n{} van {} MB",
         "failed": "Kon de build niet installeren: {}\n\nDe geïnstalleerde PlayGuard is ongewijzigd.",
         "done_manual": "{} is geïnstalleerd. Sluit PlayGuard en open het opnieuw om hem te gebruiken.",
         "no_path": "PlayGuard weet niet waar zijn .nro-bestand staat (gestart zonder hbloader?) en kan het dus niet vervangen. Installeer de build handmatig vanaf GitHub.",
         "sign_in": "Aanmelden bij GitHub voor de builds van main en pull requests",
-        "refresh": "Lijst vernieuwen ({} min geleden gecontroleerd)"
+        "checked": "Lijst {} min geleden gecontroleerd."
     },
     "github": {
         "account": "GitHub-account",
@@ -931,7 +1065,7 @@
         "diag_err": "Kan de diagnose niet opslaan",
         "relocked": "Ouderlijk toezicht weer vergrendeld.",
         "relock_err": "Kan het ouderlijk toezicht niet opnieuw vergrendelen",
-        "relocked_after_stop": "PlayGuard stopte vorige keer tijdens een wijziging: het ouderlijk toezicht is weer vergrendeld.",
+        "relocked_after_stop": "PlayGuard werd vorige keer gesloten terwijl het ouderlijk toezicht ontgrendeld was: het is weer vergrendeld.",
         "config_err": "Kan de voorkeuren niet op de SD-kaart opslaan"
     },
     "history": {
@@ -943,6 +1077,13 @@
         "section": "Wijzigingen, nieuwste eerst",
         "custom_value": "leeftijd {}, berichten beperkt: {}, communicatie beperkt: {}",
         "title_change": "{}: {} → {}",
+        "title_day_change": "{} ({}): {} → {}",
+        "unknown_kind": "Andere wijziging ({})",
+        "unknown_note": "Vastgelegd door een nieuwere versie van PlayGuard: werk PlayGuard bij om hem volledig te zien.",
+        "days_changed": "Gewijzigde dagen:",
+        "day_change": "{}: {} → {}",
+        "today_at": "Vandaag, {}",
+        "yesterday_at": "Gisteren, {}",
         "kinds": {
             "limits": "Speeltijdlimieten",
             "level": "Beperkingsniveau",
@@ -960,6 +1101,13 @@
             "rescue": "Herstel gebruikt",
             "console_lock": "Consolevergrendeling",
             "bedtime": "Bedtijdalarm",
+            "pin_shown": "Pincode getoond",
+            "config_reset": "Voorkeuren teruggezet (bestand onleesbaar)",
+            "outside_reset": "Speeltijd opnieuw begonnen (gezien door PlayGuard)",
+            "outside_clock": "Klok van de console gewijzigd (gezien door PlayGuard)",
+            "outside_limits": "Limieten buiten PlayGuard gewijzigd",
+            "new_account": "Nieuw gebruikersaccount (gezien door PlayGuard)",
+            "time_up": "Als de tijd om is",
             "remove_game": "Game verwijderd",
             "remove_update": "Update verwijderd",
             "remove_addon": "Extra content verwijderd",
@@ -991,5 +1139,19 @@
         "undo_confirm": "Terugzetten",
         "undone": "Vorige waarde teruggezet.",
         "undo_err": "Kan de vorige waarde niet terugzetten"
+    },
+    "chart": {
+        "last_days": "De laatste 7 dagen, vandaag rechts",
+        "limit_line": "De lijn over een balk is de limiet van deze week voor die dag",
+        "limit_over": "De lijn is de limiet van deze week voor die dag · ! in oranje: langer gespeeld",
+        "week_order": "Maandag tot zondag, vandaag onderstreept",
+        "unsaved": "* in oranje: gewijzigd, nog niet opgeslagen"
+    },
+    "data_notice": {
+        "config_reset": "De voorkeuren van PlayGuard konden niet worden gelezen en zijn teruggezet. Het beschadigde bestand is bewaard als config.json.bad.",
+        "config_stuck": "De voorkeuren van PlayGuard konden niet worden gelezen of opzijgezet: de standaardwaarden worden gebruikt en er wordt voorlopig niets opgeslagen, zodat het bestand niet wordt overschreven. Controleer de SD-kaart.",
+        "history_reset": "De wijzigingsgeschiedenis kon niet worden gelezen, dus er is een nieuwe begonnen. Het beschadigde bestand is bewaard als history.json.bad.",
+        "history_stuck": "De wijzigingsgeschiedenis kon niet worden gelezen of opzijgezet: er worden voorlopig geen wijzigingen in vastgelegd. Controleer de SD-kaart.",
+        "rescue_unreadable": "Er is een rapport van de herstel-sysmodule gevonden, maar het kon niet worden gelezen, dus PlayGuard weet niet wat die heeft gedaan. Controleer de pincode en de speeltijdtimer."
     }
 }

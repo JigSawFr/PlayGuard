@@ -14,13 +14,15 @@ namespace app
 bool init();
 void shutdown();
 
-bool        pctl_available();
 uint32_t    pctl_init_result();   // 0 if the probe succeeded
 
 std::string version();            // "1.0.0"
 // The commit this build comes from ("1a2b3c4"), empty when unknown (built
 // outside a git checkout). Tells which development build is installed.
 std::string commit();
+// True for a published release (built from its vX.Y.Z tag), false for any
+// other build (main, a pull request, a local one): a development build.
+bool        is_release();
 // Where the running .nro is, from the SD card root ("/switch/playguard/playguard.nro"),
 // as hbloader gave it in argv[0]; empty when unknown (nxlink, desktop).
 std::string self_path();
@@ -41,7 +43,8 @@ void        set_read_only(bool on);
 // Saved in the preferences, or on for this session only (firmware screen,
 // "read-only + developer mode").
 bool        dev_mode();
-bool        set_dev_mode(bool on, bool persist);   // false: the preference could not be saved
+// Saved off the UI thread, with ui::save_config's toasts.
+void        set_dev_mode(bool on, bool persist, const std::string& saved_text = "", const std::string& failed_text = "");
 
 // False while the app is in the background (HOME menu, system PIN prompt …):
 // periodic refreshes skip their pctl queries then, keeping the single

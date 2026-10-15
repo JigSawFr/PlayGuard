@@ -15,34 +15,38 @@ side is in [docs/parental-controls.md](docs/parental-controls.md).
 ## Waiting on data from a console
 
 These need a finding before any code: most of them a play-timer block
-compared before and after a change made from the phone app (*Developer tools ›
-Compare the play-timer block*), on a console still linked to it. A report
-attached to an issue is the most useful contribution right now.
+compared before and after a change made from the phone app, on a console
+still linked to it: *Security & app › Before unlinking: help decode…* (shown
+while linked, for everyone) or *Developer tools › Compare the play-timer
+block*. A report attached to an issue is the most useful contribution right
+now.
 
-- **Alarm only, or suspend the software** when the time is up. The setting
-  parents ask for most after the limit itself; its byte in the block's header
-  is not located yet.
-  ([details](docs/companion-app.md#1-alarm-only-or-suspend-the-software))
-- **Bedtime and start time per day of the week.** PlayGuard sets one bedtime
-  for every day; the per-day bytes have never been seen with a bedtime on.
-  ([details](docs/companion-app.md#2-bedtime-and-start-time-per-day-of-the-week))
 - **Exceptions for specific software**: show the games on the
   free-communication list by name, then add and remove them, once the list's
   entries are decoded.
   ([details](docs/companion-app.md#3-exceptions-for-specific-software))
 - **Firmware 23.0.1 / Atmosphère 1.12.0 tested on a console.** Covered by the
-  command table, not yet run on hardware.
+  command table, not yet run on hardware: until a trace from it is recorded,
+  23.x goes through the firmware screen (`PCTL_FW_TESTED_MAX` is 22.5.0).
 
 ## Ready to build
 
 No unknown left; only code.
 
+- **Bedtime and start time per day of the week.** PlayGuard sets one bedtime
+  for every day; the bytes of each day's are verified on a console, so the
+  per-day editor can set them one by one.
+  ([details](docs/companion-app.md#2-bedtime-and-start-time-per-day-of-the-week))
 - **A month in Activity**: per game, per account and per day over a month,
   with the same export, the offline counterpart of the phone app's monthly
   report. ([details](docs/companion-app.md#5-monthly-report))
 
 ## To investigate
 
+- **Game categories and suggestions** in Activity: the console's control
+  data names no genre, so "the category played most" or suggestions of new
+  games would need an outside game database (downloaded, kept up to date).
+  Worth it only if it stays optional and offline-friendly.
 - **History of PIN entries** made from the HOME menu, as the phone app shows
   since 2.5.0: does the console log them anywhere PlayGuard can read?
   ([details](docs/companion-app.md#4-history-of-pin-entries))
@@ -76,7 +80,15 @@ MQTT can join in, Home Assistant first:
 - **Chores that earn play time**: a chores app or add-on adds minutes when a
   task is done, or takes some away as a penalty.
 - **Live figures elsewhere**: time left today on a dashboard, on a
-  Busy Bar, on a phone.
+  Busy Bar, on a phone. On an iPhone, a Home Assistant automation can start a
+  **Live Activity** when play begins, through an app such as
+  [Aivi](https://docs.getaivi.app/) (a Home Assistant blueprint, or a plain
+  HTTP call): the time left counts down on the lock screen and in the Dynamic
+  Island, on every parent's phone at once, and ends with the session. A tap
+  on it opens the console's view in Home Assistant, where a parent adds time
+  or ends play for today, and the order goes back to the console: the loop is
+  closed. Between sessions, a widget can keep today's play time on the Home
+  Screen or the Apple Watch, with buttons for the same orders.
 - **Notifications that can be answered**: "10 minutes left" or "asks for more
   time", with a button that adds a quarter of an hour.
 - **Several consoles at home** seen and set from one place.
