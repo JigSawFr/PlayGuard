@@ -884,7 +884,18 @@
         "size_mb": "{} MB",
         "size_gb": "{} GB",
         "decimal_mark": ",",
-        "verify_code": "Código da consola: {}"
+        "verify_code": "Código da consola: {}",
+        "tabs": {
+            "fix": "Reparáveis aqui ({})",
+            "reinstall": "Reinstalar ({})",
+            "system": "Firmware ou cartão SD ({})"
+        },
+        "tab_note": {
+            "fix": "O PlayGuard pode repará-los: A num jogo e depois o primeiro botão.",
+            "reinstall": "Os ficheiros faltam ou estão inutilizáveis: remova-os aqui e volte a instalá-los com o instalador habitual.",
+            "system": "Os jogos estão bem: o problema é o firmware da consola ou o cartão SD. Atualize o firmware ou arranque na memória onde foram instalados."
+        },
+        "next_tab": "Lista seguinte"
     },
     "about": {
         "section_changelog": "Novidades da {}",

@@ -7,6 +7,8 @@
 
 #include "write_guard.h"
 
+#include <time.h>
+
 #define RECORD_CHUNK  64
 #define META_CHUNK    16
 #define CONTENT_CHUNK 16
@@ -113,6 +115,21 @@ static bool rights_id_set(const FsRightsId *id)
     return false;
 }
 
+// Where the last gamecheck_check() spent its time (gamecheck_last_timing).
+static GameCheckTiming s_timing;
+
+static u64 now_ns(void)
+{
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    return (u64)t.tv_sec * 1000000000ULL + (u64)t.tv_nsec;
+}
+
+void gamecheck_last_timing(GameCheckTiming *out)
+{
+    *out = s_timing;
+}
+
 // What one scan keeps open.
 typedef struct {
     Storage storages[2];
@@ -178,6 +195,7 @@ static void check_meta(GameFacts *g, const NsApplicationContentMetaStatus *m, Sc
 
 static void check_game(GameFacts *g, NsApplicationControlData *cd, Scan *sc)
 {
+    u64 t = now_ns();
     u64 size = 0;
     NacpLanguageEntry *lang = NULL;
     if (cd && R_SUCCEEDED(nsGetApplicationControlData(NsApplicationControlSource_Storage, g->app_id, cd, sizeof(*cd), &size)) &&
@@ -186,6 +204,9 @@ static void check_game(GameFacts *g, NsApplicationControlData *cd, Scan *sc)
         copy_utf8(g->name, sizeof(g->name), lang->name);
         copy_utf8(g->display_version, sizeof(g->display_version), cd->nacp.display_version);
     }
+    u64 t2 = now_ns();
+    s_timing.control_ns += t2 - t;
+    t = t2;
 
     NsApplicationContentMetaStatus metas[META_CHUNK];
     bool all_card = true;
@@ -224,19 +245,42 @@ static void check_game(GameFacts *g, NsApplicationControlData *cd, Scan *sc)
         if (got < META_CHUNK) break;
     }
     g->card_only = g->meta_count > 0 && all_card;
-    g->launch_rc = nsCheckApplicationLaunchVersion(g->app_id);
+    t2 = now_ns();
+    s_timing.contents_ns += t2 - t;
+    t = t2;
 
-    // How the HOME menu sees it (3.0.0+).
-    if (hosversionAtLeast(3, 0, 0)) {
-        NsApplicationView view;
-        memset(&view, 0, sizeof(view));
-        if (R_SUCCEEDED(nsGetApplicationView(&view, &g->app_id, 1)) && view.application_id == g->app_id) {
-            g->view_ok    = true;
-            g->view_flags = view.flags;
+    g->launch_rc = nsCheckApplicationLaunchVersion(g->app_id);
+    // The version the console wants before it starts the game (6.0.0+):
+    // only asked when it refuses to, the one case it explains.
+    if (sc->avm && R_FAILED(g->launch_rc) && R_SUCCEEDED(avmGetLaunchRequiredVersion(g->app_id, &g->launch_required)))
+        g->launch_checked = true;
+    s_timing.state_ns += now_ns() - t;
+}
+
+// How the HOME menu sees the games (3.0.0+), VIEW_CHUNK at a time: one
+// request for many, read before they are checked.
+#define VIEW_CHUNK 32
+
+static void read_views(const GameRecord *records, u32 count, GameFacts *out)
+{
+    if (!hosversionAtLeast(3, 0, 0)) return;
+    const u64 t = now_ns();
+    NsApplicationView *views = (NsApplicationView *)malloc(VIEW_CHUNK * sizeof(NsApplicationView));
+    u64 ids[VIEW_CHUNK];
+    if (!views) return;
+    for (u32 start = 0; start < count; start += VIEW_CHUNK) {
+        const u32 n = count - start < VIEW_CHUNK ? count - start : VIEW_CHUNK;
+        for (u32 i = 0; i < n; i++) ids[i] = records[start + i].app_id;
+        memset(views, 0, n * sizeof(NsApplicationView));
+        if (R_FAILED(nsGetApplicationView(views, ids, (s32)n))) continue;
+        for (u32 i = 0; i < n; i++) {
+            if (views[i].application_id != ids[i]) continue;
+            out[start + i].view_ok    = true;
+            out[start + i].view_flags = views[i].flags;
         }
     }
-    // The version the console wants before it starts the game (6.0.0+).
-    if (sc->avm && R_SUCCEEDED(avmGetLaunchRequiredVersion(g->app_id, &g->launch_required))) g->launch_checked = true;
+    free(views);
+    s_timing.state_ns += now_ns() - t;
 }
 
 Result gamecheck_records(GameRecord *out, u32 max, u32 *count, bool *truncated)
@@ -275,7 +319,9 @@ u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
                     bool (*on_game)(void *ctx, const GameFacts *game, u32 done), void *ctx)
 {
     memset(out, 0, (size_t)count * sizeof(*out));
+    memset(&s_timing, 0, sizeof(s_timing));
     if (!count || R_FAILED(nsInitialize())) return 0;
+    const u64 started = now_ns();
 
     Scan sc;
     memset(&sc, 0, sizeof(sc));
@@ -288,6 +334,8 @@ u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
     sc.storages[1].id = NcmStorageId_SdCard;
     sc.storage_count = ncm ? 2 : 0;
     NsApplicationControlData *cd = (NsApplicationControlData *)malloc(sizeof(NsApplicationControlData));
+    read_views(records, count, out);
+    s_timing.setup_ns = now_ns() - started;
     u32 done = 0;
     while (done < count) {
         GameFacts *g = &out[done];
@@ -306,6 +354,8 @@ u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
     if (sc.avm) avmExit();
     free(tickets.ids);
     nsExit();
+    s_timing.games = done;
+    s_timing.total_ns = now_ns() - started;
     return done;
 }
 

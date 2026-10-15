@@ -884,7 +884,18 @@
         "size_mb": "{} MB",
         "size_gb": "{} GB",
         "decimal_mark": ",",
-        "verify_code": "Codice della console: {}"
+        "verify_code": "Codice della console: {}",
+        "tabs": {
+            "fix": "Riparabili qui ({})",
+            "reinstall": "Da reinstallare ({})",
+            "system": "Firmware o scheda SD ({})"
+        },
+        "tab_note": {
+            "fix": "PlayGuard può ripararli: A su un gioco, poi il primo pulsante.",
+            "reinstall": "I loro file mancano o sono inutilizzabili: rimuovili qui, poi reinstallali con il tuo installer abituale.",
+            "system": "I giochi sono a posto: il problema è il firmware della console o la scheda SD. Aggiorna il firmware o avvia dalla memoria su cui sono stati installati."
+        },
+        "next_tab": "Elenco successivo"
     },
     "about": {
         "section_changelog": "Novità della {}",

@@ -884,7 +884,18 @@
         "size_mb": "{} MB",
         "size_gb": "{} GB",
         "decimal_mark": ".",
-        "verify_code": "본체 코드: {}"
+        "verify_code": "본체 코드: {}",
+        "tabs": {
+            "fix": "여기서 수리 ({})",
+            "reinstall": "재설치 ({})",
+            "system": "펌웨어 또는 SD 카드 ({})"
+        },
+        "tab_note": {
+            "fix": "PlayGuard로 수리할 수 있습니다: 게임에서 A, 그다음 첫 번째 버튼.",
+            "reinstall": "파일이 없거나 쓸 수 없습니다: 여기서 삭제한 뒤 평소 쓰는 설치 프로그램으로 다시 설치하세요.",
+            "system": "게임은 정상입니다: 본체 펌웨어나 SD 카드가 문제입니다. 펌웨어를 업데이트하거나, 게임을 설치한 저장소로 부팅하세요."
+        },
+        "next_tab": "다음 목록"
     },
     "about": {
         "section_changelog": "{}의 새로운 기능",

@@ -884,7 +884,18 @@
         "size_mb": "{} MB",
         "size_gb": "{} GB",
         "decimal_mark": ".",
-        "verify_code": "Code from the console: {}"
+        "verify_code": "Code from the console: {}",
+        "tabs": {
+            "fix": "Fix here ({})",
+            "reinstall": "Reinstall ({})",
+            "system": "Firmware or SD card ({})"
+        },
+        "tab_note": {
+            "fix": "PlayGuard can repair these: A on a game, then its first button.",
+            "reinstall": "Their files are gone or unusable: remove them here, then install them again with your usual installer.",
+            "system": "The games are fine: the console's firmware or SD card is the problem. Update the firmware, or start on the storage they were installed on."
+        },
+        "next_tab": "Next list"
     },
     "about": {
         "section_changelog": "What's new in {}",

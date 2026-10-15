@@ -884,7 +884,18 @@
         "size_mb": "{} MB",
         "size_gb": "{} GB",
         "decimal_mark": ",",
-        "verify_code": "Code van de console: {}"
+        "verify_code": "Code van de console: {}",
+        "tabs": {
+            "fix": "Hier te repareren ({})",
+            "reinstall": "Opnieuw installeren ({})",
+            "system": "Firmware of SD-kaart ({})"
+        },
+        "tab_note": {
+            "fix": "PlayGuard kan ze repareren: A op een game, dan de eerste knop.",
+            "reinstall": "Hun bestanden ontbreken of zijn onbruikbaar: verwijder ze hier en installeer ze opnieuw met je gebruikelijke installer.",
+            "system": "De games zijn in orde: de firmware van de console of de SD-kaart is het probleem. Werk de firmware bij, of start op de opslag waarop ze zijn geïnstalleerd."
+        },
+        "next_tab": "Volgende lijst"
     },
     "about": {
         "section_changelog": "Nieuw in {}",

@@ -120,6 +120,15 @@ u32 gamecheck_actions(const GameFacts *g, GameIssue issue);
 // usable behind it.
 u32 gamecheck_recommended(const GameFacts *g, GameIssue issue, u32 current_hos);
 
+// The screen's tabs: what to do about `issue`.
+typedef enum {
+    GC_CAT_FIX = 0,    // PlayGuard fixes it here (its recommended action does)
+    GC_CAT_REINSTALL,  // the game is to be installed again (or its entry cleaned)
+    GC_CAT_SYSTEM,     // the fix is outside the game: the firmware, the SD card
+    GC_CAT_COUNT
+} GameCategory;
+GameCategory gamecheck_category(const GameFacts *g, GameIssue issue, u32 current_hos);
+
 // A content meta's RequiredSystemVersion (major << 26 | minor << 20 |
 // micro << 16 | relstep) as MAKEHOSVERSION; 0 stays 0.
 u32 gamecheck_sysver_to_hos(u32 required_system_version);
@@ -147,6 +156,17 @@ Result gamecheck_records(GameRecord *out, u32 max, u32 *count, bool *truncated);
 // Returns how many games were checked.
 u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
                     bool (*on_game)(void *ctx, const GameFacts *game, u32 done), void *ctx);
+
+// Where the last gamecheck_check() spent its time, by part (the log and the
+// developer mode say it): opening the services, the tickets and the view of
+// every game (setup, the views counted in state too), each game's name and
+// icon (control), its contents, files, keys and tickets (contents), its
+// launch check and launch version (state).
+typedef struct {
+    u32 games;
+    u64 total_ns, setup_ns, control_ns, contents_ns, state_ns;
+} GameCheckTiming;
+void gamecheck_last_timing(GameCheckTiming *out);
 
 typedef struct {
     Result rc;          // listing the games (ns); nothing else is filled when it fails

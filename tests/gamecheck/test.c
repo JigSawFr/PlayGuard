@@ -61,7 +61,7 @@ static struct {
     FsRightsId tickets[MAX_TICKETS];
     int ticket_count;
     int ns_open, ncm_open, db_open, cs_open, avm_open, es_open, am_open, async_open;
-    int ns_inits, commits, pushes, record_deletes, avm_pushes, rights_reads;
+    int ns_inits, commits, pushes, record_deletes, avm_pushes, rights_reads, view_calls, avm_reads;
     u64 deleted;
     RecordMetaWire pushed[MAX_METAS];
     int pushed_count;
@@ -254,12 +254,15 @@ Result nsDeleteApplicationCompletely(u64 id)
 
 Result nsGetApplicationView(NsApplicationView *views, const u64 *ids, s32 count)
 {
-    REQUIRE(C.ns_open == 1 && count == 1);
+    REQUIRE(C.ns_open == 1 && count >= 1 && count <= 32);
+    C.view_calls++;
     if (C.view_rc) return C.view_rc;
-    const FakeGame *g = find(ids[0]);
-    memset(views, 0, sizeof(*views));
-    views->application_id = ids[0];
-    views->flags = g ? g->view_flags : 0;
+    for (s32 i = 0; i < count; i++) {
+        const FakeGame *g = find(ids[i]);
+        memset(&views[i], 0, sizeof(views[i]));
+        views[i].application_id = ids[i];
+        views[i].flags = g ? g->view_flags : 0;
+    }
     return 0;
 }
 
@@ -532,6 +535,7 @@ void avmExit(void)
 Result avmGetLaunchRequiredVersion(u64 id, u32 *version)
 {
     REQUIRE(C.avm_open == 1);
+    C.avm_reads++;
     const FakeGame *g = find(id);
     if (!g || !g->launch_known) return 0x6789;
     *version = g->launch_required;
@@ -842,7 +846,7 @@ static void test_every_problem(void)
     CHECK(f->base_required_hos == HOS(12, 0, 0) && f->patch_required_hos == HOS(20, 0, 0));
     CHECK(f->key_generation == 0x14 && f->needs_ticket && !f->ticket_missing);
     CHECK(f->view_ok && f->view_flags == (GC_VIEW_HAS_MAIN_CONTENTS | GC_VIEW_CAN_LAUNCH));
-    CHECK(f->launch_checked && f->launch_required == 0x40000);
+    CHECK(!f->launch_checked);   // the console starts it: its launch version is not asked
     CHECK(issue_of(0x0100000000010000ULL) == GC_OK);
 
     CHECK(facts(0x0100000000020000ULL)->meta_count == 0 && facts(0x0100000000020000ULL)->record_event == 11);
@@ -944,6 +948,39 @@ static void test_list_failures(void)
     CHECK(R.rc == 0x2222 && R.count == 0);
 }
 
+static void test_categories(void)
+{
+    GameFacts g;
+    memset(&g, 0, sizeof(g));
+    g.meta_count = g.content_count = 2;
+    g.has_base = g.has_patch = true;
+    g.contents[0] = (GameContent){ 0x0100000000010000ULL, 0, GC_META_APPLICATION, GC_STORAGE_SD };
+    g.contents[1] = (GameContent){ 0x0100000000010800ULL, 0x10000, GC_META_PATCH, GC_STORAGE_SD };
+    // Fixed here: the launch version, the update too new, the data to check.
+    g.launch_checked = true;
+    g.launch_required = 0x30000;
+    g.launch_rc = 1;
+    CHECK(gamecheck_category(&g, GC_LAUNCH_VERSION, CURRENT) == GC_CAT_FIX);
+    g.launch_rc = 0;
+    g.base_required_hos = HOS(19, 0, 0);
+    g.patch_required_hos = HOS(24, 0, 0);
+    CHECK(gamecheck_category(&g, GC_FIRMWARE_TOO_OLD, CURRENT) == GC_CAT_FIX);
+    CHECK(gamecheck_category(&g, GC_NEEDS_VERIFY, CURRENT) == GC_CAT_FIX);
+    CHECK(gamecheck_category(&g, GC_NO_CONTROL, CURRENT) == GC_CAT_FIX);
+    // Outside the game: the game itself too new, its keys, the SD card.
+    g.base_required_hos = HOS(24, 0, 0);
+    CHECK(gamecheck_category(&g, GC_FIRMWARE_TOO_OLD, CURRENT) == GC_CAT_SYSTEM);
+    CHECK(gamecheck_category(&g, GC_KEY_TOO_NEW, CURRENT) == GC_CAT_SYSTEM);
+    CHECK(gamecheck_category(&g, GC_STORAGE_UNAVAILABLE, CURRENT) == GC_CAT_SYSTEM);
+    // Installed again.
+    CHECK(gamecheck_category(&g, GC_FILES_MISSING, CURRENT) == GC_CAT_REINSTALL);
+    CHECK(gamecheck_category(&g, GC_TICKET_MISSING, CURRENT) == GC_CAT_REINSTALL);
+    CHECK(gamecheck_category(&g, GC_LAUNCH_REFUSED, CURRENT) == GC_CAT_REINSTALL);
+    g.has_base = false;
+    CHECK(gamecheck_category(&g, GC_NO_BASE, CURRENT) == GC_CAT_REINSTALL);
+    CHECK(gamecheck_category(&g, GC_ARCHIVED, CURRENT) == GC_CAT_REINSTALL);
+}
+
 static void test_paging(void)
 {
     // More games than one chunk of records, more than the list holds, and
@@ -1004,6 +1041,10 @@ static void test_records_and_progress(void)
     CHECK(gamecheck_check(records, 5, facts_out, on_game, &s_seen) == 5 && s_seen == 5);
     CHECK(facts_out[2].app_id == C.games[2].id && facts_out[2].record_updated == 1002 && facts_out[2].has_base);
     CHECK(C.rights_reads == 5);   // one file per game: its program
+    CHECK(C.view_calls == 1 && C.avm_reads == 0);   // the views in one request; no launch version asked
+    GameCheckTiming timing;
+    gamecheck_last_timing(&timing);
+    CHECK(timing.games == 5 && timing.total_ns >= timing.control_ns + timing.contents_ns);
     all_closed();
 
     // Stopped after the second: two checked, the sessions closed all the same.
@@ -1265,6 +1306,7 @@ int main(void)
     test_sd_card_unreadable();
     test_without_services();
     test_list_failures();
+    test_categories();
     test_records_and_progress();
     test_paging();
     test_remove();

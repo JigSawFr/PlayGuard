@@ -884,7 +884,18 @@
         "size_mb": "{} MB",
         "size_gb": "{} GB",
         "decimal_mark": ".",
-        "verify_code": "主機代碼：{}"
+        "verify_code": "主機代碼：{}",
+        "tabs": {
+            "fix": "可在此修復 ({})",
+            "reinstall": "需重新安裝 ({})",
+            "system": "韌體或 SD 卡 ({})"
+        },
+        "tab_note": {
+            "fix": "PlayGuard 可以修復：在遊戲上按 A，然後選第一個按鈕。",
+            "reinstall": "檔案缺失或無法使用：在此移除，然後用慣用的安裝工具重新安裝。",
+            "system": "遊戲本身沒問題：問題在主機韌體或 SD 卡。請更新韌體，或從安裝這些遊戲時的儲存空間啟動。"
+        },
+        "next_tab": "下一個列表"
     },
     "about": {
         "section_changelog": "{} 更新內容",
