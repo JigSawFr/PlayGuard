@@ -165,6 +165,8 @@ profiles_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
 pt_block_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
+markdown_SRC   := source/util/safe_text.cpp source/util/markdown.cpp tests/markdown/test.cpp
+markdown_FLAGS := -std=c++17 -Isource
 rollback_SRC   := source/util/paths.cpp source/util/rollback.cpp tests/rollback/test.cpp
 rollback_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 launcher_FLAGS := -std=c++17 -Isource
@@ -172,7 +174,7 @@ history_SRC   := source/util/paths.cpp source/util/history.cpp tests/history/tes
 history_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 log_upload_SRC   := source/util/paths.cpp source/util/pt_log.cpp source/util/pt_block.cpp source/util/log_files.cpp source/util/log_upload.cpp tests/log_upload/test.cpp
 log_upload_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
-dev_builds_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/update.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/github_auth.cpp tests/dev_builds/test.cpp
+dev_builds_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/update.cpp source/util/safe_text.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/github_auth.cpp tests/dev_builds/test.cpp
 dev_builds_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 dev_builds_LIBS  := -lz
 play_cache_SRC   := source/util/play_cache.cpp tests/play_cache/test.cpp
