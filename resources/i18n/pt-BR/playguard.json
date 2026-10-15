@@ -1253,6 +1253,9 @@
         "upload_show": "Mostrar o link",
         "crash": "Da última vez, o PlayGuard fechou inesperadamente",
         "sd_write": "O PlayGuard não conseguiu gravar no cartão SD",
-        "sd_write_detail": "{} não foi salvo. Verifique o cartão SD: cheio, somente leitura (a trava) ou com erros."
+        "sd_write_detail": "{} não foi salvo. Verifique o cartão SD: cheio, somente leitura (a trava) ou com erros.",
+        "games_one": "Um jogo instalado não consegue iniciar",
+        "games": "{} jogos instalados não conseguem iniciar",
+        "games_more": "{} e mais {}"
     }
 }

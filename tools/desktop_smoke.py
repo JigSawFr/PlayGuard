@@ -851,9 +851,9 @@ if OUTSIDE:
         fail("the Overview never said the console is not counting")
     time.sleep(6)              # the next refresh shows it
     shot("02_not_counting")
-    key("y")                   # the notification bell's list (the keyboard's Y): both, and the
-    if not logged("notices: 3 to do"):   # simulated network clock, not accurate, to do
-        fail("the notification bell does not hold the three notices to do")
+    key("y")                   # the notification bell's list (the keyboard's Y): both, the
+    if not logged("notices: 4 to do"):   # simulated network clock (not accurate) and broken games
+        fail("the notification bell does not hold the four notices to do")
     shot("03_notices")
     key("Escape")
     key("Down")                # Play timer: its state line says it too

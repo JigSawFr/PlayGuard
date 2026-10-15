@@ -1253,6 +1253,9 @@
         "upload_show": "Mostra il link",
         "crash": "L'ultima volta PlayGuard si è chiuso in modo imprevisto",
         "sd_write": "PlayGuard non è riuscito a scrivere sulla scheda SD",
-        "sd_write_detail": "{} non è stato salvato. Controlla la scheda SD: piena, in sola lettura (il blocco) o con errori."
+        "sd_write_detail": "{} non è stato salvato. Controlla la scheda SD: piena, in sola lettura (il blocco) o con errori.",
+        "games_one": "Un gioco installato non può avviarsi",
+        "games": "{} giochi installati non possono avviarsi",
+        "games_more": "{} e altri {}"
     }
 }

@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "action/game_notice.hpp"
 #include "action/history_flow.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
@@ -270,6 +271,7 @@ void GameCheckActivity::scan()
 void GameCheckActivity::show(const GameCheck& check)
 {
     this->shown = true;
+    game_notice::note(check);   // the bell follows every read, repairs included
     SysInfo si;
     sysinfo_get(&si);
     const u32 hos = si.hos_version;

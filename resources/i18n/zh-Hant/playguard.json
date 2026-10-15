@@ -1253,6 +1253,9 @@
         "upload_show": "顯示連結",
         "crash": "PlayGuard 上次意外關閉",
         "sd_write": "PlayGuard 無法寫入 SD 卡",
-        "sd_write_detail": "{} 未能儲存。請檢查 SD 卡：已滿、唯讀（鎖定開關）或有錯誤。"
+        "sd_write_detail": "{} 未能儲存。請檢查 SD 卡：已滿、唯讀（鎖定開關）或有錯誤。",
+        "games_one": "有 1 款已安裝的遊戲無法啟動",
+        "games": "有 {} 款已安裝的遊戲無法啟動",
+        "games_more": "{}，另有 {} 款"
     }
 }

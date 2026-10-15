@@ -1253,6 +1253,9 @@
         "upload_show": "Show the link",
         "crash": "PlayGuard closed unexpectedly last time",
         "sd_write": "PlayGuard could not write to the SD card",
-        "sd_write_detail": "{} was not saved. Check the SD card: full, read-only (the lock switch) or with errors."
+        "sd_write_detail": "{} was not saved. Check the SD card: full, read-only (the lock switch) or with errors.",
+        "games_one": "One installed game cannot start",
+        "games": "{} installed games cannot start",
+        "games_more": "{} and {} more"
     }
 }

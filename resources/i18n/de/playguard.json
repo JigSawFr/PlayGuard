@@ -1253,6 +1253,9 @@
         "upload_show": "Link anzeigen",
         "crash": "PlayGuard wurde beim letzten Mal unerwartet beendet",
         "sd_write": "PlayGuard konnte nicht auf die SD-Karte schreiben",
-        "sd_write_detail": "{} wurde nicht gespeichert. Prüfe die SD-Karte: voll, schreibgeschützt (der Schieber) oder fehlerhaft."
+        "sd_write_detail": "{} wurde nicht gespeichert. Prüfe die SD-Karte: voll, schreibgeschützt (der Schieber) oder fehlerhaft.",
+        "games_one": "Ein installiertes Spiel startet nicht",
+        "games": "{} installierte Spiele starten nicht",
+        "games_more": "{} und {} weitere"
     }
 }

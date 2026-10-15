@@ -1253,6 +1253,9 @@
         "upload_show": "Afficher le lien",
         "crash": "PlayGuard s'est fermé de façon inattendue la dernière fois",
         "sd_write": "PlayGuard n'a pas pu écrire sur la carte SD",
-        "sd_write_detail": "{} n'a pas été enregistré. Vérifiez la carte SD : pleine, en lecture seule (le verrou) ou avec des erreurs."
+        "sd_write_detail": "{} n'a pas été enregistré. Vérifiez la carte SD : pleine, en lecture seule (le verrou) ou avec des erreurs.",
+        "games_one": "Un jeu installé ne peut pas démarrer",
+        "games": "{} jeux installés ne peuvent pas démarrer",
+        "games_more": "{} et {} autres"
     }
 }
