@@ -145,6 +145,14 @@ static void test_bounds()
     CHECK(markdown::parse("").empty() && markdown::parse("\n\n\n").empty());
     CHECK(markdown::parse(std::string(100000, '[')).size() == 1);
     CHECK(markdown::parse(std::string(100000, '`')).size() <= 1);
+    // Runs that used to be scanned to the end once per character.
+    CHECK(markdown::parse(std::string(100000, '<')).size() == 1);
+    CHECK(markdown::parse(std::string(100000, '<') + ">").size() == 1);
+    CHECK(markdown::parse(std::string(100000, '&')).size() == 1);
+    std::string scripted;
+    for (int i = 0; i < 10000; i++) scripted += "<scripted ";
+    CHECK(markdown::parse(scripted).size() == 1);   // not an element: its text stays
+    CHECK(markdown::inline_text("a << b <br> c &amp; d &toolongname; e") == "a << b\nc & d &toolongname; e");
     CHECK(markdown::parse("<!--").empty());
     // Raw HTML elements go with what they hold, whatever their case; a
     // look-alike tag does not swallow the text after it.

@@ -105,8 +105,11 @@ size_t entity(const std::string& s, size_t i, std::string* out)
         { "mdash", "\xE2\x80\x94" }, { "ndash", "\xE2\x80\x93" }, { "hellip", "\xE2\x80\xA6" },
         { "rarr", "\xE2\x86\x92" }, { "larr", "\xE2\x86\x90" }, { "middot", "\xC2\xB7" }, { "copy", "\xC2\xA9" },
     };
-    const size_t semi = s.find(';', i);
-    if (semi == std::string::npos || semi - i > 10 || semi == i + 1) return 0;
+    // Only the next 11 characters: a longer name is no entity, and looking
+    // further would scan the rest of the text again for every '&'.
+    const size_t at = s.substr(i, 11).find(';');
+    if (at == std::string::npos || at == 1) return 0;
+    const size_t semi = i + at;
     const std::string name = s.substr(i + 1, semi - i - 1);
     if (name[0] == '#') {
         uint32_t cp = 0;
@@ -160,6 +163,7 @@ bool word(char c)
 std::string inline_pass(const std::string& s, int depth)
 {
     std::string out;
+    size_t next_gt = s.find('>');
     for (size_t i = 0; i < s.size();) {
         const char c = s[i];
         // \* : the character itself.
@@ -198,21 +202,19 @@ std::string inline_pass(const std::string& s, int depth)
         }
         // <https://…>: the address; <tag …> and </tag>: gone; <br>: a line break.
         if (c == '<') {
-            const size_t end = s.find('>', i);
-            if (end != std::string::npos) {
+            // The next '>' is looked for once, not again for every '<' before it.
+            if (next_gt != std::string::npos && next_gt < i) next_gt = s.find('>', i);
+            const size_t end = next_gt;
+            // An address or a tag starts with a letter, '/' or '!', and is
+            // then taken whole: what lies up to the '>' is copied only then,
+            // never once per '<' of a run like "<<<<…>".
+            const unsigned char first = end != std::string::npos && end > i + 1 ? (unsigned char)s[i + 1] : 0;
+            if (std::isalpha(first) || first == '/' || first == '!') {
                 const std::string inside = s.substr(i + 1, end - i - 1);
-                if (starts_with(inside, "http://") || starts_with(inside, "https://")) {
-                    out += inside;
-                    i = end + 1;
-                    continue;
-                }
-                const std::string tag = lower(inside);
-                const bool is_tag = !inside.empty() && (std::isalpha((unsigned char)inside[0]) || inside[0] == '/' || inside[0] == '!');
-                if (is_tag) {
-                    if (starts_with(tag, "br")) out += '\n';
-                    i = end + 1;
-                    continue;
-                }
+                if (starts_with(inside, "http://") || starts_with(inside, "https://")) out += inside;
+                else if (starts_with(lower(inside), "br")) out += '\n';
+                i = end + 1;
+                continue;
             }
         }
         if (c == '&') {
@@ -362,7 +364,7 @@ std::string drop_raw_elements(std::string md)
     std::string low = lower(md);
     for (const char* name : { "script", "style", "textarea", "title", "iframe", "noscript" }) {
         const std::string open = std::string("<") + name, close = std::string("</") + name;
-        for (size_t at; (at = low.find(open)) != std::string::npos;) {
+        for (size_t at = 0; (at = low.find(open, at)) != std::string::npos;) {
             const char next = at + open.size() < low.size() ? low[at + open.size()] : '>';
             if (next != '>' && next != ' ' && next != '\n' && next != '/') {   // "<scripted>": not this element
                 low[at] = ' ';
