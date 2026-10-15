@@ -13,6 +13,16 @@ using namespace brls::literals;
 namespace ui
 {
 
+void hold_focus(brls::Box* content)
+{
+    auto* anchor = new brls::Rectangle(nvgRGBA(0, 0, 0, 0));
+    anchor->setWidth(1);
+    anchor->setHeight(1);
+    anchor->setFocusable(true);
+    anchor->setHideHighlight(true);
+    content->addView(anchor);
+}
+
 void on_cancel(brls::Dialog* dialog, std::function<void()> on_cancel)
 {
     dialog->setCancelable(true);

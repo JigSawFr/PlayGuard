@@ -121,6 +121,7 @@ class DownloadProgress
         box->setPadding(40, 40, 40, 40);
         box->addView(this->label);
         box->addView(track);
+        ui::hold_focus(box);   // no button: the focus frame must not stay on the screen behind
         this->dialog = new brls::Dialog(box);
         this->dialog->setCancelable(false);
         this->show(0, size);

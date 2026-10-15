@@ -115,6 +115,11 @@ bool show_pin_dialog(std::function<void()> on_close = nullptr);
 // with a smaller font and narrower margins instead, so it fits.
 brls::Dialog* dialog(const std::string& text);
 
+// For a dialog with no button (a progress bar): an invisible view in
+// `content` that takes the focus. borealis draws the focus frame last, over
+// everything: left on the screen behind, it showed over the dialog.
+void hold_focus(brls::Box* content);
+
 // B closes `dialog` and runs `on_cancel` (borealis' own B only closes it).
 void on_cancel(brls::Dialog* dialog, std::function<void()> on_cancel);
 
