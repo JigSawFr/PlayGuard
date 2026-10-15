@@ -255,6 +255,7 @@ static void load_shared()
     read_bool(j, "clock_check_at_start", c.clock_check_at_start);
     read_bool(j, "intro", c.intro);
     read_string(j, "dev_builds_order", c.dev_builds_order);
+    read_bool(j, "dev_builds_prereleases", c.dev_builds_prereleases);
     read_string(j, "pin_lock", c.pin_lock);
     read_bool(j, "onboarding_at_start", c.onboarding_at_start);
     read_bool(j, "support_reminder", c.support_reminder);
@@ -349,6 +350,7 @@ bool snapshot(Snapshot& snap)
     j["clock_check_at_start"] = s_config.clock_check_at_start;
     j["intro"]           = s_config.intro;
     j["dev_builds_order"] = s_config.dev_builds_order;
+    j["dev_builds_prereleases"] = s_config.dev_builds_prereleases;
     j["pin_lock"]        = s_config.pin_lock;
     j["onboarding_at_start"] = s_config.onboarding_at_start;
     j["support_reminder"] = s_config.support_reminder;

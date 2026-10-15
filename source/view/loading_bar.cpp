@@ -35,6 +35,13 @@ void LoadingBar::fillOver(float value, brls::Time duration_us)
     this->moveTo(value, (float)duration_us, true);
 }
 
+void LoadingBar::reset()
+{
+    this->from = this->to = 0.0f;
+    this->duration = 1.0f;
+    this->since = brls::getCPUTimeUsec();
+}
+
 void LoadingBar::moveTo(float value, float duration_us, bool steady)
 {
     // From where the fill is drawn now, not from the last value asked.

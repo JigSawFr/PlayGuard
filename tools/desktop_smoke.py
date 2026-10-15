@@ -143,6 +143,8 @@ if DEVBUILD:
     import zipfile
     env.setdefault("PLAYGUARD_SIM_HBLOADER", "1")
     env.setdefault("PLAYGUARD_SIM_GITHUB_LOGIN", "ok")
+    # Each simulated answer takes a moment, so the list's bar can be seen.
+    env.setdefault("PLAYGUARD_SIM_DEV_BUILDS_DELAY", "600")
     sim = os.path.join(run_dir, "sim_github")
     os.makedirs(sim, exist_ok=True)
     token_file = os.path.join(run_dir, "playguard_data", "github_token")
@@ -157,32 +159,43 @@ if DEVBUILD:
         z.writestr("playguard.nro", pr_content)
         z.writestr("build-info.txt", "commit: ccccccc\n")
     zip_bytes = open(pr_zip, "rb").read()
-    def artifact(branch, sha, date, path, size, digest=None, head_repo=1):
+    def artifact(branch, sha, date, path, size, digest=None, head_repo=1, run=1):
         # Named as the build workflow names the artifact holding playguard.nro.
         a = {"name": f"playguard-1.0.0-{'main' if branch == 'main' else 'pr38'}-{sha[:7]}-nro",
              "size_in_bytes": size, "expired": False, "created_at": date,
+             "expires_at": "2027-01-07T12:00:00Z",
              "archive_download_url": "https://" + path,
-             "workflow_run": {"id": 1, "repository_id": 1, "head_repository_id": head_repo,
+             "workflow_run": {"id": run, "repository_id": 1, "head_repository_id": head_repo,
                               "head_branch": branch, "head_sha": sha}}
         if digest:
             a["digest"] = "sha256:" + digest
         return a
     def release(tag, date, prerelease=False):
         return {"tag_name": tag, "prerelease": prerelease, "draft": False,
+                "body": f"## [{tag[1:]}](https://github.com/o/r/compare) ({date[:10]})\n\n"
+                        "### Features\n\n* **list:** the releases of the repository\n",
                 "assets": [{"name": "playguard.nro", "size": 10, "updated_at": date,
                             "browser_download_url": "https:///missing"}]}
     json.dump(release("v1.0.0", "2026-10-01T00:00:00Z"), open(os.path.join(sim, "latest.json"), "w"))
     json.dump([release("v1.1.0-rc.1", "2026-10-05T00:00:00Z", True), release("v1.0.0", "2026-10-01T00:00:00Z")],
               open(os.path.join(sim, "releases.json"), "w"))
     json.dump({"artifacts": [
-        artifact("main", "a" * 40, "2026-10-09T12:00:00Z", "/missing", 10),
-        artifact("main", "b" * 40, "2026-10-08T12:00:00Z", "/missing", 10),
-        artifact("feat/report", "c" * 40, "2026-10-09T09:00:00Z", pr_zip, len(zip_bytes),
-                 hashlib.sha256(zip_bytes).hexdigest()),
+        artifact("main", "a" * 40, "2026-10-08T12:00:00Z", "/missing", 10, run=1),
+        artifact("main", "b" * 40, "2026-10-07T12:00:00Z", "/missing", 10, run=2),
+        artifact("feat/report", "c" * 40, "2026-10-08T09:00:00Z", pr_zip, len(zip_bytes),
+                 hashlib.sha256(zip_bytes).hexdigest(), run=3),
     ]}, open(os.path.join(sim, "artifacts.json"), "w"))
     json.dump([{"number": 38, "title": "feat: send a report online",
-                "head": {"ref": "feat/report", "repo": {"id": 1}}}],
+                "body": "## What this changes\n\n* a report can be sent online, as a gist\n",
+                "head": {"ref": "feat/report", "sha": "c" * 40, "repo": {"id": 1}},
+                "base": {"ref": "main", "repo": {"id": 1}}}],
               open(os.path.join(sim, "pulls.json"), "w"))
+    # How the runs ended: main's newest failed, the pull request's passed.
+    json.dump({"workflow_runs": [
+        {"id": 1, "head_sha": "a" * 40, "status": "completed", "conclusion": "failure"},
+        {"id": 2, "head_sha": "b" * 40, "status": "completed", "conclusion": "success"},
+        {"id": 3, "head_sha": "c" * 40, "status": "completed", "conclusion": "success"},
+    ]}, open(os.path.join(sim, "runs.json"), "w"))
     env.setdefault("PLAYGUARD_SIM_DEV_BUILDS", sim)
     installed_nro = os.path.join(run_dir, "playguard_data", "sd", "switch", "playguard", "playguard.nro")
     os.makedirs(os.path.dirname(installed_nro), exist_ok=True)
@@ -554,37 +567,40 @@ if DEVBUILD:
     key("Right")
     key("Down", 50, hold=0.15) # the Developer section, down to its last cell
     key("Return")              # Install another build: signed out, the releases and "Sign in"
+    time.sleep(1)              # once fetched (the simulated GitHub takes 0.6 s an answer)
     shot("01_dev_builds_signed_out")
     key("Down", 2)             # past the two releases, to Sign in to GitHub
     key("Return")
     shot("02_github_code")     # the code and its QR code (the simulated GitHub approves at once)
-    time.sleep(3)
+    time.sleep(4)
     if not os.path.exists(token_file):
         fail("no GitHub token saved in " + token_file)
     shot("03_dev_builds")      # the same screen filled: the tabs, the release, how old the list is
     cache_file = os.path.join(run_dir, "playguard_data", "cache", "dev_builds.json")
     if not os.path.exists(cache_file) or len(json.load(open(cache_file))["builds"]) != 5:
         fail("the list was not kept in " + cache_file)
-    loading = "Looking for builds..."
-    fetched = messages().count(loading)
+    def fetches():
+        log.flush()
+        return open(os.path.join(OUT, "app.log"), errors="replace").read().count("dev builds: fetching the list")
+    fetched = fetches()
     key("Escape")              # closed, then opened again: the list kept is shown at once
     key("Return")              # on the release's tab, its build focused
     key("Up")                  # the tabs
     key("Right", 2)            # Pull requests (the keyboard has no L / R)
     key("Return")
     shot("03b_dev_builds_kept")  # the pull requests' tab, by number
-    if messages().count(loading) != fetched:
+    if fetches() != fetched:
         fail("a list fetched a moment ago was fetched again")
     key("Down")                # the pull request
     button_x()                 # Refresh
-    time.sleep(2)
-    if messages().count(loading) != fetched + 1:
+    shot("03c_dev_builds_loading")   # the bar over the list kept, while it is fetched again (2.4 s)
+    time.sleep(3)
+    if fetches() != fetched + 1:
         fail("X did not fetch the list again")
     key("Down")                # back to the controller after the mouse (nothing below the pull request)
     key("Return")              # the pull request, still focused (the screen updated in place)
-    shot("04_dev_build_confirm")
-    key("Right")               # Install
-    key("Return")
+    shot("04_dev_build_details")   # its date, checks, size, description, and Install
+    key("Return")              # Install (focused)
     time.sleep(0.7)
     shot("05_dev_build_downloading")   # the progress bar and Cancel (the simulated download takes 4 s)
     key("Escape")              # B: cancelled; the download stops, nothing is replaced
@@ -595,9 +611,7 @@ if DEVBUILD:
         fail("no word that the download was cancelled")
     if open(installed_nro, "rb").read() != b"the build before":
         fail("a cancelled download replaced " + installed_nro)
-    key("Return")              # the pull request again
-    key("Right")               # Install
-    key("Return")
+    key("Return")              # Install again (still focused on the build's page)
     for _ in range(20):
         if not alive():
             break
@@ -609,7 +623,7 @@ if DEVBUILD:
         fail("the new build was not set as the next homebrew")
     if open(installed_nro, "rb").read() != pr_content:
         fail("the pull request's build did not replace " + installed_nro)
-    for leftover in (".old", ".new", ".new.zip"):
+    for leftover in (".old", ".new", ".new.zip", ".new.zip.part", ".new.zip.part.json"):
         if os.path.exists(installed_nro + leftover):
             fail("a %s file was left next to %s" % (leftover, installed_nro))
     finish()

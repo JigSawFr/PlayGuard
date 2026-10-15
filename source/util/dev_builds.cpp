@@ -5,11 +5,13 @@
 #include <cctype>
 #include <cerrno>
 #include <cstdio>
+#include <cstdlib>
 #include <set>
 
 #include <borealis/extern/nlohmann/json.hpp>
 
 #include "util/sha256.hpp"
+#include "util/update.hpp"
 
 namespace dev_builds
 {
@@ -49,6 +51,33 @@ std::string short_commit(const std::string& sha)
 
 bool https(const std::string& url) { return url.compare(0, 8, "https://") == 0; }
 
+// At most MAX_NOTES bytes of `text`, cut after a whole line.
+std::string cut_notes(std::string text)
+{
+    if (text.size() > MAX_NOTES) {
+        const size_t cut = text.rfind('\n', MAX_NOTES);
+        text.resize(cut == std::string::npos ? 0 : cut);
+    }
+    return text;
+}
+
+// Seconds since 1970 of "YYYY-MM-DDTHH:MM:SS…" (UTC); false when malformed.
+bool iso_seconds(const std::string& iso, int64_t* out)
+{
+    int y, mo, d, h, mi, se;
+    if (iso.size() < 19 || std::sscanf(iso.c_str(), "%4d-%2d-%2dT%2d:%2d:%2d", &y, &mo, &d, &h, &mi, &se) != 6) return false;
+    if (mo < 1 || mo > 12 || d < 1 || d > 31 || h > 23 || mi > 59 || se > 60) return false;
+    // Days from civil (Howard Hinnant's algorithm).
+    y -= mo <= 2;
+    const int64_t era = (y >= 0 ? y : y - 399) / 400;
+    const int64_t yoe = y - era * 400;
+    const int64_t doy = (153 * (mo + (mo > 2 ? -3 : 9)) + 2) / 5 + d - 1;
+    const int64_t doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    const int64_t days = era * 146097 + doe - 719468;
+    *out = days * 86400 + h * 3600 + mi * 60 + se;
+    return true;
+}
+
 // Where fetch() finds builds: a release asset on github.com, an artifact on
 // the API. A list kept on the SD card can be edited: nothing else is taken.
 bool github_url(const std::string& url)
@@ -87,11 +116,7 @@ bool release_build(const json& r, bool prerelease_ok, Build* out)
         b.url = str(a, "browser_download_url");
         b.date = str(a, "updated_at");
         b.sha256 = digest_hex(str(a, "digest"));
-        b.notes = str(r, "body");
-        if (b.notes.size() > MAX_NOTES) {
-            const size_t cut = b.notes.rfind('\n', MAX_NOTES);
-            b.notes.resize(cut == std::string::npos ? 0 : cut);
-        }
+        b.notes = cut_notes(str(r, "body"));
         const int64_t size = integer(a, "size");
         if (b.version.empty() || !https(b.url) || size <= 0) return false;
         b.size = (uint64_t)size;
@@ -116,7 +141,6 @@ bool parse_releases(const std::string& text, std::vector<Build>* out, size_t kee
             if (out->size() >= keep) break;
             Build b;
             if (!release_build(r, true, &b) || !seen.insert(b.version).second) continue;
-            b.notes.clear();   // only Update in place shows them, from the latest release
             out->push_back(b);
         }
         return true;
@@ -144,6 +168,8 @@ bool parse_artifacts(const std::string& text, std::vector<Artifact>* out, size_t
             x.url = str(a, "archive_download_url");
             x.date = str(a, "created_at");
             x.sha256 = digest_hex(str(a, "digest"));
+            x.expires = str(a, "expires_at");
+            x.run = integer(run, "id");
             x.branch = str(run, "head_branch");
             x.commit = short_commit(str(run, "head_sha"));
             x.repo = integer(run, "repository_id");
@@ -157,23 +183,135 @@ bool parse_artifacts(const std::string& text, std::vector<Artifact>* out, size_t
     });
 }
 
+namespace
+{
+bool pull_of(const json& p, Pull* out)
+{
+    if (!p.is_object() || !p.contains("head") || !p["head"].is_object()) return false;
+    const auto& head = p["head"];
+    auto repo_id = [](const json& side) {
+        return side.contains("repo") && side["repo"].is_object() ? integer(side["repo"], "id") : 0;
+    };
+    Pull x;
+    x.number = (int)integer(p, "number");
+    x.title = str(p, "title");
+    x.body = cut_notes(str(p, "body"));
+    x.branch = str(head, "ref");
+    x.head_sha = str(head, "sha");
+    // A fork that was deleted has no repository: its builds cannot be matched.
+    x.head_repo = repo_id(head);
+    x.repo = p.contains("base") && p["base"].is_object() ? repo_id(p["base"]) : 0;
+    if (x.number <= 0 || x.branch.empty() || !x.head_repo) return false;
+    *out = x;
+    return true;
+}
+
+Ci ci_of(const json& r)
+{
+    if (str(r, "status") != "completed") return Ci::Running;
+    return str(r, "conclusion") == "success" ? Ci::Passed : Ci::Failed;
+}
+}   // namespace
+
 bool parse_pulls(const std::string& text, std::vector<Pull>* out)
 {
     return parse(text, [out](const json& j) {
         if (!j.is_array()) return false;
         for (const auto& p : j) {
-            if (!p.is_object() || !p.contains("head") || !p["head"].is_object()) continue;
-            const auto& head = p["head"];
             Pull x;
-            x.number = (int)integer(p, "number");
-            x.title = str(p, "title");
-            x.branch = str(head, "ref");
-            // A fork that was deleted has no repository: its builds cannot be matched.
-            x.head_repo = head.contains("repo") && head["repo"].is_object() ? integer(head["repo"], "id") : 0;
-            if (x.number > 0 && !x.branch.empty() && x.head_repo) out->push_back(x);
+            if (pull_of(p, &x)) out->push_back(x);
         }
         return true;
     });
+}
+
+bool parse_pull(const std::string& text, Pull* out)
+{
+    return parse(text, [out](const json& j) { return pull_of(j, out); });
+}
+
+bool parse_runs(const std::string& text, std::vector<Run>* out)
+{
+    return parse(text, [out](const json& j) {
+        if (!j.is_object() || !j.contains("workflow_runs") || !j["workflow_runs"].is_array()) return false;
+        for (const auto& r : j["workflow_runs"]) {
+            if (!r.is_object()) continue;
+            Run x;
+            x.id = integer(r, "id");
+            x.sha = str(r, "head_sha");
+            x.ci = ci_of(r);
+            x.repo = r.contains("repository") && r["repository"].is_object() ? integer(r["repository"], "id") : 0;
+            x.head_repo = r.contains("head_repository") && r["head_repository"].is_object()
+                              ? integer(r["head_repository"], "id") : 0;
+            x.branch = str(r, "head_branch");
+            if (x.id > 0 && short_commit(x.sha) != "") out->push_back(x);
+        }
+        return true;
+    });
+}
+
+void apply_runs(std::vector<Build>* builds, const std::vector<Run>& runs)
+{
+    for (Build& b : *builds) {
+        if (!b.artifact || !b.run) continue;
+        for (const Run& r : runs)
+            if (r.id == b.run) b.ci = r.ci;
+    }
+}
+
+bool parse_commit(const std::string& text, std::string* sha)
+{
+    return parse(text, [sha](const json& j) {
+        if (!j.is_object()) return false;
+        const std::string s = str(j, "sha");
+        if (s.size() != 40 || !is_hex(s)) return false;
+        *sha = lower(s);
+        return true;
+    });
+}
+
+bool parse_query(const std::string& text, Query* out)
+{
+    const size_t a = text.find_first_not_of(" \t");
+    const size_t b = text.find_last_not_of(" \t");
+    if (a == std::string::npos) return false;
+    std::string t = text.substr(a, b - a + 1);
+    Query q;
+    const bool hash = t[0] == '#';
+    if (hash) t = t.substr(1);
+    const bool digits = !t.empty() && std::all_of(t.begin(), t.end(), [](char c) { return c >= '0' && c <= '9'; });
+    // A number is a pull request (up to 6 digits); 7 hex digits or more a commit.
+    if (digits && t.size() <= 6) {
+        q.pr = std::atoi(t.c_str());
+        if (q.pr <= 0) return false;
+    } else if (!hash && t.size() >= 7 && t.size() <= 40 && is_hex(t)) {
+        q.commit = lower(t);
+    } else {
+        return false;
+    }
+    *out = q;
+    return true;
+}
+
+bool newest_build(const std::vector<Artifact>& artifacts, Kind kind, Build* out)
+{
+    const Artifact* best = nullptr;
+    for (const Artifact& a : artifacts)
+        if (!best || a.date > best->date) best = &a;
+    if (!best) return false;
+    Build b;
+    b.kind = kind;
+    b.artifact = true;
+    b.commit = best->commit;
+    b.branch = best->branch;
+    b.date = best->date;
+    b.url = best->url;
+    b.size = best->size;
+    b.sha256 = best->sha256;
+    b.expires = best->expires;
+    b.run = best->run;
+    *out = b;
+    return true;
 }
 
 std::vector<Build> combine(const std::vector<Artifact>& artifacts, const std::vector<Pull>& pulls, size_t keep_main)
@@ -189,6 +327,8 @@ std::vector<Build> combine(const std::vector<Artifact>& artifacts, const std::ve
         b.url = a.url;
         b.size = a.size;
         b.sha256 = a.sha256;
+        b.expires = a.expires;
+        b.run = a.run;
         return b;
     };
     std::vector<Build> out;
@@ -210,6 +350,7 @@ std::vector<Build> combine(const std::vector<Artifact>& artifacts, const std::ve
             Build b = build(a, Kind::PullRequest);
             b.pr = p.number;
             b.title = p.title;
+            b.notes = p.body;
             out.push_back(b);
             break;   // the newest only
         }
@@ -239,14 +380,50 @@ std::vector<Build> of_kind(const std::vector<Build>& all, Kind kind, Order order
     return out;
 }
 
+bool parse_iso(const std::string& iso, int64_t* seconds)
+{
+    return iso_seconds(iso, seconds);
+}
+
+int days_between(const std::string& now_iso, const std::string& iso)
+{
+    int64_t a, b;
+    if (!iso_seconds(now_iso, &a) || !iso_seconds(iso, &b)) return 0;
+    const int64_t d = b - a;
+    return (int)(d >= 0 ? d / 86400 : -((-d + 86399) / 86400));
+}
+
+bool newer(const Build& b, const std::string& running_version, const Build* running)
+{
+    if (b.kind == Kind::Release) return !running_version.empty() && update::compare_versions(b.version, running_version) > 0;
+    return running && b.artifact && b.commit != running->commit && b.date > running->date;
+}
+
 namespace
 {
+const char* ci_name(Ci c)
+{
+    switch (c) {
+        case Ci::Running: return "running";
+        case Ci::Passed: return "passed";
+        case Ci::Failed: return "failed";
+        case Ci::Unknown: break;
+    }
+    return "";
+}
+
+Ci ci_named(const std::string& n)
+{
+    return n == "running" ? Ci::Running : n == "passed" ? Ci::Passed : n == "failed" ? Ci::Failed : Ci::Unknown;
+}
+
 const char* kind_name(Kind k)
 {
     switch (k) {
         case Kind::Release: return "release";
         case Kind::Main: return "main";
         case Kind::PullRequest: return "pr";
+        case Kind::Commit: return "commit";
     }
     return "";
 }
@@ -259,7 +436,8 @@ std::string encode_cache(const Cache& cache)
         list.push_back({ { "kind", kind_name(b.kind) }, { "artifact", b.artifact }, { "version", b.version },
                          { "prerelease", b.prerelease },
                          { "pr", b.pr }, { "title", b.title }, { "commit", b.commit }, { "date", b.date },
-                         { "url", b.url }, { "size", b.size }, { "sha256", b.sha256 } });
+                         { "url", b.url }, { "size", b.size }, { "sha256", b.sha256 }, { "notes", b.notes },
+                         { "branch", b.branch }, { "expires", b.expires }, { "run", b.run }, { "ci", ci_name(b.ci) } });
     const json j = { { "version", 1 }, { "fetched_at", cache.fetched_at }, { "needs_login", cache.needs_login },
                      { "builds", list } };
     return j.dump(1) + "\n";
@@ -279,6 +457,7 @@ bool decode_cache(const std::string& text, Cache* out)
             if (kind == "release") b.kind = Kind::Release;
             else if (kind == "main") b.kind = Kind::Main;
             else if (kind == "pr") b.kind = Kind::PullRequest;
+            else if (kind == "commit") b.kind = Kind::Commit;
             else continue;
             b.artifact = x.value("artifact", false);
             b.version = str(x, "version");
@@ -289,6 +468,11 @@ bool decode_cache(const std::string& text, Cache* out)
             b.date = str(x, "date");
             b.url = str(x, "url");
             b.sha256 = str(x, "sha256");
+            b.notes = cut_notes(str(x, "notes"));
+            b.branch = str(x, "branch");
+            b.expires = str(x, "expires");
+            b.run = integer(x, "run");
+            b.ci = ci_named(str(x, "ci"));
             const int64_t size = integer(x, "size");
             const bool commit_ok = b.kind == Kind::Release ? b.commit.empty() : short_commit(b.commit) == b.commit;
             const bool sha_ok = b.sha256.empty() || (b.sha256.size() == 64 && is_hex(b.sha256) && lower(b.sha256) == b.sha256);
