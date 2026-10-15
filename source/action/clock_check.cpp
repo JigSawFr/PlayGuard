@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <string>
 
+#include "action/notices.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/ntp_client.hpp"
@@ -38,8 +39,16 @@ void at_start()
                 return;
             }
             const long long off = std::llabs(server_now - (long long)clocks.network_time);
-            if (off < 60) return;
-            ui::notify(brls::getStr("playguard/clock/start_off", ui::fmt_play_time((uint64_t)off), server));
+            if (off < 60) {
+                notices::clear("clock_off");
+                return;
+            }
+            const std::string text = brls::getStr("playguard/clock/start_off", ui::fmt_play_time((uint64_t)off), server);
+            ui::notify(text);
+            // Kept in the bell after the toast, until put away.
+            notices::set("clock_off", notices::Level::Info, "playguard/notices/clock"_i18n, text,
+                         brls::getStr("playguard/notices/open_tab", "playguard/tabs/clock"_i18n),
+                         []() { notices::open_tab(ui::tab::clock); });
         });
     });
 }

@@ -20,6 +20,7 @@
 #include "action/pt_flow.hpp"
 #include "action/pt_log_flow.hpp"
 #include "action/rescue.hpp"
+#include "action/rollback_flow.hpp"
 #include "activity/init_error_activity.hpp"
 #include "activity/loading_activity.hpp"
 #include "activity/lock_activity.hpp"
@@ -48,6 +49,7 @@
 #include "view/loading_bar.hpp"
 #include "view/loading_mark.hpp"
 #include "view/made_in_france.hpp"
+#include "view/notice_bell.hpp"
 #include "view/version_badge.hpp"
 #include "view/scroll_view.hpp"
 #include "view/play_days.hpp"
@@ -116,6 +118,7 @@ void show_first(brls::Activity* first)
     pt_log_flow::apply();   // Developer › Record the play timer, when on (after fw_gate::prepare)
     log_prune_flow::run();  // the reports and crashes past the limits of Tools › Diagnostics
     startup_mark(StartupStep_FirstScreen);
+    rollback_flow::started();   // this build starts: nothing to go back from
     brls::Logger::info("start-up: first screen ready after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_FirstScreen));
 }
 
@@ -203,6 +206,10 @@ int main(int argc, char* argv[])
 #endif
     // logs/ before its subfolders (reports/, crashes/, uploads/, play_timer/).
     log_files::migrate(paths::logs_dir());
+    // Before anything that could crash: the last start of a build just
+    // installed never reached its first screen, or L + R are held? Then the
+    // previous build is offered (action/rollback_flow.hpp).
+    if (rollback_flow::at_start()) return EXIT_SUCCESS;
     // The system this is (sysMMC or emuMMC): its own folder, nand/<key>,
     // before config::load() reads its state.json. What the versions before
     // it kept for every system goes to the first one started.
@@ -277,6 +284,7 @@ int main(int argc, char* argv[])
     // The version (and, for a development build, its commit) at the right of
     // every screen's header.
     VersionBadge::install();
+    NoticeBell::install();   // after the badge: the bell goes in its row
 
     // The loading screen first, with nothing slow before it, and drawn at once
     // (no fade: a frame at alpha 0 is a black one). The rest of the start-up
@@ -293,6 +301,9 @@ int main(int argc, char* argv[])
 
     while (brls::Application::mainLoop())
         ;
+
+    // "Lock and quit": locked now that the screen is gone (pt_flow.hpp).
+    pt_flow::lock_at_exit_if_asked();
 
     // Network tasks still running (an update check, a sign-in waiting for its
     // code): stopped, and waited for a moment, before what they use goes away.

@@ -137,6 +137,7 @@ void sanitize(Config& c)
         c.update_snooze_version.clear(), c.update_snooze_until.clear();
     if (!is_date(c.support_reminded)) c.support_reminded.clear();
     if (c.seen_version.size() > 32) c.seen_version.clear();
+    if (c.crash_seen.size() > 64) c.crash_seen.clear();
 
     std::vector<std::string> servers;
     for (const auto& s : c.custom_servers)
@@ -260,6 +261,7 @@ static void load_shared()
     read_bool(j, "support_reminder", c.support_reminder);
     read_string(j, "support_reminded", c.support_reminded);
     read_string(j, "seen_version", c.seen_version);
+    read_string(j, "crash_seen", c.crash_seen);
     auto amounts = j.find("extra_amounts");
     if (amounts != j.end() && amounts->is_array())
         c.extra_amounts = read_int_list(*amounts);   // sanitize() keeps it only when it is one of EXTRA_SETS
@@ -354,6 +356,7 @@ bool snapshot(Snapshot& snap)
     j["support_reminder"] = s_config.support_reminder;
     j["support_reminded"] = s_config.support_reminded;
     j["seen_version"]    = s_config.seen_version;
+    j["crash_seen"]      = s_config.crash_seen;
     snap.shared = dump(j);
 
     nlohmann::json st;

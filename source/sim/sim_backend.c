@@ -377,6 +377,7 @@ Result pctl_play_timer_set_days(const u16 d[7])
     if (S.hos < PCTL_FW_MIN_PLAYTIMER) return NXM_RC_FW_UNSUPPORTED;
     for (int i = 0; i < 7; i++) if (d[i] != PT_DAY_NOLIMIT && d[i] > 1440) return NXM_RC_INVALID_ARGUMENT;
     if ((timer_enabled() || S.limit_reached) && !S.temp_unlocked) return NXM_RC_WRITE_GATED;
+    if (!S.pin_length) return NXM_RC_NO_PIN;   // pctl skips a 195101 write with no PIN
     FAIL_IF("write");
     pt_encode(S.block, d);   // read-modify-write, as pctl_ops.c does
     S.limit_reached = false;
@@ -392,6 +393,7 @@ Result pctl_play_timer_set_bedtime(const PtBedtime bed[7], int today)
     if (today < 0 || today > 6) return NXM_RC_INVALID_ARGUMENT;
     for (int i = 0; i < 7; i++) if (!pt_bedtime_ok(&bed[i])) return NXM_RC_INVALID_ARGUMENT;
     if ((timer_enabled() || S.limit_reached) && !S.temp_unlocked) return NXM_RC_WRITE_GATED;
+    if (!S.pin_length) return NXM_RC_NO_PIN;   // pctl skips a 195101 write with no PIN
     FAIL_IF("write");
     if (fails("timer")) return NXM_RC_STATE_UNKNOWN;
     if (fails("bedtime")) return NXM_RC_NOT_APPLIED;
@@ -405,6 +407,7 @@ Result pctl_play_timer_set_alarm_only(bool alarm_only)
     sim_init();
     if (S.hos < PCTL_FW_MIN_PLAYTIMER) return NXM_RC_FW_UNSUPPORTED;
     if ((timer_enabled() || S.limit_reached) && !S.temp_unlocked) return NXM_RC_WRITE_GATED;
+    if (!S.pin_length) return NXM_RC_NO_PIN;   // pctl skips a 195101 write with no PIN
     FAIL_IF("write");
     if (fails("timer")) return NXM_RC_STATE_UNKNOWN;
     return pt_set_suspends(S.block, !alarm_only) ? 0 : NXM_RC_INVALID_ARGUMENT;

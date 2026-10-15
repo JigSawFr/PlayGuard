@@ -14,11 +14,20 @@ What each tab does, how PlayGuard writes safely, and what the console counts as 
 
 ## Controls
 
-↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh · **+** saves per-day limits.
+↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh · Ⓨ notifications · **+** saves per-day limits.
 
 What failed is said in a dialog, what worked in a toast. The title says when the app is read-only or while parental controls are temporarily unlocked; in read-only mode, actions stay in place, greyed, and say why when pressed.
 
 The app is organised in tabs, like System Settings; each has its section below.
+
+## Notifications — what needs you, from any tab
+
+A bell in the header, left of the version, gathers what needs the parent; Ⓨ opens the list from any tab (the footer says *Notifications (2)* when two things are to do).
+
+- **To do**, counted on the bell in amber, stays until it is fixed: no PIN yet, parental controls temporarily unlocked (*Lock now*), extra time from an earlier day still to put back, the "time's up" alarm off, changes made outside PlayGuard, the console not counting play time, an inaccurate network clock, game patches that need a look, one of PlayGuard's own files that could not be put aside or written to the SD card, a build that did not finish starting and was gone back from (*Send a report*).
+- **For information**, a dot on the bell, can be marked as read: a new version installed (*What's new*; after an update in place, the previous build kept), a build gone back from, a report sent online (*Show the link*), a new user account, PlayGuard closed unexpectedly last time (*Send a report*), the companion app linked, a firmware not tested with this version, the serial number not blanked on emuMMC, a newer version of PlayGuard, the network clock found off at start-up, one of PlayGuard's own files found damaged and put aside (a toast at start-up points to it).
+- Ⓐ on an entry does the fix (*Turn it on*, *Set it*, *Update*…) or opens the tab where it is made. An entry goes by itself once what it says is fixed.
+- The state behind it is read when PlayGuard starts, every minute on the main screen, and every 5 s while the Overview is shown.
 
 ## Overview — today at a glance
 
@@ -78,7 +87,7 @@ The app is organised in tabs, like System Settings; each has its section below.
 ## Security & app — PIN, locks, companion app
 
 - **Set / change the PIN** (system PIN screen), **show the PIN** (after a warning and the PIN itself, asked every time; recorded in the history, then a new PIN is offered), **unlock temporarily**, **lock now**.
-- **Ask for the PIN** in PlayGuard itself: *Never*, *Before a change* (the default: anyone can look, only the parent changes something; asked again after 5 min) or *To open PlayGuard* (a lock screen at start, and again when PlayGuard comes back after 5 min or more out of focus). Checked in the service layer, so no change skips it; locking again never asks. *Show the PIN* asks for it every time, in every mode and even within the 5 minutes, and a missing or damaged `config.json` counts as *Before a change*. Quitting while parental controls are still unlocked asks whether to lock them again; closed from the HOME menu instead, PlayGuard locks them again the next time it starts.
+- **Ask for the PIN** in PlayGuard itself: *Never*, *Before a change* (the default: anyone can look, only the parent changes something; asked again after 5 min) or *To open PlayGuard* (a lock screen at start, and again when PlayGuard comes back after 5 min or more out of focus). Checked in the service layer, so no change skips it; locking again never asks. *Show the PIN* asks for it every time, in every mode and even within the 5 minutes, and a missing or damaged `config.json` counts as *Before a change*. Quitting while parental controls are still unlocked asks whether to lock them again (*Lock and quit* also closes the game PlayGuard was opened over, back to the HOME menu rather than hbmenu); closed from the HOME menu instead, PlayGuard locks them again the next time it starts.
 - **Console lock:** one switch that sets every day's limit to 0, so a PIN is needed to start a game — a light lock without age ratings or communication limits. It blocks starting games, not the HOME menu, and needs a PIN. The previous limits come back when it is turned off. While it is on, *extra time* and *no more play today* are refused, and limits set another way (a profile, a backup, the history…) replace it.
 - **Companion app:** whether the Nintendo Switch Parental Controls app is linked, its last sync, and **unlink** (otherwise its next sync overwrites the limits set here: while it is linked, every change PlayGuard asks to confirm says so). While it is linked, *Before unlinking: help decode…* opens the block comparison (see [CONTRIBUTING.md](../CONTRIBUTING.md#no-code-needed)).
 - **Delete all parental controls:** two confirmations, irreversible; a backup of the settings is saved first.

@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "action/notices.hpp"
 #include "action/pt_logic.hpp"
 #include "action/timer_health.hpp"
 #include "ui/ui.hpp"
@@ -66,7 +67,9 @@ void PtStateHeader::show(const PtState& pt)
                    : pt.alarm_only ? "playguard/play_timer/state/reached_alert_alarm"_i18n
                                    : "playguard/play_timer/state/reached_alert_suspend"_i18n);
     ui::set_visible(alert, reached);
-    ui::set_visible(health, timer_health::observe(pt));
+    const bool stalled = timer_health::observe(pt);
+    notices::note_timer_stalled(stalled);
+    ui::set_visible(health, stalled);
 }
 
 brls::View* PtStateHeader::create()

@@ -43,6 +43,27 @@ bool platform_set_next_load(const char* path)
     return true;
 }
 
+void platform_exit_to_home(void)
+{
+    if (std::getenv("PLAYGUARD_SIM_APPLET")) return;
+    std::printf("exit to HOME\n");
+    std::fflush(stdout);
+}
+
+bool platform_held_lr(void)
+{
+    return std::getenv("PLAYGUARD_SIM_HELD_LR") != nullptr;
+}
+
+bool platform_boot_choice(const char* text)
+{
+    const char* choice = std::getenv("PLAYGUARD_SIM_BOOT_CHOICE");
+    const bool a = choice && std::strcmp(choice, "a") == 0;
+    std::printf("boot screen:\n%s\nboot screen: %s\n", text ? text : "", a ? "A" : "B");
+    std::fflush(stdout);
+    return a;
+}
+
 void platform_romfs_release(void) {}
 void platform_romfs_mount(void) {}
 

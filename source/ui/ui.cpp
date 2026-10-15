@@ -2,6 +2,7 @@
 // screen's state. The other ui/*.cpp hold the rest of ui.hpp by concern.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
+#include "action/notices.hpp"
 
 #include "action/error_hint_logic.hpp"
 #include "action/pt_log_flow.hpp"
@@ -137,6 +138,7 @@ static bool queue_config(const std::string& saved_text, const std::string& faile
     *ticket = push_write("config", [text, saved_text, failed]() {
         const bool saved = config::write(text);
         s_config_saved = saved;
+        brls::sync([saved]() { notices::note_write("config", saved); });
         if (!saved) notify(failed);
         else if (!saved_text.empty()) notify(saved_text);
     }, "config");

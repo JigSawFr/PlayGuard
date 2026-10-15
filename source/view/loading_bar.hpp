@@ -17,6 +17,8 @@ class LoadingBar : public brls::View
     void setProgress(float value);
     // Fills to `value` at a steady pace, over `duration_us`.
     void fillOver(float value, brls::Time duration_us);
+    // Empty again at once (a bar shown anew, not easing back down).
+    void reset();
 
     void draw(NVGcontext* vg, float x, float y, float width, float height,
               brls::Style style, brls::FrameContext* ctx) override;

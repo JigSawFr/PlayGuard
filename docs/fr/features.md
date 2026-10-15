@@ -14,11 +14,20 @@ Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la co
 
 ## Commandes
 
-↑/↓ déplacer · Ⓐ valider · Ⓑ retour ou annuler (deux fois sur la barre latérale pour quitter) · Ⓧ actualiser · **+** enregistre les limites par jour.
+↑/↓ déplacer · Ⓐ valider · Ⓑ retour ou annuler (deux fois sur la barre latérale pour quitter) · Ⓧ actualiser · Ⓨ notifications · **+** enregistre les limites par jour.
 
 Ce qui a échoué est dit dans une boîte de dialogue, ce qui a réussi dans une notification. Le titre indique quand l'application est en lecture seule ou tant que le contrôle parental est déverrouillé temporairement ; en lecture seule, les actions restent à leur place, grisées, et disent pourquoi quand on les choisit.
 
 L'application est organisée en onglets, comme les paramètres de la console ; chacun a sa section ci-dessous.
+
+## Notifications — ce qui demande votre attention, depuis n'importe quel onglet
+
+Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'intervention du parent ; Ⓨ ouvre la liste depuis n'importe quel onglet (le pied de page indique *Notifications (2)* quand deux choses sont à faire).
+
+- **À faire**, compté en orange sur la cloche, reste jusqu'à ce que ce soit réglé : pas encore de code PIN, le contrôle parental déverrouillé temporairement (*Verrouiller maintenant*), du temps en plus d'un jour précédent à retirer, l'alarme « temps écoulé » désactivée, des modifications faites en dehors de PlayGuard, la console qui ne compte pas le temps de jeu, une horloge réseau imprécise, des patchs de jeux à vérifier, un fichier de PlayGuard qui n'a pas pu être mis de côté ou écrit sur la carte SD, une version qui n'a pas fini de démarrer et dont PlayGuard est revenu (*Envoyer un rapport*).
+- **Pour information**, un point sur la cloche, peut être marqué comme lu : une nouvelle version installée (*Nouveautés* ; après une mise à jour sur place, la version précédente gardée), un retour à la version précédente, un rapport envoyé en ligne (*Afficher le lien*), un nouveau compte utilisateur, PlayGuard fermé de façon inattendue la dernière fois (*Envoyer un rapport*), l'application mobile associée, un firmware non testé avec cette version, le numéro de série non masqué sur emuMMC, une nouvelle version de PlayGuard, l'horloge réseau trouvée décalée au lancement, un fichier de PlayGuard trouvé endommagé et mis de côté (une notification au lancement y renvoie).
+- Ⓐ sur une entrée fait la correction (*L'activer*, *La régler*, *Mettre à jour*…) ou ouvre l'onglet où elle se fait. Une entrée disparaît d'elle-même une fois réglé ce qu'elle signale.
+- L'état derrière est relu au lancement de PlayGuard, toutes les minutes sur l'écran principal, et toutes les 5 s tant que la Vue d'ensemble est affichée.
 
 ## Vue d'ensemble — la journée en un coup d'œil
 
@@ -78,7 +87,7 @@ L'application est organisée en onglets, comme les paramètres de la console ; c
 ## Sécurité et appli — code PIN, verrous, application mobile
 
 - **Définir ou changer le code PIN** (écran système), **afficher le code PIN** (après un avertissement et le code PIN lui-même, demandé à chaque fois ; noté dans l'historique, puis un nouveau code PIN est proposé), **déverrouiller temporairement**, **verrouiller maintenant**.
-- **Demander le code PIN** dans PlayGuard lui-même : *Jamais*, *Avant une modification* (par défaut : tout le monde peut regarder, seul le parent modifie ; redemandé après 5 min) ou *Pour ouvrir PlayGuard* (un écran verrouillé au lancement, et de nouveau quand PlayGuard revient après 5 min ou plus hors de l'écran). Vérifié dans la couche service, donc aucune modification n'y échappe ; reverrouiller ne le demande jamais. *Afficher le code PIN* le demande à chaque fois, dans tous les modes et même pendant les 5 minutes, et un `config.json` absent ou abîmé compte comme *Avant une modification*. Quitter alors que le contrôle parental est encore déverrouillé propose de le reverrouiller ; fermé depuis le menu HOME à la place, PlayGuard le reverrouille à son prochain lancement.
+- **Demander le code PIN** dans PlayGuard lui-même : *Jamais*, *Avant une modification* (par défaut : tout le monde peut regarder, seul le parent modifie ; redemandé après 5 min) ou *Pour ouvrir PlayGuard* (un écran verrouillé au lancement, et de nouveau quand PlayGuard revient après 5 min ou plus hors de l'écran). Vérifié dans la couche service, donc aucune modification n'y échappe ; reverrouiller ne le demande jamais. *Afficher le code PIN* le demande à chaque fois, dans tous les modes et même pendant les 5 minutes, et un `config.json` absent ou abîmé compte comme *Avant une modification*. Quitter alors que le contrôle parental est encore déverrouillé propose de le reverrouiller (*Verrouiller et quitter* ferme aussi le jeu par-dessus lequel PlayGuard a été ouvert, retour au menu HOME plutôt qu'à hbmenu) ; fermé depuis le menu HOME à la place, PlayGuard le reverrouille à son prochain lancement.
 - **Verrou de console :** un interrupteur qui met la limite de chaque jour à 0, donc un code PIN est nécessaire pour lancer un jeu — un verrou léger, sans classification par âge ni limite de communication. Il bloque le lancement des jeux, pas le menu HOME, et nécessite un code PIN. Les limites précédentes reviennent quand on le désactive. Tant qu'il est activé, *temps en plus* et *arrêter le jeu pour aujourd'hui* sont refusés, et des limites réglées autrement (un profil, une sauvegarde, l'historique…) le remplacent.
 - **Application mobile :** association de l'application Contrôle parental Nintendo Switch, dernière synchronisation, et **dissociation** (sinon sa prochaine synchronisation écrase les limites réglées ici : tant qu'elle est associée, chaque modification que PlayGuard fait confirmer le rappelle). Tant qu'elle est associée, *Avant de dissocier : aidez à décoder…* ouvre la comparaison du bloc (voir [CONTRIBUTING.md](../../CONTRIBUTING.md#no-code-needed), en anglais).
 - **Supprimer tout le contrôle parental :** deux confirmations, irréversible ; une sauvegarde des réglages est d'abord enregistrée.

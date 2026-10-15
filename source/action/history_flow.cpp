@@ -6,6 +6,7 @@
 
 #include "action/data_notice.hpp"
 #include "action/history_logic.hpp"
+#include "action/notices.hpp"
 #include "action/outside_watch.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_log_flow.hpp"
@@ -136,7 +137,9 @@ static void store(history::Entry e)
     ui::write_later("history", [e]() {
         std::string err;
         bool put_aside = false;
-        if (!history::append(e, &err, &put_aside)) brls::Logger::warning("history: not saved ({})", err);
+        const bool saved = history::append(e, &err, &put_aside);
+        if (!saved) brls::Logger::warning("history: not saved ({})", err);
+        brls::sync([saved, err]() { notices::note_write("history", saved, err); });
         if (put_aside) brls::sync([]() { data_notice::history_put_aside(); });
     });
     // Developer › Record the play timer: a line marking the change.

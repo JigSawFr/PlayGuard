@@ -21,6 +21,14 @@ class LoadingActivity : public brls::Activity
   public:
     CONTENT_FROM_XML_RES("activity/loading.xml");
 
+    enum class Mode
+    {
+        Start,     // the start-up
+        Closing,   // "Lock and quit": the last screen, the bar full, until PlayGuard is gone
+    };
+
+    explicit LoadingActivity(Mode mode = Mode::Start) : mode(mode) {}
+
     // The start-up steps, in order.
     enum class Step
     {
@@ -45,6 +53,7 @@ class LoadingActivity : public brls::Activity
     BRLS_BIND(brls::Label, step_text, "loading_step");
     BRLS_BIND(brls::Rectangle, anchor, "loading_anchor");
 
+    Mode       mode;
     brls::Time introStart = 0;   // 0: no intro
     bool       skipped    = false;
 };
