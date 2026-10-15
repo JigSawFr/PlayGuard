@@ -43,6 +43,15 @@ bool platform_set_next_load(const char *path)
     return path && envHasNextLoad() && R_SUCCEEDED(envSetNextLoad(path, path));
 }
 
+// hbmenu's own exit (+): libnx then ends the application itself (appletExit:
+// IApplicationFunctions' exit) instead of going back to hbloader.
+extern u32 __nx_applet_exit_mode;
+
+void platform_exit_to_home(void)
+{
+    if (appletGetAppletType() == AppletType_Application) __nx_applet_exit_mode = 1;
+}
+
 bool platform_region(int *region)
 {
     SetRegion r;

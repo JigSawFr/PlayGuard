@@ -8,7 +8,8 @@
         "tagline": "O controlo parental, diretamente na consola",
         "step_console": "A verificar a consola...",
         "step_settings": "A ler as definições...",
-        "step_screen": "A abrir o PlayGuard..."
+        "step_screen": "A abrir o PlayGuard...",
+        "step_closing": "A bloquear o controlo parental, a voltar ao menu HOME..."
     },
     "tabs": {
         "dashboard": "Visão geral",

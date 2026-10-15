@@ -8,7 +8,8 @@
         "tagline": "Le contrôle parental, directement sur la console",
         "step_console": "Vérification de la console...",
         "step_settings": "Lecture des réglages...",
-        "step_screen": "Ouverture de PlayGuard..."
+        "step_screen": "Ouverture de PlayGuard...",
+        "step_closing": "Verrouillage du contrôle parental, retour au menu HOME..."
     },
     "tabs": {
         "dashboard": "Vue d'ensemble",

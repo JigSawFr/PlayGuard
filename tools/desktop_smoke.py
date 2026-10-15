@@ -853,6 +853,8 @@ if RESCUE:
         time.sleep(0.1)
     if alive():
         fail("\"Lock and quit\" did not quit")
+    if "exit to HOME" not in open(os.path.join(OUT, "app.log"), errors="replace").read():
+        fail("\"Lock and quit\" went back to hbmenu, not to the HOME menu")
     finish(recorded)
 
 shot("01_dashboard")

@@ -8,7 +8,8 @@
         "tagline": "Controle dos pais direto no console",
         "step_console": "Verificando o console...",
         "step_settings": "Lendo as configurações...",
-        "step_screen": "Abrindo o PlayGuard..."
+        "step_screen": "Abrindo o PlayGuard...",
+        "step_closing": "Bloqueando o controle dos pais, voltando ao menu HOME..."
     },
     "tabs": {
         "dashboard": "Visão geral",

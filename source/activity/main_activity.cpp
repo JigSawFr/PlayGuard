@@ -3,11 +3,11 @@
 
 #include "action/clock_check.hpp"
 #include "action/data_notice.hpp"
-#include "action/history_flow.hpp"
 #include "action/fw_gate.hpp"
 #include "action/pt_flow.hpp"
 #include "action/support_flow.hpp"
 #include "action/update_flow.hpp"
+#include "activity/loading_activity.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
@@ -37,6 +37,9 @@ static void compact_sidebar(brls::View* tab_frame)
 // Quits, but first asks to lock again when parental controls are still
 // temporarily unlocked (Security › Unlock temporarily): leaving them so means
 // no limit at all until a restart, which is easy to forget on the way out.
+// Locking again waits for the screen to be gone, and closes the game PlayGuard
+// runs over too (pt_flow::lock_at_exit): back to the HOME menu, locked. Until
+// then, the closing screen.
 static void quit_or_relock()
 {
     bool unlocked = false;
@@ -51,13 +54,12 @@ static void quit_or_relock()
         brls::Application::quit();
     });
     dialog->addButton("playguard/hints/exit_lock"_i18n, []() {
-        const Result rc = pctl_relock();
-        if (R_FAILED(rc)) {   // stay, and say why: quitting would leave it unlocked
-            ui::notify_result(rc, "", "playguard/toast/relock_err"_i18n);
-            return;
-        }
-        history_flow::record_event("relock");
-        brls::Application::quit();
+        pt_flow::lock_at_exit();
+        // Drawn before quitting: the last frame, the one the console keeps
+        // behind its own screens, is this one rather than PlayGuard's.
+        brls::Application::pushActivity(new LoadingActivity(LoadingActivity::Mode::Closing),
+                                        brls::TransitionAnimation::NONE);
+        brls::sync([]() { brls::sync([]() { brls::sync([]() { brls::Application::quit(); }); }); });
     });
     dialog->open();
 }

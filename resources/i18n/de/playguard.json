@@ -8,7 +8,8 @@
         "tagline": "Altersbeschränkungen direkt auf der Konsole",
         "step_console": "Konsole wird geprüft...",
         "step_settings": "Einstellungen werden gelesen...",
-        "step_screen": "PlayGuard wird geöffnet..."
+        "step_screen": "PlayGuard wird geöffnet...",
+        "step_closing": "Jugendschutz wird aktiviert, zurück zum HOME-Menü..."
     },
     "tabs": {
         "dashboard": "Übersicht",

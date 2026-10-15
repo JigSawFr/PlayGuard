@@ -8,7 +8,8 @@
         "tagline": "Родительский контроль прямо на консоли",
         "step_console": "Проверка консоли...",
         "step_settings": "Чтение настроек...",
-        "step_screen": "Запуск PlayGuard..."
+        "step_screen": "Запуск PlayGuard...",
+        "step_closing": "Блокировка родительского контроля, возврат в меню HOME..."
     },
     "tabs": {
         "dashboard": "Обзор",

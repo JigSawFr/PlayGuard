@@ -5,6 +5,11 @@ using namespace brls::literals;
 
 void LoadingActivity::onContentAvailable()
 {
+    if (this->mode == Mode::Closing) {
+        this->step_text->setText("playguard/loading/step_closing"_i18n);
+        this->bar->setProgress(1.0f);
+        return;
+    }
     this->show(Step::Console);
 }
 
