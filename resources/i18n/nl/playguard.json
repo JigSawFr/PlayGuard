@@ -1122,6 +1122,20 @@
         "serial_detail": "Atmosphère kan het op emuMMC verbergen: zie het tabblad Hulpmiddelen.",
         "patches": "De gamepatches moeten worden nagekeken",
         "data": "Een bestand van PlayGuard was beschadigd",
-        "data_toast": "PlayGuard vond een beschadigd bestand: zie de meldingen (Y)."
+        "data_toast": "PlayGuard vond een beschadigd bestand: zie de meldingen (Y).",
+        "unlocked": "Ouderlijk toezicht is tijdelijk ontgrendeld",
+        "unlocked_detail": "Er kan zonder limiet gespeeld worden tot het weer vergrendeld is.",
+        "extra_restore_detail": "Extra tijd die op een eerdere dag is toegevoegd, verhoogt deze limiet nog.",
+        "new_account": "Een nieuw gebruikersaccount",
+        "installed": "PlayGuard {} geïnstalleerd",
+        "installed_detail": "Het is goed gestart. De vorige build, {}, blijft bewaard: de ontwikkelaarstools kunnen ernaar terug.",
+        "updated_from": "Bijgewerkt vanaf {}.",
+        "whats_new": "Wat is er nieuw",
+        "went_back": "Terug naar de vorige build",
+        "went_back_detail": "Van {} terug naar {}.",
+        "went_back_crash": "{} is niet volledig gestart (misschien vastgelopen), dus PlayGuard is teruggegaan naar {}. Een rapport helpt het op te lossen.",
+        "send_report": "Rapport versturen",
+        "upload": "Rapport verstuurd",
+        "upload_show": "Link tonen"
     }
 }

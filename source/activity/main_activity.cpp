@@ -6,6 +6,7 @@
 #include "action/fw_gate.hpp"
 #include "action/notices.hpp"
 #include "action/pt_flow.hpp"
+#include "action/rollback_flow.hpp"
 #include "action/support_flow.hpp"
 #include "action/update_flow.hpp"
 #include "activity/loading_activity.hpp"
@@ -134,8 +135,10 @@ void MainActivity::onContentAvailable()
     // Nothing set up yet (no PIN): the first steps, once per start.
     if (OnboardingActivity::wanted_at_start())
         brls::sync([]() { brls::Application::pushActivity(new OnboardingActivity()); });
-    // Settings, history or a recovery report found damaged: said once, on top.
+    // Settings, history or a recovery report found damaged, a build gone back
+    // from: in the notification bell.
     data_notice::at_start();
+    rollback_flow::note_went_back();
     // Then, with nothing else in front: "What's new" after an update, else the
     // monthly "Support PlayGuard" reminder.
     support_flow::at_start(this);

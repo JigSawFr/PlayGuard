@@ -1122,6 +1122,20 @@
         "serial_detail": "在 emuMMC 上 Atmosphère 可以隐藏它：请看“工具”标签页。",
         "patches": "游戏补丁需要检查",
         "data": "PlayGuard 的一个文件已损坏",
-        "data_toast": "PlayGuard 发现自己的一个文件已损坏：请查看通知（Y）。"
+        "data_toast": "PlayGuard 发现自己的一个文件已损坏：请查看通知（Y）。",
+        "unlocked": "家长控制已临时解锁",
+        "unlocked_detail": "重新锁定之前，可以不受限制地游玩。",
+        "extra_restore_detail": "之前某天添加的额外时间仍在提高此限制。",
+        "new_account": "新的用户账户",
+        "installed": "已安装 PlayGuard {}",
+        "installed_detail": "启动正常。之前的版本 {} 已保留：可在开发者工具中退回。",
+        "updated_from": "从 {} 更新而来。",
+        "whats_new": "新功能",
+        "went_back": "已退回之前的版本",
+        "went_back_detail": "已从 {} 退回到 {}。",
+        "went_back_crash": "{} 未能完成启动（可能已崩溃），因此 PlayGuard 退回到了 {}。发送报告有助于修复。",
+        "send_report": "发送报告",
+        "upload": "报告已发送",
+        "upload_show": "显示链接"
     }
 }

@@ -1122,6 +1122,20 @@
         "serial_detail": "O Atmosphère pode ocultá-lo no emuMMC: veja o separador Ferramentas.",
         "patches": "Os patches de jogos precisam de verificação",
         "data": "Um ficheiro do PlayGuard estava danificado",
-        "data_toast": "O PlayGuard encontrou um dos seus ficheiros danificado: veja as notificações (Y)."
+        "data_toast": "O PlayGuard encontrou um dos seus ficheiros danificado: veja as notificações (Y).",
+        "unlocked": "O controlo parental está desbloqueado temporariamente",
+        "unlocked_detail": "É possível jogar sem limite até voltar a ser bloqueado.",
+        "extra_restore_detail": "O tempo extra adicionado num dia anterior ainda aumenta este limite.",
+        "new_account": "Uma nova conta de utilizador",
+        "installed": "PlayGuard {} instalado",
+        "installed_detail": "Arrancou bem. A compilação anterior, {}, é mantida: as ferramentas de programador podem voltar a ela.",
+        "updated_from": "Atualizado a partir de {}.",
+        "whats_new": "Novidades",
+        "went_back": "Regresso à compilação anterior",
+        "went_back_detail": "De {} voltou-se a {}.",
+        "went_back_crash": "{} não terminou de arrancar (pode ter falhado), por isso o PlayGuard voltou a {}. Um relatório ajuda a corrigir.",
+        "send_report": "Enviar um relatório",
+        "upload": "Relatório enviado",
+        "upload_show": "Mostrar a ligação"
     }
 }

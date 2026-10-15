@@ -1122,6 +1122,20 @@
         "serial_detail": "Atmosphère kann sie im emuMMC ausblenden: siehe Tab Werkzeuge.",
         "patches": "Die Spiel-Patches sollten geprüft werden",
         "data": "Eine Datei von PlayGuard war beschädigt",
-        "data_toast": "PlayGuard hat eine beschädigte Datei gefunden: siehe Benachrichtigungen (Y)."
+        "data_toast": "PlayGuard hat eine beschädigte Datei gefunden: siehe Benachrichtigungen (Y).",
+        "unlocked": "Die Jugendschutzeinstellungen sind vorübergehend entsperrt",
+        "unlocked_detail": "Bis zur erneuten Sperre kann ohne Limit gespielt werden.",
+        "extra_restore_detail": "An einem früheren Tag hinzugefügte Extrazeit erhöht dieses Limit noch.",
+        "new_account": "Ein neues Benutzerkonto",
+        "installed": "PlayGuard {} installiert",
+        "installed_detail": "Es ist gut gestartet. Der vorherige Build, {}, bleibt erhalten: Die Entwicklerwerkzeuge können zu ihm zurück.",
+        "updated_from": "Aktualisiert von {}.",
+        "whats_new": "Neuigkeiten",
+        "went_back": "Zurück zum vorherigen Build",
+        "went_back_detail": "Von {} zurück zu {}.",
+        "went_back_crash": "{} ist nicht fertig gestartet (vielleicht abgestürzt), daher ist PlayGuard zu {} zurückgekehrt. Ein Bericht hilft bei der Behebung.",
+        "send_report": "Bericht senden",
+        "upload": "Bericht gesendet",
+        "upload_show": "Link anzeigen"
     }
 }

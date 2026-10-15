@@ -1122,6 +1122,20 @@
         "serial_detail": "Atmosphère può oscurarlo su emuMMC: vedi la scheda Strumenti.",
         "patches": "Le patch dei giochi vanno controllate",
         "data": "Un file di PlayGuard era danneggiato",
-        "data_toast": "PlayGuard ha trovato un suo file danneggiato: vedi le notifiche (Y)."
+        "data_toast": "PlayGuard ha trovato un suo file danneggiato: vedi le notifiche (Y).",
+        "unlocked": "Il filtro famiglia è sbloccato temporaneamente",
+        "unlocked_detail": "Si può giocare senza limite finché non viene bloccato di nuovo.",
+        "extra_restore_detail": "Il tempo extra aggiunto in un giorno precedente alza ancora questo limite.",
+        "new_account": "Un nuovo account utente",
+        "installed": "PlayGuard {} installato",
+        "installed_detail": "Si è avviato bene. La build precedente, {}, è conservata: gli strumenti per sviluppatori possono tornarci.",
+        "updated_from": "Aggiornato da {}.",
+        "whats_new": "Novità",
+        "went_back": "Ritorno alla build precedente",
+        "went_back_detail": "Da {} si è tornati a {}.",
+        "went_back_crash": "{} non ha finito di avviarsi (forse si è bloccato), quindi PlayGuard è tornato a {}. Un rapporto aiuta a correggerlo.",
+        "send_report": "Invia un rapporto",
+        "upload": "Rapporto inviato",
+        "upload_show": "Mostra il link"
     }
 }

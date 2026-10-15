@@ -1122,6 +1122,20 @@
         "serial_detail": "Atmosphère can blank it on emuMMC: see the Tools tab.",
         "patches": "Game patches need a look",
         "data": "A PlayGuard file was damaged",
-        "data_toast": "PlayGuard found one of its files damaged: see the notifications (Y)."
+        "data_toast": "PlayGuard found one of its files damaged: see the notifications (Y).",
+        "unlocked": "Parental controls are temporarily unlocked",
+        "unlocked_detail": "Games can be played without a limit until they are locked again.",
+        "extra_restore_detail": "Extra time added on an earlier day still raises this limit.",
+        "new_account": "A new user account",
+        "installed": "PlayGuard {} installed",
+        "installed_detail": "It started fine. The previous build, {}, is kept: Developer tools can go back to it.",
+        "updated_from": "Updated from {}.",
+        "whats_new": "What's new",
+        "went_back": "Back to the previous build",
+        "went_back_detail": "Gone back from {} to {}.",
+        "went_back_crash": "{} did not finish starting (it may have crashed), so PlayGuard went back to {}. A report helps fix it.",
+        "send_report": "Send a report",
+        "upload": "Report sent",
+        "upload_show": "Show the link"
     }
 }

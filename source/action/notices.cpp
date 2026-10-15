@@ -9,6 +9,7 @@
 #include "action/pt_flow.hpp"
 #include "activity/main_activity.hpp"
 #include "activity/onboarding_activity.hpp"
+#include "action/history_flow.hpp"
 #include "app.hpp"
 #include "tab/tab_base.hpp"
 #include "ui/ui.hpp"
@@ -118,6 +119,26 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
            "playguard/notices/pin_missing_detail"_i18n, "playguard/onboarding/open"_i18n,
            []() { brls::Application::pushActivity(new OnboardingActivity()); });
 
+    // Unlocked temporarily: no limit at all until locked again.
+    const bool unlocked = s.temp_unlocked_ok && s.temp_unlocked;
+    toggle(unlocked, "unlocked", Level::Action, "playguard/notices/unlocked"_i18n, "playguard/notices/unlocked_detail"_i18n,
+           writable ? "playguard/security/banner_action"_i18n : "", []() {
+               const Result rc = pctl_relock();
+               if (R_SUCCEEDED(rc)) history_flow::record_event("relock");
+               ui::notify_result(rc, "playguard/toast/relocked"_i18n, "playguard/toast/relock_err"_i18n);
+               sweep();
+               TabBase::refresh_shown();
+           });
+
+    // Extra time added on an earlier day still raises a limit.
+    toggle(pt_flow::restore_pending(pt), "extra_restore", Level::Action, pt_flow::restore_label(),
+           "playguard/notices/extra_restore_detail"_i18n, "playguard/dashboard/extra_restore"_i18n, []() {
+               pt_flow::offer_extra_time_restore([]() {
+                   sweep();
+                   TabBase::refresh_shown();
+               });
+           });
+
     // The "Time's up" alarm off: nothing says when time is up.
     toggle(pt_flow::alarm_off(pt), "alarm_off", Level::Action, "playguard/notices/alarm_off"_i18n,
            "playguard/notices/alarm_off_detail"_i18n, writable ? "playguard/notices/alarm_on"_i18n : open_label("play_timer"),
@@ -145,6 +166,13 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
                    if (writable) clock_flow::guided([]() { sweep(); });
                    else open_tab(ui::tab::clock);
                });
+
+    // A user account never seen before (flagged in the Activity tab too).
+    const std::vector<std::string> accounts = outside_watch::new_account_lines();
+    std::string accounts_text;
+    for (const auto& l : accounts) accounts_text += (accounts_text.empty() ? "" : "\n") + l;
+    toggle(!accounts.empty(), "new_account", Level::Info, "playguard/notices/new_account"_i18n, accounts_text,
+           open_label("activity"), []() { open_tab(ui::tab::activity); });
 
     // A linked phone app overwrites what is set here at its next sync.
     toggle(s.pairing_active_ok && s.pairing_active, "pairing", Level::Info, "playguard/notices/pairing"_i18n,

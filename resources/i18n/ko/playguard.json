@@ -1122,6 +1122,20 @@
         "serial_detail": "emuMMC에서는 Atmosphère로 가릴 수 있습니다. 도구 탭을 참고하세요.",
         "patches": "게임 패치를 확인해야 합니다",
         "data": "PlayGuard 파일이 손상되었습니다",
-        "data_toast": "PlayGuard 파일 중 하나가 손상되었습니다. 알림(Y)을 확인하세요."
+        "data_toast": "PlayGuard 파일 중 하나가 손상되었습니다. 알림(Y)을 확인하세요.",
+        "unlocked": "자녀 보호 기능이 일시적으로 해제되어 있습니다",
+        "unlocked_detail": "다시 잠글 때까지 제한 없이 플레이할 수 있습니다.",
+        "extra_restore_detail": "이전 날에 추가한 추가 시간이 아직 이 제한을 높이고 있습니다.",
+        "new_account": "새 사용자 계정",
+        "installed": "PlayGuard {} 설치됨",
+        "installed_detail": "정상적으로 시작되었습니다. 이전 빌드 {}은(는) 보관되어 있어 개발자 도구에서 되돌릴 수 있습니다.",
+        "updated_from": "{}에서 업데이트되었습니다.",
+        "whats_new": "새로운 기능",
+        "went_back": "이전 빌드로 돌아감",
+        "went_back_detail": "{}에서 {}(으)로 돌아갔습니다.",
+        "went_back_crash": "{}이(가) 시작을 마치지 못해(충돌했을 수 있음) PlayGuard가 {}(으)로 돌아갔습니다. 보고서를 보내면 수정에 도움이 됩니다.",
+        "send_report": "보고서 보내기",
+        "upload": "보고서를 보냈습니다",
+        "upload_show": "링크 보기"
     }
 }
