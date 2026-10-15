@@ -765,7 +765,6 @@
         "open": "檢查已安裝的遊戲",
         "title": "已安裝的遊戲",
         "note": "HOME選單無法啟動或顯示的遊戲（一直在載入的圖示、「!」、虛線框），原因以及處理方法。在遊戲上按A查看詳情。",
-        "scanning": "正在檢查已安裝的遊戲…",
         "section": "有問題的遊戲",
         "none": "已安裝的{}個遊戲看起來都正常。",
         "err_list": "無法列出已安裝的遊戲",
@@ -869,7 +868,13 @@
             "reset_launch": "接受此版本",
             "remove_update": "刪除更新",
             "remove": "刪除遊戲"
-        }
+        },
+        "searching": "正在尋找已安裝的遊戲…",
+        "checking": "正在檢查遊戲… {} / {}",
+        "check_again": "重新檢查",
+        "checked_now": "剛剛檢查。",
+        "checked_min": "{}分鐘前檢查。",
+        "checked_h": "{}小時前檢查。"
     },
     "about": {
         "section_changelog": "{} 更新內容",

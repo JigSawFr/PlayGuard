@@ -177,6 +177,8 @@ dev_builds_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 dev_builds_LIBS  := -lz
 play_cache_SRC   := source/util/play_cache.cpp tests/play_cache/test.cpp
 play_cache_FLAGS := -std=c++17 -Isource
+game_cache_SRC   := source/util/game_cache.cpp tests/game_cache/test.cpp
+game_cache_FLAGS := -std=c++17 -Isource
 activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summary/test.cpp
 activity_summary_FLAGS := -std=c++17 -Isource
 pt_log_SRC   := source/util/paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp

@@ -765,7 +765,6 @@
         "open": "Controlla i giochi installati",
         "title": "Giochi installati",
         "note": "I giochi che il menu HOME non riesce ad avviare o a mostrare (un'icona che continua a caricare, «!», una cornice tratteggiata), perché, e cosa fare. A su un gioco per i dettagli.",
-        "scanning": "Controllo dei giochi installati…",
         "section": "Giochi con un problema",
         "none": "Tutti i {} giochi installati sembrano a posto.",
         "err_list": "Impossibile elencare i giochi installati",
@@ -869,7 +868,13 @@
             "reset_launch": "Accetta questa versione",
             "remove_update": "Rimuovi l'aggiornamento",
             "remove": "Rimuovi il gioco"
-        }
+        },
+        "searching": "Ricerca dei giochi installati…",
+        "checking": "Controllo dei giochi… {} di {}",
+        "check_again": "Controlla di nuovo",
+        "checked_now": "Controllato ora.",
+        "checked_min": "Controllato {} min fa.",
+        "checked_h": "Controllato {} h fa."
     },
     "about": {
         "section_changelog": "Novità della {}",

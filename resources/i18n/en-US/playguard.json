@@ -765,7 +765,6 @@
         "open": "Check the installed games",
         "title": "Installed games",
         "note": "The games the HOME menu cannot start or draw (an icon that keeps loading, \"!\", a dotted frame), why, and what to do. A on a game for the details.",
-        "scanning": "Checking the installed games…",
         "section": "Games with a problem",
         "none": "All {} installed games look fine.",
         "err_list": "The installed games could not be listed",
@@ -869,7 +868,13 @@
             "reset_launch": "Accept this version",
             "remove_update": "Remove the update",
             "remove": "Remove the game"
-        }
+        },
+        "searching": "Looking for the installed games…",
+        "checking": "Checking the games… {} of {}",
+        "check_again": "Check again",
+        "checked_now": "Checked just now.",
+        "checked_min": "Checked {} min ago.",
+        "checked_h": "Checked {} h ago."
     },
     "about": {
         "section_changelog": "What's new in {}",

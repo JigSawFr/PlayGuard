@@ -55,6 +55,7 @@ typedef struct {
     char display_version[0x10];      // "1.4.0": the installed version as the game shows it; empty when unreadable
     bool control_ok;                 // name and icon read (what the HOME menu draws)
     u8   record_event;               // the HOME menu entry's last event (ns ApplicationRecord)
+    u64  record_updated;             // when the entry last changed (its LastUpdated): a cached check of it is stale otherwise
 
     u32  meta_count;                 // contents the console lists for it (game, update, add-ons)
     GameContent contents[GAMECHECK_MAX_CONTENTS];
@@ -129,14 +130,32 @@ u8 gamecheck_max_key_generation(u32 hos);
 // The first firmware with `key_generation` (MAKEHOSVERSION), 0 when unknown.
 u32 gamecheck_key_generation_firmware(u8 key_generation);
 
+// One HOME menu entry, as the console lists it (quick: no game is read).
+typedef struct {
+    u64 app_id;
+    u64 updated;   // LastUpdated
+    u8  event;     // LastEvent
+} GameRecord;
+
+// The console's entries, at most `max` (*truncated when there are more).
+Result gamecheck_records(GameRecord *out, u32 max, u32 *count, bool *truncated);
+
+// Checks the games of `records`, one after the other, into `out` (as many
+// facts as records), with one session per service for them all: the slow
+// part, a fraction of a second per game. `on_game` (may be NULL) is called
+// after each game with how many are done; returning false stops there.
+// Returns how many games were checked.
+u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
+                    bool (*on_game)(void *ctx, const GameFacts *game, u32 done), void *ctx);
+
 typedef struct {
     Result rc;          // listing the games (ns); nothing else is filled when it fails
-    Result tickets_rc;  // listing the tickets (es); ticket_missing is only set when it succeeded
     u32    count;       // every game the console lists, up to GAMECHECK_MAX
     bool   truncated;   // more than GAMECHECK_MAX games
     GameFacts games[GAMECHECK_MAX];
 } GameCheck;
 
+// gamecheck_records() then gamecheck_check() of them all.
 void gamecheck_scan(GameCheck *out);
 
 // Deletes the game, its update and add-ons, and its entry on the HOME menu

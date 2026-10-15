@@ -765,7 +765,6 @@
         "open": "Comprobar los juegos instalados",
         "title": "Juegos instalados",
         "note": "Los juegos que el menú HOME no puede iniciar ni mostrar (un icono que no termina de cargar, «!», un marco punteado), por qué, y qué hacer. A en un juego para ver los detalles.",
-        "scanning": "Comprobando los juegos instalados…",
         "section": "Juegos con un problema",
         "none": "Los {} juegos instalados parecen estar bien.",
         "err_list": "No se pudieron listar los juegos instalados",
@@ -869,7 +868,13 @@
             "reset_launch": "Aceptar esta versión",
             "remove_update": "Eliminar la actualización",
             "remove": "Eliminar el juego"
-        }
+        },
+        "searching": "Buscando los juegos instalados…",
+        "checking": "Comprobando los juegos… {} de {}",
+        "check_again": "Comprobar de nuevo",
+        "checked_now": "Comprobado ahora mismo.",
+        "checked_min": "Comprobado hace {} min.",
+        "checked_h": "Comprobado hace {} h."
     },
     "about": {
         "section_changelog": "Novedades de la {}",

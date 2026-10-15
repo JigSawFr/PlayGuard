@@ -765,7 +765,6 @@
         "open": "Geïnstalleerde games controleren",
         "title": "Geïnstalleerde games",
         "note": "De games die het HOME-menu niet kan starten of tonen (een icoon dat blijft laden, \"!\", een gestippeld kader), waarom, en wat je kunt doen. A op een game voor de details.",
-        "scanning": "Geïnstalleerde games worden gecontroleerd…",
         "section": "Games met een probleem",
         "none": "Alle {} geïnstalleerde games lijken in orde.",
         "err_list": "De geïnstalleerde games konden niet worden opgesomd",
@@ -869,7 +868,13 @@
             "reset_launch": "Deze versie accepteren",
             "remove_update": "Update verwijderen",
             "remove": "Game verwijderen"
-        }
+        },
+        "searching": "Geïnstalleerde games worden gezocht…",
+        "checking": "Games worden gecontroleerd… {} van {}",
+        "check_again": "Opnieuw controleren",
+        "checked_now": "Zojuist gecontroleerd.",
+        "checked_min": "{} min geleden gecontroleerd.",
+        "checked_h": "{} u geleden gecontroleerd."
     },
     "about": {
         "section_changelog": "Nieuw in {}",

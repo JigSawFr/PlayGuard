@@ -765,7 +765,6 @@
         "open": "Verificar os jogos instalados",
         "title": "Jogos instalados",
         "note": "Os jogos que o menu HOME não consegue iniciar nem exibir (um ícone que fica carregando, \"!\", uma moldura pontilhada), por quê, e o que fazer. A em um jogo para os detalhes.",
-        "scanning": "Verificando os jogos instalados…",
         "section": "Jogos com um problema",
         "none": "Os {} jogos instalados parecem estar bem.",
         "err_list": "Não foi possível listar os jogos instalados",
@@ -869,7 +868,13 @@
             "reset_launch": "Aceitar esta versão",
             "remove_update": "Remover a atualização",
             "remove": "Remover o jogo"
-        }
+        },
+        "searching": "Procurando os jogos instalados…",
+        "checking": "Verificando os jogos… {} de {}",
+        "check_again": "Verificar de novo",
+        "checked_now": "Verificado agora mesmo.",
+        "checked_min": "Verificado há {} min.",
+        "checked_h": "Verificado há {} h."
     },
     "about": {
         "section_changelog": "Novidades da {}",

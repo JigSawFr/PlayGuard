@@ -765,7 +765,6 @@
         "open": "Installierte Spiele prüfen",
         "title": "Installierte Spiele",
         "note": "Die Spiele, die das HOME-Menü nicht starten oder anzeigen kann (ein Symbol, das endlos lädt, „!“, ein gestrichelter Rahmen), warum, und was zu tun ist. A auf einem Spiel für die Details.",
-        "scanning": "Installierte Spiele werden geprüft…",
         "section": "Spiele mit einem Problem",
         "none": "Alle {} installierten Spiele scheinen in Ordnung.",
         "err_list": "Die installierten Spiele konnten nicht aufgelistet werden",
@@ -869,7 +868,13 @@
             "reset_launch": "Diese Version zulassen",
             "remove_update": "Update entfernen",
             "remove": "Spiel entfernen"
-        }
+        },
+        "searching": "Installierte Spiele werden gesucht…",
+        "checking": "Spiele werden geprüft… {} von {}",
+        "check_again": "Erneut prüfen",
+        "checked_now": "Gerade geprüft.",
+        "checked_min": "Vor {} Min. geprüft.",
+        "checked_h": "Vor {} Std. geprüft."
     },
     "about": {
         "section_changelog": "Neu in {}",

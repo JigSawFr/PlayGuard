@@ -40,6 +40,7 @@ typedef struct {
     const char *name;         // NULL: no control data
     const char *display_version;
     u8 record_event;
+    u64 record_updated;
     bool record;              // the HOME menu entry exists
     int meta_count;
     FakeMeta metas[MAX_METAS];
@@ -60,7 +61,7 @@ static struct {
     FsRightsId tickets[MAX_TICKETS];
     int ticket_count;
     int ns_open, ncm_open, db_open, cs_open, avm_open, es_open, am_open, async_open;
-    int ns_inits, commits, pushes, record_deletes, avm_pushes;
+    int ns_inits, commits, pushes, record_deletes, avm_pushes, rights_reads;
     u64 deleted;
     RecordMetaWire pushed[MAX_METAS];
     int pushed_count;
@@ -183,6 +184,7 @@ Result nsListApplicationRecord(NsApplicationRecord *records, s32 count, s32 entr
         memset(&records[n], 0, sizeof(records[n]));
         records[n].application_id = C.games[i].id;
         records[n].last_event = C.games[i].record_event;
+        records[n].last_updated = C.games[i].record_updated;
     }
     *out = n;
     return 0;
@@ -454,6 +456,7 @@ Result ncmContentMetaDatabaseListContentInfo(NcmContentMetaDatabase *db, s32 *wr
     for (s32 i = start; i < m->files && n < count; i++, n++) {
         memset(&info[n], 0, sizeof(info[n]));
         info[n].content_id = content_id_of(m, (int)i);
+        info[n].content_type = i == 0 ? NcmContentType_Program : NcmContentType_Control;
     }
     *written = n;
     return 0;
@@ -474,6 +477,8 @@ Result ncmContentStorageGetRightsIdFromContentId(NcmContentStorage *cs, NcmRight
     REQUIRE(cs->open && attr == FsContentAttributes_All);
     int file;
     const FakeMeta *m = meta_of_content(id, &file);
+    REQUIRE(file == 0);   // only the program's file is opened
+    C.rights_reads++;
     memset(out, 0, sizeof(*out));
     out->key_generation = m->key_generation;
     if (m->titlekey) out->rights_id = rights_of(m);
@@ -774,6 +779,7 @@ static void test_every_problem(void)
     FakeMeta *m;
     g = add_game(0x0100000000010000ULL, "Fine");   // game + update on the SD card, add-on, tickets
     g->display_version = "1.4.0";
+    g->record_updated = 1791471600;
     m = add_meta(g, NcmContentMetaType_Application, NcmStorageId_SdCard, 0);
     m->required_sysver = SYSVER(12, 0, 0);
     m->titlekey = true;
@@ -823,10 +829,11 @@ static void test_every_problem(void)
     g->view_flags = GC_VIEW_NEEDS_VERIFY;
 
     scan();
-    CHECK(R_SUCCEEDED(R.rc) && R_SUCCEEDED(R.tickets_rc) && R.count == (u32)C.count && !R.truncated);
+    CHECK(R_SUCCEEDED(R.rc) && R.count == (u32)C.count && !R.truncated);
 
     const GameFacts *f = facts(0x0100000000010000ULL);
     CHECK(f->control_ok && strcmp(f->name, "Fine") == 0 && strcmp(f->display_version, "1.4.0") == 0 && f->record_event == 3);
+    CHECK(f->record_updated == 1791471600);
     CHECK(f->meta_count == 3 && f->content_count == 3 && f->has_base && f->has_patch && f->patch_version == 0x30000);
     CHECK(f->contents[1].type == GC_META_PATCH && f->contents[1].id == 0x0100000000010800ULL &&
            f->contents[1].version == 0x30000 && f->contents[1].storage == GC_STORAGE_SD);
@@ -907,7 +914,7 @@ static void test_without_services(void)
     C.view_rc = 0x3B3;
     scan();
     f = facts(0x0100000000010000ULL);
-    CHECK(R.tickets_rc == 0x1E5 && f->needs_ticket && !f->ticket_missing);
+    CHECK(f->needs_ticket && !f->ticket_missing);
     CHECK(!f->view_ok && !f->launch_checked);
     CHECK(issue_of(0x0100000000010000ULL) == GC_LAUNCH_REFUSED);   // not explained without avm
 
@@ -957,6 +964,62 @@ static void test_paging(void)
     for (int i = 0; i < 64; i++) add_game(0x0100000000000000ULL + ((u64)(i + 1) << 16), "Game");   // exactly one chunk
     scan();
     CHECK(R.count == 64 && !R.truncated);
+}
+
+static int s_seen;
+static u32 s_stop_after;
+static bool on_game(void *ctx, const GameFacts *game, u32 done)
+{
+    CHECK(ctx == &s_seen);
+    CHECK(game->app_id == C.games[s_seen].id);   // in the records' order
+    CHECK(done == (u32)++s_seen);
+    return !s_stop_after || done < s_stop_after;
+}
+
+static void test_records_and_progress(void)
+{
+    // The entries alone: quick, every session closed, nothing read of a game.
+    reset();
+    for (int i = 0; i < 5; i++) {
+        FakeGame *g = add_game(0x0100000000000000ULL + ((u64)(i + 1) << 16), "Game");
+        g->record_updated = 1000 + (u64)i;
+        g->record_event = (u8)(3 + i % 2);
+        add_meta(g, NcmContentMetaType_Application, NcmStorageId_SdCard, 0);
+    }
+    GameRecord records[8];
+    u32 count = 0;
+    bool truncated = true;
+    CHECK(gamecheck_records(records, 8, &count, &truncated) == 0 && count == 5 && !truncated);
+    CHECK(records[4].app_id == C.games[4].id && records[4].updated == 1004 && records[4].event == 3);
+    CHECK(C.rights_reads == 0);
+    all_closed();
+    CHECK(gamecheck_records(records, 3, &count, &truncated) == 0 && count == 3 && truncated);
+    all_closed();
+
+    // Checked one by one, told after each, in order.
+    static GameFacts facts_out[8];
+    s_seen = 0;
+    s_stop_after = 0;
+    CHECK(gamecheck_check(records, 5, facts_out, on_game, &s_seen) == 5 && s_seen == 5);
+    CHECK(facts_out[2].app_id == C.games[2].id && facts_out[2].record_updated == 1002 && facts_out[2].has_base);
+    CHECK(C.rights_reads == 5);   // one file per game: its program
+    all_closed();
+
+    // Stopped after the second: two checked, the sessions closed all the same.
+    s_seen = 0;
+    s_stop_after = 2;
+    CHECK(gamecheck_check(records, 5, facts_out, on_game, &s_seen) == 2 && s_seen == 2);
+    all_closed();
+    s_stop_after = 0;
+
+    // Nothing to check: no session.
+    const int inits = C.ns_inits;
+    CHECK(gamecheck_check(records, 0, facts_out, on_game, &s_seen) == 0 && C.ns_inits == inits);
+
+    // The list fails: said so, nothing listed.
+    C.list_rc = 0x2222;
+    CHECK(gamecheck_records(records, 8, &count, &truncated) == 0x2222 && count == 0);
+    all_closed();
 }
 
 static bool s_confirm;
@@ -1170,6 +1233,7 @@ int main(void)
     test_sd_card_unreadable();
     test_without_services();
     test_list_failures();
+    test_records_and_progress();
     test_paging();
     test_remove();
     test_remove_content();

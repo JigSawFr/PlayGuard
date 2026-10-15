@@ -765,7 +765,6 @@
         "open": "Vérifier les jeux installés",
         "title": "Jeux installés",
         "note": "Les jeux que le menu HOME ne peut pas lancer ou afficher (une icône qui charge sans fin, « ! », un cadre en pointillés), pourquoi, et quoi faire. A sur un jeu pour le détail.",
-        "scanning": "Vérification des jeux installés…",
         "section": "Jeux avec un problème",
         "none": "Les {} jeux installés semblent en bon état.",
         "err_list": "Impossible de lister les jeux installés",
@@ -869,7 +868,13 @@
             "reset_launch": "Accepter cette version",
             "remove_update": "Supprimer la mise à jour",
             "remove": "Supprimer le jeu"
-        }
+        },
+        "searching": "Recherche des jeux installés…",
+        "checking": "Vérification des jeux… {} sur {}",
+        "check_again": "Vérifier à nouveau",
+        "checked_now": "Vérifié à l'instant.",
+        "checked_min": "Vérifié il y a {} min.",
+        "checked_h": "Vérifié il y a {} h."
     },
     "about": {
         "section_changelog": "Nouveautés de la {}",

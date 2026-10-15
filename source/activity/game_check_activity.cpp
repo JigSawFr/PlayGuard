@@ -9,6 +9,7 @@
 
 #include "action/history_flow.hpp"
 #include "app.hpp"
+#include "util/paths.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -241,50 +242,192 @@ void GameCheckActivity::onContentAvailable()
     note->setSingleLine(false);
     status->setSingleLine(false);
     hint->setSingleLine(false);
-    this->scan();
+    // Ⓧ: every game checked again, whatever the cache says.
+    this->getContentView()->registerAction("playguard/games/check_again"_i18n, brls::BUTTON_X, [this](brls::View*) {
+        this->refresh(true, 0);
+        return true;
+    });
+
+    // The last check at once, then what changed since.
+    std::string bytes;
+    if (paths::read_file(cache_file(), bytes) && game_cache::decode(bytes, &this->cache)) this->show();
+    this->refresh(false, 0);
 }
 
-void GameCheckActivity::scan()
+std::string GameCheckActivity::cache_file()
 {
-    if (this->scanning) return;
-    this->scanning = true;
-    // The first read says so; a read again after a change keeps the list
-    // where it is (it is quick), so nothing jumps.
-    if (!this->shown) {
-        status->setText("playguard/games/scanning"_i18n);
-        status->setTextColor(ui::color_text());
-        ui::set_visible(status.getView(), true);
+    return paths::nand_dir() + "/cache/games.bin";
+}
+
+void GameCheckActivity::save()
+{
+    std::string error;
+    if (!paths::ensure_dir(paths::nand_dir() + "/cache") || !paths::atomic_write(cache_file(), game_cache::encode(this->cache), &error))
+        brls::Logger::warning("games cache: not saved ({})", error);
+}
+
+void GameCheckActivity::refresh(bool all, u64 also)
+{
+    if (this->checking) {
+        if (also) this->waiting.push_back(also);   // after the check under way
+        return;
     }
+    this->checking = true;
+    this->status_text("playguard/games/searching"_i18n);
     std::weak_ptr<bool> weak = this->alive;
-    brls::async([this, weak]() {
-        auto check = std::make_shared<GameCheck>();
-        gamecheck_scan(check.get());
-        brls::sync([this, weak, check]() {
+    brls::async([this, weak, all, also]() {
+        auto records = std::make_shared<std::vector<GameRecord>>(GAMECHECK_MAX);
+        u32 count = 0;
+        bool truncated = false;
+        const Result rc = gamecheck_records(records->data(), GAMECHECK_MAX, &count, &truncated);
+        records->resize(count);
+        brls::sync([this, weak, all, also, records, rc, truncated]() {
             if (weak.expired()) return;   // the screen was closed meanwhile
-            this->scanning = false;
-            this->show(*check);
+            if (R_FAILED(rc)) {
+                this->checking = false;
+                this->list_rc = rc;
+                this->show();
+                return;
+            }
+            this->list_rc = 0;
+            this->cache.truncated = truncated;
+            SysInfo si;
+            sysinfo_get(&si);
+            u64 now = 0;
+            time_local_now(&now, nullptr);
+            const bool full = all || game_cache::expired(this->cache, (int64_t)now, si.hos_version);
+            std::vector<GameRecord> check = game_cache::to_check(&this->cache, *records, (int64_t)now, si.hos_version);
+            if (all) check = *records;
+            // Asked for besides (a game just repaired: its entry may not say so).
+            std::vector<u64> extra = this->waiting;
+            this->waiting.clear();
+            if (also) extra.push_back(also);
+            for (u64 id : extra) {
+                bool listed = false;
+                for (const GameRecord& c : check) listed |= c.app_id == id;
+                if (listed) continue;
+                for (const GameRecord& r : *records)
+                    if (r.app_id == id) check.push_back(r);
+            }
+            this->show();
+            if (check.empty()) {
+                this->checking = false;
+                this->save();   // the games no longer installed are gone
+                this->show();
+                return;
+            }
+            this->check(std::move(check), full);
         });
     });
 }
 
-void GameCheckActivity::show(const GameCheck& check)
+namespace
 {
-    this->shown = true;
+// What the checking thread shares with the screen.
+struct CheckRun
+{
+    std::weak_ptr<bool> alive;
+    std::vector<GameRecord> records;
+    std::vector<GameFacts> facts;
+    std::function<void(const GameFacts&, u32)> on_game;   // run on the main thread
+};
+
+bool on_checked(void* ctx, const GameFacts* game, u32 done)
+{
+    auto* run = (CheckRun*)ctx;
+    if (run->alive.expired()) return false;   // closed: stop
+    const GameFacts copy = *game;
+    auto weak = run->alive;
+    auto on_game = run->on_game;
+    brls::sync([weak, on_game, copy, done]() {
+        if (!weak.expired()) on_game(copy, done);
+    });
+    return true;
+}
+}   // namespace
+
+void GameCheckActivity::check(std::vector<GameRecord> records, bool full)
+{
+    this->check_total = (u32)records.size();
+    this->check_done = 0;
+    this->show();
+    auto run = std::make_shared<CheckRun>();
+    run->alive = this->alive;
+    run->records = std::move(records);
+    run->facts.resize(run->records.size());
+    run->on_game = [this](const GameFacts& game, u32 done) {
+        game_cache::put(&this->cache, game);
+        this->check_done = done;
+        this->show();
+    };
+    std::weak_ptr<bool> weak = this->alive;
+    brls::async([this, weak, run, full]() {
+        const u32 done = gamecheck_check(run->records.data(), (u32)run->records.size(), run->facts.data(), on_checked, run.get());
+        const bool complete = done == run->records.size();
+        brls::sync([this, weak, complete, full]() {
+            if (weak.expired()) return;
+            this->checking = false;
+            this->check_total = 0;
+            if (complete && full) {
+                SysInfo si;
+                sysinfo_get(&si);
+                u64 now = 0;
+                time_local_now(&now, nullptr);
+                this->cache.checked_at = (int64_t)now;
+                this->cache.hos = si.hos_version;
+            }
+            this->save();
+            // A game asked for meanwhile (a repair during the check): checked
+            // before anything is said about it.
+            if (!this->waiting.empty()) {
+                this->refresh(false, 0);
+                return;
+            }
+            this->show();
+        });
+    });
+}
+
+void GameCheckActivity::status_text(const std::string& text, NVGcolor color)
+{
+    status->setText(text);
+    status->setTextColor(color);
+    ui::set_visible(status.getView(), !text.empty());
+}
+
+void GameCheckActivity::status_text(const std::string& text)
+{
+    this->status_text(text, ui::color_text());
+}
+
+// "Checked just now.", "Checked 12 min ago.", "Checked 3 h ago."
+std::string GameCheckActivity::age_text() const
+{
+    if (this->cache.checked_at <= 0) return "";
+    u64 now = 0;
+    time_local_now(&now, nullptr);
+    const int64_t s = (int64_t)now - this->cache.checked_at;
+    if (s < 60) return "playguard/games/checked_now"_i18n;
+    if (s < 3600) return brls::getStr("playguard/games/checked_min", (int)(s / 60));
+    return brls::getStr("playguard/games/checked_h", (int)(s / 3600));
+}
+
+void GameCheckActivity::show()
+{
     SysInfo si;
     sysinfo_get(&si);
     const u32 hos = si.hos_version;
 
     struct Broken { GameFacts game; GameIssue issue; };
     std::vector<Broken> broken;
-    if (R_SUCCEEDED(check.rc)) {
-        for (u32 i = 0; i < check.count; i++) {
-            const GameIssue issue = gamecheck_classify(&check.games[i], hos);
-            if (issue != GC_OK) broken.push_back({ check.games[i], issue });
-        }
+    for (const GameFacts& g : this->cache.games) {
+        const GameIssue issue = gamecheck_classify(&g, hos);
+        if (issue != GC_OK) broken.push_back({ g, issue });
     }
+    const u32 count = (u32)this->cache.games.size();
 
-    // After a repair: whether the game left the list.
-    if (this->pending.id) {
+    // After a repair, once its game was checked again: whether it left the list.
+    if (this->pending.id && !this->checking) {
         bool still = false;
         for (const Broken& b : broken) still |= b.game.app_id == this->pending.id;
         ui::notify(still ? this->pending.done : brls::getStr("playguard/games/fixed", this->pending.name));
@@ -292,7 +435,7 @@ void GameCheckActivity::show(const GameCheck& check)
     }
 
     // The cells are reused in place, as in the History screen: one of them
-    // may have the focus when this runs again after a change.
+    // may have the focus while the list changes under it.
     auto& cells = list->getChildren();
     for (size_t i = 0; i < broken.size(); i++) {
         brls::DetailCell* cell;
@@ -313,24 +456,28 @@ void GameCheckActivity::show(const GameCheck& check)
     }
     for (size_t i = 0; i < broken.size() && i < cells.size(); i++) ui::set_visible(cells[i], true);
     for (size_t i = broken.size(); i < cells.size(); i++) ui::set_visible(cells[i], false);
-    // Nothing could have the focus while the games were read.
+    // Nothing had the focus before the first game with a problem.
     if (!this->focused && !broken.empty()) {
         this->focused = true;
         brls::Application::giveFocus(cells[0]);
     }
 
-    std::string text;
-    if (R_FAILED(check.rc)) {
-        text = "playguard/games/err_list"_i18n + " — " + ui::rc_text(check.rc);
-        status->setTextColor(ui::color_bad());
-    } else if (broken.empty()) {
-        text = brls::getStr("playguard/games/none", (int)check.count);
-        status->setTextColor(ui::color_ok());
+    // The line above the list: the check under way, an error, or the result
+    // and when it was made.
+    if (this->checking && this->check_total) {
+        this->status_text(brls::getStr("playguard/games/checking", (int)this->check_done, (int)this->check_total));
+    } else if (this->checking) {
+        this->status_text("playguard/games/searching"_i18n);
+    } else if (R_FAILED(this->list_rc)) {
+        this->status_text("playguard/games/err_list"_i18n + " — " + ui::rc_text(this->list_rc), ui::color_bad());
+    } else {
+        std::string text = broken.empty() ? brls::getStr("playguard/games/none", (int)count) : "";
+        const std::string age = this->age_text();
+        if (!age.empty()) text += (text.empty() ? "" : " ") + age;
+        if (this->cache.truncated) text += (text.empty() ? "" : "\n") + brls::getStr("playguard/games/truncated", (int)count);
+        this->status_text(text, broken.empty() ? ui::color_ok() : ui::color_note());
     }
-    if (check.truncated) text += (text.empty() ? "" : "\n") + brls::getStr("playguard/games/truncated", (int)check.count);
-    status->setText(text);
-    ui::set_visible(status.getView(), !text.empty());
-    header->setTitle(brls::getStr("playguard/games/section_count", (int)broken.size(), (int)check.count));
+    header->setTitle(brls::getStr("playguard/games/section_count", (int)broken.size(), (int)count));
     ui::set_visible(header.getView(), !broken.empty());
     hint->setText(brls::getStr("playguard/games/many", ui::storage_short(si)));
     ui::set_visible(hint.getView(), broken.size() >= MANY);
@@ -420,7 +567,7 @@ void GameCheckActivity::remove(const GameFacts& g)
                            const Result rc = gamecheck_remove(id);
                            if (R_SUCCEEDED(rc)) history_flow::record_event("remove_game", "", label);
                            ui::notify_result(rc, brls::getStr("playguard/games/removed", name), "playguard/games/remove_err"_i18n);
-                           if (R_SUCCEEDED(rc) && !weak.expired()) this->scan();
+                           if (R_SUCCEEDED(rc) && !weak.expired()) this->refresh(false, id);
                        });
 }
 
@@ -447,7 +594,7 @@ void GameCheckActivity::remove_content(const GameFacts& g, const GameContent& c)
         // Removing the update is a repair: the next read says if it worked.
         if (update) this->pending = Pending{ id, name, done };
         else ui::notify(done);
-        this->scan();
+        this->refresh(false, id);
     });
 }
 
@@ -464,7 +611,7 @@ void GameCheckActivity::reset_launch(const GameFacts& g)
     }
     history_flow::record_event("launch_version", "", label);
     this->pending = Pending{ g.app_id, name, done };
-    this->scan();
+    this->refresh(false, g.app_id);
 }
 
 void GameCheckActivity::verify(const GameFacts& g)
@@ -500,11 +647,12 @@ void GameCheckActivity::verify(const GameFacts& g)
     // Minutes for a big game: a thread of its own, so the other reads on
     // borealis' queue do not wait behind it.
     std::weak_ptr<bool> weak = this->alive;
-    ui::in_background("verify", [this, weak, state, id = g.app_id]() {
+    const u64 checked_id = g.app_id;
+    ui::in_background("verify", [this, weak, state, id = g.app_id, checked_id]() {
         bool corrupt = false;
         auto ctx = state;
         const Result rc = gamecheck_verify(id, on_verify_progress, &ctx, &corrupt);
-        brls::sync([this, weak, state, rc, corrupt]() {
+        brls::sync([this, weak, state, rc, corrupt, checked_id]() {
             auto result = [state, rc, corrupt]() {
                 if (rc == NXM_RC_CANCELLED) ui::notify("playguard/games/verify_cancelled"_i18n);
                 else if (R_FAILED(rc)) ui::error("playguard/games/verify_err"_i18n + " — " + ui::rc_text(rc));
@@ -518,7 +666,7 @@ void GameCheckActivity::verify(const GameFacts& g)
             }
             if (weak.expired()) return;
             this->verifying = false;
-            if (rc != NXM_RC_CANCELLED) this->scan();   // the console's view of it may have changed
+            if (rc != NXM_RC_CANCELLED) this->refresh(false, checked_id);   // the console's view of it may have changed
         });
     });
 }

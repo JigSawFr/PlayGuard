@@ -40,6 +40,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_NETWORK_OFFSET=1411` | A network clock that many seconds ahead of the console clock until it is set (the console clock follows it while *Synchronise* is on) |
 | `PLAYGUARD_SIM_NTP=offline` | No time server answers (a console without Internet) |
 | `PLAYGUARD_SIM_FAIL=timer,clock,unverified,bedtime,remove,launch,verify` | Failures: the play-timer write, setting the clock, an unlock the system does not confirm, a bedtime the console does not take, removing a game or a content, resetting a launch version, the integrity check |
+| `PLAYGUARD_SIM_CHECK_MS=150` | How long checking one installed game takes (*Tools › Check the installed games*) |
 | `PLAYGUARD_SIM_GAMES_OK=1` | Every installed game fine (*Tools › Check the installed games*; by default one of each problem) |
 
 | `PLAYGUARD_SIM_EMUMMC=1` | Running on emuMMC |

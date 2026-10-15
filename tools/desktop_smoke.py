@@ -89,6 +89,9 @@ config_file = os.path.join(run_dir, "playguard_data", "config.json")
 # What belongs to the simulated system (a sysMMC: util/nand.hpp): its history,
 # watch.json, backups and play-data cache.
 nand_dir = os.path.join(run_dir, "playguard_data", "nand", "sysmmc")
+games_cache = os.path.join(nand_dir, "cache", "games.bin")
+if os.path.exists(games_cache):
+    os.remove(games_cache)   # Installed games: the first check is this run's
 if (GATE or ERRORS or DEVBUILD or UPDATE) and os.path.exists(config_file):
     os.remove(config_file)   # no remembered choice, developer mode off
 if DEVBUILD:
@@ -965,7 +968,17 @@ os.remove(github_token)
 # cause and fix, and its removal (recorded in the change history).
 key("Down", 4)             # past Keep, Keep for, Keep up to: Check the installed games
 key("Return")
+time.sleep(0.8)
+shot("27_games_checking")  # the games shown as they are checked, with the count
+time.sleep(3)              # 15 games, 150 ms each
 shot("27_games")
+if not os.path.exists(games_cache):
+    fail("the installed games check was not cached in " + games_cache)
+# Opened again: the cache at once, nothing to check again.
+key("Escape")
+key("Return")
+time.sleep(0.6)
+shot("27_games_cached")
 key("Return")              # the first broken game: icon, why, what to do
 shot("27_games_details")   # Check the data (the fix, focused), Other actions, Back
 key("Right")               # Other actions…
