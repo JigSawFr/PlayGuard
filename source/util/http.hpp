@@ -4,6 +4,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -40,8 +41,11 @@ bool redirect(const std::string& url, std::string* target, std::string* error, c
 // `progress` (when set) gets the bytes received so far and the total
 // announced (0 when unknown), from the download thread. The file is left
 // behind on failure: the caller removes it.
+// `cancel` (when given) set by another thread stops the transfer within a
+// second ("cancelled").
 bool download(const std::string& url, const std::string& path, std::string* error, size_t max_bytes,
-              long timeout_s = 600, std::function<void(uint64_t done, uint64_t total)> progress = nullptr);
+              long timeout_s = 600, std::function<void(uint64_t done, uint64_t total)> progress = nullptr,
+              const std::atomic<bool>* cancel = nullptr);
 
 // At exit: a request still running stops at its next progress tick (about a
 // second), and a new one fails at once, so the threads they run on can end

@@ -933,7 +933,8 @@
         "done_manual": "{} 已安装。关闭 PlayGuard 并重新打开即可使用。",
         "no_path": "PlayGuard 不知道自己的 .nro 文件位置（未通过 hbloader 启动？），因此无法替换。请从 GitHub 手动安装该构建。",
         "sign_in": "登录 GitHub 以获取 main 和拉取请求的构建",
-        "checked": "列表于 {} 分钟前检查。"
+        "checked": "列表于 {} 分钟前检查。",
+        "cancelled": "已取消下载。"
     },
     "github": {
         "account": "GitHub 账户",
