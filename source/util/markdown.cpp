@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/markdown.hpp"
 
+#include <algorithm>
 #include <cctype>
 #include <cstdint>
 #include <cstdio>
@@ -133,11 +134,14 @@ size_t entity(const std::string& s, size_t i, std::string* out)
 }
 
 // The end of the bracketed text opening at s[i] ('[' or '('), nesting
-// counted; npos when it does not close.
+// counted; npos when it does not close within 1000 characters (CommonMark's
+// own bound on a link's text), so a run of '[' is not scanned to the end
+// once per '['.
 size_t closing(const std::string& s, size_t i, char open, char close)
 {
     int depth = 0;
-    for (size_t k = i; k < s.size(); k++) {
+    const size_t last = std::min(s.size(), i + 1000);
+    for (size_t k = i; k < last; k++) {
         if (s[k] == '\\') {
             k++;
             continue;
