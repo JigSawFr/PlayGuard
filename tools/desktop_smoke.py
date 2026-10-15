@@ -129,6 +129,11 @@ env.setdefault("PLAYGUARD_SIM_STILL_FOCUS", "1")
 # (app.cpp): the header's version badge, and the update offers (1.1.0 below)
 # stay the same once this build is 1.1.0 or later.
 env.setdefault("PLAYGUARD_SIM_VERSION", "1.0.0:1a2b3c4")
+# The installed games are checked at start-up for the notification bell:
+# at once in every scenario but the default one, which watches a check go
+# game by game (150 ms each) and waits for the start-up one first.
+if SCENARIO:
+    env.setdefault("PLAYGUARD_SIM_CHECK_MS", "0")
 if GATE:
     env.setdefault("PLAYGUARD_SIM_FW", "24.0.0")
     env.setdefault("PLAYGUARD_SIM_LATEST", "1.1.0:24.0.0")
@@ -466,6 +471,14 @@ for _ in range(60):
 else:
     fail("no first screen after the loading screen in 30 s")
 time.sleep(2)
+if not SCENARIO:
+    # The start-up check of the installed games: the bell counts them.
+    for _ in range(40):
+        if logged("games: start-up check done"):
+            break
+        time.sleep(0.25)
+    else:
+        fail("the installed games were not checked at start-up")
 # The intro (Preferences, on by default): the loading screen stays 2 s.
 intro = logged("start-up: intro, 2000 ms at least")
 if LOCK and intro:
@@ -1081,6 +1094,7 @@ os.remove(github_token)
 # Installed games: the simulated console's broken games, the first one's
 # cause and fix, and its removal (recorded in the change history).
 key("Down", 4)             # past Keep, Keep for, Keep up to: Check the installed games
+os.remove(games_cache)     # made by the start-up check: this screen's first check, game by game
 key("Return")
 time.sleep(0.8)
 shot("27_games_checking")  # the games shown as they are checked, with the count

@@ -64,7 +64,10 @@ void at_start()
         if (!paths::ensure_dir(paths::nand_dir() + "/cache") ||
             !paths::atomic_write(GameCheckActivity::cache_file(), encoded, &error))
             brls::Logger::warning("games cache: not saved ({})", error);
-        brls::sync([cache, hos]() { note(cache->games, hos); });
+        brls::sync([cache, hos]() {
+            brls::Logger::info("games: start-up check done ({} games)", cache->games.size());
+            note(cache->games, hos);
+        });
     });
 }
 
