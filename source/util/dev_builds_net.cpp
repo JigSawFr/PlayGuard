@@ -164,6 +164,8 @@ bool find(const Query& q, Build* out, std::string* error)
         Build b;
         if (!newest_build(artifacts, q.pr ? Kind::PullRequest : Kind::Commit, &b)) continue;
         b.ci = r.ci;
+        b.title = r.title;
+        b.notes = r.message;
         if (q.pr) {
             b.pr = pull.number;
             b.title = pull.title;

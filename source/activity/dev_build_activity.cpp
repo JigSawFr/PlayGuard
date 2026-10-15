@@ -9,6 +9,7 @@
 #include "ui/ui.hpp"
 #include "util/changelog.hpp"
 #include "util/markdown.hpp"
+#include "view/build_cell.hpp"
 #include "view/markdown_view.hpp"
 #include "view/qr_view.hpp"
 #include "view/release_notes.hpp"
@@ -46,22 +47,6 @@ brls::Label* text_label(const std::string& text, float size, NVGcolor color)
 void DevBuildActivity::show(const dev_builds::Build& build, bool newer)
 {
     brls::Application::pushActivity(new DevBuildActivity(build, newer));
-}
-
-void DevBuildActivity::add_tag(const std::string& text, NVGcolor color)
-{
-    auto* box = new brls::Box(brls::Axis::ROW);
-    box->setBackgroundColor(nvgTransRGBA(color, 40));
-    box->setCornerRadius(6);
-    box->setPadding(3, 10, 3, 10);
-    box->setMarginRight(8);
-    auto* l = new brls::Label();
-    l->setSingleLine(true);
-    l->setFontSize(16);
-    l->setTextColor(color);
-    l->setText(text);
-    box->addView(l);
-    tags->addView(box);
 }
 
 void DevBuildActivity::add_fact(const std::string& name, const std::string& value, NVGcolor color)
@@ -129,31 +114,17 @@ void DevBuildActivity::onContentAvailable()
     warning->setSingleLine(false);
     facts->setBackgroundColor(nvgTransRGBA(ui::color_text(), 12));
 
-    // Tags: its kind, how its checks ended, installed or newer.
+    // Tags: its kind, then the list's (kind of change, scope, pull request,
+    // checks, pre-release, installed or new).
+    const NVGcolor kind_color = accent();
     switch (b.kind) {
-        case dev_builds::Kind::Release:
-            add_tag(b.prerelease ? "playguard/dev_build/kind_prerelease"_i18n : "playguard/dev_build/kind_release"_i18n, accent());
-            break;
-        case dev_builds::Kind::Main: add_tag("main", accent()); break;
-        case dev_builds::Kind::PullRequest: add_tag(brls::getStr("playguard/dev_build/kind_pr", b.pr), accent()); break;
-        case dev_builds::Kind::Commit: add_tag("playguard/dev_build/kind_commit"_i18n, accent()); break;
+        case dev_builds::Kind::Release: tags->addView(tag_view({ "playguard/dev_build/kind_release"_i18n, kind_color }, 16)); break;
+        case dev_builds::Kind::Main: tags->addView(tag_view({ "main", kind_color }, 16)); break;
+        case dev_builds::Kind::PullRequest: break;   // its number leads the tags already
+        case dev_builds::Kind::Commit: tags->addView(tag_view({ "playguard/dev_build/kind_commit"_i18n, kind_color }, 16)); break;
     }
-    switch (b.ci) {
-        case dev_builds::Ci::Passed: add_tag("playguard/dev_build/ci_passed"_i18n, ui::color_ok()); break;
-        case dev_builds::Ci::Failed: add_tag("playguard/dev_build/ci_failed"_i18n, ui::color_bad()); break;
-        case dev_builds::Ci::Running: add_tag("playguard/dev_build/ci_running"_i18n, ui::color_warn()); break;
-        case dev_builds::Ci::Unknown: break;
-    }
-    if (dev_build_flow::installed(b)) add_tag("playguard/dev_build/installed"_i18n, ui::color_ok());
-    else if (this->newer) add_tag("playguard/dev_build/new"_i18n, accent());
-
-    // The title: a pull request's own, else what the list calls it.
-    switch (b.kind) {
-        case dev_builds::Kind::Release: headline->setText(dev_build_flow::release_text(b)); break;
-        case dev_builds::Kind::PullRequest: headline->setText(b.title); break;
-        case dev_builds::Kind::Main: headline->setText("main · " + b.commit); break;
-        case dev_builds::Kind::Commit: headline->setText(b.branch.empty() ? b.commit : b.branch + " · " + b.commit); break;
-    }
+    for (const BuildTag& t : build_tags(b, this->newer)) tags->addView(tag_view(t, 16));
+    headline->setText(build_title(b));
 
     // The facts.
     std::string built = dev_build_flow::short_date(b.date);

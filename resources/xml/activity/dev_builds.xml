@@ -2,9 +2,9 @@
 
 <!-- Developer tools › Install another build: a bar while the list is
      fetched, a tab each for the last releases, main's last commits and the
-     open pull requests (L / R move from one to the next, Y hides the
-     pre-releases or sorts the pull requests), the builds of the chosen one,
-     then signing in or finding a build, going back to the previous build,
+     open pull requests (L / R move from one to the next, A on the pull
+     requests' tab sorts them, Y finds a build), the builds of the chosen one,
+     then signing in, going back to the previous build,
      and how old the list is (X fetches
      it again). The lists are built
      by source/activity/dev_builds_activity.cpp. -->
@@ -51,8 +51,7 @@
             </brls:Box>
             <brls:Box id="db_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
             <brls:DetailCell id="db_sign_in" title="@i18n/playguard/dev_build/sign_in" marginTop="24"/>
-            <brls:DetailCell id="db_find" title="@i18n/playguard/dev_build/find" marginTop="24"/>
-            <brls:DetailCell id="db_back" title=" "/>
+            <brls:DetailCell id="db_back" title=" " marginTop="24"/>
             <brls:Label id="db_checked" text=" " fontSize="18" marginTop="16" textColor="@theme/brand/note"/>
 
         </brls:Box>

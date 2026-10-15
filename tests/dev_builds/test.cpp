@@ -183,6 +183,37 @@ static void test_find_and_runs()
     CHECK(builds[0].ci == dev_builds::Ci::Failed && builds[1].ci == dev_builds::Ci::Unknown &&
           builds[2].ci == dev_builds::Ci::Unknown);
 
+    // A commit of main takes its run's title and message; a pull request keeps its own.
+    std::vector<dev_builds::Run> titled(1);
+    titled[0].id = 21, titled[0].title = "fix(ui): wrap (#141)", titled[0].message = "fix(ui): wrap (#141)\n\nbody";
+    std::vector<Build> two(2);
+    two[0].artifact = two[1].artifact = true, two[0].run = two[1].run = 21;
+    two[0].kind = Kind::Main;
+    two[1].kind = Kind::PullRequest, two[1].title = "PR title";
+    dev_builds::apply_runs(&two, titled);
+    CHECK(two[0].title == "fix(ui): wrap (#141)" && two[0].notes == titled[0].message);
+    CHECK(two[1].title == "PR title" && two[1].notes.empty());
+    std::vector<dev_builds::Run> with_message;
+    CHECK(dev_builds::parse_runs(R"({"workflow_runs": [{"id": 5, "head_sha": ")" + std::string(40, 'a') +
+                                     R"(", "status": "completed", "conclusion": "success", "display_title": "feat: x\u202e",
+                                     "head_commit": {"message": "feat: x\n\nlong"}}]})", &with_message) &&
+          with_message.size() == 1 && with_message[0].title == "feat: x" && with_message[0].message == "feat: x\n\nlong");
+
+    // Conventional titles.
+    dev_builds::Subject t = dev_builds::parse_subject("feat(play-timer)!: show the time over the limit (#140)");
+    CHECK(t.type == "feat" && t.scope == "play-timer" && t.breaking && t.pr == 140 && t.text == "show the time over the limit");
+    t = dev_builds::parse_subject("docs: a video tour (#142)");
+    CHECK(t.type == "docs" && t.scope.empty() && !t.breaking && t.pr == 142 && t.text == "a video tour");
+    t = dev_builds::parse_subject("chore(main): release 1.1.0");
+    CHECK(t.type == "chore" && t.scope == "main" && t.pr == 0 && t.text == "release 1.1.0");
+    t = dev_builds::parse_subject("Merge branch 'x': into y (#abc)");
+    CHECK(t.type.empty() && t.pr == 0 && t.text == "Merge branch 'x': into y (#abc)");
+    t = dev_builds::parse_subject("Update README.md");
+    CHECK(t.type.empty() && t.text == "Update README.md");
+    t = dev_builds::parse_subject("fix(: nope");
+    CHECK(t.type.empty() && t.text == "fix(: nope");
+    CHECK(dev_builds::parse_subject("").text.empty());
+
     // A run's artifacts: the newest build one.
     std::vector<dev_builds::Artifact> arts(2);
     arts[0].date = "2026-10-01T00:00:00Z", arts[0].commit = "aaaaaaa", arts[0].run = 5, arts[0].branch = "fix/y";

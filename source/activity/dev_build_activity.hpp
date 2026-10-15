@@ -30,7 +30,6 @@ class DevBuildActivity : public brls::Activity
     dev_builds::Build build;
     bool              newer;
 
-    void add_tag(const std::string& text, NVGcolor color);
     void add_fact(const std::string& name, const std::string& value, NVGcolor color);
     // Its page on GitHub ("" when there is none to show).
     std::string page() const;
