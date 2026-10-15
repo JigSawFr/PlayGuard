@@ -1136,6 +1136,9 @@
         "went_back_crash": "{}이(가) 시작을 마치지 못해(충돌했을 수 있음) PlayGuard가 {}(으)로 돌아갔습니다. 보고서를 보내면 수정에 도움이 됩니다.",
         "send_report": "보고서 보내기",
         "upload": "보고서를 보냈습니다",
-        "upload_show": "링크 보기"
+        "upload_show": "링크 보기",
+        "crash": "지난번에 PlayGuard가 예기치 않게 종료되었습니다",
+        "sd_write": "PlayGuard가 SD 카드에 쓰지 못했습니다",
+        "sd_write_detail": "{}이(가) 저장되지 않았습니다. SD 카드를 확인하세요: 가득 참, 읽기 전용(잠금 스위치) 또는 오류."
     }
 }

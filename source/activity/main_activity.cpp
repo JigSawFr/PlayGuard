@@ -139,6 +139,7 @@ void MainActivity::onContentAvailable()
     // from: in the notification bell.
     data_notice::at_start();
     rollback_flow::note_went_back();
+    notices::note_crash();
     // Then, with nothing else in front: "What's new" after an update, else the
     // monthly "Support PlayGuard" reminder.
     support_flow::at_start(this);

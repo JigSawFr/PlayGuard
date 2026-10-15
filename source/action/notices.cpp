@@ -10,7 +10,11 @@
 #include "activity/main_activity.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "action/history_flow.hpp"
+#include "action/upload_flow.hpp"
 #include "app.hpp"
+#include "util/config.hpp"
+#include "util/log_files.hpp"
+#include "util/paths.hpp"
 #include "tab/tab_base.hpp"
 #include "ui/ui.hpp"
 
@@ -194,6 +198,38 @@ void note_timer_stalled(bool stalled)
 {
     toggle(stalled, "not_counting", Level::Action, "playguard/notices/not_counting"_i18n,
            "playguard/play_timer/not_counting"_i18n, open_label("play_timer"), []() { open_tab(ui::tab::play_timer); });
+}
+
+void note_crash()
+{
+    const std::vector<std::string> crashes = log_files::list(paths::crashes_dir(), log_files::CRASH);
+    if (crashes.empty()) return;
+    auto& cfg = config::get();
+    const std::string newest = crashes.front();
+    if (newest == cfg.crash_seen) return;
+    const bool first = cfg.crash_seen.empty();
+    cfg.crash_seen = newest;
+    ui::save_config();
+    if (first) return;
+    // The file's line: when, the version, what was thrown.
+    std::string text;
+    if (paths::read_file(paths::crashes_dir() + "/" + newest, text)) text = text.substr(0, text.find('\n'));
+    set("crash", Level::Info, "playguard/notices/crash"_i18n, text, "playguard/notices/send_report"_i18n, []() {
+        dismiss("crash");
+        upload_flow::choose();
+    });
+}
+
+void note_write(const char* what, bool ok, const std::string& error)
+{
+    const std::string id = std::string("sd_") + what;
+    if (ok) {
+        clear(id);
+        return;
+    }
+    const std::string file = std::string(what) == "config" ? "config.json" : std::string(what) + ".json";
+    set(id, Level::Action, "playguard/notices/sd_write"_i18n,
+        brls::getStr("playguard/notices/sd_write_detail", file) + (error.empty() ? "" : " (" + error + ")"));
 }
 
 void sweep()

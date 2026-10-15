@@ -54,6 +54,15 @@ void note_timer_stalled(bool stalled);
 // in focus): reads what refresh_status needs, in one pctl session.
 void sweep();
 
+// MainActivity, once per start: a crash file newer than the last one told
+// about (PlayGuard closed unexpectedly since). The first start with this
+// only remembers the newest, so an old crash is not told as new.
+void note_crash();
+
+// A file PlayGuard could not write to the SD card (`what`: "config",
+// "history"), or wrote again after that (`ok`): an entry to do until then.
+void note_write(const char* what, bool ok, const std::string& error = "");
+
 // Opens tab `position` (ui::tab) of the main screen, under the list.
 void open_tab(int position);
 

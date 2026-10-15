@@ -1136,6 +1136,9 @@
         "went_back_crash": "{} ist nicht fertig gestartet (vielleicht abgestürzt), daher ist PlayGuard zu {} zurückgekehrt. Ein Bericht hilft bei der Behebung.",
         "send_report": "Bericht senden",
         "upload": "Bericht gesendet",
-        "upload_show": "Link anzeigen"
+        "upload_show": "Link anzeigen",
+        "crash": "PlayGuard wurde beim letzten Mal unerwartet beendet",
+        "sd_write": "PlayGuard konnte nicht auf die SD-Karte schreiben",
+        "sd_write_detail": "{} wurde nicht gespeichert. Prüfe die SD-Karte: voll, schreibgeschützt (der Schieber) oder fehlerhaft."
     }
 }

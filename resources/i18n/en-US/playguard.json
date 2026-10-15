@@ -1136,6 +1136,9 @@
         "went_back_crash": "{} did not finish starting (it may have crashed), so PlayGuard went back to {}. A report helps fix it.",
         "send_report": "Send a report",
         "upload": "Report sent",
-        "upload_show": "Show the link"
+        "upload_show": "Show the link",
+        "crash": "PlayGuard closed unexpectedly last time",
+        "sd_write": "PlayGuard could not write to the SD card",
+        "sd_write_detail": "{} was not saved. Check the SD card: full, read-only (the lock switch) or with errors."
     }
 }

@@ -1136,6 +1136,9 @@
         "went_back_crash": "{} non ha finito di avviarsi (forse si è bloccato), quindi PlayGuard è tornato a {}. Un rapporto aiuta a correggerlo.",
         "send_report": "Invia un rapporto",
         "upload": "Rapporto inviato",
-        "upload_show": "Mostra il link"
+        "upload_show": "Mostra il link",
+        "crash": "L'ultima volta PlayGuard si è chiuso in modo imprevisto",
+        "sd_write": "PlayGuard non è riuscito a scrivere sulla scheda SD",
+        "sd_write_detail": "{} non è stato salvato. Controlla la scheda SD: piena, in sola lettura (il blocco) o con errori."
     }
 }

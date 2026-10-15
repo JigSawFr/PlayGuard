@@ -1136,6 +1136,9 @@
         "went_back_crash": "{} 未能完成啟動（可能已當機），因此 PlayGuard 退回到了 {}。傳送報告有助於修正。",
         "send_report": "傳送報告",
         "upload": "報告已傳送",
-        "upload_show": "顯示連結"
+        "upload_show": "顯示連結",
+        "crash": "PlayGuard 上次意外關閉",
+        "sd_write": "PlayGuard 無法寫入 SD 卡",
+        "sd_write_detail": "{} 未能儲存。請檢查 SD 卡：已滿、唯讀（鎖定開關）或有錯誤。"
     }
 }

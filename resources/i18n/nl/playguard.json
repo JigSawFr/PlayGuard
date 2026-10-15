@@ -1136,6 +1136,9 @@
         "went_back_crash": "{} is niet volledig gestart (misschien vastgelopen), dus PlayGuard is teruggegaan naar {}. Een rapport helpt het op te lossen.",
         "send_report": "Rapport versturen",
         "upload": "Rapport verstuurd",
-        "upload_show": "Link tonen"
+        "upload_show": "Link tonen",
+        "crash": "PlayGuard is de vorige keer onverwacht gesloten",
+        "sd_write": "PlayGuard kon niet naar de SD-kaart schrijven",
+        "sd_write_detail": "{} is niet opgeslagen. Controleer de SD-kaart: vol, alleen-lezen (het schuifje) of met fouten."
     }
 }
