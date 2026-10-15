@@ -1,16 +1,18 @@
 // PlayGuard — the installed games the HOME menu cannot start or draw: an
 // icon that keeps loading, a "!" or a dotted frame instead of the game. For
 // each game the console lists (ns), what is installed of it (ns, ncm): the
-// game itself and its update, where, whether their files are there and the
-// system version they ask for. gamecheck_classify() turns that into one
-// problem and the UI into a cause and a fix; gamecheck_remove() deletes a
-// broken game the way System Settings › Data Management does (save data
-// kept).
+// game itself, its update and add-ons, where, whether their files are there,
+// the system version and key generation they ask for, their tickets (es),
+// the launch version the console expects (avm) and how the HOME menu sees it
+// (its view flags). gamecheck_classify() turns that into one problem and the
+// UI into a cause and a fix; the actions below repair what can be repaired.
+// The checks and repairs follow what Goldleaf (XorTroll), sphaira
+// (ITotalJustice) and DBI do, and switchbrew's NS, ES and AVM pages.
 //
-// The scan only reads, one ns and ncm session for the whole list, closed
+// The scan only reads, one session per service for the whole list, closed
 // before it returns; it reads every game, so the UI runs it off the main
-// thread. Removing a game is a change: it goes through core_change_allowed()
-// (read-only mode, the PIN asked before a change).
+// thread. Every action but the integrity check is a change: it goes through
+// core_change_allowed() (read-only mode, the PIN asked before a change).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 #include "nx_types.h"
@@ -19,8 +21,31 @@
 extern "C" {
 #endif
 
-#define GAMECHECK_MAX      512
-#define GAMECHECK_NAME_LEN 128
+#define GAMECHECK_MAX          512
+#define GAMECHECK_NAME_LEN     128
+#define GAMECHECK_MAX_CONTENTS 16   // contents kept per game for the actions (the game, its update, add-ons)
+
+// NcmContentMetaType / NcmStorageId values, so the UI and the tests need no libnx.
+#define GC_META_APPLICATION 0x80
+#define GC_META_PATCH       0x81
+#define GC_META_ADDON       0x82
+#define GC_STORAGE_GAMECARD 2
+#define GC_STORAGE_NAND     4
+#define GC_STORAGE_SD       5
+
+// NsApplicationView flags qlaunch acts on (switchbrew, libnx-ext).
+#define GC_VIEW_HAS_MAIN_CONTENTS (1u << 1)
+#define GC_VIEW_CAN_LAUNCH        (1u << 8)
+#define GC_VIEW_NEEDS_UPDATE      (1u << 9)
+#define GC_VIEW_NEEDS_VERIFY      (1u << 13)
+
+// One content of a game, as ns lists it.
+typedef struct {
+    u64 id;        // its own ID: the game's, an update's (…800), an add-on's
+    u32 version;
+    u8  type;      // GC_META_*
+    u8  storage;   // GC_STORAGE_*
+} GameContent;
 
 // What was found of one game. Filled by gamecheck_scan(); the host tests and
 // the simulator fill it by hand.
@@ -28,8 +53,11 @@ typedef struct {
     u64  app_id;
     char name[GAMECHECK_NAME_LEN];   // UTF-8, console language; empty when unreadable
     bool control_ok;                 // name and icon read (what the HOME menu draws)
+    u8   record_event;               // the HOME menu entry's last event (ns ApplicationRecord)
 
     u32  meta_count;                 // contents the console lists for it (game, update, add-ons)
+    GameContent contents[GAMECHECK_MAX_CONTENTS];
+    u32  content_count;              // kept in `contents`, at most GAMECHECK_MAX_CONTENTS
     bool has_base;                   // the game itself
     bool has_patch;                  // an update
     u32  base_version, patch_version;
@@ -37,7 +65,16 @@ typedef struct {
     bool storage_unavailable;        // a content on a storage that could not be opened (SD card)
     bool meta_missing;               // a listed content the storage does not know
     bool files_missing;              // a file of the game or its update missing from its storage
-    u32  required_hos;               // MAKEHOSVERSION the game or its update needs, 0 when unknown
+    u32  base_required_hos;          // MAKEHOSVERSION the game asks for, 0 when unknown
+    u32  patch_required_hos;         // the same for its update
+    u8   key_generation;             // the highest of the game's and its update's files, 0 when unknown
+    bool needs_ticket;               // a file of the game or its update is encrypted with a title key
+    bool ticket_missing;             // … and the console has no ticket for it (only when tickets were listed)
+
+    bool view_ok;                    // view_flags read
+    u32  view_flags;                 // GC_VIEW_*
+    bool launch_checked;             // launch_required read (avm, 6.0.0+)
+    u32  launch_required;            // the version the console wants before it starts the game
     Result launch_rc;                // nsCheckApplicationLaunchVersion: why the console would refuse it
 } GameFacts;
 
@@ -49,8 +86,12 @@ typedef enum {
     GC_STORAGE_UNAVAILABLE,  // on the SD card, which cannot be read
     GC_NO_BASE,              // an update or add-on without the game: "!"
     GC_FILES_MISSING,        // installed, files missing or unknown to the storage
+    GC_NEEDS_VERIFY,         // the console found corrupt data (view flag)
+    GC_KEY_TOO_NEW,          // encrypted with a key this firmware does not have
     GC_FIRMWARE_TOO_OLD,     // needs a newer system version than this console's
-    GC_LAUNCH_REFUSED,       // the console refuses to start it (an update is required)
+    GC_TICKET_MISSING,       // needs a ticket the console does not have
+    GC_LAUNCH_VERSION,       // the console refuses it: it wants a newer version than the one installed
+    GC_LAUNCH_REFUSED,       // the console refuses to start it for another reason
     GC_NO_CONTROL,           // everything there but the name and icon: an icon that keeps loading
     GC_ISSUE_COUNT
 } GameIssue;
@@ -58,17 +99,31 @@ typedef enum {
 // `current_hos`: the console's MAKEHOSVERSION.
 GameIssue gamecheck_classify(const GameFacts *g, u32 current_hos);
 
-// Whether PlayGuard offers to remove the game for `issue`: never for a game
-// that is fine or whose SD card cannot be read (nothing to clean there, and
-// the files would stay behind on the card).
-bool gamecheck_removable(GameIssue issue);
+// The highest version of the game and its update installed: what the launch
+// version is put back to.
+u32 gamecheck_installed_version(const GameFacts *g);
+
+// What PlayGuard offers for a game with `issue` (GA_* bits).
+#define GA_REMOVE        (1u << 0)   // the whole game: not for one that is fine or whose SD card cannot be read
+#define GA_REMOVE_UPDATE (1u << 1)   // only its update (not on a game card)
+#define GA_REMOVE_ADDON  (1u << 2)   // one of its add-ons (not on a game card)
+#define GA_RESET_LAUNCH  (1u << 3)   // the launch version back to the installed one
+#define GA_VERIFY        (1u << 4)   // the console's own integrity check (reads only)
+u32 gamecheck_actions(const GameFacts *g, GameIssue issue);
 
 // A content meta's RequiredSystemVersion (major << 26 | minor << 20 |
 // micro << 16 | relstep) as MAKEHOSVERSION; 0 stays 0.
 u32 gamecheck_sysver_to_hos(u32 required_system_version);
 
+// The highest key generation (an NCA header's KeyGeneration) the firmware
+// `hos` has the keys for; 0 when the firmware is newer than the table.
+u8 gamecheck_max_key_generation(u32 hos);
+// The first firmware with `key_generation` (MAKEHOSVERSION), 0 when unknown.
+u32 gamecheck_key_generation_firmware(u8 key_generation);
+
 typedef struct {
     Result rc;          // listing the games (ns); nothing else is filled when it fails
+    Result tickets_rc;  // listing the tickets (es); ticket_missing is only set when it succeeded
     u32    count;       // every game the console lists, up to GAMECHECK_MAX
     bool   truncated;   // more than GAMECHECK_MAX games
     GameFacts games[GAMECHECK_MAX];
@@ -77,9 +132,27 @@ typedef struct {
 void gamecheck_scan(GameCheck *out);
 
 // Deletes the game, its update and add-ons, and its entry on the HOME menu
-// (nsDeleteApplicationCompletely). Save data stays. NXM_RC_READ_ONLY /
-// NXM_RC_NOT_CONFIRMED before any session is opened.
+// (nsDeleteApplicationCompletely, then the entry itself if one is left, as
+// Goldleaf does). Save data stays. NXM_RC_READ_ONLY / NXM_RC_NOT_CONFIRMED
+// before any session is opened.
 Result gamecheck_remove(u64 app_id);
+
+// Deletes one content (an update or an add-on; not the game itself, not on a
+// game card): its files and its entry in the storage (ncm), then the HOME
+// menu entry is rebuilt without it (ns ListApplicationRecordContentMeta,
+// DeleteApplicationRecord, PushApplicationRecord). An update removed: the
+// launch version goes back to what is left (avm, 6.0.0+).
+Result gamecheck_remove_content(u64 app_id, const GameContent *content);
+
+// The launch version back to `version` (avm PushLaunchVersion, 6.0.0+), then
+// read again: NXM_RC_NOT_APPLIED when the console still wants more.
+Result gamecheck_reset_launch_version(u64 app_id, u32 version);
+
+// The console's integrity check (System Settings › Data Management), which
+// reads every file of the game. `progress` is called while it runs (current
+// and total bytes, total 0 while unknown). Returns the check's result;
+// *corrupt is set when it found corrupt data.
+Result gamecheck_verify(u64 app_id, void (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt);
 
 #ifdef __cplusplus
 }

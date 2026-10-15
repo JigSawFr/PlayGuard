@@ -710,7 +710,8 @@
             "firmware": {
                 "short": "Benötigt Firmware {}",
                 "cause": "Das Spiel oder sein Update benötigt die Systemversion {}; diese Konsole hat {}.",
-                "fix": "Aktualisiere zuerst Atmosphère auf eine Version, die die neue Firmware unterstützt, dann die Firmware: In umgekehrter Reihenfolge startet die Konsole nicht mehr. Oder installiere eine ältere Version des Updates."
+                "fix": "Aktualisiere zuerst Atmosphère auf eine Version, die die neue Firmware unterstützt, dann die Firmware: In umgekehrter Reihenfolge startet die Konsole nicht mehr. Oder installiere eine ältere Version des Updates.",
+                "fix_update": "Nur sein Update braucht sie: Entferne das Update, um das Spiel ohne es zu spielen (Aktionen), oder aktualisiere zuerst Atmosphère, dann die Firmware."
             },
             "launch": {
                 "short": "Von der Konsole abgelehnt",
@@ -721,8 +722,49 @@
                 "short": "Name und Symbol unlesbar",
                 "cause": "Das Spiel ist installiert, aber sein Name und sein Symbol können nicht gelesen werden: Das HOME-Menü zeigt ein Symbol, das endlos lädt.",
                 "fix": "Starte die Konsole neu. Lädt das Symbol weiterhin, prüfe die Daten unter Systemeinstellungen › Datenverwaltung oder entferne das Spiel und installiere es erneut."
+            },
+            "needs_verify": {
+                "short": "Beschädigte Daten",
+                "cause": "Die Konsole hat beschädigte Daten in diesem Spiel gefunden und verlangt eine Prüfung.",
+                "fix": "Prüfe die Daten auf Beschädigung (Aktionen). Sind sie beschädigt, entferne das Spiel und installiere es erneut."
+            },
+            "key_too_new": {
+                "short": "Schlüssel zu neu",
+                "cause": "Das Spiel ist mit Schlüsseln verschlüsselt, die diese Firmware ({}) nicht hat (Schlüsselgeneration {})."
+            },
+            "ticket": {
+                "short": "Lizenz fehlt",
+                "cause": "Das Spiel braucht eine Lizenz (Ticket), die nicht auf der Konsole ist: Sie wurde gelöscht, oder die Installation enthielt sie nicht.",
+                "fix": "Installiere das Spiel erneut aus einer vollständigen Kopie mit seinem Ticket."
+            },
+            "launch_version": {
+                "short": "Verlangt ein entferntes Update",
+                "cause": "Die Konsole verlangt Version {} des Spiels, die eines früher installierten Updates, installiert ist aber Version {}: Das Update wurde entfernt oder nicht vollständig installiert.",
+                "fix": "Lass die installierte Version wieder zu (Aktionen) oder installiere das Update erneut."
             }
-        }
+        },
+        "actions": "Aktionen",
+        "action": {
+            "remove": "Spiel von der Konsole entfernen",
+            "remove_update": "Update entfernen (v{})",
+            "remove_addon": "Zusatzinhalt {} entfernen",
+            "reset_launch": "Installierte Version wieder zulassen (v{})",
+            "verify": "Daten auf Beschädigung prüfen"
+        },
+        "remove_update_body": "Nur das Update wird gelöscht: Das Spiel, seine Zusatzinhalte und Spielstände bleiben, und die Konsole startet das Spiel ohne das Update.",
+        "remove_addon_body": "Nur dieser Zusatzinhalt wird gelöscht: Das Spiel, sein Update und die Spielstände bleiben.",
+        "reset_launch_body": "Die Konsole verlangt Version {} dieses Spiels, installiert ist aber Version {}. Sie startet die installierte Version wieder. Es wird nichts gelöscht.",
+        "reset_launch_confirm": "Zulassen",
+        "update_removed": "{}: Update entfernt",
+        "addon_removed": "{}: Zusatzinhalt entfernt",
+        "launch_reset": "{}: die installierte Version wird wieder zugelassen",
+        "content_err": "Konnte nicht entfernt werden",
+        "launch_err": "Die Startversion konnte nicht geändert werden",
+        "verifying": "{} wird geprüft… {} %",
+        "verify_ok": "{}: keine beschädigten Daten gefunden.",
+        "verify_bad": "{}: beschädigte Daten gefunden. Entferne das Spiel und installiere es erneut.",
+        "verify_err": "Die Daten konnten nicht geprüft werden",
+        "verify_busy": "Es läuft bereits eine Prüfung."
     },
     "about": {
         "section_changelog": "Neu in {}",
@@ -906,7 +948,10 @@
             "rescue": "Wiederherstellung verwendet",
             "console_lock": "Konsolensperre",
             "bedtime": "Gute-Nacht-Alarm",
-            "remove_game": "Spiel entfernt"
+            "remove_game": "Spiel entfernt",
+            "remove_update": "Update entfernt",
+            "remove_addon": "Zusatzinhalt entfernt",
+            "launch_version": "Startversion zurückgesetzt"
         },
         "sources": {
             "uniform": "Jeden Tag gleiches Limit",

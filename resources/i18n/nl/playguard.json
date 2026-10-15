@@ -710,7 +710,8 @@
             "firmware": {
                 "short": "Vereist firmware {}",
                 "cause": "De game of de update vereist systeemversie {}; deze console draait {}.",
-                "fix": "Werk eerst Atmosphère bij naar een versie die de nieuwe firmware ondersteunt, daarna de firmware: in de andere volgorde start de console niet meer. Of installeer een oudere versie van de update."
+                "fix": "Werk eerst Atmosphère bij naar een versie die de nieuwe firmware ondersteunt, daarna de firmware: in de andere volgorde start de console niet meer. Of installeer een oudere versie van de update.",
+                "fix_update": "Alleen de update heeft hem nodig: verwijder de update om de game zonder te spelen (Acties), of werk eerst Atmosphère bij en daarna de firmware."
             },
             "launch": {
                 "short": "Geweigerd door de console",
@@ -721,8 +722,49 @@
                 "short": "Naam en icoon onleesbaar",
                 "cause": "De game is geïnstalleerd, maar de naam en het icoon kunnen niet worden gelezen: het HOME-menu toont een icoon dat blijft laden.",
                 "fix": "Start de console opnieuw. Blijft het icoon laden, controleer dan de data via Systeeminstellingen › Databeheer, of verwijder de game en installeer hem opnieuw."
+            },
+            "needs_verify": {
+                "short": "Beschadigde data",
+                "cause": "De console heeft beschadigde data in deze game gevonden en vraagt om een controle.",
+                "fix": "Controleer de data op beschadiging (Acties). Zijn ze beschadigd, verwijder de game dan en installeer hem opnieuw."
+            },
+            "key_too_new": {
+                "short": "Sleutels te nieuw",
+                "cause": "De game is versleuteld met sleutels die deze firmware ({}) niet heeft (sleutelgeneratie {})."
+            },
+            "ticket": {
+                "short": "Licentie ontbreekt",
+                "cause": "De game heeft een licentie (ticket) nodig die niet op de console staat: die is gewist, of de installatie bevatte hem niet.",
+                "fix": "Installeer de game opnieuw vanaf een volledige kopie met zijn ticket."
+            },
+            "launch_version": {
+                "short": "Vraagt om een verwijderde update",
+                "cause": "De console vraagt om versie {} van de game, die van een eerder geïnstalleerde update, maar versie {} is geïnstalleerd: de update is verwijderd of niet volledig geïnstalleerd.",
+                "fix": "Accepteer de geïnstalleerde versie weer (Acties), of installeer de update opnieuw."
             }
-        }
+        },
+        "actions": "Acties",
+        "action": {
+            "remove": "Game van de console verwijderen",
+            "remove_update": "Update verwijderen (v{})",
+            "remove_addon": "Extra content {} verwijderen",
+            "reset_launch": "Geïnstalleerde versie weer accepteren (v{})",
+            "verify": "Data op beschadiging controleren"
+        },
+        "remove_update_body": "Alleen de update wordt gewist: de game, de extra content en de opgeslagen data blijven, en de console start de game zonder de update.",
+        "remove_addon_body": "Alleen deze extra content wordt gewist: de game, de update en de opgeslagen data blijven.",
+        "reset_launch_body": "De console vraagt om versie {} van deze game, maar versie {} is geïnstalleerd. Hij start de geïnstalleerde versie weer. Er wordt niets gewist.",
+        "reset_launch_confirm": "Accepteren",
+        "update_removed": "{}: update verwijderd",
+        "addon_removed": "{}: extra content verwijderd",
+        "launch_reset": "{}: de geïnstalleerde versie wordt weer geaccepteerd",
+        "content_err": "Kon niet worden verwijderd",
+        "launch_err": "De startversie kon niet worden gewijzigd",
+        "verifying": "{} wordt gecontroleerd… {} %",
+        "verify_ok": "{}: geen beschadigde data gevonden.",
+        "verify_bad": "{}: beschadigde data gevonden. Verwijder de game en installeer hem opnieuw.",
+        "verify_err": "De data konden niet worden gecontroleerd",
+        "verify_busy": "Er loopt al een controle."
     },
     "about": {
         "section_changelog": "Nieuw in {}",
@@ -906,7 +948,10 @@
             "rescue": "Herstel gebruikt",
             "console_lock": "Consolevergrendeling",
             "bedtime": "Bedtijdalarm",
-            "remove_game": "Game verwijderd"
+            "remove_game": "Game verwijderd",
+            "remove_update": "Update verwijderd",
+            "remove_addon": "Extra content verwijderd",
+            "launch_version": "Startversie hersteld"
         },
         "sources": {
             "uniform": "Elke dag dezelfde limiet",

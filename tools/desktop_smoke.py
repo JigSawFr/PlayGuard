@@ -506,13 +506,55 @@ os.remove(github_token)
 key("Down")                # Check the installed games
 key("Return")
 shot("27_games")
-key("Return")              # the first broken game: cause, fix, Remove
+key("Return")              # the first broken game: cause, fix, Actions
 shot("27_games_details")
-key("Right")               # Remove from the console
+key("Right")               # Actions
+key("Return")
+shot("27_games_actions")   # check the data, remove the game
+key("Down")                # Remove the game from the console
+key("Return")
+key("Right")               # Remove
 key("Return")
 shot("27_games_removed")
 if not any(m.endswith("removed") for m in messages()):
     fail("the broken game was not removed: " + repr(messages()[-3:]))
+# Robot Factory: only its update needs a newer firmware; removing the update
+# fixes it (it leaves the list).
+key("Down", 2)             # past Garden Defenders, Hedgehog Rush
+key("Return")
+shot("27_games_update")    # the fix says to remove the update
+key("Right")               # Actions
+key("Return")
+key("Return")              # Remove the update (the first action)
+key("Right")               # Remove
+key("Return")
+shot("27_games_update_removed")
+if not any(m.endswith("update removed") for m in messages()):
+    fail("the update was not removed: " + repr(messages()[-3:]))
+# Moon Racer: the console asks for a removed update; the installed version
+# is accepted again.
+key("Up", 6)               # back to the first game
+key("Down", 4)             # past Garden, Hedgehog, Ocean, Castle
+key("Return")
+key("Right")               # Actions
+key("Return")
+key("Return")              # Accept the installed version again (the first action)
+shot("27_games_launch_confirm")
+key("Right")               # Accept it
+key("Return")
+if not any("accepted again" in m for m in messages()):
+    fail("the launch version was not reset: " + repr(messages()[-3:]))
+# Forest Tales: the console found corrupt data; its check runs with progress.
+key("Up", 6)
+key("Down", 4)             # past Garden, Hedgehog, Ocean, Castle
+key("Return")
+key("Right")               # Actions
+key("Return")
+key("Return")              # Check the data for corruption
+shot("27_games_verifying") # the progress in the status line
+time.sleep(3)
+shot("27_games_verified")  # corrupt data found
+key("Return")              # OK
 key("Escape")
 
 # Activity: one game's screen, then a PDF export to the (simulated) SD card.

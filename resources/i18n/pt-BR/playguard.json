@@ -710,7 +710,8 @@
             "firmware": {
                 "short": "Requer o firmware {}",
                 "cause": "O jogo ou a atualização requer a versão do sistema {}; este console está na {}.",
-                "fix": "Atualize primeiro o Atmosphère para uma versão compatível com o novo firmware, e depois o firmware: na ordem inversa o console não liga mais. Ou instale uma versão mais antiga da atualização."
+                "fix": "Atualize primeiro o Atmosphère para uma versão compatível com o novo firmware, e depois o firmware: na ordem inversa o console não liga mais. Ou instale uma versão mais antiga da atualização.",
+                "fix_update": "Só a atualização precisa dele: remova a atualização para jogar sem ela (Ações), ou atualize primeiro o Atmosphère e depois o firmware."
             },
             "launch": {
                 "short": "Recusado pelo console",
@@ -721,8 +722,49 @@
                 "short": "Nome e ícone ilegíveis",
                 "cause": "O jogo está instalado, mas o nome e o ícone não podem ser lidos: o menu HOME mostra um ícone que fica carregando.",
                 "fix": "Reinicie o console. Se o ícone continuar carregando, verifique os dados em Configurações do console › Gerenciamento de dados, ou remova o jogo e instale-o de novo."
+            },
+            "needs_verify": {
+                "short": "Dados corrompidos",
+                "cause": "O console encontrou dados corrompidos neste jogo e pede para verificá-los.",
+                "fix": "Verifique se os dados estão corrompidos (Ações). Se estiverem, remova o jogo e instale-o de novo."
+            },
+            "key_too_new": {
+                "short": "Chaves novas demais",
+                "cause": "O jogo está criptografado com chaves que este firmware ({}) não tem (geração de chaves {})."
+            },
+            "ticket": {
+                "short": "Licença ausente",
+                "cause": "O jogo precisa de uma licença (ticket) que não está no console: ela foi apagada, ou a instalação não a incluía.",
+                "fix": "Instale o jogo de novo a partir de uma cópia completa que inclua o ticket."
+            },
+            "launch_version": {
+                "short": "Pede uma atualização removida",
+                "cause": "O console pede a versão {} do jogo, a de uma atualização instalada antes, mas a versão {} está instalada: a atualização foi removida ou não foi instalada por completo.",
+                "fix": "Aceite de novo a versão instalada (Ações), ou instale a atualização de novo."
             }
-        }
+        },
+        "actions": "Ações",
+        "action": {
+            "remove": "Remover o jogo do console",
+            "remove_update": "Remover a atualização (v{})",
+            "remove_addon": "Remover o conteúdo adicional {}",
+            "reset_launch": "Aceitar de novo a versão instalada (v{})",
+            "verify": "Verificar se os dados estão corrompidos"
+        },
+        "remove_update_body": "Só a atualização é apagada: o jogo, os conteúdos adicionais e os dados salvos ficam, e o console inicia o jogo sem a atualização.",
+        "remove_addon_body": "Só este conteúdo adicional é apagado: o jogo, a atualização e os dados salvos ficam.",
+        "reset_launch_body": "O console pede a versão {} deste jogo, mas a versão {} está instalada. Ele vai iniciar a versão instalada de novo. Nada é apagado.",
+        "reset_launch_confirm": "Aceitar",
+        "update_removed": "{}: atualização removida",
+        "addon_removed": "{}: conteúdo adicional removido",
+        "launch_reset": "{}: a versão instalada é aceita de novo",
+        "content_err": "Não foi possível remover",
+        "launch_err": "Não foi possível mudar a versão de inicialização",
+        "verifying": "Verificando {}… {} %",
+        "verify_ok": "{}: nenhum dado corrompido.",
+        "verify_bad": "{}: dados corrompidos. Remova o jogo e instale-o de novo.",
+        "verify_err": "Não foi possível verificar os dados",
+        "verify_busy": "Já há uma verificação em andamento."
     },
     "about": {
         "section_changelog": "Novidades da {}",
@@ -906,7 +948,10 @@
             "rescue": "Recuperação usada",
             "console_lock": "Bloqueio do console",
             "bedtime": "Alarme de hora de dormir",
-            "remove_game": "Jogo removido"
+            "remove_game": "Jogo removido",
+            "remove_update": "Atualização removida",
+            "remove_addon": "Conteúdo adicional removido",
+            "launch_version": "Versão de inicialização restaurada"
         },
         "sources": {
             "uniform": "Mesmo limite todos os dias",

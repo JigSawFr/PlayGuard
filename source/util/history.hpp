@@ -23,7 +23,8 @@ struct Entry
     //   "custom"  3 values: age, posting restricted, communication restricted
     //   "vr", "alarm"  1 value, 0/1 (VR restricted / alarm off)
     //   "pin", "unlock", "relock", "unlink", "delete", "clock", "restore",
-//   "remove_game" (detail: the game's name and ID): no values
+//   "remove_game", "remove_update", "remove_addon", "launch_version"
+//   (detail: the game's name and ID, and the add-on's): no values
     std::string kind;
     // Where from: "uniform", "day", "per_day", "extra", "stop", "restore_extra",
     // "profile", "remove", "backup", "undo", "first_steps" … ("" when plain).

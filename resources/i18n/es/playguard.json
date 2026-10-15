@@ -710,7 +710,8 @@
             "firmware": {
                 "short": "Requiere el firmware {}",
                 "cause": "El juego o su actualización requiere la versión del sistema {}; esta consola tiene la {}.",
-                "fix": "Actualiza primero Atmosphère a una versión compatible con el nuevo firmware y después el firmware: en el orden inverso la consola ya no arranca. O instala una versión anterior de la actualización."
+                "fix": "Actualiza primero Atmosphère a una versión compatible con el nuevo firmware y después el firmware: en el orden inverso la consola ya no arranca. O instala una versión anterior de la actualización.",
+                "fix_update": "Solo la necesita su actualización: elimina la actualización para jugar sin ella (Acciones), o actualiza primero Atmosphère y después el firmware."
             },
             "launch": {
                 "short": "Rechazado por la consola",
@@ -721,8 +722,49 @@
                 "short": "Nombre e icono ilegibles",
                 "cause": "El juego está instalado, pero su nombre y su icono no se pueden leer: el menú HOME muestra un icono que no termina de cargar.",
                 "fix": "Reinicia la consola. Si el icono sigue cargando, comprueba los datos en Configuración de la consola › Gestión de datos, o elimina el juego y vuelve a instalarlo."
+            },
+            "needs_verify": {
+                "short": "Datos dañados",
+                "cause": "La consola ha encontrado datos dañados en este juego y pide comprobarlos.",
+                "fix": "Comprueba si los datos están dañados (Acciones). Si lo están, elimina el juego y vuelve a instalarlo."
+            },
+            "key_too_new": {
+                "short": "Claves demasiado nuevas",
+                "cause": "El juego está cifrado con claves que este firmware ({}) no tiene (generación de claves {})."
+            },
+            "ticket": {
+                "short": "Falta la licencia",
+                "cause": "El juego necesita una licencia (ticket) que no está en la consola: se borró, o la instalación no la incluía.",
+                "fix": "Vuelve a instalar el juego desde una copia completa que incluya su ticket."
+            },
+            "launch_version": {
+                "short": "Pide una actualización retirada",
+                "cause": "La consola pide la versión {} del juego, la de una actualización instalada antes, pero está instalada la versión {}: la actualización se retiró o no se instaló por completo.",
+                "fix": "Acepta de nuevo la versión instalada (Acciones) o vuelve a instalar la actualización."
             }
-        }
+        },
+        "actions": "Acciones",
+        "action": {
+            "remove": "Eliminar el juego de la consola",
+            "remove_update": "Eliminar la actualización (v{})",
+            "remove_addon": "Eliminar el contenido descargable {}",
+            "reset_launch": "Aceptar de nuevo la versión instalada (v{})",
+            "verify": "Comprobar si los datos están dañados"
+        },
+        "remove_update_body": "Solo se borra la actualización: el juego, sus contenidos descargables y sus datos guardados se conservan, y la consola inicia el juego sin la actualización.",
+        "remove_addon_body": "Solo se borra este contenido descargable: el juego, su actualización y sus datos guardados se conservan.",
+        "reset_launch_body": "La consola pide la versión {} de este juego, pero está instalada la versión {}. Volverá a iniciar la versión instalada. No se borra nada.",
+        "reset_launch_confirm": "Aceptar",
+        "update_removed": "{}: actualización eliminada",
+        "addon_removed": "{}: contenido descargable eliminado",
+        "launch_reset": "{}: se vuelve a aceptar la versión instalada",
+        "content_err": "No se pudo eliminar",
+        "launch_err": "No se pudo cambiar la versión de inicio",
+        "verifying": "Comprobando {}… {} %",
+        "verify_ok": "{}: no se han encontrado datos dañados.",
+        "verify_bad": "{}: se han encontrado datos dañados. Elimina el juego y vuelve a instalarlo.",
+        "verify_err": "No se pudieron comprobar los datos",
+        "verify_busy": "Ya hay una comprobación en curso."
     },
     "about": {
         "section_changelog": "Novedades de la {}",
@@ -906,7 +948,10 @@
             "rescue": "Recuperación usada",
             "console_lock": "Bloqueo de la consola",
             "bedtime": "Alarma de hora de dormir",
-            "remove_game": "Juego eliminado"
+            "remove_game": "Juego eliminado",
+            "remove_update": "Actualización eliminada",
+            "remove_addon": "Contenido descargable eliminado",
+            "launch_version": "Versión de inicio restablecida"
         },
         "sources": {
             "uniform": "Mismo límite todos los días",

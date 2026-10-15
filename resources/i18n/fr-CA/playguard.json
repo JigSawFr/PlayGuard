@@ -710,7 +710,8 @@
             "firmware": {
                 "short": "Firmware {} requis",
                 "cause": "Le jeu ou sa mise à jour demande la version système {} ; cette console est en {}.",
-                "fix": "Mettez d'abord à jour Atmosphère, vers une version qui prend en charge le nouveau firmware, puis le firmware : dans l'autre ordre, la console ne démarre plus. Ou installez une version plus ancienne de la mise à jour."
+                "fix": "Mettez d'abord à jour Atmosphère, vers une version qui prend en charge le nouveau firmware, puis le firmware : dans l'autre ordre, la console ne démarre plus. Ou installez une version plus ancienne de la mise à jour.",
+                "fix_update": "Seule sa mise à jour en a besoin : supprimez la mise à jour pour jouer au jeu sans elle (Actions), ou mettez d'abord à jour Atmosphère, puis le firmware."
             },
             "launch": {
                 "short": "Refusé par la console",
@@ -721,8 +722,49 @@
                 "short": "Nom et icône illisibles",
                 "cause": "Le jeu est installé, mais son nom et son icône ne peuvent pas être lus : le menu HOME affiche une icône qui charge sans fin.",
                 "fix": "Redémarrez la console. Si l'icône charge toujours, vérifiez les données dans Paramètres de la console › Gestion des données, ou supprimez le jeu et réinstallez-le."
+            },
+            "needs_verify": {
+                "short": "Données corrompues",
+                "cause": "La console a trouvé des données corrompues dans ce jeu et demande à les vérifier.",
+                "fix": "Vérifiez si les données sont corrompues (Actions). Si c'est le cas, supprimez le jeu et réinstallez-le."
+            },
+            "key_too_new": {
+                "short": "Clés trop récentes",
+                "cause": "Le jeu est chiffré avec des clés que ce firmware ({}) n'a pas (génération de clé {})."
+            },
+            "ticket": {
+                "short": "Licence manquante",
+                "cause": "Le jeu a besoin d'une licence (ticket) absente de la console : elle a été supprimée, ou l'installation ne la contenait pas.",
+                "fix": "Réinstallez le jeu à partir d'une copie complète qui contient son ticket."
+            },
+            "launch_version": {
+                "short": "Demande une mise à jour retirée",
+                "cause": "La console demande la version {} du jeu, celle d'une mise à jour installée auparavant, mais c'est la version {} qui est installée : la mise à jour a été retirée ou ne s'est pas installée entièrement.",
+                "fix": "Acceptez à nouveau la version installée (Actions), ou réinstallez la mise à jour."
             }
-        }
+        },
+        "actions": "Actions",
+        "action": {
+            "remove": "Supprimer le jeu de la console",
+            "remove_update": "Supprimer la mise à jour (v{})",
+            "remove_addon": "Supprimer le contenu additionnel {}",
+            "reset_launch": "Accepter à nouveau la version installée (v{})",
+            "verify": "Vérifier si les données sont corrompues"
+        },
+        "remove_update_body": "Seule la mise à jour est effacée : le jeu, ses contenus additionnels et ses sauvegardes restent, et la console lance le jeu sans la mise à jour.",
+        "remove_addon_body": "Seul ce contenu additionnel est effacé : le jeu, sa mise à jour et ses sauvegardes restent.",
+        "reset_launch_body": "La console demande la version {} de ce jeu, mais c'est la version {} qui est installée. Elle lancera de nouveau la version installée. Rien n'est effacé.",
+        "reset_launch_confirm": "Accepter",
+        "update_removed": "{} : mise à jour supprimée",
+        "addon_removed": "{} : contenu additionnel supprimé",
+        "launch_reset": "{} : la version installée est de nouveau acceptée",
+        "content_err": "Impossible de le supprimer",
+        "launch_err": "Impossible de changer la version de lancement",
+        "verifying": "Vérification de {}… {} %",
+        "verify_ok": "{} : aucune donnée corrompue.",
+        "verify_bad": "{} : données corrompues. Supprimez le jeu et réinstallez-le.",
+        "verify_err": "Impossible de vérifier les données",
+        "verify_busy": "Une vérification est déjà en cours."
     },
     "about": {
         "section_changelog": "Nouveautés de la {}",
@@ -906,7 +948,10 @@
             "rescue": "Récupération utilisée",
             "console_lock": "Verrou de console",
             "bedtime": "Alarme du coucher",
-            "remove_game": "Jeu supprimé"
+            "remove_game": "Jeu supprimé",
+            "remove_update": "Mise à jour supprimée",
+            "remove_addon": "Contenu additionnel supprimé",
+            "launch_version": "Version de lancement rétablie"
         },
         "sources": {
             "uniform": "Même limite tous les jours",

@@ -710,7 +710,8 @@
             "firmware": {
                 "short": "Needs firmware {}",
                 "cause": "The game or its update needs system version {}; this console runs {}.",
-                "fix": "Update Atmosphère first, to a version that supports the new firmware, then the firmware: in the other order the console no longer starts. Or install an older version of the update."
+                "fix": "Update Atmosphère first, to a version that supports the new firmware, then the firmware: in the other order the console no longer starts. Or install an older version of the update.",
+                "fix_update": "Only its update needs it: remove the update to play the game without it (Actions), or update Atmosphère first, then the firmware."
             },
             "launch": {
                 "short": "Refused by the console",
@@ -721,8 +722,49 @@
                 "short": "Name and icon unreadable",
                 "cause": "The game is installed, but its name and icon cannot be read: the HOME menu shows an icon that keeps loading.",
                 "fix": "Restart the console. If the icon still loads, check the data in System Settings › Data Management, or remove the game and install it again."
+            },
+            "needs_verify": {
+                "short": "Corrupt data",
+                "cause": "The console found corrupt data in this game and asks for it to be checked.",
+                "fix": "Check the data for corruption (Actions). If it is corrupt, remove the game and install it again."
+            },
+            "key_too_new": {
+                "short": "Keys too new",
+                "cause": "The game is encrypted with keys this firmware ({}) does not have (key generation {})."
+            },
+            "ticket": {
+                "short": "License missing",
+                "cause": "The game needs a license (ticket) that is not on the console: it was deleted, or the installation did not include it.",
+                "fix": "Install the game again from a complete copy that includes its ticket."
+            },
+            "launch_version": {
+                "short": "Asks for a removed update",
+                "cause": "The console asks for version {} of the game, the version of an update installed earlier, but version {} is installed: the update was removed or did not install completely.",
+                "fix": "Accept the installed version again (Actions), or install the update again."
             }
-        }
+        },
+        "actions": "Actions",
+        "action": {
+            "remove": "Remove the game from the console",
+            "remove_update": "Remove the update (v{})",
+            "remove_addon": "Remove the add-on {}",
+            "reset_launch": "Accept the installed version again (v{})",
+            "verify": "Check the data for corruption"
+        },
+        "remove_update_body": "Only the update is deleted: the game, its add-ons and its save data stay, and the console starts the game without the update.",
+        "remove_addon_body": "Only this add-on is deleted: the game, its update and its save data stay.",
+        "reset_launch_body": "The console asks for version {} of this game, but version {} is installed. It will start the installed version again. Nothing is deleted.",
+        "reset_launch_confirm": "Accept it",
+        "update_removed": "{}: update removed",
+        "addon_removed": "{}: add-on removed",
+        "launch_reset": "{}: the installed version is accepted again",
+        "content_err": "Could not remove it",
+        "launch_err": "Could not change the launch version",
+        "verifying": "Checking {}… {} %",
+        "verify_ok": "{}: no corrupt data found.",
+        "verify_bad": "{}: corrupt data found. Remove the game and install it again.",
+        "verify_err": "Could not check the data",
+        "verify_busy": "A check is already running."
     },
     "about": {
         "section_changelog": "What's new in {}",
@@ -906,7 +948,10 @@
             "rescue": "Recovery used",
             "console_lock": "Console lock",
             "bedtime": "Bedtime alarm",
-            "remove_game": "Game removed"
+            "remove_game": "Game removed",
+            "remove_update": "Update removed",
+            "remove_addon": "Add-on removed",
+            "launch_version": "Launch version reset"
         },
         "sources": {
             "uniform": "Same limit every day",

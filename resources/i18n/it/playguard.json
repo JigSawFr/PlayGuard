@@ -710,7 +710,8 @@
             "firmware": {
                 "short": "Richiede il firmware {}",
                 "cause": "Il gioco o il suo aggiornamento richiede la versione di sistema {}; questa console ha la {}.",
-                "fix": "Aggiorna prima Atmosphère a una versione che supporta il nuovo firmware, poi il firmware: nell'ordine inverso la console non si avvia più. Oppure installa una versione precedente dell'aggiornamento."
+                "fix": "Aggiorna prima Atmosphère a una versione che supporta il nuovo firmware, poi il firmware: nell'ordine inverso la console non si avvia più. Oppure installa una versione precedente dell'aggiornamento.",
+                "fix_update": "Ne ha bisogno solo il suo aggiornamento: rimuovi l'aggiornamento per giocare senza (Azioni), oppure aggiorna prima Atmosphère e poi il firmware."
             },
             "launch": {
                 "short": "Rifiutato dalla console",
@@ -721,8 +722,49 @@
                 "short": "Nome e icona illeggibili",
                 "cause": "Il gioco è installato, ma il suo nome e la sua icona non si possono leggere: il menu HOME mostra un'icona che continua a caricare.",
                 "fix": "Riavvia la console. Se l'icona continua a caricare, controlla i dati in Impostazioni di sistema › Gestione dati, oppure rimuovi il gioco e reinstallalo."
+            },
+            "needs_verify": {
+                "short": "Dati danneggiati",
+                "cause": "La console ha trovato dati danneggiati in questo gioco e chiede di controllarli.",
+                "fix": "Controlla se i dati sono danneggiati (Azioni). Se lo sono, rimuovi il gioco e reinstallalo."
+            },
+            "key_too_new": {
+                "short": "Chiavi troppo recenti",
+                "cause": "Il gioco è cifrato con chiavi che questo firmware ({}) non ha (generazione di chiavi {})."
+            },
+            "ticket": {
+                "short": "Licenza mancante",
+                "cause": "Il gioco richiede una licenza (ticket) che non è sulla console: è stata cancellata, o l'installazione non la includeva.",
+                "fix": "Reinstalla il gioco da una copia completa che includa il suo ticket."
+            },
+            "launch_version": {
+                "short": "Chiede un aggiornamento rimosso",
+                "cause": "La console chiede la versione {} del gioco, quella di un aggiornamento installato in precedenza, ma è installata la versione {}: l'aggiornamento è stato rimosso o non si è installato completamente.",
+                "fix": "Accetta di nuovo la versione installata (Azioni), oppure reinstalla l'aggiornamento."
             }
-        }
+        },
+        "actions": "Azioni",
+        "action": {
+            "remove": "Rimuovi il gioco dalla console",
+            "remove_update": "Rimuovi l'aggiornamento (v{})",
+            "remove_addon": "Rimuovi il contenuto aggiuntivo {}",
+            "reset_launch": "Accetta di nuovo la versione installata (v{})",
+            "verify": "Controlla se i dati sono danneggiati"
+        },
+        "remove_update_body": "Viene cancellato solo l'aggiornamento: il gioco, i suoi contenuti aggiuntivi e i dati di salvataggio restano, e la console avvia il gioco senza l'aggiornamento.",
+        "remove_addon_body": "Viene cancellato solo questo contenuto aggiuntivo: il gioco, il suo aggiornamento e i dati di salvataggio restano.",
+        "reset_launch_body": "La console chiede la versione {} di questo gioco, ma è installata la versione {}. Avvierà di nuovo la versione installata. Non viene cancellato nulla.",
+        "reset_launch_confirm": "Accetta",
+        "update_removed": "{}: aggiornamento rimosso",
+        "addon_removed": "{}: contenuto aggiuntivo rimosso",
+        "launch_reset": "{}: la versione installata è di nuovo accettata",
+        "content_err": "Impossibile rimuoverlo",
+        "launch_err": "Impossibile cambiare la versione di avvio",
+        "verifying": "Controllo di {}… {} %",
+        "verify_ok": "{}: nessun dato danneggiato.",
+        "verify_bad": "{}: dati danneggiati. Rimuovi il gioco e reinstallalo.",
+        "verify_err": "Impossibile controllare i dati",
+        "verify_busy": "Un controllo è già in corso."
     },
     "about": {
         "section_changelog": "Novità della {}",
@@ -906,7 +948,10 @@
             "rescue": "Recupero usato",
             "console_lock": "Blocco della console",
             "bedtime": "Sogni d'oro",
-            "remove_game": "Gioco rimosso"
+            "remove_game": "Gioco rimosso",
+            "remove_update": "Aggiornamento rimosso",
+            "remove_addon": "Contenuto aggiuntivo rimosso",
+            "launch_version": "Versione di avvio ripristinata"
         },
         "sources": {
             "uniform": "Stesso limite ogni giorno",
