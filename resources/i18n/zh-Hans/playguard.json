@@ -1139,6 +1139,15 @@
         "upload_show": "显示链接",
         "crash": "PlayGuard 上次意外关闭",
         "sd_write": "PlayGuard 无法写入 SD 卡",
-        "sd_write_detail": "{} 未能保存。请检查 SD 卡：已满、只读（锁定开关）或有错误。"
+        "sd_write_detail": "{} 未能保存。请检查 SD 卡：已满、只读（锁定开关）或有错误。",
+        "rescue_old": "恢复 sysmodule 不是最新版本",
+        "rescue_old_detail": "它来自 PlayGuard {}。请将 PlayGuard {} 的 playguard-rescue.zip 解压到 SD 卡根目录，然后重启主机。",
+        "rescue_unknown": "它安装于记录版本号之前。请将 PlayGuard {} 的 playguard-rescue.zip 解压到 SD 卡根目录，然后重启主机。",
+        "sys_atmosphere": "Atmosphère {} 已发布",
+        "sys_atmosphere_detail": "这台主机运行的是 Atmosphère {}。",
+        "sys_hekate": "hekate {} 已发布",
+        "sys_hekate_detail": "SD 卡上的 hekate 是 {}。",
+        "sys_firmware": "固件 {} 已发布",
+        "sys_firmware_detail": "这台主机是 {}。请等 Atmosphère（以及你使用的 hekate）支持该固件后再更新，否则 Atmosphère 将无法启动。"
     }
 }

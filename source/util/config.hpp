@@ -33,6 +33,11 @@ struct Config
     std::string update_latest;
     std::string update_snooze_version;
     std::string update_snooze_until;
+    // What the console runs on (action/sys_update_flow): the latest Atmosphère,
+    // hekate and firmware the last check found (util/sys_updates.hpp's text),
+    // and the day of that check ("YYYY-MM-DD").
+    std::string sys_latest;
+    std::string sys_checked;
     std::string start_tab = "dashboard";   // tab shown at start-up (main.xml order: START_TABS)
     std::vector<int> extra_amounts = { 15, 30, 60 };   // "Extra time today" choices, minutes
     int  activity_period = 1;          // Activity's period: 0 today, 1 last 7 days, 2 all time

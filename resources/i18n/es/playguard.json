@@ -1139,6 +1139,15 @@
         "upload_show": "Mostrar el enlace",
         "crash": "PlayGuard se cerró de forma inesperada la última vez",
         "sd_write": "PlayGuard no pudo escribir en la tarjeta SD",
-        "sd_write_detail": "{} no se guardó. Revisa la tarjeta SD: llena, de solo lectura (el seguro) o con errores."
+        "sd_write_detail": "{} no se guardó. Revisa la tarjeta SD: llena, de solo lectura (el seguro) o con errores.",
+        "rescue_old": "El sysmodule de recuperación no está actualizado",
+        "rescue_old_detail": "Viene de PlayGuard {}. Extrae playguard-rescue.zip de PlayGuard {} en la raíz de la tarjeta SD y reinicia la consola.",
+        "rescue_unknown": "Se instaló antes de que indicara su versión. Extrae playguard-rescue.zip de PlayGuard {} en la raíz de la tarjeta SD y reinicia la consola.",
+        "sys_atmosphere": "Atmosphère {} está disponible",
+        "sys_atmosphere_detail": "Esta consola usa Atmosphère {}.",
+        "sys_hekate": "hekate {} está disponible",
+        "sys_hekate_detail": "La tarjeta SD tiene hekate {}.",
+        "sys_firmware": "Ha salido el firmware {}",
+        "sys_firmware_detail": "Esta consola tiene {}. Actualízala solo cuando Atmosphère (y hekate, si lo usas) admitan ese firmware; si no, Atmosphère dejará de iniciarse."
     }
 }

@@ -133,6 +133,8 @@ void sanitize(Config& c)
     if (!keep_ok) c.logs_keep_mb = 0;
     if (!is_date(c.update_checked)) c.update_checked.clear();
     if (c.update_latest.size() > 32) c.update_latest.clear();
+    if (c.sys_latest.size() > 96) c.sys_latest.clear();
+    if (!is_date(c.sys_checked)) c.sys_checked.clear();
     if (c.update_snooze_version.size() > 32 || !is_date(c.update_snooze_until))
         c.update_snooze_version.clear(), c.update_snooze_until.clear();
     if (!is_date(c.support_reminded)) c.support_reminded.clear();
@@ -244,6 +246,8 @@ static void load_shared()
     read_bool(j, "update_daily", c.update_daily);
     read_string(j, "update_checked", c.update_checked);
     read_string(j, "update_latest", c.update_latest);
+    read_string(j, "sys_latest", c.sys_latest);
+    read_string(j, "sys_checked", c.sys_checked);
     read_string(j, "update_snooze_version", c.update_snooze_version);
     read_string(j, "update_snooze_until", c.update_snooze_until);
     read_string(j, "start_tab", c.start_tab);
@@ -338,6 +342,8 @@ bool snapshot(Snapshot& snap)
     j["update_daily"]    = s_config.update_daily;
     j["update_checked"]  = s_config.update_checked;
     j["update_latest"]   = s_config.update_latest;
+    j["sys_latest"]      = s_config.sys_latest;
+    j["sys_checked"]     = s_config.sys_checked;
     j["update_snooze_version"] = s_config.update_snooze_version;
     j["update_snooze_until"]   = s_config.update_snooze_until;
     j["start_tab"]       = s_config.start_tab;

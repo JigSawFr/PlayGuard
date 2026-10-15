@@ -1,0 +1,90 @@
+// Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
+#include "util/sys_updates.hpp"
+
+#include <cctype>
+#include <vector>
+
+namespace sys_updates
+{
+
+std::string version_of_tag(const std::string& tag)
+{
+    std::string t = tag;
+    if (!t.empty() && (t[0] == 'v' || t[0] == 'V')) t.erase(0, 1);
+    if (t.empty() || t.size() > 16) return "";
+    int numbers = 0;
+    bool digit = false;
+    for (char c : t) {
+        if (std::isdigit((unsigned char)c)) {
+            if (!digit) numbers++;
+            digit = true;
+        } else if (c == '.' && digit) {
+            digit = false;
+        } else {
+            return "";
+        }
+    }
+    return digit && (numbers == 2 || numbers == 3) ? t : "";
+}
+
+std::string tag_of_url(const std::string& url)
+{
+    const std::string mark = "/releases/tag/";
+    const size_t at = url.find(mark);
+    if (at == std::string::npos) return "";
+    std::string tag = url.substr(at + mark.size());
+    const size_t end = tag.find_first_of("/?#");
+    if (end != std::string::npos) tag.erase(end);
+    return tag;
+}
+
+std::string hekate_version(const std::string& bytes)
+{
+    const size_t limit = bytes.size() < 1024 ? bytes.size() : 1024;
+    for (size_t i = 0; i + 7 <= limit; i++) {
+        if (bytes.compare(i, 4, "ICTC") != 0) continue;
+        int v[3];
+        bool ok = true;
+        for (int k = 0; k < 3; k++) {
+            v[k] = (unsigned char)bytes[i + 4 + k] - '0';
+            ok = ok && v[k] >= 0 && v[k] <= 40;
+        }
+        if (ok) return std::to_string(v[0]) + "." + std::to_string(v[1]) + "." + std::to_string(v[2]);
+    }
+    return "";
+}
+
+std::string to_text(const Latest& latest)
+{
+    std::string out;
+    auto add = [&out](const char* key, const std::string& value) {
+        if (value.empty()) return;
+        out += (out.empty() ? "" : ";") + std::string(key) + "=" + value;
+    };
+    add("atmosphere", latest.atmosphere);
+    add("hekate", latest.hekate);
+    add("firmware", latest.firmware);
+    return out;
+}
+
+Latest from_text(const std::string& text)
+{
+    Latest out;
+    size_t start = 0;
+    while (start <= text.size()) {
+        size_t end = text.find(';', start);
+        if (end == std::string::npos) end = text.size();
+        const std::string part = text.substr(start, end - start);
+        const size_t eq = part.find('=');
+        if (eq != std::string::npos) {
+            const std::string key = part.substr(0, eq), value = version_of_tag(part.substr(eq + 1));
+            if (key == "atmosphere") out.atmosphere = value;
+            else if (key == "hekate") out.hekate = value;
+            else if (key == "firmware") out.firmware = value;
+        }
+        start = end + 1;
+    }
+    return out;
+}
+
+}   // namespace sys_updates

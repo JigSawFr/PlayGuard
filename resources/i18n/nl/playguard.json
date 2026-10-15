@@ -1139,6 +1139,15 @@
         "upload_show": "Link tonen",
         "crash": "PlayGuard is de vorige keer onverwacht gesloten",
         "sd_write": "PlayGuard kon niet naar de SD-kaart schrijven",
-        "sd_write_detail": "{} is niet opgeslagen. Controleer de SD-kaart: vol, alleen-lezen (het schuifje) of met fouten."
+        "sd_write_detail": "{} is niet opgeslagen. Controleer de SD-kaart: vol, alleen-lezen (het schuifje) of met fouten.",
+        "rescue_old": "De herstel-sysmodule is verouderd",
+        "rescue_old_detail": "Hij hoort bij PlayGuard {}. Pak playguard-rescue.zip van PlayGuard {} uit in de hoofdmap van de SD-kaart en start de console opnieuw.",
+        "rescue_unknown": "Hij is geïnstalleerd voordat hij zijn versie vermeldde. Pak playguard-rescue.zip van PlayGuard {} uit in de hoofdmap van de SD-kaart en start de console opnieuw.",
+        "sys_atmosphere": "Atmosphère {} is beschikbaar",
+        "sys_atmosphere_detail": "Deze console draait Atmosphère {}.",
+        "sys_hekate": "hekate {} is beschikbaar",
+        "sys_hekate_detail": "Op de SD-kaart staat hekate {}.",
+        "sys_firmware": "Firmware {} is uit",
+        "sys_firmware_detail": "Deze console draait {}. Werk haar pas bij als Atmosphère (en hekate, als je het gebruikt) die firmware ondersteunen, anders start Atmosphère niet meer."
     }
 }

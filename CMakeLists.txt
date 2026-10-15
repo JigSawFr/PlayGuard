@@ -165,8 +165,12 @@ if ("$ENV{PLAYGUARD_RELEASE}" STREQUAL "1")
     set(APP_RELEASE 1)
 endif ()
 message(STATUS "PlayGuard release build: ${APP_RELEASE}")
+# The recovery sysmodule this version ships with (tools/rescue_rev.cmake).
+include(${CMAKE_CURRENT_SOURCE_DIR}/tools/rescue_rev.cmake)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${RESCUE_REV_SOURCES})
+message(STATUS "PlayGuard recovery sysmodule revision: ${RESCUE_REV}")
 target_compile_definitions(${PROJECT_NAME} PRIVATE APP_VERSION="${APP_VERSION}" APP_COMMIT="${APP_COMMIT}"
-                           APP_RELEASE=${APP_RELEASE})
+                           APP_RELEASE=${APP_RELEASE} APP_RESCUE_REV="${RESCUE_REV}")
 target_link_libraries(${PROJECT_NAME} PRIVATE borealis ${APP_PLATFORM_LIB})
 # borealis' headers as system headers: their warnings are not PlayGuard's.
 get_target_property(BOREALIS_INCLUDES borealis INTERFACE_INCLUDE_DIRECTORIES)
