@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- One build of Install another build, before it is installed: what it is,
+     when it was built, its checks, its notes (a release's) or description (a
+     pull request's), and Install. Filled by dev_build_activity.cpp. -->
+
+<brls:AppletFrame
+    iconInterpolation="linear">
+
+    <ScrollView
+        title="@i18n/playguard/dev_build/open"
+        icon="@res/img/app_icon.jpg"
+        width="auto"
+        height="auto"
+        axis="column"
+        alignItems="stretch"
+        grow="1.0">
+
+        <brls:Box
+            width="auto"
+            height="auto"
+            axis="column"
+            alignItems="stretch"
+            paddingTop="@style/brls/sidebar/padding_top"
+            paddingRight="@style/brls/sidebar/padding_right"
+            paddingBottom="@style/brls/sidebar/padding_bottom"
+            paddingLeft="@style/brls/sidebar/padding_left">
+
+            <brls:Label id="dbd_headline" text="" fontSize="26" marginBottom="12"/>
+            <brls:Label id="dbd_facts" text="" fontSize="20" marginBottom="12"/>
+            <brls:Label id="dbd_warning" text="" fontSize="20" marginBottom="16" textColor="@theme/brand/note"/>
+            <brls:DetailCell id="dbd_install" title="@i18n/playguard/dev_build/install"/>
+            <brls:Header id="dbd_notes_header" marginTop="32" marginBottom="8"/>
+            <brls:Box id="dbd_notes" width="auto" height="auto" axis="column" alignItems="stretch"/>
+
+        </brls:Box>
+
+    </ScrollView>
+
+</brls:AppletFrame>

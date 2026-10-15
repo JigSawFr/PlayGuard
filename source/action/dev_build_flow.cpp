@@ -5,12 +5,14 @@
 #include <atomic>
 #include <borealis.hpp>
 #include <cstdio>
+#include <cstdlib>
 #include <ctime>
 #include <memory>
 #include <vector>
 
 #include "action/github_login_flow.hpp"
 #include "action/pin_lock.hpp"
+#include "activity/dev_build_activity.hpp"
 #include "activity/dev_builds_activity.hpp"
 #include "app.hpp"
 #include "core/platform.h"
@@ -71,24 +73,6 @@ std::string file_path(const std::string& sd)
 {
     const std::string root = paths::sd_root();
     return root == "/" ? sd : root + sd;
-}
-
-std::string label(const dev_builds::Build& b)
-{
-    std::string text;
-    switch (b.kind) {
-        case dev_builds::Kind::Release:
-            text = release_text(b);
-            break;
-        case dev_builds::Kind::Main:
-            text = brls::getStr("playguard/dev_build/main", b.commit, short_date(b.date));
-            break;
-        case dev_builds::Kind::PullRequest:
-            text = brls::getStr("playguard/dev_build/pr", b.pr, b.title, b.commit);
-            break;
-    }
-    if (installed(b)) text += " · " + "playguard/dev_build/installed"_i18n;
-    return text;
 }
 
 // The download's dialog: a bar, "3 of 7 MB" and Cancel (B too), updated
@@ -256,6 +240,54 @@ std::string short_date(const std::string& iso)
     return iso.substr(0, 10) + " " + iso.substr(11, 5);
 }
 
+int64_t now()
+{
+#ifndef __SWITCH__
+    // Desktop simulation: the console's frozen time, so ages stay the same in screenshots.
+    if (const char* frozen = std::getenv("PLAYGUARD_SIM_NOW"))
+        if (const long long v = std::atoll(frozen)) return v;
+#endif
+    return (int64_t)std::time(nullptr);
+}
+
+std::string age_text(const std::string& iso)
+{
+    int64_t then = 0;
+    if (!dev_builds::parse_iso(iso, &then)) return "";
+    const int64_t age = now() - then;
+    if (age < 3600) return "playguard/dev_build/age_now"_i18n;
+    if (age < 2 * 86400) return brls::getStr("playguard/dev_build/age_hours", (int)(age / 3600));
+    return brls::getStr("playguard/dev_build/age_days", (int)(age / 86400));
+}
+
+std::string label(const dev_builds::Build& b)
+{
+    std::string text;
+    switch (b.kind) {
+        case dev_builds::Kind::Release:
+            text = release_text(b);
+            break;
+        case dev_builds::Kind::Main:
+            text = brls::getStr("playguard/dev_build/main", b.commit, short_date(b.date));
+            break;
+        case dev_builds::Kind::PullRequest:
+            text = brls::getStr("playguard/dev_build/pr", b.pr, b.title, b.commit);
+            break;
+        case dev_builds::Kind::Commit:
+            text = brls::getStr("playguard/dev_build/commit", b.commit, b.branch, short_date(b.date));
+            break;
+    }
+    if (installed(b)) text += " · " + "playguard/dev_build/installed"_i18n;
+    return text;
+}
+
+const dev_builds::Build* running_build(const std::vector<dev_builds::Build>& all)
+{
+    for (const dev_builds::Build& b : all)
+        if (b.kind != dev_builds::Kind::Release && installed(b)) return &b;
+    return nullptr;
+}
+
 bool installed(const dev_builds::Build& b)
 {
     // A release is told by its version (a release build has no commit).
@@ -276,13 +308,9 @@ std::string checked_text(const dev_builds::Cache& cache)
     return brls::getStr("playguard/dev_build/checked", (int)(age > 0 ? age / 60 : 0));
 }
 
-void choose(const dev_builds::Build& b)
+void choose(const dev_builds::Build& b, bool newer)
 {
-    std::string running = app::version();
-    if (!app::commit().empty()) running += " (" + app::commit() + ")";
-    std::string body = brls::getStr("playguard/dev_build/confirm", running, label(b));
-    if (b.sha256.empty()) body += "\n\n" + "playguard/dev_build/no_digest"_i18n;
-    ui::confirm(body, "playguard/dev_build/install"_i18n, [b]() { install_now(b); });
+    DevBuildActivity::show(b, newer);
 }
 
 void install_now(const dev_builds::Build& b)
@@ -301,6 +329,37 @@ void sign_in()
     github_login_flow::sign_in([]() { open(); });
 }
 
+void find()
+{
+    if (s_busy) {
+        ui::notify("playguard/dev_build/busy"_i18n);
+        return;
+    }
+    ui::prompt_text("playguard/dev_build/find_header"_i18n, "", 40, [](std::string text) {
+        dev_builds::Query q;
+        if (!dev_builds::parse_query(text, &q)) {
+            ui::info(brls::getStr("playguard/dev_build/find_invalid", text));
+            return;
+        }
+        if (s_busy) return;
+        s_busy = true;
+        const std::string what = q.pr ? "#" + std::to_string(q.pr) : q.commit.substr(0, 7);
+        // A few requests, a few seconds: the bar fills at a steady pace meanwhile.
+        DevBuildsActivity::loading(brls::getStr("playguard/dev_build/finding", what), 0.0f, true);
+        ui::in_background("dev build find", [q]() {
+            dev_builds::Build b;
+            std::string err;
+            const bool ok = dev_builds::find(q, &b, &err);
+            brls::sync([ok, b, err]() {
+                s_busy = false;
+                DevBuildsActivity::loaded();
+                if (ok) choose(b);
+                else ui::info(brls::getStr("playguard/dev_build/find_failed", err));
+            });
+        });
+    });
+}
+
 void open(bool force)
 {
     if (s_busy) {
@@ -317,15 +376,31 @@ void open(bool force)
         return;
     }
     s_busy = true;
-    ui::notify("playguard/dev_build/loading"_i18n);
+    brls::Logger::info("dev builds: fetching the list");
+    // The screen opens at once, the list kept (if any) under a bar that shows
+    // how far the fetch is: a toast alone looked like nothing was happening.
+    // Nothing kept yet: an empty list, Sign in already there when signed out.
+    dev_builds::Cache shown = s_cache;
+    if (shown.builds.empty()) shown.needs_login = needs_login;
+    DevBuildsActivity::show(shown);
+    DevBuildsActivity::loading("playguard/dev_build/step_releases"_i18n, 0.0f);
     // Not behind the play log or the game icons (ui::in_background).
     ui::in_background("dev build list", []() {
         dev_builds::Cache fresh;
         std::string err;
-        const bool ok = dev_builds::fetch(&fresh.builds, &fresh.needs_login, &err);
+        const bool ok = dev_builds::fetch(&fresh.builds, &fresh.needs_login, &err, [](float done, dev_builds::Step step) {
+            brls::sync([done, step]() {
+                const char* key = step == dev_builds::Step::Releases    ? "playguard/dev_build/step_releases"
+                                  : step == dev_builds::Step::Artifacts ? "playguard/dev_build/step_artifacts"
+                                  : step == dev_builds::Step::Pulls     ? "playguard/dev_build/step_pulls"
+                                                                        : "playguard/dev_build/step_runs";
+                DevBuildsActivity::loading(brls::getStr(key), done);
+            });
+        });
         fresh.fetched_at = (int64_t)std::time(nullptr);
         brls::sync([ok, fresh, err]() {
             s_busy = false;
+            DevBuildsActivity::loaded();
             if (ok) {
                 keep(fresh);
                 DevBuildsActivity::show(fresh);
@@ -335,7 +410,7 @@ void open(bool force)
             } else if (fresh.needs_login) {
                 DevBuildsActivity::show(fresh);   // signing in may still list them
             } else {
-                ui::info(brls::getStr("playguard/dev_build/list_failed", err));
+                DevBuildsActivity::failed(brls::getStr("playguard/dev_build/list_failed", err));
             }
         });
     });

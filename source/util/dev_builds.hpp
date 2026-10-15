@@ -37,6 +37,16 @@ enum class Kind
     Release,       // a release (its playguard.nro)
     Main,          // a commit of main
     PullRequest,   // the newest build of an open pull request
+    Commit,        // a commit found by Find a build (any branch of this repository)
+};
+
+// How the build workflow's run that made an artifact ended.
+enum class Ci
+{
+    Unknown,   // not listed (an older run), or not an artifact
+    Running,   // the artifact is there, the run is still going (tests…)
+    Passed,
+    Failed,    // failed or cancelled
 };
 
 struct Build
@@ -47,18 +57,24 @@ struct Build
     bool        prerelease = false;   // Release: marked a pre-release on GitHub
     int         pr = 0;    // PullRequest: its number
     std::string title;     // PullRequest: its title
-    std::string commit;    // Main / PullRequest: 7 hex digits
+    std::string branch;    // Commit: its branch
+    std::string commit;    // Main / PullRequest / Commit: 7 hex digits
     std::string date;      // "2026-10-09T12:03:00Z", when it was built
     std::string url;       // the download (an artifact's archive_download_url needs the token)
     uint64_t    size = 0;
     std::string sha256;    // 64 hex digits; empty when GitHub gave no digest
-    std::string notes;     // Release: its notes (the release's Markdown body); not kept in the cache
+    std::string notes;     // Release: its notes; PullRequest: its description (Markdown, at most MAX_NOTES bytes)
+    std::string expires;   // artifact: when GitHub deletes it ("2027-01-07T12:03:00Z")
+    int64_t     run = 0;   // artifact: the workflow run that made it
+    Ci          ci = Ci::Unknown;   // artifact: how that run ended
 };
 
 // One run's artifact, as GET /repos/…/actions/artifacts lists it.
 struct Artifact
 {
     std::string sha256, url, date, branch, commit;   // commit: the run's head, 7 hex digits
+    std::string expires;
+    int64_t     run = 0;   // the workflow run's id
     uint64_t    size = 0;
     int64_t     repo = 0, head_repo = 0;   // the run's repository and the head's (a fork's for its PRs)
 };
@@ -67,8 +83,19 @@ struct Artifact
 struct Pull
 {
     int         number = 0;
-    std::string title, branch;
-    int64_t     head_repo = 0;
+    std::string title, branch, body;   // body: at most MAX_NOTES bytes, cut on a line
+    std::string head_sha;              // full
+    int64_t     head_repo = 0, repo = 0;   // the head's repository (a fork's) and this one
+};
+
+// One run of the build workflow (GET /repos/…/actions/workflows/build.yml/runs).
+struct Run
+{
+    int64_t     id = 0;
+    std::string sha;   // full
+    Ci          ci = Ci::Unknown;
+    int64_t     repo = 0, head_repo = 0;
+    std::string branch;
 };
 
 // The latest release (GET /repos/…/releases/latest): its playguard.nro and
@@ -78,8 +105,7 @@ constexpr size_t MAX_NOTES = 16 * 1024;
 bool parse_release(const std::string& json, Build* out);
 // The releases (GET /repos/…/releases), newest first as listed: each one with
 // a playguard.nro, pre-releases included (Build::prerelease), drafts left
-// out, at most `keep`, one per version, without their notes. False when the
-// answer is not a list.
+// out, at most `keep`, one per version. False when the answer is not a list.
 constexpr size_t MAX_RELEASES = 20;
 bool parse_releases(const std::string& json, std::vector<Build>* out, size_t keep = MAX_RELEASES);
 // The artifact holding playguard.nro: "playguard-<version>-<ref>-<commit>-nro",
@@ -90,6 +116,41 @@ bool is_build_artifact(const std::string& name);
 // any name: a short page is the last one.
 bool parse_artifacts(const std::string& json, std::vector<Artifact>* out, size_t* listed = nullptr);
 bool parse_pulls(const std::string& json, std::vector<Pull>* out);
+// One pull request (GET /repos/…/pulls/<n>).
+bool parse_pull(const std::string& json, Pull* out);
+// The build workflow's runs ({"workflow_runs": […]}): "completed" with
+// "success" passes, any other conclusion fails; not completed, Running.
+bool parse_runs(const std::string& json, std::vector<Run>* out);
+// Sets the CI state of each artifact build from its run in `runs`.
+void apply_runs(std::vector<Build>* builds, const std::vector<Run>& runs);
+// A commit (GET /repos/…/commits/<ref>): its full hash.
+bool parse_commit(const std::string& json, std::string* sha);
+
+// What Find a build was given: "38" or "#38" (a pull request), or 7 to 40
+// hex digits (a commit). Spaces around are ignored.
+struct Query
+{
+    int         pr = 0;
+    std::string commit;   // lower case
+};
+bool parse_query(const std::string& text, Query* out);
+
+// The newest build artifact of `artifacts` (a run's), as a build of `kind`;
+// false when none is left (expired, another artifact).
+bool newest_build(const std::vector<Artifact>& artifacts, Kind kind, Build* out);
+
+// Whether `b` came after the running build: a release with a higher version
+// (`running_version`), an artifact built after the running one (`running`,
+// the running commit's build in `all`, when it is listed there).
+bool newer(const Build& b, const std::string& running_version, const Build* running);
+
+// Seconds since 1970 of an ISO 8601 UTC time ("2026-10-09T12:03:00Z");
+// false when malformed.
+bool parse_iso(const std::string& iso, int64_t* seconds);
+
+// Days from `now_iso` to `iso` ("…T…Z" timestamps, whole days, rounded
+// down; negative when `iso` is before it). 0 when either is malformed.
+int days_between(const std::string& now_iso, const std::string& iso);
 
 // The builds: main's newest `keep_main` commits (pushed to this repository's
 // main), then for each open pull request from a branch of this repository
@@ -151,13 +212,30 @@ bool decode_cache(const std::string& json, Cache* out);
 // the clock was set back), in the same sign-in state.
 bool cache_fresh(const Cache& cache, int64_t now, bool needs_login);
 
+// What fetch() is doing: its share of the work done (0..1) and the step.
+enum class Step
+{
+    Releases,
+    Artifacts,
+    Pulls,
+    Runs,
+};
+using Progress = std::function<void(float done, Step step)>;
+
 // The builds that can be installed: the last releases, then (with a token)
-// main and the pull requests. Blocking (network): run it with brls::async.
+// main and the pull requests, with how their runs ended. Blocking (network):
+// run it with brls::async; `progress` (when set) is called from that thread.
 // *needs_login is set when there is no token, so only the releases are listed.
 // On the desktop build PLAYGUARD_SIM_DEV_BUILDS ("offline", or a folder
 // holding releases.json, artifacts.json and pulls.json; latest.json for
 // fetch_release) replaces the network.
-bool fetch(std::vector<Build>* out, bool* needs_login, std::string* error);
+bool fetch(std::vector<Build>* out, bool* needs_login, std::string* error, Progress progress = nullptr);
+
+// Find a build: the newest build of pull request `q.pr` (open or closed), or
+// of commit `q.commit`, from a branch of this repository (a fork's is
+// refused). Needs the token. Blocking (network); simulated like fetch() with
+// pull_<n>.json, commit.json, runs.json and run_artifacts.json.
+bool find(const Query& q, Build* out, std::string* error);
 
 // The latest release alone (no account needed): what Update in place
 // installs. Blocking (network); simulated like fetch().

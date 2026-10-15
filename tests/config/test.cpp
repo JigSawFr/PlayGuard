@@ -240,7 +240,7 @@ static void test_preferences()
     CHECK(d.activity_period == 1 && d.export_format == 0 && d.backup_keep == 0);
     CHECK(d.logs_keep == 20 && d.logs_keep_days == 0 && d.logs_keep_mb == 0);
     CHECK(!d.update_daily && d.update_checked.empty() && !d.clock_check_at_start && d.pin_lock == "changes");
-    CHECK(d.onboarding_at_start && d.intro && d.dev_builds_order == "newest");
+    CHECK(d.onboarding_at_start && d.intro && d.dev_builds_order == "newest" && d.dev_builds_prereleases);
     CHECK(d.support_reminder && d.support_reminded.empty() && d.seen_version.empty());
     write_config(R"({"support_reminder": false, "support_reminded": "2026-10-09", "seen_version": "1.1.0"})");
     config::load();
@@ -274,13 +274,14 @@ static void test_preferences()
                     "export_format": 3, "backup_keep": 10, "update_daily": true,
                     "update_checked": "2026-10-07", "clock_check_at_start": true, "intro": false,
                     "logs_keep": 0, "logs_keep_days": 30, "logs_keep_mb": 5, "dev_builds_order": "number",
+                    "dev_builds_prereleases": false,
                     "update_via": "inplace", "update_latest": "1.2.0", "update_snooze_version": "1.2.0",
                     "update_snooze_until": "2026-11-01"})");
     config::load();
     auto c = config::get();
     CHECK(c.update_via == "inplace" && c.update_latest == "1.2.0");
     CHECK(c.update_snooze_version == "1.2.0" && c.update_snooze_until == "2026-11-01");
-    CHECK(!c.intro && c.dev_builds_order == "number");
+    CHECK(!c.intro && c.dev_builds_order == "number" && !c.dev_builds_prereleases);
     CHECK(c.logs_keep == 0 && c.logs_keep_days == 30 && c.logs_keep_mb == 5);
     CHECK(c.start_tab == "activity" && c.extra_amounts == std::vector<int>({ 30, 60, 90 }));
     CHECK(c.activity_period == 2 && c.export_format == 3 && c.backup_keep == 10);
