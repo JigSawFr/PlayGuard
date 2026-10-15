@@ -138,3 +138,11 @@ bool gamecheck_is_corruption(Result rc)
     if (module == 2) return desc >= 4000 && desc <= 4999;  // fs: DataCorrupted
     return false;
 }
+
+GameCategory gamecheck_category(const GameFacts *g, GameIssue issue, u32 current_hos)
+{
+    const u32 fix = gamecheck_recommended(g, issue, current_hos);
+    if (fix & (GA_RESET_LAUNCH | GA_REMOVE_UPDATE | GA_VERIFY)) return GC_CAT_FIX;
+    if (issue == GC_STORAGE_UNAVAILABLE || issue == GC_KEY_TOO_NEW || issue == GC_FIRMWARE_TOO_OLD) return GC_CAT_SYSTEM;
+    return GC_CAT_REINSTALL;
+}

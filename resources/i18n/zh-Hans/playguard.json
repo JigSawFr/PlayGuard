@@ -886,7 +886,18 @@
         "size_mb": "{} MB",
         "size_gb": "{} GB",
         "decimal_mark": ".",
-        "verify_code": "主机代码：{}"
+        "verify_code": "主机代码：{}",
+        "tabs": {
+            "fix": "可在此修复 ({})",
+            "reinstall": "需重新安装 ({})",
+            "system": "固件或 SD 卡 ({})"
+        },
+        "tab_note": {
+            "fix": "PlayGuard 可以修复：在游戏上按 A，然后选第一个按钮。",
+            "reinstall": "文件缺失或无法使用：在此删除，然后用常用的安装工具重新安装。",
+            "system": "游戏本身没问题：问题在主机固件或 SD 卡。请更新固件，或从安装这些游戏时的存储启动。"
+        },
+        "next_tab": "下一个列表"
     },
     "about": {
         "section_changelog": "{} 更新内容",

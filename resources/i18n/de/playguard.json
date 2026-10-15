@@ -886,7 +886,18 @@
         "size_mb": "{} MB",
         "size_gb": "{} GB",
         "decimal_mark": ",",
-        "verify_code": "Code der Konsole: {}"
+        "verify_code": "Code der Konsole: {}",
+        "tabs": {
+            "fix": "Hier reparierbar ({})",
+            "reinstall": "Neu installieren ({})",
+            "system": "Firmware oder SD-Karte ({})"
+        },
+        "tab_note": {
+            "fix": "PlayGuard kann sie reparieren: A auf einem Spiel, dann die erste Schaltfläche.",
+            "reinstall": "Ihre Dateien fehlen oder sind unbrauchbar: hier entfernen und mit dem gewohnten Installer neu installieren.",
+            "system": "Die Spiele sind in Ordnung: Das Problem liegt an der Firmware der Konsole oder an der SD-Karte. Firmware aktualisieren oder vom Speicher starten, auf dem sie installiert wurden."
+        },
+        "next_tab": "Nächste Liste"
     },
     "about": {
         "section_changelog": "Neu in {}",

@@ -943,6 +943,13 @@ Result gamecheck_records(GameRecord *out, u32 max, u32 *count, bool *truncated)
     return 0;
 }
 
+static GameCheckTiming s_sim_timing;
+
+void gamecheck_last_timing(GameCheckTiming *out)
+{
+    *out = s_sim_timing;
+}
+
 // PLAYGUARD_SIM_CHECK_MS (default 150) per game, as a console takes.
 u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
                     bool (*on_game)(void *ctx, const GameFacts *game, u32 done), void *ctx)
@@ -952,6 +959,7 @@ u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
     const char *ms_env = getenv("PLAYGUARD_SIM_CHECK_MS");
     const long ms = ms_env ? strtol(ms_env, NULL, 10) : 150;
     memset(out, 0, (size_t)count * sizeof(*out));
+    memset(&s_sim_timing, 0, sizeof s_sim_timing);
     u32 done = 0;
     while (done < count) {
         GameFacts *g = &out[done];
@@ -965,6 +973,9 @@ u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
             nanosleep(&pause, NULL);
         }
         done++;
+        s_sim_timing.games = done;
+        s_sim_timing.total_ns += ms > 0 ? (u64)ms * 1000000ULL : 0;
+        s_sim_timing.state_ns = s_sim_timing.total_ns;
         if (on_game && !on_game(ctx, g, done)) break;
     }
     return done;
