@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- One build of Install another build, before it is installed: what it is,
-     when it was built, its checks, its notes (a release's) or description (a
-     pull request's), and Install. Filled by dev_build_activity.cpp. -->
+<!-- One build of Install another build, before it is installed: tags (its
+     kind, its checks, installed or new), its title, a card of facts (built,
+     size, commit, branch, checksum, when GitHub deletes it), what installing
+     does, Install and See on GitHub (a QR code), then its notes or
+     description. Filled by dev_build_activity.cpp. -->
 
 <brls:AppletFrame
     iconInterpolation="linear">
@@ -26,10 +28,16 @@
             paddingBottom="@style/brls/sidebar/padding_bottom"
             paddingLeft="@style/brls/sidebar/padding_left">
 
-            <brls:Label id="dbd_headline" text="" fontSize="26" marginBottom="12"/>
-            <brls:Label id="dbd_facts" text="" fontSize="20" marginBottom="12"/>
-            <brls:Label id="dbd_warning" text="" fontSize="20" marginBottom="16" textColor="@theme/brand/note"/>
-            <brls:DetailCell id="dbd_install" title="@i18n/playguard/dev_build/install"/>
+            <brls:Box id="dbd_tags" width="auto" height="auto" axis="row" marginBottom="10"/>
+            <brls:Label id="dbd_headline" text="" fontSize="26" marginBottom="16"/>
+            <brls:Box id="dbd_facts" width="auto" height="auto" axis="column" alignItems="stretch"
+                cornerRadius="10" paddingTop="10" paddingBottom="10" paddingLeft="18" paddingRight="18"
+                marginBottom="14"/>
+            <brls:Label id="dbd_warning" text="" fontSize="18" marginBottom="18" textColor="@theme/brand/note"/>
+            <brls:Box width="auto" height="auto" axis="row">
+                <brls:Button id="dbd_install" style="primary" text="@i18n/playguard/dev_build/install" grow="1.0" marginRight="12"/>
+                <brls:Button id="dbd_github" style="default" text="@i18n/playguard/dev_build/open_github"/>
+            </brls:Box>
             <brls:Header id="dbd_notes_header" marginTop="32" marginBottom="8"/>
             <brls:Box id="dbd_notes" width="auto" height="auto" axis="column" alignItems="stretch"/>
 

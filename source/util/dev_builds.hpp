@@ -65,6 +65,7 @@ struct Build
     std::string sha256;    // 64 hex digits; empty when GitHub gave no digest
     std::string notes;     // Release: its notes; PullRequest: its description (Markdown, at most MAX_NOTES bytes)
     std::string expires;   // artifact: when GitHub deletes it ("2027-01-07T12:03:00Z")
+    std::string page;      // Release / PullRequest: its page on GitHub ("https://github.com/…"; else empty)
     int64_t     run = 0;   // artifact: the workflow run that made it
     Ci          ci = Ci::Unknown;   // artifact: how that run ended
 };
@@ -84,6 +85,7 @@ struct Pull
 {
     int         number = 0;
     std::string title, branch, body;   // body: at most MAX_NOTES bytes, cut on a line
+    std::string page;                  // its page on GitHub
     std::string head_sha;              // full
     int64_t     head_repo = 0, repo = 0;   // the head's repository (a fork's) and this one
 };
@@ -98,9 +100,13 @@ struct Run
     std::string branch;
 };
 
+// Everything shown from GitHub's answers (titles, notes, branches) goes
+// through util/safe_text.hpp first, and a release's version must be one
+// (safe_text::is_version): nothing GitHub sends can hide or reorder text.
+
 // The latest release (GET /repos/…/releases/latest): its playguard.nro and
 // its notes (at most MAX_NOTES bytes, cut on a line). False for anything
-// else (a pre-release, no such asset, malformed).
+// else (a pre-release, no such asset, a tag that is not a version, malformed).
 constexpr size_t MAX_NOTES = 16 * 1024;
 bool parse_release(const std::string& json, Build* out);
 // The releases (GET /repos/…/releases), newest first as listed: each one with

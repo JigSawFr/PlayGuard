@@ -168,6 +168,7 @@ bool find(const Query& q, Build* out, std::string* error)
             b.pr = pull.number;
             b.title = pull.title;
             b.notes = pull.body;
+            b.page = pull.page;
         }
         *out = b;
         return true;

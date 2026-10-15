@@ -10,6 +10,7 @@
 
 #include <borealis/extern/nlohmann/json.hpp>
 
+#include "util/safe_text.hpp"
 #include "util/sha256.hpp"
 #include "util/update.hpp"
 
@@ -51,9 +52,31 @@ std::string short_commit(const std::string& sha)
 
 bool https(const std::string& url) { return url.compare(0, 8, "https://") == 0; }
 
-// At most MAX_NOTES bytes of `text`, cut after a whole line.
+// Shown text: clean (util/safe_text.hpp), on one line.
+constexpr size_t MAX_TITLE = 300;
+std::string line_text(const std::string& text, size_t max = MAX_TITLE)
+{
+    return safe_text::clean(text, max, false);
+}
+
+bool iso_seconds(const std::string& iso, int64_t* out);
+// A time as GitHub writes it ("2026-10-09T12:03:00Z"), or nothing.
+std::string iso_time(const std::string& text)
+{
+    int64_t unused;
+    return text.size() <= 32 && iso_seconds(text, &unused) ? line_text(text, 32) : "";
+}
+
+// A page on GitHub, or nothing.
+std::string page_url(const std::string& url)
+{
+    return url.compare(0, 19, "https://github.com/") == 0 && url.size() < 512 ? safe_text::clean(url, 512, false) : "";
+}
+
+// Notes: clean, at most MAX_NOTES bytes, cut after a whole line.
 std::string cut_notes(std::string text)
 {
+    text = safe_text::clean(text, text.size(), true);
     if (text.size() > MAX_NOTES) {
         const size_t cut = text.rfind('\n', MAX_NOTES);
         text.resize(cut == std::string::npos ? 0 : cut);
@@ -113,8 +136,10 @@ bool release_build(const json& r, bool prerelease_ok, Build* out)
         b.kind = Kind::Release;
         b.prerelease = prerelease;
         b.version = tag.size() > 1 && tag[0] == 'v' ? tag.substr(1) : tag;
+        if (!safe_text::is_version(b.version)) return false;
+        b.page = page_url(str(r, "html_url"));
         b.url = str(a, "browser_download_url");
-        b.date = str(a, "updated_at");
+        b.date = iso_time(str(a, "updated_at"));
         b.sha256 = digest_hex(str(a, "digest"));
         b.notes = cut_notes(str(r, "body"));
         const int64_t size = integer(a, "size");
@@ -166,11 +191,11 @@ bool parse_artifacts(const std::string& text, std::vector<Artifact>* out, size_t
             const auto& run = a["workflow_run"];
             Artifact x;
             x.url = str(a, "archive_download_url");
-            x.date = str(a, "created_at");
+            x.date = iso_time(str(a, "created_at"));
             x.sha256 = digest_hex(str(a, "digest"));
-            x.expires = str(a, "expires_at");
+            x.expires = iso_time(str(a, "expires_at"));
             x.run = integer(run, "id");
-            x.branch = str(run, "head_branch");
+            x.branch = line_text(str(run, "head_branch"));
             x.commit = short_commit(str(run, "head_sha"));
             x.repo = integer(run, "repository_id");
             x.head_repo = integer(run, "head_repository_id");
@@ -194,9 +219,10 @@ bool pull_of(const json& p, Pull* out)
     };
     Pull x;
     x.number = (int)integer(p, "number");
-    x.title = str(p, "title");
+    x.title = line_text(str(p, "title"));
     x.body = cut_notes(str(p, "body"));
-    x.branch = str(head, "ref");
+    x.page = page_url(str(p, "html_url"));
+    x.branch = line_text(str(head, "ref"));
     x.head_sha = str(head, "sha");
     // A fork that was deleted has no repository: its builds cannot be matched.
     x.head_repo = repo_id(head);
@@ -351,6 +377,7 @@ std::vector<Build> combine(const std::vector<Artifact>& artifacts, const std::ve
             b.pr = p.number;
             b.title = p.title;
             b.notes = p.body;
+            b.page = p.page;
             out.push_back(b);
             break;   // the newest only
         }
@@ -437,7 +464,8 @@ std::string encode_cache(const Cache& cache)
                          { "prerelease", b.prerelease },
                          { "pr", b.pr }, { "title", b.title }, { "commit", b.commit }, { "date", b.date },
                          { "url", b.url }, { "size", b.size }, { "sha256", b.sha256 }, { "notes", b.notes },
-                         { "branch", b.branch }, { "expires", b.expires }, { "run", b.run }, { "ci", ci_name(b.ci) } });
+                         { "branch", b.branch }, { "expires", b.expires }, { "run", b.run }, { "ci", ci_name(b.ci) },
+                         { "page", b.page } });
     const json j = { { "version", 1 }, { "fetched_at", cache.fetched_at }, { "needs_login", cache.needs_login },
                      { "builds", list } };
     return j.dump(1) + "\n";
@@ -460,24 +488,26 @@ bool decode_cache(const std::string& text, Cache* out)
             else if (kind == "commit") b.kind = Kind::Commit;
             else continue;
             b.artifact = x.value("artifact", false);
+            // An edited list is no more trusted than GitHub: the same cleaning.
             b.version = str(x, "version");
             b.prerelease = b.kind == Kind::Release && x.value("prerelease", false);
             b.pr = (int)integer(x, "pr");
-            b.title = str(x, "title");
+            b.title = line_text(str(x, "title"));
             b.commit = str(x, "commit");
-            b.date = str(x, "date");
+            b.date = iso_time(str(x, "date"));
             b.url = str(x, "url");
             b.sha256 = str(x, "sha256");
             b.notes = cut_notes(str(x, "notes"));
-            b.branch = str(x, "branch");
-            b.expires = str(x, "expires");
+            b.branch = line_text(str(x, "branch"));
+            b.page = page_url(str(x, "page"));
+            b.expires = iso_time(str(x, "expires"));
             b.run = integer(x, "run");
             b.ci = ci_named(str(x, "ci"));
             const int64_t size = integer(x, "size");
             const bool commit_ok = b.kind == Kind::Release ? b.commit.empty() : short_commit(b.commit) == b.commit;
             const bool sha_ok = b.sha256.empty() || (b.sha256.size() == 64 && is_hex(b.sha256) && lower(b.sha256) == b.sha256);
             if (!github_url(b.url) || size <= 0 || !commit_ok || !sha_ok) continue;
-            if (b.kind == Kind::Release ? b.version.empty() : !b.artifact) continue;
+            if (b.kind == Kind::Release ? !safe_text::is_version(b.version) : !b.artifact) continue;
             if (b.kind == Kind::PullRequest && b.pr <= 0) continue;
             b.size = (uint64_t)size;
             c.builds.push_back(b);

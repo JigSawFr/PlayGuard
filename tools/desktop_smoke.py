@@ -157,8 +157,14 @@ if DEVBUILD:
     pr_content = b"\0" * 16 + b"NRO0" + b"pull request build" * 100
     pr_zip = os.path.join(sim, "pr.zip")
     with zipfile.ZipFile(pr_zip, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr("playguard.nro", pr_content)
-        z.writestr("build-info.txt", "commit: ccccccc\n")
+        # Dated, so the zip and its SHA-256 (on the build's page) are the
+        # same in every run, as its reference screenshot needs.
+        def entry(name):
+            info = zipfile.ZipInfo(name, date_time=(2026, 10, 8, 9, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            return info
+        z.writestr(entry("playguard.nro"), pr_content)
+        z.writestr(entry("build-info.txt"), "commit: ccccccc\n")
     zip_bytes = open(pr_zip, "rb").read()
     def artifact(branch, sha, date, path, size, digest=None, head_repo=1, run=1):
         # Named as the build workflow names the artifact holding playguard.nro.
@@ -186,8 +192,19 @@ if DEVBUILD:
         artifact("feat/report", "c" * 40, "2026-10-08T09:00:00Z", pr_zip, len(zip_bytes),
                  hashlib.sha256(zip_bytes).hexdigest(), run=3),
     ]}, open(os.path.join(sim, "artifacts.json"), "w"))
-    json.dump([{"number": 38, "title": "feat: send a report online",
-                "body": "## What this changes\n\n* a report can be sent online, as a gist\n",
+    json.dump([{"number": 38, "title": "feat: send a report online\u202e\u0000",
+                # GitHub's Markdown, and text that must stay text: HTML, a
+                # right-to-left override in the title, control characters.
+                "body": "Stacked on #37: merge **that one** first.\n\n"
+                        "## What this changes, and why\n\n"
+                        "- a report can be sent online, as a [gist](https://gist.github.com)\n"
+                        "  - from *Tools \u203a Diagnostics*\n"
+                        "1. sign in\n2. send\n\n"
+                        "> [!WARNING]\n> Not run on a console.\n\n"
+                        "```sh\nmake check\n```\n\n"
+                        "| Check | Result |\n|---|---|\n| host tests | pass |\n| smoke | pass |\n\n"
+                        "## Checklist\n\n- [x] `make test` passes\n- [ ] tried on a console\n\n"
+                        "<img src=x onerror=alert(1)> <script>alert(1)</script>\u0007\u202e\n",
                 "head": {"ref": "feat/report", "sha": "c" * 40, "repo": {"id": 1}},
                 "base": {"ref": "main", "repo": {"id": 1}}}],
               open(os.path.join(sim, "pulls.json"), "w"))
@@ -637,6 +654,10 @@ if DEVBUILD:
     key("Down")                # back to the controller after the mouse (nothing below the pull request)
     key("Return")              # the pull request, still focused (the screen updated in place)
     shot("04_dev_build_details")   # its date, checks, size, description, and Install
+    key("Down", 3)             # below the buttons: the description, half a screen a press
+    shot("04b_dev_build_description")   # GitHub's Markdown: headings, lists, tasks, an alert, code, a table
+    key("Up", 3)               # back up to the buttons
+    key("Left")                # Install
     key("Return")              # Install (focused)
     time.sleep(0.7)
     shot("05_dev_build_downloading")   # the progress bar and Cancel (the simulated download takes 4 s)
