@@ -95,6 +95,8 @@ struct Run
 {
     int64_t     id = 0;
     std::string sha;   // full
+    std::string title;     // its commit's subject (display_title), clean
+    std::string message;   // its commit's whole message (head_commit.message), as notes
     Ci          ci = Ci::Unknown;
     int64_t     repo = 0, head_repo = 0;
     std::string branch;
@@ -127,8 +129,21 @@ bool parse_pull(const std::string& json, Pull* out);
 // The build workflow's runs ({"workflow_runs": […]}): "completed" with
 // "success" passes, any other conclusion fails; not completed, Running.
 bool parse_runs(const std::string& json, std::vector<Run>* out);
-// Sets the CI state of each artifact build from its run in `runs`.
+// Sets the CI state of each artifact build from its run in `runs`, and a
+// commit of main its title (the commit's subject) and notes (its message).
 void apply_runs(std::vector<Build>* builds, const std::vector<Run>& runs);
+
+// A commit's or a pull request's title in the Conventional Commits form
+// ("feat(ui)!: text (#143)"), split: type "feat", scope "ui", breaking, the
+// text "text" and the pull request it came from, 143. A title in no such
+// form is all text.
+struct Subject
+{
+    std::string type, scope, text;
+    bool        breaking = false;
+    int         pr = 0;
+};
+Subject parse_subject(const std::string& title);
 // A commit (GET /repos/…/commits/<ref>): its full hash.
 bool parse_commit(const std::string& json, std::string* sha);
 

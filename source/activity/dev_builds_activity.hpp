@@ -1,17 +1,19 @@
 // DevBuildsActivity — Developer tools › Install another build
-// (action/dev_build_flow.hpp): a tab each for the last releases, main's
-// last commits and the open pull requests (a long list of one kind never
-// hides the next), the builds of the chosen one below, each with how old it
-// is, whether its checks failed, the installed one marked and the count of
-// newer ones in its tab. Ⓛ / Ⓡ move from one tab to the next (their icons
-// on either side of the tabs, not in the footer: no room there on the console); the tab opened
-// first is the installed build's, then the last one chosen in this run. Ⓨ
-// hides or shows the pre-releases (in the releases' tab) or sorts the pull
-// requests (the newest build first, or by number), remembered in
-// config.json. A on a build shows it (activity/dev_build_activity.hpp);
-// below the list, signing in to GitHub (signed out, only the releases are
-// listed) or Find a build, Go back to the previous build (the one installed
-// before, kept: action/rollback_flow.hpp), and how old the list is; Ⓧ fetches it again.
+// (action/dev_build_flow.hpp): a tab each for the releases (pre-releases
+// included, tagged), main's last commits and the open pull requests (a long
+// list of one kind never hides the next), the builds of the chosen one
+// below (view/build_cell.hpp: its subject over its tags, how old it is),
+// and the count of newer ones in each tab. Ⓛ / Ⓡ move from one tab to the
+// next (their icons on either side of the tabs, not in the footer: no room
+// there on the console); the tab opened first is the installed build's,
+// then the last one chosen in this run. A on the pull requests' tab, when
+// it is shown, sorts them the other way (the newest build first, or by
+// number; the tab says which, config.json remembers it). Ⓨ finds the build
+// of any pull request or commit (signed in). A on a build shows it
+// (activity/dev_build_activity.hpp); below the list, signing in to GitHub
+// (signed out, only the releases are listed), Go back to the previous build
+// (the one installed before, kept: action/rollback_flow.hpp), and how old
+// the list is; Ⓧ fetches it again.
 // While the list is fetched, or a build looked for, a bar above the tabs
 // shows how far it is.
 // A list fetched again while this screen is open replaces its content in
@@ -48,17 +50,14 @@ class DevBuildsActivity : public brls::Activity
     void update(const dev_builds::Cache& cache);
     // The tabs and the chosen one's builds from this->cache, in the order chosen.
     void fill();
-    // The builds of `kind`, in the order chosen (the pre-releases left out
-    // when they are hidden).
+    // The builds of `kind`, in the order chosen.
     std::vector<dev_builds::Build> builds(dev_builds::Kind kind) const;
     // Shows `kind`'s builds, the focus on the first one when `focus_list`.
     void show_tab(dev_builds::Kind kind, bool focus_list);
     // The next tab with builds, `step` 1 or -1 (Ⓡ, Ⓛ), the focus going along.
     void next_tab(int step);
-    // Ⓨ: the pre-releases in the releases' tab, the order in the pull requests'.
-    void on_y();
+    // The pull requests' other order (A on their tab when it is shown).
     void sort();
-    void toggle_prereleases();
 
     dev_builds::Cache cache;
     dev_builds::Kind  tab = dev_builds::Kind::Release;
@@ -75,7 +74,6 @@ class DevBuildsActivity : public brls::Activity
     BRLS_BIND(brls::Button,     tab_pulls,      "db_tab_pulls");
     BRLS_BIND(brls::Box,        list,           "db_list");
     BRLS_BIND(brls::DetailCell, sign_in,        "db_sign_in");
-    BRLS_BIND(brls::DetailCell, find,           "db_find");
     BRLS_BIND(brls::DetailCell, back,           "db_back");
     BRLS_BIND(brls::Label,      checked,        "db_checked");
 };

@@ -269,7 +269,9 @@ bool parse_runs(const std::string& text, std::vector<Run>* out)
             x.repo = r.contains("repository") && r["repository"].is_object() ? integer(r["repository"], "id") : 0;
             x.head_repo = r.contains("head_repository") && r["head_repository"].is_object()
                               ? integer(r["head_repository"], "id") : 0;
-            x.branch = str(r, "head_branch");
+            x.branch = line_text(str(r, "head_branch"));
+            x.title = line_text(str(r, "display_title"));
+            if (r.contains("head_commit") && r["head_commit"].is_object()) x.message = cut_notes(str(r["head_commit"], "message"));
             if (x.id > 0 && short_commit(x.sha) != "") out->push_back(x);
         }
         return true;
@@ -280,9 +282,56 @@ void apply_runs(std::vector<Build>* builds, const std::vector<Run>& runs)
 {
     for (Build& b : *builds) {
         if (!b.artifact || !b.run) continue;
-        for (const Run& r : runs)
-            if (r.id == b.run) b.ci = r.ci;
+        for (const Run& r : runs) {
+            if (r.id != b.run) continue;
+            b.ci = r.ci;
+            // A pull request keeps its own title and description.
+            if (b.kind == Kind::PullRequest) continue;
+            if (b.title.empty()) b.title = r.title;
+            if (b.notes.empty()) b.notes = r.message;
+        }
     }
+}
+
+Subject parse_subject(const std::string& title)
+{
+    Subject s;
+    std::string t = title;
+    // " (#143)" at the end: the pull request it was merged from.
+    const size_t open = t.rfind(" (#");
+    if (open != std::string::npos && t.back() == ')') {
+        const std::string digits = t.substr(open + 3, t.size() - open - 4);
+        if (!digits.empty() && digits.size() <= 7 &&
+            std::all_of(digits.begin(), digits.end(), [](char c) { return c >= '0' && c <= '9'; })) {
+            s.pr = std::atoi(digits.c_str());
+            t.resize(open);
+        }
+    }
+    // "type(scope)!: text": a lower-case word, an optional scope, an optional "!".
+    const size_t colon = t.find(": ");
+    size_t k = 0;
+    while (k < t.size() && k < 16 && std::islower((unsigned char)t[k])) k++;
+    if (colon != std::string::npos && k > 0) {
+        size_t at = k;
+        std::string scope;
+        if (at < colon && t[at] == '(') {
+            const size_t close = t.find(')', at);
+            if (close != std::string::npos && close < colon && close - at - 1 <= 30) {
+                scope = t.substr(at + 1, close - at - 1);
+                at = close + 1;
+            }
+        }
+        const bool bang = at < colon && t[at] == '!';
+        if (bang) at++;
+        if (at == colon) {
+            s.type = t.substr(0, k);
+            s.scope = scope;
+            s.breaking = bang;
+            t = t.substr(colon + 2);
+        }
+    }
+    s.text = t;
+    return s;
 }
 
 bool parse_commit(const std::string& text, std::string* sha)

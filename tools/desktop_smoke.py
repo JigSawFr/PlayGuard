@@ -210,8 +210,12 @@ if DEVBUILD:
               open(os.path.join(sim, "pulls.json"), "w"))
     # How the runs ended: main's newest failed, the pull request's passed.
     json.dump({"workflow_runs": [
-        {"id": 1, "head_sha": "a" * 40, "status": "completed", "conclusion": "failure"},
-        {"id": 2, "head_sha": "b" * 40, "status": "completed", "conclusion": "success"},
+        {"id": 1, "head_sha": "a" * 40, "status": "completed", "conclusion": "failure",
+         "display_title": "feat(play-timer)!: show the time played over the limit (#140)",
+         "head_commit": {"message": "feat(play-timer)!: show the time played over the limit (#140)\n\n"
+                                    "* the gauge goes past its end, in red"}},
+        {"id": 2, "head_sha": "b" * 40, "status": "completed", "conclusion": "success",
+         "display_title": "docs: a 30-second video tour, at the top of the README (#142)"},
         {"id": 3, "head_sha": "c" * 40, "status": "completed", "conclusion": "success"},
     ]}, open(os.path.join(sim, "runs.json"), "w"))
     env.setdefault("PLAYGUARD_SIM_DEV_BUILDS", sim)
@@ -630,6 +634,13 @@ if DEVBUILD:
     if not os.path.exists(token_file):
         fail("no GitHub token saved in " + token_file)
     shot("03_dev_builds")      # the same screen filled: the tabs, the release, how old the list is
+    key("Up")                  # the tabs
+    key("Right")               # main
+    key("Return")
+    shot("03a_dev_builds_main")   # main's commits: their subjects, kind of change, scope, pull request, checks
+    key("Up")
+    key("Left")                # back to the releases' tab, as the rest of the run expects
+    key("Return")
     cache_file = os.path.join(run_dir, "playguard_data", "cache", "dev_builds.json")
     if not os.path.exists(cache_file) or len(json.load(open(cache_file))["builds"]) != 5:
         fail("the list was not kept in " + cache_file)
@@ -643,6 +654,10 @@ if DEVBUILD:
     key("Right", 2)            # Pull requests (the keyboard has no L / R)
     key("Return")
     shot("03b_dev_builds_kept")  # the pull requests' tab, by number
+    key("Return")              # A on that tab, shown: the other order
+    key("Return")              # and back
+    if messages()[-2:] != ["newest build first", "by number"]:
+        fail("A on the pull requests' tab did not sort them: %s" % messages()[-2:])
     if fetches() != fetched:
         fail("a list fetched a moment ago was fetched again")
     key("Down")                # the pull request

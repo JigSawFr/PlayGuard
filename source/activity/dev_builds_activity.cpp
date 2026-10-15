@@ -8,6 +8,7 @@
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "view/build_cell.hpp"
 
 using namespace brls::literals;
 
@@ -102,16 +103,15 @@ void DevBuildsActivity::onContentAvailable()
     for (const auto& b : buttons) {
         const dev_builds::Kind kind = b.second;
         b.first->registerClickAction([this, kind](brls::View*) {
-            this->show_tab(kind, false);
+            // A on the pull requests' tab when it is the one shown: the other
+            // order (the tab says which); else, that tab.
+            if (kind == dev_builds::Kind::PullRequest && this->tab == kind) this->sort();
+            else this->show_tab(kind, false);
             return true;
         });
     }
     sign_in->registerClickAction([](brls::View*) {
         dev_build_flow::sign_in();
-        return true;
-    });
-    find->registerClickAction([](brls::View*) {
-        dev_build_flow::find();
         return true;
     });
     back->registerClickAction([](brls::View*) {
@@ -130,10 +130,8 @@ void DevBuildsActivity::onContentAvailable()
         this->next_tab(-1);
         return true;
     }, true);
-    this->getContentView()->registerAction("playguard/dev_build/sort"_i18n, brls::BUTTON_Y, [this](brls::View*) {
-        this->on_y();
-        return true;
-    });
+    // Ⓨ's place among the hints (before Ⓧ); fill() sets what it does.
+    this->getContentView()->registerAction("", brls::BUTTON_Y, [](brls::View*) { return true; }, true);
     this->getContentView()->registerAction("playguard/hints/refresh"_i18n, brls::BUTTON_X, [](brls::View*) {
         dev_build_flow::open(true);
         return true;
@@ -163,14 +161,7 @@ void DevBuildsActivity::update(const dev_builds::Cache& fresh)
 
 std::vector<dev_builds::Build> DevBuildsActivity::builds(dev_builds::Kind kind) const
 {
-    std::vector<dev_builds::Build> out = dev_builds::of_kind(cache.builds, kind, order());
-    if (kind == dev_builds::Kind::Release && !config::get().dev_builds_prereleases) {
-        std::vector<dev_builds::Build> kept;
-        for (const dev_builds::Build& b : out)
-            if (!b.prerelease || dev_build_flow::installed(b)) kept.push_back(b);
-        out = kept;
-    }
-    return out;
+    return dev_builds::of_kind(cache.builds, kind, order());
 }
 
 void DevBuildsActivity::fill()
@@ -208,60 +199,31 @@ void DevBuildsActivity::fill()
     brls::View* focus = brls::Application::getCurrentFocus();
     const bool tabs_go = mains.empty() && pulls == 0;
     ui::set_visible(tabs.getView(), !tabs_go);
-    // Ⓨ: the pre-releases in the releases' tab, the order in the pull
-    // requests', nothing in main's.
-    brls::View* content = this->getContentView();
-    // One short word: the footer is full on the console (the toast says
-    // whether they are now shown or hidden).
-    content->updateActionHint(brls::BUTTON_Y, this->tab == dev_builds::Kind::Release ? "playguard/dev_build/prereleases"_i18n
-                                                                                       : "playguard/dev_build/sort"_i18n);
-    // After the hint: this one redraws the hints.
-    content->setActionAvailable(brls::BUTTON_Y, this->tab != dev_builds::Kind::Main);
+    // Ⓨ looks for the build of any pull request or commit: with a GitHub
+    // token only (signed out, no hint: the Sign in line is there instead).
+    const bool can_find = !cache.needs_login;
+    this->getContentView()->registerAction(can_find ? "playguard/dev_build/find_hint"_i18n : "", brls::BUTTON_Y,
+                                           [can_find](brls::View*) {
+                                               if (can_find) dev_build_flow::find();
+                                               return true;
+                                           }, !can_find);
+    brls::Application::getGlobalHintsUpdateEvent()->fire();
 
     const std::vector<dev_builds::Build> shown = this->builds(this->tab);
     auto& cells = list->getChildren();
     for (size_t i = 0; i < shown.size(); i++) {
-        brls::DetailCell* cell;
+        BuildCell* cell;
         if (i < cells.size()) {
-            cell = (brls::DetailCell*)cells[i];
+            cell = (BuildCell*)cells[i];
         } else {
-            cell = new brls::DetailCell();
+            cell = new BuildCell();
             list->addView(cell);
         }
         const dev_builds::Build b = shown[i];
-        switch (b.kind) {
-            case dev_builds::Kind::Release:
-                cell->setText(dev_build_flow::release_text(b));
-                break;
-            case dev_builds::Kind::Main:
-            case dev_builds::Kind::Commit:
-                cell->setText(b.commit);
-                break;
-            case dev_builds::Kind::PullRequest:
-                cell->setText(fmt::format("#{} · {}", b.pr, b.title));
-                break;
-        }
-        // At the right: "installed" in the brand teal; else how old it is,
-        // after "new" when it came after the running build, and the checks
-        // when they failed (red) or are still running (amber).
-        std::string detail = dev_build_flow::age_text(b.date);
-        if (b.kind == dev_builds::Kind::PullRequest) detail = b.commit + " · " + detail;
+        // Two lines: its title, then its tags (kind of change, checks,
+        // installed or new); how old it is and its commit at the right.
         const bool is_newer = dev_builds::newer(b, app::version(), running);
-        if (is_newer) detail = "playguard/dev_build/new"_i18n + " · " + detail;
-        NVGcolor color = ui::color_neutral();
-        if (b.ci == dev_builds::Ci::Failed) {
-            detail = "playguard/dev_build/ci_failed"_i18n + " · " + detail;
-            color = ui::color_bad();
-        } else if (b.ci == dev_builds::Ci::Running) {
-            detail = "playguard/dev_build/ci_running"_i18n + " · " + detail;
-            color = ui::color_warn();
-        }
-        if (dev_build_flow::installed(b)) {
-            detail = "playguard/dev_build/installed"_i18n;
-            color = ui::color_ok();
-        }
-        cell->setDetailText(detail);
-        cell->setDetailTextColor(color);
+        cell->set(b, is_newer);
         cell->registerClickAction([b, is_newer](brls::View*) {
             dev_build_flow::choose(b, is_newer);
             return true;
@@ -273,9 +235,7 @@ void DevBuildsActivity::fill()
     if (tabs_go && focus && focus->getParent() == tabs.getView() && !shown.empty())
         brls::Application::giveFocus(cells[0]);
     // Without a token GitHub hands out the releases only: a line signs in.
-    // With one, a line finds the build of any pull request or commit.
     ui::set_visible(sign_in.getView(), cache.needs_login);
-    ui::set_visible(find.getView(), !cache.needs_login);
     // The build installed before this one, kept: a line goes back to it.
     std::string previous;
     const bool have_previous = rollback_flow::previous(&previous);
@@ -310,35 +270,6 @@ void DevBuildsActivity::next_tab(int step)
         }
         return;
     }
-}
-
-void DevBuildsActivity::on_y()
-{
-    if (this->tab == dev_builds::Kind::Release) this->toggle_prereleases();
-    else if (this->tab == dev_builds::Kind::PullRequest) this->sort();
-}
-
-void DevBuildsActivity::toggle_prereleases()
-{
-    // The focused release keeps the focus, or the first one when it is hidden.
-    std::string focused;
-    auto& cells = list->getChildren();
-    const std::vector<dev_builds::Build> before = this->builds(dev_builds::Kind::Release);
-    for (size_t i = 0; i < cells.size() && i < before.size(); i++)
-        if (cells[i] == brls::Application::getCurrentFocus()) focused = before[i].version;
-    bool& shown = config::get().dev_builds_prereleases;
-    shown = !shown;
-    ui::save_config();
-    this->fill();
-    ui::notify(shown ? "playguard/dev_build/prereleases_shown"_i18n : "playguard/dev_build/prereleases_hidden"_i18n);
-    if (focused.empty()) return;
-    const std::vector<dev_builds::Build> after = this->builds(dev_builds::Kind::Release);
-    for (size_t i = 0; i < after.size() && i < cells.size(); i++)
-        if (after[i].version == focused) {
-            brls::Application::giveFocus(cells[i]);
-            return;
-        }
-    if (!after.empty()) brls::Application::giveFocus(cells[0]);
 }
 
 void DevBuildsActivity::sort()
