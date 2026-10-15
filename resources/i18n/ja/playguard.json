@@ -8,7 +8,8 @@
         "tagline": "本体だけで使える、みまもり設定",
         "step_console": "本体を確認しています…",
         "step_settings": "設定を読み込んでいます…",
-        "step_screen": "PlayGuardを開いています…"
+        "step_screen": "PlayGuardを開いています…",
+        "step_closing": "みまもり設定をロックして、HOMEメニューに戻ります…"
     },
     "tabs": {
         "dashboard": "概要",

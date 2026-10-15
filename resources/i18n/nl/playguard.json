@@ -8,7 +8,8 @@
         "tagline": "Ouderlijk toezicht, rechtstreeks op de console",
         "step_console": "Console controleren...",
         "step_settings": "Instellingen lezen...",
-        "step_screen": "PlayGuard openen..."
+        "step_screen": "PlayGuard openen...",
+        "step_closing": "Ouderlijk toezicht vergrendelen, terug naar het HOME-menu..."
     },
     "tabs": {
         "dashboard": "Overzicht",

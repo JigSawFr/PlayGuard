@@ -8,7 +8,8 @@
         "tagline": "Il filtro famiglia, direttamente sulla console",
         "step_console": "Verifica della console...",
         "step_settings": "Lettura delle impostazioni...",
-        "step_screen": "Apertura di PlayGuard..."
+        "step_screen": "Apertura di PlayGuard...",
+        "step_closing": "Blocco del filtro famiglia, ritorno al menu HOME..."
     },
     "tabs": {
         "dashboard": "Panoramica",

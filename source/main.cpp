@@ -294,6 +294,9 @@ int main(int argc, char* argv[])
     while (brls::Application::mainLoop())
         ;
 
+    // "Lock and quit": locked now that the screen is gone (pt_flow.hpp).
+    pt_flow::lock_at_exit_if_asked();
+
     // Network tasks still running (an update check, a sign-in waiting for its
     // code): stopped, and waited for a moment, before what they use goes away.
     // The SD-card writes still queued (ui::write_later) are done first.

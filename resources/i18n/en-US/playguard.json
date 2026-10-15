@@ -8,7 +8,8 @@
         "tagline": "Parental controls, right on the console",
         "step_console": "Checking the console...",
         "step_settings": "Reading the settings...",
-        "step_screen": "Opening PlayGuard..."
+        "step_screen": "Opening PlayGuard...",
+        "step_closing": "Locking parental controls, back to the HOME menu..."
     },
     "tabs": {
         "dashboard": "Overview",
