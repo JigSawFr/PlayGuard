@@ -1316,6 +1316,37 @@ static void test_reveal_check(void)
     CHECK(model.refs == 0);
 }
 
+/* With no PIN registered pctl skips a 195101 write and answers OK
+ * (22.5.0 sysmodule): every block write refuses first, nothing written.
+ * A 1206 that cannot be read proves nothing: the write goes ahead. */
+static void test_no_pin(void)
+{
+    PtBedtime bt[7];
+    for (int n = 0; n < 7; n++) bt[n] = bed(true, 21, 0, 7, 30);
+    for (unsigned variant = 0; variant < 5; ++variant) {
+        reset();
+        model.no_pin = true;
+        const Result rc = variant < 3 ? write_variant(variant)
+                        : variant == 3 ? pctl_play_timer_set_bedtime(bt, 2)
+                                       : pctl_play_timer_set_alarm_only(true);
+        CHECK(rc == NXM_RC_NO_PIN && model.writes == 0);
+        CHECK(model.refs == 0 && model.init_calls == model.exit_calls);
+    }
+    /* The timer counting down: the gate's own refusal comes first. */
+    reset();
+    model.no_pin = true;
+    model.enabled = true;
+    CHECK(write_variant(0) == NXM_RC_WRITE_GATED && model.writes == 0);
+    /* 1206 failing: written. */
+    reset();
+    model.fail_command = 1206;
+    CHECK(write_variant(0) == 0 && model.writes == 1 && model.refs == 0);
+    /* The other play-timer commands do not write the block: not checked. */
+    reset();
+    model.no_pin = true;
+    CHECK(pctl_play_timer_set_alarm_disabled(true) == 0 && model.writes == 1);
+}
+
 int main(void)
 {
     test_ownership();
@@ -1324,6 +1355,7 @@ int main(void)
     test_overview();
     test_write_gate();
     test_command_gate();
+    test_no_pin();
     test_block_preserved();
     test_block_not_understood();
     test_daily_mode();

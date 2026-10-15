@@ -137,6 +137,9 @@ void pctl_overview_fetch(PctlStatus *status, PtState *pt);
 // built on it, set_alarm_disabled, start, stop) re-checks 1453/1455/1006 in its
 // own session right before writing and refuses (NXM_RC_WRITE_GATED) when the
 // timer is active (enabled or restricting) and not temporarily unlocked.
+// The three that write the block (195101: set_days, set_bedtime,
+// set_alarm_only) also refuse (NXM_RC_NO_PIN) while 1206 reads no PIN: pctl
+// skips that write then, and still answers OK.
 //
 // days_min[0]=Sunday .. [6]=Saturday. If every day is PT_DAY_NOLIMIT the timer is
 // turned off. Reads the current settings (145601) first and changes only the
