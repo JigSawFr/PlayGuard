@@ -934,7 +934,8 @@
         "done_manual": "{} is geïnstalleerd. Sluit PlayGuard en open het opnieuw om hem te gebruiken.",
         "no_path": "PlayGuard weet niet waar zijn .nro-bestand staat (gestart zonder hbloader?) en kan het dus niet vervangen. Installeer de build handmatig vanaf GitHub.",
         "sign_in": "Aanmelden bij GitHub voor de builds van main en pull requests",
-        "checked": "Lijst {} min geleden gecontroleerd."
+        "checked": "Lijst {} min geleden gecontroleerd.",
+        "cancelled": "Download geannuleerd."
     },
     "github": {
         "account": "GitHub-account",

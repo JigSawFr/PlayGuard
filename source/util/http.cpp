@@ -31,18 +31,24 @@ struct Sink
     bool         file_error = false;
     std::function<void(uint64_t, uint64_t)> progress{};
     CURL*        curl = nullptr;
+    const std::atomic<bool>* cancel = nullptr;   // set: the transfer stops (download())
 };
 
-// Called by curl about once a second, even while waiting for the server.
-int on_progress(void*, curl_off_t, curl_off_t, curl_off_t, curl_off_t)
+bool cancelled(const Sink* sink)
 {
-    return s_abort ? 1 : 0;   // non-zero aborts the transfer
+    return sink && sink->cancel && sink->cancel->load();
+}
+
+// Called by curl about once a second, even while waiting for the server.
+int on_progress(void* user, curl_off_t, curl_off_t, curl_off_t, curl_off_t)
+{
+    return s_abort || cancelled(static_cast<const Sink*>(user)) ? 1 : 0;   // non-zero aborts the transfer
 }
 
 size_t on_data(char* data, size_t size, size_t count, void* user)
 {
     auto* sink = static_cast<Sink*>(user);
-    if (s_abort) return 0;
+    if (s_abort || cancelled(sink)) return 0;
     const size_t n = size * count;
     const size_t have = sink->file ? sink->written : sink->body->size();
     if (!http_logic::fits(have, n, sink->max)) {
@@ -136,6 +142,7 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
     curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
     curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, on_progress);
+    curl_easy_setopt(curl, CURLOPT_XFERINFODATA, &sink);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, agent.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, on_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &sink);
@@ -202,7 +209,7 @@ bool redirect(const std::string& url, std::string* target, std::string* error, c
 }
 
 bool download(const std::string& url, const std::string& path, std::string* error, size_t max_bytes,
-              long timeout_s, std::function<void(uint64_t, uint64_t)> progress)
+              long timeout_s, std::function<void(uint64_t, uint64_t)> progress, const std::atomic<bool>* cancel)
 {
     // Owner-writable only (fopen would ask for 0666): an executable lands here.
     const int fd = ::open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -216,9 +223,14 @@ bool download(const std::string& url, const std::string& path, std::string* erro
     Sink sink{ &unused, max_bytes };
     sink.file = file;
     sink.progress = std::move(progress);
+    sink.cancel = cancel;
     Extra x;
     x.to_file = &sink;
     bool ok = perform(url, x, &unused, error, max_bytes, timeout_s, nullptr);
+    if (cancel && cancel->load()) {
+        if (error) *error = "cancelled";
+        ok = false;
+    }
     if (std::fclose(file) != 0 && ok) {
         if (error) *error = "cannot write the file";
         ok = false;

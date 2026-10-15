@@ -22,6 +22,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <atomic>
 #include <functional>
 
 #include <cstdint>
@@ -167,7 +168,10 @@ bool fetch_release(Build* out, std::string* error);
 // PLAYGUARD_SIM_DEV_BUILDS set, a URL "https://<path>" is a local file.
 // `progress` (when set) gets the bytes received and the total, from the
 // calling thread.
+// `cancel` (when given), set by another thread, stops it within a second
+// (false, *error "cancelled").
 bool download(const Build& b, const std::string& path, std::string* error,
-              std::function<void(uint64_t done, uint64_t total)> progress = nullptr);
+              std::function<void(uint64_t done, uint64_t total)> progress = nullptr,
+              const std::atomic<bool>* cancel = nullptr);
 
 }   // namespace dev_builds

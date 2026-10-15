@@ -934,7 +934,8 @@
         "done_manual": "{} está instalada. Feche o PlayGuard e abra-o de novo para usá-la.",
         "no_path": "O PlayGuard não sabe onde está seu arquivo .nro (iniciado sem hbloader?), então não pode substituí-lo. Instale a compilação manualmente pelo GitHub.",
         "sign_in": "Entrar no GitHub para as compilações do main e dos pull requests",
-        "checked": "Lista verificada há {} min."
+        "checked": "Lista verificada há {} min.",
+        "cancelled": "Download cancelado."
     },
     "github": {
         "account": "Conta do GitHub",

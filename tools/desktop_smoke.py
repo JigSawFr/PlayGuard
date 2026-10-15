@@ -586,7 +586,18 @@ if DEVBUILD:
     key("Right")               # Install
     key("Return")
     time.sleep(0.7)
-    shot("05_dev_build_downloading")   # the progress bar (the simulated download takes 2 s)
+    shot("05_dev_build_downloading")   # the progress bar and Cancel (the simulated download takes 4 s)
+    key("Escape")              # B: cancelled; the download stops, nothing is replaced
+    time.sleep(2.5)
+    if not alive():
+        fail("cancelling the download ended the app")
+    if "Download cancelled." not in messages():
+        fail("no word that the download was cancelled")
+    if open(installed_nro, "rb").read() != b"the build before":
+        fail("a cancelled download replaced " + installed_nro)
+    key("Return")              # the pull request again
+    key("Right")               # Install
+    key("Return")
     for _ in range(20):
         if not alive():
             break
