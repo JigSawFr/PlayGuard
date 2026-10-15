@@ -910,7 +910,7 @@
     "dev_build": {
         "open": "Installer un autre build",
         "note": "En cours : {}. Un build installé d'ici prend sa place, et PlayGuard redémarre dessus.",
-        "section_release": "Dernière version",
+        "section_release": "Versions ({})",
         "section_main": "main ({})",
         "section_pulls": "Pull requests ({}) · {}",
         "order_newest": "build le plus récent d'abord",
@@ -918,6 +918,7 @@
         "sort": "Trier",
         "next_tab": "Liste suivante",
         "release": "Version {}",
+        "prerelease": "préversion",
         "main": "main · {} · {}",
         "pr": "PR #{} · {} · {}",
         "installed": "installé",
@@ -933,7 +934,8 @@
         "done_manual": "{} est installé. Fermez PlayGuard et rouvrez-le pour l'utiliser.",
         "no_path": "PlayGuard ne sait pas où se trouve son fichier .nro (lancé sans hbloader ?) et ne peut donc pas le remplacer. Installez le build à la main depuis GitHub.",
         "sign_in": "Se connecter à GitHub pour les builds de main et des pull requests",
-        "checked": "Liste vérifiée il y a {} min."
+        "checked": "Liste vérifiée il y a {} min.",
+        "cancelled": "Téléchargement annulé."
     },
     "github": {
         "account": "Compte GitHub",

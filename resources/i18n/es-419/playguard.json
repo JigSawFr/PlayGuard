@@ -910,7 +910,7 @@
     "dev_build": {
         "open": "Instalar otra compilación",
         "note": "En uso: {}. Una compilación instalada desde aquí ocupa su lugar y PlayGuard se reinicia con ella.",
-        "section_release": "Última versión",
+        "section_release": "Versiones ({})",
         "section_main": "main ({})",
         "section_pulls": "Pull requests ({}) · {}",
         "order_newest": "compilación más reciente primero",
@@ -918,6 +918,7 @@
         "sort": "Ordenar",
         "next_tab": "Lista siguiente",
         "release": "Versión {}",
+        "prerelease": "preliminar",
         "main": "main · {} · {}",
         "pr": "PR #{} · {} · {}",
         "installed": "instalada",
@@ -933,7 +934,8 @@
         "done_manual": "{} está instalada. Cierra PlayGuard y vuelve a abrirlo para usarla.",
         "no_path": "PlayGuard no sabe dónde está su archivo .nro (¿iniciado sin hbloader?), así que no puede sustituirlo. Instala la compilación a mano desde GitHub.",
         "sign_in": "Iniciar sesión en GitHub para las compilaciones de main y de las pull requests",
-        "checked": "Lista revisada hace {} min."
+        "checked": "Lista revisada hace {} min.",
+        "cancelled": "Descarga cancelada."
     },
     "github": {
         "account": "Cuenta de GitHub",

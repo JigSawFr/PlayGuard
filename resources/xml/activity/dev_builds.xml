@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Developer tools › Install another build: a tab each for the latest
-     release, main's last commits and the open pull requests (L / R move from
+<!-- Developer tools › Install another build: a tab each for the last
+     releases, main's last commits and the open pull requests (L / R move from
      one to the next, Y sorts the pull requests), the builds of the chosen one,
      then signing in, and how old the list is (X fetches it again). The lists are built
      by source/activity/dev_builds_activity.cpp. -->

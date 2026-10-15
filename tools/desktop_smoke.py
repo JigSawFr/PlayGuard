@@ -136,7 +136,7 @@ if GATE:
     open(sphaira, "w").write("NRO0")
 if DEVBUILD:
     # Developer tools › Install another build, against a simulated GitHub: the
-    # latest release, then (once signed in, simulated device flow) two commits
+    # releases (one a pre-release), then (once signed in, simulated device flow) two commits
     # of main and an open pull request whose artifact is a local zip holding
     # playguard.nro.
     import hashlib
@@ -167,10 +167,13 @@ if DEVBUILD:
         if digest:
             a["digest"] = "sha256:" + digest
         return a
-    json.dump({"tag_name": "v1.0.0", "prerelease": False, "draft": False,
-               "assets": [{"name": "playguard.nro", "size": 10, "updated_at": "2026-10-01T00:00:00Z",
-                           "browser_download_url": "https:///missing"}]},
-              open(os.path.join(sim, "latest.json"), "w"))
+    def release(tag, date, prerelease=False):
+        return {"tag_name": tag, "prerelease": prerelease, "draft": False,
+                "assets": [{"name": "playguard.nro", "size": 10, "updated_at": date,
+                            "browser_download_url": "https:///missing"}]}
+    json.dump(release("v1.0.0", "2026-10-01T00:00:00Z"), open(os.path.join(sim, "latest.json"), "w"))
+    json.dump([release("v1.1.0-rc.1", "2026-10-05T00:00:00Z", True), release("v1.0.0", "2026-10-01T00:00:00Z")],
+              open(os.path.join(sim, "releases.json"), "w"))
     json.dump({"artifacts": [
         artifact("main", "a" * 40, "2026-10-09T12:00:00Z", "/missing", 10),
         artifact("main", "b" * 40, "2026-10-08T12:00:00Z", "/missing", 10),
@@ -550,9 +553,9 @@ if DEVBUILD:
     key("Up", steps("tools", "about"))
     key("Right")
     key("Down", 50, hold=0.15) # the Developer section, down to its last cell
-    key("Return")              # Install another build: signed out, the release and "Sign in"
+    key("Return")              # Install another build: signed out, the releases and "Sign in"
     shot("01_dev_builds_signed_out")
-    key("Down")                # Sign in to GitHub
+    key("Down", 2)             # past the two releases, to Sign in to GitHub
     key("Return")
     shot("02_github_code")     # the code and its QR code (the simulated GitHub approves at once)
     time.sleep(3)
@@ -560,7 +563,7 @@ if DEVBUILD:
         fail("no GitHub token saved in " + token_file)
     shot("03_dev_builds")      # the same screen filled: the tabs, the release, how old the list is
     cache_file = os.path.join(run_dir, "playguard_data", "cache", "dev_builds.json")
-    if not os.path.exists(cache_file) or len(json.load(open(cache_file))["builds"]) != 4:
+    if not os.path.exists(cache_file) or len(json.load(open(cache_file))["builds"]) != 5:
         fail("the list was not kept in " + cache_file)
     loading = "Looking for builds..."
     fetched = messages().count(loading)
@@ -583,7 +586,18 @@ if DEVBUILD:
     key("Right")               # Install
     key("Return")
     time.sleep(0.7)
-    shot("05_dev_build_downloading")   # the progress bar (the simulated download takes 2 s)
+    shot("05_dev_build_downloading")   # the progress bar and Cancel (the simulated download takes 4 s)
+    key("Escape")              # B: cancelled; the download stops, nothing is replaced
+    time.sleep(2.5)
+    if not alive():
+        fail("cancelling the download ended the app")
+    if "Download cancelled." not in messages():
+        fail("no word that the download was cancelled")
+    if open(installed_nro, "rb").read() != b"the build before":
+        fail("a cancelled download replaced " + installed_nro)
+    key("Return")              # the pull request again
+    key("Right")               # Install
+    key("Return")
     for _ in range(20):
         if not alive():
             break

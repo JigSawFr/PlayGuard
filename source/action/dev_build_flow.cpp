@@ -78,7 +78,7 @@ std::string label(const dev_builds::Build& b)
     std::string text;
     switch (b.kind) {
         case dev_builds::Kind::Release:
-            text = brls::getStr("playguard/dev_build/release", b.version);
+            text = release_text(b);
             break;
         case dev_builds::Kind::Main:
             text = brls::getStr("playguard/dev_build/main", b.commit, short_date(b.date));
@@ -91,9 +91,11 @@ std::string label(const dev_builds::Build& b)
     return text;
 }
 
-// The download's dialog: a bar and "3 of 7 MB", updated from the download
-// thread (at most once per percent, through brls::sync). It cannot be
-// dismissed; close() takes it away once the download is over.
+// The download's dialog: a bar, "3 of 7 MB" and Cancel (B too), updated
+// from the download thread (at most once per percent, through brls::sync).
+// Cancel sets the flag the download checks (it stops within a second) and
+// closes the dialog at once; nothing touches the dialog after it closed,
+// whichever way (Cancel, B, the download's end) it did.
 class DownloadProgress
 {
   public:
@@ -115,14 +117,31 @@ class DownloadProgress
         this->fill->setHeight(12);
         this->fill->setCornerRadius(6);
         track->addView(this->fill);
+        // Its own button, not the dialog's: a dialog's button acts once the
+        // dialog is gone, and the download must stop updating it before.
+        auto* cancel = new brls::Button();
+        cancel->setText("hints/cancel"_i18n);
+        cancel->setWidth(260);
+        cancel->setMarginTop(28);
+        cancel->registerClickAction([this](brls::View*) {
+            this->cancel();
+            return true;
+        });
         auto* box = new brls::Box(brls::Axis::COLUMN);
         box->setAlignItems(brls::AlignItems::CENTER);
         box->setJustifyContent(brls::JustifyContent::CENTER);
-        box->setPadding(40, 40, 40, 40);
+        box->setPadding(40, 40, 32, 40);
         box->addView(this->label);
         box->addView(track);
+        box->addView(cancel);
         this->dialog = new brls::Dialog(box);
-        this->dialog->setCancelable(false);
+        this->dialog->setCancelable(false);   // B: below, through cancel()
+        this->dialog->getAppletFrame()->registerAction(
+            "hints/cancel"_i18n, brls::BUTTON_B, [this](brls::View*) {
+                this->cancel();
+                return true;
+            },
+            false, false, brls::SOUND_BACK);
         this->show(0, size);
         this->dialog->open();
     }
@@ -138,6 +157,10 @@ class DownloadProgress
         brls::sync([this, done, total]() { this->show(done, total); });
     }
 
+    // What the download checks.
+    const std::atomic<bool>* cancel_flag() const { return &this->cancelled; }
+    bool was_cancelled() const { return this->cancelled.load(); }
+
     void close()
     {
         if (this->dialog) this->dialog->close();
@@ -148,9 +171,17 @@ class DownloadProgress
     static constexpr float BAR_WIDTH = 480.0f;
     const uint64_t size;
     std::atomic<int> percent{ -1 };
-    brls::Dialog* dialog = nullptr;
+    std::atomic<bool> cancelled{ false };
+    brls::Dialog* dialog = nullptr;   // null once it is closing: never touched again
     brls::Label* label = nullptr;
     brls::Rectangle* fill = nullptr;
+
+    void cancel()
+    {
+        if (!this->dialog) return;
+        this->cancelled = true;
+        this->close();
+    }
 
     void show(uint64_t done, uint64_t total)
     {
@@ -189,8 +220,16 @@ void install(const dev_builds::Build& b)
         const std::string fresh = target + ".new";
         bool ok = dev_builds::download(b, fresh, &err, [progress](uint64_t done, uint64_t total) {
             progress->received(done, total);
-        });
+        }, progress->cancel_flag());
         brls::sync([b, ok, err, target, fresh, progress]() mutable {
+            // Cancelled: nothing replaced, even when the download had just
+            // ended; said with a toast (the dialog is already gone).
+            if (progress->was_cancelled()) {
+                std::remove(fresh.c_str());
+                s_busy = false;
+                ui::notify("playguard/dev_build/cancelled"_i18n);
+                return;
+            }
             if (ok) {
                 // The running .nro is held open by romfs:/ (the app's
                 // resources), and the SD card will not rename an open file:
@@ -219,8 +258,16 @@ std::string short_date(const std::string& iso)
 
 bool installed(const dev_builds::Build& b)
 {
-    if (b.kind == dev_builds::Kind::Release) return false;   // a release is told by its version
+    // A release is told by its version (a release build has no commit).
+    if (b.kind == dev_builds::Kind::Release) return app::is_release() && b.version == app::version();
     return !app::commit().empty() && b.commit == app::commit();
+}
+
+std::string release_text(const dev_builds::Build& b)
+{
+    std::string text = brls::getStr("playguard/dev_build/release", b.version);
+    if (b.prerelease) text += " · " + "playguard/dev_build/prerelease"_i18n;
+    return text;
 }
 
 std::string checked_text(const dev_builds::Cache& cache)
