@@ -69,12 +69,14 @@ void NoticesActivity::rebuild()
         if (todo) cell->title->setTextColor(ui::color_warn());
         cell->setDetailTextColor(ui::color_neutral());
         const bool has_action = !e.action_label.empty() && e.action;
-        cell->setDetailText(has_action ? e.action_label + "  ›" : "playguard/notices/seen"_i18n);
+        // To do with nothing PlayGuard can do (fixed on the SD card, from a
+        // computer): no button text, as it goes only once fixed.
+        cell->setDetailText(has_action ? e.action_label + "  ›" : todo ? "" : "playguard/notices/seen"_i18n);
         const std::string id = e.item.id;
         const auto action = e.action;
         cell->registerClickAction([this, id, todo, has_action, action](brls::View*) {
             if (!has_action) {
-                notices::dismiss(id);
+                if (!todo) notices::dismiss(id);
                 return true;
             }
             // Information acted on is read.
