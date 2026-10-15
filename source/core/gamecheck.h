@@ -52,6 +52,7 @@ typedef struct {
 typedef struct {
     u64  app_id;
     char name[GAMECHECK_NAME_LEN];   // UTF-8, console language; empty when unreadable
+    char display_version[0x10];      // "1.4.0": the installed version as the game shows it; empty when unreadable
     bool control_ok;                 // name and icon read (what the HOME menu draws)
     u8   record_event;               // the HOME menu entry's last event (ns ApplicationRecord)
 
@@ -111,6 +112,13 @@ u32 gamecheck_installed_version(const GameFacts *g);
 #define GA_VERIFY        (1u << 4)   // the console's own integrity check (reads only)
 u32 gamecheck_actions(const GameFacts *g, GameIssue issue);
 
+// The one action that fixes `issue`, if one does (a GA_* bit of
+// gamecheck_actions(), 0 when none): accept the installed version again,
+// remove the update that needs a newer firmware, check the data the console
+// found corrupt or cannot read the name of, or clean an entry with nothing
+// usable behind it.
+u32 gamecheck_recommended(const GameFacts *g, GameIssue issue, u32 current_hos);
+
 // A content meta's RequiredSystemVersion (major << 26 | minor << 20 |
 // micro << 16 | relstep) as MAKEHOSVERSION; 0 stays 0.
 u32 gamecheck_sysver_to_hos(u32 required_system_version);
@@ -150,9 +158,10 @@ Result gamecheck_reset_launch_version(u64 app_id, u32 version);
 
 // The console's integrity check (System Settings › Data Management), which
 // reads every file of the game. `progress` is called while it runs (current
-// and total bytes, total 0 while unknown). Returns the check's result;
-// *corrupt is set when it found corrupt data.
-Result gamecheck_verify(u64 app_id, void (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt);
+// and total bytes, total 0 while unknown); returning false cancels the check
+// (NXM_RC_CANCELLED). Returns the check's result; *corrupt is set when it
+// found corrupt data.
+Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt);
 
 #ifdef __cplusplus
 }

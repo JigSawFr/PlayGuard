@@ -506,55 +506,56 @@ os.remove(github_token)
 key("Down")                # Check the installed games
 key("Return")
 shot("27_games")
-key("Return")              # the first broken game: cause, fix, Actions
-shot("27_games_details")
-key("Right")               # Actions
+key("Return")              # the first broken game: icon, why, what to do
+shot("27_games_details")   # Check the data (the fix, focused), Other actions, Back
+key("Right")               # Other actions…
 key("Return")
-shot("27_games_actions")   # check the data, remove the game
-key("Down")                # Remove the game from the console
-key("Return")
+shot("27_games_actions")   # remove the game
+key("Return")              # Remove the game from the console
 key("Right")               # Remove
 key("Return")
 shot("27_games_removed")
 if not any(m.endswith("removed") for m in messages()):
     fail("the broken game was not removed: " + repr(messages()[-3:]))
 # Robot Factory: only its update needs a newer firmware; removing the update
-# fixes it (it leaves the list).
+# (the fix, the first button) makes it work again.
 key("Down", 2)             # past Garden Defenders, Hedgehog Rush
 key("Return")
-shot("27_games_update")    # the fix says to remove the update
-key("Right")               # Actions
-key("Return")
-key("Return")              # Remove the update (the first action)
+shot("27_games_update")    # Remove the update (version 2.1.0)
+key("Return")              # the fix
 key("Right")               # Remove
 key("Return")
+time.sleep(1.5)            # the toast follows the games read again
 shot("27_games_update_removed")
-if not any(m.endswith("update removed") for m in messages()):
-    fail("the update was not removed: " + repr(messages()[-3:]))
-# Moon Racer: the console asks for a removed update; the installed version
-# is accepted again.
+if not any(m.endswith("works again.") and m.startswith("Robot Factory") for m in messages()):
+    fail("the update removal did not fix the game: " + repr(messages()[-3:]))
+# Moon Racer: the console asks for a removed update; accepting the installed
+# version again (the fix, no question) makes it work again.
 key("Up", 6)               # back to the first game
 key("Down", 4)             # past Garden, Hedgehog, Ocean, Castle
 key("Return")
-key("Right")               # Actions
-key("Return")
-key("Return")              # Accept the installed version again (the first action)
-shot("27_games_launch_confirm")
-key("Right")               # Accept it
-key("Return")
-if not any("accepted again" in m for m in messages()):
-    fail("the launch version was not reset: " + repr(messages()[-3:]))
-# Forest Tales: the console found corrupt data; its check runs with progress.
+shot("27_games_launch")
+key("Return")              # Accept the installed version again
+time.sleep(1.5)            # the toast follows the games read again
+if not any(m.endswith("works again.") and m.startswith("Moon Racer") for m in messages()):
+    fail("the launch version reset did not fix the game: " + repr(messages()[-3:]))
+# Forest Tales: the console found corrupt data; its check runs in a dialog
+# with its progress and Cancel.
 key("Up", 6)
 key("Down", 4)             # past Garden, Hedgehog, Ocean, Castle
 key("Return")
-key("Right")               # Actions
-key("Return")
-key("Return")              # Check the data for corruption
-shot("27_games_verifying") # the progress in the status line
+key("Return")              # Check the data for corruption (the fix)
+shot("27_games_verifying")
 time.sleep(3)
 shot("27_games_verified")  # corrupt data found
 key("Return")              # OK
+# The check again, cancelled.
+key("Return")
+key("Return")
+key("Escape")              # B: cancel
+time.sleep(1)
+if not any(m == "Check cancelled." for m in messages()):
+    fail("the check was not cancelled: " + repr(messages()[-3:]))
 key("Escape")
 
 # Activity: one game's screen, then a PDF export to the (simulated) SD card.

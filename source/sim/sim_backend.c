@@ -552,13 +552,17 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
 
 void playstats_icons(PlayIcon *icons, size_t count)
 {
-    // The made-up games above, in order; the deleted one has no icon.
+    // The made-up games above, in order; the deleted one has no icon. The
+    // installed games of Tools › Check the installed games (…6000 and up)
+    // reuse them, but for the one whose name and icon cannot be read.
     for (size_t i = 0; i < count; i++) {
         icons[i].jpeg = NULL;
         icons[i].size = 0;
         const u64 base = 0x0100A1B2C3D40000ULL;
-        if (icons[i].app_id < base || (icons[i].app_id - base) % 0x1000 || (icons[i].app_id - base) / 0x1000 >= 5) continue;
-        const size_t k = (size_t)((icons[i].app_id - base) / 0x1000);
+        if (icons[i].app_id < base || (icons[i].app_id - base) % 0x1000 || (icons[i].app_id - base) / 0x1000 >= 16) continue;
+        size_t k = (size_t)((icons[i].app_id - base) / 0x1000);
+        if (k == 5 || k == 6) continue;
+        k %= 5;
         icons[i].jpeg = (unsigned char *)malloc(SIM_ICON_SIZES[k]);
         if (!icons[i].jpeg) continue;
         memcpy(icons[i].jpeg, SIM_ICONS[k], SIM_ICON_SIZES[k]);
@@ -632,6 +636,7 @@ void gamecheck_scan(GameCheck *out)
         GameFacts *g = &out->games[out->count++];
         g->app_id = 0x0100A1B2C3D40000ULL + i * 0x1000;
         snprintf(g->name, sizeof(g->name), "%s", fine[i]);
+        snprintf(g->display_version, sizeof(g->display_version), "1.3.0");
         g->control_ok = true;
         g->record_event = 3;
         sim_add_content(g, g->app_id, 0, GC_META_APPLICATION, GC_STORAGE_SD);
@@ -671,6 +676,7 @@ void gamecheck_scan(GameCheck *out)
         g->app_id = id;
         snprintf(g->name, sizeof(g->name), "%s", broken[i].name);
         g->control_ok = broken[i].name[0] != '\0';
+        if (g->control_ok) snprintf(g->display_version, sizeof(g->display_version), "1.0.0");
         g->record_event = broken[i].issue == GC_ARCHIVED ? 11 : 3;
         g->view_ok = true;
         g->view_flags = GC_VIEW_HAS_MAIN_CONTENTS | GC_VIEW_CAN_LAUNCH;
@@ -686,7 +692,10 @@ void gamecheck_scan(GameCheck *out)
                 sim_add_content(g, id | 0x800, 0x50000, GC_META_PATCH, GC_STORAGE_SD);
                 sim_add_content(g, (id & ~0xFFFULL) + 0x1001, 0x10000, GC_META_ADDON, GC_STORAGE_SD);
                 g->base_required_hos = MAKEHOSVERSION(19, 0, 0);
-                if (g->has_patch) g->patch_required_hos = MAKEHOSVERSION(24, 1, 0);
+                if (g->has_patch) {
+                    g->patch_required_hos = MAKEHOSVERSION(24, 1, 0);
+                    snprintf(g->display_version, sizeof(g->display_version), "2.1.0");   // the update's
+                }
                 break;
             case GC_LAUNCH_VERSION:   // its update was removed outside the console
                 sim_add_content(g, id, 0, GC_META_APPLICATION, GC_STORAGE_SD);
@@ -752,12 +761,12 @@ Result gamecheck_reset_launch_version(u64 app_id, u32 version)
 }
 
 // Two seconds or so of progress; "Forest Tales" has corrupt data.
-Result gamecheck_verify(u64 app_id, void (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt)
+Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt)
 {
     *corrupt = false;
     if (fails("verify")) return SIM_FAIL_RC;
     for (u64 step = 0; step <= 4; step++) {
-        if (progress) progress(ctx, step * 256ULL << 20, 1024ULL << 20);
+        if (progress && !progress(ctx, step * 256ULL << 20, 1024ULL << 20)) return NXM_RC_CANCELLED;
         const struct timespec pause = { 0, 500000000L };
         nanosleep(&pause, NULL);
     }

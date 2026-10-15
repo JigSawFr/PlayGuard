@@ -739,22 +739,20 @@
             },
             "launch_version": {
                 "short": "Pede uma atualização removida",
-                "cause": "O console pede a versão {} do jogo, a de uma atualização instalada antes, mas a versão {} está instalada: a atualização foi removida ou não foi instalada por completo.",
+                "cause": "O console pede o que estava instalado antes: {}. Instalado agora: {}. A atualização foi removida ou não foi instalada por completo.",
                 "fix": "Aceite de novo a versão instalada (Ações), ou instale a atualização de novo."
             }
         },
         "actions": "Ações",
         "action": {
             "remove": "Remover o jogo do console",
-            "remove_update": "Remover a atualização (v{})",
+            "remove_update": "Remover a atualização ({})",
             "remove_addon": "Remover o conteúdo adicional {}",
-            "reset_launch": "Aceitar de novo a versão instalada (v{})",
+            "reset_launch": "Aceitar de novo a versão instalada",
             "verify": "Verificar se os dados estão corrompidos"
         },
         "remove_update_body": "Só a atualização é apagada: o jogo, os conteúdos adicionais e os dados salvos ficam, e o console inicia o jogo sem a atualização.",
         "remove_addon_body": "Só este conteúdo adicional é apagado: o jogo, a atualização e os dados salvos ficam.",
-        "reset_launch_body": "O console pede a versão {} deste jogo, mas a versão {} está instalada. Ele vai iniciar a versão instalada de novo. Nada é apagado.",
-        "reset_launch_confirm": "Aceitar",
         "update_removed": "{}: atualização removida",
         "addon_removed": "{}: conteúdo adicional removido",
         "launch_reset": "{}: a versão instalada é aceita de novo",
@@ -764,7 +762,21 @@
         "verify_ok": "{}: nenhum dado corrompido.",
         "verify_bad": "{}: dados corrompidos. Remova o jogo e instale-o de novo.",
         "verify_err": "Não foi possível verificar os dados",
-        "verify_busy": "Já há uma verificação em andamento."
+        "verify_busy": "Já há uma verificação em andamento.",
+        "version": "versão {}",
+        "update_n": "atualização nº {}",
+        "base_only": "o jogo sem as atualizações",
+        "other_actions": "Outras ações…",
+        "verify_note": "Todos os arquivos do jogo são lidos: um jogo grande leva alguns minutos.",
+        "verify_cancelled": "Verificação cancelada.",
+        "section_count": "Jogos com um problema: {} de {}",
+        "fixed": "{}: reparado, funciona de novo.",
+        "fix_button": {
+            "verify": "Verificar os dados",
+            "reset_launch": "Aceitar esta versão",
+            "remove_update": "Remover a atualização",
+            "remove": "Remover o jogo"
+        }
     },
     "about": {
         "section_changelog": "Novidades da {}",

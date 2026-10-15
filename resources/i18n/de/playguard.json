@@ -739,22 +739,20 @@
             },
             "launch_version": {
                 "short": "Verlangt ein entferntes Update",
-                "cause": "Die Konsole verlangt Version {} des Spiels, die eines früher installierten Updates, installiert ist aber Version {}: Das Update wurde entfernt oder nicht vollständig installiert.",
+                "cause": "Die Konsole verlangt, was früher installiert war: {}. Jetzt installiert: {}. Das Update wurde entfernt oder nicht vollständig installiert.",
                 "fix": "Lass die installierte Version wieder zu (Aktionen) oder installiere das Update erneut."
             }
         },
         "actions": "Aktionen",
         "action": {
             "remove": "Spiel von der Konsole entfernen",
-            "remove_update": "Update entfernen (v{})",
+            "remove_update": "Update entfernen ({})",
             "remove_addon": "Zusatzinhalt {} entfernen",
-            "reset_launch": "Installierte Version wieder zulassen (v{})",
+            "reset_launch": "Installierte Version wieder zulassen",
             "verify": "Daten auf Beschädigung prüfen"
         },
         "remove_update_body": "Nur das Update wird gelöscht: Das Spiel, seine Zusatzinhalte und Spielstände bleiben, und die Konsole startet das Spiel ohne das Update.",
         "remove_addon_body": "Nur dieser Zusatzinhalt wird gelöscht: Das Spiel, sein Update und die Spielstände bleiben.",
-        "reset_launch_body": "Die Konsole verlangt Version {} dieses Spiels, installiert ist aber Version {}. Sie startet die installierte Version wieder. Es wird nichts gelöscht.",
-        "reset_launch_confirm": "Zulassen",
         "update_removed": "{}: Update entfernt",
         "addon_removed": "{}: Zusatzinhalt entfernt",
         "launch_reset": "{}: die installierte Version wird wieder zugelassen",
@@ -764,7 +762,21 @@
         "verify_ok": "{}: keine beschädigten Daten gefunden.",
         "verify_bad": "{}: beschädigte Daten gefunden. Entferne das Spiel und installiere es erneut.",
         "verify_err": "Die Daten konnten nicht geprüft werden",
-        "verify_busy": "Es läuft bereits eine Prüfung."
+        "verify_busy": "Es läuft bereits eine Prüfung.",
+        "version": "Version {}",
+        "update_n": "Update Nr. {}",
+        "base_only": "das Spiel ohne seine Updates",
+        "other_actions": "Weitere Aktionen…",
+        "verify_note": "Jede Datei des Spiels wird gelesen: Ein großes Spiel dauert einige Minuten.",
+        "verify_cancelled": "Prüfung abgebrochen.",
+        "section_count": "Spiele mit einem Problem: {} von {}",
+        "fixed": "{}: repariert, es funktioniert wieder.",
+        "fix_button": {
+            "verify": "Daten prüfen",
+            "reset_launch": "Diese Version zulassen",
+            "remove_update": "Update entfernen",
+            "remove": "Spiel entfernen"
+        }
     },
     "about": {
         "section_changelog": "Neu in {}",

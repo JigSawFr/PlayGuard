@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/game_check_activity.hpp"
 
+#include <atomic>
 #include <fmt/format.h>
 #include <functional>
 #include <string>
@@ -17,6 +18,7 @@ namespace
 // From this many broken games, the cause is more likely the SD card or the
 // storage the console started on than each game.
 constexpr size_t MANY = 3;
+constexpr float  ICON_SIZE = 72;
 
 const char* issue_key(GameIssue issue)
 {
@@ -34,6 +36,12 @@ const char* issue_key(GameIssue issue)
         case GC_NO_CONTROL:          return "no_control";
         default:                     return "";
     }
+}
+
+bool warn_only(GameIssue issue)
+{
+    return issue == GC_STORAGE_UNAVAILABLE || issue == GC_FIRMWARE_TOO_OLD || issue == GC_KEY_TOO_NEW ||
+           issue == GC_LAUNCH_VERSION;
 }
 
 std::string hos_text(u32 v)
@@ -64,6 +72,17 @@ std::string history_label(const GameFacts& g)
     return g.name[0] ? fmt::format("{} ({})", g.name, id_text(g.app_id)) : id_text(g.app_id);
 }
 
+// A version as people know it: "version 1.4.0" when it is the installed
+// one (the game says how it shows it), else "update #4" (an update's version
+// is its number times 0x10000) or "the game without its updates".
+std::string version_text(const GameFacts& g, u32 version)
+{
+    if (version == gamecheck_installed_version(&g) && g.display_version[0])
+        return brls::getStr("playguard/games/version", std::string(g.display_version));
+    if (version >> 16) return brls::getStr("playguard/games/update_n", (int)(version >> 16));
+    return "playguard/games/base_only"_i18n;
+}
+
 // The cell's value: what the HOME menu shows, in a few words.
 std::string short_text(const GameFacts& g, GameIssue issue)
 {
@@ -78,7 +97,8 @@ std::string cause_text(const GameFacts& g, GameIssue issue, u32 current_hos)
     switch (issue) {
         case GC_FIRMWARE_TOO_OLD: return brls::getStr(key, hos_text(required_hos(g)), hos_text(current_hos));
         case GC_KEY_TOO_NEW:      return brls::getStr(key, hos_text(current_hos), (int)g.key_generation);
-        case GC_LAUNCH_VERSION:   return brls::getStr(key, (int)g.launch_required, (int)gamecheck_installed_version(&g));
+        case GC_LAUNCH_VERSION:
+            return brls::getStr(key, version_text(g, g.launch_required), version_text(g, gamecheck_installed_version(&g)));
         case GC_LAUNCH_REFUSED:   return brls::getStr(key, ui::rc_text(g.launch_rc));
         default:                  return brls::getStr(key);
     }
@@ -102,22 +122,117 @@ std::string developer_text(const GameFacts& g)
                        g.needs_ticket ? (g.ticket_missing ? "missing" : "present") : "none", (int)g.meta_count);
 }
 
-struct VerifyProgress
+// The fix's button: a few words (a dialog button is half the dialog wide).
+std::string fix_button(u32 action)
 {
-    std::weak_ptr<bool> alive;
-    brls::Label* status;
+    switch (action) {
+        case GA_RESET_LAUNCH:  return "playguard/games/fix_button/reset_launch"_i18n;
+        case GA_VERIFY:        return "playguard/games/fix_button/verify"_i18n;
+        case GA_REMOVE_UPDATE: return "playguard/games/fix_button/remove_update"_i18n;
+        default:               return "playguard/games/fix_button/remove"_i18n;
+    }
+}
+
+std::string action_label(const GameFacts& g, u32 action, const GameContent* content)
+{
+    switch (action) {
+        case GA_RESET_LAUNCH:  return "playguard/games/action/reset_launch"_i18n;
+        case GA_VERIFY:        return "playguard/games/action/verify"_i18n;
+        case GA_REMOVE_UPDATE: return brls::getStr("playguard/games/action/remove_update", version_text(g, content ? content->version : g.patch_version));
+        case GA_REMOVE_ADDON:  return brls::getStr("playguard/games/action/remove_addon", id_text(content ? content->id : 0));
+        default:               return "playguard/games/action/remove"_i18n;
+    }
+}
+
+brls::Label* text_label(const std::string& text, float size, NVGcolor color)
+{
+    auto* label = new brls::Label();
+    label->setText(text);
+    label->setFontSize(size);
+    label->setTextColor(color);
+    label->setSingleLine(false);
+    label->setHorizontalAlign(brls::HorizontalAlign::LEFT);
+    return label;
+}
+
+// The details: the icon, the name and the problem, then why and what to do
+// in two blocks read from the left, the ID and version underneath.
+brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, const std::vector<unsigned char>& icon)
+{
+    auto* box = new brls::Box(brls::Axis::COLUMN);
+    box->setAlignItems(brls::AlignItems::STRETCH);
+    box->setPadding(26, 36, 18, 36);
+
+    auto* head = new brls::Box(brls::Axis::ROW);
+    head->setAlignItems(brls::AlignItems::CENTER);
+    if (!icon.empty()) {
+        auto* image = new brls::Image();
+        image->setImageFromMem(icon.data(), (int)icon.size());
+        image->setScalingType(brls::ImageScalingType::FIT);
+        image->setWidth(ICON_SIZE);
+        image->setHeight(ICON_SIZE);
+        image->setMarginRight(18);
+        head->addView(image);
+    }
+    auto* titles = new brls::Box(brls::Axis::COLUMN);
+    titles->setGrow(1.0f);
+    titles->setShrink(1.0f);
+    titles->addView(text_label(game_name(g), 24, ui::color_text()));
+    auto* problem = text_label(short_text(g, issue), 19, warn_only(issue) ? ui::color_warn() : ui::color_bad());
+    problem->setMarginTop(4);
+    titles->addView(problem);
+    head->addView(titles);
+    box->addView(head);
+
+    auto block = [box](const std::string& title, const std::string& text) {
+        auto* t = text_label(title, 18, ui::color_note());
+        t->setMarginTop(18);
+        box->addView(t);
+        auto* body = text_label(text, 20, ui::color_text());
+        body->setMarginTop(4);
+        box->addView(body);
+    };
+    block("playguard/games/cause"_i18n, cause_text(g, issue, current_hos));
+    block("playguard/games/fix"_i18n, fix_text(g, issue, current_hos));
+
+    std::string footer = brls::getStr("playguard/games/id", id_text(g.app_id));
+    if (g.display_version[0]) footer += " · " + brls::getStr("playguard/games/version", std::string(g.display_version));
+    if (app::dev_mode()) footer += "\n" + developer_text(g);
+    auto* foot = text_label(footer, 16, ui::color_note());
+    foot->setMarginTop(18);
+    box->addView(foot);
+    return box;
+}
+
+std::vector<unsigned char> icon_of(u64 app_id)
+{
+    PlayIcon icon = { app_id, nullptr, 0 };
+    playstats_icons(&icon, 1);
+    std::vector<unsigned char> bytes;
+    if (icon.jpeg) bytes.assign(icon.jpeg, icon.jpeg + icon.size);
+    free(icon.jpeg);
+    return bytes;
+}
+
+// The integrity check's dialog and what its thread shares with it.
+struct VerifyState
+{
+    std::atomic<bool> cancel{ false };
+    bool open = true;   // the dialog is on screen (main thread only)
+    brls::Dialog* dialog = nullptr;
+    brls::Label* label = nullptr;
     std::string name;
 };
 
-void on_verify_progress(void* ctx, u64 current, u64 total)
+bool on_verify_progress(void* ctx, u64 current, u64 total)
 {
-    auto* p = (VerifyProgress*)ctx;
+    auto* state = (std::shared_ptr<VerifyState>*)ctx;
+    const std::shared_ptr<VerifyState> s = *state;
     const int percent = total ? (int)(current * 100 / total) : 0;
-    const VerifyProgress copy = *p;
-    brls::sync([copy, percent]() {
-        if (copy.alive.expired()) return;
-        copy.status->setText(brls::getStr("playguard/games/verifying", copy.name, percent > 100 ? 100 : percent));
+    brls::sync([s, percent]() {
+        if (s->open) s->label->setText(brls::getStr("playguard/games/verifying", s->name, percent > 100 ? 100 : percent));
     });
+    return !s->cancel.load();
 }
 }   // namespace
 
@@ -133,9 +248,13 @@ void GameCheckActivity::scan()
 {
     if (this->scanning) return;
     this->scanning = true;
-    status->setText("playguard/games/scanning"_i18n);
-    status->setTextColor(ui::color_text());
-    ui::set_visible(status.getView(), true);
+    // The first read says so; a read again after a change keeps the list
+    // where it is (it is quick), so nothing jumps.
+    if (!this->shown) {
+        status->setText("playguard/games/scanning"_i18n);
+        status->setTextColor(ui::color_text());
+        ui::set_visible(status.getView(), true);
+    }
     std::weak_ptr<bool> weak = this->alive;
     brls::async([this, weak]() {
         auto check = std::make_shared<GameCheck>();
@@ -150,6 +269,7 @@ void GameCheckActivity::scan()
 
 void GameCheckActivity::show(const GameCheck& check)
 {
+    this->shown = true;
     SysInfo si;
     sysinfo_get(&si);
     const u32 hos = si.hos_version;
@@ -161,6 +281,14 @@ void GameCheckActivity::show(const GameCheck& check)
             const GameIssue issue = gamecheck_classify(&check.games[i], hos);
             if (issue != GC_OK) broken.push_back({ check.games[i], issue });
         }
+    }
+
+    // After a repair: whether the game left the list.
+    if (this->pending.id) {
+        bool still = false;
+        for (const Broken& b : broken) still |= b.game.app_id == this->pending.id;
+        ui::notify(still ? this->pending.done : brls::getStr("playguard/games/fixed", this->pending.name));
+        this->pending = Pending{};
     }
 
     // The cells are reused in place, as in the History screen: one of them
@@ -177,9 +305,7 @@ void GameCheckActivity::show(const GameCheck& check)
         const Broken b = broken[i];
         cell->setText(game_name(b.game));
         cell->setDetailText(short_text(b.game, b.issue));
-        const bool warn = b.issue == GC_STORAGE_UNAVAILABLE || b.issue == GC_FIRMWARE_TOO_OLD ||
-                          b.issue == GC_KEY_TOO_NEW || b.issue == GC_LAUNCH_VERSION;
-        cell->setDetailTextColor(warn ? ui::color_warn() : ui::color_bad());
+        cell->setDetailTextColor(warn_only(b.issue) ? ui::color_warn() : ui::color_bad());
         cell->registerClickAction([this, b, hos](brls::View*) {
             this->open(b.game, b.issue, hos);
             return true;
@@ -200,12 +326,11 @@ void GameCheckActivity::show(const GameCheck& check)
     } else if (broken.empty()) {
         text = brls::getStr("playguard/games/none", (int)check.count);
         status->setTextColor(ui::color_ok());
-    } else {
-        status->setTextColor(ui::color_text());
     }
     if (check.truncated) text += (text.empty() ? "" : "\n") + brls::getStr("playguard/games/truncated", (int)check.count);
     status->setText(text);
     ui::set_visible(status.getView(), !text.empty());
+    header->setTitle(brls::getStr("playguard/games/section_count", (int)broken.size(), (int)check.count));
     ui::set_visible(header.getView(), !broken.empty());
     hint->setText(brls::getStr("playguard/games/many", ui::storage_short(si)));
     ui::set_visible(hint.getView(), broken.size() >= MANY);
@@ -213,57 +338,77 @@ void GameCheckActivity::show(const GameCheck& check)
 
 void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current_hos)
 {
-    // An unnamed game is already named by its ID.
-    std::string body = game_name(game);
-    if (game.name[0]) body += "\n" + brls::getStr("playguard/games/id", id_text(game.app_id));
-    body += "\n\n" + brls::getStr("playguard/common/line", "playguard/games/cause"_i18n, cause_text(game, issue, current_hos));
-    body += "\n\n" + brls::getStr("playguard/common/line", "playguard/games/fix"_i18n, fix_text(game, issue, current_hos));
-    if (app::dev_mode()) body += "\n\n" + developer_text(game);
-
     // Every action but the check changes the console.
     u32 actions = gamecheck_actions(&game, issue);
-    const bool hidden = app::read_only() && (actions & ~GA_VERIFY);
-    if (app::read_only()) actions &= GA_VERIFY;
-    if (hidden) body += "\n\n" + "playguard/common/read_only_note"_i18n;
-    if (!actions) {
-        ui::info(body);
-        return;
+    u32 recommended = gamecheck_recommended(&game, issue, current_hos);
+    if (app::read_only()) {
+        actions &= GA_VERIFY;
+        recommended &= GA_VERIFY;
     }
+    auto* box = details_view(game, issue, current_hos, icon_of(game.app_id));
+    if (app::read_only() && gamecheck_actions(&game, issue) & ~GA_VERIFY) {
+        auto* note_ro = text_label("playguard/common/read_only_note"_i18n, 16, ui::color_note());
+        note_ro->setMarginTop(8);
+        box->addView(note_ro);
+    }
+
+    // Two buttons at most, side by side (a third goes on a row of its own):
+    // the fix first, with the focus, then the other actions; B closes. With
+    // no fix: Back, then the actions.
+    auto* dialog = new brls::Dialog(box);
     const GameFacts g = game;
-    ui::confirm(body, "playguard/games/actions"_i18n, [this, g, actions]() { this->choose(g, actions); });
+    const u32 others = actions & ~recommended;
+    if (recommended) {
+        GameContent update = {};
+        for (u32 i = 0; i < g.content_count; i++)
+            if (g.contents[i].type == GC_META_PATCH) update = g.contents[i];
+        dialog->addButton(fix_button(recommended), [this, g, recommended, update]() { this->run(g, recommended, update); });
+        if (others) dialog->addButton("playguard/games/other_actions"_i18n, [this, g, others]() { this->choose(g, others); });
+    } else {
+        dialog->addButton("hints/back"_i18n, []() {});
+        if (others) dialog->addButton("playguard/games/actions"_i18n, [this, g, others]() { this->choose(g, others); });
+    }
+    dialog->open();
 }
 
 void GameCheckActivity::choose(const GameFacts& g, u32 actions)
 {
+    // What changes nothing or can be undone first, removals last, the whole
+    // game at the very end.
     std::vector<std::string> labels;
     std::vector<std::function<void()>> runs;
-    if (actions & GA_RESET_LAUNCH) {
-        labels.push_back(brls::getStr("playguard/games/action/reset_launch", (int)gamecheck_installed_version(&g)));
-        runs.push_back([this, g]() { this->reset_launch(g); });
+    auto add = [&](u32 action, const GameContent& c) {
+        labels.push_back(action_label(g, action, &c));
+        runs.push_back([this, g, action, c]() { this->run(g, action, c); });
+    };
+    const GameContent none = {};
+    if (actions & GA_RESET_LAUNCH) add(GA_RESET_LAUNCH, none);
+    if (actions & GA_VERIFY) add(GA_VERIFY, none);
+    for (u32 i = 0; i < g.content_count; i++) {
+        const GameContent& c = g.contents[i];
+        if (c.storage != GC_STORAGE_NAND && c.storage != GC_STORAGE_SD) continue;
+        if (c.type == GC_META_PATCH && (actions & GA_REMOVE_UPDATE)) add(GA_REMOVE_UPDATE, c);
     }
     for (u32 i = 0; i < g.content_count; i++) {
-        const GameContent c = g.contents[i];
+        const GameContent& c = g.contents[i];
         if (c.storage != GC_STORAGE_NAND && c.storage != GC_STORAGE_SD) continue;
-        if (c.type == GC_META_PATCH && (actions & GA_REMOVE_UPDATE)) {
-            labels.push_back(brls::getStr("playguard/games/action/remove_update", (int)c.version));
-            runs.push_back([this, g, c]() { this->remove_content(g, c); });
-        }
-        if (c.type == GC_META_ADDON && (actions & GA_REMOVE_ADDON)) {
-            labels.push_back(brls::getStr("playguard/games/action/remove_addon", id_text(c.id)));
-            runs.push_back([this, g, c]() { this->remove_content(g, c); });
-        }
+        if (c.type == GC_META_ADDON && (actions & GA_REMOVE_ADDON)) add(GA_REMOVE_ADDON, c);
     }
-    if (actions & GA_VERIFY) {
-        labels.push_back("playguard/games/action/verify"_i18n);
-        runs.push_back([this, g]() { this->verify(g); });
-    }
-    if (actions & GA_REMOVE) {
-        labels.push_back("playguard/games/action/remove"_i18n);
-        runs.push_back([this, g]() { this->remove(g); });
-    }
+    if (actions & GA_REMOVE) add(GA_REMOVE, none);
     ui::pick(game_name(g), labels, 0, [runs](int i) {
         if (i >= 0 && i < (int)runs.size()) runs[i]();
     });
+}
+
+void GameCheckActivity::run(const GameFacts& g, u32 action, const GameContent& content)
+{
+    switch (action) {
+        case GA_RESET_LAUNCH:  this->reset_launch(g); break;
+        case GA_VERIFY:        this->verify(g); break;
+        case GA_REMOVE_UPDATE:
+        case GA_REMOVE_ADDON:  this->remove_content(g, content); break;
+        default:               this->remove(g); break;
+    }
 }
 
 void GameCheckActivity::remove(const GameFacts& g)
@@ -283,35 +428,43 @@ void GameCheckActivity::remove_content(const GameFacts& g, const GameContent& c)
 {
     const bool update = c.type == GC_META_PATCH;
     const std::string label = history_label(g), name = game_name(g);
-    const std::string what = update ? brls::getStr("playguard/games/action/remove_update", (int)c.version)
-                                    : brls::getStr("playguard/games/action/remove_addon", id_text(c.id));
-    const std::string body = name + "\n" + what + "\n\n" +
+    const std::string body = name + "\n" + action_label(g, update ? GA_REMOVE_UPDATE : GA_REMOVE_ADDON, &c) + "\n\n" +
                              (update ? "playguard/games/remove_update_body"_i18n : "playguard/games/remove_addon_body"_i18n);
     std::weak_ptr<bool> weak = this->alive;
     ui::confirm_danger(body, "playguard/games/remove"_i18n, [this, weak, id = g.app_id, c, update, label, name]() {
         const Result rc = gamecheck_remove_content(id, &c);
-        if (R_SUCCEEDED(rc))
-            history_flow::record_event(update ? "remove_update" : "remove_addon", "",
-                                       update ? label : fmt::format("{} · {}", label, id_text(c.id)));
-        ui::notify_result(rc, brls::getStr(update ? "playguard/games/update_removed" : "playguard/games/addon_removed", name),
-                          "playguard/games/content_err"_i18n);
-        if (R_SUCCEEDED(rc) && !weak.expired()) this->scan();
+        const std::string done = brls::getStr(update ? "playguard/games/update_removed" : "playguard/games/addon_removed", name);
+        if (R_FAILED(rc)) {
+            ui::notify_result(rc, done, "playguard/games/content_err"_i18n);
+            return;
+        }
+        history_flow::record_event(update ? "remove_update" : "remove_addon", "",
+                                   update ? label : fmt::format("{} · {}", label, id_text(c.id)));
+        if (weak.expired()) {
+            ui::notify(done);
+            return;
+        }
+        // Removing the update is a repair: the next read says if it worked.
+        if (update) this->pending = Pending{ id, name, done };
+        else ui::notify(done);
+        this->scan();
     });
 }
 
 void GameCheckActivity::reset_launch(const GameFacts& g)
 {
+    // Nothing is deleted and nothing is lost: no question first.
     const u32 installed = gamecheck_installed_version(&g);
     const std::string label = history_label(g), name = game_name(g);
-    const std::string body = name + "\n\n" +
-                             brls::getStr("playguard/games/reset_launch_body", (int)g.launch_required, (int)installed);
-    std::weak_ptr<bool> weak = this->alive;
-    ui::confirm(body, "playguard/games/reset_launch_confirm"_i18n, [this, weak, id = g.app_id, installed, label, name]() {
-        const Result rc = gamecheck_reset_launch_version(id, installed);
-        if (R_SUCCEEDED(rc)) history_flow::record_event("launch_version", "", label);
-        ui::notify_result(rc, brls::getStr("playguard/games/launch_reset", name), "playguard/games/launch_err"_i18n);
-        if (R_SUCCEEDED(rc) && !weak.expired()) this->scan();
-    });
+    const Result rc = gamecheck_reset_launch_version(g.app_id, installed);
+    const std::string done = brls::getStr("playguard/games/launch_reset", name);
+    if (R_FAILED(rc)) {
+        ui::notify_result(rc, done, "playguard/games/launch_err"_i18n);
+        return;
+    }
+    history_flow::record_event("launch_version", "", label);
+    this->pending = Pending{ g.app_id, name, done };
+    this->scan();
 }
 
 void GameCheckActivity::verify(const GameFacts& g)
@@ -321,23 +474,51 @@ void GameCheckActivity::verify(const GameFacts& g)
         return;
     }
     this->verifying = true;
-    const std::string name = game_name(g);
-    status->setText(brls::getStr("playguard/games/verifying", name, 0));
-    status->setTextColor(ui::color_text());
-    ui::set_visible(status.getView(), true);
+
+    // A dialog of its own: the progress, and Cancel (B too).
+    auto state = std::make_shared<VerifyState>();
+    state->name = game_name(g);
+    auto* box = new brls::Box(brls::Axis::COLUMN);
+    box->setAlignItems(brls::AlignItems::STRETCH);
+    box->setPadding(30, 40, 22, 40);
+    state->label = text_label(brls::getStr("playguard/games/verifying", state->name, 0), 24, ui::color_text());
+    state->label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    box->addView(state->label);
+    auto* hint_label = text_label("playguard/games/verify_note"_i18n, 18, ui::color_note());
+    hint_label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    hint_label->setMarginTop(14);
+    box->addView(hint_label);
+    state->dialog = new brls::Dialog(box);
+    auto cancel = [state]() {
+        state->cancel = true;
+        state->open = false;   // the dialog closes itself
+    };
+    state->dialog->addButton("hints/cancel"_i18n, cancel);
+    ui::on_cancel(state->dialog, cancel);
+    state->dialog->open();
+
     // Minutes for a big game: a thread of its own, so the other reads on
     // borealis' queue do not wait behind it.
-    auto progress = std::make_shared<VerifyProgress>(VerifyProgress{ this->alive, status.getView(), name });
     std::weak_ptr<bool> weak = this->alive;
-    ui::in_background("verify", [this, weak, progress, id = g.app_id, name]() {
+    ui::in_background("verify", [this, weak, state, id = g.app_id]() {
         bool corrupt = false;
-        const Result rc = gamecheck_verify(id, on_verify_progress, progress.get(), &corrupt);
-        brls::sync([this, weak, rc, corrupt, name]() {
-            if (R_FAILED(rc)) ui::error("playguard/games/verify_err"_i18n + " — " + ui::rc_text(rc));
-            else ui::info(brls::getStr(corrupt ? "playguard/games/verify_bad" : "playguard/games/verify_ok", name));
+        auto ctx = state;
+        const Result rc = gamecheck_verify(id, on_verify_progress, &ctx, &corrupt);
+        brls::sync([this, weak, state, rc, corrupt]() {
+            auto result = [state, rc, corrupt]() {
+                if (rc == NXM_RC_CANCELLED) ui::notify("playguard/games/verify_cancelled"_i18n);
+                else if (R_FAILED(rc)) ui::error("playguard/games/verify_err"_i18n + " — " + ui::rc_text(rc));
+                else ui::info(brls::getStr(corrupt ? "playguard/games/verify_bad" : "playguard/games/verify_ok", state->name));
+            };
+            if (state->open) {
+                state->open = false;
+                state->dialog->close(result);
+            } else {
+                result();
+            }
             if (weak.expired()) return;
             this->verifying = false;
-            this->scan();   // the console's view of it may have changed
+            if (rc != NXM_RC_CANCELLED) this->scan();   // the console's view of it may have changed
         });
     });
 }

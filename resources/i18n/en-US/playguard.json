@@ -739,22 +739,20 @@
             },
             "launch_version": {
                 "short": "Asks for a removed update",
-                "cause": "The console asks for version {} of the game, the version of an update installed earlier, but version {} is installed: the update was removed or did not install completely.",
+                "cause": "The console asks for {} of the game, installed earlier. Installed now: {}. The update was removed or did not install completely.",
                 "fix": "Accept the installed version again (Actions), or install the update again."
             }
         },
         "actions": "Actions",
         "action": {
             "remove": "Remove the game from the console",
-            "remove_update": "Remove the update (v{})",
+            "remove_update": "Remove the update ({})",
             "remove_addon": "Remove the add-on {}",
-            "reset_launch": "Accept the installed version again (v{})",
+            "reset_launch": "Accept the installed version again",
             "verify": "Check the data for corruption"
         },
         "remove_update_body": "Only the update is deleted: the game, its add-ons and its save data stay, and the console starts the game without the update.",
         "remove_addon_body": "Only this add-on is deleted: the game, its update and its save data stay.",
-        "reset_launch_body": "The console asks for version {} of this game, but version {} is installed. It will start the installed version again. Nothing is deleted.",
-        "reset_launch_confirm": "Accept it",
         "update_removed": "{}: update removed",
         "addon_removed": "{}: add-on removed",
         "launch_reset": "{}: the installed version is accepted again",
@@ -764,7 +762,21 @@
         "verify_ok": "{}: no corrupt data found.",
         "verify_bad": "{}: corrupt data found. Remove the game and install it again.",
         "verify_err": "Could not check the data",
-        "verify_busy": "A check is already running."
+        "verify_busy": "A check is already running.",
+        "version": "version {}",
+        "update_n": "update #{}",
+        "base_only": "the game without its updates",
+        "other_actions": "Other actions…",
+        "verify_note": "Every file of the game is read: a big game takes a few minutes.",
+        "verify_cancelled": "Check cancelled.",
+        "section_count": "Games with a problem: {} of {}",
+        "fixed": "{}: fixed, it works again.",
+        "fix_button": {
+            "verify": "Check the data",
+            "reset_launch": "Accept this version",
+            "remove_update": "Remove the update",
+            "remove": "Remove the game"
+        }
     },
     "about": {
         "section_changelog": "What's new in {}",

@@ -739,22 +739,20 @@
             },
             "launch_version": {
                 "short": "Vraagt om een verwijderde update",
-                "cause": "De console vraagt om versie {} van de game, die van een eerder geïnstalleerde update, maar versie {} is geïnstalleerd: de update is verwijderd of niet volledig geïnstalleerd.",
+                "cause": "De console vraagt om wat eerder geïnstalleerd was: {}. Nu geïnstalleerd: {}. De update is verwijderd of niet volledig geïnstalleerd.",
                 "fix": "Accepteer de geïnstalleerde versie weer (Acties), of installeer de update opnieuw."
             }
         },
         "actions": "Acties",
         "action": {
             "remove": "Game van de console verwijderen",
-            "remove_update": "Update verwijderen (v{})",
+            "remove_update": "Update verwijderen ({})",
             "remove_addon": "Extra content {} verwijderen",
-            "reset_launch": "Geïnstalleerde versie weer accepteren (v{})",
+            "reset_launch": "Geïnstalleerde versie weer accepteren",
             "verify": "Data op beschadiging controleren"
         },
         "remove_update_body": "Alleen de update wordt gewist: de game, de extra content en de opgeslagen data blijven, en de console start de game zonder de update.",
         "remove_addon_body": "Alleen deze extra content wordt gewist: de game, de update en de opgeslagen data blijven.",
-        "reset_launch_body": "De console vraagt om versie {} van deze game, maar versie {} is geïnstalleerd. Hij start de geïnstalleerde versie weer. Er wordt niets gewist.",
-        "reset_launch_confirm": "Accepteren",
         "update_removed": "{}: update verwijderd",
         "addon_removed": "{}: extra content verwijderd",
         "launch_reset": "{}: de geïnstalleerde versie wordt weer geaccepteerd",
@@ -764,7 +762,21 @@
         "verify_ok": "{}: geen beschadigde data gevonden.",
         "verify_bad": "{}: beschadigde data gevonden. Verwijder de game en installeer hem opnieuw.",
         "verify_err": "De data konden niet worden gecontroleerd",
-        "verify_busy": "Er loopt al een controle."
+        "verify_busy": "Er loopt al een controle.",
+        "version": "versie {}",
+        "update_n": "update nr. {}",
+        "base_only": "de game zonder updates",
+        "other_actions": "Andere acties…",
+        "verify_note": "Elk bestand van de game wordt gelezen: een grote game duurt een paar minuten.",
+        "verify_cancelled": "Controle geannuleerd.",
+        "section_count": "Games met een probleem: {} van {}",
+        "fixed": "{}: hersteld, hij werkt weer.",
+        "fix_button": {
+            "verify": "Data controleren",
+            "reset_launch": "Deze versie accepteren",
+            "remove_update": "Update verwijderen",
+            "remove": "Game verwijderen"
+        }
     },
     "about": {
         "section_changelog": "Nieuw in {}",

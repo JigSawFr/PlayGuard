@@ -38,6 +38,7 @@ typedef struct {
 typedef struct {
     u64 id;
     const char *name;         // NULL: no control data
+    const char *display_version;
     u8 record_event;
     bool record;              // the HOME menu entry exists
     int meta_count;
@@ -63,7 +64,7 @@ static struct {
     u64 deleted;
     RecordMetaWire pushed[MAX_METAS];
     int pushed_count;
-    int verify_waits, progress_calls;
+    int verify_waits, progress_calls, verify_cancels;
     bool verify_corrupt;
 } C;
 
@@ -195,6 +196,8 @@ Result nsGetApplicationControlData(NsApplicationControlSource source, u64 id, Ns
     if (!g || !g->name) return 0x1234;
     memset(&buffer->nacp, 0, sizeof(buffer->nacp));
     snprintf(buffer->nacp.lang[0].name, sizeof(buffer->nacp.lang[0].name), "%s", g->name);
+    snprintf(buffer->nacp.display_version, sizeof(buffer->nacp.display_version), "%s",
+             g->display_version ? g->display_version : "");
     *actual = sizeof(buffer->nacp) + 0x1000;
     return 0;
 }
@@ -580,6 +583,13 @@ Result nsProgressAsyncResultGetDetailResult(NsProgressAsyncResult *a)
     return C.verify_corrupt ? 0x2E02 : 0;
 }
 
+Result nsProgressAsyncResultCancel(NsProgressAsyncResult *a)
+{
+    assert(a->open);
+    C.verify_cancels++;
+    return 0;
+}
+
 void nsProgressAsyncResultClose(NsProgressAsyncResult *a)
 {
     assert(a->open);
@@ -723,11 +733,38 @@ static void test_actions(void)
     g.contents[1].storage = GC_STORAGE_GAMECARD;
     g.contents[2].storage = GC_STORAGE_GAMECARD;
     assert(gamecheck_actions(&g, GC_NO_CONTROL) == (GA_REMOVE | GA_VERIFY));
+    // What is recommended: the action that fixes it, when there is one.
+    g.has_base = true;
+    g.contents[1].storage = GC_STORAGE_SD;
+    g.contents[2].storage = GC_STORAGE_SD;
+    g.launch_rc = 0xC0DE;
+    g.launch_required = 0x30000;
+    assert(gamecheck_recommended(&g, GC_LAUNCH_VERSION, CURRENT) == GA_RESET_LAUNCH);
+    g.launch_rc = 0;
+    g.base_required_hos = HOS(19, 0, 0);
+    g.patch_required_hos = HOS(24, 0, 0);
+    assert(gamecheck_recommended(&g, GC_FIRMWARE_TOO_OLD, CURRENT) == GA_REMOVE_UPDATE);
+    g.base_required_hos = HOS(24, 0, 0);   // the game too: nothing fixes it here
+    assert(gamecheck_recommended(&g, GC_FIRMWARE_TOO_OLD, CURRENT) == 0);
+    assert(gamecheck_recommended(&g, GC_NEEDS_VERIFY, CURRENT) == GA_VERIFY);
+    assert(gamecheck_recommended(&g, GC_NO_CONTROL, CURRENT) == GA_VERIFY);
+    assert(gamecheck_recommended(&g, GC_FILES_MISSING, CURRENT) == GA_REMOVE);
+    assert(gamecheck_recommended(&g, GC_TICKET_MISSING, CURRENT) == 0);
+    assert(gamecheck_recommended(&g, GC_KEY_TOO_NEW, CURRENT) == 0);
+    assert(gamecheck_recommended(&g, GC_LAUNCH_REFUSED, CURRENT) == 0);
+    assert(gamecheck_recommended(&g, GC_OK, CURRENT) == 0);
+    assert(gamecheck_recommended(&g, GC_STORAGE_UNAVAILABLE, CURRENT) == 0);
+    g.contents[1].storage = GC_STORAGE_GAMECARD;   // the update on a card: not offered, not recommended
+    g.base_required_hos = HOS(19, 0, 0);
+    assert(gamecheck_recommended(&g, GC_FIRMWARE_TOO_OLD, CURRENT) == 0);
+
     // Without the game: removing all of it is the cleaning, nothing to check.
     g.has_base = false;
     g.contents[1].storage = GC_STORAGE_SD;
     assert(gamecheck_actions(&g, GC_NO_BASE) == GA_REMOVE);
     assert(gamecheck_actions(&g, GC_ARCHIVED) == GA_REMOVE);
+    assert(gamecheck_recommended(&g, GC_NO_BASE, CURRENT) == GA_REMOVE);
+    assert(gamecheck_recommended(&g, GC_ARCHIVED, CURRENT) == GA_REMOVE);
 }
 
 static void test_every_problem(void)
@@ -736,6 +773,7 @@ static void test_every_problem(void)
     FakeGame *g;
     FakeMeta *m;
     g = add_game(0x0100000000010000ULL, "Fine");   // game + update on the SD card, add-on, tickets
+    g->display_version = "1.4.0";
     m = add_meta(g, NcmContentMetaType_Application, NcmStorageId_SdCard, 0);
     m->required_sysver = SYSVER(12, 0, 0);
     m->titlekey = true;
@@ -788,7 +826,7 @@ static void test_every_problem(void)
     assert(R_SUCCEEDED(R.rc) && R_SUCCEEDED(R.tickets_rc) && R.count == (u32)C.count && !R.truncated);
 
     const GameFacts *f = facts(0x0100000000010000ULL);
-    assert(f->control_ok && strcmp(f->name, "Fine") == 0 && f->record_event == 3);
+    assert(f->control_ok && strcmp(f->name, "Fine") == 0 && strcmp(f->display_version, "1.4.0") == 0 && f->record_event == 3);
     assert(f->meta_count == 3 && f->content_count == 3 && f->has_base && f->has_patch && f->patch_version == 0x30000);
     assert(f->contents[1].type == GC_META_PATCH && f->contents[1].id == 0x0100000000010800ULL &&
            f->contents[1].version == 0x30000 && f->contents[1].storage == GC_STORAGE_SD);
@@ -809,7 +847,7 @@ static void test_every_problem(void)
     assert(issue_of(0x0100000000060000ULL) == GC_FIRMWARE_TOO_OLD);
     assert(facts(0x0100000000070000ULL)->launch_rc == 0xABCD && issue_of(0x0100000000070000ULL) == GC_LAUNCH_REFUSED);
     f = facts(0x0100000000080000ULL);
-    assert(!f->control_ok && f->name[0] == '\0' && issue_of(0x0100000000080000ULL) == GC_NO_CONTROL);
+    assert(!f->control_ok && f->name[0] == '\0' && f->display_version[0] == '\0' && issue_of(0x0100000000080000ULL) == GC_NO_CONTROL);
     assert(facts(0x0100000000090000ULL)->card_only && issue_of(0x0100000000090000ULL) == GC_OK);
     f = facts(0x01000000000A0000ULL);
     assert(!f->card_only && f->has_base && issue_of(0x01000000000A0000ULL) == GC_OK);   // the card is not read
@@ -1069,14 +1107,15 @@ static void test_reset_launch_version(void)
     assert(gamecheck_reset_launch_version(g->id, 0) == NXM_RC_FW_UNSUPPORTED);
 }
 
-static int s_progress_calls;
+static int s_progress_calls, s_cancel_after;
 static u64 s_last_current, s_last_total;
-static void on_progress(void *ctx, u64 current, u64 total)
+static bool on_progress(void *ctx, u64 current, u64 total)
 {
     assert(ctx == &s_progress_calls);
     s_progress_calls++;
     s_last_current = current;
     s_last_total = total;
+    return !s_cancel_after || s_progress_calls < s_cancel_after;
 }
 
 static void test_verify(void)
@@ -1086,9 +1125,21 @@ static void test_verify(void)
     add_meta(g, NcmContentMetaType_Application, NcmStorageId_SdCard, 0);
     bool corrupt = true;
     s_progress_calls = 0;
+    s_cancel_after = 0;
     assert(gamecheck_verify(g->id, on_progress, &s_progress_calls, &corrupt) == 0 && !corrupt);
-    assert(s_progress_calls == 3 && s_last_current == 300 && s_last_total == 400);
+    assert(s_progress_calls == 3 && s_last_current == 300 && s_last_total == 400 && C.verify_cancels == 0);
     all_closed();
+
+    // Cancelled from the progress: stopped, closed, nothing reported corrupt.
+    reset();
+    g = add_game(0x0100000000010000ULL, "A");
+    C.verify_corrupt = true;
+    s_progress_calls = 0;
+    s_cancel_after = 2;
+    assert(gamecheck_verify(g->id, on_progress, &s_progress_calls, &corrupt) == NXM_RC_CANCELLED && !corrupt);
+    assert(s_progress_calls == 2 && C.verify_cancels == 1);
+    all_closed();
+    s_cancel_after = 0;
 
     reset();
     g = add_game(0x0100000000010000ULL, "A");

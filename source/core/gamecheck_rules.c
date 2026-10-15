@@ -92,3 +92,30 @@ u32 gamecheck_actions(const GameFacts *g, GameIssue issue)
     if (g->has_base && issue != GC_ARCHIVED && issue != GC_NO_BASE) actions |= GA_VERIFY;
     return actions;
 }
+
+u32 gamecheck_recommended(const GameFacts *g, GameIssue issue, u32 current_hos)
+{
+    const u32 actions = gamecheck_actions(g, issue);
+    u32 pick = 0;
+    switch (issue) {
+        case GC_LAUNCH_VERSION:
+            pick = GA_RESET_LAUNCH;
+            break;
+        case GC_FIRMWARE_TOO_OLD:   // only the update needs it: the game runs without it
+            if (current_hos && g->patch_required_hos > current_hos && g->base_required_hos <= current_hos)
+                pick = GA_REMOVE_UPDATE;
+            break;
+        case GC_NEEDS_VERIFY:
+        case GC_NO_CONTROL:
+            pick = GA_VERIFY;
+            break;
+        case GC_ARCHIVED:
+        case GC_NO_BASE:
+        case GC_FILES_MISSING:
+            pick = GA_REMOVE;
+            break;
+        default:
+            break;
+    }
+    return actions & pick;
+}

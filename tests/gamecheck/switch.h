@@ -99,7 +99,7 @@ Result avmGetLaunchRequiredVersion(u64 application_id, u32 *version);
 Result avmPushLaunchVersion(u64 application_id, u32 version);
 
 typedef struct { char name[0x200]; char author[0x100]; } NacpLanguageEntry;
-typedef struct { NacpLanguageEntry lang[16]; u8 rest[0x1000]; } NacpStruct;
+typedef struct { NacpLanguageEntry lang[16]; char display_version[0x10]; u8 rest[0x1000]; } NacpStruct;
 typedef struct { NacpStruct nacp; u8 icon[0x20000]; } NsApplicationControlData;
 typedef enum { NsApplicationControlSource_CacheOnly = 0, NsApplicationControlSource_Storage = 1 } NsApplicationControlSource;
 typedef struct {
@@ -140,4 +140,5 @@ Result nsProgressAsyncResultWait(NsProgressAsyncResult *a, u64 timeout);
 Result nsProgressAsyncResultGet(NsProgressAsyncResult *a);
 Result nsProgressAsyncResultGetProgress(NsProgressAsyncResult *a, void *buffer, size_t size);
 Result nsProgressAsyncResultGetDetailResult(NsProgressAsyncResult *a);
+Result nsProgressAsyncResultCancel(NsProgressAsyncResult *a);
 void nsProgressAsyncResultClose(NsProgressAsyncResult *a);

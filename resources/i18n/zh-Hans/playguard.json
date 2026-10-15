@@ -739,22 +739,20 @@
             },
             "launch_version": {
                 "short": "要求已移除的更新",
-                "cause": "主机要求游戏的版本{}（之前安装的更新的版本），但已安装的是版本{}：更新已被移除或未完整安装。",
+                "cause": "主机要求之前安装的内容：{}。当前安装的是：{}。更新已被移除或未完整安装。",
                 "fix": "重新接受已安装的版本（操作），或重新安装更新。"
             }
         },
         "actions": "操作",
         "action": {
             "remove": "从主机删除游戏",
-            "remove_update": "删除更新（v{}）",
+            "remove_update": "删除更新（{}）",
             "remove_addon": "删除追加内容 {}",
-            "reset_launch": "重新接受已安装的版本（v{}）",
+            "reset_launch": "重新接受已安装的版本",
             "verify": "检查数据是否损坏"
         },
         "remove_update_body": "只删除更新：游戏、追加内容和存档数据保留，主机将在没有更新的情况下启动游戏。",
         "remove_addon_body": "只删除此追加内容：游戏、更新和存档数据保留。",
-        "reset_launch_body": "主机要求此游戏的版本{}，但已安装的是版本{}。它将重新启动已安装的版本。不会删除任何内容。",
-        "reset_launch_confirm": "接受",
         "update_removed": "{}：已删除更新",
         "addon_removed": "{}：已删除追加内容",
         "launch_reset": "{}：已重新接受已安装的版本",
@@ -764,7 +762,21 @@
         "verify_ok": "{}：未发现损坏的数据。",
         "verify_bad": "{}：发现损坏的数据。请删除游戏后重新安装。",
         "verify_err": "无法检查数据",
-        "verify_busy": "已有检查正在进行。"
+        "verify_busy": "已有检查正在进行。",
+        "version": "版本{}",
+        "update_n": "更新 #{}",
+        "base_only": "不含更新的游戏",
+        "other_actions": "其他操作…",
+        "verify_note": "将读取游戏的所有文件：大型游戏需要几分钟。",
+        "verify_cancelled": "已取消检查。",
+        "section_count": "有问题的游戏：{} / {}",
+        "fixed": "{}：已修复，可以再次运行。",
+        "fix_button": {
+            "verify": "检查数据",
+            "reset_launch": "接受此版本",
+            "remove_update": "删除更新",
+            "remove": "删除游戏"
+        }
     },
     "about": {
         "section_changelog": "{} 更新内容",

@@ -49,5 +49,6 @@ typedef u32      Result;
 #define NXM_RC_NO_PIN               NXM_RESULT(10)  // no parental-control PIN is set
 #define NXM_RC_RELOCK_FAILED        NXM_RESULT(11)  // unlocked, then neither verified nor locked again: may still be unlocked
 #define NXM_RC_NOT_APPLIED          NXM_RESULT(12)  // written, the console did not report it: the previous settings were put back
+#define NXM_RC_CANCELLED            NXM_RESULT(13)  // stopped on request (the installed games' integrity check)
 #define NXM_IS_APP_RESULT(rc)       (((rc) & 0x1FFu) == NXM_MODULE)
 #define NXM_RESULT_DESC(rc)         (((rc) >> 9) & 0x1FFFu)

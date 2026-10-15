@@ -181,6 +181,7 @@ static void check_game(GameFacts *g, NsApplicationControlData *cd, Scan *sc)
         size > sizeof(cd->nacp) && R_SUCCEEDED(nacpGetLanguageEntry(&cd->nacp, &lang)) && lang && lang->name[0]) {
         g->control_ok = true;
         copy_utf8(g->name, sizeof(g->name), lang->name);
+        copy_utf8(g->display_version, sizeof(g->display_version), cd->nacp.display_version);
     }
 
     NsApplicationContentMetaStatus metas[META_CHUNK];
@@ -480,7 +481,7 @@ Result gamecheck_reset_launch_version(u64 app_id, u32 version)
     return rc;
 }
 
-Result gamecheck_verify(u64 app_id, void (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt)
+Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt)
 {
     *corrupt = false;
     Result rc = nsInitialize();
@@ -494,14 +495,23 @@ Result gamecheck_verify(u64 app_id, void (*progress)(void *ctx, u64 current, u64
     rc = nsRequestVerifyApplication(&async, app_id, 0x7, buffer, VERIFY_BUFFER);   // 0x7: what qlaunch passes
     if (R_SUCCEEDED(rc)) {
         // Until it is done, the progress four times a second.
+        bool cancelled = false;
         while (nsProgressAsyncResultWait(&async, 250000000ULL) == KERNELRESULT(TimedOut)) {
             NsSystemUpdateProgress p;
             memset(&p, 0, sizeof(p));
-            if (progress && R_SUCCEEDED(nsProgressAsyncResultGetProgress(&async, &p, sizeof(p))))
-                progress(ctx, p.current_size > 0 ? (u64)p.current_size : 0, p.total_size > 0 ? (u64)p.total_size : 0);
+            if (R_FAILED(nsProgressAsyncResultGetProgress(&async, &p, sizeof(p)))) memset(&p, 0, sizeof(p));
+            if (progress && !progress(ctx, p.current_size > 0 ? (u64)p.current_size : 0, p.total_size > 0 ? (u64)p.total_size : 0)) {
+                cancelled = true;
+                nsProgressAsyncResultCancel(&async);
+                break;
+            }
         }
-        rc = nsProgressAsyncResultGet(&async);
-        if (R_SUCCEEDED(rc)) *corrupt = R_FAILED(nsProgressAsyncResultGetDetailResult(&async));
+        if (cancelled) {
+            rc = NXM_RC_CANCELLED;
+        } else {
+            rc = nsProgressAsyncResultGet(&async);
+            if (R_SUCCEEDED(rc)) *corrupt = R_FAILED(nsProgressAsyncResultGetDetailResult(&async));
+        }
         nsProgressAsyncResultClose(&async);
     }
     free(buffer);

@@ -739,22 +739,20 @@
             },
             "launch_version": {
                 "short": "要求已移除的更新",
-                "cause": "主機要求遊戲的版本{}（之前安裝的更新的版本），但已安裝的是版本{}：更新已被移除或未完整安裝。",
+                "cause": "主機要求之前安裝的內容：{}。目前安裝的是：{}。更新已被移除或未完整安裝。",
                 "fix": "重新接受已安裝的版本（操作），或重新安裝更新。"
             }
         },
         "actions": "操作",
         "action": {
             "remove": "從主機刪除遊戲",
-            "remove_update": "刪除更新（v{}）",
+            "remove_update": "刪除更新（{}）",
             "remove_addon": "刪除追加內容 {}",
-            "reset_launch": "重新接受已安裝的版本（v{}）",
+            "reset_launch": "重新接受已安裝的版本",
             "verify": "檢查資料是否損壞"
         },
         "remove_update_body": "只刪除更新：遊戲、追加內容和存檔資料保留，主機將在沒有更新的情況下啟動遊戲。",
         "remove_addon_body": "只刪除此追加內容：遊戲、更新和存檔資料保留。",
-        "reset_launch_body": "主機要求此遊戲的版本{}，但已安裝的是版本{}。它將重新啟動已安裝的版本。不會刪除任何內容。",
-        "reset_launch_confirm": "接受",
         "update_removed": "{}：已刪除更新",
         "addon_removed": "{}：已刪除追加內容",
         "launch_reset": "{}：已重新接受已安裝的版本",
@@ -764,7 +762,21 @@
         "verify_ok": "{}：未發現損壞的資料。",
         "verify_bad": "{}：發現損壞的資料。請刪除遊戲後重新安裝。",
         "verify_err": "無法檢查資料",
-        "verify_busy": "已有檢查正在進行。"
+        "verify_busy": "已有檢查正在進行。",
+        "version": "版本{}",
+        "update_n": "更新 #{}",
+        "base_only": "不含更新的遊戲",
+        "other_actions": "其他操作…",
+        "verify_note": "將讀取遊戲的所有檔案：大型遊戲需要幾分鐘。",
+        "verify_cancelled": "已取消檢查。",
+        "section_count": "有問題的遊戲：{} / {}",
+        "fixed": "{}：已修復，可以再次執行。",
+        "fix_button": {
+            "verify": "檢查資料",
+            "reset_launch": "接受此版本",
+            "remove_update": "刪除更新",
+            "remove": "刪除遊戲"
+        }
     },
     "about": {
         "section_changelog": "{} 更新內容",

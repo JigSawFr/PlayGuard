@@ -739,22 +739,20 @@
             },
             "launch_version": {
                 "short": "Pide una actualización retirada",
-                "cause": "La consola pide la versión {} del juego, la de una actualización instalada antes, pero está instalada la versión {}: la actualización se retiró o no se instaló por completo.",
+                "cause": "La consola pide lo que estaba instalado antes: {}. Instalado ahora: {}. La actualización se retiró o no se instaló por completo.",
                 "fix": "Acepta de nuevo la versión instalada (Acciones) o vuelve a instalar la actualización."
             }
         },
         "actions": "Acciones",
         "action": {
             "remove": "Eliminar el juego de la consola",
-            "remove_update": "Eliminar la actualización (v{})",
+            "remove_update": "Eliminar la actualización ({})",
             "remove_addon": "Eliminar el contenido descargable {}",
-            "reset_launch": "Aceptar de nuevo la versión instalada (v{})",
+            "reset_launch": "Aceptar de nuevo la versión instalada",
             "verify": "Comprobar si los datos están dañados"
         },
         "remove_update_body": "Solo se borra la actualización: el juego, sus contenidos descargables y sus datos guardados se conservan, y la consola inicia el juego sin la actualización.",
         "remove_addon_body": "Solo se borra este contenido descargable: el juego, su actualización y sus datos guardados se conservan.",
-        "reset_launch_body": "La consola pide la versión {} de este juego, pero está instalada la versión {}. Volverá a iniciar la versión instalada. No se borra nada.",
-        "reset_launch_confirm": "Aceptar",
         "update_removed": "{}: actualización eliminada",
         "addon_removed": "{}: contenido descargable eliminado",
         "launch_reset": "{}: se vuelve a aceptar la versión instalada",
@@ -764,7 +762,21 @@
         "verify_ok": "{}: no se han encontrado datos dañados.",
         "verify_bad": "{}: se han encontrado datos dañados. Elimina el juego y vuelve a instalarlo.",
         "verify_err": "No se pudieron comprobar los datos",
-        "verify_busy": "Ya hay una comprobación en curso."
+        "verify_busy": "Ya hay una comprobación en curso.",
+        "version": "versión {}",
+        "update_n": "actualización n.º {}",
+        "base_only": "el juego sin sus actualizaciones",
+        "other_actions": "Otras acciones…",
+        "verify_note": "Se leen todos los archivos del juego: un juego grande tarda unos minutos.",
+        "verify_cancelled": "Comprobación cancelada.",
+        "section_count": "Juegos con un problema: {} de {}",
+        "fixed": "{}: reparado, vuelve a funcionar.",
+        "fix_button": {
+            "verify": "Comprobar los datos",
+            "reset_launch": "Aceptar esta versión",
+            "remove_update": "Eliminar la actualización",
+            "remove": "Eliminar el juego"
+        }
     },
     "about": {
         "section_changelog": "Novedades de la {}",
