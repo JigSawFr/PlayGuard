@@ -499,9 +499,11 @@ Result gamecheck_reset_launch_version(u64 app_id, u32 version)
     return rc;
 }
 
-Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt)
+Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt,
+                        Result *found)
 {
     *corrupt = false;
+    *found = 0;
     Result rc = nsInitialize();
     if (R_FAILED(rc)) return rc;
     void *buffer = aligned_alloc(0x1000, VERIFY_BUFFER);
@@ -527,8 +529,15 @@ Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64
         if (cancelled) {
             rc = NXM_RC_CANCELLED;
         } else {
+            // What was found comes as the check's result itself (2016-0601,
+            // seen on a console) or as its detail (an fs result).
             rc = nsProgressAsyncResultGet(&async);
-            if (R_SUCCEEDED(rc)) *corrupt = R_FAILED(nsProgressAsyncResultGetDetailResult(&async));
+            const Result detail = nsProgressAsyncResultGetDetailResult(&async);
+            if (gamecheck_is_corruption(rc) || (R_SUCCEEDED(rc) && R_FAILED(detail))) {
+                *corrupt = true;
+                *found = R_FAILED(detail) ? detail : rc;
+                rc = 0;
+            }
         }
         nsProgressAsyncResultClose(&async);
     }

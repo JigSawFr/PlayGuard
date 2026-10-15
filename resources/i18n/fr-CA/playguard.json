@@ -108,7 +108,9 @@
         "clock_not_set": "la console indique que son horloge réseau n'a pas d'heure valide (elle n'a peut-être jamais été réglée); voir l'onglet Horloge réseau",
         "no_internet": "la console n'est pas connectée à Internet : connectez-la, puis réessayez",
         "service_denied": "le système a refusé à PlayGuard l'accès à l'un de ses services; PlayGuard a besoin d'une console sous Atmosphère",
-        "pdm_unavailable": "le service des données de jeu de la console n'est pas disponible pour le moment; réessayez dans un instant"
+        "pdm_unavailable": "le service des données de jeu de la console n'est pas disponible pour le moment; réessayez dans un instant",
+        "corrupt_data": "données corrompues : les fichiers du jeu sont endommagés ; supprimez le jeu et réinstallez-le",
+        "cancelled": "annulé"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -881,7 +883,8 @@
         "verify_left_min": "environ {} min restantes",
         "size_mb": "{} Mo",
         "size_gb": "{} Go",
-        "decimal_mark": ","
+        "decimal_mark": ",",
+        "verify_code": "Code de la console : {}"
     },
     "about": {
         "section_changelog": "Nouveautés de la {}",

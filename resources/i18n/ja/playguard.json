@@ -108,7 +108,9 @@
         "clock_not_set": "本体のネットワーク時計に有効な時刻がないと報告されました（一度も設定されていない可能性があります）。「ネットワーク時計」タブをご覧ください",
         "no_internet": "本体がインターネットに接続されていません。接続してから、もう一度お試しください",
         "service_denied": "本体がPlayGuardにサービスへのアクセスを許可しませんでした。PlayGuardにはAtmosphèreで動作する本体が必要です",
-        "pdm_unavailable": "本体のプレイ記録サービスは現在利用できません。しばらくしてから、もう一度お試しください"
+        "pdm_unavailable": "本体のプレイ記録サービスは現在利用できません。しばらくしてから、もう一度お試しください",
+        "corrupt_data": "データが破損しています：ゲームのファイルが破損しています。ゲームを削除して再インストールしてください",
+        "cancelled": "中止しました"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -881,7 +883,8 @@
         "verify_left_min": "残り約{}分",
         "size_mb": "{} MB",
         "size_gb": "{} GB",
-        "decimal_mark": "."
+        "decimal_mark": ".",
+        "verify_code": "本体のエラーコード：{}"
     },
     "about": {
         "section_changelog": "{}の更新内容",

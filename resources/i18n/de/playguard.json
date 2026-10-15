@@ -108,7 +108,9 @@
         "clock_not_set": "die Konsole meldet, dass ihre Netzwerkuhr keine gültige Zeit hat (sie wurde vielleicht nie gestellt); siehe den Tab Netzwerkuhr",
         "no_internet": "die Konsole ist nicht mit dem Internet verbunden: Verbinden Sie sie und versuchen Sie es dann erneut",
         "service_denied": "das System hat PlayGuard den Zugriff auf einen seiner Dienste verweigert; PlayGuard benötigt eine Konsole mit Atmosphère",
-        "pdm_unavailable": "der Spieldaten-Dienst der Konsole ist gerade nicht verfügbar; versuchen Sie es gleich noch einmal"
+        "pdm_unavailable": "der Spieldaten-Dienst der Konsole ist gerade nicht verfügbar; versuchen Sie es gleich noch einmal",
+        "corrupt_data": "beschädigte Daten: Die Dateien des Spiels sind beschädigt; entferne das Spiel und installiere es erneut",
+        "cancelled": "abgebrochen"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -881,7 +883,8 @@
         "verify_left_min": "noch etwa {} Min.",
         "size_mb": "{} MB",
         "size_gb": "{} GB",
-        "decimal_mark": ","
+        "decimal_mark": ",",
+        "verify_code": "Code der Konsole: {}"
     },
     "about": {
         "section_changelog": "Neu in {}",

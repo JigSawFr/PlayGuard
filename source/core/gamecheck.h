@@ -175,12 +175,21 @@ Result gamecheck_remove_content(u64 app_id, const GameContent *content);
 // read again: NXM_RC_NOT_APPLIED when the console still wants more.
 Result gamecheck_reset_launch_version(u64 app_id, u32 version);
 
+// Whether `rc` says the data read is corrupt rather than that a request
+// failed: ns 2016-0601 / 2016-0602 (Nintendo: corrupt data when a game
+// starts) and fs' DataCorrupted results (2002-4000 to 2002-4999, such as
+// 2002-4153).
+bool gamecheck_is_corruption(Result rc);
+
 // The console's integrity check (System Settings › Data Management), which
 // reads every file of the game. `progress` is called while it runs (current
 // and total bytes, total 0 while unknown); returning false cancels the check
-// (NXM_RC_CANCELLED). Returns the check's result; *corrupt is set when it
-// found corrupt data.
-Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt);
+// (NXM_RC_CANCELLED). Returns 0 when the check ran to its end, whatever it
+// found: *corrupt is then set when it found corrupt data, and *found holds
+// the code the console gave for it (0 when none). Any other result: the
+// check could not run.
+Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt,
+                        Result *found);
 
 #ifdef __cplusplus
 }

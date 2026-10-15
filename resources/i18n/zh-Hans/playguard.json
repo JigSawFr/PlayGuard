@@ -108,7 +108,9 @@
         "clock_not_set": "主机报告其网络时钟没有有效时间（可能从未设置过）；请查看“网络时钟”页",
         "no_internet": "主机未连接到互联网：请连接后重试",
         "service_denied": "系统拒绝PlayGuard访问其某项服务；PlayGuard需要运行Atmosphère的主机",
-        "pdm_unavailable": "主机的游玩数据服务目前不可用；请稍后重试"
+        "pdm_unavailable": "主机的游玩数据服务目前不可用；请稍后重试",
+        "corrupt_data": "数据已损坏：游戏文件已损坏；请删除游戏后重新安装",
+        "cancelled": "已取消"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -881,7 +883,8 @@
         "verify_left_min": "剩余约{}分钟",
         "size_mb": "{} MB",
         "size_gb": "{} GB",
-        "decimal_mark": "."
+        "decimal_mark": ".",
+        "verify_code": "主机代码：{}"
     },
     "about": {
         "section_changelog": "{} 更新内容",

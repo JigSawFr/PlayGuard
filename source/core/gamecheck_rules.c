@@ -130,3 +130,11 @@ void gamecheck_scan(GameCheck *out)
     if (R_SUCCEEDED(out->rc)) gamecheck_check(records, out->count, out->games, NULL, NULL);
     else out->count = 0;
 }
+
+bool gamecheck_is_corruption(Result rc)
+{
+    const u32 module = rc & 0x1FF, desc = (rc >> 9) & 0x1FFF;
+    if (module == 16) return desc == 601 || desc == 602;   // ns
+    if (module == 2) return desc >= 4000 && desc <= 4999;  // fs: DataCorrupted
+    return false;
+}

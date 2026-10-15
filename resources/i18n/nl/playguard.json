@@ -108,7 +108,9 @@
         "clock_not_set": "de console meldt dat de netwerkklok geen geldige tijd heeft (misschien is die nooit ingesteld); zie het tabblad Netwerkklok",
         "no_internet": "de console is niet met internet verbonden: verbind hem en probeer het opnieuw",
         "service_denied": "het systeem weigerde PlayGuard toegang tot een van zijn diensten; PlayGuard heeft een console met Atmosphère nodig",
-        "pdm_unavailable": "de speelgegevensdienst van de console is nu niet beschikbaar; probeer het zo opnieuw"
+        "pdm_unavailable": "de speelgegevensdienst van de console is nu niet beschikbaar; probeer het zo opnieuw",
+        "corrupt_data": "beschadigde data: de bestanden van de game zijn beschadigd; verwijder de game en installeer hem opnieuw",
+        "cancelled": "geannuleerd"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -881,7 +883,8 @@
         "verify_left_min": "nog ongeveer {} min",
         "size_mb": "{} MB",
         "size_gb": "{} GB",
-        "decimal_mark": ","
+        "decimal_mark": ",",
+        "verify_code": "Code van de console: {}"
     },
     "about": {
         "section_changelog": "Nieuw in {}",

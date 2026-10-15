@@ -886,9 +886,11 @@ Result gamecheck_reset_launch_version(u64 app_id, u32 version)
 }
 
 // Four seconds or so of progress over 3.8 GB; "Forest Tales" has corrupt data.
-Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt)
+Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt,
+                        Result *found)
 {
     *corrupt = false;
+    *found = 0;
     if (fails("verify")) return SIM_FAIL_RC;
     const u64 total = 3891ULL << 20;
     for (u64 step = 0; step <= 8; step++) {
@@ -897,6 +899,7 @@ Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64
         nanosleep(&pause, NULL);
     }
     *corrupt = app_id == 0x0100A1B2C3D4E000ULL;
+    if (*corrupt) *found = 16 | (601 << 9);   // 2016-0601, as a console answers
     return 0;
 }
 

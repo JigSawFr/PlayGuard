@@ -108,7 +108,9 @@
         "clock_not_set": "主機回報其網路時鐘沒有有效時間（可能從未設定過）；請查看「網路時鐘」頁",
         "no_internet": "主機未連線至網際網路：請連線後再試一次",
         "service_denied": "系統拒絕PlayGuard存取其中一項服務；PlayGuard需要執行Atmosphère的主機",
-        "pdm_unavailable": "主機的遊玩資料服務目前無法使用；請稍後再試一次"
+        "pdm_unavailable": "主機的遊玩資料服務目前無法使用；請稍後再試一次",
+        "corrupt_data": "資料已損壞：遊戲檔案已損壞；請刪除遊戲後重新安裝",
+        "cancelled": "已取消"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -881,7 +883,8 @@
         "verify_left_min": "剩餘約{}分鐘",
         "size_mb": "{} MB",
         "size_gb": "{} GB",
-        "decimal_mark": "."
+        "decimal_mark": ".",
+        "verify_code": "主機代碼：{}"
     },
     "about": {
         "section_changelog": "{} 更新內容",

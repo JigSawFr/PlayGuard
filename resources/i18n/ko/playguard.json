@@ -108,7 +108,9 @@
         "clock_not_set": "본체가 네트워크 시계에 유효한 시간이 없다고 보고했습니다(한 번도 설정되지 않았을 수 있습니다). 네트워크 시계 탭을 확인하세요",
         "no_internet": "본체가 인터넷에 연결되어 있지 않습니다. 연결한 후 다시 시도하세요",
         "service_denied": "시스템이 PlayGuard의 서비스 접근을 거부했습니다. PlayGuard는 Atmosphère를 실행하는 본체가 필요합니다",
-        "pdm_unavailable": "본체의 플레이 데이터 서비스를 지금은 사용할 수 없습니다. 잠시 후 다시 시도하세요"
+        "pdm_unavailable": "본체의 플레이 데이터 서비스를 지금은 사용할 수 없습니다. 잠시 후 다시 시도하세요",
+        "corrupt_data": "데이터 손상: 게임 파일이 손상되었습니다. 게임을 삭제한 뒤 다시 설치하세요",
+        "cancelled": "취소됨"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -881,7 +883,8 @@
         "verify_left_min": "약 {}분 남음",
         "size_mb": "{} MB",
         "size_gb": "{} GB",
-        "decimal_mark": "."
+        "decimal_mark": ".",
+        "verify_code": "본체 코드: {}"
     },
     "about": {
         "section_changelog": "{}의 새로운 기능",

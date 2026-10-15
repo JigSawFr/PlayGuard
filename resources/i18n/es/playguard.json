@@ -108,7 +108,9 @@
         "clock_not_set": "la consola indica que su reloj de red no tiene una hora válida (puede que nunca se haya ajustado); consulte la pestaña Reloj de red",
         "no_internet": "la consola no está conectada a internet: conéctela e inténtelo de nuevo",
         "service_denied": "el sistema ha denegado a PlayGuard el acceso a uno de sus servicios; PlayGuard necesita una consola con Atmosphère",
-        "pdm_unavailable": "el servicio de datos de juego de la consola no está disponible ahora; inténtelo de nuevo dentro de un momento"
+        "pdm_unavailable": "el servicio de datos de juego de la consola no está disponible ahora; inténtelo de nuevo dentro de un momento",
+        "corrupt_data": "datos dañados: los archivos del juego están dañados; elimina el juego y vuelve a instalarlo",
+        "cancelled": "cancelado"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -881,7 +883,8 @@
         "verify_left_min": "quedan unos {} min",
         "size_mb": "{} MB",
         "size_gb": "{} GB",
-        "decimal_mark": ","
+        "decimal_mark": ",",
+        "verify_code": "Código de la consola: {}"
     },
     "about": {
         "section_changelog": "Novedades de la {}",

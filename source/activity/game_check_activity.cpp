@@ -254,6 +254,12 @@ class ProgressBar : public brls::View
     NVGcolor track, done;
 };
 
+// A system result as the console shows it: 2016-0601.
+std::string console_code(Result rc)
+{
+    return fmt::format("{:04}-{:04}", 2000 + (rc & 0x1FF), (rc >> 9) & 0x1FFF);
+}
+
 // "850 MB", "3.8 GB" (the language's decimal mark).
 std::string size_text(u64 bytes)
 {
@@ -764,15 +770,27 @@ void GameCheckActivity::verify(const GameFacts& g)
     // borealis' queue do not wait behind it.
     std::weak_ptr<bool> weak = this->alive;
     const u64 checked_id = g.app_id;
-    ui::in_background("verify", [this, weak, state, id = g.app_id, checked_id]() {
+    ui::in_background("verify", [this, weak, state, id = g.app_id, checked_id, g]() {
         bool corrupt = false;
+        Result found = 0;
         auto ctx = state;
-        const Result rc = gamecheck_verify(id, on_verify_progress, &ctx, &corrupt);
-        brls::sync([this, weak, state, rc, corrupt, checked_id]() {
-            auto result = [state, rc, corrupt]() {
-                if (rc == NXM_RC_CANCELLED) ui::notify("playguard/games/verify_cancelled"_i18n);
-                else if (R_FAILED(rc)) ui::error("playguard/games/verify_err"_i18n + " — " + ui::rc_text(rc));
-                else ui::info(brls::getStr(corrupt ? "playguard/games/verify_bad" : "playguard/games/verify_ok", state->name));
+        const Result rc = gamecheck_verify(id, on_verify_progress, &ctx, &corrupt, &found);
+        brls::sync([this, weak, state, rc, corrupt, found, checked_id, g]() {
+            auto result = [this, weak, state, rc, corrupt, found, g]() {
+                if (rc == NXM_RC_CANCELLED) {
+                    ui::notify("playguard/games/verify_cancelled"_i18n);
+                } else if (R_FAILED(rc)) {
+                    ui::error("playguard/games/verify_err"_i18n + " — " + ui::rc_text(rc));
+                } else if (!corrupt) {
+                    ui::info(brls::getStr("playguard/games/verify_ok", state->name));
+                } else {
+                    // What the console found, with its code as the HOME menu
+                    // would show it, and the way out at hand.
+                    std::string body = brls::getStr("playguard/games/verify_bad", state->name);
+                    if (found) body += "\n\n" + brls::getStr("playguard/games/verify_code", console_code(found));
+                    if (app::read_only() || weak.expired()) ui::info(body);
+                    else ui::confirm(body, "playguard/games/fix_button/remove"_i18n, [this, g]() { this->remove(g); });
+                }
             };
             if (state->open) {
                 state->open = false;

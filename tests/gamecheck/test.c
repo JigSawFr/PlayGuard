@@ -67,6 +67,7 @@ static struct {
     int pushed_count;
     int verify_waits, progress_calls, verify_cancels;
     bool verify_corrupt;
+    Result verify_get_rc;     // what the check's own result says
 } C;
 
 static void reset(void)
@@ -579,7 +580,7 @@ Result nsProgressAsyncResultGetProgress(NsProgressAsyncResult *a, void *buffer, 
 Result nsProgressAsyncResultGet(NsProgressAsyncResult *a)
 {
     REQUIRE(a->open);
-    return 0;
+    return C.verify_get_rc;
 }
 
 Result nsProgressAsyncResultGetDetailResult(NsProgressAsyncResult *a)
@@ -1187,9 +1188,10 @@ static void test_verify(void)
     FakeGame *g = add_game(0x0100000000010000ULL, "A");
     add_meta(g, NcmContentMetaType_Application, NcmStorageId_SdCard, 0);
     bool corrupt = true;
+    Result found = 1;
     s_progress_calls = 0;
     s_cancel_after = 0;
-    CHECK(gamecheck_verify(g->id, on_progress, &s_progress_calls, &corrupt) == 0 && !corrupt);
+    CHECK(gamecheck_verify(g->id, on_progress, &s_progress_calls, &corrupt, &found) == 0 && !corrupt && found == 0);
     CHECK(s_progress_calls == 3 && s_last_current == 300 && s_last_total == 400 && C.verify_cancels == 0);
     all_closed();
 
@@ -1199,29 +1201,59 @@ static void test_verify(void)
     C.verify_corrupt = true;
     s_progress_calls = 0;
     s_cancel_after = 2;
-    CHECK(gamecheck_verify(g->id, on_progress, &s_progress_calls, &corrupt) == NXM_RC_CANCELLED && !corrupt);
+    CHECK(gamecheck_verify(g->id, on_progress, &s_progress_calls, &corrupt, &found) == NXM_RC_CANCELLED && !corrupt);
     CHECK(s_progress_calls == 2 && C.verify_cancels == 1);
     all_closed();
     s_cancel_after = 0;
 
+    // Corruption found, said in the detail: the check ran, with its code.
     reset();
     g = add_game(0x0100000000010000ULL, "A");
     C.verify_corrupt = true;
-    CHECK(gamecheck_verify(g->id, NULL, NULL, &corrupt) == 0 && corrupt);
+    CHECK(gamecheck_verify(g->id, NULL, NULL, &corrupt, &found) == 0 && corrupt && found == 0x2E02);
+    all_closed();
+
+    // … or as the check's own result, as a console answered (2016-0601 =
+    // 0x4B210): the same, not a failure.
+    reset();
+    g = add_game(0x0100000000010000ULL, "A");
+    C.verify_get_rc = 0x4B210;
+    CHECK(gamecheck_verify(g->id, NULL, NULL, &corrupt, &found) == 0 && corrupt && found == 0x4B210);
+    all_closed();
+    reset();
+    g = add_game(0x0100000000010000ULL, "A");
+    C.verify_get_rc = 0x4B210;
+    C.verify_corrupt = true;   // both: the detail, more precise, is kept
+    CHECK(gamecheck_verify(g->id, NULL, NULL, &corrupt, &found) == 0 && corrupt && found == 0x2E02);
+
+    // Another result of its own: the check could not run.
+    reset();
+    g = add_game(0x0100000000010000ULL, "A");
+    C.verify_get_rc = 0x7A10;   // ns 61
+    CHECK(gamecheck_verify(g->id, NULL, NULL, &corrupt, &found) == 0x7A10 && !corrupt && found == 0);
     all_closed();
 
     // Only reads: also in read-only mode.
     reset();
     g = add_game(0x0100000000010000ULL, "A");
     core_set_read_only(true);
-    CHECK(gamecheck_verify(g->id, NULL, NULL, &corrupt) == 0 && !corrupt);
+    CHECK(gamecheck_verify(g->id, NULL, NULL, &corrupt, &found) == 0 && !corrupt);
     core_set_read_only(false);
 
     reset();
     g = add_game(0x0100000000010000ULL, "A");
     C.verify_rc = 0x5A5A;
-    CHECK(gamecheck_verify(g->id, NULL, NULL, &corrupt) == 0x5A5A && !corrupt);
+    CHECK(gamecheck_verify(g->id, NULL, NULL, &corrupt, &found) == 0x5A5A && !corrupt);
     all_closed();
+
+    // What counts as corruption.
+    CHECK(gamecheck_is_corruption(0x4B210));                // 2016-0601
+    CHECK(gamecheck_is_corruption(16 | (602 << 9)));        // 2016-0602
+    CHECK(gamecheck_is_corruption(2 | (4153 << 9)));        // 2002-4153
+    CHECK(gamecheck_is_corruption(2 | (4000 << 9)) && gamecheck_is_corruption(2 | (4999 << 9)));
+    CHECK(!gamecheck_is_corruption(2 | (3999 << 9)) && !gamecheck_is_corruption(2 | (5000 << 9)));
+    CHECK(!gamecheck_is_corruption(16 | (600 << 9)) && !gamecheck_is_corruption(16 | (603 << 9)));
+    CHECK(!gamecheck_is_corruption(0) && !gamecheck_is_corruption(NXM_RC_CANCELLED));
 }
 
 int main(void)
