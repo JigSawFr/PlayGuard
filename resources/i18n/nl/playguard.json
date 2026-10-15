@@ -110,7 +110,9 @@
         "clock_not_set": "de console meldt dat de netwerkklok geen geldige tijd heeft (misschien is die nooit ingesteld); zie het tabblad Netwerkklok",
         "no_internet": "de console is niet met internet verbonden: verbind hem en probeer het opnieuw",
         "service_denied": "het systeem weigerde PlayGuard toegang tot een van zijn diensten; PlayGuard heeft een console met Atmosphère nodig",
-        "pdm_unavailable": "de speelgegevensdienst van de console is nu niet beschikbaar; probeer het zo opnieuw"
+        "pdm_unavailable": "de speelgegevensdienst van de console is nu niet beschikbaar; probeer het zo opnieuw",
+        "corrupt_data": "beschadigde data: de bestanden van de game zijn beschadigd; verwijder de game en installeer hem opnieuw",
+        "cancelled": "geannuleerd"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -767,7 +769,6 @@
         "open": "Geïnstalleerde games controleren",
         "title": "Geïnstalleerde games",
         "note": "De games die het HOME-menu niet kan starten of tonen (een icoon dat blijft laden, \"!\", een gestippeld kader), waarom, en wat je kunt doen. A op een game voor de details.",
-        "scanning": "Geïnstalleerde games worden gecontroleerd…",
         "section": "Games met een probleem",
         "none": "Alle {} geïnstalleerde games lijken in orde.",
         "err_list": "De geïnstalleerde games konden niet worden opgesomd",
@@ -853,7 +854,6 @@
         "launch_reset": "{}: de geïnstalleerde versie wordt weer geaccepteerd",
         "content_err": "Kon niet worden verwijderd",
         "launch_err": "De startversie kon niet worden gewijzigd",
-        "verifying": "{} wordt gecontroleerd… {} %",
         "verify_ok": "{}: geen beschadigde data gevonden.",
         "verify_bad": "{}: beschadigde data gevonden. Verwijder de game en installeer hem opnieuw.",
         "verify_err": "De data konden niet worden gecontroleerd",
@@ -871,7 +871,22 @@
             "reset_launch": "Deze versie accepteren",
             "remove_update": "Update verwijderen",
             "remove": "Game verwijderen"
-        }
+        },
+        "searching": "Geïnstalleerde games worden gezocht…",
+        "checking": "Games worden gecontroleerd… {} van {}",
+        "check_again": "Opnieuw controleren",
+        "checked_now": "Zojuist gecontroleerd.",
+        "checked_min": "{} min geleden gecontroleerd.",
+        "checked_h": "{} u geleden gecontroleerd.",
+        "verify_title": "Data worden gecontroleerd",
+        "verify_preparing": "Voorbereiden…",
+        "verify_amount": "{} van {}",
+        "verify_left_less": "minder dan een minuut",
+        "verify_left_min": "nog ongeveer {} min",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ",",
+        "verify_code": "Code van de console: {}"
     },
     "about": {
         "section_changelog": "Nieuw in {}",

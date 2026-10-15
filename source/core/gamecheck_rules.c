@@ -3,6 +3,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "gamecheck.h"
 
+#include <string.h>
+
 u32 gamecheck_sysver_to_hos(u32 v)
 {
     if (!v) return 0;
@@ -118,4 +120,21 @@ u32 gamecheck_recommended(const GameFacts *g, GameIssue issue, u32 current_hos)
             break;
     }
     return actions & pick;
+}
+
+void gamecheck_scan(GameCheck *out)
+{
+    memset(out, 0, sizeof(*out));
+    static GameRecord records[GAMECHECK_MAX];   // one scan at a time (the caller's thread)
+    out->rc = gamecheck_records(records, GAMECHECK_MAX, &out->count, &out->truncated);
+    if (R_SUCCEEDED(out->rc)) gamecheck_check(records, out->count, out->games, NULL, NULL);
+    else out->count = 0;
+}
+
+bool gamecheck_is_corruption(Result rc)
+{
+    const u32 module = rc & 0x1FF, desc = (rc >> 9) & 0x1FFF;
+    if (module == 16) return desc == 601 || desc == 602;   // ns
+    if (module == 2) return desc >= 4000 && desc <= 4999;  // fs: DataCorrupted
+    return false;
 }

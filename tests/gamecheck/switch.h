@@ -56,6 +56,7 @@ typedef enum {
     NcmContentMetaType_Application = 0x80, NcmContentMetaType_Patch = 0x81, NcmContentMetaType_AddOnContent = 0x82,
 } NcmContentMetaType;
 typedef enum { NcmContentInstallType_Full = 0 } NcmContentInstallType;
+typedef enum { NcmContentType_Meta = 0, NcmContentType_Program = 1, NcmContentType_Data = 2, NcmContentType_Control = 3 } NcmContentType;
 
 typedef struct { u8 c[0x10]; } NcmContentId;
 typedef struct {

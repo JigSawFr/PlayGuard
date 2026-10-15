@@ -110,7 +110,9 @@
         "clock_not_set": "la console indica che il suo orologio di rete non ha un'ora valida (forse non è mai stato impostato); vedi la scheda Orologio di rete",
         "no_internet": "la console non è connessa a Internet: connettila, quindi riprova",
         "service_denied": "il sistema ha negato a PlayGuard l'accesso a uno dei suoi servizi; PlayGuard richiede una console con Atmosphère",
-        "pdm_unavailable": "il servizio dei dati di gioco della console non è disponibile al momento; riprova tra poco"
+        "pdm_unavailable": "il servizio dei dati di gioco della console non è disponibile al momento; riprova tra poco",
+        "corrupt_data": "dati danneggiati: i file del gioco sono danneggiati; rimuovi il gioco e reinstallalo",
+        "cancelled": "annullato"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -767,7 +769,6 @@
         "open": "Controlla i giochi installati",
         "title": "Giochi installati",
         "note": "I giochi che il menu HOME non riesce ad avviare o a mostrare (un'icona che continua a caricare, «!», una cornice tratteggiata), perché, e cosa fare. A su un gioco per i dettagli.",
-        "scanning": "Controllo dei giochi installati…",
         "section": "Giochi con un problema",
         "none": "Tutti i {} giochi installati sembrano a posto.",
         "err_list": "Impossibile elencare i giochi installati",
@@ -853,7 +854,6 @@
         "launch_reset": "{}: la versione installata è di nuovo accettata",
         "content_err": "Impossibile rimuoverlo",
         "launch_err": "Impossibile cambiare la versione di avvio",
-        "verifying": "Controllo di {}… {} %",
         "verify_ok": "{}: nessun dato danneggiato.",
         "verify_bad": "{}: dati danneggiati. Rimuovi il gioco e reinstallalo.",
         "verify_err": "Impossibile controllare i dati",
@@ -871,7 +871,22 @@
             "reset_launch": "Accetta questa versione",
             "remove_update": "Rimuovi l'aggiornamento",
             "remove": "Rimuovi il gioco"
-        }
+        },
+        "searching": "Ricerca dei giochi installati…",
+        "checking": "Controllo dei giochi… {} di {}",
+        "check_again": "Controlla di nuovo",
+        "checked_now": "Controllato ora.",
+        "checked_min": "Controllato {} min fa.",
+        "checked_h": "Controllato {} h fa.",
+        "verify_title": "Controllo dei dati",
+        "verify_preparing": "Preparazione…",
+        "verify_amount": "{} di {}",
+        "verify_left_less": "meno di un minuto",
+        "verify_left_min": "circa {} min rimanenti",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ",",
+        "verify_code": "Codice della console: {}"
     },
     "about": {
         "section_changelog": "Novità della {}",

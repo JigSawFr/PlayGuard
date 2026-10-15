@@ -28,7 +28,7 @@
             paddingLeft="@style/brls/sidebar/padding_left">
 
             <brls:Label id="gc_note" text="@i18n/playguard/games/note" fontSize="20" marginBottom="16" textColor="@theme/brand/note"/>
-            <brls:Label id="gc_status" text="@i18n/playguard/games/scanning" fontSize="20" marginTop="10" marginBottom="6"/>
+            <brls:Label id="gc_status" text="@i18n/playguard/games/searching" fontSize="20" marginTop="10" marginBottom="6"/>
             <brls:Header id="gc_header" title="@i18n/playguard/games/section" marginBottom="8"/>
             <brls:Box id="gc_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
             <brls:Label id="gc_hint" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/warn"/>

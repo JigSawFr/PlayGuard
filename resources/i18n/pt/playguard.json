@@ -110,7 +110,9 @@
         "clock_not_set": "a consola indica que o relógio de rede não tem uma hora válida (talvez nunca tenha sido acertado); veja o separador Relógio de rede",
         "no_internet": "a consola não está ligada à Internet: ligue-a e tente novamente",
         "service_denied": "o sistema recusou ao PlayGuard o acesso a um dos seus serviços; o PlayGuard precisa de uma consola com Atmosphère",
-        "pdm_unavailable": "o serviço de dados de jogo da consola não está disponível de momento; tente novamente daqui a pouco"
+        "pdm_unavailable": "o serviço de dados de jogo da consola não está disponível de momento; tente novamente daqui a pouco",
+        "corrupt_data": "dados danificados: os ficheiros do jogo estão danificados; remova o jogo e volte a instalá-lo",
+        "cancelled": "cancelado"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -767,7 +769,6 @@
         "open": "Verificar os jogos instalados",
         "title": "Jogos instalados",
         "note": "Os jogos que o menu HOME não consegue iniciar nem mostrar (um ícone sempre a carregar, «!», uma moldura tracejada), porquê, e o que fazer. A num jogo para os detalhes.",
-        "scanning": "A verificar os jogos instalados…",
         "section": "Jogos com um problema",
         "none": "Os {} jogos instalados parecem estar bem.",
         "err_list": "Não foi possível listar os jogos instalados",
@@ -853,7 +854,6 @@
         "launch_reset": "{}: a versão instalada volta a ser aceite",
         "content_err": "Não foi possível remover",
         "launch_err": "Não foi possível mudar a versão de arranque",
-        "verifying": "A verificar {}… {} %",
         "verify_ok": "{}: nenhum dado danificado.",
         "verify_bad": "{}: dados danificados. Remova o jogo e volte a instalá-lo.",
         "verify_err": "Não foi possível verificar os dados",
@@ -871,7 +871,22 @@
             "reset_launch": "Aceitar esta versão",
             "remove_update": "Remover a atualização",
             "remove": "Remover o jogo"
-        }
+        },
+        "searching": "A procurar os jogos instalados…",
+        "checking": "A verificar os jogos… {} de {}",
+        "check_again": "Verificar de novo",
+        "checked_now": "Verificado agora mesmo.",
+        "checked_min": "Verificado há {} min.",
+        "checked_h": "Verificado há {} h.",
+        "verify_title": "A verificar os dados",
+        "verify_preparing": "A preparar…",
+        "verify_amount": "{} de {}",
+        "verify_left_less": "menos de um minuto",
+        "verify_left_min": "cerca de {} min restantes",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ",",
+        "verify_code": "Código da consola: {}"
     },
     "about": {
         "section_changelog": "Novidades da {}",

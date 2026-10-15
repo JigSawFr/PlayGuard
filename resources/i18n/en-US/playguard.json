@@ -110,7 +110,9 @@
         "clock_not_set": "the console reports that its network clock has no valid time (it may never have been set); see the Network clock tab",
         "no_internet": "the console is not connected to the internet: connect it, then try again",
         "service_denied": "the system refused PlayGuard access to one of its services; PlayGuard needs a console running Atmosphère",
-        "pdm_unavailable": "the console's play-data service is not available right now; try again in a moment"
+        "pdm_unavailable": "the console's play-data service is not available right now; try again in a moment",
+        "corrupt_data": "corrupt data: the game's files are damaged; remove the game and install it again",
+        "cancelled": "cancelled"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -767,7 +769,6 @@
         "open": "Check the installed games",
         "title": "Installed games",
         "note": "The games the HOME menu cannot start or draw (an icon that keeps loading, \"!\", a dotted frame), why, and what to do. A on a game for the details.",
-        "scanning": "Checking the installed games…",
         "section": "Games with a problem",
         "none": "All {} installed games look fine.",
         "err_list": "The installed games could not be listed",
@@ -853,7 +854,6 @@
         "launch_reset": "{}: the installed version is accepted again",
         "content_err": "Could not remove it",
         "launch_err": "Could not change the launch version",
-        "verifying": "Checking {}… {} %",
         "verify_ok": "{}: no corrupt data found.",
         "verify_bad": "{}: corrupt data found. Remove the game and install it again.",
         "verify_err": "Could not check the data",
@@ -871,7 +871,22 @@
             "reset_launch": "Accept this version",
             "remove_update": "Remove the update",
             "remove": "Remove the game"
-        }
+        },
+        "searching": "Looking for the installed games…",
+        "checking": "Checking the games… {} of {}",
+        "check_again": "Check again",
+        "checked_now": "Checked just now.",
+        "checked_min": "Checked {} min ago.",
+        "checked_h": "Checked {} h ago.",
+        "verify_title": "Checking the data",
+        "verify_preparing": "Getting ready…",
+        "verify_amount": "{} of {}",
+        "verify_left_less": "less than a minute left",
+        "verify_left_min": "about {} min left",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ".",
+        "verify_code": "Code from the console: {}"
     },
     "about": {
         "section_changelog": "What's new in {}",

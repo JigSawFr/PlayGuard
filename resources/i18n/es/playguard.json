@@ -110,7 +110,9 @@
         "clock_not_set": "la consola indica que su reloj de red no tiene una hora válida (puede que nunca se haya ajustado); consulte la pestaña Reloj de red",
         "no_internet": "la consola no está conectada a internet: conéctela e inténtelo de nuevo",
         "service_denied": "el sistema ha denegado a PlayGuard el acceso a uno de sus servicios; PlayGuard necesita una consola con Atmosphère",
-        "pdm_unavailable": "el servicio de datos de juego de la consola no está disponible ahora; inténtelo de nuevo dentro de un momento"
+        "pdm_unavailable": "el servicio de datos de juego de la consola no está disponible ahora; inténtelo de nuevo dentro de un momento",
+        "corrupt_data": "datos dañados: los archivos del juego están dañados; elimina el juego y vuelve a instalarlo",
+        "cancelled": "cancelado"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -767,7 +769,6 @@
         "open": "Comprobar los juegos instalados",
         "title": "Juegos instalados",
         "note": "Los juegos que el menú HOME no puede iniciar ni mostrar (un icono que no termina de cargar, «!», un marco punteado), por qué, y qué hacer. A en un juego para ver los detalles.",
-        "scanning": "Comprobando los juegos instalados…",
         "section": "Juegos con un problema",
         "none": "Los {} juegos instalados parecen estar bien.",
         "err_list": "No se pudieron listar los juegos instalados",
@@ -853,7 +854,6 @@
         "launch_reset": "{}: se vuelve a aceptar la versión instalada",
         "content_err": "No se pudo eliminar",
         "launch_err": "No se pudo cambiar la versión de inicio",
-        "verifying": "Comprobando {}… {} %",
         "verify_ok": "{}: no se han encontrado datos dañados.",
         "verify_bad": "{}: se han encontrado datos dañados. Elimina el juego y vuelve a instalarlo.",
         "verify_err": "No se pudieron comprobar los datos",
@@ -871,7 +871,22 @@
             "reset_launch": "Aceptar esta versión",
             "remove_update": "Eliminar la actualización",
             "remove": "Eliminar el juego"
-        }
+        },
+        "searching": "Buscando los juegos instalados…",
+        "checking": "Comprobando los juegos… {} de {}",
+        "check_again": "Comprobar de nuevo",
+        "checked_now": "Comprobado ahora mismo.",
+        "checked_min": "Comprobado hace {} min.",
+        "checked_h": "Comprobado hace {} h.",
+        "verify_title": "Comprobando los datos",
+        "verify_preparing": "Preparando…",
+        "verify_amount": "{} de {}",
+        "verify_left_less": "queda menos de un minuto",
+        "verify_left_min": "quedan unos {} min",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ",",
+        "verify_code": "Código de la consola: {}"
     },
     "about": {
         "section_changelog": "Novedades de la {}",

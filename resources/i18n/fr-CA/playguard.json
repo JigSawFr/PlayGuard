@@ -110,7 +110,9 @@
         "clock_not_set": "la console indique que son horloge réseau n'a pas d'heure valide (elle n'a peut-être jamais été réglée); voir l'onglet Horloge réseau",
         "no_internet": "la console n'est pas connectée à Internet : connectez-la, puis réessayez",
         "service_denied": "le système a refusé à PlayGuard l'accès à l'un de ses services; PlayGuard a besoin d'une console sous Atmosphère",
-        "pdm_unavailable": "le service des données de jeu de la console n'est pas disponible pour le moment; réessayez dans un instant"
+        "pdm_unavailable": "le service des données de jeu de la console n'est pas disponible pour le moment; réessayez dans un instant",
+        "corrupt_data": "données corrompues : les fichiers du jeu sont endommagés ; supprimez le jeu et réinstallez-le",
+        "cancelled": "annulé"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -767,7 +769,6 @@
         "open": "Vérifier les jeux installés",
         "title": "Jeux installés",
         "note": "Les jeux que le menu HOME ne peut pas lancer ou afficher (une icône qui charge sans fin, « ! », un cadre en pointillés), pourquoi, et quoi faire. A sur un jeu pour le détail.",
-        "scanning": "Vérification des jeux installés…",
         "section": "Jeux avec un problème",
         "none": "Les {} jeux installés semblent en bon état.",
         "err_list": "Impossible de lister les jeux installés",
@@ -853,7 +854,6 @@
         "launch_reset": "{} : la version installée est de nouveau acceptée",
         "content_err": "Impossible de le supprimer",
         "launch_err": "Impossible de changer la version de lancement",
-        "verifying": "Vérification de {}… {} %",
         "verify_ok": "{} : aucune donnée corrompue.",
         "verify_bad": "{} : données corrompues. Supprimez le jeu et réinstallez-le.",
         "verify_err": "Impossible de vérifier les données",
@@ -871,7 +871,22 @@
             "reset_launch": "Accepter cette version",
             "remove_update": "Supprimer la mise à jour",
             "remove": "Supprimer le jeu"
-        }
+        },
+        "searching": "Recherche des jeux installés…",
+        "checking": "Vérification des jeux… {} sur {}",
+        "check_again": "Vérifier à nouveau",
+        "checked_now": "Vérifié à l'instant.",
+        "checked_min": "Vérifié il y a {} min.",
+        "checked_h": "Vérifié il y a {} h.",
+        "verify_title": "Vérification des données",
+        "verify_preparing": "Préparation…",
+        "verify_amount": "{} sur {}",
+        "verify_left_less": "moins d'une minute restante",
+        "verify_left_min": "environ {} min restantes",
+        "size_mb": "{} Mo",
+        "size_gb": "{} Go",
+        "decimal_mark": ",",
+        "verify_code": "Code de la console : {}"
     },
     "about": {
         "section_changelog": "Nouveautés de la {}",

@@ -110,7 +110,9 @@
         "clock_not_set": "본체가 네트워크 시계에 유효한 시간이 없다고 보고했습니다(한 번도 설정되지 않았을 수 있습니다). 네트워크 시계 탭을 확인하세요",
         "no_internet": "본체가 인터넷에 연결되어 있지 않습니다. 연결한 후 다시 시도하세요",
         "service_denied": "시스템이 PlayGuard의 서비스 접근을 거부했습니다. PlayGuard는 Atmosphère를 실행하는 본체가 필요합니다",
-        "pdm_unavailable": "본체의 플레이 데이터 서비스를 지금은 사용할 수 없습니다. 잠시 후 다시 시도하세요"
+        "pdm_unavailable": "본체의 플레이 데이터 서비스를 지금은 사용할 수 없습니다. 잠시 후 다시 시도하세요",
+        "corrupt_data": "데이터 손상: 게임 파일이 손상되었습니다. 게임을 삭제한 뒤 다시 설치하세요",
+        "cancelled": "취소됨"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -767,7 +769,6 @@
         "open": "설치된 게임 확인",
         "title": "설치된 게임",
         "note": "HOME 메뉴가 실행하거나 표시하지 못하는 게임(계속 로딩되는 아이콘, \"!\", 점선 테두리)과 그 원인, 해결 방법. 게임에서 A를 누르면 자세한 내용이 표시됩니다.",
-        "scanning": "설치된 게임을 확인하는 중…",
         "section": "문제가 있는 게임",
         "none": "설치된 게임 {}개가 모두 정상으로 보입니다.",
         "err_list": "설치된 게임 목록을 불러올 수 없습니다",
@@ -853,7 +854,6 @@
         "launch_reset": "{}: 설치된 버전이 다시 허용됨",
         "content_err": "삭제할 수 없습니다",
         "launch_err": "실행 버전을 변경할 수 없습니다",
-        "verifying": "{} 확인 중… {} %",
         "verify_ok": "{}: 손상된 데이터가 없습니다.",
         "verify_bad": "{}: 손상된 데이터가 있습니다. 게임을 삭제한 뒤 다시 설치하세요.",
         "verify_err": "데이터를 확인할 수 없습니다",
@@ -871,7 +871,22 @@
             "reset_launch": "이 버전 허용",
             "remove_update": "업데이트 삭제",
             "remove": "게임 삭제"
-        }
+        },
+        "searching": "설치된 게임을 찾는 중…",
+        "checking": "게임 확인 중… {} / {}",
+        "check_again": "다시 확인",
+        "checked_now": "방금 확인했습니다.",
+        "checked_min": "{}분 전에 확인했습니다.",
+        "checked_h": "{}시간 전에 확인했습니다.",
+        "verify_title": "데이터 확인 중",
+        "verify_preparing": "준비 중…",
+        "verify_amount": "{} / {}",
+        "verify_left_less": "1분 미만 남음",
+        "verify_left_min": "약 {}분 남음",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ".",
+        "verify_code": "본체 코드: {}"
     },
     "about": {
         "section_changelog": "{}의 새로운 기능",

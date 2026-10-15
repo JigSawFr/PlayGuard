@@ -4,15 +4,21 @@
 // icon, why and what to do, the fix as the first button when one action is
 // the fix, then the other actions (accept the installed version again, check
 // the data, remove the update or an add-on, remove the game; save data always
-// kept). The games are read off the main thread when the screen opens and
-// again after every change; after a repair, a toast says whether the game
-// left the list.
+// kept). The last check shows at once (util/game_cache.hpp); then, off the
+// main thread, the console's entries are listed and only the games whose
+// entry changed are checked again (every game once a day, on another
+// firmware, or on Ⓧ), each shown as soon as it is checked. After a change
+// its game is checked again, and after a repair a toast says whether it left
+// the list.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
 #include <borealis.hpp>
 #include <memory>
 #include <string>
+#include <vector>
+
+#include "util/game_cache.hpp"
 
 #include "util/pctl_ops_c.hpp"
 
@@ -22,6 +28,10 @@ class GameCheckActivity : public brls::Activity
     CONTENT_FROM_XML_RES("activity/game_check.xml");
 
     void onContentAvailable() override;
+
+    // The last check's file (util/game_cache.hpp), also read and written by
+    // action/game_notice at start-up.
+    static std::string cache_file();
 
   private:
     // A repair waiting for the next read to tell whether it worked.
@@ -33,14 +43,24 @@ class GameCheckActivity : public brls::Activity
     };
 
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
-    bool scanning  = false;
-    bool shown     = false;   // the list was shown once: later reads keep it in place
+    game_cache::Cache cache;          // what is shown: the last check, updated game by game
+    bool   checking  = false;         // listing or checking under way
+    u32    check_done = 0, check_total = 0;
+    Result list_rc   = 0;             // the console's entries could not be listed
+    std::vector<u64> waiting;         // to check again once the check under way is over
     bool verifying = false;   // one integrity check at a time
     bool focused   = false;   // the first game got the focus once
     Pending pending;
 
-    void scan();
-    void show(const GameCheck& check);
+    void save();
+    // Lists the console's entries, then checks what changed (`all`: every
+    // game), and `also` (0: none) whatever its entry says.
+    void refresh(bool all, u64 also);
+    void check(std::vector<GameRecord> records, bool full);
+    void status_text(const std::string& text);
+    void status_text(const std::string& text, NVGcolor color);
+    std::string age_text() const;
+    void show();
     void open(const GameFacts& game, GameIssue issue, u32 current_hos);
     void choose(const GameFacts& game, u32 actions);
     void run(const GameFacts& game, u32 action, const GameContent& content);

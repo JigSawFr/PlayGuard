@@ -37,6 +37,7 @@
 //                               launch (its launch version reset), verify
 //                               (its integrity check)
 //   PLAYGUARD_SIM_GAMES_OK=1    every installed game fine (Tools › Installed games)
+//   PLAYGUARD_SIM_CHECK_MS=150  how long checking one installed game takes
 // The play-timer limits are kept as the real 0x44 block (core/pure.c encodes
 // and decodes it, as on the console); the read-only switch is core/write_guard.c.
 // Game patches are read from ./playguard_data/sd/ (the simulated SD card root).
@@ -749,7 +750,9 @@ static void sim_add_content(GameFacts *g, u64 id, u32 version, u8 type, u8 stora
     }
 }
 
-void gamecheck_scan(GameCheck *out)
+// Every game the simulated console has, fully checked (gamecheck_check
+// returns them one at a time).
+static void sim_games(GameCheck *out)
 {
     memset(out, 0, sizeof(*out));
     static const char *fine[] = { "Star Kart Racers", "Island Builders", "Pixel Quest Deluxe",
@@ -788,7 +791,7 @@ void gamecheck_scan(GameCheck *out)
         { 0x0100A1B2C3D4B000ULL, "Ocean Explorer",   GC_FILES_MISSING },
         { 0x0100A1B2C3D4C000ULL, "Castle Siege",     GC_TICKET_MISSING },
         { 0x0100A1B2C3D4D000ULL, "Moon Racer",       GC_LAUNCH_VERSION },
-        { 0x0100A1B2C3D4E000ULL, "Forest Tales",     GC_NEEDS_VERIFY },
+        { 0x0100A1B2C3D4E000ULL, "Forest Tales: Legends of the Ancient Grove for Nintendo Switch™",     GC_NEEDS_VERIFY },
         { 0x0100A1B2C3D4F000ULL, "Star Pilots",      GC_KEY_TOO_NEW },
     };
     for (size_t i = 0; i < sizeof(broken) / sizeof(broken[0]); i++) {
@@ -861,15 +864,17 @@ Result gamecheck_remove(u64 app_id)
     return 0;
 }
 
+static void sim_bump(u64 id);
+
 Result gamecheck_remove_content(u64 app_id, const GameContent *content)
 {
-    (void)app_id;
     if (!content || (content->type != GC_META_PATCH && content->type != GC_META_ADDON) ||
         (content->storage != GC_STORAGE_NAND && content->storage != GC_STORAGE_SD))
         return NXM_RC_INVALID_ARGUMENT;
     RO_GUARD();
     FAIL_IF("remove");
     sim_remember(s_removed, &s_removed_count, sizeof(s_removed) / sizeof(s_removed[0]), content->id);
+    sim_bump(app_id);
     return 0;
 }
 
@@ -879,19 +884,88 @@ Result gamecheck_reset_launch_version(u64 app_id, u32 version)
     RO_GUARD();
     FAIL_IF("launch");
     sim_remember(s_launch_reset, &s_launch_reset_count, sizeof(s_launch_reset) / sizeof(s_launch_reset[0]), app_id);
+    sim_bump(app_id);
     return 0;
 }
 
-// Two seconds or so of progress; "Forest Tales" has corrupt data.
-Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt)
+// Four seconds or so of progress over 3.8 GB; "Forest Tales" has corrupt data.
+Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt,
+                        Result *found)
 {
     *corrupt = false;
+    *found = 0;
     if (fails("verify")) return SIM_FAIL_RC;
-    for (u64 step = 0; step <= 4; step++) {
-        if (progress && !progress(ctx, step * 256ULL << 20, 1024ULL << 20)) return NXM_RC_CANCELLED;
+    const u64 total = 3891ULL << 20;
+    for (u64 step = 0; step <= 8; step++) {
+        if (progress && !progress(ctx, total * step / 8, step ? total : 0)) return NXM_RC_CANCELLED;
         const struct timespec pause = { 0, 500000000L };
         nanosleep(&pause, NULL);
     }
     *corrupt = app_id == 0x0100A1B2C3D4E000ULL;
+    if (*corrupt) *found = 16 | (601 << 9);   // 2016-0601, as a console answers
     return 0;
+}
+
+// Each change to a game (a removal, a launch version reset) bumps its entry,
+// as the console's LastUpdated does.
+static u64 s_bumps[32];
+static size_t s_bump_count;
+
+static u64 sim_updated(u64 id)
+{
+    u64 n = 1791400000ULL + (id & 0xFFFFF);
+    for (size_t i = 0; i < s_bump_count; i++)
+        if (s_bumps[i] == id) n++;
+    return n;
+}
+
+static void sim_bump(u64 id)
+{
+    if (s_bump_count < sizeof(s_bumps) / sizeof(s_bumps[0])) s_bumps[s_bump_count++] = id;
+}
+
+Result gamecheck_records(GameRecord *out, u32 max, u32 *count, bool *truncated)
+{
+    static GameCheck all;
+    sim_games(&all);
+    *count = 0;
+    *truncated = false;
+    for (u32 i = 0; i < all.count; i++) {
+        if (*count == max) {
+            *truncated = true;
+            break;
+        }
+        GameRecord *r = &out[(*count)++];
+        r->app_id  = all.games[i].app_id;
+        r->updated = sim_updated(r->app_id);
+        r->event   = all.games[i].record_event;
+    }
+    return 0;
+}
+
+// PLAYGUARD_SIM_CHECK_MS (default 150) per game, as a console takes.
+u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
+                    bool (*on_game)(void *ctx, const GameFacts *game, u32 done), void *ctx)
+{
+    static GameCheck all;
+    sim_games(&all);
+    const char *ms_env = getenv("PLAYGUARD_SIM_CHECK_MS");
+    const long ms = ms_env ? strtol(ms_env, NULL, 10) : 150;
+    memset(out, 0, (size_t)count * sizeof(*out));
+    u32 done = 0;
+    while (done < count) {
+        GameFacts *g = &out[done];
+        g->app_id = records[done].app_id;
+        for (u32 i = 0; i < all.count; i++)
+            if (all.games[i].app_id == g->app_id) *g = all.games[i];
+        g->record_updated = records[done].updated;
+        g->record_event   = records[done].event;
+        if (ms > 0) {
+            const struct timespec pause = { ms / 1000, (ms % 1000) * 1000000L };
+            nanosleep(&pause, NULL);
+        }
+        done++;
+        if (on_game && !on_game(ctx, g, done)) break;
+    }
+    return done;
 }

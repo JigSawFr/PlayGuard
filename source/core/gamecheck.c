@@ -158,7 +158,10 @@ static void check_meta(GameFacts *g, const NsApplicationContentMetaStatus *m, Sc
                 g->files_missing = true;
                 continue;
             }
-            // The key the file is encrypted with: a title key needs a ticket.
+            // The key the program is encrypted with (the other files of a
+            // game share it): a title key needs a ticket. Reading it opens
+            // the file, so only the program's is read.
+            if (infos[i].content_type != NcmContentType_Program) continue;
             NcmRightsId rights;
             memset(&rights, 0, sizeof(rights));
             if (R_FAILED(ncmContentStorageGetRightsIdFromContentId(&s->cs, &rights, &infos[i].content_id, FsContentAttributes_All)))
@@ -236,43 +239,48 @@ static void check_game(GameFacts *g, NsApplicationControlData *cd, Scan *sc)
     if (sc->avm && R_SUCCEEDED(avmGetLaunchRequiredVersion(g->app_id, &g->launch_required))) g->launch_checked = true;
 }
 
-void gamecheck_scan(GameCheck *out)
+Result gamecheck_records(GameRecord *out, u32 max, u32 *count, bool *truncated)
 {
-    memset(out, 0, sizeof(*out));
-    out->rc = nsInitialize();
-    if (R_FAILED(out->rc)) return;
-
+    *count = 0;
+    *truncated = false;
+    Result rc = nsInitialize();
+    if (R_FAILED(rc)) return rc;
     NsApplicationRecord records[RECORD_CHUNK];
     for (s32 offset = 0;;) {
         s32 got = 0;
-        const Result rc = nsListApplicationRecord(records, RECORD_CHUNK, offset, &got);
-        if (R_FAILED(rc)) {
-            if (offset == 0) out->rc = rc;
+        const Result list_rc = nsListApplicationRecord(records, RECORD_CHUNK, offset, &got);
+        if (R_FAILED(list_rc)) {
+            if (offset == 0) rc = list_rc;
             break;
         }
         if (got <= 0) break;
         for (s32 i = 0; i < got; i++) {
-            if (out->count == GAMECHECK_MAX) {
-                out->truncated = true;
+            if (*count == max) {
+                *truncated = true;
                 break;
             }
-            GameFacts *g = &out->games[out->count++];
-            g->app_id       = records[i].application_id;
-            g->record_event = records[i].last_event;
+            GameRecord *r = &out[(*count)++];
+            r->app_id  = records[i].application_id;
+            r->updated = records[i].last_updated;
+            r->event   = records[i].last_event;
         }
         offset += got;
-        if (got < RECORD_CHUNK || out->truncated) break;
+        if (got < RECORD_CHUNK || *truncated) break;
     }
-    if (R_FAILED(out->rc)) {
-        nsExit();
-        return;
-    }
+    nsExit();
+    return rc;
+}
+
+u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
+                    bool (*on_game)(void *ctx, const GameFacts *game, u32 done), void *ctx)
+{
+    memset(out, 0, (size_t)count * sizeof(*out));
+    if (!count || R_FAILED(nsInitialize())) return 0;
 
     Scan sc;
     memset(&sc, 0, sizeof(sc));
     Tickets tickets;
-    out->tickets_rc = tickets_read(&tickets);
-    if (R_SUCCEEDED(out->tickets_rc)) sc.tickets = &tickets;
+    if (R_SUCCEEDED(tickets_read(&tickets))) sc.tickets = &tickets;
     sc.avm = hosversionAtLeast(6, 0, 0) && R_SUCCEEDED(avmInitialize());
     // Without ncm, only what ns says: the files are not checked.
     const bool ncm = R_SUCCEEDED(ncmInitialize());
@@ -280,7 +288,16 @@ void gamecheck_scan(GameCheck *out)
     sc.storages[1].id = NcmStorageId_SdCard;
     sc.storage_count = ncm ? 2 : 0;
     NsApplicationControlData *cd = (NsApplicationControlData *)malloc(sizeof(NsApplicationControlData));
-    for (u32 i = 0; i < out->count; i++) check_game(&out->games[i], cd, &sc);
+    u32 done = 0;
+    while (done < count) {
+        GameFacts *g = &out[done];
+        g->app_id         = records[done].app_id;
+        g->record_updated = records[done].updated;
+        g->record_event   = records[done].event;
+        check_game(g, cd, &sc);
+        done++;
+        if (on_game && !on_game(ctx, g, done)) break;
+    }
     free(cd);
     if (ncm) {
         storages_close(sc.storages, sc.storage_count);
@@ -289,6 +306,7 @@ void gamecheck_scan(GameCheck *out)
     if (sc.avm) avmExit();
     free(tickets.ids);
     nsExit();
+    return done;
 }
 
 // --------------------------------------------------------------- changes
@@ -481,9 +499,11 @@ Result gamecheck_reset_launch_version(u64 app_id, u32 version)
     return rc;
 }
 
-Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt)
+Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt,
+                        Result *found)
 {
     *corrupt = false;
+    *found = 0;
     Result rc = nsInitialize();
     if (R_FAILED(rc)) return rc;
     void *buffer = aligned_alloc(0x1000, VERIFY_BUFFER);
@@ -509,8 +529,15 @@ Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64
         if (cancelled) {
             rc = NXM_RC_CANCELLED;
         } else {
+            // What was found comes as the check's result itself (2016-0601,
+            // seen on a console) or as its detail (an fs result).
             rc = nsProgressAsyncResultGet(&async);
-            if (R_SUCCEEDED(rc)) *corrupt = R_FAILED(nsProgressAsyncResultGetDetailResult(&async));
+            const Result detail = nsProgressAsyncResultGetDetailResult(&async);
+            if (gamecheck_is_corruption(rc) || (R_SUCCEEDED(rc) && R_FAILED(detail))) {
+                *corrupt = true;
+                *found = R_FAILED(detail) ? detail : rc;
+                rc = 0;
+            }
         }
         nsProgressAsyncResultClose(&async);
     }
