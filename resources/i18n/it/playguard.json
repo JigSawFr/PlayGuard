@@ -964,6 +964,10 @@
         "step_runs": "Controlli...",
         "prereleases_shown": "Pre-release mostrate",
         "prereleases_hidden": "Pre-release nascoste",
+        "back": "Torna alla build precedente: {}",
+        "back_body": "Sostituire PlayGuard {} con la build installata prima, {}? PlayGuard si riavvia con essa.\n\nSe una build si blocca prima della sua prima schermata, PlayGuard lo propone all'avvio successivo; tenere premuti L + R all'avvio lo propone anche.",
+        "back_confirm": "Torna indietro",
+        "back_failed": "Impossibile tornare alla build precedente: {}\n\nIl PlayGuard installato non è cambiato.",
         "prereleases": "Pre-release",
         "count_new_one": "1 nuova",
         "cancelled": "Download annullato."

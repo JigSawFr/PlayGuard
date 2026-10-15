@@ -4,6 +4,7 @@
 #include <fmt/format.h>
 
 #include "action/dev_build_flow.hpp"
+#include "action/rollback_flow.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -111,6 +112,10 @@ void DevBuildsActivity::onContentAvailable()
     });
     find->registerClickAction([](brls::View*) {
         dev_build_flow::find();
+        return true;
+    });
+    back->registerClickAction([](brls::View*) {
+        dev_build_flow::go_back();
         return true;
     });
     // The L and R icons around the tabs say what moves between them (the same
@@ -271,6 +276,11 @@ void DevBuildsActivity::fill()
     // With one, a line finds the build of any pull request or commit.
     ui::set_visible(sign_in.getView(), cache.needs_login);
     ui::set_visible(find.getView(), !cache.needs_login);
+    // The build installed before this one, kept: a line goes back to it.
+    std::string previous;
+    const bool have_previous = rollback_flow::previous(&previous);
+    if (have_previous) back->setText(brls::getStr("playguard/dev_build/back", previous));
+    ui::set_visible(back.getView(), have_previous);
     checked->setText(cache.builds.empty() ? " " : dev_build_flow::checked_text(cache));
 }
 

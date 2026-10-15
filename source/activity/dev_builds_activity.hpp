@@ -10,7 +10,8 @@
 // requests (the newest build first, or by number), remembered in
 // config.json. A on a build shows it (activity/dev_build_activity.hpp);
 // below the list, signing in to GitHub (signed out, only the releases are
-// listed) or Find a build, and how old the list is; Ⓧ fetches it again.
+// listed) or Find a build, Go back to the previous build (the one installed
+// before, kept: action/rollback_flow.hpp), and how old the list is; Ⓧ fetches it again.
 // While the list is fetched, or a build looked for, a bar above the tabs
 // shows how far it is.
 // A list fetched again while this screen is open replaces its content in
@@ -75,5 +76,6 @@ class DevBuildsActivity : public brls::Activity
     BRLS_BIND(brls::Box,        list,           "db_list");
     BRLS_BIND(brls::DetailCell, sign_in,        "db_sign_in");
     BRLS_BIND(brls::DetailCell, find,           "db_find");
+    BRLS_BIND(brls::DetailCell, back,           "db_back");
     BRLS_BIND(brls::Label,      checked,        "db_checked");
 };

@@ -552,7 +552,7 @@ bool verify_nro(const std::string& path, std::string* error)
     return true;
 }
 
-bool replace(const std::string& target, const std::string& fresh, std::string* error)
+bool replace(const std::string& target, const std::string& fresh, std::string* error, const std::string& keep_as)
 {
     const std::string old = target + ".old";
     std::remove(old.c_str());   // left by an earlier attempt
@@ -566,6 +566,10 @@ bool replace(const std::string& target, const std::string& fresh, std::string* e
         if (had_target) std::rename(old.c_str(), target.c_str());
         if (error) *error = "cannot put the new build in place";
         return false;
+    }
+    if (had_target && !keep_as.empty()) {
+        std::remove(keep_as.c_str());
+        if (std::rename(old.c_str(), keep_as.c_str()) == 0) return true;
     }
     std::remove(old.c_str());
     return true;

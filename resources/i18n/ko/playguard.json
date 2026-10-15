@@ -964,6 +964,10 @@
         "step_runs": "검사...",
         "prereleases_shown": "사전 릴리스 표시됨",
         "prereleases_hidden": "사전 릴리스 숨겨짐",
+        "back": "이전 빌드로 돌아가기: {}",
+        "back_body": "PlayGuard {}을(를) 그 전에 설치된 빌드 {}(으)로 바꿀까요? PlayGuard가 그 빌드로 다시 시작됩니다.\n\n빌드가 첫 화면 전에 충돌하면 다음 시작 때 PlayGuard가 이를 제안합니다. 시작할 때 L + R을 누르고 있어도 제안합니다.",
+        "back_confirm": "돌아가기",
+        "back_failed": "이전 빌드로 돌아갈 수 없습니다: {}\n\n설치된 PlayGuard는 변경되지 않았습니다.",
         "prereleases": "사전 릴리스",
         "count_new_one": "새 빌드 1개",
         "cancelled": "다운로드를 취소했습니다."

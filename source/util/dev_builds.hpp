@@ -187,9 +187,10 @@ bool verify_nro(const std::string& path, std::string* error);
 
 // Replaces `target` with `fresh` (both on the same file system): target
 // moves aside to "<target>.old", fresh takes its name, then the old one is
-// removed. When fresh cannot take its place, the old one is put back. A
+// removed, or kept as `keep_as` when given (util/rollback.hpp: the previous
+// build). When fresh cannot take its place, the old one is put back. A
 // missing target is simply created.
-bool replace(const std::string& target, const std::string& fresh, std::string* error);
+bool replace(const std::string& target, const std::string& fresh, std::string* error, const std::string& keep_as = "");
 
 // The last list fetched, kept on the SD card (cache/dev_builds.json) so the
 // next opening shows it at once while it is fresh.

@@ -964,6 +964,10 @@
         "step_runs": "Controles...",
         "prereleases_shown": "Voorlopige versies getoond",
         "prereleases_hidden": "Voorlopige versies verborgen",
+        "back": "Terug naar de vorige build: {}",
+        "back_body": "PlayGuard {} vervangen door de build die ervoor geïnstalleerd was, {}? PlayGuard start ermee opnieuw.\n\nAls een build crasht vóór zijn eerste scherm, biedt PlayGuard dit bij de volgende start aan; L + R ingedrukt houden tijdens het starten biedt het ook aan.",
+        "back_confirm": "Terug",
+        "back_failed": "Kan niet terug naar de vorige build: {}\n\nDe geïnstalleerde PlayGuard is niet gewijzigd.",
         "prereleases": "Voorlopige",
         "count_new_one": "1 nieuw",
         "cancelled": "Download geannuleerd."
