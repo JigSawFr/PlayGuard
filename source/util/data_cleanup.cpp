@@ -64,12 +64,13 @@ Plan cache(const std::string& data_dir)
     return sorted(plan);
 }
 
-Plan logs(const std::string& data_dir)
+Plan logs(const std::string& data_dir, const std::string& session)
 {
     Plan plan;
-    collect(data_dir + "/logs", plan, [](const std::string& rel) {
+    const std::string current = session.empty() ? std::string() : "sessions/" + session;
+    collect(data_dir + "/logs", plan, [&current](const std::string& rel) {
         return rel.compare(0, 8, "uploads/") == 0 || rel == "play_timer/block.json" ||
-               rel == "play_timer/block.json.tmp";
+               rel == "play_timer/block.json.tmp" || (!current.empty() && rel == current);
     });
     return sorted(plan);
 }

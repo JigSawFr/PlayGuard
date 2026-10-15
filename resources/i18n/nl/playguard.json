@@ -677,7 +677,7 @@
         "logs_days_never": "Nooit",
         "logs_days_n": "{} dagen",
         "logs_keep_mb": "Ruimte voor rapporten",
-        "logs_note": "Geldt voor de diagnoserapporten, de crashbestanden en de links van de online verstuurde rapporten in {}, elk apart, bij het starten en wanneer een limiet verandert. Het nieuwste blijft altijd staan.",
+        "logs_note": "Geldt voor de diagnoserapporten, de crashbestanden, de sessielogs en de links van de online verstuurde rapporten in {}, elk apart, bij het starten en wanneer een limiet verandert. Het nieuwste blijft altijd staan.",
         "language": "Taal",
         "languages": {
             "system": "Systeemtaal",
@@ -885,7 +885,7 @@
         "clear_cache": "Cache wissen",
         "clear_logs": "Logbestanden verwijderen",
         "clear_cache_body": "Cache verwijderen: {}?\n\nDe namen en pictogrammen van de games, de laatste cijfers van Activiteit en de lijst met ontwikkelbuilds. PlayGuard leest ze opnieuw van de console wanneer nodig: bij de volgende start duurt het tabblad Activiteit iets langer.",
-        "clear_logs_body": "Logbestanden verwijderen: {}?\n\nHet crashlog, de opgeslagen diagnoserapporten en de opname van de speeltijdtimer. Bewaard: de links van online verstuurde rapporten (de enige manier om ze te verwijderen) en de referentie van het speeltijdblok.",
+        "clear_logs_body": "Logbestanden verwijderen: {}?\n\nDe crashbestanden, de sessielogs (behalve die van deze sessie), de opgeslagen diagnoserapporten en de opname van de speeltijdtimer. Bewaard: de links van online verstuurde rapporten (de enige manier om ze te verwijderen) en de referentie van het speeltijdblok.",
         "clear_empty": "Niets te verwijderen.",
         "cleared": "Verwijderd: {}.",
         "clear_failed": "Verwijderd: {}.\n\nNiet verwijderd, geweigerd door de SD-kaart: {}.",

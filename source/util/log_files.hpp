@@ -1,14 +1,16 @@
 // log_files — how logs/ is laid out, and how much of it is kept:
 //
 //   logs/reports/report_20261011_142530.txt   saved diagnostic reports
-//   logs/crashes/crash_20261011_142530.txt     one file per crash (main.cpp)
+//   logs/crashes/crash_20261011_142530.txt     one file per crash (util/crash_report.hpp)
+//   logs/sessions/session_20261011_142530.txt  everything logged during one run
+//                                              (util/session_log.hpp)
 //   logs/uploads/upload_20261011_142530.url    one per report sent online: an
 //                                              Internet shortcut to its gist
 //                                              (shortcut())
 //   logs/play_timer/log.csv, log.old.csv       Developer › record the play timer
 //   logs/play_timer/block.json                 Developer › play-timer block reference
 //
-// The reports, the crashes and the uploads are pruned with the limits of the
+// The reports, the crashes, the sessions and the uploads are pruned with the limits of the
 // Tools tab (config: logs_keep, logs_keep_days, logs_keep_mb), each folder on
 // its own.
 // The date in the name (local time, as the console shows it) is what counts,
@@ -28,6 +30,7 @@ namespace log_files
 constexpr const char* REPORT = "report";
 constexpr const char* CRASH  = "crash";
 constexpr const char* UPLOAD = "upload";
+constexpr const char* SESSION = "session";
 
 // The extension of `prefix`'s files: ".url" for the uploads, ".txt" for the others.
 const char* extension(const char* prefix);

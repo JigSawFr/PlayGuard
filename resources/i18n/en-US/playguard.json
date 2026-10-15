@@ -677,7 +677,7 @@
         "logs_days_never": "Never",
         "logs_days_n": "{} days",
         "logs_keep_mb": "Space for reports",
-        "logs_note": "Applies to the diagnostic reports, the crash files and the links of the reports sent online in {}, each on its own, at start-up and when a limit changes. The newest one always stays.",
+        "logs_note": "Applies to the diagnostic reports, the crash files, the session logs and the links of the reports sent online in {}, each on its own, at start-up and when a limit changes. The newest one always stays.",
         "language": "Language",
         "languages": {
             "system": "System language",
@@ -885,7 +885,7 @@
         "clear_cache": "Clear the cache",
         "clear_logs": "Delete the log files",
         "clear_cache_body": "Delete the cache: {}?\n\nThe game names and icons, the Activity's last figures and the development build list. PlayGuard reads them again from the console when it needs them: at the next start, the Activity tab takes a moment longer.",
-        "clear_logs_body": "Delete the log files: {}?\n\nThe crash log, the saved diagnostic reports and the play-timer recording. Kept: the links of the reports sent online (the only way to remove them) and the play-timer block reference.",
+        "clear_logs_body": "Delete the log files: {}?\n\nThe crash files, the session logs (all but this run's), the saved diagnostic reports and the play-timer recording. Kept: the links of the reports sent online (the only way to remove them) and the play-timer block reference.",
         "clear_empty": "Nothing to delete.",
         "cleared": "Deleted: {}.",
         "clear_failed": "Deleted: {}.\n\nNot deleted, refused by the SD card: {}.",

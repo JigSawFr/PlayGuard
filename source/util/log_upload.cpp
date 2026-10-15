@@ -42,6 +42,34 @@ std::vector<Part> crash_files(size_t limit)
     return out;
 }
 
+std::string head_and_tail(const std::string& text, size_t max_bytes)
+{
+    if (text.size() <= max_bytes) return text;
+    // The header: up to the first blank line, when it is short.
+    size_t head = text.find("\n\n");
+    head = head == std::string::npos || head + 2 > max_bytes / 4 ? 0 : head + 2;
+    const std::string gap_note = "(... the lines in between left out ...)\n";
+    const size_t room = max_bytes > head + gap_note.size() ? max_bytes - head - gap_note.size() : 0;
+    size_t from = text.size() - room;
+    // At a whole line: after the first line break at or past `from - 1`.
+    const size_t nl = from == 0 ? std::string::npos : text.find('\n', from - 1);
+    from = nl == std::string::npos ? text.size() : nl + 1;
+    if (from < head) from = head;
+    return text.substr(0, head) + gap_note + text.substr(from);
+}
+
+std::vector<Part> session_files(size_t limit)
+{
+    std::vector<Part> out;
+    for (const std::string& name : log_files::list(paths::sessions_dir(), log_files::SESSION)) {
+        if (out.size() >= limit) break;
+        std::string content;
+        if (paths::read_file(paths::sessions_dir() + "/" + name, content))
+            out.push_back({ "logs/sessions/" + name, head_and_tail(content, SESSION_BYTES) });
+    }
+    return out;
+}
+
 std::vector<std::string> saved_reports(size_t limit)
 {
     std::vector<std::string> names = log_files::list(paths::reports_dir(), log_files::REPORT);

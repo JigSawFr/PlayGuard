@@ -148,6 +148,21 @@ static void test_logs_plan()
     remove_tree();
 }
 
+// This run's session file is still being written: it stays, the others go.
+static void test_logs_keep_session()
+{
+    make_tree();
+    dir("logs/sessions");
+    write("logs/sessions/session_20261009_141000.txt", 50);
+    write("logs/sessions/session_20261010_090000.txt", 60);
+    const dc::Plan all = dc::logs(g_root);
+    const dc::Plan p = dc::logs(g_root, "session_20261010_090000.txt");
+    CHECK(p.files.size() + 1 == all.files.size() && p.bytes + 60 == all.bytes);
+    CHECK(dc::remove(p).failed == 0);
+    CHECK(there("logs/sessions/session_20261010_090000.txt") && !there("logs/sessions/session_20261009_141000.txt"));
+    remove_tree();
+}
+
 static void test_missing_folders()
 {
     char tmpl[] = "/tmp/playguard_cleanup_XXXXXX";
@@ -194,6 +209,7 @@ int main()
 {
     test_cache_plan();
     test_logs_plan();
+    test_logs_keep_session();
     test_missing_folders();
     test_remove_counts();
     test_size_unit();

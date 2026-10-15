@@ -677,7 +677,7 @@
         "logs_days_never": "Jamais",
         "logs_days_n": "{} jours",
         "logs_keep_mb": "Place pour les rapports",
-        "logs_note": "S'applique aux rapports de diagnostic, aux fichiers de plantage et aux liens des rapports envoyés en ligne dans {}, chacun de son côté, au démarrage et quand une limite change. Le plus récent est toujours gardé.",
+        "logs_note": "S'applique aux rapports de diagnostic, aux fichiers de plantage, aux journaux de session et aux liens des rapports envoyés en ligne dans {}, chacun de son côté, au démarrage et quand une limite change. Le plus récent est toujours gardé.",
         "language": "Langue",
         "languages": {
             "system": "Langue de la console",
@@ -885,7 +885,7 @@
         "clear_cache": "Vider le cache",
         "clear_logs": "Supprimer les fichiers journaux",
         "clear_cache_body": "Supprimer le cache : {} ?\n\nLes noms et icônes des jeux, les derniers chiffres de l'Activité et la liste des builds de développement. PlayGuard les relit sur la console quand il en a besoin : au prochain lancement, l'onglet Activité met un peu plus de temps.",
-        "clear_logs_body": "Supprimer les fichiers journaux : {} ?\n\nLe journal des plantages, les rapports de diagnostic enregistrés et l'enregistrement du temps de jeu. Conservés : les liens des rapports envoyés en ligne (seul moyen de les supprimer) et la référence du bloc du temps de jeu.",
+        "clear_logs_body": "Supprimer les fichiers journaux : {} ?\n\nLes fichiers de plantage, les journaux de session (sauf celui de la session en cours), les rapports de diagnostic enregistrés et l'enregistrement du temps de jeu. Conservés : les liens des rapports envoyés en ligne (seul moyen de les supprimer) et la référence du bloc du temps de jeu.",
         "clear_empty": "Rien à supprimer.",
         "cleared": "Supprimé : {}.",
         "clear_failed": "Supprimé : {}.\n\nNon supprimés, refusés par la carte SD : {}.",

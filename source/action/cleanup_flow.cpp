@@ -9,6 +9,7 @@
 #include "ui/ui.hpp"
 #include "util/data_cleanup.hpp"
 #include "util/paths.hpp"
+#include "util/session_log.hpp"
 
 using namespace brls::literals;
 
@@ -64,7 +65,8 @@ void clear_cache()
 
 void clear_logs()
 {
-    run("clear logs", []() { return data_cleanup::logs(paths::data_dir()); }, "playguard/dev/clear_logs_body");
+    run("clear logs", []() { return data_cleanup::logs(paths::data_dir(), session_log::current_name()); },
+        "playguard/dev/clear_logs_body");
 }
 
 }   // namespace cleanup_flow

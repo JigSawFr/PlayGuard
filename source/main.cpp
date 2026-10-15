@@ -10,9 +10,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <exception>
-#include <fcntl.h>
 #include <typeinfo>
-#include <unistd.h>
 
 #include "action/fw_gate.hpp"
 #include "action/log_prune_flow.hpp"
@@ -39,12 +37,15 @@
 #include "tab/tools_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/crash_dump.h"
+#include "util/crash_report.hpp"
 #include "util/http.hpp"
 #include "util/data_move.hpp"
 #include "util/log_files.hpp"
 #include "util/nand.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
+#include "util/session_log.hpp"
 #include "util/startup.h"
 #include "view/loading_bar.hpp"
 #include "view/loading_mark.hpp"
@@ -60,12 +61,31 @@ using namespace brls::literals;
 
 namespace
 {
-// An exception nothing caught: what it said goes to a file of its own,
-// logs/crashes/crash_<date>.txt (util/log_files.hpp), then
-// PlayGuard ends as a crash, so Atmosphère's report shows where it was
-// thrown (the stack is not unwound yet). Left to std::terminate, it would
-// abort(), which hbloader takes as a normal exit: back in hbmenu, borealis'
-// task thread, still running, crashed hbmenu instead.
+// The return addresses from the caller up, for a crash file: "" when
+// none could be read (desktop).
+std::string backtrace_here()
+{
+    CrashDump d{};
+    if (!platform_code_range(&d.module_base, &d.module_size)) d.module_base = d.module_size = 0;
+    d.frames = crash_dump_backtrace((uint64_t)(uintptr_t)__builtin_frame_address(0), platform_read64, nullptr, d.frame,
+                                    CRASH_DUMP_FRAMES);
+    if (d.frames == 0) return "";
+    std::string out = "backtrace (innermost first, from the terminate handler):\n";
+    for (size_t i = 0; i < d.frames; i++) {
+        char where[40];
+        crash_dump_where(&d, d.frame[i], where, sizeof(where));
+        out += fmt::format("  #{:<3} {}\n", i, where);
+    }
+    return out;
+}
+
+// An exception nothing caught: what it said, the backtrace and the last
+// lines logged go to a file of its own, logs/crashes/crash_<date>.txt
+// (util/crash_report.hpp), then PlayGuard ends as a crash, so Atmosphère's
+// report shows where it was thrown (the stack is not unwound yet). Left to
+// std::terminate, it would abort(), which hbloader takes as a normal exit:
+// back in hbmenu, borealis' task thread, still running, crashed hbmenu
+// instead.
 [[noreturn]] void on_terminate()
 {
     std::string what = "no exception (std::terminate called directly)";
@@ -78,26 +98,70 @@ namespace
             what = "an exception not derived from std::exception";
         }
     }
-    char when[32] = "?";
-    const std::time_t now = std::time(nullptr);
-    std::tm tmv{};
-    if (localtime_r(&now, &tmv)) std::strftime(when, sizeof(when), "%Y-%m-%d %H:%M:%S", &tmv);
-    if (paths::ensure_dir(paths::crashes_dir())) {
-        // Created 0644 (as util/pt_log.cpp), not fopen's 0666. Two crashes in
-        // the same second (another thread) share the file, one line each.
-        const std::string file = paths::crashes_dir() + "/" + log_files::name(log_files::CRASH, log_files::stamp(now));
-        const int fd = ::open(file.c_str(), O_WRONLY | O_APPEND | O_CREAT, 0644);
-        if (std::FILE* f = fd < 0 ? nullptr : ::fdopen(fd, "a")) {
-            std::fprintf(f, "%s  PlayGuard %s (%s): uncaught %s\n", when, app::version().c_str(),
-                         app::commit().empty() ? "?" : app::commit().c_str(), what.c_str());
-            std::fclose(f);
-        } else if (fd >= 0) {
-            ::close(fd);
-        }
-    }
-    std::fprintf(stderr, "uncaught %s\n", what.c_str());
+    const std::string summary = "uncaught " + what;
+    const std::string trace = backtrace_here();
+    const char* name = crash_report::write(std::time(nullptr), summary.c_str(), trace.empty() ? nullptr : trace.c_str());
+    session_log::end_crash(name);
+    std::fprintf(stderr, "%s\n", summary.c_str());
     platform_crash();
     std::abort();
+}
+
+// "PlayGuard 1.2.0 (abc1234)" for the session and crash files.
+std::string build_name()
+{
+    return fmt::format("PlayGuard {} ({})", app::version(), app::commit().empty() ? "?" : app::commit());
+}
+
+// Every line logged, also in this run's session file (util/session_log.hpp).
+void keep_log_lines()
+{
+    brls::Logger::getLogEvent()->subscribe([](brls::Logger::TimePoint when, brls::LogLevel level, std::string text) {
+        static const char LEVELS[] = "EWIDV";
+        const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(when.time_since_epoch()).count() % 1000;
+        const unsigned l = (unsigned)level;
+        session_log::add(std::chrono::system_clock::to_time_t(when), (int)ms, l < 5 ? LEVELS[l] : '?', text);
+    });
+}
+
+// This run's session file, and a crash file for the run before it when it
+// never ended (no end line: a crash PlayGuard did not catch, a hang closed
+// from the HOME menu, the console turned off).
+void start_session()
+{
+    const std::time_t now = std::time(nullptr);
+    std::tm tmv{};
+    char when[32] = "?";
+    if (localtime_r(&now, &tmv)) std::strftime(when, sizeof(when), "%Y-%m-%d %H:%M:%S", &tmv);
+    const std::string header = fmt::format("=== PlayGuard session ===\nstarted : {}\nbuild   : {}\n\n", when, build_name());
+    const std::string name = session_log::start(paths::sessions_dir(), now, header);
+    crash_report::prepare(paths::crashes_dir(), build_name(), "", name);
+    if (name.empty()) brls::Logger::warning("logs: no session file in {}", paths::sessions_dir());
+
+    session_log::Unfinished before;
+    if (session_log::unfinished(paths::sessions_dir(), name, &before)) {
+        const std::string details = "last lines of logs/sessions/" + before.name + ":\n" +
+                                    session_log::last_lines(before.text, 60);
+        const char* crash = crash_report::write(
+            now, ("the run of " + before.name + " did not end: a crash PlayGuard did not catch, closed from the HOME "
+                  "menu while it hung, or the console turned off").c_str(),
+            details.c_str(), false);
+        brls::Logger::warning("logs: the last run ({}) did not end; {}", before.name,
+                              *crash ? std::string("see logs/crashes/") + crash : std::string("no crash file written"));
+    }
+}
+
+// The console, for the session and crash files: "firmware 22.5.0,
+// Atmosphère 1.11.1, sysMMC, over a game".
+std::string system_line(const SysInfo& si)
+{
+    char fw[16];
+    sysinfo_version_string(si.hos_version, fw, sizeof(fw));
+    const SysStorage storage = sysinfo_storage(&si);
+    return fmt::format("firmware {}, Atmosphère {}, {}, {}", fw,
+                       si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : "unknown",
+                       storage == SysStorage_EmuMMC ? "emuMMC" : storage == SysStorage_SysMMC ? "sysMMC" : "storage unknown",
+                       si.applet_mode ? "from the Album (applet)" : "over a game");
 }
 
 // The start-up after the loading screen, one step per frame so the loading
@@ -195,6 +259,7 @@ void start(LoadingActivity* loading)
 int main(int argc, char* argv[])
 {
     startup_mark(StartupStep_Main);
+    keep_log_lines();
     std::set_terminate(on_terminate);
     app::set_self_path(argc > 0 ? argv[0] : nullptr);
 
@@ -205,10 +270,16 @@ int main(int argc, char* argv[])
 #endif
     // logs/ before its subfolders (reports/, crashes/, uploads/, play_timer/).
     log_files::migrate(paths::logs_dir());
+    start_session();
+    // A way out of main() that skips the end of this function.
+    std::atexit([]() { session_log::end("exit"); });
     // Before anything that could crash: the last start of a build just
     // installed never reached its first screen, or L + R are held? Then the
     // previous build is offered (action/rollback_flow.hpp).
-    if (rollback_flow::at_start()) return EXIT_SUCCESS;
+    if (rollback_flow::at_start()) {
+        session_log::end("exit at start-up (the start-up screen of the previous build)");
+        return EXIT_SUCCESS;
+    }
     // The system this is (sysMMC or emuMMC): its own folder, nand/<key>,
     // before config::load() reads its state.json. What the versions before
     // it kept for every system goes to the first one started.
@@ -221,6 +292,9 @@ int main(int argc, char* argv[])
                                                                  : nand::Storage::Unknown));
         if (const size_t moved = data_move::to_nand(paths::data_dir(), paths::nand_dir()))
             brls::Logger::info("start-up: {} entries moved to {}", moved, paths::nand_dir());
+        const std::string system = system_line(si);
+        brls::Logger::info("start-up: {}, {}", build_name(), system);
+        crash_report::prepare(paths::crashes_dir(), build_name(), system, session_log::current_name());
     }
 
     // Preferences first: the locale must be chosen before borealis loads i18n.
@@ -235,6 +309,7 @@ int main(int argc, char* argv[])
 
     if (!brls::Application::init()) {
         brls::Logger::error("Unable to init borealis Application");
+        session_log::end("exit: borealis could not start");
         return EXIT_FAILURE;
     }
     startup_mark(StartupStep_Borealis);
@@ -311,5 +386,7 @@ int main(int argc, char* argv[])
     pt_log_flow::stop();
     app::shutdown();
     http::cleanup();
+    brls::Logger::info("quit: after {} s", session_log::uptime_s());
+    session_log::end("clean exit");
     return EXIT_SUCCESS;
 }

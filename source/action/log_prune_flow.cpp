@@ -21,8 +21,9 @@ void run()
         const std::time_t now = std::time(nullptr);
         const size_t removed = log_files::prune(paths::reports_dir(), log_files::REPORT, limits, now) +
                                log_files::prune(paths::crashes_dir(), log_files::CRASH, limits, now) +
+                               log_files::prune(paths::sessions_dir(), log_files::SESSION, limits, now) +
                                log_files::prune(paths::uploads_dir(), log_files::UPLOAD, limits, now);
-        if (removed) brls::Logger::info("logs: {} old report, crash or upload file(s) removed", removed);
+        if (removed) brls::Logger::info("logs: {} old report, crash, session or upload file(s) removed", removed);
     });
 }
 

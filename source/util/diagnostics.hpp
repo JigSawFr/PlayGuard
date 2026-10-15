@@ -8,8 +8,10 @@ namespace diagnostic
 {
 
 // Header (app version, read-only / developer modes, firmware, Atmosphère, launch mode) +
-// this run's start-up times + system clocks + every pctl query. Read-only;
-// never contains the PIN.
+// this run's start-up times + the logs (this run's session file, how the
+// last one ended, memory, SD card, the newest crash files) + system clocks +
+// every pctl query + the last lines logged. Read-only; never contains the
+// PIN.
 std::string current_report();
 
 // Saves as logs/reports/report_<timestamp>.txt (util/log_files.hpp). Returns the

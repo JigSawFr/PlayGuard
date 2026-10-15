@@ -27,6 +27,7 @@ std::string data_dir()
 std::string logs_dir()     { return data_dir() + "/logs"; }
 std::string reports_dir()  { return logs_dir() + "/reports"; }
 std::string crashes_dir()  { return logs_dir() + "/crashes"; }
+std::string sessions_dir() { return logs_dir() + "/sessions"; }
 std::string uploads_dir()  { return logs_dir() + "/uploads"; }
 std::string play_timer_dir() { return logs_dir() + "/play_timer"; }
 std::string profiles_dir() { return data_dir() + "/profiles"; }

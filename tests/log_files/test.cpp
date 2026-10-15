@@ -76,6 +76,7 @@ static void test_names()
     CHECK(lf::name(lf::REPORT, "20261011_142530") == "report_20261011_142530.txt");
     CHECK(lf::name(lf::CRASH, "20261011_142530", 2) == "crash_20261011_142530_2.txt");
     CHECK(lf::name(lf::UPLOAD, "20261011_142530") == "upload_20261011_142530.url");
+    CHECK(lf::name(lf::SESSION, "20261011_142530") == "session_20261011_142530.txt");
     CHECK(lf::stamp(NOW) == "20261011_120000");
     CHECK(lf::stamp(0) == "19700101_000000");
 

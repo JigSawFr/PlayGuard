@@ -66,6 +66,19 @@ bool platform_region(int *region);
 // `size` random bytes; false when none could be made.
 bool platform_random(void *buf, size_t size);
 
+// PlayGuard's code in memory (the .nro's text): where it starts and its
+// size, so a crash file gives addresses as offsets into the .nro. False when
+// not known (desktop).
+bool platform_code_range(uint64_t *base, uint64_t *size);
+
+// The 8 bytes at `addr` into *value, when they are mapped and readable
+// (crash_dump_backtrace's reader; `ctx` unused). False on desktop.
+bool platform_read64(uint64_t addr, uint64_t *value, void *ctx);
+
+// The memory PlayGuard's process uses and may use, in bytes (hbloader gives
+// it what the game or the Album it runs over leaves). False when unknown.
+bool platform_memory(uint64_t *used, uint64_t *total);
+
 // Ends PlayGuard as a crash the console reports (Atmosphère writes a crash
 // report with the stack). abort() would not: on the console it returns to
 // hbloader as a normal exit, and the next homebrew (hbmenu) is the one that

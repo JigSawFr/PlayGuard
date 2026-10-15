@@ -13,10 +13,11 @@ namespace paths
 std::string data_dir();
 std::string logs_dir();
 // Inside logs_dir() (util/log_files.hpp): the saved diagnostic reports, one
-// file per crash, one per report sent online, and the developer tools'
-// play-timer files.
+// file per crash, one per run (everything logged), one per report sent
+// online, and the developer tools' play-timer files.
 std::string reports_dir();
 std::string crashes_dir();
+std::string sessions_dir();
 std::string uploads_dir();
 std::string play_timer_dir();
 std::string profiles_dir();

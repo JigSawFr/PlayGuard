@@ -3,6 +3,7 @@
 
 #include <ctime>
 #include <fmt/format.h>
+#include <sys/statvfs.h>
 #include <vector>
 
 #include "action/fw_gate.hpp"
@@ -11,10 +12,74 @@
 #include "util/patches.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
+#include "util/session_log.hpp"
 #include "util/startup.h"
+#include "core/platform.h"
 
 namespace diagnostic
 {
+
+namespace
+{
+// "1.5 GiB", "312.4 MiB", "18 KiB".
+std::string bytes(uint64_t n)
+{
+    if (n >= (1ULL << 30)) return fmt::format("{:.1f} GiB", (double)n / (1ULL << 30));
+    if (n >= (1ULL << 20)) return fmt::format("{:.1f} MiB", (double)n / (1ULL << 20));
+    return fmt::format("{} KiB", (n + 1023) / 1024);
+}
+
+std::string first_line(const std::string& text)
+{
+    return text.substr(0, text.find('\n'));
+}
+
+// This run, the one before, the memory, the SD card and the crash files kept.
+std::string logs_section()
+{
+    std::string out = "=== logs ===\n";
+    const std::string current = session_log::current_name();
+    out += fmt::format("session     : {}, {} s since the start\n",
+                       current.empty() ? std::string("no session file") : "logs/sessions/" + current,
+                       session_log::uptime_s());
+
+    // The run before this one, and how it ended.
+    std::string before = "none kept";
+    for (const std::string& name : log_files::list(paths::sessions_dir(), log_files::SESSION)) {
+        if (name == current) continue;
+        std::string text;
+        if (!paths::read_file(paths::sessions_dir() + "/" + name, text)) {
+            before = name + ": cannot be read";
+            break;
+        }
+        const std::string reason = session_log::end_reason(text);
+        before = name + ": " + (reason.empty() ? std::string("did not end (crash, hang or power off)") : reason);
+        break;
+    }
+    out += "last run    : " + before + "\n";
+
+    uint64_t used = 0, total = 0;
+    out += "memory      : " +
+           (platform_memory(&used, &total) ? fmt::format("{} used of {}", bytes(used), bytes(total)) : std::string("unknown")) +
+           "\n";
+    struct statvfs fs;
+    if (statvfs(paths::sd_root().c_str(), &fs) == 0 && fs.f_blocks > 0)
+        out += fmt::format("sd card     : {} free of {}\n", bytes((uint64_t)fs.f_bavail * fs.f_frsize),
+                           bytes((uint64_t)fs.f_blocks * fs.f_frsize));
+    else
+        out += "sd card     : unknown\n";
+
+    // The newest crash files, with their first line (what happened).
+    const std::vector<std::string> crashes = log_files::list(paths::crashes_dir(), log_files::CRASH);
+    out += fmt::format("crash files : {}{}\n", crashes.size(), crashes.empty() ? "" : " (newest first)");
+    for (size_t i = 0; i < crashes.size() && i < 5; i++) {
+        std::string text;
+        paths::read_file(paths::crashes_dir() + "/" + crashes[i], text);
+        out += "  " + crashes[i] + "\n    " + first_line(text) + "\n";
+    }
+    return out + "\n";
+}
+}   // namespace
 
 std::string current_report()
 {
@@ -75,6 +140,7 @@ std::string current_report()
     startup_report(buf.data(), buf.size());
     out += buf.data();
     out += "\n";
+    out += logs_section();
 
     time_clock_dump(buf.data(), buf.size());
     out += buf.data();
@@ -83,6 +149,10 @@ std::string current_report()
     pctl_dump(buf.data(), buf.size());
     out += buf.data();
     if (std::string(buf.data()).size() >= buf.size() - 1) out += "\n(report truncated)\n";
+
+    // Last: what led here, which can be long.
+    const std::string recent = session_log::recent();
+    out += "\n=== last lines logged (oldest first) ===\n" + (recent.empty() ? std::string("(none)\n") : recent);
     return out;
 }
 

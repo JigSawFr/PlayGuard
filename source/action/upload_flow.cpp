@@ -138,14 +138,16 @@ void send(const std::vector<log_upload::Part>& parts)
     });
 }
 
-// The report, the latest crashes (PlayGuard's, then Atmosphère's: before the
-// debug files, so a cut takes the history first) and the debug files.
+// The report, the latest crashes (PlayGuard's, then Atmosphère's), the last
+// runs' session logs (before the debug files, so a cut takes the history
+// first) and the debug files.
 std::vector<log_upload::Part> with_debug_files(const std::string& report)
 {
     std::vector<log_upload::Part> parts{ { "playguard/upload/part_report"_i18n, report } };
     ui::settle_writes();   // the files as they are once the writes asked for are done
     for (auto& f : log_upload::crash_files()) parts.push_back(std::move(f));
     for (auto& f : log_upload::atmosphere_crashes(std::time(nullptr))) parts.push_back(std::move(f));
+    for (auto& f : log_upload::session_files()) parts.push_back(std::move(f));
     for (auto& f : log_upload::debug_files()) parts.push_back(std::move(f));
     return parts;
 }
