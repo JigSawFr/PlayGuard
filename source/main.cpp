@@ -20,6 +20,7 @@
 #include "action/pt_flow.hpp"
 #include "action/pt_log_flow.hpp"
 #include "action/rescue.hpp"
+#include "action/rollback_flow.hpp"
 #include "activity/init_error_activity.hpp"
 #include "activity/loading_activity.hpp"
 #include "activity/lock_activity.hpp"
@@ -116,6 +117,7 @@ void show_first(brls::Activity* first)
     pt_log_flow::apply();   // Developer › Record the play timer, when on (after fw_gate::prepare)
     log_prune_flow::run();  // the reports and crashes past the limits of Tools › Diagnostics
     startup_mark(StartupStep_FirstScreen);
+    rollback_flow::started();   // this build starts: nothing to go back from
     brls::Logger::info("start-up: first screen ready after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_FirstScreen));
 }
 
@@ -203,6 +205,10 @@ int main(int argc, char* argv[])
 #endif
     // logs/ before its subfolders (reports/, crashes/, uploads/, play_timer/).
     log_files::migrate(paths::logs_dir());
+    // Before anything that could crash: the last start of a build just
+    // installed never reached its first screen, or L + R are held? Then the
+    // previous build is offered (action/rollback_flow.hpp).
+    if (rollback_flow::at_start()) return EXIT_SUCCESS;
     // The system this is (sysMMC or emuMMC): its own folder, nand/<key>,
     // before config::load() reads its state.json. What the versions before
     // it kept for every system goes to the first one started.

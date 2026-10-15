@@ -82,6 +82,7 @@ LIBRARY = SCENARIO == "library"
 OUTSIDE = SCENARIO == "outside"
 LOADING = SCENARIO == "loading"
 ALARM = SCENARIO == "alarm"
+ROLLBACK = SCENARIO == "rollback"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
@@ -300,6 +301,19 @@ if LOCK:
     json.dump({"schema": 1, "pin_lock": "open", "intro": False}, open(config_file, "w"))
 if LOADING:
     env["PLAYGUARD_SIM_HOLD_LOADING"] = "1"
+if ROLLBACK:
+    # A build installed in place whose last start never reached its first
+    # screen, the build before it kept: the start-up screen offers it before
+    # anything else, A takes it back and hbloader starts it.
+    env.setdefault("PLAYGUARD_SIM_HBLOADER", "1")
+    env["PLAYGUARD_SIM_BOOT_CHOICE"] = "a"
+    sd_nro = os.path.join(run_dir, "playguard_data", "sd", "switch", "playguard", "playguard.nro")
+    os.makedirs(os.path.dirname(sd_nro), exist_ok=True)
+    open(sd_nro, "w").write("the build that crashes")
+    open(sd_nro + ".previous", "w").write("the build before")
+    data = os.path.join(run_dir, "playguard_data")
+    json.dump({"label": "1.0.0 (0abc123)"}, open(os.path.join(data, "previous_build.json"), "w"))
+    json.dump({"label": "PR #38", "starts": 1}, open(os.path.join(data, "boot_check.json"), "w"))
 log = open(os.path.join(OUT, "app.log"), "w")
 def have(tool):
     return subprocess.run(["which", tool], capture_output=True).returncode == 0
@@ -361,6 +375,29 @@ def fail(msg):
     print("SMOKE FAILED:", msg)
     print(open(os.path.join(OUT, "app.log")).read()[-3000:])
     sys.exit(1)
+
+
+if ROLLBACK:
+    # No window: PlayGuard ends at once, the previous build in place.
+    try:
+        proc.wait(20)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        fail("still running: the previous build was not offered at start-up")
+    log.flush()
+    text = open(os.path.join(OUT, "app.log"), errors="replace").read()
+    if "Its last start did not finish" not in text or "Go back to 1.0.0 (0abc123)" not in text:
+        fail("the start-up screen did not offer the previous build")
+    if "next load: sdmc:/switch/playguard/playguard.nro" not in text:
+        fail("the previous build was not set as the next homebrew")
+    if open(sd_nro).read() != "the build before" or open(sd_nro + ".previous").read() != "the build that crashes":
+        fail("the two builds were not swapped")
+    if os.path.exists(os.path.join(data, "boot_check.json")):
+        fail("the start check was left behind")
+    if json.load(open(os.path.join(data, "previous_build.json"))).get("label") != "1.0.0 (1a2b3c4)":
+        fail("the build gone back from is not named as the previous one")
+    print("desktop smoke test passed:", OUT)
+    sys.exit(0)
 
 
 for _ in range(60):
@@ -623,6 +660,12 @@ if DEVBUILD:
         fail("the new build was not set as the next homebrew")
     if open(installed_nro, "rb").read() != pr_content:
         fail("the pull request's build did not replace " + installed_nro)
+    # The build replaced is kept, its start checked (action/rollback_flow).
+    if not os.path.exists(installed_nro + ".previous") or open(installed_nro + ".previous", "rb").read() != b"the build before":
+        fail("the build replaced was not kept as " + installed_nro + ".previous")
+    check = os.path.join(run_dir, "playguard_data", "boot_check.json")
+    if not os.path.exists(check) or json.load(open(check)).get("starts") != 0:
+        fail("the next start of the build installed is not checked")
     for leftover in (".old", ".new", ".new.zip", ".new.zip.part", ".new.zip.part.json"):
         if os.path.exists(installed_nro + leftover):
             fail("a %s file was left next to %s" % (leftover, installed_nro))

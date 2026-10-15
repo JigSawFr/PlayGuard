@@ -165,6 +165,8 @@ profiles_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
 pt_block_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
+rollback_SRC   := source/util/paths.cpp source/util/rollback.cpp tests/rollback/test.cpp
+rollback_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 launcher_FLAGS := -std=c++17 -Isource
 history_SRC   := source/util/paths.cpp source/util/history.cpp tests/history/test.cpp
 history_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include

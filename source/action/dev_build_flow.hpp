@@ -17,6 +17,12 @@
 namespace dev_build_flow
 {
 
+// The running .nro from the SD card root ("/switch/playguard/playguard.nro"),
+// and as a path for the C library; "" when unknown (not started through
+// hbloader).
+std::string nro_sd_path();
+std::string nro_file();
+
 // `force`: fetch the list even when the one kept is fresh.
 void open(bool force = false);
 
@@ -47,6 +53,9 @@ void choose(const dev_builds::Build& b, bool newer = false);
 void install_now(const dev_builds::Build& b);
 // Signs in to GitHub, then lists the builds again.
 void sign_in();
+// Asks to go back to the previous build (rollback_flow), then the PIN when
+// one is set, then goes back to it.
+void go_back();
 // Find a build: asks for a pull request's number or a commit, looks for its
 // build, then shows it (choose()).
 void find();

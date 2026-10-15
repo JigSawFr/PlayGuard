@@ -1,0 +1,35 @@
+// rollback_flow — going back to the previous build (util/rollback.hpp).
+// At start-up, before borealis (so a build that crashes in its UI still
+// gets there): when the last start of a build just installed never reached
+// its first screen, or when L + R are held, a text screen offers the
+// previous build; A swaps the two .nro files and starts it again through
+// hbloader, B goes on. In the app: Install another build has a line that
+// does the same.
+// Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
+#pragma once
+
+#include <string>
+
+namespace rollback_flow
+{
+
+// The start-up check, first thing in main(). True when PlayGuard must end
+// now (the previous build is in place, hbloader starts it).
+bool at_start();
+
+// The first screen is up: the start of the build installed went well.
+void started();
+
+// A build was installed in place of the running one: the running one's
+// name is kept as the previous build's, and the next start is checked.
+void installed(const std::string& installed_label);
+
+// The previous build's name, when there is one to go back to.
+bool previous(std::string* label);
+
+// Goes back to it now: swaps the files, then restarts on it through
+// hbloader (or says to restart by hand). On the UI thread; the caller asked
+// for the confirmation and the PIN.
+void go_back_now();
+
+}   // namespace rollback_flow

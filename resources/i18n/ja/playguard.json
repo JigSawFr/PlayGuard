@@ -964,6 +964,10 @@
         "step_runs": "チェック...",
         "prereleases_shown": "プレリリースを表示中",
         "prereleases_hidden": "プレリリースを非表示",
+        "back": "前のビルドに戻す：{}",
+        "back_body": "PlayGuard {} を、その前にインストールされていたビルド {} に置き換えますか？PlayGuard はそのビルドで再起動します。\n\nビルドが最初の画面の前にクラッシュした場合、次の起動時に PlayGuard がこれを提案します。起動中に L + R を押し続けても提案されます。",
+        "back_confirm": "戻す",
+        "back_failed": "前のビルドに戻せませんでした：{}\n\nインストール済みの PlayGuard は変更されていません。",
         "prereleases": "プレリリース",
         "count_new_one": "1 件の新着",
         "cancelled": "ダウンロードを中止しました。"

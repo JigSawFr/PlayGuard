@@ -964,6 +964,10 @@
         "step_runs": "檢查...",
         "prereleases_shown": "已顯示預先發布",
         "prereleases_hidden": "已隱藏預先發布",
+        "back": "回到上一個建置：{}",
+        "back_body": "將 PlayGuard {} 取代為之前安裝的建置 {}？PlayGuard 將以它重新啟動。\n\n如果某個建置在第一個畫面之前當機，PlayGuard 會在下次啟動時提出此操作；啟動時按住 L + R 也會提出。",
+        "back_confirm": "回到上一個",
+        "back_failed": "無法回到上一個建置：{}\n\n已安裝的 PlayGuard 未改變。",
         "prereleases": "預先發布",
         "count_new_one": "1 個新的",
         "cancelled": "已取消下載。"

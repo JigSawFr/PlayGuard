@@ -435,6 +435,17 @@ static void test_files()
     CHECK(paths::atomic_write(file, "new"));
     CHECK(dev_builds::replace(dir + "/first.nro", file, &err));
     CHECK(paths::read_file(dir + "/first.nro", got) && got == "new");
+    // Kept as the previous build, the one kept before going.
+    CHECK(paths::atomic_write(target + ".previous", "older"));
+    CHECK(paths::atomic_write(file, "newest"));
+    CHECK(dev_builds::replace(target, file, &err, target + ".previous"));
+    CHECK(paths::read_file(target, got) && got == "newest");
+    CHECK(paths::read_file(target + ".previous", got) && got == content);
+    CHECK(!paths::read_file(target + ".old", got));
+    // Nothing replaced (no target): no previous build made up, the one kept stays.
+    CHECK(paths::atomic_write(file, "x"));
+    CHECK(dev_builds::replace(dir + "/second.nro", file, &err, dir + "/second.nro.previous"));
+    CHECK(!paths::read_file(dir + "/second.nro.previous", got));
 }
 
 static void test_zip()

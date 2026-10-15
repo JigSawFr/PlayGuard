@@ -12,6 +12,7 @@
 
 #include "action/github_login_flow.hpp"
 #include "action/pin_lock.hpp"
+#include "action/rollback_flow.hpp"
 #include "activity/dev_build_activity.hpp"
 #include "activity/dev_builds_activity.hpp"
 #include "app.hpp"
@@ -21,6 +22,7 @@
 #include "util/github_auth.hpp"
 #include "util/launcher.hpp"
 #include "util/paths.hpp"
+#include "util/rollback.hpp"
 
 using namespace brls::literals;
 
@@ -180,6 +182,8 @@ class DownloadProgress
 
 void installed_now(const dev_builds::Build& b)
 {
+    // The build replaced is kept, and the next start checked (rollback_flow).
+    rollback_flow::installed(label(b));
     if (launcher::can_launch() && launcher::launch_nro(sd_path())) {
         // hbloader starts the new .nro as soon as this one exits.
         brls::Application::quit();
@@ -220,7 +224,7 @@ void install(const dev_builds::Build& b)
                 // released for the two renames, here on the UI thread so that
                 // nothing reads romfs:/ meanwhile, then mounted again.
                 platform_romfs_release();
-                ok = dev_builds::replace(target, fresh, &err);
+                ok = dev_builds::replace(target, fresh, &err, rollback::previous_file(target));
                 platform_romfs_mount();
                 if (!ok) std::remove(fresh.c_str());
             }
@@ -233,6 +237,17 @@ void install(const dev_builds::Build& b)
 }
 
 }   // namespace
+
+std::string nro_sd_path()
+{
+    return sd_path();
+}
+
+std::string nro_file()
+{
+    const std::string sd = sd_path();
+    return sd.empty() ? "" : file_path(sd);
+}
 
 std::string short_date(const std::string& iso)
 {
@@ -327,6 +342,23 @@ void install_now(const dev_builds::Build& b)
 void sign_in()
 {
     github_login_flow::sign_in([]() { open(); });
+}
+
+void go_back()
+{
+    std::string previous;
+    if (s_busy || !rollback_flow::previous(&previous)) return;
+    std::string running = app::version();
+    if (!app::commit().empty()) running += " (" + app::commit() + ")";
+    ui::confirm(brls::getStr("playguard/dev_build/back_body", running, previous), "playguard/dev_build/back_confirm"_i18n,
+                []() {
+                    // As for an install: whatever Security › Ask for the PIN says.
+                    if (!pin_lock::ask()) {
+                        ui::notify(pin_lock::refusal_text());
+                        return;
+                    }
+                    rollback_flow::go_back_now();
+                });
 }
 
 void find()
