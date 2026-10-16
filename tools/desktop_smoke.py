@@ -1149,7 +1149,7 @@ if not any(m.endswith("works again.") and m.startswith("Moon Racer") for m in me
     fail("the launch version reset did not fix the game: " + repr(messages()[-3:]))
 # To reinstall: Garden Defenders (an update without its game), removed.
 key("Up", 6)               # the first game
-key("Down", 3)             # past Forest Tales, the unnamed game, Hedgehog Rush
+key("Down", 4)             # past Forest Tales, the unnamed game, Reinstall's buttons, Hedgehog Rush
 shot("27_games_reinstall")
 key("Return")
 shot("27_games_actions")   # Remove the game (the fix), Other actions
@@ -1163,7 +1163,7 @@ if not any(m.endswith("removed") for m in messages()):
 # The rest of Reinstall: their list saved, then all of them removed at once
 # (the list saved again first), each in the change history.
 exports_dir = os.path.join(run_dir, "playguard_data", "exports")
-key("Down", 2)             # past Castle Siege: Save the list of these games
+key("Up", 2)               # past Hedgehog Rush: Save the list of these games, above the games
 shot("27_games_reinstall_actions")
 key("Return")
 time.sleep(0.5)
@@ -1173,7 +1173,7 @@ if not lists or not os.path.exists(lists[0][:-4] + "txt"):
 with open(lists[0], encoding="utf-8") as f:
     if "Ocean Explorer" not in f.read():
         fail("the saved list does not name Ocean Explorer: " + lists[0])
-key("Down")                # Remove these 3 games
+key("Right")               # Remove these 3 games, next to it
 key("Return")
 shot("27_games_remove_all")
 key("Right")               # Remove
