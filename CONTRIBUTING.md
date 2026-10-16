@@ -47,11 +47,14 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_CHECK_MS=150` | How long checking one installed game takes (*Console › Check the installed games*) |
 | `PLAYGUARD_SIM_GAMES_OK=1` | Every installed game fine (*Console › Check the installed games*; by default one of each problem) |
 | `PLAYGUARD_SIM_SD_FREE_MB=300` | The SD card's free space, in MB (unset: unknown, as the desktop's own disk says nothing of a console; under 500 MB, *The SD card is almost full* on the Console tab) |
+| `PLAYGUARD_SIM_MODEL=1` | The console's model, as `setsysGetProductModel` gives it (6, a Switch OLED, by default; the remote link's `system` document) |
+| `PLAYGUARD_SIM_BATTERY_PCT=15` | The battery's charge, in percent (87 by default, `none`: unknown; the remote link's `system` document, which says the console charges unless `PLAYGUARD_SIM_BATTERY` is set) |
+| `PLAYGUARD_SIM_NETWORK=ethernet` | The connection: `wifi` (the default), `ethernet` or `none` |
 | `PLAYGUARD_SIM_EMUMMC=1` | Running on emuMMC |
 | `PLAYGUARD_SIM_BLANK=1` | Atmosphère blanking the serial number |
 | `PLAYGUARD_SIM_APPLET=1` | Applet (album) mode |
 | `PLAYGUARD_SIM_NO_GAME=1` | No game open (applet mode with nothing behind it): no "game left open keeps counting" line, no "the game in progress is suspended" warning |
-| `PLAYGUARD_SIM_DOCKED=1` | The console on its dock: *Text size › Automatic* draws the larger text |
+| `PLAYGUARD_SIM_DOCKED=1` | The console on its dock: *Text size › Automatic* draws the larger text (and the remote link's `system` document says docked) |
 | `PLAYGUARD_SIM_BATTERY=1` | The console on its battery (no charger): *Visual effects › Lighter on battery* leaves out the glow, the ring's pulse and its arc's animation |
 | `PLAYGUARD_SIM_LEFT_MIN=4` | That many minutes left today while the timer counts (the child screen's last minutes) |
 | `PLAYGUARD_SIM_NO_PDM=1` | No activity log |

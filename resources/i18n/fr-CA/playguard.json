@@ -1498,6 +1498,7 @@
         "ha_installed": "Intégration PlayGuard",
         "discovery": "Créer l'appareil dans Home Assistant (découverte MQTT)",
         "report": "Publier les rapports de diagnostic demandés",
+        "serial": "Publier le numéro de série (vers le broker seulement)",
         "note": "Un ordre est exécuté comme un changement fait ici : le mode lecture seule, le déverrouillage du minuteur et l'historique des changements s'appliquent. Supprimer le contrôle parental, délier l'appli mobile et le code PIN ne sont jamais possibles par le lien. Le mot de passe est enregistré en clair sur la carte SD.",
         "no_random": "La console n'a pas fourni de nombre aléatoire pour l'identifiant. Réessayez.",
         "save_err": "Les réglages n'ont pas pu être enregistrés",

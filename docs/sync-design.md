@@ -235,8 +235,9 @@ into long-term statistics.
   `sysmodule/common.mk`), `__nx_applet_type = None`, a static heap of
   512–768 KiB, a minimal `socketInitialize` (two 16 KiB TCP buffers, no UDP:
   about 32 KiB of transfer memory). Services: `pctl:a/s/r`, `fsp-srv`,
-  `set:sys`, `time:u`, `nifm:u`, `bsd:u`, `sfdnsres`, `ssl`, `pdm:qry`,
-  `pm:dmnt`; hosts `pg:agent` (which needs the session syscalls 0x40–0x45, as
+  `set:sys`, `set:`, `psm`, `ts`, `apm` (the system document: region,
+  battery, temperature, docked), `time:u`, `nifm:u`, `bsd:u`, `sfdnsres`,
+  `ssl`, `pdm:qry`, `spl:`, `csrng`; hosts `pg:agent` (which needs the session syscalls 0x40–0x45, as
   sys-clk's `perms.json` shows).
 - Starts after qlaunch and once `nifm` reports a connection; reads
   `sync.conf`; connects; then a 30 s cycle (5 s for a minute after an

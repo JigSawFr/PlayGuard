@@ -99,6 +99,12 @@ static void test_documents(void)
     CHECK(call(AgentCmd_PushNames, NULL, 0, big, AGENT_DOC_LARGE - 1, NULL, 0, NULL) == 0);
     CHECK(S.names_info.len == AGENT_DOC_LARGE - 1);
     CHECK(call(AgentCmd_PushWeek, NULL, 0, big, sizeof(big), NULL, 0, NULL) == AGENT_RC_TOO_LARGE);
+    // The games document, as large as the week's.
+    const char games[] = "{\"schema\":1,\"installed\":3}";
+    CHECK(call(AgentCmd_PushGames, NULL, 0, games, strlen(games), NULL, 0, NULL) == 0);
+    static char taken[AGENT_DOC_LARGE];
+    CHECK(agent_take_doc(S.games, &S.games_info, taken, sizeof(taken)) == strlen(games) && !strcmp(taken, games));
+    CHECK(call(AgentCmd_PushGames, NULL, 0, big, sizeof(big), NULL, 0, NULL) == AGENT_RC_TOO_LARGE);
 
     // Finished days: the same day replaces itself, seven at most waiting.
     const char d1[] = "2026-10-08\n{\"final\":true}";

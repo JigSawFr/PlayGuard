@@ -92,7 +92,9 @@ mosquitto-clients) and sets the remote link up in sync.conf: PlayGuard must
 come online, publish the Home Assistant discovery, the state, today's
 activity and the names, carry out a limit order (event, retained order
 cleared, new state, change history), refuse one out of range, publish the
-discovery again when Home Assistant says it restarted, show the link online
+discovery again when Home Assistant says it restarted, publish the system
+document (the simulated console; the serial number only in sync-311, which
+sets publish_serial) and the games document, show the link online
 in Preferences › Remote access with the Home Assistant integration's QR
 codes, keep the integration's version once it says it (integration.json),
 find its newer release (PLAYGUARD_SIM_HA_LATEST, its changelog) and show
@@ -409,6 +411,7 @@ if SYNC:
         "enabled=1\nhost=127.0.0.1\n"
         f"port={mqtt_port}\nallow_anonymous=1\nconsole_id={SYNC_ID}\nconsole_name=Smoke\n"
         f"mqtt_version={'3.1.1' if MQTT311 else 'auto'}\n"
+        f"publish_serial={1 if MQTT311 else 0}\n"
         "policy=auto\nremote_timer_writes=1\npoll_s=10\n")
     history = os.path.join(nand_dir, "history.json")
     if os.path.exists(history):
@@ -1306,6 +1309,22 @@ if SYNC:
         fail(f"unexpected state: {json.dumps(state)[:300]}")
     wait_for("today's activity", lambda: doc(f"{BASE}/activity"))
     wait_for("names", lambda: doc(f"{BASE}/names"))
+    # The console itself (the simulated OLED on Wi-Fi), its entities in the
+    # discovery; the serial number only with publish_serial (sync-311).
+    system = wait_for("the system document", lambda: doc(f"{BASE}/system"))
+    hw, power = system.get("hardware", {}), system.get("power", {})
+    if hw.get("model") != "oled" or power.get("battery_pct") != 87 or system.get("network", {}).get("ssid") != "Maison" \
+            or (system.get("storage", {}).get("sd") or {}).get("free_mb") is None \
+            or not system.get("versions", {}).get("firmware") or not system.get("boot_ts"):
+        fail(f"unexpected system document: {json.dumps(system)[:400]}")
+    want_serial = "XAW10000000001" if MQTT311 else None
+    if hw.get("serial") != want_serial:
+        fail(f"the serial number is {hw.get('serial')!r}, not {want_serial!r}")
+    if "/system" not in discovery["cmps"].get("battery", {}).get("stat_t", ""):
+        fail("the discovery lacks the console's own entities")
+    games = wait_for("the games document", lambda: doc(f"{BASE}/games"))
+    if not games.get("games") or games.get("total_min") is None:
+        fail(f"unexpected games document: {json.dumps(games)[:400]}")
 
     events = watch(f"{BASE}/event", "events.txt")
     discoveries = watch(f"homeassistant/device/playguard_{SYNC_ID}/config", "discoveries.txt")

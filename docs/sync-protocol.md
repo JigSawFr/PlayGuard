@@ -25,6 +25,8 @@ is `null`, never a default. JSON consumers ignore unknown fields.
 |---|---|---|---|
 | `playguard/<id>/availability` | yes | console → | `online` or `offline`. Last will (`offline`), and `offline` published before a clean disconnect. |
 | `playguard/<id>/state` | yes | console → | The state snapshot (below). |
+| `playguard/<id>/system` | yes | console → | The console itself: versions, model, name, storage, power, network (below). With the state, every `poll_s`. |
+| `playguard/<id>/games` | yes | console (app) → | The games installed and played, each with its play time in all (below), published by PlayGuard after a read of the play log. |
 | `playguard/<id>/activity` | yes | console → | Today's play time from the play log. |
 | `playguard/<id>/activity/<YYYY-MM-DD>` | yes | console → | A finished day's totals, published at the first cycle after local midnight. The console keeps the last 14 and clears older ones (empty retained publish). |
 | `playguard/<id>/names` | yes | console (app) → | Game and account names, published by PlayGuard when it runs. |
@@ -135,6 +137,65 @@ Every object is always there; a value the console could not read is `null`
   `<entity>: <reason>`.
 - `profiles`: the saved profiles' names, the choices of the `profile` order
   (at most 16; `[]` when there are none).
+
+## `system`
+
+What the console is and how it is doing, beside the parental controls:
+built by whichever of PlayGuard and the agent holds the link (the agent
+reads it all itself, so it stays fresh while PlayGuard is closed), published
+with the state. Every unknown value is `null`.
+
+```json
+{"schema": 1, "ts": 1790990000,
+ "versions": {"firmware": "23.0.1", "atmosphere": "1.12.0", "hekate": "6.5.4", "app": "1.2.0", "agent": "1.2.0"},
+ "hardware": {"model": "oled", "nickname": "Switch de Léa", "region": "eur", "system": "emummc",
+              "prodinfo_blanked": true, "serial": null},
+ "storage": {"sd": {"free_mb": 21344, "total_mb": 59640}, "nand": {"free_mb": 18470, "total_mb": 26592}},
+ "power": {"battery_pct": 87, "charging": true, "charger": "official", "docked": false, "temperature_c": 41},
+ "network": {"type": "wifi", "ip": "192.168.1.20", "wifi_bars": 3, "ssid": "Maison"},
+ "boot_ts": 1790971980}
+```
+
+- `versions.hekate`: the SD card's `bootloader/update.bin`. `app`: PlayGuard's
+  (from the agent: the one its last session said). `agent`: `null` without it.
+- `hardware.model`: `erista` (the first Switch), `mariko` (its 2019
+  revision), `lite`, `oled`, `other` (a development unit). `nickname`: System
+  Settings' console nickname. `region`: `jpn`, `usa`, `eur`, `aus`, `htk`
+  (Hong Kong, Taiwan, Korea), `chn`. `system`: `sysmmc` or `emummc`.
+- `hardware.serial`: only when `sync.conf`'s `publish_serial` is on
+  (*Remote access › Publish the serial number*, off by default); `null`
+  otherwise. It is the console's own one: the system's when PRODINFO is not
+  blanked, else the one in Atmosphère's backup of the real PRODINFO
+  (`sd:/atmosphere/automatic_backups/*PRODINFO*.bin`). It is never in a
+  report or a log.
+- `storage`: MiB, read every 5 minutes; `nand` is the user partition of the
+  system in use (the emuMMC's on an emuMMC).
+- `power.charging`: a charger that gives power (`charger`: `official` — the
+  charger or the dock —, `low_power`, `not_supported`, `none`). `docked`:
+  the boost performance mode. `temperature_c`: the internal sensor.
+- `network.type`: `wifi`, `ethernet` or `none`; `wifi_bars` 0–3. The
+  network's passphrase, which the same call returns, is wiped at once.
+- `boot_ts`: when the console started (POSIX, to the minute), not when it
+  last woke up.
+
+## `games`
+
+PlayGuard's (the agent relays the last one): every game installed (the last
+check of them, *Console › Check the installed games*) or played, most played
+first, as many as fit in 64 KiB (`complete` says whether all did).
+
+```json
+{"schema": 1, "ts": 1790990000, "installed": 42, "accounts": 3, "total_min": 12345,
+ "games": {"0100000000010000": {"name": "Super Mario Odyssey", "version": "1.3.0", "installed": true,
+                                "total_min": 1234, "launches": 56, "first_played": 1700000000,
+                                "last_played": 1790000000}},
+ "complete": true}
+```
+
+`total_min` is a game's play time since it was first played, every account
+(the play log's statistics); `version` the installed one, `null` for a game
+no longer installed. Home Assistant's native discovery has the totals; the
+integration adds one sensor per game.
 
 ## `activity`, `activity/<date>`, `names`, `week`
 
@@ -326,7 +387,8 @@ password.
 `3.1.1`), `username`, `password`,
 `allow_anonymous`, `console_id`, `console_name`, `policy` (`ask` / `auto` /
 `off`; the agent alone only applies `auto`), `remote_timer_writes`,
-`publish_report`, `publish_activity`, `ha_discovery`, `poll_s` (30, 10–300),
+`publish_report`, `publish_activity`, `publish_serial` (0: the serial number
+stays off the broker), `ha_discovery`, `poll_s` (30, 10–300),
 `topic_prefix` (`playguard`), `discovery_prefix` (`homeassistant`),
 `log_level`. A value out of range keeps its default; unknown keys are kept
 when PlayGuard writes the file again. Anonymous brokers need
@@ -337,7 +399,7 @@ when PlayGuard writes the file again. Anonymous brokers need
 Hosted by the agent (`sysmodule/agent/source/agent_ipc.c`); PlayGuard's
 client is `source/util/agent_client_nx.cpp` (`source/action/sync_flow.cpp`
 drives it). Command ids, structures and result codes are in
-`source/sync/agent_ipc.h` (protocol 1). The IPC message holds 256 bytes, so
+`source/sync/agent_ipc.h` (protocol 3). The IPC message holds 256 bytes, so
 documents, the log, an order and the status travel in mapped buffers.
 
 PlayGuard looks for the service when the link is on, at start-up and every
@@ -377,6 +439,7 @@ and come back from the broker for the agent.
 | 13 | `ReloadConfig` | | | Read `sync.conf` and `nro_state.txt` again (also done when their date changes). |
 | 14 | `GetLog` | | buffer: text | The agent's last 200 lines, oldest first. |
 | 15 | `PrepareShutdown` | | | Publish `offline`, disconnect, stay idle: first step of an update or a stop from PlayGuard. A later `Hello` of the same protocol brings the link back (the stop did not follow). |
+| 16 | `PushGames` | buffer: JSON | | Publish `games`. |
 
 Everything but `Hello`, `GetStatus` and `GetLog` needs the session. The
 command dispatch is host-tested (`tests/agent/`); the HIPC framing runs only

@@ -42,7 +42,8 @@ CMAKE_ARGS ?=
 JSON_HPP := extern/borealis/library/include/borealis/extern/nlohmann/json.hpp
 # The remote link's console-free C (source/sync/), shared by its host tests.
 SYNC_PURE := source/sync/sync_json.c source/sync/mqtt_packet.c source/sync/sync_conf.c source/sync/sync_apply.c \
-             source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c
+             source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c \
+             source/sync/sync_system.c source/sync/sync_games.c source/core/console_info_pure.c
 
 .PHONY: all clean dist nxlink desktop web web-serve test fuzz check rescue dist-rescue agent dist-agent FORCE
 
@@ -146,6 +147,8 @@ gamecheck_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/gamecheck -Isource/core
 gamecheck_LIBS  := -lz
 calendar_SRC   := source/core/calendar.c tests/calendar/test.c
 calendar_FLAGS := -std=gnu11 -Isource/core
+console_info_SRC   := source/core/console_info_pure.c tests/console_info/test.c
+console_info_FLAGS := -std=gnu11 -Isource/core
 rescue_SRC   := source/core/rescue.c tests/rescue/test.c
 rescue_FLAGS := -std=c11 -Isource/core
 forwarder_pack_SRC   := source/core/forwarder_pack.c tests/forwarder_pack/test.c
@@ -182,14 +185,25 @@ history_logic_SRC   := source/util/date.cpp source/action/history_logic.cpp test
 timer_health_logic_SRC   := source/action/timer_health_logic.cpp tests/timer_health_logic/test.cpp
 notice_logic_SRC   := source/util/date.cpp source/action/notice_logic.cpp tests/notice_logic/test.cpp
 sys_updates_SRC   := source/util/sys_updates.cpp tests/sys_updates/test.cpp
+sys_updates_FLAGS := $(TEST_CXXFLAGS) -Isource/core
+sys_updates_CSRC  := source/core/console_info_pure.c
+sys_updates_CFLAGS := -std=gnu11 -Isource/core
 # The network half twice from one test: -D__SWITCH__ for the console's path
 # (a fake http::redirect in the test), without it for the desktop's simulation.
 sys_updates_net_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp tests/sys_updates_net/test.cpp
-sys_updates_net_FLAGS := -std=c++17 -Isource -D__SWITCH__
+sys_updates_net_FLAGS := -std=c++17 -Isource -Isource/core -Itests/sysinfo -D__SWITCH__
+sys_updates_net_CSRC  := source/core/console_info_pure.c
+sys_updates_net_CFLAGS := -std=gnu11 -Isource/core
 sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp source/sim/sim_net.cpp source/sim/sim_env.cpp source/util/paths.cpp tests/sys_updates_net/test.cpp
+sys_updates_sim_FLAGS := $(TEST_CXXFLAGS) -Isource/core
+sys_updates_sim_CSRC  := source/core/console_info_pure.c
+sys_updates_sim_CFLAGS := -std=gnu11 -Isource/core
 ntp_servers_SRC   := source/util/ntp_servers.cpp tests/ntp_servers/test.cpp
 dns_hosts_SRC   := source/util/dns_hosts.cpp tests/dns_hosts/test.cpp
 sys_notes_SRC   := source/util/date.cpp source/util/safe_text.cpp source/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
+sys_notes_FLAGS := $(TEST_CXXFLAGS) -Isource/core
+sys_notes_CSRC  := $(CALENDAR_C) source/core/console_info_pure.c
+sys_notes_CFLAGS := $(CALENDAR_CFLAGS)
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
 icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp
 games_logic_SRC   := source/action/games_logic.cpp tests/games_logic/test.cpp

@@ -211,6 +211,8 @@ static void on_kv(void *vctx, const char *key, const char *value)
         if (sync_parse_bool(value, &b)) c->publish_report = b;
     } else if (!strcmp(key, "publish_activity")) {
         if (sync_parse_bool(value, &b)) c->publish_activity = b;
+    } else if (!strcmp(key, "publish_serial")) {
+        if (sync_parse_bool(value, &b)) c->publish_serial = b;
     } else if (!strcmp(key, "ha_discovery")) {
         if (sync_parse_bool(value, &b)) c->ha_discovery = b;
     } else if (!strcmp(key, "poll_s")) {
@@ -257,6 +259,7 @@ size_t sync_conf_write(const SyncConf *c, char *out, size_t cap)
         "remote_timer_writes=%d\n"
         "publish_report=%d\n"
         "publish_activity=%d\n"
+        "publish_serial=%d\n"
         "ha_discovery=%d\n"
         "poll_s=%u\n"
         "topic_prefix=%s\n"
@@ -266,7 +269,7 @@ size_t sync_conf_write(const SyncConf *c, char *out, size_t cap)
         SYNC_CONF_SCHEMA, c->enabled, c->host, (unsigned)c->port, c->tls, c->ca_file,
         sync_mqtt_version_name(c->mqtt_version), c->username, c->password,
         c->allow_anonymous, c->console_id, c->console_name, sync_policy_name(c->policy), c->remote_timer_writes,
-        c->publish_report, c->publish_activity, c->ha_discovery, (unsigned)c->poll_s, c->topic_prefix,
+        c->publish_report, c->publish_activity, c->publish_serial, c->ha_discovery, (unsigned)c->poll_s, c->topic_prefix,
         c->discovery_prefix, c->log_level, c->extra);
     if (n < 0 || (size_t)n >= cap) return 0;
     return (size_t)n;

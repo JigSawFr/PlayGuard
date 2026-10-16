@@ -94,6 +94,18 @@ Assistant* pour gérer les topics vous-même).
 | Sélecteurs | Niveau de restriction (*unrestricted* : sans restriction, young child, child, teen, custom), Profil (vos profils enregistrés) |
 | Boutons | Synchroniser maintenant, Verrouiller maintenant, Temps en plus +15 / +30 min / +1 h, Fin du jeu pour aujourd'hui, Supprimer la limite, Exporter un rapport de diagnostic |
 | Événement | Événements : chaque ordre exécuté, refusé (avec la raison) ou mis en attente de la console |
+| La console | Modèle, Surnom de la console, Région, hekate, Système (sysMMC / emuMMC), PRODINFO masqué, Numéro de série (désactivé, voir plus bas), Espace libre et taille de la carte SD, Espace libre et taille du stockage interne, Batterie, En charge, Sur le dock, Température, Connexion, Adresse IP, Signal Wi-Fi, Réseau Wi-Fi (désactivé), Dernier démarrage |
+| Jeux | Jeux installés, Temps de jeu (depuis toujours), Comptes utilisateurs ; l'intégration ci-dessous ajoute un capteur par jeu |
+
+Les entités de la console lisent `playguard/<id>/system`, que l'agent tient à
+jour quand PlayGuard est fermé ; celles des jeux lisent
+`playguard/<id>/games`, que PlayGuard publie après chaque lecture du journal
+de jeu. **Le numéro de série** n'est publié qu'une fois *Accès à distance ›
+Publier le numéro de série* activé (désactivé par défaut) : il part alors vers
+le broker, et jamais dans un rapport. Sur une console dont le PRODINFO est
+masqué, c'est le vrai, tiré de la sauvegarde qu'Atmosphère en garde sur la
+carte SD. Son entité, et le nom du réseau Wi-Fi, sont désactivés dans Home
+Assistant jusqu'à ce que vous les activiez.
 
 Les entités portent pour l'instant leurs noms anglais (*Used screen time*,
 *Limit Monday*…), ceux de l'intégration *Nintendo Switch Parental Controls*

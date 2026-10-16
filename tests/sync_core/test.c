@@ -13,7 +13,10 @@
 #include "sync_apply.h"
 #include "sync_conf.h"
 #include "sync_discovery.h"
+#include "sync_engine.h"   // SYNC_SCRATCH_SIZE: what the discovery must fit in
 #include "sync_entities.h"
+#include "sync_games.h"
+#include "sync_system.h"
 #include "sync_exec.h"
 #include "sync_json.h"
 #include "sync_state.h"
@@ -608,7 +611,7 @@ static void test_discovery(void)
     CHECK(sync_discovery_topic(&c, topic, sizeof(topic)) > 0);
     CHECK(!strcmp(topic, "homeassistant/device/playguard_a1b2c3d4/config"));
 
-    static char buf[16384];
+    static char buf[SYNC_SCRATCH_SIZE];
     const char profiles[2][SYNC_PROFILE_MAX] = { "School week", "Holidays" };
     SyncDiscovery d = { &c, "1.1.0", false, profiles, 2 };
 
@@ -647,6 +650,14 @@ static void test_discovery(void)
     CHECK(contains(buf, "\"cmd_t\":\"playguard/a1b2c3d4/limit_mon/set\",\"ret\":true,\"opt\":true"));
     CHECK(contains(buf, "\"ops\":[\"School week\",\"Holidays\"]"));
     CHECK(contains(buf, "\"bedtime_alarm\":{\"p\":\"time\""));
+    // The console's own entities read the system and games documents; the
+    // serial number and the Wi-Fi network's name are off in Home Assistant.
+    CHECK(contains(buf, "\"battery\":{\"p\":\"sensor\",\"name\":\"Battery\",\"uniq_id\":\"playguard_a1b2c3d4_battery\","
+                        "\"stat_t\":\"playguard/a1b2c3d4/system\",\"val_tpl\":\"{{ value_json.power.battery_pct }}\""));
+    CHECK(contains(buf, "\"stat_t\":\"playguard/a1b2c3d4/games\",\"val_tpl\":\"{{ value_json.installed }}\""));
+    CHECK(contains(buf, "\"val_tpl\":\"{{ value_json.hardware.serial }}\",\"ent_cat\":\"diagnostic\",\"en\":false"));
+    CHECK(contains(buf, "\"unit_of_meas\":\"\xc2\xb0" "C\",\"dev_cla\":\"temperature\""));
+    CHECK(n < SYNC_SCRATCH_SIZE * 3 / 4);   // room to grow
     // Every component has a unique id and the device's availability.
     size_t total = 0;
     const SyncEntity *list = sync_entities(&total);
@@ -860,6 +871,98 @@ static void test_activity_names_events(void)
 
 // The entity table as entities.json, for the Home Assistant integration's
 // parity test (it carries a copy: JigSawFr/playguard-ha).
+// The system document: every field, then nothing read (every key still
+// there, null), and the serial number only when given.
+static void test_system_document(void)
+{
+    SysInfo sys;
+    memset(&sys, 0, sizeof(sys));
+    sys.hos_version = MAKEHOSVERSION(23, 0, 1);
+    sys.is_atmosphere = sys.ams_valid = true;
+    sys.ams_major = 1, sys.ams_minor = 12, sys.ams_micro = 0;
+    sys.emummc_valid = sys.emummc = true;
+    sys.blank_valid = sys.blank = true;
+    ConsoleLive l;
+    console_live_init(&l);
+    l.model = ConsoleModel_Oled;
+    snprintf(l.nickname, sizeof(l.nickname), "Switch de L\xc3\xa9" "a");
+    snprintf(l.region, sizeof(l.region), "eur");
+    l.battery_pct = 87, l.charger = 1, l.docked = 0, l.temperature_c = 41;
+    l.network = 1, l.wifi_bars = 3;
+    snprintf(l.ip, sizeof(l.ip), "192.168.1.20");
+    snprintf(l.ssid, sizeof(l.ssid), "Maison");
+    l.uptime_s = 5 * 3600 + 17;
+    const ConsoleSpace sd = { 21344, 59640 }, nand = { 18470, 26592 };
+    SyncSystem s = { 1790990000, &sys, &l, &sd, &nand, "6.5.4", "1.2.0", "1.2.0", NULL };
+    static char buf[4096];
+    size_t n = sync_system_build(&s, buf, sizeof(buf));
+    CHECK(n > 0);
+    save("system.json", buf);
+    CHECK(contains(buf, "\"versions\":{\"firmware\":\"23.0.1\",\"atmosphere\":\"1.12.0\",\"hekate\":\"6.5.4\",\"app\":\"1.2.0\",\"agent\":\"1.2.0\"}"));
+    CHECK(contains(buf, "\"model\":\"oled\",\"nickname\":\"Switch de L\xc3\xa9" "a\",\"region\":\"eur\",\"system\":\"emummc\","
+                        "\"prodinfo_blanked\":true,\"serial\":null"));
+    CHECK(contains(buf, "\"storage\":{\"sd\":{\"free_mb\":21344,\"total_mb\":59640},\"nand\":{\"free_mb\":18470,\"total_mb\":26592}}"));
+    CHECK(contains(buf, "\"power\":{\"battery_pct\":87,\"charging\":true,\"charger\":\"official\",\"docked\":false,\"temperature_c\":41}"));
+    CHECK(contains(buf, "\"network\":{\"type\":\"wifi\",\"ip\":\"192.168.1.20\",\"wifi_bars\":3,\"ssid\":\"Maison\"}"));
+    // Started 5 h ago, to the minute.
+    CHECK(contains(buf, "\"boot_ts\":1790971980"));
+    s.serial = "XAW10012345678";
+    n = sync_system_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"serial\":\"XAW10012345678\""));
+    // Handheld on a low-power charger: charging; no charger: not.
+    l.charger = 2;
+    n = sync_system_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"charging\":true,\"charger\":\"low_power\""));
+    l.charger = 0;
+    n = sync_system_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"charging\":false,\"charger\":\"none\""));
+    CHECK(!sync_system_build(&s, buf, 64));   // too small: nothing
+
+    SyncSystem empty;
+    memset(&empty, 0, sizeof(empty));
+    n = sync_system_build(&empty, buf, sizeof(buf));
+    CHECK(n > 0);
+    save("system_empty.json", buf);
+    CHECK(contains(buf, "\"ts\":null") && contains(buf, "\"firmware\":null") && contains(buf, "\"model\":null"));
+    CHECK(contains(buf, "\"sd\":{\"free_mb\":null,\"total_mb\":null}") && contains(buf, "\"boot_ts\":null"));
+    CHECK(contains(buf, "\"battery_pct\":null,\"charging\":null,\"charger\":null,\"docked\":null,\"temperature_c\":null"));
+    CHECK(contains(buf, "\"type\":null,\"ip\":null,\"wifi_bars\":null,\"ssid\":null"));
+}
+
+// The games document: the games most played first, and as many as fit.
+static void test_games_document(void)
+{
+    static SyncGame games[200];
+    static char names[200][40];
+    for (size_t i = 0; i < 200; i++) {
+        snprintf(names[i], sizeof(names[i]), "Game %zu \"%s\"", i, i % 2 ? "deluxe" : "edition");
+        games[i] = (SyncGame){ 0x0100000000010000ULL + i * 0x1000, names[i], i < 150 ? "1.0.2" : NULL, i < 150,
+                               (int64_t)(5000 - i * 20), (int64_t)(300 - i), 1700000000ULL + i, 1790000000ULL + i };
+    }
+    games[0].name = "Super Mario Odyssey";
+    games[0].version = "1.3.0";
+    SyncGames g = { 1790990000, 150, 3, 123456, games, 200 };
+    static char buf[65536];
+    size_t kept = 0;
+    size_t n = sync_games_build(&g, buf, sizeof(buf), &kept);
+    CHECK(n > 0 && kept == 200 && contains(buf, "\"complete\":true"));
+    CHECK(contains(buf, "\"installed\":150,\"accounts\":3,\"total_min\":123456,\"games\":{\"0100000000010000\":"
+                        "{\"name\":\"Super Mario Odyssey\",\"version\":\"1.3.0\",\"installed\":true,\"total_min\":5000,"
+                        "\"launches\":300,\"first_played\":1700000000,\"last_played\":1790000000}"));
+    CHECK(contains(buf, "\"Game 1 \\\"deluxe\\\"\""));
+    CHECK(contains(buf, "\"version\":null,\"installed\":false"));
+    save("games.json", buf);
+    // 8 KiB: the most played only, said so.
+    static char small[8192];
+    n = sync_games_build(&g, small, sizeof(small), &kept);
+    CHECK(n > 0 && n < sizeof(small) && kept > 20 && kept < 200 && contains(small, "\"complete\":false"));
+    CHECK(contains(small, "\"0100000000010000\"") && !contains(small, "\"01000000000D7000\""));
+
+    SyncGames none = { 0, -1, -1, -1, NULL, 0 };
+    n = sync_games_build(&none, buf, sizeof(buf), NULL);
+    CHECK(n > 0 && contains(buf, "\"ts\":null,\"installed\":null,\"accounts\":null,\"total_min\":null,\"games\":{},\"complete\":true"));
+}
+
 static void test_export_entities(void)
 {
     static char buf[32768];
@@ -879,6 +982,7 @@ static void test_export_entities(void)
         sync_json_kstr(&j, "write", WRITE[e[i].write]);
         sync_json_kstr(&j, "name", e[i].name);
         sync_json_kstr_or_null(&j, "value_template", e[i].value_template);
+        sync_json_kstr(&j, "topic", e[i].topic ? e[i].topic : "state");
         sync_json_key(&j, "extra");
         sync_json_obj(&j);
         sync_json_members(&j, e[i].extra);
@@ -909,6 +1013,8 @@ int main(int argc, char **argv)
     test_discovery();
     test_state();
     test_activity_names_events();
+    test_system_document();
+    test_games_document();
     test_export_entities();
     return CHECK_DONE("sync_core: all tests passed");
 }

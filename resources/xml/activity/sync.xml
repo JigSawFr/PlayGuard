@@ -26,7 +26,7 @@
             paddingBottom="@style/brls/sidebar/padding_bottom"
             paddingLeft="@style/brls/sidebar/padding_left">
 
-            <brls:Label id="sy_intro" text="" fontSize="20" marginBottom="16" textColor="@theme/brand/note"/>
+            <brls:Label id="sy_intro" text="" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
 
             <brls:Header title="@i18n/playguard/sync/section_status" marginBottom="8"/>
             <brls:DetailCell id="sy_status" title="@i18n/playguard/sync/status"/>
@@ -52,8 +52,9 @@
             <brls:DetailCell id="sy_ha_install" title="@i18n/playguard/sync/ha_install"/>
             <brls:BooleanCell id="sy_discovery"/>
             <brls:BooleanCell id="sy_report"/>
+            <brls:BooleanCell id="sy_serial"/>
 
-            <brls:Label id="sy_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:Label id="sy_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
         </brls:Box>
 

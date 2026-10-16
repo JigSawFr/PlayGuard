@@ -16,10 +16,12 @@ AGENT_VERSION ?= $(shell sed -n 's/^set(VERSION_\(MAJOR\|MINOR\|ALTER\) "\([0-9]
 EXTRA_CFLAGS := -DAGENT_VERSION=\"$(AGENT_VERSION)\"
 
 CFILES      := main.c agent_core.c agent_ipc.c \
-               pctl_ops.c pure.c write_guard.c time_ops.c calendar.c sysinfo.c playstats.c playstats_logic.c playlog.c \
+               pctl_ops.c pctl_dump.c pure.c rescue.c write_guard.c time_ops.c calendar.c sysinfo.c \
+               playstats.c playstats_logic.c playlog.c nacp.c nacp_read.c \
+               console_info.c console_info_pure.c \
                sync_json.c mqtt_packet.c mqtt_client.c sync_conf.c sync_apply.c sync_records.c sync_exec.c \
-               sync_entities.c sync_discovery.c sync_state.c sync_engine.c sync_net.c sync_tls.c
-# playstats_logic.c reads compressed game titles (zlib).
+               sync_entities.c sync_discovery.c sync_state.c sync_system.c sync_engine.c sync_net.c sync_tls.c
+# nacp.c reads compressed game titles (zlib).
 EXTRA_LIBS  := -lz
 
 include $(TOPDIR)/../common.mk

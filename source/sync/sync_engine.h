@@ -26,7 +26,7 @@ extern "C" {
 
 #define SYNC_QUEUE_MAX       16
 #define SYNC_RX_SIZE         4096
-#define SYNC_SCRATCH_SIZE    16384
+#define SYNC_SCRATCH_SIZE    32768   // the discovery: 18.5 KiB with every entity
 #define SYNC_LIMIT_SETTLE_MS 1500
 #define SYNC_KEEPALIVE_S     30
 // The integration's document on <base>/integration: larger ones are dropped.
@@ -81,6 +81,9 @@ typedef struct {
     // was cleared (the integration removed). Not NUL-terminated, at most
     // SYNC_INTEGRATION_MAX bytes. May be NULL.
     void (*integration)(void *ctx, const char *doc, size_t len);
+    // The system document (sync_system_build), published with the state.
+    // 0: nothing now. May be NULL.
+    size_t (*system)(void *ctx, char *out, size_t cap);
 } SyncHost;
 
 typedef struct {

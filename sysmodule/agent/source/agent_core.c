@@ -152,6 +152,7 @@ uint32_t agent_dispatch(AgentShared *s, uint32_t cmd, AgentCall *c)
     case AgentCmd_PushActivity: return push_doc(s->activity, sizeof(s->activity), &s->activity_info, c);
     case AgentCmd_PushNames: return push_doc(s->names, sizeof(s->names), &s->names_info, c);
     case AgentCmd_PushWeek: return push_doc(s->week, sizeof(s->week), &s->week_info, c);
+    case AgentCmd_PushGames: return push_doc(s->games, sizeof(s->games), &s->games_info, c);
     case AgentCmd_PushFinal: return push_final(s, c);
     case AgentCmd_PopOrder: return pop_order(s, c);
     case AgentCmd_OrderResult: return order_result(s, c);
