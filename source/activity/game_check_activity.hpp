@@ -44,8 +44,8 @@ class GameCheckActivity : public brls::Activity
         brls::Header* title = nullptr;
         brls::Label*  note  = nullptr;
         brls::Box*    list  = nullptr;
-        brls::DetailCell* save = nullptr;         // Reinstall only: save the list
-        brls::DetailCell* remove_all = nullptr;   // Reinstall only: remove them all
+        brls::Button* save       = nullptr;   // Reinstall only: save the list
+        brls::Button* remove_all = nullptr;   // Reinstall only: remove them all
     };
 
     struct Pending
