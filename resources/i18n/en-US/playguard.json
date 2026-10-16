@@ -1025,7 +1025,6 @@
         "count": "{} recorded",
         "none": "Nothing recorded yet. Every change PlayGuard makes on the console (limits, restriction level, PIN, unlocks...) is listed here.",
         "note": "The newest {} changes, kept on the SD card in {}. A on a change shows it and, when possible, puts the previous value back.",
-        "section": "Changes, newest first",
         "custom_value": "age {}, posting restricted: {}, communication restricted: {}",
         "title_change": "{}: {} → {}",
         "title_day_change": "{} ({}): {} → {}",
@@ -1058,7 +1057,8 @@
             "outside_clock": "Console clock changed (seen by PlayGuard)",
             "outside_limits": "Limits changed outside PlayGuard",
             "new_account": "New user account (seen by PlayGuard)",
-            "time_up": "When the time is up"
+            "time_up": "When the time is up",
+            "countdown": "Play-time countdown"
         },
         "sources": {
             "uniform": "Same limit every day",
@@ -1085,7 +1085,34 @@
         "already_back": "The console already has the previous value.",
         "undo_confirm": "Put back",
         "undone": "Previous value put back.",
-        "undo_err": "Could not put the previous value back"
+        "undo_err": "Could not put the previous value back",
+        "show": "Show",
+        "export": "Export what is shown",
+        "shown_count": "{} ({})",
+        "none_shown": "Nothing of this kind recorded.",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "failed_title": "Refused: {}",
+        "failed_note": "The console refused this change ({}): nothing was changed.",
+        "version": "PlayGuard version",
+        "counting": "Counting down",
+        "paused": "Paused",
+        "filters": {
+            "0": "Everything",
+            "1": "Play time",
+            "2": "Restrictions",
+            "3": "Security and app",
+            "4": "Seen outside PlayGuard",
+            "5": "Refused by the console"
+        },
+        "columns": {
+            "change": "Change",
+            "details": "Details",
+            "result": "Result",
+            "kind": "Code",
+            "done": "Done",
+            "refused": "Refused ({})"
+        }
     },
     "chart": {
         "last_days": "The last 7 days, today on the right",

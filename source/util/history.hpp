@@ -1,6 +1,7 @@
 // history — what PlayGuard changed on the console, kept on the SD card
-// (sd:/config/playguard/history.json, the newest 200 changes), so a parent
-// can see who-did-what from this app and put a value back. Values are stored
+// (sd:/config/playguard/history.json, the newest 500 changes), so a parent
+// can see who-did-what from this app and put a value back. A change the
+// console refused is recorded too, with its result code. Values are stored
 // raw (minutes, levels, 0/1) and worded by the UI when shown, in the language
 // of the moment. No UI and no console calls: host-tested (tests/history).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -12,7 +13,7 @@
 namespace history
 {
 
-constexpr size_t MAX_ENTRIES = 200;
+constexpr size_t MAX_ENTRIES = 500;
 
 struct Entry
 {
@@ -26,12 +27,18 @@ struct Entry
     //   "pin", "pin_shown", "unlock", "relock", "unlink", "delete", "clock",
     //   "restore": no values
     //   "new_account" (seen by PlayGuard, not made; detail: its name): no values
+    //   "countdown" 1 value, 0/1: the play-time countdown running (pause / resume)
     std::string kind;
     // Where from: "uniform", "day", "per_day", "extra", "stop", "restore_extra",
     // "profile", "remove", "backup", "undo", "first_steps" … ("" when plain).
     std::string source;
     std::string detail;   // a profile's name, the clock's new time …
     std::vector<int> before, after;
+    // "" when the change went through; else the console's result code
+    // ("0x0001088E"): the change was tried and refused (`after` is then what
+    // was asked).
+    std::string result;
+    std::string version;  // the PlayGuard version that recorded it ("" in older entries)
 };
 
 // A history.json that is there but cannot be read or parsed is put aside as
@@ -52,7 +59,7 @@ std::vector<Entry> load();
 
 // Whether putting `before` back makes sense: a value change of a known kind
 // with as many values before as after, as the kind needs, each in the range
-// the console takes for that kind.
+// the console takes for that kind, that went through (no `result`).
 bool undoable(const Entry& e);
 
 }   // namespace history
