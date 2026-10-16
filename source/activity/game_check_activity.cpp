@@ -720,13 +720,17 @@ void GameCheckActivity::show()
         }
         for (size_t i = shown.size(); i < cells.size(); i++) ui::set_visible(cells[i], false);
         group.title->setTitle(brls::getStr(std::string("playguard/games/groups/") + category_key(category), (int)shown.size()));
+        // A section's own cells go with it: borealis would still give the
+        // focus to a visible cell inside a box that is gone.
         if (category == GC_CAT_REINSTALL) {
             group.remove_all->setText(brls::getStr("playguard/games/remove_all", (int)shown.size()));
-            ui::set_visible(group.remove_all, !app::read_only());
+            ui::set_visible(group.save, !shown.empty());
+            ui::set_visible(group.remove_all, !shown.empty() && !app::read_only());
         }
         if (category == GC_CAT_VERIFY) {
             group.verify_all->setText(shown.size() == 1 ? "playguard/games/action/verify"_i18n
                                                         : brls::getStr("playguard/games/verify_all", (int)shown.size()));
+            ui::set_visible(group.verify_all, !shown.empty());
         }
         ui::set_visible(group.box, !shown.empty());
     }

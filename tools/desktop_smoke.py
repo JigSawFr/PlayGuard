@@ -1139,9 +1139,7 @@ key("Down")                # the first game of To check
 key("Return")              # icon, why, what to do
 shot("27_games_details")   # Check the data (the fix, focused), Other actions
 key("Return")              # Check the data (the fix)
-time.sleep(2.6)            # past the first seconds: the time left shows
-shot("27_games_verifying")
-key("Escape")              # B: cancel
+key("Escape")              # B: cancel, well before its 4 s end
 time.sleep(1)
 if not any(m == "Check cancelled." for m in messages()):
     fail("the check was not cancelled: " + repr(messages()[-3:]))
@@ -1156,9 +1154,9 @@ shot("27_games_selected")  # 2 games selected, their check marks
 key("Return")
 shot("27_games_selection_menu")   # Check their data (2), Remove these games (2), …
 key("Return")              # Check their data
-time.sleep(1.5)
+time.sleep(2.6)            # past the first seconds: the time left shows
 shot("27_games_verifying_batch")  # game 1 of 2
-time.sleep(9)
+time.sleep(8)
 shot("27_games_verified_batch")   # 2 of 2 checked: 1 corrupt (Forest Tales), 1 intact
 key("Return")              # Cancel: the corrupt game stays, as such
 time.sleep(1.5)            # both read again
@@ -1197,12 +1195,13 @@ key("Down", 2)             # past Castle Siege: Save the list of these games
 shot("27_games_reinstall_actions")
 key("Return")
 time.sleep(0.5)
-lists = glob.glob(os.path.join(exports_dir, "games_to_reinstall_*.json"))
-if not lists or not os.path.exists(lists[0][:-4] + "txt"):
+# The newest: the games picked and removed above left one of their own.
+lists = sorted(glob.glob(os.path.join(exports_dir, "games_to_reinstall_*.json")), key=os.path.getmtime)
+if not lists or not os.path.exists(lists[-1][:-4] + "txt"):
     fail("the list of the games to reinstall was not saved in " + exports_dir)
-with open(lists[0], encoding="utf-8") as f:
+with open(lists[-1], encoding="utf-8") as f:
     if "Ocean Explorer" not in f.read():
-        fail("the saved list does not name Ocean Explorer: " + lists[0])
+        fail("the saved list does not name Ocean Explorer: " + lists[-1])
 key("Down")                # Remove these 3 games
 key("Return")
 shot("27_games_remove_all")
