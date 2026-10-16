@@ -19,6 +19,7 @@
         "clock": "Network clock",
         "security": "PIN",
         "console": "Console",
+        "console_count": "{} ({})",
         "history": "History",
         "preferences": "Preferences",
         "about": "About"
@@ -1345,6 +1346,9 @@
         "none": "Nothing needs your attention.",
         "section_todo": "To do",
         "section_info": "For information",
+        "section_console": "Console",
+        "console_count": "{} to look at",
+        "console_show": "Show",
         "seen": "Mark as read",
         "open_tab": "Open {}",
         "pin_missing": "Parental controls are not set up",

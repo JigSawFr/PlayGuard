@@ -19,6 +19,7 @@
         "clock": "網路時鐘",
         "security": "PIN碼",
         "console": "主機",
+        "console_count": "{} ({})",
         "history": "紀錄",
         "preferences": "偏好設定",
         "about": "關於"
@@ -1345,6 +1346,9 @@
         "none": "沒有需要處理的事項。",
         "section_todo": "待處理",
         "section_info": "供參考",
+        "section_console": "主機",
+        "console_count": "需查看的項目：{}",
+        "console_show": "顯示",
         "seen": "標為已讀",
         "open_tab": "開啟{}",
         "pin_missing": "尚未設定家長監護",

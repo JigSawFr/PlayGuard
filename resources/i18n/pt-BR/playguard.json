@@ -19,6 +19,7 @@
         "clock": "Relógio de rede",
         "security": "PIN",
         "console": "Console",
+        "console_count": "{} ({})",
         "history": "Histórico",
         "preferences": "Preferências",
         "about": "Sobre"
@@ -1345,6 +1346,9 @@
         "none": "Nada precisa da sua atenção.",
         "section_todo": "A fazer",
         "section_info": "Para informação",
+        "section_console": "Console",
+        "console_count": "{} para conferir",
+        "console_show": "Mostrar",
         "seen": "Marcar como lida",
         "open_tab": "Abrir {}",
         "pin_missing": "O controle parental não está configurado",

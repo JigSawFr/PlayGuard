@@ -19,6 +19,7 @@
         "clock": "Netwerkklok",
         "security": "Pincode",
         "console": "Console",
+        "console_count": "{} ({})",
         "history": "Geschiedenis",
         "preferences": "Voorkeuren",
         "about": "Info"
@@ -1345,6 +1346,9 @@
         "none": "Niets vraagt je aandacht.",
         "section_todo": "Te doen",
         "section_info": "Ter informatie",
+        "section_console": "Console",
+        "console_count": "{} om te bekijken",
+        "console_show": "Tonen",
         "seen": "Markeren als gelezen",
         "open_tab": "{} openen",
         "pin_missing": "Ouderlijk toezicht is niet ingesteld",

@@ -19,6 +19,7 @@
         "clock": "Horloge réseau",
         "security": "NIP",
         "console": "Console",
+        "console_count": "{} ({})",
         "history": "Historique",
         "preferences": "Préférences",
         "about": "À propos"
@@ -1345,6 +1346,9 @@
         "none": "Rien ne demande votre attention.",
         "section_todo": "À faire",
         "section_info": "Pour information",
+        "section_console": "Console",
+        "console_count": "{} à regarder",
+        "console_show": "Afficher",
         "seen": "Marquer comme lu",
         "open_tab": "Ouvrir {}",
         "pin_missing": "Le contrôle parental n'est pas configuré",

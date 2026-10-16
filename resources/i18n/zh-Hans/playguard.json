@@ -19,6 +19,7 @@
         "clock": "网络时钟",
         "security": "PIN",
         "console": "主机",
+        "console_count": "{} ({})",
         "history": "历史记录",
         "preferences": "偏好设置",
         "about": "关于"
@@ -1345,6 +1346,9 @@
         "none": "没有需要处理的事项。",
         "section_todo": "待处理",
         "section_info": "供参考",
+        "section_console": "主机",
+        "console_count": "需查看的项目：{}",
+        "console_show": "显示",
         "seen": "标为已读",
         "open_tab": "打开{}",
         "pin_missing": "尚未设置家长控制",

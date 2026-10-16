@@ -62,7 +62,7 @@ void pick_limit(const std::string& title, const int (&values)[N], int& field, st
 }   // namespace
 
 HelpTab::HelpTab()
-    : TabBase("xml/tab/help.xml")
+    : TabBase("xml/tab/help.xml", false)
 {
     export_note->setSingleLine(false);
 

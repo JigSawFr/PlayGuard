@@ -20,7 +20,7 @@ std::string keep_text(int keep)
 }   // namespace
 
 HistoryTab::HistoryTab()
-    : TabBase("xml/tab/history.xml")
+    : TabBase("xml/tab/history.xml", false)
 {
     backup_note->setSingleLine(false);
 

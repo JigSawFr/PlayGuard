@@ -19,6 +19,7 @@
         "clock": "Orologio di rete",
         "security": "PIN",
         "console": "Console",
+        "console_count": "{} ({})",
         "history": "Cronologia",
         "preferences": "Preferenze",
         "about": "Informazioni"
@@ -1345,6 +1346,9 @@
         "none": "Niente richiede la tua attenzione.",
         "section_todo": "Da fare",
         "section_info": "Per informazione",
+        "section_console": "Console",
+        "console_count": "{} da controllare",
+        "console_show": "Mostra",
         "seen": "Segna come letta",
         "open_tab": "Apri {}",
         "pin_missing": "Il filtro famiglia non è configurato",

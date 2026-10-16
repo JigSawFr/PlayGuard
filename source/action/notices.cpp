@@ -203,6 +203,11 @@ int info_count()
     return s_store.info_count();
 }
 
+int console_count()
+{
+    return s_store.console_count();
+}
+
 int listen(std::function<void()> fn)
 {
     const int id = s_next_listener++;
