@@ -113,12 +113,8 @@ dictionary. CI runs every target for 30 s.
 | `changelog/` | `changelog::parse()` and `release_notes()`: the number of releases asked for kept, icons as hex code points. |
 | `rescue/` | `rescue_request_mode()` and `rescue_report_parse()` (files anyone with the SD card can write): a parsed report formats back to the same, a refused one leaves the output untouched. |
 | `config/` | `config::load()` of `config.json` and `state.json` (in a temporary folder): what it read saves and reads back to the same settings. |
-| `game_cache/` | `game_cache::decode()`, then the rules of `core/gamecheck_rules.c` on what it returns, `to_check()`, `put()` and `set_verified()`: a decoded file encodes and decodes to the same, strings end in their arrays, the content count is bounded. |
-| `play_cache/` | `play_cache::decode()` and `shift_days()`: the same round trip, games bounded, names ending in their arrays. |
-
-`game_cache` and `play_cache` are built without UBSan's `bool` check: both
-copy the file over structs with `bool` fields, so a damaged file gives a
-`bool` that is neither 0 nor 1, which that check reports at its first read.
+| `game_cache/` | `game_cache::decode()`, then the rules of `core/gamecheck_rules.c` on what it returns, `to_check()`, `put()` and `set_verified()`: a decoded file encodes and decodes to the same, strings end in their arrays, the content count is bounded, every `bool` 0 or 1. |
+| `play_cache/` | `play_cache::decode()` and `shift_days()`: the same round trip, games bounded, names ending in their arrays, every `bool` 0 or 1. |
 
 The `pctl_session`, `time_ops` and `ntp_packet` suites started from anbingxi's
 fork (`diag/fw22-5-readonly`). Passing them does not prove how a real console

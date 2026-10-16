@@ -23,6 +23,16 @@ struct Header
 
 // The stats without their games array, then `count` games.
 constexpr size_t HEAD_SIZE = offsetof(PlayStats, games);
+
+// A damaged file can hold a bool that is neither 0 nor 1, and reading one is
+// undefined: its byte is read and written back as one.
+void fix_bool(bool& b)
+{
+    unsigned char v;
+    std::memcpy(&v, &b, 1);
+    v = v != 0;
+    std::memcpy(&b, &v, 1);
+}
 }   // namespace
 
 std::string encode(const PlayStats& stats)
@@ -55,7 +65,13 @@ bool decode(const std::string& bytes, PlayStats& out)
         return false;
     }
     bytes.copy(reinterpret_cast<char*>(out.games), out.count * sizeof(GameStat), sizeof h + HEAD_SIZE);
-    for (uint32_t i = 0; i < out.count; i++) out.games[i].name[PLAYSTATS_NAME_LEN - 1] = '\0';
+    fix_bool(out.windows_ok);
+    fix_bool(out.approximate);
+    fix_bool(out.truncated);
+    for (uint32_t i = 0; i < out.count; i++) {
+        out.games[i].name[PLAYSTATS_NAME_LEN - 1] = '\0';
+        fix_bool(out.games[i].totals_ok);
+    }
     return true;
 }
 

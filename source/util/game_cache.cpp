@@ -25,6 +25,16 @@ struct Header
     uint32_t truncated;
 };
 
+// A damaged file can hold a bool that is neither 0 nor 1, and reading one is
+// undefined: its byte is read and written back as one.
+void fix_bool(bool& b)
+{
+    unsigned char v;
+    std::memcpy(&v, &b, 1);
+    v = v != 0;
+    std::memcpy(&b, &v, 1);
+}
+
 // gamecheck_installed_version(), which lives with the console calls.
 uint32_t installed_version(const GameFacts& g)
 {
@@ -70,6 +80,10 @@ bool decode(const std::string& bytes, Cache* out)
         g.name[sizeof g.name - 1] = '\0';
         g.display_version[sizeof g.display_version - 1] = '\0';
         if (g.content_count > GAMECHECK_MAX_CONTENTS) g.content_count = GAMECHECK_MAX_CONTENTS;
+        for (bool* b : { &g.control_ok, &g.has_base, &g.has_patch, &g.card_only, &g.storage_unavailable,
+                         &g.meta_missing, &g.files_missing, &g.needs_ticket, &g.ticket_missing, &g.view_ok,
+                         &g.launch_checked })
+            fix_bool(*b);
     }
     *out = std::move(c);
     return true;

@@ -279,12 +279,6 @@ config_FUZZ        := source/util/paths.cpp source/util/config.cpp tests/fuzz/co
 game_cache_FUZZ    := source/util/game_cache.cpp tests/fuzz/game_cache/fuzz.cpp
 game_cache_FUZZ_CSRC := source/core/gamecheck_rules.c
 play_cache_FUZZ    := source/util/play_cache.cpp tests/fuzz/play_cache/fuzz.cpp
-# Both decoders copy the file's bytes over structs with bool fields, so a
-# damaged file can hold a bool that is neither 0 nor 1, which UBSan reports
-# at the first read (gamecheck_classify, the Activity tab). Not checked here
-# until decode() normalises them; every other check still runs.
-game_cache_FUZZ_FLAGS := -fno-sanitize=bool
-play_cache_FUZZ_FLAGS := -fno-sanitize=bool
 FUZZERS := $(sort $(patsubst %_FUZZ,%,$(filter %_FUZZ,$(.VARIABLES))))
 FUZZ_PROGRAMS := $(addprefix $(FUZZOUT)/,$(FUZZERS))
 FUZZ_RUNS := $(addsuffix .run,$(FUZZ_PROGRAMS))
