@@ -6,6 +6,7 @@
 #include <cstring>
 
 #include "util/date.hpp"
+#include "util/json_util.hpp"
 
 namespace outside_change_logic
 {
@@ -177,18 +178,10 @@ std::vector<std::pair<std::string, std::string>> new_accounts(const Record& rec,
 Record parse(const std::string& text)
 {
     Record rec;
-    const nlohmann::json j = nlohmann::json::parse(text, nullptr, false);
-    if (!j.is_object()) return rec;
-    auto str = [&j](const char* key) -> std::string {
-        const auto it = j.find(key);
-        return it != j.end() && it->is_string() ? it->get<std::string>() : std::string();
-    };
-    auto num = [&j](const char* key, int64_t* out) {
-        const auto it = j.find(key);
-        if (it == j.end() || !it->is_number_integer()) return false;
-        *out = it->get<int64_t>();
-        return true;
-    };
+    nlohmann::json j;
+    if (!json_util::parse(text, &j) || !j.is_object()) return rec;
+    auto str = [&j](const char* key) { return json_util::string_at(j, key); };
+    auto num = [&j](const char* key, int64_t* out) { return json_util::integer_at(j, key, out); };
 
     const std::string date = str("date");
     int64_t v = 0;
@@ -226,11 +219,11 @@ Record parse(const std::string& text)
         for (const auto& a : *acc) {
             if (rec.accounts.size() == KNOWN_ACCOUNTS_MAX) break;
             if (!a.is_object()) continue;
-            const auto id = a.find("id"), since = a.find("since"), added = a.find("new");
+            const auto id = a.find("id"), since = a.find("since");
             if (id == a.end() || !id->is_string() || !is_account_id(id->get<std::string>())) continue;
             if (since == a.end() || !since->is_string() || !is_date(since->get<std::string>())) continue;
             rec.accounts.push_back({ id->get<std::string>(), since->get<std::string>(),
-                                     added != a.end() && added->is_boolean() && added->get<bool>() });
+                                     json_util::flag_at(a, "new") });
         }
     }
     return rec;

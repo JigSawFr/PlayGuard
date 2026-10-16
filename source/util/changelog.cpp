@@ -2,70 +2,22 @@
 #include "util/changelog.hpp"
 
 #include <cctype>
-#include <cstdint>
 #include <cstdio>
 #include <sstream>
+
+#include "util/emoji.hpp"
+#include "util/text.hpp"
 
 namespace changelog
 {
 namespace
 {
-std::string trim(const std::string& s)
-{
-    size_t a = 0, b = s.size();
-    while (a < b && std::isspace((unsigned char)s[a])) a++;
-    while (b > a && std::isspace((unsigned char)s[b - 1])) b--;
-    return s.substr(a, b - a);
-}
-
-bool starts_with(const std::string& s, const char* prefix)
-{
-    return s.compare(0, std::char_traits<char>::length(prefix), prefix) == 0;
-}
-
-// Pictographs, dingbats and the joiners / variation selectors that go with
-// them: the console's shared font draws none of them.
-bool is_emoji(uint32_t cp)
-{
-    return cp >= 0x1F000 || (cp >= 0x2600 && cp <= 0x27BF) || (cp >= 0x2B00 && cp <= 0x2BFF) ||
-           (cp >= 0x231A && cp <= 0x231B) || (cp >= 0x23E9 && cp <= 0x23FA) ||   // ⌚ ⏱ ⏳ …
-           cp == 0x200D || (cp >= 0xFE00 && cp <= 0xFE0F);
-}
-
-// The UTF-8 sequence at `s[i]`: its length and code point.
-size_t decode(const std::string& s, size_t i, uint32_t* cp)
-{
-    const unsigned char c = s[i];
-    const size_t n = c < 0x80 ? 1 : (c >> 5) == 0x6 ? 2 : (c >> 4) == 0xE ? 3 : (c >> 3) == 0x1E ? 4 : 1;
-    *cp = n == 1 ? c : n == 2 ? c & 0x1F : n == 3 ? c & 0x0F : c & 0x07;
-    for (size_t k = 1; k < n && i + k < s.size(); k++) *cp = (*cp << 6) | (s[i + k] & 0x3F);
-    return n;
-}
-
 // The emoji `s` opens on (after spaces and "**"), as its first code point in
 // hex: "1f680" for "🚀 Features". Empty when it opens on anything else.
 std::string leading_icon(const std::string& s)
 {
-    size_t i = s.find_first_not_of(" *");
-    if (i == std::string::npos) return "";
-    uint32_t cp = 0;
-    decode(s, i, &cp);
-    if (!is_emoji(cp) || cp == 0x200D || (cp >= 0xFE00 && cp <= 0xFE0F)) return "";
-    char hex[9];
-    std::snprintf(hex, sizeof hex, "%x", (unsigned)cp);
-    return hex;
-}
-
-std::string drop_emoji(const std::string& s)
-{
-    std::string out;
-    for (size_t i = 0; i < s.size();) {
-        uint32_t     cp = 0;
-        const size_t n  = decode(s, i, &cp);
-        if (!is_emoji(cp)) out.append(s, i, n);
-        i += n;
-    }
-    return out;
+    const size_t i = s.find_first_not_of(" *");
+    return i == std::string::npos ? "" : emoji::icon_at(s, i);
 }
 
 // "abc1234" (a commit) or "#12" (a pull request or an issue).
@@ -114,10 +66,10 @@ std::string strip_links(const std::string& s)
 std::string clean(const std::string& s)
 {
     std::string out;
-    for (char c : strip_links(drop_emoji(s)))
+    for (char c : strip_links(emoji::drop(s)))
         if (c != '`') out += c;
     for (size_t p; (p = out.find("**")) != std::string::npos;) out.erase(p, 2);
-    return trim(out);
+    return text::trim_space(out);
 }
 
 // "1.1.0 (2026-10-10)" → "1.1.0 · 2026-10-10".
@@ -134,15 +86,15 @@ std::string release_title(std::string s)
 bool split_title(const std::string& item, std::string* title, std::string* text)
 {
     const size_t open = item.find("**");   // after the emoji, if any
-    if (open == std::string::npos || !trim(drop_emoji(item.substr(0, open))).empty()) return false;
+    if (open == std::string::npos || !text::trim_space(emoji::drop(item.substr(0, open))).empty()) return false;
     const size_t close = item.find("**", open + 2);
     if (close == std::string::npos) return false;
     std::string head = clean(item.substr(open + 2, close - open - 2));
     std::string rest = item.substr(close + 2);
     if (!head.empty() && head.back() == ':') head.pop_back();
-    else if (starts_with(rest, ":")) rest.erase(0, 1);
+    else if (text::starts_with(rest, ":")) rest.erase(0, 1);
     else return false;   // bold words inside a sentence
-    *title = trim(head);
+    *title = text::trim_space(head);
     *text  = clean(rest);
     return !title->empty();
 }
@@ -167,20 +119,20 @@ std::vector<Line> parse(const std::string& md, int max_releases)
             in_item = false;   // an HTML line: the release page's <details>, its figures
             return;
         }
-        if (starts_with(t, "## ")) {
+        if (text::starts_with(t, "## ")) {
             if (max_releases > 0 && ++releases > max_releases) {
                 stop = true;
                 return;
             }
             lines.push_back({ Line::Release, release_title(clean(t.substr(3))) });
             in_item = false;
-        } else if (starts_with(t, "# ")) {
+        } else if (text::starts_with(t, "# ")) {
             in_item = false;   // the document's title
-        } else if (starts_with(t, "### ")) {
+        } else if (text::starts_with(t, "### ")) {
             lines.push_back({ Line::Section, clean(t.substr(4)) });
             lines.back().icon = leading_icon(t.substr(4));
             in_item = false;
-        } else if (starts_with(t, "* ") || starts_with(t, "- ")) {
+        } else if (text::starts_with(t, "* ") || text::starts_with(t, "- ")) {
             const size_t indent = raw.find_first_not_of(' ');
             Line item{ Line::Item, clean(t.substr(2)), (int)(indent / 2) };
             if (item.depth == 0) {
@@ -208,7 +160,7 @@ std::vector<Line> parse(const std::string& md, int max_releases)
     enum { Plain, Comment, Hide, Only } block = Plain;
     while (!stop && std::getline(in, raw)) {
         if (!raw.empty() && raw.back() == '\r') raw.pop_back();
-        const std::string t = trim(raw);
+        const std::string t = text::trim_space(raw);
         if (block == Comment) {
             if (t.find("-->") != std::string::npos) block = Plain;
             continue;
@@ -222,15 +174,15 @@ std::vector<Line> parse(const std::string& md, int max_releases)
             in_item = false;
             continue;
         }
-        if (block == Plain && starts_with(t, "<!--")) {
+        if (block == Plain && text::starts_with(t, "<!--")) {
             in_item = false;
             const bool closed = t.size() >= 7 && t.compare(t.size() - 3, 3, "-->") == 0;
             if (t == "<!-- console:hide -->") {
                 block = Hide;
             } else if (t == "<!-- console:only") {
                 block = Only;
-            } else if (closed && starts_with(t, "<!-- console:")) {
-                const std::string inner = trim(t.substr(13, t.size() - 16));
+            } else if (closed && text::starts_with(t, "<!-- console:")) {
+                const std::string inner = text::trim_space(t.substr(13, t.size() - 16));
                 line(inner, inner);
                 in_item = false;
             } else if (!closed) {

@@ -5,6 +5,8 @@
 #include <cstdio>
 
 #include "util/paths.hpp"
+#include "util/text.hpp"
+#include "util/utf8.hpp"
 
 namespace profiles
 {
@@ -44,24 +46,6 @@ bool next_cp(const std::string& s, size_t& i, uint32_t& cp)
     return true;
 }
 
-void append_utf8(std::string& out, uint32_t cp)
-{
-    if (cp < 0x80) out += (char)cp;
-    else if (cp < 0x800) {
-        out += (char)(0xC0 | (cp >> 6));
-        out += (char)(0x80 | (cp & 0x3F));
-    } else if (cp < 0x10000) {
-        out += (char)(0xE0 | (cp >> 12));
-        out += (char)(0x80 | ((cp >> 6) & 0x3F));
-        out += (char)(0x80 | (cp & 0x3F));
-    } else {
-        out += (char)(0xF0 | (cp >> 18));
-        out += (char)(0x80 | ((cp >> 12) & 0x3F));
-        out += (char)(0x80 | ((cp >> 6) & 0x3F));
-        out += (char)(0x80 | (cp & 0x3F));
-    }
-}
-
 // U+00C0..U+00FF without their accent ("" when there is no plain letter).
 const char* LATIN1[64] = {
     "A", "A", "A", "A", "A", "A", "AE", "C", "E", "E", "E", "E", "I", "I", "I", "I",
@@ -69,13 +53,6 @@ const char* LATIN1[64] = {
     "a", "a", "a", "a", "a", "a", "ae", "c", "e", "e", "e", "e", "i", "i", "i", "i",
     "d", "n", "o", "o", "o", "o", "o", "",  "o", "u", "u", "u", "u", "y", "th", "y",
 };
-
-std::string lower_ascii(std::string s)
-{
-    for (auto& c : s)
-        if (c >= 'A' && c <= 'Z') c = (char)(c - 'A' + 'a');
-    return s;
-}
 
 std::string path_of(const std::string& stem)
 {
@@ -91,7 +68,7 @@ std::string sanitize_name(const std::string& name)
     while (chars < MAX_NAME && next_cp(name, i, cp)) {
         if (cp < 0x20 || (cp >= 0x7F && cp < 0xA0) || cp == '/' || cp == '\\' || cp == 0xFFFD) continue;
         if (cp == ' ' && (out.empty() || out.back() == ' ')) continue;   // no leading or doubled spaces
-        append_utf8(out, cp);
+        utf8::append(out, cp);
         chars++;
     }
     while (!out.empty() && out.back() == ' ') out.pop_back();
@@ -173,7 +150,7 @@ bool save(const Profile& p, std::string* error)
     }
     // The same file under another case ("School week" saved as "school
     // week"): FAT sees one file, so write to the one that exists.
-    const bool same_file = !p.file.empty() && lower_ascii(p.file) == lower_ascii(stem);
+    const bool same_file = !p.file.empty() && text::lower_ascii(p.file) == text::lower_ascii(stem);
     if (same_file) stem = p.file;
 
     nlohmann::json j;
@@ -198,10 +175,10 @@ bool remove(const std::string& file)
 
 bool find_same_file(const std::string& name, const std::string& except_file, Profile* out)
 {
-    const std::string stem = lower_ascii(file_stem(name));
+    const std::string stem = text::lower_ascii(file_stem(name));
     if (stem.empty()) return false;
     for (const auto& p : list()) {
-        if (lower_ascii(p.file) != stem || (!except_file.empty() && lower_ascii(p.file) == lower_ascii(except_file)))
+        if (text::lower_ascii(p.file) != stem || (!except_file.empty() && text::lower_ascii(p.file) == text::lower_ascii(except_file)))
             continue;
         if (out) *out = p;
         return true;

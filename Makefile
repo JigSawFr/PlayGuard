@@ -129,6 +129,9 @@ date_SRC    := source/util/date.cpp tests/date/test.cpp
 date_FLAGS  := -std=c++17 -Isource
 date_CSRC   := $(CALENDAR_C)
 date_CFLAGS := $(CALENDAR_CFLAGS)
+# The header-only helpers: utf8, emoji, text, json_util.
+text_util_SRC   := tests/text_util/test.cpp
+text_util_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 patches_SRC   := source/util/paths.cpp source/util/patches.cpp tests/patches/test.cpp
 patches_FLAGS := -std=c++17 -Isource
 duration_SRC   := source/util/duration.cpp tests/duration/test.cpp

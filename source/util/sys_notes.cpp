@@ -9,8 +9,10 @@
 #include <borealis/extern/nlohmann/json.hpp>
 
 #include "util/date.hpp"
+#include "util/json_util.hpp"
 #include "util/safe_text.hpp"
 #include "util/sys_updates.hpp"
+#include "util/text.hpp"
 #include "util/update.hpp"
 
 namespace sys_notes
@@ -19,37 +21,6 @@ namespace sys_notes
 namespace
 {
 using nlohmann::json;
-
-std::string str(const json& j, const char* key)
-{
-    const auto it = j.find(key);
-    return it != j.end() && it->is_string() ? it->get<std::string>() : std::string();
-}
-
-bool flag(const json& j, const char* key)
-{
-    const auto it = j.find(key);
-    return it != j.end() && it->is_boolean() && it->get<bool>();
-}
-
-std::string lower(std::string s)
-{
-    for (char& c : s) c = (char)std::tolower((unsigned char)c);
-    return s;
-}
-
-std::string trim(const std::string& s)
-{
-    size_t a = 0, b = s.size();
-    while (a < b && std::isspace((unsigned char)s[a])) a++;
-    while (b > a && std::isspace((unsigned char)s[b - 1])) b--;
-    return s.substr(a, b - a);
-}
-
-bool starts_with(const std::string& s, const char* head)
-{
-    return s.compare(0, std::strlen(head), head) == 0;
-}
 
 std::vector<std::string> lines_of(const std::string& text)
 {
@@ -133,14 +104,14 @@ bool parse_json(const std::string& text, F f)
 std::string heading_text(const std::vector<std::string>& lines, size_t i, bool* setext)
 {
     *setext = false;
-    const std::string t = trim(lines[i]);
+    const std::string t = text::trim_space(lines[i]);
     if (!t.empty() && t[0] == '#') {
         size_t n = t.find_first_not_of('#');
         if (n == std::string::npos || n > 6 || t[n] != ' ') return "";
-        return trim(t.substr(n));
+        return text::trim_space(t.substr(n));
     }
     if (i + 1 < lines.size() && !t.empty()) {
-        const std::string next = trim(lines[i + 1]);
+        const std::string next = text::trim_space(lines[i + 1]);
         if (next.size() >= 3 && (next.find_first_not_of('-') == std::string::npos ||
                                  next.find_first_not_of('=') == std::string::npos)) {
             *setext = true;
@@ -153,8 +124,8 @@ std::string heading_text(const std::vector<std::string>& lines, size_t i, bool* 
 // A line that is only an image ("![banner](https://…)").
 bool image_only(const std::string& line)
 {
-    const std::string t = trim(line);
-    return starts_with(t, "![") && t.back() == ')' && t.find("](") != std::string::npos;
+    const std::string t = text::trim_space(line);
+    return text::starts_with(t, "![") && t.back() == ')' && t.find("](") != std::string::npos;
 }
 }   // namespace
 
@@ -199,16 +170,18 @@ bool parse_github(const std::string& text, Which which, std::vector<Release>* ou
         if (!j.is_array()) return false;
         for (const auto& r : j) {
             if (out->size() >= keep) break;
-            if (!r.is_object() || !r.contains("draft") || flag(r, "draft") || flag(r, "prerelease")) continue;
+            if (!r.is_object() || !r.contains("draft") || json_util::flag_at(r, "draft") ||
+                json_util::flag_at(r, "prerelease"))
+                continue;
             Release x;
-            x.version = sys_updates::version_of_tag(str(r, "tag_name"));
+            x.version = sys_updates::version_of_tag(json_util::string_at(r, "tag_name"));
             if (x.version.empty()) continue;
             if (std::any_of(out->begin(), out->end(), [&x](const Release& o) { return o.version == x.version; }))
                 continue;
-            x.date = day_of(str(r, "published_at"));
-            const std::string page = str(r, "html_url");
+            x.date = day_of(json_util::string_at(r, "published_at"));
+            const std::string page = json_util::string_at(r, "html_url");
             if (https_on(page, "github.com")) x.page = safe_text::clean(page, 512, false);
-            const std::string body = cut_notes(str(r, "body"));
+            const std::string body = cut_notes(json_util::string_at(r, "body"));
             x.supports = supported_firmware(body);
             x.notes = trim_notes(which, body);
             out->push_back(x);
@@ -224,13 +197,15 @@ std::string trim_notes(Which which, const std::string& md)
     bool skipping = false;
     for (size_t i = 0; i < lines.size(); i++) {
         const std::string& line = lines[i];
-        if (which == Which::Atmosphere && starts_with(lower(trim(line)), "and the following was changed in")) break;
+        if (which == Which::Atmosphere &&
+            text::starts_with(text::lower_ascii(text::trim_space(line)), "and the following was changed in"))
+            break;
         bool setext = false;
-        const std::string h = lower(heading_text(lines, i, &setext));
+        const std::string h = text::lower_ascii(heading_text(lines, i, &setext));
         if (!h.empty()) {
             // hekate's FAQ (a folded block on GitHub, a wall of text here)
             // and its Download heading over nothing (the files are GitHub's).
-            skipping = which == Which::Hekate && (h == "faq" || starts_with(h, "download"));
+            skipping = which == Which::Hekate && (h == "faq" || text::starts_with(h, "download"));
             if (skipping && setext) i++;
             if (skipping) continue;
         }
@@ -238,9 +213,9 @@ std::string trim_notes(Which which, const std::string& md)
         out.push_back(line);
     }
     // Neither blank lines first nor last.
-    while (!out.empty() && trim(out.back()).empty()) out.pop_back();
+    while (!out.empty() && text::trim_space(out.back()).empty()) out.pop_back();
     size_t first = 0;
-    while (first < out.size() && trim(out[first]).empty()) first++;
+    while (first < out.size() && text::trim_space(out[first]).empty()) first++;
     std::string text = join(std::vector<std::string>(out.begin() + (long)first, out.end()));
     if (!text.empty()) text.pop_back();
     return text;
@@ -250,7 +225,7 @@ std::string supported_firmware(const std::string& notes)
 {
     std::string best;
     for (const std::string& raw : lines_of(notes)) {
-        const std::string line = lower(raw);
+        const std::string line = text::lower_ascii(raw);
         if (line.find("support") == std::string::npos) continue;
         for (const char* lead : { "for ", "hos ", "firmware ", "supported: " }) {
             size_t at = 0;
@@ -274,7 +249,7 @@ std::string wiki_date(const std::string& text)
 {
     static const char* MONTHS[] = { "january", "february", "march",     "april",   "may",      "june",
                                     "july",    "august",   "september", "october", "november", "december" };
-    const std::string t = lower(trim(text));
+    const std::string t = text::lower_ascii(text::trim_space(text));
     for (int m = 0; m < 12; m++) {
         const size_t n = std::strlen(MONTHS[m]);
         if (t.compare(0, n, MONTHS[m]) != 0 || t.size() <= n || t[n] != ' ') continue;
@@ -295,8 +270,8 @@ std::vector<Version> parse_versions(const std::string& wikitext, size_t keep)
     std::vector<Version> all;
     const std::vector<std::string> lines = lines_of(wikitext);
     for (size_t i = 0; i < lines.size(); i++) {
-        const std::string t = trim(lines[i]);
-        if (!starts_with(t, "| [[")) continue;
+        const std::string t = text::trim_space(lines[i]);
+        if (!text::starts_with(t, "| [[")) continue;
         const size_t end = t.find("]]");
         if (end == std::string::npos) continue;
         std::string v = t.substr(4, end - 4);
@@ -305,8 +280,8 @@ std::vector<Version> parse_versions(const std::string& wikitext, size_t keep)
         if (!firmware_version(v)) continue;
         Version x;
         x.version = v;
-        if (i + 1 < lines.size() && starts_with(trim(lines[i + 1]), "|") && !starts_with(trim(lines[i + 1]), "|-"))
-            x.date = wiki_date(trim(lines[i + 1]).substr(1));
+        const std::string next = i + 1 < lines.size() ? text::trim_space(lines[i + 1]) : "";
+        if (text::starts_with(next, "|") && !text::starts_with(next, "|-")) x.date = wiki_date(next.substr(1));
         all.push_back(x);
     }
     std::sort(all.begin(), all.end(), [](const Version& a, const Version& b) { return compare(a.version, b.version) > 0; });
@@ -345,7 +320,7 @@ std::string wiki_to_markdown(const std::string& wikitext)
                 if (end != std::string::npos) {
                     const std::string inner = raw.substr(i + 1, end - i - 1);
                     const size_t space = inner.find(' ');
-                    if (space != std::string::npos) line += trim(inner.substr(space + 1));
+                    if (space != std::string::npos) line += text::trim_space(inner.substr(space + 1));
                     i = end + 1;
                     continue;
                 }
@@ -385,7 +360,7 @@ std::string wiki_to_markdown(const std::string& wikitext)
             }
             line += raw[i++];
         }
-        line = trim(line);
+        line = text::trim_space(line);
         if (depth > 0 && !line.empty()) out += std::string((std::min<size_t>(depth, 4) - 1) * 2, ' ') + "- " + line + "\n";
         else out += line + "\n";
     }
@@ -404,17 +379,17 @@ bool parse_firmware_page(const std::string& wikitext, Release* out)
     std::vector<std::string> log;
     bool in_log = false, found = false;
     for (const std::string& raw : lines) {
-        const std::string t = trim(raw);
-        const std::string l = lower(t);
+        const std::string t = text::trim_space(raw);
+        const std::string l = text::lower_ascii(t);
         // "The Switch 23.0.1 system update was released on October 1, 2026 (UTC)."
         const size_t on = l.find("was released on ");
         if (on != std::string::npos && out->date.empty()) out->date = wiki_date(t.substr(on + 16));
-        if (starts_with(l, "security flaws fixed:")) {
-            const std::string v = trim(l.substr(21));
-            out->security = starts_with(v, "yes");
+        if (text::starts_with(l, "security flaws fixed:")) {
+            const std::string v = text::trim_space(l.substr(21));
+            out->security = text::starts_with(v, "yes");
         }
         // pctl among the updated sysmodules.
-        if (starts_with(l, "** sysmodules:")) {
+        if (text::starts_with(l, "** sysmodules:")) {
             std::string list = l.substr(14);
             for (char& c : list)
                 if (c == '.') c = ',';
@@ -423,8 +398,9 @@ bool parse_firmware_page(const std::string& wikitext, Release* out)
                 if (list[i] == ' ') list.erase(i--, 1);
             out->pctl = list.find(",pctl,") != std::string::npos;
         }
-        if (starts_with(t, "==")) {
-            in_log = lower(t).find("change-log") != std::string::npos || lower(t).find("changelog") != std::string::npos;
+        if (text::starts_with(t, "==")) {
+            const std::string title = text::lower_ascii(t);
+            in_log = title.find("change-log") != std::string::npos || title.find("changelog") != std::string::npos;
             found = found || in_log;
             continue;
         }
@@ -538,24 +514,24 @@ bool decode(const std::string& text, Cache* out)
             const auto it = j.find(key(w));
             if (it == j.end() || !it->is_object()) continue;
             List& l = c.of(w);
-            l.fetched = day_of(str(*it, "fetched"));
+            l.fetched = day_of(json_util::string_at(*it, "fetched"));
             const auto rs = it->find("releases");
             if (rs == it->end() || !rs->is_array()) continue;
             for (const auto& x : *rs) {
                 if (l.releases.size() >= MAX_RELEASES) break;
                 if (!x.is_object()) continue;
                 Release r;
-                r.version = sys_updates::version_of_tag(str(x, "version"));
+                r.version = sys_updates::version_of_tag(json_util::string_at(x, "version"));
                 if (r.version.empty()) continue;
-                r.date = day_of(str(x, "date"));
-                r.notes = cut_notes(str(x, "notes"));
-                const std::string page = str(x, "page");
+                r.date = day_of(json_util::string_at(x, "date"));
+                r.notes = cut_notes(json_util::string_at(x, "notes"));
+                const std::string page = json_util::string_at(x, "page");
                 if (https_on(page, "github.com") || https_on(page, "switchbrew.org"))
                     r.page = safe_text::clean(page, 512, false);
-                const std::string sup = str(x, "supports");
+                const std::string sup = json_util::string_at(x, "supports");
                 if (firmware_version(sup)) r.supports = sup;
-                r.security = flag(x, "security");
-                r.pctl = flag(x, "pctl");
+                r.security = json_util::flag_at(x, "security");
+                r.pctl = json_util::flag_at(x, "pctl");
                 l.releases.push_back(r);
             }
         }

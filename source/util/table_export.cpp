@@ -10,6 +10,7 @@
 #include <utility>
 
 #include "util/paths.hpp"
+#include "util/utf8.hpp"
 
 namespace table_export
 {
@@ -103,25 +104,10 @@ std::string render_json(const Table& t)
 // form, surrogate, beyond U+10FFFF, cut short) is U+FFFD, length 1.
 size_t utf8_next(const std::string& s, size_t i, uint32_t* cp)
 {
-    const unsigned char c = (unsigned char)s[i];
-    size_t len = 0;
-    uint32_t v = 0, min = 0;
-    if (c < 0x80) { *cp = c; return 1; }
-    if (c >= 0xC2 && c <= 0xDF) { len = 2; v = c & 0x1F; min = 0x80; }
-    else if (c >= 0xE0 && c <= 0xEF) { len = 3; v = c & 0x0F; min = 0x800; }
-    else if (c >= 0xF0 && c <= 0xF4) { len = 4; v = c & 0x07; min = 0x10000; }
-    bool ok = len > 0 && i + len <= s.size();
-    for (size_t k = 1; k < len && ok; k++) {
-        const unsigned char cc = (unsigned char)s[i + k];
-        ok = (cc & 0xC0) == 0x80;
-        v = (v << 6) | (cc & 0x3F);
-    }
-    if (!ok || v < min || v > 0x10FFFF || (v >= 0xD800 && v <= 0xDFFF)) {
-        *cp = 0xFFFD;
-        return 1;
-    }
-    *cp = v;
-    return len;
+    const size_t n = utf8::decode(s, i, cp);
+    if (n) return n;
+    *cp = 0xFFFD;
+    return 1;
 }
 
 // Allowed in XML 1.0: no control character but tab and line ends, no U+FFFE / U+FFFF.
@@ -344,20 +330,9 @@ std::string to_winansi(const std::string& s)
 {
     std::string out;
     for (size_t i = 0; i < s.size();) {
-        const unsigned char c = (unsigned char)s[i];
-        size_t len = 1;
-        uint32_t cp = c;
-        if (c >= 0xF0 && c < 0xF8) { len = 4; cp = c & 0x07; }
-        else if (c >= 0xE0) { len = 3; cp = c & 0x0F; }
-        else if (c >= 0xC0) { len = 2; cp = c & 0x1F; }
-        else if (c >= 0x80) { out += '?'; i++; continue; }   // a stray continuation byte
-        bool ok = i + len <= s.size();
-        for (size_t k = 1; k < len && ok; k++) {
-            const unsigned char cc = (unsigned char)s[i + k];
-            ok = (cc & 0xC0) == 0x80;
-            cp = (cp << 6) | (cc & 0x3F);
-        }
-        if (!ok) { out += '?'; i++; continue; }
+        uint32_t cp;
+        const size_t len = utf8::decode(s, i, &cp);
+        if (!len) { out += '?'; i++; continue; }   // badly encoded: one '?' a byte
         out += winansi(cp);
         i += len;
     }
@@ -447,18 +422,15 @@ std::vector<std::string> header_lines(const std::string& s, double max, double s
     return { s.substr(0, best), s.substr(best + 1) };
 }
 
-// UTF-16BE hex string for the document information (PDFDocEncoding has no em dash).
+// UTF-16BE hex string for the document information (PDFDocEncoding has no em
+// dash). Badly encoded bytes become U+FFFD.
 std::string pdf_text_string(const std::string& utf8)
 {
     std::string out = "<FEFF";
     char hex[8];
     for (size_t i = 0; i < utf8.size();) {
-        const unsigned char c = (unsigned char)utf8[i];
-        size_t len = c >= 0xF0 ? 4 : c >= 0xE0 ? 3 : c >= 0xC0 ? 2 : 1;
-        uint32_t cp = len == 1 ? c : (c & (0x7F >> len));
-        if (i + len > utf8.size()) break;
-        for (size_t k = 1; k < len; k++) cp = (cp << 6) | ((unsigned char)utf8[i + k] & 0x3F);
-        i += len;
+        uint32_t cp;
+        i += utf8_next(utf8, i, &cp);
         if (cp >= 0x10000) {
             cp -= 0x10000;
             std::snprintf(hex, sizeof(hex), "%04X", (unsigned)(0xD800 + (cp >> 10)));

@@ -184,5 +184,10 @@ int main()
     CHECK(changelog::parse("", 0).empty());
     CHECK(changelog::parse("# Changelog\n", 0).empty());
 
+    // A keycap emoji (1, U+FE0F, U+20E3): the digit stays, its marks go, as in
+    // the Markdown view (util/emoji).
+    const auto keycap = changelog::parse("## [1.0.0](u) (2026-01-01)\n\n* 1\xEF\xB8\x8F\xE2\x83\xA3 first step\n", 0);
+    CHECK(keycap.size() == 2 && keycap[1].kind == Line::Item && keycap[1].text == "1 first step");
+
     return CHECK_DONE("changelog parsing, links, references and emoji assertions passed");
 }
