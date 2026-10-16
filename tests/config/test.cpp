@@ -299,6 +299,12 @@ static void test_preferences()
     CHECK(c.logs_keep == 20 && c.logs_keep_days == 0 && c.logs_keep_mb == 0);
     CHECK(c.start_tab == "dashboard" && c.extra_amounts == std::vector<int>({ 15, 30, 60 }));
     CHECK(c.activity_period == 1 && c.export_format == 0 && c.backup_keep == 0 && c.update_checked.empty());
+    // The tabs that became Console: the network clock and the console part of Tools.
+    for (const char* old_tab : { "clock", "tools" }) {
+        write_config(std::string(R"({"start_tab": ")") + old_tab + "\"}");
+        config::load();
+        CHECK(config::get().start_tab == "console");
+    }
     write_config(R"({"extra_amounts": "15,30,60", "backup_keep": "all"})");
     config::load();
     CHECK(config::get().extra_amounts == std::vector<int>({ 15, 30, 60 }) && config::get().backup_keep == 0);
@@ -334,7 +340,7 @@ static void test_preferences()
 
     // Round trip.
     config::get() = config::Config{};
-    config::get().start_tab = "tools";
+    config::get().start_tab = "history";
     config::get().extra_amounts = { 5, 10, 15 };
     config::get().backup_keep = 20;
     config::get().logs_keep = 50;
@@ -345,7 +351,7 @@ static void test_preferences()
     CHECK(config::save());
     config::get() = config::Config{};
     config::load();
-    CHECK(config::get().start_tab == "tools" && config::get().extra_amounts == std::vector<int>({ 5, 10, 15 }));
+    CHECK(config::get().start_tab == "history" && config::get().extra_amounts == std::vector<int>({ 5, 10, 15 }));
     CHECK(config::get().backup_keep == 20);
     CHECK(config::get().logs_keep == 50 && config::get().logs_keep_days == 365 && config::get().logs_keep_mb == 20);
     CHECK(!config::get().support_reminder && config::get().seen_version == "1.2.0");

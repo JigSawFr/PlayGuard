@@ -6,6 +6,7 @@
 #include "action/notices.hpp"
 #include "action/sys_update_flow.hpp"
 #include "action/update_flow.hpp"
+#include "tab/help_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 
@@ -27,7 +28,11 @@ int index_of(const char* const (&list)[N], const std::string& value)
 PreferencesTab::PreferencesTab()
     : TabBase("xml/tab/preferences.xml")
 {
-    note->setSingleLine(false);
+    help->setDetailText(ui::opens());
+    help->registerClickAction([](brls::View*) {
+        ui::open_screen(new HelpTab(), "playguard/prefs/help"_i18n);
+        return true;
+    });
 
     language->registerClickAction([this](brls::View*) {
         std::vector<std::string> labels;
