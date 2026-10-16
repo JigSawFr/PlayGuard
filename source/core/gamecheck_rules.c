@@ -66,7 +66,9 @@ GameIssue gamecheck_classify(const GameFacts *g, u32 current_hos)
     if (g->storage_unavailable) return GC_STORAGE_UNAVAILABLE;
     if (!g->has_base) return GC_NO_BASE;
     if (g->meta_missing || g->files_missing) return GC_FILES_MISSING;
-    if (g->view_ok && (g->view_flags & GC_VIEW_NEEDS_VERIFY)) return GC_NEEDS_VERIFY;
+    if (g->verified == GC_VERIFIED_CORRUPT) return GC_CORRUPT;
+    // Checked intact since: the console's flag alone says no more.
+    if (g->view_ok && (g->view_flags & GC_VIEW_NEEDS_VERIFY) && g->verified != GC_VERIFIED_INTACT) return GC_NEEDS_VERIFY;
     const u8 max_key = gamecheck_max_key_generation(current_hos);
     if (g->key_generation && max_key && g->key_generation > max_key) return GC_KEY_TOO_NEW;
     const u32 required = g->patch_required_hos > g->base_required_hos ? g->patch_required_hos : g->base_required_hos;
@@ -108,9 +110,12 @@ u32 gamecheck_recommended(const GameFacts *g, GameIssue issue, u32 current_hos)
                 pick = GA_REMOVE_UPDATE;
             break;
         case GC_NEEDS_VERIFY:
-        case GC_NO_CONTROL:
             pick = GA_VERIFY;
             break;
+        case GC_NO_CONTROL:   // checked intact: nothing to read again
+            if (g->verified != GC_VERIFIED_INTACT) pick = GA_VERIFY;
+            break;
+        case GC_CORRUPT:
         case GC_ARCHIVED:
         case GC_NO_BASE:
         case GC_FILES_MISSING:
@@ -142,7 +147,8 @@ bool gamecheck_is_corruption(Result rc)
 GameCategory gamecheck_category(const GameFacts *g, GameIssue issue, u32 current_hos)
 {
     const u32 fix = gamecheck_recommended(g, issue, current_hos);
-    if (fix & (GA_RESET_LAUNCH | GA_REMOVE_UPDATE | GA_VERIFY)) return GC_CAT_FIX;
+    if (fix & GA_VERIFY) return GC_CAT_VERIFY;
+    if (fix & (GA_RESET_LAUNCH | GA_REMOVE_UPDATE)) return GC_CAT_FIX;
     if (issue == GC_STORAGE_UNAVAILABLE || issue == GC_KEY_TOO_NEW || issue == GC_FIRMWARE_TOO_OLD) return GC_CAT_SYSTEM;
     return GC_CAT_REINSTALL;
 }

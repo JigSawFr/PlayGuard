@@ -684,7 +684,13 @@ static void test_rules(void)
     g.has_base = true;
     CHECK(gamecheck_classify(&g, CURRENT) == GC_FILES_MISSING);
     g.files_missing = false;
+    g.verified = GC_VERIFIED_CORRUPT;   // PlayGuard's check found it corrupt
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_CORRUPT);
+    g.verified = GC_VERIFIED_NONE;
     CHECK(gamecheck_classify(&g, CURRENT) == GC_NEEDS_VERIFY);
+    g.verified = GC_VERIFIED_INTACT;    // checked intact since: the flag says no more
+    CHECK(gamecheck_classify(&g, CURRENT) == GC_KEY_TOO_NEW);
+    g.verified = GC_VERIFIED_NONE;
     g.view_flags = GC_VIEW_CAN_LAUNCH;
     CHECK(gamecheck_classify(&g, CURRENT) == GC_KEY_TOO_NEW);
     CHECK(gamecheck_classify(&g, HOS(23, 0, 0)) == GC_FIRMWARE_TOO_OLD);   // that firmware has the key
@@ -965,8 +971,20 @@ static void test_categories(void)
     g.base_required_hos = HOS(19, 0, 0);
     g.patch_required_hos = HOS(24, 0, 0);
     CHECK(gamecheck_category(&g, GC_FIRMWARE_TOO_OLD, CURRENT) == GC_CAT_FIX);
-    CHECK(gamecheck_category(&g, GC_NEEDS_VERIFY, CURRENT) == GC_CAT_FIX);
-    CHECK(gamecheck_category(&g, GC_NO_CONTROL, CURRENT) == GC_CAT_FIX);
+    // Checked first: the data the console found corrupt, the name it cannot read.
+    CHECK(gamecheck_category(&g, GC_NEEDS_VERIFY, CURRENT) == GC_CAT_VERIFY);
+    CHECK(gamecheck_category(&g, GC_NO_CONTROL, CURRENT) == GC_CAT_VERIFY);
+    CHECK(gamecheck_recommended(&g, GC_NO_CONTROL, CURRENT) == GA_VERIFY);
+    // Checked intact, the name still unreadable: installed again. Found
+    // corrupt: removed, then installed again (checking again still offered).
+    g.verified = GC_VERIFIED_INTACT;
+    CHECK(gamecheck_recommended(&g, GC_NO_CONTROL, CURRENT) == 0);
+    CHECK(gamecheck_category(&g, GC_NO_CONTROL, CURRENT) == GC_CAT_REINSTALL);
+    g.verified = GC_VERIFIED_CORRUPT;
+    CHECK(gamecheck_recommended(&g, GC_CORRUPT, CURRENT) == GA_REMOVE);
+    CHECK(gamecheck_actions(&g, GC_CORRUPT) & GA_VERIFY);
+    CHECK(gamecheck_category(&g, GC_CORRUPT, CURRENT) == GC_CAT_REINSTALL);
+    g.verified = GC_VERIFIED_NONE;
     // Outside the game: the game itself too new, its keys, the SD card.
     g.base_required_hos = HOS(24, 0, 0);
     CHECK(gamecheck_category(&g, GC_FIRMWARE_TOO_OLD, CURRENT) == GC_CAT_SYSTEM);

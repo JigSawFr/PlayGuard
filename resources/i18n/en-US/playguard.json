@@ -803,6 +803,11 @@
                 "cause": "Files of the game or of its update are missing where they are installed: an installation that was interrupted, or a damaged SD card.",
                 "fix": "Remove the game, then install it again. If several games are affected, check the SD card first."
             },
+            "corrupt": {
+                "short": "Corrupt (checked)",
+                "cause": "PlayGuard checked its data ({}): the console found corrupt data. The game cannot be played until it is installed again.",
+                "fix": "Remove the game (first button), then install it again. Save data stays."
+            },
             "firmware": {
                 "short": "Needs firmware {}",
                 "cause": "The game or its update needs system version {}; this console runs {}.",
@@ -822,7 +827,7 @@
             "needs_verify": {
                 "short": "Corrupt data",
                 "cause": "The console found corrupt data in this game and asks for it to be checked.",
-                "fix": "Check the data for corruption (Actions). If it is corrupt, remove the game and install it again."
+                "fix": "Check the data (first button): PlayGuard remembers what it finds. Intact, the game leaves the list; corrupt, it moves to Reinstall."
             },
             "key_too_new": {
                 "short": "Keys too new",
@@ -889,11 +894,13 @@
         "verify_code": "Code from the console: {}",
         "groups": {
             "fix": "Fix here ({})",
+            "verify": "To check ({})",
             "reinstall": "Reinstall ({})",
             "system": "Firmware or SD card ({})"
         },
         "group_note": {
             "fix": "PlayGuard can repair these: A on a game, then its first button.",
+            "verify": "The console suspects their data. Checking it reads every file and says whether to install the game again; PlayGuard remembers the result.",
             "reinstall": "Their files are gone or unusable. Save their list, remove them here (an installer counts them as installed until then), then install them again by searching for their name.",
             "system": "The games are fine: the console's firmware or SD card is the problem. Update the firmware, or start on the storage they were installed on."
         },
@@ -909,7 +916,27 @@
         "remove_all_body": "These {} games are removed from the console, with their updates and add-ons, so they can be installed again. Their list is saved first, in PlayGuard's exports folder. Save data stays.",
         "removing": "Removing the games… {} of {}",
         "removed_all": "{} games removed. Their list: {}",
-        "removed_some": "{} of {} games removed. Their list: {}"
+        "removed_some": "{} of {} games removed. Their list: {}",
+        "verify_all": "Check these {} games",
+        "select": "Select",
+        "unselect": "Unselect",
+        "selected_one": "1 game selected",
+        "selected": "{} games selected",
+        "selection": {
+            "verify": "Check their data ({})",
+            "remove": "Remove these games ({})",
+            "select_group": "Select all of: {}",
+            "clear": "Unselect all"
+        },
+        "verify_title_n": "Checking the data · game {} of {}",
+        "verify_done": "{} of {} games checked.",
+        "verify_count_bad": "Corrupt data: {}",
+        "verify_count_ok": "Intact: {}",
+        "verify_count_err": "Could not be checked: {}",
+        "remove_corrupt": "Remove the {} corrupt",
+        "verified_intact": "Data checked {}: intact.",
+        "select_many": "Several games at once (Y on a game)",
+        "remove_corrupt_one": "Remove the corrupt game"
     },
     "about": {
         "section_changelog": "What's new in {}",

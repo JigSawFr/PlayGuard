@@ -44,7 +44,19 @@ bool expired(const Cache& cache, int64_t now, uint32_t hos);
 // Every record when expired().
 std::vector<GameRecord> to_check(Cache* cache, const std::vector<GameRecord>& records, int64_t now, uint32_t hos);
 
-// `game` in place of the cached one with its ID, added when there is none.
+// What PlayGuard's integrity check found of the cached game with `game`'s
+// ID, copied into `game` (a scan never says it): kept while the same version
+// is installed, dropped once another is (the game updated or installed
+// again). `game` checked since keeps its own.
+void carry_verified(const Cache& cache, GameFacts* game);
+
+// `game` in place of the cached one with its ID, added when there is none,
+// with carry_verified().
 void put(Cache* cache, const GameFacts& game);
+
+// What the integrity check found of the game `app_id` (GC_VERIFIED_*, `code`
+// the console's for corrupt data), at `at`, for its installed version. False
+// when the game is not in the cache.
+bool set_verified(Cache* cache, uint64_t app_id, uint8_t result, int64_t at, Result code);
 
 }   // namespace game_cache

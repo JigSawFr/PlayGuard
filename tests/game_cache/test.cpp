@@ -3,7 +3,8 @@
 // their size) and what to check again (nothing while fresh and unchanged; a
 // new game, a changed entry; every game once a day old, on another firmware,
 // with the clock gone back or no full check yet; games gone dropped, the
-// rest in the console's order); put() in place or added.
+// rest in the console's order); put() in place or added; what the integrity
+// check found, kept while the same version is installed.
 #include "check.h"
 #include <cstdio>
 #include <cstring>
@@ -158,6 +159,43 @@ void test_put()
     game_cache::put(&c, game(9, 1));
     CHECK((ids(c.games) == std::vector<uint64_t>{ 1, 2, 3, 9 }));
 }
+
+void test_verified()
+{
+    game_cache::Cache c = fresh_cache();
+    c.games[1].has_base = true;
+    c.games[1].base_version = 0x10000;
+    CHECK(!game_cache::set_verified(&c, 42, GC_VERIFIED_CORRUPT, NOW, 0x4C010));
+    CHECK(game_cache::set_verified(&c, 2, GC_VERIFIED_CORRUPT, NOW, 0x4C010));
+    CHECK(c.games[1].verified == GC_VERIFIED_CORRUPT && c.games[1].verified_version == 0x10000 &&
+          c.games[1].verified_at == (uint64_t)NOW && c.games[1].verified_code == 0x4C010);
+
+    // Checked again, the same version: what was found stays, and the file keeps it.
+    GameFacts again = game(2, 201);
+    again.has_base = true;
+    again.base_version = 0x10000;
+    game_cache::put(&c, again);
+    CHECK(c.games[1].verified == GC_VERIFIED_CORRUPT && c.games[1].record_updated == 201);
+    game_cache::Cache read;
+    CHECK(game_cache::decode(game_cache::encode(c), &read) && read.games[1].verified == GC_VERIFIED_CORRUPT &&
+          read.games[1].verified_code == 0x4C010);
+
+    // Another version installed (an update, the game installed again): dropped.
+    GameFacts updated = again;
+    updated.has_patch = true;
+    updated.patch_version = 0x20000;
+    game_cache::put(&c, updated);
+    CHECK(c.games[1].verified == GC_VERIFIED_NONE);
+
+    // Intact: no code kept; a game checked since keeps its own.
+    CHECK(game_cache::set_verified(&c, 2, GC_VERIFIED_INTACT, NOW, 0x4C010));
+    CHECK(c.games[1].verified == GC_VERIFIED_INTACT && c.games[1].verified_code == 0);
+    GameFacts own = updated;
+    own.verified = GC_VERIFIED_CORRUPT;
+    own.verified_version = 0x20000;
+    game_cache::carry_verified(c, &own);
+    CHECK(own.verified == GC_VERIFIED_CORRUPT);
+}
 }   // namespace
 
 int main()
@@ -166,5 +204,6 @@ int main()
     test_expired();
     test_to_check();
     test_put();
+    test_verified();
     return CHECK_DONE("game cache assertions passed");
 }
