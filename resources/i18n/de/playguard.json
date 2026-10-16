@@ -110,7 +110,9 @@
         "clock_not_set": "die Konsole meldet, dass ihre Netzwerkuhr keine gültige Zeit hat (sie wurde vielleicht nie gestellt); siehe den Tab Netzwerkuhr",
         "no_internet": "die Konsole ist nicht mit dem Internet verbunden: Verbinden Sie sie und versuchen Sie es dann erneut",
         "service_denied": "das System hat PlayGuard den Zugriff auf einen seiner Dienste verweigert; PlayGuard benötigt eine Konsole mit Atmosphère",
-        "pdm_unavailable": "der Spieldaten-Dienst der Konsole ist gerade nicht verfügbar; versuchen Sie es gleich noch einmal"
+        "pdm_unavailable": "der Spieldaten-Dienst der Konsole ist gerade nicht verfügbar; versuchen Sie es gleich noch einmal",
+        "corrupt_data": "beschädigte Daten: Die Dateien des Spiels sind beschädigt; entferne das Spiel und installiere es erneut",
+        "cancelled": "abgebrochen"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -764,6 +766,151 @@
         "storage_note_emummc": "Dies ist die emuMMC: Die sysMMC hat eigene Altersbeschränkungen, die PlayGuard von hier aus nicht sieht. Legen Sie sie dort ebenfalls fest oder blenden Sie das Startmenü von hekate aus.",
         "storage_note_sysmmc": "Dies ist die sysMMC, und auf dieser SD-Karte ist eine emuMMC eingerichtet: Sie hat eigene Altersbeschränkungen, die PlayGuard von hier aus nicht sieht. Legen Sie sie dort ebenfalls fest oder blenden Sie das Startmenü von hekate aus."
     },
+    "games": {
+        "open": "Installierte Spiele prüfen",
+        "title": "Installierte Spiele",
+        "note": "Die Spiele, die das HOME-Menü nicht starten oder anzeigen kann (ein Symbol, das endlos lädt, „!“, ein gestrichelter Rahmen), warum, und was zu tun ist. A auf einem Spiel für die Details.",
+        "none": "Alle {} installierten Spiele scheinen in Ordnung.",
+        "err_list": "Die installierten Spiele konnten nicht aufgelistet werden",
+        "truncated": "Nur die ersten {} Spiele wurden geprüft.",
+        "many": "Mehrere Spiele auf einmal: Prüfe die SD-Karte an einem Computer auf Fehler und ob die Konsole vom selben Speicher ({} gerade) gestartet ist wie bei der Installation dieser Spiele. Ein von sysMMC installiertes Spiel funktioniert nicht unter emuMMC und umgekehrt.",
+        "unnamed": "Unbekanntes Spiel ({})",
+        "id": "Titel-ID: {}",
+        "cause": "Ursache",
+        "fix": "Was tun",
+        "remove": "Von der Konsole entfernen",
+        "remove_body": "Beim Entfernen werden das Spiel, sein Update und seine Zusatzinhalte von der Konsole und aus dem HOME-Menü gelöscht. Spielstände bleiben erhalten.",
+        "removed": "{} entfernt",
+        "remove_err": "Das Spiel konnte nicht entfernt werden",
+        "issues": {
+            "archived": {
+                "short": "Nichts installiert (gestrichelt)",
+                "cause": "Die Konsole listet das Spiel, aber nichts davon ist mehr installiert: Es wurde archiviert, oder seine Dateien wurden außerhalb der Konsole gelöscht.",
+                "fix": "Installiere das Spiel erneut oder entferne seinen Eintrag, um das HOME-Menü aufzuräumen."
+            },
+            "storage": {
+                "short": "SD-Karte nicht lesbar",
+                "cause": "Das Spiel liegt auf der SD-Karte, die die Konsole gerade nicht lesen kann.",
+                "fix": "Schalte die Konsole aus, nimm die SD-Karte heraus und setze sie wieder ein, und prüfe sie dann an einem Computer auf Fehler. Nichts zu entfernen: Die Dateien sind noch auf der Karte."
+            },
+            "no_base": {
+                "short": "Spiel fehlt („!“)",
+                "cause": "Nur ein Update oder ein Zusatzinhalt dieses Spiels ist installiert, nicht das Spiel selbst.",
+                "fix": "Installiere das Spiel selbst oder entferne den Eintrag und was davon übrig ist."
+            },
+            "files": {
+                "short": "Beschädigte Installation",
+                "cause": "Dateien des Spiels oder seines Updates fehlen dort, wo sie installiert sind: eine abgebrochene Installation oder eine beschädigte SD-Karte.",
+                "fix": "Entferne das Spiel und installiere es erneut. Sind mehrere Spiele betroffen, prüfe zuerst die SD-Karte."
+            },
+            "firmware": {
+                "short": "Benötigt Firmware {}",
+                "cause": "Das Spiel oder sein Update benötigt die Systemversion {}; diese Konsole hat {}.",
+                "fix": "Aktualisiere zuerst Atmosphère auf eine Version, die die neue Firmware unterstützt, dann die Firmware: In umgekehrter Reihenfolge startet die Konsole nicht mehr. Oder installiere eine ältere Version des Updates.",
+                "fix_update": "Nur sein Update braucht sie: Entferne das Update, um das Spiel ohne es zu spielen (Aktionen), oder aktualisiere zuerst Atmosphère, dann die Firmware."
+            },
+            "launch": {
+                "short": "Von der Konsole abgelehnt",
+                "cause": "Die Konsole verweigert den Start: {}. Meist ist ein neueres Update des Spiels erforderlich.",
+                "fix": "Installiere das neueste Update des Spiels. Ist es bereits installiert, entferne das Spiel und installiere es erneut."
+            },
+            "no_control": {
+                "short": "Name und Symbol unlesbar",
+                "cause": "Das Spiel ist installiert, aber sein Name und sein Symbol können nicht gelesen werden: Das HOME-Menü zeigt ein Symbol, das endlos lädt.",
+                "fix": "Starte die Konsole neu. Lädt das Symbol weiterhin, prüfe die Daten unter Systemeinstellungen › Datenverwaltung oder entferne das Spiel und installiere es erneut."
+            },
+            "needs_verify": {
+                "short": "Beschädigte Daten",
+                "cause": "Die Konsole hat beschädigte Daten in diesem Spiel gefunden und verlangt eine Prüfung.",
+                "fix": "Prüfe die Daten auf Beschädigung (Aktionen). Sind sie beschädigt, entferne das Spiel und installiere es erneut."
+            },
+            "key_too_new": {
+                "short": "Schlüssel zu neu",
+                "cause": "Das Spiel ist mit Schlüsseln verschlüsselt, die diese Firmware ({}) nicht hat (Schlüsselgeneration {})."
+            },
+            "ticket": {
+                "short": "Lizenz fehlt",
+                "cause": "Das Spiel braucht eine Lizenz (Ticket), die nicht auf der Konsole ist: Sie wurde gelöscht, oder die Installation enthielt sie nicht.",
+                "fix": "Installiere das Spiel erneut aus einer vollständigen Kopie mit seinem Ticket."
+            },
+            "launch_version": {
+                "short": "Verlangt ein entferntes Update",
+                "cause": "Die Konsole verlangt, was früher installiert war: {}. Jetzt installiert: {}. Das Update wurde entfernt oder nicht vollständig installiert.",
+                "fix": "Lass die installierte Version wieder zu (Aktionen) oder installiere das Update erneut."
+            }
+        },
+        "actions": "Aktionen",
+        "action": {
+            "remove": "Spiel von der Konsole entfernen",
+            "remove_update": "Update entfernen ({})",
+            "remove_addon": "Zusatzinhalt {} entfernen",
+            "reset_launch": "Installierte Version wieder zulassen",
+            "verify": "Daten auf Beschädigung prüfen"
+        },
+        "remove_update_body": "Nur das Update wird gelöscht: Das Spiel, seine Zusatzinhalte und Spielstände bleiben, und die Konsole startet das Spiel ohne das Update.",
+        "remove_addon_body": "Nur dieser Zusatzinhalt wird gelöscht: Das Spiel, sein Update und die Spielstände bleiben.",
+        "update_removed": "{}: Update entfernt",
+        "addon_removed": "{}: Zusatzinhalt entfernt",
+        "launch_reset": "{}: die installierte Version wird wieder zugelassen",
+        "content_err": "Konnte nicht entfernt werden",
+        "launch_err": "Die Startversion konnte nicht geändert werden",
+        "verify_ok": "{}: keine beschädigten Daten gefunden.",
+        "verify_bad": "{}: beschädigte Daten gefunden. Entferne das Spiel und installiere es erneut.",
+        "verify_err": "Die Daten konnten nicht geprüft werden",
+        "verify_busy": "Es läuft bereits eine Prüfung.",
+        "version": "Version {}",
+        "update_n": "Update Nr. {}",
+        "base_only": "das Spiel ohne seine Updates",
+        "other_actions": "Weitere Aktionen…",
+        "verify_note": "Jede Datei des Spiels wird gelesen: Ein großes Spiel dauert einige Minuten.",
+        "verify_cancelled": "Prüfung abgebrochen.",
+        "section_count": "Spiele mit einem Problem: {} von {}",
+        "fixed": "{}: repariert, es funktioniert wieder.",
+        "fix_button": {
+            "verify": "Daten prüfen",
+            "reset_launch": "Diese Version zulassen",
+            "remove_update": "Update entfernen",
+            "remove": "Spiel entfernen"
+        },
+        "searching": "Installierte Spiele werden gesucht…",
+        "checking": "Spiele werden geprüft… {} von {}",
+        "check_again": "Erneut prüfen",
+        "checked_now": "Gerade geprüft.",
+        "checked_min": "Vor {} Min. geprüft.",
+        "checked_h": "Vor {} Std. geprüft.",
+        "verify_title": "Daten werden geprüft",
+        "verify_preparing": "Wird vorbereitet…",
+        "verify_amount": "{} von {}",
+        "verify_left_less": "weniger als eine Minute",
+        "verify_left_min": "noch etwa {} Min.",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ",",
+        "verify_code": "Code der Konsole: {}",
+        "groups": {
+            "fix": "Hier reparierbar ({})",
+            "reinstall": "Neu installieren ({})",
+            "system": "Firmware oder SD-Karte ({})"
+        },
+        "group_note": {
+            "fix": "PlayGuard kann sie reparieren: A auf einem Spiel, dann die erste Schaltfläche.",
+            "reinstall": "Ihre Dateien fehlen oder sind unbrauchbar. Liste speichern, hier entfernen (ein Installer hält sie bis dahin für installiert) und dann über ihren Namen neu installieren.",
+            "system": "Die Spiele sind in Ordnung: Das Problem liegt an der Firmware der Konsole oder an der SD-Karte. Firmware aktualisieren oder vom Speicher starten, auf dem sie installiert wurden."
+        },
+        "save_list": "Liste dieser Spiele speichern",
+        "list_saved": "Liste gespeichert: {}",
+        "list_err": "Die Liste konnte nicht gespeichert werden",
+        "list_title": "Neu zu installierende Spiele",
+        "col_name": "Spiel",
+        "col_id": "Title ID",
+        "col_version": "Version",
+        "col_problem": "Problem",
+        "remove_all": "Diese {} Spiele entfernen",
+        "remove_all_body": "Diese {} Spiele werden samt Updates und Zusatzinhalten von der Konsole entfernt, damit sie neu installiert werden können. Ihre Liste wird vorher im Export-Ordner von PlayGuard gespeichert. Spielstände bleiben erhalten.",
+        "removing": "Spiele werden entfernt… {} von {}",
+        "removed_all": "{} Spiele entfernt. Ihre Liste: {}",
+        "removed_some": "{} von {} Spielen entfernt. Ihre Liste: {}"
+    },
     "about": {
         "section_changelog": "Neu in {}",
         "changelog_note": "Frühere Versionen: {}",
@@ -1058,6 +1205,10 @@
             "outside_limits": "Limits außerhalb von PlayGuard geändert",
             "new_account": "Neuer Nutzer (von PlayGuard bemerkt)",
             "time_up": "Wenn die Zeit um ist",
+            "remove_game": "Spiel entfernt",
+            "remove_update": "Update entfernt",
+            "remove_addon": "Zusatzinhalt entfernt",
+            "launch_version": "Startversion zurückgesetzt",
             "countdown": "Spielzeit-Countdown"
         },
         "sources": {
@@ -1172,6 +1323,9 @@
         "crash": "PlayGuard wurde beim letzten Mal unerwartet beendet",
         "sd_write": "PlayGuard konnte nicht auf die SD-Karte schreiben",
         "sd_write_detail": "{} wurde nicht gespeichert. Prüfe die SD-Karte: voll, schreibgeschützt (der Schieber) oder fehlerhaft.",
+        "games_one": "Ein installiertes Spiel startet nicht",
+        "games": "{} installierte Spiele starten nicht",
+        "games_more": "{} und {} weitere",
         "rescue_old": "Das Wiederherstellungs-Sysmodul ist veraltet",
         "rescue_old_detail": "Es stammt von PlayGuard {}. Entpacke playguard-rescue.zip von PlayGuard {} ins Stammverzeichnis der SD-Karte und starte die Konsole neu.",
         "rescue_unknown": "Es wurde installiert, bevor es seine Version angab. Entpacke playguard-rescue.zip von PlayGuard {} ins Stammverzeichnis der SD-Karte und starte die Konsole neu.",

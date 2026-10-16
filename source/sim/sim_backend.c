@@ -32,7 +32,12 @@
 //                               setting write), relock (1007), timer (145601
 //                               read), clock (network clock write), pin (1208),
 //                               pin_entry (the PIN screen is cancelled),
-//                               bedtime (the console does not take the bedtime)
+//                               bedtime (the console does not take the bedtime),
+//                               remove (Tools › Installed games: a removal),
+//                               launch (its launch version reset), verify
+//                               (its integrity check)
+//   PLAYGUARD_SIM_GAMES_OK=1    every installed game fine (Tools › Installed games)
+//   PLAYGUARD_SIM_CHECK_MS=150  how long checking one installed game takes
 // The play-timer limits are kept as the real 0x44 block (core/pure.c encodes
 // and decodes it, as on the console); the read-only switch is core/write_guard.c.
 // Game patches are read from ./playguard_data/sd/ (the simulated SD card root).
@@ -44,6 +49,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "../core/gamecheck.h"
 #include "../core/pctl_ops.h"
 #include "../core/playstats.h"
 #include "../core/sysinfo.h"
@@ -679,13 +685,17 @@ bool playstats_cancelled(void) { return atomic_load(&s_cancel); }
 
 void playstats_icons(PlayIcon *icons, size_t count)
 {
-    // The made-up games above, in order; the deleted one has no icon.
+    // The made-up games above, in order; the deleted one has no icon. The
+    // installed games of Tools › Check the installed games (…6000 and up)
+    // reuse them, but for the one whose name and icon cannot be read.
     for (size_t i = 0; i < count; i++) {
         icons[i].jpeg = NULL;
         icons[i].size = 0;
         const u64 base = 0x0100A1B2C3D40000ULL;
-        if (icons[i].app_id < base || (icons[i].app_id - base) % 0x1000 || (icons[i].app_id - base) / 0x1000 >= 5) continue;
-        const size_t k = (size_t)((icons[i].app_id - base) / 0x1000);
+        if (icons[i].app_id < base || (icons[i].app_id - base) % 0x1000 || (icons[i].app_id - base) / 0x1000 >= 16) continue;
+        size_t k = (size_t)((icons[i].app_id - base) / 0x1000);
+        if (k == 5 || k == 6) continue;
+        k %= 5;
         icons[i].jpeg = (unsigned char *)malloc(SIM_ICON_SIZES[k]);
         if (!icons[i].jpeg) continue;
         memcpy(icons[i].jpeg, SIM_ICONS[k], SIM_ICON_SIZES[k]);
@@ -713,4 +723,271 @@ size_t playstats_by_account(u64 app_id, AccountPlay *out, size_t max, Result *rc
         return 2;
     }
     return 0;
+}
+
+// ---------------------------------------------------------------- gamecheck
+// The made-up games of the Activity tab, fine, then one of each problem the
+// HOME menu shows (an icon that keeps loading, "!", a dotted frame, …),
+// unless PLAYGUARD_SIM_GAMES_OK. What the actions change stays until the app
+// quits: a removed game or content is gone, a launch version reset sticks.
+static u64 s_removed[32];        // whole games and single contents, by ID
+static size_t s_removed_count;
+static u64 s_launch_reset[16];
+static size_t s_launch_reset_count;
+
+static bool sim_in(const u64 *list, size_t n, u64 id)
+{
+    for (size_t i = 0; i < n; i++)
+        if (list[i] == id) return true;
+    return false;
+}
+
+static void sim_add_content(GameFacts *g, u64 id, u32 version, u8 type, u8 storage)
+{
+    if (sim_in(s_removed, s_removed_count, id)) return;
+    GameContent *c = &g->contents[g->content_count++];
+    c->id = id;
+    c->version = version;
+    c->type = type;
+    c->storage = storage;
+    g->meta_count++;
+    if (type == GC_META_APPLICATION) {
+        g->has_base = true;
+        g->base_version = version;
+    }
+    if (type == GC_META_PATCH) {
+        g->has_patch = true;
+        g->patch_version = version;
+    }
+}
+
+// Every game the simulated console has, fully checked (gamecheck_check
+// returns them one at a time).
+static void sim_games(GameCheck *out)
+{
+    memset(out, 0, sizeof(*out));
+    static const char *fine[] = { "Star Kart Racers", "Island Builders", "Pixel Quest Deluxe",
+                                  "Dragon Valley Legends", "Puzzle Garden" };
+    for (size_t i = 0; i < sizeof(fine) / sizeof(fine[0]); i++) {
+        GameFacts *g = &out->games[out->count++];
+        g->app_id = 0x0100A1B2C3D40000ULL + i * 0x1000;
+        snprintf(g->name, sizeof(g->name), "%s", fine[i]);
+        snprintf(g->display_version, sizeof(g->display_version), "1.3.0");
+        g->control_ok = true;
+        g->record_event = 3;
+        sim_add_content(g, g->app_id, 0, GC_META_APPLICATION, GC_STORAGE_SD);
+        sim_add_content(g, g->app_id | 0x800, 0x30000, GC_META_PATCH, GC_STORAGE_SD);
+        g->base_required_hos = MAKEHOSVERSION(18, 0, 0);
+        g->key_generation = 0x12;
+        g->view_ok = true;
+        g->view_flags = GC_VIEW_HAS_MAIN_CONTENTS | GC_VIEW_CAN_LAUNCH;
+        g->launch_checked = true;
+        g->launch_required = 0x30000;
+    }
+    // A game card left out of its slot: not a problem.
+    GameFacts *card = &out->games[out->count++];
+    card->app_id = 0x0100A1B2C3D4A000ULL;
+    snprintf(card->name, sizeof(card->name), "Sky Kingdom");
+    card->control_ok = true;
+    card->record_event = 5;
+    sim_add_content(card, card->app_id, 0, GC_META_APPLICATION, GC_STORAGE_GAMECARD);
+    card->card_only = true;
+    if (getenv("PLAYGUARD_SIM_GAMES_OK")) return;
+
+    static const struct { u64 id; const char *name; GameIssue issue; } broken[] = {
+        { 0x0100A1B2C3D46000ULL, "",                 GC_NO_CONTROL },
+        { 0x0100A1B2C3D47000ULL, "Garden Defenders", GC_NO_BASE },
+        { 0x0100A1B2C3D48000ULL, "Hedgehog Rush",    GC_ARCHIVED },
+        { 0x0100A1B2C3D49000ULL, "Robot Factory",    GC_FIRMWARE_TOO_OLD },
+        { 0x0100A1B2C3D4B000ULL, "Ocean Explorer",   GC_FILES_MISSING },
+        { 0x0100A1B2C3D4C000ULL, "Castle Siege",     GC_TICKET_MISSING },
+        { 0x0100A1B2C3D4D000ULL, "Moon Racer",       GC_LAUNCH_VERSION },
+        { 0x0100A1B2C3D4E000ULL, "Forest Tales: Legends of the Ancient Grove for Nintendo Switch™",     GC_NEEDS_VERIFY },
+        { 0x0100A1B2C3D4F000ULL, "Star Pilots",      GC_KEY_TOO_NEW },
+    };
+    for (size_t i = 0; i < sizeof(broken) / sizeof(broken[0]); i++) {
+        const u64 id = broken[i].id;
+        if (sim_in(s_removed, s_removed_count, id)) continue;
+        GameFacts *g = &out->games[out->count++];
+        g->app_id = id;
+        snprintf(g->name, sizeof(g->name), "%s", broken[i].name);
+        g->control_ok = broken[i].name[0] != '\0';
+        if (g->control_ok) snprintf(g->display_version, sizeof(g->display_version), "1.0.0");
+        g->record_event = broken[i].issue == GC_ARCHIVED ? 11 : 3;
+        g->view_ok = true;
+        g->view_flags = GC_VIEW_HAS_MAIN_CONTENTS | GC_VIEW_CAN_LAUNCH;
+        switch (broken[i].issue) {
+            case GC_ARCHIVED:
+                g->view_flags = 0;
+                break;
+            case GC_NO_BASE:
+                sim_add_content(g, id | 0x800, 0x10000, GC_META_PATCH, GC_STORAGE_SD);
+                break;
+            case GC_FIRMWARE_TOO_OLD:   // the update needs it, not the game
+                sim_add_content(g, id, 0, GC_META_APPLICATION, GC_STORAGE_SD);
+                sim_add_content(g, id | 0x800, 0x50000, GC_META_PATCH, GC_STORAGE_SD);
+                sim_add_content(g, (id & ~0xFFFULL) + 0x1001, 0x10000, GC_META_ADDON, GC_STORAGE_SD);
+                g->base_required_hos = MAKEHOSVERSION(19, 0, 0);
+                if (g->has_patch) {
+                    g->patch_required_hos = MAKEHOSVERSION(24, 1, 0);
+                    snprintf(g->display_version, sizeof(g->display_version), "2.1.0");   // the update's
+                }
+                break;
+            case GC_LAUNCH_VERSION:   // its update was removed outside the console
+                sim_add_content(g, id, 0, GC_META_APPLICATION, GC_STORAGE_SD);
+                g->launch_checked = true;
+                g->launch_required = sim_in(s_launch_reset, s_launch_reset_count, id) ? 0 : 0x40000;
+                g->launch_rc = g->launch_required ? (Result)0x1F0C : 0;   // refused until then
+                break;
+            case GC_TICKET_MISSING:
+                sim_add_content(g, id, 0, GC_META_APPLICATION, GC_STORAGE_SD);
+                g->needs_ticket = g->ticket_missing = true;
+                break;
+            case GC_NEEDS_VERIFY:
+                sim_add_content(g, id, 0, GC_META_APPLICATION, GC_STORAGE_NAND);
+                g->view_flags |= GC_VIEW_NEEDS_VERIFY;
+                break;
+            case GC_KEY_TOO_NEW:
+                sim_add_content(g, id, 0, GC_META_APPLICATION, GC_STORAGE_SD);
+                g->key_generation = 0x18;
+                break;
+            case GC_FILES_MISSING:
+                sim_add_content(g, id, 0, GC_META_APPLICATION, GC_STORAGE_SD);
+                g->files_missing = true;
+                break;
+            default:   // GC_NO_CONTROL
+                sim_add_content(g, id, 0, GC_META_APPLICATION, GC_STORAGE_SD);
+                break;
+        }
+    }
+}
+
+static void sim_remember(u64 *list, size_t *n, size_t cap, u64 id)
+{
+    if (*n < cap) list[(*n)++] = id;
+}
+
+Result gamecheck_remove(u64 app_id)
+{
+    RO_GUARD();
+    FAIL_IF("remove");
+    sim_remember(s_removed, &s_removed_count, sizeof(s_removed) / sizeof(s_removed[0]), app_id);
+    return 0;
+}
+
+static void sim_bump(u64 id);
+
+Result gamecheck_remove_content(u64 app_id, const GameContent *content)
+{
+    if (!content || (content->type != GC_META_PATCH && content->type != GC_META_ADDON) ||
+        (content->storage != GC_STORAGE_NAND && content->storage != GC_STORAGE_SD))
+        return NXM_RC_INVALID_ARGUMENT;
+    RO_GUARD();
+    FAIL_IF("remove");
+    sim_remember(s_removed, &s_removed_count, sizeof(s_removed) / sizeof(s_removed[0]), content->id);
+    sim_bump(app_id);
+    return 0;
+}
+
+Result gamecheck_reset_launch_version(u64 app_id, u32 version)
+{
+    (void)version;
+    RO_GUARD();
+    FAIL_IF("launch");
+    sim_remember(s_launch_reset, &s_launch_reset_count, sizeof(s_launch_reset) / sizeof(s_launch_reset[0]), app_id);
+    sim_bump(app_id);
+    return 0;
+}
+
+// Four seconds or so of progress over 3.8 GB; "Forest Tales" has corrupt data.
+Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64 total), void *ctx, bool *corrupt,
+                        Result *found)
+{
+    *corrupt = false;
+    *found = 0;
+    if (fails("verify")) return SIM_FAIL_RC;
+    const u64 total = 3891ULL << 20;
+    for (u64 step = 0; step <= 8; step++) {
+        if (progress && !progress(ctx, total * step / 8, step ? total : 0)) return NXM_RC_CANCELLED;
+        const struct timespec pause = { 0, 500000000L };
+        nanosleep(&pause, NULL);
+    }
+    *corrupt = app_id == 0x0100A1B2C3D4E000ULL;
+    if (*corrupt) *found = 16 | (601 << 9);   // 2016-0601, as a console answers
+    return 0;
+}
+
+// Each change to a game (a removal, a launch version reset) bumps its entry,
+// as the console's LastUpdated does.
+static u64 s_bumps[32];
+static size_t s_bump_count;
+
+static u64 sim_updated(u64 id)
+{
+    u64 n = 1791400000ULL + (id & 0xFFFFF);
+    for (size_t i = 0; i < s_bump_count; i++)
+        if (s_bumps[i] == id) n++;
+    return n;
+}
+
+static void sim_bump(u64 id)
+{
+    if (s_bump_count < sizeof(s_bumps) / sizeof(s_bumps[0])) s_bumps[s_bump_count++] = id;
+}
+
+Result gamecheck_records(GameRecord *out, u32 max, u32 *count, bool *truncated)
+{
+    static GameCheck all;
+    sim_games(&all);
+    *count = 0;
+    *truncated = false;
+    for (u32 i = 0; i < all.count; i++) {
+        if (*count == max) {
+            *truncated = true;
+            break;
+        }
+        GameRecord *r = &out[(*count)++];
+        r->app_id  = all.games[i].app_id;
+        r->updated = sim_updated(r->app_id);
+        r->event   = all.games[i].record_event;
+    }
+    return 0;
+}
+
+static GameCheckTiming s_sim_timing;
+
+void gamecheck_last_timing(GameCheckTiming *out)
+{
+    *out = s_sim_timing;
+}
+
+// PLAYGUARD_SIM_CHECK_MS (default 150) per game, as a console takes.
+u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
+                    bool (*on_game)(void *ctx, const GameFacts *game, u32 done), void *ctx)
+{
+    static GameCheck all;
+    sim_games(&all);
+    const char *ms_env = getenv("PLAYGUARD_SIM_CHECK_MS");
+    const long ms = ms_env ? strtol(ms_env, NULL, 10) : 150;
+    memset(out, 0, (size_t)count * sizeof(*out));
+    memset(&s_sim_timing, 0, sizeof s_sim_timing);
+    u32 done = 0;
+    while (done < count) {
+        GameFacts *g = &out[done];
+        g->app_id = records[done].app_id;
+        for (u32 i = 0; i < all.count; i++)
+            if (all.games[i].app_id == g->app_id) *g = all.games[i];
+        g->record_updated = records[done].updated;
+        g->record_event   = records[done].event;
+        if (ms > 0) {
+            const struct timespec pause = { ms / 1000, (ms % 1000) * 1000000L };
+            nanosleep(&pause, NULL);
+        }
+        done++;
+        s_sim_timing.games = done;
+        s_sim_timing.total_ns += ms > 0 ? (u64)ms * 1000000ULL : 0;
+        s_sim_timing.state_ns = s_sim_timing.total_ns;
+        if (on_game && !on_game(ctx, g, done)) break;
+    }
+    return done;
 }

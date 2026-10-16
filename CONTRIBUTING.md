@@ -39,7 +39,10 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_AUTOSYNC_OFF=1` | *Synchronise Clock via Internet* off |
 | `PLAYGUARD_SIM_NETWORK_OFFSET=1411` | A network clock that many seconds ahead of the console clock until it is set (the console clock follows it while *Synchronise* is on) |
 | `PLAYGUARD_SIM_NTP=offline` | No time server answers (a console without Internet) |
-| `PLAYGUARD_SIM_FAIL=timer,clock,unverified,bedtime` | Failures: the play-timer write, setting the clock, an unlock the system does not confirm, a bedtime the console does not take |
+| `PLAYGUARD_SIM_FAIL=timer,clock,unverified,bedtime,remove,launch,verify` | Failures: the play-timer write, setting the clock, an unlock the system does not confirm, a bedtime the console does not take, removing a game or a content, resetting a launch version, the integrity check |
+| `PLAYGUARD_SIM_CHECK_MS=150` | How long checking one installed game takes (*Tools › Check the installed games*) |
+| `PLAYGUARD_SIM_GAMES_OK=1` | Every installed game fine (*Tools › Check the installed games*; by default one of each problem) |
+
 | `PLAYGUARD_SIM_EMUMMC=1` | Running on emuMMC |
 | `PLAYGUARD_SIM_BLANK=1` | Atmosphère blanking the serial number |
 | `PLAYGUARD_SIM_APPLET=1` | Applet (album) mode |
@@ -77,7 +80,7 @@ Each job writes a summary on the run page (`tools/ci_summary.py`): what is being
 
 | Path | Content |
 |---|---|
-| `source/core/` | C, libnx: `pctl_ops`, `time_ops`, `sysinfo`, `playstats`, `platform`, `rescue`, `pure`, `calendar`, `write_guard` (these last four need no console and are shared with the simulator), `startup_hook` (times borealis' `userAppInit`, which libnx calls before `main`), `crash_handler` (PlayGuard's CPU exceptions to a crash file, before Atmosphère's report) |
+| `source/core/` | C, libnx: `pctl_ops`, `time_ops`, `sysinfo`, `playstats`, `gamecheck` (its rules in `gamecheck_rules`, shared with the simulator), `platform`, `rescue`, `pure`, `calendar`, `write_guard` (these last four need no console and are shared with the simulator), `startup_hook` (times borealis' `userAppInit`, which libnx calls before `main`), `crash_handler` (PlayGuard's CPU exceptions to a crash file, before Atmosphère's report) |
 | `source/tab/` | One class per tab |
 | `source/action/` | Flows, one per thing a tab does, with their UI-free logic in `*_logic.cpp` where there is one: the play-timer write and its recorder, the clock (and a console no time server answers), the PIN prompt and the console lock, settings backups and restores, the change history and undo, changes seen outside PlayGuard and timer health, the notification bell, the firmware screen, the recovery screen, reports and sending them online, updates, GitHub sign-in and development builds, the SD-card write queue, clearing the cache and the log files |
 | `source/activity/` | Screens: per-day editor, profiles, a game, first steps, change history, the notifications, firmware, recovery, the lock screen, the diagnostic report, what's new and the full changelog, the start-up error, the development builds, the loading screen (the start-up runs one step per frame under it; the intro keeps it 2 s) |

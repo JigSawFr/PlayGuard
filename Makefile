@@ -102,6 +102,8 @@ time_SRC   := source/core/time_ops.c source/core/calendar.c source/core/write_gu
 time_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/time_ops -Isource/core
 sysinfo_SRC   := source/core/sysinfo.c source/core/pure.c tests/sysinfo/test.c
 sysinfo_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/sysinfo -Isource/core
+gamecheck_SRC   := source/core/gamecheck.c source/core/gamecheck_rules.c source/core/write_guard.c tests/gamecheck/test.c
+gamecheck_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/gamecheck -Isource/core
 calendar_SRC   := source/core/calendar.c tests/calendar/test.c
 calendar_FLAGS := -std=gnu11 -Isource/core
 rescue_SRC   := source/core/rescue.c tests/rescue/test.c
@@ -188,6 +190,8 @@ dev_builds_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 dev_builds_LIBS  := -lz
 play_cache_SRC   := source/util/play_cache.cpp tests/play_cache/test.cpp
 play_cache_FLAGS := -std=c++17 -Isource
+game_cache_SRC   := source/util/game_cache.cpp tests/game_cache/test.cpp
+game_cache_FLAGS := -std=c++17 -Isource
 activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summary/test.cpp
 activity_summary_FLAGS := -std=c++17 -Isource
 pt_log_SRC   := source/util/paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp

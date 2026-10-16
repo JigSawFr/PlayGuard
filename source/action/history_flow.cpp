@@ -59,7 +59,8 @@ bool known_kind(const std::string& kind)
     static const char* known[] = { "limits", "level", "custom", "org", "vr", "alarm", "pin", "pin_shown",
                                    "unlock", "relock", "unlink", "delete", "clock", "restore", "rescue",
                                    "console_lock", "bedtime", "config_reset", "outside_reset", "outside_clock",
-                                   "outside_limits", "new_account", "time_up", "countdown" };
+                                   "outside_limits", "new_account", "time_up", "countdown", "remove_game",
+                                   "remove_update", "remove_addon", "launch_version" };
     for (const char* k : known)
         if (kind == k) return true;
     return false;

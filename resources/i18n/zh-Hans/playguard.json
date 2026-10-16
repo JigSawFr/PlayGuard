@@ -110,7 +110,9 @@
         "clock_not_set": "主机报告其网络时钟没有有效时间（可能从未设置过）；请查看“网络时钟”页",
         "no_internet": "主机未连接到互联网：请连接后重试",
         "service_denied": "系统拒绝PlayGuard访问其某项服务；PlayGuard需要运行Atmosphère的主机",
-        "pdm_unavailable": "主机的游玩数据服务目前不可用；请稍后重试"
+        "pdm_unavailable": "主机的游玩数据服务目前不可用；请稍后重试",
+        "corrupt_data": "数据已损坏：游戏文件已损坏；请删除游戏后重新安装",
+        "cancelled": "已取消"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -764,6 +766,151 @@
         "storage_note_emummc": "当前为emuMMC：sysMMC有自己的家长控制，PlayGuard在这里无法看到。请在那边也进行设置，或隐藏hekate的启动菜单。",
         "storage_note_sysmmc": "当前为sysMMC，且此SD卡上设置了emuMMC：它有自己的家长控制，PlayGuard在这里无法看到。请在那边也进行设置，或隐藏hekate的启动菜单。"
     },
+    "games": {
+        "open": "检查已安装的游戏",
+        "title": "已安装的游戏",
+        "note": "HOME菜单无法启动或显示的游戏（一直在加载的图标、“!”、虚线框），原因以及处理方法。在游戏上按A查看详情。",
+        "none": "已安装的{}个游戏看起来都正常。",
+        "err_list": "无法列出已安装的游戏",
+        "truncated": "仅检查了前{}个游戏。",
+        "many": "多个游戏同时出现问题：请在电脑上检查SD卡是否有错误，并确认主机启动所用的存储（当前为{}）与安装这些游戏时相同。从sysMMC安装的游戏无法在emuMMC中运行，反之亦然。",
+        "unnamed": "未知游戏（{}）",
+        "id": "标题ID：{}",
+        "cause": "原因",
+        "fix": "处理方法",
+        "remove": "从主机删除",
+        "remove_body": "删除会从主机和HOME菜单中清除游戏、其更新和追加内容。存档数据会保留。",
+        "removed": "已删除{}",
+        "remove_err": "无法删除游戏",
+        "issues": {
+            "archived": {
+                "short": "未安装任何内容（虚线）",
+                "cause": "主机列出了该游戏，但其内容已不再安装：已被归档，或其文件在主机以外被删除。",
+                "fix": "重新安装游戏，或删除该条目以清理HOME菜单。"
+            },
+            "storage": {
+                "short": "SD卡无法读取",
+                "cause": "游戏位于SD卡上，但主机目前无法读取该卡。",
+                "fix": "关闭主机，取出并重新插入SD卡，然后在电脑上检查错误。无需删除：文件仍在卡上。"
+            },
+            "no_base": {
+                "short": "缺少游戏本体（“!”）",
+                "cause": "仅安装了该游戏的更新或追加内容，没有安装游戏本体。",
+                "fix": "安装游戏本体，或删除该条目及其剩余内容。"
+            },
+            "files": {
+                "short": "安装已损坏",
+                "cause": "游戏或其更新的文件在安装位置缺失：安装被中断，或SD卡已损坏。",
+                "fix": "删除游戏后重新安装。如果多个游戏受影响，请先检查SD卡。"
+            },
+            "firmware": {
+                "short": "需要固件{}",
+                "cause": "游戏或其更新需要系统版本{}；本主机为{}。",
+                "fix": "请先将Atmosphère更新到支持新固件的版本，再更新固件：顺序颠倒会导致主机无法启动。或者安装旧版本的更新。",
+                "fix_update": "只有它的更新需要：删除更新即可在没有更新的情况下玩游戏（操作），或先更新Atmosphère，再更新固件。"
+            },
+            "launch": {
+                "short": "被主机拒绝",
+                "cause": "主机拒绝启动它：{}。通常需要更新版本的游戏更新。",
+                "fix": "安装游戏的最新更新。如果已安装，请删除游戏后重新安装。"
+            },
+            "no_control": {
+                "short": "名称和图标无法读取",
+                "cause": "游戏已安装，但无法读取其名称和图标：HOME菜单显示一直在加载的图标。",
+                "fix": "重新启动主机。如果图标仍在加载，请在设置 › 数据管理中检查数据，或删除游戏后重新安装。"
+            },
+            "needs_verify": {
+                "short": "数据已损坏",
+                "cause": "主机在此游戏中发现了损坏的数据，要求进行检查。",
+                "fix": "检查数据是否损坏（操作）。如已损坏，请删除游戏后重新安装。"
+            },
+            "key_too_new": {
+                "short": "密钥过新",
+                "cause": "此游戏使用此固件（{}）没有的密钥加密（密钥世代{}）。"
+            },
+            "ticket": {
+                "short": "缺少许可",
+                "cause": "此游戏需要主机上没有的许可（ticket）：它已被删除，或安装时未包含。",
+                "fix": "请从包含其ticket的完整副本重新安装游戏。"
+            },
+            "launch_version": {
+                "short": "要求已移除的更新",
+                "cause": "主机要求之前安装的内容：{}。当前安装的是：{}。更新已被移除或未完整安装。",
+                "fix": "重新接受已安装的版本（操作），或重新安装更新。"
+            }
+        },
+        "actions": "操作",
+        "action": {
+            "remove": "从主机删除游戏",
+            "remove_update": "删除更新（{}）",
+            "remove_addon": "删除追加内容 {}",
+            "reset_launch": "重新接受已安装的版本",
+            "verify": "检查数据是否损坏"
+        },
+        "remove_update_body": "只删除更新：游戏、追加内容和存档数据保留，主机将在没有更新的情况下启动游戏。",
+        "remove_addon_body": "只删除此追加内容：游戏、更新和存档数据保留。",
+        "update_removed": "{}：已删除更新",
+        "addon_removed": "{}：已删除追加内容",
+        "launch_reset": "{}：已重新接受已安装的版本",
+        "content_err": "无法删除",
+        "launch_err": "无法更改启动版本",
+        "verify_ok": "{}：未发现损坏的数据。",
+        "verify_bad": "{}：发现损坏的数据。请删除游戏后重新安装。",
+        "verify_err": "无法检查数据",
+        "verify_busy": "已有检查正在进行。",
+        "version": "版本{}",
+        "update_n": "更新 #{}",
+        "base_only": "不含更新的游戏",
+        "other_actions": "其他操作…",
+        "verify_note": "将读取游戏的所有文件：大型游戏需要几分钟。",
+        "verify_cancelled": "已取消检查。",
+        "section_count": "有问题的游戏：{} / {}",
+        "fixed": "{}：已修复，可以再次运行。",
+        "fix_button": {
+            "verify": "检查数据",
+            "reset_launch": "接受此版本",
+            "remove_update": "删除更新",
+            "remove": "删除游戏"
+        },
+        "searching": "正在查找已安装的游戏…",
+        "checking": "正在检查游戏… {} / {}",
+        "check_again": "重新检查",
+        "checked_now": "刚刚检查。",
+        "checked_min": "{}分钟前检查。",
+        "checked_h": "{}小时前检查。",
+        "verify_title": "正在检查数据",
+        "verify_preparing": "正在准备…",
+        "verify_amount": "{} / {}",
+        "verify_left_less": "剩余不到1分钟",
+        "verify_left_min": "剩余约{}分钟",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ".",
+        "verify_code": "主机代码：{}",
+        "groups": {
+            "fix": "可在此修复 ({})",
+            "reinstall": "需重新安装 ({})",
+            "system": "固件或 SD 卡 ({})"
+        },
+        "group_note": {
+            "fix": "PlayGuard 可以修复：在游戏上按 A，然后选第一个按钮。",
+            "reinstall": "文件缺失或无法使用。先保存列表，在此删除（在此之前安装工具会认为它们已安装），然后按名称搜索重新安装。",
+            "system": "游戏本身没问题：问题在主机固件或 SD 卡。请更新固件，或从安装这些游戏时的存储启动。"
+        },
+        "save_list": "保存这些游戏的列表",
+        "list_saved": "列表已保存：{}",
+        "list_err": "无法保存列表",
+        "list_title": "需重新安装的游戏",
+        "col_name": "游戏",
+        "col_id": "Title ID",
+        "col_version": "版本",
+        "col_problem": "问题",
+        "remove_all": "删除这 {} 个游戏",
+        "remove_all_body": "这 {} 个游戏将连同更新和追加内容从主机删除，以便重新安装。删除前会先把列表保存到 PlayGuard 的导出文件夹。存档会保留。",
+        "removing": "正在删除游戏… {}/{}",
+        "removed_all": "已删除 {} 个游戏。列表：{}",
+        "removed_some": "已删除 {} 个游戏（共 {} 个）。列表：{}"
+    },
     "about": {
         "section_changelog": "{} 更新内容",
         "changelog_note": "早期版本：{}",
@@ -1058,6 +1205,10 @@
             "outside_limits": "在PlayGuard之外更改的限制",
             "new_account": "新用户（PlayGuard发现）",
             "time_up": "时间到时",
+            "remove_game": "已删除游戏",
+            "remove_update": "已删除更新",
+            "remove_addon": "已删除追加内容",
+            "launch_version": "已重置启动版本",
             "countdown": "游戏时间倒计时"
         },
         "sources": {
@@ -1172,6 +1323,9 @@
         "crash": "PlayGuard 上次意外关闭",
         "sd_write": "PlayGuard 无法写入 SD 卡",
         "sd_write_detail": "{} 未能保存。请检查 SD 卡：已满、只读（锁定开关）或有错误。",
+        "games_one": "有 1 款已安装的游戏无法启动",
+        "games": "有 {} 款已安装的游戏无法启动",
+        "games_more": "{}，另有 {} 款",
         "rescue_old": "恢复 sysmodule 不是最新版本",
         "rescue_old_detail": "它来自 PlayGuard {}。请将 PlayGuard {} 的 playguard-rescue.zip 解压到 SD 卡根目录，然后重启主机。",
         "rescue_unknown": "它安装于记录版本号之前。请将 PlayGuard {} 的 playguard-rescue.zip 解压到 SD 卡根目录，然后重启主机。",

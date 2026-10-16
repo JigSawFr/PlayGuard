@@ -90,6 +90,9 @@ config_file = os.path.join(run_dir, "playguard_data", "config.json")
 # What belongs to the simulated system (a sysMMC: util/nand.hpp): its history,
 # watch.json, backups and play-data cache.
 nand_dir = os.path.join(run_dir, "playguard_data", "nand", "sysmmc")
+games_cache = os.path.join(nand_dir, "cache", "games.bin")
+if os.path.exists(games_cache):
+    os.remove(games_cache)   # Installed games: the first check is this run's
 if (GATE or ERRORS or DEVBUILD or UPDATE) and os.path.exists(config_file):
     os.remove(config_file)   # no remembered choice, developer mode off
 if DEVBUILD:
@@ -126,6 +129,11 @@ env.setdefault("PLAYGUARD_SIM_STILL_FOCUS", "1")
 # (app.cpp): the header's version badge, and the update offers (1.1.0 below)
 # stay the same once this build is 1.1.0 or later.
 env.setdefault("PLAYGUARD_SIM_VERSION", "1.0.0:1a2b3c4")
+# The installed games are checked at start-up for the notification bell:
+# at once in every scenario but the default one, which watches a check go
+# game by game (150 ms each) and waits for the start-up one first.
+if SCENARIO:
+    env.setdefault("PLAYGUARD_SIM_CHECK_MS", "0")
 if GATE:
     env.setdefault("PLAYGUARD_SIM_FW", "24.0.0")
     env.setdefault("PLAYGUARD_SIM_LATEST", "1.1.0:24.0.0")
@@ -463,6 +471,14 @@ for _ in range(60):
 else:
     fail("no first screen after the loading screen in 30 s")
 time.sleep(2)
+if not SCENARIO:
+    # The start-up check of the installed games: the bell counts them.
+    for _ in range(40):
+        if logged("games: start-up check done"):
+            break
+        time.sleep(0.25)
+    else:
+        fail("the installed games were not checked at start-up")
 # The intro (Preferences, on by default): the loading screen stays 2 s.
 intro = logged("start-up: intro, 2000 ms at least")
 if LOCK and intro:
@@ -852,8 +868,8 @@ if OUTSIDE:
     time.sleep(6)              # the next refresh shows it
     shot("02_not_counting")
     key("y")                   # the notification bell's list (the keyboard's Y): both, the
-    if not logged("notices: 4 to do"):   # simulated network clock (not accurate) and PIN (1234)
-        fail("the notification bell does not hold the four notices to do")
+    if not logged("notices: 5 to do"):   # simulated network clock (not accurate), PIN (1234), broken games
+        fail("the notification bell does not hold the five notices to do")
     shot("03_notices")
     key("Escape")
     key("Down")                # Play timer: its state line says it too
@@ -1074,6 +1090,102 @@ if upload_count() != uploads_before + 1:
     fail("the gist link was not recorded in " + uploads)
 key("Return")              # OK
 os.remove(github_token)
+
+# Installed games: the simulated console's broken games in three sections
+# (fixed here, to reinstall, firmware or SD card), the fixes of the first, a
+# removal (recorded in the change history) in the second, the third.
+key("Down", 4)             # past Keep, Keep for, Keep up to: Check the installed games
+os.remove(games_cache)     # made by the start-up check: this screen's first check, game by game
+key("Return")
+time.sleep(0.8)
+shot("27_games_checking")  # the games shown as they are checked, with the count
+time.sleep(3)              # 15 games, 150 ms each
+shot("27_games")           # Fix here: Forest Tales, Robot Factory, Moon Racer, an unnamed game; then Reinstall
+if not os.path.exists(games_cache):
+    fail("the installed games check was not cached in " + games_cache)
+# Opened again: the cache at once, nothing to check again.
+key("Escape")
+key("Return")
+time.sleep(0.6)
+shot("27_games_cached")
+# Forest Tales: the console found corrupt data; its check runs in a dialog
+# with its progress and Cancel.
+key("Return")              # icon, why, what to do
+shot("27_games_details")   # Check the data (the fix, focused), Other actions
+key("Return")              # Check the data for corruption (the fix)
+time.sleep(2.6)            # past the first seconds: the time left shows
+shot("27_games_verifying")
+time.sleep(3)
+shot("27_games_verified")  # corrupt data found
+key("Return")              # OK
+# The check again, cancelled.
+key("Return")
+key("Return")
+key("Escape")              # B: cancel
+time.sleep(1)
+if not any(m == "Check cancelled." for m in messages()):
+    fail("the check was not cancelled: " + repr(messages()[-3:]))
+# Robot Factory: only its update needs a newer firmware; removing the update
+# (the fix, the first button) makes it work again.
+key("Down")
+key("Return")
+shot("27_games_update")    # Remove the update (version 2.1.0)
+key("Return")              # the fix
+key("Right")               # Remove
+key("Return")
+time.sleep(1.5)            # the toast follows the games read again
+shot("27_games_update_removed")
+if not any(m.endswith("works again.") and m.startswith("Robot Factory") for m in messages()):
+    fail("the update removal did not fix the game: " + repr(messages()[-3:]))
+# Moon Racer: the console asks for a removed update; accepting the installed
+# version again (the fix, no question) makes it work again.
+key("Up", 6)               # the first game
+key("Down")                # past Forest Tales
+key("Return")
+shot("27_games_launch")
+key("Return")              # Accept the installed version again
+time.sleep(1.5)            # the toast follows the games read again
+if not any(m.endswith("works again.") and m.startswith("Moon Racer") for m in messages()):
+    fail("the launch version reset did not fix the game: " + repr(messages()[-3:]))
+# To reinstall: Garden Defenders (an update without its game), removed.
+key("Up", 6)               # the first game
+key("Down", 3)             # past Forest Tales, the unnamed game, Hedgehog Rush
+shot("27_games_reinstall")
+key("Return")
+shot("27_games_actions")   # Remove the game (the fix), Other actions
+key("Return")              # Remove the game from the console
+key("Right")               # Remove
+key("Return")
+time.sleep(1.5)
+shot("27_games_removed")
+if not any(m.endswith("removed") for m in messages()):
+    fail("the broken game was not removed: " + repr(messages()[-3:]))
+# The rest of Reinstall: their list saved, then all of them removed at once
+# (the list saved again first), each in the change history.
+exports_dir = os.path.join(run_dir, "playguard_data", "exports")
+key("Down", 2)             # past Castle Siege: Save the list of these games
+shot("27_games_reinstall_actions")
+key("Return")
+time.sleep(0.5)
+lists = glob.glob(os.path.join(exports_dir, "games_to_reinstall_*.json"))
+if not lists or not os.path.exists(lists[0][:-4] + "txt"):
+    fail("the list of the games to reinstall was not saved in " + exports_dir)
+with open(lists[0], encoding="utf-8") as f:
+    if "Ocean Explorer" not in f.read():
+        fail("the saved list does not name Ocean Explorer: " + lists[0])
+key("Down")                # Remove these 3 games
+key("Return")
+shot("27_games_remove_all")
+key("Right")               # Remove
+key("Return")
+time.sleep(2)
+shot("27_games_removed_all")
+if not any(m.startswith("3 games removed.") for m in messages()):
+    fail("the games to reinstall were not all removed: " + repr(messages()[-3:]))
+# Firmware or SD card: Star Pilots, the last game.
+key("Down", 4)
+shot("27_games_system")
+key("Escape")
 
 # Activity: one game's screen, then a PDF export to the (simulated) SD card.
 exports = os.path.join(run_dir, "playguard_data", "exports")

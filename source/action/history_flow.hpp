@@ -27,7 +27,9 @@ std::vector<int> custom_values(const PctlCustomSettings& s);
 // change itself went through.
 void record_values(const char* kind, std::vector<int> before, std::vector<int> after,
                    const std::string& source = "", const std::string& detail = "");
-// An action with no value to put back ("pin", "unlock", "unlink", …).
+// An action with no value to put back ("pin", "unlock", "unlink",
+// "remove_game" / "remove_update" / "remove_addon" / "launch_version" with
+// the game in `detail`, …).
 void record_event(const char* kind, const std::string& source = "", const std::string& detail = "");
 // A change the console refused with `rc`: what was tried (`after`, from
 // `before` when known), never undoable. Nothing changed, so the outside

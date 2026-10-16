@@ -110,7 +110,9 @@
         "clock_not_set": "the console reports that its network clock has no valid time (it may never have been set); see the Network clock tab",
         "no_internet": "the console is not connected to the internet: connect it, then try again",
         "service_denied": "the system refused PlayGuard access to one of its services; PlayGuard needs a console running Atmosphère",
-        "pdm_unavailable": "the console's play-data service is not available right now; try again in a moment"
+        "pdm_unavailable": "the console's play-data service is not available right now; try again in a moment",
+        "corrupt_data": "corrupt data: the game's files are damaged; remove the game and install it again",
+        "cancelled": "cancelled"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -764,6 +766,151 @@
         "storage_note_emummc": "This is emuMMC: sysMMC has its own parental controls, which PlayGuard cannot see from here. Set them there too, or hide the hekate boot menu.",
         "storage_note_sysmmc": "This is sysMMC, and an emuMMC is set up on this SD card: it has its own parental controls, which PlayGuard cannot see from here. Set them there too, or hide the hekate boot menu."
     },
+    "games": {
+        "open": "Check the installed games",
+        "title": "Installed games",
+        "note": "The games the HOME menu cannot start or draw (an icon that keeps loading, \"!\", a dotted frame), why, and what to do. A on a game for the details.",
+        "none": "All {} installed games look fine.",
+        "err_list": "The installed games could not be listed",
+        "truncated": "Only the first {} games were checked.",
+        "many": "Several games at once: check the SD card for errors on a computer, and that the console started on the same storage ({} now) as when these games were installed. A game installed from sysMMC does not work from emuMMC, and the other way round.",
+        "unnamed": "Unknown game ({})",
+        "id": "Title ID: {}",
+        "cause": "Cause",
+        "fix": "What to do",
+        "remove": "Remove from the console",
+        "remove_body": "Removing deletes the game, its update and its add-ons from the console and the HOME menu. Save data stays.",
+        "removed": "{} removed",
+        "remove_err": "Could not remove the game",
+        "issues": {
+            "archived": {
+                "short": "Nothing installed (dotted frame)",
+                "cause": "The console lists the game, but nothing of it is installed any more: it was archived, or its files were deleted outside the console.",
+                "fix": "Install the game again, or remove its entry to clean up the HOME menu."
+            },
+            "storage": {
+                "short": "SD card unreadable",
+                "cause": "The game is on the SD card, which the console cannot read right now.",
+                "fix": "Turn the console off, take the SD card out and put it back, then check it for errors on a computer. Nothing to remove: the files are still on the card."
+            },
+            "no_base": {
+                "short": "Game missing (\"!\")",
+                "cause": "Only an update or an add-on of this game is installed, not the game itself.",
+                "fix": "Install the game itself, or remove the entry and what is left of it."
+            },
+            "files": {
+                "short": "Damaged installation",
+                "cause": "Files of the game or of its update are missing where they are installed: an installation that was interrupted, or a damaged SD card.",
+                "fix": "Remove the game, then install it again. If several games are affected, check the SD card first."
+            },
+            "firmware": {
+                "short": "Needs firmware {}",
+                "cause": "The game or its update needs system version {}; this console runs {}.",
+                "fix": "Update Atmosphère first, to a version that supports the new firmware, then the firmware: in the other order the console no longer starts. Or install an older version of the update.",
+                "fix_update": "Only its update needs it: remove the update to play the game without it (Actions), or update Atmosphère first, then the firmware."
+            },
+            "launch": {
+                "short": "Refused by the console",
+                "cause": "The console refuses to start it: {}. Usually a newer update of the game is required.",
+                "fix": "Install the game's latest update. If it is already installed, remove the game and install it again."
+            },
+            "no_control": {
+                "short": "Name and icon unreadable",
+                "cause": "The game is installed, but its name and icon cannot be read: the HOME menu shows an icon that keeps loading.",
+                "fix": "Restart the console. If the icon still loads, check the data in System Settings › Data Management, or remove the game and install it again."
+            },
+            "needs_verify": {
+                "short": "Corrupt data",
+                "cause": "The console found corrupt data in this game and asks for it to be checked.",
+                "fix": "Check the data for corruption (Actions). If it is corrupt, remove the game and install it again."
+            },
+            "key_too_new": {
+                "short": "Keys too new",
+                "cause": "The game is encrypted with keys this firmware ({}) does not have (key generation {})."
+            },
+            "ticket": {
+                "short": "License missing",
+                "cause": "The game needs a license (ticket) that is not on the console: it was deleted, or the installation did not include it.",
+                "fix": "Install the game again from a complete copy that includes its ticket."
+            },
+            "launch_version": {
+                "short": "Asks for a removed update",
+                "cause": "The console asks for {} of the game, installed earlier. Installed now: {}. The update was removed or did not install completely.",
+                "fix": "Accept the installed version again (Actions), or install the update again."
+            }
+        },
+        "actions": "Actions",
+        "action": {
+            "remove": "Remove the game from the console",
+            "remove_update": "Remove the update ({})",
+            "remove_addon": "Remove the add-on {}",
+            "reset_launch": "Accept the installed version again",
+            "verify": "Check the data for corruption"
+        },
+        "remove_update_body": "Only the update is deleted: the game, its add-ons and its save data stay, and the console starts the game without the update.",
+        "remove_addon_body": "Only this add-on is deleted: the game, its update and its save data stay.",
+        "update_removed": "{}: update removed",
+        "addon_removed": "{}: add-on removed",
+        "launch_reset": "{}: the installed version is accepted again",
+        "content_err": "Could not remove it",
+        "launch_err": "Could not change the launch version",
+        "verify_ok": "{}: no corrupt data found.",
+        "verify_bad": "{}: corrupt data found. Remove the game and install it again.",
+        "verify_err": "Could not check the data",
+        "verify_busy": "A check is already running.",
+        "version": "version {}",
+        "update_n": "update #{}",
+        "base_only": "the game without its updates",
+        "other_actions": "Other actions…",
+        "verify_note": "Every file of the game is read: a big game takes a few minutes.",
+        "verify_cancelled": "Check cancelled.",
+        "section_count": "Games with a problem: {} of {}",
+        "fixed": "{}: fixed, it works again.",
+        "fix_button": {
+            "verify": "Check the data",
+            "reset_launch": "Accept this version",
+            "remove_update": "Remove the update",
+            "remove": "Remove the game"
+        },
+        "searching": "Looking for the installed games…",
+        "checking": "Checking the games… {} of {}",
+        "check_again": "Check again",
+        "checked_now": "Checked just now.",
+        "checked_min": "Checked {} min ago.",
+        "checked_h": "Checked {} h ago.",
+        "verify_title": "Checking the data",
+        "verify_preparing": "Getting ready…",
+        "verify_amount": "{} of {}",
+        "verify_left_less": "less than a minute left",
+        "verify_left_min": "about {} min left",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ".",
+        "verify_code": "Code from the console: {}",
+        "groups": {
+            "fix": "Fix here ({})",
+            "reinstall": "Reinstall ({})",
+            "system": "Firmware or SD card ({})"
+        },
+        "group_note": {
+            "fix": "PlayGuard can repair these: A on a game, then its first button.",
+            "reinstall": "Their files are gone or unusable. Save their list, remove them here (an installer counts them as installed until then), then install them again by searching for their name.",
+            "system": "The games are fine: the console's firmware or SD card is the problem. Update the firmware, or start on the storage they were installed on."
+        },
+        "save_list": "Save the list of these games",
+        "list_saved": "List saved: {}",
+        "list_err": "Could not save the list",
+        "list_title": "Games to reinstall",
+        "col_name": "Game",
+        "col_id": "Title ID",
+        "col_version": "Version",
+        "col_problem": "Problem",
+        "remove_all": "Remove these {} games",
+        "remove_all_body": "These {} games are removed from the console, with their updates and add-ons, so they can be installed again. Their list is saved first, in PlayGuard's exports folder. Save data stays.",
+        "removing": "Removing the games… {} of {}",
+        "removed_all": "{} games removed. Their list: {}",
+        "removed_some": "{} of {} games removed. Their list: {}"
+    },
     "about": {
         "section_changelog": "What's new in {}",
         "changelog_note": "Earlier versions: {}",
@@ -1058,6 +1205,10 @@
             "outside_limits": "Limits changed outside PlayGuard",
             "new_account": "New user account (seen by PlayGuard)",
             "time_up": "When the time is up",
+            "remove_game": "Game removed",
+            "remove_update": "Update removed",
+            "remove_addon": "Add-on removed",
+            "launch_version": "Launch version reset",
             "countdown": "Play-time countdown"
         },
         "sources": {
@@ -1172,6 +1323,9 @@
         "crash": "PlayGuard closed unexpectedly last time",
         "sd_write": "PlayGuard could not write to the SD card",
         "sd_write_detail": "{} was not saved. Check the SD card: full, read-only (the lock switch) or with errors.",
+        "games_one": "One installed game cannot start",
+        "games": "{} installed games cannot start",
+        "games_more": "{} and {} more",
         "rescue_old": "The recovery sysmodule is out of date",
         "rescue_old_detail": "It comes with PlayGuard {}. Extract playguard-rescue.zip of PlayGuard {} at the SD card root, then restart the console.",
         "rescue_unknown": "It was installed before it said which version it is. Extract playguard-rescue.zip of PlayGuard {} at the SD card root, then restart the console.",

@@ -110,7 +110,9 @@
         "clock_not_set": "de console meldt dat de netwerkklok geen geldige tijd heeft (misschien is die nooit ingesteld); zie het tabblad Netwerkklok",
         "no_internet": "de console is niet met internet verbonden: verbind hem en probeer het opnieuw",
         "service_denied": "het systeem weigerde PlayGuard toegang tot een van zijn diensten; PlayGuard heeft een console met Atmosphère nodig",
-        "pdm_unavailable": "de speelgegevensdienst van de console is nu niet beschikbaar; probeer het zo opnieuw"
+        "pdm_unavailable": "de speelgegevensdienst van de console is nu niet beschikbaar; probeer het zo opnieuw",
+        "corrupt_data": "beschadigde data: de bestanden van de game zijn beschadigd; verwijder de game en installeer hem opnieuw",
+        "cancelled": "geannuleerd"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -764,6 +766,151 @@
         "storage_note_emummc": "Dit is de emuMMC: de sysMMC heeft een eigen ouderlijk toezicht, dat PlayGuard van hieruit niet kan zien. Stel het daar ook in, of verberg het opstartmenu van hekate.",
         "storage_note_sysmmc": "Dit is de sysMMC, en op deze SD-kaart is een emuMMC ingesteld: die heeft een eigen ouderlijk toezicht, dat PlayGuard van hieruit niet kan zien. Stel het daar ook in, of verberg het opstartmenu van hekate."
     },
+    "games": {
+        "open": "Geïnstalleerde games controleren",
+        "title": "Geïnstalleerde games",
+        "note": "De games die het HOME-menu niet kan starten of tonen (een icoon dat blijft laden, \"!\", een gestippeld kader), waarom, en wat je kunt doen. A op een game voor de details.",
+        "none": "Alle {} geïnstalleerde games lijken in orde.",
+        "err_list": "De geïnstalleerde games konden niet worden opgesomd",
+        "truncated": "Alleen de eerste {} games zijn gecontroleerd.",
+        "many": "Meerdere games tegelijk: controleer de SD-kaart op een computer, en of de console is opgestart vanaf hetzelfde geheugen ({} nu) als toen deze games werden geïnstalleerd. Een game die vanaf sysMMC is geïnstalleerd werkt niet vanaf emuMMC, en andersom.",
+        "unnamed": "Onbekende game ({})",
+        "id": "Titel-ID: {}",
+        "cause": "Oorzaak",
+        "fix": "Wat te doen",
+        "remove": "Van de console verwijderen",
+        "remove_body": "Verwijderen wist de game, de update en de extra content van de console en uit het HOME-menu. Opgeslagen data blijven bewaard.",
+        "removed": "{} verwijderd",
+        "remove_err": "De game kon niet worden verwijderd",
+        "issues": {
+            "archived": {
+                "short": "Niets geïnstalleerd (gestippeld)",
+                "cause": "De console toont de game, maar er is niets meer van geïnstalleerd: hij is gearchiveerd, of de bestanden zijn buiten de console gewist.",
+                "fix": "Installeer de game opnieuw, of verwijder de vermelding om het HOME-menu op te ruimen."
+            },
+            "storage": {
+                "short": "SD-kaart onleesbaar",
+                "cause": "De game staat op de SD-kaart, die de console nu niet kan lezen.",
+                "fix": "Zet de console uit, haal de SD-kaart eruit en plaats hem terug, en controleer hem daarna op een computer. Niets te verwijderen: de bestanden staan nog op de kaart."
+            },
+            "no_base": {
+                "short": "Game ontbreekt (\"!\")",
+                "cause": "Alleen een update of extra content van deze game is geïnstalleerd, niet de game zelf.",
+                "fix": "Installeer de game zelf, of verwijder de vermelding en wat ervan over is."
+            },
+            "files": {
+                "short": "Beschadigde installatie",
+                "cause": "Bestanden van de game of de update ontbreken waar ze geïnstalleerd zijn: een onderbroken installatie of een beschadigde SD-kaart.",
+                "fix": "Verwijder de game en installeer hem opnieuw. Gaat het om meerdere games, controleer dan eerst de SD-kaart."
+            },
+            "firmware": {
+                "short": "Vereist firmware {}",
+                "cause": "De game of de update vereist systeemversie {}; deze console draait {}.",
+                "fix": "Werk eerst Atmosphère bij naar een versie die de nieuwe firmware ondersteunt, daarna de firmware: in de andere volgorde start de console niet meer. Of installeer een oudere versie van de update.",
+                "fix_update": "Alleen de update heeft hem nodig: verwijder de update om de game zonder te spelen (Acties), of werk eerst Atmosphère bij en daarna de firmware."
+            },
+            "launch": {
+                "short": "Geweigerd door de console",
+                "cause": "De console weigert hem te starten: {}. Meestal is een nieuwere update van de game nodig.",
+                "fix": "Installeer de nieuwste update van de game. Is die al geïnstalleerd, verwijder de game dan en installeer hem opnieuw."
+            },
+            "no_control": {
+                "short": "Naam en icoon onleesbaar",
+                "cause": "De game is geïnstalleerd, maar de naam en het icoon kunnen niet worden gelezen: het HOME-menu toont een icoon dat blijft laden.",
+                "fix": "Start de console opnieuw. Blijft het icoon laden, controleer dan de data via Systeeminstellingen › Databeheer, of verwijder de game en installeer hem opnieuw."
+            },
+            "needs_verify": {
+                "short": "Beschadigde data",
+                "cause": "De console heeft beschadigde data in deze game gevonden en vraagt om een controle.",
+                "fix": "Controleer de data op beschadiging (Acties). Zijn ze beschadigd, verwijder de game dan en installeer hem opnieuw."
+            },
+            "key_too_new": {
+                "short": "Sleutels te nieuw",
+                "cause": "De game is versleuteld met sleutels die deze firmware ({}) niet heeft (sleutelgeneratie {})."
+            },
+            "ticket": {
+                "short": "Licentie ontbreekt",
+                "cause": "De game heeft een licentie (ticket) nodig die niet op de console staat: die is gewist, of de installatie bevatte hem niet.",
+                "fix": "Installeer de game opnieuw vanaf een volledige kopie met zijn ticket."
+            },
+            "launch_version": {
+                "short": "Vraagt om een verwijderde update",
+                "cause": "De console vraagt om wat eerder geïnstalleerd was: {}. Nu geïnstalleerd: {}. De update is verwijderd of niet volledig geïnstalleerd.",
+                "fix": "Accepteer de geïnstalleerde versie weer (Acties), of installeer de update opnieuw."
+            }
+        },
+        "actions": "Acties",
+        "action": {
+            "remove": "Game van de console verwijderen",
+            "remove_update": "Update verwijderen ({})",
+            "remove_addon": "Extra content {} verwijderen",
+            "reset_launch": "Geïnstalleerde versie weer accepteren",
+            "verify": "Data op beschadiging controleren"
+        },
+        "remove_update_body": "Alleen de update wordt gewist: de game, de extra content en de opgeslagen data blijven, en de console start de game zonder de update.",
+        "remove_addon_body": "Alleen deze extra content wordt gewist: de game, de update en de opgeslagen data blijven.",
+        "update_removed": "{}: update verwijderd",
+        "addon_removed": "{}: extra content verwijderd",
+        "launch_reset": "{}: de geïnstalleerde versie wordt weer geaccepteerd",
+        "content_err": "Kon niet worden verwijderd",
+        "launch_err": "De startversie kon niet worden gewijzigd",
+        "verify_ok": "{}: geen beschadigde data gevonden.",
+        "verify_bad": "{}: beschadigde data gevonden. Verwijder de game en installeer hem opnieuw.",
+        "verify_err": "De data konden niet worden gecontroleerd",
+        "verify_busy": "Er loopt al een controle.",
+        "version": "versie {}",
+        "update_n": "update nr. {}",
+        "base_only": "de game zonder updates",
+        "other_actions": "Andere acties…",
+        "verify_note": "Elk bestand van de game wordt gelezen: een grote game duurt een paar minuten.",
+        "verify_cancelled": "Controle geannuleerd.",
+        "section_count": "Games met een probleem: {} van {}",
+        "fixed": "{}: hersteld, hij werkt weer.",
+        "fix_button": {
+            "verify": "Data controleren",
+            "reset_launch": "Deze versie accepteren",
+            "remove_update": "Update verwijderen",
+            "remove": "Game verwijderen"
+        },
+        "searching": "Geïnstalleerde games worden gezocht…",
+        "checking": "Games worden gecontroleerd… {} van {}",
+        "check_again": "Opnieuw controleren",
+        "checked_now": "Zojuist gecontroleerd.",
+        "checked_min": "{} min geleden gecontroleerd.",
+        "checked_h": "{} u geleden gecontroleerd.",
+        "verify_title": "Data worden gecontroleerd",
+        "verify_preparing": "Voorbereiden…",
+        "verify_amount": "{} van {}",
+        "verify_left_less": "minder dan een minuut",
+        "verify_left_min": "nog ongeveer {} min",
+        "size_mb": "{} MB",
+        "size_gb": "{} GB",
+        "decimal_mark": ",",
+        "verify_code": "Code van de console: {}",
+        "groups": {
+            "fix": "Hier te repareren ({})",
+            "reinstall": "Opnieuw installeren ({})",
+            "system": "Firmware of SD-kaart ({})"
+        },
+        "group_note": {
+            "fix": "PlayGuard kan ze repareren: A op een game, dan de eerste knop.",
+            "reinstall": "Hun bestanden ontbreken of zijn onbruikbaar. Sla hun lijst op, verwijder ze hier (tot dan ziet een installer ze als geïnstalleerd) en installeer ze opnieuw door op hun naam te zoeken.",
+            "system": "De games zijn in orde: de firmware van de console of de SD-kaart is het probleem. Werk de firmware bij, of start op de opslag waarop ze zijn geïnstalleerd."
+        },
+        "save_list": "Lijst van deze games opslaan",
+        "list_saved": "Lijst opgeslagen: {}",
+        "list_err": "De lijst kon niet worden opgeslagen",
+        "list_title": "Opnieuw te installeren games",
+        "col_name": "Game",
+        "col_id": "Title ID",
+        "col_version": "Versie",
+        "col_problem": "Probleem",
+        "remove_all": "Deze {} games verwijderen",
+        "remove_all_body": "Deze {} games worden met hun updates en extra content van de console verwijderd, zodat ze opnieuw kunnen worden geïnstalleerd. Hun lijst wordt eerst opgeslagen in de exportmap van PlayGuard. Opgeslagen data blijft.",
+        "removing": "Games verwijderen… {} van {}",
+        "removed_all": "{} games verwijderd. Hun lijst: {}",
+        "removed_some": "{} van {} games verwijderd. Hun lijst: {}"
+    },
     "about": {
         "section_changelog": "Nieuw in {}",
         "changelog_note": "Eerdere versies: {}",
@@ -1058,6 +1205,10 @@
             "outside_limits": "Limieten buiten PlayGuard gewijzigd",
             "new_account": "Nieuw gebruikersaccount (gezien door PlayGuard)",
             "time_up": "Als de tijd om is",
+            "remove_game": "Game verwijderd",
+            "remove_update": "Update verwijderd",
+            "remove_addon": "Extra content verwijderd",
+            "launch_version": "Startversie hersteld",
             "countdown": "Aftellen van de speeltijd"
         },
         "sources": {
@@ -1172,6 +1323,9 @@
         "crash": "PlayGuard is de vorige keer onverwacht gesloten",
         "sd_write": "PlayGuard kon niet naar de SD-kaart schrijven",
         "sd_write_detail": "{} is niet opgeslagen. Controleer de SD-kaart: vol, alleen-lezen (het schuifje) of met fouten.",
+        "games_one": "Eén geïnstalleerde game kan niet starten",
+        "games": "{} geïnstalleerde games kunnen niet starten",
+        "games_more": "{} en nog {}",
         "rescue_old": "De herstel-sysmodule is verouderd",
         "rescue_old_detail": "Hij hoort bij PlayGuard {}. Pak playguard-rescue.zip van PlayGuard {} uit in de hoofdmap van de SD-kaart en start de console opnieuw.",
         "rescue_unknown": "Hij is geïnstalleerd voordat hij zijn versie vermeldde. Pak playguard-rescue.zip van PlayGuard {} uit in de hoofdmap van de SD-kaart en start de console opnieuw.",
