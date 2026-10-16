@@ -99,6 +99,12 @@ void keep_focus(brls::Activity* activity, brls::View* fallback)
     if (gone) brls::Application::giveFocus(fallback ? fallback : activity->getContentView());
 }
 
+bool has_focus(brls::Activity* activity)
+{
+    brls::View* focus = brls::Application::getCurrentFocus();
+    return focus && focus->getParentActivity() == activity;
+}
+
 void go_to_tab(brls::View* from, int position)
 {
     brls::TabFrame* frame = nullptr;

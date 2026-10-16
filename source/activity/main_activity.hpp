@@ -11,6 +11,7 @@ class MainActivity : public brls::Activity
     CONTENT_FROM_XML_RES("activity/main.xml");
 
     void onContentAvailable() override;
+    void onResume() override;
 
     ~MainActivity() override;
 

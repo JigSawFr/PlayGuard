@@ -206,6 +206,11 @@ void set_visible_all(std::initializer_list<std::pair<brls::View*, bool>> changes
 // view) gets it first.
 void keep_focus(brls::Activity* activity, brls::View* fallback = nullptr);
 
+// Whether `activity` has the focus: nothing (a dialog, another screen) is
+// open over it. Unlike the top of borealis' stack, true again as soon as a
+// dialog over it starts closing.
+bool has_focus(brls::Activity* activity);
+
 // Sidebar positions of the main screen tabs, in the order of
 // resources/xml/activity/main.xml (separators count as positions).
 namespace tab
