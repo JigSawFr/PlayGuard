@@ -7,7 +7,7 @@ MQTT broker, and take orders from it. Home Assistant then shows the console as
 a device (limits, time left, play time per game, bedtime, restrictions) and
 can change the limits, add extra time or lock the console from a dashboard or
 an automation. The link is **optional and off by default**, stays on your
-local network, and works with any MQTT broker; the Mosquitto add-on of Home
+local network, and works with any MQTT broker; the Mosquitto app of Home
 Assistant is the easy path.
 
 > [!NOTE]
@@ -20,12 +20,12 @@ Assistant is the easy path.
 
 - Home Assistant **2026.5 or later** (the bedtime's `time` entities: an older
   one refuses the whole device), with the **MQTT** integration set up, and a broker: the
-  **Mosquitto broker** add-on (Settings › Add-ons) or any other MQTT broker,
+  **Mosquitto broker** app (Settings › Apps; an add-on in older Home Assistant) or any other MQTT broker,
   in version 5.0 or 3.1.1 (EMQX, HiveMQ, NanoMQ, VerneMQ …): *Remote access ›
   MQTT version* is automatic (5.0, else 3.1.1).
-- A broker user for PlayGuard. With the Mosquitto add-on, any Home Assistant
+- A broker user for PlayGuard. With the Mosquitto app, any Home Assistant
   user can log in: create one named `playguard` (Settings › People › Users,
-  "can only log in from the local network"), or add a login in the add-on's
+  "can only log in from the local network"), or add a login in the app's
   configuration.
 - The console on the same network as the broker, with a PlayGuard that has
   *Preferences › Remote access*.
@@ -34,7 +34,7 @@ Assistant is the easy path.
 
 1. Open PlayGuard › **Preferences › Remote access › MQTT / Home Assistant**.
 2. **Broker address**: the IP address or name of the machine running the
-   broker (Home Assistant's, for the add-on). **Port**: 1883 (8883 for TLS,
+   broker (Home Assistant's, for the app). **Port**: 1883 (8883 for TLS,
    which turns *Encrypted connection* on).
 3. **User name** and **Password**: the broker user created above. A broker
    that accepts anonymous clients: *User name › None*.
