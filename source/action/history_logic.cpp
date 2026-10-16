@@ -40,7 +40,7 @@ Category category(const history::Entry& e)
         return Category::PlayTime;
     if (k == "level" || k == "org" || k == "custom" || k == "vr") return Category::Restrictions;
     if (k == "pin" || k == "pin_shown" || k == "unlock" || k == "relock" || k == "unlink" || k == "delete" ||
-        k == "rescue")
+        k == "rescue" || k == "module")
         return Category::Security;
     if (k.rfind("outside_", 0) == 0 || k == "new_account") return Category::Outside;
     return Category::Other;

@@ -10,7 +10,7 @@ Au choix :
 - **sphaira › GitHub** — Le zip de la version contient déjà l'entrée (`/config/sphaira/github/playguard.json`) : après une première installation, mettez à jour depuis *GitHub* dans sphaira.
 - **Manuellement** — Téléchargez `playguard.zip` dans la [dernière version](https://github.com/JigSawFr/PlayGuard/releases/latest) et extrayez-le à la **racine** de la carte SD. L'application arrive dans `sd:/switch/playguard/`, ses fichiers dans `sd:/config/playguard/`.
 
-Le **module système de récupération** optionnel (`playguard-rescue.zip`) se télécharge à part — voir [Console bloquée ?](troubleshooting.md#console-bloquée-).
+Le **module système de récupération** optionnel s'installe depuis PlayGuard (*Outils › Modules facultatifs*, ou *Sécurité et appli › Bloqué ?*), ou à la main depuis son propre téléchargement (`playguard-rescue.zip`) — voir [Console bloquée ?](troubleshooting.md#console-bloquée-).
 
 ## Fichiers sur la carte SD
 
@@ -24,6 +24,8 @@ Tous dans `sd:/config/playguard/` (l'application elle-même reste dans `sd:/swit
 - **`github_token`** — Mode développeur uniquement : la connexion GitHub d'*Installer un autre build* (supprimé à la déconnexion)
 - **`previous_build.json`**, **`boot_check.json`** — Après l'installation d'un build sur place : le nom du build remplacé (gardé à côté du `.nro` sous `playguard.nro.previous`), et le contrôle du lancement suivant (supprimé dès que son premier écran s'affiche)
 - **`rescue_report.txt`** — Laissé par le sysmodule de secours après son intervention, jusqu'à ce que PlayGuard l'affiche au démarrage (illisible, il est supprimé et PlayGuard le signale)
+- **`sync.conf`** — Seulement une fois l'*Accès à distance* configuré : les réglages du lien, mot de passe du broker compris (jamais dans un rapport ni un envoi)
+- **`sync/`** — Seulement avec l'*Accès à distance* : les profils enregistrés, pour l'agent facultatif (`profiles.txt`) ; ce qu'il lit et écrit pour un système est dans le `nand/<système>/sync/` de ce système (enregistrements, noms des jeux, ce qu'il a changé, ses événements). Un sysMMC et un emuMMC partagent `sync.conf` mais sont deux appareils dans Home Assistant
 - **`logs/`** — `reports/` les rapports de diagnostic enregistrés (jamais le code PIN ni le numéro de série) ; `crashes/` un fichier par plantage (ce qui a arrêté PlayGuard) ; `uploads/` un raccourci Internet (`.url`) par rapport envoyé en ligne ; `play_timer/` les fichiers du minuteur des outils développeur. Combien de rapports, de fichiers de plantage et de liens sont gardés : *Outils › Diagnostic* (par nombre, âge ou taille ; le plus récent reste toujours)
 
 Plus de détails dans [packaging/README.md](../../packaging/README.md) (en anglais).

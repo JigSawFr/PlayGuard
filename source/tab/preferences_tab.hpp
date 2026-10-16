@@ -1,7 +1,8 @@
 // PreferencesTab — language, theme and start tab; the play-timer preferences
 // (lock again after a change, extra-time amounts, putting the usual limit
 // back by itself, advanced actions); the start-up clock check and the
-// monthly "Support PlayGuard" reminder. Split from
+// monthly "Support PlayGuard" reminder; the remote link's screen (MQTT,
+// Home Assistant). Split from
 // Tools, which keeps backups, updates, diagnostics, the console and the
 // developer tools.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
@@ -32,5 +33,6 @@ class PreferencesTab : public TabBase
     BRLS_BIND(brls::BooleanCell, notices_system, "pf_notices_system");
     BRLS_BIND(brls::BooleanCell, notices_summary, "pf_notices_summary");
     BRLS_BIND(brls::BooleanCell, notices_reminders, "pf_notices_reminders");
+    BRLS_BIND(brls::DetailCell,  remote,        "pf_remote");
     BRLS_BIND(brls::Label,       note,          "pf_note");
 };

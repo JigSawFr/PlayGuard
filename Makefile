@@ -36,12 +36,18 @@ SOURCE_DATE_EPOCH ?= $(shell git log -1 --format=%ct 2>/dev/null || echo 0)
 ZIP_TREE = find . -exec touch -h -d @$(SOURCE_DATE_EPOCH) {} + && find . -mindepth 1 | LC_ALL=C sort | TZ=UTC zip -X -@
 CMAKE_ARGS ?=
 JSON_HPP := extern/borealis/library/include/borealis/extern/nlohmann/json.hpp
+# The remote link's console-free C (source/sync/), shared by its host tests.
+SYNC_PURE := source/sync/sync_json.c source/sync/mqtt_packet.c source/sync/sync_conf.c source/sync/sync_apply.c \
+             source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c \
+             source/sync/sync_system.c source/sync/sync_games.c source/core/console_info_pure.c
 
-.PHONY: all clean dist nxlink desktop test check rescue dist-rescue FORCE
+.PHONY: all clean dist nxlink desktop test check rescue dist-rescue agent dist-agent FORCE
 
 RENDERER := $(if $(GL),-DUSE_DEKO3D=OFF,-DUSE_DEKO3D=ON)
 
-all:
+# The optional sysmodules first: the .nro carries them in its romfs, so
+# Tools › Optional modules can install them (CMakeLists.txt, cmake/bundle_sysmodules.cmake).
+all: rescue agent
 	@cmake -B $(BUILD) -S . -DPLATFORM_SWITCH=ON $(RENDERER) $(CMAKE_ARGS)
 	@cmake --build $(BUILD) --target $(TARGET).nro -j $(JOBS)
 	@cp $(BUILD)/$(TARGET).nro  $(TARGET).nro
@@ -59,26 +65,45 @@ dist: all
 	@cp packaging/sphaira/$(TARGET).json out/config/sphaira/github/
 	@cd out && $(ZIP_TREE) ../$(TARGET).zip
 
-# The optional recovery sysmodule (sysmodule/), as its own asset so it is a
-# deliberate install, never part of the default one. The zip drops into the
-# SD-card root: Atmosphère runs 4200000000505247 at boot (the boot2.flag).
+# The optional recovery sysmodule (sysmodule/rescue/), as its own asset so it
+# is a deliberate install, never part of the default one. The zip drops into
+# the SD-card root: Atmosphère runs 4200000000505247 at boot (the boot2.flag).
 RESCUE_TID := 4200000000505247
 # playguard-rescue.txt next to the module: the PlayGuard version it comes
 # with and its revision (tools/rescue_rev.cmake), which the app compares with
 # its own to tell a module out of date (action/rescue.hpp).
 RESCUE_VERSION := $(shell sed -n 's/^set(VERSION_[A-Z]* "\([0-9]*\)").*/\1/p' CMakeLists.txt | paste -sd.)
 rescue:
-	@$(MAKE) --no-print-directory -C sysmodule
+	@$(MAKE) --no-print-directory -C sysmodule/rescue
 
 dist-rescue: rescue
 	@echo making rescue dist ...
 	@rm -rf out-rescue/ playguard-rescue.zip
 	@mkdir -p out-rescue/atmosphere/contents/$(RESCUE_TID)/flags
-	@cp sysmodule/out/playguard-rescue.nsp out-rescue/atmosphere/contents/$(RESCUE_TID)/exefs.nsp
+	@cp sysmodule/rescue/out/playguard-rescue.nsp out-rescue/atmosphere/contents/$(RESCUE_TID)/exefs.nsp
 	@touch out-rescue/atmosphere/contents/$(RESCUE_TID)/flags/boot2.flag
+	@printf '{\n  "name": "PlayGuard rescue",\n  "tid": "%s",\n  "requires_reboot": true\n}\n' $(RESCUE_TID) \
+		> out-rescue/atmosphere/contents/$(RESCUE_TID)/toolbox.json
 	@cp LICENSE out-rescue/atmosphere/contents/$(RESCUE_TID)/LICENSE.txt
 	@printf '%s %s\n' '$(RESCUE_VERSION)' "$$(cmake -DROOT=$(CURDIR) -P tools/rescue_rev.cmake)" > out-rescue/atmosphere/contents/$(RESCUE_TID)/playguard-rescue.txt
 	@cd out-rescue && $(ZIP_TREE) ../playguard-rescue.zip
+
+# The optional remote-link agent (sysmodule/agent/): its own asset too. It
+# starts at boot (boot2.flag) and can be started or stopped without a reboot.
+AGENT_TID := 4200000000504741
+agent:
+	@$(MAKE) --no-print-directory -C sysmodule/agent
+
+dist-agent: agent
+	@echo making agent dist ...
+	@rm -rf out-agent/ playguard-agent.zip
+	@mkdir -p out-agent/atmosphere/contents/$(AGENT_TID)/flags
+	@cp sysmodule/agent/out/playguard-agent.nsp out-agent/atmosphere/contents/$(AGENT_TID)/exefs.nsp
+	@touch out-agent/atmosphere/contents/$(AGENT_TID)/flags/boot2.flag
+	@printf '{\n  "name": "PlayGuard agent",\n  "tid": "%s",\n  "requires_reboot": false\n}\n' $(AGENT_TID) \
+		> out-agent/atmosphere/contents/$(AGENT_TID)/toolbox.json
+	@cp LICENSE out-agent/atmosphere/contents/$(AGENT_TID)/LICENSE.txt
+	@cd out-agent && $(ZIP_TREE) ../playguard-agent.zip
 
 desktop:
 	@cmake -B $(DESKTOP) -S . -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release $(CMAKE_ARGS)
@@ -88,7 +113,9 @@ desktop:
 # object files, so gcov's .gcno/.gcda sit next to the program in
 # build/host-tests/). A suite is three variables: <name>_SRC (its sources,
 # the test last), <name>_FLAGS (the standard, defines, include paths) and an
-# optional <name>_LIBS; the test source's suffix picks the compiler.
+# optional <name>_LIBS; the test source's suffix picks the compiler. Two more
+# when needed: <name>_OBJS (C objects a C++ suite links) and <name>_ARGS
+# (what the program is run with).
 # `make test` builds and runs every suite in parallel (JOBS) and keeps going
 # when one fails, so a run reports every failing suite, not the first: each
 # suite's output is in build/host-tests/<name>.log, and <name>.ok marks a
@@ -106,6 +133,8 @@ gamecheck_SRC   := source/core/gamecheck.c source/core/gamecheck_rules.c source/
 gamecheck_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/gamecheck -Isource/core
 calendar_SRC   := source/core/calendar.c tests/calendar/test.c
 calendar_FLAGS := -std=gnu11 -Isource/core
+console_info_SRC   := source/core/console_info_pure.c tests/console_info/test.c
+console_info_FLAGS := -std=gnu11 -Isource/core
 rescue_SRC   := source/core/rescue.c tests/rescue/test.c
 rescue_FLAGS := -std=c11 -Isource/core
 ntp_SRC   := source/util/ntp_packet.c tests/ntp_packet/test.c
@@ -125,8 +154,8 @@ patches_SRC   := source/util/paths.cpp source/util/patches.cpp tests/patches/tes
 patches_FLAGS := -std=c++17 -Isource
 duration_SRC   := source/util/duration.cpp tests/duration/test.cpp
 duration_FLAGS := -std=c++17 -Isource
-changelog_SRC   := source/util/changelog.cpp tests/changelog/test.cpp
-changelog_FLAGS := -std=c++17 -Isource
+changelog_SRC   := source/util/changelog.cpp source/util/update.cpp tests/changelog/test.cpp
+changelog_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 support_SRC   := source/util/support.cpp tests/support/test.cpp
 support_FLAGS := -std=c++17 -Isource
 pt_logic_SRC   := source/action/pt_logic.cpp tests/pt_logic/test.cpp
@@ -142,9 +171,13 @@ timer_health_logic_FLAGS := -std=c++17 -Isource
 notice_logic_SRC   := source/action/notice_logic.cpp tests/notice_logic/test.cpp
 notice_logic_FLAGS := -std=c++17 -Isource
 sys_updates_SRC   := source/util/sys_updates.cpp tests/sys_updates/test.cpp
-sys_updates_FLAGS := -std=c++17 -Isource
+sys_updates_FLAGS := -std=c++17 -Isource -Isource/core
+sys_updates_CSRC  := source/core/console_info_pure.c
+sys_updates_CFLAGS := -std=gnu11 -Isource/core
 sys_notes_SRC   := source/util/safe_text.cpp source/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
-sys_notes_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+sys_notes_FLAGS := -std=c++17 -Isource -Isource/core -isystem extern/borealis/library/include
+sys_notes_CSRC  := source/core/console_info_pure.c
+sys_notes_CFLAGS := -std=gnu11 -Isource/core
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
 offline_clock_logic_FLAGS := -std=c++17 -Isource
 icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp
@@ -207,13 +240,32 @@ crash_dump_SRC   := source/util/crash_dump.c tests/crash_dump/test.c
 crash_dump_FLAGS := -std=c11 -Isource/util
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
 log_files_FLAGS := -std=c++17 -Isource
+modules_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/modules.cpp tests/modules/test.cpp
+modules_FLAGS := -std=c++17 -Isource
+# The remote link's files on the SD card; its C parts as objects (_OBJS), as
+# g++ would build a .c as C++.
+sync_files_SRC   := source/util/paths.cpp source/util/config.cpp source/util/profiles.cpp source/util/sync_files.cpp tests/sync_files/test.cpp
+sync_files_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+sync_files_OBJS  := $(TESTOUT)/c/sync_conf.o $(TESTOUT)/c/sync_records.o
+
+# C: the remote link (source/sync/) and the agent sysmodule's core. sync_core
+# writes the documents it builds (_ARGS: where) for tools/check_sync_json.py.
+sync_core_SRC   := $(SYNC_PURE) tests/sync_core/test.c
+sync_core_FLAGS := -std=gnu11 -Isource/sync -Isource/core
+sync_core_ARGS  := $(TESTOUT)/sync
+sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c source/sync/sync_conf.c tests/sync_exec/test.c
+sync_exec_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -Isource/sync
+sync_engine_SRC   := $(SYNC_PURE) source/sync/mqtt_client.c source/sync/sync_engine.c tests/sync_engine/test.c
+sync_engine_FLAGS := -std=gnu11 -Isource/sync -Isource/core
+agent_SRC   := sysmodule/agent/source/agent_core.c source/sync/sync_conf.c source/sync/sync_records.c tests/agent/test.c
+agent_FLAGS := -std=gnu11 -Isource/sync -Isource/core -Isysmodule/agent/source
 
 TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))
 TEST_PROGRAMS := $(addprefix $(TESTOUT)/,$(TESTS))
 TEST_OKS := $(addsuffix .ok,$(TEST_PROGRAMS))
 # Every header: a suite is rebuilt when one changes (coarse, but a suite
 # compiles in seconds and CI always starts cold).
-TEST_HEADERS := $(wildcard tests/check.h tests/*/*.h source/*.hpp source/*/*.h source/*/*.hpp)
+TEST_HEADERS := $(wildcard tests/check.h tests/*/*.h source/*.hpp source/*/*.h source/*/*.hpp sysmodule/*/source/*.h)
 
 $(TESTOUT):
 	@mkdir -p $@
@@ -229,16 +281,26 @@ FORCE:
 # variables above.
 .SECONDEXPANSION:
 # An optional <name>_CSRC (one C file, with <name>_CFLAGS) is built by $(CC)
-# into <name>.c.o and linked into a C++ suite.
-$(TEST_PROGRAMS): $(TESTOUT)/%: $$($$*_SRC) $$($$*_CSRC) $(TEST_HEADERS) $(TEST_FLAGS_FILE) | $(TESTOUT)
+# into <name>.c.o and linked into a C++ suite; <name>_OBJS are C objects of
+# source/sync/ built by the rule below.
+$(TEST_PROGRAMS): $(TESTOUT)/%: $$($$*_SRC) $$($$*_CSRC) $$($$*_OBJS) $(TEST_HEADERS) $(TEST_FLAGS_FILE) | $(TESTOUT)
 	$(if $($*_CSRC),$(CC) $($*_CFLAGS) $(CWARN) -c $($*_CSRC) -o $@.c.o)
-	$(if $(filter %.cpp,$($*_SRC)),$(CXX),$(CC)) $($*_FLAGS) $(CWARN) $($*_SRC) $(if $($*_CSRC),$@.c.o) $($*_LIBS) -o $@
+	$(if $(filter %.cpp,$($*_SRC)),$(CXX),$(CC)) $($*_FLAGS) $(CWARN) $($*_SRC) $(if $($*_CSRC),$@.c.o) $($*_OBJS) $($*_LIBS) -o $@
+
+# A C source a C++ suite links (<name>_OBJS).
+$(TESTOUT)/c/%.o: source/sync/%.c $(TEST_HEADERS) $(TEST_FLAGS_FILE)
+	@mkdir -p $(@D)
+	$(CC) -std=gnu11 $(CWARN) -Isource/sync -Isource/core -c $< -o $@
+
+$(TESTOUT)/sync:
+	@mkdir -p $@
+$(TESTOUT)/sync_core.ok: | $(TESTOUT)/sync
 
 # Running it: the output goes to <name>.log and the terminal; <name>.ok only
 # when it passed.
 $(TEST_OKS): $(TESTOUT)/%.ok: $(TESTOUT)/%
 	@rm -f $@
-	@$< > $<.log 2>&1; r=$$?; cat $<.log; if [ $$r -eq 0 ]; then touch $@; else echo "$*: exit status $$r" >&2; exit $$r; fi
+	@$< $($*_ARGS) > $<.log 2>&1; r=$$?; cat $<.log; if [ $$r -eq 0 ]; then touch $@; else echo "$*: exit status $$r" >&2; exit $$r; fi
 
 test:
 	@test -f $(JSON_HPP) || { echo "borealis is missing (nlohmann/json for the tests): run git submodule update --init"; exit 1; }
@@ -247,12 +309,14 @@ test:
 
 check: test
 	python3 tools/check_resources.py .
+	python3 tools/check_sync_json.py $(TESTOUT)/sync
 	python3 tools/gen_compat.py . $(BUILD)/compat.json
 
 clean:
 	@echo clean ...
-	@rm -rf $(BUILD) $(DESKTOP) out out-rescue $(TARGET).zip playguard-rescue.zip $(TARGET).nro $(TARGET).nacp $(TARGET).elf
-	@$(MAKE) --no-print-directory -C sysmodule clean 2>/dev/null || true
+	@rm -rf $(BUILD) $(DESKTOP) out out-rescue out-agent $(TARGET).zip playguard-rescue.zip playguard-agent.zip $(TARGET).nro $(TARGET).nacp $(TARGET).elf
+	@$(MAKE) --no-print-directory -C sysmodule/rescue clean 2>/dev/null || true
+	@$(MAKE) --no-print-directory -C sysmodule/agent clean 2>/dev/null || true
 
 nxlink: all
 	nxlink $(BUILD)/$(TARGET).nro

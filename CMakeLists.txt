@@ -122,9 +122,12 @@ else ()
     # The console-free parts are shared with the simulator: one implementation.
     list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/source/core/pure.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/calendar.c
+                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/console_info_pure.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gamecheck_rules.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/rescue.c
-                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/write_guard.c)
+                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/write_guard.c
+                              # The simulated agent runs the agent's own command dispatch.
+                              ${CMAKE_CURRENT_SOURCE_DIR}/sysmodule/agent/source/agent_core.c)
 endif ()
 
 # QR codes of the funding links in About (MIT, vendored: extern/qrcodegen).
@@ -134,6 +137,9 @@ program_target(${PROJECT_NAME} "${PLAYGUARD_SRC}")
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 
 target_include_directories(${PROJECT_NAME} PRIVATE source extern/qrcodegen ${APP_PLATFORM_INCLUDE})
+if (NOT PLATFORM_SWITCH)
+    target_include_directories(${PROJECT_NAME} PRIVATE source/sync sysmodule/agent/source)
+endif ()
 # -ffunction-sections / -fdata-sections come from borealis (PUBLIC) and
 # --gc-sections from libnx's switch.specs.
 # Warnings on PlayGuard's own sources (not borealis, not the vendored
@@ -206,7 +212,11 @@ set(ASSEMBLE_RESOURCES
     # (view/release_notes.cpp), the full list a press away.
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/.github/release-notes ${MERGED_RESOURCES}/release-notes
     COMMAND ${CMAKE_COMMAND} -E remove -f ${MERGED_RESOURCES}/release-notes/README.md ${MERGED_RESOURCES}/img/emoji/README.md
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_ICON} ${MERGED_RESOURCES}/img/app_icon.jpg)
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_ICON} ${MERGED_RESOURCES}/img/app_icon.jpg
+    # The optional sysmodules, when built (make rescue / make agent).
+    COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -DDEST=${MERGED_RESOURCES}/sysmodules
+            -DAPP_VERSION=${APP_VERSION} -DAPP_COMMIT=${APP_COMMIT}
+            -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/bundle_sysmodules.cmake)
 
 set(PLAYGUARD_COPY_SHADERS)
 if (PLATFORM_SWITCH AND USE_DEKO3D)
@@ -214,23 +224,11 @@ if (PLATFORM_SWITCH AND USE_DEKO3D)
 endif ()
 
 if (PLATFORM_SWITCH)
-    # The recovery sysmodule rides in the .nro (romfs:/rescue/exefs.nsp), so
-    # PlayGuard can update an installed one that is out of date
-    # (action/rescue.hpp). Its own Makefile (sysmodule/) builds it; it is
-    # only copied to the SD card when a parent asks.
-    find_program(PLAYGUARD_MAKE NAMES make gmake)
-    set(RESCUE_NSP ${CMAKE_CURRENT_SOURCE_DIR}/sysmodule/out/playguard-rescue.nsp)
-    add_custom_target(playguard_rescue
-        COMMAND ${PLAYGUARD_MAKE} --no-print-directory -C ${CMAKE_CURRENT_SOURCE_DIR}/sysmodule
-        BYPRODUCTS ${RESCUE_NSP}
-        COMMENT "Building the recovery sysmodule")
-    add_custom_target(${PROJECT_NAME}.nro ALL DEPENDS ${PROJECT_NAME} playguard_rescue
+    add_custom_target(${PROJECT_NAME}.nro ALL DEPENDS ${PROJECT_NAME}
         COMMAND ${NX_NACPTOOL_EXE} --create "PlayGuard" "${PROJECT_AUTHOR}"
                 "${APP_VERSION}" ${PROJECT_NAME}.nacp --titleid=${PROJECT_TITLEID}
         ${ASSEMBLE_RESOURCES}
         ${PLAYGUARD_COPY_SHADERS}
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${MERGED_RESOURCES}/rescue
-        COMMAND ${CMAKE_COMMAND} -E copy ${RESCUE_NSP} ${MERGED_RESOURCES}/rescue/exefs.nsp
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${MERGED_RESOURCES}/font
         COMMAND ${NX_ELF2NRO_EXE} ${PROJECT_NAME}.elf ${PROJECT_NAME}.nro
                 --icon=${PROJECT_ICON} --nacp=${PROJECT_NAME}.nacp

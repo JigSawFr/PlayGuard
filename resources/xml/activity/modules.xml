@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Tools › Optional modules: a sidebar, as on the main screen: an overview
+     (what these modules are, and each one's state), then a tab per module
+     (the recovery module, the remote-link agent), so each is a press away.
+     The tabs are added by source/activity/modules_activity.cpp. -->
+
+<brls:AppletFrame
+    iconInterpolation="linear"
+    footerHidden="false">
+
+    <brls:TabFrame
+        id="md_tabs"
+        title="@i18n/playguard/modules/title"
+        icon="@res/img/app_icon.jpg"/>
+
+</brls:AppletFrame>

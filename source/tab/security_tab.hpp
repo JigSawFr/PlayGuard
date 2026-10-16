@@ -39,4 +39,6 @@ class SecurityTab : public TabBase
     BRLS_BIND(brls::Label,      pr_note,        "pr_note");
     BRLS_BIND(brls::Header,     danger_header,  "sc_danger_header");
     BRLS_BIND(brls::DetailCell, del,            "sc_delete");
+    BRLS_BIND(brls::DetailCell, rescue,         "sc_rescue");
+    BRLS_BIND(brls::Label,      rescue_about,   "sc_rescue_about");
 };

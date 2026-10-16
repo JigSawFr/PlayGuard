@@ -27,6 +27,7 @@ PlayGuard ramène sur une console modifiée les réglages de l'application mobil
 - 📱 **Application mobile** — la dissocier, même sur une console d'occasion.
 - ↩️ **Historique et sauvegardes** — chaque modification est consignée et peut être annulée.
 - 🔔 **Notifications** — une cloche regroupe ce qui demande votre attention (alarme désactivée, horloge décalée, modifications faites ailleurs), avec la correction à portée d'un appui.
+- 🏠 **Home Assistant (facultatif)** — par MQTT sur votre réseau local : l'état et le temps de jeu dans Home Assistant, des ordres depuis lui (temps en plus, limites, verrouillage). Désactivé par défaut. [Guide](docs/home-assistant.fr.md).
 - 🌍 Toutes les langues de la console, thèmes clair et sombre.
 
 ## Compatibilité
@@ -51,8 +52,8 @@ Code PIN oublié ou console d'occasion : [Console bloquée ?](docs/fr/troublesho
 
 ## Documentation
 
-- **Guide :** [fonctions](docs/fr/features.md) · [installation](docs/fr/install.md) · [compatibilité](docs/fr/compatibility.md) · [dépannage](docs/fr/troubleshooting.md)
-- **Référence (en anglais) :** [application mobile](docs/companion-app.md) · [`config.json`](docs/config.md) · [fonctionnement du contrôle parental](docs/parental-controls.md) · [module de récupération](sysmodule/README.md)
+- **Guide :** [fonctions](docs/fr/features.md) · [installation](docs/fr/install.md) · [compatibilité](docs/fr/compatibility.md) · [dépannage](docs/fr/troubleshooting.md) · [Home Assistant](docs/home-assistant.fr.md)
+- **Référence (en anglais) :** [application mobile](docs/companion-app.md) · [`config.json`](docs/config.md) · [fonctionnement du contrôle parental](docs/parental-controls.md) · [modules système facultatifs](sysmodule/README.md)
 - **Contribuer (en anglais) :** [CONTRIBUTING.md](CONTRIBUTING.md) · [feuille de route](ROADMAP.md) · [changelog](CHANGELOG.md)
 
 ## Licence et remerciements

@@ -11,8 +11,8 @@ if (NOT DEFINED ROOT)
     get_filename_component(ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 endif ()
 set(RESCUE_REV_SOURCES
-    sysmodule/source/main.c
-    sysmodule/playguard-rescue.json
+    sysmodule/rescue/source/main.c
+    sysmodule/rescue/playguard-rescue.json
     source/core/rescue.c
     source/core/rescue.h)
 set(_rescue_all "")

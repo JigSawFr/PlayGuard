@@ -49,7 +49,7 @@ Les enfants aiment les jeux vidéo, et les jeux vidéo, ce sont des écrans : le
 
 Les rares outils existants ne faisaient pas l'affaire : un suivi d'activité peu maintenu et peu détaillé, un contrôle parental peu développé et inabouti. Je ne voulais pas non plus d'un remplacement maison, ni d'un sysmodule qui tourne en permanence en arrière-plan. L'objectif : **réutiliser au maximum le contrôle parental de la console**, avec tout ce qu'il sait déjà faire — la limite, le code PIN, les avertissements, la suspension — et ramener ses réglages sur la console. C'est PlayGuard.
 
-Piloter le contrôle parental de la console ouvre aussi la porte à bien plus : remonter le temps de jeu vers un serveur à la maison, recevoir des ordres, Home Assistant, des automatisations. Ce vers quoi cela pourrait aller est dans [l'horizon de la feuille de route](../../ROADMAP.md#horizon) (en anglais).
+Piloter le contrôle parental de la console ouvre aussi la porte à bien plus : remonter le temps de jeu vers un serveur à la maison, recevoir des ordres, Home Assistant, des automatisations. La première étape est là, un lien facultatif avec Home Assistant par MQTT ([guide](../home-assistant.fr.md)) ; la suite possible est dans [l'horizon de la feuille de route](../../ROADMAP.md#horizon) (en anglais).
 
 ## PlayGuard ou un sysmodule de remplacement ?
 
@@ -57,7 +57,7 @@ PlayGuard pilote le contrôle parental intégré à la console (le service `pctl
 
 - **Limite de temps de jeu** — PlayGuard : Une pour la console (le minuteur de la console). Un sysmodule de remplacement : Une par compte utilisateur.
 - **Code PIN, avertissements, suspension** — PlayGuard : Ceux de la console. Un sysmodule de remplacement : Les siens.
-- **En arrière-plan** — PlayGuard : Rien (le module de récupération optionnel n'agit qu'au démarrage, quand un fichier `RESCUE` le demande). Un sysmodule de remplacement : Un sysmodule, dès le démarrage.
+- **En arrière-plan** — PlayGuard : Rien (le module de récupération optionnel n'agit qu'au démarrage, quand un fichier `RESCUE` le demande ; l'agent du lien Home Assistant, facultatif lui aussi, ne fonctionne qu'une fois installé). Un sysmodule de remplacement : Un sysmodule, dès le démarrage.
 - **Après une mise à jour du firmware** — PlayGuard : Le contrôle de la console continue de fonctionner ; PlayGuard s'ouvre en lecture seule jusqu'à une version qui prend le firmware en charge. Un sysmodule de remplacement : Le contrôle dépend du bon fonctionnement du sysmodule.
 - **Supprimé de la carte SD** — PlayGuard : Les limites restent sur la console. Un sysmodule de remplacement : Le contrôle disparaît avec lui.
 

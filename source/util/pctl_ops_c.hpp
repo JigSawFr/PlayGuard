@@ -6,6 +6,7 @@
 
 extern "C" {
 #include "core/gamecheck.h"
+#include "core/modules_nx.h"
 #include "core/pctl_ops.h"
 #include "core/playstats.h"
 #include "core/sysinfo.h"

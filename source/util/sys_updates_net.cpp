@@ -4,6 +4,7 @@
 #include <cstring>
 
 #include "util/http.hpp"
+#include "util/paths.hpp"
 #include "util/sys_updates.hpp"
 
 namespace sys_updates
@@ -49,6 +50,42 @@ Latest fetch(std::string* error)
     out.hekate     = latest_of("CTCaer/hekate", error);
     out.firmware   = latest_of("THZoria/NX_Firmware", error);
     return out;
+#endif
+}
+
+namespace
+{
+[[maybe_unused]] constexpr const char* HA_REPO = "JigSawFr/playguard-ha";
+[[maybe_unused]] constexpr size_t CHANGELOG_MAX = 256 * 1024;
+}   // namespace
+
+std::string fetch_integration(std::string* error)
+{
+#ifndef __SWITCH__
+    const char* sim = std::getenv("PLAYGUARD_SIM_HA_LATEST");
+    if (!sim || std::strcmp(sim, "offline") == 0) {
+        if (error) *error = "simulated: no connection";
+        return "";
+    }
+    return version_of_tag(sim);
+#else
+    return latest_of(HA_REPO, error);
+#endif
+}
+
+bool fetch_integration_changelog(const std::string& version, std::string* md, std::string* error)
+{
+#ifndef __SWITCH__
+    (void)version;
+    const char* sim = std::getenv("PLAYGUARD_SIM_HA_CHANGELOG");
+    if (!sim || !paths::read_file(sim, *md)) {
+        if (error) *error = "simulated: no changelog";
+        return false;
+    }
+    return true;
+#else
+    const std::string url = std::string("https://raw.githubusercontent.com/") + HA_REPO + "/v" + version + "/CHANGELOG.md";
+    return http::get(url, md, error, CHANGELOG_MAX, 30);
 #endif
 }
 

@@ -171,6 +171,7 @@ def cmd_header(a):
     out.append("")
     out.append("Every artifact of this run is named `playguard-" + a.label + "-<component>`: "
                "`-nro` (the app, what *Install another build* downloads), `-rescue` (the recovery sysmodule), "
+               "`-agent` (the remote link's sysmodule), "
                "`-linker-map`, `-screenshots-<shard>`" + (", `-sdcard` (the store zip)" if a.tag else "") + ".")
     return "\n".join(out)
 
@@ -460,7 +461,9 @@ def cmd_build(a):
     nro = file_size(a.nro)
     sizes = {name: file_size(path) for name, path in (("playguard.nro", a.nro), ("playguard.zip", a.zip),
                                                       ("playguard-rescue.zip", a.rescue_zip),
-                                                      ("playguard-rescue.nsp", a.rescue_nsp))}
+                                                      ("playguard-rescue.nsp", a.rescue_nsp),
+                                                      ("playguard-agent.zip", a.agent_zip),
+                                                      ("playguard-agent.nsp", a.agent_nsp))}
     base = read_json(a.baseline) if a.baseline else None
     toolchain = dict(line.split(None, 1) for line in (read_text(a.toolchain) or "").splitlines() if " " in line)
     libnx = toolchain.get("libnx", "?")
@@ -474,11 +477,11 @@ def cmd_build(a):
     out += [" · ".join(strip), ""]
 
     # The sizes, the .nro against main's last build.
-    heads = ["playguard.nro", "playguard.zip", "playguard-rescue.zip", "rescue .nsp"]
-    tile = [f"**{fmt_size(sizes['playguard.nro'])}**" if nro else "—",
-            fmt_size(sizes["playguard.zip"]) if sizes["playguard.zip"] else "—",
-            fmt_size(sizes["playguard-rescue.zip"]) if sizes["playguard-rescue.zip"] else "—",
-            fmt_size(sizes["playguard-rescue.nsp"]) if sizes["playguard-rescue.nsp"] else "—"]
+    heads = ["playguard.nro", "playguard.zip", "playguard-rescue.zip", "rescue .nsp", "playguard-agent.zip", "agent .nsp"]
+    tile = [f"**{fmt_size(sizes['playguard.nro'])}**" if nro else "—"]
+    tile += [fmt_size(sizes[name]) if sizes[name] else "—"
+             for name in ("playguard.zip", "playguard-rescue.zip", "playguard-rescue.nsp", "playguard-agent.zip",
+                          "playguard-agent.nsp")]
     if base and base.get("size") and nro:
         heads.append(f"vs main {code(base.get('sha', '')[:7])}")
         delta = nro - base["size"]
@@ -526,7 +529,8 @@ def cmd_build(a):
         out.append(details("compat.json (read by the app's update check)", "```json\n" + compat.strip() + "\n```"))
         out.append("")
     listing = []
-    for name, path in (("playguard.zip", a.zip), ("playguard-rescue.zip", a.rescue_zip)):
+    for name, path in (("playguard.zip", a.zip), ("playguard-rescue.zip", a.rescue_zip),
+                       ("playguard-agent.zip", a.agent_zip)):
         for entry, size in zip_listing(path):
             listing.append([code(name), code(entry), fmt_size(size)])
     if listing:
@@ -618,7 +622,9 @@ def main():
     p.add_argument("--nro", default="playguard.nro")
     p.add_argument("--zip", default="playguard.zip")
     p.add_argument("--rescue-zip", default="playguard-rescue.zip")
-    p.add_argument("--rescue-nsp", default="sysmodule/out/playguard-rescue.nsp")
+    p.add_argument("--rescue-nsp", default="sysmodule/rescue/out/playguard-rescue.nsp")
+    p.add_argument("--agent-zip", default="playguard-agent.zip")
+    p.add_argument("--agent-nsp", default="sysmodule/agent/out/playguard-agent.nsp")
     p.add_argument("--toolchain", default="toolchain.txt")
     p.add_argument("--build-info", default="build-info.txt")
     p.add_argument("--sums", default="SHA256SUMS.txt")
@@ -638,7 +644,8 @@ def main():
     p.add_argument("--tag", required=True)
     p.add_argument("--repo-url", required=True)
     p.add_argument("--dir", default="dist")
-    p.add_argument("--files", nargs="+", default=["playguard.nro", "playguard.zip", "playguard-rescue.zip", "compat.json",
+    p.add_argument("--files", nargs="+", default=["playguard.nro", "playguard.zip", "playguard-rescue.zip",
+                                                  "playguard-agent.zip", "compat.json",
                                                   "build-info.txt", "SHA256SUMS.txt"])
     p.set_defaults(func=cmd_release)
 

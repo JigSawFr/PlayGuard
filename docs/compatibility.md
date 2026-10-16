@@ -49,7 +49,7 @@ Children love video games, and video games mean screens: a limit is part of look
 
 The few tools that existed did not do the job: activity reports that were barely maintained and not very detailed, parental controls that were rough and unfinished. And I did not want a custom replacement either, or a sysmodule always running in the background. The idea was to **reuse the console's own parental controls as much as possible**, with everything they already do — the limit, the PIN, the warnings, the suspension — and to bring their settings back onto the console. That is PlayGuard.
 
-Driving the console's own controls also opens the door to much more: reporting play time to a home server, taking orders from it, Home Assistant, automations. Where that could go is in the [roadmap's horizon](../ROADMAP.md#horizon).
+Driving the console's own controls also opens the door to much more: reporting play time to a home server, taking orders from it, Home Assistant, automations. The first step is here, an optional link to Home Assistant over MQTT ([guide](home-assistant.md)); where it could go next is in the [roadmap's horizon](../ROADMAP.md#horizon).
 
 ## PlayGuard or a replacement sysmodule?
 
@@ -57,7 +57,7 @@ PlayGuard drives the parental controls built into the console (the `pctl` servic
 
 - **Play-time limit** — PlayGuard: One for the console (the console's own timer). A replacement sysmodule: One per user account.
 - **PIN, warnings, suspension** — PlayGuard: The console's. A replacement sysmodule: Its own.
-- **In the background** — PlayGuard: Nothing (the optional recovery sysmodule only acts at boot, when a `RESCUE` file asks it to). A replacement sysmodule: A sysmodule, from boot.
+- **In the background** — PlayGuard: Nothing (the optional recovery sysmodule only acts at boot, when a `RESCUE` file asks it to; the Home Assistant link's agent, also optional, runs only once installed). A replacement sysmodule: A sysmodule, from boot.
 - **After a firmware update** — PlayGuard: The console's controls keep working; PlayGuard opens read-only until a version supports the firmware. A replacement sysmodule: The controls depend on the sysmodule still working.
 - **Deleted from the SD card** — PlayGuard: The limits stay on the console. A replacement sysmodule: The controls go with it.
 

@@ -38,6 +38,10 @@ struct Config
     // and the day of that check ("YYYY-MM-DD").
     std::string sys_latest;
     std::string sys_checked;
+    // PlayGuard's Home Assistant integration (action/ha_update_flow): its
+    // latest release the last check found, and the day of that check.
+    std::string ha_latest;
+    std::string ha_checked;
     std::string start_tab = "dashboard";   // tab shown at start-up (main.xml order: START_TABS)
     std::vector<int> extra_amounts = { 15, 30, 60 };   // "Extra time today" choices, minutes
     int  activity_period = 1;          // Activity's period: 0 today, 1 last 7 days, 2 all time
@@ -69,6 +73,11 @@ struct Config
     bool        support_reminder = true;
     std::string support_reminded;
     std::string seen_version;
+    // The agent sysmodule PlayGuard carries (its SHA-256) that the parent
+    // answered "Later" to at start-up: not offered again at start (Tools ›
+    // Optional modules still offers it).
+    std::string agent_update_skipped;
+
     // The newest crash file (logs/crashes/) the notification bell told about:
     // a newer one means PlayGuard closed unexpectedly since.
     std::string crash_seen;
@@ -160,6 +169,10 @@ struct Snapshot
 };
 bool    snapshot(Snapshot& snap);
 bool    write(const Snapshot& snap);
+// Runs at the end of every successful snapshot(), on its thread (the remote
+// link mirrors what the agent must know into sync/nro_state.txt). nullptr:
+// nothing.
+void    set_saved_hook(void (*hook)());
 // Puts every out-of-range value back to its default (load() calls it).
 void    sanitize(Config& c);
 
