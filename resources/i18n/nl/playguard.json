@@ -803,6 +803,11 @@
                 "cause": "Bestanden van de game of de update ontbreken waar ze geïnstalleerd zijn: een onderbroken installatie of een beschadigde SD-kaart.",
                 "fix": "Verwijder de game en installeer hem opnieuw. Gaat het om meerdere games, controleer dan eerst de SD-kaart."
             },
+            "corrupt": {
+                "short": "Beschadigd (gecontroleerd)",
+                "cause": "PlayGuard heeft de gegevens gecontroleerd ({}): de console vond beschadigde gegevens. Het spel start pas weer als het opnieuw is geïnstalleerd.",
+                "fix": "Verwijder het spel (eerste knop) en installeer het opnieuw. Opgeslagen gegevens blijven bewaard."
+            },
             "firmware": {
                 "short": "Vereist firmware {}",
                 "cause": "De game of de update vereist systeemversie {}; deze console draait {}.",
@@ -822,7 +827,7 @@
             "needs_verify": {
                 "short": "Beschadigde data",
                 "cause": "De console heeft beschadigde data in deze game gevonden en vraagt om een controle.",
-                "fix": "Controleer de data op beschadiging (Acties). Zijn ze beschadigd, verwijder de game dan en installeer hem opnieuw."
+                "fix": "Controleer de gegevens (eerste knop): PlayGuard onthoudt het resultaat. Intact verdwijnt het spel uit de lijst; beschadigd gaat het naar Opnieuw installeren."
             },
             "key_too_new": {
                 "short": "Sleutels te nieuw",
@@ -889,11 +894,13 @@
         "verify_code": "Code van de console: {}",
         "groups": {
             "fix": "Hier te repareren ({})",
+            "verify": "Te controleren ({})",
             "reinstall": "Opnieuw installeren ({})",
             "system": "Firmware of SD-kaart ({})"
         },
         "group_note": {
             "fix": "PlayGuard kan ze repareren: A op een game, dan de eerste knop.",
+            "verify": "De console vertrouwt hun gegevens niet. De controle leest elk bestand en zegt of het spel opnieuw moet worden geïnstalleerd; PlayGuard onthoudt het resultaat.",
             "reinstall": "Hun bestanden ontbreken of zijn onbruikbaar. Sla hun lijst op, verwijder ze hier (tot dan ziet een installer ze als geïnstalleerd) en installeer ze opnieuw door op hun naam te zoeken.",
             "system": "De games zijn in orde: de firmware van de console of de SD-kaart is het probleem. Werk de firmware bij, of start op de opslag waarop ze zijn geïnstalleerd."
         },
@@ -910,7 +917,27 @@
         "remove_all_body": "Deze {} games worden met hun updates en extra content van de console verwijderd, zodat ze opnieuw kunnen worden geïnstalleerd. Hun lijst wordt eerst opgeslagen in de exportmap van PlayGuard. Opgeslagen data blijft.",
         "removing": "Games verwijderen… {} van {}",
         "removed_all": "{} games verwijderd. Hun lijst: {}",
-        "removed_some": "{} van {} games verwijderd. Hun lijst: {}"
+        "removed_some": "{} van {} games verwijderd. Hun lijst: {}",
+        "verify_all": "Deze {} spellen controleren",
+        "select": "Selecteren",
+        "unselect": "Deselecteren",
+        "selected_one": "1 spel geselecteerd",
+        "selected": "{} spellen geselecteerd",
+        "selection": {
+            "verify": "Hun gegevens controleren ({})",
+            "remove": "Deze spellen verwijderen ({})",
+            "select_group": "Alles selecteren: {}",
+            "clear": "Alles deselecteren"
+        },
+        "verify_title_n": "Gegevens controleren · spel {} van {}",
+        "verify_done": "{} van {} spellen gecontroleerd.",
+        "verify_count_bad": "Beschadigde gegevens: {}",
+        "verify_count_ok": "Intact: {}",
+        "verify_count_err": "Niet te controleren: {}",
+        "remove_corrupt": "De {} beschadigde verwijderen",
+        "verified_intact": "Gegevens gecontroleerd op {}: intact.",
+        "select_many": "Meerdere spellen tegelijk (Y op een spel)",
+        "remove_corrupt_one": "Beschadigd spel verwijderen"
     },
     "about": {
         "section_changelog": "Nieuw in {}",

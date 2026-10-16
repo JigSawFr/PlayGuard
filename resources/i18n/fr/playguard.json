@@ -803,6 +803,11 @@
                 "cause": "Des fichiers du jeu ou de sa mise à jour manquent là où ils sont installés : une installation interrompue, ou une carte SD endommagée.",
                 "fix": "Supprimez le jeu, puis réinstallez-le. Si plusieurs jeux sont touchés, vérifiez d'abord la carte SD."
             },
+            "corrupt": {
+                "short": "Corrompu (vérifié)",
+                "cause": "PlayGuard a vérifié ses données ({}) : la console a trouvé des données corrompues. Le jeu ne se lancera pas tant qu'il n'est pas réinstallé.",
+                "fix": "Supprimez le jeu (premier bouton), puis réinstallez-le. Les sauvegardes restent."
+            },
             "firmware": {
                 "short": "Firmware {} requis",
                 "cause": "Le jeu ou sa mise à jour demande la version système {} ; cette console est en {}.",
@@ -822,7 +827,7 @@
             "needs_verify": {
                 "short": "Données corrompues",
                 "cause": "La console a trouvé des données corrompues dans ce jeu et demande à les vérifier.",
-                "fix": "Vérifiez si les données sont corrompues (Actions). Si c'est le cas, supprimez le jeu et réinstallez-le."
+                "fix": "Vérifiez les données (premier bouton) : PlayGuard retient le résultat. Intactes, le jeu quitte la liste ; corrompues, il passe dans « À réinstaller »."
             },
             "key_too_new": {
                 "short": "Clés trop récentes",
@@ -889,11 +894,13 @@
         "verify_code": "Code de la console : {}",
         "groups": {
             "fix": "Réparables ici ({})",
+            "verify": "À vérifier ({})",
             "reinstall": "À réinstaller ({})",
             "system": "Firmware ou carte SD ({})"
         },
         "group_note": {
             "fix": "PlayGuard peut les réparer : A sur un jeu, puis son premier bouton.",
+            "verify": "La console soupçonne leurs données. La vérification lit chaque fichier et dit s'il faut réinstaller le jeu ; PlayGuard retient le résultat.",
             "reinstall": "Leurs fichiers manquent ou sont inutilisables. Enregistrez leur liste, supprimez-les ici (un installeur les croit installés jusque-là), puis réinstallez-les en cherchant leur nom.",
             "system": "Les jeux vont bien : le problème vient du firmware de la console ou de la carte SD. Mettez à jour le firmware, ou démarrez sur la mémoire où ils ont été installés."
         },
@@ -910,7 +917,27 @@
         "remove_all_body": "Ces {} jeux sont supprimés de la console, avec leurs mises à jour et contenus additionnels, pour pouvoir les réinstaller. Leur liste est d'abord enregistrée dans le dossier des exports de PlayGuard. Les sauvegardes restent.",
         "removing": "Suppression des jeux… {} sur {}",
         "removed_all": "{} jeux supprimés. Leur liste : {}",
-        "removed_some": "{} jeux supprimés sur {}. Leur liste : {}"
+        "removed_some": "{} jeux supprimés sur {}. Leur liste : {}",
+        "verify_all": "Vérifier ces {} jeux",
+        "select": "Sélectionner",
+        "unselect": "Désélectionner",
+        "selected_one": "1 jeu sélectionné",
+        "selected": "{} jeux sélectionnés",
+        "selection": {
+            "verify": "Vérifier leurs données ({})",
+            "remove": "Supprimer ces jeux ({})",
+            "select_group": "Tout sélectionner : {}",
+            "clear": "Tout désélectionner"
+        },
+        "verify_title_n": "Vérification des données · jeu {} sur {}",
+        "verify_done": "{} jeux vérifiés sur {}.",
+        "verify_count_bad": "Données corrompues : {}",
+        "verify_count_ok": "Intacts : {}",
+        "verify_count_err": "Non vérifiés : {}",
+        "remove_corrupt": "Supprimer les {} corrompus",
+        "verified_intact": "Données vérifiées le {} : intactes.",
+        "select_many": "Plusieurs jeux à la fois (Y sur un jeu)",
+        "remove_corrupt_one": "Supprimer le jeu corrompu"
     },
     "about": {
         "section_changelog": "Nouveautés de la {}",

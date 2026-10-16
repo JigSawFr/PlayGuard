@@ -1218,16 +1218,19 @@ if upload_count() != uploads_before + 1:
 key("Return")              # OK
 os.remove(github_token)
 
-# Installed games: the simulated console's broken games in three sections
-# (fixed here, to reinstall, firmware or SD card), the fixes of the first, a
-# removal (recorded in the change history) in the second, the third.
+# Installed games: the simulated console's broken games in four sections
+# (fixed here, to check, to reinstall, firmware or SD card), the fixes of the
+# first, the data of the second checked one game and then both at once (the
+# section picked, the corrupt game kept as such), a removal of the games
+# picked and one of a single game (recorded in the change history), the
+# third all at once, the fourth.
 key("Down", 4)             # past Keep, Keep for, Keep up to: Check the installed games
 os.remove(games_cache)     # made by the start-up check: this screen's first check, game by game
 key("Return")
 time.sleep(0.8)
 shot("27_games_checking")  # the games shown as they are checked, with the count
 time.sleep(3)              # 15 games, 150 ms each
-shot("27_games")           # Fix here: Forest Tales, Robot Factory, Moon Racer, an unnamed game; then Reinstall
+shot("27_games")           # Fix here: Robot Factory, Moon Racer; To check: Forest Tales, an unnamed game; Reinstall; …
 if not os.path.exists(games_cache):
     fail("the installed games check was not cached in " + games_cache)
 # Opened again: the cache at once, nothing to check again.
@@ -1235,26 +1238,8 @@ key("Escape")
 key("Return")
 time.sleep(0.6)
 shot("27_games_cached")
-# Forest Tales: the console found corrupt data; its check runs in a dialog
-# with its progress and Cancel.
-key("Return")              # icon, why, what to do
-shot("27_games_details")   # Check the data (the fix, focused), Other actions
-key("Return")              # Check the data for corruption (the fix)
-time.sleep(2.6)            # past the first seconds: the time left shows
-shot("27_games_verifying")
-time.sleep(3)
-shot("27_games_verified")  # corrupt data found
-key("Return")              # OK
-# The check again, cancelled.
-key("Return")
-key("Return")
-key("Escape")              # B: cancel
-time.sleep(1)
-if not any(m == "Check cancelled." for m in messages()):
-    fail("the check was not cancelled: " + repr(messages()[-3:]))
-# Robot Factory: only its update needs a newer firmware; removing the update
-# (the fix, the first button) makes it work again.
-key("Down")
+# Robot Factory (the focus, the first game): only its update needs a newer
+# firmware; removing the update (the fix, the first button) makes it work again.
 key("Return")
 shot("27_games_update")    # Remove the update (version 2.1.0)
 key("Return")              # the fix
@@ -1266,17 +1251,60 @@ if not any(m.endswith("works again.") and m.startswith("Robot Factory") for m in
     fail("the update removal did not fix the game: " + repr(messages()[-3:]))
 # Moon Racer: the console asks for a removed update; accepting the installed
 # version again (the fix, no question) makes it work again.
-key("Up", 6)               # the first game
-key("Down")                # past Forest Tales
+key("Up", 6)               # Several games at once, above the sections
+key("Down")                # the first game
 key("Return")
 shot("27_games_launch")
 key("Return")              # Accept the installed version again
 time.sleep(1.5)            # the toast follows the games read again
 if not any(m.endswith("works again.") and m.startswith("Moon Racer") for m in messages()):
     fail("the launch version reset did not fix the game: " + repr(messages()[-3:]))
+# Forest Tales: the console found corrupt data; its check runs in a dialog
+# with its progress and Cancel, here cancelled.
+key("Up", 6)
+key("Down", 2)             # past Check these 2 games, above them: the first game of To check
+key("Return")              # icon, why, what to do
+shot("27_games_details")   # Check the data (the fix, focused), Other actions
+key("Return")              # Check the data (the fix)
+key("Escape")              # B: cancel, well before its 4 s end
+time.sleep(1)
+if not any(m == "Check cancelled." for m in messages()):
+    fail("the check was not cancelled: " + repr(messages()[-3:]))
+# Both games of To check picked at once (the keyboard has no Y), then their
+# data checked one after the other: Forest Tales corrupt, the unnamed game
+# intact; both kept as such, out of To check.
+key("Up", 6)               # Several games at once
+key("Return")
+shot("27_games_select_menu")   # Select all of: To check (2), Reinstall (4), Firmware or SD card (1)
+key("Return")
+shot("27_games_selected")  # 2 games selected, their check marks
+key("Return")
+shot("27_games_selection_menu")   # Check their data (2), Remove these games (2), …
+key("Return")              # Check their data
+time.sleep(2.6)            # past the first seconds: the time left shows
+shot("27_games_verifying_batch")  # game 1 of 2
+time.sleep(8)
+shot("27_games_verified_batch")   # 2 of 2 checked: 1 corrupt (Forest Tales), 1 intact
+key("Return")              # Cancel: the corrupt game stays, as such
+time.sleep(1.5)            # both read again
+shot("27_games_after_verify")     # Forest Tales "Corrupt (checked)" in Reinstall, still picked
+with open(games_cache, "rb") as f:
+    if f.read(8)[4:8] != (2).to_bytes(4, "little"):
+        fail("the games cache is not the version that keeps what the check found")
+# The two games picked, removed at once (their list saved first).
+key("Up", 6)               # 2 games selected
+key("Return")
+key("Down")                # Remove these games (2)
+key("Return")
+shot("27_games_remove_selected")
+key("Right")               # Remove
+key("Return")
+time.sleep(2)
+if not any(m.startswith("2 games removed.") for m in messages()):
+    fail("the games picked were not removed: " + repr(messages()[-3:]))
 # To reinstall: Garden Defenders (an update without its game), removed.
-key("Up", 6)               # the first game
-key("Down", 4)             # past Forest Tales, the unnamed game, Reinstall's buttons, Hedgehog Rush
+key("Up", 6)               # Several games at once
+key("Down", 3)             # past Reinstall's buttons, Hedgehog Rush
 shot("27_games_reinstall")
 key("Return")
 shot("27_games_actions")   # Remove the game (the fix), Other actions
@@ -1294,12 +1322,13 @@ key("Up", 2)               # past Hedgehog Rush: Save the list of these games, a
 shot("27_games_reinstall_actions")
 key("Return")
 time.sleep(0.5)
-lists = glob.glob(os.path.join(exports_dir, "games_to_reinstall_*.json"))
-if not lists or not os.path.exists(lists[0][:-4] + "txt"):
+# The newest: the games picked and removed above left one of their own.
+lists = sorted(glob.glob(os.path.join(exports_dir, "games_to_reinstall_*.json")), key=os.path.getmtime)
+if not lists or not os.path.exists(lists[-1][:-4] + "txt"):
     fail("the list of the games to reinstall was not saved in " + exports_dir)
-with open(lists[0], encoding="utf-8") as f:
+with open(lists[-1], encoding="utf-8") as f:
     if "Ocean Explorer" not in f.read():
-        fail("the saved list does not name Ocean Explorer: " + lists[0])
+        fail("the saved list does not name Ocean Explorer: " + lists[-1])
 # The same list to a secret gist (signed in): its link and QR code.
 open(github_token, "w").write("ghu_smoke")
 uploads_before = upload_count()

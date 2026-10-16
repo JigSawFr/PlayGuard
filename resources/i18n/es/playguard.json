@@ -803,6 +803,11 @@
                 "cause": "Faltan archivos del juego o de su actualización donde están instalados: una instalación interrumpida o una tarjeta SD dañada.",
                 "fix": "Elimina el juego y vuelve a instalarlo. Si hay varios juegos afectados, comprueba primero la tarjeta SD."
             },
+            "corrupt": {
+                "short": "Dañado (comprobado)",
+                "cause": "PlayGuard comprobó sus datos ({}): la consola encontró datos dañados. El juego no se podrá jugar hasta que se vuelva a instalar.",
+                "fix": "Quita el juego (primer botón) y vuelve a instalarlo. Los datos de guardado se conservan."
+            },
             "firmware": {
                 "short": "Requiere el firmware {}",
                 "cause": "El juego o su actualización requiere la versión del sistema {}; esta consola tiene la {}.",
@@ -822,7 +827,7 @@
             "needs_verify": {
                 "short": "Datos dañados",
                 "cause": "La consola ha encontrado datos dañados en este juego y pide comprobarlos.",
-                "fix": "Comprueba si los datos están dañados (Acciones). Si lo están, elimina el juego y vuelve a instalarlo."
+                "fix": "Comprueba los datos (primer botón): PlayGuard recuerda el resultado. Si están bien, el juego sale de la lista; si están dañados, pasa a Reinstalar."
             },
             "key_too_new": {
                 "short": "Claves demasiado nuevas",
@@ -889,11 +894,13 @@
         "verify_code": "Código de la consola: {}",
         "groups": {
             "fix": "Reparables aquí ({})",
+            "verify": "Por comprobar ({})",
             "reinstall": "Reinstalar ({})",
             "system": "Firmware o tarjeta SD ({})"
         },
         "group_note": {
             "fix": "PlayGuard puede repararlos: A en un juego y luego su primer botón.",
+            "verify": "La consola sospecha de sus datos. La comprobación lee cada archivo y dice si hay que reinstalar el juego; PlayGuard recuerda el resultado.",
             "reinstall": "Sus archivos faltan o no sirven. Guarda su lista, quítalos aquí (hasta entonces un instalador los da por instalados) y reinstálalos buscando su nombre.",
             "system": "Los juegos están bien: el problema es el firmware de la consola o la tarjeta SD. Actualiza el firmware o inicia en la memoria donde se instalaron."
         },
@@ -910,7 +917,27 @@
         "remove_all_body": "Estos {} juegos se quitan de la consola, con sus actualizaciones y contenidos descargables, para poder reinstalarlos. Antes se guarda su lista en la carpeta de exportaciones de PlayGuard. Los datos guardados se conservan.",
         "removing": "Quitando los juegos… {} de {}",
         "removed_all": "{} juegos quitados. Su lista: {}",
-        "removed_some": "{} de {} juegos quitados. Su lista: {}"
+        "removed_some": "{} de {} juegos quitados. Su lista: {}",
+        "verify_all": "Comprobar estos {} juegos",
+        "select": "Seleccionar",
+        "unselect": "Deseleccionar",
+        "selected_one": "1 juego seleccionado",
+        "selected": "{} juegos seleccionados",
+        "selection": {
+            "verify": "Comprobar sus datos ({})",
+            "remove": "Quitar estos juegos ({})",
+            "select_group": "Seleccionar todo: {}",
+            "clear": "Deseleccionar todo"
+        },
+        "verify_title_n": "Comprobando los datos · juego {} de {}",
+        "verify_done": "{} de {} juegos comprobados.",
+        "verify_count_bad": "Datos dañados: {}",
+        "verify_count_ok": "Sin daños: {}",
+        "verify_count_err": "No se pudieron comprobar: {}",
+        "remove_corrupt": "Quitar los {} dañados",
+        "verified_intact": "Datos comprobados el {}: sin daños.",
+        "select_many": "Varios juegos a la vez (Y en un juego)",
+        "remove_corrupt_one": "Quitar el juego dañado"
     },
     "about": {
         "section_changelog": "Novedades de la {}",

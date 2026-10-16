@@ -803,6 +803,11 @@
                 "cause": "Dateien des Spiels oder seines Updates fehlen dort, wo sie installiert sind: eine abgebrochene Installation oder eine beschädigte SD-Karte.",
                 "fix": "Entferne das Spiel und installiere es erneut. Sind mehrere Spiele betroffen, prüfe zuerst die SD-Karte."
             },
+            "corrupt": {
+                "short": "Beschädigt (geprüft)",
+                "cause": "PlayGuard hat die Daten geprüft ({}): Die Konsole hat beschädigte Daten gefunden. Das Spiel startet erst wieder, wenn es neu installiert ist.",
+                "fix": "Entferne das Spiel (erste Schaltfläche) und installiere es neu. Die Speicherdaten bleiben erhalten."
+            },
             "firmware": {
                 "short": "Benötigt Firmware {}",
                 "cause": "Das Spiel oder sein Update benötigt die Systemversion {}; diese Konsole hat {}.",
@@ -822,7 +827,7 @@
             "needs_verify": {
                 "short": "Beschädigte Daten",
                 "cause": "Die Konsole hat beschädigte Daten in diesem Spiel gefunden und verlangt eine Prüfung.",
-                "fix": "Prüfe die Daten auf Beschädigung (Aktionen). Sind sie beschädigt, entferne das Spiel und installiere es erneut."
+                "fix": "Prüfe die Daten (erste Schaltfläche): PlayGuard merkt sich das Ergebnis. Intakt verschwindet das Spiel aus der Liste, beschädigt kommt es zu „Neu installieren“."
             },
             "key_too_new": {
                 "short": "Schlüssel zu neu",
@@ -889,11 +894,13 @@
         "verify_code": "Code der Konsole: {}",
         "groups": {
             "fix": "Hier reparierbar ({})",
+            "verify": "Zu prüfen ({})",
             "reinstall": "Neu installieren ({})",
             "system": "Firmware oder SD-Karte ({})"
         },
         "group_note": {
             "fix": "PlayGuard kann sie reparieren: A auf einem Spiel, dann die erste Schaltfläche.",
+            "verify": "Die Konsole misstraut ihren Daten. Die Prüfung liest jede Datei und zeigt, ob das Spiel neu installiert werden muss; PlayGuard merkt sich das Ergebnis.",
             "reinstall": "Ihre Dateien fehlen oder sind unbrauchbar. Liste speichern, hier entfernen (ein Installer hält sie bis dahin für installiert) und dann über ihren Namen neu installieren.",
             "system": "Die Spiele sind in Ordnung: Das Problem liegt an der Firmware der Konsole oder an der SD-Karte. Firmware aktualisieren oder vom Speicher starten, auf dem sie installiert wurden."
         },
@@ -910,7 +917,27 @@
         "remove_all_body": "Diese {} Spiele werden samt Updates und Zusatzinhalten von der Konsole entfernt, damit sie neu installiert werden können. Ihre Liste wird vorher im Export-Ordner von PlayGuard gespeichert. Spielstände bleiben erhalten.",
         "removing": "Spiele werden entfernt… {} von {}",
         "removed_all": "{} Spiele entfernt. Ihre Liste: {}",
-        "removed_some": "{} von {} Spielen entfernt. Ihre Liste: {}"
+        "removed_some": "{} von {} Spielen entfernt. Ihre Liste: {}",
+        "verify_all": "Diese {} Spiele prüfen",
+        "select": "Auswählen",
+        "unselect": "Abwählen",
+        "selected_one": "1 Spiel ausgewählt",
+        "selected": "{} Spiele ausgewählt",
+        "selection": {
+            "verify": "Ihre Daten prüfen ({})",
+            "remove": "Diese Spiele entfernen ({})",
+            "select_group": "Alle auswählen: {}",
+            "clear": "Alle abwählen"
+        },
+        "verify_title_n": "Daten werden geprüft · Spiel {} von {}",
+        "verify_done": "{} von {} Spielen geprüft.",
+        "verify_count_bad": "Beschädigte Daten: {}",
+        "verify_count_ok": "Intakt: {}",
+        "verify_count_err": "Nicht prüfbar: {}",
+        "remove_corrupt": "Die {} beschädigten entfernen",
+        "verified_intact": "Daten geprüft am {}: intakt.",
+        "select_many": "Mehrere Spiele auf einmal (Y auf einem Spiel)",
+        "remove_corrupt_one": "Beschädigtes Spiel entfernen"
     },
     "about": {
         "section_changelog": "Neu in {}",

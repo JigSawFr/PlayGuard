@@ -78,7 +78,20 @@ typedef struct {
     bool launch_checked;             // launch_required read (avm, 6.0.0+)
     u32  launch_required;            // the version the console wants before it starts the game
     Result launch_rc;                // nsCheckApplicationLaunchVersion: why the console would refuse it
+
+    // What PlayGuard's own integrity check (gamecheck_verify) found. Never
+    // read from the console: the scan leaves it at GC_VERIFIED_NONE and the
+    // cache carries it from one check to the next while the same version is
+    // installed (util/game_cache.hpp).
+    u8   verified;                   // GC_VERIFIED_*
+    u32  verified_version;           // gamecheck_installed_version() it was checked at
+    u64  verified_at;                // when, POSIX (user clock)
+    Result verified_code;            // the code the console gave for the corrupt data, 0 when none
 } GameFacts;
+
+#define GC_VERIFIED_NONE    0
+#define GC_VERIFIED_INTACT  1   // read to its end: nothing corrupt
+#define GC_VERIFIED_CORRUPT 2   // read to its end: corrupt data
 
 // The one problem shown for a game, the first that applies in this order: an
 // earlier one explains the later ones (no files: no name either).
@@ -88,7 +101,8 @@ typedef enum {
     GC_STORAGE_UNAVAILABLE,  // on the SD card, which cannot be read
     GC_NO_BASE,              // an update or add-on without the game: "!"
     GC_FILES_MISSING,        // installed, files missing or unknown to the storage
-    GC_NEEDS_VERIFY,         // the console found corrupt data (view flag)
+    GC_CORRUPT,              // PlayGuard's integrity check found corrupt data
+    GC_NEEDS_VERIFY,         // the console found corrupt data (view flag), not checked since
     GC_KEY_TOO_NEW,          // encrypted with a key this firmware does not have
     GC_FIRMWARE_TOO_OLD,     // needs a newer system version than this console's
     GC_TICKET_MISSING,       // needs a ticket the console does not have
@@ -116,13 +130,14 @@ u32 gamecheck_actions(const GameFacts *g, GameIssue issue);
 // The one action that fixes `issue`, if one does (a GA_* bit of
 // gamecheck_actions(), 0 when none): accept the installed version again,
 // remove the update that needs a newer firmware, check the data the console
-// found corrupt or cannot read the name of, or clean an entry with nothing
-// usable behind it.
+// found corrupt or cannot read the name of (not once checked intact), or
+// remove a game found corrupt or with nothing usable behind it.
 u32 gamecheck_recommended(const GameFacts *g, GameIssue issue, u32 current_hos);
 
 // The screen's sections: what to do about `issue`.
 typedef enum {
     GC_CAT_FIX = 0,    // PlayGuard fixes it here (its recommended action does)
+    GC_CAT_VERIFY,     // its data is to be checked first: it says whether to install it again
     GC_CAT_REINSTALL,  // the game is to be installed again (or its entry cleaned)
     GC_CAT_SYSTEM,     // the fix is outside the game: the firmware, the SD card
     GC_CAT_COUNT

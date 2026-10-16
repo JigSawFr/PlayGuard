@@ -1,8 +1,8 @@
 // GameCheckActivity — Tools › Check the installed games: the games the HOME
 // menu cannot start or draw (core/gamecheck.h), each with what the HOME menu
 // shows, and how many of the installed games have a problem, in a section per
-// way out: repaired here, installed again, the firmware or the SD card
-// (gamecheck_category), grouped by problem in each. A on one: its
+// way out: repaired here, to check first, installed again, the firmware or
+// the SD card (gamecheck_category), grouped by problem in each. A on one: its
 // icon, why and what to do, the fix as the first button when one action is
 // the fix, then the other actions (accept the installed version again, check
 // the data, remove the update or an add-on, remove the game; save data always
@@ -11,12 +11,17 @@
 // entry changed are checked again (every game once a day, on another
 // firmware, or on Ⓧ), each shown as soon as it is checked. After a change
 // its game is checked again, and after a repair a toast says whether it left
-// the list.
+// the list. What the integrity check found is kept with the game (corrupt:
+// to install again; intact: out of the list) until another version is
+// installed. Ⓨ selects games, for one action on them all: check their data
+// one after the other, or remove them; "Check these games" does the same for
+// the whole section to check.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
 #include <borealis.hpp>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -47,6 +52,8 @@ class GameCheckActivity : public brls::Activity
         brls::Button* save       = nullptr;   // Reinstall only: save the list
         brls::Button* send       = nullptr;   // Reinstall only: send the list to a gist
         brls::Button* remove_all = nullptr;   // Reinstall only: remove them all
+        brls::Button* verify_all = nullptr;   // To check only: check them all
+        std::vector<GameFacts> games;         // as shown
     };
 
     struct Pending
@@ -67,8 +74,9 @@ class GameCheckActivity : public brls::Activity
     std::string timing;       // where the last check spent its time (developer mode)
     Pending pending;
     Group groups[GC_CAT_COUNT];
-    std::vector<GameFacts> reinstall;   // the games of "Reinstall", as shown
-    bool removing = false;              // remove_all() under way
+    bool removing = false;              // remove_games() under way
+    std::set<u64> selected;             // the games picked with Ⓨ
+    brls::DetailCell* selection = nullptr;   // above the sections: what is picked, A for what to do
 
     void save();
     // Lists the console's entries, then checks what changed (`all`: every
@@ -85,15 +93,23 @@ class GameCheckActivity : public brls::Activity
     void choose(const GameFacts& game, u32 actions);
     void run(const GameFacts& game, u32 action, const GameContent& content);
     void remove(const GameFacts& game);
-    // The games of "Reinstall": their list as text, saved (the JSON's path,
-    // "" and why on failure), and all of them removed after one question.
-    std::string list_text() const;
-    std::string save_list(std::string* error) const;
-    void remove_all();
+    // `games`' list as text, saved (the JSON's path, "" and why on
+    // failure), and all of them removed after one question (the list saved
+    // first).
+    std::string list_text(const std::vector<GameFacts>& games) const;
+    std::string save_list(const std::vector<GameFacts>& games, std::string* error) const;
+    void remove_games(std::vector<GameFacts> games);
     void remove_next(std::vector<GameFacts> games, size_t at, u32 removed, std::string path);
+    // Ⓨ on a game; the actions on the games picked.
+    void toggle(u64 id);
+    void selection_menu();
+    std::vector<GameFacts> selected_games() const;
+    std::string selection_text() const;   // "3 games selected", or how to pick some
     void remove_content(const GameFacts& game, const GameContent& content);
     void reset_launch(const GameFacts& game);
-    void verify(const GameFacts& game);
+    // The console's integrity check of `games`, one after the other in one
+    // dialog; what it found kept with each game as it goes.
+    void verify(std::vector<GameFacts> games);
 
     BRLS_BIND(brls::Label,  note,   "gc_note");
     BRLS_BIND(brls::Label,  status, "gc_status");

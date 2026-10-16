@@ -11,7 +11,7 @@ namespace game_cache
 namespace
 {
 constexpr char MAGIC[4] = { 'P', 'G', 'G', 'C' };
-constexpr uint32_t VERSION = 1;
+constexpr uint32_t VERSION = 2;   // 2: what the integrity check found
 constexpr uint32_t MAX_GAMES = GAMECHECK_MAX;
 
 struct Header
@@ -24,6 +24,14 @@ struct Header
     uint32_t count;
     uint32_t truncated;
 };
+
+// gamecheck_installed_version(), which lives with the console calls.
+uint32_t installed_version(const GameFacts& g)
+{
+    uint32_t v = g.has_base ? g.base_version : 0;
+    if (g.has_patch && g.patch_version > v) v = g.patch_version;
+    return v;
+}
 }   // namespace
 
 std::string encode(const Cache& cache)
@@ -90,14 +98,43 @@ std::vector<GameRecord> to_check(Cache* cache, const std::vector<GameRecord>& re
     return check;
 }
 
+void carry_verified(const Cache& cache, GameFacts* game)
+{
+    if (game->verified != GC_VERIFIED_NONE) return;
+    for (const GameFacts& g : cache.games) {
+        if (g.app_id != game->app_id) continue;
+        if (g.verified == GC_VERIFIED_NONE || g.verified_version != installed_version(*game)) return;
+        game->verified         = g.verified;
+        game->verified_version = g.verified_version;
+        game->verified_at      = g.verified_at;
+        game->verified_code    = g.verified_code;
+        return;
+    }
+}
+
 void put(Cache* cache, const GameFacts& game)
 {
+    GameFacts kept = game;
+    carry_verified(*cache, &kept);
     for (GameFacts& g : cache->games)
         if (g.app_id == game.app_id) {
-            g = game;
+            g = kept;
             return;
         }
-    cache->games.push_back(game);
+    cache->games.push_back(kept);
+}
+
+bool set_verified(Cache* cache, uint64_t app_id, uint8_t result, int64_t at, Result code)
+{
+    for (GameFacts& g : cache->games) {
+        if (g.app_id != app_id) continue;
+        g.verified         = result;
+        g.verified_version = installed_version(g);
+        g.verified_at      = at > 0 ? (u64)at : 0;
+        g.verified_code    = result == GC_VERIFIED_CORRUPT ? code : 0;
+        return true;
+    }
+    return false;
 }
 
 }   // namespace game_cache

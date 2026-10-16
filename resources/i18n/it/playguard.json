@@ -803,6 +803,11 @@
                 "cause": "Mancano file del gioco o del suo aggiornamento dove sono installati: un'installazione interrotta o una scheda SD danneggiata.",
                 "fix": "Rimuovi il gioco, poi reinstallalo. Se sono coinvolti più giochi, controlla prima la scheda SD."
             },
+            "corrupt": {
+                "short": "Danneggiato (verificato)",
+                "cause": "PlayGuard ha verificato i dati ({}): la console ha trovato dati danneggiati. Il gioco non si avvia finché non viene reinstallato.",
+                "fix": "Rimuovi il gioco (primo pulsante), poi reinstallalo. I dati di salvataggio restano."
+            },
             "firmware": {
                 "short": "Richiede il firmware {}",
                 "cause": "Il gioco o il suo aggiornamento richiede la versione di sistema {}; questa console ha la {}.",
@@ -822,7 +827,7 @@
             "needs_verify": {
                 "short": "Dati danneggiati",
                 "cause": "La console ha trovato dati danneggiati in questo gioco e chiede di controllarli.",
-                "fix": "Controlla se i dati sono danneggiati (Azioni). Se lo sono, rimuovi il gioco e reinstallalo."
+                "fix": "Verifica i dati (primo pulsante): PlayGuard ricorda il risultato. Se integri, il gioco esce dall'elenco; se danneggiati, passa a Reinstallare."
             },
             "key_too_new": {
                 "short": "Chiavi troppo recenti",
@@ -889,11 +894,13 @@
         "verify_code": "Codice della console: {}",
         "groups": {
             "fix": "Riparabili qui ({})",
+            "verify": "Da verificare ({})",
             "reinstall": "Da reinstallare ({})",
             "system": "Firmware o scheda SD ({})"
         },
         "group_note": {
             "fix": "PlayGuard può ripararli: A su un gioco, poi il primo pulsante.",
+            "verify": "La console sospetta dei loro dati. La verifica legge ogni file e dice se reinstallare il gioco; PlayGuard ricorda il risultato.",
             "reinstall": "I loro file mancano o sono inutilizzabili. Salva l'elenco, rimuovili qui (fino ad allora un installer li considera installati), poi reinstallali cercandone il nome.",
             "system": "I giochi sono a posto: il problema è il firmware della console o la scheda SD. Aggiorna il firmware o avvia dalla memoria su cui sono stati installati."
         },
@@ -910,7 +917,27 @@
         "remove_all_body": "Questi {} giochi vengono rimossi dalla console, con aggiornamenti e contenuti aggiuntivi, per poterli reinstallare. Prima il loro elenco viene salvato nella cartella delle esportazioni di PlayGuard. I salvataggi restano.",
         "removing": "Rimozione dei giochi… {} di {}",
         "removed_all": "{} giochi rimossi. Il loro elenco: {}",
-        "removed_some": "{} giochi rimossi su {}. Il loro elenco: {}"
+        "removed_some": "{} giochi rimossi su {}. Il loro elenco: {}",
+        "verify_all": "Verifica questi {} giochi",
+        "select": "Seleziona",
+        "unselect": "Deseleziona",
+        "selected_one": "1 gioco selezionato",
+        "selected": "{} giochi selezionati",
+        "selection": {
+            "verify": "Verifica i loro dati ({})",
+            "remove": "Rimuovi questi giochi ({})",
+            "select_group": "Seleziona tutto: {}",
+            "clear": "Deseleziona tutto"
+        },
+        "verify_title_n": "Verifica dei dati · gioco {} di {}",
+        "verify_done": "{} giochi verificati su {}.",
+        "verify_count_bad": "Dati danneggiati: {}",
+        "verify_count_ok": "Integri: {}",
+        "verify_count_err": "Non verificabili: {}",
+        "remove_corrupt": "Rimuovi i {} danneggiati",
+        "verified_intact": "Dati verificati il {}: integri.",
+        "select_many": "Più giochi insieme (Y su un gioco)",
+        "remove_corrupt_one": "Rimuovi il gioco danneggiato"
     },
     "about": {
         "section_changelog": "Novità della {}",
