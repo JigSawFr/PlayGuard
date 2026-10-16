@@ -1347,8 +1347,49 @@ static void test_no_pin(void)
     CHECK(pctl_play_timer_set_alarm_disabled(true) == 0 && model.writes == 1);
 }
 
+/* pin_is_weak and pctl_pin_weak: the PIN judged and wiped inside, no reveal
+ * check asked (nothing is shown), every session released. */
+static void test_pin_weak(void)
+{
+    const char *weak[] = {"0000", "1111", "1234", "4321", "0123", "9876", "1212", "2580", "0852",
+                          "123456", "12345678", "87654321", "121212", "00000000"};
+    for (unsigned i = 0; i < sizeof(weak) / sizeof(weak[0]); ++i)
+        CHECK(pin_is_weak(weak[i], strlen(weak[i])));
+    const char *fine[] = {"7391", "2468", "1235", "9012", "1221", "4826", "193847", "5038", "123"};
+    for (unsigned i = 0; i < sizeof(fine) / sizeof(fine[0]); ++i)
+        CHECK(!pin_is_weak(fine[i], strlen(fine[i])));
+    CHECK(!pin_is_weak(NULL, 4));
+
+    bool weak_pin = false;
+    reset();
+    reveal_answer = false;
+    reveals = 0;
+    core_set_reveal_check(reveal_check);   /* refusing: not asked at all */
+    model.pin = "1234";
+    CHECK(pctl_pin_weak(&weak_pin) == 0 && weak_pin && reveals == 0);
+    CHECK(model.writes == 0 && model.refs == 0 && model.init_calls == model.exit_calls);
+    core_set_reveal_check(NULL);
+
+    reset();
+    model.pin = "7391";
+    weak_pin = true;
+    CHECK(pctl_pin_weak(&weak_pin) == 0 && !weak_pin && model.refs == 0);
+
+    reset();
+    model.pin = "";
+    CHECK(pctl_pin_weak(&weak_pin) == NXM_RC_NO_PIN && !weak_pin && model.refs == 0);
+
+    reset();
+    model.fail_command = 1208;
+    weak_pin = true;
+    CHECK(pctl_pin_weak(&weak_pin) == MOCK_ERROR && !weak_pin && model.refs == 0);
+
+    CHECK(pctl_pin_weak(NULL) == NXM_RC_INVALID_ARGUMENT);
+}
+
 int main(void)
 {
+    test_pin_weak();
     test_ownership();
     test_reads();
     test_sample();

@@ -41,7 +41,11 @@ report is left.
 ## How to use it
 
 1. Install the module once: extract `playguard-rescue.zip` to the SD-card root
-   (it lands in `atmosphere/contents/4200000000505247/`). Reboot.
+   (it lands in `atmosphere/contents/4200000000505247/`). Reboot. Its
+   `playguard-rescue.txt` says which PlayGuard it comes with and its revision
+   (`tools/rescue_rev.cmake`, a hash of its sources): while it is not the one
+   the running PlayGuard ships with, the notification bell says to extract
+   the zip of that release again.
 2. When you are locked out: put the SD card in a computer, create an empty file
    `config/playguard/RESCUE` (or `RESCUE.txt`; to delete everything instead,
    write `delete` on a line of its own), put the card back, turn the

@@ -5,6 +5,7 @@
 #include <string>
 
 #include "action/history_flow.hpp"
+#include "action/notices.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/history.hpp"
@@ -19,6 +20,13 @@ namespace
 bool s_rescue  = false;   // a report that could not be read
 bool s_history = false;   // history.json put aside before at_start()
 bool s_started = false;   // at_start() ran: later news is shown at once
+
+// One entry of the notification bell per file: to do while it could not be
+// put aside (nothing is saved in it), else for information.
+void note(const char* id, bool stuck, const std::string& text)
+{
+    notices::set(id, stuck ? notices::Level::Action : notices::Level::Info, "playguard/notices/data"_i18n, text);
+}
 }   // namespace
 
 void rescue_unreadable()
@@ -33,7 +41,10 @@ void history_put_aside()
         s_history = true;
         return;
     }
-    brls::sync([]() { ui::info("playguard/data_notice/history_reset"_i18n); });
+    brls::sync([]() {
+        note("data_history", false, "playguard/data_notice/history_reset"_i18n);
+        ui::notify("playguard/notices/data_toast"_i18n);
+    });
 }
 
 void at_start()
@@ -41,20 +52,23 @@ void at_start()
     if (s_started) return;
     s_started = true;
 
-    std::string text;
-    auto add = [&text](const std::string& part) { text += (text.empty() ? "" : "\n\n") + part; };
+    bool found = false;
+    auto add = [&found](const char* id, bool stuck, const std::string& text) {
+        note(id, stuck, text);
+        found = true;
+    };
 
     const config::Loaded cfg = config::loaded();
-    if (cfg == config::Loaded::PutAside) add("playguard/data_notice/config_reset"_i18n);
-    else if (cfg == config::Loaded::Stuck) add("playguard/data_notice/config_stuck"_i18n);
+    if (cfg == config::Loaded::PutAside) add("data_config", false, "playguard/data_notice/config_reset"_i18n);
+    else if (cfg == config::Loaded::Stuck) add("data_config", true, "playguard/data_notice/config_stuck"_i18n);
 
     // Before the entry below, which would otherwise put it aside on its own.
     // Not while a change is being written to it (ui::write_later).
     ui::settle_writes();
     const history::Damage hist = history::check();
-    if (hist == history::Damage::PutAside || s_history) add("playguard/data_notice/history_reset"_i18n);
-    else if (hist == history::Damage::Stuck) add("playguard/data_notice/history_stuck"_i18n);
-    if (s_rescue) add("playguard/data_notice/rescue_unreadable"_i18n);
+    if (hist == history::Damage::PutAside || s_history) add("data_history", false, "playguard/data_notice/history_reset"_i18n);
+    else if (hist == history::Damage::Stuck) add("data_history", true, "playguard/data_notice/history_stuck"_i18n);
+    if (s_rescue) add("data_rescue", false, "playguard/data_notice/rescue_unreadable"_i18n);
 
     if (cfg == config::Loaded::PutAside || cfg == config::Loaded::Stuck) {
         brls::Logger::warning("config: unreadable, defaults in use ({})",
@@ -64,8 +78,8 @@ void at_start()
     if (hist != history::Damage::None)
         brls::Logger::warning("history: unreadable at start-up ({})",
                               hist == history::Damage::PutAside ? "kept as history.json.bad" : "could not be put aside");
-    if (text.empty()) return;
-    brls::sync([text]() { ui::info(text); });
+    // Said in the notification bell; a toast points to it.
+    if (found) brls::sync([]() { ui::notify("playguard/notices/data_toast"_i18n); });
 }
 
 }   // namespace data_notice

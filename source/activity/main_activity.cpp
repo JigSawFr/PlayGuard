@@ -4,10 +4,14 @@
 #include "action/clock_check.hpp"
 #include "action/data_notice.hpp"
 #include "action/fw_gate.hpp"
+#include "action/notices.hpp"
 #include "action/pt_flow.hpp"
+#include "action/rescue.hpp"
+#include "action/rollback_flow.hpp"
 #include "action/support_flow.hpp"
 #include "action/update_flow.hpp"
 #include "activity/loading_activity.hpp"
+#include "activity/notices_activity.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
@@ -86,6 +90,21 @@ void MainActivity::onContentAvailable()
         return true;
     });
 
+    // Y: the notification bell's list, from any tab.
+    this->getContentView()->registerAction("playguard/notices/hint"_i18n, brls::BUTTON_Y, [](brls::View*) {
+        NoticesActivity::open();
+        return true;
+    });
+#ifndef __SWITCH__
+    // The desktop build: the keyboard has no Ⓨ, so the Y key (smoke test).
+    this->getContentView()->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Y), [](brls::View*) {
+        NoticesActivity::open();
+        return true;
+    });
+#endif
+    this->notice_listener = notices::listen([this]() { this->update_notice_hint(); });
+    this->update_notice_hint();
+
     // Preferences › Start on: that tab rather than the Overview (first, so the
     // questions below keep the focus they take).
     int start = 0;
@@ -117,11 +136,26 @@ void MainActivity::onContentAvailable()
     // Nothing set up yet (no PIN): the first steps, once per start.
     if (OnboardingActivity::wanted_at_start())
         brls::sync([]() { brls::Application::pushActivity(new OnboardingActivity()); });
-    // Settings, history or a recovery report found damaged: said once, on top.
+    // Settings, history or a recovery report found damaged, a build gone back
+    // from: in the notification bell.
     data_notice::at_start();
+    rollback_flow::note_went_back();
+    notices::note_crash();
+    rescue::note_version();
     // Then, with nothing else in front: "What's new" after an update, else the
     // monthly "Support PlayGuard" reminder.
     support_flow::at_start(this);
+
+    // What the bell shows, read now and every minute after that: the
+    // Overview reads the same every 5 s while it is shown.
+    brls::sync([]() { notices::sweep(); });
+    this->notice_timer.setPeriod(60000);
+    this->notice_timer.setCallback([this]() {
+        auto stack = brls::Application::getActivitiesStack();
+        if (!app::in_focus() || stack.empty() || stack.back() != this) return;
+        notices::sweep();
+    });
+    this->notice_timer.start();
 
     this->day = ui::today_date();
     this->day_timer.setPeriod(30000);
@@ -136,6 +170,30 @@ void MainActivity::onContentAvailable()
         pt_flow::offer_extra_time_restore();
     });
     this->day_timer.start();
+}
+
+MainActivity::~MainActivity()
+{
+    notices::unlisten(this->notice_listener);
+}
+
+void MainActivity::update_notice_hint()
+{
+    const int n = notices::action_count();
+    this->getContentView()->updateActionHint(brls::BUTTON_Y, n > 0 ? brls::getStr("playguard/notices/hint_count", n)
+                                                                    : "playguard/notices/hint"_i18n);
+    brls::Application::getGlobalHintsUpdateEvent()->fire();
+}
+
+void MainActivity::open_tab(int position)
+{
+    auto* frame = dynamic_cast<brls::TabFrame*>(this->getView("main_tabs"));
+    if (!frame) return;
+    brls::sync([frame, position]() {
+        frame->focusTab(position);   // replaces the tab content
+        const auto& children = frame->getChildren();
+        if (children.size() >= 2) brls::Application::giveFocus(children.back());
+    });
 }
 
 void MainActivity::update_title()

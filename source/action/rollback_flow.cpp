@@ -5,6 +5,8 @@
 #include <cstdio>
 
 #include "action/dev_build_flow.hpp"
+#include "action/notices.hpp"
+#include "action/upload_flow.hpp"
 #include "app.hpp"
 #include "core/platform.h"
 #include "ui/ui.hpp"
@@ -21,6 +23,9 @@ namespace
 {
 std::string label_file() { return paths::data_dir() + "/previous_build.json"; }
 std::string check_file() { return paths::data_dir() + "/boot_check.json"; }
+// Gone back from a build: its name, and `starts` 1 when its start did not
+// finish (0: asked for). Read and removed by the build gone back to.
+std::string back_file() { return paths::data_dir() + "/went_back.json"; }
 
 bool exists(const std::string& file)
 {
@@ -36,7 +41,7 @@ std::string running_label()
 
 // The swap, the running build's name kept for the one now previous. romfs:/
 // is read from the running .nro and holds it open: released around it.
-bool swap(const std::string& nro, std::string* error)
+bool swap(const std::string& nro, std::string* error, bool crashed)
 {
     platform_romfs_release();
     const bool ok = rollback::swap(nro, error);
@@ -44,6 +49,10 @@ bool swap(const std::string& nro, std::string* error)
     if (!ok) return false;
     rollback::write_label(label_file(), running_label());
     std::remove(check_file().c_str());
+    rollback::Check back;
+    back.label  = running_label();
+    back.starts = crashed ? 1 : 0;
+    rollback::write_check(back_file(), back);
     return true;
 }
 }   // namespace
@@ -77,7 +86,7 @@ bool at_start()
     if (!platform_boot_choice(text.c_str())) return false;
 
     std::string err;
-    if (!swap(nro, &err)) {
+    if (!swap(nro, &err, offer == rollback::Offer::Crashed)) {
         platform_boot_choice(("\n  Could not go back: " + err + "\n\n  (A) / (B)  Start PlayGuard\n").c_str());
         return false;
     }
@@ -89,7 +98,30 @@ bool at_start()
 
 void started()
 {
+    rollback::Check check;
+    if (rollback::read_check(check_file(), &check) && !check.label.empty()) {
+        std::string previous;
+        if (!rollback::read_label(label_file(), &previous)) previous = "?";
+        notices::set("installed", notices::Level::Info, brls::getStr("playguard/notices/installed", check.label),
+                     brls::getStr("playguard/notices/installed_detail", previous));
+    }
     std::remove(check_file().c_str());
+}
+
+void note_went_back()
+{
+    rollback::Check back;
+    if (!rollback::read_check(back_file(), &back)) return;
+    std::remove(back_file().c_str());
+    const std::string from = back.label.empty() ? "?" : back.label;
+    notices::set("went_back", back.starts ? notices::Level::Action : notices::Level::Info,
+                 "playguard/notices/went_back"_i18n,
+                 brls::getStr(back.starts ? "playguard/notices/went_back_crash" : "playguard/notices/went_back_detail",
+                              from, running_label()),
+                 back.starts ? "playguard/notices/send_report"_i18n : "", []() {
+                     notices::clear("went_back");
+                     upload_flow::choose();
+                 });
 }
 
 void installed(const std::string& installed_label)
@@ -112,7 +144,7 @@ void go_back_now()
 {
     std::string label, err;
     if (!previous(&label)) return;
-    if (!swap(dev_build_flow::nro_file(), &err)) {
+    if (!swap(dev_build_flow::nro_file(), &err, false)) {
         ui::info(brls::getStr("playguard/dev_build/back_failed", err));
         return;
     }

@@ -851,15 +851,20 @@ if OUTSIDE:
         fail("the Overview never said the console is not counting")
     time.sleep(6)              # the next refresh shows it
     shot("02_not_counting")
+    key("y")                   # the notification bell's list (the keyboard's Y): both, the
+    if not logged("notices: 4 to do"):   # simulated network clock (not accurate) and PIN (1234)
+        fail("the notification bell does not hold the four notices to do")
+    shot("03_notices")
+    key("Escape")
     key("Down")                # Play timer: its state line says it too
     key("Right")
-    shot("03_play_timer_not_counting")
+    shot("04_play_timer_not_counting")
     key("Down")                # off the week chart (←/→ pick a day there)
     key("Left")
     key("Up")                  # back to the Overview, on the notice's Dismiss line
     key("Right")
     key("Return")
-    shot("04_dismissed")
+    shot("05_dismissed")
     try:
         watch = json.load(open(watch_file))
     except (OSError, ValueError) as e:
@@ -871,7 +876,7 @@ if OUTSIDE:
     key("Left")                # the sidebar, then Activity: Léo flagged under the account filter
     key("Down", steps("dashboard", "activity"))
     key("Right")
-    shot("05_new_account")
+    shot("06_new_account")
     finish()
 if ALARM:
     shot("01_overview_over")   # Overview: the time over the limit, not a time left

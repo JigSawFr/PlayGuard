@@ -33,6 +33,11 @@ struct Config
     std::string update_latest;
     std::string update_snooze_version;
     std::string update_snooze_until;
+    // What the console runs on (action/sys_update_flow): the latest Atmosphère,
+    // hekate and firmware the last check found (util/sys_updates.hpp's text),
+    // and the day of that check ("YYYY-MM-DD").
+    std::string sys_latest;
+    std::string sys_checked;
     std::string start_tab = "dashboard";   // tab shown at start-up (main.xml order: START_TABS)
     std::vector<int> extra_amounts = { 15, 30, 60 };   // "Extra time today" choices, minutes
     int  activity_period = 1;          // Activity's period: 0 today, 1 last 7 days, 2 all time
@@ -64,6 +69,19 @@ struct Config
     bool        support_reminder = true;
     std::string support_reminded;
     std::string seen_version;
+    // The newest crash file (logs/crashes/) the notification bell told about:
+    // a newer one means PlayGuard closed unexpectedly since.
+    std::string crash_seen;
+
+    // The notification bell (action/notices): which kinds of entries it
+    // shows (Preferences › Notifications), the entries for information read
+    // ("id:hash" of their text, the newest last, at most 48: a read one comes
+    // back when its text changes), and the day the weekly summary was read.
+    bool notices_system    = true;   // newer Atmosphère, hekate, firmware
+    bool notices_summary   = true;   // the week's play time, a limit passed several days
+    bool notices_reminders = true;   // a backup to make, the other system, a long console lock
+    std::vector<std::string> notices_read;
+    std::string summary_seen;
 
     // Console lock (Security › Console lock): every day's limit set to 0, so a
     // PIN is needed to play. console_lock is whether it is on; console_lock_prev
@@ -71,6 +89,7 @@ struct Config
     // put back when it is turned off. Empty: nothing to put back (the timer was
     // off), so turning it off clears the limit.
     bool             console_lock = false;
+    std::string      console_lock_since;   // "YYYY-MM-DD" it was turned on; "" unknown
     std::vector<int> console_lock_prev;
 
     // Choice made on the "firmware not supported yet" screen, remembered for

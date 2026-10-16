@@ -216,3 +216,17 @@ SysCompat sysinfo_compat(const SysInfo *info)
     if (info->hos_version > PCTL_FW_TESTED_MAX)     return SysCompat_UntestedNewer;
     return SysCompat_Ok;
 }
+
+bool pin_is_weak(const char *pin, size_t n)
+{
+    if (!pin || n < 4) return false;
+    bool same = true, up = true, down = true, pairs = n % 2 == 0;
+    for (size_t i = 1; i < n; i++) {
+        same = same && pin[i] == pin[0];
+        up   = up && pin[i] == pin[i - 1] + 1;
+        down = down && pin[i] == pin[i - 1] - 1;
+        if (pairs && i >= 2) pairs = pin[i] == pin[i - 2];
+    }
+    if (same || up || down || pairs) return true;
+    return n == 4 && (memcmp(pin, "2580", 4) == 0 || memcmp(pin, "0852", 4) == 0);
+}

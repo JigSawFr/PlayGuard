@@ -36,6 +36,10 @@
             <brls:BooleanCell id="pf_intro"/>
             <brls:BooleanCell id="pf_clock_check"/>
             <brls:BooleanCell id="pf_support_reminder"/>
+            <brls:Header title="@i18n/playguard/prefs/section_notices" marginTop="24" marginBottom="8"/>
+            <brls:BooleanCell id="pf_notices_system"/>
+            <brls:BooleanCell id="pf_notices_summary"/>
+            <brls:BooleanCell id="pf_notices_reminders"/>
             <brls:Label id="pf_note" text="@i18n/playguard/prefs/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
 
         </brls:Box>

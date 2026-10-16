@@ -312,6 +312,28 @@ Result pctl_get_pin(char *out, size_t out_size)
     return rc;
 }
 
+Result pctl_pin_weak(bool *weak)
+{
+    if (!weak) return NXM_RC_INVALID_ARGUMENT;
+    *weak = false;
+    Result rc = pctl_ops_reinit();
+    if (R_FAILED(rc)) return rc;
+    char pin[PIN_BUF];
+    u32 pin_len = 0;
+    rc = read_pin(pctlGetServiceSession_Service(), pin, &pin_len);
+    if (R_SUCCEEDED(rc)) {
+        size_t n = 0;
+        while (n < PIN_BUF && pin[n]) n++;
+        if (pin_len > 0 && pin_len < n) n = pin_len;
+        if (n == 0) rc = NXM_RC_NO_PIN;
+        else *weak = pin_is_weak(pin, n);
+    }
+    secure_zero(pin, sizeof(pin));
+    secure_zero(&pin_len, sizeof(pin_len));
+    pctl_ops_exit();
+    return rc;
+}
+
 Result pctl_relock(void)                     { return run_simple(1007, true); }
 Result pctl_delete_parental_controls(void)   { return run_simple(1043, false); }
 Result pctl_delete_pairing(void)             { return run_simple(1941, false); }
