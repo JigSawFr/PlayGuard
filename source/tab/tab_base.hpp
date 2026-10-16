@@ -1,5 +1,6 @@
 // TabBase — common shape of every sidebar tab: inflate the XML, re-read the
-// state each time the tab (re)appears, X refreshes on demand, optional periodic
+// state each time the tab (re)appears, X refreshes on demand (on the tabs that
+// read the console; the footer shows only what a tab can do), optional periodic
 // refresh, and the read-only note (a Label with id "tab_ro_note", if present).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -10,7 +11,9 @@
 class TabBase : public brls::Box
 {
   public:
-    explicit TabBase(const std::string& xml_res);
+    // `refreshes`: X reads the tab again. Off for a tab that shows only
+    // PlayGuard's own settings and files, which change only from it.
+    explicit TabBase(const std::string& xml_res, bool refreshes = true);
     ~TabBase() override;
 
     // Called when the tab is shown and when the main screen comes back on top

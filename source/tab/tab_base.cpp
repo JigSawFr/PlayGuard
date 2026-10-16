@@ -9,13 +9,14 @@ using namespace brls::literals;
 // The tab last shown (tabs are deleted when another one is opened).
 static TabBase* s_shown = nullptr;
 
-TabBase::TabBase(const std::string& xml_res)
+TabBase::TabBase(const std::string& xml_res, bool refreshes)
 {
     this->inflateFromXMLRes(xml_res);
-    this->registerAction("playguard/hints/refresh"_i18n, brls::BUTTON_X, [this](brls::View*) {
-        this->refresh();
-        return true;
-    });
+    if (refreshes)
+        this->registerAction("playguard/hints/refresh"_i18n, brls::BUTTON_X, [this](brls::View*) {
+            this->refresh();
+            return true;
+        });
     if (auto* note = dynamic_cast<brls::Label*>(this->getView("tab_ro_note"))) note->setSingleLine(false);
 }
 

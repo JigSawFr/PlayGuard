@@ -62,7 +62,7 @@ struct Build
     std::string date;      // "2026-10-09T12:03:00Z", when it was built
     std::string url;       // the download (an artifact's archive_download_url needs the token)
     uint64_t    size = 0;
-    std::string sha256;    // 64 hex digits; empty when GitHub gave no digest
+    std::string sha256;    // 64 hex digits; empty when GitHub gave no digest (not installed, then)
     std::string notes;     // Release: its notes; PullRequest: its description (Markdown, at most MAX_NOTES bytes)
     std::string expires;   // artifact: when GitHub deletes it ("2027-01-07T12:03:00Z")
     std::string page;      // Release / PullRequest: its page on GitHub ("https://github.com/…"; else empty)
@@ -201,16 +201,19 @@ std::string digest_hex(const std::string& digest);
 // An NRO: "NRO0" at offset 0x10.
 bool is_nro(const std::string& head);
 
-// Checks a downloaded file against `size` and `sha256` (when known).
+// Checks a downloaded file against `size` and `sha256`. A file without a
+// digest to check it against is refused (*error = NO_DIGEST): the size and
+// the NRO header say nothing of what it holds.
+extern const char* const NO_DIGEST;
 bool verify_file(const std::string& path, uint64_t size, const std::string& sha256, std::string* error);
 // Checks that `path` is an NRO.
 bool verify_nro(const std::string& path, std::string* error);
 
-// Replaces `target` with `fresh` (both on the same file system): target
-// moves aside to "<target>.old", fresh takes its name, then the old one is
-// removed, or kept as `keep_as` when given (util/rollback.hpp: the previous
-// build). When fresh cannot take its place, the old one is put back. A
-// missing target is simply created.
+// Replaces `target` with `fresh` (both on the same file system), through
+// paths::replace_file: target moves aside to "<target>.old", fresh takes
+// its name, then the old one is removed, or kept as `keep_as` when given
+// (util/rollback.hpp: the previous build). When fresh cannot take its place,
+// the old one is put back. A missing target is simply created.
 bool replace(const std::string& target, const std::string& fresh, std::string* error, const std::string& keep_as = "");
 
 // The last list fetched, kept on the SD card (cache/dev_builds.json) so the
@@ -228,7 +231,7 @@ constexpr int64_t CACHE_MAX_AGE_S = 10 * 60;
 std::string encode_cache(const Cache& cache);
 // False for anything else (damaged, another layout); a build that does not
 // look like one (a URL not on https://github.com/ or https://api.github.com/,
-// a malformed commit or digest) is left out.
+// a malformed commit, a digest missing or malformed) is left out.
 bool decode_cache(const std::string& json, Cache* out);
 // Fresh: fetched less than CACHE_MAX_AGE_S before `now` (not in the future:
 // the clock was set back), in the same sign-in state.

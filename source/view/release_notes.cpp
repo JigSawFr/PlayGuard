@@ -38,7 +38,7 @@ NVGcolor accent()
 // set in img/emoji/; nullptr when it is not one of them.
 brls::Image* icon(const std::string& hex, float size)
 {
-    if (hex.empty() || !paths::exists(std::string(BRLS_ASSET("img/emoji/")) + hex + ".png")) return nullptr;
+    if (hex.empty() || !paths::file_exists(std::string(BRLS_ASSET("img/emoji/")) + hex + ".png")) return nullptr;
     auto* image = new brls::Image();
     image->setScalingType(brls::ImageScalingType::FIT);
     image->setImageFromRes("img/emoji/" + hex + ".png");

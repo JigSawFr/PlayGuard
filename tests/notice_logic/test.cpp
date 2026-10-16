@@ -10,17 +10,63 @@ static void test_set_and_order()
 {
     Store s;
     CHECK(s.visible().empty());
-    CHECK(s.set("data", Level::Info, "Settings reset", ""));
-    CHECK(s.set("clock", Level::Action, "Clock off", "3 min"));
-    CHECK(s.set("patches", Level::Action, "sys-patch", ""));
+    CHECK(s.set("x_info", Level::Info, "Settings reset", ""));
+    CHECK(s.set("x_todo", Level::Action, "Clock off", "3 min"));
+    CHECK(s.set("y_todo", Level::Action, "Other", ""));
     const auto v = s.visible();
     if (!CHECK(v.size() == 3)) return;
-    // To do first, each kind in the order it was first set.
-    CHECK(v[0].id == "clock");
-    CHECK(v[1].id == "patches");
-    CHECK(v[2].id == "data");
+    // To do first, each kind in the order it was first set (ids with no rank).
+    CHECK(v[0].id == "x_todo");
+    CHECK(v[1].id == "y_todo");
+    CHECK(v[2].id == "x_info");
     CHECK(s.action_count() == 2);
     CHECK(s.info_count() == 1);
+    CHECK(s.console_count() == 0);
+}
+
+static void test_groups()
+{
+    // The console's entries: the firmware, the games, the SD card, PlayGuard's
+    // files (the prefixes too); anything else is about the parental controls.
+    for (const char* id : { "games", "patches", "sd_space", "sd_config", "data_history", "rescue_old", "compat",
+                            "sys_firmware", "serial", "other_system", "went_back" })
+        CHECK(group_of(id) == Group::Console);
+    for (const char* id : { "pin_missing", "unlocked", "clock", "pin_weak", "week", "upload", "update", "crash", "new" })
+        CHECK(group_of(id) == Group::Parental);
+
+    Store s;
+    s.set("games", Level::Action, "9 games", "");
+    s.set("sys_firmware", Level::Info, "23.0.1", "");
+    s.set("week", Level::Info, "8 h", "");
+    s.set("clock", Level::Action, "Clock off", "");
+    const auto v = s.visible();
+    if (!CHECK(v.size() == 4)) return;
+    // The parental controls' (to do, then for information), then the console's.
+    CHECK(v[0].id == "clock" && v[1].id == "week" && v[2].id == "games" && v[3].id == "sys_firmware");
+    // The bell counts the parental controls', the Console tab the console's to do.
+    CHECK(s.action_count() == 1 && s.info_count() == 1 && s.console_count() == 1);
+}
+
+static void test_fixed_order()
+{
+    // The order the sources set them in does not matter: a check that ends
+    // sooner or later lists the same way.
+    Store a, b;
+    a.set("pin_weak", Level::Action, "PIN", "");
+    a.set("outside", Level::Action, "Outside", "");
+    a.set("clock", Level::Action, "Clock", "");
+    b.set("clock", Level::Action, "Clock", "");
+    b.set("pin_weak", Level::Action, "PIN", "");
+    b.set("outside", Level::Action, "Outside", "");
+    const auto va = a.visible(), vb = b.visible();
+    if (!CHECK(va.size() == 3 && vb.size() == 3)) return;
+    for (size_t i = 0; i < 3; i++) CHECK(va[i].id == vb[i].id);
+    CHECK(va[0].id == "outside" && va[1].id == "clock" && va[2].id == "pin_weak");
+    // A ranked id before one with no rank.
+    Store c;
+    c.set("unknown", Level::Action, "U", "");
+    c.set("pin_weak", Level::Action, "PIN", "");
+    CHECK(c.visible()[0].id == "pin_weak");
 }
 
 static void test_replace_keeps_place()
@@ -109,6 +155,8 @@ static void test_order_after_clear()
 int main()
 {
     test_set_and_order();
+    test_groups();
+    test_fixed_order();
     test_replace_keeps_place();
     test_clear();
     test_dismiss();

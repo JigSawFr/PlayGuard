@@ -3,7 +3,8 @@
 <!-- Preferences: PlayGuard itself (language, theme, start tab), what it
      does at start-up, its notifications and its updates. A setting that
      shapes one feature sits with it (extra time in Play timer, relocking
-     in PIN, the clock check in Network clock). -->
+     in PIN, the clock check in Console › Network clock). Last, a line to
+     Help & diagnostics (tab/help.xml, on a screen of its own). -->
 
 <brls:Box
     width="auto"
@@ -38,7 +39,7 @@
             <brls:Header title="@i18n/playguard/tools/section_update" marginTop="24" marginBottom="8"/>
             <brls:BooleanCell id="pf_update_daily"/>
             <brls:DetailCell id="pf_update_via" title="@i18n/playguard/tools/update_via"/>
-            <brls:Label id="pf_note" text="@i18n/playguard/prefs/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:DetailCell id="pf_help" title="@i18n/playguard/prefs/help" marginTop="24"/>
 
         </brls:Box>
 

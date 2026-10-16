@@ -81,7 +81,7 @@ and can notify the parent.
   parental-control service itself.
 - **Needs:** a play-event log dump from a console where the PIN was entered,
   looking for an event at that time.
-- What PlayGuard already has: its own change history (*Tools › Change
+- What PlayGuard already has: its own change history (*History › Change
   history*) records its temporary unlocks, not those made from the HOME menu.
 
 ### 5. Monthly report

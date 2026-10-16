@@ -110,6 +110,8 @@ void sanitize(Config& c)
     one_of(c.fw_gate_choice, { "", "read_only", "probe", "risk" }, "");
     if (c.fw_gate_choice.empty()) c.fw_gate_fw.clear(), c.fw_gate_app.clear();
     if (c.ntp_server.size() > MAX_HOST) c.ntp_server.clear();
+    // The network clock and the console part of Tools are in Console now.
+    if (c.start_tab == "clock" || c.start_tab == "tools") c.start_tab = "console";
     bool tab_ok = false;
     for (const char* t : START_TABS) tab_ok |= c.start_tab == t;
     if (!tab_ok) c.start_tab = "dashboard";
@@ -234,7 +236,7 @@ static void load_shared()
 {
     std::string text;
     if (!paths::read_file(paths::config_file(), text)) {
-        if (paths::exists(paths::config_file())) damaged();   // missing: a first run, silently
+        if (paths::exists_or_pending(paths::config_file())) damaged();   // missing: a first run, silently
         return;
     }
     const nlohmann::json j = parse_object(text);
@@ -302,7 +304,7 @@ static void load_state()
 {
     std::string text;
     if (!paths::read_file(paths::state_file(), text)) {
-        if (!paths::exists(paths::state_file())) return;
+        if (!paths::exists_or_pending(paths::state_file())) return;
     } else {
         const nlohmann::json j = parse_object(text);
         if (!j.is_null()) {
