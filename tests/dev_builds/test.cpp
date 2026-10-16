@@ -586,6 +586,14 @@ static void test_auth()
     CHECK(github_auth::token().empty());
     github_auth::forget_token();
     CHECK(github_auth::token().empty());
+    // Refused by GitHub (401): forgotten, unless a new sign-in replaced it.
+    CHECK(github_auth::save_token("ghu_new", &error));
+    github_auth::forget_refused("ghu_abc123");
+    CHECK(github_auth::token() == "ghu_new");
+    github_auth::forget_refused("");
+    CHECK(github_auth::token() == "ghu_new");
+    github_auth::forget_refused("ghu_new");
+    CHECK(github_auth::token().empty());
 
     const auto h = github_auth::api_headers("ghu_abc");
     CHECK(h.size() == 3 && h[2] == "Authorization: Bearer ghu_abc");
