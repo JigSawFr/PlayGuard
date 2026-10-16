@@ -60,6 +60,7 @@ SecurityTab::SecurityTab()
         ui::confirm_danger(body, "playguard/pairing/unlink_confirm"_i18n, [this]() {
             Result rc = pctl_delete_pairing();
             if (R_SUCCEEDED(rc)) history_flow::record_event("unlink");
+            else history_flow::record_failure("unlink", rc);
             ui::notify_result(rc, "playguard/pairing/unlinked"_i18n, "playguard/pairing/unlink_err"_i18n);
             this->refresh();
         });
@@ -95,6 +96,7 @@ SecurityTab::SecurityTab()
         ui::confirm("playguard/security/unlock_body"_i18n, "playguard/security/unlock_confirm"_i18n, [this]() {
             Result rc = pt_flow::unlock_temporarily();
             if (R_SUCCEEDED(rc)) history_flow::record_event("unlock");
+            else history_flow::record_failure("unlock", rc);
             ui::notify_result(rc, "playguard/security/unlocked"_i18n, "playguard/security/unlock_err"_i18n);
             this->refresh();
         });
@@ -104,6 +106,7 @@ SecurityTab::SecurityTab()
         if (ui::refuse_read_only()) return true;
         Result rc = pctl_relock();
         if (R_SUCCEEDED(rc)) history_flow::record_event("relock");
+        else history_flow::record_failure("relock", rc);
         ui::notify_result(rc, "playguard/toast/relocked"_i18n, "playguard/toast/relock_err"_i18n);
         this->refresh();
         return true;
@@ -118,6 +121,7 @@ SecurityTab::SecurityTab()
                     backup_flow::backup_then([this]() {
                         Result rc = pctl_delete_parental_controls();
                         if (R_SUCCEEDED(rc)) history_flow::record_event("delete");
+                        else history_flow::record_failure("delete", rc);
                         ui::notify_result(rc, "playguard/security/deleted"_i18n, "playguard/security/delete_err"_i18n);
                         this->refresh();
                     });
@@ -133,6 +137,7 @@ void SecurityTab::change_pin()
     // Blocks while the system PIN applet is shown; the session is released first.
     Result rc = pctl_set_pin();
     brls::Logger::info("pctl_set_pin returned 0x{:08X}", (unsigned)rc);
+    // Not recorded when it fails: closing the PIN screen is a failure too.
     if (R_SUCCEEDED(rc)) history_flow::record_event("pin");
     ui::notify_result(rc, "playguard/security/pin_ok"_i18n, "playguard/security/pin_err"_i18n);
     this->refresh();

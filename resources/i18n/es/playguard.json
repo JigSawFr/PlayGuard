@@ -1025,7 +1025,6 @@
         "count": "{} registrado(s)",
         "none": "Aún no hay nada registrado. Aquí aparece cada cambio que PlayGuard hace en la consola (límites, nivel de restricción, PIN, desbloqueos...).",
         "note": "Los {} cambios más recientes, guardados en la tarjeta SD en {}. A en un cambio lo muestra y, si es posible, restablece el valor anterior.",
-        "section": "Cambios, del más reciente al más antiguo",
         "custom_value": "edad {}, publicación restringida: {}, comunicación restringida: {}",
         "title_change": "{}: {} → {}",
         "title_day_change": "{} ({}): {} → {}",
@@ -1058,7 +1057,8 @@
             "outside_clock": "Reloj de la consola cambiado (visto por PlayGuard)",
             "outside_limits": "Límites cambiados fuera de PlayGuard",
             "new_account": "Cuenta de usuario nueva (vista por PlayGuard)",
-            "time_up": "Cuando se acabe el tiempo"
+            "time_up": "Cuando se acabe el tiempo",
+            "countdown": "Cuenta atrás del tiempo de juego"
         },
         "sources": {
             "uniform": "Mismo límite todos los días",
@@ -1085,7 +1085,34 @@
         "already_back": "La consola ya tiene el valor anterior.",
         "undo_confirm": "Restablecer",
         "undone": "Valor anterior restablecido.",
-        "undo_err": "No se ha podido restablecer el valor anterior"
+        "undo_err": "No se ha podido restablecer el valor anterior",
+        "show": "Mostrar",
+        "export": "Exportar lo que se muestra",
+        "shown_count": "{} ({})",
+        "none_shown": "No hay nada de este tipo registrado.",
+        "today": "Hoy",
+        "yesterday": "Ayer",
+        "failed_title": "Rechazado: {}",
+        "failed_note": "La consola rechazó este cambio ({}): no se cambió nada.",
+        "version": "Versión de PlayGuard",
+        "counting": "Cuenta atrás en curso",
+        "paused": "En pausa",
+        "filters": {
+            "0": "Todo",
+            "1": "Tiempo de juego",
+            "2": "Restricciones",
+            "3": "Seguridad y app",
+            "4": "Visto fuera de PlayGuard",
+            "5": "Rechazado por la consola"
+        },
+        "columns": {
+            "change": "Cambio",
+            "details": "Detalles",
+            "result": "Resultado",
+            "kind": "Código",
+            "done": "Hecho",
+            "refused": "Rechazado ({})"
+        }
     },
     "chart": {
         "last_days": "Los últimos 7 días, hoy a la derecha",

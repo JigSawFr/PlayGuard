@@ -35,6 +35,39 @@ std::vector<int> undo_replaces(const history::Entry& e, const std::vector<int>& 
 // another kind or a damaged entry.
 std::vector<int> changed_days(const history::Entry& e);
 
+// What an entry is about, for the History screen's filter.
+enum class Category
+{
+    PlayTime,       // the limits, the alarms, the bedtime, the countdown, the console lock
+    Restrictions,   // the level, the rating organisation, custom settings, VR
+    Security,       // the PIN, unlocks, the companion app, deleting, recovery
+    Outside,        // what PlayGuard saw changed outside it, a new account
+    Other,          // the network clock, a backup restored, settings reset, a kind unknown
+};
+Category category(const history::Entry& e);
+
+// The History screen's filter: everything, one category, or the changes
+// the console refused.
+enum class Filter
+{
+    All,
+    PlayTime,
+    Restrictions,
+    Security,
+    Outside,
+    Failed,
+    Count
+};
+bool matches(const history::Entry& e, Filter f);
+
+// The day an entry belongs to ("2026-10-08"), "" when its stamp has none:
+// the History screen starts a group at each new one.
+std::string day_key(const history::Entry& e);
+
+// The day of the week of `date` ("2026-10-08"): 0 = Sunday; -1 when it is
+// not a date.
+int weekday_of(const std::string& date);
+
 // When the History screen dates an entry (`when`: "2026-10-08 18:30")
 // relative to `today` and `yesterday` ("2026-10-08").
 enum class Day { Today, Yesterday, Other };

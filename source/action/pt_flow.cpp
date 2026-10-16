@@ -210,6 +210,9 @@ Result write_days(const uint16_t days[7], const std::string& source, const std::
     if (R_SUCCEEDED(rc) && before.valid)
         history_flow::record_values("limits", history_flow::days_values(before.day_min), history_flow::days_values(days),
                                     source, detail);
+    if (R_FAILED(rc))
+        history_flow::record_failure("limits", rc, before.valid ? history_flow::days_values(before.day_min) : std::vector<int>{},
+                                     history_flow::days_values(days), source, detail);
     return rc;
 }
 
@@ -219,11 +222,13 @@ Result clear_days(const std::string& source)
     pctl_play_timer_query(&before);
     const Result rc = pctl_play_timer_clear();
     if (R_SUCCEEDED(rc)) limits_replaced(source);
-    if (R_SUCCEEDED(rc) && before.valid) {
-        uint16_t none[7];
-        for (auto& d : none) d = PT_DAY_NOLIMIT;
+    uint16_t none[7];
+    for (auto& d : none) d = PT_DAY_NOLIMIT;
+    if (R_SUCCEEDED(rc) && before.valid)
         history_flow::record_values("limits", history_flow::days_values(before.day_min), history_flow::days_values(none), source);
-    }
+    if (R_FAILED(rc))
+        history_flow::record_failure("limits", rc, before.valid ? history_flow::days_values(before.day_min) : std::vector<int>{},
+                                     history_flow::days_values(none), source);
     return rc;
 }
 
@@ -308,6 +313,12 @@ Result write_bedtime(const PtBedtime bed[7], const std::string& source)
         const std::string from = bedtime_text(before), to = bedtime_text(after);
         if (from != to) history_flow::record_event("bedtime", source, from + " → " + to);
     }
+    if (R_FAILED(rc)) {
+        PtState asked = before;
+        for (int n = 0; n < 7; n++) asked.bed[n] = bed[n];
+        history_flow::record_failure("bedtime", rc, {}, {}, source,
+                                     before.valid ? bedtime_text(before) + " → " + bedtime_text(asked) : "");
+    }
     return rc;
 }
 
@@ -390,6 +401,9 @@ Result write_alarm_only(bool alarm_only, const std::string& source)
     const Result rc = pctl_play_timer_set_alarm_only(alarm_only);
     if (R_SUCCEEDED(rc) && before.valid && before.alarm_only != alarm_only)
         history_flow::record_values("time_up", { before.alarm_only ? 1 : 0 }, { alarm_only ? 1 : 0 }, source);
+    if (R_FAILED(rc))
+        history_flow::record_failure("time_up", rc, before.valid ? std::vector<int>{ before.alarm_only ? 1 : 0 } : std::vector<int>{},
+                                     { alarm_only ? 1 : 0 }, source);
     return rc;
 }
 
@@ -807,6 +821,10 @@ Result write_alarm_disabled(bool disabled, const std::string& source)
     const Result rc = pctl_play_timer_set_alarm_disabled(disabled);
     if (R_SUCCEEDED(rc) && before.alarm_disabled_valid)
         history_flow::record_values("alarm", { before.alarm_disabled ? 1 : 0 }, { disabled ? 1 : 0 }, source);
+    if (R_FAILED(rc))
+        history_flow::record_failure("alarm", rc,
+                                     before.alarm_disabled_valid ? std::vector<int>{ before.alarm_disabled ? 1 : 0 } : std::vector<int>{},
+                                     { disabled ? 1 : 0 }, source);
     return rc;
 }
 
@@ -833,7 +851,19 @@ void set_countdown(bool running, std::function<void()> refresh)
     const std::string body = running ? "playguard/play_timer/resume_body"_i18n : "playguard/play_timer/pause_body"_i18n;
     const std::string label = running ? "playguard/play_timer/resume_confirm"_i18n : "playguard/play_timer/pause_confirm"_i18n;
     confirm_write(body, label, [running, refresh](bool did_unlock) {
+        PtState before;
+        pctl_play_timer_query(&before);
         const Result rc = running ? pctl_play_timer_start() : pctl_play_timer_stop();
+        // Paused or resumed: the countdown (1453) as it was, and as asked.
+        std::vector<int> was;
+        if (before.enabled_valid) was = { before.enabled ? 1 : 0 };
+        if (R_SUCCEEDED(rc)) {
+            if (was.empty()) history_flow::record_event("countdown", "", running ? "playguard/history/counting"_i18n
+                                                                              : "playguard/history/paused"_i18n);
+            else history_flow::record_values("countdown", was, { running ? 1 : 0 });
+        } else {
+            history_flow::record_failure("countdown", rc, was, { running ? 1 : 0 });
+        }
         finish_write(rc, did_unlock, "playguard/common/applied"_i18n, "playguard/play_timer/write_err"_i18n, refresh);
     }, nullptr, !running);
 }
