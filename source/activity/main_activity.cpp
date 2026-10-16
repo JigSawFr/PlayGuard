@@ -4,6 +4,7 @@
 #include "action/clock_check.hpp"
 #include "action/data_notice.hpp"
 #include "action/fw_gate.hpp"
+#include "action/game_notice.hpp"
 #include "action/notices.hpp"
 #include "action/pt_flow.hpp"
 #include "action/rescue.hpp"
@@ -130,6 +131,7 @@ void MainActivity::onContentAvailable()
     // is known and not installed: its screen), a network clock off (opt-in).
     update_flow::at_start(this);
     clock_check::at_start();
+    game_notice::at_start();   // the installed games, off the main thread: the bell says which cannot start
 
     // Firmware newer than the verified one: the firmware screen (or the remembered choice).
     fw_gate::on_main_screen();

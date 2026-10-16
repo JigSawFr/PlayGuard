@@ -26,6 +26,7 @@ const char* hint_key(uint32_t rc)
             "not_applied",            // NXM_RC_NOT_APPLIED
             "not_saved",              // NXM_RC_NOT_SAVED
             "pt_not_understood",      // NXM_RC_PT_NOT_UNDERSTOOD
+            "cancelled",              // NXM_RC_CANCELLED
         };
         const uint32_t desc = NXM_RESULT_DESC(rc);
         return desc < sizeof(OWN) / sizeof(OWN[0]) ? OWN[desc] : "";
@@ -49,6 +50,10 @@ const char* hint_key(uint32_t rc)
         case 0xCE74: return "clock_not_set";
         // 2021-0008 (switchbrew: sm NotAllowed): no access to the service asked for.
         case 0x1015: return "service_denied";
+        // 2016-0601 / 2016-0602 (Nintendo support): corrupt data when a game
+        // starts; also what the integrity check answers when it finds it.
+        case 0x4B210:
+        case 0x4B410: return "corrupt_data";
         // 2178-0150 (switchbrew: pdm "Service unavailable").
         case 0x12CB2: return "pdm_unavailable";
         default: break;

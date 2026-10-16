@@ -30,14 +30,18 @@ static void test_own()
     CHECK(is(NXM_RC_NOT_APPLIED, "not_applied"));
     CHECK(is(NXM_RC_NOT_SAVED, "not_saved"));
     CHECK(is(NXM_RC_PT_NOT_UNDERSTOOD, "pt_not_understood"));
+    CHECK(is(NXM_RC_CANCELLED, "cancelled"));
     // One a newer build would add: nothing, not another one's hint.
-    CHECK(is(NXM_RESULT(15), ""));
+    CHECK(is(NXM_RESULT(16), ""));
     CHECK(is(NXM_RESULT(0), ""));
     CHECK(is(NXM_RESULT(0x1FFF), ""));
 }
 
 static void test_system()
 {
+    CHECK(is(0x4B210, "corrupt_data"));   // 2016-0601
+    CHECK(is(0x4B410, "corrupt_data"));   // 2016-0602
+    CHECK(is(0x4B010, ""));               // 2016-0600: not documented
     CHECK(is(0xF601, "session_closed"));
     CHECK(is(0xF80E, "bad_pin_format"));
     CHECK(is(0xF08E, "wrong_pin"));                    // 2142-0120

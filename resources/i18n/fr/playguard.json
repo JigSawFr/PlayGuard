@@ -110,7 +110,9 @@
         "clock_not_set": "la console indique que son horloge réseau n'a pas d'heure valide (elle n'a peut-être jamais été réglée) ; voir l'onglet Horloge réseau",
         "no_internet": "la console n'est pas connectée à Internet : connectez-la, puis réessayez",
         "service_denied": "le système a refusé à PlayGuard l'accès à l'un de ses services ; PlayGuard a besoin d'une console sous Atmosphère",
-        "pdm_unavailable": "le service des données de jeu de la console n'est pas disponible pour le moment ; réessayez dans un instant"
+        "pdm_unavailable": "le service des données de jeu de la console n'est pas disponible pour le moment ; réessayez dans un instant",
+        "corrupt_data": "données corrompues : les fichiers du jeu sont endommagés ; supprimez le jeu et réinstallez-le",
+        "cancelled": "annulé"
     },
     "init_error": {
         "title": "PlayGuard",
@@ -764,6 +766,151 @@
         "storage_note_emummc": "Vous êtes sur l'emuMMC : la sysMMC a son propre contrôle parental, que PlayGuard ne peut pas voir d'ici. Réglez-le là aussi, ou masquez le menu de démarrage d'hekate.",
         "storage_note_sysmmc": "Vous êtes sur la sysMMC, et une emuMMC est configurée sur cette carte SD : elle a son propre contrôle parental, que PlayGuard ne peut pas voir d'ici. Réglez-le là aussi, ou masquez le menu de démarrage d'hekate."
     },
+    "games": {
+        "open": "Vérifier les jeux installés",
+        "title": "Jeux installés",
+        "note": "Les jeux que le menu HOME ne peut pas lancer ou afficher (une icône qui charge sans fin, « ! », un cadre en pointillés), pourquoi, et quoi faire. A sur un jeu pour le détail.",
+        "none": "Les {} jeux installés semblent en bon état.",
+        "err_list": "Impossible de lister les jeux installés",
+        "truncated": "Seuls les {} premiers jeux ont été vérifiés.",
+        "many": "Plusieurs jeux à la fois : vérifiez la carte SD sur un ordinateur, et que la console a démarré sur la même mémoire ({} en ce moment) que lors de l'installation de ces jeux. Un jeu installé depuis sysMMC ne fonctionne pas depuis emuMMC, et inversement.",
+        "unnamed": "Jeu inconnu ({})",
+        "id": "ID du titre : {}",
+        "cause": "Cause",
+        "fix": "Que faire",
+        "remove": "Supprimer de la console",
+        "remove_body": "La suppression efface le jeu, sa mise à jour et ses contenus additionnels de la console et du menu HOME. Les sauvegardes sont conservées.",
+        "removed": "{} supprimé",
+        "remove_err": "Impossible de supprimer le jeu",
+        "issues": {
+            "archived": {
+                "short": "Rien d'installé (pointillés)",
+                "cause": "La console liste le jeu, mais plus rien n'en est installé : il a été archivé, ou ses fichiers ont été supprimés en dehors de la console.",
+                "fix": "Réinstallez le jeu, ou supprimez son entrée pour nettoyer le menu HOME."
+            },
+            "storage": {
+                "short": "Carte SD illisible",
+                "cause": "Le jeu est sur la carte SD, que la console ne peut pas lire pour l'instant.",
+                "fix": "Éteignez la console, retirez puis remettez la carte SD, puis vérifiez-la sur un ordinateur. Rien à supprimer : les fichiers sont toujours sur la carte."
+            },
+            "no_base": {
+                "short": "Jeu manquant (« ! »)",
+                "cause": "Seule une mise à jour ou un contenu additionnel de ce jeu est installé, pas le jeu lui-même.",
+                "fix": "Installez le jeu lui-même, ou supprimez l'entrée et ce qu'il en reste."
+            },
+            "files": {
+                "short": "Installation endommagée",
+                "cause": "Des fichiers du jeu ou de sa mise à jour manquent là où ils sont installés : une installation interrompue, ou une carte SD endommagée.",
+                "fix": "Supprimez le jeu, puis réinstallez-le. Si plusieurs jeux sont touchés, vérifiez d'abord la carte SD."
+            },
+            "firmware": {
+                "short": "Firmware {} requis",
+                "cause": "Le jeu ou sa mise à jour demande la version système {} ; cette console est en {}.",
+                "fix": "Mettez d'abord à jour Atmosphère, vers une version qui prend en charge le nouveau firmware, puis le firmware : dans l'autre ordre, la console ne démarre plus. Ou installez une version plus ancienne de la mise à jour.",
+                "fix_update": "Seule sa mise à jour en a besoin : supprimez la mise à jour pour jouer au jeu sans elle (Actions), ou mettez d'abord à jour Atmosphère, puis le firmware."
+            },
+            "launch": {
+                "short": "Refusé par la console",
+                "cause": "La console refuse de le lancer : {}. En général, une mise à jour plus récente du jeu est requise.",
+                "fix": "Installez la dernière mise à jour du jeu. Si elle l'est déjà, supprimez le jeu et réinstallez-le."
+            },
+            "no_control": {
+                "short": "Nom et icône illisibles",
+                "cause": "Le jeu est installé, mais son nom et son icône ne peuvent pas être lus : le menu HOME affiche une icône qui charge sans fin.",
+                "fix": "Redémarrez la console. Si l'icône charge toujours, vérifiez les données dans Paramètres de la console › Gestion des données, ou supprimez le jeu et réinstallez-le."
+            },
+            "needs_verify": {
+                "short": "Données corrompues",
+                "cause": "La console a trouvé des données corrompues dans ce jeu et demande à les vérifier.",
+                "fix": "Vérifiez si les données sont corrompues (Actions). Si c'est le cas, supprimez le jeu et réinstallez-le."
+            },
+            "key_too_new": {
+                "short": "Clés trop récentes",
+                "cause": "Le jeu est chiffré avec des clés que ce firmware ({}) n'a pas (génération de clé {})."
+            },
+            "ticket": {
+                "short": "Licence manquante",
+                "cause": "Le jeu a besoin d'une licence (ticket) absente de la console : elle a été supprimée, ou l'installation ne la contenait pas.",
+                "fix": "Réinstallez le jeu à partir d'une copie complète qui contient son ticket."
+            },
+            "launch_version": {
+                "short": "Demande une mise à jour retirée",
+                "cause": "La console réclame ce qui avait été installé : {}. Installé aujourd'hui : {}. La mise à jour a été retirée ou ne s'est pas installée entièrement.",
+                "fix": "Acceptez à nouveau la version installée (Actions), ou réinstallez la mise à jour."
+            }
+        },
+        "actions": "Actions",
+        "action": {
+            "remove": "Supprimer le jeu de la console",
+            "remove_update": "Supprimer la mise à jour ({})",
+            "remove_addon": "Supprimer le contenu additionnel {}",
+            "reset_launch": "Accepter à nouveau la version installée",
+            "verify": "Vérifier si les données sont corrompues"
+        },
+        "remove_update_body": "Seule la mise à jour est effacée : le jeu, ses contenus additionnels et ses sauvegardes restent, et la console lance le jeu sans la mise à jour.",
+        "remove_addon_body": "Seul ce contenu additionnel est effacé : le jeu, sa mise à jour et ses sauvegardes restent.",
+        "update_removed": "{} : mise à jour supprimée",
+        "addon_removed": "{} : contenu additionnel supprimé",
+        "launch_reset": "{} : la version installée est de nouveau acceptée",
+        "content_err": "Impossible de le supprimer",
+        "launch_err": "Impossible de changer la version de lancement",
+        "verify_ok": "{} : aucune donnée corrompue.",
+        "verify_bad": "{} : données corrompues. Supprimez le jeu et réinstallez-le.",
+        "verify_err": "Impossible de vérifier les données",
+        "verify_busy": "Une vérification est déjà en cours.",
+        "version": "version {}",
+        "update_n": "mise à jour n°{}",
+        "base_only": "le jeu sans ses mises à jour",
+        "other_actions": "Autres actions…",
+        "verify_note": "Tous les fichiers du jeu sont lus : un gros jeu prend quelques minutes.",
+        "verify_cancelled": "Vérification annulée.",
+        "section_count": "Jeux avec un problème : {} sur {}",
+        "fixed": "{} : réparé, il fonctionne de nouveau.",
+        "fix_button": {
+            "verify": "Vérifier les données",
+            "reset_launch": "Accepter cette version",
+            "remove_update": "Supprimer la mise à jour",
+            "remove": "Supprimer le jeu"
+        },
+        "searching": "Recherche des jeux installés…",
+        "checking": "Vérification des jeux… {} sur {}",
+        "check_again": "Vérifier à nouveau",
+        "checked_now": "Vérifié à l'instant.",
+        "checked_min": "Vérifié il y a {} min.",
+        "checked_h": "Vérifié il y a {} h.",
+        "verify_title": "Vérification des données",
+        "verify_preparing": "Préparation…",
+        "verify_amount": "{} sur {}",
+        "verify_left_less": "moins d'une minute restante",
+        "verify_left_min": "environ {} min restantes",
+        "size_mb": "{} Mo",
+        "size_gb": "{} Go",
+        "decimal_mark": ",",
+        "verify_code": "Code de la console : {}",
+        "groups": {
+            "fix": "Réparables ici ({})",
+            "reinstall": "À réinstaller ({})",
+            "system": "Firmware ou carte SD ({})"
+        },
+        "group_note": {
+            "fix": "PlayGuard peut les réparer : A sur un jeu, puis son premier bouton.",
+            "reinstall": "Leurs fichiers manquent ou sont inutilisables. Enregistrez leur liste, supprimez-les ici (un installeur les croit installés jusque-là), puis réinstallez-les en cherchant leur nom.",
+            "system": "Les jeux vont bien : le problème vient du firmware de la console ou de la carte SD. Mettez à jour le firmware, ou démarrez sur la mémoire où ils ont été installés."
+        },
+        "save_list": "Enregistrer la liste de ces jeux",
+        "list_saved": "Liste enregistrée : {}",
+        "list_err": "Impossible d'enregistrer la liste",
+        "list_title": "Jeux à réinstaller",
+        "col_name": "Jeu",
+        "col_id": "Title ID",
+        "col_version": "Version",
+        "col_problem": "Problème",
+        "remove_all": "Supprimer ces {} jeux",
+        "remove_all_body": "Ces {} jeux sont supprimés de la console, avec leurs mises à jour et contenus additionnels, pour pouvoir les réinstaller. Leur liste est d'abord enregistrée dans le dossier des exports de PlayGuard. Les sauvegardes restent.",
+        "removing": "Suppression des jeux… {} sur {}",
+        "removed_all": "{} jeux supprimés. Leur liste : {}",
+        "removed_some": "{} jeux supprimés sur {}. Leur liste : {}"
+    },
     "about": {
         "section_changelog": "Nouveautés de la {}",
         "changelog_note": "Versions précédentes : {}",
@@ -1058,6 +1205,10 @@
             "outside_limits": "Limites modifiées en dehors de PlayGuard",
             "new_account": "Nouveau compte utilisateur (vu par PlayGuard)",
             "time_up": "Quand le temps est écoulé",
+            "remove_game": "Jeu supprimé",
+            "remove_update": "Mise à jour supprimée",
+            "remove_addon": "Contenu additionnel supprimé",
+            "launch_version": "Version de lancement rétablie",
             "countdown": "Décompte du temps de jeu"
         },
         "sources": {
@@ -1172,6 +1323,9 @@
         "crash": "PlayGuard s'est fermé de façon inattendue la dernière fois",
         "sd_write": "PlayGuard n'a pas pu écrire sur la carte SD",
         "sd_write_detail": "{} n'a pas été enregistré. Vérifiez la carte SD : pleine, en lecture seule (le verrou) ou avec des erreurs.",
+        "games_one": "Un jeu installé ne peut pas démarrer",
+        "games": "{} jeux installés ne peuvent pas démarrer",
+        "games_more": "{} et {} autres",
         "rescue_old": "Le sysmodule de récupération n'est pas à jour",
         "rescue_old_detail": "Il vient de PlayGuard {}. Extrayez playguard-rescue.zip de PlayGuard {} à la racine de la carte SD, puis redémarrez la console.",
         "rescue_unknown": "Il a été installé avant d'indiquer sa version. Extrayez playguard-rescue.zip de PlayGuard {} à la racine de la carte SD, puis redémarrez la console.",
