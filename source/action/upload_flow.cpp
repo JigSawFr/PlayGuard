@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "action/github_login_flow.hpp"
+#include "action/notices.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/diagnostics.hpp"
@@ -121,6 +122,9 @@ void send_gist(const std::vector<log_upload::Part>& parts)
                 }
                 remember(r);
                 show_link(r);
+                // The link stays in the notification bell, for later.
+                notices::set("upload", notices::Level::Info, "playguard/notices/upload"_i18n, log_upload::short_url(r.url),
+                             "playguard/notices/upload_show"_i18n, [r]() { show_link(r); });
             });
         });
     });

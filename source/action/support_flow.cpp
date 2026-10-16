@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/support_flow.hpp"
 
+#include "action/notices.hpp"
 #include "activity/whats_new_activity.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
@@ -49,6 +50,14 @@ void show_reminder()
 
 void at_start(brls::Activity* main)
 {
+    // Another version than the last one started: the bell says it was
+    // installed (an update in place says it with the previous build).
+    const std::string seen = config::get().seen_version;
+    if (!seen.empty() && seen != app::version())
+        notices::set("installed", notices::Level::Info, brls::getStr("playguard/notices/installed", app::version()),
+                     brls::getStr("playguard/notices/updated_from", seen), "playguard/notices/whats_new"_i18n,
+                     []() { brls::Application::pushActivity(new WhatsNewActivity()); });
+
     brls::delay(START_DELAY_MS, [main]() {
         auto stack = brls::Application::getActivitiesStack();
         if (stack.empty() || stack.back() != main) return;   // something else first: next start

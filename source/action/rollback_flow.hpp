@@ -17,8 +17,13 @@ namespace rollback_flow
 // now (the previous build is in place, hbloader starts it).
 bool at_start();
 
-// The first screen is up: the start of the build installed went well.
+// The first screen is up: the start of the build installed went well (the
+// notification bell says it was installed).
 void started();
+
+// The main screen: when the start-up went back to the previous build (or
+// Install another build did), the notification bell says so, once.
+void note_went_back();
 
 // A build was installed in place of the running one: the running one's
 // name is kept as the previous build's, and the next start is checked.

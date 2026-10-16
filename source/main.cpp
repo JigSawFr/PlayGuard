@@ -50,6 +50,7 @@
 #include "view/loading_bar.hpp"
 #include "view/loading_mark.hpp"
 #include "view/made_in_france.hpp"
+#include "view/notice_bell.hpp"
 #include "view/version_badge.hpp"
 #include "view/scroll_view.hpp"
 #include "view/play_days.hpp"
@@ -358,6 +359,7 @@ int main(int argc, char* argv[])
     // The version (and, for a development build, its commit) at the right of
     // every screen's header.
     VersionBadge::install();
+    NoticeBell::install();   // after the badge: the bell goes in its row
 
     // The loading screen first, with nothing slow before it, and drawn at once
     // (no fade: a frame at alpha 0 is a black one). The rest of the start-up

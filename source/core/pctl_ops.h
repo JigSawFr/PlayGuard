@@ -79,6 +79,10 @@ Result pctl_unlock_restriction_temporarily(void);
 // digits, NUL-terminated) into `out`. `out` is zeroed first and stays zeroed
 // on any error. The caller wipes it after use; never log or report it.
 Result pctl_get_pin(char *out, size_t out_size);
+// Whether the stored PIN is one anyone would try first (pin_is_weak). The PIN
+// is read (1208), judged and wiped here: it never leaves this function, so
+// no reveal check is asked (nothing is shown). NXM_RC_NO_PIN with no PIN.
+Result pctl_pin_weak(bool *weak);
 // RevertRestrictionTemporaryUnlocked (1007): re-applies restrictions now.
 Result pctl_relock(void);
 

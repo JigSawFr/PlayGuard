@@ -12,12 +12,23 @@ class MainActivity : public brls::Activity
 
     void onContentAvailable() override;
 
+    ~MainActivity() override;
+
     // "PlayGuard", or "PlayGuard · read-only" in read-only mode.
     void update_title();
+
+    // Shows tab `position` (ui::tab) and focuses its content.
+    void open_tab(int position);
 
   private:
     // Midnight while the app is open: what start-up does for a new day
     // (extra time from the day before) is done then too.
     brls::RepeatingTimer day_timer;
     std::string day;
+
+    // The notification bell: Y opens its list, the footer says how many
+    // entries are to do; the state behind it read again every minute.
+    brls::RepeatingTimer notice_timer;
+    int notice_listener = 0;
+    void update_notice_hint();
 };

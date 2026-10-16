@@ -5,6 +5,7 @@
 #include <fmt/format.h>
 
 #include "action/clock_flow.hpp"
+#include "action/notices.hpp"
 #include "action/outside_watch.hpp"
 #include "action/play_data.hpp"
 #include "action/pt_flow.hpp"
@@ -158,6 +159,9 @@ void DashboardTab::refresh()
     for (const auto& l : outside_lines) outside_joined += (outside_joined.empty() ? "" : "\n") + l;
     outside_text->setText(outside_joined);
     const bool stalled = timer_health::observe(pt);
+    // The same readings for the notification bell.
+    notices::note_timer_stalled(stalled);
+    notices::refresh_status(s, pt, si, accuracy_rc, accurate);
 
     // Today's play time.
     const int today = ui::today_weekday();

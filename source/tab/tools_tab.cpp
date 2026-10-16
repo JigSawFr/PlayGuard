@@ -13,6 +13,7 @@
 #include "action/pt_block_flow.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_log_flow.hpp"
+#include "action/sys_update_flow.hpp"
 #include "action/upload_flow.hpp"
 #include "activity/diagnostic_activity.hpp"
 #include "activity/firmware_gate_activity.hpp"
@@ -263,9 +264,22 @@ void ToolsTab::refresh()
     dev_mode->setOn(dev, false);
     dev_read_only->setOn(ro, false);
     dev_pt_log->setOn(cfg.pt_log, false);
-    fw->setDetailText(fwv);
-    ams->setDetailText(si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro)
-                                    : "playguard/common/unavailable"_i18n);
+    // With the newer release the last update check found (sys_update_flow).
+    bool newer = false;
+    fw->setDetailText(sys_update_flow::with_latest("firmware", fwv, &newer));
+    fw->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
+    if (si.ams_valid) {
+        ams->setDetailText(sys_update_flow::with_latest(
+            "atmosphere", fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro), &newer));
+        ams->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
+    } else {
+        ams->setDetailText("playguard/common/unavailable"_i18n);
+    }
+    // hekate: only when its bootloader/update.bin is on the SD card.
+    const std::string hk = sys_update_flow::installed_hekate();
+    hekate->setDetailText(sys_update_flow::with_latest("hekate", hk, &newer));
+    hekate->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
+    ui::set_visible(hekate.getView(), !hk.empty());
     NVGcolor c = ui::color_neutral();
     compat->setDetailText(ui::compat_text(si, &c));
     compat->setDetailTextColor(c);
