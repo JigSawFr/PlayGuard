@@ -8,7 +8,7 @@ affiche alors la console comme un appareil (limites, temps restant, temps de
 jeu par jeu, heure du coucher, restrictions) et peut changer les limites,
 ajouter du temps ou verrouiller la console depuis un tableau de bord ou une
 automatisation. Le lien est **facultatif et désactivé par défaut**, reste sur
-votre réseau local et fonctionne avec n'importe quel broker MQTT ; le module
+votre réseau local et fonctionne avec n'importe quel broker MQTT ; l'application
 Mosquitto de Home Assistant est le plus simple.
 
 > [!NOTE]
@@ -22,14 +22,14 @@ Mosquitto de Home Assistant est le plus simple.
 
 - Home Assistant **2026.5 ou plus récent** (les entités `time` du coucher : un
   plus ancien refuse tout l'appareil), avec l'intégration **MQTT** configurée, et un broker : le
-  module **Mosquitto broker** (Paramètres › Modules complémentaires) ou tout
+  application **Mosquitto broker** (Paramètres › Applications ; un module complémentaire dans un Home Assistant plus ancien) ou tout
   autre broker MQTT, en version 5.0 ou 3.1.1 (EMQX, HiveMQ, NanoMQ, VerneMQ…) :
   *Accès à distance › Version MQTT* est automatique (5.0, sinon 3.1.1).
-- Un utilisateur du broker pour PlayGuard. Avec le module Mosquitto, tout
+- Un utilisateur du broker pour PlayGuard. Avec l'application Mosquitto, tout
   utilisateur de Home Assistant peut se connecter : créez-en un nommé
   `playguard` (Paramètres › Personnes › Utilisateurs, « connexion depuis le
   réseau local uniquement »), ou ajoutez un identifiant dans la configuration
-  du module.
+  de l'application.
 - La console sur le même réseau que le broker, avec une version de PlayGuard
   qui a *Préférences › Accès à distance*.
 
@@ -38,7 +38,7 @@ Mosquitto de Home Assistant est le plus simple.
 1. Ouvrez PlayGuard › **Préférences › Accès à distance › MQTT / Home
    Assistant**.
 2. **Adresse du broker** : l'adresse IP ou le nom de la machine du broker
-   (celle de Home Assistant, pour le module). **Port** : 1883 (8883 pour TLS,
+   (celle de Home Assistant, pour l'application). **Port** : 1883 (8883 pour TLS,
    qui active *Connexion chiffrée*).
 3. **Nom d'utilisateur** et **Mot de passe** : l'utilisateur du broker créé
    plus haut. Un broker qui accepte les clients anonymes : *Nom d'utilisateur
