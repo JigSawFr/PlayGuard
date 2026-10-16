@@ -39,6 +39,16 @@ inline size_t decode(const std::string& s, size_t i, uint32_t* cp)
     return n;
 }
 
+// decode(), with a byte that starts no well-formed character read as U+FFFD,
+// length 1: what an export writes in its place.
+inline size_t decode_replacing(const std::string& s, size_t i, uint32_t* cp)
+{
+    const size_t n = decode(s, i, cp);
+    if (n) return n;
+    *cp = 0xFFFD;
+    return 1;
+}
+
 // The sequence at `s[i]` read without checking it: the length its first
 // byte announces (1 for a byte that starts none, which is its own code
 // point) and the bits that are there. Never 0. For text known to be valid.

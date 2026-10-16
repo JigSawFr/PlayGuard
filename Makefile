@@ -96,7 +96,7 @@ desktop:
 
 # C: the service layer (source/core) against the fake <switch.h> of each
 # suite (-DNX_HOST_TEST), and the C helpers of source/util.
-pctl_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/write_guard.c tests/pctl_session/test.c
+pctl_SRC   := source/core/pctl_ops.c source/core/pctl_dump.c source/core/pure.c source/core/write_guard.c tests/pctl_session/test.c
 pctl_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core
 time_SRC   := source/core/time_ops.c source/core/calendar.c source/core/write_guard.c tests/time_ops/test.c
 time_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/time_ops -Isource/core
@@ -186,7 +186,7 @@ backup_logic_SRC   := source/util/paths.cpp source/util/backup.cpp source/util/p
 backup_logic_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 http_logic_SRC   := source/util/http_logic.cpp tests/http_logic/test.cpp
 http_logic_FLAGS := -std=c++17 -Isource
-table_export_SRC   := source/util/paths.cpp source/util/table_export.cpp tests/table_export/test.cpp
+table_export_SRC   := source/util/paths.cpp source/util/zip_write.cpp source/util/table_export.cpp source/util/table_export_csv.cpp source/util/table_export_json.cpp source/util/table_export_xlsx.cpp source/util/table_export_pdf.cpp tests/table_export/test.cpp
 table_export_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 table_export_LIBS  := -lz
 update_SRC   := source/util/date.cpp source/util/update.cpp tests/update/test.cpp
