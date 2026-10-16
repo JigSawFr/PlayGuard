@@ -62,7 +62,9 @@ void FirmwareGateActivity::onContentAvailable()
             const bool newer = r.verdict == update::Verdict::UpdateSupports || r.verdict == update::Verdict::UpdateNoSupport;
             this->update->setDetailText(newer ? r.latest.version : "");
             ui::set_visible(this->update.getView(), newer);
-            if (r.verdict == update::Verdict::UpdateSupports) brls::Application::giveFocus(this->update.getView());
+            // Not from under the "risk" confirmation: its buttons keep the focus.
+            if (r.verdict == update::Verdict::UpdateSupports && ui::has_focus(this))
+                brls::Application::giveFocus(this->update.getView());
         });
     });
 }

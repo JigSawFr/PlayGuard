@@ -202,6 +202,19 @@ void set_visible(brls::View* view, bool visible);
 // the focus.
 void set_visible_all(std::initializer_list<std::pair<brls::View*, bool>> changes);
 
+// For an activity's onResume(): borealis then gives the focus back to the
+// view that opened the dialog (or screen) just closed, and gives none when
+// that view was hidden meanwhile; the focus would stay on the closed
+// dialog's button, deleted after its animation, and no button answer any
+// more. In that case only, `fallback` (else the activity's first focusable
+// view) gets it first.
+void keep_focus(brls::Activity* activity, brls::View* fallback = nullptr);
+
+// Whether `activity` has the focus: nothing (a dialog, another screen) is
+// open over it. Unlike the top of borealis' stack, true again as soon as a
+// dialog over it starts closing.
+bool has_focus(brls::Activity* activity);
+
 // Sidebar positions of the main screen tabs, in the order of
 // resources/xml/activity/main.xml (separators count as positions).
 namespace tab
