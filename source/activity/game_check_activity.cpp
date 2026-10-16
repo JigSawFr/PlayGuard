@@ -804,27 +804,12 @@ brls::View* GameCheckActivity::first_game() const
     return nullptr;
 }
 
-// Back from a dialog: borealis gives the focus back to the view that opened
-// it (Application::popActivity, right after this), and none when that view
-// went meanwhile: "Check these games", hidden once its games left To check
-// while the result asked whether to remove them. The focus then stayed on
-// the dialog's button, deleted after its animation: no button answered any
-// more. In that case only, the first game has it (borealis' try comes after
-// and does nothing). The view to get it back is the end of the boxes' last
-// focused views; giving the focus otherwise would change those.
+// Back from a dialog: "Check these games" may have gone meanwhile (its
+// games left To check while the result asked whether to remove them); the
+// first game then has the focus (ui::keep_focus).
 void GameCheckActivity::onResume()
 {
-    brls::View* last = this->getContentView();
-    while (auto* box = dynamic_cast<brls::Box*>(last)) {
-        brls::View* next = box->getLastFocusedView();
-        if (!next) break;
-        last = next;
-    }
-    bool gone = !last || !last->isFocusable();
-    for (brls::View* v = last; v && !gone; v = v->getParent()) gone = v->getVisibility() != brls::Visibility::VISIBLE;
-    if (!gone) return;
-    brls::View* first = this->first_game();
-    brls::Application::giveFocus(first ? first : this->getContentView());
+    ui::keep_focus(this, this->first_game());
 }
 
 bool GameCheckActivity::changes_list(const GameFacts& game) const
