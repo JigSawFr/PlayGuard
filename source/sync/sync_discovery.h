@@ -1,9 +1,11 @@
 // sync_discovery — Home Assistant's native MQTT discovery for one console:
 // one retained, device-based payload on
-// `<discovery_prefix>/device/playguard_<id>/config` (HA 2024.11 and later),
-// built from the entity table (sync_entities.c). Orders that need
+// `<discovery_prefix>/device/playguard_<id>/config`, built from the entity
+// table (sync_entities.c). Needs Home Assistant 2026.5 or later: an older one
+// knows no MQTT `time` platform and refuses the whole payload. Orders that need
 // remote_timer_writes are only announced while it is on, and none while
-// PlayGuard is read-only.
+// PlayGuard is read-only; those not offered are sent as their platform alone
+// (`{"p":"number"}`), which removes them from Home Assistant.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 

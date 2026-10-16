@@ -205,6 +205,12 @@ SyncReason sync_apply_parse(const char *entity, const char *payload, size_t len,
                 out->level = i;
                 return SyncReason_None;
             }
+        // The select's option for "none" (sync_entities.c), sent as is by a
+        // client that does not apply its command template.
+        if (!strcmp(s, "unrestricted")) {
+            out->level = 0;
+            return SyncReason_None;
+        }
         return SyncReason_Invalid;
     }
     if (!strcmp(entity, "vr_restricted")) {

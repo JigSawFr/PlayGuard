@@ -545,7 +545,8 @@ static void test_connect_and_publish(void)
     CHECK(broker.n_subs == 2 && !strcmp(broker.subs[0], "playguard/a1b2c3d4/+/set") && broker.sub_qos[0] == 1 &&
            !strcmp(broker.subs[1], "homeassistant/status"));
     const Message *disc = find_retained("homeassistant/device/playguard_a1b2c3d4/config");
-    CHECK(disc && strstr(disc->payload, "\"cmps\":{") && !strstr(disc->payload, "limit_mon"));
+    CHECK(disc && strstr(disc->payload, "\"cmps\":{") && strstr(disc->payload, "\"limit_mon\":{\"p\":\"number\"}") &&
+          !strstr(disc->payload, "limit_mon/set"));
     CHECK(host.profiles_asked >= 1);
     const Message *st = find_retained("playguard/a1b2c3d4/state");
     CHECK(st && strstr(st->payload, "\"schema\":1"));
@@ -730,6 +731,28 @@ static void test_home_assistant_restart_and_discovery_switch(void)
     ha_order("discovery", "on");
     turns(2);
     CHECK(find_retained("homeassistant/device/playguard_a1b2c3d4/config") && host.saved.ha_discovery);
+}
+
+// Another discovery prefix: the device under it, and Home Assistant's
+// restart still seen on homeassistant/status (its birth topic does not follow
+// the prefix).
+static void test_custom_discovery_prefix(void)
+{
+    setup(false, SyncPolicy_Auto);
+    strcpy(conf.discovery_prefix, "ha");
+    SyncIo io = { NULL, io_open, io_write, io_read, io_close };
+    SyncHost h = { NULL, h_state, h_activity, h_order, h_report, h_profiles, h_conf_changed, h_read_only, h_now_posix, h_log };
+    sync_engine_init(&engine, &conf, io, &h, clock_ms, "app", "1.1.0");
+    turns(3);
+    CHECK(sync_engine_online(&engine) && find_retained("ha/device/playguard_a1b2c3d4/config"));
+    CHECK(broker.n_subs == 2 && !strcmp(broker.subs[1], "homeassistant/status"));
+    const size_t before = count_on("ha/device/playguard_a1b2c3d4/config");
+    broker_publish("homeassistant/status", "online", 6, false);
+    turns(2);
+    CHECK(count_on("ha/device/playguard_a1b2c3d4/config") == before + 1);
+    broker_publish("ha/status", "online", 6, false);
+    turns(2);
+    CHECK(count_on("ha/device/playguard_a1b2c3d4/config") == before + 1);
 }
 
 static void test_connection_failures(void)
@@ -976,6 +999,7 @@ int main(void)
     test_limits_merged();
     test_async_and_waiting();
     test_home_assistant_restart_and_discovery_switch();
+    test_custom_discovery_prefix();
     test_connection_failures();
     test_keepalive();
     test_oversized_and_reconfigure();

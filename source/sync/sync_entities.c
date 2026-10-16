@@ -5,9 +5,12 @@
 
 // Discovery abbreviations (HA): unit_of_meas, dev_cla, stat_cla, ent_cat,
 // pl_on / pl_off (binary_sensor, switch commands), stat_on / stat_off
-// (switch state), ops (select options), en (enabled by default), ic (icon).
+// (switch state), ops (select options), cmd_tpl (command template), en
+// (enabled by default), ic (icon).
 #define E_MINUTES "\"unit_of_meas\":\"min\",\"dev_cla\":\"duration\""
 #define E_MEASURE E_MINUTES ",\"stat_cla\":\"measurement\""
+// A daily total, back to 0 at midnight (HA's "total_increasing", like a daily meter).
+#define E_TOTAL E_MINUTES ",\"stat_cla\":\"total_increasing\""
 #define E_BINARY "\"pl_on\":\"True\",\"pl_off\":\"False\""
 #define E_SWITCH "\"stat_on\":\"True\",\"stat_off\":\"False\",\"pl_on\":\"ON\",\"pl_off\":\"OFF\""
 #define E_LIMIT "\"min\":0,\"max\":1440,\"step\":5,\"mode\":\"box\"," E_MINUTES ",\"ent_cat\":\"config\""
@@ -31,9 +34,9 @@ static const SyncEntity ENTITIES[] = {
       "{{ value_json.clock_accurate }}", E_BINARY "," E_DIAG },
 
     // sensors
-    { "used_screen_time", "sensor", SyncWrite_None, "Used screen time", "{{ value_json.timer.used_min }}", E_MEASURE },
+    { "used_screen_time", "sensor", SyncWrite_None, "Used screen time", "{{ value_json.timer.used_min }}", E_TOTAL },
     { "used_screen_time_log", "sensor", SyncWrite_None, "Used screen time (play log)",
-      "{{ value_json.activity_today.used_min }}", E_MEASURE },
+      "{{ value_json.activity_today.used_min }}", E_TOTAL },
     { "screen_time_remaining", "sensor", SyncWrite_None, "Screen time remaining",
       "{{ value_json.timer.remaining_min }}", E_MEASURE },
     { "extended_screen_time", "sensor", SyncWrite_None, "Extended screen time",
@@ -80,13 +83,17 @@ static const SyncEntity ENTITIES[] = {
     { "free_communication_restricted", "switch", SyncWrite_Free, "Communication restricted",
       "{{ value_json.controls.free_communication_restricted }}", E_SWITCH "," E_CONFIG },
 
-    // selects (the profile's options are added when the discovery is built)
-    { "restriction_level", "select", SyncWrite_Free, "Restriction level", "{{ value_json.controls.level }}",
-      "\"ops\":[\"none\",\"young_child\",\"child\",\"teen\",\"custom\"]," E_CONFIG },
+    // selects (the profile's options are added when the discovery is built).
+    // The level "none" is shown as "unrestricted": HA reads a select's "None"
+    // as unknown. The order still carries "none" (cmd_tpl).
+    { "restriction_level", "select", SyncWrite_Free, "Restriction level",
+      "{{ 'unrestricted' if value_json.controls.level == 'none' else value_json.controls.level }}",
+      "\"ops\":[\"unrestricted\",\"young_child\",\"child\",\"teen\",\"custom\"],"
+      "\"cmd_tpl\":\"{{ 'none' if value == 'unrestricted' else value }}\"," E_CONFIG },
     { "profile", "select", SyncWrite_Timer, "Profile", "{{ None }}", E_CONFIG },
 
     // buttons
-    { "sync_now", "button", SyncWrite_Free, "Sync now", NULL, "\"ic\":\"mdi:sync\"" },
+    { "sync_now", "button", SyncWrite_Free, "Sync now", NULL, "\"ic\":\"mdi:sync\"," E_DIAG },
     { "lock_now", "button", SyncWrite_Free, "Lock now", NULL, "\"ic\":\"mdi:lock\"" },
     { "export_report", "button", SyncWrite_Free, "Export a diagnostic report", NULL, E_DIAG },
     { "add_bonus_time_15", "button", SyncWrite_Timer, "Extra time +15 min", NULL, "\"ic\":\"mdi:timer-plus-outline\"" },

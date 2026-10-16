@@ -536,6 +536,9 @@ static void test_orders(void)
     CHECK(parse("bedtime_end_time", "04:59", &in) == SyncReason_OutOfRange);
     CHECK(parse("restriction_level", "young_child", &in) == SyncReason_None && in.level == 2);
     CHECK(parse("restriction_level", "adult", &in) == SyncReason_Invalid);
+    // The select's option for "none", from a client without its command template.
+    CHECK(parse("restriction_level", "unrestricted", &in) == SyncReason_None && in.level == 0);
+    CHECK(parse("restriction_level", "none", &in) == SyncReason_None && in.level == 0);
     CHECK(parse("profile", "School week", &in) == SyncReason_None && !strcmp(in.profile, "School week"));
     CHECK(parse("profile", "0123456789012345678901234567890123", &in) == SyncReason_Invalid);
     CHECK(parse("discovery", "off", &in) == SyncReason_None && in.kind == SyncIntent_Discovery && !in.on);
@@ -609,7 +612,8 @@ static void test_discovery(void)
     const char profiles[2][SYNC_PROFILE_MAX] = { "School week", "Holidays" };
     SyncDiscovery d = { &c, "1.1.0", false, profiles, 2 };
 
-    // remote_timer_writes off: no limit, bedtime, lock or extra time entity.
+    // remote_timer_writes off: no limit, bedtime, lock or extra time entity,
+    // each sent as its platform alone, which removes it from Home Assistant.
     size_t n = sync_discovery_build(&d, buf, sizeof(buf));
     CHECK(n > 0 && n < sizeof(buf));
     CHECK(contains(buf, "\"ids\":[\"playguard_a1b2c3d4\"]"));
@@ -618,10 +622,20 @@ static void test_discovery(void)
     CHECK(contains(buf, "\"used_screen_time\":{\"p\":\"sensor\""));
     CHECK(contains(buf, "\"cmd_t\":\"playguard/a1b2c3d4/vr_restricted/set\""));
     CHECK(contains(buf, "\"cmd_t\":\"playguard/a1b2c3d4/lock_now/set\""));
-    CHECK(!contains(buf, "limit_mon"));
-    CHECK(!contains(buf, "\"unlocked\""));
-    CHECK(!contains(buf, "add_bonus_time"));
-    CHECK(!contains(buf, "\"profile\""));
+    CHECK(contains(buf, "\"limit_mon\":{\"p\":\"number\"}"));
+    CHECK(contains(buf, "\"bedtime_alarm\":{\"p\":\"time\"}"));
+    CHECK(contains(buf, "\"unlocked\":{\"p\":\"switch\"}"));
+    CHECK(contains(buf, "\"add_bonus_time_15\":{\"p\":\"button\"}"));
+    CHECK(contains(buf, "\"profile\":{\"p\":\"select\"}"));
+    CHECK(!contains(buf, "limit_mon/set"));
+    // The restriction level's "none" is the option "unrestricted" (HA reads
+    // a select's "None" as unknown), sent back as "none".
+    CHECK(contains(buf, "\"ops\":[\"unrestricted\",\"young_child\",\"child\",\"teen\",\"custom\"]"));
+    CHECK(contains(buf, "\"cmd_tpl\":\"{{ 'none' if value == 'unrestricted' else value }}\""));
+    // The day's totals restart at midnight; the time left is a measurement.
+    CHECK(contains(buf, "\"used_screen_time\":{\"p\":\"sensor\""));
+    CHECK(contains(buf, "\"stat_cla\":\"total_increasing\""));
+    CHECK(contains(buf, "\"stat_cla\":\"measurement\""));
     CHECK(contains(buf, "\"stat_t\":\"playguard/a1b2c3d4/event\",\"evt_typ\":["));
     const size_t without = n;
 
@@ -641,10 +655,10 @@ static void test_discovery(void)
     save("discovery.json", buf);
     printf("discovery: %zu bytes, %zu components\n", n, total);
 
-    // Without profiles, no profile select (a select needs options).
+    // Without profiles, no profile select (nothing to choose from): removed.
     d.n_profiles = 0;
     n = sync_discovery_build(&d, buf, sizeof(buf));
-    CHECK(!contains(buf, "\"profile\":{"));
+    CHECK(contains(buf, "\"profile\":{\"p\":\"select\"}"));
     // Read-only: sensors only.
     d.read_only = true;
     n = sync_discovery_build(&d, buf, sizeof(buf));
