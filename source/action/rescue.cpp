@@ -10,6 +10,7 @@
 #include "action/history_flow.hpp"
 #include "action/notices.hpp"
 #include "app.hpp"
+#include "ui/ui.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/paths.hpp"
 
@@ -64,10 +65,54 @@ void note_version()
         notices::clear("rescue_old");
         return;
     }
+    if (!bundled()) {
+        const std::string detail = version.empty()
+            ? brls::getStr("playguard/notices/rescue_unknown", app::version())
+            : brls::getStr("playguard/notices/rescue_old_detail", version, app::version());
+        notices::set("rescue_old", notices::Level::Action, "playguard/notices/rescue_old"_i18n, detail);
+        return;
+    }
     const std::string detail = version.empty()
-        ? brls::getStr("playguard/notices/rescue_unknown", app::version())
-        : brls::getStr("playguard/notices/rescue_old_detail", version, app::version());
-    notices::set("rescue_old", notices::Level::Action, "playguard/notices/rescue_old"_i18n, detail);
+        ? brls::getStr("playguard/notices/rescue_unknown_update", app::version())
+        : brls::getStr("playguard/notices/rescue_old_update", version, app::version());
+    notices::set("rescue_old", notices::Level::Action, "playguard/notices/rescue_old"_i18n, detail,
+                 "playguard/notices/rescue_update"_i18n, []() {
+                     std::string error;
+                     if (!update(&error)) {
+                         ui::error(brls::getStr("playguard/notices/rescue_update_failed", error));
+                         return;
+                     }
+                     notices::clear("rescue_old");
+                     ui::info("playguard/notices/rescue_updated"_i18n);
+                 });
+}
+
+bool bundled()
+{
+    struct stat st;
+    return stat(BRLS_ASSET("rescue/exefs.nsp"), &st) == 0;
+}
+
+bool update(std::string* error)
+{
+    std::string nsp;
+    if (!paths::read_file(BRLS_ASSET("rescue/exefs.nsp"), nsp) || nsp.empty()) {
+        if (error) *error = "This build does not carry the module";
+        return false;
+    }
+    const std::string dir = module_dir();
+    // The module first, then the file naming it: should the module not be
+    // written, the next start still reads the old revision and offers this again.
+    if (!paths::atomic_write(dir + "exefs.nsp", nsp, error)) {
+        brls::Logger::error("rescue: the module could not be updated: {}", error ? *error : "");
+        return false;
+    }
+    if (!paths::atomic_write(dir + "playguard-rescue.txt", app::version() + " " + revision() + "\n", error)) {
+        brls::Logger::error("rescue: playguard-rescue.txt could not be written: {}", error ? *error : "");
+        return false;
+    }
+    brls::Logger::info("rescue: module updated to revision {} ({} bytes)", revision(), nsp.size());
+    return true;
 }
 
 bool pending()
