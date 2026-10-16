@@ -25,9 +25,6 @@ now.
   free-communication list by name, then add and remove them, once the list's
   entries are decoded.
   ([details](docs/companion-app.md#3-exceptions-for-specific-software))
-- **Firmware 23.0.1 / Atmosphère 1.12.0 tested on a console.** Covered by the
-  command table, not yet run on hardware: until a trace from it is recorded,
-  23.x goes through the firmware screen (`PCTL_FW_TESTED_MAX` is 22.5.0).
 
 ## Ready to build
 
@@ -52,7 +49,7 @@ No unknown left; only code.
   ([details](docs/companion-app.md#4-history-of-pin-entries))
 - The open questions on the play timer (when the time spent resets on its
   own, whether it counts while temporarily unlocked, command 1406's error,
-  1460's layout…): [docs/parental-controls.md](docs/parental-controls.md#still-open).
+  1460's input…): [docs/parental-controls.md](docs/parental-controls.md#still-open).
   Each answer makes PlayGuard's figures and warnings more exact.
 
 ## Ongoing

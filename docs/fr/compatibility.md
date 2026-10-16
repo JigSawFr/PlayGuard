@@ -6,12 +6,13 @@ Firmwares, Atmosphère et lanceurs pris en charge, emuMMC et sysMMC, et la compa
 
 **Testé sur console** — PlayGuard a tourné sur :
 
+- **Firmware 23.0.1** — Atmosphère 1.12.1
 - **Firmware 22.0.0, 22.1.0, 22.5.0** — Atmosphère 1.11.x
 - hbmenu, sphaira et le Homebrew App Store
 
 **Devrait fonctionner, non testé** — rien dans PlayGuard ne l'empêche, mais personne ne l'a encore signalé ([retours bienvenus](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)). Chaque firmware demande un Atmosphère qui le démarre : celui indiqué ou un plus récent.
 
-- **Firmware 23.0.x** — Atmosphère 1.12.0. Mêmes commandes dans la table de [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) ; s'ouvre par l'écran [firmware plus récent](#firmware-plus-recent).
+- **Firmware 23.0.0** — Atmosphère 1.12.0. Mêmes commandes que 23.0.1 dans la table de [switchbrew](https://switchbrew.org/wiki/Parental_Control_services).
 - **Firmware 21.0.0 → 21.2.0** — Atmosphère 1.10.x. Toutes les fonctions.
 
 **Avant 21.0.0, tout sauf le temps de jeu** — restrictions, code PIN, déverrouillage temporaire, activité, horloge réseau, application mobile et historique fonctionnent. Le bloc de réglages du minuteur (0x44 octets) n'a cette structure que depuis 21.0.0, donc PlayGuard désactive ce qui en dépend : les limites quotidiennes, l'alarme du coucher, le temps en plus et le verrou de console.

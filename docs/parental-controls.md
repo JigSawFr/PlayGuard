@@ -43,7 +43,7 @@ Public reference: [switchbrew, Parental Control services](https://switchbrew.org
 | 1039 / 1044 free-communication application list | count, then 16-byte entries | entry: application ID (u64, LE), then `01` and seven zeros (observed); the meaning of the `01` is unknown |
 | 1062 / 1063 stereo vision (3D) restriction | bool | follows the temporary unlock: `false` while unlocked, `true` once locked again (observed, 22.0.0) |
 | 1903 / 1904 exempt application list (debug) | count, then entries | always empty so far |
-| 1406 `GetSettingsLastUpdated` | POSIX time | **always fails with `0x0001188E`** on the test console (observed, 22.0.0); the cause is unknown |
+| 1406 `GetSettingsLastUpdated` | POSIX time | **always fails with `0x0001188E`** on the test console (observed, 22.0.0 and 23.0.1); the cause is unknown |
 | 1403 `IsPairingActive` | companion app paired | |
 | 1043 `DeleteSettings` | wipes the PIN and every restriction | **cannot be undone** |
 | 1941 `DeletePairing` | unlinks the companion app | |
@@ -95,7 +95,7 @@ Public reference: [switchbrew, Parental Control services](https://switchbrew.org
 | 1960 `GetExtraPlayingTimeForDebug` [20.0.0+] | | always 0 so far |
 | 145601 `GetPlayTimerSettings` | 0x44 bytes [21.0.0+ size] | the block below |
 | 195101 `SetPlayTimerSettingsForDebug` | 0x44 bytes | writes the block |
-| 1460 `GetWatcherStatusDisplayInfo` [23.0.0+] | in 1 byte, out 0x18 bytes | layout unknown |
+| 1460 `GetWatcherStatusDisplayInfo` [23.0.0+] | in 1 byte, out 0x18 bytes | with 0: the first 0x18 bytes of 1459 (observed, 23.0.1); the rest of its layout and its input are unknown |
 
 **Never call 1456 or 1951**: they are the 18.0.0–20.5.0 "old" variants and
 close the session on 21.0.0+.
@@ -456,7 +456,7 @@ From the same 20:10 report:
   the sysmodule, not from a block PlayGuard has seen).
 - Bedtimes that differ from day to day, set from the companion app (the
   console's answer was only checked for today's).
-- 1459's first byte; 1460's layout (23.0.0+).
+- 1459's first byte; 1460's input and what differs from 1459 (23.0.0+).
 - When the time spent resets on its own; how long it stays frozen after the
   clock goes back (until the clock passes the old time?).
 - What turned the header's byte `07` from `06` to `00`.

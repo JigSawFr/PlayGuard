@@ -10,7 +10,7 @@
 // docs/parental-controls.md). Above it the firmware gate asks first (fw_gate),
 // and compat.json publishes it (tools/gen_compat.py): raise it only with a
 // trace from that firmware.
-#define PCTL_FW_TESTED_MAX    MAKEHOSVERSION(22, 5, 0)
+#define PCTL_FW_TESTED_MAX    MAKEHOSVERSION(23, 0, 1)
 // Newest firmware the command table was checked against (switchbrew, Oct 2026):
 // what the IDs in pctl_ops.c are known to match, not a test. Information only.
 #define PCTL_FW_TABLE_CHECKED MAKEHOSVERSION(23, 0, 1)

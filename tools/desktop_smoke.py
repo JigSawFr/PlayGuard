@@ -387,6 +387,7 @@ if SYSNOTES:
     env.setdefault("PLAYGUARD_SIM_SYS_LATEST", "1.12.1:6.5.4:23.0.1")
     # No PlayGuard update offered over Tools by the same check.
     env.setdefault("PLAYGUARD_SIM_LATEST", "offline")
+    env.setdefault("PLAYGUARD_SIM_FW", "22.5.0")   # behind 23.0.0 and 23.0.1
     update_bin = os.path.join(run_dir, "playguard_data", "sd", "bootloader", "update.bin")
     os.makedirs(os.path.dirname(update_bin), exist_ok=True)
     open(update_bin, "wb").write(b"\0" * 0x40 + b"ICTC" + bytes([ord("0") + 6, ord("0") + 5, ord("0") + 3, 0]))
