@@ -34,7 +34,7 @@ void link(brls::DetailCell* cell, int tab)
 
 void linked(brls::DetailCell* cell, const std::string& value)
 {
-    cell->setDetailText(value + "  ›");
+    cell->setDetailText(ui::opens(value));
 }
 }   // namespace
 
@@ -52,7 +52,7 @@ DashboardTab::DashboardTab()
         this->refresh();
         return true;
     });
-    first_steps->setDetailText("playguard/onboarding/pin_missing"_i18n);
+    first_steps->setDetailText(ui::opens("playguard/onboarding/pin_missing"_i18n));
     first_steps->setDetailTextColor(ui::color_warn());
     first_steps->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new OnboardingActivity());
