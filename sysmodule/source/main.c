@@ -12,6 +12,10 @@
 // It leaves the outcome in rescue_report.txt for PlayGuard, then exits — it
 // holds no service and no memory for the rest of the session.
 //
+// At every boot it also removes atmosphere/contents/<id>/restart_pending,
+// which PlayGuard leaves when it updates the module: the bell says to restart
+// the console until the new module has run.
+//
 // This needs no applet and no screen, which is why it can run while everything
 // else is blocked. It only reads a PIN the console already stores; it never
 // writes one anywhere. The pctl command IDs and the buffer details (HIPC
@@ -243,8 +247,12 @@ int main(int argc, char* argv[])
     (void)argc;
     (void)argv;
 
+    if (!wait_for_sd()) return 0;
+    // This module runs: PlayGuard no longer waits for a restart to use it.
+    remove("sdmc:/" RESCUE_RESTART_PATH);
+
     RescueMode mode;
-    if (wait_for_sd() && take_request(&mode)) {
+    if (take_request(&mode)) {
         // Take the request away first: it is acted on once, present or not next
         // boot. A delete still there would run again at every boot, so it is
         // not done; an unlock is (the parent needs PlayGuard to open), and the

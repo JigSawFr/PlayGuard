@@ -41,6 +41,10 @@ extern "C" {
 #define RESCUE_REPORT_NAME      "rescue_report.txt"
 // Where the sysmodule is installed, from the SD card root.
 #define RESCUE_SYSMODULE_PATH   "atmosphere/contents/4200000000505247/exefs.nsp"
+// Next to it: left by PlayGuard when it updates the module, removed by the
+// module at boot. While it is there, the module that runs is still the old
+// one: the console has not restarted since.
+#define RESCUE_RESTART_PATH     "atmosphere/contents/4200000000505247/restart_pending"
 
 typedef enum {
     RescueMode_Unlock = 0,   // unlock temporarily with the stored PIN

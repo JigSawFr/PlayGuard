@@ -10,6 +10,7 @@
 #include "action/history_flow.hpp"
 #include "action/notices.hpp"
 #include "app.hpp"
+#include "ui/ui.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/paths.hpp"
 
@@ -33,6 +34,26 @@ std::string module_dir()
     path += RESCUE_SYSMODULE_PATH;
     return path.substr(0, path.rfind('/') + 1);
 }
+
+std::string restart_path()
+{
+    std::string path = paths::sd_root();
+    if (path.empty() || path.back() != '/') path += '/';
+    return path + RESCUE_RESTART_PATH;
+}
+
+// The module was updated and the console has not restarted since (the old
+// one still runs at boot until then): an entry to do until it has.
+// `updated`: just now, whether or not the marker could be written.
+void note_restart(bool updated = false)
+{
+    if (!updated && !paths::exists(restart_path())) {
+        notices::clear("rescue_restart");
+        return;
+    }
+    notices::set("rescue_restart", notices::Level::Action, "playguard/notices/rescue_restart"_i18n,
+                 "playguard/notices/rescue_restart_detail"_i18n);
+}
 }   // namespace
 
 const char* revision()
@@ -48,8 +69,10 @@ void note_version()
 {
     if (!installed() || !*revision()) {
         notices::clear("rescue_old");
+        notices::clear("rescue_restart");
         return;
     }
+    note_restart();
     // "1.2.0 84d0eaa86878": the version it came with, its revision.
     std::string text, version, rev;
     if (paths::read_file(module_dir() + "playguard-rescue.txt", text)) {
@@ -64,10 +87,59 @@ void note_version()
         notices::clear("rescue_old");
         return;
     }
+    if (!bundled()) {
+        const std::string detail = version.empty()
+            ? brls::getStr("playguard/notices/rescue_unknown", app::version())
+            : brls::getStr("playguard/notices/rescue_old_detail", version, app::version());
+        notices::set("rescue_old", notices::Level::Action, "playguard/notices/rescue_old"_i18n, detail);
+        return;
+    }
     const std::string detail = version.empty()
-        ? brls::getStr("playguard/notices/rescue_unknown", app::version())
-        : brls::getStr("playguard/notices/rescue_old_detail", version, app::version());
-    notices::set("rescue_old", notices::Level::Action, "playguard/notices/rescue_old"_i18n, detail);
+        ? brls::getStr("playguard/notices/rescue_unknown_update", app::version())
+        : brls::getStr("playguard/notices/rescue_old_update", version, app::version());
+    notices::set("rescue_old", notices::Level::Action, "playguard/notices/rescue_old"_i18n, detail,
+                 "playguard/notices/rescue_update"_i18n, []() {
+                     std::string error;
+                     if (!update(&error)) {
+                         ui::error(brls::getStr("playguard/notices/rescue_update_failed", error));
+                         return;
+                     }
+                     notices::clear("rescue_old");
+                     note_restart(true);
+                     ui::info("playguard/notices/rescue_updated"_i18n);
+                 });
+}
+
+bool bundled()
+{
+    struct stat st;
+    return stat(BRLS_ASSET("rescue/exefs.nsp"), &st) == 0;
+}
+
+bool update(std::string* error)
+{
+    std::string nsp;
+    if (!paths::read_file(BRLS_ASSET("rescue/exefs.nsp"), nsp) || nsp.empty()) {
+        if (error) *error = "This build does not carry the module";
+        return false;
+    }
+    const std::string dir = module_dir();
+    // The module first, then the file naming it: should the module not be
+    // written, the next start still reads the old revision and offers this again.
+    if (!paths::atomic_write(dir + "exefs.nsp", nsp, error)) {
+        brls::Logger::error("rescue: the module could not be updated: {}", error ? *error : "");
+        return false;
+    }
+    if (!paths::atomic_write(dir + "playguard-rescue.txt", app::version() + " " + revision() + "\n", error)) {
+        brls::Logger::error("rescue: playguard-rescue.txt could not be written: {}", error ? *error : "");
+        return false;
+    }
+    // Until the module removes it at the next boot (sysmodule/source/main.c).
+    std::string ignore;
+    if (!paths::atomic_write(restart_path(), "", &ignore))
+        brls::Logger::warning("rescue: {} could not be written: {}", RESCUE_RESTART_PATH, ignore);
+    brls::Logger::info("rescue: module updated to revision {} ({} bytes)", revision(), nsp.size());
+    return true;
 }
 
 bool pending()

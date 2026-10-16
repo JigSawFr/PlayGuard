@@ -214,11 +214,23 @@ if (PLATFORM_SWITCH AND USE_DEKO3D)
 endif ()
 
 if (PLATFORM_SWITCH)
-    add_custom_target(${PROJECT_NAME}.nro ALL DEPENDS ${PROJECT_NAME}
+    # The recovery sysmodule rides in the .nro (romfs:/rescue/exefs.nsp), so
+    # PlayGuard can update an installed one that is out of date
+    # (action/rescue.hpp). Its own Makefile (sysmodule/) builds it; it is
+    # only copied to the SD card when a parent asks.
+    find_program(PLAYGUARD_MAKE NAMES make gmake)
+    set(RESCUE_NSP ${CMAKE_CURRENT_SOURCE_DIR}/sysmodule/out/playguard-rescue.nsp)
+    add_custom_target(playguard_rescue
+        COMMAND ${PLAYGUARD_MAKE} --no-print-directory -C ${CMAKE_CURRENT_SOURCE_DIR}/sysmodule
+        BYPRODUCTS ${RESCUE_NSP}
+        COMMENT "Building the recovery sysmodule")
+    add_custom_target(${PROJECT_NAME}.nro ALL DEPENDS ${PROJECT_NAME} playguard_rescue
         COMMAND ${NX_NACPTOOL_EXE} --create "PlayGuard" "${PROJECT_AUTHOR}"
                 "${APP_VERSION}" ${PROJECT_NAME}.nacp --titleid=${PROJECT_TITLEID}
         ${ASSEMBLE_RESOURCES}
         ${PLAYGUARD_COPY_SHADERS}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${MERGED_RESOURCES}/rescue
+        COMMAND ${CMAKE_COMMAND} -E copy ${RESCUE_NSP} ${MERGED_RESOURCES}/rescue/exefs.nsp
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${MERGED_RESOURCES}/font
         COMMAND ${NX_ELF2NRO_EXE} ${PROJECT_NAME}.elf ${PROJECT_NAME}.nro
                 --icon=${PROJECT_ICON} --nacp=${PROJECT_NAME}.nacp

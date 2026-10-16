@@ -46,7 +46,7 @@ export INCLUDE  := $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 export LIBPATHS := $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 export APP_JSON
 
-.PHONY: all clean
+.PHONY: all clean $(BUILD)
 
 all: $(BUILD)
 
