@@ -193,13 +193,29 @@ static void check_meta(GameFacts *g, const NsApplicationContentMetaStatus *m, Sc
     }
 }
 
+// A game's name and icon: ns' cache first, what the HOME menu itself draws
+// (a few ms), then the storage only when the cache has none (a quarter of a
+// second a game: most of a whole check when every game went that way).
+static bool read_control(u64 app_id, NsApplicationControlData *cd, u64 *size)
+{
+    static const NsApplicationControlSource sources[] = { NsApplicationControlSource_CacheOnly,
+                                                          NsApplicationControlSource_Storage };
+    for (size_t k = 0; k < sizeof(sources) / sizeof(sources[0]); k++) {
+        *size = 0;
+        if (R_SUCCEEDED(nsGetApplicationControlData(sources[k], app_id, cd, sizeof(*cd), size)) &&
+            *size > sizeof(cd->nacp) && *size <= sizeof(*cd))
+            return true;
+    }
+    return false;
+}
+
 static void check_game(GameFacts *g, NsApplicationControlData *cd, Scan *sc)
 {
     u64 t = now_ns();
     u64 size = 0;
     NacpLanguageEntry *lang = NULL;
-    if (cd && R_SUCCEEDED(nsGetApplicationControlData(NsApplicationControlSource_Storage, g->app_id, cd, sizeof(*cd), &size)) &&
-        size > sizeof(cd->nacp) && R_SUCCEEDED(nacpGetLanguageEntry(&cd->nacp, &lang)) && lang && lang->name[0]) {
+    if (cd && read_control(g->app_id, cd, &size) &&
+        R_SUCCEEDED(nacpGetLanguageEntry(&cd->nacp, &lang)) && lang && lang->name[0]) {
         g->control_ok = true;
         copy_utf8(g->name, sizeof(g->name), lang->name);
         copy_utf8(g->display_version, sizeof(g->display_version), cd->nacp.display_version);
