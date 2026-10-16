@@ -402,6 +402,37 @@ static void test_tmp_recovery()
     std::remove(file.c_str());
     std::remove((file + ".tmp").c_str());
     CHECK(!paths::read_file(file, text));
+
+    // A first write cut short (no file before it) leaves a ".part", never a
+    // ".tmp": nothing is read in its place, it is not taken for a damaged
+    // file, and the next write drops it.
+    {
+        FILE* f = std::fopen((file + ".part").c_str(), "wb");
+        CHECK(f && std::fputs("{\"theme\": \"da", f) >= 0 && std::fclose(f) == 0);
+    }
+    CHECK(!paths::read_file(file, text) && !paths::exists_or_pending(file) && !paths::file_exists(file));
+    config::get() = config::Config{};
+    config::load();
+    CHECK(config::loaded() == config::Loaded::Missing && config::get().theme == "system");
+    CHECK(paths::atomic_write(file, R"({"theme": "dark"})"));
+    CHECK(paths::read_file(file, text) && text == R"({"theme": "dark"})");
+    CHECK(!exists(file + ".part") && !exists(file + ".tmp"));
+    // The same write failing (file size limit) leaves no ".tmp" either.
+    std::remove(file.c_str());
+    CHECK(setrlimit(RLIMIT_FSIZE, &small) == 0);
+    const bool first = paths::atomic_write(file, std::string(4096, ' '));
+    CHECK(setrlimit(RLIMIT_FSIZE, &saved) == 0);
+    CHECK(!first && !exists(file) && !exists(file + ".tmp") && !exists(file + ".part"));
+    CHECK(!paths::exists_or_pending(file));
+    // A file and an older ".tmp" next to it (a write stopped before its last
+    // step): the next write replaces both with its own content.
+    write_config(R"({"theme": "light"})");
+    {
+        FILE* f = std::fopen((file + ".tmp").c_str(), "wb");
+        CHECK(f && std::fputs("{\"theme\": \"dark\"}", f) >= 0 && std::fclose(f) == 0);
+    }
+    CHECK(paths::atomic_write(file, R"({"theme": "system"})"));
+    CHECK(paths::read_file(file, text) && text == R"({"theme": "system"})" && !exists(file + ".tmp"));
 }
 
 // Each system (util/nand.hpp) has its own state.json: the console lock, the

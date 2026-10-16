@@ -1,8 +1,10 @@
 // The network half of github_auth.hpp (the rest stays plain C++ for the host tests).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
-#include <cstdlib>
 #include <cstring>
 
+#ifndef __SWITCH__
+#include "sim/sim_net.hpp"
+#endif
 #include "util/github_auth.hpp"
 #include "util/http.hpp"
 #include "util/log_upload.hpp"
@@ -17,8 +19,7 @@ const http::Headers JSON{ "Accept: application/json" };
 #ifndef __SWITCH__
 const char* sim()
 {
-    const char* value = std::getenv("PLAYGUARD_SIM_GITHUB_LOGIN");
-    return value && *value ? value : nullptr;
+    return sim_net::value("PLAYGUARD_SIM_GITHUB_LOGIN");
 }
 #endif
 }   // namespace
@@ -28,10 +29,7 @@ bool start(DeviceCode* out, std::string* error)
     std::string body;
 #ifndef __SWITCH__
     if (const char* s = sim()) {
-        if (std::strcmp(s, "offline") == 0) {
-            if (error) *error = "simulated: no connection";
-            return false;
-        }
+        if (std::strcmp(s, "offline") == 0) return sim_net::offline(error);
         body = R"({"device_code": "sim", "user_code": "SIMU-1234", "verification_uri": "https://github.com/login/device",
                    "interval": 1, "expires_in": 900})";
     } else

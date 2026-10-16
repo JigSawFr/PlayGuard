@@ -3,6 +3,9 @@
 #include <cstdlib>
 #include <cstring>
 
+#ifndef __SWITCH__
+#include "sim/sim_net.hpp"
+#endif
 #include "util/http.hpp"
 #include "util/sys_updates.hpp"
 
@@ -31,7 +34,7 @@ Latest fetch(std::string* error)
     // Without it, nothing: a smoke test never depends on the network.
     const char* sim = std::getenv("PLAYGUARD_SIM_SYS_LATEST");
     if (!sim || std::strcmp(sim, "offline") == 0) {
-        if (error) *error = "simulated: no connection";
+        sim_net::offline(error);
         return out;
     }
     const std::string s = sim;

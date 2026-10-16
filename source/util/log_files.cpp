@@ -36,12 +36,6 @@ unsigned suffix_n(const std::string& name, size_t stamp_end)
     return (unsigned)std::strtoul(name.c_str() + stamp_end + 1, nullptr, 10);
 }
 
-bool exists(const std::string& path)
-{
-    struct stat st;
-    return stat(path.c_str(), &st) == 0;
-}
-
 // "2026-10-11 14:25[:30]" at the start of `line` as a stamp ("20261011_142500",
 // the seconds when there are some); false without one.
 bool line_stamp(const std::string& line, std::string* stamp)
@@ -75,7 +69,7 @@ bool save_shortcuts(const std::string& text, const std::string& stamp, const std
         std::string st = stamp;
         const bool dated = line_stamp(line, &st);
         unsigned n = 0;
-        while (n < 1000 && exists(dir + "/" + name(UPLOAD, st, n))) n++;
+        while (n < 1000 && paths::file_exists(dir + "/" + name(UPLOAD, st, n))) n++;
         if (!paths::atomic_write(dir + "/" + name(UPLOAD, st, n), shortcut(url, removal, dated ? line.substr(0, 16) : "")))
             return false;
     }
@@ -85,7 +79,7 @@ bool save_shortcuts(const std::string& text, const std::string& stamp, const std
 // `from` to `to` when `to` is free (FAT's rename would not replace it anyway).
 bool move(const std::string& from, const std::string& to)
 {
-    if (!exists(from) || exists(to)) return false;
+    if (!paths::file_exists(from) || paths::file_exists(to)) return false;
     return std::rename(from.c_str(), to.c_str()) == 0;
 }
 }   // namespace
@@ -171,7 +165,7 @@ std::string save(const std::string& dir, const char* prefix, const std::string& 
     const std::string st = stamp(now);
     for (unsigned i = 0; i < 1000; i++) {
         const std::string path = dir + "/" + name(prefix, st, i);
-        if (paths::exists(path)) continue;
+        if (paths::exists_or_pending(path)) continue;
         return paths::atomic_write(path, content, error) ? path : "";
     }
     if (error) *error = "No free file name";
@@ -218,7 +212,7 @@ size_t migrate(const std::string& logs_dir)
         line_stamp(text, &st);
         if (paths::ensure_dir(crashes)) {
             for (unsigned i = 0; i < 100; i++)
-                if (!exists(crashes + "/" + name(CRASH, st, i))) {
+                if (!paths::file_exists(crashes + "/" + name(CRASH, st, i))) {
                     if (move(crash, crashes + "/" + name(CRASH, st, i))) moved++;
                     break;
                 }
@@ -250,7 +244,7 @@ size_t migrate(const std::string& logs_dir)
                                          { "play_timer_block.json", "block.json" } };
     for (const auto& f : PT) {
         const std::string from = logs_dir + "/" + f[0];
-        if (exists(from) && paths::ensure_dir(play_timer) && move(from, play_timer + "/" + f[1])) moved++;
+        if (paths::file_exists(from) && paths::ensure_dir(play_timer) && move(from, play_timer + "/" + f[1])) moved++;
     }
     return moved;
 }
