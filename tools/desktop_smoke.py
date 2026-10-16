@@ -868,8 +868,8 @@ if OUTSIDE:
     time.sleep(6)              # the next refresh shows it
     shot("02_not_counting")
     key("y")                   # the notification bell's list (the keyboard's Y): both, the
-    if not logged("notices: 4 to do"):   # simulated network clock (not accurate) and broken games
-        fail("the notification bell does not hold the four notices to do")
+    if not logged("notices: 5 to do"):   # simulated network clock (not accurate), PIN (1234), broken games
+        fail("the notification bell does not hold the five notices to do")
     shot("03_notices")
     key("Escape")
     key("Down")                # Play timer: its state line says it too

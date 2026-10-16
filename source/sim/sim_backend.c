@@ -237,6 +237,17 @@ Result pctl_get_pin(char *out, size_t out_size)
     snprintf(out, out_size, "1234");
     return 0;
 }
+// The simulated PIN is 1234: an easy one (PLAYGUARD_SIM_FAIL=pin fails the read).
+Result pctl_pin_weak(bool *weak)
+{
+    if (!weak) return NXM_RC_INVALID_ARGUMENT;
+    *weak = false;
+    sim_init();
+    FAIL_IF("pin");
+    if (!S.pin_length) return NXM_RC_NO_PIN;
+    *weak = pin_is_weak("1234", 4);
+    return 0;
+}
 // Locking again never asks for the PIN (write_guard.h): read-only only.
 Result pctl_lock_state(u32 *pin_length, bool *unlocked)
 {

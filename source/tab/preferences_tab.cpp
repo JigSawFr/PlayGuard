@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "action/notices.hpp"
+#include "action/sys_update_flow.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -113,6 +115,23 @@ PreferencesTab::PreferencesTab()
         config::get().intro = on;
         ui::save_config();
     });
+    // The notification bell's kinds of entries (action/notices).
+    notices_system->init("playguard/prefs/notices_system"_i18n, config::get().notices_system, [](bool on) {
+        config::get().notices_system = on;
+        ui::save_config();
+        notices::apply_preferences();
+        sys_update_flow::refresh_entries();
+    });
+    notices_summary->init("playguard/prefs/notices_summary"_i18n, config::get().notices_summary, [](bool on) {
+        config::get().notices_summary = on;
+        ui::save_config();
+        notices::apply_preferences();
+    });
+    notices_reminders->init("playguard/prefs/notices_reminders"_i18n, config::get().notices_reminders, [](bool on) {
+        config::get().notices_reminders = on;
+        ui::save_config();
+        notices::apply_preferences();
+    });
     clock_check->init("playguard/tools/clock_check"_i18n, config::get().clock_check_at_start, [](bool on) {
         config::get().clock_check_at_start = on;
         ui::save_config();
@@ -132,6 +151,9 @@ void PreferencesTab::refresh()
     intro->setOn(cfg.intro, false);
     clock_check->setOn(cfg.clock_check_at_start, false);
     support_reminder->setOn(cfg.support_reminder, false);
+    notices_system->setOn(cfg.notices_system, false);
+    notices_summary->setOn(cfg.notices_summary, false);
+    notices_reminders->setOn(cfg.notices_reminders, false);
     // Read-only: the play-timer preferences would change nothing; they stay
     // in sight, greyed (A says why).
     const bool writable = !app::read_only();

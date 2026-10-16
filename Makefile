@@ -63,6 +63,10 @@ dist: all
 # deliberate install, never part of the default one. The zip drops into the
 # SD-card root: Atmosphère runs 4200000000505247 at boot (the boot2.flag).
 RESCUE_TID := 4200000000505247
+# playguard-rescue.txt next to the module: the PlayGuard version it comes
+# with and its revision (tools/rescue_rev.cmake), which the app compares with
+# its own to tell a module out of date (action/rescue.hpp).
+RESCUE_VERSION := $(shell sed -n 's/^set(VERSION_[A-Z]* "\([0-9]*\)").*/\1/p' CMakeLists.txt | paste -sd.)
 rescue:
 	@$(MAKE) --no-print-directory -C sysmodule
 
@@ -73,6 +77,7 @@ dist-rescue: rescue
 	@cp sysmodule/out/playguard-rescue.nsp out-rescue/atmosphere/contents/$(RESCUE_TID)/exefs.nsp
 	@touch out-rescue/atmosphere/contents/$(RESCUE_TID)/flags/boot2.flag
 	@cp LICENSE out-rescue/atmosphere/contents/$(RESCUE_TID)/LICENSE.txt
+	@printf '%s %s\n' '$(RESCUE_VERSION)' "$$(cmake -DROOT=$(CURDIR) -P tools/rescue_rev.cmake)" > out-rescue/atmosphere/contents/$(RESCUE_TID)/playguard-rescue.txt
 	@cd out-rescue && $(ZIP_TREE) ../playguard-rescue.zip
 
 desktop:
@@ -136,6 +141,8 @@ timer_health_logic_SRC   := source/action/timer_health_logic.cpp tests/timer_hea
 timer_health_logic_FLAGS := -std=c++17 -Isource
 notice_logic_SRC   := source/action/notice_logic.cpp tests/notice_logic/test.cpp
 notice_logic_FLAGS := -std=c++17 -Isource
+sys_updates_SRC   := source/util/sys_updates.cpp tests/sys_updates/test.cpp
+sys_updates_FLAGS := -std=c++17 -Isource
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
 offline_clock_logic_FLAGS := -std=c++17 -Isource
 icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp

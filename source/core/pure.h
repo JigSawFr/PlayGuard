@@ -123,3 +123,8 @@ void pt_bedtime_decode(const u16 c[PT_U16_COUNT], PtBedtime out[7]);
 // becomes EACH_DAY_OF_THE_WEEK first, as in pt_encode. Writing back the
 // bedtimes just read gives the same block, byte for byte.
 void pt_bedtime_encode(u16 c[PT_U16_COUNT], const PtBedtime in[7]);
+
+// A PIN anyone would try first (4 to 8 digits): one digit repeated (0000),
+// digits that go up or down by one (1234, 4321, 0123), a pair repeated
+// (1212) or a column of the keypad (2580, 0852). `pin` holds `n` digits.
+bool pin_is_weak(const char *pin, size_t n);
