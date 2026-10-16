@@ -706,7 +706,6 @@ void GameCheckActivity::show()
 
     // The cells are reused in place, as in the History screen: one of them
     // may have the focus while the list changes under it.
-    brls::View* first = nullptr;
     for (GameCategory category : GROUPS) {
         const std::vector<Broken>& shown = by_group[category];
         Group& group = this->groups[category];
@@ -737,7 +736,6 @@ void GameCheckActivity::show()
                                      return true;
                                  });
             ui::set_visible(cell, true);
-            if (!first) first = cell;
         }
         for (size_t i = shown.size(); i < cells.size(); i++) ui::set_visible(cells[i], false);
         group.title->setTitle(brls::getStr(std::string("playguard/games/groups/") + category_key(category), (int)shown.size()));
@@ -767,6 +765,7 @@ void GameCheckActivity::show()
     brls::View* focus = brls::Application::getCurrentFocus();
     bool lost = false;
     for (brls::View* v = focus; v && !lost; v = v->getParent()) lost = v->getVisibility() != brls::Visibility::VISIBLE;
+    brls::View* first = this->first_game();
     if (first && (!this->focused || lost)) {
         this->focused = true;
         brls::Application::giveFocus(first);
@@ -791,6 +790,41 @@ void GameCheckActivity::show()
     }
     hint->setText(brls::getStr("playguard/games/many", ui::storage_short(si)));
     ui::set_visible(hint.getView(), broken.size() >= MANY);
+}
+
+// The first game of the list, in the first section shown.
+brls::View* GameCheckActivity::first_game() const
+{
+    for (GameCategory category : GROUPS) {
+        const Group& group = this->groups[category];
+        if (group.box->getVisibility() != brls::Visibility::VISIBLE) continue;
+        for (brls::View* cell : group.list->getChildren())
+            if (cell->getVisibility() == brls::Visibility::VISIBLE) return cell;
+    }
+    return nullptr;
+}
+
+// Back from a dialog: borealis gives the focus back to the view that opened
+// it (Application::popActivity, right after this), and none when that view
+// went meanwhile: "Check these games", hidden once its games left To check
+// while the result asked whether to remove them. The focus then stayed on
+// the dialog's button, deleted after its animation: no button answered any
+// more. In that case only, the first game has it (borealis' try comes after
+// and does nothing). The view to get it back is the end of the boxes' last
+// focused views; giving the focus otherwise would change those.
+void GameCheckActivity::onResume()
+{
+    brls::View* last = this->getContentView();
+    while (auto* box = dynamic_cast<brls::Box*>(last)) {
+        brls::View* next = box->getLastFocusedView();
+        if (!next) break;
+        last = next;
+    }
+    bool gone = !last || !last->isFocusable();
+    for (brls::View* v = last; v && !gone; v = v->getParent()) gone = v->getVisibility() != brls::Visibility::VISIBLE;
+    if (!gone) return;
+    brls::View* first = this->first_game();
+    brls::Application::giveFocus(first ? first : this->getContentView());
 }
 
 bool GameCheckActivity::changes_list(const GameFacts& game) const
