@@ -38,6 +38,7 @@ typedef struct {
 typedef struct {
     u64 id;
     const char *name;         // NULL: no control data
+    const char *name_fr;      // its French title entry (3), NULL: none
     bool uncached;            // ns' cache has no control data for it
     const char *display_version;
     u8 record_event;
@@ -70,12 +71,16 @@ static struct {
     int verify_waits, progress_calls, verify_cancels;
     bool verify_corrupt;
     Result verify_get_rc;     // what the check's own result says
+    SetLanguage language;     // the console's
+    Result set_rc;            // set could not be opened
+    int set_open;
 } C;
 
 static void reset(void)
 {
     memset(&C, 0, sizeof(C));
     C.hos = MAKEHOSVERSION(22, 1, 0);
+    C.language = SetLanguage_ENUS;
 }
 
 bool hosversionAtLeast(u8 major, u8 minor, u8 micro)
@@ -208,15 +213,37 @@ Result nsGetApplicationControlData(NsApplicationControlSource source, u64 id, Ns
     if (!g || !g->name) return 0x1234;
     memset(&buffer->nacp, 0, sizeof(buffer->nacp));
     snprintf(buffer->nacp.lang[0].name, sizeof(buffer->nacp.lang[0].name), "%s", g->name);
+    if (g->name_fr) snprintf(buffer->nacp.lang[3].name, sizeof(buffer->nacp.lang[3].name), "%s", g->name_fr);
     snprintf(buffer->nacp.display_version, sizeof(buffer->nacp.display_version), "%s",
              g->display_version ? g->display_version : "");
     *actual = sizeof(buffer->nacp) + 0x1000;
     return 0;
 }
 
-Result nacpGetLanguageEntry(NacpStruct *nacp, NacpLanguageEntry **entry)
+Result setInitialize(void)
 {
-    *entry = &nacp->lang[0];
+    if (C.set_rc) return C.set_rc;
+    C.set_open++;
+    return 0;
+}
+
+void setExit(void)
+{
+    REQUIRE(C.set_open > 0);
+    C.set_open--;
+}
+
+Result setGetSystemLanguage(u64 *code)
+{
+    REQUIRE(C.set_open == 1);
+    *code = 0x100 + (u64)C.language;   // a language code the fake alone reads
+    return 0;
+}
+
+Result setMakeLanguage(u64 code, SetLanguage *language)
+{
+    REQUIRE(code >= 0x100 && code < 0x100 + SetLanguage_Total);
+    *language = (SetLanguage)(code - 0x100);
     return 0;
 }
 
@@ -627,7 +654,7 @@ static GameCheck R;
 static void all_closed(void)
 {
     CHECK(C.ns_open == 0 && C.ncm_open == 0 && C.db_open == 0 && C.cs_open == 0);
-    CHECK(C.avm_open == 0 && C.es_open == 0 && C.am_open == 0 && C.async_open == 0);
+    CHECK(C.avm_open == 0 && C.es_open == 0 && C.am_open == 0 && C.async_open == 0 && C.set_open == 0);
 }
 
 static const GameFacts *facts(u64 id)
@@ -889,6 +916,35 @@ static void test_every_problem(void)
     CHECK(issue_of(0x01000000000D0000ULL) == GC_LAUNCH_VERSION);
     CHECK(gamecheck_actions(f, GC_LAUNCH_VERSION) & GA_RESET_LAUNCH);
     CHECK(issue_of(0x01000000000E0000ULL) == GC_NEEDS_VERIFY);
+}
+
+// A game's name in the console language, as the Activity tab reads it
+// (core/nacp.h), else its first title entry; and American English when the
+// language cannot be read.
+static void test_names(void)
+{
+    reset();
+    C.language = SetLanguage_FR;
+    FakeGame *g = add_game(0x0100000000010000ULL, "Star Kart");
+    g->name_fr = "Star Kart (FR)";
+    add_meta(g, NcmContentMetaType_Application, NcmStorageId_SdCard, 0);
+    g = add_game(0x0100000000020000ULL, "Pixel Quest");
+    add_meta(g, NcmContentMetaType_Application, NcmStorageId_SdCard, 0);
+    g = add_game(0x0100000000030000ULL, "\xC3(");   // not UTF-8: no name worth showing
+    add_meta(g, NcmContentMetaType_Application, NcmStorageId_SdCard, 0);
+    scan();
+    CHECK(facts(0x0100000000010000ULL)->control_ok && strcmp(facts(0x0100000000010000ULL)->name, "Star Kart (FR)") == 0);
+    CHECK(facts(0x0100000000020000ULL)->control_ok && strcmp(facts(0x0100000000020000ULL)->name, "Pixel Quest") == 0);
+    CHECK(!facts(0x0100000000030000ULL)->control_ok && facts(0x0100000000030000ULL)->name[0] == '\0');
+
+    C.language = SetLanguage_ENGB;   // entry 1, empty here: the first one
+    scan();
+    CHECK(strcmp(facts(0x0100000000010000ULL)->name, "Star Kart") == 0);
+
+    C.language = SetLanguage_FR;
+    C.set_rc = 0x5E7;
+    scan();
+    CHECK(strcmp(facts(0x0100000000010000ULL)->name, "Star Kart") == 0);
 }
 
 static void test_sd_card_unreadable(void)
@@ -1333,6 +1389,7 @@ int main(void)
     test_rules();
     test_actions();
     test_every_problem();
+    test_names();
     test_sd_card_unreadable();
     test_without_services();
     test_list_failures();

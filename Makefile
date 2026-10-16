@@ -102,8 +102,9 @@ time_SRC   := source/core/time_ops.c source/core/calendar.c source/core/write_gu
 time_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/time_ops -Isource/core
 sysinfo_SRC   := source/core/sysinfo.c source/core/pure.c tests/sysinfo/test.c
 sysinfo_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/sysinfo -Isource/core
-gamecheck_SRC   := source/core/gamecheck.c source/core/gamecheck_rules.c source/core/write_guard.c tests/gamecheck/test.c
+gamecheck_SRC   := source/core/gamecheck.c source/core/gamecheck_rules.c source/core/nacp.c source/core/nacp_read.c source/core/write_guard.c tests/gamecheck/test.c
 gamecheck_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/gamecheck -Isource/core
+gamecheck_LIBS  := -lz
 calendar_SRC   := source/core/calendar.c tests/calendar/test.c
 calendar_FLAGS := -std=gnu11 -Isource/core
 rescue_SRC   := source/core/rescue.c tests/rescue/test.c
@@ -114,7 +115,7 @@ playlog_SRC   := source/util/playlog.c tests/playlog/test.c
 playlog_FLAGS := -std=c11 -Isource/util
 startup_SRC   := source/util/startup.c tests/startup/test.c
 startup_FLAGS := -std=gnu11 -Isource/util
-playstats_SRC   := source/core/playstats_logic.c tests/playstats/test.c
+playstats_SRC   := source/core/playstats_logic.c source/core/nacp.c tests/playstats/test.c
 playstats_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/playstats -Isource/core
 playstats_LIBS  := -lz
 
