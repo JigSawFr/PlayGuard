@@ -20,6 +20,10 @@ void at_start();
 // Check for updates: a new check now, in the background.
 void check_now();
 
+// The bell's entries again, from what the last check found (Preferences ›
+// Notifications turned them back on).
+void refresh_entries();
+
 // hekate as installed on the SD card (bootloader/update.bin); "" when absent.
 std::string installed_hekate();
 // Tools › Console's value: `running`, then the newer release the last check

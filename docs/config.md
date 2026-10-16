@@ -111,6 +111,11 @@ Set in *About*.
 | `support_reminder` | boolean | *Support PlayGuard* once a month at start-up (Preferences) | `true` |
 | `support_reminded` | string | `"YYYY-MM-DD"` of the last reminder; anything else is cleared | `""` |
 | `seen_version` | string | the version whose *What's new* was shown; at most 32 characters | `""` |
+| `notices_system` | boolean | the notification bell shows newer Atmosphère, hekate and firmware releases (*Preferences › Notifications*) | `true` |
+| `notices_summary` | boolean | the bell shows the week's play time and a limit passed on several days | `true` |
+| `notices_reminders` | boolean | the bell reminds of a settings backup to make, the other system's parental controls and a console lock on for a week | `true` |
+| `notices_read` | array of strings | the bell's entries for information marked as read, `"id:hash"` of their text, the newest last, at most 48 (one longer than 96 characters is dropped); a read entry comes back when its text changes | `[]` |
+| `summary_seen` | string | `"YYYY-MM-DD"` the weekly summary was last read; it comes back 7 days later; anything else is cleared | `""` |
 | `crash_seen` | string | the newest crash file (`logs/crashes/`) the notification bell told about; at most 64 characters | `""` |
 
 ## Developer tools
@@ -145,6 +150,7 @@ play.
 | Key | Type | Values | Default |
 |---|---|---|---|
 | `console_lock` | boolean | the console lock is on | `false` |
+| `console_lock_since` | string | `"YYYY-MM-DD"` the console lock was turned on (the bell says when it has been on for a week); anything else is cleared | `""` |
 | `console_lock_prev` | array of 7 integers | the limits it replaced, Sunday to Saturday, in minutes: `0` to `1440`, or `65535` for no limit. Anything but seven valid values empties it; turning the lock off then clears the limits instead of putting them back | `[]` |
 
 ### Extra time today
@@ -217,6 +223,11 @@ line; the order does not matter when it reads them:
   "support_reminded": "",
   "seen_version": "",
   "crash_seen": "",
+  "notices_system": true,
+  "notices_summary": true,
+  "notices_reminders": true,
+  "notices_read": [],
+  "summary_seen": "",
   "dev_mode": false,
   "pt_log": false,
   "dev_builds_order": "newest",
@@ -229,6 +240,7 @@ line; the order does not matter when it reads them:
   "schema": 1,
   "console_lock": false,
   "console_lock_prev": [],
+  "console_lock_since": "",
   "extra_weekday": -1,
   "extra_date": "",
   "extra_base": 0,

@@ -20,6 +20,7 @@ namespace
 void set_flag(bool on)
 {
     config::get().console_lock = on;
+    if (!on) config::get().console_lock_since.clear();
     ui::save_config();
 }
 
@@ -45,6 +46,7 @@ void lock(std::function<void()> refresh)
         auto& cfg = config::get();
         cfg.console_lock_prev = prev;
         cfg.console_lock = true;
+        cfg.console_lock_since = ui::today_date();
         if (!ui::save_config_now()) {
             cfg.console_lock_prev.clear();
             cfg.console_lock = false;
@@ -103,6 +105,7 @@ void forget()
     if (!cfg.console_lock && cfg.console_lock_prev.empty()) return;
     cfg.console_lock = false;
     cfg.console_lock_prev.clear();
+    cfg.console_lock_since.clear();
     ui::save_config();
 }
 

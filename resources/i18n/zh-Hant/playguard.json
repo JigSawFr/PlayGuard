@@ -790,7 +790,11 @@
         "section_startup": "啟動時",
         "note": "備份、診斷報告及主機資訊位於「工具」，更新位於「關於」。",
         "intro": "顯示開場畫面 2 秒",
-        "support_reminder": "每月提醒一次支持 PlayGuard"
+        "support_reminder": "每月提醒一次支持 PlayGuard",
+        "section_notices": "通知",
+        "notices_system": "Atmosphère、hekate 和韌體的新版本",
+        "notices_summary": "本週遊戲時間",
+        "notices_reminders": "提醒：備份、另一個系統、主機鎖定"
     },
     "backup": {
         "saved": "已備份設定：{}",
@@ -1149,6 +1153,25 @@
         "sys_hekate": "hekate {} 已發布",
         "sys_hekate_detail": "SD 卡上的 hekate 是 {}。",
         "sys_firmware": "韌體 {} 已發布",
-        "sys_firmware_detail": "這台主機是 {}。請等 Atmosphère（以及你使用的 hekate）支援該韌體後再更新，否則 Atmosphère 將無法啟動。"
+        "sys_firmware_detail": "這台主機是 {}。請等 Atmosphère（以及你使用的 hekate）支援該韌體後再更新，否則 Atmosphère 將無法啟動。",
+        "pin_weak": "PIN 很容易被猜到",
+        "pin_weak_detail": "像 0000 或 1234 這樣，是別人最先會試的。請換一個更難猜到的。",
+        "pin_lock_off": "開啟 PlayGuard 不需要 PIN",
+        "pin_lock_off_detail": "任何開啟 PlayGuard 的人都能修改限制和設定。",
+        "pin_lock_choose": "要求輸入 PIN…",
+        "other_system": "另一個系統有自己的家長監護",
+        "console_lock_long": "主機鎖定從 {} 起一直開啟",
+        "console_lock_long_detail": "開啟期間，每天的限制都維持為 0。",
+        "backup_none": "還沒有設定備份",
+        "backup_old": "上次設定備份：{}",
+        "backup_detail": "備份會保存限制和設定，在重設或誤操作後可以還原。",
+        "backup_now": "立即備份",
+        "sd_space": "SD 卡快滿了",
+        "sd_space_detail": "剩餘 {} MB：PlayGuard 可能無法儲存設定、記錄和日誌。",
+        "week": "最近 7 天：遊玩 {}",
+        "week_detail": "平均每天 {}。",
+        "week_top": "玩得最多：{}（{}）。",
+        "over_limit": "最近 7 天中有 {} 天超過了限制",
+        "over_limit_detail": "時間到時主機只會提醒：超過限制後仍可繼續遊玩（遊戲時間 › 時間到時）。"
     }
 }

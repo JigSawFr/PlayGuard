@@ -1,22 +1,31 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/notices.hpp"
 
+#include <algorithm>
 #include <borealis.hpp>
+#include <cstdio>
 #include <map>
+#include <sys/statvfs.h>
 
+#include "action/backup_flow.hpp"
 #include "action/clock_flow.hpp"
+#include "action/history_flow.hpp"
 #include "action/outside_watch.hpp"
+#include "action/pin_lock.hpp"
+#include "action/play_data.hpp"
 #include "action/pt_flow.hpp"
+#include "action/upload_flow.hpp"
 #include "activity/main_activity.hpp"
 #include "activity/onboarding_activity.hpp"
-#include "action/history_flow.hpp"
-#include "action/upload_flow.hpp"
 #include "app.hpp"
+#include "tab/tab_base.hpp"
+#include "ui/ui.hpp"
+#include "util/activity_summary.hpp"
+#include "util/backup.hpp"
 #include "util/config.hpp"
 #include "util/log_files.hpp"
 #include "util/paths.hpp"
-#include "tab/tab_base.hpp"
-#include "ui/ui.hpp"
+#include "util/update.hpp"
 
 using namespace brls::literals;
 
@@ -49,6 +58,70 @@ std::string open_label(const char* tab)
     return brls::getStr("playguard/notices/open_tab", brls::getStr(std::string("playguard/tabs/") + tab));
 }
 
+// Preferences › Notifications: which kind an entry is, and whether that kind
+// is shown. Every other entry always is.
+bool shown_kind(const std::string& id)
+{
+    const auto& cfg = config::get();
+    if (id.rfind("sys_", 0) == 0) return cfg.notices_system;
+    if (id == "week" || id == "over_limit") return cfg.notices_summary;
+    if (id == "backup" || id == "other_system" || id == "console_lock_long") return cfg.notices_reminders;
+    return true;
+}
+
+// An entry for information marked as read: its id and a hash of its text,
+// remembered in config.json, so it stays read at the next start until its
+// text changes.
+std::string read_key(const std::string& id, const std::string& title, const std::string& detail)
+{
+    uint32_t h = 2166136261u;   // FNV-1a
+    for (const std::string* part : { &title, &detail })
+        for (unsigned char c : *part) h = (h ^ c) * 16777619u;
+    char hex[9];
+    std::snprintf(hex, sizeof(hex), "%08x", (unsigned)h);
+    return id + ":" + hex;
+}
+
+bool was_read(const std::string& key)
+{
+    const auto& read = config::get().notices_read;
+    return std::find(read.begin(), read.end(), key) != read.end();
+}
+
+// "2026-10-08" from a backup's name ("20261008_142530.json"); "" otherwise.
+std::string backup_date(const std::string& name)
+{
+    if (name.size() < 8) return "";
+    for (int i = 0; i < 8; i++)
+        if (name[i] < '0' || name[i] > '9') return "";
+    return name.substr(0, 4) + "-" + name.substr(4, 2) + "-" + name.substr(6, 2);
+}
+
+// `date` ("YYYY-MM-DD") is `days` days ago or more.
+bool days_ago(const std::string& date, int days)
+{
+    const std::string then = update::add_days(date, days);
+    return !then.empty() && then <= ui::today_date();
+}
+
+// Free space on the SD card, bytes; false when it cannot be read. On the
+// desktop build, PLAYGUARD_SIM_SD_FREE_MB only (the computer's disk says
+// nothing about a console).
+bool sd_free(uint64_t* bytes)
+{
+#ifndef __SWITCH__
+    const char* sim = std::getenv("PLAYGUARD_SIM_SD_FREE_MB");
+    if (!sim) return false;
+    *bytes = (uint64_t)std::strtoull(sim, nullptr, 10) << 20;
+    return true;
+#else
+    struct statvfs st;
+    if (statvfs(paths::sd_root().c_str(), &st) != 0) return false;
+    *bytes = (uint64_t)st.f_bavail * st.f_frsize;
+    return true;
+#endif
+}
+
 // One entry that is there while `on`, gone otherwise.
 void toggle(bool on, const std::string& id, Level level, const std::string& title, const std::string& detail,
             const std::string& action_label = "", std::function<void()> action = nullptr)
@@ -61,8 +134,15 @@ void toggle(bool on, const std::string& id, Level level, const std::string& titl
 void set(const std::string& id, Level level, const std::string& title, const std::string& detail,
          const std::string& action_label, std::function<void()> action)
 {
+    if (!shown_kind(id)) {
+        clear(id);
+        return;
+    }
     s_actions[id] = Act{ action ? action_label : "", action };
-    if (s_store.set(id, level, title, detail)) changed();
+    bool moved = s_store.set(id, level, title, detail);
+    // Read at an earlier start, with the same text: still read.
+    if (level == Level::Info && s_store.has(id) && was_read(read_key(id, title, detail))) moved |= s_store.dismiss(id);
+    if (moved) changed();
 }
 
 void clear(const std::string& id)
@@ -73,7 +153,27 @@ void clear(const std::string& id)
 
 void dismiss(const std::string& id)
 {
-    if (s_store.dismiss(id)) changed();
+    // Its text, for the key remembered in config.json.
+    std::string title, detail;
+    for (const auto& item : s_store.visible())
+        if (item.id == id) title = item.title, detail = item.detail;
+    if (!s_store.dismiss(id)) return;
+    auto& read = config::get().notices_read;
+    // One key per entry: an older text of it goes.
+    read.erase(std::remove_if(read.begin(), read.end(),
+                              [&id](const std::string& k) { return k.rfind(id + ":", 0) == 0; }),
+               read.end());
+    read.push_back(read_key(id, title, detail));
+    if (read.size() > 48) read.erase(read.begin(), read.end() - 48);
+    ui::save_config();
+    changed();
+}
+
+void apply_preferences()
+{
+    for (const auto& item : s_store.visible())
+        if (!shown_kind(item.id)) clear(item.id);
+    sweep();
 }
 
 std::vector<Entry> list()
@@ -192,6 +292,90 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
     toggle(ui::patches_warning(report), "patches", Level::Action, "playguard/notices/patches"_i18n,
            ui::patches_text(report) + "\n" + ui::patches_note(report, si, &warn), open_label("tools"),
            []() { open_tab(ui::tab::tools); });
+
+    const auto& cfg = config::get();
+    const bool has_pin = s.pin_length_ok && s.pin_length > 0;
+
+    // A PIN on the console, but PlayGuard itself opens and changes without it.
+    toggle(has_pin && cfg.pin_lock == "off", "pin_lock_off", Level::Action, "playguard/notices/pin_lock_off"_i18n,
+           "playguard/notices/pin_lock_off_detail"_i18n, "playguard/notices/pin_lock_choose"_i18n,
+           []() { pin_lock::choose([]() { sweep(); }); });
+
+    // The other system (sysMMC / emuMMC) has parental controls of its own.
+    const std::string other = ui::other_storage_note(si);
+    toggle(!other.empty(), "other_system", Level::Info, "playguard/notices/other_system"_i18n, other, open_label("tools"),
+           []() { open_tab(ui::tab::tools); });
+
+    // The console lock on for a week or more.
+    toggle(cfg.console_lock && !cfg.console_lock_since.empty() && days_ago(cfg.console_lock_since, 7),
+           "console_lock_long", Level::Info, brls::getStr("playguard/notices/console_lock_long", cfg.console_lock_since),
+           "playguard/notices/console_lock_long_detail"_i18n, open_label("security"),
+           []() { open_tab(ui::tab::security); });
+
+    // No settings backup yet, or none for 30 days.
+    const std::vector<std::string> backups = backup::list();
+    const std::string last = backups.empty() ? "" : backup_date(backups.front());
+    toggle(backups.empty() || (!last.empty() && days_ago(last, 30)), "backup", Level::Info,
+           backups.empty() ? "playguard/notices/backup_none"_i18n : brls::getStr("playguard/notices/backup_old", last),
+           "playguard/notices/backup_detail"_i18n, "playguard/notices/backup_now"_i18n, []() {
+               backup_flow::save_now();
+               sweep();
+           });
+
+    // The SD card nearly full: PlayGuard's own writes start failing.
+    uint64_t free_b = 0;
+    const bool free_known = sd_free(&free_b);   // before the text below, which shows it
+    toggle(free_known && free_b < (500ULL << 20), "sd_space", Level::Action, "playguard/notices/sd_space"_i18n,
+           brls::getStr("playguard/notices/sd_space_detail", (int)(free_b >> 20)));
+
+    // The play data (read in the background for the Overview).
+    const auto stats = play_data::latest("");
+    if (stats && stats->windows_ok) {
+        // The week, once every 7 days until read.
+        const activity_summary::Summary week = activity_summary::summarize(*stats, activity_summary::Week);
+        if (week.known && week.total_s > 0 && (cfg.summary_seen.empty() || days_ago(cfg.summary_seen, 7))) {
+            std::string detail = brls::getStr("playguard/notices/week_detail", ui::fmt_play_time(week.per_day_s));
+            if (week.top >= 0 && stats->games[week.top].name[0])
+                detail += "\n" + brls::getStr("playguard/notices/week_top", std::string(stats->games[week.top].name),
+                                              ui::fmt_play_time(week.top_s));
+            set("week", Level::Info, brls::getStr("playguard/notices/week", ui::fmt_play_time(week.total_s)), detail,
+                open_label("activity"), []() {
+                    config::get().summary_seen = ui::today_date();
+                    ui::save_config();
+                    clear("week");
+                    open_tab(ui::tab::activity);
+                });
+        } else {
+            clear("week");
+        }
+        // The console only warning at the limit, and the limit passed on
+        // several of the last 7 days.
+        int over = 0;
+        if (pt.valid && pt.alarm_only)
+            for (int k = 0; k < 7; k++) {
+                const uint16_t limit = pt.day_min[stats->day_wday[k] % 7];
+                if (limit == PT_DAY_NOLIMIT) continue;
+                uint64_t played = 0;
+                for (uint32_t g = 0; g < stats->count; g++) played += stats->games[g].day_s[k];
+                if (played > (uint64_t)limit * 60) over++;
+            }
+        toggle(over >= 2, "over_limit", Level::Info, brls::getStr("playguard/notices/over_limit", over),
+               "playguard/notices/over_limit_detail"_i18n, open_label("play_timer"),
+               []() { open_tab(ui::tab::play_timer); });
+    }
+}
+
+void note_pin_strength(const PctlStatus& s)
+{
+    // Read once per start, and again when the PIN's length changes (a new PIN).
+    static int checked_len = -1;
+    if (!s.pin_length_ok) return;
+    if ((int)s.pin_length == checked_len) return;
+    checked_len = (int)s.pin_length;
+    bool weak = false;
+    const bool known = s.pin_length > 0 && R_SUCCEEDED(pctl_pin_weak(&weak));
+    toggle(known && weak, "pin_weak", Level::Action, "playguard/notices/pin_weak"_i18n,
+           "playguard/notices/pin_weak_detail"_i18n, open_label("security"), []() { open_tab(ui::tab::security); });
 }
 
 void note_timer_stalled(bool stalled)
@@ -243,6 +427,7 @@ void sweep()
     sysinfo_get(&si);
     outside_watch::observe(pt);
     refresh_status(s, pt, si, accuracy_rc, accurate);
+    note_pin_strength(s);
 }
 
 void open_tab(int position)
