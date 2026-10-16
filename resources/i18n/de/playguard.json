@@ -1029,6 +1029,7 @@
         "part_report": "Diagnosebericht",
         "confirm": "An {} senden ({} KB)?",
         "confirm_gist": "Ein geheimer Gist in deinem GitHub-Konto: Jeder mit dem Link kann ihn lesen, bis du ihn auf GitHub löschst. Er enthält nie die PIN oder die Seriennummer.",
+        "confirm_public": "A bug report opened with this link is public. Only the last changes of the history are sent, without names or times of day.",
         "where_gist": "einen geheimen Gist auf GitHub",
         "relogin": "GitHub hat den Gist abgelehnt. Melde dich ab und wieder an (GitHub-Konto, in den Entwicklerwerkzeugen), um Gists zu erlauben.",
         "needs_github": "Der Bericht geht in einen geheimen Gist deines GitHub-Kontos: Jeder mit dem Link kann ihn lesen, bis du ihn auf GitHub löschst. PlayGuard ist noch nicht bei GitHub angemeldet. Jetzt anmelden?",

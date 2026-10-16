@@ -1029,6 +1029,7 @@
         "part_report": "Rapporto diagnostico",
         "confirm": "Inviare a {} ({} KB)?",
         "confirm_gist": "Un gist segreto nel tuo account GitHub: chiunque abbia il link può leggerlo, finché non lo elimini su GitHub. Non contiene mai il PIN né il numero di serie.",
+        "confirm_public": "A bug report opened with this link is public. Only the last changes of the history are sent, without names or times of day.",
         "where_gist": "un gist segreto su GitHub",
         "relogin": "GitHub ha rifiutato il gist. Esci e accedi di nuovo (Account GitHub, negli strumenti per sviluppatori) per consentire i gist.",
         "needs_github": "Il rapporto va in un gist segreto del tuo account GitHub: chiunque abbia il link può leggerlo, finché non lo elimini su GitHub. PlayGuard non ha ancora effettuato l'accesso a GitHub. Accedere ora?",

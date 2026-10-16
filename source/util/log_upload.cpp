@@ -16,17 +16,43 @@
 namespace log_upload
 {
 
-std::vector<Part> debug_files()
+std::vector<Part> debug_files(bool play_timer_log)
 {
     std::vector<Part> out;
     std::string content;
     if (paths::read_file(pt_block::reference_path(), content))
         out.push_back({ "logs/play_timer/block.json", content });
     // The recorder's file can reach megabytes: its last lines only.
-    if (paths::read_file(pt_log::path(), content))
+    if (play_timer_log && paths::read_file(pt_log::path(), content))
         out.push_back({ "logs/play_timer/log.csv", pt_log::tail(content, PT_LOG_BYTES) });
-    if (paths::read_file(paths::history_file(), content)) out.push_back({ "history.json", content });
+    if (paths::read_file(paths::history_file(), content))
+        out.push_back({ "history_recent.json", recent_history(content) });
     if (paths::read_file(paths::config_file(), content)) out.push_back({ "config.json", content });
+    return out;
+}
+
+std::string recent_history(const std::string& text, size_t limit)
+{
+    nlohmann::json entries;
+    try {
+        const auto j = nlohmann::json::parse(text);
+        if (j.is_object() && j.contains("entries") && j["entries"].is_array()) entries = j["entries"];
+    } catch (const std::exception&) {
+    }
+    if (!entries.is_array())
+        return "(the change history could not be read: " + std::to_string(text.size()) + " bytes)\n";
+    const size_t from = entries.size() > limit ? entries.size() - limit : 0;
+    std::string out = "{\n \"entries_in_all\": " + std::to_string(entries.size()) + ",\n \"entries\": [";
+    for (size_t i = from; i < entries.size(); i++) {
+        nlohmann::json e = entries[i];
+        if (e.is_object()) {
+            e.erase("detail");
+            const auto when = e.find("when");
+            if (when != e.end() && when->is_string()) *when = when->get<std::string>().substr(0, 10);   // the date
+        }
+        out += (i > from ? ",\n  " : "\n  ") + e.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);
+    }
+    out += entries.size() > from ? "\n ]\n}\n" : "]\n}\n";
     return out;
 }
 

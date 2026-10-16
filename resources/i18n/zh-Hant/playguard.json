@@ -1029,6 +1029,7 @@
         "part_report": "診斷報告",
         "confirm": "傳送到 {}（{} KB）？",
         "confirm_gist": "你 GitHub 帳戶中的秘密 Gist：在你於 GitHub 上刪除之前，任何擁有連結的人都能查看。報告中絕不包含 PIN 或序號。",
+        "confirm_public": "A bug report opened with this link is public. Only the last changes of the history are sent, without names or times of day.",
         "where_gist": "GitHub 秘密 Gist",
         "relogin": "GitHub 拒絕了該 gist。請登出後重新登入（開發者工具中的 GitHub 帳號）以允許 gist。",
         "needs_github": "報告會傳送到你 GitHub 帳號中的私密 gist：擁有連結的人都能閱讀，直到你在 GitHub 上刪除它。PlayGuard 尚未登入 GitHub。現在登入嗎？",
