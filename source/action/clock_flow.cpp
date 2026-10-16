@@ -64,6 +64,7 @@ void written(const std::string& source, const TimeApply& a, const std::string& b
              const std::function<void(const std::string&)>& done)
 {
     if (a.write_attempted && R_SUCCEEDED(a.write_rc)) history_flow::record_event("clock", "", ui::time_text(a.target));
+    if (a.write_attempted && R_FAILED(a.write_rc)) history_flow::record_failure("clock", a.write_rc, {}, {}, "", ui::time_text(a.target));
     diagnostic::save(fmt::format(
         "=== Network clock change ===\nserver={}\ntarget_utc={}\nopen_rc=0x{:08X} write_attempted={} write_rc=0x{:08X}\n"
         "verify_attempted={} verify_rc=0x{:08X} verified={} readback={}\nrefused_automatic={}\n\n--- Before ---\n{}\n--- After ---\n{}",

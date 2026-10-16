@@ -1020,7 +1020,6 @@
         "count": "{}건 기록됨",
         "none": "아직 기록이 없습니다. PlayGuard가 본체에서 변경한 모든 내용(제한, 제한 레벨, PIN, 일시 해제...)이 여기에 표시됩니다.",
         "note": "최근 변경 {}건이 SD 카드의 {}에 보관됩니다. 변경 내용에서 A를 누르면 자세히 보고, 가능하면 이전 값으로 되돌릴 수 있습니다.",
-        "section": "변경 내용 (최신순)",
         "custom_value": "연령 {}, 게시 제한: {}, 커뮤니케이션 제한: {}",
         "title_change": "{}: {} → {}",
         "title_day_change": "{} ({}): {} → {}",
@@ -1053,7 +1052,8 @@
             "outside_clock": "본체 시계 변경(PlayGuard가 감지)",
             "outside_limits": "PlayGuard 밖에서 제한 변경",
             "new_account": "새 사용자(PlayGuard가 감지)",
-            "time_up": "시간이 다 되면"
+            "time_up": "시간이 다 되면",
+            "countdown": "플레이 시간 카운트다운"
         },
         "sources": {
             "uniform": "매일 같은 제한",
@@ -1080,7 +1080,34 @@
         "already_back": "본체에 이미 이전 값이 설정되어 있습니다.",
         "undo_confirm": "되돌리기",
         "undone": "이전 값으로 되돌렸습니다.",
-        "undo_err": "이전 값으로 되돌릴 수 없습니다"
+        "undo_err": "이전 값으로 되돌릴 수 없습니다",
+        "show": "표시",
+        "export": "표시된 항목 내보내기",
+        "shown_count": "{} ({})",
+        "none_shown": "이 종류의 기록이 없습니다.",
+        "today": "오늘",
+        "yesterday": "어제",
+        "failed_title": "거부됨: {}",
+        "failed_note": "본체가 이 변경을 거부했습니다({}). 아무것도 바뀌지 않았습니다.",
+        "version": "PlayGuard 버전",
+        "counting": "카운트다운 중",
+        "paused": "일시 정지됨",
+        "filters": {
+            "0": "전체",
+            "1": "플레이 시간",
+            "2": "제한",
+            "3": "보안 및 앱",
+            "4": "PlayGuard 밖에서 감지됨",
+            "5": "본체가 거부함"
+        },
+        "columns": {
+            "change": "변경",
+            "details": "세부 정보",
+            "result": "결과",
+            "kind": "코드",
+            "done": "완료",
+            "refused": "거부됨({})"
+        }
     },
     "chart": {
         "last_days": "최근 7일 (오른쪽 끝이 오늘)",

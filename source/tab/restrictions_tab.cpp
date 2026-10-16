@@ -48,6 +48,9 @@ RestrictionsTab::RestrictionsTab()
                      ui::confirm(body, "playguard/play_timer/confirm_set"_i18n, [this, index, before]() {
                                      Result rc = pctl_set_safety_level((uint32_t)index);
                                      if (R_SUCCEEDED(rc) && before >= 0) history_flow::record_values("level", { before }, { index });
+                                     if (R_FAILED(rc))
+                                         history_flow::record_failure("level", rc, before >= 0 ? std::vector<int>{ before } : std::vector<int>{},
+                                                                      { index });
                                      ui::notify_result(rc, "playguard/restrictions/saved"_i18n, "playguard/restrictions/save_err"_i18n);
                                      this->refresh();
                                  });
@@ -104,6 +107,10 @@ RestrictionsTab::RestrictionsTab()
                                      Result rc = pctl_set_rating_org((uint32_t)index);
                                      if (R_SUCCEEDED(rc) && this->st.rating_org_ok)
                                          history_flow::record_values("org", { (int)this->st.rating_org }, { index });
+                                     if (R_FAILED(rc))
+                                         history_flow::record_failure("org", rc, this->st.rating_org_ok ? std::vector<int>{ (int)this->st.rating_org }
+                                                                                                        : std::vector<int>{},
+                                                                      { index });
                                      ui::notify_result(rc, "playguard/restrictions/saved"_i18n, "playguard/restrictions/save_err"_i18n);
                                      this->refresh();
                                  });
@@ -114,6 +121,7 @@ RestrictionsTab::RestrictionsTab()
     vr->init("playguard/restrictions/vr"_i18n, false, [this](bool on) {
         Result rc = pctl_set_stereo_vision_restricted(on);
         if (R_SUCCEEDED(rc)) history_flow::record_values("vr", { on ? 0 : 1 }, { on ? 1 : 0 });
+        else history_flow::record_failure("vr", rc, { on ? 0 : 1 }, { on ? 1 : 0 });
         ui::notify_result(rc, "playguard/restrictions/saved"_i18n, "playguard/restrictions/save_err"_i18n);
         this->refresh();
     });
@@ -141,6 +149,10 @@ void RestrictionsTab::write_custom(const PctlCustomSettings& s, const std::strin
     Result rc = pctl_set_custom_settings(&s);
     if (R_SUCCEEDED(rc) && this->st.settings_ok)
         history_flow::record_values("custom", history_flow::custom_values(this->st.settings), history_flow::custom_values(s));
+    if (R_FAILED(rc))
+        history_flow::record_failure("custom", rc,
+                                     this->st.settings_ok ? history_flow::custom_values(this->st.settings) : std::vector<int>{},
+                                     history_flow::custom_values(s));
     ui::notify_result(rc, "playguard/restrictions/saved"_i18n, "playguard/restrictions/save_err"_i18n);
     this->refresh();   // re-reads, so a refused change flips the switch back
 }

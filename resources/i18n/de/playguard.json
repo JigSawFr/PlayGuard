@@ -1020,7 +1020,6 @@
         "count": "{} erfasst",
         "none": "Noch nichts erfasst. Jede Änderung, die PlayGuard an der Konsole vornimmt (Limits, Einschränkungskategorie, Geheimzahl, Aufhebungen...), wird hier aufgeführt.",
         "note": "Die {} neuesten Änderungen, auf der SD-Karte in {} gespeichert. Mit A wird eine Änderung angezeigt und, wenn möglich, der vorherige Wert wiederhergestellt.",
-        "section": "Änderungen, neueste zuerst",
         "custom_value": "Alter {}, Posten gesperrt: {}, Kommunikation gesperrt: {}",
         "title_change": "{}: {} → {}",
         "title_day_change": "{} ({}): {} → {}",
@@ -1053,7 +1052,8 @@
             "outside_clock": "Uhr der Konsole geändert (von PlayGuard bemerkt)",
             "outside_limits": "Limits außerhalb von PlayGuard geändert",
             "new_account": "Neuer Nutzer (von PlayGuard bemerkt)",
-            "time_up": "Wenn die Zeit um ist"
+            "time_up": "Wenn die Zeit um ist",
+            "countdown": "Spielzeit-Countdown"
         },
         "sources": {
             "uniform": "Jeden Tag gleiches Limit",
@@ -1080,7 +1080,34 @@
         "already_back": "Die Konsole hat bereits den vorherigen Wert.",
         "undo_confirm": "Wiederherstellen",
         "undone": "Vorheriger Wert wiederhergestellt.",
-        "undo_err": "Vorheriger Wert konnte nicht wiederhergestellt werden"
+        "undo_err": "Vorheriger Wert konnte nicht wiederhergestellt werden",
+        "show": "Anzeigen",
+        "export": "Angezeigtes exportieren",
+        "shown_count": "{} ({})",
+        "none_shown": "Nichts dieser Art aufgezeichnet.",
+        "today": "Heute",
+        "yesterday": "Gestern",
+        "failed_title": "Abgelehnt: {}",
+        "failed_note": "Die Konsole hat diese Änderung abgelehnt ({}): Es wurde nichts geändert.",
+        "version": "PlayGuard-Version",
+        "counting": "Countdown läuft",
+        "paused": "Pausiert",
+        "filters": {
+            "0": "Alles",
+            "1": "Spielzeit",
+            "2": "Einschränkungen",
+            "3": "Sicherheit und App",
+            "4": "Außerhalb von PlayGuard bemerkt",
+            "5": "Von der Konsole abgelehnt"
+        },
+        "columns": {
+            "change": "Änderung",
+            "details": "Details",
+            "result": "Ergebnis",
+            "kind": "Code",
+            "done": "Erledigt",
+            "refused": "Abgelehnt ({})"
+        }
     },
     "chart": {
         "last_days": "Die letzten 7 Tage, heute rechts",
