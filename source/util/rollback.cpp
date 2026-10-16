@@ -25,13 +25,6 @@ bool read_json(const std::string& file, json* out)
         return false;
     }
 }
-
-bool exists(const std::string& file)
-{
-    FILE* f = std::fopen(file.c_str(), "rb");
-    if (f) std::fclose(f);
-    return f != nullptr;
-}
 }   // namespace
 
 std::string previous_file(const std::string& nro)
@@ -78,24 +71,21 @@ Offer offer_at_start(bool checked, int starts_before, bool held, bool have_previ
     return held ? Offer::Asked : Offer::None;
 }
 
+void recover(const std::string& nro)
+{
+    paths::recover_replace(nro, previous_file(nro));
+}
+
 bool swap(const std::string& nro, std::string* error)
 {
-    const std::string prev = previous_file(nro), tmp = nro + ".swap";
-    auto fail = [error](const std::string& why) {
-        if (error) *error = why;
+    const std::string prev = previous_file(nro);
+    recover(nro);   // a swap or an install stopped half-way: finished first
+    if (!paths::file_exists(prev)) {
+        if (error) *error = "no previous build";
         return false;
-    };
-    if (!exists(prev)) return fail("no previous build");
-    std::remove(tmp.c_str());   // left by an earlier attempt
-    const bool had_nro = std::rename(nro.c_str(), tmp.c_str()) == 0;
-    if (!had_nro && exists(nro)) return fail("cannot move " + nro + " aside");
-    if (std::rename(prev.c_str(), nro.c_str()) != 0) {
-        if (had_nro) std::rename(tmp.c_str(), nro.c_str());
-        return fail("cannot put the previous build in place");
     }
     // The build that ran becomes the previous one (none when there was none).
-    if (had_nro && std::rename(tmp.c_str(), prev.c_str()) != 0) std::remove(tmp.c_str());
-    return true;
+    return paths::replace_file(nro, prev, prev, error);
 }
 
 }   // namespace rollback

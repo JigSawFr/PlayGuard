@@ -27,13 +27,6 @@ std::string check_file() { return paths::data_dir() + "/boot_check.json"; }
 // finish (0: asked for). Read and removed by the build gone back to.
 std::string back_file() { return paths::data_dir() + "/went_back.json"; }
 
-bool exists(const std::string& file)
-{
-    FILE* f = std::fopen(file.c_str(), "rb");
-    if (f) std::fclose(f);
-    return f != nullptr;
-}
-
 std::string running_label()
 {
     return app::commit().empty() ? app::version() : app::version() + " (" + app::commit() + ")";
@@ -61,6 +54,9 @@ bool at_start()
 {
     const std::string nro = dev_build_flow::nro_file();
     if (nro.empty()) return false;
+    // An install or a swap cut short by a power loss: finished (the build
+    // replaced kept as the previous one) before it is looked for.
+    rollback::recover(nro);
     // This start counts: it is over once the first screen is up (started()).
     rollback::Check check;
     const bool checked = rollback::read_check(check_file(), &check);
@@ -69,7 +65,7 @@ bool at_start()
         check.starts++;
         rollback::write_check(check_file(), check);
     }
-    const bool have_previous = exists(rollback::previous_file(nro));
+    const bool have_previous = paths::file_exists(rollback::previous_file(nro));
     if (!have_previous) return false;
     const rollback::Offer offer = rollback::offer_at_start(checked, before, platform_held_lr(), have_previous);
     if (offer == rollback::Offer::None) return false;
@@ -135,7 +131,7 @@ void installed(const std::string& installed_label)
 bool previous(std::string* label)
 {
     const std::string nro = dev_build_flow::nro_file();
-    if (nro.empty() || !exists(rollback::previous_file(nro))) return false;
+    if (nro.empty() || !paths::file_exists(rollback::previous_file(nro))) return false;
     if (!rollback::read_label(label_file(), label)) *label = "?";
     return true;
 }

@@ -1,7 +1,8 @@
-// Host tests for source/util/rollback.cpp: when the previous build is
-// offered at start-up, its label and the start check on disk (damaged files
-// included), and the swap of <nro> and <nro>.previous (back and forth, with
-// no previous build, with no current one).
+// Host tests for source/util/rollback.cpp and paths::replace_file: when the
+// previous build is offered at start-up, its label and the start check on
+// disk (damaged files included), the swap of <nro> and <nro>.previous (back
+// and forth, with no previous build, with no current one), and an install
+// or a swap stopped between its renames, finished or undone.
 #include "check.h"
 #include <cstdio>
 #include <string>
@@ -85,10 +86,65 @@ static void test_swap()
     put(prev, "old");
     CHECK(rollback::swap(nro, &err) && get(nro) == "old" && get(prev) == "new");
     CHECK(rollback::swap(nro, &err) && get(nro) == "new" && get(prev) == "old");   // and back
-    CHECK(get(nro + ".swap") == "<none>");
+    CHECK(get(nro + ".old") == "<none>");
     // No current build (deleted by hand): the previous one takes its place.
     std::remove(nro.c_str());
     CHECK(rollback::swap(nro, &err) && get(nro) == "old" && get(prev) == "<none>");
+}
+
+// A power cut between the renames of paths::replace_file (an install, a
+// swap): what start-up (rollback::recover) and the next one find.
+static void test_recover()
+{
+    const std::string nro = dir() + "/cut.nro", prev = rollback::previous_file(nro), old = nro + ".old";
+    const std::string fresh = nro + ".new";
+    std::string err;
+    std::remove(nro.c_str());
+    std::remove(prev.c_str());
+    std::remove(old.c_str());
+
+    // Stopped after the first step: the build that ran only aside, the new
+    // one still beside it. Put back; the install simply did not happen.
+    put(old, "running");
+    put(fresh, "new");
+    put(prev, "older");
+    rollback::recover(nro);
+    CHECK(get(nro) == "running" && get(old) == "<none>" && get(prev) == "older");
+    // And again: nothing left to do.
+    rollback::recover(nro);
+    CHECK(get(nro) == "running" && get(prev) == "older");
+
+    // Stopped after the second: the new one in place, the build that ran
+    // aside. It becomes the previous one, as the install meant.
+    std::remove(fresh.c_str());
+    put(nro, "new");
+    put(old, "running");
+    rollback::recover(nro);
+    CHECK(get(nro) == "new" && get(prev) == "running" && get(old) == "<none>");
+
+    // A swap stopped after its second step: the previous build in place, the
+    // one that ran aside, no previous left. The next swap finishes the first,
+    // then swaps back.
+    put(nro, "older");
+    put(old, "new");
+    std::remove(prev.c_str());
+    CHECK(rollback::swap(nro, &err) && get(nro) == "new" && get(prev) == "older" && get(old) == "<none>");
+
+    // An install that finds a cut one: the earlier one is finished first,
+    // then this one replaces the build in place.
+    put(nro, "new");
+    put(old, "running");
+    put(fresh, "newest");
+    CHECK(paths::replace_file(nro, fresh, prev, &err));
+    CHECK(get(nro) == "newest" && get(prev) == "new" && get(old) == "<none>" && get(fresh) == "<none>");
+    // Without a name to keep it as, what was aside goes.
+    put(old, "stale");
+    put(fresh, "again");
+    CHECK(paths::replace_file(nro, fresh, "", &err));
+    CHECK(get(nro) == "again" && get(old) == "<none>" && get(prev) == "new");
+    // A missing new file: the build in place stays, nothing left aside.
+    CHECK(!paths::replace_file(nro, fresh, prev, &err) && !err.empty());
+    CHECK(get(nro) == "again" && get(old) == "<none>" && get(prev) == "new");
 }
 
 int main()
@@ -96,5 +152,6 @@ int main()
     test_offer();
     test_files();
     test_swap();
-    return CHECK_DONE("rollback offer, label and start check files, and swap assertions passed");
+    test_recover();
+    return CHECK_DONE("rollback offer, label and start check files, swap and recovery assertions passed");
 }

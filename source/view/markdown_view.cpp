@@ -42,7 +42,7 @@ brls::Label* growing(const std::string& text, float size, NVGcolor color)
 brls::Image* icon(const std::string& hex, float size)
 {
     if (hex.empty() || hex.size() > 6 || hex.find_first_not_of("0123456789abcdef") != std::string::npos) return nullptr;
-    if (!paths::exists(std::string(BRLS_ASSET("img/emoji/")) + hex + ".png")) return nullptr;
+    if (!paths::file_exists(std::string(BRLS_ASSET("img/emoji/")) + hex + ".png")) return nullptr;
     auto* image = new brls::Image();
     image->setScalingType(brls::ImageScalingType::FIT);
     image->setImageFromRes("img/emoji/" + hex + ".png");
