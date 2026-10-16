@@ -43,4 +43,12 @@ inline bool starts_with(const std::string& s, const char* prefix)
     return s.compare(0, std::strlen(prefix), prefix) == 0;
 }
 
+// "https://ko-fi.com/jigsawfr" -> "ko-fi.com/jigsawfr": what to type by
+// hand. A text without a scheme as it is.
+inline std::string short_url(const std::string& url)
+{
+    const size_t scheme = url.find("://");
+    return scheme == std::string::npos ? url : url.substr(scheme + 3);
+}
+
 }   // namespace text

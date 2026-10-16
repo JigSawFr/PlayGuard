@@ -122,10 +122,7 @@ std::string with_link_note(const std::string& body, const PctlStatus* st)
 void confirm_write(const std::string& body_in, const std::string& confirm_label,
                    std::function<void(bool did_unlock)> write, const uint16_t* new_days, bool danger)
 {
-    if (app::read_only()) {
-        ui::notify(ui::rc_text(NXM_RC_READ_ONLY));
-        return;
-    }
+    if (ui::refuse_read_only()) return;
 
     PtState pt;
     pctl_play_timer_query(&pt);

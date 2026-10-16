@@ -32,6 +32,9 @@ NVGcolor color_track();     // empty part of the play-time gauge
 NVGcolor color_note();      // explanatory notes under a section
 NVGcolor color_neutral();   // DetailCell value colour
 NVGcolor color_text();      // plain label text colour
+NVGcolor color_accent();    // the theme's highlight (the sidebar's active item)
+// A label of `size` in `color` that wraps (not single-line).
+brls::Label* text_label(const std::string& text, float size, NVGcolor color);
 
 // "error 0x00001234" followed by a human explanation when one is known.
 // PlayGuard's own results (read-only, invalid value …) are just the sentence:
@@ -137,6 +140,8 @@ std::string fmt_play_time(uint64_t seconds);    // "0 min", "< 1 min", "45 min",
 std::string day_name(int day);                  // 0 = Sunday, as a title ("Monday")
 std::string day_name_in_text(int day);          // inside a sentence (fr: "lundi")
 std::string bool_text(bool ok, bool value, const std::string& yes, const std::string& no);
+std::string yes_no(bool value);                // "Yes" / "No"
+std::string age_text(int age);                 // a restriction age: "None" for 0, else "12+"
 // "Now" on the console: its user clock read live and its time-zone rule
 // (calendar.h says why not time()/localtime()).
 LocalTime   local_now();

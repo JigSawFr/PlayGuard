@@ -4,6 +4,7 @@
 #include "action/sys_notes_flow.hpp"
 #include "ui/ui.hpp"
 #include "util/markdown.hpp"
+#include "util/text.hpp"
 #include "view/build_cell.hpp"
 #include "view/markdown_view.hpp"
 #include "view/qr_view.hpp"
@@ -21,15 +22,6 @@ std::string title_of(Which which)
     return which == Which::Firmware ? "playguard/tools/firmware"_i18n : std::string(sys_notes::product(which));
 }
 
-brls::Label* text_label(const std::string& text, float size, NVGcolor color)
-{
-    auto* l = new brls::Label();
-    l->setSingleLine(false);
-    l->setFontSize(size);
-    l->setTextColor(color);
-    l->setText(text);
-    return l;
-}
 }   // namespace
 
 void SysNotesActivity::show(Which which)
@@ -256,7 +248,7 @@ void SysNotesActivity::show_page()
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setPadding(20, 32, 10, 32);
-    brls::Label* body = text_label("playguard/sys_notes/online_body"_i18n, 20, ui::color_text());
+    brls::Label* body = ui::text_label("playguard/sys_notes/online_body"_i18n, 20, ui::color_text());
     body->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     body->setAlignSelf(brls::AlignSelf::STRETCH);
     box->addView(body);
@@ -264,7 +256,7 @@ void SysNotesActivity::show_page()
     qr->setMarginTop(12);
     qr->setMarginBottom(10);
     box->addView(qr);
-    brls::Label* link = text_label(url.substr(url.find("://") + 3), 17, ui::color_note());
+    brls::Label* link = ui::text_label(text::short_url(url), 17, ui::color_note());
     link->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     link->setAlignSelf(brls::AlignSelf::STRETCH);
     box->addView(link);

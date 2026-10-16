@@ -82,6 +82,16 @@ std::string bool_text(bool ok, bool value, const std::string& yes, const std::st
     return value ? yes : no;
 }
 
+std::string yes_no(bool value)
+{
+    return value ? "playguard/common/yes"_i18n : "playguard/common/no"_i18n;
+}
+
+std::string age_text(int age)
+{
+    return age == 0 ? "playguard/restrictions/age_none"_i18n : brls::getStr("playguard/restrictions/age_value", age);
+}
+
 LocalTime local_now()
 {
     LocalTime l{};

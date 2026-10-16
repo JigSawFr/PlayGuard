@@ -12,7 +12,6 @@
 
 #include "action/history_flow.hpp"
 #include "action/offline_clock_logic.hpp"
-#include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
@@ -342,10 +341,7 @@ void offer_console_clock(const Measurement& m, std::function<void()> done)
 
 void guided(std::function<void()> done)
 {
-    if (app::read_only()) {
-        ui::notify(ui::rc_text(NXM_RC_READ_ONLY));
-        return;
-    }
+    if (ui::refuse_read_only()) return;
     const std::string server = current_server();
     auto* ask = ui::dialog(brls::getStr("playguard/clock/guided_body", server));
     ask->addButton("hints/cancel"_i18n, []() {});

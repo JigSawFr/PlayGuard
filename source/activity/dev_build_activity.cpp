@@ -9,6 +9,7 @@
 #include "ui/ui.hpp"
 #include "util/changelog.hpp"
 #include "util/markdown.hpp"
+#include "util/text.hpp"
 #include "view/build_cell.hpp"
 #include "view/markdown_view.hpp"
 #include "view/qr_view.hpp"
@@ -28,20 +29,6 @@ std::string now_iso()
     return text;
 }
 
-NVGcolor accent()
-{
-    return brls::Application::getTheme()["brls/sidebar/active_item"];
-}
-
-brls::Label* text_label(const std::string& text, float size, NVGcolor color)
-{
-    auto* l = new brls::Label();
-    l->setSingleLine(false);
-    l->setFontSize(size);
-    l->setTextColor(color);
-    l->setText(text);
-    return l;
-}
 }   // namespace
 
 void DevBuildActivity::show(const dev_builds::Build& build, bool newer)
@@ -58,11 +45,11 @@ void DevBuildActivity::add_fact(const std::string& name, const std::string& valu
         row->setLineTop(1);
         row->setLineColor(nvgTransRGBA(ui::color_note(), 60));
     }
-    brls::Label* n = text_label(name, 18, ui::color_note());
+    brls::Label* n = ui::text_label(name, 18, ui::color_note());
     n->setWidth(230);
     n->setShrink(0.0f);
     row->addView(n);
-    brls::Label* v = text_label(value, 18, color);
+    brls::Label* v = ui::text_label(value, 18, color);
     v->setGrow(1.0f);
     v->setShrink(1.0f);
     row->addView(v);
@@ -90,7 +77,7 @@ void DevBuildActivity::show_page()
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setPadding(20, 32, 10, 32);
-    brls::Label* body = text_label("playguard/dev_build/open_github_body"_i18n, 20, ui::color_text());
+    brls::Label* body = ui::text_label("playguard/dev_build/open_github_body"_i18n, 20, ui::color_text());
     body->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     body->setAlignSelf(brls::AlignSelf::STRETCH);
     box->addView(body);
@@ -98,7 +85,7 @@ void DevBuildActivity::show_page()
     qr->setMarginTop(12);
     qr->setMarginBottom(10);
     box->addView(qr);
-    brls::Label* link = text_label(url.substr(url.find("://") + 3), 17, ui::color_note());
+    brls::Label* link = ui::text_label(text::short_url(url), 17, ui::color_note());
     link->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     link->setAlignSelf(brls::AlignSelf::STRETCH);
     box->addView(link);
@@ -116,7 +103,7 @@ void DevBuildActivity::onContentAvailable()
 
     // Tags: its kind, then the list's (kind of change, scope, pull request,
     // checks, pre-release, installed or new).
-    const NVGcolor kind_color = accent();
+    const NVGcolor kind_color = ui::color_accent();
     switch (b.kind) {
         case dev_builds::Kind::Release: tags->addView(tag_view({ "playguard/dev_build/kind_release"_i18n, kind_color }, 16)); break;
         case dev_builds::Kind::Main: tags->addView(tag_view({ "main", kind_color }, 16)); break;

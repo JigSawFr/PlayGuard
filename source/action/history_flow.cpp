@@ -22,16 +22,6 @@ namespace history_flow
 
 namespace
 {
-std::string yes_no(int v)
-{
-    return v ? "playguard/common/yes"_i18n : "playguard/common/no"_i18n;
-}
-
-std::string age_text(int age)
-{
-    return age == 0 ? "playguard/restrictions/age_none"_i18n : brls::getStr("playguard/restrictions/age_value", age);
-}
-
 // One recorded value set, worded for its kind ("" when it does not fit).
 std::string value_text(const std::string& kind, const std::vector<int>& v)
 {
@@ -43,14 +33,14 @@ std::string value_text(const std::string& kind, const std::vector<int>& v)
     if (v.size() == 1) {
         if (kind == "level") return ui::level_name((uint32_t)v[0]);
         if (kind == "org") return pctl_rating_org_name((uint32_t)v[0]);
-        if (kind == "vr") return yes_no(v[0]);
+        if (kind == "vr") return ui::yes_no(v[0] != 0);
         if (kind == "alarm") return v[0] ? "playguard/common/off"_i18n : "playguard/common/on"_i18n;
         if (kind == "time_up") return v[0] ? "playguard/play_timer/time_up_alarm"_i18n : "playguard/play_timer/time_up_suspend"_i18n;
         if (kind == "console_lock") return v[0] ? "playguard/common/on"_i18n : "playguard/common/off"_i18n;
         if (kind == "countdown") return v[0] ? "playguard/history/counting"_i18n : "playguard/history/paused"_i18n;
     }
     if (kind == "custom" && v.size() == 3)
-        return brls::getStr("playguard/history/custom_value", age_text(v[0]), yes_no(v[1]), yes_no(v[2]));
+        return brls::getStr("playguard/history/custom_value", ui::age_text(v[0]), ui::yes_no(v[1] != 0), ui::yes_no(v[2] != 0));
     return "";
 }
 

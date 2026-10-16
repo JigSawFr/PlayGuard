@@ -89,5 +89,16 @@ NVGcolor color_track()   { return brls::Application::getTheme()["brand/gauge_tra
 NVGcolor color_note()    { return brls::Application::getTheme()["brand/note"]; }
 NVGcolor color_neutral() { return brls::Application::getTheme()["brls/list/listItem_value_color"]; }
 NVGcolor color_text()    { return brls::Application::getTheme()["brls/text"]; }
+NVGcolor color_accent()  { return brls::Application::getTheme()["brls/sidebar/active_item"]; }
+
+brls::Label* text_label(const std::string& text, float size, NVGcolor color)
+{
+    auto* l = new brls::Label();
+    l->setSingleLine(false);
+    l->setFontSize(size);
+    l->setTextColor(color);
+    l->setText(text);
+    return l;
+}
 
 }   // namespace ui
