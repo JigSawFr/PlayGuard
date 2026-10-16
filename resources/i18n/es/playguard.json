@@ -898,6 +898,7 @@
             "system": "Los juegos están bien: el problema es el firmware de la consola o la tarjeta SD. Actualiza el firmware o inicia en la memoria donde se instalaron."
         },
         "save_list": "Guardar la lista de estos juegos",
+        "send_list": "Enviar la lista en línea",
         "list_saved": "Lista guardada: {}",
         "list_err": "No se pudo guardar la lista",
         "list_title": "Juegos para reinstalar",
@@ -1008,6 +1009,10 @@
         "send": "Enviar",
         "sending": "Enviando...",
         "failed": "No se pudo enviar el informe: {}",
+        "failed_list": "No se pudo enviar la lista: {}",
+        "needs_github_list": "La lista va a un gist secreto de tu cuenta de GitHub: cualquiera con su enlace puede leerla hasta que la borres en GitHub. PlayGuard aún no ha iniciado sesión en GitHub. ¿Iniciar sesión ahora?",
+        "done_list": "Enviada: {}\nAbre este enlace en un móvil o un ordenador para volver a encontrar estos juegos.",
+        "qr_list": "La lista",
         "done": "Enviado: {}\nDale este enlace a quien te ayude o abre con él un informe de error.",
         "partial": "Demasiado grande: solo se enviará el principio.",
         "qr_report": "El informe",

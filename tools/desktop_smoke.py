@@ -1173,7 +1173,20 @@ if not lists or not os.path.exists(lists[0][:-4] + "txt"):
 with open(lists[0], encoding="utf-8") as f:
     if "Ocean Explorer" not in f.read():
         fail("the saved list does not name Ocean Explorer: " + lists[0])
-key("Right")               # Remove these 3 games, next to it
+# The same list to a secret gist (signed in): its link and QR code.
+open(github_token, "w").write("ghu_smoke")
+uploads_before = upload_count()
+key("Right")               # Send the list online, next to it
+key("Return")
+shot("27_games_send_confirm")
+key("Right")               # Send
+key("Return")
+shot("27_games_send_link")
+if upload_count() != uploads_before + 1:
+    fail("the gist link of the list was not recorded in " + uploads)
+key("Return")              # OK
+os.remove(github_token)
+key("Right")               # Remove these 3 games, last
 key("Return")
 shot("27_games_remove_all")
 key("Right")               # Remove

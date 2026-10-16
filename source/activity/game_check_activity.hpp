@@ -45,6 +45,7 @@ class GameCheckActivity : public brls::Activity
         brls::Label*  note  = nullptr;
         brls::Box*    list  = nullptr;
         brls::Button* save       = nullptr;   // Reinstall only: save the list
+        brls::Button* send       = nullptr;   // Reinstall only: send the list to a gist
         brls::Button* remove_all = nullptr;   // Reinstall only: remove them all
     };
 
@@ -84,8 +85,9 @@ class GameCheckActivity : public brls::Activity
     void choose(const GameFacts& game, u32 actions);
     void run(const GameFacts& game, u32 action, const GameContent& content);
     void remove(const GameFacts& game);
-    // The games of "Reinstall": their list saved (the JSON's path, "" and
-    // why on failure), and all of them removed after one question.
+    // The games of "Reinstall": their list as text, saved (the JSON's path,
+    // "" and why on failure), and all of them removed after one question.
+    std::string list_text() const;
     std::string save_list(std::string* error) const;
     void remove_all();
     void remove_next(std::vector<GameFacts> games, size_t at, u32 removed, std::string path);

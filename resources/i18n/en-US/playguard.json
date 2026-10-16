@@ -898,6 +898,7 @@
             "system": "The games are fine: the console's firmware or SD card is the problem. Update the firmware, or start on the storage they were installed on."
         },
         "save_list": "Save the list of these games",
+        "send_list": "Send the list online",
         "list_saved": "List saved: {}",
         "list_err": "Could not save the list",
         "list_title": "Games to reinstall",
@@ -1008,6 +1009,10 @@
         "send": "Send",
         "sending": "Sending...",
         "failed": "Could not send the report: {}",
+        "failed_list": "Could not send the list: {}",
+        "needs_github_list": "The list goes to a secret gist in your GitHub account: anyone with its link can read it, until you delete it on GitHub. PlayGuard is not signed in to GitHub yet. Sign in now?",
+        "done_list": "Sent: {}\nOpen this link on a phone or a computer to find these games again.",
+        "qr_list": "The list",
         "done": "Sent: {}\nGive this link to whoever helps you, or open a bug report with it.",
         "partial": "Too large: only the start will be sent.",
         "qr_report": "The report",

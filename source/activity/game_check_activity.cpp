@@ -13,6 +13,7 @@
 
 #include "action/game_notice.hpp"
 #include "action/history_flow.hpp"
+#include "action/upload_flow.hpp"
 #include "app.hpp"
 #include "util/paths.hpp"
 #include "util/table_export.hpp"
@@ -355,8 +356,8 @@ void GameCheckActivity::onContentAvailable()
         group.box->addView(group.note);
         // The games to install again: their list kept on the SD card, then
         // all of them removed at once (an installer counts them as installed
-        // until then). Two buttons side by side, above the games, in reach
-        // however long the list.
+        // until then). Side by side, above the games, in reach however long
+        // the list.
         if (category == GC_CAT_REINSTALL) {
             auto* actions = new brls::Box(brls::Axis::ROW);
             actions->setMarginBottom(12);
@@ -372,6 +373,17 @@ void GameCheckActivity::onContentAvailable()
                 return true;
             });
             actions->addView(group.save);
+            // The same list to a secret gist: its link (and QR code) opens it
+            // on a phone or a computer, next to an installer.
+            group.send = new brls::Button();
+            group.send->setText("playguard/games/send_list"_i18n);
+            group.send->setGrow(1.0f);
+            group.send->setMarginRight(12);
+            group.send->registerClickAction([this](brls::View*) {
+                upload_flow::send_list("games_to_reinstall.txt", this->list_text(), "games to reinstall");
+                return true;
+            });
+            actions->addView(group.send);
             group.remove_all = new brls::Button();
             group.remove_all->setGrow(1.0f);
             group.remove_all->setTextColor(ui::color_bad());
@@ -773,6 +785,22 @@ void GameCheckActivity::remove(const GameFacts& g)
                        });
 }
 
+// The games of "Reinstall" as plain text: the title, then a line each with
+// its ID, its name (as an installer searches it), its version and what was wrong.
+std::string GameCheckActivity::list_text() const
+{
+    SysInfo si;
+    sysinfo_get(&si);
+    std::string text = "playguard/games/list_title"_i18n + "\n\n";
+    for (const GameFacts& g : this->reinstall) {
+        const GameIssue issue = gamecheck_classify(&g, si.hos_version);
+        text += fmt::format("{}  {}{} · {}\n", id_text(g.app_id), game_name(g),
+                            g.display_version[0] ? " · " + brls::getStr("playguard/games/version", std::string(g.display_version)) : "",
+                            short_text(g, issue));
+    }
+    return text;
+}
+
 // The games of "Reinstall", in a JSON table (exports/, as the Activity tab's
 // exports) and the same list as plain text next to it: their names, as an
 // installer searches them, their IDs and what was wrong.
@@ -787,14 +815,11 @@ std::string GameCheckActivity::save_list(std::string* error) const
                   { "title_id", "playguard/games/col_id"_i18n, false },
                   { "version", "playguard/games/col_version"_i18n, false },
                   { "problem", "playguard/games/col_problem"_i18n, false } };
-    std::string text = t.title + "\n\n";
     for (const GameFacts& g : this->reinstall) {
         const GameIssue issue = gamecheck_classify(&g, si.hos_version);
         t.rows.push_back({ game_name(g), id_text(g.app_id), g.display_version, short_text(g, issue) });
-        text += fmt::format("{}  {}{} · {}\n", id_text(g.app_id), game_name(g),
-                            g.display_version[0] ? " · " + brls::getStr("playguard/games/version", std::string(g.display_version)) : "",
-                            short_text(g, issue));
     }
+    const std::string text = this->list_text();
     if (!paths::ensure_dir(paths::exports_dir())) {
         if (error) *error = paths::exports_dir();
         return "";

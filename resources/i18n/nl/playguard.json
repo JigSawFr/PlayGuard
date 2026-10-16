@@ -898,6 +898,7 @@
             "system": "De games zijn in orde: de firmware van de console of de SD-kaart is het probleem. Werk de firmware bij, of start op de opslag waarop ze zijn geïnstalleerd."
         },
         "save_list": "Lijst van deze games opslaan",
+        "send_list": "Lijst online versturen",
         "list_saved": "Lijst opgeslagen: {}",
         "list_err": "De lijst kon niet worden opgeslagen",
         "list_title": "Opnieuw te installeren games",
@@ -1008,6 +1009,10 @@
         "send": "Versturen",
         "sending": "Versturen...",
         "failed": "Kon het rapport niet versturen: {}",
+        "failed_list": "Kon de lijst niet versturen: {}",
+        "needs_github_list": "De lijst gaat naar een geheime gist in je GitHub-account: iedereen met de link kan hem lezen, tot je hem op GitHub verwijdert. PlayGuard is nog niet bij GitHub ingelogd. Nu inloggen?",
+        "done_list": "Verstuurd: {}\nOpen deze link op een telefoon of computer om deze games terug te vinden.",
+        "qr_list": "De lijst",
         "done": "Verstuurd: {}\nGeef deze link aan wie je helpt, of open er een bugmelding mee.",
         "partial": "Te groot: alleen het begin wordt verstuurd.",
         "qr_report": "Het rapport",
