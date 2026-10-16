@@ -736,6 +736,7 @@
         "version": "Versão",
         "firmware": "Firmware",
         "atmosphere": "Atmosphère",
+        "available": "{} · {} disponível",
         "compat": "Compatibilidade",
         "compat_ok_info": "Este firmware foi verificado com o PlayGuard: todas as funções estão disponíveis.",
         "mode": "Modo de execução",
@@ -1139,6 +1140,15 @@
         "upload_show": "Mostrar a ligação",
         "crash": "Da última vez, o PlayGuard fechou inesperadamente",
         "sd_write": "O PlayGuard não conseguiu escrever no cartão SD",
-        "sd_write_detail": "{} não foi guardado. Verifique o cartão SD: cheio, só de leitura (o bloqueio) ou com erros."
+        "sd_write_detail": "{} não foi guardado. Verifique o cartão SD: cheio, só de leitura (o bloqueio) ou com erros.",
+        "rescue_old": "O sysmodule de recuperação está desatualizado",
+        "rescue_old_detail": "Vem do PlayGuard {}. Extraia o playguard-rescue.zip do PlayGuard {} na raiz do cartão SD e reinicie a consola.",
+        "rescue_unknown": "Foi instalado antes de indicar a sua versão. Extraia o playguard-rescue.zip do PlayGuard {} na raiz do cartão SD e reinicie a consola.",
+        "sys_atmosphere": "O Atmosphère {} está disponível",
+        "sys_atmosphere_detail": "Esta consola usa o Atmosphère {}.",
+        "sys_hekate": "O hekate {} está disponível",
+        "sys_hekate_detail": "O cartão SD tem o hekate {}.",
+        "sys_firmware": "Saiu o firmware {}",
+        "sys_firmware_detail": "Esta consola está em {}. Atualize-a só quando o Atmosphère (e o hekate, se o usar) suportarem esse firmware; caso contrário, o Atmosphère deixa de arrancar."
     }
 }

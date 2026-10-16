@@ -736,6 +736,7 @@
         "version": "Version",
         "firmware": "Firmware",
         "atmosphere": "Atmosphère",
+        "available": "{} · {} available",
         "compat": "Compatibility",
         "compat_ok_info": "This firmware has been checked with PlayGuard: every feature is available.",
         "mode": "Launch mode",
@@ -1139,6 +1140,15 @@
         "upload_show": "Show the link",
         "crash": "PlayGuard closed unexpectedly last time",
         "sd_write": "PlayGuard could not write to the SD card",
-        "sd_write_detail": "{} was not saved. Check the SD card: full, read-only (the lock switch) or with errors."
+        "sd_write_detail": "{} was not saved. Check the SD card: full, read-only (the lock switch) or with errors.",
+        "rescue_old": "The recovery sysmodule is out of date",
+        "rescue_old_detail": "It comes with PlayGuard {}. Extract playguard-rescue.zip of PlayGuard {} at the SD card root, then restart the console.",
+        "rescue_unknown": "It was installed before it said which version it is. Extract playguard-rescue.zip of PlayGuard {} at the SD card root, then restart the console.",
+        "sys_atmosphere": "Atmosphère {} is available",
+        "sys_atmosphere_detail": "This console runs Atmosphère {}.",
+        "sys_hekate": "hekate {} is available",
+        "sys_hekate_detail": "The SD card has hekate {}.",
+        "sys_firmware": "Firmware {} is out",
+        "sys_firmware_detail": "This console runs {}. Update it only once Atmosphère (and hekate, if you use it) support that firmware, or Atmosphère will no longer start."
     }
 }

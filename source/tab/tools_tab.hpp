@@ -36,6 +36,7 @@ class ToolsTab : public TabBase
     BRLS_BIND(brls::DetailCell,  backup_keep, "tl_backup_keep");
     BRLS_BIND(brls::DetailCell,  fw,          "tl_fw");
     BRLS_BIND(brls::DetailCell,  ams,         "tl_ams");
+    BRLS_BIND(brls::DetailCell,  hekate,      "tl_hekate");
     BRLS_BIND(brls::DetailCell,  compat,      "tl_compat");
     BRLS_BIND(brls::DetailCell,  storage,     "tl_storage");
     BRLS_BIND(brls::Label,       storage_note, "tl_storage_note");

@@ -6,6 +6,7 @@
 #include "action/fw_gate.hpp"
 #include "action/notices.hpp"
 #include "action/pt_flow.hpp"
+#include "action/rescue.hpp"
 #include "action/rollback_flow.hpp"
 #include "action/support_flow.hpp"
 #include "action/update_flow.hpp"
@@ -140,6 +141,7 @@ void MainActivity::onContentAvailable()
     data_notice::at_start();
     rollback_flow::note_went_back();
     notices::note_crash();
+    rescue::note_version();
     // Then, with nothing else in front: "What's new" after an update, else the
     // monthly "Support PlayGuard" reminder.
     support_flow::at_start(this);

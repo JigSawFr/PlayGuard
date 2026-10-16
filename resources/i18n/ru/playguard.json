@@ -736,6 +736,7 @@
         "version": "Версия",
         "firmware": "Прошивка",
         "atmosphere": "Atmosphère",
+        "available": "{} · доступна {}",
         "compat": "Совместимость",
         "compat_ok_info": "Эта прошивка проверена с PlayGuard: доступны все функции.",
         "mode": "Режим запуска",
@@ -1139,6 +1140,15 @@
         "upload_show": "Показать ссылку",
         "crash": "В прошлый раз PlayGuard неожиданно закрылся",
         "sd_write": "PlayGuard не смог записать на SD-карту",
-        "sd_write_detail": "{} не сохранён. Проверьте SD-карту: заполнена, защищена от записи (переключатель) или с ошибками."
+        "sd_write_detail": "{} не сохранён. Проверьте SD-карту: заполнена, защищена от записи (переключатель) или с ошибками.",
+        "rescue_old": "Модуль восстановления устарел",
+        "rescue_old_detail": "Он из PlayGuard {}. Распакуйте playguard-rescue.zip из PlayGuard {} в корень SD-карты и перезапустите консоль.",
+        "rescue_unknown": "Он установлен до того, как начал указывать свою версию. Распакуйте playguard-rescue.zip из PlayGuard {} в корень SD-карты и перезапустите консоль.",
+        "sys_atmosphere": "Доступна Atmosphère {}",
+        "sys_atmosphere_detail": "На этой консоли Atmosphère {}.",
+        "sys_hekate": "Доступен hekate {}",
+        "sys_hekate_detail": "На SD-карте hekate {}.",
+        "sys_firmware": "Вышла прошивка {}",
+        "sys_firmware_detail": "На этой консоли {}. Обновляйте её, только когда Atmosphère (и hekate, если вы его используете) поддержат эту прошивку, иначе Atmosphère перестанет запускаться."
     }
 }

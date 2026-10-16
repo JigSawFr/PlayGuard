@@ -736,6 +736,7 @@
         "version": "Version",
         "firmware": "Firmware",
         "atmosphere": "Atmosphère",
+        "available": "{} · {} verfügbar",
         "compat": "Kompatibilität",
         "compat_ok_info": "Diese Firmware wurde mit PlayGuard geprüft: Alle Funktionen sind verfügbar.",
         "mode": "Startmodus",
@@ -1139,6 +1140,15 @@
         "upload_show": "Link anzeigen",
         "crash": "PlayGuard wurde beim letzten Mal unerwartet beendet",
         "sd_write": "PlayGuard konnte nicht auf die SD-Karte schreiben",
-        "sd_write_detail": "{} wurde nicht gespeichert. Prüfe die SD-Karte: voll, schreibgeschützt (der Schieber) oder fehlerhaft."
+        "sd_write_detail": "{} wurde nicht gespeichert. Prüfe die SD-Karte: voll, schreibgeschützt (der Schieber) oder fehlerhaft.",
+        "rescue_old": "Das Wiederherstellungs-Sysmodul ist veraltet",
+        "rescue_old_detail": "Es stammt von PlayGuard {}. Entpacke playguard-rescue.zip von PlayGuard {} ins Stammverzeichnis der SD-Karte und starte die Konsole neu.",
+        "rescue_unknown": "Es wurde installiert, bevor es seine Version angab. Entpacke playguard-rescue.zip von PlayGuard {} ins Stammverzeichnis der SD-Karte und starte die Konsole neu.",
+        "sys_atmosphere": "Atmosphère {} ist verfügbar",
+        "sys_atmosphere_detail": "Diese Konsole nutzt Atmosphère {}.",
+        "sys_hekate": "hekate {} ist verfügbar",
+        "sys_hekate_detail": "Auf der SD-Karte ist hekate {}.",
+        "sys_firmware": "Firmware {} ist erschienen",
+        "sys_firmware_detail": "Diese Konsole läuft mit {}. Aktualisiere sie erst, wenn Atmosphère (und hekate, falls genutzt) diese Firmware unterstützen, sonst startet Atmosphère nicht mehr."
     }
 }

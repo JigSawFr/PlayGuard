@@ -8,8 +8,12 @@
 
 #include "action/data_notice.hpp"
 #include "action/history_flow.hpp"
+#include "action/notices.hpp"
+#include "app.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/paths.hpp"
+
+using namespace brls::literals;
 
 namespace rescue
 {
@@ -20,7 +24,51 @@ std::string report_path()
 {
     return paths::data_dir() + "/" + RESCUE_REPORT_NAME;
 }
+
+// atmosphere/contents/<id>/ on the SD card, with its trailing slash.
+std::string module_dir()
+{
+    std::string path = paths::sd_root();
+    if (path.empty() || path.back() != '/') path += '/';   // "/" on the console
+    path += RESCUE_SYSMODULE_PATH;
+    return path.substr(0, path.rfind('/') + 1);
+}
 }   // namespace
+
+const char* revision()
+{
+#ifdef APP_RESCUE_REV
+    return APP_RESCUE_REV;
+#else
+    return "";
+#endif
+}
+
+void note_version()
+{
+    if (!installed() || !*revision()) {
+        notices::clear("rescue_old");
+        return;
+    }
+    // "1.2.0 84d0eaa86878": the version it came with, its revision.
+    std::string text, version, rev;
+    if (paths::read_file(module_dir() + "playguard-rescue.txt", text)) {
+        const size_t space = text.find(' ');
+        if (space != std::string::npos) {
+            version = text.substr(0, space);
+            rev = text.substr(space + 1);
+            rev = rev.substr(0, rev.find_first_of("\r\n "));
+        }
+    }
+    if (rev == revision()) {
+        notices::clear("rescue_old");
+        return;
+    }
+    const std::string detail = version.empty()
+        ? brls::getStr("playguard/notices/rescue_unknown", app::version())
+        : brls::getStr("playguard/notices/rescue_old_detail", version, app::version());
+    notices::set("rescue_old", notices::Level::Action, "playguard/notices/rescue_old"_i18n, detail);
+}
 
 bool pending()
 {

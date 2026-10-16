@@ -736,6 +736,7 @@
         "version": "バージョン",
         "firmware": "ファームウェア",
         "atmosphere": "Atmosphère",
+        "available": "{} · {} が公開中",
         "compat": "互換性",
         "compat_ok_info": "このファームウェアはPlayGuardで確認済みです。すべての機能を使えます。",
         "mode": "起動モード",
@@ -1139,6 +1140,15 @@
         "upload_show": "リンクを表示",
         "crash": "前回、PlayGuard が予期せず終了しました",
         "sd_write": "PlayGuard が SD カードに書き込めませんでした",
-        "sd_write_detail": "{} が保存されませんでした。SD カードを確認してください：容量不足、書き込み禁止（ロックスイッチ）、またはエラー。"
+        "sd_write_detail": "{} が保存されませんでした。SD カードを確認してください：容量不足、書き込み禁止（ロックスイッチ）、またはエラー。",
+        "rescue_old": "リカバリー sysmodule が最新ではありません",
+        "rescue_old_detail": "PlayGuard {} に付属のものです。PlayGuard {} の playguard-rescue.zip を SD カードのルートに展開し、本体を再起動してください。",
+        "rescue_unknown": "バージョンを記録する前にインストールされたものです。PlayGuard {} の playguard-rescue.zip を SD カードのルートに展開し、本体を再起動してください。",
+        "sys_atmosphere": "Atmosphère {} が公開されています",
+        "sys_atmosphere_detail": "この本体は Atmosphère {} です。",
+        "sys_hekate": "hekate {} が公開されています",
+        "sys_hekate_detail": "SD カードの hekate は {} です。",
+        "sys_firmware": "ファームウェア {} が公開されました",
+        "sys_firmware_detail": "この本体は {} です。Atmosphère（使っていれば hekate も）がそのファームウェアに対応してから更新してください。対応前に更新すると Atmosphère が起動しなくなります。"
     }
 }
