@@ -36,10 +36,6 @@ class GameCheckActivity : public brls::Activity
 
     void onContentAvailable() override;
 
-    // The last check's file (util/game_cache.hpp), also read and written by
-    // action/game_notice at start-up.
-    static std::string cache_file();
-
   private:
     // A repair waiting for the next read to tell whether it worked.
     // A section of the list: its title (with its count), what to do, its games.
