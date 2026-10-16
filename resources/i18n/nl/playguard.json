@@ -1172,7 +1172,6 @@
         "count": "{} vastgelegd",
         "none": "Nog niets vastgelegd. Elke wijziging die PlayGuard op de console maakt (limieten, beperkingsniveau, pincode, ontgrendelingen...) wordt hier vermeld.",
         "note": "De {} nieuwste wijzigingen, bewaard op de SD-kaart in {}. Druk op A bij een wijziging om die te bekijken en, indien mogelijk, de vorige waarde terug te zetten.",
-        "section": "Wijzigingen, nieuwste eerst",
         "custom_value": "leeftijd {}, berichten beperkt: {}, communicatie beperkt: {}",
         "title_change": "{}: {} → {}",
         "title_day_change": "{} ({}): {} → {}",
@@ -1209,7 +1208,8 @@
             "remove_game": "Game verwijderd",
             "remove_update": "Update verwijderd",
             "remove_addon": "Extra content verwijderd",
-            "launch_version": "Startversie hersteld"
+            "launch_version": "Startversie hersteld",
+            "countdown": "Aftellen van de speeltijd"
         },
         "sources": {
             "uniform": "Elke dag dezelfde limiet",
@@ -1236,7 +1236,34 @@
         "already_back": "De console heeft de vorige waarde al.",
         "undo_confirm": "Terugzetten",
         "undone": "Vorige waarde teruggezet.",
-        "undo_err": "Kan de vorige waarde niet terugzetten"
+        "undo_err": "Kan de vorige waarde niet terugzetten",
+        "show": "Tonen",
+        "export": "Getoonde exporteren",
+        "shown_count": "{} ({})",
+        "none_shown": "Niets van deze soort vastgelegd.",
+        "today": "Vandaag",
+        "yesterday": "Gisteren",
+        "failed_title": "Geweigerd: {}",
+        "failed_note": "De console heeft deze wijziging geweigerd ({}): er is niets veranderd.",
+        "version": "PlayGuard-versie",
+        "counting": "Aftellen loopt",
+        "paused": "Gepauzeerd",
+        "filters": {
+            "0": "Alles",
+            "1": "Speeltijd",
+            "2": "Beperkingen",
+            "3": "Beveiliging en app",
+            "4": "Buiten PlayGuard gezien",
+            "5": "Door de console geweigerd"
+        },
+        "columns": {
+            "change": "Wijziging",
+            "details": "Details",
+            "result": "Resultaat",
+            "kind": "Code",
+            "done": "Uitgevoerd",
+            "refused": "Geweigerd ({})"
+        }
     },
     "chart": {
         "last_days": "De laatste 7 dagen, vandaag rechts",

@@ -1172,7 +1172,6 @@
         "count": "{} no histórico",
         "none": "O histórico está vazio. Todas as alterações que o PlayGuard faz na consola (limites, nível de restrição, PIN, desbloqueios...) aparecem aqui.",
         "note": "As {} alterações mais recentes, guardadas no cartão SD em {}. A numa alteração mostra-a e, quando possível, repõe o valor anterior.",
-        "section": "Alterações, mais recentes primeiro",
         "custom_value": "idade {}, publicações restritas: {}, comunicação restrita: {}",
         "title_change": "{}: {} → {}",
         "title_day_change": "{} ({}): {} → {}",
@@ -1209,7 +1208,8 @@
             "remove_game": "Jogo removido",
             "remove_update": "Atualização removida",
             "remove_addon": "Conteúdo adicional removido",
-            "launch_version": "Versão de arranque reposta"
+            "launch_version": "Versão de arranque reposta",
+            "countdown": "Contagem do tempo de jogo"
         },
         "sources": {
             "uniform": "Mesmo limite todos os dias",
@@ -1236,7 +1236,34 @@
         "already_back": "A consola já tem o valor anterior.",
         "undo_confirm": "Repor",
         "undone": "Valor anterior reposto.",
-        "undo_err": "Não foi possível repor o valor anterior"
+        "undo_err": "Não foi possível repor o valor anterior",
+        "show": "Mostrar",
+        "export": "Exportar o que é mostrado",
+        "shown_count": "{} ({})",
+        "none_shown": "Nada deste tipo foi registado.",
+        "today": "Hoje",
+        "yesterday": "Ontem",
+        "failed_title": "Recusado: {}",
+        "failed_note": "A consola recusou esta alteração ({}): nada foi alterado.",
+        "version": "Versão do PlayGuard",
+        "counting": "Contagem em curso",
+        "paused": "Em pausa",
+        "filters": {
+            "0": "Tudo",
+            "1": "Tempo de jogo",
+            "2": "Restrições",
+            "3": "Segurança e app",
+            "4": "Visto fora do PlayGuard",
+            "5": "Recusado pela consola"
+        },
+        "columns": {
+            "change": "Alteração",
+            "details": "Detalhes",
+            "result": "Resultado",
+            "kind": "Código",
+            "done": "Feita",
+            "refused": "Recusada ({})"
+        }
     },
     "chart": {
         "last_days": "Os últimos 7 dias, hoje à direita",

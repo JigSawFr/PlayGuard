@@ -1172,7 +1172,6 @@
         "count": "已記錄{}筆",
         "none": "尚無紀錄。PlayGuard對主機所做的每項變更（上限、限制等級、PIN碼、解除…）都會列在此處。",
         "note": "最新的{}筆變更，儲存於SD卡的{}。在變更上按A即可查看，並在可能時改回先前的數值。",
-        "section": "變更（由新到舊）",
         "custom_value": "年齡{}，限制發文：{}，限制交流：{}",
         "title_change": "{}：{} → {}",
         "title_day_change": "{}（{}）：{} → {}",
@@ -1209,7 +1208,8 @@
             "remove_game": "已刪除遊戲",
             "remove_update": "已刪除更新",
             "remove_addon": "已刪除追加內容",
-            "launch_version": "已重設啟動版本"
+            "launch_version": "已重設啟動版本",
+            "countdown": "遊玩時間倒數"
         },
         "sources": {
             "uniform": "每天相同上限",
@@ -1236,7 +1236,34 @@
         "already_back": "主機已是先前的數值。",
         "undo_confirm": "改回",
         "undone": "已改回先前的數值。",
-        "undo_err": "無法改回先前的數值"
+        "undo_err": "無法改回先前的數值",
+        "show": "顯示",
+        "export": "匯出所顯示的內容",
+        "shown_count": "{}（{}）",
+        "none_shown": "沒有此類記錄。",
+        "today": "今天",
+        "yesterday": "昨天",
+        "failed_title": "遭拒絕：{}",
+        "failed_note": "主機拒絕了此變更（{}）：未做任何變更。",
+        "version": "PlayGuard 版本",
+        "counting": "倒數中",
+        "paused": "已暫停",
+        "filters": {
+            "0": "全部",
+            "1": "遊玩時間",
+            "2": "限制",
+            "3": "安全與應用程式",
+            "4": "在 PlayGuard 之外發現",
+            "5": "遭主機拒絕"
+        },
+        "columns": {
+            "change": "變更",
+            "details": "詳細資訊",
+            "result": "結果",
+            "kind": "代碼",
+            "done": "已完成",
+            "refused": "遭拒絕（{}）"
+        }
     },
     "chart": {
         "last_days": "最近 7 天，最右邊是今天",

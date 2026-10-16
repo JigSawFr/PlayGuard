@@ -1172,7 +1172,6 @@
         "count": "{} registrate",
         "none": "Ancora nessuna registrazione. Ogni modifica che PlayGuard effettua sulla console (limiti, livello limitazioni, PIN, sblocchi...) viene elencata qui.",
         "note": "Le {} modifiche più recenti, conservate sulla scheda SD in {}. Premi A su una modifica per vederla e, se possibile, ripristinare il valore precedente.",
-        "section": "Modifiche, dalla più recente",
         "custom_value": "età {}, pubblicazioni limitate: {}, comunicazione limitata: {}",
         "title_change": "{}: {} → {}",
         "title_day_change": "{} ({}): {} → {}",
@@ -1209,7 +1208,8 @@
             "remove_game": "Gioco rimosso",
             "remove_update": "Aggiornamento rimosso",
             "remove_addon": "Contenuto aggiuntivo rimosso",
-            "launch_version": "Versione di avvio ripristinata"
+            "launch_version": "Versione di avvio ripristinata",
+            "countdown": "Conto alla rovescia del tempo di gioco"
         },
         "sources": {
             "uniform": "Stesso limite ogni giorno",
@@ -1236,7 +1236,34 @@
         "already_back": "La console ha già il valore precedente.",
         "undo_confirm": "Ripristina",
         "undone": "Valore precedente ripristinato.",
-        "undo_err": "Impossibile ripristinare il valore precedente"
+        "undo_err": "Impossibile ripristinare il valore precedente",
+        "show": "Mostra",
+        "export": "Esporta ciò che è mostrato",
+        "shown_count": "{} ({})",
+        "none_shown": "Niente di questo tipo registrato.",
+        "today": "Oggi",
+        "yesterday": "Ieri",
+        "failed_title": "Rifiutato: {}",
+        "failed_note": "La console ha rifiutato questa modifica ({}): non è cambiato nulla.",
+        "version": "Versione di PlayGuard",
+        "counting": "Conto alla rovescia in corso",
+        "paused": "In pausa",
+        "filters": {
+            "0": "Tutto",
+            "1": "Tempo di gioco",
+            "2": "Restrizioni",
+            "3": "Sicurezza e app",
+            "4": "Visto fuori da PlayGuard",
+            "5": "Rifiutato dalla console"
+        },
+        "columns": {
+            "change": "Modifica",
+            "details": "Dettagli",
+            "result": "Risultato",
+            "kind": "Codice",
+            "done": "Eseguita",
+            "refused": "Rifiutata ({})"
+        }
     },
     "chart": {
         "last_days": "Gli ultimi 7 giorni, oggi a destra",

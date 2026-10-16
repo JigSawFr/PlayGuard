@@ -105,9 +105,11 @@ bool append(const Entry& e, std::string* error, bool* put_aside)
     j["detail"] = e.detail;
     if (!e.before.empty()) j["before"] = e.before;
     if (!e.after.empty()) j["after"] = e.after;
+    if (!e.result.empty()) j["result"] = e.result;
+    if (!e.version.empty()) j["version"] = e.version;
     entries.push_back(j);
     while (entries.size() > MAX_ENTRIES) entries.erase(entries.begin());
-    // One change per line: 200 of them stay small and readable.
+    // One change per line: 500 of them stay small (about 50 KB) and readable.
     std::string text = "{\n \"schema\": 1,\n \"entries\": [";
     for (size_t i = 0; i < entries.size(); i++)
         text += (i ? ",\n  " : "\n  ") + entries[i].dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);
@@ -134,6 +136,8 @@ std::vector<Entry> load()
             e.when   = j.value("when", std::string());
             e.source = j.value("source", std::string());
             e.detail = j.value("detail", std::string());
+            e.result = j.value("result", std::string());
+            e.version = j.value("version", std::string());
         } catch (...) {
             continue;   // a field of the wrong type
         }
@@ -146,7 +150,7 @@ std::vector<Entry> load()
 bool undoable(const Entry& e)
 {
     const size_t n = values_for(e.kind);
-    return n > 0 && e.before.size() == n && e.after.size() == n && values_ok(e.kind, e.before) &&
+    return n > 0 && e.result.empty() && e.before.size() == n && e.after.size() == n && values_ok(e.kind, e.before) &&
            values_ok(e.kind, e.after);
 }
 

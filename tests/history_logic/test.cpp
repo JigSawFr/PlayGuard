@@ -87,6 +87,53 @@ static void test_day_of()
     CHECK(history_logic::day_of("2026-10", "2026-10-14", "2026-10-13") == Day::Other);
 }
 
+static void test_categories()
+{
+    using history_logic::Category;
+    using history_logic::Filter;
+    CHECK(history_logic::category(entry("limits", {}, {})) == Category::PlayTime);
+    CHECK(history_logic::category(entry("countdown", { 1 }, { 0 })) == Category::PlayTime);
+    CHECK(history_logic::category(entry("bedtime", {}, {})) == Category::PlayTime);
+    CHECK(history_logic::category(entry("console_lock", { 0 }, { 1 })) == Category::PlayTime);
+    CHECK(history_logic::category(entry("custom", {}, {})) == Category::Restrictions);
+    CHECK(history_logic::category(entry("vr", {}, {})) == Category::Restrictions);
+    CHECK(history_logic::category(entry("unlink", {}, {})) == Category::Security);
+    CHECK(history_logic::category(entry("pin_shown", {}, {})) == Category::Security);
+    CHECK(history_logic::category(entry("outside_clock", {}, {})) == Category::Outside);
+    CHECK(history_logic::category(entry("new_account", {}, {})) == Category::Outside);
+    CHECK(history_logic::category(entry("clock", {}, {})) == Category::Other);
+    CHECK(history_logic::category(entry("from_a_newer_version", {}, {})) == Category::Other);
+
+    history::Entry refused = entry("level", { 1 }, { 3 });
+    refused.result = "0x0001088E";
+    const history::Entry done = entry("level", { 1 }, { 3 });
+    CHECK(history_logic::matches(done, Filter::All) && history_logic::matches(refused, Filter::All));
+    CHECK(history_logic::matches(refused, Filter::Restrictions) && history_logic::matches(refused, Filter::Failed));
+    CHECK(!history_logic::matches(done, Filter::Failed) && !history_logic::matches(done, Filter::PlayTime));
+    CHECK(history_logic::matches(entry("relock", {}, {}), Filter::Security));
+    CHECK(history_logic::matches(entry("outside_limits", {}, {}), Filter::Outside));
+    // "Everything" is the only filter that shows a kind of no category.
+    for (int f = 1; f < (int)Filter::Count; f++) CHECK(!history_logic::matches(entry("clock", {}, {}), (Filter)f));
+    CHECK(!history_logic::matches(done, Filter::Count));
+}
+
+static void test_days()
+{
+    CHECK(history_logic::day_key(entry("pin", {}, {})) == "2026-10-08");
+    history::Entry odd = entry("pin", {}, {});
+    odd.when = "?";
+    CHECK(history_logic::day_key(odd).empty());
+    odd.when = "2026/10/08 18:30";
+    CHECK(history_logic::day_key(odd).empty());
+
+    CHECK(history_logic::weekday_of("2026-10-08") == 4);   // a Thursday
+    CHECK(history_logic::weekday_of("2026-10-11") == 0);   // a Sunday
+    CHECK(history_logic::weekday_of("2024-02-29") == 4);   // a leap day
+    CHECK(history_logic::weekday_of("2000-01-01") == 6);
+    CHECK(history_logic::weekday_of("2026-13-01") == -1 && history_logic::weekday_of("2026-1-01") == -1);
+    CHECK(history_logic::weekday_of("") == -1 && history_logic::weekday_of("abcd-ef-gh") == -1);
+}
+
 int main()
 {
     test_action();
@@ -94,5 +141,7 @@ int main()
     test_replaces();
     test_changed_days();
     test_day_of();
+    test_categories();
+    test_days();
     return CHECK_DONE("history_logic undo offer, changed-since, recorded-value, changed-day and day assertions passed");
 }

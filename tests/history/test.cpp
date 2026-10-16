@@ -1,5 +1,5 @@
 // Host tests for source/util/history.cpp: the change history on the SD card,
-// newest first, trimmed to the newest 200, a damaged file put aside (the
+// newest first, trimmed to the newest 500, a damaged file put aside (the
 // previous one kept), and what can be undone.
 #include "check.h"
 #include <cstdio>
@@ -105,13 +105,44 @@ static void test_value_ranges()
     CHECK(all.size() == 1 && all[0].kind == "org" && history::undoable(all[0]));
 }
 
+// A change the console refused, and the version that recorded each entry.
+static void test_refused_and_version()
+{
+    CHECK(paths::atomic_write(paths::history_file(), "{\"entries\": []}"));
+    history::Entry refused = limits(60, 90);
+    refused.result = "0x0001088E";
+    refused.version = "1.2.0";
+    history::Entry done = limits(90, 120);
+    done.version = "1.2.0";
+    CHECK(history::append(refused) && history::append(done));
+    auto all = history::load();
+    REQUIRE(all.size() == 2);
+    CHECK(all[0].result.empty() && all[0].version == "1.2.0" && history::undoable(all[0]));
+    CHECK(all[1].result == "0x0001088E" && all[1].version == "1.2.0");
+    // Nothing changed: nothing to put back.
+    CHECK(!history::undoable(all[1]));
+    // Written only when there is something to say.
+    std::string text;
+    CHECK(paths::read_file(paths::history_file(), text));
+    CHECK(text.find("\"result\":\"0x0001088E\"") != std::string::npos);
+    size_t results = 0;
+    for (size_t at = text.find("\"result\""); at != std::string::npos; at = text.find("\"result\"", at + 1)) results++;
+    CHECK(results == 1);
+    // An entry of an older version, without them: read as before.
+    CHECK(paths::atomic_write(paths::history_file(),
+                              R"({"entries": [{"when": "2026-10-08 18:30", "kind": "level", "before": [1], "after": [2]}]})"));
+    all = history::load();
+    CHECK(all.size() == 1 && all[0].result.empty() && all[0].version.empty() && history::undoable(all[0]));
+    CHECK(std::remove(paths::history_file().c_str()) == 0);
+}
+
 static void test_trim_and_damage()
 {
-    for (int i = 0; i < 210; i++) CHECK(history::append(limits(i, i + 1)));
+    for (int i = 0; i < 510; i++) CHECK(history::append(limits(i, i + 1)));
     auto all = history::load();
-    CHECK(all.size() == history::MAX_ENTRIES);
-    CHECK(all.front().after[0] == 210);                // the newest kept
-    CHECK(all.back().after[0] == 210 - 199);           // the oldest kept
+    CHECK(all.size() == history::MAX_ENTRIES && history::MAX_ENTRIES == 500);
+    CHECK(all.front().after[0] == 510);                // the newest kept
+    CHECK(all.back().after[0] == 510 - 499);           // the oldest kept
 
     // A damaged entry is skipped, a damaged file is an empty history.
     CHECK(paths::atomic_write(paths::history_file(),
@@ -165,6 +196,7 @@ int main()
     REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
 
     test_round_trip();
+    test_refused_and_version();
     test_trim_and_damage();
     test_value_ranges();
 

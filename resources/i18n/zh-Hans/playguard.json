@@ -1172,7 +1172,6 @@
         "count": "已记录{}条",
         "none": "尚无记录。PlayGuard对主机进行的每项更改（限制、限制等级、PIN、解除…）都会列在这里。",
         "note": "最近{}条更改，保存在SD卡的{}中。在更改上按A可查看详情，并在可能时恢复之前的值。",
-        "section": "更改（最新在前）",
         "custom_value": "年龄：{}，限制发布：{}，限制交流：{}",
         "title_change": "{}：{} → {}",
         "title_day_change": "{}（{}）：{} → {}",
@@ -1209,7 +1208,8 @@
             "remove_game": "已删除游戏",
             "remove_update": "已删除更新",
             "remove_addon": "已删除追加内容",
-            "launch_version": "已重置启动版本"
+            "launch_version": "已重置启动版本",
+            "countdown": "游戏时间倒计时"
         },
         "sources": {
             "uniform": "每天相同的限制",
@@ -1236,7 +1236,34 @@
         "already_back": "主机已是之前的值。",
         "undo_confirm": "恢复",
         "undone": "已恢复之前的值。",
-        "undo_err": "无法恢复之前的值"
+        "undo_err": "无法恢复之前的值",
+        "show": "显示",
+        "export": "导出所显示的内容",
+        "shown_count": "{}（{}）",
+        "none_shown": "没有此类记录。",
+        "today": "今天",
+        "yesterday": "昨天",
+        "failed_title": "被拒绝：{}",
+        "failed_note": "主机拒绝了此更改（{}）：未做任何更改。",
+        "version": "PlayGuard 版本",
+        "counting": "倒计时中",
+        "paused": "已暂停",
+        "filters": {
+            "0": "全部",
+            "1": "游戏时间",
+            "2": "限制",
+            "3": "安全与应用",
+            "4": "在 PlayGuard 之外发现",
+            "5": "被主机拒绝"
+        },
+        "columns": {
+            "change": "更改",
+            "details": "详情",
+            "result": "结果",
+            "kind": "代码",
+            "done": "已完成",
+            "refused": "被拒绝（{}）"
+        }
     },
     "chart": {
         "last_days": "最近 7 天，最右边是今天",
