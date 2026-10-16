@@ -143,6 +143,14 @@ notice_logic_SRC   := source/action/notice_logic.cpp tests/notice_logic/test.cpp
 notice_logic_FLAGS := -std=c++17 -Isource
 sys_updates_SRC   := source/util/sys_updates.cpp tests/sys_updates/test.cpp
 sys_updates_FLAGS := -std=c++17 -Isource
+# The network half twice from one test: -D__SWITCH__ for the console's path
+# (a fake http::redirect in the test), without it for the desktop's simulation.
+sys_updates_net_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp tests/sys_updates_net/test.cpp
+sys_updates_net_FLAGS := -std=c++17 -Isource -D__SWITCH__
+sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp tests/sys_updates_net/test.cpp
+sys_updates_sim_FLAGS := -std=c++17 -Isource
+ntp_servers_SRC   := source/util/ntp_servers.cpp tests/ntp_servers/test.cpp
+ntp_servers_FLAGS := -std=c++17 -Isource
 sys_notes_SRC   := source/util/safe_text.cpp source/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
 sys_notes_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
