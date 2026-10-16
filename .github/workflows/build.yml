@@ -124,11 +124,12 @@ jobs:
 
   # The same host tests built by clang (other warnings, other sanitizer
   # runtime), then once more by gcc with --coverage for a line coverage
-  # summary on the run page, with the last build of main as a baseline. The
-  # coverage is a report, not a gate.
+  # summary on the run page, with the last build of main as a baseline (the
+  # coverage is a report, not a gate), then the fuzz targets (clang's
+  # libFuzzer, tests/fuzz/).
   host-tests-clang-coverage:
     runs-on: ubuntu-26.04
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -168,6 +169,30 @@ jobs:
         with:
           path: baseline-coverage
           key: baseline-coverage-main-${{ github.sha }}
+      # The parsers of outside data (archives, Markdown, the rescue report,
+      # config.json, the caches) under libFuzzer, 30 s each from the seed
+      # corpus in tests/fuzz/, in parallel, last: a crash fails the job once
+      # the coverage is out. The input it stopped on is in the artifact below
+      # (replay: build/fuzz/<target> <file>).
+      - name: Fuzzing (libFuzzer, 30 s per target)
+        if: always()
+        run: make fuzz FUZZ_SECONDS=30
+      - name: Fuzzing summary
+        if: always()
+        run: python3 tools/ci_summary.py fuzz build/fuzz --seconds 30 >> "$GITHUB_STEP_SUMMARY"
+      - name: Inputs the fuzzers stopped on
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: fuzz-findings-${{ github.run_id }}
+          path: |
+            build/fuzz/*-crash-*
+            build/fuzz/*-leak-*
+            build/fuzz/*-timeout-*
+            build/fuzz/*-oom-*
+            build/fuzz/*.log
+          retention-days: 7
+          if-no-files-found: ignore
 
   # Builds the UI on Linux against the simulated backend and clicks through
   # every screen headlessly: catches borealis XML / view errors without a console.

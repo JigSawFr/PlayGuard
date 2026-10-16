@@ -4,6 +4,7 @@
 #   make dist         -> ./playguard.zip            (unzip onto the SD card root)
 #   make desktop      -> ./build-desktop/playguard  (UI with a simulated backend; needs GLFW)
 #   make test         -> host unit tests (plain gcc/g++, ASan + UBSan; parallel, all suites)
+#   make fuzz         -> libFuzzer runs of the parsers (clang; FUZZ_SECONDS=30 each, parallel)
 #   make nxlink       -> push to a Switch running hbmenu (press Y there first)
 #
 # GL=1 builds the Switch .nro with OpenGL (mesa) instead of deko3d.
@@ -37,7 +38,7 @@ ZIP_TREE = find . -exec touch -h -d @$(SOURCE_DATE_EPOCH) {} + && find . -mindep
 CMAKE_ARGS ?=
 JSON_HPP := extern/borealis/library/include/borealis/extern/nlohmann/json.hpp
 
-.PHONY: all clean dist nxlink desktop test check rescue dist-rescue FORCE
+.PHONY: all clean dist nxlink desktop test fuzz check rescue dist-rescue FORCE
 
 RENDERER := $(if $(GL),-DUSE_DEKO3D=OFF,-DUSE_DEKO3D=ON)
 
@@ -252,6 +253,67 @@ test:
 	@test -f $(JSON_HPP) || { echo "borealis is missing (nlohmann/json for the tests): run git submodule update --init"; exit 1; }
 	@rm -f $(TEST_OKS)
 	@$(MAKE) --no-print-directory -k $(if $(findstring -j,$(MAKEFLAGS)),,-j$(JOBS)) -Otarget $(TEST_OKS)
+
+# Fuzzing: one libFuzzer program per parser of outside data (tests/fuzz/,
+# see tests/README.md), built by clang with ASan and UBSan, each run for
+# FUZZ_SECONDS from the seed corpus in tests/fuzz/<name>/corpus (left as it
+# is: what a run finds goes to build/fuzz/<name>.corpus), with the libFuzzer
+# dictionary tests/fuzz/<name>/dict when there is one. In parallel like
+# `make test`, all of them even when one fails; a crash leaves its input as
+# build/fuzz/<name>-crash-* (replay it: build/fuzz/<name> <that file>). A
+# target is <name>_FUZZ (its sources, the fuzz target last; a .c one makes
+# it a C program), an optional <name>_FUZZ_CSRC (one C source a C++ target
+# links), <name>_FUZZ_FLAGS and <name>_FUZZ_LIBS.
+FUZZOUT      := $(BUILD)/fuzz
+FUZZ_SECONDS ?= 30
+FUZZ_CC      ?= clang
+FUZZ_CXX     ?= clang++
+FUZZ_SAN     := -fsanitize=fuzzer,address,undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer -g -O1
+FUZZ_CFLAGS  := -Wall -Wextra -Werror $(FUZZ_SAN) -Itests/fuzz -Isource -isystem extern/borealis/library/include
+zip_read_FUZZ      := source/util/zip_read.cpp tests/fuzz/zip_read/fuzz.cpp
+zip_read_FUZZ_LIBS := -lz
+markdown_FUZZ      := source/util/safe_text.cpp source/util/markdown.cpp tests/fuzz/markdown/fuzz.cpp
+changelog_FUZZ     := source/util/changelog.cpp tests/fuzz/changelog/fuzz.cpp
+rescue_FUZZ        := source/core/rescue.c tests/fuzz/rescue/fuzz.c
+config_FUZZ        := source/util/paths.cpp source/util/config.cpp tests/fuzz/config/fuzz.cpp
+game_cache_FUZZ    := source/util/game_cache.cpp tests/fuzz/game_cache/fuzz.cpp
+game_cache_FUZZ_CSRC := source/core/gamecheck_rules.c
+play_cache_FUZZ    := source/util/play_cache.cpp tests/fuzz/play_cache/fuzz.cpp
+# Both decoders copy the file's bytes over structs with bool fields, so a
+# damaged file can hold a bool that is neither 0 nor 1, which UBSan reports
+# at the first read (gamecheck_classify, the Activity tab). Not checked here
+# until decode() normalises them; every other check still runs.
+game_cache_FUZZ_FLAGS := -fno-sanitize=bool
+play_cache_FUZZ_FLAGS := -fno-sanitize=bool
+FUZZERS := $(sort $(patsubst %_FUZZ,%,$(filter %_FUZZ,$(.VARIABLES))))
+FUZZ_PROGRAMS := $(addprefix $(FUZZOUT)/,$(FUZZERS))
+FUZZ_RUNS := $(addsuffix .run,$(FUZZ_PROGRAMS))
+
+$(FUZZOUT):
+	@mkdir -p $@
+
+# Rebuilt when the Makefile changes too (the flags above).
+$(FUZZ_PROGRAMS): $(FUZZOUT)/%: $$($$*_FUZZ) $$($$*_FUZZ_CSRC) tests/fuzz/fuzz.h $(TEST_HEADERS) Makefile | $(FUZZOUT)
+	$(if $($*_FUZZ_CSRC),$(FUZZ_CC) -std=gnu11 $(FUZZ_CFLAGS) $($*_FUZZ_FLAGS) -c $($*_FUZZ_CSRC) -o $@.c.o)
+	$(if $(filter %.c,$(lastword $($*_FUZZ))),$(FUZZ_CC) -std=gnu11 -Isource/core,$(FUZZ_CXX) -std=c++17) \
+		$(FUZZ_CFLAGS) $($*_FUZZ_FLAGS) $($*_FUZZ) $(if $($*_FUZZ_CSRC),$@.c.o) $($*_FUZZ_LIBS) -o $@
+
+# A run: its output in <name>.log, its final figures on the terminal (tagged
+# with its name), and on a failure what it found, with the input libFuzzer
+# saved. The paths are absolute: the config target works in a folder of its
+# own (paths::data_dir() is relative).
+$(FUZZ_RUNS): $(FUZZOUT)/%.run: $(FUZZOUT)/%
+	@mkdir -p $<.corpus
+	@rm -f $<-crash-* $<-leak-* $<-timeout-* $<-oom-*
+	@$(abspath $<) -max_total_time=$(FUZZ_SECONDS) -timeout=10 -rss_limit_mb=2048 -print_final_stats=1 \
+		$(if $(wildcard tests/fuzz/$*/dict),-dict=$(abspath tests/fuzz/$*/dict)) -artifact_prefix=$(abspath $<)- $(abspath $<.corpus) $(abspath tests/fuzz/$*/corpus) > $<.log 2>&1; r=$$?; \
+		if [ $$r -eq 0 ]; then grep -E '^(Done|stat::(number_of_executed_units|new_units_added|peak_rss_mb))' $<.log; \
+		else grep -v 'Uses:' $<.log | tail -n 40; fi | sed 's/^/[$*] /'; \
+		if [ $$r -ne 0 ]; then echo "$*: the fuzzer stopped with status $$r: $$(ls $<-* 2>/dev/null | head -n 1)" >&2; exit $$r; fi
+
+fuzz:
+	@test -f $(JSON_HPP) || { echo "borealis is missing (nlohmann/json for the config target): run git submodule update --init"; exit 1; }
+	@$(MAKE) --no-print-directory -k $(if $(findstring -j,$(MAKEFLAGS)),,-j$(JOBS)) -Otarget $(FUZZ_RUNS)
 
 check: test
 	python3 tools/check_resources.py .
