@@ -16,6 +16,7 @@ class NoticesActivity : public brls::Activity
     ~NoticesActivity() override;
 
     void onContentAvailable() override;
+    void onResume() override;
 
     // Y on the main screen: the list, or a toast when it is empty.
     static void open();
@@ -23,6 +24,7 @@ class NoticesActivity : public brls::Activity
   private:
     int listener = 0;
     bool closing = false;
+    bool stale = false;   // changed under a dialog: rebuilt once back on top
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
     brls::Box* content = nullptr;
 

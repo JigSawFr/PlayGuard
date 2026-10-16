@@ -154,9 +154,19 @@ void DevBuildsActivity::update(const dev_builds::Cache& fresh)
         for (const dev_builds::Build& b : fresh.builds)
             if (dev_build_flow::installed(b)) this->tab = b.kind;
     this->fill();
+    // Never under a dialog (Back to the previous build, the sign-in code).
+    if (!ui::has_focus(this)) return;
     if (focus_moves && !list->getChildren().empty() &&
         list->getChildren()[0]->getVisibility() == brls::Visibility::VISIBLE)
         brls::Application::giveFocus(list->getChildren()[0]);
+}
+
+// Back from a build's screen or a dialog: the list fetched meanwhile may
+// have hidden the build it was opened from (fewer builds) or a tab.
+void DevBuildsActivity::onResume()
+{
+    brls::View* first = list->getChildren().empty() ? nullptr : list->getChildren()[0];
+    ui::keep_focus(this, first && first->getVisibility() == brls::Visibility::VISIBLE ? first : nullptr);
 }
 
 std::vector<dev_builds::Build> DevBuildsActivity::builds(dev_builds::Kind kind) const

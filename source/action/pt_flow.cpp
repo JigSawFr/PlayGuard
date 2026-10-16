@@ -722,7 +722,7 @@ void stop_today(const PtState& pt, std::function<void()> refresh)
         return;
     }
     const PtState copy = pt;
-    auto* list = new ActionList("playguard/dashboard/stop"_i18n,
+    auto* list = new ActionList("playguard/dashboard/stop_title"_i18n,
                                 { "playguard/dashboard/stop_now"_i18n, "playguard/dashboard/stop_soon"_i18n },
                                 [copy, soon, refresh](int index) { stop_at(copy, index == 0 ? 0 : (uint16_t)soon, refresh); });
     brls::Application::pushActivity(new brls::Activity(list));

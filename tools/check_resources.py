@@ -16,6 +16,8 @@
   inflates (CONTENT_FROM_XML_RES, TabBase("xml/..."), inflateFromXMLRes), or
   of a custom view that XML holds (<PtStateHeader/>): a missing one is a null
   view at runtime, the first use of which crashes.
+- every sidebar tab name (playguard/tabs/) fits on one line: at most
+  TAB_WIDTH columns, a wide (CJK) character counting as two.
 
 It also warns, without failing:
 - about sentence-like values a catalog still has in English (English is a
@@ -35,6 +37,7 @@ import json
 import os
 import re
 import sys
+import unicodedata
 import xml.parsers.expat
 
 ROOT = sys.argv[1] if len(sys.argv) > 1 else "."
@@ -91,6 +94,15 @@ for lang, cat in sorted(catalogs.items()):
     for k in sorted(set(base) & set(cat)):
         if str(base[k]).count("{}") != str(cat[k]).count("{}"):
             errors.append(f"{lang}: placeholder count differs for {k}")
+
+# The sidebar's tab names stay on one line in every language.
+TAB_WIDTH = 16
+for lang, cat in sorted(catalogs.items()):
+    for k, v in cat.items():
+        if k.startswith("tabs/"):
+            width = sum(2 if unicodedata.east_asian_width(c) in "WF" else 1 for c in v)
+            if width > TAB_WIDTH:
+                errors.append(f"{lang}: tab name {k} \"{v}\" is {width} columns wide, more than {TAB_WIDTH}")
 
 # The language picker's list (config::LANGUAGES) and the catalogs agree.
 config_hpp = open(f"{ROOT}/source/util/config.hpp", encoding="utf-8").read()

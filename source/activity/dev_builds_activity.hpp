@@ -45,6 +45,7 @@ class DevBuildsActivity : public brls::Activity
     ~DevBuildsActivity() override;
 
     void onContentAvailable() override;
+    void onResume() override;
 
   private:
     void update(const dev_builds::Cache& cache);
