@@ -149,8 +149,8 @@ sys_updates_FLAGS := -std=c++17 -Isource
 # (a fake http::redirect in the test), without it for the desktop's simulation.
 sys_updates_net_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp tests/sys_updates_net/test.cpp
 sys_updates_net_FLAGS := -std=c++17 -Isource -D__SWITCH__
-sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp tests/sys_updates_net/test.cpp
-sys_updates_sim_FLAGS := -std=c++17 -Isource
+sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp source/sim/sim_net.cpp source/util/paths.cpp tests/sys_updates_net/test.cpp
+sys_updates_sim_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 ntp_servers_SRC   := source/util/ntp_servers.cpp tests/ntp_servers/test.cpp
 ntp_servers_FLAGS := -std=c++17 -Isource
 sys_notes_SRC   := source/util/safe_text.cpp source/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
