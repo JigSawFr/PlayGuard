@@ -38,6 +38,7 @@ typedef struct {
 typedef struct {
     u64 id;
     const char *name;         // NULL: no control data
+    bool uncached;            // ns' cache has no control data for it
     const char *display_version;
     u8 record_event;
     u64 record_updated;
@@ -61,6 +62,7 @@ static struct {
     FsRightsId tickets[MAX_TICKETS];
     int ticket_count;
     int ns_open, ncm_open, db_open, cs_open, avm_open, es_open, am_open, async_open;
+    int control_cache_reads, control_storage_reads;
     int ns_inits, commits, pushes, record_deletes, avm_pushes, rights_reads, view_calls, avm_reads;
     u64 deleted;
     RecordMetaWire pushed[MAX_METAS];
@@ -194,8 +196,15 @@ Result nsListApplicationRecord(NsApplicationRecord *records, s32 count, s32 entr
 Result nsGetApplicationControlData(NsApplicationControlSource source, u64 id, NsApplicationControlData *buffer, size_t size,
                                    u64 *actual)
 {
-    REQUIRE(C.ns_open == 1 && source == NsApplicationControlSource_Storage && size == sizeof(*buffer));
+    REQUIRE(C.ns_open == 1 && size == sizeof(*buffer));
     const FakeGame *g = find(id);
+    if (source == NsApplicationControlSource_CacheOnly) {
+        C.control_cache_reads++;
+        if (!g || g->uncached) return 0x1234;
+    } else {
+        REQUIRE(source == NsApplicationControlSource_Storage);
+        C.control_storage_reads++;
+    }
     if (!g || !g->name) return 0x1234;
     memset(&buffer->nacp, 0, sizeof(buffer->nacp));
     snprintf(buffer->nacp.lang[0].name, sizeof(buffer->nacp.lang[0].name), "%s", g->name);
@@ -789,6 +798,7 @@ static void test_every_problem(void)
     FakeGame *g;
     FakeMeta *m;
     g = add_game(0x0100000000010000ULL, "Fine");   // game + update on the SD card, add-on, tickets
+    g->uncached = true;   // its name read from the storage
     g->display_version = "1.4.0";
     g->record_updated = 1791471600;
     m = add_meta(g, NcmContentMetaType_Application, NcmStorageId_SdCard, 0);
@@ -841,6 +851,8 @@ static void test_every_problem(void)
 
     scan();
     CHECK(R_SUCCEEDED(R.rc) && R.count == (u32)C.count && !R.truncated);
+    // The cache for every game, the storage only for the two it has nothing of.
+    CHECK(C.control_cache_reads == C.count && C.control_storage_reads == 2);
 
     const GameFacts *f = facts(0x0100000000010000ULL);
     CHECK(f->control_ok && strcmp(f->name, "Fine") == 0 && strcmp(f->display_version, "1.4.0") == 0 && f->record_event == 3);
