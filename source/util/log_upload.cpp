@@ -241,10 +241,10 @@ std::string issue_url(const std::string& repo_url, const std::string& paste_url,
     return url;
 }
 
-std::string gist_body(const std::vector<Part>& files, const std::string& version)
+std::string gist_body(const std::vector<Part>& files, const std::string& version, const std::string& what)
 {
     nlohmann::json j;
-    j["description"] = "PlayGuard " + version + " diagnostic report";
+    j["description"] = "PlayGuard " + version + " " + what;
     j["public"] = false;
     j["files"] = nlohmann::json::object();
     for (const Part& f : files) j["files"][f.name]["content"] = f.content;

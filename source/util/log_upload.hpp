@@ -111,8 +111,10 @@ struct IssueFields
 // from the link, so the form asks these in text fields, not lists.
 std::string issue_url(const std::string& repo_url, const std::string& paste_url, const IssueFields& fields);
 
-// The JSON body of a new secret gist holding `files` (gist_files()).
-std::string gist_body(const std::vector<Part>& files, const std::string& version);
+// The JSON body of a new secret gist holding `files` (gist_files()),
+// described as "PlayGuard <version> <what>".
+std::string gist_body(const std::vector<Part>& files, const std::string& version,
+                      const std::string& what = "diagnostic report");
 
 // "https://gist.github.com/u/abc" -> "gist.github.com/u/abc": what to type by hand.
 std::string short_url(const std::string& url);
@@ -128,6 +130,7 @@ struct Result
 // Sends `files` (gist_files()) to a secret gist with `token`. Blocking
 // (network): run it in the background. On the desktop build
 // PLAYGUARD_SIM_PASTE ("offline", or the link to answer) replaces the network.
-Result upload_gist(const std::vector<Part>& files, const std::string& token, const std::string& version);
+Result upload_gist(const std::vector<Part>& files, const std::string& token, const std::string& version,
+                   const std::string& what = "diagnostic report");
 
 }   // namespace log_upload

@@ -27,6 +27,14 @@ namespace
 {
 bool s_sending = false;   // one upload at a time
 
+// What goes: a diagnostic report (its link with the bug-report form, kept in
+// the notifications) or a list (its link alone).
+struct Kind
+{
+    bool        report = true;
+    std::string what = "diagnostic report";   // the gist's description, in English
+};
+
 brls::Label* centered_label(const std::string& text, int font_size, NVGcolor color)
 {
     auto* label = new brls::Label();
@@ -61,8 +69,22 @@ void remember(const log_upload::Result& r)
                     std::time(nullptr));
 }
 
-void show_link(const log_upload::Result& r)
+void show_link(const log_upload::Result& r, bool report)
 {
+    if (!report) {
+        auto* box = new brls::Box(brls::Axis::COLUMN);
+        box->setAlignItems(brls::AlignItems::CENTER);
+        box->setPadding(24, 24, 12, 24);
+        box->addView(centered_label(brls::getStr("playguard/upload/done_list", log_upload::short_url(r.url)), 20,
+                                    ui::color_text()));
+        brls::Box* card = qr_card("playguard/upload/qr_list"_i18n, r.url, log_upload::short_url(r.url));
+        card->setMarginTop(14);
+        box->addView(card);
+        auto* dialog = new brls::Dialog(box);
+        dialog->addButton("hints/ok"_i18n, []() {});
+        dialog->open();
+        return;
+    }
     SysInfo si;
     sysinfo_get(&si);
     char fw[16];
@@ -95,7 +117,7 @@ void show_link(const log_upload::Result& r)
 }
 
 // To a secret gist in the GitHub account PlayGuard is signed in to.
-void send_gist(const std::vector<log_upload::Part>& parts)
+void send_gist(const std::vector<log_upload::Part>& parts, const Kind& kind)
 {
     // Too large (a long history): the start, with the report, is what matters.
     bool cut = false;
@@ -107,39 +129,42 @@ void send_gist(const std::vector<log_upload::Part>& parts)
     const std::string body = brls::getStr("playguard/upload/confirm", "playguard/upload/where_gist"_i18n, kb) + "\n" +
                              list + "\n\n" + "playguard/upload/confirm_gist"_i18n;
     const std::string token = github_auth::token();
-    ui::confirm(body, "playguard/upload/send"_i18n, [files, token]() {
+    ui::confirm(body, "playguard/upload/send"_i18n, [files, token, kind]() {
         ui::notify("playguard/upload/sending"_i18n);
         if (s_sending) return;
         s_sending = true;
-        ui::in_background("report upload", [files, token]() {
-            const log_upload::Result r = log_upload::upload_gist(files, token, app::version());
-            brls::sync([r]() {
+        ui::in_background("gist upload", [files, token, kind]() {
+            const log_upload::Result r = log_upload::upload_gist(files, token, app::version(), kind.what);
+            brls::sync([r, kind]() {
                 s_sending = false;
                 if (!r.ok) {
                     ui::info(r.relogin ? "playguard/upload/relogin"_i18n
-                                       : brls::getStr("playguard/upload/failed", r.error));
+                                       : brls::getStr(kind.report ? "playguard/upload/failed" : "playguard/upload/failed_list",
+                                                      r.error));
                     return;
                 }
                 remember(r);
-                show_link(r);
-                // The link stays in the notification bell, for later.
+                show_link(r, kind.report);
+                // A report's link stays in the notification bell, for later.
+                if (!kind.report) return;
                 notices::set("upload", notices::Level::Info, "playguard/notices/upload"_i18n, log_upload::short_url(r.url),
-                             "playguard/notices/upload_show"_i18n, [r]() { show_link(r); });
+                             "playguard/notices/upload_show"_i18n, [r]() { show_link(r, true); });
             });
         });
     });
 }
 
 // Signed out of GitHub: signing in comes first, then the report goes.
-void send(const std::vector<log_upload::Part>& parts)
+void send(const std::vector<log_upload::Part>& parts, const Kind& kind = Kind{})
 {
     if (!github_auth::token().empty()) {
-        send_gist(parts);
+        send_gist(parts, kind);
         return;
     }
-    ui::confirm("playguard/upload/needs_github"_i18n, "playguard/upload/sign_in"_i18n, [parts]() {
-        github_login_flow::sign_in([parts]() { send_gist(parts); });
-    });
+    ui::confirm(kind.report ? "playguard/upload/needs_github"_i18n : "playguard/upload/needs_github_list"_i18n,
+                "playguard/upload/sign_in"_i18n, [parts, kind]() {
+                    github_login_flow::sign_in([parts, kind]() { send_gist(parts, kind); });
+                });
 }
 
 // The report, the latest crashes (PlayGuard's, then Atmosphère's), the last
@@ -160,6 +185,14 @@ std::vector<log_upload::Part> with_debug_files(const std::string& report)
 void send_report(const std::string& report)
 {
     send(with_debug_files(report));
+}
+
+void send_list(const std::string& name, const std::string& text, const std::string& what)
+{
+    Kind kind;
+    kind.report = false;
+    kind.what = what;
+    send({ { name, text } }, kind);
 }
 
 void choose()

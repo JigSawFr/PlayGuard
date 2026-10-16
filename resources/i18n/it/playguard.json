@@ -898,6 +898,7 @@
             "system": "I giochi sono a posto: il problema è il firmware della console o la scheda SD. Aggiorna il firmware o avvia dalla memoria su cui sono stati installati."
         },
         "save_list": "Salva l'elenco di questi giochi",
+        "send_list": "Invia l'elenco online",
         "list_saved": "Elenco salvato: {}",
         "list_err": "Impossibile salvare l'elenco",
         "list_title": "Giochi da reinstallare",
@@ -1008,6 +1009,10 @@
         "send": "Invia",
         "sending": "Invio in corso...",
         "failed": "Impossibile inviare il rapporto: {}",
+        "failed_list": "Impossibile inviare l'elenco: {}",
+        "needs_github_list": "L'elenco va in un gist segreto del tuo account GitHub: chiunque abbia il link può leggerlo, finché non lo elimini su GitHub. PlayGuard non ha ancora effettuato l'accesso a GitHub. Accedere ora?",
+        "done_list": "Inviato: {}\nApri questo link su un telefono o un computer per ritrovare questi giochi.",
+        "qr_list": "L'elenco",
         "done": "Inviato: {}\nDai questo link a chi ti aiuta o apri con esso una segnalazione di bug.",
         "partial": "Troppo grande: verrà inviato solo l'inizio.",
         "qr_report": "Il rapporto",
