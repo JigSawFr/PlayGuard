@@ -109,6 +109,7 @@ Set in *About*.
 | `support_reminder` | boolean | *Support PlayGuard* once a month at start-up (Preferences) | `true` |
 | `support_reminded` | string | `"YYYY-MM-DD"` of the last reminder; anything else is cleared | `""` |
 | `seen_version` | string | the version whose *What's new* was shown; at most 32 characters | `""` |
+| `crash_seen` | string | the newest crash file (`logs/crashes/`) the notification bell told about; at most 64 characters | `""` |
 
 ## Developer tools
 
@@ -211,6 +212,7 @@ line; the order does not matter when it reads them:
   "support_reminder": true,
   "support_reminded": "",
   "seen_version": "",
+  "crash_seen": "",
   "dev_mode": false,
   "pt_log": false,
   "dev_builds_order": "newest",

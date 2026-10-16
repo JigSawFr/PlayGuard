@@ -64,6 +64,9 @@ struct Config
     bool        support_reminder = true;
     std::string support_reminded;
     std::string seen_version;
+    // The newest crash file (logs/crashes/) the notification bell told about:
+    // a newer one means PlayGuard closed unexpectedly since.
+    std::string crash_seen;
 
     // Console lock (Security › Console lock): every day's limit set to 0, so a
     // PIN is needed to play. console_lock is whether it is on; console_lock_prev

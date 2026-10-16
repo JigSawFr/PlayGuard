@@ -26,6 +26,7 @@ PlayGuard ramène sur une console modifiée les réglages de l'application mobil
 - 🕒 **Horloge réseau** — réglée depuis des serveurs NTP publics, pour que le minuteur compte juste sur une console qui n'atteint jamais Nintendo.
 - 📱 **Application mobile** — la dissocier, même sur une console d'occasion.
 - ↩️ **Historique et sauvegardes** — chaque modification est consignée et peut être annulée.
+- 🔔 **Notifications** — une cloche regroupe ce qui demande votre attention (alarme désactivée, horloge décalée, modifications faites ailleurs), avec la correction à portée d'un appui.
 - 🌍 Toutes les langues de la console, thèmes clair et sombre.
 
 ## Compatibilité

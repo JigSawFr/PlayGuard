@@ -14,11 +14,20 @@ Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la co
 
 ## Commandes
 
-↑/↓ déplacer · Ⓐ valider · Ⓑ retour ou annuler (deux fois sur la barre latérale pour quitter) · Ⓧ actualiser · **+** enregistre les limites par jour.
+↑/↓ déplacer · Ⓐ valider · Ⓑ retour ou annuler (deux fois sur la barre latérale pour quitter) · Ⓧ actualiser · Ⓨ notifications · **+** enregistre les limites par jour.
 
 Ce qui a échoué est dit dans une boîte de dialogue, ce qui a réussi dans une notification. Le titre indique quand l'application est en lecture seule ou tant que le contrôle parental est déverrouillé temporairement ; en lecture seule, les actions restent à leur place, grisées, et disent pourquoi quand on les choisit.
 
 L'application est organisée en onglets, comme les paramètres de la console ; chacun a sa section ci-dessous.
+
+## Notifications — ce qui demande votre attention, depuis n'importe quel onglet
+
+Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'intervention du parent ; Ⓨ ouvre la liste depuis n'importe quel onglet (le pied de page indique *Notifications (2)* quand deux choses sont à faire).
+
+- **À faire**, compté en orange sur la cloche, reste jusqu'à ce que ce soit réglé : pas encore de code PIN, le contrôle parental déverrouillé temporairement (*Verrouiller maintenant*), du temps en plus d'un jour précédent à retirer, l'alarme « temps écoulé » désactivée, des modifications faites en dehors de PlayGuard, la console qui ne compte pas le temps de jeu, une horloge réseau imprécise, des patchs de jeux à vérifier, un fichier de PlayGuard qui n'a pas pu être mis de côté ou écrit sur la carte SD, une version qui n'a pas fini de démarrer et dont PlayGuard est revenu (*Envoyer un rapport*).
+- **Pour information**, un point sur la cloche, peut être marqué comme lu : une nouvelle version installée (*Nouveautés* ; après une mise à jour sur place, la version précédente gardée), un retour à la version précédente, un rapport envoyé en ligne (*Afficher le lien*), un nouveau compte utilisateur, PlayGuard fermé de façon inattendue la dernière fois (*Envoyer un rapport*), l'application mobile associée, un firmware non testé avec cette version, le numéro de série non masqué sur emuMMC, une nouvelle version de PlayGuard, l'horloge réseau trouvée décalée au lancement, un fichier de PlayGuard trouvé endommagé et mis de côté (une notification au lancement y renvoie).
+- Ⓐ sur une entrée fait la correction (*L'activer*, *La régler*, *Mettre à jour*…) ou ouvre l'onglet où elle se fait. Une entrée disparaît d'elle-même une fois réglé ce qu'elle signale.
+- L'état derrière est relu au lancement de PlayGuard, toutes les minutes sur l'écran principal, et toutes les 5 s tant que la Vue d'ensemble est affichée.
 
 ## Vue d'ensemble — la journée en un coup d'œil
 
