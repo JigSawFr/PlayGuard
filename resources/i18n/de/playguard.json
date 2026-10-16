@@ -19,6 +19,7 @@
         "clock": "Netzwerkuhr",
         "security": "Geheimzahl",
         "console": "Konsole",
+        "console_count": "{} ({})",
         "history": "Verlauf",
         "preferences": "Optionen",
         "about": "Info"
@@ -1345,6 +1346,9 @@
         "none": "Nichts erfordert deine Aufmerksamkeit.",
         "section_todo": "Zu erledigen",
         "section_info": "Zur Information",
+        "section_console": "Konsole",
+        "console_count": "{} zum Ansehen",
+        "console_show": "Anzeigen",
         "seen": "Als gelesen markieren",
         "open_tab": "{} öffnen",
         "pin_missing": "Die Jugendschutzeinstellungen sind nicht eingerichtet",

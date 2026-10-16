@@ -26,7 +26,7 @@ int index_of(const char* const (&list)[N], const std::string& value)
 }   // namespace
 
 PreferencesTab::PreferencesTab()
-    : TabBase("xml/tab/preferences.xml")
+    : TabBase("xml/tab/preferences.xml", false)
 {
     help->setDetailText(ui::opens());
     help->registerClickAction([](brls::View*) {
