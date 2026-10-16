@@ -1024,6 +1024,14 @@
         "inplace_body": "PlayGuard скачает версию {}, проверит её, заменит ею текущую и перезапустится. Настройки сохранятся.",
         "inplace_confirm": "Обновить"
     },
+    "ha_update": {
+        "body": "Home Assistant has {}. Scan the code with a phone where Home Assistant opens: in HACS, update PlayGuard, then restart Home Assistant.",
+        "hacs": "PlayGuard in HACS",
+        "hacs_caption": "Update, then restart",
+        "changes": "What changed since {}",
+        "note": "Every release: {}",
+        "no_notes": "What changed could not be read; it is on {}."
+    },
     "upload": {
         "pick": "Что отправить",
         "current": "Этот отчёт и отладочные файлы",
@@ -1364,6 +1372,7 @@
         "ha_add": "2. Add the console",
         "ha_add_caption": "Console id: {}",
         "ha_add_caption_none": "If Home Assistant does not offer it",
+        "ha_installed": "PlayGuard integration",
         "discovery": "Create the device in Home Assistant (MQTT discovery)",
         "report": "Publish the diagnostic reports asked for",
         "note": "An order is carried out like a change made here: read-only mode, the play-timer unlock and the change history apply. Deleting parental controls, unlinking the phone app and the PIN are never possible through the link. The password is stored on the SD card as plain text.",
@@ -1624,6 +1633,8 @@
         "sys_hekate_detail": "На SD-карте hekate {}.",
         "sys_firmware": "Вышла прошивка {}",
         "sys_firmware_detail": "На этой консоли {}. Обновляйте её, только когда Atmosphère (и hekate, если вы его используете) поддержат эту прошивку, иначе Atmosphère перестанет запускаться.",
+        "ha_integration": "PlayGuard integration {} is available",
+        "ha_integration_detail": "Home Assistant has {}.",
         "pin_weak": "PIN-код легко угадать",
         "pin_weak_detail": "Как 0000 или 1234: такие пробуют первыми. Выберите код, который сложнее подобрать.",
         "pin_lock_off": "PlayGuard открывается без PIN-кода",

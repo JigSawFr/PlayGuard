@@ -71,6 +71,22 @@ void write_profiles(const std::vector<profiles::Profile>& list);
 std::string names_text(const std::vector<std::pair<uint64_t, std::string>>& names);
 void write_names(const std::vector<std::pair<uint64_t, std::string>>& names);
 
+// nand/<system>/sync/integration.json: PlayGuard's Home Assistant integration's
+// document, as the link got it from the broker (docs/sync-protocol.md):
+// written by PlayGuard's own link or by the agent, removed when cleared (the
+// integration removed). PlayGuard warns of a newer release of the integration.
+std::string integration_file();
+struct Integration
+{
+    std::string version;         // "0.2.0"; "" when unknown
+    std::string homeassistant;   // "2026.10.1"; "" when unknown
+};
+// Its two versions; each "" when missing or not a version (digits first, then
+// at most 24 of [0-9A-Za-z.+-]). A document that is not JSON gives both "".
+Integration parse_integration(const std::string& doc);
+// Writes `doc` as it came, or removes the file when "" (through the writer).
+void write_integration(const std::string& doc);
+
 // nand/<system>/sync/agent_state.txt (what the agent changed itself) is at
 // least as recent as nro_state.txt next to it (what PlayGuard saved last): the agent's records are
 // then the newer ones, for PlayGuard to adopt. False when the agent never

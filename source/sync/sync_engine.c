@@ -14,6 +14,8 @@
 #define STATE_SOON_MS        300ULL
 // Home Assistant's birth and last-will topic (its MQTT integration's default).
 #define HA_STATUS_TOPIC      "homeassistant/status"
+// Under <base>: the Home Assistant integration's version (retained, from it).
+#define INTEGRATION_TOPIC    "integration"
 
 static void logf_(SyncEngine *e, const char *fmt, const char *a, const char *b)
 {
@@ -192,8 +194,17 @@ static void on_message(void *user, const MqttPublish *msg)
         return;
     }
 
-    // <base>/<entity>/set
+    // <base>/integration: the Home Assistant integration says which version runs.
     const size_t bl = strlen(e->base);
+    const size_t il = sizeof(INTEGRATION_TOPIC) - 1;
+    if (msg->topic_len == bl + 1 + il && !memcmp(msg->topic, e->base, bl) && msg->topic[bl] == '/' &&
+        !memcmp(msg->topic + bl + 1, INTEGRATION_TOPIC, il)) {
+        if (msg->payload_len <= SYNC_INTEGRATION_MAX && e->host.integration)
+            e->host.integration(e->host.ctx, (const char *)msg->payload, msg->payload_len);
+        return;
+    }
+
+    // <base>/<entity>/set
     if (msg->topic_len < bl + 6 || memcmp(msg->topic, e->base, bl) || msg->topic[bl] != '/') return;
     if (memcmp(msg->topic + msg->topic_len - 4, "/set", 4)) return;
     const size_t en = msg->topic_len - bl - 1 - 4;
@@ -518,11 +529,17 @@ static void publish_due(SyncEngine *e)
 
 static int subscribe(SyncEngine *e)
 {
-    char orders[160];
+    char orders[160], integration[160];
     snprintf(orders, sizeof(orders), "%s/+/set", e->base);
-    const char *topics[2] = { orders, HA_STATUS_TOPIC };
-    const uint8_t qos[2] = { 1, 0 };
-    return mqtt_client_subscribe(&e->mqtt, topics, qos, 2, CONNECT_TIMEOUT_MS);
+    snprintf(integration, sizeof(integration), "%s/" INTEGRATION_TOPIC, e->base);
+    const char *topics[3] = { orders, HA_STATUS_TOPIC, integration };
+    const uint8_t qos[3] = { 1, 0, 1 };
+    // The integration's version is optional: a broker's access list that
+    // leaves it out does not keep the link down.
+    const int refused = mqtt_client_subscribe(&e->mqtt, topics, qos, 3, 2, CONNECT_TIMEOUT_MS);
+    if (refused > 0)
+        logf_(e, "remote link: the broker refused %s%s, the integration's version stays unknown", integration, NULL);
+    return refused < 0 ? -1 : 0;
 }
 
 void sync_engine_replay_orders(SyncEngine *e)

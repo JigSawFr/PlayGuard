@@ -29,6 +29,8 @@ extern "C" {
 #define SYNC_SCRATCH_SIZE    16384
 #define SYNC_LIMIT_SETTLE_MS 1500
 #define SYNC_KEEPALIVE_S     30
+// The integration's document on <base>/integration: larger ones are dropped.
+#define SYNC_INTEGRATION_MAX 512
 
 typedef enum {
     SyncLink_Off = 0,     // disabled, or not configured
@@ -73,6 +75,12 @@ typedef struct {
     uint64_t (*now_posix)(void *ctx);
     // One line for the log. May be NULL.
     void (*log)(void *ctx, const char *line);
+    // The Home Assistant integration's document, retained on <base>/integration
+    // ({"schema":1,"version":"0.2.0","homeassistant":"2026.10.1"}), as it came:
+    // at each connection and when the integration changes it; len 0 when it
+    // was cleared (the integration removed). Not NUL-terminated, at most
+    // SYNC_INTEGRATION_MAX bytes. May be NULL.
+    void (*integration)(void *ctx, const char *doc, size_t len);
 } SyncHost;
 
 typedef struct {

@@ -151,8 +151,8 @@ patches_SRC   := source/util/paths.cpp source/util/patches.cpp tests/patches/tes
 patches_FLAGS := -std=c++17 -Isource
 duration_SRC   := source/util/duration.cpp tests/duration/test.cpp
 duration_FLAGS := -std=c++17 -Isource
-changelog_SRC   := source/util/changelog.cpp tests/changelog/test.cpp
-changelog_FLAGS := -std=c++17 -Isource
+changelog_SRC   := source/util/changelog.cpp source/util/update.cpp tests/changelog/test.cpp
+changelog_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 support_SRC   := source/util/support.cpp tests/support/test.cpp
 support_FLAGS := -std=c++17 -Isource
 pt_logic_SRC   := source/action/pt_logic.cpp tests/pt_logic/test.cpp

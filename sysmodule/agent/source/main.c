@@ -51,7 +51,7 @@
 
 // This system's (nand/<key>/sync/), once the system is known (system_paths()).
 static char g_system_dir[64];
-static char NRO_STATE[96], AGENT_STATE[96], AGENT_EVENTS[96], NAMES[96];
+static char NRO_STATE[96], AGENT_STATE[96], AGENT_EVENTS[96], NAMES[96], INTEGRATION[96];
 static bool g_emummc;
 
 #define ACTIVITY_EVERY_MS (5 * 60 * 1000ULL)
@@ -211,6 +211,7 @@ static void system_paths(void)
     snprintf(AGENT_STATE, sizeof(AGENT_STATE), "%s/sync/agent_state.txt", g_system_dir);
     snprintf(AGENT_EVENTS, sizeof(AGENT_EVENTS), "%s/sync/agent_events.log", g_system_dir);
     snprintf(NAMES, sizeof(NAMES), "%s/sync/names.txt", g_system_dir);
+    snprintf(INTEGRATION, sizeof(INTEGRATION), "%s/sync/integration.json", g_system_dir);
 }
 
 // ---- the agent's state ----
@@ -666,9 +667,25 @@ static void host_log(void *ctx, const char *line)
     slog("%s%s", line, NULL);
 }
 
+// The Home Assistant integration's document, kept as it came for PlayGuard
+// (sync_files::integration_file()): it reads it when it opens and warns of a
+// newer release of the integration. Cleared: the file goes. It comes again
+// at each connection: the same one is not written again.
+static void host_integration(void *ctx, const char *doc, size_t len)
+{
+    (void)ctx;
+    if (len == 0) {
+        remove(INTEGRATION);
+        return;
+    }
+    char kept[SYNC_INTEGRATION_MAX + 1];
+    if (read_file(INTEGRATION, kept, sizeof(kept)) == len && !memcmp(kept, doc, len)) return;
+    write_file(INTEGRATION, doc, len);
+}
+
 static const SyncHost HOST = {
     NULL, host_state, host_activity, host_order, host_report, host_profiles, host_conf_changed,
-    host_read_only, host_now_posix, host_log,
+    host_read_only, host_now_posix, host_log, host_integration,
 };
 
 // ---- the loop ----

@@ -65,7 +65,10 @@ come online, publish the Home Assistant discovery, the state, today's
 activity and the names, carry out a limit order (event, retained order
 cleared, new state, change history), refuse one out of range, publish the
 discovery again when Home Assistant says it restarted, show the link online
-in Preferences › Remote access, and leave "offline" behind at exit. It
+in Preferences › Remote access with the Home Assistant integration's QR
+codes, keep the integration's version once it says it (integration.json),
+find its newer release (PLAYGUARD_SIM_HA_LATEST, its changelog) and show
+what changed, and leave "offline" behind at exit. It
 connects in MQTT 5.0 ("auto"); "sync-311" runs the same with
 mqtt_version=3.1.1 (Mosquitto's log says which version the client spoke).
 The broker runs from a copy of its binary (Ubuntu's AppArmor profile for
@@ -346,6 +349,27 @@ if SYNC:
         tail = open(broker_log, errors="replace").read()[-2000:]
         print(f"SMOKE FAILED: mosquitto ({found}) did not start (exit {mqtt_broker.returncode}):\n{tail}")
         sys.exit(1)
+    # The Home Assistant integration's newer release and its changelog (the
+    # daily check runs once the integration says which version it is).
+    ha_changelog = os.path.join(OUT, "ha_changelog.md")
+    open(ha_changelog, "w").write(
+        "# Changelog\n\n"
+        "## [0.2.0](https://github.com/JigSawFr/playguard-ha/compare/v0.1.0...v0.2.0) (2026-10-20)\n\n\n"
+        "### \U0001F680 Features\n\n"
+        "* **coordinator:** tell the console which version runs ([#4](https://github.com/x/y/issues/4))\n\n"
+        "### \U0001F41B Bug Fixes\n\n"
+        "* **statistics:** a day imported twice is replaced\n\n"
+        "## 0.1.0 (2026-10-16)\n\n"
+        "### \U0001F680 Features\n\n"
+        "* **integration:** the PlayGuard integration\n")
+    env.setdefault("PLAYGUARD_SIM_HA_LATEST", "0.2.0")
+    env.setdefault("PLAYGUARD_SIM_HA_CHANGELOG", ha_changelog)
+    env.setdefault("PLAYGUARD_SIM_LATEST", "offline")   # PlayGuard's own daily check: nothing found
+    os.makedirs(os.path.dirname(config_file), exist_ok=True)
+    json.dump({"schema": 1, "update_daily": True}, open(config_file, "w"))
+    integration_json = os.path.join(nand_dir, "sync", "integration.json")
+    if os.path.exists(integration_json):
+        os.remove(integration_json)
     os.makedirs(os.path.dirname(sync_conf), exist_ok=True)
     open(sync_conf, "w").write(
         "enabled=1\nhost=127.0.0.1\n"
@@ -1135,6 +1159,22 @@ if SYNC:
     wait_for("the Home Assistant links", lambda: logged("sync: Home Assistant integration links shown"), 10)
     shot("04_ha_links")
     key("Escape")
+    # The integration says which version runs (retained): kept on the SD card,
+    # its newer release found, and the same cell opens what changed since.
+    mqtt_pub(f"{BASE}/integration", json.dumps({"schema": 1, "version": "0.1.0", "homeassistant": "2026.10.1"}))
+    wait_for("the integration's newer release", lambda: logged("ha integration: 0.1.0 installed, 0.2.0 available"), 20)
+    wait_for("the integration's document kept", lambda: os.path.exists(integration_json), 10)
+    time.sleep(1.5)            # the cell's refresh (every second): "0.1.0 · 0.2.0 available"
+    shot("05_ha_cell")
+    key("Return")
+    wait_for("the integration's update screen", lambda: logged("ha integration: update screen ("), 10)
+    if logged("ha integration: update screen (0 lines"):
+        fail("the update screen has no changes")
+    shot("06_ha_update")
+    key("Escape")
+    # The integration removed: the document cleared, so is the file.
+    mqtt_pub(f"{BASE}/integration", "")
+    wait_for("the integration's document removed", lambda: not os.path.exists(integration_json), 10)
 
     def checked():
         try:

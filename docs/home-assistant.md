@@ -114,6 +114,16 @@ the repository in HACS: *Download*, then restart Home Assistant; the console
 then shows up by itself in *Settings › Devices & services*. The second adds it
 by hand when it does not, with the console id shown under it.
 
+Once installed, the integration tells the console which version runs (retained
+on `playguard/<id>/integration`, at each start of Home Assistant): the same
+cell then reads *PlayGuard integration* with that version. PlayGuard checks
+the integration's latest release with its own updates (*Check for updates
+every day*, or *Check for updates* in About); a newer one is in the
+notification bell and on that cell (*0.1.0 · 0.2.0 available*). *What's new*
+shows what changed since the installed version and the QR code that opens the
+integration in HACS: *Update*, then restart Home Assistant. Nothing goes
+online for it before the integration is installed.
+
 ## Orders
 
 **Orders received** sets what PlayGuard does with an order:

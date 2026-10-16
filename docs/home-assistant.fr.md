@@ -126,6 +126,18 @@ redémarrez Home Assistant ; la console apparaît alors d'elle-même dans
 *Paramètres › Appareils et services*. Le second l'ajoute à la main sinon,
 avec l'identifiant de la console affiché dessous.
 
+Une fois installée, l'intégration indique à la console la version qui tourne
+(retenue sur `playguard/<id>/integration`, à chaque démarrage de Home
+Assistant) : la même cellule devient *Intégration PlayGuard*, avec cette
+version. PlayGuard cherche la dernière version de l'intégration avec ses
+propres mises à jour (*Rechercher les mises à jour chaque jour*, ou
+*Rechercher les mises à jour* dans À propos) ; une version plus récente est
+dans la cloche des notifications et sur cette cellule (*0.1.0 · 0.2.0
+disponible*). *Nouveautés* montre ce qui a changé depuis la version installée
+et le QR code qui ouvre l'intégration dans HACS : *Mettre à jour*, puis
+redémarrez Home Assistant. Rien ne passe par Internet pour elle tant que
+l'intégration n'est pas installée.
+
 ## Les ordres
 
 **Ordres reçus** règle ce que fait PlayGuard d'un ordre :

@@ -183,6 +183,31 @@ static void test_lists()
     CHECK(paths::read_file(sync_files::system_dir() + "/names.txt", read) && read.find("Super Mario Odyssey") != std::string::npos);
 }
 
+// The Home Assistant integration's document: its two versions, kept as it
+// came, removed when cleared.
+static void test_integration()
+{
+    auto i = sync_files::parse_integration(R"({"schema":1,"version":"0.2.0","homeassistant":"2026.10.1"})");
+    CHECK(i.version == "0.2.0" && i.homeassistant == "2026.10.1");
+    i = sync_files::parse_integration(R"({"schema":2,"version":"1.0.0-beta.1","extra":[1,2]})");
+    CHECK(i.version == "1.0.0-beta.1" && i.homeassistant.empty());   // a newer schema: what it knows
+    for (const char* bad : { "", "not json", "[1]", R"({"version":5})", R"({"version":"v1.0"})",
+                             R"({"version":"1.0 beta"})", R"({"version":"1.0.0;rm"})",
+                             R"({"version":"1234567890123456789012345"})" }) {
+        i = sync_files::parse_integration(bad);
+        CHECK(i.version.empty() && i.homeassistant.empty());
+    }
+
+    const std::string doc = R"({"schema":1,"version":"0.2.0"})";
+    sync_files::write_integration(doc);
+    std::string read;
+    CHECK(sync_files::integration_file() == sync_files::system_dir() + "/integration.json");
+    CHECK(paths::read_file(sync_files::integration_file(), read) && read == doc);
+    sync_files::write_integration("");
+    CHECK(!paths::read_file(sync_files::integration_file(), read));
+    sync_files::write_integration("");   // nothing to remove: fine
+}
+
 void test_agent_events()
 {
     const std::string text =
@@ -236,9 +261,10 @@ int main()
     test_records();
     test_nro_state();
     test_lists();
+    test_integration();
     test_agent_events();
 
     const std::string cleanup = std::string("rm -rf '") + dir + "'";
     CHECK(std::system(cleanup.c_str()) == 0);
-    return CHECK_DONE("sync_files: sync.conf, records, nro_state.txt, profiles, names, agent records and events assertions passed");
+    return CHECK_DONE("sync_files: sync.conf, records, nro_state.txt, profiles, names, the integration, agent records and events assertions passed");
 }

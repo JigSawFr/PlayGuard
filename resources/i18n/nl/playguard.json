@@ -1024,6 +1024,14 @@
         "inplace_body": "PlayGuard downloadt versie {}, controleert die, zet die in de plaats van deze en herstart ermee. Je instellingen blijven behouden.",
         "inplace_confirm": "Bijwerken"
     },
+    "ha_update": {
+        "body": "Home Assistant has {}. Scan the code with a phone where Home Assistant opens: in HACS, update PlayGuard, then restart Home Assistant.",
+        "hacs": "PlayGuard in HACS",
+        "hacs_caption": "Update, then restart",
+        "changes": "What changed since {}",
+        "note": "Every release: {}",
+        "no_notes": "What changed could not be read; it is on {}."
+    },
     "upload": {
         "pick": "Wat versturen",
         "current": "Dit rapport en de debugbestanden",
@@ -1364,6 +1372,7 @@
         "ha_add": "2. Add the console",
         "ha_add_caption": "Console id: {}",
         "ha_add_caption_none": "If Home Assistant does not offer it",
+        "ha_installed": "PlayGuard integration",
         "discovery": "Create the device in Home Assistant (MQTT discovery)",
         "report": "Publish the diagnostic reports asked for",
         "note": "An order is carried out like a change made here: read-only mode, the play-timer unlock and the change history apply. Deleting parental controls, unlinking the phone app and the PIN are never possible through the link. The password is stored on the SD card as plain text.",
@@ -1624,6 +1633,8 @@
         "sys_hekate_detail": "Op de SD-kaart staat hekate {}.",
         "sys_firmware": "Firmware {} is uit",
         "sys_firmware_detail": "Deze console draait {}. Werk haar pas bij als Atmosphère (en hekate, als je het gebruikt) die firmware ondersteunen, anders start Atmosphère niet meer.",
+        "ha_integration": "PlayGuard integration {} is available",
+        "ha_integration_detail": "Home Assistant has {}.",
         "pin_weak": "De pincode is makkelijk te raden",
         "pin_weak_detail": "Zoals 0000 of 1234: een van de eerste die iemand probeert. Kies er een die moeilijker te vinden is.",
         "pin_lock_off": "PlayGuard opent zonder pincode",

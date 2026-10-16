@@ -1,9 +1,10 @@
 // sys_updates — newer releases of what the console runs on: Atmosphère, hekate
-// and the Switch firmware. The latest of each is the tag GitHub's
-// releases/latest page redirects to (no API call, so no rate limit):
-// Atmosphere-NX/Atmosphere, CTCaer/hekate, and THZoria/NX_Firmware for the
-// firmware (it mirrors each Nintendo release). Parsing is plain C++
-// (host-tested); fetch() goes to the network (sys_updates_net.cpp).
+// and the Switch firmware; and of PlayGuard's Home Assistant integration. The
+// latest of each is the tag GitHub's releases/latest page redirects to (no
+// API call, so no rate limit): Atmosphere-NX/Atmosphere, CTCaer/hekate,
+// THZoria/NX_Firmware for the firmware (it mirrors each Nintendo release),
+// JigSawFr/playguard-ha. Parsing is plain C++ (host-tested); the fetches go
+// to the network (sys_updates_net.cpp).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -42,5 +43,14 @@ Latest      from_text(const std::string& text);
 // PLAYGUARD_SIM_SYS_LATEST ("1.12.0:6.5.4:23.0.1") replaces the network, and
 // without it nothing is fetched.
 Latest fetch(std::string* error);
+
+// PlayGuard's Home Assistant integration (JigSawFr/playguard-ha): its latest
+// release ("" when its page could not be read), and the CHANGELOG.md of a
+// release (raw.githubusercontent.com, at its tag; release-please's format,
+// util/changelog.hpp). Blocking, as fetch(). On the desktop build,
+// PLAYGUARD_SIM_HA_LATEST ("0.2.0") and PLAYGUARD_SIM_HA_CHANGELOG (a file)
+// replace the network, and without them nothing is fetched.
+std::string fetch_integration(std::string* error);
+bool        fetch_integration_changelog(const std::string& version, std::string* md, std::string* error);
 
 }   // namespace sys_updates

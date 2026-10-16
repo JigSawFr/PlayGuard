@@ -29,6 +29,7 @@ class SyncActivity : public brls::Activity
 
     void refresh();
     void refresh_status();
+    void refresh_ha_install();   // the integration's cell: installed, newer release
     // After the PIN check: shows `next`, saves sync.conf off the UI thread
     // (ui::write_later), then applies it. False when refused (the settings on
     // screen go back); a save that fails says so and shows the file again.

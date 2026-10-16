@@ -51,6 +51,7 @@ static struct {
     char     subs[4][160];
     uint8_t  sub_qos[4];
     size_t   n_subs;
+    char     deny[160];       // a filter its access list refuses ("" none)
     Message  retained[MAX_RETAINED];
     size_t   n_retained;
     Message *log;             // every PUBLISH the client sent
@@ -269,6 +270,10 @@ static void broker_handle(const MqttPacket *pk)
         while (p < pk->body + pk->body_len) {
             read_str(&p, filters[n], sizeof(filters[n]));
             const uint8_t q = *p++;
+            if (broker.deny[0] && !strcmp(filters[n], broker.deny)) {
+                codes[n++] = broker.version == MQTT_V5 ? 0x87 : 0x80;   // not authorised / failure
+                continue;
+            }
             // Replace an identical filter, as the spec says.
             size_t k = 0;
             while (k < broker.n_subs && strcmp(broker.subs[k], filters[n])) k++;
@@ -288,7 +293,7 @@ static void broker_handle(const MqttPacket *pk)
         }
         // Retained messages matching a new subscription, RETAIN 1.
         for (size_t f = 0; f < n; f++)
-            for (size_t i = 0; i < broker.n_retained; i++)
+            for (size_t i = 0; codes[f] < 0x80 && i < broker.n_retained; i++)
                 if (mqtt_topic_matches(filters[f], broker.retained[i].topic, strlen(broker.retained[i].topic)))
                     emit_publish(broker.retained[i].topic, broker.retained[i].payload, broker.retained[i].len, true,
                                  codes[f]);
@@ -388,6 +393,10 @@ static struct {
     bool read_only;
     SyncConf saved;
     unsigned profiles_asked;
+    unsigned integrations;    // integration() calls
+    char integration[SYNC_INTEGRATION_MAX + 1];
+    size_t integration_len;
+    unsigned refused_logs;    // "the broker refused <base>/integration" lines
 } host;
 
 static size_t h_state(void *ctx, char *out, size_t cap)
@@ -461,7 +470,18 @@ static uint64_t h_now_posix(void *ctx)
 static void h_log(void *ctx, const char *line)
 {
     (void)ctx;
-    (void)line;
+    if (strstr(line, "refused playguard/a1b2c3d4/integration, the integration's version stays unknown"))
+        host.refused_logs++;
+}
+
+static void h_integration(void *ctx, const char *doc, size_t len)
+{
+    (void)ctx;
+    REQUIRE(len <= SYNC_INTEGRATION_MAX);
+    host.integrations++;
+    memcpy(host.integration, doc, len);
+    host.integration[len] = '\0';
+    host.integration_len = len;
 }
 
 // ---------------------------------------------------------------- helpers
@@ -483,7 +503,8 @@ static void setup(bool timer_writes, SyncPolicy policy)
     conf.remote_timer_writes = timer_writes;
     conf.policy = policy;
     SyncIo io = { NULL, io_open, io_write, io_read, io_close };
-    SyncHost h = { NULL, h_state, h_activity, h_order, h_report, h_profiles, h_conf_changed, h_read_only, h_now_posix, h_log };
+    SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,     h_profiles,
+                   h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration };
     sync_engine_init(&engine, &conf, io, &h, clock_ms, "app", "1.1.0");
 }
 
@@ -542,8 +563,9 @@ static void test_connect_and_publish(void)
            !strcmp(broker.will.payload, "offline") && broker.will.retain);
     const Message *avail = find_retained("playguard/a1b2c3d4/availability");
     CHECK(avail && !strcmp(avail->payload, "online"));
-    CHECK(broker.n_subs == 2 && !strcmp(broker.subs[0], "playguard/a1b2c3d4/+/set") && broker.sub_qos[0] == 1 &&
-           !strcmp(broker.subs[1], "homeassistant/status"));
+    CHECK(broker.n_subs == 3 && !strcmp(broker.subs[0], "playguard/a1b2c3d4/+/set") && broker.sub_qos[0] == 1 &&
+           !strcmp(broker.subs[1], "homeassistant/status") && !strcmp(broker.subs[2], "playguard/a1b2c3d4/integration") &&
+           broker.sub_qos[2] == 1);
     const Message *disc = find_retained("homeassistant/device/playguard_a1b2c3d4/config");
     CHECK(disc && strstr(disc->payload, "\"cmps\":{") && strstr(disc->payload, "\"limit_mon\":{\"p\":\"number\"}") &&
           !strstr(disc->payload, "limit_mon/set"));
@@ -733,6 +755,51 @@ static void test_home_assistant_restart_and_discovery_switch(void)
     CHECK(find_retained("homeassistant/device/playguard_a1b2c3d4/config") && host.saved.ha_discovery);
 }
 
+// The integration's version: handed over as it came, at the subscription
+// (retained) and when it changes; cleared; too large, dropped. Optional: a
+// broker refusing the topic keeps the link up.
+static void test_integration_version(void)
+{
+    const char *topic = "playguard/a1b2c3d4/integration";
+    const char *doc = "{\"schema\":1,\"version\":\"0.2.0\",\"homeassistant\":\"2026.10.1\"}";
+    setup(false, SyncPolicy_Auto);
+    broker_publish(topic, doc, strlen(doc), true);
+    turns(3);
+    CHECK(sync_engine_online(&engine));
+    CHECK(host.integrations == 1 && host.integration_len == strlen(doc) && !strcmp(host.integration, doc));
+    // Not an order: no event, left on the broker.
+    CHECK(!last_on("playguard/a1b2c3d4/event") && find_retained(topic));
+
+    const char *newer = "{\"schema\":1,\"version\":\"0.3.0\"}";
+    broker_publish(topic, newer, strlen(newer), true);
+    turns(2);
+    CHECK(host.integrations == 2 && !strcmp(host.integration, newer));
+    broker_publish(topic, "", 0, true);
+    turns(2);
+    CHECK(host.integrations == 3 && host.integration_len == 0);
+    char big[SYNC_INTEGRATION_MAX + 2];
+    memset(big, 'x', sizeof(big) - 1);
+    big[sizeof(big) - 1] = '\0';
+    broker_publish(topic, big, sizeof(big) - 1, true);
+    turns(2);
+    CHECK(host.integrations == 3 && sync_engine_online(&engine));
+    // <base>/integration/set is an order like the others: no entity of that name.
+    ha_order("integration", "0.2.0");
+    turns(2);
+    CHECK(host.integrations == 3 && strstr(last_event(), "command_rejected") && !retained_order("integration"));
+
+    // A broker whose access list leaves it out, in 3.1.1 and 5.0: still online.
+    for (uint8_t v = 4; v <= 5; v++) {
+        setup(false, SyncPolicy_Auto);
+        broker.min_version = broker.max_version = v;
+        snprintf(broker.deny, sizeof(broker.deny), "%s", topic);
+        broker_publish(topic, doc, strlen(doc), true);
+        turns(3);
+        CHECK(sync_engine_online(&engine) && broker.n_subs == 2 && host.integrations == 0);
+        CHECK(host.refused_logs == 1);
+    }
+}
+
 // Another discovery prefix: the device under it, and Home Assistant's
 // restart still seen on homeassistant/status (its birth topic does not follow
 // the prefix).
@@ -741,11 +808,12 @@ static void test_custom_discovery_prefix(void)
     setup(false, SyncPolicy_Auto);
     strcpy(conf.discovery_prefix, "ha");
     SyncIo io = { NULL, io_open, io_write, io_read, io_close };
-    SyncHost h = { NULL, h_state, h_activity, h_order, h_report, h_profiles, h_conf_changed, h_read_only, h_now_posix, h_log };
+    SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,     h_profiles,
+                   h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration };
     sync_engine_init(&engine, &conf, io, &h, clock_ms, "app", "1.1.0");
     turns(3);
     CHECK(sync_engine_online(&engine) && find_retained("ha/device/playguard_a1b2c3d4/config"));
-    CHECK(broker.n_subs == 2 && !strcmp(broker.subs[1], "homeassistant/status"));
+    CHECK(broker.n_subs == 3 && !strcmp(broker.subs[1], "homeassistant/status"));
     const size_t before = count_on("ha/device/playguard_a1b2c3d4/config");
     broker_publish("homeassistant/status", "online", 6, false);
     turns(2);
@@ -1000,6 +1068,7 @@ int main(void)
     test_async_and_waiting();
     test_home_assistant_restart_and_discovery_switch();
     test_custom_discovery_prefix();
+    test_integration_version();
     test_connection_failures();
     test_keepalive();
     test_oversized_and_reconfigure();

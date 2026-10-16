@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- A newer release of PlayGuard's Home Assistant integration: the version
+     Home Assistant runs, the QR code that opens the integration in HACS on a
+     phone, and what changed since. Opened from the notification bell and
+     Remote access › Home Assistant; filled by ha_update_activity.cpp. -->
+
+<brls:AppletFrame
+    iconInterpolation="linear">
+
+    <ScrollView
+        icon="@res/img/app_icon.jpg"
+        width="auto"
+        height="auto"
+        axis="column"
+        alignItems="stretch"
+        grow="1.0">
+
+        <brls:Box
+            width="auto"
+            height="auto"
+            axis="column"
+            alignItems="stretch"
+            paddingTop="@style/brls/sidebar/padding_top"
+            paddingRight="@style/brls/sidebar/padding_right"
+            paddingBottom="@style/brls/sidebar/padding_bottom"
+            paddingLeft="@style/brls/sidebar/padding_left">
+
+            <brls:Header id="hu_header" marginBottom="8"/>
+            <brls:Box width="auto" height="auto" axis="row" alignItems="center">
+                <brls:Label id="hu_body" text="" fontSize="20" grow="1.0" shrink="1.0" marginRight="24"/>
+                <brls:Box id="hu_qr" width="auto" height="auto" shrink="0.0"/>
+            </brls:Box>
+            <brls:Header id="hu_changes" marginTop="16" marginBottom="8"/>
+            <brls:Box id="hu_notes" width="auto" height="auto" axis="column" alignItems="stretch"/>
+            <brls:Label id="hu_note" text="" fontSize="20" marginTop="16" textColor="@theme/brand/note"/>
+
+        </brls:Box>
+
+    </ScrollView>
+
+</brls:AppletFrame>
