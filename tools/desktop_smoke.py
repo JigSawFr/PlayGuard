@@ -1129,6 +1129,12 @@ if SYNC:
     shot("02_preferences_end")
     key("Return")
     shot("03_remote_access")   # the link online
+    # Home Assistant › Install the integration: the two QR codes (HACS, add the console).
+    key("Down", 14)
+    key("Return")
+    wait_for("the Home Assistant links", lambda: logged("sync: Home Assistant integration links shown"), 10)
+    shot("04_ha_links")
+    key("Escape")
 
     def checked():
         try:

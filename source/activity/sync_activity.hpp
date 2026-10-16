@@ -45,6 +45,7 @@ class SyncActivity : public brls::Activity
     BRLS_BIND(brls::DetailCell,  name,      "sy_name");
     BRLS_BIND(brls::DetailCell,  policy,    "sy_policy");
     BRLS_BIND(brls::BooleanCell, timer,     "sy_timer");
+    BRLS_BIND(brls::DetailCell,  ha_install, "sy_ha_install");
     BRLS_BIND(brls::BooleanCell, discovery, "sy_discovery");
     BRLS_BIND(brls::BooleanCell, report,    "sy_report");
     BRLS_BIND(brls::DetailCell,  status,    "sy_status");

@@ -49,6 +49,7 @@
             <brls:BooleanCell id="sy_timer"/>
 
             <brls:Header title="@i18n/playguard/sync/section_ha" marginTop="24" marginBottom="8"/>
+            <brls:DetailCell id="sy_ha_install" title="@i18n/playguard/sync/ha_install"/>
             <brls:BooleanCell id="sy_discovery"/>
             <brls:BooleanCell id="sy_report"/>
 
