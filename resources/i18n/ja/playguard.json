@@ -736,6 +736,7 @@
         "version": "バージョン",
         "firmware": "ファームウェア",
         "atmosphere": "Atmosphère",
+        "available": "{} · {} が公開中",
         "compat": "互換性",
         "compat_ok_info": "このファームウェアはPlayGuardで確認済みです。すべての機能を使えます。",
         "mode": "起動モード",

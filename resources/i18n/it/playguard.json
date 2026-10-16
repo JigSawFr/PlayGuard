@@ -736,6 +736,7 @@
         "version": "Versione",
         "firmware": "Firmware",
         "atmosphere": "Atmosphère",
+        "available": "{} · {} disponibile",
         "compat": "Compatibilità",
         "compat_ok_info": "Questo firmware è stato verificato con PlayGuard: tutte le funzioni sono disponibili.",
         "mode": "Modalità di avvio",

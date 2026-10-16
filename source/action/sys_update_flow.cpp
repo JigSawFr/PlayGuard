@@ -22,17 +22,6 @@ namespace
 {
 bool s_checking = false;
 
-// hekate as installed on the SD card (bootloader/update.bin, which hekate
-// loads when newer than the payload that started it); "" when absent.
-std::string installed_hekate()
-{
-    std::string path = paths::sd_root();
-    if (path.empty() || path.back() != '/') path += '/';
-    std::string bytes;
-    if (!paths::read_file(path + "bootloader/update.bin", bytes)) return "";
-    return sys_updates::hekate_version(bytes.substr(0, 1024));
-}
-
 // One entry: `latest` newer than `running`, else none.
 void entry(const char* id, const std::string& latest, const std::string& running, const std::string& title,
            const std::string& detail)
@@ -88,6 +77,26 @@ void check()
     });
 }
 }   // namespace
+
+// bootloader/update.bin is what hekate loads when it is newer than the
+// payload that started it: the version on the SD card.
+std::string installed_hekate()
+{
+    std::string path = paths::sd_root();
+    if (path.empty() || path.back() != '/') path += '/';
+    std::string bytes;
+    if (!paths::read_file(path + "bootloader/update.bin", bytes)) return "";
+    return sys_updates::hekate_version(bytes.substr(0, 1024));
+}
+
+std::string with_latest(const char* which, const std::string& running, bool* newer)
+{
+    const sys_updates::Latest l = sys_updates::from_text(config::get().sys_latest);
+    const std::string w = which;
+    const std::string& latest = w == "atmosphere" ? l.atmosphere : w == "hekate" ? l.hekate : l.firmware;
+    *newer = !latest.empty() && !running.empty() && update::compare_versions(latest, running) > 0;
+    return *newer ? brls::getStr("playguard/tools/available", running, latest) : running;
+}
 
 void at_start()
 {

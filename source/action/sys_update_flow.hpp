@@ -8,6 +8,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <string>
+
 namespace sys_update_flow
 {
 
@@ -17,5 +19,12 @@ void at_start();
 
 // Check for updates: a new check now, in the background.
 void check_now();
+
+// hekate as installed on the SD card (bootloader/update.bin); "" when absent.
+std::string installed_hekate();
+// Tools › Console's value: `running`, then the newer release the last check
+// found ("22.0.0 · 23.0.1 available"); *newer says whether there is one.
+// `which`: "atmosphere", "hekate" or "firmware".
+std::string with_latest(const char* which, const std::string& running, bool* newer);
 
 }   // namespace sys_update_flow

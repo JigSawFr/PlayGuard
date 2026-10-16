@@ -736,6 +736,7 @@
         "version": "版本",
         "firmware": "系统版本",
         "atmosphere": "Atmosphère",
+        "available": "{} · {} 已发布",
         "compat": "兼容性",
         "compat_ok_info": "此系统版本已通过PlayGuard验证：所有功能均可使用。",
         "mode": "启动模式",

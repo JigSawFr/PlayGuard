@@ -736,6 +736,7 @@
         "version": "Версия",
         "firmware": "Прошивка",
         "atmosphere": "Atmosphère",
+        "available": "{} · доступна {}",
         "compat": "Совместимость",
         "compat_ok_info": "Эта прошивка проверена с PlayGuard: доступны все функции.",
         "mode": "Режим запуска",

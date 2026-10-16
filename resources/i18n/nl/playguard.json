@@ -736,6 +736,7 @@
         "version": "Versie",
         "firmware": "Firmware",
         "atmosphere": "Atmosphère",
+        "available": "{} · {} beschikbaar",
         "compat": "Compatibiliteit",
         "compat_ok_info": "Deze firmware is gecontroleerd met PlayGuard: alle functies zijn beschikbaar.",
         "mode": "Startmodus",
