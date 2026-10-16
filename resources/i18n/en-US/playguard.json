@@ -893,9 +893,22 @@
         },
         "group_note": {
             "fix": "PlayGuard can repair these: A on a game, then its first button.",
-            "reinstall": "Their files are gone or unusable: remove them here, then install them again with your usual installer.",
+            "reinstall": "Their files are gone or unusable. Save their list, remove them here (an installer counts them as installed until then), then install them again by searching for their name.",
             "system": "The games are fine: the console's firmware or SD card is the problem. Update the firmware, or start on the storage they were installed on."
-        }
+        },
+        "save_list": "Save the list of these games",
+        "list_saved": "List saved: {}",
+        "list_err": "Could not save the list",
+        "list_title": "Games to reinstall",
+        "col_name": "Game",
+        "col_id": "Title ID",
+        "col_version": "Version",
+        "col_problem": "Problem",
+        "remove_all": "Remove these {} games",
+        "remove_all_body": "These {} games are removed from the console, with their updates and add-ons, so they can be installed again. Their list is saved first, in PlayGuard's exports folder. Save data stays.",
+        "removing": "Removing the games… {} of {}",
+        "removed_all": "{} games removed. Their list: {}",
+        "removed_some": "{} of {} games removed. Their list: {}"
     },
     "about": {
         "section_changelog": "What's new in {}",

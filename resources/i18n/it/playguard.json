@@ -893,9 +893,22 @@
         },
         "group_note": {
             "fix": "PlayGuard può ripararli: A su un gioco, poi il primo pulsante.",
-            "reinstall": "I loro file mancano o sono inutilizzabili: rimuovili qui, poi reinstallali con il tuo installer abituale.",
+            "reinstall": "I loro file mancano o sono inutilizzabili. Salva l'elenco, rimuovili qui (fino ad allora un installer li considera installati), poi reinstallali cercandone il nome.",
             "system": "I giochi sono a posto: il problema è il firmware della console o la scheda SD. Aggiorna il firmware o avvia dalla memoria su cui sono stati installati."
-        }
+        },
+        "save_list": "Salva l'elenco di questi giochi",
+        "list_saved": "Elenco salvato: {}",
+        "list_err": "Impossibile salvare l'elenco",
+        "list_title": "Giochi da reinstallare",
+        "col_name": "Gioco",
+        "col_id": "Title ID",
+        "col_version": "Versione",
+        "col_problem": "Problema",
+        "remove_all": "Rimuovi questi {} giochi",
+        "remove_all_body": "Questi {} giochi vengono rimossi dalla console, con aggiornamenti e contenuti aggiuntivi, per poterli reinstallare. Prima il loro elenco viene salvato nella cartella delle esportazioni di PlayGuard. I salvataggi restano.",
+        "removing": "Rimozione dei giochi… {} di {}",
+        "removed_all": "{} giochi rimossi. Il loro elenco: {}",
+        "removed_some": "{} giochi rimossi su {}. Il loro elenco: {}"
     },
     "about": {
         "section_changelog": "Novità della {}",

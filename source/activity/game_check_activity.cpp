@@ -15,6 +15,7 @@
 #include "action/history_flow.hpp"
 #include "app.hpp"
 #include "util/paths.hpp"
+#include "util/table_export.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -355,6 +356,29 @@ void GameCheckActivity::onContentAvailable()
         group.list = new brls::Box(brls::Axis::COLUMN);
         group.list->setAlignItems(brls::AlignItems::STRETCH);
         group.box->addView(group.list);
+        // The games to install again: their list kept on the SD card, then
+        // all of them removed at once (an installer counts them as installed
+        // until then).
+        if (category == GC_CAT_REINSTALL) {
+            group.save = new brls::DetailCell();
+            group.save->setText("playguard/games/save_list"_i18n);
+            group.save->setMarginTop(8);
+            group.save->registerClickAction([this](brls::View*) {
+                std::string error;
+                const std::string path = this->save_list(&error);
+                if (path.empty()) ui::error("playguard/games/list_err"_i18n + (error.empty() ? "" : ": " + error));
+                else ui::notify(brls::getStr("playguard/games/list_saved", path));
+                return true;
+            });
+            group.box->addView(group.save);
+            group.remove_all = new brls::DetailCell();
+            group.remove_all->setDetailTextColor(ui::color_bad());
+            group.remove_all->registerClickAction([this](brls::View*) {
+                this->remove_all();
+                return true;
+            });
+            group.box->addView(group.remove_all);
+        }
         list->addView(group.box);
         ui::set_visible(group.box, false);
     }
@@ -384,6 +408,7 @@ void GameCheckActivity::save()
 
 void GameCheckActivity::refresh(bool all, u64 also)
 {
+    if (this->removing) return;   // read again once every game is removed
     if (this->checking) {
         if (also) this->waiting.push_back(also);   // after the check under way
         return;
@@ -600,6 +625,12 @@ void GameCheckActivity::show()
         }
         for (size_t i = shown.size(); i < cells.size(); i++) ui::set_visible(cells[i], false);
         group.title->setTitle(brls::getStr(std::string("playguard/games/groups/") + category_key(category), (int)shown.size()));
+        if (category == GC_CAT_REINSTALL) {
+            this->reinstall.clear();
+            for (const Broken& b : shown) this->reinstall.push_back(b.game);
+            group.remove_all->setText(brls::getStr("playguard/games/remove_all", (int)shown.size()));
+            ui::set_visible(group.remove_all, !app::read_only());
+        }
         ui::set_visible(group.box, !shown.empty());
     }
     // Nothing had the focus before the first game with a problem; and never
@@ -734,6 +765,96 @@ void GameCheckActivity::remove(const GameFacts& g)
                            ui::notify_result(rc, brls::getStr("playguard/games/removed", name), "playguard/games/remove_err"_i18n);
                            if (R_SUCCEEDED(rc) && !weak.expired()) this->refresh(false, id);
                        });
+}
+
+// The games of "Reinstall", in a JSON table (exports/, as the Activity tab's
+// exports) and the same list as plain text next to it: their names, as an
+// installer searches them, their IDs and what was wrong.
+std::string GameCheckActivity::save_list(std::string* error) const
+{
+    SysInfo si;
+    sysinfo_get(&si);
+    table_export::Table t;
+    t.title = "playguard/games/list_title"_i18n;
+    t.sheet = t.title;
+    t.columns = { { "name", "playguard/games/col_name"_i18n, false },
+                  { "title_id", "playguard/games/col_id"_i18n, false },
+                  { "version", "playguard/games/col_version"_i18n, false },
+                  { "problem", "playguard/games/col_problem"_i18n, false } };
+    std::string text = t.title + "\n\n";
+    for (const GameFacts& g : this->reinstall) {
+        const GameIssue issue = gamecheck_classify(&g, si.hos_version);
+        t.rows.push_back({ game_name(g), id_text(g.app_id), g.display_version, short_text(g, issue) });
+        text += fmt::format("{}  {}{} · {}\n", id_text(g.app_id), game_name(g),
+                            g.display_version[0] ? " · " + brls::getStr("playguard/games/version", std::string(g.display_version)) : "",
+                            short_text(g, issue));
+    }
+    if (!paths::ensure_dir(paths::exports_dir())) {
+        if (error) *error = paths::exports_dir();
+        return "";
+    }
+    const std::string path = table_export::save(t, table_export::Format::Json, paths::exports_dir(), "games_to_reinstall", error);
+    if (path.empty()) return "";
+    const std::string txt = path.substr(0, path.size() - 4) + "txt";
+    if (!paths::atomic_write(txt, text, error)) return "";
+    return path;
+}
+
+void GameCheckActivity::remove_all()
+{
+    if (this->reinstall.empty() || this->removing) return;
+    const std::vector<GameFacts> games = this->reinstall;
+    std::string names;
+    for (size_t i = 0; i < games.size() && i < 6; i++) names += "\n" + game_name(games[i]);
+    if (games.size() > 6) names += "\n…";
+    const std::string body = brls::getStr("playguard/games/remove_all_body", (int)games.size()) + "\n" + names;
+    std::weak_ptr<bool> weak = this->alive;
+    ui::confirm_danger(body, "playguard/games/remove"_i18n, [this, weak, games]() {
+        if (weak.expired()) return;
+        // The list first: nothing is removed without it.
+        std::string error;
+        const std::string path = this->save_list(&error);
+        if (path.empty()) {
+            ui::error("playguard/games/list_err"_i18n + (error.empty() ? "" : ": " + error));
+            return;
+        }
+        // Read-only mode and the PIN: asked once, for them all.
+        const Result rc = core_change_allowed();
+        if (R_FAILED(rc)) {
+            ui::notify_result(rc, "", "playguard/games/remove_err"_i18n);
+            return;
+        }
+        this->removing = true;
+        this->remove_next(games, 0, 0, path);
+    });
+}
+
+// One game a frame, the count above the list in between.
+void GameCheckActivity::remove_next(std::vector<GameFacts> games, size_t at, u32 removed, std::string path)
+{
+    if (at == games.size()) {
+        this->removing = false;
+        const u32 total = (u32)games.size();
+        if (removed == total) ui::notify(brls::getStr("playguard/games/removed_all", (int)removed, path));
+        else ui::error(brls::getStr("playguard/games/removed_some", (int)removed, (int)total, path));
+        this->refresh(false, 0);
+        return;
+    }
+    this->status_text(brls::getStr("playguard/games/removing", (int)at + 1, (int)games.size()));
+    std::weak_ptr<bool> weak = this->alive;
+    brls::sync([this, weak, games, at, removed, path]() {
+        if (weak.expired()) return;
+        const GameFacts& g = games[at];
+        const Result rc = gamecheck_remove(g.app_id);
+        u32 done = removed;
+        if (R_SUCCEEDED(rc)) {
+            history_flow::record_event("remove_game", "", history_label(g));
+            done++;
+        } else {
+            brls::Logger::warning("games: {} not removed ({})", id_text(g.app_id), ui::rc_text(rc));
+        }
+        this->remove_next(games, at + 1, done, path);
+    });
 }
 
 void GameCheckActivity::remove_content(const GameFacts& g, const GameContent& c)

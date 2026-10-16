@@ -893,9 +893,22 @@
         },
         "group_note": {
             "fix": "PlayGuard 可以修复：在游戏上按 A，然后选第一个按钮。",
-            "reinstall": "文件缺失或无法使用：在此删除，然后用常用的安装工具重新安装。",
+            "reinstall": "文件缺失或无法使用。先保存列表，在此删除（在此之前安装工具会认为它们已安装），然后按名称搜索重新安装。",
             "system": "游戏本身没问题：问题在主机固件或 SD 卡。请更新固件，或从安装这些游戏时的存储启动。"
-        }
+        },
+        "save_list": "保存这些游戏的列表",
+        "list_saved": "列表已保存：{}",
+        "list_err": "无法保存列表",
+        "list_title": "需重新安装的游戏",
+        "col_name": "游戏",
+        "col_id": "Title ID",
+        "col_version": "版本",
+        "col_problem": "问题",
+        "remove_all": "删除这 {} 个游戏",
+        "remove_all_body": "这 {} 个游戏将连同更新和追加内容从主机删除，以便重新安装。删除前会先把列表保存到 PlayGuard 的导出文件夹。存档会保留。",
+        "removing": "正在删除游戏… {}/{}",
+        "removed_all": "已删除 {} 个游戏。列表：{}",
+        "removed_some": "已删除 {} 个游戏（共 {} 个）。列表：{}"
     },
     "about": {
         "section_changelog": "{} 更新内容",

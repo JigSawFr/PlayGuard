@@ -1160,6 +1160,28 @@ time.sleep(1.5)
 shot("27_games_removed")
 if not any(m.endswith("removed") for m in messages()):
     fail("the broken game was not removed: " + repr(messages()[-3:]))
+# The rest of Reinstall: their list saved, then all of them removed at once
+# (the list saved again first), each in the change history.
+exports_dir = os.path.join(run_dir, "playguard_data", "exports")
+key("Down", 2)             # past Castle Siege: Save the list of these games
+shot("27_games_reinstall_actions")
+key("Return")
+time.sleep(0.5)
+lists = glob.glob(os.path.join(exports_dir, "games_to_reinstall_*.json"))
+if not lists or not os.path.exists(lists[0][:-4] + "txt"):
+    fail("the list of the games to reinstall was not saved in " + exports_dir)
+with open(lists[0], encoding="utf-8") as f:
+    if "Ocean Explorer" not in f.read():
+        fail("the saved list does not name Ocean Explorer: " + lists[0])
+key("Down")                # Remove these 3 games
+key("Return")
+shot("27_games_remove_all")
+key("Right")               # Remove
+key("Return")
+time.sleep(2)
+shot("27_games_removed_all")
+if not any(m.startswith("3 games removed.") for m in messages()):
+    fail("the games to reinstall were not all removed: " + repr(messages()[-3:]))
 # Firmware or SD card: Star Pilots, the last game.
 key("Down", 4)
 shot("27_games_system")

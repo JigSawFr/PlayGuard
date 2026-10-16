@@ -893,9 +893,22 @@
         },
         "group_note": {
             "fix": "PlayGuard kan ze repareren: A op een game, dan de eerste knop.",
-            "reinstall": "Hun bestanden ontbreken of zijn onbruikbaar: verwijder ze hier en installeer ze opnieuw met je gebruikelijke installer.",
+            "reinstall": "Hun bestanden ontbreken of zijn onbruikbaar. Sla hun lijst op, verwijder ze hier (tot dan ziet een installer ze als geïnstalleerd) en installeer ze opnieuw door op hun naam te zoeken.",
             "system": "De games zijn in orde: de firmware van de console of de SD-kaart is het probleem. Werk de firmware bij, of start op de opslag waarop ze zijn geïnstalleerd."
-        }
+        },
+        "save_list": "Lijst van deze games opslaan",
+        "list_saved": "Lijst opgeslagen: {}",
+        "list_err": "De lijst kon niet worden opgeslagen",
+        "list_title": "Opnieuw te installeren games",
+        "col_name": "Game",
+        "col_id": "Title ID",
+        "col_version": "Versie",
+        "col_problem": "Probleem",
+        "remove_all": "Deze {} games verwijderen",
+        "remove_all_body": "Deze {} games worden met hun updates en extra content van de console verwijderd, zodat ze opnieuw kunnen worden geïnstalleerd. Hun lijst wordt eerst opgeslagen in de exportmap van PlayGuard. Opgeslagen data blijft.",
+        "removing": "Games verwijderen… {} van {}",
+        "removed_all": "{} games verwijderd. Hun lijst: {}",
+        "removed_some": "{} van {} games verwijderd. Hun lijst: {}"
     },
     "about": {
         "section_changelog": "Nieuw in {}",

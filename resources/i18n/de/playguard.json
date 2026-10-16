@@ -893,9 +893,22 @@
         },
         "group_note": {
             "fix": "PlayGuard kann sie reparieren: A auf einem Spiel, dann die erste Schaltfläche.",
-            "reinstall": "Ihre Dateien fehlen oder sind unbrauchbar: hier entfernen und mit dem gewohnten Installer neu installieren.",
+            "reinstall": "Ihre Dateien fehlen oder sind unbrauchbar. Liste speichern, hier entfernen (ein Installer hält sie bis dahin für installiert) und dann über ihren Namen neu installieren.",
             "system": "Die Spiele sind in Ordnung: Das Problem liegt an der Firmware der Konsole oder an der SD-Karte. Firmware aktualisieren oder vom Speicher starten, auf dem sie installiert wurden."
-        }
+        },
+        "save_list": "Liste dieser Spiele speichern",
+        "list_saved": "Liste gespeichert: {}",
+        "list_err": "Die Liste konnte nicht gespeichert werden",
+        "list_title": "Neu zu installierende Spiele",
+        "col_name": "Spiel",
+        "col_id": "Title ID",
+        "col_version": "Version",
+        "col_problem": "Problem",
+        "remove_all": "Diese {} Spiele entfernen",
+        "remove_all_body": "Diese {} Spiele werden samt Updates und Zusatzinhalten von der Konsole entfernt, damit sie neu installiert werden können. Ihre Liste wird vorher im Export-Ordner von PlayGuard gespeichert. Spielstände bleiben erhalten.",
+        "removing": "Spiele werden entfernt… {} von {}",
+        "removed_all": "{} Spiele entfernt. Ihre Liste: {}",
+        "removed_some": "{} von {} Spielen entfernt. Ihre Liste: {}"
     },
     "about": {
         "section_changelog": "Neu in {}",

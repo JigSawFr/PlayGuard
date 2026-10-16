@@ -44,6 +44,8 @@ class GameCheckActivity : public brls::Activity
         brls::Header* title = nullptr;
         brls::Label*  note  = nullptr;
         brls::Box*    list  = nullptr;
+        brls::DetailCell* save = nullptr;         // Reinstall only: save the list
+        brls::DetailCell* remove_all = nullptr;   // Reinstall only: remove them all
     };
 
     struct Pending
@@ -64,6 +66,8 @@ class GameCheckActivity : public brls::Activity
     std::string timing;       // where the last check spent its time (developer mode)
     Pending pending;
     Group groups[GC_CAT_COUNT];
+    std::vector<GameFacts> reinstall;   // the games of "Reinstall", as shown
+    bool removing = false;              // remove_all() under way
 
     void save();
     // Lists the console's entries, then checks what changed (`all`: every
@@ -80,6 +84,11 @@ class GameCheckActivity : public brls::Activity
     void choose(const GameFacts& game, u32 actions);
     void run(const GameFacts& game, u32 action, const GameContent& content);
     void remove(const GameFacts& game);
+    // The games of "Reinstall": their list saved (the JSON's path, "" and
+    // why on failure), and all of them removed after one question.
+    std::string save_list(std::string* error) const;
+    void remove_all();
+    void remove_next(std::vector<GameFacts> games, size_t at, u32 removed, std::string path);
     void remove_content(const GameFacts& game, const GameContent& content);
     void reset_launch(const GameFacts& game);
     void verify(const GameFacts& game);

@@ -893,9 +893,22 @@
         },
         "group_note": {
             "fix": "PlayGuard puede repararlos: A en un juego y luego su primer botón.",
-            "reinstall": "Sus archivos faltan o no sirven: quítalos aquí y vuelve a instalarlos con tu instalador habitual.",
+            "reinstall": "Sus archivos faltan o no sirven. Guarda su lista, quítalos aquí (hasta entonces un instalador los da por instalados) y reinstálalos buscando su nombre.",
             "system": "Los juegos están bien: el problema es el firmware de la consola o la tarjeta SD. Actualiza el firmware o inicia en la memoria donde se instalaron."
-        }
+        },
+        "save_list": "Guardar la lista de estos juegos",
+        "list_saved": "Lista guardada: {}",
+        "list_err": "No se pudo guardar la lista",
+        "list_title": "Juegos para reinstalar",
+        "col_name": "Juego",
+        "col_id": "Title ID",
+        "col_version": "Versión",
+        "col_problem": "Problema",
+        "remove_all": "Quitar estos {} juegos",
+        "remove_all_body": "Estos {} juegos se quitan de la consola, con sus actualizaciones y contenidos descargables, para poder reinstalarlos. Antes se guarda su lista en la carpeta de exportaciones de PlayGuard. Los datos guardados se conservan.",
+        "removing": "Quitando los juegos… {} de {}",
+        "removed_all": "{} juegos quitados. Su lista: {}",
+        "removed_some": "{} de {} juegos quitados. Su lista: {}"
     },
     "about": {
         "section_changelog": "Novedades de la {}",
