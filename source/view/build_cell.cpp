@@ -63,7 +63,9 @@ std::string build_title(const dev_builds::Build& b)
         case dev_builds::Kind::PullRequest:
         case dev_builds::Kind::Main:
         case dev_builds::Kind::Commit: {
-            if (b.title.empty()) return b.commit;   // a list kept by an older version
+            // A list kept by 1.1.0, which gave only pull requests a title.
+            // Every list fetched from 1.2.0 on has them: this can go in 1.3.0.
+            if (b.title.empty()) return b.commit;
             std::string text = dev_builds::parse_subject(b.title).text;
             if (!text.empty()) text[0] = (char)std::toupper((unsigned char)text[0]);
             return text.empty() ? b.title : text;
