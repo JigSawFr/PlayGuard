@@ -1,0 +1,43 @@
+// HelpTab — Preferences › Help & diagnostics, a screen of its own: first
+// steps, the diagnostic report (export, send online) and how many reports
+// and crash files are kept, then the developer tools (shown after seven
+// presses on About › Version; among them, clearing the cache and the log
+// files). History and backups have their own tab, the console too.
+// Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
+#pragma once
+
+#include "tab/tab_base.hpp"
+
+class HelpTab : public TabBase
+{
+  public:
+    HelpTab();
+    static brls::View* create();
+
+  protected:
+    void refresh() override;
+
+  private:
+    BRLS_BIND(brls::DetailCell,  first_steps, "hp_first_steps");
+    BRLS_BIND(brls::DetailCell,  export_cell, "hp_export");
+    BRLS_BIND(brls::Label,       export_note, "hp_export_note");
+    BRLS_BIND(brls::DetailCell,  upload,      "hp_upload");
+    BRLS_BIND(brls::Label,       upload_note, "hp_upload_note");
+    BRLS_BIND(brls::DetailCell,  logs_keep,   "hp_logs_keep");
+    BRLS_BIND(brls::DetailCell,  logs_keep_days, "hp_logs_keep_days");
+    BRLS_BIND(brls::DetailCell,  logs_keep_mb, "hp_logs_keep_mb");
+    BRLS_BIND(brls::Label,       logs_note,   "hp_logs_note");
+    BRLS_BIND(brls::Header,      dev_header,  "hp_dev_header");
+    BRLS_BIND(brls::BooleanCell, dev_mode,    "hp_dev_mode");
+    BRLS_BIND(brls::BooleanCell, dev_read_only, "hp_dev_read_only");
+    BRLS_BIND(brls::BooleanCell, dev_pt_log,  "hp_dev_pt_log");
+    BRLS_BIND(brls::Label,       dev_pt_log_note, "hp_dev_pt_log_note");
+    BRLS_BIND(brls::DetailCell,  dev_clear_cache, "hp_dev_clear_cache");
+    BRLS_BIND(brls::DetailCell,  dev_clear_logs, "hp_dev_clear_logs");
+    BRLS_BIND(brls::DetailCell,  dev_report,  "hp_dev_report");
+    BRLS_BIND(brls::DetailCell,  dev_pt_block,"hp_dev_pt_block");
+    BRLS_BIND(brls::DetailCell,  dev_github,  "hp_dev_github");
+    BRLS_BIND(brls::DetailCell,  dev_build,   "hp_dev_build");
+    BRLS_BIND(brls::DetailCell,  dev_gate,    "hp_dev_gate");
+    BRLS_BIND(brls::DetailCell,  dev_forget,  "hp_dev_forget");
+};

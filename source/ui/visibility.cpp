@@ -118,6 +118,14 @@ void go_to_tab(brls::View* from, int position)
     });
 }
 
+void open_screen(brls::View* content, const std::string& title)
+{
+    auto* frame = new brls::AppletFrame(content);
+    frame->setTitle(title);
+    frame->setIcon(brls::View::getFilePathXMLAttributeValue("@res/img/app_icon.jpg"));
+    brls::Application::pushActivity(new brls::Activity(frame));
+}
+
 void init_unlock_banner(brls::DetailCell* cell, std::function<void()> after)
 {
     cell->setText("playguard/security/banner_title"_i18n);
