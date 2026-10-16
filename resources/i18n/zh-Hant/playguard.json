@@ -1211,8 +1211,6 @@
         "unknown_note": "由較新版本的 PlayGuard 記錄：請更新 PlayGuard 以查看詳情。",
         "days_changed": "變更的日期：",
         "day_change": "{}：{} → {}",
-        "today_at": "今天 {}",
-        "yesterday_at": "昨天 {}",
         "kinds": {
             "limits": "遊玩時間上限",
             "level": "限制等級",

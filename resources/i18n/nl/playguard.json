@@ -1211,8 +1211,6 @@
         "unknown_note": "Vastgelegd door een nieuwere versie van PlayGuard: werk PlayGuard bij om hem volledig te zien.",
         "days_changed": "Gewijzigde dagen:",
         "day_change": "{}: {} → {}",
-        "today_at": "Vandaag, {}",
-        "yesterday_at": "Gisteren, {}",
         "kinds": {
             "limits": "Speeltijdlimieten",
             "level": "Beperkingsniveau",

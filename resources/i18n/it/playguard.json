@@ -1211,8 +1211,6 @@
         "unknown_note": "Registrata da una versione più recente di PlayGuard: aggiorna PlayGuard per vederla in dettaglio.",
         "days_changed": "Giorni modificati:",
         "day_change": "{}: {} → {}",
-        "today_at": "Oggi, {}",
-        "yesterday_at": "Ieri, {}",
         "kinds": {
             "limits": "Limiti di tempo di gioco",
             "level": "Livello limitazioni",
