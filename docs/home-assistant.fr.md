@@ -105,7 +105,26 @@ quand il est désactivé.
 Les chiffres du journal de jeu (temps par jeu aujourd'hui, les 7 derniers
 jours, les jours terminés) sont aussi sur le broker
 (`playguard/<id>/activity`, `…/week`, `…/activity/<date>`), pour vos propres
-modèles ou une future intégration.
+modèles ou l'intégration ci-dessous.
+
+## L'intégration PlayGuard (facultative)
+
+L'[intégration PlayGuard](https://github.com/JigSawFr/playguard-ha), un dépôt
+personnalisé HACS, remplace l'appareil MQTT de la console par les mêmes
+entités et ajoute les noms des jeux, le temps de jeu de la semaine, les
+statistiques à long terme, des actions et des corrections. Elle demande
+[HACS](https://hacs.xyz/) et Home Assistant 2026.10 ou plus récent.
+
+[![Ouvrez votre instance Home Assistant et ouvrez un dépôt dans le Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=JigSawFr&repository=playguard-ha&category=integration)
+[![Ouvrez votre instance Home Assistant et commencez à configurer une nouvelle intégration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=playguard)
+
+Depuis la console : **Accès à distance › Home Assistant › Installer
+l'intégration Home Assistant** affiche les deux mêmes liens en QR codes, pour
+un téléphone où Home Assistant s'ouvre (My Home Assistant demande une fois son
+adresse). Le premier ouvre le dépôt dans HACS : *Télécharger*, puis
+redémarrez Home Assistant ; la console apparaît alors d'elle-même dans
+*Paramètres › Appareils et services*. Le second l'ajoute à la main sinon,
+avec l'identifiant de la console affiché dessous.
 
 ## Les ordres
 
