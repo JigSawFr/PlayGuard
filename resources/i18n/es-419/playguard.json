@@ -679,7 +679,7 @@
         "logs_days_never": "Nunca",
         "logs_days_n": "{} días",
         "logs_keep_mb": "Espacio para reportes",
-        "logs_note": "Se aplica a los reportes de diagnóstico, a los archivos de fallo y a los enlaces de los reportes enviados en línea en {}, cada uno por separado, al iniciar y al cambiar un límite. El más reciente siempre se conserva.",
+        "logs_note": "Se aplica a los reportes de diagnóstico, a los archivos de fallo, a los registros de sesión y a los enlaces de los reportes enviados en línea en {}, cada uno por separado, al iniciar y al cambiar un límite. El más reciente siempre se conserva.",
         "language": "Idioma",
         "languages": {
             "system": "Idioma de la consola",
@@ -1037,7 +1037,7 @@
         "clear_cache": "Vaciar la caché",
         "clear_logs": "Eliminar los archivos de registro",
         "clear_cache_body": "¿Eliminar la caché: {}?\n\nLos nombres e íconos de los juegos, las últimas cifras de Actividad y la lista de compilaciones de desarrollo. PlayGuard los vuelve a leer de la consola cuando los necesita: en el próximo inicio, la pestaña Actividad tarda un poco más.",
-        "clear_logs_body": "¿Eliminar los archivos de registro: {}?\n\nEl registro de fallas, los informes de diagnóstico guardados y el registro del temporizador de juego. Se conservan: los enlaces de los informes enviados en línea (la única forma de eliminarlos) y la referencia del bloque del temporizador.",
+        "clear_logs_body": "¿Eliminar los archivos de registro: {}?\n\nLos archivos de fallas, los registros de sesión (salvo el de esta sesión), los informes de diagnóstico guardados y el registro del temporizador de juego. Se conservan: los enlaces de los informes enviados en línea (la única forma de eliminarlos) y la referencia del bloque del temporizador.",
         "clear_empty": "No hay nada que eliminar.",
         "cleared": "Eliminado: {}.",
         "clear_failed": "Eliminado: {}.\n\nNo eliminados, rechazados por la tarjeta SD: {}.",

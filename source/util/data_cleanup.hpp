@@ -31,8 +31,10 @@ Plan cache(const std::string& data_dir);
 // uploads/ (the links of the reports sent online, and the removal links of
 // the bpa.st pastes sent before; Tools › Diagnostics' limits prune it)
 // and play_timer/block.json (the reference a block comparison is made
-// against, and its ".tmp": an interrupted write, read in its place).
-Plan logs(const std::string& data_dir);
+// against, and its ".tmp": an interrupted write, read in its place), nor
+// `session`, this run's session file (sessions/<name>, util/session_log.hpp),
+// still being written.
+Plan logs(const std::string& data_dir, const std::string& session = "");
 
 struct Outcome
 {

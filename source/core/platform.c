@@ -119,6 +119,37 @@ bool platform_random(void *buf, size_t size)
     return true;
 }
 
+bool platform_code_range(uint64_t *base, uint64_t *size)
+{
+    // The region this function is in: the .nro's text, which hbloader maps
+    // from its first byte (NRO header included), so an offset from it is an
+    // address of the linked .elf.
+    MemoryInfo mi;
+    u32 pi;
+    if (!base || !size || R_FAILED(svcQueryMemory(&mi, &pi, (u64)(uintptr_t)&platform_code_range))) return false;
+    *base = mi.addr;
+    *size = mi.size;
+    return true;
+}
+
+bool platform_read64(uint64_t addr, uint64_t *value, void *ctx)
+{
+    (void)ctx;
+    MemoryInfo mi;
+    u32 pi;
+    if (!value || (addr & 7) || R_FAILED(svcQueryMemory(&mi, &pi, addr))) return false;
+    if (mi.type == MemType_Unmapped || !(mi.perm & Perm_R) || addr + 8 > mi.addr + mi.size) return false;
+    *value = *(const volatile u64 *)(uintptr_t)addr;
+    return true;
+}
+
+bool platform_memory(uint64_t *used, uint64_t *total)
+{
+    if (!used || !total) return false;
+    return R_SUCCEEDED(svcGetInfo(used, InfoType_UsedMemorySize, CUR_PROCESS_HANDLE, 0)) &&
+           R_SUCCEEDED(svcGetInfo(total, InfoType_TotalMemorySize, CUR_PROCESS_HANDLE, 0));
+}
+
 void platform_crash(void)
 {
     diagAbortWithResult(MAKERESULT(Module_Libnx, LibnxError_ShouldNotHappen));

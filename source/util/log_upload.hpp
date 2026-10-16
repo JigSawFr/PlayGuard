@@ -1,5 +1,5 @@
-// log_upload — sends a diagnostic report, with the latest crash reports and
-// the developer tools' debug files, to a secret gist in the parent's GitHub
+// log_upload — sends a diagnostic report, with the latest crash reports, the
+// last runs' session logs and the developer tools' debug files, to a secret gist in the parent's GitHub
 // account (PlayGuard signed in to GitHub: github_auth.hpp) and gives back its
 // link, so a report reaches whoever helps (a bug report, a chat) without
 // taking the SD card out. The link also prefills the bug-report form of the
@@ -46,9 +46,22 @@ constexpr size_t PT_LOG_BYTES = 48 * 1024;
 // token (github_auth.hpp keeps it in a file of its own).
 std::vector<Part> debug_files();
 
-// PlayGuard's own crash files (logs/crashes/crash_<date>.txt, main.cpp: an
-// exception nothing caught), newest first, at most `limit`.
+// PlayGuard's own crash files (logs/crashes/crash_<date>.txt,
+// util/crash_report.hpp: a CPU exception, an exception nothing caught, a run
+// that never ended), newest first, at most `limit`.
 std::vector<Part> crash_files(size_t limit = 3);
+
+// The session files (logs/sessions/session_<date>.txt,
+// util/session_log.hpp: everything logged during a run), newest first, at
+// most `limit`: this run's and the one before, which a crash ended. Each is
+// cut to its header and its last SESSION_BYTES (head_and_tail()).
+constexpr size_t SESSION_BYTES = 64 * 1024;
+std::vector<Part> session_files(size_t limit = 2);
+
+// `text` when it fits in `max_bytes`, else its header (up to the first blank
+// line, when short), a line saying lines were left out, and as many of its
+// last whole lines as fit.
+std::string head_and_tail(const std::string& text, size_t max_bytes);
 
 // Atmosphère's crash reports, sd:/atmosphere/crash_reports/<POSIX time>_<program id>.log,
 // of a homebrew: its process is hbloader, which PlayGuard runs as (over a

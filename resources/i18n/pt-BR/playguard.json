@@ -679,7 +679,7 @@
         "logs_days_never": "Nunca",
         "logs_days_n": "{} dias",
         "logs_keep_mb": "Espaço para relatórios",
-        "logs_note": "Vale para os relatórios de diagnóstico, os arquivos de falha e os links dos relatórios enviados on-line em {}, cada um separadamente, ao iniciar e quando um limite muda. O mais recente sempre fica.",
+        "logs_note": "Vale para os relatórios de diagnóstico, os arquivos de falha, os logs de sessão e os links dos relatórios enviados on-line em {}, cada um separadamente, ao iniciar e quando um limite muda. O mais recente sempre fica.",
         "language": "Idioma",
         "languages": {
             "system": "Idioma do sistema",
@@ -1037,7 +1037,7 @@
         "clear_cache": "Limpar o cache",
         "clear_logs": "Excluir os arquivos de log",
         "clear_cache_body": "Excluir o cache: {}?\n\nOs nomes e ícones dos jogos, os últimos números da Atividade e a lista de compilações de desenvolvimento. O PlayGuard volta a lê-los no console quando precisa: na próxima inicialização, a aba Atividade demora um pouco mais.",
-        "clear_logs_body": "Excluir os arquivos de log: {}?\n\nO log de falhas, os relatórios de diagnóstico salvos e a gravação do tempo de jogo. Mantidos: os links dos relatórios enviados online (a única forma de removê-los) e a referência do bloco do tempo de jogo.",
+        "clear_logs_body": "Excluir os arquivos de log: {}?\n\nOs arquivos de falha, os logs de sessão (exceto o da sessão atual), os relatórios de diagnóstico salvos e a gravação do tempo de jogo. Mantidos: os links dos relatórios enviados online (a única forma de removê-los) e a referência do bloco do tempo de jogo.",
         "clear_empty": "Nada a excluir.",
         "cleared": "Excluído: {}.",
         "clear_failed": "Excluído: {}.\n\nNão excluídos, recusados pelo cartão SD: {}.",

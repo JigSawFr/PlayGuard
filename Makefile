@@ -196,6 +196,13 @@ activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summar
 activity_summary_FLAGS := -std=c++17 -Isource
 pt_log_SRC   := source/util/paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp
 pt_log_FLAGS := -std=c++17 -Isource
+session_log_SRC   := source/util/paths.cpp source/util/log_files.cpp source/util/session_log.cpp source/util/crash_report.cpp tests/session_log/test.cpp
+session_log_FLAGS := -std=c++17 -Isource
+# A C source a C++ suite links (clang++ refuses to build a .c as C++).
+session_log_CSRC  := source/util/crash_dump.c
+session_log_CFLAGS := -std=c11 -Isource/util
+crash_dump_SRC   := source/util/crash_dump.c tests/crash_dump/test.c
+crash_dump_FLAGS := -std=c11 -Isource/util
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
 log_files_FLAGS := -std=c++17 -Isource
 
@@ -219,8 +226,11 @@ FORCE:
 # The suite's program. Second expansion: the pattern's stem names the
 # variables above.
 .SECONDEXPANSION:
-$(TEST_PROGRAMS): $(TESTOUT)/%: $$($$*_SRC) $(TEST_HEADERS) $(TEST_FLAGS_FILE) | $(TESTOUT)
-	$(if $(filter %.cpp,$($*_SRC)),$(CXX),$(CC)) $($*_FLAGS) $(CWARN) $($*_SRC) $($*_LIBS) -o $@
+# An optional <name>_CSRC (one C file, with <name>_CFLAGS) is built by $(CC)
+# into <name>.c.o and linked into a C++ suite.
+$(TEST_PROGRAMS): $(TESTOUT)/%: $$($$*_SRC) $$($$*_CSRC) $(TEST_HEADERS) $(TEST_FLAGS_FILE) | $(TESTOUT)
+	$(if $($*_CSRC),$(CC) $($*_CFLAGS) $(CWARN) -c $($*_CSRC) -o $@.c.o)
+	$(if $(filter %.cpp,$($*_SRC)),$(CXX),$(CC)) $($*_FLAGS) $(CWARN) $($*_SRC) $(if $($*_CSRC),$@.c.o) $($*_LIBS) -o $@
 
 # Running it: the output goes to <name>.log and the terminal; <name>.ok only
 # when it passed.

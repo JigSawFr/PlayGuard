@@ -679,7 +679,7 @@
         "logs_days_never": "Mai",
         "logs_days_n": "{} giorni",
         "logs_keep_mb": "Spazio per i rapporti",
-        "logs_note": "Si applica ai rapporti di diagnostica, ai file di arresto anomalo e ai link dei rapporti inviati online in {}, ciascuno per conto proprio, all'avvio e quando cambia un limite. Il più recente resta sempre.",
+        "logs_note": "Si applica ai rapporti di diagnostica, ai file di arresto anomalo, ai log di sessione e ai link dei rapporti inviati online in {}, ciascuno per conto proprio, all'avvio e quando cambia un limite. Il più recente resta sempre.",
         "language": "Lingua",
         "languages": {
             "system": "Lingua della console",
@@ -1037,7 +1037,7 @@
         "clear_cache": "Svuota la cache",
         "clear_logs": "Elimina i file di log",
         "clear_cache_body": "Eliminare la cache: {}?\n\nI nomi e le icone dei giochi, gli ultimi dati di Attività e l'elenco delle build di sviluppo. PlayGuard li rilegge dalla console quando servono: al prossimo avvio, la scheda Attività impiega un po' di più.",
-        "clear_logs_body": "Eliminare i file di log: {}?\n\nIl log degli arresti anomali, i rapporti di diagnostica salvati e la registrazione del tempo di gioco. Restano: i link dei rapporti inviati online (l'unico modo per rimuoverli) e il riferimento del blocco tempo di gioco.",
+        "clear_logs_body": "Eliminare i file di log: {}?\n\nI file di arresto anomalo, i log di sessione (tranne quello della sessione in corso), i rapporti di diagnostica salvati e la registrazione del tempo di gioco. Restano: i link dei rapporti inviati online (l'unico modo per rimuoverli) e il riferimento del blocco tempo di gioco.",
         "clear_empty": "Niente da eliminare.",
         "cleared": "Eliminato: {}.",
         "clear_failed": "Eliminato: {}.\n\nNon eliminati, rifiutati dalla scheda SD: {}.",

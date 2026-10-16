@@ -91,6 +91,11 @@ bool platform_random(void* buf, size_t size)
     }
 }
 
+// The simulator's addresses mean nothing to a crash file.
+bool platform_code_range(uint64_t*, uint64_t*) { return false; }
+bool platform_read64(uint64_t, uint64_t*, void*) { return false; }
+bool platform_memory(uint64_t*, uint64_t*) { return false; }
+
 void platform_crash(void)
 {
     std::abort();

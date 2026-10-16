@@ -104,6 +104,38 @@ static void test_crashes()
           ams[0].content.find("(cut: too large to send whole)") != std::string::npos);
 }
 
+static void test_sessions()
+{
+    CHECK(log_upload::session_files().empty());
+    write(paths::sessions_dir() + "/session_20261009_090000.txt", "oldest");
+    write(paths::sessions_dir() + "/session_20261010_090000.txt", "before\n=== end: crash, see x ===\n");
+    write(paths::sessions_dir() + "/session_20261011_090000.txt", "this run");
+    write(paths::sessions_dir() + "/notes.txt", "not a session");
+    auto files = log_upload::session_files();
+    REQUIRE(files.size() == 2);
+    CHECK(files[0].name == "logs/sessions/session_20261011_090000.txt" && files[0].content == "this run");
+    CHECK(files[1].content == "before\n=== end: crash, see x ===\n");
+
+    // A long one: its header and its last whole lines.
+    std::string text = "=== PlayGuard session ===\nbuild   : x\n\n";
+    for (int i = 0; i < 5000; i++) text += "12:00:00.000 I line " + std::to_string(i) + "\n";
+    text += "=== end: clean exit ===\n";
+    const std::string kept = log_upload::head_and_tail(text, 4096);
+    CHECK(kept.size() <= 4096 && kept.size() > 3000);
+    CHECK(kept.compare(0, 40, "=== PlayGuard session ===\nbuild   : x\n\n(") == 0);
+    CHECK(kept.find("(... the lines in between left out ...)\n12:00:00.000 I line ") != std::string::npos);
+    CHECK(kept.find("I line 4999\n=== end: clean exit ===\n") != std::string::npos);
+    CHECK(log_upload::head_and_tail("short", 4096) == "short");
+    // No blank line: no header, the end only.
+    const std::string flat(10000, 'x');
+    const std::string cut = log_upload::head_and_tail(flat + "\nlast\n", 100);
+    CHECK(cut.compare(0, 9, "(... the ") == 0 && cut.size() <= 100);
+    write(paths::sessions_dir() + "/session_20261012_090000.txt", text);
+    files = log_upload::session_files(1);
+    REQUIRE(files.size() == 1);
+    CHECK(files[0].content.size() <= log_upload::SESSION_BYTES);
+}
+
 static void test_gist_files()
 {
     bool cut = true;
@@ -211,6 +243,7 @@ int main()
 
     test_files();
     test_crashes();
+    test_sessions();
     test_gist_files();
     test_reply();
     test_bodies();
