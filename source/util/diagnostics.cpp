@@ -6,7 +6,6 @@
 #include <sys/statvfs.h>
 #include <vector>
 
-#include "action/fw_gate.hpp"
 #include "app.hpp"
 #include "util/log_files.hpp"
 #include "util/patches.hpp"
@@ -21,6 +20,8 @@ namespace diagnostic
 
 namespace
 {
+std::string (*s_firmware_choice)() = nullptr;
+
 // "1.5 GiB", "312.4 MiB", "18 KiB".
 std::string bytes(uint64_t n)
 {
@@ -81,6 +82,8 @@ std::string logs_section()
 }
 }   // namespace
 
+void set_firmware_choice(std::string (*summary)()) { s_firmware_choice = summary; }
+
 std::string current_report()
 {
     SysInfo si;
@@ -118,7 +121,7 @@ std::string current_report()
         "game patches: {}\n"
         "compat      : {}\n\n",
         app::version(), app::commit().empty() ? std::string() : " (commit " + app::commit() + ")",
-        app::read_only() ? 1 : 0, app::dev_mode() ? 1 : 0, fw_gate::summary(),
+        app::read_only() ? 1 : 0, app::dev_mode() ? 1 : 0, s_firmware_choice ? s_firmware_choice() : "unknown",
 #ifdef __SWITCH__
         "switch",
 #else
