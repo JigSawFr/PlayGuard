@@ -5,6 +5,7 @@
 #include <initializer_list>
 #include <iterator>
 
+#include "util/date.hpp"
 #include "util/paths.hpp"
 
 namespace config
@@ -89,13 +90,7 @@ void one_of(std::string& value, std::initializer_list<const char*> allowed, cons
 }
 
 // "YYYY-MM-DD", digits where they belong.
-bool is_date(const std::string& s)
-{
-    if (s.size() != 10 || s[4] != '-' || s[7] != '-') return false;
-    for (int i : { 0, 1, 2, 3, 5, 6, 8, 9 })
-        if (s[i] < '0' || s[i] > '9') return false;
-    return true;
-}
+bool is_date(const std::string& s) { return date::parse_shape(s); }
 }   // namespace
 
 void sanitize(Config& c)

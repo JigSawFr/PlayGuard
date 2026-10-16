@@ -121,30 +121,44 @@ playstats_LIBS  := -lz
 # C++: the UI-free helpers and flow logic (source/util, source/action).
 # borealis' headers (nlohmann/json) as system headers: their warnings are not
 # PlayGuard's (clang 22 deprecates json.hpp's literal operators, under -Werror).
+# util/date stands on core/calendar.c: a suite that links it builds that C
+# file too (<name>_CSRC).
+CALENDAR_C      := source/core/calendar.c
+CALENDAR_CFLAGS := -std=gnu11 -Isource/core
+date_SRC    := source/util/date.cpp tests/date/test.cpp
+date_FLAGS  := -std=c++17 -Isource
+date_CSRC   := $(CALENDAR_C)
+date_CFLAGS := $(CALENDAR_CFLAGS)
 patches_SRC   := source/util/paths.cpp source/util/patches.cpp tests/patches/test.cpp
 patches_FLAGS := -std=c++17 -Isource
 duration_SRC   := source/util/duration.cpp tests/duration/test.cpp
 duration_FLAGS := -std=c++17 -Isource
 changelog_SRC   := source/util/changelog.cpp tests/changelog/test.cpp
 changelog_FLAGS := -std=c++17 -Isource
-support_SRC   := source/util/support.cpp tests/support/test.cpp
+support_SRC   := source/util/date.cpp source/util/support.cpp tests/support/test.cpp
 support_FLAGS := -std=c++17 -Isource
+support_CSRC   := $(CALENDAR_C)
+support_CFLAGS := $(CALENDAR_CFLAGS)
 pt_logic_SRC   := source/action/pt_logic.cpp tests/pt_logic/test.cpp
 pt_logic_FLAGS := -std=c++17 -Isource
 pin_lock_logic_SRC   := source/action/pin_lock_logic.cpp tests/pin_lock_logic/test.cpp
 pin_lock_logic_FLAGS := -std=c++17 -Isource
 console_lock_logic_SRC   := source/action/console_lock_logic.cpp tests/console_lock_logic/test.cpp
 console_lock_logic_FLAGS := -std=c++17 -Isource
-history_logic_SRC   := source/action/history_logic.cpp tests/history_logic/test.cpp
+history_logic_SRC   := source/util/date.cpp source/action/history_logic.cpp tests/history_logic/test.cpp
 history_logic_FLAGS := -std=c++17 -Isource
+history_logic_CSRC   := $(CALENDAR_C)
+history_logic_CFLAGS := $(CALENDAR_CFLAGS)
 timer_health_logic_SRC   := source/action/timer_health_logic.cpp tests/timer_health_logic/test.cpp
 timer_health_logic_FLAGS := -std=c++17 -Isource
 notice_logic_SRC   := source/action/notice_logic.cpp tests/notice_logic/test.cpp
 notice_logic_FLAGS := -std=c++17 -Isource
 sys_updates_SRC   := source/util/sys_updates.cpp tests/sys_updates/test.cpp
 sys_updates_FLAGS := -std=c++17 -Isource
-sys_notes_SRC   := source/util/safe_text.cpp source/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
+sys_notes_SRC   := source/util/date.cpp source/util/safe_text.cpp source/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
 sys_notes_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+sys_notes_CSRC   := $(CALENDAR_C)
+sys_notes_CFLAGS := $(CALENDAR_CFLAGS)
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
 offline_clock_logic_FLAGS := -std=c++17 -Isource
 icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp
@@ -159,8 +173,10 @@ data_cleanup_SRC   := source/util/data_cleanup.cpp tests/data_cleanup/test.cpp
 data_cleanup_FLAGS := -std=c++17 -Isource
 error_hint_logic_SRC   := source/action/error_hint_logic.cpp tests/error_hint_logic/test.cpp
 error_hint_logic_FLAGS := -std=c++17 -Isource
-outside_change_logic_SRC   := source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp
+outside_change_logic_SRC   := source/util/date.cpp source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp
 outside_change_logic_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+outside_change_logic_CSRC   := $(CALENDAR_C)
+outside_change_logic_CFLAGS := $(CALENDAR_CFLAGS)
 backup_SRC   := source/util/paths.cpp source/util/backup.cpp tests/backup/test.cpp
 backup_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 backup_logic_SRC   := source/util/paths.cpp source/util/backup.cpp source/util/pt_block.cpp source/action/backup_logic.cpp tests/backup_logic/test.cpp
@@ -169,10 +185,14 @@ http_logic_SRC   := source/util/http_logic.cpp tests/http_logic/test.cpp
 http_logic_FLAGS := -std=c++17 -Isource
 table_export_SRC   := source/util/paths.cpp source/util/table_export.cpp tests/table_export/test.cpp
 table_export_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
-update_SRC   := source/util/update.cpp tests/update/test.cpp
+update_SRC   := source/util/date.cpp source/util/update.cpp tests/update/test.cpp
 update_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
-config_SRC   := source/util/paths.cpp source/util/config.cpp tests/config/test.cpp
+update_CSRC   := $(CALENDAR_C)
+update_CFLAGS := $(CALENDAR_CFLAGS)
+config_SRC   := source/util/paths.cpp source/util/date.cpp source/util/config.cpp tests/config/test.cpp
 config_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+config_CSRC   := $(CALENDAR_C)
+config_CFLAGS := $(CALENDAR_CFLAGS)
 profiles_SRC   := source/util/paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
 profiles_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
@@ -187,8 +207,10 @@ history_SRC   := source/util/paths.cpp source/util/history.cpp tests/history/tes
 history_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 log_upload_SRC   := source/util/paths.cpp source/util/pt_log.cpp source/util/pt_block.cpp source/util/log_files.cpp source/util/log_upload.cpp tests/log_upload/test.cpp
 log_upload_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
-dev_builds_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/update.cpp source/util/safe_text.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/github_auth.cpp tests/dev_builds/test.cpp
+dev_builds_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/date.cpp source/util/update.cpp source/util/safe_text.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/github_auth.cpp tests/dev_builds/test.cpp
 dev_builds_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+dev_builds_CSRC   := $(CALENDAR_C)
+dev_builds_CFLAGS := $(CALENDAR_CFLAGS)
 dev_builds_LIBS  := -lz
 play_cache_SRC   := source/util/play_cache.cpp tests/play_cache/test.cpp
 play_cache_FLAGS := -std=c++17 -Isource

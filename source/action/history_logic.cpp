@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "util/date.hpp"
+
 namespace history_logic
 {
 
@@ -66,19 +68,7 @@ std::string day_key(const history::Entry& e)
     return e.when.substr(0, 10);
 }
 
-int weekday_of(const std::string& date)
-{
-    if (date.size() < 10 || date[4] != '-' || date[7] != '-') return -1;
-    for (size_t i : { 0, 1, 2, 3, 5, 6, 8, 9 })
-        if (date[i] < '0' || date[i] > '9') return -1;
-    int y = std::stoi(date.substr(0, 4));
-    const int m = std::stoi(date.substr(5, 2)), d = std::stoi(date.substr(8, 2));
-    if (m < 1 || m > 12 || d < 1 || d > 31) return -1;
-    // Sakamoto's method.
-    static const int t[] = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
-    if (m < 3) y -= 1;
-    return (y + y / 4 - y / 100 + y / 400 + t[m - 1] + d) % 7;
-}
+int weekday_of(const std::string& day) { return date::weekday(day); }
 
 Day day_of(const std::string& when, const std::string& today, const std::string& yesterday)
 {

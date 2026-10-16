@@ -13,7 +13,7 @@
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
-#include "util/update.hpp"
+#include "util/date.hpp"
 
 using namespace brls::literals;
 
@@ -270,7 +270,7 @@ std::string day_title(const std::string& day)
     if (day.empty()) return "?";
     const std::string today = ui::today_date();
     using history_logic::Day;
-    switch (history_logic::day_of(day, today, update::add_days(today, -1))) {
+    switch (history_logic::day_of(day, today, date::add_days(today, -1))) {
     case Day::Today: return "playguard/history/today"_i18n;
     case Day::Yesterday: return "playguard/history/yesterday"_i18n;
     case Day::Other: break;

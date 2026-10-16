@@ -5,6 +5,8 @@
 #include <cstddef>
 #include <cstring>
 
+#include "util/date.hpp"
+
 namespace outside_change_logic
 {
 
@@ -19,10 +21,7 @@ bool digits(const std::string& s, size_t from, size_t n)
     return true;
 }
 
-bool is_date(const std::string& s)
-{
-    return s.size() == 10 && digits(s, 0, 4) && s[4] == '-' && digits(s, 5, 2) && s[7] == '-' && digits(s, 8, 2);
-}
+bool is_date(const std::string& s) { return date::parse_shape(s); }
 
 bool is_hm(const std::string& s)
 {
@@ -39,17 +38,12 @@ bool is_account_id(const std::string& s)
     return true;
 }
 
-// Days since 1970-01-01 of a "YYYY-MM-DD" (is_date), proleptic Gregorian.
+// Days since 1970-01-01 of a "YYYY-MM-DD" (is_date), its numbers as written.
 int64_t day_number(const std::string& d)
 {
-    int64_t y = std::stoi(d.substr(0, 4));
-    const int m = std::stoi(d.substr(5, 2)), day = std::stoi(d.substr(8, 2));
-    y -= m <= 2;
-    const int64_t era = (y >= 0 ? y : y - 399) / 400;
-    const int64_t yoe = y - era * 400;
-    const int64_t doy = (153 * (m + (m > 2 ? -3 : 9)) + 2) / 5 + day - 1;
-    const int64_t doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
-    return era * 146097 + doe - 719468;
+    date::Ymd ymd;
+    date::parse_shape(d, &ymd);
+    return date::days_from_civil(ymd);
 }
 }   // namespace
 

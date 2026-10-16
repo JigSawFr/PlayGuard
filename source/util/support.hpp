@@ -32,9 +32,6 @@ struct Decision
     State next;   // to save when it differs from the state given
 };
 
-// Days from date `a` to date `b` ("YYYY-MM-DD"); false if either is malformed.
-bool days_between(const std::string& a, const std::string& b, int* days);
-
 // At start-up, on the main screen with nothing in front of it.
 // - First time (no seen_version): remembers this version and starts the
 //   month, shows nothing: a new install has the first steps, not news.

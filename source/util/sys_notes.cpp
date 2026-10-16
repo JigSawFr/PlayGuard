@@ -8,6 +8,7 @@
 
 #include <borealis/extern/nlohmann/json.hpp>
 
+#include "util/date.hpp"
 #include "util/safe_text.hpp"
 #include "util/sys_updates.hpp"
 #include "util/update.hpp"
@@ -96,9 +97,8 @@ bool firmware_version(const std::string& v)
 // "2026-10-16T00:05:51Z" -> "2026-10-16"; "" when it is not a date.
 std::string day_of(const std::string& iso)
 {
-    int y, m, d;
-    if (iso.size() < 10 || std::sscanf(iso.c_str(), "%4d-%2d-%2d", &y, &m, &d) != 3) return "";
-    if (y < 2000 || y > 9999 || m < 1 || m > 12 || d < 1 || d > 31 || iso[4] != '-' || iso[7] != '-') return "";
+    date::Ymd d;
+    if (iso.size() < 10 || !date::parse_ranged(iso.substr(0, 10), &d) || d.year < 2000) return "";
     return iso.substr(0, 10);
 }
 

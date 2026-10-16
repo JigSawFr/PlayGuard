@@ -8,6 +8,7 @@
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/date.hpp"
 #include "util/launcher.hpp"
 
 using namespace brls::literals;
@@ -245,7 +246,7 @@ void postpone(const std::string& version, std::function<void()> done)
     const std::vector<std::string> labels = { "playguard/update/later_day"_i18n, "playguard/update/later_week"_i18n,
                                               brls::getStr("playguard/update/later_days", update::SNOOZE_MAX_DAYS) };
     ui::pick("playguard/update/later_title"_i18n, labels, 0, [version, done](int i) {
-        const std::string until = update::add_days(ui::today_date(), DAYS[i]);
+        const std::string until = date::add_days(ui::today_date(), DAYS[i]);
         if (until.empty()) return;   // no date on the console clock: nothing to count from
         auto& cfg = config::get();
         cfg.update_snooze_version = version;
