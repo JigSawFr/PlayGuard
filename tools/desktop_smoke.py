@@ -1125,7 +1125,7 @@ if SYNC:
     shot("01_overview")        # the Overview after the remote change (1 h 30 every day)
     key("Down", steps("dashboard", "preferences"))
     key("Right")
-    key("Down", 12)            # Remote access, the last cell
+    key("Down", 20)            # Remote access, the last cell (the focus stops there)
     shot("02_preferences_end")
     key("Return")
     shot("03_remote_access")   # the link online
@@ -1199,7 +1199,7 @@ if AGENT:
     shot("01_overview")        # the Overview after the order (1 h 30 every day)
     key("Down", steps("dashboard", "preferences"))
     key("Right")
-    key("Down", 12)            # Remote access, the last cell
+    key("Down", 20)            # Remote access, the last cell (the focus stops there)
     key("Return")
     shot("02_remote_access")   # online, through the agent
     # Quit the way a user does (B twice on the sidebar): the session must end.
