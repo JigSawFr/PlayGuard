@@ -708,7 +708,6 @@ void GameCheckActivity::show()
 
     // The cells are reused in place, as in the History screen: one of them
     // may have the focus while the list changes under it.
-    brls::View* first = nullptr;
     for (GameCategory category : GROUPS) {
         const std::vector<Broken>& shown = by_group[category];
         Group& group = this->groups[category];
@@ -739,7 +738,6 @@ void GameCheckActivity::show()
                                      return true;
                                  });
             ui::set_visible(cell, true);
-            if (!first) first = cell;
         }
         for (size_t i = shown.size(); i < cells.size(); i++) ui::set_visible(cells[i], false);
         group.title->setTitle(brls::getStr(std::string("playguard/games/groups/") + category_key(category), (int)shown.size()));
@@ -769,6 +767,7 @@ void GameCheckActivity::show()
     brls::View* focus = brls::Application::getCurrentFocus();
     bool lost = false;
     for (brls::View* v = focus; v && !lost; v = v->getParent()) lost = v->getVisibility() != brls::Visibility::VISIBLE;
+    brls::View* first = this->first_game();
     if (first && (!this->focused || lost)) {
         this->focused = true;
         brls::Application::giveFocus(first);
@@ -793,6 +792,26 @@ void GameCheckActivity::show()
     }
     hint->setText(brls::getStr("playguard/games/many", ui::storage_short(si)));
     ui::set_visible(hint.getView(), broken.size() >= MANY);
+}
+
+// The first game of the list, in the first section shown.
+brls::View* GameCheckActivity::first_game() const
+{
+    for (GameCategory category : GROUPS) {
+        const Group& group = this->groups[category];
+        if (group.box->getVisibility() != brls::Visibility::VISIBLE) continue;
+        for (brls::View* cell : group.list->getChildren())
+            if (cell->getVisibility() == brls::Visibility::VISIBLE) return cell;
+    }
+    return nullptr;
+}
+
+// Back from a dialog: "Check these games" may have gone meanwhile (its
+// games left To check while the result asked whether to remove them); the
+// first game then has the focus (ui::keep_focus).
+void GameCheckActivity::onResume()
+{
+    ui::keep_focus(this, this->first_game());
 }
 
 bool GameCheckActivity::changes_list(const GameFacts& game) const

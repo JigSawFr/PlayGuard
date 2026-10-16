@@ -137,6 +137,10 @@ std::string fmt_play_time(uint64_t seconds);    // "0 min", "< 1 min", "45 min",
 std::string day_name(int day);                  // 0 = Sunday, as a title ("Monday")
 std::string day_name_in_text(int day);          // inside a sentence (fr: "lundi")
 std::string bool_text(bool ok, bool value, const std::string& yes, const std::string& no);
+// The value of a line that opens a screen of its own (or another tab), with
+// a chevron after it: "12 changes  ›", or "›" alone. A line that asks first,
+// in a dialog, ends its title with "…" instead; one that acts at once, neither.
+std::string opens(const std::string& value = "");
 // "Now" on the console: its user clock read live and its time-zone rule
 // (calendar.h says why not time()/localtime()).
 LocalTime   local_now();
@@ -198,6 +202,19 @@ void set_visible(brls::View* view, bool visible);
 // the focus.
 void set_visible_all(std::initializer_list<std::pair<brls::View*, bool>> changes);
 
+// For an activity's onResume(): borealis then gives the focus back to the
+// view that opened the dialog (or screen) just closed, and gives none when
+// that view was hidden meanwhile; the focus would stay on the closed
+// dialog's button, deleted after its animation, and no button answer any
+// more. In that case only, `fallback` (else the activity's first focusable
+// view) gets it first.
+void keep_focus(brls::Activity* activity, brls::View* fallback = nullptr);
+
+// Whether `activity` has the focus: nothing (a dialog, another screen) is
+// open over it. Unlike the top of borealis' stack, true again as soon as a
+// dialog over it starts closing.
+bool has_focus(brls::Activity* activity);
+
 // Sidebar positions of the main screen tabs, in the order of
 // resources/xml/activity/main.xml (separators count as positions).
 namespace tab
@@ -206,15 +223,15 @@ constexpr int dashboard    = 0;
 constexpr int play_timer   = 2;
 constexpr int activity     = 3;   // play time per game
 constexpr int restrictions = 4;
-constexpr int clock        = 5;
-constexpr int security     = 7;   // PIN, unlock, companion app, delete
-constexpr int preferences  = 9;
-constexpr int tools        = 10;
-constexpr int about        = 11;   // version, credits, changelog
+constexpr int security     = 5;   // the PIN tab: PIN, unlock, blocking games, companion app, delete
+constexpr int console      = 7;   // the network clock, installed games, firmware, storage, serial, patches
+constexpr int history      = 9;   // changes and settings backups
+constexpr int preferences  = 10;
+constexpr int about        = 11;  // version, credits, changelog
 // The n-th tab (0 = Overview) as a sidebar position (separators count).
 constexpr int of(int n)
 {
-    constexpr int positions[] = { dashboard, play_timer, activity, restrictions, clock, security, preferences, tools, about };
+    constexpr int positions[] = { dashboard, play_timer, activity, restrictions, security, console, history, preferences, about };
     return n >= 0 && n < (int)(sizeof(positions) / sizeof(positions[0])) ? positions[n] : dashboard;
 }
 }   // namespace tab
@@ -223,6 +240,9 @@ constexpr int of(int n)
 // any view inside the current tab; the switch happens on the next frame
 // because the current tab is deleted by it.
 void go_to_tab(brls::View* from, int position);
+// `content` (a tab's view, such as the network clock) on a screen of its own,
+// over the current one, titled `title`; B closes it.
+void open_screen(brls::View* content, const std::string& title);
 
 // "Parental controls are temporarily unlocked — Lock now" cell shown at the
 // top of the Overview and Play timer tabs (no "Lock now" in read-only mode).

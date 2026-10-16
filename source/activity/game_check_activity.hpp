@@ -35,6 +35,7 @@ class GameCheckActivity : public brls::Activity
     CONTENT_FROM_XML_RES("activity/game_check.xml");
 
     void onContentAvailable() override;
+    void onResume() override;
 
   private:
     // A repair waiting for the next read to tell whether it worked.
@@ -83,6 +84,7 @@ class GameCheckActivity : public brls::Activity
     void status_text(const std::string& text, NVGcolor color);
     std::string age_text() const;
     void show();
+    brls::View* first_game() const;
     // Whether `game`, checked again, changes the list (not its status line).
     bool changes_list(const GameFacts& game) const;
     void open(const GameFacts& game, GameIssue issue, u32 current_hos);

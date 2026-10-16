@@ -1,6 +1,6 @@
 // AboutTab — the app: version (seven presses on it turn the developer tools
-// on, at the end of Tools), launch mode and data folder; its updates (check
-// now, once a day, with which store); what changed in this version (its
+// on, at the end of Tools), launch mode and data folder; checking for an
+// update now (when and how to update: Preferences); what changed in this version (its
 // highlights, the full list a press away); the credits; how to support it (the funding links
 // as QR codes, to scan with a phone); "Made in France".
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
@@ -28,8 +28,6 @@ class AboutTab : public TabBase
     BRLS_BIND(brls::DetailCell,  mode,             "ab_mode");
     BRLS_BIND(brls::DetailCell,  data,             "ab_data");
     BRLS_BIND(brls::DetailCell,  update_cell,      "ab_update");
-    BRLS_BIND(brls::BooleanCell, update_daily,     "ab_update_daily");
-    BRLS_BIND(brls::DetailCell,  update_via,       "ab_update_via");
     BRLS_BIND(brls::Header,      changelog_header, "ab_changelog_header");
     BRLS_BIND(brls::Box,         changelog,        "ab_changelog");
     BRLS_BIND(brls::DetailCell,  changelog_full,   "ab_changelog_full");

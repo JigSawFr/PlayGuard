@@ -28,13 +28,13 @@
 #include "core/platform.h"
 #include "tab/about_tab.hpp"
 #include "tab/activity_tab.hpp"
-#include "tab/clock_tab.hpp"
+#include "tab/console_tab.hpp"
 #include "tab/dashboard_tab.hpp"
+#include "tab/history_tab.hpp"
 #include "tab/play_timer_tab.hpp"
 #include "tab/preferences_tab.hpp"
 #include "tab/restrictions_tab.hpp"
 #include "tab/security_tab.hpp"
-#include "tab/tools_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/crash_dump.h"
@@ -347,10 +347,10 @@ int main(int argc, char* argv[])
     brls::Application::registerXMLView("PlayTimerTab",    PlayTimerTab::create);
     brls::Application::registerXMLView("ActivityTab",     ActivityTab::create);
     brls::Application::registerXMLView("RestrictionsTab", RestrictionsTab::create);
-    brls::Application::registerXMLView("ClockTab",        ClockTab::create);
     brls::Application::registerXMLView("SecurityTab",     SecurityTab::create);
+    brls::Application::registerXMLView("ConsoleTab",      ConsoleTab::create);
+    brls::Application::registerXMLView("HistoryTab",      HistoryTab::create);
     brls::Application::registerXMLView("PreferencesTab",  PreferencesTab::create);
-    brls::Application::registerXMLView("ToolsTab",        ToolsTab::create);
     brls::Application::registerXMLView("AboutTab",        AboutTab::create);
 
     brls::Application::registerXMLView("LoadingMark",     LoadingMark::create);

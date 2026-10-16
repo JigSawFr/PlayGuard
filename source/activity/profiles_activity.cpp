@@ -146,11 +146,14 @@ void ProfilesActivity::remove(const profiles::Profile& p)
     const std::string name = p.name, file = p.file;
     ui::confirm_danger(brls::getStr("playguard/play_timer/profile_delete_body", name), "playguard/common/delete"_i18n,
                        [this, name, file]() {
+                           // Before the error's dialog opens (both on the next
+                           // frame): rebuilt under it, the list would delete
+                           // the cell the dialog gives the focus back to.
+                           brls::sync([this]() { this->rebuild(); });
                            if (profiles::remove(file))
                                ui::notify(brls::getStr("playguard/play_timer/profile_deleted", name));
                            else
                                ui::error(brls::getStr("playguard/play_timer/profile_delete_err", name));
-                           brls::sync([this]() { this->rebuild(); });
                        });
 }
 
