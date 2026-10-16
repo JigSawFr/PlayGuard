@@ -92,6 +92,11 @@ std::string age_text(int age)
     return age == 0 ? "playguard/restrictions/age_none"_i18n : brls::getStr("playguard/restrictions/age_value", age);
 }
 
+std::string opens(const std::string& value)
+{
+    return value.empty() ? "›" : value + "  ›";
+}
+
 LocalTime local_now()
 {
     LocalTime l{};

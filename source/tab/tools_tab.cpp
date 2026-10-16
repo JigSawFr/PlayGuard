@@ -82,6 +82,7 @@ ToolsTab::ToolsTab()
     serial_note->setSingleLine(false);
     patches_note->setSingleLine(false);
 
+    first_steps->setDetailText(ui::opens());
     first_steps->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new OnboardingActivity());
         return true;
@@ -99,6 +100,7 @@ ToolsTab::ToolsTab()
     }, false, false, brls::SOUND_CLICK);
     export_note->setText(brls::getStr("playguard/tools/export_note", paths::logs_dir()));
 
+    games->setDetailText(ui::opens());
     games->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new GameCheckActivity());
         return true;
@@ -275,7 +277,7 @@ void ToolsTab::refresh()
     const size_t backups = backup_flow::count();
     backup_restore->setDetailText(backups ? brls::getStr("playguard/tools/backup_count", (int)backups) : "");
     const size_t changes = history_flow::load().size();
-    history->setDetailText(changes ? brls::getStr("playguard/history/count", (int)changes) : "");
+    history->setDetailText(ui::opens(changes ? brls::getStr("playguard/history/count", (int)changes) : ""));
 
     SysInfo si;
     sysinfo_get(&si);
@@ -287,17 +289,17 @@ void ToolsTab::refresh()
     // With the newer release the last update check found (sys_update_flow),
     // and how many releases behind when more than one.
     bool newer = false;
-    fw->setDetailText(sys_notes_flow::status_text(sys_notes::Which::Firmware, &newer));
+    fw->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::Firmware, &newer)));
     fw->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
     if (si.ams_valid) {
-        ams->setDetailText(sys_notes_flow::status_text(sys_notes::Which::Atmosphere, &newer));
+        ams->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::Atmosphere, &newer)));
         ams->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
     } else {
         ams->setDetailText("playguard/common/unavailable"_i18n);
     }
     // hekate: only when its bootloader/update.bin is on the SD card.
     const std::string hk = sys_update_flow::installed_hekate();
-    hekate->setDetailText(sys_notes_flow::status_text(sys_notes::Which::Hekate, &newer));
+    hekate->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::Hekate, &newer)));
     hekate->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
     ui::set_visible(hekate.getView(), !hk.empty());
     // A newer firmware Atmosphère or hekate does not support yet, or only in

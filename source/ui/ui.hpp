@@ -142,6 +142,10 @@ std::string day_name_in_text(int day);          // inside a sentence (fr: "lundi
 std::string bool_text(bool ok, bool value, const std::string& yes, const std::string& no);
 std::string yes_no(bool value);                // "Yes" / "No"
 std::string age_text(int age);                 // a restriction age: "None" for 0, else "12+"
+// The value of a line that opens a screen of its own (or another tab), with
+// a chevron after it: "12 changes  ›", or "›" alone. A line that asks first,
+// in a dialog, ends its title with "…" instead; one that acts at once, neither.
+std::string opens(const std::string& value = "");
 // "Now" on the console: its user clock read live and its time-zone rule
 // (calendar.h says why not time()/localtime()).
 LocalTime   local_now();
@@ -202,6 +206,19 @@ void set_visible(brls::View* view, bool visible);
 // cell that replaces the focused one (Unlock -> Lock now) is there to take
 // the focus.
 void set_visible_all(std::initializer_list<std::pair<brls::View*, bool>> changes);
+
+// For an activity's onResume(): borealis then gives the focus back to the
+// view that opened the dialog (or screen) just closed, and gives none when
+// that view was hidden meanwhile; the focus would stay on the closed
+// dialog's button, deleted after its animation, and no button answer any
+// more. In that case only, `fallback` (else the activity's first focusable
+// view) gets it first.
+void keep_focus(brls::Activity* activity, brls::View* fallback = nullptr);
+
+// Whether `activity` has the focus: nothing (a dialog, another screen) is
+// open over it. Unlike the top of borealis' stack, true again as soon as a
+// dialog over it starts closing.
+bool has_focus(brls::Activity* activity);
 
 // Sidebar positions of the main screen tabs, in the order of
 // resources/xml/activity/main.xml (separators count as positions).

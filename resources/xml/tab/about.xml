@@ -32,8 +32,6 @@
             <brls:DetailCell id="ab_data" focusable="false" title="@i18n/playguard/tools/data"/>
             <brls:Header title="@i18n/playguard/tools/section_update" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="ab_update" title="@i18n/playguard/tools/update"/>
-            <brls:BooleanCell id="ab_update_daily"/>
-            <brls:DetailCell id="ab_update_via" title="@i18n/playguard/tools/update_via"/>
             <brls:Header id="ab_changelog_header" marginTop="24" marginBottom="8"/>
             <brls:Box id="ab_changelog" width="auto" height="auto" axis="column" alignItems="stretch"/>
             <brls:DetailCell id="ab_changelog_full" title="@i18n/playguard/about/changelog_full" marginTop="12"/>
