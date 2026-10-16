@@ -790,7 +790,11 @@
         "section_startup": "Al iniciar",
         "note": "Las copias de seguridad, el informe de diagnóstico y la consola están en Herramientas; las actualizaciones, en Acerca de.",
         "intro": "Mostrar la intro durante 2 segundos",
-        "support_reminder": "Recordarme una vez al mes que apoye PlayGuard"
+        "support_reminder": "Recordarme una vez al mes que apoye PlayGuard",
+        "section_notices": "Notificaciones",
+        "notices_system": "Versiones de Atmosphère, hekate y firmware",
+        "notices_summary": "El tiempo de juego de la semana",
+        "notices_reminders": "Recordatorios: copias, el otro sistema, el bloqueo de la consola"
     },
     "backup": {
         "saved": "Copia de los ajustes guardada: {}",
@@ -1149,6 +1153,25 @@
         "sys_hekate": "hekate {} está disponible",
         "sys_hekate_detail": "La tarjeta SD tiene hekate {}.",
         "sys_firmware": "Ha salido el firmware {}",
-        "sys_firmware_detail": "Esta consola tiene {}. Actualízala solo cuando Atmosphère (y hekate, si lo usas) admitan ese firmware; si no, Atmosphère dejará de iniciarse."
+        "sys_firmware_detail": "Esta consola tiene {}. Actualízala solo cuando Atmosphère (y hekate, si lo usas) admitan ese firmware; si no, Atmosphère dejará de iniciarse.",
+        "pin_weak": "El PIN es fácil de adivinar",
+        "pin_weak_detail": "Como 0000 o 1234: es de los primeros que cualquiera prueba. Elige uno más difícil de encontrar.",
+        "pin_lock_off": "PlayGuard se abre sin el PIN",
+        "pin_lock_off_detail": "Cualquiera que abra PlayGuard puede cambiar los límites y las restricciones.",
+        "pin_lock_choose": "Pedir el PIN…",
+        "other_system": "El otro sistema tiene su propio control parental",
+        "console_lock_long": "El bloqueo de la consola está activo desde el {}",
+        "console_lock_long_detail": "El límite de cada día sigue en 0 mientras esté activo.",
+        "backup_none": "Aún no hay copia de los ajustes",
+        "backup_old": "Última copia de los ajustes: {}",
+        "backup_detail": "Una copia guarda los límites y las restricciones para restaurarlos tras un reinicio o un error.",
+        "backup_now": "Hacer copia ahora",
+        "sd_space": "La tarjeta SD está casi llena",
+        "sd_space_detail": "Quedan {} MB: PlayGuard podría no poder guardar sus ajustes, su historial ni sus registros.",
+        "week": "Últimos 7 días: {} de juego",
+        "week_detail": "{} al día de media.",
+        "week_top": "Lo más jugado: {} ({}).",
+        "over_limit": "Se superó el límite {} de los últimos 7 días",
+        "over_limit_detail": "Cuando se acaba el tiempo, la consola solo avisa: se sigue jugando pasado el límite (Tiempo de juego › Cuando se acaba el tiempo)."
     }
 }

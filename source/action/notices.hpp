@@ -33,8 +33,13 @@ struct Entry
 void set(const std::string& id, Level level, const std::string& title, const std::string& detail,
          const std::string& action_label = "", std::function<void()> action = nullptr);
 void clear(const std::string& id);
-// Puts away an Info entry (see notice_logic::Store::dismiss).
+// Puts away an Info entry (see notice_logic::Store::dismiss), and remembers
+// it in config.json (notices_read): read at the next start too, until its
+// text changes.
 void dismiss(const std::string& id);
+// Preferences › Notifications changed: entries of a kind turned off go, the
+// state is read again.
+void apply_preferences();
 
 std::vector<Entry> list();
 int action_count();
@@ -50,6 +55,9 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
 // What timer_health said, from the screens that ask it (they show the play
 // timer): the console not counting play time.
 void note_timer_stalled(bool stalled);
+// The PIN anyone would try first (pctl_pin_weak): read by the sweep once per
+// start, and again when the PIN's length changes.
+void note_pin_strength(const PctlStatus& s);
 // The main screen's own sweep (a minute apart, only while it is on top and
 // in focus): reads what refresh_status needs, in one pctl session.
 void sweep();

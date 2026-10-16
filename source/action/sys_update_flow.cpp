@@ -105,6 +105,11 @@ void at_start()
     if (cfg.update_daily && cfg.sys_checked != ui::today_date()) check();
 }
 
+void refresh_entries()
+{
+    note();
+}
+
 void check_now()
 {
     check();

@@ -790,7 +790,11 @@
         "section_startup": "Beim Start",
         "note": "Sicherungen, der Diagnosebericht und die Konsole befinden sich unter Tools, Updates unter Info.",
         "intro": "Intro 2 Sekunden lang zeigen",
-        "support_reminder": "Einmal im Monat daran erinnern, PlayGuard zu unterstützen"
+        "support_reminder": "Einmal im Monat daran erinnern, PlayGuard zu unterstützen",
+        "section_notices": "Benachrichtigungen",
+        "notices_system": "Neue Versionen von Atmosphère, hekate und Firmware",
+        "notices_summary": "Die Spielzeit der Woche",
+        "notices_reminders": "Erinnerungen: Sicherungen, anderes System, Konsolensperre"
     },
     "backup": {
         "saved": "Einstellungen gesichert: {}",
@@ -1149,6 +1153,25 @@
         "sys_hekate": "hekate {} ist verfügbar",
         "sys_hekate_detail": "Auf der SD-Karte ist hekate {}.",
         "sys_firmware": "Firmware {} ist erschienen",
-        "sys_firmware_detail": "Diese Konsole läuft mit {}. Aktualisiere sie erst, wenn Atmosphère (und hekate, falls genutzt) diese Firmware unterstützen, sonst startet Atmosphère nicht mehr."
+        "sys_firmware_detail": "Diese Konsole läuft mit {}. Aktualisiere sie erst, wenn Atmosphère (und hekate, falls genutzt) diese Firmware unterstützen, sonst startet Atmosphère nicht mehr.",
+        "pin_weak": "Die PIN ist leicht zu erraten",
+        "pin_weak_detail": "Wie 0000 oder 1234: Sie gehört zu den ersten, die jemand ausprobiert. Wähle eine, die schwerer zu finden ist.",
+        "pin_lock_off": "PlayGuard öffnet sich ohne PIN",
+        "pin_lock_off_detail": "Wer PlayGuard öffnet, kann die Limits und Einschränkungen ändern.",
+        "pin_lock_choose": "Nach der PIN fragen…",
+        "other_system": "Das andere System hat eigene Jugendschutzeinstellungen",
+        "console_lock_long": "Die Konsolensperre ist seit {} aktiv",
+        "console_lock_long_detail": "Das Limit jedes Tages bleibt 0, solange sie aktiv ist.",
+        "backup_none": "Noch keine Sicherung der Einstellungen",
+        "backup_old": "Letzte Sicherung der Einstellungen: {}",
+        "backup_detail": "Eine Sicherung bewahrt Limits und Einschränkungen, um sie nach einem Zurücksetzen oder Fehler wiederherzustellen.",
+        "backup_now": "Jetzt sichern",
+        "sd_space": "Die SD-Karte ist fast voll",
+        "sd_space_detail": "Noch {} MB frei: PlayGuard kann Einstellungen, Verlauf und Protokolle eventuell nicht mehr speichern.",
+        "week": "Letzte 7 Tage: {} gespielt",
+        "week_detail": "Im Schnitt {} pro Tag.",
+        "week_top": "Am meisten gespielt: {} ({}).",
+        "over_limit": "Das Limit wurde an {} der letzten 7 Tage überschritten",
+        "over_limit_detail": "Wenn die Zeit um ist, warnt die Konsole nur: Es wird über das Limit hinaus weitergespielt (Spielzeit › Wenn die Zeit um ist)."
     }
 }

@@ -790,7 +790,11 @@
         "section_startup": "시작할 때",
         "note": "백업, 진단 보고서, 본체 정보는 도구에, 업데이트는 정보에 있습니다.",
         "intro": "인트로를 2초 동안 표시",
-        "support_reminder": "한 달에 한 번 PlayGuard 후원 알림 표시"
+        "support_reminder": "한 달에 한 번 PlayGuard 후원 알림 표시",
+        "section_notices": "알림",
+        "notices_system": "Atmosphère, hekate, 펌웨어 새 버전",
+        "notices_summary": "이번 주 플레이 시간",
+        "notices_reminders": "알림: 백업, 다른 시스템, 본체 잠금"
     },
     "backup": {
         "saved": "설정을 백업했습니다: {}",
@@ -1149,6 +1153,25 @@
         "sys_hekate": "hekate {}을(를) 사용할 수 있습니다",
         "sys_hekate_detail": "SD 카드의 hekate는 {}입니다.",
         "sys_firmware": "펌웨어 {}이(가) 나왔습니다",
-        "sys_firmware_detail": "이 본체는 {}입니다. Atmosphère(사용한다면 hekate도)가 그 펌웨어를 지원한 뒤에 업데이트하세요. 그렇지 않으면 Atmosphère가 더 이상 시작되지 않습니다."
+        "sys_firmware_detail": "이 본체는 {}입니다. Atmosphère(사용한다면 hekate도)가 그 펌웨어를 지원한 뒤에 업데이트하세요. 그렇지 않으면 Atmosphère가 더 이상 시작되지 않습니다.",
+        "pin_weak": "PIN을 쉽게 추측할 수 있습니다",
+        "pin_weak_detail": "0000이나 1234처럼 누구나 먼저 시도하는 번호입니다. 찾기 어려운 번호로 바꾸세요.",
+        "pin_lock_off": "PlayGuard가 PIN 없이 열립니다",
+        "pin_lock_off_detail": "PlayGuard를 여는 사람은 누구나 제한과 설정을 바꿀 수 있습니다.",
+        "pin_lock_choose": "PIN 묻기…",
+        "other_system": "다른 시스템에는 별도의 자녀 보호 기능이 있습니다",
+        "console_lock_long": "본체 잠금이 {}부터 켜져 있습니다",
+        "console_lock_long_detail": "켜져 있는 동안 매일 제한은 0으로 유지됩니다.",
+        "backup_none": "아직 설정 백업이 없습니다",
+        "backup_old": "마지막 설정 백업: {}",
+        "backup_detail": "백업이 있으면 초기화나 실수 후에 제한과 설정을 되돌릴 수 있습니다.",
+        "backup_now": "지금 백업",
+        "sd_space": "SD 카드가 거의 가득 찼습니다",
+        "sd_space_detail": "{}MB 남음: PlayGuard가 설정, 기록, 로그를 저장하지 못할 수 있습니다.",
+        "week": "최근 7일: {} 플레이",
+        "week_detail": "하루 평균 {}.",
+        "week_top": "가장 많이 플레이: {} ({}).",
+        "over_limit": "최근 7일 중 {}일 동안 제한을 넘었습니다",
+        "over_limit_detail": "시간이 다 되어도 본체는 알리기만 하고, 제한을 넘어 계속 플레이할 수 있습니다(플레이 시간 › 시간이 다 되면)."
     }
 }

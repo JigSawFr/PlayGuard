@@ -790,7 +790,11 @@
         "section_startup": "Au lancement",
         "note": "Les sauvegardes, le rapport de diagnostic et la console sont dans Outils ; les mises à jour dans À propos.",
         "intro": "Afficher l'intro pendant 2 secondes",
-        "support_reminder": "Me rappeler une fois par mois de soutenir PlayGuard"
+        "support_reminder": "Me rappeler une fois par mois de soutenir PlayGuard",
+        "section_notices": "Notifications",
+        "notices_system": "Versions d'Atmosphère, de hekate et du firmware",
+        "notices_summary": "Le temps de jeu de la semaine",
+        "notices_reminders": "Rappels : sauvegardes, autre système, verrou console"
     },
     "backup": {
         "saved": "Réglages sauvegardés : {}",
@@ -1149,6 +1153,25 @@
         "sys_hekate": "hekate {} est disponible",
         "sys_hekate_detail": "La carte SD contient hekate {}.",
         "sys_firmware": "Le firmware {} est sorti",
-        "sys_firmware_detail": "Cette console est en {}. Ne la mettez à jour qu'une fois ce firmware pris en charge par Atmosphère (et hekate, si vous l'utilisez), sinon Atmosphère ne démarrera plus."
+        "sys_firmware_detail": "Cette console est en {}. Ne la mettez à jour qu'une fois ce firmware pris en charge par Atmosphère (et hekate, si vous l'utilisez), sinon Atmosphère ne démarrera plus.",
+        "pin_weak": "Le code PIN est facile à deviner",
+        "pin_weak_detail": "Comme 0000 ou 1234 : il fait partie des premiers essayés. Choisissez-en un plus difficile à trouver.",
+        "pin_lock_off": "PlayGuard s'ouvre sans le code PIN",
+        "pin_lock_off_detail": "Quiconque ouvre PlayGuard peut modifier les limites et les restrictions.",
+        "pin_lock_choose": "Demander le code PIN…",
+        "other_system": "L'autre système a son propre contrôle parental",
+        "console_lock_long": "Le verrou console est activé depuis le {}",
+        "console_lock_long_detail": "La limite de chaque jour reste à 0 tant qu'il est activé.",
+        "backup_none": "Aucune sauvegarde des réglages",
+        "backup_old": "Dernière sauvegarde des réglages : {}",
+        "backup_detail": "Une sauvegarde garde les limites et les restrictions, pour les remettre après une réinitialisation ou une erreur.",
+        "backup_now": "Sauvegarder maintenant",
+        "sd_space": "La carte SD est presque pleine",
+        "sd_space_detail": "Il reste {} Mo : PlayGuard risque de ne plus pouvoir enregistrer ses réglages, son historique et ses journaux.",
+        "week": "7 derniers jours : {} de jeu",
+        "week_detail": "{} par jour en moyenne.",
+        "week_top": "Le plus joué : {} ({}).",
+        "over_limit": "La limite a été dépassée {} jours sur les 7 derniers",
+        "over_limit_detail": "Quand le temps est écoulé, la console se contente de prévenir : le jeu continue au-delà de la limite (Temps de jeu › Quand le temps est écoulé)."
     }
 }

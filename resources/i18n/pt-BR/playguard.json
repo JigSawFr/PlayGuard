@@ -790,7 +790,11 @@
         "section_startup": "Ao iniciar",
         "note": "Backups, o relatório de diagnóstico e o console estão em Ferramentas; as atualizações, em Sobre.",
         "intro": "Mostrar a introdução por 2 segundos",
-        "support_reminder": "Lembrar uma vez por mês de apoiar o PlayGuard"
+        "support_reminder": "Lembrar uma vez por mês de apoiar o PlayGuard",
+        "section_notices": "Notificações",
+        "notices_system": "Versões do Atmosphère, hekate e firmware",
+        "notices_summary": "O tempo de jogo da semana",
+        "notices_reminders": "Lembretes: backups, o outro sistema, o bloqueio do console"
     },
     "backup": {
         "saved": "Backup das configurações feito: {}",
@@ -1149,6 +1153,25 @@
         "sys_hekate": "O hekate {} está disponível",
         "sys_hekate_detail": "O cartão SD tem o hekate {}.",
         "sys_firmware": "Saiu o firmware {}",
-        "sys_firmware_detail": "Este console está no {}. Atualize só quando o Atmosphère (e o hekate, se você usar) forem compatíveis com esse firmware; senão, o Atmosphère não vai mais iniciar."
+        "sys_firmware_detail": "Este console está no {}. Atualize só quando o Atmosphère (e o hekate, se você usar) forem compatíveis com esse firmware; senão, o Atmosphère não vai mais iniciar.",
+        "pin_weak": "O PIN é fácil de adivinhar",
+        "pin_weak_detail": "Como 0000 ou 1234: está entre os primeiros que qualquer um tenta. Escolha um mais difícil de descobrir.",
+        "pin_lock_off": "O PlayGuard abre sem o PIN",
+        "pin_lock_off_detail": "Quem abrir o PlayGuard pode mudar os limites e as restrições.",
+        "pin_lock_choose": "Pedir o PIN…",
+        "other_system": "O outro sistema tem seu próprio controle parental",
+        "console_lock_long": "O bloqueio do console está ativo desde {}",
+        "console_lock_long_detail": "O limite de cada dia fica em 0 enquanto ele estiver ativo.",
+        "backup_none": "Ainda não há backup das configurações",
+        "backup_old": "Último backup das configurações: {}",
+        "backup_detail": "Um backup guarda os limites e as restrições, para restaurá-los depois de uma redefinição ou de um erro.",
+        "backup_now": "Fazer backup agora",
+        "sd_space": "O cartão SD está quase cheio",
+        "sd_space_detail": "Restam {} MB: o PlayGuard pode não conseguir salvar as configurações, o histórico e os logs.",
+        "week": "Últimos 7 dias: {} de jogo",
+        "week_detail": "{} por dia em média.",
+        "week_top": "O mais jogado: {} ({}).",
+        "over_limit": "O limite foi ultrapassado em {} dos últimos 7 dias",
+        "over_limit_detail": "Quando o tempo acaba, o console só avisa: o jogo continua além do limite (Tempo de jogo › Quando o tempo acaba)."
     }
 }

@@ -73,12 +73,23 @@ struct Config
     // a newer one means PlayGuard closed unexpectedly since.
     std::string crash_seen;
 
+    // The notification bell (action/notices): which kinds of entries it
+    // shows (Preferences › Notifications), the entries for information read
+    // ("id:hash" of their text, the newest last, at most 48: a read one comes
+    // back when its text changes), and the day the weekly summary was read.
+    bool notices_system    = true;   // newer Atmosphère, hekate, firmware
+    bool notices_summary   = true;   // the week's play time, a limit passed several days
+    bool notices_reminders = true;   // a backup to make, the other system, a long console lock
+    std::vector<std::string> notices_read;
+    std::string summary_seen;
+
     // Console lock (Security › Console lock): every day's limit set to 0, so a
     // PIN is needed to play. console_lock is whether it is on; console_lock_prev
     // keeps the seven limits it replaced (Sun..Sat minutes, 65535 no limit), to
     // put back when it is turned off. Empty: nothing to put back (the timer was
     // off), so turning it off clears the limit.
     bool             console_lock = false;
+    std::string      console_lock_since;   // "YYYY-MM-DD" it was turned on; "" unknown
     std::vector<int> console_lock_prev;
 
     // Choice made on the "firmware not supported yet" screen, remembered for

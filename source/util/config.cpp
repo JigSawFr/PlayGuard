@@ -140,6 +140,15 @@ void sanitize(Config& c)
     if (!is_date(c.support_reminded)) c.support_reminded.clear();
     if (c.seen_version.size() > 32) c.seen_version.clear();
     if (c.crash_seen.size() > 64) c.crash_seen.clear();
+    if (!is_date(c.summary_seen)) c.summary_seen.clear();
+    if (!is_date(c.console_lock_since)) c.console_lock_since.clear();
+    {
+        std::vector<std::string> read;
+        for (const auto& s : c.notices_read)
+            if (!s.empty() && s.size() <= 96) read.push_back(s);
+        if (read.size() > 48) read.erase(read.begin(), read.end() - 48);
+        c.notices_read = read;
+    }
 
     std::vector<std::string> servers;
     for (const auto& s : c.custom_servers)
@@ -172,6 +181,7 @@ static void clear_system(Config& c)
 {
     c.console_lock = false;
     c.console_lock_prev.clear();
+    c.console_lock_since.clear();
     c.relock_pending = false;
     c.fw_gate_fw.clear(), c.fw_gate_app.clear(), c.fw_gate_choice.clear();
     clear_extra(c);
@@ -180,6 +190,7 @@ static void clear_system(Config& c)
 static void read_system(const nlohmann::json& j, Config& c)
 {
     read_bool(j, "console_lock", c.console_lock);
+    read_string(j, "console_lock_since", c.console_lock_since);
     auto prev = j.find("console_lock_prev");
     if (prev != j.end() && prev->is_array())
         c.console_lock_prev = read_int_list(*prev);   // sanitize() keeps it only when it is seven valid limits
@@ -266,6 +277,14 @@ static void load_shared()
     read_string(j, "support_reminded", c.support_reminded);
     read_string(j, "seen_version", c.seen_version);
     read_string(j, "crash_seen", c.crash_seen);
+    read_bool(j, "notices_system", c.notices_system);
+    read_bool(j, "notices_summary", c.notices_summary);
+    read_bool(j, "notices_reminders", c.notices_reminders);
+    read_string(j, "summary_seen", c.summary_seen);
+    auto read = j.find("notices_read");
+    if (read != j.end() && read->is_array())
+        for (const auto& v : *read)
+            if (v.is_string()) c.notices_read.push_back(v.get<std::string>());
     auto amounts = j.find("extra_amounts");
     if (amounts != j.end() && amounts->is_array())
         c.extra_amounts = read_int_list(*amounts);   // sanitize() keeps it only when it is one of EXTRA_SETS
@@ -363,12 +382,18 @@ bool snapshot(Snapshot& snap)
     j["support_reminded"] = s_config.support_reminded;
     j["seen_version"]    = s_config.seen_version;
     j["crash_seen"]      = s_config.crash_seen;
+    j["notices_system"]    = s_config.notices_system;
+    j["notices_summary"]   = s_config.notices_summary;
+    j["notices_reminders"] = s_config.notices_reminders;
+    j["notices_read"]      = s_config.notices_read;
+    j["summary_seen"]      = s_config.summary_seen;
     snap.shared = dump(j);
 
     nlohmann::json st;
     st["schema"]            = SCHEMA;
     st["console_lock"]      = s_config.console_lock;
     st["console_lock_prev"] = s_config.console_lock_prev;
+    st["console_lock_since"] = s_config.console_lock_since;
     st["fw_gate_fw"]        = s_config.fw_gate_fw;
     st["fw_gate_app"]       = s_config.fw_gate_app;
     st["fw_gate_choice"]    = s_config.fw_gate_choice;
