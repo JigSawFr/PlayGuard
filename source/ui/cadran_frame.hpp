@@ -9,6 +9,7 @@
 
 #include <borealis.hpp>
 #include <string>
+#include <vector>
 
 namespace cadran
 {
@@ -24,8 +25,9 @@ void style_header(brls::AppletFrame* frame, const char* icon, const std::string&
 // first time it takes the focus.
 void install_screens();
 // A TabFrame's sidebar as the boards' rail: an icon before each label, the
-// active tab on a teal pill.
-void style_rail(brls::View* tab_frame);
+// active tab on a teal pill. `icons`: one per line of the sidebar, "" for a
+// separator (none: the main screen's).
+void style_rail(brls::View* tab_frame, const std::vector<const char*>& icons = {});
 // Both, for the main screen.
 void style_frame(brls::AppletFrame* frame, brls::View* tab_frame);
 // The main screen's header pill: its text, or hidden when empty (each

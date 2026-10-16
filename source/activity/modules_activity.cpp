@@ -1,15 +1,19 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/modules_activity.hpp"
 
-#include <cstdlib>
 #include <fmt/format.h>
 #include <memory>
 
 #include "action/agent_update.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
+#include "action/rescue.hpp"
 #include "action/sync_flow.hpp"
+#include "app.hpp"
+#include "core/sim_env.h"
+#include "tab/cadran_list.hpp"
 #include "tab/tab_base.hpp"
+#include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -80,6 +84,7 @@ class ModuleTab : public TabBase
   private:
     modules::Id id;
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
+    cadran::List list;
 
     void install();
     void uninstall();
@@ -103,17 +108,17 @@ class ModulesOverview : public TabBase
     void refresh() override;
 
   private:
+    cadran::List list;
     BRLS_BIND(brls::Label,      intro,  "md_intro");
     BRLS_BIND(brls::DetailCell, rescue, "md_rescue");
     BRLS_BIND(brls::DetailCell, agent,  "md_agent");
 };
 
 // Sidebar positions (the separator counts).
-constexpr int TAB_OVERVIEW = 0;
 constexpr int TAB_RESCUE   = 2;
 constexpr int TAB_AGENT    = 3;
 
-ModulesOverview::ModulesOverview() : TabBase("xml/tab/modules_overview.xml")
+ModulesOverview::ModulesOverview() : TabBase("xml/tab/modules_overview.xml"), list(this)
 {
     intro->setSingleLine(false);
     rescue->registerClickAction([this](brls::View*) {
@@ -124,6 +129,7 @@ ModulesOverview::ModulesOverview() : TabBase("xml/tab/modules_overview.xml")
         ui::go_to_tab(this, TAB_AGENT);
         return true;
     });
+    this->list.apply({ { "md_rescue", "unlock" }, { "md_agent", "server" } });
 }
 
 void ModulesOverview::refresh()
@@ -133,9 +139,10 @@ void ModulesOverview::refresh()
     rescue->setDetailTextColor(color);
     agent->setDetailText(ModulesActivity::summary(modules::Id::Agent, &color));
     agent->setDetailTextColor(color);
+    this->list.sync();
 }
 
-ModuleTab::ModuleTab(modules::Id id) : TabBase("xml/tab/module.xml"), id(id)
+ModuleTab::ModuleTab(modules::Id id) : TabBase("xml/tab/module.xml"), id(id), list(this)
 {
     const modules::Module& m = modules::get(id);
     header->setTitle(brls::getStr(key(m, "title")));
@@ -196,6 +203,8 @@ ModuleTab::ModuleTab(modules::Id id) : TabBase("xml/tab/module.xml"), id(id)
         this->uninstall();
         return true;
     });
+    this->list.apply({ { "md_status", "info" }, { "md_action", "download" }, { "md_boot", "bolt" },
+                       { "md_run", "refresh" }, { "md_remove", "trash" } });
 }
 
 void ModuleTab::install()
@@ -236,6 +245,11 @@ void ModuleTab::install()
             ui::error("playguard/modules/error"_i18n + " — " + err);
         } else {
             modules::confirm(sd, m);
+            // Which PlayGuard it comes with, as the release's zip says: the
+            // bell's "out of date" entry goes.
+            if (!modules::write_rescue_note(sd, app::version(), rescue::revision(), &err))
+                brls::Logger::warning("modules: playguard-rescue.txt not written: {}", err);
+            rescue::note_version();
             record(m, update ? "updated" : "installed");
             ui::notify(brls::getStr(key(m, update ? "updated" : "installed")));
         }
@@ -264,6 +278,7 @@ void ModuleTab::uninstall()
                 ui::error("playguard/modules/error"_i18n + " — " + err);
             } else {
                 record(m, "removed");
+                if (m.id == modules::Id::Rescue) rescue::note_version();
                 ui::notify("playguard/modules/removed"_i18n);
             }
             if (*alive) this->refresh();
@@ -294,6 +309,7 @@ void ModuleTab::refresh()
     run->setText(running ? "playguard/modules/stop"_i18n : "playguard/modules/start"_i18n);
     ui::set_visible(run, m.resident && s.installed);
     ui::set_visible(remove, s.installed);
+    this->list.sync();
 }
 }   // namespace
 
@@ -304,7 +320,7 @@ ModulesActivity::ModulesActivity(Tab start) : start(start)
 std::string ModulesActivity::bundle_dir()
 {
 #ifndef __SWITCH__
-    if (const char* sim = std::getenv("PLAYGUARD_SIM_BUNDLED")) return sim;
+    if (const char* sim = sim_env("PLAYGUARD_SIM_BUNDLED")) return sim;
 #endif
     return BRLS_ASSET("sysmodules");
 }
@@ -324,7 +340,12 @@ void ModulesActivity::onContentAvailable()
     tabs->addTab("playguard/modules/overview"_i18n, []() { return new ModulesOverview(); });
     tabs->addSeparator();
     tabs->addTab("playguard/modules/rescue/tab"_i18n, []() { return new ModuleTab(modules::Id::Rescue); });
-    tabs->addTab("playguard/modules/agent/title"_i18n, []() { return new ModuleTab(modules::Id::Agent); });
+    tabs->addTab("playguard/modules/agent/tab"_i18n, []() { return new ModuleTab(modules::Id::Agent); });
+    // Dressed here, not by the screens' skin (ui/cadran_frame.hpp), which
+    // would take the sidebar for the list: the header, and the main
+    // screen's rail (borealis' items do not fit its width).
+    cadran::style_header(dynamic_cast<brls::AppletFrame*>(this->getContentView()), nullptr, "", false, false);
+    cadran::style_rail(tabs.getView(), { "list", "", "unlock", "server" });
 
     if (start != Tab::Overview) {
         const int position = start == Tab::Rescue ? TAB_RESCUE : TAB_AGENT;

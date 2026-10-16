@@ -1623,6 +1623,7 @@
         },
         "agent": {
             "title": "Agent du lien à distance",
+            "tab": "Agent du lien",
             "about": "Garde le lien avec Home Assistant (Préférences › Accès à distance) actif quand PlayGuard est fermé : les ordres sont exécutés et l'état reste à jour.",
             "install_body": "Installer et démarrer l'agent (version {}) ? Il se lance à chaque démarrage et utilise les réglages de l'Accès à distance.",
             "update_body": "Mettre à jour l'agent en version {} ? Il s'arrête un instant puis redémarre.",

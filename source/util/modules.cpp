@@ -23,12 +23,6 @@ std::string join(const std::string& root, const std::string& rel)
     return root + "/" + rel;
 }
 
-bool exists(const std::string& path)
-{
-    struct stat st;
-    return stat(path.c_str(), &st) == 0;
-}
-
 bool is_dir(const std::string& path)
 {
     struct stat st;
@@ -111,7 +105,7 @@ Bundle bundled(const std::string& bundle_dir, const Module& m)
     Bundle b;
     b.nsp = join(bundle_dir, std::string(m.name) + "/exefs.nsp");
     std::string text;
-    if (!exists(b.nsp) || !paths::read_file(join(bundle_dir, std::string(m.name) + "/version.txt"), text)) return b;
+    if (!paths::file_exists(b.nsp) || !paths::read_file(join(bundle_dir, std::string(m.name) + "/version.txt"), text)) return b;
     b.version = value_of(text, "version");
     b.commit = value_of(text, "commit");
     b.sha256 = value_of(text, "sha256");
@@ -162,8 +156,8 @@ State state(const std::string& sd_root, const Module& m)
     State s;
     const std::string d = dir(sd_root, m);
     s.installed = file_sha256(d + "/exefs.nsp", &s.sha256);
-    s.at_boot = exists(d + "/flags/boot2.flag");
-    s.backup = exists(d + "/exefs.nsp.bak");
+    s.at_boot = paths::file_exists(d + "/flags/boot2.flag");
+    s.backup = paths::file_exists(d + "/exefs.nsp.bak");
     std::string text;
     if (s.installed && paths::read_file(d + "/version.txt", text)) {
         // Only when it is about the module in place (a file put back by hand
@@ -212,7 +206,7 @@ bool install(const std::string& sd_root, const Module& m, const Bundle& b, bool 
         errno = 0;
         return fail(error, "the copy on the SD card does not match");
     }
-    const bool first = !exists(target);
+    const bool first = !paths::file_exists(target);
     if (!first) {
         std::remove(old.c_str());   // an older backup: this one is newer
         if (std::rename(target.c_str(), old.c_str()) != 0) {
@@ -245,7 +239,7 @@ bool rollback(const std::string& sd_root, const Module& m, std::string* error)
     s_seen.clear();
     errno = 0;
     const std::string d = dir(sd_root, m), target = d + "/exefs.nsp", old = target + ".bak";
-    if (!exists(old)) return fail(error, "no previous module to put back");
+    if (!paths::file_exists(old)) return fail(error, "no previous module to put back");
     const std::string failed = target + ".failed";
     std::remove(failed.c_str());
     std::rename(target.c_str(), failed.c_str());
@@ -258,6 +252,14 @@ bool rollback(const std::string& sd_root, const Module& m, std::string* error)
     std::remove(failed.c_str());
     std::remove((d + "/version.txt").c_str());   // its version is not known any more
     return true;
+}
+
+bool write_rescue_note(const std::string& sd_root, const std::string& version, const std::string& revision,
+                       std::string* error)
+{
+    if (revision.empty()) return true;
+    return paths::atomic_write(dir(sd_root, get(Id::Rescue)) + "/playguard-rescue.txt", version + " " + revision + "\n",
+                               error);
 }
 
 bool set_at_boot(const std::string& sd_root, const Module& m, bool on, std::string* error)
@@ -281,7 +283,7 @@ bool uninstall(const std::string& sd_root, const Module& m, std::string* error)
     s_seen.clear();
     errno = 0;
     const std::string d = dir(sd_root, m);
-    if (!exists(d)) return true;
+    if (!is_dir(d)) return true;
     if (!remove_tree(d)) return fail(error, "cannot remove " + d);
     return true;
 }

@@ -1623,6 +1623,7 @@
         },
         "agent": {
             "title": "Remote link agent",
+            "tab": "Link agent",
             "about": "Keeps the link to Home Assistant (Preferences › Remote access) running while PlayGuard is closed: orders are carried out and the state stays up to date.",
             "install_body": "Install and start the agent (version {})? It starts at each boot and uses the settings of Remote access.",
             "update_body": "Update the agent to version {}? It stops for a moment and starts again.",
