@@ -1334,6 +1334,8 @@
         "rescue_update": "更新",
         "rescue_update_failed": "無法更新復原 sysmodule（{}）。請改為將 playguard-rescue.zip 解壓縮到 SD 卡根目錄。",
         "rescue_updated": "復原 sysmodule 已是最新版本，從主機下次啟動起生效。",
+        "rescue_restart": "重新啟動主機以使用更新後的復原 sysmodule",
+        "rescue_restart_detail": "已更新，但在主機重新啟動之前仍使用舊版本。",
         "sys_atmosphere": "Atmosphère {} 已發布",
         "sys_atmosphere_detail": "這台主機執行的是 Atmosphère {}。",
         "sys_hekate": "hekate {} 已發布",

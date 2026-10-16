@@ -42,6 +42,8 @@ const char* revision();
 // revision, or there is none: installed before it was written), an entry of
 // the notification bell says so, with Update when this build carries the
 // module (bundled), else to install this release's playguard-rescue.zip.
+// After an update, another entry says to restart the console, until the new
+// module has run (it removes RESCUE_RESTART_PATH at boot).
 void note_version();
 
 // Whether this build carries its module (romfs:/rescue/exefs.nsp: Switch
@@ -49,7 +51,8 @@ void note_version();
 bool bundled();
 // Replaces the installed module with the bundled one and writes its
 // playguard-rescue.txt (this version, revision()), as extracting the zip
-// would; its flags/boot2.flag is left as it is. It runs from the next boot.
+// would; its flags/boot2.flag is left as it is. It runs from the next boot:
+// RESCUE_RESTART_PATH says so until then.
 // False, with a short English reason in *error, when it could not.
 bool update(std::string* error);
 

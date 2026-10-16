@@ -1334,6 +1334,8 @@
         "rescue_update": "Bijwerken",
         "rescue_update_failed": "De herstel-sysmodule kon niet worden bijgewerkt ({}). Pak in plaats daarvan playguard-rescue.zip uit in de hoofdmap van de SD-kaart.",
         "rescue_updated": "De herstel-sysmodule is bijgewerkt. Hij werkt vanaf de volgende start van de console.",
+        "rescue_restart": "Start de console opnieuw om de bijgewerkte herstel-sysmodule te gebruiken",
+        "rescue_restart_detail": "Hij is bijgewerkt, maar de oude blijft in gebruik tot de console opnieuw start.",
         "sys_atmosphere": "Atmosphère {} is beschikbaar",
         "sys_atmosphere_detail": "Deze console draait Atmosphère {}.",
         "sys_hekate": "hekate {} is beschikbaar",

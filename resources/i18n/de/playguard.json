@@ -1334,6 +1334,8 @@
         "rescue_update": "Aktualisieren",
         "rescue_update_failed": "Das Wiederherstellungs-Sysmodul konnte nicht aktualisiert werden ({}). Entpacke stattdessen playguard-rescue.zip ins Stammverzeichnis der SD-Karte.",
         "rescue_updated": "Das Wiederherstellungs-Sysmodul ist aktuell. Es wirkt ab dem nächsten Start der Konsole.",
+        "rescue_restart": "Starte die Konsole neu, um das aktualisierte Wiederherstellungs-Sysmodul zu nutzen",
+        "rescue_restart_detail": "Es wurde aktualisiert, aber das alte bleibt bis zum Neustart der Konsole in Betrieb.",
         "sys_atmosphere": "Atmosphère {} ist verfügbar",
         "sys_atmosphere_detail": "Diese Konsole nutzt Atmosphère {}.",
         "sys_hekate": "hekate {} ist verfügbar",

@@ -1334,6 +1334,8 @@
         "rescue_update": "업데이트",
         "rescue_update_failed": "복구 sysmodule을 업데이트하지 못했습니다({}). 대신 playguard-rescue.zip을 SD 카드 루트에 압축 해제하세요.",
         "rescue_updated": "복구 sysmodule이 최신 상태입니다. 본체를 다음에 시작할 때부터 적용됩니다.",
+        "rescue_restart": "업데이트된 복구 sysmodule을 사용하려면 본체를 다시 시작하세요",
+        "rescue_restart_detail": "업데이트되었지만 본체를 다시 시작할 때까지는 이전 것이 사용됩니다.",
         "sys_atmosphere": "Atmosphère {}을(를) 사용할 수 있습니다",
         "sys_atmosphere_detail": "이 본체는 Atmosphère {}을(를) 사용합니다.",
         "sys_hekate": "hekate {}을(를) 사용할 수 있습니다",

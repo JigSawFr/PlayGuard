@@ -47,7 +47,8 @@ report is left.
    the running PlayGuard ships with, the notification bell says so, and its
    *Update* puts in the module the `.nro` carries (`romfs:/rescue/exefs.nsp`,
    built with it) and writes `playguard-rescue.txt`; it runs from the next
-   boot. PlayGuard never installs it when it is not there already.
+   boot. Until then the bell says to restart the console: PlayGuard leaves
+   `restart_pending` next to the module, and the module removes it at boot. PlayGuard never installs it when it is not there already.
 2. When you are locked out: put the SD card in a computer, create an empty file
    `config/playguard/RESCUE` (or `RESCUE.txt`; to delete everything instead,
    write `delete` on a line of its own), put the card back, turn the

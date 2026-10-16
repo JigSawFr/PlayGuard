@@ -1334,6 +1334,8 @@
         "rescue_update": "Aggiorna",
         "rescue_update_failed": "Impossibile aggiornare il sysmodule di recupero ({}). Estrai invece playguard-rescue.zip nella radice della scheda SD.",
         "rescue_updated": "Il sysmodule di recupero è aggiornato. Funzionerà dal prossimo avvio della console.",
+        "rescue_restart": "Riavvia la console per usare il sysmodule di recupero aggiornato",
+        "rescue_restart_detail": "È stato aggiornato, ma quello vecchio resta in uso fino al riavvio della console.",
         "sys_atmosphere": "È disponibile Atmosphère {}",
         "sys_atmosphere_detail": "Questa console usa Atmosphère {}.",
         "sys_hekate": "È disponibile hekate {}",
