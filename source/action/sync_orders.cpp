@@ -49,10 +49,38 @@ std::vector<int> values(const int* v, int n)
 // The change history, as for the same change made on the console. `before`
 // is the play timer before a bedtime change; none for a change the agent made
 // (at `when`), whose bedtime is recorded as it was asked.
+// A change the console refused with its error code: in the history as the
+// same change refused on the console is (amber, never put back). PlayGuard's
+// own refusals (the play timer counting, the parent declining, read-only, a
+// value out of range) reached nothing on the console and are only answered.
+void record_refused(const Order& o, const SyncOutcome& out, const std::string& source)
+{
+    const std::string detail = o.intent.kind == SyncIntent_Profile ? std::string(o.intent.profile) : std::string();
+    const auto one = [](int v) { return v >= 0 ? std::vector<int>{ v } : std::vector<int>{}; };
+    switch (out.change) {
+        case SyncChange_Limits:
+            history_flow::record_failure("limits", out.rc, values(out.before, 7), values(out.after, 7), source, detail);
+            break;
+        case SyncChange_Level:
+            history_flow::record_failure("level", out.rc, one(out.before[0]), { out.after[0] }, source);
+            break;
+        case SyncChange_Vr: history_flow::record_failure("vr", out.rc, one(out.before[0]), { out.after[0] }, source); break;
+        case SyncChange_Custom: history_flow::record_failure("custom", out.rc, {}, {}, source); break;
+        case SyncChange_Alarm: history_flow::record_failure("alarm", out.rc, {}, {}, source); break;
+        case SyncChange_Bedtime:
+            history_flow::record_failure("bedtime", out.rc, {}, {}, source, o.entity + " = " + o.payload);
+            break;
+        case SyncChange_Unlock: history_flow::record_failure("unlock", out.rc, {}, {}, source); break;
+        case SyncChange_Relock: history_flow::record_failure("relock", out.rc, {}, {}, source); break;
+        default: break;   // nothing was asked of the console yet (it could not be read)
+    }
+}
+
 void record(const Order& o, const SyncOutcome& out, const PtState* before, const std::string& when = "")
 {
-    if (!out.applied || !out.changed) return;
     const std::string source = out.source ? out.source : "remote";
+    if (!out.applied && out.reason == SyncReason_PctlError) record_refused(o, out, source);
+    if (!out.applied || !out.changed) return;
     const std::string detail = o.intent.kind == SyncIntent_Profile ? std::string(o.intent.profile) : std::string();
     switch (out.change) {
         case SyncChange_Limits:

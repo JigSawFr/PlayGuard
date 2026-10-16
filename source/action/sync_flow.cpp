@@ -45,6 +45,16 @@ constexpr auto EXIT_WAIT = std::chrono::seconds(4);
 constexpr int AGENT_POLL_MS = 100;
 constexpr auto PROBE_EVERY = std::chrono::seconds(5);
 
+// `text` with the broker's name as "<broker>": the lines logged go into the
+// session file, which a report sent online carries, and the reports are
+// public (the Remote access screen's own log keeps the name).
+std::string without_broker(std::string text, const char* host)
+{
+    const size_t n = std::strlen(host);
+    for (size_t at; n && (at = text.find(host)) != std::string::npos;) text.replace(at, n, "<broker>");
+    return text;
+}
+
 // What the UI thread and the worker share. The worker never calls into
 // borealis but brls::sync() and the logger; the UI never calls the engine.
 struct Shared
@@ -163,8 +173,8 @@ uint64_t host_now_posix(void* ctx)
 void host_log(void* ctx, const char* line)
 {
     auto* sh = (Shared*)ctx;
-    brls::Logger::info("sync: {}", line);
     std::lock_guard<std::mutex> lk(sh->m);
+    brls::Logger::info("sync: {}", without_broker(line, sh->conf.host));
     sh->log.push_back(ui::now_hms() + "  " + line);
     while (sh->log.size() > LOG_LINES) sh->log.pop_front();
 }
@@ -855,7 +865,7 @@ void launch()
     s_week_sent.clear();
     s_state_body.clear();
     s_read_only_sent = app::read_only() ? 1 : 0;
-    brls::Logger::info("sync: remote link started ({}:{})", s_conf.host, s_conf.port);
+    brls::Logger::info("sync: remote link started (port {}{})", s_conf.port, s_conf.tls ? ", TLS" : "");
     on_play_data();
 }
 
@@ -1182,13 +1192,8 @@ std::string report_section()
                        STATES[l.state <= SyncLink_Online ? l.state : 0],
                        l.protocol == MQTT_V5 ? "5.0" : l.protocol == MQTT_V311 ? "3.1.1" : "-", l.connects, l.publishes,
                        l.orders, l.rejected, l.dropped, st.pending);
-    if (l.error[0]) {
-        // "cannot find <host>": reports are public, the broker's name is not.
-        std::string error = l.error;
-        for (size_t at; c.host[0] && (at = error.find(c.host)) != std::string::npos;)
-            error.replace(at, std::strlen(c.host), "<broker>");
-        out += fmt::format("last error  : {}\n", error);
-    }
+    // "cannot find <host>": reports are public, the broker's name is not.
+    if (l.error[0]) out += fmt::format("last error  : {}\n", without_broker(l.error, c.host));
     if (l.last_result[0]) out += fmt::format("last order  : {}\n", l.last_result);
     return out;
 }

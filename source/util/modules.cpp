@@ -260,6 +260,14 @@ bool rollback(const std::string& sd_root, const Module& m, std::string* error)
     return true;
 }
 
+bool write_rescue_note(const std::string& sd_root, const std::string& version, const std::string& revision,
+                       std::string* error)
+{
+    if (revision.empty()) return true;
+    return paths::atomic_write(dir(sd_root, get(Id::Rescue)) + "/playguard-rescue.txt", version + " " + revision + "\n",
+                               error);
+}
+
 bool set_at_boot(const std::string& sd_root, const Module& m, bool on, std::string* error)
 {
     errno = 0;

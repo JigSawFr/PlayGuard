@@ -3,7 +3,8 @@
 // card (installed by hand, at boot, a backup pending), what the screen
 // offers, a first install (boot2.flag, toolbox.json, version.txt), an update
 // keeping the previous module until confirmed or put back, the boot switch,
-// and removing a module with everything in its folder.
+// the recovery module's playguard-rescue.txt, and removing a module with
+// everything in its folder.
 #include "check.h"
 #include <cstdio>
 #include <cstdlib>
@@ -149,6 +150,16 @@ static void test_install_update_rollback()
     const Bundle absent;
     CHECK(!install(sd, m, absent, false, &err));
 
+    // playguard-rescue.txt as the release's zip has it ("<version> <revision>",
+    // what action/rescue reads); none without a revision, and none replaced
+    // by an empty one.
+    CHECK(write_rescue_note(sd, "1.2.0", "84d0eaa86878", &err));
+    CHECK(read(dir(sd, m) + "/playguard-rescue.txt") == "1.2.0 84d0eaa86878\n");
+    CHECK(write_rescue_note(sd, "1.2.0", "", &err));
+    CHECK(read(dir(sd, m) + "/playguard-rescue.txt") == "1.2.0 84d0eaa86878\n");
+    const std::string none = fresh("sd");
+    CHECK(write_rescue_note(none, "1.2.0", "", &err) && !exists(dir(none, m)));
+
     // Removed with everything in its folder.
     put(dir(sd, m) + "/LICENSE.txt", "GPL");
     CHECK(set_at_boot(sd, m, true, &err));
@@ -215,5 +226,5 @@ int main()
 
     const std::string cleanup = std::string("rm -rf '") + base + "'";
     CHECK(std::system(cleanup.c_str()) == 0);
-    return CHECK_DONE("modules table, bundle, state, install, update, rollback, removal and update plan assertions passed");
+    return CHECK_DONE("modules table, bundle, state, install, update, rollback, rescue note, removal and update plan assertions passed");
 }

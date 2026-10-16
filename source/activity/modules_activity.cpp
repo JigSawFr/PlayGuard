@@ -8,7 +8,9 @@
 #include "action/agent_update.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
+#include "action/rescue.hpp"
 #include "action/sync_flow.hpp"
+#include "app.hpp"
 #include "tab/tab_base.hpp"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
@@ -236,6 +238,11 @@ void ModuleTab::install()
             ui::error("playguard/modules/error"_i18n + " — " + err);
         } else {
             modules::confirm(sd, m);
+            // Which PlayGuard it comes with, as the release's zip says: the
+            // bell's "out of date" entry goes.
+            if (!modules::write_rescue_note(sd, app::version(), rescue::revision(), &err))
+                brls::Logger::warning("modules: playguard-rescue.txt not written: {}", err);
+            rescue::note_version();
             record(m, update ? "updated" : "installed");
             ui::notify(brls::getStr(key(m, update ? "updated" : "installed")));
         }
@@ -264,6 +271,7 @@ void ModuleTab::uninstall()
                 ui::error("playguard/modules/error"_i18n + " — " + err);
             } else {
                 record(m, "removed");
+                if (m.id == modules::Id::Rescue) rescue::note_version();
                 ui::notify("playguard/modules/removed"_i18n);
             }
             if (*alive) this->refresh();

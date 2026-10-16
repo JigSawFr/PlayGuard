@@ -81,6 +81,13 @@ void confirm(const std::string& sd_root, const Module& m);
 // Puts exefs.nsp.bak back in place. False when there is none.
 bool rollback(const std::string& sd_root, const Module& m, std::string* error = nullptr);
 
+// The recovery module's playguard-rescue.txt, as Makefile's dist-rescue
+// writes it in the zip: "<PlayGuard version> <revision>" (tools/rescue_rev.cmake),
+// which action/rescue compares with its own to tell a module out of date.
+// Nothing is written without a revision (a build that has none).
+bool write_rescue_note(const std::string& sd_root, const std::string& version, const std::string& revision,
+                       std::string* error = nullptr);
+
 bool set_at_boot(const std::string& sd_root, const Module& m, bool on, std::string* error = nullptr);
 // Removes the module's whole folder.
 bool uninstall(const std::string& sd_root, const Module& m, std::string* error = nullptr);

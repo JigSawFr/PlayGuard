@@ -99,6 +99,7 @@ static void test_categories()
     CHECK(history_logic::category(entry("vr", {}, {})) == Category::Restrictions);
     CHECK(history_logic::category(entry("unlink", {}, {})) == Category::Security);
     CHECK(history_logic::category(entry("pin_shown", {}, {})) == Category::Security);
+    CHECK(history_logic::category(entry("module", {}, {})) == Category::Security);
     CHECK(history_logic::category(entry("outside_clock", {}, {})) == Category::Outside);
     CHECK(history_logic::category(entry("new_account", {}, {})) == Category::Outside);
     CHECK(history_logic::category(entry("clock", {}, {})) == Category::Other);
