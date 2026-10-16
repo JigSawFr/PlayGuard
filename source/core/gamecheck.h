@@ -120,7 +120,7 @@ u32 gamecheck_actions(const GameFacts *g, GameIssue issue);
 // usable behind it.
 u32 gamecheck_recommended(const GameFacts *g, GameIssue issue, u32 current_hos);
 
-// The screen's tabs: what to do about `issue`.
+// The screen's sections: what to do about `issue`.
 typedef enum {
     GC_CAT_FIX = 0,    // PlayGuard fixes it here (its recommended action does)
     GC_CAT_REINSTALL,  // the game is to be installed again (or its entry cleaned)

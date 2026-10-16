@@ -767,7 +767,6 @@
         "open": "Comprobar los juegos instalados",
         "title": "Juegos instalados",
         "note": "Los juegos que el menú HOME no puede iniciar ni mostrar (un icono que no termina de cargar, «!», un marco punteado), por qué, y qué hacer. A en un juego para ver los detalles.",
-        "section": "Juegos con un problema",
         "none": "Los {} juegos instalados parecen estar bien.",
         "err_list": "No se pudieron listar los juegos instalados",
         "truncated": "Solo se comprobaron los {} primeros juegos.",
@@ -885,17 +884,16 @@
         "size_gb": "{} GB",
         "decimal_mark": ",",
         "verify_code": "Código de la consola: {}",
-        "tabs": {
+        "groups": {
             "fix": "Reparables aquí ({})",
             "reinstall": "Reinstalar ({})",
             "system": "Firmware o tarjeta SD ({})"
         },
-        "tab_note": {
+        "group_note": {
             "fix": "PlayGuard puede repararlos: A en un juego y luego su primer botón.",
             "reinstall": "Sus archivos faltan o no sirven: quítalos aquí y vuelve a instalarlos con tu instalador habitual.",
             "system": "Los juegos están bien: el problema es el firmware de la consola o la tarjeta SD. Actualiza el firmware o inicia en la memoria donde se instalaron."
-        },
-        "next_tab": "Siguiente lista"
+        }
     },
     "about": {
         "section_changelog": "Novedades de la {}",

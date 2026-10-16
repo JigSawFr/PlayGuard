@@ -767,7 +767,6 @@
         "open": "Controlla i giochi installati",
         "title": "Giochi installati",
         "note": "I giochi che il menu HOME non riesce ad avviare o a mostrare (un'icona che continua a caricare, «!», una cornice tratteggiata), perché, e cosa fare. A su un gioco per i dettagli.",
-        "section": "Giochi con un problema",
         "none": "Tutti i {} giochi installati sembrano a posto.",
         "err_list": "Impossibile elencare i giochi installati",
         "truncated": "Sono stati controllati solo i primi {} giochi.",
@@ -885,17 +884,16 @@
         "size_gb": "{} GB",
         "decimal_mark": ",",
         "verify_code": "Codice della console: {}",
-        "tabs": {
+        "groups": {
             "fix": "Riparabili qui ({})",
             "reinstall": "Da reinstallare ({})",
             "system": "Firmware o scheda SD ({})"
         },
-        "tab_note": {
+        "group_note": {
             "fix": "PlayGuard può ripararli: A su un gioco, poi il primo pulsante.",
             "reinstall": "I loro file mancano o sono inutilizzabili: rimuovili qui, poi reinstallali con il tuo installer abituale.",
             "system": "I giochi sono a posto: il problema è il firmware della console o la scheda SD. Aggiorna il firmware o avvia dalla memoria su cui sono stati installati."
-        },
-        "next_tab": "Elenco successivo"
+        }
     },
     "about": {
         "section_changelog": "Novità della {}",

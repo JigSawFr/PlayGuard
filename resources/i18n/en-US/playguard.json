@@ -767,7 +767,6 @@
         "open": "Check the installed games",
         "title": "Installed games",
         "note": "The games the HOME menu cannot start or draw (an icon that keeps loading, \"!\", a dotted frame), why, and what to do. A on a game for the details.",
-        "section": "Games with a problem",
         "none": "All {} installed games look fine.",
         "err_list": "The installed games could not be listed",
         "truncated": "Only the first {} games were checked.",
@@ -885,17 +884,16 @@
         "size_gb": "{} GB",
         "decimal_mark": ".",
         "verify_code": "Code from the console: {}",
-        "tabs": {
+        "groups": {
             "fix": "Fix here ({})",
             "reinstall": "Reinstall ({})",
             "system": "Firmware or SD card ({})"
         },
-        "tab_note": {
+        "group_note": {
             "fix": "PlayGuard can repair these: A on a game, then its first button.",
             "reinstall": "Their files are gone or unusable: remove them here, then install them again with your usual installer.",
             "system": "The games are fine: the console's firmware or SD card is the problem. Update the firmware, or start on the storage they were installed on."
-        },
-        "next_tab": "Next list"
+        }
     },
     "about": {
         "section_changelog": "What's new in {}",

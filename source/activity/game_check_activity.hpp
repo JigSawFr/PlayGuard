@@ -1,8 +1,8 @@
 // GameCheckActivity — Tools › Check the installed games: the games the HOME
 // menu cannot start or draw (core/gamecheck.h), each with what the HOME menu
-// shows, and how many of the installed games have a problem, in three tabs
-// by way out (LB/RB): repaired here, installed again, the firmware or the SD
-// card (gamecheck_category), grouped by problem in each. A on one: its
+// shows, and how many of the installed games have a problem, in a section per
+// way out: repaired here, installed again, the firmware or the SD card
+// (gamecheck_category), grouped by problem in each. A on one: its
 // icon, why and what to do, the fix as the first button when one action is
 // the fix, then the other actions (accept the installed version again, check
 // the data, remove the update or an add-on, remove the game; save data always
@@ -33,6 +33,15 @@ class GameCheckActivity : public brls::Activity
 
   private:
     // A repair waiting for the next read to tell whether it worked.
+    // A section of the list: its title (with its count), what to do, its games.
+    struct Group
+    {
+        brls::Box*    box   = nullptr;
+        brls::Header* title = nullptr;
+        brls::Label*  note  = nullptr;
+        brls::Box*    list  = nullptr;
+    };
+
     struct Pending
     {
         u64 id = 0;
@@ -48,9 +57,9 @@ class GameCheckActivity : public brls::Activity
     std::vector<u64> waiting;         // to check again once the check under way is over
     bool verifying = false;   // one integrity check at a time
     bool focused   = false;   // the first game got the focus once
-    GameCategory tab = GC_CAT_FIX;   // the tab shown; one without games is left out
     std::string timing;       // where the last check spent its time (developer mode)
     Pending pending;
+    Group groups[GC_CAT_COUNT];
 
     static std::string cache_file();
     void save();
@@ -62,8 +71,6 @@ class GameCheckActivity : public brls::Activity
     void status_text(const std::string& text, NVGcolor color);
     std::string age_text() const;
     void show();
-    void show_tab(GameCategory category);
-    void next_tab(int step);
     // Whether `game`, checked again, changes the list (not its status line).
     bool changes_list(const GameFacts& game) const;
     void open(const GameFacts& game, GameIssue issue, u32 current_hos);
@@ -76,12 +83,6 @@ class GameCheckActivity : public brls::Activity
 
     BRLS_BIND(brls::Label,  note,   "gc_note");
     BRLS_BIND(brls::Label,  status, "gc_status");
-    BRLS_BIND(brls::Header, header, "gc_header");
-    BRLS_BIND(brls::Box,    tabs,   "gc_tabs");
-    BRLS_BIND(brls::Button, tab_fix, "gc_tab_fix");
-    BRLS_BIND(brls::Button, tab_reinstall, "gc_tab_reinstall");
-    BRLS_BIND(brls::Button, tab_system, "gc_tab_system");
-    BRLS_BIND(brls::Label,  tab_note, "gc_tab_note");
     BRLS_BIND(brls::Box,    list,   "gc_list");
     BRLS_BIND(brls::Label,  hint,   "gc_hint");
 };

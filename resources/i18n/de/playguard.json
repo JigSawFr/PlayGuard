@@ -767,7 +767,6 @@
         "open": "Installierte Spiele prüfen",
         "title": "Installierte Spiele",
         "note": "Die Spiele, die das HOME-Menü nicht starten oder anzeigen kann (ein Symbol, das endlos lädt, „!“, ein gestrichelter Rahmen), warum, und was zu tun ist. A auf einem Spiel für die Details.",
-        "section": "Spiele mit einem Problem",
         "none": "Alle {} installierten Spiele scheinen in Ordnung.",
         "err_list": "Die installierten Spiele konnten nicht aufgelistet werden",
         "truncated": "Nur die ersten {} Spiele wurden geprüft.",
@@ -885,17 +884,16 @@
         "size_gb": "{} GB",
         "decimal_mark": ",",
         "verify_code": "Code der Konsole: {}",
-        "tabs": {
+        "groups": {
             "fix": "Hier reparierbar ({})",
             "reinstall": "Neu installieren ({})",
             "system": "Firmware oder SD-Karte ({})"
         },
-        "tab_note": {
+        "group_note": {
             "fix": "PlayGuard kann sie reparieren: A auf einem Spiel, dann die erste Schaltfläche.",
             "reinstall": "Ihre Dateien fehlen oder sind unbrauchbar: hier entfernen und mit dem gewohnten Installer neu installieren.",
             "system": "Die Spiele sind in Ordnung: Das Problem liegt an der Firmware der Konsole oder an der SD-Karte. Firmware aktualisieren oder vom Speicher starten, auf dem sie installiert wurden."
-        },
-        "next_tab": "Nächste Liste"
+        }
     },
     "about": {
         "section_changelog": "Neu in {}",

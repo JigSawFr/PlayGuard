@@ -20,7 +20,7 @@ using namespace brls::literals;
 
 namespace
 {
-const GameCategory TABS[GC_CAT_COUNT] = { GC_CAT_FIX, GC_CAT_REINSTALL, GC_CAT_SYSTEM };
+const GameCategory GROUPS[GC_CAT_COUNT] = { GC_CAT_FIX, GC_CAT_REINSTALL, GC_CAT_SYSTEM };
 
 const char* category_key(GameCategory category)
 {
@@ -338,21 +338,25 @@ void GameCheckActivity::onContentAvailable()
     note->setSingleLine(false);
     status->setSingleLine(false);
     hint->setSingleLine(false);
-    brls::Button* const buttons[GC_CAT_COUNT] = { tab_fix.getView(), tab_reinstall.getView(), tab_system.getView() };
-    for (GameCategory category : TABS)
-        buttons[category]->registerClickAction([this, category](brls::View*) {
-            this->show_tab(category);
-            return true;
-        });
-    tab_note->setSingleLine(false);
-    this->getContentView()->registerAction("playguard/games/next_tab"_i18n, brls::BUTTON_RB, [this](brls::View*) {
-        this->next_tab(1);
-        return true;
-    });
-    this->getContentView()->registerAction("", brls::BUTTON_LB, [this](brls::View*) {
-        this->next_tab(-1);
-        return true;
-    }, true);
+    // A section per way out, under its title and what to do; each hidden
+    // while it has no game.
+    for (GameCategory category : GROUPS) {
+        Group& group = this->groups[category];
+        group.box = new brls::Box(brls::Axis::COLUMN);
+        group.box->setAlignItems(brls::AlignItems::STRETCH);
+        group.title = new brls::Header();
+        group.title->setMarginBottom(4);
+        group.title->setMarginTop(category == GROUPS[0] ? 10 : 20);
+        group.box->addView(group.title);
+        group.note = text_label(brls::getStr(std::string("playguard/games/group_note/") + category_key(category)), 18, ui::color_note());
+        group.note->setMarginBottom(8);
+        group.box->addView(group.note);
+        group.list = new brls::Box(brls::Axis::COLUMN);
+        group.list->setAlignItems(brls::AlignItems::STRETCH);
+        group.box->addView(group.list);
+        list->addView(group.box);
+        ui::set_visible(group.box, false);
+    }
     // Ⓧ: every game checked again, whatever the cache says.
     this->getContentView()->registerAction("playguard/games/check_again"_i18n, brls::BUTTON_X, [this](brls::View*) {
         this->refresh(true, 0);
@@ -542,37 +546,20 @@ void GameCheckActivity::show()
 
     struct Broken { GameFacts game; GameIssue issue; };
     std::vector<Broken> broken;
-    std::vector<Broken> by_tab[GC_CAT_COUNT];
+    std::vector<Broken> by_group[GC_CAT_COUNT];
     for (const GameFacts& g : this->cache.games) {
         const GameIssue issue = gamecheck_classify(&g, hos);
         if (issue == GC_OK) continue;
         broken.push_back({ g, issue });
-        by_tab[gamecheck_category(&g, issue, hos)].push_back({ g, issue });
+        by_group[gamecheck_category(&g, issue, hos)].push_back({ g, issue });
     }
     const u32 count = (u32)this->cache.games.size();
-    // In a tab, the games with the same problem together, by name.
-    for (auto& games : by_tab)
+    // In a section, the games with the same problem together, by name.
+    for (auto& games : by_group)
         std::stable_sort(games.begin(), games.end(), [](const Broken& a, const Broken& b) {
             if (a.issue != b.issue) return a.issue < b.issue;
             return strcasecmp(game_name(a.game).c_str(), game_name(b.game).c_str()) < 0;
         });
-    // The tab shown always has games, when any has.
-    if (by_tab[this->tab].empty())
-        for (GameCategory category : TABS)
-            if (!by_tab[category].empty()) {
-                this->tab = category;
-                break;
-            }
-    const std::vector<Broken>& shown = by_tab[this->tab];
-    brls::Button* const buttons[GC_CAT_COUNT] = { tab_fix.getView(), tab_reinstall.getView(), tab_system.getView() };
-    for (GameCategory category : TABS) {
-        buttons[category]->setText(brls::getStr(std::string("playguard/games/tabs/") + category_key(category), (int)by_tab[category].size()));
-        buttons[category]->setStyle(category == this->tab ? &brls::BUTTONSTYLE_PRIMARY : &brls::BUTTONSTYLE_DEFAULT);
-        ui::set_visible(buttons[category], !by_tab[category].empty());
-    }
-    ui::set_visible(tabs.getView(), !broken.empty());
-    tab_note->setText(brls::getStr(std::string("playguard/games/tab_note/") + category_key(this->tab)));
-    ui::set_visible(tab_note.getView(), !broken.empty());
 
     // After a repair, once its game was checked again: whether it left the list.
     if (this->pending.id && !this->checking) {
@@ -584,30 +571,42 @@ void GameCheckActivity::show()
 
     // The cells are reused in place, as in the History screen: one of them
     // may have the focus while the list changes under it.
-    auto& cells = list->getChildren();
-    for (size_t i = 0; i < shown.size(); i++) {
-        brls::DetailCell* cell;
-        if (i < cells.size()) {
-            cell = (brls::DetailCell*)cells[i];
-        } else {
-            cell = new brls::DetailCell();
-            list->addView(cell);
+    brls::View* first = nullptr;
+    for (GameCategory category : GROUPS) {
+        const std::vector<Broken>& shown = by_group[category];
+        const Group& group = this->groups[category];
+        auto& cells = group.list->getChildren();
+        for (size_t i = 0; i < shown.size(); i++) {
+            brls::DetailCell* cell;
+            if (i < cells.size()) {
+                cell = (brls::DetailCell*)cells[i];
+            } else {
+                cell = new brls::DetailCell();
+                group.list->addView(cell);
+            }
+            const Broken b = shown[i];
+            cell->setText(game_name(b.game));
+            cell->setDetailText(short_text(b.game, b.issue));
+            cell->setDetailTextColor(warn_only(b.issue) ? ui::color_warn() : ui::color_bad());
+            cell->registerClickAction([this, b, hos](brls::View*) {
+                this->open(b.game, b.issue, hos);
+                return true;
+            });
+            ui::set_visible(cell, true);
+            if (!first) first = cell;
         }
-        const Broken b = shown[i];
-        cell->setText(game_name(b.game));
-        cell->setDetailText(short_text(b.game, b.issue));
-        cell->setDetailTextColor(warn_only(b.issue) ? ui::color_warn() : ui::color_bad());
-        cell->registerClickAction([this, b, hos](brls::View*) {
-            this->open(b.game, b.issue, hos);
-            return true;
-        });
+        for (size_t i = shown.size(); i < cells.size(); i++) ui::set_visible(cells[i], false);
+        group.title->setTitle(brls::getStr(std::string("playguard/games/groups/") + category_key(category), (int)shown.size()));
+        ui::set_visible(group.box, !shown.empty());
     }
-    for (size_t i = 0; i < shown.size() && i < cells.size(); i++) ui::set_visible(cells[i], true);
-    for (size_t i = shown.size(); i < cells.size(); i++) ui::set_visible(cells[i], false);
-    // Nothing had the focus before the first game with a problem.
-    if (!this->focused && !shown.empty()) {
+    // Nothing had the focus before the first game with a problem; and never
+    // the focus left in a section that went (its last game repaired).
+    brls::View* focus = brls::Application::getCurrentFocus();
+    bool lost = false;
+    for (brls::View* v = focus; v && !lost; v = v->getParent()) lost = v->getVisibility() != brls::Visibility::VISIBLE;
+    if (first && (!this->focused || lost)) {
         this->focused = true;
-        brls::Application::giveFocus(cells[0]);
+        brls::Application::giveFocus(first);
     }
 
     // The line above the list: the check under way, an error, or the result
@@ -619,47 +618,16 @@ void GameCheckActivity::show()
     } else if (R_FAILED(this->list_rc)) {
         this->status_text("playguard/games/err_list"_i18n + " — " + ui::rc_text(this->list_rc), ui::color_bad());
     } else {
-        std::string text = broken.empty() ? brls::getStr("playguard/games/none", (int)count) : "";
+        std::string text = broken.empty() ? brls::getStr("playguard/games/none", (int)count)
+                                          : brls::getStr("playguard/games/section_count", (int)broken.size(), (int)count);
         const std::string age = this->age_text();
-        if (!age.empty()) text += (text.empty() ? "" : " ") + age;
+        if (!age.empty()) text += (text.empty() ? "" : broken.empty() ? " " : " · ") + age;
         if (this->cache.truncated) text += (text.empty() ? "" : "\n") + brls::getStr("playguard/games/truncated", (int)count);
         if (app::dev_mode() && !this->timing.empty()) text += (text.empty() ? "" : "\n") + this->timing;
         this->status_text(text, broken.empty() ? ui::color_ok() : ui::color_note());
     }
-    header->setTitle(brls::getStr("playguard/games/section_count", (int)broken.size(), (int)count));
-    ui::set_visible(header.getView(), !broken.empty());
     hint->setText(brls::getStr("playguard/games/many", ui::storage_short(si)));
     ui::set_visible(hint.getView(), broken.size() >= MANY);
-}
-
-void GameCheckActivity::show_tab(GameCategory category)
-{
-    this->tab = category;
-    this->show();
-}
-
-void GameCheckActivity::next_tab(int step)
-{
-    SysInfo si;
-    sysinfo_get(&si);
-    bool has[GC_CAT_COUNT] = {};
-    for (const GameFacts& g : this->cache.games) {
-        const GameIssue issue = gamecheck_classify(&g, si.hos_version);
-        if (issue != GC_OK) has[gamecheck_category(&g, issue, si.hos_version)] = true;
-    }
-    int at = (int)this->tab;
-    for (int n = 0; n < GC_CAT_COUNT; n++) {
-        at = (at + step + GC_CAT_COUNT) % GC_CAT_COUNT;
-        if (!has[at] || at == (int)this->tab) continue;
-        // From a tab, the focus goes to the tab chosen; else to its first game.
-        brls::View* focus = brls::Application::getCurrentFocus();
-        const bool on_tabs = focus && focus->getParent() == tabs.getView();
-        this->show_tab((GameCategory)at);
-        brls::View* const buttons[GC_CAT_COUNT] = { tab_fix.getView(), tab_reinstall.getView(), tab_system.getView() };
-        if (on_tabs) brls::Application::giveFocus(buttons[at]);
-        else if (!list->getChildren().empty()) brls::Application::giveFocus(list->getChildren()[0]);
-        return;
-    }
 }
 
 bool GameCheckActivity::changes_list(const GameFacts& game) const

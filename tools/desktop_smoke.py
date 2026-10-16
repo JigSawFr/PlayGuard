@@ -964,15 +964,15 @@ if upload_count() != uploads_before + 1:
 key("Return")              # OK
 os.remove(github_token)
 
-# Installed games: the simulated console's broken games in three tabs (fixed
-# here, to reinstall, firmware or SD card), the fixes of the first, a removal
-# (recorded in the change history) in the second, the third.
+# Installed games: the simulated console's broken games in three sections
+# (fixed here, to reinstall, firmware or SD card), the fixes of the first, a
+# removal (recorded in the change history) in the second, the third.
 key("Down", 4)             # past Keep, Keep for, Keep up to: Check the installed games
 key("Return")
 time.sleep(0.8)
 shot("27_games_checking")  # the games shown as they are checked, with the count
 time.sleep(3)              # 15 games, 150 ms each
-shot("27_games")           # Fix here: Forest Tales, Robot Factory, Moon Racer, an unnamed game
+shot("27_games")           # Fix here: Forest Tales, Robot Factory, Moon Racer, an unnamed game; then Reinstall
 if not os.path.exists(games_cache):
     fail("the installed games check was not cached in " + games_cache)
 # Opened again: the cache at once, nothing to check again.
@@ -1011,21 +1011,18 @@ if not any(m.endswith("works again.") and m.startswith("Robot Factory") for m in
     fail("the update removal did not fix the game: " + repr(messages()[-3:]))
 # Moon Racer: the console asks for a removed update; accepting the installed
 # version again (the fix, no question) makes it work again.
-key("Up", 6)               # the first game, then the tabs
-key("Down", 2)             # past Forest Tales
+key("Up", 6)               # the first game
+key("Down")                # past Forest Tales
 key("Return")
 shot("27_games_launch")
 key("Return")              # Accept the installed version again
 time.sleep(1.5)            # the toast follows the games read again
 if not any(m.endswith("works again.") and m.startswith("Moon Racer") for m in messages()):
     fail("the launch version reset did not fix the game: " + repr(messages()[-3:]))
-# To reinstall: Hedgehog Rush first (archived), removed.
-key("Up", 6)               # the tabs
-key("Right")               # To reinstall
-key("Return")
-time.sleep(0.4)
+# To reinstall: Garden Defenders (an update without its game), removed.
+key("Up", 6)               # the first game
+key("Down", 3)             # past Forest Tales, the unnamed game, Hedgehog Rush
 shot("27_games_reinstall")
-key("Down", 2)             # past Hedgehog Rush: Garden Defenders
 key("Return")
 shot("27_games_actions")   # Remove the game (the fix), Other actions
 key("Return")              # Remove the game from the console
@@ -1035,11 +1032,8 @@ time.sleep(1.5)
 shot("27_games_removed")
 if not any(m.endswith("removed") for m in messages()):
     fail("the broken game was not removed: " + repr(messages()[-3:]))
-# Firmware or SD card: Star Pilots.
-key("Up", 6)
-key("Right")
-key("Return")
-time.sleep(0.4)
+# Firmware or SD card: Star Pilots, the last game.
+key("Down", 4)
 shot("27_games_system")
 key("Escape")
 
