@@ -16,7 +16,7 @@ side is in [docs/parental-controls.md](docs/parental-controls.md).
 
 These need a finding before any code: most of them a play-timer block
 compared before and after a change made from the phone app, on a console
-still linked to it: *Security & app › Before unlinking: help decode…* (shown
+still linked to it: *PIN › Before unlinking: help decode…* (shown
 while linked, for everyone) or *Developer tools › Compare the play-timer
 block*. A report attached to an issue is the most useful contribution right
 now.

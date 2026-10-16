@@ -14,6 +14,7 @@
 #include "activity/onboarding_activity.hpp"
 #include "activity/play_timer_perday_activity.hpp"
 #include "app.hpp"
+#include "tab/clock_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
 
@@ -34,7 +35,7 @@ void link(brls::DetailCell* cell, int tab)
 
 void linked(brls::DetailCell* cell, const std::string& value)
 {
-    cell->setDetailText(value + "  ›");
+    cell->setDetailText(ui::opens(value));
 }
 }   // namespace
 
@@ -52,7 +53,7 @@ DashboardTab::DashboardTab()
         this->refresh();
         return true;
     });
-    first_steps->setDetailText("playguard/onboarding/pin_missing"_i18n);
+    first_steps->setDetailText(ui::opens("playguard/onboarding/pin_missing"_i18n));
     first_steps->setDetailTextColor(ui::color_warn());
     first_steps->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new OnboardingActivity());
@@ -95,14 +96,14 @@ DashboardTab::DashboardTab()
     // Inaccurate and writable: the guided measure-and-set path; else the tab.
     clock->registerAction("playguard/hints/open"_i18n, brls::BUTTON_A, [this](brls::View*) {
         if (this->clock_inaccurate && !app::read_only()) clock_flow::guided([this]() { this->refresh(); });
-        else ui::go_to_tab(clock, ui::tab::clock);
+        else ClockTab::open_screen();
         return true;
     }, false, false, brls::SOUND_CLICK);
     link(pairing, ui::tab::security);
-    link(fw, ui::tab::tools);
-    link(compat, ui::tab::tools);
-    link(serial, ui::tab::tools);
-    link(game_patches, ui::tab::tools);
+    link(fw, ui::tab::console);
+    link(compat, ui::tab::console);
+    link(serial, ui::tab::console);
+    link(game_patches, ui::tab::console);
 }
 
 DashboardTab::~DashboardTab()

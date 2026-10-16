@@ -49,7 +49,7 @@ the Overview and the Play timer tab must show the time over the limit.
 
 The "sysnotes" scenario checks for updates at start-up against a simulated
 GitHub and switchbrew (PLAYGUARD_SIM_SYS_LATEST, PLAYGUARD_SIM_SYS_NOTES),
-hekate 6.5.3 on the SD card: Tools › Console must say how far behind each
+hekate 6.5.3 on the SD card: Console must say how far behind each
 one is and that the newest firmware needs a newer hekate, then show the
 release notes of the firmware (the closest newer version, then the
 installed one), of Atmosphère and of hekate, and keep them in the cache.
@@ -398,7 +398,7 @@ if SYSNOTES:
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
     json.dump({"schema": 1, "update_daily": True}, open(config_file, "w"))
 if LOCK:
-    # Security › Ask for the PIN › To open PlayGuard: the lock screen comes
+    # PIN › Protect PlayGuard with the PIN › To open PlayGuard: the lock screen comes
     # first, and the right PIN (the simulated PIN screen accepts) opens the
     # app in its place. And without the intro (Preferences): no 2 s hold.
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
@@ -566,7 +566,7 @@ if not LOADING and not LOCK:
     if not m or int(m.group(1)) < 2000:
         fail("the first screen came before the end of the intro: " + (ready[0].strip() if ready else "no line"))
 
-tabs = ["dashboard", "play_timer", "activity", "restrictions", "clock", "security", "preferences", "tools", "about"]
+tabs = ["dashboard", "play_timer", "activity", "restrictions", "security", "console", "history", "preferences", "about"]
 
 
 def steps(a, b):
@@ -615,10 +615,13 @@ if GATE:
     key("Right")
     key("Return", 7)
     shot("04_dev_enabled")
-    # The developer tools are at the end of Tools: press like a hand.
+    # The developer tools are at the end of Preferences › Help & diagnostics:
+    # press like a hand.
     key("Left")
-    key("Up", steps("tools", "about"))
+    key("Up", steps("preferences", "about"))
     key("Right")
+    key("Down", 50, hold=0.15) # its last line: Help & diagnostics
+    key("Return")
     key("Down", 50, hold=0.15) # the Developer section, down to its last cell
     shot("05_dev_tools")
     # Turning a developer switch off asks first; B keeps it on (the end of
@@ -712,8 +715,10 @@ if DEVBUILD:
     key("Right")
     key("Return", 7)
     key("Left")
-    key("Up", steps("tools", "about"))
+    key("Up", steps("preferences", "about"))
     key("Right")
+    key("Down", 50, hold=0.15) # its last line: Help & diagnostics
+    key("Return")
     key("Down", 50, hold=0.15) # the Developer section, down to its last cell
     key("Return")              # Install another build: signed out, the releases and "Sign in"
     time.sleep(1)              # once fetched (the simulated GitHub takes 0.6 s an answer)
@@ -858,8 +863,9 @@ if ERRORS:
     shot("04_unlock_failed")   # a dialog, not a toast
     key("Return")              # OK
     key("Left")                # back to the sidebar
-    key("Down", 3)             # Network clock
-    key("Right")
+    key("Down", steps("play_timer", "console"))
+    key("Right")               # Network clock, its own screen
+    key("Return")
     shot("05_clock_autosync_off")
     # No time server answers: measuring offers the console clock instead,
     # behind the same confirmation as a measured time.
@@ -984,9 +990,9 @@ if SYSNOTES:
             time.sleep(0.5)
         fail(f"no {what} in 30 s")
     wait_logged("release notes: lists kept", "release lists from the start-up check")
-    key("Down", steps("dashboard", "tools"))
-    key("Right")
-    key("Down", 13)            # Console › hekate (the first presses scroll the notes above), the warning under it
+    key("Down", steps("dashboard", "console"))
+    key("Right")               # Network clock
+    key("Down", 4)             # past the installed games, Firmware, Atmosphère: hekate, the warning under it
     shot("01_tools_console")   # 2 versions behind, and 23.0.1 needs hekate 6.5.4 first
     key("Up", 2)               # Firmware
     key("Return")
@@ -1164,11 +1170,35 @@ shot("23_bedtime_done")
 if not any(m.startswith("Bedtime alarm changed.") for m in messages()):
     fail("the bedtime alarm was not changed: " + repr(messages()[-3:]))
 
+# Play timer › Advanced: its own screen, the switch next to the actions it
+# shows; turned on, then off again (backups restore the alarm only with it on).
+key("Down", 4)             # past Allowed again at, the extra-time amounts and switch: Advanced
+key("Return")
+shot("23_advanced")
+def advanced_saved(on):
+    # The config is written off the UI thread (ui::save_config).
+    for _ in range(25):
+        try:
+            if bool(json.load(open(config_file)).get("advanced")) == on:
+                return True
+        except (OSError, ValueError):
+            pass
+        time.sleep(0.2)
+    return False
+key("Return")              # Show advanced play-timer actions: on
+shot("23_advanced_on")     # the "Time's up" alarm, pause and resume below it
+if not advanced_saved(True):
+    fail("the advanced actions switch was not saved on")
+key("Return")              # and off again
+if not advanced_saved(False):
+    fail("the advanced actions switch was not saved off")
+key("Escape")              # back to the Play timer tab
+
 # Settings backup: save one, open the list and the restore summary (cancelled).
 key("Left")                # back to the sidebar
-key("Down", steps("play_timer", "tools"))
-key("Right")               # First steps…
-key("Down", 2)             # past the change history: Back up the settings
+key("Down", steps("play_timer", "history"))
+key("Right")               # Changes made with PlayGuard
+key("Down")                # Back up the settings
 backups = os.path.join(nand_dir, "backups")
 before = len(os.listdir(backups)) if os.path.isdir(backups) else 0
 key("Return")              # Back up the settings
@@ -1197,7 +1227,12 @@ reports = os.path.join(run_dir, "playguard_data", "logs", "reports")
 def saved_reports():
     return [f for f in (os.listdir(reports) if os.path.isdir(reports) else []) if f.startswith("report_") and f.endswith(".txt")]
 saved = saved_reports()
-key("Down", 3)             # past Keep, Export: Send a report online
+key("Left")                # back to the sidebar
+key("Down", steps("history", "preferences"))
+key("Right")
+key("Down", 50, hold=0.15) # its last line: Help & diagnostics
+key("Return")
+key("Down", 2)             # past First steps, Export: Send a report online
 key("Return")
 if saved:                  # reports saved by an earlier local run: this report is the first choice
     key("Return")
@@ -1225,7 +1260,11 @@ os.remove(github_token)
 # section picked, the corrupt game kept as such), a removal of the games
 # picked and one of a single game (recorded in the change history), the
 # third all at once, the fourth.
-key("Down", 4)             # past Keep, Keep for, Keep up to: Check the installed games
+key("Escape")              # back to Preferences
+key("Left")                # back to the sidebar
+key("Up", steps("console", "preferences"))
+key("Right")               # Network clock
+key("Down")                # Check the installed games
 os.remove(games_cache)     # made by the start-up check: this screen's first check, game by game
 key("Return")
 time.sleep(0.8)
@@ -1363,7 +1402,7 @@ def pdfs():
     return {f for f in (os.listdir(exports) if os.path.isdir(exports) else []) if f.endswith(".pdf")}
 pdfs_before = pdfs()   # the run folder is kept between local runs
 key("Left")                # back to the sidebar
-key("Up", steps("activity", "tools"))
+key("Up", steps("activity", "console"))
 key("Right")               # Account (the simulated console has two; the totals are not focusable)
 key("Down", 5)             # a scroll, then past Period, the game to rediscover and Export: the first game
 key("Return")

@@ -5,6 +5,8 @@
 #include "action/history_flow.hpp"
 #include "app.hpp"
 
+#include <algorithm>
+
 using namespace brls::literals;
 
 namespace ui
@@ -80,6 +82,29 @@ void set_visible_all(std::initializer_list<std::pair<brls::View*, bool>> changes
         if (!c.second) set_visible(c.first, false);
 }
 
+void keep_focus(brls::Activity* activity, brls::View* fallback)
+{
+    // The view to get the focus back: the end of the boxes' last focused
+    // views. Box::removeView leaves a removed child there: the walk stops
+    // at one no longer among its box's children (never read).
+    brls::View* last = activity->getContentView();
+    while (auto* box = dynamic_cast<brls::Box*>(last)) {
+        brls::View* next = box->getLastFocusedView();
+        const auto& children = box->getChildren();
+        if (!next || std::find(children.begin(), children.end(), next) == children.end()) break;
+        last = next;
+    }
+    bool gone = !last || !last->isFocusable();
+    for (brls::View* v = last; v && !gone; v = v->getParent()) gone = v->getVisibility() != brls::Visibility::VISIBLE;
+    if (gone) brls::Application::giveFocus(fallback ? fallback : activity->getContentView());
+}
+
+bool has_focus(brls::Activity* activity)
+{
+    brls::View* focus = brls::Application::getCurrentFocus();
+    return focus && focus->getParentActivity() == activity;
+}
+
 void go_to_tab(brls::View* from, int position)
 {
     brls::TabFrame* frame = nullptr;
@@ -91,6 +116,14 @@ void go_to_tab(brls::View* from, int position)
         const auto& children = frame->getChildren();
         if (children.size() >= 2) brls::Application::giveFocus(children.back());
     });
+}
+
+void open_screen(brls::View* content, const std::string& title)
+{
+    auto* frame = new brls::AppletFrame(content);
+    frame->setTitle(title);
+    frame->setIcon(brls::View::getFilePathXMLAttributeValue("@res/img/app_icon.jpg"));
+    brls::Application::pushActivity(new brls::Activity(frame));
 }
 
 void init_unlock_banner(brls::DetailCell* cell, std::function<void()> after)

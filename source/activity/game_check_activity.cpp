@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "action/game_notice.hpp"
+#include "action/game_scan.hpp"
 #include "action/history_flow.hpp"
 #include "action/upload_flow.hpp"
 #include "app.hpp"
@@ -474,21 +475,13 @@ void GameCheckActivity::onContentAvailable()
     });
 
     // The last check at once, then what changed since.
-    std::string bytes;
-    if (paths::read_file(cache_file(), bytes) && game_cache::decode(bytes, &this->cache)) this->show();
+    if (game_scan::load(&this->cache)) this->show();
     this->refresh(false, 0);
-}
-
-std::string GameCheckActivity::cache_file()
-{
-    return paths::nand_dir() + "/cache/games.bin";
 }
 
 void GameCheckActivity::save()
 {
-    std::string error;
-    if (!paths::ensure_dir(paths::nand_dir() + "/cache") || !paths::atomic_write(cache_file(), game_cache::encode(this->cache), &error))
-        brls::Logger::warning("games cache: not saved ({})", error);
+    game_scan::save(this->cache);
 }
 
 void GameCheckActivity::refresh(bool all, u64 also)
@@ -501,12 +494,13 @@ void GameCheckActivity::refresh(bool all, u64 also)
     this->checking = true;
     this->status_text("playguard/games/searching"_i18n);
     std::weak_ptr<bool> weak = this->alive;
-    brls::async([this, weak, all, also]() {
+    const auto list = [this, weak, all, also]() {
         auto records = std::make_shared<std::vector<GameRecord>>(GAMECHECK_MAX);
         u32 count = 0;
         bool truncated = false;
         const Result rc = gamecheck_records(records->data(), GAMECHECK_MAX, &count, &truncated);
         records->resize(count);
+        if (ui::quitting()) return;
         brls::sync([this, weak, all, also, records, rc, truncated]() {
             if (weak.expired()) return;   // the screen was closed meanwhile
             if (R_FAILED(rc)) {
@@ -544,6 +538,13 @@ void GameCheckActivity::refresh(bool all, u64 also)
             }
             this->check(std::move(check), full);
         });
+    };
+    // After the start-up check when it is still under way (game_scan): what
+    // it checked first.
+    game_scan::when_free([this, weak, list](bool waited) {
+        if (weak.expired()) return;
+        if (waited && game_scan::load(&this->cache)) this->show();
+        ui::in_background("games list", list);
     });
 }
 
@@ -561,7 +562,7 @@ struct CheckRun
 bool on_checked(void* ctx, const GameFacts* game, u32 done)
 {
     auto* run = (CheckRun*)ctx;
-    if (run->alive.expired()) return false;   // closed: stop
+    if (run->alive.expired() || ui::quitting()) return false;   // closed: stop
     const GameFacts copy = *game;
     auto weak = run->alive;
     auto on_game = run->on_game;
@@ -593,7 +594,7 @@ void GameCheckActivity::check(std::vector<GameRecord> records, bool full)
         else this->status_text(brls::getStr("playguard/games/checking", (int)this->check_done, (int)this->check_total));
     };
     std::weak_ptr<bool> weak = this->alive;
-    brls::async([this, weak, run, full]() {
+    ui::in_background("games check", [this, weak, run, full]() {
         const u32 done = gamecheck_check(run->records.data(), (u32)run->records.size(), run->facts.data(), on_checked, run.get());
         const bool complete = done == run->records.size();
         GameCheckTiming t;
@@ -602,6 +603,7 @@ void GameCheckActivity::check(std::vector<GameRecord> records, bool full)
         const std::string timing = fmt::format("{} games in {} ms: setup {}, control {}, contents {}, state {}", t.games,
                                                ms(t.total_ns), ms(t.setup_ns), ms(t.control_ns), ms(t.contents_ns), ms(t.state_ns));
         brls::Logger::info("games check: {}", timing);
+        if (ui::quitting()) return;
         brls::sync([this, weak, complete, full, timing]() {
             if (weak.expired()) return;
             this->checking = false;
@@ -706,7 +708,6 @@ void GameCheckActivity::show()
 
     // The cells are reused in place, as in the History screen: one of them
     // may have the focus while the list changes under it.
-    brls::View* first = nullptr;
     for (GameCategory category : GROUPS) {
         const std::vector<Broken>& shown = by_group[category];
         Group& group = this->groups[category];
@@ -737,7 +738,6 @@ void GameCheckActivity::show()
                                      return true;
                                  });
             ui::set_visible(cell, true);
-            if (!first) first = cell;
         }
         for (size_t i = shown.size(); i < cells.size(); i++) ui::set_visible(cells[i], false);
         group.title->setTitle(brls::getStr(std::string("playguard/games/groups/") + category_key(category), (int)shown.size()));
@@ -767,6 +767,7 @@ void GameCheckActivity::show()
     brls::View* focus = brls::Application::getCurrentFocus();
     bool lost = false;
     for (brls::View* v = focus; v && !lost; v = v->getParent()) lost = v->getVisibility() != brls::Visibility::VISIBLE;
+    brls::View* first = this->first_game();
     if (first && (!this->focused || lost)) {
         this->focused = true;
         brls::Application::giveFocus(first);
@@ -791,6 +792,26 @@ void GameCheckActivity::show()
     }
     hint->setText(brls::getStr("playguard/games/many", ui::storage_short(si)));
     ui::set_visible(hint.getView(), broken.size() >= MANY);
+}
+
+// The first game of the list, in the first section shown.
+brls::View* GameCheckActivity::first_game() const
+{
+    for (GameCategory category : GROUPS) {
+        const Group& group = this->groups[category];
+        if (group.box->getVisibility() != brls::Visibility::VISIBLE) continue;
+        for (brls::View* cell : group.list->getChildren())
+            if (cell->getVisibility() == brls::Visibility::VISIBLE) return cell;
+    }
+    return nullptr;
+}
+
+// Back from a dialog: "Check these games" may have gone meanwhile (its
+// games left To check while the result asked whether to remove them); the
+// first game then has the focus (ui::keep_focus).
+void GameCheckActivity::onResume()
+{
+    ui::keep_focus(this, this->first_game());
 }
 
 bool GameCheckActivity::changes_list(const GameFacts& game) const

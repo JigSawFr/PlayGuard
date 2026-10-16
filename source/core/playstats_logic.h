@@ -1,11 +1,13 @@
 // playstats_logic — the parts of the play data layer (playstats.c) that never
 // talk to a service: one raw log entry as a playlog event, the bounded walk
-// of the log through a query function, a game's name out of its control.nacp
-// (titles compressed on 21.0.0+ included), the names already known, and the
-// game icons kept on the SD card. libnx calls stay in playstats.c, so the
-// host tests (tests/playstats/) run all of this against a fake <switch.h>.
+// of the log through a query function, the names already known, and the
+// game icons kept on the SD card (a game's name out of its control.nacp is
+// nacp.h's, shared with the installed games check). libnx calls stay in
+// playstats.c, so the host tests (tests/playstats/) run all of this against a
+// fake <switch.h>.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
+#include "nacp.h"
 #include "playstats.h"
 
 // One raw log entry as a playlog event; false for entries that do not matter.
@@ -45,25 +47,6 @@ typedef bool (*PlayTotalsQuery)(void *ctx, u64 app_id, GameStat *g);
 // while there is room (PLAYSTATS_MAX): the games already there (this week's)
 // are never pushed out. One more played game sets out->truncated.
 void playstats_add_played(PlayStats *out, const u64 *ids, size_t count, PlayTotalsQuery query, void *ctx);
-
-// `s` is valid UTF-8 for its first `len` bytes (no overlong form, surrogate
-// or code point above U+10FFFF).
-bool playstats_utf8_valid(const char *s, size_t len);
-// Copies at most n-1 bytes of a UTF-8 string without cutting a character.
-void playstats_copy_utf8(char *dst, size_t n, const char *src);
-
-// Byte 0x3215 of a control.nacp ([21.0.0+] TitlesDataFormat): 1 when the
-// title block (0x3000 bytes at 0) is {u16 size; raw DEFLATE} that inflates to
-// up to 32 language entries of 0x300 bytes.
-#define PLAYSTATS_NACP_SIZE          0x4000
-#define PLAYSTATS_NACP_TITLES_FORMAT 0x3215
-
-// The game's name from its control.nacp (`size` bytes, at least
-// PLAYSTATS_NACP_SIZE): the entry of language `lang` (an index into the
-// title entries), else the first one with a name or a publisher, as
-// nacpGetLanguageEntry() picks it. False, `out` empty, when there is none or
-// it is not valid UTF-8 (the UI then names the game by its title ID).
-bool playstats_nacp_name(const void *nacp, size_t size, u32 lang, char *out, size_t out_size);
 
 // The names already read: this run's, and the last run's from the SD cache
 // (PlayStats.names_lang says in which console language they are).

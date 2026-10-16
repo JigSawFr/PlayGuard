@@ -4,7 +4,7 @@ Thanks for helping! This file covers building, testing, the code layout, release
 
 ## No code needed
 
-Two minutes, if your console is still linked to the phone app: *Security & app › Before unlinking: help decode…* saves the play-timer block, you change one setting in the phone app ("alarm only", or a bedtime for one day), and PlayGuard lists what changed. Attach that file to an issue: it is the data the [roadmap](ROADMAP.md#waiting-on-data-from-a-console) waits for most. Translation fixes from native speakers are just as welcome (see [Translating PlayGuard](#translating-playguard)).
+Two minutes, if your console is still linked to the phone app: *PIN › Before unlinking: help decode…* saves the play-timer block, you change one setting in the phone app ("alarm only", or a bedtime for one day), and PlayGuard lists what changed. Attach that file to an issue: it is the data the [roadmap](ROADMAP.md#waiting-on-data-from-a-console) waits for most. Translation fixes from native speakers are just as welcome (see [Translating PlayGuard](#translating-playguard)).
 
 ## Build from source
 
@@ -40,8 +40,8 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_NETWORK_OFFSET=1411` | A network clock that many seconds ahead of the console clock until it is set (the console clock follows it while *Synchronise* is on) |
 | `PLAYGUARD_SIM_NTP=offline` | No time server answers (a console without Internet) |
 | `PLAYGUARD_SIM_FAIL=timer,clock,unverified,bedtime,remove,launch,verify` | Failures: the play-timer write, setting the clock, an unlock the system does not confirm, a bedtime the console does not take, removing a game or a content, resetting a launch version, the integrity check |
-| `PLAYGUARD_SIM_CHECK_MS=150` | How long checking one installed game takes (*Tools › Check the installed games*) |
-| `PLAYGUARD_SIM_GAMES_OK=1` | Every installed game fine (*Tools › Check the installed games*; by default one of each problem) |
+| `PLAYGUARD_SIM_CHECK_MS=150` | How long checking one installed game takes (*Console › Check the installed games*) |
+| `PLAYGUARD_SIM_GAMES_OK=1` | Every installed game fine (*Console › Check the installed games*; by default one of each problem) |
 
 | `PLAYGUARD_SIM_EMUMMC=1` | Running on emuMMC |
 | `PLAYGUARD_SIM_BLANK=1` | Atmosphère blanking the serial number |
@@ -53,7 +53,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_REGION=2` | The console region |
 | `PLAYGUARD_SIM_LATEST=1.1.0:24.0.0` | The latest release and the newest firmware it supports, for the update check (`offline` for no network) |
 | `PLAYGUARD_SIM_SYS_LATEST=1.12.1:6.5.4:23.0.1` | The latest Atmosphère, hekate and firmware the daily update check finds (Atmosphère : hekate : firmware; `offline` for no network) |
-| `PLAYGUARD_SIM_SYS_NOTES=<folder>` | What GitHub and switchbrew return for the release notes of *Tools › Console*: `atmosphere.json` and `hekate.json` (GitHub's release lists), `System_Versions.wiki` and `<version>.wiki` (switchbrew's pages, as wikitext); `offline` for no network |
+| `PLAYGUARD_SIM_SYS_NOTES=<folder>` | What GitHub and switchbrew return for the release notes in *Console*: `atmosphere.json` and `hekate.json` (GitHub's release lists), `System_Versions.wiki` and `<version>.wiki` (switchbrew's pages, as wikitext); `offline` for no network |
 | `PLAYGUARD_SIM_PASTE=https://gist.github.com/u/ab12` | What GitHub answers to *Send a report online* (`offline` for no network) |
 | `PLAYGUARD_SIM_DEV_BUILDS=<folder>` | What the GitHub API returns for *Install another build*: `releases.json` (the releases tab), `latest.json` (the latest release, for *Update in place*), `artifacts.json`, `pulls.json`; `runs.json`, and for *Find a build* `pull_<n>.json`, `commit.json`, `run_artifacts.json`; `https://<local path>` download URLs are copied from disk (`offline` for no network); `PLAYGUARD_SIM_DEV_BUILDS_DELAY=<ms>` slows each answer |
 | `PLAYGUARD_SIM_HELD_LR=1`, `PLAYGUARD_SIM_BOOT_CHOICE=a` | L + R held at start-up, and the answer of the start-up screen that offers the previous build (`a`: A, else B) |
@@ -70,7 +70,7 @@ Game patches are read from `./playguard_data/sd/`, the simulated SD card root.
 ## Tests and CI
 
 - `make test` — host unit tests (`tests/`, see [`tests/README.md`](tests/README.md)), including the recovery sysmodule logic (`tests/rescue/`); every suite runs, in parallel, and leaves its output in `build/host-tests/<suite>.log`.
-- `tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|library|outside|alarm|sysnotes]` — clicks through every screen of the desktop build headlessly (needs `DISPLAY`, `xdotool`, ImageMagick) and saves screenshots. The `gate` scenario covers the firmware screen and developer mode on a simulated 24.0.0; `errors` covers a failed unlock and an unsettable clock; `rescue` the recovery screen, then quitting while still unlocked; `forged` a rescue report the console does not confirm (no action, the lock screen first); `lock` the lock screen of *Ask for the PIN › To open PlayGuard*; `library` a large library in Activity (its first 50 games, then *Show every game*); `devbuild` signing in to a simulated GitHub and installing a pull request's build in place out of its artifact; `alarm` the Overview and the Play timer tab past the limit while the console only warns; `sysnotes` the release notes of the firmware, Atmosphère and hekate from *Tools › Console*, against a simulated GitHub and switchbrew. `outside` the Overview's notices: changes made outside PlayGuard (a play time that started over, the clock, the limits) and, after 90 s on screen, a console that is not counting play time (it takes about two minutes).
+- `tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|library|outside|alarm|sysnotes]` — clicks through every screen of the desktop build headlessly (needs `DISPLAY`, `xdotool`, ImageMagick) and saves screenshots. The `gate` scenario covers the firmware screen and developer mode on a simulated 24.0.0; `errors` covers a failed unlock and an unsettable clock; `rescue` the recovery screen, then quitting while still unlocked; `forged` a rescue report the console does not confirm (no action, the lock screen first); `lock` the lock screen of *Protect PlayGuard with the PIN › To open PlayGuard*; `library` a large library in Activity (its first 50 games, then *Show every game*); `devbuild` signing in to a simulated GitHub and installing a pull request's build in place out of its artifact; `alarm` the Overview and the Play timer tab past the limit while the console only warns; `sysnotes` the release notes of the firmware, Atmosphère and hekate from *Console*, against a simulated GitHub and switchbrew. `outside` the Overview's notices: changes made outside PlayGuard (a play time that started over, the clock, the limits) and, after 90 s on screen, a console that is not counting play time (it takes about two minutes).
 - `tools/visual_check.py` — compares those screenshots with the references in `tests/visual/`. A screen that changed fails CI; see [`tests/visual/README.md`](tests/visual/README.md) to update them.
 - `python3 tools/check_resources.py .` — checks the XML layouts and translation catalogs.
 
@@ -82,8 +82,8 @@ Each job writes a summary on the run page (`tools/ci_summary.py`): what is being
 
 | Path | Content |
 |---|---|
-| `source/core/` | C, libnx: `pctl_ops`, `time_ops`, `sysinfo`, `playstats`, `gamecheck` (its rules in `gamecheck_rules`, shared with the simulator), `platform`, `rescue`, `pure`, `calendar`, `write_guard` (these last four need no console and are shared with the simulator), `startup_hook` (times borealis' `userAppInit`, which libnx calls before `main`), `crash_handler` (PlayGuard's CPU exceptions to a crash file, before Atmosphère's report) |
-| `source/tab/` | One class per tab |
+| `source/core/` | C, libnx: `pctl_ops`, `time_ops`, `sysinfo`, `playstats`, `gamecheck` (its rules in `gamecheck_rules`, shared with the simulator), `nacp` (a game's name out of its control data, for both), `platform`, `rescue`, `pure`, `calendar`, `write_guard` (these last four need no console and are shared with the simulator), `startup_hook` (times borealis' `userAppInit`, which libnx calls before `main`), `crash_handler` (PlayGuard's CPU exceptions to a crash file, before Atmosphère's report) |
+| `source/tab/` | One class per tab, and the two screens opened from one: the network clock (from Console) and Help & diagnostics (from Preferences), shown with `ui::open_screen` |
 | `source/action/` | Flows, one per thing a tab does, with their UI-free logic in `*_logic.cpp` where there is one: the play-timer write and its recorder, the clock (and a console no time server answers), the PIN prompt and the console lock, settings backups and restores, the change history and undo, changes seen outside PlayGuard and timer health, the notification bell, the firmware screen, the recovery screen, reports and sending them online, updates, GitHub sign-in and development builds, the SD-card write queue, clearing the cache and the log files |
 | `source/activity/` | Screens: per-day editor, profiles, a game, first steps, change history, the notifications, firmware, recovery, the lock screen, the diagnostic report, what's new and the full changelog, the start-up error, the development builds, the loading screen (the start-up runs one step per frame under it; the intro keeps it 2 s) |
 | `source/view/` | Widgets: the week chart, the gauge, the play-timer state line, the day bars, the game cell, the QR codes and funding links, release notes, the scrolling frame, the loading screen's icon and progress bar, the notification bell |

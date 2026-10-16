@@ -19,6 +19,8 @@ class ClockTab : public TabBase
   public:
     ClockTab();
     static brls::View* create();
+    // The network clock on a screen of its own (Console › Network clock).
+    static void open_screen();
 
   protected:
     void refresh() override;
@@ -61,4 +63,5 @@ class ClockTab : public TabBase
     BRLS_BIND(brls::Label,      warning,  "ck_warning");
     BRLS_BIND(brls::DetailCell, apply_cell, "ck_apply");
     BRLS_BIND(brls::DetailCell, copy_cell, "ck_copy");
+    BRLS_BIND(brls::BooleanCell, check_at_start, "ck_check_at_start");
 };

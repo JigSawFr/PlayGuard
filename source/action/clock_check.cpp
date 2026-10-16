@@ -7,6 +7,7 @@
 #include <string>
 
 #include "action/notices.hpp"
+#include "tab/clock_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/ntp_client.hpp"
@@ -48,7 +49,7 @@ void at_start()
             // Kept in the bell after the toast, until put away.
             notices::set("clock_off", notices::Level::Info, "playguard/notices/clock"_i18n, text,
                          brls::getStr("playguard/notices/open_tab", "playguard/tabs/clock"_i18n),
-                         []() { notices::open_tab(ui::tab::clock); });
+                         []() { ClockTab::open_screen(); });
         });
     });
 }

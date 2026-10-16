@@ -30,24 +30,24 @@
             <RestrictionsTab/>
         </brls:Tab>
 
-        <brls:Tab label="@i18n/playguard/tabs/clock">
-            <ClockTab/>
-        </brls:Tab>
-
-        <brls:Separator/>
-
         <brls:Tab label="@i18n/playguard/tabs/security">
             <SecurityTab/>
         </brls:Tab>
 
         <brls:Separator/>
 
-        <brls:Tab label="@i18n/playguard/tabs/preferences">
-            <PreferencesTab/>
+        <brls:Tab label="@i18n/playguard/tabs/console">
+            <ConsoleTab/>
         </brls:Tab>
 
-        <brls:Tab label="@i18n/playguard/tabs/tools">
-            <ToolsTab/>
+        <brls:Separator/>
+
+        <brls:Tab label="@i18n/playguard/tabs/history">
+            <HistoryTab/>
+        </brls:Tab>
+
+        <brls:Tab label="@i18n/playguard/tabs/preferences">
+            <PreferencesTab/>
         </brls:Tab>
 
         <brls:Tab label="@i18n/playguard/tabs/about">
