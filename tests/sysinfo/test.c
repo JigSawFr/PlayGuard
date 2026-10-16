@@ -133,13 +133,14 @@ int main(void)
 
     reset();
     SysInfo t = get();
-    CHECK(sysinfo_compat(&t) == SysCompat_UntestedNewer);   /* 23.0.1 */
+    CHECK(sysinfo_compat(&t) == SysCompat_Ok);   /* 23.0.1 */
     t.hos_version = MAKEHOSVERSION(22, 1, 0);  CHECK(sysinfo_compat(&t) == SysCompat_Ok);
     t.hos_version = MAKEHOSVERSION(23, 1, 0);  CHECK(sysinfo_compat(&t) == SysCompat_UntestedNewer);
-    // The command table was checked up to 23.0.1, but no console trace yet:
-    // 23.x asks first, the newest verified firmware does not.
-    t.hos_version = MAKEHOSVERSION(23, 0, 1);  CHECK(sysinfo_compat(&t) == SysCompat_UntestedNewer);
-    t.hos_version = MAKEHOSVERSION(23, 0, 0);  CHECK(sysinfo_compat(&t) == SysCompat_UntestedNewer);
+    // Verified on a console up to 23.0.1 (Atmosphère 1.12.1): the newest
+    // verified firmware does not ask, the next one does.
+    t.hos_version = MAKEHOSVERSION(23, 0, 1);  CHECK(sysinfo_compat(&t) == SysCompat_Ok);
+    t.hos_version = MAKEHOSVERSION(23, 0, 0);  CHECK(sysinfo_compat(&t) == SysCompat_Ok);
+    t.hos_version = MAKEHOSVERSION(23, 0, 2);  CHECK(sysinfo_compat(&t) == SysCompat_UntestedNewer);
     t.hos_version = MAKEHOSVERSION(22, 5, 0);  CHECK(sysinfo_compat(&t) == SysCompat_Ok);
     CHECK(PCTL_FW_TESTED_MAX <= PCTL_FW_TABLE_CHECKED);
     t.hos_version = MAKEHOSVERSION(20, 5, 0);  CHECK(sysinfo_compat(&t) == SysCompat_PlayTimerUnsupported);

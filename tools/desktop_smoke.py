@@ -144,6 +144,8 @@ if SCENARIO:
     env.setdefault("PLAYGUARD_SIM_CHECK_MS", "0")
 if GATE:
     env.setdefault("PLAYGUARD_SIM_FW", "24.0.0")
+if SYSNOTES:
+    env.setdefault("PLAYGUARD_SIM_FW", "22.5.0")   # behind 23.0.0 and 23.0.1
     env.setdefault("PLAYGUARD_SIM_LATEST", "1.1.0:24.0.0")
     # Started through hbloader, with sphaira on the SD card: the update can be
     # handed over to it.

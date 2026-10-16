@@ -21,7 +21,7 @@ enum class Choice
 
 bool        needed();       // the firmware is newer than the verified range
 std::string firmware();     // "24.0.0"
-std::string tested_max();   // "22.5.0"
+std::string tested_max();   // "23.0.1"
 
 // Before the main screen is built: read-only when needed(), then the
 // remembered choice if it matches this firmware and app version.
