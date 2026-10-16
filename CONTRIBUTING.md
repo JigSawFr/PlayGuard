@@ -100,7 +100,7 @@ Each job writes a summary on the run page (`tools/ci_summary.py`): what is being
 
 Releases are automated with [release-please](https://github.com/googleapis/release-please), which reads [conventional commits](https://www.conventionalcommits.org/):
 
-- Give each pull request a conventional title (`feat: …`, `fix: …`, `docs: …`, `feat!: …` for a breaking change); CI checks it.
+- Give each pull request a conventional title with a scope, the part of the app it changes (`feat(history): …`, `fix(play-timer): …`, `docs(install): …`, `feat(notices)!: …` for a breaking change); CI checks it. release-please sorts each section of the changelog by scope, so a title without one lands apart from the rest.
 - **Squash-merge** pull requests, so each one lands as a single commit carrying that title. A plain merge commit makes release-please apply a PR's `BEGIN_COMMIT_OVERRIDE` block to every commit of the PR.
 - release-please keeps a `chore(main): release X.Y.Z` PR open; merging it tags the release and attaches the `.nro` / `.zip`.
 - release-please runs with a token of the *PlayGuard Release* GitHub App (variable `RELEASE_APP_ID`, secret `RELEASE_APP_PRIVATE_KEY`; permissions Contents, Pull requests and Issues: write), not `GITHUB_TOKEN`: the app is on the tag ruleset's bypass list, so it can create the `vX.Y.Z` tag, and its pushes to the release PR run the required checks.

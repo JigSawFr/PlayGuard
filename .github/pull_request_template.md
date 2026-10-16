@@ -1,6 +1,7 @@
 <!--
-The title must be a conventional commit (feat: …, fix: …, docs: …): CI checks it, and the
-squash merge makes it the commit subject that release-please writes the changelog from.
+The title must be a conventional commit with a scope (feat(history): …, fix(play-timer): …,
+docs(install): …): CI checks it, and the squash merge makes it the commit subject that
+release-please writes the changelog from.
 -->
 
 ## What this changes, and why

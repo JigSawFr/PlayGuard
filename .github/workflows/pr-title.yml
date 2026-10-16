@@ -1,7 +1,9 @@
 name: pr-title
 
 # PRs are squash-merged, so the PR title becomes the commit message that
-# release-please reads: it must be a conventional commit (feat:, fix:, …).
+# release-please reads: it must be a conventional commit with a scope
+# (feat(notices): …, fix(play-timer): …), so the changelog groups each part
+# of the app.
 on:
   pull_request_target:
     types: [ opened, edited, synchronize, reopened ]
@@ -34,3 +36,4 @@ jobs:
             change
             deprecate
             remove
+          requireScope: true
