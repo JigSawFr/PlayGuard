@@ -25,7 +25,7 @@ static uint64_t clock_ms(void) { return now; }
 
 typedef struct {
     char    topic[160];
-    char    payload[16384];
+    char    payload[32768];   // the discovery: 18.5 KiB
     size_t  len;
     bool    retain;
 } Message;
@@ -397,6 +397,7 @@ static struct {
     char integration[SYNC_INTEGRATION_MAX + 1];
     size_t integration_len;
     unsigned refused_logs;    // "the broker refused <base>/integration" lines
+    unsigned systems;         // system() calls
 } host;
 
 static size_t h_state(void *ctx, char *out, size_t cap)
@@ -474,6 +475,13 @@ static void h_log(void *ctx, const char *line)
         host.refused_logs++;
 }
 
+static size_t h_system(void *ctx, char *out, size_t cap)
+{
+    (void)ctx;
+    host.systems++;
+    return (size_t)snprintf(out, cap, "{\"schema\":1,\"n\":%u}", host.systems);
+}
+
 static void h_integration(void *ctx, const char *doc, size_t len)
 {
     (void)ctx;
@@ -503,8 +511,8 @@ static void setup(bool timer_writes, SyncPolicy policy)
     conf.remote_timer_writes = timer_writes;
     conf.policy = policy;
     SyncIo io = { NULL, io_open, io_write, io_read, io_close };
-    SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,     h_profiles,
-                   h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration };
+    SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,      h_profiles,
+                   h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration, h_system };
     sync_engine_init(&engine, &conf, io, &h, clock_ms, "app", "1.1.0");
 }
 
@@ -572,16 +580,20 @@ static void test_connect_and_publish(void)
     CHECK(host.profiles_asked >= 1);
     const Message *st = find_retained("playguard/a1b2c3d4/state");
     CHECK(st && strstr(st->payload, "\"schema\":1"));
+    // The system document with it, retained.
+    const Message *sy = find_retained("playguard/a1b2c3d4/system");
+    CHECK(sy && sy->retain && strstr(sy->payload, "\"schema\":1") && host.systems >= 1);
     CHECK(find_retained("playguard/a1b2c3d4/activity"));
 
     // The state again after poll_s, not before.
-    const unsigned states = host.states;
+    const unsigned states = host.states, systems = host.systems;
     now += 10000;
     turns(1);
-    CHECK(host.states == states);
+    CHECK(host.states == states && host.systems == systems);
     now += 25000;
     turns(1);
-    CHECK(host.states == states + 1);
+    CHECK(host.states == states + 1 && host.systems == systems + 1);
+    CHECK(strstr(find_retained("playguard/a1b2c3d4/system")->payload, "\"n\":") != NULL);
 
     // Today's activity: every minute, or at once when the host says it changed.
     const size_t acts = count_on("playguard/a1b2c3d4/activity");
@@ -808,8 +820,8 @@ static void test_custom_discovery_prefix(void)
     setup(false, SyncPolicy_Auto);
     strcpy(conf.discovery_prefix, "ha");
     SyncIo io = { NULL, io_open, io_write, io_read, io_close };
-    SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,     h_profiles,
-                   h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration };
+    SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,      h_profiles,
+                   h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration, h_system };
     sync_engine_init(&engine, &conf, io, &h, clock_ms, "app", "1.1.0");
     turns(3);
     CHECK(sync_engine_online(&engine) && find_retained("ha/device/playguard_a1b2c3d4/config"));

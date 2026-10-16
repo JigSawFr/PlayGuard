@@ -46,7 +46,8 @@ typedef struct {
     char         activity[AGENT_DOC_STATE];
     char         names[AGENT_DOC_LARGE];
     char         week[AGENT_DOC_LARGE];
-    AgentDocInfo state_info, activity_info, names_info, week_info;
+    char         games[AGENT_DOC_LARGE];
+    AgentDocInfo state_info, activity_info, names_info, week_info, games_info;
     AgentFinal   finals[AGENT_FINALS];
 
     // Orders handed to PlayGuard, and their results.

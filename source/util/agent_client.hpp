@@ -25,7 +25,7 @@ void close();
 bool connected();
 
 Result set_foreground(bool on);
-Result push(AgentCmd cmd, const std::string& doc);                 // PushState, PushActivity, PushNames, PushWeek
+Result push(AgentCmd cmd, const std::string& doc);                 // PushState, PushActivity, PushNames, PushWeek, PushGames
 Result push_final(const std::string& date, const std::string& doc); // activity/<date> ("" clears it)
 Result pop_order(AgentOrder* out);
 Result order_result(const AgentResult& r);

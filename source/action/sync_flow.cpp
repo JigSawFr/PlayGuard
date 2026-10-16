@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/sync_flow.hpp"
 
+#include <algorithm>
 #include <atomic>
 #include <borealis.hpp>
 #include <borealis/extern/nlohmann/json.hpp>
@@ -14,20 +15,27 @@
 #include <mutex>
 #include <set>
 #include <thread>
+#include <vector>
 
 #include "action/ha_update_flow.hpp"
 #include "action/play_data.hpp"
 #include "action/sync_orders.hpp"
+#include "action/sys_update_flow.hpp"
 #include "activity/lock_activity.hpp"
 #include "app.hpp"
+#include "core/console_info.h"
+#include "sync/sync_games.h"
 #include "sync/sync_net.h"
 #include "sync/sync_state.h"
+#include "sync/sync_system.h"
 #include "sync/sync_tls.h"
 #include "tab/tab_base.hpp"
 #include "ui/ui.hpp"
 #include "util/agent_client.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
+#include "util/game_cache.hpp"
+#include "util/paths.hpp"
 #include "util/profiles.hpp"
 #include "util/sync_files.hpp"
 
@@ -46,6 +54,8 @@ constexpr auto EXIT_WAIT = std::chrono::seconds(4);
 constexpr int AGENT_POLL_MS = 100;
 constexpr auto PROBE_EVERY = std::chrono::seconds(5);
 constexpr auto INTEGRATION_EVERY = std::chrono::seconds(30);
+constexpr auto SPACE_EVERY = std::chrono::minutes(5);
+constexpr size_t GAMES_MAX = 64 * 1024;   // the agent's slot (AGENT_DOC_LARGE): the most played that fit
 
 // `text` with the broker's name as "<broker>": the lines logged go into the
 // session file, which a report sent online carries, and the reports are
@@ -69,7 +79,7 @@ struct Shared
     bool reconf = false;
     SyncConf conf{};
     bool sync_now = false, state_changed = false, activity_changed = false, discovery_changed = false;
-    std::string state, activity;            // the documents the engine publishes
+    std::string state, activity, system;    // the documents the engine publishes
     Clock::time_point state_at{};
     std::vector<std::string> profiles;
     std::map<std::string, std::pair<std::string, bool>> pubs;   // sub -> payload, retained (sent once online)
@@ -114,6 +124,13 @@ size_t host_activity(void* ctx, char* out, size_t cap)
     auto* sh = (Shared*)ctx;
     std::lock_guard<std::mutex> lk(sh->m);
     return copy_out(sh->activity, out, cap);
+}
+
+size_t host_system(void* ctx, char* out, size_t cap)
+{
+    auto* sh = (Shared*)ctx;
+    std::lock_guard<std::mutex> lk(sh->m);
+    return copy_out(sh->system, out, cap);
 }
 
 void pump();
@@ -223,6 +240,7 @@ void worker(std::shared_ptr<Shared> sh, SyncConf conf, std::string version)
     host.now_posix = host_now_posix;
     host.log = host_log;
     host.integration = host_integration;
+    host.system = host_system;
 
     // About 40 KiB: on the heap, not on this thread's stack.
     std::unique_ptr<Link> link(new Link());
@@ -303,7 +321,7 @@ std::deque<sync_orders::Order> s_queue;
 bool s_order_running = false;
 std::set<std::string> s_finals_sent;
 bool s_old_cleared = false;
-std::string s_names_sent, s_week_sent;
+std::string s_names_sent, s_week_sent, s_games_sent;
 std::vector<std::string> s_profiles_sent;
 bool s_profiles_known = false;
 int s_read_only_sent = -1;   // the discovery offers no control in read-only mode
@@ -367,6 +385,7 @@ void post_publish(const std::string& sub, const std::string& payload, bool retai
     if (s_agent) {
         if (sub == "names") agent_ok(agent_client::push(AgentCmd_PushNames, payload), "names");
         else if (sub == "week") agent_ok(agent_client::push(AgentCmd_PushWeek, payload), "week");
+        else if (sub == "games") agent_ok(agent_client::push(AgentCmd_PushGames, payload), "games");
         else if (sub.compare(0, 9, "activity/") == 0) {
             s_agent_finals.push_back({ sub.substr(9), payload });
             agent_flush_finals();
@@ -509,8 +528,89 @@ std::string week_doc(const PlayStats& stats, const LocalTime& today, uint64_t ts
     return j.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);
 }
 
+// The games document: the installed games (the last check of them, Tools ›
+// Check the installed games) and the played ones, most played first.
+std::string games_doc(const PlayStats& stats, uint64_t ts)
+{
+    game_cache::Cache cache;
+    std::string bytes;
+    const bool listed = paths::read_file(paths::nand_dir() + "/cache/games.bin", bytes) && game_cache::decode(bytes, &cache);
+    std::map<uint64_t, SyncGame> by_id;
+    auto game_of = [&by_id](uint64_t id) -> SyncGame& {
+        auto it = by_id.find(id);
+        if (it != by_id.end()) return it->second;
+        SyncGame g{};
+        g.app_id = id;
+        g.total_min = g.launches = -1;
+        return by_id.emplace(id, g).first->second;
+    };
+    for (const GameFacts& f : cache.games) {
+        SyncGame& g = game_of(f.app_id);
+        g.installed = true;
+        if (f.name[0]) g.name = f.name;
+        if (f.display_version[0]) g.version = f.display_version;
+    }
+    int64_t total_s = 0;
+    for (uint32_t i = 0; i < stats.count; i++) {
+        const GameStat& s = stats.games[i];
+        SyncGame& g = game_of(s.app_id);
+        if (!g.name && s.name[0]) g.name = s.name;
+        if (!s.totals_ok) continue;
+        g.total_min = (int64_t)(s.total_s / 60);
+        g.launches = s.launches;
+        g.first_played = s.first_played;
+        g.last_played = s.last_played;
+        total_s += (int64_t)s.total_s;
+    }
+    std::vector<SyncGame> games;
+    for (const auto& e : by_id) games.push_back(e.second);
+    std::stable_sort(games.begin(), games.end(),
+                     [](const SyncGame& a, const SyncGame& b) { return a.total_min > b.total_min; });
+    SyncGames doc{};
+    doc.ts = ts;
+    doc.installed = listed ? (int)cache.games.size() : -1;
+    doc.accounts = play_data::accounts().empty() ? -1 : (int)play_data::accounts().size();
+    doc.total_min = R_SUCCEEDED(stats.stats_rc) ? total_s / 60 : -1;
+    doc.games = games.data();
+    doc.n_games = games.size();
+    std::string out(GAMES_MAX, '\0');
+    const size_t n = sync_games_build(&doc, &out[0], out.size(), nullptr);
+    out.resize(n);
+    return out;
+}
+
+// The system document: the console read now, the space left and hekate
+// every 5 minutes, the serial number only with publish_serial.
+std::string system_doc(const SysInfo& si, uint64_t ts)
+{
+    static ConsoleSpace sd{ -1, -1 }, nand{ -1, -1 };
+    static std::string hekate;
+    static Clock::time_point space_at{};
+    static bool serial_read = false, serial_ok = false;
+    static char serial[CONSOLE_SERIAL_LEN + 1];
+    const auto now = Clock::now();
+    if (space_at == Clock::time_point{} || now - space_at >= SPACE_EVERY) {
+        space_at = now;
+        console_space_read(&sd, &nand);
+        hekate = sys_update_flow::installed_hekate();
+    }
+    if (s_conf.publish_serial && !serial_read) {
+        serial_read = true;
+        serial_ok = console_real_serial(&si, paths::sd_root().c_str(), serial);
+    }
+    ConsoleLive live;
+    console_live_read(&live);
+    const std::string version = app::version();
+    SyncSystem s{ ts, &si, &live, &sd, &nand, hekate.c_str(), version.c_str(), nullptr,
+                  s_conf.publish_serial && serial_ok ? serial : nullptr };
+    std::string out(4096, '\0');
+    const size_t n = sync_system_build(&s, &out[0], out.size());
+    out.resize(n);
+    return out;
+}
+
 // After each read of the play log (this run's, for every account): today's
-// activity, the names, the week, the finished days.
+// activity, the names, the week, the games, the finished days.
 void on_play_data()
 {
     if (!running() || !play_data::fresh("", std::chrono::seconds(60))) return;
@@ -545,6 +645,11 @@ void on_play_data()
     if (without_ts(week) != without_ts(s_week_sent)) {
         s_week_sent = week;
         post_publish("week", week, true);
+    }
+    const std::string games = games_doc(*stats, posix);
+    if (!games.empty() && without_ts(games) != without_ts(s_games_sent)) {
+        s_games_sent = games;
+        post_publish("games", games, true);
     }
     for (int k = 1; k <= 6; k++) {
         const std::string day = date_before(today, k);
@@ -643,8 +748,10 @@ void build_state()
         }
         return;
     }
+    const std::string system = system_doc(si, posix);
     std::lock_guard<std::mutex> lk(s_shared->m);
     s_shared->state = doc;
+    s_shared->system = system;
     s_shared->state_at = Clock::now();
     s_shared->read_only = app::read_only();
     if (s_read_only_sent != (app::read_only() ? 1 : 0)) {

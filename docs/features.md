@@ -104,7 +104,7 @@ A bell in the header, left of the version, gathers what needs the parent; Ⓨ op
 - A network-clock check at start-up (a toast when it is more than a minute off; it never sets the clock).
 - A **monthly reminder to support PlayGuard** (on by default, never in the first month nor right after an update; *Don't show again* on the reminder or this switch turns it off for good, updates included).
 - Advanced actions.
-- **Remote access (MQTT / Home Assistant):** the broker and its MQTT version, the console's name, what to do with orders (ask on the console, carry them out, refuse them), whether they may change the play timer (off by default), Home Assistant's discovery, QR codes that install the PlayGuard integration from HACS and add the console (once installed, its version, and its newer release), the live status, *Sync now* and the log. See [the Home Assistant guide](home-assistant.md).
+- **Remote access (MQTT / Home Assistant):** the broker and its MQTT version, the console's name, what to do with orders (ask on the console, carry them out, refuse them), whether they may change the play timer (off by default), Home Assistant's discovery, the console's own information (model, versions, storage, battery, network, games; the serial number only with *Publish the serial number*), QR codes that install the PlayGuard integration from HACS and add the console (once installed, its version, and its newer release), the live status, *Sync now* and the log. See [the Home Assistant guide](home-assistant.md).
 
 ## Tools and About — history, backups, console info; version, updates, what's new, credits
 

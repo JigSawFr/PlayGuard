@@ -512,8 +512,10 @@ static void publish_due(SyncEngine *e)
     }
     if (e->want_state || now >= e->next_state_ms) {
         if (now >= e->next_state_ms || e->want_state) {
-            const size_t n = e->host.state ? e->host.state(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
+            size_t n = e->host.state ? e->host.state(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
             if (n) sync_engine_publish(e, "state", e->scratch, n, true);
+            n = e->host.system && e->mqtt.connected ? e->host.system(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
+            if (n) sync_engine_publish(e, "system", e->scratch, n, true);
             e->want_state = false;
             e->next_state_ms = now + (uint64_t)e->conf.poll_s * 1000ULL;
         }

@@ -248,6 +248,12 @@ void SyncActivity::onContentAvailable()
         next.publish_report = on;
         if (!this->commit(next)) report->setOn(this->conf.publish_report, false);
     });
+    // Off by default: the serial number goes to the broker only, never into a report.
+    serial->init("playguard/sync/serial"_i18n, conf.publish_serial, [this](bool on) {
+        SyncConf next = this->conf;
+        next.publish_serial = on;
+        if (!this->commit(next)) serial->setOn(this->conf.publish_serial, false);
+    });
 
     status->registerClickAction([this](brls::View*) {
         const sync_flow::Status st = sync_flow::status();
@@ -356,6 +362,7 @@ void SyncActivity::refresh()
     timer->setOn(conf.remote_timer_writes, false);
     discovery->setOn(conf.ha_discovery, false);
     report->setOn(conf.publish_report, false);
+    serial->setOn(conf.publish_serial, false);
     char device[SYNC_ID_LEN + 1];
     sync_conf_device_id(&conf, device);
     id->setDetailText(device[0] ? std::string(device) : "playguard/sync/none"_i18n);

@@ -27,6 +27,8 @@ typedef struct {
     const char *name;             // English name shown in HA
     const char *value_template;   // over the state document; NULL: no state (button, event)
     const char *extra;            // more discovery options, a JSON fragment without braces ("" none)
+    const char *topic;            // the document value_template reads, under <base>/: NULL the state,
+                                  // "system", "games" (docs/sync-protocol.md)
 } SyncEntity;
 
 const SyncEntity *sync_entities(size_t *count);

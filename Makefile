@@ -38,7 +38,8 @@ CMAKE_ARGS ?=
 JSON_HPP := extern/borealis/library/include/borealis/extern/nlohmann/json.hpp
 # The remote link's console-free C (source/sync/), shared by its host tests.
 SYNC_PURE := source/sync/sync_json.c source/sync/mqtt_packet.c source/sync/sync_conf.c source/sync/sync_apply.c \
-             source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c
+             source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c \
+             source/sync/sync_system.c source/sync/sync_games.c source/core/console_info_pure.c
 
 .PHONY: all clean dist nxlink desktop test check rescue dist-rescue agent dist-agent FORCE
 
@@ -132,6 +133,8 @@ gamecheck_SRC   := source/core/gamecheck.c source/core/gamecheck_rules.c source/
 gamecheck_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/gamecheck -Isource/core
 calendar_SRC   := source/core/calendar.c tests/calendar/test.c
 calendar_FLAGS := -std=gnu11 -Isource/core
+console_info_SRC   := source/core/console_info_pure.c tests/console_info/test.c
+console_info_FLAGS := -std=gnu11 -Isource/core
 rescue_SRC   := source/core/rescue.c tests/rescue/test.c
 rescue_FLAGS := -std=c11 -Isource/core
 ntp_SRC   := source/util/ntp_packet.c tests/ntp_packet/test.c
@@ -168,9 +171,13 @@ timer_health_logic_FLAGS := -std=c++17 -Isource
 notice_logic_SRC   := source/action/notice_logic.cpp tests/notice_logic/test.cpp
 notice_logic_FLAGS := -std=c++17 -Isource
 sys_updates_SRC   := source/util/sys_updates.cpp tests/sys_updates/test.cpp
-sys_updates_FLAGS := -std=c++17 -Isource
+sys_updates_FLAGS := -std=c++17 -Isource -Isource/core
+sys_updates_CSRC  := source/core/console_info_pure.c
+sys_updates_CFLAGS := -std=gnu11 -Isource/core
 sys_notes_SRC   := source/util/safe_text.cpp source/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
-sys_notes_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+sys_notes_FLAGS := -std=c++17 -Isource -Isource/core -isystem extern/borealis/library/include
+sys_notes_CSRC  := source/core/console_info_pure.c
+sys_notes_CFLAGS := -std=gnu11 -Isource/core
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
 offline_clock_logic_FLAGS := -std=c++17 -Isource
 icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp

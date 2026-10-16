@@ -55,6 +55,7 @@ typedef struct {
     bool       remote_timer_writes;     // orders may change the play timer (unlocking with the stored PIN)
     bool       publish_report;
     bool       publish_activity;
+    bool       publish_serial;          // the serial number in the system document (off by default)
     bool       ha_discovery;            // Home Assistant MQTT discovery
     uint16_t   poll_s;                  // state refresh, 10..300
     char       topic_prefix[SYNC_PREFIX_MAX];      // "playguard"

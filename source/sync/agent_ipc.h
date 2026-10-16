@@ -27,9 +27,9 @@ extern "C" {
 
 #define AGENT_SERVICE_NAME "pg:agent"
 // 2: the 1.0.0 layout (sd:/config/playguard, each system's files in
-// nand/<system>/sync/). An agent of another protocol is refused, and
-// PlayGuard offers the one it carries.
-#define AGENT_PROTOCOL     2
+// nand/<system>/sync/). 3: PushGames. An agent of another protocol is
+// refused, and PlayGuard offers the one it carries.
+#define AGENT_PROTOCOL     3
 #define AGENT_VERSION_MAX  24
 #define AGENT_ORDERS_MAX   SYNC_QUEUE_MAX
 #define AGENT_LOG_LINES    200
@@ -60,6 +60,7 @@ typedef enum {
     AgentCmd_ReloadConfig    = 13,  // sync.conf and nro_state.txt changed
     AgentCmd_GetLog          = 14,  // out buffer: the last lines, oldest first, one per line
     AgentCmd_PrepareShutdown = 15,  // "offline", disconnect: an update or a stop follows
+    AgentCmd_PushGames       = 16,  // in buffer: the games document
 } AgentCmd;
 
 typedef struct {

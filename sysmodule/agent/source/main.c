@@ -28,12 +28,14 @@
 
 #include "agent_core.h"
 #include "calendar.h"
+#include "console_info.h"
 #include "nand_key.h"
 #include "pctl_ops.h"
 #include "playstats.h"
 #include "sync_engine.h"
 #include "sync_net.h"
 #include "sync_state.h"
+#include "sync_system.h"
 #include "sync_tls.h"
 #include "sysinfo.h"
 #include "time_ops.h"
@@ -667,6 +669,44 @@ static void host_log(void *ctx, const char *line)
     slog("%s%s", line, NULL);
 }
 
+// The system document: the console read now, the space left and hekate every
+// 5 minutes, PlayGuard's version as its last session said it, the serial
+// number only when sync.conf's publish_serial asks for it.
+#define SPACE_EVERY_MS (5 * 60 * 1000ULL)
+static char g_app_version[AGENT_VERSION_MAX];
+
+static size_t host_system(void *ctx, char *out, size_t cap)
+{
+    (void)ctx;
+    static SysInfo si;
+    static ConsoleLive live;
+    static ConsoleSpace sd = { -1, -1 }, nand = { -1, -1 };
+    static char hekate[16], serial[CONSOLE_SERIAL_LEN + 1];
+    static bool serial_read, serial_ok;
+    static uint64_t space_at;
+    sysinfo_get(&si);
+    console_live_read(&live);
+    const uint64_t now_ms = sync_now_ms();
+    if (!space_at || now_ms - space_at >= SPACE_EVERY_MS) {
+        space_at = now_ms ? now_ms : 1;
+        console_space_read(&sd, &nand);
+        if (!console_hekate("sdmc:/", hekate)) hekate[0] = '\0';
+    }
+    if (g_conf.publish_serial && !serial_read) {
+        serial_read = true;
+        serial_ok = console_real_serial(&si, "sdmc:/", serial);
+    }
+    mutexLock(&g_lock);
+    if (g_shared.app_session && g_shared.app_version[0])
+        snprintf(g_app_version, sizeof(g_app_version), "%s", g_shared.app_version);
+    mutexUnlock(&g_lock);
+    u64 now = 0;
+    time_local_now(&now, NULL);
+    SyncSystem s = { now, &si, &live, &sd, &nand, hekate, g_app_version[0] ? g_app_version : NULL, AGENT_VERSION,
+                     g_conf.publish_serial && serial_ok ? serial : NULL };
+    return sync_system_build(&s, out, cap);
+}
+
 // The Home Assistant integration's document, kept as it came for PlayGuard
 // (sync_files::integration_file()): it reads it when it opens and warns of a
 // newer release of the integration. Cleared: the file goes. It comes again
@@ -685,7 +725,7 @@ static void host_integration(void *ctx, const char *doc, size_t len)
 
 static const SyncHost HOST = {
     NULL, host_state, host_activity, host_order, host_report, host_profiles, host_conf_changed,
-    host_read_only, host_now_posix, host_log, host_integration,
+    host_read_only, host_now_posix, host_log, host_integration, host_system,
 };
 
 // ---- the loop ----
@@ -874,6 +914,10 @@ static void hand_over(void)
     n = agent_take_doc(g_shared.week, &g_shared.week_info, g_doc, sizeof(g_doc));
     mutexUnlock(&g_lock);
     if (n) sync_engine_publish(&g_engine, "week", g_doc, n, true);
+    mutexLock(&g_lock);
+    n = agent_take_doc(g_shared.games, &g_shared.games_info, g_doc, sizeof(g_doc));
+    mutexUnlock(&g_lock);
+    if (n) sync_engine_publish(&g_engine, "games", g_doc, n, true);
     for (int i = 0; i < AGENT_FINALS; i++) {
         char sub[32] = "";
         n = 0;

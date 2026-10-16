@@ -100,7 +100,7 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
             for (size_t t = 0; t < sizeof(types) / sizeof(types[0]); t++) sync_json_str(&j, types[t]);
             sync_json_arr_end(&j);
         } else if (e->value_template) {
-            snprintf(topic, sizeof(topic), "%s/state", base);
+            snprintf(topic, sizeof(topic), "%s/%s", base, e->topic ? e->topic : "state");
             sync_json_kstr(&j, "stat_t", topic);
             sync_json_kstr(&j, "val_tpl", e->value_template);
         }

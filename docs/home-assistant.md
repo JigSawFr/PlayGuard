@@ -86,6 +86,17 @@ handle the topics yourself).
 | Selects | Restriction level (*unrestricted*, young child, child, teen, custom), Profile (your saved profiles) |
 | Buttons | Sync now, Lock now, Extra time +15 / +30 min / +1 h, No more play today, Remove the limit, Export a diagnostic report |
 | Event | Events: every order applied, refused (with the reason) or kept waiting for the console |
+| The console | Model, Console nickname, Region, hekate, System (sysMMC / emuMMC), PRODINFO blanked, Serial number (off, see below), SD card free space and size, Internal storage free space and size, Battery, Charging, Docked, Temperature, Connection, IP address, Wi-Fi signal, Wi-Fi network (off), Last started |
+| Games | Games installed, Play time (all time), User accounts; the integration below adds one sensor per game |
+
+The console's own entities read `playguard/<id>/system`, which the agent
+keeps fresh while PlayGuard is closed; the games ones read
+`playguard/<id>/games`, which PlayGuard publishes after each read of the play
+log. **The serial number** is only published once *Remote access › Publish
+the serial number* is on (off by default): it then goes to the broker, and
+never into a report. On a console whose PRODINFO is blanked, it is the real
+one, from Atmosphère's backup of it on the SD card. Its entity, and the
+Wi-Fi network's name, are off in Home Assistant until you turn them on.
 
 The names follow Home Assistant's own *Nintendo Switch Parental Controls*
 integration where they mean the same thing. The entities that change the play
