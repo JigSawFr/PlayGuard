@@ -61,7 +61,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 
 ## `pin_lock`
 
-*Security › Ask for the PIN*. A string:
+*PIN › Protect PlayGuard with the PIN*. A string:
 
 | Value | In the app | What it does |
 |---|---|---|
@@ -144,7 +144,7 @@ stays in `config.json`.
 
 ### Console lock
 
-*Security › Console lock*: every day's limit set to 0, so the PIN is needed to
+*PIN › Block all games*: every day's limit set to 0, so the PIN is needed to
 play.
 
 | Key | Type | Values | Default |
@@ -185,7 +185,7 @@ version. The three keys go together.
 
 ## Example
 
-Every key with *Ask for the PIN* set to *To open PlayGuard*, in the order of
+Every key with *Protect PlayGuard with the PIN* set to *To open PlayGuard*, in the order of
 this page: `config.json`, then a system's `state.json`. PlayGuard itself
 writes the keys in alphabetical order, with each array element on its own
 line; the order does not matter when it reads them:

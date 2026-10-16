@@ -4,7 +4,7 @@ Thanks for helping! This file covers building, testing, the code layout, release
 
 ## No code needed
 
-Two minutes, if your console is still linked to the phone app: *Security & app › Before unlinking: help decode…* saves the play-timer block, you change one setting in the phone app ("alarm only", or a bedtime for one day), and PlayGuard lists what changed. Attach that file to an issue: it is the data the [roadmap](ROADMAP.md#waiting-on-data-from-a-console) waits for most. Translation fixes from native speakers are just as welcome (see [Translating PlayGuard](#translating-playguard)).
+Two minutes, if your console is still linked to the phone app: *PIN › Before unlinking: help decode…* saves the play-timer block, you change one setting in the phone app ("alarm only", or a bedtime for one day), and PlayGuard lists what changed. Attach that file to an issue: it is the data the [roadmap](ROADMAP.md#waiting-on-data-from-a-console) waits for most. Translation fixes from native speakers are just as welcome (see [Translating PlayGuard](#translating-playguard)).
 
 ## Build from source
 

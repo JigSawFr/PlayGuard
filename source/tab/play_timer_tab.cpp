@@ -59,6 +59,7 @@ PlayTimerTab::PlayTimerTab()
         pt_flow::stop_today(this->pt, [this]() { this->refresh(); });
         return true;
     });
+    per_day->setDetailText(ui::opens());
     per_day->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new PlayTimerPerDayActivity());
         return true;
@@ -159,8 +160,8 @@ void PlayTimerTab::refresh()
     // Profiles…: the profile applied now, else how many are saved.
     const std::string current = this->pt.valid ? profiles::match(this->pt.day_min) : "";
     const size_t saved = current.empty() ? profiles::count() : 0;
-    profiles_cell->setDetailText(!current.empty() ? current
-                                 : saved ? brls::getStr("playguard/play_timer/profiles_count", (int)saved) : "");
+    profiles_cell->setDetailText(ui::opens(!current.empty() ? current
+                                           : saved ? brls::getStr("playguard/play_timer/profiles_count", (int)saved) : ""));
     time_up->setDetailText(pt_flow::time_up_text(this->pt));
 
     // "Same limit every day": the value when all days agree, else that they
