@@ -8,6 +8,7 @@
 #include <ctime>
 #include <sys/stat.h>
 #include <utility>
+#include <zlib.h>
 
 #include "util/paths.hpp"
 #include "util/utf8.hpp"
@@ -205,21 +206,10 @@ std::string sheet_xml(const Table& t)
     return x + "</sheetData></worksheet>";
 }
 
-uint32_t crc32(const std::string& data)
+// zlib's CRC-32 of a part (a sheet is far below 4 GiB).
+uint32_t crc_of(const std::string& data)
 {
-    static uint32_t table[256];
-    static bool ready = false;
-    if (!ready) {
-        for (uint32_t n = 0; n < 256; n++) {
-            uint32_t c = n;
-            for (int k = 0; k < 8; k++) c = (c & 1) ? 0xEDB88320u ^ (c >> 1) : c >> 1;
-            table[n] = c;
-        }
-        ready = true;
-    }
-    uint32_t crc = 0xFFFFFFFFu;
-    for (unsigned char b : data) crc = table[(crc ^ b) & 0xFF] ^ (crc >> 8);
-    return crc ^ 0xFFFFFFFFu;
+    return (uint32_t)crc32(0L, (const Bytef*)data.data(), (uInt)data.size());
 }
 
 void put16(std::string& o, uint32_t v)
@@ -244,7 +234,7 @@ std::string zip(const std::vector<std::pair<std::string, std::string>>& files)
                               (uint32_t)now.tm_mday;
     std::string out, central;
     for (const auto& f : files) {
-        const uint32_t crc = crc32(f.second), size = (uint32_t)f.second.size(), offset = (uint32_t)out.size();
+        const uint32_t crc = crc_of(f.second), size = (uint32_t)f.second.size(), offset = (uint32_t)out.size();
         put32(out, 0x04034B50); put16(out, 20); put16(out, 0); put16(out, 0);   // version, flags, stored
         put16(out, dos_time); put16(out, dos_date);
         put32(out, crc); put32(out, size); put32(out, size);

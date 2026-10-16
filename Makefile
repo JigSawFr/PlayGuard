@@ -188,6 +188,7 @@ http_logic_SRC   := source/util/http_logic.cpp tests/http_logic/test.cpp
 http_logic_FLAGS := -std=c++17 -Isource
 table_export_SRC   := source/util/paths.cpp source/util/table_export.cpp tests/table_export/test.cpp
 table_export_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
+table_export_LIBS  := -lz
 update_SRC   := source/util/date.cpp source/util/update.cpp tests/update/test.cpp
 update_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 update_CSRC   := $(CALENDAR_C)
