@@ -23,6 +23,11 @@ std::string play_timer_dir();
 std::string profiles_dir();
 std::string exports_dir();
 std::string config_file();
+// What can be fetched or read again (data_cleanup::cache empties it): the
+// whole console's (lists fetched, icons) and, in nand_dir(), the system's
+// own (its play data).
+std::string cache_dir();
+std::string nand_cache_dir();
 
 // The folder of the system PlayGuard runs on (util/nand.hpp):
 // data_dir()/nand/<key>. set_nand() once at start-up, before config::load();

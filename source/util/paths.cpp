@@ -33,6 +33,7 @@ std::string play_timer_dir() { return logs_dir() + "/play_timer"; }
 std::string profiles_dir() { return data_dir() + "/profiles"; }
 std::string exports_dir()  { return data_dir() + "/exports"; }
 std::string config_file()  { return data_dir() + "/config.json"; }
+std::string cache_dir()    { return data_dir() + "/cache"; }
 
 namespace
 {
@@ -44,6 +45,7 @@ std::string nand_dir()     { return data_dir() + "/nand/" + s_nand; }
 std::string backups_dir()  { return nand_dir() + "/backups"; }
 std::string history_file() { return nand_dir() + "/history.json"; }
 std::string state_file()   { return nand_dir() + "/state.json"; }
+std::string nand_cache_dir() { return nand_dir() + "/cache"; }
 
 std::string sd_root()
 {
