@@ -1,4 +1,4 @@
-// Host tests for source/util/sha256.cpp, dev_builds.cpp, zip_read.cpp and
+// Host tests for source/util/sha256.cpp (and its HMAC), dev_builds.cpp, zip_read.cpp and
 // github_auth.cpp: the SHA-256 test vectors, digests, the latest release and
 // the list of releases, the
 // artifact and pull-request lists and how they combine (main's commits, each
@@ -48,6 +48,33 @@ static void test_sha256()
     CHECK(sha(std::string(55, 'x')).size() == 64);
     CHECK(sha(std::string(56, 'a')) == "b35439a4ac6f0948b6d6f9e3c6af0f5f590ce20f1bde7090ef7970686ec6738a");
     CHECK(sha(std::string(64, 'a')) == "ffe054fe7ae0cb6dc65c3af9b61d5209f439851db43d0ba5997337df154668eb");
+}
+
+static std::string hex_of(const std::array<uint8_t, 32>& d)
+{
+    static const char HEX[] = "0123456789abcdef";
+    std::string out;
+    for (uint8_t b : d) {
+        out += HEX[b >> 4];
+        out += HEX[b & 0xF];
+    }
+    return out;
+}
+
+// RFC 4231's test cases 1, 2 and 6 (a key longer than a block).
+static void test_hmac_sha256()
+{
+    const std::string k1(20, '\x0b'), m1 = "Hi There";
+    CHECK(hex_of(hmac_sha256(k1.data(), k1.size(), m1.data(), m1.size())) ==
+          "b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7");
+    const std::string k2 = "Jefe", m2 = "what do ya want for nothing?";
+    CHECK(hex_of(hmac_sha256(k2.data(), k2.size(), m2.data(), m2.size())) ==
+          "5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843");
+    const std::string k6(131, '\xaa'), m6 = "Test Using Larger Than Block-Size Key - Hash Key First";
+    CHECK(hex_of(hmac_sha256(k6.data(), k6.size(), m6.data(), m6.size())) ==
+          "60e431591ee0b67f0d8a26aacbf5b77f8e0bc6213728c5140546040f0ee37f54");
+    Sha256 h;
+    CHECK(hex_of(h.digest()) == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
 }
 
 static void test_names()
@@ -572,6 +599,7 @@ int main()
     REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
 
     test_sha256();
+    test_hmac_sha256();
     test_names();
     test_release();
     test_releases();
@@ -584,5 +612,5 @@ int main()
     test_auth();
 
     std::system((std::string("rm -rf '") + dir + "'").c_str());
-    return CHECK_DONE("sha256, release and artifact lists, the order of each kind, the cached list, download checks, zip extraction, replacement and GitHub sign-in assertions passed");
+    return CHECK_DONE("sha256, HMAC-SHA256, release and artifact lists, the order of each kind, the cached list, download checks, zip extraction, replacement and GitHub sign-in assertions passed");
 }

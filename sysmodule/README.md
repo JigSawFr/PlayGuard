@@ -38,6 +38,20 @@ so (check the PIN and the play timer yourself). Should the SD card not be
 mounted at boot (the module retries for about 10 s), nothing is done and no
 report is left.
 
+The report is a plain file, so PlayGuard does not take its word for it. It
+opens the recovery actions (set a new PIN, delete everything) only when the
+console's state agrees with the report and, after an unlock, when the report
+carries the module's **proof**: PlayGuard keeps a random challenge in
+`config/playguard/rescue_nonce` (a new one at every start, so a report is
+believed only at the first start after the boot that wrote it), and the
+module adds to its report that challenge and an HMAC-SHA256 of the report
+keyed with the PIN the console stores, which PlayGuard computes again. A
+report written by hand, copied from an earlier recovery, or left by a module
+older than this check is shown without the actions, and *Open PlayGuard*
+goes through the lock screen as on any start. The PIN itself is never
+written; the proof is made from it, so like the report it is removed at the
+next start of PlayGuard.
+
 ## How to use it
 
 1. Install the module once: extract `playguard-rescue.zip` to the SD-card root
@@ -52,7 +66,9 @@ report is left.
 2. When you are locked out: put the SD card in a computer, create an empty file
    `config/playguard/RESCUE` (or `RESCUE.txt`; to delete everything instead,
    write `delete` on a line of its own), put the card back, turn the
-   console on. Open PlayGuard and finish from the recovery screen.
+   console on. Open PlayGuard and finish from the recovery screen. (PlayGuard
+   must have been opened once since the module was installed: that leaves the
+   challenge the module answers.)
 3. Remove `atmosphere/contents/4200000000505247` when you no longer need it:
    while it is installed, anyone who can edit the SD card can use it.
 

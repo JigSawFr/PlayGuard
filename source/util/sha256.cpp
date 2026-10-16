@@ -69,7 +69,7 @@ void Sha256::update(const void* data, size_t size)
     }
 }
 
-std::string Sha256::hex()
+std::array<uint8_t, 32> Sha256::digest()
 {
     const uint64_t bits = total * 8;
     const uint8_t pad = 0x80;
@@ -79,9 +79,44 @@ std::string Sha256::hex()
     uint8_t len[8];
     for (int i = 0; i < 8; i++) len[i] = (uint8_t)(bits >> (56 - 8 * i));
     update(len, 8);
+    std::array<uint8_t, 32> out;
+    for (size_t i = 0; i < 8; i++)
+        for (size_t b = 0; b < 4; b++) out[4 * i + b] = (uint8_t)(h[i] >> (24 - 8 * b));
+    return out;
+}
+
+std::string Sha256::hex()
+{
     static const char HEX[] = "0123456789abcdef";
     std::string out;
-    for (uint32_t v : h)
-        for (int s = 28; s >= 0; s -= 4) out += HEX[(v >> s) & 0xF];
+    for (uint8_t b : digest()) {
+        out += HEX[b >> 4];
+        out += HEX[b & 0xF];
+    }
     return out;
+}
+
+std::array<uint8_t, 32> hmac_sha256(const void* key, size_t key_size, const void* msg, size_t msg_size)
+{
+    // A key longer than a block is hashed first; a shorter one is padded with zeros.
+    uint8_t k[64] = {};
+    if (key_size > sizeof(k)) {
+        Sha256 h;
+        h.update(key, key_size);
+        const std::array<uint8_t, 32> d = h.digest();
+        std::memcpy(k, d.data(), d.size());
+    } else if (key_size) {
+        std::memcpy(k, key, key_size);
+    }
+    uint8_t pad[64];
+    for (size_t i = 0; i < sizeof(pad); i++) pad[i] = (uint8_t)(k[i] ^ 0x36);
+    Sha256 inner;
+    inner.update(pad, sizeof(pad));
+    inner.update(msg, msg_size);
+    const std::array<uint8_t, 32> in = inner.digest();
+    for (size_t i = 0; i < sizeof(pad); i++) pad[i] = (uint8_t)(k[i] ^ 0x5c);
+    Sha256 outer;
+    outer.update(pad, sizeof(pad));
+    outer.update(in.data(), in.size());
+    return outer.digest();
 }

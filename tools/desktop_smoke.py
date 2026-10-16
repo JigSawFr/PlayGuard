@@ -284,24 +284,33 @@ if ERRORS:
 if RESCUE:
     # The playguard-rescue sysmodule left a report: PlayGuard must show the
     # recovery screen at start-up and open the app when it is dismissed.
-    # The console confirms it: the sysmodule is installed and its unlock is
-    # still on (a report the console does not confirm only shows, without
-    # the actions).
+    # The console confirms it: the sysmodule is installed, its unlock is
+    # still on, and the report carries its proof (core/rescue.h): the
+    # challenge PlayGuard left, and an HMAC-SHA256 keyed with the simulated
+    # PIN (1234). A report the console does not confirm only shows, without
+    # the actions.
+    import hashlib
+    import hmac
     env.setdefault("PLAYGUARD_SIM_UNLOCKED", "1")
     sysmodule = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "contents", "4200000000505247", "exefs.nsp")
     os.makedirs(os.path.dirname(sysmodule), exist_ok=True)
     open(sysmodule, "w").write("NSP0")
     report = os.path.join(run_dir, "playguard_data", "rescue_report.txt")
     os.makedirs(os.path.dirname(report), exist_ok=True)
-    open(report, "w").write("mode=unlock\nresult=ok\nrc=0x00000000\nunlocks=1\n")
+    nonce = os.urandom(16).hex()
+    open(os.path.join(run_dir, "playguard_data", "rescue_nonce"), "w").write(nonce + "\n")
+    body = "mode=unlock\nresult=ok\nrc=0x00000000\nunlocks=1\nrequest=removed\n"
+    mac = hmac.new(b"1234", f"playguard-rescue/1\nnonce={nonce}\n{body}".encode(), hashlib.sha256).hexdigest()
+    open(report, "w").write(f"{body}nonce={nonce}\nmac={mac}\n")
     history = os.path.join(nand_dir, "history.json")
     if os.path.exists(history):
         os.remove(history)   # a clean history: the rescue entry must be the only one
 if FORGED:
     # A rescue report written by hand while PlayGuard asks for the PIN to
     # open, on a console a parent left temporarily unlocked but without the
-    # sysmodule: the recovery screen shows it with no action, and "Open
-    # PlayGuard" goes through the lock screen.
+    # sysmodule: the console's state agrees with it, but it has no proof
+    # (core/rescue.h). The recovery screen shows it with no action, and
+    # "Open PlayGuard" goes through the lock screen.
     env.setdefault("PLAYGUARD_SIM_UNLOCKED", "1")
     sysmodule = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "contents", "4200000000505247")
     if os.path.exists(sysmodule):
@@ -1063,6 +1072,13 @@ if RESCUE:
     report_path = os.path.join(run_dir, "playguard_data", "rescue_report.txt")
     if os.path.exists(report_path):
         fail("the rescue report was not removed after it was read")
+    if "rescue report confirmed by the console (proof valid" not in open(os.path.join(OUT, "app.log"), errors="replace").read():
+        fail("the sysmodule's proof was not checked")
+    try:
+        if open(os.path.join(run_dir, "playguard_data", "rescue_nonce")).read().strip() == nonce:
+            fail("the challenge was not replaced once the report was read")
+    except OSError:
+        fail("no new challenge after the report was read")
 
     def recorded():
         history = os.path.join(nand_dir, "history.json")

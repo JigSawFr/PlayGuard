@@ -4,6 +4,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "core/platform.h"
 
+#include "util/sha256.hpp"
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -89,6 +91,13 @@ bool platform_random(void* buf, size_t size)
     } catch (const std::exception&) {
         return false;
     }
+}
+
+// For sim_backend.c's pctl_pin_hmac: `dst` gets 32 bytes.
+extern "C" void sim_hmac_sha256(void* dst, const void* key, size_t key_size, const void* msg, size_t size)
+{
+    const std::array<uint8_t, 32> mac = hmac_sha256(key, key_size, msg, size);
+    std::memcpy(dst, mac.data(), mac.size());
 }
 
 // The simulator's addresses mean nothing to a crash file.

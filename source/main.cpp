@@ -211,10 +211,12 @@ brls::Activity* choose_first()
     // The playguard-rescue sysmodule acted on a RESCUE file: show what it
     // did and let the parent finish, before (and instead of) the lock
     // screen — they are here because they forgot the PIN. Only when the
-    // console confirms it: anyone can write the report file, and an
-    // unconfirmed one leads to the lock screen like any start.
-    auto report = rescue::take();
-    const bool confirmed = report && rescue::confirmed(*report);
+    // console confirms it (and the sysmodule's proof, for an unlock): anyone
+    // can write the report file, and an unconfirmed one leads to the lock
+    // screen like any start.
+    RescueProof proof;
+    auto report = rescue::take(&proof);
+    const bool confirmed = report && rescue::confirmed(*report, proof);
     // Stopped in the middle of a change last time: lock again before any
     // screen, so a lock screen left with B does not leave the console
     // unlocked. Not after a confirmed recovery unlock: that one is wanted.

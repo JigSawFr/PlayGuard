@@ -33,8 +33,10 @@ The latest release. Fixes are not backported.
   (*Install another build*), from this repository's own CI builds of `main` and of pull
   requests from its branches (pull requests from forks are never offered).
 - **The recovery screen** — reaching its actions (set a new PIN, delete everything) from a
-  `rescue_report.txt` the console's state does not confirm, or without the recovery
-  sysmodule installed.
+  `rescue_report.txt` the console's state does not confirm, or, after an unlock, from one
+  without the recovery sysmodule's proof for the current challenge (`rescue_nonce`, an
+  HMAC keyed with the stored PIN: see [`sysmodule/README.md`](sysmodule/README.md)), or
+  without the recovery sysmodule installed.
 
 ## What is not
 
