@@ -64,9 +64,17 @@ bool quitting();
 // waiting is dropped for the newer one. `job` reports its own result (ui::
 // notify, ui::error). finish_background runs what is still queued at exit.
 void write_later(const char* what, std::function<void()> job, const std::string& key = "");
-// Until every write asked so far is on the SD card: before reading back a
-// file that write_later writes (history.json, the play-timer log).
+// The same for a file added to (history.json, the play-timer log): `key`
+// names it, and none of its writes is dropped.
+void append_later(const char* what, const std::string& key, std::function<void()> job);
+// Until every write asked so far is on the SD card, the waiting ones run on
+// this thread: off the UI thread only (a report collecting every file).
 void settle_writes();
+// Until every write of the file `key` asked so far is on the SD card: before
+// reading it back (history.json). Its writes still waiting run here; those
+// of other files are left to the queue, so a long export does not hold the
+// UI thread.
+void settle_writes(const std::string& key);
 
 // Deferred to the next frame (toasts fired right after a system applet returns
 // were dropped on fw 22.1.0).
@@ -82,7 +90,9 @@ void error(const std::string& text);
 // at once.
 bool save_config(const std::string& saved_text = "", const std::string& failed_text = "");
 // The same, waiting for the write: for a record that must be on the SD card
-// before the console change it describes. False when it is not.
+// before the console change it describes. False when it is not. Only for
+// config.json: it goes ahead of the other writes still waiting, and runs here
+// when the queue is on another file's.
 bool save_config_now();
 // `next` in place of the current screen. Borealis never pops the first
 // activity (the loading screen, under every start screen): a screen that
@@ -144,6 +154,21 @@ int         today_weekday();                    // 0 = Sunday
 std::string today_date();                       // "2026-10-07"
 std::string now_hms();                          // "14:03:12"
 std::string now_stamp();                        // "2026-10-07 14:03"
+// While one lives, local_now() and the four above read the console's clock
+// once on the thread that made it (two IPCs each time otherwise): a screen's
+// refresh asks the time of day a dozen times, through the helpers it calls.
+// Other threads read it live. Nested ones keep the outer one's time.
+class SameTime
+{
+public:
+    SameTime();
+    ~SameTime();
+    SameTime(const SameTime&) = delete;
+    SameTime& operator=(const SameTime&) = delete;
+
+private:
+    bool outer_;
+};
 
 // System / compatibility strings shared by the dashboard and the About section.
 std::string fw_text(const SysInfo& info);                 // "23.0.1 · Atmosphère 1.12.0"

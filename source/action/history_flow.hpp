@@ -39,6 +39,9 @@ void record_failure(const char* kind, Result rc, std::vector<int> before = {}, s
 
 // history::load(), once the entries still being written are on the SD card.
 std::vector<history::Entry> load();
+// How many entries load() would give, without reading the file each time:
+// read once, then kept up to date by the entries PlayGuard writes. UI thread.
+size_t count();
 
 // The History screen's wording: one line, and the details for its dialog.
 std::string title(const history::Entry& e);

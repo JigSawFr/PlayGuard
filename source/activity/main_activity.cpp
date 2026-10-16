@@ -155,7 +155,7 @@ void MainActivity::onContentAvailable()
     this->notice_timer.setCallback([this]() {
         auto stack = brls::Application::getActivitiesStack();
         if (!app::in_focus() || stack.empty() || stack.back() != this) return;
-        notices::sweep();
+        notices::sweep_if_stale();
     });
     this->notice_timer.start();
 

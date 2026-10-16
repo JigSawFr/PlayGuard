@@ -50,6 +50,12 @@ bool atomic_write(const std::string& path, const std::string& content, std::stri
 // stopped between its remove and its rename), reads that one instead.
 bool read_file(const std::string& path, std::string& out);
 
+// Part of a large file, for when only its start or its end is used: its
+// first `head` bytes followed by its last `tail` bytes, the ones in between
+// not read at all; the whole file when it holds no more than head + tail.
+// Falls back to the ".tmp" as read_file does.
+bool read_ends(const std::string& path, size_t head, size_t tail, std::string& out);
+
 // Whether `path` or its ".tmp" (see read_file) is there at all: one that is
 // there but cannot be read is damaged, which is not the same as none.
 bool exists(const std::string& path);

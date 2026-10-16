@@ -61,6 +61,9 @@ void note_pin_strength(const PctlStatus& s);
 // The main screen's own sweep (a minute apart, only while it is on top and
 // in focus): reads what refresh_status needs, in one pctl session.
 void sweep();
+// The same, unless the Overview gave refresh_status its readings in the last
+// seconds: the main screen's minute timer.
+void sweep_if_stale();
 
 // MainActivity, once per start: a crash file newer than the last one told
 // about (PlayGuard closed unexpectedly since). The first start with this

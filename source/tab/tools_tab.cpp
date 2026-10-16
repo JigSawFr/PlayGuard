@@ -274,7 +274,7 @@ void ToolsTab::refresh()
     logs_keep_mb->setDetailText(logs_mb_text(cfg.logs_keep_mb));
     const size_t backups = backup_flow::count();
     backup_restore->setDetailText(backups ? brls::getStr("playguard/tools/backup_count", (int)backups) : "");
-    const size_t changes = history_flow::load().size();
+    const size_t changes = history_flow::count();
     history->setDetailText(changes ? brls::getStr("playguard/history/count", (int)changes) : "");
 
     SysInfo si;

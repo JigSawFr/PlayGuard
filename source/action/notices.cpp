@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <borealis.hpp>
+#include <chrono>
 #include <cstdio>
 #include <map>
 #include <sys/statvfs.h>
@@ -214,9 +215,21 @@ void unlisten(int id)
     s_listeners.erase(id);
 }
 
+namespace
+{
+// The last readings refresh_status() was given, for the minute's sweep.
+PctlStatus                            s_status{};
+std::chrono::steady_clock::time_point s_status_at;
+bool                                  s_status_known = false;
+}   // namespace
+
 void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, Result accuracy_rc, bool accurate)
 {
     const bool writable = !app::read_only();
+    s_status = s;
+    s_status_at = std::chrono::steady_clock::now();
+    s_status_known = true;
+    ui::SameTime same;   // the date and the weekday of every entry below, read once
 
     // Nothing set up yet: no PIN, so nothing is protected.
     toggle(s.pin_length_ok && s.pin_length == 0, "pin_missing", Level::Action, "playguard/notices/pin_missing"_i18n,
@@ -416,8 +429,20 @@ void note_write(const char* what, bool ok, const std::string& error)
         brls::getStr("playguard/notices/sd_write_detail", file) + (error.empty() ? "" : " (" + error + ")"));
 }
 
+void sweep_if_stale()
+{
+    // The Overview read the same a moment ago (every 5 s while it is shown):
+    // nothing new to ask the console.
+    if (s_status_known && std::chrono::steady_clock::now() - s_status_at < std::chrono::seconds(10)) {
+        note_pin_strength(s_status);
+        return;
+    }
+    sweep();
+}
+
 void sweep()
 {
+    ui::SameTime same;
     PctlStatus s;
     PtState    pt;
     pctl_overview_fetch(&s, &pt);
