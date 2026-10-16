@@ -61,4 +61,5 @@ class ClockTab : public TabBase
     BRLS_BIND(brls::Label,      warning,  "ck_warning");
     BRLS_BIND(brls::DetailCell, apply_cell, "ck_apply");
     BRLS_BIND(brls::DetailCell, copy_cell, "ck_copy");
+    BRLS_BIND(brls::BooleanCell, check_at_start, "ck_check_at_start");
 };
