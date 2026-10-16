@@ -22,7 +22,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 
 - ⏱️ **Play-time limit** — the same every day or one per day, profiles, extra time or no more play today in one press.
 - 📊 **Activity** — time per game and per account, charts, export to CSV, JSON, XLSX or PDF.
-- 🔒 **Restrictions and PIN** — restriction level, age rating, PIN, temporary unlock, a one-switch console lock.
+- 🔒 **Restrictions and PIN** — restriction level, age rating, PIN, temporary unlock, *Block all games* in one switch.
 - 🕒 **Network clock** — set from public NTP servers, so the timer counts right on a console that never reaches Nintendo.
 - 📱 **Companion app** — unlink it, even on a second-hand console.
 - ↩️ **History and backups** — every change is logged and can be undone.
@@ -44,7 +44,7 @@ Search for *PlayGuard* in the Homebrew App Store or sphaira, or extract `playgua
 ## Quick start
 
 1. Open PlayGuard: the *First steps* guide sets the PIN and the daily limit.
-2. Still linked to the phone app? *Security & app › Unlink the companion app*, or its next sync overwrites what you set.
+2. Still linked to the phone app? *PIN › Unlink the companion app*, or its next sync overwrites what you set.
 3. Network clock inaccurate? *Network clock › Measure*, then set it. Without Internet, read [this first](docs/compatibility.md#supported-versions).
 
 Forgotten PIN or second-hand console: [Locked out?](docs/troubleshooting.md#locked-out)

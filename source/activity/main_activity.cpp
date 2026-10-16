@@ -207,3 +207,10 @@ void MainActivity::update_title()
     if (ui::known_unlocked()) title += " · " + "playguard/title_tags/unlocked"_i18n;
     if (auto* frame = dynamic_cast<brls::AppletFrame*>(this->getContentView())) frame->setTitle(title);
 }
+
+// Back from a dialog or a screen: a tab may have hidden the view that opened
+// it meanwhile (the Overview's refresh, every 5 s and on new play data).
+void MainActivity::onResume()
+{
+    ui::keep_focus(this);
+}

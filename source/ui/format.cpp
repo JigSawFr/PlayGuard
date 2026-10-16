@@ -84,6 +84,11 @@ std::string bool_text(bool ok, bool value, const std::string& yes, const std::st
     return value ? yes : no;
 }
 
+std::string opens(const std::string& value)
+{
+    return value.empty() ? "›" : value + "  ›";
+}
+
 namespace
 {
 // SameTime: the thread it pins the time for, and that time once read.

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Play timer › Advanced: the switch for the advanced (debug-class) actions,
+     then those actions ("Time's up" alarm, pausing and resuming the
+     countdown) while it is on, and the diagnostic in developer mode.
+     Filled by source/activity/play_timer_advanced_activity.cpp. -->
+
+<brls:AppletFrame
+    iconInterpolation="linear">
+
+    <ScrollView
+        title="@i18n/playguard/play_timer/section_advanced"
+        icon="@res/img/app_icon.jpg"
+        width="auto"
+        height="auto"
+        axis="column"
+        alignItems="stretch"
+        grow="1.0">
+
+        <brls:Box
+            width="auto"
+            height="auto"
+            axis="column"
+            alignItems="stretch"
+            paddingTop="@style/brls/sidebar/padding_top"
+            paddingRight="@style/brls/sidebar/padding_right"
+            paddingBottom="@style/brls/sidebar/padding_bottom"
+            paddingLeft="@style/brls/sidebar/padding_left">
+
+            <brls:BooleanCell id="pa_show"/>
+            <brls:Label id="pa_note" text="@i18n/playguard/play_timer/advanced_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:BooleanCell id="pa_alarm" marginTop="16"/>
+            <brls:DetailCell id="pa_pause" title="@i18n/playguard/play_timer/pause"/>
+            <brls:DetailCell id="pa_resume" title="@i18n/playguard/play_timer/resume"/>
+            <brls:DetailCell id="pa_diag" title="@i18n/playguard/play_timer/diag" marginTop="16"/>
+
+        </brls:Box>
+
+    </ScrollView>
+
+</brls:AppletFrame>

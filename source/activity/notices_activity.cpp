@@ -28,10 +28,26 @@ void NoticesActivity::onContentAvailable()
     // A change while the list is open (a source cleared what it fixed):
     // rebuilt on the next frame, outside the source's own call.
     // `alive`: the screen can be gone by then.
+    // Under a dialog (an upload's link, an error): rebuilt once back on top,
+    // as the dialog gives the focus back to a cell a rebuild deletes, and
+    // closing would close the dialog instead.
     this->listener = notices::listen([this]() {
         brls::sync([this, alive = this->alive]() {
-            if (*alive && !this->closing) this->rebuild();
+            if (!*alive || this->closing) return;
+            if (ui::has_focus(this)) this->rebuild();
+            else this->stale = true;
         });
+    });
+}
+
+void NoticesActivity::onResume()
+{
+    if (!this->stale) return;
+    this->stale = false;
+    // Next frame: borealis first gives the focus back to the cell that
+    // opened the dialog, which rebuild() then moves away before deleting it.
+    brls::sync([this, alive = this->alive]() {
+        if (*alive && !this->closing) this->rebuild();
     });
 }
 

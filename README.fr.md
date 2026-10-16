@@ -22,7 +22,7 @@ PlayGuard ramène sur une console modifiée les réglages de l'application mobil
 
 - ⏱️ **Limite de temps de jeu** — la même tous les jours ou une par jour, des profils, du temps en plus ou l'arrêt du jeu pour aujourd'hui en un appui.
 - 📊 **Activité** — temps par jeu et par compte, graphiques, export en CSV, JSON, XLSX ou PDF.
-- 🔒 **Restrictions et code PIN** — niveau de restriction, classification par âge, code PIN, déverrouillage temporaire, verrou de console en un interrupteur.
+- 🔒 **Restrictions et code PIN** — niveau de restriction, classification par âge, code PIN, déverrouillage temporaire, *Bloquer tous les jeux* en un interrupteur.
 - 🕒 **Horloge réseau** — réglée depuis des serveurs NTP publics, pour que le minuteur compte juste sur une console qui n'atteint jamais Nintendo.
 - 📱 **Application mobile** — la dissocier, même sur une console d'occasion.
 - ↩️ **Historique et sauvegardes** — chaque modification est consignée et peut être annulée.
@@ -44,7 +44,7 @@ Cherchez *PlayGuard* dans le Homebrew App Store ou sphaira, ou extrayez `playgua
 ## Premiers pas
 
 1. Ouvrez PlayGuard : le guide *Premiers pas* règle le code PIN et la limite quotidienne.
-2. Encore associé à l'application mobile ? *Sécurité et appli › Dissocier l'application mobile*, sinon sa prochaine synchronisation écrase vos réglages.
+2. Encore associé à l'application mobile ? *Code PIN › Dissocier l'application mobile*, sinon sa prochaine synchronisation écrase vos réglages.
 3. Horloge réseau imprécise ? *Horloge réseau › Mesurer l'écart*, puis réglez-la. Sans Internet, lisez d'abord [ceci](docs/fr/compatibility.md#versions-prises-en-charge).
 
 Code PIN oublié ou console d'occasion : [Console bloquée ?](docs/fr/troubleshooting.md#console-bloquée-)
