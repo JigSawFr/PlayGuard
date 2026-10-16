@@ -10,6 +10,10 @@
 #pragma once
 #include "nx_types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     u16 year;
     u8  month;    // 1..12
@@ -42,3 +46,7 @@ void calendar_add_days(LocalTime *t, int days);
 // "7 days" window is 7 calendar days, 167 or 169 hours around a change.
 // Without a usable rule: `now` minus the time of day in UTC.
 u64  local_midnight(const TimeRule *rule, u64 now, int days_back);
+
+#ifdef __cplusplus
+}
+#endif

@@ -6,6 +6,10 @@
 #pragma once
 #include "nx_types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // PlayTimerSettings (fw 21.0.0+): u16[34] (0x44 bytes), read with 145601 and
 // written with 195101. Observed on a console with a real limit configured
 // through the companion app (fw 22.1.0):
@@ -128,3 +132,7 @@ void pt_bedtime_encode(u16 c[PT_U16_COUNT], const PtBedtime in[7]);
 // digits that go up or down by one (1234, 4321, 0123), a pair repeated
 // (1212) or a column of the keypad (2580, 0852). `pin` holds `n` digits.
 bool pin_is_weak(const char *pin, size_t n);
+
+#ifdef __cplusplus
+}
+#endif

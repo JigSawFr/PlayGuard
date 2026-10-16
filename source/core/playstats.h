@@ -15,6 +15,10 @@
 #include "nx_types.h"
 #include "../util/playlog.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define PLAYSTATS_MAX      256
 #define PLAYSTATS_NAME_LEN 128
 
@@ -101,3 +105,7 @@ typedef struct {
 } PlayIcon;
 
 void playstats_icons(PlayIcon *icons, size_t count);
+
+#ifdef __cplusplus
+}
+#endif

@@ -18,6 +18,10 @@
 #pragma once
 #include "nx_types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void core_set_read_only(bool on);
 bool core_read_only(void);
 
@@ -32,3 +36,7 @@ void core_set_reveal_check(bool (*check)(void));
 
 // What showing the PIN calls first: the same results as core_change_allowed.
 Result core_reveal_allowed(void);
+
+#ifdef __cplusplus
+}
+#endif
