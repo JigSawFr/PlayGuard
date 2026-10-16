@@ -4,6 +4,7 @@
 // once. Beyond the sanitizers: what decode() accepts encodes to a file that
 // decodes to the same, strings end inside their arrays, the content count is
 // bounded, and to_check() keeps only listed games.
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <set>
@@ -58,7 +59,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         records.push_back(r);
         listed.insert(r.app_id);
     }
-    const int64_t now = c.checked_at + 60;
+    // A minute after the check, unless the file's time leaves no room for it.
+    const int64_t now = c.checked_at > INT64_MAX - 60 ? c.checked_at : c.checked_at + 60;
     game_cache::expired(c, now, hos);
     game_cache::Cache shown = c;
     game_cache::to_check(&shown, records, now, hos);
