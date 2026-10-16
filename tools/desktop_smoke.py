@@ -1164,6 +1164,30 @@ shot("23_bedtime_done")
 if not any(m.startswith("Bedtime alarm changed.") for m in messages()):
     fail("the bedtime alarm was not changed: " + repr(messages()[-3:]))
 
+# Play timer › Advanced: its own screen, the switch next to the actions it
+# shows; turned on, then off again (backups restore the alarm only with it on).
+key("Down", 4)             # past Allowed again at, the extra-time amounts and switch: Advanced
+key("Return")
+shot("23_advanced")
+def advanced_saved(on):
+    # The config is written off the UI thread (ui::save_config).
+    for _ in range(25):
+        try:
+            if bool(json.load(open(config_file)).get("advanced")) == on:
+                return True
+        except (OSError, ValueError):
+            pass
+        time.sleep(0.2)
+    return False
+key("Return")              # Show advanced play-timer actions: on
+shot("23_advanced_on")     # the "Time's up" alarm, pause and resume below it
+if not advanced_saved(True):
+    fail("the advanced actions switch was not saved on")
+key("Return")              # and off again
+if not advanced_saved(False):
+    fail("the advanced actions switch was not saved off")
+key("Escape")              # back to the Play timer tab
+
 # Settings backup: save one, open the list and the restore summary (cancelled).
 key("Left")                # back to the sidebar
 key("Down", steps("play_timer", "tools"))

@@ -21,7 +21,7 @@ How the settings are stored on the console is in
 | Companion app | PlayGuard | Notes |
 |---|---|---|
 | Daily play-time limit, the same every day or one per day | *Play timer* | Plus saved profiles, and the week chart as the editor |
-| "Extend today's play time" (+5 min … +1 h, added in 2.4.0 for +1 h); undo today's changes | *Extra time today*, *No more play today*; the usual limit comes back the next day | Amounts in *Preferences*, including +5/+10/+15 |
+| "Extend today's play time" (+5 min … +1 h, added in 2.4.0 for +1 h); undo today's changes | *Extra time today*, *No more play today*; the usual limit comes back the next day | Amounts in *Play timer › Extra time*, including +5/+10/+15 |
 | Alarm only, or suspend the software, when the time is up | *Play timer › When the time is up* | Shown once a limit or a bedtime is set (see gap 1) |
 | Bedtime alarm and the time play is allowed again (2.1.0) | *Play timer › Bedtime alarm* | Partly: one time for every day (see gap 2) |
 | Restriction level, age rating, rating organisation, posting to social media, communicating with other players, VR mode (1.10.0) | *Restrictions* | |

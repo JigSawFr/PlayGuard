@@ -10,6 +10,7 @@
 #include "action/rescue.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
+#include "util/config.hpp"
 
 using namespace brls::literals;
 
@@ -111,6 +112,12 @@ SecurityTab::SecurityTab()
         this->refresh();
         return true;
     });
+    // After a change PlayGuard made with a temporary unlock: on at once, or offered.
+    ui::guard_switch(auto_relock);
+    auto_relock->init("playguard/tools/auto_relock"_i18n, config::get().auto_relock, [](bool on) {
+        config::get().auto_relock = on;
+        ui::save_config();
+    });
     del->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
         ui::confirm_danger("playguard/security/delete_body"_i18n, "playguard/security/delete_confirm"_i18n, [this]() {
@@ -188,8 +195,10 @@ void SecurityTab::refresh()
                           { pr_decode.getView(), paired } });
     for (brls::DetailCell* c : { (brls::DetailCell*)set_pin.getView(), (brls::DetailCell*)show_pin.getView(),
                                  (brls::DetailCell*)unlock.getView(), (brls::DetailCell*)relock.getView(),
-                                 (brls::DetailCell*)console_lock_cell.getView(), (brls::DetailCell*)pr_unlink.getView() })
+                                 (brls::DetailCell*)console_lock_cell.getView(), (brls::DetailCell*)pr_unlink.getView(),
+                                 (brls::DetailCell*)auto_relock.getView() })
         ui::show_writable(c, writable);
+    auto_relock->setOn(config::get().auto_relock, false);
     ui::show_writable(del, writable, ui::color_bad(), ui::color_neutral());
 }
 
