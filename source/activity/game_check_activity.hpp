@@ -49,10 +49,11 @@ class GameCheckActivity : public brls::Activity
         brls::Header* title = nullptr;
         brls::Label*  note  = nullptr;
         brls::Box*    list  = nullptr;
-        brls::DetailCell* save = nullptr;         // Reinstall only: save the list
-        brls::DetailCell* remove_all = nullptr;   // Reinstall only: remove them all
-        brls::DetailCell* verify_all = nullptr;   // Verify only: check them all
-        std::vector<GameFacts> games;             // as shown
+        brls::Button* save       = nullptr;   // Reinstall only: save the list
+        brls::Button* send       = nullptr;   // Reinstall only: send the list to a gist
+        brls::Button* remove_all = nullptr;   // Reinstall only: remove them all
+        brls::Button* verify_all = nullptr;   // To check only: check them all
+        std::vector<GameFacts> games;         // as shown
     };
 
     struct Pending
@@ -92,8 +93,10 @@ class GameCheckActivity : public brls::Activity
     void choose(const GameFacts& game, u32 actions);
     void run(const GameFacts& game, u32 action, const GameContent& content);
     void remove(const GameFacts& game);
-    // `games`' list saved (the JSON's path, "" and why on failure), and all
-    // of them removed after one question (the list saved first).
+    // `games`' list as text, saved (the JSON's path, "" and why on
+    // failure), and all of them removed after one question (the list saved
+    // first).
+    std::string list_text(const std::vector<GameFacts>& games) const;
     std::string save_list(const std::vector<GameFacts>& games, std::string* error) const;
     void remove_games(std::vector<GameFacts> games);
     void remove_next(std::vector<GameFacts> games, size_t at, u32 removed, std::string path);

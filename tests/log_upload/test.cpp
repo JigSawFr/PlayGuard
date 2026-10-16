@@ -212,6 +212,9 @@ static void test_bodies()
            R"({"description":"PlayGuard 1.2.0 diagnostic report","files":{"1-report.txt":{"content":"a \"b\"\n)"
            "\xC3\xA9"
            R"("},"2-config.json":{"content":"{}"}},"public":false})");
+    // Another kind of gist: its own description.
+    CHECK(log_upload::gist_body({ { "1-games.txt", "x" } }, "1.2.0", "games to reinstall") ==
+           R"({"description":"PlayGuard 1.2.0 games to reinstall","files":{"1-games.txt":{"content":"x"}},"public":false})");
 }
 
 static void test_urls()

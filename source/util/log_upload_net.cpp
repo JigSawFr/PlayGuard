@@ -32,7 +32,8 @@ bool simulated(Result* r)
 }
 }   // namespace
 
-Result upload_gist(const std::vector<Part>& files, const std::string& token, const std::string& version)
+Result upload_gist(const std::vector<Part>& files, const std::string& token, const std::string& version,
+                   const std::string& what)
 {
     Result r;
     if (simulated(&r)) return r;
@@ -40,7 +41,7 @@ Result upload_gist(const std::vector<Part>& files, const std::string& token, con
     long status = 0;
     http::Headers headers = github_auth::api_headers(token);
     // The answer repeats the content: room for it, escaped.
-    if (!http::post("https://api.github.com/gists", gist_body(files, version), "application/json", &body, &r.error,
+    if (!http::post("https://api.github.com/gists", gist_body(files, version, what), "application/json", &body, &r.error,
                     &status, 3 * GIST_MAX_BYTES, 60, headers)) {
         // 401: the token was revoked; 403 / 404: it was given before PlayGuard
         // asked for the gist permission.

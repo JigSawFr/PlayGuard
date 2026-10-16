@@ -6,6 +6,7 @@
 #include <string>
 
 #include "action/notices.hpp"
+#include "action/sys_notes_flow.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
@@ -44,9 +45,11 @@ void note()
           brls::getStr("playguard/notices/sys_atmosphere_detail", ams));
     entry("sys_hekate", latest.hekate, hekate, brls::getStr("playguard/notices/sys_hekate", latest.hekate),
           brls::getStr("playguard/notices/sys_hekate_detail", hekate));
+    // What the notes of Atmosphère and hekate say of that firmware, when they say something.
+    const std::string advice = sys_notes_flow::firmware_advice();
     entry("sys_firmware", latest.firmware, si.hos_version ? std::string(fw) : "",
           brls::getStr("playguard/notices/sys_firmware", latest.firmware),
-          brls::getStr("playguard/notices/sys_firmware_detail", std::string(fw)));
+          brls::getStr("playguard/notices/sys_firmware_detail", std::string(fw)) + (advice.empty() ? "" : "\n" + advice));
 }
 
 void check()
@@ -56,8 +59,12 @@ void check()
     ui::in_background("system update check", []() {
         std::string error;
         const sys_updates::Latest found = sys_updates::fetch(&error);
+        // The release lists too (one request each): how far behind, and
+        // whether the newest firmware is supported yet.
+        const sys_notes::Cache lists = ui::quitting() ? sys_notes::Cache{} : sys_notes_flow::fetch_lists();
         if (ui::quitting()) return;
-        brls::sync([found, error]() {
+        brls::sync([found, error, lists]() {
+            sys_notes_flow::keep(lists);
             s_checking = false;
             if (!error.empty()) brls::Logger::info("system update check: {}", error);
             // What could not be read keeps what the last check found.
