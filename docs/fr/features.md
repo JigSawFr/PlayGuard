@@ -100,7 +100,7 @@ Les entrées qui concernent la console plutôt que le contrôle parental viennen
 - le sysmodule de récupération pas à jour (pas celui fourni avec cette version, ou installé avant qu'il n'indique sa version ; *Mettre à jour* installe celui que cette version contient), puis la console à redémarrer pour qu'il serve, jusqu'à ce qu'elle l'ait été ;
 - une version qui n'a pas fini de démarrer et dont PlayGuard est revenu (*Envoyer un rapport*).
 
-Celles pour information : un retour à la version précédente, un firmware non testé avec cette version, une nouvelle version d'Atmosphère, de hekate ou du firmware (vérifiée avec *Rechercher les mises à jour chaque jour* ; l'entrée du firmware conseille d'attendre qu'Atmosphère le prenne en charge), le numéro de série non masqué sur emuMMC, le contrôle parental propre à l'autre système, un fichier de PlayGuard trouvé endommagé et mis de côté (une notification au lancement y renvoie).
+Celles pour information : un retour à la version précédente, un firmware non testé avec cette version, une nouvelle version d'Atmosphère, de hekate ou du firmware (vérifiée avec *Rechercher les mises à jour chaque jour* ; l'entrée du firmware conseille d'attendre qu'Atmosphère le prenne en charge), une nouvelle version de l'intégration Home Assistant (une fois qu'elle a indiqué la version que Home Assistant utilise : *Nouveautés* montre ce qui a changé depuis et le QR code qui l'ouvre dans HACS), le numéro de série non masqué sur emuMMC, le contrôle parental propre à l'autre système, un fichier de PlayGuard trouvé endommagé et mis de côté (une notification au lancement y renvoie).
 
 ### Comportement des entrées
 
@@ -440,7 +440,7 @@ Sur une console sans Internet, *Régler l'horloge réseau sur l'horloge de la co
 - Les messages qu'il affiche :
   - Les types de notifications (voir [plus haut](#comportement-des-entrées)).
   - Un **rappel mensuel pour soutenir PlayGuard** (activé par défaut, jamais le premier mois ni juste après une mise à jour ; *Ne plus afficher* sur le rappel ou cet interrupteur le désactive pour de bon, mises à jour comprises).
-- **Accès à distance (MQTT / Home Assistant) :** le broker et sa version MQTT, le nom de la console, que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, des QR codes qui installent l'intégration PlayGuard depuis HACS et ajoutent la console, l'état en direct, *Synchroniser maintenant* et le journal. Voir [le guide Home Assistant](../home-assistant.fr.md).
+- **Accès à distance (MQTT / Home Assistant) :** le broker et sa version MQTT, le nom de la console, que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, des QR codes qui installent l'intégration PlayGuard depuis HACS et ajoutent la console (une fois installée, sa version et sa nouvelle version), l'état en direct, *Synchroniser maintenant* et le journal. Voir [le guide Home Assistant](../home-assistant.fr.md).
 - Un réglage qui ne concerne qu'une fonction est à côté d'elle : le temps en plus dans *Temps de jeu*, la réactivation dans *Code PIN*, la vérification de l'horloge dans *Console › Horloge réseau*. Les mises à jour et *Aide et diagnostic* sont dans *À propos*.
 
 ## À propos

@@ -1118,6 +1118,14 @@
         "inplace_body": "PlayGuard va télécharger la version {}, la vérifier, la mettre à la place de celle-ci et redémarrer dessus. Vos réglages sont conservés.",
         "inplace_confirm": "Mettre à jour"
     },
+    "ha_update": {
+        "body": "Home Assistant a la version {}. Scannez le code avec un téléphone où Home Assistant s'ouvre : dans HACS, mettez à jour PlayGuard, puis redémarrez Home Assistant.",
+        "hacs": "PlayGuard dans HACS",
+        "hacs_caption": "Mettre à jour, puis redémarrer",
+        "changes": "Ce qui a changé depuis la {}",
+        "note": "Toutes les versions : {}",
+        "no_notes": "Les nouveautés n'ont pas pu être lues ; elles sont sur {}."
+    },
     "upload": {
         "pick": "Que faut-il envoyer ?",
         "current": "Ce rapport et les fichiers de débogage",
@@ -1487,6 +1495,7 @@
         "ha_add": "2. Ajouter la console",
         "ha_add_caption": "Identifiant de la console : {}",
         "ha_add_caption_none": "Si Home Assistant ne la propose pas",
+        "ha_installed": "Intégration PlayGuard",
         "discovery": "Créer l'appareil dans Home Assistant (découverte MQTT)",
         "report": "Publier les rapports de diagnostic demandés",
         "note": "Un ordre est exécuté comme un changement fait ici : le mode lecture seule, le déverrouillage du minuteur et l'historique des changements s'appliquent. Supprimer le contrôle parental, délier l'appli mobile et le code PIN ne sont jamais possibles par le lien. Le mot de passe est enregistré en clair sur la carte SD.",
@@ -1763,6 +1772,8 @@
         "sys_hekate_detail": "La carte SD contient hekate {}.",
         "sys_firmware": "Le firmware {} est sorti",
         "sys_firmware_detail": "Cette console est en {}. Ne la mettez à jour qu'une fois ce firmware pris en charge par Atmosphère (et hekate, si vous l'utilisez), sinon Atmosphère ne démarrera plus.",
+        "ha_integration": "L'intégration PlayGuard {} est disponible",
+        "ha_integration_detail": "Home Assistant a la version {}.",
         "pin_weak": "Le code PIN est facile à deviner",
         "pin_weak_detail": "Comme 0000 ou 1234 : il fait partie des premiers essayés. Choisissez-en un plus difficile à trouver.",
         "pin_lock_off": "PlayGuard s'ouvre sans le code PIN",

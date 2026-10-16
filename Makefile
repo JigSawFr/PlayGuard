@@ -173,7 +173,7 @@ date_SRC    := source/util/date.cpp tests/date/test.cpp
 # The header-only helpers: utf8, emoji, text, json_util.
 text_util_SRC   := tests/text_util/test.cpp
 patches_SRC   := source/util/paths.cpp source/util/patches.cpp tests/patches/test.cpp
-changelog_SRC   := source/util/changelog.cpp tests/changelog/test.cpp
+changelog_SRC   := source/util/date.cpp source/util/changelog.cpp source/util/update.cpp tests/changelog/test.cpp
 support_SRC   := source/util/date.cpp source/util/support.cpp tests/support/test.cpp
 pt_logic_SRC   := source/action/pt_logic.cpp source/util/date.cpp tests/pt_logic/test.cpp
 pin_lock_logic_SRC   := source/action/pin_lock_logic.cpp tests/pin_lock_logic/test.cpp
@@ -350,6 +350,7 @@ zip_read_FUZZ      := source/util/zip_read.cpp tests/fuzz/zip_read/fuzz.cpp
 zip_read_FUZZ_LIBS := -lz
 markdown_FUZZ      := $(filter-out tests/%,$(markdown_SRC)) tests/fuzz/markdown/fuzz.cpp
 changelog_FUZZ     := $(filter-out tests/%,$(changelog_SRC)) tests/fuzz/changelog/fuzz.cpp
+changelog_FUZZ_CSRC := $(CALENDAR_C)
 rescue_FUZZ        := $(filter-out tests/%,$(rescue_SRC)) tests/fuzz/rescue/fuzz.c
 config_FUZZ        := $(filter-out tests/%,$(config_SRC)) tests/fuzz/config/fuzz.cpp
 config_FUZZ_CSRC   := $(CALENDAR_C)

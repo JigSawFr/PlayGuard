@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/sync_files.hpp"
 
+#include <borealis/extern/nlohmann/json.hpp>
+#include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -202,6 +204,47 @@ std::string names_text(const std::vector<std::pair<uint64_t, std::string>>& name
 void write_names(const std::vector<std::pair<uint64_t, std::string>>& names)
 {
     write(system_dir(), "names.txt", names_text(names));
+}
+
+std::string integration_file()
+{
+    return system_dir() + "/integration.json";
+}
+
+namespace
+{
+std::string version_of(const nlohmann::json& j, const char* key)
+{
+    const auto it = j.find(key);
+    if (it == j.end() || !it->is_string()) return "";
+    const std::string v = it->get<std::string>();
+    if (v.empty() || v.size() > 24 || v[0] < '0' || v[0] > '9') return "";
+    for (const char c : v)
+        if (!std::isalnum((unsigned char)c) && c != '.' && c != '+' && c != '-') return "";
+    return v;
+}
+}   // namespace
+
+Integration parse_integration(const std::string& doc)
+{
+    Integration out;
+    const nlohmann::json j = nlohmann::json::parse(doc, nullptr, false);
+    if (!j.is_object()) return out;
+    out.version = version_of(j, "version");
+    out.homeassistant = version_of(j, "homeassistant");
+    return out;
+}
+
+void write_integration(const std::string& doc)
+{
+    if (!doc.empty()) {
+        write(system_dir(), "integration.json", doc);
+        return;
+    }
+    const std::string file = integration_file();
+    auto job = [file]() { std::remove(file.c_str()); };
+    if (s_writer) s_writer(file, job);
+    else job();
 }
 
 namespace

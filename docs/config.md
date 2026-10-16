@@ -113,6 +113,8 @@ settings are not here but in `sync.conf` ([`sync-protocol.md`](sync-protocol.md)
 | `update_latest` | string | the latest release the last check found; while newer than the running version, start-up checks again and opens the update screen | `""` |
 | `sys_latest` | string | the latest Atmosphère, hekate and firmware the last check found (`"atmosphere=1.12.0;hekate=6.5.4;firmware=23.0.1"`); the notification bell says which are newer than what the console runs; at most 96 characters | `""` |
 | `sys_checked` | string | `"YYYY-MM-DD"` of that check (once a day, with *Check for updates every day*); anything else is cleared | `""` |
+| `ha_latest` | string | the latest release of PlayGuard's Home Assistant integration the last check found (checked only once the integration said which version Home Assistant runs); the notification bell says when it is newer; at most 32 characters | `""` |
+| `ha_checked` | string | `"YYYY-MM-DD"` of that check (as `sys_checked`); anything else is cleared | `""` |
 | `update_snooze_version` | string | the release whose screen *Later* postponed (cleared with `update_snooze_until` when either is malformed) | `""` |
 | `update_snooze_until` | string | `"YYYY-MM-DD"`: that release is offered again from that day (30 days at most; a farther date is ignored) | `""` |
 
@@ -272,6 +274,8 @@ line; the order does not matter when it reads them:
   "update_latest": "",
   "sys_latest": "",
   "sys_checked": "",
+  "ha_latest": "",
+  "ha_checked": "",
   "update_snooze_version": "",
   "update_snooze_until": "",
   "support_reminder": true,

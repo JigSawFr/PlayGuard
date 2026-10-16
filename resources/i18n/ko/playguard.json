@@ -1118,6 +1118,14 @@
         "inplace_body": "PlayGuard가 버전 {}을(를) 다운로드하고 확인한 뒤 현재 버전을 교체하고 다시 시작합니다. 설정은 유지됩니다.",
         "inplace_confirm": "업데이트"
     },
+    "ha_update": {
+        "body": "Home Assistant has {}. Scan the code with a phone where Home Assistant opens: in HACS, update PlayGuard, then restart Home Assistant.",
+        "hacs": "PlayGuard in HACS",
+        "hacs_caption": "Update, then restart",
+        "changes": "What changed since {}",
+        "note": "Every release: {}",
+        "no_notes": "What changed could not be read; it is on {}."
+    },
     "upload": {
         "pick": "보낼 내용",
         "current": "이 보고서와 디버그 파일",
@@ -1487,6 +1495,7 @@
         "ha_add": "2. Add the console",
         "ha_add_caption": "Console id: {}",
         "ha_add_caption_none": "If Home Assistant does not offer it",
+        "ha_installed": "PlayGuard integration",
         "discovery": "Create the device in Home Assistant (MQTT discovery)",
         "report": "Publish the diagnostic reports asked for",
         "note": "An order is carried out like a change made here: read-only mode, the play-timer unlock and the change history apply. Deleting parental controls, unlinking the phone app and the PIN are never possible through the link. The password is stored on the SD card as plain text.",
@@ -1763,6 +1772,8 @@
         "sys_hekate_detail": "SD 카드의 hekate는 {}입니다.",
         "sys_firmware": "펌웨어 {}이(가) 나왔습니다",
         "sys_firmware_detail": "이 본체는 {}입니다. Atmosphère(사용한다면 hekate도)가 그 펌웨어를 지원한 뒤에 업데이트하세요. 그렇지 않으면 Atmosphère가 더 이상 시작되지 않습니다.",
+        "ha_integration": "PlayGuard integration {} is available",
+        "ha_integration_detail": "Home Assistant has {}.",
         "pin_weak": "PIN을 쉽게 추측할 수 있습니다",
         "pin_weak_detail": "0000이나 1234처럼 누구나 먼저 시도하는 번호입니다. 찾기 어려운 번호로 바꾸세요.",
         "pin_lock_off": "PlayGuard가 PIN 없이 열립니다",

@@ -99,7 +99,7 @@ The entries about the console rather than the parental controls come last, on on
 - the recovery sysmodule out of date (not the one this version ships with, or installed before it said its version; *Update* puts in the one this version carries), then the console to restart for it, until it has;
 - a build that did not finish starting and was gone back from (*Send a report*).
 
-Those for information: a build gone back from, a firmware not tested with this version, a newer Atmosphère, hekate or firmware (checked with *Check for updates every day*; the firmware's entry says to wait until Atmosphère supports it), the serial number not blanked on emuMMC, the other system's own parental controls, one of PlayGuard's own files found damaged and put aside (a toast at start-up points to it).
+Those for information: a build gone back from, a firmware not tested with this version, a newer Atmosphère, hekate or firmware (checked with *Check for updates every day*; the firmware's entry says to wait until Atmosphère supports it), a newer release of the Home Assistant integration (once it said which version Home Assistant runs: *What's new* shows what changed since and the QR code that opens it in HACS), the serial number not blanked on emuMMC, the other system's own parental controls, one of PlayGuard's own files found damaged and put aside (a toast at start-up points to it).
 
 ### How entries behave
 
@@ -439,7 +439,7 @@ On a console without Internet, *Set the network clock to the console clock* appe
 - The messages it shows:
   - The kinds of notifications (see [above](#how-entries-behave)).
   - A **monthly reminder to support PlayGuard** (on by default, never in the first month nor right after an update; *Don't show again* on the reminder or this switch turns it off for good, updates included).
-- **Remote access (MQTT / Home Assistant):** the broker and its MQTT version, the console's name, what to do with orders (ask on the console, carry them out, refuse them), whether they may change the play timer (off by default), Home Assistant's discovery, QR codes that install the PlayGuard integration from HACS and add the console, the live status, *Sync now* and the log. See [the Home Assistant guide](home-assistant.md).
+- **Remote access (MQTT / Home Assistant):** the broker and its MQTT version, the console's name, what to do with orders (ask on the console, carry them out, refuse them), whether they may change the play timer (off by default), Home Assistant's discovery, QR codes that install the PlayGuard integration from HACS and add the console (once installed, its version, and its newer release), the live status, *Sync now* and the log. See [the Home Assistant guide](home-assistant.md).
 - A setting that shapes one feature sits with it: extra time in *Play timer*, turning parental controls back on in *PIN*, the clock check in *Console › Network clock*. The updates and *Help & diagnostics* are in *About*.
 
 ## About

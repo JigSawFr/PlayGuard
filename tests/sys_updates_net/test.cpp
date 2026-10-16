@@ -36,6 +36,14 @@ bool redirect(const std::string& url, std::string* target, std::string* error, c
     *target = it->second;
     return true;
 }
+// The integration's changelog (sys_updates::fetch_integration_changelog):
+// not asked for by these tests.
+bool get(const std::string& url, std::string*, std::string* error, size_t, long, const Headers&, long*)
+{
+    s_asked.push_back(url);
+    if (error) *error = "not served";
+    return false;
+}
 }   // namespace http
 
 #ifdef __SWITCH__

@@ -34,6 +34,7 @@ is `null`, never a default. JSON consumers ignore unknown fields.
 | `playguard/<id>/report` | yes | console → | The last diagnostic report, plain text, at most 128 KiB. Only when `publish_report` is on. |
 | `homeassistant/device/playguard_<id>/config` | yes | console → | HA native discovery. Only when `ha_discovery` is on; cleared when it is turned off. |
 | `homeassistant/status` | — | ← HA | Subscribed: on `online`, the console republishes discovery, state and activity. |
+| `playguard/<id>/integration` | yes | ← the HA integration | Which version of the integration (and of Home Assistant) runs (below), at each set-up of the integration's entry; cleared when the entry is removed. Never cleared by the console. |
 
 MQTT version: **5.0, or 3.1.1** (`mqtt_version` in `sync.conf`: `auto`, the
 default, connects in 5.0 and, when the broker refuses it, answering in 3.1.1
@@ -53,7 +54,9 @@ running without the agent (23 characters at most, as MQTT 3.1.1 promises). Only 
 Outbound publishes use QoS 0 (retained state heals itself at the next cycle);
 the subscription to `playguard/<id>/+/set` uses QoS 1, the one to
 `homeassistant/status` (Home Assistant's birth topic, whatever the discovery
-prefix) QoS 0. Keep-alive is 30 s, so a console that falls asleep is marked offline
+prefix) QoS 0, the one to `playguard/<id>/integration` QoS 1. That last one
+is optional: a broker whose access list refuses it keeps the link up (the
+integration's version stays unknown, and the log says so). Keep-alive is 30 s, so a console that falls asleep is marked offline
 within 45 s.
 
 ## `state`
@@ -274,6 +277,25 @@ meaning matches. The table is `source/sync/sync_entities.c`.
 The HA integration, when installed, publishes `discovery/set = OFF`, and
 creates its own entities with the same object ids.
 
+## `integration`
+
+What the HA integration (JigSawFr/playguard-ha) publishes about itself,
+retained, at each set-up of a console's entry (so at each start of Home
+Assistant), and clears (empty retained publish) when the entry is removed:
+
+```json
+{"schema": 1, "version": "0.2.0", "homeassistant": "2026.10.1"}
+```
+
+The console keeps it as it came (at most 512 bytes; a larger one is
+ignored) in `nand/<system>/sync/integration.json`, written by whichever of
+PlayGuard and the agent holds the link. PlayGuard shows the version in
+*Remote access › Home Assistant* and in the report, and checks the
+integration's latest release with its other updates (*Check for updates
+every day*, *Check for updates*), only once the integration is known: a
+newer one is in the notification bell, with what changed since (the
+release's `CHANGELOG.md`) and the QR code that opens it in HACS.
+
 ## Files on the SD card
 
 | File | Written by | Content |
@@ -284,6 +306,7 @@ creates its own entities with the same object ids.
 | `config/playguard/nand/<system>/sync/nro_state.txt` | PlayGuard, after every settings save (`config.json`, this system's `state.json`) once `sync.conf` exists, and when read-only mode changes | The extra-time record, the console lock and its saved limits, `relock_pending`, `extra_auto_restore`, the firmware choice (`fw_gate_*`), `pin_lock`, `read_only` and `firmware` (the one PlayGuard last ran on): what the agent must know to act on PlayGuard's behalf. The agent changes nothing when `read_only=1`, when the key is missing, or when the console's firmware is no longer `firmware` (a system update PlayGuard has not seen). A line break in a value is written as a space. |
 | `config/playguard/nand/<system>/sync/names.txt` | PlayGuard, after a read of the play log | `0100000000010000=Super Mario Odyssey`: the agent's "now playing". |
 | `config/playguard/nand/<system>/sync/agent_state.txt` | the agent | The same records, for what the agent changed itself. At start the agent takes the newer of this file and `nro_state.txt`; PlayGuard adopts the agent's records (`GetRecords`) when it opens. |
+| `config/playguard/nand/<system>/sync/integration.json` | the link that got it (PlayGuard's or the agent's) | The HA integration's document (`integration`, above), as it came; removed when the integration clears it. PlayGuard reads it at start, and every 30 s while the agent holds the link. |
 | `config/playguard/nand/<system>/sync/agent_events.log` | the agent | One line per order the agent carried out itself, tab-separated: time (POSIX), entity, payload, applied (0/1), reason, change kind (`SyncChange`), number of values, source (`remote`, `remote_extra`…), values before (comma-separated), values after, the console lock afterwards (-1 unchanged, 0, 1). PlayGuard imports them into `history.json`, with the agent's time, when it opens a session, and removes the file. |
 | `config/playguard/logs/reports/report_<date>_<time>.txt` | the agent | A report asked for by `export_report` while PlayGuard is closed (clocks and parental controls, as PlayGuard's report has them). Named as PlayGuard's reports, so *About › Help & diagnostics* lists, sends and prunes it with them. |
 | `atmosphere/contents/<tid>/{exefs.nsp, flags/boot2.flag, toolbox.json, version.txt}` | *Console › Optional modules*, or the user | The installed module (`4200000000505247` recovery, `4200000000504741` agent). |

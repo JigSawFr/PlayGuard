@@ -236,7 +236,8 @@ int mqtt_client_connect(MqttClient *c, const char *host, uint16_t port, const Mq
     return 0;
 }
 
-int mqtt_client_subscribe(MqttClient *c, const char *const *topics, const uint8_t *qos, size_t count, int timeout_ms)
+int mqtt_client_subscribe(MqttClient *c, const char *const *topics, const uint8_t *qos, size_t count,
+                          size_t required, int timeout_ms)
 {
     if (!c->connected) return -1;
     const uint16_t id = take_id(c);
@@ -256,8 +257,13 @@ int mqtt_client_subscribe(MqttClient *c, const char *const *topics, const uint8_
     size_t got = 0;
     if (mqtt_decode_suback(&p, c->version, &got_id, codes, sizeof(codes), &got) != MQTT_OK || got < count)
         return fail(c, "the broker sent a malformed SUBACK");
+    int refused = 0;
     for (size_t i = 0; i < count; i++) {
         if (codes[i] < 0x80u) continue;
+        if (i >= required) {
+            refused++;
+            continue;
+        }
         char why[128];
         if (c->version == MQTT_V5 && codes[i] != 0x80u)
             snprintf(why, sizeof(why), "the broker refused a subscription: %s", mqtt_reason_text(codes[i]));
@@ -265,7 +271,7 @@ int mqtt_client_subscribe(MqttClient *c, const char *const *topics, const uint8_
             snprintf(why, sizeof(why), "the broker refused a subscription (check the user's access list)");
         return fail(c, why);
     }
-    return 0;
+    return refused;
 }
 
 int mqtt_client_publish(MqttClient *c, const char *topic, const void *payload, size_t len, bool retain)

@@ -1118,6 +1118,14 @@
         "inplace_body": "PlayGuard 將下載版本 {},檢查後取代目前版本並重新啟動。你的設定會保留。",
         "inplace_confirm": "更新"
     },
+    "ha_update": {
+        "body": "Home Assistant has {}. Scan the code with a phone where Home Assistant opens: in HACS, update PlayGuard, then restart Home Assistant.",
+        "hacs": "PlayGuard in HACS",
+        "hacs_caption": "Update, then restart",
+        "changes": "What changed since {}",
+        "note": "Every release: {}",
+        "no_notes": "What changed could not be read; it is on {}."
+    },
     "upload": {
         "pick": "傳送內容",
         "current": "此報告與除錯檔案",
@@ -1487,6 +1495,7 @@
         "ha_add": "2. Add the console",
         "ha_add_caption": "Console id: {}",
         "ha_add_caption_none": "If Home Assistant does not offer it",
+        "ha_installed": "PlayGuard integration",
         "discovery": "Create the device in Home Assistant (MQTT discovery)",
         "report": "Publish the diagnostic reports asked for",
         "note": "An order is carried out like a change made here: read-only mode, the play-timer unlock and the change history apply. Deleting parental controls, unlinking the phone app and the PIN are never possible through the link. The password is stored on the SD card as plain text.",
@@ -1763,6 +1772,8 @@
         "sys_hekate_detail": "SD 卡上的 hekate 是 {}。",
         "sys_firmware": "韌體 {} 已發布",
         "sys_firmware_detail": "這台主機是 {}。請等 Atmosphère（以及你使用的 hekate）支援該韌體後再更新，否則 Atmosphère 將無法啟動。",
+        "ha_integration": "PlayGuard integration {} is available",
+        "ha_integration_detail": "Home Assistant has {}.",
         "pin_weak": "PIN 很容易被猜到",
         "pin_weak_detail": "像 0000 或 1234 這樣，是別人最先會試的。請換一個更難猜到的。",
         "pin_lock_off": "開啟 PlayGuard 不需要 PIN",

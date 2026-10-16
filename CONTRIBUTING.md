@@ -65,6 +65,8 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_REGION=2` | The console region |
 | `PLAYGUARD_SIM_LATEST=1.1.0:24.0.0` | The latest release and the newest firmware it supports, for the update check (`offline` for no network) |
 | `PLAYGUARD_SIM_SYS_LATEST=1.12.1:6.5.4:23.0.1` | The latest Atmosphère, hekate and firmware the daily update check finds (Atmosphère : hekate : firmware; `offline` for no network) |
+| `PLAYGUARD_SIM_HA_LATEST=v0.2.0` | The Home Assistant integration's latest release the update check finds, once the integration said its version (`offline` or unset: no network) |
+| `PLAYGUARD_SIM_HA_CHANGELOG=<file>` | Its `CHANGELOG.md`, read from that file (*What's new* lists what changed since the installed version) |
 | `PLAYGUARD_SIM_SYS_NOTES=<folder>` | What GitHub and switchbrew return for the release notes in *Console*: `atmosphere.json` and `hekate.json` (GitHub's release lists), `System_Versions.wiki` and `<version>.wiki` (switchbrew's pages, as wikitext); `offline` for no network |
 | `PLAYGUARD_SIM_PASTE=https://gist.github.com/u/ab12` | What GitHub answers to *Send a report online* (`offline` for no network) |
 | `PLAYGUARD_SIM_DEV_BUILDS=<folder>` | What the GitHub API returns for *Install another build*: `releases.json` (the releases tab), `latest.json` (the latest release, for *Update in place*), `artifacts.json`, `pulls.json`; `runs.json`, and for *Find a build* `pull_<n>.json`, `commit.json`, `run_artifacts.json`; `https://<local path>` download URLs are copied from disk (`offline` for no network); `PLAYGUARD_SIM_DEV_BUILDS_DELAY=<ms>` slows each answer |

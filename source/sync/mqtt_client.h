@@ -62,9 +62,11 @@ void mqtt_client_init(MqttClient *c, SyncIo io, uint8_t *rx, size_t rx_cap, uint
 // Opens the stream, sends CONNECT and waits for an accepted CONNACK.
 int  mqtt_client_connect(MqttClient *c, const char *host, uint16_t port, const MqttConnect *opts, int timeout_ms);
 // Subscribes and waits for the SUBACK; messages delivered meanwhile (retained
-// ones arrive right away) go to the callback. Fails when a topic is refused.
+// ones arrive right away) go to the callback. Fails when one of the first
+// `required` topics is refused; the others are optional: how many of them the
+// broker refused is returned (0: every topic granted).
 int  mqtt_client_subscribe(MqttClient *c, const char *const *topics, const uint8_t *qos, size_t count,
-                           int timeout_ms);
+                           size_t required, int timeout_ms);
 // QoS 0.
 int  mqtt_client_publish(MqttClient *c, const char *topic, const void *payload, size_t len, bool retain);
 // Reads for up to `timeout_ms`, delivers messages, keeps the connection alive

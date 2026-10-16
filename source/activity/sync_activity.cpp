@@ -6,15 +6,15 @@
 #include <string>
 #include <vector>
 
+#include "action/ha_update_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/sync_flow.hpp"
-#include "app.hpp"
 #include "sync/sync_net.h"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/sync_files.hpp"
-#include "view/qr_view.hpp"
+#include "view/ha_links.hpp"
 
 extern "C" {
 #include "core/platform.h"
@@ -73,54 +73,6 @@ std::string problem_text(const SyncConf& c)
     if (!c.host[0]) return "playguard/sync/problem_host"_i18n;
     if (!c.username[0] && !c.allow_anonymous) return "playguard/sync/problem_user"_i18n;
     return p;
-}
-
-brls::Label* centered_label(const std::string& text, int font_size, NVGcolor color)
-{
-    auto* label = new brls::Label();
-    label->setFontSize(font_size);
-    label->setTextColor(color);
-    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    label->setSingleLine(false);
-    label->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the card's width
-    label->setText(text);
-    return label;
-}
-
-brls::Box* qr_card(const std::string& title, const std::string& url, const std::string& caption)
-{
-    auto* card = new brls::Box(brls::Axis::COLUMN);
-    card->setAlignItems(brls::AlignItems::CENTER);
-    card->setWidth(320);
-    card->addView(new QrView(url, 220));
-    brls::Label* name = centered_label(title, 20, ui::color_text());
-    name->setMarginTop(6);
-    card->addView(name);
-    card->addView(centered_label(caption, 17, ui::color_note()));
-    return card;
-}
-
-// The integration in the parent's own Home Assistant, from a phone: playguard-ha
-// in HACS, then adding this console (when Home Assistant does not offer it by
-// itself), through My Home Assistant's redirects.
-void show_ha_links(const std::string& device)
-{
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::CENTER);
-    box->setPadding(24, 24, 12, 24);
-    box->addView(centered_label("playguard/sync/ha_install_body"_i18n, 20, ui::color_text()));
-    auto* row = new brls::Box(brls::Axis::ROW);
-    row->setJustifyContent(brls::JustifyContent::SPACE_EVENLY);
-    row->setMarginTop(14);
-    row->addView(qr_card("playguard/sync/ha_hacs"_i18n, app::HA_HACS_URL, "playguard/sync/ha_hacs_caption"_i18n));
-    row->addView(qr_card("playguard/sync/ha_add"_i18n, app::HA_ADD_URL,
-                         device.empty() ? "playguard/sync/ha_add_caption_none"_i18n
-                                        : brls::getStr("playguard/sync/ha_add_caption", device)));
-    box->addView(row);
-    auto* dialog = new brls::Dialog(box);
-    dialog->addButton("hints/ok"_i18n, []() {});
-    dialog->open();
-    brls::Logger::info("sync: Home Assistant integration links shown");
 }
 }   // namespace
 
@@ -281,12 +233,18 @@ void SyncActivity::onContentAvailable()
     });
 
     // No setting changes here: shown whatever the link's state (the integration
-    // is installed before the link works), without the PIN check.
-    ha_install->setDetailText("HACS");
+    // is installed before the link works), without the PIN check. Once the
+    // integration said which version Home Assistant runs: that version, and
+    // its newer release's screen.
+    this->refresh_ha_install();
     ha_install->registerClickAction([this](brls::View*) {
+        if (!ha_update_flow::newer().empty()) {
+            ha_update_flow::open();
+            return true;
+        }
         char device[SYNC_ID_LEN + 1];
         sync_conf_device_id(&this->conf, device);
-        show_ha_links(device);
+        ha_links::show(device);
         return true;
     });
 
@@ -410,8 +368,24 @@ void SyncActivity::refresh()
     this->refresh_status();
 }
 
+void SyncActivity::refresh_ha_install()
+{
+    const std::string installed = ha_update_flow::installed();
+    if (installed.empty()) {
+        ha_install->setText("playguard/sync/ha_install"_i18n);
+        ha_install->setDetailText("HACS");
+        ha_install->setDetailTextColor(ui::color_neutral());
+        return;
+    }
+    const std::string newer = ha_update_flow::newer();
+    ha_install->setText("playguard/sync/ha_installed"_i18n);
+    ha_install->setDetailText(newer.empty() ? installed : brls::getStr("playguard/tools/available", installed, newer));
+    ha_install->setDetailTextColor(newer.empty() ? ui::color_neutral() : ui::color_warn());
+}
+
 void SyncActivity::refresh_status()
 {
+    this->refresh_ha_install();
     const sync_flow::Status st = sync_flow::status();
     std::string text;
     NVGcolor color = ui::color_neutral();

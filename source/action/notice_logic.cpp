@@ -23,7 +23,7 @@ const char* const RANKS[] = {
     "console_lock_long", "backup", "update", "installed", "crash", "upload",
     // The console (CONSOLE below).
     "games", "patches", "sd_space", "sd_", "data_", "rescue_old", "rescue_restart", "went_back",
-    "compat", "sys_firmware", "sys_atmosphere", "sys_hekate", "serial", "other_system",
+    "compat", "sys_firmware", "sys_atmosphere", "sys_hekate", "ha_integration", "serial", "other_system",
 };
 // The first of RANKS about the console: it and every one after it.
 const int CONSOLE = 20;

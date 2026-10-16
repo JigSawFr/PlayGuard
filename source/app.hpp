@@ -37,6 +37,8 @@ constexpr const char* KOFI_URL     = "https://ko-fi.com/jigsawfr";
 constexpr const char* HA_HACS_URL =
     "https://my.home-assistant.io/redirect/hacs_repository/?owner=JigSawFr&repository=playguard-ha&category=integration";
 constexpr const char* HA_ADD_URL = "https://my.home-assistant.io/redirect/config_flow_start/?domain=playguard";
+// Its releases, with what changed in each.
+constexpr const char* HA_RELEASES_URL = "https://github.com/JigSawFr/playguard-ha/releases";
 
 // Read-only mode: the service layer refuses every change (core/write_guard.h)
 // and the tabs hide their write controls. On at launch when the firmware is

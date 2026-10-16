@@ -1118,6 +1118,14 @@
         "inplace_body": "PlayGuard will download version {}, check it, put it in place of this one and restart on it. Your settings are kept.",
         "inplace_confirm": "Update"
     },
+    "ha_update": {
+        "body": "Home Assistant has {}. Scan the code with a phone where Home Assistant opens: in HACS, update PlayGuard, then restart Home Assistant.",
+        "hacs": "PlayGuard in HACS",
+        "hacs_caption": "Update, then restart",
+        "changes": "What changed since {}",
+        "note": "Every release: {}",
+        "no_notes": "What changed could not be read; it is on {}."
+    },
     "upload": {
         "pick": "What to send",
         "current": "This report and the debug files",
@@ -1487,6 +1495,7 @@
         "ha_add": "2. Add the console",
         "ha_add_caption": "Console id: {}",
         "ha_add_caption_none": "If Home Assistant does not offer it",
+        "ha_installed": "PlayGuard integration",
         "discovery": "Create the device in Home Assistant (MQTT discovery)",
         "report": "Publish the diagnostic reports asked for",
         "note": "An order is carried out like a change made here: read-only mode, the play-timer unlock and the change history apply. Deleting parental controls, unlinking the phone app and the PIN are never possible through the link. The password is stored on the SD card as plain text.",
@@ -1763,6 +1772,8 @@
         "sys_hekate_detail": "The SD card has hekate {}.",
         "sys_firmware": "Firmware {} is out",
         "sys_firmware_detail": "This console runs {}. Update it only once Atmosphère (and hekate, if you use it) support that firmware, or Atmosphère will no longer start.",
+        "ha_integration": "PlayGuard integration {} is available",
+        "ha_integration_detail": "Home Assistant has {}.",
         "pin_weak": "The PIN is easy to guess",
         "pin_weak_detail": "Like 0000 or 1234: it is among the first anyone tries. Choose one that is harder to find.",
         "pin_lock_off": "PlayGuard opens without the PIN",

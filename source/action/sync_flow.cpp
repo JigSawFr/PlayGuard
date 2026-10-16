@@ -15,6 +15,7 @@
 #include <set>
 #include <thread>
 
+#include "action/ha_update_flow.hpp"
 #include "action/play_data.hpp"
 #include "action/sync_orders.hpp"
 #include "activity/lock_activity.hpp"
@@ -44,6 +45,7 @@ constexpr auto ACCOUNTS_FRESH = std::chrono::minutes(15);
 constexpr auto EXIT_WAIT = std::chrono::seconds(4);
 constexpr int AGENT_POLL_MS = 100;
 constexpr auto PROBE_EVERY = std::chrono::seconds(5);
+constexpr auto INTEGRATION_EVERY = std::chrono::seconds(30);
 
 // `text` with the broker's name as "<broker>": the lines logged go into the
 // session file, which a report sent online carries, and the reports are
@@ -80,6 +82,8 @@ struct Shared
     std::deque<sync_orders::Order> orders;
     bool conf_saved = false;
     SyncConf saved{};
+    bool integration_got = false;
+    std::string integration;   // the Home Assistant integration's document ("" cleared)
     bool state_wanted = false;
     SyncStatus status{};
     size_t pending = 0;
@@ -157,6 +161,17 @@ void host_conf_changed(void* ctx, const SyncConf* conf)
     brls::sync([]() { pump(); });
 }
 
+void host_integration(void* ctx, const char* doc, size_t len)
+{
+    auto* sh = (Shared*)ctx;
+    {
+        std::lock_guard<std::mutex> lk(sh->m);
+        sh->integration.assign(doc, len);
+        sh->integration_got = true;
+    }
+    brls::sync([]() { pump(); });
+}
+
 bool host_read_only(void* ctx)
 {
     return ((Shared*)ctx)->read_only.load();
@@ -207,6 +222,7 @@ void worker(std::shared_ptr<Shared> sh, SyncConf conf, std::string version)
     host.read_only = host_read_only;
     host.now_posix = host_now_posix;
     host.log = host_log;
+    host.integration = host_integration;
 
     // About 40 KiB: on the heap, not on this thread's stack.
     std::unique_ptr<Link> link(new Link());
@@ -301,7 +317,7 @@ bool s_agent_refused = false;   // the agent runs but speaks another protocol: i
 AgentHelloReply s_hello{};
 AgentStatus s_agent_status{};
 int s_agent_fg = -1;            // what the agent was last told (-1: nothing yet)
-Clock::time_point s_agent_state_at{}, s_last_probe{};
+Clock::time_point s_agent_state_at{}, s_last_probe{}, s_integration_read{};
 bool s_hold = false;            // an update of the agent runs
 std::string s_agent_activity;
 std::deque<std::pair<std::string, std::string>> s_agent_finals;   // date, document: waiting for room
@@ -755,8 +771,9 @@ void pump()
 {
     if (!s_shared) return;
     std::deque<sync_orders::Order> orders;
-    bool saved = false, wanted = false;
+    bool saved = false, wanted = false, integration_got = false;
     SyncConf conf{};
+    std::string integration;
     {
         std::lock_guard<std::mutex> lk(s_shared->m);
         orders.swap(s_shared->orders);
@@ -765,8 +782,12 @@ void pump()
         s_shared->conf_saved = false;
         wanted = s_shared->state_wanted;
         s_shared->state_wanted = false;
+        integration_got = s_shared->integration_got;
+        integration.swap(s_shared->integration);
+        s_shared->integration_got = false;
     }
     if (wanted) s_dirty = true;
+    if (integration_got) ha_update_flow::received(integration);
     if (saved) {
         // Only what an order may change: Home Assistant's discovery switch.
         s_conf.ha_discovery = conf.ha_discovery;
@@ -796,6 +817,11 @@ void agent_tick()
     if (!agent_ok(agent_client::status(&st), "status")) return;
     s_agent_status = st;
     agent_flush_finals();
+    // The integration's document, as the agent keeps it (sync/integration.json).
+    if (Clock::now() - s_integration_read >= INTEGRATION_EVERY) {
+        s_integration_read = Clock::now();
+        ha_update_flow::reload();
+    }
     // One at a time, in the foreground (next_order says when).
     if (s_agent && fg && !s_order_running && s_queue.empty()) {
         AgentOrder a;
@@ -1182,6 +1208,10 @@ std::string report_section()
                        c.username[0] ? "set" : "none",
                        c.allow_anonymous ? 1 : 0, sync_policy_name(c.policy), c.remote_timer_writes ? 1 : 0,
                        c.ha_discovery ? 1 : 0, c.publish_report ? 1 : 0, c.publish_activity ? 1 : 0, c.poll_s);
+    if (!ha_update_flow::installed().empty())
+        out += fmt::format("integration : {} (Home Assistant {}){}\n", ha_update_flow::installed(),
+                           ha_update_flow::homeassistant().empty() ? "?" : ha_update_flow::homeassistant(),
+                           ha_update_flow::newer().empty() ? "" : ", " + ha_update_flow::newer() + " available");
     if (st.agent || st.agent_refused)
         out += fmt::format("agent       : {} {}\n", st.agent_version,
                            st.agent ? (st.agent_read_only ? "(holds the link, read-only)" : "(holds the link)")

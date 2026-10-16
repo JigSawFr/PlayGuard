@@ -401,6 +401,8 @@ static void test_preferences()
     config::get().support_reminder = false;
     config::get().seen_version = "1.2.0";
     config::get().agent_update_skipped = std::string(64, 'a');
+    config::get().ha_latest = "0.2.0";
+    config::get().ha_checked = "2026-10-18";
     CHECK(save_config());
     config::get() = config::Config{};
     config::load();
@@ -409,6 +411,11 @@ static void test_preferences()
     CHECK(config::get().logs_keep == 50 && config::get().logs_keep_days == 365 && config::get().logs_keep_mb == 20);
     CHECK(!config::get().support_reminder && config::get().seen_version == "1.2.0");
     CHECK(config::get().agent_update_skipped == std::string(64, 'a'));
+    // The Home Assistant integration's newer release and the day it was checked.
+    CHECK(config::get().ha_latest == "0.2.0" && config::get().ha_checked == "2026-10-18");
+    write_config(R"({"ha_latest": ")" + std::string(33, '9') + R"(", "ha_checked": "18/10/2026"})");
+    config::load();
+    CHECK(config::get().ha_latest.empty() && config::get().ha_checked.empty());   // too long; not a date
     write_config(R"({"agent_update_skipped": ")" + std::string(65, 'b') + R"("})");
     config::load();
     CHECK(config::get().agent_update_skipped.empty());

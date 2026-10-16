@@ -45,6 +45,10 @@ struct Config
     // and the day of that check ("YYYY-MM-DD").
     std::string sys_latest;
     std::string sys_checked;
+    // PlayGuard's Home Assistant integration (action/ha_update_flow): its
+    // latest release the last check found, and the day of that check.
+    std::string ha_latest;
+    std::string ha_checked;
     std::string start_tab = "dashboard";   // tab shown at start-up (main.xml order: START_TABS)
     std::vector<int> extra_amounts = { 15, 30, 60 };   // "Extra time today" choices, minutes
     int  activity_period = 1;          // Activity's period: 0 today, 1 last 7 days, 2 all time, 3 last 30 days
