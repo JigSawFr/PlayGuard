@@ -192,7 +192,7 @@ jobs:
           - shard: developer
             scenarios: devbuild update library rollback
           - shard: outside
-            scenarios: outside
+            scenarios: outside sysnotes
     env:
       CMAKE_C_COMPILER_LAUNCHER: ccache
       CMAKE_CXX_COMPILER_LAUNCHER: ccache

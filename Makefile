@@ -143,6 +143,8 @@ notice_logic_SRC   := source/action/notice_logic.cpp tests/notice_logic/test.cpp
 notice_logic_FLAGS := -std=c++17 -Isource
 sys_updates_SRC   := source/util/sys_updates.cpp tests/sys_updates/test.cpp
 sys_updates_FLAGS := -std=c++17 -Isource
+sys_notes_SRC   := source/util/safe_text.cpp source/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
+sys_notes_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
 offline_clock_logic_FLAGS := -std=c++17 -Isource
 icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp
