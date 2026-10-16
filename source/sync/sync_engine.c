@@ -12,6 +12,8 @@
 #define BACKOFF_MAX_MS       300000ULL
 #define ACTIVITY_PERIOD_MS   60000ULL
 #define STATE_SOON_MS        300ULL
+// Home Assistant's birth and last-will topic (its MQTT integration's default).
+#define HA_STATUS_TOPIC      "homeassistant/status"
 
 static void logf_(SyncEngine *e, const char *fmt, const char *a, const char *b)
 {
@@ -182,10 +184,10 @@ static void on_message(void *user, const MqttPublish *msg)
 {
     SyncEngine *e = (SyncEngine *)user;
 
-    // Home Assistant (re)started: publish everything again.
-    char status_topic[64];
-    const int sn = snprintf(status_topic, sizeof(status_topic), "%s/status", e->conf.discovery_prefix);
-    if (sn > 0 && (size_t)sn == msg->topic_len && !memcmp(msg->topic, status_topic, (size_t)sn)) {
+    // Home Assistant (re)started: publish everything again. Its birth message
+    // is on homeassistant/status whatever the discovery prefix.
+    const size_t sn = sizeof(HA_STATUS_TOPIC) - 1;
+    if (msg->topic_len == sn && !memcmp(msg->topic, HA_STATUS_TOPIC, sn)) {
         if (msg->payload_len == 6 && !memcmp(msg->payload, "online", 6)) sync_engine_sync_now(e);
         return;
     }
@@ -516,10 +518,9 @@ static void publish_due(SyncEngine *e)
 
 static int subscribe(SyncEngine *e)
 {
-    char orders[160], ha[64];
+    char orders[160];
     snprintf(orders, sizeof(orders), "%s/+/set", e->base);
-    snprintf(ha, sizeof(ha), "%s/status", e->conf.discovery_prefix);
-    const char *topics[2] = { orders, ha };
+    const char *topics[2] = { orders, HA_STATUS_TOPIC };
     const uint8_t qos[2] = { 1, 0 };
     return mqtt_client_subscribe(&e->mqtt, topics, qos, 2, CONNECT_TIMEOUT_MS);
 }

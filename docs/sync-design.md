@@ -312,7 +312,7 @@ update with roll-back, and an order sent from HA while a game runs.
 | A homebrew launched by hbloader can use `pm:shell` and `pm:dmnt` (`hbl.json` grants `*`); Hekate-Toolbox, TriPlayer and SwitchPresence do | verified in sources |
 | A sysmodule with sockets: ~32 KiB of transfer memory with a minimal config, 512–768 KiB of heap; `service_host` needs syscalls 0x40–0x45 | verified in libnx and sys-clk / sys-ftpd sources |
 | TLS through the console's `ssl` service from a socket, with the system CA store and an importable CA | verified in libnx (`ssl.h`, `socketSslConnectionSetSocketDescriptor`), used by nx.js |
-| HA MQTT discovery: `optimistic`, `retain`, device-based payloads, the `event` and `time` platforms, removal by an empty retained payload | verified in HA documentation |
+| HA MQTT discovery: `optimistic`, `retain`, device-based payloads, the `event` and `time` platforms (`time` since HA 2026.5: an older HA refuses the whole device payload), a component removed by its platform alone, the device by an empty retained payload | verified in HA documentation |
 | HA MQTT-triggered discovery flows for custom integrations; `async_add_external_statistics`; HACS: one integration per repository | verified in HA core and HACS documentation |
 | `psc:m` registration from a third-party sysmodule | open, kept out of scope |
 | The PIN applet's process id (`0x0100000000001001`, LibraryAppletAuth), used to skip agent cycles | to check on switchbrew |

@@ -20,7 +20,8 @@ Mosquitto de Home Assistant est le plus simple.
 
 ## Ce qu'il faut
 
-- Home Assistant avec l'intégration **MQTT** configurée, et un broker : le
+- Home Assistant **2026.5 ou plus récent** (les entités `time` du coucher : un
+  plus ancien refuse tout l'appareil), avec l'intégration **MQTT** configurée, et un broker : le
   module **Mosquitto broker** (Paramètres › Modules complémentaires) ou tout
   autre broker MQTT, en version 5.0 ou 3.1.1 (EMQX, HiveMQ, NanoMQ, VerneMQ…) :
   *Accès à distance › Version MQTT* est automatique (5.0, sinon 3.1.1).
@@ -85,20 +86,21 @@ Assistant* pour gérer les topics vous-même).
 
 | Type | Entités |
 |---|---|
-| Capteurs | Temps d'écran utilisé (le décompte du minuteur), Temps d'écran utilisé (journal de jeu), Temps d'écran restant, Temps d'écran prolongé, En cours de jeu (vide tant que PlayGuard est ouvert : personne ne joue alors), Âge de classification, Firmware, Atmosphère, Dernier ordre |
+| Capteurs | Temps d'écran utilisé (le décompte du minuteur), Temps d'écran utilisé (journal de jeu), Temps d'écran restant, Temps d'écran prolongé, En cours de jeu (inconnu tant que PlayGuard est ouvert : personne ne joue alors), Âge de classification, Firmware, Atmosphère, Dernier ordre |
 | Capteurs binaires | Contrôle parental, Déverrouillé temporairement, Code PIN défini, Appli mobile liée, Minuteur, Temps écoulé, Horloge réseau exacte |
 | Nombres | Limite dimanche … samedi, Limite tous les jours, Temps d'écran max aujourd'hui (0 à 1440 minutes ; 1440 = pas de limite) |
 | Heures | Alarme du coucher, Fin du coucher |
 | Interrupteurs | Verrou de console, Alarme « temps écoulé », Déverrouillé, Alarme du coucher activée, Mode VR restreint, Publication sur les réseaux sociaux restreinte, Communication restreinte |
-| Sélecteurs | Niveau de restriction, Profil (vos profils enregistrés) |
+| Sélecteurs | Niveau de restriction (*unrestricted* : sans restriction, young child, child, teen, custom), Profil (vos profils enregistrés) |
 | Boutons | Synchroniser maintenant, Verrouiller maintenant, Temps en plus +15 / +30 min / +1 h, Fin du jeu pour aujourd'hui, Supprimer la limite, Exporter un rapport de diagnostic |
-| Événement | Événements : chaque ordre exécuté ou refusé, avec la raison |
+| Événement | Événements : chaque ordre exécuté, refusé (avec la raison) ou mis en attente de la console |
 
 Les entités portent pour l'instant leurs noms anglais (*Used screen time*,
 *Limit Monday*…), ceux de l'intégration *Nintendo Switch Parental Controls*
 de Home Assistant quand le sens est le même ; renommez-les dans Home Assistant
 si besoin. Celles qui changent le minuteur n'apparaissent qu'une fois *Les
-ordres peuvent changer le temps de jeu* activé (plus bas).
+ordres peuvent changer le temps de jeu* activé (plus bas), et disparaissent
+quand il est désactivé.
 
 Les chiffres du journal de jeu (temps par jeu aujourd'hui, les 7 derniers
 jours, les jours terminés) sont aussi sur le broker
@@ -138,8 +140,8 @@ type: button
 name: +30 min
 icon: mdi:timer-plus-outline
 tap_action:
-  action: call-service
-  service: button.press
+  action: perform-action
+  perform_action: button.press
   target:
     entity_id: button.salon_extra_time_30_min
 ```

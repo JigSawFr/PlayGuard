@@ -30,7 +30,7 @@ is `null`, never a default. JSON consumers ignore unknown fields.
 | `playguard/<id>/names` | yes | console (app) → | Game and account names, published by PlayGuard when it runs. |
 | `playguard/<id>/week` | yes | console (app) → | The 7-day table per game and per account, published by PlayGuard when it runs. |
 | `playguard/<id>/<entity>/set` | yes (by the publisher) | → console | An order. Cleared by the console once handled. |
-| `playguard/<id>/event` | **no** | console → | One event per line of history: applied, rejected, unlocked, limit reached… |
+| `playguard/<id>/event` | **no** | console → | One event per order handled: `command_applied`, `command_rejected`, `command_waiting` (an order waiting for PlayGuard or the parent) |
 | `playguard/<id>/report` | yes | console → | The last diagnostic report, plain text, at most 128 KiB. Only when `publish_report` is on. |
 | `homeassistant/device/playguard_<id>/config` | yes | console → | HA native discovery. Only when `ha_discovery` is on; cleared when it is turned off. |
 | `homeassistant/status` | — | ← HA | Subscribed: on `online`, the console republishes discovery, state and activity. |
@@ -51,8 +51,9 @@ Orders arrive the same way in both versions; topic aliases are never used.
 Client ids: `pg-<id>-agent` for the agent, `pg-<id>-app` for PlayGuard
 running without the agent (23 characters at most, as MQTT 3.1.1 promises). Only one of them connects at a time.
 Outbound publishes use QoS 0 (retained state heals itself at the next cycle);
-the subscription to `playguard/<id>/+/set` and `homeassistant/status` uses
-QoS 1. Keep-alive is 30 s, so a console that falls asleep is marked offline
+the subscription to `playguard/<id>/+/set` uses QoS 1, the one to
+`homeassistant/status` (Home Assistant's birth topic, whatever the discovery
+prefix) QoS 0. Keep-alive is 30 s, so a console that falls asleep is marked offline
 within 45 s.
 
 ## `state`
@@ -191,9 +192,9 @@ the usual confirmation on the console).
 | `play_timer_alarm` | `ON` / `OFF` | | yes | `OFF` = the "time's up" alarm disabled (1953). |
 | `bedtime_enabled` | `ON` / `OFF` | | yes | The bedtime alarm on (at the time the days share, else 21:00) or off. |
 | `bedtime_alarm` | `HH:MM` (`HH:MM:SS` accepted) | 16:00–23:59 | yes | The bedtime alarm, every day. |
-| `bedtime_end_time` | `HH:MM` | 05:00–09:00 | yes | When play is allowed again, on the days with a bedtime. |
+| `bedtime_end_time` | `HH:MM` (`HH:MM:SS` accepted) | 05:00–09:00 | yes | When play is allowed again, on the days with a bedtime. |
 | `profile` | a profile name | must exist on the SD card | yes | Applies the saved profile's limits. |
-| `restriction_level` | `none` / `young_child` / `child` / `teen` / `custom` | | no | 1033. |
+| `restriction_level` | `none` / `young_child` / `child` / `teen` / `custom` (`unrestricted` accepted for `none`) | | no | 1033. The discovery's select shows `none` as `unrestricted` (Home Assistant reads a select's `None` as unknown) and sends `none` back (`cmd_tpl`). |
 | `vr_restricted` | `ON` / `OFF` | | no | `ON` = VR mode restricted (1063). |
 | `sns_post_restricted`, `free_communication_restricted` | `ON` / `OFF` | custom level only | no | 1036; refused at another level. |
 | `sync_now` | `PRESS` | | no | Republish everything now. |
@@ -234,16 +235,20 @@ was away misses them on purpose; the state carries `link.last_result`.
 
 One retained, device-based payload on
 `homeassistant/device/playguard_<id>/config` (about 13 KiB with every
-entity): `dev` (identifiers `playguard_<id>`, the console's name or
-`Nintendo Switch`, manufacturer `PlayGuard`, model `Nintendo Switch`,
-`sw`), `o` (origin `PlayGuard`, version, support URL), `avty_t`, a default
-`stat_t` of `playguard/<id>/state`, and `cmps` keyed by object id. Every
-component reads the shared state through a `val_tpl`; writable ones have
+entity), which needs **Home Assistant 2026.5 or later** (the MQTT `time`
+platform; an older one refuses the whole payload): `dev` (identifiers
+`playguard_<id>`, the console's name or `Nintendo Switch`, manufacturer
+`PlayGuard`, model `Nintendo Switch`, `sw`), `o` (origin `PlayGuard`,
+version, support URL), `avty_t`, and `cmps` keyed by object id. Every
+component but the buttons and the event reads the shared state
+(`stat_t` `playguard/<id>/state`) through a `val_tpl`; writable ones have
 `cmd_t` `playguard/<id>/<entity>/set` and `ret: true`. The entities that need
-`remote_timer_writes` are not announced while it is off, and none is writable
-in read-only mode. The discovery is published again when Home Assistant
-announces `online` on `homeassistant/status`, when the profiles change and
-when read-only mode changes.
+`remote_timer_writes` are not offered while it is off, nor any writable one in
+read-only mode, nor the profile select without profiles: each is then sent as
+its platform alone (`"limit_mon": {"p": "number"}`), which removes it from
+Home Assistant when an earlier discovery had it. The discovery is published
+again when Home Assistant announces `online` on `homeassistant/status`, when
+the profiles change and when read-only mode changes.
 
 | Platform | Object ids |
 |---|---|
@@ -251,13 +256,15 @@ when read-only mode changes.
 | sensor | `used_screen_time`, `used_screen_time_log`, `screen_time_remaining`, `extended_screen_time`, `now_playing`, `rating_age`, `firmware`, `atmosphere`, `spent_raw` (disabled by default), `last_order` |
 | number | `limit_sun` … `limit_sat`, `limit_uniform`, `max_screentime_today` (0–1440, step 5, minutes) |
 | time | `bedtime_alarm`, `bedtime_end_time` |
-| select | `restriction_level`, `profile` (the saved profiles; only when there are some) |
+| select | `restriction_level` (`unrestricted`, `young_child`, `child`, `teen`, `custom`), `profile` (the saved profiles; only when there are some) |
 | switch | `bedtime_enabled`, `console_lock`, `play_timer_alarm`, `unlocked`, `vr_restricted`, `sns_post_restricted`, `free_communication_restricted` |
 | button | `sync_now`, `lock_now`, `export_report`, `add_bonus_time_15`, `add_bonus_time_30`, `add_bonus_time_60`, `stop_today`, `remove_limit` |
 | event | `events` (event types `command_applied`, `command_rejected`, `command_waiting`) |
 
 `used_screen_time` is the timer's figure, `used_screen_time_log` the play
-log's; both are `measurement`, in minutes, device class `duration`.
+log's; both are `total_increasing` (a day's total, back to 0 at midnight),
+`screen_time_remaining` is `measurement`, all in minutes, device class
+`duration`.
 Diagnostic entities (`pin_set`, `clock_accurate`, `rating_age`, `firmware`,
 `atmosphere`, `spent_raw`, `last_order`, `export_report`) carry
 `ent_cat: diagnostic`; the limits, bedtime, alarm and restrictions `config`.

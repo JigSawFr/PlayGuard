@@ -49,6 +49,8 @@ def main():
     for oid, c in disc["cmps"].items():
         if not re.fullmatch(r"[a-z0-9_]+", oid):
             fail(f"discovery: bad object id {oid!r}")
+        if set(c) == {"p"}:
+            continue   # not offered now: its platform alone, which removes it
         for key in ("p", "name", "uniq_id"):
             if key not in c:
                 fail(f"discovery: {oid} has no {key}")

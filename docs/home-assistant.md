@@ -18,7 +18,8 @@ Assistant is the easy path.
 
 ## What you need
 
-- Home Assistant with the **MQTT** integration set up, and a broker: the
+- Home Assistant **2026.5 or later** (the bedtime's `time` entities: an older
+  one refuses the whole device), with the **MQTT** integration set up, and a broker: the
   **Mosquitto broker** add-on (Settings › Add-ons) or any other MQTT broker,
   in version 5.0 or 3.1.1 (EMQX, HiveMQ, NanoMQ, VerneMQ …): *Remote access ›
   MQTT version* is automatic (5.0, else 3.1.1).
@@ -77,18 +78,19 @@ handle the topics yourself).
 
 | Kind | Entities |
 |---|---|
-| Sensors | Used screen time (the play timer's count), Used screen time (play log), Screen time remaining, Extended screen time, Now playing (empty while PlayGuard is open: nobody plays then), Age rating, Firmware, Atmosphère, Last order |
+| Sensors | Used screen time (the play timer's count), Used screen time (play log), Screen time remaining, Extended screen time, Now playing (unknown while PlayGuard is open: nobody plays then), Age rating, Firmware, Atmosphère, Last order |
 | Binary sensors | Parental controls, Temporarily unlocked, PIN set, Companion app linked, Play timer, Time is up, Network clock accurate |
 | Numbers | Limit Sunday … Saturday, Limit every day, Max screentime today (0 to 1440 minutes; 1440 means no limit) |
 | Time | Bedtime alarm, Bedtime end time |
 | Switches | Console lock, Time's up alarm, Unlocked, Bedtime alarm enabled, VR mode restricted, Posting to social media restricted, Communication restricted |
-| Selects | Restriction level, Profile (your saved profiles) |
+| Selects | Restriction level (*unrestricted*, young child, child, teen, custom), Profile (your saved profiles) |
 | Buttons | Sync now, Lock now, Extra time +15 / +30 min / +1 h, No more play today, Remove the limit, Export a diagnostic report |
-| Event | Events: every order applied or refused, with the reason |
+| Event | Events: every order applied, refused (with the reason) or kept waiting for the console |
 
 The names follow Home Assistant's own *Nintendo Switch Parental Controls*
 integration where they mean the same thing. The entities that change the play
-timer only appear once *Orders may change the play timer* is on (below).
+timer only appear once *Orders may change the play timer* is on (below), and
+go again when it is turned off.
 
 The play log's figures (time per game today, the last 7 days, the finished
 days) are also on the broker (`playguard/<id>/activity`, `…/week`,
@@ -126,8 +128,8 @@ type: button
 name: +30 min
 icon: mdi:timer-plus-outline
 tap_action:
-  action: call-service
-  service: button.press
+  action: perform-action
+  perform_action: button.press
   target:
     entity_id: button.living_room_extra_time_30_min
 ```

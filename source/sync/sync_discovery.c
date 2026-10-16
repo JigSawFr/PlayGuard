@@ -30,7 +30,7 @@ static bool announced(const SyncEntity *e, const SyncDiscovery *d)
     if (e->write == SyncWrite_None) return true;
     if (d->read_only) return false;
     if (e->write == SyncWrite_Timer && !d->conf->remote_timer_writes) return false;
-    if (!strcmp(e->id, "profile") && d->n_profiles == 0) return false;   // a select needs options
+    if (!strcmp(e->id, "profile") && d->n_profiles == 0) return false;   // nothing to choose from
     return true;
 }
 
@@ -76,10 +76,17 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
     const SyncEntity *list = sync_entities(&n);
     for (size_t i = 0; i < n; i++) {
         const SyncEntity *e = &list[i];
-        if (!announced(e, d)) continue;
         sync_json_key(&j, e->id);
         sync_json_obj(&j);
         sync_json_kstr(&j, "p", e->platform);
+        // Not offered now (remote_timer_writes off, read-only, no profile):
+        // its platform alone, which removes it from Home Assistant if an
+        // earlier discovery had it, rather than leaving it there to refuse
+        // every order.
+        if (!announced(e, d)) {
+            sync_json_obj_end(&j);
+            continue;
+        }
         sync_json_kstr(&j, "name", e->name);
         snprintf(uid, sizeof(uid), "playguard_%s_%s", id, e->id);
         sync_json_kstr(&j, "uniq_id", uid);
@@ -88,8 +95,8 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
             sync_json_kstr(&j, "stat_t", topic);
             sync_json_key(&j, "evt_typ");
             sync_json_arr(&j);
-            static const char *const types[] = { "command_applied", "command_rejected", "command_waiting",
-                                                 "extra_restored", "limit_reached", "agent_started" };
+            // The events the engine sends (sync_engine.c's event()).
+            static const char *const types[] = { "command_applied", "command_rejected", "command_waiting" };
             for (size_t t = 0; t < sizeof(types) / sizeof(types[0]); t++) sync_json_str(&j, types[t]);
             sync_json_arr_end(&j);
         } else if (e->value_template) {
