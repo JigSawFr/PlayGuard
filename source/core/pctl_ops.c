@@ -637,13 +637,6 @@ Result pctl_play_timer_set_days(const u16 days_min[7])
     return 0;
 }
 
-Result pctl_play_timer_set_uniform(u16 minutes)
-{
-    u16 d[7];
-    for (int i = 0; i < 7; i++) d[i] = minutes;
-    return pctl_play_timer_set_days(d);
-}
-
 Result pctl_play_timer_clear(void)
 {
     u16 d[7];

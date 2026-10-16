@@ -82,8 +82,6 @@ void stop()
     s_running = false;
 }
 
-bool running() { return s_running; }
-
 void note(const std::string& event)
 {
     if (!s_running) return;

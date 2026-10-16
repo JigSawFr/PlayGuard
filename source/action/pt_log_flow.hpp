@@ -16,7 +16,6 @@ namespace pt_log_flow
 void apply();
 // At exit.
 void stop();
-bool running();
 
 // A line right away (once the caller has returned), with `event` in its last
 // column, while recording: what PlayGuard just changed (history_flow), so the

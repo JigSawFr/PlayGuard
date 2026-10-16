@@ -260,19 +260,6 @@ std::string details(const history::Entry& e)
     return out;
 }
 
-std::string when_text(const history::Entry& e)
-{
-    if (e.when.size() < 16) return e.when.empty() ? "?" : e.when;
-    const std::string today = ui::today_date();
-    using history_logic::Day;
-    switch (history_logic::day_of(e.when, today, update::add_days(today, -1))) {
-    case Day::Today: return brls::getStr("playguard/history/today_at", e.when.substr(11, 5));
-    case Day::Yesterday: return brls::getStr("playguard/history/yesterday_at", e.when.substr(11, 5));
-    case Day::Other: break;
-    }
-    return e.when;
-}
-
 std::string time_of(const history::Entry& e)
 {
     return e.when.size() >= 16 ? e.when.substr(11, 5) : (e.when.empty() ? "?" : e.when);

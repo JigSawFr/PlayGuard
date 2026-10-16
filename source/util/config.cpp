@@ -326,12 +326,6 @@ void load()
     sanitize(s_config);
 }
 
-bool save()
-{
-    Snapshot snap;
-    return snapshot(snap) && write(snap);
-}
-
 bool write(const Snapshot& snap)
 {
     // Both, even when the first fails.

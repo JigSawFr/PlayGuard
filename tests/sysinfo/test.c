@@ -75,7 +75,7 @@ int main(void)
     CHECK(si.serial_valid && strcmp(si.serial, "XAW10000000001") == 0);
     sysinfo_get(&si);
     CHECK(m.spl_inits == 1); /* cached */
-    CHECK(sysinfo_fw_at_least(MAKEHOSVERSION(21, 0, 0)));
+    CHECK(si.hos_version >= MAKEHOSVERSION(21, 0, 0));
 
     // emuMMC, PRODINFO blanked.
     reset();

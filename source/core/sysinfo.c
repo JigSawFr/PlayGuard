@@ -64,13 +64,6 @@ void sysinfo_get(SysInfo *out)
 void sysinfo_reset_cache(void) { s_cached = false; }
 #endif
 
-bool sysinfo_fw_at_least(u32 version)
-{
-    SysInfo info;
-    sysinfo_get(&info);
-    return info.hos_version >= version;
-}
-
 void sysinfo_version_string(u32 version, char *buf, size_t size)
 {
     if (!version) { snprintf(buf, size, "?"); return; }

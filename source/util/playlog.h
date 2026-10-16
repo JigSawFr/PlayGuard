@@ -52,12 +52,7 @@ typedef struct {
 // Folds `events` (oldest first) into one total per game with time in the
 // week window. `now` is the current user-clock time; a game still in focus at
 // the end of the log counts until then. Returns the number of totals written
-// to `out` (games beyond `max` are dropped).
-size_t playlog_fold(const PlayLogEvent *events, size_t n, uint64_t now,
-                    uint64_t day_start, uint64_t week_start,
-                    PlayLogTotal *out, size_t max);
-
-// The same with every day of the window: `day_starts[k]` is when the day k
+// to `out` (games beyond `max` are dropped). `day_starts[k]` is when the day k
 // days back began (strictly decreasing: [0] today's midnight, [6] the
 // window's start). Days are taken as given, so a 23 or 25 h day (a
 // daylight-saving change, calendar.h) is one day.

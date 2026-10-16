@@ -57,21 +57,6 @@ static uint64_t duration(const PlayLogEvent *from, const PlayLogEvent *to)
     return 0;
 }
 
-size_t playlog_fold(const PlayLogEvent *events, size_t n, uint64_t now,
-                    uint64_t day_start, uint64_t week_start,
-                    PlayLogTotal *out, size_t max)
-{
-    // Whole days between the two (the old interface knew no others).
-    uint64_t starts[7];
-    starts[0] = day_start;
-    for (int k = 1; k < 7; k++) {
-        const uint64_t back = (uint64_t)k * 86400u;
-        starts[k] = day_start > week_start + back ? day_start - back : week_start;
-    }
-    starts[6] = week_start;
-    return playlog_fold_days(events, n, now, starts, out, max);
-}
-
 size_t playlog_fold_days(const PlayLogEvent *events, size_t n, uint64_t now,
                          const uint64_t day_starts[7], PlayLogTotal *out, size_t max)
 {

@@ -158,7 +158,6 @@ void pctl_overview_fetch(PctlStatus *status, PtState *pt);
 // A block read that fails pt_plausible is refused (NXM_RC_PT_NOT_UNDERSTOOD),
 // as by the bedtime write below.
 Result pctl_play_timer_set_days(const u16 days_min[7]);
-Result pctl_play_timer_set_uniform(u16 minutes);
 Result pctl_play_timer_clear(void);
 
 // Bedtime, Sun..Sat (pure.h): written into the block read with 145601 (only

@@ -440,9 +440,10 @@ static void test_reads(void)
 static Result write_variant(unsigned variant)
 {
     u16 days[7] = {0, 10, 20, 30, 40, 50, 60};
+    static const u16 zeros[7] = {0};
     switch (variant) {
         case 0: return pctl_play_timer_set_days(days);
-        case 1: return pctl_play_timer_set_uniform(0);
+        case 1: return pctl_play_timer_set_days(zeros);
         default: return pctl_play_timer_clear();
     }
 }
@@ -1028,7 +1029,8 @@ static void test_unlock_and_relock(void)
     CHECK(model.unlocked && model.refs == 0 && model.init_calls == model.exit_calls);
     CHECK(model.got_pin_size == 7 && strcmp(model.got_pin, "123456") == 0);
     /* After a verified unlock the gate lets the write through. */
-    CHECK(pctl_play_timer_set_uniform(45) == 0);
+    const u16 all45[7] = {45, 45, 45, 45, 45, 45, 45};
+    CHECK(pctl_play_timer_set_days(all45) == 0);
     CHECK(pctl_relock() == 0 && !model.unlocked && model.last_write_cmd == 1007);
     CHECK(model.refs == 0);
 

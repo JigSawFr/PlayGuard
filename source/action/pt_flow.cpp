@@ -24,11 +24,6 @@ const std::vector<uint16_t>& quick_values()
     return pt_logic::quick_values();
 }
 
-int played_today_min(const PtState& pt)
-{
-    return pt_logic::played_today_min(pt, ui::today_weekday());
-}
-
 // A record made by this run is an unlock still in use, not an interrupted one.
 static bool s_pending_this_run = false;
 

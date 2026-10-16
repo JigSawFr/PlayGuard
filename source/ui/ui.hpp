@@ -75,11 +75,11 @@ void notify(const std::string& text);
 // toast (a toast is gone before "error 0x…" is read). Next frame, so it can
 // be called from a dialog button. Logged as "error: " for the smoke test.
 void error(const std::string& text);
-// config::save(), off the UI thread (write_later): `saved_text` as a toast
-// once it is on the SD card, `failed_text` (default: the config_err toast)
-// when the card refused it. False only when it cannot be saved at all (an
-// unreadable config.json kept: config::save refuses to overwrite it), said
-// at once.
+// Saves the settings (config::snapshot, then config::write off the UI
+// thread: write_later): `saved_text` as a toast once it is on the SD card,
+// `failed_text` (default: the config_err toast) when the card refused it.
+// False only when it cannot be saved at all (an unreadable config.json kept:
+// config::snapshot refuses to overwrite it), said at once.
 bool save_config(const std::string& saved_text = "", const std::string& failed_text = "");
 // The same, waiting for the write: for a record that must be on the SD card
 // before the console change it describes. False when it is not.

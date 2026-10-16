@@ -17,6 +17,14 @@
 
 // config.json alone, as the versions before state.json left it: its
 // per-system fields are read from it.
+// A save as the app makes one (ui::save_config_now): the content, then the
+// atomic writes; false when either refuses.
+static bool save_config()
+{
+    config::Snapshot snap;
+    return config::snapshot(snap) && config::write(snap);
+}
+
 static void write_config(const std::string& text)
 {
     CHECK(paths::atomic_write(paths::config_file(), text));
@@ -64,7 +72,7 @@ static void test_damaged()
     CHECK(config::loaded() == config::Loaded::PutAside && !config::get().relock_pending);
     CHECK(!exists(file) && paths::read_file(bad, text) && text == first);
     // The automatic saves at start-up then write a new file; the damaged one stays.
-    CHECK(config::save() && exists(file));
+    CHECK(save_config() && exists(file));
     CHECK(paths::read_file(bad, text) && text == first);
     config::load();
     CHECK(config::loaded() == config::Loaded::Read);
@@ -95,7 +103,7 @@ static void test_damaged()
     CHECK(paths::atomic_write(older + "/x", "keeps the folder non-empty"));
     config::load();
     CHECK(config::loaded() == config::Loaded::Stuck && exists(file));
-    CHECK(!config::save());
+    CHECK(!save_config());
     CHECK(paths::read_file(bad, text) && text == "{ half");
     std::remove((older + "/x").c_str());
     CHECK(rmdir(older.c_str()) == 0 && rmdir(file.c_str()) == 0);
@@ -103,7 +111,7 @@ static void test_damaged()
     // Missing again: a first run, silent, and saves work.
     std::remove(bad.c_str());
     config::load();
-    CHECK(config::loaded() == config::Loaded::Missing && config::save());
+    CHECK(config::loaded() == config::Loaded::Missing && save_config());
 }
 
 static void test_fields()
@@ -185,7 +193,7 @@ static void test_round_trip()
     c.extra_value = 150;
     c.extra_auto_restore = true;
     c.intro = false;
-    CHECK(config::save());
+    CHECK(save_config());
 
     std::string text;
     CHECK(paths::read_file(paths::config_file(), text) && text.find("\"schema\": 1") != std::string::npos);
@@ -200,7 +208,7 @@ static void test_round_trip()
     c = config::Config{};
     c.console_lock = true;
     c.console_lock_prev = { 180, 120, 120, 120, 120, 120, 0xFFFF };
-    CHECK(config::save());
+    CHECK(save_config());
     c = config::Config{};
     config::load();
     CHECK(c.console_lock && c.console_lock_prev == std::vector<int>({ 180, 120, 120, 120, 120, 120, 0xFFFF }));
@@ -342,7 +350,7 @@ static void test_preferences()
     config::get().logs_keep_mb = 20;
     config::get().support_reminder = false;
     config::get().seen_version = "1.2.0";
-    CHECK(config::save());
+    CHECK(save_config());
     config::get() = config::Config{};
     config::load();
     CHECK(config::get().start_tab == "tools" && config::get().extra_amounts == std::vector<int>({ 5, 10, 15 }));
@@ -356,7 +364,7 @@ static void test_tmp_recovery()
     // Stopped after removing config.json, before renaming config.json.tmp.
     config::get() = config::Config{};
     config::get().theme = "dark";
-    CHECK(config::save());
+    CHECK(save_config());
     const std::string file = paths::config_file();
     CHECK(std::rename(file.c_str(), (file + ".tmp").c_str()) == 0);
     config::get() = config::Config{};
@@ -409,7 +417,7 @@ static void test_systems()
                     "console_lock_prev": [60, 60, 60, 60, 60, 60, 60]})");
     config::load();
     CHECK(config::get().console_lock && config::get().relock_pending && config::get().theme == "dark");
-    CHECK(config::save());
+    CHECK(save_config());
     std::string text;
     CHECK(paths::read_file(paths::config_file(), text));
     CHECK(text.find("console_lock") == std::string::npos && text.find("relock_pending") == std::string::npos);
@@ -424,7 +432,7 @@ static void test_systems()
     CHECK(config::get().console_lock_prev.empty());
     config::get().fw_gate_fw = "24.0.0", config::get().fw_gate_app = "1.0.0", config::get().fw_gate_choice = "probe";
     config::get().theme = "light";
-    CHECK(config::save());
+    CHECK(save_config());
 
     // Back on the first: its own state, the preference changed on the other.
     paths::set_nand("sysmmc");
