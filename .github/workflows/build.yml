@@ -16,6 +16,17 @@ on:
         description: Release tag to build and attach the assets to
         type: string
         required: true
+    # What release-please.yml passes, by name (no `secrets: inherit`). Each is
+    # optional, as on a fork: the jobs go on without it.
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: false
+      DOCKERHUB_TOKEN:
+        required: false
+      RELEASE_APP_PRIVATE_KEY:
+        required: false
+      OPENROUTER_API_KEY:
+        required: false
 
 permissions:
   contents: read
@@ -337,7 +348,8 @@ jobs:
   switch:
     needs: [ meta ]
     runs-on: ubuntu-26.04
-    timeout-minutes: 20
+    # A release builds twice from scratch (no ccache, below): longer.
+    timeout-minutes: ${{ inputs.tag && 45 || 20 }}
     container:
       image: devkitpro/devkita64@sha256:1fc388c3a0d34bd2045a6dadcb1020e069d5f876a187fd705de14b4440c00282
       credentials: ${{ (secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '') && fromJSON(format('{{"username":{0},"password":{1}}}', toJSON(secrets.DOCKERHUB_USERNAME), toJSON(secrets.DOCKERHUB_TOKEN))) || fromJSON('{}') }}
@@ -356,7 +368,11 @@ jobs:
         run: apt-get update -qq && apt-get install -y -qq --no-install-recommends ccache
       - name: Compiler messages as annotations
         run: echo "::add-matcher::.github/problem-matchers/gcc.json"
+      # Not for a release: its two builds compile everything, so the
+      # reproducibility check below compares two real compilations, not
+      # objects both builds took from main's cache.
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: ${{ !inputs.tag }}
         with:
           path: .ccache
           key: ccache-switch-${{ github.sha }}
@@ -376,6 +392,9 @@ jobs:
           # refuses it without this, and CMake reads the commit the app shows.
           git config --global --add safe.directory '*'
           export CCACHE_DIR="$GITHUB_WORKSPACE/.ccache" CCACHE_BASEDIR="$GITHUB_WORKSPACE"
+          # A release: no cache at all, the second build below included (it
+          # would take every object from the first).
+          if [ "$PLAYGUARD_RELEASE" = 1 ]; then export CCACHE_DISABLE=1; fi
           ccache --zero-stats > /dev/null
           # PlayGuard's warnings as errors, as on the desktop: the libnx code
           # (source/core/*.c, the __SWITCH__ paths) is only built here.
