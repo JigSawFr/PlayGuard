@@ -47,12 +47,19 @@ The "alarm" scenario starts with "When the time is up" on a warning only and
 today's limit passed (PLAYGUARD_SIM_ALARM_ONLY, PLAYGUARD_SIM_RESTRICTED):
 the Overview and the Play timer tab must show the time over the limit.
 
+The "sysnotes" scenario checks for updates at start-up against a simulated
+GitHub and switchbrew (PLAYGUARD_SIM_SYS_LATEST, PLAYGUARD_SIM_SYS_NOTES),
+hekate 6.5.3 on the SD card: Tools › Console must say how far behind each
+one is and that the newest firmware needs a newer hekate, then show the
+release notes of the firmware (the closest newer version, then the
+installed one), of Atmosphère and of hekate, and keep them in the cache.
+
 The "loading" scenario stops the start-up on the loading screen
 (PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|update|library|outside|loading|alarm]   (needs DISPLAY, xdotool, ImageMagick)
+Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|update|library|outside|loading|alarm|sysnotes]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -82,6 +89,7 @@ LIBRARY = SCENARIO == "library"
 OUTSIDE = SCENARIO == "outside"
 LOADING = SCENARIO == "loading"
 ALARM = SCENARIO == "alarm"
+SYSNOTES = SCENARIO == "sysnotes"
 ROLLBACK = SCENARIO == "rollback"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
@@ -322,6 +330,72 @@ if OUTSIDE:
     history_file = os.path.join(nand_dir, "history.json")
     if os.path.exists(history_file):
         os.remove(history_file)   # the outside_* entries must be this run's
+if SYSNOTES:
+    # A simulated GitHub and switchbrew (util/sys_notes.hpp), shaped like
+    # theirs: Atmosphère 1.12.0 runs (1.12.1 is out), hekate 6.5.3 is on the
+    # SD card (6.5.4 is out, the first to support 23.0.1), the console runs
+    # 22.5.0 (23.0.0 and 23.0.1 are out).
+    sim_notes = os.path.join(run_dir, "sys_notes_sim")
+    os.makedirs(sim_notes, exist_ok=True)
+    def release(repo, tag, date, body):
+        return {"tag_name": tag, "html_url": f"https://github.com/{repo}/releases/tag/{tag}", "draft": False,
+                "prerelease": False, "published_at": date, "body": body.replace("\n", "\r\n")}
+    ams = "Atmosphere-NX/Atmosphere"
+    json.dump([release(ams, "1.12.1", "2026-10-06T00:05:51Z",
+                       "**1.12.1** is Atmosphère's ninety-fourth official release.\n\n"
+                       "The following was changed since the last release:\n"
+                       "* Support was added for the new \"BatchRead\" storage in `fs.mitm`.\n"
+                       "  * Firmware 23.0.0 introduced a new type of filesystem storage.\n"
+                       "* General system stability improvements to enhance the user's experience.\n\n"
+                       "And the following was changed in 1.12.0:\n* Support was added for 23.0.0."),
+               release(ams, "1.12.0", "2026-09-27T23:21:53Z",
+                       "**1.12.0** is Atmosphère's ninety-third official release.\n\n"
+                       "The following was changed since the last release:\n\n* Support was added for 23.0.0.\n"
+                       "    * `mesosphère` was updated to reflect the latest official kernel behavior.\n"
+                       "* General system stability improvements to enhance the user's experience."),
+               release(ams, "1.11.2", "2026-06-16T22:01:02Z", "* Basic support was added for 22.5.0.")],
+              open(os.path.join(sim_notes, "atmosphere.json"), "w"))
+    def hekate_notes(v, fw):
+        return ("![hekate-nyx-banner](https://example.invalid/banner.png)\n\n"
+                "**Supports booting ALL current CFWs, Android, Linux and payload tools.**\n\n"
+                f"### Latest HOS supported: {fw}\n\n\nhekate v{v} changes\n-------------\n- **HOS {fw} support**\n\n\n"
+                "FAQ\n-------------\n\n- **Which Linux/Android distributions are supported?**\n Many.\n\n"
+                "# How to update:\n- Drag n drop `bootloader` folder into sd card root.\n\n\n# Download:")
+    json.dump([release("CTCaer/hekate", "v6.5.4", "2026-09-28T00:06:10Z", hekate_notes("6.5.4", "23.0.1")),
+               release("CTCaer/hekate", "v6.5.3", "2026-06-16T22:14:44Z", hekate_notes("6.5.3", "22.5.0"))],
+              open(os.path.join(sim_notes, "hekate.json"), "w"))
+    rows = [("22.0.0", "March 3, 2026"), ("22.1.0", "May 5, 2026"), ("22.5.0", "June 16, 2026"),
+            ("23.0.0", "September 10, 2026"), ("23.0.1", "October 1, 2026")]
+    open(os.path.join(sim_notes, "System_Versions.wiki"), "w").write(
+        "{| class=\"wikitable\"\n|-\n! System version\n! Release date\n" +
+        "".join(f"|-\n| [[{v}]]\n| {d} (UTC)\n" for v, d in rows) + "|}\n")
+    pages = {
+        "22.5.0": ("June 16, 2026", "no", "* General system stability improvements to enhance the user's experience.", "sdb"),
+        "23.0.0": ("September 10, 2026", "yes",
+                   "* Added \u201cSettings\u201d to Virtual Game Cards from the HOME Menu.\n"
+                   "** You can review and edit which of your systems can use virtual game cards.\n"
+                   "* General system stability improvements to enhance the user's experience.", "usb, pctl, ns"),
+        "23.0.1": ("October 1, 2026", "<fill this in manually>",
+                   "* Fixed an issue from system version 23.0.0 where software occasionally took a long time to start.", "sdb"),
+    }
+    for v, (d, flaws, log_text, sysmodules) in pages.items():
+        open(os.path.join(sim_notes, v + ".wiki"), "w").write(
+            f"The Switch {v} system update was released on {d} (UTC).\n\nSecurity flaws fixed: {flaws}.\n\n"
+            "==Change-log==\n[https://en-americas-support.nintendo.com/ Official] ALL change-log:\n"
+            f"{log_text}\n\n==System Titles==\n* The following titles were updated:\n** Sysmodules: {sysmodules}.\n")
+    env.setdefault("PLAYGUARD_SIM_SYS_NOTES", sim_notes)
+    env.setdefault("PLAYGUARD_SIM_SYS_LATEST", "1.12.1:6.5.4:23.0.1")
+    # No PlayGuard update offered over Tools by the same check.
+    env.setdefault("PLAYGUARD_SIM_LATEST", "offline")
+    update_bin = os.path.join(run_dir, "playguard_data", "sd", "bootloader", "update.bin")
+    os.makedirs(os.path.dirname(update_bin), exist_ok=True)
+    open(update_bin, "wb").write(b"\0" * 0x40 + b"ICTC" + bytes([ord("0") + 6, ord("0") + 5, ord("0") + 3, 0]))
+    notes_cache = os.path.join(run_dir, "playguard_data", "cache", "sys_notes.json")
+    if os.path.exists(notes_cache):
+        os.remove(notes_cache)   # fetched in this run
+    # Checking for updates at start-up (the daily check), not done yet today.
+    os.makedirs(os.path.dirname(config_file), exist_ok=True)
+    json.dump({"schema": 1, "update_daily": True}, open(config_file, "w"))
 if LOCK:
     # Security › Ask for the PIN › To open PlayGuard: the lock screen comes
     # first, and the right PIN (the simulated PIN screen accepts) opens the
@@ -899,6 +973,59 @@ if ALARM:
     key("Down")                # Play timer: the state line and the banner say so
     shot("02_play_timer_over")
     finish()
+if SYSNOTES:
+    def wait_logged(text, what):
+        for _ in range(60):
+            if logged(text):
+                return
+            if not alive():
+                fail(f"app exited while waiting for {what}")
+            time.sleep(0.5)
+        fail(f"no {what} in 30 s")
+    wait_logged("release notes: lists kept", "release lists from the start-up check")
+    key("Down", steps("dashboard", "tools"))
+    key("Right")
+    key("Down", 13)            # Console › hekate (the first presses scroll the notes above), the warning under it
+    shot("01_tools_console")   # 2 versions behind, and 23.0.1 needs hekate 6.5.4 first
+    key("Up", 2)               # Firmware
+    key("Return")
+    wait_logged("release notes: firmware fetched", "firmware notes")
+    shot("02_firmware_next")   # the closest newer one, 23.0.0: security fixes, parental controls changed
+    key("Left")                # the installed one's tab
+    key("Return")
+    shot("03_firmware_installed")
+    key("Escape")
+    key("Down")                # Atmosphère
+    key("Return")
+    # Its list came with the start-up check, today: shown, not fetched again.
+    wait_logged("release notes: atmosphere opened", "Atmosphère notes")
+    shot("04_atmosphere")
+    key("Escape")
+    key("Down")                # hekate
+    key("Return")
+    wait_logged("release notes: hekate opened", "hekate notes")
+    shot("05_hekate")
+
+    def check_cache():
+        if logged("release notes: atmosphere fetched") or logged("release notes: hekate fetched"):
+            fail("Atmosphère's or hekate's notes fetched again on the day of the start-up check")
+        try:
+            kept = json.load(open(notes_cache))
+        except (OSError, ValueError) as e:
+            fail(f"the release notes were not kept: {e}")
+        ams_kept = {r["version"]: r for r in kept["atmosphere"]["releases"]}
+        if ams_kept.get("1.12.1", {}).get("supports") != "23.0.0" or "And the following" in ams_kept["1.12.1"]["notes"]:
+            fail("Atmosphère 1.12.1 kept wrong: " + repr(ams_kept.get("1.12.1")))
+        hek = {r["version"]: r for r in kept["hekate"]["releases"]}
+        if hek.get("6.5.4", {}).get("supports") != "23.0.1" or "FAQ" in hek["6.5.4"]["notes"]:
+            fail("hekate 6.5.4 kept wrong: " + repr(hek.get("6.5.4")))
+        fw = {r["version"]: r for r in kept["firmware"]["releases"]}
+        for v in ("22.5.0", "23.0.0", "23.0.1"):
+            if not fw.get(v, {}).get("notes"):
+                fail(f"no notes kept for firmware {v}")
+        if not fw["23.0.0"].get("security") or not fw["23.0.0"].get("pctl") or fw["23.0.1"].get("security"):
+            fail("firmware 23.0.0 / 23.0.1 flags kept wrong")
+    finish(check_cache)
 if LOADING:
     shot("01_loading")         # the icon, the wordmark, the bar at its last step
     finish()

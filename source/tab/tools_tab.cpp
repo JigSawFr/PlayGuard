@@ -13,6 +13,7 @@
 #include "action/pt_block_flow.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_log_flow.hpp"
+#include "action/sys_notes_flow.hpp"
 #include "action/sys_update_flow.hpp"
 #include "action/upload_flow.hpp"
 #include "activity/diagnostic_activity.hpp"
@@ -165,6 +166,21 @@ ToolsTab::ToolsTab()
         return true;
     });
 
+    // The release notes of each (installed and newer versions).
+    const std::pair<brls::DetailCell*, sys_notes::Which> notes_cells[] = {
+        { fw.getView(), sys_notes::Which::Firmware },
+        { ams.getView(), sys_notes::Which::Atmosphere },
+        { hekate.getView(), sys_notes::Which::Hekate },
+    };
+    for (const auto& n : notes_cells) {
+        const sys_notes::Which which = n.second;
+        n.first->registerAction("playguard/sys_notes/hint"_i18n, brls::BUTTON_A, [which](brls::View*) {
+            sys_notes_flow::open(which);
+            return true;
+        });
+    }
+    sys_advice->setSingleLine(false);
+
     // On a firmware newer than the checked one, the firmware screen again.
     compat->registerClickAction([](brls::View*) {
         if (fw_gate::needed()) brls::Application::pushActivity(new FirmwareGateActivity());
@@ -263,29 +279,31 @@ void ToolsTab::refresh()
 
     SysInfo si;
     sysinfo_get(&si);
-    char fwv[16];
-    sysinfo_version_string(si.hos_version, fwv, sizeof(fwv));
     const bool ro  = app::read_only();
     const bool dev = app::dev_mode();
     dev_mode->setOn(dev, false);
     dev_read_only->setOn(ro, false);
     dev_pt_log->setOn(cfg.pt_log, false);
-    // With the newer release the last update check found (sys_update_flow).
+    // With the newer release the last update check found (sys_update_flow),
+    // and how many releases behind when more than one.
     bool newer = false;
-    fw->setDetailText(sys_update_flow::with_latest("firmware", fwv, &newer));
+    fw->setDetailText(sys_notes_flow::status_text(sys_notes::Which::Firmware, &newer));
     fw->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
     if (si.ams_valid) {
-        ams->setDetailText(sys_update_flow::with_latest(
-            "atmosphere", fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro), &newer));
+        ams->setDetailText(sys_notes_flow::status_text(sys_notes::Which::Atmosphere, &newer));
         ams->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
     } else {
         ams->setDetailText("playguard/common/unavailable"_i18n);
     }
     // hekate: only when its bootloader/update.bin is on the SD card.
     const std::string hk = sys_update_flow::installed_hekate();
-    hekate->setDetailText(sys_update_flow::with_latest("hekate", hk, &newer));
+    hekate->setDetailText(sys_notes_flow::status_text(sys_notes::Which::Hekate, &newer));
     hekate->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
     ui::set_visible(hekate.getView(), !hk.empty());
+    // A newer firmware Atmosphère or hekate does not support yet, or only in
+    // a newer release (their notes say).
+    const std::string advice = sys_notes_flow::firmware_advice();
+    sys_advice->setText(advice);
     NVGcolor c = ui::color_neutral();
     compat->setDetailText(ui::compat_text(si, &c));
     compat->setDetailTextColor(c);
@@ -313,6 +331,7 @@ void ToolsTab::refresh()
     patches_note->setText(note);
     patches_note->setTextColor(warn ? ui::color_warn() : ui::color_note());
     ui::set_visible_all({ { storage_note.getView(), !other.empty() },
+                          { sys_advice.getView(), !advice.empty() },
                           { serial_note.getView(), ui::serial_warning(si) },
                           { patches_note.getView(), !note.empty() },
                           { dev_header.getView(), dev },

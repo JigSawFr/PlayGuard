@@ -1,5 +1,5 @@
 // ToolsTab — first steps, change history, settings backup / restore,
-// diagnostic export, the installed games check and how many reports and crash files are kept, the console (firmware, storage, serial, game patches)
+// diagnostic export, the installed games check and how many reports and crash files are kept, the console (firmware, Atmosphère and hekate, A on each opening its release notes; storage, serial, game patches)
 // and the developer tools (shown after seven presses on About › Version;
 // among them, clearing the cache and the log files). The
 // preferences are in PreferencesTab, the version, updates and changelog in AboutTab.
@@ -38,6 +38,7 @@ class ToolsTab : public TabBase
     BRLS_BIND(brls::DetailCell,  fw,          "tl_fw");
     BRLS_BIND(brls::DetailCell,  ams,         "tl_ams");
     BRLS_BIND(brls::DetailCell,  hekate,      "tl_hekate");
+    BRLS_BIND(brls::Label,       sys_advice,  "tl_sys_advice");
     BRLS_BIND(brls::DetailCell,  compat,      "tl_compat");
     BRLS_BIND(brls::DetailCell,  storage,     "tl_storage");
     BRLS_BIND(brls::Label,       storage_note, "tl_storage_note");

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Tools › Console › Atmosphère, hekate or Firmware: the release notes.
+     A tab for the installed version and one for each newer one (L / R move
+     from one to the next), a bar while they are fetched, what updating the
+     firmware needs first, then the chosen version's tags, title, notes and
+     its page as a QR code (See online), and when they were fetched (X
+     fetches them again). Filled by sys_notes_activity.cpp. -->
+
+<brls:AppletFrame
+    iconInterpolation="linear">
+
+    <ScrollView
+        icon="@res/img/app_icon.jpg"
+        width="auto"
+        height="auto"
+        axis="column"
+        alignItems="stretch"
+        grow="1.0">
+
+        <brls:Box
+            width="auto"
+            height="auto"
+            axis="column"
+            alignItems="stretch"
+            paddingTop="@style/brls/sidebar/padding_top"
+            paddingRight="@style/brls/sidebar/padding_right"
+            paddingBottom="@style/brls/sidebar/padding_bottom"
+            paddingLeft="@style/brls/sidebar/padding_left">
+
+            <!-- While the notes are fetched: a bar and what is fetched. -->
+            <brls:Box id="sn_loading" width="auto" height="auto" axis="column" alignItems="center"
+                marginTop="8" marginBottom="24" visibility="gone">
+                <LoadingBar id="sn_loading_bar" width="420" height="8" marginBottom="14"/>
+                <brls:Label id="sn_loading_text" text=" " fontSize="18" horizontalAlign="center"
+                    textColor="@theme/brand/note"/>
+            </brls:Box>
+            <!-- Between the L and R icons (set in the code); the tabs themselves
+                 are made in the code, one per version. -->
+            <brls:Box id="sn_tabs" width="auto" height="auto" axis="row" alignItems="center" marginBottom="16">
+                <brls:Label id="sn_tab_l" text=" " fontSize="25.5" marginRight="12" textColor="@theme/brand/note"/>
+                <brls:Box id="sn_tab_list" width="auto" height="auto" axis="row" alignItems="center"/>
+                <brls:Label id="sn_tab_r" text=" " fontSize="25.5" textColor="@theme/brand/note"/>
+            </brls:Box>
+            <brls:Label id="sn_advice" text="" fontSize="20" marginBottom="16" textColor="@theme/brand/warn"/>
+            <brls:Box id="sn_tags" width="auto" height="auto" axis="row" marginBottom="10"/>
+            <brls:Header id="sn_header" marginBottom="8"/>
+            <brls:Label id="sn_language" text="@i18n/playguard/sys_notes/english" fontSize="18" marginBottom="12"
+                textColor="@theme/brand/note"/>
+            <brls:Box id="sn_notes" width="auto" height="auto" axis="column" alignItems="stretch"/>
+            <brls:Label id="sn_empty" text="" fontSize="20" marginTop="8" textColor="@theme/brand/note"/>
+            <brls:Label id="sn_more" text="" fontSize="18" marginTop="16" textColor="@theme/brand/note"/>
+            <brls:Box width="auto" height="auto" axis="row" marginTop="24">
+                <brls:Button id="sn_online" style="default" text="@i18n/playguard/sys_notes/online"/>
+            </brls:Box>
+            <brls:Label id="sn_checked" text=" " fontSize="18" marginTop="16" textColor="@theme/brand/note"/>
+
+        </brls:Box>
+
+    </ScrollView>
+
+</brls:AppletFrame>
