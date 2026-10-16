@@ -44,7 +44,9 @@ static void test_system()
     CHECK(is(0x4B010, ""));               // 2016-0600: not documented
     CHECK(is(0xF601, "session_closed"));
     CHECK(is(0xF80E, "bad_pin_format"));
-    CHECK(is(0x1088E, "pctl_0132"));
+    CHECK(is(0xF08E, "wrong_pin"));                    // 2142-0120
+    CHECK(is(0x1088E, "no_pin"));                      // 2142-0132
+    CHECK(is(0x10E8E, "pctl_not_ready"));              // 2142-0135
     CHECK(is((142 | (223 << 9)), "no_internet"));       // 2142-0223
     CHECK(is(0xCC74, "clock_not_set"));                 // 2116-0102
     CHECK(is((116 | (103 << 9)), "clock_not_set"));     // 2116-0103

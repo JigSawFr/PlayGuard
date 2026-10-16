@@ -5,12 +5,15 @@
 #include <atomic>
 #include <borealis.hpp>
 #include <cstdio>
+#include <cstdlib>
 #include <ctime>
 #include <memory>
 #include <vector>
 
 #include "action/github_login_flow.hpp"
 #include "action/pin_lock.hpp"
+#include "action/rollback_flow.hpp"
+#include "activity/dev_build_activity.hpp"
 #include "activity/dev_builds_activity.hpp"
 #include "app.hpp"
 #include "core/platform.h"
@@ -19,6 +22,7 @@
 #include "util/github_auth.hpp"
 #include "util/launcher.hpp"
 #include "util/paths.hpp"
+#include "util/rollback.hpp"
 
 using namespace brls::literals;
 
@@ -73,27 +77,11 @@ std::string file_path(const std::string& sd)
     return root == "/" ? sd : root + sd;
 }
 
-std::string label(const dev_builds::Build& b)
-{
-    std::string text;
-    switch (b.kind) {
-        case dev_builds::Kind::Release:
-            text = brls::getStr("playguard/dev_build/release", b.version);
-            break;
-        case dev_builds::Kind::Main:
-            text = brls::getStr("playguard/dev_build/main", b.commit, short_date(b.date));
-            break;
-        case dev_builds::Kind::PullRequest:
-            text = brls::getStr("playguard/dev_build/pr", b.pr, b.title, b.commit);
-            break;
-    }
-    if (installed(b)) text += " · " + "playguard/dev_build/installed"_i18n;
-    return text;
-}
-
-// The download's dialog: a bar and "3 of 7 MB", updated from the download
-// thread (at most once per percent, through brls::sync). It cannot be
-// dismissed; close() takes it away once the download is over.
+// The download's dialog: a bar, "3 of 7 MB" and Cancel (B too), updated
+// from the download thread (at most once per percent, through brls::sync).
+// Cancel sets the flag the download checks (it stops within a second) and
+// closes the dialog at once; nothing touches the dialog after it closed,
+// whichever way (Cancel, B, the download's end) it did.
 class DownloadProgress
 {
   public:
@@ -115,14 +103,31 @@ class DownloadProgress
         this->fill->setHeight(12);
         this->fill->setCornerRadius(6);
         track->addView(this->fill);
+        // Its own button, not the dialog's: a dialog's button acts once the
+        // dialog is gone, and the download must stop updating it before.
+        auto* cancel = new brls::Button();
+        cancel->setText("hints/cancel"_i18n);
+        cancel->setWidth(260);
+        cancel->setMarginTop(28);
+        cancel->registerClickAction([this](brls::View*) {
+            this->cancel();
+            return true;
+        });
         auto* box = new brls::Box(brls::Axis::COLUMN);
         box->setAlignItems(brls::AlignItems::CENTER);
         box->setJustifyContent(brls::JustifyContent::CENTER);
-        box->setPadding(40, 40, 40, 40);
+        box->setPadding(40, 40, 32, 40);
         box->addView(this->label);
         box->addView(track);
+        box->addView(cancel);
         this->dialog = new brls::Dialog(box);
-        this->dialog->setCancelable(false);
+        this->dialog->setCancelable(false);   // B: below, through cancel()
+        this->dialog->getAppletFrame()->registerAction(
+            "hints/cancel"_i18n, brls::BUTTON_B, [this](brls::View*) {
+                this->cancel();
+                return true;
+            },
+            false, false, brls::SOUND_BACK);
         this->show(0, size);
         this->dialog->open();
     }
@@ -138,6 +143,10 @@ class DownloadProgress
         brls::sync([this, done, total]() { this->show(done, total); });
     }
 
+    // What the download checks.
+    const std::atomic<bool>* cancel_flag() const { return &this->cancelled; }
+    bool was_cancelled() const { return this->cancelled.load(); }
+
     void close()
     {
         if (this->dialog) this->dialog->close();
@@ -148,9 +157,17 @@ class DownloadProgress
     static constexpr float BAR_WIDTH = 480.0f;
     const uint64_t size;
     std::atomic<int> percent{ -1 };
-    brls::Dialog* dialog = nullptr;
+    std::atomic<bool> cancelled{ false };
+    brls::Dialog* dialog = nullptr;   // null once it is closing: never touched again
     brls::Label* label = nullptr;
     brls::Rectangle* fill = nullptr;
+
+    void cancel()
+    {
+        if (!this->dialog) return;
+        this->cancelled = true;
+        this->close();
+    }
 
     void show(uint64_t done, uint64_t total)
     {
@@ -165,6 +182,8 @@ class DownloadProgress
 
 void installed_now(const dev_builds::Build& b)
 {
+    // The build replaced is kept, and the next start checked (rollback_flow).
+    rollback_flow::installed(label(b));
     if (launcher::can_launch() && launcher::launch_nro(sd_path())) {
         // hbloader starts the new .nro as soon as this one exits.
         brls::Application::quit();
@@ -189,15 +208,23 @@ void install(const dev_builds::Build& b)
         const std::string fresh = target + ".new";
         bool ok = dev_builds::download(b, fresh, &err, [progress](uint64_t done, uint64_t total) {
             progress->received(done, total);
-        });
+        }, progress->cancel_flag());
         brls::sync([b, ok, err, target, fresh, progress]() mutable {
+            // Cancelled: nothing replaced, even when the download had just
+            // ended; said with a toast (the dialog is already gone).
+            if (progress->was_cancelled()) {
+                std::remove(fresh.c_str());
+                s_busy = false;
+                ui::notify("playguard/dev_build/cancelled"_i18n);
+                return;
+            }
             if (ok) {
                 // The running .nro is held open by romfs:/ (the app's
                 // resources), and the SD card will not rename an open file:
                 // released for the two renames, here on the UI thread so that
                 // nothing reads romfs:/ meanwhile, then mounted again.
                 platform_romfs_release();
-                ok = dev_builds::replace(target, fresh, &err);
+                ok = dev_builds::replace(target, fresh, &err, rollback::previous_file(target));
                 platform_romfs_mount();
                 if (!ok) std::remove(fresh.c_str());
             }
@@ -211,16 +238,83 @@ void install(const dev_builds::Build& b)
 
 }   // namespace
 
+std::string nro_sd_path()
+{
+    return sd_path();
+}
+
+std::string nro_file()
+{
+    const std::string sd = sd_path();
+    return sd.empty() ? "" : file_path(sd);
+}
+
 std::string short_date(const std::string& iso)
 {
     if (iso.size() < 16) return iso;
     return iso.substr(0, 10) + " " + iso.substr(11, 5);
 }
 
+int64_t now()
+{
+#ifndef __SWITCH__
+    // Desktop simulation: the console's frozen time, so ages stay the same in screenshots.
+    if (const char* frozen = std::getenv("PLAYGUARD_SIM_NOW"))
+        if (const long long v = std::atoll(frozen)) return v;
+#endif
+    return (int64_t)std::time(nullptr);
+}
+
+std::string age_text(const std::string& iso)
+{
+    int64_t then = 0;
+    if (!dev_builds::parse_iso(iso, &then)) return "";
+    const int64_t age = now() - then;
+    if (age < 3600) return "playguard/dev_build/age_now"_i18n;
+    if (age < 2 * 86400) return brls::getStr("playguard/dev_build/age_hours", (int)(age / 3600));
+    return brls::getStr("playguard/dev_build/age_days", (int)(age / 86400));
+}
+
+std::string label(const dev_builds::Build& b)
+{
+    std::string text;
+    switch (b.kind) {
+        case dev_builds::Kind::Release:
+            text = release_text(b);
+            break;
+        case dev_builds::Kind::Main:
+            text = brls::getStr("playguard/dev_build/main", b.commit, short_date(b.date));
+            break;
+        case dev_builds::Kind::PullRequest:
+            text = brls::getStr("playguard/dev_build/pr", b.pr, b.title, b.commit);
+            break;
+        case dev_builds::Kind::Commit:
+            text = brls::getStr("playguard/dev_build/commit", b.commit, b.branch, short_date(b.date));
+            break;
+    }
+    if (installed(b)) text += " · " + "playguard/dev_build/installed"_i18n;
+    return text;
+}
+
+const dev_builds::Build* running_build(const std::vector<dev_builds::Build>& all)
+{
+    for (const dev_builds::Build& b : all)
+        if (b.kind != dev_builds::Kind::Release && installed(b)) return &b;
+    return nullptr;
+}
+
 bool installed(const dev_builds::Build& b)
 {
-    if (b.kind == dev_builds::Kind::Release) return false;   // a release is told by its version
+    // A release is told by its version (a release build has no commit).
+    if (b.kind == dev_builds::Kind::Release) return app::is_release() && b.version == app::version();
     return !app::commit().empty() && b.commit == app::commit();
+}
+
+std::string release_text(const dev_builds::Build& b)
+{
+    std::string text = brls::getStr("playguard/dev_build/release", b.version);
+    if (b.prerelease) text += " · " + "playguard/dev_build/prerelease"_i18n;
+    return text;
 }
 
 std::string checked_text(const dev_builds::Cache& cache)
@@ -229,13 +323,9 @@ std::string checked_text(const dev_builds::Cache& cache)
     return brls::getStr("playguard/dev_build/checked", (int)(age > 0 ? age / 60 : 0));
 }
 
-void choose(const dev_builds::Build& b)
+void choose(const dev_builds::Build& b, bool newer)
 {
-    std::string running = app::version();
-    if (!app::commit().empty()) running += " (" + app::commit() + ")";
-    std::string body = brls::getStr("playguard/dev_build/confirm", running, label(b));
-    if (b.sha256.empty()) body += "\n\n" + "playguard/dev_build/no_digest"_i18n;
-    ui::confirm(body, "playguard/dev_build/install"_i18n, [b]() { install_now(b); });
+    DevBuildActivity::show(b, newer);
 }
 
 void install_now(const dev_builds::Build& b)
@@ -254,6 +344,54 @@ void sign_in()
     github_login_flow::sign_in([]() { open(); });
 }
 
+void go_back()
+{
+    std::string previous;
+    if (s_busy || !rollback_flow::previous(&previous)) return;
+    std::string running = app::version();
+    if (!app::commit().empty()) running += " (" + app::commit() + ")";
+    ui::confirm(brls::getStr("playguard/dev_build/back_body", running, previous), "playguard/dev_build/back_confirm"_i18n,
+                []() {
+                    // As for an install: whatever Security › Ask for the PIN says.
+                    if (!pin_lock::ask()) {
+                        ui::notify(pin_lock::refusal_text());
+                        return;
+                    }
+                    rollback_flow::go_back_now();
+                });
+}
+
+void find()
+{
+    if (s_busy) {
+        ui::notify("playguard/dev_build/busy"_i18n);
+        return;
+    }
+    ui::prompt_text("playguard/dev_build/find_header"_i18n, "", 40, [](std::string text) {
+        dev_builds::Query q;
+        if (!dev_builds::parse_query(text, &q)) {
+            ui::info(brls::getStr("playguard/dev_build/find_invalid", text));
+            return;
+        }
+        if (s_busy) return;
+        s_busy = true;
+        const std::string what = q.pr ? "#" + std::to_string(q.pr) : q.commit.substr(0, 7);
+        // A few requests, a few seconds: the bar fills at a steady pace meanwhile.
+        DevBuildsActivity::loading(brls::getStr("playguard/dev_build/finding", what), 0.0f, true);
+        ui::in_background("dev build find", [q]() {
+            dev_builds::Build b;
+            std::string err;
+            const bool ok = dev_builds::find(q, &b, &err);
+            brls::sync([ok, b, err]() {
+                s_busy = false;
+                DevBuildsActivity::loaded();
+                if (ok) choose(b);
+                else ui::info(brls::getStr("playguard/dev_build/find_failed", err));
+            });
+        });
+    });
+}
+
 void open(bool force)
 {
     if (s_busy) {
@@ -270,15 +408,31 @@ void open(bool force)
         return;
     }
     s_busy = true;
-    ui::notify("playguard/dev_build/loading"_i18n);
+    brls::Logger::info("dev builds: fetching the list");
+    // The screen opens at once, the list kept (if any) under a bar that shows
+    // how far the fetch is: a toast alone looked like nothing was happening.
+    // Nothing kept yet: an empty list, Sign in already there when signed out.
+    dev_builds::Cache shown = s_cache;
+    if (shown.builds.empty()) shown.needs_login = needs_login;
+    DevBuildsActivity::show(shown);
+    DevBuildsActivity::loading("playguard/dev_build/step_releases"_i18n, 0.0f);
     // Not behind the play log or the game icons (ui::in_background).
     ui::in_background("dev build list", []() {
         dev_builds::Cache fresh;
         std::string err;
-        const bool ok = dev_builds::fetch(&fresh.builds, &fresh.needs_login, &err);
+        const bool ok = dev_builds::fetch(&fresh.builds, &fresh.needs_login, &err, [](float done, dev_builds::Step step) {
+            brls::sync([done, step]() {
+                const char* key = step == dev_builds::Step::Releases    ? "playguard/dev_build/step_releases"
+                                  : step == dev_builds::Step::Artifacts ? "playguard/dev_build/step_artifacts"
+                                  : step == dev_builds::Step::Pulls     ? "playguard/dev_build/step_pulls"
+                                                                        : "playguard/dev_build/step_runs";
+                DevBuildsActivity::loading(brls::getStr(key), done);
+            });
+        });
         fresh.fetched_at = (int64_t)std::time(nullptr);
         brls::sync([ok, fresh, err]() {
             s_busy = false;
+            DevBuildsActivity::loaded();
             if (ok) {
                 keep(fresh);
                 DevBuildsActivity::show(fresh);
@@ -288,7 +442,7 @@ void open(bool force)
             } else if (fresh.needs_login) {
                 DevBuildsActivity::show(fresh);   // signing in may still list them
             } else {
-                ui::info(brls::getStr("playguard/dev_build/list_failed", err));
+                DevBuildsActivity::failed(brls::getStr("playguard/dev_build/list_failed", err));
             }
         });
     });

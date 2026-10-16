@@ -6,7 +6,10 @@
 //   PLAYGUARD_SIM_NUMPAD=1:30   the number pad returns "1:30" ("cancel": B)
 //   PLAYGUARD_SIM_BACKGROUND=1  PlayGuard is not in focus (HOME menu)
 //   PLAYGUARD_SIM_HBLOADER=1    started through hbloader: a store can be launched
+//   PLAYGUARD_SIM_APPLET=1      applet (album) mode: no game to close on exit
 //   PLAYGUARD_SIM_REGION=2      the console region (SetRegion, 2 = Europe)
+//   PLAYGUARD_SIM_HELD_LR=1     L + R held while PlayGuard starts
+//   PLAYGUARD_SIM_BOOT_CHOICE=a the start-up screen's answer (a: A, else B)
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 #include "nx_types.h"
@@ -35,6 +38,10 @@ bool platform_can_launch(void);
 // hbloader starts `path` (an "sdmc:/…" path; also its argv[0]) when PlayGuard
 // exits. False when it cannot.
 bool platform_set_next_load(const char *path);
+// PlayGuard's exit closes the game it was started over (title override) and
+// returns to the HOME menu, rather than to hbloader's next homebrew (hbmenu).
+// Nothing in applet (album) mode, where there is no game to close.
+void platform_exit_to_home(void);
 
 // romfs:/ (the app's own resources) is read from its .nro, which stays open
 // while it is mounted, and the SD card will not rename an open file. Released
@@ -43,6 +50,14 @@ bool platform_set_next_load(const char *path);
 // between. Nothing to do on desktop (the resources are plain files there).
 void platform_romfs_release(void);
 void platform_romfs_mount(void);
+
+// L + R held while PlayGuard starts (read once, before borealis).
+bool platform_held_lr(void);
+// A text screen before borealis starts (libnx's console), for the
+// start-up's own question (action/rollback_flow): `text`, then waits for A
+// (true) or B (false; also when the HOME menu closes PlayGuard). Plain
+// ASCII: the console's font has nothing else.
+bool platform_boot_choice(const char *text);
 
 // The console region (SetRegion: 0 Japan, 1 Americas, 2 Europe,
 // 3 Australia / New Zealand, 4 Hong Kong / Taiwan / Korea, 5 China).

@@ -34,8 +34,14 @@ const char* hint_key(uint32_t rc)
     switch (rc) {
         case 0xF601: return "session_closed";   // 2001-0123 SessionClosed
         case 0xF80E: return "bad_pin_format";
-        // 2142-0132: reported writing the play timer on 22.1 (NX-Pctl-Manager #5); meaning unknown.
-        case 0x1088E: return "pctl_0132";
+        // The 22.5.0 pctl sysmodule (NX-Pctl-Manager's docs/pctl-reverse-engineering.md):
+        // 2142-0120, the PIN check of 1201 refusing a wrong or malformed PIN;
+        case 0xF08E: return "wrong_pin";
+        // 2142-0132, the same check with no PIN registered (also reported
+        // writing the play timer on 22.1, NX-Pctl-Manager #5);
+        case 0x1088E: return "no_pin";
+        // 2142-0135, its settings manager not set up yet.
+        case 0x10E8E: return "pctl_not_ready";
         // 2142-0223 (switchbrew): IsAnyInternetRequestAccepted returned false, no connection.
         case 0x1BE8E: return "no_internet";
         // 2116-0102 (switchbrew: OffsetInvalid): switch-time saw it reading a never-set network clock.

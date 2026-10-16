@@ -31,20 +31,44 @@ struct Sink
     bool         file_error = false;
     std::function<void(uint64_t, uint64_t)> progress{};
     CURL*        curl = nullptr;
+    uint64_t     base = 0;          // bytes already in the file (a download resumed)
+    bool         status_seen = false;
+    const std::atomic<bool>* cancel = nullptr;   // set: the transfer stops (download())
 };
 
-// Called by curl about once a second, even while waiting for the server.
-int on_progress(void*, curl_off_t, curl_off_t, curl_off_t, curl_off_t)
+bool cancelled(const Sink* sink)
 {
-    return s_abort ? 1 : 0;   // non-zero aborts the transfer
+    return sink && sink->cancel && sink->cancel->load();
+}
+
+// Called by curl about once a second, even while waiting for the server.
+int on_progress(void* user, curl_off_t, curl_off_t, curl_off_t, curl_off_t)
+{
+    return s_abort || cancelled(static_cast<const Sink*>(user)) ? 1 : 0;   // non-zero aborts the transfer
 }
 
 size_t on_data(char* data, size_t size, size_t count, void* user)
 {
     auto* sink = static_cast<Sink*>(user);
-    if (s_abort) return 0;
+    if (s_abort || cancelled(sink)) return 0;
     const size_t n = size * count;
-    const size_t have = sink->file ? sink->written : sink->body->size();
+    // A resumed download the server answers in full (200, not 206): it
+    // starts over, from an empty file.
+    if (sink->file && sink->base && !sink->status_seen) {
+        sink->status_seen = true;
+        long status = 0;
+        curl_easy_getinfo(sink->curl, CURLINFO_RESPONSE_CODE, &status);
+        if (status != 206) {
+            std::fflush(sink->file);
+            if (::ftruncate(::fileno(sink->file), 0) != 0) {
+                sink->file_error = true;
+                return 0;
+            }
+            std::rewind(sink->file);
+            sink->base = 0;
+        }
+    }
+    const size_t have = sink->file ? sink->base + sink->written : sink->body->size();
     if (!http_logic::fits(have, n, sink->max)) {
         sink->overflow = true;
         return 0;   // aborts the transfer (CURLE_WRITE_ERROR)
@@ -61,7 +85,7 @@ size_t on_data(char* data, size_t size, size_t count, void* user)
     if (sink->progress) {
         curl_off_t total = -1;
         curl_easy_getinfo(sink->curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &total);
-        sink->progress(sink->written, total > 0 ? (uint64_t)total : 0);
+        sink->progress(sink->base + sink->written, total > 0 ? sink->base + (uint64_t)total : 0);
     }
     return n;
 }
@@ -132,10 +156,12 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
     if (to_file) {   // a long transfer: give up on a stall rather than at the end
         curl_easy_setopt(curl, CURLOPT_LOW_SPEED_LIMIT, 1L);
         curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 30L);
+        if (to_file->base) curl_easy_setopt(curl, CURLOPT_RESUME_FROM_LARGE, (curl_off_t)to_file->base);
     }
     curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
     curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, on_progress);
+    curl_easy_setopt(curl, CURLOPT_XFERINFODATA, &sink);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, agent.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, on_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &sink);
@@ -202,11 +228,12 @@ bool redirect(const std::string& url, std::string* target, std::string* error, c
 }
 
 bool download(const std::string& url, const std::string& path, std::string* error, size_t max_bytes,
-              long timeout_s, std::function<void(uint64_t, uint64_t)> progress)
+              long timeout_s, std::function<void(uint64_t, uint64_t)> progress, uint64_t resume_from,
+              const std::atomic<bool>* cancel)
 {
     // Owner-writable only (fopen would ask for 0666): an executable lands here.
-    const int fd = ::open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    FILE* file = fd >= 0 ? ::fdopen(fd, "wb") : nullptr;
+    const int fd = ::open(path.c_str(), O_WRONLY | O_CREAT | (resume_from ? O_APPEND : O_TRUNC), 0644);
+    FILE* file = fd >= 0 ? ::fdopen(fd, resume_from ? "ab" : "wb") : nullptr;
     if (!file) {
         if (fd >= 0) ::close(fd);
         if (error) *error = "cannot create " + path;
@@ -215,10 +242,16 @@ bool download(const std::string& url, const std::string& path, std::string* erro
     std::string unused;
     Sink sink{ &unused, max_bytes };
     sink.file = file;
+    sink.base = resume_from;
     sink.progress = std::move(progress);
+    sink.cancel = cancel;
     Extra x;
     x.to_file = &sink;
     bool ok = perform(url, x, &unused, error, max_bytes, timeout_s, nullptr);
+    if (cancel && cancel->load()) {
+        if (error) *error = "cancelled";
+        ok = false;
+    }
     if (std::fclose(file) != 0 && ok) {
         if (error) *error = "cannot write the file";
         ok = false;

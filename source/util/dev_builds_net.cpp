@@ -45,6 +45,9 @@ bool api_get(const std::string& path, const char* name, const std::string& token
 {
 #ifndef __SWITCH__
     if (const char* folder = sim()) {
+        // PLAYGUARD_SIM_DEV_BUILDS_DELAY: each answer takes that many ms (the bar shows).
+        if (const char* delay = std::getenv("PLAYGUARD_SIM_DEV_BUILDS_DELAY"))
+            std::this_thread::sleep_for(std::chrono::milliseconds(std::atoi(delay)));
         if (std::strcmp(folder, "offline") == 0 || !paths::read_file(std::string(folder) + "/" + name, *body)) {
             if (error) *error = "simulated: no connection";
             return false;
@@ -57,18 +60,25 @@ bool api_get(const std::string& path, const char* name, const std::string& token
 }
 }   // namespace
 
-bool fetch(std::vector<Build>* out, bool* needs_login, std::string* error)
+bool fetch(std::vector<Build>* out, bool* needs_login, std::string* error, Progress progress)
 {
     out->clear();
     const std::string token = github_auth::token();
     *needs_login = token.empty();
     std::string body, err;
     bool reached = false;
+    // Signed out, the releases are all there is to fetch.
+    auto step = [&progress, &token](float done, Step s) {
+        if (progress) progress(token.empty() ? (done > 0 ? 1.0f : 0.0f) : done, s);
+    };
+    step(0.0f, Step::Releases);
 
-    Build release;
-    if (api_get("/releases/latest", "latest.json", token, &body, &err, 512 * 1024)) {
+    // The last releases, newest first (each one's notes come along: a few
+    // KB apiece).
+    if (api_get("/releases?per_page=" + std::to_string(MAX_RELEASES), "releases.json", token, &body, &err,
+                4 * 1024 * 1024)) {
         reached = true;
-        if (parse_release(body, &release)) out->push_back(release);
+        parse_releases(body, out);
     }
     if (!token.empty()) {
         // The artifacts of the last runs, newest first, 100 a page: the API
@@ -82,7 +92,9 @@ bool fetch(std::vector<Build>* out, bool* needs_login, std::string* error)
         std::vector<Artifact> artifacts;
         std::vector<Pull> pulls;
         bool a = false;
+        // The share of each step: the artifacts' pages take most of it.
         for (int page = 1; page <= 5; page++) {
+            step(0.15f + 0.1f * (page - 1), Step::Artifacts);
             size_t listed = 0;
             if (!api_get("/actions/artifacts?per_page=100&page=" + std::to_string(page), "artifacts.json", token,
                          &body, &err, 4 * 1024 * 1024) ||
@@ -91,14 +103,79 @@ bool fetch(std::vector<Build>* out, bool* needs_login, std::string* error)
             a = true;
             if (listed < 100) break;
         }
+        step(0.65f, Step::Pulls);
         const bool p = api_get("/pulls?state=open&per_page=50", "pulls.json", token, &body, &err, 4 * 1024 * 1024) &&
                        parse_pulls(body, &pulls);
         reached |= a || p;
-        for (Build& b : combine(artifacts, pulls)) out->push_back(std::move(b));
+        std::vector<Build> builds = combine(artifacts, pulls);
+        // How the runs that made them ended: the build workflow's last 100
+        // runs (an older one stays unknown). Nice to have: no answer, no state.
+        step(0.85f, Step::Runs);
+        std::vector<Run> runs;
+        if (api_get("/actions/workflows/build.yml/runs?per_page=100", "runs.json", token, &body, &err, 8 * 1024 * 1024) &&
+            parse_runs(body, &runs))
+            apply_runs(&builds, runs);
+        for (Build& b : builds) out->push_back(std::move(b));
     }
+    step(1.0f, Step::Runs);
     if (!out->empty()) return true;
     if (error) *error = reached ? std::string("no build found") : err;
     return false;
+}
+
+bool find(const Query& q, Build* out, std::string* error)
+{
+    const std::string token = github_auth::token();
+    std::string body, err;
+    auto fail = [error](const std::string& why) {
+        if (error) *error = why;
+        return false;
+    };
+    if (token.empty()) return fail("sign in to GitHub first");
+    Pull pull;
+    std::string sha;
+    if (q.pr) {
+        if (!api_get("/pulls/" + std::to_string(q.pr), ("pull_" + std::to_string(q.pr) + ".json").c_str(), token, &body,
+                     &err, 4 * 1024 * 1024))
+            return fail(err == "HTTP 404" ? "no pull request #" + std::to_string(q.pr) : err);
+        if (!parse_pull(body, &pull)) return fail("unexpected answer from GitHub");
+        // Never a fork's build: nobody with write access has reviewed its code.
+        if (pull.head_repo != pull.repo) return fail("pull request from a fork");
+        sha = pull.head_sha;
+    } else {
+        if (!api_get("/commits/" + q.commit, "commit.json", token, &body, &err, 4 * 1024 * 1024))
+            return fail(err == "HTTP 404" || err == "HTTP 422" ? "no commit " + q.commit : err);
+        if (!parse_commit(body, &sha)) return fail("unexpected answer from GitHub");
+    }
+    // The build workflow's runs of that commit, then the newest one's artifact.
+    std::vector<Run> runs;
+    if (!api_get("/actions/workflows/build.yml/runs?per_page=20&head_sha=" + sha, "runs.json", token, &body, &err,
+                 4 * 1024 * 1024) ||
+        !parse_runs(body, &runs))
+        return fail(err.empty() ? "unexpected answer from GitHub" : err);
+    for (const Run& r : runs) {
+        if (r.sha != sha) continue;   // the simulated folder answers any commit
+        if (r.head_repo != r.repo) continue;   // a fork's run of the same commit
+        std::vector<Artifact> artifacts;
+        if (!api_get("/actions/runs/" + std::to_string(r.id) + "/artifacts?per_page=100", "run_artifacts.json", token,
+                     &body, &err, 4 * 1024 * 1024) ||
+            !parse_artifacts(body, &artifacts))
+            continue;
+        Build b;
+        if (!newest_build(artifacts, q.pr ? Kind::PullRequest : Kind::Commit, &b)) continue;
+        b.ci = r.ci;
+        b.title = r.title;
+        b.notes = r.message;
+        if (q.pr) {
+            b.pr = pull.number;
+            b.title = pull.title;
+            b.notes = pull.body;
+            b.page = pull.page;
+        }
+        *out = b;
+        return true;
+    }
+    return fail("no build of " + (q.pr ? "#" + std::to_string(q.pr) : sha.substr(0, 7)) + " left (artifacts expire after 90 days)");
 }
 
 bool fetch_release(Build* out, std::string* error)
@@ -114,7 +191,7 @@ bool fetch_release(Build* out, std::string* error)
 }
 
 bool download(const Build& b, const std::string& path, std::string* error,
-              std::function<void(uint64_t done, uint64_t total)> progress)
+              std::function<void(uint64_t done, uint64_t total)> progress, const std::atomic<bool>* cancel)
 {
     if (b.size > MAX_DOWNLOAD) {
         if (error) *error = "too large for PlayGuard";
@@ -122,36 +199,90 @@ bool download(const Build& b, const std::string& path, std::string* error,
     }
     // An artifact arrives as a zip next to the target, playguard.nro is taken out of it.
     const std::string file = b.artifact ? path + ".zip" : path;
+    // Received into <file>.part; a download cut short leaves it, with what it
+    // is of (<file>.part.json), and the next one of the same build goes on
+    // from there.
+    const std::string part = file + ".part", meta = part + ".json";
+    const std::string identity = b.url + " " + std::to_string(b.size) + " " + b.sha256 + "\n";
+    uint64_t resume_from = 0;
+    {
+        std::string kept;
+        FILE* f = std::fopen(part.c_str(), "rb");
+        if (f && paths::read_file(meta, kept) && kept == identity && std::fseek(f, 0, SEEK_END) == 0) {
+            const long have = std::ftell(f);
+            if (have > 0 && (uint64_t)have < b.size) resume_from = (uint64_t)have;
+        }
+        if (f) std::fclose(f);
+        if (!resume_from) std::remove(part.c_str());
+        std::string werr;
+        if (!paths::atomic_write(meta, identity, &werr)) std::remove(meta.c_str());   // only loses the resume
+    }
     bool ok;
 #ifndef __SWITCH__
     if (sim()) {
         std::string content;
         ok = b.url.compare(0, 8, "https://") == 0 && paths::read_file(b.url.substr(8), content);
-        // A few steps, slow enough for the progress bar to be seen.
-        for (int i = 1; ok && progress && i <= 4; i++) {
+        // A few steps, slow enough for the progress bar to be seen, and
+        // for the smoke test to cancel one.
+        for (int i = 1; ok && progress && i <= 8; i++) {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            progress(content.size() * i / 4, content.size());
+            if (cancel && cancel->load()) {
+                if (error) *error = "cancelled";
+                ok = false;
+                break;
+            }
+            progress(content.size() * i / 8, content.size());
         }
-        ok = ok && paths::atomic_write(file, content, error);
+        if (ok) {
+            FILE* f = std::fopen(part.c_str(), resume_from ? "ab" : "wb");
+            const std::string rest = resume_from < content.size() ? content.substr(resume_from) : "";
+            ok = f && std::fwrite(rest.data(), 1, rest.size(), f) == rest.size();
+            if (f && std::fclose(f) != 0) ok = false;
+        }
         if (!ok && error && error->empty()) *error = "simulated: cannot read " + b.url;
     } else
 #endif
-    if (b.artifact) {
-        // The API answers with a short-lived signed link to the zip, on
-        // another host: fetched without the token.
-        std::string link;
-        // The token only ever goes to the API itself, whatever the list says.
-        const bool api = b.url.compare(0, 23, "https://api.github.com/") == 0;
-        ok = http::redirect(b.url, &link, error, github_auth::api_headers(api ? github_auth::token() : ""));
-        // A token without the Actions permission (an older sign-in) lists the
-        // builds but is refused the download.
-        if (!ok && error && (*error == "HTTP 401" || *error == "HTTP 403"))
-            *error += ": GitHub refused the download, sign out of GitHub and sign in again";
-        if (ok) ok = http::download(link, file, error, (size_t)b.size + 1, 600, progress);
-    } else {
-        ok = http::download(b.url, file, error, (size_t)b.size + 1, 600, progress);
+    {
+        std::string link = b.url;
+        ok = true;
+        if (b.artifact) {
+            // The API answers with a short-lived signed link to the zip, on
+            // another host: fetched without the token (asked again for a
+            // resumed download, the last one has expired).
+            // The token only ever goes to the API itself, whatever the list says.
+            const bool api = b.url.compare(0, 23, "https://api.github.com/") == 0;
+            ok = http::redirect(b.url, &link, error, github_auth::api_headers(api ? github_auth::token() : ""));
+            // A token without the Actions permission (an older sign-in) lists the
+            // builds but is refused the download.
+            if (!ok && error && (*error == "HTTP 401" || *error == "HTTP 403"))
+                *error += ": GitHub refused the download, sign out of GitHub and sign in again";
+        }
+        if (ok) ok = http::download(link, part, error, (size_t)b.size + 1, 600, progress, resume_from, cancel);
+        // The part kept no longer matches what the server has: from the start.
+        if (!ok && resume_from && error && *error == "HTTP 416" && !(cancel && cancel->load())) {
+            resume_from = 0;
+            ok = http::download(link, part, error, (size_t)b.size + 1, 600, progress, 0, cancel);
+        }
     }
-    if (ok) ok = verify_file(file, b.size, b.sha256, error);
+    if (!ok) {
+        // Cut short: what arrived is kept for the next attempt (nothing: nothing kept).
+        FILE* f = std::fopen(part.c_str(), "rb");
+        const bool some = f && std::fgetc(f) != EOF;
+        if (f) std::fclose(f);
+        if (!some) {
+            std::remove(part.c_str());
+            std::remove(meta.c_str());
+        }
+        return false;
+    }
+    // Complete: checked whole, the part kept no more (a bad one would only fail again).
+    ok = verify_file(part, b.size, b.sha256, error);
+    std::remove(meta.c_str());
+    if (ok && std::rename(part.c_str(), file.c_str()) != 0) {
+        if (error) *error = "cannot rename the download";
+        ok = false;
+    }
+    std::remove(part.c_str());
     if (ok && b.artifact) ok = zip_read::extract(file, "playguard.nro", path, MAX_DOWNLOAD, error);
     if (ok) ok = verify_nro(path, error);
     if (b.artifact) std::remove(file.c_str());

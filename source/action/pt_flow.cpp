@@ -9,6 +9,7 @@
 #include "action/history_flow.hpp"
 #include "action/pt_logic.hpp"
 #include "app.hpp"
+#include "core/platform.h"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "view/pt_week.hpp"
@@ -88,6 +89,28 @@ Result unlock_temporarily()
 void keep_unlocked()
 {
     set_relock_pending(false);
+}
+
+static bool s_lock_at_exit = false;
+
+void lock_at_exit()
+{
+    set_relock_pending(true);
+    s_lock_at_exit = true;
+}
+
+void lock_at_exit_if_asked()
+{
+    if (!s_lock_at_exit) return;
+    const Result rc = pctl_relock();
+    if (R_FAILED(rc)) {
+        brls::Logger::error("lock at exit: failed ({:#x}), locked again at the next start", (unsigned)rc);
+        return;
+    }
+    brls::Logger::info("lock at exit: locked");
+    history_flow::record_event("relock");
+    set_relock_pending(false);
+    platform_exit_to_home();
 }
 
 std::string with_link_note(const std::string& body, const PctlStatus* st)

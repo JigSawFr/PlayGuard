@@ -26,6 +26,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 - 🕒 **Network clock** — set from public NTP servers, so the timer counts right on a console that never reaches Nintendo.
 - 📱 **Companion app** — unlink it, even on a second-hand console.
 - ↩️ **History and backups** — every change is logged and can be undone.
+- 🔔 **Notifications** — a bell gathers what needs you (an alarm off, a clock drifting, changes made elsewhere), with the fix one press away.
 - 🌍 Every console language, light and dark themes.
 
 ## Compatibility

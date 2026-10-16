@@ -145,5 +145,16 @@ void relock_if_interrupted();
 Result unlock_temporarily();
 // Quitting while unlocked, "Quit, still unlocked": a choice, so the record goes.
 void keep_unlocked();
+// Quitting while unlocked, "Lock and quit": the lock waits for the end of
+// main(), once the screen is gone (lock_at_exit_if_asked). Locked while the
+// app still ran, the console would at once stop the game PlayGuard runs over
+// (the play timer's "limit reached", the PIN) with PlayGuard behind it, and
+// close it only after that. Recorded first: a lock that fails then, with no
+// screen left to say so, is made at the next start.
+void lock_at_exit();
+// In main(), after the main loop: the lock asked for above, then the end of
+// the game PlayGuard runs over (back to the HOME menu). On failure the record
+// stays and hbloader's next homebrew starts as usual.
+void lock_at_exit_if_asked();
 
 }   // namespace pt_flow

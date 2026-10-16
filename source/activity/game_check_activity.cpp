@@ -11,6 +11,7 @@
 #include <strings.h>
 #include <vector>
 
+#include "action/game_notice.hpp"
 #include "action/history_flow.hpp"
 #include "app.hpp"
 #include "util/paths.hpp"
@@ -554,6 +555,8 @@ void GameCheckActivity::show()
         by_group[gamecheck_category(&g, issue, hos)].push_back({ g, issue });
     }
     const u32 count = (u32)this->cache.games.size();
+    // The bell follows every check, repairs included (not halfway through one).
+    if (!this->checking && !this->list_rc) game_notice::note(this->cache.games, hos);
     // In a section, the games with the same problem together, by name.
     for (auto& games : by_group)
         std::stable_sort(games.begin(), games.end(), [](const Broken& a, const Broken& b) {

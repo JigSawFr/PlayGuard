@@ -1,5 +1,6 @@
 // Host tests for source/util/sha256.cpp, dev_builds.cpp, zip_read.cpp and
-// github_auth.cpp: the SHA-256 test vectors, digests, the latest release, the
+// github_auth.cpp: the SHA-256 test vectors, digests, the latest release and
+// the list of releases, the
 // artifact and pull-request lists and how they combine (main's commits, each
 // open pull request's newest build, forks included), the cached list, the download checks
 // (size, SHA-256, NRO header), zip extraction (deflated, stored, a changed
@@ -95,6 +96,156 @@ static void test_release()
         R"({"message": "Not Found"})", "[]", "not json", "",
     };
     for (const char* j : bad) CHECK(!dev_builds::parse_release(j, &b));
+}
+
+// One release of GET /releases.
+static std::string release_json(const std::string& tag, bool prerelease, bool draft, const std::string& asset = "playguard.nro")
+{
+    return R"({"tag_name": ")" + tag + R"(", "prerelease": )" + (prerelease ? "true" : "false") +
+           R"(, "draft": )" + (draft ? "true" : "false") + R"(, "body": "notes", "assets": [{"name": ")" + asset +
+           R"(", "size": 1000, "updated_at": "2026-10-01T00:00:00Z", "browser_download_url": "https://github.com/o/r/releases/download/)" +
+           tag + R"(/playguard.nro"}]})";
+}
+
+static void test_releases()
+{
+    std::vector<Build> out;
+    const std::string list = "[" + release_json("v1.3.0-rc.1", true, false) + "," + release_json("v1.2.0", false, false) +
+                             "," + release_json("v1.2.1", false, true) + "," +   // a draft
+                             release_json("v1.1.0", false, false, "playguard.zip") + "," +   // no .nro
+                             release_json("v1.2.0", false, false) + "," +   // the same version again
+                             R"("not a release", {"tag_name": "v0.9.0"},)" + release_json("v1.0.0", false, false) + "]";
+    CHECK(dev_builds::parse_releases(list, &out));
+    if (!CHECK(out.size() == 3)) return;
+    CHECK(out[0].version == "1.3.0-rc.1" && out[0].prerelease && out[0].kind == Kind::Release && !out[0].artifact);
+    CHECK(out[1].version == "1.2.0" && !out[1].prerelease && out[1].size == 1000 && out[1].notes == "notes");
+    CHECK(out[2].version == "1.0.0");
+    // At most `keep`, the newest.
+    out.clear();
+    CHECK(dev_builds::parse_releases(list, &out, 2) && out.size() == 2 && out[1].version == "1.2.0");
+    // Not a list.
+    out.clear();
+    CHECK(!dev_builds::parse_releases(R"({"message": "Not Found"})", &out) && out.empty());
+    CHECK(!dev_builds::parse_releases("not json", &out) && out.empty());
+    CHECK(dev_builds::parse_releases("[]", &out) && out.empty());
+    // The latest release alone still never takes a pre-release.
+    Build b;
+    CHECK(!dev_builds::parse_release(release_json("v1.3.0-rc.1", true, false), &b));
+    CHECK(dev_builds::parse_release(release_json("v1.2.0", false, false), &b) && !b.prerelease);
+}
+
+static void test_find_and_runs()
+{
+    // What Find a build takes.
+    dev_builds::Query q;
+    CHECK(dev_builds::parse_query("38", &q) && q.pr == 38 && q.commit.empty());
+    CHECK(dev_builds::parse_query(" #145 ", &q) && q.pr == 145);
+    CHECK(dev_builds::parse_query("ABCDEF1", &q) && q.pr == 0 && q.commit == "abcdef1");
+    CHECK(dev_builds::parse_query("1234567", &q) && q.commit == "1234567");   // 7 digits: a commit
+    CHECK(dev_builds::parse_query(std::string(40, 'a'), &q) && q.commit.size() == 40);
+    const std::string bad[] = { "", "  ", "#", "0", "#abcdef1", "abcdef", "xyz1234", std::string(41, 'a'), "-3", "3 4" };
+    for (const std::string& t : bad) CHECK(!dev_builds::parse_query(t, &q));
+
+    // One pull request: its description cut on a line, the fork told apart.
+    dev_builds::Pull p;
+    const std::string pull = R"({"number": 38, "title": "feat: x", "body": "## What\nmore",
+        "head": {"ref": "feat/x", "sha": ")" + std::string(40, 'c') + R"(", "repo": {"id": 1}},
+        "base": {"ref": "main", "repo": {"id": 1}}})";
+    CHECK(dev_builds::parse_pull(pull, &p) && p.number == 38 && p.body == "## What\nmore" &&
+          p.head_sha == std::string(40, 'c') && p.head_repo == 1 && p.repo == 1);
+    std::string fork = pull;
+    fork.replace(fork.find(R"("repo": {"id": 1}})"), 18, R"("repo": {"id": 7}})");
+    CHECK(dev_builds::parse_pull(fork, &p) && p.head_repo == 7 && p.repo == 1);
+    CHECK(!dev_builds::parse_pull(R"({"message": "Not Found"})", &p));
+
+    std::string sha;
+    CHECK(dev_builds::parse_commit(R"({"sha": ")" + std::string(40, 'A') + R"("})", &sha) && sha == std::string(40, 'a'));
+    CHECK(!dev_builds::parse_commit(R"({"sha": "abc"})", &sha) && !dev_builds::parse_commit("[]", &sha));
+
+    // The runs: passed, failed (or cancelled), still running.
+    std::vector<dev_builds::Run> runs;
+    const std::string list = R"({"total_count": 4, "workflow_runs": [
+        {"id": 11, "head_sha": ")" + std::string(40, 'a') + R"(", "status": "completed", "conclusion": "success",
+         "head_branch": "main", "repository": {"id": 1}, "head_repository": {"id": 1}},
+        {"id": 12, "head_sha": ")" + std::string(40, 'b') + R"(", "status": "completed", "conclusion": "cancelled"},
+        {"id": 13, "head_sha": ")" + std::string(40, 'c') + R"(", "status": "in_progress", "conclusion": null},
+        {"id": 14, "head_sha": "nope", "status": "completed", "conclusion": "success"}]})";
+    CHECK(dev_builds::parse_runs(list, &runs));
+    if (!CHECK(runs.size() == 3)) return;
+    CHECK(runs[0].ci == dev_builds::Ci::Passed && runs[0].repo == 1 && runs[0].head_repo == 1 && runs[0].branch == "main");
+    CHECK(runs[1].ci == dev_builds::Ci::Failed && runs[2].ci == dev_builds::Ci::Running);
+    CHECK(!dev_builds::parse_runs("[]", &runs));
+    std::vector<Build> builds(3);
+    builds[0].artifact = true, builds[0].run = 12;
+    builds[1].artifact = true, builds[1].run = 99;   // an older run, not listed
+    builds[2].run = 11;                               // not an artifact
+    dev_builds::apply_runs(&builds, runs);
+    CHECK(builds[0].ci == dev_builds::Ci::Failed && builds[1].ci == dev_builds::Ci::Unknown &&
+          builds[2].ci == dev_builds::Ci::Unknown);
+
+    // A commit of main takes its run's title and message; a pull request keeps its own.
+    std::vector<dev_builds::Run> titled(1);
+    titled[0].id = 21, titled[0].title = "fix(ui): wrap (#141)", titled[0].message = "fix(ui): wrap (#141)\n\nbody";
+    std::vector<Build> two(2);
+    two[0].artifact = two[1].artifact = true, two[0].run = two[1].run = 21;
+    two[0].kind = Kind::Main;
+    two[1].kind = Kind::PullRequest, two[1].title = "PR title";
+    dev_builds::apply_runs(&two, titled);
+    CHECK(two[0].title == "fix(ui): wrap (#141)" && two[0].notes == titled[0].message);
+    CHECK(two[1].title == "PR title" && two[1].notes.empty());
+    std::vector<dev_builds::Run> with_message;
+    CHECK(dev_builds::parse_runs(R"({"workflow_runs": [{"id": 5, "head_sha": ")" + std::string(40, 'a') +
+                                     R"(", "status": "completed", "conclusion": "success", "display_title": "feat: x\u202e",
+                                     "head_commit": {"message": "feat: x\n\nlong"}}]})", &with_message) &&
+          with_message.size() == 1 && with_message[0].title == "feat: x" && with_message[0].message == "feat: x\n\nlong");
+
+    // Conventional titles.
+    dev_builds::Subject t = dev_builds::parse_subject("feat(play-timer)!: show the time over the limit (#140)");
+    CHECK(t.type == "feat" && t.scope == "play-timer" && t.breaking && t.pr == 140 && t.text == "show the time over the limit");
+    t = dev_builds::parse_subject("docs: a video tour (#142)");
+    CHECK(t.type == "docs" && t.scope.empty() && !t.breaking && t.pr == 142 && t.text == "a video tour");
+    t = dev_builds::parse_subject("chore(main): release 1.1.0");
+    CHECK(t.type == "chore" && t.scope == "main" && t.pr == 0 && t.text == "release 1.1.0");
+    t = dev_builds::parse_subject("Merge branch 'x': into y (#abc)");
+    CHECK(t.type.empty() && t.pr == 0 && t.text == "Merge branch 'x': into y (#abc)");
+    t = dev_builds::parse_subject("Update README.md");
+    CHECK(t.type.empty() && t.text == "Update README.md");
+    t = dev_builds::parse_subject("fix(: nope");
+    CHECK(t.type.empty() && t.text == "fix(: nope");
+    CHECK(dev_builds::parse_subject("").text.empty());
+
+    // A run's artifacts: the newest build one.
+    std::vector<dev_builds::Artifact> arts(2);
+    arts[0].date = "2026-10-01T00:00:00Z", arts[0].commit = "aaaaaaa", arts[0].run = 5, arts[0].branch = "fix/y";
+    arts[1].date = "2026-10-02T00:00:00Z", arts[1].commit = "bbbbbbb", arts[1].run = 6, arts[1].branch = "fix/y";
+    Build b;
+    CHECK(dev_builds::newest_build(arts, Kind::Commit, &b) && b.commit == "bbbbbbb" && b.run == 6 && b.artifact &&
+          b.kind == Kind::Commit && b.branch == "fix/y");
+    CHECK(!dev_builds::newest_build({}, Kind::Commit, &b));
+
+    // Newer than the running build.
+    Build rel;
+    rel.kind = Kind::Release;
+    rel.version = "1.2.0";
+    CHECK(dev_builds::newer(rel, "1.1.0", nullptr) && !dev_builds::newer(rel, "1.2.0", nullptr) &&
+          !dev_builds::newer(rel, "1.10.0", nullptr) && !dev_builds::newer(rel, "", nullptr));
+    rel.version = "1.2.0-rc.1";
+    CHECK(!dev_builds::newer(rel, "1.2.0", nullptr) && dev_builds::newer(rel, "1.1.0", nullptr));
+    Build running, later, earlier;
+    running.artifact = later.artifact = earlier.artifact = true;
+    running.commit = "aaaaaaa", running.date = "2026-10-05T00:00:00Z";
+    later.commit = "bbbbbbb", later.date = "2026-10-06T00:00:00Z";
+    earlier.commit = "ccccccc", earlier.date = "2026-10-04T00:00:00Z";
+    CHECK(dev_builds::newer(later, "", &running) && !dev_builds::newer(earlier, "", &running) &&
+          !dev_builds::newer(running, "", &running) && !dev_builds::newer(later, "", nullptr));
+
+    // Whole days between two timestamps.
+    CHECK(dev_builds::days_between("2026-10-01T12:00:00Z", "2026-10-04T11:59:59Z") == 2);
+    CHECK(dev_builds::days_between("2026-10-01T12:00:00Z", "2026-10-04T12:00:00Z") == 3);
+    CHECK(dev_builds::days_between("2026-12-31T00:00:00Z", "2027-03-01T00:00:00Z") == 60);
+    CHECK(dev_builds::days_between("2028-02-28T00:00:00Z", "2028-03-01T00:00:00Z") == 2);   // a leap year
+    CHECK(dev_builds::days_between("2026-10-04T00:00:00Z", "2026-10-03T23:00:00Z") == -1);
+    CHECK(dev_builds::days_between("x", "2026-10-03T23:00:00Z") == 0 && dev_builds::days_between("2026-13-01T00:00:00Z", "2026-10-03T00:00:00Z") == 0);
 }
 
 // The artifact holding playguard.nro, named after its build as the workflow
@@ -224,6 +375,7 @@ static void test_cache()
     rel.url = "https://github.com/o/r/releases/download/v1.2.0/playguard.nro";
     rel.size = 5000;
     rel.sha256 = std::string(64, 'a');
+    rel.prerelease = true;
     Build pr;
     pr.kind = Kind::PullRequest;
     pr.artifact = true;
@@ -233,6 +385,10 @@ static void test_cache()
     pr.date = "2026-10-09T12:03:00Z";
     pr.url = "https://api.github.com/repos/o/r/actions/artifacts/1/zip";
     pr.size = 4000;
+    pr.notes = "## What\nit does";
+    pr.expires = "2027-01-07T12:03:00Z";
+    pr.run = 77;
+    pr.ci = dev_builds::Ci::Failed;
     Build bad = pr;
     bad.url = "http://x";   // not https: left out when read back
     // An edited list: anywhere but GitHub is left out too.
@@ -249,10 +405,12 @@ static void test_cache()
     CHECK(dev_builds::decode_cache(dev_builds::encode_cache(c), &back));
     CHECK(back.fetched_at == 1000000 && !back.needs_login && back.builds.size() == 2);
     CHECK(back.builds[0].kind == Kind::Release && back.builds[0].version == "1.2.0" && !back.builds[0].artifact &&
-           back.builds[0].size == 5000 && back.builds[0].sha256 == rel.sha256 && back.builds[0].url == rel.url);
+           back.builds[0].size == 5000 && back.builds[0].sha256 == rel.sha256 && back.builds[0].url == rel.url &&
+           back.builds[0].prerelease);
     CHECK(back.builds[1].kind == Kind::PullRequest && back.builds[1].artifact && back.builds[1].pr == 48 &&
            back.builds[1].title == pr.title && back.builds[1].commit == "abc1234" && back.builds[1].date == pr.date &&
-           back.builds[1].sha256.empty());
+           back.builds[1].sha256.empty() && !back.builds[1].prerelease && back.builds[1].notes == pr.notes &&
+           back.builds[1].expires == pr.expires && back.builds[1].run == 77 && back.builds[1].ci == dev_builds::Ci::Failed);
 
     // Fresh: under ten minutes old, not from the future, same sign-in state, not empty.
     CHECK(dev_builds::cache_fresh(back, 1000000 + 599, false));
@@ -308,6 +466,17 @@ static void test_files()
     CHECK(paths::atomic_write(file, "new"));
     CHECK(dev_builds::replace(dir + "/first.nro", file, &err));
     CHECK(paths::read_file(dir + "/first.nro", got) && got == "new");
+    // Kept as the previous build, the one kept before going.
+    CHECK(paths::atomic_write(target + ".previous", "older"));
+    CHECK(paths::atomic_write(file, "newest"));
+    CHECK(dev_builds::replace(target, file, &err, target + ".previous"));
+    CHECK(paths::read_file(target, got) && got == "newest");
+    CHECK(paths::read_file(target + ".previous", got) && got == content);
+    CHECK(!paths::read_file(target + ".old", got));
+    // Nothing replaced (no target): no previous build made up, the one kept stays.
+    CHECK(paths::atomic_write(file, "x"));
+    CHECK(dev_builds::replace(dir + "/second.nro", file, &err, dir + "/second.nro.previous"));
+    CHECK(!paths::read_file(dir + "/second.nro.previous", got));
 }
 
 static void test_zip()
@@ -405,6 +574,8 @@ int main()
     test_sha256();
     test_names();
     test_release();
+    test_releases();
+    test_find_and_runs();
     test_artifacts();
     test_order();
     test_cache();
