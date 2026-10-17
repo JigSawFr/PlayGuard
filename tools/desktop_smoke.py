@@ -417,7 +417,8 @@ if LOADING:
 if ROLLBACK:
     # A build installed in place whose last start never reached its first
     # screen, the build before it kept: the start-up screen offers it before
-    # anything else, A takes it back and hbloader starts it.
+    # anything else (the PIN set or not), A takes it back and hbloader starts
+    # it. Then L + R, with a PIN and without (see the end of the run).
     env.setdefault("PLAYGUARD_SIM_HBLOADER", "1")
     env["PLAYGUARD_SIM_BOOT_CHOICE"] = "a"
     sd_nro = os.path.join(run_dir, "playguard_data", "sd", "switch", "playguard", "playguard.nro")
@@ -509,6 +510,41 @@ if ROLLBACK:
         fail("the start check was left behind")
     if json.load(open(os.path.join(data, "previous_build.json"))).get("label") != "1.0.0 (1a2b3c4)":
         fail("the build gone back from is not named as the previous one")
+
+    def again(name, extra, until):
+        """Starts PlayGuard once more with L + R held (and A answered); its
+        log in <name>.log. Ended once `until` is logged (it goes on to its
+        window), or after 20 s."""
+        run_env = dict(env, PLAYGUARD_SIM_HELD_LR="1", **extra)
+        run_log_file = os.path.join(OUT, name + ".log")
+        with open(run_log_file, "w") as run_log:
+            p = subprocess.Popen(cmd, cwd=run_dir, env=run_env, stdout=run_log, stderr=subprocess.STDOUT)
+            for _ in range(40):
+                if p.poll() is not None or until in open(run_log_file, errors="replace").read():
+                    break
+                time.sleep(0.5)
+            if p.poll() is None:
+                time.sleep(1)   # the lines logged right after it
+                p.kill()
+            p.wait()
+        return open(run_log_file, errors="replace").read()
+
+    # L + R with a PIN set (the simulated console has one): anyone can hold
+    # them, so the start-up screen only says where to go back, after the
+    # PIN; the two builds stay as they are.
+    text = again("app-lr-pin", {}, "rollback: L + R held, not offered")
+    if "but a PIN is set" not in text or "Go back to the previous build (the PIN is asked)" not in text:
+        fail("L + R with a PIN set did not say where to go back from")
+    if "rollback: back to" in text or "next load: sdmc:" in text:
+        fail("L + R went back to the previous build without the PIN")
+    if open(sd_nro).read() != "the build before" or open(sd_nro + ".previous").read() != "the build that crashes":
+        fail("L + R with a PIN set swapped the two builds")
+    # L + R without a PIN: offered, and A swaps them back.
+    text = again("app-lr-no-pin", {"PLAYGUARD_SIM_NOT_SET_UP": "1"}, "next load: sdmc:")
+    if "L + R were held at start-up." not in text or "rollback: back to" not in text:
+        fail("L + R without a PIN did not offer the previous build")
+    if open(sd_nro).read() != "the build that crashes" or open(sd_nro + ".previous").read() != "the build before":
+        fail("L + R without a PIN did not swap the two builds back")
     print("desktop smoke test passed:", OUT)
     sys.exit(0)
 

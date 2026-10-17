@@ -8,6 +8,7 @@
 #include "action/notices.hpp"
 #include "action/upload_flow.hpp"
 #include "app.hpp"
+#include "core/pctl_ops.h"
 #include "core/platform.h"
 #include "ui/ui.hpp"
 #include "util/launcher.hpp"
@@ -26,6 +27,17 @@ std::string check_file() { return paths::data_dir() + "/boot_check.json"; }
 // Gone back from a build: its name, and `starts` 1 when its start did not
 // finish (0: asked for). Read and removed by the build gone back to.
 std::string back_file() { return paths::data_dir() + "/went_back.json"; }
+
+// The console has a PIN (1206, its length only: the PIN itself is never
+// read here). Before config::load() and borealis, in a session of its own.
+// A read that fails counts as a PIN: L + R then only says where to go back.
+bool pin_set()
+{
+    u32 length = 0;
+    const Result rc = pctl_lock_state(&length, nullptr);
+    if (R_FAILED(rc)) brls::Logger::warning("rollback: the PIN could not be checked (0x{:08X})", (unsigned)rc);
+    return R_FAILED(rc) || length > 0;
+}
 
 std::string running_label()
 {
@@ -67,13 +79,26 @@ bool at_start()
     }
     const bool have_previous = paths::file_exists(rollback::previous_file(nro));
     if (!have_previous) return false;
-    const rollback::Offer offer = rollback::offer_at_start(checked, before, platform_held_lr(), have_previous);
+    // pctl is asked only when L + R are held: a start that did not finish
+    // goes back whatever it says (rollback::offer_at_start).
+    const bool held = platform_held_lr();
+    const rollback::Offer offer = rollback::offer_at_start(checked, before, held, have_previous, held && pin_set());
     if (offer == rollback::Offer::None) return false;
 
     std::string previous;
     if (!rollback::read_label(label_file(), &previous)) previous = "the previous build";
     // Plain ASCII, in English: borealis (and the translations) are not up yet.
     std::string text = "\n  PlayGuard " + running_label() + "\n\n  ";
+    if (offer == rollback::Offer::Refused) {
+        // Anyone can hold L + R: with a PIN, going back is the app's, where
+        // it is asked (dev_build_flow::go_back).
+        text += "L + R were held at start-up, but a PIN is set.\n\n  To go back to " + previous +
+                ", in developer mode:\n  Preferences > Help & diagnostics > Install another build >\n"
+                "  Go back to the previous build (the PIN is asked).\n\n  (A) / (B)  Start PlayGuard\n";
+        brls::Logger::info("rollback: L + R held, not offered (a PIN is set)");
+        platform_boot_choice(text.c_str());
+        return false;
+    }
     text += offer == rollback::Offer::Crashed
                 ? "Its last start did not finish (it may have crashed)."
                 : "L + R were held at start-up.";
