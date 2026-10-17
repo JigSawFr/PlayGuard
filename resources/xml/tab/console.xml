@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Console: the network clock (its own screen, the former tab), the
-     installed games check, then what the console runs (firmware, Atmosphère,
-     hekate: A on each opens its release notes), compatibility, storage, the
-     serial number and the game patches. -->
+<!-- Console: under Diagnostics, the network clock (its own screen, the
+     former tab) and the installed games check, then what the console runs
+     (firmware, Atmosphère, hekate: A on each opens its release notes),
+     compatibility, storage, the serial number and the game patches. -->
 
 <brls:Box
     width="auto"
@@ -24,6 +24,7 @@
             paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
             paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
 
+            <brls:Header title="@i18n/playguard/tools/section_diag" marginBottom="8"/>
             <brls:DetailCell id="cn_clock" title="@i18n/playguard/tabs/clock"/>
             <brls:DetailCell id="cn_games" title="@i18n/playguard/games/open"/>
             <brls:Header title="@i18n/playguard/tools/section_console" marginTop="24" marginBottom="8"/>
