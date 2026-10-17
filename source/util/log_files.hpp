@@ -11,7 +11,7 @@
 //   logs/play_timer/block.json                 Developer › play-timer block reference
 //
 // The reports, the crashes, the sessions and the uploads are pruned with the limits of
-// Preferences › Help & diagnostics (config: logs_keep, logs_keep_days, logs_keep_mb), each folder on
+// About › Help & diagnostics (config: logs_keep, logs_keep_days, logs_keep_mb), each folder on
 // its own.
 // The date in the name (local time, as the console shows it) is what counts,
 // not the file's date, which the SD card does not always keep.

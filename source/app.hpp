@@ -39,7 +39,7 @@ constexpr const char* KOFI_URL     = "https://ko-fi.com/jigsawfr";
 bool        read_only();
 void        set_read_only(bool on);
 
-// Developer mode: the developer tools at the end of Preferences › Help & diagnostics, and the
+// Developer mode: the developer tools at the end of About › Help & diagnostics, and the
 // full diagnostic of Play timer › Advanced.
 // Saved in the preferences, or on for this session only (firmware screen,
 // "read-only + developer mode").

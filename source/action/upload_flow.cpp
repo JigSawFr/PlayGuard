@@ -154,7 +154,7 @@ void send_gist(const Parts& parts, const Kind& kind)
                     // then forgotten): signing in again replaces it, then the
                     // same files go. A 403 or 404 keeps it (a 403 can also be
                     // a rate limit): the GitHub account cell signs out.
-                    const std::string where = "playguard/tabs/preferences"_i18n + " › " + "playguard/prefs/help"_i18n +
+                    const std::string where = "playguard/tabs/about"_i18n + " › " + "playguard/prefs/help"_i18n +
                                               " › " + "playguard/github/account"_i18n;
                     ui::confirm(brls::getStr("playguard/upload/relogin", where), "playguard/upload/sign_in"_i18n,
                                 [parts, kind]() {

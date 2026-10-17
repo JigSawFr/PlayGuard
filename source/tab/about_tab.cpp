@@ -4,6 +4,7 @@
 #include "action/update_flow.hpp"
 #include "activity/changelog_activity.hpp"
 #include "app.hpp"
+#include "tab/help_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
@@ -28,6 +29,20 @@ AboutTab::AboutTab()
 
     update_cell->registerClickAction([](brls::View*) {
         update_flow::check_now();
+        return true;
+    });
+    update_daily->init("playguard/tools/update_daily"_i18n, config::get().update_daily, [](bool on) {
+        config::get().update_daily = on;
+        ui::save_config();
+    });
+    update_via->registerClickAction([this](brls::View*) {
+        update_flow::choose_method([this]() { this->refresh(); });
+        return true;
+    });
+
+    help->setDetailText(ui::opens());
+    help->registerClickAction([](brls::View*) {
+        ui::open_screen(new HelpTab(), "playguard/prefs/help"_i18n);
         return true;
     });
 
@@ -90,6 +105,8 @@ void AboutTab::refresh()
 {
     const auto& cfg = config::get();
     update_cell->setDetailText(cfg.update_checked.empty() ? "" : brls::getStr("playguard/tools/update_last", cfg.update_checked));
+    update_daily->setOn(cfg.update_daily, false);
+    update_via->setDetailText(update_flow::method_text());
 
     SysInfo si;
     sysinfo_get(&si);
