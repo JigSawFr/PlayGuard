@@ -4,6 +4,7 @@
 #include <string>
 
 #include "action/notices.hpp"
+#include "activity/notices_activity.hpp"
 #include "ui/ui.hpp"
 
 static constexpr float SIZE = 40;
@@ -17,6 +18,8 @@ NoticeBell::NoticeBell()
     this->setHeight(SIZE);
     this->setAlignSelf(brls::AlignSelf::CENTER);
     this->setMarginRight(20);
+    // A tap opens the list, as Y does (hitTest finds it, focusable or not).
+    this->addGestureRecognizer(new brls::TapGestureRecognizer(this, []() { NoticesActivity::open(); }));
     this->listener = notices::listen([this]() { this->update(); });
     this->update();
 }
@@ -24,6 +27,13 @@ NoticeBell::NoticeBell()
 NoticeBell::~NoticeBell()
 {
     notices::unlisten(this->listener);
+}
+
+brls::View* NoticeBell::hitTest(brls::Point point)
+{
+    // brls::View::hitTest skips a view that cannot take the focus.
+    if (this->getAlpha() == 0.0f || this->getVisibility() != brls::Visibility::VISIBLE) return nullptr;
+    return this->getFrame().pointInside(point) ? this : nullptr;
 }
 
 void NoticeBell::update()
