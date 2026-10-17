@@ -39,6 +39,7 @@
 #include "util/config.hpp"
 #include "util/crash_dump.h"
 #include "util/crash_report.hpp"
+#include "util/diagnostics.hpp"
 #include "util/http.hpp"
 #include "util/data_move.hpp"
 #include "util/log_files.hpp"
@@ -180,12 +181,11 @@ void start_session()
 // Atmosphère 1.11.1, sysMMC, over a game".
 std::string system_line(const SysInfo& si)
 {
-    char fw[16];
-    sysinfo_version_string(si.hos_version, fw, sizeof(fw));
-    const SysStorage storage = sysinfo_storage(&si);
+    const std::string fw = ui::hos_text(si.hos_version);
+    const char* storage = diagnostic::storage_name(sysinfo_storage(&si));
     return fmt::format("firmware {}, Atmosphère {}, {}, {}", fw,
                        si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : "unknown",
-                       storage == SysStorage_EmuMMC ? "emuMMC" : storage == SysStorage_SysMMC ? "sysMMC" : "storage unknown",
+                       storage ? storage : "storage unknown",
                        si.applet_mode ? "from the Album (applet)" : "over a game");
 }
 

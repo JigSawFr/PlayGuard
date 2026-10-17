@@ -50,16 +50,12 @@ std::string firmware()
 {
     SysInfo si;
     sysinfo_get(&si);
-    char fw[16];
-    sysinfo_version_string(si.hos_version, fw, sizeof(fw));
-    return fw;
+    return ui::hos_text(si.hos_version);
 }
 
 std::string tested_max()
 {
-    char fw[16];
-    sysinfo_version_string(PCTL_FW_TESTED_MAX, fw, sizeof(fw));
-    return fw;
+    return ui::hos_text(PCTL_FW_TESTED_MAX);
 }
 
 void prepare()

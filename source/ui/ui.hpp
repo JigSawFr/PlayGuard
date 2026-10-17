@@ -192,6 +192,7 @@ private:
 };
 
 // System / compatibility strings shared by the dashboard and the About section.
+std::string hos_text(u32 version);                        // "23.0.1" (MAKEHOSVERSION), "?" for 0
 std::string fw_text(const SysInfo& info);                 // "23.0.1 · Atmosphère 1.12.0"
 std::string compat_text(const SysInfo& info, NVGcolor* color = nullptr);
 

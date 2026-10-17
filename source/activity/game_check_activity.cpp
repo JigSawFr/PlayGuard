@@ -41,13 +41,6 @@ using game_verify_flow::Verified;
 
 constexpr float ICON_SIZE = 72;
 
-std::string hos_text(u32 v)
-{
-    char buf[16];
-    sysinfo_version_string(v, buf, sizeof(buf));
-    return buf;
-}
-
 // A game without a name: its ID.
 std::string unnamed_text(const std::string& id)
 {
@@ -74,7 +67,7 @@ std::string version_text(const GameFacts& g, u32 version)
 std::string short_text(const GameFacts& g, GameIssue issue)
 {
     const std::string key = issue_text_key(issue, "short");
-    if (issue == GC_FIRMWARE_TOO_OLD) return brls::getStr(key, hos_text(required_hos(g)));
+    if (issue == GC_FIRMWARE_TOO_OLD) return brls::getStr(key, ui::hos_text(required_hos(g)));
     return brls::getStr(key);
 }
 
@@ -110,8 +103,8 @@ std::string cause_text(const GameFacts& g, GameIssue issue, u32 current_hos)
 {
     const std::string key = issue_text_key(issue, "cause");
     switch (issue) {
-        case GC_FIRMWARE_TOO_OLD: return brls::getStr(key, hos_text(required_hos(g)), hos_text(current_hos));
-        case GC_KEY_TOO_NEW:      return brls::getStr(key, hos_text(current_hos), (int)g.key_generation);
+        case GC_FIRMWARE_TOO_OLD: return brls::getStr(key, ui::hos_text(required_hos(g)), ui::hos_text(current_hos));
+        case GC_KEY_TOO_NEW:      return brls::getStr(key, ui::hos_text(current_hos), (int)g.key_generation);
         case GC_LAUNCH_VERSION:
             return brls::getStr(key, version_text(g, g.launch_required), version_text(g, gamecheck_installed_version(&g)));
         case GC_LAUNCH_REFUSED:   return brls::getStr(key, ui::rc_text(g.launch_rc));

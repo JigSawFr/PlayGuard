@@ -110,9 +110,7 @@ std::string installed(Which which)
     if (which == Which::Atmosphere)
         return si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : "";
     if (!si.hos_version) return "";
-    char fw[16];
-    sysinfo_version_string(si.hos_version, fw, sizeof(fw));
-    return fw;
+    return ui::hos_text(si.hos_version);
 }
 
 std::string latest(Which which)

@@ -84,8 +84,7 @@ void show_link(const log_upload::Result& r, bool report)
     }
     SysInfo si;
     sysinfo_get(&si);
-    char fw[16];
-    sysinfo_version_string(si.hos_version, fw, sizeof(fw));
+    const std::string fw = ui::hos_text(si.hos_version);
     log_upload::IssueFields fields;
     fields.version = app::version();
     fields.firmware = fw;
@@ -93,7 +92,7 @@ void show_link(const log_upload::Result& r, bool report)
     // The menu it was started from is not known: the reporter adds it.
     fields.launcher = si.applet_mode ? "from the Album (applet)" : "over a game (title override)";
     const SysStorage storage = sysinfo_storage(&si);
-    if (storage != SysStorage_Unknown) fields.storage = storage == SysStorage_EmuMMC ? "emuMMC" : "sysMMC";
+    if (const char* name = diagnostic::storage_name(storage)) fields.storage = name;
     const std::string issue = log_upload::issue_url(app::repo_url(), r.url, fields);
 
     std::string text = brls::getStr("playguard/upload/done", text::short_url(r.url));
