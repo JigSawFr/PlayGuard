@@ -20,6 +20,8 @@ Vous connaissez le code PIN, mais l'application mobile de l'ancien propriétaire
 
 PlayGuard lui-même ne peut pas démarrer. Installez **à l'avance** le module système de récupération optionnel (`playguard-rescue.zip`) ; une fois bloqué, déposez un fichier vide `config/playguard/RESCUE` sur la carte SD et démarrez — il déverrouille la console pour que PlayGuard puisse s'ouvrir. Voir [`sysmodule/README.md`](../../sysmodule/README.md) (en anglais).
 
+Le module doit suivre la version de PlayGuard : à chaque mise à jour de PlayGuard, extrayez à nouveau le `playguard-rescue.zip` de cette version (ou *Mettre à jour* sur l'entrée *Le sysmodule de récupération n'est pas à jour* de la cloche), puis redémarrez la console. Un module plus ancien laisse un rapport que PlayGuard ne peut pas vérifier : l'écran de récupération ne propose alors rien, dit que le module est plus ancien, et refaire `RESCUE` donne le même résultat tant qu'il n'est pas mis à jour.
+
 ### Console non modifiée
 
 PlayGuard ne peut rien faire : il nécessite Atmosphère. La procédure officielle passe par la clé maîtresse du service client de Nintendo.

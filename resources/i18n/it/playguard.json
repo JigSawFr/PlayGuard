@@ -651,13 +651,15 @@
             "no_pin": "Non c'era alcun PIN da recuperare: nessun PIN del filtro famiglia è impostato.",
             "failed": "Il recupero non è riuscito a concludersi.",
             "refused": "Non è stato eliminato nulla: non è stato possibile rimuovere il file RESCUE dalla scheda SD.",
-            "unconfirmed": "La console non mostra il recupero descritto da questo rapporto."
+            "unconfirmed": "La console non mostra il recupero descritto da questo rapporto.",
+            "old_module": "Il sysmodule di recupero è più vecchio di questo PlayGuard: il suo rapporto non può essere verificato."
         },
         "hint": {
             "reset_pin": "scegline uno nuovo",
             "delete": "rimuovi tutto"
         },
-        "note_unconfirmed": "Senza il PIN qui non si può modificare nulla, e PlayGuard si apre come al solito. Bloccato? Rimetti il file RESCUE sulla scheda SD, con il sysmodule di recupero installato, poi riavvia la console."
+        "note_unconfirmed": "Senza il PIN qui non si può modificare nulla, e PlayGuard si apre come al solito. Bloccato? Rimetti il file RESCUE sulla scheda SD, con il sysmodule di recupero installato, poi riavvia la console.",
+        "note_old_module": "Senza il PIN qui non si può modificare nulla, e PlayGuard si apre come al solito. Aggiorna il modulo da un computer: estrai playguard-rescue.zip di PlayGuard {} nella radice della scheda SD, rimetti il file RESCUE, poi riavvia la console."
     },
     "tools": {
         "section_diag": "Diagnostica",

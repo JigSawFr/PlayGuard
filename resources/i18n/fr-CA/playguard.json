@@ -651,13 +651,15 @@
             "no_pin": "Aucun NIP à récupérer : aucun NIP de contrôle parental n'est défini.",
             "failed": "La récupération n'a pas pu aboutir.",
             "refused": "Rien n'a été supprimé : le fichier RESCUE n'a pas pu être retiré de la carte SD.",
-            "unconfirmed": "La console ne montre pas la récupération que décrit ce rapport."
+            "unconfirmed": "La console ne montre pas la récupération que décrit ce rapport.",
+            "old_module": "Le sysmodule de récupération est plus ancien que ce PlayGuard : son rapport ne peut pas être vérifié."
         },
         "hint": {
             "reset_pin": "en choisir un nouveau",
             "delete": "tout supprimer"
         },
-        "note_unconfirmed": "Rien ne peut être modifié ici sans le NIP, et PlayGuard s'ouvre comme d'habitude. Bloqué? Remettez le fichier RESCUE sur la carte SD, avec le sysmodule de récupération installé, puis redémarrez la console."
+        "note_unconfirmed": "Rien ne peut être modifié ici sans le NIP, et PlayGuard s'ouvre comme d'habitude. Bloqué? Remettez le fichier RESCUE sur la carte SD, avec le sysmodule de récupération installé, puis redémarrez la console.",
+        "note_old_module": "Rien ne peut être modifié ici sans le NIP, et PlayGuard s'ouvre comme d'habitude. Mettez le module à jour depuis un ordinateur : extrayez playguard-rescue.zip de PlayGuard {} à la racine de la carte SD, remettez le fichier RESCUE, puis redémarrez la console."
     },
     "tools": {
         "section_diag": "Diagnostic",

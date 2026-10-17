@@ -30,7 +30,10 @@ std::optional<RescueReport> take(RescueProof* proof);
 // sysmodule makes the proof, so a report that has one shows it is installed
 // too. Anything else (no PIN left) needs the sysmodule on the SD card
 // (installed()). False when a read fails.
-bool confirmed(const RescueReport& report, const RescueProof& proof);
+// *old_module, when given, says why an unlock is not confirmed: the console
+// agrees, but the report has no proof and the module installed is
+// outdated(), one from before the proof (it writes none, at every RESCUE).
+bool confirmed(const RescueReport& report, const RescueProof& proof, bool* old_module = nullptr);
 
 // Whether the sysmodule is on the SD card
 // (atmosphere/contents/4200000000505247/exefs.nsp): while it is, anyone who
@@ -39,6 +42,9 @@ bool installed();
 
 // The revision of the module this PlayGuard comes with (tools/rescue_rev.cmake).
 const char* revision();
+// Whether the module is installed and is not the one this PlayGuard comes
+// with: its playguard-rescue.txt says another revision, or there is none.
+bool outdated();
 // MainActivity, once per start: when the module is installed and is not the
 // one this PlayGuard comes with (its playguard-rescue.txt says another
 // revision, or there is none: installed before it was written), an entry of

@@ -106,6 +106,32 @@ const char* revision()
 #endif
 }
 
+namespace
+{
+// The installed module's playguard-rescue.txt, "1.2.0 84d0eaa86878": the
+// version it came with (into *version), and its revision, returned. Empty
+// when there is none (installed before it was written).
+std::string installed_revision(std::string* version)
+{
+    std::string text, rev;
+    if (version) version->clear();
+    if (paths::read_file(module_dir() + "playguard-rescue.txt", text)) {
+        const size_t space = text.find(' ');
+        if (space != std::string::npos) {
+            if (version) *version = text.substr(0, space);
+            rev = text.substr(space + 1);
+            rev = rev.substr(0, rev.find_first_of("\r\n "));
+        }
+    }
+    return rev;
+}
+}   // namespace
+
+bool outdated()
+{
+    return installed() && *revision() && installed_revision(nullptr) != revision();
+}
+
 void note_version()
 {
     if (!installed() || !*revision()) {
@@ -114,16 +140,8 @@ void note_version()
         return;
     }
     note_restart();
-    // "1.2.0 84d0eaa86878": the version it came with, its revision.
-    std::string text, version, rev;
-    if (paths::read_file(module_dir() + "playguard-rescue.txt", text)) {
-        const size_t space = text.find(' ');
-        if (space != std::string::npos) {
-            version = text.substr(0, space);
-            rev = text.substr(space + 1);
-            rev = rev.substr(0, rev.find_first_of("\r\n "));
-        }
-    }
+    std::string version;
+    const std::string rev = installed_revision(&version);
     if (rev == revision()) {
         notices::clear("rescue_old");
         return;
@@ -230,8 +248,9 @@ std::optional<RescueReport> take(RescueProof* proof)
     return r;
 }
 
-bool confirmed(const RescueReport& report, const RescueProof& proof)
+bool confirmed(const RescueReport& report, const RescueProof& proof, bool* old_module)
 {
+    if (old_module) *old_module = false;
     u32 pin_length = 0;
     bool unlocked = false;
     const Result rc = pctl_lock_state(&pin_length, &unlocked);
@@ -240,6 +259,10 @@ bool confirmed(const RescueReport& report, const RescueProof& proof)
     const bool needs_proof = rescue_report_needs_proof(&report);
     const bool made_by_module = needs_proof ? state && proven(report, proof) : installed();
     const bool ok = state && made_by_module;
+    // The console agrees but no proof came with the unlock, and the module
+    // installed is not this PlayGuard's: one from before the proof writes
+    // none, and doing RESCUE again gives the same.
+    if (old_module) *old_module = !ok && state && needs_proof && !proof.present && outdated();
     brls::Logger::info("rescue report {} by the console ({} {}, rc=0x{:08X}, PIN {}, unlocked={})",
                        ok ? "confirmed" : "not confirmed", needs_proof ? "proof" : "sysmodule",
                        needs_proof ? (made_by_module ? "valid" : proof.present ? "invalid" : "missing")

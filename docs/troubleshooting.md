@@ -20,6 +20,8 @@ You know the PIN, but the previous owner's phone app is still linked (unlinking 
 
 PlayGuard itself cannot start then. Install the optional recovery sysmodule (`playguard-rescue.zip`) **beforehand**; when locked out, drop an empty `config/playguard/RESCUE` file on the SD card and boot — it unlocks the console so PlayGuard can open. See [`sysmodule/README.md`](../sysmodule/README.md).
 
+The module must follow PlayGuard's version: with each PlayGuard update, extract that release's `playguard-rescue.zip` again (or *Update* on the notification bell's *The recovery sysmodule is out of date*), then restart the console. An older module leaves a report PlayGuard cannot check: the recovery screen then offers nothing, says the module is older, and doing `RESCUE` again gives the same until it is updated.
+
 ### Console not modded
 
 PlayGuard cannot help: it needs Atmosphère. Nintendo support's master-key procedure is the official way.

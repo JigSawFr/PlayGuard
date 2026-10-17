@@ -651,13 +651,15 @@
             "no_pin": "Es gab keine Geheimzahl wiederherzustellen: Es ist keine Geheimzahl festgelegt.",
             "failed": "Die Wiederherstellung konnte nicht abgeschlossen werden.",
             "refused": "Nichts wurde gelöscht: Die RESCUE-Datei konnte nicht von der SD-Karte entfernt werden.",
-            "unconfirmed": "Die Konsole zeigt die in diesem Bericht beschriebene Wiederherstellung nicht."
+            "unconfirmed": "Die Konsole zeigt die in diesem Bericht beschriebene Wiederherstellung nicht.",
+            "old_module": "Das Wiederherstellungs-Sysmodul ist älter als dieses PlayGuard: Sein Bericht kann nicht geprüft werden."
         },
         "hint": {
             "reset_pin": "eine neue wählen",
             "delete": "alles entfernen"
         },
-        "note_unconfirmed": "Ohne Geheimzahl kann hier nichts geändert werden, und PlayGuard öffnet sich wie gewohnt. Ausgesperrt? Legen Sie die RESCUE-Datei wieder auf die SD-Karte, mit installiertem Wiederherstellungs-Sysmodul, und starten Sie die Konsole neu."
+        "note_unconfirmed": "Ohne Geheimzahl kann hier nichts geändert werden, und PlayGuard öffnet sich wie gewohnt. Ausgesperrt? Legen Sie die RESCUE-Datei wieder auf die SD-Karte, mit installiertem Wiederherstellungs-Sysmodul, und starten Sie die Konsole neu.",
+        "note_old_module": "Ohne Geheimzahl kann hier nichts geändert werden, und PlayGuard öffnet sich wie gewohnt. Aktualisieren Sie das Modul an einem Computer: Entpacken Sie playguard-rescue.zip von PlayGuard {} ins Stammverzeichnis der SD-Karte, legen Sie die RESCUE-Datei wieder darauf und starten Sie die Konsole neu."
     },
     "tools": {
         "section_diag": "Diagnose",

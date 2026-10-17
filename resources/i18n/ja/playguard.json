@@ -651,13 +651,15 @@
             "no_pin": "復旧する暗証番号はありません：みまもり設定の暗証番号が設定されていません。",
             "failed": "復旧を完了できませんでした。",
             "refused": "何も削除されていません。RESCUEファイルをSDカードから削除できませんでした。",
-            "unconfirmed": "本体の状態が、このレポートの復旧内容と一致しません。"
+            "unconfirmed": "本体の状態が、このレポートの復旧内容と一致しません。",
+            "old_module": "復旧用sysmoduleがこのPlayGuardより古いため、レポートを確認できません。"
         },
         "hint": {
             "reset_pin": "新しく決める",
             "delete": "すべて消す"
         },
-        "note_unconfirmed": "暗証番号なしではここから何も変更できません。PlayGuardは通常どおり起動します。締め出された場合は、復旧用sysmoduleをインストールした状態でRESCUEファイルをSDカードに置き直し、本体を再起動してください。"
+        "note_unconfirmed": "暗証番号なしではここから何も変更できません。PlayGuardは通常どおり起動します。締め出された場合は、復旧用sysmoduleをインストールした状態でRESCUEファイルをSDカードに置き直し、本体を再起動してください。",
+        "note_old_module": "暗証番号なしではここから何も変更できません。PlayGuardは通常どおり起動します。パソコンでモジュールを更新してください：PlayGuard {}のplayguard-rescue.zipをSDカードのルートに展開し、RESCUEファイルを置き直してから本体を再起動します。"
     },
     "tools": {
         "section_diag": "診断",

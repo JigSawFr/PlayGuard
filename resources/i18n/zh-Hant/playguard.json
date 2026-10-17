@@ -651,13 +651,15 @@
             "no_pin": "沒有可復原的PIN碼：未設定家長監護的PIN碼。",
             "failed": "未能完成復原。",
             "refused": "未刪除任何內容：無法從 SD 卡移除 RESCUE 檔案。",
-            "unconfirmed": "主機狀態與此報告所述的復原不符。"
+            "unconfirmed": "主機狀態與此報告所述的復原不符。",
+            "old_module": "復原 sysmodule 比此 PlayGuard 舊：無法核實它的報告。"
         },
         "hint": {
             "reset_pin": "重新設定",
             "delete": "全部刪除"
         },
-        "note_unconfirmed": "沒有 PIN碼 就無法在此變更任何內容，PlayGuard 會照常開啟。被鎖在外面？請在已安裝復原 sysmodule 的情況下把 RESCUE 檔案放回 SD 卡，然後重新啟動主機。"
+        "note_unconfirmed": "沒有 PIN碼 就無法在此變更任何內容，PlayGuard 會照常開啟。被鎖在外面？請在已安裝復原 sysmodule 的情況下把 RESCUE 檔案放回 SD 卡，然後重新啟動主機。",
+        "note_old_module": "沒有 PIN碼 無法在此變更任何內容，PlayGuard 會照常開啟。請在電腦上更新該模組：將 PlayGuard {} 的 playguard-rescue.zip 解壓縮到 SD 卡根目錄，放回 RESCUE 檔案，然後重新啟動主機。"
     },
     "tools": {
         "section_diag": "診斷",

@@ -651,13 +651,15 @@
             "no_pin": "There was no PIN to recover: no parental-control PIN is set.",
             "failed": "Recovery could not finish.",
             "refused": "Nothing was deleted: the RESCUE file could not be removed from the SD card.",
-            "unconfirmed": "The console does not show the recovery this report describes."
+            "unconfirmed": "The console does not show the recovery this report describes.",
+            "old_module": "The recovery sysmodule is older than this PlayGuard: its report cannot be checked."
         },
         "hint": {
             "reset_pin": "choose a new one",
             "delete": "remove everything"
         },
-        "note_unconfirmed": "Nothing can be changed from here without the PIN, and PlayGuard opens as usual. Locked out? Put the RESCUE file back on the SD card with the recovery sysmodule installed, then restart the console."
+        "note_unconfirmed": "Nothing can be changed from here without the PIN, and PlayGuard opens as usual. Locked out? Put the RESCUE file back on the SD card with the recovery sysmodule installed, then restart the console.",
+        "note_old_module": "Nothing can be changed from here without the PIN, and PlayGuard opens as usual. Update the module from a computer: extract playguard-rescue.zip of PlayGuard {} at the SD card root, put the RESCUE file back, then restart the console."
     },
     "tools": {
         "section_diag": "Diagnostics",
