@@ -2,9 +2,9 @@
 // the network clock. Each line shows whether the step is done and does it on
 // A (the system PIN screen, the same limit picker as the Play timer tab, the
 // guided clock flow), plus unlinking the phone app while it is linked, the
-// alarm while it is off, and, once a PIN is set, Ask for the PIN. Shown
+// alarm while it is off, and, once a PIN is set, Protect PlayGuard with the PIN. Shown
 // at start-up while no PIN is set (writable builds on a checked firmware)
-// unless turned off here; Overview and Tools bring it back.
+// unless turned off here; Overview and Preferences › Help & diagnostics bring it back.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 

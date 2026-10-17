@@ -56,7 +56,7 @@ void OnboardingActivity::onContentAvailable()
         return true;
     });
 
-    // Security's own choice: the PIN is the console's, this keeps a child out
+    // The PIN tab's own choice: the PIN is the console's, this keeps a child out
     // of PlayGuard itself.
     protect->registerClickAction([this](brls::View*) {
         pin_lock::choose([this]() { this->refresh(); });
@@ -151,7 +151,7 @@ void OnboardingActivity::refresh()
     alarm->setText(brls::getStr("playguard/onboarding/step_alarm", paired ? 5 : 4));
     ui::set_visible(alarm.getView(), alarm_off);
 
-    // Last, once a PIN is set: Ask for the PIN (any mode but "Never").
+    // Last, once a PIN is set: Protect PlayGuard with the PIN (any mode but "Never").
     const bool protected_ = config::get().pin_lock != "off";
     protect->setText(brls::getStr("playguard/onboarding/step_protect", 4 + (paired ? 1 : 0) + (alarm_off ? 1 : 0)));
     protect->setDetailText(protected_ ? pin_lock::mode_text() : todo);

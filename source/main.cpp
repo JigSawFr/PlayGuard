@@ -202,8 +202,8 @@ std::string system_line(const SysInfo& si)
 void show_first(brls::Activity* first)
 {
     brls::Application::pushActivity(first, brls::TransitionAnimation::NONE);
-    pt_log_flow::apply();   // Developer › Record the play timer, when on (after fw_gate::prepare)
-    log_prune_flow::run();  // the reports and crashes past the limits of Tools › Diagnostics
+    pt_log_flow::apply();   // Help & diagnostics › Developer › Record the play timer, when on (after fw_gate::prepare)
+    log_prune_flow::run();  // the reports and crashes past the limits of Preferences › Help & diagnostics
     startup_mark(StartupStep_FirstScreen);
     rollback_flow::started();   // this build starts: nothing to go back from
     brls::Logger::info("start-up: first screen ready after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_FirstScreen));
@@ -226,7 +226,7 @@ brls::Activity* choose_first()
 {
     // Untested firmware: read-only (or the remembered choice) before any tab is built.
     fw_gate::prepare();
-    // Security › Ask for the PIN: checked before every change from now on;
+    // PIN › Protect PlayGuard with the PIN: checked before every change from now on;
     // "To open PlayGuard" starts on the lock screen.
     pin_lock::install();
     // ... and again after a while away, over whatever is open.

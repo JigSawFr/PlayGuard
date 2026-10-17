@@ -40,8 +40,8 @@ struct Part
 constexpr size_t PT_LOG_BYTES = 48 * 1024;
 
 // The debug files found in the data directory, in a fixed order:
-// logs/play_timer/block.json (Developer tools › play-timer block),
-// logs/play_timer/log.csv (Developer tools › record the play timer: its last
+// logs/play_timer/block.json (Developer › Compare the play-timer block),
+// logs/play_timer/log.csv (Developer › Record the play timer: its last
 // PT_LOG_BYTES, header kept) only with `play_timer_log` (the recorder is on:
 // it is what the developer asked to be sent; otherwise a child's play time
 // stays home), history_recent.json (recent_history() of the change history)

@@ -1,5 +1,5 @@
 // game_cache — the last check of the installed games (core/gamecheck.h),
-// kept on the SD card so Tools › Check the installed games shows it at once,
+// kept on the SD card so Console › Check the installed games shows it at once,
 // then only checks again what changed since: a game whose HOME menu entry
 // changed (installed, updated, archived, removed) or every game once the
 // check is a day old, from another firmware, or asked for (Ⓧ). Pure: the

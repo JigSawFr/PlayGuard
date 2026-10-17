@@ -17,9 +17,9 @@ side is in [docs/parental-controls.md](docs/parental-controls.md).
 These need a finding before any code: most of them a play-timer block
 compared before and after a change made from the phone app, on a console
 still linked to it: *PIN › Before unlinking: help decode…* (shown
-while linked, for everyone) or *Developer tools › Compare the play-timer
-block*. A report attached to an issue is the most useful contribution right
-now.
+while linked, for everyone) or *Preferences › Help & diagnostics ›
+Developer › Compare the play-timer block*. A report attached to an issue
+is the most useful contribution right now.
 
 - **Exceptions for specific software**: show the games on the
   free-communication list by name, then add and remove them, once the list's

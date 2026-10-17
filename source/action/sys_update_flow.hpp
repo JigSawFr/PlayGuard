@@ -27,7 +27,7 @@ void refresh_entries();
 // hekate as installed on the SD card (bootloader/update.bin); "" when absent.
 // Read once per run (its first KB): hekate is not updated while PlayGuard runs.
 std::string installed_hekate();
-// Tools › Console's value: `running`, then the newer release the last check
+// The Console tab's value: `running`, then the newer release the last check
 // found ("22.0.0 · 23.0.1 available"); *newer says whether there is one.
 // `which`: "atmosphere", "hekate" or "firmware".
 std::string with_latest(const char* which, const std::string& running, bool* newer);

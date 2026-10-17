@@ -124,7 +124,7 @@ SecurityTab::SecurityTab()
             // Second, separate confirmation with a different button: this cannot be undone.
             brls::sync([this]() {
                 ui::confirm_danger("playguard/security/delete_body2"_i18n, "playguard/security/delete_confirm2"_i18n, [this]() {
-                    // A backup first, so the settings can come back (Tools › Restore).
+                    // A backup first, so the settings can come back (History › Restore a backup).
                     backup_flow::backup_then([this]() {
                         Result rc = pctl_delete_parental_controls();
                         if (R_SUCCEEDED(rc)) history_flow::record_event("delete");

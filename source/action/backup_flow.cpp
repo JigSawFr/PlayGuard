@@ -186,7 +186,7 @@ std::string save_snapshot(std::string* error)
         return "";
     }
     const std::string path = backup::save(s, error);
-    // Tools › Keep backups: the oldest beyond that number go (never the new one).
+    // History › Backups kept: the oldest beyond that number go (never the new one).
     if (!path.empty()) backup::prune((size_t)config::get().backup_keep, path);
     return path;
 }

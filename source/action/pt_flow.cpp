@@ -585,7 +585,7 @@ void add_extra_time(const PtState& pt, std::function<void()> refresh)
     if (refuse_console_lock()) return;
     const int wd = ui::today_weekday();
     if (!pt.valid || pt.day_min[wd] == PT_DAY_NOLIMIT) return;
-    // Tools › Extra time amounts.
+    // Play timer › Extra time amounts.
     const std::vector<int> amounts = config::get().extra_amounts;
     std::vector<std::string> labels;
     for (int e : amounts) labels.push_back("+" + ui::fmt_minutes((uint16_t)e));

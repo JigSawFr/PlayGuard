@@ -1,4 +1,4 @@
-// GameCheckActivity — Tools › Check the installed games: the games the HOME
+// GameCheckActivity — Console › Check the installed games: the games the HOME
 // menu cannot start or draw (core/gamecheck.h), each with what the HOME menu
 // shows, and how many of the installed games have a problem, in a section per
 // way out: repaired here, to check first, installed again, the firmware or

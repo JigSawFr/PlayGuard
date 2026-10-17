@@ -131,14 +131,14 @@ Result write_bedtime(const PtBedtime bed[7], const std::string& source);
 std::string bedtime_text(const PtState& pt);
 
 // At start-up, before the first screen (and again on the main screen): an
-// earlier run unlocked (for a change, or Security › Unlock temporarily) and
+// earlier run unlocked (for a change, or PIN › Unlock temporarily) and
 // stopped before locking again (config relock_pending) -> lock again now,
 // with a toast. The record stays until the console reads back as locked.
 // Also called when the app leaves read-only mode, which keeps the record;
 // this run's own unlock is left alone (pt_logic::pending_relock).
 void relock_if_interrupted();
 
-// Security › Unlock temporarily: unlocks, recorded as above, so that closing
+// PIN › Unlock temporarily: unlocks, recorded as above, so that closing
 // PlayGuard from the HOME menu (which asks nothing) locks again at the next
 // start.
 Result unlock_temporarily();

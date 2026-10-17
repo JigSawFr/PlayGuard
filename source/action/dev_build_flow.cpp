@@ -331,7 +331,7 @@ void choose(const dev_builds::Build& b, bool newer)
 void install_now(const dev_builds::Build& b)
 {
     // Replacing PlayGuard can undo everything it guards: the PIN is asked
-    // whenever one is set, whatever Security › Ask for the PIN says.
+    // whenever one is set, whatever Protect PlayGuard with the PIN says.
     if (!pin_lock::ask()) {
         ui::notify(pin_lock::refusal_text());
         return;
@@ -352,7 +352,7 @@ void go_back()
     if (!app::commit().empty()) running += " (" + app::commit() + ")";
     ui::confirm(brls::getStr("playguard/dev_build/back_body", running, previous), "playguard/dev_build/back_confirm"_i18n,
                 []() {
-                    // As for an install: whatever Security › Ask for the PIN says.
+                    // As for an install: whatever Protect PlayGuard with the PIN says.
                     if (!pin_lock::ask()) {
                         ui::notify(pin_lock::refusal_text());
                         return;

@@ -31,7 +31,7 @@ the release in place of the simulated playguard.nro and hand it to hbloader.
 The "errors" scenario starts with today's limit reached, the temporary unlock
 failing and "Synchronise clock via Internet" off (PLAYGUARD_SIM_FAIL & co.):
 a limit change must end in the "could not unlock" dialog, with the app alive,
-and the clock tab must say why the network clock cannot be set. With no time
+and the network clock screen must say why the network clock cannot be set. With no time
 server answering (PLAYGUARD_SIM_NTP) and a network clock 1411 s ahead, the
 tab must then offer the console clock instead, and set it once confirmed.
 
@@ -59,7 +59,7 @@ The "loading" scenario stops the start-up on the loading screen
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|update|library|outside|loading|alarm|sysnotes]   (needs DISPLAY, xdotool, ImageMagick)
+Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -152,7 +152,7 @@ if GATE:
     os.makedirs(os.path.dirname(sphaira), exist_ok=True)
     open(sphaira, "w").write("NRO0")
 if DEVBUILD:
-    # Developer tools › Install another build, against a simulated GitHub: the
+    # Help & diagnostics › Developer › Install another build, against a simulated GitHub: the
     # releases (one a pre-release), then (once signed in, simulated device flow) two commits
     # of main and an open pull request whose artifact is a local zip holding
     # playguard.nro.
@@ -394,7 +394,7 @@ if SYSNOTES:
             f"{log_text}\n\n==System Titles==\n* The following titles were updated:\n** Sysmodules: {sysmodules}.\n")
     env.setdefault("PLAYGUARD_SIM_SYS_NOTES", sim_notes)
     env.setdefault("PLAYGUARD_SIM_SYS_LATEST", "1.12.1:6.5.4:23.0.1")
-    # No PlayGuard update offered over Tools by the same check.
+    # No PlayGuard update offered over the Console tab by the same check.
     env.setdefault("PLAYGUARD_SIM_LATEST", "offline")
     env.setdefault("PLAYGUARD_SIM_FW", "22.5.0")   # behind 23.0.0 and 23.0.1
     update_bin = os.path.join(run_dir, "playguard_data", "sd", "bootloader", "update.bin")

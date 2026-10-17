@@ -52,7 +52,7 @@ struct Config
     bool clock_check_at_start = false; // measure the network clock at start-up, say when it is off
     bool intro = true;                 // the loading screen stays 2 s at start-up (activity/loading_activity.hpp)
     std::string dev_builds_order = "newest";   // Install another build's pull requests: "newest" or "number"
-    // Security › Ask for the PIN: "off", "changes" (before the first change,
+    // PIN › Protect PlayGuard with the PIN: "off", "changes" (before the first change,
     // then not for 5 min) or "open" (to open PlayGuard). See pin_lock.hpp.
     // "changes" by default, and when the value is missing or unknown: a
     // damaged file must not turn the prompt off.
@@ -83,7 +83,7 @@ struct Config
     std::vector<std::string> notices_read;
     std::string summary_seen;
 
-    // Console lock (Security › Console lock): every day's limit set to 0, so a
+    // Console lock (PIN › Block all games): every day's limit set to 0, so a
     // PIN is needed to play. console_lock is whether it is on; console_lock_prev
     // keeps the seven limits it replaced (Sun..Sat minutes, 65535 no limit), to
     // put back when it is turned off. Empty: nothing to put back (the timer was
@@ -128,7 +128,7 @@ constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "r
 // What extra_amounts may be (the Preferences picker offers these sets).
 constexpr int EXTRA_SETS[][3] = { { 15, 30, 60 }, { 10, 20, 30 }, { 30, 60, 90 }, { 5, 10, 15 } };
 constexpr int BACKUP_KEEP[]   = { 0, 5, 10, 20 };
-// What the Tools tab offers for the reports and crash files kept.
+// What Preferences › Help & diagnostics offers for the reports and crash files kept.
 constexpr int LOGS_KEEP[]      = { 0, 5, 10, 20, 50 };
 constexpr int LOGS_KEEP_DAYS[] = { 0, 7, 30, 90, 365 };
 constexpr int LOGS_KEEP_MB[]   = { 0, 1, 5, 20 };

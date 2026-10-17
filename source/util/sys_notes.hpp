@@ -1,9 +1,9 @@
-// sys_notes — the release notes of what the console runs on, for Tools ›
-// Console (activity/sys_notes_activity.hpp): Atmosphère's and hekate's from
+// sys_notes — the release notes of what the console runs on, for the
+// Console tab (activity/sys_notes_activity.hpp): Atmosphère's and hekate's from
 // their GitHub releases (GET /repos/…/releases: one request, each release's
 // notes included), the firmware's from switchbrew (its System_Versions table,
 // then one page per version, as wikitext). Each release keeps the newest
-// firmware its notes say it supports, so Tools can say when a firmware is
+// firmware its notes say it supports, so the Console tab can say when a firmware is
 // out before Atmosphère or hekate support it. Parsing is plain C++
 // (host-tested, tests/sys_notes); fetch() goes to the network
 // (sys_notes_net.cpp). Everything read is text from outside: cleaned

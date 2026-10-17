@@ -1,4 +1,4 @@
-// pin_lock — Security › "Ask for the PIN": the parental-control PIN (in the
+// pin_lock — PIN › "Protect PlayGuard with the PIN": the parental-control PIN (in the
 // system's own PIN screen) before PlayGuard changes anything, or before it
 // opens at all.
 //
@@ -64,7 +64,7 @@ std::string mode_text();
 // One sentence on what the chosen mode means (shown under the setting).
 std::string note_text();
 
-// Security's picker. Turning it on needs a PIN on the console; turning it
+// The PIN tab's picker. Turning it on needs a PIN on the console; turning it
 // down asks for the PIN first. `done` runs after a change.
 void choose(std::function<void()> done);
 

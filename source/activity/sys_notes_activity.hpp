@@ -1,4 +1,4 @@
-// SysNotesActivity — Tools › Console › Atmosphère, hekate or Firmware: the
+// SysNotesActivity — Console › Atmosphère, hekate or Firmware: the
 // release notes of the installed version and of each newer one, a tab each
 // (util/sys_notes.hpp's tabs(): at most five newer ones). Ⓛ / Ⓡ move from
 // one tab to the next (their icons on either side of the tabs); the screen

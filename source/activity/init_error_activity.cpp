@@ -10,7 +10,7 @@ using namespace brls::literals;
 
 void InitErrorActivity::onContentAvailable()
 {
-    // No Tools tab here to send a report from.
+    // No Help & diagnostics here to send a report from.
     this->error_code->setText(ui::rc_text(app::pctl_init_result(), false));
 
     SysInfo si;

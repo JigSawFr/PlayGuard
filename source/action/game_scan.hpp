@@ -1,6 +1,6 @@
 // game_scan — the last check of the installed games (util/game_cache.hpp)
 // for its two users: the start-up check (action/game_notice), which brings it
-// up to date off the main thread, and Tools › Check the installed games
+// up to date off the main thread, and Console › Check the installed games
 // (activity/game_check_activity). Where it is kept, its saves off the UI
 // thread through ui::write_later (one file, so a save still waiting gives way
 // to a newer one), and one scan at a time: the screen's waits for the

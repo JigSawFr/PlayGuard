@@ -33,10 +33,10 @@
 //                               read), clock (network clock write), pin (1208),
 //                               pin_entry (the PIN screen is cancelled),
 //                               bedtime (the console does not take the bedtime),
-//                               remove (Tools › Installed games: a removal),
+//                               remove (Console › Check the installed games: a removal),
 //                               launch (its launch version reset), verify
 //                               (its integrity check)
-//   PLAYGUARD_SIM_GAMES_OK=1    every installed game fine (Tools › Installed games)
+//   PLAYGUARD_SIM_GAMES_OK=1    every installed game fine (Console › Check the installed games)
 //   PLAYGUARD_SIM_CHECK_MS=150  how long checking one installed game takes
 // The play-timer limits are kept as the real 0x44 block (core/pure.c encodes
 // and decodes it, as on the console); the read-only switch is core/write_guard.c.
@@ -699,7 +699,7 @@ bool playstats_cancelled(void) { return atomic_load(&s_cancel); }
 void playstats_icons(PlayIcon *icons, size_t count)
 {
     // The made-up games above, in order; the deleted one has no icon. The
-    // installed games of Tools › Check the installed games (…6000 and up)
+    // installed games of Console › Check the installed games (…6000 and up)
     // reuse them, but for the one whose name and icon cannot be read.
     for (size_t i = 0; i < count; i++) {
         icons[i].jpeg = NULL;
