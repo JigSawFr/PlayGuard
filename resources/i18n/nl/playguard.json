@@ -381,6 +381,8 @@
         "section_totals": "Speeltijd",
         "account": "Account",
         "account_all": "Alle accounts",
+        "account_default": "Standaardaccount",
+        "account_last": "Het laatst getoonde",
         "today": "Vandaag",
         "week": "Afgelopen 7 dagen",
         "all_time": "Totaal",
@@ -437,6 +439,8 @@
         "summary": {
             "per_day": "Gemiddeld per dag",
             "per_day_over": "{} over {} dagen",
+            "per_day_over_months": "{} over {} maanden",
+            "per_day_over_years": "{} over {} jaar",
             "top": "Meest gespeeld",
             "days_played": "Speeldagen",
             "days_played_value": "{} van 7",

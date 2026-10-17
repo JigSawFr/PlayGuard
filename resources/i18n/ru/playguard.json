@@ -381,6 +381,8 @@
         "section_totals": "Время игры",
         "account": "Пользователь",
         "account_all": "Все пользователи",
+        "account_default": "Учётная запись по умолчанию",
+        "account_last": "Последняя показанная",
         "today": "Сегодня",
         "week": "За 7 дней",
         "all_time": "За всё время",
@@ -437,6 +439,8 @@
         "summary": {
             "per_day": "В среднем за день",
             "per_day_over": "{} за {} дн.",
+            "per_day_over_months": "{} за {} мес.",
+            "per_day_over_years": "{} за {} г.",
             "top": "Больше всего",
             "days_played": "Дней с игрой",
             "days_played_value": "{} из 7",

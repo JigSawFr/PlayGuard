@@ -381,6 +381,8 @@
         "section_totals": "游戏时间",
         "account": "用户",
         "account_all": "所有用户",
+        "account_default": "默认账户",
+        "account_last": "上次显示的账户",
         "today": "今天",
         "week": "最近7天",
         "all_time": "累计",
@@ -437,6 +439,8 @@
         "summary": {
             "per_day": "日均",
             "per_day_over": "{}（{} 天）",
+            "per_day_over_months": "{}（{} 个月）",
+            "per_day_over_years": "{}（{} 年）",
             "top": "玩得最多",
             "days_played": "游玩天数",
             "days_played_value": "7 天中 {} 天",

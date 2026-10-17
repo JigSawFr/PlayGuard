@@ -28,6 +28,7 @@
             <brls:Header title="@i18n/playguard/activity/section_totals" marginBottom="8"/>
             <brls:DetailCell id="ac_account" title="@i18n/playguard/activity/account"/>
             <brls:Label id="ac_new_account" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/warn"/>
+            <brls:DetailCell id="ac_account_default" title="@i18n/playguard/activity/account_default"/>
             <PlayDaysView id="ac_days" width="auto" height="auto" marginTop="8" marginBottom="16"/>
             <brls:DetailCell id="ac_today" focusable="false" title="@i18n/playguard/activity/today"/>
             <brls:DetailCell id="ac_week" focusable="false" title="@i18n/playguard/activity/week"/>
