@@ -2,6 +2,7 @@
 // other scripts, the file name they give, collisions FAT would make, renames
 // and damaged files.
 #include "check.h"
+#include "temp_dir.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -135,14 +136,11 @@ static void test_files()
 
 int main()
 {
-    char dir[] = "/tmp/playguard_profiles_XXXXXX";
-    REQUIRE(mkdtemp(dir) != nullptr);
-    REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
+    TempDir tmp("profiles", TempDir::Enter);   // paths::data_dir() is ./playguard_data on the host
 
     test_names();
     test_files();
 
-    const std::string cleanup = std::string("rm -rf '") + dir + "'";
-    CHECK(std::system(cleanup.c_str()) == 0);
+    CHECK(tmp.remove());
     return CHECK_DONE("profiles names, file names, collisions, renames and damaged-file assertions passed");
 }

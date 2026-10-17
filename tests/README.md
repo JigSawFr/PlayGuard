@@ -36,6 +36,19 @@ file:line and the expression and the suite goes on, and `main()` ends with
 `if (!CHECK(p)) return;` stops a test whose next line needs `p`; `REQUIRE(expr)`
 stops the program (a mock handed a bad pointer, a setup step everything needs).
 
+What the suites share, next to `check.h` (`-Itests`):
+[`temp_dir.hpp`](temp_dir.hpp), a fresh folder under `/tmp` removed with
+the object (`TempDir tmp("config", TempDir::Enter)` also makes it the
+working directory, so `paths::data_dir()`, `./playguard_data` on the host,
+lands in it, until `CHECK(tmp.remove())` or the end);
+[`fs.hpp`](fs.hpp), the files a suite sets up and looks at (`fs::write`
+with its folders, `fs::exists`, `fs::read` and `fs::content_of` as the app
+reads a file, `.tmp` included); and
+[`fake_switch_base.h`](fake_switch_base.h), what every fake `<switch.h>` of
+the C suites starts with (libnx's integer types, `Result` and its macros,
+the firmware version macros), each suite's own `switch.h` adding the
+services its code calls.
+
 | Suite | Covers |
 |---|---|
 | `pctl_session/` | `source/core/pctl_ops.c` and `pctl_dump.c`: one session per operation and release on every error path; firmware gates (no play-timer IPC below 21.0.0, 1459 on 20.0.0+, 1460 on 23.0.0+); the recorder's reading (two sessions, both released, failed reads kept apart, a session that cannot open giving its error to every read, nothing below 21.0.0); the write gate for all enabled / restricted / unlocked combinations and every play-timer write (the three limit entry points, the alarm switch, start and stop); the block writes refused with no PIN (pctl would skip them and answer OK), nothing written, a 1206 that cannot be read letting them through; the temporary-unlock verification, the PIN it hands to 1201 and the lock (1007) sent when 1006 cannot be read after it, and `NXM_RC_RELOCK_FAILED` when that lock fails too; the play-timer write starting from what 145601 returns (unknown fields kept, the same limits giving the same block byte for byte, the observed layout when the timer was off, or when the read fails while it is off — while it is active a failed read refuses the write, `NXM_RC_STATE_UNKNOWN`, unless no day keeps a limit); restrictionMode (byte 1 alone, read back and put back when not kept, refused with nothing set, an unreadable or unknown block, or while the timer counts down); a `DAILY` block (timerMode `0`) read through its daily rule, left as read when nothing changes, moved to each day of the week from it when something does, restrictionMode kept; the bedtime write (only its bytes change, limits kept around it and the block kept while a bedtime is on, the console's answer checked for today or the day before, the block put back when it differs or cannot be read, refused out of range, with an unreadable block or while the timer counts down); `pctl_pin_weak` and `pin_is_weak` (a repeated digit, digits going up or down by one, a repeated pair, a keypad column; the PIN judged inside, no reveal check asked, every session released, no PIN and a failed read); `pctl_get_pin` (4 to 8 digits only, output wiped on every error, the reveal check asked every time instead of the change check, even with none installed); restriction writes; the PIN never appearing in the dump; read-only mode refusing every mutation, and writes working again once it is off. |

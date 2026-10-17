@@ -203,7 +203,7 @@ TEST_PROGRAMS := $(addprefix $(TESTOUT)/,$(TESTS))
 TEST_OKS := $(addsuffix .ok,$(TEST_PROGRAMS))
 # Every header: a suite is rebuilt when one changes (coarse, but a suite
 # compiles in seconds and CI always starts cold).
-TEST_HEADERS := $(wildcard tests/check.h tests/*/*.h source/*.hpp source/*/*.h source/*/*.hpp)
+TEST_HEADERS := $(wildcard tests/*.h tests/*.hpp tests/*/*.h source/*.hpp source/*/*.h source/*/*.hpp)
 
 $(TESTOUT):
 	@mkdir -p $@

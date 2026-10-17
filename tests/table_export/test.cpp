@@ -3,6 +3,7 @@
 // a cross-reference walk), not with the writer's own helpers.
 #include <borealis/extern/nlohmann/json.hpp>
 #include "check.h"
+#include "temp_dir.hpp"
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -190,16 +191,14 @@ static void test_pdf()
 
 static void test_save()
 {
-    char dir[] = "/tmp/playguard_export_XXXXXX";
-    REQUIRE(mkdtemp(dir) != nullptr);
+    TempDir tmp("export");
     std::string err;
-    const std::string a = table_export::save(sample(), Format::Csv, std::string(dir) + "/exports", "activity", &err);
-    const std::string b = table_export::save(sample(), Format::Csv, std::string(dir) + "/exports", "activity", &err);
+    const std::string a = table_export::save(sample(), Format::Csv, tmp.path() + "/exports", "activity", &err);
+    const std::string b = table_export::save(sample(), Format::Csv, tmp.path() + "/exports", "activity", &err);
     CHECK(!a.empty() && !b.empty() && a != b && err.empty());
     CHECK(a.size() > 4 && a.compare(a.size() - 4, 4, ".csv") == 0 && has(a, "/exports/activity_"));
     CHECK(std::string(table_export::extension(Format::Xlsx)) == "xlsx");
-    const std::string cleanup = std::string("rm -rf '") + dir + "'";
-    CHECK(std::system(cleanup.c_str()) == 0);
+    CHECK(tmp.remove());
 }
 
 int main()

@@ -1,23 +1,11 @@
 #pragma once
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include "fake_switch_base.h"
 
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef int32_t s32;
-typedef int64_t s64;
-typedef u32 Result;
 typedef struct { unsigned handle; } Service;
 typedef struct {
     unsigned out_num_objects;
     Service *out_objects;
 } SfDispatchParams;
-
-#define R_SUCCEEDED(rc) ((rc) == 0)
-#define R_FAILED(rc) ((rc) != 0)
 
 typedef struct { u16 year; u8 month, day, hour, minute, second, pad; } TimeCalendarTime;
 typedef struct { u32 wday, yday; char timezoneName[8]; u32 DST; int32_t offset; } TimeCalendarAdditionalInfo;
