@@ -1110,7 +1110,7 @@
         "main": "main · {} · {}",
         "pr": "PR #{} · {} · {}",
         "installed": "installed",
-        "no_digest": "GitHub gives no checksum for this file: only its size and type are checked.",
+        "no_digest": "GitHub gives no checksum for this file: it cannot be installed.",
         "install": "Install",
         "busy": "Already in progress...",
         "list_failed": "Could not list the builds: {}",
