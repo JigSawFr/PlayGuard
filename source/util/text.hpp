@@ -7,6 +7,7 @@
 
 #include <cstring>
 #include <string>
+#include <vector>
 
 namespace text
 {
@@ -49,6 +50,18 @@ inline std::string short_url(const std::string& url)
 {
     const size_t scheme = url.find("://");
     return scheme == std::string::npos ? url : url.substr(scheme + 3);
+}
+
+// The parts one after the other, `sep` between two of them: {"a", "b"} with
+// "\n" -> "a\nb"; none -> "".
+inline std::string join(const std::vector<std::string>& parts, const std::string& sep)
+{
+    std::string out;
+    for (size_t i = 0; i < parts.size(); i++) {
+        if (i) out += sep;
+        out += parts[i];
+    }
+    return out;
 }
 
 }   // namespace text

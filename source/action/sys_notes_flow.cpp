@@ -14,6 +14,7 @@
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/sys_updates.hpp"
+#include "util/text.hpp"
 #include "util/update.hpp"
 
 using namespace brls::literals;
@@ -239,22 +240,20 @@ std::string firmware_advice()
     if (fw.empty() || running.empty() || update::compare_versions(fw, running) <= 0) return "";
     // Nothing said before the notes kept are read (what shows it is refreshed then).
     if (!ready()) return "";
-    std::string text;
+    std::vector<std::string> lines;
     for (Which w : { Which::Atmosphere, Which::Hekate }) {
         const std::string mine = installed(w);
         // hekate off the SD card: not used to boot, nothing to say.
         if (w == Which::Hekate && mine.empty()) continue;
         std::string version;
         const sys_notes::Need need = sys_notes::need_for(s_cache.of(w), mine, fw, &version);
-        std::string line;
         if (need == sys_notes::Need::Wait) {
-            line = brls::getStr("playguard/sys_notes/advice_wait", sys_notes::product(w), version, fw);
+            lines.push_back(brls::getStr("playguard/sys_notes/advice_wait", sys_notes::product(w), version, fw));
         } else if (need == sys_notes::Need::Update) {
-            line = brls::getStr("playguard/sys_notes/advice_update", fw, sys_notes::product(w), version);
+            lines.push_back(brls::getStr("playguard/sys_notes/advice_update", fw, sys_notes::product(w), version));
         }
-        if (!line.empty()) text += (text.empty() ? "" : "\n") + line;
     }
-    return text;
+    return text::join(lines, "\n");
 }
 
 }   // namespace sys_notes_flow

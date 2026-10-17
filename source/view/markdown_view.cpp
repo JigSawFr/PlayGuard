@@ -5,6 +5,7 @@
 
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
+#include "util/text.hpp"
 
 using namespace brls::literals;
 
@@ -112,9 +113,7 @@ brls::View* code(const markdown::Block& b)
     box->setPadding(12, 16, 12, 16);
     box->setMarginTop(8);
     box->setMarginBottom(4);
-    std::string text;
-    for (const std::string& l : b.lines) text += (text.empty() ? "" : "\n") + l;
-    box->addView(ui::text_label(text, 18, ui::color_text()));
+    box->addView(ui::text_label(text::join(b.lines, "\n"), 18, ui::color_text()));
     return box;
 }
 

@@ -22,6 +22,7 @@
 #include "util/config.hpp"
 #include "util/paths.hpp"
 #include "util/table_export.hpp"
+#include "util/text.hpp"
 
 using namespace brls::literals;
 
@@ -183,8 +184,7 @@ ActivityTab::ActivityTab()
     ui::set_visible(account.getView(), play_data::accounts().size() > 1);
     // An account not seen before (a fresh play record is a known trick).
     new_account->setSingleLine(false);
-    std::string fresh;
-    for (const auto& l : outside_watch::new_account_lines()) fresh += (fresh.empty() ? "" : "\n") + l;
+    const std::string fresh = text::join(outside_watch::new_account_lines(), "\n");
     new_account->setText(fresh);
     ui::set_visible(new_account, !fresh.empty());
     // Applet mode (opened from the album): a few MB for icons is too much,

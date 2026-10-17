@@ -1,8 +1,8 @@
 // Host tests for the header-only helpers of source/util: utf8.hpp (the strict
 // and the loose reader, the writer), emoji.hpp (what counts, the icon a text
 // opens on, dropping them), text.hpp (the two trims, ASCII lower case, a
-// prefix, a URL without its scheme) and json_util.hpp (fields read by type,
-// a text that is no JSON).
+// prefix, a URL without its scheme, parts joined) and json_util.hpp (fields
+// read by type, a text that is no JSON).
 #include "check.h"
 #include <cstdio>
 
@@ -72,6 +72,8 @@ static void test_text()
     CHECK(text::starts_with("## Title", "## ") && !text::starts_with("#", "## ") && text::starts_with("x", ""));
     CHECK(text::short_url("https://ko-fi.com/jigsawfr") == "ko-fi.com/jigsawfr");
     CHECK(text::short_url("github.com/x") == "github.com/x" && text::short_url("").empty());
+    CHECK(text::join({ "a", "b", "c" }, "\n") == "a\nb\nc" && text::join({ "a" }, " · ") == "a");
+    CHECK(text::join({}, "\n").empty() && text::join({ "", "b", "" }, ",") == ",b,");   // empty parts kept
 }
 
 static void test_json()
