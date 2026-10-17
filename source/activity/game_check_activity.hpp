@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include "action/game_verify_flow.hpp"
 #include "util/game_cache.hpp"
 
 #include "util/pctl_ops_c.hpp"
@@ -111,6 +112,9 @@ class GameCheckActivity : public brls::Activity
     // The console's integrity check of `games`, one after the other in one
     // dialog; what it found kept with each game as it goes.
     void verify(std::vector<GameFacts> games);
+    // What it found, once its dialog is closed; `self` only while `weak` lives.
+    static void report_verified(GameCheckActivity* self, const std::weak_ptr<bool>& weak,
+                                const std::vector<game_verify_flow::Verified>& results, size_t total);
 
     BRLS_BIND(brls::Label,  note,   "gc_note");
     BRLS_BIND(brls::Label,  status, "gc_status");
