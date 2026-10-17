@@ -7,6 +7,7 @@
 // byte, a cut archive), the replacement of the running file, and the
 // device-flow answers and the token file.
 #include "check.h"
+#include "temp_dir.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -635,9 +636,7 @@ static void test_auth()
 
 int main()
 {
-    char dir[] = "/tmp/playguard_dev_builds_XXXXXX";
-    REQUIRE(mkdtemp(dir) != nullptr);
-    REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
+    TempDir tmp("dev_builds", TempDir::Enter);   // paths::data_dir() is ./playguard_data on the host
 
     test_sha256();
     test_hmac_sha256();
@@ -652,6 +651,6 @@ int main()
     test_zip();
     test_auth();
 
-    std::system((std::string("rm -rf '") + dir + "'").c_str());
+    tmp.remove();
     return CHECK_DONE("sha256, HMAC-SHA256, release and artifact lists, the order of each kind, the cached list, download checks, zip extraction, replacement and GitHub sign-in assertions passed");
 }

@@ -2,6 +2,7 @@
 // sigpatch file detection, the overall verdict and an emuMMC set up on the
 // card, on fake SD card trees.
 #include "check.h"
+#include "temp_dir.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -52,9 +53,8 @@ static void install_syspatch(const std::string& root, bool at_boot)
 
 int main()
 {
-    char tmpl[] = "/tmp/playguard_patches_XXXXXX";
-    REQUIRE(mkdtemp(tmpl));
-    g_base = tmpl;
+    TempDir tmp("patches");
+    g_base = tmp.path();
 
     // Parser: sections, comments, blank lines, spaces, CRLF, no trailing newline.
     {
@@ -167,7 +167,6 @@ int main()
         CHECK(emummc_configured(root));
     }
 
-    std::string cmd = "rm -rf '" + g_base + "'";
-    CHECK(std::system(cmd.c_str()) == 0);
+    CHECK(tmp.remove());
     return CHECK_DONE("patches detection assertions passed");
 }

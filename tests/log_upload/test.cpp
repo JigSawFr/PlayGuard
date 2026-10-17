@@ -3,6 +3,7 @@
 // on a whole UTF-8 character, GitHub's answer, the body sent and the
 // prefilled bug-report link (percent-encoded: text::url_encode, tests/text_util).
 #include "check.h"
+#include "temp_dir.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -304,9 +305,7 @@ static void test_recent_history()
 
 int main()
 {
-    char dir[] = "/tmp/playguard_log_upload_XXXXXX";
-    REQUIRE(mkdtemp(dir) != nullptr);
-    REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
+    TempDir tmp("log_upload", TempDir::Enter);   // paths::data_dir() is ./playguard_data on the host
 
     test_files();
     test_recent_history();
@@ -317,6 +316,6 @@ int main()
     test_bodies();
     test_urls();
 
-    std::system((std::string("rm -rf '") + dir + "'").c_str());
+    tmp.remove();
     return CHECK_DONE("log upload files, recent history, crashes, gist files, gist answer and body, bug-report link assertions passed");
 }

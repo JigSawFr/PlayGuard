@@ -4,6 +4,8 @@
 // and forth, with no previous build, with no current one), and an install
 // or a swap stopped between its renames, finished or undone.
 #include "check.h"
+#include "fs.hpp"
+#include "temp_dir.hpp"
 #include <cstdio>
 #include <string>
 #include <unistd.h>
@@ -13,30 +15,8 @@
 
 using rollback::Offer;
 
-static std::string dir()
-{
-    static std::string d;
-    if (d.empty()) {
-        char tmpl[] = "/tmp/pg_rollback_XXXXXX";
-        REQUIRE(mkdtemp(tmpl));
-        d = tmpl;
-    }
-    return d;
-}
-
-static void put(const std::string& path, const std::string& text)
-{
-    FILE* f = std::fopen(path.c_str(), "wb");
-    REQUIRE(f);
-    std::fwrite(text.data(), 1, text.size(), f);
-    std::fclose(f);
-}
-
-static std::string get(const std::string& path)
-{
-    std::string text;
-    return paths::read_file(path, text) ? text : "<none>";
-}
+// The suite's folder (main()).
+static std::string g_dir;
 
 static void test_offer()
 {
@@ -63,13 +43,13 @@ static void test_offer()
 
 static void test_files()
 {
-    const std::string label = dir() + "/previous_build.json", check = dir() + "/boot_check.json";
+    const std::string label = g_dir + "/previous_build.json", check = g_dir + "/boot_check.json";
     std::string l;
     CHECK(!rollback::read_label(label, &l));
     CHECK(rollback::write_label(label, "1.2.0 (abc1234)") && rollback::read_label(label, &l) && l == "1.2.0 (abc1234)");
-    put(label, "{\"label\": 3}");
+    fs::write(label, "{\"label\": 3}");
     CHECK(!rollback::read_label(label, &l));
-    put(label, "not json");
+    fs::write(label, "not json");
     CHECK(!rollback::read_label(label, &l));
 
     rollback::Check c;
@@ -79,33 +59,33 @@ static void test_files()
     CHECK(rollback::write_check(check, c));
     rollback::Check back;
     CHECK(rollback::read_check(check, &back) && back.label == "PR #38" && back.starts == 1);
-    put(check, "{\"starts\": -4}");
+    fs::write(check, "{\"starts\": -4}");
     CHECK(rollback::read_check(check, &back) && back.starts == 0 && back.label.empty());
-    put(check, "[]");
+    fs::write(check, "[]");
     CHECK(!rollback::read_check(check, &back));
 }
 
 static void test_swap()
 {
-    const std::string nro = dir() + "/playguard.nro", prev = rollback::previous_file(nro);
+    const std::string nro = g_dir + "/playguard.nro", prev = rollback::previous_file(nro);
     CHECK(prev == nro + ".previous");
     std::string err;
-    put(nro, "new");
-    CHECK(!rollback::swap(nro, &err) && !err.empty() && get(nro) == "new");   // no previous build
-    put(prev, "old");
-    CHECK(rollback::swap(nro, &err) && get(nro) == "old" && get(prev) == "new");
-    CHECK(rollback::swap(nro, &err) && get(nro) == "new" && get(prev) == "old");   // and back
-    CHECK(get(nro + ".old") == "<none>");
+    fs::write(nro, "new");
+    CHECK(!rollback::swap(nro, &err) && !err.empty() && fs::content_of(nro) == "new");   // no previous build
+    fs::write(prev, "old");
+    CHECK(rollback::swap(nro, &err) && fs::content_of(nro) == "old" && fs::content_of(prev) == "new");
+    CHECK(rollback::swap(nro, &err) && fs::content_of(nro) == "new" && fs::content_of(prev) == "old");   // and back
+    CHECK(fs::content_of(nro + ".old") == "<none>");
     // No current build (deleted by hand): the previous one takes its place.
     std::remove(nro.c_str());
-    CHECK(rollback::swap(nro, &err) && get(nro) == "old" && get(prev) == "<none>");
+    CHECK(rollback::swap(nro, &err) && fs::content_of(nro) == "old" && fs::content_of(prev) == "<none>");
 }
 
 // A power cut between the renames of paths::replace_file (an install, a
 // swap): what start-up (rollback::recover) and the next one find.
 static void test_recover()
 {
-    const std::string nro = dir() + "/cut.nro", prev = rollback::previous_file(nro), old = nro + ".old";
+    const std::string nro = g_dir + "/cut.nro", prev = rollback::previous_file(nro), old = nro + ".old";
     const std::string fresh = nro + ".new";
     std::string err;
     std::remove(nro.c_str());
@@ -114,50 +94,53 @@ static void test_recover()
 
     // Stopped after the first step: the build that ran only aside, the new
     // one still beside it. Put back; the install simply did not happen.
-    put(old, "running");
-    put(fresh, "new");
-    put(prev, "older");
+    fs::write(old, "running");
+    fs::write(fresh, "new");
+    fs::write(prev, "older");
     rollback::recover(nro);
-    CHECK(get(nro) == "running" && get(old) == "<none>" && get(prev) == "older");
+    CHECK(fs::content_of(nro) == "running" && fs::content_of(old) == "<none>" && fs::content_of(prev) == "older");
     // And again: nothing left to do.
     rollback::recover(nro);
-    CHECK(get(nro) == "running" && get(prev) == "older");
+    CHECK(fs::content_of(nro) == "running" && fs::content_of(prev) == "older");
 
     // Stopped after the second: the new one in place, the build that ran
     // aside. It becomes the previous one, as the install meant.
     std::remove(fresh.c_str());
-    put(nro, "new");
-    put(old, "running");
+    fs::write(nro, "new");
+    fs::write(old, "running");
     rollback::recover(nro);
-    CHECK(get(nro) == "new" && get(prev) == "running" && get(old) == "<none>");
+    CHECK(fs::content_of(nro) == "new" && fs::content_of(prev) == "running" && fs::content_of(old) == "<none>");
 
     // A swap stopped after its second step: the previous build in place, the
     // one that ran aside, no previous left. The next swap finishes the first,
     // then swaps back.
-    put(nro, "older");
-    put(old, "new");
+    fs::write(nro, "older");
+    fs::write(old, "new");
     std::remove(prev.c_str());
-    CHECK(rollback::swap(nro, &err) && get(nro) == "new" && get(prev) == "older" && get(old) == "<none>");
+    CHECK(rollback::swap(nro, &err) && fs::content_of(nro) == "new" && fs::content_of(prev) == "older" && fs::content_of(old) == "<none>");
 
     // An install that finds a cut one: the earlier one is finished first,
     // then this one replaces the build in place.
-    put(nro, "new");
-    put(old, "running");
-    put(fresh, "newest");
+    fs::write(nro, "new");
+    fs::write(old, "running");
+    fs::write(fresh, "newest");
     CHECK(paths::replace_file(nro, fresh, prev, &err));
-    CHECK(get(nro) == "newest" && get(prev) == "new" && get(old) == "<none>" && get(fresh) == "<none>");
+    CHECK(fs::content_of(nro) == "newest" && fs::content_of(prev) == "new" && fs::content_of(old) == "<none>" && fs::content_of(fresh) == "<none>");
     // Without a name to keep it as, what was aside goes.
-    put(old, "stale");
-    put(fresh, "again");
+    fs::write(old, "stale");
+    fs::write(fresh, "again");
     CHECK(paths::replace_file(nro, fresh, "", &err));
-    CHECK(get(nro) == "again" && get(old) == "<none>" && get(prev) == "new");
+    CHECK(fs::content_of(nro) == "again" && fs::content_of(old) == "<none>" && fs::content_of(prev) == "new");
     // A missing new file: the build in place stays, nothing left aside.
     CHECK(!paths::replace_file(nro, fresh, prev, &err) && !err.empty());
-    CHECK(get(nro) == "again" && get(old) == "<none>" && get(prev) == "new");
+    CHECK(fs::content_of(nro) == "again" && fs::content_of(old) == "<none>" && fs::content_of(prev) == "new");
 }
 
 int main()
 {
+    const TempDir tmp("rollback");
+    g_dir = tmp.path();
+
     test_offer();
     test_files();
     test_swap();

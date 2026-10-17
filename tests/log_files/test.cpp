@@ -7,10 +7,11 @@
 // system's key (sysMMC or emuMMC) and the move of one system's files into
 // its folder.
 #include "check.h"
+#include "fs.hpp"
+#include "temp_dir.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <fcntl.h>
 #include <string>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -28,13 +29,7 @@ std::string g_root;
 
 void write(const std::string& rel, const std::string& content)
 {
-    const std::string path = g_root + "/" + rel;
-    REQUIRE(paths::ensure_dir(path.substr(0, path.find_last_of('/'))));
-    const int fd = ::open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    FILE* f = fd >= 0 ? ::fdopen(fd, "wb") : nullptr;
-    REQUIRE(f);
-    std::fwrite(content.data(), 1, content.size(), f);
-    std::fclose(f);
+    fs::write(g_root + "/" + rel, content);
 }
 
 void write_size(const std::string& rel, size_t size)
@@ -44,27 +39,12 @@ void write_size(const std::string& rel, size_t size)
 
 bool there(const std::string& rel)
 {
-    struct stat st;
-    return stat((g_root + "/" + rel).c_str(), &st) == 0;
+    return fs::exists(g_root + "/" + rel);
 }
 
 std::string read(const std::string& rel)
 {
-    std::string out;
-    paths::read_file(g_root + "/" + rel, out);
-    return out;
-}
-
-void make_root()
-{
-    char tmpl[] = "/tmp/playguard_logs_XXXXXX";
-    REQUIRE(mkdtemp(tmpl));
-    g_root = tmpl;
-}
-
-void remove_root()
-{
-    std::system(("rm -rf '" + g_root + "'").c_str());
+    return fs::read(g_root + "/" + rel);
 }
 
 // 2026-10-11 12:00:00 UTC (TZ is UTC in main()).
@@ -95,7 +75,8 @@ static void test_names()
 
 static void test_list()
 {
-    make_root();
+    const TempDir root("logs");
+    g_root = root.path();
     write("r/report_20261009_141203.txt", "a");
     write("r/report_20261009_141203_1.txt", "b");
     write("r/report_20261009_141203_10.txt", "c");
@@ -115,7 +96,6 @@ static void test_list()
         CHECK(names[5] == "report_20261001_080000.txt");
     }
     CHECK(lf::list(g_root + "/missing", lf::REPORT).empty());
-    remove_root();
 }
 
 static void test_to_prune()
@@ -147,7 +127,8 @@ static void test_to_prune()
 
 static void test_save()
 {
-    make_root();
+    const TempDir root("logs");
+    g_root = root.path();
     const std::string dir = g_root + "/logs/uploads";
     const std::string a = lf::save(dir, lf::UPLOAD, "a", NOW);
     const std::string b = lf::save(dir, lf::UPLOAD, "b", NOW);   // the same second
@@ -166,12 +147,12 @@ static void test_save()
           "Sent=2026-10-11 14:25\r\nRemoval=https://bpa.st/remove/BBBB\r\n");
     CHECK(lf::shortcut("https://gist.github.com/x/1", "", "") ==
           "[InternetShortcut]\r\nURL=https://gist.github.com/x/1\r\n\r\n[PlayGuard]\r\n");
-    remove_root();
 }
 
 static void test_prune()
 {
-    make_root();
+    const TempDir root("logs");
+    g_root = root.path();
     const std::string dir = g_root + "/logs/reports";
     write_size("logs/reports/report_20261011_100000.txt", 10);
     write_size("logs/reports/report_20261010_100000.txt", 10);
@@ -188,12 +169,12 @@ static void test_prune()
     CHECK(there("logs/reports/report_20261011_100000.txt") && there("logs/reports/report_20261010_100000.txt"));
     CHECK(there("logs/reports/notes.txt") && there("logs/reports/crash_20200101_000000.txt"));
     CHECK(lf::prune(g_root + "/missing", lf::REPORT, lf::Limits{ 1, 1, 1 }, NOW) == 0);
-    remove_root();
 }
 
 static void test_migrate_logs()
 {
-    make_root();
+    const TempDir root("logs");
+    g_root = root.path();
     write("logs/20261009_141203.txt", "report a");
     write("logs/20261009_141203_1.txt", "report b");
     write("logs/notes.txt", "stays");
@@ -245,12 +226,12 @@ static void test_migrate_logs()
     write("logs/crash.txt", "garbage 2");
     CHECK(lf::migrate(g_root + "/logs") == 1 && read("logs/crashes/crash_19700101_000000_1.txt") == "garbage 2");
     CHECK(lf::migrate(g_root + "/missing") == 0);
-    remove_root();
 }
 
 static void test_data_move()
 {
-    make_root();
+    const TempDir root("logs");
+    g_root = root.path();
     const std::string from = g_root + "/switch/playguard", to = g_root + "/config/playguard";
     write("switch/playguard/playguard.nro", "NRO0");
     write("switch/playguard/LICENSE.txt", "GPL");
@@ -286,7 +267,6 @@ static void test_data_move()
     CHECK(data_move::run(g_root + "/missing", to) == 0);
     CHECK(data_move::run(to, to) == 0);
     CHECK(data_move::old_dir() == "/switch/playguard");
-    remove_root();
 }
 
 static void test_nand()
@@ -298,7 +278,8 @@ static void test_nand()
 
 static void test_to_nand()
 {
-    make_root();
+    const TempDir root("logs");
+    g_root = root.path();
     const std::string data = g_root + "/config/playguard", sys = data + "/nand/sysmmc";
     write("config/playguard/config.json", "{}");
     write("config/playguard/history.json", "[]");
@@ -324,7 +305,6 @@ static void test_to_nand()
     // The next system finds nothing left to take.
     CHECK(data_move::to_nand(data, data + "/nand/emummc") == 0);
     CHECK(!there("config/playguard/nand/emummc"));
-    remove_root();
 }
 
 int main()

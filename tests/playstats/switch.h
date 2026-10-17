@@ -2,21 +2,8 @@
 // types, Result helpers and the pdm play-event layout (field names and enum
 // values as libnx has them; the unused members are left out).
 #pragma once
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include "fake_switch_base.h"
 
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef int32_t s32;
-typedef int64_t s64;
-typedef u32 Result;
-
-#define R_SUCCEEDED(rc) ((rc) == 0)
-#define R_FAILED(rc) ((rc) != 0)
-#define MAKERESULT(module, description) ((((module) & 0x1FF)) | ((description) & 0x1FFF) << 9)
 enum { Module_Libnx = 345 };
 enum { LibnxError_OutOfMemory = 2 };
 
