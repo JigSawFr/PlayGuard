@@ -192,7 +192,7 @@ brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, co
     if (g.display_version[0]) footer += " · " + brls::getStr("playguard/games/version", std::string(g.display_version));
     if (g.verified == GC_VERIFIED_INTACT) footer += "\n" + brls::getStr("playguard/games/verified_intact", ui::time_text(g.verified_at));
     if (app::dev_mode()) footer += "\n" + developer_text(g);
-    auto* foot = ui::text_label(footer, 16, ui::color_note());
+    auto* foot = ui::text_label(footer, 18, ui::color_note());
     foot->setMarginTop(18);
     box->addView(foot);
     return box;
@@ -698,15 +698,22 @@ void GameCheckActivity::show()
     ui::set_visible(this->selection, broken.size() >= 2 || !this->selected.empty());
 
     // Nothing had the focus before the first game with a problem; and never
-    // the focus left in a section that went (its last game repaired).
+    // the focus left in a section that went (its last game repaired). While
+    // the games are checked, until the user moves it, the focus stays on the
+    // first game: the games found later go into the sections above and would
+    // push the cell it was given below the screen (the scroll does not follow).
     brls::View* focus = brls::Application::getCurrentFocus();
     bool lost = false;
     for (brls::View* v = focus; v && !lost; v = v->getParent()) lost = v->getVisibility() != brls::Visibility::VISIBLE;
     brls::View* first = this->first_game();
-    if (first && (!this->focused || lost)) {
+    const bool untouched = this->auto_focus && focus == this->auto_focus;
+    if (first && (!this->focused || lost || untouched)) {
         this->focused = true;
+        this->auto_focus = first;
         brls::Application::giveFocus(first);
     }
+    // The check over (this was its last show): the focus is the user's.
+    if (!this->checking) this->auto_focus = nullptr;
 
     // The line above the list: the check under way, an error, or the result
     // and when it was made.
@@ -775,7 +782,7 @@ void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current
     }
     auto* box = details_view(game, issue, current_hos, icon_of(game.app_id));
     if (app::read_only() && gamecheck_actions(&game, issue) & ~GA_VERIFY) {
-        auto* note_ro = ui::text_label("playguard/common/read_only_note"_i18n, 16, ui::color_note());
+        auto* note_ro = ui::text_label("playguard/common/read_only_note"_i18n, 18, ui::color_note());
         note_ro->setMarginTop(8);
         box->addView(note_ro);
     }
@@ -1115,7 +1122,7 @@ void GameCheckActivity::verify(std::vector<GameFacts> games)
     state->percent->setSingleLine(true);
     state->percent->setMarginRight(14);
     numbers->addView(state->percent);
-    state->detail = ui::text_label("", 17, ui::color_note());
+    state->detail = ui::text_label("", 18, ui::color_note());
     state->detail->setSingleLine(true);
     state->detail->setGrow(1.0f);
     state->detail->setShrink(1.0f);
@@ -1123,7 +1130,7 @@ void GameCheckActivity::verify(std::vector<GameFacts> games)
     numbers->addView(state->detail);
     box->addView(numbers);
 
-    auto* note_label = ui::text_label("playguard/games/verify_note"_i18n, 16, ui::color_note());
+    auto* note_label = ui::text_label("playguard/games/verify_note"_i18n, 18, ui::color_note());
     note_label->setMarginTop(16);
     box->addView(note_label);
     state->dialog = new brls::Dialog(box);

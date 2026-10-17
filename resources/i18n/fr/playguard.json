@@ -185,7 +185,7 @@
         "updated": "Mis à jour à {}",
         "extra": "Temps en plus aujourd'hui...",
         "extra_title": "Temps en plus aujourd'hui",
-        "extra_body_auto": "Ajouter {} aujourd'hui ?\n\nLa limite du {} passe de {} à {}. Dès le lendemain, PlayGuard la remettra à {} tout seul.",
+        "extra_body_auto": "Ajouter {} aujourd'hui ?\n\nLa limite du {} passe de {} à {}. Dès le lendemain, PlayGuard la remettra à {} la prochaine fois qu'il sera ouvert.",
         "extra_confirm": "Ajouter",
         "extra_done": "Temps ajouté : limite de {} aujourd'hui.",
         "extra_keep": "Garder {}",
@@ -195,7 +195,7 @@
         "stop": "Arrêter le jeu pour aujourd'hui...",
         "stop_title": "Arrêter le jeu pour aujourd'hui",
         "stop_body": "Arrêter le jeu pour aujourd'hui ?\n\nLa limite du {} passe à 0 pour aujourd'hui. Dès le lendemain, PlayGuard proposera de la remettre à {}.",
-        "stop_body_auto": "Arrêter le jeu pour aujourd'hui ?\n\nLa limite du {} passe à 0 pour aujourd'hui. Dès le lendemain, PlayGuard la remettra à {} tout seul.",
+        "stop_body_auto": "Arrêter le jeu pour aujourd'hui ?\n\nLa limite du {} passe à 0 pour aujourd'hui. Dès le lendemain, PlayGuard la remettra à {} la prochaine fois qu'il sera ouvert.",
         "stop_confirm": "Arrêter pour aujourd'hui",
         "stop_done": "Jeu arrêté pour aujourd'hui.",
         "stop_restore_body": "Le {}, la limite du {} a été mise à {} pour la journée seulement. La remettre à {} ?",
@@ -205,7 +205,7 @@
         "stop_now": "Maintenant",
         "stop_soon": "Dans 5 minutes",
         "stop_soon_body": "Arrêter le jeu dans 5 minutes ?\n\nLa limite du {} passe à {} pour aujourd'hui : environ 5 minutes de plus, le temps de sauvegarder. Dès le lendemain, PlayGuard proposera de la remettre à {}.",
-        "stop_soon_body_auto": "Arrêter le jeu dans 5 minutes ?\n\nLa limite du {} passe à {} pour aujourd'hui : environ 5 minutes de plus, le temps de sauvegarder. Dès le lendemain, PlayGuard la remettra à {} tout seul.",
+        "stop_soon_body_auto": "Arrêter le jeu dans 5 minutes ?\n\nLa limite du {} passe à {} pour aujourd'hui : environ 5 minutes de plus, le temps de sauvegarder. Dès le lendemain, PlayGuard la remettra à {} la prochaine fois qu'il sera ouvert.",
         "stop_soon_done": "Le jeu s'arrête dans environ 5 minutes.",
         "stop_alarm_only": "La console se contente de prévenir quand le temps est écoulé (voir « Quand le temps est écoulé ») : le jeu en cours n'est pas arrêté.",
         "outside_reset": "Le temps de jeu du jour est reparti de zéro vers {} (horloge changée ?).",
@@ -651,13 +651,15 @@
             "no_pin": "Aucun code PIN à récupérer : aucun code PIN de contrôle parental n'est défini.",
             "failed": "La récupération n'a pas pu aboutir.",
             "refused": "Rien n'a été supprimé : le fichier RESCUE n'a pas pu être retiré de la carte SD.",
-            "unconfirmed": "La console ne montre pas la récupération que décrit ce rapport."
+            "unconfirmed": "La console ne montre pas la récupération que décrit ce rapport.",
+            "old_module": "Le sysmodule de récupération est plus ancien que ce PlayGuard : son rapport ne peut pas être vérifié."
         },
         "hint": {
             "reset_pin": "en choisir un nouveau",
             "delete": "tout supprimer"
         },
-        "note_unconfirmed": "Rien ne peut être modifié ici sans le code PIN, et PlayGuard s'ouvre comme d'habitude. Bloqué ? Remettez le fichier RESCUE sur la carte SD, avec le sysmodule de récupération installé, puis redémarrez la console."
+        "note_unconfirmed": "Rien ne peut être modifié ici sans le code PIN, et PlayGuard s'ouvre comme d'habitude. Bloqué ? Remettez le fichier RESCUE sur la carte SD, avec le sysmodule de récupération installé, puis redémarrez la console.",
+        "note_old_module": "Rien ne peut être modifié ici sans le code PIN, et PlayGuard s'ouvre comme d'habitude. Mettez le module à jour depuis un ordinateur : extrayez playguard-rescue.zip de PlayGuard {} à la racine de la carte SD, remettez le fichier RESCUE, puis redémarrez la console."
     },
     "tools": {
         "section_diag": "Diagnostic",
@@ -1032,7 +1034,7 @@
         "confirm_gist": "Un gist secret dans votre compte GitHub : toute personne qui a le lien peut le lire, jusqu'à ce que vous le supprimiez sur GitHub. Il ne contient jamais le code PIN ni le numéro de série.",
         "confirm_public": "Un rapport de bug ouvert avec ce lien est public. De l'historique, seuls les derniers changements sont envoyés, sans noms ni heures.",
         "where_gist": "un gist secret GitHub",
-        "relogin": "GitHub a refusé le gist. Déconnectez-vous puis reconnectez-vous (Compte GitHub, dans les outils développeur) pour autoriser les gists.",
+        "relogin": "GitHub a refusé le gist : la connexion de PlayGuard n'autorise pas les gists. Se reconnecter pour les autoriser ? Pour vous déconnecter plutôt : {}.",
         "needs_github": "Le rapport part dans un gist secret de votre compte GitHub : toute personne qui a son lien peut le lire, jusqu'à ce que vous le supprimiez sur GitHub. PlayGuard n'est pas encore connecté à GitHub. Se connecter maintenant ?",
         "sign_in": "Se connecter",
         "send": "Envoyer",
@@ -1256,7 +1258,9 @@
             "first_steps": "Premiers pas",
             "overview": "Vue d'ensemble",
             "profile": "Profil « {} »",
-            "console_lock": "Bloquer tous les jeux"
+            "console_lock": "Bloquer tous les jeux",
+            "notices": "Notifications",
+            "rescue": "Récupération"
         },
         "when": "Quand",
         "how": "Origine",
@@ -1368,6 +1372,7 @@
         "unlocked": "Le contrôle parental est déverrouillé temporairement",
         "unlocked_detail": "On peut jouer sans limite jusqu'à ce qu'il soit reverrouillé.",
         "extra_restore_detail": "Du temps en plus ajouté un jour précédent relève encore cette limite.",
+        "stop_restore_detail": "« {} » un jour précédent abaisse encore cette limite sous l'habituelle.",
         "new_account": "Un nouveau compte utilisateur",
         "installed": "PlayGuard {} installé",
         "installed_detail": "Il a bien démarré. La version précédente, {}, est gardée : les outils de développement peuvent y revenir.",

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Preferences › Help & diagnostics: first steps, the diagnostic report
-     (export, send online) and how many reports are kept, then (once enabled
-     by seven presses on About › Version) the developer tools. -->
+     (export, send online, and the GitHub account it is sent with) and how
+     many reports are kept, then (once enabled by seven presses on About ›
+     Version) the developer tools. -->
 
 <brls:Box
     width="auto"
@@ -28,6 +29,7 @@
             <brls:Header title="@i18n/playguard/tools/section_diag" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="hp_export" title="@i18n/playguard/tools/export"/>
             <brls:DetailCell id="hp_upload" title="@i18n/playguard/tools/upload"/>
+            <brls:DetailCell id="hp_github" title="@i18n/playguard/github/account"/>
             <brls:Label id="hp_export_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
             <brls:Label id="hp_upload_note" text="@i18n/playguard/tools/upload_note" fontSize="20" marginTop="4" marginBottom="6" textColor="@theme/brand/note"/>
             <brls:DetailCell id="hp_logs_keep" title="@i18n/playguard/tools/logs_keep"/>
@@ -45,7 +47,6 @@
             <brls:DetailCell id="hp_dev_pt_block" title="@i18n/playguard/dev/pt_block"/>
             <brls:DetailCell id="hp_dev_gate" title="@i18n/playguard/dev/gate"/>
             <brls:DetailCell id="hp_dev_forget" title="@i18n/playguard/dev/forget"/>
-            <brls:DetailCell id="hp_dev_github" title="@i18n/playguard/github/account"/>
             <brls:DetailCell id="hp_dev_build" title="@i18n/playguard/dev_build/open"/>
 
         </brls:Box>

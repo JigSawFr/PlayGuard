@@ -87,6 +87,13 @@ HelpTab::HelpTab()
         upload_flow::choose();
         return true;
     });
+    // The account a report goes with: signing out takes it off the console.
+    // Shown once signed in (Send a report online signs in without developer
+    // mode), and to a developer, whose builds need it.
+    github->registerClickAction([this](brls::View*) {
+        github_login_flow::open([this]() { this->refresh(); });
+        return true;
+    });
 
     // Only the SD card: also offered in read-only mode.
     logs_note->setSingleLine(false);
@@ -163,10 +170,6 @@ HelpTab::HelpTab()
         pt_block_flow::open();
         return true;
     });
-    dev_github->registerClickAction([this](brls::View*) {
-        github_login_flow::open([this]() { this->refresh(); });
-        return true;
-    });
     dev_build->registerClickAction([](brls::View*) {
         dev_build_flow::open();
         return true;
@@ -195,7 +198,9 @@ void HelpTab::refresh()
     dev_mode->setOn(dev, false);
     dev_read_only->setOn(ro, false);
     dev_pt_log->setOn(cfg.pt_log, false);
-    ui::set_visible_all({ { dev_header.getView(), dev },
+    const bool signed_in = !github_auth::token().empty();
+    ui::set_visible_all({ { github.getView(), dev || signed_in },
+                          { dev_header.getView(), dev },
                           { dev_mode.getView(), dev },
                           { dev_read_only.getView(), dev },
                           { dev_pt_log.getView(), dev },
@@ -204,10 +209,8 @@ void HelpTab::refresh()
                           { dev_clear_logs.getView(), dev },
                           { dev_report.getView(), dev },
                           { dev_pt_block.getView(), dev },
-                          { dev_github.getView(), dev },
                           { dev_build.getView(), dev },
                           { dev_gate.getView(), dev && fw_gate::needed() },
                           { dev_forget.getView(), dev } });
-    dev_github->setDetailText(github_auth::token().empty() ? "playguard/github/not_signed_in"_i18n
-                                                           : "playguard/github/signed_in_short"_i18n);
+    github->setDetailText(signed_in ? "playguard/github/signed_in_short"_i18n : "playguard/github/not_signed_in"_i18n);
 }

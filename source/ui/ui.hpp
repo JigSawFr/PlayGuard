@@ -62,6 +62,13 @@ void in_background(const char* what, std::function<void()> task);
 bool finish_background(std::chrono::milliseconds max);
 bool quitting();
 
+// One screen of its own at start-up, the first to ask: the firmware screen,
+// then First steps (both as the main screen opens), the update screen (once
+// the check answers), "What's new" or the support reminder (a few seconds
+// in). True for that one; the others wait for the next start, as when
+// something else is in front of the main screen. `what` names it in the log.
+bool claim_start_screen(const char* what);
+
 // An SD-card write off the UI thread (a slow card must not hold a frame), on
 // one queue run by a task of in_background: the writes happen one at a time,
 // in the order asked. `key` names a file written whole: a write of it still

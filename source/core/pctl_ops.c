@@ -156,13 +156,22 @@ Result pctl_lock_state(u32 *pin_length, bool *unlocked)
 
 // ---------------------------------------------------------------- PIN / unlock
 
+// What the pctlauth applet (switchbrew's Auth Applet: its result in a 4-byte
+// output storage, which libnx returns) gives when it is left without a PIN:
+// B on its screen, PCTL_RC_AUTH_CANCELLED. Said as NXM_RC_CANCELLED, which
+// the screens pass over in silence.
+static Result auth_result(Result rc)
+{
+    return rc == PCTL_RC_AUTH_CANCELLED ? NXM_RC_CANCELLED : rc;
+}
+
 Result pctl_set_pin(void)
 {
     // The pctlauth applet opens its own privileged session: ours must be closed.
     pctl_ops_exit();
     Result rc = core_change_allowed();
     if (R_FAILED(rc)) return rc;
-    return pctlauthRegisterPasscode();
+    return auth_result(pctlauthRegisterPasscode());
 }
 
 Result pctl_ask_pin(void)
@@ -176,7 +185,7 @@ Result pctl_ask_pin(void)
     pctl_ops_exit();
     if (R_FAILED(rc)) return rc;
     if (len == 0) return NXM_RC_NO_PIN;
-    return pctlauthShowForConfiguration();
+    return auth_result(pctlauthShowForConfiguration());
 }
 
 Result pctl_unlock_restriction_temporarily(void)

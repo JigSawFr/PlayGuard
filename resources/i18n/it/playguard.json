@@ -185,7 +185,7 @@
         "updated": "Aggiornato alle {}",
         "extra": "Tempo extra oggi...",
         "extra_title": "Tempo extra oggi",
-        "extra_body_auto": "Vuoi aggiungere {} oggi?\n\nIl limite di {} passa da {} a {}. Dal giorno seguente, PlayGuard lo riporterà automaticamente a {}.",
+        "extra_body_auto": "Vuoi aggiungere {} oggi?\n\nIl limite di {} passa da {} a {}. Dal giorno seguente, PlayGuard lo riporterà a {} la prossima volta che viene aperto.",
         "extra_confirm": "Aggiungi",
         "extra_done": "Tempo extra aggiunto: limite di {} oggi.",
         "extra_keep": "Mantieni {}",
@@ -195,7 +195,7 @@
         "stop": "Basta giocare per oggi...",
         "stop_title": "Basta giocare per oggi",
         "stop_body": "Vuoi interrompere il gioco per oggi?\n\nIl limite di {} diventa 0 per oggi. Dal giorno seguente, PlayGuard ti proporrà di riportarlo a {}.",
-        "stop_body_auto": "Vuoi interrompere il gioco per oggi?\n\nIl limite di {} diventa 0 per oggi. Dal giorno seguente, PlayGuard lo riporterà automaticamente a {}.",
+        "stop_body_auto": "Vuoi interrompere il gioco per oggi?\n\nIl limite di {} diventa 0 per oggi. Dal giorno seguente, PlayGuard lo riporterà a {} la prossima volta che viene aperto.",
         "stop_confirm": "Interrompi per oggi",
         "stop_done": "Gioco interrotto per oggi.",
         "stop_restore_body": "Il {}, il limite di {} è stato impostato a {} solo per quel giorno. Vuoi riportarlo a {}?",
@@ -205,7 +205,7 @@
         "stop_now": "Adesso",
         "stop_soon": "Tra 5 minuti",
         "stop_soon_body": "Interrompere tra 5 minuti?\n\nIl limite di {} diventa {} per oggi: circa 5 minuti in più, il tempo di salvare. Dal giorno seguente, PlayGuard ti proporrà di riportarlo a {}.",
-        "stop_soon_body_auto": "Interrompere tra 5 minuti?\n\nIl limite di {} diventa {} per oggi: circa 5 minuti in più, il tempo di salvare. Dal giorno seguente, PlayGuard lo riporterà automaticamente a {}.",
+        "stop_soon_body_auto": "Interrompere tra 5 minuti?\n\nIl limite di {} diventa {} per oggi: circa 5 minuti in più, il tempo di salvare. Dal giorno seguente, PlayGuard lo riporterà a {} la prossima volta che viene aperto.",
         "stop_soon_done": "Il gioco si interrompe tra circa 5 minuti.",
         "stop_alarm_only": "La console si limita ad avvisare quando il tempo è scaduto (vedi \"Quando il tempo è scaduto\"): il gioco in corso non viene interrotto.",
         "outside_reset": "Il tempo di gioco di oggi è ripartito da zero verso le {} (orologio cambiato?).",
@@ -651,13 +651,15 @@
             "no_pin": "Non c'era alcun PIN da recuperare: nessun PIN del filtro famiglia è impostato.",
             "failed": "Il recupero non è riuscito a concludersi.",
             "refused": "Non è stato eliminato nulla: non è stato possibile rimuovere il file RESCUE dalla scheda SD.",
-            "unconfirmed": "La console non mostra il recupero descritto da questo rapporto."
+            "unconfirmed": "La console non mostra il recupero descritto da questo rapporto.",
+            "old_module": "Il sysmodule di recupero è più vecchio di questo PlayGuard: il suo rapporto non può essere verificato."
         },
         "hint": {
             "reset_pin": "scegline uno nuovo",
             "delete": "rimuovi tutto"
         },
-        "note_unconfirmed": "Senza il PIN qui non si può modificare nulla, e PlayGuard si apre come al solito. Bloccato? Rimetti il file RESCUE sulla scheda SD, con il sysmodule di recupero installato, poi riavvia la console."
+        "note_unconfirmed": "Senza il PIN qui non si può modificare nulla, e PlayGuard si apre come al solito. Bloccato? Rimetti il file RESCUE sulla scheda SD, con il sysmodule di recupero installato, poi riavvia la console.",
+        "note_old_module": "Senza il PIN qui non si può modificare nulla, e PlayGuard si apre come al solito. Aggiorna il modulo da un computer: estrai playguard-rescue.zip di PlayGuard {} nella radice della scheda SD, rimetti il file RESCUE, poi riavvia la console."
     },
     "tools": {
         "section_diag": "Diagnostica",
@@ -734,7 +736,7 @@
         "patches_note_unpatched": "sys-patch non ha applicato le patch: {}. Aggiorna sys-patch per questo firmware.",
         "auto_relock": "Riattiva il filtro famiglia dopo una modifica",
         "extra_amounts": "Quantità di tempo extra",
-        "extra_auto": "Ripristina da solo il limite dopo \"Basta giocare per oggi\"",
+        "extra_auto": "Dopo \"Basta giocare per oggi\", ripristina il limite",
         "clock_check": "Controlla l'orologio di rete all'avvio",
         "section_about": "Informazioni",
         "version": "Versione",
@@ -1032,7 +1034,7 @@
         "confirm_gist": "Un gist segreto nel tuo account GitHub: chiunque abbia il link può leggerlo, finché non lo elimini su GitHub. Non contiene mai il PIN né il numero di serie.",
         "confirm_public": "Una segnalazione di bug aperta con questo link è pubblica. Della cronologia vengono inviate solo le ultime modifiche, senza nomi né orari.",
         "where_gist": "un gist segreto su GitHub",
-        "relogin": "GitHub ha rifiutato il gist. Esci e accedi di nuovo (Account GitHub, negli strumenti per sviluppatori) per consentire i gist.",
+        "relogin": "GitHub ha rifiutato il gist: l'accesso di PlayGuard non consente i gist. Accedere di nuovo per consentirli? Per uscire invece: {}.",
         "needs_github": "Il rapporto va in un gist segreto del tuo account GitHub: chiunque abbia il link può leggerlo, finché non lo elimini su GitHub. PlayGuard non ha ancora effettuato l'accesso a GitHub. Accedere ora?",
         "sign_in": "Accedi",
         "send": "Invia",
@@ -1256,7 +1258,9 @@
             "first_steps": "Primi passi",
             "overview": "Panoramica",
             "profile": "Profilo \"{}\"",
-            "console_lock": "Blocca tutti i giochi"
+            "console_lock": "Blocca tutti i giochi",
+            "notices": "Notifiche",
+            "rescue": "Recupero"
         },
         "when": "Quando",
         "how": "Origine",
@@ -1368,6 +1372,7 @@
         "unlocked": "Il filtro famiglia è sbloccato temporaneamente",
         "unlocked_detail": "Si può giocare senza limite finché non viene bloccato di nuovo.",
         "extra_restore_detail": "Il tempo extra aggiunto in un giorno precedente alza ancora questo limite.",
+        "stop_restore_detail": "\"{}\" in un giorno precedente tiene ancora questo limite sotto quello abituale.",
         "new_account": "Un nuovo account utente",
         "installed": "PlayGuard {} installato",
         "installed_detail": "Si è avviato bene. La build precedente, {}, è conservata: gli strumenti per sviluppatori possono tornarci.",

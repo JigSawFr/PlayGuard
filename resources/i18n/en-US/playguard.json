@@ -185,7 +185,7 @@
         "updated": "Updated at {}",
         "extra": "Extra time today...",
         "extra_title": "Extra time today",
-        "extra_body_auto": "Add {} today?\n\nThe {} limit goes from {} to {}. From the next day, PlayGuard puts it back to {} by itself.",
+        "extra_body_auto": "Add {} today?\n\nThe {} limit goes from {} to {}. From the next day, PlayGuard puts it back to {} the next time it is opened.",
         "extra_confirm": "Add",
         "extra_done": "Extra time added: today's limit is now {}.",
         "extra_keep": "Keep {}",
@@ -195,7 +195,7 @@
         "stop": "No more play today...",
         "stop_title": "No more play today",
         "stop_body": "No more play today?\n\nThe {} limit becomes 0 for today. From the next day, PlayGuard will offer to put it back to {}.",
-        "stop_body_auto": "No more play today?\n\nThe {} limit becomes 0 for today. From the next day, PlayGuard puts it back to {} by itself.",
+        "stop_body_auto": "No more play today?\n\nThe {} limit becomes 0 for today. From the next day, PlayGuard puts it back to {} the next time it is opened.",
         "stop_confirm": "Stop for today",
         "stop_done": "No more play today.",
         "stop_restore_body": "On {}, the {} limit was set to {} for that day only. Put it back to {}?",
@@ -205,7 +205,7 @@
         "stop_now": "Now",
         "stop_soon": "In 5 minutes",
         "stop_soon_body": "Stop in 5 minutes?\n\nThe {} limit becomes {} for today: about 5 more minutes, time to save. From the next day, PlayGuard will offer to put it back to {}.",
-        "stop_soon_body_auto": "Stop in 5 minutes?\n\nThe {} limit becomes {} for today: about 5 more minutes, time to save. From the next day, PlayGuard puts it back to {} by itself.",
+        "stop_soon_body_auto": "Stop in 5 minutes?\n\nThe {} limit becomes {} for today: about 5 more minutes, time to save. From the next day, PlayGuard puts it back to {} the next time it is opened.",
         "stop_soon_done": "Play stops in about 5 minutes.",
         "stop_alarm_only": "The console only warns when the time is up (see \"When the time is up\"): the game in progress is not stopped.",
         "outside_reset": "Today's play time started over at about {} (clock changed?).",
@@ -651,13 +651,15 @@
             "no_pin": "There was no PIN to recover: no parental-control PIN is set.",
             "failed": "Recovery could not finish.",
             "refused": "Nothing was deleted: the RESCUE file could not be removed from the SD card.",
-            "unconfirmed": "The console does not show the recovery this report describes."
+            "unconfirmed": "The console does not show the recovery this report describes.",
+            "old_module": "The recovery sysmodule is older than this PlayGuard: its report cannot be checked."
         },
         "hint": {
             "reset_pin": "choose a new one",
             "delete": "remove everything"
         },
-        "note_unconfirmed": "Nothing can be changed from here without the PIN, and PlayGuard opens as usual. Locked out? Put the RESCUE file back on the SD card with the recovery sysmodule installed, then restart the console."
+        "note_unconfirmed": "Nothing can be changed from here without the PIN, and PlayGuard opens as usual. Locked out? Put the RESCUE file back on the SD card with the recovery sysmodule installed, then restart the console.",
+        "note_old_module": "Nothing can be changed from here without the PIN, and PlayGuard opens as usual. Update the module from a computer: extract playguard-rescue.zip of PlayGuard {} at the SD card root, put the RESCUE file back, then restart the console."
     },
     "tools": {
         "section_diag": "Diagnostics",
@@ -1032,7 +1034,7 @@
         "confirm_gist": "A secret gist in your GitHub account: anyone with the link can read it, until you delete it on GitHub. It never contains the PIN or the serial number.",
         "confirm_public": "A bug report opened with this link is public. Only the last changes of the history are sent, without names or times of day.",
         "where_gist": "a secret gist on GitHub",
-        "relogin": "GitHub refused the gist. Sign out and sign in again (GitHub account, in the developer tools) to allow gists.",
+        "relogin": "GitHub refused the gist: PlayGuard's sign-in does not allow gists. Sign in again to allow them? To sign out instead: {}.",
         "needs_github": "The report goes to a secret gist in your GitHub account: anyone with its link can read it, until you delete it on GitHub. PlayGuard is not signed in to GitHub yet. Sign in now?",
         "sign_in": "Sign in",
         "send": "Send",
@@ -1256,7 +1258,9 @@
             "first_steps": "First steps",
             "overview": "Overview",
             "profile": "Profile \"{}\"",
-            "console_lock": "Block all games"
+            "console_lock": "Block all games",
+            "notices": "Notifications",
+            "rescue": "Recovery"
         },
         "when": "When",
         "how": "From",
@@ -1368,6 +1372,7 @@
         "unlocked": "Parental controls are temporarily unlocked",
         "unlocked_detail": "Games can be played without a limit until they are locked again.",
         "extra_restore_detail": "Extra time added on an earlier day still raises this limit.",
+        "stop_restore_detail": "\"{}\" on an earlier day still lowers this limit below the usual one.",
         "new_account": "A new user account",
         "installed": "PlayGuard {} installed",
         "installed_detail": "It started fine. The previous build, {}, is kept: Developer tools can go back to it.",

@@ -239,12 +239,13 @@ brls::Activity* choose_first()
     // screen like any start.
     RescueProof proof;
     auto report = rescue::take(&proof);
-    const bool confirmed = report && rescue::confirmed(*report, proof);
+    bool old_module = false;   // an unlock by a module from before the proof
+    const bool confirmed = report && rescue::confirmed(*report, proof, &old_module);
     // Stopped in the middle of a change last time: lock again before any
     // screen, so a lock screen left with B does not leave the console
     // unlocked. Not after a confirmed recovery unlock: that one is wanted.
     if (!(confirmed && report->mode == RescueMode_Unlock)) pt_flow::relock_if_interrupted();
-    if (report) return new RescueActivity(*report, confirmed);
+    if (report) return new RescueActivity(*report, confirmed, old_module);
     if (pin_lock::at_start()) return new LockActivity();
     return new MainActivity();
 }

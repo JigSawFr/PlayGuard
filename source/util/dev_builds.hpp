@@ -203,7 +203,9 @@ bool is_nro(const std::string& head);
 
 // Checks a downloaded file against `size` and `sha256`. A file without a
 // digest to check it against is refused (*error = NO_DIGEST): the size and
-// the NRO header say nothing of what it holds.
+// the NRO header say nothing of what it holds. NO_DIGEST is a marker the
+// screens compare against and say as dev_build/no_digest, in the user's
+// language.
 extern const char* const NO_DIGEST;
 bool verify_file(const std::string& path, uint64_t size, const std::string& sha256, std::string* error);
 // Checks that `path` is an NRO.

@@ -85,12 +85,12 @@ void DevBuildActivity::onContentAvailable()
     // checks, pre-release, installed or new).
     const NVGcolor kind_color = ui::color_accent();
     switch (b.kind) {
-        case dev_builds::Kind::Release: tags->addView(tag_view({ "playguard/dev_build/kind_release"_i18n, kind_color }, 16)); break;
-        case dev_builds::Kind::Main: tags->addView(tag_view({ "main", kind_color }, 16)); break;
+        case dev_builds::Kind::Release: tags->addView(tag_view({ "playguard/dev_build/kind_release"_i18n, kind_color }, 18)); break;
+        case dev_builds::Kind::Main: tags->addView(tag_view({ "main", kind_color }, 18)); break;
         case dev_builds::Kind::PullRequest: break;   // its number leads the tags already
-        case dev_builds::Kind::Commit: tags->addView(tag_view({ "playguard/dev_build/kind_commit"_i18n, kind_color }, 16)); break;
+        case dev_builds::Kind::Commit: tags->addView(tag_view({ "playguard/dev_build/kind_commit"_i18n, kind_color }, 18)); break;
     }
-    for (const BuildTag& t : build_tags(b, this->newer)) tags->addView(tag_view(t, 16));
+    for (const BuildTag& t : build_tags(b, this->newer)) tags->addView(tag_view(t, 18));
     headline->setText(build_title(b));
 
     // The facts.
@@ -127,6 +127,11 @@ void DevBuildActivity::onContentAvailable()
         return true;
     });
     ui::set_visible(github.getView(), !this->page().empty());
+    // No checksum: it cannot be installed (the facts say why), so Install is
+    // not offered, and See on GitHub takes the focus. Kept when there is no
+    // page either, to hold the focus: it says why then.
+    const bool offered = !b.sha256.empty() || this->page().empty();
+    ui::set_visible(install.getView(), offered);
 
     // The notes: a release's in release-please's form (its sections, their
     // icons) when they are, else any notes and a pull request's description
@@ -139,5 +144,5 @@ void DevBuildActivity::onContentAvailable()
     ui::set_visible(notes_header.getView(), !lines.empty() || !blocks.empty());
     if (!lines.empty()) release_notes::fill(notes, lines);
     else markdown_view::fill(notes, blocks);
-    brls::Application::giveFocus(install.getView());
+    brls::Application::giveFocus(offered ? install.getView() : github.getView());
 }

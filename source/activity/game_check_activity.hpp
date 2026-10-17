@@ -68,6 +68,9 @@ class GameCheckActivity : public brls::Activity
     std::vector<u64> waiting;         // to check again once the check under way is over
     bool verifying = false;   // one integrity check at a time
     bool focused   = false;   // the first game got the focus once
+    // The cell given the focus while the games are being checked, until the
+    // user moves it: it follows the first game as the list grows above it.
+    brls::View* auto_focus = nullptr;
     std::string timing;       // where the last check spent its time (developer mode)
     Pending pending;
     Group groups[GC_CAT_COUNT];

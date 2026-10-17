@@ -69,7 +69,9 @@ void OnboardingActivity::onContentAvailable()
         Result rc = pctl_set_pin();
         brls::Logger::info("pctl_set_pin returned 0x{:08X}", (unsigned)rc);
         if (R_SUCCEEDED(rc)) history_flow::record_event("pin", "first_steps");
-        ui::notify_result(rc, "playguard/security/pin_ok"_i18n, "playguard/security/pin_err"_i18n);
+        // Left with B: nothing changed, nothing to say.
+        if (rc != NXM_RC_CANCELLED)
+            ui::notify_result(rc, "playguard/security/pin_ok"_i18n, "playguard/security/pin_err"_i18n);
         this->refresh();
         return true;
     });

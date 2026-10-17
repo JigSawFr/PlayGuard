@@ -733,6 +733,11 @@ std::string restore_label()
     return brls::getStr("playguard/dashboard/extra_pending", ui::day_name_in_text(rec.weekday), ui::fmt_minutes(rec.base));
 }
 
+bool restore_lowers()
+{
+    return pt_logic::restore_tightens(extra_record());
+}
+
 // Set when a restore had to wait for a state that could not be read: the
 // main screen's 30-second check tries again (retry_extra_time_restore).
 static bool s_restore_retry = false;

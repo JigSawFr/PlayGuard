@@ -11,6 +11,9 @@
 // The parent came here because they forgot the PIN. A report the console does
 // not confirm (written by hand, or a recovery that failed) is only shown: no
 // action is offered and "Open PlayGuard" goes through the usual lock screen.
+// An unlock left by a module older than this PlayGuard (`old_module`: no
+// proof, the console agreeing) says to update the module instead, as doing
+// RESCUE again with it gives the same.
 // Proceeding installs the normal gate and opens the app.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -22,7 +25,7 @@
 class RescueActivity : public brls::Activity
 {
   public:
-    RescueActivity(RescueReport report, bool confirmed);
+    RescueActivity(RescueReport report, bool confirmed, bool old_module = false);
 
     CONTENT_FROM_XML_RES("activity/rescue.xml");
 
@@ -32,6 +35,7 @@ class RescueActivity : public brls::Activity
   private:
     RescueReport report;
     bool confirmed;
+    bool old_module;
 
     void refresh();
     void proceed();

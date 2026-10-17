@@ -178,13 +178,13 @@ void SysNotesActivity::fill()
         // fixes and a change to the parental-control service.
         const NVGcolor accent = brls::Application::getTheme()["brls/sidebar/active_item"];
         if ((int)this->shown[this->tab] == installed_at)
-            tags->addView(tag_view({ "playguard/sys_notes/tag_installed"_i18n, accent }, 16));
+            tags->addView(tag_view({ "playguard/sys_notes/tag_installed"_i18n, accent }, 18));
         else if (!mine.empty())
-            tags->addView(tag_view({ "playguard/sys_notes/tag_new"_i18n, ui::color_warn() }, 16));
+            tags->addView(tag_view({ "playguard/sys_notes/tag_new"_i18n, ui::color_warn() }, 18));
         if (!r.supports.empty())
-            tags->addView(tag_view({ brls::getStr("playguard/sys_notes/tag_supports", r.supports), ui::color_neutral() }, 16));
-        if (r.security) tags->addView(tag_view({ "playguard/sys_notes/tag_security"_i18n, ui::color_warn() }, 16));
-        if (r.pctl) tags->addView(tag_view({ "playguard/sys_notes/tag_pctl"_i18n, ui::color_warn() }, 16));
+            tags->addView(tag_view({ brls::getStr("playguard/sys_notes/tag_supports", r.supports), ui::color_neutral() }, 18));
+        if (r.security) tags->addView(tag_view({ "playguard/sys_notes/tag_security"_i18n, ui::color_warn() }, 18));
+        if (r.pctl) tags->addView(tag_view({ "playguard/sys_notes/tag_pctl"_i18n, ui::color_warn() }, 18));
         ui::set_visible(tags.getView(), !tags->getChildren().empty());
 
         header->setTitle(title_of(this->which) + " " + r.version);

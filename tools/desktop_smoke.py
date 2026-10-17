@@ -671,7 +671,7 @@ if GATE:
     shot("05_dev_tools")
     # Turning a developer switch off asks first; B keeps it on (the end of
     # the scenario checks developer mode was saved on).
-    key("Up", 9)               # past the cleanup cells and the recorder: Read-only mode
+    key("Up", 8)               # past the cleanup cells and the recorder: Read-only mode
     key("Return")
     shot("06a_read_only_off")  # untested firmware: the "own risk" warning
     key("Escape")

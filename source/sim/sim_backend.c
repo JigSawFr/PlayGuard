@@ -31,7 +31,8 @@
 //                               (1201 fine, 1006 still false), write (every
 //                               setting write), relock (1007), timer (145601
 //                               read), clock (network clock write), pin (1208),
-//                               pin_entry (the PIN screen is cancelled),
+//                               pin_entry (the PIN screen is cancelled, when
+//                               asking for the PIN as when setting one),
 //                               bedtime (the console does not take the bedtime),
 //                               remove (Console › Check the installed games: a removal),
 //                               launch (its launch version reset), verify
@@ -215,7 +216,13 @@ void pctl_status_fetch(PctlStatus *o)
 // Refuses like the console when PLAYGUARD_SIM_FAIL lists `what`.
 #define FAIL_IF(what) do { if (fails(what)) return SIM_FAIL_RC; } while (0)
 
-Result pctl_set_pin(void)                         { RO_GUARD(); S.pin_length = 4; return 0; }
+Result pctl_set_pin(void)
+{
+    RO_GUARD();
+    if (fails("pin_entry")) return NXM_RC_CANCELLED;   // as pctl_ops.c says B on the PIN screen
+    S.pin_length = 4;
+    return 0;
+}
 Result pctl_unlock_restriction_temporarily(void)
 {
     RO_GUARD();
@@ -273,7 +280,12 @@ Result pctl_lock_state(u32 *pin_length, bool *unlocked)
 }
 Result pctl_relock(void)                          { if (core_read_only()) return NXM_RC_READ_ONLY; FAIL_IF("relock"); S.temp_unlocked = false; return 0; }
 // PLAYGUARD_SIM_FAIL=pin_entry: the PIN screen is cancelled.
-Result pctl_ask_pin(void)                         { sim_init(); if (!S.pin_length) return NXM_RC_NO_PIN; FAIL_IF("pin_entry"); return 0; }
+Result pctl_ask_pin(void)
+{
+    sim_init();
+    if (!S.pin_length) return NXM_RC_NO_PIN;
+    return fails("pin_entry") ? NXM_RC_CANCELLED : 0;
+}
 Result pctl_delete_parental_controls(void)
 {
     RO_GUARD();

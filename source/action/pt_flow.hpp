@@ -86,6 +86,9 @@ void retry_extra_time_restore();
 // the line the Overview shows for it ("Put Saturday's limit back to 2 h").
 bool restore_pending(const PtState& pt);
 std::string restore_label();
+// Putting that limit back lowers it (pt_logic::restore_tightens): extra time
+// still raises it. False for "No more play today", which lowered it.
+bool restore_lowers();
 
 // "+30 min" when extra time was added today and is still there, else "".
 std::string extra_today_text(const PtState& pt);

@@ -185,7 +185,7 @@
         "updated": "Atualizado às {}",
         "extra": "Tempo extra hoje...",
         "extra_title": "Tempo extra hoje",
-        "extra_body_auto": "Adicionar {} hoje?\n\nO limite de {} passa de {} para {}. A partir do dia seguinte, o PlayGuard volta o limite para {} automaticamente.",
+        "extra_body_auto": "Adicionar {} hoje?\n\nO limite de {} passa de {} para {}. A partir do dia seguinte, o PlayGuard volta o limite para {} na próxima vez que for aberto.",
         "extra_confirm": "Adicionar",
         "extra_done": "Tempo extra adicionado: limite de {} hoje.",
         "extra_keep": "Manter {}",
@@ -195,7 +195,7 @@
         "stop": "Encerrar o jogo por hoje...",
         "stop_title": "Encerrar o jogo por hoje",
         "stop_body": "Encerrar o jogo por hoje?\n\nO limite de {} passa a ser 0 hoje. A partir do dia seguinte, o PlayGuard vai sugerir voltar o limite para {}.",
-        "stop_body_auto": "Encerrar o jogo por hoje?\n\nO limite de {} passa a ser 0 hoje. A partir do dia seguinte, o PlayGuard volta o limite para {} automaticamente.",
+        "stop_body_auto": "Encerrar o jogo por hoje?\n\nO limite de {} passa a ser 0 hoje. A partir do dia seguinte, o PlayGuard volta o limite para {} na próxima vez que for aberto.",
         "stop_confirm": "Parar por hoje",
         "stop_done": "Jogo encerrado por hoje.",
         "stop_restore_body": "Em {}, o limite de {} foi definido como {} só para aquele dia. Voltar para {}?",
@@ -205,7 +205,7 @@
         "stop_now": "Agora",
         "stop_soon": "Daqui a 5 minutos",
         "stop_soon_body": "Parar daqui a 5 minutos?\n\nO limite de {} passa a ser {} hoje: cerca de 5 minutos a mais, tempo para salvar. A partir do dia seguinte, o PlayGuard vai sugerir voltar o limite para {}.",
-        "stop_soon_body_auto": "Parar daqui a 5 minutos?\n\nO limite de {} passa a ser {} hoje: cerca de 5 minutos a mais, tempo para salvar. A partir do dia seguinte, o PlayGuard volta o limite para {} automaticamente.",
+        "stop_soon_body_auto": "Parar daqui a 5 minutos?\n\nO limite de {} passa a ser {} hoje: cerca de 5 minutos a mais, tempo para salvar. A partir do dia seguinte, o PlayGuard volta o limite para {} na próxima vez que for aberto.",
         "stop_soon_done": "O jogo para daqui a uns 5 minutos.",
         "stop_alarm_only": "O console só avisa quando o tempo acaba (veja \"Quando o tempo acabar\"): o jogo em andamento não é interrompido.",
         "outside_reset": "O tempo de jogo de hoje recomeçou do zero por volta das {} (relógio alterado?).",
@@ -651,13 +651,15 @@
             "no_pin": "Não havia PIN para recuperar: nenhum PIN do controle dos pais está definido.",
             "failed": "Não foi possível concluir a recuperação.",
             "refused": "Nada foi excluído: não foi possível remover o arquivo RESCUE do cartão SD.",
-            "unconfirmed": "O console não mostra a recuperação que este relatório descreve."
+            "unconfirmed": "O console não mostra a recuperação que este relatório descreve.",
+            "old_module": "O sysmodule de recuperação é mais antigo que este PlayGuard: o relatório dele não pode ser verificado."
         },
         "hint": {
             "reset_pin": "escolher um novo",
             "delete": "excluir tudo"
         },
-        "note_unconfirmed": "Sem o PIN não é possível alterar nada aqui, e o PlayGuard abre como de costume. Sem acesso? Coloque o arquivo RESCUE de volta no cartão SD, com o sysmodule de recuperação instalado, e reinicie o console."
+        "note_unconfirmed": "Sem o PIN não é possível alterar nada aqui, e o PlayGuard abre como de costume. Sem acesso? Coloque o arquivo RESCUE de volta no cartão SD, com o sysmodule de recuperação instalado, e reinicie o console.",
+        "note_old_module": "Sem o PIN não é possível alterar nada aqui, e o PlayGuard abre como de costume. Atualize o módulo em um computador: extraia o playguard-rescue.zip do PlayGuard {} na raiz do cartão SD, coloque o arquivo RESCUE de volta e reinicie o console."
     },
     "tools": {
         "section_diag": "Diagnóstico",
@@ -969,7 +971,7 @@
         "section_notices": "Notificações",
         "notices_system": "Versões do Atmosphère, hekate e firmware",
         "notices_summary": "O tempo de jogo da semana",
-        "notices_reminders": "Lembretes: backups, o outro sistema, os jogos bloqueados",
+        "notices_reminders": "Avisos: backups, outro sistema, jogos bloqueados",
         "help": "Ajuda e diagnóstico"
     },
     "backup": {
@@ -1032,7 +1034,7 @@
         "confirm_gist": "Um gist secreto na sua conta do GitHub: qualquer pessoa com o link pode lê-lo, até você apagá-lo no GitHub. Ele nunca contém o PIN nem o número de série.",
         "confirm_public": "Um relatório de bug aberto com este link é público. Do histórico, só as últimas alterações são enviadas, sem nomes nem horários.",
         "where_gist": "um gist secreto no GitHub",
-        "relogin": "O GitHub recusou o gist. Saia e faça login de novo (Conta do GitHub, nas ferramentas de desenvolvedor) para permitir gists.",
+        "relogin": "O GitHub recusou o gist: o login do PlayGuard não permite gists. Fazer login de novo para permiti-los? Para sair em vez disso: {}.",
         "needs_github": "O relatório vai para um gist secreto da sua conta do GitHub: quem tiver o link pode lê-lo, até você apagá-lo no GitHub. O PlayGuard ainda não fez login no GitHub. Fazer login agora?",
         "sign_in": "Fazer login",
         "send": "Enviar",
@@ -1256,7 +1258,9 @@
             "first_steps": "Primeiros passos",
             "overview": "Visão geral",
             "profile": "Perfil \"{}\"",
-            "console_lock": "Bloquear todos os jogos"
+            "console_lock": "Bloquear todos os jogos",
+            "notices": "Notificações",
+            "rescue": "Recuperação"
         },
         "when": "Quando",
         "how": "Origem",
@@ -1368,6 +1372,7 @@
         "unlocked": "O controle parental está desbloqueado temporariamente",
         "unlocked_detail": "Dá para jogar sem limite até ele ser bloqueado de novo.",
         "extra_restore_detail": "O tempo extra adicionado em um dia anterior ainda aumenta este limite.",
+        "stop_restore_detail": "\"{}\" em um dia anterior ainda mantém este limite abaixo do habitual.",
         "new_account": "Uma nova conta de usuário",
         "installed": "PlayGuard {} instalado",
         "installed_detail": "Ele iniciou bem. O build anterior, {}, foi mantido: as ferramentas de desenvolvedor podem voltar para ele.",

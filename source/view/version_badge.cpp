@@ -36,7 +36,7 @@ VersionBadge::VersionBadge()
     tag->setMarginRight(10);
     auto* dev = new brls::Label();
     dev->setText("DEV");
-    dev->setFontSize(15);
+    dev->setFontSize(18);
     dev->setSingleLine(true);
     dev->setTextColor(brls::Application::getTheme()["brls/background"]);
     tag->addView(dev);
