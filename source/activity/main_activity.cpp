@@ -136,8 +136,9 @@ void MainActivity::onContentAvailable()
 
     // Firmware newer than the verified one: the firmware screen (or the remembered choice).
     fw_gate::on_main_screen();
-    // Nothing set up yet (no PIN): the first steps, once per start.
-    if (OnboardingActivity::wanted_at_start())
+    // Nothing set up yet (no PIN): the first steps, once per start, unless the
+    // firmware screen opens (one screen per start: ui::claim_start_screen).
+    if (OnboardingActivity::wanted_at_start() && ui::claim_start_screen("first steps"))
         brls::sync([]() { brls::Application::pushActivity(new OnboardingActivity()); });
     // Settings, history or a recovery report found damaged, a build gone back
     // from: in the notification bell.

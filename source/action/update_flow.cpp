@@ -123,7 +123,8 @@ void show_when_free(brls::Activity* main, const Offer& o, int steps_left)
 {
     auto stack = brls::Application::getActivitiesStack();
     if (!stack.empty() && stack.back() == main) {
-        UpdateActivity::show(o);
+        // Not after another screen of its own this start (First steps): the next.
+        if (ui::claim_start_screen("the update screen")) UpdateActivity::show(o);
         return;
     }
     if (steps_left <= 0) return;   // still busy: the next start-up

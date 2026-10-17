@@ -74,6 +74,17 @@ bool quitting()
     return s_quitting;
 }
 
+bool claim_start_screen(const char* what)
+{
+    static const char* s_claimed = nullptr;
+    if (s_claimed) {
+        brls::Logger::info("start-up: {} waits for the next start ({} was shown)", what, s_claimed);
+        return false;
+    }
+    s_claimed = what;
+    return true;
+}
+
 bool finish_background(std::chrono::milliseconds max)
 {
     s_quitting = true;

@@ -79,6 +79,7 @@ void on_main_screen()
 {
     if (!needed()) return;
     if (!s_remembered) {
+        ui::claim_start_screen("the firmware screen");   // first: nothing asked before it
         brls::sync([]() { brls::Application::pushActivity(new FirmwareGateActivity()); });
         return;
     }
