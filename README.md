@@ -13,7 +13,7 @@
 
 PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.apple.com/app/id1190074407) phone app onto a modded console. It drives the console's own controls (the limit, the PIN, the warnings, the suspension), so nothing runs in the background.
 
-[![PlayGuard in 30 seconds](images/video/playguard-tour.gif)](images/video/playguard-tour.mp4)
+[![PlayGuard in 30 seconds](images/video/playguard-tour.gif)](images/video/playguard-tour.gif)
 
 > [!WARNING]
 > **Requires custom firmware (Atmosphère).** PlayGuard uses the restricted `pctl` service, some of it through `*ForDebug` commands. **Use at your own risk.**
@@ -23,7 +23,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 - ⏱️ **Play-time limit** — the same every day or one per day, profiles, extra time or no more play today in one press.
 - 📊 **Activity** — time per game and per account, charts, export to CSV, JSON, XLSX or PDF.
 - 🔒 **Restrictions and PIN** — restriction level, age rating, PIN, temporary unlock, *Block all games* in one switch.
-- 🕒 **Network clock** — set from public NTP servers, so the timer counts right on a console that never reaches Nintendo.
+- 🕒 **Console** — the network clock set from public NTP servers, so the timer counts right on a console that never reaches Nintendo, and a check of the installed games.
 - 📱 **Companion app** — unlink it, even on a second-hand console.
 - ↩️ **History and backups** — every change is logged and can be undone.
 - 🔔 **Notifications** — a bell gathers what needs you (an alarm off, a clock drifting, changes made elsewhere), with the fix one press away.
@@ -45,7 +45,7 @@ Search for *PlayGuard* in the Homebrew App Store or sphaira, or extract `playgua
 
 1. Open PlayGuard: the *First steps* guide sets the PIN and the daily limit.
 2. Still linked to the phone app? *PIN › Unlink the companion app*, or its next sync overwrites what you set.
-3. Network clock inaccurate? *Network clock › Measure*, then set it. Without Internet, read [this first](docs/compatibility.md#supported-versions).
+3. Network clock inaccurate? *Console › Network clock › Measure the time difference*, then set it. Without Internet, read [this first](docs/compatibility.md#supported-versions).
 
 Forgotten PIN or second-hand console: [Locked out?](docs/troubleshooting.md#locked-out)
 

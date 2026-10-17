@@ -2,8 +2,10 @@
 
 What each tab does, how PlayGuard writes safely, and what the console counts as play time. Back to the [README](../README.md).
 
-| Play timer | Per-day limits |
+| Overview | Console |
 |---|---|
+| ![Overview](../images/screenshots/dashboard.png) | ![Console](../images/screenshots/console.png) |
+| **Play timer** | **Per-day limits** |
 | ![Play timer](../images/screenshots/play_timer.png) | ![Per-day limits](../images/screenshots/per_day.png) |
 | **Activity** | **A game** |
 | ![Activity](../images/screenshots/activity.png) | ![A game](../images/screenshots/activity_game.png) |
@@ -35,7 +37,7 @@ A bell in the header, left of the version, gathers what needs the parent; Ⓨ op
 ## Overview — today at a glance
 
 - **Today first:** a gauge of today's play time (while no game is running, the time from the activity log, marked ≈), today's limit, time left, bedtime alarm. The "time's up" alarm shows in amber while it is off — Ⓐ turns it back on. Under the gauge, a reminder: a game left open on the HOME menu keeps counting (see [What counts as play time](#what-counts-as-play-time)).
-- **Is the console counting?** PlayGuard's own time counts while it runs as an application, so with a limit today the time left should go down while it is open. When it has not moved for about 90 s on screen (timer on, a limit today, not unlocked, not opened from the album), an amber line says *The console is not counting play time right now*, with the likely causes: the clock was set back (it counts again later), the network clock was never set (*Network clock* tab), or a limit was just written (start a game for a minute, then check). It goes as soon as the time left moves again. The Play timer's state line says it too.
+- **Is the console counting?** PlayGuard's own time counts while it runs as an application, so with a limit today the time left should go down while it is open. When it has not moved for about 90 s on screen (timer on, a limit today, not unlocked, not opened from the album), an amber line says *The console is not counting play time right now*, with the likely causes: the clock was set back (it counts again later), the network clock was never set (*Console › Network clock*), or a limit was just written (start a game for a minute, then check). It goes as soon as the time left moves again. The Play timer's state line says it too.
 - **Changed outside PlayGuard:** today's play time starting over on the same day (a clock change does that), the console clock moved by more than 5 minutes, limits that differ from the ones PlayGuard last saw (the phone app, another tool). An amber notice until dismissed or the next day, and an entry in the change history. PlayGuard does not run in the background: it only sees what changed while it was open, or since it last was, when it reads the console again.
 - **At the limit** the console shows "Time's up", then suspends the game (no "continue") or only warns: *When the time is up* shows which and changes it, once a limit or a bedtime is set ([details](parental-controls.md#when-the-time-runs-out)).
 - **Then the state:** parental controls, PIN (*Set* or *Not set*, never its length), restriction level.

@@ -1,7 +1,8 @@
 // Renders branding/tour.html, frame by frame, to images/video/playguard-tour.mp4
 // (1920x1080, 30 fps) and images/video/playguard-tour.gif (720 px, 10 fps): the
-// README shows the GIF, which GitHub plays inline (its mobile app too, which
-// does not play an MP4 from the repository), and links it to the MP4.
+// README shows the GIF, which GitHub plays inline (its mobile app too), and
+// links it to itself at full size: GitHub never plays an MP4 from the
+// repository (its file view says it is too big, its raw link downloads it).
 // The GIF is rendered with tour.html?still (no drifting glow, no zoom on the
 // screenshots), so most of each frame repeats the last one and it stays small.
 // Needs Node + Playwright (Chromium) and ffmpeg; loads the Sora font from Google Fonts.
