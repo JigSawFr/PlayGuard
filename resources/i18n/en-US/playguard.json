@@ -1344,6 +1344,10 @@
         "offline": "Offline: notes kept from {}.",
         "failed": "The notes could not be fetched. Press X to try again."
     },
+    "quick": {
+        "title": "Language and theme",
+        "hint": "Language & theme"
+    },
     "notices": {
         "title": "Notifications",
         "hint": "Notifications",

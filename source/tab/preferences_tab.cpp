@@ -12,8 +12,6 @@ using namespace brls::literals;
 
 namespace
 {
-const char* THEMES[]    = { "system", "light", "dark" };
-
 template <size_t N>
 int index_of(const char* const (&list)[N], const std::string& value)
 {
@@ -27,28 +25,12 @@ PreferencesTab::PreferencesTab()
     : TabBase("xml/tab/preferences.xml", false)
 {
     language->registerClickAction([this](brls::View*) {
-        std::vector<std::string> labels;
-        for (const char* l : config::LANGUAGES) labels.push_back(brls::getStr(std::string("playguard/tools/languages/") + l));
-        ui::pick("playguard/tools/language"_i18n, labels, index_of(config::LANGUAGES, config::get().language), [this](int i) {
-            const bool changed = config::get().language != config::LANGUAGES[i];
-            config::get().language = config::LANGUAGES[i];
-            ui::save_config();
-            this->refresh();
-            if (changed) ui::offer_restart();
-        });
+        ui::pick_language([this]() { this->refresh(); });
         return true;
     });
 
     theme->registerClickAction([this](brls::View*) {
-        std::vector<std::string> labels;
-        for (const char* t : THEMES) labels.push_back(brls::getStr(std::string("playguard/tools/themes/") + t));
-        ui::pick("playguard/tools/theme"_i18n, labels, index_of(THEMES, config::get().theme), [this](int i) {
-            const bool changed = config::get().theme != THEMES[i];
-            config::get().theme = THEMES[i];
-            ui::save_config();
-            this->refresh();
-            if (changed) ui::offer_restart();
-        });
+        ui::pick_theme([this]() { this->refresh(); });
         return true;
     });
 
@@ -94,8 +76,8 @@ PreferencesTab::PreferencesTab()
 void PreferencesTab::refresh()
 {
     const auto& cfg = config::get();
-    language->setDetailText(brls::getStr("playguard/tools/languages/" + std::string(config::LANGUAGES[index_of(config::LANGUAGES, cfg.language)])));
-    theme->setDetailText(brls::getStr("playguard/tools/themes/" + std::string(THEMES[index_of(THEMES, cfg.theme)])));
+    language->setDetailText(ui::language_name());
+    theme->setDetailText(ui::theme_name());
     start_tab->setDetailText(brls::getStr(std::string("playguard/tabs/") + config::START_TABS[index_of(config::START_TABS, cfg.start_tab)]));
     intro->setOn(cfg.intro, false);
     notices_system->setOn(cfg.notices_system, false);

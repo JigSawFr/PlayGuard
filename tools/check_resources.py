@@ -258,7 +258,7 @@ DYNAMIC_KEYS = {
     "tabs/": array_of("source/util/config.hpp", "START_TABS") +
     re.findall(r'open_label\("(\w+)"\)', read(f"{ROOT}/source/action/notices.cpp")),
     "tools/languages/": array_of("source/util/config.hpp", "LANGUAGES"),
-    "tools/themes/": array_of("source/tab/preferences_tab.cpp", "THEMES"),
+    "tools/themes/": array_of("source/util/config.hpp", "THEMES"),
     "tools/update_via_values/": array_of("source/action/update_flow.cpp", "METHODS"),
 }
 for prefix, values in sorted(DYNAMIC_KEYS.items()):

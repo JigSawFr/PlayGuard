@@ -16,7 +16,7 @@ What each tab does, how PlayGuard writes safely, and what the console counts as 
 
 ## Controls
 
-↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh (on the tabs that read the console) · Ⓨ notifications · **+** saves per-day limits.
+↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh (on the tabs that read the console) · Ⓨ notifications · **−** language and theme · **+** saves per-day limits.
 
 What failed is said in a dialog, what worked in a toast. The title says when the app is read-only or while parental controls are temporarily unlocked; in read-only mode, actions stay in place, greyed, and say why when pressed.
 
@@ -25,6 +25,8 @@ The app is organised in tabs, like System Settings; each has its section below.
 ## Notifications — what needs you, from any tab
 
 A bell in the header, left of the version, gathers what needs the parent; Ⓨ opens the list from any tab (the footer says *Notifications (2)* when two things are to do).
+
+Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun for light, a moon for dark, a half-filled circle when it follows the console): a tap opens the same list as *Preferences*, and **−** offers both from any tab. Either change takes effect once PlayGuard is started again.
 
 - **To do**, counted on the bell in amber, stays until it is fixed: no PIN yet, a PIN anyone would try first (0000, 1234, 1212, 2580…: judged on the console, never shown), a PIN on the console while PlayGuard itself opens without it (*Protect PlayGuard with the PIN* on *Never*), parental controls temporarily unlocked (*Turn back on*), extra time from an earlier day still to put back, the "time's up" alarm off, changes made outside PlayGuard, the console not counting play time, an inaccurate network clock.
 - **For information**, a dot on the bell, can be marked as read: a limit still lowered by *No more play today* on an earlier day (*Put back*), a new version installed (*What's new*; after an update in place, the previous build kept), a report sent online (*Show the link*), the week's play time (every 7 days until read) and a limit passed on two or more of the last 7 days while the console only warns, a settings backup to make (none yet, or none for 30 days), all games blocked for a week, a new user account, PlayGuard closed unexpectedly last time (*Send a report*), the companion app linked, a newer version of PlayGuard, the network clock found off at start-up.

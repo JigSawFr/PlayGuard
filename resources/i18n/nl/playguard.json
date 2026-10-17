@@ -1344,6 +1344,10 @@
         "offline": "Offline: opmerkingen van {}.",
         "failed": "De opmerkingen konden niet worden opgehaald. Druk op X om het opnieuw te proberen."
     },
+    "quick": {
+        "title": "Taal en thema",
+        "hint": "Taal en thema"
+    },
     "notices": {
         "title": "Meldingen",
         "hint": "Meldingen",

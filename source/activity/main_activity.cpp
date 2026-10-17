@@ -15,6 +15,7 @@
 #include "activity/notices_activity.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
+#include "tab/tab_base.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -105,6 +106,17 @@ void MainActivity::onContentAvailable()
     // The desktop build: the keyboard has no Ⓨ, so the Y key (smoke test).
     this->getContentView()->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Y), [](brls::View*) {
         NoticesActivity::open();
+        return true;
+    });
+#endif
+    // −: the language and the theme (also a tap on them in the header).
+    this->getContentView()->registerAction("playguard/quick/hint"_i18n, brls::BUTTON_BACK, [](brls::View*) {
+        ui::quick_settings(TabBase::refresh_shown);
+        return true;
+    });
+#ifndef __SWITCH__
+    this->getContentView()->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_MINUS), [](brls::View*) {
+        ui::quick_settings(TabBase::refresh_shown);
         return true;
     });
 #endif
