@@ -1,5 +1,6 @@
 // Host tests for source/action/notice_logic.cpp: what the notification bell
-// lists, in which order, what it counts, and what putting an entry away does;
+// lists, in which order, what it counts, and what putting an entry away or
+// ignoring one does;
 // and the rules action/notices applies: which kinds Preferences › Notifications
 // hides, the key an entry read is remembered by, when the backup, console
 // lock, SD card and week reminders are due, and the days over the limit.
@@ -142,6 +143,101 @@ static void test_dismissed_moved_to_action()
     CHECK(s.action_count() == 1);
 }
 
+static void test_ack()
+{
+    Store s;
+    s.set("pin_weak", Level::Action, "PIN", "");
+    s.set("unlocked", Level::Action, "Unlocked", "");
+    s.set("sd_space", Level::Action, "SD", "120 MB");
+    s.set("week", Level::Info, "8 h", "");
+    CHECK(s.action_count() == 2 && s.console_count() == 1);
+    // Only the entries to do the parent may ignore.
+    CHECK(!s.ack("unlocked"));
+    CHECK(!s.ack("week"));
+    CHECK(!s.ack("unknown"));
+    CHECK(s.ack("pin_weak"));
+    CHECK(!s.ack("pin_weak"));   // already ignored
+    CHECK(s.acked("pin_weak") && !s.has("pin_weak"));
+    // No longer counted on the bell, listed apart.
+    CHECK(s.action_count() == 1);
+    const auto v = s.visible();
+    if (!CHECK(v.size() == 3)) return;
+    CHECK(v[0].id == "unlocked" && v[1].id == "week" && v[2].id == "sd_space");
+    const auto ign = s.ignored();
+    CHECK(ign.size() == 1 && ign[0].id == "pin_weak");
+    // A new text (the free space read again) keeps it ignored.
+    CHECK(s.ack("sd_space"));
+    CHECK(s.console_count() == 0);
+    s.set("sd_space", Level::Action, "SD", "90 MB");
+    CHECK(s.acked("sd_space") && s.console_count() == 0);
+    // Counted again.
+    CHECK(s.unack("sd_space"));
+    CHECK(!s.unack("sd_space"));
+    CHECK(s.console_count() == 1);
+    // Cleared while ignored: not shown, nothing changes on the bell; set
+    // again, it is new and counted.
+    CHECK(!s.clear("pin_weak"));
+    CHECK(s.ignored().empty());
+    s.set("pin_weak", Level::Action, "PIN", "");
+    CHECK(s.has("pin_weak") && s.action_count() == 2);
+}
+
+static void test_ack_kind_changes()
+{
+    // Ignored as something to do, then only for information, then to do
+    // again: asked again.
+    Store s;
+    s.set("pin_weak", Level::Action, "PIN", "");
+    CHECK(s.ack("pin_weak"));
+    CHECK(s.set("pin_weak", Level::Info, "PIN", ""));
+    CHECK(!s.acked("pin_weak") && s.has("pin_weak"));
+    CHECK(!s.ack("pin_weak"));   // information: put away, not ignored
+    CHECK(s.set("pin_weak", Level::Action, "PIN", ""));
+    CHECK(s.has("pin_weak") && s.action_count() == 1);
+}
+
+static void test_ackable()
+{
+    for (const char* id : { "pin_weak", "pin_lock_off", "alarm_off", "sd_space" }) CHECK(ackable(id));
+    for (const char* id : { "pin_missing", "unlocked", "outside", "not_counting", "clock", "extra_restore",
+                            "data_history", "sd_config", "sd_history", "rescue_old", "rescue_restart", "games",
+                            "patches", "week", "pin", "pin_weak_" })
+        CHECK(!ackable(id));
+}
+
+static void test_ack_keys()
+{
+    CHECK(ack_key("pin_weak", "4", "2026-10-17") == "pin_weak:4:2026-10-17");
+    CHECK(ack_key("alarm_off", "", "2026-10-17") == "alarm_off::2026-10-17");
+    std::vector<std::string> keys = { "pin_weak:4:2026-10-17", "alarm_off::2026-09-01", "sd_space::bad-date",
+                                      "pin_lock_off::2026-1-1" };
+    CHECK(ack_day(keys, "pin_weak", "4") == "2026-10-17");
+    CHECK(ack_day(keys, "pin_weak", "6") == "");   // a new PIN, of another length: asked again
+    CHECK(ack_day(keys, "pin_weak", "") == "");
+    CHECK(ack_day(keys, "alarm_off", "") == "2026-09-01");
+    CHECK(ack_day(keys, "sd_space", "") == "");     // not a date
+    CHECK(ack_day(keys, "pin_lock_off", "") == "");
+    CHECK(ack_day(keys, "pin", "") == "" && ack_day(keys, "pin", "weak:4") == "");
+    CHECK(ack_day({}, "pin_weak", "4") == "");
+
+    // For 30 days with the reminder, for good without.
+    CHECK(ack_holds(keys, "pin_weak", "4", "2026-10-17", true));
+    CHECK(ack_holds(keys, "pin_weak", "4", "2026-11-15", true));
+    CHECK(!ack_holds(keys, "pin_weak", "4", "2026-11-16", true));
+    CHECK(ack_holds(keys, "pin_weak", "4", "2030-01-01", false));
+    CHECK(!ack_holds(keys, "pin_weak", "6", "2026-10-17", false));
+    CHECK(!ack_holds(keys, "alarm_off", "", "2026-10-17", true));
+    CHECK(ack_until(keys, "pin_weak", "4", true) == "2026-11-16");
+    CHECK(ack_until(keys, "pin_weak", "4", false) == "");
+    CHECK(ack_until(keys, "pin_weak", "6", true) == "");
+
+    // Forgotten: only that id's, whatever it was about.
+    CHECK(ack_forget(keys, "pin_weak"));
+    CHECK(!ack_forget(keys, "pin_weak"));
+    CHECK(!ack_forget(keys, "pin"));
+    CHECK(keys.size() == 3 && ack_day(keys, "alarm_off", "") == "2026-09-01");
+}
+
 static void test_order_after_clear()
 {
     // Cleared and set again: last of its kind, as a new entry.
@@ -278,6 +374,10 @@ int main()
     test_clear();
     test_dismiss();
     test_dismissed_moved_to_action();
+    test_ack();
+    test_ack_kind_changes();
+    test_ackable();
+    test_ack_keys();
     test_order_after_clear();
     test_shown_kind();
     test_read_key();

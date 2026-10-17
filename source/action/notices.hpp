@@ -30,18 +30,37 @@ struct Entry
 };
 
 // Adds or replaces the entry `id`. `action` runs from the list, after it closed.
+// `print`: what an entry the parent may ignore is about (the PIN's length for
+// pin_weak): ignored for one, it is asked again for another.
 void set(const std::string& id, Level level, const std::string& title, const std::string& detail,
-         const std::string& action_label = "", std::function<void()> action = nullptr);
+         const std::string& action_label = "", std::function<void()> action = nullptr,
+         const std::string& print = "");
 void clear(const std::string& id);
+// What `id` says is fixed, as read (not only unknown for now): cleared, and
+// no longer ignored, so it is told again if it comes back.
+void resolved(const std::string& id);
 // Puts away an Info entry (see notice_logic::Store::dismiss), and remembers
 // it in config.json (notices_read): read at the next start too, until its
 // text changes.
 void dismiss(const std::string& id);
+// Every entry for information put away (dismiss).
+void dismiss_all();
+// Ignores an entry to do the parent may ignore (notice_logic::ackable), and
+// remembers it in config.json (notices_acked): no longer counted, listed
+// apart, for 30 days (notices_ack_remind) or until what it says is fixed.
+// The caller asks for the PIN first.
+void acknowledge(const std::string& id);
+// Counted again.
+void reactivate(const std::string& id);
 // Preferences › Notifications changed: entries of a kind turned off go, the
 // state is read again.
 void apply_preferences();
 
 std::vector<Entry> list();
+// The entries ignored (acknowledge), the bell's order.
+std::vector<Entry> ignored();
+// The day `id`, ignored, counts again ("" with no reminder).
+std::string ignored_until(const std::string& id);
 int action_count();    // the parental controls' entries to do: the bell's number
 int info_count();      // the parental controls' entries for information
 int console_count();   // the console's entries to do: the Console tab's number

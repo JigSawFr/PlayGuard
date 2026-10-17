@@ -96,6 +96,11 @@ PreferencesTab::PreferencesTab()
         ui::save_config();
         notices::apply_preferences();
     });
+    notices_ack_remind->init("playguard/prefs/notices_ack_remind"_i18n, config::get().notices_ack_remind, [](bool on) {
+        config::get().notices_ack_remind = on;
+        ui::save_config();
+        notices::apply_preferences();
+    });
     // Updates: PlayGuard's own (About keeps "Check for updates" by the version).
     update_daily->init("playguard/tools/update_daily"_i18n, config::get().update_daily, [](bool on) {
         config::get().update_daily = on;
@@ -118,6 +123,7 @@ void PreferencesTab::refresh()
     notices_system->setOn(cfg.notices_system, false);
     notices_summary->setOn(cfg.notices_summary, false);
     notices_reminders->setOn(cfg.notices_reminders, false);
+    notices_ack_remind->setOn(cfg.notices_ack_remind, false);
     update_daily->setOn(cfg.update_daily, false);
     update_via->setDetailText(update_flow::method_text());
 }

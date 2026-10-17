@@ -978,6 +978,7 @@
         "notices_system": "Nieuwe versies van Atmosphère, hekate en firmware",
         "notices_summary": "De speeltijd van de week",
         "notices_reminders": "Herinneringen: back-ups, ander systeem, games op slot",
+        "notices_ack_remind": "Genegeerde waarschuwingen na 30 dagen weer meetellen",
         "help": "Hulp en diagnose"
     },
     "backup": {
@@ -1356,6 +1357,14 @@
         "console_count": "{} om te bekijken",
         "console_show": "Tonen",
         "seen": "Markeren als gelezen",
+        "read_all": "Alles als gelezen markeren",
+        "ignore": "Negeren",
+        "ignore_confirm": "‘{}’\n\nDeze waarschuwing telt niet meer mee op de bel. Ze komt over 30 dagen terug, of eerder als ze is opgelost en opnieuw optreedt.",
+        "ignore_confirm_kept": "‘{}’\n\nDeze waarschuwing telt niet meer mee op de bel. Ze komt pas terug als ze is opgelost en opnieuw optreedt.",
+        "section_ignored": "Genegeerd",
+        "reactivate": "Weer meetellen",
+        "ignored_until": "Genegeerd tot {}",
+        "ignored_kept": "Genegeerd",
         "open_tab": "{} openen",
         "pin_missing": "Ouderlijk toezicht is niet ingesteld",
         "pin_missing_detail": "Nog geen pincode: de console is niet beschermd.",

@@ -978,6 +978,7 @@
         "notices_system": "Atmosphère、hekate 和韌體的新版本",
         "notices_summary": "本週遊戲時間",
         "notices_reminders": "提醒：備份、另一個系統、封鎖遊戲",
+        "notices_ack_remind": "30 天後重新計入已忽略的警告",
         "help": "說明與診斷"
     },
     "backup": {
@@ -1356,6 +1357,14 @@
         "console_count": "需查看的項目：{}",
         "console_show": "顯示",
         "seen": "標為已讀",
+        "read_all": "全部標為已讀",
+        "ignore": "忽略",
+        "ignore_confirm": "「{}」\n\n此警告將不再計入鈴鐺。30 天後會再次出現；如果問題解決後又再次發生，會更早出現。",
+        "ignore_confirm_kept": "「{}」\n\n此警告將不再計入鈴鐺。只有在問題解決後又再次發生時才會再次出現。",
+        "section_ignored": "已忽略",
+        "reactivate": "重新計入",
+        "ignored_until": "忽略至 {}",
+        "ignored_kept": "已忽略",
         "open_tab": "開啟{}",
         "pin_missing": "尚未設定家長監護",
         "pin_missing_detail": "還沒有 PIN：主機未受保護。",

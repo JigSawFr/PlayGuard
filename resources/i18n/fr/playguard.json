@@ -978,6 +978,7 @@
         "notices_system": "Versions d'Atmosphère, de hekate et du firmware",
         "notices_summary": "Le temps de jeu de la semaine",
         "notices_reminders": "Rappels : sauvegardes, autre système, jeux bloqués",
+        "notices_ack_remind": "Rappeler les avertissements ignorés après 30 jours",
         "help": "Aide et diagnostic"
     },
     "backup": {
@@ -1356,6 +1357,14 @@
         "console_count": "{} à regarder",
         "console_show": "Afficher",
         "seen": "Marquer comme lu",
+        "read_all": "Tout marquer comme lu",
+        "ignore": "Ignorer",
+        "ignore_confirm": "« {} »\n\nCet avertissement ne sera plus compté sur la cloche. Il reviendra dans 30 jours, ou plus tôt s'il est corrigé puis se reproduit.",
+        "ignore_confirm_kept": "« {} »\n\nCet avertissement ne sera plus compté sur la cloche. Il ne reviendra que s'il est corrigé puis se reproduit.",
+        "section_ignored": "Ignorés",
+        "reactivate": "Réactiver",
+        "ignored_until": "Ignoré jusqu'au {}",
+        "ignored_kept": "Ignoré",
         "open_tab": "Ouvrir {}",
         "pin_missing": "Le contrôle parental n'est pas configuré",
         "pin_missing_detail": "Pas encore de code PIN : la console n'est pas protégée.",

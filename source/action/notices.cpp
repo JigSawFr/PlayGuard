@@ -43,6 +43,8 @@ struct Act
     std::function<void()> run;
 };
 std::map<std::string, Act> s_actions;
+// What each entry the parent may ignore is about (set's `print`).
+std::map<std::string, std::string> s_prints;
 
 std::map<int, std::function<void()>> s_listeners;
 int s_next_listener = 1;
@@ -74,6 +76,39 @@ bool was_read(const std::string& key)
 {
     const auto& read = config::get().notices_read;
     return std::find(read.begin(), read.end(), key) != read.end();
+}
+
+// Ignored or counted, as config.json says today (30 days gone by, the PIN
+// changed). True when what the bell shows changed.
+bool recheck_ack(const std::string& id)
+{
+    if (!notice_logic::ackable(id)) return false;
+    const auto& cfg = config::get();
+    auto it = s_prints.find(id);
+    const std::string print = it == s_prints.end() ? "" : it->second;
+    if (notice_logic::ack_holds(cfg.notices_acked, id, print, ui::today_date(), cfg.notices_ack_remind))
+        return s_store.ack(id);
+    return s_store.unack(id);
+}
+
+void recheck_acks()
+{
+    bool moved = false;
+    for (const char* id : { "pin_weak", "pin_lock_off", "alarm_off", "sd_space" }) moved |= recheck_ack(id);
+    if (moved) changed();
+}
+
+// The entry's in s_store.visible() and ignored(), with its action.
+Entry entry_of(const notice_logic::Item& item)
+{
+    Entry e;
+    e.item = item;
+    auto it = s_actions.find(item.id);
+    if (it != s_actions.end()) {
+        e.action_label = it->second.label;
+        e.action       = it->second.run;
+    }
+    return e;
 }
 
 // Free space on the SD card, bytes; false when it cannot be read. On the
@@ -114,31 +149,42 @@ bool sd_free_kept(uint64_t* bytes)
 
 // One entry that is there while `on`, gone otherwise.
 void toggle(bool on, const std::string& id, Level level, const std::string& title, const std::string& detail,
-            const std::string& action_label = "", std::function<void()> action = nullptr)
+            const std::string& action_label = "", std::function<void()> action = nullptr,
+            const std::string& print = "")
 {
-    if (on) set(id, level, title, detail, action_label, action);
+    if (on) set(id, level, title, detail, action_label, action, print);
     else clear(id);
 }
 }   // namespace
 
 void set(const std::string& id, Level level, const std::string& title, const std::string& detail,
-         const std::string& action_label, std::function<void()> action)
+         const std::string& action_label, std::function<void()> action, const std::string& print)
 {
     if (!shown_kind(id)) {
         clear(id);
         return;
     }
     s_actions[id] = Act{ action ? action_label : "", action };
+    s_prints[id] = print;
     bool moved = s_store.set(id, level, title, detail);
     // Read at an earlier start, with the same text: still read.
     if (level == Level::Info && s_store.has(id) && was_read(notice_logic::read_key(id, title, detail))) moved |= s_store.dismiss(id);
+    // Ignored at an earlier start, about the same: still ignored.
+    if (level == Level::Action) moved |= recheck_ack(id);
     if (moved) changed();
 }
 
 void clear(const std::string& id)
 {
     s_actions.erase(id);
+    s_prints.erase(id);
     if (s_store.clear(id)) changed();
+}
+
+void resolved(const std::string& id)
+{
+    clear(id);
+    if (notice_logic::ack_forget(config::get().notices_acked, id)) ui::save_config();
 }
 
 void dismiss(const std::string& id)
@@ -159,27 +205,61 @@ void dismiss(const std::string& id)
     changed();
 }
 
+void dismiss_all()
+{
+    for (const auto& item : s_store.visible())
+        if (item.level == Level::Info) dismiss(item.id);
+}
+
+void acknowledge(const std::string& id)
+{
+    if (!s_store.ack(id)) return;
+    auto& acked = config::get().notices_acked;
+    notice_logic::ack_forget(acked, id);
+    acked.push_back(notice_logic::ack_key(id, s_prints[id], ui::today_date()));
+    if (acked.size() > 16) acked.erase(acked.begin(), acked.end() - 16);
+    ui::save_config();
+    brls::Logger::info("notices: {} ignored", id);
+    changed();
+}
+
+void reactivate(const std::string& id)
+{
+    if (!s_store.unack(id)) return;
+    notice_logic::ack_forget(config::get().notices_acked, id);
+    ui::save_config();
+    brls::Logger::info("notices: {} counted again", id);
+    changed();
+}
+
 void apply_preferences()
 {
     for (const auto& item : s_store.visible())
         if (!shown_kind(item.id)) clear(item.id);
+    recheck_acks();   // the reminder after 30 days turned on or off
     sweep();
 }
 
 std::vector<Entry> list()
 {
     std::vector<Entry> out;
-    for (const auto& item : s_store.visible()) {
-        Entry e;
-        e.item = item;
-        auto it = s_actions.find(item.id);
-        if (it != s_actions.end()) {
-            e.action_label = it->second.label;
-            e.action       = it->second.run;
-        }
-        out.push_back(e);
-    }
+    for (const auto& item : s_store.visible()) out.push_back(entry_of(item));
     return out;
+}
+
+std::vector<Entry> ignored()
+{
+    std::vector<Entry> out;
+    for (const auto& item : s_store.ignored()) out.push_back(entry_of(item));
+    return out;
+}
+
+std::string ignored_until(const std::string& id)
+{
+    const auto& cfg = config::get();
+    auto it = s_prints.find(id);
+    return notice_logic::ack_until(cfg.notices_acked, id, it == s_prints.end() ? "" : it->second,
+                                   cfg.notices_ack_remind);
 }
 
 int action_count()
@@ -256,13 +336,16 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
                }, true);
            });
 
-    // The "Time's up" alarm off: nothing says when time is up.
-    toggle(pt_flow::alarm_off(pt), "alarm_off", Level::Action, "playguard/notices/alarm_off"_i18n,
-           "playguard/notices/alarm_off_detail"_i18n, writable ? "playguard/notices/alarm_on"_i18n : open_label("play_timer"),
-           [writable]() {
-               if (writable) pt_flow::turn_alarm_on("notices", []() { sweep(); });
-               else open_tab(ui::tab::play_timer);
-           });
+    // The "Time's up" alarm off: nothing says when time is up. Read as on
+    // (or the timer off): fixed, told again if it goes off again.
+    const bool alarm_known = pt.fw_supported && pt.enabled_valid && (!pt.enabled || pt.alarm_disabled_valid);
+    if (alarm_known && !pt_flow::alarm_off(pt)) resolved("alarm_off");
+    else toggle(pt_flow::alarm_off(pt), "alarm_off", Level::Action, "playguard/notices/alarm_off"_i18n,
+                "playguard/notices/alarm_off_detail"_i18n, writable ? "playguard/notices/alarm_on"_i18n : open_label("play_timer"),
+                [writable]() {
+                    if (writable) pt_flow::turn_alarm_on("notices", []() { sweep(); });
+                    else open_tab(ui::tab::play_timer);
+                });
 
     // Changes seen outside PlayGuard today (the Overview says them too).
     const std::vector<std::string> outside = outside_watch::notice_lines();
@@ -310,9 +393,10 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
     const bool has_pin = s.pin_length_ok && s.pin_length > 0;
 
     // A PIN on the console, but PlayGuard itself opens and changes without it.
-    toggle(has_pin && cfg.pin_lock == "off", "pin_lock_off", Level::Action, "playguard/notices/pin_lock_off"_i18n,
-           "playguard/notices/pin_lock_off_detail"_i18n, "playguard/notices/pin_lock_choose"_i18n,
-           []() { pin_lock::choose([]() { sweep(); }); });
+    if (s.pin_length_ok && !(has_pin && cfg.pin_lock == "off")) resolved("pin_lock_off");
+    else toggle(has_pin && cfg.pin_lock == "off", "pin_lock_off", Level::Action, "playguard/notices/pin_lock_off"_i18n,
+                "playguard/notices/pin_lock_off_detail"_i18n, "playguard/notices/pin_lock_choose"_i18n,
+                []() { pin_lock::choose([]() { sweep(); }); });
 
     // The other system (sysMMC / emuMMC) has parental controls of its own.
     const std::string other = ui::other_storage_note(si);
@@ -339,8 +423,9 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
     // The SD card nearly full: PlayGuard's own writes start failing.
     uint64_t free_b = 0;
     const bool free_known = sd_free_kept(&free_b);   // before the text below, which shows it
-    toggle(notice_logic::sd_space_low(free_known, free_b), "sd_space", Level::Action, "playguard/notices/sd_space"_i18n,
-           brls::getStr("playguard/notices/sd_space_detail", (int)(free_b >> 20)));
+    if (free_known && !notice_logic::sd_space_low(free_known, free_b)) resolved("sd_space");
+    else toggle(notice_logic::sd_space_low(free_known, free_b), "sd_space", Level::Action, "playguard/notices/sd_space"_i18n,
+                brls::getStr("playguard/notices/sd_space_detail", (int)(free_b >> 20)));
 
     // The play data (read in the background for the Overview).
     const auto stats = play_data::latest("");
@@ -369,6 +454,9 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
                "playguard/notices/over_limit_detail"_i18n, open_label("play_timer"),
                []() { open_tab(ui::tab::play_timer); });
     }
+
+    // An entry ignored 30 days ago counts again (the PIN's, set once per start, too).
+    recheck_acks();
 }
 
 void note_pin_strength(const PctlStatus& s)
@@ -380,8 +468,12 @@ void note_pin_strength(const PctlStatus& s)
     checked_len = (int)s.pin_length;
     bool weak = false;
     const bool known = s.pin_length > 0 && R_SUCCEEDED(pctl_pin_weak(&weak));
-    toggle(known && weak, "pin_weak", Level::Action, "playguard/notices/pin_weak"_i18n,
-           "playguard/notices/pin_weak_detail"_i18n, open_label("security"), []() { open_tab(ui::tab::security); });
+    // A PIN harder to guess, or none: fixed, told again if a weak one comes back.
+    // Ignored, it stays ignored for a PIN of the same length (`print`, never the PIN).
+    if ((known && !weak) || s.pin_length == 0) resolved("pin_weak");
+    else toggle(known && weak, "pin_weak", Level::Action, "playguard/notices/pin_weak"_i18n,
+                "playguard/notices/pin_weak_detail"_i18n, open_label("security"), []() { open_tab(ui::tab::security); },
+                std::to_string(s.pin_length));
 }
 
 void note_timer_stalled(bool stalled)

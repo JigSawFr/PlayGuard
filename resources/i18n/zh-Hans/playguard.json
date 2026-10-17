@@ -978,6 +978,7 @@
         "notices_system": "Atmosphère、hekate 和固件的新版本",
         "notices_summary": "本周游戏时间",
         "notices_reminders": "提醒：备份、另一个系统、阻止游戏",
+        "notices_ack_remind": "30 天后重新计入已忽略的警告",
         "help": "帮助与诊断"
     },
     "backup": {
@@ -1356,6 +1357,14 @@
         "console_count": "需查看的项目：{}",
         "console_show": "显示",
         "seen": "标为已读",
+        "read_all": "全部标为已读",
+        "ignore": "忽略",
+        "ignore_confirm": "“{}”\n\n此警告将不再计入铃铛。30 天后会再次出现；如果问题解决后又再次发生，会更早出现。",
+        "ignore_confirm_kept": "“{}”\n\n此警告将不再计入铃铛。只有在问题解决后又再次发生时才会再次出现。",
+        "section_ignored": "已忽略",
+        "reactivate": "重新计入",
+        "ignored_until": "忽略至 {}",
+        "ignored_kept": "已忽略",
         "open_tab": "打开{}",
         "pin_missing": "尚未设置家长控制",
         "pin_missing_detail": "还没有 PIN：主机未受保护。",

@@ -36,6 +36,7 @@
             <brls:BooleanCell id="pf_notices_system"/>
             <brls:BooleanCell id="pf_notices_summary"/>
             <brls:BooleanCell id="pf_notices_reminders"/>
+            <brls:BooleanCell id="pf_notices_ack_remind"/>
             <brls:Header title="@i18n/playguard/tools/section_update" marginTop="24" marginBottom="8"/>
             <brls:BooleanCell id="pf_update_daily"/>
             <brls:DetailCell id="pf_update_via" title="@i18n/playguard/tools/update_via"/>

@@ -978,6 +978,7 @@
         "notices_system": "Atmosphère, hekate, 펌웨어 새 버전",
         "notices_summary": "이번 주 플레이 시간",
         "notices_reminders": "알림: 백업, 다른 시스템, 소프트웨어 차단",
+        "notices_ack_remind": "무시한 경고를 30일 후 다시 표시",
         "help": "도움말 및 진단"
     },
     "backup": {
@@ -1356,6 +1357,14 @@
         "console_count": "확인할 항목 {}개",
         "console_show": "보기",
         "seen": "읽음으로 표시",
+        "read_all": "모두 읽음으로 표시",
+        "ignore": "무시",
+        "ignore_confirm": "“{}”\n\n이 경고는 더 이상 벨에 표시되는 개수에 포함되지 않습니다. 30일 후에, 또는 해결된 뒤 다시 발생하면 그보다 일찍 다시 나타납니다.",
+        "ignore_confirm_kept": "“{}”\n\n이 경고는 더 이상 벨에 표시되는 개수에 포함되지 않습니다. 해결된 뒤 다시 발생할 때만 다시 나타납니다.",
+        "section_ignored": "무시됨",
+        "reactivate": "다시 표시",
+        "ignored_until": "{}까지 무시",
+        "ignored_kept": "무시됨",
         "open_tab": "{} 열기",
         "pin_missing": "자녀 보호 기능이 설정되지 않았습니다",
         "pin_missing_detail": "아직 PIN이 없습니다. 본체가 보호되지 않습니다.",

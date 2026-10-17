@@ -79,11 +79,15 @@ struct Config
     // The notification bell (action/notices): which kinds of entries it
     // shows (Preferences › Notifications), the entries for information read
     // ("id:hash" of their text, the newest last, at most 48: a read one comes
-    // back when its text changes), and the day the weekly summary was read.
+    // back when its text changes), the entries to do ignored ("id:print:day",
+    // at most 16; notice_logic::ack_key), whether those count again after 30
+    // days, and the day the weekly summary was read.
     bool notices_system    = true;   // newer Atmosphère, hekate, firmware
     bool notices_summary   = true;   // the week's play time, a limit passed several days
     bool notices_reminders = true;   // a backup to make, the other system, a long console lock
     std::vector<std::string> notices_read;
+    std::vector<std::string> notices_acked;
+    bool notices_ack_remind = true;
     std::string summary_seen;
 
     // Console lock (PIN › Block all games): every day's limit set to 0, so a

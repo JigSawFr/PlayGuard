@@ -3,7 +3,9 @@
 
 #include "action/notices.hpp"
 #include "action/notice_logic.hpp"
+#include "action/pin_lock.hpp"
 #include "ui/ui.hpp"
+#include "util/config.hpp"
 
 using namespace brls::literals;
 
@@ -35,7 +37,7 @@ void NoticesActivity::open()
 {
     brls::Logger::info("notices: {} to do, {} for information, {} about the console to do", notices::action_count(),
                        notices::info_count(), notices::console_count());
-    if (notices::list().empty()) {
+    if (notices::list().empty() && notices::ignored().empty()) {
         ui::notify("playguard/notices/none"_i18n);
         return;
     }
@@ -44,6 +46,11 @@ void NoticesActivity::open()
 
 void NoticesActivity::onContentAvailable()
 {
+    // Every entry for information put away at once.
+    this->getContentView()->registerAction("playguard/notices/read_all"_i18n, brls::BUTTON_Y, [](brls::View*) {
+        notices::dismiss_all();
+        return true;
+    });
     this->rebuild();
     // A change while the list is open (a source cleared what it fixed):
     // rebuilt on the next frame, outside the source's own call.
@@ -93,7 +100,8 @@ brls::DetailCell* NoticesActivity::console_line(const std::vector<notices::Entry
 }
 
 // An entry: its title (amber when it is to do), and A for what fixes it, or
-// to mark it read.
+// to mark it read. X marks one for information read, or ignores one to do
+// the parent may ignore (after a confirmation and the PIN).
 brls::DetailCell* NoticesActivity::entry_cell(const notices::Entry& e, bool todo)
 {
     auto* cell = new brls::DetailCell();
@@ -117,13 +125,52 @@ brls::DetailCell* NoticesActivity::entry_cell(const notices::Entry& e, bool todo
         brls::Application::popActivity(brls::TransitionAnimation::FADE, [action]() { action(); });
         return true;
     });
+    if (!todo) {
+        cell->registerAction("playguard/notices/seen"_i18n, brls::BUTTON_X, [id](brls::View*) {
+            notices::dismiss(id);
+            return true;
+        });
+    } else if (notice_logic::ackable(id)) {
+        const std::string title = e.item.title;
+        cell->registerAction("playguard/notices/ignore"_i18n, brls::BUTTON_X, [id, title](brls::View*) {
+            const std::string body = brls::getStr(config::get().notices_ack_remind ? "playguard/notices/ignore_confirm"
+                                                                                   : "playguard/notices/ignore_confirm_kept",
+                                                  title);
+            ui::confirm(body, "playguard/notices/ignore"_i18n, [id]() {
+                // A choice about the parental controls: the parent's.
+                if (!pin_lock::confirm()) {
+                    ui::notify(pin_lock::refusal_text());
+                    return;
+                }
+                notices::acknowledge(id);
+            });
+            return true;
+        });
+    }
+    return cell;
+}
+
+// An entry ignored: its title (not amber: no longer counted), and A to
+// count it again.
+brls::DetailCell* NoticesActivity::ignored_cell(const notices::Entry& e)
+{
+    auto* cell = new brls::DetailCell();
+    cell->setText(e.item.title);
+    cell->setDetailTextColor(ui::color_neutral());
+    cell->setDetailText("playguard/notices/reactivate"_i18n);
+    const std::string id = e.item.id;
+    cell->registerClickAction([id](brls::View*) {
+        notices::reactivate(id);
+        return true;
+    });
     return cell;
 }
 
 void NoticesActivity::rebuild()
 {
     const auto all = notices::list();
-    if (all.empty()) {
+    const auto ignored = notices::ignored();
+    if (all.empty() && ignored.empty()) {
         // Nothing left: back to the main screen, once.
         this->closing = true;
         brls::Application::popActivity();
@@ -174,6 +221,19 @@ void NoticesActivity::rebuild()
         if (console && this->console_open && !focus) focus = cell;
 
         if (!e.item.detail.empty()) box->addView(detail_label(e.item.detail));
+    }
+
+    // Last, what the parent chose to ignore.
+    if (!ignored.empty()) {
+        header("playguard/notices/section_ignored"_i18n);
+        for (const notices::Entry& e : ignored) {
+            brls::DetailCell* cell = this->ignored_cell(e);
+            box->addView(cell);
+            if (!first) first = cell;
+            const std::string until = notices::ignored_until(e.item.id);
+            box->addView(detail_label(until.empty() ? "playguard/notices/ignored_kept"_i18n
+                                                    : brls::getStr("playguard/notices/ignored_until", until)));
+        }
     }
 
     root->addView(box);
