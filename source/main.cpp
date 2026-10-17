@@ -50,6 +50,7 @@
 #include "view/loading_bar.hpp"
 #include "view/loading_mark.hpp"
 #include "view/made_in_france.hpp"
+#include "view/header_settings.hpp"
 #include "view/notice_bell.hpp"
 #include "view/version_badge.hpp"
 #include "view/scroll_view.hpp"
@@ -203,7 +204,7 @@ void show_first(brls::Activity* first)
 {
     brls::Application::pushActivity(first, brls::TransitionAnimation::NONE);
     pt_log_flow::apply();   // Help & diagnostics › Developer › Record the play timer, when on (after fw_gate::prepare)
-    log_prune_flow::run();  // the reports and crashes past the limits of Preferences › Help & diagnostics
+    log_prune_flow::run();  // the reports and crashes past the limits of About › Help & diagnostics
     startup_mark(StartupStep_FirstScreen);
     rollback_flow::started();   // this build starts: nothing to go back from
     brls::Logger::info("start-up: first screen ready after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_FirstScreen));
@@ -379,6 +380,7 @@ int main(int argc, char* argv[])
     // every screen's header.
     VersionBadge::install();
     NoticeBell::install();   // after the badge: the bell goes in its row
+    HeaderSetting::install();   // after the bell: the language and theme go left of it
 
     // The loading screen first, with nothing slow before it, and drawn at once
     // (no fade: a frame at alpha 0 is a black one). The rest of the start-up

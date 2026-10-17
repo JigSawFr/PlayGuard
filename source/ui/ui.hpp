@@ -279,6 +279,16 @@ void show_unlock_banner(brls::DetailCell* cell, bool unlocked);
 // Asks before quitting so a language / theme change can take effect.
 void offer_restart();
 
+// The language and theme pickers, shared by Preferences and the main
+// screen's header: save the choice, run `after` (a refresh), then offer the
+// restart it needs. language_name / theme_name: the choice saved, as text.
+void        pick_language(std::function<void()> after = nullptr);
+void        pick_theme(std::function<void()> after = nullptr);
+std::string language_name();
+std::string theme_name();
+// − on the main screen: a list of the two, each opening its picker.
+void        quick_settings(std::function<void()> after = nullptr);
+
 // Temporary unlock as last read by any tab (`valid` false: the read failed,
 // keep the previous value). The main screen's title says it while unlocked.
 void note_unlocked(bool valid, bool unlocked);

@@ -16,7 +16,7 @@ What each tab does, how PlayGuard writes safely, and what the console counts as 
 
 ## Controls
 
-↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh (on the tabs that read the console) · Ⓨ notifications · **+** saves per-day limits.
+↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh (on the tabs that read the console) · Ⓨ notifications · **−** language and theme · **+** saves per-day limits.
 
 What failed is said in a dialog, what worked in a toast. The title says when the app is read-only or while parental controls are temporarily unlocked; in read-only mode, actions stay in place, greyed, and say why when pressed.
 
@@ -25,6 +25,8 @@ The app is organised in tabs, like System Settings; each has its section below.
 ## Notifications — what needs you, from any tab
 
 A bell in the header, left of the version, gathers what needs the parent; Ⓨ opens the list from any tab (the footer says *Notifications (2)* when two things are to do).
+
+Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun for light, a moon for dark, a half-filled circle when it follows the console): a tap opens the same list as *Preferences*, and **−** offers both from any tab. Either change takes effect once PlayGuard is started again.
 
 - **To do**, counted on the bell in amber, stays until it is fixed: no PIN yet, a PIN anyone would try first (0000, 1234, 1212, 2580…: judged on the console, never shown), a PIN on the console while PlayGuard itself opens without it (*Protect PlayGuard with the PIN* on *Never*), parental controls temporarily unlocked (*Turn back on*), extra time from an earlier day still to put back, the "time's up" alarm off, changes made outside PlayGuard, the console not counting play time, an inaccurate network clock.
 - **For information**, a dot on the bell, can be marked as read: a limit still lowered by *No more play today* on an earlier day (*Put back*), a new version installed (*What's new*; after an update in place, the previous build kept), a report sent online (*Show the link*), the week's play time (every 7 days until read) and a limit passed on two or more of the last 7 days while the console only warns, a settings backup to make (none yet, or none for 30 days), all games blocked for a week, a new user account, PlayGuard closed unexpectedly last time (*Send a report*), the companion app linked, a newer version of PlayGuard, the network clock found off at start-up.
@@ -111,20 +113,22 @@ A bell in the header, left of the version, gathers what needs the parent; Ⓨ op
 
 ## Preferences
 
-- Language (every console language, or the console's own) and theme (light / dark, with an offer to restart).
-- The tab to start on.
-- **The intro** at start-up: the loading screen for 2 seconds (on by default; Ⓐ or Ⓑ skips it; off, PlayGuard opens as soon as it is ready).
-- A **monthly reminder to support PlayGuard** (on by default, never in the first month nor right after an update; *Don't show again* on the reminder or this switch turns it off for good, updates included).
-- The kinds of notifications (see above).
-- **Updates:** check once a day at start-up, and *Update with*: in PlayGuard, which downloads the release, checks it, replaces itself and restarts, or sphaira, Homebrew App Store or by hand (asked on the first update when none is chosen).
-- A setting that shapes one feature sits with it: extra time in *Play timer*, turning parental controls back on in *PIN*, the clock check in *Console › Network clock*.
-- **Help & diagnostics ›**, a screen of its own, at the end:
-  - **First steps** opens the guide again (with an *Unlink the companion app* step while linked, a *Turn the "Time's up" alarm back on* step while it is off, a *Protect PlayGuard* step once a PIN is set — the *Protect PlayGuard with the PIN* choice —, and a switch to stop it coming up at start-up). Below *Close*, *Support PlayGuard* shows the funding QR codes.
-  - **Export a diagnostic report**, or **send one online** (see [Reporting a bug](troubleshooting.md#reporting-a-bug)); how many saved reports, crash files, session logs and links of reports sent online are kept, by number, age or size.
+- What sets PlayGuard itself up:
+  - Language (every console language, or the console's own) and theme (light / dark, with an offer to restart).
+  - The tab to start on.
+  - **The intro** at start-up: the loading screen for 2 seconds (on by default; Ⓐ or Ⓑ skips it; off, PlayGuard opens as soon as it is ready).
+- The messages it shows:
+  - The kinds of notifications (see above).
+  - A **monthly reminder to support PlayGuard** (on by default, never in the first month nor right after an update; *Don't show again* on the reminder or this switch turns it off for good, updates included).
+- A setting that shapes one feature sits with it: extra time in *Play timer*, turning parental controls back on in *PIN*, the clock check in *Console › Network clock*. The updates and *Help & diagnostics* are in *About*.
 
 ## About
 
-- Version, launch mode and data folder; **check for updates** now (when and how to update: *Preferences*). While a newer release is known, PlayGuard opens on **PlayGuard X.Y.Z is available** (its date and notes): *Update*, or *Later* for 1 day, 1 week or 30 days at most; **what's new** in the running version (its highlights, in English, and *Full list of changes* for its entry of the bundled changelog); the credits, how to **support PlayGuard** ([GitHub Sponsors](https://github.com/sponsors/JigSawFr), [Ko-fi](https://ko-fi.com/jigsawfr), shown as QR codes to scan with a phone), and a small *Made in France* 🇫🇷. After an update, PlayGuard opens once on **What's new in X.Y.Z** (the same highlights, then the QR codes).
+- The installed PlayGuard: version, launch mode and data folder; **check for updates** now; *Check for updates every day* at start-up, and *Update with*: in PlayGuard, which downloads the release, checks it, replaces itself and restarts, or sphaira, Homebrew App Store or by hand (asked on the first update when none is chosen). While a newer release is known, PlayGuard opens on **PlayGuard X.Y.Z is available** (its date and notes): *Update*, or *Later* for 1 day, 1 week or 30 days at most; **what's new** in the running version (its highlights, in English, and *Full list of changes* for its entry of the bundled changelog). After an update, PlayGuard opens once on **What's new in X.Y.Z** (the same highlights, then the QR codes).
+- **Help & diagnostics ›**, a screen of its own, below *What's new*:
+  - **First steps** opens the guide again (with an *Unlink the companion app* step while linked, a *Turn the "Time's up" alarm back on* step while it is off, a *Protect PlayGuard* step once a PIN is set — the *Protect PlayGuard with the PIN* choice —, and a switch to stop it coming up at start-up). Below *Close*, *Support PlayGuard* shows the funding QR codes.
+  - **Export a diagnostic report**, or **send one online** (see [Reporting a bug](troubleshooting.md#reporting-a-bug)); how many saved reports, crash files, session logs and links of reports sent online are kept, by number, age or size.
+- The credits, how to **support PlayGuard** ([GitHub Sponsors](https://github.com/sponsors/JigSawFr), [Ko-fi](https://ko-fi.com/jigsawfr), shown as QR codes to scan with a phone), and a small *Made in France* 🇫🇷.
 
 ## Safety by design
 

@@ -105,8 +105,8 @@
         "relock_failed": "主機已解鎖，但無法重新啟用家長監護：請立即啟用（PIN碼 › 重新啟用家長監護）",
         "not_applied": "主機未接受變更，已還原先前的設定",
         "not_saved": "PlayGuard 無法在 SD 卡上儲存之後需要復原的內容，因此未寫入任何資料",
-        "next_step": "如果再次發生，請傳送報告：「偏好設定 › 說明與診斷 › 線上傳送報告」。",
-        "pt_not_understood": "主機的遊玩時間設定格式PlayGuard無法識別，因此未變更任何設定。請傳送報告：「偏好設定 › 說明與診斷 › 線上傳送報告」。",
+        "next_step": "如果再次發生，請傳送報告：「關於 › 說明與診斷 › 線上傳送報告」。",
+        "pt_not_understood": "主機的遊玩時間設定格式PlayGuard無法識別，因此未變更任何設定。請傳送報告：「關於 › 說明與診斷 › 線上傳送報告」。",
         "wrong_pin": "系統拒絕了此PIN碼：PIN碼錯誤，或不是4到8位數字",
         "pctl_not_ready": "家長監護服務尚未就緒：請稍候，然後重試",
         "clock_not_set": "主機回報其網路時鐘沒有有效時間（可能從未設定過）；請查看「主機 › 網路時鐘」",
@@ -218,7 +218,7 @@
         "open": "初始設定",
         "pin_missing": "尚未設定PIN碼",
         "headline": "只要三個步驟即可保護主機。在步驟上按A即可執行。",
-        "all_done": "設定完成：主機已受到保護。隨時可從「偏好設定 › 說明與診斷」回到此處。",
+        "all_done": "設定完成：主機已受到保護。隨時可從「關於 › 說明與診斷」回到此處。",
         "section_steps": "步驟",
         "step_pin": "1. 設定家長監護PIN碼",
         "step_limit": "2. 選擇每天的遊玩時間上限",
@@ -310,7 +310,7 @@
         "bedtime_end_confirm": "在設有就寢鬧鐘的日子，{} 起允許再次遊玩？",
         "bedtime_written": "已變更就寢鬧鐘。",
         "bedtime_err": "無法變更就寢鬧鐘",
-        "bedtime_unknown": "PlayGuard 未能在遊玩時間設定中預期的位置找到這台主機的就寢鬧鐘，因此不會變更它。請使用手機應用程式，或傳送診斷報告（偏好設定 › 說明與診斷），以便提供支援。",
+        "bedtime_unknown": "PlayGuard 未能在遊玩時間設定中預期的位置找到這台主機的就寢鬧鐘，因此不會變更它。請使用手機應用程式，或傳送診斷報告（關於 › 說明與診斷），以便提供支援。",
         "bedtime_end_needs_alarm": "請先開啟就寢鬧鐘。",
         "section_advanced": "進階",
         "section_extra": "延長時間",
@@ -966,12 +966,11 @@
         "support_body": "PlayGuard 免費、開源且無廣告。如果它對您的家庭有幫助，可以支持它的開發：用手機掃描 QR 碼。",
         "reminder_title": "PlayGuard 對您有幫助嗎？",
         "reminder_never": "不再顯示",
-        "reminder_off": "每月提醒已關閉。可在「偏好設定 › 啟動時」重新開啟。",
+        "reminder_off": "每月提醒已關閉。可在「偏好設定 › 通知」重新開啟。",
         "whats_new_close": "繼續"
     },
     "prefs": {
         "section_app": "應用程式",
-        "section_startup": "啟動時",
         "intro": "顯示開場畫面 2 秒",
         "support_reminder": "每月提醒一次支持 PlayGuard",
         "section_notices": "通知",
@@ -1094,12 +1093,12 @@
         "forgotten": "下次啟動時會再次詢問韌體的選擇。",
         "forget_body": "清除在韌體畫面上做出的選擇？下次啟動時會再次詢問。",
         "forget_confirm": "清除",
-        "mode_off_body": "關閉開發者模式？「偏好設定 › 說明與診斷」底部的開發者工具會消失，遊玩時間限制記錄也會停止。在「關於」中按「版本」七次即可恢復。",
+        "mode_off_body": "關閉開發者模式？「關於 › 說明與診斷」底部的開發者工具會消失，遊玩時間限制記錄也會停止。在「關於」中按「版本」七次即可恢復。",
         "mode_off_confirm": "關閉",
         "read_only_off_body": "退出唯讀模式？PlayGuard 將可以再次變更主機的家長監護和時鐘。",
         "read_only_off_confirm": "允許變更",
         "already_on": "開發者模式已開啟。",
-        "enabled": "開發者模式已開啟：請查看「偏好設定 › 說明與診斷」底部。",
+        "enabled": "開發者模式已開啟：請查看「關於 › 說明與診斷」底部。",
         "presses_left": "再按{}次即可開啟開發者模式。",
         "presses_left_one": "再按1次即可開啟開發者模式。",
         "report_upload": "線上傳送"
@@ -1345,6 +1344,10 @@
         "fetched": "說明取得於 {}。",
         "offline": "離線：{} 儲存的說明。",
         "failed": "無法取得說明。按 X 重試。"
+    },
+    "quick": {
+        "title": "語言和主題",
+        "hint": "語言和主題"
     },
     "notices": {
         "title": "通知",

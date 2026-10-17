@@ -129,13 +129,15 @@ constexpr int    SCHEMA             = 1;    // "schema" in config.json
 // playguard/tools/languages/. tools/check_resources.py checks both; README
 // "Translating PlayGuard" lists the steps to add one.
 constexpr const char* LANGUAGES[] = { "system", "en-US", "fr", "fr-CA", "de", "es", "es-419", "it", "nl", "pt", "pt-BR", "ru", "ja", "ko", "zh-Hans", "zh-Hant" };
+// What theme may be: the console's own, then the two forced ones.
+constexpr const char* THEMES[] = { "system", "light", "dark" };
 // What start_tab may be, in the sidebar's order.
 constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "restrictions",
                                        "security", "console", "history", "preferences", "about" };
 // What extra_amounts may be (the Preferences picker offers these sets).
 constexpr int EXTRA_SETS[][3] = { { 15, 30, 60 }, { 10, 20, 30 }, { 30, 60, 90 }, { 5, 10, 15 } };
 constexpr int BACKUP_KEEP[]   = { 0, 5, 10, 20 };
-// What Preferences › Help & diagnostics offers for the reports and crash files kept.
+// What About › Help & diagnostics offers for the reports and crash files kept.
 constexpr int LOGS_KEEP[]      = { 0, 5, 10, 20, 50 };
 constexpr int LOGS_KEEP_DAYS[] = { 0, 7, 30, 90, 365 };
 constexpr int LOGS_KEEP_MB[]   = { 0, 1, 5, 20 };

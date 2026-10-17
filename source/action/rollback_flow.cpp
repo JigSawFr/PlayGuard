@@ -93,7 +93,7 @@ bool at_start()
         // Anyone can hold L + R: with a PIN, going back is the app's, where
         // it is asked (dev_build_flow::go_back).
         text += "L + R were held at start-up, but a PIN is set.\n\n  To go back to " + previous +
-                ", in developer mode:\n  Preferences > Help & diagnostics > Install another build >\n"
+                ", in developer mode:\n  About > Help & diagnostics > Install another build >\n"
                 "  Go back to the previous build (the PIN is asked).\n\n  (A) / (B)  Start PlayGuard\n";
         brls::Logger::info("rollback: L + R held, not offered (a PIN is set)");
         platform_boot_choice(text.c_str());

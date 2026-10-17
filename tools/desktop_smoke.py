@@ -660,12 +660,12 @@ if GATE:
     key("Right")
     key("Return", 7)
     shot("04_dev_enabled")
-    # The developer tools are at the end of Preferences › Help & diagnostics:
+    # The developer tools are at the end of About › Help & diagnostics:
     # press like a hand.
     key("Left")
-    key("Up", steps("preferences", "about"))
     key("Right")
-    key("Down", 50, hold=0.15) # its last line: Help & diagnostics
+    key("Down", 50, hold=0.15) # its last line: the funding QR codes
+    key("Up", 2)               # past Source: Help & diagnostics
     key("Return")
     key("Down", 50, hold=0.15) # the Developer section, down to its last cell
     shot("05_dev_tools")
@@ -760,9 +760,9 @@ if DEVBUILD:
     key("Right")
     key("Return", 7)
     key("Left")
-    key("Up", steps("preferences", "about"))
     key("Right")
-    key("Down", 50, hold=0.15) # its last line: Help & diagnostics
+    key("Down", 50, hold=0.15) # its last line: the funding QR codes
+    key("Up", 2)               # past Source: Help & diagnostics
     key("Return")
     key("Down", 50, hold=0.15) # the Developer section, down to its last cell
     key("Return")              # Install another build: signed out, the releases and "Sign in"
@@ -1298,9 +1298,10 @@ def saved_reports():
     return [f for f in (os.listdir(reports) if os.path.isdir(reports) else []) if f.startswith("report_") and f.endswith(".txt")]
 saved = saved_reports()
 key("Left")                # back to the sidebar
-key("Down", steps("history", "preferences"))
+key("Down", steps("history", "about"))
 key("Right")
-key("Down", 50, hold=0.15) # its last line: Help & diagnostics
+key("Down", 50, hold=0.15) # its last line: the funding QR codes
+key("Up", 2)               # past Source: Help & diagnostics
 key("Return")
 key("Down", 2)             # past First steps, Export: Send a report online
 key("Return")
@@ -1330,9 +1331,9 @@ os.remove(github_token)
 # section picked, the corrupt game kept as such), a removal of the games
 # picked and one of a single game (recorded in the change history), the
 # third all at once, the fourth.
-key("Escape")              # back to Preferences
+key("Escape")              # back to About
 key("Left")                # back to the sidebar
-key("Up", steps("console", "preferences"))
+key("Up", steps("console", "about"))
 key("Right")               # Network clock
 key("Down")                # Check the installed games
 os.remove(games_cache)     # made by the start-up check: this screen's first check, game by game

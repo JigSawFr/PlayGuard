@@ -105,8 +105,8 @@
         "relock_failed": "die Konsole wurde entsperrt, die Altersbeschränkungen konnten aber nicht wieder aktiviert werden: Holen Sie das jetzt nach (Geheimzahl › Altersbeschränkungen wieder aktivieren)",
         "not_applied": "die Konsole hat die Änderung nicht übernommen, daher wurden die vorherigen Einstellungen wiederhergestellt",
         "not_saved": "PlayGuard konnte nicht auf der SD-Karte speichern, was später wiederhergestellt werden muss, daher wurde nichts geschrieben",
-        "next_step": "Wenn das erneut passiert, senden Sie einen Bericht: Optionen › Hilfe & Diagnose › Bericht online senden.",
-        "pt_not_understood": "die Spielzeit-Einstellungen der Konsole liegen in einem Format vor, das PlayGuard nicht versteht, daher wurde nichts geändert. Senden Sie einen Bericht: Optionen › Hilfe & Diagnose › Bericht online senden.",
+        "next_step": "Wenn das erneut passiert, senden Sie einen Bericht: Info › Hilfe & Diagnose › Bericht online senden.",
+        "pt_not_understood": "die Spielzeit-Einstellungen der Konsole liegen in einem Format vor, das PlayGuard nicht versteht, daher wurde nichts geändert. Senden Sie einen Bericht: Info › Hilfe & Diagnose › Bericht online senden.",
         "wrong_pin": "das System hat die Geheimzahl abgelehnt: falsche Geheimzahl oder nicht 4 bis 8 Ziffern",
         "pctl_not_ready": "der Dienst der Altersbeschränkungen ist noch nicht bereit: warten Sie einen Moment und versuchen Sie es dann erneut",
         "clock_not_set": "die Konsole meldet, dass ihre Netzwerkuhr keine gültige Zeit hat (sie wurde vielleicht nie gestellt); siehe Konsole › Netzwerkuhr",
@@ -218,7 +218,7 @@
         "open": "Erste Schritte",
         "pin_missing": "Noch keine Geheimzahl",
         "headline": "Drei Schritte, und die Konsole ist geschützt. Mit A führen Sie einen Schritt aus.",
-        "all_done": "Fertig: Die Konsole ist geschützt. Über Optionen › Hilfe & Diagnose können Sie jederzeit hierher zurückkehren.",
+        "all_done": "Fertig: Die Konsole ist geschützt. Über Info › Hilfe & Diagnose können Sie jederzeit hierher zurückkehren.",
         "section_steps": "Schritte",
         "step_pin": "1. Geheimzahl für die Altersbeschränkungen festlegen",
         "step_limit": "2. Tägliches Spielzeitlimit wählen",
@@ -310,7 +310,7 @@
         "bedtime_end_confirm": "Spielen an jedem Tag mit Gute-Nacht-Alarm ab {} wieder erlauben?",
         "bedtime_written": "Gute-Nacht-Alarm geändert.",
         "bedtime_err": "Der Gute-Nacht-Alarm konnte nicht geändert werden",
-        "bedtime_unknown": "PlayGuard findet den Gute-Nacht-Alarm dieser Konsole nicht dort, wo er ihn in den Spielzeit-Einstellungen erwartet, und ändert ihn deshalb nicht. Nutzen Sie die App oder senden Sie einen Diagnosebericht (Optionen › Hilfe & Diagnose), damit er unterstützt werden kann.",
+        "bedtime_unknown": "PlayGuard findet den Gute-Nacht-Alarm dieser Konsole nicht dort, wo er ihn in den Spielzeit-Einstellungen erwartet, und ändert ihn deshalb nicht. Nutzen Sie die App oder senden Sie einen Diagnosebericht (Info › Hilfe & Diagnose), damit er unterstützt werden kann.",
         "bedtime_end_needs_alarm": "Schalten Sie zuerst den Gute-Nacht-Alarm ein.",
         "section_advanced": "Erweitert",
         "section_extra": "Zusatzzeit",
@@ -966,12 +966,11 @@
         "support_body": "PlayGuard ist kostenlos, quelloffen und werbefrei. Wenn es Ihrer Familie hilft, können Sie die Entwicklung unterstützen: Scannen Sie einen Code mit Ihrem Smartphone.",
         "reminder_title": "Gefällt Ihnen PlayGuard?",
         "reminder_never": "Nicht mehr anzeigen",
-        "reminder_off": "Die monatliche Erinnerung ist aus. Unter Optionen › Beim Start lässt sie sich wieder einschalten.",
+        "reminder_off": "Die monatliche Erinnerung ist aus. Unter Optionen › Benachrichtigungen lässt sie sich wieder einschalten.",
         "whats_new_close": "Weiter"
     },
     "prefs": {
         "section_app": "App",
-        "section_startup": "Beim Start",
         "intro": "Intro 2 Sekunden lang zeigen",
         "support_reminder": "Einmal im Monat daran erinnern, PlayGuard zu unterstützen",
         "section_notices": "Benachrichtigungen",
@@ -1094,12 +1093,12 @@
         "forgotten": "Die Firmware-Wahl wird beim nächsten Start erneut abgefragt.",
         "forget_body": "Die auf dem Firmware-Bildschirm getroffene Wahl vergessen? Sie wird beim nächsten Start erneut abgefragt.",
         "forget_confirm": "Vergessen",
-        "mode_off_body": "Entwicklermodus ausschalten? Seine Werkzeuge verschwinden vom Ende von Optionen › Hilfe & Diagnose und die Spielzeit-Aufzeichnung endet. Sieben Drücke auf Info › Version holen sie zurück.",
+        "mode_off_body": "Entwicklermodus ausschalten? Seine Werkzeuge verschwinden vom Ende von Info › Hilfe & Diagnose und die Spielzeit-Aufzeichnung endet. Sieben Drücke auf Info › Version holen sie zurück.",
         "mode_off_confirm": "Ausschalten",
         "read_only_off_body": "Schreibschutzmodus verlassen? PlayGuard kann dann die Altersbeschränkungen und die Uhr der Konsole wieder ändern.",
         "read_only_off_confirm": "Änderungen erlauben",
         "already_on": "Der Entwicklermodus ist bereits aktiv.",
-        "enabled": "Entwicklermodus aktiv: siehe Ende des Tabs Optionen › Hilfe & Diagnose.",
+        "enabled": "Entwicklermodus aktiv: siehe Ende des Tabs Info › Hilfe & Diagnose.",
         "presses_left": "Noch {} Mal drücken, um den Entwicklermodus zu aktivieren.",
         "presses_left_one": "Noch 1 Mal drücken, um den Entwicklermodus zu aktivieren.",
         "report_upload": "Online senden"
@@ -1345,6 +1344,10 @@
         "fetched": "Hinweise abgerufen am {}.",
         "offline": "Offline: Hinweise vom {}.",
         "failed": "Die Hinweise konnten nicht abgerufen werden. Drücken Sie X, um es erneut zu versuchen."
+    },
+    "quick": {
+        "title": "Sprache und Design",
+        "hint": "Sprache & Design"
     },
     "notices": {
         "title": "Benachrichtigungen",
