@@ -153,6 +153,7 @@ ntp_servers_SRC   := source/util/ntp_servers.cpp tests/ntp_servers/test.cpp
 sys_notes_SRC   := source/util/date.cpp source/util/safe_text.cpp source/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
 icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp
+games_logic_SRC   := source/action/games_logic.cpp tests/games_logic/test.cpp
 write_queue_logic_SRC   := source/action/write_queue_logic.cpp tests/write_queue_logic/test.cpp
 write_queue_logic_LIBS  := -pthread
 worker_threads_SRC   := source/util/worker_threads.cpp tests/worker_threads/test.cpp

@@ -265,6 +265,7 @@ static void load_shared()
     read_string(j, "update_snooze_until", c.update_snooze_until);
     read_string(j, "start_tab", c.start_tab);
     read_int(j, "activity_period", c.activity_period);
+    read_bool(j, "games_grid", c.games_grid);
     read_int(j, "export_format", c.export_format);
     read_int(j, "backup_keep", c.backup_keep);
     read_int(j, "logs_keep", c.logs_keep);
@@ -370,6 +371,7 @@ bool snapshot(Snapshot& snap)
     j["start_tab"]       = s_config.start_tab;
     j["extra_amounts"]   = s_config.extra_amounts;
     j["activity_period"] = s_config.activity_period;
+    j["games_grid"]      = s_config.games_grid;
     j["export_format"]   = s_config.export_format;
     j["backup_keep"]     = s_config.backup_keep;
     j["logs_keep"]       = s_config.logs_keep;

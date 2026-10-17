@@ -449,6 +449,15 @@
         "account_new": "Nuovo utente dal {}: {}",
         "truncated": "Si possono elencare solo {} giochi: ne mancano alcuni non giocati questa settimana, e il totale da sempre non li conta."
     },
+    "library": {
+        "title": "Giochi",
+        "open": "Tutti i giochi",
+        "view": "Vista",
+        "views": {
+            "0": "Elenco",
+            "1": "Copertine"
+        }
+    },
     "restrictions": {
         "section_level": "Livello limitazioni",
         "level": "Livello",

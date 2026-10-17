@@ -449,6 +449,15 @@
         "account_new": "Cuenta nueva desde el {}: {}",
         "truncated": "Solo se pueden mostrar {} juegos: faltan algunos que no se han jugado esta semana, y el total desde siempre no los cuenta."
     },
+    "library": {
+        "title": "Juegos",
+        "open": "Todos los juegos",
+        "view": "Vista",
+        "views": {
+            "0": "Lista",
+            "1": "Portadas"
+        }
+    },
     "restrictions": {
         "section_level": "Nivel de restricción",
         "level": "Nivel",
