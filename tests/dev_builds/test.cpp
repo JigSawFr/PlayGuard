@@ -12,6 +12,7 @@
 #include <string>
 #include <unistd.h>
 
+#include "util/date.hpp"
 #include "util/dev_builds.hpp"
 #include "util/paths.hpp"
 #include "util/github_auth.hpp"
@@ -266,13 +267,24 @@ static void test_find_and_runs()
     CHECK(dev_builds::newer(later, "", &running) && !dev_builds::newer(earlier, "", &running) &&
           !dev_builds::newer(running, "", &running) && !dev_builds::newer(later, "", nullptr));
 
-    // Whole days between two timestamps.
-    CHECK(dev_builds::days_between("2026-10-01T12:00:00Z", "2026-10-04T11:59:59Z") == 2);
-    CHECK(dev_builds::days_between("2026-10-01T12:00:00Z", "2026-10-04T12:00:00Z") == 3);
-    CHECK(dev_builds::days_between("2026-12-31T00:00:00Z", "2027-03-01T00:00:00Z") == 60);
-    CHECK(dev_builds::days_between("2028-02-28T00:00:00Z", "2028-03-01T00:00:00Z") == 2);   // a leap year
-    CHECK(dev_builds::days_between("2026-10-04T00:00:00Z", "2026-10-03T23:00:00Z") == -1);
-    CHECK(dev_builds::days_between("x", "2026-10-03T23:00:00Z") == 0 && dev_builds::days_between("2026-13-01T00:00:00Z", "2026-10-03T00:00:00Z") == 0);
+    // Whole days left before a timestamp (an artifact's expiry).
+    int64_t now = 0;
+    CHECK(date::iso_seconds("2026-10-01T12:00:00Z", &now));
+    CHECK(dev_builds::days_left("2026-10-04T11:59:59Z", now) == 2 && dev_builds::days_left("2026-10-04T12:00:00Z", now) == 3);
+    CHECK(dev_builds::days_left("2026-10-01T11:00:00Z", now) == -1 && dev_builds::days_left("2026-10-01T12:00:00Z", now) == 0);
+    CHECK(dev_builds::days_left("x", now) == 0 && dev_builds::days_left("2026-13-01T00:00:00Z", now) == 0);
+
+    // A build's date shorter, and its age.
+    CHECK(dev_builds::short_date("2026-10-09T12:03:00Z") == "2026-10-09 12:03");
+    CHECK(dev_builds::short_date("2026-10-09T12:0") == "2026-10-09T12:0" && dev_builds::short_date("").empty());
+    auto age = [now](const char* iso, dev_builds::Age::Unit unit, int count) {
+        const dev_builds::Age a = dev_builds::age_of(iso, now);
+        return a.unit == unit && a.count == count;
+    };
+    CHECK(age("2026-10-01T11:00:01Z", dev_builds::Age::Now, 0) && age("2026-10-02T00:00:00Z", dev_builds::Age::Now, 0));   // a time to come
+    CHECK(age("2026-10-01T11:00:00Z", dev_builds::Age::Hours, 1) && age("2026-09-29T12:00:01Z", dev_builds::Age::Hours, 47));
+    CHECK(age("2026-09-29T12:00:00Z", dev_builds::Age::Days, 2) && age("2025-10-01T12:00:00Z", dev_builds::Age::Days, 365));
+    CHECK(age("x", dev_builds::Age::None, 0) && age("2026-10-01 12:00:00Z", dev_builds::Age::None, 0));
 }
 
 // The artifact holding playguard.nro, named after its build as the workflow
@@ -601,10 +613,24 @@ static void test_auth()
     CHECK(github_auth::token() == "ghu_new");
     github_auth::forget_refused("ghu_new");
     CHECK(github_auth::token().empty());
+    // Only GitHub's 401 forgets it: 403 and the rest keep it.
+    CHECK(github_auth::save_token("ghu_new", &error));
+    CHECK(!github_auth::forget_if_revoked(403, "ghu_new") && !github_auth::forget_if_revoked(0, "ghu_new"));
+    CHECK(github_auth::token() == "ghu_new");
+    CHECK(github_auth::forget_if_revoked(401, "ghu_old") && github_auth::token() == "ghu_new");   // a sign-in since
+    CHECK(github_auth::forget_if_revoked(401, "ghu_new") && github_auth::token().empty());
+    // White space after it (an edited file) is not part of it; before it is.
+    CHECK(paths::atomic_write(github_auth::token_file(), "ghu_x \t\r\n"));
+    CHECK(github_auth::token() == "ghu_x");
+    CHECK(paths::atomic_write(github_auth::token_file(), " ghu_x\n"));
+    CHECK(github_auth::token().empty());
+    github_auth::forget_token();
 
     const auto h = github_auth::api_headers("ghu_abc");
     CHECK(h.size() == 3 && h[2] == "Authorization: Bearer ghu_abc");
     CHECK(github_auth::api_headers("").size() == 2);
+    CHECK(github_auth::api_url("gists") == "https://api.github.com/gists");
+    CHECK(github_auth::api_url("repos/o/r/releases") == "https://api.github.com/repos/o/r/releases");
 }
 
 int main()

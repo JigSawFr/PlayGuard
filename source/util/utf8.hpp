@@ -1,7 +1,8 @@
 // utf8 — reading and writing one UTF-8 character. Two readers, as their
 // callers need: decode() validates (what comes from outside: safe_text,
 // the exports), decode_loose() trusts the text (already cleaned, or shipped
-// with the app) and never fails. Header-only, plain C++.
+// with the app) and never fails; and where to cut a text between two
+// characters. Header-only, plain C++.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -58,6 +59,15 @@ inline size_t decode_loose(const std::string& s, size_t i, uint32_t* cp)
     const size_t n = c < 0x80 ? 1 : (c >> 5) == 0x6 ? 2 : (c >> 4) == 0xE ? 3 : (c >> 3) == 0x1E ? 4 : 1;
     *cp = n == 1 ? c : n == 2 ? c & 0x1F : n == 3 ? c & 0x0F : c & 0x07;
     for (size_t k = 1; k < n && i + k < s.size(); k++) *cp = (*cp << 6) | ((unsigned char)s[i + k] & 0x3F);
+    return n;
+}
+
+// Where to cut `s` to at most `n` bytes without splitting a character: `n`,
+// moved back over the continuation bytes (10xxxxxx) found there. `n` itself
+// at the end of `s` or past it.
+inline size_t boundary_before(const std::string& s, size_t n)
+{
+    while (n > 0 && n < s.size() && ((unsigned char)s[n] & 0xC0) == 0x80) n--;
     return n;
 }
 

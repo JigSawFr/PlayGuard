@@ -1,8 +1,10 @@
 // The network half of update.hpp (the rest stays plain C++ for the host tests).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
-#include <cstdlib>
 #include <cstring>
 
+#ifndef __SWITCH__
+#include "sim/sim_net.hpp"
+#endif
 #include "app.hpp"
 #include "util/http.hpp"
 #include "util/update.hpp"
@@ -10,10 +12,14 @@
 namespace update
 {
 
+namespace
+{
+// <repository>/releases/latest/download/compat.json
 std::string compat_url()
 {
     return std::string(app::repo_url()) + "/releases/latest/download/compat.json";
 }
+}   // namespace
 
 Result check(uint32_t console_fw)
 {
@@ -23,7 +29,7 @@ Result check(uint32_t console_fw)
 #ifndef __SWITCH__
     // Desktop simulation: "1.1.0:24.0.0" (latest version : firmware it supports),
     // "none" (no release published) or "offline".
-    if (const char* sim = std::getenv("PLAYGUARD_SIM_LATEST")) {
+    if (const char* sim = sim_net::value("PLAYGUARD_SIM_LATEST")) {
         if (std::strcmp(sim, "none") == 0) {
             r.verdict = Verdict::NoRelease;
             r.error = "HTTP 404";
@@ -31,7 +37,7 @@ Result check(uint32_t console_fw)
         }
         const char* colon = std::strchr(sim, ':');
         if (!colon) {
-            r.error = "simulated: no connection";
+            sim_net::offline(&r.error);
             return r;
         }
         body = "{\"schema\": 1, \"version\": \"" + std::string(sim, colon) + "\", \"fw_tested_max\": \"" +

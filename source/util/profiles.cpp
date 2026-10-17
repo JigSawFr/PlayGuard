@@ -4,6 +4,7 @@
 #include <borealis/extern/nlohmann/json.hpp>
 #include <cstdio>
 
+#include "util/json_util.hpp"
 #include "util/paths.hpp"
 #include "util/text.hpp"
 #include "util/utf8.hpp"
@@ -111,16 +112,15 @@ std::vector<Profile> list()
     for (const auto& file : paths::list_files(paths::profiles_dir(), ".json")) {
         std::string text;
         if (!paths::read_file(paths::profiles_dir() + "/" + file, text)) continue;
-        try {
-            auto j = nlohmann::json::parse(text);
-            if (!j.is_object()) continue;
+        // An unreadable profile file is ignored.
+        json_util::parse_with(text, [&out, &file](const nlohmann::json& j) {
+            if (!j.is_object()) return false;
             Profile p;
             p.file = file.substr(0, file.size() - 5);
-            auto name = j.find("name");
-            if (name != j.end() && name->is_string()) p.name = sanitize_name(name->get<std::string>());
+            p.name = sanitize_name(json_util::string_at(j, "name"));
             if (p.name.empty()) p.name = sanitize_name(p.file);
-            auto days = j.find("days");
-            if (days == j.end() || !days->is_array() || days->size() != 7) continue;
+            const nlohmann::json* days = json_util::array_at(j, "days");
+            if (!days || days->size() != 7) return false;
             bool ok = true;
             for (int i = 0; i < 7 && ok; i++) {
                 const auto& d = (*days)[i];
@@ -133,9 +133,8 @@ std::vector<Profile> list()
                 if (ok) p.days[i] = (uint16_t)d.get<long long>();
             }
             if (ok && !p.name.empty()) out.push_back(p);
-        } catch (...) {
-            // ignore unreadable profile files
-        }
+            return ok;
+        });
     }
     return out;
 }

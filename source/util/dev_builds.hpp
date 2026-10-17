@@ -165,13 +165,22 @@ bool newest_build(const std::vector<Artifact>& artifacts, Kind kind, Build* out)
 // the running commit's build in `all`, when it is listed there).
 bool newer(const Build& b, const std::string& running_version, const Build* running);
 
-// Seconds since 1970 of an ISO 8601 UTC time ("2026-10-09T12:03:00Z");
-// false when malformed.
-bool parse_iso(const std::string& iso, int64_t* seconds);
+// "2026-10-09T12:03:00Z" -> "2026-10-09 12:03"; a shorter text as it is.
+std::string short_date(const std::string& iso);
 
-// Days from `now_iso` to `iso` ("…T…Z" timestamps, whole days, rounded
-// down; negative when `iso` is before it). 0 when either is malformed.
-int days_between(const std::string& now_iso, const std::string& iso);
+// How long before `now` (POSIX seconds) the time `iso` ("…T…Z") was, as the
+// builds' screens say it: under an hour (or later than now) Now, under two
+// days in whole hours, else in whole days; None when `iso` is malformed.
+struct Age
+{
+    enum Unit { None, Now, Hours, Days } unit = None;
+    int count = 0;   // the hours or the days
+};
+Age age_of(const std::string& iso, int64_t now);
+
+// Whole days from `now` (POSIX seconds) to the time `iso` ("…T…Z"), rounded
+// down: negative once it is past; 0 when `iso` is malformed.
+int days_left(const std::string& iso, int64_t now);
 
 // The builds: main's newest `keep_main` commits (pushed to this repository's
 // main), then for each open pull request from a branch of this repository

@@ -105,9 +105,6 @@ size_t total_bytes(const std::vector<Part>& files);
 // gist.github.com link.
 bool parse_gist(const std::string& body, std::string* url);
 
-// RFC 3986 percent-encoding of everything but unreserved characters.
-std::string url_encode(const std::string& text);
-
 // What the console knows of the bug-report form's fields; empty ones are
 // left for the reporter.
 struct IssueFields

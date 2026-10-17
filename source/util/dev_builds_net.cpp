@@ -16,6 +16,7 @@
 #include "util/http.hpp"
 #include "util/http_logic.hpp"
 #include "util/paths.hpp"
+#include "util/text.hpp"
 #include "util/zip_read.hpp"
 
 namespace dev_builds
@@ -31,7 +32,7 @@ std::string api_url()
 {
     const std::string repo = app::repo_url();
     const std::string host = "https://github.com/";
-    return "https://api.github.com/repos/" + repo.substr(host.size());
+    return github_auth::api_url("repos/" + repo.substr(host.size()));
 }
 
 #ifndef __SWITCH__
@@ -58,7 +59,7 @@ bool api_get(const std::string& path, const char* name, const std::string& token
     const bool ok = http::get(api_url() + path, body, error, max, 30, github_auth::api_headers(token), &status);
     // A token GitHub no longer takes (revoked): forgotten, the next fetch
     // lists what needs none and asks to sign in again.
-    if (!ok && status == 401) github_auth::forget_refused(token);
+    if (!ok) github_auth::forget_if_revoked(status, token);
     return ok;
 }
 }   // namespace
@@ -229,7 +230,7 @@ bool download(const Build& b, const std::string& path, std::string* error,
 #ifndef __SWITCH__
     if (sim()) {
         std::string content;
-        ok = b.url.compare(0, 8, "https://") == 0 && paths::read_file(b.url.substr(8), content);
+        ok = text::starts_with(b.url, "https://") && paths::read_file(b.url.substr(8), content);
         // A few steps, slow enough for the progress bar to be seen, and
         // for the smoke test to cancel one.
         for (int i = 1; ok && progress && i <= 8; i++) {
@@ -258,14 +259,15 @@ bool download(const Build& b, const std::string& path, std::string* error,
             // another host: fetched without the token (asked again for a
             // resumed download, the last one has expired).
             // The token only ever goes to the API itself, whatever the list says.
-            const bool api = b.url.compare(0, 23, "https://api.github.com/") == 0;
+            const bool api = text::starts_with(b.url, github_auth::API_ROOT);
             const std::string token = api ? github_auth::token() : "";
-            ok = http::redirect(b.url, &link, error, github_auth::api_headers(token));
+            long status = 0;
+            ok = http::redirect(b.url, &link, error, github_auth::api_headers(token), &status);
             // A token without the Actions permission (an older sign-in) lists the
             // builds but is refused the download (403); a revoked one is
             // refused everything (401), and forgotten.
-            if (!ok && error && *error == "HTTP 401") github_auth::forget_refused(token);
-            if (!ok && error && (*error == "HTTP 401" || *error == "HTTP 403"))
+            if (!ok) github_auth::forget_if_revoked(status, token);
+            if (!ok && error && (status == 401 || status == 403))
                 *error += ": GitHub refused the download, sign out of GitHub and sign in again";
         }
         if (ok) ok = http::download(link, part, error, (size_t)b.size + 1, 600, progress, resume_from, cancel);

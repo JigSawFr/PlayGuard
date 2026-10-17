@@ -1,8 +1,11 @@
 // Host tests for source/util/date.cpp: reading "YYYY-MM-DD" at its three
 // levels of strictness, day numbers, moving by days, the days between two
-// dates, the weekday and ISO 8601 stamps as seconds.
+// dates, the weekday, ISO 8601 stamps as seconds, the days between two
+// such times and a time written in local time.
 #include "check.h"
 #include <cstdio>
+#include <cstdlib>
+#include <ctime>
 
 #include "util/date.hpp"
 
@@ -83,11 +86,34 @@ static void test_iso()
     CHECK(!date::iso_seconds("2026-13-16T10:00:00Z", &s) && !date::iso_seconds("2026-10-16T1a:00:00Z", &s));
 }
 
+static void test_seconds()
+{
+    int64_t a = 0, b = 0;
+    CHECK(date::iso_seconds("2026-10-01T12:00:00Z", &a));
+    CHECK(date::iso_seconds("2026-10-04T11:59:59Z", &b) && date::days_between(a, b) == 2);
+    CHECK(date::iso_seconds("2026-10-04T12:00:00Z", &b) && date::days_between(a, b) == 3);
+    CHECK(date::iso_seconds("2026-12-31T00:00:00Z", &a) && date::iso_seconds("2027-03-01T00:00:00Z", &b) &&
+          date::days_between(a, b) == 60);
+    CHECK(date::iso_seconds("2028-02-28T00:00:00Z", &a) && date::iso_seconds("2028-03-01T00:00:00Z", &b) &&
+          date::days_between(a, b) == 2);   // a leap year
+    CHECK(date::days_between(0, 0) == 0 && date::days_between(0, 86399) == 0 && date::days_between(0, 86400) == 1);
+    CHECK(date::days_between(0, -1) == -1 && date::days_between(0, -86400) == -1 && date::days_between(0, -86401) == -2);
+
+    // In UTC, so the same everywhere.
+    setenv("TZ", "UTC", 1);
+    tzset();
+    CHECK(date::local_time(0, "%Y-%m-%d %H:%M:%S") == "1970-01-01 00:00:00");
+    CHECK(date::local_time(20742LL * 86400 + 351, "%H:%M:%S") == "00:05:51");
+    CHECK(date::local_time(0, "%Y-%m-%d %H:%M:%S and %Y-%m-%d") == "?");   // past 31 bytes
+    CHECK(date::local_time(0, "") == "?");
+}
+
 int main()
 {
     test_parse();
     test_days();
     test_weekday();
     test_iso();
-    CHECK_DONE("date parsing, day number, add, between, weekday and ISO stamp assertions passed");
+    test_seconds();
+    CHECK_DONE("date parsing, day number, add, between, weekday, ISO stamp and local time assertions passed");
 }

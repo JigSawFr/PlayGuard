@@ -1,7 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/dev_build_activity.hpp"
 
-#include <ctime>
 #include <fmt/format.h>
 
 #include "action/dev_build_flow.hpp"
@@ -14,20 +13,6 @@
 #include "view/release_notes.hpp"
 
 using namespace brls::literals;
-
-namespace
-{
-std::string now_iso()
-{
-    const std::time_t now = (std::time_t)dev_build_flow::now();
-    std::tm t{};
-    gmtime_r(&now, &t);
-    char text[32];
-    std::strftime(text, sizeof(text), "%Y-%m-%dT%H:%M:%SZ", &t);
-    return text;
-}
-
-}   // namespace
 
 void DevBuildActivity::show(const dev_builds::Build& build, bool newer)
 {
@@ -94,7 +79,7 @@ void DevBuildActivity::onContentAvailable()
     headline->setText(build_title(b));
 
     // The facts.
-    std::string built = dev_build_flow::short_date(b.date);
+    std::string built = dev_builds::short_date(b.date);
     const std::string age = dev_build_flow::age_text(b.date);
     if (!age.empty()) built += " · " + age;
     add_fact("playguard/dev_build/fact_built"_i18n, built, ui::color_text());
@@ -107,7 +92,7 @@ void DevBuildActivity::onContentAvailable()
     if (b.sha256.empty()) add_fact("playguard/dev_build/fact_checksum"_i18n, "playguard/dev_build/no_digest"_i18n, ui::color_warn());
     else add_fact("playguard/dev_build/fact_checksum"_i18n, b.sha256.substr(0, 16) + "…", ui::color_text());
     if (!b.expires.empty()) {
-        const int days = std::max(0, dev_builds::days_between(now_iso(), b.expires));
+        const int days = std::max(0, dev_builds::days_left(b.expires, dev_build_flow::now()));
         add_fact("playguard/dev_build/fact_expires"_i18n, brls::getStr("playguard/dev_build/expires_in", days),
                  days < 7 ? ui::color_warn() : ui::color_text());
     }

@@ -5,6 +5,7 @@
 #include <string>
 
 #include "util/date.hpp"
+#include "util/text.hpp"
 
 namespace history_logic
 {
@@ -45,7 +46,7 @@ Category category(const history::Entry& e)
     if (k == "pin" || k == "pin_shown" || k == "unlock" || k == "relock" || k == "unlink" || k == "delete" ||
         k == "rescue")
         return Category::Security;
-    if (k.rfind("outside_", 0) == 0 || k == "new_account") return Category::Outside;
+    if (text::starts_with(k, "outside_") || k == "new_account") return Category::Outside;
     return Category::Other;
 }
 

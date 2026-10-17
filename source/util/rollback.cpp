@@ -5,6 +5,7 @@
 
 #include <borealis/extern/nlohmann/json.hpp>
 
+#include "util/json_util.hpp"
 #include "util/paths.hpp"
 
 namespace rollback
@@ -18,12 +19,10 @@ bool read_json(const std::string& file, json* out)
 {
     std::string text;
     if (!paths::read_file(file, text)) return false;
-    try {
-        *out = json::parse(text);
+    return json_util::parse_with(text, [out](json j) {
+        *out = std::move(j);
         return out->is_object();
-    } catch (const std::exception&) {
-        return false;
-    }
+    });
 }
 }   // namespace
 
@@ -35,9 +34,11 @@ std::string previous_file(const std::string& nro)
 bool read_label(const std::string& json_file, std::string* label)
 {
     json j;
-    if (!read_json(json_file, &j) || !j.contains("label") || !j["label"].is_string()) return false;
-    *label = j["label"].get<std::string>();
-    return !label->empty();
+    if (!read_json(json_file, &j)) return false;
+    const std::string l = json_util::string_at(j, "label");
+    if (l.empty()) return false;
+    *label = l;
+    return true;
 }
 
 bool write_label(const std::string& json_file, const std::string& label)
@@ -51,7 +52,7 @@ bool read_check(const std::string& json_file, Check* out)
     json j;
     if (!read_json(json_file, &j)) return false;
     Check c;
-    if (j.contains("label") && j["label"].is_string()) c.label = j["label"].get<std::string>();
+    c.label = json_util::string_at(j, "label");
     if (j.contains("starts") && j["starts"].is_number_integer()) c.starts = j["starts"].get<int>();
     if (c.starts < 0) c.starts = 0;
     *out = c;
