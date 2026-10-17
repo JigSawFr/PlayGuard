@@ -59,19 +59,27 @@ static Result query_events(s32 index, PdmPlayEvent *events, s32 count, s32 *got)
     return pdmqryQueryPlayEvent(index, events, count, got);
 }
 
+// Appends `id` to the array *ids (*count used of *cap, grown as needed).
+// False, and nothing added, when it cannot grow.
+static bool push_id(u64 **ids, size_t *count, size_t *cap, u64 id)
+{
+    if (*count == *cap) {
+        size_t grown = *cap ? *cap * 2 : 128;
+        u64 *bigger = (u64 *)realloc(*ids, grown * sizeof(u64));
+        if (!bigger) return false;
+        *ids = bigger;
+        *cap = grown;
+    }
+    (*ids)[(*count)++] = id;
+    return true;
+}
+
 // Adds `id` to the candidates for the all-time totals, once.
 static void add_candidate(u64 **ids, size_t *count, size_t *cap, u64 id)
 {
     for (size_t i = 0; i < *count; i++)
         if ((*ids)[i] == id) return;
-    if (*count == *cap) {
-        size_t grown = *cap ? *cap * 2 : 128;
-        u64 *bigger = (u64 *)realloc(*ids, grown * sizeof(u64));
-        if (!bigger) return;
-        *ids = bigger;
-        *cap = grown;
-    }
-    (*ids)[(*count)++] = id;
+    push_id(ids, count, cap, id);
 }
 
 static GameStat *find_or_add(PlayStats *out, u64 id)
@@ -202,16 +210,8 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
             break;
         }
         if (got <= 0) break;
-        for (s32 i = 0; i < got; i++) {
-            if (id_count == id_cap) {
-                size_t grown = id_cap ? id_cap * 2 : 128;
-                u64 *bigger = (u64 *)realloc(ids, grown * sizeof(u64));
-                if (!bigger) break;
-                ids = bigger;
-                id_cap = grown;
-            }
-            ids[id_count++] = records[i].application_id;
-        }
+        for (s32 i = 0; i < got; i++)
+            if (!push_id(&ids, &id_count, &id_cap, records[i].application_id)) break;
         offset += got;
         if (got < RECORD_CHUNK) break;
     }

@@ -23,7 +23,8 @@
 // else is blocked. It only reads a PIN the console already stores; it never
 // writes one anywhere (only the MAC made with it). The pctl command IDs and
 // the buffer details (HIPC pointer buffers, the NUL-terminated PIN) are the
-// ones in source/core/pctl_ops.c, proven on hardware.
+// app's, proven on hardware: the PIN read and the unlock come from
+// source/core/pctl_ops_internal.h.
 //
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include <fcntl.h>
@@ -32,6 +33,7 @@
 #include <unistd.h>
 #include <switch.h>
 
+#include "pctl_ops_internal.h"
 #include "rescue.h"
 
 #define DATA_DIR    "sdmc:/config/playguard"
@@ -86,77 +88,50 @@ void __appExit(void)
     smExit();
 }
 
-// ---- the pctl commands this module needs (source/core/pctl_ops.c) ----
-
-static Result pctl_cmd(u32 id)
-{
-    return serviceDispatch(pctlGetServiceSession_Service(), id);
-}
-
-static Result pctl_pin_length(u32* len)
-{
-    return serviceDispatchOut(pctlGetServiceSession_Service(), 1206, *len);
-}
-
-static Result pctl_is_unlocked(bool* out)
-{
-    u8 v = 0;
-    Result rc = serviceDispatchOut(pctlGetServiceSession_Service(), 1006, v);
-    if (R_SUCCEEDED(rc)) *out = v != 0;
-    return rc;
-}
-
-#define PIN_BUF 32
+// ---- the pctl commands this module needs (core/pctl_ops_internal.h) ----
 
 // 1208 GetPinCode into `pin` (PIN_BUF bytes, always NUL-terminated), its
 // length in *n (rescue_pin_length). The caller wipes `pin`.
-static Result read_stored_pin(char* pin, size_t* n)
+static Result read_stored_pin(Service* srv, char* pin, size_t* n)
 {
-    memset(pin, 0, PIN_BUF);
     *n = 0;
     u32 len = 0;
-    Result rc = serviceDispatchOut(pctlGetServiceSession_Service(), 1208, len,
-        .buffer_attrs = { SfBufferAttr_HipcPointer | SfBufferAttr_Out },
-        .buffers      = { { pin, PIN_BUF } });
-    pin[PIN_BUF - 1] = '\0';
+    Result rc = read_pin(srv, pin, &len);
     if (R_SUCCEEDED(rc)) *n = rescue_pin_length(pin, PIN_BUF, len);
+    secure_zero(&len, sizeof(len));
     return rc;
 }
 
 // 1208 reads the PIN; 1201 then unlocks with it. The PIN stays in this one
 // buffer, wiped before returning; it is never written to the SD card.
-static Result pctl_unlock_with_stored_pin(void)
+static Result pctl_unlock_with_stored_pin(Service* srv)
 {
     char pin[PIN_BUF];
     size_t n = 0;
-    Result rc = read_stored_pin(pin, &n);
-    if (R_SUCCEEDED(rc)) {
-        rc = serviceDispatch(pctlGetServiceSession_Service(), 1201,
-            .buffer_attrs = { SfBufferAttr_HipcPointer | SfBufferAttr_In },
-            .buffers      = { { pin, n + 1 } });   // NUL-terminated, like the app
-    }
-    memset(pin, 0, sizeof(pin));
+    Result rc = read_stored_pin(srv, pin, &n);
+    if (R_SUCCEEDED(rc)) rc = unlock_with_pin(srv, pin, n + 1);   // NUL-terminated, like the app
+    secure_zero(pin, sizeof(pin));
     return rc;
 }
 
 // The report's proof (core/rescue.h): HMAC-SHA256 of rescue_mac_message,
 // keyed with the stored PIN, read again (1208) here and wiped. False, and
 // *out left absent, when the PIN cannot be read or there is none.
-static bool sign_report(const RescueReport* r, const u8* nonce, RescueProof* out)
+static bool sign_report(Service* srv, const RescueReport* r, const u8* nonce, RescueProof* out)
 {
     static char msg[256];
     const size_t m = rescue_mac_message(r, nonce, msg, sizeof(msg));
     if (m == 0) return false;
     char pin[PIN_BUF];
     size_t n = 0;
-    const Result rc = read_stored_pin(pin, &n);
+    const Result rc = read_stored_pin(srv, pin, &n);
     const bool ok = R_SUCCEEDED(rc) && n > 0;
     if (ok) {
         hmacSha256CalculateMac(out->mac, pin, n, msg, m);
         memcpy(out->nonce, nonce, RESCUE_NONCE_SIZE);
         out->present = true;
     }
-    memset(pin, 0, sizeof(pin));
+    secure_zero(pin, sizeof(pin));
     return ok;
 }
 
@@ -265,7 +240,7 @@ static bool wait_for_pctl(void)
     return false;
 }
 
-static void do_rescue(RescueMode mode, RescueReport* out)
+static void do_rescue(Service* srv, RescueMode mode, RescueReport* out)
 {
     out->mode    = mode;
     out->result  = RescueResult_Failed;
@@ -273,24 +248,24 @@ static void do_rescue(RescueMode mode, RescueReport* out)
     out->unlocks = 0;
 
     if (mode == RescueMode_Delete) {
-        Result rc = pctl_cmd(1043);   // DeleteSettings — irreversible
+        Result rc = serviceDispatch(srv, 1043);   // DeleteSettings — irreversible
         out->rc     = rc;
         out->result = R_SUCCEEDED(rc) ? RescueResult_Ok : RescueResult_Failed;
         return;
     }
 
     u32 len = 0;
-    Result rc = pctl_pin_length(&len);
+    Result rc = rd_u32(srv, 1206, &len);
     if (R_FAILED(rc)) { out->rc = rc; return; }
     if (len == 0) { out->result = RescueResult_NoPin; return; }
 
-    rc = pctl_unlock_with_stored_pin();
+    rc = pctl_unlock_with_stored_pin(srv);
     if (R_FAILED(rc)) { out->rc = rc; return; }
     out->unlocks = 1;
 
     // Confirm the unlock took; if the read fails, say so rather than claim it.
     bool unlocked = false;
-    rc = pctl_is_unlocked(&unlocked);
+    rc = rd_bool(srv, 1006, &unlocked);
     if (R_FAILED(rc)) { out->rc = rc; return; }
     out->result = unlocked ? RescueResult_Ok : RescueResult_Failed;
 }
@@ -323,11 +298,12 @@ int main(int argc, char* argv[])
             report.mode = mode;
             report.result = RescueResult_Refused;
         } else if (wait_for_pctl()) {
-            do_rescue(mode, &report);
+            Service* srv = pctlGetServiceSession_Service();
+            do_rescue(srv, mode, &report);
             // Without a challenge (PlayGuard never opened since it was
             // installed) the report goes without a proof: PlayGuard then
             // shows it without the recovery actions.
-            if (challenged && rescue_report_needs_proof(&report)) sign_report(&report, nonce, &proof);
+            if (challenged && rescue_report_needs_proof(&report)) sign_report(srv, &report, nonce, &proof);
             pctlExit();
         } else {
             report.mode = mode;

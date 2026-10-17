@@ -5,6 +5,7 @@
 #include "pctl_ops.h"
 #include "pctl_ops_internal.h"
 #include "pure.h"
+#include "rescue.h"
 #include "write_guard.h"
 #include <string.h>
 #include <stdio.h>
@@ -188,6 +189,30 @@ Result pctl_ask_pin(void)
     return auth_result(pctlauthShowForConfiguration());
 }
 
+// Reads the PIN (1208), hands it to `use` and wipes it: the PIN never lives
+// outside this call. `use` runs only when the read succeeded, and its Result
+// is returned; `len` is the length 1208 reported.
+typedef Result (*PinUse)(Service *srv, const char *pin, u32 len, void *ctx);
+
+static Result with_pin(Service *srv, PinUse use, void *ctx)
+{
+    char pin[PIN_BUF];
+    u32 pin_len = 0;
+    Result rc = read_pin(srv, pin, &pin_len);
+    if (R_SUCCEEDED(rc)) rc = use(srv, pin, pin_len, ctx);
+    secure_zero(pin, sizeof(pin));
+    secure_zero(&pin_len, sizeof(pin_len));
+    return rc;
+}
+
+// 1201 with the PIN NUL-terminated: the length reported + 1 bytes, the whole
+// buffer when that length is of no use.
+static Result pin_unlock(Service *srv, const char *pin, u32 len, void *ctx)
+{
+    (void)ctx;
+    return unlock_with_pin(srv, pin, (len > 0 && len < PIN_BUF) ? ((size_t)len + 1) : PIN_BUF);
+}
+
 Result pctl_unlock_restriction_temporarily(void)
 {
     pctl_ops_exit();   // nothing held while the PIN check may show its applet
@@ -204,18 +229,7 @@ Result pctl_unlock_restriction_temporarily(void)
     if (R_FAILED(rc)) return rc;
     Service *srv = pctlGetServiceSession_Service();
 
-    char pin[PIN_BUF];
-    u32 pin_len = 0;
-    rc = read_pin(srv, pin, &pin_len);
-    if (R_SUCCEEDED(rc)) {
-        size_t n = (pin_len > 0 && pin_len < (u32)sizeof(pin)) ? ((size_t)pin_len + 1) : sizeof(pin);
-        (void)n;   // only referenced inside the buffer descriptor below
-        rc = serviceDispatch(srv, 1201,
-            .buffer_attrs = { SfBufferAttr_HipcPointer | SfBufferAttr_In },
-            .buffers      = { { pin, n } });
-    }
-    secure_zero(pin, sizeof(pin));
-    secure_zero(&pin_len, sizeof(pin_len));
+    rc = with_pin(srv, pin_unlock, NULL);
 
     if (R_SUCCEEDED(rc)) {
         bool unlocked = false;
@@ -234,6 +248,26 @@ Result pctl_unlock_restriction_temporarily(void)
     return rc;
 }
 
+typedef struct {
+    char  *out;
+    size_t size;
+} PinOut;
+
+static Result pin_copy(Service *srv, const char *pin, u32 len, void *ctx)
+{
+    (void)srv;
+    PinOut *o = (PinOut *)ctx;
+    const size_t n = rescue_pin_length(pin, PIN_BUF, len);
+    // A Switch PIN is 4 to 8 digits; anything else is not shown.
+    bool digits = n >= 4 && n <= 8;
+    for (size_t i = 0; i < n && digits; i++) digits = pin[i] >= '0' && pin[i] <= '9';
+    if (!digits) return NXM_RC_STATE_UNKNOWN;
+    if (n >= o->size) return NXM_RC_INVALID_ARGUMENT;
+    memcpy(o->out, pin, n);
+    o->out[n] = '\0';
+    return 0;
+}
+
 Result pctl_get_pin(char *out, size_t out_size)
 {
     if (out && out_size) secure_zero(out, out_size);
@@ -244,28 +278,19 @@ Result pctl_get_pin(char *out, size_t out_size)
     // Same session handling as the unlock above, where 1208 was validated.
     Result rc = pctl_ops_reinit();
     if (R_FAILED(rc)) return rc;
-
-    char pin[PIN_BUF];
-    u32 pin_len = 0;
-    rc = read_pin(pctlGetServiceSession_Service(), pin, &pin_len);
-    if (R_SUCCEEDED(rc)) {
-        size_t n = 0;
-        while (n < PIN_BUF && pin[n]) n++;
-        if (pin_len > 0 && pin_len < n) n = pin_len;
-        // A Switch PIN is 4 to 8 digits; anything else is not shown.
-        bool digits = n >= 4 && n <= 8;
-        for (size_t i = 0; i < n && digits; i++) digits = pin[i] >= '0' && pin[i] <= '9';
-        if (!digits)            rc = NXM_RC_STATE_UNKNOWN;
-        else if (n >= out_size) rc = NXM_RC_INVALID_ARGUMENT;
-        else {
-            memcpy(out, pin, n);
-            out[n] = '\0';
-        }
-    }
-    secure_zero(pin, sizeof(pin));
-    secure_zero(&pin_len, sizeof(pin_len));
+    PinOut o = { out, out_size };
+    rc = with_pin(pctlGetServiceSession_Service(), pin_copy, &o);
     pctl_ops_exit();
     return rc;
+}
+
+static Result pin_judge(Service *srv, const char *pin, u32 len, void *ctx)
+{
+    (void)srv;
+    const size_t n = rescue_pin_length(pin, PIN_BUF, len);
+    if (n == 0) return NXM_RC_NO_PIN;
+    *(bool *)ctx = pin_is_weak(pin, n);
+    return 0;
 }
 
 Result pctl_pin_weak(bool *weak)
@@ -274,20 +299,26 @@ Result pctl_pin_weak(bool *weak)
     *weak = false;
     Result rc = pctl_ops_reinit();
     if (R_FAILED(rc)) return rc;
-    char pin[PIN_BUF];
-    u32 pin_len = 0;
-    rc = read_pin(pctlGetServiceSession_Service(), pin, &pin_len);
-    if (R_SUCCEEDED(rc)) {
-        size_t n = 0;
-        while (n < PIN_BUF && pin[n]) n++;
-        if (pin_len > 0 && pin_len < n) n = pin_len;
-        if (n == 0) rc = NXM_RC_NO_PIN;
-        else *weak = pin_is_weak(pin, n);
-    }
-    secure_zero(pin, sizeof(pin));
-    secure_zero(&pin_len, sizeof(pin_len));
+    rc = with_pin(pctlGetServiceSession_Service(), pin_judge, weak);
     pctl_ops_exit();
     return rc;
+}
+
+typedef struct {
+    const void *msg;
+    size_t      size;
+    u8         *mac;
+} PinMac;
+
+static Result pin_mac(Service *srv, const char *pin, u32 len, void *ctx)
+{
+    (void)srv;
+    const PinMac *m = (const PinMac *)ctx;
+    // The key the recovery sysmodule takes (rescue_pin_length, as it does).
+    const size_t n = rescue_pin_length(pin, PIN_BUF, len);
+    if (n == 0) return NXM_RC_NO_PIN;
+    hmacSha256CalculateMac(m->mac, pin, n, m->msg, m->size);
+    return 0;
 }
 
 Result pctl_pin_hmac(const void *msg, size_t size, u8 *mac)
@@ -297,19 +328,8 @@ Result pctl_pin_hmac(const void *msg, size_t size, u8 *mac)
     if (!msg) return NXM_RC_INVALID_ARGUMENT;
     Result rc = pctl_ops_reinit();
     if (R_FAILED(rc)) return rc;
-    char pin[PIN_BUF];
-    u32 pin_len = 0;
-    rc = read_pin(pctlGetServiceSession_Service(), pin, &pin_len);
-    if (R_SUCCEEDED(rc)) {
-        // The key the recovery sysmodule takes (rescue_pin_length's rule).
-        size_t n = 0;
-        while (n < PIN_BUF && pin[n]) n++;
-        if (pin_len > 0 && pin_len < n) n = pin_len;
-        if (n == 0) rc = NXM_RC_NO_PIN;
-        else hmacSha256CalculateMac(mac, pin, n, msg, size);
-    }
-    secure_zero(pin, sizeof(pin));
-    secure_zero(&pin_len, sizeof(pin_len));
+    PinMac m = { msg, size, mac };
+    rc = with_pin(pctlGetServiceSession_Service(), pin_mac, &m);
     pctl_ops_exit();
     return rc;
 }
@@ -335,8 +355,6 @@ Result pctl_get_level_settings(u32 level, PctlCustomSettings *out)
     }
     return rc;
 }
-
-#define RATING_ORG_COUNT 13   // nn::ns::RatingOrganization, as pctl_rating_org_name names them
 
 Result pctl_set_rating_org(u32 org)
 {
@@ -545,81 +563,133 @@ void pctl_overview_fetch(PctlStatus *status, PtState *pt)
     pctl_ops_exit();
 }
 
-Result pctl_play_timer_set_days(const u16 days_min[7])
+// One write of the play-timer block (195101), as the three writers below make
+// it: the change check, the firmware, the arguments, then in one session the
+// gate, the block as it is (145601) to start from, `edit`, the write and a
+// read-back. A write the console did not take is undone with the block read.
+typedef struct {
+    const void *arg;
+    bool (*args_ok)(const void *arg);   // NULL: nothing to check
+    // Turns `c`, the block as read, into the one to write; a failure refuses
+    // the write with that Result.
+    Result (*edit)(u16 c[PT_U16_COUNT], const void *arg);
+    // Whether the console took `c`, read after writing it: false puts back
+    // the block as it was read (nothing when it could not be).
+    bool (*took)(Service *srv, const u16 c[PT_U16_COUNT], const void *arg);
+    // When 145601 fails: 0 starts from a zeroed block, anything else refuses
+    // the write. NULL: refused (NXM_RC_STATE_UNKNOWN). `active` as
+    // pt_write_gate says.
+    Result (*unreadable)(bool active, const void *arg);
+    bool write_unchanged;   // write even when `edit` changed nothing
+} PtWrite;
+
+static Result pt_write_in(Service *srv, const PtWrite *w)
+{
+    bool active = false;
+    Result rc = pt_block_write_gate(srv, &active);
+    if (R_FAILED(rc)) return rc;
+
+    u16 before[PT_U16_COUNT], c[PT_U16_COUNT];
+    memset(before, 0, sizeof(before));
+    const bool have_current = R_SUCCEEDED(serviceDispatchOut(srv, 145601, before));
+    // Read, but not a layout this app knows: writing from it could break what
+    // it holds, and a zeroed block would wipe it.
+    if (have_current && !pt_plausible(before)) return NXM_RC_PT_NOT_UNDERSTOOD;
+    if (!have_current) {
+        memset(before, 0, sizeof(before));
+        rc = w->unreadable ? w->unreadable(active, w->arg) : NXM_RC_STATE_UNKNOWN;
+        if (R_FAILED(rc)) return rc;
+    }
+    memcpy(c, before, sizeof(c));
+    rc = w->edit(c, w->arg);
+    if (R_FAILED(rc)) return rc;
+    if (!w->write_unchanged && memcmp(c, before, sizeof(c)) == 0) return 0;
+    rc = serviceDispatchIn(srv, 195101, c);
+    if (R_FAILED(rc)) return rc;
+
+    // 195101 is a debug command: "written" is never said of a block the
+    // console did not take.
+    if (w->took(srv, c, w->arg)) return 0;
+    if (have_current) rc = serviceDispatchIn(srv, 195101, before);
+    return R_FAILED(rc) ? rc : NXM_RC_NOT_APPLIED;
+}
+
+static Result pt_write(const PtWrite *w)
 {
     pctl_ops_exit();   // nothing held while the PIN check may show its applet
     Result gate = core_change_allowed();
     if (R_FAILED(gate)) return gate;
     if (!pt_fw_supported()) return NXM_RC_FW_UNSUPPORTED;
-    for (int n = 0; n < 7; n++)
-        if (days_min[n] != PT_DAY_NOLIMIT && days_min[n] > 1440) return NXM_RC_INVALID_ARGUMENT;
+    if (w->args_ok && !w->args_ok(w->arg)) return NXM_RC_INVALID_ARGUMENT;
 
     Result rc = pctl_ops_reinit();
     if (R_FAILED(rc)) return rc;
-    Service *srv = pctlGetServiceSession_Service();
-
-    bool active = false;
-    rc = pt_block_write_gate(srv, &active);
-    if (R_FAILED(rc)) {
-        pctl_ops_exit();
-        return rc;
-    }
-
-    // Start from the settings as they are, so the fields this app does not
-    // understand survive. Should the read fail while the timer is off, fall
-    // back to the layout observed on hardware (what earlier versions always
-    // wrote): there is nothing set to lose. While it is on, the block holds
-    // what the companion app set, which a zeroed block would wipe: refuse,
-    // unless no day keeps a limit (pt_encode then writes all zeros anyway).
-    u16 c[PT_U16_COUNT];
-    memset(c, 0, sizeof(c));
-    const bool have_current = R_SUCCEEDED(serviceDispatchOut(srv, 145601, c));
-    // Read, but not a layout this app knows: writing from it could break what
-    // it holds, and a zeroed block would wipe it.
-    if (have_current && !pt_plausible(c)) {
-        pctl_ops_exit();
-        return NXM_RC_PT_NOT_UNDERSTOOD;
-    }
-    if (!have_current) {
-        memset(c, 0, sizeof(c));
-        bool any = false;
-        for (int n = 0; n < 7; n++) if (days_min[n] != PT_DAY_NOLIMIT) any = true;
-        if (active && any) {
-            pctl_ops_exit();
-            return NXM_RC_STATE_UNKNOWN;
-        }
-    }
-    u16 before[PT_U16_COUNT];
-    memcpy(before, c, sizeof(before));
-    pt_encode(c, days_min);
-    rc = serviceDispatchIn(srv, 195101, c);
-    if (R_FAILED(rc)) {
-        pctl_ops_exit();
-        return rc;
-    }
-
-    // 195101 is a debug command: read the block back, as the bedtime write
-    // does, so "written" is never said of limits the console did not take.
-    // An unreadable block proves nothing either way: the write stands.
-    u16 back[PT_U16_COUNT], want[7], got[7];
-    if (R_SUCCEEDED(serviceDispatchOut(srv, 145601, back))) {
-        pt_decode(c, want);
-        pt_decode(back, got);
-        if (memcmp(want, got, sizeof(want)) != 0) {
-            if (have_current) rc = serviceDispatchIn(srv, 195101, before);
-            pctl_ops_exit();
-            return R_FAILED(rc) ? rc : NXM_RC_NOT_APPLIED;
-        }
-    }
+    rc = pt_write_in(pctlGetServiceSession_Service(), w);
     pctl_ops_exit();
+    return rc;
+}
+
+static bool days_args_ok(const void *arg) { return pt_days_ok((const u16 *)arg); }
+
+static Result days_edit(u16 c[PT_U16_COUNT], const void *arg)
+{
+    pt_encode(c, (const u16 *)arg);
     return 0;
 }
 
-Result pctl_play_timer_clear(void)
+// The limits read back are the ones written. An unreadable block proves
+// nothing either way: the write stands.
+static bool days_took(Service *srv, const u16 c[PT_U16_COUNT], const void *arg)
 {
-    u16 d[7];
-    for (int i = 0; i < 7; i++) d[i] = PT_DAY_NOLIMIT;
-    return pctl_play_timer_set_days(d);
+    (void)arg;
+    u16 back[PT_U16_COUNT], want[7], got[7];
+    if (R_FAILED(serviceDispatchOut(srv, 145601, back))) return true;
+    pt_decode(c, want);
+    pt_decode(back, got);
+    return memcmp(want, got, sizeof(want)) == 0;
+}
+
+// Start from the settings as they are, so the fields this app does not
+// understand survive. Should the read fail while the timer is off, fall back
+// to the layout observed on hardware (what earlier versions always wrote):
+// there is nothing set to lose. While it is on, the block holds what the
+// companion app set, which a zeroed block would wipe: refuse, unless no day
+// keeps a limit (pt_encode then writes all zeros anyway).
+static Result days_unreadable(bool active, const void *arg)
+{
+    const u16 *days_min = (const u16 *)arg;
+    bool any = false;
+    for (int n = 0; n < 7; n++) if (days_min[n] != PT_DAY_NOLIMIT) any = true;
+    return active && any ? NXM_RC_STATE_UNKNOWN : 0;
+}
+
+Result pctl_play_timer_set_days(const u16 days_min[7])
+{
+    const PtWrite w = { .arg = days_min, .args_ok = days_args_ok, .edit = days_edit, .took = days_took,
+                        .unreadable = days_unreadable, .write_unchanged = true };
+    return pt_write(&w);
+}
+
+typedef struct {
+    const PtBedtime *bed;
+    int today;
+} BedtimeArg;
+
+static bool bedtime_args_ok(const void *arg)
+{
+    const BedtimeArg *a = (const BedtimeArg *)arg;
+    if (a->today < 0 || a->today > 6) return false;
+    for (int n = 0; n < 7; n++)
+        if (!pt_bedtime_ok(&a->bed[n])) return false;
+    return true;
+}
+
+// Only ever from the block as it is (no `unreadable`): a zeroed one would
+// wipe the limits.
+static Result bedtime_edit(u16 c[PT_U16_COUNT], const void *arg)
+{
+    pt_bedtime_encode(c, ((const BedtimeArg *)arg)->bed);
+    return 0;
 }
 
 // What 1954/1956/1957 report is `b` (the time only matters while it is on).
@@ -628,113 +698,45 @@ static bool bedtime_reported(const PtBedtime *b, bool on, u8 h, u8 m)
     return on == b->on && (!on || (h == b->hour && m == b->minute));
 }
 
-Result pctl_play_timer_set_bedtime(const PtBedtime bed[7], int today)
+// Today's bedtime or yesterday's (still running past midnight) is reported;
+// one that cannot be read is not taken.
+static bool bedtime_took(Service *srv, const u16 c[PT_U16_COUNT], const void *arg)
 {
-    pctl_ops_exit();   // nothing held while the PIN check may show its applet
-    Result gate = core_change_allowed();
-    if (R_FAILED(gate)) return gate;
-    if (!pt_fw_supported()) return NXM_RC_FW_UNSUPPORTED;
-    if (today < 0 || today > 6) return NXM_RC_INVALID_ARGUMENT;
-    for (int n = 0; n < 7; n++)
-        if (!pt_bedtime_ok(&bed[n])) return NXM_RC_INVALID_ARGUMENT;
-
-    Result rc = pctl_ops_reinit();
-    if (R_FAILED(rc)) return rc;
-    Service *srv = pctlGetServiceSession_Service();
-    rc = pt_block_write_gate(srv, NULL);
-    if (R_FAILED(rc)) {
-        pctl_ops_exit();
-        return rc;
-    }
-
-    // Only ever from the block as it is: a zeroed one would wipe the limits.
-    u16 before[PT_U16_COUNT], c[PT_U16_COUNT];
-    memset(before, 0, sizeof(before));
-    if (R_FAILED(serviceDispatchOut(srv, 145601, before))) {
-        pctl_ops_exit();
-        return NXM_RC_STATE_UNKNOWN;
-    }
-    if (!pt_plausible(before)) {
-        pctl_ops_exit();
-        return NXM_RC_PT_NOT_UNDERSTOOD;
-    }
-    memcpy(c, before, sizeof(c));
-    pt_bedtime_encode(c, bed);
-    if (memcmp(c, before, sizeof(c)) == 0) {
-        pctl_ops_exit();
-        return 0;
-    }
-    rc = serviceDispatchIn(srv, 195101, c);
-    if (R_FAILED(rc)) {
-        pctl_ops_exit();
-        return rc;
-    }
-
+    (void)c;
+    const BedtimeArg *a = (const BedtimeArg *)arg;
     bool on = false;
     u8 h = 0, m = 0;
     const bool read = R_SUCCEEDED(rd_bool(srv, 1954, &on)) && R_SUCCEEDED(rd_u8(srv, 1956, &h)) &&
                       R_SUCCEEDED(rd_u8(srv, 1957, &m));
-    if (read && (bedtime_reported(&bed[today], on, h, m) || bedtime_reported(&bed[(today + 6) % 7], on, h, m))) {
-        pctl_ops_exit();
-        return 0;
-    }
-    rc = serviceDispatchIn(srv, 195101, before);
-    pctl_ops_exit();
-    return R_FAILED(rc) ? rc : NXM_RC_NOT_APPLIED;
+    return read && (bedtime_reported(&a->bed[a->today], on, h, m) ||
+                    bedtime_reported(&a->bed[(a->today + 6) % 7], on, h, m));
+}
+
+Result pctl_play_timer_set_bedtime(const PtBedtime bed[7], int today)
+{
+    const BedtimeArg a = { bed, today };
+    const PtWrite w = { .arg = &a, .args_ok = bedtime_args_ok, .edit = bedtime_edit, .took = bedtime_took };
+    return pt_write(&w);
+}
+
+// Only ever from the block as it is, as the bedtime.
+static Result alarm_only_edit(u16 c[PT_U16_COUNT], const void *arg)
+{
+    return pt_set_suspends(c, !*(const bool *)arg) ? 0 : NXM_RC_INVALID_ARGUMENT;
+}
+
+// An unreadable block proves nothing either way: the write stands.
+static bool alarm_only_took(Service *srv, const u16 c[PT_U16_COUNT], const void *arg)
+{
+    (void)c;
+    u16 back[PT_U16_COUNT];
+    return !(R_SUCCEEDED(serviceDispatchOut(srv, 145601, back)) && pt_suspends(back) == *(const bool *)arg);
 }
 
 Result pctl_play_timer_set_alarm_only(bool alarm_only)
 {
-    pctl_ops_exit();   // nothing held while the PIN check may show its applet
-    Result gate = core_change_allowed();
-    if (R_FAILED(gate)) return gate;
-    if (!pt_fw_supported()) return NXM_RC_FW_UNSUPPORTED;
-
-    Result rc = pctl_ops_reinit();
-    if (R_FAILED(rc)) return rc;
-    Service *srv = pctlGetServiceSession_Service();
-    rc = pt_block_write_gate(srv, NULL);
-    if (R_FAILED(rc)) {
-        pctl_ops_exit();
-        return rc;
-    }
-
-    // Only ever from the block as it is: a zeroed one would wipe the limits.
-    u16 before[PT_U16_COUNT], c[PT_U16_COUNT];
-    memset(before, 0, sizeof(before));
-    if (R_FAILED(serviceDispatchOut(srv, 145601, before))) {
-        pctl_ops_exit();
-        return NXM_RC_STATE_UNKNOWN;
-    }
-    if (!pt_plausible(before)) {
-        pctl_ops_exit();
-        return NXM_RC_PT_NOT_UNDERSTOOD;
-    }
-    memcpy(c, before, sizeof(c));
-    if (!pt_set_suspends(c, !alarm_only)) {
-        pctl_ops_exit();
-        return NXM_RC_INVALID_ARGUMENT;
-    }
-    if (memcmp(c, before, sizeof(c)) == 0) {
-        pctl_ops_exit();
-        return 0;
-    }
-    rc = serviceDispatchIn(srv, 195101, c);
-    if (R_FAILED(rc)) {
-        pctl_ops_exit();
-        return rc;
-    }
-
-    // A debug command: read back, as the other play-timer writes. An
-    // unreadable block proves nothing either way: the write stands.
-    u16 back[PT_U16_COUNT];
-    if (R_SUCCEEDED(serviceDispatchOut(srv, 145601, back)) && pt_suspends(back) == alarm_only) {
-        rc = serviceDispatchIn(srv, 195101, before);
-        pctl_ops_exit();
-        return R_FAILED(rc) ? rc : NXM_RC_NOT_APPLIED;
-    }
-    pctl_ops_exit();
-    return 0;
+    const PtWrite w = { .arg = &alarm_only, .edit = alarm_only_edit, .took = alarm_only_took };
+    return pt_write(&w);
 }
 
 Result pctl_play_timer_set_alarm_disabled(bool disabled)

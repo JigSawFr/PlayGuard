@@ -142,14 +142,6 @@ void time_clock_set_to_user(TimeApply *out)
     time_clock_snapshot(&out->after);
 }
 
-void time_format_utc(u64 posix, char *buf, size_t size)
-{
-    time_t t = (time_t)posix;
-    struct tm tmv;
-    if (gmtime_r(&t, &tmv) && strftime(buf, size, "%Y-%m-%d %H:%M:%S UTC", &tmv)) return;
-    snprintf(buf, size, "%llu", (unsigned long long)posix);
-}
-
 void time_format_local(u64 posix, char *buf, size_t size)
 {
     TimeCalendarTime cal;
