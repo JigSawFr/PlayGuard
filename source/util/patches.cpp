@@ -2,25 +2,13 @@
 #include "util/patches.hpp"
 
 #include "util/paths.hpp"
+#include "util/text.hpp"
 
 namespace patches
 {
 
 namespace
 {
-std::string trim(const std::string& s)
-{
-    size_t b = s.find_first_not_of(" \t\r\n");
-    if (b == std::string::npos) return "";
-    size_t e = s.find_last_not_of(" \t\r\n");
-    return s.substr(b, e - b + 1);
-}
-
-bool starts_with(const std::string& s, const char* prefix)
-{
-    return s.compare(0, std::char_traits<char>::length(prefix), prefix) == 0;
-}
-
 bool has_ips(const std::string& dir)
 {
     return !paths::list_files(dir, ".ips").empty() || !paths::list_files(dir, ".IPS").empty();
@@ -41,17 +29,17 @@ Ini parse_ini(const std::string& text)
     while (pos <= text.size()) {
         size_t end = text.find('\n', pos);
         if (end == std::string::npos) end = text.size();
-        std::string line = trim(text.substr(pos, end - pos));
+        std::string line = text::trim_space(text.substr(pos, end - pos));
         pos = end + 1;
         if (line.empty() || line[0] == ';' || line[0] == '#') continue;
         if (line.front() == '[' && line.back() == ']') {
-            section = trim(line.substr(1, line.size() - 2));
+            section = text::trim_space(line.substr(1, line.size() - 2));
             ini[section];
             continue;
         }
         size_t eq = line.find('=');
         if (eq == std::string::npos) continue;
-        ini[section][trim(line.substr(0, eq))] = trim(line.substr(eq + 1));
+        ini[section][text::trim_space(line.substr(0, eq))] = text::trim_space(line.substr(eq + 1));
     }
     return ini;
 }
@@ -64,11 +52,11 @@ Module module_state(const Ini& ini, const std::string& name)
     bool all_skipped = true, all_disabled = true;
     for (const auto& kv : it->second) {
         const std::string& v = kv.second;
-        syspatch |= starts_with(v, "Patched (sys-patch)");
-        file     |= starts_with(v, "Patched (file)");
-        failed   |= starts_with(v, "Failed");
-        all_skipped  &= starts_with(v, "Skipped");
-        all_disabled &= starts_with(v, "Disabled");
+        syspatch |= text::starts_with(v, "Patched (sys-patch)");
+        file     |= text::starts_with(v, "Patched (file)");
+        failed   |= text::starts_with(v, "Failed");
+        all_skipped  &= text::starts_with(v, "Skipped");
+        all_disabled &= text::starts_with(v, "Disabled");
     }
     if (syspatch) return Module::SysPatch;
     if (file) return Module::File;

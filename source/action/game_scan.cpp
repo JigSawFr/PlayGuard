@@ -41,7 +41,7 @@ void store(game_cache::Cache cache, bool keep_verified)
     s_saved = std::make_shared<const game_cache::Cache>(std::move(cache));
     ui::write_later("games cache", [encoded = std::move(encoded)]() {
         std::string error;
-        if (!paths::ensure_dir(paths::nand_dir() + "/cache") || !paths::atomic_write(cache_file(), encoded, &error))
+        if (!paths::ensure_dir(paths::nand_cache_dir()) || !paths::atomic_write(cache_file(), encoded, &error))
             brls::Logger::warning("games cache: not saved ({})", error);
     }, "games");
 }
@@ -73,7 +73,7 @@ bool keep_going(void*, const GameFacts*, u32)
 
 std::string cache_file()
 {
-    return paths::nand_dir() + "/cache/games.bin";
+    return paths::nand_cache_dir() + "/games.bin";
 }
 
 bool load(game_cache::Cache* out)

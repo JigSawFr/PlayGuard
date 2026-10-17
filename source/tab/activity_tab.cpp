@@ -121,19 +121,6 @@ uint64_t value_of(const GameStat& g, int period)
 // Games shown under "To rediscover", at most.
 constexpr size_t REDISCOVER_SHOWN = 3;
 
-// Most played in `period` first, a tie to the most recently played. The
-// export (`by_total`) breaks a tie by all-time play first (raw total_s), so
-// its unplayed games keep a useful order too.
-void sort_by_play(std::vector<const GameStat*>& games, int period, bool by_total)
-{
-    std::sort(games.begin(), games.end(), [period, by_total](const GameStat* a, const GameStat* b) {
-        const uint64_t va = value_of(*a, period), vb = value_of(*b, period);
-        if (va != vb) return va > vb;
-        if (by_total && a->total_s != b->total_s) return a->total_s > b->total_s;
-        return a->last_played > b->last_played;
-    });
-}
-
 std::string game_name(const GameStat& g)
 {
     if (g.name[0]) return g.name;
@@ -289,7 +276,7 @@ void ActivityTab::rebuild()
     for (uint32_t i = 0; i < s.count; i++)
         if (value_of(s.games[i], this->period) > 0) rows.push_back(&s.games[i]);
     const int p = this->period;
-    sort_by_play(rows, p, false);
+    activity_summary::sort_by_play(rows, p, false);
 
     // The list on screen: the first ROWS_SHOWN rows unless "Show all" was
     // chosen (then every row, or rows_max in applet mode). When the same games
@@ -557,48 +544,25 @@ void ActivityTab::export_to_sd() const
         config::get().export_format = index;
         ui::save_config();
         const PlayStats& s = *data;
-        table_export::Table t;
-        t.title    = "PlayGuard — " + "playguard/tabs/activity"_i18n;
-        t.subtitle = brls::getStr("playguard/activity/export_subtitle", ui::time_text(s.now), who);
-        if (s.truncated) t.subtitle += " · " + brls::getStr("playguard/activity/truncated", PLAYSTATS_MAX);
-        t.sheet    = "playguard/tabs/activity"_i18n;
-        t.columns  = {
-            { "game", "playguard/activity/columns/game"_i18n, false },
-            { "title_id", "playguard/activity/columns/id"_i18n, false },
-            { "today_min", "playguard/activity/columns/today"_i18n, true },
+        activity_summary::ExportText text;
+        text.title    = "PlayGuard — " + "playguard/tabs/activity"_i18n;
+        text.subtitle = brls::getStr("playguard/activity/export_subtitle", ui::time_text(s.now), who);
+        if (s.truncated) text.subtitle += " · " + brls::getStr("playguard/activity/truncated", PLAYSTATS_MAX);
+        text.sheet    = "playguard/tabs/activity"_i18n;
+        text.game     = "playguard/activity/columns/game"_i18n;
+        text.id       = "playguard/activity/columns/id"_i18n;
+        text.today    = "playguard/activity/columns/today"_i18n;
+        text.week     = "playguard/activity/columns/week"_i18n;
+        text.total    = "playguard/activity/columns/total"_i18n;
+        text.launches = "playguard/activity/launches"_i18n;
+        text.first    = "playguard/activity/first"_i18n;
+        text.last     = "playguard/activity/last"_i18n;
+        text.day = [](int wday) {
+            return brls::getStr("playguard/activity/columns/day", brls::getStr(fmt::format("playguard/days_short/{}", wday)));
         };
-        // The six days before today, most recent first ("Sat (min)").
-        for (int k = 1; k < 7; k++)
-            t.columns.push_back({ fmt::format("day_{}_min", k),
-                                  brls::getStr("playguard/activity/columns/day",
-                                               brls::getStr(fmt::format("playguard/days_short/{}", (int)s.day_wday[k]))),
-                                  true });
-        t.columns.insert(t.columns.end(), {
-            { "week_min", "playguard/activity/columns/week"_i18n, true },
-            { "total_min", "playguard/activity/columns/total"_i18n, true },
-            { "launches", "playguard/activity/launches"_i18n, true },
-            { "first_played", "playguard/activity/first"_i18n, false },
-            { "last_played", "playguard/activity/last"_i18n, false },
-        });
-        std::vector<const GameStat*> games;
-        for (uint32_t i = 0; i < s.count; i++) games.push_back(&s.games[i]);
-        sort_by_play(games, p, true);
-        auto minutes = [](uint64_t seconds) { return std::to_string((seconds + 30) / 60); };
-        for (const GameStat* g : games) {
-            t.rows.push_back({
-                game_name(*g),
-                fmt::format("{:016X}", (unsigned long long)g->app_id),
-                s.windows_ok ? minutes(g->today_s) : "",
-            });
-            for (int k = 1; k < 7; k++) t.rows.back().push_back(s.windows_ok ? minutes(g->day_s[k]) : "");
-            t.rows.back().insert(t.rows.back().end(), {
-                s.windows_ok ? minutes(g->week_s) : "",
-                g->totals_ok ? minutes(g->total_s) : "",
-                g->totals_ok ? std::to_string(g->launches) : "",
-                g->totals_ok && g->first_played ? ui::time_text(g->first_played) : "",
-                g->totals_ok && g->last_played ? ui::time_text(g->last_played) : "",
-            });
-        }
+        text.name = [](const GameStat& g) { return game_name(g); };
+        text.time = [](uint64_t posix) { return ui::time_text(posix); };
+        const table_export::Table t = activity_summary::export_table(s, p, text);
         // Encoded (a PDF, a zip for XLSX) and written off the UI thread.
         const auto format = (table_export::Format)index;
         const std::string failed = "playguard/activity/export_err"_i18n;

@@ -285,10 +285,4 @@ std::string gist_body(const std::vector<Part>& files, const std::string& version
     return j.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);
 }
 
-std::string short_url(const std::string& url)
-{
-    const size_t scheme = url.find("://");
-    return scheme == std::string::npos ? url : url.substr(scheme + 3);
-}
-
 }   // namespace log_upload

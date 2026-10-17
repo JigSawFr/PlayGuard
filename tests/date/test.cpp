@@ -42,8 +42,11 @@ static void test_days()
     CHECK(!date::day_number("2026-02-30", &n) && !date::day_number("", &n));
 
     CHECK(date::add_days("2026-10-12", 7) == "2026-10-19");
+    CHECK(date::add_days("2026-10-12", 30) == "2026-11-11");
     CHECK(date::add_days("2026-12-25", 10) == "2027-01-04");
-    CHECK(date::add_days("2028-02-28", 1) == "2028-02-29");
+    CHECK(date::add_days("2028-02-28", 1) == "2028-02-29");   // a leap year
+    CHECK(date::add_days("2026-02-28", 1) == "2026-03-01");
+    CHECK(date::add_days("", 1).empty());
     CHECK(date::add_days("2026-03-01", -1) == "2026-02-28");
     CHECK(date::add_days("2026-02-30", 1).empty() && date::add_days("2026-1-01", 1).empty());
     CHECK(date::add_days("9999-12-31", 1).empty() && date::add_days("0000-01-01", -1).empty());

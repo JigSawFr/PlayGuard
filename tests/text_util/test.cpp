@@ -84,11 +84,20 @@ static void test_json()
     CHECK(json_util::integer_at(j, "n", &v) && v == 42);
     v = -1;
     CHECK(!json_util::integer_at(j, "x", &v) && !json_util::integer_at(j, "s", &v) && v == -1);
+    CHECK(json_util::integer_or(j, "n") == 42 && json_util::integer_or(j, "x") == 0 && json_util::integer_or(j, "-", 7) == 7);
 
     // Not an object: no field, no exception.
     CHECK(json_util::parse("[1, 2]", &j) && json_util::string_at(j, "s").empty() && !json_util::flag_at(j, "b"));
     CHECK(json_util::parse("\"text\"", &j) && !json_util::integer_at(j, "n", &v));
     CHECK(!json_util::parse("{\"s\": ", &j) && !json_util::parse("", &j) && !json_util::parse("nope", &j));
+    CHECK(json_util::integer_or(j, "n", 3) == 3);
+
+    // parse_with: the reader's answer, false for no JSON or a reader that throws.
+    auto is_object = [](const nlohmann::json& d) { return d.is_object(); };
+    CHECK(json_util::parse_with("{}", is_object) && !json_util::parse_with("[]", is_object));
+    CHECK(!json_util::parse_with("{", is_object) && !json_util::parse_with("", is_object));
+    CHECK(!json_util::parse_with(R"({"b": "yes"})", [](const nlohmann::json& d) { return d.value("b", false); }));
+    CHECK(json_util::parse_with(R"({"b": true})", [](const nlohmann::json& d) { return d.value("b", false); }));
 }
 
 int main()

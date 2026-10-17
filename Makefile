@@ -232,6 +232,8 @@ game_cache_SRC   := source/util/game_cache.cpp tests/game_cache/test.cpp
 game_cache_FLAGS := -std=c++17 -Isource
 activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summary/test.cpp
 activity_summary_FLAGS := -std=c++17 -Isource
+game_check_text_SRC   := source/action/game_check_text.cpp tests/game_check_text/test.cpp
+game_check_text_FLAGS := -std=c++17 -Isource
 pt_log_SRC   := source/util/paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp
 pt_log_FLAGS := -std=c++17 -Isource
 session_log_SRC   := source/util/paths.cpp source/util/log_files.cpp source/util/session_log.cpp source/util/crash_report.cpp tests/session_log/test.cpp

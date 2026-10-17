@@ -75,11 +75,6 @@ bool parse_compat(const std::string& json, Latest* out)
     }
 }
 
-std::string add_days(const std::string& day, int days)
-{
-    return date::add_days(day, days);
-}
-
 bool offer_at_start(const std::string& latest, const std::string& running, const Snooze& snooze,
                     const std::string& today)
 {

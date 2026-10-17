@@ -268,8 +268,6 @@ static void test_urls()
            "https://github.com/o/r/issues/new?template=1-bug.yml&report=https%3A%2F%2Fgist.github.com%2Fu%2Fab12"
            "&version=1.2.0&firmware=23.0.1&atmosphere=1.12.0"
            "&launcher=from%20the%20Album%20%28applet%29&storage=emuMMC");
-    CHECK(log_upload::short_url("https://gist.github.com/u/ab12") == "gist.github.com/u/ab12");
-    CHECK(log_upload::short_url("gist.github.com/u/ab12") == "gist.github.com/u/ab12");
 }
 
 // The last entries of the change history, without names or times of day.

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cstdint>
+#include <exception>
 #include <string>
 
 #include <borealis/extern/nlohmann/json.hpp>
@@ -18,6 +19,20 @@ inline bool parse(const std::string& text, nlohmann::json* out)
 {
     *out = nlohmann::json::parse(text, nullptr, false);
     return !out->is_discarded();
+}
+
+// `text` parsed and handed to `read`, whose answer it returns; false when the
+// text is not JSON or when `read` throws (a field of another type taken with
+// json::value(), memory running out). For a reader that walks a whole
+// document rather than checking each field's type first.
+template <typename F>
+bool parse_with(const std::string& text, F read)
+{
+    try {
+        return read(nlohmann::json::parse(text));
+    } catch (const std::exception&) {
+        return false;
+    }
 }
 
 // j[key] when `j` is an object holding a string there, else "".
@@ -41,6 +56,14 @@ inline bool integer_at(const nlohmann::json& j, const char* key, int64_t* out)
     if (it == j.end() || !it->is_number_integer()) return false;
     *out = it->get<int64_t>();
     return true;
+}
+
+// j[key] when it is an integer, else `fallback`.
+inline int64_t integer_or(const nlohmann::json& j, const char* key, int64_t fallback = 0)
+{
+    int64_t v = fallback;
+    integer_at(j, key, &v);
+    return v;
 }
 
 }   // namespace json_util

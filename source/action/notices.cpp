@@ -25,9 +25,9 @@
 #include "util/activity_summary.hpp"
 #include "util/backup.hpp"
 #include "util/config.hpp"
+#include "util/date.hpp"
 #include "util/log_files.hpp"
 #include "util/paths.hpp"
-#include "util/update.hpp"
 
 using namespace brls::literals;
 
@@ -99,10 +99,10 @@ std::string backup_date(const std::string& name)
     return name.substr(0, 4) + "-" + name.substr(4, 2) + "-" + name.substr(6, 2);
 }
 
-// `date` ("YYYY-MM-DD") is `days` days ago or more.
-bool days_ago(const std::string& date, int days)
+// `day` ("YYYY-MM-DD") is `days` days ago or more.
+bool days_ago(const std::string& day, int days)
 {
-    const std::string then = update::add_days(date, days);
+    const std::string then = date::add_days(day, days);
     return !then.empty() && then <= ui::today_date();
 }
 

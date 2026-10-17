@@ -90,16 +90,6 @@ bool https_on(const std::string& url, const char* host)
     return url.compare(0, head.size(), head) == 0 && url.size() < 512;
 }
 
-template <typename F>
-bool parse_json(const std::string& text, F f)
-{
-    try {
-        return f(json::parse(text));
-    } catch (const std::exception&) {
-        return false;
-    }
-}
-
 // A Markdown heading's text ("## FAQ", or the line over a setext rule), else "".
 std::string heading_text(const std::vector<std::string>& lines, size_t i, bool* setext)
 {
@@ -166,7 +156,7 @@ const char* repo(Which which)
 
 bool parse_github(const std::string& text, Which which, std::vector<Release>* out, size_t keep)
 {
-    return parse_json(text, [which, out, keep](const json& j) {
+    return json_util::parse_with(text, [which, out, keep](const json& j) {
         if (!j.is_array()) return false;
         for (const auto& r : j) {
             if (out->size() >= keep) break;
@@ -508,7 +498,7 @@ std::string encode(const Cache& cache)
 bool decode(const std::string& text, Cache* out)
 {
     Cache c;
-    const bool ok = parse_json(text, [&c](const json& j) {
+    const bool ok = json_util::parse_with(text, [&c](const json& j) {
         if (!j.is_object()) return false;
         for (Which w : { Which::Atmosphere, Which::Hekate, Which::Firmware }) {
             const auto it = j.find(key(w));

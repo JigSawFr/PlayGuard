@@ -125,6 +125,29 @@ void keep_log_lines()
     });
 }
 
+// The shims for the layouts of earlier versions (util/data_move.hpp,
+// log_files::migrate), before anything is written to the data folder: the
+// session file goes to the logs/ they leave. What one system keeps waits for
+// its key: nand_migration().
+void start_up_migrations()
+{
+#ifdef __SWITCH__
+    // The data folder of the versions that kept it next to the .nro.
+    if (const size_t moved = data_move::run(data_move::old_dir(), paths::data_dir()))
+        brls::Logger::info("start-up: {} entries moved from {} to {}", moved, data_move::old_dir(), paths::data_dir());
+#endif
+    // logs/ before its subfolders (reports/, crashes/, uploads/, play_timer/).
+    log_files::migrate(paths::logs_dir());
+}
+
+// What the versions before the per-system folders kept for every system,
+// to this one's: the first system started takes it. After paths::set_nand().
+void nand_migration()
+{
+    if (const size_t moved = data_move::to_nand(paths::data_dir(), paths::nand_dir()))
+        brls::Logger::info("start-up: {} entries moved to {}", moved, paths::nand_dir());
+}
+
 // This run's session file, and a crash file for the run before it when it
 // never ended (no end line: a crash PlayGuard did not catch, a hang closed
 // from the HOME menu, the console turned off).
@@ -266,13 +289,7 @@ int main(int argc, char* argv[])
     std::set_terminate(on_terminate);
     app::set_self_path(argc > 0 ? argv[0] : nullptr);
 
-#ifdef __SWITCH__
-    // The data folder of the versions that kept it next to the .nro.
-    if (const size_t moved = data_move::run(data_move::old_dir(), paths::data_dir()))
-        brls::Logger::info("start-up: {} entries moved from {} to {}", moved, data_move::old_dir(), paths::data_dir());
-#endif
-    // logs/ before its subfolders (reports/, crashes/, uploads/, play_timer/).
-    log_files::migrate(paths::logs_dir());
+    start_up_migrations();
     start_session();
     // A way out of main() that skips the end of this function.
     std::atexit([]() { session_log::end("exit"); });
@@ -293,8 +310,7 @@ int main(int argc, char* argv[])
         paths::set_nand(nand::key(storage == SysStorage_SysMMC   ? nand::Storage::SysMMC
                                   : storage == SysStorage_EmuMMC ? nand::Storage::EmuMMC
                                                                  : nand::Storage::Unknown));
-        if (const size_t moved = data_move::to_nand(paths::data_dir(), paths::nand_dir()))
-            brls::Logger::info("start-up: {} entries moved to {}", moved, paths::nand_dir());
+        nand_migration();
         const std::string system = system_line(si);
         brls::Logger::info("start-up: {}, {}", build_name(), system);
         crash_report::prepare(paths::crashes_dir(), build_name(), system, session_log::current_name());
@@ -371,7 +387,7 @@ int main(int argc, char* argv[])
     brls::sync([loading]() { start(loading); });
 
     // Game icons kept between runs, next to the play data cache.
-    playstats_set_icon_dir((paths::data_dir() + "/cache/icons").c_str());
+    playstats_set_icon_dir((paths::cache_dir() + "/icons").c_str());
     // borealis joins its task thread before mainLoop() returns: a play-data
     // or icon read running there stops now, not after every game is read.
     brls::Application::getExitEvent()->subscribe([]() { playstats_cancel(); });

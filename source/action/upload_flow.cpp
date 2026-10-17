@@ -19,6 +19,7 @@
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/session_log.hpp"
+#include "util/text.hpp"
 #include "view/qr_view.hpp"
 
 using namespace brls::literals;
@@ -83,9 +84,9 @@ void show_link(const log_upload::Result& r, bool report)
         auto* box = new brls::Box(brls::Axis::COLUMN);
         box->setAlignItems(brls::AlignItems::CENTER);
         box->setPadding(24, 24, 12, 24);
-        box->addView(centered_label(brls::getStr("playguard/upload/done_list", log_upload::short_url(r.url)), 20,
+        box->addView(centered_label(brls::getStr("playguard/upload/done_list", text::short_url(r.url)), 20,
                                     ui::color_text()));
-        brls::Box* card = qr_card("playguard/upload/qr_list"_i18n, r.url, log_upload::short_url(r.url));
+        brls::Box* card = qr_card("playguard/upload/qr_list"_i18n, r.url, text::short_url(r.url));
         card->setMarginTop(14);
         box->addView(card);
         auto* dialog = new brls::Dialog(box);
@@ -107,7 +108,7 @@ void show_link(const log_upload::Result& r, bool report)
     if (storage != SysStorage_Unknown) fields.storage = storage == SysStorage_EmuMMC ? "emuMMC" : "sysMMC";
     const std::string issue = log_upload::issue_url(app::repo_url(), r.url, fields);
 
-    std::string text = brls::getStr("playguard/upload/done", log_upload::short_url(r.url));
+    std::string text = brls::getStr("playguard/upload/done", text::short_url(r.url));
 
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::CENTER);
@@ -116,7 +117,7 @@ void show_link(const log_upload::Result& r, bool report)
     auto* row = new brls::Box(brls::Axis::ROW);
     row->setJustifyContent(brls::JustifyContent::SPACE_EVENLY);
     row->setMarginTop(14);
-    row->addView(qr_card("playguard/upload/qr_report"_i18n, r.url, log_upload::short_url(r.url)));
+    row->addView(qr_card("playguard/upload/qr_report"_i18n, r.url, text::short_url(r.url)));
     row->addView(qr_card("playguard/upload/qr_issue"_i18n, issue, "playguard/upload/qr_issue_note"_i18n));
     box->addView(row);
     auto* dialog = new brls::Dialog(box);
@@ -158,7 +159,7 @@ void send_gist(const Parts& parts, const Kind& kind)
                 show_link(r, kind.report);
                 // A report's link stays in the notification bell, for later.
                 if (!kind.report) return;
-                notices::set("upload", notices::Level::Info, "playguard/notices/upload"_i18n, log_upload::short_url(r.url),
+                notices::set("upload", notices::Level::Info, "playguard/notices/upload"_i18n, text::short_url(r.url),
                              "playguard/notices/upload_show"_i18n, [r]() { show_link(r, true); });
             });
         });

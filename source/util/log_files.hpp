@@ -95,6 +95,10 @@ size_t prune(const std::string& dir, const char* prefix, const Limits& limits, s
 // lines) to .url files too, play_timer_log.csv,
 // play_timer_log.old.csv and play_timer_block.json to play_timer/. A file
 // whose new name is taken stays where it is. Returns how many were moved.
+//
+// A shim for the builds before 1.0.0 (October 2026), the only ones that
+// wrote this layout: it can go with data_move's (util/data_move.hpp), in the
+// first release after April 2027.
 size_t migrate(const std::string& logs_dir);
 
 }   // namespace log_files

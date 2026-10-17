@@ -9,9 +9,12 @@
 
 #include <borealis/extern/nlohmann/json.hpp>
 
+#include "util/date.hpp"
+#include "util/json_util.hpp"
 #include "util/paths.hpp"
 #include "util/safe_text.hpp"
 #include "util/sha256.hpp"
+#include "util/text.hpp"
 #include "util/update.hpp"
 
 namespace dev_builds
@@ -26,31 +29,13 @@ bool is_hex(const std::string& s)
     return std::all_of(s.begin(), s.end(), [](char c) { return std::isxdigit((unsigned char)c) != 0; });
 }
 
-std::string lower(std::string s)
-{
-    for (char& c : s) c = (char)std::tolower((unsigned char)c);
-    return s;
-}
-
-std::string str(const json& j, const char* key)
-{
-    const auto it = j.find(key);
-    return it != j.end() && it->is_string() ? it->get<std::string>() : std::string();
-}
-
-int64_t integer(const json& j, const char* key)
-{
-    const auto it = j.find(key);
-    return it != j.end() && it->is_number_integer() ? it->get<int64_t>() : 0;
-}
-
 // A full commit hash -> its first 7 digits; empty when it is not one.
 std::string short_commit(const std::string& sha)
 {
-    return sha.size() >= 7 && sha.size() <= 64 && is_hex(sha) ? lower(sha.substr(0, 7)) : "";
+    return sha.size() >= 7 && sha.size() <= 64 && is_hex(sha) ? text::lower_ascii(sha.substr(0, 7)) : "";
 }
 
-bool https(const std::string& url) { return url.compare(0, 8, "https://") == 0; }
+bool https(const std::string& url) { return text::starts_with(url, "https://"); }
 
 // Shown text: clean (util/safe_text.hpp), on one line.
 constexpr size_t MAX_TITLE = 300;
@@ -59,18 +44,17 @@ std::string line_text(const std::string& text, size_t max = MAX_TITLE)
     return safe_text::clean(text, max, false);
 }
 
-bool iso_seconds(const std::string& iso, int64_t* out);
 // A time as GitHub writes it ("2026-10-09T12:03:00Z"), or nothing.
 std::string iso_time(const std::string& text)
 {
     int64_t unused;
-    return text.size() <= 32 && iso_seconds(text, &unused) ? line_text(text, 32) : "";
+    return text.size() <= 32 && date::iso_seconds(text, &unused) ? line_text(text, 32) : "";
 }
 
 // A page on GitHub, or nothing.
 std::string page_url(const std::string& url)
 {
-    return url.compare(0, 19, "https://github.com/") == 0 && url.size() < 512 ? safe_text::clean(url, 512, false) : "";
+    return text::starts_with(url, "https://github.com/") && url.size() < 512 ? safe_text::clean(url, 512, false) : "";
 }
 
 // Notes: clean, at most MAX_NOTES bytes, cut after a whole line.
@@ -84,38 +68,11 @@ std::string cut_notes(std::string text)
     return text;
 }
 
-// Seconds since 1970 of "YYYY-MM-DDTHH:MM:SS…" (UTC); false when malformed.
-bool iso_seconds(const std::string& iso, int64_t* out)
-{
-    int y, mo, d, h, mi, se;
-    if (iso.size() < 19 || std::sscanf(iso.c_str(), "%4d-%2d-%2dT%2d:%2d:%2d", &y, &mo, &d, &h, &mi, &se) != 6) return false;
-    if (mo < 1 || mo > 12 || d < 1 || d > 31 || h > 23 || mi > 59 || se > 60) return false;
-    // Days from civil (Howard Hinnant's algorithm).
-    y -= mo <= 2;
-    const int64_t era = (y >= 0 ? y : y - 399) / 400;
-    const int64_t yoe = y - era * 400;
-    const int64_t doy = (153 * (mo + (mo > 2 ? -3 : 9)) + 2) / 5 + d - 1;
-    const int64_t doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
-    const int64_t days = era * 146097 + doe - 719468;
-    *out = days * 86400 + h * 3600 + mi * 60 + se;
-    return true;
-}
-
 // Where fetch() finds builds: a release asset on github.com, an artifact on
 // the API. A list kept on the SD card can be edited: nothing else is taken.
 bool github_url(const std::string& url)
 {
-    return url.compare(0, 19, "https://github.com/") == 0 || url.compare(0, 23, "https://api.github.com/") == 0;
-}
-
-template <typename F>
-bool parse(const std::string& text, F f)
-{
-    try {
-        return f(json::parse(text));
-    } catch (const std::exception&) {
-        return false;
-    }
+    return text::starts_with(url, "https://github.com/") || text::starts_with(url, "https://api.github.com/");
 }
 }   // namespace
 
@@ -129,20 +86,20 @@ bool release_build(const json& r, bool prerelease_ok, Build* out)
     const bool prerelease = r.value("prerelease", true);
     if (prerelease && !prerelease_ok) return false;
     if (!r.contains("assets") || !r["assets"].is_array()) return false;
-    const std::string tag = str(r, "tag_name");
+    const std::string tag = json_util::string_at(r, "tag_name");
     for (const auto& a : r["assets"]) {
-        if (!a.is_object() || str(a, "name") != "playguard.nro") continue;
+        if (!a.is_object() || json_util::string_at(a, "name") != "playguard.nro") continue;
         Build b;
         b.kind = Kind::Release;
         b.prerelease = prerelease;
         b.version = tag.size() > 1 && tag[0] == 'v' ? tag.substr(1) : tag;
         if (!safe_text::is_version(b.version)) return false;
-        b.page = page_url(str(r, "html_url"));
-        b.url = str(a, "browser_download_url");
-        b.date = iso_time(str(a, "updated_at"));
-        b.sha256 = digest_hex(str(a, "digest"));
-        b.notes = cut_notes(str(r, "body"));
-        const int64_t size = integer(a, "size");
+        b.page = page_url(json_util::string_at(r, "html_url"));
+        b.url = json_util::string_at(a, "browser_download_url");
+        b.date = iso_time(json_util::string_at(a, "updated_at"));
+        b.sha256 = digest_hex(json_util::string_at(a, "digest"));
+        b.notes = cut_notes(json_util::string_at(r, "body"));
+        const int64_t size = json_util::integer_or(a, "size");
         if (b.version.empty() || !https(b.url) || size <= 0) return false;
         b.size = (uint64_t)size;
         *out = b;
@@ -154,12 +111,12 @@ bool release_build(const json& r, bool prerelease_ok, Build* out)
 
 bool parse_release(const std::string& text, Build* out)
 {
-    return parse(text, [out](const json& r) { return release_build(r, false, out); });
+    return json_util::parse_with(text, [out](const json& r) { return release_build(r, false, out); });
 }
 
 bool parse_releases(const std::string& text, std::vector<Build>* out, size_t keep)
 {
-    return parse(text, [out, keep](const json& j) {
+    return json_util::parse_with(text, [out, keep](const json& j) {
         if (!j.is_array()) return false;
         std::set<std::string> seen;
         for (const auto& r : j) {
@@ -174,32 +131,36 @@ bool parse_releases(const std::string& text, std::vector<Build>* out, size_t kee
 
 bool is_build_artifact(const std::string& name)
 {
+    // A shim: the runs before 1.0.0 (2026-10-12) named it so, and their
+    // artifacts expire 90 days later (GitHub's default; the -nro upload sets
+    // no retention-days). This line can go in the first release after
+    // 2027-01-10, its test with it.
     if (name == "playguard_release") return true;
     const std::string head = "playguard-", tail = "-nro";
-    return name.size() > head.size() + tail.size() && name.compare(0, head.size(), head) == 0 &&
+    return name.size() > head.size() + tail.size() && text::starts_with(name, head.c_str()) &&
            name.compare(name.size() - tail.size(), tail.size(), tail) == 0;
 }
 
 bool parse_artifacts(const std::string& text, std::vector<Artifact>* out, size_t* listed)
 {
-    return parse(text, [out, listed](const json& j) {
+    return json_util::parse_with(text, [out, listed](const json& j) {
         if (!j.is_object() || !j.contains("artifacts") || !j["artifacts"].is_array()) return false;
         if (listed) *listed = j["artifacts"].size();
         for (const auto& a : j["artifacts"]) {
-            if (!a.is_object() || !is_build_artifact(str(a, "name")) || a.value("expired", true)) continue;
+            if (!a.is_object() || !is_build_artifact(json_util::string_at(a, "name")) || a.value("expired", true)) continue;
             if (!a.contains("workflow_run") || !a["workflow_run"].is_object()) continue;
             const auto& run = a["workflow_run"];
             Artifact x;
-            x.url = str(a, "archive_download_url");
-            x.date = iso_time(str(a, "created_at"));
-            x.sha256 = digest_hex(str(a, "digest"));
-            x.expires = iso_time(str(a, "expires_at"));
-            x.run = integer(run, "id");
-            x.branch = line_text(str(run, "head_branch"));
-            x.commit = short_commit(str(run, "head_sha"));
-            x.repo = integer(run, "repository_id");
-            x.head_repo = integer(run, "head_repository_id");
-            const int64_t size = integer(a, "size_in_bytes");
+            x.url = json_util::string_at(a, "archive_download_url");
+            x.date = iso_time(json_util::string_at(a, "created_at"));
+            x.sha256 = digest_hex(json_util::string_at(a, "digest"));
+            x.expires = iso_time(json_util::string_at(a, "expires_at"));
+            x.run = json_util::integer_or(run, "id");
+            x.branch = line_text(json_util::string_at(run, "head_branch"));
+            x.commit = short_commit(json_util::string_at(run, "head_sha"));
+            x.repo = json_util::integer_or(run, "repository_id");
+            x.head_repo = json_util::integer_or(run, "head_repository_id");
+            const int64_t size = json_util::integer_or(a, "size_in_bytes");
             if (!https(x.url) || size <= 0 || x.commit.empty() || x.branch.empty() || !x.repo || !x.head_repo) continue;
             x.size = (uint64_t)size;
             out->push_back(x);
@@ -215,15 +176,15 @@ bool pull_of(const json& p, Pull* out)
     if (!p.is_object() || !p.contains("head") || !p["head"].is_object()) return false;
     const auto& head = p["head"];
     auto repo_id = [](const json& side) {
-        return side.contains("repo") && side["repo"].is_object() ? integer(side["repo"], "id") : 0;
+        return side.contains("repo") && side["repo"].is_object() ? json_util::integer_or(side["repo"], "id") : 0;
     };
     Pull x;
-    x.number = (int)integer(p, "number");
-    x.title = line_text(str(p, "title"));
-    x.body = cut_notes(str(p, "body"));
-    x.page = page_url(str(p, "html_url"));
-    x.branch = line_text(str(head, "ref"));
-    x.head_sha = str(head, "sha");
+    x.number = (int)json_util::integer_or(p, "number");
+    x.title = line_text(json_util::string_at(p, "title"));
+    x.body = cut_notes(json_util::string_at(p, "body"));
+    x.page = page_url(json_util::string_at(p, "html_url"));
+    x.branch = line_text(json_util::string_at(head, "ref"));
+    x.head_sha = json_util::string_at(head, "sha");
     // A fork that was deleted has no repository: its builds cannot be matched.
     x.head_repo = repo_id(head);
     x.repo = p.contains("base") && p["base"].is_object() ? repo_id(p["base"]) : 0;
@@ -234,14 +195,14 @@ bool pull_of(const json& p, Pull* out)
 
 Ci ci_of(const json& r)
 {
-    if (str(r, "status") != "completed") return Ci::Running;
-    return str(r, "conclusion") == "success" ? Ci::Passed : Ci::Failed;
+    if (json_util::string_at(r, "status") != "completed") return Ci::Running;
+    return json_util::string_at(r, "conclusion") == "success" ? Ci::Passed : Ci::Failed;
 }
 }   // namespace
 
 bool parse_pulls(const std::string& text, std::vector<Pull>* out)
 {
-    return parse(text, [out](const json& j) {
+    return json_util::parse_with(text, [out](const json& j) {
         if (!j.is_array()) return false;
         for (const auto& p : j) {
             Pull x;
@@ -253,25 +214,26 @@ bool parse_pulls(const std::string& text, std::vector<Pull>* out)
 
 bool parse_pull(const std::string& text, Pull* out)
 {
-    return parse(text, [out](const json& j) { return pull_of(j, out); });
+    return json_util::parse_with(text, [out](const json& j) { return pull_of(j, out); });
 }
 
 bool parse_runs(const std::string& text, std::vector<Run>* out)
 {
-    return parse(text, [out](const json& j) {
+    return json_util::parse_with(text, [out](const json& j) {
         if (!j.is_object() || !j.contains("workflow_runs") || !j["workflow_runs"].is_array()) return false;
         for (const auto& r : j["workflow_runs"]) {
             if (!r.is_object()) continue;
             Run x;
-            x.id = integer(r, "id");
-            x.sha = str(r, "head_sha");
+            x.id = json_util::integer_or(r, "id");
+            x.sha = json_util::string_at(r, "head_sha");
             x.ci = ci_of(r);
-            x.repo = r.contains("repository") && r["repository"].is_object() ? integer(r["repository"], "id") : 0;
+            x.repo = r.contains("repository") && r["repository"].is_object() ? json_util::integer_or(r["repository"], "id") : 0;
             x.head_repo = r.contains("head_repository") && r["head_repository"].is_object()
-                              ? integer(r["head_repository"], "id") : 0;
-            x.branch = line_text(str(r, "head_branch"));
-            x.title = line_text(str(r, "display_title"));
-            if (r.contains("head_commit") && r["head_commit"].is_object()) x.message = cut_notes(str(r["head_commit"], "message"));
+                              ? json_util::integer_or(r["head_repository"], "id") : 0;
+            x.branch = line_text(json_util::string_at(r, "head_branch"));
+            x.title = line_text(json_util::string_at(r, "display_title"));
+            if (r.contains("head_commit") && r["head_commit"].is_object())
+                x.message = cut_notes(json_util::string_at(r["head_commit"], "message"));
             if (x.id > 0 && short_commit(x.sha) != "") out->push_back(x);
         }
         return true;
@@ -336,21 +298,19 @@ Subject parse_subject(const std::string& title)
 
 bool parse_commit(const std::string& text, std::string* sha)
 {
-    return parse(text, [sha](const json& j) {
+    return json_util::parse_with(text, [sha](const json& j) {
         if (!j.is_object()) return false;
-        const std::string s = str(j, "sha");
+        const std::string s = json_util::string_at(j, "sha");
         if (s.size() != 40 || !is_hex(s)) return false;
-        *sha = lower(s);
+        *sha = text::lower_ascii(s);
         return true;
     });
 }
 
 bool parse_query(const std::string& text, Query* out)
 {
-    const size_t a = text.find_first_not_of(" \t");
-    const size_t b = text.find_last_not_of(" \t");
-    if (a == std::string::npos) return false;
-    std::string t = text.substr(a, b - a + 1);
+    std::string t = text::trim_blank(text);
+    if (t.empty()) return false;
     Query q;
     const bool hash = t[0] == '#';
     if (hash) t = t.substr(1);
@@ -360,7 +320,7 @@ bool parse_query(const std::string& text, Query* out)
         q.pr = std::atoi(t.c_str());
         if (q.pr <= 0) return false;
     } else if (!hash && t.size() >= 7 && t.size() <= 40 && is_hex(t)) {
-        q.commit = lower(t);
+        q.commit = text::lower_ascii(t);
     } else {
         return false;
     }
@@ -458,13 +418,13 @@ std::vector<Build> of_kind(const std::vector<Build>& all, Kind kind, Order order
 
 bool parse_iso(const std::string& iso, int64_t* seconds)
 {
-    return iso_seconds(iso, seconds);
+    return date::iso_seconds(iso, seconds);
 }
 
 int days_between(const std::string& now_iso, const std::string& iso)
 {
     int64_t a, b;
-    if (!iso_seconds(now_iso, &a) || !iso_seconds(iso, &b)) return 0;
+    if (!date::iso_seconds(now_iso, &a) || !date::iso_seconds(iso, &b)) return 0;
     const int64_t d = b - a;
     return (int)(d >= 0 ? d / 86400 : -((-d + 86399) / 86400));
 }
@@ -522,15 +482,16 @@ std::string encode_cache(const Cache& cache)
 
 bool decode_cache(const std::string& text, Cache* out)
 {
-    return parse(text, [out](const json& j) {
-        if (!j.is_object() || integer(j, "version") != 1 || !j.contains("builds") || !j["builds"].is_array()) return false;
+    return json_util::parse_with(text, [out](const json& j) {
+        if (!j.is_object() || json_util::integer_or(j, "version") != 1 || !j.contains("builds") || !j["builds"].is_array())
+            return false;
         Cache c;
-        c.fetched_at = integer(j, "fetched_at");
+        c.fetched_at = json_util::integer_or(j, "fetched_at");
         c.needs_login = j.value("needs_login", true);
         for (const auto& x : j["builds"]) {
             if (!x.is_object()) continue;
             Build b;
-            const std::string kind = str(x, "kind");
+            const std::string kind = json_util::string_at(x, "kind");
             if (kind == "release") b.kind = Kind::Release;
             else if (kind == "main") b.kind = Kind::Main;
             else if (kind == "pr") b.kind = Kind::PullRequest;
@@ -538,24 +499,24 @@ bool decode_cache(const std::string& text, Cache* out)
             else continue;
             b.artifact = x.value("artifact", false);
             // An edited list is no more trusted than GitHub: the same cleaning.
-            b.version = str(x, "version");
+            b.version = json_util::string_at(x, "version");
             b.prerelease = b.kind == Kind::Release && x.value("prerelease", false);
-            b.pr = (int)integer(x, "pr");
-            b.title = line_text(str(x, "title"));
-            b.commit = str(x, "commit");
-            b.date = iso_time(str(x, "date"));
-            b.url = str(x, "url");
-            b.sha256 = str(x, "sha256");
-            b.notes = cut_notes(str(x, "notes"));
-            b.branch = line_text(str(x, "branch"));
-            b.page = page_url(str(x, "page"));
-            b.expires = iso_time(str(x, "expires"));
-            b.run = integer(x, "run");
-            b.ci = ci_named(str(x, "ci"));
-            const int64_t size = integer(x, "size");
+            b.pr = (int)json_util::integer_or(x, "pr");
+            b.title = line_text(json_util::string_at(x, "title"));
+            b.commit = json_util::string_at(x, "commit");
+            b.date = iso_time(json_util::string_at(x, "date"));
+            b.url = json_util::string_at(x, "url");
+            b.sha256 = json_util::string_at(x, "sha256");
+            b.notes = cut_notes(json_util::string_at(x, "notes"));
+            b.branch = line_text(json_util::string_at(x, "branch"));
+            b.page = page_url(json_util::string_at(x, "page"));
+            b.expires = iso_time(json_util::string_at(x, "expires"));
+            b.run = json_util::integer_or(x, "run");
+            b.ci = ci_named(json_util::string_at(x, "ci"));
+            const int64_t size = json_util::integer_or(x, "size");
             const bool commit_ok = b.kind == Kind::Release ? b.commit.empty() : short_commit(b.commit) == b.commit;
             // A build without its digest could not be installed: not kept either.
-            const bool sha_ok = b.sha256.size() == 64 && is_hex(b.sha256) && lower(b.sha256) == b.sha256;
+            const bool sha_ok = b.sha256.size() == 64 && is_hex(b.sha256) && text::lower_ascii(b.sha256) == b.sha256;
             if (!github_url(b.url) || size <= 0 || !commit_ok || !sha_ok) continue;
             if (b.kind == Kind::Release ? !safe_text::is_version(b.version) : !b.artifact) continue;
             if (b.kind == Kind::PullRequest && b.pr <= 0) continue;
@@ -577,9 +538,9 @@ bool cache_fresh(const Cache& cache, int64_t now, bool needs_login)
 std::string digest_hex(const std::string& digest)
 {
     static const std::string PREFIX = "sha256:";
-    if (digest.size() != PREFIX.size() + 64 || digest.compare(0, PREFIX.size(), PREFIX) != 0) return "";
+    if (digest.size() != PREFIX.size() + 64 || !text::starts_with(digest, PREFIX.c_str())) return "";
     const std::string hex = digest.substr(PREFIX.size());
-    return is_hex(hex) ? lower(hex) : "";
+    return is_hex(hex) ? text::lower_ascii(hex) : "";
 }
 
 bool is_nro(const std::string& head)

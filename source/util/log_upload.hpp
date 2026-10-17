@@ -129,9 +129,6 @@ std::string issue_url(const std::string& repo_url, const std::string& paste_url,
 std::string gist_body(const std::vector<Part>& files, const std::string& version,
                       const std::string& what = "diagnostic report");
 
-// "https://gist.github.com/u/abc" -> "gist.github.com/u/abc": what to type by hand.
-std::string short_url(const std::string& url);
-
 struct Result
 {
     bool        ok = false;

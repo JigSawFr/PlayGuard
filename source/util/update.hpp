@@ -57,9 +57,6 @@ struct Snooze
     std::string until;     // "YYYY-MM-DD": offered again from that day
 };
 
-// date::add_days. Kept while action/notices.cpp still calls it from here:
-// new code calls date::add_days.
-std::string add_days(const std::string& date, int days);
 // Whether start-up offers `latest`: a version newer than `running`, not
 // postponed. A postponement is for its version only (a newer release is
 // offered at once), and ignored when its day is over SNOOZE_MAX_DAYS away

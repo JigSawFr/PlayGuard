@@ -45,7 +45,7 @@ size_t content_hash(const PlayStats& stats)
 
 std::string cache_file(const Key& key)
 {
-    return paths::nand_dir() + "/cache/activity_" + (key.empty() ? std::string("all") : key) + ".bin";
+    return paths::nand_cache_dir() + "/activity_" + (key.empty() ? std::string("all") : key) + ".bin";
 }
 
 // Local days between two user-clock times, or 0 when the time zone cannot say.
@@ -92,7 +92,7 @@ void save(const Key& key, const PlayStats& stats)
         if (it != s_saved.end() && it->second == hash && paths::exists_or_pending(cache_file(key))) return;
     }
     std::string error;
-    if (!paths::ensure_dir(paths::nand_dir() + "/cache") ||
+    if (!paths::ensure_dir(paths::nand_cache_dir()) ||
         !paths::atomic_write(cache_file(key), play_cache::encode(stats), &error)) {
         brls::Logger::warning("play_data: cache not saved: {}", error);
         return;
