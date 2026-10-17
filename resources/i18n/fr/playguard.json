@@ -1345,6 +1345,10 @@
         "offline": "Hors ligne : notes enregistrées le {}.",
         "failed": "Les notes n'ont pas pu être récupérées. Appuyez sur X pour réessayer."
     },
+    "quick": {
+        "title": "Langue et thème",
+        "hint": "Langue et thème"
+    },
     "notices": {
         "title": "Notifications",
         "hint": "Notifications",

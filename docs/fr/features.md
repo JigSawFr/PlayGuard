@@ -16,7 +16,7 @@ Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la co
 
 ## Commandes
 
-↑/↓ déplacer · Ⓐ valider · Ⓑ retour ou annuler (deux fois sur la barre latérale pour quitter) · Ⓧ actualiser (sur les onglets qui relisent la console) · Ⓨ notifications · **+** enregistre les limites par jour.
+↑/↓ déplacer · Ⓐ valider · Ⓑ retour ou annuler (deux fois sur la barre latérale pour quitter) · Ⓧ actualiser (sur les onglets qui relisent la console) · Ⓨ notifications · **−** langue et thème · **+** enregistre les limites par jour.
 
 Ce qui a échoué est dit dans une boîte de dialogue, ce qui a réussi dans une notification. Le titre indique quand l'application est en lecture seule ou tant que le contrôle parental est déverrouillé temporairement ; en lecture seule, les actions restent à leur place, grisées, et disent pourquoi quand on les choisit.
 
@@ -25,6 +25,8 @@ L'application est organisée en onglets, comme les paramètres de la console ; c
 ## Notifications — ce qui demande votre attention, depuis n'importe quel onglet
 
 Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'intervention du parent ; Ⓨ ouvre la liste depuis n'importe quel onglet (le pied de page indique *Notifications (2)* quand deux choses sont à faire).
+
+À gauche de la cloche, la langue (son code, *FR*, *EN*…) et le thème (un soleil pour clair, une lune pour sombre, un cercle à moitié plein quand il suit la console) : un appui ouvre la même liste que dans *Préférences*, et **−** propose les deux depuis n'importe quel onglet. Le changement prend effet au prochain lancement de PlayGuard.
 
 - **À faire**, compté en orange sur la cloche, reste jusqu'à ce que ce soit réglé : pas encore de code PIN, un code PIN que n'importe qui essaierait en premier (0000, 1234, 1212, 2580… : vérifié sur la console, jamais affiché), un code PIN sur la console alors que PlayGuard s'ouvre sans lui (*Protéger PlayGuard par le code PIN* sur *Jamais*), le contrôle parental déverrouillé temporairement (*Réactiver*), du temps en plus d'un jour précédent à retirer, l'alarme « temps écoulé » désactivée, des modifications faites en dehors de PlayGuard, la console qui ne compte pas le temps de jeu, une horloge réseau imprécise.
 - **Pour information**, un point sur la cloche, peut être marqué comme lu : une limite encore abaissée par *Arrêter le jeu pour aujourd'hui* un jour précédent (*Remettre*), une nouvelle version installée (*Nouveautés* ; après une mise à jour sur place, la version précédente gardée), un rapport envoyé en ligne (*Afficher le lien*), le temps de jeu de la semaine (tous les 7 jours jusqu'à lecture) et une limite dépassée deux jours ou plus sur les 7 derniers quand la console se contente de prévenir, une sauvegarde des réglages à faire (aucune, ou aucune depuis 30 jours), tous les jeux bloqués depuis une semaine, un nouveau compte utilisateur, PlayGuard fermé de façon inattendue la dernière fois (*Envoyer un rapport*), l'application mobile associée, une nouvelle version de PlayGuard, l'horloge réseau trouvée décalée au lancement.

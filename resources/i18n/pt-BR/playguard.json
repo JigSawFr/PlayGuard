@@ -1345,6 +1345,10 @@
         "offline": "Offline: notas salvas em {}.",
         "failed": "Não foi possível obter as notas. Pressione X para tentar de novo."
     },
+    "quick": {
+        "title": "Idioma e tema",
+        "hint": "Idioma e tema"
+    },
     "notices": {
         "title": "Notificações",
         "hint": "Notificações",

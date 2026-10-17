@@ -3,6 +3,7 @@
 #include "ui/ui.hpp"
 
 #include "core/platform.h"
+#include "util/config.hpp"
 #include "util/duration.hpp"
 #include "util/text.hpp"
 #include "view/qr_view.hpp"
@@ -272,6 +273,65 @@ void offer_restart()
     dialog->addButton("playguard/common/quit"_i18n, []() { brls::Application::quit(); });
     dialog->setCancelable(true);
     dialog->open();
+}
+
+namespace
+{
+template <size_t N>
+int index_of(const char* const (&list)[N], const std::string& value)
+{
+    for (size_t i = 0; i < N; i++)
+        if (value == list[i]) return (int)i;
+    return 0;
+}
+
+// Saves `value` in `field`, then refreshes and asks to restart if it changed.
+void choose(std::string& field, const char* value, std::function<void()> after)
+{
+    const bool changed = field != value;
+    field = value;
+    save_config();
+    if (after) after();
+    if (changed) offer_restart();
+}
+}   // namespace
+
+void pick_language(std::function<void()> after)
+{
+    std::vector<std::string> labels;
+    for (const char* l : config::LANGUAGES) labels.push_back(brls::getStr(std::string("playguard/tools/languages/") + l));
+    pick("playguard/tools/language"_i18n, labels, index_of(config::LANGUAGES, config::get().language), [after](int i) {
+        choose(config::get().language, config::LANGUAGES[i], after);
+    });
+}
+
+void pick_theme(std::function<void()> after)
+{
+    std::vector<std::string> labels;
+    for (const char* t : config::THEMES) labels.push_back(brls::getStr(std::string("playguard/tools/themes/") + t));
+    pick("playguard/tools/theme"_i18n, labels, index_of(config::THEMES, config::get().theme), [after](int i) {
+        choose(config::get().theme, config::THEMES[i], after);
+    });
+}
+
+std::string language_name()
+{
+    return brls::getStr("playguard/tools/languages/" + std::string(config::LANGUAGES[index_of(config::LANGUAGES, config::get().language)]));
+}
+
+std::string theme_name()
+{
+    return brls::getStr("playguard/tools/themes/" + std::string(config::THEMES[index_of(config::THEMES, config::get().theme)]));
+}
+
+void quick_settings(std::function<void()> after)
+{
+    const std::vector<std::string> labels = { "playguard/tools/language"_i18n + " · " + language_name(),
+                                              "playguard/tools/theme"_i18n + " · " + theme_name() };
+    pick("playguard/quick/title"_i18n, labels, 0, [after](int i) {
+        if (i == 0) pick_language(after);
+        else pick_theme(after);
+    });
 }
 
 namespace

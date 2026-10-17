@@ -1345,6 +1345,10 @@
         "offline": "Sin conexión: notas guardadas el {}.",
         "failed": "No se pudieron obtener las notas. Pulsa X para reintentar."
     },
+    "quick": {
+        "title": "Idioma y tema",
+        "hint": "Idioma y tema"
+    },
     "notices": {
         "title": "Notificaciones",
         "hint": "Notificaciones",

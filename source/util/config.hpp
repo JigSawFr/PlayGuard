@@ -125,6 +125,8 @@ constexpr int    SCHEMA             = 1;    // "schema" in config.json
 // playguard/tools/languages/. tools/check_resources.py checks both; README
 // "Translating PlayGuard" lists the steps to add one.
 constexpr const char* LANGUAGES[] = { "system", "en-US", "fr", "fr-CA", "de", "es", "es-419", "it", "nl", "pt", "pt-BR", "ru", "ja", "ko", "zh-Hans", "zh-Hant" };
+// What theme may be: the console's own, then the two forced ones.
+constexpr const char* THEMES[] = { "system", "light", "dark" };
 // What start_tab may be, in the sidebar's order.
 constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "restrictions",
                                        "security", "console", "history", "preferences", "about" };

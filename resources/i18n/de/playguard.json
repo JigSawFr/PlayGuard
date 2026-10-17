@@ -1345,6 +1345,10 @@
         "offline": "Offline: Hinweise vom {}.",
         "failed": "Die Hinweise konnten nicht abgerufen werden. Drücken Sie X, um es erneut zu versuchen."
     },
+    "quick": {
+        "title": "Sprache und Design",
+        "hint": "Sprache & Design"
+    },
     "notices": {
         "title": "Benachrichtigungen",
         "hint": "Benachrichtigungen",

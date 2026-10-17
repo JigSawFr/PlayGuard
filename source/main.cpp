@@ -50,6 +50,7 @@
 #include "view/loading_bar.hpp"
 #include "view/loading_mark.hpp"
 #include "view/made_in_france.hpp"
+#include "view/header_settings.hpp"
 #include "view/notice_bell.hpp"
 #include "view/version_badge.hpp"
 #include "view/scroll_view.hpp"
@@ -379,6 +380,7 @@ int main(int argc, char* argv[])
     // every screen's header.
     VersionBadge::install();
     NoticeBell::install();   // after the badge: the bell goes in its row
+    HeaderSetting::install();   // after the bell: the language and theme go left of it
 
     // The loading screen first, with nothing slow before it, and drawn at once
     // (no fade: a frame at alpha 0 is a black one). The rest of the start-up
