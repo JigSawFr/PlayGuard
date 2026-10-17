@@ -4,6 +4,7 @@
 #include <borealis/extern/nlohmann/json.hpp>
 #include <cstdio>
 
+#include "util/json_util.hpp"
 #include "util/paths.hpp"
 
 namespace pt_block
@@ -114,21 +115,15 @@ bool load_reference(Reference* out)
 {
     std::string text;
     if (!paths::read_file(reference_path(), text)) return false;
-    try {
-        const auto j = nlohmann::json::parse(text);
-        if (!j.is_object() || j.value("format", "") != "playguard-play-timer-block") return false;
+    return json_util::parse_with(text, [out](const nlohmann::json& j) {
+        if (!j.is_object() || json_util::string_at(j, "format") != "playguard-play-timer-block") return false;
         Reference r;
-        const auto block = j.find("block");
-        if (block == j.end() || !block->is_string() || !from_hex(block->get<std::string>(), &r.block)) return false;
-        const auto saved = j.find("saved_at");
-        if (saved != j.end() && saved->is_string()) r.saved_at = saved->get<std::string>();
-        const auto fw = j.find("firmware");
-        if (fw != j.end() && fw->is_string()) r.firmware = fw->get<std::string>();
+        if (!from_hex(json_util::string_at(j, "block"), &r.block)) return false;
+        r.saved_at = json_util::string_at(j, "saved_at");
+        r.firmware = json_util::string_at(j, "firmware");
         if (out) *out = r;
         return true;
-    } catch (...) {
-        return false;
-    }
+    });
 }
 
 }   // namespace pt_block

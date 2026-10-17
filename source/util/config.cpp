@@ -6,6 +6,7 @@
 #include <iterator>
 
 #include "util/date.hpp"
+#include "util/json_util.hpp"
 #include "util/paths.hpp"
 
 namespace config
@@ -214,13 +215,12 @@ static void read_system(const nlohmann::json& j, Config& c)
 // The file as JSON, or null when it is not a JSON object.
 static nlohmann::json parse_object(const std::string& text)
 {
-    nlohmann::json j;
-    try {
-        j = nlohmann::json::parse(text);
-    } catch (...) {
-        return nullptr;   // not JSON at all
-    }
-    return j.is_object() ? j : nlohmann::json(nullptr);
+    nlohmann::json j(nullptr);
+    json_util::parse_with(text, [&j](nlohmann::json parsed) {
+        if (parsed.is_object()) j = std::move(parsed);
+        return true;
+    });
+    return j;
 }
 
 // There but not readable as settings: defaults, and the file is put aside

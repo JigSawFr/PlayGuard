@@ -25,12 +25,8 @@ Ini parse_ini(const std::string& text)
 {
     Ini ini;
     std::string section;
-    size_t pos = 0;
-    while (pos <= text.size()) {
-        size_t end = text.find('\n', pos);
-        if (end == std::string::npos) end = text.size();
-        std::string line = text::trim_space(text.substr(pos, end - pos));
-        pos = end + 1;
+    for (const std::string& raw : text::lines(text)) {
+        const std::string line = text::trim_space(raw);
         if (line.empty() || line[0] == ';' || line[0] == '#') continue;
         if (line.front() == '[' && line.back() == ']') {
             section = text::trim_space(line.substr(1, line.size() - 2));

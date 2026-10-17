@@ -16,6 +16,7 @@
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/date.hpp"
+#include "util/text.hpp"
 
 using namespace brls::literals;
 
@@ -119,7 +120,7 @@ static void store(history::Entry e)
     // A change PlayGuard made: what it reads next is not a change made
     // outside (the outside_* entries are those, and a new account; a refused
     // change changed nothing).
-    if (e.kind.rfind("outside_", 0) != 0 && e.kind != "new_account" && e.result.empty()) outside_watch::own_change();
+    if (!text::starts_with(e.kind, "outside_") && e.kind != "new_account" && e.result.empty()) outside_watch::own_change();
     e.when = ui::now_stamp();
     e.version = app::version();
     // Off the UI thread: append() reads and rewrites the whole file.

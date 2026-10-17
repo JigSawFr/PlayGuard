@@ -6,6 +6,7 @@
 #include <borealis/extern/nlohmann/json.hpp>
 #include <ctime>
 
+#include "util/json_util.hpp"
 #include "util/paths.hpp"
 
 namespace backup
@@ -68,12 +69,11 @@ std::string to_json(const Snapshot& s)
 bool from_json(const std::string& text, Snapshot& out)
 {
     Snapshot s;
-    try {
-        const auto j = nlohmann::json::parse(text);
+    const bool read = json_util::parse_with(text, [&s](const nlohmann::json& j) {
         int format = 0;
         if (!j.is_object() || !j.contains("format") || !int_in(j.at("format"), FORMAT, FORMAT, format)) return false;
-        if (j.contains("created") && j.at("created").is_string()) s.created = j.at("created").get<std::string>();
-        if (j.contains("firmware") && j.at("firmware").is_string()) s.firmware = j.at("firmware").get<std::string>();
+        s.created = json_util::string_at(j, "created");
+        s.firmware = json_util::string_at(j, "firmware");
 
         if (j.contains("restrictions")) {
             const auto& r = j.at("restrictions");
@@ -134,10 +134,9 @@ bool from_json(const std::string& text, Snapshot& out)
                 s.raw_block = hex;
             }
         }
-    } catch (...) {
-        return false;
-    }
-    if (s.empty()) return false;
+        return true;
+    });
+    if (!read || s.empty()) return false;
     out = s;
     return true;
 }

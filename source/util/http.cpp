@@ -274,16 +274,18 @@ bool post(const std::string& url, const std::string& data, const char* content_t
     return perform(url, x, body, error, max_bytes, timeout_s, status);
 }
 
-bool redirect(const std::string& url, std::string* target, std::string* error, const Headers& headers)
+bool redirect(const std::string& url, std::string* target, std::string* error, const Headers& headers, long* status)
 {
     Extra x;
     x.headers = &headers;
     x.follow = false;
     x.location = target;
     std::string body;
-    long status = 0;
-    if (!perform(url, x, &body, error, 64 * 1024, 30, &status)) return false;
-    return http_logic::redirect_ok(status, *target, error);
+    long answered = 0;
+    const bool ok = perform(url, x, &body, error, 64 * 1024, 30, &answered);
+    if (status) *status = answered;
+    if (!ok) return false;
+    return http_logic::redirect_ok(answered, *target, error);
 }
 
 bool download(const std::string& url, const std::string& path, std::string* error, size_t max_bytes,

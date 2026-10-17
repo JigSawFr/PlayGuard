@@ -2,6 +2,7 @@
 // reading, failed reads, the hex columns only when they change), the tail
 // kept for a report and the file with its header and rotation.
 #include "check.h"
+#include "temp_dir.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -167,16 +168,13 @@ static void test_file()
 
 int main()
 {
-    char dir[] = "/tmp/playguard_pt_log_XXXXXX";
-    REQUIRE(mkdtemp(dir) != nullptr);
-    REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
+    TempDir tmp("pt_log", TempDir::Enter);   // paths::data_dir() is ./playguard_data on the host
 
     test_rows();
     test_events();
     test_tail();
     test_file();
 
-    const std::string cleanup = std::string("rm -rf '") + dir + "'";
-    CHECK(std::system(cleanup.c_str()) == 0);
+    CHECK(tmp.remove());
     return CHECK_DONE("play-timer recorder lines, tail and file assertions passed");
 }

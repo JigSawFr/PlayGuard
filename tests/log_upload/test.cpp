@@ -1,8 +1,9 @@
 // Host tests for source/util/log_upload.cpp: which debug files and saved
 // reports are offered, what of the change history goes, the crash reports sent, a gist's files and their cut
-// on a whole UTF-8 character, GitHub's answer, the body sent, percent-encoding
-// and the prefilled bug-report link.
+// on a whole UTF-8 character, GitHub's answer, the body sent and the
+// prefilled bug-report link (percent-encoded: text::url_encode, tests/text_util).
 #include "check.h"
+#include "temp_dir.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -253,9 +254,6 @@ static void test_bodies()
 
 static void test_urls()
 {
-    CHECK(log_upload::url_encode("aZ09-_.~") == "aZ09-_.~");
-    CHECK(log_upload::url_encode("https://gist.github.com/A b") == "https%3A%2F%2Fgist.github.com%2FA%20b");
-    CHECK(log_upload::url_encode("\xC3\xA8") == "%C3%A8");
     log_upload::IssueFields fields;
     CHECK(log_upload::issue_url("https://github.com/o/r", "https://gist.github.com/aa5a", fields) ==
            "https://github.com/o/r/issues/new?template=1-bug.yml&report=https%3A%2F%2Fgist.github.com%2Faa5a");
@@ -307,9 +305,7 @@ static void test_recent_history()
 
 int main()
 {
-    char dir[] = "/tmp/playguard_log_upload_XXXXXX";
-    REQUIRE(mkdtemp(dir) != nullptr);
-    REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
+    TempDir tmp("log_upload", TempDir::Enter);   // paths::data_dir() is ./playguard_data on the host
 
     test_files();
     test_recent_history();
@@ -320,6 +316,6 @@ int main()
     test_bodies();
     test_urls();
 
-    std::system((std::string("rm -rf '") + dir + "'").c_str());
+    tmp.remove();
     return CHECK_DONE("log upload files, recent history, crashes, gist files, gist answer and body, bug-report link assertions passed");
 }

@@ -1,6 +1,7 @@
 // Host tests for source/util/safe_text.cpp and markdown.cpp: what text from
 // GitHub keeps (valid UTF-8, no control, bidi or zero-width character, cut
-// between two characters), versions, and GitHub-flavoured Markdown as blocks
+// between two characters; notes cut after a whole line), versions, and
+// GitHub-flavoured Markdown as blocks
 // (headings, paragraphs and their line breaks, lists, tasks, code, quotes and
 // alerts, rules, tables, HTML, inline marks, entities, emoji) with its bounds.
 #include "check.h"
@@ -35,6 +36,14 @@ static void test_safe_text()
     // Cut between two characters, never inside one.
     CHECK(clean("ab\xC3\xA9", 3, false) == "ab");
     CHECK(clean("ab\xC3\xA9", 4, false) == "ab\xC3\xA9");
+
+    // Notes: cleaned on several lines, cut at the end of a whole line.
+    using safe_text::clean_notes;
+    CHECK(clean_notes("one\r\ntwo\nthree", 100) == "one\ntwo\nthree");
+    CHECK(clean_notes("one\ntwo\nthree", 13) == "one\ntwo\nthree" && clean_notes("one\ntwo\nthree", 12) == "one\ntwo");
+    CHECK(clean_notes("one\ntwo\nthree", 7) == "one\ntwo" && clean_notes("one\ntwo\nthree", 6) == "one");
+    CHECK(clean_notes("a long first line\nx", 5).empty() && clean_notes("", 0).empty());
+    CHECK(clean_notes("a\x80\nb", 3) == "a\nb");   // measured once cleaned
 
     CHECK(safe_text::is_version("1.2.0") && safe_text::is_version("1.3.0-rc.1") && safe_text::is_version("2.0.0+build_5"));
     CHECK(!safe_text::is_version("") && !safe_text::is_version("../1.0") && !safe_text::is_version("1.0 beta") &&

@@ -6,6 +6,7 @@
 #include <cstdio>
 
 #include "util/backup.hpp"
+#include "util/json_util.hpp"
 #include "util/paths.hpp"
 
 namespace history
@@ -64,15 +65,12 @@ bool load_array(nlohmann::json& entries)
     entries = nlohmann::json::array();
     std::string text;
     if (!paths::read_file(paths::history_file(), text)) return !paths::exists_or_pending(paths::history_file());   // missing: fine
-    try {
-        nlohmann::json j = nlohmann::json::parse(text);
-        if (j.is_object() && j.contains("entries") && j["entries"].is_array()) {
-            entries = j["entries"];
-            return true;
-        }
-    } catch (...) {
-    }
-    return false;
+    return json_util::parse_with(text, [&entries](const nlohmann::json& j) {
+        const nlohmann::json* in = json_util::array_at(j, "entries");
+        if (!in) return false;
+        entries = *in;
+        return true;
+    });
 }
 
 // The entries of the file's array, newest first; a damaged one is skipped.

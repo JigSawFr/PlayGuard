@@ -41,7 +41,7 @@ void UpdateActivity::onContentAvailable()
 
     std::string date;
     const auto lines = this->offer.has_release ? notes_of(this->offer.release, &date) : std::vector<changelog::Line>{};
-    if (date.empty() && this->offer.has_release) date = dev_build_flow::short_date(this->offer.release.date).substr(0, 10);
+    if (date.empty() && this->offer.has_release) date = dev_builds::short_date(this->offer.release.date).substr(0, 10);
     std::string text = brls::getStr("playguard/update/running", app::version());
     if (!date.empty()) text = brls::getStr("playguard/update/released", date) + "\n" + text;
     if (this->offer.result.verdict == update::Verdict::UpdateNoSupport) {

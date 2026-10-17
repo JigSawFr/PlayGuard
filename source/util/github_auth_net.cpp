@@ -7,7 +7,7 @@
 #endif
 #include "util/github_auth.hpp"
 #include "util/http.hpp"
-#include "util/log_upload.hpp"
+#include "util/text.hpp"
 
 namespace github_auth
 {
@@ -55,7 +55,7 @@ Poll poll(const DeviceCode& code, std::string* token, std::string* error)
     } else
 #endif
     if (!http::post("https://github.com/login/oauth/access_token",
-                    "client_id=" + std::string(CLIENT_ID) + "&device_code=" + log_upload::url_encode(code.device_code) +
+                    "client_id=" + std::string(CLIENT_ID) + "&device_code=" + text::url_encode(code.device_code) +
                         "&grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code",
                     "application/x-www-form-urlencoded", &body, error, nullptr, 8 * 1024, 30, JSON))
         return Poll::Failed;

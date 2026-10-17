@@ -1,22 +1,8 @@
 // Minimal fake <switch.h> for the gamecheck host tests: the ns and ncm calls
 // core/gamecheck.c makes, played by tests/gamecheck/test.c.
 #pragma once
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include "fake_switch_base.h"
 
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef int32_t s32;
-typedef int64_t s64;
-typedef u32 Result;
-
-#define R_SUCCEEDED(rc) ((rc) == 0)
-#define R_FAILED(rc) ((rc) != 0)
-#define MAKEHOSVERSION(_major, _minor, _micro) (((u32)(_major) << 16) | ((u32)(_minor) << 8) | (u32)(_micro))
-#define MAKERESULT(module, description) ((((module) & 0x1FF)) | ((description) & 0x1FFF) << 9)
 #define KERNELRESULT(description) MAKERESULT(Module_Kernel, KernelError_##description)
 enum { Module_Kernel = 1, Module_Libnx = 345 };
 enum { KernelError_TimedOut = 117 };

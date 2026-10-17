@@ -209,7 +209,7 @@ void dismiss(const std::string& id)
     auto& read = config::get().notices_read;
     // One key per entry: an older text of it goes.
     read.erase(std::remove_if(read.begin(), read.end(),
-                              [&id](const std::string& k) { return k.rfind(id + ":", 0) == 0; }),
+                              [&id](const std::string& k) { return text::starts_with(k, id + ":"); }),
                read.end());
     read.push_back(notice_logic::read_key(id, title, detail));
     if (read.size() > 48) read.erase(read.begin(), read.end() - 48);

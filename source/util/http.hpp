@@ -34,8 +34,10 @@ bool post(const std::string& url, const std::string& data, const char* content_t
 
 // Where `url` redirects to (an https:// URL), without following it: a
 // signed download link can then be fetched without the headers (a token)
-// sent to `url`. False when it does not redirect.
-bool redirect(const std::string& url, std::string* target, std::string* error, const Headers& headers = {});
+// sent to `url`. False when it does not redirect; *status gets the HTTP
+// status when the server answered (as for get()).
+bool redirect(const std::string& url, std::string* target, std::string* error, const Headers& headers = {},
+              long* status = nullptr);
 
 // GETs `url` (redirects followed) into the file `path`, created or
 // truncated. Fails beyond `max_bytes`, or when nothing arrives for 30 s;

@@ -32,8 +32,6 @@ void open(bool force = false);
 bool installed(const dev_builds::Build& b);
 // "Release 1.2.0", "· pre-release" after it for one.
 std::string release_text(const dev_builds::Build& b);
-// "2026-10-09T12:03:00Z" -> "2026-10-09 12:03"
-std::string short_date(const std::string& iso);
 // Now, in POSIX seconds (on desktop, PLAYGUARD_SIM_NOW when set).
 int64_t now();
 // How long ago `iso` was: "just now", "5 h ago", "3 d ago" ("" when malformed).

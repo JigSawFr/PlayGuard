@@ -67,7 +67,15 @@ void        forget_token();
 // forget_token(), when the saved token is still `token`: GitHub refused it
 // (HTTP 401). A sign-in made since keeps its own.
 void        forget_refused(const std::string& token);
+// What every request made with `token` does with the HTTP status GitHub
+// answered: a 401 (the token revoked) has it forgotten (forget_refused) and
+// returns true; any other status, nothing (false).
+bool        forget_if_revoked(long status, const std::string& token);
 std::string token_file();
+
+// The REST API's root; api_url("gists") -> "https://api.github.com/gists".
+constexpr const char* API_ROOT = "https://api.github.com/";
+std::string api_url(const std::string& path);
 
 // "Authorization: Bearer <token>" plus the API's media type and version, for
 // http::get; only the media type without a token.

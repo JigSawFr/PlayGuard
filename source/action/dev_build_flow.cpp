@@ -247,12 +247,6 @@ std::string nro_file()
     return sd.empty() ? "" : file_path(sd);
 }
 
-std::string short_date(const std::string& iso)
-{
-    if (iso.size() < 16) return iso;
-    return iso.substr(0, 10) + " " + iso.substr(11, 5);
-}
-
 int64_t now()
 {
 #ifndef __SWITCH__
@@ -265,12 +259,14 @@ int64_t now()
 
 std::string age_text(const std::string& iso)
 {
-    int64_t then = 0;
-    if (!dev_builds::parse_iso(iso, &then)) return "";
-    const int64_t age = now() - then;
-    if (age < 3600) return "playguard/dev_build/age_now"_i18n;
-    if (age < 2 * 86400) return brls::getStr("playguard/dev_build/age_hours", (int)(age / 3600));
-    return brls::getStr("playguard/dev_build/age_days", (int)(age / 86400));
+    const dev_builds::Age age = dev_builds::age_of(iso, now());
+    switch (age.unit) {
+        case dev_builds::Age::None: break;
+        case dev_builds::Age::Now: return "playguard/dev_build/age_now"_i18n;
+        case dev_builds::Age::Hours: return brls::getStr("playguard/dev_build/age_hours", age.count);
+        case dev_builds::Age::Days: return brls::getStr("playguard/dev_build/age_days", age.count);
+    }
+    return "";
 }
 
 std::string label(const dev_builds::Build& b)
@@ -281,13 +277,13 @@ std::string label(const dev_builds::Build& b)
             text = release_text(b);
             break;
         case dev_builds::Kind::Main:
-            text = brls::getStr("playguard/dev_build/main", b.commit, short_date(b.date));
+            text = brls::getStr("playguard/dev_build/main", b.commit, dev_builds::short_date(b.date));
             break;
         case dev_builds::Kind::PullRequest:
             text = brls::getStr("playguard/dev_build/pr", b.pr, b.title, b.commit);
             break;
         case dev_builds::Kind::Commit:
-            text = brls::getStr("playguard/dev_build/commit", b.commit, b.branch, short_date(b.date));
+            text = brls::getStr("playguard/dev_build/commit", b.commit, b.branch, dev_builds::short_date(b.date));
             break;
     }
     if (installed(b)) text += " · " + "playguard/dev_build/installed"_i18n;
@@ -317,7 +313,7 @@ std::string release_text(const dev_builds::Build& b)
 
 std::string checked_text(const dev_builds::Cache& cache)
 {
-    const int64_t age = (int64_t)std::time(nullptr) - cache.fetched_at;
+    const int64_t age = now() - cache.fetched_at;
     return brls::getStr("playguard/dev_build/checked", (int)(age > 0 ? age / 60 : 0));
 }
 
@@ -408,7 +404,7 @@ void open(bool force)
     // be reached).
     read_cache();
     const bool needs_login = github_auth::token().empty();
-    if (!force && dev_builds::cache_fresh(s_cache, (int64_t)std::time(nullptr), needs_login)) {
+    if (!force && dev_builds::cache_fresh(s_cache, now(), needs_login)) {
         DevBuildsActivity::show(s_cache);
         return;
     }
@@ -434,7 +430,7 @@ void open(bool force)
                 DevBuildsActivity::loading(brls::getStr(key), done);
             });
         });
-        fresh.fetched_at = (int64_t)std::time(nullptr);
+        fresh.fetched_at = now();
         brls::sync([ok, fresh, err]() {
             s_busy = false;
             DevBuildsActivity::loaded();

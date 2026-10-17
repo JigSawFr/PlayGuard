@@ -78,7 +78,7 @@ std::string token()
 {
     std::string t;
     if (!paths::read_file(token_file(), t)) return "";
-    while (!t.empty() && std::isspace((unsigned char)t.back())) t.pop_back();
+    t = text::trim_space_end(t);
     // The earlier OAuth app's token: refused the artifacts, signed in again.
     if (text::starts_with(t, "gho_")) return "";
     return token_chars(t) ? t : "";
@@ -107,6 +107,18 @@ void forget_refused(const std::string& t)
 {
     if (t.empty() || token() != t) return;
     forget_token();
+}
+
+bool forget_if_revoked(long status, const std::string& t)
+{
+    if (status != 401) return false;
+    forget_refused(t);
+    return true;
+}
+
+std::string api_url(const std::string& path)
+{
+    return API_ROOT + path;
 }
 
 std::vector<std::string> api_headers(const std::string& t)

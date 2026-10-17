@@ -49,6 +49,20 @@ inline bool flag_at(const nlohmann::json& j, const char* key)
     return it != j.end() && it->is_boolean() && it->get<bool>();
 }
 
+// &j[key] when `j` is an object holding an array there, else nullptr.
+inline const nlohmann::json* array_at(const nlohmann::json& j, const char* key)
+{
+    const auto it = j.find(key);
+    return it != j.end() && it->is_array() ? &*it : nullptr;
+}
+
+// &j[key] when `j` is an object holding an object there, else nullptr.
+inline const nlohmann::json* object_at(const nlohmann::json& j, const char* key)
+{
+    const auto it = j.find(key);
+    return it != j.end() && it->is_object() ? &*it : nullptr;
+}
+
 // j[key] into `out` when it is an integer; false (and `out` untouched) otherwise.
 inline bool integer_at(const nlohmann::json& j, const char* key, int64_t* out)
 {

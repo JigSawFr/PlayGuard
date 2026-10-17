@@ -41,6 +41,16 @@ std::string clean(const std::string& text, size_t max_bytes, bool multiline)
     return out;
 }
 
+std::string clean_notes(const std::string& text, size_t max_bytes)
+{
+    std::string out = clean(text, text.size(), true);
+    if (out.size() > max_bytes) {
+        const size_t cut = out.rfind('\n', max_bytes);
+        out.resize(cut == std::string::npos ? 0 : cut);
+    }
+    return out;
+}
+
 bool is_version(const std::string& text)
 {
     if (text.empty() || text.size() > 40 || !std::isalnum((unsigned char)text[0])) return false;

@@ -1,10 +1,13 @@
 // Host tests for the header-only helpers of source/util: utf8.hpp (the strict
-// and the loose reader, the writer), emoji.hpp (what counts, the icon a text
-// opens on, dropping them), text.hpp (the two trims, ASCII lower case, a
-// prefix, a URL without its scheme, parts joined) and json_util.hpp (fields
-// read by type, a text that is no JSON).
+// and the loose reader, the writer, where to cut), emoji.hpp (what counts,
+// the icon a text opens on, dropping them), text.hpp (the trims, ASCII lower
+// case and capital, a prefix and a suffix, lines, a URL without its scheme,
+// percent-encoding, parts joined) and json_util.hpp (fields read by type,
+// arrays and objects, a text that is no JSON).
 #include "check.h"
 #include <cstdio>
+#include <string>
+#include <vector>
 
 #include "util/emoji.hpp"
 #include "util/json_util.hpp"
@@ -41,6 +44,13 @@ static void test_utf8()
         n++;
     }
     CHECK(n == 5);
+
+    // Where to cut: back to the start of the character there.
+    const std::string s = "a\xC3\xA9\xF0\x9F\x9A\x80z";   // a, é, 🚀, z
+    CHECK(utf8::boundary_before(s, 0) == 0 && utf8::boundary_before(s, 1) == 1 && utf8::boundary_before(s, 2) == 1);
+    CHECK(utf8::boundary_before(s, 3) == 3 && utf8::boundary_before(s, 4) == 3 && utf8::boundary_before(s, 6) == 3);
+    CHECK(utf8::boundary_before(s, 7) == 7 && utf8::boundary_before(s, 8) == 8 && utf8::boundary_before(s, 9) == 9);
+    CHECK(utf8::boundary_before("\x80\x80", 1) == 0 && utf8::boundary_before("", 0) == 0);   // strays: all the way back
 }
 
 static void test_emoji()
@@ -68,8 +78,24 @@ static void test_text()
     CHECK(text::trim_blank(" \t x y \t ") == "x y");
     CHECK(text::trim_blank("x\n") == "x\n" && text::trim_blank("\r x") == "\r x");   // line ends stay
     CHECK(text::trim_blank(" \t ").empty());
+    CHECK(text::trim_space_end(" x y \t\r\n") == " x y" && text::trim_space_end(" \n").empty() && text::trim_space_end("").empty());
     CHECK(text::lower_ascii("Hello WORLD \xC3\x89") == "hello world \xC3\x89");
+    CHECK(text::capitalise_ascii("play time") == "Play time" && text::capitalise_ascii("Already") == "Already");
+    CHECK(text::capitalise_ascii("\xC3\xA9t\xC3\xA9") == "\xC3\xA9t\xC3\xA9" && text::capitalise_ascii("2 games") == "2 games");
+    CHECK(text::capitalise_ascii("").empty() && text::capitalise_ascii("`code`") == "`code`");
     CHECK(text::starts_with("## Title", "## ") && !text::starts_with("#", "## ") && text::starts_with("x", ""));
+    CHECK(text::starts_with("zh-Hans", std::string("zh")) && !text::starts_with("z", std::string("zh")));
+    CHECK(text::starts_with("a", std::string()) && !text::starts_with("", std::string("a")));
+    CHECK(text::ends_with("sdmc:/x.nro", ".nro") && !text::ends_with("nro", ".nro") && text::ends_with("x", ""));
+
+    using Lines = std::vector<std::string>;
+    CHECK(text::lines("a\nb") == (Lines{ "a", "b" }) && text::lines("a\r\nb\r\n") == (Lines{ "a", "b", "" }));
+    CHECK(text::lines("") == Lines{ "" } && text::lines("\n") == (Lines{ "", "" }));
+    CHECK(text::lines("a\r\r\nb\r") == (Lines{ "a\r", "b" }) && text::lines("\rx") == Lines{ "\rx" });   // one \r, at the end
+
+    CHECK(text::url_encode("aZ09-_.~") == "aZ09-_.~");
+    CHECK(text::url_encode("https://gist.github.com/A b") == "https%3A%2F%2Fgist.github.com%2FA%20b");
+    CHECK(text::url_encode("\xC3\xA8") == "%C3%A8" && text::url_encode(std::string("\0\x7F", 2)) == "%00%7F");
     CHECK(text::short_url("https://ko-fi.com/jigsawfr") == "ko-fi.com/jigsawfr");
     CHECK(text::short_url("github.com/x") == "github.com/x" && text::short_url("").empty());
     CHECK(text::join({ "a", "b", "c" }, "\n") == "a\nb\nc" && text::join({ "a" }, " · ") == "a");
@@ -88,8 +114,15 @@ static void test_json()
     CHECK(!json_util::integer_at(j, "x", &v) && !json_util::integer_at(j, "s", &v) && v == -1);
     CHECK(json_util::integer_or(j, "n") == 42 && json_util::integer_or(j, "x") == 0 && json_util::integer_or(j, "-", 7) == 7);
 
+    CHECK(json_util::parse(R"({"a": [1], "o": {"k": 1}, "s": "[]", "e": []})", &j));
+    const nlohmann::json* a = json_util::array_at(j, "a");
+    CHECK(a && a->size() == 1 && json_util::array_at(j, "e") && !json_util::array_at(j, "o") && !json_util::array_at(j, "s"));
+    const nlohmann::json* o = json_util::object_at(j, "o");
+    CHECK(o && json_util::integer_or(*o, "k") == 1 && !json_util::object_at(j, "a") && !json_util::object_at(j, "-"));
+
     // Not an object: no field, no exception.
     CHECK(json_util::parse("[1, 2]", &j) && json_util::string_at(j, "s").empty() && !json_util::flag_at(j, "b"));
+    CHECK(!json_util::array_at(j, "s") && !json_util::object_at(j, "s"));
     CHECK(json_util::parse("\"text\"", &j) && !json_util::integer_at(j, "n", &v));
     CHECK(!json_util::parse("{\"s\": ", &j) && !json_util::parse("", &j) && !json_util::parse("nope", &j));
     CHECK(json_util::integer_or(j, "n", 3) == 3);

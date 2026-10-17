@@ -4,6 +4,7 @@
 #include "action/sys_notes_flow.hpp"
 #include "ui/ui.hpp"
 #include "util/markdown.hpp"
+#include "util/text.hpp"
 #include "view/build_cell.hpp"
 #include "view/markdown_view.hpp"
 
@@ -191,7 +192,7 @@ void SysNotesActivity::fill()
         header->setSubtitle(r.date);
         ui::set_visible(header.getView(), true);
         // Notes as published: in English, said when the console is not.
-        const bool english = brls::Application::getLocale().compare(0, 2, "en") == 0;
+        const bool english = text::starts_with(brls::Application::getLocale(), "en");
         ui::set_visible(language.getView(), !r.notes.empty() && !english);
         if (!r.notes.empty()) markdown_view::fill(notes, markdown::parse(r.notes));
         empty->setText(fetching ? "playguard/sys_notes/fetching"_i18n : "playguard/sys_notes/no_notes"_i18n);

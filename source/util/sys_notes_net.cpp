@@ -40,8 +40,8 @@ bool fetch(Which which, const std::string& installed, bool pages, List* out, std
     std::string body, err;
     if (which != Which::Firmware) {
         // Signed in to GitHub (developer tools), its token: a higher rate limit.
-        const std::string url = std::string("https://api.github.com/repos/") + repo(which) + "/releases?per_page=" +
-                                std::to_string(MAX_RELEASES);
+        const std::string url =
+            github_auth::api_url(std::string("repos/") + repo(which) + "/releases?per_page=" + std::to_string(MAX_RELEASES));
         if (!get(url, std::string(key(which)) + ".json", github_auth::api_headers(github_auth::token()), MAX_LIST, &body,
                  &err)) {
             if (error) *error = std::string(repo(which)) + ": " + err;

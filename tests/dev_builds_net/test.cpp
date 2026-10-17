@@ -16,6 +16,8 @@
 // only, a refused one (401 forgets the token, 401 and 403 say to sign in
 // again), playguard.nro taken out and the zip removed.
 #include "check.h"
+#include "fs.hpp"
+#include "temp_dir.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -72,11 +74,14 @@ bool get(const std::string&, std::string*, std::string* error, size_t, long, con
     return false;
 }
 
-bool redirect(const std::string&, std::string* target, std::string* error, const Headers& headers)
+bool redirect(const std::string&, std::string* target, std::string* error, const Headers& headers, long* status)
 {
     s_redirect_headers = headers;
+    if (status) *status = 302;
     if (s_redirect_to.empty()) {
         if (error) *error = s_redirect_error;
+        // The status behind an "HTTP <status>" error (http_logic::succeeded).
+        if (status) *status = s_redirect_error.compare(0, 5, "HTTP ") == 0 ? std::atol(s_redirect_error.c_str() + 5) : 0;
         return false;
     }
     *target = s_redirect_to;
@@ -134,17 +139,8 @@ static std::string nro(size_t size)
     return s;
 }
 
-static bool exists(const std::string& path)
-{
-    struct stat st;
-    return stat(path.c_str(), &st) == 0;
-}
-
-static std::string content_of(const std::string& path)
-{
-    std::string s;
-    return paths::read_file(path, s) ? s : std::string("<none>");
-}
+using fs::content_of;
+using fs::exists;
 
 static Build release(const std::string& content)
 {
@@ -444,9 +440,7 @@ static void test_artifact()
 
 int main()
 {
-    char dir[] = "/tmp/playguard_dev_builds_net_XXXXXX";
-    REQUIRE(mkdtemp(dir) != nullptr);
-    REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
+    TempDir tmp("dev_builds_net", TempDir::Enter);   // paths::data_dir() is ./playguard_data on the host
     REQUIRE(paths::ensure_dir(paths::data_dir()));
     unsetenv("PLAYGUARD_SIM_DEV_BUILDS");   // the network, not a simulated folder
 
@@ -457,6 +451,6 @@ int main()
     test_bad_download();
     test_artifact();
 
-    std::system((std::string("rm -rf '") + dir + "'").c_str());
+    tmp.remove();
     return CHECK_DONE("dev_builds_net tests passed");
 }

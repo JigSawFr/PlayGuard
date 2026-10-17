@@ -2,6 +2,7 @@
 // keeps a damaged file away from the console, save / list / load, and what a
 // restore would write.
 #include "check.h"
+#include "temp_dir.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -122,9 +123,7 @@ static void test_validation()
 
 static void test_files()
 {
-    char dir[] = "/tmp/playguard_backup_XXXXXX";
-    REQUIRE(mkdtemp(dir) != nullptr);
-    REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
+    TempDir tmp("backup", TempDir::Enter);   // paths::data_dir() is ./playguard_data on the host
 
     CHECK(backup::list().empty());
     std::string err;
@@ -166,8 +165,7 @@ static void test_files()
     CHECK(after.size() == 2 && after[0] == "29990101_000000.json" && after[1] == "20000101_000000.json");
     CHECK(backup::prune(1, past) == 1 && backup::list() == std::vector<std::string>{ "20000101_000000.json" });
 
-    const std::string cleanup = std::string("rm -rf '") + dir + "'";
-    CHECK(std::system(cleanup.c_str()) == 0);
+    CHECK(tmp.remove());
 }
 
 // A restore that would change nothing writes nothing: no unlock, no
