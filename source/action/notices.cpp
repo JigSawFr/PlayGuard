@@ -10,7 +10,7 @@
 
 #include "action/backup_flow.hpp"
 #include "action/clock_flow.hpp"
-#include "action/history_flow.hpp"
+#include "action/console_actions.hpp"
 #include "action/outside_watch.hpp"
 #include "action/pin_lock.hpp"
 #include "action/play_data.hpp"
@@ -314,11 +314,10 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
     const bool unlocked = s.temp_unlocked_ok && s.temp_unlocked;
     toggle(unlocked, "unlocked", Level::Action, "playguard/notices/unlocked"_i18n, "playguard/notices/unlocked_detail"_i18n,
            writable ? "playguard/security/banner_action"_i18n : "", []() {
-               const Result rc = pctl_relock();
-               if (R_SUCCEEDED(rc)) history_flow::record_event("relock");
-               ui::notify_result(rc, "playguard/toast/relocked"_i18n, "playguard/toast/relock_err"_i18n);
-               sweep();
-               TabBase::refresh_shown();
+               console_actions::relock("", []() {
+                   sweep();
+                   TabBase::refresh_shown();
+               });
            });
 
     // Extra time added on an earlier day still raises a limit: to do, the

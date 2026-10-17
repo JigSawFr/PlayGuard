@@ -2,7 +2,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
-#include "action/history_flow.hpp"
+#include "action/console_actions.hpp"
 #include "app.hpp"
 
 #include <algorithm>
@@ -134,14 +134,7 @@ void init_unlock_banner(brls::DetailCell* cell, std::function<void()> after)
     cell->setCornerRadius(6);
     cell->setDetailText("playguard/security/banner_action"_i18n);
     cell->registerClickAction([after](brls::View*) {
-        if (app::read_only()) {
-            notify(rc_text(NXM_RC_READ_ONLY));
-            return true;
-        }
-        Result rc = pctl_relock();
-        if (R_SUCCEEDED(rc)) history_flow::record_event("relock");
-        notify_result(rc, "playguard/toast/relocked"_i18n, "playguard/toast/relock_err"_i18n);
-        if (after) after();
+        console_actions::relock("", after);
         return true;
     });
 }
