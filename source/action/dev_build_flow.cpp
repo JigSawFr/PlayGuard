@@ -230,6 +230,8 @@ void install(const dev_builds::Build& b)
             }
             s_busy = false;
             progress->close();
+            // The one reason a user can act on, said in their language.
+            if (err == dev_builds::NO_DIGEST) err = "playguard/dev_build/no_digest"_i18n;
             if (!ok) ui::info(brls::getStr("playguard/dev_build/failed", err));
             else installed_now(b);
         });
@@ -330,6 +332,12 @@ void choose(const dev_builds::Build& b, bool newer)
 
 void install_now(const dev_builds::Build& b)
 {
+    // Nothing to check it against: refused before the PIN and the download
+    // (its screen hides Install then).
+    if (b.sha256.empty()) {
+        ui::info("playguard/dev_build/no_digest"_i18n);
+        return;
+    }
     // Replacing PlayGuard can undo everything it guards: the PIN is asked
     // whenever one is set, whatever Security › Ask for the PIN says.
     if (!pin_lock::ask()) {
