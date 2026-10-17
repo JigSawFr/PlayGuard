@@ -10,6 +10,9 @@
 
 #include <borealis.hpp>
 #include <memory>
+#include <vector>
+
+#include "action/notices.hpp"
 
 class NoticesActivity : public brls::Activity
 {
@@ -32,6 +35,9 @@ class NoticesActivity : public brls::Activity
     brls::Box* content = nullptr;
 
     void rebuild();
+    // rebuild()'s cells: the console's entries folded into one line, and an entry.
+    brls::DetailCell* console_line(const std::vector<notices::Entry>& all);
+    brls::DetailCell* entry_cell(const notices::Entry& e, bool todo);
 
     BRLS_BIND(brls::Box, root, "nt_root");
 };
