@@ -88,8 +88,9 @@ desktop:
 # Host tests: one program per suite, built straight from its sources (no
 # object files, so gcov's .gcno/.gcda sit next to the program in
 # build/host-tests/). A suite is three variables: <name>_SRC (its sources,
-# the test last), <name>_FLAGS (the standard, defines, include paths) and an
-# optional <name>_LIBS; the test source's suffix picks the compiler.
+# the test last), <name>_FLAGS (the standard, defines, include paths; a C++
+# suite without one gets TEST_CXXFLAGS) and an optional <name>_LIBS; the test
+# source's suffix picks the compiler.
 # `make test` builds and runs every suite in parallel (JOBS) and keeps going
 # when one fails, so a run reports every failing suite, not the first: each
 # suite's output is in build/host-tests/<name>.log, and <name>.ok marks a
@@ -120,145 +121,82 @@ playstats_SRC   := source/core/playstats_logic.c source/core/nacp.c tests/playst
 playstats_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/playstats -Isource/core
 playstats_LIBS  := -lz
 
-# C++: the UI-free helpers and flow logic (source/util, source/action).
+# C++: the UI-free helpers and flow logic (source/util, source/action), by
+# default with TEST_CXXFLAGS (a <name>_FLAGS only where a suite differs).
 # borealis' headers (nlohmann/json) as system headers: their warnings are not
 # PlayGuard's (clang 22 deprecates json.hpp's literal operators, under -Werror).
 # util/date stands on core/calendar.c: a suite that links it builds that C
-# file too (<name>_CSRC).
+# file too (its <name>_CSRC, without having to say so).
+TEST_CXXFLAGS   := -std=c++17 -Isource -isystem extern/borealis/library/include
 CALENDAR_C      := source/core/calendar.c
 CALENDAR_CFLAGS := -std=gnu11 -Isource/core
 date_SRC    := source/util/date.cpp tests/date/test.cpp
-date_FLAGS  := -std=c++17 -Isource
-date_CSRC   := $(CALENDAR_C)
-date_CFLAGS := $(CALENDAR_CFLAGS)
 # The header-only helpers: utf8, emoji, text, json_util.
 text_util_SRC   := tests/text_util/test.cpp
-text_util_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 patches_SRC   := source/util/paths.cpp source/util/patches.cpp tests/patches/test.cpp
-patches_FLAGS := -std=c++17 -Isource
 duration_SRC   := source/util/duration.cpp tests/duration/test.cpp
-duration_FLAGS := -std=c++17 -Isource
 changelog_SRC   := source/util/changelog.cpp tests/changelog/test.cpp
-changelog_FLAGS := -std=c++17 -Isource
 support_SRC   := source/util/date.cpp source/util/support.cpp tests/support/test.cpp
-support_FLAGS := -std=c++17 -Isource
-support_CSRC   := $(CALENDAR_C)
-support_CFLAGS := $(CALENDAR_CFLAGS)
 pt_logic_SRC   := source/action/pt_logic.cpp tests/pt_logic/test.cpp
-pt_logic_FLAGS := -std=c++17 -Isource
 pin_lock_logic_SRC   := source/action/pin_lock_logic.cpp tests/pin_lock_logic/test.cpp
-pin_lock_logic_FLAGS := -std=c++17 -Isource
 console_lock_logic_SRC   := source/action/console_lock_logic.cpp tests/console_lock_logic/test.cpp
-console_lock_logic_FLAGS := -std=c++17 -Isource
 history_logic_SRC   := source/util/date.cpp source/action/history_logic.cpp tests/history_logic/test.cpp
-history_logic_FLAGS := -std=c++17 -Isource
-history_logic_CSRC   := $(CALENDAR_C)
-history_logic_CFLAGS := $(CALENDAR_CFLAGS)
 timer_health_logic_SRC   := source/action/timer_health_logic.cpp tests/timer_health_logic/test.cpp
-timer_health_logic_FLAGS := -std=c++17 -Isource
 notice_logic_SRC   := source/util/date.cpp source/action/notice_logic.cpp tests/notice_logic/test.cpp
-notice_logic_FLAGS := -std=c++17 -Isource
-notice_logic_CSRC   := $(CALENDAR_C)
-notice_logic_CFLAGS := $(CALENDAR_CFLAGS)
 sys_updates_SRC   := source/util/sys_updates.cpp tests/sys_updates/test.cpp
-sys_updates_FLAGS := -std=c++17 -Isource
 # The network half twice from one test: -D__SWITCH__ for the console's path
 # (a fake http::redirect in the test), without it for the desktop's simulation.
 sys_updates_net_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp tests/sys_updates_net/test.cpp
 sys_updates_net_FLAGS := -std=c++17 -Isource -D__SWITCH__
 sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp source/sim/sim_net.cpp source/util/paths.cpp tests/sys_updates_net/test.cpp
-sys_updates_sim_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 ntp_servers_SRC   := source/util/ntp_servers.cpp tests/ntp_servers/test.cpp
-ntp_servers_FLAGS := -std=c++17 -Isource
 sys_notes_SRC   := source/util/date.cpp source/util/safe_text.cpp source/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
-sys_notes_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
-sys_notes_CSRC   := $(CALENDAR_C)
-sys_notes_CFLAGS := $(CALENDAR_CFLAGS)
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
-offline_clock_logic_FLAGS := -std=c++17 -Isource
 icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp
-icon_logic_FLAGS := -std=c++17 -Isource
 write_queue_logic_SRC   := source/action/write_queue_logic.cpp tests/write_queue_logic/test.cpp
-write_queue_logic_FLAGS := -std=c++17 -Isource
 write_queue_logic_LIBS  := -pthread
 worker_threads_SRC   := source/util/worker_threads.cpp tests/worker_threads/test.cpp
-worker_threads_FLAGS := -std=c++17 -Isource
 worker_threads_LIBS  := -pthread
 data_cleanup_SRC   := source/util/data_cleanup.cpp tests/data_cleanup/test.cpp
-data_cleanup_FLAGS := -std=c++17 -Isource
 error_hint_logic_SRC   := source/action/error_hint_logic.cpp tests/error_hint_logic/test.cpp
-error_hint_logic_FLAGS := -std=c++17 -Isource
 outside_change_logic_SRC   := source/util/date.cpp source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp
-outside_change_logic_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
-outside_change_logic_CSRC   := $(CALENDAR_C)
-outside_change_logic_CFLAGS := $(CALENDAR_CFLAGS)
 backup_SRC   := source/util/paths.cpp source/util/backup.cpp tests/backup/test.cpp
-backup_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 backup_logic_SRC   := source/util/paths.cpp source/util/backup.cpp source/util/pt_block.cpp source/action/backup_logic.cpp tests/backup_logic/test.cpp
-backup_logic_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 http_logic_SRC   := source/util/http_logic.cpp tests/http_logic/test.cpp
-http_logic_FLAGS := -std=c++17 -Isource
 table_export_SRC   := source/util/paths.cpp source/util/zip_write.cpp source/util/table_export.cpp source/util/table_export_csv.cpp source/util/table_export_json.cpp source/util/table_export_xlsx.cpp source/util/table_export_pdf.cpp tests/table_export/test.cpp
-table_export_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 table_export_LIBS  := -lz
 update_SRC   := source/util/date.cpp source/util/update.cpp tests/update/test.cpp
-update_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
-update_CSRC   := $(CALENDAR_C)
-update_CFLAGS := $(CALENDAR_CFLAGS)
 config_SRC   := source/util/paths.cpp source/util/date.cpp source/util/config.cpp tests/config/test.cpp
-config_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
-config_CSRC   := $(CALENDAR_C)
-config_CFLAGS := $(CALENDAR_CFLAGS)
 profiles_SRC   := source/util/paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
-profiles_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
-pt_block_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
 markdown_SRC   := source/util/safe_text.cpp source/util/markdown.cpp tests/markdown/test.cpp
-markdown_FLAGS := -std=c++17 -Isource
 rollback_SRC   := source/util/paths.cpp source/util/rollback.cpp tests/rollback/test.cpp
-rollback_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
-launcher_FLAGS := -std=c++17 -Isource
 history_SRC   := source/util/paths.cpp source/util/history.cpp tests/history/test.cpp
-history_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 log_upload_SRC   := source/util/paths.cpp source/util/pt_log.cpp source/util/pt_block.cpp source/util/log_files.cpp source/util/log_upload.cpp tests/log_upload/test.cpp
-log_upload_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 dev_builds_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/date.cpp source/util/update.cpp source/util/safe_text.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/github_auth.cpp tests/dev_builds/test.cpp
-dev_builds_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
-dev_builds_CSRC   := $(CALENDAR_C)
-dev_builds_CFLAGS := $(CALENDAR_CFLAGS)
 dev_builds_LIBS  := -lz
 # The download and its resume: without PLAYGUARD_SIM_DEV_BUILDS the desktop
 # build takes the console's path, here against a fake http::download and
 # http::redirect in the test (-D__SWITCH__ would reach date.cpp's switch.h).
 dev_builds_net_SRC   := $(filter-out tests/%,$(dev_builds_SRC)) source/util/http_logic.cpp source/util/zip_write.cpp source/sim/sim_net.cpp source/util/dev_builds_net.cpp tests/dev_builds_net/test.cpp
-dev_builds_net_FLAGS := $(dev_builds_FLAGS)
-dev_builds_net_CSRC   := $(CALENDAR_C)
-dev_builds_net_CFLAGS := $(CALENDAR_CFLAGS)
 dev_builds_net_LIBS  := -lz
 play_cache_SRC   := source/util/play_cache.cpp tests/play_cache/test.cpp
-play_cache_FLAGS := -std=c++17 -Isource
 game_cache_SRC   := source/util/game_cache.cpp tests/game_cache/test.cpp
-game_cache_FLAGS := -std=c++17 -Isource
 activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summary/test.cpp
-activity_summary_FLAGS := -std=c++17 -Isource
 # The text helpers that only translate, over ui/tr.hpp's stand-in for
 # borealis' getStr and fmt header-only (the catalogs read by the test).
 format_text_SRC   := source/ui/format_text.cpp tests/format_text/test.cpp
-format_text_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DPLAYGUARD_HOST_I18N
+format_text_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DPLAYGUARD_HOST_I18N
 game_check_text_SRC   := source/action/game_check_text.cpp tests/game_check_text/test.cpp
-game_check_text_FLAGS := -std=c++17 -Isource
 pt_log_SRC   := source/util/paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp
-pt_log_FLAGS := -std=c++17 -Isource
 session_log_SRC   := source/util/paths.cpp source/util/log_files.cpp source/util/session_log.cpp source/util/crash_report.cpp tests/session_log/test.cpp
-session_log_FLAGS := -std=c++17 -Isource
 # A C source a C++ suite links (clang++ refuses to build a .c as C++).
 session_log_CSRC  := source/util/crash_dump.c
 session_log_CFLAGS := -std=c11 -Isource/util
 crash_dump_SRC   := source/util/crash_dump.c tests/crash_dump/test.c
 crash_dump_FLAGS := -std=c11 -Isource/util
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
-log_files_FLAGS := -std=c++17 -Isource
 
 TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))
 TEST_PROGRAMS := $(addprefix $(TESTOUT)/,$(TESTS))
@@ -281,10 +219,14 @@ FORCE:
 # variables above.
 .SECONDEXPANSION:
 # An optional <name>_CSRC (one C file, with <name>_CFLAGS) is built by $(CC)
-# into <name>.c.o and linked into a C++ suite.
-$(TEST_PROGRAMS): $(TESTOUT)/%: $$($$*_SRC) $$($$*_CSRC) $(TEST_HEADERS) $(TEST_FLAGS_FILE) | $(TESTOUT)
-	$(if $($*_CSRC),$(CC) $($*_CFLAGS) $(CWARN) -c $($*_CSRC) -o $@.c.o)
-	$(if $(filter %.cpp,$($*_SRC)),$(CXX),$(CC)) $($*_FLAGS) $(CWARN) $($*_SRC) $(if $($*_CSRC),$@.c.o) $($*_LIBS) -o $@
+# into <name>.c.o and linked into a C++ suite; one that links util/date.cpp
+# gets CALENDAR_C (with CALENDAR_CFLAGS) when it names none.
+test_flags  = $(or $($1_FLAGS),$(if $(filter %.cpp,$($1_SRC)),$(TEST_CXXFLAGS)))
+test_csrc   = $(or $($1_CSRC),$(if $(filter source/util/date.cpp,$($1_SRC)),$(CALENDAR_C)))
+test_cflags = $(if $($1_CSRC),$($1_CFLAGS),$(CALENDAR_CFLAGS))
+$(TEST_PROGRAMS): $(TESTOUT)/%: $$($$*_SRC) $$(call test_csrc,$$*) $(TEST_HEADERS) $(TEST_FLAGS_FILE) | $(TESTOUT)
+	$(if $(call test_csrc,$*),$(CC) $(call test_cflags,$*) $(CWARN) -c $(call test_csrc,$*) -o $@.c.o)
+	$(if $(filter %.cpp,$($*_SRC)),$(CXX),$(CC)) $(call test_flags,$*) $(CWARN) $($*_SRC) $(if $(call test_csrc,$*),$@.c.o) $($*_LIBS) -o $@
 
 # Running it: the output goes to <name>.log and the terminal; <name>.ok only
 # when it passed.
@@ -306,7 +248,8 @@ test:
 # build/fuzz/<name>-crash-* (replay it: build/fuzz/<name> <that file>). A
 # target is <name>_FUZZ (its sources, the fuzz target last; a .c one makes
 # it a C program), an optional <name>_FUZZ_CSRC (one C source a C++ target
-# links), <name>_FUZZ_FLAGS and <name>_FUZZ_LIBS.
+# links), <name>_FUZZ_FLAGS and <name>_FUZZ_LIBS. A parser a suite tests
+# takes that suite's sources: $(filter-out tests/%,$(<suite>_SRC)).
 FUZZOUT      := $(BUILD)/fuzz
 FUZZ_SECONDS ?= 30
 FUZZ_CC      ?= clang
@@ -315,14 +258,14 @@ FUZZ_SAN     := -fsanitize=fuzzer,address,undefined -fno-sanitize-recover=undefi
 FUZZ_CFLAGS  := -Wall -Wextra -Werror $(FUZZ_SAN) -Itests/fuzz -Isource -isystem extern/borealis/library/include
 zip_read_FUZZ      := source/util/zip_read.cpp tests/fuzz/zip_read/fuzz.cpp
 zip_read_FUZZ_LIBS := -lz
-markdown_FUZZ      := source/util/safe_text.cpp source/util/markdown.cpp tests/fuzz/markdown/fuzz.cpp
-changelog_FUZZ     := source/util/changelog.cpp tests/fuzz/changelog/fuzz.cpp
-rescue_FUZZ        := source/core/rescue.c tests/fuzz/rescue/fuzz.c
-config_FUZZ        := source/util/paths.cpp source/util/date.cpp source/util/config.cpp tests/fuzz/config/fuzz.cpp
+markdown_FUZZ      := $(filter-out tests/%,$(markdown_SRC)) tests/fuzz/markdown/fuzz.cpp
+changelog_FUZZ     := $(filter-out tests/%,$(changelog_SRC)) tests/fuzz/changelog/fuzz.cpp
+rescue_FUZZ        := $(filter-out tests/%,$(rescue_SRC)) tests/fuzz/rescue/fuzz.c
+config_FUZZ        := $(filter-out tests/%,$(config_SRC)) tests/fuzz/config/fuzz.cpp
 config_FUZZ_CSRC   := $(CALENDAR_C)
-game_cache_FUZZ    := source/util/game_cache.cpp tests/fuzz/game_cache/fuzz.cpp
+game_cache_FUZZ    := $(filter-out tests/%,$(game_cache_SRC)) tests/fuzz/game_cache/fuzz.cpp
 game_cache_FUZZ_CSRC := source/core/gamecheck_rules.c
-play_cache_FUZZ    := source/util/play_cache.cpp tests/fuzz/play_cache/fuzz.cpp
+play_cache_FUZZ    := $(filter-out tests/%,$(play_cache_SRC)) tests/fuzz/play_cache/fuzz.cpp
 FUZZERS := $(sort $(patsubst %_FUZZ,%,$(filter %_FUZZ,$(.VARIABLES))))
 FUZZ_PROGRAMS := $(addprefix $(FUZZOUT)/,$(FUZZERS))
 FUZZ_RUNS := $(addsuffix .run,$(FUZZ_PROGRAMS))
