@@ -2,6 +2,7 @@
 #include "util/activity_summary.hpp"
 
 #include <algorithm>
+#include <cstdio>
 
 namespace activity_summary
 {
@@ -89,6 +90,60 @@ uint64_t unattributed_s(uint64_t total_s, const AccountPlay* accounts, size_t co
     uint64_t gap = total_s;
     for (size_t i = 0; i < count && gap; i++) gap -= accounts[i].total_s < gap ? accounts[i].total_s : gap;
     return gap >= UNATTRIBUTED_MIN_S ? gap : 0;
+}
+
+void sort_by_play(std::vector<const GameStat*>& games, int period, bool by_total)
+{
+    std::sort(games.begin(), games.end(), [period, by_total](const GameStat* a, const GameStat* b) {
+        const uint64_t va = value(*a, period), vb = value(*b, period);
+        if (va != vb) return va > vb;
+        if (by_total && a->total_s != b->total_s) return a->total_s > b->total_s;
+        return a->last_played > b->last_played;
+    });
+}
+
+table_export::Table export_table(const PlayStats& s, int period, const ExportText& text)
+{
+    table_export::Table t;
+    t.title    = text.title;
+    t.subtitle = text.subtitle;
+    t.sheet    = text.sheet;
+    t.columns  = {
+        { "game", text.game, false },
+        { "title_id", text.id, false },
+        { "today_min", text.today, true },
+    };
+    // The six days before today, most recent first.
+    for (int k = 1; k < 7; k++) t.columns.push_back({ "day_" + std::to_string(k) + "_min", text.day((int)s.day_wday[k]), true });
+    t.columns.insert(t.columns.end(), {
+        { "week_min", text.week, true },
+        { "total_min", text.total, true },
+        { "launches", text.launches, true },
+        { "first_played", text.first, false },
+        { "last_played", text.last, false },
+    });
+    std::vector<const GameStat*> games;
+    for (uint32_t i = 0; i < s.count && i < PLAYSTATS_MAX; i++) games.push_back(&s.games[i]);
+    sort_by_play(games, period, true);
+    auto minutes = [](uint64_t seconds) { return std::to_string((seconds + 30) / 60); };
+    for (const GameStat* g : games) {
+        char id[24];
+        std::snprintf(id, sizeof(id), "%016llX", (unsigned long long)g->app_id);
+        t.rows.push_back({
+            text.name(*g),
+            id,
+            s.windows_ok ? minutes(g->today_s) : "",
+        });
+        for (int k = 1; k < 7; k++) t.rows.back().push_back(s.windows_ok ? minutes(g->day_s[k]) : "");
+        t.rows.back().insert(t.rows.back().end(), {
+            s.windows_ok ? minutes(g->week_s) : "",
+            g->totals_ok ? minutes(g->total_s) : "",
+            g->totals_ok ? std::to_string(g->launches) : "",
+            g->totals_ok && g->first_played ? text.time(g->first_played) : "",
+            g->totals_ok && g->last_played ? text.time(g->last_played) : "",
+        });
+    }
+    return t;
 }
 
 }   // namespace activity_summary

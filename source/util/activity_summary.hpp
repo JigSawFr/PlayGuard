@@ -1,15 +1,19 @@
 // activity_summary — the Activity tab's summary of one account's play data
 // (core/playstats.h) over the chosen period: the average per day, the most
 // played game, the days played and the busiest one, the average session; and
-// the games to rediscover (installed, little played, left aside for a while).
-// Pure, so the host tests can run it (tests/activity_summary).
+// the games to rediscover (installed, little played, left aside for a while);
+// the list's order and the table its export writes. Pure (the words are the
+// tab's, handed in), so the host tests can run it (tests/activity_summary).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
 #include <cstdint>
+#include <functional>
+#include <string>
 #include <vector>
 
 #include "util/pctl_ops_c.hpp"
+#include "util/table_export.hpp"
 
 namespace activity_summary
 {
@@ -55,5 +59,28 @@ std::vector<int> rediscover(const PlayStats& stats, size_t max);
 // (the two counts round apart by a few seconds).
 constexpr uint64_t UNATTRIBUTED_MIN_S = 60;
 uint64_t unattributed_s(uint64_t total_s, const AccountPlay* accounts, size_t count);
+
+// Most played in `period` first, a tie to the most recently played. The
+// export (`by_total`) breaks a tie by all-time play first (raw total_s), so
+// its unplayed games keep a useful order too.
+void sort_by_play(std::vector<const GameStat*>& games, int period, bool by_total);
+
+// What the export's table says, in the language shown: the tab's words.
+struct ExportText
+{
+    std::string title, subtitle, sheet;
+    // The column headers, but the six days before today's.
+    std::string game, id, today, week, total, launches, first, last;
+    std::function<std::string(int wday)> day;           // a day's column ("Sat (min)"), 0 = Sunday
+    std::function<std::string(const GameStat&)> name;   // a game's name, a deleted one's too
+    std::function<std::string(uint64_t posix)> time;    // a date and time, never given 0
+};
+
+// Every game of `stats`, in the export's order (sort_by_play by total), with
+// its play time in whole minutes (rounded, so a spreadsheet can add them up)
+// today, on each of the six days before (most recent first), this week and
+// in all; its launches and first and last plays. A figure that was not read
+// is an empty cell.
+table_export::Table export_table(const PlayStats& stats, int period, const ExportText& text);
 
 }   // namespace activity_summary

@@ -12,6 +12,7 @@
 #include <strings.h>
 #include <vector>
 
+#include "action/game_check_text.hpp"
 #include "action/game_notice.hpp"
 #include "action/game_scan.hpp"
 #include "action/history_flow.hpp"
@@ -25,47 +26,18 @@ using namespace brls::literals;
 
 namespace
 {
-const GameCategory GROUPS[GC_CAT_COUNT] = { GC_CAT_FIX, GC_CAT_VERIFY, GC_CAT_REINSTALL, GC_CAT_SYSTEM };
+// The rules (sections, problems, keys, IDs): action/game_check_text.hpp.
+using game_check_text::category_key;
+using game_check_text::console_code;
+using game_check_text::GROUPS;
+using game_check_text::history_label;
+using game_check_text::id_text;
+using game_check_text::issue_text_key;
+using game_check_text::MANY;
+using game_check_text::required_hos;
+using game_check_text::warn_only;
 
-const char* category_key(GameCategory category)
-{
-    switch (category) {
-        case GC_CAT_FIX:       return "fix";
-        case GC_CAT_VERIFY:    return "verify";
-        case GC_CAT_REINSTALL: return "reinstall";
-        default:               return "system";
-    }
-}
-
-// From this many broken games, the cause is more likely the SD card or the
-// storage the console started on than each game.
-constexpr size_t MANY = 3;
-constexpr float  ICON_SIZE = 72;
-
-const char* issue_key(GameIssue issue)
-{
-    switch (issue) {
-        case GC_ARCHIVED:            return "archived";
-        case GC_STORAGE_UNAVAILABLE: return "storage";
-        case GC_NO_BASE:             return "no_base";
-        case GC_FILES_MISSING:       return "files";
-        case GC_CORRUPT:             return "corrupt";
-        case GC_NEEDS_VERIFY:        return "needs_verify";
-        case GC_KEY_TOO_NEW:         return "key_too_new";
-        case GC_FIRMWARE_TOO_OLD:    return "firmware";
-        case GC_TICKET_MISSING:      return "ticket";
-        case GC_LAUNCH_VERSION:      return "launch_version";
-        case GC_LAUNCH_REFUSED:      return "launch";
-        case GC_NO_CONTROL:          return "no_control";
-        default:                     return "";
-    }
-}
-
-bool warn_only(GameIssue issue)
-{
-    return issue == GC_STORAGE_UNAVAILABLE || issue == GC_FIRMWARE_TOO_OLD || issue == GC_KEY_TOO_NEW ||
-           issue == GC_LAUNCH_VERSION;
-}
+constexpr float ICON_SIZE = 72;
 
 std::string hos_text(u32 v)
 {
@@ -74,31 +46,9 @@ std::string hos_text(u32 v)
     return buf;
 }
 
-u32 required_hos(const GameFacts& g)
-{
-    return g.patch_required_hos > g.base_required_hos ? g.patch_required_hos : g.base_required_hos;
-}
-
-std::string id_text(u64 id)
-{
-    return fmt::format("{:016X}", (unsigned long long)id);
-}
-
-// A system result as the console shows it: 2016-0601.
-std::string console_code(Result rc)
-{
-    return fmt::format("{:04}-{:04}", 2000 + (rc & 0x1FF), (rc >> 9) & 0x1FFF);
-}
-
 std::string game_name(const GameFacts& g)
 {
     return g.name[0] ? std::string(g.name) : brls::getStr("playguard/games/unnamed", id_text(g.app_id));
-}
-
-// What the change history keeps: the name and the ID.
-std::string history_label(const GameFacts& g)
-{
-    return g.name[0] ? fmt::format("{} ({})", g.name, id_text(g.app_id)) : id_text(g.app_id);
 }
 
 // A version as people know it: "version 1.4.0" when it is the installed
@@ -115,14 +65,14 @@ std::string version_text(const GameFacts& g, u32 version)
 // The cell's value: what the HOME menu shows, in a few words.
 std::string short_text(const GameFacts& g, GameIssue issue)
 {
-    const std::string key = std::string("playguard/games/issues/") + issue_key(issue) + "/short";
+    const std::string key = issue_text_key(issue, "short");
     if (issue == GC_FIRMWARE_TOO_OLD) return brls::getStr(key, hos_text(required_hos(g)));
     return brls::getStr(key);
 }
 
 std::string cause_text(const GameFacts& g, GameIssue issue, u32 current_hos)
 {
-    const std::string key = std::string("playguard/games/issues/") + issue_key(issue) + "/cause";
+    const std::string key = issue_text_key(issue, "cause");
     switch (issue) {
         case GC_FIRMWARE_TOO_OLD: return brls::getStr(key, hos_text(required_hos(g)), hos_text(current_hos));
         case GC_KEY_TOO_NEW:      return brls::getStr(key, hos_text(current_hos), (int)g.key_generation);
@@ -140,11 +90,7 @@ std::string cause_text(const GameFacts& g, GameIssue issue, u32 current_hos)
 
 std::string fix_text(const GameFacts& g, GameIssue issue, u32 current_hos)
 {
-    // Only the update too new: playing without it is the other way out.
-    if (issue == GC_FIRMWARE_TOO_OLD && g.patch_required_hos > current_hos && g.base_required_hos <= current_hos)
-        return "playguard/games/issues/firmware/fix_update"_i18n;
-    if (issue == GC_KEY_TOO_NEW) return "playguard/games/issues/firmware/fix"_i18n;
-    return brls::getStr(std::string("playguard/games/issues/") + issue_key(issue) + "/fix");
+    return brls::getStr(game_check_text::fix_key(g, issue, current_hos));
 }
 
 // What the console reports, for a hardware test (developer mode): not worded.
@@ -176,17 +122,6 @@ std::string action_label(const GameFacts& g, u32 action, const GameContent* cont
         case GA_REMOVE_ADDON:  return brls::getStr("playguard/games/action/remove_addon", id_text(content ? content->id : 0));
         default:               return "playguard/games/action/remove"_i18n;
     }
-}
-
-brls::Label* text_label(const std::string& text, float size, NVGcolor color)
-{
-    auto* label = new brls::Label();
-    label->setText(text);
-    label->setFontSize(size);
-    label->setTextColor(color);
-    label->setSingleLine(false);
-    label->setHorizontalAlign(brls::HorizontalAlign::LEFT);
-    return label;
 }
 
 // A game of the list: its name and problem, with borealis' check mark in
@@ -235,18 +170,18 @@ brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, co
     auto* titles = new brls::Box(brls::Axis::COLUMN);
     titles->setGrow(1.0f);
     titles->setShrink(1.0f);
-    titles->addView(text_label(game_name(g), 24, ui::color_text()));
-    auto* problem = text_label(short_text(g, issue), 19, warn_only(issue) ? ui::color_warn() : ui::color_bad());
+    titles->addView(ui::text_label(game_name(g), 24, ui::color_text()));
+    auto* problem = ui::text_label(short_text(g, issue), 19, warn_only(issue) ? ui::color_warn() : ui::color_bad());
     problem->setMarginTop(4);
     titles->addView(problem);
     head->addView(titles);
     box->addView(head);
 
     auto block = [box](const std::string& title, const std::string& text) {
-        auto* t = text_label(title, 18, ui::color_note());
+        auto* t = ui::text_label(title, 18, ui::color_note());
         t->setMarginTop(18);
         box->addView(t);
-        auto* body = text_label(text, 20, ui::color_text());
+        auto* body = ui::text_label(text, 20, ui::color_text());
         body->setMarginTop(4);
         box->addView(body);
     };
@@ -257,7 +192,7 @@ brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, co
     if (g.display_version[0]) footer += " · " + brls::getStr("playguard/games/version", std::string(g.display_version));
     if (g.verified == GC_VERIFIED_INTACT) footer += "\n" + brls::getStr("playguard/games/verified_intact", ui::time_text(g.verified_at));
     if (app::dev_mode()) footer += "\n" + developer_text(g);
-    auto* foot = text_label(footer, 16, ui::color_note());
+    auto* foot = ui::text_label(footer, 16, ui::color_note());
     foot->setMarginTop(18);
     box->addView(foot);
     return box;
@@ -406,7 +341,7 @@ void GameCheckActivity::onContentAvailable()
         group.title->setMarginBottom(4);
         group.title->setMarginTop(category == GROUPS[0] ? 10 : 20);
         group.box->addView(group.title);
-        group.note = text_label(brls::getStr(std::string("playguard/games/group_note/") + category_key(category)), 18, ui::color_note());
+        group.note = ui::text_label(brls::getStr(std::string("playguard/games/group_note/") + category_key(category)), 18, ui::color_note());
         group.note->setMarginBottom(8);
         group.box->addView(group.note);
         // The games to install again: their list kept on the SD card, then
@@ -840,7 +775,7 @@ void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current
     }
     auto* box = details_view(game, issue, current_hos, icon_of(game.app_id));
     if (app::read_only() && gamecheck_actions(&game, issue) & ~GA_VERIFY) {
-        auto* note_ro = text_label("playguard/common/read_only_note"_i18n, 16, ui::color_note());
+        auto* note_ro = ui::text_label("playguard/common/read_only_note"_i18n, 16, ui::color_note());
         note_ro->setMarginTop(8);
         box->addView(note_ro);
     }
@@ -1161,9 +1096,9 @@ void GameCheckActivity::verify(std::vector<GameFacts> games)
     auto* titles = new brls::Box(brls::Axis::COLUMN);
     titles->setGrow(1.0f);
     titles->setShrink(1.0f);
-    state->title = text_label("playguard/games/verify_title"_i18n, 18, ui::color_note());
+    state->title = ui::text_label("playguard/games/verify_title"_i18n, 18, ui::color_note());
     titles->addView(state->title);
-    state->name = text_label("", 22, ui::color_text());
+    state->name = ui::text_label("", 22, ui::color_text());
     state->name->setSingleLine(true);   // a long name is cut, not wrapped over the dialog
     state->name->setMarginTop(2);
     titles->addView(state->name);
@@ -1176,11 +1111,11 @@ void GameCheckActivity::verify(std::vector<GameFacts> games)
     auto* numbers = new brls::Box(brls::Axis::ROW);
     numbers->setAlignItems(brls::AlignItems::CENTER);
     numbers->setMarginTop(10);
-    state->percent = text_label("", 22, ui::color_text());
+    state->percent = ui::text_label("", 22, ui::color_text());
     state->percent->setSingleLine(true);
     state->percent->setMarginRight(14);
     numbers->addView(state->percent);
-    state->detail = text_label("", 17, ui::color_note());
+    state->detail = ui::text_label("", 17, ui::color_note());
     state->detail->setSingleLine(true);
     state->detail->setGrow(1.0f);
     state->detail->setShrink(1.0f);
@@ -1188,7 +1123,7 @@ void GameCheckActivity::verify(std::vector<GameFacts> games)
     numbers->addView(state->detail);
     box->addView(numbers);
 
-    auto* note_label = text_label("playguard/games/verify_note"_i18n, 16, ui::color_note());
+    auto* note_label = ui::text_label("playguard/games/verify_note"_i18n, 16, ui::color_note());
     note_label->setMarginTop(16);
     box->addView(note_label);
     state->dialog = new brls::Dialog(box);

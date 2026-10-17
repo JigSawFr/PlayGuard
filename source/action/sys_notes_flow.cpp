@@ -25,7 +25,7 @@ sys_notes::Cache s_cache;
 bool             s_cache_read = false;
 bool             s_fetching[3] = { false, false, false };
 
-std::string cache_file() { return paths::data_dir() + "/cache/sys_notes.json"; }
+std::string cache_file() { return paths::cache_dir() + "/sys_notes.json"; }
 
 void read_cache()
 {
@@ -41,7 +41,7 @@ void save()
     ui::write_later("release notes", [text = sys_notes::encode(s_cache)]() {
         std::string err;
         // Only saves a fetch on the next opening: a write that fails is just logged.
-        if (!paths::ensure_dir(paths::data_dir() + "/cache") || !paths::atomic_write(cache_file(), text, &err))
+        if (!paths::ensure_dir(paths::cache_dir()) || !paths::atomic_write(cache_file(), text, &err))
             brls::Logger::warning("release notes: cannot keep them ({})", err);
     }, "sys_notes");
 }

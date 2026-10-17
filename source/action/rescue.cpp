@@ -183,12 +183,6 @@ bool update(std::string* error)
     return true;
 }
 
-bool pending()
-{
-    std::string ignore;
-    return paths::read_file(report_path(), ignore);
-}
-
 bool installed()
 {
     std::string path = paths::sd_root();

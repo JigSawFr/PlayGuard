@@ -32,10 +32,6 @@ std::optional<RescueReport> take(RescueProof* proof);
 // (installed()). False when a read fails.
 bool confirmed(const RescueReport& report, const RescueProof& proof);
 
-// Whether a report is waiting (without removing it): decides at start-up
-// whether to show the recovery screen instead of the lock screen.
-bool pending();
-
 // Whether the sysmodule is on the SD card
 // (atmosphere/contents/4200000000505247/exefs.nsp): while it is, anyone who
 // can edit the card can unlock or wipe the parental controls at boot.

@@ -7,7 +7,9 @@
 
 #include <borealis/extern/nlohmann/json.hpp>
 
+#include "util/json_util.hpp"
 #include "util/paths.hpp"
+#include "util/text.hpp"
 
 namespace github_auth
 {
@@ -15,12 +17,6 @@ namespace github_auth
 namespace
 {
 using nlohmann::json;
-
-std::string str(const json& j, const char* key)
-{
-    const auto it = j.find(key);
-    return it != j.end() && it->is_string() ? it->get<std::string>() : std::string();
-}
 
 // GitHub tokens: letters, digits and '_' ("ghu_…"); nothing that could break a header.
 bool token_chars(const std::string& t)
@@ -32,51 +28,45 @@ bool token_chars(const std::string& t)
 
 bool parse_device_code(const std::string& text, DeviceCode* out)
 {
-    try {
-        const auto j = json::parse(text);
-        if (!j.is_object()) return false;
-        DeviceCode d;
-        d.device_code = str(j, "device_code");
-        d.user_code = str(j, "user_code");
-        d.verification_uri = str(j, "verification_uri");
-        if (j.contains("interval") && j["interval"].is_number_integer()) d.interval = j["interval"].get<int>();
-        if (j.contains("expires_in") && j["expires_in"].is_number_integer()) d.expires_in = j["expires_in"].get<int>();
-        if (d.device_code.empty() || d.user_code.empty() || d.verification_uri.compare(0, 8, "https://") != 0)
-            return false;
-        d.interval = std::min(std::max(d.interval, 1), 60);
-        d.expires_in = std::min(std::max(d.expires_in, 60), 3600);
-        *out = d;
-        return true;
-    } catch (const std::exception&) {
+    json j;
+    if (!json_util::parse(text, &j) || !j.is_object()) return false;
+    DeviceCode d;
+    d.device_code = json_util::string_at(j, "device_code");
+    d.user_code = json_util::string_at(j, "user_code");
+    d.verification_uri = json_util::string_at(j, "verification_uri");
+    d.interval = (int)json_util::integer_or(j, "interval", d.interval);
+    d.expires_in = (int)json_util::integer_or(j, "expires_in", d.expires_in);
+    if (d.device_code.empty() || d.user_code.empty() || !text::starts_with(d.verification_uri, "https://"))
         return false;
-    }
+    d.interval = std::min(std::max(d.interval, 1), 60);
+    d.expires_in = std::min(std::max(d.expires_in, 60), 3600);
+    *out = d;
+    return true;
 }
 
 Poll parse_poll(const std::string& text, std::string* token, std::string* error)
 {
-    try {
-        const auto j = json::parse(text);
-        if (!j.is_object()) throw std::runtime_error("not an object");
-        const std::string t = str(j, "access_token");
-        if (!t.empty()) {
-            if (!token_chars(t)) {
-                if (error) *error = "unexpected token";
-                return Poll::Failed;
-            }
-            *token = t;
-            return Poll::Token;
-        }
-        const std::string e = str(j, "error");
-        if (e == "authorization_pending") return Poll::Pending;
-        if (e == "slow_down") return Poll::SlowDown;
-        if (e == "expired_token") return Poll::Expired;
-        if (e == "access_denied") return Poll::Denied;
-        if (error) *error = e.empty() ? std::string("unexpected answer") : e;
-        return Poll::Failed;
-    } catch (const std::exception&) {
+    json j;
+    if (!json_util::parse(text, &j) || !j.is_object()) {
         if (error) *error = "unexpected answer";
         return Poll::Failed;
     }
+    const std::string t = json_util::string_at(j, "access_token");
+    if (!t.empty()) {
+        if (!token_chars(t)) {
+            if (error) *error = "unexpected token";
+            return Poll::Failed;
+        }
+        *token = t;
+        return Poll::Token;
+    }
+    const std::string e = json_util::string_at(j, "error");
+    if (e == "authorization_pending") return Poll::Pending;
+    if (e == "slow_down") return Poll::SlowDown;
+    if (e == "expired_token") return Poll::Expired;
+    if (e == "access_denied") return Poll::Denied;
+    if (error) *error = e.empty() ? std::string("unexpected answer") : e;
+    return Poll::Failed;
 }
 
 std::string token_file()
@@ -90,7 +80,7 @@ std::string token()
     if (!paths::read_file(token_file(), t)) return "";
     while (!t.empty() && std::isspace((unsigned char)t.back())) t.pop_back();
     // The earlier OAuth app's token: refused the artifacts, signed in again.
-    if (t.compare(0, 4, "gho_") == 0) return "";
+    if (text::starts_with(t, "gho_")) return "";
     return token_chars(t) ? t : "";
 }
 

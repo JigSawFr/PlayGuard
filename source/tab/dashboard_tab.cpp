@@ -16,7 +16,6 @@
 #include "app.hpp"
 #include "tab/clock_tab.hpp"
 #include "ui/ui.hpp"
-#include "util/paths.hpp"
 
 using namespace brls::literals;
 

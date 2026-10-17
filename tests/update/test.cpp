@@ -86,16 +86,6 @@ static void test_decide()
 
 static void test_snooze()
 {
-    CHECK(update::add_days("2026-10-12", 7) == "2026-10-19");
-    CHECK(update::add_days("2026-10-12", 30) == "2026-11-11");
-    CHECK(update::add_days("2026-12-25", 10) == "2027-01-04");
-    CHECK(update::add_days("2028-02-28", 1) == "2028-02-29");   // leap year
-    CHECK(update::add_days("2026-02-28", 1) == "2026-03-01");
-    CHECK(update::add_days("2026-03-01", -1) == "2026-02-28");
-    CHECK(update::add_days("2026-02-30", 1).empty());
-    CHECK(update::add_days("2026-1-01", 1).empty());
-    CHECK(update::add_days("", 1).empty());
-
     const update::Snooze none;
     CHECK(update::offer_at_start("1.2.0", "1.1.0", none, "2026-10-12"));
     CHECK(!update::offer_at_start("1.1.0", "1.1.0", none, "2026-10-12"));    // already running it

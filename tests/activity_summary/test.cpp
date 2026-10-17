@@ -1,11 +1,13 @@
 // Host tests for util/activity_summary.hpp: the Activity tab's summary over
 // each period (average per day, most played game, days played, busiest day,
 // average session), what is left out when a figure was not read, the
-// games to rediscover, and the play time no account holds.
+// games to rediscover, the play time no account holds, the list's order and
+// the export's table.
 #include "check.h"
 #include <cstdio>
 #include <cstring>
 #include <memory>
+#include <string>
 
 #include "util/activity_summary.hpp"
 
@@ -178,11 +180,116 @@ static void test_unattributed()
     CHECK(unattributed_s(UINT64_MAX, a, 3) == 0);
 }
 
+static std::string names(const std::vector<const GameStat*>& games)
+{
+    std::string out;
+    for (const GameStat* g : games) out += std::string(out.empty() ? "" : ",") + g->name;
+    return out;
+}
+
+static void test_sort()
+{
+    auto s = sample();
+    add(*s, "Old", 100, 1, 20);    // nothing this week, more in all, played longer ago
+    add(*s, "New", 50, 1, 10);
+    std::vector<const GameStat*> games;
+    for (uint32_t i = 0; i < s->count; i++) games.push_back(&s->games[i]);
+
+    sort_by_play(games, Week, false);
+    CHECK(names(games) == "Farm,Kart,New,Old");   // a tie: the one played last first
+    sort_by_play(games, Week, true);
+    CHECK(names(games) == "Farm,Kart,Old,New");   // the export: all time first
+    sort_by_play(games, Today, false);
+    CHECK(names(games) == "Kart,Farm,New,Old");
+    sort_by_play(games, AllTime, false);
+    CHECK(names(games) == "Kart,Farm,Old,New");
+    // All time without its totals: none played, the most recent first.
+    for (uint32_t i = 0; i < s->count; i++) s->games[i].totals_ok = false;
+    sort_by_play(games, AllTime, true);
+    CHECK(names(games) == "Kart,Farm,Old,New");   // total_s still breaks the tie, then the last play
+}
+
+static ExportText words()
+{
+    ExportText t;
+    t.title = "T";
+    t.subtitle = "S";
+    t.sheet = "Sheet";
+    t.game = "Game";
+    t.id = "ID";
+    t.today = "Today";
+    t.week = "Week";
+    t.total = "Total";
+    t.launches = "Launches";
+    t.first = "First";
+    t.last = "Last";
+    t.day = [](int wday) { return "d" + std::to_string(wday); };
+    t.name = [](const GameStat& g) { return g.name[0] ? std::string(g.name) : std::string("(deleted)"); };
+    t.time = [](uint64_t posix) {
+        CHECK(posix != 0);
+        return "t" + std::to_string(posix);
+    };
+    return t;
+}
+
+static void test_export()
+{
+    auto s = sample();
+    GameStat& gone = add(*s, "", 1, 1, 40);   // deleted: its name from the tab
+    gone.today_s = 89;                        // 1 min 29 s: 1 min
+    gone.day_s[1] = 90;                       // 1 min 30 s: 2 min
+    gone.first_played = 0;                    // unknown: an empty cell
+    table_export::Table t = export_table(*s, Week, words());
+    CHECK(t.title == "T" && t.subtitle == "S" && t.sheet == "Sheet");
+
+    // The columns: the game, today, the six days before (most recent first,
+    // named after their weekday), the week, all time, launches, plays.
+    if (!CHECK(t.columns.size() == 14)) return;
+    const char* keys[] = { "game", "title_id", "today_min", "day_1_min", "day_2_min", "day_3_min", "day_4_min",
+                           "day_5_min", "day_6_min", "week_min", "total_min", "launches", "first_played", "last_played" };
+    for (size_t i = 0; i < 14; i++) CHECK(t.columns[i].key == keys[i]);
+    CHECK(t.columns[0].label == "Game" && t.columns[1].label == "ID" && t.columns[2].label == "Today");
+    CHECK(t.columns[3].label == "d2" && t.columns[4].label == "d1" && t.columns[8].label == "d4");
+    CHECK(t.columns[9].label == "Week" && t.columns[13].label == "Last");
+    CHECK(!t.columns[0].numeric && !t.columns[1].numeric && t.columns[2].numeric && t.columns[8].numeric);
+    CHECK(t.columns[11].numeric && !t.columns[12].numeric && !t.columns[13].numeric);
+
+    // The rows: the export's order, every column.
+    if (!CHECK(t.rows.size() == 3)) return;
+    for (const auto& r : t.rows) CHECK(r.size() == 14);
+    const std::vector<std::string> farm = { "Farm", "0100000000012000", "0", "0", "80", "0", "0", "0", "0",
+                                            "80", "400", "20", "t" + std::to_string(NOW - 99 * DAY - 3600),
+                                            "t" + std::to_string(NOW - 2 * DAY) };
+    CHECK(t.rows[0] == farm);
+    CHECK(t.rows[1][0] == "Kart" && t.rows[1][2] == "30" && t.rows[1][4] == "40" && t.rows[1][9] == "70");
+    CHECK(t.rows[2][0] == "(deleted)" && t.rows[2][2] == "1" && t.rows[2][3] == "2");
+    CHECK(t.rows[2][12].empty() && t.rows[2][13] == "t" + std::to_string(NOW - 40 * DAY));
+
+    // The log unread: no figure of the week; the statistics unread for a
+    // game: none of its totals.
+    s->windows_ok = false;
+    s->games[0].totals_ok = false;
+    t = export_table(*s, AllTime, words());
+    if (!CHECK(t.rows.size() == 3)) return;
+    CHECK(t.rows[0][0] == "Farm" && t.rows[1][0] == "(deleted)" && t.rows[2][0] == "Kart");
+    for (const auto& r : t.rows)
+        for (size_t i = 2; i <= 9; i++) CHECK(r[i].empty());
+    for (size_t i = 10; i < 14; i++) CHECK(t.rows[2][i].empty());
+    CHECK(t.rows[0][10] == "400" && t.rows[0][11] == "20");
+
+    // No game: the columns only.
+    s->count = 0;
+    t = export_table(*s, Week, words());
+    CHECK(t.columns.size() == 14 && t.rows.empty());
+}
+
 int main()
 {
     test_periods();
     test_edges();
     test_rediscover();
     test_unattributed();
+    test_sort();
+    test_export();
     return CHECK_DONE("activity_summary assertions passed");
 }

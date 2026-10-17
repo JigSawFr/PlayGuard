@@ -9,7 +9,7 @@
 
 #include "ui/ui.hpp"
 #include "util/github_auth.hpp"
-#include "util/log_upload.hpp"
+#include "util/text.hpp"
 #include "view/qr_view.hpp"
 
 using namespace brls::literals;
@@ -42,7 +42,7 @@ void show_code(const github_auth::DeviceCode& code, std::function<void()> done)
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setPadding(20, 32, 10, 32);
-    box->addView(centered(brls::getStr("playguard/github/code_body", log_upload::short_url(code.verification_uri)), 20,
+    box->addView(centered(brls::getStr("playguard/github/code_body", text::short_url(code.verification_uri)), 20,
                           ui::color_text()));
     brls::Label* user_code = centered(code.user_code, 44, ui::color_text());
     user_code->setMarginTop(10);
