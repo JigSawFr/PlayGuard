@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- About: the app (version — seven presses turn the developer tools on, at
-     the end of Preferences › Help & diagnostics —, launch mode, data folder), its updates, what changed
-     in this version (its highlights and a cell to the full list, or the full
-     list when it has none; filled in by AboutTab), the
-     credits, how to support it (QR codes of the funding links, Ⓐ shows one
-     larger), and "Made in France". -->
+<!-- About: the installed PlayGuard and help with it. The app (version —
+     seven presses turn the developer tools on, at the end of Help &
+     diagnostics, below —, launch mode, data folder); all of its updates
+     (check now, every day, how); what changed in this version (its
+     highlights and a cell to the full list, or the full list when it has
+     none; filled in by AboutTab); a line to Help & diagnostics
+     (tab/help.xml, on a screen of its own); the credits; how to support it
+     (QR codes of the funding links, Ⓐ shows one larger), and "Made in
+     France". -->
 
 <brls:Box
     width="auto"
@@ -32,10 +35,13 @@
             <brls:DetailCell id="ab_data" focusable="false" title="@i18n/playguard/tools/data"/>
             <brls:Header title="@i18n/playguard/tools/section_update" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="ab_update" title="@i18n/playguard/tools/update"/>
+            <brls:BooleanCell id="ab_update_daily"/>
+            <brls:DetailCell id="ab_update_via" title="@i18n/playguard/tools/update_via"/>
             <brls:Header id="ab_changelog_header" marginTop="24" marginBottom="8"/>
             <brls:Box id="ab_changelog" width="auto" height="auto" axis="column" alignItems="stretch"/>
             <brls:DetailCell id="ab_changelog_full" title="@i18n/playguard/about/changelog_full" marginTop="12"/>
             <brls:Label id="ab_changelog_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:DetailCell id="ab_help" title="@i18n/playguard/prefs/help" marginTop="24"/>
             <brls:Header title="@i18n/playguard/about/section_credits" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="ab_author" focusable="false" title="@i18n/playguard/about/credit_author"/>
             <brls:DetailCell id="ab_upstream" focusable="false" title="@i18n/playguard/about/credit_upstream"/>

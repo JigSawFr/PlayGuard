@@ -23,7 +23,7 @@
 // The last RING_LINES lines also stay in memory, for the crash files and
 // the diagnostic report: that part allocates nothing and takes no lock
 // (recent()), as the CPU exception handler reads it.
-// The files are pruned with the reports (the limits of Preferences › Help & diagnostics).
+// The files are pruned with the reports (the limits of About › Help & diagnostics).
 // Plain C++ (no borealis): host-tested (tests/session_log).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
