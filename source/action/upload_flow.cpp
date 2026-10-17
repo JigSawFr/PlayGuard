@@ -112,11 +112,11 @@ void show_link(const log_upload::Result& r, bool report)
 
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::CENTER);
-    box->setPadding(24, 24, 12, 24);
+    box->setPadding(16, 24, 12, 24);   // the two cards and their captions at 18 px fit above OK
     box->addView(centered_label(text, 20, ui::color_text()));
     auto* row = new brls::Box(brls::Axis::ROW);
     row->setJustifyContent(brls::JustifyContent::SPACE_EVENLY);
-    row->setMarginTop(14);
+    row->setMarginTop(8);
     row->addView(qr_card("playguard/upload/qr_report"_i18n, r.url, text::short_url(r.url)));
     row->addView(qr_card("playguard/upload/qr_issue"_i18n, issue, "playguard/upload/qr_issue_note"_i18n));
     box->addView(row);
