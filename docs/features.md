@@ -2,8 +2,10 @@
 
 What each tab does, how PlayGuard writes safely, and what the console counts as play time. Back to the [README](../README.md).
 
-| Play timer | Per-day limits |
+| Overview | Console |
 |---|---|
+| ![Overview](../images/screenshots/dashboard.png) | ![Console](../images/screenshots/console.png) |
+| **Play timer** | **Per-day limits** |
 | ![Play timer](../images/screenshots/play_timer.png) | ![Per-day limits](../images/screenshots/per_day.png) |
 | **Activity** | **A game** |
 | ![Activity](../images/screenshots/activity.png) | ![A game](../images/screenshots/activity_game.png) |

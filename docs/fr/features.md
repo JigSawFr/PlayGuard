@@ -2,8 +2,10 @@
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Retour au [README](../../README.fr.md).
 
-| Temps de jeu | Limites par jour |
+| Vue d'ensemble | Console |
 |---|---|
+| ![Vue d'ensemble](../../images/screenshots/dashboard.png) | ![Console](../../images/screenshots/console.png) |
+| **Temps de jeu** | **Limites par jour** |
 | ![Temps de jeu](../../images/screenshots/play_timer.png) | ![Limites par jour](../../images/screenshots/per_day.png) |
 | **Activité** | **Un jeu** |
 | ![Activité](../../images/screenshots/activity.png) | ![Un jeu](../../images/screenshots/activity_game.png) |
