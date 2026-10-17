@@ -48,8 +48,37 @@ static void test_groups()
     if (!CHECK(v.size() == 4)) return;
     // The parental controls' (to do, then for information), then the console's.
     CHECK(v[0].id == "clock" && v[1].id == "week" && v[2].id == "games" && v[3].id == "sys_firmware");
-    // The bell counts the parental controls', the Console tab the console's to do.
+    // The bell counts the parental controls' to do, console_count the console's.
     CHECK(s.action_count() == 1 && s.info_count() == 1 && s.console_count() == 1);
+}
+
+static void test_tabs()
+{
+    // Each entry where it is fixed: the console's and the network clock on
+    // the Console tab, the PIN's on the PIN tab, the alarm on the Play timer.
+    for (const char* id : { "games", "sd_space", "data_history", "rescue_old", "clock", "clock_off" })
+        CHECK(tab_of(id) == "console");
+    for (const char* id : { "pin_missing", "unlocked", "pin_weak", "pin_lock_off" }) CHECK(tab_of(id) == "security");
+    for (const char* id : { "alarm_off", "not_counting" }) CHECK(tab_of(id) == "play_timer");
+    CHECK(tab_of("outside") == "dashboard" && tab_of("extra_restore") == "dashboard");
+    CHECK(tab_of("new") == "");
+
+    // A tab counts its entries to do only: not those for information, put
+    // away or ignored.
+    Store s;
+    s.set("unlocked", Level::Action, "Unlocked", "");
+    s.set("pin_weak", Level::Action, "PIN", "");
+    s.set("pairing", Level::Info, "App", "");
+    s.set("games", Level::Action, "9 games", "");
+    s.set("clock", Level::Action, "Clock off", "");
+    s.set("sys_firmware", Level::Info, "23.0.1", "");
+    CHECK(s.tab_count("security") == 2);
+    CHECK(s.tab_count("console") == 2);
+    CHECK(s.tab_count("play_timer") == 0);
+    CHECK(s.ack("pin_weak"));
+    CHECK(s.tab_count("security") == 1);
+    s.clear("unlocked");
+    CHECK(s.tab_count("security") == 0);
 }
 
 static void test_fixed_order()
@@ -369,6 +398,7 @@ int main()
     test_every();
     test_set_and_order();
     test_groups();
+    test_tabs();
     test_fixed_order();
     test_replace_keeps_place();
     test_clear();

@@ -52,6 +52,22 @@ int rank_of(const std::string& id)
     return i < 0 ? (int)(sizeof(RANKS) / sizeof(RANKS[0])) : i;
 }
 
+std::string tab_of(const std::string& id)
+{
+    // The network clock is a screen of the Console tab, and the Overview
+    // says the changes seen outside and the limits to put back.
+    if (group_of(id) == Group::Console || id == "clock" || id == "clock_off") return "console";
+    if (id == "pin_missing" || id == "unlocked" || id == "pin_weak" || id == "pin_lock_off" || id == "pairing" ||
+        id == "console_lock_long")
+        return "security";
+    if (id == "alarm_off" || id == "not_counting" || id == "over_limit") return "play_timer";
+    if (id == "outside" || id == "extra_restore") return "dashboard";
+    if (id == "week" || id == "new_account") return "activity";
+    if (id == "backup") return "history";
+    if (id == "update" || id == "installed" || id == "crash" || id == "upload") return "about";
+    return "";
+}
+
 Store::Slot* Store::find(const std::string& id)
 {
     for (auto& s : this->slots)
@@ -183,6 +199,14 @@ int Store::info_count() const
 int Store::console_count() const
 {
     return this->count(Group::Console, Level::Action);
+}
+
+int Store::tab_count(const std::string& tab) const
+{
+    int n = 0;
+    for (const auto& s : this->slots)
+        if (!s.dismissed && !s.acked && s.item.level == Level::Action && tab_of(s.item.id) == tab) n++;
+    return n;
 }
 
 bool shown_kind(const std::string& id, const Shown& shown)

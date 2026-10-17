@@ -19,7 +19,6 @@
         "clock": "Сетевые часы",
         "security": "PIN-код",
         "console": "Консоль",
-        "console_count": "{} ({})",
         "history": "История",
         "preferences": "Настройки",
         "about": "О программе"

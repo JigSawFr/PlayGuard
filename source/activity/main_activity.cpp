@@ -19,6 +19,7 @@
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
+#include "view/tab_badge.hpp"
 
 using namespace brls::literals;
 
@@ -204,14 +205,18 @@ void MainActivity::update_notice_hint()
     this->getContentView()->updateActionHint(brls::BUTTON_Y, n > 0 ? brls::getStr("playguard/notices/hint_count", n)
                                                                     : "playguard/notices/hint"_i18n);
     brls::Application::getGlobalHintsUpdateEvent()->fire();
-    // The console's entries to do: counted on the Console tab, not the bell.
+    // Each tab counts its own entries to do (notice_logic::tab_of), on a
+    // badge by its name: where to look, without opening the list.
     auto* frame   = this->getView("main_tabs");
     auto* sidebar = frame ? dynamic_cast<brls::Sidebar*>(frame->getView("brls/tab_frame/sidebar")) : nullptr;
-    if (brls::SidebarItem* item = sidebar ? sidebar->getItem(ui::tab::console) : nullptr) {
-        const int c = notices::console_count();
-        item->setLabel(c > 0 ? brls::getStr("playguard/tabs/console_count", "playguard/tabs/console"_i18n, c)
-                             : "playguard/tabs/console"_i18n);
-    }
+    if (!sidebar) return;
+    static const std::pair<int, const char*> TABS[] = {
+        { ui::tab::dashboard, "dashboard" }, { ui::tab::play_timer, "play_timer" }, { ui::tab::activity, "activity" },
+        { ui::tab::security, "security" },   { ui::tab::console, "console" },       { ui::tab::history, "history" },
+        { ui::tab::about, "about" },
+    };
+    for (const auto& t : TABS)
+        if (TabBadge* badge = TabBadge::of(sidebar->getItem(t.first))) badge->set_count(notices::tab_count(t.second));
 }
 
 void MainActivity::open_tab(int position)

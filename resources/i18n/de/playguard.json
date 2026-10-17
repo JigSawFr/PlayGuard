@@ -19,7 +19,6 @@
         "clock": "Netzwerkuhr",
         "security": "Geheimzahl",
         "console": "Konsole",
-        "console_count": "{} ({})",
         "history": "Verlauf",
         "preferences": "Optionen",
         "about": "Info"

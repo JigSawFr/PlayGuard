@@ -19,7 +19,6 @@
         "clock": "ネットワーク時計",
         "security": "暗証番号",
         "console": "本体",
-        "console_count": "{} ({})",
         "history": "履歴",
         "preferences": "オプション",
         "about": "情報"

@@ -19,7 +19,6 @@
         "clock": "網路時鐘",
         "security": "PIN碼",
         "console": "主機",
-        "console_count": "{} ({})",
         "history": "紀錄",
         "preferences": "偏好設定",
         "about": "關於"
