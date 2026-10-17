@@ -1138,7 +1138,7 @@
         "step_pulls": "Pull Requests...",
         "step_runs": "Prüfungen...",
         "back": "Zurück zum vorherigen Build: {}",
-        "back_body": "PlayGuard {} durch den davor installierten Build {} ersetzen? PlayGuard startet damit neu.\n\nStürzt ein Build vor seinem ersten Bildschirm ab, bietet PlayGuard dies beim nächsten Start an; L + R beim Start gedrückt halten bietet es ebenfalls an.",
+        "back_body": "PlayGuard {} durch den davor installierten Build {} ersetzen? PlayGuard startet damit neu.\n\nStürzt ein Build vor seinem ersten Bildschirm ab, bietet PlayGuard dies beim nächsten Start an; L + R beim Start gedrückt halten bietet es ebenfalls an, wenn keine Geheimzahl festgelegt ist.",
         "back_confirm": "Zurück",
         "back_failed": "Zurück zum vorherigen Build nicht möglich: {}\n\nDas installierte PlayGuard ist unverändert.",
         "count_new_one": "1 neu",

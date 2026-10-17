@@ -56,7 +56,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_SYS_NOTES=<folder>` | What GitHub and switchbrew return for the release notes in *Console*: `atmosphere.json` and `hekate.json` (GitHub's release lists), `System_Versions.wiki` and `<version>.wiki` (switchbrew's pages, as wikitext); `offline` for no network |
 | `PLAYGUARD_SIM_PASTE=https://gist.github.com/u/ab12` | What GitHub answers to *Send a report online* (`offline` for no network) |
 | `PLAYGUARD_SIM_DEV_BUILDS=<folder>` | What the GitHub API returns for *Install another build*: `releases.json` (the releases tab), `latest.json` (the latest release, for *Update in place*), `artifacts.json`, `pulls.json`; `runs.json`, and for *Find a build* `pull_<n>.json`, `commit.json`, `run_artifacts.json`; `https://<local path>` download URLs are copied from disk (`offline` for no network); `PLAYGUARD_SIM_DEV_BUILDS_DELAY=<ms>` slows each answer |
-| `PLAYGUARD_SIM_HELD_LR=1`, `PLAYGUARD_SIM_BOOT_CHOICE=a` | L + R held at start-up, and the answer of the start-up screen that offers the previous build (`a`: A, else B) |
+| `PLAYGUARD_SIM_HELD_LR=1`, `PLAYGUARD_SIM_BOOT_CHOICE=a` | L + R held at start-up, and the answer of the start-up screen that offers the previous build (`a`: A, else B); with a PIN set (the default), L + R only says where to go back from: add `PLAYGUARD_SIM_NOT_SET_UP=1` for the offer |
 | `PLAYGUARD_SIM_GITHUB_LOGIN=ok` | The GitHub device flow of *GitHub account*: `ok` approves at once, `denied` refuses, `offline` fails |
 | `PLAYGUARD_SIM_HBLOADER=1` | A homebrew loader that can hand an update over to a store |
 | `PLAYGUARD_SIM_NUMPAD=1:30` | What the system number pad returns |

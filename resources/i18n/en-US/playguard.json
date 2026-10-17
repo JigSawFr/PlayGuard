@@ -1138,7 +1138,7 @@
         "step_pulls": "Pull requests...",
         "step_runs": "Checks...",
         "back": "Go back to the previous build: {}",
-        "back_body": "Replace PlayGuard {} with the build installed before it, {}? PlayGuard restarts on it.\n\nIf a build crashes before its first screen, PlayGuard offers this at its next start; holding L + R while it starts offers it too.",
+        "back_body": "Replace PlayGuard {} with the build installed before it, {}? PlayGuard restarts on it.\n\nIf a build crashes before its first screen, PlayGuard offers this at its next start; holding L + R while it starts offers it too, when no PIN is set.",
         "back_confirm": "Go back",
         "back_failed": "Could not go back to the previous build: {}\n\nThe installed PlayGuard is unchanged.",
         "count_new_one": "1 new",
