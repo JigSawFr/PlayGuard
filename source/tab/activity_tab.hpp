@@ -41,6 +41,16 @@ class ActivityTab : public TabBase
     // otherwise only when there is nothing to show yet.
     void fetch(bool shown);
     void rebuild();
+    // rebuild()'s sections: the totals and the chart, the list (its figures
+    // only when the same games are there, the rest below them on "Show every
+    // game", or every cell again), and the line under it.
+    void show_totals(const PlayStats& s, const PlayAccount* who);
+    void show_list(const std::vector<const GameStat*>& rows, const std::shared_ptr<const PlayStats>& data, bool reading);
+    void grow_list(const std::vector<const GameStat*>& rows, size_t shown_n, bool more,
+                   const std::shared_ptr<const PlayStats>& data);
+    void build_list(const std::vector<const GameStat*>& rows, size_t shown_n, bool more,
+                    const std::shared_ptr<const PlayStats>& data);
+    void show_status(const PlayStats& s, bool empty);
     // The console's play-timer state for the chart's limit line: read when
     // the tab is made (each time the sidebar reaches it, so after a change on
     // another screen), on Ⓧ and once a minute, not at every rebuild (a pctl
