@@ -5,17 +5,23 @@
   playguard.json) defines exactly the keys of en-US, with as many "{}";
 - config::LANGUAGES (source/util/config.hpp) lists exactly those languages,
   and each has a name under playguard/tools/languages/;
-- every "playguard/..." key referenced from C++ or XML exists in en-US
-  (keys built at runtime are checked as prefixes: "playguard/days/{}" etc.);
-- every en-US key is referenced (exactly, or under such a prefix): no dead
+- every "playguard/..." key referenced from C++ or XML exists in en-US;
+- a key built at runtime ("playguard/days/{}", "playguard/history/kinds/" +
+  kind) is under a prefix DYNAMIC_KEYS declares, with the values the code
+  can put after it (read from the code's own lists where there is one): each
+  has its key, and a key under the prefix that is none of them is unused;
+- every en-US key is referenced (exactly, or as such a value): no dead
   strings for translators to keep up to date;
+- every history kind the code records (record_event("...")) is one
+  history_logic names;
 - every XML layout is well formed (borealis' "brls:" prefix is not declared,
   so a non-namespace-aware parser is used);
 - brls:Label never carries padding attributes (borealis throws at runtime);
 - every BRLS_BIND(type, name, "id") names an id of the XML its class
   inflates (CONTENT_FROM_XML_RES, TabBase("xml/..."), inflateFromXMLRes), or
   of a custom view that XML holds (<PtStateHeader/>): a missing one is a null
-  view at runtime, the first use of which crashes.
+  view at runtime, the first use of which crashes. Every class of a header
+  and of its .cpp counts.
 - every sidebar tab name (playguard/tabs/) fits on one line: at most
   TAB_WIDTH columns, a wide (CJK) character counting as two.
 
@@ -30,7 +36,13 @@ It also warns, without failing:
   no icon on the console);
 - about a key docs/config.md documents that source/util/config.cpp neither
   reads nor writes, and one config.cpp reads or writes that the page leaves
-  out.
+  out;
+- about a history source the code writes that history_logic does not name
+  (the History screen leaves it unsaid);
+- about a PLAYGUARD_SIM_* variable the code reads that CONTRIBUTING.md does
+  not document, or one it documents that nothing reads, and about a
+  tools/desktop_smoke.py scenario its list leaves out, or one it lists that
+  the script does not have.
 """
 import glob
 import json
@@ -163,10 +175,6 @@ for path in sorted(glob.glob(f"{ROOT}/resources/xml/**/*.xml", recursive=True)):
     except xml.parsers.expat.ExpatError as e:
         errors.append(f"{path}: {e}")
 
-for k in sorted(en_keys):
-    if k not in used_exact and not any(k.startswith(p) for p in used_prefixes):
-        errors.append(f"unused i18n key playguard/{k} (remove it from every language)")
-
 
 def read(path):
     try:
@@ -175,26 +183,157 @@ def read(path):
         return ""
 
 
+def strings_of(text):
+    return re.findall(r'"([^"\\]*)"', text)
+
+
+def array_of(path, name):
+    """The string literals of the array `name` (`NAME[] = { ... }` or a
+    vector `NAME = { ... }`) in `path`."""
+    m = re.search(r"\b" + re.escape(name) + r"\s*(?:\[\w*\])?\s*=\s*\{(.*?)\};", read(f"{ROOT}/{path}"), re.S)
+    return [v for v in strings_of(m.group(1)) if v] if m else []
+
+
+def function_of(path, name):
+    """The body of the function `name` in `path` (up to the next closing brace
+    at the start of a line)."""
+    m = re.search(r"\b" + re.escape(name) + r"\([^)]*\)\s*\{(.*?)^\}", read(f"{ROOT}/{path}"), re.S | re.M)
+    return m.group(1) if m else ""
+
+
+def returned_by(path, name):
+    """The string literals `name` returns ("" aside)."""
+    return [v for v in re.findall(r'return\s+"([^"]*)"', function_of(path, name)) if v]
+
+
+def enum_count(path, name):
+    """The enumerators of `enum class name` before its `Count`."""
+    m = re.search(r"enum\s+class\s+" + re.escape(name) + r"\s*\{(.*?)\}", read(f"{ROOT}/{path}"), re.S)
+    if not m:
+        return 0
+    body = re.sub(r"//[^\n]*", "", m.group(1))
+    names = [n.strip().split("=")[0].strip() for n in body.split(",") if n.strip()]
+    return names.index("Count") if "Count" in names else len(names)
+
+
+def numbers(n):
+    return [str(i) for i in range(n)]
+
+
+def issue_suffixes():
+    """games/issues/<issue>/<part>: each issue its short text and its cause;
+    its fix too, except "key_too_new" (fix_key gives it firmware's)."""
+    out = []
+    for issue in returned_by("source/action/game_check_text.cpp", "issue_key"):
+        out += [f"{issue}/short", f"{issue}/cause"] + ([] if issue == "key_too_new" else [f"{issue}/fix"])
+    return out
+
+
+# Every prefix a key is built under at runtime, with the values the code can
+# put after it: from the code's own list where there is one, else written
+# out here, next to where the code counts them. A new prefix, or a value the
+# list gains, needs its keys; a key no value names is reported unused.
+DYNAMIC_KEYS = {
+    # Loops over 0..N-1 (the screens' pickers and the week).
+    "activity/formats/": numbers(4),     # history_activity.cpp, activity_tab.cpp: f < 4
+    "activity/none/": numbers(3),        # activity_tab.cpp: one per period
+    "activity/periods/": numbers(3),     # activity_tab.cpp: p < 3
+    "days/": numbers(7),
+    "days_lower/": numbers(7),
+    "days_short/": numbers(7),
+    "restrictions/levels/": numbers(5),  # format_text.cpp, level_name: up to 4
+    "history/filters/": numbers(enum_count("source/action/history_logic.hpp", "Filter")),
+    # The code's lists.
+    "clock/region_names/": re.findall(r'^\s*\{\s*"(\w+)",\s*\{', read(f"{ROOT}/source/util/ntp_servers.cpp"), re.M) +
+    ["custom"],   # clock_tab.cpp: the servers the parent typed
+    "error/": strings_of(re.sub(r"//[^\n]*", "", function_of("source/action/error_hint_logic.cpp", "hint_key"))),
+    "games/group_note/": returned_by("source/action/game_check_text.cpp", "category_key"),
+    "games/groups/": returned_by("source/action/game_check_text.cpp", "category_key"),
+    "games/issues/": issue_suffixes(),
+    "history/kinds/": array_of("source/action/history_logic.cpp", "KINDS"),
+    "history/sources/": array_of("source/action/history_logic.cpp", "SOURCES"),
+    "pin_lock/modes/": array_of("source/action/pin_lock_logic.cpp", "MODES"),
+    "pin_lock/notes/": array_of("source/action/pin_lock_logic.cpp", "MODES"),
+    "tabs/": array_of("source/util/config.hpp", "START_TABS") +
+    re.findall(r'open_label\("(\w+)"\)', read(f"{ROOT}/source/action/notices.cpp")),
+    "tools/languages/": array_of("source/util/config.hpp", "LANGUAGES"),
+    "tools/themes/": array_of("source/tab/preferences_tab.cpp", "THEMES"),
+    "tools/update_via_values/": array_of("source/action/update_flow.cpp", "METHODS"),
+}
+for prefix, values in sorted(DYNAMIC_KEYS.items()):
+    values = [v for v in values if v]
+    DYNAMIC_KEYS[prefix] = set(values)
+    if not values:
+        errors.append(f"tools/check_resources.py: no value found for keys under playguard/{prefix} (DYNAMIC_KEYS)")
+    for v in sorted(set(values)):
+        if prefix + v not in en_keys:
+            errors.append(f"the code builds playguard/{prefix}{v}, which en-US does not have")
+for prefix in sorted(used_prefixes - set(DYNAMIC_KEYS)):
+    errors.append(f"a key is built at runtime under playguard/{prefix}: declare its values in "
+                  f"tools/check_resources.py (DYNAMIC_KEYS)")
+
+
+def dynamic(k):
+    return any(k.startswith(p) and k[len(p):] in vs for p, vs in DYNAMIC_KEYS.items())
+
+
+for k in sorted(en_keys):
+    if k not in used_exact and not dynamic(k):
+        errors.append(f"unused i18n key playguard/{k} (remove it from every language)")
+
+# The kinds and sources of the history the code writes, against those the
+# History screen names.
+code_text = {p: read(p) for p in glob.glob(f"{ROOT}/source/**/*.[ch]pp", recursive=True)}
+kinds = DYNAMIC_KEYS["history/kinds/"]
+sources = DYNAMIC_KEYS["history/sources/"] | {"", "profile"}   # "profile": named apart
+for path, text in sorted(code_text.items()):
+    for k in re.findall(r'record_event\(\s*"(\w+)"', text) + \
+            re.findall(r'record_event\(\s*\w+\s*\?\s*"(\w+)"\s*:\s*"(?:\w+)"', text) + \
+            re.findall(r'record_event\(\s*\w+\s*\?\s*"\w+"\s*:\s*"(\w+)"', text):
+        if k not in kinds:
+            errors.append(f"{path}: records the history kind \"{k}\", which history_logic does not know (KINDS)")
+    for src in sorted(set(re.findall(r'(?:record_event\(\s*"\w+"\s*,|write_days\([^,()]+,|write_alarm_\w+\([^,()]+,|'
+                          r'turn_alarm_on\()\s*"(\w*)"', text))):
+        if src not in sources:
+            warnings.append(f"{path}: writes the history source \"{src}\", which history_logic does not name "
+                            f"(SOURCES, and a key under playguard/history/sources/)")
+
+
 # BRLS_BIND ids against the XML each class inflates. A class's XML is named in
 # its header (an activity's CONTENT_FROM_XML_RES("activity/x.xml"), under
 # resources/xml/) or in its .cpp (a tab's TabBase("xml/tab/x.xml"), a view's
-# inflateFromXMLRes("xml/view/x.xml"), under resources/). One class per header.
+# inflateFromXMLRes("xml/view/x.xml"), under resources/). Each one, and each
+# BRLS_BIND, belongs to the class around it: the last "class X" before it, or
+# the last "X::f(" a definition at the start of a line opens, whichever is
+# nearer; in the header or in its .cpp.
 xml_dir = f"{ROOT}/resources/xml"
 code_files = glob.glob(f"{ROOT}/source/**/*.[ch]pp", recursive=True)
 class_xml = {}      # class name -> XML path, relative to resources/xml
-class_binds = {}    # class name -> (header, [ids])
+class_binds = {}    # class name -> (file, [ids])
 loaded_xml = set()
-for path in sorted(glob.glob(f"{ROOT}/source/**/*.hpp", recursive=True)):
-    text = read(path)
-    own = text + read(path[:-len(".hpp")] + ".cpp")
-    names = re.findall(r"^\s*class\s+(\w+)\b[^;]*$", text, re.M)
-    res = re.findall(r'CONTENT_FROM_XML_RES\(\s*"([^"]+)"', own) + \
-        [p[len("xml/"):] for p in re.findall(r'(?:TabBase|inflateFromXMLRes)\(\s*"(xml/[^"]+)"', own)]
-    binds = re.findall(r'BRLS_BIND\([^;]*?,\s*\w+\s*,\s*"([^"]+)"\s*\)', text)
-    if names and res:
-        class_xml[names[0]] = res[0]
-    if names and binds:
-        class_binds[names[0]] = (path, binds)
+OWNER = re.compile(r"^\s*class\s+(\w+)\b[^;]*$|^(?:[A-Za-z_][^\n;{}]*?[\s*&])?([A-Za-z_]\w*)::~?\w+\s*\(", re.M)
+
+
+def owner_at(text, pos):
+    name = None
+    for m in OWNER.finditer(text, 0, pos):
+        name = m.group(1) or m.group(2)
+    return name
+
+
+pairs = sorted({p[:-len(".hpp")] if p.endswith(".hpp") else p[:-len(".cpp")]
+                for p in glob.glob(f"{ROOT}/source/**/*.[ch]pp", recursive=True)})
+for stem in pairs:
+    for path in (stem + ".hpp", stem + ".cpp"):
+        text = read(path)
+        for m in re.finditer(r'CONTENT_FROM_XML_RES\(\s*"([^"]+)"|(?:TabBase|inflateFromXMLRes)\(\s*"xml/([^"]+)"', text):
+            name = owner_at(text, m.start())
+            if name:
+                class_xml.setdefault(name, m.group(1) or m.group(2))
+        for m in re.finditer(r'BRLS_BIND\([^;]*?,\s*\w+\s*,\s*"([^"]+)"\s*\)', text):
+            name = owner_at(text, m.start())
+            if name:
+                class_binds.setdefault(name, (path, []))[1].append(m.group(1))
 for path in code_files:
     text = read(path)
     loaded_xml.update(re.findall(r'CONTENT_FROM_XML_RES\(\s*"([^"]+)"', text))
@@ -302,6 +441,32 @@ for k in sorted(code_written - code_read - {"schema"}):
     warnings.append(f"source/util/config.cpp writes `{k}` but never reads it back")
 for k in sorted(code_read - code_written):
     warnings.append(f"source/util/config.cpp reads `{k}` but never writes it (lost at the next save)")
+
+# CONTRIBUTING.md against the code: the simulator's PLAYGUARD_SIM_* variables
+# (read with getenv or sim_net::value) and the smoke scenarios of
+# tools/desktop_smoke.py (SCENARIO == "name"), against its list of them.
+contributing = read(f"{ROOT}/CONTRIBUTING.md")
+sim_read = set()
+for path, text in code_text.items():
+    sim_read |= set(re.findall(r'(?:getenv|sim_net::value)\(\s*"(PLAYGUARD_SIM_\w+)"', text))
+for path in glob.glob(f"{ROOT}/source/**/*.[ch]", recursive=True):
+    sim_read |= set(re.findall(r'getenv\(\s*"(PLAYGUARD_SIM_\w+)"', read(path)))
+sim_documented = set(re.findall(r"`(PLAYGUARD_SIM_\w+)", contributing))
+if not sim_read or not sim_documented:
+    errors.append("no PLAYGUARD_SIM_* variable found in the code or in CONTRIBUTING.md")
+for v in sorted(sim_read - sim_documented):
+    warnings.append(f"the code reads {v}, which CONTRIBUTING.md does not document (the simulator's table)")
+for v in sorted(sim_documented - sim_read):
+    warnings.append(f"CONTRIBUTING.md documents {v}, which the code does not read")
+scenarios = set(re.findall(r'SCENARIO\s*==\s*"(\w+)"', read(f"{ROOT}/tools/desktop_smoke.py")))
+m = re.search(r"desktop_smoke\.py\s+<out-dir>\s+\[([\w|]+)\]", contributing)
+listed_scenarios = set(m.group(1).split("|")) if m else set()
+if not scenarios or not listed_scenarios:
+    errors.append("no smoke scenario found in tools/desktop_smoke.py, or no list of them in CONTRIBUTING.md")
+for v in sorted(scenarios - listed_scenarios):
+    warnings.append(f"tools/desktop_smoke.py has the scenario {v}, which CONTRIBUTING.md does not list")
+for v in sorted(listed_scenarios - scenarios):
+    warnings.append(f"CONTRIBUTING.md lists the smoke scenario {v}, which tools/desktop_smoke.py does not have")
 
 for w in warnings:
     print("WARNING:", w)
