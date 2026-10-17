@@ -1,8 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/rescue_activity.hpp"
 
-#include "action/backup_flow.hpp"
-#include "action/history_flow.hpp"
+#include "action/console_actions.hpp"
 #include "action/pin_lock.hpp"
 #include "activity/lock_activity.hpp"
 #include "activity/main_activity.hpp"
@@ -28,30 +27,11 @@ void RescueActivity::onContentAvailable()
     if (confirmed) core_set_change_check(nullptr);
 
     reset_pin->registerClickAction([this](brls::View*) {
-        if (!confirmed || ui::refuse_read_only()) return true;
-        Result rc = pctl_set_pin();   // the system PIN screen, which sets a new one
-        brls::Logger::info("pctl_set_pin returned 0x{:08X}", (unsigned)rc);
-        if (R_SUCCEEDED(rc)) history_flow::record_event("pin", "rescue");
-        // Left with B: nothing changed, nothing to say.
-        if (rc != NXM_RC_CANCELLED)
-            ui::notify_result(rc, "playguard/security/pin_ok"_i18n, "playguard/security/pin_err"_i18n);
-        this->refresh();
+        if (confirmed) console_actions::set_pin("rescue", [this]() { this->refresh(); });
         return true;
     });
     del->registerClickAction([this](brls::View*) {
-        if (!confirmed || ui::refuse_read_only()) return true;
-        ui::confirm_danger("playguard/security/delete_body"_i18n, "playguard/security/delete_confirm"_i18n, [this]() {
-            brls::sync([this]() {
-                ui::confirm_danger("playguard/security/delete_body2"_i18n, "playguard/security/delete_confirm2"_i18n, [this]() {
-                    backup_flow::backup_then([this]() {
-                        Result rc = pctl_delete_parental_controls();
-                        if (R_SUCCEEDED(rc)) history_flow::record_event("delete", "rescue");
-                        ui::notify_result(rc, "playguard/security/deleted"_i18n, "playguard/security/delete_err"_i18n);
-                        this->refresh();
-                    });
-                });
-            });
-        });
+        if (confirmed) console_actions::delete_all("rescue", [this]() { this->refresh(); });
         return true;
     });
     cont->registerClickAction([this](brls::View*) {

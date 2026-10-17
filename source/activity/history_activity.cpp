@@ -1,11 +1,9 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/history_activity.hpp"
 
-#include <fmt/format.h>
-
+#include "action/export_flow.hpp"
 #include "action/history_flow.hpp"
 #include "ui/ui.hpp"
-#include "util/config.hpp"
 #include "util/paths.hpp"
 #include "util/table_export.hpp"
 
@@ -67,22 +65,8 @@ void HistoryActivity::export_shown()
         ui::notify("playguard/history/none_shown"_i18n);
         return;
     }
-    std::vector<std::string> labels;
-    for (int f = 0; f < 4; f++) labels.push_back(brls::getStr(fmt::format("playguard/activity/formats/{}", f)));
     const table_export::Table t = history_flow::table(this->shown);
-    ui::pick("playguard/activity/export_title"_i18n, labels, config::get().export_format, [t](int index) {
-        config::get().export_format = index;
-        ui::save_config();
-        // Encoded (a PDF, a zip for XLSX) and written off the UI thread.
-        const auto format = (table_export::Format)index;
-        const std::string failed = "playguard/activity/export_err"_i18n;
-        ui::write_later("export history", [t, format, failed]() {
-            std::string err;
-            const std::string path = table_export::save(t, format, paths::exports_dir(), "history", &err);
-            if (path.empty()) ui::error(failed + ": " + err);
-            else ui::notify(brls::getStr("playguard/activity/exported", path));
-        });
-    });
+    export_flow::choose("export history", "history", [t]() { return t; });
 }
 
 void HistoryActivity::rebuild()

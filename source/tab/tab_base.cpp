@@ -50,8 +50,7 @@ void TabBase::enable_auto_refresh(int period_ms)
     this->auto_timer.setPeriod(period_ms);
     this->auto_timer.setCallback([this]() {
         if (!app::in_focus()) return;
-        auto stack = brls::Application::getActivitiesStack();
-        if (stack.empty() || stack.back() != this->getParentActivity()) return;
+        if (!ui::on_top(this->getParentActivity())) return;
         this->refresh();
     });
     this->auto_timer.start();

@@ -13,6 +13,7 @@
 
 #include <stb_image.h>
 
+#include "action/export_flow.hpp"
 #include "action/icon_logic.hpp"
 #include "action/outside_watch.hpp"
 #include "action/play_data.hpp"
@@ -20,8 +21,7 @@
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
 #include "util/config.hpp"
-#include "util/paths.hpp"
-#include "util/table_export.hpp"
+#include "util/text.hpp"
 
 using namespace brls::literals;
 
@@ -172,8 +172,7 @@ ActivityTab::ActivityTab()
     this->period = config::get().activity_period;
     s_cache.shown = this;
     this->listener = play_data::listen([this]() {
-        const auto stack = brls::Application::getActivitiesStack();
-        if (!stack.empty() && stack.back() != this->getParentActivity()) {
+        if (!ui::on_top(this->getParentActivity())) {
             this->stale = true;
             return;
         }
@@ -183,8 +182,7 @@ ActivityTab::ActivityTab()
     ui::set_visible(account.getView(), play_data::accounts().size() > 1);
     // An account not seen before (a fresh play record is a known trick).
     new_account->setSingleLine(false);
-    std::string fresh;
-    for (const auto& l : outside_watch::new_account_lines()) fresh += (fresh.empty() ? "" : "\n") + l;
+    const std::string fresh = text::join(outside_watch::new_account_lines(), "\n");
     new_account->setText(fresh);
     ui::set_visible(new_account, !fresh.empty());
     // Applet mode (opened from the album): a few MB for icons is too much,
@@ -567,13 +565,9 @@ void ActivityTab::export_to_sd() const
         ui::notify("playguard/activity/export_not_ready"_i18n);
         return;
     }
-    std::vector<std::string> labels;
-    for (int f = 0; f < 4; f++) labels.push_back(brls::getStr(fmt::format("playguard/activity/formats/{}", f)));
     const int p = this->period;
     const std::string who = account_label(chosen_account());
-    ui::pick("playguard/activity/export_title"_i18n, labels, config::get().export_format, [data, p, who](int index) {
-        config::get().export_format = index;
-        ui::save_config();
+    export_flow::choose("export", "activity", [data, p, who]() {
         const PlayStats& s = *data;
         activity_summary::ExportText text;
         text.title    = "PlayGuard — " + "playguard/tabs/activity"_i18n;
@@ -593,16 +587,7 @@ void ActivityTab::export_to_sd() const
         };
         text.name = [](const GameStat& g) { return game_name(g); };
         text.time = [](uint64_t posix) { return ui::time_text(posix); };
-        const table_export::Table t = activity_summary::export_table(s, p, text);
-        // Encoded (a PDF, a zip for XLSX) and written off the UI thread.
-        const auto format = (table_export::Format)index;
-        const std::string failed = "playguard/activity/export_err"_i18n;
-        ui::write_later("export", [t, format, failed]() {
-            std::string err;
-            const std::string path = table_export::save(t, format, paths::exports_dir(), "activity", &err);
-            if (path.empty()) ui::error(failed + ": " + err);
-            else ui::notify(brls::getStr("playguard/activity/exported", path));
-        });
+        return activity_summary::export_table(s, p, text);
     });
 }
 

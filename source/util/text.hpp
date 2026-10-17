@@ -114,4 +114,16 @@ inline std::string url_encode(const std::string& s)
     return out;
 }
 
+// The parts one after the other, `sep` between two of them: {"a", "b"} with
+// "\n" -> "a\nb"; none -> "".
+inline std::string join(const std::vector<std::string>& parts, const std::string& sep)
+{
+    std::string out;
+    for (size_t i = 0; i < parts.size(); i++) {
+        if (i) out += sep;
+        out += parts[i];
+    }
+    return out;
+}
+
 }   // namespace text

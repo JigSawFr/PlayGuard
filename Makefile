@@ -189,6 +189,8 @@ activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summar
 format_text_SRC   := source/ui/format_text.cpp tests/format_text/test.cpp
 format_text_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DPLAYGUARD_HOST_I18N
 game_check_text_SRC   := source/action/game_check_text.cpp tests/game_check_text/test.cpp
+game_check_text_CSRC   := source/core/gamecheck_rules.c
+game_check_text_CFLAGS := -std=gnu11 -Isource/core
 pt_log_SRC   := source/util/paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp
 session_log_SRC   := source/util/paths.cpp source/util/log_files.cpp source/util/session_log.cpp source/util/crash_report.cpp tests/session_log/test.cpp
 # A C source a C++ suite links (clang++ refuses to build a .c as C++).

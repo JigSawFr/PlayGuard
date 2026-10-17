@@ -1,7 +1,10 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/game_check_text.hpp"
 
+#include <algorithm>
 #include <cstdio>
+#include <cstring>
+#include <strings.h>
 
 namespace game_check_text
 {
@@ -79,6 +82,107 @@ std::string console_code(Result rc)
     char buf[16];
     std::snprintf(buf, sizeof(buf), "%04u-%04u", 2000u + (unsigned)(rc & 0x1FF), (unsigned)((rc >> 9) & 0x1FFF));
     return buf;
+}
+
+std::string game_name(const GameFacts& g, const std::function<std::string(const std::string& id)>& unnamed)
+{
+    return g.name[0] ? std::string(g.name) : unnamed(id_text(g.app_id));
+}
+
+Sorted sort_broken(const std::vector<GameFacts>& games, u32 hos, const Words& w)
+{
+    Sorted out;
+    for (const GameFacts& g : games) {
+        const GameIssue issue = gamecheck_classify(&g, hos);
+        if (issue == GC_OK) continue;
+        out.all.push_back({ g, issue });
+        out.by_group[gamecheck_category(&g, issue, hos)].push_back({ g, issue });
+    }
+    // In a section, the games with the same problem together, by name.
+    for (auto& group : out.by_group)
+        std::stable_sort(group.begin(), group.end(), [&w](const Broken& a, const Broken& b) {
+            if (a.issue != b.issue) return a.issue < b.issue;
+            return strcasecmp(game_name(a.game, w.unnamed).c_str(), game_name(b.game, w.unnamed).c_str()) < 0;
+        });
+    return out;
+}
+
+std::map<u64, std::string> line_names(const std::vector<Broken>& broken, const Words& w)
+{
+    std::map<std::string, std::vector<const GameFacts*>> same_name;
+    for (const Broken& b : broken) same_name[game_name(b.game, w.unnamed)].push_back(&b.game);
+    std::map<u64, std::string> out;
+    for (const Broken& b : broken) {
+        const GameFacts& g = b.game;
+        const std::string name = game_name(g, w.unnamed);
+        const auto& twins = same_name[name];
+        if (twins.size() < 2 || !g.name[0]) {
+            out[g.app_id] = name;
+            continue;
+        }
+        bool versions_differ = g.display_version[0] != '\0';
+        for (const GameFacts* t : twins)
+            if (t->app_id != g.app_id && !std::strcmp(t->display_version, g.display_version)) versions_differ = false;
+        out[g.app_id] = name + " · " + (versions_differ ? std::string(g.display_version) : id_text(g.app_id));
+    }
+    return out;
+}
+
+std::set<u64> still_selected(const std::set<u64>& selected, const std::vector<Broken>& broken)
+{
+    std::set<u64> still;
+    for (const Broken& b : broken)
+        if (selected.count(b.game.app_id)) still.insert(b.game.app_id);
+    return still;
+}
+
+std::string age_text(int64_t checked_at, int64_t now, const Words& w)
+{
+    if (checked_at <= 0) return "";
+    const int64_t s = now - checked_at;
+    if (s < 60) return w.checked_now;
+    if (s < 3600) return w.checked_min((int)(s / 60));
+    return w.checked_h((int)(s / 3600));
+}
+
+std::string result_line(const std::string& found, bool none, const std::string& age,
+                        const std::vector<std::string>& notes)
+{
+    std::string text = found;
+    if (!age.empty()) text += (text.empty() ? "" : none ? " " : " · ") + age;
+    for (const std::string& n : notes)
+        if (!n.empty()) text += (text.empty() ? "" : "\n") + n;
+    return text;
+}
+
+std::string list_text(const std::vector<GameFacts>& games, u32 hos, const Words& w)
+{
+    std::string text = w.list_title + "\n\n";
+    for (const GameFacts& g : games) {
+        const GameIssue issue = gamecheck_classify(&g, hos);
+        text += id_text(g.app_id) + "  " + game_name(g, w.unnamed) +
+                (g.display_version[0] ? " · " + w.version(g.display_version) : "") + " · " + w.problem(g, issue) + "\n";
+    }
+    return text;
+}
+
+std::string name_lines(const std::vector<GameFacts>& games, const Words& w)
+{
+    std::string names;
+    for (size_t i = 0; i < games.size() && i < NAMES_SHOWN; i++) names += "\n" + game_name(games[i], w.unnamed);
+    if (games.size() > NAMES_SHOWN) names += "\n…";
+    return names;
+}
+
+Tally tally(const std::vector<Verified>& results)
+{
+    Tally t;
+    for (const Verified& v : results) {
+        if (R_FAILED(v.rc)) t.failed++;
+        else if (v.corrupt) t.corrupt.push_back(v.game);
+        else t.intact++;
+    }
+    return t;
 }
 
 }   // namespace game_check_text

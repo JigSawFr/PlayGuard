@@ -15,6 +15,8 @@
 #include "util/patches.hpp"
 #include "util/pctl_ops_c.hpp"
 
+class MainActivity;
+
 namespace ui
 {
 
@@ -36,6 +38,8 @@ NVGcolor color_text();      // plain label text colour
 NVGcolor color_accent();    // the theme's highlight (the sidebar's active item)
 // A label of `size` in `color` that wraps (not single-line).
 brls::Label* text_label(const std::string& text, float size, NVGcolor color);
+// The same, centred, wrapping at the width of the box it is in (a dialog's).
+brls::Label* centered_label(const std::string& text, float size, NVGcolor color);
 
 // "error 0x00001234" followed by a human explanation when one is known.
 // PlayGuard's own results (read-only, invalid value …) are just the sentence:
@@ -141,10 +145,21 @@ brls::Dialog* dialog(const std::string& text);
 
 // B closes `dialog` and runs `on_cancel` (borealis' own B only closes it).
 void on_cancel(brls::Dialog* dialog, std::function<void()> on_cancel);
+// A Cancel button and B, both closing `dialog` and running `cancel`: a
+// dialog that waits for something (a check, an answer from the network).
+void add_cancel(brls::Dialog* dialog, std::function<void()> cancel);
 
 // Dropdown list; `on_pick(index)` runs after the list has closed.
 void pick(const std::string& title, const std::vector<std::string>& values, int selected,
           std::function<void(int)> on_pick);
+// A list of things to do: each line's label, and what it runs once the
+// list has closed. The first line is selected; none, no list.
+struct Choice
+{
+    std::string           label;
+    std::function<void()> run;
+};
+void pick_actions(const std::string& title, const std::vector<Choice>& choices);
 
 // System keyboard prompts (callback only on confirm). prompt_minutes accepts
 // minutes ("90") or hours:minutes ("1:30"), up to 24:00.
@@ -177,6 +192,7 @@ private:
 };
 
 // System / compatibility strings shared by the dashboard and the About section.
+std::string hos_text(u32 version);                        // "23.0.1" (MAKEHOSVERSION), "?" for 0
 std::string fw_text(const SysInfo& info);                 // "23.0.1 · Atmosphère 1.12.0"
 std::string compat_text(const SysInfo& info, NVGcolor* color = nullptr);
 
@@ -240,6 +256,11 @@ void keep_focus(brls::Activity* activity, brls::View* fallback = nullptr);
 // open over it. Unlike the top of borealis' stack, true again as soon as a
 // dialog over it starts closing.
 bool has_focus(brls::Activity* activity);
+// Whether `activity` is the top of borealis' stack: no screen or dialog
+// pushed over it, one closing included.
+bool on_top(brls::Activity* activity);
+// The main screen, wherever it is in the stack; nullptr before it opens.
+MainActivity* main_activity();
 
 // Sidebar positions of the main screen tabs, in the order of
 // resources/xml/activity/main.xml (separators count as positions).

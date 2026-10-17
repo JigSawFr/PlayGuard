@@ -148,8 +148,7 @@ std::shared_ptr<State> make_dialog()
         state->cancel = true;
         state->open = false;   // the dialog closes itself
     };
-    state->dialog->addButton("hints/cancel"_i18n, cancel);
-    ui::on_cancel(state->dialog, cancel);
+    ui::add_cancel(state->dialog, cancel);
     return state;
 }
 

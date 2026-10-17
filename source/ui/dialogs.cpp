@@ -30,6 +30,12 @@ void on_cancel(brls::Dialog* dialog, std::function<void()> on_cancel)
         false, false, brls::SOUND_BACK);
 }
 
+void add_cancel(brls::Dialog* dialog, std::function<void()> cancel)
+{
+    dialog->addButton("hints/cancel"_i18n, cancel);
+    on_cancel(dialog, cancel);
+}
+
 // A dialog's text has to fit: borealis' Label stops wrapping when the height
 // it is offered is below what its wrapped text needs, and draws the whole
 // text on one line across the screen instead (label.cpp, labelMeasureFunc).
@@ -200,18 +206,12 @@ void qr_dialog(const std::string& body, const std::string& url)
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setPadding(20, 32, 10, 32);
-    brls::Label* label = text_label(body, 20, color_text());
-    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    label->setAlignSelf(brls::AlignSelf::STRETCH);
-    box->addView(label);
+    box->addView(centered_label(body, 20, color_text()));
     auto* qr = new QrView(url, 240);
     qr->setMarginTop(12);
     qr->setMarginBottom(10);
     box->addView(qr);
-    brls::Label* link = text_label(text::short_url(url), 18, color_note());
-    link->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    link->setAlignSelf(brls::AlignSelf::STRETCH);
-    box->addView(link);
+    box->addView(centered_label(text::short_url(url), 18, color_note()));
     auto* dialog = new brls::Dialog(box);
     dialog->addButton("hints/ok"_i18n, []() {});
     dialog->open();
@@ -232,6 +232,15 @@ void pick(const std::string& title, const std::vector<std::string>& values, int 
             }
         });
     brls::Application::pushActivity(new brls::Activity(dropdown));
+}
+
+void pick_actions(const std::string& title, const std::vector<Choice>& choices)
+{
+    std::vector<std::string> labels;
+    for (const Choice& c : choices) labels.push_back(c.label);
+    pick(title, labels, 0, [choices](int i) {
+        if (i >= 0 && i < (int)choices.size()) choices[i].run();
+    });
 }
 
 void prompt_minutes(const std::string& header, uint16_t current, std::function<void(uint16_t)> on_value)

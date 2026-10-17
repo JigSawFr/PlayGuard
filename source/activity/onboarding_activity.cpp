@@ -2,7 +2,7 @@
 #include "activity/onboarding_activity.hpp"
 
 #include "action/clock_flow.hpp"
-#include "action/history_flow.hpp"
+#include "action/console_actions.hpp"
 #include "action/fw_gate.hpp"
 #include "action/pin_lock.hpp"
 #include "action/pt_flow.hpp"
@@ -38,15 +38,7 @@ void OnboardingActivity::onContentAvailable()
         ui::save_config();
     });
     unlink->registerClickAction([this](brls::View*) {
-        if (ui::refuse_read_only()) return true;
-        // The block comparison needs the link: last chance to help decode the settings.
-        const std::string body = "playguard/pairing/unlink_body"_i18n + "\n\n" + "playguard/pairing/decode_note"_i18n;
-        ui::confirm_danger(body, "playguard/pairing/unlink_confirm"_i18n, [this]() {
-            Result rc = pctl_delete_pairing();
-            if (R_SUCCEEDED(rc)) history_flow::record_event("unlink", "first_steps");
-            ui::notify_result(rc, "playguard/pairing/unlinked"_i18n, "playguard/pairing/unlink_err"_i18n);
-            this->refresh();
-        });
+        console_actions::unlink("first_steps", [this]() { this->refresh(); });
         return true;
     });
     alarm->setDetailText("playguard/dashboard/alarm_off"_i18n);   // the title says why
@@ -64,15 +56,7 @@ void OnboardingActivity::onContentAvailable()
     });
 
     pin->registerClickAction([this](brls::View*) {
-        if (ui::refuse_read_only()) return true;
-        // Blocks while the system PIN screen is shown.
-        Result rc = pctl_set_pin();
-        brls::Logger::info("pctl_set_pin returned 0x{:08X}", (unsigned)rc);
-        if (R_SUCCEEDED(rc)) history_flow::record_event("pin", "first_steps");
-        // Left with B: nothing changed, nothing to say.
-        if (rc != NXM_RC_CANCELLED)
-            ui::notify_result(rc, "playguard/security/pin_ok"_i18n, "playguard/security/pin_err"_i18n);
-        this->refresh();
+        console_actions::set_pin("first_steps", [this]() { this->refresh(); });
         return true;
     });
     limit->registerClickAction([this](brls::View*) {

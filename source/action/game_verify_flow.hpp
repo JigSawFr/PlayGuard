@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 
+#include "action/game_check_text.hpp"
 #include "core/gamecheck.h"
 
 namespace game_verify_flow
@@ -38,13 +39,7 @@ struct State
 };
 
 // What the check of one game of a batch gave.
-struct Verified
-{
-    GameFacts game;
-    Result rc = 0;
-    bool corrupt = false;
-    Result found = 0;
-};
+using Verified = game_check_text::Verified;
 
 // The dialog, built but not open yet (main thread).
 std::shared_ptr<State> make_dialog();

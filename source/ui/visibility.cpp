@@ -2,7 +2,8 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
-#include "action/history_flow.hpp"
+#include "action/console_actions.hpp"
+#include "activity/main_activity.hpp"
 #include "app.hpp"
 
 #include <algorithm>
@@ -105,6 +106,19 @@ bool has_focus(brls::Activity* activity)
     return focus && focus->getParentActivity() == activity;
 }
 
+bool on_top(brls::Activity* activity)
+{
+    const auto& stack = brls::Application::getActivitiesStack();
+    return !stack.empty() && stack.back() == activity;
+}
+
+MainActivity* main_activity()
+{
+    for (brls::Activity* a : brls::Application::getActivitiesStack())
+        if (auto* main = dynamic_cast<MainActivity*>(a)) return main;
+    return nullptr;
+}
+
 void go_to_tab(brls::View* from, int position)
 {
     brls::TabFrame* frame = nullptr;
@@ -134,14 +148,7 @@ void init_unlock_banner(brls::DetailCell* cell, std::function<void()> after)
     cell->setCornerRadius(6);
     cell->setDetailText("playguard/security/banner_action"_i18n);
     cell->registerClickAction([after](brls::View*) {
-        if (app::read_only()) {
-            notify(rc_text(NXM_RC_READ_ONLY));
-            return true;
-        }
-        Result rc = pctl_relock();
-        if (R_SUCCEEDED(rc)) history_flow::record_event("relock");
-        notify_result(rc, "playguard/toast/relocked"_i18n, "playguard/toast/relock_err"_i18n);
-        if (after) after();
+        console_actions::relock("", after);
         return true;
     });
 }

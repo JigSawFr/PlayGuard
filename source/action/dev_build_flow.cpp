@@ -87,11 +87,7 @@ class DownloadProgress
   public:
     explicit DownloadProgress(uint64_t size) : size(size)
     {
-        this->label = new brls::Label();
-        this->label->setFontSize(22);
-        this->label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-        this->label->setSingleLine(false);
-        this->label->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the box's width (ui::dialog)
+        this->label = ui::centered_label("", 22, ui::color_text());
         this->label->setMarginBottom(24);
         auto* track = new brls::Box(brls::Axis::ROW);
         track->setWidth(BAR_WIDTH);

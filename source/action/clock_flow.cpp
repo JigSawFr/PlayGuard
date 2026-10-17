@@ -120,12 +120,7 @@ brls::Dialog* progress_dialog(const std::string& text, std::shared_ptr<std::atom
     spinner->setWidth(60);
     spinner->setHeight(60);
     spinner->setMarginBottom(24);
-    auto* label = new brls::Label();
-    label->setText(text);
-    label->setFontSize(22);
-    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    label->setSingleLine(false);
-    label->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the box's width (ui::dialog)
+    brls::Label* label = ui::centered_label(text, 22, ui::color_text());
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setJustifyContent(brls::JustifyContent::CENTER);
@@ -133,8 +128,7 @@ brls::Dialog* progress_dialog(const std::string& text, std::shared_ptr<std::atom
     box->addView(spinner);
     box->addView(label);
     auto* dialog = new brls::Dialog(box);
-    dialog->addButton("hints/cancel"_i18n, [cancelled]() { *cancelled = true; });
-    ui::on_cancel(dialog, [cancelled]() { *cancelled = true; });
+    ui::add_cancel(dialog, [cancelled]() { *cancelled = true; });
     return dialog;
 }
 }   // namespace

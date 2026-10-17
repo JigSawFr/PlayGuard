@@ -4,6 +4,7 @@
 #include "action/dev_build_flow.hpp"
 #include "app.hpp"
 #include "core/sysinfo.h"
+#include "ui/ui.hpp"
 #include "util/changelog.hpp"
 #include "view/release_notes.hpp"
 
@@ -46,8 +47,7 @@ void UpdateActivity::onContentAvailable()
     if (this->offer.result.verdict == update::Verdict::UpdateNoSupport) {
         SysInfo si;
         sysinfo_get(&si);
-        char fw[16];
-        sysinfo_version_string(si.hos_version, fw, sizeof(fw));
+        const std::string fw = ui::hos_text(si.hos_version);
         text += "\n" + brls::getStr("playguard/update/available_no_fw", fw);
     }
     body->setText(text);

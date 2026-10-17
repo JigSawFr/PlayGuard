@@ -39,8 +39,7 @@ void note()
     SysInfo si;
     sysinfo_get(&si);
     const std::string ams = si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : "";
-    char fw[16];
-    sysinfo_version_string(si.hos_version, fw, sizeof(fw));
+    const std::string fw = ui::hos_text(si.hos_version);
     const std::string hekate = installed_hekate();
     entry("sys_atmosphere", latest.atmosphere, ams, brls::getStr("playguard/notices/sys_atmosphere", latest.atmosphere),
           brls::getStr("playguard/notices/sys_atmosphere_detail", ams));

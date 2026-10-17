@@ -84,6 +84,15 @@ std::string logs_section()
 
 void set_firmware_choice(std::string (*summary)()) { s_firmware_choice = summary; }
 
+const char* storage_name(SysStorage storage)
+{
+    switch (storage) {
+        case SysStorage_EmuMMC: return "emuMMC";
+        case SysStorage_SysMMC: return "sysMMC";
+        default:                return nullptr;
+    }
+}
+
 std::string current_report()
 {
     SysInfo si;
@@ -108,7 +117,7 @@ std::string current_report()
 
     // The serial number itself is never written: reports are attached to
     // public bug reports.
-    const SysStorage storage = sysinfo_storage(&si);
+    const char* storage = storage_name(sysinfo_storage(&si));
     std::string out = fmt::format(
         "=== PlayGuard diagnostic ===\n"
         "app version : {}{}\n"
@@ -132,7 +141,7 @@ std::string current_report()
         si.is_atmosphere ? "detected" : "not detected",
         si.applet_mode ? "applet (album)" : "application",
         fmt::format("{} (data: nand/{})",
-                    storage == SysStorage_EmuMMC ? "emuMMC" : storage == SysStorage_SysMMC ? "sysMMC" : "unknown",
+                    storage ? storage : "unknown",
                     paths::nand_key()),
         !si.blank_valid ? "unknown" : (si.blank ? "blanked" : "not blanked"),
         patch_line,

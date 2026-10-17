@@ -16,6 +16,7 @@
 #include "app.hpp"
 #include "tab/clock_tab.hpp"
 #include "ui/ui.hpp"
+#include "util/text.hpp"
 
 using namespace brls::literals;
 
@@ -144,9 +145,7 @@ bool DashboardTab::show_outside(const PtState& pt)
     outside_watch::observe(pt);
     outside_watch::observe_accounts();   // once per run; flagged in the Activity tab
     const std::vector<std::string> outside_lines = outside_watch::notice_lines();
-    std::string outside_joined;
-    for (const auto& l : outside_lines) outside_joined += (outside_joined.empty() ? "" : "\n") + l;
-    outside_text->setText(outside_joined);
+    outside_text->setText(text::join(outside_lines, "\n"));
     return !outside_lines.empty();
 }
 

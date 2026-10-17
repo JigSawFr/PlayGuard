@@ -2,8 +2,8 @@
 // and the loose reader, the writer, where to cut), emoji.hpp (what counts,
 // the icon a text opens on, dropping them), text.hpp (the trims, ASCII lower
 // case and capital, a prefix and a suffix, lines, a URL without its scheme,
-// percent-encoding) and json_util.hpp (fields read by type, arrays and
-// objects, a text that is no JSON).
+// percent-encoding, parts joined) and json_util.hpp (fields read by type,
+// arrays and objects, a text that is no JSON).
 #include "check.h"
 #include <cstdio>
 #include <string>
@@ -98,6 +98,8 @@ static void test_text()
     CHECK(text::url_encode("\xC3\xA8") == "%C3%A8" && text::url_encode(std::string("\0\x7F", 2)) == "%00%7F");
     CHECK(text::short_url("https://ko-fi.com/jigsawfr") == "ko-fi.com/jigsawfr");
     CHECK(text::short_url("github.com/x") == "github.com/x" && text::short_url("").empty());
+    CHECK(text::join({ "a", "b", "c" }, "\n") == "a\nb\nc" && text::join({ "a" }, " · ") == "a");
+    CHECK(text::join({}, "\n").empty() && text::join({ "", "b", "" }, ",") == ",b,");   // empty parts kept
 }
 
 static void test_json()

@@ -214,8 +214,7 @@ backup::Snapshot capture()
 
     SysInfo si;
     sysinfo_get(&si);
-    char fw[16];
-    sysinfo_version_string(si.hos_version, fw, sizeof(fw));
+    const std::string fw = ui::hos_text(si.hos_version);
     s.firmware = fw;
 
     s.created = ui::now_stamp();

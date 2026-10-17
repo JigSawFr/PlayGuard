@@ -2,6 +2,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
+#include "util/diagnostics.hpp"
 #include "util/paths.hpp"
 
 #include <fmt/format.h>
@@ -11,10 +12,16 @@ using namespace brls::literals;
 namespace ui
 {
 
+std::string hos_text(u32 version)
+{
+    char buf[16];
+    sysinfo_version_string(version, buf, sizeof(buf));
+    return buf;
+}
+
 std::string fw_text(const SysInfo& info)
 {
-    char fw[16];
-    sysinfo_version_string(info.hos_version, fw, sizeof(fw));
+    const std::string fw = hos_text(info.hos_version);
     std::string ams = info.ams_valid ? fmt::format("{}.{}.{}", info.ams_major, info.ams_minor, info.ams_micro)
                                      : std::string("?");
     return fmt::format("{} · Atmosphère {}", fw, ams);
@@ -22,8 +29,7 @@ std::string fw_text(const SysInfo& info)
 
 std::string compat_text(const SysInfo& info, NVGcolor* color)
 {
-    char tested[16];
-    sysinfo_version_string(PCTL_FW_TESTED_MAX, tested, sizeof(tested));
+    const std::string tested = hos_text(PCTL_FW_TESTED_MAX);
     switch (sysinfo_compat(&info)) {
         case SysCompat_Ok:
             if (color) *color = color_ok();
@@ -51,11 +57,8 @@ std::string storage_text(const SysInfo& info)
 
 std::string storage_short(const SysInfo& info)
 {
-    switch (sysinfo_storage(&info)) {
-        case SysStorage_EmuMMC: return "emuMMC";
-        case SysStorage_SysMMC: return "sysMMC";
-        default:                return "—";
-    }
+    const char* name = diagnostic::storage_name(sysinfo_storage(&info));
+    return name ? name : "—";
 }
 
 std::string other_storage_note(const SysInfo& info)
@@ -105,8 +108,7 @@ const patches::Report& patch_report()
     if (!read) {
         SysInfo si;
         sysinfo_get(&si);
-        char fw[16];
-        sysinfo_version_string(si.hos_version, fw, sizeof(fw));
+        const std::string fw = hos_text(si.hos_version);
         report = patches::detect(paths::sd_root(), fw, si.emummc);
         read = true;
     }

@@ -44,28 +44,16 @@ struct Kind
     std::string what = "diagnostic report";   // the gist's description, in English
 };
 
-brls::Label* centered_label(const std::string& text, int font_size, NVGcolor color)
-{
-    auto* label = new brls::Label();
-    label->setFontSize(font_size);
-    label->setTextColor(color);
-    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    label->setSingleLine(false);
-    label->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the box's width (ui::dialog)
-    label->setText(text);
-    return label;
-}
-
 brls::Box* qr_card(const std::string& title, const std::string& url, const std::string& caption)
 {
     auto* card = new brls::Box(brls::Axis::COLUMN);
     card->setAlignItems(brls::AlignItems::CENTER);
     card->setWidth(300);
     card->addView(new QrView(url, 220));
-    brls::Label* name = centered_label(title, 20, ui::color_text());
+    brls::Label* name = ui::centered_label(title, 20, ui::color_text());
     name->setMarginTop(6);
     card->addView(name);
-    card->addView(centered_label(caption, 18, ui::color_note()));
+    card->addView(ui::centered_label(caption, 18, ui::color_note()));
     return card;
 }
 
@@ -84,7 +72,7 @@ void show_link(const log_upload::Result& r, bool report)
         auto* box = new brls::Box(brls::Axis::COLUMN);
         box->setAlignItems(brls::AlignItems::CENTER);
         box->setPadding(24, 24, 12, 24);
-        box->addView(centered_label(brls::getStr("playguard/upload/done_list", text::short_url(r.url)), 20,
+        box->addView(ui::centered_label(brls::getStr("playguard/upload/done_list", text::short_url(r.url)), 20,
                                     ui::color_text()));
         brls::Box* card = qr_card("playguard/upload/qr_list"_i18n, r.url, text::short_url(r.url));
         card->setMarginTop(14);
@@ -96,8 +84,7 @@ void show_link(const log_upload::Result& r, bool report)
     }
     SysInfo si;
     sysinfo_get(&si);
-    char fw[16];
-    sysinfo_version_string(si.hos_version, fw, sizeof(fw));
+    const std::string fw = ui::hos_text(si.hos_version);
     log_upload::IssueFields fields;
     fields.version = app::version();
     fields.firmware = fw;
@@ -105,7 +92,7 @@ void show_link(const log_upload::Result& r, bool report)
     // The menu it was started from is not known: the reporter adds it.
     fields.launcher = si.applet_mode ? "from the Album (applet)" : "over a game (title override)";
     const SysStorage storage = sysinfo_storage(&si);
-    if (storage != SysStorage_Unknown) fields.storage = storage == SysStorage_EmuMMC ? "emuMMC" : "sysMMC";
+    if (const char* name = diagnostic::storage_name(storage)) fields.storage = name;
     const std::string issue = log_upload::issue_url(app::repo_url(), r.url, fields);
 
     std::string text = brls::getStr("playguard/upload/done", text::short_url(r.url));
@@ -113,7 +100,7 @@ void show_link(const log_upload::Result& r, bool report)
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setPadding(16, 24, 12, 24);   // the two cards and their captions at 18 px fit above OK
-    box->addView(centered_label(text, 20, ui::color_text()));
+    box->addView(ui::centered_label(text, 20, ui::color_text()));
     auto* row = new brls::Box(brls::Axis::ROW);
     row->setJustifyContent(brls::JustifyContent::SPACE_EVENLY);
     row->setMarginTop(8);

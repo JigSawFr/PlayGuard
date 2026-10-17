@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/security_tab.hpp"
 
-#include "action/backup_flow.hpp"
+#include "action/console_actions.hpp"
 #include "action/console_lock.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
@@ -61,20 +61,10 @@ SecurityTab::SecurityTab()
         return true;
     });
     pr_unlink->registerClickAction([this](brls::View*) {
-        if (ui::refuse_read_only()) return true;
-        // The block comparison needs the link: last chance to help decode the settings.
-        const std::string body = "playguard/pairing/unlink_body"_i18n + "\n\n" + "playguard/pairing/decode_note"_i18n;
-        ui::confirm_danger(body, "playguard/pairing/unlink_confirm"_i18n, [this]() {
-            Result rc = pctl_delete_pairing();
-            if (R_SUCCEEDED(rc)) history_flow::record_event("unlink");
-            else history_flow::record_failure("unlink", rc);
-            ui::notify_result(rc, "playguard/pairing/unlinked"_i18n, "playguard/pairing/unlink_err"_i18n);
-            this->refresh();
-        });
+        console_actions::unlink("", [this]() { this->refresh(); });
         return true;
     });
     set_pin->registerClickAction([this](brls::View*) {
-        if (ui::refuse_read_only()) return true;
         this->change_pin();
         return true;
     });
@@ -110,12 +100,7 @@ SecurityTab::SecurityTab()
         return true;
     });
     relock->registerClickAction([this](brls::View*) {
-        if (ui::refuse_read_only()) return true;
-        Result rc = pctl_relock();
-        if (R_SUCCEEDED(rc)) history_flow::record_event("relock");
-        else history_flow::record_failure("relock", rc);
-        ui::notify_result(rc, "playguard/toast/relocked"_i18n, "playguard/toast/relock_err"_i18n);
-        this->refresh();
+        console_actions::relock("", [this]() { this->refresh(); });
         return true;
     });
     // After a change PlayGuard made with a temporary unlock: on at once, or offered.
@@ -125,36 +110,14 @@ SecurityTab::SecurityTab()
         ui::save_config();
     });
     del->registerClickAction([this](brls::View*) {
-        if (ui::refuse_read_only()) return true;
-        ui::confirm_danger("playguard/security/delete_body"_i18n, "playguard/security/delete_confirm"_i18n, [this]() {
-            // Second, separate confirmation with a different button: this cannot be undone.
-            brls::sync([this]() {
-                ui::confirm_danger("playguard/security/delete_body2"_i18n, "playguard/security/delete_confirm2"_i18n, [this]() {
-                    // A backup first, so the settings can come back (History › Restore a backup).
-                    backup_flow::backup_then([this]() {
-                        Result rc = pctl_delete_parental_controls();
-                        if (R_SUCCEEDED(rc)) history_flow::record_event("delete");
-                        else history_flow::record_failure("delete", rc);
-                        ui::notify_result(rc, "playguard/security/deleted"_i18n, "playguard/security/delete_err"_i18n);
-                        this->refresh();
-                    });
-                });
-            });
-        });
+        console_actions::delete_all("", [this]() { this->refresh(); });
         return true;
     });
 }
 
 void SecurityTab::change_pin()
 {
-    // Blocks while the system PIN applet is shown; the session is released first.
-    Result rc = pctl_set_pin();
-    brls::Logger::info("pctl_set_pin returned 0x{:08X}", (unsigned)rc);
-    // Not recorded when it fails. Left with B: nothing changed, nothing to say.
-    if (R_SUCCEEDED(rc)) history_flow::record_event("pin");
-    if (rc != NXM_RC_CANCELLED)
-        ui::notify_result(rc, "playguard/security/pin_ok"_i18n, "playguard/security/pin_err"_i18n);
-    this->refresh();
+    console_actions::set_pin("", [this]() { this->refresh(); });
 }
 
 void SecurityTab::refresh()

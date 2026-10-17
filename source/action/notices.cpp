@@ -10,7 +10,7 @@
 
 #include "action/backup_flow.hpp"
 #include "action/clock_flow.hpp"
-#include "action/history_flow.hpp"
+#include "action/console_actions.hpp"
 #include "action/outside_watch.hpp"
 #include "action/pin_lock.hpp"
 #include "action/play_data.hpp"
@@ -156,6 +156,17 @@ void toggle(bool on, const std::string& id, Level level, const std::string& titl
     if (on) set(id, level, title, detail, action_label, action, print);
     else clear(id);
 }
+
+// The same for an entry the parent may ignore: when what it is about was
+// read (`known`) and is fine, it is fixed (resolved(): its "ignored" goes,
+// so it is told again if it comes back); otherwise toggle().
+void toggle_or_resolve(bool known, bool on, const std::string& id, Level level, const std::string& title,
+                       const std::string& detail, const std::string& action_label = "",
+                       std::function<void()> action = nullptr, const std::string& print = "")
+{
+    if (known && !on) resolved(id);
+    else toggle(on, id, level, title, detail, action_label, action, print);
+}
 }   // namespace
 
 void set(const std::string& id, Level level, const std::string& title, const std::string& detail,
@@ -298,14 +309,13 @@ std::chrono::steady_clock::time_point s_status_at;
 bool                                  s_status_known = false;
 }   // namespace
 
-void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, Result accuracy_rc, bool accurate)
+namespace
 {
-    const bool writable = !app::read_only();
-    s_status = s;
-    s_status_at = std::chrono::steady_clock::now();
-    s_status_known = true;
-    ui::SameTime same;   // the date and the weekday of every entry below, read once
-
+// What leaves the parental controls open: no PIN, a temporary unlock,
+// PlayGuard itself without its PIN, the phone app linked, the console lock
+// left on.
+void note_security(const PctlStatus& s, bool writable)
+{
     // Nothing set up yet: no PIN, so nothing is protected.
     toggle(s.pin_length_ok && s.pin_length == 0, "pin_missing", Level::Action, "playguard/notices/pin_missing"_i18n,
            "playguard/notices/pin_missing_detail"_i18n, "playguard/onboarding/open"_i18n,
@@ -315,13 +325,35 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
     const bool unlocked = s.temp_unlocked_ok && s.temp_unlocked;
     toggle(unlocked, "unlocked", Level::Action, "playguard/notices/unlocked"_i18n, "playguard/notices/unlocked_detail"_i18n,
            writable ? "playguard/security/banner_action"_i18n : "", []() {
-               const Result rc = pctl_relock();
-               if (R_SUCCEEDED(rc)) history_flow::record_event("relock");
-               ui::notify_result(rc, "playguard/toast/relocked"_i18n, "playguard/toast/relock_err"_i18n);
-               sweep();
-               TabBase::refresh_shown();
+               console_actions::relock("", []() {
+                   sweep();
+                   TabBase::refresh_shown();
+               });
            });
 
+    // A linked phone app overwrites what is set here at its next sync.
+    toggle(s.pairing_active_ok && s.pairing_active, "pairing", Level::Info, "playguard/notices/pairing"_i18n,
+           "playguard/notices/pairing_detail"_i18n, open_label("security"), []() { open_tab(ui::tab::security); });
+
+    const auto& cfg = config::get();
+    const bool has_pin = s.pin_length_ok && s.pin_length > 0;
+
+    // A PIN on the console, but PlayGuard itself opens and changes without it.
+    toggle_or_resolve(s.pin_length_ok, has_pin && cfg.pin_lock == "off", "pin_lock_off", Level::Action,
+                      "playguard/notices/pin_lock_off"_i18n, "playguard/notices/pin_lock_off_detail"_i18n,
+                      "playguard/notices/pin_lock_choose"_i18n, []() { pin_lock::choose([]() { sweep(); }); });
+
+    // The console lock on for a week or more.
+    toggle(notice_logic::console_lock_long(cfg.console_lock, cfg.console_lock_since, ui::today_date()),
+           "console_lock_long", Level::Info, brls::getStr("playguard/notices/console_lock_long", cfg.console_lock_since),
+           "playguard/notices/console_lock_long_detail"_i18n, open_label("security"),
+           []() { open_tab(ui::tab::security); });
+}
+
+// What the play timer counts on: its limits back to usual, its alarm, the
+// changes seen outside PlayGuard, the network clock.
+void note_timer(const PtState& pt, Result accuracy_rc, bool accurate, bool writable)
+{
     // Extra time added on an earlier day still raises a limit: to do, the
     // child has more than usual. Or "No more play today" still lowers one
     // (the preference to put it back with no question off): only said, the
@@ -340,19 +372,16 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
     // The "Time's up" alarm off: nothing says when time is up. Read as on
     // (or the timer off): fixed, told again if it goes off again.
     const bool alarm_known = pt.fw_supported && pt.enabled_valid && (!pt.enabled || pt.alarm_disabled_valid);
-    if (alarm_known && !pt_flow::alarm_off(pt)) resolved("alarm_off");
-    else toggle(pt_flow::alarm_off(pt), "alarm_off", Level::Action, "playguard/notices/alarm_off"_i18n,
-                "playguard/notices/alarm_off_detail"_i18n, writable ? "playguard/notices/alarm_on"_i18n : open_label("play_timer"),
-                [writable]() {
-                    if (writable) pt_flow::turn_alarm_on("notices", []() { sweep(); });
-                    else open_tab(ui::tab::play_timer);
-                });
+    toggle_or_resolve(alarm_known, pt_flow::alarm_off(pt), "alarm_off", Level::Action, "playguard/notices/alarm_off"_i18n,
+                      "playguard/notices/alarm_off_detail"_i18n,
+                      writable ? "playguard/notices/alarm_on"_i18n : open_label("play_timer"), [writable]() {
+                          if (writable) pt_flow::turn_alarm_on("notices", []() { sweep(); });
+                          else open_tab(ui::tab::play_timer);
+                      });
 
     // Changes seen outside PlayGuard today (the Overview says them too).
     const std::vector<std::string> outside = outside_watch::notice_lines();
-    std::string outside_text;
-    for (const auto& l : outside) outside_text += (outside_text.empty() ? "" : "\n") + l;
-    toggle(!outside.empty(), "outside", Level::Action, "playguard/notices/outside"_i18n, outside_text,
+    toggle(!outside.empty(), "outside", Level::Action, "playguard/notices/outside"_i18n, text::join(outside, "\n"),
            "playguard/dashboard/outside_dismiss"_i18n, []() {
                outside_watch::dismiss();
                clear("outside");
@@ -367,19 +396,12 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
                    if (writable) clock_flow::guided([]() { sweep(); });
                    else ClockTab::open_screen();
                });
+}
 
-    // A user account never seen before (flagged in the Activity tab too).
-    const std::vector<std::string> accounts = outside_watch::new_account_lines();
-    std::string accounts_text;
-    for (const auto& l : accounts) accounts_text += (accounts_text.empty() ? "" : "\n") + l;
-    toggle(!accounts.empty(), "new_account", Level::Info, "playguard/notices/new_account"_i18n, accounts_text,
-           open_label("activity"), []() { open_tab(ui::tab::activity); });
-
-    // A linked phone app overwrites what is set here at its next sync.
-    toggle(s.pairing_active_ok && s.pairing_active, "pairing", Level::Info, "playguard/notices/pairing"_i18n,
-           "playguard/notices/pairing_detail"_i18n, open_label("security"), []() { open_tab(ui::tab::security); });
-
-    // The system: what the Overview shows in amber.
+// The system: what the Overview shows in amber, and the other system's
+// parental controls.
+void note_system(const SysInfo& si)
+{
     toggle(sysinfo_compat(&si) != SysCompat_Ok, "compat", Level::Info, "playguard/notices/compat"_i18n,
            ui::fw_text(si) + " · " + ui::compat_text(si), open_label("console"), []() { open_tab(ui::tab::console); });
     toggle(ui::serial_warning(si), "serial", Level::Info, "playguard/notices/serial"_i18n,
@@ -390,26 +412,15 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
            ui::patches_text(report) + "\n" + ui::patches_note(report, si, &warn), open_label("console"),
            []() { open_tab(ui::tab::console); });
 
-    const auto& cfg = config::get();
-    const bool has_pin = s.pin_length_ok && s.pin_length > 0;
-
-    // A PIN on the console, but PlayGuard itself opens and changes without it.
-    if (s.pin_length_ok && !(has_pin && cfg.pin_lock == "off")) resolved("pin_lock_off");
-    else toggle(has_pin && cfg.pin_lock == "off", "pin_lock_off", Level::Action, "playguard/notices/pin_lock_off"_i18n,
-                "playguard/notices/pin_lock_off_detail"_i18n, "playguard/notices/pin_lock_choose"_i18n,
-                []() { pin_lock::choose([]() { sweep(); }); });
-
     // The other system (sysMMC / emuMMC) has parental controls of its own.
     const std::string other = ui::other_storage_note(si);
     toggle(!other.empty(), "other_system", Level::Info, "playguard/notices/other_system"_i18n, other, open_label("console"),
            []() { open_tab(ui::tab::console); });
+}
 
-    // The console lock on for a week or more.
-    toggle(notice_logic::console_lock_long(cfg.console_lock, cfg.console_lock_since, ui::today_date()),
-           "console_lock_long", Level::Info, brls::getStr("playguard/notices/console_lock_long", cfg.console_lock_since),
-           "playguard/notices/console_lock_long_detail"_i18n, open_label("security"),
-           []() { open_tab(ui::tab::security); });
-
+// The SD card: the settings backups, its free space.
+void note_storage()
+{
     // No settings backup yet, or none for 30 days (listed once, then after
     // each backup saved: backup_flow).
     const std::vector<std::string>& backups = backup_flow::names();
@@ -424,37 +435,64 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
     // The SD card nearly full: PlayGuard's own writes start failing.
     uint64_t free_b = 0;
     const bool free_known = sd_free_kept(&free_b);   // before the text below, which shows it
-    if (free_known && !notice_logic::sd_space_low(free_known, free_b)) resolved("sd_space");
-    else toggle(notice_logic::sd_space_low(free_known, free_b), "sd_space", Level::Action, "playguard/notices/sd_space"_i18n,
-                brls::getStr("playguard/notices/sd_space_detail", (int)(free_b >> 20)));
+    toggle_or_resolve(free_known, notice_logic::sd_space_low(free_known, free_b), "sd_space", Level::Action,
+                      "playguard/notices/sd_space"_i18n,
+                      brls::getStr("playguard/notices/sd_space_detail", (int)(free_b >> 20)));
+}
+
+// Who plays and how much: an account never seen before, the week's summary,
+// the limit passed while the console only warns.
+void note_play_data(const PtState& pt)
+{
+    // A user account never seen before (flagged in the Activity tab too).
+    const std::vector<std::string> accounts = outside_watch::new_account_lines();
+    toggle(!accounts.empty(), "new_account", Level::Info, "playguard/notices/new_account"_i18n, text::join(accounts, "\n"),
+           open_label("activity"), []() { open_tab(ui::tab::activity); });
 
     // The play data (read in the background for the Overview).
     const auto stats = play_data::latest("");
-    if (stats && stats->windows_ok) {
-        // The week, once every 7 days until read.
-        const activity_summary::Summary week = activity_summary::summarize(*stats, activity_summary::Week);
-        if (notice_logic::week_due(week.known, week.total_s, cfg.summary_seen, ui::today_date())) {
-            std::string detail = brls::getStr("playguard/notices/week_detail", ui::fmt_play_time(week.per_day_s));
-            if (week.top >= 0 && stats->games[week.top].name[0])
-                detail += "\n" + brls::getStr("playguard/notices/week_top", std::string(stats->games[week.top].name),
-                                              ui::fmt_play_time(week.top_s));
-            set("week", Level::Info, brls::getStr("playguard/notices/week", ui::fmt_play_time(week.total_s)), detail,
-                open_label("activity"), []() {
-                    config::get().summary_seen = ui::today_date();
-                    ui::save_config();
-                    clear("week");
-                    open_tab(ui::tab::activity);
-                });
-        } else {
-            clear("week");
-        }
-        // The console only warning at the limit, and the limit passed on
-        // several of the last 7 days.
-        const int over = notice_logic::over_limit_days(pt, *stats);
-        toggle(over >= 2, "over_limit", Level::Info, brls::getStr("playguard/notices/over_limit", over),
-               "playguard/notices/over_limit_detail"_i18n, open_label("play_timer"),
-               []() { open_tab(ui::tab::play_timer); });
+    if (!stats || !stats->windows_ok) return;
+    // The week, once every 7 days until read.
+    const auto& cfg = config::get();
+    const activity_summary::Summary week = activity_summary::summarize(*stats, activity_summary::Week);
+    if (notice_logic::week_due(week.known, week.total_s, cfg.summary_seen, ui::today_date())) {
+        std::string detail = brls::getStr("playguard/notices/week_detail", ui::fmt_play_time(week.per_day_s));
+        if (week.top >= 0 && stats->games[week.top].name[0])
+            detail += "\n" + brls::getStr("playguard/notices/week_top", std::string(stats->games[week.top].name),
+                                          ui::fmt_play_time(week.top_s));
+        set("week", Level::Info, brls::getStr("playguard/notices/week", ui::fmt_play_time(week.total_s)), detail,
+            open_label("activity"), []() {
+                config::get().summary_seen = ui::today_date();
+                ui::save_config();
+                clear("week");
+                open_tab(ui::tab::activity);
+            });
+    } else {
+        clear("week");
     }
+    // The console only warning at the limit, and the limit passed on
+    // several of the last 7 days.
+    const int over = notice_logic::over_limit_days(pt, *stats);
+    toggle(over >= 2, "over_limit", Level::Info, brls::getStr("playguard/notices/over_limit", over),
+           "playguard/notices/over_limit_detail"_i18n, open_label("play_timer"),
+           []() { open_tab(ui::tab::play_timer); });
+}
+}   // namespace
+
+void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, Result accuracy_rc, bool accurate)
+{
+    const bool writable = !app::read_only();
+    s_status = s;
+    s_status_at = std::chrono::steady_clock::now();
+    s_status_known = true;
+    ui::SameTime same;   // the date and the weekday of every entry below, read once
+
+    // By topic; the bell lists them in its own order (notice_logic's ranks).
+    note_security(s, writable);
+    note_timer(pt, accuracy_rc, accurate, writable);
+    note_system(si);
+    note_storage();
+    note_play_data(pt);
 
     // An entry ignored 30 days ago counts again (the PIN's, set once per start, too).
     recheck_acks();
@@ -471,10 +509,9 @@ void note_pin_strength(const PctlStatus& s)
     const bool known = s.pin_length > 0 && R_SUCCEEDED(pctl_pin_weak(&weak));
     // A PIN harder to guess, or none: fixed, told again if a weak one comes back.
     // Ignored, it stays ignored for a PIN of the same length (`print`, never the PIN).
-    if ((known && !weak) || s.pin_length == 0) resolved("pin_weak");
-    else toggle(known && weak, "pin_weak", Level::Action, "playguard/notices/pin_weak"_i18n,
-                "playguard/notices/pin_weak_detail"_i18n, open_label("security"), []() { open_tab(ui::tab::security); },
-                std::to_string(s.pin_length));
+    toggle_or_resolve(known || s.pin_length == 0, known && weak, "pin_weak", Level::Action, "playguard/notices/pin_weak"_i18n,
+                      "playguard/notices/pin_weak_detail"_i18n, open_label("security"),
+                      []() { open_tab(ui::tab::security); }, std::to_string(s.pin_length));
 }
 
 void note_timer_stalled(bool stalled)
@@ -548,11 +585,7 @@ void sweep()
 
 void open_tab(int position)
 {
-    for (brls::Activity* a : brls::Application::getActivitiesStack())
-        if (auto* main = dynamic_cast<MainActivity*>(a)) {
-            main->open_tab(position);
-            return;
-        }
+    if (MainActivity* main = ui::main_activity()) main->open_tab(position);
 }
 
 }   // namespace notices

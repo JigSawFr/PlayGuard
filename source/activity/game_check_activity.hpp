@@ -20,6 +20,7 @@
 #pragma once
 
 #include <borealis.hpp>
+#include <functional>
 #include <memory>
 #include <set>
 #include <string>
@@ -79,6 +80,8 @@ class GameCheckActivity : public brls::Activity
     std::set<u64> selected;             // the games picked with Ⓨ
     brls::DetailCell* selection = nullptr;   // above the sections: what is picked, A for what to do
 
+    // A section's box, title, note, actions and list, hidden until it has a game.
+    void build_group(GameCategory category);
     void save();
     // Lists the console's entries, then checks what changed (`all`: every
     // game), and `also` (0: none) whatever its entry says.
@@ -86,7 +89,6 @@ class GameCheckActivity : public brls::Activity
     void check(std::vector<GameRecord> records, bool full);
     void status_text(const std::string& text);
     void status_text(const std::string& text, NVGcolor color);
-    std::string age_text() const;
     void show();
     brls::View* first_game() const;
     // Whether `game`, checked again, changes the list (not its status line).
@@ -95,11 +97,11 @@ class GameCheckActivity : public brls::Activity
     void choose(const GameFacts& game, u32 actions);
     void run(const GameFacts& game, u32 action, const GameContent& content);
     void remove(const GameFacts& game);
-    // `games`' list as text, saved (the JSON's path, "" and why on
-    // failure), and all of them removed after one question (the list saved
-    // first).
-    std::string list_text(const std::vector<GameFacts>& games) const;
-    std::string save_list(const std::vector<GameFacts>& games, std::string* error) const;
+    // `games`' list saved off the UI thread, then `done` on it with the
+    // JSON's path ("" and why on failure); and all of them removed after one
+    // question (the list saved first).
+    void save_list(const std::vector<GameFacts>& games,
+                   std::function<void(const std::string& path, const std::string& error)> done) const;
     void remove_games(std::vector<GameFacts> games);
     void remove_next(std::vector<GameFacts> games, size_t at, u32 removed, std::string path);
     // Ⓨ on a game; the actions on the games picked.

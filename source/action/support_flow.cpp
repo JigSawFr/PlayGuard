@@ -59,8 +59,7 @@ void at_start(brls::Activity* main)
                      []() { brls::Application::pushActivity(new WhatsNewActivity()); });
 
     brls::delay(START_DELAY_MS, [main]() {
-        auto stack = brls::Application::getActivitiesStack();
-        if (stack.empty() || stack.back() != main) return;   // something else first: next start
+        if (!ui::on_top(main)) return;   // something else first: next start
 
         auto& cfg = config::get();
         const support::State state{ cfg.support_reminder, cfg.support_reminded, cfg.seen_version };

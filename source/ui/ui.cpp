@@ -203,16 +203,14 @@ void note_unlocked(bool valid, bool unlocked)
     // Next frame: at start-up the first tab is read before the main screen is
     // on the activity stack.
     brls::sync([]() {
-        for (brls::Activity* activity : brls::Application::getActivitiesStack())
-            if (auto* main = dynamic_cast<MainActivity*>(activity)) main->update_title();
+        if (MainActivity* main = main_activity()) main->update_title();
     });
 }
 
 void on_mode_changed()
 {
     pt_log_flow::apply();   // the recorder only runs in developer mode
-    for (brls::Activity* activity : brls::Application::getActivitiesStack())
-        if (auto* main = dynamic_cast<MainActivity*>(activity)) main->update_title();
+    if (MainActivity* main = main_activity()) main->update_title();
     TabBase::refresh_shown();
 }
 
