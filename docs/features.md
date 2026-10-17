@@ -59,7 +59,7 @@ A bell in the header, left of the version, gathers what needs the parent; Ⓨ op
 - **Profiles** saved on the SD card: apply, edit, rename or delete one; save the current limits or make a new one. Any name, in any script (*École*, *周末*, *Выходные* …) — a name without Latin letters gets a file name of its own, and two names that would map to the same file are caught.
 - Every confirmation draws the week as it will be, with the days that change in amber.
 - **Bedtime alarm**: the alarm time (16:00 to 23:45, or off) and when play is allowed again (05:00 to 09:00), the same every day. Its place in the play-timer settings, worked out from the companion app's settings, is verified on a console (22.0.0); PlayGuard still changes it only once the console reports what PlayGuard reads there, checks the console's answer after the change and puts the previous settings back if it differs.
-- **Extra time:** the amounts offered (+15/+30/+1 h, +10/+20/+30 min …) and putting the usual limit back by itself after *No more play today* (extra time always comes back by itself).
+- **Extra time:** the amounts offered (+15/+30/+1 h, +10/+20/+30 min …) and putting the usual limit back without asking after *No more play today* (extra time always comes back without asking). Either is done the next time PlayGuard is opened, from the next day on: a console it is not opened on keeps the limit of that day.
 - **Advanced ›**, a screen of its own: the switch for the debug-class actions and, while it is on, the "time's up" alarm on/off and pause / resume the countdown. The same switch lets a backup or the history put the alarm back.
 - `0` minutes means *no play that day*; *Remove the play-time limit* turns the timer off.
 
