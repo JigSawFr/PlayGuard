@@ -46,8 +46,6 @@ size_t count();
 // The History screen's wording: one line, and the details for its dialog.
 std::string title(const history::Entry& e);
 std::string details(const history::Entry& e);
-// When it was made: "Today, 21:29", "Yesterday, 01:25", else the stamp.
-std::string when_text(const history::Entry& e);
 // Its time of day, "21:29" (the stamp when it has none).
 std::string time_of(const history::Entry& e);
 // A day's group title on the History screen: "Today", "Yesterday", else

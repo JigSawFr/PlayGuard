@@ -10,6 +10,10 @@
 #include "nacp.h"
 #include "playstats.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // One raw log entry as a playlog event; false for entries that do not matter.
 bool playstats_convert(const PdmPlayEvent *p, PlayLogEvent *e);
 
@@ -79,3 +83,7 @@ bool icon_store_open(IconStore *s, const char *dir, u8 lang, u64 max_bytes, u32 
 // The JPEG kept for `id`, malloc'ed (the caller frees it), or NULL.
 unsigned char *icon_store_get(const IconStore *s, u64 id, size_t *size);
 void icon_store_put(IconStore *s, u64 id, const unsigned char *jpeg, size_t size);
+
+#ifdef __cplusplus
+}
+#endif

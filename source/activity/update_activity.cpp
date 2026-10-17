@@ -3,7 +3,7 @@
 
 #include "action/dev_build_flow.hpp"
 #include "app.hpp"
-#include "ui/ui.hpp"
+#include "core/sysinfo.h"
 #include "util/changelog.hpp"
 #include "view/release_notes.hpp"
 

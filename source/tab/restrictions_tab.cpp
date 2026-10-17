@@ -12,11 +12,6 @@ namespace
 {
 const uint8_t AGES[] = { 0, 3, 4, 6, 7, 8, 10, 12, 13, 14, 15, 16, 17, 18 };
 
-std::string age_text(uint8_t age)
-{
-    return age == 0 ? "playguard/restrictions/age_none"_i18n : brls::getStr("playguard/restrictions/age_value", (int)age);
-}
-
 }   // namespace
 
 RestrictionsTab::RestrictionsTab()
@@ -26,10 +21,7 @@ RestrictionsTab::RestrictionsTab()
     note->setSingleLine(false);
 
     level->registerClickAction([this](brls::View*) {
-        if (app::read_only()) {
-            ui::notify(ui::rc_text(NXM_RC_READ_ONLY));
-            return true;
-        }
+        if (ui::refuse_read_only()) return true;
         std::vector<std::string> names;
         for (uint32_t i = 0; i <= 4; i++) names.push_back(ui::level_name(i));
         ui::pick("playguard/restrictions/level"_i18n, names, this->st.safety_level_ok ? (int)this->st.safety_level : 0,
@@ -60,14 +52,11 @@ RestrictionsTab::RestrictionsTab()
 
     age->registerClickAction([this](brls::View*) {
         if (!this->st.settings_ok) return true;
-        if (app::read_only()) {
-            ui::notify(ui::rc_text(NXM_RC_READ_ONLY));
-            return true;
-        }
+        if (ui::refuse_read_only()) return true;
         std::vector<std::string> names;
         int selected = 0;
         for (size_t i = 0; i < sizeof(AGES); i++) {
-            names.push_back(age_text(AGES[i]));
+            names.push_back(ui::age_text(AGES[i]));
             if (AGES[i] == this->st.settings.rating_age) selected = (int)i;
         }
         ui::pick("playguard/restrictions/age"_i18n, names, selected, [this](int index) {
@@ -76,7 +65,7 @@ RestrictionsTab::RestrictionsTab()
             s.rating_age = AGES[index];
             // 0 is no limit: any other change from it is stricter.
             const bool looser = before != 0 && (s.rating_age == 0 || s.rating_age > before);
-            this->write_custom(s, looser ? brls::getStr("playguard/restrictions/confirm_age", age_text(s.rating_age)) : "");
+            this->write_custom(s, looser ? brls::getStr("playguard/restrictions/confirm_age", ui::age_text(s.rating_age)) : "");
         });
         return true;
     });
@@ -92,10 +81,7 @@ RestrictionsTab::RestrictionsTab()
         this->write_custom(s, on ? "" : "playguard/restrictions/confirm_comm_off"_i18n);
     });
     org->registerClickAction([this](brls::View*) {
-        if (app::read_only()) {
-            ui::notify(ui::rc_text(NXM_RC_READ_ONLY));
-            return true;
-        }
+        if (ui::refuse_read_only()) return true;
         std::vector<std::string> names;
         for (uint32_t i = 0; i < 13; i++) names.push_back(pctl_rating_org_name(i));
         ui::pick("playguard/restrictions/org"_i18n, names, this->st.rating_org_ok && this->st.rating_org < 13 ? (int)this->st.rating_org : 0,
@@ -133,10 +119,9 @@ RestrictionsTab::RestrictionsTab()
 std::string RestrictionsTab::settings_text(const PctlCustomSettings& s) const
 {
     const std::string org = this->st.rating_org_ok ? std::string(" (") + pctl_rating_org_name(this->st.rating_org) + ")" : "";
-    auto yes_no = [](bool v) { return v ? "playguard/common/yes"_i18n : "playguard/common/no"_i18n; };
-    return brls::getStr("playguard/common/line", "playguard/restrictions/age"_i18n, age_text(s.rating_age) + org) + "\n" +
-           brls::getStr("playguard/common/line", "playguard/restrictions/sns"_i18n, yes_no(s.sns_post_restriction)) + "\n" +
-           brls::getStr("playguard/common/line", "playguard/restrictions/comm"_i18n, yes_no(s.free_communication_restriction));
+    return brls::getStr("playguard/common/line", "playguard/restrictions/age"_i18n, ui::age_text(s.rating_age) + org) + "\n" +
+           brls::getStr("playguard/common/line", "playguard/restrictions/sns"_i18n, ui::yes_no(s.sns_post_restriction)) + "\n" +
+           brls::getStr("playguard/common/line", "playguard/restrictions/comm"_i18n, ui::yes_no(s.free_communication_restriction));
 }
 
 void RestrictionsTab::write_custom(const PctlCustomSettings& s, const std::string& loosens)
@@ -172,7 +157,6 @@ void RestrictionsTab::refresh()
     PctlCustomSettings preset = {};
     const bool preset_ok = !custom && this->st.safety_level_ok && this->st.safety_level != PctlSafetyLevel_Custom &&
                            R_SUCCEEDED(pctl_get_level_settings(this->st.safety_level, &preset));
-    auto yes_no = [](bool v) { return v ? "playguard/common/yes"_i18n : "playguard/common/no"_i18n; };
     custom_header->setTitle(custom ? "playguard/restrictions/section_custom"_i18n
                                    : "playguard/restrictions/section_level_settings"_i18n);
     ui::set_visible(custom_header.getView(), custom || preset_ok);
@@ -180,16 +164,16 @@ void RestrictionsTab::refresh()
     ui::set_visible(preset_sns.getView(), preset_ok);
     ui::set_visible(preset_comm.getView(), preset_ok);
     if (preset_ok) {
-        preset_age->setDetailText(age_text(preset.rating_age));
-        preset_sns->setDetailText(yes_no(preset.sns_post_restriction));
-        preset_comm->setDetailText(yes_no(preset.free_communication_restriction));
+        preset_age->setDetailText(ui::age_text(preset.rating_age));
+        preset_sns->setDetailText(ui::yes_no(preset.sns_post_restriction));
+        preset_comm->setDetailText(ui::yes_no(preset.free_communication_restriction));
     }
     ui::set_visible(age.getView(), custom);
     ui::set_visible(sns.getView(), custom);
     ui::set_visible(comm.getView(), custom);
     ui::set_visible(custom_note.getView(), !custom);
     if (this->st.settings_ok) {
-        age->setDetailText(age_text(this->st.settings.rating_age));
+        age->setDetailText(ui::age_text(this->st.settings.rating_age));
         sns->setOn(this->st.settings.sns_post_restriction, false);
         comm->setOn(this->st.settings.free_communication_restriction, false);
     }

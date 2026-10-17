@@ -1215,8 +1215,6 @@
         "unknown_note": "Recorded by a newer version of PlayGuard: update PlayGuard to see it in full.",
         "days_changed": "Days changed:",
         "day_change": "{}: {} → {}",
-        "today_at": "Today, {}",
-        "yesterday_at": "Yesterday, {}",
         "kinds": {
             "limits": "Play-time limits",
             "level": "Restriction level",

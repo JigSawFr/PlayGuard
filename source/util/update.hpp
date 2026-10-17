@@ -57,8 +57,8 @@ struct Snooze
     std::string until;     // "YYYY-MM-DD": offered again from that day
 };
 
-// "2026-10-12" + 7 -> "2026-10-19" (months and leap years included);
-// empty when `date` is malformed.
+// date::add_days. Kept while action/notices.cpp still calls it from here:
+// new code calls date::add_days.
 std::string add_days(const std::string& date, int days);
 // Whether start-up offers `latest`: a version newer than `running`, not
 // postponed. A postponement is for its version only (a newer release is

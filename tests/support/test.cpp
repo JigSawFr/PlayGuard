@@ -10,15 +10,6 @@ using support::State;
 
 int main()
 {
-    int days = 0;
-    CHECK(support::days_between("2026-10-09", "2026-11-08", &days) && days == 30);
-    CHECK(support::days_between("2026-12-31", "2027-01-01", &days) && days == 1);
-    CHECK(support::days_between("2028-02-28", "2028-03-01", &days) && days == 2);   // leap year
-    CHECK(support::days_between("2026-10-09", "2026-10-01", &days) && days == -8);
-    CHECK(!support::days_between("", "2026-10-09", &days));
-    CHECK(!support::days_between("2026-13-01", "2026-10-09", &days));
-    CHECK(!support::days_between("2026/10/09", "2026-10-09", &days));
-
     // A new install: nothing shown, the version is remembered, the month starts.
     auto d = support::decide(State{}, "1.1.0", "2026-10-09", true);
     CHECK(d.show == Show::Nothing && d.next.seen_version == "1.1.0" && d.next.reminded == "2026-10-09");

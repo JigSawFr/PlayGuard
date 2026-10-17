@@ -10,7 +10,6 @@
 #include "action/backup_logic.hpp"
 #include "action/history_flow.hpp"
 #include "action/pt_flow.hpp"
-#include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -23,16 +22,6 @@ namespace backup_flow
 
 namespace
 {
-std::string yes_no(bool value)
-{
-    return value ? "playguard/common/yes"_i18n : "playguard/common/no"_i18n;
-}
-
-std::string age_text(uint8_t age)
-{
-    return age == 0 ? "playguard/restrictions/age_none"_i18n : brls::getStr("playguard/restrictions/age_value", (int)age);
-}
-
 // "2 h every day", or "Mon 2 h · Tue 2 h · …" (Monday first).
 std::string days_text(const std::array<uint16_t, 7>& days)
 {
@@ -74,12 +63,12 @@ std::string summary(const backup::Snapshot& s, backup::RestoreTally* tally)
         compare("playguard/restrictions/section_level"_i18n, st.safety_level_ok,
                 ui::level_name(st.safety_level), ui::level_name(s.level));
     if (s.level_ok && s.level == PctlSafetyLevel_Custom && s.custom_ok) {
-        compare("playguard/restrictions/age"_i18n, st.settings_ok, age_text(st.settings.rating_age), age_text(s.rating_age));
-        compare("playguard/restrictions/sns"_i18n, st.settings_ok, yes_no(st.settings.sns_post_restriction), yes_no(s.sns_restricted));
-        compare("playguard/restrictions/comm"_i18n, st.settings_ok, yes_no(st.settings.free_communication_restriction),
-                yes_no(s.comm_restricted));
+        compare("playguard/restrictions/age"_i18n, st.settings_ok, ui::age_text(st.settings.rating_age), ui::age_text(s.rating_age));
+        compare("playguard/restrictions/sns"_i18n, st.settings_ok, ui::yes_no(st.settings.sns_post_restriction), ui::yes_no(s.sns_restricted));
+        compare("playguard/restrictions/comm"_i18n, st.settings_ok, ui::yes_no(st.settings.free_communication_restriction),
+                ui::yes_no(s.comm_restricted));
     }
-    if (s.vr_ok) compare("playguard/restrictions/vr"_i18n, st.stereo_vision_ok, yes_no(st.stereo_vision_restricted), yes_no(s.vr_restricted));
+    if (s.vr_ok) compare("playguard/restrictions/vr"_i18n, st.stereo_vision_ok, ui::yes_no(st.stereo_vision_restricted), ui::yes_no(s.vr_restricted));
     if (s.rating_org_ok)
         compare("playguard/restrictions/org"_i18n, st.rating_org_ok, pctl_rating_org_name(st.rating_org),
                 pctl_rating_org_name(s.rating_org));
@@ -182,7 +171,7 @@ void restore(const backup::Snapshot& s, std::function<void()> refresh)
     // The alarm is a play-timer write as well.
     const bool timer = s.days_ok || (s.alarm_ok && config::get().advanced);
     if (timer) pt_flow::confirm_write(body, "playguard/backup/restore_confirm"_i18n, run, s.days_ok ? s.days.data() : nullptr, true);
-    else if (app::read_only()) ui::notify(ui::rc_text(NXM_RC_READ_ONLY));
+    else if (ui::refuse_read_only()) return;
     else ui::confirm(pt_flow::with_link_note(body), "playguard/backup/restore_confirm"_i18n, [run]() { run(false); }, nullptr, true);
 }
 

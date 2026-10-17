@@ -183,7 +183,6 @@ void sysinfo_get(SysInfo *out)
     out->serial_valid = true;
     snprintf(out->serial, sizeof(out->serial), "%s", out->blank ? SYSINFO_BLANK_SERIAL : "XAW10000000001");
 }
-bool sysinfo_fw_at_least(u32 v) { sim_init(); return S.hos >= v; }
 void sysinfo_version_string(u32 v, char *buf, size_t size)
 {
     if (!v) { snprintf(buf, size, "?"); return; }
@@ -440,7 +439,6 @@ Result pctl_play_timer_set_alarm_only(bool alarm_only)
     return pt_set_suspends(S.block, !alarm_only) ? 0 : NXM_RC_INVALID_ARGUMENT;
 }
 
-Result pctl_play_timer_set_uniform(u16 m) { u16 d[7]; for (int i = 0; i < 7; i++) d[i] = m; return pctl_play_timer_set_days(d); }
 Result pctl_play_timer_clear(void)        { u16 d[7]; for (int i = 0; i < 7; i++) d[i] = PT_DAY_NOLIMIT; return pctl_play_timer_set_days(d); }
 
 void pctl_dump(char *buf, size_t n)

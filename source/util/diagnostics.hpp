@@ -14,6 +14,11 @@ namespace diagnostic
 // PIN.
 std::string current_report();
 
+// What the header's firmware_choice says (action/fw_gate's summary(): "none",
+// "read_only", "probe (remembered)" …), given by that layer at start-up so
+// this one does not reach up to it. "unknown" until then.
+void set_firmware_choice(std::string (*summary)());
+
 // Saves as logs/reports/report_<timestamp>.txt (util/log_files.hpp). Returns the
 // saved path, or an empty string (and *error set) on failure.
 std::string save(const std::string& report, std::string* error = nullptr);

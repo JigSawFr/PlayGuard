@@ -13,9 +13,7 @@
 #include <cstdint>
 #include <string>
 
-extern "C" {
 #include "core/pctl_ops.h"
-}
 
 namespace pt_log
 {

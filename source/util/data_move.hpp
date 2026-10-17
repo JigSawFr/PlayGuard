@@ -4,6 +4,11 @@
 // history with it. Run once at start-up, before config::load(); then the
 // files of the logs/ layout before its subfolders are moved into them
 // (log_files::migrate). Plain C++ (no borealis): host-tested (tests/log_files).
+//
+// A shim for the 1.0.x layout, which 1.1.0 (October 2026) left: run() and
+// to_nand() can go in the first release after April 2027, when an install
+// still on 1.0.x is unlikely (it would then start without its old data,
+// still in /switch/playguard, where a release note can point to it).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 

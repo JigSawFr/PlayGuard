@@ -1,8 +1,9 @@
 // table_export — writes a small table (the Activity tab's figures) to a file
-// as CSV, JSON, XLSX or PDF, with nothing beyond nlohmann/json: the XLSX is an
-// uncompressed zip of the minimal SpreadsheetML parts, the PDF a plain text
-// layout in the standard Helvetica font (Latin-1 text; other characters print
-// as "?"). Plain C++ (no UI, no libnx) so the host tests can run it.
+// as CSV, JSON, XLSX or PDF, with nothing beyond nlohmann/json and zlib's
+// CRC-32: the XLSX is an uncompressed zip of the minimal SpreadsheetML parts,
+// the PDF a plain text layout in the standard Helvetica font (Latin-1 text;
+// other characters print as "?"). Plain C++ (no UI, no libnx) so the host
+// tests can run it.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 

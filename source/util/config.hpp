@@ -139,15 +139,14 @@ constexpr size_t MAX_CUSTOM_SERVERS = 10;
 // or parsed (not one wrong field: those keep their default alone) is put
 // aside as config.json.bad (state.json the same: state.json.bad, with the
 // same notice) (paths::put_aside: the previous .bad is kept as
-// .bad.1), and the defaults are used. When it cannot be moved, save() refuses
+// .bad.1), and the defaults are used. When it cannot be moved, snapshot() refuses
 // to write for the rest of the session rather than replace it.
 enum class Loaded { Missing, Read, PutAside, Stuck };
 
 Config& get();
 void    load();          // never throws; missing / broken file => defaults, per field
 Loaded  loaded();
-bool    save();          // atomic write; false on failure (or Loaded::Stuck)
-// save() in two steps, so the write can be left to another thread: the
+// A save in two steps, so the write can be left to another thread: the
 // files' content now (false: Loaded::Stuck, nothing may be written), then
 // writing them. write() touches no config state: callable from any thread.
 // `shared` is config.json; `system` is this system's state.json

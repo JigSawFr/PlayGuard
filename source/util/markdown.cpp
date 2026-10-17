@@ -7,32 +7,16 @@
 #include <cstdio>
 #include <cstring>
 
+#include "util/emoji.hpp"
 #include "util/safe_text.hpp"
+#include "util/text.hpp"
+#include "util/utf8.hpp"
 
 namespace markdown
 {
 
 namespace
 {
-std::string trim(const std::string& s)
-{
-    size_t a = 0, b = s.size();
-    while (a < b && (s[a] == ' ' || s[a] == '\t')) a++;
-    while (b > a && (s[b - 1] == ' ' || s[b - 1] == '\t')) b--;
-    return s.substr(a, b - a);
-}
-
-bool starts_with(const std::string& s, const char* p)
-{
-    return s.compare(0, std::strlen(p), p) == 0;
-}
-
-std::string lower(std::string s)
-{
-    for (char& c : s) c = (char)std::tolower((unsigned char)c);
-    return s;
-}
-
 size_t indent_of(const std::string& line)
 {
     size_t n = 0;
@@ -42,59 +26,6 @@ size_t indent_of(const std::string& line)
         else break;
     }
     return n;
-}
-
-// The UTF-8 sequence at s[i] (already valid: safe_text::clean ran first).
-size_t decode(const std::string& s, size_t i, uint32_t* cp)
-{
-    const unsigned char c = (unsigned char)s[i];
-    const size_t n = c < 0x80 ? 1 : (c >> 5) == 0x6 ? 2 : (c >> 4) == 0xE ? 3 : 4;
-    *cp = n == 1 ? c : n == 2 ? c & 0x1F : n == 3 ? c & 0x0F : c & 0x07;
-    for (size_t k = 1; k < n && i + k < s.size(); k++) *cp = (*cp << 6) | ((unsigned char)s[i + k] & 0x3F);
-    return n;
-}
-
-void encode(uint32_t cp, std::string* out)
-{
-    if (cp < 0x80) *out += (char)cp;
-    else if (cp < 0x800) *out += (char)(0xC0 | (cp >> 6)), *out += (char)(0x80 | (cp & 0x3F));
-    else if (cp < 0x10000)
-        *out += (char)(0xE0 | (cp >> 12)), *out += (char)(0x80 | ((cp >> 6) & 0x3F)), *out += (char)(0x80 | (cp & 0x3F));
-    else
-        *out += (char)(0xF0 | (cp >> 18)), *out += (char)(0x80 | ((cp >> 12) & 0x3F)),
-            *out += (char)(0x80 | ((cp >> 6) & 0x3F)), *out += (char)(0x80 | (cp & 0x3F));
-}
-
-// Pictographs and what goes with them: the console's font draws none.
-bool is_emoji(uint32_t cp)
-{
-    return cp >= 0x1F000 || (cp >= 0x2600 && cp <= 0x27BF) || (cp >= 0x2B00 && cp <= 0x2BFF) ||
-           (cp >= 0x231A && cp <= 0x231B) || (cp >= 0x23E9 && cp <= 0x23FA) || cp == 0x200D ||
-           (cp >= 0xFE00 && cp <= 0xFE0F) || cp == 0x20E3;
-}
-
-// The emoji `s` opens on, in hex; empty when it opens on anything else.
-std::string leading_icon(const std::string& s)
-{
-    if (s.empty()) return "";
-    uint32_t cp = 0;
-    decode(s, 0, &cp);
-    if (!is_emoji(cp) || cp == 0x200D || (cp >= 0xFE00 && cp <= 0xFE0F) || cp == 0x20E3) return "";
-    char hex[9];
-    std::snprintf(hex, sizeof hex, "%x", (unsigned)cp);
-    return hex;
-}
-
-std::string drop_emoji(const std::string& s)
-{
-    std::string out;
-    for (size_t i = 0; i < s.size();) {
-        uint32_t cp = 0;
-        const size_t n = decode(s, i, &cp);
-        if (!is_emoji(cp)) out.append(s, i, n);
-        i += n;
-    }
-    return out;
 }
 
 // "&amp;" and the like at s[i]: its text and length; 0 when it is not one.
@@ -122,7 +53,7 @@ size_t entity(const std::string& s, size_t i, std::string* out)
         }
         if (cp == 0 || cp > 0x10FFFF || (cp >= 0xD800 && cp <= 0xDFFF)) return 0;
         std::string text;
-        encode(cp, &text);
+        utf8::append(text, cp);
         // What a reference spells out is cleaned like the rest (no control
         // or bidi character sneaks in that way).
         *out = safe_text::clean(text, 8, false);
@@ -178,7 +109,7 @@ std::string inline_pass(const std::string& s, int depth)
             while (i + ticks < s.size() && s[i + ticks] == '`') ticks++;
             const size_t end = s.find(std::string(ticks, '`'), i + ticks);
             if (end != std::string::npos) {
-                out += trim(s.substr(i + ticks, end - i - ticks));
+                out += text::trim_blank(s.substr(i + ticks, end - i - ticks));
                 i = end + ticks;
                 continue;
             }
@@ -211,8 +142,8 @@ std::string inline_pass(const std::string& s, int depth)
             const unsigned char first = end != std::string::npos && end > i + 1 ? (unsigned char)s[i + 1] : 0;
             if (std::isalpha(first) || first == '/' || first == '!') {
                 const std::string inside = s.substr(i + 1, end - i - 1);
-                if (starts_with(inside, "http://") || starts_with(inside, "https://")) out += inside;
-                else if (starts_with(lower(inside), "br")) out += '\n';
+                if (text::starts_with(inside, "http://") || text::starts_with(inside, "https://")) out += inside;
+                else if (text::starts_with(text::lower_ascii(inside), "br")) out += '\n';
                 i = end + 1;
                 continue;
             }
@@ -253,7 +184,7 @@ std::string squeeze(const std::string& s)
         if (c == '\n') while (!out.empty() && out.back() == ' ') out.pop_back();
         out += c;
     }
-    return trim(out);
+    return text::trim_blank(out);
 }
 
 bool is_rule(const std::string& t)
@@ -281,13 +212,13 @@ std::vector<std::string> cells(std::string t)
             cell += '|';
             i++;
         } else if (t[i] == '|') {
-            out.push_back(trim(cell));
+            out.push_back(text::trim_blank(cell));
             cell.clear();
         } else {
             cell += t[i];
         }
     }
-    out.push_back(trim(cell));
+    out.push_back(text::trim_blank(cell));
     return out;
 }
 
@@ -341,8 +272,8 @@ struct Parser
         Block b;
         b.kind = kind;
         b.level = level;
-        std::string t = trim(raw);
-        b.icon = kind == Block::Heading || kind == Block::Item ? leading_icon(squeeze(inline_pass(t, 0))) : "";
+        std::string t = text::trim_blank(raw);
+        b.icon = kind == Block::Heading || kind == Block::Item ? emoji::icon_at(squeeze(inline_pass(t, 0))) : "";
         b.text = inline_text(t);
         if (b.text.empty() && kind != Block::Item) return;
         add(std::move(b));
@@ -352,7 +283,7 @@ struct Parser
 
 std::string inline_text(const std::string& md)
 {
-    return squeeze(drop_emoji(inline_pass(md, 0)));
+    return squeeze(emoji::drop(inline_pass(md, 0)));
 }
 
 namespace
@@ -361,7 +292,7 @@ namespace
 // too, as GitHub drops it (not just their tags, which would leave the code).
 std::string drop_raw_elements(std::string md)
 {
-    std::string low = lower(md);
+    std::string low = text::lower_ascii(md);
     for (const char* name : { "script", "style", "textarea", "title", "iframe", "noscript" }) {
         const std::string open = std::string("<") + name, close = std::string("</") + name;
         for (size_t at = 0; (at = low.find(open, at)) != std::string::npos;) {
@@ -395,23 +326,23 @@ std::vector<Block> parse(const std::string& source)
     bool in_comment = false;
     for (size_t n = 0; n < lines.size() && !p.full; n++) {
         const std::string& raw = lines[n];
-        std::string t = trim(raw);
+        std::string t = text::trim_blank(raw);
 
         // <!-- … --> on one line or several: gone.
         if (in_comment) {
             const size_t end = t.find("-->");
             if (end == std::string::npos) continue;
             in_comment = false;
-            t = trim(t.substr(end + 3));
+            t = text::trim_blank(t.substr(end + 3));
         }
         for (size_t open; (open = t.find("<!--")) != std::string::npos;) {
             const size_t end = t.find("-->", open + 4);
             if (end == std::string::npos) {
                 in_comment = true;
-                t = trim(t.substr(0, open));
+                t = text::trim_blank(t.substr(0, open));
                 break;
             }
-            t = trim(t.substr(0, open) + t.substr(end + 3));
+            t = text::trim_blank(t.substr(0, open) + t.substr(end + 3));
         }
 
         if (t.empty()) {
@@ -420,12 +351,12 @@ std::vector<Block> parse(const std::string& source)
         }
 
         // ``` or ~~~ fences: the lines as they are, to the closing fence.
-        if (starts_with(t, "```") || starts_with(t, "~~~")) {
+        if (text::starts_with(t, "```") || text::starts_with(t, "~~~")) {
             const std::string fence = t.substr(0, 3);
             Block b;
             b.kind = Block::Code;
             size_t k = n + 1;
-            for (; k < lines.size() && !starts_with(trim(lines[k]), fence.c_str()); k++) {
+            for (; k < lines.size() && !text::starts_with(text::trim_blank(lines[k]), fence.c_str()); k++) {
                 if (b.lines.size() < MAX_CODE_LINES) b.lines.push_back(lines[k]);
                 else if (b.lines.size() == MAX_CODE_LINES) b.lines.push_back("\xE2\x80\xA6");   // …
             }
@@ -436,8 +367,8 @@ std::vector<Block> parse(const std::string& source)
 
         // <details> and the like: <summary> as a heading, the rest as text.
         if (t[0] == '<') {
-            const std::string tag = lower(t);
-            if (starts_with(tag, "<summary")) {
+            const std::string tag = text::lower_ascii(t);
+            if (text::starts_with(tag, "<summary")) {
                 p.text_block(Block::Heading, t, 4);
                 continue;
             }
@@ -467,7 +398,7 @@ std::vector<Block> parse(const std::string& source)
             size_t level = 0;
             while (level < t.size() && t[level] == '#') level++;
             if (level <= 6 && (level == t.size() || t[level] == ' ')) {
-                std::string text = trim(t.substr(level));
+                std::string text = text::trim_blank(t.substr(level));
                 while (!text.empty() && text.back() == '#') text.pop_back();   // "## Title ##"
                 p.text_block(Block::Heading, text, (int)level);
                 continue;
@@ -476,9 +407,9 @@ std::vector<Block> parse(const std::string& source)
 
         // > quotes, and GitHub's alerts ("> [!WARNING]").
         if (t[0] == '>') {
-            std::string inside = trim(t.substr(1));
-            while (!inside.empty() && inside[0] == '>') inside = trim(inside.substr(1));   // nested: flattened
-            const std::string tag = lower(inside);
+            std::string inside = text::trim_blank(t.substr(1));
+            while (!inside.empty() && inside[0] == '>') inside = text::trim_blank(inside.substr(1));   // nested: flattened
+            const std::string tag = text::lower_ascii(inside);
             for (const char* alert : { "note", "tip", "important", "warning", "caution" })
                 if (tag == std::string("[!") + alert + "]") {
                     Block b;
@@ -504,12 +435,12 @@ std::vector<Block> parse(const std::string& source)
         }
 
         // A table: a row of cells, then a row of dashes.
-        if (t.find('|') != std::string::npos && n + 1 < lines.size() && is_table_rule(trim(lines[n + 1]))) {
+        if (t.find('|') != std::string::npos && n + 1 < lines.size() && is_table_rule(text::trim_blank(lines[n + 1]))) {
             Block b;
             b.kind = Block::Table;
             auto row = [&](const std::string& line) {
                 std::vector<std::string> r;
-                for (const std::string& c : cells(trim(line))) {
+                for (const std::string& c : cells(text::trim_blank(line))) {
                     if (r.size() >= MAX_COLUMNS) break;
                     r.push_back(inline_text(c));
                 }
@@ -517,7 +448,7 @@ std::vector<Block> parse(const std::string& source)
             };
             b.rows.push_back(row(t));
             size_t k = n + 2;
-            for (; k < lines.size() && trim(lines[k]).find('|') != std::string::npos; k++)
+            for (; k < lines.size() && text::trim_blank(lines[k]).find('|') != std::string::npos; k++)
                 if (b.rows.size() < MAX_ROWS + 1) b.rows.push_back(row(lines[k]));
             n = k - 1;
             p.add(std::move(b));
@@ -534,10 +465,10 @@ std::vector<Block> parse(const std::string& source)
             b.level = (int)(indent / 2);
             if (b.level > MAX_DEPTH) b.level = MAX_DEPTH;
             std::string rest = t.substr(len);
-            if (starts_with(rest, "[ ] ") || rest == "[ ]") b.task = 0;
-            else if (starts_with(lower(rest), "[x] ") || lower(rest) == "[x]") b.task = 1;
+            if (text::starts_with(rest, "[ ] ") || rest == "[ ]") b.task = 0;
+            else if (text::starts_with(text::lower_ascii(rest), "[x] ") || text::lower_ascii(rest) == "[x]") b.task = 1;
             if (b.task >= 0) rest = rest.size() > 3 ? rest.substr(4) : "";
-            b.icon = leading_icon(squeeze(inline_pass(rest, 0)));
+            b.icon = emoji::icon_at(squeeze(inline_pass(rest, 0)));
             b.text = inline_text(rest);
             p.add(std::move(b));
             p.open_item = true;

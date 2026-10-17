@@ -38,7 +38,7 @@ bool s_busy = false;   // one list or download at a time
 dev_builds::Cache s_cache;
 bool              s_cache_read = false;
 
-std::string cache_file() { return paths::data_dir() + "/cache/dev_builds.json"; }
+std::string cache_file() { return paths::cache_dir() + "/dev_builds.json"; }
 
 void read_cache()
 {
@@ -53,7 +53,7 @@ void keep(const dev_builds::Cache& cache)
     s_cache = cache;
     std::string err;
     // Only saves time on the next start: a write that fails is just logged.
-    if (!paths::ensure_dir(paths::data_dir() + "/cache") ||
+    if (!paths::ensure_dir(paths::cache_dir()) ||
         !paths::atomic_write(cache_file(), dev_builds::encode_cache(cache), &err))
         brls::Logger::warning("dev builds: cannot keep the list ({})", err);
 }

@@ -13,6 +13,10 @@
 #include "nx_types.h"
 #include "pure.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     PctlSafetyLevel_None       = 0,
     PctlSafetyLevel_Custom     = 1,
@@ -159,7 +163,6 @@ void pctl_overview_fetch(PctlStatus *status, PtState *pt);
 // A block read that fails pt_plausible is refused (NXM_RC_PT_NOT_UNDERSTOOD),
 // as by the bedtime write below.
 Result pctl_play_timer_set_days(const u16 days_min[7]);
-Result pctl_play_timer_set_uniform(u16 minutes);
 Result pctl_play_timer_clear(void);
 
 // Bedtime, Sun..Sat (pure.h): written into the block read with 145601 (only
@@ -212,3 +215,7 @@ void pctl_play_timer_sample(PtSample *out);
 // Writes a multi-line read-only diagnostic report (raw rc + bytes for every
 // command above plus 1459/1460/1952/1960). PIN contents are never included.
 void pctl_dump(char *buf, size_t bufsz);
+
+#ifdef __cplusplus
+}
+#endif

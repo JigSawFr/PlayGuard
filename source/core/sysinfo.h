@@ -3,6 +3,10 @@
 #pragma once
 #include "nx_types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Firmware policy. PlayTimerSettings (cmds 145601 / 195101) has been 0x44 bytes
 // since 21.0.0 — the only layout this tool knows how to read and write.
 #define PCTL_FW_MIN_PLAYTIMER MAKEHOSVERSION(21, 0, 0)
@@ -54,6 +58,9 @@ static inline SysStorage sysinfo_storage(const SysInfo *info)
     if (!info->is_atmosphere || !info->emummc_valid) return SysStorage_Unknown;
     return info->emummc ? SysStorage_EmuMMC : SysStorage_SysMMC;
 }
-bool      sysinfo_fw_at_least(u32 version);    // compares against hos_version
 // "23.0.1" style string. buf must hold at least 16 bytes.
 void      sysinfo_version_string(u32 version, char *buf, size_t size);
+
+#ifdef __cplusplus
+}
+#endif

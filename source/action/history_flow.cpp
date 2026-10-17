@@ -15,7 +15,7 @@
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
-#include "util/update.hpp"
+#include "util/date.hpp"
 
 using namespace brls::literals;
 
@@ -24,16 +24,6 @@ namespace history_flow
 
 namespace
 {
-std::string yes_no(int v)
-{
-    return v ? "playguard/common/yes"_i18n : "playguard/common/no"_i18n;
-}
-
-std::string age_text(int age)
-{
-    return age == 0 ? "playguard/restrictions/age_none"_i18n : brls::getStr("playguard/restrictions/age_value", age);
-}
-
 // One recorded value set, worded for its kind ("" when it does not fit).
 std::string value_text(const std::string& kind, const std::vector<int>& v)
 {
@@ -45,14 +35,14 @@ std::string value_text(const std::string& kind, const std::vector<int>& v)
     if (v.size() == 1) {
         if (kind == "level") return ui::level_name((uint32_t)v[0]);
         if (kind == "org") return pctl_rating_org_name((uint32_t)v[0]);
-        if (kind == "vr") return yes_no(v[0]);
+        if (kind == "vr") return ui::yes_no(v[0] != 0);
         if (kind == "alarm") return v[0] ? "playguard/common/off"_i18n : "playguard/common/on"_i18n;
         if (kind == "time_up") return v[0] ? "playguard/play_timer/time_up_alarm"_i18n : "playguard/play_timer/time_up_suspend"_i18n;
         if (kind == "console_lock") return v[0] ? "playguard/common/on"_i18n : "playguard/common/off"_i18n;
         if (kind == "countdown") return v[0] ? "playguard/history/counting"_i18n : "playguard/history/paused"_i18n;
     }
     if (kind == "custom" && v.size() == 3)
-        return brls::getStr("playguard/history/custom_value", age_text(v[0]), yes_no(v[1]), yes_no(v[2]));
+        return brls::getStr("playguard/history/custom_value", ui::age_text(v[0]), ui::yes_no(v[1] != 0), ui::yes_no(v[2] != 0));
     return "";
 }
 
@@ -282,19 +272,6 @@ std::string details(const history::Entry& e)
     return out;
 }
 
-std::string when_text(const history::Entry& e)
-{
-    if (e.when.size() < 16) return e.when.empty() ? "?" : e.when;
-    const std::string today = ui::today_date();
-    using history_logic::Day;
-    switch (history_logic::day_of(e.when, today, update::add_days(today, -1))) {
-    case Day::Today: return brls::getStr("playguard/history/today_at", e.when.substr(11, 5));
-    case Day::Yesterday: return brls::getStr("playguard/history/yesterday_at", e.when.substr(11, 5));
-    case Day::Other: break;
-    }
-    return e.when;
-}
-
 std::string time_of(const history::Entry& e)
 {
     return e.when.size() >= 16 ? e.when.substr(11, 5) : (e.when.empty() ? "?" : e.when);
@@ -305,7 +282,7 @@ std::string day_title(const std::string& day)
     if (day.empty()) return "?";
     const std::string today = ui::today_date();
     using history_logic::Day;
-    switch (history_logic::day_of(day, today, update::add_days(today, -1))) {
+    switch (history_logic::day_of(day, today, date::add_days(today, -1))) {
     case Day::Today: return "playguard/history/today"_i18n;
     case Day::Yesterday: return "playguard/history/yesterday"_i18n;
     case Day::Other: break;

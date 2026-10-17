@@ -8,11 +8,6 @@ using namespace brls::literals;
 
 namespace
 {
-NVGcolor accent()
-{
-    return brls::Application::getTheme()["brls/sidebar/active_item"];
-}
-
 // The kind of change: a word and a colour (the common types named,
 // others as they are written).
 BuildTag type_tag(const std::string& type)
@@ -32,7 +27,7 @@ BuildTag type_tag(const std::string& type)
             text = brls::getStr(k.key);
             color = k.color;
         }
-    const NVGcolor colors[] = { accent(), ui::color_warn(), nvgRGB(0x2F, 0x81, 0xF7), nvgRGB(0x89, 0x57, 0xE5),
+    const NVGcolor colors[] = { ui::color_accent(), ui::color_warn(), nvgRGB(0x2F, 0x81, 0xF7), nvgRGB(0x89, 0x57, 0xE5),
                                 ui::color_bad(), ui::color_note() };
     return { text, colors[color] };
 }
@@ -42,7 +37,7 @@ std::vector<BuildTag> build_tags(const dev_builds::Build& b, bool newer)
 {
     std::vector<BuildTag> tags;
     const dev_builds::Subject s = dev_builds::parse_subject(b.title);
-    if (b.kind == dev_builds::Kind::PullRequest) tags.push_back({ "#" + std::to_string(b.pr), accent() });
+    if (b.kind == dev_builds::Kind::PullRequest) tags.push_back({ "#" + std::to_string(b.pr), ui::color_accent() });
     if (b.kind != dev_builds::Kind::Release) {
         if (!s.type.empty()) tags.push_back(type_tag(s.type));
         if (!s.scope.empty()) tags.push_back({ s.scope, ui::color_note() });
@@ -57,7 +52,7 @@ std::vector<BuildTag> build_tags(const dev_builds::Build& b, bool newer)
         case dev_builds::Ci::Unknown: break;
     }
     if (dev_build_flow::installed(b)) tags.push_back({ "playguard/dev_build/installed"_i18n, ui::color_ok() });
-    else if (newer) tags.push_back({ "playguard/dev_build/new"_i18n, accent() });
+    else if (newer) tags.push_back({ "playguard/dev_build/new"_i18n, ui::color_accent() });
     return tags;
 }
 
@@ -68,7 +63,9 @@ std::string build_title(const dev_builds::Build& b)
         case dev_builds::Kind::PullRequest:
         case dev_builds::Kind::Main:
         case dev_builds::Kind::Commit: {
-            if (b.title.empty()) return b.commit;   // a list kept by an older version
+            // A list kept by 1.1.0, which gave only pull requests a title.
+            // Every list fetched from 1.2.0 on has them: this can go in 1.3.0.
+            if (b.title.empty()) return b.commit;
             std::string text = dev_builds::parse_subject(b.title).text;
             if (!text.empty()) text[0] = (char)std::toupper((unsigned char)text[0]);
             return text.empty() ? b.title : text;

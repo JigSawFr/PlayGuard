@@ -20,10 +20,6 @@ namespace pt_flow
 // Limits offered by the pickers, in minutes (0 = no play that day).
 const std::vector<uint16_t>& quick_values();
 
-// Minutes already played today, or -1 when the system does not say (timer
-// off, no limit today, or no game counted yet).
-int played_today_min(const PtState& pt);
-
 // `body`, then, while the console is linked to the phone app, the note that
 // its next synchronisation overwrites what is written here: every write
 // confirmation ends with it. `st`: a status already read, else it is read now.

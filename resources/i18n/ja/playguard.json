@@ -1215,8 +1215,6 @@
         "unknown_note": "新しいバージョンの PlayGuard で記録されました。詳しく見るには PlayGuard を更新してください。",
         "days_changed": "変更された曜日：",
         "day_change": "{}：{} → {}",
-        "today_at": "今日 {}",
-        "yesterday_at": "昨日 {}",
         "kinds": {
             "limits": "プレイ時間の上限",
             "level": "制限レベル",

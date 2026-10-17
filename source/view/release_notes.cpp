@@ -11,27 +11,12 @@ namespace release_notes
 {
 namespace
 {
-brls::Label* text_label(const std::string& text, int font_size, NVGcolor color)
-{
-    auto* label = new brls::Label();
-    label->setSingleLine(false);
-    label->setFontSize(font_size);
-    label->setTextColor(color);
-    label->setText(text);
-    return label;
-}
-
 // "play time per game" (a commit's subject, a highlight's text after its
 // title): "Play time per game".
 std::string capitalised(std::string text)
 {
     if (!text.empty()) text[0] = (char)std::toupper((unsigned char)text[0]);
     return text;
-}
-
-NVGcolor accent()
-{
-    return brls::Application::getTheme()["brls/sidebar/active_item"];
 }
 
 // The emoji `hex` ("1f680") as an image `size` pixels wide, from the Twemoji
@@ -59,9 +44,9 @@ brls::View* section(const changelog::Line& l, bool first)
         image->setMarginRight(10);
         row->addView(image);
     }
-    row->addView(text_label(l.text, 23, accent()));
+    row->addView(ui::text_label(l.text, 23, ui::color_accent()));
     box->addView(row);
-    auto* rule = new brls::Rectangle(nvgTransRGBA(accent(), 90));
+    auto* rule = new brls::Rectangle(nvgTransRGBA(ui::color_accent(), 90));
     rule->setHeight(2);
     rule->setMarginTop(6);
     box->addView(rule);
@@ -72,7 +57,7 @@ brls::View* section(const changelog::Line& l, bool first)
 brls::View* tag(const std::string& text)
 {
     auto* box = new brls::Box(brls::Axis::ROW);
-    box->setBackgroundColor(nvgTransRGBA(accent(), 34));
+    box->setBackgroundColor(nvgTransRGBA(ui::color_accent(), 34));
     box->setCornerRadius(4);
     box->setPadding(1, 7, 1, 7);
     box->setMarginRight(8);
@@ -81,7 +66,7 @@ brls::View* tag(const std::string& text)
     auto* label = new brls::Label();
     label->setSingleLine(true);
     label->setFontSize(16);
-    label->setTextColor(accent());
+    label->setTextColor(ui::color_accent());
     label->setText(text);
     box->addView(label);
     return box;
@@ -99,7 +84,7 @@ brls::Box* card(const changelog::Line& l, bool left)
     else half->setPaddingLeft(6);
     auto* box = new brls::Box(brls::Axis::ROW);
     box->setGrow(1.0f);
-    box->setBackgroundColor(nvgTransRGBA(accent(), 22));
+    box->setBackgroundColor(nvgTransRGBA(ui::color_accent(), 22));
     box->setCornerRadius(10);
     box->setAlignItems(brls::AlignItems::FLEX_START);
     box->setPadding(14, 16, 14, 14);
@@ -108,7 +93,7 @@ brls::Box* card(const changelog::Line& l, bool left)
         box->addView(image);
     } else {
         box->setAlignItems(brls::AlignItems::STRETCH);
-        auto* bar = new brls::Rectangle(accent());
+        auto* bar = new brls::Rectangle(ui::color_accent());
         bar->setWidth(4);
         bar->setCornerRadius(2);
         bar->setMarginRight(14);
@@ -118,12 +103,12 @@ brls::Box* card(const changelog::Line& l, bool left)
     body->setGrow(1.0f);
     body->setShrink(1.0f);
     if (l.title.empty()) {
-        body->addView(text_label(l.text, 21, accent()));   // no lead-in: the line is the title
+        body->addView(ui::text_label(l.text, 21, ui::color_accent()));   // no lead-in: the line is the title
     } else {
-        brls::Label* title = text_label(l.title, 21, accent());
+        brls::Label* title = ui::text_label(l.title, 21, ui::color_accent());
         title->setMarginBottom(4);
         body->addView(title);
-        body->addView(text_label(capitalised(l.text), 18, ui::color_text()));
+        body->addView(ui::text_label(capitalised(l.text), 18, ui::color_text()));
     }
     box->addView(body);
     half->addView(box);
@@ -162,14 +147,14 @@ void fill(brls::Box* box, const std::vector<changelog::Line>& lines)
                 row->setMarginTop(6);
                 brls::View* bullet = icon(l.icon, 20);
                 if (!bullet) {
-                    bullet = text_label("•", 20, accent());
+                    bullet = ui::text_label("•", 20, ui::color_accent());
                     bullet->setWidth(20);
                 }
                 bullet->setMarginRight(8);
                 bullet->setShrink(0.0f);
                 row->addView(bullet);
                 if (!l.title.empty()) row->addView(tag(l.title));
-                brls::Label* text = text_label(capitalised(l.text), 20, ui::color_text());
+                brls::Label* text = ui::text_label(capitalised(l.text), 20, ui::color_text());
                 text->setGrow(1.0f);
                 text->setShrink(1.0f);
                 row->addView(text);
@@ -177,7 +162,7 @@ void fill(brls::Box* box, const std::vector<changelog::Line>& lines)
                 break;
             }
             case changelog::Line::Text:
-                view = text_label(l.text, 20, ui::color_note());
+                view = ui::text_label(l.text, 20, ui::color_note());
                 view->setMarginTop(6);
                 break;
         }
@@ -208,7 +193,7 @@ void fill_highlights(brls::Box* box, const std::vector<changelog::Line>& lines)
         if (l.kind == changelog::Line::Item) continue;   // a nested item: not on a card
         brls::View* view = nullptr;
         if (l.kind == changelog::Line::Text) {
-            view = after_items ? text_label(l.text, 18, ui::color_note()) : text_label(l.text, 21, ui::color_text());
+            view = after_items ? ui::text_label(l.text, 18, ui::color_note()) : ui::text_label(l.text, 21, ui::color_text());
             view->setMarginTop(after_items ? 16 : 2);
         } else {
             view = section(l, box->getChildren().empty());

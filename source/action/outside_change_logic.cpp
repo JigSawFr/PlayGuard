@@ -5,6 +5,9 @@
 #include <cstddef>
 #include <cstring>
 
+#include "util/date.hpp"
+#include "util/json_util.hpp"
+
 namespace outside_change_logic
 {
 
@@ -19,10 +22,7 @@ bool digits(const std::string& s, size_t from, size_t n)
     return true;
 }
 
-bool is_date(const std::string& s)
-{
-    return s.size() == 10 && digits(s, 0, 4) && s[4] == '-' && digits(s, 5, 2) && s[7] == '-' && digits(s, 8, 2);
-}
+bool is_date(const std::string& s) { return date::parse_shape(s); }
 
 bool is_hm(const std::string& s)
 {
@@ -39,17 +39,12 @@ bool is_account_id(const std::string& s)
     return true;
 }
 
-// Days since 1970-01-01 of a "YYYY-MM-DD" (is_date), proleptic Gregorian.
+// Days since 1970-01-01 of a "YYYY-MM-DD" (is_date), its numbers as written.
 int64_t day_number(const std::string& d)
 {
-    int64_t y = std::stoi(d.substr(0, 4));
-    const int m = std::stoi(d.substr(5, 2)), day = std::stoi(d.substr(8, 2));
-    y -= m <= 2;
-    const int64_t era = (y >= 0 ? y : y - 399) / 400;
-    const int64_t yoe = y - era * 400;
-    const int64_t doy = (153 * (m + (m > 2 ? -3 : 9)) + 2) / 5 + day - 1;
-    const int64_t doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
-    return era * 146097 + doe - 719468;
+    date::Ymd ymd;
+    date::parse_shape(d, &ymd);
+    return date::days_from_civil(ymd);
 }
 }   // namespace
 
@@ -183,18 +178,10 @@ std::vector<std::pair<std::string, std::string>> new_accounts(const Record& rec,
 Record parse(const std::string& text)
 {
     Record rec;
-    const nlohmann::json j = nlohmann::json::parse(text, nullptr, false);
-    if (!j.is_object()) return rec;
-    auto str = [&j](const char* key) -> std::string {
-        const auto it = j.find(key);
-        return it != j.end() && it->is_string() ? it->get<std::string>() : std::string();
-    };
-    auto num = [&j](const char* key, int64_t* out) {
-        const auto it = j.find(key);
-        if (it == j.end() || !it->is_number_integer()) return false;
-        *out = it->get<int64_t>();
-        return true;
-    };
+    nlohmann::json j;
+    if (!json_util::parse(text, &j) || !j.is_object()) return rec;
+    auto str = [&j](const char* key) { return json_util::string_at(j, key); };
+    auto num = [&j](const char* key, int64_t* out) { return json_util::integer_at(j, key, out); };
 
     const std::string date = str("date");
     int64_t v = 0;
@@ -232,11 +219,11 @@ Record parse(const std::string& text)
         for (const auto& a : *acc) {
             if (rec.accounts.size() == KNOWN_ACCOUNTS_MAX) break;
             if (!a.is_object()) continue;
-            const auto id = a.find("id"), since = a.find("since"), added = a.find("new");
+            const auto id = a.find("id"), since = a.find("since");
             if (id == a.end() || !id->is_string() || !is_account_id(id->get<std::string>())) continue;
             if (since == a.end() || !since->is_string() || !is_date(since->get<std::string>())) continue;
             rec.accounts.push_back({ id->get<std::string>(), since->get<std::string>(),
-                                     added != a.end() && added->is_boolean() && added->get<bool>() });
+                                     json_util::flag_at(a, "new") });
         }
     }
     return rec;

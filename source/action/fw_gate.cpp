@@ -7,6 +7,7 @@
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/diagnostics.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/update.hpp"
 
@@ -63,6 +64,7 @@ std::string tested_max()
 
 void prepare()
 {
+    diagnostic::set_firmware_choice(summary);
     if (!needed()) return;
     app::set_read_only(true);
     const auto& cfg = config::get();

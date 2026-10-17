@@ -14,6 +14,21 @@ static const uint64_t DAY_START  = 10 * DAY;
 static const uint64_t NOW        = 10 * DAY + 18 * H;
 static const uint64_t WEEK_START = 4 * DAY;
 
+// playlog_fold_days() with whole days between `day_start` and `week_start`.
+static size_t playlog_fold(const PlayLogEvent *events, size_t n, uint64_t now,
+                           uint64_t day_start, uint64_t week_start,
+                           PlayLogTotal *out, size_t max)
+{
+    uint64_t starts[7];
+    starts[0] = day_start;
+    for (int k = 1; k < 7; k++) {
+        const uint64_t back = (uint64_t)k * 86400u;
+        starts[k] = day_start > week_start + back ? day_start - back : week_start;
+    }
+    starts[6] = week_start;
+    return playlog_fold_days(events, n, now, starts, out, max);
+}
+
 static PlayLogEvent ev(uint64_t app, uint8_t kind, uint64_t user)
 {
     // Steady clock: the user clock with an arbitrary offset (no clock change).
