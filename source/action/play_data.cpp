@@ -89,7 +89,7 @@ void save(const Key& key, const PlayStats& stats)
     {
         std::lock_guard<std::mutex> lock(s_saved_lock);
         const auto it = s_saved.find(key);
-        if (it != s_saved.end() && it->second == hash && paths::exists(cache_file(key))) return;
+        if (it != s_saved.end() && it->second == hash && paths::exists_or_pending(cache_file(key))) return;
     }
     std::string error;
     if (!paths::ensure_dir(paths::nand_dir() + "/cache") ||
