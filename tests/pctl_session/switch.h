@@ -26,6 +26,8 @@ void pctlExit(void);
 Service *pctlGetServiceSession_Service(void);
 Result pctlauthRegisterPasscode(void);
 Result pctlauthShowForConfiguration(void);
+/* libnx's crypto/hmac.h; the mock records the key it is given. */
+void hmacSha256CalculateMac(void *dst, const void *key, size_t key_size, const void *src, size_t size);
 
 /* Buffer descriptors (the "..." arguments) keep only their attributes, address
  * and size, so the mock can fill GetPinCode's buffer and check what 1201

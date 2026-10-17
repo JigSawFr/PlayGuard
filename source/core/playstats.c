@@ -98,32 +98,6 @@ static Result read_events(u64 since, PlayLogEvent **events, size_t *count, bool 
     return playstats_collect_events(query_events, start, total, since, PLAYSTATS_EVENTS_MAX, events, count, capped);
 }
 
-// The title entry of each console language (SetLanguage), as libnx's
-// nacpGetLanguageEntry() maps them.
-static const u8 NACP_LANGUAGE[SetLanguage_Total] = {
-    [SetLanguage_JA] = 2,      [SetLanguage_ENUS] = 0,   [SetLanguage_FR] = 3,     [SetLanguage_DE] = 4,
-    [SetLanguage_IT] = 7,      [SetLanguage_ES] = 6,     [SetLanguage_ZHCN] = 14,  [SetLanguage_KO] = 12,
-    [SetLanguage_NL] = 8,      [SetLanguage_PT] = 10,    [SetLanguage_RU] = 11,    [SetLanguage_ZHTW] = 13,
-    [SetLanguage_ENGB] = 1,    [SetLanguage_FRCA] = 9,   [SetLanguage_ES419] = 5,  [SetLanguage_ZHHANS] = 14,
-    [SetLanguage_ZHHANT] = 13, [SetLanguage_PTBR] = 15,
-};
-
-// The console language as PlayStats.names_lang (0 when it cannot be read),
-// and its title entry in a control.nacp (American English when unknown).
-static u8 console_language(u32 *nacp_index)
-{
-    *nacp_index = 0;
-    u64 code = 0;
-    SetLanguage lang = SetLanguage_ENUS;
-    if (R_FAILED(setInitialize())) return 0;
-    const bool ok = R_SUCCEEDED(setGetSystemLanguage(&code)) && R_SUCCEEDED(setMakeLanguage(code, &lang)) &&
-                    (u32)lang < SetLanguage_Total;
-    setExit();
-    if (!ok) return 0;
-    *nacp_index = NACP_LANGUAGE[lang];
-    return (u8)(lang + 1);
-}
-
 static void open_icon_store(u8 lang)
 {
     if (s_icons_tried || !s_icon_dir[0] || !lang) return;
@@ -144,22 +118,6 @@ void playstats_remember(const PlayStats *known)
     for (u32 i = 0; known && i < known->count && i < PLAYSTATS_MAX; i++) s_known[s_known_count++] = known->games[i].app_id;
 }
 
-// A game's control data: ns' cache first (quick, and it still has a game card
-// not inserted or an archived game), then the storage. With `icon`, only data
-// that holds one.
-static bool read_control(u64 id, NsApplicationControlData *cd, bool icon, u64 *size)
-{
-    static const NsApplicationControlSource sources[] = { NsApplicationControlSource_CacheOnly,
-                                                          NsApplicationControlSource_Storage };
-    for (size_t k = 0; k < sizeof(sources) / sizeof(sources[0]); k++) {
-        *size = 0;
-        if (R_SUCCEEDED(nsGetApplicationControlData(sources[k], id, cd, sizeof(*cd), size)) &&
-            *size >= sizeof(cd->nacp) + (icon ? 1 : 0) && *size <= sizeof(*cd))
-            return true;
-    }
-    return false;
-}
-
 // Keeps the icon of control data read for something else (one read a game).
 static void keep_icon(u64 id, const NsApplicationControlData *cd, u64 size)
 {
@@ -170,16 +128,16 @@ static void read_name(GameStat *g, NsApplicationControlData **cd, u32 nacp_index
 {
     const char *known = playnames_find(&s_names, g->app_id);
     if (known) {
-        playstats_copy_utf8(g->name, sizeof(g->name), known);
+        nacp_copy_utf8(g->name, sizeof(g->name), known);
         return;
     }
     for (u32 i = 0; i < s_unnamed_count; i++)
         if (s_unnamed[i] == g->app_id) return;
     if (!*cd) *cd = (NsApplicationControlData *)malloc(sizeof(NsApplicationControlData));
     u64 size = 0;
-    if (*cd && read_control(g->app_id, *cd, false, &size)) {
+    if (*cd && nacp_read_control(g->app_id, *cd, false, &size)) {
         keep_icon(g->app_id, *cd, size);
-        if (playstats_nacp_name(&(*cd)->nacp, sizeof((*cd)->nacp), nacp_index, g->name, sizeof(g->name))) {
+        if (nacp_name(&(*cd)->nacp, sizeof((*cd)->nacp), nacp_index, g->name, sizeof(g->name))) {
             playnames_add(&s_names, g->app_id, g->name);
             return;
         }
@@ -331,7 +289,7 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
     // Names: those already known, then ns for the others (and their icons,
     // from the same read).
     u32 nacp_index = 0;
-    out->names_lang = console_language(&nacp_index);
+    out->names_lang = nacp_console_language(&nacp_index);
     playnames_use_language(&s_names, out->names_lang);
     open_icon_store(out->names_lang);
     NsApplicationControlData *cd = NULL;
@@ -348,7 +306,7 @@ void playstats_icons(PlayIcon *icons, size_t count)
     }
     if (!count) return;
     u32 nacp_index = 0;
-    const u8 lang = console_language(&nacp_index);
+    const u8 lang = nacp_console_language(&nacp_index);
     open_icon_store(lang);
     // Kept on the SD card by an earlier read: no ns at all.
     size_t missing = 0;
@@ -363,7 +321,7 @@ void playstats_icons(PlayIcon *icons, size_t count)
         for (size_t i = 0; i < count && !playstats_cancelled(); i++) {
             if (icons[i].jpeg) continue;
             u64 got = 0;
-            if (!read_control(icons[i].app_id, cd, true, &got)) continue;
+            if (!nacp_read_control(icons[i].app_id, cd, true, &got)) continue;
             const size_t size = got - sizeof(cd->nacp);
             if (size > sizeof(cd->icon)) continue;
             icons[i].jpeg = (unsigned char *)malloc(size);
@@ -374,7 +332,7 @@ void playstats_icons(PlayIcon *icons, size_t count)
             // Its name from the same read, for the next fetch.
             char name[PLAYSTATS_NAME_LEN];
             if (!playnames_find(&s_names, icons[i].app_id) &&
-                playstats_nacp_name(&cd->nacp, sizeof(cd->nacp), nacp_index, name, sizeof(name)))
+                nacp_name(&cd->nacp, sizeof(cd->nacp), nacp_index, name, sizeof(name)))
                 playnames_add(&s_names, icons[i].app_id, name);
         }
         free(cd);
@@ -399,7 +357,7 @@ size_t playstats_accounts(PlayAccount *out, size_t max, Result *rc_out)
             AccountProfileBase base;
             if (R_SUCCEEDED(accountGetProfile(&profile, uids[i]))) {
                 if (R_SUCCEEDED(accountProfileGet(&profile, NULL, &base)))
-                    playstats_copy_utf8(a->nickname, sizeof(a->nickname), base.nickname);
+                    nacp_copy_utf8(a->nickname, sizeof(a->nickname), base.nickname);
                 accountProfileClose(&profile);
             }
         }
@@ -434,7 +392,7 @@ size_t playstats_by_account(u64 app_id, AccountPlay *out, size_t max, Result *rc
                 AccountProfileBase base;
                 if (R_SUCCEEDED(accountGetProfile(&profile, uids[i]))) {
                     if (R_SUCCEEDED(accountProfileGet(&profile, NULL, &base)))
-                        playstats_copy_utf8(a->nickname, sizeof(a->nickname), base.nickname);
+                        nacp_copy_utf8(a->nickname, sizeof(a->nickname), base.nickname);
                     accountProfileClose(&profile);
                 }
                 n++;

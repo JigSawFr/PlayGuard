@@ -155,7 +155,7 @@ void MainActivity::onContentAvailable()
     this->notice_timer.setCallback([this]() {
         auto stack = brls::Application::getActivitiesStack();
         if (!app::in_focus() || stack.empty() || stack.back() != this) return;
-        notices::sweep();
+        notices::sweep_if_stale();
     });
     this->notice_timer.start();
 
@@ -185,6 +185,14 @@ void MainActivity::update_notice_hint()
     this->getContentView()->updateActionHint(brls::BUTTON_Y, n > 0 ? brls::getStr("playguard/notices/hint_count", n)
                                                                     : "playguard/notices/hint"_i18n);
     brls::Application::getGlobalHintsUpdateEvent()->fire();
+    // The console's entries to do: counted on the Console tab, not the bell.
+    auto* frame   = this->getView("main_tabs");
+    auto* sidebar = frame ? dynamic_cast<brls::Sidebar*>(frame->getView("brls/tab_frame/sidebar")) : nullptr;
+    if (brls::SidebarItem* item = sidebar ? sidebar->getItem(ui::tab::console) : nullptr) {
+        const int c = notices::console_count();
+        item->setLabel(c > 0 ? brls::getStr("playguard/tabs/console_count", "playguard/tabs/console"_i18n, c)
+                             : "playguard/tabs/console"_i18n);
+    }
 }
 
 void MainActivity::open_tab(int position)

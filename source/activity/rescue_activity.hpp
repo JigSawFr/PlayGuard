@@ -6,7 +6,8 @@
 //
 // While it is on screen the PIN-before-a-change check is off, but only for a
 // report the console confirms (rescue::confirmed): the sysmodule really
-// unlocked or deleted, which needs it installed and the console restarted.
+// unlocked (its proof, made with the stored PIN, says it wrote the report) or
+// deleted, which needs it installed and the console restarted.
 // The parent came here because they forgot the PIN. A report the console does
 // not confirm (written by hand, or a recovery that failed) is only shown: no
 // action is offered and "Open PlayGuard" goes through the usual lock screen.

@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <borealis.hpp>
+#include <chrono>
 #include <cstdio>
 #include <map>
 #include <sys/statvfs.h>
@@ -18,6 +19,7 @@
 #include "activity/main_activity.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
+#include "tab/clock_tab.hpp"
 #include "tab/tab_base.hpp"
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
@@ -202,6 +204,11 @@ int info_count()
     return s_store.info_count();
 }
 
+int console_count()
+{
+    return s_store.console_count();
+}
+
 int listen(std::function<void()> fn)
 {
     const int id = s_next_listener++;
@@ -214,9 +221,21 @@ void unlisten(int id)
     s_listeners.erase(id);
 }
 
+namespace
+{
+// The last readings refresh_status() was given, for the minute's sweep.
+PctlStatus                            s_status{};
+std::chrono::steady_clock::time_point s_status_at;
+bool                                  s_status_known = false;
+}   // namespace
+
 void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, Result accuracy_rc, bool accurate)
 {
     const bool writable = !app::read_only();
+    s_status = s;
+    s_status_at = std::chrono::steady_clock::now();
+    s_status_known = true;
+    ui::SameTime same;   // the date and the weekday of every entry below, read once
 
     // Nothing set up yet: no PIN, so nothing is protected.
     toggle(s.pin_length_ok && s.pin_length == 0, "pin_missing", Level::Action, "playguard/notices/pin_missing"_i18n,
@@ -268,7 +287,7 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
         toggle(!accurate, "clock", Level::Action, "playguard/notices/clock"_i18n, "playguard/notices/clock_detail"_i18n,
                writable ? "playguard/notices/clock_fix"_i18n : open_label("clock"), [writable]() {
                    if (writable) clock_flow::guided([]() { sweep(); });
-                   else open_tab(ui::tab::clock);
+                   else ClockTab::open_screen();
                });
 
     // A user account never seen before (flagged in the Activity tab too).
@@ -284,14 +303,14 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
 
     // The system: what the Overview shows in amber.
     toggle(sysinfo_compat(&si) != SysCompat_Ok, "compat", Level::Info, "playguard/notices/compat"_i18n,
-           ui::fw_text(si) + " · " + ui::compat_text(si), open_label("tools"), []() { open_tab(ui::tab::tools); });
+           ui::fw_text(si) + " · " + ui::compat_text(si), open_label("console"), []() { open_tab(ui::tab::console); });
     toggle(ui::serial_warning(si), "serial", Level::Info, "playguard/notices/serial"_i18n,
-           "playguard/notices/serial_detail"_i18n, open_label("tools"), []() { open_tab(ui::tab::tools); });
+           "playguard/notices/serial_detail"_i18n, open_label("console"), []() { open_tab(ui::tab::console); });
     const patches::Report& report = ui::patch_report();
     bool warn = false;
     toggle(ui::patches_warning(report), "patches", Level::Action, "playguard/notices/patches"_i18n,
-           ui::patches_text(report) + "\n" + ui::patches_note(report, si, &warn), open_label("tools"),
-           []() { open_tab(ui::tab::tools); });
+           ui::patches_text(report) + "\n" + ui::patches_note(report, si, &warn), open_label("console"),
+           []() { open_tab(ui::tab::console); });
 
     const auto& cfg = config::get();
     const bool has_pin = s.pin_length_ok && s.pin_length > 0;
@@ -303,8 +322,8 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
 
     // The other system (sysMMC / emuMMC) has parental controls of its own.
     const std::string other = ui::other_storage_note(si);
-    toggle(!other.empty(), "other_system", Level::Info, "playguard/notices/other_system"_i18n, other, open_label("tools"),
-           []() { open_tab(ui::tab::tools); });
+    toggle(!other.empty(), "other_system", Level::Info, "playguard/notices/other_system"_i18n, other, open_label("console"),
+           []() { open_tab(ui::tab::console); });
 
     // The console lock on for a week or more.
     toggle(cfg.console_lock && !cfg.console_lock_since.empty() && days_ago(cfg.console_lock_since, 7),
@@ -416,8 +435,20 @@ void note_write(const char* what, bool ok, const std::string& error)
         brls::getStr("playguard/notices/sd_write_detail", file) + (error.empty() ? "" : " (" + error + ")"));
 }
 
+void sweep_if_stale()
+{
+    // The Overview read the same a moment ago (every 5 s while it is shown):
+    // nothing new to ask the console.
+    if (s_status_known && std::chrono::steady_clock::now() - s_status_at < std::chrono::seconds(10)) {
+        note_pin_strength(s_status);
+        return;
+    }
+    sweep();
+}
+
 void sweep()
 {
+    ui::SameTime same;
     PctlStatus s;
     PtState    pt;
     pctl_overview_fetch(&s, &pt);

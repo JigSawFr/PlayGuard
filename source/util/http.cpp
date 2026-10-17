@@ -15,9 +15,60 @@
 namespace http
 {
 
-static std::mutex s_lock;   // one request at a time; also guards the global init
-static bool       s_ready = false;
 static std::atomic<bool> s_abort{ false };   // abort_all(): the app is quitting
+
+namespace
+{
+// libcurl's global state, set up by the first request. Requests run
+// side by side (a download of a few minutes holds up nothing else): what they
+// share is the DNS cache and, where the TLS backend keeps them in libcurl,
+// the TLS sessions (switch-curl's libnx backend keeps its own, inside the
+// console's ssl service, per connection: there it is the DNS alone).
+std::mutex        s_init_lock;       // held for the set-up only, never during a transfer
+std::atomic<bool> s_ready{ false };
+CURLSH*           s_share = nullptr;
+std::mutex        s_share_locks[CURL_LOCK_DATA_LAST];
+std::atomic<int>  s_running{ 0 };    // requests under way: cleanup() waits for none
+
+void share_lock(CURL*, curl_lock_data data, curl_lock_access, void*)
+{
+    if ((unsigned)data < (unsigned)CURL_LOCK_DATA_LAST) s_share_locks[data].lock();
+}
+
+void share_unlock(CURL*, curl_lock_data data, void*)
+{
+    if ((unsigned)data < (unsigned)CURL_LOCK_DATA_LAST) s_share_locks[data].unlock();
+}
+
+// Set up by the first request (again by the next one when it failed).
+bool ready()
+{
+    if (s_ready) return true;
+    std::lock_guard<std::mutex> guard(s_init_lock);
+    if (s_ready) return true;
+    // On the Switch this starts the ssl and csrng services (switch-curl's libnx backend).
+    if (curl_global_init(CURL_GLOBAL_DEFAULT) != CURLE_OK) return false;
+    // Without the share, each request simply resolves and shakes hands on its own.
+    s_share = curl_share_init();
+    if (s_share && (curl_share_setopt(s_share, CURLSHOPT_LOCKFUNC, share_lock) != CURLSHE_OK ||
+                    curl_share_setopt(s_share, CURLSHOPT_UNLOCKFUNC, share_unlock) != CURLSHE_OK ||
+                    curl_share_setopt(s_share, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS) != CURLSHE_OK)) {
+        curl_share_cleanup(s_share);
+        s_share = nullptr;
+    }
+    // A nicety: refused, the DNS still is shared.
+    if (s_share) curl_share_setopt(s_share, CURLSHOPT_SHARE, CURL_LOCK_DATA_SSL_SESSION);
+    s_ready = true;   // last: a request that sees it sees the share too
+    return true;
+}
+
+// Counts a request under way for as long as it lives.
+struct Running
+{
+    Running()  { s_running++; }
+    ~Running() { s_running--; }
+};
+}   // namespace
 
 namespace
 {
@@ -33,6 +84,7 @@ struct Sink
     CURL*        curl = nullptr;
     uint64_t     base = 0;          // bytes already in the file (a download resumed)
     bool         status_seen = false;
+    bool         refused = false;   // the answer was not written (http_logic::download_start)
     const std::atomic<bool>* cancel = nullptr;   // set: the transfer stops (download())
 };
 
@@ -52,20 +104,28 @@ size_t on_data(char* data, size_t size, size_t count, void* user)
     auto* sink = static_cast<Sink*>(user);
     if (s_abort || cancelled(sink)) return 0;
     const size_t n = size * count;
-    // A resumed download the server answers in full (200, not 206): it
-    // starts over, from an empty file.
-    if (sink->file && sink->base && !sink->status_seen) {
+    // A download looks at the status before its first byte: an error page is
+    // not written (a part kept stays usable), a resumed download the server
+    // answers in full (200, not 206) starts over, from an empty file.
+    if (sink->file && !sink->status_seen) {
         sink->status_seen = true;
         long status = 0;
         curl_easy_getinfo(sink->curl, CURLINFO_RESPONSE_CODE, &status);
-        if (status != 206) {
-            std::fflush(sink->file);
-            if (::ftruncate(::fileno(sink->file), 0) != 0) {
-                sink->file_error = true;
-                return 0;
-            }
-            std::rewind(sink->file);
-            sink->base = 0;
+        switch (http_logic::download_start(status, sink->base > 0)) {
+            case http_logic::Start::Refuse:
+                sink->refused = true;
+                return 0;   // aborts the transfer
+            case http_logic::Start::StartOver:
+                std::fflush(sink->file);
+                if (::ftruncate(::fileno(sink->file), 0) != 0) {
+                    sink->file_error = true;
+                    return 0;
+                }
+                std::rewind(sink->file);
+                sink->base = 0;
+                break;
+            case http_logic::Start::Write:
+                break;
         }
     }
     const size_t have = sink->file ? sink->base + sink->written : sink->body->size();
@@ -109,20 +169,16 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
 {
     const std::string* post = x.post;
     Sink* to_file = x.to_file;
-    std::lock_guard<std::mutex> guard(s_lock);
+    const Running running;
     body->clear();
     if (status_out) *status_out = 0;
     if (s_abort) {
         if (error) *error = "PlayGuard is quitting";
         return false;
     }
-    if (!s_ready) {
-        // On the Switch this starts the ssl and csrng services (switch-curl's libnx backend).
-        if (curl_global_init(CURL_GLOBAL_DEFAULT) != CURLE_OK) {
-            if (error) *error = "libcurl initialisation failed";
-            return false;
-        }
-        s_ready = true;
+    if (!ready()) {
+        if (error) *error = "libcurl initialisation failed";
+        return false;
     }
     CURL* curl = curl_easy_init();
     if (!curl) {
@@ -137,6 +193,7 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
     char message[CURL_ERROR_SIZE] = "";
     struct curl_slist* headers = nullptr;
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    if (s_share) curl_easy_setopt(curl, CURLOPT_SHARE, s_share);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, x.follow && !post ? 1L : 0L);
     curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 5L);
     // HTTPS only, redirects included (no downgrade to http:// or other schemes).
@@ -191,6 +248,7 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
     outcome.status      = status;
     outcome.overflow    = sink.overflow;
     outcome.file_error  = sink.file_error;
+    outcome.refused     = sink.refused;
     outcome.transfer_ok = rc == CURLE_OK;
     if (rc != CURLE_OK) outcome.transfer_error = message[0] ? message : curl_easy_strerror(rc);
     return http_logic::succeeded(outcome, error);
@@ -268,8 +326,10 @@ void cleanup()
 {
     // A request still running (the app quit during a check) would hold the
     // exit for up to its timeout: skip the cleanup, the process ends anyway.
-    std::unique_lock<std::mutex> guard(s_lock, std::try_to_lock);
-    if (!guard.owns_lock() || !s_ready) return;
+    // Called once, at exit, after abort_all(): no request starts after it.
+    if (s_running > 0 || !s_ready) return;
+    if (s_share) curl_share_cleanup(s_share);
+    s_share = nullptr;
     curl_global_cleanup();
     s_ready = false;
 }

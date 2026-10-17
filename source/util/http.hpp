@@ -21,6 +21,7 @@ using Headers = std::vector<std::string>;
 // an HTTP status >= 400, a timeout or a body larger than `max_bytes`;
 // *status gets the HTTP status when the server answered (a 404 tells
 // "nothing there" from a network failure). Blocking: call it from brls::async.
+// Requests on several threads run side by side.
 bool get(const std::string& url, std::string* body, std::string* error,
          size_t max_bytes = 64 * 1024, long timeout_s = 10, const Headers& headers = {}, long* status = nullptr);
 
@@ -43,7 +44,9 @@ bool redirect(const std::string& url, std::string* target, std::string* error, c
 // behind on failure: the caller removes it, or resumes it.
 // `resume_from` > 0: `path` already holds that many bytes of it; the rest is
 // asked for (a Range request) and appended. A server that sends it all again
-// (200, not 206) has the file started over.
+// (200, not 206) has the file started over; an error answer (>= 400), or
+// any other one to a Range request, writes nothing, and the file keeps what
+// it held.
 // `cancel` (when given) set by another thread stops the transfer within a
 // second ("cancelled").
 bool download(const std::string& url, const std::string& path, std::string* error, size_t max_bytes,

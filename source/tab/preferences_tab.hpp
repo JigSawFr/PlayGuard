@@ -1,7 +1,8 @@
 // PreferencesTab — PlayGuard itself: language, theme and start tab; the
 // intro and the monthly "Support PlayGuard" reminder; the kinds of
-// notifications; the daily update check and how to update. A setting that
-// shapes one feature lives in that feature's tab.
+// notifications; the daily update check and how to update; a line to Help &
+// diagnostics (HelpTab, on a screen of its own). A setting that shapes one
+// feature lives in that feature's tab.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -27,5 +28,5 @@ class PreferencesTab : public TabBase
     BRLS_BIND(brls::BooleanCell, notices_reminders, "pf_notices_reminders");
     BRLS_BIND(brls::BooleanCell, update_daily,  "pf_update_daily");
     BRLS_BIND(brls::DetailCell,  update_via,    "pf_update_via");
-    BRLS_BIND(brls::Label,       note,          "pf_note");
+    BRLS_BIND(brls::DetailCell,  help,          "pf_help");
 };

@@ -28,10 +28,10 @@ PlayGuard cannot help: it needs Atmosphère. Nintendo support's master-key proce
 
 An error shows the system's code (such as `0x0001088E`) with what is known about it: what to do for the codes whose meaning is documented, otherwise a report helps.
 
-1. *Tools › Export a diagnostic report* saves a text file in `sd:/config/playguard/logs/reports/`: firmware, Atmosphère version, how long the start-up took, clocks, storage, serial-blanking and game-patch status, the raw result of every parental-control query, and the logs: how the last run ended, the memory and SD-card space left, the newest crash files and the last 80 lines logged. **It never contains the PIN or the serial number.**
+1. *Preferences › Help & diagnostics › Export a diagnostic report* saves a text file in `sd:/config/playguard/logs/reports/`: firmware, Atmosphère version, how long the start-up took, clocks, storage, serial-blanking and game-patch status, the raw result of every parental-control query, and the logs: how the last run ended, the memory and SD-card space left, the newest crash files and the last 80 lines logged. **It never contains the PIN or the serial number.**
 2. [Open an issue](https://github.com/JigSawFr/PlayGuard/issues/new) and attach it.
 
-Or, with the console online, *Tools › Send a report online* (Ⓧ on the diagnostic report in developer mode) sends it, with the latest crash reports (PlayGuard's last 3 in `logs/crashes/`, and Atmosphère's last 2 of a homebrew from the past week, in `sd:/atmosphere/crash_reports/`: another homebrew's crash can be one of them, the list shown before sending says which), the logs of this run and the one before (`logs/sessions/`; a long one: its start and its last 64 KiB) and the debug files (the play-timer block reference, the end of the play-timer recording, the change history and PlayGuard's settings), to a secret gist in your GitHub account (the report and each file as a file of its own; signed out, PlayGuard offers to sign in first, as *GitHub account* in the developer tools does), after saying exactly what goes. It shows the link and two QR codes: the report, and the bug-report form with the link, your versions, how PlayGuard was started (over a game or from the Album; add the menu) and the system (sysMMC or emuMMC) already filled in. Anyone with the link can read the report, until you delete the gist on GitHub. Each link is kept in `logs/uploads/` as an Internet shortcut (`.url`) that a computer opens in its browser. A report saved earlier in `logs/reports/` can be sent the same way.
+Or, with the console online, *Preferences › Help & diagnostics › Send a report online* (Ⓧ on the diagnostic report in developer mode) sends it, with the latest crash reports (PlayGuard's last 3 in `logs/crashes/`, and Atmosphère's last 2 of a homebrew from the past week, in `sd:/atmosphere/crash_reports/`: another homebrew's crash can be one of them, the list shown before sending says which), the logs of this run and the one before (`logs/sessions/`; a long one: its start and its last 64 KiB) and the debug files (the play-timer block reference, the end of the play-timer recording while *Record the play timer* is on, the last 20 changes of the change history, without names (of games, accounts or profiles) and with their date only, and PlayGuard's settings), to a secret gist in your GitHub account (the report and each file as a file of its own; signed out, PlayGuard offers to sign in first, as *GitHub account* in the developer tools does), after saying exactly what goes. It shows the link and two QR codes: the report, and the bug-report form with the link, your versions, how PlayGuard was started (over a game or from the Album; add the menu) and the system (sysMMC or emuMMC) already filled in. Anyone with the link can read the report, until you delete the gist on GitHub, and a bug report opened with it is public: the confirmation says so. Each link is kept in `logs/uploads/` as an Internet shortcut (`.url`) that a computer opens in its browser. A report saved earlier in `logs/reports/` can be sent the same way.
 
 ### What PlayGuard keeps on the SD card
 
@@ -46,11 +46,11 @@ Everything is in `sd:/config/playguard/logs/`, plain text a computer opens:
   The crash files caught while PlayGuard runs end with the last 80 lines logged before the crash.
 - `reports/`, `uploads/`, `play_timer/` — the saved reports, the links of the reports sent online, the play-timer recording.
 
-*Tools › Diagnostics* sets how many reports, crash files, session logs and links are kept (each folder on its own; the newest always stays).
+*Preferences › Help & diagnostics* sets how many reports, crash files, session logs and links are kept (each folder on its own; the newest always stays).
 
 ## Developer mode (investigating a new firmware)
 
-Press *About › Version* seven times; the developer tools appear at the end of *Tools*. It adds:
+Press *About › Version* seven times; the developer tools appear at the end of *Preferences › Help & diagnostics*. It adds:
 
 - a **read-only** switch — with it on, the app cannot change anything: the safe way to investigate a new firmware (the firmware screen offers it directly);
 - the diagnostic report on screen (Ⓨ saves it, Ⓧ sends it online), and a shortcut to export it from the Play timer tab;

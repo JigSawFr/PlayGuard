@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/history_flow.hpp"
 
+#include <algorithm>
+#include <atomic>
 #include <borealis.hpp>
 #include <fmt/format.h>
 
@@ -118,6 +120,11 @@ std::vector<int> custom_values(const PctlCustomSettings& s)
     return { s.rating_age, s.sns_post_restriction ? 1 : 0, s.free_communication_restriction ? 1 : 0 };
 }
 
+// count(): unknown (-1) until the file is first read. Moved on by the
+// write itself, off the UI thread: load() waits for those still queued, so
+// once it has read the file no write it read is counted again.
+static std::atomic<long> s_count{ -1 };
+
 static void store(history::Entry e)
 {
     // A change PlayGuard made: what it reads next is not a change made
@@ -127,11 +134,18 @@ static void store(history::Entry e)
     e.when = ui::now_stamp();
     e.version = app::version();
     // Off the UI thread: append() reads and rewrites the whole file.
-    ui::write_later("history", [e]() {
+    ui::append_later("history", "history", [e]() {
         std::string err;
         bool put_aside = false;
         const bool saved = history::append(e, &err, &put_aside);
         if (!saved) brls::Logger::warning("history: not saved ({})", err);
+        // A damaged file put aside: the history starts again with this entry.
+        if (put_aside) s_count = saved ? 1 : 0;
+        else if (saved) {
+            long n = s_count.load();
+            while (n >= 0 && !s_count.compare_exchange_weak(n, std::min<long>(n + 1, (long)history::MAX_ENTRIES))) {
+            }
+        }
         brls::sync([saved, err]() { notices::note_write("history", saved, err); });
         if (put_aside) brls::sync([]() { data_notice::history_put_aside(); });
     });
@@ -188,8 +202,16 @@ void record_failure(const char* kind, Result rc, std::vector<int> before, std::v
 
 std::vector<history::Entry> load()
 {
-    ui::settle_writes();
-    return history::load();
+    ui::settle_writes("history");
+    std::vector<history::Entry> all = history::load();
+    s_count = (long)all.size();
+    return all;
+}
+
+size_t count()
+{
+    if (s_count < 0) load();
+    return (size_t)s_count;
 }
 
 // The result code of a refused change, as recorded ("0x0001088E").

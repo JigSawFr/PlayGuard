@@ -54,7 +54,13 @@ jobs:
       attestations: write
       discussions: write
     uses: ./.github/workflows/build.yml
-    # The Docker Hub login for the switch job's image (see build.yml).
-    secrets: inherit
+    # Only the secrets the build asks for (its workflow_call secrets), not
+    # every secret of the repository: the Docker Hub login for the switch
+    # job's image, and the release job's app key and release-page key.
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
     with:
       tag: ${{ needs.release-please.outputs.tag_name }}

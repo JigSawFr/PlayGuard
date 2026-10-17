@@ -1,7 +1,8 @@
 // Host tests for source/action/write_queue_logic.cpp: the SD-card writes run
 // in the order asked, a file written whole keeps only its newest content, a
-// waiter sees its write done (running it itself when the runner has not
-// started), and nothing queued is lost at exit.
+// file added to keeps every write, a waiter sees its write done (running its
+// own file's jobs itself, never another file's, and never two of one file at
+// once), config.json can go first, and nothing queued is lost at exit.
 #include "check.h"
 #include <atomic>
 #include <chrono>
@@ -88,11 +89,12 @@ static void test_wait_takes_over()
     bool start = false;
     q.push("", [&]() { log.add("a"); }, &start);
     const Queue::Ticket t = q.push("config", [&]() { log.add("b"); }, &start);
-    // The runner was asked for but has not started: the waiter runs the jobs.
+    // The runner was asked for but has not started: the waiter runs its own
+    // job, and only that one (never another file's, on the UI thread).
     q.wait(t);
-    CHECK(log.get() == "ab");
-    q.run();   // the runner, late: nothing left, nothing run twice
-    CHECK(log.get() == "ab");
+    CHECK(log.get() == "b");
+    q.run();   // the runner, late: what is left, nothing run twice
+    CHECK(log.get() == "ba");
     q.wait(t);   // already run: returns at once
     q.wait(0);
     q.settle();
@@ -111,19 +113,99 @@ static void test_threads()
     }, &start);
     REQUIRE(start);
     std::thread runner([&q]() { q.run(); });
-    while (!started) std::this_thread::sleep_for(1ms);   // the runner is on it: queue behind
-    const Queue::Ticket t = q.push("config", [&]() { log.add("+cfg"); }, &start);
+    while (!started) std::this_thread::sleep_for(1ms);   // the runner is on a long export
+    const Queue::Ticket t = q.push("config", [&]() { log.add("cfg+"); }, &start);
     CHECK(!start);
-    std::thread waiter([&q, t]() { q.wait(t); });
-    std::this_thread::sleep_for(20ms);
-    CHECK(log.get().empty());   // still behind the slow one
+    // config.json is another file: written now by its waiter, not behind the export.
+    q.wait(t);
+    CHECK(log.get() == "cfg+");
     release = true;
-    waiter.join();
-    CHECK(log.get() == "slow+cfg");   // in order, done when wait() returned
     q.push("", [&]() { log.add("+h"); }, &start);
     q.settle();   // the runner may have gone: settle runs it here then
-    CHECK(log.get() == "slow+cfg+h");
+    CHECK(log.get() == "cfg+slow+h");
     runner.join();
+}
+
+static void test_same_file()
+{
+    // A job of the same file as the one running waits for it: never two
+    // writes of one file at once, nor out of order.
+    Queue q;
+    Log log;
+    std::atomic<bool> started{ false }, release{ false };
+    bool start = false;
+    q.push("config", [&]() {
+        started = true;
+        while (!release) std::this_thread::sleep_for(1ms);
+        log.add("1");
+    }, &start);
+    std::thread runner([&q]() { q.run(); });
+    while (!started) std::this_thread::sleep_for(1ms);
+    const Queue::Ticket t = q.push("config", [&]() { log.add("2"); }, &start);
+    std::thread waiter([&q, t]() { q.wait(t); });
+    std::this_thread::sleep_for(20ms);
+    CHECK(log.get().empty());
+    release = true;
+    waiter.join();
+    CHECK(log.get() == "12");
+    runner.join();
+
+    // The runner skips a file a waiter is writing, and comes back to it.
+    Queue busy;
+    Log done;
+    std::atomic<bool> in{ false }, out{ false };
+    const Queue::Ticket first = busy.push("history", [&]() {
+        in = true;
+        while (!out) std::this_thread::sleep_for(1ms);
+        done.add("h1");
+    }, &start, Queue::Write::Append);
+    busy.push("history", [&]() { done.add("h2"); }, &start, Queue::Write::Append);
+    busy.push("", [&]() { done.add("e"); }, &start);
+    std::thread w([&busy, first]() { busy.wait(first); });
+    while (!in) std::this_thread::sleep_for(1ms);
+    std::thread r([&busy]() { busy.run(); });
+    // The export goes past the history while h1 is being written.
+    while (done.get().empty()) std::this_thread::sleep_for(1ms);
+    CHECK(done.get() == "e");
+    out = true;
+    w.join();
+    r.join();
+    CHECK(done.get() == "eh1h2");
+}
+
+static void test_settle_key()
+{
+    Queue q;
+    Log log;
+    bool start = false;
+    q.push("", [&]() { log.add("x"); }, &start);
+    q.push("history", [&]() { log.add("1"); }, &start, Queue::Write::Append);
+    q.push("pt_log", [&]() { log.add("p"); }, &start, Queue::Write::Append);
+    q.push("history", [&]() { log.add("2"); }, &start, Queue::Write::Append);
+    // Appends of one file are all kept, in order; only that file's run here.
+    q.settle("history");
+    CHECK(log.get() == "12");
+    q.settle("history");   // nothing left of it: at once
+    q.settle("none");
+    q.settle();   // every file, here
+    CHECK(log.get() == "12xp");
+    q.run();
+    CHECK(log.get() == "12xp");
+}
+
+static void test_first()
+{
+    // config.json ahead of the jobs still waiting.
+    Queue q;
+    Log log;
+    bool start = false;
+    q.push("", [&]() { log.add("e"); }, &start);
+    q.push("history", [&]() { log.add("h"); }, &start, Queue::Write::Append);
+    q.push("config", [&]() { log.add("1"); }, &start, Queue::Write::Whole, true);
+    const Queue::Ticket t = q.push("config", [&]() { log.add("2"); }, &start, Queue::Write::Whole, true);
+    q.run();
+    CHECK(log.get() == "2eh");   // the newer config.json only, first
+    q.wait(t);
 }
 
 static void test_flush()
@@ -184,6 +266,9 @@ int main()
     test_latest_wins();
     test_wait_takes_over();
     test_threads();
+    test_same_file();
+    test_settle_key();
+    test_first();
     test_flush();
     test_throwing_job();
     return CHECK_DONE("write_queue_logic: all tests passed");

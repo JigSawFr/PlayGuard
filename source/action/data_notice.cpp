@@ -64,7 +64,7 @@ void at_start()
 
     // Before the entry below, which would otherwise put it aside on its own.
     // Not while a change is being written to it (ui::write_later).
-    ui::settle_writes();
+    ui::settle_writes("history");
     const history::Damage hist = history::check();
     if (hist == history::Damage::PutAside || s_history) add("data_history", false, "playguard/data_notice/history_reset"_i18n);
     else if (hist == history::Damage::Stuck) add("data_history", true, "playguard/data_notice/history_stuck"_i18n);

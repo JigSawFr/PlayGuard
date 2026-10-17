@@ -28,13 +28,13 @@
 #include "core/platform.h"
 #include "tab/about_tab.hpp"
 #include "tab/activity_tab.hpp"
-#include "tab/clock_tab.hpp"
+#include "tab/console_tab.hpp"
 #include "tab/dashboard_tab.hpp"
+#include "tab/history_tab.hpp"
 #include "tab/play_timer_tab.hpp"
 #include "tab/preferences_tab.hpp"
 #include "tab/restrictions_tab.hpp"
 #include "tab/security_tab.hpp"
-#include "tab/tools_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/crash_dump.h"
@@ -211,10 +211,12 @@ brls::Activity* choose_first()
     // The playguard-rescue sysmodule acted on a RESCUE file: show what it
     // did and let the parent finish, before (and instead of) the lock
     // screen — they are here because they forgot the PIN. Only when the
-    // console confirms it: anyone can write the report file, and an
-    // unconfirmed one leads to the lock screen like any start.
-    auto report = rescue::take();
-    const bool confirmed = report && rescue::confirmed(*report);
+    // console confirms it (and the sysmodule's proof, for an unlock): anyone
+    // can write the report file, and an unconfirmed one leads to the lock
+    // screen like any start.
+    RescueProof proof;
+    auto report = rescue::take(&proof);
+    const bool confirmed = report && rescue::confirmed(*report, proof);
     // Stopped in the middle of a change last time: lock again before any
     // screen, so a lock screen left with B does not leave the console
     // unlocked. Not after a confirmed recovery unlock: that one is wanted.
@@ -347,10 +349,10 @@ int main(int argc, char* argv[])
     brls::Application::registerXMLView("PlayTimerTab",    PlayTimerTab::create);
     brls::Application::registerXMLView("ActivityTab",     ActivityTab::create);
     brls::Application::registerXMLView("RestrictionsTab", RestrictionsTab::create);
-    brls::Application::registerXMLView("ClockTab",        ClockTab::create);
     brls::Application::registerXMLView("SecurityTab",     SecurityTab::create);
+    brls::Application::registerXMLView("ConsoleTab",      ConsoleTab::create);
+    brls::Application::registerXMLView("HistoryTab",      HistoryTab::create);
     brls::Application::registerXMLView("PreferencesTab",  PreferencesTab::create);
-    brls::Application::registerXMLView("ToolsTab",        ToolsTab::create);
     brls::Application::registerXMLView("AboutTab",        AboutTab::create);
 
     brls::Application::registerXMLView("LoadingMark",     LoadingMark::create);
@@ -374,8 +376,11 @@ int main(int argc, char* argv[])
     // or icon read running there stops now, not after every game is read.
     brls::Application::getExitEvent()->subscribe([]() { playstats_cancel(); });
 
-    while (brls::Application::mainLoop())
-        ;
+    while (brls::Application::mainLoop()) {
+        // The lines the session file waits for, written off the UI thread
+        // once they waited long enough (util/session_log.hpp).
+        if (session_log::due()) ui::write_later("session log", []() { session_log::flush(); }, "session_log");
+    }
 
     // "Lock and quit": locked now that the screen is gone (pt_flow.hpp).
     pt_flow::lock_at_exit_if_asked();

@@ -35,6 +35,7 @@ config/playguard/nand/<system>/cache/         play data per account (activity_*.
 config/playguard/github_token            GitHub sign-in of the developer tools: the token in plain text,
                                          treat it as a password (Disconnect deletes it)
 config/playguard/rescue_report.txt       left by the recovery sysmodule, read at start-up
+config/playguard/rescue_nonce            the challenge the recovery sysmodule answers in its report
 ```
 
 The optional recovery sysmodule (`playguard-rescue.zip`, a separate download) is also extracted at the root of the SD card:

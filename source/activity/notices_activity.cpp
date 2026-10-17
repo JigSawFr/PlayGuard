@@ -2,6 +2,7 @@
 #include "activity/notices_activity.hpp"
 
 #include "action/notices.hpp"
+#include "action/notice_logic.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -14,7 +15,8 @@ NoticesActivity::~NoticesActivity()
 
 void NoticesActivity::open()
 {
-    brls::Logger::info("notices: {} to do, {} for information", notices::action_count(), notices::info_count());
+    brls::Logger::info("notices: {} to do, {} for information, {} about the console to do", notices::action_count(),
+                       notices::info_count(), notices::console_count());
     if (notices::list().empty()) {
         ui::notify("playguard/notices/none"_i18n);
         return;
@@ -67,17 +69,49 @@ void NoticesActivity::rebuild()
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::STRETCH);
     brls::View* first = nullptr;
-    bool header_todo = false, header_info = false;
+    brls::View* focus = nullptr;
+    bool parental = false;
+    for (const notices::Entry& e : all) parental |= e.item.group == notice_logic::Group::Parental;
+    // The console's entries: on one line until opened, unless they are all
+    // there is.
+    const bool console_shown = this->console_open || !parental;
+    enum Section { None, Todo, Info, Console } section = None;
+    const auto header = [&](const std::string& title) {
+        auto* h = new brls::Header();
+        h->setTitle(title);
+        h->setMarginTop(first ? 24 : 0);
+        h->setMarginBottom(8);
+        box->addView(h);
+    };
     for (const notices::Entry& e : all) {
         const bool todo = e.item.level == notices::Level::Action;
-        bool& said = todo ? header_todo : header_info;
-        if (!said) {
-            said = true;
-            auto* header = new brls::Header();
-            header->setTitle(todo ? "playguard/notices/section_todo"_i18n : "playguard/notices/section_info"_i18n);
-            header->setMarginTop(first ? 24 : 0);
-            header->setMarginBottom(8);
-            box->addView(header);
+        const bool console = e.item.group == notice_logic::Group::Console;
+        const Section here = console ? Console : todo ? Todo : Info;
+        if (here != section) {
+            section = here;
+            header(here == Todo ? "playguard/notices/section_todo"_i18n
+                   : here == Info ? "playguard/notices/section_info"_i18n
+                                  : "playguard/notices/section_console"_i18n);
+            if (console && !console_shown) {
+                int count = 0, todos = 0;
+                for (const notices::Entry& c : all)
+                    if (c.item.group == notice_logic::Group::Console) count++, todos += c.item.level == notices::Level::Action;
+                auto* more = new brls::DetailCell();
+                more->setText(brls::getStr("playguard/notices/console_count", count));
+                if (todos) more->title->setTextColor(ui::color_warn());
+                more->setDetailText(ui::opens("playguard/notices/console_show"_i18n));
+                more->registerClickAction([this](brls::View*) {
+                    // Next frame: the rebuild deletes this cell.
+                    this->console_open = true;
+                    brls::sync([this, alive = this->alive]() {
+                        if (*alive && !this->closing) this->rebuild();
+                    });
+                    return true;
+                });
+                box->addView(more);
+                if (!first) first = more;
+                break;
+            }
         }
 
         auto* cell = new brls::DetailCell();
@@ -103,6 +137,8 @@ void NoticesActivity::rebuild()
         });
         box->addView(cell);
         if (!first) first = cell;
+        // Just opened: the focus on the console's first entry.
+        if (console && this->console_open && !focus) focus = cell;
 
         if (!e.item.detail.empty()) {
             auto* text = new brls::Label();
@@ -119,7 +155,7 @@ void NoticesActivity::rebuild()
     }
 
     root->addView(box);
-    brls::Application::giveFocus(first);
+    brls::Application::giveFocus(focus ? focus : first);
     if (this->content) root->removeView(this->content);
     this->content = box;
 }

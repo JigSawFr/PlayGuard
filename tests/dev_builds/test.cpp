@@ -1,4 +1,4 @@
-// Host tests for source/util/sha256.cpp, dev_builds.cpp, zip_read.cpp and
+// Host tests for source/util/sha256.cpp (and its HMAC), dev_builds.cpp, zip_read.cpp and
 // github_auth.cpp: the SHA-256 test vectors, digests, the latest release and
 // the list of releases, the
 // artifact and pull-request lists and how they combine (main's commits, each
@@ -48,6 +48,33 @@ static void test_sha256()
     CHECK(sha(std::string(55, 'x')).size() == 64);
     CHECK(sha(std::string(56, 'a')) == "b35439a4ac6f0948b6d6f9e3c6af0f5f590ce20f1bde7090ef7970686ec6738a");
     CHECK(sha(std::string(64, 'a')) == "ffe054fe7ae0cb6dc65c3af9b61d5209f439851db43d0ba5997337df154668eb");
+}
+
+static std::string hex_of(const std::array<uint8_t, 32>& d)
+{
+    static const char HEX[] = "0123456789abcdef";
+    std::string out;
+    for (uint8_t b : d) {
+        out += HEX[b >> 4];
+        out += HEX[b & 0xF];
+    }
+    return out;
+}
+
+// RFC 4231's test cases 1, 2 and 6 (a key longer than a block).
+static void test_hmac_sha256()
+{
+    const std::string k1(20, '\x0b'), m1 = "Hi There";
+    CHECK(hex_of(hmac_sha256(k1.data(), k1.size(), m1.data(), m1.size())) ==
+          "b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7");
+    const std::string k2 = "Jefe", m2 = "what do ya want for nothing?";
+    CHECK(hex_of(hmac_sha256(k2.data(), k2.size(), m2.data(), m2.size())) ==
+          "5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843");
+    const std::string k6(131, '\xaa'), m6 = "Test Using Larger Than Block-Size Key - Hash Key First";
+    CHECK(hex_of(hmac_sha256(k6.data(), k6.size(), m6.data(), m6.size())) ==
+          "60e431591ee0b67f0d8a26aacbf5b77f8e0bc6213728c5140546040f0ee37f54");
+    Sha256 h;
+    CHECK(hex_of(h.digest()) == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
 }
 
 static void test_names()
@@ -389,15 +416,21 @@ static void test_cache()
     pr.expires = "2027-01-07T12:03:00Z";
     pr.run = 77;
     pr.ci = dev_builds::Ci::Failed;
+    pr.sha256 = std::string(64, 'b');
     Build bad = pr;
     bad.url = "http://x";   // not https: left out when read back
     // An edited list: anywhere but GitHub is left out too.
+    // No digest, or a malformed one: it could not be installed, not kept.
+    Build undigested = pr, upper = rel, short_digest = rel;
+    undigested.sha256.clear();
+    upper.sha256 = std::string(64, 'A');
+    short_digest.sha256 = std::string(63, 'a');
     Build elsewhere = rel, lookalike = pr, userinfo = rel;
     elsewhere.url = "https://example.com/playguard.nro";
     lookalike.url = "https://api.github.com.example.com/repos/o/r/actions/artifacts/1/zip";
     userinfo.url = "https://github.com@example.com/playguard.nro";
     dev_builds::Cache c;
-    c.builds = { rel, pr, bad, elsewhere, lookalike, userinfo };
+    c.builds = { rel, pr, bad, elsewhere, lookalike, userinfo, undigested, upper, short_digest };
     c.needs_login = false;
     c.fetched_at = 1000000;
 
@@ -409,7 +442,7 @@ static void test_cache()
            back.builds[0].prerelease);
     CHECK(back.builds[1].kind == Kind::PullRequest && back.builds[1].artifact && back.builds[1].pr == 48 &&
            back.builds[1].title == pr.title && back.builds[1].commit == "abc1234" && back.builds[1].date == pr.date &&
-           back.builds[1].sha256.empty() && !back.builds[1].prerelease && back.builds[1].notes == pr.notes &&
+           back.builds[1].sha256 == pr.sha256 && !back.builds[1].prerelease && back.builds[1].notes == pr.notes &&
            back.builds[1].expires == pr.expires && back.builds[1].run == 77 && back.builds[1].ci == dev_builds::Ci::Failed);
 
     // Fresh: under ten minutes old, not from the future, same sign-in state, not empty.
@@ -443,10 +476,11 @@ static void test_files()
 
     std::string err;
     CHECK(dev_builds::verify_file(file, content.size(), sha(content), &err));
-    CHECK(dev_builds::verify_file(file, content.size(), "", &err));   // no digest: the size only
+    // No digest: refused, whatever the size and the header say.
+    CHECK(!dev_builds::verify_file(file, content.size(), "", &err) && err == dev_builds::NO_DIGEST);
     CHECK(!dev_builds::verify_file(file, content.size(), sha(content + "x"), &err) && err == "SHA-256 does not match");
     CHECK(!dev_builds::verify_file(file, 4999, sha(content), &err) && err.find("size") == 0);
-    CHECK(!dev_builds::verify_file(dir + "/missing.nro", 1, "", &err));
+    CHECK(!dev_builds::verify_file(dir + "/missing.nro", 1, sha(content), &err));
     CHECK(dev_builds::verify_nro(file, &err));
     CHECK(paths::atomic_write(dir + "/zip.nro", std::string(5000, 'z')));
     CHECK(!dev_builds::verify_nro(dir + "/zip.nro", &err) && err == "not an NRO file");
@@ -559,6 +593,14 @@ static void test_auth()
     CHECK(github_auth::token().empty());
     github_auth::forget_token();
     CHECK(github_auth::token().empty());
+    // Refused by GitHub (401): forgotten, unless a new sign-in replaced it.
+    CHECK(github_auth::save_token("ghu_new", &error));
+    github_auth::forget_refused("ghu_abc123");
+    CHECK(github_auth::token() == "ghu_new");
+    github_auth::forget_refused("");
+    CHECK(github_auth::token() == "ghu_new");
+    github_auth::forget_refused("ghu_new");
+    CHECK(github_auth::token().empty());
 
     const auto h = github_auth::api_headers("ghu_abc");
     CHECK(h.size() == 3 && h[2] == "Authorization: Bearer ghu_abc");
@@ -572,6 +614,7 @@ int main()
     REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
 
     test_sha256();
+    test_hmac_sha256();
     test_names();
     test_release();
     test_releases();
@@ -584,5 +627,5 @@ int main()
     test_auth();
 
     std::system((std::string("rm -rf '") + dir + "'").c_str());
-    return CHECK_DONE("sha256, release and artifact lists, the order of each kind, the cached list, download checks, zip extraction, replacement and GitHub sign-in assertions passed");
+    return CHECK_DONE("sha256, HMAC-SHA256, release and artifact lists, the order of each kind, the cached list, download checks, zip extraction, replacement and GitHub sign-in assertions passed");
 }

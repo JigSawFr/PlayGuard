@@ -17,7 +17,7 @@ namespace
 }   // namespace
 
 AboutTab::AboutTab()
-    : TabBase("xml/tab/about.xml")
+    : TabBase("xml/tab/about.xml", false)
 {
     changelog_note->setSingleLine(false);
     support_note->setSingleLine(false);

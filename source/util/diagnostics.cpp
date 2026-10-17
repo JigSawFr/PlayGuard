@@ -48,8 +48,8 @@ std::string logs_section()
     std::string before = "none kept";
     for (const std::string& name : log_files::list(paths::sessions_dir(), log_files::SESSION)) {
         if (name == current) continue;
-        std::string text;
-        if (!paths::read_file(paths::sessions_dir() + "/" + name, text)) {
+        std::string text;   // its end line: the end of the file is enough
+        if (!session_log::tail_of(paths::sessions_dir() + "/" + name, &text)) {
             before = name + ": cannot be read";
             break;
         }

@@ -46,7 +46,7 @@ void record(std::string event = "")
     pctl_play_timer_sample(&s);
     // Read here, written off the UI thread (with the other SD-card writes, in order).
     const std::string line = pt_log::row(stamp, posix, s, &s_prev, event);
-    ui::write_later("pt_log", [line]() {
+    ui::append_later("pt_log", "pt_log", [line]() {
         std::string error;
         if (pt_log::append(line, &error)) s_warned = false;
         else if (!s_warned.exchange(true)) brls::Logger::warning("pt_log: {}", error);

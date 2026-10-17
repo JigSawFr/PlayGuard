@@ -4,18 +4,21 @@
 #include <borealis.hpp>
 #include <ctime>
 #include <fmt/format.h>
+#include <memory>
 #include <vector>
 
 #include "action/github_login_flow.hpp"
 #include "action/notices.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
+#include "util/config.hpp"
 #include "util/diagnostics.hpp"
 #include "util/github_auth.hpp"
 #include "util/log_files.hpp"
 #include "util/log_upload.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
+#include "util/session_log.hpp"
 #include "view/qr_view.hpp"
 
 using namespace brls::literals;
@@ -25,7 +28,12 @@ namespace upload_flow
 
 namespace
 {
-bool s_sending = false;   // one upload at a time
+bool s_sending = false;      // one upload at a time
+bool s_collecting = false;   // the files of a report being read
+
+// The parts, shared by the dialogs and the tasks they lead to: a report with
+// its files is a few hundred KB, read once and never copied after.
+using Parts = std::shared_ptr<const std::vector<log_upload::Part>>;
 
 // What goes: a diagnostic report (its link with the bug-report form, kept in
 // the notifications) or a list (its link alone).
@@ -117,24 +125,27 @@ void show_link(const log_upload::Result& r, bool report)
 }
 
 // To a secret gist in the GitHub account PlayGuard is signed in to.
-void send_gist(const std::vector<log_upload::Part>& parts, const Kind& kind)
+void send_gist(const Parts& parts, const Kind& kind)
 {
     // Too large (a long history): the start, with the report, is what matters.
     bool cut = false;
-    const std::vector<log_upload::Part> files = log_upload::gist_files(parts, log_upload::GIST_MAX_BYTES, &cut);
+    const Parts files = std::make_shared<const std::vector<log_upload::Part>>(
+        log_upload::gist_files(*parts, log_upload::GIST_MAX_BYTES, &cut));
     std::string list;
-    for (const auto& p : parts) list += "\n• " + p.name;
+    for (const auto& p : *parts) list += "\n• " + p.name;
     if (cut) list += "\n" + "playguard/upload/partial"_i18n;
-    const int kb = (int)((log_upload::total_bytes(files) + 1023) / 1024);
-    const std::string body = brls::getStr("playguard/upload/confirm", "playguard/upload/where_gist"_i18n, kb) + "\n" +
-                             list + "\n\n" + "playguard/upload/confirm_gist"_i18n;
+    const int kb = (int)((log_upload::total_bytes(*files) + 1023) / 1024);
+    std::string body = brls::getStr("playguard/upload/confirm", "playguard/upload/where_gist"_i18n, kb) + "\n" +
+                       list + "\n\n" + "playguard/upload/confirm_gist"_i18n;
+    // Its link goes into a bug report, which anyone can read.
+    if (kind.report) body += " " + "playguard/upload/confirm_public"_i18n;
     const std::string token = github_auth::token();
     ui::confirm(body, "playguard/upload/send"_i18n, [files, token, kind]() {
         ui::notify("playguard/upload/sending"_i18n);
         if (s_sending) return;
         s_sending = true;
         ui::in_background("gist upload", [files, token, kind]() {
-            const log_upload::Result r = log_upload::upload_gist(files, token, app::version(), kind.what);
+            const log_upload::Result r = log_upload::upload_gist(*files, token, app::version(), kind.what);
             brls::sync([r, kind]() {
                 s_sending = false;
                 if (!r.ok) {
@@ -155,7 +166,7 @@ void send_gist(const std::vector<log_upload::Part>& parts, const Kind& kind)
 }
 
 // Signed out of GitHub: signing in comes first, then the report goes.
-void send(const std::vector<log_upload::Part>& parts, const Kind& kind = Kind{})
+void send(const Parts& parts, const Kind& kind = Kind{})
 {
     if (!github_auth::token().empty()) {
         send_gist(parts, kind);
@@ -167,24 +178,44 @@ void send(const std::vector<log_upload::Part>& parts, const Kind& kind = Kind{})
                 });
 }
 
+Parts parts_of(std::vector<log_upload::Part> parts)
+{
+    return std::make_shared<const std::vector<log_upload::Part>>(std::move(parts));
+}
+
 // The report, the latest crashes (PlayGuard's, then Atmosphère's), the last
 // runs' session logs (before the debug files, so a cut takes the history
-// first) and the debug files.
-std::vector<log_upload::Part> with_debug_files(const std::string& report)
+// first) and the debug files. Read off the UI thread: the files are on the
+// SD card (only the part of each that is sent is read), then the sending
+// goes on, on the UI thread.
+void with_debug_files(const std::string& report)
 {
-    std::vector<log_upload::Part> parts{ { "playguard/upload/part_report"_i18n, report } };
-    ui::settle_writes();   // the files as they are once the writes asked for are done
-    for (auto& f : log_upload::crash_files()) parts.push_back(std::move(f));
-    for (auto& f : log_upload::atmosphere_crashes(std::time(nullptr))) parts.push_back(std::move(f));
-    for (auto& f : log_upload::session_files()) parts.push_back(std::move(f));
-    for (auto& f : log_upload::debug_files()) parts.push_back(std::move(f));
-    return parts;
+    if (s_collecting) return;
+    s_collecting = true;
+    const std::string name = "playguard/upload/part_report"_i18n;
+    // The recorder's file only while it records: the developer is after it.
+    const bool pt_log = config::get().pt_log;
+    ui::in_background("report files", [name, report, pt_log]() {
+        std::vector<log_upload::Part> parts{ { name, report } };
+        session_log::flush();   // this run's lines still in memory, into its file
+        ui::settle_writes();    // the files as they are once the writes asked for are done
+        for (auto& f : log_upload::crash_files()) parts.push_back(std::move(f));
+        for (auto& f : log_upload::atmosphere_crashes(std::time(nullptr))) parts.push_back(std::move(f));
+        for (auto& f : log_upload::session_files()) parts.push_back(std::move(f));
+        for (auto& f : log_upload::debug_files(pt_log)) parts.push_back(std::move(f));
+        if (ui::quitting()) return;
+        const Parts all = parts_of(std::move(parts));
+        brls::sync([all]() {
+            s_collecting = false;
+            send(all);
+        });
+    });
 }
 }   // namespace
 
 void send_report(const std::string& report)
 {
-    send(with_debug_files(report));
+    with_debug_files(report);
 }
 
 void send_list(const std::string& name, const std::string& text, const std::string& what)
@@ -192,7 +223,7 @@ void send_list(const std::string& name, const std::string& text, const std::stri
     Kind kind;
     kind.report = false;
     kind.what = what;
-    send({ { name, text } }, kind);
+    send(parts_of({ { name, text } }), kind);
 }
 
 void choose()
@@ -215,7 +246,7 @@ void choose()
             ui::info(brls::getStr("playguard/upload/failed", "cannot read " + name));
             return;
         }
-        send({ { "logs/reports/" + name, content } });
+        send(parts_of({ { "logs/reports/" + name, std::move(content) } }));
     });
 }
 

@@ -14,7 +14,7 @@
 	"filesystem_access":	{
 		"permissions":	"0xffffffffffffffff"
 	},
-	"service_access":	["pctl:a", "pctl:s", "pctl:r", "fsp-srv"],
+	"service_access":	["pctl:a", "pctl:s", "pctl:r", "fsp-srv", "set:sys"],
 	"service_host":	[],
 	"kernel_capabilities":	[{
 			"type":	"kernel_flags",

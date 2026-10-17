@@ -46,6 +46,7 @@ Result upload_gist(const std::vector<Part>& files, const std::string& token, con
         // 401: the token was revoked; 403 / 404: it was given before PlayGuard
         // asked for the gist permission.
         r.relogin = status == 401 || status == 403 || status == 404;
+        if (status == 401) github_auth::forget_refused(token);   // no use keeping it
         r.error = "GitHub: " + r.error;
         return r;
     }

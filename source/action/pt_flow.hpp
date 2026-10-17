@@ -60,10 +60,6 @@ void choose_uniform_limit(const PtState& pt, std::function<void()> refresh);
 // minutes (PT_DAY_NOLIMIT for no limit).
 void pick_limit(const std::string& title, uint16_t current, std::function<void(uint16_t)> on_value);
 
-// Changes one weekday's limit (0 = Sunday) on the console, through pick_limit
-// and confirm_write: what the week chart does on A.
-void change_day_limit(int day, uint16_t current, std::function<void()> refresh);
-
 // "Extra time today": raises today's weekday limit by 15 / 30 / 60 min and
 // remembers the previous value (config extra_*), so that it can be put back.
 void add_extra_time(const PtState& pt, std::function<void()> refresh);

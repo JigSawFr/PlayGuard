@@ -87,6 +87,11 @@ Result pctl_get_pin(char *out, size_t out_size);
 // is read (1208), judged and wiped here: it never leaves this function, so
 // no reveal check is asked (nothing is shown). NXM_RC_NO_PIN with no PIN.
 Result pctl_pin_weak(bool *weak);
+// HMAC-SHA256 of `msg` (`size` bytes) keyed with the stored PIN (1208), into
+// `mac` (32 bytes, zeroed on any error): what checks the recovery report's
+// proof (core/rescue.h). As above, the PIN is read, used and wiped here and
+// nothing is shown, so no reveal check is asked. NXM_RC_NO_PIN with no PIN.
+Result pctl_pin_hmac(const void *msg, size_t size, u8 *mac);
 // RevertRestrictionTemporaryUnlocked (1007): re-applies restrictions now.
 Result pctl_relock(void);
 

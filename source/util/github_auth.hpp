@@ -16,7 +16,10 @@
 // reads one as none, so the next opening asks to sign in again.
 //
 // The token is kept in its own file, sd:/config/playguard/github_token,
-// never in config.json, which "Send a report online" sends.
+// never in config.json, which "Send a report online" sends. It does not
+// expire (the app has token expiry off: CONTRIBUTING.md), so GitHub hands
+// no refresh token; one GitHub answers 401 (revoked, or the app's
+// authorisation removed) is forgotten, and the next use asks to sign in.
 //
 // Parsing and the token file are plain C++ for the host tests
 // (tests/dev_builds); start() and poll() are in github_auth_net.cpp.
@@ -61,6 +64,9 @@ Poll parse_poll(const std::string& json, std::string* token, std::string* error)
 std::string token();
 bool        save_token(const std::string& token, std::string* error);
 void        forget_token();
+// forget_token(), when the saved token is still `token`: GitHub refused it
+// (HTTP 401). A sign-in made since keeps its own.
+void        forget_refused(const std::string& token);
 std::string token_file();
 
 // "Authorization: Bearer <token>" plus the API's media type and version, for

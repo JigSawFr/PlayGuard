@@ -28,6 +28,8 @@ class PtWeekView : public brls::Box
     void set_on_pick(std::function<void(int)> on_pick);
     // Whether the days take the focus (today first). Off: a plain chart.
     void set_editable(bool editable);
+    // The day (0 = Sunday) the first press lands on, instead of today.
+    void focus_day(int day);
 
     static brls::View* create();
 

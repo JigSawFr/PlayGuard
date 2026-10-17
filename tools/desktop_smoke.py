@@ -49,7 +49,7 @@ the Overview and the Play timer tab must show the time over the limit.
 
 The "sysnotes" scenario checks for updates at start-up against a simulated
 GitHub and switchbrew (PLAYGUARD_SIM_SYS_LATEST, PLAYGUARD_SIM_SYS_NOTES),
-hekate 6.5.3 on the SD card: Tools › Console must say how far behind each
+hekate 6.5.3 on the SD card: Console must say how far behind each
 one is and that the newest firmware needs a newer hekate, then show the
 release notes of the firmware (the closest newer version, then the
 installed one), of Atmosphère and of hekate, and keep them in the cache.
@@ -284,24 +284,33 @@ if ERRORS:
 if RESCUE:
     # The playguard-rescue sysmodule left a report: PlayGuard must show the
     # recovery screen at start-up and open the app when it is dismissed.
-    # The console confirms it: the sysmodule is installed and its unlock is
-    # still on (a report the console does not confirm only shows, without
-    # the actions).
+    # The console confirms it: the sysmodule is installed, its unlock is
+    # still on, and the report carries its proof (core/rescue.h): the
+    # challenge PlayGuard left, and an HMAC-SHA256 keyed with the simulated
+    # PIN (1234). A report the console does not confirm only shows, without
+    # the actions.
+    import hashlib
+    import hmac
     env.setdefault("PLAYGUARD_SIM_UNLOCKED", "1")
     sysmodule = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "contents", "4200000000505247", "exefs.nsp")
     os.makedirs(os.path.dirname(sysmodule), exist_ok=True)
     open(sysmodule, "w").write("NSP0")
     report = os.path.join(run_dir, "playguard_data", "rescue_report.txt")
     os.makedirs(os.path.dirname(report), exist_ok=True)
-    open(report, "w").write("mode=unlock\nresult=ok\nrc=0x00000000\nunlocks=1\n")
+    nonce = os.urandom(16).hex()
+    open(os.path.join(run_dir, "playguard_data", "rescue_nonce"), "w").write(nonce + "\n")
+    body = "mode=unlock\nresult=ok\nrc=0x00000000\nunlocks=1\nrequest=removed\n"
+    mac = hmac.new(b"1234", f"playguard-rescue/1\nnonce={nonce}\n{body}".encode(), hashlib.sha256).hexdigest()
+    open(report, "w").write(f"{body}nonce={nonce}\nmac={mac}\n")
     history = os.path.join(nand_dir, "history.json")
     if os.path.exists(history):
         os.remove(history)   # a clean history: the rescue entry must be the only one
 if FORGED:
     # A rescue report written by hand while PlayGuard asks for the PIN to
     # open, on a console a parent left temporarily unlocked but without the
-    # sysmodule: the recovery screen shows it with no action, and "Open
-    # PlayGuard" goes through the lock screen.
+    # sysmodule: the console's state agrees with it, but it has no proof
+    # (core/rescue.h). The recovery screen shows it with no action, and
+    # "Open PlayGuard" goes through the lock screen.
     env.setdefault("PLAYGUARD_SIM_UNLOCKED", "1")
     sysmodule = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "contents", "4200000000505247")
     if os.path.exists(sysmodule):
@@ -398,7 +407,7 @@ if SYSNOTES:
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
     json.dump({"schema": 1, "update_daily": True}, open(config_file, "w"))
 if LOCK:
-    # Security › Ask for the PIN › To open PlayGuard: the lock screen comes
+    # PIN › Protect PlayGuard with the PIN › To open PlayGuard: the lock screen comes
     # first, and the right PIN (the simulated PIN screen accepts) opens the
     # app in its place. And without the intro (Preferences): no 2 s hold.
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
@@ -566,7 +575,7 @@ if not LOADING and not LOCK:
     if not m or int(m.group(1)) < 2000:
         fail("the first screen came before the end of the intro: " + (ready[0].strip() if ready else "no line"))
 
-tabs = ["dashboard", "play_timer", "activity", "restrictions", "clock", "security", "preferences", "tools", "about"]
+tabs = ["dashboard", "play_timer", "activity", "restrictions", "security", "console", "history", "preferences", "about"]
 
 
 def steps(a, b):
@@ -615,10 +624,13 @@ if GATE:
     key("Right")
     key("Return", 7)
     shot("04_dev_enabled")
-    # The developer tools are at the end of Tools: press like a hand.
+    # The developer tools are at the end of Preferences › Help & diagnostics:
+    # press like a hand.
     key("Left")
-    key("Up", steps("tools", "about"))
+    key("Up", steps("preferences", "about"))
     key("Right")
+    key("Down", 50, hold=0.15) # its last line: Help & diagnostics
+    key("Return")
     key("Down", 50, hold=0.15) # the Developer section, down to its last cell
     shot("05_dev_tools")
     # Turning a developer switch off asks first; B keeps it on (the end of
@@ -712,8 +724,10 @@ if DEVBUILD:
     key("Right")
     key("Return", 7)
     key("Left")
-    key("Up", steps("tools", "about"))
+    key("Up", steps("preferences", "about"))
     key("Right")
+    key("Down", 50, hold=0.15) # its last line: Help & diagnostics
+    key("Return")
     key("Down", 50, hold=0.15) # the Developer section, down to its last cell
     key("Return")              # Install another build: signed out, the releases and "Sign in"
     time.sleep(1)              # once fetched (the simulated GitHub takes 0.6 s an answer)
@@ -858,8 +872,9 @@ if ERRORS:
     shot("04_unlock_failed")   # a dialog, not a toast
     key("Return")              # OK
     key("Left")                # back to the sidebar
-    key("Down", 3)             # Network clock
-    key("Right")
+    key("Down", steps("play_timer", "console"))
+    key("Right")               # Network clock, its own screen
+    key("Return")
     shot("05_clock_autosync_off")
     # No time server answers: measuring offers the console clock instead,
     # behind the same confirmation as a measured time.
@@ -943,8 +958,10 @@ if OUTSIDE:
     time.sleep(6)              # the next refresh shows it
     shot("02_not_counting")
     key("y")                   # the notification bell's list (the keyboard's Y): both, the
-    if not logged("notices: 5 to do"):   # simulated network clock (not accurate), PIN (1234), broken games
-        fail("the notification bell does not hold the five notices to do")
+    # simulated network clock (not accurate) and PIN (1234) to do; the broken
+    # games under Console, on one line.
+    if not logged("notices: 4 to do") or not logged("1 about the console to do"):
+        fail("the notification bell does not hold four notices to do and one about the console")
     shot("03_notices")
     key("Escape")
     key("Down")                # Play timer: its state line says it too
@@ -984,9 +1001,9 @@ if SYSNOTES:
             time.sleep(0.5)
         fail(f"no {what} in 30 s")
     wait_logged("release notes: lists kept", "release lists from the start-up check")
-    key("Down", steps("dashboard", "tools"))
-    key("Right")
-    key("Down", 13)            # Console › hekate (the first presses scroll the notes above), the warning under it
+    key("Down", steps("dashboard", "console"))
+    key("Right")               # Network clock
+    key("Down", 4)             # past the installed games, Firmware, Atmosphère: hekate, the warning under it
     shot("01_tools_console")   # 2 versions behind, and 23.0.1 needs hekate 6.5.4 first
     key("Up", 2)               # Firmware
     key("Return")
@@ -1063,6 +1080,13 @@ if RESCUE:
     report_path = os.path.join(run_dir, "playguard_data", "rescue_report.txt")
     if os.path.exists(report_path):
         fail("the rescue report was not removed after it was read")
+    if "rescue report confirmed by the console (proof valid" not in open(os.path.join(OUT, "app.log"), errors="replace").read():
+        fail("the sysmodule's proof was not checked")
+    try:
+        if open(os.path.join(run_dir, "playguard_data", "rescue_nonce")).read().strip() == nonce:
+            fail("the challenge was not replaced once the report was read")
+    except OSError:
+        fail("no new challenge after the report was read")
 
     def recorded():
         history = os.path.join(nand_dir, "history.json")
@@ -1110,35 +1134,39 @@ for i, tab in enumerate(tabs[1:], start=2):
     shot(f"{i:02d}_{tab}_end")
     key("Left")       # back to the sidebar
 
-# Extra-time picker, per-day editor (the week chart is the editor) and its
-# day picker.
+# The per-day editor, opened from the tab's week chart on the day picked
+# (its picker already open), then the extra-time picker and the
+# Weekdays and weekend row (the editor, Monday–Friday picker first).
 key("Up", steps("play_timer", tabs[-1]))   # from the last tab back to Play timer
 key("Right")               # the week chart, on today
 key("Right")               # tomorrow's day
-key("Return")              # its limit picker, from the tab itself
+key("Return")              # the per-day editor on that day, its picker open
 shot("19_day_picker")
 key("Escape")
-key("Down")                # Same limit every day
-key("Down")                # Extra time today…
-key("Return")
-shot("20_extra_time")
-key("Escape")
-key("Down", 2)             # past No more play today: A different limit for each day…
-key("Return")
-shot("21_per_day")
-key("Return")              # today's limit (the chart has the focus)
+shot("21_per_day")         # the editor, tomorrow focused
+key("Return")              # tomorrow's limit again
 shot("22_dropdown")
 key("Down", 15)            # to the end of the list (No limit) …
 key("Up")                  # … then Enter minutes…: the number pad types "1:30"
 key("Return")
-shot("22_numpad")          # today: 1 h 30, drawn as unsaved; "+ Save (1)" in the footer
+shot("22_numpad")          # tomorrow: 1 h 30, drawn as unsaved; "+ Save (1)" in the footer
 if not any("numpad: " in l and l.rstrip().endswith("-> 1:30") for l in open(os.path.join(OUT, "app.log"), errors="replace")):
     fail("the number pad was not asked for the minutes")
 key("Escape")              # unsaved: asks before leaving
 shot("23_discard")
 key("Right")               # Discard
 key("Return")
-shot("23_back")
+shot("23_back")            # the tab, on the chart again
+key("Down")                # Same limit every day
+key("Down")                # Extra time today…
+key("Return")
+shot("20_extra_time")
+key("Escape")
+key("Down", 2)             # past No more play today: Weekdays and weekend
+key("Return")
+shot("21_split")           # the editor, Monday–Friday picker open
+key("Escape")              # no value: no weekend picker either
+key("Escape")              # nothing staged: leaves without asking
 
 # When the time is up: its two choices (on "Suspend the software"), and the
 # confirmation of the other one, cancelled.
@@ -1190,9 +1218,9 @@ key("Escape")              # back to the Play timer tab
 
 # Settings backup: save one, open the list and the restore summary (cancelled).
 key("Left")                # back to the sidebar
-key("Down", steps("play_timer", "tools"))
-key("Right")               # First steps…
-key("Down", 2)             # past the change history: Back up the settings
+key("Down", steps("play_timer", "history"))
+key("Right")               # Changes made with PlayGuard
+key("Down")                # Back up the settings
 backups = os.path.join(nand_dir, "backups")
 before = len(os.listdir(backups)) if os.path.isdir(backups) else 0
 key("Return")              # Back up the settings
@@ -1221,7 +1249,12 @@ reports = os.path.join(run_dir, "playguard_data", "logs", "reports")
 def saved_reports():
     return [f for f in (os.listdir(reports) if os.path.isdir(reports) else []) if f.startswith("report_") and f.endswith(".txt")]
 saved = saved_reports()
-key("Down", 3)             # past Keep, Export: Send a report online
+key("Left")                # back to the sidebar
+key("Down", steps("history", "preferences"))
+key("Right")
+key("Down", 50, hold=0.15) # its last line: Help & diagnostics
+key("Return")
+key("Down", 2)             # past First steps, Export: Send a report online
 key("Return")
 if saved:                  # reports saved by an earlier local run: this report is the first choice
     key("Return")
@@ -1249,7 +1282,11 @@ os.remove(github_token)
 # section picked, the corrupt game kept as such), a removal of the games
 # picked and one of a single game (recorded in the change history), the
 # third all at once, the fourth.
-key("Down", 4)             # past Keep, Keep for, Keep up to: Check the installed games
+key("Escape")              # back to Preferences
+key("Left")                # back to the sidebar
+key("Up", steps("console", "preferences"))
+key("Right")               # Network clock
+key("Down")                # Check the installed games
 os.remove(games_cache)     # made by the start-up check: this screen's first check, game by game
 key("Return")
 time.sleep(0.8)
@@ -1387,7 +1424,7 @@ def pdfs():
     return {f for f in (os.listdir(exports) if os.path.isdir(exports) else []) if f.endswith(".pdf")}
 pdfs_before = pdfs()   # the run folder is kept between local runs
 key("Left")                # back to the sidebar
-key("Up", steps("activity", "tools"))
+key("Up", steps("activity", "console"))
 key("Right")               # Account (the simulated console has two; the totals are not focusable)
 key("Down", 5)             # a scroll, then past Period, the game to rediscover and Export: the first game
 key("Return")
