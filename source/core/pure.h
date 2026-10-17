@@ -104,6 +104,9 @@ void pt_encode(u16 c[PT_U16_COUNT], const u16 days_min[7]);
 //  (A day whose bedtime is on keeps its times: only its limit flag and minutes
 //  change, and "no limit on any day" keeps the block while a bedtime is on.)
 
+// Sun..Sat limits a write may set: 0..1440 minutes, or PT_DAY_NOLIMIT.
+bool pt_days_ok(const u16 days_min[7]);
+
 // One day's bedtime (pure.h layout above): the alarm at hour:minute, play
 // allowed again at end_hour:end_minute.
 typedef struct {

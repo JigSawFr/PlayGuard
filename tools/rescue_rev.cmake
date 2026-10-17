@@ -14,7 +14,8 @@ set(RESCUE_REV_SOURCES
     sysmodule/source/main.c
     sysmodule/playguard-rescue.json
     source/core/rescue.c
-    source/core/rescue.h)
+    source/core/rescue.h
+    source/core/pctl_ops_internal.h)
 set(_rescue_all "")
 foreach (_f ${RESCUE_REV_SOURCES})
     file(READ "${ROOT}/${_f}" _content HEX)

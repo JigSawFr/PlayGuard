@@ -64,6 +64,7 @@ void pctl_status_fetch(PctlStatus *out);
 Result pctl_lock_state(u32 *pin_length, bool *unlocked);
 
 const char *pctl_rating_org_name(u32 org);           // "PEGI", "ESRB", … or "?"
+#define RATING_ORG_COUNT 13   // nn::ns::RatingOrganization, as pctl_rating_org_name names them
 
 // ---- PIN / unlock ----
 // Opens the system PIN applet (registers / changes it). NXM_RC_CANCELLED when
@@ -166,7 +167,13 @@ void pctl_overview_fetch(PctlStatus *status, PtState *pt);
 // A block read that fails pt_plausible is refused (NXM_RC_PT_NOT_UNDERSTOOD),
 // as by the bedtime write below.
 Result pctl_play_timer_set_days(const u16 days_min[7]);
-Result pctl_play_timer_clear(void);
+// No limit on any day: the timer off. Inline, so the simulator has it too.
+static inline Result pctl_play_timer_clear(void)
+{
+    u16 d[7];
+    for (int i = 0; i < 7; i++) d[i] = PT_DAY_NOLIMIT;
+    return pctl_play_timer_set_days(d);
+}
 
 // Bedtime, Sun..Sat (pure.h): written into the block read with 145601 (only
 // the bedtime bytes change), behind the same gate. The block layout is
