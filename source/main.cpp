@@ -51,6 +51,7 @@
 #include "view/loading_bar.hpp"
 #include "view/loading_mark.hpp"
 #include "view/made_in_france.hpp"
+#include "view/footer_hints.hpp"
 #include "view/header_settings.hpp"
 #include "view/notice_bell.hpp"
 #include "view/version_badge.hpp"
@@ -344,6 +345,9 @@ void register_views()
 
     brls::Application::registerXMLView("LoadingMark",     LoadingMark::create);
     brls::Application::registerXMLView("LoadingBar",      LoadingBar::create);
+
+    // In place of borealis' brls:Hints: the footer's clock on one line.
+    FooterHints::install();
 
     // The version (and, for a development build, its commit) at the right of
     // every screen's header.

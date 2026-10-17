@@ -1,4 +1,6 @@
 # Keys and values of config.json / state.json (source/util/config.cpp), for libFuzzer's -dict.
+"\"activity_account\":"
+"\"activity_account_last\":"
 "\"activity_period\":"
 "\"advanced\":"
 "\"appstore\":"

@@ -1,9 +1,9 @@
 // SysNotesActivity — Console › Atmosphère, hekate or Firmware: the
-// release notes of the installed version and of each newer one, a tab each
-// (util/sys_notes.hpp's tabs(): at most five newer ones). Ⓛ / Ⓡ move from
-// one tab to the next (their icons on either side of the tabs); the screen
-// opens on the closest newer version, or on the installed one when it is
-// the newest. For the firmware, what updating to the newest needs first
+// release notes of the installed version, of each newer one and, in the
+// tabs left, of the older ones, a tab each (util/sys_notes.hpp's tabs(): at
+// most five newer ones, six tabs). Ⓛ / Ⓡ move from one tab to the next
+// (their icons on either side of the tabs); the screen opens on the closest
+// newer version, or on the installed one when it is the newest. For the firmware, what updating to the newest needs first
 // (Atmosphère's and hekate's notes: update them, or wait). Each version:
 // tags (installed or new, the newest firmware it supports, security fixes,
 // parental controls changed), its title and date, its notes as Markdown

@@ -111,11 +111,13 @@ std::string firmware_page(const std::string& version);
 // --- What a screen shows ------------------------------------------------------
 
 // The releases a screen shows as tabs, as indexes into `list.releases`, in
-// the order of the tabs: the installed one first (when listed), then the
-// newer ones from the closest to the newest, at most MAX_NEWER of them (the
-// newest). *hidden: the newer releases left out; *installed_at: the
-// installed one's index (-1 when it is not listed).
-std::vector<size_t> tabs(const List& list, const std::string& installed, size_t* hidden, int* installed_at);
+// the order of the tabs, from the oldest: older ones (in the tabs the newer
+// ones leave, the closest), the installed one (when listed), then the newer
+// ones, at most MAX_NEWER of them (the newest). *hidden: the newer releases
+// left out; *installed_at: the installed one's index (-1 when it is not
+// listed); *newer_from: the first newer one's tab (the count when none).
+std::vector<size_t> tabs(const List& list, const std::string& installed, size_t* hidden, int* installed_at,
+                         size_t* newer_from = nullptr);
 
 // How many listed releases are newer than `installed`.
 size_t newer_count(const List& list, const std::string& installed);

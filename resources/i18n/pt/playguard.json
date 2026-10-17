@@ -382,6 +382,8 @@
         "section_totals": "Tempo de jogo",
         "account": "Conta",
         "account_all": "Todas as contas",
+        "account_default": "Conta predefinida",
+        "account_last": "A última mostrada",
         "today": "Hoje",
         "week": "Últimos 7 dias",
         "all_time": "Desde sempre",
@@ -438,6 +440,8 @@
         "summary": {
             "per_day": "Média por dia",
             "per_day_over": "{} em {} dias",
+            "per_day_over_months": "{} em {} meses",
+            "per_day_over_years": "{} em {} anos",
             "top": "O mais jogado",
             "days_played": "Dias jogados",
             "days_played_value": "{} de 7",

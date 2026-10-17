@@ -7,8 +7,10 @@
 // the Overview, and kept on the SD card for the next run): what is known
 // shows at once, and is read again in the background when over a minute old,
 // without a spinner; Ⓧ reads it again with one. The chart marks each day's
-// current limit (every account only). A user account new to PlayGuard is
-// flagged under the account filter (action/outside_watch).
+// current limit (every account only). It starts on the account shown last,
+// or one chosen under "Account by default" (config's activity_account). A
+// user account new to PlayGuard is flagged under the account filter
+// (action/outside_watch).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -72,6 +74,7 @@ class ActivityTab : public TabBase
     BRLS_BIND(brls::DetailCell, week,        "ac_week");
     BRLS_BIND(brls::DetailCell, total,       "ac_total");
     BRLS_BIND(brls::DetailCell, account,     "ac_account");
+    BRLS_BIND(brls::DetailCell, account_default, "ac_account_default");
     BRLS_BIND(brls::Label,      new_account, "ac_new_account");
     BRLS_BIND(brls::DetailCell, sort,        "ac_period");
     BRLS_BIND(brls::DetailCell, per_day,     "ac_per_day");

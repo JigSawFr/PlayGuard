@@ -382,6 +382,8 @@
         "section_totals": "Spielzeit",
         "account": "Nutzer",
         "account_all": "Alle Nutzer",
+        "account_default": "Standardkonto",
+        "account_last": "Das zuletzt angezeigte",
         "today": "Heute",
         "week": "Letzte 7 Tage",
         "all_time": "Gesamt",
@@ -438,6 +440,8 @@
         "summary": {
             "per_day": "Durchschnitt pro Tag",
             "per_day_over": "{} über {} Tage",
+            "per_day_over_months": "{} über {} Monate",
+            "per_day_over_years": "{} über {} Jahre",
             "top": "Meistgespielt",
             "days_played": "Spieltage",
             "days_played_value": "{} von 7",

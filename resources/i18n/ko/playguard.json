@@ -382,6 +382,8 @@
         "section_totals": "플레이 시간",
         "account": "사용자",
         "account_all": "모든 사용자",
+        "account_default": "기본 계정",
+        "account_last": "마지막으로 표시한 계정",
         "today": "오늘",
         "week": "최근 7일",
         "all_time": "전체 기간",
@@ -438,6 +440,8 @@
         "summary": {
             "per_day": "하루 평균",
             "per_day_over": "{} ({}일 기준)",
+            "per_day_over_months": "{} ({}개월 기준)",
+            "per_day_over_years": "{} ({}년 기준)",
             "top": "가장 많이 한 게임",
             "days_played": "플레이한 날",
             "days_played_value": "7일 중 {}일",

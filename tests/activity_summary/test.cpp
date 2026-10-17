@@ -283,6 +283,18 @@ static void test_export()
     CHECK(t.columns.size() == 14 && t.rows.empty());
 }
 
+static void test_start_account()
+{
+    const std::string A(32, 'A'), B(32, 'B');
+    const std::vector<std::string> keys = { A, B };
+    CHECK(start_account("last", B, keys) == 1);
+    CHECK(start_account("last", "", keys) == -1);
+    CHECK(start_account("last", std::string(32, 'C'), keys) == -1);   // an account gone since
+    CHECK(start_account(A, B, keys) == 0);                             // a fixed one, whatever was shown last
+    CHECK(start_account("", B, keys) == -1);                           // every account
+    CHECK(start_account(B, "", {}) == -1);                             // no account listed
+}
+
 int main()
 {
     test_periods();
@@ -291,5 +303,6 @@ int main()
     test_unattributed();
     test_sort();
     test_export();
+    test_start_account();
     return CHECK_DONE("activity_summary assertions passed");
 }

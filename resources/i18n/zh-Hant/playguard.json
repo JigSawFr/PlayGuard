@@ -382,6 +382,8 @@
         "section_totals": "遊玩時間",
         "account": "帳號",
         "account_all": "所有帳號",
+        "account_default": "預設帳號",
+        "account_last": "上次顯示的帳號",
         "today": "今天",
         "week": "過去7天",
         "all_time": "全部期間",
@@ -438,6 +440,8 @@
         "summary": {
             "per_day": "日均",
             "per_day_over": "{}（{} 天）",
+            "per_day_over_months": "{}（{} 個月）",
+            "per_day_over_years": "{}（{} 年）",
             "top": "玩得最多",
             "days_played": "遊玩天數",
             "days_played_value": "7 天中 {} 天",

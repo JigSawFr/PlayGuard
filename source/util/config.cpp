@@ -92,6 +92,16 @@ void one_of(std::string& value, std::initializer_list<const char*> allowed, cons
 
 // "YYYY-MM-DD", digits where they belong.
 bool is_date(const std::string& s) { return date::parse_shape(s); }
+
+// "" (every account) or a user account's uid, 32 upper-case hex digits.
+bool account_key_ok(const std::string& s)
+{
+    if (s.empty()) return true;
+    if (s.size() != 32) return false;
+    for (char ch : s)
+        if (!((ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'F'))) return false;
+    return true;
+}
 }   // namespace
 
 void sanitize(Config& c)
@@ -116,6 +126,8 @@ void sanitize(Config& c)
         set_ok |= c.extra_amounts == std::vector<int>(std::begin(set), std::end(set));
     if (!set_ok) c.extra_amounts = { 15, 30, 60 };
     if (c.activity_period < 0 || c.activity_period > 2) c.activity_period = 1;
+    if (c.activity_account != "last" && !account_key_ok(c.activity_account)) c.activity_account = "last";
+    if (!account_key_ok(c.activity_account_last)) c.activity_account_last.clear();
     if (c.export_format < 0 || c.export_format > 3) c.export_format = 0;
     bool keep_ok = false;
     for (int k : BACKUP_KEEP) keep_ok |= c.backup_keep == k;
@@ -266,6 +278,8 @@ static void load_shared()
     read_string(j, "start_tab", c.start_tab);
     read_int(j, "activity_period", c.activity_period);
     read_bool(j, "games_grid", c.games_grid);
+    read_string(j, "activity_account", c.activity_account);
+    read_string(j, "activity_account_last", c.activity_account_last);
     read_int(j, "export_format", c.export_format);
     read_int(j, "backup_keep", c.backup_keep);
     read_int(j, "logs_keep", c.logs_keep);
@@ -372,6 +386,8 @@ bool snapshot(Snapshot& snap)
     j["extra_amounts"]   = s_config.extra_amounts;
     j["activity_period"] = s_config.activity_period;
     j["games_grid"]      = s_config.games_grid;
+    j["activity_account"]      = s_config.activity_account;
+    j["activity_account_last"] = s_config.activity_account_last;
     j["export_format"]   = s_config.export_format;
     j["backup_keep"]     = s_config.backup_keep;
     j["logs_keep"]       = s_config.logs_keep;
