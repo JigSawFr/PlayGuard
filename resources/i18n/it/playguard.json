@@ -109,7 +109,7 @@
         "pt_not_understood": "le impostazioni del tempo di gioco della console sono in un formato che PlayGuard non comprende, quindi non è stato modificato nulla. Invia un rapporto: Preferenze › Aiuto e diagnostica › Invia un rapporto online.",
         "wrong_pin": "il sistema ha rifiutato il PIN: PIN errato, oppure non di 4-8 cifre",
         "pctl_not_ready": "il servizio del filtro famiglia non è ancora pronto: attendi un momento, poi riprova",
-        "clock_not_set": "la console indica che il suo orologio di rete non ha un'ora valida (forse non è mai stato impostato); vedi la scheda Console › Orologio di rete",
+        "clock_not_set": "la console indica che il suo orologio di rete non ha un'ora valida (forse non è mai stato impostato); vedi Console › Orologio di rete",
         "no_internet": "la console non è connessa a Internet: connettila, quindi riprova",
         "service_denied": "il sistema ha negato a PlayGuard l'accesso a uno dei suoi servizi; PlayGuard richiede una console con Atmosphère",
         "pdm_unavailable": "il servizio dei dati di gioco della console non è disponibile al momento; riprova tra poco",
@@ -374,7 +374,7 @@
         "write_err": "Impossibile applicare il limite di tempo di gioco",
         "removed": "Limite di tempo di gioco rimosso.",
         "remove_err": "Impossibile rimuovere il limite di tempo di gioco",
-        "not_counting": "La console non sta conteggiando il tempo di gioco in questo momento. Cause probabili: l'orologio è stato portato indietro (riprenderà a contare più tardi), l'orologio di rete non è mai stato impostato (scheda Console › Orologio di rete), oppure è appena stato scritto un limite (avvia un gioco per un minuto, poi controlla).",
+        "not_counting": "La console non sta conteggiando il tempo di gioco in questo momento. Cause probabili: l'orologio è stato portato indietro (riprenderà a contare più tardi), l'orologio di rete non è mai stato impostato (Console › Orologio di rete), oppure è appena stato scritto un limite (avvia un gioco per un minuto, poi controlla).",
         "limit_note": "Al limite la console mostra \"Tempo scaduto\", poi sospende il gioco o si limita ad avvisare, secondo \"Quando il tempo è scaduto\".",
         "unsaved": "I progressi non salvati potrebbero andare persi: lascia prima salvare il bambino."
     },
@@ -537,7 +537,7 @@
             "timeout": "nessuna risposta",
             "bad_reply": "risposta non valida"
         },
-        "start_off": "L'orologio di rete è sfasato di {} (secondo {}). Il tempo di gioco si basa su di esso: vedi la scheda Console › Orologio di rete.",
+        "start_off": "L'orologio di rete è sfasato di {} (secondo {}). Il tempo di gioco si basa su di esso: vedi Console › Orologio di rete.",
         "guided_body": "L'orologio di rete non è preciso, e il tempo di gioco si basa su di esso.\n\nVuoi misurare ora l'orario con {}? (La console deve essere connessa a Internet.) Prima di impostare l'orologio ti verrà chiesta conferma.",
         "guided_measure": "Misura ora",
         "guided_fine": "L'orologio di rete è preciso: non c'è nulla da fare.",

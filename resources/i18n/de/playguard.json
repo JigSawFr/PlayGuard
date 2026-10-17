@@ -109,7 +109,7 @@
         "pt_not_understood": "die Spielzeit-Einstellungen der Konsole liegen in einem Format vor, das PlayGuard nicht versteht, daher wurde nichts geändert. Senden Sie einen Bericht: Optionen › Hilfe & Diagnose › Bericht online senden.",
         "wrong_pin": "das System hat die Geheimzahl abgelehnt: falsche Geheimzahl oder nicht 4 bis 8 Ziffern",
         "pctl_not_ready": "der Dienst der Altersbeschränkungen ist noch nicht bereit: warten Sie einen Moment und versuchen Sie es dann erneut",
-        "clock_not_set": "die Konsole meldet, dass ihre Netzwerkuhr keine gültige Zeit hat (sie wurde vielleicht nie gestellt); siehe den Tab Konsole › Netzwerkuhr",
+        "clock_not_set": "die Konsole meldet, dass ihre Netzwerkuhr keine gültige Zeit hat (sie wurde vielleicht nie gestellt); siehe Konsole › Netzwerkuhr",
         "no_internet": "die Konsole ist nicht mit dem Internet verbunden: Verbinden Sie sie und versuchen Sie es dann erneut",
         "service_denied": "das System hat PlayGuard den Zugriff auf einen seiner Dienste verweigert; PlayGuard benötigt eine Konsole mit Atmosphère",
         "pdm_unavailable": "der Spieldaten-Dienst der Konsole ist gerade nicht verfügbar; versuchen Sie es gleich noch einmal",
@@ -374,7 +374,7 @@
         "write_err": "Spielzeitlimit konnte nicht angewendet werden",
         "removed": "Spielzeitlimit entfernt.",
         "remove_err": "Spielzeitlimit konnte nicht entfernt werden",
-        "not_counting": "Die Konsole zählt die Spielzeit gerade nicht. Mögliche Ursachen: Die Uhr wurde zurückgestellt (sie zählt später wieder), die Netzwerkuhr wurde nie gestellt (Tab „Konsole › Netzwerkuhr“), oder ein Limit wurde gerade geschrieben (starten Sie ein Spiel für eine Minute und prüfen Sie dann erneut).",
+        "not_counting": "Die Konsole zählt die Spielzeit gerade nicht. Mögliche Ursachen: Die Uhr wurde zurückgestellt (sie zählt später wieder), die Netzwerkuhr wurde nie gestellt (Konsole › Netzwerkuhr), oder ein Limit wurde gerade geschrieben (starten Sie ein Spiel für eine Minute und prüfen Sie dann erneut).",
         "limit_note": "Beim Limit zeigt die Konsole „Zeit ist um“ an und unterbricht dann das Spiel oder warnt nur, je nach „Wenn die Zeit um ist“.",
         "unsaved": "Nicht gespeicherter Fortschritt kann verloren gehen: Lassen Sie das Kind zuerst speichern."
     },
@@ -537,7 +537,7 @@
             "timeout": "keine Antwort",
             "bad_reply": "ungültige Antwort"
         },
-        "start_off": "Die Netzwerkuhr weicht um {} ab (geprüft mit {}). Die Spielzeitbegrenzung verlässt sich darauf: siehe Tab Konsole › Netzwerkuhr.",
+        "start_off": "Die Netzwerkuhr weicht um {} ab (geprüft mit {}). Die Spielzeitbegrenzung verlässt sich darauf: siehe Konsole › Netzwerkuhr.",
         "guided_body": "Die Netzwerkuhr ist ungenau, und die Spielzeitbegrenzung verlässt sich darauf.\n\nJetzt die Zeit mit {} messen? (Die Konsole muss online sein.) Bevor die Uhr gestellt wird, werden Sie gefragt.",
         "guided_measure": "Jetzt messen",
         "guided_fine": "Die Netzwerkuhr ist genau: nichts zu tun.",

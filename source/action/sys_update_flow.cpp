@@ -88,8 +88,8 @@ void check()
 
 // bootloader/update.bin is what hekate loads when it is newer than the
 // payload that started it: the version on the SD card. The version sits in
-// the first KB of a file of about 200 KB: only that is read, once (Tools ›
-// Console asks for it each time it is shown).
+// the first KB of a file of about 200 KB: only that is read, once (the
+// Console tab asks for it each time it is shown).
 std::string installed_hekate()
 {
     static std::mutex lock;

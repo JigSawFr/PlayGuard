@@ -1,6 +1,6 @@
 // clock_flow — measuring the network clock against public NTP servers and
 // setting it (or, with no server, setting it to the console clock), shared
-// by the Network clock tab, the Overview's "Inaccurate" line and the
+// by Console › Network clock, the Overview's "Inaccurate" line and the
 // first-steps screen (one implementation of the measurement, the 2-minute
 // validity and the write with its before / after report).
 // NTP sampling and the time:s write are adapted from anbingxi's fork.

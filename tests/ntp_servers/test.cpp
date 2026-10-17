@@ -72,7 +72,7 @@ static void test_regions()
 
     const auto& list = ntp::regions();
     CHECK(!list.empty());
-    if (!CHECK(std::strcmp(list.front().id, "global") == 0)) return;   // the clock tab's first choice
+    if (!CHECK(std::strcmp(list.front().id, "global") == 0)) return;   // the network clock screen's first choice
     CHECK(list.front().hosts.front() == std::string("pool.ntp.org"));
 
     std::set<std::string> ids, hosts;

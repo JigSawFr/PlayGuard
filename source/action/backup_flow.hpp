@@ -20,7 +20,7 @@ backup::Snapshot capture();
 void save_now();
 
 // How many backups are on the SD card. Listed once, then kept up to date by
-// the saves made here (Tools refreshes often: every pick, the serial toggle).
+// the saves made here (the History tab refreshes often).
 size_t count();
 
 // "Restore a backup…": list of the backups → summary → confirmation → write.

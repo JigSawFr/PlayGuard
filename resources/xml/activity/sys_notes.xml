@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Tools › Console › Atmosphère, hekate or Firmware: the release notes.
+<!-- Console › Atmosphère, hekate or Firmware: the release notes.
      A tab for the installed version and one for each newer one (L / R move
      from one to the next), a bar while they are fetched, what updating the
      firmware needs first, then the chosen version's tags, title, notes and

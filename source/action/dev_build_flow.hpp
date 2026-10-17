@@ -1,4 +1,4 @@
-// dev_build_flow — Developer tools › Install another build: lists the last
+// dev_build_flow — Help & diagnostics › Developer › Install another build: lists the last
 // releases, the last commits of main and the open pull requests
 // (util/dev_builds.hpp), downloads the one picked, checks it, puts it in
 // place of the running .nro and restarts PlayGuard on it through hbloader.

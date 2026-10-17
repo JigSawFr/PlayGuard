@@ -179,7 +179,7 @@ int days_between(const std::string& now_iso, const std::string& iso);
 std::vector<Build> combine(const std::vector<Artifact>& artifacts, const std::vector<Pull>& pulls,
                            size_t keep_main = 20);
 
-// How Developer tools › Install another build orders main's commits and the
+// How Help & diagnostics › Developer › Install another build orders main's commits and the
 // pull requests (config.json "dev_builds_order").
 enum class Order
 {

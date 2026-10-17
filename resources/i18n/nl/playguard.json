@@ -109,7 +109,7 @@
         "pt_not_understood": "de speeltijdinstellingen van de console hebben een indeling die PlayGuard niet begrijpt, dus er is niets gewijzigd. Verstuur een rapport: Voorkeuren › Hulp en diagnose › Rapport online versturen.",
         "wrong_pin": "het systeem heeft de pincode geweigerd: verkeerde pincode, of niet 4 tot 8 cijfers",
         "pctl_not_ready": "de dienst voor ouderlijk toezicht is nog niet klaar: wacht even en probeer het dan opnieuw",
-        "clock_not_set": "de console meldt dat de netwerkklok geen geldige tijd heeft (misschien is die nooit ingesteld); zie het tabblad Console › Netwerkklok",
+        "clock_not_set": "de console meldt dat de netwerkklok geen geldige tijd heeft (misschien is die nooit ingesteld); zie Console › Netwerkklok",
         "no_internet": "de console is niet met internet verbonden: verbind hem en probeer het opnieuw",
         "service_denied": "het systeem weigerde PlayGuard toegang tot een van zijn diensten; PlayGuard heeft een console met Atmosphère nodig",
         "pdm_unavailable": "de speelgegevensdienst van de console is nu niet beschikbaar; probeer het zo opnieuw",
@@ -374,7 +374,7 @@
         "write_err": "Kan de speeltijdlimiet niet toepassen",
         "removed": "Speeltijdlimiet verwijderd.",
         "remove_err": "Kan de speeltijdlimiet niet verwijderen",
-        "not_counting": "De console telt op dit moment geen speeltijd. Waarschijnlijke oorzaken: de klok is teruggezet (later telt hij weer), de netwerkklok is nooit ingesteld (tabblad Console › Netwerkklok), of er is net een limiet geschreven (start een game voor een minuut en kijk dan opnieuw).",
+        "not_counting": "De console telt op dit moment geen speeltijd. Waarschijnlijke oorzaken: de klok is teruggezet (later telt hij weer), de netwerkklok is nooit ingesteld (Console › Netwerkklok), of er is net een limiet geschreven (start een game voor een minuut en kijk dan opnieuw).",
         "limit_note": "Bij de limiet toont de console \"Tijd is om\" en onderbreekt hij daarna de game of waarschuwt hij alleen, volgens \"Als de tijd om is\".",
         "unsaved": "Niet-opgeslagen voortgang kan verloren gaan: laat het kind eerst opslaan."
     },
@@ -537,7 +537,7 @@
             "timeout": "geen antwoord",
             "bad_reply": "ongeldig antwoord"
         },
-        "start_off": "De netwerkklok wijkt {} af (gecontroleerd met {}). De speeltijdtimer is ervan afhankelijk: zie het tabblad Console › Netwerkklok.",
+        "start_off": "De netwerkklok wijkt {} af (gecontroleerd met {}). De speeltijdtimer is ervan afhankelijk: zie Console › Netwerkklok.",
         "guided_body": "De netwerkklok is onnauwkeurig, en de speeltijdtimer is ervan afhankelijk.\n\nNu de tijd meten met {}? (De console moet online zijn.) Daarna krijg je eerst nog de vraag of de klok mag worden ingesteld.",
         "guided_measure": "Nu meten",
         "guided_fine": "De netwerkklok is nauwkeurig: niets te doen.",

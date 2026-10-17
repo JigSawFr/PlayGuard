@@ -1,4 +1,4 @@
-// Host tests for action/game_check_text.hpp: the rules behind what Tools ›
+// Host tests for action/game_check_text.hpp: the rules behind what Console ›
 // Check the installed games says of a game (each problem and section its own
 // key, the warnings, the firmware asked for, the fix text chosen) and the IDs
 // and console codes as the screen writes them.

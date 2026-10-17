@@ -109,7 +109,7 @@
         "pt_not_understood": "les réglages du temps de jeu de la console sont dans un format que PlayGuard ne comprend pas, rien n'a été modifié. Envoyez un rapport : Préférences › Aide et diagnostic › Envoyer un rapport en ligne.",
         "wrong_pin": "le système a refusé le NIP : NIP erroné, ou pas de 4 à 8 chiffres",
         "pctl_not_ready": "le service du contrôle parental n'est pas encore prêt : patientez un instant, puis réessayez",
-        "clock_not_set": "la console indique que son horloge réseau n'a pas d'heure valide (elle n'a peut-être jamais été réglée); voir l'onglet Console › Horloge réseau",
+        "clock_not_set": "la console indique que son horloge réseau n'a pas d'heure valide (elle n'a peut-être jamais été réglée); voir Console › Horloge réseau",
         "no_internet": "la console n'est pas connectée à Internet : connectez-la, puis réessayez",
         "service_denied": "le système a refusé à PlayGuard l'accès à l'un de ses services; PlayGuard a besoin d'une console sous Atmosphère",
         "pdm_unavailable": "le service des données de jeu de la console n'est pas disponible pour le moment; réessayez dans un instant",
@@ -374,7 +374,7 @@
         "write_err": "Impossible d'appliquer la limite de temps de jeu",
         "removed": "Limite de temps de jeu supprimée.",
         "remove_err": "Impossible de supprimer la limite de temps de jeu",
-        "not_counting": "La console ne décompte pas le temps de jeu en ce moment. Causes probables : l'horloge a été reculée (le décompte reprendra plus tard), l'horloge réseau n'a jamais été réglée (onglet Console › Horloge réseau), ou une limite vient d'être écrite (lancez un jeu une minute, puis vérifiez).",
+        "not_counting": "La console ne décompte pas le temps de jeu en ce moment. Causes probables : l'horloge a été reculée (le décompte reprendra plus tard), l'horloge réseau n'a jamais été réglée (Console › Horloge réseau), ou une limite vient d'être écrite (lancez un jeu une minute, puis vérifiez).",
         "limit_note": "À la limite, la console affiche « temps écoulé », puis suspend le jeu ou se contente d'avertir, selon « Quand le temps est écoulé ».",
         "unsaved": "La progression non sauvegardée peut être perdue : laissez l'enfant sauvegarder d'abord."
     },
@@ -537,7 +537,7 @@
             "timeout": "pas de réponse",
             "bad_reply": "réponse invalide"
         },
-        "start_off": "L'horloge réseau a {} d'écart (vérifiée avec {}). La limite de temps de jeu s'appuie dessus : voir l'onglet Console › Horloge réseau.",
+        "start_off": "L'horloge réseau a {} d'écart (vérifiée avec {}). La limite de temps de jeu s'appuie dessus : voir Console › Horloge réseau.",
         "guided_body": "L'horloge réseau est imprécise, et la limite de temps de jeu s'appuie dessus.\n\nMesurer l'heure avec {} maintenant? (La console doit être connectée.) Le réglage de l'horloge vous sera ensuite proposé.",
         "guided_measure": "Mesurer maintenant",
         "guided_fine": "L'horloge réseau est précise : rien à faire.",

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Developer tools › Install another build: a bar while the list is
+<!-- Help & diagnostics › Developer › Install another build: a bar while the list is
      fetched, a tab each for the last releases, main's last commits and the
      open pull requests (L / R move from one to the next, A on the pull
      requests' tab sorts them, Y finds a build), the builds of the chosen one,

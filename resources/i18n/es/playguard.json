@@ -109,7 +109,7 @@
         "pt_not_understood": "los ajustes del tiempo de juego de la consola están en un formato que PlayGuard no entiende, así que no se ha cambiado nada. Envíe un informe: Preferencias › Ayuda y diagnóstico › Enviar un informe en línea.",
         "wrong_pin": "el sistema ha rechazado el PIN: PIN incorrecto o no tiene de 4 a 8 dígitos",
         "pctl_not_ready": "el servicio de control parental aún no está listo: espere un momento e inténtelo de nuevo",
-        "clock_not_set": "la consola indica que su reloj de red no tiene una hora válida (puede que nunca se haya ajustado); consulte la pestaña Consola › Reloj de red",
+        "clock_not_set": "la consola indica que su reloj de red no tiene una hora válida (puede que nunca se haya ajustado); consulte Consola › Reloj de red",
         "no_internet": "la consola no está conectada a internet: conéctela e inténtelo de nuevo",
         "service_denied": "el sistema ha denegado a PlayGuard el acceso a uno de sus servicios; PlayGuard necesita una consola con Atmosphère",
         "pdm_unavailable": "el servicio de datos de juego de la consola no está disponible ahora; inténtelo de nuevo dentro de un momento",
@@ -374,7 +374,7 @@
         "write_err": "No se ha podido aplicar el límite de tiempo de juego",
         "removed": "Límite de tiempo de juego quitado.",
         "remove_err": "No se ha podido quitar el límite de tiempo de juego",
-        "not_counting": "La consola no está contando el tiempo de juego ahora mismo. Causas probables: el reloj se atrasó (volverá a contar más tarde), el reloj de red nunca se ajustó (pestaña Consola › Reloj de red) o se acaba de escribir un límite (inicia un juego un minuto y vuelve a comprobarlo).",
+        "not_counting": "La consola no está contando el tiempo de juego ahora mismo. Causas probables: el reloj se atrasó (volverá a contar más tarde), el reloj de red nunca se ajustó (Consola › Reloj de red) o se acaba de escribir un límite (inicia un juego un minuto y vuelve a comprobarlo).",
         "limit_note": "Al llegar al límite, la consola muestra «Se acabó el tiempo» y luego suspende el juego o solo avisa, según «Cuando se acabe el tiempo».",
         "unsaved": "Se puede perder el progreso no guardado: deja que el niño guarde antes."
     },
@@ -537,7 +537,7 @@
             "timeout": "sin respuesta",
             "bad_reply": "respuesta no válida"
         },
-        "start_off": "El reloj de red tiene un desfase de {} (comprobado con {}). El temporizador de juego depende de él: consulte la pestaña Consola › Reloj de red.",
+        "start_off": "El reloj de red tiene un desfase de {} (comprobado con {}). El temporizador de juego depende de él: consulte Consola › Reloj de red.",
         "guided_body": "El reloj de red es impreciso, y el temporizador de juego depende de él.\n\n¿Medir la hora con {} ahora? (La consola debe estar conectada a Internet.) Después se le pedirá confirmación antes de ajustar el reloj.",
         "guided_measure": "Medir ahora",
         "guided_fine": "El reloj de red es preciso: no hay nada que hacer.",

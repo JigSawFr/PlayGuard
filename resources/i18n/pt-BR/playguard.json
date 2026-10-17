@@ -109,7 +109,7 @@
         "pt_not_understood": "as configurações de tempo de jogo do console estão em um formato que o PlayGuard não entende, então nada foi alterado. Envie um relatório: Preferências › Ajuda e diagnóstico › Enviar um relatório online.",
         "wrong_pin": "o sistema recusou o PIN: PIN errado, ou não tem de 4 a 8 dígitos",
         "pctl_not_ready": "o serviço de controle dos pais ainda não está pronto: aguarde um momento e tente novamente",
-        "clock_not_set": "o console indica que o relógio de rede não tem uma hora válida (talvez nunca tenha sido acertado); veja a aba Console › Relógio de rede",
+        "clock_not_set": "o console indica que o relógio de rede não tem uma hora válida (talvez nunca tenha sido acertado); veja Console › Relógio de rede",
         "no_internet": "o console não está conectado à internet: conecte-o e tente novamente",
         "service_denied": "o sistema negou ao PlayGuard o acesso a um dos seus serviços; o PlayGuard precisa de um console com Atmosphère",
         "pdm_unavailable": "o serviço de dados de jogo do console não está disponível no momento; tente novamente daqui a pouco",
@@ -374,7 +374,7 @@
         "write_err": "Não foi possível aplicar o limite de tempo de jogo",
         "removed": "Limite de tempo de jogo removido.",
         "remove_err": "Não foi possível remover o limite de tempo de jogo",
-        "not_counting": "O console não está contando o tempo de jogo agora. Causas prováveis: o relógio foi atrasado (volta a contar mais tarde), o relógio de rede nunca foi ajustado (aba Console › Relógio de rede) ou um limite acabou de ser gravado (abra um jogo por um minuto e verifique de novo).",
+        "not_counting": "O console não está contando o tempo de jogo agora. Causas prováveis: o relógio foi atrasado (volta a contar mais tarde), o relógio de rede nunca foi ajustado (Console › Relógio de rede) ou um limite acabou de ser gravado (abra um jogo por um minuto e verifique de novo).",
         "limit_note": "No limite, o console mostra \"Tempo esgotado\" e depois suspende o jogo ou apenas avisa, conforme \"Quando o tempo acabar\".",
         "unsaved": "O progresso não salvo pode ser perdido: deixe a criança salvar antes."
     },
@@ -537,7 +537,7 @@
             "timeout": "sem resposta",
             "bad_reply": "resposta inválida"
         },
-        "start_off": "O relógio de rede está com {} de diferença (conferido com {}). O limite de tempo de jogo depende dele: veja a aba Console › Relógio de rede.",
+        "start_off": "O relógio de rede está com {} de diferença (conferido com {}). O limite de tempo de jogo depende dele: veja Console › Relógio de rede.",
         "guided_body": "O relógio de rede está impreciso, e o limite de tempo de jogo depende dele.\n\nMedir o horário com {} agora? (O console precisa estar online.) Você vai confirmar antes de o relógio ser ajustado.",
         "guided_measure": "Medir agora",
         "guided_fine": "O relógio de rede está preciso: nada a fazer.",

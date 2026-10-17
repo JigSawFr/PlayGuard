@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Writes compat.json, published with every release next to playguard.nro.
 
-The app reads the one of the latest release (Tools > Check for updates, and
+The app reads the one of the latest release (About › Check for updates, and
 the "firmware not supported yet" screen) to know whether updating would make
 the console's firmware supported. Values come from the sources, so they can
 never disagree with the build:

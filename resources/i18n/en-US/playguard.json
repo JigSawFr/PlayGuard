@@ -109,7 +109,7 @@
         "pt_not_understood": "the console's play-timer settings are in a format PlayGuard does not understand, so nothing was changed. Send a report: Preferences › Help & diagnostics › Send a report online.",
         "wrong_pin": "the system refused the PIN: wrong PIN, or not 4 to 8 digits",
         "pctl_not_ready": "the parental-control service is not ready yet: wait a moment, then try again",
-        "clock_not_set": "the console reports that its network clock has no valid time (it may never have been set); see the Console › Network clock tab",
+        "clock_not_set": "the console reports that its network clock has no valid time (it may never have been set); see Console › Network clock",
         "no_internet": "the console is not connected to the internet: connect it, then try again",
         "service_denied": "the system refused PlayGuard access to one of its services; PlayGuard needs a console running Atmosphère",
         "pdm_unavailable": "the console's play-data service is not available right now; try again in a moment",
@@ -374,7 +374,7 @@
         "write_err": "Could not apply the play-time limit",
         "removed": "Play-time limit removed.",
         "remove_err": "Could not remove the play-time limit",
-        "not_counting": "The console is not counting play time right now. Likely causes: the clock was set back (it counts again later), the network clock was never set (Console › Network clock tab), or a limit was just written (start a game for a minute, then check).",
+        "not_counting": "The console is not counting play time right now. Likely causes: the clock was set back (it counts again later), the network clock was never set (Console › Network clock), or a limit was just written (start a game for a minute, then check).",
         "limit_note": "At the limit the console shows \"Time's up\", then suspends the game or only warns, as set in \"When the time is up\".",
         "unsaved": "Unsaved progress may be lost: let the child save first."
     },
@@ -537,7 +537,7 @@
             "timeout": "no answer",
             "bad_reply": "invalid answer"
         },
-        "start_off": "The network clock is {} off (checked against {}). The play timer counts on it: see the Console › Network clock tab.",
+        "start_off": "The network clock is {} off (checked against {}). The play timer counts on it: see Console › Network clock.",
         "guided_body": "The network clock is inaccurate, and the play timer counts on it.\n\nMeasure the time against {} now? (The console must be online.) You will then be asked before the clock is set.",
         "guided_measure": "Measure now",
         "guided_fine": "The network clock is accurate: nothing to do.",

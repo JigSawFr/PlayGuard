@@ -1,8 +1,8 @@
 // sys_notes_flow — the release notes of Atmosphère, hekate and the firmware
-// (util/sys_notes.hpp): Tools › Console opens them (A on a line), the screen
+// (util/sys_notes.hpp): the Console tab opens them (A on a line), the screen
 // showing what was kept on the SD card at once and fetching them again in
 // the background; the daily update check (sys_update_flow) refreshes the
-// lists too, so Tools can say how far behind each one is and when the
+// lists too, so the Console tab can say how far behind each one is and when the
 // newest firmware is not supported yet.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -37,8 +37,8 @@ sys_notes::Cache fetch_lists();
 // Keeps `fresh` (merged into what was kept) and saves it.
 void keep(const sys_notes::Cache& fresh);
 
-// "22.0.0 · 23.0.1 available (4 versions behind)" for a line of Tools ›
-// Console; *newer when a newer one is out.
+// "22.0.0 · 23.0.1 available (4 versions behind)" for a line of the
+// Console tab; *newer when a newer one is out.
 std::string status_text(sys_notes::Which which, bool* newer);
 
 // What updating to the newest firmware needs first, from the notes of

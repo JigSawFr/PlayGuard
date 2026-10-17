@@ -120,7 +120,7 @@ void info(const std::string& body);
 // Reads the stored PIN (pctl_get_pin) and shows it in large digits, or a
 // dialog with the error. The app's copies are wiped as soon as the label
 // holds the text. True when it was shown; `on_close` then runs once it is
-// closed (OK or B). Used by Security › Show the PIN.
+// closed (OK or B). Used by PIN › Show the PIN.
 bool show_pin_dialog(std::function<void()> on_close = nullptr);
 
 // A dialog showing `text`. borealis' own text dialog does not scroll: a text
@@ -184,7 +184,7 @@ std::string fw_text(const SysInfo& info);                 // "23.0.1 · Atmosph�
 std::string compat_text(const SysInfo& info, NVGcolor* color = nullptr);
 std::string level_name(uint32_t level);                    // localised restriction level
 
-// Console section (Tools) and Overview warnings.
+// The Console tab's and the Overview's warnings.
 std::string storage_text(const SysInfo& info);             // "emuMMC (Atmosphère)"
 std::string storage_short(const SysInfo& info);            // "emuMMC" / "sysMMC" / "—"
 // The other system (sysMMC from emuMMC, or an emuMMC set up on the card from
@@ -198,7 +198,7 @@ std::string blank_text(const SysInfo& info, NVGcolor* color = nullptr);
 std::string serial_text(const SysInfo& info, bool reveal);
 bool        patches_warning(const patches::Report& report);
 // The game-patch report of this boot, read from the SD card once per run (it
-// only changes with a reboot): the Overview and Tools no longer rescan it
+// only changes with a reboot): the Overview and the Console tab no longer rescan it
 // each time they are opened.
 const patches::Report& patch_report();
 std::string patches_text(const patches::Report& report, NVGcolor* color = nullptr);

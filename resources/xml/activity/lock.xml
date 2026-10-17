@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Security › Ask for the PIN: "To open PlayGuard". The PIN screen opens over
+<!-- PIN › Protect PlayGuard with the PIN: "To open PlayGuard". The PIN screen opens over
      this one; "Enter the PIN" shows it again, B quits. -->
 
 <brls:AppletFrame

@@ -101,7 +101,7 @@ RestoreWay restore_way(const ExtraRecord& rec, const PtState& pt, int weekday, b
 bool restore_tightens(const ExtraRecord& rec);
 
 // config relock_pending: PlayGuard unlocked parental controls (for a change,
-// or Security › Unlock temporarily) and may have stopped before locking them
+// or PIN › Unlock temporarily) and may have stopped before locking them
 // again. What a start (or leaving read-only) does with that record:
 enum class PendingRelock
 {

@@ -40,7 +40,7 @@ static void compact_sidebar(brls::View* tab_frame)
 }
 
 // Quits, but first asks to lock again when parental controls are still
-// temporarily unlocked (Security › Unlock temporarily): leaving them so means
+// temporarily unlocked (PIN › Unlock temporarily): leaving them so means
 // no limit at all until a restart, which is easy to forget on the way out.
 // Locking again waits for the screen to be gone, and closes the game PlayGuard
 // runs over too (pt_flow::lock_at_exit): back to the HOME menu, locked. Until
