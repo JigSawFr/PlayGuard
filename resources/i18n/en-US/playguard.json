@@ -1370,6 +1370,7 @@
         "unlocked": "Parental controls are temporarily unlocked",
         "unlocked_detail": "Games can be played without a limit until they are locked again.",
         "extra_restore_detail": "Extra time added on an earlier day still raises this limit.",
+        "stop_restore_detail": "\"{}\" on an earlier day still lowers this limit below the usual one.",
         "new_account": "A new user account",
         "installed": "PlayGuard {} installed",
         "installed_detail": "It started fine. The previous build, {}, is kept: Developer tools can go back to it.",

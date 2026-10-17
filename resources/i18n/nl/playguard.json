@@ -1370,6 +1370,7 @@
         "unlocked": "Ouderlijk toezicht is tijdelijk ontgrendeld",
         "unlocked_detail": "Er kan zonder limiet gespeeld worden tot het weer vergrendeld is.",
         "extra_restore_detail": "Extra tijd die op een eerdere dag is toegevoegd, verhoogt deze limiet nog.",
+        "stop_restore_detail": "\"{}\" op een eerdere dag houdt deze limiet nog onder de gebruikelijke.",
         "new_account": "Een nieuw gebruikersaccount",
         "installed": "PlayGuard {} geïnstalleerd",
         "installed_detail": "Het is goed gestart. De vorige build, {}, blijft bewaard: de ontwikkelaarstools kunnen ernaar terug.",

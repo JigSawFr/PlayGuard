@@ -1370,6 +1370,7 @@
         "unlocked": "Il filtro famiglia è sbloccato temporaneamente",
         "unlocked_detail": "Si può giocare senza limite finché non viene bloccato di nuovo.",
         "extra_restore_detail": "Il tempo extra aggiunto in un giorno precedente alza ancora questo limite.",
+        "stop_restore_detail": "\"{}\" in un giorno precedente tiene ancora questo limite sotto quello abituale.",
         "new_account": "Un nuovo account utente",
         "installed": "PlayGuard {} installato",
         "installed_detail": "Si è avviato bene. La build precedente, {}, è conservata: gli strumenti per sviluppatori possono tornarci.",

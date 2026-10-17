@@ -1370,6 +1370,7 @@
         "unlocked": "家长控制已临时解锁",
         "unlocked_detail": "重新锁定之前，可以不受限制地游玩。",
         "extra_restore_detail": "之前某天添加的额外时间仍在提高此限制。",
+        "stop_restore_detail": "之前某天的“{}”仍使此限制低于平时。",
         "new_account": "新的用户账户",
         "installed": "已安装 PlayGuard {}",
         "installed_detail": "启动正常。之前的版本 {} 已保留：可在开发者工具中退回。",

@@ -1370,6 +1370,7 @@
         "unlocked": "자녀 보호 기능이 일시적으로 해제되어 있습니다",
         "unlocked_detail": "다시 잠글 때까지 제한 없이 플레이할 수 있습니다.",
         "extra_restore_detail": "이전 날에 추가한 추가 시간이 아직 이 제한을 높이고 있습니다.",
+        "stop_restore_detail": "이전 날의 '{}'(으)로 이 제한이 아직 평소보다 낮습니다.",
         "new_account": "새 사용자 계정",
         "installed": "PlayGuard {} 설치됨",
         "installed_detail": "정상적으로 시작되었습니다. 이전 빌드 {}은(는) 보관되어 있어 개발자 도구에서 되돌릴 수 있습니다.",

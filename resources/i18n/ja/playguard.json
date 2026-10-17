@@ -1370,6 +1370,7 @@
         "unlocked": "みまもり設定が一時的に解除されています",
         "unlocked_detail": "再びロックするまで、制限なしで遊べます。",
         "extra_restore_detail": "以前の日に追加した延長時間で、この制限がまだ上がっています。",
+        "stop_restore_detail": "以前の日の「{}」で、この制限はまだいつもより低くなっています。",
         "new_account": "新しいユーザーアカウント",
         "installed": "PlayGuard {} をインストールしました",
         "installed_detail": "正常に起動しました。前のビルド {} は残してあり、開発者ツールから戻せます。",

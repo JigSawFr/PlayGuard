@@ -253,9 +253,15 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
                TabBase::refresh_shown();
            });
 
-    // Extra time added on an earlier day still raises a limit.
-    toggle(pt_flow::restore_pending(pt), "extra_restore", Level::Action, pt_flow::restore_label(),
-           "playguard/notices/extra_restore_detail"_i18n, "playguard/dashboard/extra_restore"_i18n, []() {
+    // Extra time added on an earlier day still raises a limit: to do, the
+    // child has more than usual. Or "No more play today" still lowers one
+    // (the preference to put it back with no question off): only said, the
+    // limit being stricter than usual protects the child no less.
+    const bool raised = pt_flow::restore_lowers();
+    toggle(pt_flow::restore_pending(pt), "extra_restore", raised ? Level::Action : Level::Info, pt_flow::restore_label(),
+           raised ? "playguard/notices/extra_restore_detail"_i18n
+                  : brls::getStr("playguard/notices/stop_restore_detail", "playguard/dashboard/stop_title"_i18n),
+           "playguard/dashboard/extra_restore"_i18n, []() {
                pt_flow::offer_extra_time_restore([]() {
                    sweep();
                    TabBase::refresh_shown();

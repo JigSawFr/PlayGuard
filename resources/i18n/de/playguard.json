@@ -1370,6 +1370,7 @@
         "unlocked": "Die Jugendschutzeinstellungen sind vorübergehend entsperrt",
         "unlocked_detail": "Bis zur erneuten Sperre kann ohne Limit gespielt werden.",
         "extra_restore_detail": "An einem früheren Tag hinzugefügte Extrazeit erhöht dieses Limit noch.",
+        "stop_restore_detail": "„{}“ an einem früheren Tag senkt dieses Limit noch unter das übliche.",
         "new_account": "Ein neues Benutzerkonto",
         "installed": "PlayGuard {} installiert",
         "installed_detail": "Es ist gut gestartet. Der vorherige Build, {}, bleibt erhalten: Die Entwicklerwerkzeuge können zu ihm zurück.",

@@ -1370,6 +1370,7 @@
         "unlocked": "El control parental está desbloqueado temporalmente",
         "unlocked_detail": "Se puede jugar sin límite hasta que se vuelva a bloquear.",
         "extra_restore_detail": "El tiempo extra añadido un día anterior aún eleva este límite.",
+        "stop_restore_detail": "«{}» en un día anterior aún deja este límite por debajo del habitual.",
         "new_account": "Una nueva cuenta de usuario",
         "installed": "PlayGuard {} instalado",
         "installed_detail": "Se inició bien. La compilación anterior, {}, se conserva: las herramientas de desarrollo pueden volver a ella.",

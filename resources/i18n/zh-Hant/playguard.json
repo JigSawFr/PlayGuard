@@ -1370,6 +1370,7 @@
         "unlocked": "家長監護已暫時解鎖",
         "unlocked_detail": "重新鎖定之前，可以不受限制地遊玩。",
         "extra_restore_detail": "之前某天加入的額外時間仍在提高此限制。",
+        "stop_restore_detail": "之前某天的「{}」仍使此限制低於平常。",
         "new_account": "新的使用者帳號",
         "installed": "已安裝 PlayGuard {}",
         "installed_detail": "啟動正常。先前的版本 {} 已保留：可在開發者工具中退回。",
