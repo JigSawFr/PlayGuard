@@ -1,8 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/launcher.hpp"
 
-#include <sys/stat.h>
-
 #include "core/platform.h"
 #include "util/paths.hpp"
 
@@ -20,8 +18,7 @@ bool exists(const std::string& sd_path)
 {
     std::string root = paths::sd_root();
     if (!root.empty() && root.back() == '/') root.pop_back();
-    struct stat st;
-    return stat((root + sd_path).c_str(), &st) == 0 && S_ISREG(st.st_mode);
+    return paths::file_exists(root + sd_path);
 }
 
 template <size_t N>

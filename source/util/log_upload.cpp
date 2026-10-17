@@ -22,8 +22,9 @@ std::vector<Part> debug_files(bool play_timer_log)
     std::string content;
     if (paths::read_file(pt_block::reference_path(), content))
         out.push_back({ "logs/play_timer/block.json", content });
-    // The recorder's file can reach megabytes: its last lines only.
-    if (play_timer_log && paths::read_file(pt_log::path(), content))
+    // The recorder's file can reach megabytes: its last lines only, and
+    // only those read (one byte more than kept: tail() then cuts the same).
+    if (play_timer_log && paths::read_ends(pt_log::path(), 0, PT_LOG_BYTES + 1, content))
         out.push_back({ "logs/play_timer/log.csv", pt_log::tail(content, PT_LOG_BYTES) });
     if (paths::read_file(paths::history_file(), content))
         out.push_back({ "history_recent.json", recent_history(content) });
@@ -89,8 +90,10 @@ std::vector<Part> session_files(size_t limit)
     std::vector<Part> out;
     for (const std::string& name : log_files::list(paths::sessions_dir(), log_files::SESSION)) {
         if (out.size() >= limit) break;
+        // Up to 1 MiB: only the part head_and_tail() keeps is read, its
+        // header (in the first quarter) and one byte more than its end.
         std::string content;
-        if (paths::read_file(paths::sessions_dir() + "/" + name, content))
+        if (paths::read_ends(paths::sessions_dir() + "/" + name, SESSION_BYTES / 4, SESSION_BYTES + 1, content))
             out.push_back({ "logs/sessions/" + name, head_and_tail(content, SESSION_BYTES) });
     }
     return out;
@@ -163,8 +166,12 @@ std::vector<Part> atmosphere_crashes(std::time_t now, int days, size_t limit)
     std::vector<Part> out;
     for (const auto& f : found) {
         if (out.size() >= limit) break;
+        // Only the start is sent (and says the process): one byte more is
+        // read, to know it was cut.
         std::string content;
-        if (!paths::read_file(dir + "/" + f.second, content) || process_name(content) != "hbloader") continue;
+        if (!paths::read_ends(dir + "/" + f.second, ATMOSPHERE_CRASH_BYTES + 1, 0, content) ||
+            process_name(content) != "hbloader")
+            continue;
         if (content.size() > ATMOSPHERE_CRASH_BYTES) content = cut_to(content, ATMOSPHERE_CRASH_BYTES);
         out.push_back({ "atmosphere/crash_reports/" + f.second, content });
     }

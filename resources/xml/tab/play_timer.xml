@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Play timer: state, daily limit, profiles, bedtime, advanced actions. -->
+<!-- Play timer: state, daily limit, profiles, bedtime, the extra-time
+     settings and a line to Advanced (activity/play_timer_advanced.xml). -->
 
 <brls:Box
     width="auto"
@@ -31,7 +32,7 @@
             <brls:DetailCell id="pt_quick" title="@i18n/playguard/play_timer/quick"/>
             <brls:DetailCell id="pt_extra" title="@i18n/playguard/dashboard/extra"/>
             <brls:DetailCell id="pt_stop" title="@i18n/playguard/dashboard/stop"/>
-            <brls:DetailCell id="pt_per_day" title="@i18n/playguard/play_timer/per_day"/>
+            <brls:DetailCell id="pt_split" title="@i18n/playguard/play_timer/split"/>
             <brls:DetailCell id="pt_remove" title="@i18n/playguard/play_timer/remove"/>
             <brls:DetailCell id="pt_profiles" title="@i18n/playguard/play_timer/profiles"/>
             <brls:DetailCell id="pt_time_up" title="@i18n/playguard/play_timer/time_up"/>
@@ -40,11 +41,10 @@
             <brls:DetailCell id="pt_bedtime" title="@i18n/playguard/play_timer/bedtime"/>
             <brls:DetailCell id="pt_bedtime_reset" title="@i18n/playguard/play_timer/bedtime_reset"/>
             <brls:Label id="pt_bedtime_note" text="@i18n/playguard/play_timer/bedtime_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
-            <brls:Header id="pt_adv_header" title="@i18n/playguard/play_timer/section_advanced" marginTop="24" marginBottom="8"/>
-            <brls:BooleanCell id="pt_alarm"/>
-            <brls:DetailCell id="pt_pause" title="@i18n/playguard/play_timer/pause"/>
-            <brls:DetailCell id="pt_resume" title="@i18n/playguard/play_timer/resume"/>
-            <brls:DetailCell id="pt_diag" title="@i18n/playguard/play_timer/diag"/>
+            <brls:Header id="pt_extra_header" title="@i18n/playguard/play_timer/section_extra" marginTop="24" marginBottom="8"/>
+            <brls:DetailCell id="pt_extra_amounts" title="@i18n/playguard/tools/extra_amounts"/>
+            <brls:BooleanCell id="pt_extra_auto"/>
+            <brls:DetailCell id="pt_advanced" title="@i18n/playguard/play_timer/section_advanced" marginTop="24"/>
 
         </brls:Box>
 

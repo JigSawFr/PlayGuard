@@ -5,7 +5,8 @@
 
 #include "action/notices.hpp"
 #include "action/sys_update_flow.hpp"
-#include "app.hpp"
+#include "action/update_flow.hpp"
+#include "tab/help_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 
@@ -22,27 +23,16 @@ int index_of(const char* const (&list)[N], const std::string& value)
         if (value == list[i]) return (int)i;
     return 0;
 }
-
-// "+15 min / +30 min / +1 h"
-std::string amounts_text(const int (&set)[3])
-{
-    std::string text;
-    for (int m : set) text += (text.empty() ? "+" : " / +") + ui::fmt_minutes((uint16_t)m);
-    return text;
-}
-
-int extra_set_index(const std::vector<int>& amounts)
-{
-    for (size_t i = 0; i < sizeof(config::EXTRA_SETS) / sizeof(config::EXTRA_SETS[0]); i++)
-        if (amounts == std::vector<int>(std::begin(config::EXTRA_SETS[i]), std::end(config::EXTRA_SETS[i]))) return (int)i;
-    return 0;
-}
 }   // namespace
 
 PreferencesTab::PreferencesTab()
-    : TabBase("xml/tab/preferences.xml")
+    : TabBase("xml/tab/preferences.xml", false)
 {
-    note->setSingleLine(false);
+    help->setDetailText(ui::opens());
+    help->registerClickAction([](brls::View*) {
+        ui::open_screen(new HelpTab(), "playguard/prefs/help"_i18n);
+        return true;
+    });
 
     language->registerClickAction([this](brls::View*) {
         std::vector<std::string> labels;
@@ -81,32 +71,6 @@ PreferencesTab::PreferencesTab()
         return true;
     });
 
-    ui::guard_switch(auto_relock);
-    ui::guard_switch(extra_auto);
-    ui::guard_switch(advanced);
-    auto_relock->init("playguard/tools/auto_relock"_i18n, config::get().auto_relock, [](bool on) {
-        config::get().auto_relock = on;
-        ui::save_config();
-    });
-    extra_amounts->registerClickAction([this](brls::View*) {
-        if (ui::refuse_read_only()) return true;
-        std::vector<std::string> labels;
-        for (const auto& set : config::EXTRA_SETS) labels.push_back(amounts_text(set));
-        ui::pick("playguard/tools/extra_amounts"_i18n, labels, extra_set_index(config::get().extra_amounts), [this](int i) {
-            config::get().extra_amounts.assign(std::begin(config::EXTRA_SETS[i]), std::end(config::EXTRA_SETS[i]));
-            ui::save_config();
-            this->refresh();
-        });
-        return true;
-    });
-    extra_auto->init("playguard/tools/extra_auto"_i18n, config::get().extra_auto_restore, [](bool on) {
-        config::get().extra_auto_restore = on;
-        ui::save_config();
-    });
-    advanced->init("playguard/tools/advanced"_i18n, config::get().advanced, [](bool on) {
-        config::get().advanced = on;
-        ui::save_config();
-    });
     support_reminder->init("playguard/prefs/support_reminder"_i18n, config::get().support_reminder, [](bool on) {
         config::get().support_reminder = on;
         ui::save_config();
@@ -132,9 +96,14 @@ PreferencesTab::PreferencesTab()
         ui::save_config();
         notices::apply_preferences();
     });
-    clock_check->init("playguard/tools/clock_check"_i18n, config::get().clock_check_at_start, [](bool on) {
-        config::get().clock_check_at_start = on;
+    // Updates: PlayGuard's own (About keeps "Check for updates" by the version).
+    update_daily->init("playguard/tools/update_daily"_i18n, config::get().update_daily, [](bool on) {
+        config::get().update_daily = on;
         ui::save_config();
+    });
+    update_via->registerClickAction([this](brls::View*) {
+        update_flow::choose_method([this]() { this->refresh(); });
+        return true;
     });
 }
 
@@ -144,22 +113,13 @@ void PreferencesTab::refresh()
     language->setDetailText(brls::getStr("playguard/tools/languages/" + std::string(config::LANGUAGES[index_of(config::LANGUAGES, cfg.language)])));
     theme->setDetailText(brls::getStr("playguard/tools/themes/" + std::string(THEMES[index_of(THEMES, cfg.theme)])));
     start_tab->setDetailText(brls::getStr(std::string("playguard/tabs/") + config::START_TABS[index_of(config::START_TABS, cfg.start_tab)]));
-    auto_relock->setOn(cfg.auto_relock, false);
-    extra_amounts->setDetailText(amounts_text(config::EXTRA_SETS[extra_set_index(cfg.extra_amounts)]));
-    extra_auto->setOn(cfg.extra_auto_restore, false);
-    advanced->setOn(cfg.advanced, false);
     intro->setOn(cfg.intro, false);
-    clock_check->setOn(cfg.clock_check_at_start, false);
     support_reminder->setOn(cfg.support_reminder, false);
     notices_system->setOn(cfg.notices_system, false);
     notices_summary->setOn(cfg.notices_summary, false);
     notices_reminders->setOn(cfg.notices_reminders, false);
-    // Read-only: the play-timer preferences would change nothing; they stay
-    // in sight, greyed (A says why).
-    const bool writable = !app::read_only();
-    for (brls::DetailCell* c : { (brls::DetailCell*)auto_relock.getView(), (brls::DetailCell*)extra_amounts.getView(),
-                                 (brls::DetailCell*)extra_auto.getView(), (brls::DetailCell*)advanced.getView() })
-        ui::show_writable(c, writable);
+    update_daily->setOn(cfg.update_daily, false);
+    update_via->setDetailText(update_flow::method_text());
 }
 
 brls::View* PreferencesTab::create()

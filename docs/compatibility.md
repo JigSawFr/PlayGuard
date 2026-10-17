@@ -27,19 +27,19 @@ Supported firmware, Atmosphère and launchers, emuMMC and sysMMC, and how PlayGu
 - **Firmware 13.x** — Atmosphère 1.1.0 → 1.2.6
 - **Firmware 12.x and older** — Atmosphère 1.0.0 and older
 
-PlayGuard checks that Atmosphère runs, not which version: what counts is the firmware it boots. *Tools* shows both.
+PlayGuard checks that Atmosphère runs, not which version: what counts is the firmware it boots. *Console* shows both.
 
 **Launchers.** Launching over a game (title override) is recommended. The app says whether it runs as an application or as an applet (album). Over a game, the console counts PlayGuard's time as that game's. In the activity, it goes to the user picked at launch: open it with a parent's user, not a child's. The play timer is the console's, the same for every user: it counts that time whoever opened PlayGuard (unless the timer is off).
 
 **Nintendo Switch 2.** Not supported: there is no Atmosphère for it.
 
-<a id="newer-firmware"></a>**Newer firmware?** Above the newest firmware tested on a console, PlayGuard opens **read-only** and checks whether a newer release supports it. If one does, it offers to update (in PlayGuard itself, through sphaira or the Homebrew App Store). Otherwise you choose: read-only, read-only with the developer tools (to investigate the firmware), or every feature at your own risk. The choice can be remembered for that firmware and app version; *Tools › Compatibility* brings the screen back.
+<a id="newer-firmware"></a>**Newer firmware?** Above the newest firmware tested on a console, PlayGuard opens **read-only** and checks whether a newer release supports it. If one does, it offers to update (in PlayGuard itself, through sphaira or the Homebrew App Store). Otherwise you choose: read-only, read-only with the developer tools (to investigate the firmware), or every feature at your own risk. The choice can be remembered for that firmware and app version; *Console › Compatibility* brings the screen back.
 
-**emuMMC and sysMMC.** Each has its own parental controls, and PlayGuard only sees those of the system it runs on. On emuMMC, *Tools* and *First steps* say so; on sysMMC too, when an emuMMC is set up on the SD card. Set the controls on both, or hide the hekate boot menu so that a child cannot pick the other system. PlayGuard keeps each system's history, backups and state apart (the sysMMC and the emuMMC, in `nand/`); the preferences and profiles are shared.
+**emuMMC and sysMMC.** Each has its own parental controls, and PlayGuard only sees those of the system it runs on. On emuMMC, *Console* and *First steps* say so; on sysMMC too, when an emuMMC is set up on the SD card. Set the controls on both, or hide the hekate boot menu so that a child cannot pick the other system. PlayGuard keeps each system's history, backups and state apart (the sysMMC and the emuMMC, in `nand/`); the preferences and profiles are shared.
 
 **Can it get the console banned?** PlayGuard never contacts Nintendo: online, it only reaches public time servers, GitHub (updates, and the reports you send). What gets consoles banned is custom firmware or an emuMMC going online to Nintendo ([switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)). No ban tied to parental-control or clock changes is documented; that is not a guarantee.
 
-**A console without Internet?** That is what PlayGuard is for, and the play timer still needs a network clock that has been set. With no time server to ask, *Network clock › Measure* offers to set it to the console clock instead: check the console clock first, with *Synchronize Clock via Internet* off, and turn that setting on only afterwards (see [Network clock](features.md#network-clock--the-clock-the-play-timer-relies-on)).
+**A console without Internet?** That is what PlayGuard is for, and the play timer still needs a network clock that has been set. With no time server to ask, *Console › Network clock › Measure* offers to set it to the console clock instead: check the console clock first, with *Synchronize Clock via Internet* off, and turn that setting on only afterwards (see [Console](features.md#console--the-network-clock-the-installed-games-what-the-console-runs)).
 
 **Phone notifications.** Since 22.0.0, a console still linked to the phone app may notify the parent when the PIN is entered on the console ([switchbrew](https://switchbrew.org/wiki/22.0.0)). Whether PlayGuard's own unlocks trigger it is unknown.
 

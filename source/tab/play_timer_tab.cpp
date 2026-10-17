@@ -8,24 +8,31 @@
 #include "action/outside_watch.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_logic.hpp"
+#include "activity/play_timer_advanced_activity.hpp"
 #include "activity/play_timer_perday_activity.hpp"
 #include "activity/profiles_activity.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
-#include "util/diagnostics.hpp"
 #include "util/profiles.hpp"
 
 using namespace brls::literals;
 
 namespace
 {
-void export_diagnostic()
+// "+15 min / +30 min / +1 h"
+std::string amounts_text(const int (&set)[3])
 {
-    std::string err;
-    std::string path = diagnostic::save(diagnostic::current_report(), &err);
-    if (path.empty()) ui::error("playguard/toast/diag_err"_i18n + ": " + err);
-    else ui::notify(brls::getStr("playguard/toast/diag_saved", path));
+    std::string text;
+    for (int m : set) text += (text.empty() ? "+" : " / +") + ui::fmt_minutes((uint16_t)m);
+    return text;
+}
+
+int extra_set_index(const std::vector<int>& amounts)
+{
+    for (size_t i = 0; i < sizeof(config::EXTRA_SETS) / sizeof(config::EXTRA_SETS[0]); i++)
+        if (amounts == std::vector<int>(std::begin(config::EXTRA_SETS[i]), std::end(config::EXTRA_SETS[i]))) return (int)i;
+    return 0;
 }
 }   // namespace
 
@@ -38,10 +45,11 @@ PlayTimerTab::PlayTimerTab()
     ui::init_unlock_banner(unlocked_banner, [this]() { this->refresh(); });
     this->enable_auto_refresh(5000);
 
-    // The week chart is the editor: ←/→ pick a day, A changes its limit.
+    // ←/→ pick a day, A opens the per-day editor on it (its picker open):
+    // the edits are saved together there.
     week->set_on_pick([this](int day) {
         if (!this->pt.valid) return;
-        pt_flow::change_day_limit(day, this->pt.day_min[day], [this]() { this->refresh(); });
+        brls::Application::pushActivity(new PlayTimerPerDayActivity(day));
     });
 
     quick->registerClickAction([this](brls::View*) {
@@ -59,8 +67,10 @@ PlayTimerTab::PlayTimerTab()
         pt_flow::stop_today(this->pt, [this]() { this->refresh(); });
         return true;
     });
-    per_day->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new PlayTimerPerDayActivity());
+    split->setDetailText(ui::opens());
+    split->registerClickAction([](brls::View*) {
+        if (ui::refuse_read_only()) return true;
+        brls::Application::pushActivity(PlayTimerPerDayActivity::week_split());
         return true;
     });
     remove->registerClickAction([this](brls::View*) {
@@ -84,24 +94,26 @@ PlayTimerTab::PlayTimerTab()
         return true;
     });
 
-    ui::guard_switch(alarm);
-    alarm->init("playguard/play_timer/alarm"_i18n, true, [this](bool on) {
-        // The switch shows the console's value until the change is made
-        // (after a confirmation, and the unlock when the timer counts down).
-        this->alarm->setOn(!on, false);
-        pt_flow::set_alarm(on, "", [this]() { this->refresh(); });
-    });
-    pause->registerClickAction([this](brls::View*) {
-        pt_flow::set_countdown(false, [this]() { this->refresh(); });
+    // The extra-time settings: PlayGuard's own, kept with the actions they shape.
+    ui::guard_switch(extra_auto);
+    extra_amounts->registerClickAction([this](brls::View*) {
+        if (ui::refuse_read_only()) return true;
+        std::vector<std::string> labels;
+        for (const auto& set : config::EXTRA_SETS) labels.push_back(amounts_text(set));
+        ui::pick("playguard/tools/extra_amounts"_i18n, labels, extra_set_index(config::get().extra_amounts), [this](int i) {
+            config::get().extra_amounts.assign(std::begin(config::EXTRA_SETS[i]), std::end(config::EXTRA_SETS[i]));
+            ui::save_config();
+            this->refresh();
+        });
         return true;
     });
-    resume->registerClickAction([this](brls::View*) {
-        pt_flow::set_countdown(true, [this]() { this->refresh(); });
-        return true;
+    extra_auto->init("playguard/tools/extra_auto"_i18n, config::get().extra_auto_restore, [](bool on) {
+        config::get().extra_auto_restore = on;
+        ui::save_config();
     });
-    // Diagnostic shortcut in developer mode; everyone else uses Tools.
-    diag->registerClickAction([](brls::View*) {
-        export_diagnostic();
+    advanced->setDetailText(ui::opens());
+    advanced->registerClickAction([](brls::View*) {
+        brls::Application::pushActivity(new PlayTimerAdvancedActivity());
         return true;
     });
 }
@@ -114,16 +126,14 @@ void PlayTimerTab::refresh()
 
     const bool fw_ok    = this->pt.fw_supported;
     const bool writable = fw_ok && !app::read_only();
-    const bool advanced = fw_ok && config::get().advanced;
-    const bool dev      = fw_ok && app::dev_mode();
 
     ui::note_unlocked(this->pt.temporary_unlocked_valid, this->pt.temporary_unlocked);
     ui::show_unlock_banner(unlocked_banner, this->pt.temporary_unlocked_valid && this->pt.temporary_unlocked);
     ui::set_visible(fw_note.getView(), !fw_ok);
     // Read-only: the actions that write stay in sight, greyed (A says why);
-    // the per-day editor and the profiles can still be looked at.
+    // the profiles can still be looked at.
     for (brls::View* v : { (brls::View*)limit_header.getView(), (brls::View*)quick.getView(),
-                           (brls::View*)per_day.getView(), (brls::View*)remove.getView(),
+                           (brls::View*)split.getView(), (brls::View*)remove.getView(),
                            (brls::View*)profiles_cell.getView(), (brls::View*)limit_note.getView() })
         ui::set_visible(v, fw_ok);
     // When the time is up: only with something set (pt_configured), the
@@ -133,19 +143,22 @@ void PlayTimerTab::refresh()
     ui::set_visible(extra.getView(), pt_logic::can_add_extra_time(this->pt, wd, false));
     ui::set_visible(stop.getView(), pt_logic::can_stop_today(this->pt, wd, false));
     for (brls::DetailCell* c : { (brls::DetailCell*)quick.getView(), (brls::DetailCell*)extra.getView(),
-                                 (brls::DetailCell*)stop.getView(), (brls::DetailCell*)remove.getView(),
-                                 (brls::DetailCell*)pause.getView(), (brls::DetailCell*)resume.getView(),
+                                 (brls::DetailCell*)stop.getView(), (brls::DetailCell*)split.getView(),
+                                 (brls::DetailCell*)remove.getView(),
                                  (brls::DetailCell*)bedtime.getView(), (brls::DetailCell*)bedtime_reset.getView(),
-                                 (brls::DetailCell*)time_up.getView() })
+                                 (brls::DetailCell*)time_up.getView(), (brls::DetailCell*)extra_amounts.getView(),
+                                 (brls::DetailCell*)extra_auto.getView() })
         ui::show_writable(c, writable);
     extra->setDetailText(pt_flow::extra_today_text(this->pt));
     for (brls::View* v : { (brls::View*)bedtime_header.getView(), (brls::View*)bedtime.getView(),
                            (brls::View*)bedtime_reset.getView(), (brls::View*)bedtime_note.getView() })
         ui::set_visible(v, fw_ok);
-    for (brls::View* v : { (brls::View*)alarm.getView(), (brls::View*)pause.getView(), (brls::View*)resume.getView() })
-        ui::set_visible(v, advanced);
-    ui::set_visible(diag.getView(), dev);
-    ui::set_visible(adv_header.getView(), advanced || dev);
+    for (brls::View* v : { (brls::View*)extra_header.getView(), (brls::View*)extra_amounts.getView(),
+                           (brls::View*)extra_auto.getView(), (brls::View*)advanced.getView() })
+        ui::set_visible(v, fw_ok);
+    const auto& cfg = config::get();
+    extra_amounts->setDetailText(amounts_text(config::EXTRA_SETS[extra_set_index(cfg.extra_amounts)]));
+    extra_auto->setOn(cfg.extra_auto_restore, false);
 
     ui::set_visible(week.getView(), fw_ok && this->pt.valid);
     ui::set_visible(week_header.getView(), fw_ok && this->pt.valid);
@@ -159,8 +172,8 @@ void PlayTimerTab::refresh()
     // Profiles…: the profile applied now, else how many are saved.
     const std::string current = this->pt.valid ? profiles::match(this->pt.day_min) : "";
     const size_t saved = current.empty() ? profiles::count() : 0;
-    profiles_cell->setDetailText(!current.empty() ? current
-                                 : saved ? brls::getStr("playguard/play_timer/profiles_count", (int)saved) : "");
+    profiles_cell->setDetailText(ui::opens(!current.empty() ? current
+                                           : saved ? brls::getStr("playguard/play_timer/profiles_count", (int)saved) : ""));
     time_up->setDetailText(pt_flow::time_up_text(this->pt));
 
     // "Same limit every day": the value when all days agree, else that they
@@ -194,8 +207,6 @@ void PlayTimerTab::refresh()
             ? fmt::format("{:02d}:{:02d}", this->pt.bedtime_reset_hour, this->pt.bedtime_reset_minute) : na);
     }
 
-    if (this->pt.alarm_disabled_valid) alarm->setOn(!this->pt.alarm_disabled, false);
-    ui::show_writable(alarm, writable);
 }
 
 void PlayTimerTab::remove_limit()

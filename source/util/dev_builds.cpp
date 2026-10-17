@@ -3,13 +3,13 @@
 
 #include <algorithm>
 #include <cctype>
-#include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 #include <set>
 
 #include <borealis/extern/nlohmann/json.hpp>
 
+#include "util/paths.hpp"
 #include "util/safe_text.hpp"
 #include "util/sha256.hpp"
 #include "util/update.hpp"
@@ -554,7 +554,8 @@ bool decode_cache(const std::string& text, Cache* out)
             b.ci = ci_named(str(x, "ci"));
             const int64_t size = integer(x, "size");
             const bool commit_ok = b.kind == Kind::Release ? b.commit.empty() : short_commit(b.commit) == b.commit;
-            const bool sha_ok = b.sha256.empty() || (b.sha256.size() == 64 && is_hex(b.sha256) && lower(b.sha256) == b.sha256);
+            // A build without its digest could not be installed: not kept either.
+            const bool sha_ok = b.sha256.size() == 64 && is_hex(b.sha256) && lower(b.sha256) == b.sha256;
             if (!github_url(b.url) || size <= 0 || !commit_ok || !sha_ok) continue;
             if (b.kind == Kind::Release ? !safe_text::is_version(b.version) : !b.artifact) continue;
             if (b.kind == Kind::PullRequest && b.pr <= 0) continue;
@@ -586,6 +587,8 @@ bool is_nro(const std::string& head)
     return head.size() >= 0x14 && head.compare(0x10, 4, "NRO0") == 0;
 }
 
+const char* const NO_DIGEST = "GitHub gives no SHA-256 for this file: not installed";
+
 bool verify_file(const std::string& path, uint64_t size, const std::string& sha256, std::string* error)
 {
     FILE* f = std::fopen(path.c_str(), "rb");
@@ -611,7 +614,11 @@ bool verify_file(const std::string& path, uint64_t size, const std::string& sha2
         if (error) *error = "size " + std::to_string(got) + " instead of " + std::to_string(size);
         return false;
     }
-    if (!sha256.empty() && hash.hex() != sha256) {
+    if (sha256.empty()) {
+        if (error) *error = NO_DIGEST;
+        return false;
+    }
+    if (hash.hex() != sha256) {
         if (error) *error = "SHA-256 does not match";
         return false;
     }
@@ -633,25 +640,7 @@ bool verify_nro(const std::string& path, std::string* error)
 
 bool replace(const std::string& target, const std::string& fresh, std::string* error, const std::string& keep_as)
 {
-    const std::string old = target + ".old";
-    std::remove(old.c_str());   // left by an earlier attempt
-    // FAT has no atomic replace: move the old one aside first.
-    const bool had_target = std::rename(target.c_str(), old.c_str()) == 0;
-    if (!had_target && errno != ENOENT) {
-        if (error) *error = "cannot move " + target + " aside";
-        return false;
-    }
-    if (std::rename(fresh.c_str(), target.c_str()) != 0) {
-        if (had_target) std::rename(old.c_str(), target.c_str());
-        if (error) *error = "cannot put the new build in place";
-        return false;
-    }
-    if (had_target && !keep_as.empty()) {
-        std::remove(keep_as.c_str());
-        if (std::rename(old.c_str(), keep_as.c_str()) == 0) return true;
-    }
-    std::remove(old.c_str());
-    return true;
+    return paths::replace_file(target, fresh, keep_as, error);
 }
 
 }   // namespace dev_builds

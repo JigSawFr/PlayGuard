@@ -63,7 +63,7 @@ bool load_array(nlohmann::json& entries)
 {
     entries = nlohmann::json::array();
     std::string text;
-    if (!paths::read_file(paths::history_file(), text)) return !paths::exists(paths::history_file());   // missing: fine
+    if (!paths::read_file(paths::history_file(), text)) return !paths::exists_or_pending(paths::history_file());   // missing: fine
     try {
         nlohmann::json j = nlohmann::json::parse(text);
         if (j.is_object() && j.contains("entries") && j["entries"].is_array()) {

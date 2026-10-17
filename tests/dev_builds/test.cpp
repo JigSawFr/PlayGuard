@@ -416,15 +416,21 @@ static void test_cache()
     pr.expires = "2027-01-07T12:03:00Z";
     pr.run = 77;
     pr.ci = dev_builds::Ci::Failed;
+    pr.sha256 = std::string(64, 'b');
     Build bad = pr;
     bad.url = "http://x";   // not https: left out when read back
     // An edited list: anywhere but GitHub is left out too.
+    // No digest, or a malformed one: it could not be installed, not kept.
+    Build undigested = pr, upper = rel, short_digest = rel;
+    undigested.sha256.clear();
+    upper.sha256 = std::string(64, 'A');
+    short_digest.sha256 = std::string(63, 'a');
     Build elsewhere = rel, lookalike = pr, userinfo = rel;
     elsewhere.url = "https://example.com/playguard.nro";
     lookalike.url = "https://api.github.com.example.com/repos/o/r/actions/artifacts/1/zip";
     userinfo.url = "https://github.com@example.com/playguard.nro";
     dev_builds::Cache c;
-    c.builds = { rel, pr, bad, elsewhere, lookalike, userinfo };
+    c.builds = { rel, pr, bad, elsewhere, lookalike, userinfo, undigested, upper, short_digest };
     c.needs_login = false;
     c.fetched_at = 1000000;
 
@@ -436,7 +442,7 @@ static void test_cache()
            back.builds[0].prerelease);
     CHECK(back.builds[1].kind == Kind::PullRequest && back.builds[1].artifact && back.builds[1].pr == 48 &&
            back.builds[1].title == pr.title && back.builds[1].commit == "abc1234" && back.builds[1].date == pr.date &&
-           back.builds[1].sha256.empty() && !back.builds[1].prerelease && back.builds[1].notes == pr.notes &&
+           back.builds[1].sha256 == pr.sha256 && !back.builds[1].prerelease && back.builds[1].notes == pr.notes &&
            back.builds[1].expires == pr.expires && back.builds[1].run == 77 && back.builds[1].ci == dev_builds::Ci::Failed);
 
     // Fresh: under ten minutes old, not from the future, same sign-in state, not empty.
@@ -470,10 +476,11 @@ static void test_files()
 
     std::string err;
     CHECK(dev_builds::verify_file(file, content.size(), sha(content), &err));
-    CHECK(dev_builds::verify_file(file, content.size(), "", &err));   // no digest: the size only
+    // No digest: refused, whatever the size and the header say.
+    CHECK(!dev_builds::verify_file(file, content.size(), "", &err) && err == dev_builds::NO_DIGEST);
     CHECK(!dev_builds::verify_file(file, content.size(), sha(content + "x"), &err) && err == "SHA-256 does not match");
     CHECK(!dev_builds::verify_file(file, 4999, sha(content), &err) && err.find("size") == 0);
-    CHECK(!dev_builds::verify_file(dir + "/missing.nro", 1, "", &err));
+    CHECK(!dev_builds::verify_file(dir + "/missing.nro", 1, sha(content), &err));
     CHECK(dev_builds::verify_nro(file, &err));
     CHECK(paths::atomic_write(dir + "/zip.nro", std::string(5000, 'z')));
     CHECK(!dev_builds::verify_nro(dir + "/zip.nro", &err) && err == "not an NRO file");

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "nacp.h"
 #include "write_guard.h"
 
 #include <time.h>
@@ -51,16 +52,6 @@ static void storages_close(Storage *list, size_t n)
         ncmContentStorageClose(&list[i].cs);
         ncmContentMetaDatabaseClose(&list[i].db);
     }
-}
-
-// Copies at most n-1 bytes of a UTF-8 string without cutting a character.
-static void copy_utf8(char *dst, size_t n, const char *src)
-{
-    size_t len = strnlen(src, n - 1);
-    if (len == n - 1)
-        while (len > 0 && ((unsigned char)src[len] & 0xC0) == 0x80) len--;   // inside a character
-    memcpy(dst, src, len);
-    dst[len] = '\0';
 }
 
 // The tickets on the console (es: the common and the personalized ones),
@@ -136,6 +127,7 @@ typedef struct {
     size_t storage_count;   // 0 without ncm
     const Tickets *tickets;   // NULL when they could not be listed
     bool avm;
+    u32 title_index;          // the console language's title entry (nacp_console_language)
 } Scan;
 
 // One content (the game or its update) on its storage: known there, its
@@ -195,30 +187,17 @@ static void check_meta(GameFacts *g, const NsApplicationContentMetaStatus *m, Sc
 
 // A game's name and icon: ns' cache first, what the HOME menu itself draws
 // (a few ms), then the storage only when the cache has none (a quarter of a
-// second a game: most of a whole check when every game went that way).
-static bool read_control(u64 app_id, NsApplicationControlData *cd, u64 *size)
-{
-    static const NsApplicationControlSource sources[] = { NsApplicationControlSource_CacheOnly,
-                                                          NsApplicationControlSource_Storage };
-    for (size_t k = 0; k < sizeof(sources) / sizeof(sources[0]); k++) {
-        *size = 0;
-        if (R_SUCCEEDED(nsGetApplicationControlData(sources[k], app_id, cd, sizeof(*cd), size)) &&
-            *size > sizeof(cd->nacp) && *size <= sizeof(*cd))
-            return true;
-    }
-    return false;
-}
-
+// second a game: most of a whole check when every game went that way). The
+// name as the Activity tab reads it (nacp.h: compressed titles of 21.0.0+
+// included).
 static void check_game(GameFacts *g, NsApplicationControlData *cd, Scan *sc)
 {
     u64 t = now_ns();
     u64 size = 0;
-    NacpLanguageEntry *lang = NULL;
-    if (cd && read_control(g->app_id, cd, &size) &&
-        R_SUCCEEDED(nacpGetLanguageEntry(&cd->nacp, &lang)) && lang && lang->name[0]) {
+    if (cd && nacp_read_control(g->app_id, cd, true, &size) &&
+        nacp_name(&cd->nacp, sizeof(cd->nacp), sc->title_index, g->name, sizeof(g->name))) {
         g->control_ok = true;
-        copy_utf8(g->name, sizeof(g->name), lang->name);
-        copy_utf8(g->display_version, sizeof(g->display_version), cd->nacp.display_version);
+        nacp_copy_utf8(g->display_version, sizeof(g->display_version), cd->nacp.display_version);
     }
     u64 t2 = now_ns();
     s_timing.control_ns += t2 - t;
@@ -349,6 +328,7 @@ u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
     sc.storages[0].id = NcmStorageId_BuiltInUser;
     sc.storages[1].id = NcmStorageId_SdCard;
     sc.storage_count = ncm ? 2 : 0;
+    nacp_console_language(&sc.title_index);
     NsApplicationControlData *cd = (NsApplicationControlData *)malloc(sizeof(NsApplicationControlData));
     read_views(records, count, out);
     s_timing.setup_ns = now_ns() - started;

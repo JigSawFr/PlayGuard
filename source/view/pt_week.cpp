@@ -96,8 +96,12 @@ void PtWeekView::set_editable(bool editable)
     this->editable = editable && (bool)this->on_pick;
     for (int d = 0; d < 7; d++) this->cols[d].box->setFocusable(this->editable);
     // Today is where the eye is: the first press lands on it.
-    const int today = ui::today_weekday();
-    this->row->setDefaultFocusedIndex((today + 6) % 7);
+    this->focus_day(ui::today_weekday());
+}
+
+void PtWeekView::focus_day(int day)
+{
+    this->row->setDefaultFocusedIndex((day + 6) % 7);
 }
 
 void PtWeekView::show(const PtState& pt)

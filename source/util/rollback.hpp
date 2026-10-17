@@ -46,7 +46,14 @@ enum class Offer
 Offer offer_at_start(bool checked, int starts_before, bool held, bool have_previous);
 
 // Swaps <nro> and <nro>.previous (the build running becomes the previous
-// one), through "<nro>.swap". When a step fails, what was moved is put back.
+// one), through paths::replace_file. When a step fails, what was moved is
+// put back.
 bool swap(const std::string& nro, std::string* error);
+
+// An install or a swap stopped half-way (a power cut between its renames,
+// paths::recover_replace): <nro> put back from "<nro>.old", or the build
+// replaced kept as <nro>.previous as it should have been. At start-up, and
+// before each swap or install.
+void recover(const std::string& nro);
 
 }   // namespace rollback

@@ -42,7 +42,8 @@ std::string sd_root();
 bool ensure_dir(const std::string& dir);
 
 // Writes `content` to `path` through a ".tmp" sibling + rename, so a crash or a
-// full SD card never leaves a half-written file behind. On failure returns
+// full SD card never leaves a half-written file behind (the content is
+// written as "<path>.part" first: a ".tmp" there is always whole). On failure returns
 // false and puts a short English reason in *error (when non-null).
 bool atomic_write(const std::string& path, const std::string& content, std::string* error = nullptr);
 
@@ -50,9 +51,32 @@ bool atomic_write(const std::string& path, const std::string& content, std::stri
 // stopped between its remove and its rename), reads that one instead.
 bool read_file(const std::string& path, std::string& out);
 
+// Part of a large file, for when only its start or its end is used: its
+// first `head` bytes followed by its last `tail` bytes, the ones in between
+// not read at all; the whole file when it holds no more than head + tail.
+// Falls back to the ".tmp" as read_file does.
+bool read_ends(const std::string& path, size_t head, size_t tail, std::string& out);
+// A regular file at `path` itself (its ".tmp" not counted).
+bool file_exists(const std::string& path);
+
 // Whether `path` or its ".tmp" (see read_file) is there at all: one that is
 // there but cannot be read is damaged, which is not the same as none.
-bool exists(const std::string& path);
+bool exists_or_pending(const std::string& path);
+
+// Replaces `target` with `fresh` (both on the same file system), for a
+// file too large for atomic_write (a .nro). FAT has no atomic replace:
+// target moves aside to "<target>.old", fresh takes its name, then the old
+// one is removed, or kept as `keep_as` when given (it may be `fresh`'s own
+// name: then the two swap). When fresh cannot take its place, the old one is
+// put back. A missing target is simply created; with no target, `keep_as`
+// is left as it is. Begins with recover_replace().
+bool replace_file(const std::string& target, const std::string& fresh, const std::string& keep_as,
+                  std::string* error);
+
+// Finishes or undoes a replace_file() stopped half-way (a power cut between
+// its renames): `target` missing and "<target>.old" there, that one is put
+// back; both there, the old one becomes `keep_as` (or goes, without one).
+void recover_replace(const std::string& target, const std::string& keep_as);
 
 // Moves a damaged `path` (or its ".tmp", when only that one is left) to
 // `path`.bad, so no later write replaces it. A `path`.bad already there

@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <ctime>
 #include <fmt/format.h>
+#include <mutex>
+#include <thread>
 
 using namespace brls::literals;
 
@@ -82,7 +84,20 @@ std::string bool_text(bool ok, bool value, const std::string& yes, const std::st
     return value ? yes : no;
 }
 
-LocalTime local_now()
+std::string opens(const std::string& value)
+{
+    return value.empty() ? "›" : value + "  ›";
+}
+
+namespace
+{
+// SameTime: the thread it pins the time for, and that time once read.
+std::mutex      s_same_lock;
+std::thread::id s_same_thread;
+bool            s_same_read = false;
+LocalTime       s_same_time{};
+
+LocalTime read_local_now()
 {
     LocalTime l{};
     u64 posix = 0;
@@ -102,6 +117,38 @@ LocalTime local_now()
     l.minute = (uint8_t)tmv.tm_min;
     l.second = (uint8_t)tmv.tm_sec;
     l.wday = (uint8_t)tmv.tm_wday;
+    return l;
+}
+}   // namespace
+
+SameTime::SameTime()
+{
+    std::lock_guard<std::mutex> lock(s_same_lock);
+    outer_ = s_same_thread == std::thread::id();
+    if (!outer_) return;
+    s_same_thread = std::this_thread::get_id();
+    s_same_read = false;
+}
+
+SameTime::~SameTime()
+{
+    if (!outer_) return;
+    std::lock_guard<std::mutex> lock(s_same_lock);
+    s_same_thread = std::thread::id();
+}
+
+LocalTime local_now()
+{
+    {
+        std::lock_guard<std::mutex> lock(s_same_lock);
+        if (s_same_thread == std::this_thread::get_id() && s_same_read) return s_same_time;
+    }
+    const LocalTime l = read_local_now();
+    std::lock_guard<std::mutex> lock(s_same_lock);
+    if (s_same_thread == std::this_thread::get_id()) {
+        s_same_time = l;
+        s_same_read = true;
+    }
     return l;
 }
 

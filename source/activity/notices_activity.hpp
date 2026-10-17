@@ -1,5 +1,7 @@
 // NoticesActivity — the notification bell's list (action/notices): "To do",
-// then "For information". A on an entry closes the list and runs its action
+// then "For information", about the parental controls; then "Console", the
+// console's entries on one line that A opens (open at once when they are all
+// there is). A on an entry closes the list and runs its action
 // (the fix, or the screen where it is made); an entry for information with
 // nothing to do is put away. Rebuilt when the entries change; closes by
 // itself once none is left.
@@ -16,6 +18,7 @@ class NoticesActivity : public brls::Activity
     ~NoticesActivity() override;
 
     void onContentAvailable() override;
+    void onResume() override;
 
     // Y on the main screen: the list, or a toast when it is empty.
     static void open();
@@ -23,6 +26,8 @@ class NoticesActivity : public brls::Activity
   private:
     int listener = 0;
     bool closing = false;
+    bool stale = false;   // changed under a dialog: rebuilt once back on top
+    bool console_open = false;   // the console's entries shown, not only their line
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
     brls::Box* content = nullptr;
 

@@ -36,7 +36,6 @@ extern "C" {
 // NsApplicationView flags qlaunch acts on (switchbrew, libnx-ext).
 #define GC_VIEW_HAS_MAIN_CONTENTS (1u << 1)
 #define GC_VIEW_CAN_LAUNCH        (1u << 8)
-#define GC_VIEW_NEEDS_UPDATE      (1u << 9)
 #define GC_VIEW_NEEDS_VERIFY      (1u << 13)
 
 // One content of a game, as ns lists it.

@@ -1,8 +1,8 @@
 // The network half of sys_notes.hpp (the rest stays plain C++ for the host tests).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
-#include <cstdlib>
-#include <cstring>
-
+#ifndef __SWITCH__
+#include "sim/sim_net.hpp"
+#endif
 #include "util/github_auth.hpp"
 #include "util/http.hpp"
 #include "util/paths.hpp"
@@ -19,14 +19,6 @@ constexpr size_t MAX_LIST = 2 * 1024 * 1024;
 // A switchbrew page: its tables of changed services can be long.
 constexpr size_t MAX_PAGE = 512 * 1024;
 
-#ifndef __SWITCH__
-const char* sim()
-{
-    const char* value = std::getenv("PLAYGUARD_SIM_SYS_NOTES");
-    return value && *value ? value : nullptr;
-}
-#endif
-
 // GETs `url` (or, on desktop, the file `name` of the simulated folder).
 bool get(const std::string& url, const std::string& name, const http::Headers& headers, size_t max, std::string* body,
          std::string* error)
@@ -35,12 +27,7 @@ bool get(const std::string& url, const std::string& name, const http::Headers& h
     (void)url;
     (void)headers;
     (void)max;
-    const char* folder = sim();
-    if (!folder || std::strcmp(folder, "offline") == 0 || !paths::read_file(std::string(folder) + "/" + name, *body)) {
-        if (error) *error = "simulated: no connection";
-        return false;
-    }
-    return true;
+    return sim_net::get(sim_net::value("PLAYGUARD_SIM_SYS_NOTES"), name, body, error);
 #else
     (void)name;
     return http::get(url, body, error, max, 20, headers);

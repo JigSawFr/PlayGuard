@@ -45,23 +45,23 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `schema` | integer | `1` | `1` | written by PlayGuard, not read |
 | `language` | string | `"system"` (the console's language), `"en-US"`, `"fr"`, `"fr-CA"`, `"de"`, `"es"`, `"es-419"`, `"it"`, `"nl"`, `"pt"`, `"pt-BR"`, `"ru"`, `"ja"`, `"ko"`, `"zh-Hans"`, `"zh-Hant"` | `"system"` | Preferences |
 | `theme` | string | `"system"`, `"light"`, `"dark"` | `"system"` | Preferences |
-| `start_tab` | string | the tab shown at start-up: `"dashboard"` (Overview), `"play_timer"`, `"activity"`, `"restrictions"`, `"clock"` (Network clock), `"security"`, `"preferences"`, `"tools"`, `"about"` | `"dashboard"` | Preferences |
-| `advanced` | boolean | shows the play timer's debug-class actions | `false` | Preferences |
-| `auto_relock` | boolean | locks parental controls again right after a change that needed the temporary unlock | `true` | Preferences |
+| `start_tab` | string | the tab shown at start-up: `"dashboard"` (Overview), `"play_timer"`, `"activity"`, `"restrictions"`, `"security"` (PIN), `"console"`, `"history"`, `"preferences"`, `"about"`; `"clock"` and `"tools"`, from before they became Console, read as `"console"` | `"dashboard"` | Preferences |
+| `advanced` | boolean | shows the play timer's debug-class actions | `false` | Play timer › Advanced |
+| `auto_relock` | boolean | turns parental controls back on right after a change that needed the temporary unlock | `true` | PIN |
 | `onboarding_at_start` | boolean | *First steps* opens by itself at start-up while no PIN is set | `true` | First steps (*Show at start-up*) |
-| `clock_check_at_start` | boolean | measures the network clock at start-up and says when it is off | `false` | Preferences |
+| `clock_check_at_start` | boolean | measures the network clock at start-up and says when it is off | `false` | Console › Network clock |
 | `intro` | boolean | the loading screen stays 2 seconds at start-up (Ⓐ or Ⓑ skips it); off, the first screen comes as soon as it is ready | `true` | Preferences (*Show the intro for 2 seconds*) |
 | `activity_period` | integer | Activity's period: `0` today, `1` last 7 days, `2` all time | `1` | Activity |
 | `export_format` | integer | the last export format: `0` CSV, `1` JSON, `2` XLSX, `3` PDF | `0` | Activity › Export |
-| `backup_keep` | integer | backups kept after a new one: `0` (all of them), `5`, `10`, `20` | `0` | Tools |
-| `logs_keep` | integer | saved reports kept, crash files kept, session logs kept and links of reports sent online kept (`logs/reports/`, `logs/crashes/`, `logs/sessions/`, `logs/uploads/`, each on its own): the newest `5`, `10`, `20` or `50`; `0` all of them. A file goes when any of the three `logs_keep*` says so, at start-up and when one changes; the newest file of each folder always stays | `20` | Tools › Diagnostics |
-| `logs_keep_days` | integer | the same, by age: those of the last `7`, `30`, `90` or `365` days (from the date in the file name); `0` no limit | `0` | Tools › Diagnostics |
-| `logs_keep_mb` | integer | the same, by size: the newest that fit in `1`, `5` or `20` MB together; `0` no limit | `0` | Tools › Diagnostics |
-| `extra_amounts` | array of 3 integers | the *Extra time today* choices, in minutes: `[15, 30, 60]`, `[10, 20, 30]`, `[30, 60, 90]` or `[5, 10, 15]` | `[15, 30, 60]` | Preferences |
+| `backup_keep` | integer | backups kept after a new one: `0` (all of them), `5`, `10`, `20` | `0` | History |
+| `logs_keep` | integer | saved reports kept, crash files kept, session logs kept and links of reports sent online kept (`logs/reports/`, `logs/crashes/`, `logs/sessions/`, `logs/uploads/`, each on its own): the newest `5`, `10`, `20` or `50`; `0` all of them. A file goes when any of the three `logs_keep*` says so, at start-up and when one changes; the newest file of each folder always stays | `20` | Preferences › Help & diagnostics |
+| `logs_keep_days` | integer | the same, by age: those of the last `7`, `30`, `90` or `365` days (from the date in the file name); `0` no limit | `0` | Preferences › Help & diagnostics |
+| `logs_keep_mb` | integer | the same, by size: the newest that fit in `1`, `5` or `20` MB together; `0` no limit | `0` | Preferences › Help & diagnostics |
+| `extra_amounts` | array of 3 integers | the *Extra time today* choices, in minutes: `[15, 30, 60]`, `[10, 20, 30]`, `[30, 60, 90]` or `[5, 10, 15]` | `[15, 30, 60]` | Play timer |
 
 ## `pin_lock`
 
-*Security › Ask for the PIN*. A string:
+*PIN › Protect PlayGuard with the PIN*. A string:
 
 | Value | In the app | What it does |
 |---|---|---|
@@ -144,7 +144,7 @@ stays in `config.json`.
 
 ### Console lock
 
-*Security › Console lock*: every day's limit set to 0, so the PIN is needed to
+*PIN › Block all games*: every day's limit set to 0, so the PIN is needed to
 play.
 
 | Key | Type | Values | Default |
@@ -164,7 +164,7 @@ day only. All four keys go together.
 | `extra_date` | string | `"YYYY-MM-DD"` of the change | `""` |
 | `extra_base` | integer | the limit before, in minutes: `0` to `1440`, or `65535` for no limit | `0` |
 | `extra_value` | integer | the limit for that day, `0` to `1440` minutes | `0` |
-| `extra_auto_restore` | boolean | the next day, put the limit back by itself instead of asking (the temporary unlock is still asked when needed); set in Preferences | `false` |
+| `extra_auto_restore` | boolean | the next day, put the limit back by itself instead of asking (the temporary unlock is still asked when needed); set in Play timer | `false` |
 
 ### Firmware not supported yet
 
@@ -185,7 +185,7 @@ version. The three keys go together.
 
 ## Example
 
-Every key with *Ask for the PIN* set to *To open PlayGuard*, in the order of
+Every key with *Protect PlayGuard with the PIN* set to *To open PlayGuard*, in the order of
 this page: `config.json`, then a system's `state.json`. PlayGuard itself
 writes the keys in alphabetical order, with each array element on its own
 line; the order does not matter when it reads them:

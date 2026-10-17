@@ -495,32 +495,6 @@ void pick_limit(const std::string& title, uint16_t current, std::function<void(u
     });
 }
 
-void change_day_limit(int day, uint16_t current, std::function<void()> refresh)
-{
-    if (day < 0 || day > 6) return;
-    pick_limit(brls::getStr("playguard/play_timer/perday/pick_title", ui::day_name(day)), current,
-               [day, current, refresh](uint16_t minutes) {
-        if (minutes == current) return;
-        // The other days as the console has them now (the tab's copy may be
-        // a few seconds old), only this one changed.
-        PtState now;
-        pctl_play_timer_query(&now);
-        if (!now.valid) {
-            ui::error(ui::rc_text(NXM_RC_STATE_UNKNOWN));
-            return;
-        }
-        std::array<uint16_t, 7> days;
-        for (int i = 0; i < 7; i++) days[i] = now.day_min[i];
-        days[day] = minutes;
-        const std::string body = brls::getStr("playguard/play_timer/confirm_day", ui::day_name_in_text(day), ui::fmt_minutes(minutes));
-        confirm_write(body, "playguard/play_timer/confirm_set"_i18n, [days, refresh](bool did_unlock) {
-            Result rc = write_days(days.data(), "day");
-            finish_write(rc, did_unlock, "playguard/play_timer/written_days"_i18n,
-                         "playguard/play_timer/write_err"_i18n, refresh);
-        }, days.data());
-    });
-}
-
 // "No more play today" can wait this long, for a save.
 static constexpr int STOP_SOON_MIN = 5;
 
@@ -722,7 +696,7 @@ void stop_today(const PtState& pt, std::function<void()> refresh)
         return;
     }
     const PtState copy = pt;
-    auto* list = new ActionList("playguard/dashboard/stop"_i18n,
+    auto* list = new ActionList("playguard/dashboard/stop_title"_i18n,
                                 { "playguard/dashboard/stop_now"_i18n, "playguard/dashboard/stop_soon"_i18n },
                                 [copy, soon, refresh](int index) { stop_at(copy, index == 0 ? 0 : (uint16_t)soon, refresh); });
     brls::Application::pushActivity(new brls::Activity(list));

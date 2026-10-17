@@ -47,6 +47,11 @@ ClockTab::ClockTab()
     result->setSingleLine(false);
     warning->setSingleLine(false);
     progress_text->setSingleLine(false);
+    // Only a notification at start-up (it never sets the clock): PlayGuard's own setting.
+    check_at_start->init("playguard/tools/clock_check"_i18n, config::get().clock_check_at_start, [](bool on) {
+        config::get().clock_check_at_start = on;
+        ui::save_config();
+    });
 
     this->server = clock_flow::current_server();
     this->region_id = find_region(this->server);
@@ -258,4 +263,9 @@ void ClockTab::copy()
 brls::View* ClockTab::create()
 {
     return new ClockTab();
+}
+
+void ClockTab::open_screen()
+{
+    ui::open_screen(new ClockTab(), "playguard/tabs/clock"_i18n);
 }

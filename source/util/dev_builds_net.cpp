@@ -6,6 +6,8 @@
 #ifndef __SWITCH__
 #include <chrono>
 #include <thread>
+
+#include "sim/sim_net.hpp"
 #endif
 
 #include "app.hpp"
@@ -34,8 +36,7 @@ std::string api_url()
 #ifndef __SWITCH__
 const char* sim()
 {
-    const char* value = std::getenv("PLAYGUARD_SIM_DEV_BUILDS");
-    return value && *value ? value : nullptr;
+    return sim_net::value("PLAYGUARD_SIM_DEV_BUILDS");
 }
 #endif
 
@@ -48,11 +49,7 @@ bool api_get(const std::string& path, const char* name, const std::string& token
         // PLAYGUARD_SIM_DEV_BUILDS_DELAY: each answer takes that many ms (the bar shows).
         if (const char* delay = std::getenv("PLAYGUARD_SIM_DEV_BUILDS_DELAY"))
             std::this_thread::sleep_for(std::chrono::milliseconds(std::atoi(delay)));
-        if (std::strcmp(folder, "offline") == 0 || !paths::read_file(std::string(folder) + "/" + name, *body)) {
-            if (error) *error = "simulated: no connection";
-            return false;
-        }
-        return true;
+        return sim_net::get(folder, name, body, error);
     }
 #endif
     (void)name;
@@ -202,6 +199,11 @@ bool download(const Build& b, const std::string& path, std::string* error,
         if (error) *error = "too large for PlayGuard";
         return false;
     }
+    // Refused before anything is fetched (verify_file would, after).
+    if (b.sha256.empty()) {
+        if (error) *error = NO_DIGEST;
+        return false;
+    }
     // An artifact arrives as a zip next to the target, playguard.nro is taken out of it.
     const std::string file = b.artifact ? path + ".zip" : path;
     // Received into <file>.part; a download cut short leaves it, with what it
@@ -286,6 +288,7 @@ bool download(const Build& b, const std::string& path, std::string* error,
     // Complete: checked whole, the part kept no more (a bad one would only fail again).
     ok = verify_file(part, b.size, b.sha256, error);
     std::remove(meta.c_str());
+    if (ok) std::remove(file.c_str());   // left by an attempt cut short: FAT rename does not replace it
     if (ok && std::rename(part.c_str(), file.c_str()) != 0) {
         if (error) *error = "cannot rename the download";
         ok = false;

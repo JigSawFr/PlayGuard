@@ -3,6 +3,7 @@
 
 #include <borealis.hpp>
 #include <fmt/format.h>
+#include <mutex>
 #include <string>
 
 #include "action/notices.hpp"
@@ -86,14 +87,22 @@ void check()
 }   // namespace
 
 // bootloader/update.bin is what hekate loads when it is newer than the
-// payload that started it: the version on the SD card.
+// payload that started it: the version on the SD card. The version sits in
+// the first KB of a file of about 200 KB: only that is read, once (Tools ›
+// Console asks for it each time it is shown).
 std::string installed_hekate()
 {
+    static std::mutex lock;
+    static bool read = false;
+    static std::string version;
+    std::lock_guard<std::mutex> guard(lock);
+    if (read) return version;
+    read = true;
     std::string path = paths::sd_root();
     if (path.empty() || path.back() != '/') path += '/';
     std::string bytes;
-    if (!paths::read_file(path + "bootloader/update.bin", bytes)) return "";
-    return sys_updates::hekate_version(bytes.substr(0, 1024));
+    if (paths::read_ends(path + "bootloader/update.bin", 1024, 0, bytes)) version = sys_updates::hekate_version(bytes);
+    return version;
 }
 
 std::string with_latest(const char* which, const std::string& running, bool* newer)

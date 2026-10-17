@@ -51,6 +51,8 @@ static void test_files()
     CHECK(files.size() == 4 && files[1].name == "logs/play_timer/log.csv" && files[2].name == "history_recent.json");
     CHECK(files[1].content.size() <= log_upload::PT_LOG_BYTES && files[1].content.size() > 40000);
     CHECK(files[1].content.compare(0, pt_log::header().size(), pt_log::header()) == 0);
+    // Only its end is read, and what is kept is the same as from the whole file.
+    CHECK(files[1].content == pt_log::tail(csv, log_upload::PT_LOG_BYTES));
     CHECK(std::remove(pt_log::path().c_str()) == 0);
 
     write(paths::reports_dir() + "/report_20261008_090000.txt", "a");
@@ -139,6 +141,33 @@ static void test_sessions()
     files = log_upload::session_files(1);
     REQUIRE(files.size() == 1);
     CHECK(files[0].content.size() <= log_upload::SESSION_BYTES);
+    CHECK(files[0].content == log_upload::head_and_tail(text, log_upload::SESSION_BYTES));
+
+    // A large one (the part in between is not read): the same as from the
+    // whole text, header and last lines.
+    std::string big = "=== PlayGuard session ===\nbuild   : x\n\n";
+    for (int i = 0; i < 40000; i++) big += "12:00:00.000 I a longer line, number " + std::to_string(i) + "\n";
+    big += "=== end: clean exit ===\n";
+    REQUIRE(big.size() > 1000 * 1000);
+    write(paths::sessions_dir() + "/session_20261013_090000.txt", big);
+    files = log_upload::session_files(1);
+    REQUIRE(files.size() == 1);
+    CHECK(files[0].content == log_upload::head_and_tail(big, log_upload::SESSION_BYTES));
+    CHECK(files[0].content.compare(0, 40, "=== PlayGuard session ===\nbuild   : x\n\n(") == 0);
+
+    // paths::read_ends: the whole file when small, else its two ends; a
+    // missing file read from its ".tmp".
+    std::string part;
+    const std::string small = paths::sessions_dir() + "/ends.txt";
+    write(small, "0123456789");
+    CHECK(paths::read_ends(small, 4, 6, part) && part == "0123456789");
+    CHECK(paths::read_ends(small, 3, 2, part) && part == "01289");
+    CHECK(paths::read_ends(small, 0, 3, part) && part == "789");
+    CHECK(paths::read_ends(small, 4, 0, part) && part == "0123");
+    CHECK(std::rename(small.c_str(), (small + ".tmp").c_str()) == 0);
+    CHECK(paths::read_ends(small, 2, 0, part) && part == "01");
+    CHECK(std::remove((small + ".tmp").c_str()) == 0);
+    CHECK(!paths::read_ends(small, 2, 2, part));
 }
 
 static void test_gist_files()

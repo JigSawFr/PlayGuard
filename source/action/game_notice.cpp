@@ -3,14 +3,11 @@
 
 #include <borealis.hpp>
 #include <fmt/format.h>
-#include <memory>
 #include <string>
 
+#include "action/game_scan.hpp"
 #include "action/notices.hpp"
 #include "activity/game_check_activity.hpp"
-#include "ui/ui.hpp"
-#include "util/game_cache.hpp"
-#include "util/paths.hpp"
 
 using namespace brls::literals;
 
@@ -32,43 +29,7 @@ void at_start()
     sysinfo_get(&si);
     if (si.applet_mode) return;
     const u32 hos = si.hos_version;
-    ui::in_background("game check", [hos]() {
-        // The last check, then what changed since: what the screen does.
-        auto cache = std::make_shared<game_cache::Cache>();
-        std::string bytes;
-        if (paths::read_file(GameCheckActivity::cache_file(), bytes)) game_cache::decode(bytes, cache.get());
-        std::vector<GameRecord> records(GAMECHECK_MAX);
-        u32 count = 0;
-        bool truncated = false;
-        if (R_FAILED(gamecheck_records(records.data(), GAMECHECK_MAX, &count, &truncated))) return;
-        records.resize(count);
-        cache->truncated = truncated;
-        u64 now = 0;
-        time_local_now(&now, nullptr);
-        const bool full = game_cache::expired(*cache, (int64_t)now, hos);
-        const std::vector<GameRecord> check = game_cache::to_check(cache.get(), records, (int64_t)now, hos);
-        bool complete = true;
-        if (!check.empty()) {
-            std::vector<GameFacts> facts(check.size());
-            const u32 done = gamecheck_check(check.data(), (u32)check.size(), facts.data(), nullptr, nullptr);
-            for (u32 i = 0; i < done; i++) game_cache::put(cache.get(), facts[i]);
-            complete = done == check.size();
-        }
-        if (complete && full) {
-            cache->checked_at = (int64_t)now;
-            cache->hos = hos;
-        }
-        if (ui::quitting()) return;
-        const std::string encoded = game_cache::encode(*cache);
-        std::string error;
-        if (!paths::ensure_dir(paths::nand_dir() + "/cache") ||
-            !paths::atomic_write(GameCheckActivity::cache_file(), encoded, &error))
-            brls::Logger::warning("games cache: not saved ({})", error);
-        brls::sync([cache, hos]() {
-            brls::Logger::info("games: start-up check done ({} games)", cache->games.size());
-            note(cache->games, hos);
-        });
-    });
+    game_scan::at_start(hos, [hos](const game_cache::Cache& cache) { note(cache.games, hos); });
 }
 
 void note(const std::vector<GameFacts>& games, u32 hos)

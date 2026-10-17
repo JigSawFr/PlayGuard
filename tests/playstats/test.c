@@ -285,20 +285,20 @@ static void test_add_played(void)
 
 static void test_utf8(void)
 {
-    CHECK(playstats_utf8_valid("Pixel Quest", 11));
-    CHECK(playstats_utf8_valid("Pok\xC3\xA9mon \xE3\x83\x9D \xF0\x9F\x8E\xAE", 17));
-    CHECK(playstats_utf8_valid("", 0));
-    CHECK(!playstats_utf8_valid("\x80", 1));              // a continuation byte first
-    CHECK(!playstats_utf8_valid("\xC0\x80", 2));          // overlong NUL
-    CHECK(!playstats_utf8_valid("\xE0\x80\xAF", 3));      // overlong '/'
-    CHECK(!playstats_utf8_valid("\xED\xA0\x80", 3));      // a surrogate
-    CHECK(!playstats_utf8_valid("\xF4\x90\x80\x80", 4));  // past U+10FFFF
-    CHECK(!playstats_utf8_valid("\xC3", 1));              // cut
-    CHECK(!playstats_utf8_valid("\xE3\x83", 2));
-    CHECK(!playstats_utf8_valid("a\xC3(", 3));
+    CHECK(nacp_utf8_valid("Pixel Quest", 11));
+    CHECK(nacp_utf8_valid("Pok\xC3\xA9mon \xE3\x83\x9D \xF0\x9F\x8E\xAE", 17));
+    CHECK(nacp_utf8_valid("", 0));
+    CHECK(!nacp_utf8_valid("\x80", 1));              // a continuation byte first
+    CHECK(!nacp_utf8_valid("\xC0\x80", 2));          // overlong NUL
+    CHECK(!nacp_utf8_valid("\xE0\x80\xAF", 3));      // overlong '/'
+    CHECK(!nacp_utf8_valid("\xED\xA0\x80", 3));      // a surrogate
+    CHECK(!nacp_utf8_valid("\xF4\x90\x80\x80", 4));  // past U+10FFFF
+    CHECK(!nacp_utf8_valid("\xC3", 1));              // cut
+    CHECK(!nacp_utf8_valid("\xE3\x83", 2));
+    CHECK(!nacp_utf8_valid("a\xC3(", 3));
 
     char out[8];
-    playstats_copy_utf8(out, sizeof(out), "abcd\xC3\xA9\xC3\xA9");   // 7 bytes fit, not half an é
+    nacp_copy_utf8(out, sizeof(out), "abcd\xC3\xA9\xC3\xA9");   // 7 bytes fit, not half an é
     CHECK(strcmp(out, "abcd\xC3\xA9") == 0);
 }
 
@@ -327,12 +327,12 @@ static void pack_titles(u8 *nacp, const u8 *entries, size_t size)
     deflateEnd(&z);
     nacp[0] = (u8)packed;
     nacp[1] = (u8)(packed >> 8);
-    nacp[PLAYSTATS_NACP_TITLES_FORMAT] = 1;
+    nacp[NACP_TITLES_FORMAT] = 1;
 }
 
 static void test_nacp(void)
 {
-    u8 *nacp = (u8 *)calloc(1, PLAYSTATS_NACP_SIZE);
+    u8 *nacp = (u8 *)calloc(1, NACP_SIZE);
     u8 *big = (u8 *)calloc(32, ENTRY);
     REQUIRE(nacp && big);
     char name[PLAYSTATS_NAME_LEN];
@@ -340,48 +340,48 @@ static void test_nacp(void)
     // Format 0: the entry of the language, else the first one used.
     set_title(nacp, 0, "Star Kart Racers", "Nin");
     set_title(nacp, 3, "Star Kart Racers (FR)", "Nin");
-    CHECK(playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 3, name, sizeof(name)) && strcmp(name, "Star Kart Racers (FR)") == 0);
-    CHECK(playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 5, name, sizeof(name)) && strcmp(name, "Star Kart Racers") == 0);
-    CHECK(playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 99, name, sizeof(name)) && strcmp(name, "Star Kart Racers") == 0);
+    CHECK(nacp_name(nacp, NACP_SIZE, 3, name, sizeof(name)) && strcmp(name, "Star Kart Racers (FR)") == 0);
+    CHECK(nacp_name(nacp, NACP_SIZE, 5, name, sizeof(name)) && strcmp(name, "Star Kart Racers") == 0);
+    CHECK(nacp_name(nacp, NACP_SIZE, 99, name, sizeof(name)) && strcmp(name, "Star Kart Racers") == 0);
     set_title(nacp, 0, "", "");
-    CHECK(playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 1, name, sizeof(name)) && strcmp(name, "Star Kart Racers (FR)") == 0);
+    CHECK(nacp_name(nacp, NACP_SIZE, 1, name, sizeof(name)) && strcmp(name, "Star Kart Racers (FR)") == 0);
     // A long name is cut on a whole character.
     char longer[300];
     memset(longer, 'a', 126);
     strcpy(longer + 126, "\xC3\xA9xyz");
     set_title(nacp, 3, longer, "");
-    CHECK(playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 3, name, sizeof(name)) && strlen(name) == 126);
+    CHECK(nacp_name(nacp, NACP_SIZE, 3, name, sizeof(name)) && strlen(name) == 126);
     // Garbage, a publisher with no name, no title, a short read: no name.
     set_title(nacp, 3, "Bad \xFF name", "");
-    CHECK(!playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 3, name, sizeof(name)) && name[0] == '\0');
+    CHECK(!nacp_name(nacp, NACP_SIZE, 3, name, sizeof(name)) && name[0] == '\0');
     set_title(nacp, 3, "", "Publisher only");
-    CHECK(!playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 3, name, sizeof(name)));
-    memset(nacp, 0, PLAYSTATS_NACP_SIZE);
-    CHECK(!playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 0, name, sizeof(name)));
+    CHECK(!nacp_name(nacp, NACP_SIZE, 3, name, sizeof(name)));
+    memset(nacp, 0, NACP_SIZE);
+    CHECK(!nacp_name(nacp, NACP_SIZE, 0, name, sizeof(name)));
     set_title(nacp, 0, "Island Builders", "");
-    CHECK(!playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE - 1, 0, name, sizeof(name)));
+    CHECK(!nacp_name(nacp, NACP_SIZE - 1, 0, name, sizeof(name)));
     memset(nacp, 'x', 0x200);   // a name with no end
-    CHECK(!playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 0, name, sizeof(name)));
+    CHECK(!nacp_name(nacp, NACP_SIZE, 0, name, sizeof(name)));
 
     // Format 1 (21.0.0+): 32 entries compressed; one past the first 16 too.
     set_title(big, 0, "Dragon Valley Legends", "Pub");
     set_title(big, 12, "\xEB\x93\x9C\xEB\x9E\x98\xEA\xB3\xA4", "Pub");
     set_title(big, 20, "Entry twenty", "Pub");
     pack_titles(nacp, big, 32 * ENTRY);
-    CHECK(playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 12, name, sizeof(name)) && strcmp(name, "\xEB\x93\x9C\xEB\x9E\x98\xEA\xB3\xA4") == 0);
-    CHECK(playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 20, name, sizeof(name)) && strcmp(name, "Entry twenty") == 0);
-    CHECK(playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 3, name, sizeof(name)) && strcmp(name, "Dragon Valley Legends") == 0);
+    CHECK(nacp_name(nacp, NACP_SIZE, 12, name, sizeof(name)) && strcmp(name, "\xEB\x93\x9C\xEB\x9E\x98\xEA\xB3\xA4") == 0);
+    CHECK(nacp_name(nacp, NACP_SIZE, 20, name, sizeof(name)) && strcmp(name, "Entry twenty") == 0);
+    CHECK(nacp_name(nacp, NACP_SIZE, 3, name, sizeof(name)) && strcmp(name, "Dragon Valley Legends") == 0);
     // The deflate bytes are never read as a name (what nacpGetLanguageEntry gives).
     CHECK(strcmp(name, (const char *)nacp + 2) != 0);
     // 16 entries compressed are fine too.
     set_title(big, 0, "", "");
     set_title(big, 7, "Sixteen", "Pub");
     pack_titles(nacp, big, 16 * ENTRY);
-    CHECK(playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 0, name, sizeof(name)) && strcmp(name, "Sixteen") == 0);
+    CHECK(nacp_name(nacp, NACP_SIZE, 0, name, sizeof(name)) && strcmp(name, "Sixteen") == 0);
     // Invalid UTF-8 inside: no name rather than garbage.
     set_title(big, 7, "Bad \xC0\xAF", "Pub");
     pack_titles(nacp, big, 16 * ENTRY);
-    CHECK(!playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 7, name, sizeof(name)));
+    CHECK(!nacp_name(nacp, NACP_SIZE, 7, name, sizeof(name)));
 
     // A broken block: a cut stream, a size of 0 or past the block, garbage.
     set_title(big, 7, "Sixteen", "Pub");
@@ -389,20 +389,20 @@ static void test_nacp(void)
     const u32 packed = (u32)nacp[0] | ((u32)nacp[1] << 8);
     nacp[0] = (u8)(packed / 2);
     nacp[1] = (u8)((packed / 2) >> 8);
-    CHECK(!playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 7, name, sizeof(name)));
+    CHECK(!nacp_name(nacp, NACP_SIZE, 7, name, sizeof(name)));
     nacp[0] = nacp[1] = 0;
-    CHECK(!playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 7, name, sizeof(name)));
+    CHECK(!nacp_name(nacp, NACP_SIZE, 7, name, sizeof(name)));
     nacp[0] = 0xFF;
     nacp[1] = 0x2F;   // 0x2FFF: one past the room there is
-    CHECK(!playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 7, name, sizeof(name)));
+    CHECK(!nacp_name(nacp, NACP_SIZE, 7, name, sizeof(name)));
     memset(nacp + 2, 0xA5, 0x100);
     nacp[0] = 0x00;
     nacp[1] = 0x01;
-    CHECK(!playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 7, name, sizeof(name)));
+    CHECK(!nacp_name(nacp, NACP_SIZE, 7, name, sizeof(name)));
     // A format this code does not know.
     set_title(nacp, 0, "Island Builders", "");
-    nacp[PLAYSTATS_NACP_TITLES_FORMAT] = 2;
-    CHECK(!playstats_nacp_name(nacp, PLAYSTATS_NACP_SIZE, 0, name, sizeof(name)));
+    nacp[NACP_TITLES_FORMAT] = 2;
+    CHECK(!nacp_name(nacp, NACP_SIZE, 0, name, sizeof(name)));
     free(big);
     free(nacp);
 }

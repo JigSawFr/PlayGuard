@@ -17,7 +17,7 @@ namespace
 }   // namespace
 
 AboutTab::AboutTab()
-    : TabBase("xml/tab/about.xml")
+    : TabBase("xml/tab/about.xml", false)
 {
     changelog_note->setSingleLine(false);
     support_note->setSingleLine(false);
@@ -26,14 +26,6 @@ AboutTab::AboutTab()
         return true;
     });
 
-    update_daily->init("playguard/tools/update_daily"_i18n, config::get().update_daily, [](bool on) {
-        config::get().update_daily = on;
-        ui::save_config();
-    });
-    update_via->registerClickAction([this](brls::View*) {
-        update_flow::choose_method([this]() { this->refresh(); });
-        return true;
-    });
     update_cell->registerClickAction([](brls::View*) {
         update_flow::check_now();
         return true;
@@ -97,9 +89,7 @@ void AboutTab::count_version_press()
 void AboutTab::refresh()
 {
     const auto& cfg = config::get();
-    update_daily->setOn(cfg.update_daily, false);
     update_cell->setDetailText(cfg.update_checked.empty() ? "" : brls::getStr("playguard/tools/update_last", cfg.update_checked));
-    update_via->setDetailText(update_flow::method_text());
 
     SysInfo si;
     sysinfo_get(&si);

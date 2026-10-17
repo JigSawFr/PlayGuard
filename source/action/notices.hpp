@@ -42,8 +42,9 @@ void dismiss(const std::string& id);
 void apply_preferences();
 
 std::vector<Entry> list();
-int action_count();
-int info_count();
+int action_count();    // the parental controls' entries to do: the bell's number
+int info_count();      // the parental controls' entries for information
+int console_count();   // the console's entries to do: the Console tab's number
 
 // Called (UI thread) after every change of what the bell shows.
 int  listen(std::function<void()> fn);
@@ -61,6 +62,9 @@ void note_pin_strength(const PctlStatus& s);
 // The main screen's own sweep (a minute apart, only while it is on top and
 // in focus): reads what refresh_status needs, in one pctl session.
 void sweep();
+// The same, unless the Overview gave refresh_status its readings in the last
+// seconds: the main screen's minute timer.
+void sweep_if_stale();
 
 // MainActivity, once per start: a crash file newer than the last one told
 // about (PlayGuard closed unexpectedly since). The first start with this

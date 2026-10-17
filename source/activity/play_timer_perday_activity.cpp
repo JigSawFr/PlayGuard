@@ -20,6 +20,18 @@ PlayTimerPerDayActivity::PlayTimerPerDayActivity(std::string title, const Days& 
     for (int i = 0; i < 7; i++) this->live.day_min[i] = this->pending[i] = days[i];
 }
 
+PlayTimerPerDayActivity::PlayTimerPerDayActivity(int start_day)
+    : start_day(start_day >= 0 && start_day <= 6 ? start_day : -1)
+{
+}
+
+PlayTimerPerDayActivity* PlayTimerPerDayActivity::week_split()
+{
+    auto* a        = new PlayTimerPerDayActivity();
+    a->start_split = true;
+    return a;
+}
+
 void PlayTimerPerDayActivity::onContentAvailable()
 {
     unavailable->setSingleLine(false);
@@ -112,6 +124,20 @@ void PlayTimerPerDayActivity::onContentAvailable()
     }
     this->reload_from_service();
     this->rerender();
+
+    // Opened for one day, or for the week / weekend split: that picker first
+    // (once the screen is up), the edit staged like any other.
+    if (this->start_day >= 0) {
+        week->focus_day(this->start_day);
+        const int d = this->start_day;
+        brls::sync([this, d]() { this->edit_day(d); });
+    } else if (this->start_split) {
+        brls::sync([this]() {
+            this->fill_days({ 1, 2, 3, 4, 5 }, "playguard/play_timer/perday/weekdays"_i18n, [this]() {
+                brls::sync([this]() { this->fill_days({ 0, 6 }, "playguard/play_timer/perday/weekend"_i18n); });
+            });
+        });
+    }
 }
 
 void PlayTimerPerDayActivity::reload_from_service()
@@ -159,16 +185,17 @@ void PlayTimerPerDayActivity::edit_day(int d)
                         });
 }
 
-void PlayTimerPerDayActivity::fill_days(std::initializer_list<int> days, const std::string& title)
+void PlayTimerPerDayActivity::fill_days(std::initializer_list<int> days, const std::string& title, std::function<void()> then)
 {
     if (!this->live.valid) {
         ui::notify("playguard/play_timer/perday/unavailable"_i18n);
         return;
     }
     std::vector<int> list(days);
-    pt_flow::pick_limit(title, this->pending[list.front()], [this, list](u16 v) {
+    pt_flow::pick_limit(title, this->pending[list.front()], [this, list, then](u16 v) {
         for (int d : list) this->pending[d] = v;
         this->rerender();
+        if (then) then();
     });
 }
 
