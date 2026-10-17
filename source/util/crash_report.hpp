@@ -42,10 +42,8 @@ void prepare(const std::string& dir, const std::string& build, const std::string
 // call), "" when it could not be written.
 const char* write(std::time_t now, const char* summary, const char* details, bool recent = true) noexcept;
 
-// The CPU exception handler's: the dump as the details
-// (crash_dump_format), then session_log::end_crash().
-void write_cpu(const CrashDump* dump) noexcept;
-
 }   // namespace crash_report
 
+// The CPU exception handler's: the dump as the details
+// (crash_dump_format), then session_log::end_crash().
 extern "C" void crash_report_cpu(const CrashDump* dump);

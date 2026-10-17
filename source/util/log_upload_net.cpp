@@ -1,8 +1,10 @@
 // The network half of log_upload.hpp (the rest stays plain C++ for the host tests).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
-#include <cstdlib>
 #include <cstring>
 
+#ifndef __SWITCH__
+#include "sim/sim_net.hpp"
+#endif
 #include "util/github_auth.hpp"
 #include "util/http.hpp"
 #include "util/log_upload.hpp"
@@ -16,9 +18,9 @@ namespace
 bool simulated(Result* r)
 {
 #ifndef __SWITCH__
-    if (const char* sim = std::getenv("PLAYGUARD_SIM_PASTE")) {
+    if (const char* sim = sim_net::value("PLAYGUARD_SIM_PASTE")) {
         if (std::strcmp(sim, "offline") == 0) {
-            r->error = "simulated: no connection";
+            sim_net::offline(&r->error);
             return true;
         }
         r->ok = true;
@@ -41,12 +43,11 @@ Result upload_gist(const std::vector<Part>& files, const std::string& token, con
     long status = 0;
     http::Headers headers = github_auth::api_headers(token);
     // The answer repeats the content: room for it, escaped.
-    if (!http::post("https://api.github.com/gists", gist_body(files, version, what), "application/json", &body, &r.error,
+    if (!http::post(github_auth::api_url("gists"), gist_body(files, version, what), "application/json", &body, &r.error,
                     &status, 3 * GIST_MAX_BYTES, 60, headers)) {
-        // 401: the token was revoked; 403 / 404: it was given before PlayGuard
-        // asked for the gist permission.
-        r.relogin = status == 401 || status == 403 || status == 404;
-        if (status == 401) github_auth::forget_refused(token);   // no use keeping it
+        // 401: the token was revoked (forgotten: no use keeping it); 403 /
+        // 404: it was given before PlayGuard asked for the gist permission.
+        r.relogin = github_auth::forget_if_revoked(status, token) || status == 403 || status == 404;
         r.error = "GitHub: " + r.error;
         return r;
     }

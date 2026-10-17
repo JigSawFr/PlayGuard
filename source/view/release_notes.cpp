@@ -1,24 +1,15 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/release_notes.hpp"
 
-#include <cctype>
-
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
+#include "util/text.hpp"
 
 namespace release_notes
 {
 namespace
 {
-// "play time per game" (a commit's subject, a highlight's text after its
-// title): "Play time per game".
-std::string capitalised(std::string text)
-{
-    if (!text.empty()) text[0] = (char)std::toupper((unsigned char)text[0]);
-    return text;
-}
-
 // The emoji `hex` ("1f680") as an image `size` pixels wide, from the Twemoji
 // set in img/emoji/; nullptr when it is not one of them.
 brls::Image* icon(const std::string& hex, float size)
@@ -108,7 +99,7 @@ brls::Box* card(const changelog::Line& l, bool left)
         brls::Label* title = ui::text_label(l.title, 21, ui::color_accent());
         title->setMarginBottom(4);
         body->addView(title);
-        body->addView(ui::text_label(capitalised(l.text), 18, ui::color_text()));
+        body->addView(ui::text_label(text::capitalise_ascii(l.text), 18, ui::color_text()));
     }
     box->addView(body);
     half->addView(box);
@@ -154,7 +145,7 @@ void fill(brls::Box* box, const std::vector<changelog::Line>& lines)
                 bullet->setShrink(0.0f);
                 row->addView(bullet);
                 if (!l.title.empty()) row->addView(tag(l.title));
-                brls::Label* text = ui::text_label(capitalised(l.text), 20, ui::color_text());
+                brls::Label* text = ui::text_label(text::capitalise_ascii(l.text), 20, ui::color_text());
                 text->setGrow(1.0f);
                 text->setShrink(1.0f);
                 row->addView(text);

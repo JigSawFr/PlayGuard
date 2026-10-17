@@ -7,6 +7,7 @@
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
+#include "util/text.hpp"
 
 #ifndef APP_VERSION
 #define APP_VERSION "0.0.0-dev"
@@ -75,8 +76,8 @@ void set_self_path(const char* argv0)
     if (!argv0) return;
     const std::string path = argv0;
     const std::string prefix = "sdmc:/", suffix = ".nro";
-    if (path.size() > prefix.size() + suffix.size() && path.compare(0, prefix.size(), prefix) == 0 &&
-        path.compare(path.size() - suffix.size(), suffix.size(), suffix) == 0)
+    if (path.size() > prefix.size() + suffix.size() && text::starts_with(path, prefix) &&
+        text::ends_with(path, suffix))
         s_self_path = path.substr(prefix.size() - 1);
 }
 const char* repo_url()         { return "https://github.com/JigSawFr/PlayGuard"; }

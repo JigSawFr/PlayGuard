@@ -64,8 +64,6 @@ struct Snooze
 bool offer_at_start(const std::string& latest, const std::string& running, const Snooze& snooze,
                     const std::string& today);
 
-// <repository>/releases/latest/download/compat.json
-std::string compat_url();
 // Fetches compat.json of the latest release and decides. Blocking (network):
 // run it with brls::async. On the desktop build PLAYGUARD_SIM_LATEST
 // ("1.1.0:24.0.0", "none" or "offline") replaces the network.

@@ -12,10 +12,11 @@
 namespace sys_updates
 {
 
+#ifdef __SWITCH__
 namespace
 {
 // The version releases/latest redirects to; "" (and *error) when it does not.
-[[maybe_unused]] std::string latest_of(const char* repo, std::string* error)
+std::string latest_of(const char* repo, std::string* error)
 {
     std::string target, err;
     if (!http::redirect(std::string("https://github.com/") + repo + "/releases/latest", &target, &err)) {
@@ -25,6 +26,7 @@ namespace
     return version_of_tag(tag_of_url(target));
 }
 }   // namespace
+#endif
 
 Latest fetch(std::string* error)
 {

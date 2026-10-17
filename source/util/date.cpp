@@ -114,4 +114,10 @@ bool iso_seconds(const std::string& iso, int64_t* out)
     return true;
 }
 
+int64_t days_between(int64_t from, int64_t to)
+{
+    const int64_t d = to - from;
+    return d >= 0 ? d / 86400 : -((-d + 86399) / 86400);
+}
+
 }   // namespace date

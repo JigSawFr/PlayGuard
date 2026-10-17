@@ -8,6 +8,8 @@
 #include <cstdlib>
 #endif
 
+#include "util/text.hpp"
+
 namespace ui
 {
 
@@ -60,7 +62,7 @@ void use_latin_font()
     // the pinyin letters é, è, ê… as full-width glyphs ("prot é g é e"), and a
     // full-width "·" and "…". Chinese keeps it: the han in its own style.
     const std::string locale = brls::Application::getLocale();
-    if (locale.rfind("zh", 0) == 0) return;
+    if (text::starts_with(locale, "zh")) return;
 
     PlFontData standard;
     if (R_FAILED(plGetSharedFontByType(&standard, PlSharedFontType_Standard))) return;

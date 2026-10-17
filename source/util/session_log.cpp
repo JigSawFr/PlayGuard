@@ -11,8 +11,10 @@
 #include <mutex>
 #include <unistd.h>
 
+#include "util/date.hpp"
 #include "util/log_files.hpp"
 #include "util/paths.hpp"
+#include "util/utf8.hpp"
 
 namespace session_log
 {
@@ -121,29 +123,18 @@ void to_ring(const std::string& line)
     char* slot = g_ring[g_count.load(std::memory_order_relaxed) % RING_LINES];
     size_t n = line.size();
     if (n > 0 && line[n - 1] == '\n') n--;
-    if (n > LINE_BYTES - 2) {
-        n = LINE_BYTES - 2;
-        while (n > 0 && ((unsigned char)line[n] & 0xC0) == 0x80) n--;
-    }
+    if (n > LINE_BYTES - 2) n = utf8::boundary_before(line, LINE_BYTES - 2);
     for (size_t i = 0; i < n; i++) slot[i] = line[i] == '\n' || line[i] == '\r' ? ' ' : line[i];
     slot[n] = '\n';
     slot[n + 1] = '\0';
     g_count.fetch_add(1, std::memory_order_release);
-}
-
-std::string local_time(std::time_t t, const char* fmt)
-{
-    std::tm tmv{};
-    char buf[32];
-    if (!localtime_r(&t, &tmv) || std::strftime(buf, sizeof(buf), fmt, &tmv) == 0) return "?";
-    return buf;
 }
 }   // namespace
 
 std::string format(std::time_t t, int ms, char level, const std::string& text)
 {
     char head[24];
-    std::snprintf(head, sizeof(head), "%s.%03d %c ", local_time(t, "%H:%M:%S").c_str(), ms < 0 || ms > 999 ? 0 : ms,
+    std::snprintf(head, sizeof(head), "%s.%03d %c ", date::local_time(t, "%H:%M:%S").c_str(), ms < 0 || ms > 999 ? 0 : ms,
                   level);
     std::string out = head;
     for (size_t i = 0; i < text.size(); i++) {

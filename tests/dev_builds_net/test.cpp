@@ -74,11 +74,14 @@ bool get(const std::string&, std::string*, std::string* error, size_t, long, con
     return false;
 }
 
-bool redirect(const std::string&, std::string* target, std::string* error, const Headers& headers)
+bool redirect(const std::string&, std::string* target, std::string* error, const Headers& headers, long* status)
 {
     s_redirect_headers = headers;
+    if (status) *status = 302;
     if (s_redirect_to.empty()) {
         if (error) *error = s_redirect_error;
+        // The status behind an "HTTP <status>" error (http_logic::succeeded).
+        if (status) *status = s_redirect_error.compare(0, 5, "HTTP ") == 0 ? std::atol(s_redirect_error.c_str() + 5) : 0;
         return false;
     }
     *target = s_redirect_to;

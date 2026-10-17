@@ -15,6 +15,9 @@
 #include <unistd.h>
 
 #include "core/platform.h"
+#ifndef __SWITCH__
+#include "sim/sim_net.hpp"
+#endif
 
 namespace ntp {
 namespace {
@@ -66,9 +69,9 @@ Reply fetch(const std::string& host, int timeout_ms, unsigned max_addresses, boo
     }
 #ifndef __SWITCH__
     // Desktop simulation: PLAYGUARD_SIM_NTP=offline, a console without Internet.
-    if (const char* sim = std::getenv("PLAYGUARD_SIM_NTP"); sim && std::strcmp(sim, "offline") == 0) {
+    if (const char* sim = sim_net::value("PLAYGUARD_SIM_NTP"); sim && std::strcmp(sim, "offline") == 0) {
         reply.kind = Error::Lookup;
-        reply.error = "simulated: no connection";
+        sim_net::offline(&reply.error);
         return reply;
     }
 #endif

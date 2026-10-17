@@ -24,6 +24,11 @@ namespace safe_text
 // - at most `max_bytes` bytes, cut between two characters.
 std::string clean(const std::string& text, size_t max_bytes, bool multiline);
 
+// Release notes, a description: clean() on several lines, then at most
+// `max_bytes` bytes, cut at the end of a whole line ("" when even the first
+// one is longer).
+std::string clean_notes(const std::string& text, size_t max_bytes);
+
 // A version as releases name it ("1.2.0", "1.3.0-rc.1", "2.0.0+build.5"):
 // 1 to 40 of [0-9A-Za-z.+-_], starting with a digit or a letter.
 bool is_version(const std::string& text);

@@ -22,21 +22,6 @@ namespace
 {
 using nlohmann::json;
 
-std::vector<std::string> lines_of(const std::string& text)
-{
-    std::vector<std::string> out;
-    size_t start = 0;
-    while (start <= text.size()) {
-        size_t end = text.find('\n', start);
-        if (end == std::string::npos) end = text.size();
-        std::string line = text.substr(start, end - start);
-        if (!line.empty() && line.back() == '\r') line.pop_back();
-        out.push_back(line);
-        start = end + 1;
-    }
-    return out;
-}
-
 std::string join(const std::vector<std::string>& lines)
 {
     std::string out;
@@ -76,18 +61,12 @@ std::string day_of(const std::string& iso)
 // Notes: clean, at most MAX_NOTES bytes, cut after a whole line.
 std::string cut_notes(const std::string& text)
 {
-    std::string out = safe_text::clean(text, text.size(), true);
-    if (out.size() > MAX_NOTES) {
-        const size_t cut = out.rfind('\n', MAX_NOTES);
-        out.resize(cut == std::string::npos ? 0 : cut);
-    }
-    return out;
+    return safe_text::clean_notes(text, MAX_NOTES);
 }
 
 bool https_on(const std::string& url, const char* host)
 {
-    const std::string head = std::string("https://") + host + "/";
-    return url.compare(0, head.size(), head) == 0 && url.size() < 512;
+    return text::starts_with(url, std::string("https://") + host + "/") && url.size() < 512;
 }
 
 // A Markdown heading's text ("## FAQ", or the line over a setext rule), else "".
@@ -182,7 +161,7 @@ bool parse_github(const std::string& text, Which which, std::vector<Release>* ou
 
 std::string trim_notes(Which which, const std::string& md)
 {
-    const std::vector<std::string> lines = lines_of(md);
+    const std::vector<std::string> lines = text::lines(md);
     std::vector<std::string> out;
     bool skipping = false;
     for (size_t i = 0; i < lines.size(); i++) {
@@ -214,7 +193,7 @@ std::string trim_notes(Which which, const std::string& md)
 std::string supported_firmware(const std::string& notes)
 {
     std::string best;
-    for (const std::string& raw : lines_of(notes)) {
+    for (const std::string& raw : text::lines(notes)) {
         const std::string line = text::lower_ascii(raw);
         if (line.find("support") == std::string::npos) continue;
         for (const char* lead : { "for ", "hos ", "firmware ", "supported: " }) {
@@ -258,7 +237,7 @@ std::vector<Version> parse_versions(const std::string& wikitext, size_t keep)
 {
     // Rows: "|-", then a cell per line: "| [[23.0.1]]", "| October 1, 2026 (UTC)", ...
     std::vector<Version> all;
-    const std::vector<std::string> lines = lines_of(wikitext);
+    const std::vector<std::string> lines = text::lines(wikitext);
     for (size_t i = 0; i < lines.size(); i++) {
         const std::string t = text::trim_space(lines[i]);
         if (!text::starts_with(t, "| [[")) continue;
@@ -284,7 +263,7 @@ std::vector<Version> parse_versions(const std::string& wikitext, size_t keep)
 std::string wiki_to_markdown(const std::string& wikitext)
 {
     std::string out;
-    for (const std::string& whole : lines_of(wikitext)) {
+    for (const std::string& whole : text::lines(wikitext)) {
         // Bullets first ("*", "**", "#"…: nested items; in wikitext bold is
         // ''', so a leading * is always a bullet).
         size_t depth = 0;
@@ -365,7 +344,7 @@ std::string firmware_page(const std::string& version)
 
 bool parse_firmware_page(const std::string& wikitext, Release* out)
 {
-    const std::vector<std::string> lines = lines_of(wikitext);
+    const std::vector<std::string> lines = text::lines(wikitext);
     std::vector<std::string> log;
     bool in_log = false, found = false;
     for (const std::string& raw : lines) {

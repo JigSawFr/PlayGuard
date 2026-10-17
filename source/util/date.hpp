@@ -1,13 +1,15 @@
 // date — "YYYY-MM-DD" dates as the settings, the history and the notes keep
 // them: reading one (three levels of strictness, each kept by a caller that
 // relies on it), the day number since 1970-01-01, moving by days, the days
-// between two, the weekday, and an ISO 8601 UTC stamp as seconds. The
-// arithmetic is core/calendar.c's (one implementation for C and C++); this
-// is its string side. Plain C++ so the host tests can run it.
+// between two, the weekday, an ISO 8601 UTC stamp as seconds, the days
+// between two such times, and a time written in local time. The arithmetic
+// is core/calendar.c's (one implementation for C and C++); this is its
+// string side. Plain C++ so the host tests can run it.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
 #include <cstdint>
+#include <ctime>
 #include <string>
 
 namespace date
@@ -47,5 +49,19 @@ int weekday(const std::string& s);
 // Seconds since 1970 of "YYYY-MM-DDTHH:MM:SS…" (UTC, the rest ignored); false
 // when malformed (fields out of range, a leap second allowed).
 bool iso_seconds(const std::string& iso, int64_t* out);
+// Whole days from `from` to `to` (seconds since 1970), rounded down: -1 when
+// `to` is a second before `from`.
+int64_t days_between(int64_t from, int64_t to);
+
+// `t` in local time through strftime's `fmt` ("%H:%M:%S"), at most 31
+// bytes; "?" when it cannot be written. Inline: session_log needs nothing
+// else of this file (nor core/calendar.c).
+inline std::string local_time(std::time_t t, const char* fmt)
+{
+    std::tm tmv{};
+    char buf[32];
+    if (!localtime_r(&t, &tmv) || std::strftime(buf, sizeof(buf), fmt, &tmv) == 0) return "?";
+    return buf;
+}
 
 }   // namespace date

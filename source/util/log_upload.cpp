@@ -8,11 +8,13 @@
 
 #include <borealis/extern/nlohmann/json.hpp>
 
+#include "util/json_util.hpp"
 #include "util/log_files.hpp"
 #include "util/paths.hpp"
 #include "util/pt_block.hpp"
 #include "util/pt_log.hpp"
 #include "util/text.hpp"
+#include "util/utf8.hpp"
 
 namespace log_upload
 {
@@ -36,11 +38,11 @@ std::vector<Part> debug_files(bool play_timer_log)
 std::string recent_history(const std::string& text, size_t limit)
 {
     nlohmann::json entries;
-    try {
-        const auto j = nlohmann::json::parse(text);
-        if (j.is_object() && j.contains("entries") && j["entries"].is_array()) entries = j["entries"];
-    } catch (const std::exception&) {
-    }
+    json_util::parse_with(text, [&entries](const nlohmann::json& j) {
+        const nlohmann::json* in = json_util::array_at(j, "entries");
+        if (in) entries = *in;
+        return in != nullptr;
+    });
     if (!entries.is_array())
         return "(the change history could not be read: " + std::to_string(text.size()) + " bytes)\n";
     const size_t from = entries.size() > limit ? entries.size() - limit : 0;
@@ -116,7 +118,7 @@ const std::string CUT_NOTICE = "\n\n(cut: too large to send whole)\n";
 std::string cut_to(const std::string& text, size_t room)
 {
     size_t keep = room > CUT_NOTICE.size() ? room - CUT_NOTICE.size() : 0;
-    while (keep > 0 && ((unsigned char)text[keep] & 0xC0) == 0x80) keep--;
+    keep = utf8::boundary_before(text, keep);
     return text.substr(0, keep) + CUT_NOTICE.substr(0, room - keep);
 }
 }   // namespace
@@ -130,9 +132,8 @@ std::string process_name(const std::string& text)
     const size_t at = text.find("Process Name:");
     if (at == std::string::npos) return "";
     const size_t end = text.find('\n', at);
-    std::string name = text::trim_space(text.substr(at + 13, end == std::string::npos ? std::string::npos : end - at - 13));
-    std::transform(name.begin(), name.end(), name.begin(), [](unsigned char c) { return (char)std::tolower(c); });
-    return name;
+    return text::lower_ascii(
+        text::trim_space(text.substr(at + 13, end == std::string::npos ? std::string::npos : end - at - 13)));
 }
 }   // namespace
 
@@ -180,7 +181,7 @@ std::vector<Part> gist_files(const std::vector<Part>& parts, size_t max_bytes, b
         // Its path under logs/, its folders joined with "_" (a gist file
         // name has no "/"): "logs/play_timer/block.json" is play_timer_block.json.
         std::string name = parts[i].name;
-        if (name.compare(0, 5, "logs/") == 0) name.erase(0, 5);
+        if (text::starts_with(name, "logs/")) name.erase(0, 5);
         std::replace(name.begin(), name.end(), '/', '_');
         const std::string file =
             std::to_string(i + 1) + "-" + (name.find('.') == std::string::npos ? std::string("report.txt") : name);
@@ -209,7 +210,7 @@ namespace
 // "https://<host>/<id>" with the id made only of the given characters.
 bool link_with_id(const std::string& text, const std::string& prefix, bool (*ok)(unsigned char))
 {
-    if (text.compare(0, prefix.size(), prefix) != 0) return false;
+    if (!text::starts_with(text, prefix)) return false;
     const std::string id = text.substr(prefix.size());
     return !id.empty() && id.size() <= 64 &&
            std::all_of(id.begin(), id.end(), [ok](char c) { return ok((unsigned char)c); });
@@ -219,45 +220,24 @@ bool link_with_id(const std::string& text, const std::string& prefix, bool (*ok)
 
 bool parse_gist(const std::string& body, std::string* url)
 {
-    try {
-        const auto j = nlohmann::json::parse(body);
-        const auto it = j.is_object() ? j.find("html_url") : j.end();
-        if (it == j.end() || !it->is_string()) return false;
+    return json_util::parse_with(body, [url](const nlohmann::json& j) {
         // "https://gist.github.com/<id>", or ".../<user>/<id>".
-        const std::string link = it->get<std::string>();
+        const std::string link = json_util::string_at(j, "html_url");
         if (!link_with_id(link, "https://gist.github.com/", [](unsigned char c) {
                 return std::isalnum(c) || c == '-' || c == '/';
             }) || link.find("//", 8) != std::string::npos || link.back() == '/')
             return false;
         *url = link;
         return true;
-    } catch (const std::exception&) {
-        return false;
-    }
-}
-
-std::string url_encode(const std::string& text)
-{
-    static const char HEX[] = "0123456789ABCDEF";
-    std::string out;
-    for (unsigned char c : text) {
-        if (std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
-            out += (char)c;
-        } else {
-            out += '%';
-            out += HEX[c >> 4];
-            out += HEX[c & 0xF];
-        }
-    }
-    return out;
+    });
 }
 
 std::string issue_url(const std::string& repo_url, const std::string& paste_url, const IssueFields& fields)
 {
     // Issue forms take each field's id as a query parameter.
-    std::string url = repo_url + "/issues/new?template=1-bug.yml&report=" + url_encode(paste_url);
+    std::string url = repo_url + "/issues/new?template=1-bug.yml&report=" + text::url_encode(paste_url);
     auto add = [&url](const char* id, const std::string& value) {
-        if (!value.empty()) url += std::string("&") + id + "=" + url_encode(value);
+        if (!value.empty()) url += std::string("&") + id + "=" + text::url_encode(value);
     };
     add("version", fields.version);
     add("firmware", fields.firmware);

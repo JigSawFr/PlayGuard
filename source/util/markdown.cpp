@@ -510,12 +510,8 @@ std::vector<Block> parse(const std::string& source)
 {
     const std::string md = drop_raw_elements(safe_text::clean(source, source.size(), true));
     Parser p;
-    for (size_t start = 0; start <= md.size();) {
-        size_t end = md.find('\n', start);
-        if (end == std::string::npos) end = md.size();
-        p.lines.push_back(md.substr(start, end - start));
-        start = end + 1;
-    }
+    // safe_text::clean() left no \r for lines() to drop.
+    p.lines = text::lines(md);
     for (size_t n = 0; n < p.lines.size() && !p.full; n++) {
         const std::string& raw = p.lines[n];
         std::string t = text::trim_blank(raw);

@@ -58,14 +58,16 @@ std::string page_url(const std::string& url)
 }
 
 // Notes: clean, at most MAX_NOTES bytes, cut after a whole line.
-std::string cut_notes(std::string text)
+std::string cut_notes(const std::string& text)
 {
-    text = safe_text::clean(text, text.size(), true);
-    if (text.size() > MAX_NOTES) {
-        const size_t cut = text.rfind('\n', MAX_NOTES);
-        text.resize(cut == std::string::npos ? 0 : cut);
-    }
-    return text;
+    return safe_text::clean_notes(text, MAX_NOTES);
+}
+
+// The "id" of the object j[key] (a repository); 0 when there is none.
+int64_t id_at(const json& j, const char* key)
+{
+    const json* o = json_util::object_at(j, key);
+    return o ? json_util::integer_or(*o, "id") : 0;
 }
 
 // Where fetch() finds builds: a release asset on github.com, an artifact on
@@ -85,9 +87,10 @@ bool release_build(const json& r, bool prerelease_ok, Build* out)
     if (!r.is_object() || r.value("draft", true)) return false;
     const bool prerelease = r.value("prerelease", true);
     if (prerelease && !prerelease_ok) return false;
-    if (!r.contains("assets") || !r["assets"].is_array()) return false;
+    const json* assets = json_util::array_at(r, "assets");
+    if (!assets) return false;
     const std::string tag = json_util::string_at(r, "tag_name");
-    for (const auto& a : r["assets"]) {
+    for (const auto& a : *assets) {
         if (!a.is_object() || json_util::string_at(a, "name") != "playguard.nro") continue;
         Build b;
         b.kind = Kind::Release;
@@ -137,19 +140,20 @@ bool is_build_artifact(const std::string& name)
     // 2027-01-10, its test with it.
     if (name == "playguard_release") return true;
     const std::string head = "playguard-", tail = "-nro";
-    return name.size() > head.size() + tail.size() && text::starts_with(name, head.c_str()) &&
-           name.compare(name.size() - tail.size(), tail.size(), tail) == 0;
+    return name.size() > head.size() + tail.size() && text::starts_with(name, head) && text::ends_with(name, tail);
 }
 
 bool parse_artifacts(const std::string& text, std::vector<Artifact>* out, size_t* listed)
 {
     return json_util::parse_with(text, [out, listed](const json& j) {
-        if (!j.is_object() || !j.contains("artifacts") || !j["artifacts"].is_array()) return false;
-        if (listed) *listed = j["artifacts"].size();
-        for (const auto& a : j["artifacts"]) {
+        const json* artifacts = json_util::array_at(j, "artifacts");
+        if (!artifacts) return false;
+        if (listed) *listed = artifacts->size();
+        for (const auto& a : *artifacts) {
             if (!a.is_object() || !is_build_artifact(json_util::string_at(a, "name")) || a.value("expired", true)) continue;
-            if (!a.contains("workflow_run") || !a["workflow_run"].is_object()) continue;
-            const auto& run = a["workflow_run"];
+            const json* workflow_run = json_util::object_at(a, "workflow_run");
+            if (!workflow_run) continue;
+            const auto& run = *workflow_run;
             Artifact x;
             x.url = json_util::string_at(a, "archive_download_url");
             x.date = iso_time(json_util::string_at(a, "created_at"));
@@ -173,11 +177,10 @@ namespace
 {
 bool pull_of(const json& p, Pull* out)
 {
-    if (!p.is_object() || !p.contains("head") || !p["head"].is_object()) return false;
-    const auto& head = p["head"];
-    auto repo_id = [](const json& side) {
-        return side.contains("repo") && side["repo"].is_object() ? json_util::integer_or(side["repo"], "id") : 0;
-    };
+    const json* head_side = json_util::object_at(p, "head");
+    if (!head_side) return false;
+    const auto& head = *head_side;
+    const json* base = json_util::object_at(p, "base");
     Pull x;
     x.number = (int)json_util::integer_or(p, "number");
     x.title = line_text(json_util::string_at(p, "title"));
@@ -186,8 +189,8 @@ bool pull_of(const json& p, Pull* out)
     x.branch = line_text(json_util::string_at(head, "ref"));
     x.head_sha = json_util::string_at(head, "sha");
     // A fork that was deleted has no repository: its builds cannot be matched.
-    x.head_repo = repo_id(head);
-    x.repo = p.contains("base") && p["base"].is_object() ? repo_id(p["base"]) : 0;
+    x.head_repo = id_at(head, "repo");
+    x.repo = base ? id_at(*base, "repo") : 0;
     if (x.number <= 0 || x.branch.empty() || !x.head_repo) return false;
     *out = x;
     return true;
@@ -220,20 +223,20 @@ bool parse_pull(const std::string& text, Pull* out)
 bool parse_runs(const std::string& text, std::vector<Run>* out)
 {
     return json_util::parse_with(text, [out](const json& j) {
-        if (!j.is_object() || !j.contains("workflow_runs") || !j["workflow_runs"].is_array()) return false;
-        for (const auto& r : j["workflow_runs"]) {
+        const json* runs = json_util::array_at(j, "workflow_runs");
+        if (!runs) return false;
+        for (const auto& r : *runs) {
             if (!r.is_object()) continue;
             Run x;
             x.id = json_util::integer_or(r, "id");
             x.sha = json_util::string_at(r, "head_sha");
             x.ci = ci_of(r);
-            x.repo = r.contains("repository") && r["repository"].is_object() ? json_util::integer_or(r["repository"], "id") : 0;
-            x.head_repo = r.contains("head_repository") && r["head_repository"].is_object()
-                              ? json_util::integer_or(r["head_repository"], "id") : 0;
+            x.repo = id_at(r, "repository");
+            x.head_repo = id_at(r, "head_repository");
             x.branch = line_text(json_util::string_at(r, "head_branch"));
             x.title = line_text(json_util::string_at(r, "display_title"));
-            if (r.contains("head_commit") && r["head_commit"].is_object())
-                x.message = cut_notes(json_util::string_at(r["head_commit"], "message"));
+            if (const json* commit = json_util::object_at(r, "head_commit"))
+                x.message = cut_notes(json_util::string_at(*commit, "message"));
             if (x.id > 0 && short_commit(x.sha) != "") out->push_back(x);
         }
         return true;
@@ -416,17 +419,29 @@ std::vector<Build> of_kind(const std::vector<Build>& all, Kind kind, Order order
     return out;
 }
 
-bool parse_iso(const std::string& iso, int64_t* seconds)
+std::string short_date(const std::string& iso)
 {
-    return date::iso_seconds(iso, seconds);
+    if (iso.size() < 16) return iso;
+    return iso.substr(0, 10) + " " + iso.substr(11, 5);
 }
 
-int days_between(const std::string& now_iso, const std::string& iso)
+Age age_of(const std::string& iso, int64_t now)
 {
-    int64_t a, b;
-    if (!date::iso_seconds(now_iso, &a) || !date::iso_seconds(iso, &b)) return 0;
-    const int64_t d = b - a;
-    return (int)(d >= 0 ? d / 86400 : -((-d + 86399) / 86400));
+    Age a;
+    int64_t then = 0;
+    if (!date::iso_seconds(iso, &then)) return a;
+    const int64_t age = now - then;
+    if (age < 3600) a.unit = Age::Now;
+    else if (age < 2 * 86400) a.unit = Age::Hours, a.count = (int)(age / 3600);
+    else a.unit = Age::Days, a.count = (int)(age / 86400);
+    return a;
+}
+
+int days_left(const std::string& iso, int64_t now)
+{
+    int64_t then = 0;
+    if (!date::iso_seconds(iso, &then)) return 0;
+    return (int)date::days_between(now, then);
 }
 
 bool newer(const Build& b, const std::string& running_version, const Build* running)
@@ -483,12 +498,12 @@ std::string encode_cache(const Cache& cache)
 bool decode_cache(const std::string& text, Cache* out)
 {
     return json_util::parse_with(text, [out](const json& j) {
-        if (!j.is_object() || json_util::integer_or(j, "version") != 1 || !j.contains("builds") || !j["builds"].is_array())
-            return false;
+        const json* builds = json_util::array_at(j, "builds");
+        if (!j.is_object() || json_util::integer_or(j, "version") != 1 || !builds) return false;
         Cache c;
         c.fetched_at = json_util::integer_or(j, "fetched_at");
         c.needs_login = j.value("needs_login", true);
-        for (const auto& x : j["builds"]) {
+        for (const auto& x : *builds) {
             if (!x.is_object()) continue;
             Build b;
             const std::string kind = json_util::string_at(x, "kind");

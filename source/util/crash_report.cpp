@@ -125,6 +125,8 @@ const char* write(std::time_t now, const char* summary, const char* details, boo
     return g_name;
 }
 
+namespace
+{
 void write_cpu(const CrashDump* dump) noexcept
 {
     char summary[200] = "cpu exception";
@@ -137,6 +139,7 @@ void write_cpu(const CrashDump* dump) noexcept
     const char* name = write(std::time(nullptr), summary, dump ? g_details : nullptr);
     session_log::end_crash(name);
 }
+}   // namespace
 
 }   // namespace crash_report
 

@@ -5,6 +5,7 @@
 #include <cstdio>
 
 #include "util/date.hpp"
+#include "util/text.hpp"
 
 namespace notice_logic
 {
@@ -29,7 +30,7 @@ const int CONSOLE = 20;
 
 bool matches(const std::string& id, const std::string& key)
 {
-    return key.back() == '_' ? id.compare(0, key.size(), key) == 0 : id == key;
+    return key.back() == '_' ? text::starts_with(id, key) : id == key;
 }
 
 int index_of(const std::string& id)
@@ -186,7 +187,7 @@ int Store::console_count() const
 
 bool shown_kind(const std::string& id, const Shown& shown)
 {
-    if (id.rfind("sys_", 0) == 0) return shown.system;
+    if (text::starts_with(id, "sys_")) return shown.system;
     if (id == "week" || id == "over_limit") return shown.summary;
     if (id == "backup" || id == "other_system" || id == "console_lock_long") return shown.reminders;
     return true;
@@ -216,7 +217,7 @@ std::string ack_day(const std::vector<std::string>& keys, const std::string& id,
 {
     const std::string head = id + ":" + print + ":";
     for (const auto& k : keys)
-        if (k.size() == head.size() + 10 && k.compare(0, head.size(), head) == 0) {
+        if (k.size() == head.size() + 10 && text::starts_with(k, head)) {
             const std::string day = k.substr(head.size());
             if (!date::add_days(day, 0).empty()) return day;
         }
@@ -241,7 +242,7 @@ bool ack_forget(std::vector<std::string>& keys, const std::string& id)
 {
     const std::string head = id + ":";
     const auto end = std::remove_if(keys.begin(), keys.end(),
-                                    [&head](const std::string& k) { return k.compare(0, head.size(), head) == 0; });
+                                    [&head](const std::string& k) { return text::starts_with(k, head); });
     const bool gone = end != keys.end();
     keys.erase(end, keys.end());
     return gone;

@@ -4,6 +4,7 @@
 #include <borealis/extern/nlohmann/json.hpp>
 
 #include "util/date.hpp"
+#include "util/json_util.hpp"
 
 namespace update
 {
@@ -59,20 +60,16 @@ uint32_t parse_firmware(const std::string& text)
 
 bool parse_compat(const std::string& json, Latest* out)
 {
-    try {
-        const auto j = nlohmann::json::parse(json);
-        if (!j.is_object() || !j.contains("version") || !j.contains("fw_tested_max")) return false;
-        if (!j["version"].is_string() || !j["fw_tested_max"].is_string()) return false;
+    return json_util::parse_with(json, [out](const nlohmann::json& j) {
+        // A field missing or not a text reads as "", which neither parse takes.
         Latest l;
-        l.version       = j["version"].get<std::string>();
-        l.fw_tested_max = parse_firmware(j["fw_tested_max"].get<std::string>());
+        l.version       = json_util::string_at(j, "version");
+        l.fw_tested_max = parse_firmware(json_util::string_at(j, "fw_tested_max"));
         int v[3];
         if (!parse_version(l.version, v) || !l.fw_tested_max) return false;
         *out = l;
         return true;
-    } catch (...) {
-        return false;
-    }
+    });
 }
 
 bool offer_at_start(const std::string& latest, const std::string& running, const Snooze& snooze,

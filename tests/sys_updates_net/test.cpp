@@ -25,7 +25,7 @@ static std::vector<std::string>          s_asked;
 
 namespace http
 {
-bool redirect(const std::string& url, std::string* target, std::string* error, const Headers&)
+bool redirect(const std::string& url, std::string* target, std::string* error, const Headers&, long*)
 {
     s_asked.push_back(url);
     const auto it = s_redirects.find(url);
