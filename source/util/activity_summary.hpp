@@ -65,6 +65,13 @@ uint64_t unattributed_s(uint64_t total_s, const AccountPlay* accounts, size_t co
 // its unplayed games keep a useful order too.
 void sort_by_play(std::vector<const GameStat*>& games, int period, bool by_total);
 
+// The account Activity starts on, as an index in `keys` (each account's
+// play_data key, in play_data::accounts() order), -1 every account. `setting`
+// is config's activity_account: "last" takes `last`, the one shown last; ""
+// or a key no account has any more (deleted, or the other system's), every
+// account.
+int start_account(const std::string& setting, const std::string& last, const std::vector<std::string>& keys);
+
 // What the export's table says, in the language shown: the tab's words.
 struct ExportText
 {

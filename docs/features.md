@@ -68,7 +68,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 ## Activity — who played what, and how long
 
-- Time per game **today**, in the **last 7 days** and **in all**, from the console's own activity log — for every account or **one user account** (*Account*, when the console has several).
+- Time per game **today**, in the **last 7 days** and **in all**, from the console's own activity log — for every account or **one user account** (*Account*, when the console has several). PlayGuard starts on the account shown last, or on the one set under *Account by default* (every account, or one).
 - A chart of the last seven days (today on the right, a legend under it), with this week's limit for each day as a line and the time over it in amber, marked !; today's, the week's and all-time totals.
 - A **summary** over the chosen period, for the account shown: average per day, the most played game, the days played and the busiest one (last 7 days), the average session (all time).
 - **To rediscover**: installed games under 3 h in all and not played for a month or more, the least played first (up to three).

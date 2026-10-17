@@ -382,6 +382,8 @@
         "section_totals": "Speeltijd",
         "account": "Account",
         "account_all": "Alle accounts",
+        "account_default": "Standaardaccount",
+        "account_last": "Het laatst getoonde",
         "today": "Vandaag",
         "week": "Afgelopen 7 dagen",
         "all_time": "Totaal",

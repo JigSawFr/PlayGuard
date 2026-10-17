@@ -41,6 +41,11 @@ struct Config
     std::string start_tab = "dashboard";   // tab shown at start-up (main.xml order: START_TABS)
     std::vector<int> extra_amounts = { 15, 30, 60 };   // "Extra time today" choices, minutes
     int  activity_period = 1;          // Activity's period: 0 today, 1 last 7 days, 2 all time
+    // Activity's account when PlayGuard starts: "last" (the one shown last,
+    // activity_account_last), "" every account, or one account's uid as 32
+    // hex digits (play_data::key_of); an account gone since: every account.
+    std::string activity_account = "last";
+    std::string activity_account_last;   // "" every account, or a uid as above
     int  export_format   = 0;          // last export format (table_export::Format)
     int  backup_keep     = 0;          // backups kept after a new one (0: all of them)
     // The saved reports and the crash files kept, each folder on its own

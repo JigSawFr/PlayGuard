@@ -146,4 +146,13 @@ table_export::Table export_table(const PlayStats& s, int period, const ExportTex
     return t;
 }
 
+int start_account(const std::string& setting, const std::string& last, const std::vector<std::string>& keys)
+{
+    const std::string& key = setting == "last" ? last : setting;
+    if (key.empty()) return -1;
+    for (size_t i = 0; i < keys.size(); i++)
+        if (keys[i] == key) return (int)i;
+    return -1;
+}
+
 }   // namespace activity_summary

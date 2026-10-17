@@ -382,6 +382,8 @@
         "section_totals": "Spielzeit",
         "account": "Nutzer",
         "account_all": "Alle Nutzer",
+        "account_default": "Standardkonto",
+        "account_last": "Das zuletzt angezeigte",
         "today": "Heute",
         "week": "Letzte 7 Tage",
         "all_time": "Gesamt",
