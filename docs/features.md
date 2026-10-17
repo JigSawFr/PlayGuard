@@ -49,9 +49,9 @@ A bell in the header, left of the version, gathers what needs the parent; Ⓨ op
 ## Play timer — the week chart is the editor
 
 - A state line: active, time left, today's limit, the matching profile (red while the limit is reached).
-- **The week chart:** ←/→ pick a day, Ⓐ changes its limit.
+- **The week chart:** ←/→ pick a day, Ⓐ opens the per-day editor on it, its picker already open. The editor is the one place for a limit per day: change several days, they stay in amber and marked \* until **+** (from anywhere) saves them all at once, with one confirmation; quick values, "no limit" per day, Monday–Friday / weekend presets, copy today to every day.
 - **Same limit every day:** a quick list or any value, typed in minutes (`90`, `90 min`) or hours (`1:30`, `1h30`).
-- **A different limit for each day:** unsaved days in amber and marked \*, quick values, Monday–Friday / weekend presets, "no limit" per day; **+** saves from anywhere.
+- **Weekdays and weekend ›:** the editor, asking for Monday–Friday then for the weekend.
 - **Remove the limit**, **extra time today**, **no more play today** (as on the Overview).
 - A note under the daily limit says what the console does at the limit (as on the Overview). While parental controls are temporarily unlocked, play time *may* not be counted: that is still open ([docs](parental-controls.md#still-open)).
 - **Profiles** saved on the SD card: apply, edit, rename or delete one; save the current limits or make a new one. Any name, in any script (*École*, *周末*, *Выходные* …) — a name without Latin letters gets a file name of its own, and two names that would map to the same file are caught.
