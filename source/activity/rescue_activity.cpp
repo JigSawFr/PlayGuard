@@ -12,8 +12,8 @@
 
 using namespace brls::literals;
 
-RescueActivity::RescueActivity(RescueReport report, bool confirmed)
-    : report(report), confirmed(confirmed)
+RescueActivity::RescueActivity(RescueReport report, bool confirmed, bool old_module)
+    : report(report), confirmed(confirmed), old_module(old_module && !confirmed)
 {
 }
 
@@ -32,7 +32,9 @@ void RescueActivity::onContentAvailable()
         Result rc = pctl_set_pin();   // the system PIN screen, which sets a new one
         brls::Logger::info("pctl_set_pin returned 0x{:08X}", (unsigned)rc);
         if (R_SUCCEEDED(rc)) history_flow::record_event("pin", "rescue");
-        ui::notify_result(rc, "playguard/security/pin_ok"_i18n, "playguard/security/pin_err"_i18n);
+        // Left with B: nothing changed, nothing to say.
+        if (rc != NXM_RC_CANCELLED)
+            ui::notify_result(rc, "playguard/security/pin_ok"_i18n, "playguard/security/pin_err"_i18n);
         this->refresh();
         return true;
     });
@@ -81,8 +83,11 @@ void RescueActivity::refresh()
     const bool ok        = report.result == RescueResult_Ok && confirmed;
     const bool deleted   = ok && report.mode == RescueMode_Delete;
 
-    // What the sysmodule did, in the status colour that matches it.
-    const char* key = doubted                               ? "playguard/rescue/outcome/unconfirmed"
+    // What the sysmodule did, in the status colour that matches it. A module
+    // from before the proof: doing RESCUE again gives the same, so it says
+    // to update the module rather than to try again.
+    const char* key = old_module                            ? "playguard/rescue/outcome/old_module"
+                    : doubted                               ? "playguard/rescue/outcome/unconfirmed"
                     : deleted                               ? "playguard/rescue/outcome/deleted"
                     : ok                                    ? "playguard/rescue/outcome/unlocked"
                     : report.result == RescueResult_NoPin   ? "playguard/rescue/outcome/no_pin"
@@ -90,9 +95,11 @@ void RescueActivity::refresh()
                                                             : "playguard/rescue/outcome/failed";
     outcome->setText(brls::getStr(key));
     outcome->setTextColor(ok ? ui::color_ok()
-                             : report.result == RescueResult_NoPin && !doubted ? ui::color_warn() : ui::color_bad());
+                             : old_module || (report.result == RescueResult_NoPin && !doubted) ? ui::color_warn()
+                                                                                               : ui::color_bad());
 
-    std::string n = doubted                               ? "playguard/rescue/note_unconfirmed"_i18n
+    std::string n = old_module                            ? brls::getStr("playguard/rescue/note_old_module", app::version())
+                  : doubted                               ? "playguard/rescue/note_unconfirmed"_i18n
                   : deleted                               ? "playguard/rescue/note_deleted"_i18n
                   : ok                                    ? "playguard/rescue/note"_i18n
                   : report.result == RescueResult_NoPin   ? "playguard/rescue/note_no_pin"_i18n

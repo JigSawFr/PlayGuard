@@ -3,13 +3,13 @@
 <!-- First steps: three steps with their state, each one done right here (the
      system PIN screen, the daily-limit picker, the guided clock measure), a
      fourth while the phone app is linked (unlink it), one more while the
-     "time's up" alarm is off (turn it back on), one once a PIN is set (Ask
-     for the PIN, Security's choice), and whether the screen opens
+     "time's up" alarm is off (turn it back on), one once a PIN is set (Protect
+     PlayGuard with the PIN, the PIN tab's choice), and whether the screen opens
      by itself at start-up; below Close, Support PlayGuard (the funding QR
      codes). Under the note, on emuMMC (or on sysMMC with an emuMMC set up),
      that the other system has its own parental controls.
      Shown at start-up while no PIN is set; Overview › First steps and
-     Tools › First steps bring it back. Filled by onboarding_activity.cpp. -->
+     Preferences › Help & diagnostics › First steps bring it back. Filled by onboarding_activity.cpp. -->
 
 <brls:AppletFrame
     iconInterpolation="linear">

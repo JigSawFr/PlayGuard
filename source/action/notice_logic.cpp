@@ -2,6 +2,9 @@
 #include "action/notice_logic.hpp"
 
 #include <algorithm>
+#include <cstdio>
+
+#include "util/date.hpp"
 
 namespace notice_logic
 {
@@ -144,6 +147,74 @@ int Store::info_count() const
 int Store::console_count() const
 {
     return this->count(Group::Console, Level::Action);
+}
+
+bool shown_kind(const std::string& id, const Shown& shown)
+{
+    if (id.rfind("sys_", 0) == 0) return shown.system;
+    if (id == "week" || id == "over_limit") return shown.summary;
+    if (id == "backup" || id == "other_system" || id == "console_lock_long") return shown.reminders;
+    return true;
+}
+
+std::string read_key(const std::string& id, const std::string& title, const std::string& detail)
+{
+    uint32_t h = 2166136261u;   // FNV-1a
+    for (const std::string* part : { &title, &detail })
+        for (unsigned char c : *part) h = (h ^ c) * 16777619u;
+    char hex[9];
+    std::snprintf(hex, sizeof(hex), "%08x", (unsigned)h);
+    return id + ":" + hex;
+}
+
+std::string backup_date(const std::string& name)
+{
+    if (name.size() < 8) return "";
+    for (int i = 0; i < 8; i++)
+        if (name[i] < '0' || name[i] > '9') return "";
+    return name.substr(0, 4) + "-" + name.substr(4, 2) + "-" + name.substr(6, 2);
+}
+
+bool days_ago(const std::string& day, int days, const std::string& today)
+{
+    const std::string then = date::add_days(day, days);
+    return !then.empty() && then <= today;
+}
+
+bool backup_due(const std::vector<std::string>& backups, const std::string& today)
+{
+    if (backups.empty()) return true;
+    const std::string last = backup_date(backups.front());
+    return !last.empty() && days_ago(last, 30, today);
+}
+
+bool console_lock_long(bool on, const std::string& since, const std::string& today)
+{
+    return on && !since.empty() && days_ago(since, 7, today);
+}
+
+bool sd_space_low(bool known, uint64_t free_bytes)
+{
+    return known && free_bytes < (500ULL << 20);
+}
+
+bool week_due(bool known, uint64_t total_s, const std::string& seen, const std::string& today)
+{
+    return known && total_s > 0 && (seen.empty() || days_ago(seen, 7, today));
+}
+
+int over_limit_days(const PtState& pt, const PlayStats& stats)
+{
+    int over = 0;
+    if (!pt.valid || !pt.alarm_only) return 0;
+    for (int k = 0; k < 7; k++) {
+        const uint16_t limit = pt.day_min[stats.day_wday[k] % 7];
+        if (limit == PT_DAY_NOLIMIT) continue;
+        uint64_t played = 0;
+        for (uint32_t g = 0; g < stats.count; g++) played += stats.games[g].day_s[k];
+        if (played > (uint64_t)limit * 60) over++;
+    }
+    return over;
 }
 
 }   // namespace notice_logic

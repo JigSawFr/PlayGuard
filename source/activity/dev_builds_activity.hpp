@@ -1,4 +1,4 @@
-// DevBuildsActivity — Developer tools › Install another build
+// DevBuildsActivity — Help & diagnostics › Developer › Install another build
 // (action/dev_build_flow.hpp): a tab each for the releases (pre-releases
 // included, tagged), main's last commits and the open pull requests (a long
 // list of one kind never hides the next), the builds of the chosen one

@@ -25,6 +25,11 @@ class HistoryActivity : public brls::Activity
     void export_shown();
 
     history_logic::Filter filter = history_logic::Filter::All;
+    // Every entry, read once and again only after a change was recorded
+    // (history_flow::changes()): a new filter does not read the file.
+    std::vector<history::Entry> all;
+    bool                        read = false;
+    uint64_t                    read_at = 0;   // history_flow::changes() when read
     std::vector<history::Entry> shown;   // what rebuild() listed, for the export
 
     BRLS_BIND(brls::Label,      note,   "hi_note");

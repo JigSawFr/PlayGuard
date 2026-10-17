@@ -7,9 +7,9 @@ body:
     attributes:
       value: |
         The [roadmap](https://github.com/JigSawFr/PlayGuard/blob/main/ROADMAP.md#waiting-on-data-from-a-console)
-        lists the findings that unblock features. Most of them come from *Developer tools ›
-        Compare the play-timer block*, run before and after one change made from the
-        Nintendo phone app, on a console still linked to it.
+        lists the findings that unblock features. Most of them come from *Preferences ›
+        Help & diagnostics › Developer › Compare the play-timer block*, run before and
+        after one change made from the Nintendo phone app, on a console still linked to it.
 
   - type: input
     id: topic

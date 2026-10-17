@@ -202,8 +202,8 @@ std::string system_line(const SysInfo& si)
 void show_first(brls::Activity* first)
 {
     brls::Application::pushActivity(first, brls::TransitionAnimation::NONE);
-    pt_log_flow::apply();   // Developer › Record the play timer, when on (after fw_gate::prepare)
-    log_prune_flow::run();  // the reports and crashes past the limits of Tools › Diagnostics
+    pt_log_flow::apply();   // Help & diagnostics › Developer › Record the play timer, when on (after fw_gate::prepare)
+    log_prune_flow::run();  // the reports and crashes past the limits of Preferences › Help & diagnostics
     startup_mark(StartupStep_FirstScreen);
     rollback_flow::started();   // this build starts: nothing to go back from
     brls::Logger::info("start-up: first screen ready after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_FirstScreen));
@@ -226,7 +226,7 @@ brls::Activity* choose_first()
 {
     // Untested firmware: read-only (or the remembered choice) before any tab is built.
     fw_gate::prepare();
-    // Security › Ask for the PIN: checked before every change from now on;
+    // PIN › Protect PlayGuard with the PIN: checked before every change from now on;
     // "To open PlayGuard" starts on the lock screen.
     pin_lock::install();
     // ... and again after a while away, over whatever is open.
@@ -239,12 +239,13 @@ brls::Activity* choose_first()
     // screen like any start.
     RescueProof proof;
     auto report = rescue::take(&proof);
-    const bool confirmed = report && rescue::confirmed(*report, proof);
+    bool old_module = false;   // an unlock by a module from before the proof
+    const bool confirmed = report && rescue::confirmed(*report, proof, &old_module);
     // Stopped in the middle of a change last time: lock again before any
     // screen, so a lock screen left with B does not leave the console
     // unlocked. Not after a confirmed recovery unlock: that one is wanted.
     if (!(confirmed && report->mode == RescueMode_Unlock)) pt_flow::relock_if_interrupted();
-    if (report) return new RescueActivity(*report, confirmed);
+    if (report) return new RescueActivity(*report, confirmed, old_module);
     if (pin_lock::at_start()) return new LockActivity();
     return new MainActivity();
 }
@@ -294,8 +295,8 @@ int main(int argc, char* argv[])
     // A way out of main() that skips the end of this function.
     std::atexit([]() { session_log::end("exit"); });
     // Before anything that could crash: the last start of a build just
-    // installed never reached its first screen, or L + R are held? Then the
-    // previous build is offered (action/rollback_flow.hpp).
+    // installed never reached its first screen, or L + R are held (and no
+    // PIN is set)? Then the previous build is offered (action/rollback_flow.hpp).
     if (rollback_flow::at_start()) {
         session_log::end("exit at start-up (the start-up screen of the previous build)");
         return EXIT_SUCCESS;
@@ -398,7 +399,7 @@ int main(int argc, char* argv[])
         if (session_log::due()) ui::write_later("session log", []() { session_log::flush(); }, "session_log");
     }
 
-    // "Lock and quit": locked now that the screen is gone (pt_flow.hpp).
+    // "Turn back on and quit": locked now that the screen is gone (pt_flow.hpp).
     pt_flow::lock_at_exit_if_asked();
 
     // Network tasks still running (an update check, a sign-in waiting for its

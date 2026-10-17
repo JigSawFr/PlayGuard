@@ -27,7 +27,7 @@ void DiagnosticActivity::onContentAvailable()
         if (chunk.back() == '\n') chunk.pop_back();
         auto* label = new brls::Label();
         label->setText(chunk);
-        label->setFontSize(16);
+        label->setFontSize(18);
         label->setSingleLine(false);
         label->setFocusable(true);
         label->setMarginBottom(8);

@@ -1,4 +1,4 @@
-// upload_flow — Tools › Send a report online: pick a report, sign in to
+// upload_flow — Help & diagnostics › Send a report online: pick a report, sign in to
 // GitHub first when PlayGuard is not (the report goes to a secret gist in
 // that account), confirm what goes, send it (util/log_upload.hpp), then show
 // its link and two QR codes: the report itself, and the bug-report form with

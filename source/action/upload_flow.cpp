@@ -65,7 +65,7 @@ brls::Box* qr_card(const std::string& title, const std::string& url, const std::
     brls::Label* name = centered_label(title, 20, ui::color_text());
     name->setMarginTop(6);
     card->addView(name);
-    card->addView(centered_label(caption, 17, ui::color_note()));
+    card->addView(centered_label(caption, 18, ui::color_note()));
     return card;
 }
 
@@ -112,11 +112,11 @@ void show_link(const log_upload::Result& r, bool report)
 
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::CENTER);
-    box->setPadding(24, 24, 12, 24);
+    box->setPadding(16, 24, 12, 24);   // the two cards and their captions at 18 px fit above OK
     box->addView(centered_label(text, 20, ui::color_text()));
     auto* row = new brls::Box(brls::Axis::ROW);
     row->setJustifyContent(brls::JustifyContent::SPACE_EVENLY);
-    row->setMarginTop(14);
+    row->setMarginTop(8);
     row->addView(qr_card("playguard/upload/qr_report"_i18n, r.url, text::short_url(r.url)));
     row->addView(qr_card("playguard/upload/qr_issue"_i18n, issue, "playguard/upload/qr_issue_note"_i18n));
     box->addView(row);
@@ -141,18 +141,30 @@ void send_gist(const Parts& parts, const Kind& kind)
     // Its link goes into a bug report, which anyone can read.
     if (kind.report) body += " " + "playguard/upload/confirm_public"_i18n;
     const std::string token = github_auth::token();
-    ui::confirm(body, "playguard/upload/send"_i18n, [files, token, kind]() {
+    ui::confirm(body, "playguard/upload/send"_i18n, [parts, files, token, kind]() {
         ui::notify("playguard/upload/sending"_i18n);
         if (s_sending) return;
         s_sending = true;
-        ui::in_background("gist upload", [files, token, kind]() {
+        ui::in_background("gist upload", [parts, files, token, kind]() {
             const log_upload::Result r = log_upload::upload_gist(*files, token, app::version(), kind.what);
-            brls::sync([r, kind]() {
+            brls::sync([parts, r, kind]() {
                 s_sending = false;
+                if (r.relogin) {
+                    // The sign-in does not allow gists (or was revoked, and
+                    // then forgotten): signing in again replaces it, then the
+                    // same files go. A 403 or 404 keeps it (a 403 can also be
+                    // a rate limit): the GitHub account cell signs out.
+                    const std::string where = "playguard/tabs/preferences"_i18n + " › " + "playguard/prefs/help"_i18n +
+                                              " › " + "playguard/github/account"_i18n;
+                    ui::confirm(brls::getStr("playguard/upload/relogin", where), "playguard/upload/sign_in"_i18n,
+                                [parts, kind]() {
+                                    github_login_flow::sign_in([parts, kind]() { send_gist(parts, kind); });
+                                });
+                    return;
+                }
                 if (!r.ok) {
-                    ui::info(r.relogin ? "playguard/upload/relogin"_i18n
-                                       : brls::getStr(kind.report ? "playguard/upload/failed" : "playguard/upload/failed_list",
-                                                      r.error));
+                    ui::info(brls::getStr(kind.report ? "playguard/upload/failed" : "playguard/upload/failed_list",
+                                          r.error));
                     return;
                 }
                 remember(r);

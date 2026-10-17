@@ -9,6 +9,7 @@
 
 #include "action/backup_logic.hpp"
 #include "action/history_flow.hpp"
+#include "action/notices.hpp"
 #include "action/pt_flow.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -175,27 +176,32 @@ void restore(const backup::Snapshot& s, std::function<void()> refresh)
     else ui::confirm(pt_flow::with_link_note(body), "playguard/backup/restore_confirm"_i18n, [run]() { run(false); }, nullptr, true);
 }
 
-int s_count = -1;   // backups on the SD card, -1: not listed yet
+backup_logic::Listing s_listing;   // the backups on the SD card
 
 std::string save_snapshot(std::string* error)
 {
-    s_count = -1;   // list again next time: one more file, or a failed save
+    s_listing.forget();   // list again next time: one more file, fewer once pruned, or a failed save
+    notices::sd_written();
     const backup::Snapshot s = capture();
     if (s.empty()) {
         *error = "playguard/backup/unreadable_console"_i18n;
         return "";
     }
     const std::string path = backup::save(s, error);
-    // Tools › Keep backups: the oldest beyond that number go (never the new one).
+    // History › Backups kept: the oldest beyond that number go (never the new one).
     if (!path.empty()) backup::prune((size_t)config::get().backup_keep, path);
     return path;
 }
 }   // namespace
 
+const std::vector<std::string>& names()
+{
+    return s_listing.names([]() { return backup::list(); });
+}
+
 size_t count()
 {
-    if (s_count < 0) s_count = (int)backup::list().size();
-    return (size_t)s_count;
+    return names().size();
 }
 
 backup::Snapshot capture()
@@ -226,7 +232,10 @@ void save_now()
 
 void choose_and_restore(std::function<void()> refresh)
 {
+    // Listed again (what the parent picks from must be on the SD card now),
+    // and kept for the Overview and the count.
     const auto names = backup::list();
+    s_listing.set(names);
     if (names.empty()) {
         ui::notify("playguard/backup/none"_i18n);
         return;

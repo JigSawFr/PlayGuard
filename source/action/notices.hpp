@@ -74,6 +74,9 @@ void note_crash();
 // A file PlayGuard could not write to the SD card (`what`: "config",
 // "history"), or wrote again after that (`ok`): an entry to do until then.
 void note_write(const char* what, bool ok, const std::string& error = "");
+// A backup is being written: the SD card's free space is read again at the
+// next refresh_status, not at most once a minute as otherwise.
+void sd_written();
 
 // Opens tab `position` (ui::tab) of the main screen, under the list.
 void open_tab(int position);

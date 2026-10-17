@@ -49,6 +49,9 @@ PtWeekView::PtWeekView()
             if (this->on_pick) this->on_pick(d);
             return true;
         });
+        // A tap picks the day too, once the columns take the focus
+        // (editable): hitTest only finds a focusable view.
+        col->addGestureRecognizer(new brls::TapGestureRecognizer(col));
 
         Column& c = this->cols[d];
         c.box = col;

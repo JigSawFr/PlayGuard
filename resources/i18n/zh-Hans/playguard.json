@@ -28,7 +28,7 @@
         "refresh": "刷新",
         "open": "打开",
         "exit_again": "再按一次B退出",
-        "exit_unlocked": "家长控制仍处于临时解锁状态：在重新锁定或主机重启前，可以不受限制地游玩。\n\n退出前重新锁定？",
+        "exit_unlocked": "家长控制仍处于临时解锁状态：在重新启用或主机重启前，可以不受限制地游玩。\n\n退出前重新启用？",
         "exit_lock": "重新启用并退出",
         "exit_leave": "不锁定直接退出"
     },
@@ -109,7 +109,7 @@
         "pt_not_understood": "主机的游戏时间设置格式PlayGuard无法识别，未进行任何更改。请发送报告：偏好设置 › 帮助与诊断 › 在线发送报告。",
         "wrong_pin": "系统拒绝了此PIN码：PIN码错误，或不是4到8位数字",
         "pctl_not_ready": "家长控制服务尚未就绪：请稍候，然后重试",
-        "clock_not_set": "主机报告其网络时钟没有有效时间（可能从未设置过）；请查看“主机 › 网络时钟”页",
+        "clock_not_set": "主机报告其网络时钟没有有效时间（可能从未设置过）；请查看“主机 › 网络时钟”",
         "no_internet": "主机未连接到互联网：请连接后重试",
         "service_denied": "系统拒绝PlayGuard访问其某项服务；PlayGuard需要运行Atmosphère的主机",
         "pdm_unavailable": "主机的游玩数据服务目前不可用；请稍后重试",
@@ -185,7 +185,7 @@
         "updated": "更新于{}",
         "extra": "今天加时…",
         "extra_title": "今天加时",
-        "extra_body_auto": "要为今天增加{}吗？\n\n{}的限制将从{}变为{}。从第二天起，PlayGuard会自动恢复为{}。",
+        "extra_body_auto": "要为今天增加{}吗？\n\n{}的限制将从{}变为{}。从第二天起，下次打开PlayGuard时会恢复为{}。",
         "extra_confirm": "增加",
         "extra_done": "已加时：今天的限制为{}。",
         "extra_keep": "保留{}",
@@ -195,7 +195,7 @@
         "stop": "今天停止游玩…",
         "stop_title": "今天停止游玩",
         "stop_body": "要停止今天的游玩吗？\n\n今天{}的限制将变为0。从第二天起，PlayGuard会询问是否恢复为{}。",
-        "stop_body_auto": "要停止今天的游玩吗？\n\n今天{}的限制将变为0。从第二天起，PlayGuard会自动恢复为{}。",
+        "stop_body_auto": "要停止今天的游玩吗？\n\n今天{}的限制将变为0。从第二天起，下次打开PlayGuard时会恢复为{}。",
         "stop_confirm": "今天到此为止",
         "stop_done": "今天已停止游玩。",
         "stop_restore_body": "{}，{}的限制曾被设为{}（仅限当天）。要恢复为{}吗？",
@@ -205,7 +205,7 @@
         "stop_now": "现在",
         "stop_soon": "5分钟后",
         "stop_soon_body": "要在5分钟后停止游玩吗？\n\n今天{}的限制将变为{}：大约还有5分钟，足够存档。从第二天起，PlayGuard会询问是否恢复为{}。",
-        "stop_soon_body_auto": "要在5分钟后停止游玩吗？\n\n今天{}的限制将变为{}：大约还有5分钟，足够存档。从第二天起，PlayGuard会自动恢复为{}。",
+        "stop_soon_body_auto": "要在5分钟后停止游玩吗？\n\n今天{}的限制将变为{}：大约还有5分钟，足够存档。从第二天起，下次打开PlayGuard时会恢复为{}。",
         "stop_soon_done": "大约5分钟后停止游玩。",
         "stop_alarm_only": "时间到时主机只会提醒（见“时间到时”）：正在进行的游戏不会停止。",
         "outside_reset": "今天的游戏时间在{}左右重新开始计算（时钟被更改了？）。",
@@ -374,7 +374,7 @@
         "write_err": "无法应用游戏时间限制",
         "removed": "已取消游戏时间限制。",
         "remove_err": "无法取消游戏时间限制",
-        "not_counting": "主机目前没有计算游戏时间。可能的原因：时钟被调回（之后会重新计时）、网络时钟从未设置（“主机 › 网络时钟”标签页），或刚刚写入了限制（启动一个游戏玩一分钟后再查看）。",
+        "not_counting": "主机目前没有计算游戏时间。可能的原因：时钟被调回（之后会重新计时）、网络时钟从未设置（“主机 › 网络时钟”），或刚刚写入了限制（启动一个游戏玩一分钟后再查看）。",
         "limit_note": "达到限制时，主机会显示“时间到”，然后按照“时间到时”的设置中断游戏或仅提醒。",
         "unsaved": "未保存的进度可能会丢失：请先让孩子存档。"
     },
@@ -537,7 +537,7 @@
             "timeout": "无响应",
             "bad_reply": "响应无效"
         },
-        "start_off": "网络时钟误差为{}（以{}为准）。游戏时间依赖网络时钟：请查看“主机 › 网络时钟”标签页。",
+        "start_off": "网络时钟误差为{}（以{}为准）。游戏时间依赖网络时钟：请查看“主机 › 网络时钟”。",
         "guided_body": "网络时钟不准确，而游戏时间依赖网络时钟。\n\n要现在通过{}测量时间吗？（主机需连接网络。）设置时钟前会再次询问。",
         "guided_measure": "立即测量",
         "guided_fine": "网络时钟准确：无需操作。",
@@ -651,13 +651,15 @@
             "no_pin": "没有可恢复的PIN：未设置家长控制PIN。",
             "failed": "未能完成恢复。",
             "refused": "未删除任何内容：无法从 SD 卡移除 RESCUE 文件。",
-            "unconfirmed": "主机状态与此报告所述的恢复不符。"
+            "unconfirmed": "主机状态与此报告所述的恢复不符。",
+            "old_module": "恢复 sysmodule 比此 PlayGuard 旧：无法核实它的报告。"
         },
         "hint": {
             "reset_pin": "重新设置",
             "delete": "全部删除"
         },
-        "note_unconfirmed": "没有 PIN 就无法在此更改任何内容，PlayGuard 会照常打开。被锁在外面？请在已安装恢复 sysmodule 的情况下把 RESCUE 文件放回 SD 卡，然后重启主机。"
+        "note_unconfirmed": "没有 PIN 就无法在此更改任何内容，PlayGuard 会照常打开。被锁在外面？请在已安装恢复 sysmodule 的情况下把 RESCUE 文件放回 SD 卡，然后重启主机。",
+        "note_old_module": "没有 PIN 无法在此更改任何内容，PlayGuard 会照常打开。请在电脑上更新该模块：将 PlayGuard {} 的 playguard-rescue.zip 解压到 SD 卡根目录，放回 RESCUE 文件，然后重启主机。"
     },
     "tools": {
         "section_diag": "诊断",
@@ -1032,7 +1034,7 @@
         "confirm_gist": "你 GitHub 账户中的私密 Gist：在你于 GitHub 上删除之前，任何拥有链接的人都可以查看。报告中从不包含 PIN 或序列号。",
         "confirm_public": "用此链接提交的错误报告是公开的。历史记录只发送最近的更改，不含名称和时间。",
         "where_gist": "GitHub 私密 Gist",
-        "relogin": "GitHub 拒绝了该 gist。请退出后重新登录（开发者工具中的 GitHub 账号）以允许 gist。",
+        "relogin": "GitHub 拒绝了该 gist：PlayGuard 的登录不允许 gist。重新登录以允许 gist？如需退出登录：{}。",
         "needs_github": "报告会发送到你 GitHub 账号中的私密 gist：拥有链接的人都能阅读，直到你在 GitHub 上删除它。PlayGuard 尚未登录 GitHub。现在登录吗？",
         "sign_in": "登录",
         "send": "发送",
@@ -1138,7 +1140,7 @@
         "step_pulls": "拉取请求...",
         "step_runs": "检查...",
         "back": "回到上一个构建：{}",
-        "back_body": "将 PlayGuard {} 替换为之前安装的构建 {}？PlayGuard 将以它重新启动。\n\n如果某个构建在第一个界面之前崩溃，PlayGuard 会在下次启动时提出此操作；启动时按住 L + R 也会提出。",
+        "back_body": "将 PlayGuard {} 替换为之前安装的构建 {}？PlayGuard 将以它重新启动。\n\n如果某个构建在第一个界面之前崩溃，PlayGuard 会在下次启动时提出此操作；未设置PIN时，启动时按住 L + R 也会提出。",
         "back_confirm": "回到上一个",
         "back_failed": "无法回到上一个构建：{}\n\n已安装的 PlayGuard 未改变。",
         "count_new_one": "1 个新的",
@@ -1256,7 +1258,9 @@
             "first_steps": "入门",
             "overview": "概览",
             "profile": "配置“{}”",
-            "console_lock": "阻止所有游戏"
+            "console_lock": "阻止所有游戏",
+            "notices": "通知",
+            "rescue": "恢复"
         },
         "when": "时间",
         "how": "来源",
@@ -1368,6 +1372,7 @@
         "unlocked": "家长控制已临时解锁",
         "unlocked_detail": "重新锁定之前，可以不受限制地游玩。",
         "extra_restore_detail": "之前某天添加的额外时间仍在提高此限制。",
+        "stop_restore_detail": "之前某天的“{}”仍使此限制低于平时。",
         "new_account": "新的用户账户",
         "installed": "已安装 PlayGuard {}",
         "installed_detail": "启动正常。之前的版本 {} 已保留：可在开发者工具中退回。",

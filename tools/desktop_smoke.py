@@ -31,7 +31,7 @@ the release in place of the simulated playguard.nro and hand it to hbloader.
 The "errors" scenario starts with today's limit reached, the temporary unlock
 failing and "Synchronise clock via Internet" off (PLAYGUARD_SIM_FAIL & co.):
 a limit change must end in the "could not unlock" dialog, with the app alive,
-and the clock tab must say why the network clock cannot be set. With no time
+and the network clock screen must say why the network clock cannot be set. With no time
 server answering (PLAYGUARD_SIM_NTP) and a network clock 1411 s ahead, the
 tab must then offer the console clock instead, and set it once confirmed.
 
@@ -59,7 +59,7 @@ The "loading" scenario stops the start-up on the loading screen
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|update|library|outside|loading|alarm|sysnotes]   (needs DISPLAY, xdotool, ImageMagick)
+Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -152,7 +152,7 @@ if GATE:
     os.makedirs(os.path.dirname(sphaira), exist_ok=True)
     open(sphaira, "w").write("NRO0")
 if DEVBUILD:
-    # Developer tools › Install another build, against a simulated GitHub: the
+    # Help & diagnostics › Developer › Install another build, against a simulated GitHub: the
     # releases (one a pre-release), then (once signed in, simulated device flow) two commits
     # of main and an open pull request whose artifact is a local zip holding
     # playguard.nro.
@@ -394,7 +394,7 @@ if SYSNOTES:
             f"{log_text}\n\n==System Titles==\n* The following titles were updated:\n** Sysmodules: {sysmodules}.\n")
     env.setdefault("PLAYGUARD_SIM_SYS_NOTES", sim_notes)
     env.setdefault("PLAYGUARD_SIM_SYS_LATEST", "1.12.1:6.5.4:23.0.1")
-    # No PlayGuard update offered over Tools by the same check.
+    # No PlayGuard update offered over the Console tab by the same check.
     env.setdefault("PLAYGUARD_SIM_LATEST", "offline")
     env.setdefault("PLAYGUARD_SIM_FW", "22.5.0")   # behind 23.0.0 and 23.0.1
     update_bin = os.path.join(run_dir, "playguard_data", "sd", "bootloader", "update.bin")
@@ -417,7 +417,8 @@ if LOADING:
 if ROLLBACK:
     # A build installed in place whose last start never reached its first
     # screen, the build before it kept: the start-up screen offers it before
-    # anything else, A takes it back and hbloader starts it.
+    # anything else (the PIN set or not), A takes it back and hbloader starts
+    # it. Then L + R, with a PIN and without (see the end of the run).
     env.setdefault("PLAYGUARD_SIM_HBLOADER", "1")
     env["PLAYGUARD_SIM_BOOT_CHOICE"] = "a"
     sd_nro = os.path.join(run_dir, "playguard_data", "sd", "switch", "playguard", "playguard.nro")
@@ -509,6 +510,41 @@ if ROLLBACK:
         fail("the start check was left behind")
     if json.load(open(os.path.join(data, "previous_build.json"))).get("label") != "1.0.0 (1a2b3c4)":
         fail("the build gone back from is not named as the previous one")
+
+    def again(name, extra, until):
+        """Starts PlayGuard once more with L + R held (and A answered); its
+        log in <name>.log. Ended once `until` is logged (it goes on to its
+        window), or after 20 s."""
+        run_env = dict(env, PLAYGUARD_SIM_HELD_LR="1", **extra)
+        run_log_file = os.path.join(OUT, name + ".log")
+        with open(run_log_file, "w") as run_log:
+            p = subprocess.Popen(cmd, cwd=run_dir, env=run_env, stdout=run_log, stderr=subprocess.STDOUT)
+            for _ in range(40):
+                if p.poll() is not None or until in open(run_log_file, errors="replace").read():
+                    break
+                time.sleep(0.5)
+            if p.poll() is None:
+                time.sleep(1)   # the lines logged right after it
+                p.kill()
+            p.wait()
+        return open(run_log_file, errors="replace").read()
+
+    # L + R with a PIN set (the simulated console has one): anyone can hold
+    # them, so the start-up screen only says where to go back, after the
+    # PIN; the two builds stay as they are.
+    text = again("app-lr-pin", {}, "rollback: L + R held, not offered")
+    if "but a PIN is set" not in text or "Go back to the previous build (the PIN is asked)" not in text:
+        fail("L + R with a PIN set did not say where to go back from")
+    if "rollback: back to" in text or "next load: sdmc:" in text:
+        fail("L + R went back to the previous build without the PIN")
+    if open(sd_nro).read() != "the build before" or open(sd_nro + ".previous").read() != "the build that crashes":
+        fail("L + R with a PIN set swapped the two builds")
+    # L + R without a PIN: offered, and A swaps them back.
+    text = again("app-lr-no-pin", {"PLAYGUARD_SIM_NOT_SET_UP": "1"}, "next load: sdmc:")
+    if "L + R were held at start-up." not in text or "rollback: back to" not in text:
+        fail("L + R without a PIN did not offer the previous build")
+    if open(sd_nro).read() != "the build that crashes" or open(sd_nro + ".previous").read() != "the build before":
+        fail("L + R without a PIN did not swap the two builds back")
     print("desktop smoke test passed:", OUT)
     sys.exit(0)
 
@@ -635,7 +671,7 @@ if GATE:
     shot("05_dev_tools")
     # Turning a developer switch off asks first; B keeps it on (the end of
     # the scenario checks developer mode was saved on).
-    key("Up", 9)               # past the cleanup cells and the recorder: Read-only mode
+    key("Up", 8)               # past the cleanup cells and the recorder: Read-only mode
     key("Return")
     shot("06a_read_only_off")  # untested firmware: the "own risk" warning
     key("Escape")
@@ -1097,7 +1133,7 @@ if RESCUE:
         if not any(e.get("kind") == "rescue" for e in entries):
             fail("recovery was not recorded in the change history")
         if not any(e.get("kind") == "relock" for e in entries):
-            fail("\"Lock and quit\" did not lock again")
+            fail("\"Turn back on and quit\" did not lock again")
 
     # Still unlocked (the sysmodule's unlock): quitting asks to lock again.
     def asked_to_relock():
@@ -1108,19 +1144,19 @@ if RESCUE:
             break
         key("Escape")
         time.sleep(0.3)
+    time.sleep(4.5)            # the "Press B again" toast gone: the dialog is a reference
     shot("03_quit_unlocked")
     if not alive() or not asked_to_relock():
         fail("quitting while unlocked did not ask to lock again")
-    key("Right")               # Quit, still unlocked | Lock and quit
-    key("Return")
+    key("Return")              # Turn back on and quit, the first button: focused
     for _ in range(50):
         if not alive():
             break
         time.sleep(0.1)
     if alive():
-        fail("\"Lock and quit\" did not quit")
+        fail("\"Turn back on and quit\" did not quit")
     if "exit to HOME" not in open(os.path.join(OUT, "app.log"), errors="replace").read():
-        fail("\"Lock and quit\" went back to hbmenu, not to the HOME menu")
+        fail("\"Turn back on and quit\" went back to hbmenu, not to the HOME menu")
     finish(recorded)
 
 shot("01_dashboard")

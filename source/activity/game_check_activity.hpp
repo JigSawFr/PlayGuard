@@ -1,4 +1,4 @@
-// GameCheckActivity — Tools › Check the installed games: the games the HOME
+// GameCheckActivity — Console › Check the installed games: the games the HOME
 // menu cannot start or draw (core/gamecheck.h), each with what the HOME menu
 // shows, and how many of the installed games have a problem, in a section per
 // way out: repaired here, to check first, installed again, the firmware or
@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include "action/game_verify_flow.hpp"
 #include "util/game_cache.hpp"
 
 #include "util/pctl_ops_c.hpp"
@@ -68,6 +69,9 @@ class GameCheckActivity : public brls::Activity
     std::vector<u64> waiting;         // to check again once the check under way is over
     bool verifying = false;   // one integrity check at a time
     bool focused   = false;   // the first game got the focus once
+    // The cell given the focus while the games are being checked, until the
+    // user moves it: it follows the first game as the list grows above it.
+    brls::View* auto_focus = nullptr;
     std::string timing;       // where the last check spent its time (developer mode)
     Pending pending;
     Group groups[GC_CAT_COUNT];
@@ -108,6 +112,9 @@ class GameCheckActivity : public brls::Activity
     // The console's integrity check of `games`, one after the other in one
     // dialog; what it found kept with each game as it goes.
     void verify(std::vector<GameFacts> games);
+    // What it found, once its dialog is closed; `self` only while `weak` lives.
+    static void report_verified(GameCheckActivity* self, const std::weak_ptr<bool>& weak,
+                                const std::vector<game_verify_flow::Verified>& results, size_t total);
 
     BRLS_BIND(brls::Label,  note,   "gc_note");
     BRLS_BIND(brls::Label,  status, "gc_status");

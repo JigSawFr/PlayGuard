@@ -1,5 +1,5 @@
-// LockActivity — shown instead of the main screen when Security › Ask for the
-// PIN is "To open PlayGuard": the system's PIN screen comes up at once; the
+// LockActivity — shown instead of the main screen when PIN › Protect PlayGuard
+// with the PIN is "To open PlayGuard": the system's PIN screen comes up at once; the
 // right PIN opens the main screen, B quits. Also pushed again over the open
 // screens when PlayGuard comes back after a while away (lock_again()): the
 // right PIN then uncovers them.

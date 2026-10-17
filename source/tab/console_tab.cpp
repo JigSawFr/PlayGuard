@@ -6,7 +6,6 @@
 #include "action/sys_update_flow.hpp"
 #include "activity/firmware_gate_activity.hpp"
 #include "activity/game_check_activity.hpp"
-#include "app.hpp"
 #include "tab/clock_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/patches.hpp"

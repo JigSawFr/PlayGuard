@@ -196,7 +196,7 @@ garbage) is not shown, and every play-timer write refuses it without writing
 understand*); the diagnostic report still has it, byte for byte.
 
 How the minutes field was confirmed (22.0.0, 2026-10-09): the block was saved
-as a reference (Developer tools › play-timer block), Sunday and Saturday were
+as a reference (Developer › Compare the play-timer block), Sunday and Saturday were
 changed from 120 to 180 minutes in PlayGuard, then the block was read again.
 Only two bytes changed: `0x12` and `0x42`, both `78` → `B4`. The header, the
 flags and the bedtime bytes stayed as they were.
@@ -474,10 +474,10 @@ From the same 20:10 report:
 
 1. Turn on the developer tools, take a diagnostic report, change one thing,
    take another one. For the play-timer block, save the reference first
-   (Developer tools › play-timer block): the next report lists every byte that
+   (Developer › Compare the play-timer block): the next report lists every byte that
    changed.
    For what changes over time (the time spent, 1459, a reset at midnight),
-   turn on *Developer tools › Record the play timer* instead: one CSV line
+   turn on *Developer › Record the play timer* instead: one CSV line
    every 30 s in `logs/play_timer/log.csv` while PlayGuard is open (its own
    time counts, so the time runs down with PlayGuard alone). The two hex
    columns are written only when they change. The last column, `event`, says

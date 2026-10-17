@@ -5,7 +5,7 @@
 // returns NXM_RC_READ_ONLY before opening any session. The UI hides its write
 // controls too, but this is the check that cannot be skipped.
 //
-// The change check: a function the UI installs (Security › Ask for the PIN)
+// The change check: a function the UI installs (PIN › Protect PlayGuard with the PIN)
 // that runs before every change and may ask for the parental-control PIN; it
 // refuses with NXM_RC_NOT_CONFIRMED. It runs before any session is opened,
 // so it may show the system's PIN applet. Locking again (1007) never asks:

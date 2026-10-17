@@ -1,5 +1,5 @@
 // AboutTab — the app: version (seven presses on it turn the developer tools
-// on, at the end of Tools), launch mode and data folder; checking for an
+// on, at the end of Preferences › Help & diagnostics), launch mode and data folder; checking for an
 // update now (when and how to update: Preferences); what changed in this version (its
 // highlights, the full list a press away); the credits; how to support it (the funding links
 // as QR codes, to scan with a phone); "Made in France".

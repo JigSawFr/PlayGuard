@@ -1,5 +1,5 @@
-// pt_log_flow — runs the play-timer recorder (util/pt_log) of Tools ›
-// Developer: a line now, then one every 30 s while PlayGuard is open. Only
+// pt_log_flow — runs the play-timer recorder (util/pt_log) of Help &
+// diagnostics › Developer: a line now, then one every 30 s while PlayGuard is open. Only
 // reads the console and appends to the SD card (off the UI thread). Its
 // switch is remembered (config pt_log) and only acts while the developer
 // mode is on.

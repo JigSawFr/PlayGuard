@@ -649,7 +649,23 @@ void nsProgressAsyncResultClose(NsProgressAsyncResult *a)
 #define SYSVER(a, b, c) (((u32)(a) << 26) | ((u32)(b) << 20) | ((u32)(c) << 16))
 static const u32 CURRENT = HOS(22, 1, 0);
 
-static GameCheck R;
+// A check of every game, as game_scan runs it: gamecheck_records(), then
+// gamecheck_check() of them all.
+static struct {
+    Result    rc;          // listing the games; nothing else is filled when it fails
+    u32       count;
+    bool      truncated;
+    GameFacts games[GAMECHECK_MAX];
+} R;
+static GameRecord R_records[GAMECHECK_MAX];
+
+static void check_all(void)
+{
+    memset(&R, 0, sizeof(R));
+    R.rc = gamecheck_records(R_records, GAMECHECK_MAX, &R.count, &R.truncated);
+    if (R_SUCCEEDED(R.rc)) gamecheck_check(R_records, R.count, R.games, NULL, NULL);
+    else R.count = 0;
+}
 
 static void all_closed(void)
 {
@@ -672,7 +688,7 @@ static GameIssue issue_of(u64 id)
 
 static void scan(void)
 {
-    gamecheck_scan(&R);
+    check_all();
     all_closed();
 }
 
@@ -694,9 +710,6 @@ static void test_tables(void)
     CHECK(gamecheck_max_key_generation(HOS(23, 0, 1)) == 0x17);
     CHECK(gamecheck_max_key_generation(HOS(24, 0, 0)) == 0);   // newer than the table: not judged
     CHECK(gamecheck_max_key_generation(0) == 0);
-    CHECK(gamecheck_key_generation_firmware(0x0A) == HOS(9, 0, 0));
-    CHECK(gamecheck_key_generation_firmware(0x17) == HOS(23, 0, 0));
-    CHECK(gamecheck_key_generation_firmware(0x30) == 0);
 }
 
 static void test_rules(void)
@@ -1012,7 +1025,7 @@ static void test_list_failures(void)
 {
     reset();
     C.ns_init_rc = 0x1111;
-    gamecheck_scan(&R);
+    check_all();
     CHECK(R.rc == 0x1111 && R.count == 0 && C.ns_open == 0);
 
     reset();

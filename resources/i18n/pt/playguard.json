@@ -28,7 +28,7 @@
         "refresh": "Atualizar",
         "open": "Abrir",
         "exit_again": "Prima B novamente para sair",
-        "exit_unlocked": "O controlo parental continua desbloqueado temporariamente: pode jogar-se sem limite até voltar a ser bloqueado ou a consola reiniciar.\n\nBloquear antes de sair?",
+        "exit_unlocked": "O controlo parental continua desbloqueado temporariamente: pode jogar-se sem limite até ser reativado ou a consola reiniciar.\n\nReativar antes de sair?",
         "exit_lock": "Reativar e sair",
         "exit_leave": "Sair sem bloquear"
     },
@@ -109,7 +109,7 @@
         "pt_not_understood": "as definições do tempo de jogo da consola estão num formato que o PlayGuard não compreende, por isso nada foi alterado. Envie um relatório: Preferências › Ajuda e diagnóstico › Enviar um relatório online.",
         "wrong_pin": "o sistema recusou o PIN: PIN errado, ou não tem de 4 a 8 dígitos",
         "pctl_not_ready": "o serviço de controlo parental ainda não está pronto: aguarde um momento e tente novamente",
-        "clock_not_set": "a consola indica que o relógio de rede não tem uma hora válida (talvez nunca tenha sido acertado); veja o separador Consola › Relógio de rede",
+        "clock_not_set": "a consola indica que o relógio de rede não tem uma hora válida (talvez nunca tenha sido acertado); veja Consola › Relógio de rede",
         "no_internet": "a consola não está ligada à Internet: ligue-a e tente novamente",
         "service_denied": "o sistema recusou ao PlayGuard o acesso a um dos seus serviços; o PlayGuard precisa de uma consola com Atmosphère",
         "pdm_unavailable": "o serviço de dados de jogo da consola não está disponível de momento; tente novamente daqui a pouco",
@@ -185,7 +185,7 @@
         "updated": "Atualizado às {}",
         "extra": "Tempo extra hoje...",
         "extra_title": "Tempo extra hoje",
-        "extra_body_auto": "Adicionar {} hoje?\n\nO limite de {} passa de {} para {}. A partir do dia seguinte, o PlayGuard repõe-no em {} automaticamente.",
+        "extra_body_auto": "Adicionar {} hoje?\n\nO limite de {} passa de {} para {}. A partir do dia seguinte, o PlayGuard repõe-no em {} da próxima vez que for aberto.",
         "extra_confirm": "Adicionar",
         "extra_done": "Tempo extra adicionado: limite de {} hoje.",
         "extra_keep": "Manter {}",
@@ -195,7 +195,7 @@
         "stop": "Terminar o jogo por hoje...",
         "stop_title": "Terminar o jogo por hoje",
         "stop_body": "Terminar o jogo por hoje?\n\nO limite de {} passa a 0 hoje. A partir do dia seguinte, o PlayGuard propõe repô-lo em {}.",
-        "stop_body_auto": "Terminar o jogo por hoje?\n\nO limite de {} passa a 0 hoje. A partir do dia seguinte, o PlayGuard repõe-no em {} automaticamente.",
+        "stop_body_auto": "Terminar o jogo por hoje?\n\nO limite de {} passa a 0 hoje. A partir do dia seguinte, o PlayGuard repõe-no em {} da próxima vez que for aberto.",
         "stop_confirm": "Parar por hoje",
         "stop_done": "Jogo terminado por hoje.",
         "stop_restore_body": "Em {}, o limite de {} foi definido para {} apenas nesse dia. Repor o limite em {}?",
@@ -205,7 +205,7 @@
         "stop_now": "Agora",
         "stop_soon": "Daqui a 5 minutos",
         "stop_soon_body": "Parar daqui a 5 minutos?\n\nO limite de {} passa a {} hoje: cerca de 5 minutos a mais, tempo para guardar. A partir do dia seguinte, o PlayGuard propõe repô-lo em {}.",
-        "stop_soon_body_auto": "Parar daqui a 5 minutos?\n\nO limite de {} passa a {} hoje: cerca de 5 minutos a mais, tempo para guardar. A partir do dia seguinte, o PlayGuard repõe-no em {} automaticamente.",
+        "stop_soon_body_auto": "Parar daqui a 5 minutos?\n\nO limite de {} passa a {} hoje: cerca de 5 minutos a mais, tempo para guardar. A partir do dia seguinte, o PlayGuard repõe-no em {} da próxima vez que for aberto.",
         "stop_soon_done": "O jogo para daqui a cerca de 5 minutos.",
         "stop_alarm_only": "A consola só avisa quando o tempo acaba (ver \"Quando o tempo acabar\"): o jogo em curso não é parado.",
         "outside_reset": "O tempo de jogo de hoje recomeçou do zero por volta das {} (relógio alterado?).",
@@ -374,7 +374,7 @@
         "write_err": "Não foi possível aplicar o limite de tempo de jogo",
         "removed": "Limite de tempo de jogo removido.",
         "remove_err": "Não foi possível remover o limite de tempo de jogo",
-        "not_counting": "A consola não está a contar o tempo de jogo neste momento. Causas prováveis: o relógio foi atrasado (volta a contar mais tarde), o relógio de rede nunca foi acertado (separador Consola › Relógio de rede) ou acabou de ser escrito um limite (inicie um jogo durante um minuto e verifique de novo).",
+        "not_counting": "A consola não está a contar o tempo de jogo neste momento. Causas prováveis: o relógio foi atrasado (volta a contar mais tarde), o relógio de rede nunca foi acertado (Consola › Relógio de rede) ou acabou de ser escrito um limite (inicie um jogo durante um minuto e verifique de novo).",
         "limit_note": "No limite, a consola mostra \"Tempo esgotado\" e depois suspende o jogo ou apenas avisa, conforme \"Quando o tempo acabar\".",
         "unsaved": "O progresso não guardado pode perder-se: deixe a criança guardar primeiro."
     },
@@ -537,7 +537,7 @@
             "timeout": "sem resposta",
             "bad_reply": "resposta inválida"
         },
-        "start_off": "O relógio de rede tem uma diferença de {} (verificado com {}). O temporizador de jogo depende dele: consulte o separador Consola › Relógio de rede.",
+        "start_off": "O relógio de rede tem uma diferença de {} (verificado com {}). O temporizador de jogo depende dele: consulte Consola › Relógio de rede.",
         "guided_body": "O relógio de rede está impreciso, e o temporizador de jogo depende dele.\n\nMedir a hora com {} agora? (A consola tem de estar online.) Antes de o relógio ser acertado, será pedida confirmação.",
         "guided_measure": "Medir agora",
         "guided_fine": "O relógio de rede está preciso: nada a fazer.",
@@ -651,13 +651,15 @@
             "no_pin": "Não havia nenhum PIN para recuperar: não está definido nenhum PIN do controlo parental.",
             "failed": "Não foi possível concluir a recuperação.",
             "refused": "Nada foi eliminado: não foi possível remover o ficheiro RESCUE do cartão SD.",
-            "unconfirmed": "A consola não mostra a recuperação que este relatório descreve."
+            "unconfirmed": "A consola não mostra a recuperação que este relatório descreve.",
+            "old_module": "O sysmodule de recuperação é mais antigo do que este PlayGuard: o seu relatório não pode ser verificado."
         },
         "hint": {
             "reset_pin": "escolher um novo",
             "delete": "eliminar tudo"
         },
-        "note_unconfirmed": "Sem o PIN não é possível alterar nada aqui, e o PlayGuard abre como habitualmente. Sem acesso? Volte a colocar o ficheiro RESCUE no cartão SD, com o sysmodule de recuperação instalado, e reinicie a consola."
+        "note_unconfirmed": "Sem o PIN não é possível alterar nada aqui, e o PlayGuard abre como habitualmente. Sem acesso? Volte a colocar o ficheiro RESCUE no cartão SD, com o sysmodule de recuperação instalado, e reinicie a consola.",
+        "note_old_module": "Sem o PIN não é possível alterar nada aqui, e o PlayGuard abre como habitualmente. Atualize o módulo a partir de um computador: extraia o playguard-rescue.zip do PlayGuard {} na raiz do cartão SD, volte a colocar o ficheiro RESCUE e reinicie a consola."
     },
     "tools": {
         "section_diag": "Diagnóstico",
@@ -965,11 +967,11 @@
         "section_app": "Aplicação",
         "section_startup": "Ao iniciar",
         "intro": "Mostrar a introdução durante 2 segundos",
-        "support_reminder": "Lembrar-me uma vez por mês de apoiar o PlayGuard",
+        "support_reminder": "Lembrar-me todos os meses de apoiar o PlayGuard",
         "section_notices": "Notificações",
         "notices_system": "Versões do Atmosphère, hekate e firmware",
         "notices_summary": "O tempo de jogo da semana",
-        "notices_reminders": "Lembretes: cópias de segurança, o outro sistema, os jogos bloqueados",
+        "notices_reminders": "Avisos: cópias, outro sistema, jogos bloqueados",
         "help": "Ajuda e diagnóstico"
     },
     "backup": {
@@ -1032,7 +1034,7 @@
         "confirm_gist": "Um gist secreto na sua conta GitHub: qualquer pessoa com a ligação pode lê-lo, até que o apague no GitHub. Nunca contém o PIN nem o número de série.",
         "confirm_public": "Um relatório de erro aberto com esta ligação é público. Do histórico, só as últimas alterações são enviadas, sem nomes nem horas.",
         "where_gist": "um gist secreto no GitHub",
-        "relogin": "O GitHub recusou o gist. Termine a sessão e inicie-a de novo (Conta GitHub, nas ferramentas de programador) para permitir gists.",
+        "relogin": "O GitHub recusou o gist: a sessão do PlayGuard não permite gists. Iniciar sessão de novo para os permitir? Para terminar a sessão: {}.",
         "needs_github": "O relatório vai para um gist secreto da sua conta GitHub: quem tiver a ligação pode lê-lo, até o apagar no GitHub. O PlayGuard ainda não iniciou sessão no GitHub. Iniciar sessão agora?",
         "sign_in": "Iniciar sessão",
         "send": "Enviar",
@@ -1138,7 +1140,7 @@
         "step_pulls": "Pull requests...",
         "step_runs": "Verificações...",
         "back": "Voltar à compilação anterior: {}",
-        "back_body": "Substituir o PlayGuard {} pela compilação instalada antes, {}? O PlayGuard reinicia com ela.\n\nSe uma compilação falhar antes do primeiro ecrã, o PlayGuard propõe isto no arranque seguinte; manter L + R premidos durante o arranque também o propõe.",
+        "back_body": "Substituir o PlayGuard {} pela compilação instalada antes, {}? O PlayGuard reinicia com ela.\n\nSe uma compilação falhar antes do primeiro ecrã, o PlayGuard propõe isto no arranque seguinte; manter L + R premidos durante o arranque também o propõe, se não houver PIN definido.",
         "back_confirm": "Voltar",
         "back_failed": "Não foi possível voltar à compilação anterior: {}\n\nO PlayGuard instalado não foi alterado.",
         "count_new_one": "1 nova",
@@ -1256,7 +1258,9 @@
             "first_steps": "Primeiros passos",
             "overview": "Visão geral",
             "profile": "Perfil \"{}\"",
-            "console_lock": "Bloquear todos os jogos"
+            "console_lock": "Bloquear todos os jogos",
+            "notices": "Notificações",
+            "rescue": "Recuperação"
         },
         "when": "Quando",
         "how": "Origem",
@@ -1368,6 +1372,7 @@
         "unlocked": "O controlo parental está desbloqueado temporariamente",
         "unlocked_detail": "É possível jogar sem limite até voltar a ser bloqueado.",
         "extra_restore_detail": "O tempo extra adicionado num dia anterior ainda aumenta este limite.",
+        "stop_restore_detail": "\"{}\" num dia anterior ainda mantém este limite abaixo do habitual.",
         "new_account": "Uma nova conta de utilizador",
         "installed": "PlayGuard {} instalado",
         "installed_detail": "Arrancou bem. A compilação anterior, {}, é mantida: as ferramentas de programador podem voltar a ela.",

@@ -31,12 +31,13 @@
 //                               (1201 fine, 1006 still false), write (every
 //                               setting write), relock (1007), timer (145601
 //                               read), clock (network clock write), pin (1208),
-//                               pin_entry (the PIN screen is cancelled),
+//                               pin_entry (the PIN screen is cancelled, when
+//                               asking for the PIN as when setting one),
 //                               bedtime (the console does not take the bedtime),
-//                               remove (Tools › Installed games: a removal),
+//                               remove (Console › Check the installed games: a removal),
 //                               launch (its launch version reset), verify
 //                               (its integrity check)
-//   PLAYGUARD_SIM_GAMES_OK=1    every installed game fine (Tools › Installed games)
+//   PLAYGUARD_SIM_GAMES_OK=1    every installed game fine (Console › Check the installed games)
 //   PLAYGUARD_SIM_CHECK_MS=150  how long checking one installed game takes
 // The play-timer limits are kept as the real 0x44 block (core/pure.c encodes
 // and decodes it, as on the console); the read-only switch is core/write_guard.c.
@@ -215,7 +216,13 @@ void pctl_status_fetch(PctlStatus *o)
 // Refuses like the console when PLAYGUARD_SIM_FAIL lists `what`.
 #define FAIL_IF(what) do { if (fails(what)) return SIM_FAIL_RC; } while (0)
 
-Result pctl_set_pin(void)                         { RO_GUARD(); S.pin_length = 4; return 0; }
+Result pctl_set_pin(void)
+{
+    RO_GUARD();
+    if (fails("pin_entry")) return NXM_RC_CANCELLED;   // as pctl_ops.c says B on the PIN screen
+    S.pin_length = 4;
+    return 0;
+}
 Result pctl_unlock_restriction_temporarily(void)
 {
     RO_GUARD();
@@ -273,7 +280,12 @@ Result pctl_lock_state(u32 *pin_length, bool *unlocked)
 }
 Result pctl_relock(void)                          { if (core_read_only()) return NXM_RC_READ_ONLY; FAIL_IF("relock"); S.temp_unlocked = false; return 0; }
 // PLAYGUARD_SIM_FAIL=pin_entry: the PIN screen is cancelled.
-Result pctl_ask_pin(void)                         { sim_init(); if (!S.pin_length) return NXM_RC_NO_PIN; FAIL_IF("pin_entry"); return 0; }
+Result pctl_ask_pin(void)
+{
+    sim_init();
+    if (!S.pin_length) return NXM_RC_NO_PIN;
+    return fails("pin_entry") ? NXM_RC_CANCELLED : 0;
+}
 Result pctl_delete_parental_controls(void)
 {
     RO_GUARD();
@@ -699,7 +711,7 @@ bool playstats_cancelled(void) { return atomic_load(&s_cancel); }
 void playstats_icons(PlayIcon *icons, size_t count)
 {
     // The made-up games above, in order; the deleted one has no icon. The
-    // installed games of Tools › Check the installed games (…6000 and up)
+    // installed games of Console › Check the installed games (…6000 and up)
     // reuse them, but for the one whose name and icon cannot be read.
     for (size_t i = 0; i < count; i++) {
         icons[i].jpeg = NULL;
@@ -776,7 +788,12 @@ static void sim_add_content(GameFacts *g, u64 id, u32 version, u8 type, u8 stora
 
 // Every game the simulated console has, fully checked (gamecheck_check
 // returns them one at a time).
-static void sim_games(GameCheck *out)
+typedef struct {
+    u32       count;
+    GameFacts games[GAMECHECK_MAX];
+} SimGames;
+
+static void sim_games(SimGames *out)
 {
     memset(out, 0, sizeof(*out));
     static const char *fine[] = { "Star Kart Racers", "Island Builders", "Pixel Quest Deluxe",
@@ -950,7 +967,7 @@ static void sim_bump(u64 id)
 
 Result gamecheck_records(GameRecord *out, u32 max, u32 *count, bool *truncated)
 {
-    static GameCheck all;
+    static SimGames all;
     sim_games(&all);
     *count = 0;
     *truncated = false;
@@ -978,7 +995,7 @@ void gamecheck_last_timing(GameCheckTiming *out)
 u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
                     bool (*on_game)(void *ctx, const GameFacts *game, u32 done), void *ctx)
 {
-    static GameCheck all;
+    static SimGames all;
     sim_games(&all);
     const char *ms_env = getenv("PLAYGUARD_SIM_CHECK_MS");
     const long ms = ms_env ? strtol(ms_env, NULL, 10) : 150;

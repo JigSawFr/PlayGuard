@@ -1,10 +1,14 @@
-// ui — dialogs, confirmations, the dropdown, keyboard prompts and the PIN dialog.
+// ui — dialogs, confirmations, a web page's QR code, the dropdown, keyboard prompts and the PIN dialog.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
 #include "core/platform.h"
 #include "util/duration.hpp"
+#include "util/text.hpp"
+#include "view/qr_view.hpp"
 
+#include <algorithm>
+#include <cmath>
 #include <memory>
 #include <yoga/Yoga.h>
 
@@ -49,13 +53,14 @@ static float text_height(brls::Label* label, const std::string& text, float size
 }
 
 // The largest of `sizes` at which `text` fits `height` in `width` (a few
-// pixels spare), else the smallest, with a warning in the log.
+// pixels spare), else the smallest (*fits false then).
 static float fitting_size(brls::Label* label, const std::string& text, std::initializer_list<float> sizes,
-                          float width, float height)
+                          float width, float height, bool* fits)
 {
+    *fits = true;
     for (float size : sizes)
         if (text_height(label, text, size, width) + 4 <= height) return size;
-    brls::Logger::warning("dialog: text too long even at {} px ({} bytes)", *(sizes.end() - 1), text.size());
+    *fits = false;
     return *(sizes.end() - 1);
 }
 
@@ -68,30 +73,68 @@ static brls::Label* wrapping_label(const std::string& text)
     return label;
 }
 
+// The smallest font is 18 px: a text still too tall for the dialog scrolls,
+// in a frame of `height`, rather than going smaller. The frame holds the
+// label (wrapped at its width, its own height unbounded); a finger drags it,
+// and the D-pad's up and down scroll it half a frame (scroll_with), the
+// buttons keeping the focus.
+static brls::ScrollingFrame* scrolling_text(brls::Label* label, float height)
+{
+    auto* frame = new brls::ScrollingFrame();
+    frame->setHeight(height);
+    frame->setScrollingBehavior(brls::ScrollingBehavior::NATURAL);
+    frame->setContentView(label);
+    return frame;
+}
+
+static void scroll_with(brls::Dialog* dialog, brls::ScrollingFrame* frame, brls::View* text)
+{
+    for (const brls::ControllerButton button : { brls::BUTTON_NAV_UP, brls::BUTTON_NAV_DOWN }) {
+        const bool down = button == brls::BUTTON_NAV_DOWN;
+        dialog->getAppletFrame()->registerAction(
+            "", button,
+            [frame, text, down](brls::View*) {
+                const float page = std::round(frame->getHeight() / 2);
+                const float limit = std::max(0.0f, text->getHeight() - frame->getHeight());
+                const float target = std::min(std::max(frame->getContentOffsetY() + (down ? page : -page), 0.0f), limit);
+                frame->setContentOffsetY(target, true);
+                return true;
+            },
+            true, true, brls::SOUND_NONE);
+    }
+}
+
 brls::Dialog* dialog(const std::string& text)
 {
     // borealis' own layout first (24 px, 65 / 115 px margins, as
     // brls::Dialog(text)); a longer text gets narrower margins and a
-    // smaller font. Never brls::Dialog(text) itself: its label sits in a
-    // row, which Yoga may measure at a width of 0.
+    // smaller font, down to 18 px, then scrolls. Never brls::Dialog(text)
+    // itself: its label sits in a row, which Yoga may measure at a width of 0.
     auto* label = wrapping_label(text);
     auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->addView(label);
     box->setAlignItems(brls::AlignItems::STRETCH);   // the dialog's width: the label wraps
     box->setJustifyContent(brls::JustifyContent::CENTER);
     const float h = content_height();
+    brls::ScrollingFrame* frame = nullptr;
     if (text_height(label, text, 24, 720 - 2 * 115) + 4 <= h - 2 * 65) {
         label->setFontSize(24);
         box->setPadding(65, 115, 65, 115);
+        box->addView(label);
     } else {
-        label->setFontSize(fitting_size(label, text, { 21, 19, 17, 15, 14 }, 720 - 2 * 40, h - 2 * 28));
+        bool fits = true;
+        label->setFontSize(fitting_size(label, text, { 21, 19, 18 }, 720 - 2 * 40, h - 2 * 28, &fits));
         box->setPadding(28, 40, 28, 40);
+        if (fits) box->addView(label);
+        else box->addView(frame = scrolling_text(label, h - 2 * 28));
     }
-    return new brls::Dialog(box);
+    auto* dialog = new brls::Dialog(box);
+    if (frame) scroll_with(dialog, frame, label);
+    return dialog;
 }
 
 // The text and `extra` (a week chart) under it, the font as large as fits
-// (20 px down to 14: German, with every note), `extra` measured first.
+// (20 px down to 18: German, with every note, then the text scrolls),
+// `extra` measured first.
 static brls::Dialog* dialog_with(const std::string& text, brls::View* extra)
 {
     const float width = 720 - 2 * 40;
@@ -99,13 +142,18 @@ static brls::Dialog* dialog_with(const std::string& text, brls::View* extra)
     YGNodeCalculateLayout(extra->getYGNode(), width, YGUndefined, YGDirectionLTR);
     const float extra_h = YGNodeLayoutGetHeight(extra->getYGNode()) + 18;
     auto* label = wrapping_label(text);
-    label->setFontSize(fitting_size(label, text, { 20, 18, 16, 15, 14 }, width, content_height() - 26 - 18 - extra_h));
+    const float text_h = content_height() - 26 - 18 - extra_h;
+    bool fits = true;
+    label->setFontSize(fitting_size(label, text, { 20, 18 }, width, text_h, &fits));
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::STRETCH);
     box->setPadding(26, 40, 18, 40);
-    box->addView(label);
+    brls::ScrollingFrame* frame = fits ? nullptr : scrolling_text(label, text_h);
+    box->addView(frame ? (brls::View*)frame : label);
     box->addView(extra);
-    return new brls::Dialog(box);
+    auto* dialog = new brls::Dialog(box);
+    if (frame) scroll_with(dialog, frame, label);
+    return dialog;
 }
 
 static void open_confirm(const std::string& body, const std::string& confirm_label,
@@ -142,6 +190,28 @@ void confirm_danger(const std::string& body, const std::string& confirm_label, s
 void info(const std::string& body)
 {
     auto* dialog = ui::dialog(body);
+    dialog->addButton("hints/ok"_i18n, []() {});
+    dialog->open();
+}
+
+void qr_dialog(const std::string& body, const std::string& url)
+{
+    auto* box = new brls::Box(brls::Axis::COLUMN);
+    box->setAlignItems(brls::AlignItems::CENTER);
+    box->setPadding(20, 32, 10, 32);
+    brls::Label* label = text_label(body, 20, color_text());
+    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    label->setAlignSelf(brls::AlignSelf::STRETCH);
+    box->addView(label);
+    auto* qr = new QrView(url, 240);
+    qr->setMarginTop(12);
+    qr->setMarginBottom(10);
+    box->addView(qr);
+    brls::Label* link = text_label(text::short_url(url), 18, color_note());
+    link->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    link->setAlignSelf(brls::AlignSelf::STRETCH);
+    box->addView(link);
+    auto* dialog = new brls::Dialog(box);
     dialog->addButton("hints/ok"_i18n, []() {});
     dialog->open();
 }

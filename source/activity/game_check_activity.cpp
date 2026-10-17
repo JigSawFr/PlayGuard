@@ -15,6 +15,7 @@
 #include "action/game_check_text.hpp"
 #include "action/game_notice.hpp"
 #include "action/game_scan.hpp"
+#include "action/game_verify_flow.hpp"
 #include "action/history_flow.hpp"
 #include "action/upload_flow.hpp"
 #include "app.hpp"
@@ -36,6 +37,7 @@ using game_check_text::issue_text_key;
 using game_check_text::MANY;
 using game_check_text::required_hos;
 using game_check_text::warn_only;
+using game_verify_flow::Verified;
 
 constexpr float ICON_SIZE = 72;
 
@@ -192,7 +194,7 @@ brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, co
     if (g.display_version[0]) footer += " · " + brls::getStr("playguard/games/version", std::string(g.display_version));
     if (g.verified == GC_VERIFIED_INTACT) footer += "\n" + brls::getStr("playguard/games/verified_intact", ui::time_text(g.verified_at));
     if (app::dev_mode()) footer += "\n" + developer_text(g);
-    auto* foot = ui::text_label(footer, 16, ui::color_note());
+    auto* foot = ui::text_label(footer, 18, ui::color_note());
     foot->setMarginTop(18);
     box->addView(foot);
     return box;
@@ -206,113 +208,6 @@ std::vector<unsigned char> icon_of(u64 app_id)
     if (icon.jpeg) bytes.assign(icon.jpeg, icon.jpeg + icon.size);
     free(icon.jpeg);
     return bytes;
-}
-
-// The integrity check's dialog and what its thread shares with it.
-// A plain progress bar: the track, then the part done in the icon's teal.
-class ProgressBar : public brls::View
-{
-  public:
-    ProgressBar()
-        : track(ui::color_track()), done(ui::color_ok())
-    {
-        this->setHeight(12);
-        this->setFocusable(false);
-    }
-
-    void set(float fraction)
-    {
-        this->fraction = fraction < 0 ? 0 : fraction > 1 ? 1 : fraction;
-    }
-
-    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style, brls::FrameContext*) override
-    {
-        const float radius = height / 2.0f;
-        nvgBeginPath(vg);
-        nvgRoundedRect(vg, x, y, width, height, radius);
-        nvgFillColor(vg, this->track);
-        nvgFill(vg);
-        if (this->fraction <= 0) return;
-        float w = width * this->fraction;
-        if (w < height) w = height;
-        nvgBeginPath(vg);
-        nvgRoundedRect(vg, x, y, w, height, radius);
-        nvgFillColor(vg, this->done);
-        nvgFill(vg);
-    }
-
-  private:
-    float fraction = 0;
-    NVGcolor track, done;
-};
-
-// "850 MB", "3.8 GB" (the language's decimal mark).
-std::string size_text(u64 bytes)
-{
-    const u64 mb = bytes >> 20;
-    if (mb < 1024) return brls::getStr("playguard/games/size_mb", (int)mb);
-    std::string gb = fmt::format("{:.1f}", (double)bytes / (double)(1ULL << 30));
-    const std::string mark = "playguard/games/decimal_mark"_i18n;
-    const size_t dot = gb.find('.');
-    if (dot != std::string::npos) gb.replace(dot, 1, mark);
-    return brls::getStr("playguard/games/size_gb", gb);
-}
-
-// The integrity check's dialog and what its thread shares with it.
-struct VerifyState
-{
-    std::atomic<bool> cancel{ false };
-    bool open = true;   // the dialog is on screen (main thread only)
-    brls::Dialog* dialog = nullptr;
-    brls::Image* image = nullptr;
-    brls::Label* title = nullptr;   // "Checking the data", with the game's place in a batch
-    brls::Label* name = nullptr;
-    ProgressBar* bar = nullptr;
-    brls::Label* percent = nullptr;
-    brls::Label* detail = nullptr;
-    std::chrono::steady_clock::time_point started = std::chrono::steady_clock::now();
-};
-
-// What the check of one game of a batch gave.
-struct Verified
-{
-    GameFacts game;
-    Result rc = 0;
-    bool corrupt = false;
-    Result found = 0;
-};
-
-// What the dialog says at `current` of `total` bytes: the share done, how
-// much, and the time left once it can be told (a few seconds in).
-void show_progress(VerifyState* s, u64 current, u64 total)
-{
-    if (!total) {
-        s->bar->set(0);
-        s->percent->setText("playguard/games/verify_preparing"_i18n);
-        s->detail->setText("");
-        return;
-    }
-    if (current > total) current = total;
-    s->bar->set((float)((double)current / (double)total));
-    s->percent->setText(fmt::format("{} %", (int)(current * 100 / total)));
-    std::string detail = brls::getStr("playguard/games/verify_amount", size_text(current), size_text(total));
-    const double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now() - s->started).count();
-    if (current > 0 && elapsed >= 3) {
-        const double left = elapsed * (double)(total - current) / (double)current;
-        detail += " · " + (left < 60 ? "playguard/games/verify_left_less"_i18n
-                                      : brls::getStr("playguard/games/verify_left_min", (int)(left / 60 + 0.5)));
-    }
-    s->detail->setText(detail);
-}
-
-bool on_verify_progress(void* ctx, u64 current, u64 total)
-{
-    auto* state = (std::shared_ptr<VerifyState>*)ctx;
-    const std::shared_ptr<VerifyState> s = *state;
-    brls::sync([s, current, total]() {
-        if (s->open) show_progress(s.get(), current, total);
-    });
-    return !s->cancel.load();
 }
 }   // namespace
 
@@ -698,15 +593,22 @@ void GameCheckActivity::show()
     ui::set_visible(this->selection, broken.size() >= 2 || !this->selected.empty());
 
     // Nothing had the focus before the first game with a problem; and never
-    // the focus left in a section that went (its last game repaired).
+    // the focus left in a section that went (its last game repaired). While
+    // the games are checked, until the user moves it, the focus stays on the
+    // first game: the games found later go into the sections above and would
+    // push the cell it was given below the screen (the scroll does not follow).
     brls::View* focus = brls::Application::getCurrentFocus();
     bool lost = false;
     for (brls::View* v = focus; v && !lost; v = v->getParent()) lost = v->getVisibility() != brls::Visibility::VISIBLE;
     brls::View* first = this->first_game();
-    if (first && (!this->focused || lost)) {
+    const bool untouched = this->auto_focus && focus == this->auto_focus;
+    if (first && (!this->focused || lost || untouched)) {
         this->focused = true;
+        this->auto_focus = first;
         brls::Application::giveFocus(first);
     }
+    // The check over (this was its last show): the focus is the user's.
+    if (!this->checking) this->auto_focus = nullptr;
 
     // The line above the list: the check under way, an error, or the result
     // and when it was made.
@@ -775,7 +677,7 @@ void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current
     }
     auto* box = details_view(game, issue, current_hos, icon_of(game.app_id));
     if (app::read_only() && gamecheck_actions(&game, issue) & ~GA_VERIFY) {
-        auto* note_ro = ui::text_label("playguard/common/read_only_note"_i18n, 16, ui::color_note());
+        auto* note_ro = ui::text_label("playguard/common/read_only_note"_i18n, 18, ui::color_note());
         note_ro->setMarginTop(8);
         box->addView(note_ro);
     }
@@ -1067,6 +969,60 @@ void GameCheckActivity::reset_launch(const GameFacts& g)
     this->refresh(false, g.app_id);
 }
 
+// What the check of `total` games found, once the dialog is closed: the
+// activity may be gone by then (`weak`), only the way out needs it.
+void GameCheckActivity::report_verified(GameCheckActivity* self, const std::weak_ptr<bool>& weak,
+                                        const std::vector<Verified>& results, size_t total)
+{
+    if (results.empty()) {
+        ui::notify("playguard/games/verify_cancelled"_i18n);
+        return;
+    }
+    if (total == 1) {
+        // What the console found, with its code as the HOME menu
+        // would show it, and the way out at hand.
+        const Verified& v = results.front();
+        const std::string name = game_name(v.game);
+        if (R_FAILED(v.rc)) {
+            ui::error("playguard/games/verify_err"_i18n + " — " + ui::rc_text(v.rc));
+        } else if (!v.corrupt) {
+            ui::info(brls::getStr("playguard/games/verify_ok", name));
+        } else {
+            std::string body = brls::getStr("playguard/games/verify_bad", name);
+            if (v.found) body += "\n\n" + brls::getStr("playguard/games/verify_code", console_code(v.found));
+            if (app::read_only() || weak.expired()) ui::info(body);
+            else ui::confirm(body, "playguard/games/fix_button/remove"_i18n, [self, g = v.game]() { self->remove(g); });
+        }
+        return;
+    }
+    // A batch: how many of each, the corrupt ones by name, and
+    // removing them all at hand.
+    std::vector<GameFacts> corrupt;
+    std::string names;
+    size_t intact = 0, failed = 0;
+    for (const Verified& v : results) {
+        if (R_FAILED(v.rc)) {
+            failed++;
+        } else if (v.corrupt) {
+            corrupt.push_back(v.game);
+            if (corrupt.size() <= 6) names += "\n" + game_name(v.game);
+        } else {
+            intact++;
+        }
+    }
+    if (corrupt.size() > 6) names += "\n…";
+    std::string body = brls::getStr("playguard/games/verify_done", (int)results.size(), (int)total);
+    body += "\n\n" + brls::getStr("playguard/games/verify_count_bad", (int)corrupt.size()) + names;
+    body += "\n" + brls::getStr("playguard/games/verify_count_ok", (int)intact);
+    if (failed) body += "\n" + brls::getStr("playguard/games/verify_count_err", (int)failed);
+    if (corrupt.empty() || app::read_only() || weak.expired()) ui::info(body);
+    else
+        ui::confirm(body,
+                    corrupt.size() == 1 ? "playguard/games/remove_corrupt_one"_i18n
+                                        : brls::getStr("playguard/games/remove_corrupt", (int)corrupt.size()),
+                    [self, corrupt]() { self->remove_games(corrupt); });
+}
+
 void GameCheckActivity::verify(std::vector<GameFacts> games)
 {
     if (games.empty()) return;
@@ -1077,74 +1033,14 @@ void GameCheckActivity::verify(std::vector<GameFacts> games)
     this->verifying = true;
     const size_t total = games.size();
 
-    // A dialog of its own: the game (icon, name on one line), its place in a
-    // batch, the bar, the share done with how much and the time left, and
-    // Cancel (B too), which stops the batch after what was checked.
-    auto state = std::make_shared<VerifyState>();
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::STRETCH);
-    box->setPadding(26, 36, 20, 36);
-
-    auto* head = new brls::Box(brls::Axis::ROW);
-    head->setAlignItems(brls::AlignItems::CENTER);
-    state->image = new brls::Image();
-    state->image->setScalingType(brls::ImageScalingType::FIT);
-    state->image->setWidth(56);
-    state->image->setHeight(56);
-    state->image->setMarginRight(16);
-    head->addView(state->image);
-    auto* titles = new brls::Box(brls::Axis::COLUMN);
-    titles->setGrow(1.0f);
-    titles->setShrink(1.0f);
-    state->title = ui::text_label("playguard/games/verify_title"_i18n, 18, ui::color_note());
-    titles->addView(state->title);
-    state->name = ui::text_label("", 22, ui::color_text());
-    state->name->setSingleLine(true);   // a long name is cut, not wrapped over the dialog
-    state->name->setMarginTop(2);
-    titles->addView(state->name);
-    head->addView(titles);
-    box->addView(head);
-
-    state->bar = new ProgressBar();
-    state->bar->setMarginTop(22);
-    box->addView(state->bar);
-    auto* numbers = new brls::Box(brls::Axis::ROW);
-    numbers->setAlignItems(brls::AlignItems::CENTER);
-    numbers->setMarginTop(10);
-    state->percent = ui::text_label("", 22, ui::color_text());
-    state->percent->setSingleLine(true);
-    state->percent->setMarginRight(14);
-    numbers->addView(state->percent);
-    state->detail = ui::text_label("", 17, ui::color_note());
-    state->detail->setSingleLine(true);
-    state->detail->setGrow(1.0f);
-    state->detail->setShrink(1.0f);
-    state->detail->setHorizontalAlign(brls::HorizontalAlign::RIGHT);
-    numbers->addView(state->detail);
-    box->addView(numbers);
-
-    auto* note_label = ui::text_label("playguard/games/verify_note"_i18n, 16, ui::color_note());
-    note_label->setMarginTop(16);
-    box->addView(note_label);
-    state->dialog = new brls::Dialog(box);
-    auto cancel = [state]() {
-        state->cancel = true;
-        state->open = false;   // the dialog closes itself
-    };
-    state->dialog->addButton("hints/cancel"_i18n, cancel);
-    ui::on_cancel(state->dialog, cancel);
+    // A dialog of its own (action/game_verify_flow): the game, its place in a
+    // batch, the bar, and Cancel, which stops the batch after what was checked.
+    std::shared_ptr<game_verify_flow::State> state = game_verify_flow::make_dialog();
 
     // The game under way, in the dialog (main thread).
     auto start = [state, total](const GameFacts& g, size_t at) {
         if (!state->open) return;
-        const std::vector<unsigned char> icon = icon_of(g.app_id);
-        if (!icon.empty()) state->image->setImageFromMem(icon.data(), (int)icon.size());
-        ui::set_visible(state->image, !icon.empty());
-        state->title->setText(total == 1 ? "playguard/games/verify_title"_i18n
-                                         : brls::getStr("playguard/games/verify_title_n", (int)at + 1, (int)total));
-        state->name->setText(game_name(g));
-        state->started = std::chrono::steady_clock::now();
-        show_progress(state.get(), 0, 0);
+        game_verify_flow::show_game(state.get(), icon_of(g.app_id), game_name(g), at, total);
     };
     start(games[0], 0);
     state->dialog->open();
@@ -1161,8 +1057,7 @@ void GameCheckActivity::verify(std::vector<GameFacts> games)
             if (at) brls::sync([start, g, at]() { start(g, at); });
             Verified v;
             v.game = g;
-            auto ctx = state;
-            v.rc = gamecheck_verify(g.app_id, on_verify_progress, &ctx, &v.corrupt, &v.found);
+            v.rc = game_verify_flow::verify(state, g.app_id, &v.corrupt, &v.found);
             if (v.rc == NXM_RC_CANCELLED) break;
             results->push_back(v);
             if (R_FAILED(v.rc)) continue;
@@ -1176,61 +1071,7 @@ void GameCheckActivity::verify(std::vector<GameFacts> games)
             });
         }
         brls::sync([this, weak, state, results, total = games.size()]() {
-            auto result = [this, weak, state, results, total]() {
-                if (results->empty()) {
-                    ui::notify("playguard/games/verify_cancelled"_i18n);
-                    return;
-                }
-                if (total == 1) {
-                    // What the console found, with its code as the HOME menu
-                    // would show it, and the way out at hand.
-                    const Verified& v = results->front();
-                    const std::string name = game_name(v.game);
-                    if (R_FAILED(v.rc)) {
-                        ui::error("playguard/games/verify_err"_i18n + " — " + ui::rc_text(v.rc));
-                    } else if (!v.corrupt) {
-                        ui::info(brls::getStr("playguard/games/verify_ok", name));
-                    } else {
-                        std::string body = brls::getStr("playguard/games/verify_bad", name);
-                        if (v.found) body += "\n\n" + brls::getStr("playguard/games/verify_code", console_code(v.found));
-                        if (app::read_only() || weak.expired()) ui::info(body);
-                        else ui::confirm(body, "playguard/games/fix_button/remove"_i18n, [this, g = v.game]() { this->remove(g); });
-                    }
-                    return;
-                }
-                // A batch: how many of each, the corrupt ones by name, and
-                // removing them all at hand.
-                std::vector<GameFacts> corrupt;
-                std::string names;
-                size_t intact = 0, failed = 0;
-                for (const Verified& v : *results) {
-                    if (R_FAILED(v.rc)) {
-                        failed++;
-                    } else if (v.corrupt) {
-                        corrupt.push_back(v.game);
-                        if (corrupt.size() <= 6) names += "\n" + game_name(v.game);
-                    } else {
-                        intact++;
-                    }
-                }
-                if (corrupt.size() > 6) names += "\n…";
-                std::string body = brls::getStr("playguard/games/verify_done", (int)results->size(), (int)total);
-                body += "\n\n" + brls::getStr("playguard/games/verify_count_bad", (int)corrupt.size()) + names;
-                body += "\n" + brls::getStr("playguard/games/verify_count_ok", (int)intact);
-                if (failed) body += "\n" + brls::getStr("playguard/games/verify_count_err", (int)failed);
-                if (corrupt.empty() || app::read_only() || weak.expired()) ui::info(body);
-                else
-                    ui::confirm(body,
-                                corrupt.size() == 1 ? "playguard/games/remove_corrupt_one"_i18n
-                                                    : brls::getStr("playguard/games/remove_corrupt", (int)corrupt.size()),
-                                [this, corrupt]() { this->remove_games(corrupt); });
-            };
-            if (state->open) {
-                state->open = false;
-                state->dialog->close(result);
-            } else {
-                result();
-            }
+            game_verify_flow::close(state, [this, weak, results, total]() { report_verified(this, weak, *results, total); });
             if (weak.expired()) return;
             this->verifying = false;
             // The console's view of them may have changed: checked again.

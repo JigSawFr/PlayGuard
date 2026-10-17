@@ -18,7 +18,6 @@ class ClockTab : public TabBase
 {
   public:
     ClockTab();
-    static brls::View* create();
     // The network clock on a screen of its own (Console › Network clock).
     static void open_screen();
 

@@ -28,7 +28,7 @@ std::atomic<uint64_t> g_count{ 0 };
 std::mutex  g_mutex;
 // This run's file. Opened for each write, not kept open: the console's SD
 // card refuses to read or delete a file open for writing (a report sent
-// online with it, Developer tools › Delete the log files).
+// online with it, Developer › Delete the log files).
 char        g_path[640];
 size_t      g_bytes = 0;          // written to it, or waiting in g_pending
 bool        g_full = false;       // past MAX_BYTES: nothing more is written

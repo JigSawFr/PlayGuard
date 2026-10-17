@@ -102,18 +102,18 @@
         "session_closed": "das System hat die Sitzung der Altersbeschränkungen beendet; versuchen Sie es erneut",
         "bad_pin_format": "das System hat das Format der Geheimzahl abgelehnt",
         "pctl_refused": "vom Dienst der Altersbeschränkungen abgelehnt",
-        "relock_failed": "die Konsole wurde entsperrt, die Altersbeschränkungen konnten aber nicht wieder aktiviert werden: Hole das jetzt nach (Geheimzahl › Altersbeschränkungen wieder aktivieren)",
+        "relock_failed": "die Konsole wurde entsperrt, die Altersbeschränkungen konnten aber nicht wieder aktiviert werden: Holen Sie das jetzt nach (Geheimzahl › Altersbeschränkungen wieder aktivieren)",
         "not_applied": "die Konsole hat die Änderung nicht übernommen, daher wurden die vorherigen Einstellungen wiederhergestellt",
         "not_saved": "PlayGuard konnte nicht auf der SD-Karte speichern, was später wiederhergestellt werden muss, daher wurde nichts geschrieben",
         "next_step": "Wenn das erneut passiert, senden Sie einen Bericht: Optionen › Hilfe & Diagnose › Bericht online senden.",
         "pt_not_understood": "die Spielzeit-Einstellungen der Konsole liegen in einem Format vor, das PlayGuard nicht versteht, daher wurde nichts geändert. Senden Sie einen Bericht: Optionen › Hilfe & Diagnose › Bericht online senden.",
         "wrong_pin": "das System hat die Geheimzahl abgelehnt: falsche Geheimzahl oder nicht 4 bis 8 Ziffern",
         "pctl_not_ready": "der Dienst der Altersbeschränkungen ist noch nicht bereit: warten Sie einen Moment und versuchen Sie es dann erneut",
-        "clock_not_set": "die Konsole meldet, dass ihre Netzwerkuhr keine gültige Zeit hat (sie wurde vielleicht nie gestellt); siehe den Tab Konsole › Netzwerkuhr",
+        "clock_not_set": "die Konsole meldet, dass ihre Netzwerkuhr keine gültige Zeit hat (sie wurde vielleicht nie gestellt); siehe Konsole › Netzwerkuhr",
         "no_internet": "die Konsole ist nicht mit dem Internet verbunden: Verbinden Sie sie und versuchen Sie es dann erneut",
         "service_denied": "das System hat PlayGuard den Zugriff auf einen seiner Dienste verweigert; PlayGuard benötigt eine Konsole mit Atmosphère",
         "pdm_unavailable": "der Spieldaten-Dienst der Konsole ist gerade nicht verfügbar; versuchen Sie es gleich noch einmal",
-        "corrupt_data": "beschädigte Daten: Die Dateien des Spiels sind beschädigt; entferne das Spiel und installiere es erneut",
+        "corrupt_data": "beschädigte Daten: Die Dateien des Spiels sind beschädigt; entfernen Sie das Spiel und installieren Sie es erneut",
         "cancelled": "abgebrochen"
     },
     "init_error": {
@@ -185,7 +185,7 @@
         "updated": "Aktualisiert um {}",
         "extra": "Zusatzzeit für heute...",
         "extra_title": "Zusatzzeit für heute",
-        "extra_body_auto": "Heute {} hinzufügen?\n\nDas Limit für {} steigt von {} auf {}. Ab dem nächsten Tag setzt PlayGuard es automatisch wieder auf {}.",
+        "extra_body_auto": "Heute {} hinzufügen?\n\nDas Limit für {} steigt von {} auf {}. Ab dem nächsten Tag setzt PlayGuard es beim nächsten Öffnen wieder auf {}.",
         "extra_confirm": "Hinzufügen",
         "extra_done": "Zusatzzeit hinzugefügt: Limit heute {}.",
         "extra_keep": "{} behalten",
@@ -195,17 +195,17 @@
         "stop": "Heute nicht mehr spielen...",
         "stop_title": "Heute nicht mehr spielen",
         "stop_body": "Heute nicht mehr spielen?\n\nDas Limit für {} wird für heute auf 0 gesetzt. Ab dem nächsten Tag bietet PlayGuard an, es wieder auf {} zu setzen.",
-        "stop_body_auto": "Heute nicht mehr spielen?\n\nDas Limit für {} wird für heute auf 0 gesetzt. Ab dem nächsten Tag setzt PlayGuard es automatisch wieder auf {}.",
+        "stop_body_auto": "Heute nicht mehr spielen?\n\nDas Limit für {} wird für heute auf 0 gesetzt. Ab dem nächsten Tag setzt PlayGuard es beim nächsten Öffnen wieder auf {}.",
         "stop_confirm": "Für heute beenden",
         "stop_done": "Heute wird nicht mehr gespielt.",
         "stop_restore_body": "Am {} wurde das Limit für {} nur für diesen Tag auf {} gesetzt. Wieder auf {} setzen?",
         "applet": "PlayGuard läuft als Applet (aus dem Album geöffnet) mit wenig Speicher: Ein Export oder eine lange Aktivitätsliste kann fehlschlagen. Für die vollständige App halten Sie beim Starten eines Spiels R gedrückt.",
-        "counted": "Über einem Spiel geöffnet, zählt PlayGuard als dieses Spiel: Die Konsole rechnet die Zeit dem Spielzeit-Timer und der Aktivität des beim Start gewählten Nutzers an. Öffne PlayGuard mit dem Nutzer eines Elternteils oder für einen kurzen Blick über das Album.",
+        "counted": "Über einem Spiel geöffnet, zählt PlayGuard als dieses Spiel: Die Konsole rechnet die Zeit dem Spielzeit-Timer und der Aktivität des beim Start gewählten Nutzers an. Öffnen Sie PlayGuard mit dem Nutzer eines Elternteils oder für einen kurzen Blick über das Album.",
         "home_counts": "Ein im HOME-Menü offen gelassenes Spiel wird weiter gezählt.",
         "stop_now": "Jetzt",
         "stop_soon": "In 5 Minuten",
         "stop_soon_body": "In 5 Minuten aufhören?\n\nDas Limit für {} wird für heute auf {} gesetzt: noch etwa 5 Minuten, Zeit zum Speichern. Ab dem nächsten Tag bietet PlayGuard an, es wieder auf {} zu setzen.",
-        "stop_soon_body_auto": "In 5 Minuten aufhören?\n\nDas Limit für {} wird für heute auf {} gesetzt: noch etwa 5 Minuten, Zeit zum Speichern. Ab dem nächsten Tag setzt PlayGuard es automatisch wieder auf {}.",
+        "stop_soon_body_auto": "In 5 Minuten aufhören?\n\nDas Limit für {} wird für heute auf {} gesetzt: noch etwa 5 Minuten, Zeit zum Speichern. Ab dem nächsten Tag setzt PlayGuard es beim nächsten Öffnen wieder auf {}.",
         "stop_soon_done": "Das Spielen endet in etwa 5 Minuten.",
         "stop_alarm_only": "Die Konsole warnt nur, wenn die Zeit um ist (siehe „Wenn die Zeit um ist“): Das laufende Spiel wird nicht beendet.",
         "outside_reset": "Die heutige Spielzeit hat gegen {} wieder bei null angefangen (Uhr geändert?).",
@@ -224,10 +224,10 @@
         "step_limit": "2. Tägliches Spielzeitlimit wählen",
         "step_clock": "3. Netzwerkuhr prüfen",
         "todo": "Offen",
-        "step_unlink": "4. Smart-Geräte-App trennen (ihre nächste Synchronisierung würde dies rückgängig machen)",
+        "step_unlink": "4. Smart-Geräte-App trennen (die nächste Synchronisierung würde alles aufheben)",
         "step_alarm": "{}. Alarm „Zeit ist um“ wieder einschalten (nichts warnt, wenn die Zeit um ist)",
         "at_start": "Beim Start anzeigen, solange keine Geheimzahl festgelegt ist",
-        "note": "Die Geheimzahl ist die der Konsole; das Limit richtet sich nach der Netzwerkuhr, daher muss sie genau sein. Öffne PlayGuard mit dem Nutzer eines Elternteils: Über einem Spiel geöffnet, zählt seine Zeit als Spielzeit.",
+        "note": "Die Geheimzahl ist die der Konsole; das Limit richtet sich nach der Netzwerkuhr, daher muss sie genau sein. Öffnen Sie PlayGuard mit dem Nutzer eines Elternteils: Über einem Spiel geöffnet, zählt seine Zeit als Spielzeit.",
         "close": "Schließen",
         "step_protect": "{}. PlayGuard schützen: Geheimzahl abfragen"
     },
@@ -279,7 +279,7 @@
         "time_up_alarm": "Nur warnen",
         "time_up_suspend_body": "Die Software unterbrechen, wenn die Zeit um ist?\n\nBeim Limit zeigt die Konsole „Zeit ist um“ an und unterbricht das Spiel. Nicht gespeicherter Fortschritt kann verloren gehen.",
         "time_up_alarm_body": "Nur warnen, wenn die Zeit um ist?\n\nBeim Limit zeigt die Konsole „Zeit ist um“ an, unterbricht das Spiel aber nicht: Es kann weitergehen.",
-        "time_up_needs_limit": "Lege zuerst ein Spielzeitlimit oder eine Schlafenszeit fest: Was passiert, wenn die Zeit um ist, zählt erst dann.",
+        "time_up_needs_limit": "Legen Sie zuerst ein Spielzeitlimit oder eine Schlafenszeit fest: Was passiert, wenn die Zeit um ist, zählt erst dann.",
         "profile_current": "{} (aktuell)",
         "profile_range": "{} bis {}",
         "profile_saved": "Profil „{}“ gespeichert.",
@@ -310,8 +310,8 @@
         "bedtime_end_confirm": "Spielen an jedem Tag mit Gute-Nacht-Alarm ab {} wieder erlauben?",
         "bedtime_written": "Gute-Nacht-Alarm geändert.",
         "bedtime_err": "Der Gute-Nacht-Alarm konnte nicht geändert werden",
-        "bedtime_unknown": "PlayGuard findet den Gute-Nacht-Alarm dieser Konsole nicht dort, wo er ihn in den Spielzeit-Einstellungen erwartet, und ändert ihn deshalb nicht. Nutze die App oder sende einen Diagnosebericht (Optionen › Hilfe & Diagnose), damit er unterstützt werden kann.",
-        "bedtime_end_needs_alarm": "Schalte zuerst den Gute-Nacht-Alarm ein.",
+        "bedtime_unknown": "PlayGuard findet den Gute-Nacht-Alarm dieser Konsole nicht dort, wo er ihn in den Spielzeit-Einstellungen erwartet, und ändert ihn deshalb nicht. Nutzen Sie die App oder senden Sie einen Diagnosebericht (Optionen › Hilfe & Diagnose), damit er unterstützt werden kann.",
+        "bedtime_end_needs_alarm": "Schalten Sie zuerst den Gute-Nacht-Alarm ein.",
         "section_advanced": "Erweitert",
         "section_extra": "Zusatzzeit",
         "advanced_note": "Zeigt die Aktionen unten an und erlaubt Sicherungen und dem Verlauf, auch diesen Alarm zurückzusetzen. Sie nutzen die Debug-Befehle der Konsole.",
@@ -374,7 +374,7 @@
         "write_err": "Spielzeitlimit konnte nicht angewendet werden",
         "removed": "Spielzeitlimit entfernt.",
         "remove_err": "Spielzeitlimit konnte nicht entfernt werden",
-        "not_counting": "Die Konsole zählt die Spielzeit gerade nicht. Mögliche Ursachen: Die Uhr wurde zurückgestellt (sie zählt später wieder), die Netzwerkuhr wurde nie gestellt (Tab „Konsole › Netzwerkuhr“), oder ein Limit wurde gerade geschrieben (starten Sie ein Spiel für eine Minute und prüfen Sie dann erneut).",
+        "not_counting": "Die Konsole zählt die Spielzeit gerade nicht. Mögliche Ursachen: Die Uhr wurde zurückgestellt (sie zählt später wieder), die Netzwerkuhr wurde nie gestellt (Konsole › Netzwerkuhr), oder ein Limit wurde gerade geschrieben (starten Sie ein Spiel für eine Minute und prüfen Sie dann erneut).",
         "limit_note": "Beim Limit zeigt die Konsole „Zeit ist um“ an und unterbricht dann das Spiel oder warnt nur, je nach „Wenn die Zeit um ist“.",
         "unsaved": "Nicht gespeicherter Fortschritt kann verloren gehen: Lassen Sie das Kind zuerst speichern."
     },
@@ -430,7 +430,7 @@
         "first": "Erstmals gespielt",
         "last": "Zuletzt gespielt",
         "less_than_minute": "< 1 min",
-        "note": "Aus dem Aktivitätsprotokoll der Konsole gelesen, für alle Nutzer. Die Zeiten sind ungefähr, wenn die Konsolenuhr geändert wurde. PlayGuard über einem Spiel geöffnet zählt als dieses Spiel für den beim Start gewählten Nutzer: öffne es mit dem Nutzer eines Elternteils.",
+        "note": "Aus dem Aktivitätsprotokoll der Konsole gelesen, für alle Nutzer. Die Zeiten sind ungefähr, wenn die Konsolenuhr geändert wurde. PlayGuard über einem Spiel geöffnet zählt als dieses Spiel für den beim Start gewählten Nutzer: Öffnen Sie es mit dem Nutzer eines Elternteils.",
         "show_all": "Alle Spiele anzeigen",
         "section_summary": "Übersicht",
         "section_rediscover": "Wiederentdecken",
@@ -537,7 +537,7 @@
             "timeout": "keine Antwort",
             "bad_reply": "ungültige Antwort"
         },
-        "start_off": "Die Netzwerkuhr weicht um {} ab (geprüft mit {}). Die Spielzeitbegrenzung verlässt sich darauf: siehe Tab Konsole › Netzwerkuhr.",
+        "start_off": "Die Netzwerkuhr weicht um {} ab (geprüft mit {}). Die Spielzeitbegrenzung verlässt sich darauf: siehe Konsole › Netzwerkuhr.",
         "guided_body": "Die Netzwerkuhr ist ungenau, und die Spielzeitbegrenzung verlässt sich darauf.\n\nJetzt die Zeit mit {} messen? (Die Konsole muss online sein.) Bevor die Uhr gestellt wird, werden Sie gefragt.",
         "guided_measure": "Jetzt messen",
         "guided_fine": "Die Netzwerkuhr ist genau: nichts zu tun.",
@@ -630,7 +630,7 @@
         "off_body": "Spiele freigeben? Die vorherigen Spielzeitlimits werden wiederhergestellt.",
         "off_confirm": "Spiele freigeben",
         "off_done": "Spiele freigegeben.",
-        "blocks_change": "„Alle Spiele sperren“ ist aktiv: Das Limit jedes Tages bleibt bei 0. Deaktiviere es zuerst im Tab „Geheimzahl“."
+        "blocks_change": "„Alle Spiele sperren“ ist aktiv: Das Limit jedes Tages bleibt bei 0. Deaktivieren Sie es zuerst im Tab „Geheimzahl“."
     },
     "rescue": {
         "title": "Wiederherstellung",
@@ -640,8 +640,8 @@
         "continue": "PlayGuard öffnen",
         "note": "Sie sind über die RESCUE-Datei hierher gelangt, daher wird hier keine Geheimzahl abgefragt. Legen Sie eine neue Geheimzahl fest oder entfernen Sie die Altersbeschränkungen und öffnen Sie dann PlayGuard.",
         "note_failed": "Die Wiederherstellung wurde nicht abgeschlossen, daher kann hier ohne Geheimzahl nichts geändert werden. Versuchen Sie es erneut mit der RESCUE-Datei, oder entnehmen Sie die SD-Karte und ändern Sie die Einstellungen an einem Computer.",
-        "note_refused": "Alle Jugendschutzeinstellungen wären gelöscht worden, aber die Anforderungsdatei konnte nicht von der SD-Karte entfernt werden und wäre bei jedem Start erneut ausgeführt worden. Entferne sie an einem Computer und versuche es erneut.",
-        "request_kept": "Die Datei {} konnte nicht von der SD-Karte entfernt werden: Solange sie da ist, wird die Konsole bei jedem Start erneut entsperrt. Entferne sie an einem Computer.",
+        "note_refused": "Alle Jugendschutzeinstellungen wären gelöscht worden, aber die Anforderungsdatei konnte nicht von der SD-Karte entfernt werden und wäre bei jedem Start erneut ausgeführt worden. Entfernen Sie sie an einem Computer und versuchen Sie es erneut.",
+        "request_kept": "Die Datei {} konnte nicht von der SD-Karte entfernt werden: Solange sie da ist, wird die Konsole bei jedem Start erneut entsperrt. Entfernen Sie sie an einem Computer.",
         "note_deleted": "Alle Altersbeschränkungen wurden entfernt, einschließlich der Geheimzahl. Öffnen Sie PlayGuard – dort können Sie sie jederzeit neu einrichten.",
         "note_no_pin": "Es war keine Geheimzahl für die Altersbeschränkungen festgelegt, daher gab es nichts aufzuheben. Sie können hier eine festlegen und dann PlayGuard öffnen.",
         "failed_code": "Meldung der Konsole: {}.",
@@ -651,13 +651,15 @@
             "no_pin": "Es gab keine Geheimzahl wiederherzustellen: Es ist keine Geheimzahl festgelegt.",
             "failed": "Die Wiederherstellung konnte nicht abgeschlossen werden.",
             "refused": "Nichts wurde gelöscht: Die RESCUE-Datei konnte nicht von der SD-Karte entfernt werden.",
-            "unconfirmed": "Die Konsole zeigt die in diesem Bericht beschriebene Wiederherstellung nicht."
+            "unconfirmed": "Die Konsole zeigt die in diesem Bericht beschriebene Wiederherstellung nicht.",
+            "old_module": "Das Wiederherstellungs-Sysmodul ist älter als dieses PlayGuard: Sein Bericht kann nicht geprüft werden."
         },
         "hint": {
             "reset_pin": "eine neue wählen",
             "delete": "alles entfernen"
         },
-        "note_unconfirmed": "Ohne Geheimzahl kann hier nichts geändert werden, und PlayGuard öffnet sich wie gewohnt. Ausgesperrt? Legen Sie die RESCUE-Datei wieder auf die SD-Karte, mit installiertem Wiederherstellungs-Sysmodul, und starten Sie die Konsole neu."
+        "note_unconfirmed": "Ohne Geheimzahl kann hier nichts geändert werden, und PlayGuard öffnet sich wie gewohnt. Ausgesperrt? Legen Sie die RESCUE-Datei wieder auf die SD-Karte, mit installiertem Wiederherstellungs-Sysmodul, und starten Sie die Konsole neu.",
+        "note_old_module": "Ohne Geheimzahl kann hier nichts geändert werden, und PlayGuard öffnet sich wie gewohnt. Aktualisieren Sie das Modul an einem Computer: Entpacken Sie playguard-rescue.zip von PlayGuard {} ins Stammverzeichnis der SD-Karte, legen Sie die RESCUE-Datei wieder darauf und starten Sie die Konsole neu."
     },
     "tools": {
         "section_diag": "Diagnose",
@@ -764,7 +766,7 @@
         "flag_read_only": "schreibgeschützt",
         "flag_dev": "Entwickler",
         "upload": "Bericht online senden...",
-        "upload_note": "Sendet einen Bericht in einen geheimen Gist deines GitHub-Kontos (bei Bedarf zuerst anmelden) und zeigt seinen Link mit einem QR-Code: Gib ihn an deine Hilfe weiter oder eröffne damit einen Fehlerbericht.",
+        "upload_note": "Sendet einen Bericht in einen geheimen Gist Ihres GitHub-Kontos (bei Bedarf zuerst anmelden) und zeigt seinen Link mit einem QR-Code: Geben Sie ihn an die Person weiter, die Ihnen hilft, oder eröffnen Sie damit einen Fehlerbericht.",
         "storage_note_emummc": "Dies ist die emuMMC: Die sysMMC hat eigene Altersbeschränkungen, die PlayGuard von hier aus nicht sieht. Legen Sie sie dort ebenfalls fest oder blenden Sie das Startmenü von hekate aus.",
         "storage_note_sysmmc": "Dies ist die sysMMC, und auf dieser SD-Karte ist eine emuMMC eingerichtet: Sie hat eigene Altersbeschränkungen, die PlayGuard von hier aus nicht sieht. Legen Sie sie dort ebenfalls fest oder blenden Sie das Startmenü von hekate aus."
     },
@@ -775,7 +777,7 @@
         "none": "Alle {} installierten Spiele scheinen in Ordnung.",
         "err_list": "Die installierten Spiele konnten nicht aufgelistet werden",
         "truncated": "Nur die ersten {} Spiele wurden geprüft.",
-        "many": "Mehrere Spiele auf einmal: Prüfe die SD-Karte an einem Computer auf Fehler und ob die Konsole vom selben Speicher ({} gerade) gestartet ist wie bei der Installation dieser Spiele. Ein von sysMMC installiertes Spiel funktioniert nicht unter emuMMC und umgekehrt.",
+        "many": "Mehrere Spiele auf einmal: Prüfen Sie die SD-Karte an einem Computer auf Fehler und ob die Konsole vom selben Speicher ({} gerade) gestartet ist wie bei der Installation dieser Spiele. Ein von sysMMC installiertes Spiel funktioniert nicht unter emuMMC und umgekehrt.",
         "unnamed": "Unbekanntes Spiel ({})",
         "id": "Titel-ID: {}",
         "cause": "Ursache",
@@ -788,48 +790,48 @@
             "archived": {
                 "short": "Nichts installiert (gestrichelt)",
                 "cause": "Die Konsole listet das Spiel, aber nichts davon ist mehr installiert: Es wurde archiviert, oder seine Dateien wurden außerhalb der Konsole gelöscht.",
-                "fix": "Installiere das Spiel erneut oder entferne seinen Eintrag, um das HOME-Menü aufzuräumen."
+                "fix": "Installieren Sie das Spiel erneut oder entfernen Sie seinen Eintrag, um das HOME-Menü aufzuräumen."
             },
             "storage": {
                 "short": "SD-Karte nicht lesbar",
                 "cause": "Das Spiel liegt auf der SD-Karte, die die Konsole gerade nicht lesen kann.",
-                "fix": "Schalte die Konsole aus, nimm die SD-Karte heraus und setze sie wieder ein, und prüfe sie dann an einem Computer auf Fehler. Nichts zu entfernen: Die Dateien sind noch auf der Karte."
+                "fix": "Schalten Sie die Konsole aus, nehmen Sie die SD-Karte heraus und setzen Sie sie wieder ein, und prüfen Sie sie dann an einem Computer auf Fehler. Nichts zu entfernen: Die Dateien sind noch auf der Karte."
             },
             "no_base": {
                 "short": "Spiel fehlt („!“)",
                 "cause": "Nur ein Update oder ein Zusatzinhalt dieses Spiels ist installiert, nicht das Spiel selbst.",
-                "fix": "Installiere das Spiel selbst oder entferne den Eintrag und was davon übrig ist."
+                "fix": "Installieren Sie das Spiel selbst oder entfernen Sie den Eintrag und was davon übrig ist."
             },
             "files": {
                 "short": "Beschädigte Installation",
                 "cause": "Dateien des Spiels oder seines Updates fehlen dort, wo sie installiert sind: eine abgebrochene Installation oder eine beschädigte SD-Karte.",
-                "fix": "Entferne das Spiel und installiere es erneut. Sind mehrere Spiele betroffen, prüfe zuerst die SD-Karte."
+                "fix": "Entfernen Sie das Spiel und installieren Sie es erneut. Sind mehrere Spiele betroffen, prüfen Sie zuerst die SD-Karte."
             },
             "corrupt": {
                 "short": "Beschädigt (geprüft)",
                 "cause": "PlayGuard hat die Daten geprüft ({}): Die Konsole hat beschädigte Daten gefunden. Das Spiel startet erst wieder, wenn es neu installiert ist.",
-                "fix": "Entferne das Spiel (erste Schaltfläche) und installiere es neu. Die Speicherdaten bleiben erhalten."
+                "fix": "Entfernen Sie das Spiel (erste Schaltfläche) und installieren Sie es neu. Die Speicherdaten bleiben erhalten."
             },
             "firmware": {
                 "short": "Benötigt Firmware {}",
                 "cause": "Das Spiel oder sein Update benötigt die Systemversion {}; diese Konsole hat {}.",
-                "fix": "Aktualisiere zuerst Atmosphère auf eine Version, die die neue Firmware unterstützt, dann die Firmware: In umgekehrter Reihenfolge startet die Konsole nicht mehr. Oder installiere eine ältere Version des Updates.",
-                "fix_update": "Nur sein Update braucht sie: Entferne das Update, um das Spiel ohne es zu spielen (Aktionen), oder aktualisiere zuerst Atmosphère, dann die Firmware."
+                "fix": "Aktualisieren Sie zuerst Atmosphère auf eine Version, die die neue Firmware unterstützt, dann die Firmware: In umgekehrter Reihenfolge startet die Konsole nicht mehr. Oder installieren Sie eine ältere Version des Updates.",
+                "fix_update": "Nur sein Update braucht sie: Entfernen Sie das Update, um das Spiel ohne es zu spielen (Aktionen), oder aktualisieren Sie zuerst Atmosphère, dann die Firmware."
             },
             "launch": {
                 "short": "Von der Konsole abgelehnt",
                 "cause": "Die Konsole verweigert den Start: {}. Meist ist ein neueres Update des Spiels erforderlich.",
-                "fix": "Installiere das neueste Update des Spiels. Ist es bereits installiert, entferne das Spiel und installiere es erneut."
+                "fix": "Installieren Sie das neueste Update des Spiels. Ist es bereits installiert, entfernen Sie das Spiel und installieren Sie es erneut."
             },
             "no_control": {
                 "short": "Name und Symbol unlesbar",
                 "cause": "Das Spiel ist installiert, aber sein Name und sein Symbol können nicht gelesen werden: Das HOME-Menü zeigt ein Symbol, das endlos lädt.",
-                "fix": "Starte die Konsole neu. Lädt das Symbol weiterhin, prüfe die Daten unter Systemeinstellungen › Datenverwaltung oder entferne das Spiel und installiere es erneut."
+                "fix": "Starten Sie die Konsole neu. Lädt das Symbol weiterhin, prüfen Sie die Daten unter Systemeinstellungen › Datenverwaltung oder entfernen Sie das Spiel und installieren Sie es erneut."
             },
             "needs_verify": {
                 "short": "Beschädigte Daten",
                 "cause": "Die Konsole hat beschädigte Daten in diesem Spiel gefunden und verlangt eine Prüfung.",
-                "fix": "Prüfe die Daten (erste Schaltfläche): PlayGuard merkt sich das Ergebnis. Intakt verschwindet das Spiel aus der Liste, beschädigt kommt es zu „Neu installieren“."
+                "fix": "Prüfen Sie die Daten (erste Schaltfläche): PlayGuard merkt sich das Ergebnis. Intakt verschwindet das Spiel aus der Liste, beschädigt kommt es zu „Neu installieren“."
             },
             "key_too_new": {
                 "short": "Schlüssel zu neu",
@@ -838,12 +840,12 @@
             "ticket": {
                 "short": "Lizenz fehlt",
                 "cause": "Das Spiel braucht eine Lizenz (Ticket), die nicht auf der Konsole ist: Sie wurde gelöscht, oder die Installation enthielt sie nicht.",
-                "fix": "Installiere das Spiel erneut aus einer vollständigen Kopie mit seinem Ticket."
+                "fix": "Installieren Sie das Spiel erneut aus einer vollständigen Kopie mit seinem Ticket."
             },
             "launch_version": {
                 "short": "Verlangt ein entferntes Update",
                 "cause": "Die Konsole verlangt, was früher installiert war: {}. Jetzt installiert: {}. Das Update wurde entfernt oder nicht vollständig installiert.",
-                "fix": "Lass die installierte Version wieder zu (Aktionen) oder installiere das Update erneut."
+                "fix": "Lassen Sie die installierte Version wieder zu (Aktionen) oder installieren Sie das Update erneut."
             }
         },
         "actions": "Aktionen",
@@ -862,7 +864,7 @@
         "content_err": "Konnte nicht entfernt werden",
         "launch_err": "Die Startversion konnte nicht geändert werden",
         "verify_ok": "{}: keine beschädigten Daten gefunden.",
-        "verify_bad": "{}: beschädigte Daten gefunden. Entferne das Spiel und installiere es erneut.",
+        "verify_bad": "{}: beschädigte Daten gefunden. Entfernen Sie das Spiel und installieren Sie es erneut.",
         "verify_err": "Die Daten konnten nicht geprüft werden",
         "verify_busy": "Es läuft bereits eine Prüfung.",
         "version": "Version {}",
@@ -969,7 +971,7 @@
         "section_notices": "Benachrichtigungen",
         "notices_system": "Neue Versionen von Atmosphère, hekate und Firmware",
         "notices_summary": "Die Spielzeit der Woche",
-        "notices_reminders": "Erinnerungen: Sicherungen, anderes System, alle Spiele gesperrt",
+        "notices_reminders": "Erinnerungen: Sicherungen, anderes System, Spielsperre",
         "help": "Hilfe & Diagnose"
     },
     "backup": {
@@ -1020,7 +1022,7 @@
         "later_week": "1 Woche",
         "later_days": "{} Tagen",
         "later_done": "Erinnerung verschoben auf den {}.",
-        "inplace_body": "PlayGuard lädt Version {} herunter, prüft sie, ersetzt diese Version damit und startet sie neu. Deine Einstellungen bleiben erhalten.",
+        "inplace_body": "PlayGuard lädt Version {} herunter, prüft sie, ersetzt diese Version damit und startet sie neu. Ihre Einstellungen bleiben erhalten.",
         "inplace_confirm": "Aktualisieren"
     },
     "upload": {
@@ -1029,20 +1031,20 @@
         "saved": "Gespeicherter Bericht {}",
         "part_report": "Diagnosebericht",
         "confirm": "An {} senden ({} KB)?",
-        "confirm_gist": "Ein geheimer Gist in deinem GitHub-Konto: Jeder mit dem Link kann ihn lesen, bis du ihn auf GitHub löschst. Er enthält nie die PIN oder die Seriennummer.",
+        "confirm_gist": "Ein geheimer Gist in Ihrem GitHub-Konto: Jeder mit dem Link kann ihn lesen, bis Sie ihn auf GitHub löschen. Er enthält nie die PIN oder die Seriennummer.",
         "confirm_public": "Ein mit diesem Link eröffneter Fehlerbericht ist öffentlich. Vom Verlauf werden nur die letzten Änderungen gesendet, ohne Namen und ohne Uhrzeit.",
         "where_gist": "einen geheimen Gist auf GitHub",
-        "relogin": "GitHub hat den Gist abgelehnt. Melde dich ab und wieder an (GitHub-Konto, in den Entwicklerwerkzeugen), um Gists zu erlauben.",
-        "needs_github": "Der Bericht geht in einen geheimen Gist deines GitHub-Kontos: Jeder mit dem Link kann ihn lesen, bis du ihn auf GitHub löschst. PlayGuard ist noch nicht bei GitHub angemeldet. Jetzt anmelden?",
+        "relogin": "GitHub hat den Gist abgelehnt: Die Anmeldung von PlayGuard erlaubt keine Gists. Erneut anmelden, um sie zu erlauben? Zum Abmelden stattdessen: {}.",
+        "needs_github": "Der Bericht geht in einen geheimen Gist Ihres GitHub-Kontos: Jeder mit dem Link kann ihn lesen, bis Sie ihn auf GitHub löschen. PlayGuard ist noch nicht bei GitHub angemeldet. Jetzt anmelden?",
         "sign_in": "Anmelden",
         "send": "Senden",
         "sending": "Wird gesendet...",
         "failed": "Bericht konnte nicht gesendet werden: {}",
         "failed_list": "Liste konnte nicht gesendet werden: {}",
-        "needs_github_list": "Die Liste geht in einen geheimen Gist deines GitHub-Kontos: Jeder mit dem Link kann sie lesen, bis du sie auf GitHub löschst. PlayGuard ist noch nicht bei GitHub angemeldet. Jetzt anmelden?",
-        "done_list": "Gesendet: {}\nÖffne diesen Link auf einem Handy oder Computer, um diese Spiele wiederzufinden.",
+        "needs_github_list": "Die Liste geht in einen geheimen Gist Ihres GitHub-Kontos: Jeder mit dem Link kann sie lesen, bis Sie sie auf GitHub löschen. PlayGuard ist noch nicht bei GitHub angemeldet. Jetzt anmelden?",
+        "done_list": "Gesendet: {}\nÖffnen Sie diesen Link auf einem Handy oder Computer, um diese Spiele wiederzufinden.",
         "qr_list": "Die Liste",
-        "done": "Gesendet: {}\nGib diesen Link der Person, die dir hilft, oder eröffne damit einen Fehlerbericht.",
+        "done": "Gesendet: {}\nGeben Sie diesen Link der Person, die Ihnen hilft, oder eröffnen Sie damit einen Fehlerbericht.",
         "partial": "Zu groß: Nur der Anfang wird gesendet.",
         "qr_report": "Der Bericht",
         "qr_issue": "Fehler melden",
@@ -1115,8 +1117,8 @@
         "list_stale": "Liste konnte nicht aktualisiert werden ({}): die letzte wird angezeigt.",
         "downloading": "Build wird heruntergeladen...\n{} von {} MB",
         "failed": "Build konnte nicht installiert werden: {}\n\nDas installierte PlayGuard ist unverändert.",
-        "done_manual": "{} ist installiert. Schließe PlayGuard und öffne es erneut, um ihn zu verwenden.",
-        "no_path": "PlayGuard weiß nicht, wo seine .nro-Datei liegt (ohne hbloader gestartet?), und kann sie daher nicht ersetzen. Installiere den Build manuell von GitHub.",
+        "done_manual": "{} ist installiert. Schließen Sie PlayGuard und öffnen Sie es erneut, um ihn zu verwenden.",
+        "no_path": "PlayGuard weiß nicht, wo seine .nro-Datei liegt (ohne hbloader gestartet?), und kann sie daher nicht ersetzen. Installieren Sie den Build manuell von GitHub.",
         "sign_in": "Bei GitHub anmelden für die Builds von main und Pull Requests",
         "checked": "Liste vor {} Min. geprüft.",
         "count_new": "{} neu",
@@ -1138,7 +1140,7 @@
         "step_pulls": "Pull Requests...",
         "step_runs": "Prüfungen...",
         "back": "Zurück zum vorherigen Build: {}",
-        "back_body": "PlayGuard {} durch den davor installierten Build {} ersetzen? PlayGuard startet damit neu.\n\nStürzt ein Build vor seinem ersten Bildschirm ab, bietet PlayGuard dies beim nächsten Start an; L + R beim Start gedrückt halten bietet es ebenfalls an.",
+        "back_body": "PlayGuard {} durch den davor installierten Build {} ersetzen? PlayGuard startet damit neu.\n\nStürzt ein Build vor seinem ersten Bildschirm ab, bietet PlayGuard dies beim nächsten Start an; L + R beim Start gedrückt halten bietet es ebenfalls an, wenn keine Geheimzahl festgelegt ist.",
         "back_confirm": "Zurück",
         "back_failed": "Zurück zum vorherigen Build nicht möglich: {}\n\nDas installierte PlayGuard ist unverändert.",
         "count_new_one": "1 neu",
@@ -1154,7 +1156,7 @@
         "size_mb": "{} MB",
         "expires_in": "in {} Tagen",
         "open_github": "Auf GitHub ansehen",
-        "open_github_body": "Scanne den Code mit einem Telefon, um diese Seite auf GitHub zu öffnen.",
+        "open_github_body": "Scannen Sie den Code mit einem Telefon, um diese Seite auf GitHub zu öffnen.",
         "type_feat": "Funktion",
         "type_fix": "Fehlerbehebung",
         "type_docs": "Doku",
@@ -1182,12 +1184,12 @@
         "not_signed_in": "Nicht angemeldet",
         "signed_in_short": "Angemeldet",
         "starting": "Verbindung zu GitHub...",
-        "code_body": "Öffne auf einem Handy oder Computer {} (oder scanne den Code) und gib ein:",
-        "code_note": "PlayGuard fordert nur an, die Dateien des Build-Workflows zu lesen (Actions), um Entwicklungs-Builds zu installieren, und Gists zu erstellen, um Berichte zu senden; sonst kann es nur lesen, was auf GitHub öffentlich ist. Warte auf deine Zustimmung...",
+        "code_body": "Öffnen Sie auf einem Handy oder Computer {} (oder scannen Sie den Code) und geben Sie ein:",
+        "code_note": "PlayGuard fordert nur an, die Dateien des Build-Workflows zu lesen (Actions), um Entwicklungs-Builds zu installieren, und Gists zu erstellen, um Berichte zu senden; sonst kann es nur lesen, was auf GitHub öffentlich ist. Warten auf Ihre Zustimmung...",
         "signed_in": "Bei GitHub angemeldet.",
         "failed": "Anmeldung bei GitHub fehlgeschlagen: {}",
         "denied": "Die Anmeldung bei GitHub wurde abgelehnt.",
-        "expired": "Der Code ist abgelaufen, bevor er eingegeben wurde. Versuche es erneut.",
+        "expired": "Der Code ist abgelaufen, bevor er eingegeben wurde. Versuchen Sie es erneut.",
         "sign_out": "Abmelden",
         "sign_out_body": "Von GitHub abmelden? PlayGuard vergisst sein Token. Um es auch zu widerrufen: GitHub › Settings › Applications › Authorized GitHub Apps › PlayGuard dev builds.",
         "signed_out": "Von GitHub abgemeldet."
@@ -1210,7 +1212,7 @@
         "title_change": "{}: {} → {}",
         "title_day_change": "{} ({}): {} → {}",
         "unknown_kind": "Andere Änderung ({})",
-        "unknown_note": "Von einer neueren PlayGuard-Version gespeichert: Aktualisiere PlayGuard, um sie vollständig zu sehen.",
+        "unknown_note": "Von einer neueren PlayGuard-Version gespeichert: Aktualisieren Sie PlayGuard, um sie vollständig zu sehen.",
         "days_changed": "Geänderte Tage:",
         "day_change": "{}: {} → {}",
         "kinds": {
@@ -1256,7 +1258,9 @@
             "first_steps": "Erste Schritte",
             "overview": "Übersicht",
             "profile": "Profil „{}“",
-            "console_lock": "Alle Spiele sperren"
+            "console_lock": "Alle Spiele sperren",
+            "notices": "Benachrichtigungen",
+            "rescue": "Wiederherstellung"
         },
         "when": "Wann",
         "how": "Quelle",
@@ -1315,10 +1319,10 @@
         "title": "Versionshinweise · {}",
         "hint": "Versionshinweise",
         "behind": "{} ({} Versionen zurück)",
-        "advice_wait": "Die Hinweise zu {} {} erwähnen Firmware {} noch nicht: Warte mit dem Konsolen-Update, sonst startet sie nicht mehr.",
-        "advice_update": "Firmware {} braucht {} {} oder neuer: Aktualisiere es zuerst.",
+        "advice_wait": "Die Hinweise zu {} {} erwähnen Firmware {} noch nicht: Warten Sie mit dem Konsolen-Update, sonst startet sie nicht mehr.",
+        "advice_update": "Firmware {} braucht {} {} oder neuer: Aktualisieren Sie es zuerst.",
         "fetching": "Versionshinweise werden abgerufen…",
-        "none": "Noch keine Versionshinweise gespeichert. Verbinde dich mit dem Internet und drücke X.",
+        "none": "Noch keine Versionshinweise gespeichert. Verbinden Sie sich mit dem Internet und drücken Sie X.",
         "no_notes": "Keine Hinweise zu dieser Version hier: Sieh sie online an.",
         "english": "Auf Englisch, wie veröffentlicht.",
         "tab_installed": "{} · installiert",
@@ -1330,16 +1334,16 @@
         "hidden": "Nicht angezeigte Zwischenversionen: {}. Sieh sie online an.",
         "installed_missing": "Die Hinweise zur installierten Version ({}) sind nicht in der Liste: Sieh sie online an.",
         "online": "Online ansehen",
-        "online_body": "Scanne diesen Code, um die Hinweise auf deinem Handy zu lesen.",
+        "online_body": "Scannen Sie diesen Code, um die Hinweise auf Ihrem Handy zu lesen.",
         "fetched": "Hinweise abgerufen am {}.",
         "offline": "Offline: Hinweise vom {}.",
-        "failed": "Die Hinweise konnten nicht abgerufen werden. Drücke X, um es erneut zu versuchen."
+        "failed": "Die Hinweise konnten nicht abgerufen werden. Drücken Sie X, um es erneut zu versuchen."
     },
     "notices": {
         "title": "Benachrichtigungen",
         "hint": "Benachrichtigungen",
         "hint_count": "Benachrichtigungen ({})",
-        "none": "Nichts erfordert deine Aufmerksamkeit.",
+        "none": "Nichts erfordert Ihre Aufmerksamkeit.",
         "section_todo": "Zu erledigen",
         "section_info": "Zur Information",
         "section_console": "Konsole",
@@ -1355,7 +1359,7 @@
         "outside": "Änderungen außerhalb von PlayGuard",
         "not_counting": "Die Konsole zählt die Spielzeit nicht",
         "clock": "Die Netzwerkuhr ist ungenau",
-        "clock_detail": "Der Spielzeit-Timer richtet sich nach ihr: Stelle sie über einen Zeitserver.",
+        "clock_detail": "Der Spielzeit-Timer richtet sich nach ihr: Stellen Sie sie über einen Zeitserver.",
         "clock_fix": "Stellen",
         "pairing": "Die Smart-Geräte-App ist verknüpft",
         "pairing_detail": "Ihre nächste Synchronisierung überschreibt, was hier eingestellt ist.",
@@ -1368,6 +1372,7 @@
         "unlocked": "Die Jugendschutzeinstellungen sind vorübergehend entsperrt",
         "unlocked_detail": "Bis zur erneuten Sperre kann ohne Limit gespielt werden.",
         "extra_restore_detail": "An einem früheren Tag hinzugefügte Extrazeit erhöht dieses Limit noch.",
+        "stop_restore_detail": "„{}“ an einem früheren Tag senkt dieses Limit noch unter das übliche.",
         "new_account": "Ein neues Benutzerkonto",
         "installed": "PlayGuard {} installiert",
         "installed_detail": "Es ist gut gestartet. Der vorherige Build, {}, bleibt erhalten: Die Entwicklerwerkzeuge können zu ihm zurück.",
@@ -1381,28 +1386,28 @@
         "upload_show": "Link anzeigen",
         "crash": "PlayGuard wurde beim letzten Mal unerwartet beendet",
         "sd_write": "PlayGuard konnte nicht auf die SD-Karte schreiben",
-        "sd_write_detail": "{} wurde nicht gespeichert. Prüfe die SD-Karte: voll, schreibgeschützt (der Schieber) oder fehlerhaft.",
+        "sd_write_detail": "{} wurde nicht gespeichert. Prüfen Sie die SD-Karte: voll, schreibgeschützt (der Schieber) oder fehlerhaft.",
         "games_one": "Ein installiertes Spiel startet nicht",
         "games": "{} installierte Spiele starten nicht",
         "games_more": "{} und {} weitere",
         "rescue_old": "Das Wiederherstellungs-Sysmodul ist veraltet",
-        "rescue_old_detail": "Es stammt von PlayGuard {}. Entpacke playguard-rescue.zip von PlayGuard {} ins Stammverzeichnis der SD-Karte und starte die Konsole neu.",
-        "rescue_unknown": "Es wurde installiert, bevor es seine Version angab. Entpacke playguard-rescue.zip von PlayGuard {} ins Stammverzeichnis der SD-Karte und starte die Konsole neu.",
+        "rescue_old_detail": "Es stammt von PlayGuard {}. Entpacken Sie playguard-rescue.zip von PlayGuard {} ins Stammverzeichnis der SD-Karte und starten Sie die Konsole neu.",
+        "rescue_unknown": "Es wurde installiert, bevor es seine Version angab. Entpacken Sie playguard-rescue.zip von PlayGuard {} ins Stammverzeichnis der SD-Karte und starten Sie die Konsole neu.",
         "rescue_old_update": "Es stammt von PlayGuard {}. Aktualisieren installiert das von PlayGuard {}; es wirkt ab dem nächsten Start der Konsole.",
         "rescue_unknown_update": "Es wurde installiert, bevor es seine Version angab. Aktualisieren installiert das von PlayGuard {}; es wirkt ab dem nächsten Start der Konsole.",
         "rescue_update": "Aktualisieren",
-        "rescue_update_failed": "Das Wiederherstellungs-Sysmodul konnte nicht aktualisiert werden ({}). Entpacke stattdessen playguard-rescue.zip ins Stammverzeichnis der SD-Karte.",
+        "rescue_update_failed": "Das Wiederherstellungs-Sysmodul konnte nicht aktualisiert werden ({}). Entpacken Sie stattdessen playguard-rescue.zip ins Stammverzeichnis der SD-Karte.",
         "rescue_updated": "Das Wiederherstellungs-Sysmodul ist aktuell. Es wirkt ab dem nächsten Start der Konsole.",
-        "rescue_restart": "Starte die Konsole neu, um das aktualisierte Wiederherstellungs-Sysmodul zu nutzen",
+        "rescue_restart": "Starten Sie die Konsole neu, um das aktualisierte Wiederherstellungs-Sysmodul zu nutzen",
         "rescue_restart_detail": "Es wurde aktualisiert, aber das alte bleibt bis zum Neustart der Konsole in Betrieb.",
         "sys_atmosphere": "Atmosphère {} ist verfügbar",
         "sys_atmosphere_detail": "Diese Konsole nutzt Atmosphère {}.",
         "sys_hekate": "hekate {} ist verfügbar",
         "sys_hekate_detail": "Auf der SD-Karte ist hekate {}.",
         "sys_firmware": "Firmware {} ist erschienen",
-        "sys_firmware_detail": "Diese Konsole läuft mit {}. Aktualisiere sie erst, wenn Atmosphère (und hekate, falls genutzt) diese Firmware unterstützen, sonst startet Atmosphère nicht mehr.",
+        "sys_firmware_detail": "Diese Konsole läuft mit {}. Aktualisieren Sie sie erst, wenn Atmosphère (und hekate, falls genutzt) diese Firmware unterstützen, sonst startet Atmosphère nicht mehr.",
         "pin_weak": "Die PIN ist leicht zu erraten",
-        "pin_weak_detail": "Wie 0000 oder 1234: Sie gehört zu den ersten, die jemand ausprobiert. Wähle eine, die schwerer zu finden ist.",
+        "pin_weak_detail": "Wie 0000 oder 1234: Sie gehört zu den ersten, die jemand ausprobiert. Wählen Sie eine, die schwerer zu finden ist.",
         "pin_lock_off": "PlayGuard öffnet sich ohne PIN",
         "pin_lock_off_detail": "Wer PlayGuard öffnet, kann die Limits und Einschränkungen ändern.",
         "pin_lock_choose": "PlayGuard mit der Geheimzahl schützen…",

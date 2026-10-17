@@ -28,7 +28,7 @@
         "refresh": "重新整理",
         "open": "開啟",
         "exit_again": "再按一次B即可結束",
-        "exit_unlocked": "家長監護仍處於暫時解除狀態：在重新鎖定或主機重新啟動前，可以不受限制地遊玩。\n\n結束前重新鎖定？",
+        "exit_unlocked": "家長監護仍處於暫時解除狀態：在重新啟用或主機重新啟動前，可以不受限制地遊玩。\n\n結束前重新啟用？",
         "exit_lock": "重新啟用並結束",
         "exit_leave": "不鎖定直接結束"
     },
@@ -109,7 +109,7 @@
         "pt_not_understood": "主機的遊玩時間設定格式PlayGuard無法識別，因此未變更任何設定。請傳送報告：「偏好設定 › 說明與診斷 › 線上傳送報告」。",
         "wrong_pin": "系統拒絕了此PIN碼：PIN碼錯誤，或不是4到8位數字",
         "pctl_not_ready": "家長監護服務尚未就緒：請稍候，然後重試",
-        "clock_not_set": "主機回報其網路時鐘沒有有效時間（可能從未設定過）；請查看「主機 › 網路時鐘」頁",
+        "clock_not_set": "主機回報其網路時鐘沒有有效時間（可能從未設定過）；請查看「主機 › 網路時鐘」",
         "no_internet": "主機未連線至網際網路：請連線後再試一次",
         "service_denied": "系統拒絕PlayGuard存取其中一項服務；PlayGuard需要執行Atmosphère的主機",
         "pdm_unavailable": "主機的遊玩資料服務目前無法使用；請稍後再試一次",
@@ -185,7 +185,7 @@
         "updated": "更新於{}",
         "extra": "今天延長時間…",
         "extra_title": "今天延長時間",
-        "extra_body_auto": "今天要增加{}嗎？\n\n{}的上限將從{}改為{}。隔天起，PlayGuard會自動改回{}。",
+        "extra_body_auto": "今天要增加{}嗎？\n\n{}的上限將從{}改為{}。隔天起，下次開啟PlayGuard時會改回{}。",
         "extra_confirm": "增加",
         "extra_done": "已延長時間：今天的上限為{}。",
         "extra_keep": "保留{}",
@@ -195,7 +195,7 @@
         "stop": "停止今天的遊玩…",
         "stop_title": "停止今天的遊玩",
         "stop_body": "要停止今天的遊玩嗎？\n\n今天{}的上限將設為0。隔天起，PlayGuard會詢問是否改回{}。",
-        "stop_body_auto": "要停止今天的遊玩嗎？\n\n今天{}的上限將設為0。隔天起，PlayGuard會自動改回{}。",
+        "stop_body_auto": "要停止今天的遊玩嗎？\n\n今天{}的上限將設為0。隔天起，下次開啟PlayGuard時會改回{}。",
         "stop_confirm": "今天到此為止",
         "stop_done": "今天已停止遊玩。",
         "stop_restore_body": "{}，{}的上限曾設為{}，僅限該日。要改回{}嗎？",
@@ -205,7 +205,7 @@
         "stop_now": "現在",
         "stop_soon": "5分鐘後",
         "stop_soon_body": "要在5分鐘後停止遊玩嗎？\n\n今天{}的上限將設為{}：大約還有5分鐘，足夠存檔。隔天起，PlayGuard會詢問是否改回{}。",
-        "stop_soon_body_auto": "要在5分鐘後停止遊玩嗎？\n\n今天{}的上限將設為{}：大約還有5分鐘，足夠存檔。隔天起，PlayGuard會自動改回{}。",
+        "stop_soon_body_auto": "要在5分鐘後停止遊玩嗎？\n\n今天{}的上限將設為{}：大約還有5分鐘，足夠存檔。隔天起，下次開啟PlayGuard時會改回{}。",
         "stop_soon_done": "大約5分鐘後停止遊玩。",
         "stop_alarm_only": "時間到時主機只會提醒（見「時間到時」）：進行中的遊戲不會停止。",
         "outside_reset": "今天的遊玩時間在{}左右重新開始計算（時鐘被更改了？）。",
@@ -374,7 +374,7 @@
         "write_err": "無法套用遊玩時間上限",
         "removed": "已移除遊玩時間限制。",
         "remove_err": "無法移除遊玩時間限制",
-        "not_counting": "主機目前沒有計算遊玩時間。可能的原因：時鐘被調回（之後會重新計時）、網路時鐘從未設定（「主機 › 網路時鐘」分頁），或剛寫入上限（啟動遊戲玩一分鐘後再查看）。",
+        "not_counting": "主機目前沒有計算遊玩時間。可能的原因：時鐘被調回（之後會重新計時）、網路時鐘從未設定（「主機 › 網路時鐘」），或剛寫入上限（啟動遊戲玩一分鐘後再查看）。",
         "limit_note": "達到上限時，主機會顯示「時間到」，然後依照「時間到時」的設定中斷遊戲或僅提醒。",
         "unsaved": "未儲存的進度可能會遺失：請先讓孩子存檔。"
     },
@@ -537,7 +537,7 @@
             "timeout": "無回應",
             "bad_reply": "回應無效"
         },
-        "start_off": "網路時鐘偏差{}（與{}比對）。遊玩時間限制依據此時鐘：請查看「主機 › 網路時鐘」分頁。",
+        "start_off": "網路時鐘偏差{}（與{}比對）。遊玩時間限制依據此時鐘：請查看「主機 › 網路時鐘」。",
         "guided_body": "網路時鐘不準確，而遊玩時間限制依據此時鐘。\n\n要立即以{}測量時間嗎？（主機必須連線至網路。）設定時鐘前會再次詢問您。",
         "guided_measure": "立即測量",
         "guided_fine": "網路時鐘準確：不需要任何操作。",
@@ -651,13 +651,15 @@
             "no_pin": "沒有可復原的PIN碼：未設定家長監護的PIN碼。",
             "failed": "未能完成復原。",
             "refused": "未刪除任何內容：無法從 SD 卡移除 RESCUE 檔案。",
-            "unconfirmed": "主機狀態與此報告所述的復原不符。"
+            "unconfirmed": "主機狀態與此報告所述的復原不符。",
+            "old_module": "復原 sysmodule 比此 PlayGuard 舊：無法核實它的報告。"
         },
         "hint": {
             "reset_pin": "重新設定",
             "delete": "全部刪除"
         },
-        "note_unconfirmed": "沒有 PIN碼 就無法在此變更任何內容，PlayGuard 會照常開啟。被鎖在外面？請在已安裝復原 sysmodule 的情況下把 RESCUE 檔案放回 SD 卡，然後重新啟動主機。"
+        "note_unconfirmed": "沒有 PIN碼 就無法在此變更任何內容，PlayGuard 會照常開啟。被鎖在外面？請在已安裝復原 sysmodule 的情況下把 RESCUE 檔案放回 SD 卡，然後重新啟動主機。",
+        "note_old_module": "沒有 PIN碼 無法在此變更任何內容，PlayGuard 會照常開啟。請在電腦上更新該模組：將 PlayGuard {} 的 playguard-rescue.zip 解壓縮到 SD 卡根目錄，放回 RESCUE 檔案，然後重新啟動主機。"
     },
     "tools": {
         "section_diag": "診斷",
@@ -1032,7 +1034,7 @@
         "confirm_gist": "你 GitHub 帳戶中的秘密 Gist：在你於 GitHub 上刪除之前，任何擁有連結的人都能查看。報告中絕不包含 PIN 或序號。",
         "confirm_public": "用此連結提交的錯誤回報是公開的。歷程記錄只傳送最近的變更，不含名稱和時間。",
         "where_gist": "GitHub 秘密 Gist",
-        "relogin": "GitHub 拒絕了該 gist。請登出後重新登入（開發者工具中的 GitHub 帳號）以允許 gist。",
+        "relogin": "GitHub 拒絕了該 gist：PlayGuard 的登入不允許 gist。重新登入以允許 gist？如需登出：{}。",
         "needs_github": "報告會傳送到你 GitHub 帳號中的私密 gist：擁有連結的人都能閱讀，直到你在 GitHub 上刪除它。PlayGuard 尚未登入 GitHub。現在登入嗎？",
         "sign_in": "登入",
         "send": "傳送",
@@ -1138,7 +1140,7 @@
         "step_pulls": "拉取請求...",
         "step_runs": "檢查...",
         "back": "回到上一個建置：{}",
-        "back_body": "將 PlayGuard {} 取代為之前安裝的建置 {}？PlayGuard 將以它重新啟動。\n\n如果某個建置在第一個畫面之前當機，PlayGuard 會在下次啟動時提出此操作；啟動時按住 L + R 也會提出。",
+        "back_body": "將 PlayGuard {} 取代為之前安裝的建置 {}？PlayGuard 將以它重新啟動。\n\n如果某個建置在第一個畫面之前當機，PlayGuard 會在下次啟動時提出此操作；未設定PIN碼時，啟動時按住 L + R 也會提出。",
         "back_confirm": "回到上一個",
         "back_failed": "無法回到上一個建置：{}\n\n已安裝的 PlayGuard 未改變。",
         "count_new_one": "1 個新的",
@@ -1256,7 +1258,9 @@
             "first_steps": "初始設定",
             "overview": "總覽",
             "profile": "設定檔「{}」",
-            "console_lock": "封鎖所有遊戲"
+            "console_lock": "封鎖所有遊戲",
+            "notices": "通知",
+            "rescue": "復原"
         },
         "when": "時間",
         "how": "來源",
@@ -1368,6 +1372,7 @@
         "unlocked": "家長監護已暫時解鎖",
         "unlocked_detail": "重新鎖定之前，可以不受限制地遊玩。",
         "extra_restore_detail": "之前某天加入的額外時間仍在提高此限制。",
+        "stop_restore_detail": "之前某天的「{}」仍使此限制低於平常。",
         "new_account": "新的使用者帳號",
         "installed": "已安裝 PlayGuard {}",
         "installed_detail": "啟動正常。先前的版本 {} 已保留：可在開發者工具中退回。",

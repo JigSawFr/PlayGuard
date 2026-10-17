@@ -1,7 +1,7 @@
 // update_flow — "Check for updates", the screen that offers a newer release
 // (activity/update_activity.hpp) and installing it the way About › Update
 // with says: in place (PlayGuard downloads the release, checks it, replaces
-// itself and restarts, as Developer tools › Install another build does),
+// itself and restarts, as Developer › Install another build does),
 // through sphaira or the Homebrew App Store, or by hand. While no way is
 // chosen, the first update asks for one.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).

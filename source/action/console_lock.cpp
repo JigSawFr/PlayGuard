@@ -1,4 +1,4 @@
-// console_lock — Security › Console lock (see console_lock.hpp).
+// console_lock — PIN › Block all games (see console_lock.hpp).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/console_lock.hpp"
 

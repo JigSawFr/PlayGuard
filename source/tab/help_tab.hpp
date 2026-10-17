@@ -1,6 +1,7 @@
 // HelpTab — Preferences › Help & diagnostics, a screen of its own: first
-// steps, the diagnostic report (export, send online) and how many reports
-// and crash files are kept, then the developer tools (shown after seven
+// steps, the diagnostic report (export, send online, and the GitHub account
+// it is sent with, shown once signed in) and how many reports and crash files
+// are kept, then the developer tools (shown after seven
 // presses on About › Version; among them, clearing the cache and the log
 // files). History and backups have their own tab, the console too.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
@@ -12,7 +13,6 @@ class HelpTab : public TabBase
 {
   public:
     HelpTab();
-    static brls::View* create();
 
   protected:
     void refresh() override;
@@ -22,6 +22,7 @@ class HelpTab : public TabBase
     BRLS_BIND(brls::DetailCell,  export_cell, "hp_export");
     BRLS_BIND(brls::Label,       export_note, "hp_export_note");
     BRLS_BIND(brls::DetailCell,  upload,      "hp_upload");
+    BRLS_BIND(brls::DetailCell,  github,      "hp_github");
     BRLS_BIND(brls::Label,       upload_note, "hp_upload_note");
     BRLS_BIND(brls::DetailCell,  logs_keep,   "hp_logs_keep");
     BRLS_BIND(brls::DetailCell,  logs_keep_days, "hp_logs_keep_days");
@@ -36,7 +37,6 @@ class HelpTab : public TabBase
     BRLS_BIND(brls::DetailCell,  dev_clear_logs, "hp_dev_clear_logs");
     BRLS_BIND(brls::DetailCell,  dev_report,  "hp_dev_report");
     BRLS_BIND(brls::DetailCell,  dev_pt_block,"hp_dev_pt_block");
-    BRLS_BIND(brls::DetailCell,  dev_github,  "hp_dev_github");
     BRLS_BIND(brls::DetailCell,  dev_build,   "hp_dev_build");
     BRLS_BIND(brls::DetailCell,  dev_gate,    "hp_dev_gate");
     BRLS_BIND(brls::DetailCell,  dev_forget,  "hp_dev_forget");

@@ -114,7 +114,7 @@ brls::View* code(const markdown::Block& b)
     box->setMarginBottom(4);
     std::string text;
     for (const std::string& l : b.lines) text += (text.empty() ? "" : "\n") + l;
-    box->addView(ui::text_label(text, 16, ui::color_text()));
+    box->addView(ui::text_label(text, 18, ui::color_text()));
     return box;
 }
 

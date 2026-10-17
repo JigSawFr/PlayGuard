@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <utility>
 
 #include "util/pt_block.hpp"
 
@@ -57,6 +58,18 @@ std::string Tally::failed_list() const
     std::string what;
     for (const auto& f : failed) what += (what.empty() ? "" : ", ") + f;
     return what;
+}
+
+const std::vector<std::string>& Listing::names(const std::function<std::vector<std::string>()>& list)
+{
+    if (!listed) set(list());
+    return kept;
+}
+
+void Listing::set(std::vector<std::string> fresh)
+{
+    kept = std::move(fresh);
+    listed = true;
 }
 
 }   // namespace backup_logic

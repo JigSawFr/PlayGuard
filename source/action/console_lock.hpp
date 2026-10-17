@@ -1,4 +1,4 @@
-// console_lock — Security › Console lock: one switch that sets every day's
+// console_lock — PIN › Block all games: one switch that sets every day's
 // play-time limit to 0, so a PIN is needed to play at all (a light "lock the
 // console" without turning on age ratings, communication limits or the phone
 // app). It reuses the proven play-timer write (pt_flow): the limits it

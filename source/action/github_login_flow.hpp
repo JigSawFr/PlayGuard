@@ -1,4 +1,4 @@
-// github_login_flow — Developer tools › GitHub account: signs in with the
+// github_login_flow — Help & diagnostics › GitHub account: signs in with the
 // device flow (util/github_auth.hpp), a code and a QR code to scan, or signs
 // out (forgets the token).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).

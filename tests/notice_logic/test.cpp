@@ -1,6 +1,10 @@
 // Host tests for source/action/notice_logic.cpp: what the notification bell
-// lists, in which order, what it counts, and what putting an entry away does.
+// lists, in which order, what it counts, and what putting an entry away does;
+// and the rules action/notices applies: which kinds Preferences › Notifications
+// hides, the key an entry read is remembered by, when the backup, console
+// lock, SD card and week reminders are due, and the days over the limit.
 #include "check.h"
+#include <cstring>
 
 #include "action/notice_logic.hpp"
 
@@ -152,8 +156,121 @@ static void test_order_after_clear()
     CHECK(v[1].id == "a");
 }
 
+static void test_shown_kind()
+{
+    Shown all;
+    for (const char* id : { "sys_firmware", "week", "over_limit", "backup", "other_system", "console_lock_long",
+                            "pin_missing", "sd_space", "crash" })
+        CHECK(shown_kind(id, all));
+    Shown none;
+    none.system = none.summary = none.reminders = false;
+    CHECK(!shown_kind("sys_firmware", none) && !shown_kind("sys_hekate", none));
+    CHECK(!shown_kind("week", none) && !shown_kind("over_limit", none));
+    CHECK(!shown_kind("backup", none) && !shown_kind("other_system", none) && !shown_kind("console_lock_long", none));
+    // Everything else always shows.
+    for (const char* id : { "pin_missing", "unlocked", "sd_space", "crash", "system", "weekly" })
+        CHECK(shown_kind(id, none));
+    // Each switch only hides its own kind.
+    Shown no_summary;
+    no_summary.summary = false;
+    CHECK(!shown_kind("week", no_summary) && shown_kind("sys_firmware", no_summary) && shown_kind("backup", no_summary));
+}
+
+static void test_read_key()
+{
+    // FNV-1a over the title then the detail, as 8 hex digits after the id.
+    CHECK(read_key("week", "", "") == "week:811c9dc5");
+    CHECK(read_key("x", "a", "") == "x:e40c292c");
+    CHECK(read_key("x", "a", "") == read_key("x", "", "a"));   // one stream: where it splits does not count
+    CHECK(read_key("x", "Title", "Detail") != read_key("x", "Title", "Detail!"));
+    CHECK(read_key("x", "Title", "Detail").rfind("x:", 0) == 0 && read_key("x", "Title", "Detail").size() == 10);
+}
+
+static void test_dates()
+{
+    CHECK(backup_date("20261008_142530.json") == "2026-10-08");
+    CHECK(backup_date("20261008") == "2026-10-08");
+    CHECK(backup_date("2026100") == "" && backup_date("2026-10-08.json") == "" && backup_date("") == "");
+
+    CHECK(days_ago("2026-10-01", 7, "2026-10-08") && days_ago("2026-10-01", 7, "2026-10-09"));
+    CHECK(!days_ago("2026-10-01", 7, "2026-10-07"));
+    CHECK(days_ago("2026-09-30", 30, "2026-10-30") && !days_ago("2026-09-30", 30, "2026-10-29"));
+    CHECK(!days_ago("", 7, "2026-10-08") && !days_ago("junk", 7, "2026-10-08"));
+
+    // No backup at all: due. The newest 30 days old: due; younger, or a
+    // name that is no date: not.
+    const std::string today = "2026-10-17";
+    CHECK(backup_due({}, today));
+    CHECK(backup_due({ "20260917_120000.json", "20260101_000000.json" }, today));
+    CHECK(!backup_due({ "20260918_120000.json", "20260101_000000.json" }, today));
+    CHECK(!backup_due({ "manual.json" }, today));
+
+    CHECK(console_lock_long(true, "2026-10-10", today) && !console_lock_long(true, "2026-10-11", today));
+    CHECK(!console_lock_long(false, "2026-01-01", today) && !console_lock_long(true, "", today));
+
+    // The week: some play time, never read or read 7 days ago or more.
+    CHECK(week_due(true, 60, "", today) && week_due(true, 60, "2026-10-10", today));
+    CHECK(!week_due(true, 60, "2026-10-11", today));
+    CHECK(!week_due(true, 0, "", today) && !week_due(false, 60, "", today));
+}
+
+static void test_sd_space()
+{
+    CHECK(sd_space_low(true, 0) && sd_space_low(true, (500ULL << 20) - 1));
+    CHECK(!sd_space_low(true, 500ULL << 20) && !sd_space_low(false, 0));
+}
+
+static void test_over_limit()
+{
+    static PlayStats stats;
+    std::memset(&stats, 0, sizeof(stats));
+    PtState pt;
+    std::memset(&pt, 0, sizeof(pt));
+    pt.valid = true;
+    pt.alarm_only = true;
+    for (int d = 0; d < 7; d++) pt.day_min[d] = 60;
+    pt.day_min[0] = PT_DAY_NOLIMIT;   // Sunday: no limit
+    // Today is a Sunday: day k is (7 - k) % 7.
+    for (int k = 0; k < 7; k++) stats.day_wday[k] = (uint8_t)((7 - k) % 7);
+    stats.count = 2;
+    // Two games, played 40 min each on day 1 (Saturday): 80 min over 60.
+    stats.games[0].day_s[1] = 40 * 60;
+    stats.games[1].day_s[1] = 40 * 60;
+    // Exactly the limit on day 2: not over.
+    stats.games[0].day_s[2] = 60 * 60;
+    // Way over on Sunday (day 0): no limit that day.
+    stats.games[0].day_s[0] = 10 * 3600;
+    CHECK(over_limit_days(pt, stats) == 1);
+    stats.games[1].day_s[3] = 60 * 60 + 1;
+    CHECK(over_limit_days(pt, stats) == 2);
+    // The console suspends the game at the limit, or the limits are unread: none.
+    pt.alarm_only = false;
+    CHECK(over_limit_days(pt, stats) == 0);
+    pt.alarm_only = true;
+    pt.valid = false;
+    CHECK(over_limit_days(pt, stats) == 0);
+}
+
+static void test_every()
+{
+    Every e(60000);
+    CHECK(e.due(0));                 // never taken: due at once
+    e.taken(1000);
+    CHECK(!e.due(1000));
+    CHECK(!e.due(6000));             // the Overview's next refresh: kept
+    CHECK(!e.due(60999));
+    CHECK(e.due(61000));             // a minute later: due
+    e.taken(61000);
+    CHECK(!e.due(65000));
+    e.forget();                      // a backup written: due at once
+    CHECK(e.due(65000));
+    e.taken(65000);
+    CHECK(e.due(64000));             // a clock that went back: not trusted, due
+}
+
 int main()
 {
+    test_every();
     test_set_and_order();
     test_groups();
     test_fixed_order();
@@ -162,5 +279,10 @@ int main()
     test_dismiss();
     test_dismissed_moved_to_action();
     test_order_after_clear();
+    test_shown_kind();
+    test_read_key();
+    test_dates();
+    test_sd_space();
+    test_over_limit();
     return CHECK_DONE("notice_logic tests passed");
 }

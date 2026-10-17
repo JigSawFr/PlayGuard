@@ -156,8 +156,10 @@ history_logic_CSRC   := $(CALENDAR_C)
 history_logic_CFLAGS := $(CALENDAR_CFLAGS)
 timer_health_logic_SRC   := source/action/timer_health_logic.cpp tests/timer_health_logic/test.cpp
 timer_health_logic_FLAGS := -std=c++17 -Isource
-notice_logic_SRC   := source/action/notice_logic.cpp tests/notice_logic/test.cpp
+notice_logic_SRC   := source/util/date.cpp source/action/notice_logic.cpp tests/notice_logic/test.cpp
 notice_logic_FLAGS := -std=c++17 -Isource
+notice_logic_CSRC   := $(CALENDAR_C)
+notice_logic_CFLAGS := $(CALENDAR_CFLAGS)
 sys_updates_SRC   := source/util/sys_updates.cpp tests/sys_updates/test.cpp
 sys_updates_FLAGS := -std=c++17 -Isource
 # The network half twice from one test: -D__SWITCH__ for the console's path
@@ -226,12 +228,24 @@ dev_builds_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include
 dev_builds_CSRC   := $(CALENDAR_C)
 dev_builds_CFLAGS := $(CALENDAR_CFLAGS)
 dev_builds_LIBS  := -lz
+# The download and its resume: without PLAYGUARD_SIM_DEV_BUILDS the desktop
+# build takes the console's path, here against a fake http::download and
+# http::redirect in the test (-D__SWITCH__ would reach date.cpp's switch.h).
+dev_builds_net_SRC   := $(filter-out tests/%,$(dev_builds_SRC)) source/util/http_logic.cpp source/util/zip_write.cpp source/sim/sim_net.cpp source/util/dev_builds_net.cpp tests/dev_builds_net/test.cpp
+dev_builds_net_FLAGS := $(dev_builds_FLAGS)
+dev_builds_net_CSRC   := $(CALENDAR_C)
+dev_builds_net_CFLAGS := $(CALENDAR_CFLAGS)
+dev_builds_net_LIBS  := -lz
 play_cache_SRC   := source/util/play_cache.cpp tests/play_cache/test.cpp
 play_cache_FLAGS := -std=c++17 -Isource
 game_cache_SRC   := source/util/game_cache.cpp tests/game_cache/test.cpp
 game_cache_FLAGS := -std=c++17 -Isource
 activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summary/test.cpp
 activity_summary_FLAGS := -std=c++17 -Isource
+# The text helpers that only translate, over ui/tr.hpp's stand-in for
+# borealis' getStr and fmt header-only (the catalogs read by the test).
+format_text_SRC   := source/ui/format_text.cpp tests/format_text/test.cpp
+format_text_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DPLAYGUARD_HOST_I18N
 game_check_text_SRC   := source/action/game_check_text.cpp tests/game_check_text/test.cpp
 game_check_text_FLAGS := -std=c++17 -Isource
 pt_log_SRC   := source/util/paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp

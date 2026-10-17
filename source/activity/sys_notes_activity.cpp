@@ -4,10 +4,8 @@
 #include "action/sys_notes_flow.hpp"
 #include "ui/ui.hpp"
 #include "util/markdown.hpp"
-#include "util/text.hpp"
 #include "view/build_cell.hpp"
 #include "view/markdown_view.hpp"
-#include "view/qr_view.hpp"
 
 using namespace brls::literals;
 using sys_notes::Which;
@@ -40,6 +38,13 @@ void SysNotesActivity::fetched(Which which, bool ok)
     s_failed[(int)which] = !ok;
     if (!s_open || s_open->which != which) return;
     s_open->set_loading(false);
+    s_open->fill();
+}
+
+void SysNotesActivity::loaded()
+{
+    if (!s_open) return;
+    s_open->set_loading(sys_notes_flow::fetching(s_open->which));
     s_open->fill();
 }
 
@@ -173,13 +178,13 @@ void SysNotesActivity::fill()
         // fixes and a change to the parental-control service.
         const NVGcolor accent = brls::Application::getTheme()["brls/sidebar/active_item"];
         if ((int)this->shown[this->tab] == installed_at)
-            tags->addView(tag_view({ "playguard/sys_notes/tag_installed"_i18n, accent }, 16));
+            tags->addView(tag_view({ "playguard/sys_notes/tag_installed"_i18n, accent }, 18));
         else if (!mine.empty())
-            tags->addView(tag_view({ "playguard/sys_notes/tag_new"_i18n, ui::color_warn() }, 16));
+            tags->addView(tag_view({ "playguard/sys_notes/tag_new"_i18n, ui::color_warn() }, 18));
         if (!r.supports.empty())
-            tags->addView(tag_view({ brls::getStr("playguard/sys_notes/tag_supports", r.supports), ui::color_neutral() }, 16));
-        if (r.security) tags->addView(tag_view({ "playguard/sys_notes/tag_security"_i18n, ui::color_warn() }, 16));
-        if (r.pctl) tags->addView(tag_view({ "playguard/sys_notes/tag_pctl"_i18n, ui::color_warn() }, 16));
+            tags->addView(tag_view({ brls::getStr("playguard/sys_notes/tag_supports", r.supports), ui::color_neutral() }, 18));
+        if (r.security) tags->addView(tag_view({ "playguard/sys_notes/tag_security"_i18n, ui::color_warn() }, 18));
+        if (r.pctl) tags->addView(tag_view({ "playguard/sys_notes/tag_pctl"_i18n, ui::color_warn() }, 18));
         ui::set_visible(tags.getView(), !tags->getChildren().empty());
 
         header->setTitle(title_of(this->which) + " " + r.version);
@@ -244,23 +249,5 @@ void SysNotesActivity::next_tab(int step)
 void SysNotesActivity::show_page()
 {
     const std::string url = this->page;
-    if (url.empty()) return;
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::CENTER);
-    box->setPadding(20, 32, 10, 32);
-    brls::Label* body = ui::text_label("playguard/sys_notes/online_body"_i18n, 20, ui::color_text());
-    body->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    body->setAlignSelf(brls::AlignSelf::STRETCH);
-    box->addView(body);
-    auto* qr = new QrView(url, 240);
-    qr->setMarginTop(12);
-    qr->setMarginBottom(10);
-    box->addView(qr);
-    brls::Label* link = ui::text_label(text::short_url(url), 17, ui::color_note());
-    link->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    link->setAlignSelf(brls::AlignSelf::STRETCH);
-    box->addView(link);
-    auto* dialog = new brls::Dialog(box);
-    dialog->addButton("hints/ok"_i18n, []() {});
-    dialog->open();
+    if (!url.empty()) ui::qr_dialog("playguard/sys_notes/online_body"_i18n, url);
 }

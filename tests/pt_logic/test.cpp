@@ -382,7 +382,7 @@ static void test_pickers()
 }
 
 // relock_pending at a start: an unlock left on by an earlier run (a change
-// cut short, or Security › Unlock temporarily and PlayGuard closed from the
+// cut short, or PIN › Unlock temporarily and PlayGuard closed from the
 // HOME menu) is locked again; this run's own unlock is not.
 static void test_pending_relock()
 {

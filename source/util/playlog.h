@@ -8,7 +8,7 @@
 // without that being logged for the game (the HOME menu gets the focus after a
 // crash, the console sleeps or shuts down, another game starts or gets the
 // focus). Durations come from the steady clock, so changing the console clock
-// (Network clock tab) does not stretch them; the user clock only places them
+// (Console › Network clock) does not stretch them; the user clock only places them
 // on the calendar.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once

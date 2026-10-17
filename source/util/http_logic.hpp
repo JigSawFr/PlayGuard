@@ -31,9 +31,21 @@ struct Outcome
     bool        file_error = false;   // the download could not be written
     bool        refused = false;      // a download's answer not written (download_start)
     bool        transfer_ok = true;   // CURLE_OK
+    bool        range_error = false;  // CURLE_RANGE_ERROR: a Range request the server would not honour
     std::string transfer_error;
 };
 bool succeeded(const Outcome& o, std::string* error);
+
+// The error of a resumed download the server will not go on with, the same
+// whatever libcurl's version says ("doesn't seem to support byte ranges" in
+// 7.69.1, the Switch's, "does not seem…" in 8.x): libcurl stops a Range
+// request answered in full (200) before its first byte reaches the file.
+extern const char* const RANGE_REFUSED;
+
+// A resumed download to fetch again from the start: the part kept no longer
+// matches what the server has (416), or the server cannot resume it
+// (RANGE_REFUSED). `error` as succeeded() wrote it.
+bool restart_resume(const std::string& error);
 
 // What a download does with the first bytes of the answer, from its status.
 // `resumed`: the file already holds the start of it, and the rest was asked

@@ -406,7 +406,7 @@ jobs:
         env:
           # The commit the app says it was built from (app::commit()): for a
           # pull request its head, as the artifacts API names the run, not the
-          # merge commit checked out. Developer tools › Install another build
+          # merge commit checked out. Developer › Install another build
           # tells the installed build by it.
           PLAYGUARD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
           # A release (a vX.Y.Z tag, from release-please.yml): the header's
@@ -491,7 +491,7 @@ jobs:
           unzip -l playguard.zip
           unzip -l playguard-rescue.zip
       # One artifact per component, named after the build (playguard-<label>-…):
-      # -nro is what Developer tools › Install another build downloads on the
+      # -nro is what Developer › Install another build downloads on the
       # console (source/util/dev_builds.hpp: the raw .nro and the small text
       # files only, never the zip too); -rescue the recovery sysmodule, as the
       # zip the release attaches (SD-card layout) and the raw .nsp; -sdcard the

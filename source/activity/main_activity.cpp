@@ -40,7 +40,7 @@ static void compact_sidebar(brls::View* tab_frame)
 }
 
 // Quits, but first asks to lock again when parental controls are still
-// temporarily unlocked (Security › Unlock temporarily): leaving them so means
+// temporarily unlocked (PIN › Unlock temporarily): leaving them so means
 // no limit at all until a restart, which is easy to forget on the way out.
 // Locking again waits for the screen to be gone, and closes the game PlayGuard
 // runs over too (pt_flow::lock_at_exit): back to the HOME menu, locked. Until
@@ -53,11 +53,9 @@ static void quit_or_relock()
         return;
     }
     brls::Logger::info("quitting while unlocked: asking to lock again");
+    // Turning them back on first: borealis focuses a dialog's first button, so
+    // a quick A on the way out never leaves the console unlocked.
     auto* dialog = ui::dialog("playguard/hints/exit_unlocked"_i18n);
-    dialog->addButton("playguard/hints/exit_leave"_i18n, []() {
-        pt_flow::keep_unlocked();   // chosen: the next start does not lock again
-        brls::Application::quit();
-    });
     dialog->addButton("playguard/hints/exit_lock"_i18n, []() {
         pt_flow::lock_at_exit();
         // Drawn before quitting: the last frame, the one the console keeps
@@ -66,6 +64,13 @@ static void quit_or_relock()
                                         brls::TransitionAnimation::NONE);
         brls::sync([]() { brls::sync([]() { brls::sync([]() { brls::Application::quit(); }); }); });
     });
+    dialog->addButton("playguard/hints/exit_leave"_i18n, []() {
+        pt_flow::keep_unlocked();   // chosen: the next start does not lock again
+        brls::Application::quit();
+    });
+    // The risky choice in the warning colour, as ui::confirm_danger draws it.
+    if (auto* button = dynamic_cast<brls::Button*>(dialog->getView("brls/dialog/button2")))
+        button->setTextColor(ui::color_bad());
     dialog->open();
 }
 
@@ -136,8 +141,9 @@ void MainActivity::onContentAvailable()
 
     // Firmware newer than the verified one: the firmware screen (or the remembered choice).
     fw_gate::on_main_screen();
-    // Nothing set up yet (no PIN): the first steps, once per start.
-    if (OnboardingActivity::wanted_at_start())
+    // Nothing set up yet (no PIN): the first steps, once per start, unless the
+    // firmware screen opens (one screen per start: ui::claim_start_screen).
+    if (OnboardingActivity::wanted_at_start() && ui::claim_start_screen("first steps"))
         brls::sync([]() { brls::Application::pushActivity(new OnboardingActivity()); });
     // Settings, history or a recovery report found damaged, a build gone back
     // from: in the notification bell.

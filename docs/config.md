@@ -91,7 +91,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 
 ## Updates
 
-Set in *About*.
+`update_via` and `update_daily` are set in *Preferences › Updates*; *About › Check for updates* checks at once.
 
 | Key | Type | Values | Default |
 |---|---|---|---|
@@ -118,13 +118,15 @@ Set in *About*.
 | `summary_seen` | string | `"YYYY-MM-DD"` the weekly summary was last read; it comes back 7 days later; anything else is cleared | `""` |
 | `crash_seen` | string | the newest crash file (`logs/crashes/`) the notification bell told about; at most 64 characters | `""` |
 
-## Developer tools
+## Developer
+
+Set in *Preferences › Help & diagnostics › Developer*, shown once developer mode is on.
 
 | Key | Type | Values | Default |
 |---|---|---|---|
-| `dev_mode` | boolean | the developer tools (seven presses on *About › Version*) | `false` |
-| `pt_log` | boolean | *Developer tools › Record the play timer* (`logs/play_timer/log.csv`) | `false` |
-| `dev_builds_order` | string | how *Developer tools › Install another build* orders the pull requests (A on their tab when it is shown): `"newest"` (the newest build first) or `"number"` (the highest number first); main's commits are always newest first | `"newest"` |
+| `dev_mode` | boolean | the developer tools at the end of *Preferences › Help & diagnostics* (seven presses on *About › Version* turn them on, *Developer mode* there turns them off) | `false` |
+| `pt_log` | boolean | *Record the play timer* (`logs/play_timer/log.csv`) | `false` |
+| `dev_builds_order` | string | how *Install another build* orders the pull requests (A on their tab when it is shown): `"newest"` (the newest build first) or `"number"` (the highest number first); main's commits are always newest first | `"newest"` |
 
 ## State kept between launches
 
@@ -164,7 +166,7 @@ day only. All four keys go together.
 | `extra_date` | string | `"YYYY-MM-DD"` of the change | `""` |
 | `extra_base` | integer | the limit before, in minutes: `0` to `1440`, or `65535` for no limit | `0` |
 | `extra_value` | integer | the limit for that day, `0` to `1440` minutes | `0` |
-| `extra_auto_restore` | boolean | after *No more play today*, put the limit back the next day as any change instead of asking (the temporary unlock and the PIN are still asked when needed; "no limit" is always asked); extra time comes back by itself whatever this says; set in Play timer | `false` |
+| `extra_auto_restore` | boolean | after *No more play today*, put the limit back the next day as any change instead of asking (the temporary unlock and the PIN are still asked when needed; "no limit" is always asked); extra time comes back without asking whatever this says (either the next time PlayGuard is opened, from the next day on); set in Play timer | `false` |
 
 ### Firmware not supported yet
 
@@ -181,7 +183,7 @@ version. The three keys go together.
 
 | Key | Type | Values | Default |
 |---|---|---|---|
-| `relock_pending` | boolean | set right before PlayGuard unlocks parental controls (for a change, or *Security › Unlock temporarily*), cleared once they are locked again (or *Quit, still unlocked* is chosen on quitting). Still `true` at start-up: the app stopped in between (or was closed from the HOME menu), so it locks again then | `false` |
+| `relock_pending` | boolean | set right before PlayGuard unlocks parental controls (for a change, or *PIN › Unlock temporarily*), cleared once they are locked again (or *Quit, still unlocked* is chosen on quitting). Still `true` at start-up: the app stopped in between (or was closed from the HOME menu), so it locks again then | `false` |
 
 ## Example
 

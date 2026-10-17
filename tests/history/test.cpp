@@ -143,6 +143,8 @@ static void test_trim_and_damage()
     CHECK(all.size() == history::MAX_ENTRIES && history::MAX_ENTRIES == 500);
     CHECK(all.front().after[0] == 510);                // the newest kept
     CHECK(all.back().after[0] == 510 - 499);           // the oldest kept
+    size_t full = 0;
+    CHECK(history::check(&full) == history::Damage::None && full == history::MAX_ENTRIES);
 
     // A damaged entry is skipped, a damaged file is an empty history.
     CHECK(paths::atomic_write(paths::history_file(),
@@ -150,6 +152,10 @@ static void test_trim_and_damage()
                         {"kind": "limits", "before": "no"}]})"));
     all = history::load();
     CHECK(all.size() == 1 && all[0].kind == "level");
+    // check() counts what load() gives, damaged entries left out, from its
+    // own reading (the History tab's count at start-up).
+    size_t counted = 99;
+    CHECK(history::check(&counted) == history::Damage::None && counted == 1);
     CHECK(paths::atomic_write(paths::history_file(), "not json"));
     CHECK(history::load().empty());
     // The next change does not overwrite it: it is kept as history.json.bad.
@@ -171,7 +177,8 @@ static void test_trim_and_damage()
     // check() at start-up: puts it aside now (a third drops the oldest), and
     // the history starts again; missing is not damaged.
     CHECK(paths::atomic_write(paths::history_file(), "third"));
-    CHECK(history::check() == history::Damage::PutAside && history::load().empty());
+    counted = 99;
+    CHECK(history::check(&counted) == history::Damage::PutAside && counted == 0 && history::load().empty());
     CHECK(paths::read_file(paths::history_file() + ".bad", kept) && kept == "third");
     CHECK(paths::read_file(paths::history_file() + ".bad.1", kept) && kept == "{\"entries\": 3}");
     CHECK(history::check() == history::Damage::None);
@@ -181,7 +188,8 @@ static void test_trim_and_damage()
     CHECK(std::remove(older.c_str()) == 0 && mkdir(older.c_str(), 0700) == 0);
     CHECK(paths::atomic_write(older + "/x", "keeps the folder non-empty"));
     CHECK(paths::atomic_write(paths::history_file(), "fourth"));
-    CHECK(history::check() == history::Damage::Stuck);
+    counted = 99;
+    CHECK(history::check(&counted) == history::Damage::Stuck && counted == 0 && history::load().empty());
     std::string error;
     CHECK(!history::append(limits(1, 2), &error) && !error.empty());
     CHECK(paths::read_file(paths::history_file(), kept) && kept == "fourth");

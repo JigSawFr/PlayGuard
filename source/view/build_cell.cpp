@@ -125,7 +125,7 @@ BuildCell::BuildCell()
     right->addView(this->age);
     this->commit = new brls::Label();
     this->commit->setSingleLine(true);
-    this->commit->setFontSize(15);
+    this->commit->setFontSize(18);
     this->commit->setTextColor(ui::color_note());
     this->commit->setHorizontalAlign(brls::HorizontalAlign::RIGHT);
     this->commit->setMarginTop(4);

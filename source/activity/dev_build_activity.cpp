@@ -9,10 +9,8 @@
 #include "ui/ui.hpp"
 #include "util/changelog.hpp"
 #include "util/markdown.hpp"
-#include "util/text.hpp"
 #include "view/build_cell.hpp"
 #include "view/markdown_view.hpp"
-#include "view/qr_view.hpp"
 #include "view/release_notes.hpp"
 
 using namespace brls::literals;
@@ -73,25 +71,7 @@ std::string DevBuildActivity::page() const
 void DevBuildActivity::show_page()
 {
     const std::string url = this->page();
-    if (url.empty()) return;
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::CENTER);
-    box->setPadding(20, 32, 10, 32);
-    brls::Label* body = ui::text_label("playguard/dev_build/open_github_body"_i18n, 20, ui::color_text());
-    body->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    body->setAlignSelf(brls::AlignSelf::STRETCH);
-    box->addView(body);
-    auto* qr = new QrView(url, 240);
-    qr->setMarginTop(12);
-    qr->setMarginBottom(10);
-    box->addView(qr);
-    brls::Label* link = ui::text_label(text::short_url(url), 17, ui::color_note());
-    link->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    link->setAlignSelf(brls::AlignSelf::STRETCH);
-    box->addView(link);
-    auto* dialog = new brls::Dialog(box);
-    dialog->addButton("hints/ok"_i18n, []() {});
-    dialog->open();
+    if (!url.empty()) ui::qr_dialog("playguard/dev_build/open_github_body"_i18n, url);
 }
 
 void DevBuildActivity::onContentAvailable()
@@ -105,12 +85,12 @@ void DevBuildActivity::onContentAvailable()
     // checks, pre-release, installed or new).
     const NVGcolor kind_color = ui::color_accent();
     switch (b.kind) {
-        case dev_builds::Kind::Release: tags->addView(tag_view({ "playguard/dev_build/kind_release"_i18n, kind_color }, 16)); break;
-        case dev_builds::Kind::Main: tags->addView(tag_view({ "main", kind_color }, 16)); break;
+        case dev_builds::Kind::Release: tags->addView(tag_view({ "playguard/dev_build/kind_release"_i18n, kind_color }, 18)); break;
+        case dev_builds::Kind::Main: tags->addView(tag_view({ "main", kind_color }, 18)); break;
         case dev_builds::Kind::PullRequest: break;   // its number leads the tags already
-        case dev_builds::Kind::Commit: tags->addView(tag_view({ "playguard/dev_build/kind_commit"_i18n, kind_color }, 16)); break;
+        case dev_builds::Kind::Commit: tags->addView(tag_view({ "playguard/dev_build/kind_commit"_i18n, kind_color }, 18)); break;
     }
-    for (const BuildTag& t : build_tags(b, this->newer)) tags->addView(tag_view(t, 16));
+    for (const BuildTag& t : build_tags(b, this->newer)) tags->addView(tag_view(t, 18));
     headline->setText(build_title(b));
 
     // The facts.
@@ -147,6 +127,11 @@ void DevBuildActivity::onContentAvailable()
         return true;
     });
     ui::set_visible(github.getView(), !this->page().empty());
+    // No checksum: it cannot be installed (the facts say why), so Install is
+    // not offered, and See on GitHub takes the focus. Kept when there is no
+    // page either, to hold the focus: it says why then.
+    const bool offered = !b.sha256.empty() || this->page().empty();
+    ui::set_visible(install.getView(), offered);
 
     // The notes: a release's in release-please's form (its sections, their
     // icons) when they are, else any notes and a pull request's description
@@ -159,5 +144,5 @@ void DevBuildActivity::onContentAvailable()
     ui::set_visible(notes_header.getView(), !lines.empty() || !blocks.empty());
     if (!lines.empty()) release_notes::fill(notes, lines);
     else markdown_view::fill(notes, blocks);
-    brls::Application::giveFocus(install.getView());
+    brls::Application::giveFocus(offered ? install.getView() : github.getView());
 }

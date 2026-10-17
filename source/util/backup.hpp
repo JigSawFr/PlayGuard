@@ -1,6 +1,6 @@
 // backup — snapshots of the parental-control settings saved on the SD card
 // (sd:/config/playguard/backups/<YYYYMMDD_HHMMSS>.json) and restored from the
-// Tools tab: restriction level, custom settings, VR mode and the per-day
+// History tab: restriction level, custom settings, VR mode and the per-day
 // play-time limits. The PIN is never saved. Plain C++ (no libnx, no UI) so the
 // host tests can run it; reading and writing the console is backup_flow's job.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).

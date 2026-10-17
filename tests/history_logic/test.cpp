@@ -1,6 +1,8 @@
 // Host tests for source/action/history_logic.cpp: what an undoable entry's
 // dialog offers given the console's value now, what the undo records, the
-// days a limits change touched and the relative day of an entry.
+// days a limits change touched, the relative day of an entry, and the kinds
+// and sources the History screen names (tools/check_resources.py checks each
+// has its name in the catalog).
 #include "check.h"
 #include <cstdio>
 #include <vector>
@@ -134,6 +136,26 @@ static void test_days()
     CHECK(history_logic::weekday_of("") == -1 && history_logic::weekday_of("abcd-ef-gh") == -1);
 }
 
+static void test_known()
+{
+    for (const char* k : { "limits", "level", "pin", "unlock", "relock", "console_lock", "bedtime", "time_up",
+                           "countdown", "remove_game", "launch_version", "outside_limits", "new_account" })
+        CHECK(history_logic::known_kind(k));
+    // Written by a newer version, or nothing: unknown.
+    CHECK(!history_logic::known_kind("") && !history_logic::known_kind("teleport") && !history_logic::known_kind("Limits"));
+    CHECK(history_logic::known_kinds().size() == 28);
+    for (const std::string& k : history_logic::known_kinds()) CHECK(history_logic::known_kind(k));
+
+    for (const char* s : { "uniform", "per_day", "extra", "stop", "undo", "backup", "overview", "console_lock" })
+        CHECK(history_logic::known_source(s));
+    // No longer written, still in older histories: still named.
+    CHECK(history_logic::known_source("day"));
+    // "profile" is named apart (with the profile's name), others not at all.
+    CHECK(!history_logic::known_source("profile") && !history_logic::known_source("") &&
+          !history_logic::known_source("telepathy"));
+    for (const std::string& s : history_logic::known_sources()) CHECK(history_logic::known_source(s));
+}
+
 int main()
 {
     test_action();
@@ -143,5 +165,6 @@ int main()
     test_day_of();
     test_categories();
     test_days();
-    return CHECK_DONE("history_logic undo offer, changed-since, recorded-value, changed-day and day assertions passed");
+    test_known();
+    return CHECK_DONE("history_logic undo offer, changed-since, recorded-value, changed-day, day and known kind and source assertions passed");
 }

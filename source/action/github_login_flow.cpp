@@ -50,7 +50,7 @@ void show_code(const github_auth::DeviceCode& code, std::function<void()> done)
     auto* qr = new QrView(code.verification_uri, 200);
     qr->setMarginTop(8);
     box->addView(qr);
-    box->addView(centered("playguard/github/code_note"_i18n, 17, ui::color_note()));
+    box->addView(centered("playguard/github/code_note"_i18n, 18, ui::color_note()));
     auto* dialog = new brls::Dialog(box);
     dialog->addButton("hints/cancel"_i18n, [cancelled]() { *cancelled = true; });
     ui::on_cancel(dialog, [cancelled]() { *cancelled = true; });

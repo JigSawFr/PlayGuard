@@ -38,12 +38,17 @@ enum class Offer
 {
     None,
     Crashed,   // the last start of the build installed did not reach its first screen
-    Asked,     // L + R held while PlayGuard started
+    Asked,     // L + R held while PlayGuard started, no PIN set
+    Refused,   // L + R held, but a PIN is set (or unknown): only said where to go back, after the PIN
 };
 // `checked`: boot_check.json was there, `starts_before` read from it (before
 // this start counts); `held`: L + R; `have_previous`: <nro>.previous is
-// there. Nothing is offered without a previous build.
-Offer offer_at_start(bool checked, int starts_before, bool held, bool have_previous);
+// there; `pin_set`: the console has a PIN, or it could not be read. Nothing
+// is offered without a previous build. Only a start that did not finish
+// goes back without the PIN: the PIN screen itself may be what crashes, and
+// the build was just installed by whoever knows the PIN. L + R can be held
+// by anyone, so with a PIN it goes back from the app, where it is asked.
+Offer offer_at_start(bool checked, int starts_before, bool held, bool have_previous, bool pin_set);
 
 // Swaps <nro> and <nro>.previous (the build running becomes the previous
 // one), through paths::replace_file. When a step fails, what was moved is

@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>
 
+#include "ui/format_text.hpp"
 #include "util/patches.hpp"
 #include "util/pctl_ops_c.hpp"
 
@@ -60,6 +61,13 @@ void in_background(const char* what, std::function<void()> task);
 // for later run at once. False when some are still running.
 bool finish_background(std::chrono::milliseconds max);
 bool quitting();
+
+// One screen of its own at start-up, the first to ask: the firmware screen,
+// then First steps (both as the main screen opens), the update screen (once
+// the check answers), "What's new" or the support reminder (a few seconds
+// in). True for that one; the others wait for the next start, as when
+// something else is in front of the main screen. `what` names it in the log.
+bool claim_start_screen(const char* what);
 
 // An SD-card write off the UI thread (a slow card must not hold a frame), on
 // one queue run by a task of in_background: the writes happen one at a time,
@@ -116,11 +124,14 @@ void confirm_with(const std::string& body, brls::View* extra, const std::string&
 // "bad" colour so it never looks like an ordinary OK.
 void confirm_danger(const std::string& body, const std::string& confirm_label, std::function<void()> on_yes);
 void info(const std::string& body);
+// A web page to open on a phone: `body`, the QR code of `url`, then `url`
+// itself, shortened (text::short_url), and OK.
+void qr_dialog(const std::string& body, const std::string& url);
 
 // Reads the stored PIN (pctl_get_pin) and shows it in large digits, or a
 // dialog with the error. The app's copies are wiped as soon as the label
 // holds the text. True when it was shown; `on_close` then runs once it is
-// closed (OK or B). Used by Security › Show the PIN.
+// closed (OK or B). Used by PIN › Show the PIN.
 bool show_pin_dialog(std::function<void()> on_close = nullptr);
 
 // A dialog showing `text`. borealis' own text dialog does not scroll: a text
@@ -141,21 +152,7 @@ void prompt_minutes(const std::string& header, uint16_t current, std::function<v
 void prompt_text(const std::string& header, const std::string& initial, int max_len,
                  std::function<void(std::string)> on_value);
 
-std::string fmt_minutes(uint16_t minutes);      // a limit: "No limit", "0 min (no play)", "45 min", "2 h 30"
-// Seven limits in a few words: "2 h every day", "1 h to 3 h", "1 h to no limit", "No limit".
-std::string days_summary(const uint16_t days[7]);
-std::string fmt_played(uint16_t minutes);       // time played: "0 min", "45 min", "2 h 30"
-std::string fmt_duration_ns(uint64_t ns);       // remaining time, rounded to minutes
-std::string fmt_play_time(uint64_t seconds);    // "0 min", "< 1 min", "45 min", "152 h 30" (no 24 h cap)
-std::string day_name(int day);                  // 0 = Sunday, as a title ("Monday")
-std::string day_name_in_text(int day);          // inside a sentence (fr: "lundi")
-std::string bool_text(bool ok, bool value, const std::string& yes, const std::string& no);
-std::string yes_no(bool value);                // "Yes" / "No"
-std::string age_text(int age);                 // a restriction age: "None" for 0, else "12+"
-// The value of a line that opens a screen of its own (or another tab), with
-// a chevron after it: "12 changes  ›", or "›" alone. A line that asks first,
-// in a dialog, ends its title with "…" instead; one that acts at once, neither.
-std::string opens(const std::string& value = "");
+// Limits, play time, day, level and age names as text: ui/format_text.hpp.
 // "Now" on the console: its user clock read live and its time-zone rule
 // (calendar.h says why not time()/localtime()).
 LocalTime   local_now();
@@ -182,9 +179,8 @@ private:
 // System / compatibility strings shared by the dashboard and the About section.
 std::string fw_text(const SysInfo& info);                 // "23.0.1 · Atmosphère 1.12.0"
 std::string compat_text(const SysInfo& info, NVGcolor* color = nullptr);
-std::string level_name(uint32_t level);                    // localised restriction level
 
-// Console section (Tools) and Overview warnings.
+// The Console tab's and the Overview's warnings.
 std::string storage_text(const SysInfo& info);             // "emuMMC (Atmosphère)"
 std::string storage_short(const SysInfo& info);            // "emuMMC" / "sysMMC" / "—"
 // The other system (sysMMC from emuMMC, or an emuMMC set up on the card from
@@ -198,7 +194,7 @@ std::string blank_text(const SysInfo& info, NVGcolor* color = nullptr);
 std::string serial_text(const SysInfo& info, bool reveal);
 bool        patches_warning(const patches::Report& report);
 // The game-patch report of this boot, read from the SD card once per run (it
-// only changes with a reboot): the Overview and Tools no longer rescan it
+// only changes with a reboot): the Overview and the Console tab no longer rescan it
 // each time they are opened.
 const patches::Report& patch_report();
 std::string patches_text(const patches::Report& report, NVGcolor* color = nullptr);

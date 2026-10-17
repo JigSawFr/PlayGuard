@@ -10,15 +10,11 @@
 #include <cstdint>
 #include <functional>
 #include <string>
-#include <vector>
 
 #include "util/pctl_ops_c.hpp"
 
 namespace pt_flow
 {
-
-// Limits offered by the pickers, in minutes (0 = no play that day).
-const std::vector<uint16_t>& quick_values();
 
 // `body`, then, while the console is linked to the phone app, the note that
 // its next synchronisation overwrites what is written here: every write
@@ -90,6 +86,9 @@ void retry_extra_time_restore();
 // the line the Overview shows for it ("Put Saturday's limit back to 2 h").
 bool restore_pending(const PtState& pt);
 std::string restore_label();
+// Putting that limit back lowers it (pt_logic::restore_tightens): extra time
+// still raises it. False for "No more play today", which lowered it.
+bool restore_lowers();
 
 // "+30 min" when extra time was added today and is still there, else "".
 std::string extra_today_text(const PtState& pt);
@@ -135,20 +134,20 @@ Result write_bedtime(const PtBedtime bed[7], const std::string& source);
 std::string bedtime_text(const PtState& pt);
 
 // At start-up, before the first screen (and again on the main screen): an
-// earlier run unlocked (for a change, or Security › Unlock temporarily) and
+// earlier run unlocked (for a change, or PIN › Unlock temporarily) and
 // stopped before locking again (config relock_pending) -> lock again now,
 // with a toast. The record stays until the console reads back as locked.
 // Also called when the app leaves read-only mode, which keeps the record;
 // this run's own unlock is left alone (pt_logic::pending_relock).
 void relock_if_interrupted();
 
-// Security › Unlock temporarily: unlocks, recorded as above, so that closing
+// PIN › Unlock temporarily: unlocks, recorded as above, so that closing
 // PlayGuard from the HOME menu (which asks nothing) locks again at the next
 // start.
 Result unlock_temporarily();
 // Quitting while unlocked, "Quit, still unlocked": a choice, so the record goes.
 void keep_unlocked();
-// Quitting while unlocked, "Lock and quit": the lock waits for the end of
+// Quitting while unlocked, "Turn back on and quit": the lock waits for the end of
 // main(), once the screen is gone (lock_at_exit_if_asked). Locked while the
 // app still ran, the console would at once stop the game PlayGuard runs over
 // (the play timer's "limit reached", the PIN) with PlayGuard behind it, and

@@ -1,7 +1,9 @@
 // history_logic — the decisions behind history_flow's undo, without any UI:
 // what an undoable entry's dialog offers given the console's value now, and
 // what the undo records. Whether an entry can be undone at all is
-// history::undoable (tests/history). Host-tested (tests/history_logic).
+// history::undoable (tests/history). Also the History screen's categories
+// and filters, and the kinds and sources it names. Host-tested
+// (tests/history_logic).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -72,5 +74,16 @@ int weekday_of(const std::string& date);
 // relative to `today` and `yesterday` ("2026-10-08").
 enum class Day { Today, Yesterday, Other };
 Day day_of(const std::string& when, const std::string& today, const std::string& yesterday);
+
+// The kinds of change this version records, each named under
+// playguard/history/kinds/ (tools/check_resources.py checks the catalog
+// against the list): one not in it was written by a newer version.
+const std::vector<std::string>& known_kinds();
+bool known_kind(const std::string& kind);
+// What made a change, each named under playguard/history/sources/ ("day" is
+// no longer written, but older histories hold it). "profile" is said apart,
+// with the profile's name; any other source is not said.
+const std::vector<std::string>& known_sources();
+bool known_source(const std::string& source);
 
 }   // namespace history_logic

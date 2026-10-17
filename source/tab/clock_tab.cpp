@@ -260,11 +260,6 @@ void ClockTab::copy()
     });
 }
 
-brls::View* ClockTab::create()
-{
-    return new ClockTab();
-}
-
 void ClockTab::open_screen()
 {
     ui::open_screen(new ClockTab(), "playguard/tabs/clock"_i18n);

@@ -78,7 +78,7 @@ std::string cache_file()
 
 bool load(game_cache::Cache* out)
 {
-    ui::settle_writes();   // a save still queued (most often none)
+    ui::settle_writes("games");   // a save of it still queued (most often none)
     return read(out);
 }
 
