@@ -382,6 +382,8 @@
         "section_totals": "遊玩時間",
         "account": "帳號",
         "account_all": "所有帳號",
+        "account_default": "預設帳號",
+        "account_last": "上次顯示的帳號",
         "today": "今天",
         "week": "過去7天",
         "all_time": "全部期間",

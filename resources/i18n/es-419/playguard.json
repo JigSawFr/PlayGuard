@@ -382,6 +382,8 @@
         "section_totals": "Tiempo de juego",
         "account": "Cuenta",
         "account_all": "Todas las cuentas",
+        "account_default": "Cuenta predeterminada",
+        "account_last": "La última mostrada",
         "today": "Hoy",
         "week": "Últimos 7 días",
         "all_time": "Total",

@@ -382,6 +382,8 @@
         "section_totals": "プレイ時間",
         "account": "ユーザー",
         "account_all": "すべてのユーザー",
+        "account_default": "既定のアカウント",
+        "account_last": "最後に表示したアカウント",
         "today": "今日",
         "week": "過去7日間",
         "all_time": "これまでの合計",
