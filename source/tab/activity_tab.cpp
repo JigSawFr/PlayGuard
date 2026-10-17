@@ -61,6 +61,7 @@ struct
 {
     ActivityTab* shown = nullptr;       // the tab on screen, if any
     int account = -1;                   // index in play_data::accounts(), -1 every account
+    bool account_set = false;           // `account` taken from the config, once per run
     // "Show every game" chosen: kept when the sidebar leaves the tab and
     // comes back, until another period or account.
     bool show_all = false;
@@ -108,6 +109,24 @@ std::string account_label(const PlayAccount* a)
     return a->nickname[0] ? std::string(a->nickname) : "?";
 }
 
+// Each account's play_data key, in play_data::accounts() order.
+std::vector<std::string> account_keys()
+{
+    std::vector<std::string> keys;
+    for (const auto& a : play_data::accounts()) keys.push_back(play_data::key_of(&a));
+    return keys;
+}
+
+// What Activity starts on (config's activity_account): the last one shown,
+// every account or one.
+std::string default_label(const std::string& setting)
+{
+    if (setting == "last") return "playguard/activity/account_last"_i18n;
+    const auto& list = play_data::accounts();
+    const int i = activity_summary::start_account(setting, "", account_keys());
+    return account_label(i >= 0 ? &list[i] : nullptr);
+}
+
 std::shared_ptr<const PlayStats> shown_stats()
 {
     return play_data::latest(play_data::key_of(chosen_account()));
@@ -148,8 +167,30 @@ ActivityTab::ActivityTab()
         ui::pick("playguard/activity/account"_i18n, labels, s_cache.account + 1, [this](int index) {
             s_cache.account = index - 1;
             s_cache.show_all = false;
+            // The next run starts there, when Activity starts on the last one shown.
+            auto& cfg = config::get();
+            const std::string key = play_data::key_of(chosen_account());
+            if (cfg.activity_account_last != key) {
+                cfg.activity_account_last = key;
+                ui::save_config();
+            }
             this->rebuild();
             if (!play_data::fresh(play_data::key_of(chosen_account()), MAX_AGE)) this->fetch(false);
+        });
+        return true;
+    });
+    account_default->registerClickAction([this](brls::View*) {
+        // The last one shown, every account, then each account.
+        const auto& list = play_data::accounts();
+        const std::vector<std::string> keys = account_keys();
+        std::vector<std::string> labels = { "playguard/activity/account_last"_i18n, account_label(nullptr) };
+        for (const auto& a : list) labels.push_back(account_label(&a));
+        const std::string& setting = config::get().activity_account;
+        const int selected = setting == "last" ? 0 : activity_summary::start_account(setting, "", keys) + 2;
+        ui::pick("playguard/activity/account_default"_i18n, labels, selected, [this, keys](int index) {
+            config::get().activity_account = index == 0 ? "last" : index == 1 ? "" : keys[index - 2];
+            ui::save_config();
+            this->account_default->setDetailText(default_label(config::get().activity_account));
         });
         return true;
     });
@@ -178,8 +219,17 @@ ActivityTab::ActivityTab()
         }
         this->rebuild();
     });
+    // The account it starts on, once per run (the sidebar keeps the one chosen).
+    if (!s_cache.account_set) {
+        s_cache.account_set = true;
+        const auto& cfg = config::get();
+        s_cache.account = activity_summary::start_account(cfg.activity_account, cfg.activity_account_last, account_keys());
+    }
     // No account to choose between on a console with one (or none listed).
-    ui::set_visible(account.getView(), play_data::accounts().size() > 1);
+    const bool several = play_data::accounts().size() > 1;
+    ui::set_visible(account.getView(), several);
+    ui::set_visible(account_default.getView(), several);
+    account_default->setDetailText(default_label(config::get().activity_account));
     // An account not seen before (a fresh play record is a known trick).
     new_account->setSingleLine(false);
     const std::string fresh = text::join(outside_watch::new_account_lines(), "\n");

@@ -1481,7 +1481,7 @@ pdfs_before = pdfs()   # the run folder is kept between local runs
 key("Left")                # back to the sidebar
 key("Up", steps("activity", "console"))
 key("Right")               # Account (the simulated console has two; the totals are not focusable)
-key("Down", 5)             # a scroll, then past Period, the game to rediscover and Export: the first game
+key("Down", 6)             # a scroll, then past Account by default, Period, the game to rediscover and Export: the first game
 key("Return")
 shot("28_activity_game")   # its own screen: icon, seven days, figures, accounts
 key("Down", 8)             # scrolled to the accounts: Alice, Léo, and the time on no account

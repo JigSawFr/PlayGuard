@@ -382,6 +382,8 @@
         "section_totals": "플레이 시간",
         "account": "사용자",
         "account_all": "모든 사용자",
+        "account_default": "기본 계정",
+        "account_last": "마지막으로 표시한 계정",
         "today": "오늘",
         "week": "최근 7일",
         "all_time": "전체 기간",
