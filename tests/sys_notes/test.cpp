@@ -232,27 +232,33 @@ static void test_tabs()
                              { "22.0.0", "" }, { "21.2.0", "" }, { "21.0.0", "" } });
     size_t hidden = 0;
     int at = 0;
-    // The installed one, then the newer ones from the closest.
-    std::vector<size_t> t = tabs(l, "22.5.0", &hidden, &at);
-    CHECK(t.size() == 3 && t[0] == 2 && t[1] == 1 && t[2] == 0 && hidden == 0 && at == 2);
-    // Six newer: the newest five, one hidden.
-    t = tabs(l, "21.2.0", &hidden, &at);
-    CHECK(t.size() == 6 && t[0] == 6 && t[1] == 4 && t[5] == 0 && hidden == 1);
-    // Up to date: the installed one alone.
-    t = tabs(l, "23.0.1", &hidden, &at);
-    CHECK(t.size() == 1 && t[0] == 0 && hidden == 0);
-    // Not listed (older than the list, or a version in between): the newer ones only.
+    size_t from = 0;
+    // The older ones in the tabs left, the installed one, then the newer ones
+    // from the closest.
+    std::vector<size_t> t = tabs(l, "22.5.0", &hidden, &at, &from);
+    CHECK(t.size() == 6 && t[0] == 5 && t[2] == 3 && t[3] == 2 && t[4] == 1 && t[5] == 0 && hidden == 0 && at == 2 &&
+          from == 4);
+    // Six newer: the newest five, one hidden, no room for older ones.
+    t = tabs(l, "21.2.0", &hidden, &at, &from);
+    CHECK(t.size() == 6 && t[0] == 6 && t[1] == 4 && t[5] == 0 && hidden == 1 && from == 1);
+    // Up to date: the five closest older ones, then the installed one.
+    t = tabs(l, "23.0.1", &hidden, &at, &from);
+    CHECK(t.size() == 6 && t[0] == 5 && t[4] == 1 && t[5] == 0 && hidden == 0 && at == 0 && from == 6);
+    // The oldest listed: no older ones.
+    t = tabs(l, "21.0.0", &hidden, &at, &from);
+    CHECK(t.size() == 6 && t[0] == 7 && from == 1 && hidden == 2);
+    // Not listed (older than the list, or a version in between): no installed tab.
     t = tabs(l, "20.0.0", &hidden, &at);
     CHECK(at == -1 && t.size() == 5 && hidden == 3 && t[4] == 0);
-    t = tabs(l, "22.0.2", &hidden, &at);
-    CHECK(at == -1 && t.size() == 4 && t[0] == 3);
+    t = tabs(l, "22.0.2", &hidden, &at, &from);
+    CHECK(at == -1 && t.size() == 6 && t[1] == 4 && t[2] == 3 && t[5] == 0 && from == 2);
     // Unknown: every listed one is "newer".
     t = tabs(l, "", &hidden, &at);
     CHECK(at == -1 && t.size() == 5);
     // Two-number versions (hekate's tags may have them).
     const List h = list_of({ { "6.5.4", "" }, { "6.5", "" } });
-    t = tabs(h, "6.5.0", &hidden, &at);
-    CHECK(at == 1 && t.size() == 2);
+    t = tabs(h, "6.5.0", &hidden, &at, &from);
+    CHECK(at == 1 && t.size() == 2 && t[0] == 1 && from == 1);
     CHECK(newer_count(l, "22.0.0") == 5);
     CHECK(newer_count(l, "23.0.1") == 0);
     CHECK(newer_count(l, "") == 0);

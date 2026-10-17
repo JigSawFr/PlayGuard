@@ -383,19 +383,25 @@ bool parse_firmware_page(const std::string& wikitext, Release* out)
     return true;
 }
 
-std::vector<size_t> tabs(const List& list, const std::string& installed, size_t* hidden, int* installed_at)
+std::vector<size_t> tabs(const List& list, const std::string& installed, size_t* hidden, int* installed_at,
+                         size_t* newer_from)
 {
-    std::vector<size_t> newer;   // newest first, as listed
+    std::vector<size_t> newer, older;   // newest first, as listed
     *installed_at = -1;
     for (size_t i = 0; i < list.releases.size(); i++) {
         const int c = installed.empty() ? 1 : compare(list.releases[i].version, installed);
         if (c > 0) newer.push_back(i);
         else if (c == 0 && *installed_at < 0) *installed_at = (int)i;
+        else if (c < 0) older.push_back(i);
     }
     *hidden = newer.size() > MAX_NEWER ? newer.size() - MAX_NEWER : 0;
     if (newer.size() > MAX_NEWER) newer.resize(MAX_NEWER);
-    std::vector<size_t> out;
+    // The tabs left take the older ones, from the closest.
+    const size_t room = 1 + MAX_NEWER - newer.size() - (*installed_at >= 0 ? 1 : 0);
+    if (older.size() > room) older.resize(room);
+    std::vector<size_t> out(older.rbegin(), older.rend());
     if (*installed_at >= 0) out.push_back((size_t)*installed_at);
+    if (newer_from) *newer_from = out.size();
     out.insert(out.end(), newer.rbegin(), newer.rend());
     return out;
 }

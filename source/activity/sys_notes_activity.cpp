@@ -136,9 +136,11 @@ void SysNotesActivity::fill()
     const std::string mine = sys_notes_flow::installed(this->which);
     size_t hidden = 0;
     int installed_at = -1;
-    this->shown = sys_notes::tabs(list, mine, &hidden, &installed_at);
-    // Opens on the closest newer version (the one after the installed one).
-    if (!this->tab_chosen) this->tab = this->shown.size() > 1 && installed_at >= 0 ? 1 : 0;
+    size_t newer_from = 0;
+    this->shown = sys_notes::tabs(list, mine, &hidden, &installed_at, &newer_from);
+    // Opens on the closest newer version, else the newest one shown.
+    if (!this->tab_chosen)
+        this->tab = newer_from < this->shown.size() ? newer_from : this->shown.empty() ? 0 : this->shown.size() - 1;
     if (this->tab >= this->shown.size()) this->tab = this->shown.empty() ? 0 : this->shown.size() - 1;
 
     // The tabs: the installed one says so; one alone is no choice.
@@ -180,7 +182,7 @@ void SysNotesActivity::fill()
         const NVGcolor accent = brls::Application::getTheme()["brls/sidebar/active_item"];
         if ((int)this->shown[this->tab] == installed_at)
             tags->addView(tag_view({ "playguard/sys_notes/tag_installed"_i18n, accent }, 18));
-        else if (!mine.empty())
+        else if (!mine.empty() && this->tab >= newer_from)
             tags->addView(tag_view({ "playguard/sys_notes/tag_new"_i18n, ui::color_warn() }, 18));
         if (!r.supports.empty())
             tags->addView(tag_view({ brls::getStr("playguard/sys_notes/tag_supports", r.supports), ui::color_neutral() }, 18));
