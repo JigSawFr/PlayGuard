@@ -282,81 +282,50 @@ void start(LoadingActivity* loading)
         brls::sync([loading, first]() { after_intro(loading, first); });
     });
 }
-}   // namespace
 
-int main(int argc, char* argv[])
+// The system this is (sysMMC or emuMMC): its own folder, nand/<key>,
+// before config::load() reads its state.json. What the versions before it
+// kept for every system goes to the first one started. Then the system in
+// the log and in a crash file.
+void select_nand_and_log_system()
 {
-    startup_mark(StartupStep_Main);
-    keep_log_lines();
-    std::set_terminate(on_terminate);
-    app::set_self_path(argc > 0 ? argv[0] : nullptr);
+    SysInfo si;
+    sysinfo_get(&si);
+    const SysStorage storage = sysinfo_storage(&si);
+    paths::set_nand(nand::key(storage == SysStorage_SysMMC   ? nand::Storage::SysMMC
+                              : storage == SysStorage_EmuMMC ? nand::Storage::EmuMMC
+                                                             : nand::Storage::Unknown));
+    nand_migration();
+    const std::string system = system_line(si);
+    brls::Logger::info("start-up: {}, {}", build_name(), system);
+    crash_report::prepare(paths::crashes_dir(), build_name(), system, session_log::current_name());
+}
 
-    start_up_migrations();
-    start_session();
-    // A way out of main() that skips the end of this function.
-    std::atexit([]() { session_log::end("exit"); });
-    // Before anything that could crash: the last start of a build just
-    // installed never reached its first screen, or L + R are held (and no
-    // PIN is set)? Then the previous build is offered (action/rollback_flow.hpp).
-    if (rollback_flow::at_start()) {
-        session_log::end("exit at start-up (the start-up screen of the previous build)");
-        return EXIT_SUCCESS;
-    }
-    // The system this is (sysMMC or emuMMC): its own folder, nand/<key>,
-    // before config::load() reads its state.json. What the versions before
-    // it kept for every system goes to the first one started.
-    {
-        SysInfo si;
-        sysinfo_get(&si);
-        const SysStorage storage = sysinfo_storage(&si);
-        paths::set_nand(nand::key(storage == SysStorage_SysMMC   ? nand::Storage::SysMMC
-                                  : storage == SysStorage_EmuMMC ? nand::Storage::EmuMMC
-                                                                 : nand::Storage::Unknown));
-        nand_migration();
-        const std::string system = system_line(si);
-        brls::Logger::info("start-up: {}, {}", build_name(), system);
-        crash_report::prepare(paths::crashes_dir(), build_name(), system, session_log::current_name());
-    }
-
-    // Preferences first: the locale must be chosen before borealis loads i18n.
-    config::load();
-    startup_mark(StartupStep_Preferences);
-    const auto& cfg = config::get();
+// The language of the preferences, before borealis loads i18n.
+void apply_locale()
+{
     // config::sanitize() keeps the language to config::LANGUAGES.
+    const auto& cfg = config::get();
     if (cfg.language != "system")
         brls::Platform::APP_LOCALE_DEFAULT = cfg.language;
     else
         brls::Platform::APP_LOCALE_DEFAULT = brls::LOCALE_AUTO;
+}
 
-    if (!brls::Application::init()) {
-        brls::Logger::error("Unable to init borealis Application");
-        session_log::end("exit: borealis could not start");
-        return EXIT_FAILURE;
-    }
-    startup_mark(StartupStep_Borealis);
-
-    brls::Application::createWindow("playguard/title"_i18n);
-    ui::use_latin_font();
-    startup_mark(StartupStep_Window);
-
-    // Follows the console theme unless a preference says otherwise.
+// Follows the console theme unless a preference says otherwise (once the
+// window exists).
+void apply_theme()
+{
+    const auto& cfg = config::get();
     if (cfg.theme == "dark")
         brls::Application::getPlatform()->setThemeVariant(brls::ThemeVariant::DARK);
     else if (cfg.theme == "light")
         brls::Application::getPlatform()->setThemeVariant(brls::ThemeVariant::LIGHT);
+}
 
-    // No cross-fade when a screen opens or closes: on the console's LCD the
-    // two screens blended for 200 ms read as ghosting. 2 ms, not 0: borealis
-    // still runs (and ends) its animations, in whole milliseconds, and a
-    // picker's takes half of it.
-    brls::getStyle().addMetric("brls/animations/show", 2.0f);
-
-    // PlayGuard status colours (light / dark variants), before any view exists.
-    ui::register_theme_colors();
-
-    // We own the quit path (B on the sidebar / error screen).
-    brls::Application::setGlobalQuit(false);
-
+// The views the XML layouts name, and what goes in every screen's header.
+void register_views()
+{
     brls::Application::registerXMLView("ScrollView",      ScrollView::create);
     brls::Application::registerXMLView("PtStateHeader",   PtStateHeader::create);
     brls::Application::registerXMLView("PtGauge",         PtGauge::create);
@@ -381,6 +350,79 @@ int main(int argc, char* argv[])
     VersionBadge::install();
     NoticeBell::install();   // after the badge: the bell goes in its row
     HeaderSetting::install();   // after the bell: the language and theme go left of it
+}
+
+// After the main loop: the play timer locked again if asked, the tasks and
+// writes still running finished, the services closed, the session ended.
+void shut_down()
+{
+    // "Turn back on and quit": locked now that the screen is gone (pt_flow.hpp).
+    pt_flow::lock_at_exit_if_asked();
+
+    // Network tasks still running (an update check, a sign-in waiting for its
+    // code): stopped, and waited for a moment, before what they use goes away.
+    // The SD-card writes still queued (ui::write_later) are done first.
+    http::abort_all();
+    ui::finish_background(std::chrono::seconds(3));
+    pt_log_flow::stop();
+    app::shutdown();
+    http::cleanup();
+    brls::Logger::info("quit: after {} s", session_log::uptime_s());
+    session_log::end("clean exit");
+}
+}   // namespace
+
+int main(int argc, char* argv[])
+{
+    startup_mark(StartupStep_Main);
+    keep_log_lines();
+    std::set_terminate(on_terminate);
+    app::set_self_path(argc > 0 ? argv[0] : nullptr);
+
+    start_up_migrations();
+    start_session();
+    // A way out of main() that skips the end of this function.
+    std::atexit([]() { session_log::end("exit"); });
+    // Before anything that could crash: the last start of a build just
+    // installed never reached its first screen, or L + R are held (and no
+    // PIN is set)? Then the previous build is offered (action/rollback_flow.hpp).
+    if (rollback_flow::at_start()) {
+        session_log::end("exit at start-up (the start-up screen of the previous build)");
+        return EXIT_SUCCESS;
+    }
+    select_nand_and_log_system();
+
+    // Preferences first: the locale must be chosen before borealis loads i18n.
+    config::load();
+    startup_mark(StartupStep_Preferences);
+    apply_locale();
+
+    if (!brls::Application::init()) {
+        brls::Logger::error("Unable to init borealis Application");
+        session_log::end("exit: borealis could not start");
+        return EXIT_FAILURE;
+    }
+    startup_mark(StartupStep_Borealis);
+
+    brls::Application::createWindow("playguard/title"_i18n);
+    ui::use_latin_font();
+    startup_mark(StartupStep_Window);
+
+    apply_theme();
+
+    // No cross-fade when a screen opens or closes: on the console's LCD the
+    // two screens blended for 200 ms read as ghosting. 2 ms, not 0: borealis
+    // still runs (and ends) its animations, in whole milliseconds, and a
+    // picker's takes half of it.
+    brls::getStyle().addMetric("brls/animations/show", 2.0f);
+
+    // PlayGuard status colours (light / dark variants), before any view exists.
+    ui::register_theme_colors();
+
+    // We own the quit path (B on the sidebar / error screen).
+    brls::Application::setGlobalQuit(false);
+
+    register_views();
 
     // The loading screen first, with nothing slow before it, and drawn at once
     // (no fade: a frame at alpha 0 is a black one). The rest of the start-up
@@ -401,18 +443,6 @@ int main(int argc, char* argv[])
         if (session_log::due()) ui::write_later("session log", []() { session_log::flush(); }, "session_log");
     }
 
-    // "Turn back on and quit": locked now that the screen is gone (pt_flow.hpp).
-    pt_flow::lock_at_exit_if_asked();
-
-    // Network tasks still running (an update check, a sign-in waiting for its
-    // code): stopped, and waited for a moment, before what they use goes away.
-    // The SD-card writes still queued (ui::write_later) are done first.
-    http::abort_all();
-    ui::finish_background(std::chrono::seconds(3));
-    pt_log_flow::stop();
-    app::shutdown();
-    http::cleanup();
-    brls::Logger::info("quit: after {} s", session_log::uptime_s());
-    session_log::end("clean exit");
+    shut_down();
     return EXIT_SUCCESS;
 }
