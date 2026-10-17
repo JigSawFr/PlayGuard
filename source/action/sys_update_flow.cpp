@@ -46,7 +46,10 @@ void note()
           brls::getStr("playguard/notices/sys_atmosphere_detail", ams));
     entry("sys_hekate", latest.hekate, hekate, brls::getStr("playguard/notices/sys_hekate", latest.hekate),
           brls::getStr("playguard/notices/sys_hekate_detail", hekate));
-    // What the notes of Atmosphère and hekate say of that firmware, when they say something.
+    // What the notes of Atmosphère and hekate say of that firmware, when they
+    // say something: set once they are read (sys_notes_flow::load() calls
+    // refresh_entries() then), so the entry does not change under the parent.
+    if (!sys_notes_flow::ready()) return;
     const std::string advice = sys_notes_flow::firmware_advice();
     entry("sys_firmware", latest.firmware, si.hos_version ? std::string(fw) : "",
           brls::getStr("playguard/notices/sys_firmware", latest.firmware),
@@ -116,6 +119,8 @@ std::string with_latest(const char* which, const std::string& running, bool* new
 
 void at_start()
 {
+    // The release notes kept, read in the background for the entries below.
+    sys_notes_flow::load();
     note();
     const auto& cfg = config::get();
     if (cfg.update_daily && cfg.sys_checked != ui::today_date()) check();

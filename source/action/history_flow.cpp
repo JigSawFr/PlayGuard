@@ -109,9 +109,13 @@ std::vector<int> custom_values(const PctlCustomSettings& s)
 // write itself, off the UI thread: load() waits for those still queued, so
 // once it has read the file no write it read is counted again.
 static std::atomic<long> s_count{ -1 };
+// Moved on by every entry asked to be written (UI thread): a list read
+// before it is out of date.
+static uint64_t s_changes = 0;
 
 static void store(history::Entry e)
 {
+    s_changes++;
     // A change PlayGuard made: what it reads next is not a change made
     // outside (the outside_* entries are those, and a new account; a refused
     // change changed nothing).
@@ -197,6 +201,16 @@ size_t count()
 {
     if (s_count < 0) load();
     return (size_t)s_count;
+}
+
+void counted(size_t n)
+{
+    s_count = (long)n;
+}
+
+uint64_t changes()
+{
+    return s_changes;
 }
 
 // The result code of a refused change, as recorded ("0x0001088E").

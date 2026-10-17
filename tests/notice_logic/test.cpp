@@ -251,8 +251,26 @@ static void test_over_limit()
     CHECK(over_limit_days(pt, stats) == 0);
 }
 
+static void test_every()
+{
+    Every e(60000);
+    CHECK(e.due(0));                 // never taken: due at once
+    e.taken(1000);
+    CHECK(!e.due(1000));
+    CHECK(!e.due(6000));             // the Overview's next refresh: kept
+    CHECK(!e.due(60999));
+    CHECK(e.due(61000));             // a minute later: due
+    e.taken(61000);
+    CHECK(!e.due(65000));
+    e.forget();                      // a backup written: due at once
+    CHECK(e.due(65000));
+    e.taken(65000);
+    CHECK(e.due(64000));             // a clock that went back: not trusted, due
+}
+
 int main()
 {
+    test_every();
     test_set_and_order();
     test_groups();
     test_fixed_order();

@@ -122,10 +122,40 @@ static void test_tally()
     CHECK(!refused.any_written() && refused.first == 0x10 && refused.failed_list() == "Level, Limits");
 }
 
+static void test_listing()
+{
+    backup_logic::Listing l;
+    int listed = 0;
+    std::vector<std::string> on_card = { "b.json", "a.json" };
+    auto list = [&]() {
+        listed++;
+        return on_card;
+    };
+
+    // Listed on first use, then kept: the Overview asking every 5 s reads nothing.
+    CHECK(l.names(list) == on_card && listed == 1);
+    on_card.insert(on_card.begin(), "c.json");     // a file another tool put there: not seen yet
+    CHECK(l.names(list).size() == 2 && listed == 1);
+
+    // A save (and its prune) forgets it: listed again once, then kept.
+    l.forget();
+    CHECK(l.names(list) == on_card && listed == 2);
+    CHECK(l.names(list).front() == "c.json" && listed == 2);
+
+    // A listing made anyway (the restore's) replaces it without another one.
+    l.set({});
+    CHECK(l.names(list).empty() && listed == 2);
+    l.forget();
+    on_card.clear();                                // none left: an empty listing is kept too
+    CHECK(l.names(list).empty() && listed == 3);
+    CHECK(l.names(list).empty() && listed == 3);
+}
+
 int main()
 {
     test_snapshot();
     test_label();
     test_tally();
-    return CHECK_DONE("backup_logic snapshot, label and tally tests passed");
+    test_listing();
+    return CHECK_DONE("backup_logic snapshot, label, tally and listing tests passed");
 }

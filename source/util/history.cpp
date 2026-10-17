@@ -74,12 +74,41 @@ bool load_array(nlohmann::json& entries)
     }
     return false;
 }
+
+// The entries of the file's array, newest first; a damaged one is skipped.
+std::vector<Entry> entries_of(const nlohmann::json& entries)
+{
+    std::vector<Entry> out;
+    for (auto it = entries.rbegin(); it != entries.rend(); ++it) {
+        const nlohmann::json& j = *it;
+        if (!j.is_object()) continue;
+        Entry e;
+        try {
+            if (!j.contains("kind") || !j["kind"].is_string()) continue;
+            e.kind   = j["kind"].get<std::string>();
+            e.when   = j.value("when", std::string());
+            e.source = j.value("source", std::string());
+            e.detail = j.value("detail", std::string());
+            e.result = j.value("result", std::string());
+            e.version = j.value("version", std::string());
+        } catch (...) {
+            continue;   // a field of the wrong type
+        }
+        if (!read_values(j, "before", e.before) || !read_values(j, "after", e.after)) continue;
+        out.push_back(e);
+    }
+    return out;
+}
 }   // namespace
 
-Damage check()
+Damage check(size_t* count)
 {
     nlohmann::json entries;
-    if (load_array(entries)) return Damage::None;
+    if (count) *count = 0;
+    if (load_array(entries)) {
+        if (count) *count = entries_of(entries).size();
+        return Damage::None;
+    }
     // Damaged or unreadable: put it aside as history.json.bad (its undo
     // values can still be read by hand; the previous .bad is kept as .bad.1)
     // and start again.
@@ -123,28 +152,9 @@ bool append(const Entry& e, std::string* error, bool* put_aside)
 
 std::vector<Entry> load()
 {
-    std::vector<Entry> out;
     nlohmann::json entries;
     load_array(entries);   // damaged: shown empty; the next change puts it aside
-    for (auto it = entries.rbegin(); it != entries.rend(); ++it) {   // newest first
-        const nlohmann::json& j = *it;
-        if (!j.is_object()) continue;
-        Entry e;
-        try {
-            if (!j.contains("kind") || !j["kind"].is_string()) continue;
-            e.kind   = j["kind"].get<std::string>();
-            e.when   = j.value("when", std::string());
-            e.source = j.value("source", std::string());
-            e.detail = j.value("detail", std::string());
-            e.result = j.value("result", std::string());
-            e.version = j.value("version", std::string());
-        } catch (...) {
-            continue;   // a field of the wrong type
-        }
-        if (!read_values(j, "before", e.before) || !read_values(j, "after", e.after)) continue;
-        out.push_back(e);
-    }
-    return out;
+    return entries_of(entries);
 }
 
 bool undoable(const Entry& e)

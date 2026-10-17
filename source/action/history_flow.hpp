@@ -42,6 +42,12 @@ std::vector<history::Entry> load();
 // How many entries load() would give, without reading the file each time:
 // read once, then kept up to date by the entries PlayGuard writes. UI thread.
 size_t count();
+// What history::check() counted at start-up, once the writes still queued
+// were settled: count() needs no reading of its own.
+void counted(size_t n);
+// Moves on with every entry recorded (UI thread): the History screen reads
+// the file again only when it did since its last load().
+uint64_t changes();
 
 // The History screen's wording: one line, and the details for its dialog.
 std::string title(const history::Entry& e);

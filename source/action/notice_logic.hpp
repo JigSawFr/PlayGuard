@@ -123,4 +123,26 @@ bool week_due(bool known, uint64_t total_s, const std::string& seen, const std::
 // console only warns at the limit (alarm only); 0 otherwise.
 int over_limit_days(const PtState& pt, const PlayStats& stats);
 
+// A reading kept for `period_ms` (the SD card's free space, which the
+// Overview would otherwise ask for every 5 s): due again once that long has
+// gone by since it was taken, or once forgotten (something was written).
+// Times in milliseconds of a steady clock.
+class Every
+{
+  public:
+    explicit Every(int64_t period_ms) : period(period_ms) {}
+    bool due(int64_t now_ms) const { return !taken_once || now_ms - at < 0 || now_ms - at >= period; }
+    void taken(int64_t now_ms)
+    {
+        at = now_ms;
+        taken_once = true;
+    }
+    void forget() { taken_once = false; }
+
+  private:
+    int64_t period;
+    int64_t at = 0;
+    bool    taken_once = false;
+};
+
 }   // namespace notice_logic

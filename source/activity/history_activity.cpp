@@ -87,9 +87,15 @@ void HistoryActivity::export_shown()
 
 void HistoryActivity::rebuild()
 {
-    const auto all = history_flow::load();
+    // The file again only when an entry was recorded since (an undo, a change
+    // made from a dialog), not for another filter.
+    if (!this->read || this->read_at != history_flow::changes()) {
+        this->read_at = history_flow::changes();
+        this->all = history_flow::load();
+        this->read = true;
+    }
     this->shown.clear();
-    for (const history::Entry& e : all)
+    for (const history::Entry& e : this->all)
         if (history_logic::matches(e, this->filter)) this->shown.push_back(e);
     filter_cell->setDetailText(brls::getStr("playguard/history/shown_count", history_flow::filter_label(this->filter),
                                             (int)this->shown.size()));

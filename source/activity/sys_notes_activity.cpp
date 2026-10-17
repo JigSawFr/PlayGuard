@@ -41,6 +41,13 @@ void SysNotesActivity::fetched(Which which, bool ok)
     s_open->fill();
 }
 
+void SysNotesActivity::loaded()
+{
+    if (!s_open) return;
+    s_open->set_loading(sys_notes_flow::fetching(s_open->which));
+    s_open->fill();
+}
+
 SysNotesActivity::SysNotesActivity(Which which) : which(which)
 {
     s_open = this;

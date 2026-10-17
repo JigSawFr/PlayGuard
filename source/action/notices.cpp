@@ -94,6 +94,24 @@ bool sd_free(uint64_t* bytes)
 #endif
 }
 
+// sd_free(), asked again at most once a minute, or after a backup written
+// (sd_written()): the Overview refreshes every 5 s.
+notice_logic::Every s_free_every(60 * 1000);
+bool                s_free_known = false;
+uint64_t            s_free_bytes = 0;
+
+bool sd_free_kept(uint64_t* bytes)
+{
+    const int64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::steady_clock::now().time_since_epoch()).count();
+    if (s_free_every.due(now)) {
+        s_free_known = sd_free(&s_free_bytes);
+        s_free_every.taken(now);
+    }
+    *bytes = s_free_bytes;
+    return s_free_known;
+}
+
 // One entry that is there while `on`, gone otherwise.
 void toggle(bool on, const std::string& id, Level level, const std::string& title, const std::string& detail,
             const std::string& action_label = "", std::function<void()> action = nullptr)
@@ -301,8 +319,9 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
            "playguard/notices/console_lock_long_detail"_i18n, open_label("security"),
            []() { open_tab(ui::tab::security); });
 
-    // No settings backup yet, or none for 30 days.
-    const std::vector<std::string> backups = backup::list();
+    // No settings backup yet, or none for 30 days (listed once, then after
+    // each backup saved: backup_flow).
+    const std::vector<std::string>& backups = backup_flow::names();
     const std::string last = backups.empty() ? "" : notice_logic::backup_date(backups.front());
     toggle(notice_logic::backup_due(backups, ui::today_date()), "backup", Level::Info,
            backups.empty() ? "playguard/notices/backup_none"_i18n : brls::getStr("playguard/notices/backup_old", last),
@@ -313,7 +332,7 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
 
     // The SD card nearly full: PlayGuard's own writes start failing.
     uint64_t free_b = 0;
-    const bool free_known = sd_free(&free_b);   // before the text below, which shows it
+    const bool free_known = sd_free_kept(&free_b);   // before the text below, which shows it
     toggle(notice_logic::sd_space_low(free_known, free_b), "sd_space", Level::Action, "playguard/notices/sd_space"_i18n,
            brls::getStr("playguard/notices/sd_space_detail", (int)(free_b >> 20)));
 
@@ -395,6 +414,11 @@ void note_write(const char* what, bool ok, const std::string& error)
     const std::string file = std::string(what) == "config" ? "config.json" : std::string(what) + ".json";
     set(id, Level::Action, "playguard/notices/sd_write"_i18n,
         brls::getStr("playguard/notices/sd_write_detail", file) + (error.empty() ? "" : " (" + error + ")"));
+}
+
+void sd_written()
+{
+    s_free_every.forget();
 }
 
 void sweep_if_stale()
