@@ -101,12 +101,19 @@ void HeaderSetting::draw_theme(NVGcontext* vg, float x, float y, float width, fl
         nvgLineCap(vg, NVG_ROUND);
         nvgStroke(vg);
     } else if (theme == "dark") {
-        // A crescent moon: a disc with an offset one cut out of it.
-        const float r = height * 0.32f;
+        // A crescent moon: the disc's far side, then back along the edge of
+        // the disc that bites it (offset up and right), between the two
+        // points where they cross. (A hole wider than the disc leaves a ring.)
+        const float r = height * 0.32f, R = r * 0.85f;
+        const float ox = r * 0.55f, oy = -r * 0.35f, d = std::sqrt(ox * ox + oy * oy);
+        const float t = std::atan2(oy, ox);
+        const float along = (d * d + r * r - R * R) / (2 * d);   // the crossing points, along the offset
+        const float a = std::acos(along / r);                     // their angle on the disc
+        const float b = std::acos((along - d) / R);               // and on the bite
         nvgBeginPath(vg);
-        nvgCircle(vg, cx, cy, r);
-        nvgCircle(vg, cx + r * 0.55f, cy - r * 0.35f, r * 0.85f);
-        nvgPathWinding(vg, NVG_HOLE);
+        nvgArc(vg, cx, cy, r, t + a, t + 2 * NVG_PI - a, NVG_CW);
+        nvgArc(vg, cx + ox, cy + oy, R, t - b, t + b - 2 * NVG_PI, NVG_CCW);
+        nvgClosePath(vg);
         nvgFillColor(vg, ink);
         nvgFill(vg);
     } else {
