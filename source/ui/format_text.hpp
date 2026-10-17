@@ -16,7 +16,9 @@ std::string fmt_minutes(uint16_t minutes);      // a limit: "No limit", "0 min (
 std::string days_summary(const uint16_t days[7]);
 std::string fmt_played(uint16_t minutes);       // time played: "0 min", "45 min", "2 h 30"
 std::string fmt_duration_ns(uint64_t ns);       // remaining time, rounded to minutes
-std::string fmt_play_time(uint64_t seconds);    // "0 min", "< 1 min", "45 min", "152 h 30" (no 24 h cap)
+std::string fmt_play_time(uint64_t seconds);    // "0 min", "< 1 min", "45 min", "52 h 30", "278 h" (no 24 h cap)
+// A daily average and the days it spans: "53 min over 45 days", "… over 18 months", "… over 6 years".
+std::string fmt_per_day_over(uint64_t per_day_s, int days);
 std::string day_name(int day);                  // 0 = Sunday, as a title ("Monday")
 std::string day_name_in_text(int day);          // inside a sentence (fr: "lundi")
 std::string bool_text(bool ok, bool value, const std::string& yes, const std::string& no);

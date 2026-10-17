@@ -440,6 +440,8 @@
         "summary": {
             "per_day": "Average per day",
             "per_day_over": "{} over {} days",
+            "per_day_over_months": "{} over {} months",
+            "per_day_over_years": "{} over {} years",
             "top": "Most played",
             "days_played": "Days played",
             "days_played_value": "{} of 7",

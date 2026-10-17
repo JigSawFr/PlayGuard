@@ -440,6 +440,8 @@
         "summary": {
             "per_day": "Media por día",
             "per_day_over": "{} en {} días",
+            "per_day_over_months": "{} en {} meses",
+            "per_day_over_years": "{} en {} años",
             "top": "El más jugado",
             "days_played": "Días jugados",
             "days_played_value": "{} de 7",

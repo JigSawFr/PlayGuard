@@ -440,6 +440,8 @@
         "summary": {
             "per_day": "日均",
             "per_day_over": "{}（{} 天）",
+            "per_day_over_months": "{}（{} 個月）",
+            "per_day_over_years": "{}（{} 年）",
             "top": "玩得最多",
             "days_played": "遊玩天數",
             "days_played_value": "7 天中 {} 天",
