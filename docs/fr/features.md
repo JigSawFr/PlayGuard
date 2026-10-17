@@ -49,9 +49,9 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 ## Temps de jeu — le graphique de la semaine sert d'éditeur
 
 - Une ligne d'état : actif, temps restant, limite du jour, profil correspondant (en rouge tant que la limite est atteinte).
-- **Le graphique de la semaine :** ←/→ choisit un jour, Ⓐ change sa limite.
+- **Le graphique de la semaine :** ←/→ choisit un jour, Ⓐ ouvre l'éditeur par jour sur ce jour, son choix déjà ouvert. L'éditeur est le seul endroit pour une limite par jour : modifiez plusieurs jours, ils restent en orange et marqués \* jusqu'à ce que **+** (depuis n'importe où) les enregistre tous d'un coup, avec une seule confirmation ; valeurs rapides, « pas de limite » par jour, préréglages lundi–vendredi / week-end, copie du jour sur tous les jours.
 - **Même limite tous les jours :** liste rapide ou valeur libre, en minutes (`90`, `90 min`) ou en heures (`1:30`, `1h30`).
-- **Limite différente selon le jour :** jours non enregistrés en orange et marqués \*, valeurs rapides, préréglages lundi–vendredi / week-end, « pas de limite » par jour ; **+** enregistre depuis n'importe où.
+- **Semaine et week-end › :** l'éditeur, qui demande la limite du lundi au vendredi puis celle du week-end.
 - **Suppression de la limite**, **temps en plus aujourd'hui**, **arrêter le jeu pour aujourd'hui** (comme dans la Vue d'ensemble).
 - Une note sous la limite quotidienne dit ce que fait la console à la limite (comme dans la Vue d'ensemble). Pendant un déverrouillage temporaire du contrôle parental, le temps de jeu n'est *peut-être* pas décompté : la question reste ouverte ([docs, en anglais](../parental-controls.md#still-open)).
 - **Profils** enregistrés sur la carte SD : appliquer, modifier, renommer ou supprimer un profil ; enregistrer les limites actuelles ou en créer un nouveau. N'importe quel nom, dans n'importe quelle écriture (*École*, *周末*, *Выходные* …) — un nom sans lettres latines reçoit son propre nom de fichier, et deux noms qui donneraient le même fichier sont repérés.

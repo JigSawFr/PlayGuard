@@ -45,10 +45,11 @@ PlayTimerTab::PlayTimerTab()
     ui::init_unlock_banner(unlocked_banner, [this]() { this->refresh(); });
     this->enable_auto_refresh(5000);
 
-    // The week chart is the editor: ←/→ pick a day, A changes its limit.
+    // ←/→ pick a day, A opens the per-day editor on it (its picker open):
+    // the edits are saved together there.
     week->set_on_pick([this](int day) {
         if (!this->pt.valid) return;
-        pt_flow::change_day_limit(day, this->pt.day_min[day], [this]() { this->refresh(); });
+        brls::Application::pushActivity(new PlayTimerPerDayActivity(day));
     });
 
     quick->registerClickAction([this](brls::View*) {
@@ -66,9 +67,10 @@ PlayTimerTab::PlayTimerTab()
         pt_flow::stop_today(this->pt, [this]() { this->refresh(); });
         return true;
     });
-    per_day->setDetailText(ui::opens());
-    per_day->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new PlayTimerPerDayActivity());
+    split->setDetailText(ui::opens());
+    split->registerClickAction([](brls::View*) {
+        if (ui::refuse_read_only()) return true;
+        brls::Application::pushActivity(PlayTimerPerDayActivity::week_split());
         return true;
     });
     remove->registerClickAction([this](brls::View*) {
@@ -129,9 +131,9 @@ void PlayTimerTab::refresh()
     ui::show_unlock_banner(unlocked_banner, this->pt.temporary_unlocked_valid && this->pt.temporary_unlocked);
     ui::set_visible(fw_note.getView(), !fw_ok);
     // Read-only: the actions that write stay in sight, greyed (A says why);
-    // the per-day editor and the profiles can still be looked at.
+    // the profiles can still be looked at.
     for (brls::View* v : { (brls::View*)limit_header.getView(), (brls::View*)quick.getView(),
-                           (brls::View*)per_day.getView(), (brls::View*)remove.getView(),
+                           (brls::View*)split.getView(), (brls::View*)remove.getView(),
                            (brls::View*)profiles_cell.getView(), (brls::View*)limit_note.getView() })
         ui::set_visible(v, fw_ok);
     // When the time is up: only with something set (pt_configured), the
@@ -141,7 +143,8 @@ void PlayTimerTab::refresh()
     ui::set_visible(extra.getView(), pt_logic::can_add_extra_time(this->pt, wd, false));
     ui::set_visible(stop.getView(), pt_logic::can_stop_today(this->pt, wd, false));
     for (brls::DetailCell* c : { (brls::DetailCell*)quick.getView(), (brls::DetailCell*)extra.getView(),
-                                 (brls::DetailCell*)stop.getView(), (brls::DetailCell*)remove.getView(),
+                                 (brls::DetailCell*)stop.getView(), (brls::DetailCell*)split.getView(),
+                                 (brls::DetailCell*)remove.getView(),
                                  (brls::DetailCell*)bedtime.getView(), (brls::DetailCell*)bedtime_reset.getView(),
                                  (brls::DetailCell*)time_up.getView(), (brls::DetailCell*)extra_amounts.getView(),
                                  (brls::DetailCell*)extra_auto.getView() })

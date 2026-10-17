@@ -114,7 +114,7 @@ DashboardTab::~DashboardTab()
 void DashboardTab::open_today_limit()
 {
     // Writable: change the limit right here (the same picker as the Play timer
-    // tab when every day shares one limit, the per-day editor otherwise).
+    // tab when every day shares one limit, the per-day editor on today otherwise).
     if (app::read_only() || !this->pt.fw_supported || !this->pt.valid) {
         ui::go_to_tab(today_limit, ui::tab::play_timer);
         return;
@@ -122,7 +122,7 @@ void DashboardTab::open_today_limit()
     bool uniform = true;
     for (int i = 1; i < 7 && uniform; i++) uniform = this->pt.day_min[i] == this->pt.day_min[0];
     if (uniform) pt_flow::choose_uniform_limit(this->pt, [this]() { this->refresh(); });
-    else brls::Application::pushActivity(new PlayTimerPerDayActivity());
+    else brls::Application::pushActivity(new PlayTimerPerDayActivity(ui::today_weekday()));
 }
 
 void DashboardTab::refresh()

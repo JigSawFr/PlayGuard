@@ -32,7 +32,7 @@
             <brls:DetailCell id="pt_quick" title="@i18n/playguard/play_timer/quick"/>
             <brls:DetailCell id="pt_extra" title="@i18n/playguard/dashboard/extra"/>
             <brls:DetailCell id="pt_stop" title="@i18n/playguard/dashboard/stop"/>
-            <brls:DetailCell id="pt_per_day" title="@i18n/playguard/play_timer/per_day"/>
+            <brls:DetailCell id="pt_split" title="@i18n/playguard/play_timer/split"/>
             <brls:DetailCell id="pt_remove" title="@i18n/playguard/play_timer/remove"/>
             <brls:DetailCell id="pt_profiles" title="@i18n/playguard/play_timer/profiles"/>
             <brls:DetailCell id="pt_time_up" title="@i18n/playguard/play_timer/time_up"/>

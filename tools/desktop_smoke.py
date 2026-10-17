@@ -1118,35 +1118,39 @@ for i, tab in enumerate(tabs[1:], start=2):
     shot(f"{i:02d}_{tab}_end")
     key("Left")       # back to the sidebar
 
-# Extra-time picker, per-day editor (the week chart is the editor) and its
-# day picker.
+# The per-day editor, opened from the tab's week chart on the day picked
+# (its picker already open), then the extra-time picker and the
+# Weekdays and weekend row (the editor, Monday–Friday picker first).
 key("Up", steps("play_timer", tabs[-1]))   # from the last tab back to Play timer
 key("Right")               # the week chart, on today
 key("Right")               # tomorrow's day
-key("Return")              # its limit picker, from the tab itself
+key("Return")              # the per-day editor on that day, its picker open
 shot("19_day_picker")
 key("Escape")
-key("Down")                # Same limit every day
-key("Down")                # Extra time today…
-key("Return")
-shot("20_extra_time")
-key("Escape")
-key("Down", 2)             # past No more play today: A different limit for each day…
-key("Return")
-shot("21_per_day")
-key("Return")              # today's limit (the chart has the focus)
+shot("21_per_day")         # the editor, tomorrow focused
+key("Return")              # tomorrow's limit again
 shot("22_dropdown")
 key("Down", 15)            # to the end of the list (No limit) …
 key("Up")                  # … then Enter minutes…: the number pad types "1:30"
 key("Return")
-shot("22_numpad")          # today: 1 h 30, drawn as unsaved; "+ Save (1)" in the footer
+shot("22_numpad")          # tomorrow: 1 h 30, drawn as unsaved; "+ Save (1)" in the footer
 if not any("numpad: " in l and l.rstrip().endswith("-> 1:30") for l in open(os.path.join(OUT, "app.log"), errors="replace")):
     fail("the number pad was not asked for the minutes")
 key("Escape")              # unsaved: asks before leaving
 shot("23_discard")
 key("Right")               # Discard
 key("Return")
-shot("23_back")
+shot("23_back")            # the tab, on the chart again
+key("Down")                # Same limit every day
+key("Down")                # Extra time today…
+key("Return")
+shot("20_extra_time")
+key("Escape")
+key("Down", 2)             # past No more play today: Weekdays and weekend
+key("Return")
+shot("21_split")           # the editor, Monday–Friday picker open
+key("Escape")              # no value: no weekend picker either
+key("Escape")              # nothing staged: leaves without asking
 
 # When the time is up: its two choices (on "Suspend the software"), and the
 # confirmation of the other one, cancelled.
