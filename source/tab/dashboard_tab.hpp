@@ -30,6 +30,30 @@ class DashboardTab : public TabBase
 
     void open_today_limit();
 
+    // Today's play time from the activity log, for when the timer does not say.
+    struct TodayLog
+    {
+        bool     ok         = false;
+        uint64_t played_s   = 0;
+        uint16_t played_min = 0;   // rounded, at most a day
+    };
+    // What the System section flags: shown here only then (the Console tab always).
+    struct SystemIssues
+    {
+        bool compat  = false;
+        bool serial  = false;
+        bool patches = false;
+    };
+
+    // refresh()'s sections, in the order it runs them.
+    static TodayLog read_today_log();
+    bool show_outside(const PtState& pt);
+    void show_today(const PtState& pt, int today, bool unlocked, const TodayLog& log);
+    void show_remaining(const PtState& pt, int today, bool unlocked, const TodayLog& log);
+    void show_bedtime(const PtState& pt);
+    void show_controls(const PctlStatus& s, bool unlocked, bool has_pin);
+    SystemIssues show_system(const PctlStatus& s, const SysInfo& si, Result accuracy_rc, bool accurate);
+
     BRLS_BIND(brls::DetailCell, unlocked_banner, "dash_unlocked_banner");
     BRLS_BIND(brls::DetailCell, pc,          "dash_pc");
     BRLS_BIND(brls::DetailCell, pin,         "dash_pin");

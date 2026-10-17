@@ -124,50 +124,36 @@ void DashboardTab::open_today_limit()
     else brls::Application::pushActivity(new PlayTimerPerDayActivity(ui::today_weekday()));
 }
 
-void DashboardTab::refresh()
+DashboardTab::TodayLog DashboardTab::read_today_log()
 {
-    const std::string na = "playguard/common/unavailable"_i18n;
-    // The time of day, for every helper below (today's limit, the outside
-    // watch, the timer health, the bell), read once.
-    ui::SameTime same;
-
-    // Every 5 s: one pctl session with only what this screen shows, and the
-    // network clock's accuracy flag alone.
-    PctlStatus s;
-    pctl_overview_fetch(&s, &this->pt);
-    const PtState& pt = this->pt;
-    bool accurate = false;
-    const Result accuracy_rc = time_network_accuracy(&accurate);
-    SysInfo si;
-    sysinfo_get(&si);
-
-    const bool unlocked = s.temp_unlocked_ok && s.temp_unlocked;
-    const bool has_pin  = s.pin_length_ok && s.pin_length > 0;
-    ui::note_unlocked(s.temp_unlocked_ok, s.temp_unlocked);
-
     // Today's play time from the activity log, for when the timer does not
     // say (no game counted yet today, no limit today). Read again in the
     // background when older than a few minutes.
+    TodayLog out;
     const auto log = play_data::latest("");
-    const bool log_ok = log && log->windows_ok;
-    const uint64_t log_played_s = log_ok ? play_data::today_total_s(*log) : 0;
+    out.ok = log && log->windows_ok;
+    out.played_s = out.ok ? play_data::today_total_s(*log) : 0;
     if (!play_data::fresh("", std::chrono::minutes(5)) && !play_data::busy("")) play_data::fetch(nullptr);
-    const uint16_t log_played_min = (uint16_t)std::min<uint64_t>(1440, (log_played_s + 30) / 60);
+    out.played_min = (uint16_t)std::min<uint64_t>(1440, (out.played_s + 30) / 60);
+    return out;
+}
 
-    // Changes seen outside PlayGuard, and whether the console counts at all.
+// The notices of changes seen outside PlayGuard; true when there is one.
+bool DashboardTab::show_outside(const PtState& pt)
+{
     outside_watch::observe(pt);
     outside_watch::observe_accounts();   // once per run; flagged in the Activity tab
     const std::vector<std::string> outside_lines = outside_watch::notice_lines();
     std::string outside_joined;
     for (const auto& l : outside_lines) outside_joined += (outside_joined.empty() ? "" : "\n") + l;
     outside_text->setText(outside_joined);
-    const bool stalled = timer_health::observe(pt);
-    // The same readings for the notification bell.
-    notices::note_timer_stalled(stalled);
-    notices::refresh_status(s, pt, si, accuracy_rc, accurate);
+    return !outside_lines.empty();
+}
 
-    // Today's play time.
-    const int today = ui::today_weekday();
+// Today's limit and the gauge of today's play time.
+void DashboardTab::show_today(const PtState& pt, int today, bool unlocked, const TodayLog& log)
+{
+    const std::string na = "playguard/common/unavailable"_i18n;
     today_limit->setText(brls::getStr("playguard/dashboard/today_limit", ui::day_name_in_text(today)));
     bool show_gauge = true;
     if (!pt.fw_supported) {
@@ -187,7 +173,7 @@ void DashboardTab::refresh()
             gauge_text->setText("playguard/dashboard/gauge_unlocked"_i18n);
         } else if (limit == PT_DAY_NOLIMIT || !pt.enabled) {
             show_gauge = false;   // nothing to measure against: the text says it
-            gauge_text->setText(log_ok ? brls::getStr("playguard/dashboard/gauge_none_played", ui::fmt_play_time(log_played_s))
+            gauge_text->setText(log.ok ? brls::getStr("playguard/dashboard/gauge_none_played", ui::fmt_play_time(log.played_s))
                                        : "playguard/dashboard/gauge_none"_i18n);
         } else if (pt.restricted_valid && pt.restricted) {
             gauge->setFraction(1);
@@ -203,11 +189,11 @@ void DashboardTab::refresh()
             gauge->setFraction((float)used / (float)limit);
             gauge_text->setText(brls::getStr("playguard/dashboard/gauge_known",
                                              ui::fmt_played(used), ui::fmt_minutes(limit)));
-        } else if (log_ok) {
+        } else if (log.ok) {
             // No game counted yet by the timer: the log's figure, marked as an
             // estimate (it counts PlayGuard opened over a game, for instance).
-            gauge->setFraction(limit ? std::min(1.0f, (float)log_played_min / (float)limit) : 1.0f);
-            gauge_text->setText(brls::getStr("playguard/dashboard/gauge_log", ui::fmt_play_time(log_played_s),
+            gauge->setFraction(limit ? std::min(1.0f, (float)log.played_min / (float)limit) : 1.0f);
+            gauge_text->setText(brls::getStr("playguard/dashboard/gauge_log", ui::fmt_play_time(log.played_s),
                                              ui::fmt_minutes(limit)));
         } else {
             gauge->setFraction(-1);
@@ -215,7 +201,11 @@ void DashboardTab::refresh()
         }
     }
     ui::set_visible(gauge.getView(), show_gauge);
+}
 
+// The time left today, as the gauge reads it.
+void DashboardTab::show_remaining(const PtState& pt, int today, bool unlocked, const TodayLog& log)
+{
     if (!pt.fw_supported || !pt.valid || !pt.enabled_valid)
         linked(remaining, "—");
     else if (unlocked && pt.day_min[today] != PT_DAY_NOLIMIT)
@@ -229,20 +219,27 @@ void DashboardTab::refresh()
         linked(remaining, ui::fmt_played(0));
     else if (pt.remaining_valid && pt.remaining_ns > 0)
         linked(remaining, ui::fmt_duration_ns((uint64_t)pt.remaining_ns));
-    else if (log_ok)
+    else if (log.ok)
         linked(remaining, brls::getStr("playguard/dashboard/remaining_log",
-                                       ui::fmt_played((uint16_t)(pt.day_min[today] > log_played_min ? pt.day_min[today] - log_played_min : 0))));
+                                       ui::fmt_played((uint16_t)(pt.day_min[today] > log.played_min ? pt.day_min[today] - log.played_min : 0))));
     else
         linked(remaining, "playguard/dashboard/remaining_idle"_i18n);
+}
 
+void DashboardTab::show_bedtime(const PtState& pt)
+{
     if (pt.bedtime_valid) {
         std::string hm = fmt::format("{:02d}:{:02d}", pt.bedtime_hour, pt.bedtime_minute);
         linked(bedtime, brls::getStr(pt.bedtime_enabled ? "playguard/play_timer/bedtime_value_on"
                                                         : "playguard/play_timer/bedtime_value_off", hm));
     } else {
-        linked(bedtime, pt.fw_supported ? na : "—");
+        linked(bedtime, pt.fw_supported ? "playguard/common/unavailable"_i18n : "—");
     }
+}
 
+void DashboardTab::show_controls(const PctlStatus& s, bool unlocked, bool has_pin)
+{
+    const std::string na = "playguard/common/unavailable"_i18n;
     // Parental controls overall state.
     if (!s.restriction_enabled_ok) {
         linked(pc, na);
@@ -266,7 +263,12 @@ void DashboardTab::refresh()
     else linked(pin, "playguard/dashboard/pin_set"_i18n);   // not its length: it narrows a guess
 
     linked(level, s.safety_level_ok ? ui::level_name(s.safety_level) : na);
+}
 
+DashboardTab::SystemIssues DashboardTab::show_system(const PctlStatus& s, const SysInfo& si, Result accuracy_rc,
+                                                     bool accurate)
+{
+    const std::string na = "playguard/common/unavailable"_i18n;
     // System: only what needs attention stands out.
     this->clock_inaccurate = R_SUCCEEDED(accuracy_rc) && !accurate;
     if (R_FAILED(accuracy_rc)) {
@@ -284,21 +286,60 @@ void DashboardTab::refresh()
 
     // Firmware and compatibility appear here only when there is something to
     // check; the Console tab always shows them.
-    const bool compat_issue = sysinfo_compat(&si) != SysCompat_Ok;
+    SystemIssues issues;
+    issues.compat = sysinfo_compat(&si) != SysCompat_Ok;
     linked(fw, ui::fw_text(si));
     NVGcolor c = ui::color_neutral();
     linked(compat, ui::compat_text(si, &c));
     compat->setDetailTextColor(c);
 
     // Serial number visible on emuMMC, sigpatch files only or sys-patch incomplete.
-    const bool serial_issue  = ui::serial_warning(si);
+    issues.serial = ui::serial_warning(si);
     const patches::Report& patch_report = ui::patch_report();
-    const bool patches_issue = ui::patches_warning(patch_report);
+    issues.patches = ui::patches_warning(patch_report);
     linked(serial, "playguard/dashboard/serial_visible"_i18n);
     serial->setDetailTextColor(ui::color_warn());
     c = ui::color_neutral();
     linked(game_patches, ui::patches_text(patch_report, &c));
     game_patches->setDetailTextColor(c);
+    return issues;
+}
+
+void DashboardTab::refresh()
+{
+    // The time of day, for every helper below (today's limit, the outside
+    // watch, the timer health, the bell), read once.
+    ui::SameTime same;
+
+    // Every 5 s: one pctl session with only what this screen shows, and the
+    // network clock's accuracy flag alone.
+    PctlStatus s;
+    pctl_overview_fetch(&s, &this->pt);
+    const PtState& pt = this->pt;
+    bool accurate = false;
+    const Result accuracy_rc = time_network_accuracy(&accurate);
+    SysInfo si;
+    sysinfo_get(&si);
+
+    const bool unlocked = s.temp_unlocked_ok && s.temp_unlocked;
+    const bool has_pin  = s.pin_length_ok && s.pin_length > 0;
+    ui::note_unlocked(s.temp_unlocked_ok, s.temp_unlocked);
+
+    const TodayLog log = read_today_log();
+
+    // Changes seen outside PlayGuard, and whether the console counts at all.
+    const bool outside_shown = this->show_outside(pt);
+    const bool stalled = timer_health::observe(pt);
+    // The same readings for the notification bell.
+    notices::note_timer_stalled(stalled);
+    notices::refresh_status(s, pt, si, accuracy_rc, accurate);
+
+    const int today = ui::today_weekday();
+    this->show_today(pt, today, unlocked, log);
+    this->show_remaining(pt, today, unlocked, log);
+    this->show_bedtime(pt);
+    this->show_controls(s, unlocked, has_pin);
+    const SystemIssues issues = this->show_system(s, si, accuracy_rc, accurate);
 
     // When the values were last read (X refreshes now, the timer every 5 s).
     updated->setText(brls::getStr("playguard/dashboard/updated", ui::now_hms()));
@@ -320,12 +361,12 @@ void DashboardTab::refresh()
                           { alarm.getView(), pt_flow::alarm_off(pt) },
                           { first_steps.getView(), not_set_up }, { applet.getView(), si.applet_mode },
                           { counted.getView(), !si.applet_mode },
-                          { fw.getView(), compat_issue }, { compat.getView(), compat_issue },
-                          { serial.getView(), serial_issue }, { game_patches.getView(), patches_issue },
+                          { fw.getView(), issues.compat }, { compat.getView(), issues.compat },
+                          { serial.getView(), issues.serial }, { game_patches.getView(), issues.patches },
                           { unlocked_banner.getView(), unlocked },
                           { not_counting.getView(), stalled },
-                          { outside_text.getView(), !outside_lines.empty() },
-                          { outside.getView(), !outside_lines.empty() } });
+                          { outside_text.getView(), outside_shown },
+                          { outside.getView(), outside_shown } });
 }
 
 brls::View* DashboardTab::create()
