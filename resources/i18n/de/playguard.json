@@ -1032,7 +1032,7 @@
         "confirm_gist": "Ein geheimer Gist in deinem GitHub-Konto: Jeder mit dem Link kann ihn lesen, bis du ihn auf GitHub löschst. Er enthält nie die PIN oder die Seriennummer.",
         "confirm_public": "Ein mit diesem Link eröffneter Fehlerbericht ist öffentlich. Vom Verlauf werden nur die letzten Änderungen gesendet, ohne Namen und ohne Uhrzeit.",
         "where_gist": "einen geheimen Gist auf GitHub",
-        "relogin": "GitHub hat den Gist abgelehnt. Melde dich ab und wieder an (GitHub-Konto, in den Entwicklerwerkzeugen), um Gists zu erlauben.",
+        "relogin": "GitHub hat den Gist abgelehnt: Die Anmeldung von PlayGuard erlaubt keine Gists. Erneut anmelden, um sie zu erlauben? Zum Abmelden stattdessen: {}.",
         "needs_github": "Der Bericht geht in einen geheimen Gist deines GitHub-Kontos: Jeder mit dem Link kann ihn lesen, bis du ihn auf GitHub löschst. PlayGuard ist noch nicht bei GitHub angemeldet. Jetzt anmelden?",
         "sign_in": "Anmelden",
         "send": "Senden",

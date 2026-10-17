@@ -1032,7 +1032,7 @@
         "confirm_gist": "Un gist secret dans votre compte GitHub : toute personne qui a le lien peut le lire, jusqu'à ce que vous le supprimiez sur GitHub. Il ne contient jamais le code PIN ni le numéro de série.",
         "confirm_public": "Un rapport de bogue ouvert avec ce lien est public. De l'historique, seuls les derniers changements sont envoyés, sans noms ni heures.",
         "where_gist": "un gist secret GitHub",
-        "relogin": "GitHub a refusé le gist. Déconnectez-vous puis reconnectez-vous (Compte GitHub, dans les outils de développement) pour autoriser les gists.",
+        "relogin": "GitHub a refusé le gist : la connexion de PlayGuard n'autorise pas les gists. Se reconnecter pour les autoriser? Pour vous déconnecter plutôt : {}.",
         "needs_github": "Le rapport part dans un gist secret de votre compte GitHub : toute personne qui a son lien peut le lire, jusqu'à ce que vous le supprimiez sur GitHub. PlayGuard n'est pas encore connecté à GitHub. Se connecter maintenant?",
         "sign_in": "Se connecter",
         "send": "Envoyer",

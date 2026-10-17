@@ -1032,7 +1032,7 @@
         "confirm_gist": "Un gist secreto en tu cuenta de GitHub: cualquiera con el enlace puede leerlo hasta que lo elimines en GitHub. Nunca contiene el PIN ni el número de serie.",
         "confirm_public": "Un reporte de error abierto con este enlace es público. Del historial solo se envían los últimos cambios, sin nombres ni horas.",
         "where_gist": "un gist secreto en GitHub",
-        "relogin": "GitHub rechazó el gist. Cierra sesión y vuelve a iniciarla (Cuenta de GitHub, en las herramientas de desarrollo) para permitir gists.",
+        "relogin": "GitHub rechazó el gist: el inicio de sesión de PlayGuard no permite gists. ¿Iniciar sesión de nuevo para permitirlos? Para cerrar sesión en su lugar: {}.",
         "needs_github": "El informe va a un gist secreto de tu cuenta de GitHub: cualquiera con su enlace puede leerlo hasta que lo borres en GitHub. PlayGuard aún no inició sesión en GitHub. ¿Iniciar sesión ahora?",
         "sign_in": "Iniciar sesión",
         "send": "Enviar",

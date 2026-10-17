@@ -1032,7 +1032,7 @@
         "confirm_gist": "Een geheime gist in je GitHub-account: iedereen met de link kan hem lezen, tot je hem op GitHub verwijdert. Hij bevat nooit de pincode of het serienummer.",
         "confirm_public": "Een foutrapport dat met deze link wordt geopend, is openbaar. Van de geschiedenis worden alleen de laatste wijzigingen verstuurd, zonder namen of tijdstippen.",
         "where_gist": "een geheime gist op GitHub",
-        "relogin": "GitHub heeft de gist geweigerd. Log uit en opnieuw in (GitHub-account, in de ontwikkelaarstools) om gists toe te staan.",
+        "relogin": "GitHub heeft de gist geweigerd: de aanmelding van PlayGuard staat geen gists toe. Opnieuw inloggen om ze toe te staan? Om in plaats daarvan uit te loggen: {}.",
         "needs_github": "Het rapport gaat naar een geheime gist in je GitHub-account: iedereen met de link kan het lezen, tot je het op GitHub verwijdert. PlayGuard is nog niet bij GitHub ingelogd. Nu inloggen?",
         "sign_in": "Inloggen",
         "send": "Versturen",

@@ -141,18 +141,30 @@ void send_gist(const Parts& parts, const Kind& kind)
     // Its link goes into a bug report, which anyone can read.
     if (kind.report) body += " " + "playguard/upload/confirm_public"_i18n;
     const std::string token = github_auth::token();
-    ui::confirm(body, "playguard/upload/send"_i18n, [files, token, kind]() {
+    ui::confirm(body, "playguard/upload/send"_i18n, [parts, files, token, kind]() {
         ui::notify("playguard/upload/sending"_i18n);
         if (s_sending) return;
         s_sending = true;
-        ui::in_background("gist upload", [files, token, kind]() {
+        ui::in_background("gist upload", [parts, files, token, kind]() {
             const log_upload::Result r = log_upload::upload_gist(*files, token, app::version(), kind.what);
-            brls::sync([r, kind]() {
+            brls::sync([parts, r, kind]() {
                 s_sending = false;
+                if (r.relogin) {
+                    // The sign-in does not allow gists (or was revoked, and
+                    // then forgotten): signing in again replaces it, then the
+                    // same files go. A 403 or 404 keeps it (a 403 can also be
+                    // a rate limit): the GitHub account cell signs out.
+                    const std::string where = "playguard/tabs/preferences"_i18n + " › " + "playguard/prefs/help"_i18n +
+                                              " › " + "playguard/github/account"_i18n;
+                    ui::confirm(brls::getStr("playguard/upload/relogin", where), "playguard/upload/sign_in"_i18n,
+                                [parts, kind]() {
+                                    github_login_flow::sign_in([parts, kind]() { send_gist(parts, kind); });
+                                });
+                    return;
+                }
                 if (!r.ok) {
-                    ui::info(r.relogin ? "playguard/upload/relogin"_i18n
-                                       : brls::getStr(kind.report ? "playguard/upload/failed" : "playguard/upload/failed_list",
-                                                      r.error));
+                    ui::info(brls::getStr(kind.report ? "playguard/upload/failed" : "playguard/upload/failed_list",
+                                          r.error));
                     return;
                 }
                 remember(r);

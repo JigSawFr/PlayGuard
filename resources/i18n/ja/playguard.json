@@ -1032,7 +1032,7 @@
         "confirm_gist": "GitHub アカウントのシークレット Gist：GitHub で削除するまで、リンクを知っている人は誰でも閲覧できます。PIN やシリアル番号は含まれません。",
         "confirm_public": "このリンクで作成したバグ報告は公開されます。履歴は最近の変更のみを、名前と時刻を除いて送信します。",
         "where_gist": "GitHub のシークレット Gist",
-        "relogin": "GitHub が gist を拒否しました。gist を許可するには、サインアウトしてから再度サインインしてください（開発者ツールの GitHub アカウント）。",
+        "relogin": "GitHub が gist を拒否しました。PlayGuard のサインインでは gist が許可されていません。許可するために再度サインインしますか？サインアウトする場合: {}。",
         "needs_github": "レポートは GitHub アカウントのシークレット gist に送られます。リンクを知っている人は、GitHub で削除するまで閲覧できます。PlayGuard はまだ GitHub にサインインしていません。今すぐサインインしますか？",
         "sign_in": "サインイン",
         "send": "送信",

@@ -1032,7 +1032,7 @@
         "confirm_gist": "你 GitHub 帳戶中的秘密 Gist：在你於 GitHub 上刪除之前，任何擁有連結的人都能查看。報告中絕不包含 PIN 或序號。",
         "confirm_public": "用此連結提交的錯誤回報是公開的。歷程記錄只傳送最近的變更，不含名稱和時間。",
         "where_gist": "GitHub 秘密 Gist",
-        "relogin": "GitHub 拒絕了該 gist。請登出後重新登入（開發者工具中的 GitHub 帳號）以允許 gist。",
+        "relogin": "GitHub 拒絕了該 gist：PlayGuard 的登入不允許 gist。重新登入以允許 gist？如需登出：{}。",
         "needs_github": "報告會傳送到你 GitHub 帳號中的私密 gist：擁有連結的人都能閱讀，直到你在 GitHub 上刪除它。PlayGuard 尚未登入 GitHub。現在登入嗎？",
         "sign_in": "登入",
         "send": "傳送",
