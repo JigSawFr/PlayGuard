@@ -609,11 +609,17 @@
         },
         "notes": {
             "off": "Iedereen die de console vasthoudt, kan hier de instellingen wijzigen. Voor het tonen van de pincode wordt er nog steeds om gevraagd.",
-            "changes": "Iedereen kan kijken; alleen de ouder kan iets wijzigen (na 5 minuten wordt opnieuw gevraagd). Voor opnieuw vergrendelen is nooit een pincode nodig.",
-            "open": "Een vergrendelscherm totdat de pincode is ingevoerd, en opnieuw na 5 minuten buiten PlayGuard. Voor opnieuw vergrendelen is nooit een pincode nodig."
+            "changes": "Iedereen kan kijken; alleen de ouder kan iets wijzigen. Voor opnieuw vergrendelen is nooit een pincode nodig.",
+            "open": "Een vergrendelscherm totdat de pincode is ingevoerd. Voor opnieuw vergrendelen is nooit een pincode nodig."
         },
         "no_pin": "Stel eerst een pincode in (Pincode instellen of wijzigen).",
         "set": "PlayGuard beveiligen met de pincode: {}",
+        "ask_again": "Na 5 minuten opnieuw om de pincode vragen",
+        "again_on": {
+            "changes": "Na 5 minuten wordt opnieuw gevraagd.",
+            "open": "Het komt terug na 5 minuten buiten PlayGuard."
+        },
+        "again_off": "Eenmaal ingevoerd, geldt hij tot PlayGuard wordt gesloten.",
         "locked_title": "PlayGuard is vergrendeld",
         "locked_body": "Voer de pincode voor ouderlijk toezicht in om te openen.",
         "enter": "Pincode invoeren"

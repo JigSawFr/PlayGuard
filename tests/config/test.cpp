@@ -247,7 +247,7 @@ static void test_preferences()
     CHECK(d.start_tab == "dashboard" && d.extra_amounts == std::vector<int>({ 15, 30, 60 }));
     CHECK(d.activity_period == 1 && d.export_format == 0 && d.backup_keep == 0);
     CHECK(d.logs_keep == 20 && d.logs_keep_days == 0 && d.logs_keep_mb == 0);
-    CHECK(!d.update_daily && d.update_checked.empty() && !d.clock_check_at_start && d.pin_lock == "changes");
+    CHECK(!d.update_daily && d.update_checked.empty() && !d.clock_check_at_start && d.pin_lock == "changes" && !d.pin_ask_again);
     CHECK(d.onboarding_at_start && d.intro && d.dev_builds_order == "newest");
     CHECK(d.support_reminder && d.support_reminded.empty() && d.seen_version.empty());
     write_config(R"({"support_reminder": false, "support_reminded": "2026-10-09", "seen_version": "1.1.0"})");
@@ -260,9 +260,9 @@ static void test_preferences()
     write_config(R"({"onboarding_at_start": false})");
     config::load();
     CHECK(!config::get().onboarding_at_start);
-    write_config(R"({"pin_lock": "open"})");
+    write_config(R"({"pin_lock": "open", "pin_ask_again": true})");
     config::load();
-    CHECK(config::get().pin_lock == "open");
+    CHECK(config::get().pin_lock == "open" && config::get().pin_ask_again);
     write_config(R"({"pin_lock": "off"})");
     config::load();
     CHECK(config::get().pin_lock == "off");   // chosen on purpose: kept

@@ -609,11 +609,17 @@
         },
         "notes": {
             "off": "Qualquer pessoa com a consola na mão pode alterar as definições aqui. Mostrar o PIN continua a pedi-lo.",
-            "changes": "Todos podem consultar; só o responsável altera algo (pedido novamente após 5 minutos). Voltar a bloquear nunca o pede.",
-            "open": "Um ecrã de bloqueio até o PIN ser introduzido, e de novo após 5 minutos fora do PlayGuard. Voltar a bloquear nunca o pede."
+            "changes": "Todos podem consultar; só o responsável altera algo. Voltar a bloquear nunca o pede.",
+            "open": "Um ecrã de bloqueio até o PIN ser introduzido. Voltar a bloquear nunca o pede."
         },
         "no_pin": "Defina primeiro um PIN (Definir ou alterar o PIN).",
         "set": "Proteger o PlayGuard com o PIN: {}",
+        "ask_again": "Pedir o PIN novamente após 5 minutos",
+        "again_on": {
+            "changes": "Pedido novamente após 5 minutos.",
+            "open": "Volta após 5 minutos fora do PlayGuard."
+        },
+        "again_off": "Uma vez introduzido, vale até o PlayGuard fechar.",
         "locked_title": "O PlayGuard está bloqueado",
         "locked_body": "Introduza o PIN de controlo parental para o abrir.",
         "enter": "Introduzir o PIN"

@@ -3,11 +3,14 @@
 // opens at all.
 //
 //   off      never, except before "Show the PIN" (the PIN opens everything);
-//   changes  before the first change, then not again for 5 minutes: anyone
-//            can look, only the parent can change (the default, also when
-//            config.json is missing, damaged or holds an unknown value);
-//   open     to open PlayGuard (a lock screen until it is entered), and again
-//            after 5 minutes or more out of focus.
+//   changes  before the first change: anyone can look, only the parent can
+//            change (the default, also when config.json is missing, damaged
+//            or holds an unknown value);
+//   open     to open PlayGuard (a lock screen until it is entered).
+//
+// Once entered, the PIN holds until PlayGuard closes. "Ask for the PIN
+// again" (off by default) makes it hold 5 minutes instead: "changes" asks
+// again after them, "open" locks again after 5 minutes or more out of focus.
 //
 // "Show the PIN" asks every time, whatever the mode (the reveal check,
 // write_guard.h).
@@ -51,6 +54,9 @@ bool at_start();
 
 // Asks for the PIN now. True when it was entered, or when no PIN is set.
 bool ask();
+// Asks for the PIN unless it still holds (entered since PlayGuard opened, or
+// in the last 5 minutes with "Ask for the PIN again"), whatever the mode.
+bool confirm();
 // Before showing the PIN: asks for it now, in every mode, ignoring the grace
 // and the lock screen. True when it may be shown (the read right after does
 // not ask again). On a refusal it says why.
@@ -67,5 +73,9 @@ std::string note_text();
 // The PIN tab's picker. Turning it on needs a PIN on the console; turning it
 // down asks for the PIN first. `done` runs after a change.
 void choose(std::function<void()> done);
+
+// "Ask for the PIN again" (config pin_ask_again). Turning it off asks for
+// the PIN first (confirm()). `done` runs after a change.
+void set_ask_again(bool on, std::function<void()> done);
 
 }   // namespace pin_lock

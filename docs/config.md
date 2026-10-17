@@ -48,6 +48,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `start_tab` | string | the tab shown at start-up: `"dashboard"` (Overview), `"play_timer"`, `"activity"`, `"restrictions"`, `"security"` (PIN), `"console"`, `"history"`, `"preferences"`, `"about"`; `"clock"` and `"tools"`, from before they became Console, read as `"console"` | `"dashboard"` | Preferences |
 | `advanced` | boolean | shows the play timer's debug-class actions | `false` | Play timer › Advanced |
 | `auto_relock` | boolean | turns parental controls back on right after a change that needed the temporary unlock | `true` | PIN |
+| `pin_ask_again` | boolean | the PIN, once entered, holds 5 minutes instead of until PlayGuard closes: *Before a change* asks again after them, *To open PlayGuard* locks again after 5 minutes or more out of focus | `false` | PIN (*Ask for the PIN again after 5 minutes*) |
 | `onboarding_at_start` | boolean | *First steps* opens by itself at start-up while no PIN is set | `true` | First steps (*Show at start-up*) |
 | `clock_check_at_start` | boolean | measures the network clock at start-up and says when it is off | `false` | Console › Network clock |
 | `intro` | boolean | the loading screen stays 2 seconds at start-up (Ⓐ or Ⓑ skips it); off, the first screen comes as soon as it is ready | `true` | Preferences (*Show the intro for 2 seconds*) |
@@ -66,12 +67,16 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | Value | In the app | What it does |
 |---|---|---|
 | `"off"` | Never | Nothing is asked, except before *Show the PIN* (the PIN opens everything else). |
-| `"changes"` | Before a change | Anyone can look; the first change asks for the PIN, then nothing is asked for 5 minutes. The default. |
-| `"open"` | To open PlayGuard | A lock screen first; the right PIN opens the app, B quits. It comes back when PlayGuard returns after 5 minutes or more out of focus. |
+| `"changes"` | Before a change | Anyone can look; the first change asks for the PIN, then nothing is asked until PlayGuard closes. The default. |
+| `"open"` | To open PlayGuard | A lock screen first; the right PIN opens the app, B quits. Nothing is asked again until PlayGuard closes. |
+
+- With `pin_ask_again` on, the PIN holds 5 minutes instead: *Before a change*
+  asks again after them, and *To open PlayGuard*'s lock screen comes back when
+  PlayGuard returns after 5 minutes or more out of focus.
 
 - With no PIN on the console, nothing is asked whatever the value.
-- *Show the PIN* asks for it every time, whatever the value, even within the
-  5 minutes.
+- *Show the PIN* asks for it every time, whatever the value, even right after
+  it was entered.
 - A missing file, a missing key or a value not in the list gives `"changes"`:
   a damaged file never turns the prompt off. Only `"off"` written on purpose
   does.
@@ -200,6 +205,7 @@ line; the order does not matter when it reads them:
   "start_tab": "dashboard",
   "advanced": false,
   "auto_relock": true,
+  "pin_ask_again": false,
   "onboarding_at_start": true,
   "clock_check_at_start": false,
   "intro": true,

@@ -52,11 +52,14 @@ struct Config
     bool clock_check_at_start = false; // measure the network clock at start-up, say when it is off
     bool intro = true;                 // the loading screen stays 2 s at start-up (activity/loading_activity.hpp)
     std::string dev_builds_order = "newest";   // Install another build's pull requests: "newest" or "number"
-    // PIN › Protect PlayGuard with the PIN: "off", "changes" (before the first change,
-    // then not for 5 min) or "open" (to open PlayGuard). See pin_lock.hpp.
+    // PIN › Protect PlayGuard with the PIN: "off", "changes" (before the first
+    // change) or "open" (to open PlayGuard). See pin_lock.hpp.
     // "changes" by default, and when the value is missing or unknown: a
     // damaged file must not turn the prompt off.
     std::string pin_lock = "changes";
+    // PIN › Ask for the PIN again: the PIN holds 5 minutes, not until
+    // PlayGuard closes ("open" locks again after 5 minutes away).
+    bool pin_ask_again = false;
     // First steps opens by itself at start-up while no PIN is set, unless
     // its "Show at start-up" switch was turned off.
     bool onboarding_at_start = true;

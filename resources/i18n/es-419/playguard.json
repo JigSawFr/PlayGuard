@@ -609,11 +609,17 @@
         },
         "notes": {
             "off": "Cualquiera que tenga la consola puede cambiar aquí los ajustes. Mostrar el PIN lo pide igualmente.",
-            "changes": "Cualquiera puede consultar; solo el padre o la madre puede cambiar algo (se vuelve a pedir tras 5 minutos). Volver a bloquear nunca lo pide.",
-            "open": "Una pantalla de bloqueo hasta que se ingresa el PIN, y de nuevo después de 5 minutos fuera de PlayGuard. Volver a bloquear nunca lo pide."
+            "changes": "Cualquiera puede consultar; solo el padre o la madre puede cambiar algo. Volver a bloquear nunca lo pide.",
+            "open": "Una pantalla de bloqueo hasta que se ingresa el PIN. Volver a bloquear nunca lo pide."
         },
         "no_pin": "Defina primero un PIN (Definir o cambiar el PIN).",
         "set": "Proteger PlayGuard con el PIN: {}",
+        "ask_again": "Volver a pedir el PIN tras 5 minutos",
+        "again_on": {
+            "changes": "Se vuelve a pedir tras 5 minutos.",
+            "open": "Vuelve después de 5 minutos fuera de PlayGuard."
+        },
+        "again_off": "Una vez ingresado, vale hasta que se cierra PlayGuard.",
         "locked_title": "PlayGuard está bloqueado",
         "locked_body": "Ingrese el PIN de control parental para abrirlo.",
         "enter": "Ingresar el PIN"

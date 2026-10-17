@@ -20,8 +20,8 @@ namespace
 using pin_lock_logic::MODES;
 using pin_lock_logic::rank;
 
-std::chrono::steady_clock::time_point s_confirmed_until, s_refused_until;
-std::chrono::steady_clock::time_point s_pin_at;        // when the PIN was last entered
+std::chrono::steady_clock::time_point s_refused_until;
+std::chrono::steady_clock::time_point s_pin_at = pin_lock_logic::NEVER;   // when the PIN was last entered
 std::chrono::steady_clock::time_point s_reveal_until;  // before_show_pin() just asked
 std::chrono::steady_clock::time_point s_away_since;    // out of focus since (s_away)
 bool s_away = false;
@@ -36,8 +36,8 @@ bool check()
     // locking again. It grants no grace to the changes after it.
     if (s_tightening > 0) return true;
     using pin_lock_logic::Check;
-    const Check c = pin_lock_logic::check(config::get().pin_lock, std::chrono::steady_clock::now(),
-                                          s_confirmed_until, s_refused_until);
+    const Check c = pin_lock_logic::check(config::get().pin_lock, std::chrono::steady_clock::now(), s_pin_at,
+                                          config::get().pin_ask_again, s_refused_until);
     if (c == Check::Allow) return true;
     if (c == Check::Refuse) return false;
     if (ask()) return true;
@@ -82,7 +82,8 @@ void watch_focus(std::function<void()> lock)
         const auto since = s_away_since;
         // After this frame: a PIN screen that took the focus has returned by then.
         brls::sync([lock, since, now]() {
-            if (pin_lock_logic::lock_again(config::get().pin_lock, since, now, s_pin_at)) lock();
+            if (pin_lock_logic::lock_again(config::get().pin_lock, since, now, s_pin_at, config::get().pin_ask_again))
+                lock();
         });
     });
 }
@@ -99,10 +100,15 @@ bool ask()
     brls::Logger::info("pctl_ask_pin returned 0x{:08X}", (unsigned)rc);
     if (R_SUCCEEDED(rc)) {
         s_pin_at = std::chrono::steady_clock::now();
-        s_confirmed_until = s_pin_at + pin_lock_logic::GRACE;
         return true;
     }
     return rc == NXM_RC_NO_PIN;   // nothing to ask for
+}
+
+bool confirm()
+{
+    if (pin_lock_logic::holds(s_pin_at, std::chrono::steady_clock::now(), config::get().pin_ask_again)) return true;
+    return ask();
 }
 
 bool before_show_pin()
@@ -130,7 +136,12 @@ std::string mode_text()
 
 std::string note_text()
 {
-    return brls::getStr(std::string("playguard/pin_lock/notes/") + MODES[rank(config::get().pin_lock)]);
+    const int mode = rank(config::get().pin_lock);
+    std::string text = brls::getStr(std::string("playguard/pin_lock/notes/") + MODES[mode]);
+    if (mode > 0)
+        text += " " + (config::get().pin_ask_again ? brls::getStr(std::string("playguard/pin_lock/again_on/") + MODES[mode])
+                                                   : "playguard/pin_lock/again_off"_i18n);
+    return text;
 }
 
 void choose(std::function<void()> done)
@@ -148,7 +159,7 @@ void choose(std::function<void()> done)
             ui::notify("playguard/pin_lock/no_pin"_i18n);
             return;
         }
-        if (change == pin_lock_logic::Change::AskPin && !ask()) {
+        if (change == pin_lock_logic::Change::AskPin && !confirm()) {
             ui::notify(refusal_text());
             return;
         }
@@ -156,6 +167,20 @@ void choose(std::function<void()> done)
         ui::save_config(brls::getStr("playguard/pin_lock/set", labels[index]));
         if (done) done();
     });
+}
+
+void set_ask_again(bool on, std::function<void()> done)
+{
+    if (on == config::get().pin_ask_again) return;
+    // Less protection: only the parent may choose it.
+    if (!on && !confirm()) {
+        ui::notify(refusal_text());
+        if (done) done();   // the switch shows the setting again
+        return;
+    }
+    config::get().pin_ask_again = on;
+    ui::save_config();
+    if (done) done();
 }
 
 }   // namespace pin_lock

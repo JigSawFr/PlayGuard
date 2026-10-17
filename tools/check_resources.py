@@ -254,6 +254,7 @@ DYNAMIC_KEYS = {
     "history/sources/": array_of("source/action/history_logic.cpp", "SOURCES"),
     "pin_lock/modes/": array_of("source/action/pin_lock_logic.cpp", "MODES"),
     "pin_lock/notes/": array_of("source/action/pin_lock_logic.cpp", "MODES"),
+    "pin_lock/again_on/": [m for m in array_of("source/action/pin_lock_logic.cpp", "MODES") if m != "off"],   # pin_lock.cpp, note_text
     "tabs/": array_of("source/util/config.hpp", "START_TABS") +
     re.findall(r'open_label\("(\w+)"\)', read(f"{ROOT}/source/action/notices.cpp")),
     "tools/languages/": array_of("source/util/config.hpp", "LANGUAGES"),

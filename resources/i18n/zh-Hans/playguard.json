@@ -609,11 +609,17 @@
         },
         "notes": {
             "off": "拿到主机的任何人都能在此更改设置。显示 PIN 时仍需输入 PIN。",
-            "changes": "任何人都可以查看，只有家长能进行更改（5分钟后需再次输入）。重新启用时不需要输入。",
-            "open": "显示锁定画面，直到输入PIN为止；离开PlayGuard 5分钟后再次显示。重新启用时不需要输入。"
+            "changes": "任何人都可以查看，只有家长能进行更改。重新启用时不需要输入。",
+            "open": "显示锁定画面，直到输入PIN为止。重新启用时不需要输入。"
         },
         "no_pin": "请先设置PIN（设置或更改PIN）。",
         "set": "用PIN保护PlayGuard：{}",
+        "ask_again": "5分钟后再次要求输入PIN",
+        "again_on": {
+            "changes": "5分钟后需再次输入。",
+            "open": "离开PlayGuard 5分钟后再次显示。"
+        },
+        "again_off": "输入一次后，在关闭PlayGuard之前一直有效。",
         "locked_title": "PlayGuard已锁定",
         "locked_body": "请输入家长控制PIN以打开。",
         "enter": "输入PIN"

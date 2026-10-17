@@ -609,11 +609,17 @@
         },
         "notes": {
             "off": "Jeder, der die Konsole in der Hand hat, kann die Einstellungen hier ändern. Zum Anzeigen der Geheimzahl wird sie trotzdem abgefragt.",
-            "changes": "Jeder kann sich alles ansehen; nur Eltern können etwas ändern (erneute Abfrage nach 5 Minuten). Zum erneuten Aktivieren wird nie gefragt.",
-            "open": "Ein Sperrbildschirm, bis die Geheimzahl eingegeben wird, und erneut nach 5 Minuten außerhalb von PlayGuard. Zum erneuten Aktivieren wird nie gefragt."
+            "changes": "Jeder kann sich alles ansehen; nur Eltern können etwas ändern. Zum erneuten Aktivieren wird nie gefragt.",
+            "open": "Ein Sperrbildschirm, bis die Geheimzahl eingegeben wird. Zum erneuten Aktivieren wird nie gefragt."
         },
         "no_pin": "Legen Sie zuerst eine Geheimzahl fest (Geheimzahl festlegen oder ändern).",
         "set": "PlayGuard mit der Geheimzahl schützen: {}",
+        "ask_again": "Geheimzahl nach 5 Minuten erneut abfragen",
+        "again_on": {
+            "changes": "Erneute Abfrage nach 5 Minuten.",
+            "open": "Er erscheint erneut nach 5 Minuten außerhalb von PlayGuard."
+        },
+        "again_off": "Einmal eingegeben, gilt sie, bis PlayGuard geschlossen wird.",
         "locked_title": "PlayGuard ist gesperrt",
         "locked_body": "Geben Sie die Geheimzahl für die Altersbeschränkungen ein, um die App zu öffnen.",
         "enter": "Geheimzahl eingeben"
