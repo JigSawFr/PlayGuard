@@ -7,6 +7,11 @@ named after the emoji's code point in lowercase hex, without the U+FE0F
 variation selector: `1f680.png` for 🚀, `26a0.png` for ⚠️. An emoji that is
 not here shows no icon.
 
+The set is a palette, larger than what the notes use today on purpose: a new
+note can open on any of these without a new file. `tools/check_resources.py`
+leaves the unused ones alone, and warns about an emoji the notes open on that
+has no file here.
+
 To add one, take its 72×72 PNG from the same Twemoji release:
 
     curl -fO https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/<hex>.png

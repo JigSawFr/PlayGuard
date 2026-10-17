@@ -54,6 +54,8 @@ stops the program (a mock handed a bad pointer, a setup step everything needs).
 | `history_logic/` | `source/action/history_logic.cpp`: what an undoable history entry offers given the console's value now (already back, read-only, the alarm only in advanced mode, an unread value still offered), the "changed since" note and the value an undo records as replaced; the History screen's categories and filters (a refused change in its own category's filter and in *Refused by the console*, a kind of no category only under *Everything*), the day an entry belongs to and its day of the week (leap day, a malformed date). |
 | `timer_health_logic/` | `source/action/timer_health_logic.cpp`: when the Overview says the console is not counting play time (the timer on and not unlocked, a limit today above 0 and not reached nor passed, PlayGuard run as an application; the time left not moving by 5 s over 90 s on screen, a gap of over 15 s between two readings not counted as time on screen), and when it stops saying so. |
 | `sys_updates/` | `source/util/sys_updates.cpp`: release tags as versions (`v6.5.4`, `1.12.0`; one number, four, empty parts or a suffix refused), the tag at the end of a release page's URL, hekate's version in `bootloader/update.bin` (its `ICTC` magic and digit bytes within the first kilobyte, a minor of 10, noise before it, a cut file), and the text `config.json` keeps (round trip, missing ones left out, unknown keys and bad versions ignored). |
+| `sys_updates_net/` | `source/util/sys_updates_net.cpp`, built twice: `sys_updates_net` (`-D__SWITCH__`, against a fake `http::redirect`) for each repository's `releases/latest` redirect read as a version, in order, a page that does not redirect leaving its version empty and the first failure in the error, the others still asked, a redirect elsewhere or to a tag that is not a version giving nothing; `sys_updates_sim` for the desktop's `PLAYGUARD_SIM_SYS_LATEST` (three versions, nothing without it or with `offline`, a malformed value refused). |
+| `ntp_servers/` | `source/util/ntp_servers.cpp` against a fake `platform_region()`: the server picked for each console region (an unknown one, or none read, giving `pool.ntp.org`), the built-in list (region ids and hosts unique, every host a plain name `config.json` can keep, each region's default in it), and the two cross-check servers (never the primary). |
 | `sys_notes/` | `source/util/sys_notes.cpp`: GitHub release lists (drafts, pre-releases, tags that are not versions and repeated ones left out; dates; pages elsewhere than github.com dropped; not a list refused), the notes trimmed (hekate's banner, FAQ and empty Download section; Atmosphère's notes of the previous release), the firmware each release says it supports ("Support was added for", "Latest HOS supported:", "HOS … support"; mentions that are not claims ignored), switchbrew's version table and dates, a version's page (its change-log as Markdown, security fixes, pctl updated), the tabs a screen shows (the installed version, then at most five newer ones), what updating the firmware needs (nothing, update first, wait), and the cache file (round trip, an edited file's bad values left out, a fresh list keeping the notes read before). |
 | `notice_logic/` | `source/action/notice_logic.cpp`: what the notification bell lists (to do first, each kind in the order first set; an entry set again keeps its place, one moved to the other kind joins that kind), what it counts, and putting an entry away (only one for information; it stays away while set again with the same text, comes back with new text or when set again after being cleared). |
 | `offline_clock_logic/` | `source/action/offline_clock_logic.cpp`: when no time server answers, when *Set the network clock to the console clock* is offered (not for a console clock before 2026, never set; not when the two clocks already agree) and what its confirmation must add, with *Synchronize Clock via Internet* on or off. |
@@ -82,6 +84,37 @@ stops the program (a mock handed a bad pointer, a setup step everything needs).
 | `pt_logic/` | `source/action/pt_logic.cpp`: when a play-timer write needs the temporary unlock, how much was played today (past the limit while the console only warns: the time left below 0, the time over it), the suspend warning (none on a warning only), extra time, *No more play today* and putting it back, the bedtime, what `pt_flow`'s pickers start on (limits, bedtimes) and the Overview's extra-time and alarm lines. |
 | `support/` | `source/util/support.cpp`: when the main screen shows *What's new* or the monthly *Support PlayGuard* reminder. |
 | `ntp_packet/` | `source/util/ntp_packet.c`: every malformed / unsynchronised NTP reply is rejected; NTP era handling. |
+
+## Fuzzing
+
+`tests/fuzz/<target>/` holds a libFuzzer target for each parser of outside
+data, built by clang with AddressSanitizer and UndefinedBehaviorSanitizer:
+
+```sh
+make fuzz                  # every target, 30 s each, in parallel (JOBS)
+make fuzz FUZZ_SECONDS=300
+make build/fuzz/markdown.run FUZZ_SECONDS=60   # one target
+```
+
+It needs clang and its fuzzer runtime (`libclang-rt-dev`). Each run starts
+from the seed inputs in `tests/fuzz/<target>/corpus/` (never written to) and
+keeps what it finds in `build/fuzz/<target>.corpus/`; its output is in
+`build/fuzz/<target>.log`. A crash, a sanitizer report or a broken property
+(`FUZZ_ASSERT`, [`fuzz/fuzz.h`](fuzz/fuzz.h)) stops the target and leaves
+the input as `build/fuzz/<target>-crash-<sha1>`: `build/fuzz/<target> <that
+file>` replays it. A target is a few lines in the Makefile (`<name>_FUZZ`,
+next to the others); a `dict` file next to its corpus is passed as libFuzzer's
+dictionary. CI runs every target for 30 s.
+
+| Target | Fuzzes |
+|---|---|
+| `zip_read/` | `zip_read::extract()` on any archive (a downloaded Actions artifact): an extraction that succeeds leaves at most the size allowed, one that fails leaves no file and says why. |
+| `markdown/` | `markdown::parse()`, `inline_text()` and `safe_text::clean()` on any bytes: the bounds `markdown.hpp` promises, every string valid UTF-8, `clean()` within its size and stable. |
+| `changelog/` | `changelog::parse()` and `release_notes()`: the number of releases asked for kept, icons as hex code points. |
+| `rescue/` | `rescue_request_mode()` and `rescue_report_parse()` (files anyone with the SD card can write): a parsed report formats back to the same, a refused one leaves the output untouched. |
+| `config/` | `config::load()` of `config.json` and `state.json` (in a temporary folder): what it read saves and reads back to the same settings. |
+| `game_cache/` | `game_cache::decode()`, then the rules of `core/gamecheck_rules.c` on what it returns, `to_check()`, `put()` and `set_verified()`: a decoded file encodes and decodes to the same, strings end in their arrays, the content count is bounded, every `bool` 0 or 1. |
+| `play_cache/` | `play_cache::decode()` and `shift_days()`: the same round trip, games bounded, names ending in their arrays, every `bool` 0 or 1. |
 
 The `pctl_session`, `time_ops` and `ntp_packet` suites started from anbingxi's
 fork (`diag/fw22-5-readonly`). Passing them does not prove how a real console
