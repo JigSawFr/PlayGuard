@@ -46,33 +46,18 @@ std::string value_text(const std::string& kind, const std::vector<int>& v)
     return "";
 }
 
-bool known_kind(const std::string& kind)
-{
-    static const char* known[] = { "limits", "level", "custom", "org", "vr", "alarm", "pin", "pin_shown",
-                                   "unlock", "relock", "unlink", "delete", "clock", "restore", "rescue",
-                                   "console_lock", "bedtime", "config_reset", "outside_reset", "outside_clock",
-                                   "outside_limits", "new_account", "time_up", "countdown", "remove_game",
-                                   "remove_update", "remove_addon", "launch_version" };
-    for (const char* k : known)
-        if (kind == k) return true;
-    return false;
-}
-
 std::string kind_label(const std::string& kind)
 {
     // A kind this version does not know (written by a newer one): said as
     // such, with its name for a bug report.
-    if (!known_kind(kind)) return brls::getStr("playguard/history/unknown_kind", kind);
+    if (!history_logic::known_kind(kind)) return brls::getStr("playguard/history/unknown_kind", kind);
     return brls::getStr("playguard/history/kinds/" + kind);
 }
 
 std::string source_label(const history::Entry& e)
 {
-    static const char* known[] = { "uniform", "day", "per_day", "extra", "stop", "restore_extra",
-                                   "remove", "backup", "undo", "first_steps", "overview", "console_lock" };
     if (e.source == "profile") return brls::getStr("playguard/history/sources/profile", e.detail);
-    for (const char* s : known)
-        if (e.source == s) return brls::getStr(std::string("playguard/history/sources/") + s);
+    if (history_logic::known_source(e.source)) return brls::getStr("playguard/history/sources/" + e.source);
     return "";
 }
 
@@ -268,7 +253,7 @@ std::string details(const history::Entry& e)
         out += "\n" + brls::getStr("playguard/common/line", "playguard/history/version"_i18n, e.version);
     if (!e.result.empty())
         out += "\n\n" + brls::getStr("playguard/history/failed_note", ui::rc_text(result_of(e), false));
-    if (!known_kind(e.kind)) out += "\n\n" + "playguard/history/unknown_note"_i18n;
+    if (!history_logic::known_kind(e.kind)) out += "\n\n" + "playguard/history/unknown_note"_i18n;
     return out;
 }
 
