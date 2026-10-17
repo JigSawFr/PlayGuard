@@ -28,7 +28,7 @@
         "refresh": "Actualiser",
         "open": "Ouvrir",
         "exit_again": "Appuyez de nouveau sur B pour quitter",
-        "exit_unlocked": "Le contrôle parental est encore déverrouillé temporairement : on peut jouer sans limite jusqu'à ce qu'il soit reverrouillé ou que la console redémarre.\n\nLe reverrouiller avant de quitter ?",
+        "exit_unlocked": "Le contrôle parental est encore déverrouillé temporairement : on peut jouer sans limite jusqu'à ce qu'il soit réactivé ou que la console redémarre.\n\nLe réactiver avant de quitter ?",
         "exit_lock": "Réactiver et quitter",
         "exit_leave": "Quitter sans verrouiller"
     },

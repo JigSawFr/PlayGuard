@@ -1,9 +1,11 @@
-// ui — dialogs, confirmations, the dropdown, keyboard prompts and the PIN dialog.
+// ui — dialogs, confirmations, a web page's QR code, the dropdown, keyboard prompts and the PIN dialog.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
 #include "core/platform.h"
 #include "util/duration.hpp"
+#include "util/text.hpp"
+#include "view/qr_view.hpp"
 
 #include <memory>
 #include <yoga/Yoga.h>
@@ -142,6 +144,28 @@ void confirm_danger(const std::string& body, const std::string& confirm_label, s
 void info(const std::string& body)
 {
     auto* dialog = ui::dialog(body);
+    dialog->addButton("hints/ok"_i18n, []() {});
+    dialog->open();
+}
+
+void qr_dialog(const std::string& body, const std::string& url)
+{
+    auto* box = new brls::Box(brls::Axis::COLUMN);
+    box->setAlignItems(brls::AlignItems::CENTER);
+    box->setPadding(20, 32, 10, 32);
+    brls::Label* label = text_label(body, 20, color_text());
+    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    label->setAlignSelf(brls::AlignSelf::STRETCH);
+    box->addView(label);
+    auto* qr = new QrView(url, 240);
+    qr->setMarginTop(12);
+    qr->setMarginBottom(10);
+    box->addView(qr);
+    brls::Label* link = text_label(text::short_url(url), 17, color_note());
+    link->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    link->setAlignSelf(brls::AlignSelf::STRETCH);
+    box->addView(link);
+    auto* dialog = new brls::Dialog(box);
     dialog->addButton("hints/ok"_i18n, []() {});
     dialog->open();
 }

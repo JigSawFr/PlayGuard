@@ -44,7 +44,8 @@ bool redirect(const std::string& url, std::string* target, std::string* error, c
 // behind on failure: the caller removes it, or resumes it.
 // `resume_from` > 0: `path` already holds that many bytes of it; the rest is
 // asked for (a Range request) and appended. A server that sends it all again
-// (200, not 206) has the file started over; an error answer (>= 400), or
+// (200, not 206) has the file started over, unless libcurl stops it first
+// (http_logic::RANGE_REFUSED, the file as it was); an error answer (>= 400), or
 // any other one to a Range request, writes nothing, and the file keeps what
 // it held.
 // `cancel` (when given) set by another thread stops the transfer within a

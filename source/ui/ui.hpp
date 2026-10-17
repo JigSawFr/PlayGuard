@@ -116,6 +116,9 @@ void confirm_with(const std::string& body, brls::View* extra, const std::string&
 // "bad" colour so it never looks like an ordinary OK.
 void confirm_danger(const std::string& body, const std::string& confirm_label, std::function<void()> on_yes);
 void info(const std::string& body);
+// A web page to open on a phone: `body`, the QR code of `url`, then `url`
+// itself, shortened (text::short_url), and OK.
+void qr_dialog(const std::string& body, const std::string& url);
 
 // Reads the stored PIN (pctl_get_pin) and shows it in large digits, or a
 // dialog with the error. The app's copies are wiped as soon as the label

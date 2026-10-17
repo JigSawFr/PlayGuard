@@ -12,6 +12,7 @@
 #include "util/paths.hpp"
 #include "util/pt_block.hpp"
 #include "util/pt_log.hpp"
+#include "util/text.hpp"
 
 namespace log_upload
 {
@@ -118,14 +119,6 @@ std::string cut_to(const std::string& text, size_t room)
     while (keep > 0 && ((unsigned char)text[keep] & 0xC0) == 0x80) keep--;
     return text.substr(0, keep) + CUT_NOTICE.substr(0, room - keep);
 }
-
-std::string trimmed(const std::string& s)
-{
-    size_t b = 0, e = s.size();
-    while (b < e && std::isspace((unsigned char)s[b])) b++;
-    while (e > b && std::isspace((unsigned char)s[e - 1])) e--;
-    return s.substr(b, e - b);
-}
 }   // namespace
 
 namespace
@@ -137,7 +130,7 @@ std::string process_name(const std::string& text)
     const size_t at = text.find("Process Name:");
     if (at == std::string::npos) return "";
     const size_t end = text.find('\n', at);
-    std::string name = trimmed(text.substr(at + 13, end == std::string::npos ? std::string::npos : end - at - 13));
+    std::string name = text::trim_space(text.substr(at + 13, end == std::string::npos ? std::string::npos : end - at - 13));
     std::transform(name.begin(), name.end(), name.begin(), [](unsigned char c) { return (char)std::tolower(c); });
     return name;
 }

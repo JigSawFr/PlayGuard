@@ -5,21 +5,12 @@
 // decodes to the same, strings end inside their arrays, the content count is
 // bounded, and to_check() keeps only listed games.
 #include <cstdint>
-#include <cstdlib>
 #include <cstring>
 #include <set>
 #include <string>
 
 #include "fuzz.h"
 #include "util/game_cache.hpp"
-
-// gamecheck_rules.c's gamecheck_scan() reads the console through these
-// (core/gamecheck.c, not linked here); nothing here scans.
-extern "C" Result gamecheck_records(GameRecord*, u32, u32*, bool*) { abort(); }
-extern "C" u32 gamecheck_check(const GameRecord*, u32, GameFacts*, bool (*)(void*, const GameFacts*, u32), void*)
-{
-    abort();
-}
 
 static void judge(const GameFacts& g, uint32_t hos)
 {

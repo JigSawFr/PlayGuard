@@ -5,7 +5,6 @@
 #endif
 #include "util/github_auth.hpp"
 #include "util/http.hpp"
-#include "util/paths.hpp"
 #include "util/sys_notes.hpp"
 
 namespace sys_notes

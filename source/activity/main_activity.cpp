@@ -53,11 +53,9 @@ static void quit_or_relock()
         return;
     }
     brls::Logger::info("quitting while unlocked: asking to lock again");
+    // Turning them back on first: borealis focuses a dialog's first button, so
+    // a quick A on the way out never leaves the console unlocked.
     auto* dialog = ui::dialog("playguard/hints/exit_unlocked"_i18n);
-    dialog->addButton("playguard/hints/exit_leave"_i18n, []() {
-        pt_flow::keep_unlocked();   // chosen: the next start does not lock again
-        brls::Application::quit();
-    });
     dialog->addButton("playguard/hints/exit_lock"_i18n, []() {
         pt_flow::lock_at_exit();
         // Drawn before quitting: the last frame, the one the console keeps
@@ -66,6 +64,13 @@ static void quit_or_relock()
                                         brls::TransitionAnimation::NONE);
         brls::sync([]() { brls::sync([]() { brls::sync([]() { brls::Application::quit(); }); }); });
     });
+    dialog->addButton("playguard/hints/exit_leave"_i18n, []() {
+        pt_flow::keep_unlocked();   // chosen: the next start does not lock again
+        brls::Application::quit();
+    });
+    // The risky choice in the warning colour, as ui::confirm_danger draws it.
+    if (auto* button = dynamic_cast<brls::Button*>(dialog->getView("brls/dialog/button2")))
+        button->setTextColor(ui::color_bad());
     dialog->open();
 }
 

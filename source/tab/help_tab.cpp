@@ -211,8 +211,3 @@ void HelpTab::refresh()
     dev_github->setDetailText(github_auth::token().empty() ? "playguard/github/not_signed_in"_i18n
                                                            : "playguard/github/signed_in_short"_i18n);
 }
-
-brls::View* HelpTab::create()
-{
-    return new HelpTab();
-}

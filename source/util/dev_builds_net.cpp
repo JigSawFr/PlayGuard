@@ -14,6 +14,7 @@
 #include "util/dev_builds.hpp"
 #include "util/github_auth.hpp"
 #include "util/http.hpp"
+#include "util/http_logic.hpp"
 #include "util/paths.hpp"
 #include "util/zip_read.hpp"
 
@@ -268,9 +269,13 @@ bool download(const Build& b, const std::string& path, std::string* error,
                 *error += ": GitHub refused the download, sign out of GitHub and sign in again";
         }
         if (ok) ok = http::download(link, part, error, (size_t)b.size + 1, 600, progress, resume_from, cancel);
-        // The part kept no longer matches what the server has: from the start.
-        if (!ok && resume_from && error && *error == "HTTP 416" && !(cancel && cancel->load())) {
+        // The part kept no longer matches what the server has (416), or the
+        // server cannot resume it (libcurl stops before the 200 that starts
+        // over is written): from the start, or every later attempt would stop
+        // the same way.
+        if (!ok && resume_from && error && http_logic::restart_resume(*error) && !(cancel && cancel->load())) {
             resume_from = 0;
+            std::remove(part.c_str());
             ok = http::download(link, part, error, (size_t)b.size + 1, 600, progress, 0, cancel);
         }
     }

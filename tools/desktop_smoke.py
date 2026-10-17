@@ -1097,7 +1097,7 @@ if RESCUE:
         if not any(e.get("kind") == "rescue" for e in entries):
             fail("recovery was not recorded in the change history")
         if not any(e.get("kind") == "relock" for e in entries):
-            fail("\"Lock and quit\" did not lock again")
+            fail("\"Turn back on and quit\" did not lock again")
 
     # Still unlocked (the sysmodule's unlock): quitting asks to lock again.
     def asked_to_relock():
@@ -1108,19 +1108,19 @@ if RESCUE:
             break
         key("Escape")
         time.sleep(0.3)
+    time.sleep(4.5)            # the "Press B again" toast gone: the dialog is a reference
     shot("03_quit_unlocked")
     if not alive() or not asked_to_relock():
         fail("quitting while unlocked did not ask to lock again")
-    key("Right")               # Quit, still unlocked | Lock and quit
-    key("Return")
+    key("Return")              # Turn back on and quit, the first button: focused
     for _ in range(50):
         if not alive():
             break
         time.sleep(0.1)
     if alive():
-        fail("\"Lock and quit\" did not quit")
+        fail("\"Turn back on and quit\" did not quit")
     if "exit to HOME" not in open(os.path.join(OUT, "app.log"), errors="replace").read():
-        fail("\"Lock and quit\" went back to hbmenu, not to the HOME menu")
+        fail("\"Turn back on and quit\" went back to hbmenu, not to the HOME menu")
     finish(recorded)
 
 shot("01_dashboard")

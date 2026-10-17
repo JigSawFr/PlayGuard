@@ -27,10 +27,17 @@ bool succeeded(const Outcome& o, std::string* error)
     else if (o.refused) why = "unexpected answer (HTTP " + std::to_string(o.status) + ")";
     else if (o.overflow) why = "response too large";
     else if (o.file_error) why = "cannot write the file";
-    else if (!o.transfer_ok) why = o.transfer_error;
+    else if (!o.transfer_ok) why = o.range_error ? RANGE_REFUSED : o.transfer_error;
     else return true;
     if (error) *error = why;
     return false;
+}
+
+const char* const RANGE_REFUSED = "the server cannot resume this download";
+
+bool restart_resume(const std::string& error)
+{
+    return error == "HTTP 416" || error == RANGE_REFUSED;
 }
 
 Start download_start(long status, bool resumed)

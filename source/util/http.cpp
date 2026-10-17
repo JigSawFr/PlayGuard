@@ -250,6 +250,7 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
     outcome.file_error  = sink.file_error;
     outcome.refused     = sink.refused;
     outcome.transfer_ok = rc == CURLE_OK;
+    outcome.range_error = rc == CURLE_RANGE_ERROR;
     if (rc != CURLE_OK) outcome.transfer_error = message[0] ? message : curl_easy_strerror(rc);
     return http_logic::succeeded(outcome, error);
 }

@@ -9,10 +9,8 @@
 #include "ui/ui.hpp"
 #include "util/changelog.hpp"
 #include "util/markdown.hpp"
-#include "util/text.hpp"
 #include "view/build_cell.hpp"
 #include "view/markdown_view.hpp"
-#include "view/qr_view.hpp"
 #include "view/release_notes.hpp"
 
 using namespace brls::literals;
@@ -73,25 +71,7 @@ std::string DevBuildActivity::page() const
 void DevBuildActivity::show_page()
 {
     const std::string url = this->page();
-    if (url.empty()) return;
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::CENTER);
-    box->setPadding(20, 32, 10, 32);
-    brls::Label* body = ui::text_label("playguard/dev_build/open_github_body"_i18n, 20, ui::color_text());
-    body->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    body->setAlignSelf(brls::AlignSelf::STRETCH);
-    box->addView(body);
-    auto* qr = new QrView(url, 240);
-    qr->setMarginTop(12);
-    qr->setMarginBottom(10);
-    box->addView(qr);
-    brls::Label* link = ui::text_label(text::short_url(url), 17, ui::color_note());
-    link->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    link->setAlignSelf(brls::AlignSelf::STRETCH);
-    box->addView(link);
-    auto* dialog = new brls::Dialog(box);
-    dialog->addButton("hints/ok"_i18n, []() {});
-    dialog->open();
+    if (!url.empty()) ui::qr_dialog("playguard/dev_build/open_github_body"_i18n, url);
 }
 
 void DevBuildActivity::onContentAvailable()

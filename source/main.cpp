@@ -398,7 +398,7 @@ int main(int argc, char* argv[])
         if (session_log::due()) ui::write_later("session log", []() { session_log::flush(); }, "session_log");
     }
 
-    // "Lock and quit": locked now that the screen is gone (pt_flow.hpp).
+    // "Turn back on and quit": locked now that the screen is gone (pt_flow.hpp).
     pt_flow::lock_at_exit_if_asked();
 
     // Network tasks still running (an update check, a sign-in waiting for its

@@ -28,7 +28,7 @@
         "refresh": "Aggiorna",
         "open": "Apri",
         "exit_again": "Premi di nuovo B per uscire",
-        "exit_unlocked": "Il filtro famiglia è ancora sbloccato temporaneamente: si può giocare senza limiti finché non viene bloccato di nuovo o la console si riavvia.\n\nBloccarlo prima di uscire?",
+        "exit_unlocked": "Il filtro famiglia è ancora sbloccato temporaneamente: si può giocare senza limiti finché non viene riattivato o la console si riavvia.\n\nRiattivarlo prima di uscire?",
         "exit_lock": "Riattiva ed esci",
         "exit_leave": "Esci senza bloccare"
     },

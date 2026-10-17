@@ -28,7 +28,7 @@
         "refresh": "Atualizar",
         "open": "Abrir",
         "exit_again": "Prima B novamente para sair",
-        "exit_unlocked": "O controlo parental continua desbloqueado temporariamente: pode jogar-se sem limite até voltar a ser bloqueado ou a consola reiniciar.\n\nBloquear antes de sair?",
+        "exit_unlocked": "O controlo parental continua desbloqueado temporariamente: pode jogar-se sem limite até ser reativado ou a consola reiniciar.\n\nReativar antes de sair?",
         "exit_lock": "Reativar e sair",
         "exit_leave": "Sair sem bloquear"
     },

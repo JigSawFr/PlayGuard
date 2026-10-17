@@ -67,6 +67,23 @@ static void test_outcome()
     http_logic::Outcome server;
     server.status = 503;
     CHECK(!http_logic::succeeded(server, &error) && error == "HTTP 503");
+
+    // A Range request answered in full: libcurl stops it (CURLE_RANGE_ERROR)
+    // with a message that changed between versions, so the error is one of
+    // PlayGuard's own, and a resumed download starts over on it as on a 416.
+    http_logic::Outcome range;
+    range.status = 200;
+    range.transfer_ok = false;
+    range.range_error = true;
+    range.transfer_error = "HTTP server doesn't seem to support byte ranges. Cannot resume.";
+    CHECK(!http_logic::succeeded(range, &error) && error == http_logic::RANGE_REFUSED);
+    CHECK(http_logic::restart_resume(error));
+    range.transfer_error = "HTTP server does not seem to support byte ranges. Cannot resume.";
+    CHECK(!http_logic::succeeded(range, &error) && error == http_logic::RANGE_REFUSED);
+    CHECK(http_logic::restart_resume("HTTP 416"));
+    CHECK(!http_logic::restart_resume("HTTP 404"));
+    CHECK(!http_logic::restart_resume(timeout.transfer_error));
+    CHECK(!http_logic::restart_resume("cancelled"));
 }
 
 static void test_download_start()

@@ -12,7 +12,6 @@ class HelpTab : public TabBase
 {
   public:
     HelpTab();
-    static brls::View* create();
 
   protected:
     void refresh() override;

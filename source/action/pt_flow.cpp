@@ -20,11 +20,6 @@ using namespace brls::literals;
 namespace pt_flow
 {
 
-const std::vector<uint16_t>& quick_values()
-{
-    return pt_logic::quick_values();
-}
-
 // A record made by this run is an unlock still in use, not an interrupted one.
 static bool s_pending_this_run = false;
 
@@ -449,14 +444,14 @@ void choose_uniform_limit(const PtState& pt, std::function<void()> refresh)
 {
     const pt_logic::UniformPick pick = pt_logic::uniform_pick(pt);
     std::vector<std::string> labels;
-    for (uint16_t v : quick_values()) labels.push_back(ui::fmt_minutes(v));
+    for (uint16_t v : pt_logic::quick_values()) labels.push_back(ui::fmt_minutes(v));
     labels.push_back("playguard/common/custom"_i18n);
 
     const std::string title = pick.uniform ? "playguard/play_timer/quick_title"_i18n
                                            : "playguard/play_timer/quick_title_varies"_i18n;
     const uint16_t seed = pick.seed;
     ui::pick(title, labels, pick.selected, [refresh, seed](int index) {
-        const auto& values = quick_values();
+        const auto& values = pt_logic::quick_values();
         if ((size_t)index < values.size()) {
             apply_uniform(values[index], refresh);
             return;
@@ -472,7 +467,7 @@ void pick_limit(const std::string& title, uint16_t current, std::function<void(u
     // no limit; the current value is pre-selected.
     const pt_logic::LimitPick pick = pt_logic::limit_pick(current);
     std::vector<std::string> options;
-    for (uint16_t v : quick_values()) options.push_back(ui::fmt_minutes(v));
+    for (uint16_t v : pt_logic::quick_values()) options.push_back(ui::fmt_minutes(v));
     options.push_back("playguard/play_timer/perday/pick_minutes"_i18n);
     options.push_back("playguard/play_timer/perday/pick_no_limit"_i18n);
 
@@ -483,7 +478,7 @@ void pick_limit(const std::string& title, uint16_t current, std::function<void(u
         } else if (index == custom_index) {
             ui::prompt_minutes(title, pt_logic::limit_seed(current), [on_value](uint16_t v) { on_value(v); });
         } else {
-            on_value(quick_values()[index]);
+            on_value(pt_logic::quick_values()[index]);
         }
     });
 }

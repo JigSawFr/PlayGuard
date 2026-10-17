@@ -10,15 +10,11 @@
 #include <cstdint>
 #include <functional>
 #include <string>
-#include <vector>
 
 #include "util/pctl_ops_c.hpp"
 
 namespace pt_flow
 {
-
-// Limits offered by the pickers, in minutes (0 = no play that day).
-const std::vector<uint16_t>& quick_values();
 
 // `body`, then, while the console is linked to the phone app, the note that
 // its next synchronisation overwrites what is written here: every write
@@ -148,7 +144,7 @@ void relock_if_interrupted();
 Result unlock_temporarily();
 // Quitting while unlocked, "Quit, still unlocked": a choice, so the record goes.
 void keep_unlocked();
-// Quitting while unlocked, "Lock and quit": the lock waits for the end of
+// Quitting while unlocked, "Turn back on and quit": the lock waits for the end of
 // main(), once the screen is gone (lock_at_exit_if_asked). Locked while the
 // app still ran, the console would at once stop the game PlayGuard runs over
 // (the play timer's "limit reached", the PIN) with PlayGuard behind it, and

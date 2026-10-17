@@ -24,7 +24,7 @@ class LoadingActivity : public brls::Activity
     enum class Mode
     {
         Start,     // the start-up
-        Closing,   // "Lock and quit": the last screen, the bar full, until PlayGuard is gone
+        Closing,   // "Turn back on and quit": the last screen, the bar full, until PlayGuard is gone
     };
 
     explicit LoadingActivity(Mode mode = Mode::Start) : mode(mode) {}

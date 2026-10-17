@@ -3,8 +3,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "gamecheck.h"
 
-#include <string.h>
-
 u32 gamecheck_sysver_to_hos(u32 v)
 {
     if (!v) return 0;
@@ -34,14 +32,6 @@ u8 gamecheck_max_key_generation(u32 hos)
         if (first <= hos) max = KEY_GENERATIONS[i].key_generation;
     }
     return max;
-}
-
-u32 gamecheck_key_generation_firmware(u8 key_generation)
-{
-    for (size_t i = 0; i < KEY_GENERATION_COUNT; i++)
-        if (KEY_GENERATIONS[i].key_generation >= key_generation)
-            return MAKEHOSVERSION(KEY_GENERATIONS[i].major, KEY_GENERATIONS[i].minor, KEY_GENERATIONS[i].micro);
-    return 0;
 }
 
 u32 gamecheck_installed_version(const GameFacts *g)
@@ -125,15 +115,6 @@ u32 gamecheck_recommended(const GameFacts *g, GameIssue issue, u32 current_hos)
             break;
     }
     return actions & pick;
-}
-
-void gamecheck_scan(GameCheck *out)
-{
-    memset(out, 0, sizeof(*out));
-    static GameRecord records[GAMECHECK_MAX];   // one scan at a time (the caller's thread)
-    out->rc = gamecheck_records(records, GAMECHECK_MAX, &out->count, &out->truncated);
-    if (R_SUCCEEDED(out->rc)) gamecheck_check(records, out->count, out->games, NULL, NULL);
-    else out->count = 0;
 }
 
 bool gamecheck_is_corruption(Result rc)

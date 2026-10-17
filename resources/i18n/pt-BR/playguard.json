@@ -28,7 +28,7 @@
         "refresh": "Atualizar",
         "open": "Abrir",
         "exit_again": "Pressione B de novo para sair",
-        "exit_unlocked": "O controle dos pais continua desbloqueado temporariamente: dá para jogar sem limite até ele ser bloqueado de novo ou o console reiniciar.\n\nBloquear antes de sair?",
+        "exit_unlocked": "O controle dos pais continua desbloqueado temporariamente: dá para jogar sem limite até ele ser reativado ou o console reiniciar.\n\nReativar antes de sair?",
         "exit_lock": "Reativar e sair",
         "exit_leave": "Sair sem bloquear"
     },

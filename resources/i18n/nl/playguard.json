@@ -28,7 +28,7 @@
         "refresh": "Vernieuwen",
         "open": "Openen",
         "exit_again": "Druk nogmaals op B om af te sluiten",
-        "exit_unlocked": "Ouderlijk toezicht is nog tijdelijk ontgrendeld: er kan zonder limiet worden gespeeld tot het weer wordt vergrendeld of de console opnieuw start.\n\nVergrendelen voor het afsluiten?",
+        "exit_unlocked": "Ouderlijk toezicht is nog tijdelijk ontgrendeld: er kan zonder limiet worden gespeeld tot het weer wordt ingeschakeld of de console opnieuw start.\n\nWeer inschakelen voor het afsluiten?",
         "exit_lock": "Weer inschakelen en afsluiten",
         "exit_leave": "Afsluiten zonder vergrendelen"
     },

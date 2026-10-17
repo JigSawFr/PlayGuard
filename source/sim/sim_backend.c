@@ -776,7 +776,12 @@ static void sim_add_content(GameFacts *g, u64 id, u32 version, u8 type, u8 stora
 
 // Every game the simulated console has, fully checked (gamecheck_check
 // returns them one at a time).
-static void sim_games(GameCheck *out)
+typedef struct {
+    u32       count;
+    GameFacts games[GAMECHECK_MAX];
+} SimGames;
+
+static void sim_games(SimGames *out)
 {
     memset(out, 0, sizeof(*out));
     static const char *fine[] = { "Star Kart Racers", "Island Builders", "Pixel Quest Deluxe",
@@ -950,7 +955,7 @@ static void sim_bump(u64 id)
 
 Result gamecheck_records(GameRecord *out, u32 max, u32 *count, bool *truncated)
 {
-    static GameCheck all;
+    static SimGames all;
     sim_games(&all);
     *count = 0;
     *truncated = false;
@@ -978,7 +983,7 @@ void gamecheck_last_timing(GameCheckTiming *out)
 u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
                     bool (*on_game)(void *ctx, const GameFacts *game, u32 done), void *ctx)
 {
-    static GameCheck all;
+    static SimGames all;
     sim_games(&all);
     const char *ms_env = getenv("PLAYGUARD_SIM_CHECK_MS");
     const long ms = ms_env ? strtol(ms_env, NULL, 10) : 150;

@@ -46,7 +46,7 @@ typedef struct {
     u8  storage;   // GC_STORAGE_*
 } GameContent;
 
-// What was found of one game. Filled by gamecheck_scan(); the host tests and
+// What was found of one game. Filled by gamecheck_check(); the host tests and
 // the simulator fill it by hand.
 typedef struct {
     u64  app_id;
@@ -150,8 +150,6 @@ u32 gamecheck_sysver_to_hos(u32 required_system_version);
 // The highest key generation (an NCA header's KeyGeneration) the firmware
 // `hos` has the keys for; 0 when the firmware is newer than the table.
 u8 gamecheck_max_key_generation(u32 hos);
-// The first firmware with `key_generation` (MAKEHOSVERSION), 0 when unknown.
-u32 gamecheck_key_generation_firmware(u8 key_generation);
 
 // One HOME menu entry, as the console lists it (quick: no game is read).
 typedef struct {
@@ -181,16 +179,6 @@ typedef struct {
     u64 total_ns, setup_ns, control_ns, contents_ns, state_ns;
 } GameCheckTiming;
 void gamecheck_last_timing(GameCheckTiming *out);
-
-typedef struct {
-    Result rc;          // listing the games (ns); nothing else is filled when it fails
-    u32    count;       // every game the console lists, up to GAMECHECK_MAX
-    bool   truncated;   // more than GAMECHECK_MAX games
-    GameFacts games[GAMECHECK_MAX];
-} GameCheck;
-
-// gamecheck_records() then gamecheck_check() of them all.
-void gamecheck_scan(GameCheck *out);
 
 // Deletes the game, its update and add-ons, and its entry on the HOME menu
 // (nsDeleteApplicationCompletely, then the entry itself if one is left, as
