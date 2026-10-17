@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>
 
+#include "ui/format_text.hpp"
 #include "util/patches.hpp"
 #include "util/pctl_ops_c.hpp"
 
@@ -144,21 +145,7 @@ void prompt_minutes(const std::string& header, uint16_t current, std::function<v
 void prompt_text(const std::string& header, const std::string& initial, int max_len,
                  std::function<void(std::string)> on_value);
 
-std::string fmt_minutes(uint16_t minutes);      // a limit: "No limit", "0 min (no play)", "45 min", "2 h 30"
-// Seven limits in a few words: "2 h every day", "1 h to 3 h", "1 h to no limit", "No limit".
-std::string days_summary(const uint16_t days[7]);
-std::string fmt_played(uint16_t minutes);       // time played: "0 min", "45 min", "2 h 30"
-std::string fmt_duration_ns(uint64_t ns);       // remaining time, rounded to minutes
-std::string fmt_play_time(uint64_t seconds);    // "0 min", "< 1 min", "45 min", "152 h 30" (no 24 h cap)
-std::string day_name(int day);                  // 0 = Sunday, as a title ("Monday")
-std::string day_name_in_text(int day);          // inside a sentence (fr: "lundi")
-std::string bool_text(bool ok, bool value, const std::string& yes, const std::string& no);
-std::string yes_no(bool value);                // "Yes" / "No"
-std::string age_text(int age);                 // a restriction age: "None" for 0, else "12+"
-// The value of a line that opens a screen of its own (or another tab), with
-// a chevron after it: "12 changes  ›", or "›" alone. A line that asks first,
-// in a dialog, ends its title with "…" instead; one that acts at once, neither.
-std::string opens(const std::string& value = "");
+// Limits, play time, day, level and age names as text: ui/format_text.hpp.
 // "Now" on the console: its user clock read live and its time-zone rule
 // (calendar.h says why not time()/localtime()).
 LocalTime   local_now();
@@ -185,7 +172,6 @@ private:
 // System / compatibility strings shared by the dashboard and the About section.
 std::string fw_text(const SysInfo& info);                 // "23.0.1 · Atmosphère 1.12.0"
 std::string compat_text(const SysInfo& info, NVGcolor* color = nullptr);
-std::string level_name(uint32_t level);                    // localised restriction level
 
 // The Console tab's and the Overview's warnings.
 std::string storage_text(const SysInfo& info);             // "emuMMC (Atmosphère)"

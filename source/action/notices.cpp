@@ -25,7 +25,6 @@
 #include "util/activity_summary.hpp"
 #include "util/backup.hpp"
 #include "util/config.hpp"
-#include "util/date.hpp"
 #include "util/log_files.hpp"
 #include "util/paths.hpp"
 
@@ -60,50 +59,21 @@ std::string open_label(const char* tab)
     return brls::getStr("playguard/notices/open_tab", brls::getStr(std::string("playguard/tabs/") + tab));
 }
 
-// Preferences › Notifications: which kind an entry is, and whether that kind
-// is shown. Every other entry always is.
+// Preferences › Notifications: whether the kind of entry `id` is shown.
 bool shown_kind(const std::string& id)
 {
     const auto& cfg = config::get();
-    if (id.rfind("sys_", 0) == 0) return cfg.notices_system;
-    if (id == "week" || id == "over_limit") return cfg.notices_summary;
-    if (id == "backup" || id == "other_system" || id == "console_lock_long") return cfg.notices_reminders;
-    return true;
-}
-
-// An entry for information marked as read: its id and a hash of its text,
-// remembered in config.json, so it stays read at the next start until its
-// text changes.
-std::string read_key(const std::string& id, const std::string& title, const std::string& detail)
-{
-    uint32_t h = 2166136261u;   // FNV-1a
-    for (const std::string* part : { &title, &detail })
-        for (unsigned char c : *part) h = (h ^ c) * 16777619u;
-    char hex[9];
-    std::snprintf(hex, sizeof(hex), "%08x", (unsigned)h);
-    return id + ":" + hex;
+    notice_logic::Shown shown;
+    shown.system = cfg.notices_system;
+    shown.summary = cfg.notices_summary;
+    shown.reminders = cfg.notices_reminders;
+    return notice_logic::shown_kind(id, shown);
 }
 
 bool was_read(const std::string& key)
 {
     const auto& read = config::get().notices_read;
     return std::find(read.begin(), read.end(), key) != read.end();
-}
-
-// "2026-10-08" from a backup's name ("20261008_142530.json"); "" otherwise.
-std::string backup_date(const std::string& name)
-{
-    if (name.size() < 8) return "";
-    for (int i = 0; i < 8; i++)
-        if (name[i] < '0' || name[i] > '9') return "";
-    return name.substr(0, 4) + "-" + name.substr(4, 2) + "-" + name.substr(6, 2);
-}
-
-// `day` ("YYYY-MM-DD") is `days` days ago or more.
-bool days_ago(const std::string& day, int days)
-{
-    const std::string then = date::add_days(day, days);
-    return !then.empty() && then <= ui::today_date();
 }
 
 // Free space on the SD card, bytes; false when it cannot be read. On the
@@ -143,7 +113,7 @@ void set(const std::string& id, Level level, const std::string& title, const std
     s_actions[id] = Act{ action ? action_label : "", action };
     bool moved = s_store.set(id, level, title, detail);
     // Read at an earlier start, with the same text: still read.
-    if (level == Level::Info && s_store.has(id) && was_read(read_key(id, title, detail))) moved |= s_store.dismiss(id);
+    if (level == Level::Info && s_store.has(id) && was_read(notice_logic::read_key(id, title, detail))) moved |= s_store.dismiss(id);
     if (moved) changed();
 }
 
@@ -165,7 +135,7 @@ void dismiss(const std::string& id)
     read.erase(std::remove_if(read.begin(), read.end(),
                               [&id](const std::string& k) { return k.rfind(id + ":", 0) == 0; }),
                read.end());
-    read.push_back(read_key(id, title, detail));
+    read.push_back(notice_logic::read_key(id, title, detail));
     if (read.size() > 48) read.erase(read.begin(), read.end() - 48);
     ui::save_config();
     changed();
@@ -326,15 +296,15 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
            []() { open_tab(ui::tab::console); });
 
     // The console lock on for a week or more.
-    toggle(cfg.console_lock && !cfg.console_lock_since.empty() && days_ago(cfg.console_lock_since, 7),
+    toggle(notice_logic::console_lock_long(cfg.console_lock, cfg.console_lock_since, ui::today_date()),
            "console_lock_long", Level::Info, brls::getStr("playguard/notices/console_lock_long", cfg.console_lock_since),
            "playguard/notices/console_lock_long_detail"_i18n, open_label("security"),
            []() { open_tab(ui::tab::security); });
 
     // No settings backup yet, or none for 30 days.
     const std::vector<std::string> backups = backup::list();
-    const std::string last = backups.empty() ? "" : backup_date(backups.front());
-    toggle(backups.empty() || (!last.empty() && days_ago(last, 30)), "backup", Level::Info,
+    const std::string last = backups.empty() ? "" : notice_logic::backup_date(backups.front());
+    toggle(notice_logic::backup_due(backups, ui::today_date()), "backup", Level::Info,
            backups.empty() ? "playguard/notices/backup_none"_i18n : brls::getStr("playguard/notices/backup_old", last),
            "playguard/notices/backup_detail"_i18n, "playguard/notices/backup_now"_i18n, []() {
                backup_flow::save_now();
@@ -344,7 +314,7 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
     // The SD card nearly full: PlayGuard's own writes start failing.
     uint64_t free_b = 0;
     const bool free_known = sd_free(&free_b);   // before the text below, which shows it
-    toggle(free_known && free_b < (500ULL << 20), "sd_space", Level::Action, "playguard/notices/sd_space"_i18n,
+    toggle(notice_logic::sd_space_low(free_known, free_b), "sd_space", Level::Action, "playguard/notices/sd_space"_i18n,
            brls::getStr("playguard/notices/sd_space_detail", (int)(free_b >> 20)));
 
     // The play data (read in the background for the Overview).
@@ -352,7 +322,7 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
     if (stats && stats->windows_ok) {
         // The week, once every 7 days until read.
         const activity_summary::Summary week = activity_summary::summarize(*stats, activity_summary::Week);
-        if (week.known && week.total_s > 0 && (cfg.summary_seen.empty() || days_ago(cfg.summary_seen, 7))) {
+        if (notice_logic::week_due(week.known, week.total_s, cfg.summary_seen, ui::today_date())) {
             std::string detail = brls::getStr("playguard/notices/week_detail", ui::fmt_play_time(week.per_day_s));
             if (week.top >= 0 && stats->games[week.top].name[0])
                 detail += "\n" + brls::getStr("playguard/notices/week_top", std::string(stats->games[week.top].name),
@@ -369,15 +339,7 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
         }
         // The console only warning at the limit, and the limit passed on
         // several of the last 7 days.
-        int over = 0;
-        if (pt.valid && pt.alarm_only)
-            for (int k = 0; k < 7; k++) {
-                const uint16_t limit = pt.day_min[stats->day_wday[k] % 7];
-                if (limit == PT_DAY_NOLIMIT) continue;
-                uint64_t played = 0;
-                for (uint32_t g = 0; g < stats->count; g++) played += stats->games[g].day_s[k];
-                if (played > (uint64_t)limit * 60) over++;
-            }
+        const int over = notice_logic::over_limit_days(pt, *stats);
         toggle(over >= 2, "over_limit", Level::Info, brls::getStr("playguard/notices/over_limit", over),
                "playguard/notices/over_limit_detail"_i18n, open_label("play_timer"),
                []() { open_tab(ui::tab::play_timer); });

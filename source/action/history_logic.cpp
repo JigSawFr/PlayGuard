@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/history_logic.hpp"
 
+#include <algorithm>
 #include <string>
 
 #include "util/date.hpp"
@@ -79,5 +80,37 @@ Day day_of(const std::string& when, const std::string& today, const std::string&
     if (!yesterday.empty() && date == yesterday) return Day::Yesterday;
     return Day::Other;
 }
+
+namespace
+{
+const char* const KINDS[] = { "limits", "level", "custom", "org", "vr", "alarm", "pin", "pin_shown",
+                              "unlock", "relock", "unlink", "delete", "clock", "restore", "rescue",
+                              "console_lock", "bedtime", "config_reset", "outside_reset", "outside_clock",
+                              "outside_limits", "new_account", "time_up", "countdown", "remove_game",
+                              "remove_update", "remove_addon", "launch_version" };
+const char* const SOURCES[] = { "uniform", "day", "per_day", "extra", "stop", "restore_extra",
+                                "remove", "backup", "undo", "first_steps", "overview", "console_lock" };
+
+bool listed(const std::vector<std::string>& list, const std::string& s)
+{
+    return std::find(list.begin(), list.end(), s) != list.end();
+}
+}   // namespace
+
+const std::vector<std::string>& known_kinds()
+{
+    static const std::vector<std::string> kinds(std::begin(KINDS), std::end(KINDS));
+    return kinds;
+}
+
+bool known_kind(const std::string& kind) { return listed(known_kinds(), kind); }
+
+const std::vector<std::string>& known_sources()
+{
+    static const std::vector<std::string> sources(std::begin(SOURCES), std::end(SOURCES));
+    return sources;
+}
+
+bool known_source(const std::string& source) { return listed(known_sources(), source); }
 
 }   // namespace history_logic
