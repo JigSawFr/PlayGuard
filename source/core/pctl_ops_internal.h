@@ -1,7 +1,7 @@
-// pctl_ops_internal — what pctl_ops.c shares with pctl_dump.c: the typed
-// readers, the PIN read and its wiping. Internal to the service layer (the UI
-// includes pctl_ops.h); `static inline`, so nothing more is exported. The
-// caller holds the session it passes.
+// pctl_ops_internal — what pctl_ops.c shares with pctl_dump.c and the recovery
+// sysmodule: the typed readers, the PIN read, the unlock with it and the
+// wiping. Internal to the service layer (the UI includes pctl_ops.h); `static
+// inline`, so nothing more is exported. The caller holds the session it passes.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 #include "nx_types.h"
@@ -58,6 +58,15 @@ static inline Result read_pin(Service *srv, char *pin, u32 *len)
         .buffers      = { { pin, PIN_BUF } });
     pin[PIN_BUF - 1] = '\0';
     return rc;
+}
+
+// UnlockRestrictionTemporarily (1201) with `size` bytes of `pin`, the NUL
+// included: also a HIPC *pointer* buffer (pctl_ops.c).
+static inline Result unlock_with_pin(Service *srv, const char *pin, size_t size)
+{
+    return serviceDispatch(srv, 1201,
+        .buffer_attrs = { SfBufferAttr_HipcPointer | SfBufferAttr_In },
+        .buffers      = { { pin, size } });
 }
 
 // PlayTimerSettings: layout and codec in pure.h, known from 21.0.0 on.

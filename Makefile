@@ -98,7 +98,7 @@ desktop:
 
 # C: the service layer (source/core) against the fake <switch.h> of each
 # suite (-DNX_HOST_TEST), and the C helpers of source/util.
-pctl_SRC   := source/core/pctl_ops.c source/core/pctl_dump.c source/core/pure.c source/core/write_guard.c tests/pctl_session/test.c
+pctl_SRC   := source/core/pctl_ops.c source/core/pctl_dump.c source/core/pure.c source/core/rescue.c source/core/write_guard.c tests/pctl_session/test.c
 pctl_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core
 time_SRC   := source/core/time_ops.c source/core/calendar.c source/core/write_guard.c tests/time_ops/test.c
 time_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/time_ops -Isource/core

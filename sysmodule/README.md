@@ -94,9 +94,10 @@ make dist-rescue           # -> playguard-rescue.zip  (SD-card layout, from the 
 ```
 
 The module shares `source/core/rescue.c` with the app (the request / report
-file format, host-tested in `tests/rescue/`). Its own pctl calls are the ones
-documented in `source/core/pctl_ops.c`, kept minimal and self-contained so the
-sysmodule pulls in nothing from the app's service layer.
+file format, host-tested in `tests/rescue/`). Its pctl calls are the app's,
+from `source/core/pctl_ops_internal.h` (the typed reads, the PIN read and the
+unlock with it, all `static inline`): the sysmodule links nothing else of the
+app's service layer.
 
 Program ID `0x4200000000505247` is in the private range homebrew sysmodules use,
 so it never collides with a real title.

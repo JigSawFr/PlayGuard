@@ -1,6 +1,8 @@
 // PlayGuard — local dates (see calendar.h).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "calendar.h"
+#include <stdio.h>
+#include <time.h>
 
 #define DAY_S 86400u
 
@@ -80,4 +82,12 @@ u64 local_midnight(const TimeRule *rule, u64 now, int days_back)
         if (n > 0) return earliest(c, n);   // the instant of the jump
     }
     return fallback;
+}
+
+void time_format_utc(u64 posix, char *buf, size_t size)
+{
+    time_t t = (time_t)posix;
+    struct tm tmv;
+    if (gmtime_r(&t, &tmv) && strftime(buf, size, "%Y-%m-%d %H:%M:%S UTC", &tmv)) return;
+    snprintf(buf, size, "%llu", (unsigned long long)posix);
 }

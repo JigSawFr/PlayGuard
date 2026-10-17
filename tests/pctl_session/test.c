@@ -14,6 +14,8 @@ static struct {
     unsigned refs, init_calls, exit_calls, ipc_calls, failed_ipcs, writes, applets;
     unsigned fail_init_call;
     u32 fail_command, fail_command2;   /* commands that return MOCK_ERROR */
+    u32 fail_nth_command;              /* ... and only its fail_nth-th call (from 1) */
+    unsigned fail_nth, nth_seen;
     bool enabled, restricted, unlocked, unlock_effective;
     u32 safety_level;
     u32 last_write_cmd;
@@ -137,7 +139,8 @@ Result mock_dispatch(Service *srv, u32 command, void *out, size_t out_size,
         model.writes++;
         model.last_write_cmd = command;
     }
-    if (command == model.fail_command || command == model.fail_command2) {
+    if (command == model.fail_command || command == model.fail_command2 ||
+        (command == model.fail_nth_command && ++model.nth_seen == model.fail_nth)) {
         model.failed_ipcs++;
         return MOCK_ERROR;
     }
@@ -593,10 +596,27 @@ static void test_write_gate(void)
     /* Taken: one write, read back once. */
     reset();
     CHECK(write_variant(0) == 0 && model.writes == 1);
+    /* Not taken, from a block that could not be read: nothing to put back. */
+    reset();
+    model.pt_ignored = true;
+    model.fail_nth_command = 145601;
+    model.fail_nth = 1;
+    CHECK(write_variant(0) == NXM_RC_NOT_APPLIED && model.writes == 1);
+    CHECK(model.refs == 0 && model.init_calls == model.exit_calls);
+    /* Not taken, and putting the block back fails: that failure is returned. */
+    reset();
+    model.pt_ignored = true;
+    model.fail_nth_command = 195101;
+    model.fail_nth = 2;
+    CHECK(write_variant(0) == MOCK_ERROR && model.writes == 2);
+    CHECK(model.refs == 0 && model.init_calls == model.exit_calls);
 
     /* Out-of-range minutes and old firmware are refused before any IPC. */
+    const u16 edge[7] = {0, 1440, PT_DAY_NOLIMIT, 1, 0, 0, 0};
+    CHECK(pt_days_ok(edge));
     reset();
     u16 bad[7] = {0, 0, 0, 1441, 0, 0, 0};
+    CHECK(!pt_days_ok(bad));
     CHECK(pctl_play_timer_set_days(bad) == NXM_RC_INVALID_ARGUMENT && model.init_calls == 0);
     reset_with(MAKEHOSVERSION(20, 5, 0));
     CHECK(pctl_play_timer_clear() == NXM_RC_FW_UNSUPPORTED && model.init_calls == 0);
@@ -929,6 +949,11 @@ static void test_alarm_only(void)
     model.pt_ignored = true;
     CHECK(pctl_play_timer_set_alarm_only(true) == NXM_RC_NOT_APPLIED && model.writes == 2 && model.refs == 0);
     CHECK(memcmp(model.last_write, model.pt_block, 0x44) == 0);
+    /* The block unreadable after the write: it stands. */
+    reset();
+    model.fail_nth_command = 145601;
+    model.fail_nth = 2;
+    CHECK(pctl_play_timer_set_alarm_only(true) == 0 && model.writes == 1 && model.refs == 0);
 
     /* Refused before writing: the block unreadable or not understood, the
      * timer counting down; below 21.0.0 nothing sent. */

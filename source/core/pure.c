@@ -141,6 +141,13 @@ void pt_encode(u16 c[PT_U16_COUNT], const u16 days_min[7])
     }
 }
 
+bool pt_days_ok(const u16 days_min[7])
+{
+    for (int n = 0; n < 7; n++)
+        if (days_min[n] != PT_DAY_NOLIMIT && days_min[n] > 1440) return false;
+    return true;
+}
+
 bool pt_bedtime_ok(const PtBedtime *b)
 {
     if (!b->on) return true;

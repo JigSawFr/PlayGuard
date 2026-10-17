@@ -295,7 +295,7 @@ Result pctl_delete_parental_controls(void)
     return 0;
 }
 Result pctl_delete_pairing(void)                  { RO_GUARD(); FAIL_IF("write"); S.pairing_active = false; return 0; }
-Result pctl_set_safety_level(u32 l)               { RO_GUARD(); FAIL_IF("write"); if (l > 4) return NXM_RC_INVALID_ARGUMENT; S.safety_level = l; return 0; }
+Result pctl_set_safety_level(u32 l)               { RO_GUARD(); FAIL_IF("write"); if (l > PctlSafetyLevel_Teen) return NXM_RC_INVALID_ARGUMENT; S.safety_level = l; return 0; }
 Result pctl_set_custom_settings(const PctlCustomSettings *c)
 {
     RO_GUARD();
@@ -305,18 +305,19 @@ Result pctl_set_custom_settings(const PctlCustomSettings *c)
     return 0;
 }
 Result pctl_set_stereo_vision_restricted(bool r)  { RO_GUARD(); FAIL_IF("write"); S.stereo_restricted = r; return 0; }
-Result pctl_set_rating_org(u32 org)               { RO_GUARD(); FAIL_IF("write"); if (org >= 13) return NXM_RC_INVALID_ARGUMENT; S.rating_org = org; return 0; }
+Result pctl_set_rating_org(u32 org)               { RO_GUARD(); FAIL_IF("write"); if (org >= RATING_ORG_COUNT) return NXM_RC_INVALID_ARGUMENT; S.rating_org = org; return 0; }
 Result pctl_get_level_settings(u32 level, PctlCustomSettings *out)
 {
     // Made-up presets in the spirit of the console's.
     static const PctlCustomSettings presets[5] = { { 0, false, false }, { 0, false, false },
                                                    { 6, true, true }, { 12, true, true }, { 16, false, false } };
-    if (!out || level > 4) return NXM_RC_INVALID_ARGUMENT;
+    if (!out || level > PctlSafetyLevel_Teen) return NXM_RC_INVALID_ARGUMENT;
     *out = level == PctlSafetyLevel_Custom ? S.custom : presets[level];
     return 0;
 }
 // The same gate as pctl_ops.c: no play-timer write while it counts down.
-#define PT_GATE() do { if ((timer_enabled() || S.limit_reached) && !S.temp_unlocked) return NXM_RC_WRITE_GATED; } while (0)
+static bool pt_gated(void) { return (timer_enabled() || S.limit_reached) && !S.temp_unlocked; }
+#define PT_GATE() do { if (pt_gated()) return NXM_RC_WRITE_GATED; } while (0)
 Result pctl_play_timer_set_alarm_disabled(bool d) { RO_GUARD(); PT_GATE(); FAIL_IF("write"); S.alarm_disabled = d; return 0; }
 Result pctl_play_timer_start(void)                { RO_GUARD(); PT_GATE(); FAIL_IF("write"); S.paused = false; return 0; }
 Result pctl_play_timer_stop(void)                 { RO_GUARD(); PT_GATE(); FAIL_IF("write"); S.paused = true; return 0; }
@@ -408,15 +409,23 @@ void pctl_play_timer_sample(PtSample *o)
                                   : (u64)SIM_PLAYED_TODAY_MIN * 60 * 1000000000ULL;
 }
 
+// What a block write (195101) meets once its arguments are checked: the gate,
+// no PIN (pctl skips the write), PLAYGUARD_SIM_FAIL=write.
+static Result sim_pt_gate(void)
+{
+    if (pt_gated()) return NXM_RC_WRITE_GATED;
+    if (!S.pin_length) return NXM_RC_NO_PIN;
+    return fails("write") ? SIM_FAIL_RC : 0;
+}
+
 Result pctl_play_timer_set_days(const u16 d[7])
 {
     RO_GUARD();
     sim_init();
     if (S.hos < PCTL_FW_MIN_PLAYTIMER) return NXM_RC_FW_UNSUPPORTED;
-    for (int i = 0; i < 7; i++) if (d[i] != PT_DAY_NOLIMIT && d[i] > 1440) return NXM_RC_INVALID_ARGUMENT;
-    if ((timer_enabled() || S.limit_reached) && !S.temp_unlocked) return NXM_RC_WRITE_GATED;
-    if (!S.pin_length) return NXM_RC_NO_PIN;   // pctl skips a 195101 write with no PIN
-    FAIL_IF("write");
+    if (!pt_days_ok(d)) return NXM_RC_INVALID_ARGUMENT;
+    Result rc = sim_pt_gate();
+    if (R_FAILED(rc)) return rc;
     pt_encode(S.block, d);   // read-modify-write, as pctl_ops.c does
     S.limit_reached = false;
     return 0;
@@ -430,9 +439,8 @@ Result pctl_play_timer_set_bedtime(const PtBedtime bed[7], int today)
     if (S.hos < PCTL_FW_MIN_PLAYTIMER) return NXM_RC_FW_UNSUPPORTED;
     if (today < 0 || today > 6) return NXM_RC_INVALID_ARGUMENT;
     for (int i = 0; i < 7; i++) if (!pt_bedtime_ok(&bed[i])) return NXM_RC_INVALID_ARGUMENT;
-    if ((timer_enabled() || S.limit_reached) && !S.temp_unlocked) return NXM_RC_WRITE_GATED;
-    if (!S.pin_length) return NXM_RC_NO_PIN;   // pctl skips a 195101 write with no PIN
-    FAIL_IF("write");
+    Result rc = sim_pt_gate();
+    if (R_FAILED(rc)) return rc;
     if (fails("timer")) return NXM_RC_STATE_UNKNOWN;
     if (fails("bedtime")) return NXM_RC_NOT_APPLIED;
     pt_bedtime_encode(S.block, bed);
@@ -444,14 +452,11 @@ Result pctl_play_timer_set_alarm_only(bool alarm_only)
     RO_GUARD();
     sim_init();
     if (S.hos < PCTL_FW_MIN_PLAYTIMER) return NXM_RC_FW_UNSUPPORTED;
-    if ((timer_enabled() || S.limit_reached) && !S.temp_unlocked) return NXM_RC_WRITE_GATED;
-    if (!S.pin_length) return NXM_RC_NO_PIN;   // pctl skips a 195101 write with no PIN
-    FAIL_IF("write");
+    Result rc = sim_pt_gate();
+    if (R_FAILED(rc)) return rc;
     if (fails("timer")) return NXM_RC_STATE_UNKNOWN;
     return pt_set_suspends(S.block, !alarm_only) ? 0 : NXM_RC_INVALID_ARGUMENT;
 }
-
-Result pctl_play_timer_clear(void)        { u16 d[7]; for (int i = 0; i < 7; i++) d[i] = PT_DAY_NOLIMIT; return pctl_play_timer_set_days(d); }
 
 void pctl_dump(char *buf, size_t n)
 {
@@ -586,11 +591,6 @@ bool time_local_now(u64 *posix, LocalTime *local)
     const u64 now = s.user_time;   // the user clock, as the snapshot says
     if (posix) *posix = now;
     return local ? host_to_local(NULL, now, local) : true;
-}
-void time_format_utc(u64 posix, char *buf, size_t size)
-{
-    time_t t = (time_t)posix; struct tm tmv;
-    if (!gmtime_r(&t, &tmv) || !strftime(buf, size, "%Y-%m-%d %H:%M:%S UTC", &tmv)) snprintf(buf, size, "%llu", (unsigned long long)posix);
 }
 void time_format_local(u64 posix, char *buf, size_t size)
 {
