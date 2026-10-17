@@ -26,11 +26,15 @@ std::chrono::steady_clock::time_point s_reveal_until;  // before_show_pin() just
 std::chrono::steady_clock::time_point s_away_since;    // out of focus since (s_away)
 bool s_away = false;
 Result s_last_rc = 0;   // what the last ask() got
+int s_tightening = 0;   // Tightening scopes alive
 
 // The service layer's change check (write_guard.h). Runs on the UI thread,
 // with no pctl session open.
 bool check()
 {
+    // Putting back a limit that extra time raised: asked of no one, like
+    // locking again. It grants no grace to the changes after it.
+    if (s_tightening > 0) return true;
     using pin_lock_logic::Check;
     const Check c = pin_lock_logic::check(config::get().pin_lock, std::chrono::steady_clock::now(),
                                           s_confirmed_until, s_refused_until);
@@ -54,6 +58,9 @@ bool reveal_check()
     return ask();
 }
 }   // namespace
+
+Tightening::Tightening()  { s_tightening++; }
+Tightening::~Tightening() { s_tightening--; }
 
 void install()
 {

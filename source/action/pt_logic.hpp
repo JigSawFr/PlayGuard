@@ -82,6 +82,24 @@ enum class Restore
 };
 Restore restore_action(const ExtraRecord& rec, const std::string& today, const PtState& pt, bool read_only);
 
+// How a record restore_action() offers to put back is put back. `weekday`:
+// today's (0 = Sunday); `by_itself`: the preference to put back "no more
+// play today" with no question (config extra_auto_restore).
+enum class RestoreWay
+{
+    ByItself,   // extra time: putting the limit back only lowers it, so it is
+                // done with no question and no PIN, as locking again is
+    Wait,       // the same, but on today's weekday and below the time already
+                // played: the game in progress would be suspended; the next day
+    Direct,     // no more play, with the preference on: put back as any change (the PIN)
+    Ask,        // no more play: asked first (the preference off, or "no limit" to put back)
+};
+RestoreWay restore_way(const ExtraRecord& rec, const PtState& pt, int weekday, bool by_itself);
+
+// Putting `rec.base` back lowers the limit that holds `rec.value`: never to
+// "no limit", which is a removal and is always asked.
+bool restore_tightens(const ExtraRecord& rec);
+
 // config relock_pending: PlayGuard unlocked parental controls (for a change,
 // or Security › Unlock temporarily) and may have stopped before locking them
 // again. What a start (or leaving read-only) does with that record:

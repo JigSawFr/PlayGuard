@@ -78,7 +78,7 @@ DashboardTab::DashboardTab()
         return true;
     });
     extra_pending->registerClickAction([this](brls::View*) {
-        pt_flow::offer_extra_time_restore([this]() { this->refresh(); });
+        pt_flow::offer_extra_time_restore([this]() { this->refresh(); }, true);
         return true;
     });
     // Shown only while the alarm is off: A turns it back on (the dialog says why).

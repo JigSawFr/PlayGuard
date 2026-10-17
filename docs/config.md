@@ -164,7 +164,7 @@ day only. All four keys go together.
 | `extra_date` | string | `"YYYY-MM-DD"` of the change | `""` |
 | `extra_base` | integer | the limit before, in minutes: `0` to `1440`, or `65535` for no limit | `0` |
 | `extra_value` | integer | the limit for that day, `0` to `1440` minutes | `0` |
-| `extra_auto_restore` | boolean | the next day, put the limit back by itself instead of asking (the temporary unlock is still asked when needed); set in Play timer | `false` |
+| `extra_auto_restore` | boolean | after *No more play today*, put the limit back the next day as any change instead of asking (the temporary unlock and the PIN are still asked when needed; "no limit" is always asked); extra time comes back by itself whatever this says; set in Play timer | `false` |
 
 ### Firmware not supported yet
 

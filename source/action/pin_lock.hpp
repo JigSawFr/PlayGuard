@@ -28,6 +28,20 @@ namespace pin_lock
 // At start-up, once: installs the checks in the service layer.
 void install();
 
+// While one lives, the change check lets every change through without the
+// PIN, as it does locking again (read-only mode still refuses them). Only for
+// the few calls of a change that tightens a limit and that nobody chose
+// (pt_flow: extra time put back the next day), made at once on the UI thread,
+// where every change check runs: no question, no dialog, no wait in between.
+class Tightening
+{
+  public:
+    Tightening();
+    ~Tightening();
+    Tightening(const Tightening&) = delete;
+    Tightening& operator=(const Tightening&) = delete;
+};
+
 // At start-up, once: runs `lock` (on the UI thread) when PlayGuard comes back
 // into focus and "open" wants the lock screen again (pin_lock_logic::lock_again).
 void watch_focus(std::function<void()> lock);

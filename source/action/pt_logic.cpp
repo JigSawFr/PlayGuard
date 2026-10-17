@@ -89,6 +89,24 @@ Restore restore_action(const ExtraRecord& rec, const std::string& today, const P
     return Restore::Offer;
 }
 
+bool restore_tightens(const ExtraRecord& rec)
+{
+    return rec.base != PT_DAY_NOLIMIT && rec.base < rec.value;
+}
+
+RestoreWay restore_way(const ExtraRecord& rec, const PtState& pt, int weekday, bool by_itself)
+{
+    if (restore_tightens(rec)) {
+        if (rec.weekday < 0 || rec.weekday > 6 || rec.weekday != weekday) return RestoreWay::ByItself;
+        uint16_t days[7];
+        for (int i = 0; i < 7; i++) days[i] = pt.day_min[i];
+        days[weekday] = rec.base;
+        return suspend_warning_min(pt, weekday, days) > 0 ? RestoreWay::Wait : RestoreWay::ByItself;
+    }
+    // "No limit" back is a removal: never without the question.
+    return by_itself && rec.base != PT_DAY_NOLIMIT ? RestoreWay::Direct : RestoreWay::Ask;
+}
+
 static bool reported(const PtState& pt, const PtBedtime& b)
 {
     return b.on == pt.bedtime_enabled && (!b.on || (b.hour == pt.bedtime_hour && b.minute == pt.bedtime_minute));

@@ -220,6 +220,59 @@ static void test_restore()
     CHECK(pt_logic::restore_action(rec, "2026-10-08", pt, false) == Restore::None);
 }
 
+static void test_restore_way()
+{
+    using pt_logic::RestoreWay;
+    pt_logic::ExtraRecord rec;
+    rec.weekday = 3;
+    rec.date = "2026-10-07";
+    rec.base = 120;
+    rec.value = 150;
+    PtState pt = counting();   // Wednesday at 150 (the extra time), 105 min played
+    pt.day_min[3] = 150;
+
+    // Extra time lowers back: by itself, whatever the preference.
+    CHECK(pt_logic::restore_tightens(rec));
+    CHECK(pt_logic::restore_way(rec, pt, 4, false) == RestoreWay::ByItself);
+    CHECK(pt_logic::restore_way(rec, pt, 4, true) == RestoreWay::ByItself);
+    // A week later, on that weekday, below the time played: the game in
+    // progress would be suspended, the next day instead.
+    pt.remaining_ns = 10 * MIN_NS;                       // 140 played of 150
+    CHECK(pt_logic::restore_way(rec, pt, 3, false) == RestoreWay::Wait);
+    CHECK(pt_logic::restore_way(rec, pt, 3, true) == RestoreWay::Wait);
+    CHECK(pt_logic::restore_way(rec, pt, 4, false) == RestoreWay::ByItself);   // another day: nothing played on it
+    pt.alarm_only = true;                                // only a warning: nothing is suspended
+    CHECK(pt_logic::restore_way(rec, pt, 3, false) == RestoreWay::ByItself);
+    pt = counting();
+    pt.day_min[3] = 150;                                 // 105 played, under 120: no suspend
+    CHECK(pt_logic::restore_way(rec, pt, 3, false) == RestoreWay::ByItself);
+
+    // No more play today raises back: asked, or as any change with the preference.
+    rec.value = 0;
+    pt.day_min[3] = 0;
+    CHECK(!pt_logic::restore_tightens(rec));
+    CHECK(pt_logic::restore_way(rec, pt, 4, false) == RestoreWay::Ask);
+    CHECK(pt_logic::restore_way(rec, pt, 4, true) == RestoreWay::Direct);
+    // "In 5 minutes" (80 for that day) the same.
+    rec.value = 80;
+    CHECK(pt_logic::restore_way(rec, pt, 4, true) == RestoreWay::Direct);
+    // "No limit" back is a removal: always asked, even with the preference.
+    rec.base = PT_DAY_NOLIMIT;
+    rec.value = 0;
+    CHECK(!pt_logic::restore_tightens(rec));
+    CHECK(pt_logic::restore_way(rec, pt, 4, true) == RestoreWay::Ask);
+    CHECK(pt_logic::restore_way(rec, pt, 4, false) == RestoreWay::Ask);
+    // No more play, then extra time on the same day: what comes back is the
+    // usual limit, below the extra one: by itself.
+    rec.base = 60;
+    rec.value = 90;
+    CHECK(pt_logic::restore_tightens(rec));
+    CHECK(pt_logic::restore_way(rec, pt, 4, false) == RestoreWay::ByItself);
+    // ... or above a smaller amount of extra time: asked.
+    rec.value = 30;
+    CHECK(pt_logic::restore_way(rec, pt, 4, false) == RestoreWay::Ask);
+}
+
 static PtBedtime bed(bool on, uint8_t h, uint8_t m, uint8_t eh, uint8_t em)
 {
     PtBedtime b;
@@ -396,6 +449,7 @@ int main()
     test_extra();
     test_stop();
     test_restore();
+    test_restore_way();
     test_bedtime();
     test_pickers();
     test_extra_today();
