@@ -145,6 +145,11 @@ void sanitize(Config& c)
             if (!s.empty() && s.size() <= 96) read.push_back(s);
         if (read.size() > 48) read.erase(read.begin(), read.end() - 48);
         c.notices_read = read;
+        std::vector<std::string> acked;
+        for (const auto& s : c.notices_acked)
+            if (!s.empty() && s.size() <= 96) acked.push_back(s);
+        if (acked.size() > 16) acked.erase(acked.begin(), acked.end() - 16);
+        c.notices_acked = acked;
     }
 
     std::vector<std::string> servers;
@@ -283,6 +288,11 @@ static void load_shared()
     if (read != j.end() && read->is_array())
         for (const auto& v : *read)
             if (v.is_string()) c.notices_read.push_back(v.get<std::string>());
+    auto acked = j.find("notices_acked");
+    if (acked != j.end() && acked->is_array())
+        for (const auto& v : *acked)
+            if (v.is_string()) c.notices_acked.push_back(v.get<std::string>());
+    read_bool(j, "notices_ack_remind", c.notices_ack_remind);
     auto amounts = j.find("extra_amounts");
     if (amounts != j.end() && amounts->is_array())
         c.extra_amounts = read_int_list(*amounts);   // sanitize() keeps it only when it is one of EXTRA_SETS
@@ -379,6 +389,8 @@ bool snapshot(Snapshot& snap)
     j["notices_summary"]   = s_config.notices_summary;
     j["notices_reminders"] = s_config.notices_reminders;
     j["notices_read"]      = s_config.notices_read;
+    j["notices_acked"]     = s_config.notices_acked;
+    j["notices_ack_remind"] = s_config.notices_ack_remind;
     j["summary_seen"]      = s_config.summary_seen;
     snap.shared = dump(j);
 

@@ -977,6 +977,7 @@
         "notices_system": "Versioni di Atmosphère, hekate e firmware",
         "notices_summary": "Il tempo di gioco della settimana",
         "notices_reminders": "Promemoria: backup, l'altro sistema, i giochi bloccati",
+        "notices_ack_remind": "Conta di nuovo gli avvisi ignorati dopo 30 giorni",
         "help": "Aiuto e diagnostica"
     },
     "backup": {
@@ -1359,6 +1360,14 @@
         "console_count": "{} da controllare",
         "console_show": "Mostra",
         "seen": "Segna come letta",
+        "read_all": "Segna tutto come letto",
+        "ignore": "Ignora",
+        "ignore_confirm": "«{}»\n\nQuesto avviso non sarà più contato sulla campanella. Tornerà tra 30 giorni, o prima se viene risolto e poi si ripresenta.",
+        "ignore_confirm_kept": "«{}»\n\nQuesto avviso non sarà più contato sulla campanella. Tornerà solo se viene risolto e poi si ripresenta.",
+        "section_ignored": "Ignorati",
+        "reactivate": "Conta di nuovo",
+        "ignored_until": "Ignorato fino al {}",
+        "ignored_kept": "Ignorato",
         "open_tab": "Apri {}",
         "pin_missing": "Il filtro famiglia non è configurato",
         "pin_missing_detail": "Ancora nessun PIN: la console non è protetta.",

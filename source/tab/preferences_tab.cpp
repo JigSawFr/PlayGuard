@@ -66,6 +66,11 @@ PreferencesTab::PreferencesTab()
         ui::save_config();
         notices::apply_preferences();
     });
+    notices_ack_remind->init("playguard/prefs/notices_ack_remind"_i18n, config::get().notices_ack_remind, [](bool on) {
+        config::get().notices_ack_remind = on;
+        ui::save_config();
+        notices::apply_preferences();
+    });
     // Support PlayGuard once a month at start-up (action/support_flow).
     support_reminder->init("playguard/prefs/support_reminder"_i18n, config::get().support_reminder, [](bool on) {
         config::get().support_reminder = on;
@@ -83,6 +88,7 @@ void PreferencesTab::refresh()
     notices_system->setOn(cfg.notices_system, false);
     notices_summary->setOn(cfg.notices_summary, false);
     notices_reminders->setOn(cfg.notices_reminders, false);
+    notices_ack_remind->setOn(cfg.notices_ack_remind, false);
     support_reminder->setOn(cfg.support_reminder, false);
 }
 

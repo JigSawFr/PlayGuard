@@ -977,6 +977,7 @@
         "notices_system": "Neue Versionen von Atmosphère, hekate und Firmware",
         "notices_summary": "Die Spielzeit der Woche",
         "notices_reminders": "Erinnerungen: Sicherungen, anderes System, Spielsperre",
+        "notices_ack_remind": "Ignorierte Warnungen nach 30 Tagen wieder zählen",
         "help": "Hilfe & Diagnose"
     },
     "backup": {
@@ -1359,6 +1360,14 @@
         "console_count": "{} zum Ansehen",
         "console_show": "Anzeigen",
         "seen": "Als gelesen markieren",
+        "read_all": "Alle als gelesen markieren",
+        "ignore": "Ignorieren",
+        "ignore_confirm": "„{}“\n\nDiese Warnung wird nicht mehr an der Glocke gezählt. Sie kommt in 30 Tagen wieder, oder früher, wenn sie behoben wurde und erneut auftritt.",
+        "ignore_confirm_kept": "„{}“\n\nDiese Warnung wird nicht mehr an der Glocke gezählt. Sie kommt erst wieder, wenn sie behoben wurde und erneut auftritt.",
+        "section_ignored": "Ignoriert",
+        "reactivate": "Wieder zählen",
+        "ignored_until": "Ignoriert bis {}",
+        "ignored_kept": "Ignoriert",
         "open_tab": "{} öffnen",
         "pin_missing": "Die Jugendschutzeinstellungen sind nicht eingerichtet",
         "pin_missing_detail": "Noch keine PIN: Die Konsole ist nicht geschützt.",

@@ -4,7 +4,8 @@
 // bell, which stays until what it says is fixed (only its source clears it),
 // and "for information", which the parent can put away; one put away comes
 // back only when its source clears it and sets it again, or when its text
-// changes. Each entry is about the parental controls or about the console
+// changes. A few to do (ackable) the parent can also choose to ignore: no
+// longer counted, listed apart, until put back. Each entry is about the parental controls or about the console
 // PlayGuard runs on (the firmware, the games, the SD card, PlayGuard's own
 // files): the bell counts the first, the Console tab the second, and the
 // list shows them apart. Within a group and a kind, entries come in a fixed
@@ -64,13 +65,22 @@ class Store
     bool clear(const std::string& id);
     // Puts away an Info entry. False for an Action entry or an unknown id.
     bool dismiss(const std::string& id);
+    // Ignores an Action entry the parent may ignore (ackable): not counted,
+    // not in visible() but in ignored(), until unack() or its kind changes.
+    // False for anything else, or one already ignored.
+    bool ack(const std::string& id);
+    // Counted again. False when it was not ignored.
+    bool unack(const std::string& id);
 
     bool has(const std::string& id) const;   // set and shown
+    bool acked(const std::string& id) const;   // set and ignored
 
     // What the bell lists: the parental controls' Action entries, then their
     // Info ones, then the console's (Action, then Info); each kind in rank
     // order, then in the order they were first set.
     std::vector<Item> visible() const;
+    // The entries ignored, in the same order.
+    std::vector<Item> ignored() const;
     int action_count() const;   // the parental controls' Action entries: the bell's number
     int info_count() const;     // the parental controls' Info entries shown
     int console_count() const;  // the console's Action entries: the Console tab's number
@@ -80,11 +90,13 @@ class Store
     {
         Item item;
         bool dismissed = false;
+        bool acked     = false;
     };
     std::vector<Slot> slots;
     uint64_t next_order = 1;
 
-    int         count(Group group, Level level) const;
+    int               count(Group group, Level level) const;
+    std::vector<Item> sorted(bool acked) const;
     Slot*       find(const std::string& id);
     const Slot* find(const std::string& id) const;
 };
@@ -102,6 +114,28 @@ bool shown_kind(const std::string& id, const Shown& shown);
 // ("week:1a2b3c4d"), remembered in config.json, so it stays read at the next
 // start until its text changes.
 std::string read_key(const std::string& id, const std::string& title, const std::string& detail);
+
+// The entries to do the parent may ignore: a weak PIN, PlayGuard open
+// without the PIN, the "time's up" alarm off, the SD card nearly full. What
+// leaves the console open or broken (no PIN, unlocked, the clock, the play
+// timer not counting, PlayGuard's own files) never is.
+bool ackable(const std::string& id);
+// An entry ignored, remembered in config.json: its id, what it was about
+// (`print`: the PIN's length for pin_weak, "" otherwise; never the PIN) and
+// the day ("pin_weak:4:2026-10-17").
+std::string ack_key(const std::string& id, const std::string& print, const std::string& day);
+// The day `keys` says `id` was ignored, while about the same `print`; ""
+// when it was not.
+std::string ack_day(const std::vector<std::string>& keys, const std::string& id, const std::string& print);
+// Still ignored on `today`: for 30 days with `remind` (counted again after
+// them), for good without.
+bool ack_holds(const std::vector<std::string>& keys, const std::string& id, const std::string& print,
+               const std::string& today, bool remind);
+// The day it is counted again ("" without `remind`, or not ignored).
+std::string ack_until(const std::vector<std::string>& keys, const std::string& id, const std::string& print,
+                      bool remind);
+// `keys` without `id`'s. True when one went.
+bool ack_forget(std::vector<std::string>& keys, const std::string& id);
 
 // "2026-10-08" from a backup's name ("20261008_142530.json"); "" otherwise.
 std::string backup_date(const std::string& name);

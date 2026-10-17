@@ -3,8 +3,11 @@
 // console's entries on one line that A opens (open at once when they are all
 // there is). A on an entry closes the list and runs its action
 // (the fix, or the screen where it is made); an entry for information with
-// nothing to do is put away. Rebuilt when the entries change; closes by
-// itself once none is left.
+// nothing to do is put away. X puts one for information away, or ignores one
+// to do the parent may ignore (notice_logic::ackable): those come last,
+// under "Ignored", where A counts them again. Y puts every entry for
+// information away. Rebuilt when the entries change; closes by itself once
+// none is left.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -38,6 +41,7 @@ class NoticesActivity : public brls::Activity
     // rebuild()'s cells: the console's entries folded into one line, and an entry.
     brls::DetailCell* console_line(const std::vector<notices::Entry>& all);
     brls::DetailCell* entry_cell(const notices::Entry& e, bool todo);
+    brls::DetailCell* ignored_cell(const notices::Entry& e);
 
     BRLS_BIND(brls::Box, root, "nt_root");
 };

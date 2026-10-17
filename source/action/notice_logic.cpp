@@ -70,6 +70,9 @@ bool Store::set(const std::string& id, Level level, const std::string& title, co
     if (Slot* s = this->find(id)) {
         Item& it = s->item;
         if (it.level == level && it.title == title && it.detail == detail) return false;
+        // Ignored as something to do, now only for information (or the
+        // other way round): a new question.
+        if (it.level != level) s->acked = false;
         it.level  = level;
         it.title  = title;
         it.detail = detail;
@@ -93,7 +96,7 @@ bool Store::clear(const std::string& id)
 {
     auto it = std::find_if(this->slots.begin(), this->slots.end(), [&id](const Slot& s) { return s.item.id == id; });
     if (it == this->slots.end()) return false;
-    const bool shown = !it->dismissed;
+    const bool shown = !it->dismissed && !it->acked;
     this->slots.erase(it);
     return shown;
 }
@@ -106,17 +109,49 @@ bool Store::dismiss(const std::string& id)
     return true;
 }
 
+bool Store::ack(const std::string& id)
+{
+    Slot* s = this->find(id);
+    if (!s || s->acked || s->item.level != Level::Action || !ackable(id)) return false;
+    s->acked = true;
+    return true;
+}
+
+bool Store::unack(const std::string& id)
+{
+    Slot* s = this->find(id);
+    if (!s || !s->acked) return false;
+    s->acked = false;
+    return true;
+}
+
 bool Store::has(const std::string& id) const
 {
     const Slot* s = this->find(id);
-    return s && !s->dismissed;
+    return s && !s->dismissed && !s->acked;
+}
+
+bool Store::acked(const std::string& id) const
+{
+    const Slot* s = this->find(id);
+    return s && s->acked;
 }
 
 std::vector<Item> Store::visible() const
 {
+    return this->sorted(false);
+}
+
+std::vector<Item> Store::ignored() const
+{
+    return this->sorted(true);
+}
+
+std::vector<Item> Store::sorted(bool acked) const
+{
     std::vector<Item> out;
     for (const auto& s : this->slots)
-        if (!s.dismissed) out.push_back(s.item);
+        if (!s.dismissed && s.acked == acked) out.push_back(s.item);
     std::stable_sort(out.begin(), out.end(), [](const Item& a, const Item& b) {
         if (a.group != b.group) return a.group == Group::Parental;
         if (a.level != b.level) return a.level == Level::Action;
@@ -130,7 +165,7 @@ int Store::count(Group group, Level level) const
 {
     int n = 0;
     for (const auto& s : this->slots)
-        if (!s.dismissed && s.item.group == group && s.item.level == level) n++;
+        if (!s.dismissed && !s.acked && s.item.group == group && s.item.level == level) n++;
     return n;
 }
 
@@ -165,6 +200,51 @@ std::string read_key(const std::string& id, const std::string& title, const std:
     char hex[9];
     std::snprintf(hex, sizeof(hex), "%08x", (unsigned)h);
     return id + ":" + hex;
+}
+
+bool ackable(const std::string& id)
+{
+    return id == "pin_weak" || id == "pin_lock_off" || id == "alarm_off" || id == "sd_space";
+}
+
+std::string ack_key(const std::string& id, const std::string& print, const std::string& day)
+{
+    return id + ":" + print + ":" + day;
+}
+
+std::string ack_day(const std::vector<std::string>& keys, const std::string& id, const std::string& print)
+{
+    const std::string head = id + ":" + print + ":";
+    for (const auto& k : keys)
+        if (k.size() == head.size() + 10 && k.compare(0, head.size(), head) == 0) {
+            const std::string day = k.substr(head.size());
+            if (!date::add_days(day, 0).empty()) return day;
+        }
+    return "";
+}
+
+bool ack_holds(const std::vector<std::string>& keys, const std::string& id, const std::string& print,
+               const std::string& today, bool remind)
+{
+    const std::string day = ack_day(keys, id, print);
+    return !day.empty() && (!remind || !days_ago(day, 30, today));
+}
+
+std::string ack_until(const std::vector<std::string>& keys, const std::string& id, const std::string& print,
+                      bool remind)
+{
+    const std::string day = ack_day(keys, id, print);
+    return remind && !day.empty() ? date::add_days(day, 30) : "";
+}
+
+bool ack_forget(std::vector<std::string>& keys, const std::string& id)
+{
+    const std::string head = id + ":";
+    const auto end = std::remove_if(keys.begin(), keys.end(),
+                                    [&head](const std::string& k) { return k.compare(0, head.size(), head) == 0; });
+    const bool gone = end != keys.end();
+    keys.erase(end, keys.end());
+    return gone;
 }
 
 std::string backup_date(const std::string& name)

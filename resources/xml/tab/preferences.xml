@@ -35,6 +35,7 @@
             <brls:BooleanCell id="pf_notices_system"/>
             <brls:BooleanCell id="pf_notices_summary"/>
             <brls:BooleanCell id="pf_notices_reminders"/>
+            <brls:BooleanCell id="pf_notices_ack_remind"/>
             <brls:BooleanCell id="pf_support_reminder"/>
 
         </brls:Box>

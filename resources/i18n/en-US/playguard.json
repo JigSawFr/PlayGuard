@@ -977,6 +977,7 @@
         "notices_system": "Atmosphère, hekate and firmware releases",
         "notices_summary": "The week's play time",
         "notices_reminders": "Reminders: backups, the other system, all games blocked",
+        "notices_ack_remind": "Count ignored warnings again after 30 days",
         "help": "Help & diagnostics"
     },
     "backup": {
@@ -1359,6 +1360,14 @@
         "console_count": "{} to look at",
         "console_show": "Show",
         "seen": "Mark as read",
+        "read_all": "Mark all as read",
+        "ignore": "Ignore",
+        "ignore_confirm": "“{}”\n\nThis warning will no longer be counted on the bell. It comes back in 30 days, or sooner once it has been fixed and happens again.",
+        "ignore_confirm_kept": "“{}”\n\nThis warning will no longer be counted on the bell. It comes back only once it has been fixed and happens again.",
+        "section_ignored": "Ignored",
+        "reactivate": "Count again",
+        "ignored_until": "Ignored until {}",
+        "ignored_kept": "Ignored",
         "open_tab": "Open {}",
         "pin_missing": "Parental controls are not set up",
         "pin_missing_detail": "No PIN yet: the console is not protected.",

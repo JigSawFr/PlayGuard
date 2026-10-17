@@ -25,4 +25,5 @@ class PreferencesTab : public TabBase
     BRLS_BIND(brls::BooleanCell, notices_system, "pf_notices_system");
     BRLS_BIND(brls::BooleanCell, notices_summary, "pf_notices_summary");
     BRLS_BIND(brls::BooleanCell, notices_reminders, "pf_notices_reminders");
+    BRLS_BIND(brls::BooleanCell, notices_ack_remind, "pf_notices_ack_remind");
 };

@@ -977,6 +977,7 @@
         "notices_system": "Atmosphère・hekate・ファームウェアの新しいバージョン",
         "notices_summary": "この週のプレイ時間",
         "notices_reminders": "リマインダー：バックアップ、もう一方のシステム、ソフトのブロック",
+        "notices_ack_remind": "無視した警告を30日後に再び数える",
         "help": "ヘルプと診断"
     },
     "backup": {
@@ -1359,6 +1360,14 @@
         "console_count": "確認が必要な項目：{}",
         "console_show": "表示",
         "seen": "既読にする",
+        "read_all": "すべて既読にする",
+        "ignore": "無視する",
+        "ignore_confirm": "「{}」\n\nこの警告はベルの件数に含まれなくなります。30日後、または解決後に再び起きた時点で、もう一度表示されます。",
+        "ignore_confirm_kept": "「{}」\n\nこの警告はベルの件数に含まれなくなります。解決後に再び起きた場合にのみ、もう一度表示されます。",
+        "section_ignored": "無視中",
+        "reactivate": "再び数える",
+        "ignored_until": "{} まで無視",
+        "ignored_kept": "無視中",
         "open_tab": "{}を開く",
         "pin_missing": "みまもり設定がされていません",
         "pin_missing_detail": "暗証番号がまだありません。本体は保護されていません。",

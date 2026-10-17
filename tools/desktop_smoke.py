@@ -999,6 +999,18 @@ if OUTSIDE:
     if not logged("notices: 4 to do") or not logged("1 about the console to do"):
         fail("the notification bell does not hold four notices to do and one about the console")
     shot("03_notices")
+    key("Down", 3)             # the weak PIN, the last to do: X ignores it, once confirmed
+    button_x()
+    # Right twice: after the mouse's Ⓧ, borealis takes the first key press
+    # only to show the focus again.
+    key("Right", 2)            # Ignore
+    key("Return")
+    if not logged("notices: pin_weak ignored"):
+        fail("the weak PIN was not ignored from the notification bell's list")
+    time.sleep(1)              # written in the background
+    if "pin_weak:4:" not in open(config_file).read():
+        fail("the weak PIN ignored is not in config.json (notices_acked)")
+    shot("03_notices_ignored")  # under "Ignored", last
     key("Escape")
     key("Down")                # Play timer: its state line says it too
     key("Right")
