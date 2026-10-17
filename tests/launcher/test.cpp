@@ -2,6 +2,7 @@
 // which store is found on the SD card for each preference, and what reaches
 // hbloader (an "sdmc:/" path, nothing when PlayGuard was not started by it).
 #include "check.h"
+#include "temp_dir.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
@@ -39,9 +40,7 @@ static void install(const std::string& sd_path)
 
 int main()
 {
-    char dir[] = "/tmp/playguard_launcher_XXXXXX";
-    REQUIRE(mkdtemp(dir) != nullptr);
-    REQUIRE(chdir(dir) == 0);   // paths::sd_root() is ./playguard_data/sd on the host
+    TempDir tmp("launcher", TempDir::Enter);   // paths::sd_root() is ./playguard_data/sd on the host
 
     using launcher::Store;
     // Nothing installed: no store, whatever the preference.
@@ -77,7 +76,6 @@ int main()
     const int nro_calls = g_calls;
     CHECK(!launcher::launch_nro("") && !launcher::launch_nro("switch/playguard.nro") && g_calls == nro_calls);
 
-    const std::string cleanup = std::string("rm -rf '") + dir + "'";
-    CHECK(std::system(cleanup.c_str()) == 0);
+    CHECK(tmp.remove());
     return CHECK_DONE("launcher store search and hbloader hand-off assertions passed");
 }

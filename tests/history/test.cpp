@@ -2,6 +2,7 @@
 // newest first, trimmed to the newest 500, a damaged file put aside (the
 // previous one kept), and what can be undone.
 #include "check.h"
+#include "temp_dir.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -199,16 +200,13 @@ static void test_trim_and_damage()
 
 int main()
 {
-    char dir[] = "/tmp/playguard_history_XXXXXX";
-    REQUIRE(mkdtemp(dir) != nullptr);
-    REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
+    TempDir tmp("history", TempDir::Enter);   // paths::data_dir() is ./playguard_data on the host
 
     test_round_trip();
     test_refused_and_version();
     test_trim_and_damage();
     test_value_ranges();
 
-    const std::string cleanup = std::string("rm -rf '") + dir + "'";
-    CHECK(std::system(cleanup.c_str()) == 0);
+    CHECK(tmp.remove());
     return CHECK_DONE("history round trip, order, trimming, damaged-file, undo and value-range assertions passed");
 }

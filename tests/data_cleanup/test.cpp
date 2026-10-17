@@ -5,9 +5,10 @@
 // count (a file gone since the plan is neither removed nor failed, one that
 // cannot be removed is failed), and the size shown.
 #include "check.h"
+#include "fs.hpp"
+#include "temp_dir.hpp"
 #include <cstdio>
 #include <cstdlib>
-#include <fcntl.h>
 #include <string>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -22,12 +23,7 @@ std::string g_root;
 
 void write(const std::string& rel, size_t size)
 {
-    // 0644, not fopen's 0666.
-    const int fd = ::open((g_root + "/" + rel).c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    FILE* f = fd >= 0 ? ::fdopen(fd, "wb") : nullptr;
-    REQUIRE(f);
-    for (size_t i = 0; i < size; i++) std::fputc('x', f);
-    std::fclose(f);
+    fs::write(g_root + "/" + rel, std::string(size, 'x'));
 }
 
 void dir(const std::string& rel)
@@ -37,16 +33,13 @@ void dir(const std::string& rel)
 
 bool there(const std::string& rel)
 {
-    struct stat st;
-    return stat((g_root + "/" + rel).c_str(), &st) == 0;
+    return fs::exists(g_root + "/" + rel);
 }
 
-// A data folder as PlayGuard leaves it.
-void make_tree()
+// A data folder as PlayGuard leaves it, in `root`.
+void make_tree(const TempDir& root)
 {
-    char tmpl[] = "/tmp/playguard_cleanup_XXXXXX";
-    REQUIRE(mkdtemp(tmpl));
-    g_root = tmpl;
+    g_root = root.path();
     write("config.json", 300);
     write("history.json", 400);
     write("watch.json", 50);
@@ -85,16 +78,12 @@ void make_tree()
     write("logs/uploads/upload_20261009_150000.url", 150);
     write("logs/uploads/upload_20261009_150000_1.url.tmp", 160);
 }
-
-void remove_tree()
-{
-    std::system(("rm -rf '" + g_root + "'").c_str());
-}
 }   // namespace
 
 static void test_cache_plan()
 {
-    make_tree();
+    const TempDir root("cleanup");
+    make_tree(root);
     const dc::Plan p = dc::cache(g_root);
     CHECK(p.files.size() == 7);
     CHECK(p.bytes == 5000 + 3000 + 700 + 1 + 6000 + 7000 + 4000);
@@ -120,12 +109,12 @@ static void test_cache_plan()
     // Nothing left: an empty plan.
     const dc::Plan again = dc::cache(g_root);
     CHECK(again.files.empty() && again.bytes == 0);
-    remove_tree();
 }
 
 static void test_logs_plan()
 {
-    make_tree();
+    const TempDir root("cleanup");
+    make_tree(root);
     dir("logs/old");   // kept by their path from logs/: elsewhere, the same names go
     dir("logs/old/uploads");
     write("logs/old/uploads/upload_20261009_150000.url", 10);
@@ -145,13 +134,13 @@ static void test_logs_plan()
           there("logs/play_timer/block.json") &&
           there("logs/play_timer/block.json.tmp"));
     CHECK(there("cache/activity_all.bin"));
-    remove_tree();
 }
 
 // This run's session file is still being written: it stays, the others go.
 static void test_logs_keep_session()
 {
-    make_tree();
+    const TempDir root("cleanup");
+    make_tree(root);
     dir("logs/sessions");
     write("logs/sessions/session_20261009_141000.txt", 50);
     write("logs/sessions/session_20261010_090000.txt", 60);
@@ -160,24 +149,22 @@ static void test_logs_keep_session()
     CHECK(p.files.size() + 1 == all.files.size() && p.bytes + 60 == all.bytes);
     CHECK(dc::remove(p).failed == 0);
     CHECK(there("logs/sessions/session_20261010_090000.txt") && !there("logs/sessions/session_20261009_141000.txt"));
-    remove_tree();
 }
 
 static void test_missing_folders()
 {
-    char tmpl[] = "/tmp/playguard_cleanup_XXXXXX";
-    REQUIRE(mkdtemp(tmpl));
-    g_root = tmpl;
+    const TempDir root("cleanup");
+    g_root = root.path();
     CHECK(dc::cache(g_root).files.empty());
     CHECK(dc::logs(g_root).files.empty());
     const dc::Outcome out = dc::remove(dc::Plan{});
     CHECK(out.removed == 0 && out.failed == 0 && out.bytes == 0);
-    remove_tree();
 }
 
 static void test_remove_counts()
 {
-    make_tree();
+    const TempDir root("cleanup");
+    make_tree(root);
     dc::Plan p = dc::cache(g_root);
     // Gone since the plan: neither removed nor failed.
     REQUIRE(std::remove((g_root + "/cache/dev_builds.json").c_str()) == 0);
@@ -189,7 +176,6 @@ static void test_remove_counts()
     CHECK(out.removed == 5);
     CHECK(out.bytes == 3000 + 1 + 6000 + 7000 + 4000);
     CHECK(out.failed == 1);
-    remove_tree();
 }
 
 static void test_size_unit()

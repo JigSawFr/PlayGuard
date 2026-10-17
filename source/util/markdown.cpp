@@ -255,7 +255,9 @@ struct Parser
     bool open_paragraph = false;   // the last block is a paragraph still taking lines
     bool open_item = false;        // the last block is an item taking continuation lines
     bool open_quote = false;
+    bool in_comment = false;       // inside a <!-- … --> that spans lines
     bool full = false;
+    std::vector<std::string> lines;   // the text's, as parse() split it
 
     void add(Block b)
     {
@@ -277,6 +279,198 @@ struct Parser
         b.text = inline_text(t);
         if (b.text.empty() && kind != Block::Item) return;
         add(std::move(b));
+    }
+
+    // The steps of parse(), one kind of block each, in the order they are
+    // tried: a step given line n (`t`: trimmed, comments out) says whether
+    // it took the line, and moves n to the last line it took.
+
+    // <!-- … --> on one line or several: out of `t`. False when the whole
+    // line is inside a comment (the line is skipped, nothing closed).
+    bool uncomment(std::string& t)
+    {
+        if (in_comment) {
+            const size_t end = t.find("-->");
+            if (end == std::string::npos) return false;
+            in_comment = false;
+            t = text::trim_blank(t.substr(end + 3));
+        }
+        for (size_t open; (open = t.find("<!--")) != std::string::npos;) {
+            const size_t end = t.find("-->", open + 4);
+            if (end == std::string::npos) {
+                in_comment = true;
+                t = text::trim_blank(t.substr(0, open));
+                break;
+            }
+            t = text::trim_blank(t.substr(0, open) + t.substr(end + 3));
+        }
+        return true;
+    }
+
+    // ``` or ~~~ fences: the lines as they are, to the closing fence.
+    bool fence(size_t& n, const std::string& t)
+    {
+        if (!text::starts_with(t, "```") && !text::starts_with(t, "~~~")) return false;
+        const std::string mark = t.substr(0, 3);
+        Block b;
+        b.kind = Block::Code;
+        size_t k = n + 1;
+        for (; k < lines.size() && !text::starts_with(text::trim_blank(lines[k]), mark.c_str()); k++) {
+            if (b.lines.size() < MAX_CODE_LINES) b.lines.push_back(lines[k]);
+            else if (b.lines.size() == MAX_CODE_LINES) b.lines.push_back("\xE2\x80\xA6");   // …
+        }
+        n = k;
+        if (!b.lines.empty()) add(std::move(b));
+        return true;
+    }
+
+    // <details> and the like: <summary> as a heading, the rest as text.
+    bool details(const std::string& t)
+    {
+        if (t[0] != '<') return false;
+        const std::string tag = text::lower_ascii(t);
+        if (text::starts_with(tag, "<summary")) {
+            text_block(Block::Heading, t, 4);
+            return true;
+        }
+        if (inline_text(t).empty()) {   // a line of tags only
+            open_paragraph = open_item = open_quote = false;
+            return true;
+        }
+        return false;
+    }
+
+    // Setext headings: a paragraph's single line underlined.
+    bool setext_heading(const std::string& t)
+    {
+        if (!open_paragraph || blocks.empty() || blocks.back().text.find('\n') != std::string::npos ||
+            (t.find_first_not_of('=') != std::string::npos && t.find_first_not_of('-') != std::string::npos))
+            return false;
+        blocks.back().kind = Block::Heading;
+        blocks.back().level = t[0] == '=' ? 1 : 2;
+        open_paragraph = false;
+        return true;
+    }
+
+    bool rule(const std::string& t)
+    {
+        if (!is_rule(t)) return false;
+        Block b;
+        b.kind = Block::Rule;
+        add(std::move(b));
+        return true;
+    }
+
+    bool heading(const std::string& t)
+    {
+        if (t[0] != '#') return false;
+        size_t level = 0;
+        while (level < t.size() && t[level] == '#') level++;
+        if (level > 6 || (level != t.size() && t[level] != ' ')) return false;
+        std::string text = text::trim_blank(t.substr(level));
+        while (!text.empty() && text.back() == '#') text.pop_back();   // "## Title ##"
+        text_block(Block::Heading, text, (int)level);
+        return true;
+    }
+
+    // > quotes, and GitHub's alerts ("> [!WARNING]").
+    bool quote(const std::string& t)
+    {
+        if (t[0] != '>') return false;
+        std::string inside = text::trim_blank(t.substr(1));
+        while (!inside.empty() && inside[0] == '>') inside = text::trim_blank(inside.substr(1));   // nested: flattened
+        const std::string tag = text::lower_ascii(inside);
+        for (const char* alert : { "note", "tip", "important", "warning", "caution" })
+            if (tag == std::string("[!") + alert + "]") {
+                Block b;
+                b.kind = Block::Quote;
+                b.alert = alert;
+                add(std::move(b));
+                open_quote = true;
+                inside.clear();
+            }
+        if (inside.empty()) return true;
+        const std::string text = inline_text(inside);
+        if (open_quote && !blocks.empty()) {
+            std::string& q = blocks.back().text;
+            q += (q.empty() ? "" : "\n") + text;
+        } else {
+            Block b;
+            b.kind = Block::Quote;
+            b.text = text;
+            add(std::move(b));
+            open_quote = true;
+        }
+        return true;
+    }
+
+    // A table: a row of cells, then a row of dashes.
+    bool table(size_t& n, const std::string& t)
+    {
+        if (t.find('|') == std::string::npos || n + 1 >= lines.size() || !is_table_rule(text::trim_blank(lines[n + 1])))
+            return false;
+        Block b;
+        b.kind = Block::Table;
+        auto row = [&](const std::string& line) {
+            std::vector<std::string> r;
+            for (const std::string& c : cells(text::trim_blank(line))) {
+                if (r.size() >= MAX_COLUMNS) break;
+                r.push_back(inline_text(c));
+            }
+            return r;
+        };
+        b.rows.push_back(row(t));
+        size_t k = n + 2;
+        for (; k < lines.size() && text::trim_blank(lines[k]).find('|') != std::string::npos; k++)
+            if (b.rows.size() < MAX_ROWS + 1) b.rows.push_back(row(lines[k]));
+        n = k - 1;
+        add(std::move(b));
+        return true;
+    }
+
+    // List items: their depth from their indentation (two to four spaces a level).
+    bool item(const std::string& raw, const std::string& t)
+    {
+        int number = 0;
+        const size_t len = list_marker(t, &number);
+        if (!len) return false;
+        Block b;
+        b.kind = Block::Item;
+        b.number = number;
+        const size_t indent = indent_of(raw);
+        b.level = (int)(indent / 2);
+        if (b.level > MAX_DEPTH) b.level = MAX_DEPTH;
+        std::string rest = t.substr(len);
+        if (text::starts_with(rest, "[ ] ") || rest == "[ ]") b.task = 0;
+        else if (text::starts_with(text::lower_ascii(rest), "[x] ") || text::lower_ascii(rest) == "[x]") b.task = 1;
+        if (b.task >= 0) rest = rest.size() > 3 ? rest.substr(4) : "";
+        b.icon = emoji::icon_at(squeeze(inline_pass(rest, 0)));
+        b.text = inline_text(rest);
+        add(std::move(b));
+        open_item = true;
+        return true;
+    }
+
+    // An indented line after an item continues it; any other line
+    // continues the paragraph, on a line of its own.
+    void paragraph(const std::string& raw, const std::string& t)
+    {
+        const std::string text = inline_text(t);
+        if (text.empty()) return;
+        if (open_item && indent_of(raw) > 0 && !blocks.empty()) {
+            std::string& last = blocks.back().text;
+            last += (last.empty() ? "" : " ") + text;
+            return;
+        }
+        if (open_paragraph && !blocks.empty()) {
+            blocks.back().text += "\n" + text;
+            return;
+        }
+        Block b;
+        b.kind = Block::Paragraph;
+        b.text = text;
+        add(std::move(b));
+        open_paragraph = true;
     }
 };
 }   // namespace
@@ -316,183 +510,24 @@ std::vector<Block> parse(const std::string& source)
 {
     const std::string md = drop_raw_elements(safe_text::clean(source, source.size(), true));
     Parser p;
-    std::vector<std::string> lines;
     for (size_t start = 0; start <= md.size();) {
         size_t end = md.find('\n', start);
         if (end == std::string::npos) end = md.size();
-        lines.push_back(md.substr(start, end - start));
+        p.lines.push_back(md.substr(start, end - start));
         start = end + 1;
     }
-    bool in_comment = false;
-    for (size_t n = 0; n < lines.size() && !p.full; n++) {
-        const std::string& raw = lines[n];
+    for (size_t n = 0; n < p.lines.size() && !p.full; n++) {
+        const std::string& raw = p.lines[n];
         std::string t = text::trim_blank(raw);
-
-        // <!-- … --> on one line or several: gone.
-        if (in_comment) {
-            const size_t end = t.find("-->");
-            if (end == std::string::npos) continue;
-            in_comment = false;
-            t = text::trim_blank(t.substr(end + 3));
-        }
-        for (size_t open; (open = t.find("<!--")) != std::string::npos;) {
-            const size_t end = t.find("-->", open + 4);
-            if (end == std::string::npos) {
-                in_comment = true;
-                t = text::trim_blank(t.substr(0, open));
-                break;
-            }
-            t = text::trim_blank(t.substr(0, open) + t.substr(end + 3));
-        }
-
+        if (!p.uncomment(t)) continue;
         if (t.empty()) {
             p.open_paragraph = p.open_item = p.open_quote = false;
             continue;
         }
-
-        // ``` or ~~~ fences: the lines as they are, to the closing fence.
-        if (text::starts_with(t, "```") || text::starts_with(t, "~~~")) {
-            const std::string fence = t.substr(0, 3);
-            Block b;
-            b.kind = Block::Code;
-            size_t k = n + 1;
-            for (; k < lines.size() && !text::starts_with(text::trim_blank(lines[k]), fence.c_str()); k++) {
-                if (b.lines.size() < MAX_CODE_LINES) b.lines.push_back(lines[k]);
-                else if (b.lines.size() == MAX_CODE_LINES) b.lines.push_back("\xE2\x80\xA6");   // …
-            }
-            n = k;
-            if (!b.lines.empty()) p.add(std::move(b));
+        if (p.fence(n, t) || p.details(t) || p.setext_heading(t) || p.rule(t) || p.heading(t) || p.quote(t) ||
+            p.table(n, t) || p.item(raw, t))
             continue;
-        }
-
-        // <details> and the like: <summary> as a heading, the rest as text.
-        if (t[0] == '<') {
-            const std::string tag = text::lower_ascii(t);
-            if (text::starts_with(tag, "<summary")) {
-                p.text_block(Block::Heading, t, 4);
-                continue;
-            }
-            if (inline_text(t).empty()) {   // a line of tags only
-                p.open_paragraph = p.open_item = p.open_quote = false;
-                continue;
-            }
-        }
-
-        // Setext headings: a paragraph's single line underlined.
-        if (p.open_paragraph && !p.blocks.empty() && p.blocks.back().text.find('\n') == std::string::npos &&
-            (t.find_first_not_of('=') == std::string::npos || t.find_first_not_of('-') == std::string::npos)) {
-            p.blocks.back().kind = Block::Heading;
-            p.blocks.back().level = t[0] == '=' ? 1 : 2;
-            p.open_paragraph = false;
-            continue;
-        }
-
-        if (is_rule(t)) {
-            Block b;
-            b.kind = Block::Rule;
-            p.add(std::move(b));
-            continue;
-        }
-
-        if (t[0] == '#') {
-            size_t level = 0;
-            while (level < t.size() && t[level] == '#') level++;
-            if (level <= 6 && (level == t.size() || t[level] == ' ')) {
-                std::string text = text::trim_blank(t.substr(level));
-                while (!text.empty() && text.back() == '#') text.pop_back();   // "## Title ##"
-                p.text_block(Block::Heading, text, (int)level);
-                continue;
-            }
-        }
-
-        // > quotes, and GitHub's alerts ("> [!WARNING]").
-        if (t[0] == '>') {
-            std::string inside = text::trim_blank(t.substr(1));
-            while (!inside.empty() && inside[0] == '>') inside = text::trim_blank(inside.substr(1));   // nested: flattened
-            const std::string tag = text::lower_ascii(inside);
-            for (const char* alert : { "note", "tip", "important", "warning", "caution" })
-                if (tag == std::string("[!") + alert + "]") {
-                    Block b;
-                    b.kind = Block::Quote;
-                    b.alert = alert;
-                    p.add(std::move(b));
-                    p.open_quote = true;
-                    inside.clear();
-                }
-            if (inside.empty()) continue;
-            const std::string text = inline_text(inside);
-            if (p.open_quote && !p.blocks.empty()) {
-                std::string& q = p.blocks.back().text;
-                q += (q.empty() ? "" : "\n") + text;
-            } else {
-                Block b;
-                b.kind = Block::Quote;
-                b.text = text;
-                p.add(std::move(b));
-                p.open_quote = true;
-            }
-            continue;
-        }
-
-        // A table: a row of cells, then a row of dashes.
-        if (t.find('|') != std::string::npos && n + 1 < lines.size() && is_table_rule(text::trim_blank(lines[n + 1]))) {
-            Block b;
-            b.kind = Block::Table;
-            auto row = [&](const std::string& line) {
-                std::vector<std::string> r;
-                for (const std::string& c : cells(text::trim_blank(line))) {
-                    if (r.size() >= MAX_COLUMNS) break;
-                    r.push_back(inline_text(c));
-                }
-                return r;
-            };
-            b.rows.push_back(row(t));
-            size_t k = n + 2;
-            for (; k < lines.size() && text::trim_blank(lines[k]).find('|') != std::string::npos; k++)
-                if (b.rows.size() < MAX_ROWS + 1) b.rows.push_back(row(lines[k]));
-            n = k - 1;
-            p.add(std::move(b));
-            continue;
-        }
-
-        // List items: their depth from their indentation (two to four spaces a level).
-        int number = 0;
-        if (const size_t len = list_marker(t, &number)) {
-            Block b;
-            b.kind = Block::Item;
-            b.number = number;
-            const size_t indent = indent_of(raw);
-            b.level = (int)(indent / 2);
-            if (b.level > MAX_DEPTH) b.level = MAX_DEPTH;
-            std::string rest = t.substr(len);
-            if (text::starts_with(rest, "[ ] ") || rest == "[ ]") b.task = 0;
-            else if (text::starts_with(text::lower_ascii(rest), "[x] ") || text::lower_ascii(rest) == "[x]") b.task = 1;
-            if (b.task >= 0) rest = rest.size() > 3 ? rest.substr(4) : "";
-            b.icon = emoji::icon_at(squeeze(inline_pass(rest, 0)));
-            b.text = inline_text(rest);
-            p.add(std::move(b));
-            p.open_item = true;
-            continue;
-        }
-
-        // An indented line after an item continues it; any other line
-        // continues the paragraph, on a line of its own.
-        const std::string text = inline_text(t);
-        if (text.empty()) continue;
-        if (p.open_item && indent_of(raw) > 0 && !p.blocks.empty()) {
-            std::string& item = p.blocks.back().text;
-            item += (item.empty() ? "" : " ") + text;
-            continue;
-        }
-        if (p.open_paragraph && !p.blocks.empty()) {
-            p.blocks.back().text += "\n" + text;
-            continue;
-        }
-        Block b;
-        b.kind = Block::Paragraph;
-        b.text = text;
-        p.add(std::move(b));
-        p.open_paragraph = true;
+        p.paragraph(raw, t);
     }
     return p.blocks;
 }

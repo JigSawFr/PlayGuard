@@ -4,6 +4,8 @@
 // of a save that stopped between its remove and its rename, a damaged file
 // put aside (config.json.bad) before anything saves over it.
 #include "check.h"
+#include "fs.hpp"
+#include "temp_dir.hpp"
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
@@ -54,11 +56,7 @@ static void test_defaults()
     std::remove((paths::config_file() + ".bad.1").c_str());
 }
 
-static bool exists(const std::string& path)
-{
-    struct stat st;
-    return stat(path.c_str(), &st) == 0;
-}
+using fs::exists;
 
 // A file that is there but cannot be read as settings is put aside before
 // any save, the previous damaged copy kept; a missing one is a silent first run.
@@ -491,9 +489,7 @@ static void test_systems()
 
 int main()
 {
-    char dir[] = "/tmp/playguard_config_XXXXXX";
-    REQUIRE(mkdtemp(dir) != nullptr);
-    REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
+    TempDir tmp("config", TempDir::Enter);   // paths::data_dir() is ./playguard_data on the host
 
     test_defaults();
     test_damaged();
@@ -504,7 +500,6 @@ int main()
     test_tmp_recovery();
     test_systems();
 
-    const std::string cleanup = std::string("rm -rf '") + dir + "'";
-    CHECK(std::system(cleanup.c_str()) == 0);
+    CHECK(tmp.remove());
     return CHECK_DONE("config fields, ranges, round trip, .tmp recovery, damaged-file and per-system state assertions passed");
 }

@@ -7,6 +7,8 @@
 // system and session lines, the details, the last lines logged, a free name
 // within a second, the session's end line pointing at the file).
 #include "check.h"
+#include "fs.hpp"
+#include "temp_dir.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -27,12 +29,7 @@ namespace
 // 2026-10-15 12:00:00 UTC (TZ is UTC in main()).
 constexpr std::time_t NOW = 1792065600;
 
-std::string read(const std::string& path)
-{
-    std::string out;
-    paths::read_file(path, out);
-    return out;
-}
+using fs::read;
 
 void write(const std::string& path, const std::string& content)
 {
@@ -291,9 +288,7 @@ int main()
 {
     setenv("TZ", "UTC", 1);
     tzset();
-    char dir[] = "/tmp/playguard_session_log_XXXXXX";
-    REQUIRE(mkdtemp(dir) != nullptr);
-    REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
+    TempDir tmp("session_log", TempDir::Enter);   // paths::data_dir() is ./playguard_data on the host
 
     test_format();
     test_session();
@@ -303,6 +298,6 @@ int main()
     test_unfinished();
     test_crash_files();
 
-    std::system((std::string("rm -rf '") + dir + "'").c_str());
+    tmp.remove();
     return CHECK_DONE("session log file, memory, size limit, unfinished run and crash file assertions passed");
 }

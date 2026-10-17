@@ -21,7 +21,13 @@ The suites build and run in parallel (`JOBS=n` for fewer jobs), every one of
 them even when one fails: each leaves its output in `build/host-tests/<suite>.log`
 and a `<suite>.ok` when it passed, and `make` fails at the end if any did. A
 suite is three variables in the Makefile (`<name>_SRC`, `<name>_FLAGS`, an
-optional `<name>_LIBS`); a new one is three lines there, next to the others. A C++ suite that needs one C source names it in `<name>_CSRC` (with `<name>_CFLAGS`): it is built by `$(CC)` and linked in, as clang++ refuses to build a `.c` file as C++.
+optional `<name>_LIBS`); a new one is three lines there, next to the others.
+A C++ suite leaves out `<name>_FLAGS` when `TEST_CXXFLAGS` (C++17, `source/`
+and borealis' headers) is all it needs, so it is often one line. A C++ suite
+that needs one C source names it in `<name>_CSRC` (with `<name>_CFLAGS`): it
+is built by `$(CC)` and linked in, as clang++ refuses to build a `.c` file as
+C++. One that links `source/util/date.cpp` gets `source/core/calendar.c` that
+way without naming it.
 
 The suites check with `CHECK(expr)` from [`check.h`](check.h), not `assert()`:
 the expression is always evaluated (also under `-DNDEBUG`), a failure prints
@@ -29,6 +35,19 @@ file:line and the expression and the suite goes on, and `main()` ends with
 `return CHECK_DONE("... passed");`, non-zero when any check failed.
 `if (!CHECK(p)) return;` stops a test whose next line needs `p`; `REQUIRE(expr)`
 stops the program (a mock handed a bad pointer, a setup step everything needs).
+
+What the suites share, next to `check.h` (`-Itests`):
+[`temp_dir.hpp`](temp_dir.hpp), a fresh folder under `/tmp` removed with
+the object (`TempDir tmp("config", TempDir::Enter)` also makes it the
+working directory, so `paths::data_dir()`, `./playguard_data` on the host,
+lands in it, until `CHECK(tmp.remove())` or the end);
+[`fs.hpp`](fs.hpp), the files a suite sets up and looks at (`fs::write`
+with its folders, `fs::exists`, `fs::read` and `fs::content_of` as the app
+reads a file, `.tmp` included); and
+[`fake_switch_base.h`](fake_switch_base.h), what every fake `<switch.h>` of
+the C suites starts with (libnx's integer types, `Result` and its macros,
+the firmware version macros), each suite's own `switch.h` adding the
+services its code calls.
 
 | Suite | Covers |
 |---|---|
