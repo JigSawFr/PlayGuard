@@ -5,6 +5,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -36,6 +37,25 @@ struct Tally
     bool any_written() const { return tried > failed.size(); }
     // "Restriction level, VR mode".
     std::string failed_list() const;
+};
+
+// The backups on the SD card (file names, newest first), as backup_flow
+// keeps them: listed on first use, again only once forgotten (a save, a
+// prune) or replaced by a listing made anyway (the restore's). The Overview
+// asks every 5 s for the newest, the backups tab for the count.
+class Listing
+{
+  public:
+    // The names; `list` (backup::list) runs only when none are kept.
+    const std::vector<std::string>& names(const std::function<std::vector<std::string>()>& list);
+    // Listed again next time.
+    void forget() { listed = false; }
+    // A listing made anyway, kept as it is.
+    void set(std::vector<std::string> fresh);
+
+  private:
+    bool                     listed = false;
+    std::vector<std::string> kept;
 };
 
 }   // namespace backup_logic

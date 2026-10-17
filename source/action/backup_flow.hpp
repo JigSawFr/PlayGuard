@@ -7,6 +7,7 @@
 
 #include <functional>
 #include <string>
+#include <vector>
 
 #include "util/backup.hpp"
 
@@ -19,8 +20,11 @@ backup::Snapshot capture();
 // "Back up the settings": capture + save, then a toast with the file.
 void save_now();
 
-// How many backups are on the SD card. Listed once, then kept up to date by
-// the saves made here (Tools refreshes often: every pick, the serial toggle).
+// The backups on the SD card, file names newest first (backup::list). Listed
+// once, then again after a save here (which prunes too) and at each restore
+// list (the Overview asks every 5 s, Tools at every pick).
+const std::vector<std::string>& names();
+// How many there are.
 size_t count();
 
 // "Restore a backup…": list of the backups → summary → confirmation → write.

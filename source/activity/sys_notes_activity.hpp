@@ -30,6 +30,9 @@ class SysNotesActivity : public brls::Activity
     static void changed(sys_notes::Which which);
     // It ended (`ok`: the notes kept were replaced): the screen again.
     static void fetched(sys_notes::Which which, bool ok);
+    // The notes kept on the SD card were read (in the background, at
+    // start-up): the screen again, the bar while a fetch still runs.
+    static void loaded();
 
     explicit SysNotesActivity(sys_notes::Which which);
     ~SysNotesActivity() override;

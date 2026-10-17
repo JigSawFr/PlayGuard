@@ -47,8 +47,10 @@ struct Entry
 // history.json.bad (paths::put_aside: the previous .bad is kept as .bad.1)
 // and a new history starts. check() does it now (at start-up, so the parent
 // can be told); Stuck: it could not be moved, and nothing is written over it.
+// *count: how many entries load() gives now (0 unless None), from the same
+// reading, so the parent's count needs no second one.
 enum class Damage { None, PutAside, Stuck };
-Damage check();
+Damage check(size_t* count = nullptr);
 
 // Adds `e` (newest) and keeps the newest MAX_ENTRIES. False when the SD card
 // refused the write (*error says why). *put_aside: a damaged file found then
