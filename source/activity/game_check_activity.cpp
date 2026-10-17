@@ -698,15 +698,22 @@ void GameCheckActivity::show()
     ui::set_visible(this->selection, broken.size() >= 2 || !this->selected.empty());
 
     // Nothing had the focus before the first game with a problem; and never
-    // the focus left in a section that went (its last game repaired).
+    // the focus left in a section that went (its last game repaired). While
+    // the games are checked, until the user moves it, the focus stays on the
+    // first game: the games found later go into the sections above and would
+    // push the cell it was given below the screen (the scroll does not follow).
     brls::View* focus = brls::Application::getCurrentFocus();
     bool lost = false;
     for (brls::View* v = focus; v && !lost; v = v->getParent()) lost = v->getVisibility() != brls::Visibility::VISIBLE;
     brls::View* first = this->first_game();
-    if (first && (!this->focused || lost)) {
+    const bool untouched = this->auto_focus && focus == this->auto_focus;
+    if (first && (!this->focused || lost || untouched)) {
         this->focused = true;
+        this->auto_focus = first;
         brls::Application::giveFocus(first);
     }
+    // The check over (this was its last show): the focus is the user's.
+    if (!this->checking) this->auto_focus = nullptr;
 
     // The line above the list: the check under way, an error, or the result
     // and when it was made.
