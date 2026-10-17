@@ -1010,6 +1010,12 @@ if OUTSIDE:
     time.sleep(1)              # written in the background
     if "pin_weak:4:" not in open(config_file).read():
         fail("the weak PIN ignored is not in config.json (notices_acked)")
+    # The rebuilt list has the focus on its first entry, but after the mouse's
+    # Ⓧ borealis does not scroll to it: the list stays where it was, clamped
+    # to its end on whichever frame the new layout landed, a fraction of a
+    # pixel apart from one run to the next. Down to the end (past the last
+    # entry, a press does nothing) scrolls it from the settled layout.
+    key("Down", 10)
     shot("03_notices_ignored")  # under "Ignored", last
     key("Escape")
     key("Down")                # Play timer: its state line says it too
