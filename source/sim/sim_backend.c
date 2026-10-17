@@ -248,6 +248,21 @@ Result pctl_pin_weak(bool *weak)
     *weak = pin_is_weak("1234", 4);
     return 0;
 }
+// HMAC-SHA256 with util/sha256 (sim_platform.cpp): C++, as the rest of it.
+void sim_hmac_sha256(void *dst, const void *key, size_t key_size, const void *msg, size_t size);
+// The recovery report's proof, keyed with the simulated PIN as pctl_pin_weak
+// reads it (PLAYGUARD_SIM_FAIL=pin fails the read).
+Result pctl_pin_hmac(const void *msg, size_t size, u8 *mac)
+{
+    if (!mac) return NXM_RC_INVALID_ARGUMENT;
+    memset(mac, 0, 32);
+    if (!msg) return NXM_RC_INVALID_ARGUMENT;
+    sim_init();
+    FAIL_IF("pin");
+    if (!S.pin_length) return NXM_RC_NO_PIN;
+    sim_hmac_sha256(mac, "1234", 4, msg, size);
+    return 0;
+}
 // Locking again never asks for the PIN (write_guard.h): read-only only.
 Result pctl_lock_state(u32 *pin_length, bool *unlocked)
 {

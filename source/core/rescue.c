@@ -160,6 +160,152 @@ bool rescue_report_parse(const char *text, size_t len, RescueReport *out)
     return true;
 }
 
+bool rescue_report_needs_proof(const RescueReport *r)
+{
+    return r && r->result == RescueResult_Ok && r->mode == RescueMode_Unlock;
+}
+
+// `n` bytes as lower-case hex into buf (2n + 1 bytes, NUL-terminated).
+static void to_hex(const uint8_t *bytes, size_t n, char *buf)
+{
+    static const char HEX[] = "0123456789abcdef";
+    for (size_t i = 0; i < n; i++) {
+        buf[2 * i]     = HEX[bytes[i] >> 4];
+        buf[2 * i + 1] = HEX[bytes[i] & 0xF];
+    }
+    buf[2 * n] = '\0';
+}
+
+static int hex_digit(char c)
+{
+    if (c >= '0' && c <= '9') return c - '0';
+    if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+    if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+    return -1;
+}
+
+// Exactly 2n hex digits in `text` (`len` bytes) into out[n]; out is only
+// written when they all are.
+static bool from_hex(const char *text, size_t len, uint8_t *out, size_t n)
+{
+    if (len != 2 * n) return false;
+    for (size_t i = 0; i < len; i++)
+        if (hex_digit(text[i]) < 0) return false;
+    for (size_t i = 0; i < n; i++)
+        out[i] = (uint8_t)(hex_digit(text[2 * i]) << 4 | hex_digit(text[2 * i + 1]));
+    return true;
+}
+
+size_t rescue_nonce_format(const uint8_t nonce[RESCUE_NONCE_SIZE], char *buf, size_t size)
+{
+    if (!buf || size == 0) return 0;
+    buf[0] = '\0';
+    if (!nonce || size < 2 * RESCUE_NONCE_SIZE + 2) return 0;
+    to_hex(nonce, RESCUE_NONCE_SIZE, buf);
+    buf[2 * RESCUE_NONCE_SIZE]     = '\n';
+    buf[2 * RESCUE_NONCE_SIZE + 1] = '\0';
+    return 2 * RESCUE_NONCE_SIZE + 1;
+}
+
+bool rescue_nonce_parse(const char *text, size_t len, uint8_t out[RESCUE_NONCE_SIZE])
+{
+    if (!text || !out) return false;
+    size_t b = 0, e = len;
+    while (b < e && is_space(text[b])) b++;
+    while (e > b && is_space(text[e - 1])) e--;
+    return from_hex(text + b, e - b, out, RESCUE_NONCE_SIZE);
+}
+
+size_t rescue_mac_message(const RescueReport *r, const uint8_t nonce[RESCUE_NONCE_SIZE], char *buf, size_t size)
+{
+    if (!buf || size == 0) return 0;
+    buf[0] = '\0';
+    if (!r || !nonce) return 0;
+    char hex[2 * RESCUE_NONCE_SIZE + 1];
+    to_hex(nonce, RESCUE_NONCE_SIZE, hex);
+    const int head = snprintf(buf, size, "playguard-rescue/1\nnonce=%s\n", hex);
+    if (head < 0 || (size_t)head >= size) {
+        buf[0] = '\0';
+        return 0;
+    }
+    const size_t body = rescue_report_format(r, buf + head, size - (size_t)head);
+    if (body == 0) {
+        buf[0] = '\0';
+        return 0;
+    }
+    return (size_t)head + body;
+}
+
+size_t rescue_proof_format(const RescueProof *p, char *buf, size_t size)
+{
+    if (!buf || size == 0) return 0;
+    buf[0] = '\0';
+    if (!p || !p->present) return 0;
+    char nonce[2 * RESCUE_NONCE_SIZE + 1], mac[2 * RESCUE_MAC_SIZE + 1];
+    to_hex(p->nonce, RESCUE_NONCE_SIZE, nonce);
+    to_hex(p->mac, RESCUE_MAC_SIZE, mac);
+    const int n = snprintf(buf, size, "nonce=%s\nmac=%s\n", nonce, mac);
+    if (n < 0 || (size_t)n >= size) {
+        buf[0] = '\0';
+        return 0;
+    }
+    return (size_t)n;
+}
+
+void rescue_proof_parse(const char *text, size_t len, RescueProof *out)
+{
+    if (!out) return;
+    memset(out, 0, sizeof(*out));
+    if (!text) return;
+    RescueProof p;
+    memset(&p, 0, sizeof(p));
+    bool has_nonce = false, has_mac = false;
+    size_t i = 0;
+    while (i < len) {
+        size_t end = i;
+        while (end < len && text[end] != '\n') end++;
+        size_t line_end = end;
+        if (line_end > i && text[line_end - 1] == '\r') line_end--;
+        const char *line = text + i;
+        const size_t n = line_end - i;
+        const char *eq = memchr(line, '=', n);
+        if (eq) {
+            const size_t kn = (size_t)(eq - line);
+            const char *v = eq + 1;
+            const size_t vn = n - kn - 1;
+            // A second line of either kind: not one the sysmodule wrote.
+            if (equals(line, kn, "nonce")) {
+                if (has_nonce || !from_hex(v, vn, p.nonce, RESCUE_NONCE_SIZE)) return;
+                has_nonce = true;
+            } else if (equals(line, kn, "mac")) {
+                if (has_mac || !from_hex(v, vn, p.mac, RESCUE_MAC_SIZE)) return;
+                has_mac = true;
+            }
+        }
+        i = end + 1;
+    }
+    if (!has_nonce || !has_mac) return;
+    p.present = true;
+    *out = p;
+}
+
+bool rescue_mac_equal(const uint8_t a[RESCUE_MAC_SIZE], const uint8_t b[RESCUE_MAC_SIZE])
+{
+    if (!a || !b) return false;
+    uint8_t diff = 0;
+    for (size_t i = 0; i < RESCUE_MAC_SIZE; i++) diff |= (uint8_t)(a[i] ^ b[i]);
+    return diff == 0;
+}
+
+size_t rescue_pin_length(const char *pin, size_t size, uint32_t reported)
+{
+    if (!pin) return 0;
+    size_t n = 0;
+    while (n < size && pin[n]) n++;
+    if (reported > 0 && reported < n) n = reported;
+    return n;
+}
+
 bool rescue_report_confirmed(const RescueReport *r, uint32_t pin_length, bool unlocked)
 {
     if (!r) return false;

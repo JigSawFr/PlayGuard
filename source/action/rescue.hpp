@@ -18,13 +18,19 @@ namespace rescue
 // The report left on the SD card, read and then removed (it is shown once).
 // None when there is no report or it is damaged (data_notice then tells the
 // parent at start-up). Reading it records a "rescue" entry in the change history.
-std::optional<RescueReport> take();
+// *proof gets its proof (core/rescue.h), present only when it answers the
+// challenge on the card (RESCUE_NONCE_NAME). Called at every start, which
+// replaces the challenge: a report answers the one of the start before it.
+std::optional<RescueReport> take(RescueProof* proof);
 
 // Whether the console confirms `report` (rescue_report_confirmed, from a
-// fresh read of 1206 and 1006), with the sysmodule installed on the SD card
-// (a console a parent left temporarily unlocked would otherwise confirm a
-// report written by hand). False when the read fails.
-bool confirmed(const RescueReport& report);
+// fresh read of 1206 and 1006). An unlock also needs `proof`, its MAC checked
+// with the stored PIN (pctl_pin_hmac): a console a parent left temporarily
+// unlocked confirms a report written by hand just as well, and only the
+// sysmodule makes the proof, so a report that has one shows it is installed
+// too. Anything else (no PIN left) needs the sysmodule on the SD card
+// (installed()). False when a read fails.
+bool confirmed(const RescueReport& report, const RescueProof& proof);
 
 // Whether a report is waiting (without removing it): decides at start-up
 // whether to show the recovery screen instead of the lock screen.

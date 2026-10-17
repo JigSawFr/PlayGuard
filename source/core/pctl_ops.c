@@ -334,6 +334,30 @@ Result pctl_pin_weak(bool *weak)
     return rc;
 }
 
+Result pctl_pin_hmac(const void *msg, size_t size, u8 *mac)
+{
+    if (!mac) return NXM_RC_INVALID_ARGUMENT;
+    memset(mac, 0, 32);
+    if (!msg) return NXM_RC_INVALID_ARGUMENT;
+    Result rc = pctl_ops_reinit();
+    if (R_FAILED(rc)) return rc;
+    char pin[PIN_BUF];
+    u32 pin_len = 0;
+    rc = read_pin(pctlGetServiceSession_Service(), pin, &pin_len);
+    if (R_SUCCEEDED(rc)) {
+        // The key the recovery sysmodule takes (rescue_pin_length's rule).
+        size_t n = 0;
+        while (n < PIN_BUF && pin[n]) n++;
+        if (pin_len > 0 && pin_len < n) n = pin_len;
+        if (n == 0) rc = NXM_RC_NO_PIN;
+        else hmacSha256CalculateMac(mac, pin, n, msg, size);
+    }
+    secure_zero(pin, sizeof(pin));
+    secure_zero(&pin_len, sizeof(pin_len));
+    pctl_ops_exit();
+    return rc;
+}
+
 Result pctl_relock(void)                     { return run_simple(1007, true); }
 Result pctl_delete_parental_controls(void)   { return run_simple(1043, false); }
 Result pctl_delete_pairing(void)             { return run_simple(1941, false); }

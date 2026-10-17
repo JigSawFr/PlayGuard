@@ -1,5 +1,5 @@
 // Host tests for source/util/log_upload.cpp: which debug files and saved
-// reports are offered, the crash reports sent, a gist's files and their cut
+// reports are offered, what of the change history goes, the crash reports sent, a gist's files and their cut
 // on a whole UTF-8 character, GitHub's answer, the body sent, percent-encoding
 // and the prefilled bug-report link.
 #include "check.h"
@@ -31,19 +31,24 @@ static void test_files()
     CHECK(files[1].name == "config.json");
     write(paths::history_file(), "[]");
     files = log_upload::debug_files();
-    CHECK(files.size() == 3 && files[1].name == "history.json" && files[2].name == "config.json");
+    CHECK(files.size() == 3 && files[1].name == "history_recent.json" && files[2].name == "config.json");
+    CHECK(files[1].content.find("could not be read") != std::string::npos);   // not the shape history.json has
     // The GitHub token (util/github_auth.hpp) is never sent.
     write(paths::data_dir() + "/github_token", "ghu_secret");
     files = log_upload::debug_files();
     CHECK(files.size() == 3);
     for (const auto& f : files) CHECK(f.content.find("ghu_secret") == std::string::npos);
 
-    // The recorder's file, after the block: only its end, header kept.
+    // The recorder's file, after the block, only while it records: only its
+    // end, header kept.
     std::string csv = pt_log::header();
     for (int i = 0; i < 5000; i++) csv += "2026-10-09 20:10:52,1791569454,0,1,0,0,1428,5772,7200,,\n";
     write(pt_log::path(), csv);
     files = log_upload::debug_files();
-    CHECK(files.size() == 4 && files[1].name == "logs/play_timer/log.csv" && files[2].name == "history.json");
+    CHECK(files.size() == 3);
+    for (const auto& f : files) CHECK(f.name != "logs/play_timer/log.csv");
+    files = log_upload::debug_files(true);
+    CHECK(files.size() == 4 && files[1].name == "logs/play_timer/log.csv" && files[2].name == "history_recent.json");
     CHECK(files[1].content.size() <= log_upload::PT_LOG_BYTES && files[1].content.size() > 40000);
     CHECK(files[1].content.compare(0, pt_log::header().size(), pt_log::header()) == 0);
     // Only its end is read, and what is kept is the same as from the whole file.
@@ -267,6 +272,41 @@ static void test_urls()
     CHECK(log_upload::short_url("gist.github.com/u/ab12") == "gist.github.com/u/ab12");
 }
 
+// The last entries of the change history, without names or times of day.
+static void test_recent_history()
+{
+    std::string text = "{\n \"schema\": 1,\n \"entries\": [";
+    for (int i = 0; i < 30; i++)
+        text += std::string(i ? ",\n  " : "\n  ") + R"({"when":"2026-10-)" + (i < 9 ? "0" : "") + std::to_string(i + 1) +
+                R"( 18:30","kind":"remove_game","source":"remove","detail":"Secret Game )" + std::to_string(i) +
+                R"x( (0100000000001000)","version":"1.2.0"})x";
+    text += R"(,
+  {"when":"2026-10-31 07:05","kind":"limits","source":"day","detail":"","before":[60,60,60,60,60,60,60],"after":[60,90,60,60,60,60,60],"result":"0x0001088E"},
+  {"when":"2026-10-31 07:06","kind":"new_account","source":"","detail":"Alice"}
+ ]
+})";
+    const std::string out = log_upload::recent_history(text);
+    CHECK(out.find("\"entries_in_all\": 32") != std::string::npos);
+    CHECK(out.find("Secret Game") == std::string::npos && out.find("Alice") == std::string::npos);
+    CHECK(out.find("detail") == std::string::npos && out.find("18:30") == std::string::npos &&
+          out.find("07:05") == std::string::npos);
+    // The last 20, oldest first: from the 13th of the 30 removals.
+    CHECK(out.find("2026-10-12") == std::string::npos && out.find("\"2026-10-13\"") != std::string::npos);
+    CHECK(out.find("\"2026-10-13\"") < out.find("\"2026-10-31\""));
+    // Values and the console's refusal are what a report is for: kept.
+    CHECK(out.find(R"("after":[60,90,60,60,60,60,60])") != std::string::npos &&
+          out.find(R"("result":"0x0001088E")") != std::string::npos && out.find(R"("version":"1.2.0")") != std::string::npos);
+    size_t entries = 0;
+    for (size_t at = out.find("\"kind\""); at != std::string::npos; at = out.find("\"kind\"", at + 1)) entries++;
+    CHECK(entries == log_upload::HISTORY_ENTRIES);
+    CHECK(log_upload::recent_history(text, 1).find("\"kind\":\"new_account\"") != std::string::npos);
+
+    CHECK(log_upload::recent_history(R"({"schema":1,"entries":[]})") == "{\n \"entries_in_all\": 0,\n \"entries\": []\n}\n");
+    CHECK(log_upload::recent_history("{not json").find("could not be read: 9 bytes") != std::string::npos);
+    // An entry of another shape is passed on as it is (still nothing else of the file).
+    CHECK(log_upload::recent_history(R"({"entries":[3,{"when":5}]})").find(R"("when":5)") != std::string::npos);
+}
+
 int main()
 {
     char dir[] = "/tmp/playguard_log_upload_XXXXXX";
@@ -274,6 +314,7 @@ int main()
     REQUIRE(chdir(dir) == 0);   // paths::data_dir() is ./playguard_data on the host
 
     test_files();
+    test_recent_history();
     test_crashes();
     test_sessions();
     test_gist_files();
@@ -282,5 +323,5 @@ int main()
     test_urls();
 
     std::system((std::string("rm -rf '") + dir + "'").c_str());
-    return CHECK_DONE("log upload files, crashes, gist files, gist answer and body, bug-report link assertions passed");
+    return CHECK_DONE("log upload files, recent history, crashes, gist files, gist answer and body, bug-report link assertions passed");
 }

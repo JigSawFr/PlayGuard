@@ -1032,6 +1032,7 @@
         "part_report": "Диагностический отчёт",
         "confirm": "Отправить в {} ({} КБ)?",
         "confirm_gist": "Секретный gist в вашем аккаунте GitHub: любой, у кого есть ссылка, может читать его, пока вы не удалите его на GitHub. Он никогда не содержит PIN-код и серийный номер.",
+        "confirm_public": "A bug report opened with this link is public. Only the last changes of the history are sent, without names or times of day.",
         "where_gist": "секретный gist на GitHub",
         "relogin": "GitHub отклонил gist. Выйдите и войдите снова (Учётная запись GitHub, в инструментах разработчика), чтобы разрешить gist.",
         "needs_github": "Отчёт отправляется в секретный gist вашей учётной записи GitHub: любой, у кого есть ссылка, может его прочитать, пока вы не удалите его на GitHub. PlayGuard ещё не вошёл в GitHub. Войти сейчас?",

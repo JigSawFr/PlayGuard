@@ -19,7 +19,9 @@
 // PlayGuard's own PIN prompt (pin_lock.hpp): it keeps a child out, not
 // someone with a computer. No PIN is ever written to either file. The report
 // is a plain file anyone can write, so PlayGuard trusts it only when the
-// console confirms it (rescue_report_confirmed).
+// console confirms it (rescue_report_confirmed) and, for an unlock, when it
+// carries the sysmodule's proof (RescueProof): an answer to a challenge the
+// app left on the card (RESCUE_NONCE_NAME), keyed with the stored PIN.
 //
 // Plain C, no libnx: host-tested (tests/rescue).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -39,6 +41,12 @@ extern "C" {
 #define RESCUE_REQUEST_NAME_TXT "RESCUE.txt"
 #define RESCUE_REQUEST_NAME_DONE "RESCUE.done"   // a request that could not be removed
 #define RESCUE_REPORT_NAME      "rescue_report.txt"
+// The app's challenge: RESCUE_NONCE_SIZE random bytes as hex digits, a new
+// one written at every start of PlayGuard (a report answers the one before,
+// once). The sysmodule reads it and never writes it.
+#define RESCUE_NONCE_NAME       "rescue_nonce"
+#define RESCUE_NONCE_SIZE       16
+#define RESCUE_MAC_SIZE         32   // HMAC-SHA256
 // Where the sysmodule is installed, from the SD card root.
 #define RESCUE_SYSMODULE_PATH   "atmosphere/contents/4200000000505247/exefs.nsp"
 // Next to it: left by PlayGuard when it updates the module, removed by the
@@ -74,6 +82,18 @@ typedef struct {
     RescueRequest request;  // "request=" line; Removed when absent (older reports)
 } RescueReport;
 
+// What shows the sysmodule wrote a report: its "nonce=" and "mac=" lines,
+// after the others. `nonce` is the challenge it read (RESCUE_NONCE_NAME);
+// `mac` is HMAC-SHA256 of rescue_mac_message, keyed with the stored PIN
+// (1208, rescue_pin_length digits), which the app reads too to check it.
+// Nothing that cannot read the PIN can make one. Absent (present false) from
+// an older sysmodule's reports, and when there was no challenge to answer.
+typedef struct {
+    bool    present;
+    uint8_t nonce[RESCUE_NONCE_SIZE];
+    uint8_t mac[RESCUE_MAC_SIZE];
+} RescueProof;
+
 // The mode a request asks for: Delete when, in its first `len` bytes, a line
 // reads "delete" in any case once ASCII spaces (and a UTF-8 byte-order mark at
 // the start) are trimmed; else Unlock (an empty file included). "delete
@@ -94,8 +114,44 @@ bool rescue_report_parse(const char *text, size_t len, RescueReport *out);
 // temporarily unlocked (1006), a delete that worked or a "no PIN" leaves no
 // PIN (1206 == 0). A failure or a refusal changed nothing, so nothing
 // confirms it. Only a confirmed report opens the recovery actions without the
-// PIN: a report written by hand on the SD card proves nothing.
+// PIN: a report written by hand on the SD card proves nothing. A confirmed
+// unlock still needs its proof (rescue_report_needs_proof).
 bool rescue_report_confirmed(const RescueReport *r, uint32_t pin_length, bool unlocked);
+
+// Whether `r` must carry a proof to be believed: an unlock that worked. It
+// leaves the PIN set and the recovery actions (a new PIN, delete everything)
+// go around it, while a console left temporarily unlocked by the parent
+// confirms it just as well. A delete or a "no PIN" leaves no PIN to go
+// around; a failure or a refusal opens nothing.
+bool rescue_report_needs_proof(const RescueReport *r);
+
+// The challenge file's content: the nonce as lower-case hex digits and "\n".
+// Returns the length written, or 0 when it does not fit (buf then holds "").
+size_t rescue_nonce_format(const uint8_t nonce[RESCUE_NONCE_SIZE], char *buf, size_t size);
+// Back from it: the hex digits (either case), ASCII spaces around them
+// ignored. False, and *out unchanged, for anything else.
+bool rescue_nonce_parse(const char *text, size_t len, uint8_t out[RESCUE_NONCE_SIZE]);
+
+// What the MAC covers: "playguard-rescue/1\n", "nonce=<hex>\n" and the report
+// as rescue_report_format writes it. Both sides build it from the values, so
+// a report parsed back gives the same bytes. Length, or 0 when it does not fit.
+size_t rescue_mac_message(const RescueReport *r, const uint8_t nonce[RESCUE_NONCE_SIZE], char *buf, size_t size);
+
+// "nonce=<32 hex>\nmac=<64 hex>\n" into buf, for a present proof; 0 (buf "")
+// when it is absent or does not fit.
+size_t rescue_proof_format(const RescueProof *p, char *buf, size_t size);
+// The proof of a report's text. present is false (and the rest zero) unless
+// both lines are there with the right number of hex digits.
+void rescue_proof_parse(const char *text, size_t len, RescueProof *out);
+
+// Whether two MACs are the same, in a time that does not depend on where
+// they differ.
+bool rescue_mac_equal(const uint8_t a[RESCUE_MAC_SIZE], const uint8_t b[RESCUE_MAC_SIZE]);
+
+// The PIN's length in the GetPinCode (1208) buffer `pin` (`size` bytes):
+// up to its first NUL, or `reported` (1208's own count) when that is shorter.
+// The MAC key on both sides, so they agree on it.
+size_t rescue_pin_length(const char *pin, size_t size, uint32_t reported);
 
 const char *rescue_mode_name(RescueMode mode);         // "unlock" / "delete"
 const char *rescue_result_name(RescueResult result);   // "ok" / "no_pin" / "failed" / "refused"

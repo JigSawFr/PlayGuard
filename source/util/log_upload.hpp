@@ -9,8 +9,9 @@
 //
 // What is sent is only what the parent picked, after a confirmation that
 // says where it goes: the diagnostic report never holds the PIN or the
-// serial number, and the debug files are PlayGuard's own settings and change
-// history. Anyone with the link can read it.
+// serial number, and the debug files are PlayGuard's own settings and the
+// last changes of its history, without names or times of day. Anyone with
+// the link can read it, and a bug report opened with it is public.
 //
 // Everything but upload() is plain C++ for the host tests (tests/log_upload);
 // upload() is in log_upload_net.cpp.
@@ -41,10 +42,22 @@ constexpr size_t PT_LOG_BYTES = 48 * 1024;
 // The debug files found in the data directory, in a fixed order:
 // logs/play_timer/block.json (Developer tools › play-timer block),
 // logs/play_timer/log.csv (Developer tools › record the play timer: its last
-// PT_LOG_BYTES, header kept), history.json (the change history) and config.json (PlayGuard's settings;
-// the PIN is not one of them). Missing ones are left out. Never the GitHub
-// token (github_auth.hpp keeps it in a file of its own).
-std::vector<Part> debug_files();
+// PT_LOG_BYTES, header kept) only with `play_timer_log` (the recorder is on:
+// it is what the developer asked to be sent; otherwise a child's play time
+// stays home), history_recent.json (recent_history() of the change history)
+// and config.json (PlayGuard's settings; the PIN is not one of them).
+// Missing ones are left out. Never the GitHub token (github_auth.hpp keeps
+// it in a file of its own).
+std::vector<Part> debug_files(bool play_timer_log = false);
+
+// The last `limit` entries of history.json's text (util/history.hpp), oldest
+// first as in the file, for a report: what changed and how, without what
+// could name someone or tell their day (an entry's detail: an account's,
+// game's or profile's name; its time of day: only the date is kept), and how
+// many entries there are in all. A history that does not parse is said to
+// be so, with its size.
+constexpr size_t HISTORY_ENTRIES = 20;
+std::string recent_history(const std::string& text, size_t limit = HISTORY_ENTRIES);
 
 // PlayGuard's own crash files (logs/crashes/crash_<date>.txt,
 // util/crash_report.hpp: a CPU exception, an exception nothing caught, a run

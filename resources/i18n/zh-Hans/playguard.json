@@ -1032,6 +1032,7 @@
         "part_report": "诊断报告",
         "confirm": "发送到 {}（{} KB）？",
         "confirm_gist": "你 GitHub 账户中的私密 Gist：在你于 GitHub 上删除之前，任何拥有链接的人都可以查看。报告中从不包含 PIN 或序列号。",
+        "confirm_public": "A bug report opened with this link is public. Only the last changes of the history are sent, without names or times of day.",
         "where_gist": "GitHub 私密 Gist",
         "relogin": "GitHub 拒绝了该 gist。请退出后重新登录（开发者工具中的 GitHub 账号）以允许 gist。",
         "needs_github": "报告会发送到你 GitHub 账号中的私密 gist：拥有链接的人都能阅读，直到你在 GitHub 上删除它。PlayGuard 尚未登录 GitHub。现在登录吗？",

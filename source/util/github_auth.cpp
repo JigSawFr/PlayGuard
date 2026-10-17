@@ -113,6 +113,12 @@ void forget_token()
     std::remove((token_file() + ".tmp").c_str());
 }
 
+void forget_refused(const std::string& t)
+{
+    if (t.empty() || token() != t) return;
+    forget_token();
+}
+
 std::vector<std::string> api_headers(const std::string& t)
 {
     std::vector<std::string> h{ "Accept: application/vnd.github+json", "X-GitHub-Api-Version: 2022-11-28" };

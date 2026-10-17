@@ -53,7 +53,12 @@ bool api_get(const std::string& path, const char* name, const std::string& token
     }
 #endif
     (void)name;
-    return http::get(api_url() + path, body, error, max, 30, github_auth::api_headers(token));
+    long status = 0;
+    const bool ok = http::get(api_url() + path, body, error, max, 30, github_auth::api_headers(token), &status);
+    // A token GitHub no longer takes (revoked): forgotten, the next fetch
+    // lists what needs none and asks to sign in again.
+    if (!ok && status == 401) github_auth::forget_refused(token);
+    return ok;
 }
 }   // namespace
 
@@ -253,9 +258,12 @@ bool download(const Build& b, const std::string& path, std::string* error,
             // resumed download, the last one has expired).
             // The token only ever goes to the API itself, whatever the list says.
             const bool api = b.url.compare(0, 23, "https://api.github.com/") == 0;
-            ok = http::redirect(b.url, &link, error, github_auth::api_headers(api ? github_auth::token() : ""));
+            const std::string token = api ? github_auth::token() : "";
+            ok = http::redirect(b.url, &link, error, github_auth::api_headers(token));
             // A token without the Actions permission (an older sign-in) lists the
-            // builds but is refused the download.
+            // builds but is refused the download (403); a revoked one is
+            // refused everything (401), and forgotten.
+            if (!ok && error && *error == "HTTP 401") github_auth::forget_refused(token);
             if (!ok && error && (*error == "HTTP 401" || *error == "HTTP 403"))
                 *error += ": GitHub refused the download, sign out of GitHub and sign in again";
         }

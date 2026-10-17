@@ -1032,6 +1032,7 @@
         "part_report": "진단 보고서",
         "confirm": "{}(으)로 보낼까요? ({} KB)",
         "confirm_gist": "GitHub 계정의 비밀 Gist: GitHub에서 삭제할 때까지 링크가 있는 사람은 누구나 읽을 수 있습니다. PIN이나 일련번호는 포함되지 않습니다.",
+        "confirm_public": "A bug report opened with this link is public. Only the last changes of the history are sent, without names or times of day.",
         "where_gist": "GitHub 비밀 Gist",
         "relogin": "GitHub가 gist를 거부했습니다. gist를 허용하려면 로그아웃한 뒤 다시 로그인하세요(개발자 도구의 GitHub 계정).",
         "needs_github": "보고서는 GitHub 계정의 비밀 gist로 전송됩니다. 링크가 있는 사람은 GitHub에서 삭제할 때까지 읽을 수 있습니다. PlayGuard가 아직 GitHub에 로그인하지 않았습니다. 지금 로그인할까요?",

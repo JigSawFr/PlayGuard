@@ -11,6 +11,7 @@
 #include "action/notices.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
+#include "util/config.hpp"
 #include "util/diagnostics.hpp"
 #include "util/github_auth.hpp"
 #include "util/log_files.hpp"
@@ -134,8 +135,10 @@ void send_gist(const Parts& parts, const Kind& kind)
     for (const auto& p : *parts) list += "\n• " + p.name;
     if (cut) list += "\n" + "playguard/upload/partial"_i18n;
     const int kb = (int)((log_upload::total_bytes(*files) + 1023) / 1024);
-    const std::string body = brls::getStr("playguard/upload/confirm", "playguard/upload/where_gist"_i18n, kb) + "\n" +
-                             list + "\n\n" + "playguard/upload/confirm_gist"_i18n;
+    std::string body = brls::getStr("playguard/upload/confirm", "playguard/upload/where_gist"_i18n, kb) + "\n" +
+                       list + "\n\n" + "playguard/upload/confirm_gist"_i18n;
+    // Its link goes into a bug report, which anyone can read.
+    if (kind.report) body += " " + "playguard/upload/confirm_public"_i18n;
     const std::string token = github_auth::token();
     ui::confirm(body, "playguard/upload/send"_i18n, [files, token, kind]() {
         ui::notify("playguard/upload/sending"_i18n);
@@ -190,14 +193,16 @@ void with_debug_files(const std::string& report)
     if (s_collecting) return;
     s_collecting = true;
     const std::string name = "playguard/upload/part_report"_i18n;
-    ui::in_background("report files", [name, report]() {
+    // The recorder's file only while it records: the developer is after it.
+    const bool pt_log = config::get().pt_log;
+    ui::in_background("report files", [name, report, pt_log]() {
         std::vector<log_upload::Part> parts{ { name, report } };
         session_log::flush();   // this run's lines still in memory, into its file
         ui::settle_writes();    // the files as they are once the writes asked for are done
         for (auto& f : log_upload::crash_files()) parts.push_back(std::move(f));
         for (auto& f : log_upload::atmosphere_crashes(std::time(nullptr))) parts.push_back(std::move(f));
         for (auto& f : log_upload::session_files()) parts.push_back(std::move(f));
-        for (auto& f : log_upload::debug_files()) parts.push_back(std::move(f));
+        for (auto& f : log_upload::debug_files(pt_log)) parts.push_back(std::move(f));
         if (ui::quitting()) return;
         const Parts all = parts_of(std::move(parts));
         brls::sync([all]() {

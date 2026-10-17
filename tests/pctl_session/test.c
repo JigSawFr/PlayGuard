@@ -61,6 +61,22 @@ bool hosversionAtLeast(u8 major, u8 minor, u8 micro)
     return model.hos >= MAKEHOSVERSION(major, minor, micro);
 }
 
+/* What pctl_pin_hmac handed libnx's HMAC: the key and the message. */
+static char hmac_key[33];
+static size_t hmac_key_size, hmac_msg_size;
+static unsigned hmacs;
+
+void hmacSha256CalculateMac(void *dst, const void *key, size_t key_size, const void *src, size_t size)
+{
+    hmacs++;
+    hmac_key_size = key_size < sizeof(hmac_key) ? key_size : sizeof(hmac_key) - 1;
+    memcpy(hmac_key, key, hmac_key_size);
+    hmac_key[hmac_key_size] = '\0';
+    hmac_msg_size = size;
+    memset(dst, 0xA5, 32);   /* any MAC: what matters is what it is made of */
+    (void)src;
+}
+
 Result pctlInitialize(void)
 {
     model.init_calls++;
@@ -1387,9 +1403,40 @@ static void test_pin_weak(void)
     CHECK(pctl_pin_weak(NULL) == NXM_RC_INVALID_ARGUMENT);
 }
 
+/* pctl_pin_hmac: the digits of the PIN as the key (as the recovery sysmodule
+ * takes them), no reveal check, every session released, nothing on error. */
+static void test_pin_hmac(void)
+{
+    u8 mac[32];
+    reset();
+    reveal_answer = false;
+    reveals = 0;
+    hmacs = 0;
+    core_set_reveal_check(reveal_check);   /* refusing: not asked at all */
+    model.pin = "1234";
+    CHECK(pctl_pin_hmac("message", 7, mac) == 0 && reveals == 0 && hmacs == 1);
+    CHECK(strcmp(hmac_key, "1234") == 0 && hmac_key_size == 4 && hmac_msg_size == 7 && mac[0] == 0xA5);
+    CHECK(model.writes == 0 && model.refs == 0 && model.init_calls == model.exit_calls);
+    core_set_reveal_check(NULL);
+
+    reset();
+    model.pin = "";
+    memset(mac, 1, sizeof(mac));
+    CHECK(pctl_pin_hmac("m", 1, mac) == NXM_RC_NO_PIN && mac[0] == 0 && hmacs == 1 && model.refs == 0);
+
+    reset();
+    model.fail_command = 1208;
+    memset(mac, 1, sizeof(mac));
+    CHECK(pctl_pin_hmac("m", 1, mac) == MOCK_ERROR && mac[31] == 0 && hmacs == 1 && model.refs == 0);
+
+    CHECK(pctl_pin_hmac(NULL, 0, mac) == NXM_RC_INVALID_ARGUMENT);
+    CHECK(pctl_pin_hmac("m", 1, NULL) == NXM_RC_INVALID_ARGUMENT);
+}
+
 int main(void)
 {
     test_pin_weak();
+    test_pin_hmac();
     test_ownership();
     test_reads();
     test_sample();

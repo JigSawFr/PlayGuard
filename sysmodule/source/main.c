@@ -10,7 +10,10 @@
 //   - or, when a line of the file reads "delete", deletes every parental
 //     control (1043) — only once the request is gone, so it never repeats.
 // It leaves the outcome in rescue_report.txt for PlayGuard, then exits — it
-// holds no service and no memory for the rest of the session.
+// holds no service and no memory for the rest of the session. An unlock's
+// report carries a proof (core/rescue.h, RescueProof): the challenge PlayGuard
+// left in rescue_nonce, and an HMAC-SHA256 of the report keyed with the stored
+// PIN, which PlayGuard checks before it opens the recovery actions.
 //
 // At every boot it also removes atmosphere/contents/<id>/restart_pending,
 // which PlayGuard leaves when it updates the module: the bell says to restart
@@ -18,9 +21,9 @@
 //
 // This needs no applet and no screen, which is why it can run while everything
 // else is blocked. It only reads a PIN the console already stores; it never
-// writes one anywhere. The pctl command IDs and the buffer details (HIPC
-// pointer buffers, the NUL-terminated PIN) are the ones in source/core/
-// pctl_ops.c, proven on hardware.
+// writes one anywhere (only the MAC made with it). The pctl command IDs and
+// the buffer details (HIPC pointer buffers, the NUL-terminated PIN) are the
+// ones in source/core/pctl_ops.c, proven on hardware.
 //
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include <fcntl.h>
@@ -36,6 +39,7 @@
 #define PATH_REQTXT DATA_DIR "/" RESCUE_REQUEST_NAME_TXT
 #define PATH_DONE   DATA_DIR "/" RESCUE_REQUEST_NAME_DONE
 #define PATH_REPORT DATA_DIR "/" RESCUE_REPORT_NAME
+#define PATH_NONCE  DATA_DIR "/" RESCUE_NONCE_NAME
 
 // A sysmodule, not an application: no applet, one fs session, a small heap.
 u32 __nx_applet_type = AppletType_None;
@@ -60,6 +64,16 @@ void __appInit(void)
 {
     Result rc = smInitialize();
     if (R_FAILED(rc)) diagAbortWithResult(rc);
+    // The firmware version, as libnx's own start-up sets it for a program
+    // that keeps the default __appInit: pctlInitialize picks the command
+    // that opens its session by it (CreateService before 4.0.0). Not an
+    // abort when it cannot be read: libnx then takes the version as 0.
+    if (hosversionGet() == 0 && R_SUCCEEDED(setsysInitialize())) {
+        SetSysFirmwareVersion fw;
+        if (R_SUCCEEDED(setsysGetFirmwareVersion(&fw)))
+            hosversionSet(MAKEHOSVERSION(fw.major, fw.minor, fw.micro));
+        setsysExit();
+    }
     rc = fsInitialize();
     if (R_FAILED(rc)) diagAbortWithResult(rc);
     s_sd_mounted = R_SUCCEEDED(fsdevMountSdmc());
@@ -92,28 +106,58 @@ static Result pctl_is_unlocked(bool* out)
     return rc;
 }
 
-// 1208 GetPinCode into `pin` (always NUL-terminated); 1201 then unlocks with
-// it. The PIN stays in this one buffer, wiped before returning; it is never
-// written to the SD card.
-static Result pctl_unlock_with_stored_pin(void)
+#define PIN_BUF 32
+
+// 1208 GetPinCode into `pin` (PIN_BUF bytes, always NUL-terminated), its
+// length in *n (rescue_pin_length). The caller wipes `pin`.
+static Result read_stored_pin(char* pin, size_t* n)
 {
-    char pin[32];
-    memset(pin, 0, sizeof(pin));
+    memset(pin, 0, PIN_BUF);
+    *n = 0;
     u32 len = 0;
     Result rc = serviceDispatchOut(pctlGetServiceSession_Service(), 1208, len,
         .buffer_attrs = { SfBufferAttr_HipcPointer | SfBufferAttr_Out },
-        .buffers      = { { pin, sizeof(pin) } });
-    pin[sizeof(pin) - 1] = '\0';
+        .buffers      = { { pin, PIN_BUF } });
+    pin[PIN_BUF - 1] = '\0';
+    if (R_SUCCEEDED(rc)) *n = rescue_pin_length(pin, PIN_BUF, len);
+    return rc;
+}
+
+// 1208 reads the PIN; 1201 then unlocks with it. The PIN stays in this one
+// buffer, wiped before returning; it is never written to the SD card.
+static Result pctl_unlock_with_stored_pin(void)
+{
+    char pin[PIN_BUF];
+    size_t n = 0;
+    Result rc = read_stored_pin(pin, &n);
     if (R_SUCCEEDED(rc)) {
-        size_t n = 0;
-        while (n < sizeof(pin) && pin[n]) n++;
-        if (len > 0 && len < n) n = len;
         rc = serviceDispatch(pctlGetServiceSession_Service(), 1201,
             .buffer_attrs = { SfBufferAttr_HipcPointer | SfBufferAttr_In },
             .buffers      = { { pin, n + 1 } });   // NUL-terminated, like the app
     }
     memset(pin, 0, sizeof(pin));
     return rc;
+}
+
+// The report's proof (core/rescue.h): HMAC-SHA256 of rescue_mac_message,
+// keyed with the stored PIN, read again (1208) here and wiped. False, and
+// *out left absent, when the PIN cannot be read or there is none.
+static bool sign_report(const RescueReport* r, const u8* nonce, RescueProof* out)
+{
+    static char msg[256];
+    const size_t m = rescue_mac_message(r, nonce, msg, sizeof(msg));
+    if (m == 0) return false;
+    char pin[PIN_BUF];
+    size_t n = 0;
+    const Result rc = read_stored_pin(pin, &n);
+    const bool ok = R_SUCCEEDED(rc) && n > 0;
+    if (ok) {
+        hmacSha256CalculateMac(out->mac, pin, n, msg, m);
+        memcpy(out->nonce, nonce, RESCUE_NONCE_SIZE);
+        out->present = true;
+    }
+    memset(pin, 0, sizeof(pin));
+    return ok;
 }
 
 // ---- SD files ----
@@ -140,6 +184,14 @@ static bool take_request(RescueMode* mode)
         return false;
     *mode = rescue_request_mode(buf, n);
     return true;
+}
+
+// The challenge PlayGuard left (RESCUE_NONCE_NAME), for it to replace.
+static bool read_nonce(u8* out)
+{
+    static char buf[128];
+    size_t n = 0;
+    return read_small(PATH_NONCE, buf, sizeof(buf), &n) && rescue_nonce_parse(buf, n, out);
 }
 
 static bool exists(const char* path)
@@ -169,11 +221,12 @@ static RescueRequest consume_requests(void)
     return a > b ? a : b;
 }
 
-static void write_report(const RescueReport* r)
+static void write_report(const RescueReport* r, const RescueProof* proof)
 {
-    char buf[128];
+    static char buf[256];
     size_t n = rescue_report_format(r, buf, sizeof(buf));
     if (n == 0) return;
+    n += rescue_proof_format(proof, buf + n, sizeof(buf) - n);   // nothing when absent
     // Through a ".tmp" sibling, as the app's own files: a report cut short
     // (power off, SD card full) is never read as a whole one. PlayGuard reads
     // the ".tmp" when the report itself is missing (paths::read_file).
@@ -258,24 +311,30 @@ int main(int argc, char* argv[])
         // not done; an unlock is (the parent needs PlayGuard to open), and the
         // report says the file is still there.
         const RescueRequest request = consume_requests();
+        u8 nonce[RESCUE_NONCE_SIZE];
+        const bool challenged = read_nonce(nonce);
 
         RescueReport report;
+        memset(&report, 0, sizeof(report));
+        report.request = request;   // before the proof, which covers it
+        RescueProof proof;
+        memset(&proof, 0, sizeof(proof));
         if (mode == RescueMode_Delete && request == RescueRequest_Kept) {
             report.mode = mode;
             report.result = RescueResult_Refused;
-            report.rc = 0;
-            report.unlocks = 0;
         } else if (wait_for_pctl()) {
             do_rescue(mode, &report);
+            // Without a challenge (PlayGuard never opened since it was
+            // installed) the report goes without a proof: PlayGuard then
+            // shows it without the recovery actions.
+            if (challenged && rescue_report_needs_proof(&report)) sign_report(&report, nonce, &proof);
             pctlExit();
         } else {
             report.mode = mode;
             report.result = RescueResult_Failed;
             report.rc = MAKERESULT(Module_Libnx, LibnxError_InitFail_SM);
-            report.unlocks = 0;
         }
-        report.request = request;
-        write_report(&report);
+        write_report(&report, &proof);
     }
 
     return 0;   // boot2 reclaims the process; nothing stays resident
