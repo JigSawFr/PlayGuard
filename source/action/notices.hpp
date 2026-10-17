@@ -63,7 +63,8 @@ std::vector<Entry> ignored();
 std::string ignored_until(const std::string& id);
 int action_count();    // the parental controls' entries to do: the bell's number
 int info_count();      // the parental controls' entries for information
-int console_count();   // the console's entries to do: the Console tab's number
+int console_count();   // the console's entries to do
+int tab_count(const std::string& tab);   // the entries to do of a tab (notice_logic::tab_of): its sidebar badge
 
 // Called (UI thread) after every change of what the bell shows.
 int  listen(std::function<void()> fn);

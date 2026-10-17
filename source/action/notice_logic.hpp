@@ -7,8 +7,9 @@
 // changes. A few to do (ackable) the parent can also choose to ignore: no
 // longer counted, listed apart, until put back. Each entry is about the parental controls or about the console
 // PlayGuard runs on (the firmware, the games, the SD card, PlayGuard's own
-// files): the bell counts the first, the Console tab the second, and the
-// list shows them apart. Within a group and a kind, entries come in a fixed
+// files): the bell counts the first, and the list shows them apart. Each
+// tab of the sidebar counts, on a badge, the entries to do fixed there
+// (tab_of). Within a group and a kind, entries come in a fixed
 // order (rank_of), whatever the order their sources set them in. The rules
 // action/notices applies (when an entry is due, which kind it is) are here
 // too, over what they read passed in.
@@ -34,7 +35,7 @@ enum class Level
 enum class Group
 {
     Parental,   // the parental controls and the play timer: the bell counts them
-    Console,    // the console and PlayGuard's files: the Console tab counts them
+    Console,    // the console and PlayGuard's files: the Console tab's badge counts them
 };
 
 // Which group an entry is in, from its id: the console's ones are listed
@@ -43,6 +44,10 @@ Group group_of(const std::string& id);
 // Its place in its group and kind: the order of that list, then the ids not
 // in it (in the order they were first set).
 int rank_of(const std::string& id);
+// The main screen's tab where what it says is seen and fixed, as the tab's
+// name in the catalogs ("security", "console"): the sidebar counts there
+// the entries to do. "" for an id no tab is about (the bell only).
+std::string tab_of(const std::string& id);
 
 struct Item
 {
@@ -83,7 +88,8 @@ class Store
     std::vector<Item> ignored() const;
     int action_count() const;   // the parental controls' Action entries: the bell's number
     int info_count() const;     // the parental controls' Info entries shown
-    int console_count() const;  // the console's Action entries: the Console tab's number
+    int console_count() const;  // the console's Action entries
+    int tab_count(const std::string& tab) const;   // the Action entries of tab_of() `tab`: its number in the sidebar
 
   private:
     struct Slot

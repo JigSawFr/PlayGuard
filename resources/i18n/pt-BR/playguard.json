@@ -19,7 +19,6 @@
         "clock": "Relógio de rede",
         "security": "PIN",
         "console": "Console",
-        "console_count": "{} ({})",
         "history": "Histórico",
         "preferences": "Preferências",
         "about": "Sobre"

@@ -289,6 +289,11 @@ int console_count()
     return s_store.console_count();
 }
 
+int tab_count(const std::string& tab)
+{
+    return s_store.tab_count(tab);
+}
+
 int listen(std::function<void()> fn)
 {
     const int id = s_next_listener++;

@@ -19,7 +19,6 @@
         "clock": "네트워크 시계",
         "security": "PIN",
         "console": "본체",
-        "console_count": "{} ({})",
         "history": "변경 기록",
         "preferences": "환경 설정",
         "about": "정보"

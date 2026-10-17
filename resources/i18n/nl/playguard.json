@@ -19,7 +19,6 @@
         "clock": "Netwerkklok",
         "security": "Pincode",
         "console": "Console",
-        "console_count": "{} ({})",
         "history": "Geschiedenis",
         "preferences": "Voorkeuren",
         "about": "Info"
