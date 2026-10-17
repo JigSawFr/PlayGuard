@@ -85,7 +85,7 @@ void DevBuildActivity::show_page()
     qr->setMarginTop(12);
     qr->setMarginBottom(10);
     box->addView(qr);
-    brls::Label* link = ui::text_label(text::short_url(url), 17, ui::color_note());
+    brls::Label* link = ui::text_label(text::short_url(url), 18, ui::color_note());
     link->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     link->setAlignSelf(brls::AlignSelf::STRETCH);
     box->addView(link);
@@ -105,12 +105,12 @@ void DevBuildActivity::onContentAvailable()
     // checks, pre-release, installed or new).
     const NVGcolor kind_color = ui::color_accent();
     switch (b.kind) {
-        case dev_builds::Kind::Release: tags->addView(tag_view({ "playguard/dev_build/kind_release"_i18n, kind_color }, 16)); break;
-        case dev_builds::Kind::Main: tags->addView(tag_view({ "main", kind_color }, 16)); break;
+        case dev_builds::Kind::Release: tags->addView(tag_view({ "playguard/dev_build/kind_release"_i18n, kind_color }, 18)); break;
+        case dev_builds::Kind::Main: tags->addView(tag_view({ "main", kind_color }, 18)); break;
         case dev_builds::Kind::PullRequest: break;   // its number leads the tags already
-        case dev_builds::Kind::Commit: tags->addView(tag_view({ "playguard/dev_build/kind_commit"_i18n, kind_color }, 16)); break;
+        case dev_builds::Kind::Commit: tags->addView(tag_view({ "playguard/dev_build/kind_commit"_i18n, kind_color }, 18)); break;
     }
-    for (const BuildTag& t : build_tags(b, this->newer)) tags->addView(tag_view(t, 16));
+    for (const BuildTag& t : build_tags(b, this->newer)) tags->addView(tag_view(t, 18));
     headline->setText(build_title(b));
 
     // The facts.

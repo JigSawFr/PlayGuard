@@ -65,7 +65,7 @@ brls::Box* qr_card(const std::string& title, const std::string& url, const std::
     brls::Label* name = centered_label(title, 20, ui::color_text());
     name->setMarginTop(6);
     card->addView(name);
-    card->addView(centered_label(caption, 17, ui::color_note()));
+    card->addView(centered_label(caption, 18, ui::color_note()));
     return card;
 }
 

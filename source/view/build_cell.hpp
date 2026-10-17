@@ -26,7 +26,7 @@ std::vector<BuildTag> build_tags(const dev_builds::Build& b, bool newer);
 // Its title as the list shows it.
 std::string build_title(const dev_builds::Build& b);
 // A tag as a view: its text in its colour, on a tint of it.
-brls::Box* tag_view(const BuildTag& tag, float font_size = 15);
+brls::Box* tag_view(const BuildTag& tag, float font_size = 18);
 
 class BuildCell : public brls::RecyclerCell
 {

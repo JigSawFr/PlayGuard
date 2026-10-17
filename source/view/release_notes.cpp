@@ -65,7 +65,7 @@ brls::View* tag(const std::string& text)
     box->setShrink(0.0f);
     auto* label = new brls::Label();
     label->setSingleLine(true);
-    label->setFontSize(16);
+    label->setFontSize(18);
     label->setTextColor(ui::color_accent());
     label->setText(text);
     box->addView(label);
