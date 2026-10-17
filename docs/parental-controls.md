@@ -272,7 +272,7 @@ Observed on 22.0.0, 2026-10-09 (a Friday, limit 120 minutes):
   the console counts from a reference time that is now in the future (21:08)
   and waits for the clock to pass it.
 - Both reset the remaining time to the full limit: changing the clock is a
-  way around the play timer, and PlayGuard's own *Network clock* tab does it.
+  way around the play timer, and PlayGuard's own *Console › Network clock* does it.
 
 When the time spent resets on its own (midnight local time, or the "allowed
 again" time) is not confirmed yet.
