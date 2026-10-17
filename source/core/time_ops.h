@@ -58,8 +58,8 @@ bool time_local_now(u64 *posix, LocalTime *local);
 
 // Formats a POSIX time in the console's configured time zone
 // ("2026-10-07 14:03:12"). Falls back to UTC (with a " UTC" suffix) on failure.
+// time_format_utc is in calendar.h.
 void time_format_local(u64 posix, char *buf, size_t size);
-void time_format_utc(u64 posix, char *buf, size_t size);
 
 #ifdef __cplusplus
 }

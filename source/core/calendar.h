@@ -47,6 +47,11 @@ void calendar_add_days(LocalTime *t, int days);
 // Without a usable rule: `now` minus the time of day in UTC.
 u64  local_midnight(const TimeRule *rule, u64 now, int days_back);
 
+// A POSIX time in UTC ("2026-10-07 12:03:12 UTC"), or its number of seconds
+// when it cannot be written. Shared by the console (time_ops.c) and the
+// simulator.
+void time_format_utc(u64 posix, char *buf, size_t size);
+
 #ifdef __cplusplus
 }
 #endif
