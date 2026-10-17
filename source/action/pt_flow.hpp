@@ -69,11 +69,22 @@ void add_extra_time(const PtState& pt, std::function<void()> refresh);
 // lock). Recorded like extra time, so the usual limit comes back the next day.
 void stop_today(const PtState& pt, std::function<void()> refresh);
 
-// Extra time added on an earlier day is still on its weekday limit -> offer
-// to put the previous value back (or keep it), or put it back at once when the
-// "by itself" preference is on. Called at start-up and when the date changes
-// while the app is open; `refresh` runs after a change.
-void offer_extra_time_restore(std::function<void()> refresh = nullptr);
+// A limit changed for one earlier day still holds -> put the usual one back.
+// Extra time: by itself, with no question and no PIN (it only lowers the
+// limit, as locking again does), through the temporary unlock while the timer
+// counts down, locked again at once; it waits while it cannot be written
+// (read-only, firmware not supported, state unknown, the console lock) and,
+// on today's weekday, while it would suspend the game in progress (then the
+// next day). No more play today: put back as any change (the PIN) when the
+// "by itself" preference is on, else asked (keep it, or put it back); "no
+// limit" to put back is always asked. Called at start-up, when the date
+// changes while the app is open and when read-only mode ends; `asked`: from
+// the Overview or the bell, where what stops it is said. `refresh` runs after
+// a change.
+void offer_extra_time_restore(std::function<void()> refresh = nullptr, bool asked = false);
+// The last restore waited for a state it could not read: try again (the main
+// screen, every 30 s).
+void retry_extra_time_restore();
 
 // That offer is pending (what offer_extra_time_restore would ask now), and
 // the line the Overview shows for it ("Put Saturday's limit back to 2 h").

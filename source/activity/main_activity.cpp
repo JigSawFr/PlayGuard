@@ -122,7 +122,8 @@ void MainActivity::onContentAvailable()
     }
 
     // Stopped in the middle of a change last time: lock again first. Then, for
-    // extra time added on an earlier day, offer to put the limit back.
+    // a limit changed for an earlier day, put the usual one back (extra time:
+    // by itself; no more play today: asked, or as the preference says).
     brls::sync([]() {
         pt_flow::relock_if_interrupted();
         pt_flow::offer_extra_time_restore();
@@ -167,7 +168,10 @@ void MainActivity::onContentAvailable()
         auto stack = brls::Application::getActivitiesStack();
         if (!app::in_focus() || stack.empty() || stack.back() != this) return;
         const std::string today = ui::today_date();
-        if (today == this->day) return;
+        if (today == this->day) {
+            pt_flow::retry_extra_time_restore();   // only after a state that could not be read
+            return;
+        }
         this->day = today;
         pt_flow::offer_extra_time_restore();
     });

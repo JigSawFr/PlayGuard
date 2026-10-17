@@ -7,6 +7,7 @@
 
 #include "action/console_lock.hpp"
 #include "action/history_flow.hpp"
+#include "action/pin_lock.hpp"
 #include "action/pt_logic.hpp"
 #include "app.hpp"
 #include "core/platform.h"
@@ -601,10 +602,10 @@ void add_extra_time(const PtState& pt, std::function<void()> refresh)
         const bool again = pt_logic::recorded_today(rec, wd, ui::today_date());
         const pt_logic::ExtraPlan plan = pt_logic::plan_extra(base, extra, again, rec.base);
         const uint16_t value = plan.value, original = plan.original;
-        const std::string body = brls::getStr(config::get().extra_auto_restore ? "playguard/dashboard/extra_body_auto"
-                                                                               : "playguard/dashboard/extra_body",
-                                              ui::fmt_minutes(extra), ui::day_name_in_text(wd), ui::fmt_minutes(base),
-                                              ui::fmt_minutes(value), ui::fmt_minutes(original));
+        // Put back by itself the next day, whatever the preference (pt_logic::restore_way).
+        const std::string body = brls::getStr("playguard/dashboard/extra_body_auto", ui::fmt_minutes(extra),
+                                              ui::day_name_in_text(wd), ui::fmt_minutes(base), ui::fmt_minutes(value),
+                                              ui::fmt_minutes(original));
         confirm_write(body, "playguard/dashboard/extra_confirm"_i18n, [refresh, wd, base, value, original](bool did_unlock) {
             PtState now;
             pctl_play_timer_query(&now);
@@ -737,32 +738,118 @@ std::string restore_label()
     return brls::getStr("playguard/dashboard/extra_pending", ui::day_name_in_text(rec.weekday), ui::fmt_minutes(rec.base));
 }
 
-void offer_extra_time_restore(std::function<void()> refresh)
+// Set when a restore had to wait for a state that could not be read: the
+// main screen's 30-second check tries again (retry_extra_time_restore).
+static bool s_restore_retry = false;
+
+// Extra time from an earlier day, put back with no question: the limit only
+// goes down, so, as for locking again, the PIN is not asked
+// (pin_lock::Tightening), and nobody keeps the extra time by answering a
+// dialog. The play timer is still never written while it counts down: the
+// temporary unlock comes first, and the console is locked again right after.
+// `pt` was just read (restore_action said Offer). `asked`: from the Overview
+// or the bell, where a failure is said; at start-up it is only logged, and the
+// bell keeps its entry.
+static void put_back_by_itself(const pt_logic::ExtraRecord& rec, const PtState& pt, bool asked,
+                               std::function<void()> refresh)
+{
+    if (!pt_logic::state_known(pt)) {
+        s_restore_retry = true;
+        if (asked) ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN));
+        return;
+    }
+    const int wd = rec.weekday;
+    uint16_t days[7];
+    for (int i = 0; i < 7; i++) days[i] = pt.day_min[i];
+    days[wd] = rec.base;
+
+    pin_lock::Tightening no_pin;
+    const bool unlock = pt_logic::needs_unlock(pt);
+    if (unlock) {
+        // As in confirm_write: the record first, so that a stop before the
+        // lock below locks again at the next start.
+        if (!set_relock_pending(true)) {
+            config::get().relock_pending = false;   // not on the card: not in memory either
+            brls::Logger::warning("extra time: not put back, the unlock could not be recorded");
+            if (asked) ui::error("playguard/play_timer/write_err"_i18n + " — " + ui::rc_text(NXM_RC_NOT_SAVED));
+            return;
+        }
+        const Result rc = pctl_unlock_restriction_temporarily();
+        if (R_FAILED(rc)) {
+            settle_failed_unlock();
+            brls::Logger::warning("extra time: not put back, the unlock failed ({:#x})", (unsigned)rc);
+            if (asked) ui::error("playguard/play_timer/gate/failed"_i18n + " — " + ui::rc_text(rc));
+            return;
+        }
+    }
+    const Result rc = write_days(days, "restore_extra");
+    if (R_SUCCEEDED(rc)) clear_extra_record();
+    // The unlock was this function's own, never the user's: locked again
+    // whatever the "lock again automatically" preference says.
+    Result relock = 0;
+    if (unlock) {
+        relock = pctl_relock();
+        if (R_SUCCEEDED(relock)) set_relock_pending(false);
+    }
+    const std::string done =
+        brls::getStr("playguard/dashboard/extra_restored", ui::day_name_in_text(wd), ui::fmt_minutes(rec.base));
+    if (R_FAILED(relock)) {
+        // Said even at start-up: the console may be left unlocked.
+        const std::string text = R_SUCCEEDED(rc) ? done : "playguard/play_timer/write_err"_i18n + " — " + ui::rc_text(rc);
+        ui::error(text + "\n\n" + "playguard/toast/relock_err"_i18n + " — " + ui::rc_text(relock));
+    } else if (R_SUCCEEDED(rc)) {
+        ui::notify(done);
+    } else {
+        brls::Logger::warning("extra time: not put back ({:#x})", (unsigned)rc);
+        if (asked) ui::notify_result(rc, "", "playguard/play_timer/write_err"_i18n);
+    }
+    if (refresh) refresh();
+}
+
+void offer_extra_time_restore(std::function<void()> refresh, bool asked)
 {
     const pt_logic::ExtraRecord rec = extra_record();
-    if (app::read_only() || rec.weekday < 0 || rec.weekday > 6 || rec.date == ui::today_date()) return;
+    if (rec.weekday < 0 || rec.weekday > 6 || rec.date == ui::today_date()) return;
+    // Kept for when the firmware screen leaves read-only mode.
+    if (app::read_only()) {
+        if (asked) ui::refuse_read_only();
+        return;
+    }
     // The lock holds every day at 0; the record waits for its limits to come back.
     if (console_lock::active()) return;
 
     PtState pt;
     pctl_play_timer_query(&pt);
+    s_restore_retry = false;
     switch (pt_logic::restore_action(rec, ui::today_date(), pt, app::read_only())) {
-        case pt_logic::Restore::None:
-        case pt_logic::Restore::Later:  return;                       // ask again next time
+        case pt_logic::Restore::None:   return;
+        case pt_logic::Restore::Later:                                  // not read: again soon
+            s_restore_retry = pt.fw_supported;
+            if (asked) ui::notify(ui::rc_text(pt.fw_supported ? NXM_RC_STATE_UNKNOWN : NXM_RC_FW_UNSUPPORTED));
+            return;
         case pt_logic::Restore::Forget: clear_extra_record(); return;  // changed since
         case pt_logic::Restore::Offer:  break;
     }
     const int wd = rec.weekday;
     const uint16_t base = rec.base, value = rec.value;
-    if (config::get().extra_auto_restore) {   // no question (the unlock, if needed, still asks)
-        restore_extra(wd, base, value, refresh);
-        return;
+    switch (pt_logic::restore_way(rec, pt, ui::today_weekday(), config::get().extra_auto_restore)) {
+        case pt_logic::RestoreWay::ByItself:
+            put_back_by_itself(rec, pt, asked, refresh);
+            return;
+        case pt_logic::RestoreWay::Wait:
+            // Asked for: as any change, the suspend warning first (and the PIN).
+            if (asked) restore_extra(wd, base, value, refresh);
+            return;
+        case pt_logic::RestoreWay::Direct:   // no question (the unlock and the PIN, if needed, still ask)
+            restore_extra(wd, base, value, refresh);
+            return;
+        case pt_logic::RestoreWay::Ask:
+            break;
     }
-    // Raised (extra time) or lowered (no more play) for that day only.
-    auto* dialog = ui::dialog(brls::getStr(value > base ? "playguard/dashboard/extra_restore_body"
-                                                        : "playguard/dashboard/stop_restore_body",
-                                           rec.date, ui::day_name_in_text(wd), ui::fmt_minutes(value),
-                                           ui::fmt_minutes(base)));
+    // Lowered for that day only (no more play): keeping that is stricter
+    // still; putting the limit back raises it, through the PIN as any change.
+    auto* dialog = ui::dialog(brls::getStr("playguard/dashboard/stop_restore_body", rec.date, ui::day_name_in_text(wd),
+                                           ui::fmt_minutes(value), ui::fmt_minutes(base)));
     dialog->addButton(brls::getStr("playguard/dashboard/extra_keep", ui::fmt_minutes(value)), [refresh]() {
         clear_extra_record();
         if (refresh) refresh();
@@ -773,6 +860,12 @@ void offer_extra_time_restore(std::function<void()> refresh)
     // B: decide later (the record stays; the Overview keeps a line for it).
     dialog->setCancelable(true);
     dialog->open();
+}
+
+void retry_extra_time_restore()
+{
+    if (!s_restore_retry) return;
+    offer_extra_time_restore();
 }
 
 bool alarm_off(const PtState& pt)

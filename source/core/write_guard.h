@@ -9,7 +9,8 @@
 // that runs before every change and may ask for the parental-control PIN; it
 // refuses with NXM_RC_NOT_CONFIRMED. It runs before any session is opened,
 // so it may show the system's PIN applet. Locking again (1007) never asks:
-// it is never refused for want of a PIN.
+// it is never refused for want of a PIN. Nor is putting back a limit that
+// extra time raised: the UI's check lets that one through (pin_lock::Tightening).
 //
 // The reveal check: the same, before the stored PIN is read for display
 // (pctl_get_pin). The UI installs one that asks for the PIN every time,

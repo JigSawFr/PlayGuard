@@ -259,7 +259,7 @@ void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, R
                pt_flow::offer_extra_time_restore([]() {
                    sweep();
                    TabBase::refresh_shown();
-               });
+               }, true);
            });
 
     // The "Time's up" alarm off: nothing says when time is up.
