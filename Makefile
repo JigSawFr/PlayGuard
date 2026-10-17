@@ -231,7 +231,7 @@ dev_builds_LIBS  := -lz
 # The download and its resume: without PLAYGUARD_SIM_DEV_BUILDS the desktop
 # build takes the console's path, here against a fake http::download and
 # http::redirect in the test (-D__SWITCH__ would reach date.cpp's switch.h).
-dev_builds_net_SRC   := $(filter-out tests/%,$(dev_builds_SRC)) source/util/zip_write.cpp source/sim/sim_net.cpp source/util/dev_builds_net.cpp tests/dev_builds_net/test.cpp
+dev_builds_net_SRC   := $(filter-out tests/%,$(dev_builds_SRC)) source/util/http_logic.cpp source/util/zip_write.cpp source/sim/sim_net.cpp source/util/dev_builds_net.cpp tests/dev_builds_net/test.cpp
 dev_builds_net_FLAGS := $(dev_builds_FLAGS)
 dev_builds_net_CSRC   := $(CALENDAR_C)
 dev_builds_net_CFLAGS := $(CALENDAR_CFLAGS)
