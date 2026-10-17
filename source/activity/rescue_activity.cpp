@@ -32,7 +32,9 @@ void RescueActivity::onContentAvailable()
         Result rc = pctl_set_pin();   // the system PIN screen, which sets a new one
         brls::Logger::info("pctl_set_pin returned 0x{:08X}", (unsigned)rc);
         if (R_SUCCEEDED(rc)) history_flow::record_event("pin", "rescue");
-        ui::notify_result(rc, "playguard/security/pin_ok"_i18n, "playguard/security/pin_err"_i18n);
+        // Left with B: nothing changed, nothing to say.
+        if (rc != NXM_RC_CANCELLED)
+            ui::notify_result(rc, "playguard/security/pin_ok"_i18n, "playguard/security/pin_err"_i18n);
         this->refresh();
         return true;
     });

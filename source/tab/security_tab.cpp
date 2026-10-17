@@ -144,9 +144,10 @@ void SecurityTab::change_pin()
     // Blocks while the system PIN applet is shown; the session is released first.
     Result rc = pctl_set_pin();
     brls::Logger::info("pctl_set_pin returned 0x{:08X}", (unsigned)rc);
-    // Not recorded when it fails: closing the PIN screen is a failure too.
+    // Not recorded when it fails. Left with B: nothing changed, nothing to say.
     if (R_SUCCEEDED(rc)) history_flow::record_event("pin");
-    ui::notify_result(rc, "playguard/security/pin_ok"_i18n, "playguard/security/pin_err"_i18n);
+    if (rc != NXM_RC_CANCELLED)
+        ui::notify_result(rc, "playguard/security/pin_ok"_i18n, "playguard/security/pin_err"_i18n);
     this->refresh();
 }
 

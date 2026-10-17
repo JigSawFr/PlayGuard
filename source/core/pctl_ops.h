@@ -66,10 +66,13 @@ Result pctl_lock_state(u32 *pin_length, bool *unlocked);
 const char *pctl_rating_org_name(u32 org);           // "PEGI", "ESRB", … or "?"
 
 // ---- PIN / unlock ----
-Result pctl_set_pin(void);                   // opens the system PIN applet (registers / changes it)
+// Opens the system PIN applet (registers / changes it). NXM_RC_CANCELLED when
+// it was left with B (PCTL_RC_AUTH_CANCELLED): nothing to say then.
+Result pctl_set_pin(void);
 // The system's PIN screen (pctlauth, as System Settings shows it), to confirm
 // it is the parent: 0 when the right PIN was entered, NXM_RC_NO_PIN (nothing
-// shown) when none is set, anything else when it was cancelled. Changes
+// shown) when none is set, NXM_RC_CANCELLED when it was left with B, another
+// error otherwise. Changes
 // nothing, so read-only mode and the change check do not apply.
 Result pctl_ask_pin(void);
 
