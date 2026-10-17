@@ -971,7 +971,7 @@
         "section_notices": "Notificações",
         "notices_system": "Versões do Atmosphère, hekate e firmware",
         "notices_summary": "O tempo de jogo da semana",
-        "notices_reminders": "Lembretes: backups, o outro sistema, os jogos bloqueados",
+        "notices_reminders": "Avisos: backups, outro sistema, jogos bloqueados",
         "help": "Ajuda e diagnóstico"
     },
     "backup": {

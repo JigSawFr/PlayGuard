@@ -224,7 +224,7 @@
         "step_limit": "2. Een dagelijkse speeltijdlimiet kiezen",
         "step_clock": "3. De netwerkklok controleren",
         "todo": "Te doen",
-        "step_unlink": "4. De smartphone-app ontkoppelen (de volgende synchronisatie zou dit ongedaan maken)",
+        "step_unlink": "4. De smartphone-app ontkoppelen (de volgende synchronisatie maakt dit ongedaan)",
         "step_alarm": "{}. Alarm \"Tijd is om\" weer inschakelen (niets waarschuwt als de tijd om is)",
         "at_start": "Bij het opstarten tonen zolang er geen pincode is",
         "note": "De pincode is die van de console zelf; de limiet wordt gecontroleerd met de netwerkklok, die dus nauwkeurig moet zijn. Open PlayGuard met de gebruiker van een ouder: over een spel geopend telt de tijd als speeltijd.",
@@ -971,7 +971,7 @@
         "section_notices": "Meldingen",
         "notices_system": "Nieuwe versies van Atmosphère, hekate en firmware",
         "notices_summary": "De speeltijd van de week",
-        "notices_reminders": "Herinneringen: back-ups, het andere systeem, geblokkeerde games",
+        "notices_reminders": "Herinneringen: back-ups, ander systeem, games op slot",
         "help": "Hulp en diagnose"
     },
     "backup": {

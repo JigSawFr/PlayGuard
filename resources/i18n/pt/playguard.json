@@ -967,11 +967,11 @@
         "section_app": "Aplicação",
         "section_startup": "Ao iniciar",
         "intro": "Mostrar a introdução durante 2 segundos",
-        "support_reminder": "Lembrar-me uma vez por mês de apoiar o PlayGuard",
+        "support_reminder": "Lembrar-me todos os meses de apoiar o PlayGuard",
         "section_notices": "Notificações",
         "notices_system": "Versões do Atmosphère, hekate e firmware",
         "notices_summary": "O tempo de jogo da semana",
-        "notices_reminders": "Lembretes: cópias de segurança, o outro sistema, os jogos bloqueados",
+        "notices_reminders": "Avisos: cópias, outro sistema, jogos bloqueados",
         "help": "Ajuda e diagnóstico"
     },
     "backup": {

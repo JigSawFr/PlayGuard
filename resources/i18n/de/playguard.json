@@ -224,7 +224,7 @@
         "step_limit": "2. Tägliches Spielzeitlimit wählen",
         "step_clock": "3. Netzwerkuhr prüfen",
         "todo": "Offen",
-        "step_unlink": "4. Smart-Geräte-App trennen (ihre nächste Synchronisierung würde dies rückgängig machen)",
+        "step_unlink": "4. Smart-Geräte-App trennen (die nächste Synchronisierung würde alles aufheben)",
         "step_alarm": "{}. Alarm „Zeit ist um“ wieder einschalten (nichts warnt, wenn die Zeit um ist)",
         "at_start": "Beim Start anzeigen, solange keine Geheimzahl festgelegt ist",
         "note": "Die Geheimzahl ist die der Konsole; das Limit richtet sich nach der Netzwerkuhr, daher muss sie genau sein. Öffne PlayGuard mit dem Nutzer eines Elternteils: Über einem Spiel geöffnet, zählt seine Zeit als Spielzeit.",
@@ -971,7 +971,7 @@
         "section_notices": "Benachrichtigungen",
         "notices_system": "Neue Versionen von Atmosphère, hekate und Firmware",
         "notices_summary": "Die Spielzeit der Woche",
-        "notices_reminders": "Erinnerungen: Sicherungen, anderes System, alle Spiele gesperrt",
+        "notices_reminders": "Erinnerungen: Sicherungen, anderes System, Spielsperre",
         "help": "Hilfe & Diagnose"
     },
     "backup": {

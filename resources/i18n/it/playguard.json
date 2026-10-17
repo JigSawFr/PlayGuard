@@ -736,7 +736,7 @@
         "patches_note_unpatched": "sys-patch non ha applicato le patch: {}. Aggiorna sys-patch per questo firmware.",
         "auto_relock": "Riattiva il filtro famiglia dopo una modifica",
         "extra_amounts": "Quantità di tempo extra",
-        "extra_auto": "Ripristina da solo il limite dopo \"Basta giocare per oggi\"",
+        "extra_auto": "Dopo \"Basta giocare per oggi\", ripristina il limite",
         "clock_check": "Controlla l'orologio di rete all'avvio",
         "section_about": "Informazioni",
         "version": "Versione",
