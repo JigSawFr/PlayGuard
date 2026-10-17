@@ -21,18 +21,6 @@ namespace
 {
 bool s_busy = false;   // one sign-in at a time
 
-brls::Label* centered(const std::string& text, int size, NVGcolor color)
-{
-    auto* label = new brls::Label();
-    label->setFontSize(size);
-    label->setTextColor(color);
-    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    label->setSingleLine(false);
-    label->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the box's width (ui::dialog)
-    label->setText(text);
-    return label;
-}
-
 // The code, the address and its QR code, until GitHub answers or the
 // developer cancels.
 void show_code(const github_auth::DeviceCode& code, std::function<void()> done)
@@ -42,18 +30,17 @@ void show_code(const github_auth::DeviceCode& code, std::function<void()> done)
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setPadding(20, 32, 10, 32);
-    box->addView(centered(brls::getStr("playguard/github/code_body", text::short_url(code.verification_uri)), 20,
-                          ui::color_text()));
-    brls::Label* user_code = centered(code.user_code, 44, ui::color_text());
+    box->addView(ui::centered_label(brls::getStr("playguard/github/code_body", text::short_url(code.verification_uri)), 20,
+                                    ui::color_text()));
+    brls::Label* user_code = ui::centered_label(code.user_code, 44, ui::color_text());
     user_code->setMarginTop(10);
     box->addView(user_code);
     auto* qr = new QrView(code.verification_uri, 200);
     qr->setMarginTop(8);
     box->addView(qr);
-    box->addView(centered("playguard/github/code_note"_i18n, 18, ui::color_note()));
+    box->addView(ui::centered_label("playguard/github/code_note"_i18n, 18, ui::color_note()));
     auto* dialog = new brls::Dialog(box);
-    dialog->addButton("hints/cancel"_i18n, [cancelled]() { *cancelled = true; });
-    ui::on_cancel(dialog, [cancelled]() { *cancelled = true; });
+    ui::add_cancel(dialog, [cancelled]() { *cancelled = true; });
     dialog->open();
 
     // Polls for up to 15 minutes: on its own thread, not holding up the play

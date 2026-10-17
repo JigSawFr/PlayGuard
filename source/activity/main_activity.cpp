@@ -132,9 +132,8 @@ void MainActivity::onContentAvailable()
     }
     if (start > 0 && start < (int)(sizeof(config::START_TABS) / sizeof(config::START_TABS[0]))) {   // ui::tab::of knows them all
         brls::sync([this, start]() {
-            auto stack = brls::Application::getActivitiesStack();
             auto* frame = dynamic_cast<brls::TabFrame*>(this->getView("main_tabs"));
-            if (frame && !stack.empty() && stack.back() == this) frame->focusTab(ui::tab::of(start));
+            if (frame && ui::on_top(this)) frame->focusTab(ui::tab::of(start));
         });
     }
 
@@ -172,8 +171,7 @@ void MainActivity::onContentAvailable()
     brls::sync([]() { notices::sweep(); });
     this->notice_timer.setPeriod(60000);
     this->notice_timer.setCallback([this]() {
-        auto stack = brls::Application::getActivitiesStack();
-        if (!app::in_focus() || stack.empty() || stack.back() != this) return;
+        if (!app::in_focus() || !ui::on_top(this)) return;
         notices::sweep_if_stale();
     });
     this->notice_timer.start();
@@ -183,8 +181,7 @@ void MainActivity::onContentAvailable()
     this->day_timer.setCallback([this]() {
         // Only on the main screen, not behind a dialog: the date is compared
         // again at the next tick otherwise.
-        auto stack = brls::Application::getActivitiesStack();
-        if (!app::in_focus() || stack.empty() || stack.back() != this) return;
+        if (!app::in_focus() || !ui::on_top(this)) return;
         const std::string today = ui::today_date();
         if (today == this->day) {
             pt_flow::retry_extra_time_restore();   // only after a state that could not be read

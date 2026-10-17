@@ -121,8 +121,7 @@ void run_check(std::function<void(const Offer&)> done)
 // front of it to close.
 void show_when_free(brls::Activity* main, const Offer& o, int steps_left)
 {
-    auto stack = brls::Application::getActivitiesStack();
-    if (!stack.empty() && stack.back() == main) {
+    if (ui::on_top(main)) {
         // Not after another screen of its own this start (First steps): the next.
         if (ui::claim_start_screen("the update screen")) UpdateActivity::show(o);
         return;

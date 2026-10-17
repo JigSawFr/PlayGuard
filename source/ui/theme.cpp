@@ -101,4 +101,12 @@ brls::Label* text_label(const std::string& text, float size, NVGcolor color)
     return l;
 }
 
+brls::Label* centered_label(const std::string& text, float size, NVGcolor color)
+{
+    brls::Label* l = text_label(text, size, color);
+    l->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    l->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the box's width (ui::dialog)
+    return l;
+}
+
 }   // namespace ui

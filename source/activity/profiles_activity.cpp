@@ -100,8 +100,7 @@ bool ProfilesActivity::store(const profiles::Profile& p, const std::string& ok_t
     std::string focus = file;
     for (const auto& q : profiles::list())
         if (profiles::file_stem(q.name) == file) focus = q.file;
-    const auto stack = brls::Application::getActivitiesStack();
-    if (!stack.empty() && stack.back() != this) {   // the limits editor is still open
+    if (!ui::on_top(this)) {   // the limits editor is still open
         this->relist_pending = true;
         this->relist_focus   = focus;
         return true;

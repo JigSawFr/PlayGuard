@@ -3,6 +3,7 @@
 #include "ui/ui.hpp"
 
 #include "action/console_actions.hpp"
+#include "activity/main_activity.hpp"
 #include "app.hpp"
 
 #include <algorithm>
@@ -103,6 +104,19 @@ bool has_focus(brls::Activity* activity)
 {
     brls::View* focus = brls::Application::getCurrentFocus();
     return focus && focus->getParentActivity() == activity;
+}
+
+bool on_top(brls::Activity* activity)
+{
+    const auto& stack = brls::Application::getActivitiesStack();
+    return !stack.empty() && stack.back() == activity;
+}
+
+MainActivity* main_activity()
+{
+    for (brls::Activity* a : brls::Application::getActivitiesStack())
+        if (auto* main = dynamic_cast<MainActivity*>(a)) return main;
+    return nullptr;
 }
 
 void go_to_tab(brls::View* from, int position)

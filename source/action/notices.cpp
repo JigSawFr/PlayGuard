@@ -585,11 +585,7 @@ void sweep()
 
 void open_tab(int position)
 {
-    for (brls::Activity* a : brls::Application::getActivitiesStack())
-        if (auto* main = dynamic_cast<MainActivity*>(a)) {
-            main->open_tab(position);
-            return;
-        }
+    if (MainActivity* main = ui::main_activity()) main->open_tab(position);
 }
 
 }   // namespace notices
