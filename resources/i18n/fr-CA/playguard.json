@@ -609,11 +609,17 @@
         },
         "notes": {
             "off": "Toute personne qui tient la console peut modifier les réglages ici. Afficher le NIP le demande quand même.",
-            "changes": "Tout le monde peut consulter; seul le parent modifie (redemandé après 5 minutes). Reverrouiller ne le demande jamais.",
-            "open": "Un écran verrouillé jusqu'à la saisie du code, et de nouveau après 5 minutes hors de PlayGuard. Reverrouiller ne le demande jamais."
+            "changes": "Tout le monde peut consulter; seul le parent modifie. Reverrouiller ne le demande jamais.",
+            "open": "Un écran verrouillé jusqu'à la saisie du code. Reverrouiller ne le demande jamais."
         },
         "no_pin": "Définissez d'abord un NIP (Définir ou changer le NIP).",
         "set": "Protéger PlayGuard par le NIP : {}",
+        "ask_again": "Redemander le NIP après 5 minutes",
+        "again_on": {
+            "changes": "Redemandé après 5 minutes.",
+            "open": "Il revient après 5 minutes hors de PlayGuard."
+        },
+        "again_off": "Une fois saisi, il vaut jusqu'à la fermeture de PlayGuard.",
         "locked_title": "PlayGuard est verrouillé",
         "locked_body": "Saisissez le NIP du contrôle parental pour l'ouvrir.",
         "enter": "Saisir le NIP"

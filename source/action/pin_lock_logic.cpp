@@ -13,11 +13,17 @@ int rank(const std::string& mode)
     return 0;
 }
 
-Check check(const std::string& mode, Clock::time_point now, Clock::time_point confirmed_until,
+bool holds(Clock::time_point pin_at, Clock::time_point now, bool ask_again)
+{
+    if (pin_at == NEVER) return false;
+    return !ask_again || now - pin_at < GRACE;
+}
+
+Check check(const std::string& mode, Clock::time_point now, Clock::time_point pin_at, bool ask_again,
             Clock::time_point refused_until)
 {
     if (mode != "changes") return Check::Allow;
-    if (now < confirmed_until) return Check::Allow;
+    if (holds(pin_at, now, ask_again)) return Check::Allow;
     if (now < refused_until) return Check::Refuse;
     return Check::Ask;
 }
@@ -31,9 +37,9 @@ Change change(const std::string& from, int to, bool has_pin)
 }
 
 bool lock_again(const std::string& mode, Clock::time_point away_since, Clock::time_point now,
-                Clock::time_point pin_at)
+                Clock::time_point pin_at, bool ask_again)
 {
-    if (mode != "open") return false;
+    if (mode != "open" || !ask_again) return false;
     if (now - away_since < GRACE) return false;
     return pin_at < away_since;
 }

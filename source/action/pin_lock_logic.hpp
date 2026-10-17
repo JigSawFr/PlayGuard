@@ -13,9 +13,12 @@ namespace pin_lock_logic
 
 using Clock = std::chrono::steady_clock;
 
-// After the PIN was entered, changes go ahead without asking again. In
-// "open", this long out of focus brings the lock screen back.
+// Once entered, the PIN holds until PlayGuard closes. With "Ask for the PIN
+// again" (config pin_ask_again) it holds this long instead, and in "open"
+// this long out of focus brings the lock screen back.
 constexpr auto GRACE = std::chrono::minutes(5);
+// The PIN not entered yet.
+constexpr Clock::time_point NEVER = Clock::time_point::min();
 // One action can make several changes (a restore): after a refusal, the
 // next ones are refused too instead of asking once per change.
 constexpr auto REFUSAL_HOLDS = std::chrono::seconds(3);
@@ -26,15 +29,18 @@ extern const char* const MODES[3];
 // A mode's place in MODES; an unknown one counts as "off".
 int rank(const std::string& mode);
 
+// Whether the PIN entered at `pin_at` (or NEVER) still holds at `now`.
+bool holds(Clock::time_point pin_at, Clock::time_point now, bool ask_again);
+
 enum class Check
 {
-    Allow,    // not "changes", or the PIN was entered less than GRACE ago
+    Allow,    // not "changes", or the PIN still holds
     Refuse,   // refused less than REFUSAL_HOLDS ago
     Ask,      // ask for the PIN now
 };
-// The change check at `now`, given until when the last entry and the last
-// refusal hold.
-Check check(const std::string& mode, Clock::time_point now, Clock::time_point confirmed_until,
+// The change check at `now`, given when the PIN was last entered and until
+// when the last refusal holds.
+Check check(const std::string& mode, Clock::time_point now, Clock::time_point pin_at, bool ask_again,
             Clock::time_point refused_until);
 
 enum class Change
@@ -47,10 +53,10 @@ enum class Change
 Change change(const std::string& from, int to, bool has_pin);
 
 // Back in focus at `now` after leaving it at `away_since` (the HOME menu, a
-// game over it): whether the lock screen comes back. Only in "open", after
-// GRACE or more away, unless the PIN was entered at `pin_at` since leaving
-// (the system PIN screen takes the focus too).
+// game over it): whether the lock screen comes back. Only in "open" with
+// "Ask for the PIN again", after GRACE or more away, unless the PIN was
+// entered at `pin_at` since leaving (the system PIN screen takes the focus too).
 bool lock_again(const std::string& mode, Clock::time_point away_since, Clock::time_point now,
-                Clock::time_point pin_at);
+                Clock::time_point pin_at, bool ask_again);
 
 }   // namespace pin_lock_logic

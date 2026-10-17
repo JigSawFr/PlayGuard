@@ -30,6 +30,7 @@
             <brls:Header id="sc_actions_header" title="@i18n/playguard/security/section_actions" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="sc_set_pin" title="@i18n/playguard/security/set_pin"/>
             <brls:DetailCell id="sc_pin_lock" title="@i18n/playguard/pin_lock/title"/>
+            <brls:BooleanCell id="sc_pin_ask_again"/>
             <brls:DetailCell id="sc_show_pin" title="@i18n/playguard/security/show_pin"/>
             <brls:DetailCell id="sc_unlock" title="@i18n/playguard/security/unlock"/>
             <brls:DetailCell id="sc_relock" title="@i18n/playguard/security/relock"/>

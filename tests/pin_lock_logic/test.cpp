@@ -1,5 +1,6 @@
 // Host tests for source/action/pin_lock_logic.cpp: the change check (modes,
-// the 5-minute grace after the PIN, the 3-second hold after a refusal), what
+// the PIN holding until PlayGuard closes or 5 minutes with "Ask for the PIN
+// again", the 3-second hold after a refusal), what
 // moving between the modes needs, and "open" locking again after time away.
 #include "check.h"
 #include <cstdio>
@@ -26,33 +27,55 @@ static void test_rank()
     for (int i = 0; i < 3; i++) CHECK(pin_lock_logic::rank(pin_lock_logic::MODES[i]) == i);
 }
 
+static void test_holds()
+{
+    const Clock::time_point never = pin_lock_logic::NEVER;
+    // Never entered: holds nowhere, whatever the setting.
+    CHECK(!pin_lock_logic::holds(never, T0, false));
+    CHECK(!pin_lock_logic::holds(never, T0, true));
+    // Entered at T0: until PlayGuard closes by default...
+    CHECK(pin_lock_logic::holds(T0, T0, false));
+    CHECK(pin_lock_logic::holds(T0, T0 + std::chrono::hours(5), false));
+    // ...5 minutes with "Ask for the PIN again".
+    CHECK(pin_lock_logic::holds(T0, T0 + minutes(4) + seconds(59), true));
+    CHECK(!pin_lock_logic::holds(T0, T0 + minutes(5), true));
+    // A clock that has not gone far since its epoch: still not "entered".
+    CHECK(!pin_lock_logic::holds(never, Clock::time_point{}, false));
+}
+
 static void test_check()
 {
-    const Clock::time_point never{};
+    const Clock::time_point never = pin_lock_logic::NEVER;
     // Only "changes" asks: "open" asks once at the start, not per change.
-    CHECK(pin_lock_logic::check("off", T0, never, never) == Check::Allow);
-    CHECK(pin_lock_logic::check("open", T0, never, never) == Check::Allow);
-    CHECK(pin_lock_logic::check("bogus", T0, never, never) == Check::Allow);
-    CHECK(pin_lock_logic::check("changes", T0, never, never) == Check::Ask);
-    // Even with a refusal held: other modes never refuse.
-    CHECK(pin_lock_logic::check("off", T0, never, T0 + seconds(1)) == Check::Allow);
+    for (bool again : { false, true }) {
+        CHECK(pin_lock_logic::check("off", T0, never, again, never) == Check::Allow);
+        CHECK(pin_lock_logic::check("open", T0, never, again, never) == Check::Allow);
+        CHECK(pin_lock_logic::check("bogus", T0, never, again, never) == Check::Allow);
+        CHECK(pin_lock_logic::check("changes", T0, never, again, never) == Check::Ask);
+        // Even with a refusal held: other modes never refuse.
+        CHECK(pin_lock_logic::check("off", T0, never, again, T0 + seconds(1)) == Check::Allow);
+    }
 
-    // The PIN entered at T0: no asking for 5 minutes, then again.
-    const Clock::time_point confirmed = T0 + pin_lock_logic::GRACE;
-    CHECK(pin_lock_logic::check("changes", T0, confirmed, never) == Check::Allow);
-    CHECK(pin_lock_logic::check("changes", T0 + minutes(4) + seconds(59), confirmed, never) == Check::Allow);
-    CHECK(pin_lock_logic::check("changes", T0 + minutes(5), confirmed, never) == Check::Ask);
-    CHECK(pin_lock_logic::check("changes", T0 + minutes(6), confirmed, never) == Check::Ask);
+    // The PIN entered at T0: not asked again until PlayGuard closes.
+    CHECK(pin_lock_logic::check("changes", T0, T0, false, never) == Check::Allow);
+    CHECK(pin_lock_logic::check("changes", T0 + std::chrono::hours(3), T0, false, never) == Check::Allow);
+
+    // With "Ask for the PIN again": no asking for 5 minutes, then again.
+    CHECK(pin_lock_logic::check("changes", T0, T0, true, never) == Check::Allow);
+    CHECK(pin_lock_logic::check("changes", T0 + minutes(4) + seconds(59), T0, true, never) == Check::Allow);
+    CHECK(pin_lock_logic::check("changes", T0 + minutes(5), T0, true, never) == Check::Ask);
+    CHECK(pin_lock_logic::check("changes", T0 + minutes(6), T0, true, never) == Check::Ask);
 
     // Refused at T0: the next changes of the same action are refused without
     // asking, for 3 seconds.
     const Clock::time_point refused = T0 + pin_lock_logic::REFUSAL_HOLDS;
-    CHECK(pin_lock_logic::check("changes", T0, never, refused) == Check::Refuse);
-    CHECK(pin_lock_logic::check("changes", T0 + seconds(2), never, refused) == Check::Refuse);
-    CHECK(pin_lock_logic::check("changes", T0 + seconds(3), never, refused) == Check::Ask);
+    CHECK(pin_lock_logic::check("changes", T0, never, false, refused) == Check::Refuse);
+    CHECK(pin_lock_logic::check("changes", T0 + seconds(2), never, false, refused) == Check::Refuse);
+    CHECK(pin_lock_logic::check("changes", T0 + seconds(3), never, false, refused) == Check::Ask);
 
-    // A grace still running wins over a refusal (the PIN was entered since).
-    CHECK(pin_lock_logic::check("changes", T0, confirmed, refused) == Check::Allow);
+    // A PIN that still holds wins over a refusal (it was entered since).
+    CHECK(pin_lock_logic::check("changes", T0, T0, true, refused) == Check::Allow);
+    CHECK(pin_lock_logic::check("changes", T0, T0, false, refused) == Check::Allow);
 }
 
 static void test_change()
@@ -80,29 +103,33 @@ static void test_change()
 
 static void test_lock_again()
 {
-    const Clock::time_point never{};
+    const Clock::time_point never = pin_lock_logic::NEVER;
     const Clock::time_point pin_before = T0 - minutes(30);   // entered on the lock screen at start
-    // "open": five minutes or more out of focus brings the lock screen back.
-    CHECK(pin_lock_logic::lock_again("open", T0, T0 + minutes(5), pin_before));
-    CHECK(pin_lock_logic::lock_again("open", T0, T0 + std::chrono::hours(3), pin_before));
-    CHECK(pin_lock_logic::lock_again("open", T0, T0 + minutes(5), never));
+    // By default, entered once is enough: no lock screen again, however long away.
+    CHECK(!pin_lock_logic::lock_again("open", T0, T0 + minutes(5), pin_before, false));
+    CHECK(!pin_lock_logic::lock_again("open", T0, T0 + std::chrono::hours(3), pin_before, false));
+    // "Ask for the PIN again": five minutes or more out of focus brings it back.
+    CHECK(pin_lock_logic::lock_again("open", T0, T0 + minutes(5), pin_before, true));
+    CHECK(pin_lock_logic::lock_again("open", T0, T0 + std::chrono::hours(3), pin_before, true));
+    CHECK(pin_lock_logic::lock_again("open", T0, T0 + minutes(5), never, true));
     // A shorter look at the HOME menu does not.
-    CHECK(!pin_lock_logic::lock_again("open", T0, T0 + minutes(4) + seconds(59), pin_before));
-    CHECK(!pin_lock_logic::lock_again("open", T0, T0, pin_before));
+    CHECK(!pin_lock_logic::lock_again("open", T0, T0 + minutes(4) + seconds(59), pin_before, true));
+    CHECK(!pin_lock_logic::lock_again("open", T0, T0, pin_before, true));
     // The PIN entered while away (its own screen takes the focus): no lock.
-    CHECK(!pin_lock_logic::lock_again("open", T0, T0 + minutes(8), T0 + minutes(7)));
-    CHECK(!pin_lock_logic::lock_again("open", T0, T0 + minutes(8), T0));
+    CHECK(!pin_lock_logic::lock_again("open", T0, T0 + minutes(8), T0 + minutes(7), true));
+    CHECK(!pin_lock_logic::lock_again("open", T0, T0 + minutes(8), T0, true));
     // The other modes never show the lock screen ("changes" asks after its grace).
-    CHECK(!pin_lock_logic::lock_again("changes", T0, T0 + minutes(30), pin_before));
-    CHECK(!pin_lock_logic::lock_again("off", T0, T0 + minutes(30), pin_before));
-    CHECK(!pin_lock_logic::lock_again("bogus", T0, T0 + minutes(30), pin_before));
+    CHECK(!pin_lock_logic::lock_again("changes", T0, T0 + minutes(30), pin_before, true));
+    CHECK(!pin_lock_logic::lock_again("off", T0, T0 + minutes(30), pin_before, true));
+    CHECK(!pin_lock_logic::lock_again("bogus", T0, T0 + minutes(30), pin_before, true));
 }
 
 int main()
 {
     test_rank();
+    test_holds();
     test_check();
     test_change();
     test_lock_again();
-    return CHECK_DONE("pin_lock_logic mode, grace, refusal hold, mode-change and lock-again assertions passed");
+    return CHECK_DONE("pin_lock_logic mode, hold, grace, refusal hold, mode-change and lock-again assertions passed");
 }

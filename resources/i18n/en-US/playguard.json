@@ -609,11 +609,17 @@
         },
         "notes": {
             "off": "Anyone who holds the console can change the settings here. Showing the PIN still asks for it.",
-            "changes": "Anyone can look; changing something needs the PIN (asked again after 5 minutes). Locking again never asks.",
-            "open": "A lock screen until the PIN is entered, and again after 5 minutes away from PlayGuard. Locking again never asks."
+            "changes": "Anyone can look; changing something needs the PIN. Locking again never asks.",
+            "open": "A lock screen until the PIN is entered. Locking again never asks."
         },
         "no_pin": "Set a PIN first (Set or change the PIN).",
         "set": "Protect PlayGuard with the PIN: {}",
+        "ask_again": "Ask for the PIN again after 5 minutes",
+        "again_on": {
+            "changes": "Asked again after 5 minutes.",
+            "open": "It comes back after 5 minutes away from PlayGuard."
+        },
+        "again_off": "Once entered, it holds until PlayGuard closes.",
         "locked_title": "PlayGuard is locked",
         "locked_body": "Enter the parental-control PIN to open it.",
         "enter": "Enter the PIN"

@@ -339,8 +339,9 @@ void install_now(const dev_builds::Build& b)
         return;
     }
     // Replacing PlayGuard can undo everything it guards: the PIN is asked
-    // whenever one is set, whatever Protect PlayGuard with the PIN says.
-    if (!pin_lock::ask()) {
+    // whenever one is set, whatever Protect PlayGuard with the PIN says
+    // (unless it was entered since PlayGuard opened).
+    if (!pin_lock::confirm()) {
         ui::notify(pin_lock::refusal_text());
         return;
     }
@@ -361,7 +362,7 @@ void go_back()
     ui::confirm(brls::getStr("playguard/dev_build/back_body", running, previous), "playguard/dev_build/back_confirm"_i18n,
                 []() {
                     // As for an install: whatever Protect PlayGuard with the PIN says.
-                    if (!pin_lock::ask()) {
+                    if (!pin_lock::confirm()) {
                         ui::notify(pin_lock::refusal_text());
                         return;
                     }

@@ -609,11 +609,17 @@
         },
         "notes": {
             "off": "任何拿到主機的人都能在此變更設定。顯示 PIN碼 時仍需輸入 PIN碼。",
-            "changes": "任何人都能檢視；只有家長能變更（5分鐘後會再次詢問）。重新鎖定時不會詢問。",
-            "open": "在輸入PIN碼前顯示鎖定畫面；離開PlayGuard 5分鐘後會再次顯示。重新鎖定時不會詢問。"
+            "changes": "任何人都能檢視；只有家長能變更。重新鎖定時不會詢問。",
+            "open": "在輸入PIN碼前顯示鎖定畫面。重新鎖定時不會詢問。"
         },
         "no_pin": "請先設定PIN碼（「設定或變更PIN碼」）。",
         "set": "用PIN碼保護PlayGuard：{}",
+        "ask_again": "5分鐘後再次詢問PIN碼",
+        "again_on": {
+            "changes": "5分鐘後會再次詢問。",
+            "open": "離開PlayGuard 5分鐘後會再次顯示。"
+        },
+        "again_off": "輸入一次後，在關閉PlayGuard前都有效。",
         "locked_title": "PlayGuard已鎖定",
         "locked_body": "請輸入家長監護PIN碼以開啟。",
         "enter": "輸入PIN碼"

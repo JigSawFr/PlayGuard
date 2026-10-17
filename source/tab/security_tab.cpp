@@ -47,6 +47,12 @@ SecurityTab::SecurityTab()
         pin_lock::choose([this]() { this->refresh(); });
         return true;
     });
+    // Off by default: once entered, the PIN holds until PlayGuard closes.
+    pin_ask_again->init("playguard/pin_lock/ask_again"_i18n, config::get().pin_ask_again, [](bool) {});
+    pin_ask_again->registerClickAction([this](brls::View*) {
+        pin_lock::set_ask_again(!config::get().pin_ask_again, [this]() { this->refresh(); });
+        return true;
+    });
     // While linked, anyone can save the block before and after a change made
     // in the phone app: the data ROADMAP.md waits for (Developer tools has it too).
     pr_decode->setDetailText(ui::fmt_played(2));   // how long it takes
@@ -178,6 +184,7 @@ void SecurityTab::refresh()
 
     pin_lock_cell->setDetailText(pin_lock::mode_text());
     pin_lock_note->setText(pin_lock::note_text());
+    pin_ask_again->setOn(config::get().pin_ask_again, false);
 
     const bool locked = console_lock::active();
     console_lock_cell->setDetailText(locked ? "playguard/common/on"_i18n : "playguard/common/off"_i18n);
