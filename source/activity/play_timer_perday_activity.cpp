@@ -32,9 +32,9 @@ PlayTimerPerDayActivity* PlayTimerPerDayActivity::week_split()
     return a;
 }
 
-void PlayTimerPerDayActivity::onContentAvailable()
+// The cells' actions: the week chart, the quick fills, copy today, discard, save.
+void PlayTimerPerDayActivity::bind_cells()
 {
-    unavailable->setSingleLine(false);
     week->set_on_pick([this](int d) { this->edit_day(d); });
     week->set_editable(true);
     pt_weekdays->registerClickAction([this](brls::View*) {
@@ -83,6 +83,12 @@ void PlayTimerPerDayActivity::onContentAvailable()
         this->save();
         return true;
     });
+}
+
+// The screen's buttons: + saves, X reads the console again, B asks before
+// dropping edits.
+void PlayTimerPerDayActivity::bind_buttons()
+{
     // + saves from anywhere on the screen (the cell stays for the eye). Not Y:
     // Y deleted a profile elsewhere, and a button must not mean both.
     this->getContentView()->registerAction("hints/save"_i18n, brls::BUTTON_START, [this](brls::View*) {
@@ -116,6 +122,13 @@ void PlayTimerPerDayActivity::onContentAvailable()
                     []() { brls::sync([]() { brls::Application::popActivity(); }); });
         return true;
     });
+}
+
+void PlayTimerPerDayActivity::onContentAvailable()
+{
+    unavailable->setSingleLine(false);
+    this->bind_cells();
+    this->bind_buttons();
 
     if (this->profile_mode) {
         // The console's state is not what this screen edits: no header.

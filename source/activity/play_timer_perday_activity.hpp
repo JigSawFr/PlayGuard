@@ -48,6 +48,9 @@ class PlayTimerPerDayActivity : public brls::Activity
     u16     pending[7] = { PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT,
                            PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT };
 
+    // onContentAvailable()'s actions: the cells', then the screen's buttons.
+    void bind_cells();
+    void bind_buttons();
     void reload_from_service();
     void rerender();
     bool has_changes() const;
