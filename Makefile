@@ -248,6 +248,8 @@ format_text_SRC   := source/ui/format_text.cpp tests/format_text/test.cpp
 format_text_FLAGS := -std=c++17 -Isource -isystem extern/borealis/library/include -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DPLAYGUARD_HOST_I18N
 game_check_text_SRC   := source/action/game_check_text.cpp tests/game_check_text/test.cpp
 game_check_text_FLAGS := -std=c++17 -Isource
+game_check_text_CSRC   := source/core/gamecheck_rules.c
+game_check_text_CFLAGS := -std=gnu11 -Isource/core
 pt_log_SRC   := source/util/paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp
 pt_log_FLAGS := -std=c++17 -Isource
 session_log_SRC   := source/util/paths.cpp source/util/log_files.cpp source/util/session_log.cpp source/util/crash_report.cpp tests/session_log/test.cpp

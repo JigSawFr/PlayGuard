@@ -2,9 +2,9 @@
 #include "action/game_notice.hpp"
 
 #include <borealis.hpp>
-#include <fmt/format.h>
 #include <string>
 
+#include "action/game_check_text.hpp"
 #include "action/game_scan.hpp"
 #include "action/notices.hpp"
 #include "activity/game_check_activity.hpp"
@@ -37,8 +37,9 @@ void note(const std::vector<GameFacts>& games, u32 hos)
     std::vector<std::string> names;
     for (const GameFacts& g : games) {
         if (gamecheck_classify(&g, hos) == GC_OK) continue;
-        names.push_back(g.name[0] ? std::string(g.name)
-                                  : brls::getStr("playguard/games/unnamed", fmt::format("{:016X}", (unsigned long long)g.app_id)));
+        names.push_back(game_check_text::game_name(g, [](const std::string& id) {
+            return brls::getStr("playguard/games/unnamed", id);
+        }));
     }
     if (names.empty()) {
         notices::clear("games");

@@ -145,6 +145,14 @@ void on_cancel(brls::Dialog* dialog, std::function<void()> on_cancel);
 // Dropdown list; `on_pick(index)` runs after the list has closed.
 void pick(const std::string& title, const std::vector<std::string>& values, int selected,
           std::function<void(int)> on_pick);
+// A list of things to do: each line's label, and what it runs once the
+// list has closed. The first line is selected; none, no list.
+struct Choice
+{
+    std::string           label;
+    std::function<void()> run;
+};
+void pick_actions(const std::string& title, const std::vector<Choice>& choices);
 
 // System keyboard prompts (callback only on confirm). prompt_minutes accepts
 // minutes ("90") or hours:minutes ("1:30"), up to 24:00.
