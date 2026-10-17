@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Preferences: PlayGuard itself (language, theme, start tab), what it
-     does at start-up, its notifications and its updates. A setting that
-     shapes one feature sits with it (extra time in Play timer, relocking
-     in PIN, the clock check in Console › Network clock). Last, a line to
-     Help & diagnostics (tab/help.xml, on a screen of its own). -->
+<!-- Preferences: only what sets PlayGuard itself up — the app (language,
+     theme, start tab, the intro) and the messages it shows (the kinds of
+     notifications, the monthly "Support PlayGuard" reminder). A setting
+     that shapes one feature sits with it (extra time in Play timer,
+     relocking in PIN, the clock check in Console › Network clock); the
+     updates and Help & diagnostics are in About. -->
 
 <brls:Box
     width="auto"
@@ -29,17 +30,12 @@
             <brls:DetailCell id="pf_language" title="@i18n/playguard/tools/language"/>
             <brls:DetailCell id="pf_theme" title="@i18n/playguard/tools/theme"/>
             <brls:DetailCell id="pf_start_tab" title="@i18n/playguard/tools/start_tab"/>
-            <brls:Header title="@i18n/playguard/prefs/section_startup" marginTop="24" marginBottom="8"/>
             <brls:BooleanCell id="pf_intro"/>
-            <brls:BooleanCell id="pf_support_reminder"/>
             <brls:Header title="@i18n/playguard/prefs/section_notices" marginTop="24" marginBottom="8"/>
             <brls:BooleanCell id="pf_notices_system"/>
             <brls:BooleanCell id="pf_notices_summary"/>
             <brls:BooleanCell id="pf_notices_reminders"/>
-            <brls:Header title="@i18n/playguard/tools/section_update" marginTop="24" marginBottom="8"/>
-            <brls:BooleanCell id="pf_update_daily"/>
-            <brls:DetailCell id="pf_update_via" title="@i18n/playguard/tools/update_via"/>
-            <brls:DetailCell id="pf_help" title="@i18n/playguard/prefs/help" marginTop="24"/>
+            <brls:BooleanCell id="pf_support_reminder"/>
 
         </brls:Box>
 

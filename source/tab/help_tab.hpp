@@ -1,4 +1,4 @@
-// HelpTab — Preferences › Help & diagnostics, a screen of its own: first
+// HelpTab — About › Help & diagnostics, a screen of its own: first
 // steps, the diagnostic report (export, send online, and the GitHub account
 // it is sent with, shown once signed in) and how many reports and crash files
 // are kept, then the developer tools (shown after seven

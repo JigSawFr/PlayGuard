@@ -112,20 +112,22 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 
 ## Préférences
 
-- Langue (toutes celles de la console, ou celle de la console) et thème (clair / sombre, avec proposition de relancer).
-- L'onglet d'ouverture.
-- **L'intro** au lancement : l'écran de chargement pendant 2 secondes (activée par défaut ; Ⓐ ou Ⓑ la passe ; désactivée, PlayGuard s'ouvre dès qu'il est prêt).
-- Un **rappel mensuel pour soutenir PlayGuard** (activé par défaut, jamais le premier mois ni juste après une mise à jour ; *Ne plus afficher* sur le rappel ou cet interrupteur le désactive pour de bon, mises à jour comprises).
-- Les types de notifications (voir plus haut).
-- **Mises à jour :** recherche une fois par jour au lancement, et *Mettre à jour avec* : dans PlayGuard, qui télécharge la version, la vérifie, se remplace et redémarre, ou sphaira, le Homebrew App Store ou à la main (demandé à la première mise à jour si rien n'est choisi).
-- Un réglage qui ne concerne qu'une fonction est à côté d'elle : le temps en plus dans *Temps de jeu*, la réactivation dans *Code PIN*, la vérification de l'horloge dans *Console › Horloge réseau*.
-- **Aide et diagnostic ›**, un écran à part, à la fin :
-  - **Premiers pas** rouvre le guide (avec une étape *Dissocier l'application mobile* tant qu'elle est associée, une étape *Réactiver l'alarme « temps écoulé »* tant qu'elle est désactivée, une étape *Protéger PlayGuard* une fois le code PIN défini — le choix *Protéger PlayGuard par le code PIN* —, et un interrupteur pour qu'il ne s'ouvre plus au lancement). Sous *Fermer*, *Soutenir PlayGuard* affiche les QR codes de soutien.
-  - **Exporter un rapport de diagnostic**, ou **l'envoyer en ligne** (voir [Signaler un bug](troubleshooting.md#signaler-un-bug)) ; combien de rapports enregistrés, de fichiers de plantage, de journaux de session et de liens des rapports envoyés en ligne sont gardés, par nombre, âge ou taille.
+- Ce qui règle PlayGuard lui-même :
+  - Langue (toutes celles de la console, ou celle de la console) et thème (clair / sombre, avec proposition de relancer).
+  - L'onglet d'ouverture.
+  - **L'intro** au lancement : l'écran de chargement pendant 2 secondes (activée par défaut ; Ⓐ ou Ⓑ la passe ; désactivée, PlayGuard s'ouvre dès qu'il est prêt).
+- Les messages qu'il affiche :
+  - Les types de notifications (voir plus haut).
+  - Un **rappel mensuel pour soutenir PlayGuard** (activé par défaut, jamais le premier mois ni juste après une mise à jour ; *Ne plus afficher* sur le rappel ou cet interrupteur le désactive pour de bon, mises à jour comprises).
+- Un réglage qui ne concerne qu'une fonction est à côté d'elle : le temps en plus dans *Temps de jeu*, la réactivation dans *Code PIN*, la vérification de l'horloge dans *Console › Horloge réseau*. Les mises à jour et *Aide et diagnostic* sont dans *À propos*.
 
 ## À propos
 
-- Version, mode de lancement et dossier des données ; **recherche d'une mise à jour** maintenant (quand et comment mettre à jour : *Préférences*). Tant qu'une version plus récente est connue, PlayGuard s'ouvre sur **PlayGuard X.Y.Z est disponible** (sa date et ses notes) : *Mettre à jour*, ou *Plus tard* pour 1 jour, 1 semaine ou 30 jours au plus ; les **nouveautés** de la version installée (ses points forts, en anglais, et *Liste complète des changements* pour son entrée du changelog intégré) ; les crédits, comment **soutenir PlayGuard** ([GitHub Sponsors](https://github.com/sponsors/JigSawFr), [Ko-fi](https://ko-fi.com/jigsawfr), affichés en QR codes à scanner avec un téléphone), et un petit *Made in France* 🇫🇷. Après une mise à jour, PlayGuard s'ouvre une fois sur **Nouveautés de la X.Y.Z** (les mêmes points forts, puis les QR codes).
+- PlayGuard installé : version, mode de lancement et dossier des données ; **recherche d'une mise à jour** maintenant ; *Rechercher les mises à jour chaque jour* au lancement, et *Mettre à jour avec* : dans PlayGuard, qui télécharge la version, la vérifie, se remplace et redémarre, ou sphaira, le Homebrew App Store ou à la main (demandé à la première mise à jour si rien n'est choisi). Tant qu'une version plus récente est connue, PlayGuard s'ouvre sur **PlayGuard X.Y.Z est disponible** (sa date et ses notes) : *Mettre à jour*, ou *Plus tard* pour 1 jour, 1 semaine ou 30 jours au plus ; les **nouveautés** de la version installée (ses points forts, en anglais, et *Liste complète des changements* pour son entrée du changelog intégré). Après une mise à jour, PlayGuard s'ouvre une fois sur **Nouveautés de la X.Y.Z** (les mêmes points forts, puis les QR codes).
+- **Aide et diagnostic ›**, un écran à part, sous les *Nouveautés* :
+  - **Premiers pas** rouvre le guide (avec une étape *Dissocier l'application mobile* tant qu'elle est associée, une étape *Réactiver l'alarme « temps écoulé »* tant qu'elle est désactivée, une étape *Protéger PlayGuard* une fois le code PIN défini — le choix *Protéger PlayGuard par le code PIN* —, et un interrupteur pour qu'il ne s'ouvre plus au lancement). Sous *Fermer*, *Soutenir PlayGuard* affiche les QR codes de soutien.
+  - **Exporter un rapport de diagnostic**, ou **l'envoyer en ligne** (voir [Signaler un bug](troubleshooting.md#signaler-un-bug)) ; combien de rapports enregistrés, de fichiers de plantage, de journaux de session et de liens des rapports envoyés en ligne sont gardés, par nombre, âge ou taille.
+- Les crédits, comment **soutenir PlayGuard** ([GitHub Sponsors](https://github.com/sponsors/JigSawFr), [Ko-fi](https://ko-fi.com/jigsawfr), affichés en QR codes à scanner avec un téléphone), et un petit *Made in France* 🇫🇷.
 
 ## Sûr par conception
 

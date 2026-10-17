@@ -55,9 +55,9 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `activity_period` | integer | Activity's period: `0` today, `1` last 7 days, `2` all time | `1` | Activity |
 | `export_format` | integer | the last export format: `0` CSV, `1` JSON, `2` XLSX, `3` PDF | `0` | Activity › Export |
 | `backup_keep` | integer | backups kept after a new one: `0` (all of them), `5`, `10`, `20` | `0` | History |
-| `logs_keep` | integer | saved reports kept, crash files kept, session logs kept and links of reports sent online kept (`logs/reports/`, `logs/crashes/`, `logs/sessions/`, `logs/uploads/`, each on its own): the newest `5`, `10`, `20` or `50`; `0` all of them. A file goes when any of the three `logs_keep*` says so, at start-up and when one changes; the newest file of each folder always stays | `20` | Preferences › Help & diagnostics |
-| `logs_keep_days` | integer | the same, by age: those of the last `7`, `30`, `90` or `365` days (from the date in the file name); `0` no limit | `0` | Preferences › Help & diagnostics |
-| `logs_keep_mb` | integer | the same, by size: the newest that fit in `1`, `5` or `20` MB together; `0` no limit | `0` | Preferences › Help & diagnostics |
+| `logs_keep` | integer | saved reports kept, crash files kept, session logs kept and links of reports sent online kept (`logs/reports/`, `logs/crashes/`, `logs/sessions/`, `logs/uploads/`, each on its own): the newest `5`, `10`, `20` or `50`; `0` all of them. A file goes when any of the three `logs_keep*` says so, at start-up and when one changes; the newest file of each folder always stays | `20` | About › Help & diagnostics |
+| `logs_keep_days` | integer | the same, by age: those of the last `7`, `30`, `90` or `365` days (from the date in the file name); `0` no limit | `0` | About › Help & diagnostics |
+| `logs_keep_mb` | integer | the same, by size: the newest that fit in `1`, `5` or `20` MB together; `0` no limit | `0` | About › Help & diagnostics |
 | `extra_amounts` | array of 3 integers | the *Extra time today* choices, in minutes: `[15, 30, 60]`, `[10, 20, 30]`, `[30, 60, 90]` or `[5, 10, 15]` | `[15, 30, 60]` | Play timer |
 
 ## `pin_lock`
@@ -96,7 +96,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 
 ## Updates
 
-`update_via` and `update_daily` are set in *Preferences › Updates*; *About › Check for updates* checks at once.
+`update_via` and `update_daily` are set in *About › Updates*, under *Check for updates*, which checks at once.
 
 | Key | Type | Values | Default |
 |---|---|---|---|
@@ -113,7 +113,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 
 | Key | Type | Values | Default |
 |---|---|---|---|
-| `support_reminder` | boolean | *Support PlayGuard* once a month at start-up (Preferences) | `true` |
+| `support_reminder` | boolean | *Support PlayGuard* once a month at start-up (*Preferences › Notifications*) | `true` |
 | `support_reminded` | string | `"YYYY-MM-DD"` of the last reminder; anything else is cleared | `""` |
 | `seen_version` | string | the version whose *What's new* was shown; at most 32 characters | `""` |
 | `notices_system` | boolean | the notification bell shows newer Atmosphère, hekate and firmware releases (*Preferences › Notifications*) | `true` |
@@ -125,11 +125,11 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 
 ## Developer
 
-Set in *Preferences › Help & diagnostics › Developer*, shown once developer mode is on.
+Set in *About › Help & diagnostics › Developer*, shown once developer mode is on.
 
 | Key | Type | Values | Default |
 |---|---|---|---|
-| `dev_mode` | boolean | the developer tools at the end of *Preferences › Help & diagnostics* (seven presses on *About › Version* turn them on, *Developer mode* there turns them off) | `false` |
+| `dev_mode` | boolean | the developer tools at the end of *About › Help & diagnostics* (seven presses on *About › Version* turn them on, *Developer mode* there turns them off) | `false` |
 | `pt_log` | boolean | *Record the play timer* (`logs/play_timer/log.csv`) | `false` |
 | `dev_builds_order` | string | how *Install another build* orders the pull requests (A on their tab when it is shown): `"newest"` (the newest build first) or `"number"` (the highest number first); main's commits are always newest first | `"newest"` |
 

@@ -133,7 +133,7 @@ constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "r
 // What extra_amounts may be (the Preferences picker offers these sets).
 constexpr int EXTRA_SETS[][3] = { { 15, 30, 60 }, { 10, 20, 30 }, { 30, 60, 90 }, { 5, 10, 15 } };
 constexpr int BACKUP_KEEP[]   = { 0, 5, 10, 20 };
-// What Preferences › Help & diagnostics offers for the reports and crash files kept.
+// What About › Help & diagnostics offers for the reports and crash files kept.
 constexpr int LOGS_KEEP[]      = { 0, 5, 10, 20, 50 };
 constexpr int LOGS_KEEP_DAYS[] = { 0, 7, 30, 90, 365 };
 constexpr int LOGS_KEEP_MB[]   = { 0, 1, 5, 20 };

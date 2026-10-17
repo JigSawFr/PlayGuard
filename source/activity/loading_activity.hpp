@@ -5,7 +5,7 @@
 // moves the progress bar along; the first real screen is then pushed over this
 // one, which stays at the bottom of the stack (borealis' Application::clear(),
 // to remove it, is private).
-// The intro (Preferences › At start-up › Show the intro): the start-up takes
+// The intro (Preferences › Show the intro): the start-up takes
 // a fraction of a second, too short to see this screen, so it stays at least
 // INTRO_US, its bar filling at a steady pace; Ⓐ or Ⓑ skip the rest. Nothing
 // else to press here.
