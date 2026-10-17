@@ -100,7 +100,9 @@ Result avmGetLaunchRequiredVersion(u64 application_id, u32 *version);
 Result avmPushLaunchVersion(u64 application_id, u32 version);
 
 typedef struct { char name[0x200]; char author[0x100]; } NacpLanguageEntry;
-typedef struct { NacpLanguageEntry lang[16]; char display_version[0x10]; u8 rest[0x1000]; } NacpStruct;
+// libnx's layout where nacp.c reads it: the title entries at 0, the display
+// version at 0x3060, the titles' format at 0x3215, 0x4000 bytes in all.
+typedef struct { NacpLanguageEntry lang[16]; u8 x3000[0x60]; char display_version[0x10]; u8 rest[0xF90]; } NacpStruct;
 typedef struct { NacpStruct nacp; u8 icon[0x20000]; } NsApplicationControlData;
 typedef enum { NsApplicationControlSource_CacheOnly = 0, NsApplicationControlSource_Storage = 1 } NsApplicationControlSource;
 typedef struct {
@@ -128,7 +130,6 @@ void nsExit(void);
 Result nsListApplicationRecord(NsApplicationRecord *records, s32 count, s32 entry_offset, s32 *out_entrycount);
 Result nsGetApplicationControlData(NsApplicationControlSource source, u64 application_id, NsApplicationControlData *buffer,
                                    size_t size, u64 *actual_size);
-Result nacpGetLanguageEntry(NacpStruct *nacp, NacpLanguageEntry **langentry);
 Result nsListApplicationContentMetaStatus(u64 application_id, s32 index, NsApplicationContentMetaStatus *list, s32 count,
                                           s32 *out_entrycount);
 Result nsCheckApplicationLaunchVersion(u64 application_id);
@@ -143,3 +144,15 @@ Result nsProgressAsyncResultGetProgress(NsProgressAsyncResult *a, void *buffer, 
 Result nsProgressAsyncResultGetDetailResult(NsProgressAsyncResult *a);
 Result nsProgressAsyncResultCancel(NsProgressAsyncResult *a);
 void nsProgressAsyncResultClose(NsProgressAsyncResult *a);
+
+// set: the console language (core/nacp_read.c), libnx's SetLanguage values.
+typedef enum {
+    SetLanguage_JA = 0, SetLanguage_ENUS = 1, SetLanguage_FR = 2, SetLanguage_DE = 3, SetLanguage_IT = 4,
+    SetLanguage_ES = 5, SetLanguage_ZHCN = 6, SetLanguage_KO = 7, SetLanguage_NL = 8, SetLanguage_PT = 9,
+    SetLanguage_RU = 10, SetLanguage_ZHTW = 11, SetLanguage_ENGB = 12, SetLanguage_FRCA = 13, SetLanguage_ES419 = 14,
+    SetLanguage_ZHHANS = 15, SetLanguage_ZHHANT = 16, SetLanguage_PTBR = 17, SetLanguage_Total = 18,
+} SetLanguage;
+Result setInitialize(void);
+void setExit(void);
+Result setGetSystemLanguage(u64 *language_code);
+Result setMakeLanguage(u64 language_code, SetLanguage *language);

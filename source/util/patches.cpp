@@ -1,8 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/patches.hpp"
 
-#include <sys/stat.h>
-
 #include "util/paths.hpp"
 
 namespace patches
@@ -21,12 +19,6 @@ std::string trim(const std::string& s)
 bool starts_with(const std::string& s, const char* prefix)
 {
     return s.compare(0, std::char_traits<char>::length(prefix), prefix) == 0;
-}
-
-bool exists(const std::string& path)
-{
-    struct stat st;
-    return stat(path.c_str(), &st) == 0;
 }
 
 bool has_ips(const std::string& dir)
@@ -89,8 +81,8 @@ Module module_state(const Ini& ini, const std::string& name)
 Report detect(const std::string& root, const std::string& fw, bool emummc)
 {
     Report r;
-    r.syspatch_installed = exists(join(root, "atmosphere/contents/420000000000000B/exefs.nsp"));
-    r.syspatch_at_boot   = exists(join(root, "atmosphere/contents/420000000000000B/flags/boot2.flag"));
+    r.syspatch_installed = paths::file_exists(join(root, "atmosphere/contents/420000000000000B/exefs.nsp"));
+    r.syspatch_at_boot   = paths::file_exists(join(root, "atmosphere/contents/420000000000000B/flags/boot2.flag"));
 
     std::string text;
     if (paths::read_file(join(root, "config/sys-patch/log.ini"), text) && !text.empty()) {
@@ -114,7 +106,7 @@ Report detect(const std::string& root, const std::string& fw, bool emummc)
     if (has_ips(join(root, "atmosphere/kip_patches/fs_patches")))       r.files.push_back("fs");
     if (has_ips(join(root, "atmosphere/kip_patches/loader_patches")))   r.files.push_back("loader");
     if (has_ips(join(root, "atmosphere/exefs_patches/nfim_ctest")))     r.files.push_back("nifm");
-    if (exists(join(root, "bootloader/patches.ini")))                   r.files.push_back("hekate");
+    if (paths::file_exists(join(root, "bootloader/patches.ini")))                   r.files.push_back("hekate");
     return r;
 }
 

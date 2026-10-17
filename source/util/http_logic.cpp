@@ -24,12 +24,22 @@ bool succeeded(const Outcome& o, std::string* error)
 {
     std::string why;
     if (o.status >= 400) why = "HTTP " + std::to_string(o.status);
+    else if (o.refused) why = "unexpected answer (HTTP " + std::to_string(o.status) + ")";
     else if (o.overflow) why = "response too large";
     else if (o.file_error) why = "cannot write the file";
     else if (!o.transfer_ok) why = o.transfer_error;
     else return true;
     if (error) *error = why;
     return false;
+}
+
+Start download_start(long status, bool resumed)
+{
+    if (status >= 400) return Start::Refuse;
+    if (!resumed) return Start::Write;
+    if (status == 206) return Start::Write;
+    if (status == 200) return Start::StartOver;
+    return Start::Refuse;
 }
 
 bool redirect_ok(long status, const std::string& target, std::string* error)

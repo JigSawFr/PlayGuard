@@ -1,6 +1,7 @@
 // http_logic — the decisions behind http, without libcurl: the size limit of a
 // response, the request headers, how a transfer's outcome becomes the error
-// the caller shows, and which answers count as a redirect. Plain C++ so the
+// the caller shows, what a download does with the answer it gets, and which
+// answers count as a redirect. Plain C++ so the
 // host tests can run it (tests/http_logic).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -28,10 +29,25 @@ struct Outcome
     long        status = 0;           // HTTP status, 0 when the server did not answer
     bool        overflow = false;     // the body went past the size limit
     bool        file_error = false;   // the download could not be written
+    bool        refused = false;      // a download's answer not written (download_start)
     bool        transfer_ok = true;   // CURLE_OK
     std::string transfer_error;
 };
 bool succeeded(const Outcome& o, std::string* error);
+
+// What a download does with the first bytes of the answer, from its status.
+// `resumed`: the file already holds the start of it, and the rest was asked
+// for (a Range request). An error page (>= 400) is never written, so a part
+// kept for a later attempt stays as it was; a resumed download goes on with
+// a 206, starts over with a 200 (the server sends it all again) and keeps
+// its part on anything else.
+enum class Start
+{
+    Write,       // append to the file as it is
+    StartOver,   // empty the file first
+    Refuse,      // write nothing, stop the transfer
+};
+Start download_start(long status, bool resumed);
 
 // A redirect() answer: a 3xx status pointing to an https:// URL. False and
 // *error otherwise.

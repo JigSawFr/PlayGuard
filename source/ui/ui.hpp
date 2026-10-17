@@ -248,15 +248,15 @@ constexpr int dashboard    = 0;
 constexpr int play_timer   = 2;
 constexpr int activity     = 3;   // play time per game
 constexpr int restrictions = 4;
-constexpr int clock        = 5;
-constexpr int security     = 7;   // PIN, unlock, companion app, delete
-constexpr int preferences  = 9;
-constexpr int tools        = 10;
-constexpr int about        = 11;   // version, credits, changelog
+constexpr int security     = 5;   // the PIN tab: PIN, unlock, blocking games, companion app, delete
+constexpr int console      = 7;   // the network clock, installed games, firmware, storage, serial, patches
+constexpr int history      = 9;   // changes and settings backups
+constexpr int preferences  = 10;
+constexpr int about        = 11;  // version, credits, changelog
 // The n-th tab (0 = Overview) as a sidebar position (separators count).
 constexpr int of(int n)
 {
-    constexpr int positions[] = { dashboard, play_timer, activity, restrictions, clock, security, preferences, tools, about };
+    constexpr int positions[] = { dashboard, play_timer, activity, restrictions, security, console, history, preferences, about };
     return n >= 0 && n < (int)(sizeof(positions) / sizeof(positions[0])) ? positions[n] : dashboard;
 }
 }   // namespace tab
@@ -265,6 +265,9 @@ constexpr int of(int n)
 // any view inside the current tab; the switch happens on the next frame
 // because the current tab is deleted by it.
 void go_to_tab(brls::View* from, int position);
+// `content` (a tab's view, such as the network clock) on a screen of its own,
+// over the current one, titled `title`; B closes it.
+void open_screen(brls::View* content, const std::string& title);
 
 // "Parental controls are temporarily unlocked — Lock now" cell shown at the
 // top of the Overview and Play timer tabs (no "Lock now" in read-only mode).

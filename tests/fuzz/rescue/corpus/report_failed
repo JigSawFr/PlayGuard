@@ -1,0 +1,6 @@
+request=kept
+result=failed
+mode=delete
+rc=0xdeadbeef
+unlocks=0
+other=1

@@ -47,7 +47,7 @@ std::string restart_path()
 // `updated`: just now, whether or not the marker could be written.
 void note_restart(bool updated = false)
 {
-    if (!updated && !paths::exists(restart_path())) {
+    if (!updated && !paths::exists_or_pending(restart_path())) {
         notices::clear("rescue_restart");
         return;
     }

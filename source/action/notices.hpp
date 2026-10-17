@@ -42,8 +42,9 @@ void dismiss(const std::string& id);
 void apply_preferences();
 
 std::vector<Entry> list();
-int action_count();
-int info_count();
+int action_count();    // the parental controls' entries to do: the bell's number
+int info_count();      // the parental controls' entries for information
+int console_count();   // the console's entries to do: the Console tab's number
 
 // Called (UI thread) after every change of what the bell shows.
 int  listen(std::function<void()> fn);

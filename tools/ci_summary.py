@@ -4,6 +4,7 @@ Markdown on stdout: each job appends one section to $GITHUB_STEP_SUMMARY.
 
   header     the run: version, commit, branch or pull request, trigger
   host-tests the suites of `make test` from build/host-tests/<suite>.log and .ok
+  fuzz       the libFuzzer runs of `make fuzz` from build/fuzz/<target>.log
   coverage   gcovr's JSON summary (--json-summary), per file, and vs main
   smoke      a desktop-smoke shard: each scenario's smoke test and visual check
   build      the Switch build: sizes vs main, downloads, what makes the .nro
@@ -222,6 +223,42 @@ def cmd_host_tests(a):
         heading += f" · {a.flags}"
     body = table(["", "Suite", "Tests", "Result"], rows)
     return heading + "\n\n" + details(f"{total} suites, build/host-tests/&lt;suite&gt;.log", body, open_=bool(failed or not_run))
+
+
+# ---------------------------------------------------------------------- fuzz
+
+def fuzzers_of(makefile):
+    """The fuzz targets of the Makefile, in its order: (name, target source)."""
+    text = read_text(makefile) or ""
+    return [(m.group(1), m.group(2).split()[-1]) for m in re.finditer(r"^(\w+)_FUZZ\s*:=\s*(.+)$", text, re.M)]
+
+
+def cmd_fuzz(a):
+    targets = fuzzers_of(a.makefile)
+    rows, failed = [], 0
+    for name, target in targets:
+        log = read_text(os.path.join(a.dir, name + ".log"))
+        found = sorted(f for f in os.listdir(a.dir) if f.startswith(name + "-")) if os.path.isdir(a.dir) else []
+        stats = dict(re.findall(r"^stat::(\w+):\s*(\d+)", log or "", re.M))
+        runs = f"{int(stats['number_of_executed_units']):,}" if "number_of_executed_units" in stats else ""
+        if log is None:
+            failed += 1
+            rows.append([SKIP, code(name), code(target), "", "did not build or run (see the job log)"])
+        elif found or not re.search(r"^Done \d+ runs", log, re.M):
+            failed += 1
+            why = [l for l in log.splitlines() if "ERROR:" in l or "runtime error" in l or "SUMMARY:" in l
+                   or "fuzz property failed" in l]
+            rows.append([FAIL, code(name), code(target), runs,
+                         "<br>".join(code(l[:200]) for l in why[:4] + [f"input: {f}" for f in found[:1]])
+                         or "stopped with an error"])
+        else:
+            rows.append([OK, code(name), code(target), runs, f"{stats.get('new_units_added', '0')} new inputs"])
+    verdict = f"{FAIL} {failed} of {len(targets)} targets failed" if failed else f"{OK} {len(targets)} targets ran clean"
+    heading = f"## 🎲 Fuzzing — {verdict}"
+    if a.seconds:
+        heading += f" · {a.seconds} s each"
+    body = table(["", "Target", "Source", "Runs", "Result"], rows)
+    return heading + "\n\n" + details(f"{len(targets)} targets, build/fuzz/&lt;target&gt;.log", body, open_=bool(failed))
 
 
 # ------------------------------------------------------------------ coverage
@@ -586,6 +623,12 @@ def main():
     p.add_argument("--compiler", default="")
     p.add_argument("--flags", default="")
     p.set_defaults(func=cmd_host_tests)
+
+    p = sub.add_parser("fuzz", help="the libFuzzer runs of make fuzz")
+    p.add_argument("dir", help="build/fuzz")
+    p.add_argument("--makefile", default="Makefile")
+    p.add_argument("--seconds", default="")
+    p.set_defaults(func=cmd_fuzz)
 
     p = sub.add_parser("coverage", help="gcovr --json-summary")
     p.add_argument("json")

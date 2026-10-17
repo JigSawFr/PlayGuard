@@ -1,4 +1,5 @@
-// PlayTimerTab — daily limit (same for every day / extra time today / per day /
+// PlayTimerTab — the week chart (A on a day opens the per-day editor on it),
+// daily limit (same for every day / extra time today / weekdays and weekend /
 // remove), saved profiles, what happens when the time is up, the bedtime
 // alarm, the extra-time settings (amounts offered, the usual limit put back
 // the next day by itself) and a line to the advanced (debug-class) actions.
@@ -32,7 +33,7 @@ class PlayTimerTab : public TabBase
     BRLS_BIND(brls::DetailCell,  quick,           "pt_quick");
     BRLS_BIND(brls::DetailCell,  extra,           "pt_extra");
     BRLS_BIND(brls::DetailCell,  stop,            "pt_stop");
-    BRLS_BIND(brls::DetailCell,  per_day,         "pt_per_day");
+    BRLS_BIND(brls::DetailCell,  split,           "pt_split");
     BRLS_BIND(brls::DetailCell,  remove,          "pt_remove");
     BRLS_BIND(brls::DetailCell,  profiles_cell,   "pt_profiles");
     BRLS_BIND(brls::DetailCell,  time_up,         "pt_time_up");
