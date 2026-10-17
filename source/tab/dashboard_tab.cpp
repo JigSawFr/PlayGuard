@@ -128,6 +128,9 @@ void DashboardTab::open_today_limit()
 void DashboardTab::refresh()
 {
     const std::string na = "playguard/common/unavailable"_i18n;
+    // The time of day, for every helper below (today's limit, the outside
+    // watch, the timer health, the bell), read once.
+    ui::SameTime same;
 
     // Every 5 s: one pctl session with only what this screen shows, and the
     // network clock's accuracy flag alone.

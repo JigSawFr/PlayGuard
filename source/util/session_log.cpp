@@ -26,16 +26,29 @@ char                  g_ring[RING_LINES][LINE_BYTES];
 std::atomic<uint64_t> g_count{ 0 };
 
 std::mutex  g_mutex;
-// This run's file. Opened for each line, not kept open: the console's SD
+// This run's file. Opened for each write, not kept open: the console's SD
 // card refuses to read or delete a file open for writing (a report sent
 // online with it, Developer tools › Delete the log files).
 char        g_path[640];
-size_t      g_bytes = 0;          // written to it
+size_t      g_bytes = 0;          // written to it, or waiting in g_pending
 bool        g_full = false;       // past MAX_BYTES: nothing more is written
 std::atomic<bool> g_ended{ false };
 std::string g_name;
 std::chrono::steady_clock::time_point g_started;
 bool        g_has_start = false;
+
+// The lines not written yet, under g_mutex. end_crash() writes them without
+// the lock (a crash on the thread that holds it): the length is stored once
+// the bytes are in.
+char                  g_pending[PENDING_BYTES];
+std::atomic<size_t>   g_pending_len{ 0 };
+std::atomic<long long> g_pending_since{ 0 };   // steady ms of the first of them
+
+long long steady_ms()
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch())
+        .count();
+}
 
 bool write_all(int fd, const char* data, size_t size)
 {
@@ -58,17 +71,47 @@ bool append(const char* path, const char* data, size_t size) noexcept
     return ::close(fd) == 0 && ok;
 }
 
-// Into the file, under g_mutex.
+// What waits, into the file at once, under g_mutex. Lines the SD card
+// refused are lost, as they were one by one.
+void write_pending()
+{
+    const size_t n = g_pending_len.load(std::memory_order_acquire);
+    if (n == 0) return;
+    if (!append(g_path, g_pending, n)) g_bytes -= n;
+    g_pending_len.store(0, std::memory_order_release);
+}
+
+// Into the file, under g_mutex: with the lines that wait, written together
+// (write_pending()).
 void to_file(const std::string& text)
 {
     if (!g_path[0] || g_full || g_ended) return;
     if (g_bytes + text.size() > MAX_BYTES) {
+        write_pending();
         const char note[] = "(this file stops here: over 1 MiB; the next lines were not written)\n";
         append(g_path, note, sizeof(note) - 1);
         g_full = true;
         return;
     }
-    if (append(g_path, text.data(), text.size())) g_bytes += text.size();
+    g_bytes += text.size();
+    size_t n = g_pending_len.load(std::memory_order_relaxed);
+    if (n + text.size() > PENDING_BYTES) {
+        write_pending();
+        n = 0;
+    }
+    if (text.size() > PENDING_BYTES) {   // a message longer than the buffer: on its own
+        if (!append(g_path, text.data(), text.size())) g_bytes -= text.size();
+        return;
+    }
+    if (n == 0) g_pending_since.store(steady_ms(), std::memory_order_relaxed);
+    std::memcpy(g_pending + n, text.data(), text.size());
+    g_pending_len.store(n + text.size(), std::memory_order_release);
+}
+
+bool due_now()
+{
+    return g_pending_len.load(std::memory_order_acquire) > 0 &&
+           steady_ms() - g_pending_since.load(std::memory_order_relaxed) >= FLUSH_MS;
 }
 
 // Into memory, under g_mutex: one line, cut to LINE_BYTES (on a whole UTF-8
@@ -142,6 +185,7 @@ std::string start(const std::string& dir, std::time_t now, const std::string& he
     const uint64_t first = count > RING_LINES ? count - RING_LINES : 0;
     if (first > 0) to_file("(" + std::to_string(first) + " earlier line(s) not kept)\n");
     for (uint64_t i = first; i < count; i++) to_file(g_ring[i % RING_LINES]);
+    write_pending();
     return g_name;
 }
 
@@ -151,12 +195,30 @@ void add(std::time_t t, int ms, char level, const std::string& text)
     std::lock_guard<std::mutex> lock(g_mutex);
     to_ring(line);
     to_file(line);
+    // A warning or an error may come just before a crash: on the card now.
+    if (g_path[0] && !g_ended && (level == 'E' || level == 'W' || due_now())) write_pending();
+}
+
+bool due()
+{
+    return due_now();
+}
+
+void flush()
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    if (g_path[0] && !g_ended) write_pending();
 }
 
 void end(const std::string& reason)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
-    if (g_ended.exchange(true) || !g_path[0]) return;
+    if (g_ended || !g_path[0]) {
+        g_ended = true;
+        return;
+    }
+    write_pending();   // before the end line: nothing logged is lost
+    if (g_ended.exchange(true)) return;
     const std::string line = std::string(END) + reason + " ===\n";
     append(g_path, line.data(), line.size());
 }
@@ -164,6 +226,9 @@ void end(const std::string& reason)
 void end_crash(const char* crash_name) noexcept
 {
     if (g_ended.exchange(true) || !g_path[0]) return;
+    // The lines still waiting, then the end line (no lock: see g_pending).
+    const size_t waiting = g_pending_len.exchange(0, std::memory_order_acq_rel);
+    if (waiting > 0) append(g_path, g_pending, std::min(waiting, sizeof(g_pending)));
     char line[160];
     const int n = std::snprintf(line, sizeof(line), "%scrash, see logs/crashes/%s ===\n", END,
                                 crash_name && *crash_name ? crash_name : "(no crash file)");
@@ -248,14 +313,28 @@ std::string last_lines(const std::string& text, size_t n)
     return text.substr(from);
 }
 
+bool tail_of(const std::string& path, std::string* out)
+{
+    std::string text;
+    if (!paths::read_ends(path, 0, TAIL_BYTES + 1, text)) return false;
+    // Cut: from its first whole line.
+    if (text.size() > TAIL_BYTES) {
+        const size_t nl = text.find('\n');
+        text.erase(0, nl == std::string::npos ? text.size() : nl + 1);
+    }
+    *out = std::move(text);
+    return true;
+}
+
 bool unfinished(const std::string& dir, const std::string& current, Unfinished* out)
 {
     for (const std::string& name : log_files::list(dir, log_files::SESSION)) {
         if (name == current) continue;
         // The newest other one only: an older one without an end line was
-        // reported at the start after it.
+        // reported at the start after it. Its end only (a file can reach
+        // 1 MiB): the end line, and the last lines for the crash file.
         std::string text;
-        if (!paths::read_file(dir + "/" + name, text) || finished(text)) return false;
+        if (!tail_of(dir + "/" + name, &text) || finished(text)) return false;
         if (out) *out = { name, text };
         return true;
     }
@@ -272,6 +351,7 @@ void reset()
     g_name.clear();
     g_has_start = false;
     g_count = 0;
+    g_pending_len = 0;
 }
 
 }   // namespace session_log

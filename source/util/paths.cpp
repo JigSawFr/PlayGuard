@@ -138,15 +138,48 @@ static bool read_whole(const std::string& path, std::string& out)
     return true;
 }
 
-bool read_file(const std::string& path, std::string& out)
+// The first `head` bytes, then the last `tail` (all of it when the file is
+// no longer): the bytes in between are skipped, not read.
+static bool read_ends_of(const std::string& path, size_t head, size_t tail, std::string& out)
 {
-    if (read_whole(path, out)) return true;
-    // atomic_write stopped between removing the old file and renaming the
-    // new one (crash, power loss, rename error): the ".tmp" is the complete
-    // new content. It is only used when the file itself is missing.
+    FILE* f = std::fopen(path.c_str(), "rb");
+    if (!f) return false;
+    out.clear();
+    const auto take = [f, &out](size_t count) {
+        const size_t at = out.size();
+        out.resize(at + count);
+        out.resize(at + std::fread(&out[at], 1, count, f));
+        return !std::ferror(f);
+    };
+    bool ok = std::fseek(f, 0, SEEK_END) == 0;
+    const long size = ok ? std::ftell(f) : -1;
+    ok = size >= 0 && std::fseek(f, 0, SEEK_SET) == 0;
+    if (ok && (size_t)size <= head + tail) ok = take((size_t)size);
+    else if (ok) ok = take(head) && std::fseek(f, size - (long)tail, SEEK_SET) == 0 && take(tail);
+    std::fclose(f);
+    return ok;
+}
+
+// `read` on `path`, else on its ".tmp": atomic_write stopped between removing
+// the old file and renaming the new one (crash, power loss, rename error),
+// and the ".tmp" is the complete new content. It is only used when the file
+// itself is missing.
+template <typename Read> static bool read_or_tmp(const std::string& path, Read read)
+{
+    if (read(path)) return true;
     struct stat st;
     if (stat(path.c_str(), &st) == 0) return false;
-    return read_whole(path + ".tmp", out);
+    return read(path + ".tmp");
+}
+
+bool read_file(const std::string& path, std::string& out)
+{
+    return read_or_tmp(path, [&out](const std::string& p) { return read_whole(p, out); });
+}
+
+bool read_ends(const std::string& path, size_t head, size_t tail, std::string& out)
+{
+    return read_or_tmp(path, [&](const std::string& p) { return read_ends_of(p, head, tail, out); });
 }
 
 bool file_exists(const std::string& path)

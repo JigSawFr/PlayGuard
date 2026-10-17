@@ -87,10 +87,13 @@ bool finish_background(std::chrono::milliseconds max)
     return done;
 }
 
-static uint64_t push_write(const char* what, std::function<void()> job, const std::string& key)
+using Write = write_queue_logic::Queue::Write;
+
+static uint64_t push_write(const char* what, std::function<void()> job, const std::string& key,
+                           Write write = Write::Whole, bool first = false)
 {
     bool start = false;
-    const uint64_t ticket = s_writes.push(key, std::move(job), &start);
+    const uint64_t ticket = s_writes.push(key, std::move(job), &start, write, first);
     if (start) in_background(what, []() { s_writes.run(); });
     return ticket;
 }
@@ -100,9 +103,19 @@ void write_later(const char* what, std::function<void()> job, const std::string&
     push_write(what, std::move(job), key);
 }
 
+void append_later(const char* what, const std::string& key, std::function<void()> job)
+{
+    push_write(what, std::move(job), key, Write::Append);
+}
+
 void settle_writes()
 {
     s_writes.settle();
+}
+
+void settle_writes(const std::string& key)
+{
+    s_writes.settle(key);
 }
 
 void notify(const std::string& text)
@@ -135,13 +148,16 @@ static bool queue_config(const std::string& saved_text, const std::string& faile
         notify(failed);
         return false;
     }
+    // Ahead of the writes still waiting (an export, the history): what the
+    // parent just set is what a crash must not lose, and save_config_now()
+    // waits for it.
     *ticket = push_write("config", [text, saved_text, failed]() {
         const bool saved = config::write(text);
         s_config_saved = saved;
         brls::sync([saved]() { notices::note_write("config", saved); });
         if (!saved) notify(failed);
         else if (!saved_text.empty()) notify(saved_text);
-    }, "config");
+    }, "config", Write::Whole, true);
     return true;
 }
 

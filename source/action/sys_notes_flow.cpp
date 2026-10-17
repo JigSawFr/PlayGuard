@@ -35,13 +35,15 @@ void read_cache()
     if (paths::read_file(cache_file(), text) && !sys_notes::decode(text, &s_cache)) s_cache = {};
 }
 
+// Off the UI thread (ui::write_later), as they are now.
 void save()
 {
-    std::string err;
-    // Only saves a fetch on the next opening: a write that fails is just logged.
-    if (!paths::ensure_dir(paths::data_dir() + "/cache") ||
-        !paths::atomic_write(cache_file(), sys_notes::encode(s_cache), &err))
-        brls::Logger::warning("release notes: cannot keep them ({})", err);
+    ui::write_later("release notes", [text = sys_notes::encode(s_cache)]() {
+        std::string err;
+        // Only saves a fetch on the next opening: a write that fails is just logged.
+        if (!paths::ensure_dir(paths::data_dir() + "/cache") || !paths::atomic_write(cache_file(), text, &err))
+            brls::Logger::warning("release notes: cannot keep them ({})", err);
+    }, "sys_notes");
 }
 
 int index(Which which) { return (int)which; }

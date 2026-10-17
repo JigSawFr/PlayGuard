@@ -1,6 +1,7 @@
 // Host tests for source/util/session_log.cpp and source/util/crash_report.cpp:
 // a run's log file (its header, the lines logged before it, one line per
-// message, the end line, its size limit), the lines kept in memory for the
+// message written in batches, at once for a warning, before the end line and
+// a crash's, the end line, its size limit), the lines kept in memory for the
 // crash files (cut, oldest first, as many as fit), a run that never ended
 // found at the next start, and the crash files (their first line, the
 // system and session lines, the details, the last lines logged, a free name
@@ -91,6 +92,57 @@ static void test_session()
     sl::reset();
 }
 
+static void test_batches()
+{
+    sl::reset();
+    const std::string dir = paths::logs_dir() + "/batches";
+    const std::string name = sl::start(dir, NOW, "h\n\n");
+    REQUIRE(!name.empty());
+    const std::string path = dir + "/" + name;
+    // An info line waits in memory, the file closed meanwhile ...
+    sl::add(NOW, 1, 'I', "one");
+    sl::add(NOW, 2, 'D', "two");
+    CHECK(read(path) == "h\n\n");
+    CHECK(!sl::due());
+    CHECK(sl::recent().find("two") != std::string::npos);
+    // ... and goes with the next lines once FLUSH_MS have passed.
+    usleep((useconds_t)(sl::FLUSH_MS + 50) * 1000);
+    CHECK(sl::due());
+    sl::add(NOW, 3, 'I', "three");
+    CHECK(read(path) == "h\n\n12:00:00.001 I one\n12:00:00.002 D two\n12:00:00.003 I three\n");
+    CHECK(!sl::due());
+    // flush() writes what waits; a warning or an error goes at once.
+    sl::add(NOW, 4, 'I', "four");
+    sl::flush();
+    CHECK(read(path).find("I four\n") != std::string::npos);
+    sl::flush();   // nothing waits: nothing written twice
+    CHECK(count(read(path), "I four\n") == 1);
+    sl::add(NOW, 5, 'I', "five");
+    sl::add(NOW, 6, 'E', "six");
+    CHECK(read(path).find("I five\n12:00:00.006 E six\n") != std::string::npos);
+    // More than the buffer holds: written as it fills, nothing lost.
+    const std::string line(1000, 'y');
+    for (int i = 0; i < 40; i++) sl::add(NOW, 0, 'I', line);
+    CHECK(count(read(path), line) >= 32);
+    sl::add(NOW, 7, 'I', std::string(sl::PENDING_BYTES + 10, 'z'));   // longer than the buffer
+    sl::add(NOW, 8, 'I', "last words");
+    // The end line after the lines still waiting.
+    sl::end("clean exit");
+    std::string text = read(path);
+    CHECK(count(text, line) == 40 && count(text, std::string(sl::PENDING_BYTES + 10, 'z')) == 1);
+    CHECK(text.find("I last words\n=== end: clean exit ===\n") != std::string::npos);
+    sl::reset();
+
+    // A crash: the lines still waiting, then its end line.
+    const std::string crashed = sl::start(dir, NOW + 60, "h\n\n");
+    REQUIRE(!crashed.empty());
+    sl::add(NOW, 9, 'I', "just before");
+    sl::end_crash("crash_20261015_120100.txt");
+    text = read(dir + "/" + crashed);
+    CHECK(text == "h\n\n12:00:00.009 I just before\n=== end: crash, see logs/crashes/crash_20261015_120100.txt ===\n");
+    sl::reset();
+}
+
 static void test_memory()
 {
     sl::reset();
@@ -155,6 +207,16 @@ static void test_unfinished()
     // This run's own file does not count.
     const std::string name = sl::start(dir, NOW, "h\n\n");
     CHECK(sl::unfinished(dir, name, &u) && u.name == "session_20261015_090000.txt");
+    // A long one: only its end is read, from a whole line.
+    std::string longer = "h\n\n";
+    for (int i = 0; i < 2000; i++) longer += "09:00:00.000 I line " + std::to_string(i) + "\n";
+    write(dir + "/session_20261015_090000.txt", longer + "09:00:01.000 E last words\n");
+    CHECK(sl::unfinished(dir, name, &u));
+    CHECK(u.text.size() <= sl::TAIL_BYTES && u.text.compare(0, 13, "09:00:00.000 ") == 0);
+    CHECK(sl::last_lines(u.text, 2) == "09:00:00.000 I line 1999\n09:00:01.000 E last words\n");
+    write(dir + "/session_20261015_090000.txt", longer + "=== end: clean exit ===\n");
+    CHECK(!sl::unfinished(dir, name, &u));
+    write(dir + "/session_20261015_090000.txt", "h\n\n09:00:00.000 I start\n09:00:01.000 E last words\n");
     // Ended by a crash: not unfinished.
     write(dir + "/session_20261015_090000.txt", "h\n\n=== end: crash, see logs/crashes/crash_20261015_090001.txt ===\n");
     CHECK(!sl::unfinished(dir, name, &u));
@@ -235,6 +297,7 @@ int main()
 
     test_format();
     test_session();
+    test_batches();
     test_memory();
     test_size_limit();
     test_unfinished();

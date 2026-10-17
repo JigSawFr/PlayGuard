@@ -64,7 +64,7 @@ void HistoryTab::refresh()
     backup_keep->setDetailText(keep_text(cfg.backup_keep));
     const size_t backups = backup_flow::count();
     backup_restore->setDetailText(backups ? brls::getStr("playguard/tools/backup_count", (int)backups) : "");
-    const size_t changes = history_flow::load().size();
+    const size_t changes = history_flow::count();
     history->setDetailText(ui::opens(changes ? brls::getStr("playguard/history/count", (int)changes) : ""));
     // Read-only: restoring would write; it stays in sight, greyed.
     ui::show_writable(backup_restore, !app::read_only());

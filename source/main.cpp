@@ -374,8 +374,11 @@ int main(int argc, char* argv[])
     // or icon read running there stops now, not after every game is read.
     brls::Application::getExitEvent()->subscribe([]() { playstats_cancel(); });
 
-    while (brls::Application::mainLoop())
-        ;
+    while (brls::Application::mainLoop()) {
+        // The lines the session file waits for, written off the UI thread
+        // once they waited long enough (util/session_log.hpp).
+        if (session_log::due()) ui::write_later("session log", []() { session_log::flush(); }, "session_log");
+    }
 
     // "Lock and quit": locked now that the screen is gone (pt_flow.hpp).
     pt_flow::lock_at_exit_if_asked();

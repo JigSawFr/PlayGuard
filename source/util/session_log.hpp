@@ -12,6 +12,14 @@
 // software closed from the HOME menu while it hung): the next start says so
 // in a crash file (main.cpp, unfinished()).
 //
+// The lines are written to the file together, not one by one (each write
+// opens and closes it, under borealis' log lock): they wait in memory, up to
+// PENDING_BYTES, and go FLUSH_MS after the first of them (at the next line,
+// or flush() from the app's main loop: due()), at once for a warning or an
+// error, and before the end line, a crash's too (end_crash() writes them
+// with no lock). Only a run that stops without either (the console turned
+// off) loses the last lines that waited, a few info lines at most.
+//
 // The last RING_LINES lines also stay in memory, for the crash files and
 // the diagnostic report: that part allocates nothing and takes no lock
 // (recent()), as the CPU exception handler reads it.
@@ -36,6 +44,13 @@ constexpr size_t MAX_BYTES = 1024 * 1024;
 constexpr size_t RING_LINES = 80;
 constexpr size_t LINE_BYTES = 240;
 
+// The lines waiting to be written, at most, and for how long.
+constexpr size_t PENDING_BYTES = 16 * 1024;
+constexpr long long FLUSH_MS = 500;
+
+// What unfinished() and tail_of() read of a file: its end.
+constexpr size_t TAIL_BYTES = 16 * 1024;
+
 // What a finished file's last line starts with.
 constexpr const char* END = "=== end: ";
 
@@ -50,15 +65,22 @@ std::string format(std::time_t t, int ms, char level, const std::string& text);
 // still kept in memory).
 std::string start(const std::string& dir, std::time_t now, const std::string& header);
 
-// Logs one line: in memory, and in the file when one is open.
+// Logs one line: in memory, and in the file when one is open (at once for
+// `level` E or W, else with the next ones).
 void add(std::time_t t, int ms, char level, const std::string& text);
 
-// "=== end: <reason> ===", once, then the file is closed. Nothing after it
-// is written to the file.
+// Whether lines have waited FLUSH_MS (no lock: for a main loop), and the
+// waiting lines written now (before reading this run's file, for one).
+bool due();
+void flush();
+
+// The lines still waiting, then "=== end: <reason> ===", once. Nothing
+// after it is written to the file.
 void end(const std::string& reason);
 
-// The same from the crash handlers: "=== end: crash, see logs/crashes/<name> ===",
-// with no allocation and no lock.
+// The same from the crash handlers: the lines still waiting, then
+// "=== end: crash, see logs/crashes/<name> ===", with no allocation and no
+// lock.
 void end_crash(const char* crash_name) noexcept;
 
 // The lines kept in memory, oldest first, each ending in "\n", as many of
@@ -83,8 +105,13 @@ std::string end_reason(const std::string& text);
 // The last `n` lines of `text`.
 std::string last_lines(const std::string& text, size_t n);
 
+// The last TAIL_BYTES of the file at `path`, from a whole line (false when
+// it cannot be read): enough for its end line and its last lines.
+bool tail_of(const std::string& path, std::string* out);
+
 // The newest session file of `dir` other than `current`, when it has no end
-// line: its name and text. False when there is none, or when it ended.
+// line: its name and the end of its text (tail_of()). False when there is
+// none, or when it ended.
 struct Unfinished
 {
     std::string name;

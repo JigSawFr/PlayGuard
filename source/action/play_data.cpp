@@ -3,7 +3,10 @@
 
 #include <borealis.hpp>
 #include <fmt/format.h>
+#include <functional>
 #include <map>
+#include <memory>
+#include <mutex>
 #include <set>
 #include <vector>
 
@@ -24,6 +27,21 @@ struct Entry
 std::map<Key, Entry> s_entries;
 std::map<int, std::function<void()>> s_listeners;
 int s_next_id = 1;
+
+// What each cache file holds, as a hash of its encoding without the time of
+// the read (which changes at every read): a read that found the same is not
+// written again. Read by save(), off the UI thread.
+std::mutex s_saved_lock;
+std::map<Key, size_t> s_saved;
+
+size_t content_hash(const PlayStats& stats)
+{
+    // `now` only moves the day windows at the next start (shift_days): an
+    // older one of the same day, with the same windows, shifts them the same.
+    auto copy = std::make_unique<PlayStats>(stats);
+    copy->now = 0;
+    return std::hash<std::string>()(play_cache::encode(*copy));
+}
 
 std::string cache_file(const Key& key)
 {
@@ -50,6 +68,10 @@ Entry& entry(const Key& key)
     if (!paths::read_file(cache_file(key), bytes)) return e;
     auto data = std::make_shared<PlayStats>();
     if (!play_cache::decode(bytes, *data)) return e;
+    {
+        std::lock_guard<std::mutex> lock(s_saved_lock);
+        s_saved[key] = content_hash(*data);
+    }
     u64 now = 0;
     time_local_now(&now, nullptr);
     if (now) play_cache::shift_days(*data, days_between(data->now, now));
@@ -61,10 +83,22 @@ Entry& entry(const Key& key)
 void save(const Key& key, const PlayStats& stats)
 {
     if (R_FAILED(stats.rc)) return;   // nothing worth keeping
+    // Read every 5 min: most reads find what the file already holds (unless
+    // Clear the cache removed it since).
+    const size_t hash = content_hash(stats);
+    {
+        std::lock_guard<std::mutex> lock(s_saved_lock);
+        const auto it = s_saved.find(key);
+        if (it != s_saved.end() && it->second == hash && paths::exists_or_pending(cache_file(key))) return;
+    }
     std::string error;
     if (!paths::ensure_dir(paths::nand_dir() + "/cache") ||
-        !paths::atomic_write(cache_file(key), play_cache::encode(stats), &error))
+        !paths::atomic_write(cache_file(key), play_cache::encode(stats), &error)) {
         brls::Logger::warning("play_data: cache not saved: {}", error);
+        return;
+    }
+    std::lock_guard<std::mutex> lock(s_saved_lock);
+    s_saved[key] = hash;
 }
 }   // namespace
 
