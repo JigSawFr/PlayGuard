@@ -444,8 +444,7 @@ void ActivityTab::show_summary(const std::shared_ptr<const PlayStats>& data)
                                                : activity_summary::Summary();
     const int p = this->period;
     if (sum.known && sum.days > 0) {
-        const std::string avg = ui::fmt_play_time(sum.per_day_s);
-        per_day->setDetailText(p == AllTime ? brls::getStr("playguard/activity/summary/per_day_over", avg, sum.days) : avg);
+        per_day->setDetailText(p == AllTime ? ui::fmt_per_day_over(sum.per_day_s, sum.days) : ui::fmt_play_time(sum.per_day_s));
     }
     if (sum.known && sum.top >= 0)
         top->setDetailText(game_name(data->games[sum.top]) + " · " + ui::fmt_play_time(sum.top_s));

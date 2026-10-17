@@ -438,6 +438,8 @@
         "summary": {
             "per_day": "В среднем за день",
             "per_day_over": "{} за {} дн.",
+            "per_day_over_months": "{} за {} мес.",
+            "per_day_over_years": "{} за {} г.",
             "top": "Больше всего",
             "days_played": "Дней с игрой",
             "days_played_value": "{} из 7",

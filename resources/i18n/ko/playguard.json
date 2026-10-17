@@ -438,6 +438,8 @@
         "summary": {
             "per_day": "하루 평균",
             "per_day_over": "{} ({}일 기준)",
+            "per_day_over_months": "{} ({}개월 기준)",
+            "per_day_over_years": "{} ({}년 기준)",
             "top": "가장 많이 한 게임",
             "days_played": "플레이한 날",
             "days_played_value": "7일 중 {}일",

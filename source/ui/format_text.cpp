@@ -62,8 +62,18 @@ std::string fmt_play_time(uint64_t seconds)
     if (seconds > 0 && seconds < 60) return "playguard/activity/less_than_minute"_i18n;
     const uint64_t m = (seconds + 30) / 60;
     if (m < 60) return brls::getStr("playguard/common/minutes", (int)m);
-    if (m % 60 == 0) return brls::getStr("playguard/common/hours", (unsigned long long)(m / 60));
+    // From 100 h, the minutes are noise: whole hours, rounded.
+    if (m % 60 == 0 || m >= 100 * 60) return brls::getStr("playguard/common/hours", (unsigned long long)((m + 30) / 60));
     return brls::getStr("playguard/common/hours_minutes", (unsigned long long)(m / 60), fmt::format("{:02d}", (int)(m % 60)));
+}
+
+std::string fmt_per_day_over(uint64_t per_day_s, int days)
+{
+    const std::string avg = fmt_play_time(per_day_s);
+    if (days < 60) return brls::getStr("playguard/activity/summary/per_day_over", avg, days);
+    // Rounded to the nearest month (30.44 days) or year (365.25 days).
+    if (days < 730) return brls::getStr("playguard/activity/summary/per_day_over_months", avg, (days * 100 + 1522) / 3044);
+    return brls::getStr("playguard/activity/summary/per_day_over_years", avg, (days * 100 + 18262) / 36525);
 }
 
 std::string day_name(int day)

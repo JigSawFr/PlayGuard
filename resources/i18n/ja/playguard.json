@@ -438,6 +438,8 @@
         "summary": {
             "per_day": "1日の平均",
             "per_day_over": "{}（{}日間）",
+            "per_day_over_months": "{}（{}か月間）",
+            "per_day_over_years": "{}（{}年間）",
             "top": "いちばん遊んだソフト",
             "days_played": "遊んだ日数",
             "days_played_value": "7日中{}日",

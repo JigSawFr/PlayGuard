@@ -3,8 +3,9 @@
 // test` runs in) through ui/tr.hpp's stand-in for borealis: limits ("No
 // limit", "0 min (no play)", "45 min", "2 h", "2 h 05"), the week's limits in
 // a few words, time played and left (rounded to the minute, at most a day),
-// play time over any length ("< 1 min", "152 h 30"), the day names (in a
-// title and inside a sentence, French for the difference), the restriction
+// play time over any length ("< 1 min", "52 h 30", "278 h"), a daily
+// average over days, months or years, the day names (in a title and inside
+// a sentence, French for the difference), the restriction
 // levels and ages, yes / no, "Unavailable", and the chevron of a line that
 // opens a screen. Every key the helpers ask for exists in the catalog.
 #include "check.h"
@@ -91,8 +92,20 @@ static void test_minutes()
     CHECK(ui::fmt_play_time(1) == "< 1 min" && ui::fmt_play_time(59) == "< 1 min");
     CHECK(ui::fmt_play_time(60) == "1 min" && ui::fmt_play_time(89) == "1 min" && ui::fmt_play_time(90) == "2 min");
     CHECK(ui::fmt_play_time(3600) == "1 h" && ui::fmt_play_time(3600 + 5 * 60) == "1 h 05");
-    CHECK(ui::fmt_play_time(152 * 3600 + 30 * 60) == "152 h 30");
+    CHECK(ui::fmt_play_time(99 * 3600 + 59 * 60) == "99 h 59");
+    // From 100 h, whole hours, rounded.
+    CHECK(ui::fmt_play_time(152 * 3600 + 29 * 60) == "152 h" && ui::fmt_play_time(152 * 3600 + 30 * 60) == "153 h");
+    CHECK(ui::fmt_play_time(277 * 3600 + 58 * 60) == "278 h");
     CHECK(ui::fmt_play_time(100000ULL * 3600) == "100000 h");
+
+    // A daily average over its days: days under two months, then months, then years.
+    CHECK(ui::fmt_per_day_over(53 * 60, 45) == "53 min over 45 days");
+    CHECK(ui::fmt_per_day_over(53 * 60, 59) == "53 min over 59 days");
+    CHECK(ui::fmt_per_day_over(53 * 60, 60) == "53 min over 2 months");
+    CHECK(ui::fmt_per_day_over(53 * 60, 548) == "53 min over 18 months");
+    CHECK(ui::fmt_per_day_over(53 * 60, 729) == "53 min over 24 months");
+    CHECK(ui::fmt_per_day_over(53 * 60, 730) == "53 min over 2 years");
+    CHECK(ui::fmt_per_day_over(53 * 60, 2199) == "53 min over 6 years");
 }
 
 static void test_days_summary()
@@ -139,6 +152,7 @@ static void test_french()
     CHECK(ui::day_name(1) == s_catalog["playguard/days/1"]);
     CHECK(ui::day_name_in_text(1) == "lundi");
     CHECK(ui::fmt_minutes(125) == "2 h 05");
+    CHECK(ui::fmt_per_day_over(53 * 60, 2199) == "53 min sur 6 ans");
     CHECK(ui::fmt_minutes(PT_DAY_NOLIMIT) == s_catalog["playguard/common/no_limit"]);
 }
 
