@@ -27,6 +27,13 @@ AboutTab::AboutTab()
         this->count_version_press();
         return true;
     }, true, false, brls::SOUND_CLICK);
+#ifndef __SWITCH__
+    // The desktop build: the keyboard has no Ⓨ, so the Y key (smoke test).
+    version->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Y), [this](brls::View*) {
+        this->count_version_press();
+        return true;
+    });
+#endif
 
     update_cell->registerClickAction([](brls::View*) {
         update_flow::check_now();
