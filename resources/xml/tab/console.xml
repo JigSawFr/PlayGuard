@@ -32,15 +32,11 @@
             <brls:DetailCell id="cn_fw" title="@i18n/playguard/tools/firmware"/>
             <brls:DetailCell id="cn_ams" title="@i18n/playguard/tools/atmosphere"/>
             <brls:DetailCell id="cn_hekate" title="hekate"/>
-            <brls:Label id="cn_sys_advice" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/warn"/>
             <brls:DetailCell id="cn_compat" title="@i18n/playguard/tools/compat"/>
             <brls:DetailCell id="cn_storage" focusable="false" title="@i18n/playguard/tools/storage"/>
-            <brls:Label id="cn_storage_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/warn"/>
             <brls:DetailCell id="cn_blank" focusable="false" title="@i18n/playguard/tools/blank"/>
             <brls:DetailCell id="cn_serial" title="@i18n/playguard/tools/serial"/>
-            <brls:Label id="cn_serial_note" text="@i18n/playguard/tools/serial_note_emummc" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/warn"/>
             <brls:DetailCell id="cn_patches" title="@i18n/playguard/tools/patches"/>
-            <brls:Label id="cn_patches_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
 
         </brls:Box>
 
