@@ -349,10 +349,10 @@ void register_views()
     // In place of borealis' brls:Hints: the footer's clock on one line.
     FooterHints::install();
 
-    // The version (and, for a development build, its commit) at the right of
-    // every screen's header.
+    // The version (and, for a development build, its commit) next to every
+    // screen's title.
     VersionBadge::install();
-    NoticeBell::install();   // after the badge: the bell goes in its row
+    NoticeBell::install();   // the bell goes in the header's row at the right
     HeaderSetting::install();   // after the bell: the language and theme go left of it
 }
 

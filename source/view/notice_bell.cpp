@@ -6,6 +6,7 @@
 #include "action/notices.hpp"
 #include "activity/notices_activity.hpp"
 #include "ui/ui.hpp"
+#include "view/version_badge.hpp"
 
 static constexpr float SIZE = 40;
 static constexpr const char* BELL_ID = "notice_bell";
@@ -17,7 +18,6 @@ NoticeBell::NoticeBell()
     this->setWidth(SIZE);
     this->setHeight(SIZE);
     this->setAlignSelf(brls::AlignSelf::CENTER);
-    this->setMarginRight(20);
     // A tap opens the list, as Y does (hitTest finds it, focusable or not).
     this->addGestureRecognizer(new brls::TapGestureRecognizer(this, []() { NoticesActivity::open(); }));
     this->listener = notices::listen([this]() { this->update(); });
@@ -88,17 +88,17 @@ void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float heigh
     }
 }
 
-// The main screen (its tab frame) holding `focus`: the bell goes first in
-// the version badge's row, unless it has one.
+// The main screen (its tab frame) holding `focus`: the bell goes in the
+// header's row at the right, unless it has one.
 static void bell_screen_of(brls::View* focus)
 {
     if (!focus) return;
     while (focus->hasParent()) focus = focus->getParent();
     auto* frame = dynamic_cast<brls::AppletFrame*>(focus);
     if (!frame || !frame->getView("main_tabs")) return;
-    auto* badge = dynamic_cast<brls::Box*>(frame->getView("version_badge"));
-    if (!badge || badge->getView(BELL_ID)) return;
-    badge->addView(new NoticeBell(), 0);
+    auto* tools = VersionBadge::header_tools(frame);
+    if (!tools || tools->getView(BELL_ID)) return;
+    tools->addView(new NoticeBell(), 0);
 }
 
 void NoticeBell::install()
