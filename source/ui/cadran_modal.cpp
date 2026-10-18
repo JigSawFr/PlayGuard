@@ -152,11 +152,14 @@ bool table_of(const std::string& paragraph, std::vector<std::pair<std::string, s
     return rows->size() > 1 || (rows->size() == 1 && rows->front().second.size() <= 30);
 }
 
-// A note the app adds to its dialogs, and its icon (nullptr: not one).
+// A note the app adds to its dialogs, and its icon (nullptr: not one): the
+// linked phone app, the help it can give before unlinking, the unlock, a game
+// about to be suspended.
 const char* note_icon(const std::string& paragraph, bool* warn)
 {
     *warn = false;
     if (paragraph == "playguard/pairing/note"_i18n) return "phone";
+    if (paragraph == "playguard/pairing/decode_note"_i18n) return "code";
     if (starts_with(paragraph, "playguard/play_timer/gate/body"_i18n)) return "unlock";
     const std::string suspend = "playguard/play_timer/suspend_warning"_i18n;
     if (starts_with(paragraph, suspend.substr(0, suspend.find("{}")))) {

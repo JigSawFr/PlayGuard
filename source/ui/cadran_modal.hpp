@@ -28,8 +28,8 @@ enum class Emphasis
 // A dialog's text laid out as the boards do (ui::dialog under Cadran),
 // left-aligned: its question as a title, a paragraph of "label: value" lines
 // (playguard/common/line) as a table, the notes the app adds (the linked
-// phone app, the temporary unlock, a game about to be suspended) at the
-// bottom, small, each with its icon; any other paragraph as text. `extra`
+// phone app and its help before unlinking, the temporary unlock, a game about
+// to be suspended) at the bottom, small, each with its icon; any other paragraph as text. `extra`
 // (the week as it will be) goes after the text, before the notes.
 brls::Box* dialog_body(const std::string& text, brls::View* extra = nullptr);
 

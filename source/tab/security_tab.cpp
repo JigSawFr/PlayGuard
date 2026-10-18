@@ -174,7 +174,8 @@ void SecurityTab::refresh()
                           { relock.getView(), unlocked },
                           // Nothing to unlink when the read says not linked.
                           { pr_unlink.getView(), !s.pairing_active_ok || paired },
-                          { pr_decode.getView(), paired } });
+                          // The block comparison needs the app to sync.
+                          { pr_decode.getView(), syncs } });
     for (brls::DetailCell* c : { (brls::DetailCell*)set_pin.getView(), (brls::DetailCell*)show_pin.getView(),
                                  (brls::DetailCell*)unlock.getView(), (brls::DetailCell*)relock.getView(),
                                  (brls::DetailCell*)console_lock_cell.getView(), (brls::DetailCell*)pr_unlink.getView(),
