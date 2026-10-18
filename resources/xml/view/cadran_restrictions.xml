@@ -11,7 +11,7 @@
     alignItems="stretch"
     marginBottom="8">
 
-    <brls:Label id="crs_kicker" text="" fontSize="14" textColor="@theme/cadran/text3" marginBottom="10"/>
+    <brls:Label id="crs_kicker" text="" fontSize="15" textColor="@theme/cadran/text3" marginBottom="10"/>
     <brls:Box id="crs_tiles" axis="row" alignItems="stretch"/>
 
 </brls:Box>

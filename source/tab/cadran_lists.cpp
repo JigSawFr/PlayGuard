@@ -29,7 +29,7 @@ brls::Box* kicker(const char* icon, const std::string& title)
     auto* head = new brls::Box(brls::Axis::ROW);
     head->setAlignItems(brls::AlignItems::CENTER);
     head->addView(kit::icon(icon, 18, "cadran/text3"));
-    brls::Label* text = kit::label(cadran::upper(title), 14, "cadran/text3");
+    brls::Label* text = kit::label(cadran::upper(title), 15, "cadran/text3");
     text->setSingleLine(true);
     text->setMarginLeft(8);
     head->addView(text);

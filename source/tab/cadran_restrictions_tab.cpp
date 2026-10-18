@@ -48,7 +48,7 @@ CadranRestrictionsTab::Tile CadranRestrictionsTab::make_tile(uint32_t level, boo
         title->setSingleLine(true);
         title->setMarginRight(14);
         t.box->addView(title);
-        t.note = kit::label("playguard/cadran/restrictions/none"_i18n, 14, "cadran/text3");
+        t.note = kit::label("playguard/cadran/restrictions/none"_i18n, 15, "cadran/text3");
         t.note->setGrow(1.0f);
         t.note->setWidth(0);
         t.box->addView(t.note);
@@ -78,7 +78,7 @@ CadranRestrictionsTab::Tile CadranRestrictionsTab::make_tile(uint32_t level, boo
         t.age->setMarginTop(10);
         t.age->setFitWidth(200);
         t.box->addView(t.age);
-        t.note = kit::label("", 14, "cadran/text3");
+        t.note = kit::label("", 15, "cadran/text3");
         t.note->setMarginTop(4);
         t.box->addView(t.note);
 
@@ -105,7 +105,7 @@ CadranRestrictionsTab::Tile CadranRestrictionsTab::make_tile(uint32_t level, boo
             r->addView(dot);
             // On two lines when a language needs them (the tiles of the row
             // grow together).
-            text = kit::label("", 13.5f, "cadran/text2");
+            text = kit::label("", 15, "cadran/text2");
             text->setGrow(1.0f);
             text->setWidth(0);
             r->addView(text);

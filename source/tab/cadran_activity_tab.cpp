@@ -85,15 +85,19 @@ CadranActivityTab::CadranActivityTab()
         c.name = kit::label("", 19);
         c.name->setSingleLine(true);
         text->addView(c.name);
+        // On two lines when a language needs them.
         auto* line = new brls::Box(brls::Axis::ROW);
-        line->setAlignItems(brls::AlignItems::CENTER);
+        line->setAlignItems(brls::AlignItems::FLEX_START);
         line->setMarginTop(4);
         c.today = new CadranDigits();
-        c.today->setFontSize(14);
+        c.today->setFontSize(15);
+        c.today->setMarginTop(1);
         c.today->setMarginRight(6);
+        c.today->setShrink(0);
         line->addView(c.today);
-        c.rest = kit::label("", 14, "cadran/text2");
-        c.rest->setSingleLine(true);
+        c.rest = kit::label("", 15, "cadran/text2");
+        c.rest->setGrow(1.0f);
+        c.rest->setWidth(0);
         line->addView(c.rest);
         text->addView(line);
         c.box->addView(text);

@@ -298,7 +298,7 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         cell->title->setGrow(0);
         cell->title->setMarginRight(0);
         cell->title->setSingleLine(status);
-        cell->title->setFontSize(status ? 14.5f : 17.0f);
+        cell->title->setFontSize(status ? 15.0f : 17.0f);
         if (status) cell->title->setTextColor(theme["cadran/text3"]);
         cell->detail->setHorizontalAlign(brls::HorizontalAlign::LEFT);
         cell->detail->setMaxWidth(10000);
@@ -369,7 +369,7 @@ void cadran::List::section(brls::Header* header)
     if (!header->getChildren().empty()) header->getChildren()[0]->setVisibility(brls::Visibility::GONE);   // the bar
     for (const char* part : { "brls/header/title", "brls/header/subtitle" }) {
         if (auto* text = dynamic_cast<brls::Label*>(header->getView(part))) {
-            text->setFontSize(14);
+            text->setFontSize(15);
             text->setTextColor(theme["cadran/text3"]);
         }
     }
