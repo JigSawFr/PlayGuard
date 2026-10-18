@@ -1117,6 +1117,7 @@ if CADRAN:
     key("Down")                # Stop for today
     key("Right")               # Show the child
     key("Return")
+    time.sleep(1)              # the screen's own entrance over
     shot("11_child")
     key("Return")              # A: back to the parent, the PIN first
     time.sleep(1)
@@ -1170,7 +1171,8 @@ if CADRAN:
     key("Up", steps("console", "preferences"))
     key("Right")               # Network clock, the first line
     key("Return")
-    shot("18_clock")
+    time.sleep(1)              # the screen's own entrance over
+    shot("18_clock")           # not a reference: the focus ring's shading varies from run to run there
     key("Escape")
 
     # Activity: a game's own screen from its card.
@@ -1179,6 +1181,7 @@ if CADRAN:
     key("Right")               # Every account, the first chip
     key("Down")                # the first game's card
     key("Return")
+    time.sleep(1)              # the screen's own entrance over
     shot("19_game")
     key("Escape")
     finish()
