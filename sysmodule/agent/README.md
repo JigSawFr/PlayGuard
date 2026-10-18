@@ -35,8 +35,10 @@ started again (`source/action/agent_update.cpp`, the steps host-tested in
 - Carries out orders **only under the *auto* policy**, through the same gate,
   unlock and relock as PlayGuard (`source/sync/sync_exec.c`). Under *ask*,
   orders wait on the broker until PlayGuard opens and asks on the console.
-- Puts the usual limit back the day after extra time or "no more play today",
-  as PlayGuard does when it opens.
+- Puts the usual limit back by itself the day after extra time, as PlayGuard
+  does (not while the lower limit would stop the game in progress, on the
+  same weekday a week later). The day after "no more play today", or when
+  the usual limit was "no limit", it leaves the question to PlayGuard.
 - Changes nothing when PlayGuard was in read-only mode, or when the firmware
   is not the one PlayGuard last ran on (a system update PlayGuard has not
   checked): `nro_state.txt`.

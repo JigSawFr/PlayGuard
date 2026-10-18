@@ -246,8 +246,9 @@ into long-term statistics.
   while the PIN applet process exists, back off for a minute when
   `pctlInitialize` fails; otherwise one snapshot (every pctl call opens and
   closes its own session, as in the app), today's play-log fold, publish,
-  handle inbound orders, and at midnight publish yesterday and restore the
-  extra time if its record still matches.
+  handle inbound orders, and at midnight publish yesterday and put back the
+  limit extra time raised, if its record still matches (as PlayGuard does:
+  "no more play today" and a "no limit" base wait for PlayGuard's question).
 - Two threads: the MQTT loop in 500 ms slices, and the IPC server blocked on
   `svcReplyAndReceive`, joined by a mailbox under a mutex.
 - Sleep: the last will marks the console offline within 45 s; the socket error

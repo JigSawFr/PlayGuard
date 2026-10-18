@@ -250,7 +250,7 @@ the usual confirmation on the console).
 | `console_lock` | `ON` / `OFF` | | yes | 0 minutes every day (`ON`), saving the limits; `OFF` puts them back (or removes the limit when none were saved). |
 | `add_bonus_time` | integer | 5–180 | yes | Extra minutes today, 24 h at most; the usual limit comes back the next day, as in PlayGuard. Refused without a limit today or under the console lock. |
 | `add_bonus_time_15`, `_30`, `_60` | `PRESS` | | yes | The same, 15 / 30 / 60 minutes. |
-| `stop_today` | `PRESS` | | yes | 0 minutes today; the usual limit comes back the next day. |
+| `stop_today` | `PRESS` | | yes | 0 minutes today; the next day PlayGuard offers to put the usual limit back (or does it, with *Play timer › Put the limit back by itself after "No more play today"*). |
 | `unlocked` | `ON` / `OFF` | | `ON` only | `ON` unlocks parental controls temporarily with the stored PIN; `OFF` locks again. |
 | `lock_now` | `PRESS` | | no | Locks again (1007), always allowed, never asked. |
 | `play_timer_alarm` | `ON` / `OFF` | | yes | `OFF` = the "time's up" alarm disabled (1953). |

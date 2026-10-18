@@ -289,7 +289,7 @@ sync_files_CFLAGS := -std=gnu11 -Isource/sync -Isource/core
 sync_core_SRC   := $(SYNC_PURE) tests/sync_core/test.c
 sync_core_FLAGS := -std=gnu11 -Isource/sync -Isource/core
 sync_core_ARGS  := $(TESTOUT)/sync
-sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c source/sync/sync_conf.c tests/sync_exec/test.c
+sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c source/sync/sync_conf.c source/sync/sync_state.c source/sync/sync_json.c tests/sync_exec/test.c
 sync_exec_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -Isource/sync
 sync_engine_SRC   := $(SYNC_PURE) source/sync/mqtt_client.c source/sync/sync_engine.c tests/sync_engine/test.c
 sync_engine_FLAGS := -std=gnu11 -Isource/sync -Isource/core

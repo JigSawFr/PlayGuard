@@ -24,6 +24,7 @@ static struct {
     u8 age, sns, comm;
     bool vr;
     bool alarm_disabled;
+    s64 remaining_ns;            // 1454: today's time left
     u16 block[34];
     int bed_day;                 // the day 1954/1956/1957 report
     u32 fail_command;            // that command returns MOCK_ERROR
@@ -57,6 +58,7 @@ static void reset(void)
     set_days(days);
     model.enabled = true;
     model.bed_day = 1;
+    model.remaining_ns = 3600000000000LL;   // an hour left
     core_set_read_only(false);
     core_set_change_check(NULL);
 }
@@ -160,7 +162,7 @@ Result mock_dispatch(Service *srv, u32 command, void *out, size_t out_size, cons
     case 1037: w = 6; return put(out, out_size, &w, 4);
     case 1039: w = 0; return put(out, out_size, &w, 4);
     case 1406: q = 0; return put(out, out_size, &q, 8);
-    case 1454: q = 3600000000000ULL; return put(out, out_size, &q, 8);
+    case 1454: return put(out, out_size, &model.remaining_ns, 8);
     case 1035: { u8 raw[3] = { model.age, model.sns, model.comm }; return put(out, out_size, raw, 3); }
     case 145601: return put(out, out_size, model.block, sizeof(model.block));
     default: CHECK(!"unexpected command"); return 0;
@@ -364,11 +366,53 @@ static void test_extra_time(void)
     SyncExecCtx next = ctx_with(false);   // putting back needs no remote_timer_writes
     next.today = "2026-10-06";
     next.weekday = 2;
+    // It raises the limit again: not by itself, PlayGuard asks (main's #182).
+    model.n_cmds = 0;
+    CHECK(!sync_exec_restore_extra(&next, &out));
+    days_now(d);
+    CHECK(d[1] == 0 && rec.extra_weekday == 1 && model.n_cmds == 0);
+
+    // Extra time, put back the next day by itself: the limit comes down.
+    reset();
+    sync_records_clear(&rec);
+    run("add_bonus_time_15", "PRESS", &out);
+    days_now(d);
+    CHECK(out.applied && d[1] == 135 && rec.extra_base == 120);
     CHECK(sync_exec_restore_extra(&next, &out));
     days_now(d);
     CHECK(out.applied && d[1] == 120 && rec.extra_weekday == -1);
     CHECK(!sync_exec_restore_extra(&next, &out));   // nothing left
+
+    // A week later, the same weekday: not while it would stop the game (130
+    // minutes played of 135), then once it would not (75 of 135).
+    run("add_bonus_time_15", "PRESS", &out);
+    SyncExecCtx week = ctx_with(false);
+    week.today = "2026-10-12";
+    week.weekday = 1;
+    model.remaining_ns = 5 * 60000000000LL;
+    model.n_cmds = 0;
+    CHECK(!sync_exec_restore_extra(&week, &out));
+    CHECK(rec.extra_weekday == 1 && model.n_cmds == 0);
+    model.remaining_ns = 60 * 60000000000LL;
+    CHECK(sync_exec_restore_extra(&week, &out));
+    days_now(d);
+    CHECK(out.applied && d[1] == 120 && rec.extra_weekday == -1);
+
+    // A "no limit" base: never by itself.
+    reset();
+    sync_records_clear(&rec);
+    rec.extra_weekday = 1;
+    rec.extra_base = 0xFFFF;
+    rec.extra_value = 135;
+    strcpy(rec.extra_date, "2026-10-05");
+    const u16 raised[7] = { 180, 135, 120, 120, 120, 120, 180 };
+    set_days(raised);
+    CHECK(!sync_exec_restore_extra(&next, &out));
+    CHECK(rec.extra_weekday == 1 && model.n_cmds == 0);
+
     // The same day: nothing yet.
+    reset();
+    sync_records_clear(&rec);
     run("add_bonus_time_15", "PRESS", &out);
     SyncExecCtx same = ctx_with(true);
     CHECK(!sync_exec_restore_extra(&same, &out));

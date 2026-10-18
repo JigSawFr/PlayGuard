@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "sync_exec.h"
 
+#include "sync_state.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -580,6 +582,17 @@ bool sync_exec_restore_extra(const SyncExecCtx *ctx, SyncOutcome *out)
         r->extra_date[0] = '\0';
         out->records_changed = true;
         return false;
+    }
+    // As PlayGuard since main's #182 (pt_logic::restore_way): by itself only
+    // what extra time raised, the limit coming back down. No more play today
+    // and a "no limit" base wait for PlayGuard, which asks (or puts them back
+    // itself when told to).
+    if (r->extra_base == PT_DAY_NOLIMIT || r->extra_base >= r->extra_value) return false;
+    // On the record's weekday again, not while the lower limit would stop the
+    // game in progress: a later check puts it back.
+    if (wd == ctx->weekday && !pt.alarm_only) {
+        const int played = sync_played_today_min(&pt, wd);
+        if (played > 0 && r->extra_base < played) return false;
     }
     uint16_t days[7];
     memcpy(days, pt.day_min, sizeof(days));
