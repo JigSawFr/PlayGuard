@@ -452,6 +452,15 @@
         "account_new": "新用户（自{}起）：{}",
         "truncated": "最多只能列出{}款游戏：部分本周未玩的游戏未列出，也未计入累计时间。"
     },
+    "library": {
+        "title": "游戏",
+        "open": "所有游戏",
+        "view": "显示",
+        "views": {
+            "0": "列表",
+            "1": "图标"
+        }
+    },
     "restrictions": {
         "section_level": "限制等级",
         "level": "等级",

@@ -3,7 +3,7 @@
 
 Starts build-desktop/playguard on an X display (Xvfb), opens every tab, the
 extra-time picker, the per-day editor (the week chart's day picker and the
-number pad), a bedtime alarm change, the settings backup, a game's screen in the Activity tab and its
+number pad), a bedtime alarm change, the settings backup, Activity › All games (covers, then the list), a game's screen from it and the
 PDF export, and fails if the app dies on the way (borealis throws on unknown
 XML attributes, missing views, …) or the export is missing. Screenshots of
 each screen are written to the output folder.
@@ -321,8 +321,8 @@ if FORGED:
     open(report, "w").write("mode=unlock\nresult=ok\nrc=0x00000000\nunlocks=1\n")
     json.dump({"schema": 1, "pin_lock": "open"}, open(config_file, "w"))
 if LIBRARY:
-    # A large library: the Activity list builds its first rows, then the
-    # rest on "Show every game".
+    # A large library: All games builds its first covers, then the rest on
+    # "Show every game".
     env.setdefault("PLAYGUARD_SIM_GAMES", "120")
 if OUTSIDE:
     # What PlayGuard saw last time (outside_change_logic): 100 min played
@@ -947,27 +947,27 @@ def main_opened():
 if LIBRARY:
     def listed():
         log.flush()
-        return [l.split("activity list: ", 1)[1].strip()
-                for l in open(os.path.join(OUT, "app.log"), errors="replace") if "activity list: " in l]
+        return [l.split("games list: ", 1)[1].strip()
+                for l in open(os.path.join(OUT, "app.log"), errors="replace") if "games list: " in l]
     key("Down", steps("dashboard", "activity"))
-    key("Right")
-    shot("01_activity")
-    if not listed() or not listed()[-1].startswith("50 of "):
-        fail("the Activity list did not start with its first 50 games: " + repr(listed()))
-    key("Down", 70, hold=0.15)  # past the chart and the 50 games, to "Show every game"
+    key("Right")               # Account (the simulated console has two)
+    key("Down", 5)             # a scroll, then past Account by default, Period and the game to rediscover: All games
+    key("Return")
+    shot("01_games")           # the covers, the first one's figures on top
+    if not listed() or not listed()[-1].startswith("50 of ") or not listed()[-1].endswith("(grid)"):
+        fail("All games did not open on its first 50 games as covers: " + repr(listed()))
+    key("Down", 8)             # the ninth row: the 49th and 50th covers, then "Show every game"
+    key("Right", 2)
     shot("02_show_every_game")
     key("Return")
-    shot("03_every_game")
+    shot("03_every_game")      # the first cover added, selected
     total = listed()[-1].split(" of ")[1].split()[0]
-    if listed()[-1] != f"{total} of {total} games":
+    if listed()[-1] != f"{total} of {total} games (grid)":
         fail("\"Show every game\" did not list them all: " + repr(listed()))
-    # Another tab and back (the sidebar makes the tab again): still every game.
-    built = len(listed())
-    key("Left")
-    key("Up")
-    key("Down")
-    if len(listed()) == built or listed()[-1] != f"{total} of {total} games":
-        fail("\"Show every game\" was not kept across tabs: " + repr(listed()))
+    key("y")                   # the list instead, on the same game
+    shot("04_list")
+    if listed()[-1] != f"{total} of {total} games (list)":
+        fail("Y did not switch to the list: " + repr(listed()))
     finish()
 if OUTSIDE:
     def log_text():
@@ -1473,7 +1473,7 @@ key("Down", 4)
 shot("27_games_system")
 key("Escape")
 
-# Activity: one game's screen, then a PDF export to the (simulated) SD card.
+# Activity: All games, one game's screen, then a PDF export to the (simulated) SD card.
 exports = os.path.join(run_dir, "playguard_data", "exports")
 def pdfs():
     return {f for f in (os.listdir(exports) if os.path.isdir(exports) else []) if f.endswith(".pdf")}
@@ -1481,13 +1481,19 @@ pdfs_before = pdfs()   # the run folder is kept between local runs
 key("Left")                # back to the sidebar
 key("Up", steps("activity", "console"))
 key("Right")               # Account (the simulated console has two; the totals are not focusable)
-key("Down", 6)             # a scroll, then past Account by default, Period, the game to rediscover and Export: the first game
+key("Down", 5)             # a scroll, then past Account by default, Period and the game to rediscover: All games
+key("Return")              # the covers, on the first game
+shot("28_activity_games")
 key("Return")
 shot("28_activity_game")   # its own screen: icon, seven days, figures, accounts
 key("Down", 8)             # scrolled to the accounts: Alice, Léo, and the time on no account
 shot("28b_activity_game_accounts")
 key("Escape")
-key("Up")                  # Export to the SD card…
+key("y")                   # All games as a list
+shot("28c_activity_games_list")
+key("y")                   # covers again (the config keeps the choice)
+key("Escape")
+key("Down")                # Export to the SD card…
 key("Return")
 key("Down", 3)             # PDF
 key("Return")

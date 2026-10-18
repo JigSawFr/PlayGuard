@@ -52,7 +52,8 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `onboarding_at_start` | boolean | *First steps* opens by itself at start-up while no PIN is set | `true` | First steps (*Show at start-up*) |
 | `clock_check_at_start` | boolean | measures the network clock at start-up and says when it is off | `false` | Console › Network clock |
 | `intro` | boolean | the loading screen stays 2 seconds at start-up (Ⓐ or Ⓑ skips it); off, the first screen comes as soon as it is ready | `true` | Preferences (*Show the intro for 2 seconds*) |
-| `activity_period` | integer | Activity's period: `0` today, `1` last 7 days, `2` all time | `1` | Activity |
+| `activity_period` | integer | Activity's period: `0` today, `1` last 7 days, `2` all time | `1` | Activity, Activity › All games |
+| `games_grid` | boolean | *Activity › All games* shows the games as a grid of covers; off, as a list | `true` | Activity › All games (Ⓨ) |
 | `activity_account` | string | the account Activity shows when PlayGuard starts: `"last"` (the one shown last, `activity_account_last`), `""` every account, or one user account's uid as 32 upper-case hex digits; an account no longer on the console reads as every account | `"last"` | Activity (*Account by default*) |
 | `activity_account_last` | string | the account Activity showed last: `""` every account, or a uid as above | `""` | Activity (*Account*) |
 | `export_format` | integer | the last export format: `0` CSV, `1` JSON, `2` XLSX, `3` PDF | `0` | Activity › Export |
@@ -214,6 +215,7 @@ line; the order does not matter when it reads them:
   "clock_check_at_start": false,
   "intro": true,
   "activity_period": 1,
+  "games_grid": true,
   "activity_account": "last",
   "activity_account_last": "",
   "export_format": 0,

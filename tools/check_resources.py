@@ -239,6 +239,7 @@ DYNAMIC_KEYS = {
     "activity/none/": numbers(3),        # activity_tab.cpp: one per period
     "activity/periods/": numbers(3),     # activity_tab.cpp: p < 3
     "days/": numbers(7),
+    "library/views/": numbers(2),        # games_activity.cpp: list, covers
     "days_lower/": numbers(7),
     "days_short/": numbers(7),
     "restrictions/levels/": numbers(5),  # format_text.cpp, level_name: up to 4

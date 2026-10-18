@@ -452,6 +452,15 @@
         "account_new": "Neuer Nutzer seit {}: {}",
         "truncated": "Nur {} Spiele können aufgeführt werden: Einige, die diese Woche nicht gespielt wurden, fehlen, auch in der Gesamtzeit."
     },
+    "library": {
+        "title": "Spiele",
+        "open": "Alle Spiele",
+        "view": "Ansicht",
+        "views": {
+            "0": "Liste",
+            "1": "Cover"
+        }
+    },
     "restrictions": {
         "section_level": "Einschränkungskategorie",
         "level": "Kategorie",

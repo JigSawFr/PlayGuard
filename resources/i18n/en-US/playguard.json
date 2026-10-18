@@ -452,6 +452,15 @@
         "account_new": "New account since {}: {}",
         "truncated": "Only {} games can be listed: some not played this week are missing, and the all-time total leaves them out."
     },
+    "library": {
+        "title": "Games",
+        "open": "All games",
+        "view": "View",
+        "views": {
+            "0": "List",
+            "1": "Covers"
+        }
+    },
     "restrictions": {
         "section_level": "Restriction level",
         "level": "Level",

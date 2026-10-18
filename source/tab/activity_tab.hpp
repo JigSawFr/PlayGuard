@@ -1,23 +1,21 @@
-// ActivityTab — play time per game (today, last 7 days, all time) from the
-// console's play data, for every account or one, its summary over the chosen
-// period and the games to rediscover (util/activity_summary.hpp), and its
-// export to the SD card (CSV, JSON, XLSX or PDF). Read-only, so also in
-// read-only mode. The data comes from play_data (read off the main thread, shared with the
-// Overview, and kept on the SD card for the next run): what is known shows at
-// once, and is read again in the background when over a minute old, without
-// a spinner; Ⓧ reads it again with one. The chart marks each day's current
-// limit (every account only). A large library lists its first rows, then
-// every game on "Show every game" (kept across visits; capped in applet mode).
-// It starts on the account shown last, or one chosen under "Account by
-// default" (config's activity_account).
-// A user account new to PlayGuard is flagged under the account filter
+// ActivityTab — play time (today, last 7 days, all time) from the console's
+// play data, for every account or one, its summary over the chosen period and
+// the games to rediscover (util/activity_summary.hpp), the way to every game
+// of the period (activity/games_activity: a list or covers) and its export
+// to the SD card (CSV, JSON, XLSX or PDF). Read-only, so also in read-only
+// mode. The data comes from play_data (read off the main thread, shared with
+// the Overview, and kept on the SD card for the next run): what is known
+// shows at once, and is read again in the background when over a minute old,
+// without a spinner; Ⓧ reads it again with one. The chart marks each day's
+// current limit (every account only). It starts on the account shown last,
+// or one chosen under "Account by default" (config's activity_account). A
+// user account new to PlayGuard is flagged under the account filter
 // (action/outside_watch).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
 #include <chrono>
 #include <memory>
-#include <utility>
 #include <vector>
 
 #include "tab/tab_base.hpp"
@@ -43,15 +41,9 @@ class ActivityTab : public TabBase
     // otherwise only when there is nothing to show yet.
     void fetch(bool shown);
     void rebuild();
-    // rebuild()'s sections: the totals and the chart, the list (its figures
-    // only when the same games are there, the rest below them on "Show every
-    // game", or every cell again), and the line under it.
+    // rebuild()'s sections: the totals and the chart, and the line under All
+    // games.
     void show_totals(const PlayStats& s, const PlayAccount* who);
-    void show_list(const std::vector<const GameStat*>& rows, const std::shared_ptr<const PlayStats>& data, bool reading);
-    void grow_list(const std::vector<const GameStat*>& rows, size_t shown_n, bool more,
-                   const std::shared_ptr<const PlayStats>& data);
-    void build_list(const std::vector<const GameStat*>& rows, size_t shown_n, bool more,
-                    const std::shared_ptr<const PlayStats>& data);
     void show_status(const PlayStats& s, bool empty);
     // The console's play-timer state for the chart's limit line: read when
     // the tab is made (each time the sidebar reaches it, so after a change on
@@ -60,21 +52,16 @@ class ActivityTab : public TabBase
     const PtState& play_timer();
     // The summary over the period, and the games to rediscover.
     void show_summary(const std::shared_ptr<const PlayStats>& data);
-    // Reads the icons the list still lacks (first rows only), off the main
-    // thread, then puts them on the cells on screen.
-    void load_icons();
-    void apply_icons();
     // What Ⓐ on a game's cell opens (its own screen, with this read's data).
     static void on_click(GameCell* cell, const GameStat& game, const std::shared_ptr<const PlayStats>& data);
     void export_to_sd() const;
 
-    std::vector<std::pair<u64, GameCell*>> cells;   // the list on screen, top first
-    brls::DetailCell* more_cell = nullptr;          // "Show all", below them, when rows are left out
     std::vector<u64> rediscover_ids;                  // the games to rediscover on screen, in order
     int listener = 0;                                 // play_data::listen id
-    // Data arrived while another screen (a game's own screen, a dialog) was
-    // on top: the list is rebuilt once this one is back. Deleting its cells
-    // sooner would free the one borealis gives the focus back to.
+    // Data arrived while another screen (a game's own screen, All games, a
+    // dialog) was on top, or All games changed the period: the tab is rebuilt
+    // once it is back. Deleting the games to rediscover sooner would free the
+    // cell borealis gives the focus back to.
     bool stale = false;
     bool spinner = false;   // Ⓧ pressed: the spinner stays until its read ends
     PtState pt = {};
@@ -97,9 +84,9 @@ class ActivityTab : public TabBase
     BRLS_BIND(brls::DetailCell, session,     "ac_session");
     BRLS_BIND(brls::Box,        rediscover,  "ac_rediscover");
     BRLS_BIND(brls::Box,        rediscover_list, "ac_rediscover_list");
+    BRLS_BIND(brls::DetailCell, games,       "ac_games");
     BRLS_BIND(brls::DetailCell, export_cell, "ac_export");
     BRLS_BIND(brls::Box,        progress,    "ac_progress");
-    BRLS_BIND(brls::Box,        list,        "ac_list");
     BRLS_BIND(brls::Label,      capped,      "ac_capped");
     BRLS_BIND(brls::Label,      status,      "ac_status");
     BRLS_BIND(brls::Label,      note,        "ac_note");

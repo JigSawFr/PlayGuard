@@ -452,6 +452,15 @@
         "account_new": "Nieuw account sinds {}: {}",
         "truncated": "Er kunnen maar {} games worden getoond: sommige die deze week niet zijn gespeeld ontbreken, ook in het totaal."
     },
+    "library": {
+        "title": "Games",
+        "open": "Alle games",
+        "view": "Weergave",
+        "views": {
+            "0": "Lijst",
+            "1": "Covers"
+        }
+    },
     "restrictions": {
         "section_level": "Beperkingsniveau",
         "level": "Niveau",

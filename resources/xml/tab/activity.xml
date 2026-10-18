@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Activity: play time per game (today, last 7 days, all time), read from the
+<!-- Activity: play time (today, last 7 days, all time), read from the
      console's play data for every account, its summary over the chosen period,
-     the games to rediscover, and its export to the SD card. The game cells
-     (icon, name, time) are added in code; A on one opens its screen
+     the games to rediscover, every game of the period on a screen of its own
+     (activity/games.xml) and its export to the SD card. The games to
+     rediscover are added in code; A on one opens its screen
      (activity/game.xml). -->
 
 <brls:Box
@@ -46,12 +47,12 @@
                 <brls:Label text="@i18n/playguard/activity/rediscover_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
             </brls:Box>
             <brls:Header title="@i18n/playguard/activity/section_games" marginTop="24" marginBottom="8"/>
+            <brls:DetailCell id="ac_games" title="@i18n/playguard/library/open"/>
             <brls:DetailCell id="ac_export" title="@i18n/playguard/activity/export"/>
             <brls:Box id="ac_progress" axis="row" alignItems="center" marginTop="10" marginBottom="6" marginLeft="16" marginRight="16">
                 <brls:ProgressSpinner width="30" height="30" marginRight="14"/>
                 <brls:Label text="@i18n/playguard/activity/loading" fontSize="20" grow="1.0" textColor="@theme/brand/note"/>
             </brls:Box>
-            <brls:Box id="ac_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
             <brls:Label id="ac_capped" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note" visibility="gone"/>
             <brls:Label id="ac_status" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
             <brls:Label id="ac_note" text="@i18n/playguard/activity/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>

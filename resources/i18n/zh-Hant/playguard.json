@@ -452,6 +452,15 @@
         "account_new": "新帳號（自{}起）：{}",
         "truncated": "最多只能列出{}款遊戲：部分本週未玩的遊戲未列出，也未計入全部期間的總計。"
     },
+    "library": {
+        "title": "遊戲",
+        "open": "所有遊戲",
+        "view": "顯示",
+        "views": {
+            "0": "清單",
+            "1": "圖示"
+        }
+    },
     "restrictions": {
         "section_level": "限制等級",
         "level": "等級",
