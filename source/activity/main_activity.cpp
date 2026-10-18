@@ -20,6 +20,7 @@
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "view/tab_badge.hpp"
+#include "view/title_state.hpp"
 
 using namespace brls::literals;
 
@@ -219,25 +220,31 @@ void MainActivity::update_notice_hint()
         if (TabBadge* badge = TabBadge::of(sidebar->getItem(t.first))) badge->set_count(notices::tab_count(t.second));
 }
 
-void MainActivity::open_tab(int position)
+void MainActivity::open_tab(int position, const std::string& row)
 {
     auto* frame = dynamic_cast<brls::TabFrame*>(this->getView("main_tabs"));
     if (!frame) return;
-    brls::sync([frame, position]() {
+    brls::sync([frame, position, row]() {
         frame->focusTab(position);   // replaces the tab content
         const auto& children = frame->getChildren();
-        if (children.size() >= 2) brls::Application::giveFocus(children.back());
+        if (children.size() < 2) return;
+        brls::View* focus = children.back();
+        if (brls::View* cell = row.empty() ? nullptr : focus->getView(row))
+            if (cell->getVisibility() == brls::Visibility::VISIBLE) focus = cell;
+        brls::Application::giveFocus(focus);
     });
 }
 
 void MainActivity::update_title()
 {
-    // "PlayGuard", then what the user must know whatever the tab: read-only,
-    // temporarily unlocked (the play timer is not counting).
-    std::string title = "playguard/title"_i18n;
-    if (app::read_only()) title += " · " + "playguard/title_tags/read_only"_i18n;
-    if (ui::known_unlocked()) title += " · " + "playguard/title_tags/unlocked"_i18n;
-    if (auto* frame = dynamic_cast<brls::AppletFrame*>(this->getContentView())) frame->setTitle(title);
+    // "PlayGuard", then what the user must know whatever the tab, as icons
+    // a tap undoes: temporarily unlocked (the play timer is not counting),
+    // read-only.
+    auto* frame = dynamic_cast<brls::AppletFrame*>(this->getContentView());
+    if (!frame) return;
+    frame->setTitle("playguard/title"_i18n);
+    TitleState::show(frame, TitleState::Kind::UNLOCKED, ui::known_unlocked());
+    TitleState::show(frame, TitleState::Kind::READ_ONLY, app::read_only());
 }
 
 // Back from a dialog or a screen: a tab may have hidden the view that opened

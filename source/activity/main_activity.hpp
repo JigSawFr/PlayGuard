@@ -15,11 +15,13 @@ class MainActivity : public brls::Activity
 
     ~MainActivity() override;
 
-    // "PlayGuard", or "PlayGuard · read-only" in read-only mode.
+    // "PlayGuard", then an icon each for temporarily unlocked and read-only
+    // (view/title_state).
     void update_title();
 
-    // Shows tab `position` (ui::tab) and focuses its content.
-    void open_tab(int position);
+    // Shows tab `position` (ui::tab) and focuses its content: the view
+    // with id `row` when given and shown, else its first one.
+    void open_tab(int position, const std::string& row = "");
 
   private:
     // Midnight while the app is open: what start-up does for a new day

@@ -1,9 +1,5 @@
 {
     "title": "PlayGuard",
-    "title_tags": {
-        "read_only": "только чтение",
-        "unlocked": "временно разблокировано"
-    },
     "loading": {
         "tagline": "Родительский контроль прямо на консоли",
         "step_console": "Проверка консоли...",

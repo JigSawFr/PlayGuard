@@ -1,9 +1,5 @@
 {
     "title": "PlayGuard",
-    "title_tags": {
-        "read_only": "唯讀",
-        "unlocked": "已暫時解除"
-    },
     "loading": {
         "tagline": "直接在主機上使用的家長監護",
         "step_console": "正在檢查主機…",
