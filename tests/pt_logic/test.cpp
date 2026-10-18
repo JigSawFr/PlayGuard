@@ -1,6 +1,7 @@
 // Host tests for source/action/pt_logic.cpp: when a play-timer write needs the
 // temporary unlock, how much was played today, extra time and putting it back,
-// what pt_flow's pickers start on, and an unlock left on by an earlier run.
+// what pt_flow's pickers start on, an unlock left on by an earlier run, and
+// what stops play first today (Cadran's Today).
 #include "check.h"
 #include <cstdio>
 #include <cstring>
@@ -441,6 +442,41 @@ static void test_extra_today()
     CHECK(!pt_logic::alarm_off(pt));
 }
 
+static void test_next_stop()
+{
+    using pt_logic::NextStop;
+    PtBedtime off = {};
+    PtBedtime bed = {};
+    bed.on = true;
+    bed.hour = 21;
+    bed.end_hour = 6;
+    // 16:00, 40 min left: the time up first, at 16:40.
+    NextStop n = pt_logic::next_stop(16 * 60, 40, bed);
+    CHECK(n.kind == NextStop::TIME_UP && n.at == 16 * 60 + 40 && n.in == 40);
+    // 20:30, 40 min left: the bedtime comes first.
+    n = pt_logic::next_stop(20 * 60 + 30, 40, bed);
+    CHECK(n.kind == NextStop::BEDTIME && n.at == 21 * 60 && n.in == 30);
+    // Nothing counting down: the bedtime, or nothing without one.
+    n = pt_logic::next_stop(10 * 60, -1, bed);
+    CHECK(n.kind == NextStop::BEDTIME && n.in == 11 * 60);
+    CHECK(pt_logic::next_stop(10 * 60, -1, off).kind == NextStop::NONE);
+    // Past the bedtime: play again at 06:00.
+    n = pt_logic::next_stop(22 * 60, 40, bed);
+    CHECK(n.kind == NextStop::BEDTIME_NOW && n.at == 6 * 60);
+    // Before the morning's end: the night before's, not told.
+    CHECK(pt_logic::next_stop(5 * 60, 40, bed).kind == NextStop::NONE);
+    // A time up after midnight, without a bedtime: the limit counts again by then.
+    CHECK(pt_logic::next_stop(23 * 60 + 30, 40, off).kind == NextStop::NONE);
+    n = pt_logic::next_stop(23 * 60, 40, off);
+    CHECK(n.kind == NextStop::TIME_UP && n.at == 23 * 60 + 40);
+    // A bedtime that does not run from an evening to a morning: not placed.
+    PtBedtime odd = bed;
+    odd.hour = 5;
+    odd.end_hour = 6;
+    n = pt_logic::next_stop(10 * 60, 40, odd);
+    CHECK(n.kind == NextStop::TIME_UP);
+}
+
 int main()
 {
     test_gate();
@@ -454,5 +490,6 @@ int main()
     test_pickers();
     test_extra_today();
     test_pending_relock();
-    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, bedtime, picker and pending-relock assertions passed");
+    test_next_stop();
+    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, bedtime, picker, pending-relock and next-stop assertions passed");
 }

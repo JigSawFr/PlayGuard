@@ -1500,7 +1500,10 @@
             "ok": "ok",
             "clock_fix": "Medir y ajustar ahora",
             "clock_fine": "el temporizador cuenta bien",
-            "serial_hidden": "Número de serie oculto"
+            "serial_hidden": "Número de serie oculto",
+            "next_time_up": "Si se sigue jugando, se acaba el tiempo hacia las {}",
+            "next_bedtime": "Alarma de hora de dormir a las {}, dentro de {}",
+            "next_bedtime_now": "Hora de dormir: se puede volver a jugar a las {}"
         },
         "pill": {
             "pc_on": "Control parental activo",
@@ -1557,7 +1560,8 @@
             "comm_blocked": "Comunicación · restringida",
             "comm_allowed": "Comunicación · permitida",
             "comm_unknown": "Comunicación · —",
-            "none": "programas de cualquier edad, redes sociales y comunicación permitidas"
+            "none": "programas de cualquier edad, redes sociales y comunicación permitidas",
+            "to_settings": "Sus ajustes"
         },
         "clock": {
             "console": "Consola",

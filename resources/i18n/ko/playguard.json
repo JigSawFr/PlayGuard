@@ -1500,7 +1500,10 @@
             "ok": "정상",
             "clock_fix": "지금 측정하고 설정",
             "clock_fine": "타이머가 정확히 계산 중",
-            "serial_hidden": "일련번호 숨김"
+            "serial_hidden": "일련번호 숨김",
+            "next_time_up": "계속 플레이하면 {}쯤 시간 종료",
+            "next_bedtime": "취침 알람 {} ({} 후)",
+            "next_bedtime_now": "취침 시간: {}부터 다시 플레이 가능"
         },
         "pill": {
             "pc_on": "자녀 보호 켜짐",
@@ -1557,7 +1560,8 @@
             "comm_blocked": "커뮤니케이션 · 제한",
             "comm_allowed": "커뮤니케이션 · 허용",
             "comm_unknown": "커뮤니케이션 · —",
-            "none": "모든 연령의 소프트웨어, SNS와 커뮤니케이션 허용"
+            "none": "모든 연령의 소프트웨어, SNS와 커뮤니케이션 허용",
+            "to_settings": "설정 보기"
         },
         "clock": {
             "console": "본체",

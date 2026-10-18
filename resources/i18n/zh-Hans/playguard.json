@@ -1500,7 +1500,10 @@
             "ok": "正常",
             "clock_fix": "立即测量并设置",
             "clock_fine": "计时准确",
-            "serial_hidden": "序列号已隐藏"
+            "serial_hidden": "序列号已隐藏",
+            "next_time_up": "继续游玩的话，约{}时间到",
+            "next_bedtime": "就寝提醒{}（还有{}）",
+            "next_bedtime_now": "就寝时间：{}起可再次游玩"
         },
         "pill": {
             "pc_on": "家长控制已开启",
@@ -1557,7 +1560,8 @@
             "comm_blocked": "交流 · 受限",
             "comm_allowed": "交流 · 允许",
             "comm_unknown": "交流 · —",
-            "none": "所有年龄的软件，允许社交媒体与交流"
+            "none": "所有年龄的软件，允许社交媒体与交流",
+            "to_settings": "查看设置"
         },
         "clock": {
             "console": "主机",

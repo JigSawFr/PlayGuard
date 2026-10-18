@@ -1500,7 +1500,10 @@
             "ok": "正常",
             "clock_fix": "立即測量並設定",
             "clock_fine": "計時準確",
-            "serial_hidden": "序號已隱藏"
+            "serial_hidden": "序號已隱藏",
+            "next_time_up": "繼續遊玩的話，約{}時間到",
+            "next_bedtime": "就寢鬧鐘{}（還有{}）",
+            "next_bedtime_now": "就寢時間：{}起可再次遊玩"
         },
         "pill": {
             "pc_on": "家長監護已開啟",
@@ -1557,7 +1560,8 @@
             "comm_blocked": "交流 · 受限",
             "comm_allowed": "交流 · 允許",
             "comm_unknown": "交流 · —",
-            "none": "所有年齡的軟體，允許社群媒體與交流"
+            "none": "所有年齡的軟體，允許社群媒體與交流",
+            "to_settings": "查看設定"
         },
         "clock": {
             "console": "主機",

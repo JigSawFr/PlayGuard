@@ -151,8 +151,33 @@ CadranWeekView::CadranWeekView()
             if (this->on_change) this->on_change(d, PT_DAY_NOLIMIT);
             return true;
         }, true);
+        c.box->addGestureRecognizer(new brls::TapGestureRecognizer([this, d](brls::TapGestureStatus status, brls::Sound* sound) {
+            if (status.state != brls::GestureState::END) return;
+            *sound = brls::SOUND_CLICK;
+            this->tap(d, status.position.y);
+        }));
         this->addView(c.box);
     }
+}
+
+void CadranWeekView::tap(int day, float y)
+{
+    Column* box = this->cols[day].box;
+    if (!this->edit || this->focused != day) {
+        if (this->can_edit && !this->can_edit()) {
+            brls::Application::giveFocus(box);
+            return;
+        }
+        this->moving = this->edit;   // from another day being edited: the edit goes on
+        brls::Application::giveFocus(box);
+        this->moving = false;
+        this->set_edit(true);
+        return;
+    }
+    const float third = box->getHeight() / 3;
+    if (y < box->getY() + third) this->nudge(day, STEP);
+    else if (y > box->getY() + 2 * third) this->nudge(day, -STEP);
+    else this->set_edit(false);
 }
 
 void CadranWeekView::set_edit(bool on)

@@ -20,6 +20,7 @@
 #include "tab/tab_base.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "view/cadran_digits.hpp"
+#include "view/cadran_icon.hpp"
 #include "view/pt_ring.hpp"
 
 namespace cadran
@@ -75,8 +76,13 @@ class CadranTab : public DashboardTab
     };
     cadran::List list;
     std::vector<Pill> pill_slots;
+    // What stops play first today, under the time played (show_next).
+    brls::Box*   next      = nullptr;
+    CadranIcon*  next_icon = nullptr;
+    brls::Label* next_text = nullptr;
 
     void show_ring(bool unlocked);
+    void show_next(bool unlocked);
     void show_cards(bool unlocked, bool has_pin);
     void show_pills();
 

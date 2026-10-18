@@ -1500,7 +1500,10 @@
             "ok": "ok",
             "clock_fix": "Misura e regola ora",
             "clock_fine": "il timer conta giusto",
-            "serial_hidden": "Numero di serie nascosto"
+            "serial_hidden": "Numero di serie nascosto",
+            "next_time_up": "Se si continua a giocare, tempo scaduto verso le {}",
+            "next_bedtime": "Sogni d'oro alle {}, tra {}",
+            "next_bedtime_now": "Ora di dormire: si può giocare di nuovo alle {}"
         },
         "pill": {
             "pc_on": "Filtro famiglia attivo",
@@ -1557,7 +1560,8 @@
             "comm_blocked": "Comunicazione · limitata",
             "comm_allowed": "Comunicazione · consentita",
             "comm_unknown": "Comunicazione · —",
-            "none": "software per tutte le età, social network e comunicazione consentiti"
+            "none": "software per tutte le età, social network e comunicazione consentiti",
+            "to_settings": "Le sue impostazioni"
         },
         "clock": {
             "console": "Console",

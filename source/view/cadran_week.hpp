@@ -4,7 +4,10 @@
 // 15 min, left / right go on to the next day (still editing), L copies it to
 // Monday to Friday, R to the weekend, Y sets no limit, A or B ends the edit.
 // X, editing or not, opens the day's picker (the quick values, a duration,
-// no limit). The caller keeps the pending values and saves them.
+// no limit). By touch: a day tapped is edited; on the day being edited, a tap
+// on its upper third adds 15 min, on its lower third takes them off (the
+// arrows are there), in between ends the edit. The caller keeps the pending
+// values and saves them.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -64,4 +67,5 @@ class CadranWeekView : public brls::Box
     void nudge(int day, int delta);
     void set_edit(bool on);
     bool step(int day, int direction);   // left / right while editing
+    void tap(int day, float y);          // a touch on a day, at height y
 };

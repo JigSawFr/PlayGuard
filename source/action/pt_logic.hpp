@@ -180,4 +180,22 @@ int extra_today_min(const ExtraRecord& rec, const std::string& today, int weekda
 // The timer is on and its "time's up" alarm is off.
 bool alarm_off(const PtState& pt);
 
+// What stops play first today, as Cadran's Today says it: at `now` (minutes
+// after midnight), with `left` minutes of play left (-1: none counting down)
+// and today's bedtime `bed` (an evening alarm, play allowed again the next
+// morning). Before the morning's end, the night is the day before's: its
+// bedtime is not this one's to tell.
+struct NextStop
+{
+    enum Kind
+    {
+        NONE,
+        TIME_UP,       // `at`, `in` minutes of play from now
+        BEDTIME,       // at `at`, in `in` minutes
+        BEDTIME_NOW,   // play allowed again at `at`
+    } kind = NONE;
+    int at = 0, in = 0;
+};
+NextStop next_stop(int now, int left, const PtBedtime& bed);
+
 }   // namespace pt_logic

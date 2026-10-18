@@ -1500,7 +1500,10 @@
             "ok": "ok",
             "clock_fix": "Jetzt messen und einstellen",
             "clock_fine": "der Timer zählt richtig",
-            "serial_hidden": "Seriennummer verborgen"
+            "serial_hidden": "Seriennummer verborgen",
+            "next_time_up": "Wenn weitergespielt wird, ist die Zeit gegen {} um",
+            "next_bedtime": "Gute-Nacht-Alarm um {}, in {}",
+            "next_bedtime_now": "Schlafenszeit: Spielen wieder erlaubt ab {}"
         },
         "pill": {
             "pc_on": "Jugendschutz aktiv",
@@ -1557,7 +1560,8 @@
             "comm_blocked": "Kommunikation · eingeschränkt",
             "comm_allowed": "Kommunikation · erlaubt",
             "comm_unknown": "Kommunikation · —",
-            "none": "Software jeder Altersstufe, soziale Medien und Kommunikation erlaubt"
+            "none": "Software jeder Altersstufe, soziale Medien und Kommunikation erlaubt",
+            "to_settings": "Ihre Einstellungen"
         },
         "clock": {
             "console": "Konsole",

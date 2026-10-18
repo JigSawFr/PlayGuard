@@ -1500,7 +1500,10 @@
             "ok": "ok",
             "clock_fix": "Measure and set it now",
             "clock_fine": "the timer counts right",
-            "serial_hidden": "Serial number hidden"
+            "serial_hidden": "Serial number hidden",
+            "next_time_up": "If play goes on, time is up around {}",
+            "next_bedtime": "Bedtime alarm at {}, in {}",
+            "next_bedtime_now": "Bedtime: games allowed again at {}"
         },
         "pill": {
             "pc_on": "Parental controls on",
@@ -1557,7 +1560,8 @@
             "comm_blocked": "Communication · restricted",
             "comm_allowed": "Communication · allowed",
             "comm_unknown": "Communication · —",
-            "none": "software of any rating, social media and communication allowed"
+            "none": "software of any rating, social media and communication allowed",
+            "to_settings": "Its settings"
         },
         "clock": {
             "console": "Console",

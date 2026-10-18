@@ -1500,7 +1500,10 @@
             "ok": "OK",
             "clock_fix": "今すぐ測って合わせる",
             "clock_fine": "タイマーは正しく計測中",
-            "serial_hidden": "シリアル番号は非表示"
+            "serial_hidden": "シリアル番号は非表示",
+            "next_time_up": "このまま遊ぶと{}ごろに時間切れ",
+            "next_bedtime": "おやすみアラームは{}（あと{}）",
+            "next_bedtime_now": "おやすみの時間：{}から再びプレイ可能"
         },
         "pill": {
             "pc_on": "みまもり設定 有効",
@@ -1557,7 +1560,8 @@
             "comm_blocked": "交流・制限",
             "comm_allowed": "交流・許可",
             "comm_unknown": "交流・—",
-            "none": "全年齢のソフト、SNS投稿・交流も許可"
+            "none": "全年齢のソフト、SNS投稿・交流も許可",
+            "to_settings": "設定を見る"
         },
         "clock": {
             "console": "本体",

@@ -277,4 +277,18 @@ bool alarm_off(const PtState& pt)
     return pt.fw_supported && pt.enabled_valid && pt.enabled && pt.alarm_disabled_valid && pt.alarm_disabled;
 }
 
+NextStop next_stop(int now, int left, const PtBedtime& bed)
+{
+    const int start = bed.hour * 60 + bed.minute, end = bed.end_hour * 60 + bed.end_minute;
+    // An evening to the next morning, as the console sets it; anything else is
+    // not one this can place.
+    const bool night = bed.on && start > end;
+    if (night && now >= start) return { NextStop::BEDTIME_NOW, end, 0 };
+    if (night && now < end) return {};
+    // The limit counts again from midnight: a time up after it is not today's.
+    if (left >= 0 && now + left < 24 * 60 && (!night || now + left < start)) return { NextStop::TIME_UP, now + left, left };
+    if (night) return { NextStop::BEDTIME, start, start - now };
+    return {};
+}
+
 }   // namespace pt_logic

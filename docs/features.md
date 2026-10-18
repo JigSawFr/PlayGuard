@@ -27,11 +27,12 @@ The app is organised in tabs, like System Settings; each has its section below.
 PlayGuard has two looks, chosen in *Preferences › Appearance* (taken at the next start):
 
 - **Cadran**, the default: an icon rail for the tabs, a navy or cool-white palette (with the theme), cards instead of lists. Each tab opens on what matters most, and keeps every line of its classic version underneath:
-  - *Today* (the Overview): the time left as a ring, *Extra time* with its amounts one press away, *Stop for today*, *Show the child*; the bedtime alarm, parental controls and the network clock as cards; the console's state as pills.
-  - *Play timer*: the week is the editor. Ⓐ on a day edits it: ↑/↓ change it by 15 min, ←/→ move to the next day, Ⓛ copies it to Monday–Friday, Ⓡ to the weekend, Ⓨ sets no limit, Ⓐ or Ⓑ ends the edit; Ⓧ picks an exact time. The changes are saved together, with **+** or *Save*, as in the per-day editor; *Discard* puts them back. Profiles, the same limit every day, bedtime, *When the time is up* and the removal are chips above and below it.
+  - *Today* (the Overview): the time left as a ring, and under it what stops play first (the time up if play goes on, or the bedtime alarm and when games are allowed again); *Extra time* with its amounts one press away, *Stop for today*, *Show the child*; the bedtime alarm, parental controls and the network clock as cards; the console's state as pills.
+  - *Play timer*: the week is the editor. Ⓐ on a day edits it: ↑/↓ change it by 15 min, ←/→ move to the next day, Ⓛ copies it to Monday–Friday, Ⓡ to the weekend, Ⓨ sets no limit, Ⓐ or Ⓑ ends the edit; Ⓧ picks an exact time. By touch, a day tapped is edited, then a tap on its top or bottom changes it by 15 min. The changes are saved together, with **+** or *Save*, as in the per-day editor; *Discard* puts them back. Profiles, the same limit every day, bedtime, *When the time is up* and the removal are chips above and below it.
   - *Activity*: the accounts as chips, the period and the export, today, the last 7 days and all time as figures, the four games most played as cards (Ⓐ opens one).
-  - *Restrictions*: the four levels side by side, each with what it restricts (Ⓐ sets it); no restriction under them.
+  - *Restrictions*: the four levels side by side, each with what it restricts (Ⓐ sets it; on *Custom* in force, Ⓐ goes to its settings below); no restriction under them.
   - **The child screen** (*Show the child* on *Today*): only the time left, the bedtime and what happens when time is up, to hand the console over. Ⓐ goes back to the parent's screens with the PIN; Ⓑ leaves PlayGuard (asking first to turn parental controls back on, as quitting does).
+  - Dialogs are cards with their buttons as pills, the confirmation in teal (in coral when it removes or stops something); the choices open as a card above the hints, the current one in teal; messages appear as cards under the header.
 - **Classic**: the lists of earlier versions, as the screenshots above show them.
 
 ## Notifications — what needs you, from any tab

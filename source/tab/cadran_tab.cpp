@@ -412,6 +412,18 @@ CadranTab::CadranTab()
         text->setFontSize(id == std::string("dash_gauge_text") ? 30 : 16.5f);
         if (id == std::string("dash_gauge_text")) text->setTextColor(theme["cadran/text"]);
     }
+    // What stops play first, under the time played.
+    this->next = new brls::Box(brls::Axis::ROW);
+    this->next->setAlignItems(brls::AlignItems::CENTER);
+    this->next->setMarginTop(8);
+    this->next_icon = kit::icon("timer", 18, "cadran/teal");
+    this->next_icon->setMarginRight(8);
+    this->next->addView(this->next_icon);
+    this->next_text = kit::label("", 16.5f, "cadran/text2");
+    this->next_text->setSingleLine(true);
+    this->next->addView(this->next_text);
+    this->next->setVisibility(brls::Visibility::GONE);
+    today_text->addView(this->next, 2);
     this->list.park({ "dash_gauge", "dash_extra", "dash_stop", "dash_remaining", "dash_bedtime", "dash_pc", "dash_pin",
                       "dash_level", "dash_clock", "dash_pairing", "dash_serial", "dash_patches", "dash_fw", "dash_compat" });
     if (gauge_box) gauge_box->setVisibility(brls::Visibility::GONE);   // emptied
@@ -507,6 +519,33 @@ void CadranTab::show_ring(bool unlocked)
     ring->setFraction(frac);
     ring->setValue(left);
     ring->setCaption(caption);
+}
+
+void CadranTab::show_next(bool unlocked)
+{
+    const PtState& pt = this->pt;
+    const int today = ui::today_weekday();
+    pt_logic::NextStop n;
+    // Unlocked, or the timer off: nothing stops play.
+    if (!unlocked && pt.fw_supported && pt.valid && pt.enabled_valid && pt.enabled) {
+        const uint16_t limit = pt.day_min[today];
+        int left = -1;
+        if (limit != PT_DAY_NOLIMIT && pt.remaining_valid && pt.remaining_ns > 0 && pt_logic::over_limit_min(pt, today) < 0)
+            left = (int)((uint64_t)pt.remaining_ns / 60000000000ULL);
+        const LocalTime now = ui::local_now();
+        n = pt_logic::next_stop(now.hour * 60 + now.minute, left, pt.bed[today]);
+    }
+    const auto clock = [](int minutes) { return fmt::format("{:02d}:{:02d}", minutes / 60, minutes % 60); };
+    std::string text;
+    if (n.kind == pt_logic::NextStop::TIME_UP) text = brls::getStr("playguard/cadran/today/next_time_up", clock(n.at));
+    else if (n.kind == pt_logic::NextStop::BEDTIME)
+        text = brls::getStr("playguard/cadran/today/next_bedtime", clock(n.at), ui::fmt_minutes((uint16_t)n.in));
+    else if (n.kind == pt_logic::NextStop::BEDTIME_NOW) text = brls::getStr("playguard/cadran/today/next_bedtime_now", clock(n.at));
+    if (!text.empty()) {
+        ui::set_text(this->next_text, text);
+        this->next_icon->setIcon(n.kind == pt_logic::NextStop::TIME_UP ? "timer" : "moon");
+    }
+    ui::set_visible(this->next, !text.empty());
 }
 
 void CadranTab::show_cards(bool unlocked, bool has_pin)
@@ -615,6 +654,7 @@ void CadranTab::refresh()
     else cadran::set_pill("playguard/cadran/pill/pc_off"_i18n, "alert", true);
 
     this->show_ring(unlocked);
+    this->show_next(unlocked);
     this->show_cards(unlocked, has_pin);
     this->show_pills();
     // The actions while their lines would be shown.

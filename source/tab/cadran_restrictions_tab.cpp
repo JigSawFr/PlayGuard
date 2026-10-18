@@ -112,8 +112,13 @@ CadranRestrictionsTab::Tile CadranRestrictionsTab::make_tile(uint32_t level, boo
     }
 
     t.box->registerAction("playguard/cadran/restrictions/choose"_i18n, brls::BUTTON_A, [this, level](brls::View*) {
+        if (this->st.safety_level_ok && this->st.safety_level == level) {
+            // Custom in force: its settings, the lines under the tiles.
+            brls::View* first = level == PctlSafetyLevel_Custom ? this->getView("rs_age") : nullptr;
+            if (first && first->getVisibility() == brls::Visibility::VISIBLE) brls::Application::giveFocus(first);
+            return true;
+        }
         if (ui::refuse_read_only()) return true;
-        if (this->st.safety_level_ok && this->st.safety_level == level) return true;
         this->choose_level((int)level);
         return true;
     });
@@ -172,6 +177,12 @@ void CadranRestrictionsTab::refresh()
         t.box->setBackgroundColor(selected ? theme["cadran/teal_soft"] : theme["cadran/surf"]);
         t.box->setBorderColor(selected ? theme["cadran/teal_fill"] : theme["cadran/line"]);
         t.badge->setVisibility(selected ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
+        if (t.level == PctlSafetyLevel_Custom && t.to_settings != custom) {
+            t.to_settings = custom;
+            t.box->updateActionHint(brls::BUTTON_A, custom ? "playguard/cadran/restrictions/to_settings"_i18n
+                                                           : "playguard/cadran/restrictions/choose"_i18n);
+            brls::Application::getGlobalHintsUpdateEvent()->fire();
+        }
         // Read-only: the levels stay, dimmed; A says why nothing changes.
         t.box->setAlpha(app::read_only() && !selected ? 0.6f : 1.0f);
         if (!t.age) continue;   // no restriction: its words say it all

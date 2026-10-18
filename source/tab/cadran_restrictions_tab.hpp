@@ -35,6 +35,7 @@ class CadranRestrictionsTab : public RestrictionsTab
         brls::Label*     sns      = nullptr;
         brls::Rectangle* comm_dot = nullptr;
         brls::Label*     comm     = nullptr;
+        bool             to_settings = false;   // A goes to Custom's settings
     };
     cadran::List list;
     std::vector<Tile> tiles;
