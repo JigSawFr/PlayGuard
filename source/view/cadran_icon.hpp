@@ -1,7 +1,7 @@
 // CadranIcon — the "Cadran" prototype's icons, drawn as nanovg paths from
 // the design boards' 24-unit SVG strokes (no SVG loader in this borealis):
 // today, timer, activity, shield, lock, globe, settings, tools, info, plus,
-// stop, eye, check, moon, pause, list, lines, download, chevron-down,
+// stop, eye, check, moon, pause, list, lines, download, chevron-down, chevron-left,
 // chevron-right, caret-up, caret-down, and "mark", the PlayGuard logo
 // (branding/mark.svg); for the other screens, in the same strokes: key,
 // unlock, phone, trash, server, pin, refresh, history, restore, save, upload,

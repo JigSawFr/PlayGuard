@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <fmt/format.h>
+#include <yoga/Yoga.h>
 
 #include "ui/ui.hpp"
 #include "view/cadran_digits.hpp"
@@ -97,6 +98,11 @@ brls::Box* chip(const std::string& text, float height)
     digits->setFontSize(17);
     box->addView(digits);
     return box;
+}
+
+void wrap(brls::View* row)
+{
+    if (row) YGNodeStyleSetFlexWrap(row->getYGNode(), YGWrapWrap);
 }
 
 bool press(brls::View* line)

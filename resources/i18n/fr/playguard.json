@@ -1505,7 +1505,33 @@
         "pill": {
             "pc_on": "Contrôle parental actif",
             "pc_off": "Contrôle parental non configuré",
-            "unlocked": "Déverrouillé temporairement"
+            "unlocked": "Déverrouillé temporairement",
+            "timer_on": "Minuteur actif",
+            "timer_off": "Décompte en pause",
+            "timer_none": "Pas de limite de temps de jeu"
+        },
+        "week": {
+            "no_limit": "pas de limite",
+            "every_day": "{} tous les jours",
+            "summary": "{} en semaine · {} le week-end",
+            "profile": "Profil · {}",
+            "edit": "Modifier",
+            "done": "Terminé",
+            "pick": "Durée exacte",
+            "edit_day": "modifier un jour",
+            "pick_day": "durée exacte ou pas de limite",
+            "step": "± 15 min",
+            "day": "changer de jour",
+            "weekdays": "copier sur lun → ven",
+            "weekend": "copier sur sam · dim",
+            "none": "pas de limite",
+            "first_change": "{} {} → {}",
+            "no_changes": "Aucune modification en attente · + enregistre",
+            "discard": "Annuler",
+            "remove": "Supprimer la limite"
+        },
+        "tabs": {
+            "today": "Aujourd'hui"
         }
     }
 }

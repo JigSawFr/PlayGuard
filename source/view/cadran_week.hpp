@@ -1,8 +1,10 @@
-// CadranWeekView — "Cadran" prototype: the week's limits as seven tall
-// columns that are the editor. Each day takes the focus: up / down change
-// its limit by 15 min, left / right change day, L copies it to Monday to
-// Friday, R to the weekend, Y sets no limit, A opens the picker. The caller
-// keeps the pending values and saves them (+). Strings not localised.
+// CadranWeekView — the week's limits as seven tall columns that are the
+// editor (Cadran's Play timer). The stick moves between the days and out of
+// the week; A edits the focused day: then up / down change its limit by
+// 15 min, left / right go on to the next day (still editing), L copies it to
+// Monday to Friday, R to the weekend, Y sets no limit, A or B ends the edit.
+// X, editing or not, opens the day's picker (the quick values, a duration,
+// no limit). The caller keeps the pending values and saves them.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -21,9 +23,15 @@ class CadranWeekView : public brls::Box
     // `days`: the limits as they will be; `live`: as the console has them (a
     // day that differs is drawn as unsaved). 0 = Sunday, laid out Monday first.
     void show(const uint16_t days[7], const uint16_t live[7]);
-    void set_on_change(std::function<void(int day, uint16_t minutes)> on_change);   // stick edits
-    void set_on_pick(std::function<void(int day)> on_pick);                         // A
+    void set_on_change(std::function<void(int day, uint16_t minutes)> on_change);   // stick edits, Y
+    void set_on_pick(std::function<void(int day)> on_pick);                         // X
     void set_on_copy(std::function<void(int day, bool weekend)> on_copy);           // L / R
+    // Asked before an edit starts (A, X): false refuses it (read-only mode…;
+    // the callee says why).
+    void set_can_edit(std::function<bool()> can_edit);
+    // The edit starts or ends (the screen's key hints follow).
+    void set_on_mode(std::function<void(bool editing)> on_mode);
+    bool editing() const { return this->edit; }
     int  focused_day() const { return this->focused; }
 
     static brls::View* create();
@@ -44,10 +52,16 @@ class CadranWeekView : public brls::Box
     uint16_t live[7] = {};
     bool     valid = false;
     int      focused = -1;
+    bool     edit = false;
+    bool     moving = false;   // left / right while editing: the edit goes on
     std::function<void(int, uint16_t)> on_change;
     std::function<void(int)>           on_pick;
     std::function<void(int, bool)>     on_copy;
+    std::function<bool()>              can_edit;
+    std::function<void(bool)>          on_mode;
 
     void render();
     void nudge(int day, int delta);
+    void set_edit(bool on);
+    bool step(int day, int direction);   // left / right while editing
 };

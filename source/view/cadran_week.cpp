@@ -2,8 +2,11 @@
 #include "view/cadran_week.hpp"
 
 #include <algorithm>
+#include <fmt/format.h>
 
 #include "ui/ui.hpp"
+
+using namespace brls::literals;
 
 namespace
 {
@@ -23,6 +26,9 @@ class CadranWeekView::Column : public brls::Box
     {
         brls::Box::onFocusGained();
         this->owner->focused = this->day;
+        // Reached any other way than left / right while editing (the stick
+        // from elsewhere, back from a dialog): not editing.
+        if (!this->owner->moving) this->owner->set_edit(false);
         this->owner->render();
     }
     void onFocusLost() override
@@ -37,6 +43,12 @@ class CadranWeekView::Column : public brls::Box
     int day;
 };
 
+namespace
+{
+// Monday first, Sunday last.
+constexpr int ORDER[7] = { 1, 2, 3, 4, 5, 6, 0 };
+}   // namespace
+
 CadranWeekView::CadranWeekView()
 {
     brls::Theme theme = brls::Application::getTheme();
@@ -46,8 +58,8 @@ CadranWeekView::CadranWeekView()
     this->setHeight(COL_HEIGHT);
     this->setFocusable(false);
 
-    for (int i = 1; i <= 7; i++) {   // Monday first, Sunday last
-        const int d = i % 7;
+    for (int i = 0; i < 7; i++) {
+        const int d = ORDER[i];
         Col& c = this->cols[d];
         c.box = new Column(this, d);
         c.box->setGrow(1.0f);
@@ -58,7 +70,9 @@ CadranWeekView::CadranWeekView()
         c.box->setPadding(10, 6, 8, 6);
         c.box->setCornerRadius(18);
         c.box->setFocusable(true);
-        if (i < 7) c.box->setMarginRight(8);
+        c.box->setHideHighlightBackground(true);
+        c.box->setHighlightCornerRadius(18);
+        if (i < 6) c.box->setMarginRight(8);
 
         c.up = new CadranIcon();
         c.up->setIcon("caret-up");
@@ -79,7 +93,8 @@ CadranWeekView::CadranWeekView()
         c.box->addView(c.bar);
         c.day = new brls::Label();
         c.day->setFontSize(16);
-        c.day->setText(ui::day_name_in_text(d).substr(0, 3));
+        c.day->setSingleLine(true);
+        c.day->setText(brls::getStr(fmt::format("playguard/days_short/{}", d)));
         c.box->addView(c.day);
         c.down = new CadranIcon();
         c.down->setIcon("caret-down");
@@ -89,21 +104,77 @@ CadranWeekView::CadranWeekView()
         c.down->setMarginTop(4);
         c.box->addView(c.down);
 
-        // The stick edits the day; the hints stay out of the footer.
-        c.box->registerAction("", brls::BUTTON_NAV_UP, [this, d](brls::View*) { this->nudge(d, STEP); return true; }, true, true);
-        c.box->registerAction("", brls::BUTTON_NAV_DOWN, [this, d](brls::View*) { this->nudge(d, -STEP); return true; }, true, true);
-        c.box->registerAction("", brls::BUTTON_LB, [this, d](brls::View*) { if (this->on_copy) this->on_copy(d, false); return true; }, true);
-        c.box->registerAction("", brls::BUTTON_RB, [this, d](brls::View*) { if (this->on_copy) this->on_copy(d, true); return true; }, true);
-        c.box->registerAction("", brls::BUTTON_Y, [this, d](brls::View*) {
-            if (this->on_change) this->on_change(d, PT_DAY_NOLIMIT);
+        // A starts and ends the edit; editing, the stick and the shoulders
+        // edit the day (their hints are on the screen, under the week), and
+        // B ends it. Not editing, they do what they do anywhere else.
+        c.box->registerAction("playguard/cadran/week/edit"_i18n, brls::BUTTON_A, [this](brls::View*) {
+            if (!this->edit && this->can_edit && !this->can_edit()) return true;
+            this->set_edit(!this->edit);
             return true;
-        }, true);
-        c.box->registerClickAction([this, d](brls::View*) {
+        });
+        c.box->registerAction("playguard/cadran/week/pick"_i18n, brls::BUTTON_X, [this, d](brls::View*) {
+            if (this->can_edit && !this->can_edit()) return true;
             if (this->on_pick) this->on_pick(d);
             return true;
         });
+        c.box->registerAction("", brls::BUTTON_B, [this](brls::View*) {
+            if (!this->edit) return false;
+            this->set_edit(false);
+            return true;
+        }, true);
+        c.box->registerAction("", brls::BUTTON_NAV_UP, [this, d](brls::View*) {
+            if (!this->edit) return false;
+            this->nudge(d, STEP);
+            return true;
+        }, true, true);
+        c.box->registerAction("", brls::BUTTON_NAV_DOWN, [this, d](brls::View*) {
+            if (!this->edit) return false;
+            this->nudge(d, -STEP);
+            return true;
+        }, true, true);
+        c.box->registerAction("", brls::BUTTON_NAV_LEFT, [this, d](brls::View*) { return this->step(d, -1); }, true, true);
+        c.box->registerAction("", brls::BUTTON_NAV_RIGHT, [this, d](brls::View*) { return this->step(d, 1); }, true, true);
+        c.box->registerAction("", brls::BUTTON_LB, [this, d](brls::View*) {
+            if (!this->edit) return false;
+            if (this->on_copy) this->on_copy(d, false);
+            return true;
+        }, true);
+        c.box->registerAction("", brls::BUTTON_RB, [this, d](brls::View*) {
+            if (!this->edit) return false;
+            if (this->on_copy) this->on_copy(d, true);
+            return true;
+        }, true);
+        c.box->registerAction("", brls::BUTTON_Y, [this, d](brls::View*) {
+            if (!this->edit) return false;
+            if (this->on_change) this->on_change(d, PT_DAY_NOLIMIT);
+            return true;
+        }, true);
         this->addView(c.box);
     }
+}
+
+void CadranWeekView::set_edit(bool on)
+{
+    if (this->edit == on) return;
+    this->edit = on;
+    for (const Col& c : this->cols)
+        c.box->updateActionHint(brls::BUTTON_A, on ? "playguard/cadran/week/done"_i18n : "playguard/cadran/week/edit"_i18n);
+    brls::Application::getGlobalHintsUpdateEvent()->fire();
+    this->render();
+    if (this->on_mode) this->on_mode(on);
+}
+
+bool CadranWeekView::step(int day, int direction)
+{
+    if (!this->edit) return false;
+    int at = 0;
+    while (at < 7 && ORDER[at] != day) at++;
+    const int next = at + direction;
+    if (next < 0 || next > 6) return true;   // the edit stays in the week
+    this->moving = true;
+    brls::Application::giveFocus(this->cols[ORDER[next]].box);
+    this->moving = false;
+    return true;
 }
 
 void CadranWeekView::nudge(int day, int delta)
@@ -128,6 +199,8 @@ void CadranWeekView::show(const uint16_t days[7], const uint16_t live[7])
 void CadranWeekView::set_on_change(std::function<void(int, uint16_t)> f) { this->on_change = std::move(f); }
 void CadranWeekView::set_on_pick(std::function<void(int)> f) { this->on_pick = std::move(f); }
 void CadranWeekView::set_on_copy(std::function<void(int, bool)> f) { this->on_copy = std::move(f); }
+void CadranWeekView::set_can_edit(std::function<bool()> f) { this->can_edit = std::move(f); }
+void CadranWeekView::set_on_mode(std::function<void(bool)> f) { this->on_mode = std::move(f); }
 
 void CadranWeekView::render()
 {
@@ -146,9 +219,11 @@ void CadranWeekView::render()
         c.bar->setHeight(!this->valid || m == PT_DAY_NOLIMIT ? BAR_MIN : std::max(BAR_MIN, BAR_MAX * (float)m / (float)top));
         c.bar->setBackgroundColor(focused ? theme["cadran/teal_fill"] : d == today ? theme["cadran/bar_today"] : theme["cadran/bar"]);
         c.day->setTextColor(d == today ? theme["cadran/teal"] : theme["cadran/text3"]);
-        c.box->setBackgroundColor(focused ? theme["cadran/surf2"] : theme["cadran/none"]);
-        c.up->setVisibility(focused ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
-        c.down->setVisibility(focused ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
+        // The day being edited on the soft teal, its arrows shown.
+        const bool editing = focused && this->edit;
+        c.box->setBackgroundColor(editing ? theme["cadran/teal_soft"] : focused ? theme["cadran/surf2"] : theme["cadran/none"]);
+        c.up->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
+        c.down->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
     }
 }
 

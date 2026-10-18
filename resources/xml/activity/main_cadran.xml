@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Root screen with the "Cadran" prototype Overview (PLAYGUARD_SIM_CADRAN=1 on the desktop, About › Help & diagnostics › Developer › Cadran prototype on the console):
-     the tabs carry the boards' short French labels; cadran::style_frame adds the icons. Each tab
-     is a custom view registered in main.cpp and implemented in source/tab/: the first four
-     drawn anew, PIN, Preferences and About the current tabs restyled (source/tab/cadran_lists.cpp),
-     Console and History as they are. The same order as main.xml. -->
+<!-- Root screen in the Cadran appearance (cadran::enabled(), Preferences ›
+     Appearance): the tabs of main.xml in the same order, each the tab itself
+     with its Cadran top (source/tab/cadran_*.cpp, registered in main.cpp);
+     cadran::style_rail gives the sidebar its icons. -->
 
 <brls:AppletFrame
     iconInterpolation="linear"
@@ -15,45 +14,45 @@
         title="@i18n/playguard/title"
         icon="@res/img/app_icon.jpg">
 
-        <brls:Tab label="Aujourd'hui">
+        <brls:Tab label="@i18n/playguard/cadran/tabs/today">
             <CadranTab/>
         </brls:Tab>
 
         <brls:Separator/>
 
-        <brls:Tab label="Temps de jeu">
+        <brls:Tab label="@i18n/playguard/tabs/play_timer">
             <CadranPlayTimerTab/>
         </brls:Tab>
 
-        <brls:Tab label="Activité">
+        <brls:Tab label="@i18n/playguard/tabs/activity">
             <CadranActivityTab/>
         </brls:Tab>
 
-        <brls:Tab label="Restrictions">
+        <brls:Tab label="@i18n/playguard/tabs/restrictions">
             <CadranRestrictionsTab/>
         </brls:Tab>
 
-        <brls:Tab label="Code PIN">
+        <brls:Tab label="@i18n/playguard/tabs/security">
             <CadranSecurityTab/>
         </brls:Tab>
 
         <brls:Separator/>
 
-        <brls:Tab label="Console">
+        <brls:Tab label="@i18n/playguard/tabs/console">
             <ConsoleTab/>
         </brls:Tab>
 
         <brls:Separator/>
 
-        <brls:Tab label="Historique">
+        <brls:Tab label="@i18n/playguard/tabs/history">
             <HistoryTab/>
         </brls:Tab>
 
-        <brls:Tab label="Préférences">
+        <brls:Tab label="@i18n/playguard/tabs/preferences">
             <CadranPreferencesTab/>
         </brls:Tab>
 
-        <brls:Tab label="À propos">
+        <brls:Tab label="@i18n/playguard/tabs/about">
             <CadranAboutTab/>
         </brls:Tab>
 

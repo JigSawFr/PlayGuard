@@ -1505,7 +1505,33 @@
         "pill": {
             "pc_on": "Parental controls on",
             "pc_off": "Parental controls not set up",
-            "unlocked": "Unlocked for now"
+            "unlocked": "Unlocked for now",
+            "timer_on": "Play timer on",
+            "timer_off": "Countdown paused",
+            "timer_none": "No play-time limit"
+        },
+        "week": {
+            "no_limit": "no limit",
+            "every_day": "{} every day",
+            "summary": "{} on weekdays · {} at the weekend",
+            "profile": "Profile · {}",
+            "edit": "Edit",
+            "done": "Done",
+            "pick": "Exact time",
+            "edit_day": "edit a day",
+            "pick_day": "exact time or no limit",
+            "step": "± 15 min",
+            "day": "change day",
+            "weekdays": "copy to Mon → Fri",
+            "weekend": "copy to Sat · Sun",
+            "none": "no limit",
+            "first_change": "{} {} → {}",
+            "no_changes": "No changes waiting · + saves",
+            "discard": "Discard",
+            "remove": "Remove the limit"
+        },
+        "tabs": {
+            "today": "Today"
         }
     }
 }

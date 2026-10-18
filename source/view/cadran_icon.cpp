@@ -139,6 +139,8 @@ void CadranIcon::draw(NVGcontext* vg, float x, float y, float width, float heigh
         nvgMoveTo(vg, 4, 20); nvgLineTo(vg, 20, 20); nvgStroke(vg);
     } else if (i == "chevron-down") {
         nvgBeginPath(vg); nvgStrokeWidth(vg, 2.5f); nvgMoveTo(vg, 6, 9); nvgLineTo(vg, 12, 15); nvgLineTo(vg, 18, 9); nvgStroke(vg);
+    } else if (i == "chevron-left") {
+        nvgBeginPath(vg); nvgStrokeWidth(vg, 2.5f); nvgMoveTo(vg, 15, 6); nvgLineTo(vg, 9, 12); nvgLineTo(vg, 15, 18); nvgStroke(vg);
     } else if (i == "chevron-right") {
         nvgBeginPath(vg); nvgStrokeWidth(vg, 2.5f); nvgMoveTo(vg, 9, 6); nvgLineTo(vg, 15, 12); nvgLineTo(vg, 9, 18); nvgStroke(vg);
     } else if (i == "caret-up") {

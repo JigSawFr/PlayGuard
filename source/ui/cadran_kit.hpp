@@ -29,6 +29,10 @@ brls::Box* pill(const std::string& text, const char* dot_key);
 // A rounded chip with a text in the display face (an amount, a period…).
 brls::Box* chip(const std::string& text, float height = 48);
 
+// A row whose items go on to the next line when they do not fit (the XML
+// has no attribute for it).
+void wrap(brls::View* row);
+
 // Runs the A action `line` registered (its own code, its own checks). False
 // when it has none.
 bool press(brls::View* line);

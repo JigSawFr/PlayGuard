@@ -19,8 +19,9 @@ class PlayTimerTab : public TabBase
   protected:
     void refresh() override;
 
+    PtState pt = {};   // the state the last refresh read
+
   private:
-    PtState pt = {};
 
     void remove_limit();
 
