@@ -90,6 +90,7 @@ class Store
     int info_count() const;     // the parental controls' Info entries shown
     int console_count() const;  // the console's Action entries
     int tab_count(const std::string& tab) const;   // the Action entries of tab_of() `tab`: its number in the sidebar
+    int count_of(const std::vector<std::string>& ids) const;   // the Action entries among `ids`: a row's badge
 
   private:
     struct Slot

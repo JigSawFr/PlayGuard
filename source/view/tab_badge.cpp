@@ -45,6 +45,19 @@ void TabBadge::draw(NVGcontext* vg, float x, float y, float width, float height,
     nvgText(vg, cx, cy + r * 0.06f, n.c_str(), nullptr);
 }
 
+TabBadge* TabBadge::on_row(brls::Box* row)
+{
+    if (!row) return nullptr;
+    if (auto* badge = dynamic_cast<TabBadge*>(row->getView(BADGE_ID))) return badge;
+    auto* badge = new TabBadge();
+    // Last, so it lines up at the right whatever the value (an empty one
+    // still takes room).
+    badge->setMarginLeft(12);
+    badge->setMarginRight(0);
+    row->addView(badge);
+    return badge;
+}
+
 TabBadge* TabBadge::of(brls::SidebarItem* item)
 {
     if (!item) return nullptr;

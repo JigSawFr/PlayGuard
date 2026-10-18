@@ -65,6 +65,7 @@ int action_count();    // the parental controls' entries to do: the bell's numbe
 int info_count();      // the parental controls' entries for information
 int console_count();   // the console's entries to do
 int tab_count(const std::string& tab);   // the entries to do of a tab (notice_logic::tab_of): its sidebar badge
+int count_of(const std::vector<std::string>& ids);   // the entries to do among `ids`: a row's badge in its tab
 
 // Called (UI thread) after every change of what the bell shows.
 int  listen(std::function<void()> fn);

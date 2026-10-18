@@ -18,6 +18,10 @@ SecurityTab::SecurityTab()
     : TabBase("xml/tab/security.xml")
 {
     this->enable_auto_refresh(5000);
+    // What the notification bell says is to do here, on its row.
+    this->mark(set_pin.getView(), { "pin_missing", "pin_weak" });
+    this->mark(pin_lock_cell.getView(), { "pin_lock_off" });
+    this->mark(relock.getView(), { "unlocked" });
     pr_note->setSingleLine(false);
     rescue_note->setSingleLine(false);
     // Checked once: the sysmodule only comes and goes with the SD card out.

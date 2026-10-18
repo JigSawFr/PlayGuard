@@ -209,6 +209,16 @@ int Store::tab_count(const std::string& tab) const
     return n;
 }
 
+int Store::count_of(const std::vector<std::string>& ids) const
+{
+    int n = 0;
+    for (const auto& s : this->slots)
+        if (!s.dismissed && !s.acked && s.item.level == Level::Action &&
+            std::find(ids.begin(), ids.end(), s.item.id) != ids.end())
+            n++;
+    return n;
+}
+
 bool shown_kind(const std::string& id, const Shown& shown)
 {
     if (text::starts_with(id, "sys_")) return shown.system;
