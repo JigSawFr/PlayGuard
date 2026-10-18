@@ -38,12 +38,12 @@ VersionBadge::VersionBadge()
     number->setTextColor(brls::Application::getTheme()["brls/background"]);
     tag->addView(number);
     this->addView(tag);
-    if (release) return;
+    if (release || commit.empty()) return;
     auto* text = new brls::Label();
     text->setFontSize(18);
     text->setSingleLine(true);
     text->setMarginLeft(10);
-    text->setText(commit.empty() ? "DEV" : "DEV · " + commit);
+    text->setText(commit);
     text->setTextColor(ink);
     this->addView(text);
 }
