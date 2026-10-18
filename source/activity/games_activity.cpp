@@ -385,8 +385,14 @@ void GamesActivity::show_selected(const GameStat* g)
     bool owned = false;
     if (const int tex = game_icons::texture(g->app_id, owned)) {
         // As GameCell: the flag set once the old one is replaced.
+        icon->setScalingType(brls::ImageScalingType::FIT);
         icon->innerSetImage(tex);
         icon->setFreeTexture(owned);
+    } else if (const int waiting = game_icons::placeholder()) {
+        // Until it arrives, or for a game without one, as the covers.
+        icon->setScalingType(brls::ImageScalingType::CENTER);
+        icon->innerSetImage(waiting);
+        icon->setFreeTexture(false);
     }
 }
 

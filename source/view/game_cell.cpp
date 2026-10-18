@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/game_cell.hpp"
 
+#include "action/game_icons.hpp"
+
 GameCell::GameCell(bool with_icon)
 {
     if (!with_icon) return;
@@ -10,6 +12,11 @@ GameCell::GameCell(bool with_icon)
     this->icon->setCornerRadius(8);
     this->icon->setMarginRight(16);
     this->icon->setScalingType(brls::ImageScalingType::FIT);
+    // Until the icon arrives (or for a game without one): the placeholder.
+    if (const int waiting = game_icons::placeholder()) {
+        this->icon->innerSetImage(waiting);
+        this->icon->setFreeTexture(false);
+    }
     this->addView(this->icon, 0);   // before the title
 }
 
