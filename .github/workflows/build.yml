@@ -263,8 +263,15 @@ jobs:
           path: .ccache
           key: ccache-desktop-${{ github.sha }}
           restore-keys: ccache-desktop-
+      # Only what this build used goes back to the cache (a hit refreshes an
+      # object's date): one build's objects, about 25 MB, not 400 MB of builds
+      # gone by that every shard restored.
       - name: Build (desktop simulation)
-        run: make desktop CMAKE_ARGS=-DPLAYGUARD_WERROR=ON && ccache --show-stats
+        run: |
+          start=$(date +%s)
+          make desktop CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
+          ccache --show-stats
+          ccache --evict-older-than "$(( $(date +%s) - start + 60 ))s"
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: matrix.shard == 'default'
         with:
@@ -424,6 +431,7 @@ jobs:
           # would take every object from the first).
           if [ "$PLAYGUARD_RELEASE" = 1 ]; then export CCACHE_DISABLE=1; fi
           ccache --zero-stats > /dev/null
+          start=$(date +%s)
           # PlayGuard's warnings as errors, as on the desktop: the libnx code
           # (source/core/*.c, the __SWITCH__ paths) is only built here.
           make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
@@ -453,6 +461,9 @@ jobs:
           fi
           # The raw sysmodule next to its zip, for the rescue artifact.
           cp sysmodule/out/playguard-rescue.nsp playguard-rescue.nsp
+          # Only what these builds used goes back to the cache (a hit refreshes
+          # an object's date), not 350 MB of builds gone by.
+          ccache --evict-older-than "$(( $(date +%s) - start + 60 ))s"
       - name: Both builds, when they differ
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
