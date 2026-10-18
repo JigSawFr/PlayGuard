@@ -1,9 +1,5 @@
 {
     "title": "PlayGuard",
-    "title_tags": {
-        "read_only": "只读",
-        "unlocked": "已暂时解除"
-    },
     "loading": {
         "tagline": "直接在主机上使用的家长控制",
         "step_console": "正在检查主机…",

@@ -1,9 +1,5 @@
 {
     "title": "PlayGuard",
-    "title_tags": {
-        "read_only": "alleen-lezen",
-        "unlocked": "tijdelijk ontgrendeld"
-    },
     "loading": {
         "tagline": "Ouderlijk toezicht, rechtstreeks op de console",
         "step_console": "Console controleren...",

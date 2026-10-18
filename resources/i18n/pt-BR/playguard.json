@@ -1,9 +1,5 @@
 {
     "title": "PlayGuard",
-    "title_tags": {
-        "read_only": "somente leitura",
-        "unlocked": "desbloqueado temporariamente"
-    },
     "loading": {
         "tagline": "Controle dos pais direto no console",
         "step_console": "Verificando o console...",

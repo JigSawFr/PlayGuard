@@ -1,9 +1,5 @@
 {
     "title": "PlayGuard",
-    "title_tags": {
-        "read_only": "sola lettura",
-        "unlocked": "sbloccato temporaneamente"
-    },
     "loading": {
         "tagline": "Il filtro famiglia, direttamente sulla console",
         "step_console": "Verifica della console...",

@@ -1,9 +1,5 @@
 {
     "title": "PlayGuard",
-    "title_tags": {
-        "read_only": "읽기 전용",
-        "unlocked": "일시 해제 중"
-    },
     "loading": {
         "tagline": "본체에서 바로 쓰는 자녀 보호 기능",
         "step_console": "본체 확인 중...",

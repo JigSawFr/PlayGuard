@@ -1,9 +1,5 @@
 {
     "title": "PlayGuard",
-    "title_tags": {
-        "read_only": "read-only",
-        "unlocked": "temporarily unlocked"
-    },
     "loading": {
         "tagline": "Parental controls, right on the console",
         "step_console": "Checking the console...",

@@ -1,9 +1,5 @@
 {
     "title": "PlayGuard",
-    "title_tags": {
-        "read_only": "só de leitura",
-        "unlocked": "desbloqueado temporariamente"
-    },
     "loading": {
         "tagline": "O controlo parental, diretamente na consola",
         "step_console": "A verificar a consola...",

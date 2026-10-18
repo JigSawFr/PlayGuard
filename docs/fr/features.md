@@ -18,7 +18,7 @@ Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la co
 
 ↑/↓ déplacer · Ⓐ valider · Ⓑ retour ou annuler (deux fois sur la barre latérale pour quitter) · Ⓧ actualiser (sur les onglets qui relisent la console) · Ⓨ notifications · **−** langue et thème · **+** enregistre les limites par jour.
 
-Ce qui a échoué est dit dans une boîte de dialogue, ce qui a réussi dans une notification. Le titre indique quand l'application est en lecture seule ou tant que le contrôle parental est déverrouillé temporairement ; en lecture seule, les actions restent à leur place, grisées, et disent pourquoi quand on les choisit.
+Ce qui a échoué est dit dans une boîte de dialogue, ce qui a réussi dans une notification. Une icône à droite du titre indique tant que le contrôle parental est déverrouillé temporairement (un cadenas ouvert) ou quand l'application est en lecture seule (un crayon barré) ; la toucher mène là où on l'annule (Code PIN › Réactiver le contrôle parental, l'écran du firmware) ; en lecture seule, les actions restent à leur place, grisées, et disent pourquoi quand on les choisit.
 
 L'application est organisée en onglets, comme les paramètres de la console ; chacun a sa section ci-dessous.
 

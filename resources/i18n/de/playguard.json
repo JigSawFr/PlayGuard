@@ -1,9 +1,5 @@
 {
     "title": "PlayGuard",
-    "title_tags": {
-        "read_only": "schreibgeschützt",
-        "unlocked": "vorübergehend aufgehoben"
-    },
     "loading": {
         "tagline": "Altersbeschränkungen direkt auf der Konsole",
         "step_console": "Konsole wird geprüft...",

@@ -713,7 +713,7 @@ if GATE:
     shot("01_gate")            # a release supports the firmware: its cell has the focus
     key("Down")                # Continue in read-only mode
     key("Return")
-    shot("02_read_only")       # title "PlayGuard · read-only"
+    shot("02_read_only")       # title "PlayGuard" and the read-only icon
     key("Down")                # Play timer: the read-only note, no limit editors
     key("Right")
     shot("03_play_timer_read_only")
