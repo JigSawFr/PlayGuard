@@ -1568,6 +1568,17 @@
         "about": {
             "tagline": "Parental controls for Nintendo Switch · free software (GPLv3)",
             "version": "Version {}"
+        },
+        "child": {
+            "header": "Child screen · PIN to come back",
+            "title": "Time left today",
+            "bed": "Bed at",
+            "stops": "The console stops by itself when time is up",
+            "warns": "The console tells you when time is up",
+            "enjoy": "Have fun!",
+            "of": "of {}",
+            "back": "Back to the parent · PIN",
+            "play": "Hand the console over and play"
         }
     }
 }

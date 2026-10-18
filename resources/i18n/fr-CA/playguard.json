@@ -1568,6 +1568,17 @@
         "about": {
             "tagline": "Contrôle parental pour Nintendo Switch · logiciel libre (GPLv3)",
             "version": "Version {}"
+        },
+        "child": {
+            "header": "Écran enfant · code PIN pour revenir",
+            "title": "Il te reste aujourd'hui",
+            "bed": "Au lit à",
+            "stops": "La console s'arrête toute seule quand le temps est écoulé",
+            "warns": "La console prévient quand le temps est écoulé",
+            "enjoy": "Bonne partie !",
+            "of": "sur {}",
+            "back": "Retour parent · code PIN",
+            "play": "Rendre la console et jouer"
         }
     }
 }

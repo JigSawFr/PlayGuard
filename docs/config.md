@@ -45,6 +45,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `schema` | integer | `1` | `1` | written by PlayGuard, not read |
 | `language` | string | `"system"` (the console's language), `"en-US"`, `"fr"`, `"fr-CA"`, `"de"`, `"es"`, `"es-419"`, `"it"`, `"nl"`, `"pt"`, `"pt-BR"`, `"ru"`, `"ja"`, `"ko"`, `"zh-Hans"`, `"zh-Hant"` | `"system"` | Preferences |
 | `theme` | string | `"system"`, `"light"`, `"dark"` | `"system"` | Preferences |
+| `appearance` | string | `"cadran"` (the screens after the design boards: an icon rail, today's time as a ring, cards and tiles) or `"classic"` (the lists of earlier versions); read at start-up, so a change asks to restart | `"cadran"` | Preferences |
 | `start_tab` | string | the tab shown at start-up: `"dashboard"` (Overview), `"play_timer"`, `"activity"`, `"restrictions"`, `"security"` (PIN), `"console"`, `"history"`, `"preferences"`, `"about"`; `"clock"` and `"tools"`, from before they became Console, read as `"console"` | `"dashboard"` | Preferences |
 | `advanced` | boolean | shows the play timer's debug-class actions | `false` | Play timer › Advanced |
 | `auto_relock` | boolean | turns parental controls back on right after a change that needed the temporary unlock | `true` | PIN |
@@ -139,7 +140,6 @@ Set in *About › Help & diagnostics › Developer*, shown once developer mode i
 | `pt_log` | boolean | *Record the play timer* (`logs/play_timer/log.csv`) | `false` |
 | `dev_builds_order` | string | how *Install another build* orders the pull requests (A on their tab when it is shown): `"newest"` (the newest build first) or `"number"` (the highest number first); main's commits are always newest first | `"newest"` |
 | `frame_stats` | boolean | *About › Help & diagnostics › Developer › Frame statistics* (`logs/frame_stats.txt`: one line per second, the UI thread's time per frame and the late frames, to weigh one screen against another on the console) | `false` |
-| `cadran` | boolean | *About › Help & diagnostics › Developer › Cadran prototype*: the screens after the design boards instead of the current ones, read at start-up, only while the developer tools are on | `false` |
 
 ## State kept between launches
 
@@ -210,6 +210,7 @@ line; the order does not matter when it reads them:
   "schema": 1,
   "language": "fr",
   "theme": "system",
+  "appearance": "cadran",
   "start_tab": "dashboard",
   "advanced": false,
   "auto_relock": true,
@@ -250,7 +251,6 @@ line; the order does not matter when it reads them:
   "dev_mode": false,
   "pt_log": false,
   "frame_stats": false,
-  "cadran": false,
   "dev_builds_order": "newest",
   "extra_auto_restore": false
 }

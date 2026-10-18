@@ -133,21 +133,6 @@ void cadran::install_theme()
 
 namespace
 {
-// "jeudi 8 octobre", from the console's clock.
-std::string date_text()
-{
-    static const char* months[] = { "janvier", "février", "mars", "avril", "mai", "juin", "juillet",
-                                    "août", "septembre", "octobre", "novembre", "décembre" };
-    const std::string date = ui::today_date();   // "2026-10-08"
-    int month = 0, day = 0;
-    if (date.size() >= 10) {
-        month = std::atoi(date.substr(5, 2).c_str());
-        day = std::atoi(date.substr(8, 2).c_str());
-    }
-    if (month < 1 || month > 12 || day < 1) return date;
-    return fmt::format("{} {} {}", ui::day_name_in_text(ui::today_weekday()), day, months[month - 1]);
-}
-
 class Glow : public brls::View
 {
   public:
@@ -283,7 +268,7 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
         s_main_pill_label = pill_label;
         s_main_pill_icon = glyph;
         auto* date = new brls::Label();
-        date->setText(date_text());
+        date->setText(cadran::kit::long_date());
         date->setFontSize(16);
         date->setTextColor(theme["cadran/text3"]);
         date->setMarginLeft(10);

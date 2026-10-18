@@ -1,9 +1,9 @@
-// CadranChildActivity — "Cadran" prototype, the child screen: what the parent
-// shows before handing the console over. One big ring of the time left
-// today, the bedtime, nothing to change. A goes back to the parent once the
-// PIN is entered (at once without a PIN on the console), B leaves PlayGuard
-// so the child can play. PLAYGUARD_SIM_CADRAN=1 on the desktop, Tools ›
-// Developer › Cadran prototype on the console; strings not localised.
+// CadranChildActivity — the Cadran child screen (Overview › Show the child):
+// what the parent shows before handing the console over. One big ring of
+// the time left today, the bedtime, what the console does when time is up,
+// nothing to change. A goes back to the parent once the PIN is entered (at
+// once without a PIN on the console), B leaves PlayGuard so the child can
+// play (asking first to lock again while unlocked, as quitting does).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -28,4 +28,5 @@ class CadranChildActivity : public brls::Activity
     BRLS_BIND(PtRing,       ring,     "child_ring");
     BRLS_BIND(CadranDigits, bedtime,  "child_bedtime");
     BRLS_BIND(brls::Box,    bed_chip, "child_bed_chip");
+    BRLS_BIND(brls::Label,  time_up,  "child_time_up");
 };

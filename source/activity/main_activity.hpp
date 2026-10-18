@@ -8,8 +8,8 @@
 class MainActivity : public brls::Activity
 {
   public:
-    // activity/main.xml; on desktop, PLAYGUARD_SIM_CADRAN=1 swaps the Overview
-    // for the "Cadran" prototype (activity/main_cadran.xml).
+    // activity/main.xml, or activity/main_cadran.xml in the Cadran appearance
+    // (cadran::enabled(): Preferences › Appearance).
     brls::View* createContentView() override;
 
     void onContentAvailable() override;
@@ -24,6 +24,10 @@ class MainActivity : public brls::Activity
     // Shows tab `position` (ui::tab) and focuses its content: the view
     // with id `row` when given and shown, else its first one.
     void open_tab(int position, const std::string& row = "");
+
+    // Quits, but first asks to lock again when parental controls are still
+    // temporarily unlocked (B twice on the sidebar, the child screen's B).
+    static void quit_or_relock();
 
   private:
     // Midnight while the app is open: what start-up does for a new day

@@ -51,7 +51,7 @@ static void compact_sidebar(brls::View* tab_frame)
 // Locking again waits for the screen to be gone, and closes the game PlayGuard
 // runs over too (pt_flow::lock_at_exit): back to the HOME menu, locked. Until
 // then, the closing screen.
-static void quit_or_relock()
+void MainActivity::quit_or_relock()
 {
     bool unlocked = false;
     if (app::read_only() || R_FAILED(pctl_lock_state(nullptr, &unlocked)) || !unlocked) {
@@ -92,7 +92,7 @@ void MainActivity::onContentAvailable()
     brls::Logger::info("main screen opened");
     this->update_title();
     compact_sidebar(this->getView("main_tabs"));
-    // The "Cadran" prototype: the frame after the design boards.
+    // The Cadran appearance: the frame after the design boards.
     if (cadran::enabled())
         cadran::style_frame(dynamic_cast<brls::AppletFrame*>(this->getContentView()), this->getView("main_tabs"));
 

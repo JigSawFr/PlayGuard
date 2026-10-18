@@ -18,7 +18,8 @@
   so a non-namespace-aware parser is used);
 - brls:Label never carries padding attributes (borealis throws at runtime);
 - every BRLS_BIND(type, name, "id") names an id of the XML its class
-  inflates (CONTENT_FROM_XML_RES, TabBase("xml/..."), inflateFromXMLRes), or
+  inflates (CONTENT_FROM_XML_RES, TabBase("xml/..."), inflateFromXMLRes,
+  createFromXMLResource), or
   of a custom view that XML holds (<PtStateHeader/>): a missing one is a null
   view at runtime, the first use of which crashes. Every class of a header
   and of its .cpp counts.
@@ -306,7 +307,8 @@ for path, text in sorted(code_text.items()):
 # BRLS_BIND ids against the XML each class inflates. A class's XML is named in
 # its header (an activity's CONTENT_FROM_XML_RES("activity/x.xml"), under
 # resources/xml/) or in its .cpp (a tab's TabBase("xml/tab/x.xml"), a view's
-# inflateFromXMLRes("xml/view/x.xml"), under resources/). Each one, and each
+# inflateFromXMLRes("xml/view/x.xml"), under resources/; a Cadran tab's top,
+# createFromXMLResource("view/x.xml"), under resources/xml/). Each one, and each
 # BRLS_BIND, belongs to the class around it: the last "class X" before it, or
 # the last "X::f(" a definition at the start of a line opens, whichever is
 # nearer; in the header or in its .cpp.
@@ -330,7 +332,7 @@ pairs = sorted({p[:-len(".hpp")] if p.endswith(".hpp") else p[:-len(".cpp")]
 for stem in pairs:
     for path in (stem + ".hpp", stem + ".cpp"):
         text = read(path)
-        for m in re.finditer(r'CONTENT_FROM_XML_RES\(\s*"([^"]+)"|(?:TabBase|inflateFromXMLRes)\(\s*"xml/([^"]+)"', text):
+        for m in re.finditer(r'(?:CONTENT_FROM_XML_RES|createFromXMLResource)\(\s*"([^"]+)"|(?:TabBase|inflateFromXMLRes)\(\s*"xml/([^"]+)"', text):
             name = owner_at(text, m.start())
             if name:
                 class_xml.setdefault(name, m.group(1) or m.group(2))
@@ -342,6 +344,7 @@ for path in code_files:
     text = read(path)
     loaded_xml.update(re.findall(r'CONTENT_FROM_XML_RES\(\s*"([^"]+)"', text))
     loaded_xml.update(re.findall(r'"xml/([^"]+\.xml)"', text))   # TabBase, inflateFromXMLRes
+    loaded_xml.update(re.findall(r'createFromXMLResource\(\s*"([^"]+\.xml)"', text))
 
 xml_ids = {}    # XML path -> (ids, element names)
 for path in glob.glob(f"{xml_dir}/**/*.xml", recursive=True):
@@ -389,7 +392,7 @@ for name, (path, binds) in sorted(class_binds.items()):
 
 # XML layouts nothing loads.
 for res in sorted(set(xml_ids) - loaded_xml):
-    warnings.append(f"resources/xml/{res} is never loaded (no CONTENT_FROM_XML_RES, TabBase or inflateFromXMLRes)")
+    warnings.append(f"resources/xml/{res} is never loaded (no CONTENT_FROM_XML_RES, TabBase, inflateFromXMLRes or createFromXMLResource)")
 
 # Images nothing names ("img/x.png" in the code, "@res/img/x.png" in a layout).
 # The emoji are a palette for the release notes (img/emoji/README.md): an
