@@ -104,34 +104,34 @@ void ClockTab::refresh()
     if (std::getenv("PLAYGUARD_SIM_NOW")) ticked = 0;
 #endif
     const std::string na = "playguard/common/unavailable"_i18n;
-    user->setDetailText(R_SUCCEEDED(s.user_rc) ? ui::time_text(s.user_time + ticked) : na);
-    network->setDetailText(R_SUCCEEDED(s.network_rc) ? ui::time_text(s.network_time + ticked) : na);
-    accuracy->setDetailText(ui::bool_text(R_SUCCEEDED(s.accuracy_rc), s.accuracy,
-                                          "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
+    ui::set_detail(user, R_SUCCEEDED(s.user_rc) ? ui::time_text(s.user_time + ticked) : na);
+    ui::set_detail(network, R_SUCCEEDED(s.network_rc) ? ui::time_text(s.network_time + ticked) : na);
+    ui::set_detail(accuracy, ui::bool_text(R_SUCCEEDED(s.accuracy_rc), s.accuracy,
+                                           "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
     accuracy->setDetailTextColor(R_SUCCEEDED(s.accuracy_rc) ? (s.accuracy ? ui::color_ok() : ui::color_warn())
                                                             : ui::color_neutral());
-    autosync->setDetailText(ui::bool_text(R_SUCCEEDED(s.automatic_rc), s.automatic,
-                                          "playguard/common/on"_i18n, "playguard/common/off"_i18n));
+    ui::set_detail(autosync, ui::bool_text(R_SUCCEEDED(s.automatic_rc), s.automatic,
+                                           "playguard/common/on"_i18n, "playguard/common/off"_i18n));
     this->autosync_off = R_SUCCEEDED(s.automatic_rc) && !s.automatic;
     autosync->setDetailTextColor(this->autosync_off ? ui::color_warn() : ui::color_neutral());
-    zone->setDetailText(R_SUCCEEDED(s.location_rc) && s.location[0] ? std::string(s.location) : na);
+    ui::set_detail(zone, R_SUCCEEDED(s.location_rc) && s.location[0] ? std::string(s.location) : na);
 
-    region->setDetailText(region_label(this->region_id));
-    server_cell->setDetailText(this->server);
+    ui::set_detail(region, region_label(this->region_id));
+    ui::set_detail(server_cell, this->server);
 
     // "Set the network clock" only exists while a fresh measurement does.
     if (this->last.ok) {
         const int64_t left = clock_flow::seconds_left(this->last);
         if (left <= 0) {
             this->last = clock_flow::Measurement{};
-            this->result->setText("playguard/clock/expired"_i18n);
+            ui::set_text(this->result, "playguard/clock/expired"_i18n);
             ui::set_visible(warning.getView(), false);
         } else {
             // Counts down every second (the tab refreshes itself each second).
             // "1 min 45 s": "1:45" read like the hours:minutes typed elsewhere.
             const std::string span = left >= 60 ? brls::getStr("playguard/common/min_sec", (int)(left / 60), (int)(left % 60))
                                                 : brls::getStr("playguard/common/sec", (int)left);
-            apply_cell->setDetailText(brls::getStr("playguard/clock/valid_for", span));
+            ui::set_detail(apply_cell, brls::getStr("playguard/clock/valid_for", span));
         }
     }
     // Measuring only reads: also in read-only mode, where setting is greyed.
@@ -148,7 +148,7 @@ void ClockTab::set_server(const std::string& host, const std::string& reg)
     this->region_id = reg;
     this->last = clock_flow::Measurement{};
     this->offline = false;
-    this->result->setText("");
+    ui::set_text(this->result, "");
     ui::set_visible(warning.getView(), false);
     auto& cfg = config::get();
     cfg.ntp_server = host;
@@ -216,9 +216,9 @@ void ClockTab::measure()
     ui::set_visible(apply_cell.getView(), false);
     ui::set_visible(copy_cell.getView(), false);
     ui::set_visible(warning.getView(), false);
-    this->result->setText("");
+    ui::set_text(this->result, "");
     // A spinner says it is working; the text says with whom.
-    progress_text->setText(brls::getStr("playguard/clock/measuring", this->server));
+    ui::set_text(progress_text, brls::getStr("playguard/clock/measuring", this->server));
     ui::set_visible(progress.getView(), true);
 
     std::weak_ptr<bool> weak = this->alive;
@@ -228,11 +228,11 @@ void ClockTab::measure()
         ui::set_visible(progress.getView(), false);
         this->last = m;
         this->offline = offline_clock_logic::offer(m.ok, this->snap) != offline_clock_logic::Offer::None;
-        this->result->setText(this->offline ? m.report + "\n\n" + "playguard/clock/offline_hint"_i18n : m.report);
+        ui::set_text(this->result, this->offline ? m.report + "\n\n" + "playguard/clock/offline_hint"_i18n : m.report);
         // The servers disagreeing, and a write that would be refused, in amber.
         std::string warn = m.warning;
         if (m.ok && this->autosync_off) warn += (warn.empty() ? "" : "\n") + "playguard/clock/autosync_off_note"_i18n;
-        warning->setText(warn);
+        ui::set_text(warning, warn);
         ui::set_visible(warning.getView(), !warn.empty());
         this->refresh();   // shows "Set the network clock"
     });
@@ -242,7 +242,7 @@ void ClockTab::apply()
 {
     clock_flow::apply(this->last, [this](const std::string& message) {
         this->last = clock_flow::Measurement{};
-        this->result->setText(message);
+        ui::set_text(this->result, message);
         ui::set_visible(warning.getView(), false);
         this->snap_ok = false;   // the network clock just changed: read it again
         this->refresh();
@@ -253,7 +253,7 @@ void ClockTab::copy()
 {
     clock_flow::apply_console_clock([this](const std::string& message) {
         this->offline = false;
-        this->result->setText(message);
+        ui::set_text(this->result, message);
         ui::set_visible(warning.getView(), false);
         this->snap_ok = false;   // the network clock just changed: read it again
         this->refresh();

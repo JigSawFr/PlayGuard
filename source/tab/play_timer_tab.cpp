@@ -69,7 +69,7 @@ PlayTimerTab::PlayTimerTab()
         pt_flow::stop_today(this->pt, [this]() { this->refresh(); });
         return true;
     });
-    split->setDetailText(ui::opens());
+    ui::set_detail(split, ui::opens());
     split->registerClickAction([](brls::View*) {
         if (ui::refuse_read_only()) return true;
         brls::Application::pushActivity(PlayTimerPerDayActivity::week_split());
@@ -113,7 +113,7 @@ PlayTimerTab::PlayTimerTab()
         config::get().extra_auto_restore = on;
         ui::save_config();
     });
-    advanced->setDetailText(ui::opens());
+    ui::set_detail(advanced, ui::opens());
     advanced->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new PlayTimerAdvancedActivity());
         return true;
@@ -151,7 +151,7 @@ void PlayTimerTab::refresh()
                                  (brls::DetailCell*)time_up.getView(), (brls::DetailCell*)extra_amounts.getView(),
                                  (brls::DetailCell*)extra_auto.getView() })
         ui::show_writable(c, writable);
-    extra->setDetailText(pt_flow::extra_today_text(this->pt));
+    ui::set_detail(extra, pt_flow::extra_today_text(this->pt));
     for (brls::View* v : { (brls::View*)bedtime_header.getView(), (brls::View*)bedtime.getView(),
                            (brls::View*)bedtime_reset.getView(), (brls::View*)bedtime_note.getView() })
         ui::set_visible(v, fw_ok);
@@ -159,7 +159,7 @@ void PlayTimerTab::refresh()
                            (brls::View*)extra_auto.getView(), (brls::View*)advanced.getView() })
         ui::set_visible(v, fw_ok);
     const auto& cfg = config::get();
-    extra_amounts->setDetailText(amounts_text(config::EXTRA_SETS[extra_set_index(cfg.extra_amounts)]));
+    ui::set_detail(extra_amounts, amounts_text(config::EXTRA_SETS[extra_set_index(cfg.extra_amounts)]));
     extra_auto->setOn(cfg.extra_auto_restore, false);
 
     ui::set_visible(week.getView(), fw_ok && this->pt.valid);
@@ -174,16 +174,16 @@ void PlayTimerTab::refresh()
     // Profiles…: the profile applied now, else how many are saved.
     const std::string current = this->pt.valid ? profiles::match(this->pt.day_min) : "";
     const size_t saved = current.empty() ? profiles::count() : 0;
-    profiles_cell->setDetailText(ui::opens(!current.empty() ? current
-                                           : saved ? brls::getStr("playguard/play_timer/profiles_count", (int)saved) : ""));
-    time_up->setDetailText(pt_flow::time_up_text(this->pt));
+    ui::set_detail(profiles_cell, ui::opens(!current.empty() ? current
+                                            : saved ? brls::getStr("playguard/play_timer/profiles_count", (int)saved) : ""));
+    ui::set_detail(time_up, pt_flow::time_up_text(this->pt));
 
     // "Same limit every day": the value when all days agree, else that they
     // differ, as the bedtime row says it (a range such as "1 h to 3 h" read
     // as a limit that is set; a dash would read as "unavailable").
     bool uniform = this->pt.valid;
     for (int i = 1; i < 7 && uniform; i++) uniform = this->pt.day_min[i] == this->pt.day_min[0];
-    quick->setDetailText(uniform ? ui::fmt_minutes(this->pt.day_min[0]) : "playguard/play_timer/bedtime_varies"_i18n);
+    ui::set_detail(quick, uniform ? ui::fmt_minutes(this->pt.day_min[0]) : "playguard/play_timer/bedtime_varies"_i18n);
 
     // The bedtime as the block holds it, every day, once the console's answer
     // confirms where it is (pt_logic::bedtime_layout_ok); else what the
@@ -192,20 +192,20 @@ void PlayTimerTab::refresh()
     PtBedtime same;
     if (pt_logic::bedtime_layout_ok(this->pt, wd)) {
         const bool uniform = pt_logic::bedtime_uniform(this->pt, &same);
-        bedtime->setDetailText(!uniform ? "playguard/play_timer/bedtime_varies"_i18n
-                               : same.on ? fmt::format("{:02d}:{:02d}", same.hour, same.minute)
-                                         : "playguard/common/off"_i18n);
-        bedtime_reset->setDetailText(uniform && same.on ? fmt::format("{:02d}:{:02d}", same.end_hour, same.end_minute)
-                                     : uniform ? "—" : "playguard/play_timer/bedtime_varies"_i18n);
+        ui::set_detail(bedtime, !uniform ? "playguard/play_timer/bedtime_varies"_i18n
+                                : same.on ? fmt::format("{:02d}:{:02d}", same.hour, same.minute)
+                                          : "playguard/common/off"_i18n);
+        ui::set_detail(bedtime_reset, uniform && same.on ? fmt::format("{:02d}:{:02d}", same.end_hour, same.end_minute)
+                                      : uniform ? "—" : "playguard/play_timer/bedtime_varies"_i18n);
     } else {
         if (this->pt.bedtime_valid) {
             std::string hm = fmt::format("{:02d}:{:02d}", this->pt.bedtime_hour, this->pt.bedtime_minute);
-            bedtime->setDetailText(brls::getStr(this->pt.bedtime_enabled ? "playguard/play_timer/bedtime_value_on"
-                                                                         : "playguard/play_timer/bedtime_value_off", hm));
+            ui::set_detail(bedtime, brls::getStr(this->pt.bedtime_enabled ? "playguard/play_timer/bedtime_value_on"
+                                                                          : "playguard/play_timer/bedtime_value_off", hm));
         } else {
-            bedtime->setDetailText(na);
+            ui::set_detail(bedtime, na);
         }
-        bedtime_reset->setDetailText(this->pt.bedtime_reset_valid
+        ui::set_detail(bedtime_reset, this->pt.bedtime_reset_valid
             ? fmt::format("{:02d}:{:02d}", this->pt.bedtime_reset_hour, this->pt.bedtime_reset_minute) : na);
     }
 
