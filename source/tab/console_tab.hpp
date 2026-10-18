@@ -7,6 +7,8 @@
 
 #include "tab/tab_base.hpp"
 
+class WarnIcon;
+
 class ConsoleTab : public TabBase
 {
   public:
@@ -17,7 +19,9 @@ class ConsoleTab : public TabBase
     void refresh() override;
 
   private:
-    bool serial_revealed = false;   // until the tab is left (tabs are rebuilt when reopened)
+    bool        serial_revealed = false;   // until the tab is left (tabs are rebuilt when reopened)
+    std::string storage_note;              // the other system's, shown by A on the storage row
+    WarnIcon*   storage_warn = nullptr;
 
     BRLS_BIND(brls::DetailCell,  clock,        "cn_clock");
     BRLS_BIND(brls::DetailCell,  games,        "cn_games");
@@ -27,7 +31,6 @@ class ConsoleTab : public TabBase
     BRLS_BIND(brls::Label,       sys_advice,   "cn_sys_advice");
     BRLS_BIND(brls::DetailCell,  compat,       "cn_compat");
     BRLS_BIND(brls::DetailCell,  storage,      "cn_storage");
-    BRLS_BIND(brls::Label,       storage_note, "cn_storage_note");
     BRLS_BIND(brls::DetailCell,  blank,        "cn_blank");
     BRLS_BIND(brls::DetailCell,  serial,       "cn_serial");
     BRLS_BIND(brls::Label,       serial_note,  "cn_serial_note");

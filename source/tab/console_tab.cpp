@@ -9,13 +9,13 @@
 #include "tab/clock_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/patches.hpp"
+#include "view/warn_icon.hpp"
 
 using namespace brls::literals;
 
 ConsoleTab::ConsoleTab()
     : TabBase("xml/tab/console.xml")
 {
-    storage_note->setSingleLine(false);
     serial_note->setSingleLine(false);
     patches_note->setSingleLine(false);
 
@@ -58,6 +58,14 @@ ConsoleTab::ConsoleTab()
     this->mark(storage.getView(), { "sd_space" });
     this->mark(game_patches.getView(), { "patches" });
 
+    // The other system's parental controls: an icon on the row, the text a
+    // press away (a paragraph under it took half the screen).
+    storage_warn = WarnIcon::on_row(storage.getView());
+    storage->registerClickAction([this](brls::View*) {
+        if (!this->storage_note.empty()) ui::info(this->storage_note);
+        return true;
+    });
+
     // On a firmware newer than the checked one, the firmware screen again.
     compat->registerClickAction([](brls::View*) {
         if (fw_gate::needed()) brls::Application::pushActivity(new FirmwareGateActivity());
@@ -95,8 +103,9 @@ void ConsoleTab::refresh()
     compat->setDetailTextColor(c);
 
     storage->setDetailText(ui::storage_text(si));
-    const std::string other = ui::other_storage_note(si);
-    storage_note->setText(other);
+    this->storage_note = ui::other_storage_note(si);
+    storage->setFocusable(!this->storage_note.empty());
+    storage_warn->set_shown(!this->storage_note.empty());
     c = ui::color_neutral();
     blank->setDetailText(ui::blank_text(si, &c));
     blank->setDetailTextColor(c);
@@ -116,8 +125,7 @@ void ConsoleTab::refresh()
     const std::string note = ui::patches_note(report, si, &warn);
     patches_note->setText(note);
     patches_note->setTextColor(warn ? ui::color_warn() : ui::color_note());
-    ui::set_visible_all({ { storage_note.getView(), !other.empty() },
-                          { sys_advice.getView(), !advice.empty() },
+    ui::set_visible_all({ { sys_advice.getView(), !advice.empty() },
                           { serial_note.getView(), ui::serial_warning(si) },
                           { patches_note.getView(), !note.empty() } });
 }
