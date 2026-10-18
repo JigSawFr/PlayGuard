@@ -1534,7 +1534,8 @@
             "first_change": "{} {} → {}",
             "no_changes": "Keine offenen Änderungen · + speichert",
             "discard": "Verwerfen",
-            "remove": "Limit entfernen"
+            "remove": "Limit entfernen",
+            "save_title": "Die Limits der Woche speichern?"
         },
         "tabs": {
             "today": "Heute"

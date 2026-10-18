@@ -1534,7 +1534,8 @@
             "first_change": "{} {} → {}",
             "no_changes": "Sem alterações pendentes · + guarda",
             "discard": "Descartar",
-            "remove": "Remover o limite"
+            "remove": "Remover o limite",
+            "save_title": "Salvar os limites da semana?"
         },
         "tabs": {
             "today": "Hoje"

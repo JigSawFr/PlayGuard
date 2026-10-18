@@ -117,8 +117,29 @@ static void scroll_with(brls::Dialog* dialog, brls::ScrollingFrame* frame, brls:
     }
 }
 
+// Cadran: the text laid out by cadran::dialog_body (and `extra` in it),
+// scrolling when taller than the dialog's room.
+static brls::Dialog* cadran_dialog(const std::string& text, brls::View* extra)
+{
+    brls::Box* body = cadran::dialog_body(text, extra);
+    YGNodeCalculateLayout(body->getYGNode(), 720, YGUndefined, YGDirectionLTR);
+    const float room = content_height();
+    if (YGNodeLayoutGetHeight(body->getYGNode()) <= room) return new brls::Dialog(body);
+    auto* frame = new brls::ScrollingFrame();
+    frame->setHeight(room);
+    frame->setScrollingBehavior(brls::ScrollingBehavior::NATURAL);
+    frame->setContentView(body);
+    auto* box = new brls::Box(brls::Axis::COLUMN);
+    box->setAlignItems(brls::AlignItems::STRETCH);
+    box->addView(frame);
+    auto* dialog = new brls::Dialog(box);
+    scroll_with(dialog, frame, body);
+    return dialog;
+}
+
 brls::Dialog* dialog(const std::string& text)
 {
+    if (cadran::enabled()) return cadran_dialog(text, nullptr);
     // borealis' own layout first (24 px, 65 / 115 px margins, as
     // brls::Dialog(text)); a longer text gets narrower margins and a
     // smaller font, down to 18 px, then scrolls. Never brls::Dialog(text)
@@ -150,6 +171,7 @@ brls::Dialog* dialog(const std::string& text)
 // `extra` measured first.
 static brls::Dialog* dialog_with(const std::string& text, brls::View* extra)
 {
+    if (cadran::enabled()) return cadran_dialog(text, extra);
     const float width = 720 - 2 * 40;
     extra->setMarginTop(18);
     YGNodeCalculateLayout(extra->getYGNode(), width, YGUndefined, YGDirectionLTR);

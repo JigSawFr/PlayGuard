@@ -33,7 +33,8 @@ std::string with_link_note(const std::string& body, const PctlStatus* st)
 }
 
 void confirm_write(const std::string& body_in, const std::string& confirm_label,
-                   std::function<void(bool did_unlock)> write, const uint16_t* new_days, bool danger)
+                   std::function<void(bool did_unlock)> write, const uint16_t* new_days, bool danger,
+                   const std::string& title)
 {
     if (ui::refuse_read_only()) return;
 
@@ -68,9 +69,14 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
         return week;
     };
 
+    const auto titled = [&title](const std::string& text) { return title.empty() ? text : title + "\n\n" + text; };
     if (!unlock) {
-        if (body.empty()) write(false);
-        else if (brls::View* week = preview()) ui::confirm_with(body, week, confirm_label, [write]() { write(false); }, nullptr, danger);
+        if (body.empty()) {
+            write(false);
+            return;
+        }
+        body = titled(body);
+        if (brls::View* week = preview()) ui::confirm_with(body, week, confirm_label, [write]() { write(false); }, nullptr, danger);
         else ui::confirm(body, confirm_label, [write]() { write(false); }, nullptr, danger);
         return;
     }
@@ -79,6 +85,7 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
     text += "playguard/play_timer/gate/body"_i18n + " " +
             (config::get().auto_relock ? "playguard/play_timer/gate/relock_auto"_i18n
                                        : "playguard/play_timer/gate/relock_manual"_i18n);
+    text = titled(text);
     auto unlock_and_write = [write]() {
         // Should the app stop before finish_write, the next start locks again:
         // without that record saved, no unlock (as for the extra time).

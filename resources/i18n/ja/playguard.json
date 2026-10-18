@@ -1534,7 +1534,8 @@
             "first_change": "{} {} → {}",
             "no_changes": "未保存の変更なし・＋で保存",
             "discard": "破棄",
-            "remove": "制限を削除"
+            "remove": "制限を削除",
+            "save_title": "今週の上限を保存しますか？"
         },
         "tabs": {
             "today": "今日"

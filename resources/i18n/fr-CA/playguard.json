@@ -1534,7 +1534,8 @@
             "first_change": "{} {} → {}",
             "no_changes": "Aucune modification en attente · + enregistre",
             "discard": "Annuler",
-            "remove": "Supprimer la limite"
+            "remove": "Supprimer la limite",
+            "save_title": "Enregistrer les limites de la semaine ?"
         },
         "tabs": {
             "today": "Aujourd'hui"

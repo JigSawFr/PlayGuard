@@ -1534,7 +1534,8 @@
             "first_change": "{} {} → {}",
             "no_changes": "No changes waiting · + saves",
             "discard": "Discard",
-            "remove": "Remove the limit"
+            "remove": "Remove the limit",
+            "save_title": "Save the week's limits?"
         },
         "tabs": {
             "today": "Today"

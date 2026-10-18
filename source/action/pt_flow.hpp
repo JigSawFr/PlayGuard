@@ -30,10 +30,11 @@ std::string with_link_note(const std::string& body, const PctlStatus* st = nullp
 // `write` runs at once. `write(did_unlock)` only runs when it is safe to
 // write; otherwise the user has already been told why.
 // `danger`: the confirm button is drawn in the "bad" colour (removing or
-// overwriting limits).
+// overwriting limits). `title`: the dialog's first line, when there is one
+// (no dialog only for it).
 void confirm_write(const std::string& body, const std::string& confirm_label,
                    std::function<void(bool did_unlock)> write, const uint16_t* new_days = nullptr,
-                   bool danger = false);
+                   bool danger = false, const std::string& title = "");
 
 // Writes the seven limits (pctl_play_timer_set_days) and records the change
 // in the history with `source` ("uniform", "profile" …) and `detail` (a

@@ -107,6 +107,7 @@ void cadran::install_theme()
         t->addColor("cadran/coral", p->coral);
         t->addColor("cadran/coral_fill", p->coral_fill);
         t->addColor("cadran/coral_line", p->coral_line);
+        t->addColor("cadran/coral_soft", p == &dark ? nvgRGBA(0xFF, 0x7A, 0x7A, 36) : nvgRGBA(0xE5, 0x48, 0x4D, 28));
         t->addColor("cadran/track", p->track);
         t->addColor("cadran/surf", p->surf);
         t->addColor("cadran/surf2", p->surf2);

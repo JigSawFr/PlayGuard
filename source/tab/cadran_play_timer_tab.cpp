@@ -160,7 +160,7 @@ void CadranPlayTimerTab::save()
         Result rc = pt_flow::write_days(snapshot.data(), "per_day");
         pt_flow::finish_write(rc, did_unlock, "playguard/play_timer/written_days"_i18n,
                               "playguard/play_timer/write_err"_i18n, [this]() { this->refresh(); });
-    }, snapshot.data());
+    }, snapshot.data(), false, "playguard/cadran/week/save_title"_i18n);
 }
 
 void CadranPlayTimerTab::discard()

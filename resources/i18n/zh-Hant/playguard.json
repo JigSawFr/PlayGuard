@@ -1534,7 +1534,8 @@
             "first_change": "{} {} → {}",
             "no_changes": "無待儲存的變更 · + 儲存",
             "discard": "放棄",
-            "remove": "刪除限制"
+            "remove": "刪除限制",
+            "save_title": "儲存本週的限制？"
         },
         "tabs": {
             "today": "今天"

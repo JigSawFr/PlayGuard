@@ -7,6 +7,7 @@
 #pragma once
 
 #include <borealis.hpp>
+#include <string>
 
 namespace cadran
 {
@@ -24,9 +25,18 @@ enum class Emphasis
     DANGER,    // the same, in coral
 };
 
+// A dialog's text laid out as the boards do (ui::dialog under Cadran),
+// left-aligned: its question as a title, a paragraph of "label: value" lines
+// (playguard/common/line) as a table, the notes the app adds (the linked
+// phone app, the temporary unlock, a game about to be suspended) at the
+// bottom, small, each with its icon; any other paragraph as text. `extra`
+// (the week as it will be) goes after the text, before the notes.
+brls::Box* dialog_body(const std::string& text, brls::View* extra = nullptr);
+
 // `dialog` as a card, its buttons as pills. Once: a dressed dialog is left as
 // it is (every screen that takes the focus comes through here, see
-// install_screens). Call it after the dialog's last addButton.
+// install_screens). Call it after the dialog's last addButton. DANGER also
+// puts a coral warning before a dialog_body's title.
 void style_dialog(brls::Dialog* dialog, Emphasis emphasis = Emphasis::NONE);
 
 // A picker's frame as a card above the hints.

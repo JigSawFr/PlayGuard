@@ -1534,7 +1534,8 @@
             "first_change": "{} {} → {}",
             "no_changes": "Geen wijzigingen in behandeling · + slaat op",
             "discard": "Verwerpen",
-            "remove": "Limiet verwijderen"
+            "remove": "Limiet verwijderen",
+            "save_title": "De limieten van de week opslaan?"
         },
         "tabs": {
             "today": "Vandaag"

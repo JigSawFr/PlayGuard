@@ -1534,7 +1534,8 @@
             "first_change": "{} {} → {}",
             "no_changes": "대기 중인 변경 없음 · +로 저장",
             "discard": "취소",
-            "remove": "제한 삭제"
+            "remove": "제한 삭제",
+            "save_title": "이번 주 제한을 저장할까요?"
         },
         "tabs": {
             "today": "오늘"
