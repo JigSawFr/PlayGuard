@@ -94,6 +94,33 @@ if (PLATFORM_DESKTOP)
     set(BRLS_RESOURCES_DIR ${CMAKE_BINARY_DIR})
 endif ()
 
+# PlayGuard's fixes to borealis, until upstream has them (patches/borealis/,
+# its README says why each one): applied to the submodule's files at
+# configure time, in order. One already in place is left as it is, so
+# configuring again (or a second build, as CI's reproducibility check does)
+# changes nothing; one that no longer applies (after a borealis bump) stops
+# the configure. safe.directory: CI's container checks out as another user.
+file(GLOB PLAYGUARD_BOREALIS_PATCHES ${CMAKE_CURRENT_SOURCE_DIR}/patches/borealis/*.patch)
+list(SORT PLAYGUARD_BOREALIS_PATCHES)
+find_package(Git REQUIRED)
+foreach (patch ${PLAYGUARD_BOREALIS_PATCHES})
+    get_filename_component(patch_name ${patch} NAME)
+    execute_process(COMMAND ${GIT_EXECUTABLE} -c safe.directory=* apply --reverse --check ${patch}
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/extern/borealis
+                    RESULT_VARIABLE patch_missing OUTPUT_QUIET ERROR_QUIET)
+    if (patch_missing)
+        execute_process(COMMAND ${GIT_EXECUTABLE} -c safe.directory=* apply ${patch}
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/extern/borealis
+                        RESULT_VARIABLE patch_failed)
+        if (patch_failed)
+            message(FATAL_ERROR "patches/borealis/${patch_name} does not apply to extern/borealis: "
+                                "update it for the new borealis, or drop it if upstream has the fix")
+        endif ()
+        message(STATUS "borealis: ${patch_name} applied")
+    endif ()
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${patch})
+endforeach ()
+
 add_subdirectory(${BOREALIS_LIBRARY} ${CMAKE_BINARY_DIR}/borealis_library)
 
 find_package(Threads REQUIRED)
