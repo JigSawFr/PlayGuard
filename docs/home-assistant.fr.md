@@ -90,9 +90,9 @@ Assistant* pour gérer les topics vous-même).
 | Capteurs binaires | Contrôle parental, Déverrouillé temporairement, Code PIN défini, Appli mobile liée, Minuteur, Temps écoulé, Horloge réseau exacte |
 | Nombres | Limite dimanche … samedi, Limite tous les jours, Temps d'écran max aujourd'hui (0 à 1440 minutes ; 1440 = pas de limite) |
 | Heures | Alarme du coucher, Fin du coucher |
-| Interrupteurs | Verrou de console, Alarme « temps écoulé », Déverrouillé, Alarme du coucher activée, Mode VR restreint, Publication sur les réseaux sociaux restreinte, Communication restreinte |
+| Interrupteurs | Bloquer tous les jeux, Alarme « temps écoulé », Déverrouillé, Alarme du coucher activée, Mode VR restreint, Publication sur les réseaux sociaux restreinte, Communication restreinte |
 | Sélecteurs | Niveau de restriction (*unrestricted* : sans restriction, young child, child, teen, custom), Profil (vos profils enregistrés) |
-| Boutons | Synchroniser maintenant, Verrouiller maintenant, Temps en plus +15 / +30 min / +1 h, Fin du jeu pour aujourd'hui, Supprimer la limite, Exporter un rapport de diagnostic |
+| Boutons | Synchroniser maintenant, Réactiver le contrôle parental, Temps en plus +15 / +30 min / +1 h, Fin du jeu pour aujourd'hui, Supprimer la limite, Exporter un rapport de diagnostic |
 | Événement | Événements : chaque ordre exécuté, refusé (avec la raison) ou mis en attente de la console |
 | La console | Modèle, Surnom de la console, Région, hekate, Système (sysMMC / emuMMC), PRODINFO masqué, Numéro de série (désactivé, voir plus bas), Espace libre et taille de la carte SD, Espace libre et taille du stockage interne, Batterie, En charge, Sur le dock, Température, Connexion, Adresse IP, Signal Wi-Fi, Réseau Wi-Fi (désactivé), Dernier démarrage |
 | Jeux | Jeux installés, Temps de jeu (depuis toujours), Comptes utilisateurs ; l'intégration ci-dessous ajoute un capteur par jeu |

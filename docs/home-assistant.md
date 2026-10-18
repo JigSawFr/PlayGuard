@@ -82,9 +82,9 @@ handle the topics yourself).
 | Binary sensors | Parental controls, Temporarily unlocked, PIN set, Companion app linked, Play timer, Time is up, Network clock accurate |
 | Numbers | Limit Sunday … Saturday, Limit every day, Max screentime today (0 to 1440 minutes; 1440 means no limit) |
 | Time | Bedtime alarm, Bedtime end time |
-| Switches | Console lock, Time's up alarm, Unlocked, Bedtime alarm enabled, VR mode restricted, Posting to social media restricted, Communication restricted |
+| Switches | Block all games, Time's up alarm, Unlocked, Bedtime alarm enabled, VR mode restricted, Posting to social media restricted, Communication restricted |
 | Selects | Restriction level (*unrestricted*, young child, child, teen, custom), Profile (your saved profiles) |
-| Buttons | Sync now, Lock now, Extra time +15 / +30 min / +1 h, No more play today, Remove the limit, Export a diagnostic report |
+| Buttons | Sync now, Turn parental controls back on, Extra time +15 / +30 min / +1 h, No more play today, Remove the limit, Export a diagnostic report |
 | Event | Events: every order applied, refused (with the reason) or kept waiting for the console |
 | The console | Model, Console nickname, Region, hekate, System (sysMMC / emuMMC), PRODINFO blanked, Serial number (off, see below), SD card free space and size, Internal storage free space and size, Battery, Charging, Docked, Temperature, Connection, IP address, Wi-Fi signal, Wi-Fi network (off), Last started |
 | Games | Games installed, Play time (all time), User accounts; the integration below adds one sensor per game |

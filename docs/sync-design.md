@@ -173,9 +173,10 @@ are) stays under both.
   still two devices, each with its own id and its own files
   (`nand/<system>/sync/`), as their parental controls are their own.
 - `remote_timer_writes` is **off by default**: with it off, the link is
-  monitoring plus *Lock now* plus the restrictions; with it on, a remote order
-  may unlock parental controls for a moment with the stored PIN, write, and
-  lock again, exactly as a press on the console would. The gate refuses any
+  monitoring plus *Turn parental controls back on* plus the restrictions;
+  with it on, a remote order may unlock parental controls for a moment with
+  the stored PIN, write, and lock again, exactly as a press on the console
+  would. The gate refuses any
   timer write on a console that has an active limit otherwise, so the setting
   is worded for what it really does.
 - An anonymous broker is refused unless `allow_anonymous` is set. The

@@ -74,7 +74,7 @@ static const SyncEntity ENTITIES[] = {
       "{{ value_json.timer.bedtime.enabled }}", E_SWITCH "," E_CONFIG, NULL },
 
     // switches
-    { "console_lock", "switch", SyncWrite_Timer, "Console lock", "{{ value_json.timer.console_locked }}",
+    { "console_lock", "switch", SyncWrite_Timer, "Block all games", "{{ value_json.timer.console_locked }}",
       E_SWITCH ",\"ic\":\"mdi:lock\"", NULL },
     { "play_timer_alarm", "switch", SyncWrite_Timer, "Time's up alarm", "{{ value_json.timer.alarm_on }}",
       E_SWITCH "," E_CONFIG, NULL },
@@ -98,7 +98,7 @@ static const SyncEntity ENTITIES[] = {
 
     // buttons
     { "sync_now", "button", SyncWrite_Free, "Sync now", NULL, "\"ic\":\"mdi:sync\"," E_DIAG, NULL },
-    { "lock_now", "button", SyncWrite_Free, "Lock now", NULL, "\"ic\":\"mdi:lock\"", NULL },
+    { "lock_now", "button", SyncWrite_Free, "Turn parental controls back on", NULL, "\"ic\":\"mdi:lock\"", NULL },
     { "export_report", "button", SyncWrite_Free, "Export a diagnostic report", NULL, E_DIAG, NULL },
     { "add_bonus_time_15", "button", SyncWrite_Timer, "Extra time +15 min", NULL, "\"ic\":\"mdi:timer-plus-outline\"", NULL },
     { "add_bonus_time_30", "button", SyncWrite_Timer, "Extra time +30 min", NULL, "\"ic\":\"mdi:timer-plus-outline\"", NULL },
