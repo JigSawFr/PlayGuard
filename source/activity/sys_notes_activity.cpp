@@ -14,7 +14,7 @@ using sys_notes::Which;
 namespace
 {
 SysNotesActivity* s_open = nullptr;   // the screen, while it is open
-bool              s_failed[3] = { false, false, false };   // the last fetch of each failed
+bool              s_failed[sys_notes::COUNT] = {};   // the last fetch of each failed
 
 std::string title_of(Which which)
 {
@@ -157,6 +157,9 @@ void SysNotesActivity::fill()
     }
     brls::View* focus = brls::Application::getCurrentFocus();
     const bool tabs_go = this->shown.size() < 2;
+    // The tabs appearing (the first fetch, nothing kept before): the focus
+    // goes to them from See online, where it waited.
+    const bool tabs_came = !tabs_go && tabs->getVisibility() != brls::Visibility::VISIBLE;
     ui::set_visible(tabs.getView(), !tabs_go);
 
     // The firmware: what updating to the newest one needs first.
@@ -225,7 +228,8 @@ void SysNotesActivity::fill()
     brls::View* target = this->focus_target();
     const bool focus_gone = !focus || focus->getVisibility() != brls::Visibility::VISIBLE ||
                             (focus->getParent() == tab_list.getView() && tabs_go);
-    if (target && (focus_gone || focus->getParent() == tab_list.getView())) brls::Application::giveFocus(target);
+    if (target && (focus_gone || focus->getParent() == tab_list.getView() || (tabs_came && focus == online.getView())))
+        brls::Application::giveFocus(target);
     brls::Application::getGlobalHintsUpdateEvent()->fire();
 }
 

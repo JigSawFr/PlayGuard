@@ -1,5 +1,6 @@
 // sys_notes_flow — the release notes of Atmosphère, hekate and the firmware
-// (util/sys_notes.hpp): the Console tab opens them (A on a line), the screen
+// (util/sys_notes.hpp): the Console tab opens them (A on a line), About
+// PlayGuard's, the screen
 // showing what was kept on the SD card at once and fetching them again in
 // the background; the daily update check (sys_update_flow) refreshes the
 // lists too, so the Console tab can say how far behind each one is and when the
@@ -14,10 +15,12 @@
 namespace sys_notes_flow
 {
 
-// What the console runs: "1.12.0", "6.5.4" (bootloader/update.bin), "22.0.0";
-// "" when unknown (no Atmosphère, no hekate on the SD card).
+// What the console runs: "1.12.0", "6.5.4" (bootloader/update.bin), "22.0.0",
+// PlayGuard's own version; "" when unknown (no Atmosphère, no hekate on the
+// SD card).
 std::string installed(sys_notes::Which which);
-// The newest release the update check found (sys_updates), "" none.
+// The newest release the update check found (sys_updates; PlayGuard's
+// update check for PlayGuard), "" none.
 std::string latest(sys_notes::Which which);
 
 // Reads the lists kept on the SD card, off the UI thread (at start-up; any
@@ -48,7 +51,7 @@ sys_notes::Cache fetch_lists();
 void keep(const sys_notes::Cache& fresh);
 
 // "22.0.0 · 23.0.1 available (4 versions behind)" for a line of the
-// Console tab; *newer when a newer one is out.
+// Console tab (or About's, for PlayGuard); *newer when a newer one is out.
 std::string status_text(sys_notes::Which which, bool* newer);
 
 // What updating to the newest firmware needs first, from the notes of

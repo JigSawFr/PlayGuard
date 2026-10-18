@@ -58,7 +58,8 @@ GitHub and switchbrew (PLAYGUARD_SIM_SYS_LATEST, PLAYGUARD_SIM_SYS_NOTES),
 hekate 6.5.3 on the SD card: Console must say how far behind each
 one is and that the newest firmware needs a newer hekate, then show the
 release notes of the firmware (the closest newer version, then the
-installed one), of Atmosphère and of hekate, and keep them in the cache.
+installed one), of Atmosphère, of hekate and, from About, of PlayGuard
+itself, and keep them in the cache.
 
 The "loading" scenario stops the start-up on the loading screen
 (PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
@@ -380,6 +381,25 @@ if SYSNOTES:
     json.dump([release("CTCaer/hekate", "v6.5.4", "2026-09-28T00:06:10Z", hekate_notes("6.5.4", "23.0.1")),
                release("CTCaer/hekate", "v6.5.3", "2026-06-16T22:14:44Z", hekate_notes("6.5.3", "22.5.0"))],
               open(os.path.join(sim_notes, "hekate.json"), "w"))
+    # PlayGuard's own releases, as its release workflow writes their pages:
+    # 1.0.0 runs (the simulated version), 1.1.0 is out.
+    def playguard_notes(v, highlight, change):
+        return (f"## [{v}](https://github.com/JigSawFr/PlayGuard/compare/v1.0.0...v{v}) \u00b7 2026-10-14\n\n"
+                f"<p>\u2b07\ufe0f <a href=\"https://github.com/JigSawFr/PlayGuard/releases/download/v{v}/playguard.zip\">"
+                "<b>Download playguard.zip</b></a> (2.4 MB)</p>\n\n<hr>\n\n### \U0001f31f Highlights\n\n"
+                f"* \u23f0 **{highlight}**:  \n  Choose what the console does when the play-time limit is reached.\n\n"
+                "<!-- console:hide -->\n> [!IMPORTANT]\n> Summary written automatically.\n<!-- /console -->\n"
+                "<!-- console: Summary written automatically. -->\n\n<hr>\n\n"
+                f"<details>\n<summary><b>Every change in {v}</b> (1 change)</summary>\n\n### \U0001f680 Features\n\n"
+                f"* **play-timer:** {change} ([#134](https://github.com/JigSawFr/PlayGuard/issues/134)) "
+                "([cc4b958](https://github.com/JigSawFr/PlayGuard/commit/cc4b958acba7017bb8b178c192d99a1448f66063))\n\n"
+                "</details>\n\n## \U0001f4e6 Install\n\n1. **New install**: download `playguard.zip`.\n")
+    pg = "JigSawFr/PlayGuard"
+    json.dump([release(pg, "v1.1.0", "2026-10-14T22:31:37Z",
+                       playguard_notes("1.1.0", "When time is up", "choose what the console does when the time is up")),
+               release(pg, "v1.0.0", "2026-10-12T20:17:06Z",
+                       playguard_notes("1.0.0", "Play-time limit", "the same every day or one per day"))],
+              open(os.path.join(sim_notes, "playguard.json"), "w"))
     rows = [("22.0.0", "March 3, 2026"), ("22.1.0", "May 5, 2026"), ("22.5.0", "June 16, 2026"),
             ("23.0.0", "September 10, 2026"), ("23.0.1", "October 1, 2026")]
     open(os.path.join(sim_notes, "System_Versions.wiki"), "w").write(
@@ -1120,6 +1140,20 @@ if SYSNOTES:
     key("Return")
     wait_logged("release notes: hekate opened", "hekate notes")
     shot("05_hekate")
+    # PlayGuard's own, from About › Release notes (its third line from the
+    # end, over Help & diagnostics and Source): the closest newer one first.
+    key("Escape")
+    key("Left")
+    key("Down", steps("console", "about"))
+    key("Right")
+    key_to_end("Down", hold=0.15) # its last line: the funding QR codes
+    key("Up", 3)               # past Source, Help & diagnostics: Release notes
+    key("Return")
+    wait_logged("release notes: playguard fetched", "PlayGuard notes")
+    shot("06_playguard_next")  # 1.1.0, newer: its highlights and changes, not its download or install lines
+    key("Left")                # the installed one's tab
+    key("Return")
+    shot("07_playguard_installed")
 
     def check_cache():
         if logged("release notes: atmosphere fetched") or logged("release notes: hekate fetched"):
@@ -1140,6 +1174,10 @@ if SYSNOTES:
                 fail(f"no notes kept for firmware {v}")
         if not fw["23.0.0"].get("security") or not fw["23.0.0"].get("pctl") or fw["23.0.1"].get("security"):
             fail("firmware 23.0.0 / 23.0.1 flags kept wrong")
+        pg_kept = {r["version"]: r for r in kept.get("playguard", {}).get("releases", [])}
+        pg_notes = pg_kept.get("1.1.0", {}).get("notes", "")
+        if "When time is up" not in pg_notes or "Download" in pg_notes or "Install" in pg_notes or "#134" in pg_notes:
+            fail("PlayGuard 1.1.0 kept wrong: " + repr(pg_kept.get("1.1.0")))
     finish(check_cache)
 if LOADING:
     shot("01_loading")         # the icon, the wordmark, the bar at its last step
