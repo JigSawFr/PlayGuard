@@ -464,8 +464,7 @@ int main(int argc, char* argv[])
 
     // PlayGuard status colours (light / dark variants), before any view exists.
     ui::register_theme_colors();
-    // The "Cadran" prototype's navy theme (PLAYGUARD_SIM_CADRAN=1 on the
-    // desktop, About › Help & diagnostics › Developer › Cadran prototype on the console).
+    // The Cadran appearance's palettes (Preferences › Appearance, the default).
     if (cadran::enabled()) cadran::install_theme();
 
     // We own the quit path (B on the sidebar / error screen).

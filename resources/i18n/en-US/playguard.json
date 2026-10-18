@@ -1099,7 +1099,7 @@
         "size_mb": "{} MB",
         "pt_log_on": "Recording every 30 s in {}",
         "frame_stats": "Frame statistics",
-        "frame_stats_note": "One line every second while PlayGuard is open, in logs/frame_stats.txt: the mode (docked or handheld) and the frame size, the screen shown, the frames per second, the UI's own computing time per frame (mean and maximum, in ms), the interval between two frames (mean and maximum) and how many frames came late (more than 20 ms). To compare the current screens with the Cadran prototype: leave each screen shown for 30 s without touching anything, docked then handheld. The file starts over each time this is turned on.",
+        "frame_stats_note": "One line every second while PlayGuard is open, in logs/frame_stats.txt: the mode (docked or handheld) and the frame size, the screen shown, the frames per second, the UI's own computing time per frame (mean and maximum, in ms), the interval between two frames (mean and maximum) and how many frames came late (more than 20 ms). To compare the two appearances (Preferences › Appearance): leave each screen shown for 30 s without touching anything, docked then handheld. The file starts over each time this is turned on.",
         "frame_stats_on": "One line every second in {}",
         "frame_stats_wait": "First line in a second…",
         "gate": "Show the firmware screen again",

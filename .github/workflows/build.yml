@@ -231,7 +231,7 @@ jobs:
           - shard: developer
             scenarios: devbuild update library rollback
           - shard: outside
-            scenarios: outside sysnotes
+            scenarios: outside sysnotes cadran
     env:
       CMAKE_C_COMPILER_LAUNCHER: ccache
       CMAKE_CXX_COMPILER_LAUNCHER: ccache

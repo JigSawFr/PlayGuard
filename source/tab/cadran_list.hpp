@@ -1,5 +1,5 @@
-// cadran::List — the "Cadran" prototype's look for the list screens (Clock,
-// Security, Preferences, Tools, About) without rewriting them: the original
+// cadran::List — the Cadran look for the list screens (the tabs' lines under
+// their tops, every other screen) without rewriting them: the original
 // tab is built as usual (its XML, its i18n strings, its actions), then its
 // lines are restyled after the boards' settings lists. A section header
 // becomes a kicker (14 px, capitals, text3); each run of cells a card (surf,
@@ -10,8 +10,7 @@
 //
 // The tab keeps every view it binds (they move, they are not rebuilt), and
 // its own show / hide logic: a card or a tile row with all its lines hidden
-// draws nothing and takes no room. Strings of the restyle itself (none here)
-// would be hard-coded French, like the rest of the prototype.
+// draws nothing and takes no room. The restyle adds no words of its own.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 

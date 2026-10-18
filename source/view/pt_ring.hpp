@@ -1,4 +1,4 @@
-// PtRing — "Cadran" prototype: today's play time as a ring (the brand mark),
+// PtRing — Cadran: today's play time as a ring (the brand mark),
 // the time left in big digits in the middle. Teal → amber (≥ 75 %) → coral
 // (limit reached); the numbers are always written too, never colour alone.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).

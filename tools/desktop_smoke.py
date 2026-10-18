@@ -61,12 +61,19 @@ release notes of the firmware (the closest newer version, then the
 installed one), of Atmosphère, of hekate and, from About, of PlayGuard
 itself, and keep them in the cache.
 
+The "cadran" scenario tours the Cadran appearance (the default one; every
+other scenario runs the classic lists, which their key presses follow, and
+the Cadran tabs are those same tabs under their boards' tops): every tab,
+then the child screen and back with the PIN, a day of the week edited with
+the stick and saved, a restriction level's confirmation, the appearance
+picker, the network clock's screen and a game's screen from its card.
+
 The "loading" scenario stops the start-up on the loading screen
 (PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes]   (needs DISPLAY, xdotool, ImageMagick)
+Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -99,6 +106,7 @@ ALARM = SCENARIO == "alarm"
 SYSNOTES = SCENARIO == "sysnotes"
 ROLLBACK = SCENARIO == "rollback"
 GAMES = SCENARIO == "games"
+CADRAN = SCENARIO == "cadran"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
@@ -145,6 +153,9 @@ env.setdefault("PLAYGUARD_SIM_STILL_FOCUS", "1")
 # (app.cpp): the header's version badge, and the update offers (1.1.0 below)
 # stay the same once this build is 1.1.0 or later.
 env.setdefault("PLAYGUARD_SIM_VERSION", "1.0.0:1a2b3c4")
+# The appearance, whatever config.json says: the classic lists, which every
+# scenario's key presses follow, but in the one that tours Cadran.
+env.setdefault("PLAYGUARD_SIM_APPEARANCE", "cadran" if CADRAN else "classic")
 # The installed games are checked at start-up for the notification bell:
 # at once in every scenario but the default one and "games", which watches a
 # check go game by game (150 ms each) and waits for the start-up one first.
@@ -720,7 +731,7 @@ if GATE:
     shot("05_dev_tools")
     # Turning a developer switch off asks first; B keeps it on (the end of
     # the scenario checks developer mode was saved on).
-    key("Up", 10)              # past the cleanup cells, the Cadran and statistics switches and the recorder: Read-only mode
+    key("Up", 9)               # past the cleanup cells, the statistics switch and the recorder: Read-only mode
     key("Return")
     shot("06a_read_only_off")  # untested firmware: the "own risk" warning
     key("Escape")
@@ -728,7 +739,7 @@ if GATE:
     key("Return")
     shot("06b_dev_mode_off")
     key("Escape")
-    key("Down", 7)             # Read-only, the recorder, the statistics and Cadran switches, the two cleanup cells: Show the diagnostic report
+    key("Down", 6)             # Read-only, the recorder, the statistics switch, the two cleanup cells: Show the diagnostic report
     key("Return")
     shot("06_dev_report")
     key("Escape")
@@ -1088,6 +1099,88 @@ if OUTSIDE:
     key("Down", steps("dashboard", "activity"))
     key("Right")
     shot("06_new_account")
+    finish()
+if CADRAN:
+    shot("01_today")
+    for i, tab in enumerate(tabs[1:], start=2):
+        key("Down")
+        key("Right")
+        shot(f"{i:02d}_{tab}")
+        key("Down", 12)        # scroll through the whole tab
+        shot(f"{i:02d}_{tab}_end")
+        key("Left")            # back to the sidebar
+
+    # The child screen, then back to the parent's with the PIN (the simulated
+    # PIN screen accepts at once).
+    key("Up", steps("dashboard", tabs[-1]))
+    key("Right")               # Extra time, the hero's first action
+    key("Down")                # Stop for today
+    key("Right")               # Show the child
+    key("Return")
+    shot("11_child")
+    key("Return")              # A: back to the parent, the PIN first
+    time.sleep(1)
+    if not alive() or not logged("pctl_ask_pin returned"):
+        fail("the child screen did not ask for the PIN to go back")
+    shot("12_today_again")
+
+    # The week edited with the stick: Monday +30 min, saved with the unlock the
+    # running timer needs.
+    key("Left", 3)             # the sidebar (Escape there would ask to quit)
+    key("Down", steps("dashboard", "play_timer"))
+    key("Right")               # the profile chip
+    key("Down")                # the week, on Monday
+    key("Return")              # A: edit the day
+    key("Up", 2)               # +30 min
+    shot("13_week_edit")
+    key("Return")              # A: done
+    key("Down")                # Discard, then Save
+    key("Right")
+    key("Return")
+    shot("14_week_confirm")
+    key("Right")               # Unlock and apply
+    key("Return")
+    time.sleep(1)
+    written = json.load(open(os.path.join(ROOT, "resources", "i18n", "en-US", "playguard.json")))["play_timer"]["written_days"]
+    if not any(m.startswith(written) for m in messages()):
+        fail("the week's change was not saved: " + repr(messages()[-3:]))
+    time.sleep(3.5)            # the toast gone: the next screen is a reference
+    shot("15_week_saved")
+
+    # A restriction level from its tile: the confirmation, cancelled.
+    key("Left", 2)
+    key("Down", steps("play_timer", "restrictions"))
+    key("Right")               # Young child, the first tile
+    key("Right", 2)            # Teen
+    key("Return")
+    shot("16_level_confirm")
+    key("Escape")
+
+    # Preferences › Appearance: its two choices.
+    key("Left", 3)
+    key("Down", steps("restrictions", "preferences"))
+    key("Right")               # Language, the first tile
+    key("Right", 2)            # Appearance
+    key("Return")
+    shot("17_appearance")
+    key("Escape")
+
+    # Console › Network clock: both clocks large.
+    key("Left", 3)
+    key("Up", steps("console", "preferences"))
+    key("Right")               # Network clock, the first line
+    key("Return")
+    shot("18_clock")
+    key("Escape")
+
+    # Activity: a game's own screen from its card.
+    key("Left")
+    key("Up", steps("activity", "console"))
+    key("Right")               # Every account, the first chip
+    key("Down")                # the first game's card
+    key("Return")
+    shot("19_game")
+    key("Escape")
     finish()
 if ALARM:
     shot("01_overview_over")   # Overview: the time over the limit, not a time left

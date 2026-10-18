@@ -1,4 +1,4 @@
-// CadranIcon — the "Cadran" prototype's icons, drawn as nanovg paths from
+// CadranIcon — Cadran's icons, drawn as nanovg paths from
 // the design boards' 24-unit SVG strokes (no SVG loader in this borealis):
 // today, timer, activity, shield, lock, globe, settings, tools, info, plus,
 // stop, eye, check, moon, pause, list, lines, download, chevron-down, chevron-left,

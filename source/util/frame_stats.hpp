@@ -2,7 +2,7 @@
 // (About › Help & diagnostics › Developer › Frame statistics): how long PlayGuard's own thread
 // works for each frame, how far apart the frames come and how many come late,
 // so one screen can be weighed against another on the console, docked and
-// handheld (the current Overview against the "Cadran" prototype), in
+// handheld (one appearance against the other, Preferences › Appearance), in
 // logs/frame_stats.txt. This part is plain C++ (no libnx, no UI) for the host
 // tests (tests/frame_stats); action/frame_stats_flow runs it.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).

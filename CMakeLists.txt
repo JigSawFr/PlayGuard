@@ -213,7 +213,7 @@ endif ()
 
 # Resources: borealis built-ins first, then ours on top. On the Switch
 # borealis' bundled fonts and demo assets are dropped (the system shared font
-# is used); ours stay (resources/font: the Cadran prototype's figures).
+# is used); ours stay (resources/font: the Cadran appearance's figures).
 # en-GB reuses the English strings, already in British spelling (borealis looks
 # the locale up verbatim), except the quoted system menu labels, spelt as on a
 # US console ("Synchronize Clock via Internet").
