@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- About: the installed PlayGuard and help with it. The app (version —
-     seven presses turn the developer tools on, at the end of Help &
+     Ⓐ opens every version's release notes, on a screen of their own; seven
+     presses of a hidden Ⓨ turn the developer tools on, at the end of Help &
      diagnostics, below —, launch mode, data folder); all of its updates
-     (check now, every day, how) and a line to the release notes (every
-     version's, on a screen of their own); a line to Help & diagnostics
+     (check now, every day, how); a line to Help & diagnostics
      (tab/help.xml, on a screen of its own); the credits; how to support it
      (QR codes of the funding links, Ⓐ shows one larger), and "Made in
      France". -->
@@ -36,7 +36,6 @@
             <brls:DetailCell id="ab_update" title="@i18n/playguard/tools/update"/>
             <brls:BooleanCell id="ab_update_daily"/>
             <brls:DetailCell id="ab_update_via" title="@i18n/playguard/tools/update_via"/>
-            <brls:DetailCell id="ab_notes" title="@i18n/playguard/sys_notes/hint"/>
             <brls:DetailCell id="ab_help" title="@i18n/playguard/prefs/help" marginTop="24"/>
             <brls:Header title="@i18n/playguard/about/section_credits" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="ab_author" focusable="false" title="@i18n/playguard/about/credit_author"/>

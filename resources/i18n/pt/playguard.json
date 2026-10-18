@@ -1098,7 +1098,7 @@
         "forgotten": "A escolha do firmware será pedida novamente da próxima vez que a aplicação for iniciada.",
         "forget_body": "Esquecer a escolha feita no ecrã do firmware? Será pedida de novo no próximo arranque.",
         "forget_confirm": "Esquecer",
-        "mode_off_body": "Desativar o modo de programador? As suas ferramentas saem do fim de Sobre › Ajuda e diagnóstico e o registo do temporizador para. Sete toques em Sobre › Versão trazem-nas de volta.",
+        "mode_off_body": "Desativar o modo de programador? As suas ferramentas saem do fim de Sobre › Ajuda e diagnóstico e o registo do temporizador para. Sete toques em Y em Sobre › Versão trazem-nas de volta.",
         "mode_off_confirm": "Desativar",
         "read_only_off_body": "Sair do modo só de leitura? O PlayGuard poderá voltar a alterar o controlo parental e o relógio da consola.",
         "read_only_off_confirm": "Permitir alterações",

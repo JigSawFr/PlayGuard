@@ -1098,7 +1098,7 @@
         "forgotten": "The firmware choice will be asked again at the next launch.",
         "forget_body": "Forget the choice made on the firmware screen? It will be asked again at the next launch.",
         "forget_confirm": "Forget",
-        "mode_off_body": "Turn developer mode off? Its tools leave the end of About › Help & diagnostics and the play-timer recording stops. Seven presses on About › Version bring them back.",
+        "mode_off_body": "Turn developer mode off? Its tools leave the end of About › Help & diagnostics and the play-timer recording stops. Seven presses of Y on About › Version bring them back.",
         "mode_off_confirm": "Turn off",
         "read_only_off_body": "Leave read-only mode? PlayGuard can then change the console's parental controls and clock again.",
         "read_only_off_confirm": "Allow changes",

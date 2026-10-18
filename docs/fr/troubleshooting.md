@@ -52,7 +52,7 @@ Tout est dans `sd:/config/playguard/logs/`, en texte brut qu'un ordinateur ouvre
 
 ## Mode développeur (examiner un nouveau firmware)
 
-Appuyez sept fois sur *À propos › Version* ; les outils développeur apparaissent à la fin de *À propos › Aide et diagnostic*. Il ajoute :
+Appuyez sept fois sur Ⓨ sur *À propos › Version* ; les outils développeur apparaissent à la fin de *À propos › Aide et diagnostic*. Il ajoute :
 
 - un interrupteur **lecture seule** — activé, l'application ne peut rien modifier : c'est la façon sûre d'examiner un nouveau firmware (l'écran firmware le propose directement) ;
 - le rapport de diagnostic à l'écran (Ⓨ l'enregistre, Ⓧ l'envoie en ligne), et un raccourci pour l'exporter depuis l'onglet Temps de jeu ;

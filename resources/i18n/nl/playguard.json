@@ -1098,7 +1098,7 @@
         "forgotten": "Bij de volgende start wordt opnieuw naar de firmwarekeuze gevraagd.",
         "forget_body": "De keuze op het firmwarescherm vergeten? Die wordt bij de volgende start opnieuw gevraagd.",
         "forget_confirm": "Vergeten",
-        "mode_off_body": "Ontwikkelaarsmodus uitschakelen? De tools verdwijnen van het einde van Info › Hulp en diagnose en het vastleggen van de speeltijdtimer stopt. Zeven keer drukken op Info › Versie brengt ze terug.",
+        "mode_off_body": "Ontwikkelaarsmodus uitschakelen? De tools verdwijnen van het einde van Info › Hulp en diagnose en het vastleggen van de speeltijdtimer stopt. Zeven keer op Y drukken bij Info › Versie brengt ze terug.",
         "mode_off_confirm": "Uitschakelen",
         "read_only_off_body": "Alleen-lezenmodus verlaten? PlayGuard kan dan het ouderlijk toezicht en de klok van de console weer wijzigen.",
         "read_only_off_confirm": "Wijzigingen toestaan",

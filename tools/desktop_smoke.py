@@ -16,7 +16,7 @@ game's screen from it and the PDF export, which must be there.
 
 The "gate" scenario starts on a firmware newer than the checked one, with a
 simulated release that supports it: the firmware screen, read-only mode,
-seven presses on About › Version for the developer mode, its report, a play-timer
+seven presses of Y on About › Version for the developer mode, its report, a play-timer
 block reference, deleting the log files and clearing the cache (what goes and
 what stays checked on disk), the firmware screen again and the hand-over of
 the update to sphaira (simulated hbloader).
@@ -704,10 +704,10 @@ if GATE:
     key("Right")
     shot("03_play_timer_read_only")
     key("Left")
-    # About: seven presses on Version (its first cell) turn the developer mode on.
+    # About: seven presses of Y on Version (its first cell) turn the developer mode on.
     key("Down", steps("play_timer", "about"))
     key("Right")
-    key("Return", 7)
+    key("y", 7)
     shot("04_dev_enabled")
     # The developer tools are at the end of About › Help & diagnostics:
     # press like a hand.
@@ -804,10 +804,10 @@ if GATE:
         fail("a firmware choice was remembered without the box ticked")
     finish()
 if DEVBUILD:
-    # About: seven presses on Version turn the developer mode on.
+    # About: seven presses of Y on Version turn the developer mode on.
     key("Down", steps("dashboard", "about"))
     key("Right")
-    key("Return", 7)
+    key("y", 7)
     key("Left")
     key("Right")
     key_to_end("Down", hold=0.15) # its last line: the funding QR codes
@@ -1126,14 +1126,12 @@ if SYSNOTES:
     key("Return")
     wait_logged("release notes: hekate opened", "hekate notes")
     shot("05_hekate")
-    # PlayGuard's own, from About › Release notes (its third line from the
-    # end, over Help & diagnostics and Source): the closest newer one first.
+    # PlayGuard's own, from About › Version (its first line): the closest
+    # newer one first.
     key("Escape")
     key("Left")
     key("Down", steps("console", "about"))
     key("Right")
-    key_to_end("Down", hold=0.15) # its last line: the funding QR codes
-    key("Up", 3)               # past Source, Help & diagnostics: Release notes
     key("Return")
     wait_logged("release notes: playguard fetched", "PlayGuard notes")
     shot("06_playguard_next")  # 1.1.0, newer: its highlights and changes, not its download or install lines

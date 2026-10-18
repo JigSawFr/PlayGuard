@@ -1098,7 +1098,7 @@
         "forgotten": "La elección del firmware se volverá a pedir en el próximo inicio.",
         "forget_body": "¿Olvidar la elección hecha en la pantalla del firmware? Se volverá a preguntar en el próximo inicio.",
         "forget_confirm": "Olvidar",
-        "mode_off_body": "¿Desactivar el modo desarrollador? Sus herramientas salen del final de Información › Ayuda y diagnóstico y el registro del temporizador se detiene. Siete pulsaciones en Información › Versión las recuperan.",
+        "mode_off_body": "¿Desactivar el modo desarrollador? Sus herramientas salen del final de Información › Ayuda y diagnóstico y el registro del temporizador se detiene. Siete pulsaciones de Y en Información › Versión las recuperan.",
         "mode_off_confirm": "Desactivar",
         "read_only_off_body": "¿Salir del modo de solo lectura? PlayGuard podrá volver a cambiar el control parental y el reloj de la consola.",
         "read_only_off_confirm": "Permitir cambios",

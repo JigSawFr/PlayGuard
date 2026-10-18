@@ -1,7 +1,7 @@
-// AboutTab — the installed PlayGuard and help with it: version (seven presses
-// on it turn the developer tools on, at the end of Help & diagnostics), launch
-// mode and data folder; its updates (check now, every day, and how) and a
-// line to the release notes (SysNotesActivity); a line to Help & diagnostics (HelpTab, on a screen of its own); the credits; how to
+// AboutTab — the installed PlayGuard and help with it: version (Ⓐ opens its
+// release notes, SysNotesActivity; seven presses of a hidden Ⓨ on it turn the
+// developer tools on, at the end of Help & diagnostics), launch mode and data
+// folder; its updates (check now, every day, and how); a line to Help & diagnostics (HelpTab, on a screen of its own); the credits; how to
 // support it (the funding links as QR codes, to scan with a phone); "Made in
 // France".
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
@@ -30,7 +30,6 @@ class AboutTab : public TabBase
     BRLS_BIND(brls::DetailCell,  update_cell,      "ab_update");
     BRLS_BIND(brls::BooleanCell, update_daily,     "ab_update_daily");
     BRLS_BIND(brls::DetailCell,  update_via,       "ab_update_via");
-    BRLS_BIND(brls::DetailCell,  notes,            "ab_notes");
     BRLS_BIND(brls::DetailCell,  help,             "ab_help");
     BRLS_BIND(brls::DetailCell,  author,           "ab_author");
     BRLS_BIND(brls::DetailCell,  upstream,         "ab_upstream");

@@ -16,10 +16,24 @@ AboutTab::AboutTab()
     : TabBase("xml/tab/about.xml", false)
 {
     support_note->setSingleLine(false);
-    version->registerClickAction([this](brls::View*) {
+    // Every version's notes, from the releases on GitHub, as for Atmosphère
+    // and hekate on their rows in Console: the installed one, the newer and
+    // the older ones. Seven presses of a hidden Ⓨ turn the developer tools on.
+    version->registerAction("playguard/sys_notes/hint"_i18n, brls::BUTTON_A, [](brls::View*) {
+        sys_notes_flow::open(sys_notes::Which::PlayGuard);
+        return true;
+    }, false, false, brls::SOUND_CLICK);
+    version->registerAction("", brls::BUTTON_Y, [this](brls::View*) {
+        this->count_version_press();
+        return true;
+    }, true, false, brls::SOUND_CLICK);
+#ifndef __SWITCH__
+    // The desktop build: the keyboard has no Ⓨ, so the Y key (smoke test).
+    version->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Y), [this](brls::View*) {
         this->count_version_press();
         return true;
     });
+#endif
 
     update_cell->registerClickAction([](brls::View*) {
         update_flow::check_now();
@@ -48,12 +62,6 @@ AboutTab::AboutTab()
     license->setDetailText("GPLv3");
     source->setDetailText(app::repo_url());
     funding->addView(funding::cards(180, true));
-    // Every version's notes, from the releases on GitHub, as for Atmosphère
-    // and hekate (Console): the installed one, the newer and the older ones.
-    notes->registerClickAction([](brls::View*) {
-        sys_notes_flow::open(sys_notes::Which::PlayGuard);
-        return true;
-    });
 }
 
 void AboutTab::count_version_press()
@@ -84,11 +92,6 @@ void AboutTab::refresh()
     update_cell->setDetailText(cfg.update_checked.empty() ? "" : brls::getStr("playguard/tools/update_last", cfg.update_checked));
     update_daily->setOn(cfg.update_daily, false);
     update_via->setDetailText(update_flow::method_text());
-    // With the newer release the last update check found, as in Console.
-    bool newer = false;
-    notes->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::PlayGuard, &newer)));
-    notes->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
-
     SysInfo si;
     sysinfo_get(&si);
     std::string flags;
@@ -96,7 +99,10 @@ void AboutTab::refresh()
     if (app::dev_mode()) flags += " · " + "playguard/tools/flag_dev"_i18n;
     // Developer mode: the commit too, to tell development builds apart.
     const std::string commit = app::dev_mode() && !app::commit().empty() ? " (" + app::commit() + ")" : "";
-    version->setDetailText(app::version() + commit + flags);
+    // With the newer release the last update check found, as in Console.
+    bool newer = false;
+    version->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::PlayGuard, &newer) + commit + flags));
+    version->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
     mode->setDetailText(si.applet_mode ? "playguard/tools/mode_applet"_i18n : "playguard/tools/mode_app"_i18n);
     data->setDetailText(paths::data_dir());
 }

@@ -52,7 +52,7 @@ Everything is in `sd:/config/playguard/logs/`, plain text a computer opens:
 
 ## Developer mode (investigating a new firmware)
 
-Press *About › Version* seven times; the developer tools appear at the end of *About › Help & diagnostics*. It adds:
+Press Ⓨ seven times on *About › Version*; the developer tools appear at the end of *About › Help & diagnostics*. It adds:
 
 - a **read-only** switch — with it on, the app cannot change anything: the safe way to investigate a new firmware (the firmware screen offers it directly);
 - the diagnostic report on screen (Ⓨ saves it, Ⓧ sends it online), and a shortcut to export it from the Play timer tab;
