@@ -137,7 +137,11 @@ void wrap(brls::View* row)
 
 bool press(brls::View* line)
 {
-    if (!line) return false;
+    if (!line) {
+        // A line renamed or gone (check_resources checks the ids it knows).
+        brls::Logger::warning("cadran: no line to press");
+        return false;
+    }
     for (const std::shared_ptr<brls::Action>& action : line->getActions()) {
         if (!(*action == brls::BUTTON_A) || !action->isAvailable()) continue;
         action->getActionListener()(line);
