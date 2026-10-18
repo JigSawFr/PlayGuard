@@ -1514,7 +1514,9 @@
             "next_bedtime_now": "Bedtijd: weer spelen vanaf {}",
             "clock_fix_dns": "Geblokkeerd door de DNS: meten en instellen",
             "next_with_extra": "Met {} extra is de tijd om rond {}",
-            "next_with_extra_bed": "Met {} extra komt het bedtijdalarm om {} eerst"
+            "next_with_extra_bed": "Met {} extra komt het bedtijdalarm om {} eerst",
+            "head_unlocked": "Limiet van {} gepauzeerd",
+            "pc_lifted": "Opgeheven tot het weer aan staat"
         },
         "pill": {
             "pc_on": "Ouderlijk toezicht actief",

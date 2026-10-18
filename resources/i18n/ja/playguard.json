@@ -1514,7 +1514,9 @@
             "next_bedtime_now": "おやすみの時間：{}から再びプレイ可能",
             "clock_fix_dns": "DNSでブロック中：測って合わせる",
             "next_with_extra": "{}追加すると{}ごろに時間切れ",
-            "next_with_extra_bed": "{}追加しても、{}のおやすみアラームが先です"
+            "next_with_extra_bed": "{}追加しても、{}のおやすみアラームが先です",
+            "head_unlocked": "上限{}は一時停止中",
+            "pc_lifted": "再び有効にするまで解除中"
         },
         "pill": {
             "pc_on": "みまもり設定 有効",

@@ -1514,7 +1514,9 @@
             "next_bedtime_now": "취침 시간: {}부터 다시 플레이 가능",
             "clock_fix_dns": "DNS로 차단됨: 측정해 맞추기",
             "next_with_extra": "{} 추가하면 {}쯤 시간 종료",
-            "next_with_extra_bed": "{} 추가해도 {} 취침 알람이 먼저 울립니다"
+            "next_with_extra_bed": "{} 추가해도 {} 취침 알람이 먼저 울립니다",
+            "head_unlocked": "{} 제한 일시 중지됨",
+            "pc_lifted": "다시 켤 때까지 해제됨"
         },
         "pill": {
             "pc_on": "자녀 보호 켜짐",

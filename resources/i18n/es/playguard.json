@@ -1514,7 +1514,9 @@
             "next_bedtime_now": "Hora de dormir: se puede volver a jugar a las {}",
             "clock_fix_dns": "Bloqueado por el DNS: medir y ajustar",
             "next_with_extra": "Con {} más, se acaba el tiempo hacia las {}",
-            "next_with_extra_bed": "Con {} más, la alarma de hora de dormir de las {} llega antes"
+            "next_with_extra_bed": "Con {} más, la alarma de hora de dormir de las {} llega antes",
+            "head_unlocked": "Límite de {} en pausa",
+            "pc_lifted": "Desactivado hasta reactivarlo"
         },
         "pill": {
             "pc_on": "Control parental activo",

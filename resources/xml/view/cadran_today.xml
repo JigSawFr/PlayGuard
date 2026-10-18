@@ -13,7 +13,7 @@
 
     <brls:Box axis="row" alignItems="center" marginBottom="18">
         <PtRing id="cad_ring" width="248" height="248" marginRight="36"/>
-        <brls:Box id="cad_today_text" axis="column" alignItems="flexStart" grow="1.0">
+        <brls:Box id="cad_today_text" axis="column" alignItems="flexStart" grow="1.0" width="0">
             <brls:Label id="cad_kicker" text="" fontSize="14" textColor="@theme/cadran/text3" marginBottom="10"/>
             <brls:Box id="cad_actions" axis="row" alignItems="center" marginTop="14" marginBottom="12">
                 <brls:Button id="cad_extra" style="primary" text="@i18n/playguard/cadran/today/extra" fontSize="19" height="56" cornerRadius="28" paddingLeft="22" paddingRight="22" marginRight="12"/>

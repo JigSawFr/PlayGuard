@@ -1514,7 +1514,9 @@
             "next_bedtime_now": "Bedtime: games allowed again at {}",
             "clock_fix_dns": "Blocked by the DNS: measure and set it",
             "next_with_extra": "With {} more, time is up around {}",
-            "next_with_extra_bed": "With {} more, the bedtime alarm at {} still comes first"
+            "next_with_extra_bed": "With {} more, the bedtime alarm at {} still comes first",
+            "head_unlocked": "{} limit on hold",
+            "pc_lifted": "Lifted until turned back on"
         },
         "pill": {
             "pc_on": "Parental controls on",

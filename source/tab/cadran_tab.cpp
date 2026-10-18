@@ -433,13 +433,19 @@ CadranTab::CadranTab()
     }
     // What stops play first, under the time played.
     this->next = new brls::Box(brls::Axis::ROW);
-    this->next->setAlignItems(brls::AlignItems::CENTER);
+    this->next->setAlignItems(brls::AlignItems::FLEX_START);
+    this->next->setAlignSelf(brls::AlignSelf::STRETCH);   // the column's width, for its text to wrap in
     this->next->setMarginTop(8);
     this->next_icon = kit::icon("timer", 18, "cadran/teal");
     this->next_icon->setMarginRight(8);
+    this->next_icon->setMarginTop(2);
+    this->next_icon->setShrink(0);
     this->next->addView(this->next_icon);
+    // A second line when it has to (the unlocked case says why at length).
     this->next_text = kit::label("", 16.5f, "cadran/text2");
-    this->next_text->setSingleLine(true);
+    this->next_text->setSingleLine(false);
+    this->next_text->setGrow(1.0f);
+    this->next_text->setWidth(0);
     this->next->addView(this->next_text);
     this->next->setVisibility(brls::Visibility::GONE);
     today_text->addView(this->next, 2);
@@ -523,12 +529,14 @@ void CadranTab::show_ring(bool unlocked)
     if (pt.fw_supported && pt.valid && pt.enabled_valid) {
         const uint16_t limit = pt.day_min[today];
         const int over = pt_logic::over_limit_min(pt, today);
-        if (limit == PT_DAY_NOLIMIT || !pt.enabled) {
-            left = "playguard/cadran/today/free"_i18n;
-            caption = "playguard/cadran/today/no_limit"_i18n;
-        } else if (unlocked) {
+        // Unlocked first, as the Overview's gauge: the console reports the
+        // timer off while unlocked, though today's limit still stands.
+        if (unlocked && limit != PT_DAY_NOLIMIT) {
             left = ui::fmt_minutes(limit);
             caption = "playguard/cadran/today/unlocked"_i18n;
+        } else if (limit == PT_DAY_NOLIMIT || !pt.enabled) {
+            left = "playguard/cadran/today/free"_i18n;
+            caption = "playguard/cadran/today/no_limit"_i18n;
         } else if (over >= 0 || (pt.restricted_valid && pt.restricted)) {
             frac = 1.0f;
             left = ui::fmt_played(0);
@@ -578,7 +586,13 @@ void CadranTab::show_next(bool unlocked)
     const auto clock = [](int minutes) { return fmt::format("{:02d}:{:02d}", minutes / 60, minutes % 60); };
     const std::string amount = ui::fmt_minutes((uint16_t)this->preview_extra);
     std::string text;
-    if (with_extra && n.kind == pt_logic::NextStop::TIME_UP)
+    const char* glyph = n.kind == pt_logic::NextStop::TIME_UP ? "timer" : "moon";
+    if (unlocked && pt.valid && pt.day_min[today] != PT_DAY_NOLIMIT) {
+        // Nothing stops play while unlocked: the headline says the limit is
+        // on hold, this line why.
+        text  = "playguard/dashboard/gauge_unlocked"_i18n;
+        glyph = "unlock";
+    } else if (with_extra && n.kind == pt_logic::NextStop::TIME_UP)
         text = brls::getStr("playguard/cadran/today/next_with_extra", amount, clock(n.at));
     else if (with_extra && n.kind == pt_logic::NextStop::BEDTIME)
         text = brls::getStr("playguard/cadran/today/next_with_extra_bed", amount, clock(n.at));
@@ -588,7 +602,7 @@ void CadranTab::show_next(bool unlocked)
     else if (n.kind == pt_logic::NextStop::BEDTIME_NOW) text = brls::getStr("playguard/cadran/today/next_bedtime_now", clock(n.at));
     if (!text.empty()) {
         ui::set_text(this->next_text, text);
-        this->next_icon->setIcon(n.kind == pt_logic::NextStop::TIME_UP ? "timer" : "moon");
+        this->next_icon->setIcon(glyph);
     }
     ui::set_visible(this->next, !text.empty());
 }
@@ -624,6 +638,7 @@ void CadranTab::show_cards(bool unlocked, bool has_pin)
         pc_state->setTextColor(has_pin ? theme["cadran/teal"] : theme["cadran/amber"]);
     }
     pc_sub->setText(!s.restriction_enabled_ok ? na
+                    : unlocked                ? "playguard/cadran/today/pc_lifted"_i18n
                     : s.restriction_enabled   ? "playguard/dashboard/pc_active"_i18n
                     : has_pin                 ? "playguard/dashboard/pc_pin_only"_i18n
                                               : "playguard/dashboard/pc_off"_i18n);
@@ -704,6 +719,12 @@ void CadranTab::refresh()
     else cadran::set_pill("playguard/cadran/pill/pc_off"_i18n, "alert", true);
 
     this->unlocked_now = unlocked;
+    if (unlocked && this->pt.fw_supported && this->pt.valid && this->pt.enabled_valid) {
+        const uint16_t limit = this->pt.day_min[ui::today_weekday()];
+        if (limit != PT_DAY_NOLIMIT)
+            if (auto* head = dynamic_cast<brls::Label*>(this->getView("dash_gauge_text")))
+                ui::set_text(head, brls::getStr("playguard/cadran/today/head_unlocked", ui::fmt_minutes(limit)));
+    }
     this->show_ring(unlocked);
     this->show_next(unlocked);
     this->show_cards(unlocked, has_pin);

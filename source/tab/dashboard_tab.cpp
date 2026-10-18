@@ -376,8 +376,9 @@ void DashboardTab::refresh()
                           { serial.getView(), issues.serial }, { game_patches.getView(), issues.patches },
                           { unlocked_banner.getView(), unlocked },
                           { not_counting.getView(), stalled },
-                          // Only while a game is open to keep counting.
-                          { home_hint.getView(), platform_game_open(nullptr) },
+                          // Only while a game is open to keep counting, and not
+                          // while unlocked (the gauge says the time may not count).
+                          { home_hint.getView(), platform_game_open(nullptr) && !unlocked },
                           { outside_text.getView(), outside_shown },
                           { outside.getView(), outside_shown } });
 }

@@ -1514,7 +1514,9 @@
             "next_bedtime_now": "Schlafenszeit: Spielen wieder erlaubt ab {}",
             "clock_fix_dns": "Vom DNS blockiert: messen und einstellen",
             "next_with_extra": "Mit {} mehr ist die Zeit gegen {} um",
-            "next_with_extra_bed": "Auch mit {} mehr kommt der Gute-Nacht-Alarm um {} zuerst"
+            "next_with_extra_bed": "Auch mit {} mehr kommt der Gute-Nacht-Alarm um {} zuerst",
+            "head_unlocked": "Limit von {} ausgesetzt",
+            "pc_lifted": "Aufgehoben bis zur Reaktivierung"
         },
         "pill": {
             "pc_on": "Jugendschutz aktiv",

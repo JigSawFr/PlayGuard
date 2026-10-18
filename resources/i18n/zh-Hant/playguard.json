@@ -1514,7 +1514,9 @@
             "next_bedtime_now": "就寢時間：{}起可再次遊玩",
             "clock_fix_dns": "已被DNS封鎖：測量並校準",
             "next_with_extra": "增加{}後，約{}時間到",
-            "next_with_extra_bed": "即使增加{}，{}的就寢鬧鐘也會先響"
+            "next_with_extra_bed": "即使增加{}，{}的就寢鬧鐘也會先響",
+            "head_unlocked": "{}的限制已暫停",
+            "pc_lifted": "已解除，直到重新啟用"
         },
         "pill": {
             "pc_on": "家長監護已開啟",
