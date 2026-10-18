@@ -465,7 +465,16 @@ int main(int argc, char* argv[])
     // PlayGuard status colours (light / dark variants), before any view exists.
     ui::register_theme_colors();
     // The Cadran appearance's palettes (Preferences › Appearance, the default).
-    if (cadran::enabled()) cadran::install_theme();
+    if (cadran::enabled()) {
+        cadran::install_theme();
+        // The console clears the screen with a colour deko3d records once
+        // (SwitchVideoContext::recordStaticCommands: at start-up and on a theme
+        // change), so before this palette: the space behind the tabs stayed
+        // borealis' grey next to the rail's navy. A theme change records it
+        // again (the desktop clears with the theme's colour every frame).
+        brls::Platform* platform = brls::Application::getPlatform();
+        platform->setThemeVariant(platform->getThemeVariant());
+    }
 
     // We own the quit path (B on the sidebar / error screen).
     brls::Application::setGlobalQuit(false);
