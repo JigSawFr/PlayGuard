@@ -12,6 +12,14 @@ namespace kit = cadran::kit;
 
 namespace
 {
+// A row's inner margins in a card: left with its icon, left without, right;
+// the icon's square and the space after it.
+constexpr float ROW_PAD_ICON = 20.0f;
+constexpr float ROW_PAD      = 24.0f;
+constexpr float ROW_PAD_END  = 24.0f;
+constexpr float ICON_SQUARE  = 36.0f;
+constexpr float ICON_GAP     = 14.0f;
+
 void append_utf8(std::string& out, uint32_t cp)
 {
     if (cp < 0x80) {
@@ -88,14 +96,14 @@ brls::Box* row_icon(const char* name)
 {
     brls::Theme theme = brls::Application::getTheme();
     auto* square = new brls::Box(brls::Axis::ROW);
-    square->setWidth(36);
-    square->setHeight(36);
+    square->setWidth(ICON_SQUARE);
+    square->setHeight(ICON_SQUARE);
     square->setCornerRadius(10);
     square->setShrink(0);
     square->setBackgroundColor(theme["cadran/surf2"]);
     square->setAlignItems(brls::AlignItems::CENTER);
     square->setJustifyContent(brls::JustifyContent::CENTER);
-    square->setMarginRight(14);
+    square->setMarginRight(ICON_GAP);
     square->addView(make_icon(name, 19, theme["cadran/text2"]));
     return square;
 }
@@ -157,9 +165,9 @@ void cadran::Card::draw(NVGcontext* vg, float x, float y, float width, float hei
     for (brls::View* row : this->getChildren()) {
         if (row->getVisibility() == brls::Visibility::GONE) continue;
         if (previous) {
-            const float inset = has_icon(previous) ? 64.0f : 18.0f;
+            const float inset = has_icon(previous) ? ROW_PAD_ICON + ICON_SQUARE + ICON_GAP : ROW_PAD;
             nvgBeginPath(vg);
-            nvgRect(vg, x + inset, row->getY() - 0.5f, width - inset - 16, 1);
+            nvgRect(vg, x + inset, row->getY() - 0.5f, width - inset - ROW_PAD_END, 1);
             nvgFillColor(vg, this->a(this->border));
             nvgFill(vg);
         }
@@ -207,8 +215,8 @@ cadran::List::List(brls::View* tab, bool sub_screen)
         for (brls::View* child : frame->getChildren())
             if (auto* column = dynamic_cast<brls::Box*>(child)) this->box = column;
     if (!this->box) return;
-    if (sub_screen) this->box->setPadding(10, 72, 32, 72);
-    else this->box->setPadding(4, 48, 32, 28);
+    if (sub_screen) this->box->setPadding(20, 72, 36, 72);
+    else this->box->setPadding(16, 48, 36, 32);
 }
 
 cadran::List::List(brls::View* screen, brls::Box* column)
@@ -272,9 +280,9 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         cell->setJustifyContent(brls::JustifyContent::FLEX_START);
         cell->setGrow(1.0f);
         cell->setWidth(0);
-        cell->setHeight(status ? 118 : 112);
+        cell->setHeight(status ? 128 : 120);
         if (status) this->readings.push_back(cell);
-        cell->setPadding(16, 16, 14, 16);
+        cell->setPadding(20, 22, 18, 22);
         cell->setMarginRight(i + 1 < cells.size() ? 12 : 0);
         cell->setCornerRadius(18);
         cell->setHighlightCornerRadius(18);
@@ -326,7 +334,7 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
             header->setLineBottom(0);
             header->setPaddingTop(0);
             header->setPaddingBottom(0);
-            header->setMarginLeft(4);
+            header->setMarginLeft(8);
             header->setMarginBottom(10);
             if (margin_top(header) > 0) header->setMarginTop(26);
             if (!header->getChildren().empty()) header->getChildren()[0]->setVisibility(brls::Visibility::GONE);   // the bar
@@ -344,8 +352,8 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
             // A note (a headline, larger, keeps its size).
             if (auto* note = dynamic_cast<brls::Label*>(line); note && note->getFontSize() <= 20.5f) {
                 note->setFontSize(16.5f);
-                note->setMarginLeft(6);
-                note->setMarginRight(6);
+                note->setMarginLeft(10);
+                note->setMarginRight(10);
                 if (margin_top(note) >= 10) note->setMarginTop(10);
             }
             continue;
@@ -357,15 +365,15 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
             this->box->addView(card, index_in(this->box, cell));
         }
         move_to(cell, card);
-        cell->setHeight(58);
-        cell->setPaddingLeft(14);
-        cell->setPaddingRight(16);
+        cell->setHeight(60);
+        cell->setPaddingLeft(ROW_PAD_ICON);
+        cell->setPaddingRight(ROW_PAD_END);
         cell->setLineBottom(0);
         cell->setHighlightCornerRadius(14);
         cell->title->setFontSize(18);
         cell->detail->setFontSize(16.5f);
         if (const char* name = icon_of(cell)) cell->addView(row_icon(name), 0);
-        else cell->setPaddingLeft(18);
+        else cell->setPaddingLeft(ROW_PAD);
         if (auto* toggle = dynamic_cast<brls::BooleanCell*>(cell)) {
             toggle->detail->setVisibility(brls::Visibility::GONE);
             toggle->addView(new Switch(toggle));
@@ -389,7 +397,7 @@ cadran::Card* cadran::List::wrap(const char* id)
     const int at = line ? index_in(this->box, line) : -1;
     if (at < 0) return nullptr;
     auto* card = new Card();
-    card->setPadding(14, 18, 14, 18);
+    card->setPadding(18, 24, 18, 24);
     this->box->addView(card, at);
     move_to(line, card);
     return card;

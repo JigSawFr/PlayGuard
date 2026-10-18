@@ -19,7 +19,7 @@ brls::Box* hero_card(bool grow)
 {
     brls::Box* card = kit::card(false, grow);
     card->setCornerRadius(22);
-    card->setPadding(18, 22, 18, 22);
+    card->setPadding(22, 26, 22, 26);
     return card;
 }
 
@@ -236,7 +236,7 @@ CadranAboutTab::CadranAboutTab()
         hero->setAlignItems(brls::AlignItems::CENTER);
         hero->setMarginTop(10);
         hero->setMarginBottom(6);
-        hero->setPadding(22, 26, 22, 26);
+        hero->setPadding(24, 30, 24, 30);
         auto* badge = new brls::Box(brls::Axis::ROW);
         badge->setWidth(84);
         badge->setHeight(84);

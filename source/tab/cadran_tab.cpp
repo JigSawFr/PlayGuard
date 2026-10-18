@@ -73,6 +73,11 @@ void cadran::install_theme()
         t->addColor("brls/highlight/background", p->surf);
         t->addColor("brls/highlight/color1", p->hl1);
         t->addColor("brls/highlight/color2", p->hl2);
+#ifndef __SWITCH__
+        // The smoke test's still focus (ui::register_theme_colors): the glow
+        // in the stroke's own colour, so a screenshot does not depend on when.
+        if (std::getenv("PLAYGUARD_SIM_STILL_FOCUS")) t->addColor("brls/highlight/color2", p->hl1);
+#endif
         t->addColor("brls/click_pulse", nvgRGBA(0x2E, 0xC4, 0xA6, 38));
         t->addColor("brls/button/primary_enabled_background", p->teal_fill);
         t->addColor("brls/button/primary_enabled_text", navy);

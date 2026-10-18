@@ -102,6 +102,14 @@ CadranPlayTimerTab::CadranPlayTimerTab()
         keys_idle->setVisibility(editing ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
         keys_edit->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
     });
+    // The footer has no room for a sixth hint while a day is edited (+ Save,
+    // the bell, language and theme, B, A): Ⓧ still reads the console again
+    // (it does every 5 s anyway), out of sight; on the week it opens the
+    // day's picker, which the keys under the week say.
+    this->registerAction("playguard/hints/refresh"_i18n, brls::BUTTON_X, [this](brls::View*) {
+        this->refresh();
+        return true;
+    }, true);
     save_button->registerClickAction([this](brls::View*) {
         this->save();
         return true;

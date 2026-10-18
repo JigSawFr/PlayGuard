@@ -40,7 +40,7 @@ brls::Box* card(bool focusable, bool grow)
     box->setBorderColor(theme["cadran/line"]);
     box->setBorderThickness(1);
     box->setCornerRadius(20);
-    box->setPadding(18, 20, 18, 20);
+    box->setPadding(20, 24, 20, 24);
     if (focusable) {
         box->setFocusable(true);
         box->setHideHighlightBackground(true);
@@ -59,8 +59,8 @@ brls::Box* pill(const std::string& text, const char* dot_key)
     auto* box = new brls::Box(brls::Axis::ROW);
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setHeight(30);
-    box->setPaddingLeft(12);
-    box->setPaddingRight(12);
+    box->setPaddingLeft(14);
+    box->setPaddingRight(16);
     box->setCornerRadius(15);
     box->setBorderColor(theme["cadran/line"]);
     box->setBorderThickness(1);
@@ -85,8 +85,8 @@ brls::Box* chip(const std::string& text, float height)
     auto* box = new brls::Box(brls::Axis::ROW);
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setHeight(height);
-    box->setPaddingLeft(18);
-    box->setPaddingRight(18);
+    box->setPaddingLeft(22);
+    box->setPaddingRight(22);
     box->setCornerRadius(height / 2);
     box->setBackgroundColor(theme["cadran/surf2"]);
     box->setBorderColor(theme["cadran/line"]);

@@ -112,11 +112,13 @@ CadranWeekView::CadranWeekView()
             this->set_edit(!this->edit);
             return true;
         });
+        // X: told by the keys under the week, not in the footer (+ Save and
+        // the global hints already fill it while a day is edited).
         c.box->registerAction("playguard/cadran/week/pick"_i18n, brls::BUTTON_X, [this, d](brls::View*) {
             if (this->can_edit && !this->can_edit()) return true;
             if (this->on_pick) this->on_pick(d);
             return true;
-        });
+        }, true);
         c.box->registerAction("", brls::BUTTON_B, [this](brls::View*) {
             if (!this->edit) return false;
             this->set_edit(false);

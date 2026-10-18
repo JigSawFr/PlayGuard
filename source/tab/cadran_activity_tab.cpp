@@ -60,7 +60,7 @@ CadranActivityTab::CadranActivityTab()
         c.box = kit::card(true, true);
         c.box->setAxis(brls::Axis::ROW);
         c.box->setAlignItems(brls::AlignItems::CENTER);
-        c.box->setPadding(12, 18, 12, 12);
+        c.box->setPadding(14, 22, 14, 14);
         c.box->setMarginBottom(12);
         if (i % 2 == 0) c.box->setMarginRight(12);
         c.icon_fallback = new brls::Box();
@@ -159,7 +159,7 @@ void CadranActivityTab::build_chips()
         auto* chip = new brls::Box(brls::Axis::ROW);
         chip->setAlignItems(brls::AlignItems::CENTER);
         chip->setHeight(44);
-        chip->setPadding(0, 16, 0, i < 0 ? 16 : 6);
+        chip->setPadding(0, 18, 0, i < 0 ? 18 : 6);
         chip->setCornerRadius(22);
         chip->setFocusable(true);
         chip->setHideHighlightBackground(true);   // the ring alone: a chosen chip keeps its fill

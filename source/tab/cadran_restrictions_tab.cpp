@@ -41,7 +41,7 @@ CadranRestrictionsTab::Tile CadranRestrictionsTab::make_tile(uint32_t level, boo
         t.box->setAlignItems(brls::AlignItems::CENTER);
         t.box->setCornerRadius(18);
         t.box->setHighlightCornerRadius(18);
-        t.box->setPadding(12, 16, 12, 18);
+        t.box->setPadding(14, 22, 14, 24);
         t.box->setBorderThickness(2);
         t.box->setMarginTop(12);
         brls::Label* title = kit::label(ui::level_name(level), 17);
@@ -59,7 +59,7 @@ CadranRestrictionsTab::Tile CadranRestrictionsTab::make_tile(uint32_t level, boo
         t.box->setMinHeight(226);
         t.box->setCornerRadius(22);
         t.box->setHighlightCornerRadius(22);
-        t.box->setPadding(16, 14, 14, 14);
+        t.box->setPadding(18, 18, 16, 18);
         t.box->setBorderThickness(2);
         if (!last) t.box->setMarginRight(12);
 

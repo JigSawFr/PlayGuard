@@ -1173,7 +1173,7 @@ if CADRAN:
     key("Right")               # Network clock, the first line
     key("Return")
     time.sleep(1)              # the screen's own entrance over
-    shot("18_clock")           # not a reference: the focus ring's shading varies from run to run there
+    shot("18_clock")
     key("Escape")
 
     # Activity: a game's own screen from its card.
