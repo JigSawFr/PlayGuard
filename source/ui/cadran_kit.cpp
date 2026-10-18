@@ -101,6 +101,35 @@ brls::Box* chip(const std::string& text, float height)
     return box;
 }
 
+Empty empty(const char* icon_name)
+{
+    brls::Theme theme = brls::Application::getTheme();
+    Empty e;
+    e.box = card(false, false);
+    e.box->setAlignItems(brls::AlignItems::CENTER);
+    e.box->setPadding(32, 40, 32, 40);
+    auto* circle = new brls::Box(brls::Axis::ROW);
+    circle->setWidth(64);
+    circle->setHeight(64);
+    circle->setCornerRadius(32);
+    circle->setBackgroundColor(theme["cadran/teal_soft"]);
+    circle->setAlignItems(brls::AlignItems::CENTER);
+    circle->setJustifyContent(brls::JustifyContent::CENTER);
+    circle->addView(icon(icon_name, 28, "cadran/teal"));
+    e.box->addView(circle);
+    e.title = label("", 19, "cadran/text");
+    e.title->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    e.title->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the card's width
+    e.title->setMarginTop(16);
+    e.box->addView(e.title);
+    e.text = label("", 15.5f, "cadran/text2");
+    e.text->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    e.text->setAlignSelf(brls::AlignSelf::STRETCH);
+    e.text->setMarginTop(6);
+    e.box->addView(e.text);
+    return e;
+}
+
 void wrap(brls::View* row)
 {
     if (row) YGNodeStyleSetFlexWrap(row->getYGNode(), YGWrapWrap);

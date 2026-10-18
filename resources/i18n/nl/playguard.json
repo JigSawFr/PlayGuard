@@ -371,7 +371,8 @@
         "remove_err": "Kan de speeltijdlimiet niet verwijderen",
         "not_counting": "De console telt op dit moment geen speeltijd. Waarschijnlijke oorzaken: de klok is teruggezet (later telt hij weer), de netwerkklok is nooit ingesteld (Console › Netwerkklok), of er is net een limiet geschreven (start een game voor een minuut en kijk dan opnieuw).",
         "limit_note": "Bij de limiet toont de console \"Tijd is om\" en onderbreekt hij daarna de game of waarschuwt hij alleen, volgens \"Als de tijd om is\".",
-        "unsaved": "Niet-opgeslagen voortgang kan verloren gaan: laat het kind eerst opslaan."
+        "unsaved": "Niet-opgeslagen voortgang kan verloren gaan: laat het kind eerst opslaan.",
+        "profile_already": "Het profiel ‘{}’ is al toegepast."
     },
     "activity": {
         "section_totals": "Speeltijd",
@@ -557,7 +558,8 @@
         "confirm_copy_follows": "\n\n\"Klok synchroniseren via internet\" staat aan, dus de consoleklok volgt de netwerkklok en kan net zo fout zijn. Zo ja: zet de instelling uit, stel datum en tijd in bij Systeeminstellingen › Systeem › Datum en tijd en kom dan hier terug.",
         "confirm_copy_sync_after": "\n\n\"Klok synchroniseren via internet\" staat uit: de consoleklok blijft zoals hij is. Als je de instelling daarna aanzet, verspringt hij niet meer, omdat beide klokken dan dezelfde tijd tonen.",
         "copied_sync_on": "\n\nJe kunt nu \"Klok synchroniseren via internet\" aanzetten (Systeeminstellingen › Systeem › Datum en tijd): de consoleklok verspringt niet.",
-        "copy_implausible": "De consoleklok geeft {} aan: hij lijkt niet ingesteld. Stel eerst datum en tijd in bij Systeeminstellingen › Systeem › Datum en tijd (met \"Klok synchroniseren via internet\" uit) en kom dan hier terug."
+        "copy_implausible": "De consoleklok geeft {} aan: hij lijkt niet ingesteld. Stel eerst datum en tijd in bij Systeeminstellingen › Systeem › Datum en tijd (met \"Klok synchroniseren via internet\" uit) en kom dan hier terug.",
+        "dns_note": "Op deze console blokkeert de DNS-omleiding van Atmosphère (atmosphere/hosts) de tijdserver van Nintendo: de netwerkklok kan zichzelf niet instellen."
     },
     "pairing": {
         "section": "App Nintendo Switch Ouderlijk toezicht",
@@ -1321,7 +1323,10 @@
             "kind": "Code",
             "done": "Uitgevoerd",
             "refused": "Geweigerd ({})"
-        }
+        },
+        "undo_hint": "Ongedaan maken",
+        "empty_title": "Nog niets vastgelegd",
+        "empty_text": "Elke wijziging die PlayGuard op de console maakt (limieten, beperkingsniveau, pincode, ontgrendelingen...) wordt hier vermeld."
     },
     "chart": {
         "last_days": "De laatste 7 dagen, vandaag rechts",
@@ -1458,7 +1463,8 @@
         "week_detail": "Gemiddeld {} per dag.",
         "week_top": "Meest gespeeld: {} ({}).",
         "over_limit": "De limiet is overschreden op {} van de afgelopen 7 dagen",
-        "over_limit_detail": "Als de tijd om is, waarschuwt de console alleen: er wordt verder gespeeld na de limiet (Speeltijd › Als de tijd om is)."
+        "over_limit_detail": "Als de tijd om is, waarschuwt de console alleen: er wordt verder gespeeld na de limiet (Speeltijd › Als de tijd om is).",
+        "clock_detail_dns": "De DNS van Atmosphère blokkeert de tijdserver van Nintendo, dus de console kan hem niet zelf instellen: stel hem in via een tijdserver."
     },
     "cadran": {
         "date": "{1} {2} {3}",
@@ -1505,7 +1511,10 @@
             "serial_hidden": "Serienummer verborgen",
             "next_time_up": "Als er verder gespeeld wordt, is de tijd om rond {}",
             "next_bedtime": "Bedtijdalarm om {}, over {}",
-            "next_bedtime_now": "Bedtijd: weer spelen vanaf {}"
+            "next_bedtime_now": "Bedtijd: weer spelen vanaf {}",
+            "clock_fix_dns": "Geblokkeerd door de DNS: meten en instellen",
+            "next_with_extra": "Met {} extra is de tijd om rond {}",
+            "next_with_extra_bed": "Met {} extra komt het bedtijdalarm om {} eerst"
         },
         "pill": {
             "pc_on": "Ouderlijk toezicht actief",
@@ -1550,7 +1559,9 @@
             "top": "meest gespeeld · {}",
             "card_today": "vandaag",
             "card_week": "vandaag · {} in 7 dagen",
-            "card_total": "vandaag · {} in totaal"
+            "card_total": "vandaag · {} in totaal",
+            "empty_note": "Games die op deze console gespeeld worden, verschijnen hier, per account.",
+            "see_all": "Totaal bekijken"
         },
         "restrictions": {
             "choose": "Dit niveau kiezen",
@@ -1586,6 +1597,9 @@
             "of": "van {}",
             "back": "Terug naar de ouder · pincode",
             "play": "Console geven en spelen"
+        },
+        "dialog": {
+            "unlock_short": "Ouderlijk toezicht wordt voor de wijziging ontgrendeld met de opgeslagen pincode en daarna weer vergrendeld."
         }
     }
 }

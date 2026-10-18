@@ -4,6 +4,7 @@
 #include "action/export_flow.hpp"
 #include "action/history_flow.hpp"
 #include "tab/cadran_list.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
 #include "util/perf.hpp"
@@ -52,6 +53,11 @@ void HistoryActivity::onContentAvailable()
         this->export_shown();
         return true;
     });
+    if (cadran::enabled()) {
+        this->empty_card = cadran::kit::empty("history");
+        this->empty_card.box->setMarginTop(16);
+        if (auto* root = dynamic_cast<brls::Box*>(empty->getParent())) root->addView(this->empty_card.box);
+    }
     this->rebuild();
 }
 
@@ -133,8 +139,17 @@ void HistoryActivity::rebuild()
         }
         for (size_t i = 0; i < this->shown.size(); i++) ui::set_visible(slots[i], true);
     });
-    ui::set_visible(empty.getView(), this->shown.empty());
-    empty->setText(this->filter == Filter::All ? "playguard/history/none"_i18n : "playguard/history/none_shown"_i18n);
+    if (this->empty_card.box) {
+        const bool all = this->filter == Filter::All;
+        ui::set_visible(empty.getView(), false);
+        ui::set_visible(this->empty_card.box, this->shown.empty());
+        this->empty_card.title->setText(all ? "playguard/history/empty_title"_i18n : "playguard/history/none_shown"_i18n);
+        this->empty_card.text->setText(all ? "playguard/history/empty_text"_i18n : "");
+        ui::set_visible(this->empty_card.text, all);
+    } else {
+        ui::set_visible(empty.getView(), this->shown.empty());
+        empty->setText(this->filter == Filter::All ? "playguard/history/none"_i18n : "playguard/history/none_shown"_i18n);
+    }
     if (focus_hidden) brls::Application::giveFocus(filter_cell.getView());
     brls::Logger::info("history list: {} of {} changes", this->shown.size(), this->all.size());
 }

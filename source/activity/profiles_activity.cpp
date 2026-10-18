@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/profiles_activity.hpp"
 
+#include <algorithm>
+
 #include "action/pt_flow.hpp"
 #include "activity/play_timer_perday_activity.hpp"
 #include "tab/cadran_list.hpp"
@@ -78,6 +80,12 @@ void ProfilesActivity::apply(const profiles::Profile& p)
 {
     const std::string file = p.file;
     auto days = p.days;
+    // Already the console's limits: nothing to write, nothing to ask.
+    pctl_play_timer_query(&this->live);
+    if (this->live.valid && std::equal(days.begin(), days.end(), this->live.day_min)) {
+        ui::notify(brls::getStr("playguard/play_timer/profile_already", p.name));
+        return;
+    }
     // The week as the profile sets it is drawn under the question.
     pt_flow::confirm_write(brls::getStr("playguard/play_timer/profile_apply", p.name),
                            "playguard/play_timer/confirm_set"_i18n, [this, file, days, name = p.name](bool did_unlock) {
@@ -182,7 +190,7 @@ void ProfilesActivity::save_current()
 {
     pctl_play_timer_query(&this->live);
     if (!this->live.valid) {
-        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN));
+        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN), ui::Toast::Refused);
         return;
     }
     std::array<uint16_t, 7> days;

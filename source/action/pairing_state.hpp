@@ -11,9 +11,7 @@
 namespace pairing_state
 {
 
-// The parental-control server redirected by DNS.mitm (DNS.mitm on, the hosts
-// file Atmosphère reads naming it). Read from the SD card once a run:
-// Atmosphère itself reads its hosts file once, at start-up.
+// The parental-control server redirected by DNS.mitm (action/nintendo_dns).
 bool dns_blocked();
 
 // Linked, as `s` read it, and not blocked.

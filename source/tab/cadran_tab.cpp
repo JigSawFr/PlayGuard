@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "action/clock_flow.hpp"
+#include "action/nintendo_dns.hpp"
 #include "action/pairing_state.hpp"
 #include "activity/cadran_child_activity.hpp"
 #include "action/pt_flow.hpp"
@@ -478,6 +479,15 @@ CadranTab::CadranTab()
             pt_flow::add_extra_minutes(this->pt, (uint16_t)minutes, [this]() { this->refresh(); });
             return true;
         });
+        // Focused, the next stop's line says when play would end with it.
+        amount->getFocusEvent()->subscribe([this, minutes](brls::View*) {
+            this->preview_extra = minutes;
+            this->show_next(this->unlocked_now);
+        });
+        amount->getFocusLostEvent()->subscribe([this](brls::View*) {
+            this->preview_extra = 0;
+            this->show_next(this->unlocked_now);
+        });
         chips->addView(amount);
     }
     stop->registerClickAction([this](brls::View*) {
@@ -543,18 +553,35 @@ void CadranTab::show_next(bool unlocked)
     const PtState& pt = this->pt;
     const int today = ui::today_weekday();
     pt_logic::NextStop n;
+    bool with_extra = false;
     // Unlocked, or the timer off: nothing stops play.
     if (!unlocked && pt.fw_supported && pt.valid && pt.enabled_valid && pt.enabled) {
         const uint16_t limit = pt.day_min[today];
+        const int over = pt_logic::over_limit_min(pt, today);
         int left = -1;
-        if (limit != PT_DAY_NOLIMIT && pt.remaining_valid && pt.remaining_ns > 0 && pt_logic::over_limit_min(pt, today) < 0)
+        if (limit != PT_DAY_NOLIMIT && pt.remaining_valid && pt.remaining_ns > 0 && over < 0)
             left = (int)((uint64_t)pt.remaining_ns / 60000000000ULL);
+        // A chip's amount added to the limit (24 h at most, as add_extra_minutes
+        // writes it), from the time left or the time over it.
+        if (this->preview_extra > 0 && limit != PT_DAY_NOLIMIT && pt.remaining_valid) {
+            const int base  = over >= 0 ? -over : std::max(0, left);
+            const int added = std::min(24 * 60, limit + this->preview_extra) - limit;
+            if (base + added > 0) {
+                left       = base + added;
+                with_extra = true;
+            }
+        }
         const LocalTime now = ui::local_now();
         n = pt_logic::next_stop(now.hour * 60 + now.minute, left, pt.bed[today]);
     }
     const auto clock = [](int minutes) { return fmt::format("{:02d}:{:02d}", minutes / 60, minutes % 60); };
+    const std::string amount = ui::fmt_minutes((uint16_t)this->preview_extra);
     std::string text;
-    if (n.kind == pt_logic::NextStop::TIME_UP) text = brls::getStr("playguard/cadran/today/next_time_up", clock(n.at));
+    if (with_extra && n.kind == pt_logic::NextStop::TIME_UP)
+        text = brls::getStr("playguard/cadran/today/next_with_extra", amount, clock(n.at));
+    else if (with_extra && n.kind == pt_logic::NextStop::BEDTIME)
+        text = brls::getStr("playguard/cadran/today/next_with_extra_bed", amount, clock(n.at));
+    else if (n.kind == pt_logic::NextStop::TIME_UP) text = brls::getStr("playguard/cadran/today/next_time_up", clock(n.at));
     else if (n.kind == pt_logic::NextStop::BEDTIME)
         text = brls::getStr("playguard/cadran/today/next_bedtime", clock(n.at), ui::fmt_minutes((uint16_t)n.in));
     else if (n.kind == pt_logic::NextStop::BEDTIME_NOW) text = brls::getStr("playguard/cadran/today/next_bedtime_now", clock(n.at));
@@ -609,7 +636,10 @@ void CadranTab::show_cards(bool unlocked, bool has_pin)
     clock_title->setTextColor(bad ? theme["cadran/amber"] : theme["cadran/text3"]);
     clock_state->setText(bad ? "playguard/cadran/today/to_set"_i18n : "playguard/cadran/today/ok"_i18n);
     clock_state->setTextColor(bad ? theme["cadran/amber"] : theme["cadran/teal"]);
-    clock_sub->setText(bad ? "playguard/cadran/today/clock_fix"_i18n : "playguard/cadran/today/clock_fine"_i18n);
+    // Nintendo's time server blocked by the DNS: why it went wrong.
+    clock_sub->setText(!bad                         ? "playguard/cadran/today/clock_fine"_i18n
+                       : nintendo_dns::time_blocked() ? "playguard/cadran/today/clock_fix_dns"_i18n
+                                                    : "playguard/cadran/today/clock_fix"_i18n);
     clock_sub->setTextColor(bad ? theme["cadran/text"] : theme["cadran/text2"]);
     ui::set_visible(clock_key.getView(), bad && !app::read_only());
     clock_card->setBackgroundColor(bad ? theme["cadran/amber_surf"] : theme["cadran/surf"]);
@@ -672,6 +702,7 @@ void CadranTab::refresh()
     else if (s.restriction_enabled) cadran::set_pill("playguard/cadran/pill/pc_on"_i18n);
     else cadran::set_pill("playguard/cadran/pill/pc_off"_i18n, "alert", true);
 
+    this->unlocked_now = unlocked;
     this->show_ring(unlocked);
     this->show_next(unlocked);
     this->show_cards(unlocked, has_pin);

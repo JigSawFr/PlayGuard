@@ -10,6 +10,7 @@
 #include <borealis.hpp>
 
 #include "action/history_logic.hpp"
+#include "ui/cadran_kit.hpp"
 #include "util/history.hpp"
 
 class HistoryActivity : public brls::Activity
@@ -31,6 +32,7 @@ class HistoryActivity : public brls::Activity
     bool                        read = false;
     uint64_t                    read_at = 0;   // history_flow::changes() when read
     std::vector<history::Entry> shown;   // what rebuild() listed, for the export
+    cadran::kit::Empty          empty_card;   // Cadran: in hi_empty's place
 
     BRLS_BIND(brls::Label,      note,   "hi_note");
     BRLS_BIND(brls::DetailCell, filter_cell, "hi_filter");

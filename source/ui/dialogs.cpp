@@ -317,12 +317,17 @@ void pick_actions(const std::string& title, const std::vector<Choice>& choices)
 
 void prompt_minutes(const std::string& header, uint16_t current, std::function<void(uint16_t)> on_value)
 {
+    // Cadran: the stick, not the number pad.
+    if (cadran::enabled()) {
+        cadran::prompt_minutes(header, current == PT_DAY_NOLIMIT ? 60 : current, std::move(on_value));
+        return;
+    }
     const std::string guide   = "playguard/numpad/guide"_i18n;
     const std::string initial = duration::format_hm(current == PT_DAY_NOLIMIT ? 60 : current);
     auto handle = [on_value](const std::string& text) {
         uint16_t minutes = 0;
         if (!duration::parse(text, &minutes)) {
-            notify(rc_text(NXM_RC_INVALID_ARGUMENT));
+            notify(rc_text(NXM_RC_INVALID_ARGUMENT), Toast::Refused);
             return;
         }
         on_value(minutes);

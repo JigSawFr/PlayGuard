@@ -21,6 +21,10 @@ static void test_matches()
     CHECK(!matches("*.nintendo.com", dns_hosts::PCTL_HOST));
     CHECK(!matches("api-%.pctl.srv.nintendo.net.example", dns_hosts::PCTL_HOST));
     CHECK(!matches("", dns_hosts::PCTL_HOST));
+    // The time server, by the same names.
+    CHECK(matches("*nintendo.net", dns_hosts::TIME_HOST));
+    CHECK(matches("aauth-%.ndas.srv.nintendo.net", dns_hosts::TIME_HOST));
+    CHECK(!matches("api-%.pctl.srv.nintendo.net", dns_hosts::TIME_HOST));
     // "%" is the environment, not a wildcard.
     CHECK(!matches("api-%.pctl.srv.nintendo.net", "api-dd1.pctl.srv.nintendo.net"));
 }

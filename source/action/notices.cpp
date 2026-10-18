@@ -11,6 +11,7 @@
 #include "action/backup_flow.hpp"
 #include "action/clock_flow.hpp"
 #include "action/console_actions.hpp"
+#include "action/nintendo_dns.hpp"
 #include "action/outside_watch.hpp"
 #include "action/pairing_state.hpp"
 #include "action/pin_lock.hpp"
@@ -403,7 +404,8 @@ void note_timer(const PtState& pt, Result accuracy_rc, bool accurate, bool writa
     // The network clock the play timer counts on.
     // (clock_check's measure at start-up is an entry of its own, clock_off.)
     if (R_SUCCEEDED(accuracy_rc))
-        toggle(!accurate, "clock", Level::Action, "playguard/notices/clock"_i18n, "playguard/notices/clock_detail"_i18n,
+        toggle(!accurate, "clock", Level::Action, "playguard/notices/clock"_i18n,
+               nintendo_dns::time_blocked() ? "playguard/notices/clock_detail_dns"_i18n : "playguard/notices/clock_detail"_i18n,
                writable ? "playguard/notices/clock_fix"_i18n : open_label("clock"), [writable]() {
                    if (writable) clock_flow::guided([]() { sweep(); });
                    else ClockTab::open_screen();

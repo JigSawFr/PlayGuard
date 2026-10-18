@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <vector>
 
+#include "action/nintendo_dns.hpp"
 #include "action/offline_clock_logic.hpp"
 #include "app.hpp"
 #include "tab/cadran_lists.hpp"
@@ -47,6 +48,8 @@ ClockTab::ClockTab()
     : TabBase("xml/tab/clock.xml")
 {
     why->setSingleLine(false);
+    // Nintendo's time server blocked here: the clock will not set itself.
+    if (nintendo_dns::time_blocked()) why->setText("playguard/clock/why"_i18n + "\n\n" + "playguard/clock/dns_note"_i18n);
     result->setSingleLine(false);
     warning->setSingleLine(false);
     progress_text->setSingleLine(false);
@@ -197,7 +200,7 @@ void ClockTab::enter_custom()
 {
     ui::prompt_text("playguard/clock/custom_header"_i18n, this->server, 253, [this](std::string host) {
         if (!plausible_host(host)) {
-            ui::notify(ui::rc_text(NXM_RC_INVALID_ARGUMENT));
+            ui::notify(ui::rc_text(NXM_RC_INVALID_ARGUMENT), ui::Toast::Refused);
             return;
         }
         auto& list = config::get().custom_servers;

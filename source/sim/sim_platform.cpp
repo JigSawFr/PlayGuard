@@ -32,6 +32,12 @@ bool platform_in_focus(void)
     return std::getenv("PLAYGUARD_SIM_BACKGROUND") == nullptr;
 }
 
+bool platform_game_open(bool* known)
+{
+    if (known) *known = true;
+    return std::getenv("PLAYGUARD_SIM_NO_GAME") == nullptr;
+}
+
 bool platform_can_launch(void)
 {
     return std::getenv("PLAYGUARD_SIM_HBLOADER") != nullptr;

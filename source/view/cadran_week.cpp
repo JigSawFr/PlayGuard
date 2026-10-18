@@ -241,7 +241,7 @@ void CadranWeekView::render()
         const uint16_t m = this->days[d];
         const bool focused = d == this->focused;
         const bool changed = this->valid && m != this->live[d];
-        c.value->setText(!this->valid ? "—" : m == PT_DAY_NOLIMIT ? "—" : ui::fmt_minutes(m));
+        c.value->setText(!this->valid ? "—" : m == PT_DAY_NOLIMIT ? "—" : ui::fmt_played(m));
         c.value->setTextColor(focused ? theme["cadran/teal"] : changed ? theme["cadran/amber"] : theme["cadran/text"]);
         c.bar->setHeight(!this->valid || m == PT_DAY_NOLIMIT ? BAR_MIN : std::max(BAR_MIN, BAR_MAX * (float)m / (float)top));
         c.bar->setBackgroundColor(focused ? theme["cadran/teal_fill"] : d == today ? theme["cadran/bar_today"] : theme["cadran/bar"]);

@@ -10,6 +10,7 @@
 #include "action/write_queue_logic.hpp"
 #include "activity/main_activity.hpp"
 #include "tab/tab_base.hpp"
+#include "ui/cadran_modal.hpp"
 #include "util/config.hpp"
 #include "util/worker_threads.hpp"
 
@@ -130,11 +131,13 @@ void settle_writes(const std::string& key)
     s_writes.settle(key);
 }
 
-void notify(const std::string& text)
+void notify(const std::string& text, Toast kind)
 {
     // Logged too: the desktop smoke test checks what the user was told.
     brls::Logger::info("toast: {}", text);
-    brls::sync([text]() { brls::Application::notify(text); });
+    brls::sync([text, kind]() {
+        brls::Application::notify(text, kind == Toast::Info ? nullptr : cadran::toast_icon(kind == Toast::Done));
+    });
 }
 
 void error(const std::string& text)
@@ -168,7 +171,7 @@ static bool queue_config(const std::string& saved_text, const std::string& faile
         s_config_saved = saved;
         brls::sync([saved]() { notices::note_write("config", saved); });
         if (!saved) notify(failed);
-        else if (!saved_text.empty()) notify(saved_text);
+        else if (!saved_text.empty()) notify(saved_text, Toast::Done);
     }, "config", Write::Whole, true);
     return true;
 }
@@ -189,7 +192,7 @@ bool save_config_now()
 
 void notify_result(Result rc, const std::string& ok_text, const std::string& error_prefix)
 {
-    if (R_SUCCEEDED(rc)) notify(ok_text);
+    if (R_SUCCEEDED(rc)) notify(ok_text, Toast::Done);
     else error(error_prefix + " — " + rc_text(rc));
 }
 

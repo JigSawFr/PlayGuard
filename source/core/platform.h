@@ -7,6 +7,7 @@
 //   PLAYGUARD_SIM_BACKGROUND=1  PlayGuard is not in focus (HOME menu)
 //   PLAYGUARD_SIM_HBLOADER=1    started through hbloader: a store can be launched
 //   PLAYGUARD_SIM_APPLET=1      applet (album) mode: no game to close on exit
+//   PLAYGUARD_SIM_NO_GAME=1     no game open (applet mode with nothing behind)
 //   PLAYGUARD_SIM_REGION=2      the console region (SetRegion, 2 = Europe)
 //   PLAYGUARD_SIM_BOOT_CHOICE=a the start-up screen's answer (a: A, else B)
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -30,6 +31,12 @@ PlatformInput platform_numpad(const char *header, const char *guide, const char 
 
 // False while the HOME menu or another applet has the screen.
 bool platform_in_focus(void);
+
+// A game is open, so it counts play time and the console would suspend it:
+// PlayGuard itself run over a game (title override), or, in applet (album)
+// mode, a game left open on the HOME menu. *known false (and true returned)
+// when it cannot be read.
+bool platform_game_open(bool *known);
 
 // PlayGuard was started through hbloader, which can start another homebrew
 // once it exits.

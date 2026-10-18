@@ -1,8 +1,8 @@
 // dns_hosts — whether Atmosphère's DNS.mitm sends a host name elsewhere, read
-// the way it reads its hosts file (docs/features/dns_mitm.md): the phone app's
-// synchronization goes through Nintendo's parental-control server
-// (api-lp1.pctl.srv.nintendo.net), which a hosts file that blocks Nintendo
-// redirects, so the app can no longer overwrite what is set here.
+// the way it reads its hosts file (docs/features/dns_mitm.md). A hosts file
+// that blocks Nintendo redirects its parental-control server (the phone app
+// can no longer overwrite what is set here) and its time server (the network
+// clock no longer sets itself).
 // Plain C++ (no libnx, no file access): host-tested (tests/dns_hosts).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -16,6 +16,9 @@ namespace dns_hosts
 // The parental-control server the console synchronizes with ("api-%" on
 // switchbrew's server list, "lp1" on production consoles).
 constexpr const char* PCTL_HOST = "api-lp1.pctl.srv.nintendo.net";
+// The server the console sets its network clock from ("aauth-%", its /v1/time;
+// Atmosphère issue #2148): blocked, the clock no longer sets itself.
+constexpr const char* TIME_HOST = "aauth-lp1.ndas.srv.nintendo.net";
 
 // A host name against one of a hosts file's names: "*" any run of characters
 // (none included), "%" the environment ("lp1"), letters in either case.

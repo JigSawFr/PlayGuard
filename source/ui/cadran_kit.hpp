@@ -29,6 +29,17 @@ brls::Box* pill(const std::string& text, const char* dot_key);
 // A rounded chip with a text in the display face (an amount, a period…).
 brls::Box* chip(const std::string& text, float height = 48);
 
+// What an empty list shows instead: a card with `icon_name` in a soft circle,
+// `title` (why it is empty) and `text` under it (what will come; may be
+// empty), centred; `box` takes an action (a chip) at its end.
+struct Empty
+{
+    brls::Box*   box   = nullptr;
+    brls::Label* title = nullptr;
+    brls::Label* text  = nullptr;
+};
+Empty empty(const char* icon_name);
+
 // A row whose items go on to the next line when they do not fit (the XML
 // has no attribute for it).
 void wrap(brls::View* row);

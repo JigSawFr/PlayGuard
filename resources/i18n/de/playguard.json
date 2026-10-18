@@ -371,7 +371,8 @@
         "remove_err": "Spielzeitlimit konnte nicht entfernt werden",
         "not_counting": "Die Konsole zählt die Spielzeit gerade nicht. Mögliche Ursachen: Die Uhr wurde zurückgestellt (sie zählt später wieder), die Netzwerkuhr wurde nie gestellt (Konsole › Netzwerkuhr), oder ein Limit wurde gerade geschrieben (starten Sie ein Spiel für eine Minute und prüfen Sie dann erneut).",
         "limit_note": "Beim Limit zeigt die Konsole „Zeit ist um“ an und unterbricht dann das Spiel oder warnt nur, je nach „Wenn die Zeit um ist“.",
-        "unsaved": "Nicht gespeicherter Fortschritt kann verloren gehen: Lassen Sie das Kind zuerst speichern."
+        "unsaved": "Nicht gespeicherter Fortschritt kann verloren gehen: Lassen Sie das Kind zuerst speichern.",
+        "profile_already": "Das Profil „{}“ ist bereits aktiv."
     },
     "activity": {
         "section_totals": "Spielzeit",
@@ -557,7 +558,8 @@
         "confirm_copy_follows": "\n\n„Uhr mithilfe des Internets synchronisieren“ ist aktiviert: Die Konsolenuhr folgt der Netzwerkuhr und kann genauso falsch gehen. Wenn ja: Deaktivieren Sie die Einstellung, stellen Sie Datum und Uhrzeit unter Systemeinstellungen › Konsole › Datum und Uhrzeit ein und kommen Sie dann hierher zurück.",
         "confirm_copy_sync_after": "\n\n„Uhr mithilfe des Internets synchronisieren“ ist deaktiviert: Die Konsolenuhr bleibt, wie sie ist. Wenn Sie die Einstellung danach aktivieren, springt sie nicht mehr, da beide Uhren dann dieselbe Zeit zeigen.",
         "copied_sync_on": "\n\nSie können jetzt „Uhr mithilfe des Internets synchronisieren“ aktivieren (Systemeinstellungen › Konsole › Datum und Uhrzeit): Die Konsolenuhr springt dabei nicht.",
-        "copy_implausible": "Die Konsolenuhr zeigt {}: Sie scheint nicht gestellt zu sein. Stellen Sie zuerst Datum und Uhrzeit unter Systemeinstellungen › Konsole › Datum und Uhrzeit ein (mit deaktiviertem „Uhr mithilfe des Internets synchronisieren“) und kommen Sie dann hierher zurück."
+        "copy_implausible": "Die Konsolenuhr zeigt {}: Sie scheint nicht gestellt zu sein. Stellen Sie zuerst Datum und Uhrzeit unter Systemeinstellungen › Konsole › Datum und Uhrzeit ein (mit deaktiviertem „Uhr mithilfe des Internets synchronisieren“) und kommen Sie dann hierher zurück.",
+        "dns_note": "Auf dieser Konsole blockiert die DNS-Umleitung von Atmosphère (atmosphere/hosts) Nintendos Zeitserver: Die Netzwerkuhr kann sich nicht selbst stellen."
     },
     "pairing": {
         "section": "App für die Nintendo Switch-Altersbeschränkungen",
@@ -1321,7 +1323,10 @@
             "kind": "Code",
             "done": "Erledigt",
             "refused": "Abgelehnt ({})"
-        }
+        },
+        "undo_hint": "Rückgängig",
+        "empty_title": "Noch nichts erfasst",
+        "empty_text": "Jede Änderung, die PlayGuard an der Konsole vornimmt (Limits, Einschränkungskategorie, Geheimzahl, Aufhebungen...), wird hier aufgeführt."
     },
     "chart": {
         "last_days": "Die letzten 7 Tage, heute rechts",
@@ -1458,7 +1463,8 @@
         "week_detail": "Im Schnitt {} pro Tag.",
         "week_top": "Am meisten gespielt: {} ({}).",
         "over_limit": "Das Limit wurde an {} der letzten 7 Tage überschritten",
-        "over_limit_detail": "Wenn die Zeit um ist, warnt die Konsole nur: Es wird über das Limit hinaus weitergespielt (Spielzeit › Wenn die Zeit um ist)."
+        "over_limit_detail": "Wenn die Zeit um ist, warnt die Konsole nur: Es wird über das Limit hinaus weitergespielt (Spielzeit › Wenn die Zeit um ist).",
+        "clock_detail_dns": "Das DNS von Atmosphère blockiert Nintendos Zeitserver, die Konsole kann sie also nicht selbst stellen: Stellen Sie sie über einen Zeitserver."
     },
     "cadran": {
         "date": "{0}, {2}. {3}",
@@ -1505,7 +1511,10 @@
             "serial_hidden": "Seriennummer verborgen",
             "next_time_up": "Wenn weitergespielt wird, ist die Zeit gegen {} um",
             "next_bedtime": "Gute-Nacht-Alarm um {}, in {}",
-            "next_bedtime_now": "Schlafenszeit: Spielen wieder erlaubt ab {}"
+            "next_bedtime_now": "Schlafenszeit: Spielen wieder erlaubt ab {}",
+            "clock_fix_dns": "Vom DNS blockiert: messen und einstellen",
+            "next_with_extra": "Mit {} mehr ist die Zeit gegen {} um",
+            "next_with_extra_bed": "Auch mit {} mehr kommt der Gute-Nacht-Alarm um {} zuerst"
         },
         "pill": {
             "pc_on": "Jugendschutz aktiv",
@@ -1550,7 +1559,9 @@
             "top": "am meisten gespielt · {}",
             "card_today": "heute",
             "card_week": "heute · {} in 7 Tagen",
-            "card_total": "heute · {} insgesamt"
+            "card_total": "heute · {} insgesamt",
+            "empty_note": "Auf dieser Konsole gespielte Spiele erscheinen hier, Konto für Konto.",
+            "see_all": "Gesamt ansehen"
         },
         "restrictions": {
             "choose": "Diese Stufe wählen",
@@ -1586,6 +1597,9 @@
             "of": "von {}",
             "back": "Zurück zu den Eltern · PIN",
             "play": "Konsole übergeben und spielen"
+        },
+        "dialog": {
+            "unlock_short": "Die Altersbeschränkungen werden für die Änderung mit der gespeicherten Geheimzahl aufgehoben und danach wieder aktiviert."
         }
     }
 }

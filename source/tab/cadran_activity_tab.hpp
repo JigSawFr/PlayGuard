@@ -13,6 +13,7 @@
 
 #include "tab/activity_tab.hpp"
 #include "tab/cadran_list.hpp"
+#include "ui/cadran_kit.hpp"
 #include "view/cadran_digits.hpp"
 
 class CadranActivityTab : public ActivityTab
@@ -41,6 +42,9 @@ class CadranActivityTab : public ActivityTab
     cadran::List list;
     std::vector<brls::Box*> chips;   // every account, then each one
     std::vector<Card> cards;
+    // Nothing played over the period: why, and all time when it has some.
+    cadran::kit::Empty empty;
+    brls::Box* see_all = nullptr;
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
 
     void build_chips();

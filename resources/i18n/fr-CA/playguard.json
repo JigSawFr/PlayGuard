@@ -371,7 +371,8 @@
         "remove_err": "Impossible de supprimer la limite de temps de jeu",
         "not_counting": "La console ne décompte pas le temps de jeu en ce moment. Causes probables : l'horloge a été reculée (le décompte reprendra plus tard), l'horloge réseau n'a jamais été réglée (Console › Horloge réseau), ou une limite vient d'être écrite (lancez un jeu une minute, puis vérifiez).",
         "limit_note": "À la limite, la console affiche « temps écoulé », puis suspend le jeu ou se contente d'avertir, selon « Quand le temps est écoulé ».",
-        "unsaved": "La progression non sauvegardée peut être perdue : laissez l'enfant sauvegarder d'abord."
+        "unsaved": "La progression non sauvegardée peut être perdue : laissez l'enfant sauvegarder d'abord.",
+        "profile_already": "Le profil « {} » est déjà appliqué."
     },
     "activity": {
         "section_totals": "Temps de jeu",
@@ -557,7 +558,8 @@
         "confirm_copy_follows": "\n\n« Synchroniser l'horloge par Internet » est activé : l'horloge de la console suit l'horloge réseau et peut être tout aussi fausse. Dans ce cas : désactivez ce réglage, réglez la date et l'heure dans Paramètres de la console › Console › Date et heure, puis revenez ici.",
         "confirm_copy_sync_after": "\n\n« Synchroniser l'horloge par Internet » est désactivé : l'horloge de la console reste telle quelle. L'activer ensuite ne la fera plus sauter, les deux horloges indiquant alors la même heure.",
         "copied_sync_on": "\n\nVous pouvez maintenant activer « Synchroniser l'horloge par Internet » (Paramètres de la console › Console › Date et heure) : l'horloge de la console ne sautera pas.",
-        "copy_implausible": "L'horloge de la console indique {} : elle ne semble pas réglée. Réglez d'abord la date et l'heure dans Paramètres de la console › Console › Date et heure (avec « Synchroniser l'horloge par Internet » désactivé), puis revenez ici."
+        "copy_implausible": "L'horloge de la console indique {} : elle ne semble pas réglée. Réglez d'abord la date et l'heure dans Paramètres de la console › Console › Date et heure (avec « Synchroniser l'horloge par Internet » désactivé), puis revenez ici.",
+        "dns_note": "Sur cette console, la redirection DNS d'Atmosphère (atmosphere/hosts) bloque le serveur de temps de Nintendo : l'horloge réseau ne peut pas se régler seule."
     },
     "pairing": {
         "section": "Application Contrôle parental Nintendo Switch",
@@ -1321,7 +1323,10 @@
             "kind": "Code",
             "done": "Effectuée",
             "refused": "Refusée ({})"
-        }
+        },
+        "undo_hint": "Annuler",
+        "empty_title": "Rien d'enregistré pour l'instant",
+        "empty_text": "Chaque modification faite par PlayGuard sur la console (limites, niveau de restriction, NIP, déverrouillages...) apparaît ici."
     },
     "chart": {
         "last_days": "Les 7 derniers jours, aujourd'hui à droite",
@@ -1458,7 +1463,8 @@
         "week_detail": "{} par jour en moyenne.",
         "week_top": "Le plus joué : {} ({}).",
         "over_limit": "La limite a été dépassée {} jours sur les 7 derniers",
-        "over_limit_detail": "Quand le temps est écoulé, la console se contente de prévenir : le jeu continue au-delà de la limite (Temps de jeu › Quand le temps est écoulé)."
+        "over_limit_detail": "Quand le temps est écoulé, la console se contente de prévenir : le jeu continue au-delà de la limite (Temps de jeu › Quand le temps est écoulé).",
+        "clock_detail_dns": "Le DNS d'Atmosphère bloque le serveur de temps de Nintendo, la console ne peut donc pas la régler seule : réglez-la depuis un serveur de temps."
     },
     "cadran": {
         "date": "{1} {2} {3}",
@@ -1505,7 +1511,10 @@
             "serial_hidden": "Numéro de série masqué",
             "next_time_up": "Si le jeu continue, temps écoulé vers {}",
             "next_bedtime": "Alarme du coucher à {}, dans {}",
-            "next_bedtime_now": "Heure du coucher : jeu de nouveau permis à {}"
+            "next_bedtime_now": "Heure du coucher : jeu de nouveau permis à {}",
+            "clock_fix_dns": "Bloquée par le DNS : mesurer et régler",
+            "next_with_extra": "Avec {} de plus, temps écoulé vers {}",
+            "next_with_extra_bed": "Avec {} de plus, l'alarme du coucher à {} arrive d'abord"
         },
         "pill": {
             "pc_on": "Contrôle parental actif",
@@ -1550,7 +1559,9 @@
             "top": "le plus joué · {}",
             "card_today": "aujourd'hui",
             "card_week": "aujourd'hui · {} sur 7 jours",
-            "card_total": "aujourd'hui · {} en tout"
+            "card_total": "aujourd'hui · {} en tout",
+            "empty_note": "Les jeux joués sur cette console apparaissent ici, compte par compte.",
+            "see_all": "Voir depuis toujours"
         },
         "restrictions": {
             "choose": "Choisir ce niveau",
@@ -1586,6 +1597,9 @@
             "of": "sur {}",
             "back": "Retour parent · code PIN",
             "play": "Rendre la console et jouer"
+        },
+        "dialog": {
+            "unlock_short": "Le contrôle parental est déverrouillé avec le code PIN enregistré le temps de la modification, puis reverrouillé."
         }
     }
 }

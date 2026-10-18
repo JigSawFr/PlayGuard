@@ -32,6 +32,21 @@ bool platform_in_focus(void)
     return appletGetFocusState() == AppletFocusState_InFocus;
 }
 
+bool platform_game_open(bool *known)
+{
+    if (known) *known = true;
+    // Run over a game, PlayGuard is the application that counts.
+    if (appletGetAppletType() == AppletType_Application) return true;
+    u64 pid = 0;
+    if (R_FAILED(pmdmntInitialize())) {
+        if (known) *known = false;
+        return true;
+    }
+    const bool open = R_SUCCEEDED(pmdmntGetApplicationProcessId(&pid));
+    pmdmntExit();
+    return open;
+}
+
 bool platform_can_launch(void)
 {
     return envHasNextLoad();

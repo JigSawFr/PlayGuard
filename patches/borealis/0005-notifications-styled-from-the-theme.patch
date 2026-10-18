@@ -1,9 +1,71 @@
+diff --git a/library/include/borealis/core/application.hpp b/library/include/borealis/core/application.hpp
+index cfff62b..b615d2b 100644
+--- a/library/include/borealis/core/application.hpp
++++ b/library/include/borealis/core/application.hpp
+@@ -171,7 +171,7 @@ class Application
+ 
+     static int getDefaultFont();
+ 
+-    static void notify(const std::string& text);
++    static void notify(const std::string& text, View* leading = nullptr);
+ 
+     static void onControllerButtonPressed(enum ControllerButton button, bool repeating);
+ 
+diff --git a/library/include/borealis/core/notification_manager.hpp b/library/include/borealis/core/notification_manager.hpp
+index 6f92431..7892911 100644
+--- a/library/include/borealis/core/notification_manager.hpp
++++ b/library/include/borealis/core/notification_manager.hpp
+@@ -30,7 +30,8 @@ namespace brls
+ class Notification : public Box
+ {
+   public:
+-    explicit Notification(const std::string& text);
++    // `leading` (an icon, owned by the notification) before the text.
++    explicit Notification(const std::string& text, View* leading = nullptr);
+     ~Notification() override;
+ 
+     Animatable timeoutTimer;
+@@ -45,7 +46,7 @@ class NotificationManager : public Box
+     NotificationManager();
+     ~NotificationManager() override;
+ 
+-    void notify(const std::string& text);
++    void notify(const std::string& text, View* leading = nullptr);
+ };
+ 
+ }; // namespace brls
+diff --git a/library/lib/core/application.cpp b/library/lib/core/application.cpp
+index a45103d..d150150 100644
+--- a/library/lib/core/application.cpp
++++ b/library/lib/core/application.cpp
+@@ -874,9 +874,9 @@ void Application::setSwapInterval(int interval)
+     Application::platform->getVideoContext()->setSwapInterval(interval);
+ }
+ 
+-void Application::notify(const std::string& text)
++void Application::notify(const std::string& text, View* leading)
+ {
+-    Application::notificationManager->notify(text);
++    Application::notificationManager->notify(text, leading);
+ }
+ 
+ void Application::giveFocus(View* view)
 diff --git a/library/lib/core/notification_manager.cpp b/library/lib/core/notification_manager.cpp
-index 52aefff..2778c80 100644
+index 52aefff..3b4eec4 100644
 --- a/library/lib/core/notification_manager.cpp
 +++ b/library/lib/core/notification_manager.cpp
-@@ -40,8 +40,15 @@ void NotificationManager::notify(const std::string& text)
-     auto* notification = new Notification(text);
+@@ -32,16 +32,23 @@ NotificationManager::NotificationManager()
+     this->setAxis(Axis::COLUMN);
+ }
+ 
+-void NotificationManager::notify(const std::string& text)
++void NotificationManager::notify(const std::string& text, View* leading)
+ {
+     // Create the notification
+     brls::Logger::debug("Showing notification \"{}\"", text);
+ 
+-    auto* notification = new Notification(text);
++    auto* notification = new Notification(text, leading);
      this->addView(notification, 0);
  
 +    // Where the stack sits, from the style as it is now (an app may set it
@@ -19,9 +81,12 @@ index 52aefff..2778c80 100644
      float timeout = style.getMetric("brls/animations/notification_timeout");
      float show    = style.getMetric("brls/animations/notification_show");
      float slide   = style.getMetric("brls/notification/slide");
-@@ -75,15 +82,18 @@ NotificationManager::~NotificationManager()
+@@ -73,17 +80,27 @@ NotificationManager::~NotificationManager()
+     }
+ }
  
- Notification::Notification(const std::string& text)
+-Notification::Notification(const std::string& text)
++Notification::Notification(const std::string& text, View* leading)
  {
 -    this->setBackground(ViewBackground::BACKDROP);
      auto style    = Application::getStyle();
@@ -37,6 +102,13 @@ index 52aefff..2778c80 100644
      this->label->setText(text);
 -    this->label->setTextColor(RGB(255, 255, 255));
 +    this->label->setTextColor(theme["brls/notification/text"]);
++    if (leading) {
++        // The text beside it, wrapping in what is left.
++        this->setAlignItems(AlignItems::CENTER);
++        this->addView(leading);
++        this->label->setGrow(1.0f);
++        this->label->setWidth(0);
++    }
      this->addView(label);
  }
  

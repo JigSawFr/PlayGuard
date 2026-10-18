@@ -93,7 +93,15 @@ void settle_writes(const std::string& key);
 
 // Deferred to the next frame (toasts fired right after a system applet returns
 // were dropped on fw 22.1.0).
-void notify(const std::string& text);
+// What a toast says: news (plain), something done (a check), or something
+// not done because of how things are (a warning); the icon in the Cadran look.
+enum class Toast
+{
+    Info,
+    Done,
+    Refused,
+};
+void notify(const std::string& text, Toast kind = Toast::Info);
 // A failure the user asked for something and did not get: a dialog, not a
 // toast (a toast is gone before "error 0x…" is read). Next frame, so it can
 // be called from a dialog button. Logged as "error: " for the smoke test.

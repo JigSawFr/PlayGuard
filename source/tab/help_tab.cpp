@@ -8,6 +8,7 @@
 #include "action/github_login_flow.hpp"
 #include "action/fw_gate.hpp"
 #include "action/log_prune_flow.hpp"
+#include "action/pairing_state.hpp"
 #include "action/pt_block_flow.hpp"
 #include "action/pt_flow.hpp"
 #include "action/frame_stats_flow.hpp"
@@ -213,6 +214,14 @@ void HelpTab::refresh()
     dev_frame_stats->setOn(cfg.frame_stats, false);
     this->update_frame_stats();
     const bool signed_in = !github_auth::token().empty();
+    // The block comparison reads what the phone app changes: only while it
+    // is linked and can sync (the status read only for the developer tools).
+    bool phone_syncs = false;
+    if (dev) {
+        PctlStatus s;
+        pctl_status_fetch(&s);
+        phone_syncs = pairing_state::syncs(s);
+    }
     ui::set_visible_all({ { github.getView(), dev || signed_in },
                           { dev_header.getView(), dev },
                           { dev_mode.getView(), dev },
@@ -225,7 +234,7 @@ void HelpTab::refresh()
                           { dev_clear_cache.getView(), dev },
                           { dev_clear_logs.getView(), dev },
                           { dev_report.getView(), dev },
-                          { dev_pt_block.getView(), dev },
+                          { dev_pt_block.getView(), dev && phone_syncs },
                           { dev_build.getView(), dev },
                           { dev_gate.getView(), dev && fw_gate::needed() },
                           { dev_forget.getView(), dev } });

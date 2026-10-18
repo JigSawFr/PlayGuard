@@ -1,11 +1,15 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "ui/cadran_modal.hpp"
 
+#include <algorithm>
 #include <functional>
+#include <memory>
 #include <vector>
 #include <yoga/Yoga.h>
 
 #include "ui/cadran_kit.hpp"
+#include "ui/ui.hpp"
+#include "view/cadran_digits.hpp"
 #include "view/cadran_icon.hpp"
 
 using namespace brls::literals;
@@ -216,7 +220,9 @@ brls::Box* cadran::dialog_body(const std::string& text, brls::View* extra)
     for (const std::string& paragraph : paragraphs) {
         bool warn = false;
         if (const char* icon = note_icon(paragraph, &warn)) {
-            notes.push_back({ paragraph, icon, warn });
+            // Locked again by itself: the unlock in one line.
+            const std::string unlock_auto = "playguard/play_timer/gate/body"_i18n + " " + "playguard/play_timer/gate/relock_auto"_i18n;
+            notes.push_back({ paragraph == unlock_auto ? "playguard/cadran/dialog/unlock_short"_i18n : paragraph, icon, warn });
             continue;
         }
         std::vector<std::pair<std::string, std::string>> rows;
@@ -358,6 +364,98 @@ void cadran::style_dialog(brls::Dialog* dialog, Emphasis emphasis)
         row->setHeight(DIALOG_BUTTONS);
         row->setPadding(0, 24, DIALOG_BUTTONS - PILL, 24);
     }
+}
+
+void cadran::prompt_minutes(const std::string& header, uint16_t initial, std::function<void(uint16_t)> on_value)
+{
+    namespace kit = cadran::kit;
+    brls::Theme theme = brls::Application::getTheme();
+    auto minutes = std::make_shared<int>(std::min<int>(initial, 24 * 60));
+    auto* body = new brls::Box(brls::Axis::COLUMN);
+    body->setAlignItems(brls::AlignItems::CENTER);
+    body->setPadding(30, 40, 22, 40);
+    auto* title = new DisplayLabel();
+    title->setText(header);
+    title->setFontSize(23);
+    title->setTextColor(theme["cadran/text"]);
+    title->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    body->addView(title);
+    CadranIcon* up = kit::icon("caret-up", 30, "cadran/teal");
+    up->setMarginTop(18);
+    body->addView(up);
+    auto* value = new CadranDigits();
+    value->setFontSize(56);
+    value->setSmallUnits(true);
+    value->setTextColor(theme["cadran/text"]);
+    value->setText(ui::fmt_played((uint16_t)*minutes));
+    body->addView(value);
+    CadranIcon* down = kit::icon("caret-down", 30, "cadran/teal");
+    body->addView(down);
+    // The keys, as the week's: the arrows 15 min, L and R 5 min.
+    auto* keys = new brls::Box(brls::Axis::ROW);
+    keys->setAlignItems(brls::AlignItems::CENTER);
+    keys->setMarginTop(16);
+    const auto key = [&theme](const char* letter) {
+        auto* bubble = new brls::Box(brls::Axis::ROW);
+        bubble->setWidth(24);
+        bubble->setHeight(24);
+        bubble->setCornerRadius(12);
+        bubble->setBackgroundColor(theme["cadran/key_bg"]);
+        bubble->setAlignItems(brls::AlignItems::CENTER);
+        bubble->setJustifyContent(brls::JustifyContent::CENTER);
+        bubble->setMarginRight(4);
+        auto* text = new CadranDigits();
+        text->setFontSize(12);
+        text->setTextColor(theme["cadran/key_fg"]);
+        text->setText(letter);
+        bubble->addView(text);
+        return bubble;
+    };
+    keys->addView(kit::icon("caret-up", 18, "cadran/text3"));
+    keys->addView(kit::icon("caret-down", 18, "cadran/text3"));
+    brls::Label* quarter = kit::label(ui::fmt_played(15), 16, "cadran/text3");
+    quarter->setMarginLeft(6);
+    quarter->setMarginRight(22);
+    keys->addView(quarter);
+    keys->addView(key("L"));
+    keys->addView(key("R"));
+    brls::Label* five = kit::label(ui::fmt_played(5), 16, "cadran/text3");
+    five->setMarginLeft(4);
+    keys->addView(five);
+    body->addView(keys);
+
+    auto* dialog = new brls::Dialog(body);
+    const auto step = [minutes, value](int delta) {
+        *minutes = std::max(0, std::min(24 * 60, *minutes + delta));
+        value->setText(ui::fmt_played((uint16_t)*minutes));
+    };
+    brls::View* frame = dialog->getAppletFrame();
+    for (const auto& [button, delta] : { std::pair<brls::ControllerButton, int>{ brls::BUTTON_NAV_UP, 15 },
+                                         { brls::BUTTON_NAV_DOWN, -15 }, { brls::BUTTON_RB, 5 }, { brls::BUTTON_LB, -5 } })
+        frame->registerAction("", button, [step, delta = delta](brls::View*) {
+            step(delta);
+            return true;
+        }, true, true, brls::SOUND_FOCUS_CHANGE);
+    up->addGestureRecognizer(new brls::TapGestureRecognizer(up, [step]() { step(15); }));
+    down->addGestureRecognizer(new brls::TapGestureRecognizer(down, [step]() { step(-15); }));
+    dialog->addButton("hints/cancel"_i18n, []() {});
+    dialog->addButton("hints/ok"_i18n, [minutes, on_value]() {
+        if (on_value) on_value((uint16_t)*minutes);
+    });
+    dialog->setCancelable(true);
+    style_dialog(dialog, Emphasis::PRIMARY);
+    // A value is set, then confirmed: A right after the arrows is OK, not Cancel.
+    if (brls::View* ok = dialog->getView("brls/dialog/button2")) dialog->setLastFocusedView(ok);
+    dialog->open();
+}
+
+brls::View* cadran::toast_icon(bool done)
+{
+    if (!enabled()) return nullptr;
+    CadranIcon* icon = cadran::kit::icon(done ? "check" : "alert", 22, done ? "cadran/teal_fill" : "cadran/amber_fill");
+    icon->setMarginRight(14);
+    icon->setShrink(0);
+    return icon;
 }
 
 void cadran::style_picker(brls::Dropdown* dropdown)

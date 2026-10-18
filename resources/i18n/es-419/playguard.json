@@ -371,7 +371,8 @@
         "remove_err": "No se pudo quitar el límite de tiempo de juego",
         "not_counting": "La consola no está contando el tiempo de juego en este momento. Causas probables: el reloj se atrasó (volverá a contar más tarde), el reloj de red nunca se ajustó (Consola › Reloj de red) o se acaba de escribir un límite (inicia un juego un minuto y vuelve a revisar).",
         "limit_note": "Al llegar al límite, la consola muestra “Se acabó el tiempo” y luego suspende el juego o solo avisa, según “Cuando se acabe el tiempo”.",
-        "unsaved": "Se puede perder el progreso no guardado: deja que el niño guarde antes."
+        "unsaved": "Se puede perder el progreso no guardado: deja que el niño guarde antes.",
+        "profile_already": "El perfil «{}» ya está aplicado."
     },
     "activity": {
         "section_totals": "Tiempo de juego",
@@ -557,7 +558,8 @@
         "confirm_copy_follows": "\n\n“Sincronizar el reloj por Internet” está activado: el reloj de la consola sigue al reloj de red y puede estar igual de mal. En ese caso, desactive la opción, ajuste la fecha y la hora en Configuración de la consola › Consola › Fecha y hora y vuelva aquí.",
         "confirm_copy_sync_after": "\n\n“Sincronizar el reloj por Internet” está desactivado: el reloj de la consola se queda como está. Si lo activa después, ya no saltará, porque los dos relojes marcarán la misma hora.",
         "copied_sync_on": "\n\nYa puede activar “Sincronizar el reloj por Internet” (Configuración de la consola › Consola › Fecha y hora): el reloj de la consola no saltará.",
-        "copy_implausible": "El reloj de la consola marca {}: no parece ajustado. Ajuste primero la fecha y la hora en Configuración de la consola › Consola › Fecha y hora (con “Sincronizar el reloj por Internet” desactivado) y vuelva aquí."
+        "copy_implausible": "El reloj de la consola marca {}: no parece ajustado. Ajuste primero la fecha y la hora en Configuración de la consola › Consola › Fecha y hora (con “Sincronizar el reloj por Internet” desactivado) y vuelva aquí.",
+        "dns_note": "En esta consola, la redirección DNS de Atmosphère (atmosphere/hosts) bloquea el servidor de hora de Nintendo: el reloj de red no puede ajustarse solo."
     },
     "pairing": {
         "section": "App Control parental de Nintendo Switch",
@@ -1321,7 +1323,10 @@
             "kind": "Código",
             "done": "Hecho",
             "refused": "Rechazado ({})"
-        }
+        },
+        "undo_hint": "Deshacer",
+        "empty_title": "Aún no hay nada registrado",
+        "empty_text": "Aquí aparece cada cambio que PlayGuard hace en la consola (límites, nivel de restricción, PIN, desbloqueos...)."
     },
     "chart": {
         "last_days": "Los últimos 7 días, hoy a la derecha",
@@ -1458,7 +1463,8 @@
         "week_detail": "{} por día en promedio.",
         "week_top": "Lo más jugado: {} ({}).",
         "over_limit": "Se superó el límite {} de los últimos 7 días",
-        "over_limit_detail": "Cuando se acaba el tiempo, la consola solo avisa: se sigue jugando pasado el límite (Tiempo de juego › Cuando se acaba el tiempo)."
+        "over_limit_detail": "Cuando se acaba el tiempo, la consola solo avisa: se sigue jugando pasado el límite (Tiempo de juego › Cuando se acaba el tiempo).",
+        "clock_detail_dns": "El DNS de Atmosphère bloquea el servidor de hora de Nintendo, así que la consola no puede ajustarlo sola: ajústelo desde un servidor de hora."
     },
     "cadran": {
         "date": "{1}, {2} de {3}",
@@ -1505,7 +1511,10 @@
             "serial_hidden": "Número de serie oculto",
             "next_time_up": "Si se sigue jugando, se acaba el tiempo hacia las {}",
             "next_bedtime": "Alarma de hora de dormir a las {}, dentro de {}",
-            "next_bedtime_now": "Hora de dormir: se puede volver a jugar a las {}"
+            "next_bedtime_now": "Hora de dormir: se puede volver a jugar a las {}",
+            "clock_fix_dns": "Bloqueado por el DNS: medir y ajustar",
+            "next_with_extra": "Con {} más, se acaba el tiempo hacia las {}",
+            "next_with_extra_bed": "Con {} más, la alarma de hora de dormir de las {} llega antes"
         },
         "pill": {
             "pc_on": "Control parental activo",
@@ -1550,7 +1559,9 @@
             "top": "el más jugado · {}",
             "card_today": "hoy",
             "card_week": "hoy · {} en 7 días",
-            "card_total": "hoy · {} en total"
+            "card_total": "hoy · {} en total",
+            "empty_note": "Los juegos jugados en esta consola aparecen aquí, cuenta por cuenta.",
+            "see_all": "Ver el total"
         },
         "restrictions": {
             "choose": "Elegir este nivel",
@@ -1586,6 +1597,9 @@
             "of": "de {}",
             "back": "Volver al adulto · PIN",
             "play": "Entregar la consola y jugar"
+        },
+        "dialog": {
+            "unlock_short": "El control parental se desbloquea con el PIN guardado durante el cambio y luego se vuelve a bloquear."
         }
     }
 }

@@ -80,6 +80,10 @@ class CadranTab : public DashboardTab
     brls::Box*   next      = nullptr;
     CadranIcon*  next_icon = nullptr;
     brls::Label* next_text = nullptr;
+    // The extra time whose chip has the focus (show_next says where it ends),
+    // and whether parental controls were unlocked at the last refresh.
+    int  preview_extra = 0;
+    bool unlocked_now  = false;
 
     void show_ring(bool unlocked);
     void show_next(bool unlocked);

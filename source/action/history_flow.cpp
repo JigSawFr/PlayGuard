@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <chrono>
 #include <borealis.hpp>
 #include <fmt/format.h>
 
@@ -12,7 +13,9 @@
 #include "action/outside_watch.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_log_flow.hpp"
+#include "activity/main_activity.hpp"
 #include "app.hpp"
+#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/date.hpp"
@@ -113,6 +116,9 @@ static std::atomic<long> s_count{ -1 };
 // Moved on by every entry asked to be written (UI thread): a list read
 // before it is out of date.
 static uint64_t s_changes = 0;
+// The newest entry asked to be written, and when (offer_undo's change).
+static history::Entry                        s_last;
+static std::chrono::steady_clock::time_point s_last_at;
 
 static void store(history::Entry e)
 {
@@ -123,6 +129,8 @@ static void store(history::Entry e)
     if (!text::starts_with(e.kind, "outside_") && e.kind != "new_account" && e.result.empty()) outside_watch::own_change();
     e.when = ui::now_stamp();
     e.version = app::version();
+    s_last    = e;
+    s_last_at = std::chrono::steady_clock::now();
     // Off the UI thread: append() reads and rewrites the whole file.
     ui::append_later("history", "history", [e]() {
         std::string err;
@@ -390,6 +398,45 @@ void open(const history::Entry& e, std::function<void()> refresh)
         ui::notify_result(rc, "playguard/history/undone"_i18n, "playguard/history/undo_err"_i18n);
         if (refresh) refresh();
     });
+}
+
+namespace
+{
+// The ZR action offer_undo put on the main screen, until it times out.
+brls::View*            s_undo_view   = nullptr;
+brls::ActionIdentifier s_undo_action = 0;
+size_t                 s_undo_timer  = 0;
+
+void withdraw_undo()
+{
+    if (!s_undo_view) return;
+    brls::cancelDelay(s_undo_timer);
+    s_undo_view->unregisterAction(s_undo_action);
+    s_undo_view = nullptr;
+    brls::Application::getGlobalHintsUpdateEvent()->fire();
+}
+}   // namespace
+
+void offer_undo(std::function<void()> refresh)
+{
+    constexpr long OFFER_MS = 8000;
+    MainActivity* main = ui::main_activity();
+    if (!cadran::enabled() || !main || brls::Application::getActivitiesStack().back() != main) return;
+    withdraw_undo();
+    // The change just recorded (a write records it before it ends), when it
+    // can be put back; not an undo itself, and nothing when the write
+    // recorded nothing (the same values again).
+    if (std::chrono::steady_clock::now() - s_last_at > std::chrono::seconds(5)) return;
+    if (!history::undoable(s_last) || s_last.source == "undo") return;
+    const history::Entry change = s_last;
+    s_undo_view = main->getContentView();
+    s_undo_action = s_undo_view->registerAction("playguard/history/undo_hint"_i18n, brls::BUTTON_RT, [change, refresh](brls::View*) {
+        withdraw_undo();
+        open(change, refresh);
+        return true;
+    });
+    brls::Application::getGlobalHintsUpdateEvent()->fire();
+    s_undo_timer = brls::delay(OFFER_MS, []() { withdraw_undo(); });
 }
 
 }   // namespace history_flow

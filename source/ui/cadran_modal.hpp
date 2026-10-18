@@ -7,6 +7,8 @@
 #pragma once
 
 #include <borealis.hpp>
+#include <cstdint>
+#include <functional>
 #include <string>
 
 namespace cadran
@@ -38,6 +40,15 @@ brls::Box* dialog_body(const std::string& text, brls::View* extra = nullptr);
 // install_screens). Call it after the dialog's last addButton. DANGER also
 // puts a coral warning before a dialog_body's title.
 void style_dialog(brls::Dialog* dialog, Emphasis emphasis = Emphasis::NONE);
+
+// A duration chosen with the stick, in place of the system number pad: up /
+// down 15 min, L / R 5 min (or a tap on the arrows), from 0 to 24:00, OK
+// or Cancel; `on_value` runs once the dialog has closed.
+void prompt_minutes(const std::string& header, uint16_t initial, std::function<void(uint16_t)> on_value);
+
+// A toast's icon: a check for something done, a warning for something not
+// done; nullptr in the classic look.
+brls::View* toast_icon(bool done);
 
 // A picker's frame as a card above the hints.
 void style_picker(brls::Dropdown* dropdown);

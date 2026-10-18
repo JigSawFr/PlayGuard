@@ -15,6 +15,7 @@
 #include "activity/onboarding_activity.hpp"
 #include "activity/play_timer_perday_activity.hpp"
 #include "app.hpp"
+#include "core/platform.h"
 #include "tab/clock_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/perf.hpp"
@@ -375,6 +376,8 @@ void DashboardTab::refresh()
                           { serial.getView(), issues.serial }, { game_patches.getView(), issues.patches },
                           { unlocked_banner.getView(), unlocked },
                           { not_counting.getView(), stalled },
+                          // Only while a game is open to keep counting.
+                          { home_hint.getView(), platform_game_open(nullptr) },
                           { outside_text.getView(), outside_shown },
                           { outside.getView(), outside_shown } });
 }

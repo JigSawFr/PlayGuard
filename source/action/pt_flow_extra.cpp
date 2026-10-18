@@ -261,7 +261,7 @@ static void put_back_by_itself(const pt_logic::ExtraRecord& rec, const PtState& 
 {
     if (!pt_logic::state_known(pt)) {
         s_restore_retry = true;
-        if (asked) ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN));
+        if (asked) ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN), ui::Toast::Refused);
         return;
     }
     const int wd = rec.weekday;
@@ -331,7 +331,7 @@ void offer_extra_time_restore(std::function<void()> refresh, bool asked)
         case pt_logic::Restore::None:   return;
         case pt_logic::Restore::Later:                                  // not read: again soon
             s_restore_retry = pt.fw_supported;
-            if (asked) ui::notify(ui::rc_text(pt.fw_supported ? NXM_RC_STATE_UNKNOWN : NXM_RC_FW_UNSUPPORTED));
+            if (asked) ui::notify(ui::rc_text(pt.fw_supported ? NXM_RC_STATE_UNKNOWN : NXM_RC_FW_UNSUPPORTED), ui::Toast::Refused);
             return;
         case pt_logic::Restore::Forget: clear_extra_record(); return;  // changed since
         case pt_logic::Restore::Offer:  break;

@@ -13,6 +13,7 @@
 //   PLAYGUARD_SIM_BLANK=1       PRODINFO blanked (serial XAW00000000000)
 //   PLAYGUARD_SIM_NO_PDM=1      the play-data service (Activity tab) fails
 //   PLAYGUARD_SIM_GAMES=200     that many more games played this week (a large library)
+//   PLAYGUARD_SIM_NO_PLAY=1     nothing played for weeks (the all-time totals stay)
 //   PLAYGUARD_SIM_NOT_SET_UP=1  parental controls never set up (no PIN, no restriction)
 //   PLAYGUARD_SIM_APPLET=1      started from the album (applet mode)
 //   PLAYGUARD_SIM_RESTRICTED=1  today's limit is reached (the console says "Time's up")
@@ -651,6 +652,7 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         { 0x0100A1B2C3D45000ULL, "",                          0,   0, 15,  15, 0 },
         { 0x0100A1B2C3D46000ULL, "Space Farm Tales",        95,   4,  0,   0, 75 },
     };
+    const bool idle_weeks = getenv("PLAYGUARD_SIM_NO_PLAY") != NULL;
     out->windows_ok = true;
     LocalTime today;
     const int wday = host_to_local(NULL, out->now, &today) ? today.wday : 0;
@@ -662,10 +664,11 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         g->totals_ok = games[i].total_min > 0;
         g->total_s = (u64)games[i].total_min * 60;
         g->launches = games[i].launches;
-        g->last_played = g->totals_ok ? out->now - (u64)games[i].days_ago * 86400 - 3600 : 0;
+        const u32 days_ago = idle_weeks ? games[i].days_ago + 30 : games[i].days_ago;
+        g->last_played = g->totals_ok ? out->now - (u64)days_ago * 86400 - 3600 : 0;
         g->first_played = g->totals_ok ? out->now - 400ULL * 86400 : 0;
-        g->today_s = games[i].today_min * 60;
-        g->week_s = games[i].week_min * 60;
+        g->today_s = idle_weeks ? 0 : games[i].today_min * 60;
+        g->week_s = idle_weeks ? 0 : games[i].week_min * 60;
         // The rest of the week spread over the six days before, unevenly.
         static const u32 spread[6] = { 30, 0, 25, 15, 0, 30 };
         g->day_s[0] = g->today_s;

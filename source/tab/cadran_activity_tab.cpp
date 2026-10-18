@@ -11,6 +11,7 @@
 #include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
+#include "util/config.hpp"
 
 using namespace brls::literals;
 
@@ -131,6 +132,29 @@ CadranActivityTab::CadranActivityTab()
         this->cards.push_back(c);
     }
 
+    // In the games' place when none was played over the period.
+    this->empty = kit::empty("gamepad");
+    this->empty.text->setText("playguard/cadran/activity/empty_note"_i18n);
+    this->see_all = kit::chip("playguard/cadran/activity/see_all"_i18n, 44);
+    this->empty.box->setMarginBottom(12);
+    this->see_all->setMarginTop(18);
+    this->see_all->registerClickAction([this](brls::View*) {
+        this->period = AllTime;
+        config::get().activity_period = AllTime;   // as the period's own picker
+        ui::save_config();
+        this->rebuild();
+        if (this->empty.box->getVisibility() != brls::Visibility::VISIBLE)
+            brls::Application::giveFocus(period_chip.getView());
+        return true;
+    });
+    this->empty.box->addView(this->see_all);
+    this->empty.box->setVisibility(brls::Visibility::GONE);
+    if (auto* parent = dynamic_cast<brls::Box*>(games_grid->getParent())) {
+        const auto& views = parent->getChildren();
+        const auto at = std::find(views.begin(), views.end(), games_grid.getView());
+        parent->addView(this->empty.box, at - views.begin());
+    }
+
     // The period and the export: the tab's own lines.
     period_chip->registerClickAction([this](brls::View*) {
         kit::press(this->getView("ac_period"));
@@ -237,6 +261,7 @@ void CadranActivityTab::show_hero()
         for (brls::Label* l : { today_sub.getView(), week_sub.getView(), total_sub.getView() }) l->setText("");
         games_note->setText("playguard/activity/loading"_i18n);
         ui::set_visible(games_note, true);
+        ui::set_visible(this->empty.box, false);
         for (Card& c : this->cards) ui::set_visible(c.box, false);
         return;
     }
@@ -283,8 +308,17 @@ void CadranActivityTab::show_hero()
     std::sort(games.begin(), games.end(), [p](const GameStat* a, const GameStat* b) {
         return activity_summary::value(*a, p) > activity_summary::value(*b, p);
     });
-    games_note->setText(games.empty() ? brls::getStr(fmt::format("playguard/activity/none/{}", p)) : "");
-    ui::set_visible(games_note, games.empty());
+    // Unread (the line under All games says why), or nothing played: the
+    // empty card says so instead of that line.
+    const bool unread = R_FAILED(s.rc) || (p != AllTime && !s.windows_ok) || (p == AllTime && R_FAILED(s.stats_rc));
+    const bool none   = games.empty() && !unread;
+    ui::set_visible(games_note, false);
+    ui::set_visible(this->empty.box, none);
+    if (none) {
+        this->empty.title->setText(brls::getStr(fmt::format("playguard/activity/none/{}", p)));
+        ui::set_visible(this->see_all, p != AllTime && all.known && all.total_s > 0);
+    }
+    if (brls::View* status = this->getView("ac_status"); status && none) ui::set_visible(status, false);
     std::vector<u64> ids;
     for (size_t i = 0; i < this->cards.size(); i++) {
         Card& c = this->cards[i];

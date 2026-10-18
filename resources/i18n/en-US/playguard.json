@@ -371,7 +371,8 @@
         "remove_err": "Could not remove the play-time limit",
         "not_counting": "The console is not counting play time right now. Likely causes: the clock was set back (it counts again later), the network clock was never set (Console › Network clock), or a limit was just written (start a game for a minute, then check).",
         "limit_note": "At the limit the console shows \"Time's up\", then suspends the game or only warns, as set in \"When the time is up\".",
-        "unsaved": "Unsaved progress may be lost: let the child save first."
+        "unsaved": "Unsaved progress may be lost: let the child save first.",
+        "profile_already": "The profile \"{}\" is already in place."
     },
     "activity": {
         "section_totals": "Play time",
@@ -557,7 +558,8 @@
         "confirm_copy_follows": "\n\n\"Synchronize Clock via Internet\" is on, so the console clock follows the network clock and may be just as wrong. If it is: turn the setting off, set the date and time in System Settings › System › Date and Time, then come back here.",
         "confirm_copy_sync_after": "\n\n\"Synchronize Clock via Internet\" is off: the console clock stays as it is. Turning it on afterwards will no longer make it jump, both clocks then showing the same time.",
         "copied_sync_on": "\n\nYou can now turn on \"Synchronize Clock via Internet\" (System Settings › System › Date and Time): the console clock will not jump.",
-        "copy_implausible": "The console clock reads {}: it does not look set. Set the date and time in System Settings › System › Date and Time first (with \"Synchronize Clock via Internet\" off), then come back here."
+        "copy_implausible": "The console clock reads {}: it does not look set. Set the date and time in System Settings › System › Date and Time first (with \"Synchronize Clock via Internet\" off), then come back here.",
+        "dns_note": "On this console, Atmosphère's DNS redirection (atmosphere/hosts) blocks Nintendo's time server: the network clock cannot set itself."
     },
     "pairing": {
         "section": "Nintendo Switch Parental Controls app",
@@ -1321,7 +1323,10 @@
             "kind": "Code",
             "done": "Done",
             "refused": "Refused ({})"
-        }
+        },
+        "undo_hint": "Undo",
+        "empty_title": "Nothing recorded yet",
+        "empty_text": "Every change PlayGuard makes on the console (limits, restriction level, PIN, unlocks...) is listed here."
     },
     "chart": {
         "last_days": "The last 7 days, today on the right",
@@ -1458,7 +1463,8 @@
         "week_detail": "{} a day on average.",
         "week_top": "Most played: {} ({}).",
         "over_limit": "The limit was passed on {} of the last 7 days",
-        "over_limit_detail": "When the time is up, the console only warns: play goes on past the limit (Play timer › When the time is up)."
+        "over_limit_detail": "When the time is up, the console only warns: play goes on past the limit (Play timer › When the time is up).",
+        "clock_detail_dns": "Atmosphère's DNS blocks Nintendo's time server, so the console cannot set it itself: set it from a time server."
     },
     "cadran": {
         "date": "{0}, {3} {2}",
@@ -1505,7 +1511,10 @@
             "serial_hidden": "Serial number hidden",
             "next_time_up": "If play goes on, time is up around {}",
             "next_bedtime": "Bedtime alarm at {}, in {}",
-            "next_bedtime_now": "Bedtime: games allowed again at {}"
+            "next_bedtime_now": "Bedtime: games allowed again at {}",
+            "clock_fix_dns": "Blocked by the DNS: measure and set it",
+            "next_with_extra": "With {} more, time is up around {}",
+            "next_with_extra_bed": "With {} more, the bedtime alarm at {} still comes first"
         },
         "pill": {
             "pc_on": "Parental controls on",
@@ -1550,7 +1559,9 @@
             "top": "most played · {}",
             "card_today": "today",
             "card_week": "today · {} over 7 days",
-            "card_total": "today · {} in all"
+            "card_total": "today · {} in all",
+            "empty_note": "Games played on this console show up here, account by account.",
+            "see_all": "See all time"
         },
         "restrictions": {
             "choose": "Choose this level",
@@ -1586,6 +1597,9 @@
             "of": "of {}",
             "back": "Back to the parent · PIN",
             "play": "Hand the console over and play"
+        },
+        "dialog": {
+            "unlock_short": "Parental controls are unlocked with the stored PIN for the change, then locked again."
         }
     }
 }
