@@ -14,6 +14,7 @@
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/perf.hpp"
 #include "util/profiles.hpp"
 
 using namespace brls::literals;
@@ -122,6 +123,11 @@ PlayTimerTab::PlayTimerTab()
 
 void PlayTimerTab::refresh()
 {
+    perf::Timed timed("Play timer refresh");   // the diagnostic report's timings
+    // The time of day, for every helper below (the state, the week chart,
+    // the outside watch, the timer health), read once, as on the Overview.
+    ui::SameTime same_time;
+
     pctl_play_timer_query(&this->pt);
     state_header->show(this->pt);
     outside_watch::observe(this->pt);

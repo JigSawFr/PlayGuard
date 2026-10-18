@@ -451,17 +451,27 @@ def alive():
     return proc.poll() is None
 
 
+# The pauses around a press and before a screenshot. borealis' longest
+# animation (a toast coming in) takes 300 ms, and a label starts scrolling
+# after 1.5 s focused: a screenshot comes 0.9 s after the last press, every
+# animation over, no label moving yet.
+KEY_BEFORE = 0.35
+KEY_AFTER = 0.1
+SHOT_WAIT = 0.45
+
+
 def key(name, n=1, hold=0.02):
     """Presses `name` n times, each exactly once. A held Down / Up repeats
     (ScrollView scrolls a long text, then moves the focus again); with frames
-    as slow as under software GL, even an 80 ms press could. So each press waits for the screen to settle (the app then waits
-    for input and sees the press at once) and is released `hold` seconds later
-    (20 ms by default), both
-    sent by one xdotool process so a busy runner cannot delay the release."""
+    as slow as under software GL, even an 80 ms press could. So each press
+    waits for the screen to settle (KEY_BEFORE: borealis' animations last
+    300 ms at most, timed by the clock, not by the frames) and is released
+    `hold` seconds later (20 ms by default), both sent by one xdotool process
+    so a busy runner cannot delay the release."""
     for _ in range(n):
-        time.sleep(0.6)
+        time.sleep(KEY_BEFORE)
         subprocess.run(["xdotool", "keydown", name, "sleep", str(hold), "keyup", name], env=env)
-        time.sleep(0.2)
+        time.sleep(KEY_AFTER)
 
 
 def screen(name):
@@ -493,13 +503,13 @@ def key_to_end(name, most=50, hold=0.02):
 def button_x():
     """Ⓧ: the desktop build reads it from the middle mouse button (the
     keyboard has none), clicked over the title, where nothing takes the focus."""
-    time.sleep(0.6)
+    time.sleep(KEY_BEFORE)
     subprocess.run(["xdotool", "mousemove", "640", "40", "mousedown", "2", "sleep", "0.05", "mouseup", "2"], env=env)
-    time.sleep(0.2)
+    time.sleep(KEY_AFTER)
 
 
 def shot(name):
-    time.sleep(0.8)
+    time.sleep(SHOT_WAIT)
     subprocess.run(IM + ["import", "-window", "root", os.path.join(OUT, name + ".png")], env=env)
     if not alive():
         fail(f"app exited while showing {name}")

@@ -11,6 +11,7 @@
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/ntp_servers.hpp"
+#include "util/perf.hpp"
 
 using namespace brls::literals;
 
@@ -90,6 +91,7 @@ ClockTab::ClockTab()
 
 void ClockTab::refresh()
 {
+    perf::Timed timed("Network clock refresh");   // the diagnostic report's timings
     const auto now = std::chrono::steady_clock::now();
     if (!this->snap_ok || now - this->snap_at >= SNAPSHOT_EVERY || now < this->snap_at) {
         time_clock_snapshot(&this->snap);
