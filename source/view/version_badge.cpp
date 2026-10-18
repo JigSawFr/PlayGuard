@@ -17,6 +17,8 @@ VersionBadge::VersionBadge()
     this->setAlignItems(brls::AlignItems::CENTER);
     this->setAlignSelf(brls::AlignSelf::CENTER);
     this->setMarginLeft(16);
+    // Level with the title, which borealis moves down by this much.
+    this->setMarginTop(brls::getStyle()["brls/applet_frame/header_title_top_offset"]);
 
     // On the desktop, one made-up build (PLAYGUARD_SIM_VERSION, see app.cpp).
     const std::string version = app::version(), commit = app::commit();
