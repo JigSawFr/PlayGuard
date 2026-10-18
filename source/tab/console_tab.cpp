@@ -9,7 +9,7 @@
 #include "tab/clock_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/patches.hpp"
-#include "view/warn_icon.hpp"
+#include "view/info_icon.hpp"
 
 using namespace brls::literals;
 
@@ -58,9 +58,9 @@ ConsoleTab::ConsoleTab()
     this->mark(storage.getView(), { "sd_space" });
     this->mark(game_patches.getView(), { "patches" });
 
-    // The other system's parental controls: an icon on the row, the text a
+    // The other system's parental controls: an info icon on the row, the text a
     // press away (a paragraph under it took half the screen).
-    storage_warn = WarnIcon::on_row(storage.getView());
+    storage_info = InfoIcon::on_row(storage.getView());
     storage->registerClickAction([this](brls::View*) {
         if (!this->storage_note.empty()) ui::info(this->storage_note);
         return true;
@@ -105,7 +105,7 @@ void ConsoleTab::refresh()
     storage->setDetailText(ui::storage_text(si));
     this->storage_note = ui::other_storage_note(si);
     storage->setFocusable(!this->storage_note.empty());
-    storage_warn->set_shown(!this->storage_note.empty());
+    storage_info->set_shown(!this->storage_note.empty());
     c = ui::color_neutral();
     blank->setDetailText(ui::blank_text(si, &c));
     blank->setDetailTextColor(c);
