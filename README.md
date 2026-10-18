@@ -27,7 +27,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 - 📱 **Companion app** — unlink it, even on a second-hand console.
 - ↩️ **History and backups** — every change is logged and can be undone.
 - 🔔 **Notifications** — a bell gathers what needs you (an alarm off, a clock drifting, changes made elsewhere), with the fix one press away.
-- 🌍 Every console language, light and dark themes.
+- 🌍 Every console language, light and dark themes, two appearances: Cadran (cards, today's time as a ring, the week edited with the stick) or the classic lists.
 
 ## Compatibility
 

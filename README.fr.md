@@ -27,7 +27,7 @@ PlayGuard ramène sur une console modifiée les réglages de l'application mobil
 - 📱 **Application mobile** — la dissocier, même sur une console d'occasion.
 - ↩️ **Historique et sauvegardes** — chaque modification est consignée et peut être annulée.
 - 🔔 **Notifications** — une cloche regroupe ce qui demande votre attention (alarme désactivée, horloge décalée, modifications faites ailleurs), avec la correction à portée d'un appui.
-- 🌍 Toutes les langues de la console, thèmes clair et sombre.
+- 🌍 Toutes les langues de la console, thèmes clair et sombre, deux apparences : Cadran (des cartes, le temps du jour en anneau, la semaine réglée au stick) ou les listes classiques.
 
 ## Compatibilité
 

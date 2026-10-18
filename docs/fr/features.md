@@ -16,11 +16,23 @@ Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la co
 
 ## Commandes
 
-↑/↓ déplacer · Ⓐ valider · Ⓑ retour ou annuler (deux fois sur la barre latérale pour quitter) · Ⓧ actualiser (sur les onglets qui relisent la console) · Ⓨ notifications · **−** langue et thème · **+** enregistre les limites par jour.
+↑/↓ déplacer · Ⓐ valider · Ⓑ retour ou annuler (deux fois sur la barre latérale pour quitter) · Ⓧ actualiser (sur les onglets qui relisent la console) · Ⓨ notifications · **−** langue et thème · **+** enregistre les limites par jour (et, en Cadran, la semaine modifiée dans *Temps de jeu*).
 
 Ce qui a échoué est dit dans une boîte de dialogue, ce qui a réussi dans une notification. Une icône à droite du titre indique tant que le contrôle parental est déverrouillé temporairement (un cadenas ouvert) ou quand l'application est en lecture seule (un crayon barré) ; la toucher mène là où on l'annule (Code PIN › Réactiver le contrôle parental, l'écran du firmware) ; en lecture seule, les actions restent à leur place, grisées, et disent pourquoi quand on les choisit.
 
 L'application est organisée en onglets, comme les paramètres de la console ; chacun a sa section ci-dessous.
+
+## Deux apparences
+
+PlayGuard a deux apparences, au choix dans *Préférences › Apparence* (prise en compte au prochain lancement) :
+
+- **Cadran**, par défaut : une barre d'icônes pour les onglets, une palette bleu nuit ou blanc froid (selon le thème), des cartes au lieu des listes. Chaque onglet s'ouvre sur l'essentiel et garde en dessous toutes les lignes de sa version classique :
+  - *Aujourd'hui* (la vue d'ensemble) : le temps restant en anneau, *Temps en plus* avec ses montants à portée d'un appui, *Arrêter pour aujourd'hui*, *Montrer à l'enfant* ; l'alarme du coucher, le contrôle parental et l'horloge réseau en cartes ; l'état de la console en pastilles.
+  - *Temps de jeu* : la semaine est l'éditeur. Ⓐ sur un jour le modifie : ↑/↓ le changent de 15 min, ←/→ passent au jour suivant, Ⓛ le copie du lundi au vendredi, Ⓡ sur le week-end, Ⓨ met « pas de limite », Ⓐ ou Ⓑ terminent ; Ⓧ choisit une durée exacte. Les modifications s'enregistrent ensemble, avec **+** ou *Enregistrer*, comme dans l'éditeur par jour ; *Annuler* les remet. Les profils, la même limite tous les jours, le coucher, *Quand le temps est écoulé* et la suppression sont des puces au-dessus et en dessous.
+  - *Activité* : les comptes en puces, la période et l'export, aujourd'hui, les 7 derniers jours et depuis toujours en chiffres, les quatre jeux les plus joués en cartes (Ⓐ en ouvre un).
+  - *Restrictions* : les quatre niveaux côte à côte, chacun avec ce qu'il restreint (Ⓐ le choisit) ; « aucune restriction » en dessous.
+  - **L'écran enfant** (*Montrer à l'enfant* sur *Aujourd'hui*) : seulement le temps restant, le coucher et ce qui se passe quand le temps est écoulé, pour confier la console. Ⓐ revient aux écrans du parent avec le code PIN ; Ⓑ quitte PlayGuard (en proposant d'abord de réactiver le contrôle parental, comme en quittant).
+- **Classique** : les listes des versions précédentes, comme sur les captures ci-dessus.
 
 ## Notifications — ce qui demande votre attention, depuis n'importe quel onglet
 
@@ -114,7 +126,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 ## Préférences
 
 - Ce qui règle PlayGuard lui-même :
-  - Langue (toutes celles de la console, ou celle de la console) et thème (clair / sombre, avec proposition de relancer).
+  - Langue (toutes celles de la console, ou celle de la console), thème (clair / sombre) et apparence (Cadran / Classique, voir plus haut), chacun avec proposition de relancer.
   - L'onglet d'ouverture.
   - **L'intro** au lancement : l'écran de chargement pendant 2 secondes (activée par défaut ; Ⓐ ou Ⓑ la passe ; désactivée, PlayGuard s'ouvre dès qu'il est prêt).
 - Les messages qu'il affiche :

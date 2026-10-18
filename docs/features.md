@@ -16,11 +16,23 @@ What each tab does, how PlayGuard writes safely, and what the console counts as 
 
 ## Controls
 
-↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh (on the tabs that read the console) · Ⓨ notifications · **−** language and theme · **+** saves per-day limits.
+↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh (on the tabs that read the console) · Ⓨ notifications · **−** language and theme · **+** saves per-day limits (and, in Cadran, the week edited on *Play timer*).
 
 What failed is said in a dialog, what worked in a toast. An icon right of the title says while parental controls are temporarily unlocked (an open padlock) or when the app is read-only (a crossed-out pencil); a tap on it goes where it is undone (PIN › Turn parental controls back on, the firmware screen); in read-only mode, actions stay in place, greyed, and say why when pressed.
 
 The app is organised in tabs, like System Settings; each has its section below.
+
+## Two appearances
+
+PlayGuard has two looks, chosen in *Preferences › Appearance* (taken at the next start):
+
+- **Cadran**, the default: an icon rail for the tabs, a navy or cool-white palette (with the theme), cards instead of lists. Each tab opens on what matters most, and keeps every line of its classic version underneath:
+  - *Today* (the Overview): the time left as a ring, *Extra time* with its amounts one press away, *Stop for today*, *Show the child*; the bedtime alarm, parental controls and the network clock as cards; the console's state as pills.
+  - *Play timer*: the week is the editor. Ⓐ on a day edits it: ↑/↓ change it by 15 min, ←/→ move to the next day, Ⓛ copies it to Monday–Friday, Ⓡ to the weekend, Ⓨ sets no limit, Ⓐ or Ⓑ ends the edit; Ⓧ picks an exact time. The changes are saved together, with **+** or *Save*, as in the per-day editor; *Discard* puts them back. Profiles, the same limit every day, bedtime, *When the time is up* and the removal are chips above and below it.
+  - *Activity*: the accounts as chips, the period and the export, today, the last 7 days and all time as figures, the four games most played as cards (Ⓐ opens one).
+  - *Restrictions*: the four levels side by side, each with what it restricts (Ⓐ sets it); no restriction under them.
+  - **The child screen** (*Show the child* on *Today*): only the time left, the bedtime and what happens when time is up, to hand the console over. Ⓐ goes back to the parent's screens with the PIN; Ⓑ leaves PlayGuard (asking first to turn parental controls back on, as quitting does).
+- **Classic**: the lists of earlier versions, as the screenshots above show them.
 
 ## Notifications — what needs you, from any tab
 
@@ -114,7 +126,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 ## Preferences
 
 - What sets PlayGuard itself up:
-  - Language (every console language, or the console's own) and theme (light / dark, with an offer to restart).
+  - Language (every console language, or the console's own), theme (light / dark) and appearance (Cadran / Classic, see above), each with an offer to restart.
   - The tab to start on.
   - **The intro** at start-up: the loading screen for 2 seconds (on by default; Ⓐ or Ⓑ skips it; off, PlayGuard opens as soon as it is ready).
 - The messages it shows:
