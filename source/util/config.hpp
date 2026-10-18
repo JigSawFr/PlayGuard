@@ -14,6 +14,9 @@ struct Config
 {
     std::string language = "system";   // "system" or one of LANGUAGES
     std::string theme    = "system";   // "system", "light", "dark"
+    // The look: "cadran" (the design after the 2026 boards, source/tab/cadran_*)
+    // or "classic" (the lists of 1.x), read at start-up.
+    std::string appearance = "cadran";
     std::string ntp_server;            // empty: pick from the console region
     std::vector<std::string> custom_servers;
     bool advanced = false;             // show debug-class play-timer actions
@@ -21,7 +24,6 @@ struct Config
     bool dev_mode = false;             // developer tools (7 presses on About > Version)
     bool pt_log = false;               // Developer › record the play timer (action/pt_log_flow)
     bool frame_stats = false;          // Developer › frame statistics (action/frame_stats_flow)
-    bool cadran = false;               // Developer › the "Cadran" prototype screens (tab/cadran_tab)
     // How an update is installed: "" (not chosen yet: asked on the first
     // update), "inplace" (PlayGuard downloads it and replaces itself),
     // "auto", "sphaira", "appstore", "manual".
@@ -140,6 +142,8 @@ constexpr int    SCHEMA             = 1;    // "schema" in config.json
 constexpr const char* LANGUAGES[] = { "system", "en-US", "fr", "fr-CA", "de", "es", "es-419", "it", "nl", "pt", "pt-BR", "ru", "ja", "ko", "zh-Hans", "zh-Hant" };
 // What theme may be: the console's own, then the two forced ones.
 constexpr const char* THEMES[] = { "system", "light", "dark" };
+// What appearance may be: the default first.
+constexpr const char* APPEARANCES[] = { "cadran", "classic" };
 // What start_tab may be, in the sidebar's order.
 constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "restrictions",
                                        "security", "console", "history", "preferences", "about" };

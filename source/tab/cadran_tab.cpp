@@ -2,6 +2,8 @@
 #include "tab/cadran_tab.hpp"
 
 #include <cctype>
+#include <algorithm>
+#include <yoga/Yoga.h>
 #include <cstdlib>
 #include <fmt/format.h>
 #include <utility>
@@ -11,6 +13,9 @@
 #include "activity/cadran_child_activity.hpp"
 #include "action/pt_flow.hpp"
 #include "app.hpp"
+#include "action/pt_logic.hpp"
+#include "ui/cadran_kit.hpp"
+#include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "view/cadran_icon.hpp"
@@ -19,10 +24,14 @@ using namespace brls::literals;
 
 bool cadran::enabled()
 {
+    // Read once: a change in Preferences takes effect at the next launch.
+    static const bool on = []() {
 #ifndef __SWITCH__
-    if (std::getenv("PLAYGUARD_SIM_CADRAN")) return true;
+        if (const char* forced = std::getenv("PLAYGUARD_SIM_APPEARANCE")) return std::string(forced) != "classic";
 #endif
-    return app::dev_mode() && config::get().cadran;
+        return config::get().appearance != "classic";
+    }();
+    return on;
 }
 
 void cadran::install_theme()
@@ -227,7 +236,7 @@ brls::View* cadran::make_glow(float cx, float cy, float radius, const char* colo
 
 void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const std::string& pill_text, bool filled, bool with_date)
 {
-    if (!frame) return;
+    if (!frame || frame->getView("cadran_mark")) return;
     brls::Theme theme = brls::Application::getTheme();
     brls::View* app_icon = frame->getView("brls/applet_frame/title_icon");
     brls::Box* left = app_icon ? app_icon->getParent() : nullptr;
@@ -236,6 +245,7 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
         left->setAlignItems(brls::AlignItems::CENTER);
         left->setGrow(1.0f);
         CadranIcon* mark = icon("mark", 38, theme["cadran/text"]);
+        mark->setId("cadran_mark");
         mark->setMarginRight(14);
         left->addView(mark, 0);
     }
@@ -243,6 +253,7 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
         title->setFontSize(24);
         title->setMarginTop(0);
     }
+    if (!pill_icon) return;   // a screen of its own: the mark and the title
     auto* right = new brls::Box(brls::Axis::ROW);
     right->setAlignItems(brls::AlignItems::CENTER);
     const NVGcolor ink = filled ? theme["cadran/pill_ok_ink"] : theme["cadran/text2"];
@@ -279,6 +290,28 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
         right->addView(date);
     }
     if (brls::Box* header = frame->getHeader()) header->addView(right, 1);
+}
+
+namespace
+{
+// Every screen but the main one (MainActivity styles that one, rail and all):
+// the header after the boards, and its list in cards. Once per screen: the
+// mark it adds says it is done.
+void skin_screen_of(brls::View* focus)
+{
+    if (!focus) return;
+    while (focus->hasParent()) focus = focus->getParent();
+    auto* frame = dynamic_cast<brls::AppletFrame*>(focus);
+    if (!frame || frame->getView("main_tabs") || frame->getView("cadran_mark")) return;
+    if (!frame->getView("brls/applet_frame/header")) return;
+    cadran::style_header(frame, nullptr, "", false, false);
+    cadran::List(frame, true).apply({});
+}
+}   // namespace
+
+void cadran::install_screens()
+{
+    brls::Application::getGlobalFocusChangeEvent()->subscribe(skin_screen_of);
 }
 
 void cadran::style_rail(brls::View* tab_frame)
@@ -338,158 +371,245 @@ void cadran::style_frame(brls::AppletFrame* frame, brls::View* tab_frame)
 }
 
 CadranTab::CadranTab()
-    : TabBase("xml/tab/cadran.xml")
+    : list(this)
 {
+    namespace kit = cadran::kit;
     brls::Theme theme = brls::Application::getTheme();
-    this->teal       = theme["cadran/teal"];
-    this->amber      = theme["cadran/amber"];
-    this->text       = theme["cadran/text"];
-    this->text2      = theme["cadran/text2"];
-    this->text3      = theme["cadran/text3"];
-    this->surf       = theme["cadran/surf"];
-    this->amber_surf = theme["cadran/amber_surf"];
-    this->line       = theme["cadran/line"];
-    this->amber_line = theme["cadran/amber_line"];
+    brls::Box* column = this->list.content();
+    brls::View* hero = brls::View::createFromXMLResource("view/cadran_today.xml");
+    // Above the hero: what needs the parent first (the notices and banners
+    // of the Overview); under it, the lines it has no place for.
+    int at = 0;
+    for (const char* id : { "dash_applet", "dash_first_steps", "dash_unlocked_banner", "dash_outside_text", "dash_outside" }) {
+        const auto& lines = column->getChildren();
+        for (size_t i = 0; i < lines.size(); i++)
+            if (lines[i] == this->getView(id)) at = std::max(at, (int)i + 1);
+    }
+    column->addView(hero, at);
+    YGNodeStyleSetFlexWrap(pills->getYGNode(), YGWrapWrap);
+
+    // The gauge's own words under the ring's title; the timer's warnings with them.
+    auto* gauge_text = dynamic_cast<brls::Label*>(this->getView("dash_gauge_text"));
+    brls::Box* gauge_box = gauge_text ? gauge_text->getParent() : nullptr;
+    int slot = 1;
+    for (const char* id : { "dash_gauge_text", "dash_not_counting", "dash_home_hint" }) {
+        auto* text = dynamic_cast<brls::Label*>(this->getView(id));
+        if (!text) continue;
+        if (text->getParent()) text->getParent()->removeView(text, false);
+        today_text->addView(text, slot++);
+        text->setMarginTop(id == std::string("dash_gauge_text") ? 0 : 6);
+        text->setFontSize(id == std::string("dash_gauge_text") ? 30 : 16.5f);
+        if (id == std::string("dash_gauge_text")) text->setTextColor(theme["cadran/text"]);
+    }
+    this->list.park({ "dash_gauge", "dash_extra", "dash_stop", "dash_remaining", "dash_bedtime", "dash_pc", "dash_pin",
+                      "dash_level", "dash_clock", "dash_pairing", "dash_serial", "dash_patches", "dash_fw", "dash_compat" });
+    if (gauge_box) gauge_box->setVisibility(brls::Visibility::GONE);   // emptied
+    // The Overview's section titles: their lines are up there now.
+    for (brls::View* line : column->getChildren())
+        if (dynamic_cast<brls::Header*>(line)) line->setVisibility(brls::Visibility::GONE);
+    this->list.apply({ { "dash_first_steps", "sparkle" }, { "dash_outside", "alert" }, { "dash_today_limit", "timer" },
+                       { "dash_extra_pending", "refresh" }, { "dash_alarm", "bell" }, { "dash_unlocked_banner", "unlock" } });
+    this->list.banners({ "dash_first_steps", "dash_unlocked_banner", "dash_outside" });
 
     // The buttons' icons, before their label.
-    CadranIcon* plus = icon("plus", 20, theme["cadran/navy"]);
+    CadranIcon* plus = kit::icon("plus", 20, "cadran/navy");
     plus->setMarginRight(10);
     extra->addView(plus, 0);
     extra->setAlignItems(brls::AlignItems::CENTER);
-    CadranIcon* square = icon("stop", 18, theme["cadran/coral"]);
+    CadranIcon* square = kit::icon("stop", 18, "cadran/coral");
     square->setMarginRight(10);
     stop->addView(square, 0);
     stop->setAlignItems(brls::AlignItems::CENTER);
-    CadranIcon* eye = icon("eye", 18, this->text2);
+    CadranIcon* eye = kit::icon("eye", 18, "cadran/text2");
     eye->setMarginRight(10);
     child->addView(eye, 0);
     child->setAlignItems(brls::AlignItems::CENTER);
 
-    const auto extra_time = [this](brls::View*) {
-        pt_flow::add_extra_time(this->pt, [this]() { this->refresh(); });
+    // The Overview's own actions, from where they are shown now.
+    extra->registerClickAction([this](brls::View*) {
+        kit::press(this->getView("dash_extra"));
         return true;
-    };
-    extra->registerClickAction(extra_time);
-    chip15->registerClickAction(extra_time);
-    chip30->registerClickAction(extra_time);
-    chip60->registerClickAction(extra_time);
+    });
+    for (int minutes : config::get().extra_amounts) {
+        brls::Box* amount = kit::chip("+" + ui::fmt_minutes((uint16_t)minutes));
+        amount->setMarginRight(10);
+        amount->registerClickAction([this, minutes](brls::View*) {
+            if (ui::refuse_read_only()) return true;
+            pt_flow::add_extra_minutes(this->pt, (uint16_t)minutes, [this]() { this->refresh(); });
+            return true;
+        });
+        chips->addView(amount);
+    }
     stop->registerClickAction([this](brls::View*) {
-        pt_flow::stop_today(this->pt, [this]() { this->refresh(); });
+        kit::press(this->getView("dash_stop"));
         return true;
     });
     child->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new CadranChildActivity());
         return true;
     });
-    clock_card->registerClickAction([this](brls::View*) {
-        if (this->clock_inaccurate && !app::read_only()) clock_flow::guided([this]() { this->refresh(); });
+    bed_card->registerClickAction([this](brls::View*) {
+        kit::press(this->getView("dash_bedtime"));
         return true;
     });
-    this->enable_auto_refresh(5000);
+    pc_card->registerClickAction([this](brls::View*) {
+        kit::press(this->getView("dash_pc"));
+        return true;
+    });
+    clock_card->registerClickAction([this](brls::View*) {
+        kit::press(this->getView("dash_clock"));
+        return true;
+    });
 }
 
-void CadranTab::refresh()
+void CadranTab::show_ring(bool unlocked)
 {
-    const std::string na = "playguard/common/unavailable"_i18n;
-
-    PctlStatus s;
-    pctl_overview_fetch(&s, &this->pt);
     const PtState& pt = this->pt;
-    bool accurate = false;
-    const Result accuracy_rc = time_network_accuracy(&accurate);
-
-    const bool unlocked = s.temp_unlocked_ok && s.temp_unlocked;
-    const bool has_pin  = s.pin_length_ok && s.pin_length > 0;
-    ui::note_unlocked(s.temp_unlocked_ok, s.temp_unlocked);
-    if (!s.restriction_enabled_ok) cadran::set_pill("");
-    else if (unlocked) cadran::set_pill("Déverrouillé temporairement", "unlock", true);
-    else if (s.restriction_enabled) cadran::set_pill("Contrôle parental actif");
-    else cadran::set_pill("Contrôle parental non configuré", "alert", true);
-
-    // The ring: today's limit, what is left of it.
     const int today = ui::today_weekday();
-    std::string day = ui::day_name_in_text(today);
-    for (char& c : day) c = (char)std::toupper((unsigned char)c);   // ASCII: the French day names have no accent
-    kicker->setText("AUJOURD'HUI · LIMITE DU " + day);
+    kicker->setText(cadran::upper(brls::getStr("playguard/cadran/today/kicker", ui::day_name_in_text(today))));
     float frac = -1.0f;
-    std::string left = "—", caption = "restantes", sentence;
-    if (!pt.fw_supported || !pt.valid || !pt.enabled_valid) {
-        sentence = "Temps de jeu indisponible";
-    } else {
+    std::string left = "—", caption;
+    if (pt.fw_supported && pt.valid && pt.enabled_valid) {
         const uint16_t limit = pt.day_min[today];
+        const int over = pt_logic::over_limit_min(pt, today);
         if (limit == PT_DAY_NOLIMIT || !pt.enabled) {
-            left = "libre";
-            caption = "pas de limite";
-            sentence = "Pas de limite de temps de jeu aujourd'hui";
+            left = "playguard/cadran/today/free"_i18n;
+            caption = "playguard/cadran/today/no_limit"_i18n;
         } else if (unlocked) {
             left = ui::fmt_minutes(limit);
-            caption = "déverrouillé";
-            sentence = "Peut-être non décompté pendant le déverrouillage";
-        } else if (pt.restricted_valid && pt.restricted) {
+            caption = "playguard/cadran/today/unlocked"_i18n;
+        } else if (over >= 0 || (pt.restricted_valid && pt.restricted)) {
             frac = 1.0f;
-            left = "0 min";
-            caption = "temps écoulé";
-            sentence = "La limite du jour est atteinte";
+            left = ui::fmt_played(0);
+            caption = "playguard/cadran/today/time_up"_i18n;
         } else if (pt.remaining_valid && pt.remaining_ns > 0 && limit > 0) {
-            const uint64_t left_min = pt.remaining_ns / 60000000000ULL;
+            const uint64_t left_min = (uint64_t)pt.remaining_ns / 60000000000ULL;
             const uint16_t used = left_min >= limit ? 0 : (uint16_t)(limit - left_min);
             frac = (float)used / (float)limit;
-            left = ui::fmt_duration_ns(pt.remaining_ns);
-            sentence = ui::fmt_played(used) + " jouées sur " + ui::fmt_minutes(limit);
+            left = ui::fmt_duration_ns((uint64_t)pt.remaining_ns);
+            caption = "playguard/cadran/today/left"_i18n;
         } else {
             left = ui::fmt_minutes(limit);
-            caption = "aujourd'hui";
-            sentence = "Le temps restant s'affiche pendant qu'un jeu tourne.";
+            caption = "playguard/cadran/today/today"_i18n;
         }
     }
     ring->setFraction(frac);
     ring->setValue(left);
     ring->setCaption(caption);
-    played->setText(sentence);
+}
 
-    // Bedtime card.
+void CadranTab::show_cards(bool unlocked, bool has_pin)
+{
+    brls::Theme theme = brls::Application::getTheme();
+    const std::string na = "playguard/common/unavailable"_i18n;
+    const PtState& pt = this->pt;
+    const PctlStatus& s = this->status;
+
+    // Bedtime.
     if (pt.bedtime_valid) {
         bed_value->setText(fmt::format("{:02d}:{:02d}", pt.bedtime_hour, pt.bedtime_minute));
-        bed_state->setText(pt.bedtime_enabled ? "activée" : "désactivée");
-        bed_state->setTextColor(pt.bedtime_enabled ? this->teal : this->text2);
-        bed_sub->setText(pt.bedtime_reset_valid
-                             ? fmt::format("jeu de nouveau permis à {:02d}:{:02d}", pt.bedtime_reset_hour, pt.bedtime_reset_minute)
-                             : "");
+        bed_state->setText(pt.bedtime_enabled ? "playguard/cadran/today/on"_i18n : "playguard/cadran/today/off"_i18n);
+        bed_state->setTextColor(pt.bedtime_enabled ? theme["cadran/teal"] : theme["cadran/text2"]);
+        bed_sub->setText(pt.bedtime_reset_valid ? brls::getStr("playguard/cadran/today/bed_sub",
+                                                               fmt::format("{:02d}:{:02d}", pt.bedtime_reset_hour, pt.bedtime_reset_minute))
+                                                : "");
     } else {
         bed_value->setText("—");
         bed_state->setText("");
         bed_sub->setText(pt.fw_supported ? na : "");
     }
 
-    // Parental-control card: the level, the PIN, the overall state.
+    // Parental controls: the level, the PIN, the overall state.
     pc_value->setText(s.safety_level_ok ? ui::level_name(s.safety_level) : na);
     if (unlocked) {
-        pc_state->setText("déverrouillé");
-        pc_state->setTextColor(this->amber);
+        pc_state->setText("playguard/cadran/today/pc_unlocked"_i18n);
+        pc_state->setTextColor(theme["cadran/amber"]);
     } else {
-        pc_state->setText(has_pin ? "PIN défini" : "pas de PIN");
-        pc_state->setTextColor(has_pin ? this->teal : this->amber);
+        pc_state->setText(has_pin ? "playguard/cadran/today/pin_set"_i18n : "playguard/cadran/today/no_pin"_i18n);
+        pc_state->setTextColor(has_pin ? theme["cadran/teal"] : theme["cadran/amber"]);
     }
     pc_sub->setText(!s.restriction_enabled_ok ? na
-                    : s.restriction_enabled   ? "contrôle parental actif"
-                    : has_pin                 ? "code PIN défini, sans restriction"
-                                              : "non configuré");
+                    : s.restriction_enabled   ? "playguard/dashboard/pc_active"_i18n
+                    : has_pin                 ? "playguard/dashboard/pc_pin_only"_i18n
+                                              : "playguard/dashboard/pc_off"_i18n);
 
-    // Network clock card: amber, and a call to action, only when it needs one.
-    this->clock_inaccurate = R_SUCCEEDED(accuracy_rc) && !accurate;
+    // Network clock: amber, and a call to action, only when it needs one.
     const bool bad = this->clock_inaccurate;
-    clock_value->setText(R_FAILED(accuracy_rc) ? na : accurate ? "Précise" : "Imprécise");
-    clock_value->setTextColor(bad ? this->amber : this->text);
-    clock_title->setTextColor(bad ? this->amber : this->text3);
-    clock_state->setText(bad ? "à régler" : "ok");
-    clock_state->setTextColor(bad ? this->amber : this->teal);
-    clock_sub->setText(bad ? "Mesurer et régler maintenant" : "le minuteur compte juste");
-    clock_sub->setTextColor(bad ? this->text : this->text2);
-    ui::set_visible(clock_key.getView(), bad);
-    clock_card->setBackgroundColor(bad ? this->amber_surf : this->surf);
-    clock_card->setBorderColor(bad ? this->amber_line : this->line);
+    clock_value->setText(R_FAILED(this->accuracy_rc) ? na
+                         : this->accurate              ? "playguard/cadran/today/clock_ok"_i18n
+                                                       : "playguard/cadran/today/clock_bad"_i18n);
+    clock_value->setTextColor(bad ? theme["cadran/amber"] : theme["cadran/text"]);
+    clock_title->setTextColor(bad ? theme["cadran/amber"] : theme["cadran/text3"]);
+    clock_state->setText(bad ? "playguard/cadran/today/to_set"_i18n : "playguard/cadran/today/ok"_i18n);
+    clock_state->setTextColor(bad ? theme["cadran/amber"] : theme["cadran/teal"]);
+    clock_sub->setText(bad ? "playguard/cadran/today/clock_fix"_i18n : "playguard/cadran/today/clock_fine"_i18n);
+    clock_sub->setTextColor(bad ? theme["cadran/text"] : theme["cadran/text2"]);
+    ui::set_visible(clock_key.getView(), bad && !app::read_only());
+    clock_card->setBackgroundColor(bad ? theme["cadran/amber_surf"] : theme["cadran/surf"]);
+    clock_card->setBorderColor(bad ? theme["cadran/amber_line"] : theme["cadran/line"]);
+}
 
-    updated->setText(brls::getStr("playguard/dashboard/updated", ui::now_hms()));
+// The console's state as pills: what the Overview's System lines say, in
+// their colours; A opens where each is set, as the line would.
+void CadranTab::show_pills()
+{
+    namespace kit = cadran::kit;
+    brls::Theme theme = brls::Application::getTheme();
+    if (this->pill_slots.empty()) {
+        for (const char* line : { "dash_compat", "dash_pairing", "dash_serial", "dash_patches" }) {
+            Pill p;
+            p.line = line;
+            p.box = kit::pill("", "cadran/teal_fill");
+            p.box->setFocusable(true);
+            p.box->setHideHighlightBackground(true);
+            p.dot = dynamic_cast<brls::Rectangle*>(p.box->getChildren()[0]);
+            p.text = dynamic_cast<brls::Label*>(p.box->getChildren()[1]);
+            brls::View* cell = this->getView(line);
+            p.box->registerClickAction([cell](brls::View*) {
+                kit::press(cell);
+                return true;
+            });
+            pills->addView(p.box);
+            this->pill_slots.push_back(p);
+        }
+    }
+    const SysInfo& si = this->sys;
+    NVGcolor c = ui::color_neutral();
+    const std::string compat = ui::compat_text(si, &c);
+    for (Pill& p : this->pill_slots) {
+        auto* cell = dynamic_cast<brls::DetailCell*>(this->getView(p.line));
+        if (!cell) continue;
+        // A line shown says there is something to look at; else the all-fine words.
+        const bool shown = cell->getVisibility() == brls::Visibility::VISIBLE;
+        std::string ok;
+        if (p.line == std::string("dash_compat")) ok = ui::fw_text(si) + " · " + compat;
+        else if (p.line == std::string("dash_serial")) ok = "playguard/cadran/today/serial_hidden"_i18n;
+        const std::string text = shown ? cell->title->getFullText() + " · " + kit::without_chevron(cell->detail->getFullText()) : ok;
+        ui::set_text(p.text, text);
+        p.dot->setColor(theme[shown ? kit::dot_of(cell->detail->getTextColor()) : "cadran/teal_fill"]);
+        ui::set_visible(p.box, !text.empty());
+    }
+}
+
+void CadranTab::refresh()
+{
+    DashboardTab::refresh();
+    this->list.sync();
+    const PctlStatus& s = this->status;
+    const bool unlocked = s.temp_unlocked_ok && s.temp_unlocked;
+    const bool has_pin  = s.pin_length_ok && s.pin_length > 0;
+    if (!s.restriction_enabled_ok) cadran::set_pill("");
+    else if (unlocked) cadran::set_pill("playguard/cadran/pill/unlocked"_i18n, "unlock", true);
+    else if (s.restriction_enabled) cadran::set_pill("playguard/cadran/pill/pc_on"_i18n);
+    else cadran::set_pill("playguard/cadran/pill/pc_off"_i18n, "alert", true);
+
+    this->show_ring(unlocked);
+    this->show_cards(unlocked, has_pin);
+    this->show_pills();
+    // The actions while their lines would be shown.
+    cadran::kit::follow(extra.getView(), this->getView("dash_extra"));
+    cadran::kit::follow(chips.getView(), this->getView("dash_extra"));
+    cadran::kit::follow(stop.getView(), this->getView("dash_stop"));
 }
 
 brls::View* CadranTab::create() { return new CadranTab(); }

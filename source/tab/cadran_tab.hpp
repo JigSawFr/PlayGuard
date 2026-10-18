@@ -1,14 +1,22 @@
-// CadranTab — "Cadran" prototype of the Overview (PLAYGUARD_SIM_CADRAN=1 on
-// the desktop, About › Help & diagnostics › Developer › Cadran prototype on the console), after
-// the design boards: today's time left as a
-// ring, the two everyday actions under it, three state cards, a line of
-// "all fine" pills; the navy theme, an icon rail for a sidebar, the mark and
-// a status pill in the header, a glow behind the whole screen. Same readings as DashboardTab, refreshed every
-// 5 s. Used to look at the design and to measure its cost against the current
-// Overview; the strings are not localised.
+// Cadran — PlayGuard's look after the 2026 design boards (Preferences ›
+// Appearance, the default; "Classic" keeps the lists of 1.x): the navy and
+// cool-white palettes, an icon rail for a sidebar, the mark and a status pill
+// in the header, cards in place of lists, the figures in Sora.
+//
+// CadranTab — the Overview after its board: today's time left as a ring with
+// the everyday actions beside it, three state cards (bedtime, parental
+// controls, network clock), the console's state as pills; under them the
+// Overview's own lines that have no place up there (today's limit, the
+// alarm, the notices). It is DashboardTab: the same readings every 5 s, the
+// same actions; the lines the top shows its own way are kept out of sight
+// and their actions run from the cards and buttons.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <vector>
+
+#include "tab/cadran_list.hpp"
+#include "tab/dashboard_tab.hpp"
 #include "tab/tab_base.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "view/cadran_digits.hpp"
@@ -16,9 +24,10 @@
 
 namespace cadran
 {
-// Whether the prototype replaces the current screens: PLAYGUARD_SIM_CADRAN=1
-// on the desktop; config cadran (About › Help & diagnostics › Developer) while the developer
-// mode is on. Read at start-up: a change takes effect at the next launch.
+// Whether the app wears Cadran (Preferences › Appearance, config appearance,
+// the default) rather than the classic lists; PLAYGUARD_SIM_APPEARANCE=classic
+// or =cadran forces it on the desktop. Read once, at start-up: a change takes
+// effect at the next launch.
 bool enabled();
 // The boards' two palettes on borealis' two variants (dark: navy; light:
 // cool white), the rail's metrics and the display font: before any view.
@@ -27,6 +36,10 @@ void install_theme();
 // at 24, a pill at the right (`icon` and `text`; `filled` teal, else a
 // bordered one) and, when asked, the date.
 void style_header(brls::AppletFrame* frame, const char* icon, const std::string& text, bool filled, bool with_date);
+// From then on, every screen but the main one gets the header after the
+// boards (the mark, the title) and its list in cards (cadran::List), the
+// first time it takes the focus.
+void install_screens();
 // A TabFrame's sidebar as the boards' rail: an icon before each label, the
 // active tab on a teal pill.
 void style_rail(brls::View* tab_frame);
@@ -42,7 +55,7 @@ void set_pill(const std::string& text, const char* icon = "check", bool warn = f
 brls::View* make_glow(float cx, float cy, float radius, const char* color_key);
 }
 
-class CadranTab : public TabBase
+class CadranTab : public DashboardTab
 {
   public:
     CadranTab();
@@ -52,17 +65,27 @@ class CadranTab : public TabBase
     void refresh() override;
 
   private:
-    PtState pt = {};
-    bool clock_inaccurate = false;
-    NVGcolor teal, amber, text, text2, text3, surf, amber_surf, line, amber_line;
+    // A pill of the console's state, standing for one of the Overview's lines.
+    struct Pill
+    {
+        const char*      line = nullptr;
+        brls::Box*       box  = nullptr;
+        brls::Rectangle* dot  = nullptr;
+        brls::Label*     text = nullptr;
+    };
+    cadran::List list;
+    std::vector<Pill> pill_slots;
+
+    void show_ring(bool unlocked);
+    void show_cards(bool unlocked, bool has_pin);
+    void show_pills();
 
     BRLS_BIND(PtRing,       ring,        "cad_ring");
     BRLS_BIND(brls::Label,  kicker,      "cad_kicker");
-    BRLS_BIND(CadranDigits, played,      "cad_played");
+    BRLS_BIND(brls::Box,    today_text,  "cad_today_text");
+    BRLS_BIND(brls::Box,    actions,     "cad_actions");
     BRLS_BIND(brls::Button, extra,       "cad_extra");
-    BRLS_BIND(brls::Box,    chip15,      "cad_chip15");
-    BRLS_BIND(brls::Box,    chip30,      "cad_chip30");
-    BRLS_BIND(brls::Box,    chip60,      "cad_chip60");
+    BRLS_BIND(brls::Box,    chips,       "cad_chips");
     BRLS_BIND(brls::Button, stop,        "cad_stop");
     BRLS_BIND(brls::Button, child,       "cad_child");
     BRLS_BIND(brls::Box,    bed_card,    "cad_bed_card");
@@ -79,5 +102,5 @@ class CadranTab : public TabBase
     BRLS_BIND(CadranDigits, clock_value, "cad_clock_value");
     BRLS_BIND(brls::Box,    clock_key,   "cad_clock_key");
     BRLS_BIND(brls::Label,  clock_sub,   "cad_clock_sub");
-    BRLS_BIND(brls::Label,  updated,     "cad_updated");
+    BRLS_BIND(brls::Box,    pills,       "cad_pills");
 };

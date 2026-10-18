@@ -389,6 +389,7 @@ void register_views()
     VersionBadge::install();
     NoticeBell::install();   // the bell goes in the header's row at the right
     HeaderSetting::install();   // after the bell: the language and theme go left of it
+    if (cadran::enabled()) cadran::install_screens();   // the other screens after the boards
 }
 
 // After the main loop: the play timer locked again if asked, the tasks and

@@ -242,6 +242,7 @@ DYNAMIC_KEYS = {
     "library/views/": numbers(2),        # games_activity.cpp: list, covers
     "days_lower/": numbers(7),
     "days_short/": numbers(7),
+    "cadran/months/": [str(m) for m in range(1, 13)],   # cadran_kit.cpp, long_date: 1..12
     "restrictions/levels/": numbers(5),  # format_text.cpp, level_name: up to 4
     "history/filters/": numbers(enum_count("source/action/history_logic.hpp", "Filter")),
     # The code's lists.
@@ -260,6 +261,7 @@ DYNAMIC_KEYS = {
     re.findall(r'open_label\("(\w+)"\)', read(f"{ROOT}/source/action/notices.cpp")),
     "tools/languages/": array_of("source/util/config.hpp", "LANGUAGES"),
     "tools/themes/": array_of("source/util/config.hpp", "THEMES"),
+    "prefs/appearances/": array_of("source/util/config.hpp", "APPEARANCES"),
     "tools/update_via_values/": array_of("source/action/update_flow.cpp", "METHODS"),
 }
 for prefix, values in sorted(DYNAMIC_KEYS.items()):

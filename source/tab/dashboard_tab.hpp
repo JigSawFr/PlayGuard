@@ -23,12 +23,18 @@ class DashboardTab : public TabBase
   protected:
     void refresh() override;
 
-  private:
-    PtState pt = {};
+    // The last readings, for a look that shows them its own way (CadranTab).
+    PtState    pt = {};
+    PctlStatus status = {};
+    SysInfo    sys = {};
+    Result     accuracy_rc = 0;
+    bool       accurate = false;
     bool clock_inaccurate = false;   // last read: A on the clock line offers to fix it
-    int  listener = 0;               // play_data::listen id
 
     void open_today_limit();
+
+  private:
+    int  listener = 0;               // play_data::listen id
 
     // Today's play time from the activity log, for when the timer does not say.
     struct TodayLog

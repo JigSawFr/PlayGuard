@@ -317,6 +317,8 @@ void offer_restart();
 // restart it needs. language_name / theme_name: the choice saved, as text.
 void        pick_language(std::function<void()> after = nullptr);
 void        pick_theme(std::function<void()> after = nullptr);
+void        pick_appearance(std::function<void()> after = nullptr);
+std::string appearance_name();
 std::string language_name();
 std::string theme_name();
 // − on the main screen: a list of the two, each opening its picker.

@@ -323,6 +323,20 @@ void pick_theme(std::function<void()> after)
     });
 }
 
+void pick_appearance(std::function<void()> after)
+{
+    std::vector<std::string> labels;
+    for (const char* a : config::APPEARANCES) labels.push_back(brls::getStr(std::string("playguard/prefs/appearances/") + a));
+    pick("playguard/prefs/appearance"_i18n, labels, index_of(config::APPEARANCES, config::get().appearance), [after](int i) {
+        choose(config::get().appearance, config::APPEARANCES[i], after);
+    });
+}
+
+std::string appearance_name()
+{
+    return brls::getStr("playguard/prefs/appearances/" + std::string(config::APPEARANCES[index_of(config::APPEARANCES, config::get().appearance)]));
+}
+
 std::string language_name()
 {
     return brls::getStr("playguard/tools/languages/" + std::string(config::LANGUAGES[index_of(config::LANGUAGES, config::get().language)]));

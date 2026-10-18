@@ -131,6 +131,13 @@ cadran::Card::Card()
 }
 
 void cadran::Card::setAccent(NVGcolor color) { this->border = color; }
+void cadran::Card::setFill(NVGcolor color) { this->fill = color; }
+
+cadran::Parking::Parking()
+{
+    this->setVisibility(brls::Visibility::GONE);
+    this->setFocusable(false);
+}
 
 void cadran::Card::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style, brls::FrameContext* ctx)
 {
@@ -190,14 +197,51 @@ void cadran::Switch::draw(NVGcontext* vg, float x, float y, float width, float h
 
 // ---------------------------------------------------------------------------
 
-cadran::List::List(brls::View* tab)
+cadran::List::List(brls::View* tab, bool sub_screen)
     : tab(tab)
 {
     if (brls::ScrollingFrame* frame = find_scroll(tab))
         for (brls::View* child : frame->getChildren())
             if (auto* column = dynamic_cast<brls::Box*>(child)) this->box = column;
     if (!this->box) return;
-    this->box->setPadding(4, 48, 32, 28);
+    if (sub_screen) this->box->setPadding(10, 72, 32, 72);
+    else this->box->setPadding(4, 48, 32, 28);
+}
+
+void cadran::List::park(const std::vector<const char*>& ids)
+{
+    if (!this->box) return;
+    if (!this->parking) {
+        this->parking = new Parking();
+        this->box->addView(this->parking);
+    }
+    for (const char* id : ids)
+        if (brls::View* view = this->tab->getView(id)) move_to(view, this->parking);
+}
+
+void cadran::List::banners(const std::vector<const char*>& ids)
+{
+    brls::Theme theme = brls::Application::getTheme();
+    for (const char* id : ids) {
+        auto* cell = dynamic_cast<brls::DetailCell*>(this->tab->getView(id));
+        Card* card = cell ? dynamic_cast<Card*>(cell->getParent()) : nullptr;
+        if (!card) continue;
+        // On its own: out of the card it shares, into a card of its own colours.
+        if (card->getChildren().size() > 1) {
+            auto* own = new Card();
+            const int at = index_in(this->box, card);
+            const int row = index_in(card, cell);
+            this->box->addView(own, row == 0 ? at : at + 1);
+            move_to(cell, own);
+            card = own;
+        }
+        card->setFill(theme["cadran/amber_surf"]);
+        card->setAccent(theme["cadran/amber_line"]);
+        card->setMarginBottom(6);
+        cell->setBackgroundColor(theme["cadran/none"]);
+        cell->title->setTextColor(theme["cadran/amber"]);
+        cell->detail->setTextColor(theme["cadran/amber"]);
+    }
 }
 
 brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const char*>>& cells, bool status)
@@ -284,8 +328,9 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
         auto* cell = dynamic_cast<brls::DetailCell*>(line);
         if (!cell) {
             card = nullptr;
-            if (auto* note = dynamic_cast<brls::Label*>(line)) {
-                note->setFontSize(15.5f);
+            // A note (a headline, larger, keeps its size).
+            if (auto* note = dynamic_cast<brls::Label*>(line); note && note->getFontSize() <= 20.5f) {
+                note->setFontSize(16.5f);
                 note->setMarginLeft(6);
                 note->setMarginRight(6);
                 if (margin_top(note) >= 10) note->setMarginTop(10);
@@ -299,7 +344,7 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
             this->box->addView(card, index_in(this->box, cell));
         }
         move_to(cell, card);
-        cell->setHeight(60);
+        cell->setHeight(58);
         cell->setPaddingLeft(14);
         cell->setPaddingRight(16);
         cell->setLineBottom(0);
@@ -311,11 +356,6 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
         if (auto* toggle = dynamic_cast<brls::BooleanCell*>(cell)) {
             toggle->detail->setVisibility(brls::Visibility::GONE);
             toggle->addView(new Switch(toggle));
-        } else if (cell->isFocusable()) {
-            CadranIcon* chevron = make_icon("chevron-right", 16, theme["cadran/text3"]);
-            chevron->setMarginLeft(10);
-            chevron->setShrink(0);
-            cell->addView(chevron);
         }
     }
     this->sync();

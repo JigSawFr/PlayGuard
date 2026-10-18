@@ -342,6 +342,11 @@ void DashboardTab::refresh()
     this->show_controls(s, unlocked, has_pin);
     const SystemIssues issues = this->show_system(s, si, accuracy_rc, accurate);
 
+    this->status = s;
+    this->sys = si;
+    this->accuracy_rc = accuracy_rc;
+    this->accurate = accurate;
+
     // When the values were last read (X refreshes now, the timer every 5 s).
     ui::set_text(updated, brls::getStr("playguard/dashboard/updated", ui::now_hms()));
 

@@ -1,4 +1,4 @@
-// PreferencesTab — PlayGuard itself: language, theme, start tab and the
+// PreferencesTab — PlayGuard itself: language, theme, appearance, start tab and the
 // intro; the kinds of notifications and the monthly "Support PlayGuard"
 // reminder. A setting that shapes one feature lives in that feature's tab;
 // the updates and Help & diagnostics are in About.
@@ -19,6 +19,7 @@ class PreferencesTab : public TabBase
   private:
     BRLS_BIND(brls::DetailCell,  language,      "pf_language");
     BRLS_BIND(brls::DetailCell,  theme,         "pf_theme");
+    BRLS_BIND(brls::DetailCell,  appearance,    "pf_appearance");
     BRLS_BIND(brls::DetailCell,  start_tab,     "pf_start_tab");
     BRLS_BIND(brls::BooleanCell, intro,         "pf_intro");
     BRLS_BIND(brls::BooleanCell, support_reminder, "pf_support_reminder");

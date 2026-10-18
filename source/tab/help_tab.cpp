@@ -166,11 +166,6 @@ HelpTab::HelpTab()
     dev_frame_stats_last->setSingleLine(false);
     this->stats_timer.setPeriod(1000);
     this->stats_timer.setCallback([this]() { this->update_frame_stats(); });
-    dev_cadran->init("playguard/dev/cadran"_i18n, config::get().cadran, [](bool on) {
-        config::get().cadran = on;
-        ui::save_config();
-        ui::offer_restart();
-    });
     dev_clear_cache->registerClickAction([](brls::View*) {
         cleanup_flow::clear_cache();
         return true;
@@ -216,7 +211,6 @@ void HelpTab::refresh()
     dev_read_only->setOn(ro, false);
     dev_pt_log->setOn(cfg.pt_log, false);
     dev_frame_stats->setOn(cfg.frame_stats, false);
-    dev_cadran->setOn(cfg.cadran, false);
     this->update_frame_stats();
     const bool signed_in = !github_auth::token().empty();
     ui::set_visible_all({ { github.getView(), dev || signed_in },
@@ -228,8 +222,6 @@ void HelpTab::refresh()
                           { dev_frame_stats.getView(), dev },
                           { dev_frame_stats_note.getView(), dev },
                           { dev_frame_stats_last.getView(), dev && frame_stats_flow::running() },
-                          { dev_cadran.getView(), dev },
-                          { dev_cadran_note.getView(), dev },
                           { dev_clear_cache.getView(), dev },
                           { dev_clear_logs.getView(), dev },
                           { dev_report.getView(), dev },

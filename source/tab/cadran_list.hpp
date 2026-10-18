@@ -34,6 +34,7 @@ class Card : public brls::Box
   public:
     Card();
     void setAccent(NVGcolor color);
+    void setFill(NVGcolor color);
     void draw(NVGcontext* vg, float x, float y, float width, float height,
               brls::Style style, brls::FrameContext* ctx) override;
 
@@ -55,11 +56,24 @@ class Switch : public brls::View
     NVGcolor on, off, knob_on, knob_off;
 };
 
+// A box that holds the lines a Cadran screen shows its own way (a hero, a
+// tile): hidden, never focused, so the screen's own code still finds, fills
+// and shows or hides them as it always did.
+class Parking : public brls::Box
+{
+  public:
+    Parking();
+    brls::View* getDefaultFocus() override { return nullptr; }
+    brls::View* getNextFocus(brls::FocusDirection, brls::View*) override { return nullptr; }
+};
+
 class List
 {
   public:
-    // A tab inflated from one of the list XMLs (a ScrollView and its column).
-    explicit List(brls::View* tab);
+    // A screen inflated from one of the list XMLs (a ScrollView and its
+    // column): a tab (`sub_screen` false: the rail at its left) or a screen
+    // of its own (wider margins).
+    explicit List(brls::View* tab, bool sub_screen = false);
 
     // The column of lines (nullptr when the tab has none).
     brls::Box* content() const { return this->box; }
@@ -73,10 +87,17 @@ class List
     // Hides the section header just above this line (its lines went to tiles).
     void hide_header_before(const char* id);
 
+    // Moves these lines (any view, found by id) out of sight (see Parking).
+    void park(const std::vector<const char*>& ids);
+
+    // These cells as amber banners, each a card of its own (after apply()).
+    void banners(const std::vector<const char*>& ids);
+
     // Puts this line (not a cell: a box of text) in a card of its own.
     Card* wrap(const char* id);
 
-    // Restyles every other line; `icons`: cell id -> icon name.
+    // Restyles every other line; `icons`: cell id -> icon name. A line that
+    // opens a screen keeps the app's own "›" at the end of its value.
     void apply(const std::vector<std::pair<const char*, const char*>>& icons);
 
     // The card holding this cell (after apply()).
@@ -90,6 +111,7 @@ class List
   private:
     brls::View* tab;
     brls::Box*  box = nullptr;
+    Parking*    parking = nullptr;
     std::vector<brls::Header*> headers;
     std::vector<brls::DetailCell*> readings;   // the status tiles
 };

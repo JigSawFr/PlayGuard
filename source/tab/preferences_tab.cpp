@@ -29,6 +29,10 @@ PreferencesTab::PreferencesTab()
         return true;
     });
 
+    appearance->registerClickAction([this](brls::View*) {
+        ui::pick_appearance([this]() { this->refresh(); });
+        return true;
+    });
     theme->registerClickAction([this](brls::View*) {
         ui::pick_theme([this]() { this->refresh(); });
         return true;
@@ -83,6 +87,7 @@ void PreferencesTab::refresh()
     const auto& cfg = config::get();
     language->setDetailText(ui::language_name());
     theme->setDetailText(ui::theme_name());
+    appearance->setDetailText(ui::appearance_name());
     start_tab->setDetailText(brls::getStr(std::string("playguard/tabs/") + config::START_TABS[index_of(config::START_TABS, cfg.start_tab)]));
     intro->setOn(cfg.intro, false);
     notices_system->setOn(cfg.notices_system, false);

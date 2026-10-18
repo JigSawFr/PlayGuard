@@ -983,7 +983,12 @@
         "notices_summary": "この週のプレイ時間",
         "notices_reminders": "リマインダー：バックアップ、もう一方のシステム、ソフトのブロック",
         "notices_ack_remind": "無視した警告を30日後に再び数える",
-        "help": "ヘルプと診断"
+        "help": "ヘルプと診断",
+        "appearance": "外観",
+        "appearances": {
+            "cadran": "Cadran",
+            "classic": "クラシック"
+        }
     },
     "backup": {
         "saved": "設定をバックアップしました：{}",
@@ -1097,8 +1102,6 @@
         "frame_stats_note": "One line every second while PlayGuard is open, in logs/frame_stats.txt: the mode (docked or handheld) and the frame size, the screen shown, the frames per second, the UI's own computing time per frame (mean and maximum, in ms), the interval between two frames (mean and maximum) and how many frames came late (more than 20 ms). To compare the current screens with the Cadran prototype: leave each screen shown for 30 s without touching anything, docked then handheld. The file starts over each time this is turned on.",
         "frame_stats_on": "One line every second in {}",
         "frame_stats_wait": "First line in a second…",
-        "cadran": "Cadran prototype",
-        "cadran_note": "The screens after the design boards (the ring of today's time, the icon rail, the navy theme) instead of the current ones, to look at and measure on the console. Same settings read and written; texts in French only. Takes effect at the next launch; turn it off to get the current screens back.",
         "gate": "ファームウェア画面をもう一度表示",
         "forget": "ファームウェアの選択を忘れる",
         "forgotten": "次回の起動時に、ファームウェアの選択をもう一度確認します。",
@@ -1454,5 +1457,55 @@
         "week_top": "いちばん遊んだゲーム：{}（{}）。",
         "over_limit": "この 7 日間のうち {} 日、制限を超えました",
         "over_limit_detail": "時間になっても本体は知らせるだけで、制限を超えて遊び続けられます（プレイ時間 › 時間になったとき）。"
+    },
+    "cadran": {
+        "date": "{3}{2}日 {0}",
+        "months": {
+            "1": "1月",
+            "2": "2月",
+            "3": "3月",
+            "4": "4月",
+            "5": "5月",
+            "6": "6月",
+            "7": "7月",
+            "8": "8月",
+            "9": "9月",
+            "10": "10月",
+            "11": "11月",
+            "12": "12月"
+        },
+        "today": {
+            "kicker": "Today · {}'s limit",
+            "free": "free",
+            "no_limit": "no limit",
+            "unlocked": "unlocked",
+            "time_up": "time's up",
+            "left": "left",
+            "today": "today",
+            "extra": "Extra time",
+            "stop": "Stop for today",
+            "child": "Show the child",
+            "bed_title": "Bedtime alarm",
+            "on": "on",
+            "off": "off",
+            "bed_sub": "games allowed again at {}",
+            "pc_title": "Parental controls",
+            "pc_unlocked": "unlocked",
+            "pin_set": "PIN set",
+            "no_pin": "no PIN",
+            "clock_title": "Network clock",
+            "clock_ok": "Accurate",
+            "clock_bad": "Inaccurate",
+            "to_set": "to set",
+            "ok": "ok",
+            "clock_fix": "Measure and set it now",
+            "clock_fine": "the timer counts right",
+            "serial_hidden": "Serial number hidden"
+        },
+        "pill": {
+            "pc_on": "Parental controls on",
+            "pc_off": "Parental controls not set up",
+            "unlocked": "Unlocked for now"
+        }
     }
 }

@@ -983,7 +983,12 @@
         "notices_summary": "Le temps de jeu de la semaine",
         "notices_reminders": "Rappels : sauvegardes, autre système, jeux bloqués",
         "notices_ack_remind": "Rappeler les avertissements ignorés après 30 jours",
-        "help": "Aide et diagnostic"
+        "help": "Aide et diagnostic",
+        "appearance": "Apparence",
+        "appearances": {
+            "cadran": "Cadran",
+            "classic": "Classique"
+        }
     },
     "backup": {
         "saved": "Réglages sauvegardés : {}",
@@ -1097,8 +1102,6 @@
         "frame_stats_note": "Une ligne par seconde tant que PlayGuard est ouvert, dans logs/frame_stats.txt : le mode (dock ou portable) et la taille de l'image, l'écran affiché, les images par seconde, le temps de calcul de l'interface par image (moyenne et maximum, en ms), l'intervalle entre deux images (moyenne et maximum) et le nombre d'images en retard (plus de 20 ms). Pour comparer l'interface actuelle et le prototype Cadran : laisser chaque écran affiché 30 s sans rien toucher, en dock puis en portable. Le fichier repart de zéro à chaque activation.",
         "frame_stats_on": "Une ligne par seconde dans {}",
         "frame_stats_wait": "Première ligne dans une seconde…",
-        "cadran": "Prototype Cadran",
-        "cadran_note": "Les écrans d'après les planches de design (l'anneau du temps du jour, le rail d'icônes, le thème marine) à la place des écrans actuels, pour les regarder et les mesurer sur la console. Mêmes réglages lus et écrits ; textes en français seulement. Prend effet au prochain lancement ; remettre sur arrêt pour retrouver les écrans actuels.",
         "gate": "Revoir l'écran firmware",
         "forget": "Oublier le choix pour le firmware",
         "forgotten": "Le choix pour le firmware sera redemandé au prochain lancement.",
@@ -1454,5 +1457,55 @@
         "week_top": "Le plus joué : {} ({}).",
         "over_limit": "La limite a été dépassée {} jours sur les 7 derniers",
         "over_limit_detail": "Quand le temps est écoulé, la console se contente de prévenir : le jeu continue au-delà de la limite (Temps de jeu › Quand le temps est écoulé)."
+    },
+    "cadran": {
+        "date": "{1} {2} {3}",
+        "months": {
+            "1": "janvier",
+            "2": "février",
+            "3": "mars",
+            "4": "avril",
+            "5": "mai",
+            "6": "juin",
+            "7": "juillet",
+            "8": "août",
+            "9": "septembre",
+            "10": "octobre",
+            "11": "novembre",
+            "12": "décembre"
+        },
+        "today": {
+            "kicker": "Aujourd'hui · limite du {}",
+            "free": "libre",
+            "no_limit": "pas de limite",
+            "unlocked": "déverrouillé",
+            "time_up": "temps écoulé",
+            "left": "restantes",
+            "today": "aujourd'hui",
+            "extra": "Temps en plus",
+            "stop": "Arrêter pour aujourd'hui",
+            "child": "Montrer à l'enfant",
+            "bed_title": "Alarme du coucher",
+            "on": "activée",
+            "off": "désactivée",
+            "bed_sub": "jeu de nouveau permis à {}",
+            "pc_title": "Contrôle parental",
+            "pc_unlocked": "déverrouillé",
+            "pin_set": "PIN défini",
+            "no_pin": "pas de PIN",
+            "clock_title": "Horloge réseau",
+            "clock_ok": "Précise",
+            "clock_bad": "Imprécise",
+            "to_set": "à régler",
+            "ok": "ok",
+            "clock_fix": "Mesurer et régler maintenant",
+            "clock_fine": "le minuteur compte juste",
+            "serial_hidden": "Numéro de série masqué"
+        },
+        "pill": {
+            "pc_on": "Contrôle parental actif",
+            "pc_off": "Contrôle parental non configuré",
+            "unlocked": "Déverrouillé temporairement"
+        }
     }
 }

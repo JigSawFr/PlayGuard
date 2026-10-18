@@ -59,6 +59,8 @@ void pick_limit(const std::string& title, uint16_t current, std::function<void(u
 // "Extra time today": raises today's weekday limit by 15 / 30 / 60 min and
 // remembers the previous value (config extra_*), so that it can be put back.
 void add_extra_time(const PtState& pt, std::function<void()> refresh);
+// The same for one amount (its confirmation only, no picker).
+void add_extra_minutes(const PtState& pt, uint16_t minutes, std::function<void()> refresh);
 
 // "No more play today": today's weekday limit to 0 for today only (through
 // confirm_write: the suspend warning says the game in progress stops at the

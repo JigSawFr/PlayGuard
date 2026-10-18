@@ -44,8 +44,6 @@
             <brls:BooleanCell id="hp_dev_frame_stats"/>
             <brls:Label id="hp_dev_frame_stats_note" text="@i18n/playguard/dev/frame_stats_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
             <brls:Label id="hp_dev_frame_stats_last" fontSize="18" marginBottom="10" textColor="@theme/brand/note"/>
-            <brls:BooleanCell id="hp_dev_cadran"/>
-            <brls:Label id="hp_dev_cadran_note" text="@i18n/playguard/dev/cadran_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
             <brls:DetailCell id="hp_dev_clear_cache" title="@i18n/playguard/dev/clear_cache"/>
             <brls:DetailCell id="hp_dev_clear_logs" title="@i18n/playguard/dev/clear_logs"/>
             <brls:DetailCell id="hp_dev_report" title="@i18n/playguard/dev/report"/>

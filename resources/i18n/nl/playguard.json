@@ -983,7 +983,12 @@
         "notices_summary": "De speeltijd van de week",
         "notices_reminders": "Herinneringen: back-ups, ander systeem, games op slot",
         "notices_ack_remind": "Genegeerde waarschuwingen na 30 dagen weer meetellen",
-        "help": "Hulp en diagnose"
+        "help": "Hulp en diagnose",
+        "appearance": "Weergave",
+        "appearances": {
+            "cadran": "Cadran",
+            "classic": "Klassiek"
+        }
     },
     "backup": {
         "saved": "Back-up van instellingen gemaakt: {}",
@@ -1097,8 +1102,6 @@
         "frame_stats_note": "One line every second while PlayGuard is open, in logs/frame_stats.txt: the mode (docked or handheld) and the frame size, the screen shown, the frames per second, the UI's own computing time per frame (mean and maximum, in ms), the interval between two frames (mean and maximum) and how many frames came late (more than 20 ms). To compare the current screens with the Cadran prototype: leave each screen shown for 30 s without touching anything, docked then handheld. The file starts over each time this is turned on.",
         "frame_stats_on": "One line every second in {}",
         "frame_stats_wait": "First line in a second…",
-        "cadran": "Cadran prototype",
-        "cadran_note": "The screens after the design boards (the ring of today's time, the icon rail, the navy theme) instead of the current ones, to look at and measure on the console. Same settings read and written; texts in French only. Takes effect at the next launch; turn it off to get the current screens back.",
         "gate": "Firmwarescherm opnieuw tonen",
         "forget": "Firmwarekeuze vergeten",
         "forgotten": "Bij de volgende start wordt opnieuw naar de firmwarekeuze gevraagd.",
@@ -1454,5 +1457,55 @@
         "week_top": "Meest gespeeld: {} ({}).",
         "over_limit": "De limiet is overschreden op {} van de afgelopen 7 dagen",
         "over_limit_detail": "Als de tijd om is, waarschuwt de console alleen: er wordt verder gespeeld na de limiet (Speeltijd › Als de tijd om is)."
+    },
+    "cadran": {
+        "date": "{1} {2} {3}",
+        "months": {
+            "1": "januari",
+            "2": "februari",
+            "3": "maart",
+            "4": "april",
+            "5": "mei",
+            "6": "juni",
+            "7": "juli",
+            "8": "augustus",
+            "9": "september",
+            "10": "oktober",
+            "11": "november",
+            "12": "december"
+        },
+        "today": {
+            "kicker": "Today · {}'s limit",
+            "free": "free",
+            "no_limit": "no limit",
+            "unlocked": "unlocked",
+            "time_up": "time's up",
+            "left": "left",
+            "today": "today",
+            "extra": "Extra time",
+            "stop": "Stop for today",
+            "child": "Show the child",
+            "bed_title": "Bedtime alarm",
+            "on": "on",
+            "off": "off",
+            "bed_sub": "games allowed again at {}",
+            "pc_title": "Parental controls",
+            "pc_unlocked": "unlocked",
+            "pin_set": "PIN set",
+            "no_pin": "no PIN",
+            "clock_title": "Network clock",
+            "clock_ok": "Accurate",
+            "clock_bad": "Inaccurate",
+            "to_set": "to set",
+            "ok": "ok",
+            "clock_fix": "Measure and set it now",
+            "clock_fine": "the timer counts right",
+            "serial_hidden": "Serial number hidden"
+        },
+        "pill": {
+            "pc_on": "Parental controls on",
+            "pc_off": "Parental controls not set up",
+            "unlocked": "Unlocked for now"
+        }
     }
 }
