@@ -8,6 +8,8 @@
 
 #include "action/offline_clock_logic.hpp"
 #include "app.hpp"
+#include "tab/cadran_lists.hpp"
+#include "tab/cadran_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/ntp_servers.hpp"
@@ -264,5 +266,6 @@ void ClockTab::copy()
 
 void ClockTab::open_screen()
 {
-    ui::open_screen(new ClockTab(), "playguard/tabs/clock"_i18n);
+    // The Cadran appearance: the same screen with both clocks large.
+    ui::open_screen(cadran::enabled() ? new CadranClockTab() : new ClockTab(), "playguard/tabs/clock"_i18n);
 }

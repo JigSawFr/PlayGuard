@@ -47,6 +47,8 @@ std::string without_chevron(const std::string& value);
 // coral (bad), or the quiet one.
 const char* dot_of(NVGcolor value_color);
 
-// "jeudi 8 octobre", from the console's clock, in the app's language.
+// "jeudi 8 octobre", from the console's clock, in the app's language; the
+// same for a "2026-10-08" (the text itself when it is not a date).
 std::string long_date();
+std::string long_date(const std::string& ymd);
 }   // namespace cadran::kit

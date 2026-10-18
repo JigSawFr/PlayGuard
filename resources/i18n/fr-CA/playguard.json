@@ -1509,7 +1509,9 @@
             "timer_on": "Minuteur actif",
             "timer_off": "Décompte en pause",
             "timer_none": "Pas de limite de temps de jeu",
-            "level": "Niveau · {}"
+            "level": "Niveau · {}",
+            "pin_set": "PIN défini",
+            "pin_none": "Pas de code PIN"
         },
         "week": {
             "no_limit": "pas de limite",
@@ -1556,6 +1558,16 @@
             "comm_allowed": "Communication · autorisée",
             "comm_unknown": "Communication · —",
             "none": "logiciels de tout âge, réseaux sociaux et communication permis"
+        },
+        "clock": {
+            "console": "Console",
+            "network": "Réseau · utilisée par le minuteur",
+            "accurate": "précise",
+            "inaccurate": "imprécise · à régler ci-dessous"
+        },
+        "about": {
+            "tagline": "Contrôle parental pour Nintendo Switch · logiciel libre (GPLv3)",
+            "version": "Version {}"
         }
     }
 }

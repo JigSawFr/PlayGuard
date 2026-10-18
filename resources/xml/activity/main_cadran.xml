@@ -39,13 +39,13 @@
         <brls:Separator/>
 
         <brls:Tab label="@i18n/playguard/tabs/console">
-            <ConsoleTab/>
+            <CadranConsoleTab/>
         </brls:Tab>
 
         <brls:Separator/>
 
         <brls:Tab label="@i18n/playguard/tabs/history">
-            <HistoryTab/>
+            <CadranHistoryTab/>
         </brls:Tab>
 
         <brls:Tab label="@i18n/playguard/tabs/preferences">

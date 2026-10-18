@@ -5,7 +5,10 @@
 #include <cstdint>
 #include <yoga/Yoga.h>
 
+#include "ui/cadran_kit.hpp"
 #include "view/cadran_icon.hpp"
+
+namespace kit = cadran::kit;
 
 namespace
 {
@@ -298,6 +301,11 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
 {
     if (!this->box) return;
     brls::Theme theme = brls::Application::getTheme();
+    // Marks the column as dressed (the screens' skin leaves it alone).
+    auto* mark = new brls::Box();
+    mark->setId("cadran_list");
+    mark->setVisibility(brls::Visibility::GONE);
+    this->box->addView(mark);
     const auto icon_of = [this, &icons](brls::View* cell) -> const char* {
         for (const auto& [id, icon] : icons)
             if (this->tab->getView(id) == cell) return icon;
@@ -400,6 +408,10 @@ void cadran::List::sync()
     brls::Theme theme = brls::Application::getTheme();
     const NVGcolor neutral = theme["brls/list/listItem_value_color"];
     for (brls::DetailCell* cell : this->readings) {
+        // A reading that also opens something: the tile is the way in, no "›".
+        const std::string value = cell->detail->getFullText();
+        const std::string bare = kit::without_chevron(value);
+        if (bare != value) cell->detail->setText(bare);
         const NVGcolor c = cell->detail->getTextColor();
         if (c.r == neutral.r && c.g == neutral.g && c.b == neutral.b && c.a == neutral.a)
             cell->detail->setTextColor(theme["cadran/text"]);

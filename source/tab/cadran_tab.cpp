@@ -305,7 +305,7 @@ void skin_screen_of(brls::View* focus)
     if (!frame || frame->getView("main_tabs") || frame->getView("cadran_mark")) return;
     if (!frame->getView("brls/applet_frame/header")) return;
     cadran::style_header(frame, nullptr, "", false, false);
-    cadran::List(frame, true).apply({});
+    if (!frame->getView("cadran_list")) cadran::List(frame, true).apply({});   // a Cadran screen dresses itself
 }
 }   // namespace
 

@@ -376,7 +376,8 @@ void register_views()
     brls::Application::registerXMLView("CadranPlayTimerTab", CadranPlayTimerTab::create);
     brls::Application::registerXMLView("CadranActivityTab", CadranActivityTab::create);
     brls::Application::registerXMLView("CadranWeekView",  CadranWeekView::create);
-    brls::Application::registerXMLView("CadranClockTab",  CadranClockTab::create);
+    brls::Application::registerXMLView("CadranConsoleTab", CadranConsoleTab::create);
+    brls::Application::registerXMLView("CadranHistoryTab", CadranHistoryTab::create);
     brls::Application::registerXMLView("CadranSecurityTab", CadranSecurityTab::create);
     brls::Application::registerXMLView("CadranPreferencesTab", CadranPreferencesTab::create);
     brls::Application::registerXMLView("CadranAboutTab",  CadranAboutTab::create);

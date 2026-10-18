@@ -2,64 +2,38 @@
 #include "tab/cadran_lists.hpp"
 
 #include <algorithm>
-#include <cstdlib>
-#include <fmt/format.h>
 
 #include "app.hpp"
 #include "tab/cadran_tab.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
-#include "view/cadran_icon.hpp"
 
 using namespace brls::literals;
 
 namespace
 {
-brls::Label* label(const std::string& text, float size, NVGcolor color)
-{
-    auto* l = new brls::Label();
-    l->setText(text);
-    l->setFontSize(size);
-    l->setTextColor(color);
-    return l;
-}
+namespace kit = cadran::kit;
 
-CadranIcon* icon(const char* name, float size, NVGcolor color)
-{
-    auto* view = new CadranIcon();
-    view->setIcon(name);
-    view->setWidth(size);
-    view->setHeight(size);
-    view->setColor(color);
-    return view;
-}
-
-// A card of the heroes (not a list: no rows), `grow` shares a row.
+// A card of the tops (not a list: no rows), `grow` shares a row.
 brls::Box* hero_card(bool grow)
 {
-    brls::Theme theme = brls::Application::getTheme();
-    auto* card = new brls::Box(brls::Axis::COLUMN);
-    card->setBackgroundColor(theme["cadran/surf"]);
-    card->setBorderColor(theme["cadran/line"]);
-    card->setBorderThickness(1);
+    brls::Box* card = kit::card(false, grow);
     card->setCornerRadius(22);
     card->setPadding(18, 22, 18, 22);
-    if (grow) {
-        card->setGrow(1.0f);
-        card->setWidth(0);
-    }
     return card;
 }
 
-// "2026-10-08" -> "8 octobre 2026" (the text itself when it is not a date).
-std::string long_date(const std::string& date)
+// A kicker: an icon and a title in capitals.
+brls::Box* kicker(const char* icon, const std::string& title)
 {
-    static const char* months[] = { "janvier", "février", "mars", "avril", "mai", "juin", "juillet",
-                                    "août", "septembre", "octobre", "novembre", "décembre" };
-    if (date.size() != 10 || date[4] != '-' || date[7] != '-') return date;
-    const int month = std::atoi(date.substr(5, 2).c_str());
-    const int day = std::atoi(date.substr(8, 2).c_str());
-    if (month < 1 || month > 12 || day < 1) return date;
-    return fmt::format("{} {} {}", day, months[month - 1], date.substr(0, 4));
+    auto* head = new brls::Box(brls::Axis::ROW);
+    head->setAlignItems(brls::AlignItems::CENTER);
+    head->addView(kit::icon(icon, 18, "cadran/text3"));
+    brls::Label* text = kit::label(cadran::upper(title), 14, "cadran/text3");
+    text->setSingleLine(true);
+    text->setMarginLeft(8);
+    head->addView(text);
+    return head;
 }
 
 // "2026-10-08 16:00:00" -> { "2026-10-08", "16:00:00" }; else { "", text }.
@@ -78,12 +52,12 @@ std::string detail_of(brls::View* tab, const char* id)
 }   // namespace
 
 // ---------------------------------------------------------------------------
-// Clock: both clocks large, the network one amber while it is inaccurate.
+// The network clock: both clocks large, the network one amber while it is
+// inaccurate. A screen of its own (ClockTab::open_screen).
 
 CadranClockTab::CadranClockTab()
-    : list(this)
+    : list(this, true)
 {
-    brls::Theme theme = brls::Application::getTheme();
     if (brls::Box* column = this->list.content()) {
         auto* row = new brls::Box(brls::Axis::ROW);
         row->setAlignItems(brls::AlignItems::STRETCH);
@@ -91,30 +65,18 @@ CadranClockTab::CadranClockTab()
 
         brls::Box* console = hero_card(true);
         console->setMarginRight(12);
-        auto* head = new brls::Box(brls::Axis::ROW);
-        head->setAlignItems(brls::AlignItems::CENTER);
-        head->addView(icon("gamepad", 18, theme["cadran/text3"]));
-        brls::Label* kicker = label("CONSOLE", 14, theme["cadran/text3"]);
-        kicker->setMarginLeft(8);
-        head->addView(kicker);
-        console->addView(head);
+        console->addView(kicker("gamepad", "playguard/cadran/clock/console"_i18n));
         this->user_time = new CadranDigits();
         this->user_time->setFontSize(46);
         this->user_time->setMarginTop(10);
         console->addView(this->user_time);
-        this->user_date = label("", 15.5f, theme["cadran/text2"]);
+        this->user_date = kit::label("", 15.5f, "cadran/text2");
         this->user_date->setMarginTop(4);
         console->addView(this->user_date);
         row->addView(console);
 
         this->network_card = hero_card(true);
-        auto* nhead = new brls::Box(brls::Axis::ROW);
-        nhead->setAlignItems(brls::AlignItems::CENTER);
-        nhead->addView(icon("globe", 18, theme["cadran/text3"]));
-        brls::Label* nkicker = label("RÉSEAU · UTILISÉE PAR LE MINUTEUR", 14, theme["cadran/text3"]);
-        nkicker->setMarginLeft(8);
-        nhead->addView(nkicker);
-        this->network_card->addView(nhead);
+        this->network_card->addView(kicker("globe", "playguard/cadran/clock/network"_i18n));
         this->network_time = new CadranDigits();
         this->network_time->setFontSize(46);
         this->network_time->setMarginTop(10);
@@ -122,13 +84,13 @@ CadranClockTab::CadranClockTab()
         auto* state = new brls::Box(brls::Axis::ROW);
         state->setAlignItems(brls::AlignItems::CENTER);
         state->setMarginTop(4);
-        this->network_dot = new brls::Rectangle(theme["cadran/teal_fill"]);
+        this->network_dot = new brls::Rectangle(brls::Application::getTheme()["cadran/teal_fill"]);
         this->network_dot->setWidth(9);
         this->network_dot->setHeight(9);
         this->network_dot->setCornerRadius(4.5f);
         this->network_dot->setMarginRight(8);
         state->addView(this->network_dot);
-        this->network_state = label("", 15.5f, theme["cadran/teal"]);
+        this->network_state = kit::label("", 15.5f, "cadran/teal");
         state->addView(this->network_state);
         this->network_card->addView(state);
         row->addView(this->network_card);
@@ -138,11 +100,11 @@ CadranClockTab::CadranClockTab()
         const auto& lines = column->getChildren();
         const auto at = std::find(lines.begin(), lines.end(), first);
         column->addView(row, at == lines.end() ? 0 : (size_t)(at - lines.begin()));
-        for (const char* id : { "ck_user", "ck_network", "ck_accuracy" })
-            this->getView(id)->setVisibility(brls::Visibility::GONE);
+        this->list.park({ "ck_user", "ck_network", "ck_accuracy" });
     }
     this->list.apply({ { "ck_auto", "refresh" }, { "ck_zone", "pin" }, { "ck_region", "globe" }, { "ck_server", "server" },
-                       { "ck_custom", "pencil" }, { "ck_measure", "timer" }, { "ck_apply", "check" }, { "ck_copy", "today" } });
+                       { "ck_custom", "pencil" }, { "ck_measure", "timer" }, { "ck_apply", "check" }, { "ck_copy", "today" },
+                       { "ck_check_at_start", "bolt" } });
 }
 
 void CadranClockTab::refresh()
@@ -154,40 +116,37 @@ void CadranClockTab::refresh()
     const auto user = split_time(detail_of(this, "ck_user"));
     const auto network = split_time(detail_of(this, "ck_network"));
     this->user_time->setText(user.second);
-    this->user_date->setText(long_date(user.first));
+    this->user_date->setText(user.first.empty() ? "" : kit::long_date(user.first));
     this->network_time->setText(network.second);
 
     const std::string accuracy = detail_of(this, "ck_accuracy");
     const bool known = accuracy == "playguard/common/yes"_i18n || accuracy == "playguard/common/no"_i18n;
     const bool bad = accuracy == "playguard/common/no"_i18n;
-    std::string state = !known ? accuracy : bad ? "imprécise · à régler ci-dessous" : "précise";
-    if (known && !network.first.empty() && network.first != user.first) state += " · " + long_date(network.first);
+    std::string state = !known ? accuracy : bad ? "playguard/cadran/clock/inaccurate"_i18n : "playguard/cadran/clock/accurate"_i18n;
+    if (known && !network.first.empty() && network.first != user.first) state += " · " + kit::long_date(network.first);
     this->network_state->setText(state);
     this->network_state->setTextColor(!known ? theme["cadran/text3"] : bad ? theme["cadran/amber"] : theme["cadran/teal"]);
     this->network_dot->setColor(!known ? theme["cadran/text3"] : bad ? theme["cadran/amber_fill"] : theme["cadran/teal_fill"]);
     this->network_time->setTextColor(bad ? theme["cadran/amber"] : theme["cadran/text"]);
     this->network_card->setBackgroundColor(bad ? theme["cadran/amber_surf"] : theme["cadran/surf"]);
     this->network_card->setBorderColor(bad ? theme["cadran/amber_line"] : theme["cadran/line"]);
-    if (!known) cadran::set_pill("");
-    else if (bad) cadran::set_pill("Horloge réseau imprécise", "alert", true);
-    else cadran::set_pill("Horloge réseau précise", "globe");
 }
 
 brls::View* CadranClockTab::create() { return new CadranClockTab(); }
 
 // ---------------------------------------------------------------------------
-// Security: the three states as tiles, the deletion in a coral card.
+// PIN: the three states as tiles, the deletion in a coral card.
 
 CadranSecurityTab::CadranSecurityTab()
     : list(this)
 {
     this->list.tiles({ { "sc_pin", "key" }, { "sc_restrictions", "shield" }, { "sc_temp", "unlock" } }, true);
-    this->list.apply({ { "sc_set_pin", "key" }, { "sc_pin_lock", "lock" }, { "sc_show_pin", "eye" },
-                       { "sc_unlock", "unlock" }, { "sc_relock", "lock" }, { "sc_console_lock", "gamepad" },
-                       { "pr_active", "phone" }, { "pr_updated", "refresh" }, { "pr_decode", "code" },
-                       { "pr_unlink", "stop" }, { "sc_delete", "trash" } });
-    brls::Theme theme = brls::Application::getTheme();
-    if (cadran::Card* danger = this->list.card_of("sc_delete")) danger->setAccent(theme["cadran/coral_line"]);
+    this->list.apply({ { "sc_set_pin", "key" }, { "sc_pin_lock", "lock" }, { "sc_pin_ask_again", "timer" },
+                       { "sc_show_pin", "eye" }, { "sc_unlock", "unlock" }, { "sc_relock", "lock" },
+                       { "sc_auto_relock", "refresh" }, { "sc_console_lock", "gamepad" }, { "pr_active", "phone" },
+                       { "pr_updated", "refresh" }, { "pr_decode", "code" }, { "pr_unlink", "stop" }, { "sc_delete", "trash" } });
+    if (cadran::Card* danger = this->list.card_of("sc_delete"))
+        danger->setAccent(brls::Application::getTheme()["cadran/coral_line"]);
 }
 
 void CadranSecurityTab::refresh()
@@ -195,24 +154,64 @@ void CadranSecurityTab::refresh()
     SecurityTab::refresh();
     this->list.sync();
     const std::string pin = detail_of(this, "sc_pin");
-    const bool unlocked = detail_of(this, "sc_temp") == "playguard/common/yes"_i18n;
-    if (unlocked) cadran::set_pill("Déverrouillé temporairement", "unlock", true);
-    else if (pin == "playguard/dashboard/pin_set"_i18n) cadran::set_pill("PIN défini", "key");
-    else if (pin == "playguard/common/not_set"_i18n) cadran::set_pill("Pas de code PIN", "key", true);
+    if (detail_of(this, "sc_temp") == "playguard/common/yes"_i18n) cadran::set_pill("playguard/cadran/pill/unlocked"_i18n, "unlock", true);
+    else if (pin == "playguard/dashboard/pin_set"_i18n) cadran::set_pill("playguard/cadran/pill/pin_set"_i18n, "key");
+    else if (pin == "playguard/common/not_set"_i18n) cadran::set_pill("playguard/cadran/pill/pin_none"_i18n, "key", true);
     else cadran::set_pill("");
 }
 
 brls::View* CadranSecurityTab::create() { return new CadranSecurityTab(); }
 
 // ---------------------------------------------------------------------------
-// Preferences: language, theme and start screen as tiles, switches below.
+// Console: the firmware, Atmosphère and compatibility as tiles.
+
+CadranConsoleTab::CadranConsoleTab()
+    : list(this)
+{
+    this->list.tiles({ { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_compat", "check" } }, true);
+    this->list.apply({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_hekate", "flag" }, { "cn_storage", "folder" },
+                       { "cn_blank", "code" }, { "cn_serial", "tag" }, { "cn_patches", "shield" } });
+}
+
+void CadranConsoleTab::refresh()
+{
+    ConsoleTab::refresh();
+    this->list.sync();
+    cadran::set_pill("");
+}
+
+brls::View* CadranConsoleTab::create() { return new CadranConsoleTab(); }
+
+// ---------------------------------------------------------------------------
+// History: the backup's two actions as tiles.
+
+CadranHistoryTab::CadranHistoryTab()
+    : list(this)
+{
+    this->list.tiles({ { "hs_backup_save", "save" }, { "hs_backup_restore", "restore" } }, false);
+    this->list.apply({ { "hs_history", "history" }, { "hs_backup_keep", "folder" } });
+}
+
+void CadranHistoryTab::refresh()
+{
+    HistoryTab::refresh();
+    this->list.sync();
+    cadran::set_pill("");
+}
+
+brls::View* CadranHistoryTab::create() { return new CadranHistoryTab(); }
+
+// ---------------------------------------------------------------------------
+// Preferences: the language, the theme, the appearance and the start screen
+// as tiles, the switches below.
 
 CadranPreferencesTab::CadranPreferencesTab()
     : list(this)
 {
-    this->list.tiles({ { "pf_language", "language" }, { "pf_theme", "contrast" }, { "pf_start_tab", "home" } }, false);
-    this->list.apply({ { "pf_auto_relock", "lock" }, { "pf_extra_amounts", "plus" }, { "pf_extra_auto", "refresh" },
-                       { "pf_advanced", "settings" }, { "pf_intro", "sparkle" }, { "pf_clock_check", "timer" },
+    this->list.tiles({ { "pf_language", "language" }, { "pf_theme", "contrast" }, { "pf_appearance", "sparkle" },
+                       { "pf_start_tab", "home" } }, false);
+    this->list.apply({ { "pf_intro", "bolt" }, { "pf_notices_system", "chip" }, { "pf_notices_summary", "calendar" },
+                       { "pf_notices_reminders", "bell" }, { "pf_notices_ack_remind", "alert" },
                        { "pf_support_reminder", "heart" } });
 }
 
@@ -231,7 +230,6 @@ brls::View* CadranPreferencesTab::create() { return new CadranPreferencesTab(); 
 CadranAboutTab::CadranAboutTab()
     : list(this)
 {
-    brls::Theme theme = brls::Application::getTheme();
     if (brls::Box* column = this->list.content()) {
         brls::Box* hero = hero_card(false);
         hero->setAxis(brls::Axis::ROW);
@@ -244,22 +242,23 @@ CadranAboutTab::CadranAboutTab()
         badge->setHeight(84);
         badge->setCornerRadius(24);
         badge->setShrink(0);
-        badge->setBackgroundColor(theme["cadran/teal_soft"]);
+        badge->setBackgroundColor(brls::Application::getTheme()["cadran/teal_soft"]);
         badge->setAlignItems(brls::AlignItems::CENTER);
         badge->setJustifyContent(brls::JustifyContent::CENTER);
         badge->setMarginRight(22);
-        badge->addView(icon("mark", 52, theme["cadran/teal"]));
+        badge->addView(kit::icon("mark", 52, "cadran/teal"));
         hero->addView(badge);
         auto* text = new brls::Box(brls::Axis::COLUMN);
         text->setGrow(1.0f);
+        text->setWidth(0);
         auto* name = new CadranDigits();
         name->setText("PlayGuard");
         name->setFontSize(36);
         text->addView(name);
-        this->version_line = label("", 16, theme["cadran/text2"]);
+        this->version_line = kit::label("", 16, "cadran/text2");
         this->version_line->setMarginTop(4);
         text->addView(this->version_line);
-        brls::Label* tagline = label("Contrôle parental pour Nintendo Switch · logiciel libre (GPLv3)", 15, theme["cadran/text3"]);
+        brls::Label* tagline = kit::label("playguard/cadran/about/tagline"_i18n, 15, "cadran/text3");
         tagline->setMarginTop(6);
         text->addView(tagline);
         hero->addView(text);
@@ -268,8 +267,9 @@ CadranAboutTab::CadranAboutTab()
     if (cadran::Card* notes = this->list.wrap("ab_changelog")) notes->setMarginBottom(10);
     this->list.apply({ { "ab_version", "info" }, { "ab_mode", "gamepad" }, { "ab_data", "folder" },
                        { "ab_update", "download" }, { "ab_update_daily", "calendar" }, { "ab_update_via", "server" },
-                       { "ab_changelog_full", "list" }, { "ab_author", "user" }, { "ab_upstream", "flag" },
-                       { "ab_fixes", "check" }, { "ab_ui", "contrast" }, { "ab_license", "file" }, { "ab_source", "code" } });
+                       { "ab_changelog_full", "list" }, { "ab_notes", "file" }, { "ab_help", "tools" },
+                       { "ab_author", "user" }, { "ab_upstream", "flag" }, { "ab_fixes", "check" }, { "ab_ui", "contrast" },
+                       { "ab_license", "file" }, { "ab_source", "code" } });
 }
 
 void CadranAboutTab::refresh()
@@ -277,8 +277,8 @@ void CadranAboutTab::refresh()
     AboutTab::refresh();
     this->list.sync();
     if (this->version_line) {
-        const std::string commit = app::commit().empty() ? "" : " · " + app::commit();
-        this->version_line->setText("Version " + app::version() + commit);
+        const std::string version = app::commit().empty() ? app::version() : app::version() + " · " + app::commit();
+        this->version_line->setText(brls::getStr("playguard/cadran/about/version", version));
     }
     cadran::set_pill("");
 }

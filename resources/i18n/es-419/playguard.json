@@ -1509,7 +1509,9 @@
             "timer_on": "Play timer on",
             "timer_off": "Countdown paused",
             "timer_none": "No play-time limit",
-            "level": "Level · {}"
+            "level": "Level · {}",
+            "pin_set": "PIN set",
+            "pin_none": "No PIN"
         },
         "week": {
             "no_limit": "no limit",
@@ -1556,6 +1558,16 @@
             "comm_allowed": "Communication · allowed",
             "comm_unknown": "Communication · —",
             "none": "software of any rating, social media and communication allowed"
+        },
+        "clock": {
+            "console": "Console",
+            "network": "Network · used by the play timer",
+            "accurate": "accurate",
+            "inaccurate": "inaccurate · set it below"
+        },
+        "about": {
+            "tagline": "Parental controls for Nintendo Switch · free software (GPLv3)",
+            "version": "Version {}"
         }
     }
 }

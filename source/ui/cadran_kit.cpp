@@ -2,6 +2,7 @@
 #include "ui/cadran_kit.hpp"
 
 #include <cstdlib>
+#include <ctime>
 #include <fmt/format.h>
 #include <yoga/Yoga.h>
 
@@ -141,6 +142,17 @@ const char* dot_of(NVGcolor c)
     return "cadran/text3";
 }
 
+namespace
+{
+// {0} the day's name, {1} the same in lower case, {2} the day, {3} the month.
+std::string date_text(int weekday, int day, int month)
+{
+    return brls::getStr("playguard/cadran/date", brls::getStr(fmt::format("playguard/days/{}", weekday)),
+                        brls::getStr(fmt::format("playguard/days_lower/{}", weekday)), day,
+                        brls::getStr(fmt::format("playguard/cadran/months/{}", month)));
+}
+}   // namespace
+
 std::string long_date()
 {
     const std::string date = ui::today_date();   // "2026-10-08"
@@ -150,11 +162,19 @@ std::string long_date()
         day = std::atoi(date.substr(8, 2).c_str());
     }
     if (month < 1 || month > 12 || day < 1) return date;
-    // {0} the day's name, {1} the same in lower case, {2} the day, {3} the month.
-    const int wd = ui::today_weekday();
-    return brls::getStr("playguard/cadran/date", brls::getStr(fmt::format("playguard/days/{}", wd)),
-                        brls::getStr(fmt::format("playguard/days_lower/{}", wd)), day,
-                        brls::getStr(fmt::format("playguard/cadran/months/{}", month)));
+    return date_text(ui::today_weekday(), day, month);
+}
+
+std::string long_date(const std::string& ymd)
+{
+    if (ymd.size() != 10 || ymd[4] != '-' || ymd[7] != '-') return ymd;
+    std::tm tm = {};
+    tm.tm_year = std::atoi(ymd.substr(0, 4).c_str()) - 1900;
+    tm.tm_mon = std::atoi(ymd.substr(5, 2).c_str()) - 1;
+    tm.tm_mday = std::atoi(ymd.substr(8, 2).c_str());
+    tm.tm_hour = 12;   // clear of any change of hour
+    if (tm.tm_mon < 0 || tm.tm_mon > 11 || tm.tm_mday < 1 || std::mktime(&tm) == (std::time_t)-1) return ymd;
+    return date_text(tm.tm_wday, tm.tm_mday, tm.tm_mon + 1);
 }
 
 }   // namespace cadran::kit
