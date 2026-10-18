@@ -2,75 +2,65 @@
 #include "tab/cadran_activity_tab.hpp"
 
 #include <algorithm>
-#include <cstdlib>
 #include <fmt/format.h>
 
+#include "action/game_icons.hpp"
 #include "action/play_data.hpp"
 #include "activity/game_activity.hpp"
-#include "tab/activity_tab.hpp"
-#include "tab/cadran_list.hpp"
 #include "tab/cadran_tab.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
-#include "util/config.hpp"
 
 using namespace brls::literals;
 
 namespace
 {
-// The icons read so far (the bytes as the control data holds them), kept for the run.
-std::map<uint64_t, std::vector<unsigned char>> s_icons;
-std::set<uint64_t> s_no_icon;
-bool s_icons_busy = false;
-
 constexpr size_t CARDS = 4;
 constexpr float  WEEK_BAR_MAX = 56.0f;
 constexpr float  SPARK_MAX = 40.0f;
+// The accounts' avatars, in turn (no picture of theirs is read).
 const NVGcolor AVATARS[] = { nvgRGB(0x7C, 0x6C, 0xF2), nvgRGB(0xFF, 0xB5, 0x47), nvgRGB(0x4F, 0xA3, 0xFF), nvgRGB(0xE9, 0x6A, 0xA8) };
 
-brls::Label* label(const std::string& text, float size, NVGcolor color)
+std::string game_name(const GameStat& g)
 {
-    auto* l = new brls::Label();
-    l->setText(text);
-    l->setFontSize(size);
-    l->setTextColor(color);
-    return l;
+    if (g.name[0]) return g.name;
+    return brls::getStr("playguard/activity/deleted_game", fmt::format("{:016X}", (unsigned long long)g.app_id));
 }
 
-brls::Box* chip(float height, float padding)
+// Seven bars, oldest first, today last (teal); `values[k]`: k days ago.
+template <typename T>
+void show_bars(const std::vector<brls::View*>& bars, const T* values, float most)
 {
-    auto* b = new brls::Box(brls::Axis::ROW);
-    b->setAlignItems(brls::AlignItems::CENTER);
-    b->setHeight(height);
-    b->setPaddingLeft(padding);
-    b->setPaddingRight(padding);
-    b->setCornerRadius(height / 2.0f);
-    b->setFocusable(true);
-    b->setHideHighlightBackground(true);   // the focus ring alone: a selected chip keeps its fill
-    b->setMarginRight(10);
-    return b;
+    brls::Theme theme = brls::Application::getTheme();
+    uint64_t top = 0;
+    for (int k = 0; k < 7; k++) top = std::max<uint64_t>(top, values[k]);
+    for (size_t i = 0; i < bars.size() && i < 7; i++) {
+        const uint64_t v = values[6 - i];
+        bars[i]->setHeight(v && top ? std::max(4.0f, most * (float)v / (float)top) : 3.0f);
+        bars[i]->setBackgroundColor(i == 6 ? theme["cadran/teal_fill"] : theme["cadran/bar"]);
+    }
 }
-
 }   // namespace
 
 CadranActivityTab::CadranActivityTab()
-    : TabBase("xml/tab/cadran_activity.xml")
+    : list(this)
 {
+    namespace kit = cadran::kit;
     brls::Theme theme = brls::Application::getTheme();
-    // The game cards, built once; filled by refresh().
+    brls::Box* column = this->list.content();
+    column->addView(brls::View::createFromXMLResource("view/cadran_activity.xml"), 0);
+    this->list.park({ "ac_account", "ac_today", "ac_week", "ac_total", "ac_period", "ac_export" });
+    this->list.apply({ { "ac_account_default", "user" }, { "ac_games", "list" } });
+
+    // The game cards, built once, two rows of two; filled by show_hero().
+    brls::Box* row = nullptr;
     for (size_t i = 0; i < CARDS; i++) {
         Card c;
-        c.box = new brls::Box(brls::Axis::ROW);
+        c.box = kit::card(true, true);
+        c.box->setAxis(brls::Axis::ROW);
         c.box->setAlignItems(brls::AlignItems::CENTER);
-        c.box->setGrow(1.0f);
-        c.box->setWidth(0);
         c.box->setPadding(12, 18, 12, 12);
-        c.box->setCornerRadius(20);
-        c.box->setBackgroundColor(theme["cadran/surf"]);
-        c.box->setBorderColor(theme["cadran/line"]);
-        c.box->setBorderThickness(1);
-        c.box->setFocusable(true);
-        c.box->setHideHighlightBackground(true);
         c.box->setMarginBottom(12);
         if (i % 2 == 0) c.box->setMarginRight(12);
         c.icon_fallback = new brls::Box();
@@ -91,7 +81,7 @@ CadranActivityTab::CadranActivityTab()
         auto* text = new brls::Box(brls::Axis::COLUMN);
         text->setGrow(1.0f);
         text->setWidth(0);
-        c.name = label("", 19, theme["cadran/text"]);
+        c.name = kit::label("", 19);
         c.name->setSingleLine(true);
         text->addView(c.name);
         auto* line = new brls::Box(brls::Axis::ROW);
@@ -101,7 +91,7 @@ CadranActivityTab::CadranActivityTab()
         c.today->setFontSize(14);
         c.today->setMarginRight(6);
         line->addView(c.today);
-        c.rest = label("", 14, theme["cadran/text2"]);
+        c.rest = kit::label("", 14, "cadran/text2");
         c.rest->setSingleLine(true);
         line->addView(c.rest);
         text->addView(line);
@@ -119,88 +109,67 @@ CadranActivityTab::CadranActivityTab()
             spark->addView(c.bars[k]);
         }
         c.box->addView(spark);
-        this->cards.push_back(c);
-    }
-    // Two rows of two.
-    auto* row1 = new brls::Box(brls::Axis::ROW);
-    auto* row2 = new brls::Box(brls::Axis::ROW);
-    row1->setAlignItems(brls::AlignItems::STRETCH);
-    row2->setAlignItems(brls::AlignItems::STRETCH);
-    row1->addView(this->cards[0].box);
-    row1->addView(this->cards[1].box);
-    row2->addView(this->cards[2].box);
-    row2->addView(this->cards[3].box);
-    games_grid->addView(row1);
-    games_grid->addView(row2);
-    for (size_t i = 0; i < CARDS; i++) {
-        this->cards[i].box->registerAction("Détail du jeu", brls::BUTTON_A, [this, i](brls::View*) {
-            const auto data = this->stats();
+        if (i % 2 == 0) {
+            row = new brls::Box(brls::Axis::ROW);
+            row->setAlignItems(brls::AlignItems::STRETCH);
+            games_grid->addView(row);
+        }
+        row->addView(c.box);
+        // The game's own screen, as All games opens it.
+        c.box->registerClickAction([this, i](brls::View*) {
+            const auto data = shown_data();
             if (!data) return true;
             for (uint32_t g = 0; g < data->count; g++) {
                 if (data->games[g].app_id != this->cards[i].app_id) continue;
-                std::vector<unsigned char> icon;
-                const auto it = s_icons.find(data->games[g].app_id);
-                if (it != s_icons.end()) icon = it->second;
-                // Every account's figures when no account is chosen (main's GameActivity says so).
-                brls::Application::pushActivity(new GameActivity(data->games[g], data, std::move(icon), this->account < 0));
+                std::vector<unsigned char> bytes;
+                if (const auto* b = game_icons::bytes(data->games[g].app_id)) bytes = *b;
+                brls::Application::pushActivity(new GameActivity(data->games[g], data, std::move(bytes), shown_account() < 0));
                 break;
             }
             return true;
         });
+        this->cards.push_back(c);
     }
 
-    // The period and the export: the Activity tab's own (same setting, same files).
-    this->period = std::clamp(config::get().activity_period, 0, 2);
+    // The period and the export: the tab's own lines.
     period_chip->registerClickAction([this](brls::View*) {
-        std::vector<std::string> labels;
-        for (int p = 0; p < 3; p++) labels.push_back(brls::getStr(fmt::format("playguard/activity/periods/{}", p)));
-        ui::pick("playguard/activity/period"_i18n, labels, this->period, [this](int index) {
-            this->period = index;
-            config::get().activity_period = index;
-            ui::save_config();
-            this->refresh();
-        });
+        kit::press(this->getView("ac_period"));
         return true;
     });
     export_chip->registerClickAction([this](brls::View*) {
-        const auto& accounts = play_data::accounts();
-        const PlayAccount* acc = this->account >= 0 && this->account < (int)accounts.size() ? &accounts[this->account] : nullptr;
-        ActivityTab::export_stats(this->stats(), this->period, acc);
+        kit::press(this->getView("ac_export"));
         return true;
     });
-
     this->build_chips();
-    this->listener = play_data::listen([this]() {
-        this->refresh();
-        this->apply_icons();
-    });
+    this->show_hero();
 }
 
 CadranActivityTab::~CadranActivityTab()
 {
     *this->alive = false;
-    play_data::unlisten(this->listener);
-}
-
-std::shared_ptr<const PlayStats> CadranActivityTab::stats() const
-{
-    const auto& list = play_data::accounts();
-    const PlayAccount* acc = this->account >= 0 && this->account < (int)list.size() ? &list[this->account] : nullptr;
-    return play_data::latest(play_data::key_of(acc));
 }
 
 void CadranActivityTab::build_chips()
 {
     brls::Theme theme = brls::Application::getTheme();
-    accounts_row->clearViews();
-    this->chips.clear();
-    const auto& list = play_data::accounts();
-    for (int i = -1; i < (int)list.size(); i++) {
-        brls::Box* b = chip(44, 16);
+    const auto& accounts = play_data::accounts();
+    // No account to choose between on a console with one (as the tab's line).
+    if (accounts.size() < 2) return;
+    for (int i = -1; i < (int)accounts.size(); i++) {
+        auto* chip = new brls::Box(brls::Axis::ROW);
+        chip->setAlignItems(brls::AlignItems::CENTER);
+        chip->setHeight(44);
+        chip->setPadding(0, 16, 0, i < 0 ? 16 : 6);
+        chip->setCornerRadius(22);
+        chip->setFocusable(true);
+        chip->setHideHighlightBackground(true);   // the ring alone: a chosen chip keeps its fill
+        chip->setHighlightCornerRadius(22);
+        chip->setMarginRight(10);
+        chip->setShrink(0);
         if (i < 0) {
-            b->addView(label("Tous les comptes", 16, theme["cadran/text"]));
+            chip->addView(cadran::kit::label("playguard/activity/account_all"_i18n, 16));
         } else {
-            b->setPaddingLeft(6);
+            const std::string nick = accounts[i].nickname[0] ? std::string(accounts[i].nickname) : "?";
             auto* avatar = new brls::Box(brls::Axis::ROW);
             avatar->setWidth(32);
             avatar->setHeight(32);
@@ -211,96 +180,112 @@ void CadranActivityTab::build_chips()
             avatar->setMarginRight(10);
             auto* initial = new CadranDigits();
             initial->setFontSize(15);
-            const std::string nick = list[i].nickname[0] ? std::string(list[i].nickname) : "?";
-            initial->setText(nick.substr(0, 1));
+            // The first character, whole (a nickname is UTF-8).
+            size_t len = 1;
+            while (len < nick.size() && (nick[len] & 0xC0) == 0x80) len++;
+            initial->setText(nick.substr(0, len));
             initial->setTextColor(i % 4 == 1 ? theme["cadran/navy"] : nvgRGB(0xFF, 0xFF, 0xFF));
             avatar->addView(initial);
-            b->addView(avatar);
-            b->addView(label(nick, 16, theme["cadran/text"]));
+            chip->addView(avatar);
+            brls::Label* name = cadran::kit::label(nick, 16);
+            name->setSingleLine(true);
+            chip->addView(name);
         }
-        b->registerClickAction([this, i](brls::View*) {
-            this->account = i;
-            const auto& accounts = play_data::accounts();
-            const PlayAccount* acc = i >= 0 && i < (int)accounts.size() ? &accounts[i] : nullptr;
-            if (!play_data::fresh(play_data::key_of(acc), std::chrono::minutes(5)) && !play_data::busy(play_data::key_of(acc)))
-                play_data::fetch(acc);
-            this->refresh();
+        chip->registerClickAction([this, i](brls::View*) {
+            this->show_account(i);
             return true;
         });
-        accounts_row->addView(b);
-        this->chips.push_back(b);
+        accounts_row->addView(chip);
+        this->chips.push_back(chip);
     }
 }
 
 void CadranActivityTab::refresh()
 {
-    brls::Theme theme = brls::Application::getTheme();
+    ActivityTab::refresh();
+    this->list.sync();
     cadran::set_pill("");
+}
+
+void CadranActivityTab::rebuild()
+{
+    ActivityTab::rebuild();
+    this->show_hero();
+}
+
+void CadranActivityTab::show_hero()
+{
+    brls::Theme theme = brls::Application::getTheme();
+    const int who = shown_account();
     for (size_t i = 0; i < this->chips.size(); i++) {
-        const bool on = (int)i - 1 == this->account;
+        const bool on = (int)i - 1 == who;
         this->chips[i]->setBackgroundColor(on ? theme["cadran/teal_fill"] : theme["cadran/surf"]);
         this->chips[i]->setBorderColor(on ? theme["cadran/none"] : theme["cadran/line"]);
         this->chips[i]->setBorderThickness(on ? 0 : 1);
         for (brls::View* v : this->chips[i]->getChildren())
             if (auto* l = dynamic_cast<brls::Label*>(v)) l->setTextColor(on ? theme["cadran/navy"] : theme["cadran/text"]);
     }
+    const int p = this->period;
+    const std::string period_name = brls::getStr(fmt::format("playguard/activity/periods/{}", p));
+    period_label->setText(period_name);
+    games_title->setText(cadran::upper("playguard/activity/section_games"_i18n + " · " + period_name));
 
-    const auto data = this->stats();
-    if (!data || !data->windows_ok) {
-        if (!play_data::busy("") && !data) play_data::fetch(nullptr);
-        today_value->setText("—");
-        week_value->setText("—");
-        total_value->setText("—");
-        today_sub->setText("lecture des données de jeu de la console…");
-        week_sub->setText("");
-        total_sub->setText("");
-        games_note->setText("Lecture des données de jeu de la console…");
+    const auto data = shown_data();
+    if (!data) {
+        // Nothing read for this account yet: the tab's spinner says so.
+        for (CadranDigits* v : { today_value.getView(), week_value.getView(), total_value.getView() }) v->setText("—");
+        for (brls::Label* l : { today_sub.getView(), week_sub.getView(), total_sub.getView() }) l->setText("");
+        games_note->setText("playguard/activity/loading"_i18n);
+        ui::set_visible(games_note, true);
         for (Card& c : this->cards) ui::set_visible(c.box, false);
         return;
     }
     const PlayStats& s = *data;
 
-    // The three figures.
-    PtState pt;
-    pctl_play_timer_query(&pt);
-    const int today = ui::today_weekday();
+    // Today: on today's limit (every account: the limit is the console's).
+    uint64_t today_s = 0;
     int games_today = 0;
-    for (uint32_t g = 0; g < s.count; g++) games_today += s.games[g].today_s > 0;
-    today_value->setText(ui::fmt_play_time(play_data::today_total_s(s)));
-    today_sub->setText((pt.valid && pt.enabled && pt.day_min[today] != PT_DAY_NOLIMIT ? "sur une limite de " + ui::fmt_minutes(pt.day_min[today]) : "pas de limite")
-                       + fmt::format(" · {} jeu{}", games_today, games_today > 1 ? "x" : ""));
+    for (uint32_t g = 0; g < s.count; g++) {
+        today_s += s.games[g].today_s;
+        games_today += s.games[g].today_s > 0;
+    }
+    std::string sub = brls::getStr("playguard/cadran/activity/games", games_today);
+    if (who < 0) {
+        const PtState& pt = this->play_timer();
+        const uint16_t limit = pt.fw_supported && pt.valid ? pt.day_min[ui::today_weekday()] : PT_DAY_NOLIMIT;
+        sub = (limit == PT_DAY_NOLIMIT ? "playguard/cadran/week/no_limit"_i18n
+                                       : brls::getStr("playguard/cadran/activity/on_limit", ui::fmt_minutes(limit))) + " · " + sub;
+    }
+    today_value->setText(s.windows_ok ? ui::fmt_play_time(today_s) : "—");
+    today_sub->setText(s.windows_ok ? sub : "");
+
+    // The last seven days, and their bars.
     const auto week = activity_summary::summarize(s, activity_summary::Week);
-    week_value->setText(ui::fmt_play_time(week.total_s));
-    week_sub->setText(week.days_played >= 0 ? fmt::format("{} jour{} joué{} · {} par jour", week.days_played, week.days_played > 1 ? "s" : "",
-                                                          week.days_played > 1 ? "s" : "", ui::fmt_play_time(week.per_day_s))
-                                            : "");
-    uint64_t day_total[7] = {}, day_max = 0;
+    week_value->setText(s.windows_ok ? ui::fmt_play_time(week.total_s) : "—");
+    week_sub->setText(s.windows_ok && week.days_played >= 0
+                          ? brls::getStr("playguard/activity/summary/days_played_value", week.days_played) + " · " +
+                                brls::getStr("playguard/cadran/activity/per_day", ui::fmt_play_time(week.per_day_s))
+                          : "");
+    uint64_t day_total[7] = {};
     for (uint32_t g = 0; g < s.count; g++)
         for (int k = 0; k < 7; k++) day_total[k] += s.games[g].day_s[k];
-    for (int k = 0; k < 7; k++) day_max = std::max(day_max, day_total[k]);
-    const auto& bars = week_bars->getChildren();
-    for (size_t k = 0; k < bars.size() && k < 7; k++) {
-        const uint64_t v = day_total[6 - k];   // oldest first, today last
-        bars[k]->setHeight(v && day_max ? std::max(4.0f, WEEK_BAR_MAX * (float)v / (float)day_max) : 3.0f);
-        bars[k]->setBackgroundColor(k == 6 ? theme["cadran/teal_fill"] : theme["cadran/bar"]);
-    }
+    show_bars(week_bars->getChildren(), day_total, WEEK_BAR_MAX);
+
+    // All time, and the game most played.
     const auto all = activity_summary::summarize(s, activity_summary::AllTime);
     total_value->setText(all.known ? ui::fmt_play_time(all.total_s) : "—");
-    total_sub->setText(all.top >= 0 && s.games[all.top].name[0] ? std::string("le plus joué · ") + s.games[all.top].name : "");
+    total_sub->setText(all.known && all.top >= 0 ? brls::getStr("playguard/cadran/activity/top", game_name(s.games[all.top])) : "");
 
     // The games of the period, most played first.
-    const int p = this->period;
-    const std::string period_name = brls::getStr(fmt::format("playguard/activity/periods/{}", p));
-    period_label->setText(period_name);
-    games_title->setText("JEUX · " + cadran::upper(period_name));
     std::vector<const GameStat*> games;
     for (uint32_t g = 0; g < s.count; g++)
         if (activity_summary::value(s.games[g], p) > 0) games.push_back(&s.games[g]);
     std::sort(games.begin(), games.end(), [p](const GameStat* a, const GameStat* b) {
         return activity_summary::value(*a, p) > activity_summary::value(*b, p);
     });
-    static const char* none[] = { "Aucun jeu joué aujourd'hui.", "Aucun jeu joué ces 7 derniers jours.", "Aucun jeu joué." };
-    games_note->setText(games.empty() ? none[p] : "");
+    games_note->setText(games.empty() ? brls::getStr(fmt::format("playguard/activity/none/{}", p)) : "");
+    ui::set_visible(games_note, games.empty());
+    std::vector<u64> ids;
     for (size_t i = 0; i < this->cards.size(); i++) {
         Card& c = this->cards[i];
         const bool shown = i < games.size();
@@ -308,60 +293,43 @@ void CadranActivityTab::refresh()
         if (!shown) continue;
         const GameStat& g = *games[i];
         c.app_id = g.app_id;
-        c.name->setText(g.name[0] ? g.name : brls::getStr("playguard/activity/deleted_game", fmt::format("{:016X}", g.app_id)));
-        c.today->setText(g.today_s ? ui::fmt_play_time(g.today_s) : "—");
+        ids.push_back(g.app_id);
+        c.name->setText(game_name(g));
+        c.today->setText(s.windows_ok && g.today_s ? ui::fmt_play_time(g.today_s) : "—");
         c.today->setTextColor(g.today_s ? theme["cadran/text"] : theme["cadran/text3"]);
-        c.rest->setText(p == activity_summary::Today  ? std::string("aujourd'hui")
-                        : p == activity_summary::Week ? "aujourd'hui · " + ui::fmt_play_time(g.week_s) + " sur 7 jours"
-                                                      : "aujourd'hui · " + ui::fmt_play_time(g.total_s) + " en tout");
-        uint32_t gmax = 0;
-        for (int k = 0; k < 7; k++) gmax = std::max(gmax, g.day_s[k]);
-        for (int k = 0; k < 7; k++) {
-            const uint32_t v = g.day_s[6 - k];
-            c.bars[k]->setHeight(v && gmax ? std::max(4.0f, SPARK_MAX * (float)v / (float)gmax) : 3.0f);
-            c.bars[k]->setBackgroundColor(k == 6 ? theme["cadran/teal_fill"] : theme["cadran/bar"]);
-        }
+        c.rest->setText(p == Today ? "playguard/cadran/activity/card_today"_i18n
+                        : p == Week ? brls::getStr("playguard/cadran/activity/card_week", ui::fmt_play_time(g.week_s))
+                                    : brls::getStr("playguard/cadran/activity/card_total", ui::fmt_play_time(g.total_s)));
+        std::vector<brls::View*> bars(std::begin(c.bars), std::end(c.bars));
+        show_bars(bars, g.day_s, SPARK_MAX);
     }
-    this->apply_icons();
-    this->load_icons();
+    // A row with both its cards hidden takes no room.
+    for (brls::View* row : games_grid->getChildren()) {
+        bool any = false;
+        for (brls::View* card : static_cast<brls::Box*>(row)->getChildren()) any = any || card->getVisibility() == brls::Visibility::VISIBLE;
+        row->setVisibility(any ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    }
+    this->show_icons();
+    if (!game_icons::wanted()) return;
+    std::weak_ptr<bool> weak = this->alive;
+    game_icons::load(ids, [this, weak]() {
+        if (!weak.expired()) this->show_icons();
+    });
 }
 
-void CadranActivityTab::apply_icons()
+void CadranActivityTab::show_icons()
 {
     for (Card& c : this->cards) {
-        const auto it = s_icons.find(c.app_id);
-        const bool has = it != s_icons.end() && !it->second.empty();
-        if (has) c.icon->setImageFromMem(it->second.data(), (int)it->second.size());
-        c.icon->setVisibility(has ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
-        c.icon_fallback->setVisibility(has ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
+        bool owned = false;
+        const int texture = c.app_id ? game_icons::texture(c.app_id, owned) : 0;
+        if (texture) {
+            // As GameCell: the flag set once the old one is replaced.
+            c.icon->innerSetImage(texture);
+            c.icon->setFreeTexture(owned);
+        }
+        c.icon->setVisibility(texture ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+        c.icon_fallback->setVisibility(texture ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
     }
-}
-
-void CadranActivityTab::load_icons()
-{
-    if (s_icons_busy) return;
-    auto wanted = std::make_shared<std::vector<PlayIcon>>();
-    for (const Card& c : this->cards)
-        if (c.app_id && !s_icons.count(c.app_id) && !s_no_icon.count(c.app_id)) wanted->push_back(PlayIcon{ c.app_id, nullptr, 0 });
-    if (wanted->empty()) return;
-    s_icons_busy = true;
-    std::weak_ptr<bool> weak = this->alive;
-    brls::async([wanted, weak]() {
-        playstats_icons(wanted->data(), wanted->size());
-        brls::sync([wanted, weak]() {
-            s_icons_busy = false;
-            for (PlayIcon& icon : *wanted) {
-                if (icon.jpeg && icon.size) s_icons[icon.app_id].assign(icon.jpeg, icon.jpeg + icon.size);
-                else s_no_icon.insert(icon.app_id);
-                std::free(icon.jpeg);
-                icon.jpeg = nullptr;
-            }
-            if (auto keep = weak.lock()) {
-                // The tab still exists: show them.
-                TabBase::refresh_shown();
-            }
-        });
-    });
 }
 
 brls::View* CadranActivityTab::create() { return new CadranActivityTab(); }

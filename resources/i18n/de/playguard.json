@@ -1532,6 +1532,16 @@
         },
         "tabs": {
             "today": "Today"
+        },
+        "activity": {
+            "export": "Export",
+            "games": "{} game(s)",
+            "on_limit": "of a {} limit",
+            "per_day": "{} a day",
+            "top": "most played · {}",
+            "card_today": "today",
+            "card_week": "today · {} over 7 days",
+            "card_total": "today · {} in all"
         }
     }
 }

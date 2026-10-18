@@ -1532,6 +1532,16 @@
         },
         "tabs": {
             "today": "Aujourd'hui"
+        },
+        "activity": {
+            "export": "Exporter",
+            "games": "{} jeu(x)",
+            "on_limit": "sur une limite de {}",
+            "per_day": "{} par jour",
+            "top": "le plus joué · {}",
+            "card_today": "aujourd'hui",
+            "card_week": "aujourd'hui · {} sur 7 jours",
+            "card_total": "aujourd'hui · {} en tout"
         }
     }
 }

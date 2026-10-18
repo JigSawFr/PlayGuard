@@ -96,16 +96,7 @@ ActivityTab::ActivityTab()
         std::vector<std::string> labels = { account_label(nullptr) };
         for (const auto& a : list) labels.push_back(account_label(&a));
         ui::pick("playguard/activity/account"_i18n, labels, s_cache.account + 1, [this](int index) {
-            s_cache.account = index - 1;
-            // The next run starts there, when Activity starts on the last one shown.
-            auto& cfg = config::get();
-            const std::string key = play_data::key_of(chosen_account());
-            if (cfg.activity_account_last != key) {
-                cfg.activity_account_last = key;
-                ui::save_config();
-            }
-            this->rebuild();
-            if (!play_data::fresh(play_data::key_of(chosen_account()), MAX_AGE)) this->fetch(false);
+            this->show_account(index - 1);
         });
         return true;
     });
@@ -175,6 +166,30 @@ ActivityTab::ActivityTab()
 ActivityTab::~ActivityTab()
 {
     play_data::unlisten(this->listener);
+}
+
+void ActivityTab::show_account(int index)
+{
+    s_cache.account = index;
+    // The next run starts there, when Activity starts on the last one shown.
+    auto& cfg = config::get();
+    const std::string key = play_data::key_of(chosen_account());
+    if (cfg.activity_account_last != key) {
+        cfg.activity_account_last = key;
+        ui::save_config();
+    }
+    this->rebuild();
+    if (!play_data::fresh(play_data::key_of(chosen_account()), MAX_AGE)) this->fetch(false);
+}
+
+int ActivityTab::shown_account()
+{
+    return chosen_account() ? s_cache.account : -1;
+}
+
+std::shared_ptr<const PlayStats> ActivityTab::shown_data()
+{
+    return shown_stats();
 }
 
 void ActivityTab::refresh()

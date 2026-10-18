@@ -31,29 +31,38 @@ class ActivityTab : public TabBase
 
     // Asks for a format, then writes every game of `data` (most played over
     // `period` first) to the exports folder; `account` says whose figures
-    // they are (nullptr: every account). Also the Cadran prototype's Export.
+    // they are (nullptr: every account).
     static void export_stats(std::shared_ptr<const PlayStats> data, int period, const PlayAccount* account);
 
   protected:
     void refresh() override;
 
-  private:
     enum Period { Today = 0, Week = 1, AllTime = 2 };
     int period = Week;
 
-    // Reads the data again. `shown`: with the spinner, even over a list (Ⓧ);
-    // otherwise only when there is nothing to show yet.
-    void fetch(bool shown);
-    void rebuild();
-    // rebuild()'s sections: the totals and the chart, and the line under All
-    // games.
-    void show_totals(const PlayStats& s, const PlayAccount* who);
-    void show_status(const PlayStats& s, bool empty);
+    // Shows this account (-1: every account), remembered for the next run
+    // when Activity starts on the last one shown; its data read again when
+    // over a minute old.
+    void show_account(int account);
+    // The account shown (-1: every account) and its data (nullptr: not read yet).
+    static int shown_account();
+    static std::shared_ptr<const PlayStats> shown_data();
+    // The screen again from the data at hand (a read arrived, a choice changed).
+    virtual void rebuild();
     // The console's play-timer state for the chart's limit line: read when
     // the tab is made (each time the sidebar reaches it, so after a change on
     // another screen), on Ⓧ and once a minute, not at every rebuild (a pctl
     // session and about ten requests on the UI thread).
     const PtState& play_timer();
+
+  private:
+    // Reads the data again. `shown`: with the spinner, even over a list (Ⓧ);
+    // otherwise only when there is nothing to show yet.
+    void fetch(bool shown);
+    // rebuild()'s sections: the totals and the chart, and the line under All
+    // games.
+    void show_totals(const PlayStats& s, const PlayAccount* who);
+    void show_status(const PlayStats& s, bool empty);
     // The summary over the period.
     void show_summary(const std::shared_ptr<const PlayStats>& data);
     void export_to_sd() const;
