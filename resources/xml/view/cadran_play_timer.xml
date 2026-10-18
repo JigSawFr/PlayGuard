@@ -72,8 +72,8 @@
     <brls:Box axis="row" alignItems="center" marginBottom="12" height="44">
         <brls:Rectangle id="cpt_pending_dot" width="9" height="9" cornerRadius="4.5" color="@theme/cadran/amber_fill" marginRight="8"/>
         <brls:Label id="cpt_pending" text="" fontSize="15" textColor="@theme/cadran/text3" grow="1.0" width="0" singleLine="true"/>
-        <brls:Button id="cpt_discard" style="bordered" text="@i18n/playguard/cadran/week/discard" fontSize="15" height="40" cornerRadius="20" paddingLeft="18" paddingRight="18" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line" borderThickness="2" marginRight="10"/>
-        <brls:Button id="cpt_save" style="primary" text="@i18n/playguard/play_timer/perday/section_save" fontSize="15" height="40" cornerRadius="20" paddingLeft="20" paddingRight="20"/>
+        <brls:Button id="cpt_discard" style="bordered" text="@i18n/playguard/cadran/week/discard" fontSize="15" height="40" cornerRadius="20" highlightCornerRadius="20" paddingLeft="18" paddingRight="18" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line" borderThickness="2" marginRight="10"/>
+        <brls:Button id="cpt_save" style="primary" text="@i18n/playguard/play_timer/perday/section_save" fontSize="15" height="40" cornerRadius="20" highlightCornerRadius="22" paddingLeft="20" paddingRight="20"/>
     </brls:Box>
 
     <brls:Box id="cpt_chips" axis="row" alignItems="center" marginBottom="8">

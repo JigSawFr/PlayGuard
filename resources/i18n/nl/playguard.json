@@ -1548,7 +1548,10 @@
             "dns_blocked": "Geblokkeerd",
             "dns_reachable": "Bereikbaar",
             "counted_title": "De tijd hier telt mee",
-            "counted_pill": "Over een spel geopend · telt mee voor de timer"
+            "counted_pill": "Over een spel geopend · telt mee voor de timer",
+            "no_play": "Niet spelen",
+            "head_no_play": "Vandaag niet spelen",
+            "head_unlocked_no_play": "Vandaag niet spelen, gepauzeerd"
         },
         "pill": {
             "pc_on": "Ouderlijk toezicht actief",

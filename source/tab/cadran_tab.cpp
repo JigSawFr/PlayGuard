@@ -542,6 +542,25 @@ CadranTab::CadranTab()
     kit::wrap(actions2.getView());
     YGNodeStyleSetGap(actions2->getYGNode(), YGGutterColumn, 12);
     YGNodeStyleSetGap(actions2->getYGNode(), YGGutterRow, 10);
+    // Wrapped, the row's buttons are one line to borealis: ↓ would leave it
+    // past today's limit, on the line under. Between its lines, ↑ and ↓.
+    const auto below = [](brls::View* from, brls::View* to) {
+        return to->getVisibility() == brls::Visibility::VISIBLE && to->getY() > from->getY() + 1;
+    };
+    for (brls::View* above : { stop.getView(), child.getView() })
+        above->registerAction("", brls::BUTTON_NAV_DOWN, [this, below](brls::View* view) {
+            if (!below(view, limit.getView())) return false;
+            brls::Application::giveFocus(limit.getView());
+            return true;
+        }, true);
+    limit->registerAction("", brls::BUTTON_NAV_UP, [this, below](brls::View* view) {
+        for (brls::View* above : { child.getView(), stop.getView() })
+            if (above->getVisibility() == brls::Visibility::VISIBLE && below(above, view)) {
+                brls::Application::giveFocus(above);
+                return true;
+            }
+        return false;
+    }, true);
 
     // The Overview's own actions, from where they are shown now: turning
     // parental controls back on (its banner's) and today's limit (its line's)
@@ -612,7 +631,12 @@ void CadranTab::show_ring(bool unlocked)
         const int over = pt_logic::over_limit_min(pt, today);
         // Unlocked first, as the Overview's gauge: the console reports the
         // timer off while unlocked, though today's limit still stands.
-        if (unlocked && limit != PT_DAY_NOLIMIT) {
+        if (limit == 0) {
+            // A day without play: said in words, not as "0 min".
+            frac = unlocked ? -1.0f : 1.0f;
+            left = "playguard/cadran/today/no_play"_i18n;
+            caption = unlocked ? "playguard/cadran/today/unlocked"_i18n : "playguard/cadran/today/today"_i18n;
+        } else if (unlocked && limit != PT_DAY_NOLIMIT) {
             left = ui::fmt_minutes(limit);
             caption = "playguard/cadran/today/unlocked"_i18n;
         } else if (limit == PT_DAY_NOLIMIT || !pt.enabled) {
@@ -974,11 +998,14 @@ void CadranTab::refresh()
     else cadran::set_pill("playguard/cadran/pill/pc_off"_i18n, "alert", true);
 
     this->unlocked_now = unlocked;
-    if (unlocked && this->pt.fw_supported && this->pt.valid && this->pt.enabled_valid) {
+    if (this->pt.fw_supported && this->pt.valid && this->pt.enabled_valid) {
         const uint16_t limit = this->pt.day_min[ui::today_weekday()];
-        if (limit != PT_DAY_NOLIMIT)
-            if (auto* head = dynamic_cast<brls::Label*>(this->getView("dash_gauge_text")))
-                ui::set_text(head, brls::getStr("playguard/cadran/today/head_unlocked", ui::fmt_minutes(limit)));
+        auto* head = dynamic_cast<brls::Label*>(this->getView("dash_gauge_text"));
+        // A day without play in words ("0 min (no play)" said it twice).
+        if (head && limit == 0 && (unlocked || this->pt.enabled))
+            ui::set_text(head, unlocked ? "playguard/cadran/today/head_unlocked_no_play"_i18n : "playguard/cadran/today/head_no_play"_i18n);
+        else if (head && unlocked && limit != PT_DAY_NOLIMIT)
+            ui::set_text(head, brls::getStr("playguard/cadran/today/head_unlocked", ui::fmt_minutes(limit)));
     }
     this->show_ring(unlocked);
     this->show_next(unlocked);

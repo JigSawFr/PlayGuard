@@ -1548,7 +1548,10 @@
             "dns_blocked": "차단됨",
             "dns_reachable": "접속 가능",
             "counted_title": "여기서 보낸 시간도 집계됩니다",
-            "counted_pill": "게임 위에서 열림 · 타이머에 포함"
+            "counted_pill": "게임 위에서 열림 · 타이머에 포함",
+            "no_play": "플레이 불가",
+            "head_no_play": "오늘은 플레이 불가",
+            "head_unlocked_no_play": "오늘은 플레이 불가, 일시 중지됨"
         },
         "pill": {
             "pc_on": "자녀 보호 켜짐",

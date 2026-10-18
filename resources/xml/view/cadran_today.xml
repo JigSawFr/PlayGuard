@@ -2,9 +2,10 @@
 
 <!-- The top of the Cadran Overview (tab/cadran_tab.cpp, over the Overview's
      own lines): today's time left as a ring with the everyday actions beside
-     it (turning parental controls back on first while they are unlocked;
-     today's limit with them), three state cards, the console's state as pills. Filled by
-     CadranTab::refresh() from the Overview's readings. -->
+     it (turning parental controls back on first, the row's whole width,
+     while they are unlocked; today's limit with them, the second row's
+     buttons sharing its width), three state cards, the console's state as
+     pills. Filled by CadranTab::refresh() from the Overview's readings. -->
 
 <brls:Box
     width="auto"
@@ -16,15 +17,15 @@
         <PtRing id="cad_ring" width="248" height="248" marginRight="36"/>
         <brls:Box id="cad_today_text" axis="column" alignItems="flexStart" grow="1.0" width="0">
             <brls:Label id="cad_kicker" text="" fontSize="15" textColor="@theme/cadran/text3" marginBottom="10"/>
-            <brls:Box id="cad_actions" axis="row" alignItems="center" marginTop="14" marginBottom="12">
-                <brls:Button id="cad_relock" style="primary" text="@i18n/playguard/security/banner_action" fontSize="19" height="56" cornerRadius="28" paddingLeft="22" paddingRight="22" marginRight="12" visibility="gone"/>
-                <brls:Button id="cad_extra" style="primary" text="@i18n/playguard/cadran/today/extra" fontSize="19" height="56" cornerRadius="28" paddingLeft="22" paddingRight="22" marginRight="12"/>
+            <brls:Box id="cad_actions" axis="row" alignItems="center" alignSelf="stretch" marginTop="14" marginBottom="12">
+                <brls:Button id="cad_relock" style="primary" text="@i18n/playguard/security/banner_action" fontSize="19" height="56" cornerRadius="28" highlightCornerRadius="30" paddingLeft="22" paddingRight="22" grow="1.0" visibility="gone"/>
+                <brls:Button id="cad_extra" style="primary" text="@i18n/playguard/cadran/today/extra" fontSize="19" height="56" cornerRadius="28" highlightCornerRadius="30" paddingLeft="22" paddingRight="22" marginRight="12"/>
                 <brls:Box id="cad_chips" axis="row" alignItems="center"/>
             </brls:Box>
-            <brls:Box id="cad_actions2" axis="row" alignItems="center">
-                <brls:Button id="cad_stop" style="bordered" text="@i18n/playguard/cadran/today/stop" fontSize="17" height="48" cornerRadius="24" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/coral" borderColor="@theme/cadran/coral_line" borderThickness="2"/>
-                <brls:Button id="cad_child" style="bordered" text="@i18n/playguard/cadran/today/child" fontSize="17" height="48" cornerRadius="24" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line" borderThickness="2"/>
-                <brls:Button id="cad_limit" style="bordered" text="@i18n/playguard/cadran/today/limit" fontSize="17" height="48" cornerRadius="24" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line" borderThickness="2"/>
+            <brls:Box id="cad_actions2" axis="row" alignItems="center" alignSelf="stretch">
+                <brls:Button id="cad_stop" style="bordered" text="@i18n/playguard/cadran/today/stop" fontSize="17" height="48" cornerRadius="24" highlightCornerRadius="24" grow="1.0" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/coral" borderColor="@theme/cadran/coral_line" borderThickness="2"/>
+                <brls:Button id="cad_child" style="bordered" text="@i18n/playguard/cadran/today/child" fontSize="17" height="48" cornerRadius="24" highlightCornerRadius="24" grow="1.0" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line" borderThickness="2"/>
+                <brls:Button id="cad_limit" style="bordered" text="@i18n/playguard/cadran/today/limit" fontSize="17" height="48" cornerRadius="24" highlightCornerRadius="24" grow="1.0" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line" borderThickness="2"/>
             </brls:Box>
         </brls:Box>
     </brls:Box>

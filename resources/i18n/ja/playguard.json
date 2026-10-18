@@ -1548,7 +1548,10 @@
             "dns_blocked": "ブロック中",
             "dns_reachable": "接続可能",
             "counted_title": "ここでの時間も加算されます",
-            "counted_pill": "ゲームの上で開いています · タイマーに加算"
+            "counted_pill": "ゲームの上で開いています · タイマーに加算",
+            "no_play": "プレイ不可",
+            "head_no_play": "今日はプレイ不可",
+            "head_unlocked_no_play": "今日はプレイ不可（一時停止中）"
         },
         "pill": {
             "pc_on": "みまもり設定 有効",

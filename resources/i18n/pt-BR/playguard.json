@@ -1548,7 +1548,10 @@
             "dns_blocked": "Bloqueado",
             "dns_reachable": "Acessível",
             "counted_title": "O tempo passado aqui conta",
-            "counted_pill": "Aberto sobre um jogo · conta no temporizador"
+            "counted_pill": "Aberto sobre um jogo · conta no temporizador",
+            "no_play": "Sem jogar",
+            "head_no_play": "Hoje, sem jogar",
+            "head_unlocked_no_play": "Hoje sem jogar, em pausa"
         },
         "pill": {
             "pc_on": "Controlo parental ativo",

@@ -1548,7 +1548,10 @@
             "dns_blocked": "Blockiert",
             "dns_reachable": "Erreichbar",
             "counted_title": "Die Zeit hier wird mitgezählt",
-            "counted_pill": "Über einem Spiel geöffnet · zählt zum Timer"
+            "counted_pill": "Über einem Spiel geöffnet · zählt zum Timer",
+            "no_play": "Kein Spielen",
+            "head_no_play": "Heute kein Spielen",
+            "head_unlocked_no_play": "Heute kein Spielen, ausgesetzt"
         },
         "pill": {
             "pc_on": "Jugendschutz aktiv",

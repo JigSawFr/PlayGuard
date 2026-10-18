@@ -1548,7 +1548,10 @@
             "dns_blocked": "Blocked",
             "dns_reachable": "Reachable",
             "counted_title": "Time spent here counts",
-            "counted_pill": "Opened over a game · counts on the timer"
+            "counted_pill": "Opened over a game · counts on the timer",
+            "no_play": "No play",
+            "head_no_play": "No play today",
+            "head_unlocked_no_play": "No play today, on hold"
         },
         "pill": {
             "pc_on": "Parental controls on",

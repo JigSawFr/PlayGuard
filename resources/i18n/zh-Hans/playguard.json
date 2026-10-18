@@ -1548,7 +1548,10 @@
             "dns_blocked": "已拦截",
             "dns_reachable": "可访问",
             "counted_title": "在此处的时间也会计入",
-            "counted_pill": "在游戏上打开 · 计入计时器"
+            "counted_pill": "在游戏上打开 · 计入计时器",
+            "no_play": "不可游玩",
+            "head_no_play": "今天不可游玩",
+            "head_unlocked_no_play": "今天不可游玩，已暂停"
         },
         "pill": {
             "pc_on": "家长控制已开启",
