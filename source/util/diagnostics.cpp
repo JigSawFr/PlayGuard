@@ -11,6 +11,7 @@
 #include "util/patches.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
+#include "util/perf.hpp"
 #include "util/session_log.hpp"
 #include "util/startup.h"
 #include "core/platform.h"
@@ -152,6 +153,8 @@ std::string current_report()
     startup_report(buf.data(), buf.size());
     out += buf.data();
     out += "\n";
+    // How long the slow work of the screens took in this run (util/perf.hpp).
+    out += perf::report() + "\n";
     out += logs_section();
 
     time_clock_dump(buf.data(), buf.size());

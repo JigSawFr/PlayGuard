@@ -13,6 +13,7 @@
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
 #include "util/config.hpp"
+#include "util/perf.hpp"
 
 using namespace brls::literals;
 
@@ -195,6 +196,7 @@ void GamesActivity::rebuild()
 
 void GamesActivity::build(u64 focus_id)
 {
+    perf::Timed timed("All games list");   // the diagnostic report's timings
     // The cells are about to be deleted: never leave the focus on one.
     bool focus_in_list = false;
     for (brls::View* v = brls::Application::getCurrentFocus(); v && !focus_in_list; v = v->getParent())

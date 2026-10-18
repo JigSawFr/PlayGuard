@@ -11,6 +11,7 @@
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/perf.hpp"
 
 using namespace brls::literals;
 
@@ -126,6 +127,7 @@ void SecurityTab::change_pin()
 
 void SecurityTab::refresh()
 {
+    perf::Timed timed("PIN refresh");   // the diagnostic report's timings
     PctlStatus s;
     pctl_status_fetch(&s);
     ui::note_unlocked(s.temp_unlocked_ok, s.temp_unlocked);

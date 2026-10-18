@@ -19,6 +19,7 @@
 #include "action/upload_flow.hpp"
 #include "app.hpp"
 #include "util/paths.hpp"
+#include "util/perf.hpp"
 #include "util/table_export.hpp"
 #include "ui/ui.hpp"
 
@@ -462,6 +463,7 @@ void GameCheckActivity::check(std::vector<GameRecord> records, bool full)
         const std::string timing = fmt::format("{} games in {} ms: setup {}, control {}, contents {}, state {}", t.games,
                                                ms(t.total_ns), ms(t.setup_ns), ms(t.control_ns), ms(t.contents_ns), ms(t.state_ns));
         brls::Logger::info("games check: {}", timing);
+        perf::record("Installed games check", (double)t.total_ns / 1e6);
         if (ui::quitting()) return;
         brls::sync([this, weak, complete, full, timing]() {
             if (weak.expired()) return;

@@ -16,6 +16,7 @@
 #include "app.hpp"
 #include "tab/clock_tab.hpp"
 #include "ui/ui.hpp"
+#include "util/perf.hpp"
 #include "util/text.hpp"
 
 using namespace brls::literals;
@@ -306,6 +307,7 @@ DashboardTab::SystemIssues DashboardTab::show_system(const PctlStatus& s, const 
 
 void DashboardTab::refresh()
 {
+    perf::Timed timed("Overview refresh");   // the diagnostic report's timings
     // The time of day, for every helper below (today's limit, the outside
     // watch, the timer health, the bell), read once.
     ui::SameTime same;

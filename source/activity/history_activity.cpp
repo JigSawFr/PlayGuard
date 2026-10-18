@@ -5,6 +5,7 @@
 #include "action/history_flow.hpp"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
+#include "util/perf.hpp"
 #include "util/table_export.hpp"
 
 using namespace brls::literals;
@@ -71,6 +72,7 @@ void HistoryActivity::export_shown()
 
 void HistoryActivity::rebuild()
 {
+    perf::Timed timed("Change history list");   // the diagnostic report's timings
     // The file again only when an entry was recorded since (an undo, a change
     // made from a dialog), not for another filter.
     if (!this->read || this->read_at != history_flow::changes()) {

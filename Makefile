@@ -184,6 +184,7 @@ dev_builds_net_SRC   := $(filter-out tests/%,$(dev_builds_SRC)) source/util/http
 dev_builds_net_LIBS  := -lz
 play_cache_SRC   := source/util/play_cache.cpp tests/play_cache/test.cpp
 game_cache_SRC   := source/util/game_cache.cpp tests/game_cache/test.cpp
+perf_SRC   := source/util/perf.cpp tests/perf/test.cpp
 activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summary/test.cpp
 # The text helpers that only translate, over ui/tr.hpp's stand-in for
 # borealis' getStr and fmt header-only (the catalogs read by the test).
