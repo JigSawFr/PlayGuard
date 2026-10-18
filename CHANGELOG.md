@@ -1,5 +1,101 @@
 # Changelog
 
+## [1.2.0](https://github.com/JigSawFr/PlayGuard/compare/v1.1.0...v1.2.0) (2026-10-18)
+
+
+### 🚀 Features
+
+* **about:** PlayGuard's release notes on the same screen as Atmosphère's and hekate's ([#211](https://github.com/JigSawFr/PlayGuard/issues/211)) ([6a368b4](https://github.com/JigSawFr/PlayGuard/commit/6a368b47a91a4ebed9d2edaf6d787b616d6ae1a9))
+* **about:** the release notes on the Version row, Ⓐ and a chevron, not a row of their own ([#220](https://github.com/JigSawFr/PlayGuard/issues/220)) ([98ca7da](https://github.com/JigSawFr/PlayGuard/commit/98ca7daf4449d6c603a82f839790befaf8ca71aa))
+* **about:** the release notes on their own screen, laid out as in "What's new" ([#217](https://github.com/JigSawFr/PlayGuard/issues/217)) ([be36404](https://github.com/JigSawFr/PlayGuard/commit/be3640402fcb8b1a2b41d7206b0c851fa5bb5c4b))
+* **activity:** a grey controller on a game's cover until its icon arrives ([#214](https://github.com/JigSawFr/PlayGuard/issues/214)) ([ae4628c](https://github.com/JigSawFr/PlayGuard/commit/ae4628c6643fa089004759a61f35c834165ef3a9))
+* **activity:** All games on a screen of its own, as covers or a list ([#201](https://github.com/JigSawFr/PlayGuard/issues/201)) ([1c7a4c8](https://github.com/JigSawFr/PlayGuard/commit/1c7a4c820b9f3561bb81144cdbd8df08b85a0e8f))
+* **activity:** drop the games to rediscover ([#209](https://github.com/JigSawFr/PlayGuard/issues/209)) ([6d03162](https://github.com/JigSawFr/PlayGuard/commit/6d031626fd0ca05df2f8ad519c9066c90f460f5a))
+* **activity:** play time over 100 h in whole hours, the all-time average over months or years ([#195](https://github.com/JigSawFr/PlayGuard/issues/195)) ([69591f3](https://github.com/JigSawFr/PlayGuard/commit/69591f35b92d48665b66a620c8c4e5828a5fd31a))
+* **activity:** start on the account shown last, or on a default one ([#198](https://github.com/JigSawFr/PlayGuard/issues/198)) ([5f88b3b](https://github.com/JigSawFr/PlayGuard/commit/5f88b3bfe239c023153293feb87a365bf4983a87))
+* **compat:** firmware 23.0.1 verified on a console ([#167](https://github.com/JigSawFr/PlayGuard/issues/167)) ([a3f8802](https://github.com/JigSawFr/PlayGuard/commit/a3f8802384b253739e90a61107e58ddf84f56f13))
+* **console:** the Console tab's notes icons on their rows, their text a press away ([#216](https://github.com/JigSawFr/PlayGuard/issues/216)) ([3b98efb](https://github.com/JigSawFr/PlayGuard/commit/3b98efb570a7ed72ab0d0d2447981768b79a681d))
+* **dev-builds:** a clearer build page, GitHub's Markdown, text from GitHub made safe ([#149](https://github.com/JigSawFr/PlayGuard/issues/149)) ([0f325f3](https://github.com/JigSawFr/PlayGuard/commit/0f325f38017e9e72116180a375e07159c06c8a94))
+* **dev-builds:** a page per build, a loading bar, Find a build, resumed downloads ([#147](https://github.com/JigSawFr/PlayGuard/issues/147)) ([44239ec](https://github.com/JigSawFr/PlayGuard/commit/44239ec2399e71cd90885768c3575849dbe58466))
+* **dev-builds:** each build on two lines with tags, Y to search ([#150](https://github.com/JigSawFr/PlayGuard/issues/150)) ([4f7d8bf](https://github.com/JigSawFr/PlayGuard/commit/4f7d8bf8683476211f3b0473076879daa7a13f95))
+* **dev-builds:** go back to the previous build, even when the new one crashes ([#148](https://github.com/JigSawFr/PlayGuard/issues/148)) ([a116ddf](https://github.com/JigSawFr/PlayGuard/commit/a116ddfceefd5aeb8aff281f824865986352608c))
+* **dev-builds:** the first tab lists the repository's releases, not just the latest ([#145](https://github.com/JigSawFr/PlayGuard/issues/145)) ([e7eacd3](https://github.com/JigSawFr/PlayGuard/commit/e7eacd3bb09524e8e8e295133476642c44c5bbd5))
+* **games:** the data check remembered, a To check section, games picked for one action ([#166](https://github.com/JigSawFr/PlayGuard/issues/166)) ([ea59309](https://github.com/JigSawFr/PlayGuard/commit/ea5930994509ab95e6c537d042c13cc464eb0ce2))
+* **games:** the Reinstall actions as buttons above the list, and the list sent to a gist ([#163](https://github.com/JigSawFr/PlayGuard/issues/163)) ([a04395b](https://github.com/JigSawFr/PlayGuard/commit/a04395bce3aa3957f8bf1d5a91dab415aa94273b))
+* **games:** Tools › Check the installed games: the cause, the fix and the repairs ([#69](https://github.com/JigSawFr/PlayGuard/issues/69)) ([bb35936](https://github.com/JigSawFr/PlayGuard/commit/bb3593630df563654d51c12f37226cbead824d8b))
+* **header:** the language and the theme in the main screen's header, a tap or − to change them ([#189](https://github.com/JigSawFr/PlayGuard/issues/189)) ([4964e7a](https://github.com/JigSawFr/PlayGuard/commit/4964e7a79cb131d94fe948e0789b3afbf48bd1ed))
+* **header:** the version in a tag next to the title, the bell, language and theme at the right ([#221](https://github.com/JigSawFr/PlayGuard/issues/221)) ([7b4f601](https://github.com/JigSawFr/PlayGuard/commit/7b4f60106d5fa624859f054db19b700fdcd641cf))
+* **history:** refused changes, the countdown, day groups, a filter and an export ([#159](https://github.com/JigSawFr/PlayGuard/issues/159)) ([fd00eef](https://github.com/JigSawFr/PlayGuard/commit/fd00eef161c6f485a2b80f046f51ab9c99298a5e))
+* **logs:** a log file per run, PlayGuard's own CPU crashes with their backtrace, a fuller report ([#157](https://github.com/JigSawFr/PlayGuard/issues/157)) ([cdbe871](https://github.com/JigSawFr/PlayGuard/commit/cdbe8715e370e0e2d8e4efcc8e4a9e3cbf53017b))
+* **notices:** a notification bell gathers what needs the parent, Y opens it ([#155](https://github.com/JigSawFr/PlayGuard/issues/155)) ([97be4df](https://github.com/JigSawFr/PlayGuard/commit/97be4df0a0aabc5e9659ebc02a96e6b42775ee6d))
+* **notices:** a weak PIN, PlayGuard open without it, backups, SD space, the week, and kinds to turn off ([#158](https://github.com/JigSawFr/PlayGuard/issues/158)) ([0338592](https://github.com/JigSawFr/PlayGuard/commit/03385923fbc6237e0cb833fcaa799518639e2a4f))
+* **notices:** ignore a warning to do from the bell, mark everything read ([#188](https://github.com/JigSawFr/PlayGuard/issues/188)) ([fe4a5b2](https://github.com/JigSawFr/PlayGuard/commit/fe4a5b26ec0a3485c4567ddb3a567e5455aa6790))
+* **notices:** the bell counts the parental controls, the Console tab the console, in a fixed order ([#179](https://github.com/JigSawFr/PlayGuard/issues/179)) ([ff92739](https://github.com/JigSawFr/PlayGuard/commit/ff92739f4d6fd846abed0aef6ab7d360c66e415e))
+* **notices:** the recovery sysmodule out of date, newer Atmosphère, hekate and firmware ([#156](https://github.com/JigSawFr/PlayGuard/issues/156)) ([7a386cf](https://github.com/JigSawFr/PlayGuard/commit/7a386cf2caf50993358aa3c8cadb58d7fa0e1aa7))
+* **pin:** the PIN entered once holds until PlayGuard closes, asking again after 5 minutes a switch away ([#186](https://github.com/JigSawFr/PlayGuard/issues/186)) ([e307f09](https://github.com/JigSawFr/PlayGuard/commit/e307f09059476d939f14a64fabaf1fb05ccee36c))
+* **play-timer:** the week chart opens the per-day editor, one save for several days ([#180](https://github.com/JigSawFr/PlayGuard/issues/180)) ([9b9430a](https://github.com/JigSawFr/PlayGuard/commit/9b9430aa1ee3addd137a77c35abda045874874b8))
+* **rescue:** update an out-of-date recovery sysmodule from the notification bell ([#164](https://github.com/JigSawFr/PlayGuard/issues/164)) ([88a2c4f](https://github.com/JigSawFr/PlayGuard/commit/88a2c4ff878723724edcc2dc3776830daeccfe10))
+* **rollback:** the previous build offered only after a start that did not finish, not with L + R ([#218](https://github.com/JigSawFr/PlayGuard/issues/218)) ([ea80f11](https://github.com/JigSawFr/PlayGuard/commit/ea80f117e34e1a4f99f3f8992b725b5ab0dcb9d0))
+* **tools:** release notes of Atmosphère, hekate and the firmware ([#165](https://github.com/JigSawFr/PlayGuard/issues/165)) ([ddc8ca8](https://github.com/JigSawFr/PlayGuard/commit/ddc8ca8736aee829f5d3901938886faf91310b72))
+* **ui:** a badge on each tab with something to do ([#199](https://github.com/JigSawFr/PlayGuard/issues/199)) ([e23c2ef](https://github.com/JigSawFr/PlayGuard/commit/e23c2ef1ad7ae3df909b4fa2104fa52402b07966))
+* **ui:** a Console tab and a History tab in place of Tools and Network clock ([#178](https://github.com/JigSawFr/PlayGuard/issues/178)) ([36c19b5](https://github.com/JigSawFr/PlayGuard/commit/36c19b5ebf118c340f9ad3655ccdd9b5003aa9fa))
+* **ui:** an open padlock and a crossed-out pencil by the title, a tap goes where they are undone ([#212](https://github.com/JigSawFr/PlayGuard/issues/212)) ([ab8a14e](https://github.com/JigSawFr/PlayGuard/commit/ab8a14e222c3c844525012524f007bf75e9a66d5))
+* **ui:** each setting next to the feature it shapes, Advanced on a screen of its own ([#176](https://github.com/JigSawFr/PlayGuard/issues/176)) ([c7a01bb](https://github.com/JigSawFr/PlayGuard/commit/c7a01bb44c97357531170f42b0812367896001ce))
+* **ui:** one meaning per word for the locks, a PIN tab, a chevron on lines that open a screen ([#170](https://github.com/JigSawFr/PlayGuard/issues/170)) ([6cc0166](https://github.com/JigSawFr/PlayGuard/commit/6cc01669ab368d397956af6258e1f24b7924e0ef))
+* **ui:** the badge on the row to fix, and the tab opens on it ([#202](https://github.com/JigSawFr/PlayGuard/issues/202)) ([a494fd2](https://github.com/JigSawFr/PlayGuard/commit/a494fd223f37fc80e5abd702944c9e9d2ee04656))
+* **ui:** the installed games to check as covers, and All games' chevron ([#213](https://github.com/JigSawFr/PlayGuard/issues/213)) ([34b57c8](https://github.com/JigSawFr/PlayGuard/commit/34b57c89905e3ab3175f609aa0bcc74abbbd7c9c))
+
+
+### 🐞 Bug Fixes
+
+* **app:** the findings of the second review of main ([#185](https://github.com/JigSawFr/PlayGuard/issues/185)) ([1dee8b6](https://github.com/JigSawFr/PlayGuard/commit/1dee8b6f7b1ee84721e9576a92f440f38be4a48e))
+* **console:** a Diagnostics header above the network clock and the game check ([#197](https://github.com/JigSawFr/PlayGuard/issues/197)) ([a987107](https://github.com/JigSawFr/PlayGuard/commit/a987107b399075cc4dab4fa390f92ac58560b045))
+* **dev-builds:** no error page in a resumed download, requests side by side, a cut install recovered, a digest required ([#173](https://github.com/JigSawFr/PlayGuard/issues/173)) ([263e2ae](https://github.com/JigSawFr/PlayGuard/commit/263e2ae92c32dcf2a800d2dd048b6209ee19afe0))
+* **diagnostic:** the memory PlayGuard allocated, developer mode logged, the free-communication list one ID per line ([#222](https://github.com/JigSawFr/PlayGuard/issues/222)) ([26463a1](https://github.com/JigSawFr/PlayGuard/commit/26463a110347e6501bb45f181fbd4bd50e4679a3))
+* **games:** one scan of the installed games at a time, stopped on exit, and the same names as Activity ([#171](https://github.com/JigSawFr/PlayGuard/issues/171)) ([475240b](https://github.com/JigSawFr/PlayGuard/commit/475240b2c61279ac30149608b57ced398f520f84))
+* **i18n:** a build without a checksum said to be refused, the public-report notice translated ([#181](https://github.com/JigSawFr/PlayGuard/issues/181)) ([c457964](https://github.com/JigSawFr/PlayGuard/commit/c457964eab9f093256905bee7403d6a0ba21f57e))
+* **markdown:** runs of &lt;, & and &lt;scripted are read once, not once per character ([#154](https://github.com/JigSawFr/PlayGuard/issues/154)) ([b6c7561](https://github.com/JigSawFr/PlayGuard/commit/b6c7561b13c74336285a9d40f264d9eb6c39ef33))
+* **play-timer:** extra time comes back by itself the next day, no "Keep" to dismiss it with ([#182](https://github.com/JigSawFr/PlayGuard/issues/182)) ([fb1f49d](https://github.com/JigSawFr/PlayGuard/commit/fb1f49db667b47adb989951baa5fad372c983a72))
+* **play-timer:** no PIN, no silent "not applied"; three pctl codes named ([#151](https://github.com/JigSawFr/PlayGuard/issues/151)) ([8c271f6](https://github.com/JigSawFr/PlayGuard/commit/8c271f661cafc7bf4c317753816c2d405c67570d))
+* **rescue:** the recovery report proven by the sysmodule, and other security fixes ([#175](https://github.com/JigSawFr/PlayGuard/issues/175)) ([7fbf87a](https://github.com/JigSawFr/PlayGuard/commit/7fbf87a0c84d4ed957a623f3bc75fc652a2bb6b2))
+* **security:** "Lock and quit" closes the game PlayGuard runs over ([#146](https://github.com/JigSawFr/PlayGuard/issues/146)) ([fc60f5f](https://github.com/JigSawFr/PlayGuard/commit/fc60f5f3fc96e260ff1f525d2b69b68b410820a7))
+* **sys-notes:** older versions in the tabs left, so an up-to-date console can browse its notes ([#196](https://github.com/JigSawFr/PlayGuard/issues/196)) ([e01aed8](https://github.com/JigSawFr/PlayGuard/commit/e01aed89f5d5187ccacea34e5e3f50eec3c12f3f))
+* **ui:** the focus kept on the screen after a dialog whose opener went ([#169](https://github.com/JigSawFr/PlayGuard/issues/169)) ([f84c157](https://github.com/JigSawFr/PlayGuard/commit/f84c157a5332441955b5eb0bc1e11929763389ef))
+* **ui:** the footer clock on one line, the hints whole on the Switch ([#200](https://github.com/JigSawFr/PlayGuard/issues/200)) ([db00d83](https://github.com/JigSawFr/PlayGuard/commit/db00d8378e150c1128146b9044f45dbc3d9e8803))
+
+
+### ✨ Polish
+
+* **activity:** the games' icons decoded off the UI thread ([#210](https://github.com/JigSawFr/PlayGuard/issues/210)) ([47a7895](https://github.com/JigSawFr/PlayGuard/commit/47a789551090c3dc0707b5f03b6f43f5f4347108))
+* **ci:** shorter smoke-test pauses, cached packages, and the slow screens' timings in the diagnostic report ([#206](https://github.com/JigSawFr/PlayGuard/issues/206)) ([9b88467](https://github.com/JigSawFr/PlayGuard/commit/9b8846767dde9b5b9468f92b558c09c7a2484643))
+* **ci:** the smoke test in balanced shards, faster scrolls to a list's end, and no relayout for an unchanged text ([#203](https://github.com/JigSawFr/PlayGuard/issues/203)) ([2353adb](https://github.com/JigSawFr/PlayGuard/commit/2353adb7af2d78e60c9ac3be2902d679074f4695))
+* **core:** pctl, the recovery sysmodule, the simulator and playstats share what they repeated ([#190](https://github.com/JigSawFr/PlayGuard/issues/190)) ([f39766c](https://github.com/JigSawFr/PlayGuard/commit/f39766c4d918d968e7c554b27712c95f3a111f5d))
+* **games:** the name and icon of each game read from ns' cache first ([#168](https://github.com/JigSawFr/PlayGuard/issues/168)) ([f107fae](https://github.com/JigSawFr/PlayGuard/commit/f107fae43a14c77434105c32afd529c4ba9b70ef))
+* **i18n:** borealis' string lookup without an exception per string in English ([#207](https://github.com/JigSawFr/PlayGuard/issues/207)) ([bd93f24](https://github.com/JigSawFr/PlayGuard/commit/bd93f24f09cdf3cd1f5669dc0e9bee7365c62754))
+* **prefs:** Preferences only sets the app up, About holds its updates and help ([#187](https://github.com/JigSawFr/PlayGuard/issues/187)) ([f827f98](https://github.com/JigSawFr/PlayGuard/commit/f827f9826d84328d172c70e8803995d98d59e9d4))
+* **startup:** the start-up's SD-card looks before the preferences halved, and each one timed ([#215](https://github.com/JigSawFr/PlayGuard/issues/215)) ([e9c1f1b](https://github.com/JigSawFr/PlayGuard/commit/e9c1f1ba57ff3caba253c3bed1548419eeb4679d))
+* **tests:** shared test helpers, default suite flags, markdown::parse in steps ([#191](https://github.com/JigSawFr/PlayGuard/issues/191)) ([358a223](https://github.com/JigSawFr/PlayGuard/commit/358a223c262308c273b3f3eea9732005fd5be69b))
+* **ui:** borealis lays out only what changed, and registers a view's XML attributes only when read ([#208](https://github.com/JigSawFr/PlayGuard/issues/208)) ([69e2cae](https://github.com/JigSawFr/PlayGuard/commit/69e2cae0f116e28ca8b698e749c3abc26a9a45bc))
+* **ui:** shared console actions, the game check's rules under test, smaller notices and main() ([#193](https://github.com/JigSawFr/PlayGuard/issues/193)) ([97887fb](https://github.com/JigSawFr/PlayGuard/commit/97887fb61e270e0702db789b593b98a8826661fc))
+* **ui:** the change history and All games laid out once, and ccache caches the size of one build ([#205](https://github.com/JigSawFr/PlayGuard/issues/205)) ([a10465e](https://github.com/JigSawFr/PlayGuard/commit/a10465e51e1552847cd48ea2952aaf85e23354d0))
+* **ui:** the UI thread kept off the SD card: logs in batches, files read in part, config.json first ([#172](https://github.com/JigSawFr/PlayGuard/issues/172)) ([ac248cd](https://github.com/JigSawFr/PlayGuard/commit/ac248cd7eda980e4a470f18622f2edd152574ad9))
+* **util:** shared date, text, UTF-8, emoji and JSON helpers; dead code out; core headers extern "C" ([#177](https://github.com/JigSawFr/PlayGuard/issues/177)) ([d1005c4](https://github.com/JigSawFr/PlayGuard/commit/d1005c47e0ff8a57bac82827941412fcc2d37b7f))
+* **util:** the remaining copies on the shared helpers; the game check's rules and the Activity export out of their screens ([#183](https://github.com/JigSawFr/PlayGuard/issues/183)) ([8d00e08](https://github.com/JigSawFr/PlayGuard/commit/8d00e08169fc94d585eac599699999c7ce5cc69e))
+* **util:** the remaining hand-written copies on the shared helpers; the GitHub API's URLs and its 401 handled once ([#192](https://github.com/JigSawFr/PlayGuard/issues/192)) ([276e5fa](https://github.com/JigSawFr/PlayGuard/commit/276e5fa89057bda9226e65f3a7e43583f8b14564))
+
+
+### 🧪 Tests
+
+* **fuzz:** resource checks for binds, layouts, images and config keys, new suites and seven fuzz targets ([#174](https://github.com/JigSawFr/PlayGuard/issues/174)) ([7d76ecc](https://github.com/JigSawFr/PlayGuard/commit/7d76ecc91bbba1db8437ddc38515ed9b0b15fa47))
+* **smoke:** the notices' ignored screen taken once the list scrolled from its settled layout ([#194](https://github.com/JigSawFr/PlayGuard/issues/194)) ([56503fd](https://github.com/JigSawFr/PlayGuard/commit/56503fd774f26d56f93531e88ece80cfe6fa6a60))
+
+
+### 📚 Documentation
+
+* **readme:** the docs, screenshots and video tour of the current tabs ([#184](https://github.com/JigSawFr/PlayGuard/issues/184)) ([8f1cba4](https://github.com/JigSawFr/PlayGuard/commit/8f1cba41a8805cfd14ad29055d7aef688b78dc59))
+* **readme:** the release badge read from the release-please manifest, not the GitHub API ([#219](https://github.com/JigSawFr/PlayGuard/issues/219)) ([bac4c15](https://github.com/JigSawFr/PlayGuard/commit/bac4c152d37c1d474ae288a029557f49291678e6))
+* **readme:** the screenshots and video tour of 1.2.0 ([#204](https://github.com/JigSawFr/PlayGuard/issues/204)) ([0d4da46](https://github.com/JigSawFr/PlayGuard/commit/0d4da465d7419a63c82b1ebb871648f46ffe046c))
+
 ## [1.1.0](https://github.com/JigSawFr/PlayGuard/compare/v1.0.0...v1.1.0) (2026-10-14)
 
 
