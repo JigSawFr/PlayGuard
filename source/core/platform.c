@@ -63,7 +63,9 @@ bool platform_region(int *region)
 bool platform_held_lr(void)
 {
     // Read a few times over 30 ms: the first state read may predate the
-    // controllers being polled.
+    // controllers being polled. A connected controller's state is this
+    // moment's, so it settles it at once (the 40 ms of waiting were most of
+    // the start-up's "previous build check" on a console).
     padConfigureInput(1, HidNpadStyleSet_NpadStandard);
     PadState pad;
     padInitializeDefault(&pad);
@@ -71,7 +73,8 @@ bool platform_held_lr(void)
     for (int i = 0; i < 4; i++) {
         padUpdate(&pad);
         if ((padGetButtons(&pad) & both) == both) return true;
-        svcSleepThread(10000000ULL);
+        if (padIsConnected(&pad)) return false;
+        if (i < 3) svcSleepThread(10000000ULL);
     }
     return false;
 }
