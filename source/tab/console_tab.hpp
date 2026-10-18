@@ -7,7 +7,7 @@
 
 #include "tab/tab_base.hpp"
 
-class InfoIcon;
+class RowIcon;
 
 class ConsoleTab : public TabBase
 {
@@ -21,8 +21,8 @@ class ConsoleTab : public TabBase
   private:
     bool        serial_revealed = false;   // until the tab is left (tabs are rebuilt when reopened)
     std::string storage_note;              // the other system's, shown by A on the storage row
-    InfoIcon*   storage_info = nullptr;
-    InfoIcon*   blank_info   = nullptr;   // the serial number not blanked on emuMMC, by A
+    RowIcon*    storage_info = nullptr;
+    RowIcon*    blank_warn   = nullptr;   // the serial number not blanked on emuMMC, by A
 
     BRLS_BIND(brls::DetailCell,  clock,        "cn_clock");
     BRLS_BIND(brls::DetailCell,  games,        "cn_games");

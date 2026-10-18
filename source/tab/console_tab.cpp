@@ -9,7 +9,7 @@
 #include "tab/clock_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/patches.hpp"
-#include "view/info_icon.hpp"
+#include "view/row_icon.hpp"
 
 using namespace brls::literals;
 
@@ -59,14 +59,14 @@ ConsoleTab::ConsoleTab()
 
     // The other system's parental controls: an info icon on the row, the text a
     // press away (a paragraph under it took half the screen).
-    storage_info = InfoIcon::on_row(storage.getView());
+    storage_info = RowIcon::on_row(storage.getView(), RowIcon::Kind::Info);
     storage->registerClickAction([this](brls::View*) {
         if (!this->storage_note.empty()) ui::info(this->storage_note);
         return true;
     });
-    // The same for the serial number not blanked on emuMMC, on the row that
+    // A warning icon for the serial number not blanked on emuMMC, on the row that
     // says so (A on the serial number's row shows / hides its digits).
-    blank_info = InfoIcon::on_row(blank.getView());
+    blank_warn = RowIcon::on_row(blank.getView(), RowIcon::Kind::Warning);
     blank->registerClickAction([](brls::View*) {
         ui::info("playguard/tools/serial_note_emummc"_i18n);
         return true;
@@ -116,7 +116,7 @@ void ConsoleTab::refresh()
     blank->setDetailText(ui::blank_text(si, &c));
     blank->setDetailTextColor(c);
     blank->setFocusable(ui::serial_warning(si));
-    blank_info->set_shown(ui::serial_warning(si));
+    blank_warn->set_shown(ui::serial_warning(si));
     const bool maskable = si.serial_valid && si.serial[0] && !(si.blank_valid && si.blank);
     serial->setDetailText(ui::serial_text(si, this->serial_revealed));
     serial->setDetailTextColor(ui::serial_warning(si) ? ui::color_warn() : ui::color_neutral());
