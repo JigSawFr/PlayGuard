@@ -959,7 +959,6 @@
         "section_changelog": "Nouveautés de la {}",
         "changelog_note": "Versions précédentes : {}",
         "changelog_full": "Liste complète des changements",
-        "changelog_none": "Pas de notes pour cette version (une version de développement ?). Toutes les versions : {}",
         "section_credits": "Crédits",
         "credit_author": "Développeur",
         "credit_upstream": "D'après",

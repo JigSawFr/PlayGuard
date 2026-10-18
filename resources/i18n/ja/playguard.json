@@ -959,7 +959,6 @@
         "section_changelog": "{}の更新内容",
         "changelog_note": "以前のバージョン：{}",
         "changelog_full": "すべての変更点",
-        "changelog_none": "このバージョンの更新内容はありません（開発版？）。すべてのリリース：{}",
         "section_credits": "クレジット",
         "credit_author": "開発者",
         "credit_upstream": "ベース",

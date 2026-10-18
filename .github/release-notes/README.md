@@ -37,10 +37,12 @@ shown there only, the lines of a `<!-- console:only` … `-->` comment too, and
 those between `<!-- console:hide -->` and `<!-- /console -->` are not (the
 *Important* box: the console shows its words as a plain line). It keeps the
 first 16 KB only: the summary is what it shows for sure. Version 1.0.0 knows
-none of this: its update screen shows these lines as they are. The build also bundles the file: About and
-the "What's new" screen after an update show this summary alone, with a *Full
-list of changes* cell to the release's `CHANGELOG.md` entry (no summary: that
-entry, as before).
+none of this: its update screen shows these lines as they are. The build also bundles the file: the "What's
+new" screen after an update shows this summary alone, with a *Full list of
+changes* cell to the release's `CHANGELOG.md` entry (no summary: that entry,
+as before). *About › Release notes* shows every version's page (the summary
+as cards, then the lists), the installed one's from the bundled files when
+GitHub's is not there.
 
 Write the summary in a pull request while the `chore(main): release X.Y.Z`
 pull request is open (its title gives the version), and merge it before that
@@ -75,8 +77,8 @@ A release need not have a summary. Notes with no change a user notices
 `NONE` when the rest is too small to summarise (a typo, a minor fix); it
 writes one bullet per change a user notices, from one to eight, never
 padding. Either way: no summary and no warning. The page then goes from the
-figures to the lists, the console shows the lists, and About and "What's
-new" show the `CHANGELOG.md` entry, as with no file.
+figures to the lists, the console shows the lists, and "What's new"
+shows the `CHANGELOG.md` entry, as with no file.
 
 ## An existing release
 

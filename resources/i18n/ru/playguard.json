@@ -959,7 +959,6 @@
         "section_changelog": "Что нового в {}",
         "changelog_note": "Предыдущие версии: {}",
         "changelog_full": "Полный список изменений",
-        "changelog_none": "Для этой версии нет заметок (сборка для разработки?). Все версии: {}",
         "section_credits": "Благодарности",
         "credit_author": "Разработчик",
         "credit_upstream": "Основано на",
