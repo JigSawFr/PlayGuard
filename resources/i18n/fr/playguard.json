@@ -1152,7 +1152,7 @@
         "step_pulls": "Pull requests...",
         "step_runs": "Vérifications...",
         "back": "Revenir au build précédent : {}",
-        "back_body": "Remplacer PlayGuard {} par le build installé avant lui, {} ? PlayGuard redémarre dessus.\n\nSi un build plante avant son premier écran, PlayGuard le propose au lancement suivant ; maintenir L + R pendant le lancement le propose aussi, si aucun code PIN n'est défini.",
+        "back_body": "Remplacer PlayGuard {} par le build installé avant lui, {} ? PlayGuard redémarre dessus.\n\nSi un build plante avant son premier écran, PlayGuard le propose au lancement suivant.",
         "back_confirm": "Revenir",
         "back_failed": "Impossible de revenir au build précédent : {}\n\nLe PlayGuard installé n'a pas changé.",
         "count_new_one": "1 nouveau",

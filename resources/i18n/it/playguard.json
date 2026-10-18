@@ -1152,7 +1152,7 @@
         "step_pulls": "Pull request...",
         "step_runs": "Controlli...",
         "back": "Torna alla build precedente: {}",
-        "back_body": "Sostituire PlayGuard {} con la build installata prima, {}? PlayGuard si riavvia con essa.\n\nSe una build si blocca prima della sua prima schermata, PlayGuard lo propone all'avvio successivo; tenere premuti L + R all'avvio lo propone anche, se non è impostato alcun PIN.",
+        "back_body": "Sostituire PlayGuard {} con la build installata prima, {}? PlayGuard si riavvia con essa.\n\nSe una build si blocca prima della sua prima schermata, PlayGuard lo propone all'avvio successivo.",
         "back_confirm": "Torna indietro",
         "back_failed": "Impossibile tornare alla build precedente: {}\n\nIl PlayGuard installato non è cambiato.",
         "count_new_one": "1 nuova",

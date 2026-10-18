@@ -4,7 +4,7 @@
 // previous_build.json; starting a build just installed is checked
 // (boot_check.json): a start that never reached its first screen (it
 // crashed) offers the previous build at the next start, before anything
-// else, and so does holding L + R while PlayGuard starts. The screen that
+// else. The screen that
 // asks is action/rollback_flow.hpp's; this is the plain C++ part, for the
 // host tests (tests/rollback).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -33,22 +33,13 @@ struct Check
 bool read_check(const std::string& json_file, Check* out);
 bool write_check(const std::string& json_file, const Check& check);
 
-// Why the previous build is offered at start-up.
-enum class Offer
-{
-    None,
-    Crashed,   // the last start of the build installed did not reach its first screen
-    Asked,     // L + R held while PlayGuard started, no PIN set
-    Refused,   // L + R held, but a PIN is set (or unknown): only said where to go back, after the PIN
-};
-// `checked`: boot_check.json was there, `starts_before` read from it (before
-// this start counts); `held`: L + R; `have_previous`: <nro>.previous is
-// there; `pin_set`: the console has a PIN, or it could not be read. Nothing
-// is offered without a previous build. Only a start that did not finish
-// goes back without the PIN: the PIN screen itself may be what crashes, and
-// the build was just installed by whoever knows the PIN. L + R can be held
-// by anyone, so with a PIN it goes back from the app, where it is asked.
-Offer offer_at_start(bool checked, int starts_before, bool held, bool have_previous, bool pin_set);
+// Whether the previous build is offered at start-up: the last start of the
+// build installed did not reach its first screen. `checked`: boot_check.json
+// was there, `starts_before` read from it (before this start counts);
+// `have_previous`: <nro>.previous is there. It goes back without the PIN:
+// the PIN screen itself may be what crashes, and the build was just
+// installed by whoever knows the PIN.
+bool offer_at_start(bool checked, int starts_before, bool have_previous);
 
 // Swaps <nro> and <nro>.previous (the build running becomes the previous
 // one), through paths::replace_file. When a step fails, what was moved is

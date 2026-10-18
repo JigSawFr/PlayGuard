@@ -13,32 +13,21 @@
 #include "util/paths.hpp"
 #include "util/rollback.hpp"
 
-using rollback::Offer;
-
 // The suite's folder (main()).
 static std::string g_dir;
 
 static void test_offer()
 {
     // Nothing without a previous build, whatever happened.
-    CHECK(rollback::offer_at_start(true, 3, true, false, false) == Offer::None);
-    CHECK(rollback::offer_at_start(true, 3, true, false, true) == Offer::None);
+    CHECK(!rollback::offer_at_start(true, 3, false));
     // The build installed started once without reaching its first screen:
-    // offered without the PIN (the PIN screen may be what crashes).
-    CHECK(rollback::offer_at_start(true, 1, false, true, false) == Offer::Crashed);
-    CHECK(rollback::offer_at_start(true, 1, true, true, false) == Offer::Crashed);
-    CHECK(rollback::offer_at_start(true, 1, false, true, true) == Offer::Crashed);
-    CHECK(rollback::offer_at_start(true, 1, true, true, true) == Offer::Crashed);
-    // Its first start (nothing failed yet), or no check at all: only when asked.
-    CHECK(rollback::offer_at_start(true, 0, false, true, false) == Offer::None);
-    CHECK(rollback::offer_at_start(true, 0, true, true, false) == Offer::Asked);
-    CHECK(rollback::offer_at_start(false, 0, true, true, false) == Offer::Asked);
-    CHECK(rollback::offer_at_start(false, 0, false, true, false) == Offer::None);
-    // L + R with a PIN set (or not known): never the swap, only where to go
-    // back from, in the app, after the PIN.
-    CHECK(rollback::offer_at_start(true, 0, true, true, true) == Offer::Refused);
-    CHECK(rollback::offer_at_start(false, 0, true, true, true) == Offer::Refused);
-    CHECK(rollback::offer_at_start(false, 0, false, true, true) == Offer::None);
+    // offered (without the PIN: the PIN screen may be what crashes).
+    CHECK(rollback::offer_at_start(true, 1, true));
+    CHECK(rollback::offer_at_start(true, 3, true));
+    // Its first start (nothing failed yet), or no check at all: nothing.
+    CHECK(!rollback::offer_at_start(true, 0, true));
+    CHECK(!rollback::offer_at_start(false, 0, true));
+    CHECK(!rollback::offer_at_start(false, 2, true));   // a check that is not there counts nothing
 }
 
 static void test_files()

@@ -1152,7 +1152,7 @@
         "step_pulls": "Pull requests...",
         "step_runs": "Verificações...",
         "back": "Voltar para a compilação anterior: {}",
-        "back_body": "Substituir o PlayGuard {} pela compilação instalada antes, {}? O PlayGuard reinicia com ela.\n\nSe uma compilação travar antes da primeira tela, o PlayGuard oferece isso na próxima inicialização; segurar L + R ao iniciar também oferece, se não houver PIN definido.",
+        "back_body": "Substituir o PlayGuard {} pela compilação instalada antes, {}? O PlayGuard reinicia com ela.\n\nSe uma compilação travar antes da primeira tela, o PlayGuard oferece isso na próxima inicialização.",
         "back_confirm": "Voltar",
         "back_failed": "Não foi possível voltar para a compilação anterior: {}\n\nO PlayGuard instalado não foi alterado.",
         "count_new_one": "1 nova",

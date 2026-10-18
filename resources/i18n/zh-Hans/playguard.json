@@ -1152,7 +1152,7 @@
         "step_pulls": "拉取请求...",
         "step_runs": "检查...",
         "back": "回到上一个构建：{}",
-        "back_body": "将 PlayGuard {} 替换为之前安装的构建 {}？PlayGuard 将以它重新启动。\n\n如果某个构建在第一个界面之前崩溃，PlayGuard 会在下次启动时提出此操作；未设置PIN时，启动时按住 L + R 也会提出。",
+        "back_body": "将 PlayGuard {} 替换为之前安装的构建 {}？PlayGuard 将以它重新启动。\n\n如果某个构建在第一个界面之前崩溃，PlayGuard 会在下次启动时提出此操作。",
         "back_confirm": "回到上一个",
         "back_failed": "无法回到上一个构建：{}\n\n已安装的 PlayGuard 未改变。",
         "count_new_one": "1 个新的",
