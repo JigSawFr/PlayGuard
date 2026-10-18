@@ -264,10 +264,9 @@ CadranAboutTab::CadranAboutTab()
         hero->addView(text);
         column->addView(hero, 0);
     }
-    if (cadran::Card* notes = this->list.wrap("ab_changelog")) notes->setMarginBottom(10);
     this->list.apply({ { "ab_version", "info" }, { "ab_mode", "gamepad" }, { "ab_data", "folder" },
                        { "ab_update", "download" }, { "ab_update_daily", "calendar" }, { "ab_update_via", "server" },
-                       { "ab_changelog_full", "list" }, { "ab_notes", "file" }, { "ab_help", "tools" },
+                       { "ab_help", "tools" },
                        { "ab_author", "user" }, { "ab_upstream", "flag" }, { "ab_fixes", "check" }, { "ab_ui", "contrast" },
                        { "ab_license", "file" }, { "ab_source", "code" } });
 }
