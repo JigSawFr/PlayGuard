@@ -94,6 +94,10 @@ bool dev_mode() { return s_dev_session || config::get().dev_mode; }
 
 void set_dev_mode(bool on, bool persist, const std::string& saved_text, const std::string& failed_text)
 {
+    // Logged: a report's header gives the mode at the time it was made, and
+    // the toasts before it may tell otherwise.
+    if (on != dev_mode())
+        brls::Logger::info("developer mode: {}{}", on ? "on" : "off", persist || !on ? "" : " (this session)");
     s_dev_session = on;
     if (persist || !on) {
         config::get().dev_mode = on;

@@ -102,13 +102,14 @@ static bool dump_status(char **p, char *e)
     return true;
 }
 
-// Software allowed to communicate: the entry layout is not documented,
-// so the bytes as returned (an application ID per entry is expected).
+// Software allowed to communicate: 16-byte entries, an application ID (u64,
+// LE) then eight bytes of unknown meaning (01 and zeros, observed), shown
+// as returned.
 static bool dump_free_comm(char **p, char *e)
 {
     Service *srv;
     if (!(srv = dump_session(p, e, "1044"))) return false;
-    { u8 list[0x200]; memset(list, 0, sizeof(list));
+    { u8 list[0x10 * 64]; memset(list, 0, sizeof(list));
       u32 offset = 0, count = 0;
       Result r = serviceDispatchInOut(srv, 1044, offset, count,
           .buffer_attrs = { SfBufferAttr_HipcMapAlias | SfBufferAttr_Out },
@@ -116,9 +117,16 @@ static bool dump_free_comm(char **p, char *e)
       rep(p, e, "%6u %-38s rc=0x%08X  ", 1044u, "GetFreeCommunicationApplicationList(0)", (unsigned)r);
       if (R_SUCCEEDED(r)) {
           rep(p, e, "count=%u\n", (unsigned)count);
-          size_t n = (size_t)count * 0x20;
-          if (n > sizeof(list)) n = sizeof(list);
-          if (n) rep_hex(p, e, list, n);
+          const size_t n = count < sizeof(list) / 0x10 ? count : sizeof(list) / 0x10;
+          for (size_t i = 0; i < n; i++) {
+              const u8 *entry = list + i * 0x10;
+              u64 id = 0;
+              for (int b = 7; b >= 0; b--) id = (id << 8) | entry[b];
+              rep(p, e, "  %016llX ", (unsigned long long)id);
+              for (int b = 8; b < 0x10; b++) rep(p, e, " %02X", entry[b]);
+              rep(p, e, "\n");
+          }
+          rep(p, e, "\n");
       } else {
           rep(p, e, "-\n");
       } }

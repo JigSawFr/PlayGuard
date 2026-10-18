@@ -2,6 +2,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "platform.h"
 
+#include <malloc.h>
 #include <stdio.h>
 
 PlatformInput platform_numpad(const char *header, const char *guide, const char *initial, int max_len,
@@ -130,8 +131,11 @@ bool platform_read64(uint64_t addr, uint64_t *value, void *ctx)
 bool platform_memory(uint64_t *used, uint64_t *total)
 {
     if (!used || !total) return false;
-    return R_SUCCEEDED(svcGetInfo(used, InfoType_UsedMemorySize, CUR_PROCESS_HANDLE, 0)) &&
-           R_SUCCEEDED(svcGetInfo(total, InfoType_TotalMemorySize, CUR_PROCESS_HANDLE, 0));
+    // Not InfoType_UsedMemorySize: libnx maps the whole heap at start-up, so
+    // the process "uses" all of it from the first frame. What malloc handed
+    // out is what PlayGuard really holds.
+    *used = (uint64_t)mallinfo().uordblks;
+    return R_SUCCEEDED(svcGetInfo(total, InfoType_TotalMemorySize, CUR_PROCESS_HANDLE, 0));
 }
 
 void platform_crash(void)

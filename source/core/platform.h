@@ -72,8 +72,9 @@ bool platform_code_range(uint64_t *base, uint64_t *size);
 // (crash_dump_backtrace's reader; `ctx` unused). False on desktop.
 bool platform_read64(uint64_t addr, uint64_t *value, void *ctx);
 
-// The memory PlayGuard's process uses and may use, in bytes (hbloader gives
-// it what the game or the Album it runs over leaves). False when unknown.
+// The memory PlayGuard has allocated and the memory its process may use, in
+// bytes (hbloader gives it what the game or the Album it runs over leaves).
+// False when unknown.
 bool platform_memory(uint64_t *used, uint64_t *total);
 
 // Ends PlayGuard as a crash the console reports (Atmosphère writes a crash

@@ -218,8 +218,13 @@ Result mock_dispatch(Service *srv, u32 command, void *out, size_t out_size,
         case 1044:
             CHECK(in_size == 4 && params.buffer_attrs[0] == (SfBufferAttr_HipcMapAlias | SfBufferAttr_Out));
             REQUIRE(params.buffers[0].ptr != NULL && params.buffers[0].size >= 0x20);
-            memset((void *)params.buffers[0].ptr, 0xAB, 0x20);
-            w = 1; return put(out, out_size, &w, 4);
+            {   /* two entries: an application ID, then 01 and zeros */
+                static const u8 entries[0x20] = {
+                    0x00, 0x60, 0xCE, 0x0E, 0xA0, 0xC9, 0x00, 0x01, 0x01, 0, 0, 0, 0, 0, 0, 0,
+                    0x00, 0x20, 0x0A, 0x00, 0xF0, 0xF8, 0x00, 0x01, 0x01, 0, 0, 0, 0, 0, 0, 0 };
+                memcpy((void *)params.buffers[0].ptr, entries, sizeof(entries));
+            }
+            w = 2; return put(out, out_size, &w, 4);
         case 1903: w = model.exempt; return put(out, out_size, &w, 4);
         case 1904:
             model.saw_1904 = true;
@@ -388,6 +393,9 @@ static void test_reads(void)
         CHECK(strstr(report, "content=not recorded") != NULL);
         CHECK(strstr(report, model.pin) == NULL);
         CHECK(strstr(report, "set (length not recorded)") != NULL);   /* whether, not how long */
+        /* The free-communication list: one line per entry, its application ID read. */
+        CHECK(strstr(report, "count=2\n  0100C9A00ECE6000  01 00 00 00 00 00 00 00\n"
+                             "  0100F8F0000A2000  01 00 00 00 00 00 00 00\n") != NULL);
         CHECK(strstr(report, "Tool-owned pctl session released.") != NULL);
         CHECK(model.refs == 0 && model.writes == 0);
     }

@@ -62,7 +62,7 @@ std::string logs_section()
 
     uint64_t used = 0, total = 0;
     out += "memory      : " +
-           (platform_memory(&used, &total) ? fmt::format("{} used of {}", bytes(used), bytes(total)) : std::string("unknown")) +
+           (platform_memory(&used, &total) ? fmt::format("{} allocated, of {} for the process", bytes(used), bytes(total)) : std::string("unknown")) +
            "\n";
     struct statvfs fs;
     if (statvfs(paths::sd_root().c_str(), &fs) == 0 && fs.f_blocks > 0)
