@@ -10,7 +10,7 @@ enum { MS = 1000000 };
 // A console start: every step reached, from userAppInit.
 static void console_times(int64_t at[StartupStep_Count])
 {
-    static const int ms[StartupStep_Count] = { 0, 412, 415, 423, 443, 823, 863, 983, 993, 2863, 2913 };
+    static const int ms[StartupStep_Count] = { 0, 412, 415, 416, 418, 419, 420, 423, 443, 823, 863, 983, 993, 2863, 2913 };
     const int64_t boot = 3600LL * 1000 * MS;   // the system tick counts from the console's boot
     for (int i = 0; i < StartupStep_Count; i++) at[i] = boot + (int64_t)ms[i] * MS;
 }
@@ -49,7 +49,8 @@ static void test_desktop(void)
     CHECK(strstr(out, "start-up    : first screen after 2498 ms (from main())\n") == out);
     CHECK(!strstr(out, "system services"));
     CHECK(!strstr(out, "C++ static initialisation"));
-    CHECK(strstr(out, "  preferences (config.json)                     8       8\n"));
+    CHECK(strstr(out, "  data folder: older layouts                    1       1\n"));
+    CHECK(strstr(out, "  preferences (config.json, state.json)         3       8\n"));
 }
 
 static void test_missing_steps(void)
@@ -83,7 +84,7 @@ static void test_missing_steps(void)
     at[StartupStep_Main] = at[StartupStep_ServicesBegin];
     startup_format(at, out, sizeof(out));
     CHECK(strstr(out, "  C++ static initialisation                     0       0\n"));
-    CHECK(strstr(out, "  preferences (config.json)                   423     423\n"));
+    CHECK(strstr(out, "  data folder: older layouts                  416     416\n"));
 }
 
 static void test_truncated(void)

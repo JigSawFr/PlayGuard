@@ -7,6 +7,7 @@
 #include <cstring>
 #include <sys/stat.h>
 #include <utility>
+#include <vector>
 
 #include "util/paths.hpp"
 
@@ -196,7 +197,12 @@ size_t migrate(const std::string& logs_dir)
     const std::string reports = logs_dir + "/reports", crashes = logs_dir + "/crashes",
                       play_timer = logs_dir + "/play_timer";
     size_t moved = 0;
-    for (const std::string& n : paths::list_files(logs_dir, ".txt")) {
+    // logs/ read once: on the SD card each look for a file costs about a
+    // millisecond, and the old names are missing at nearly every start.
+    const std::vector<std::string> names = paths::list_files(logs_dir, "");
+    const auto has = [&names](const std::string& n) { return std::binary_search(names.begin(), names.end(), n); };
+    for (const std::string& n : names) {
+        if (n.size() <= 4 || n.compare(n.size() - 4, 4, ".txt") != 0) continue;
         // diagnostic::save's names before the folders: "20261009_141203[_n].txt".
         if (!is_stamp(n, 0)) continue;
         const std::string rest = n.substr(15, n.size() - 15 - 4);
@@ -207,7 +213,7 @@ size_t migrate(const std::string& logs_dir)
     // crash.txt held every crash, one line each, starting "2026-10-11 14:25:30".
     const std::string crash = logs_dir + "/crash.txt";
     std::string text;
-    if (paths::read_file(crash, text)) {
+    if ((has("crash.txt") || has("crash.txt.tmp")) && paths::read_file(crash, text)) {
         std::string st = "19700101_000000";
         line_stamp(text, &st);
         if (paths::ensure_dir(crashes)) {
@@ -222,14 +228,14 @@ size_t migrate(const std::string& logs_dir)
     // uploads.txt held every link, one line each: "2026-10-11 14:25  https://…";
     // then uploads/upload_<date>.txt, a file per link.
     const std::string uploads = logs_dir + "/uploads.txt", uploads_dir = logs_dir + "/uploads";
-    if (paths::read_file(uploads, text) && paths::ensure_dir(uploads_dir) &&
+    if ((has("uploads.txt") || has("uploads.txt.tmp")) && paths::read_file(uploads, text) && paths::ensure_dir(uploads_dir) &&
         save_shortcuts(text, "19700101_000000", uploads_dir)) {
         // Only once every line is in a file of its own.
         std::remove(uploads.c_str());
         std::remove((uploads + ".tmp").c_str());
         moved++;
     }
-    for (const std::string& n : paths::list_files(uploads_dir, ".txt")) {
+    for (const std::string& n : has("uploads") ? paths::list_files(uploads_dir, ".txt") : std::vector<std::string>{}) {
         const std::string path = uploads_dir + "/" + n;
         const std::string as_url = n.substr(0, n.size() - 4) + ".url";
         std::string st;
@@ -244,7 +250,7 @@ size_t migrate(const std::string& logs_dir)
                                          { "play_timer_block.json", "block.json" } };
     for (const auto& f : PT) {
         const std::string from = logs_dir + "/" + f[0];
-        if (paths::file_exists(from) && paths::ensure_dir(play_timer) && move(from, play_timer + "/" + f[1])) moved++;
+        if (has(f[0]) && paths::file_exists(from) && paths::ensure_dir(play_timer) && move(from, play_timer + "/" + f[1])) moved++;
     }
     return moved;
 }

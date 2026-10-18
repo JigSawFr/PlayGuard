@@ -58,6 +58,10 @@ std::string sd_root()
 
 bool ensure_dir(const std::string& dir)
 {
+    // Nearly always there already: one look, not a mkdir per folder of the
+    // path (each one on the SD card costs about a millisecond).
+    struct stat st;
+    if (stat(dir.c_str(), &st) == 0 && S_ISDIR(st.st_mode)) return true;
     std::string partial;
     std::stringstream ss(dir);
     std::string part;

@@ -24,7 +24,11 @@ typedef enum {
     StartupStep_ServicesBegin,   // userAppInit called: libnx's own services are up
     StartupStep_Services,        // it returned: sockets, romfs, settings, network (borealis' switch_wrapper.c)
     StartupStep_Main,            // main() entered: the C++ static constructors ran
-    StartupStep_Preferences,     // config.json read
+    StartupStep_Migrations,      // the data folder of older versions' layouts moved (data_move, log_files)
+    StartupStep_Session,         // this run's session file, the last run checked for a crash
+    StartupStep_Rollback,        // rollback_flow::at_start: a build that never reached its first screen
+    StartupStep_System,          // the system (sysMMC or emuMMC) and its folder
+    StartupStep_Preferences,     // config.json and state.json read
     StartupStep_Borealis,        // brls::Application::init: the platform, the translations
     StartupStep_Window,          // brls::Application::createWindow: graphics (deko3d), sounds, fonts
     StartupStep_LoadingDrawn,    // the loading screen's first frame drawn

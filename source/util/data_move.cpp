@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/data_move.hpp"
 
+#include <algorithm>
 #include <cstdio>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -75,12 +76,18 @@ size_t to_nand(const std::string& data_dir, const std::string& nand_dir)
 {
     static const char* const FILES[] = { "history.json", "watch.json" };
     static const char* const SUFFIXES[] = { "", ".tmp", ".bad", ".bad.1" };
+    // The folder read once: on the SD card each look for a file costs about
+    // a millisecond, and once moved the names are missing at every start.
+    const std::vector<std::string> names = paths::list_files(data_dir, "");
+    const auto has = [&names](const std::string& n) { return std::binary_search(names.begin(), names.end(), n); };
     std::vector<std::pair<std::string, std::string>> moves;   // from, to (relative)
     for (const char* f : FILES)
-        for (const char* s : SUFFIXES) moves.push_back({ std::string(f) + s, std::string(f) + s });
-    moves.push_back({ "backups", "backups" });
-    for (const std::string& n : paths::list_files(data_dir + "/cache", ".bin"))
-        if (n.compare(0, 9, "activity_") == 0) moves.push_back({ "cache/" + n, "cache/" + n });
+        for (const char* s : SUFFIXES)
+            if (has(std::string(f) + s)) moves.push_back({ std::string(f) + s, std::string(f) + s });
+    if (has("backups")) moves.push_back({ "backups", "backups" });
+    if (has("cache"))
+        for (const std::string& n : paths::list_files(data_dir + "/cache", ".bin"))
+            if (n.compare(0, 9, "activity_") == 0) moves.push_back({ "cache/" + n, "cache/" + n });
     size_t moved = 0;
     struct stat st;
     for (const auto& m : moves) {
