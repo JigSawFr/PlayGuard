@@ -18,7 +18,7 @@ What each tab does, how PlayGuard writes safely, and what the console counts as 
 
 ↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh (on the tabs that read the console) · Ⓨ notifications · **−** language and theme · **+** saves per-day limits (and, in Cadran, the week edited on *Play timer*).
 
-What failed is said in a dialog, what worked in a toast. A dialog only says what applies to this console now: that the game in progress would be suspended, only while a game is open; that the companion app could overwrite a change, only while it is linked and can sync. An icon right of the title says while parental controls are temporarily unlocked (an open padlock) or when the app is read-only (a crossed-out pencil); a tap on it goes where it is undone (PIN › Turn parental controls back on, the firmware screen); in read-only mode, actions stay in place, greyed, and say why when pressed.
+What failed is said in a dialog, what worked in a toast. A dialog only says what applies to this console now: that the game in progress would be suspended, only while a game is open; that the companion app could overwrite a change, only while it is linked and can sync. An icon right of the title says while parental controls are temporarily unlocked (an open padlock; in Cadran, the header's pill says it instead, on every tab) or when the app is read-only (a crossed-out pencil); a tap on it goes where it is undone (PIN › Turn parental controls back on, the firmware screen); in read-only mode, actions stay in place, greyed, and say why when pressed.
 
 The app is organised in tabs, like System Settings; each has its section below.
 

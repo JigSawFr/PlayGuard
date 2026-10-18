@@ -255,8 +255,10 @@ void MainActivity::update_title()
     auto* frame = dynamic_cast<brls::AppletFrame*>(this->getContentView());
     if (!frame) return;
     frame->setTitle("playguard/title"_i18n);
-    TitleState::show(frame, TitleState::Kind::UNLOCKED, ui::known_unlocked());
+    // Cadran says it in the header's pill, on every screen.
+    TitleState::show(frame, TitleState::Kind::UNLOCKED, ui::known_unlocked() && !cadran::enabled());
     TitleState::show(frame, TitleState::Kind::READ_ONLY, app::read_only());
+    if (cadran::enabled()) cadran::refresh_pill();
 }
 
 // Back from a dialog or a screen: a tab may have hidden the view that opened

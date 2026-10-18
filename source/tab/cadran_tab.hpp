@@ -49,7 +49,11 @@ void style_frame(brls::AppletFrame* frame, brls::View* tab_frame);
 // The main screen's header pill: its text, or hidden when empty (each
 // screen says what it has to: "Contrôle parental actif", "Minuteur actif"…),
 // its icon, and amber for a state that needs the parent ("Pas de code PIN").
+// While parental controls are known to be unlocked (ui::known_unlocked), it
+// says that instead, whatever the screen: the header's padlock in Classic.
 void set_pill(const std::string& text, const char* icon = "check", bool warn = false);
+// The pill again after the unlocked state changed (MainActivity::update_title).
+void refresh_pill();
 // The soft glow of the boards, an absolute full-screen view to add first in
 // a frame: a radial gradient of `color_key` centred on (cx, cy), `radius`
 // wide. PLAYGUARD_SIM_CADRAN_NOGLOW=1 draws nothing.

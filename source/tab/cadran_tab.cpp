@@ -237,11 +237,29 @@ namespace
 brls::Box*   s_main_pill = nullptr;
 brls::Label* s_main_pill_label = nullptr;
 CadranIcon*  s_main_pill_icon = nullptr;
+// What the screen shown last asked the pill to say.
+std::string s_pill_text;
+std::string s_pill_glyph = "check";
+bool        s_pill_warn  = false;
 }   // namespace
 
 void cadran::set_pill(const std::string& text, const char* glyph, bool warn)
 {
+    s_pill_text  = text;
+    s_pill_glyph = glyph ? glyph : "check";
+    s_pill_warn  = warn;
+    refresh_pill();
+}
+
+void cadran::refresh_pill()
+{
     if (!s_main_pill || !s_main_pill_label || !s_main_pill_icon) return;
+    // Unlocked: that first, on every screen (what a tab says comes back
+    // once locked again).
+    const bool unlocked = ui::known_unlocked();
+    const std::string text = unlocked ? "playguard/cadran/pill/unlocked"_i18n : s_pill_text;
+    const char* glyph = unlocked ? "unlock" : s_pill_glyph.c_str();
+    const bool warn = unlocked || s_pill_warn;
     brls::Theme theme = brls::Application::getTheme();
     const NVGcolor ink = warn ? theme["cadran/amber"] : theme["cadran/pill_ok_ink"];
     s_main_pill_label->setText(text);
