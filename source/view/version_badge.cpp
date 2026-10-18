@@ -4,7 +4,10 @@
 #include "app.hpp"
 #include "ui/ui.hpp"
 
+#include <algorithm>
+
 static constexpr const char* BADGE_ID = "version_badge";
+static constexpr const char* TOOLS_ID = "header_tools";
 
 VersionBadge::VersionBadge()
     : brls::Box(brls::Axis::ROW)
@@ -13,51 +16,65 @@ VersionBadge::VersionBadge()
     this->setFocusable(false);
     this->setAlignItems(brls::AlignItems::CENTER);
     this->setAlignSelf(brls::AlignSelf::CENTER);
-    this->setMarginLeft(20);
+    this->setMarginLeft(16);
 
     // On the desktop, one made-up build (PLAYGUARD_SIM_VERSION, see app.cpp).
     const std::string version = app::version(), commit = app::commit();
     const bool release = app::is_release();
 
+    // The tag: filled (the amber of the warnings, or the notes' grey for a
+    // release), the version in the background's colour.
+    const NVGcolor ink = release ? ui::color_note() : ui::color_warn();
+    auto* tag = new brls::Box(brls::Axis::ROW);
+    tag->setBackgroundColor(ink);
+    tag->setCornerRadius(4);
+    tag->setPadding(2, 8, 2, 8);
+    auto* number = new brls::Label();
+    number->setText(version);
+    number->setFontSize(18);
+    number->setSingleLine(true);
+    number->setTextColor(brls::Application::getTheme()["brls/background"]);
+    tag->addView(number);
+    this->addView(tag);
+    if (release) return;
     auto* text = new brls::Label();
     text->setFontSize(18);
     text->setSingleLine(true);
-    if (release) {
-        text->setText("v" + version);
-        text->setTextColor(ui::color_note());
-        this->addView(text);
-        return;
-    }
-    // The tag: the amber of the warnings, filled, its text in the background's colour.
-    auto* tag = new brls::Box(brls::Axis::ROW);
-    tag->setBackgroundColor(ui::color_warn());
-    tag->setCornerRadius(4);
-    tag->setPadding(2, 8, 2, 8);
-    tag->setMarginRight(10);
-    auto* dev = new brls::Label();
-    dev->setText("DEV");
-    dev->setFontSize(18);
-    dev->setSingleLine(true);
-    dev->setTextColor(brls::Application::getTheme()["brls/background"]);
-    tag->addView(dev);
-    this->addView(tag);
-    text->setText(commit.empty() ? version : version + " · " + commit);
-    text->setTextColor(ui::color_warn());
+    text->setMarginLeft(10);
+    text->setText(commit.empty() ? "DEV" : "DEV · " + commit);
+    text->setTextColor(ink);
     this->addView(text);
 }
 
-// Adds the badge to the header of the screen holding `focus` (its root view:
-// borealis gives a new screen the focus before putting it on the activity
-// stack), unless it has one. Screens without the applet frame's header (the
-// loading screen, dialogs) are left alone.
+// Adds the badge right after the title of the screen holding `focus` (its
+// root view: borealis gives a new screen the focus before putting it on the
+// activity stack), unless it has one. Screens without the applet frame's
+// header (the loading screen, dialogs) are left alone.
 static void badge_screen_of(brls::View* focus)
 {
     if (!focus) return;
     while (focus->hasParent()) focus = focus->getParent();
-    auto* frame  = dynamic_cast<brls::AppletFrame*>(focus);
+    auto* frame = dynamic_cast<brls::AppletFrame*>(focus);
+    auto* label = frame ? frame->getView("brls/applet_frame/title_label") : nullptr;
+    auto* row   = label ? dynamic_cast<brls::Box*>(label->getParent()) : nullptr;
+    if (!row || row->getView(BADGE_ID)) return;
+    const auto& views = row->getChildren();
+    const auto at = std::find(views.begin(), views.end(), label) - views.begin() + 1;
+    row->addView(new VersionBadge(), at);
+}
+
+brls::Box* VersionBadge::header_tools(brls::AppletFrame* frame)
+{
     auto* header = frame ? dynamic_cast<brls::Box*>(frame->getView("brls/applet_frame/header")) : nullptr;
-    if (!header || header->getView(BADGE_ID)) return;
-    header->addView(new VersionBadge());
+    if (!header) return nullptr;
+    if (auto* tools = dynamic_cast<brls::Box*>(header->getView(TOOLS_ID))) return tools;
+    auto* tools = new brls::Box(brls::Axis::ROW);
+    tools->setId(TOOLS_ID);
+    tools->setFocusable(false);
+    tools->setAlignItems(brls::AlignItems::CENTER);
+    tools->setAlignSelf(brls::AlignSelf::CENTER);
+    header->addView(tools);
+    return tools;
 }
 
 void VersionBadge::install()

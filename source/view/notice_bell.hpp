@@ -1,10 +1,9 @@
-// NoticeBell — the notification bell in the main screen's header, left of
-// the version badge: a bell drawn with nanovg, with the number of entries
+// NoticeBell — the notification bell at the right of the main screen's header: a bell drawn with nanovg, with the number of entries
 // to do on an amber disc. Information only: the bell without a number, a
 // small dot. Not focusable: Y opens the list (action/notices), and so does a
 // tap on it. Only on the
-// main screen, inside the version badge's row so the header keeps its
-// layout (the title at the left, the badge at the right).
+// main screen, in the header's row at the right (VersionBadge::header_tools;
+// the title and the version badge stay at the left).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -17,7 +16,7 @@ class NoticeBell : public brls::View
     ~NoticeBell() override;
 
     // Puts the bell in the main screen's header, when it first takes the
-    // focus (after VersionBadge::install's badge). Called once, at start-up.
+    // focus. Called once, at start-up.
     static void install();
 
     void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,

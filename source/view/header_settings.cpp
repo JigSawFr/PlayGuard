@@ -8,6 +8,7 @@
 #include "tab/tab_base.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "view/version_badge.hpp"
 
 static constexpr float SIZE = 40;
 static constexpr const char* LANGUAGE_ID = "header_language";
@@ -134,18 +135,18 @@ void HeaderSetting::draw_theme(NVGcontext* vg, float x, float y, float width, fl
 }
 
 // The main screen (its tab frame) holding `focus`: the language then the
-// theme go first in the version badge's row (the bell is there already),
-// unless it has them.
+// theme go first in the header's row at the right (the bell is there
+// already), unless it has them.
 static void settings_screen_of(brls::View* focus)
 {
     if (!focus) return;
     while (focus->hasParent()) focus = focus->getParent();
     auto* frame = dynamic_cast<brls::AppletFrame*>(focus);
     if (!frame || !frame->getView("main_tabs")) return;
-    auto* badge = dynamic_cast<brls::Box*>(frame->getView("version_badge"));
-    if (!badge || badge->getView(LANGUAGE_ID)) return;
-    badge->addView(new HeaderSetting(HeaderSetting::Kind::LANGUAGE), 0);
-    badge->addView(new HeaderSetting(HeaderSetting::Kind::THEME), 1);
+    auto* tools = VersionBadge::header_tools(frame);
+    if (!tools || tools->getView(LANGUAGE_ID)) return;
+    tools->addView(new HeaderSetting(HeaderSetting::Kind::LANGUAGE), 0);
+    tools->addView(new HeaderSetting(HeaderSetting::Kind::THEME), 1);
 }
 
 void HeaderSetting::install()
