@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/game_tile.hpp"
 
+#include "action/game_icons.hpp"
 #include "ui/ui.hpp"
 
 namespace
@@ -25,8 +26,14 @@ GameTile::GameTile()
     this->icon->setWidth(COVER);
     this->icon->setHeight(COVER);
     this->icon->setCornerRadius(8);
-    this->icon->setBackgroundColor(ui::color_track());   // until the icon arrives
-    this->icon->setScalingType(brls::ImageScalingType::FIT);
+    this->icon->setBackgroundColor(ui::color_track());
+    // Until the icon arrives (or for a game without one): the placeholder,
+    // its own size in the middle of the cover.
+    if (const int waiting = game_icons::placeholder()) {
+        this->icon->setScalingType(brls::ImageScalingType::CENTER);
+        this->icon->innerSetImage(waiting);
+        this->icon->setFreeTexture(false);
+    }
     this->addView(this->icon);
 
     this->name = new brls::Label();
@@ -68,6 +75,7 @@ void GameTile::set_icon_texture(int texture, bool owned)
     if (texture == 0) return;
     // The one shown before is freed only if it was this tile's own: the flag
     // still says so while it is replaced.
+    this->icon->setScalingType(brls::ImageScalingType::FIT);
     this->icon->innerSetImage(texture);
     this->icon->setFreeTexture(owned);
     this->iconed = true;

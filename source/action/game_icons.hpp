@@ -31,6 +31,11 @@ const std::vector<unsigned char>* bytes(u64 app_id);
 // yet, or cannot be decoded.
 int texture(u64 app_id, bool& owned);
 
+// A game's icon until its own arrives, and for a game without one: the
+// controller of img/emoji, greyed and faint, one texture for the run (never
+// free it); 0 when it cannot be read.
+int placeholder();
+
 // The game has no icon to read, or it is read already.
 bool known(u64 app_id);
 
