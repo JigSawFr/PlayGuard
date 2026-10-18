@@ -1,0 +1,109 @@
+<!doctype html>
+<!-- The web simulator's page (web/README.md): PlayGuard's desktop simulator
+     built with Emscripten, its settings in the URL and in the side panel. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PlayGuard simulator</title>
+  <meta name="description" content="PlayGuard running in the browser against a simulated console.">
+  <link rel="icon" href="icon.jpg">
+  <link rel="stylesheet" href="simulator.css">
+  <!-- Threads need a cross-origin isolated page; GitHub Pages cannot send the
+       headers, so this service worker adds them (and reloads once). -->
+  <script src="coi-serviceworker.js"></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <img src="icon.jpg" alt="" width="28" height="28">
+      <span class="name">PlayGuard</span>
+      <span class="tag" data-i18n="title">Simulator</span>
+    </div>
+    <div class="build" id="build"></div>
+    <button class="icon-btn panel-toggle" id="panel-toggle" type="button" aria-controls="panel" aria-expanded="true"
+            data-i18n-title="settings" title="Settings">⚙</button>
+  </header>
+
+  <main class="layout">
+    <section class="stage">
+      <div class="screen" id="screen">
+        <canvas id="canvas" width="1280" height="720" tabindex="0" oncontextmenu="event.preventDefault()"
+                aria-label="PlayGuard"></canvas>
+        <div class="overlay" id="overlay">
+          <div class="spinner" aria-hidden="true"></div>
+          <p id="status" data-i18n="loading">Loading…</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <p class="keys" data-i18n-html="keys"></p>
+        <div class="control-actions">
+          <button type="button" class="btn ghost" id="pad-toggle" aria-pressed="false" data-i18n="pad">Pad</button>
+          <button type="button" class="btn ghost" id="shot" data-i18n="screenshot">Screenshot</button>
+        </div>
+      </div>
+
+      <div class="pad" id="pad" hidden>
+        <div class="pad-row shoulders">
+          <button type="button" data-button="0">ZL</button><button type="button" data-button="1">L</button>
+          <button type="button" data-button="7" class="small">−</button><button type="button" data-button="9" class="small">+</button>
+          <button type="button" data-button="15">R</button><button type="button" data-button="16">ZR</button>
+        </div>
+        <div class="pad-row">
+          <div class="dpad">
+            <button type="button" data-button="3" class="up" aria-label="Up">▲</button>
+            <button type="button" data-button="6" class="left" aria-label="Left">◀</button>
+            <button type="button" data-button="4" class="right" aria-label="Right">▶</button>
+            <button type="button" data-button="5" class="down" aria-label="Down">▼</button>
+          </div>
+          <div class="face">
+            <button type="button" data-button="14" class="x">X</button>
+            <button type="button" data-button="11" class="y">Y</button>
+            <button type="button" data-button="13" class="a">A</button>
+            <button type="button" data-button="12" class="b">B</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel" id="panel">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" class="tab" aria-selected="true" data-tab="settings" data-i18n="settings">Settings</button>
+        <button type="button" role="tab" class="tab" aria-selected="false" data-tab="log" data-i18n="log">Log</button>
+      </div>
+
+      <div class="tab-body" data-body="settings">
+        <label class="field preset">
+          <span data-i18n="preset">Preset</span>
+          <select id="preset"></select>
+        </label>
+        <form id="form" autocomplete="off"></form>
+        <details class="group" id="other-group">
+          <summary data-i18n="other">Other parameters</summary>
+          <p class="help" data-i18n="other_help"></p>
+          <div id="other"></div>
+          <div class="add-other">
+            <input id="other-name" placeholder="name" aria-label="name">
+            <input id="other-value" placeholder="value" aria-label="value">
+            <button type="button" class="btn ghost" id="other-add" data-i18n="add">Add</button>
+          </div>
+        </details>
+      </div>
+
+      <div class="tab-body" data-body="log" hidden>
+        <pre class="log" id="log"></pre>
+      </div>
+
+      <div class="panel-actions">
+        <button type="button" class="btn primary" id="apply" data-i18n="apply">Apply</button>
+        <button type="button" class="btn" id="copy" data-i18n="copy">Copy link</button>
+        <button type="button" class="btn ghost" id="reset" data-i18n="reset">Reset</button>
+      </div>
+      <p class="note" data-i18n="note"></p>
+    </aside>
+  </main>
+
+  <script src="simulator.js"></script>
+</body>
+</html>

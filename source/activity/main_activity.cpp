@@ -104,8 +104,9 @@ void MainActivity::onContentAvailable()
         NoticesActivity::open();
         return true;
     });
-#ifndef __SWITCH__
-    // The desktop build: the keyboard has no Ⓨ, so the Y key (smoke test).
+#if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
+    // The desktop build: the keyboard has no Ⓨ, so the Y key (smoke test). Not in
+    // a browser, where the page presses Ⓨ itself for the Y key (web/README.md).
     this->getContentView()->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Y), [](brls::View*) {
         NoticesActivity::open();
         return true;
@@ -116,7 +117,7 @@ void MainActivity::onContentAvailable()
         ui::quick_settings(TabBase::refresh_shown);
         return true;
     });
-#ifndef __SWITCH__
+#if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
     this->getContentView()->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_MINUS), [](brls::View*) {
         ui::quick_settings(TabBase::refresh_shown);
         return true;

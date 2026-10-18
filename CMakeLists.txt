@@ -240,8 +240,9 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${BOREALIS_INCLUDES})
 target_link_options(${PROJECT_NAME} PRIVATE ${APP_PLATFORM_LINK_OPTION})
 # The web simulator: WebGL 2, threads from a pool started with the page (a
 # thread asked for later waits for the browser, which a busy main thread never
-# lets it have), the resources packaged at /app/resources, and ENV for the page
-# to set the PLAYGUARD_SIM_* variables before main() (web/shell.html).
+# lets it have), the resources packaged at /app/resources, and ENV and FS for
+# the page to set the PLAYGUARD_SIM_* variables and write config.json before
+# main() (web/simulator.js).
 if (PLAYGUARD_WEB)
     target_link_options(${PROJECT_NAME} PRIVATE
         -pthread -fexceptions -sUSE_SDL=2 -sUSE_ZLIB=1
@@ -249,7 +250,7 @@ if (PLAYGUARD_WEB)
         -sALLOW_MEMORY_GROWTH -sINITIAL_MEMORY=128MB -sSTACK_SIZE=1MB -sDEFAULT_PTHREAD_STACK_SIZE=1MB
         -sPTHREAD_POOL_SIZE=16
         -sEXIT_RUNTIME=0
-        -sEXPORTED_RUNTIME_METHODS=ENV
+        -sEXPORTED_RUNTIME_METHODS=ENV,FS
         --preload-file ${CMAKE_BINARY_DIR}/resources@/app/resources)
 endif ()
 # On the Switch: borealis' userAppInit, which libnx calls before main, timed
@@ -313,4 +314,21 @@ if (PLATFORM_SWITCH)
 else ()
     add_custom_target(${PROJECT_NAME}_resources ALL ${ASSEMBLE_RESOURCES})
     add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_resources)
+endif ()
+
+# The web simulator's site, ready to serve (web/README.md): the page from
+# web/, PlayGuard and its packaged resources, in <build>/site/.
+if (PLAYGUARD_WEB)
+    set(PLAYGUARD_SITE ${CMAKE_BINARY_DIR}/site)
+    add_custom_target(${PROJECT_NAME}_site ALL DEPENDS ${PROJECT_NAME}
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${PLAYGUARD_SITE}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${PLAYGUARD_SITE}
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_CURRENT_SOURCE_DIR}/web/index.html ${CMAKE_CURRENT_SOURCE_DIR}/web/simulator.js
+                ${CMAKE_CURRENT_SOURCE_DIR}/web/simulator.css ${CMAKE_CURRENT_SOURCE_DIR}/web/params.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/web/coi-serviceworker.js ${PROJECT_ICON}
+                ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.js ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.wasm
+                ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.data
+                ${PLAYGUARD_SITE}
+        COMMENT "Assembling the web simulator's site in ${PLAYGUARD_SITE}")
 endif ()

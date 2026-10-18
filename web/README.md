@@ -1,0 +1,81 @@
+# The web simulator
+
+The desktop simulator (`make desktop`, `source/sim/`), compiled with
+[Emscripten](https://emscripten.org) for a browser: the real borealis UI
+against a simulated console, to click through a change, try a state or show
+a screen without a build on the console.
+
+- **main**: <https://jigsawfr.github.io/PlayGuard/>
+- **a pull request**: `https://jigsawfr.github.io/PlayGuard/pr-<number>/`, linked in a
+  comment on the pull request and updated at each push (`.github/workflows/web.yml`).
+  It goes when the pull request is closed. Pull requests from forks are built
+  but not published (their token cannot write to the repository).
+
+## The page
+
+- **The settings are in the URL**, each `PLAYGUARD_SIM_*` variable by its name
+  in lower case without the prefix: `?unlocked=1&fw=20.5.0` is
+  `PLAYGUARD_SIM_UNLOCKED=1 PLAYGUARD_SIM_FW=20.5.0`
+  ([CONTRIBUTING.md](../CONTRIBUTING.md#the-desktop-simulator) says what each
+  one simulates). Three more are not variables but preferences, written into
+  the simulated `config.json` before PlayGuard starts: `lang` (`fr`, `de`, …),
+  `theme` (`light`, `dark`) and `tab` (the first tab: `play_timer`,
+  `console`, …). A variable the panel does not know (one a newer build reads)
+  still reaches PlayGuard.
+- **The side panel** shows them and changes them; **Apply** reloads the page
+  with the new URL, so PlayGuard starts again from a fresh state, and **Copy
+  link** gives a link that opens that state. **Presets** set common states in
+  one go (keeping the language, theme and first tab). What is changed inside
+  PlayGuard (a limit, the language in Preferences) lives in memory only and
+  goes with the next reload.
+- **Controls**: the arrows, Enter (Ⓐ) and Esc (Ⓑ) reach SDL directly; the
+  page presses the other buttons by what the key says, on any layout: X, Y,
+  L, R, Shift+L (ZL), Shift+R (ZR), + or P, − or M, Backspace (Ⓑ). A click is
+  a touch. **Pad** shows an on-screen controller (shown by default on a touch
+  screen). A gamepad works through the browser.
+- **Screenshot** saves the screen as it is (1280×720); **Log** shows what
+  PlayGuard logs.
+- The network is a console without a connection: GitHub and switchbrew send
+  no CORS headers, so a page cannot reach them (`source/sim/web_http.cpp`).
+  The `PLAYGUARD_SIM_*` folders the desktop reads its answers from do not
+  exist here either: their variables take `offline` or nothing.
+
+## How it is built
+
+`make web` (needs Emscripten's `emcmake` on the `PATH`: `source <emsdk>/emsdk_env.sh`)
+builds `build-web/site/`; `make web-serve` serves it at <http://localhost:8000>.
+
+- `CMakeLists.txt`, under `emcmake` (`PLAYGUARD_WEB`): the desktop build on
+  borealis' SDL2 platform with OpenGL ES 3, which Emscripten maps to WebGL 2;
+  SDL2 and zlib from Emscripten's ports; no libcurl; the resources packaged at
+  `/app/resources` (`playguard.data`); a pool of 16 threads started with the
+  page (a thread asked for later waits for the browser, which a busy main
+  thread never lets it have).
+- `source/main.cpp`: in a browser a frame must hand the thread back to the
+  page, so the main loop is `emscripten_set_main_loop`, one `run_frame()` per
+  display refresh.
+- `patches/borealis/0090-sdl-in-a-browser.patch`: no SDL haptic in a browser,
+  and `brls_web_button()`, which the page calls to press a button.
+- The page: `index.html`, `simulator.js`, `simulator.css`, and `params.json`,
+  the panel's entries. `tools/check_web_params.py` (CI) fails when a
+  `PLAYGUARD_SIM_*` variable read in `source/` has no entry there, or an
+  entry no longer matches a variable.
+- **Threads need a cross-origin isolated page** (the COOP / COEP headers).
+  GitHub Pages cannot send them, so `coi-serviceworker.js` (vendored, MIT)
+  adds them from a service worker, which reloads the page once on the first
+  visit. `serve.py` sends them itself.
+- CI writes `build.json` (the repository, commit, branch, pull request and
+  its title) for the page's header, and the page asks for PlayGuard's files
+  with the commit in their URL: GitHub Pages lets browsers keep them 10
+  minutes, and an old `.wasm` with a new `.js` would not start.
+
+## GitHub Pages
+
+The site is the `gh-pages` branch, which `web.yml` writes: main's build at its
+root, each pull request's in `pr-<number>/`. The branch holds a single commit,
+pushed again at each deployment, so the previews' `.wasm` files do not pile up
+in its history. Once the first run has created it, GitHub Pages must serve it:
+*Settings › Pages › Build and deployment › Deploy from a branch › `gh-pages` / (root)*.
+
+Downloaded, a build is about 3.4 MB compressed (the `.wasm` 1.5 MB, the
+resources 1.9 MB; the run page's summary gives the sizes of each build).
