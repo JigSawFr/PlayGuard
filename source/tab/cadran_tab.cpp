@@ -39,11 +39,13 @@ void cadran::install_theme()
 {
     const NVGcolor navy = nvgRGB(0x0B, 0x14, 0x24);
     // Dark: the boards' navy. Light: the style board's cool white, the inks
-    // darkened to 4.5:1 (teal #0F8A74, amber #8A5200, coral #B71C1C).
+    // darkened to 4.5:1 on every surface they are drawn on, the rail's active
+    // pill included (teal #0A705F, amber #8A5200, coral #B71C1C); the quiet
+    // text too, on both (text3 4.5:1 on the second surface).
     struct P { NVGcolor bg, text, text2, text3, surf, surf2, line, teal, teal_fill, teal_soft, amber, amber_fill,
                coral, coral_fill, coral_line, track, glow, glow_strong, amber_surf, amber_line, pill_ok, pill_ok_ink,
                rail_active, key_bg, key_fg, hl1, hl2, border; };
-    const P dark = { navy, nvgRGB(0xEE, 0xF2, 0xF8), nvgRGB(0xA9, 0xB5, 0xC9), nvgRGB(0x7B, 0x8A, 0xA3),
+    const P dark = { navy, nvgRGB(0xEE, 0xF2, 0xF8), nvgRGB(0xA9, 0xB5, 0xC9), nvgRGB(0x83, 0x92, 0xAA),
                      nvgRGB(0x12, 0x1E, 0x33), nvgRGB(0x1A, 0x2A, 0x45), nvgRGBA(255, 255, 255, 20),
                      nvgRGB(0x2E, 0xC4, 0xA6), nvgRGB(0x2E, 0xC4, 0xA6), nvgRGBA(0x2E, 0xC4, 0xA6, 26),
                      nvgRGB(0xFF, 0xB5, 0x47), nvgRGB(0xFF, 0xB5, 0x47),
@@ -54,7 +56,7 @@ void cadran::install_theme()
                      nvgRGB(0xEE, 0xF2, 0xF8), navy, nvgRGB(0x2E, 0xC4, 0xA6), nvgRGB(0x9A, 0xF0, 0xDC), nvgRGBA(255, 255, 255, 60) };
     const P light = { nvgRGB(0xED, 0xF0, 0xF4), navy, nvgRGB(0x3F, 0x4C, 0x63), nvgRGB(0x5F, 0x6E, 0x88),
                       nvgRGB(0xFF, 0xFF, 0xFF), nvgRGB(0xF3, 0xF5, 0xF8), nvgRGBA(0x0B, 0x14, 0x24, 26),
-                      nvgRGB(0x0F, 0x8A, 0x74), nvgRGB(0x14, 0xA3, 0x8A), nvgRGBA(0x14, 0xA3, 0x8A, 26),
+                      nvgRGB(0x0A, 0x70, 0x5F), nvgRGB(0x14, 0xA3, 0x8A), nvgRGBA(0x14, 0xA3, 0x8A, 26),
                       nvgRGB(0x8A, 0x52, 0x00), nvgRGB(0xE0, 0x93, 0x1B),
                       nvgRGB(0xB7, 0x1C, 0x1C), nvgRGB(0xE5, 0x48, 0x4D), nvgRGB(0xE3, 0x9A, 0x9A),
                       nvgRGBA(0x0B, 0x14, 0x24, 26), nvgRGBA(0x2E, 0xC4, 0xA6, 41), nvgRGBA(0x2E, 0xC4, 0xA6, 56),
@@ -129,9 +131,10 @@ void cadran::install_theme()
     }
     brls::Style style = brls::getStyle();
     style.addMetric("brls/applet_frame/header_height", 84.0f);
-    // 220 px, not the boards' 196: the console's font is wider than the
-    // boards' (Nunito Sans), and "Préférences" must stay on one line.
-    style.addMetric("brls/tab_frame/sidebar_width", 220.0f);
+    // 232 px, not the boards' 196: the console's font is wider than the
+    // boards' (Nunito Sans), and the longest names must stay whole
+    // ("Tiempo de juego", "Einschränkungen", "Code PIN" and its badge).
+    style.addMetric("brls/tab_frame/sidebar_width", 232.0f);
     style.addMetric("brls/sidebar/padding_top", 6.0f);
     style.addMetric("brls/sidebar/padding_right", 8.0f);
     style.addMetric("brls/sidebar/padding_bottom", 10.0f);
@@ -149,8 +152,20 @@ void cadran::install_theme()
     style.addMetric("brls/notification/spacing", 10.0f);
     style.addMetric("cadran/hairline", 1.0f);
     // The boards' display face for the figures (Sora Bold, OFL).
-    if (!brls::Application::loadFontFromFile("cadran/digits", BRLS_ASSET("font/sora_bold_latin.ttf")))
+    if (!brls::Application::loadFontFromFile("cadran/digits", BRLS_ASSET("font/sora_bold_latin.ttf"))) {
         brls::Logger::warning("cadran: display font not loaded, the default one is used");
+        return;
+    }
+    // Latin only: the units in other scripts ("40 мин", "+1 ч", "40分") from
+    // the app's own fonts (fontstash looks one level deep: each of them).
+    NVGcontext* vg = brls::Application::getNVGContext();
+    const int digits = brls::Application::getFont("cadran/digits");
+    for (int font : { brls::Application::getDefaultFont(), brls::Application::getFont(brls::FONT_REGULAR),
+                      brls::Application::getFont(brls::FONT_CHINESE_SIMPLIFIED),
+                      brls::Application::getFont(brls::FONT_CHINESE_SIMPLIFIED_EXT),
+                      brls::Application::getFont(brls::FONT_CHINESE_TRADITIONAL),
+                      brls::Application::getFont(brls::FONT_KOREAN_REGULAR) })
+        if (font != brls::FONT_INVALID && font != digits) nvgAddFallbackFontId(vg, digits, font);
 }
 
 namespace

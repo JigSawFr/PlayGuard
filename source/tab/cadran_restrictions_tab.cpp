@@ -93,17 +93,21 @@ CadranRestrictionsTab::Tile CadranRestrictionsTab::make_tile(uint32_t level, boo
         t.box->addView(rule);
         const auto row = [&](brls::Rectangle*& dot, brls::Label*& text) {
             auto* r = new brls::Box(brls::Axis::ROW);
-            r->setAlignItems(brls::AlignItems::CENTER);
+            r->setAlignItems(brls::AlignItems::FLEX_START);   // the dot by the first line
             r->setMarginBottom(6);
             dot = new brls::Rectangle(theme["cadran/text3"]);
             dot->setWidth(8);
             dot->setHeight(8);
             dot->setCornerRadius(4);
+            dot->setMarginTop(5);
             dot->setMarginRight(6);
             dot->setShrink(0);
             r->addView(dot);
+            // On two lines when a language needs them (the tiles of the row
+            // grow together).
             text = kit::label("", 13.5f, "cadran/text2");
-            text->setSingleLine(true);
+            text->setGrow(1.0f);
+            text->setWidth(0);
             r->addView(text);
             t.box->addView(r);
         };

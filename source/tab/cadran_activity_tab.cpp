@@ -184,7 +184,7 @@ void CadranActivityTab::build_chips()
             size_t len = 1;
             while (len < nick.size() && (nick[len] & 0xC0) == 0x80) len++;
             initial->setText(nick.substr(0, len));
-            initial->setTextColor(i % 4 == 1 ? theme["cadran/navy"] : nvgRGB(0xFF, 0xFF, 0xFF));
+            initial->setTextColor(theme["cadran/navy"]);   // 4.6:1 or more on every avatar colour
             avatar->addView(initial);
             chip->addView(avatar);
             brls::Label* name = cadran::kit::label(nick, 16);
