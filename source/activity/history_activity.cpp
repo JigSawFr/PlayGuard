@@ -3,6 +3,7 @@
 
 #include "action/export_flow.hpp"
 #include "action/history_flow.hpp"
+#include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
 #include "util/perf.hpp"
@@ -30,6 +31,10 @@ brls::Box* new_slot()
     auto* cell = new brls::DetailCell();
     cell->setDetailTextColor(ui::color_neutral());
     slot->addView(cell);
+    if (cadran::enabled()) {   // each change a card of its own, under its day
+        cadran::List::section(day);
+        cadran::List::row(cell, nullptr, true);
+    }
     return slot;
 }
 }   // namespace
@@ -105,7 +110,10 @@ void HistoryActivity::rebuild()
             const std::string this_day = history_logic::day_key(e);
             brls::Header* header = day_of_slot(slot);
             const bool starts_day = i == 0 || this_day != day;
-            if (starts_day) header->setTitle(history_flow::day_title(this_day));
+            if (starts_day) {
+                const std::string title = history_flow::day_title(this_day);
+                header->setTitle(cadran::enabled() ? cadran::upper(title) : title);
+            }
             ui::set_visible(header, starts_day);
             day = this_day;
 

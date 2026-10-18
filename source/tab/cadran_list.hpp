@@ -21,6 +21,8 @@
 
 namespace cadran
 {
+bool enabled();   // tab/cadran_tab.cpp: the Cadran appearance is on
+
 // "Sécurité" -> "SÉCURITÉ": ASCII, Latin-1, œ and Cyrillic (the catalogs' scripts
 // with a case); anything else is kept.
 std::string upper(const std::string& text);
@@ -110,6 +112,15 @@ class List
     // may set them, e.g. About's "What's new in …"), and a status tile's
     // plain value in the text colour (its warnings keep theirs).
     void sync();
+
+    // For the lists a screen fills itself (its own code finds its lines where
+    // it put them, so nothing is moved): a section title, and a cell as a row
+    // of a card (apply()'s own), or as a card of its own (`alone`).
+    static void section(brls::Header* header);
+    static void row(brls::DetailCell* cell, const char* icon = nullptr, bool alone = false);
+    // The box a screen's rows go in: `list` itself in the classic look, else
+    // a card in it (made the first time). The screen clears and fills that one.
+    static brls::Box* rows_in(brls::Box* list);
 
   private:
     brls::View* tab;

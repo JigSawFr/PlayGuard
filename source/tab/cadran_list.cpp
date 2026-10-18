@@ -313,7 +313,6 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
 void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>& icons)
 {
     if (!this->box) return;
-    brls::Theme theme = brls::Application::getTheme();
     // Marks the column as dressed (the screens' skin leaves it alone).
     auto* mark = new brls::Box();
     mark->setId("cadran_list");
@@ -331,19 +330,7 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
         if (auto* header = dynamic_cast<brls::Header*>(line)) {
             card = nullptr;
             this->headers.push_back(header);
-            header->setLineBottom(0);
-            header->setPaddingTop(0);
-            header->setPaddingBottom(0);
-            header->setMarginLeft(8);
-            header->setMarginBottom(10);
-            if (margin_top(header) > 0) header->setMarginTop(26);
-            if (!header->getChildren().empty()) header->getChildren()[0]->setVisibility(brls::Visibility::GONE);   // the bar
-            for (const char* part : { "brls/header/title", "brls/header/subtitle" }) {
-                if (auto* text = dynamic_cast<brls::Label*>(header->getView(part))) {
-                    text->setFontSize(14);
-                    text->setTextColor(theme["cadran/text3"]);
-                }
-            }
+            section(header);
             continue;
         }
         auto* cell = dynamic_cast<brls::DetailCell*>(line);
@@ -365,21 +352,63 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
             this->box->addView(card, index_in(this->box, cell));
         }
         move_to(cell, card);
-        cell->setHeight(60);
-        cell->setPaddingLeft(ROW_PAD_ICON);
-        cell->setPaddingRight(ROW_PAD_END);
-        cell->setLineBottom(0);
-        cell->setHighlightCornerRadius(14);
-        cell->title->setFontSize(18);
-        cell->detail->setFontSize(16.5f);
-        if (const char* name = icon_of(cell)) cell->addView(row_icon(name), 0);
-        else cell->setPaddingLeft(ROW_PAD);
-        if (auto* toggle = dynamic_cast<brls::BooleanCell*>(cell)) {
-            toggle->detail->setVisibility(brls::Visibility::GONE);
-            toggle->addView(new Switch(toggle));
-        }
+        row(cell, icon_of(cell));
     }
     this->sync();
+}
+
+void cadran::List::section(brls::Header* header)
+{
+    brls::Theme theme = brls::Application::getTheme();
+    header->setLineBottom(0);
+    header->setPaddingTop(0);
+    header->setPaddingBottom(0);
+    header->setMarginLeft(8);
+    header->setMarginBottom(10);
+    if (margin_top(header) > 0) header->setMarginTop(26);
+    if (!header->getChildren().empty()) header->getChildren()[0]->setVisibility(brls::Visibility::GONE);   // the bar
+    for (const char* part : { "brls/header/title", "brls/header/subtitle" }) {
+        if (auto* text = dynamic_cast<brls::Label*>(header->getView(part))) {
+            text->setFontSize(14);
+            text->setTextColor(theme["cadran/text3"]);
+        }
+    }
+}
+
+void cadran::List::row(brls::DetailCell* cell, const char* icon, bool alone)
+{
+    cell->setHeight(60);
+    cell->setPaddingLeft(ROW_PAD_ICON);
+    cell->setPaddingRight(ROW_PAD_END);
+    cell->setLineBottom(0);
+    cell->setLineTop(0);
+    cell->setHighlightCornerRadius(14);
+    cell->title->setFontSize(18);
+    cell->detail->setFontSize(16.5f);
+    if (icon) cell->addView(row_icon(icon), 0);
+    else cell->setPaddingLeft(ROW_PAD);
+    if (auto* toggle = dynamic_cast<brls::BooleanCell*>(cell)) {
+        toggle->detail->setVisibility(brls::Visibility::GONE);
+        toggle->addView(new Switch(toggle));
+    }
+    if (alone) {
+        brls::Theme theme = brls::Application::getTheme();
+        cell->setCornerRadius(14);
+        cell->setBackgroundColor(theme["cadran/surf"]);
+        cell->setBorderColor(theme["cadran/line"]);
+        cell->setBorderThickness(1);
+        cell->setMarginBottom(8);
+    }
+}
+
+brls::Box* cadran::List::rows_in(brls::Box* list)
+{
+    if (!cadran::enabled() || !list) return list;
+    for (brls::View* child : list->getChildren())
+        if (auto* card = dynamic_cast<Card*>(child)) return card;
+    auto* card = new Card();
+    list->addView(card);
+    return card;
 }
 
 void cadran::List::hide_header_before(const char* id)

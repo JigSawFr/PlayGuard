@@ -3,6 +3,7 @@
 
 #include "action/pt_flow.hpp"
 #include "activity/play_timer_perday_activity.hpp"
+#include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -28,7 +29,8 @@ void ProfilesActivity::rebuild(const std::string& focus_file)
     // Move the focus to a cell that survives before deleting the old list,
     // so borealis never holds a pointer to a deleted cell.
     brls::Application::giveFocus(save_cell);
-    list->clearViews();
+    brls::Box* rows = cadran::List::rows_in(list);   // a card in the Cadran look
+    rows->clearViews();
 
     const auto all = profiles::list();
     const std::string current = this->live.valid ? profiles::match(this->live.day_min) : "";
@@ -47,7 +49,8 @@ void ProfilesActivity::rebuild(const std::string& focus_file)
             this->actions(p);
             return true;
         });
-        list->addView(cell);
+        rows->addView(cell);
+        if (cadran::enabled()) cadran::List::row(cell);
         if (!focus || p.file == focus_file) focus = cell;
     }
     ui::set_visible(empty.getView(), all.empty());
