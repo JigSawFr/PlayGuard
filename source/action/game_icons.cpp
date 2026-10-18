@@ -6,11 +6,13 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <string>
 #include <vector>
 
 #include <stb_image.h>
 
 #include "action/icon_logic.hpp"
+#include "util/paths.hpp"
 
 namespace game_icons
 {
@@ -152,6 +154,35 @@ int texture(u64 app_id, bool& owned)
     // A texture the cell frees: its pixels stay for the next one.
     owned = t != 0;
     return t;
+}
+
+int placeholder()
+{
+    static int tex = 0;
+    static bool tried = false;
+    if (tried) return tex;
+    tried = true;
+    std::string png;
+    if (!paths::read_file(BRLS_ASSET("img/emoji/1f3ae.png"), png)) return 0;
+    int w = 0, h = 0, comp = 0;
+    unsigned char* rgba = stbi_load_from_memory((const unsigned char*)png.data(), (int)png.size(), &w, &h, &comp, 4);
+    if (!rgba) return 0;
+    // Grey, at 40 %: a shape that waits, on the cover's own grey, in either
+    // theme. With a clear border: drawn centred, the image's edge pixels are
+    // stretched to the cover's edges.
+    constexpr int BORDER = 2;
+    const int bw = w + 2 * BORDER, bh = h + 2 * BORDER;
+    std::vector<unsigned char> out((size_t)bw * bh * 4, 0);
+    for (int y = 0; y < h; y++)
+        for (int x = 0; x < w; x++) {
+            const unsigned char* p = rgba + ((size_t)y * w + x) * 4;
+            unsigned char* q = out.data() + ((size_t)(y + BORDER) * bw + x + BORDER) * 4;
+            q[0] = q[1] = q[2] = (unsigned char)((p[0] * 299 + p[1] * 587 + p[2] * 114) / 1000);
+            q[3] = (unsigned char)(p[3] * 2 / 5);
+        }
+    stbi_image_free(rgba);
+    tex = nvgCreateImageRGBA(brls::Application::getNVGContext(), bw, bh, 0, out.data());
+    return tex;
 }
 
 bool known(u64 app_id)
