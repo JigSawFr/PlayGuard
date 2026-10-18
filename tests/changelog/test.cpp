@@ -177,6 +177,11 @@ int main()
     CHECK(pg[4].kind == Line::Item && pg[4].text == "only here");
     CHECK(pg[5].kind == Line::Section && pg[5].text == "Bug Fixes");
     CHECK(pg[6].kind == Line::Item && pg[6].text == "a fix");
+    // The summary: the highlights, up to release-please's first list.
+    CHECK(changelog::summary_end(pg) == 5);
+    CHECK(changelog::summary_end(changelog::release_notes(MD, "1.1.0")) == 0);
+    CHECK(changelog::summary_end(changelog::parse("### Highlights\n\n* one\n", 0)) == 2);
+    CHECK(changelog::summary_end({}) == 0);
     // An unclosed hide block hides the rest; an unclosed comment too.
     CHECK(changelog::parse("<!-- console:hide -->\n* gone\n", 0).empty());
     CHECK(changelog::parse("<!-- open\n* gone\n", 0).empty());

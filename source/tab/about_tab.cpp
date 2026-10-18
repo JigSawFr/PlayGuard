@@ -3,25 +3,18 @@
 
 #include "action/sys_notes_flow.hpp"
 #include "action/update_flow.hpp"
-#include "activity/changelog_activity.hpp"
 #include "app.hpp"
 #include "tab/help_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
 #include "view/funding.hpp"
-#include "view/release_notes.hpp"
 
 using namespace brls::literals;
-
-namespace
-{
-}   // namespace
 
 AboutTab::AboutTab()
     : TabBase("xml/tab/about.xml", false)
 {
-    changelog_note->setSingleLine(false);
     support_note->setSingleLine(false);
     version->registerClickAction([this](brls::View*) {
         this->count_version_press();
@@ -55,29 +48,6 @@ AboutTab::AboutTab()
     license->setDetailText("GPLv3");
     source->setDetailText(app::repo_url());
     funding->addView(funding::cards(180, true));
-    this->fill_changelog();
-}
-
-void AboutTab::fill_changelog()
-{
-    // This version's highlights, the full list a press away; the full list
-    // itself when there are none. The earlier versions are on the releases page.
-    std::string date;
-    const auto lines      = release_notes::current(&date);
-    const auto highlights = release_notes::highlights();
-    changelog_header->setTitle(brls::getStr("playguard/about/section_changelog", app::version()));
-    if (!date.empty()) changelog_header->setSubtitle(date);
-    const std::string releases = std::string(app::repo_url()) + "/releases";
-    changelog_note->setText(lines.empty() && highlights.empty() ? brls::getStr("playguard/about/changelog_none", releases)
-                                                                : brls::getStr("playguard/about/changelog_note", releases));
-    const bool short_form = !highlights.empty() && !lines.empty();
-    if (highlights.empty()) release_notes::fill(changelog, lines);
-    else release_notes::fill_highlights(changelog, highlights);
-    changelog_full->setVisibility(short_form ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
-    changelog_full->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new ChangelogActivity());
-        return true;
-    });
     // Every version's notes, from the releases on GitHub, as for Atmosphère
     // and hekate (Console): the installed one, the newer and the older ones.
     notes->registerClickAction([](brls::View*) {

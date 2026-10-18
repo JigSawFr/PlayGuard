@@ -121,6 +121,13 @@ std::vector<changelog::Line> highlights()
     return changelog::parse(md, 0);
 }
 
+std::vector<changelog::Line> bundled()
+{
+    std::vector<changelog::Line> lines = highlights();
+    for (changelog::Line& l : current()) lines.push_back(std::move(l));
+    return lines;
+}
+
 void fill(brls::Box* box, const std::vector<changelog::Line>& lines)
 {
     bool first = true;
@@ -192,6 +199,22 @@ void fill_highlights(brls::Box* box, const std::vector<changelog::Line>& lines)
         box->addView(view);
         row = nullptr;
     }
+}
+
+void fill_release(brls::Box* box, const std::vector<changelog::Line>& lines)
+{
+    const size_t end = changelog::summary_end(lines);
+    if (end == 0) {
+        fill(box, lines);
+        return;
+    }
+    fill_highlights(box, { lines.begin(), lines.begin() + (long)end });
+    if (end == lines.size()) return;
+    auto* lists = new brls::Box(brls::Axis::COLUMN);
+    lists->setAlignItems(brls::AlignItems::STRETCH);
+    lists->setMarginTop(28);
+    fill(lists, { lines.begin() + (long)end, lines.end() });
+    box->addView(lists);
 }
 
 }   // namespace release_notes

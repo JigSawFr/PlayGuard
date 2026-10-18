@@ -215,4 +215,18 @@ std::vector<Line> release_notes(const std::string& md, const std::string& versio
     return notes;
 }
 
+size_t summary_end(const std::vector<Line>& lines)
+{
+    // release-please-config.json's sections, their emoji dropped, and the
+    // breaking changes it lists first.
+    static const char* const LISTS[] = { "BREAKING CHANGES", "Features", "Changes", "Bug Fixes", "Polish", "Other",
+                                         "Tests", "Documentation" };
+    for (size_t i = 0; i < lines.size(); i++) {
+        if (lines[i].kind != Line::Section) continue;
+        for (const char* name : LISTS)
+            if (lines[i].text == name) return i;
+    }
+    return lines.size();
+}
+
 }   // namespace changelog

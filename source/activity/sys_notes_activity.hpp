@@ -8,7 +8,10 @@
 // (Atmosphère's and hekate's notes: update them, or wait). Each version:
 // tags (installed or new, the newest firmware it supports, security fixes,
 // parental controls changed), its title and date, its notes as Markdown
-// (view/markdown_view.hpp; in English, as published), See online (its page
+// (view/markdown_view.hpp; in English, as published; PlayGuard's as in
+// "What's new", view/release_notes.hpp: the summary as cards, then the
+// lists, the installed version's from the app when GitHub's are not there),
+// See online (its page
 // as a QR code), and when they were fetched. The notes kept on the SD card
 // show at once; a bar shows while they are fetched again (action/
 // sys_notes_flow.hpp), Ⓧ fetches them now.

@@ -1,6 +1,7 @@
-// release_notes — the running version's notes, as views: in About and on the
-// "What's new" screen shown once after an update, the hand-written highlights
-// when there are some, the full list (the bundled CHANGELOG.md) a press away.
+// release_notes — PlayGuard's release notes, as views: on the "What's new"
+// screen shown once after an update, the hand-written highlights when there
+// are some, the full list (the bundled CHANGELOG.md) a press away; on the
+// release notes screen (About › Release notes), a release's both together.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -22,6 +23,10 @@ std::vector<changelog::Line> current(std::string* date = nullptr);
 // Empty when there is none.
 std::vector<changelog::Line> highlights();
 
+// Both, as a release's notes read: the highlights, then this version's lines
+// (fill_release() tells them apart).
+std::vector<changelog::Line> bundled();
+
 // Adds `lines` to `box`: section titles (their emoji as an icon, over a
 // rule), then their items with the bullet (or their emoji) in its own column,
 // wrapped lines staying under the text, and their lead-in ("activity") as a tag.
@@ -32,5 +37,9 @@ void fill(brls::Box* box, const std::vector<changelog::Line>& lines);
 // its text; with no title, the item itself in the accent colour), then the
 // closing lines as a note.
 void fill_highlights(brls::Box* box, const std::vector<changelog::Line>& lines);
+
+// Adds a release's notes to `box`: its summary (changelog::summary_end()) as
+// highlights, then release-please's lists as by fill().
+void fill_release(brls::Box* box, const std::vector<changelog::Line>& lines);
 
 }   // namespace release_notes
