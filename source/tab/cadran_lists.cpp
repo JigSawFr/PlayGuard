@@ -2,6 +2,7 @@
 #include "tab/cadran_lists.hpp"
 
 #include <algorithm>
+#include <yoga/Yoga.h>
 
 #include "app.hpp"
 #include "tab/cadran_tab.hpp"
@@ -163,13 +164,24 @@ void CadranSecurityTab::refresh()
 brls::View* CadranSecurityTab::create() { return new CadranSecurityTab(); }
 
 // ---------------------------------------------------------------------------
-// Console: the firmware, Atmosphère and compatibility as tiles.
+// Console: what the console runs as tiles at the top (the firmware,
+// Atmosphère, hekate when it is there), then the lines; compatibility the
+// first of the console's.
 
 CadranConsoleTab::CadranConsoleTab()
     : list(this)
 {
-    this->list.tiles({ { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_compat", "check" } }, true);
-    this->list.apply({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_hekate", "flag" }, { "cn_storage", "folder" },
+    if (brls::Box* tiles = this->list.tiles({ { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_hekate", "flag" } }, true)) {
+        // Spaced by the row, not by their margins: hekate's tile comes and goes.
+        for (brls::View* tile : tiles->getChildren()) tile->setMarginRight(0);
+        YGNodeStyleSetGap(tiles->getYGNode(), YGGutterColumn, 12);
+        tiles->setMarginBottom(20);
+        if (brls::Box* column = tiles->getParent()) {
+            column->removeView(tiles, false);
+            column->addView(tiles, 0);
+        }
+    }
+    this->list.apply({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_compat", "check" }, { "cn_storage", "folder" },
                        { "cn_blank", "code" }, { "cn_serial", "tag" }, { "cn_patches", "shield" } });
 }
 
