@@ -1518,7 +1518,14 @@
             "head_unlocked": "Limit von {} ausgesetzt",
             "pc_lifted": "Aufgehoben bis zur Reaktivierung",
             "limit": "Heutiges Limit…",
-            "bed_in": "in {}"
+            "bed_in": "in {}",
+            "dns_nintendo": "DNS · Nintendo blockiert",
+            "dns_sync": "DNS · App-Sync blockiert",
+            "dns_time": "DNS · Zeitserver blockiert",
+            "dns_title": "DNS-Umleitung von Atmosphère",
+            "dns_intro": "Seine Hosts-Datei (atmosphere/hosts) leitet Server von Nintendo um.",
+            "dns_sync_note": "Die Smart-Geräte-App kann sich nicht synchronisieren und überschreibt daher nicht, was hier eingestellt ist.",
+            "dns_time_note": "Die Netzwerkuhr kann sich nicht selbst einstellen: PlayGuard stellt sie über einen Zeitserver ein ({})."
         },
         "pill": {
             "pc_on": "Jugendschutz aktiv",

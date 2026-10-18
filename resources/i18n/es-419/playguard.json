@@ -1518,7 +1518,14 @@
             "head_unlocked": "Límite de {} en pausa",
             "pc_lifted": "Desactivado hasta reactivarlo",
             "limit": "Límite de hoy…",
-            "bed_in": "dentro de {}"
+            "bed_in": "dentro de {}",
+            "dns_nintendo": "DNS · Nintendo bloqueado",
+            "dns_sync": "DNS · sincronización de la app bloqueada",
+            "dns_time": "DNS · servidor de hora bloqueado",
+            "dns_title": "Redirección DNS de Atmosphère",
+            "dns_intro": "Su archivo hosts (atmosphere/hosts) desvía servidores de Nintendo.",
+            "dns_sync_note": "La app para móvil no puede sincronizarse, así que no sobrescribe lo que se ajusta aquí.",
+            "dns_time_note": "El reloj de red no puede ajustarse solo: PlayGuard lo ajusta desde un servidor de hora ({})."
         },
         "pill": {
             "pc_on": "Control parental activo",

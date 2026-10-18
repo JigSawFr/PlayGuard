@@ -80,6 +80,9 @@ class CadranTab : public DashboardTab
     };
     cadran::List list;
     std::vector<Pill> pill_slots;
+    // Atmosphère's DNS sending Nintendo's servers elsewhere (nintendo_dns):
+    // a pill of its own, after the serial number's, while it does.
+    Pill dns_pill;
     // What stops play first today, under the time played (show_next).
     brls::Box*   next      = nullptr;
     CadranIcon*  next_icon = nullptr;

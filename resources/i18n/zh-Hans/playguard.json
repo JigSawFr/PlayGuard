@@ -1518,7 +1518,14 @@
             "head_unlocked": "{}的限制已暂停",
             "pc_lifted": "已解除，直到重新启用",
             "limit": "今天的限制…",
-            "bed_in": "还有{}"
+            "bed_in": "还有{}",
+            "dns_nintendo": "DNS · 已拦截Nintendo",
+            "dns_sync": "DNS · 已拦截应用同步",
+            "dns_time": "DNS · 已拦截时间服务器",
+            "dns_title": "Atmosphère 的 DNS 重定向",
+            "dns_intro": "其 hosts 文件（atmosphere/hosts）将 Nintendo 的服务器重定向到别处。",
+            "dns_sync_note": "手机应用无法同步，因此不会覆盖在此处所做的设置。",
+            "dns_time_note": "网络时钟无法自行校准：PlayGuard 通过时间服务器校准（{}）。"
         },
         "pill": {
             "pc_on": "家长控制已开启",

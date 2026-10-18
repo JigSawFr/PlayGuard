@@ -1518,7 +1518,14 @@
             "head_unlocked": "上限{}は一時停止中",
             "pc_lifted": "再び有効にするまで解除中",
             "limit": "今日の上限…",
-            "bed_in": "あと{}"
+            "bed_in": "あと{}",
+            "dns_nintendo": "DNS · Nintendoをブロック中",
+            "dns_sync": "DNS · アプリの同期をブロック中",
+            "dns_time": "DNS · 時刻サーバーをブロック中",
+            "dns_title": "AtmosphèreのDNSリダイレクト",
+            "dns_intro": "hostsファイル（atmosphere/hosts）がNintendoのサーバーへの接続を別の宛先に向けています。",
+            "dns_sync_note": "スマホアプリは同期できないため、ここでの設定を上書きしません。",
+            "dns_time_note": "ネットワーク時計は自動で合わせられません。PlayGuardが時刻サーバーから合わせます（{}）。"
         },
         "pill": {
             "pc_on": "みまもり設定 有効",

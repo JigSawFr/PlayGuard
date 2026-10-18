@@ -1518,7 +1518,14 @@
             "head_unlocked": "Limiet van {} gepauzeerd",
             "pc_lifted": "Opgeheven tot het weer aan staat",
             "limit": "Limiet vandaag…",
-            "bed_in": "over {}"
+            "bed_in": "over {}",
+            "dns_nintendo": "DNS · Nintendo geblokkeerd",
+            "dns_sync": "DNS · app-synchronisatie geblokkeerd",
+            "dns_time": "DNS · tijdserver geblokkeerd",
+            "dns_title": "DNS-omleiding van Atmosphère",
+            "dns_intro": "Het hosts-bestand (atmosphere/hosts) leidt servers van Nintendo om.",
+            "dns_sync_note": "De smartphone-app kan niet synchroniseren en overschrijft dus niet wat hier is ingesteld.",
+            "dns_time_note": "De netwerkklok kan zichzelf niet instellen: PlayGuard stelt hem in via een tijdserver ({})."
         },
         "pill": {
             "pc_on": "Ouderlijk toezicht actief",

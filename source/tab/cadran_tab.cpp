@@ -790,6 +790,24 @@ void CadranTab::show_pills()
             });
             pills->addView(p.box);
             this->pill_slots.push_back(p);
+            if (p.line == std::string("dash_serial")) {
+                // Ⓐ: what the DNS blocks, and what that changes here.
+                Pill& d = this->dns_pill;
+                d.box = kit::pill("", "cadran/teal_fill");
+                d.box->setFocusable(true);
+                d.box->setHideHighlightBackground(true);
+                d.text = dynamic_cast<brls::Label*>(d.box->getChildren()[1]);
+                d.box->registerClickAction([](brls::View*) {
+                    std::string body = "playguard/cadran/today/dns_title"_i18n + "\n\n" + "playguard/cadran/today/dns_intro"_i18n;
+                    if (nintendo_dns::pctl_blocked()) body += "\n\n" + "playguard/cadran/today/dns_sync_note"_i18n;
+                    if (nintendo_dns::time_blocked())
+                        body += "\n\n" + brls::getStr("playguard/cadran/today/dns_time_note",
+                                                     "playguard/tabs/console"_i18n + " › " + "playguard/tabs/clock"_i18n);
+                    ui::info(body);
+                    return true;
+                });
+                pills->addView(d.box);
+            }
         }
     }
     const SysInfo& si = this->sys;
@@ -809,6 +827,14 @@ void CadranTab::show_pills()
         ui::set_text(p.text, text);
         p.dot->setColor(theme[shown ? kit::dot_of(cell->detail->getTextColor()) : "cadran/teal_fill"]);
         ui::set_visible(p.box, !text.empty());
+    }
+    const bool sync = nintendo_dns::pctl_blocked(), time = nintendo_dns::time_blocked();
+    if (this->dns_pill.text) {
+        ui::set_text(this->dns_pill.text, sync && time ? "playguard/cadran/today/dns_nintendo"_i18n
+                                          : sync       ? "playguard/cadran/today/dns_sync"_i18n
+                                          : time       ? "playguard/cadran/today/dns_time"_i18n
+                                                       : "");
+        ui::set_visible(this->dns_pill.box, sync || time);
     }
 }
 

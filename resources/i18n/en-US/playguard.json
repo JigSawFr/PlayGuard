@@ -1518,7 +1518,14 @@
             "head_unlocked": "{} limit on hold",
             "pc_lifted": "Lifted until turned back on",
             "limit": "Today's limit…",
-            "bed_in": "in {}"
+            "bed_in": "in {}",
+            "dns_nintendo": "DNS · Nintendo blocked",
+            "dns_sync": "DNS · app sync blocked",
+            "dns_time": "DNS · time server blocked",
+            "dns_title": "Atmosphère's DNS redirection",
+            "dns_intro": "Its hosts file (atmosphere/hosts) sends Nintendo's servers elsewhere.",
+            "dns_sync_note": "The companion app cannot synchronize, so it does not overwrite what is set here.",
+            "dns_time_note": "The network clock cannot set itself: PlayGuard sets it from a time server ({})."
         },
         "pill": {
             "pc_on": "Parental controls on",

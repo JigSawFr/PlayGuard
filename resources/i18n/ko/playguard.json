@@ -1518,7 +1518,14 @@
             "head_unlocked": "{} 제한 일시 중지됨",
             "pc_lifted": "다시 켤 때까지 해제됨",
             "limit": "오늘의 제한…",
-            "bed_in": "{} 후"
+            "bed_in": "{} 후",
+            "dns_nintendo": "DNS · Nintendo 차단됨",
+            "dns_sync": "DNS · 앱 동기화 차단됨",
+            "dns_time": "DNS · 시간 서버 차단됨",
+            "dns_title": "Atmosphère의 DNS 리디렉션",
+            "dns_intro": "hosts 파일(atmosphere/hosts)이 Nintendo 서버로의 연결을 다른 곳으로 돌립니다.",
+            "dns_sync_note": "스마트폰 앱이 동기화할 수 없으므로 여기서 설정한 내용을 덮어쓰지 않습니다.",
+            "dns_time_note": "네트워크 시계가 스스로 맞춰지지 않습니다. PlayGuard가 시간 서버에서 맞춥니다({})."
         },
         "pill": {
             "pc_on": "자녀 보호 켜짐",

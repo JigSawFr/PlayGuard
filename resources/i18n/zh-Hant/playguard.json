@@ -1518,7 +1518,14 @@
             "head_unlocked": "{}的限制已暫停",
             "pc_lifted": "已解除，直到重新啟用",
             "limit": "今天的上限…",
-            "bed_in": "還有{}"
+            "bed_in": "還有{}",
+            "dns_nintendo": "DNS · 已封鎖Nintendo",
+            "dns_sync": "DNS · 已封鎖應用程式同步",
+            "dns_time": "DNS · 已封鎖時間伺服器",
+            "dns_title": "Atmosphère 的 DNS 重新導向",
+            "dns_intro": "其 hosts 檔案（atmosphere/hosts）將 Nintendo 的伺服器重新導向到別處。",
+            "dns_sync_note": "手機應用程式無法同步，因此不會覆寫在此處所做的設定。",
+            "dns_time_note": "網路時鐘無法自行校準：PlayGuard 透過時間伺服器校準（{}）。"
         },
         "pill": {
             "pc_on": "家長監護已開啟",
