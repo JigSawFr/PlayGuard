@@ -83,6 +83,16 @@ void set_visible_all(std::initializer_list<std::pair<brls::View*, bool>> changes
         if (!c.second) set_visible(c.first, false);
 }
 
+void set_text(brls::Label* label, const std::string& text)
+{
+    if (label && label->getFullText() != text) label->setText(text);
+}
+
+void set_detail(brls::DetailCell* cell, const std::string& text)
+{
+    if (cell) set_text(cell->detail, text);
+}
+
 void keep_focus(brls::Activity* activity, brls::View* fallback)
 {
     // The view to get the focus back: the end of the boxes' last focused

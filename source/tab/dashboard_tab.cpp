@@ -53,7 +53,7 @@ DashboardTab::DashboardTab()
         this->refresh();
         return true;
     });
-    first_steps->setDetailText(ui::opens("playguard/onboarding/pin_missing"_i18n));
+    ui::set_detail(first_steps, ui::opens("playguard/onboarding/pin_missing"_i18n));
     first_steps->setDetailTextColor(ui::color_warn());
     first_steps->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new OnboardingActivity());
@@ -82,7 +82,7 @@ DashboardTab::DashboardTab()
         return true;
     });
     // Shown only while the alarm is off: A turns it back on (the dialog says why).
-    alarm->setDetailText("playguard/dashboard/alarm_off"_i18n);
+    ui::set_detail(alarm, "playguard/dashboard/alarm_off"_i18n);
     alarm->setDetailTextColor(ui::color_warn());
     alarm->registerClickAction([this](brls::View*) {
         pt_flow::turn_alarm_on("overview", [this]() { this->refresh(); });
@@ -145,7 +145,7 @@ bool DashboardTab::show_outside(const PtState& pt)
     outside_watch::observe(pt);
     outside_watch::observe_accounts();   // once per run; flagged in the Activity tab
     const std::vector<std::string> outside_lines = outside_watch::notice_lines();
-    outside_text->setText(text::join(outside_lines, "\n"));
+    ui::set_text(outside_text, text::join(outside_lines, "\n"));
     return !outside_lines.empty();
 }
 
@@ -157,46 +157,46 @@ void DashboardTab::show_today(const PtState& pt, int today, bool unlocked, const
     bool show_gauge = true;
     if (!pt.fw_supported) {
         gauge->setFraction(-1);
-        gauge_text->setText("playguard/play_timer/fw_too_old_short"_i18n);
-        today_limit->setDetailText("—");
+        ui::set_text(gauge_text, "playguard/play_timer/fw_too_old_short"_i18n);
+        ui::set_detail(today_limit, "—");
     } else if (!pt.valid || !pt.enabled_valid) {
         gauge->setFraction(-1);
-        gauge_text->setText("playguard/dashboard/gauge_unknown"_i18n);
-        today_limit->setDetailText(na);
+        ui::set_text(gauge_text, "playguard/dashboard/gauge_unknown"_i18n);
+        ui::set_detail(today_limit, na);
     } else {
         const uint16_t limit = pt.day_min[today];
         const int over = pt_logic::over_limit_min(pt, today);
-        today_limit->setDetailText(ui::fmt_minutes(limit));
+        ui::set_detail(today_limit, ui::fmt_minutes(limit));
         if (limit != PT_DAY_NOLIMIT && unlocked) {
             show_gauge = false;   // the countdown may be off while unlocked (docs: open)
-            gauge_text->setText("playguard/dashboard/gauge_unlocked"_i18n);
+            ui::set_text(gauge_text, "playguard/dashboard/gauge_unlocked"_i18n);
         } else if (limit == PT_DAY_NOLIMIT || !pt.enabled) {
             show_gauge = false;   // nothing to measure against: the text says it
-            gauge_text->setText(log.ok ? brls::getStr("playguard/dashboard/gauge_none_played", ui::fmt_play_time(log.played_s))
-                                       : "playguard/dashboard/gauge_none"_i18n);
+            ui::set_text(gauge_text, log.ok ? brls::getStr("playguard/dashboard/gauge_none_played", ui::fmt_play_time(log.played_s))
+                                            : "playguard/dashboard/gauge_none"_i18n);
         } else if (pt.restricted_valid && pt.restricted) {
             gauge->setFraction(1);
-            gauge_text->setText("playguard/dashboard/gauge_reached"_i18n);
+            ui::set_text(gauge_text, "playguard/dashboard/gauge_reached"_i18n);
         } else if (over >= 0) {
             // Past the limit, the console only warning: the time over it.
             gauge->setFraction(1);
-            gauge_text->setText(brls::getStr("playguard/dashboard/gauge_over", ui::fmt_played((uint16_t)(limit + over)),
-                                             ui::fmt_minutes(limit), ui::fmt_played((uint16_t)over)));
+            ui::set_text(gauge_text, brls::getStr("playguard/dashboard/gauge_over", ui::fmt_played((uint16_t)(limit + over)),
+                                                  ui::fmt_minutes(limit), ui::fmt_played((uint16_t)over)));
         } else if (pt.remaining_valid && pt.remaining_ns > 0 && limit > 0) {
             uint64_t left = (uint64_t)pt.remaining_ns / 60000000000ULL;
             uint16_t used = left >= limit ? 0 : (uint16_t)(limit - left);
             gauge->setFraction((float)used / (float)limit);
-            gauge_text->setText(brls::getStr("playguard/dashboard/gauge_known",
-                                             ui::fmt_played(used), ui::fmt_minutes(limit)));
+            ui::set_text(gauge_text, brls::getStr("playguard/dashboard/gauge_known",
+                                                  ui::fmt_played(used), ui::fmt_minutes(limit)));
         } else if (log.ok) {
             // No game counted yet by the timer: the log's figure, marked as an
             // estimate (it counts PlayGuard opened over a game, for instance).
             gauge->setFraction(limit ? std::min(1.0f, (float)log.played_min / (float)limit) : 1.0f);
-            gauge_text->setText(brls::getStr("playguard/dashboard/gauge_log", ui::fmt_play_time(log.played_s),
-                                             ui::fmt_minutes(limit)));
+            ui::set_text(gauge_text, brls::getStr("playguard/dashboard/gauge_log", ui::fmt_play_time(log.played_s),
+                                                  ui::fmt_minutes(limit)));
         } else {
             gauge->setFraction(-1);
-            gauge_text->setText("playguard/dashboard/gauge_idle"_i18n);
+            ui::set_text(gauge_text, "playguard/dashboard/gauge_idle"_i18n);
         }
     }
     ui::set_visible(gauge.getView(), show_gauge);
@@ -341,12 +341,12 @@ void DashboardTab::refresh()
     const SystemIssues issues = this->show_system(s, si, accuracy_rc, accurate);
 
     // When the values were last read (X refreshes now, the timer every 5 s).
-    updated->setText(brls::getStr("playguard/dashboard/updated", ui::now_hms()));
+    ui::set_text(updated, brls::getStr("playguard/dashboard/updated", ui::now_hms()));
 
     // Visibility last, so a vanished focused cell hands the focus to a neighbour.
     // No PIN yet: parental controls are not set up, say where to start.
     const bool not_set_up = s.pin_length_ok && s.pin_length == 0;
-    extra->setDetailText(pt_flow::extra_today_text(pt));
+    ui::set_detail(extra, pt_flow::extra_today_text(pt));
     const bool pending = pt_flow::restore_pending(pt);
     if (pending) extra_pending->setText(pt_flow::restore_label());
     ui::show_writable(extra, !app::read_only());

@@ -244,6 +244,12 @@ void set_visible(brls::View* view, bool visible);
 // the focus.
 void set_visible_all(std::initializer_list<std::pair<brls::View*, bool>> changes);
 
+// A label's text, or a cell's detail, set only when it changes: borealis lays
+// the whole screen out again on every setText, and the tabs that refresh
+// themselves every few seconds mostly write the same values back.
+void set_text(brls::Label* label, const std::string& text);
+void set_detail(brls::DetailCell* cell, const std::string& text);
+
 // For an activity's onResume(): borealis then gives the focus back to the
 // view that opened the dialog (or screen) just closed, and gives none when
 // that view was hidden meanwhile; the focus would stay on the closed

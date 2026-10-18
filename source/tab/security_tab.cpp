@@ -59,7 +59,7 @@ SecurityTab::SecurityTab()
     });
     // While linked, anyone can save the block before and after a change made
     // in the phone app: the data ROADMAP.md waits for (Developer tools has it too).
-    pr_decode->setDetailText(ui::fmt_played(2));   // how long it takes
+    ui::set_detail(pr_decode, ui::fmt_played(2));   // how long it takes
     pr_decode->registerClickAction([](brls::View*) {
         pt_block_flow::open();
         return true;
@@ -131,32 +131,32 @@ void SecurityTab::refresh()
     ui::note_unlocked(s.temp_unlocked_ok, s.temp_unlocked);
     const std::string na = "playguard/common/unavailable"_i18n;
 
-    if (!s.pin_length_ok) pin->setDetailText(na);
-    else if (s.pin_length == 0) pin->setDetailText("playguard/common/not_set"_i18n);
-    else pin->setDetailText("playguard/dashboard/pin_set"_i18n);   // not its length: it narrows a guess
+    if (!s.pin_length_ok) ui::set_detail(pin, na);
+    else if (s.pin_length == 0) ui::set_detail(pin, "playguard/common/not_set"_i18n);
+    else ui::set_detail(pin, "playguard/dashboard/pin_set"_i18n);   // not its length: it narrows a guess
 
-    restrictions->setDetailText(ui::bool_text(s.restriction_enabled_ok, s.restriction_enabled,
-                                              "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
-    temp->setDetailText(ui::bool_text(s.temp_unlocked_ok, s.temp_unlocked,
-                                      "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
+    ui::set_detail(restrictions, ui::bool_text(s.restriction_enabled_ok, s.restriction_enabled,
+                                               "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
+    ui::set_detail(temp, ui::bool_text(s.temp_unlocked_ok, s.temp_unlocked,
+                                       "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
     temp->setDetailTextColor(s.temp_unlocked_ok && s.temp_unlocked ? ui::color_warn() : ui::color_neutral());
 
     // Companion app: while linked, its next sync overwrites what is set here.
     const bool paired = s.pairing_active_ok && s.pairing_active;
-    pr_active->setDetailText(ui::bool_text(s.pairing_active_ok, s.pairing_active,
-                                           "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
+    ui::set_detail(pr_active, ui::bool_text(s.pairing_active_ok, s.pairing_active,
+                                            "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
     pr_active->setDetailTextColor(paired ? ui::color_warn() : ui::color_neutral());
-    pr_updated->setDetailText(s.last_updated_ok ? ui::time_text(s.last_updated) : "playguard/common/unavailable"_i18n);
+    ui::set_detail(pr_updated, s.last_updated_ok ? ui::time_text(s.last_updated) : "playguard/common/unavailable"_i18n);
     pr_note->setTextColor(paired ? ui::color_warn() : ui::color_note());
 
-    pin_lock_cell->setDetailText(pin_lock::mode_text());
-    pin_lock_note->setText(pin_lock::note_text());
+    ui::set_detail(pin_lock_cell, pin_lock::mode_text());
+    ui::set_text(pin_lock_note, pin_lock::note_text());
     pin_ask_again->setOn(config::get().pin_ask_again, false);
 
     const bool locked = console_lock::active();
-    console_lock_cell->setDetailText(locked ? "playguard/common/on"_i18n : "playguard/common/off"_i18n);
+    ui::set_detail(console_lock_cell, locked ? "playguard/common/on"_i18n : "playguard/common/off"_i18n);
     console_lock_cell->setDetailTextColor(locked ? ui::color_warn() : ui::color_neutral());
-    console_lock_note->setText(locked ? "playguard/console_lock/note_on"_i18n : "playguard/console_lock/note_off"_i18n);
+    ui::set_text(console_lock_note, locked ? "playguard/console_lock/note_on"_i18n : "playguard/console_lock/note_off"_i18n);
 
     const bool writable = !app::read_only();
     const bool has_pin  = s.pin_length_ok && s.pin_length > 0;
