@@ -11,6 +11,9 @@
 #include <ctime>
 #include <exception>
 #include <typeinfo>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "action/fw_gate.hpp"
 #include "action/log_prune_flow.hpp"
@@ -374,7 +377,18 @@ void shut_down()
     brls::Logger::info("quit: after {} s", session_log::uptime_s());
     session_log::end("clean exit");
 }
+
+// One frame; false once PlayGuard quits.
+bool run_frame()
+{
+    if (!brls::Application::mainLoop()) return false;
+    // The lines the session file waits for, written off the UI thread
+    // once they waited long enough (util/session_log.hpp).
+    if (session_log::due()) ui::write_later("session log", []() { session_log::flush(); }, "session_log");
+    return true;
+}
 }   // namespace
+
 
 int main(int argc, char* argv[])
 {
@@ -445,12 +459,19 @@ int main(int argc, char* argv[])
     // or icon read running there stops now, not after every game is read.
     brls::Application::getExitEvent()->subscribe([]() { playstats_cancel(); });
 
-    while (brls::Application::mainLoop()) {
-        // The lines the session file waits for, written off the UI thread
-        // once they waited long enough (util/session_log.hpp).
-        if (session_log::due()) ui::write_later("session log", []() { session_log::flush(); }, "session_log");
-    }
+#ifdef __EMSCRIPTEN__
+    // In a browser a frame must hand the thread back to the page (web/README.md):
+    // the browser calls one per display refresh, and main() returns at once.
+    emscripten_set_main_loop([]() {
+        if (run_frame()) return;
+        emscripten_cancel_main_loop();
+        shut_down();
+    }, 0, false);
+    return EXIT_SUCCESS;
+#else
+    while (run_frame()) {}
 
     shut_down();
     return EXIT_SUCCESS;
+#endif
 }
