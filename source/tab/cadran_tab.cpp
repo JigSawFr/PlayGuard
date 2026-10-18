@@ -314,6 +314,7 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
         date->setMarginLeft(10);
         right->addView(date);
     }
+    right->setMarginRight(16);   // clear of the header's tools (language, theme, bell) after it
     if (brls::Box* header = frame->getHeader()) header->addView(right, 1);
 }
 
