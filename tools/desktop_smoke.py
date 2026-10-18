@@ -67,14 +67,16 @@ the Cadran tabs are those same tabs under their boards' tops): every tab,
 then the child screen and back with the PIN, a day of the week edited with
 the stick and saved, a restriction level's confirmation, the appearance
 picker, the network clock's screen, a game's screen from its card and the
-notification bell's list.
+notification bell's list. The "cadranstates" one shows Cadran's Today and
+Play timer in the states "alarm" and "outside" set up, together: the time
+over the limit (a warning only) and the changes made outside PlayGuard.
 
 The "loading" scenario stops the start-up on the loading screen
 (PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran]   (needs DISPLAY, xdotool, ImageMagick)
+Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -108,6 +110,7 @@ SYSNOTES = SCENARIO == "sysnotes"
 ROLLBACK = SCENARIO == "rollback"
 GAMES = SCENARIO == "games"
 CADRAN = SCENARIO == "cadran"
+CADRANSTATES = SCENARIO == "cadranstates"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
@@ -156,7 +159,7 @@ env.setdefault("PLAYGUARD_SIM_STILL_FOCUS", "1")
 env.setdefault("PLAYGUARD_SIM_VERSION", "1.0.0:1a2b3c4")
 # The appearance, whatever config.json says: the classic lists, which every
 # scenario's key presses follow, but in the one that tours Cadran.
-env.setdefault("PLAYGUARD_SIM_APPEARANCE", "cadran" if CADRAN else "classic")
+env.setdefault("PLAYGUARD_SIM_APPEARANCE", "cadran" if CADRAN or CADRANSTATES else "classic")
 # The installed games are checked at start-up for the notification bell:
 # at once in every scenario but the default one and "games", which watches a
 # check go game by game (150 ms each) and waits for the start-up one first.
@@ -290,7 +293,7 @@ if not GATE and not ERRORS and not DEVBUILD and not UPDATE:
     github_token = os.path.join(run_dir, "playguard_data", "github_token")
     if os.path.exists(github_token):
         os.remove(github_token)   # signed out: Send a report online offers to sign in first
-if ALARM:
+if ALARM or CADRANSTATES:
     # "When the time is up" on a warning only, today's limit passed: the
     # console does not restrict, and its time left reads below 0.
     env.setdefault("PLAYGUARD_SIM_ALARM_ONLY", "1")
@@ -344,7 +347,7 @@ if LIBRARY:
     # A large library: All games builds its first covers, then the rest on
     # "Show every game".
     env.setdefault("PLAYGUARD_SIM_GAMES", "120")
-if OUTSIDE:
+if OUTSIDE or CADRANSTATES:
     # What PlayGuard saw last time (outside_change_logic): 100 min played
     # today (the console says 80), a clock 15 min off the steady one (the
     # simulated steady clock's source is 16 bytes of 0x53), 1 h 30 on
@@ -1191,6 +1194,15 @@ if CADRAN:
     time.sleep(1)              # the screen's own entrance over
     shot("20_notices")
     key("Escape")
+    finish()
+if CADRANSTATES:
+    # Cadran's tops in the states the other scenarios show in the classic
+    # lists: the time over the limit (a warning only) and the changes made
+    # outside PlayGuard.
+    shot("01_today")
+    key("Down")
+    key("Right")
+    shot("02_play_timer")
     finish()
 if ALARM:
     shot("01_overview_over")   # Overview: the time over the limit, not a time left
