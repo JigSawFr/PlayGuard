@@ -64,27 +64,6 @@ Summary summarize(const PlayStats& s, int period)
     return out;
 }
 
-std::vector<int> rediscover(const PlayStats& s, size_t max)
-{
-    std::vector<int> out;
-    if (R_FAILED(s.rc) || R_FAILED(s.stats_rc)) return out;
-    for (uint32_t i = 0; i < s.count && i < PLAYSTATS_MAX; i++) {
-        const GameStat& g = s.games[i];
-        if (!g.name[0] || !g.totals_ok || !g.last_played || g.total_s >= REDISCOVER_MAX_S) continue;
-        if (s.now < g.last_played || s.now - g.last_played < REDISCOVER_AFTER_S) continue;
-        if (s.windows_ok && g.week_s) continue;   // the log says otherwise
-        out.push_back((int)i);
-    }
-    // The least played first, then the one left aside the longest.
-    std::sort(out.begin(), out.end(), [&s](int a, int b) {
-        const GameStat& ga = s.games[a];
-        const GameStat& gb = s.games[b];
-        return ga.total_s != gb.total_s ? ga.total_s < gb.total_s : ga.last_played < gb.last_played;
-    });
-    if (out.size() > max) out.resize(max);
-    return out;
-}
-
 uint64_t unattributed_s(uint64_t total_s, const AccountPlay* accounts, size_t count)
 {
     uint64_t gap = total_s;

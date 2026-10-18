@@ -1,8 +1,7 @@
 // Host tests for util/activity_summary.hpp: the Activity tab's summary over
 // each period (average per day, most played game, days played, busiest day,
-// average session), what is left out when a figure was not read, the
-// games to rediscover, the play time no account holds, the list's order and
-// the export's table.
+// average session), what is left out when a figure was not read, the play
+// time no account holds, the list's order and the export's table.
 #include "check.h"
 #include <cstdio>
 #include <cstring>
@@ -122,41 +121,6 @@ static void test_edges()
     }
     Summary w = summarize(*s, Week);
     CHECK(w.days_played == 0 && w.busiest == -1 && w.per_day_s == 0 && w.top == -1);
-}
-
-static void test_rediscover()
-{
-    auto s = sample();
-    CHECK(rediscover(*s, 3).empty());   // both played recently, and long
-
-    add(*s, "Puzzle", 45, 2, 60);        // 45 min, 60 days ago
-    add(*s, "Tennis", 45, 3, 90);        // as little, left aside longer
-    add(*s, "Quiz", 20, 1, 30);          // exactly 30 days: in
-    add(*s, "Recent", 10, 1, 29);        // 29 days: out
-    add(*s, "Long", 180, 9, 200);        // 3 h: out
-    add(*s, "", 5, 1, 200);              // deleted (no name): out
-    GameStat& unread = add(*s, "Unread", 5, 1, 200);
-    unread.totals_ok = false;            // its totals unknown: out
-    GameStat& never = add(*s, "Never", 5, 1, 200);
-    never.last_played = 0;               // last play unknown: out
-    GameStat& week = add(*s, "Week", 5, 1, 200);
-    week.week_s = 60;                    // the log has it this week: out
-    GameStat& future = add(*s, "Future", 5, 1, 0);
-    future.last_played = NOW + DAY;      // the clock went back: out
-
-    std::vector<int> r = rediscover(*s, 3);
-    if (!CHECK(r.size() == 3)) return;
-    CHECK(!std::strcmp(s->games[r[0]].name, "Quiz"));
-    CHECK(!std::strcmp(s->games[r[1]].name, "Tennis"));
-    CHECK(!std::strcmp(s->games[r[2]].name, "Puzzle"));
-    CHECK(rediscover(*s, 1).size() == 1 && rediscover(*s, 10).size() == 3);
-
-    // Without the log, the "this week" check is left out.
-    s->windows_ok = false;
-    CHECK(rediscover(*s, 10).size() == 4);
-    // Without the statistics, nothing.
-    s->stats_rc = 0x1A0C;
-    CHECK(rediscover(*s, 10).empty());
 }
 
 static void test_unattributed()
@@ -299,7 +263,6 @@ int main()
 {
     test_periods();
     test_edges();
-    test_rediscover();
     test_unattributed();
     test_sort();
     test_export();

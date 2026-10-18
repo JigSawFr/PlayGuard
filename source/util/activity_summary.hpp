@@ -1,8 +1,7 @@
 // activity_summary — the Activity tab's summary of one account's play data
 // (core/playstats.h) over the chosen period: the average per day, the most
-// played game, the days played and the busiest one, the average session; and
-// the games to rediscover (installed, little played, left aside for a while);
-// the list's order and the table its export writes. Pure (the words are the
+// played game, the days played and the busiest one, the average session; the
+// list's order and the table its export writes. Pure (the words are the
 // tab's, handed in), so the host tests can run it (tests/activity_summary).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -44,13 +43,6 @@ struct Summary
 };
 
 Summary summarize(const PlayStats& stats, int period);
-
-// Games to rediscover: still installed (a name), under 3 h in all and not
-// played for 30 days or more, the least played first, at most `max`. Indices
-// in PlayStats.games.
-constexpr uint64_t REDISCOVER_MAX_S   = 3 * 3600;
-constexpr uint64_t REDISCOVER_AFTER_S = 30 * 86400;
-std::vector<int> rediscover(const PlayStats& stats, size_t max);
 
 // A game's all-time play time that no user account holds (`total_s` is the
 // game's, every account): played without choosing an account (some games

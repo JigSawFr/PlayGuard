@@ -1014,7 +1014,7 @@ if LIBRARY:
                 for l in open(os.path.join(OUT, "app.log"), errors="replace") if "games list: " in l]
     key("Down", steps("dashboard", "activity"))
     key("Right")               # Account (the simulated console has two)
-    key("Down", 5)             # a scroll, then past Account by default, Period and the game to rediscover: All games
+    key("Down", 4)             # a scroll, then past Account by default and Period: All games
     key("Return")
     shot("01_games")           # the covers, the first one's figures on top
     if not listed() or not listed()[-1].startswith("50 of ") or not listed()[-1].endswith("(grid)"):
@@ -1594,7 +1594,7 @@ pdfs_before = pdfs()   # the run folder is kept between local runs
 key("Left")                # back to the sidebar
 key("Up", steps("activity", "console"))
 key("Right")               # Account (the simulated console has two; the totals are not focusable)
-key("Down", 5)             # a scroll, then past Account by default, Period and the game to rediscover: All games
+key("Down", 4)             # a scroll, then past Account by default and Period: All games
 key("Return")              # the covers, on the first game
 shot("28_activity_games")
 key("Return")

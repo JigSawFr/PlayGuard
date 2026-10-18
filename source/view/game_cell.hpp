@@ -1,4 +1,4 @@
-// GameCell — a game in a list (All games, the games to rediscover): its icon (when the control data has
+// GameCell — a game in a list (All games): its icon (when the control data has
 // one and the app runs with full memory), its name and a play time. The icon
 // slot is kept even before the icon arrives, so the names line up.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
