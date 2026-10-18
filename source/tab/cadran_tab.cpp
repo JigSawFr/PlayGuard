@@ -15,6 +15,7 @@
 #include "app.hpp"
 #include "action/pt_logic.hpp"
 #include "ui/cadran_kit.hpp"
+#include "ui/cadran_modal.hpp"
 #include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -120,6 +121,11 @@ void cadran::install_theme()
         t->addColor("cadran/none", nvgRGBA(0, 0, 0, 0));
         t->addColor("cadran/bar", p == &dark ? nvgRGB(0x33, 0x48, 0x6B) : nvgRGB(0xB9, 0xC6, 0xDA));
         t->addColor("cadran/bar_today", p == &dark ? nvgRGB(0x5A, 0x71, 0x96) : nvgRGB(0x7E, 0x90, 0xAE));
+        // Behind a dialog or a picker: the navy, dimmed. A toast: a card of
+        // the second surface on the dark theme, navy on the light one.
+        t->addColor("brls/backdrop", p == &dark ? nvgRGBA(3, 8, 18, 190) : nvgRGBA(0x0B, 0x14, 0x24, 115));
+        t->addColor("brls/notification/background", p == &dark ? nvgRGBA(0x1A, 0x2A, 0x45, 250) : nvgRGBA(0x0B, 0x14, 0x24, 240));
+        t->addColor("brls/notification/text", p == &dark ? p->text : nvgRGB(0xEE, 0xF2, 0xF8));
     }
     brls::Style style = brls::getStyle();
     style.addMetric("brls/applet_frame/header_height", 84.0f);
@@ -131,6 +137,17 @@ void cadran::install_theme()
     style.addMetric("brls/sidebar/padding_bottom", 10.0f);
     style.addMetric("brls/sidebar/padding_left", 16.0f);
     style.addMetric("brls/sidebar/item_height", 52.0f);
+    // The pickers' rows inside their card (cadran_modal), the toasts as
+    // cards under the header, and the pills' hairline.
+    style.addMetric("brls/dropdown/listPadding", 14.0f);
+    style.addMetric("brls/dropdown/listPaddingSides", 20.0f);
+    style.addMetric("brls/notification/width", 400.0f);
+    style.addMetric("brls/notification/padding", 18.0f);
+    style.addMetric("brls/notification/corner_radius", 16.0f);
+    style.addMetric("brls/notification/margin_top", 96.0f);
+    style.addMetric("brls/notification/margin_right", 32.0f);
+    style.addMetric("brls/notification/spacing", 10.0f);
+    style.addMetric("cadran/hairline", 1.0f);
     // The boards' display face for the figures (Sora Bold, OFL).
     if (!brls::Application::loadFontFromFile("cadran/digits", BRLS_ASSET("font/sora_bold_latin.ttf")))
         brls::Logger::warning("cadran: display font not loaded, the default one is used");
@@ -285,12 +302,16 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
 namespace
 {
 // Every screen but the main one (MainActivity styles that one, rail and all):
-// the header after the boards, and its list in cards. Once per screen: the
-// mark it adds says it is done.
+// the header after the boards, and its list in cards; a dialog as a card.
+// Once per screen: the mark it adds says it is done.
 void skin_screen_of(brls::View* focus)
 {
     if (!focus) return;
     while (focus->hasParent()) focus = focus->getParent();
+    if (auto* dialog = dynamic_cast<brls::Dialog*>(focus)) {
+        cadran::style_dialog(dialog);
+        return;
+    }
     auto* frame = dynamic_cast<brls::AppletFrame*>(focus);
     if (!frame || frame->getView("main_tabs") || frame->getView("cadran_mark")) return;
     if (!frame->getView("brls/applet_frame/header")) return;

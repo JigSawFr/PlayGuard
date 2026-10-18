@@ -149,9 +149,11 @@ void on_cancel(brls::Dialog* dialog, std::function<void()> on_cancel);
 // dialog that waits for something (a check, an answer from the network).
 void add_cancel(brls::Dialog* dialog, std::function<void()> cancel);
 
-// Dropdown list; `on_pick(index)` runs after the list has closed.
+// Dropdown list; `on_pick(index)` runs after the list has closed. The row
+// `selected` has the focus and is checked as the current value, unless
+// `checked` is false (a list of things to do, not of values).
 void pick(const std::string& title, const std::vector<std::string>& values, int selected,
-          std::function<void(int)> on_pick);
+          std::function<void(int)> on_pick, bool checked = true);
 // A list of things to do: each line's label, and what it runs once the
 // list has closed. The first line is selected; none, no list.
 struct Choice

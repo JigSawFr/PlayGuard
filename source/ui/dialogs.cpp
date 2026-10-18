@@ -3,6 +3,7 @@
 #include "ui/ui.hpp"
 
 #include "core/platform.h"
+#include "ui/cadran_modal.hpp"
 #include "util/config.hpp"
 #include "util/duration.hpp"
 #include "util/text.hpp"
@@ -43,8 +44,13 @@ void add_cancel(brls::Dialog* dialog, std::function<void()> cancel)
 // the way the Label measures it, never from a character count (French and
 // German lines hold fewer characters than English ones).
 
-// Height of the dialog's content above its button row (72 px).
-static float content_height() { return brls::Application::contentHeight - 72; }
+// Height of the dialog's content above its button row (72 px; Cadran's is
+// taller, and its card keeps a margin from the screen's top and bottom).
+static float content_height()
+{
+    if (cadran::enabled()) return brls::Application::contentHeight - cadran::DIALOG_BUTTONS - 2 * cadran::DIALOG_MARGIN;
+    return brls::Application::contentHeight - 72;
+}
 
 // Wrapped height of `text` at `size` in `width`, as labelMeasureFunc does it.
 static float text_height(brls::Label* label, const std::string& text, float size, float width)
@@ -171,7 +177,9 @@ static void open_confirm(const std::string& body, const std::string& confirm_lab
     dialog->addButton("hints/cancel"_i18n, [on_no]() { if (on_no) on_no(); });
     dialog->addButton(confirm_label, [on_yes]() { if (on_yes) on_yes(); });
     on_cancel(dialog, on_no);
-    if (danger)
+    if (cadran::enabled())
+        cadran::style_dialog(dialog, danger ? cadran::Emphasis::DANGER : cadran::Emphasis::PRIMARY);
+    else if (danger)
         if (auto* button = dynamic_cast<brls::Button*>(dialog->getView("brls/dialog/button2")))
             button->setTextColor(color_bad());
     dialog->open();
@@ -217,21 +225,63 @@ void qr_dialog(const std::string& body, const std::string& url)
     dialog->open();
 }
 
+// borealis' Dropdown with the row `checked` (−1: none) checked and the
+// focus on `focus`; in the Cadran look, a card and its rows (cadran_modal).
+class Picker : public brls::Dropdown
+{
+  public:
+    Picker(const std::string& title, const std::vector<std::string>& values, int checked, int focus,
+           std::function<void(int)> on_pick)
+        : brls::Dropdown(
+              title, values, [this](int index) { this->chosen = index; }, focus,
+              [this, on_pick](int) {
+                  if (this->chosen >= 0 && on_pick) {
+                      const int index = this->chosen;
+                      brls::sync([on_pick, index]() { on_pick(index); });
+                  }
+              }),
+          labels(values), checked(checked)
+    {
+        // The rows Dropdown's constructor already made used its own
+        // cellForRow (this one did not exist yet): set again here.
+        this->restyle(this);
+        if (cadran::enabled()) cadran::style_picker(this);
+    }
+
+  private:
+    std::vector<std::string> labels;
+    int checked;
+    int chosen = -1;
+
+    void row(brls::RadioCell* cell, bool on)
+    {
+        cell->setSelected(on);
+        if (cadran::enabled()) cadran::style_pick_row(cell, on);
+    }
+
+    void restyle(brls::View* view)
+    {
+        if (auto* cell = dynamic_cast<brls::RadioCell*>(view)) this->row(cell, this->checked >= 0 && cell->getSelected());
+        if (auto* box = dynamic_cast<brls::Box*>(view))
+            for (brls::View* child : box->getChildren()) this->restyle(child);
+    }
+
+    brls::RecyclerCell* cellForRow(brls::RecyclerFrame* recycler, brls::IndexPath index) override
+    {
+        auto* cell = (brls::RadioCell*)recycler->dequeueReusableCell("Cell");
+        cell->title->setText(this->labels[index.row]);
+        this->row(cell, index.row == this->checked);
+        return cell;
+    }
+};
+
 void pick(const std::string& title, const std::vector<std::string>& values, int selected,
-          std::function<void(int)> on_pick)
+          std::function<void(int)> on_pick, bool checked)
 {
     if (values.empty()) return;
-    auto chosen = std::make_shared<int>(-1);
-    auto* dropdown = new brls::Dropdown(
-        title, values, [chosen](int index) { *chosen = index; },
-        selected < 0 ? 0 : selected,
-        [chosen, on_pick](int) {
-            if (*chosen >= 0 && on_pick) {
-                int index = *chosen;
-                brls::sync([on_pick, index]() { on_pick(index); });
-            }
-        });
-    brls::Application::pushActivity(new brls::Activity(dropdown));
+    const int focus = selected < 0 ? 0 : selected;
+    auto* list = new Picker(title, values, checked ? focus : -1, focus, std::move(on_pick));
+    brls::Application::pushActivity(new brls::Activity(list));
 }
 
 void pick_actions(const std::string& title, const std::vector<Choice>& choices)

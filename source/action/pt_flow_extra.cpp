@@ -73,48 +73,6 @@ static void put_back_extra_record(const pt_logic::ExtraRecord& prev)
     ui::save_config();
 }
 
-// A list of actions, not of values: no row is checked as the current one
-// (borealis' Dropdown checks one, ui::pick the `selected`). The first row
-// takes the focus.
-class ActionList : public brls::Dropdown
-{
-  public:
-    ActionList(const std::string& title, const std::vector<std::string>& values, std::function<void(int)> on_pick)
-        : brls::Dropdown(
-              title, values, [this](int index) { this->chosen = index; }, 0,
-              [this, on_pick](int) {
-                  if (this->chosen >= 0 && on_pick) {
-                      const int index = this->chosen;
-                      brls::sync([on_pick, index]() { on_pick(index); });
-                  }
-              }),
-          labels(values)
-    {
-        // The rows Dropdown's constructor already made used its own
-        // cellForRow (this one did not exist yet): unchecked here.
-        uncheck(this);
-    }
-
-  private:
-    std::vector<std::string> labels;
-    int chosen = -1;
-
-    static void uncheck(brls::View* view)
-    {
-        if (auto* cell = dynamic_cast<brls::RadioCell*>(view)) cell->setSelected(false);
-        if (auto* box = dynamic_cast<brls::Box*>(view))
-            for (brls::View* child : box->getChildren()) uncheck(child);
-    }
-
-    brls::RecyclerCell* cellForRow(brls::RecyclerFrame* recycler, brls::IndexPath index) override
-    {
-        auto* cell = (brls::RadioCell*)recycler->dequeueReusableCell("Cell");
-        cell->title->setText(this->labels[index.row]);
-        cell->setSelected(false);
-        return cell;
-    }
-};
-
 // `extra` minutes more today, after the confirmation (the picker below, or a
 // chip of the Cadran Overview).
 static void add_extra(int wd, uint16_t base, uint16_t extra, std::function<void()> refresh)
@@ -160,10 +118,10 @@ void add_extra_time(const PtState& pt, std::function<void()> refresh)
     std::vector<std::string> labels;
     for (int e : amounts) labels.push_back("+" + ui::fmt_minutes((uint16_t)e));
     const uint16_t base = pt.day_min[wd];
-    auto* list = new ActionList("playguard/dashboard/extra_title"_i18n, labels, [refresh, wd, base, amounts](int index) {
+    // A list of actions, not of values: no row is checked.
+    ui::pick("playguard/dashboard/extra_title"_i18n, labels, 0, [refresh, wd, base, amounts](int index) {
         add_extra(wd, base, (uint16_t)amounts[index], refresh);
-    });
-    brls::Application::pushActivity(new brls::Activity(list));
+    }, false);
 }
 
 void add_extra_minutes(const PtState& pt, uint16_t minutes, std::function<void()> refresh)
@@ -233,10 +191,9 @@ void stop_today(const PtState& pt, std::function<void()> refresh)
         return;
     }
     const PtState copy = pt;
-    auto* list = new ActionList("playguard/dashboard/stop_title"_i18n,
-                                { "playguard/dashboard/stop_now"_i18n, "playguard/dashboard/stop_soon"_i18n },
-                                [copy, soon, refresh](int index) { stop_at(copy, index == 0 ? 0 : (uint16_t)soon, refresh); });
-    brls::Application::pushActivity(new brls::Activity(list));
+    ui::pick("playguard/dashboard/stop_title"_i18n,
+             { "playguard/dashboard/stop_now"_i18n, "playguard/dashboard/stop_soon"_i18n }, 0,
+             [copy, soon, refresh](int index) { stop_at(copy, index == 0 ? 0 : (uint16_t)soon, refresh); }, false);
 }
 
 // Puts `base` back on weekday `wd`, if it still holds the extra time (`value`).
