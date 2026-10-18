@@ -1,8 +1,9 @@
 // game_icons — the games' icons for the Games screen and a game's own screen:
-// read off the main thread from the control data, their bytes kept as an LRU
-// (action/icon_logic.hpp), decoded small once for the run (NVG images, up to
-// a fixed number; past it, a cell decodes and frees its own). None in applet
-// mode (opened from the album: a few MB is too much). UI thread only.
+// read and decoded small off the main thread from the control data, their
+// bytes kept as an LRU (action/icon_logic.hpp), made textures once for the
+// run (NVG images, up to a fixed number; past it, a cell gets its own and
+// frees it). None in applet mode (opened from the album: a few MB is too
+// much). UI thread only.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
