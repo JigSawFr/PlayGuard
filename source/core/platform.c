@@ -60,22 +60,6 @@ bool platform_region(int *region)
     return true;
 }
 
-bool platform_held_lr(void)
-{
-    // Read a few times over 30 ms: the first state read may predate the
-    // controllers being polled.
-    padConfigureInput(1, HidNpadStyleSet_NpadStandard);
-    PadState pad;
-    padInitializeDefault(&pad);
-    const u64 both = HidNpadButton_L | HidNpadButton_R;
-    for (int i = 0; i < 4; i++) {
-        padUpdate(&pad);
-        if ((padGetButtons(&pad) & both) == both) return true;
-        svcSleepThread(10000000ULL);
-    }
-    return false;
-}
-
 bool platform_boot_choice(const char *text)
 {
     consoleInit(NULL);
@@ -85,7 +69,7 @@ bool platform_boot_choice(const char *text)
     printf("%s", text ? text : "");
     consoleUpdate(NULL);
     bool a = false;
-    // Only a new press counts: L + R, held to get here, answer nothing.
+    // Only a new press counts: a button held since the start answers nothing.
     while (appletMainLoop()) {
         padUpdate(&pad);
         const u64 down = padGetButtonsDown(&pad);

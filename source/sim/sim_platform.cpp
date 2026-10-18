@@ -52,11 +52,6 @@ void platform_exit_to_home(void)
     std::fflush(stdout);
 }
 
-bool platform_held_lr(void)
-{
-    return std::getenv("PLAYGUARD_SIM_HELD_LR") != nullptr;
-}
-
 bool platform_boot_choice(const char* text)
 {
     const char* choice = std::getenv("PLAYGUARD_SIM_BOOT_CHOICE");

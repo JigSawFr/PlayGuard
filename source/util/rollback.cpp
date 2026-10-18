@@ -65,12 +65,9 @@ bool write_check(const std::string& json_file, const Check& check)
     return paths::atomic_write(json_file, json{ { "label", check.label }, { "starts", check.starts } }.dump() + "\n", &err);
 }
 
-Offer offer_at_start(bool checked, int starts_before, bool held, bool have_previous, bool pin_set)
+bool offer_at_start(bool checked, int starts_before, bool have_previous)
 {
-    if (!have_previous) return Offer::None;
-    if (checked && starts_before >= 1) return Offer::Crashed;
-    if (!held) return Offer::None;
-    return pin_set ? Offer::Refused : Offer::Asked;
+    return have_previous && checked && starts_before >= 1;
 }
 
 void recover(const std::string& nro)

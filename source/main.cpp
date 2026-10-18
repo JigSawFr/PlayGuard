@@ -390,8 +390,8 @@ int main(int argc, char* argv[])
     // A way out of main() that skips the end of this function.
     std::atexit([]() { session_log::end("exit"); });
     // Before anything that could crash: the last start of a build just
-    // installed never reached its first screen, or L + R are held (and no
-    // PIN is set)? Then the previous build is offered (action/rollback_flow.hpp).
+    // installed never reached its first screen? Then the previous build is
+    // offered (action/rollback_flow.hpp).
     if (rollback_flow::at_start()) {
         session_log::end("exit at start-up (the start-up screen of the previous build)");
         return EXIT_SUCCESS;
