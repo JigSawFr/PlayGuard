@@ -207,10 +207,11 @@ jobs:
 
   # Builds the UI on Linux against the simulated backend and clicks through
   # every screen headlessly: catches borealis XML / view errors without a console.
-  # The scenarios run in parallel shards (under software GL the default one
-  # alone takes close to 4 minutes, and `outside` waits 90 s on screen by
-  # design); each shard builds with the shared ccache (about 12 s warm), and
-  # only the first saves it back. The desktop-smoke job below gathers them
+  # The scenarios run in parallel shards of about the same length, 3 to 4
+  # minutes under software GL (the default tour is split in two, `smoke`
+  # and `games`, and `outside` waits 90 s on screen by design); each shard
+  # builds with the shared ccache (about 12 s warm), and only the first
+  # saves it back. The desktop-smoke job below gathers them
   # under one name for the release job and branch rules.
   desktop-smoke-shard:
     name: desktop-smoke (${{ matrix.shard }})
@@ -223,6 +224,8 @@ jobs:
         include:
           - shard: default
             scenarios: smoke
+          - shard: games
+            scenarios: games
           - shard: states
             scenarios: gate errors rescue forged lock loading alarm
           - shard: developer

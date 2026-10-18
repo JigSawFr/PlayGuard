@@ -3,10 +3,15 @@
 
 Starts build-desktop/playguard on an X display (Xvfb), opens every tab, the
 extra-time picker, the per-day editor (the week chart's day picker and the
-number pad), a bedtime alarm change, the settings backup, Activity › All games (covers, then the list), a game's screen from it and the
-PDF export, and fails if the app dies on the way (borealis throws on unknown
-XML attributes, missing views, …) or the export is missing. Screenshots of
-each screen are written to the output folder.
+number pad), a bedtime alarm change and the settings backup, and fails if the
+app dies on the way (borealis throws on unknown XML attributes, missing
+views, …). Screenshots of each screen are written to the output folder.
+
+The "games" scenario is the rest of that tour, in a run of its own so CI can
+run both halves side by side: a report sent online (GitHub sign-in first),
+Console › Check the installed games (a check game by game, then every fix,
+check and removal), then Activity › All games (covers, then the list), a
+game's screen from it and the PDF export, which must be there.
 
 The "gate" scenario starts on a firmware newer than the checked one, with a
 simulated release that supports it: the firmware screen, read-only mode,
@@ -59,7 +64,7 @@ The "loading" scenario stops the start-up on the loading screen
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes]   (needs DISPLAY, xdotool, ImageMagick)
+Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -91,6 +96,7 @@ LOADING = SCENARIO == "loading"
 ALARM = SCENARIO == "alarm"
 SYSNOTES = SCENARIO == "sysnotes"
 ROLLBACK = SCENARIO == "rollback"
+GAMES = SCENARIO == "games"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
@@ -138,9 +144,9 @@ env.setdefault("PLAYGUARD_SIM_STILL_FOCUS", "1")
 # stay the same once this build is 1.1.0 or later.
 env.setdefault("PLAYGUARD_SIM_VERSION", "1.0.0:1a2b3c4")
 # The installed games are checked at start-up for the notification bell:
-# at once in every scenario but the default one, which watches a check go
-# game by game (150 ms each) and waits for the start-up one first.
-if SCENARIO:
+# at once in every scenario but the default one and "games", which watches a
+# check go game by game (150 ms each) and waits for the start-up one first.
+if SCENARIO and not GAMES:
     env.setdefault("PLAYGUARD_SIM_CHECK_MS", "0")
 if GATE:
     env.setdefault("PLAYGUARD_SIM_FW", "24.0.0")
@@ -457,6 +463,32 @@ def key(name, n=1, hold=0.02):
         time.sleep(0.2)
 
 
+def screen(name):
+    """A screenshot of the screen without the footer (its clock follows the
+    host), as <out-dir>/name.png."""
+    path = os.path.join(OUT, name + ".png")
+    subprocess.run(IM + ["import", "-window", "root", "-crop", "1280x650+0+0", "+repage", path], env=env)
+    return path
+
+
+def key_to_end(name, most=50, hold=0.02):
+    """Presses `name` until the screen stops changing (the end of the list:
+    the focus and the scroll stay put), `most` times at most. A pixel counts
+    as changed past 10 % (the focused tile's shade wavers by a few), as in
+    tools/visual_check.py; a screen that never settles gets all `most`
+    presses, as key() would."""
+    before = screen("_before")
+    for _ in range(most):
+        key(name, hold=hold)
+        now = screen("_now")
+        changed = subprocess.run(IM + ["compare", "-fuzz", "10%", "-metric", "AE", before, now, "null:"],
+                                 capture_output=True, text=True).stderr.split()
+        os.replace(now, before)
+        if changed[:1] == ["0"]:   # ImageMagick 7 adds " (0)"
+            break
+    os.remove(before)
+
+
 def button_x():
     """Ⓧ: the desktop build reads it from the middle mouse button (the
     keyboard has none), clicked over the title, where nothing takes the focus."""
@@ -591,7 +623,7 @@ for _ in range(60):
 else:
     fail("no first screen after the loading screen in 30 s")
 time.sleep(2)
-if not SCENARIO:
+if not SCENARIO or GAMES:
     # The start-up check of the installed games: the bell counts them.
     for _ in range(40):
         if logged("games: start-up check done"):
@@ -664,10 +696,10 @@ if GATE:
     # press like a hand.
     key("Left")
     key("Right")
-    key("Down", 50, hold=0.15) # its last line: the funding QR codes
+    key_to_end("Down", hold=0.15) # its last line: the funding QR codes
     key("Up", 2)               # past Source: Help & diagnostics
     key("Return")
-    key("Down", 50, hold=0.15) # the Developer section, down to its last cell
+    key_to_end("Down", hold=0.15) # the Developer section, down to its last cell
     shot("05_dev_tools")
     # Turning a developer switch off asks first; B keeps it on (the end of
     # the scenario checks developer mode was saved on).
@@ -761,10 +793,10 @@ if DEVBUILD:
     key("Return", 7)
     key("Left")
     key("Right")
-    key("Down", 50, hold=0.15) # its last line: the funding QR codes
+    key_to_end("Down", hold=0.15) # its last line: the funding QR codes
     key("Up", 2)               # past Source: Help & diagnostics
     key("Return")
-    key("Down", 50, hold=0.15) # the Developer section, down to its last cell
+    key_to_end("Down", hold=0.15) # the Developer section, down to its last cell
     key("Return")              # Install another build: signed out, the releases and "Sign in"
     time.sleep(1)              # once fetched (the simulated GitHub takes 0.6 s an answer)
     shot("01_dev_builds_signed_out")
@@ -1177,118 +1209,121 @@ if RESCUE:
         fail("\"Turn back on and quit\" went back to hbmenu, not to the HOME menu")
     finish(recorded)
 
-shot("01_dashboard")
-# Left (not Escape) goes back to the sidebar: Escape there asks to quit, so a
-# step that went wrong could close the app.
-for i, tab in enumerate(tabs[1:], start=2):
-    key("Down")
-    key("Right")
-    shot(f"{i:02d}_{tab}")
-    key("Down", 12)   # scroll through the whole tab
-    shot(f"{i:02d}_{tab}_end")
-    key("Left")       # back to the sidebar
+if not GAMES:
+    shot("01_dashboard")
+    # Left (not Escape) goes back to the sidebar: Escape there asks to quit, so a
+    # step that went wrong could close the app.
+    for i, tab in enumerate(tabs[1:], start=2):
+        key("Down")
+        key("Right")
+        shot(f"{i:02d}_{tab}")
+        key("Down", 12)   # scroll through the whole tab
+        shot(f"{i:02d}_{tab}_end")
+        key("Left")       # back to the sidebar
 
-# The per-day editor, opened from the tab's week chart on the day picked
-# (its picker already open), then the extra-time picker and the
-# Weekdays and weekend row (the editor, Monday–Friday picker first).
-key("Up", steps("play_timer", tabs[-1]))   # from the last tab back to Play timer
-key("Right")               # the week chart, on today
-key("Right")               # tomorrow's day
-key("Return")              # the per-day editor on that day, its picker open
-shot("19_day_picker")
-key("Escape")
-shot("21_per_day")         # the editor, tomorrow focused
-key("Return")              # tomorrow's limit again
-shot("22_dropdown")
-key("Down", 15)            # to the end of the list (No limit) …
-key("Up")                  # … then Enter minutes…: the number pad types "1:30"
-key("Return")
-shot("22_numpad")          # tomorrow: 1 h 30, drawn as unsaved; "+ Save (1)" in the footer
-if not any("numpad: " in l and l.rstrip().endswith("-> 1:30") for l in open(os.path.join(OUT, "app.log"), errors="replace")):
-    fail("the number pad was not asked for the minutes")
-key("Escape")              # unsaved: asks before leaving
-shot("23_discard")
-key("Right")               # Discard
-key("Return")
-shot("23_back")            # the tab, on the chart again
-key("Down")                # Same limit every day
-key("Down")                # Extra time today…
-key("Return")
-shot("20_extra_time")
-key("Escape")
-key("Down", 2)             # past No more play today: Weekdays and weekend
-key("Return")
-shot("21_split")           # the editor, Monday–Friday picker open
-key("Escape")              # no value: no weekend picker either
-key("Escape")              # nothing staged: leaves without asking
+    # The per-day editor, opened from the tab's week chart on the day picked
+    # (its picker already open), then the extra-time picker and the
+    # Weekdays and weekend row (the editor, Monday–Friday picker first).
+    key("Up", steps("play_timer", tabs[-1]))   # from the last tab back to Play timer
+    key("Right")               # the week chart, on today
+    key("Right")               # tomorrow's day
+    key("Return")              # the per-day editor on that day, its picker open
+    shot("19_day_picker")
+    key("Escape")
+    shot("21_per_day")         # the editor, tomorrow focused
+    key("Return")              # tomorrow's limit again
+    shot("22_dropdown")
+    key("Down", 15)            # to the end of the list (No limit) …
+    key("Up")                  # … then Enter minutes…: the number pad types "1:30"
+    key("Return")
+    shot("22_numpad")          # tomorrow: 1 h 30, drawn as unsaved; "+ Save (1)" in the footer
+    if not any("numpad: " in l and l.rstrip().endswith("-> 1:30") for l in open(os.path.join(OUT, "app.log"), errors="replace")):
+        fail("the number pad was not asked for the minutes")
+    key("Escape")              # unsaved: asks before leaving
+    shot("23_discard")
+    key("Right")               # Discard
+    key("Return")
+    shot("23_back")            # the tab, on the chart again
+    key("Down")                # Same limit every day
+    key("Down")                # Extra time today…
+    key("Return")
+    shot("20_extra_time")
+    key("Escape")
+    key("Down", 2)             # past No more play today: Weekdays and weekend
+    key("Return")
+    shot("21_split")           # the editor, Monday–Friday picker open
+    key("Escape")              # no value: no weekend picker either
+    key("Escape")              # nothing staged: leaves without asking
 
-# When the time is up: its two choices (on "Suspend the software"), and the
-# confirmation of the other one, cancelled.
-key("Down", 3)             # past Remove and Profiles…: When the time is up
-key("Return")
-shot("23_time_up_picker")
-key("Down")                # Warning only: a long confirmation, with the unlock
-key("Return")
-shot("23_time_up_confirm") # the text wraps inside the dialog (ui::dialog measures it)
-key("Escape")              # cancelled: nothing written
+    # When the time is up: its two choices (on "Suspend the software"), and the
+    # confirmation of the other one, cancelled.
+    key("Down", 3)             # past Remove and Profiles…: When the time is up
+    key("Return")
+    shot("23_time_up_picker")
+    key("Down")                # Warning only: a long confirmation, with the unlock
+    key("Return")
+    shot("23_time_up_confirm") # the text wraps inside the dialog (ui::dialog measures it)
+    key("Escape")              # cancelled: nothing written
 
-# Bedtime: the alarm picker (on 21:00), 21:30, confirmed with the unlock the
-# running timer needs; the tab must then show it.
-key("Down")                # Bedtime alarm
-key("Return")
-shot("23_bedtime_picker")
-key("Down", 2)             # 21:30
-key("Return")
-shot("23_bedtime_confirm")
-key("Right")               # Unlock and apply
-key("Return")
-shot("23_bedtime_done")
-if not any(m.startswith("Bedtime alarm changed.") for m in messages()):
-    fail("the bedtime alarm was not changed: " + repr(messages()[-3:]))
+    # Bedtime: the alarm picker (on 21:00), 21:30, confirmed with the unlock the
+    # running timer needs; the tab must then show it.
+    key("Down")                # Bedtime alarm
+    key("Return")
+    shot("23_bedtime_picker")
+    key("Down", 2)             # 21:30
+    key("Return")
+    shot("23_bedtime_confirm")
+    key("Right")               # Unlock and apply
+    key("Return")
+    shot("23_bedtime_done")
+    if not any(m.startswith("Bedtime alarm changed.") for m in messages()):
+        fail("the bedtime alarm was not changed: " + repr(messages()[-3:]))
 
-# Play timer › Advanced: its own screen, the switch next to the actions it
-# shows; turned on, then off again (backups restore the alarm only with it on).
-key("Down", 4)             # past Allowed again at, the extra-time amounts and switch: Advanced
-key("Return")
-shot("23_advanced")
-def advanced_saved(on):
-    # The config is written off the UI thread (ui::save_config).
-    for _ in range(25):
-        try:
-            if bool(json.load(open(config_file)).get("advanced")) == on:
-                return True
-        except (OSError, ValueError):
-            pass
-        time.sleep(0.2)
-    return False
-key("Return")              # Show advanced play-timer actions: on
-shot("23_advanced_on")     # the "Time's up" alarm, pause and resume below it
-if not advanced_saved(True):
-    fail("the advanced actions switch was not saved on")
-key("Return")              # and off again
-if not advanced_saved(False):
-    fail("the advanced actions switch was not saved off")
-key("Escape")              # back to the Play timer tab
+    # Play timer › Advanced: its own screen, the switch next to the actions it
+    # shows; turned on, then off again (backups restore the alarm only with it on).
+    key("Down", 4)             # past Allowed again at, the extra-time amounts and switch: Advanced
+    key("Return")
+    shot("23_advanced")
+    def advanced_saved(on):
+        # The config is written off the UI thread (ui::save_config).
+        for _ in range(25):
+            try:
+                if bool(json.load(open(config_file)).get("advanced")) == on:
+                    return True
+            except (OSError, ValueError):
+                pass
+            time.sleep(0.2)
+        return False
+    key("Return")              # Show advanced play-timer actions: on
+    shot("23_advanced_on")     # the "Time's up" alarm, pause and resume below it
+    if not advanced_saved(True):
+        fail("the advanced actions switch was not saved on")
+    key("Return")              # and off again
+    if not advanced_saved(False):
+        fail("the advanced actions switch was not saved off")
+    key("Escape")              # back to the Play timer tab
 
-# Settings backup: save one, open the list and the restore summary (cancelled).
-key("Left")                # back to the sidebar
-key("Down", steps("play_timer", "history"))
-key("Right")               # Changes made with PlayGuard
-key("Down")                # Back up the settings
-backups = os.path.join(nand_dir, "backups")
-before = len(os.listdir(backups)) if os.path.isdir(backups) else 0
-key("Return")              # Back up the settings
-shot("24_backup_saved")
-if (len(os.listdir(backups)) if os.path.isdir(backups) else 0) != before + 1:
-    fail("Return on 'Back up the settings' saved no backup (wrong cell focused?)")
-key("Down")                # Restore a backup…
-key("Return")
-shot("25_backup_list")
-key("Return")
-shot("26_backup_restore")
-key("Escape")
-shot("27_back")
+    # Settings backup: save one, open the list and the restore summary (cancelled).
+    key("Left")                # back to the sidebar
+    key("Down", steps("play_timer", "history"))
+    key("Right")               # Changes made with PlayGuard
+    key("Down")                # Back up the settings
+    backups = os.path.join(nand_dir, "backups")
+    before = len(os.listdir(backups)) if os.path.isdir(backups) else 0
+    key("Return")              # Back up the settings
+    shot("24_backup_saved")
+    if (len(os.listdir(backups)) if os.path.isdir(backups) else 0) != before + 1:
+        fail("Return on 'Back up the settings' saved no backup (wrong cell focused?)")
+    key("Down")                # Restore a backup…
+    key("Return")
+    shot("25_backup_list")
+    key("Return")
+    shot("26_backup_restore")
+    key("Escape")
+    shot("27_back")
+    finish()
 
+# The "games" scenario, from the sidebar on the Overview.
 # Send a report online: signing in to GitHub first, the confirmation, then the link and its QR codes.
 uploads = os.path.join(run_dir, "playguard_data", "logs", "uploads")
 def upload_count():
@@ -1303,10 +1338,9 @@ reports = os.path.join(run_dir, "playguard_data", "logs", "reports")
 def saved_reports():
     return [f for f in (os.listdir(reports) if os.path.isdir(reports) else []) if f.startswith("report_") and f.endswith(".txt")]
 saved = saved_reports()
-key("Left")                # back to the sidebar
-key("Down", steps("history", "about"))
+key("Down", steps("dashboard", "about"))
 key("Right")
-key("Down", 50, hold=0.15) # its last line: the funding QR codes
+key_to_end("Down", hold=0.15) # its last line: the funding QR codes
 key("Up", 2)               # past Source: Help & diagnostics
 key("Return")
 key("Down", 2)             # past First steps, Export: Send a report online

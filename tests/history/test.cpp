@@ -139,7 +139,21 @@ static void test_refused_and_version()
 
 static void test_trim_and_damage()
 {
-    for (int i = 0; i < 510; i++) CHECK(history::append(limits(i, i + 1)));
+    // A full history (as 500 appends would leave it, written at once: each
+    // append reads and writes the whole file, slow under the sanitizers),
+    // then 10 more changes, each dropping the oldest.
+    std::string full_text = "{\n \"schema\": 1,\n \"entries\": [";
+    for (int i = 0; i < 500; i++) {
+        const std::string from = std::to_string(i), to = std::to_string(i + 1);
+        std::string before = from, after = to;
+        for (int d = 1; d < 7; d++) before += "," + from, after += "," + to;
+        full_text += std::string(i ? ",\n  " : "\n  ") + "{\"after\":[" + after + "],\"before\":[" + before +
+                     "],\"detail\":\"\",\"kind\":\"limits\",\"source\":\"uniform\",\"when\":\"2026-10-08 18:30\"}";
+    }
+    full_text += "\n ]\n}\n";
+    CHECK(paths::atomic_write(paths::history_file(), full_text));
+    CHECK(history::load().size() == 500);
+    for (int i = 500; i < 510; i++) CHECK(history::append(limits(i, i + 1)));
     auto all = history::load();
     CHECK(all.size() == history::MAX_ENTRIES && history::MAX_ENTRIES == 500);
     CHECK(all.front().after[0] == 510);                // the newest kept
