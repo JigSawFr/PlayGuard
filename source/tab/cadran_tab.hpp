@@ -83,6 +83,13 @@ class CadranTab : public DashboardTab
     // Atmosphère's DNS sending Nintendo's servers elsewhere (nintendo_dns):
     // a pill of its own, after the serial number's, while it does.
     Pill dns_pill;
+    // Opened over a game (the Overview's paragraph, Ⓐ for it).
+    Pill counted_pill;
+    // What changed outside PlayGuard: a card of its own above the ring, its
+    // lines rebuilt when the Overview's text changes.
+    brls::Box*  outside_card  = nullptr;
+    brls::Box*  outside_lines = nullptr;
+    std::string outside_shown;
     // What stops play first today, under the time played (show_next).
     brls::Box*   next      = nullptr;
     CadranIcon*  next_icon = nullptr;
@@ -98,6 +105,8 @@ class CadranTab : public DashboardTab
     void show_ring(bool unlocked);
     void show_next(bool unlocked);
     void show_low(bool unlocked);
+    void build_outside_card(brls::Box* column, int at);
+    void show_outside_card();
     void show_cards(bool unlocked, bool has_pin);
     void show_pills();
 

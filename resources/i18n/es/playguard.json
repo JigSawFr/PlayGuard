@@ -1540,7 +1540,15 @@
             "dns_title": "Redirección DNS de Atmosphère",
             "dns_intro": "Su archivo hosts (atmosphere/hosts) desvía servidores de Nintendo.",
             "dns_sync_note": "La app para móvil no puede sincronizarse, así que no sobrescribe lo que se ajusta aquí.",
-            "dns_time_note": "El reloj de red no puede ajustarse solo: PlayGuard lo ajusta desde un servidor de hora ({})."
+            "dns_time_note": "El reloj de red no puede ajustarse solo: PlayGuard lo ajusta desde un servidor de hora ({}).",
+            "dns_open": "DNS · Nintendo no bloqueado",
+            "dns_intro_open": "Deja pasar los servidores de Nintendo que importan aquí.",
+            "dns_row_sync": "Servidor del control parental",
+            "dns_row_time": "Servidor de hora",
+            "dns_blocked": "Bloqueado",
+            "dns_reachable": "Accesible",
+            "counted_title": "El tiempo que pasas aquí cuenta",
+            "counted_pill": "Abierto sobre un juego · cuenta en el temporizador"
         },
         "pill": {
             "pc_on": "Control parental activo",
@@ -1572,7 +1580,8 @@
             "no_changes": "Sin cambios pendientes · + guarda",
             "discard": "Descartar",
             "remove": "Quitar el límite",
-            "save_title": "¿Guardar los límites de la semana?"
+            "save_title": "¿Guardar los límites de la semana?",
+            "played_key": "jugado, últimos 7 días"
         },
         "tabs": {
             "today": "Hoy"
@@ -1584,7 +1593,6 @@
             "per_day": "{} al día",
             "top": "el más jugado · {}",
             "card_today": "hoy",
-            "card_week": "hoy · {} en 7 días",
             "card_total": "hoy · {} en total",
             "empty_note": "Los juegos jugados en esta consola aparecen aquí, cuenta por cuenta.",
             "see_all": "Ver desde siempre"

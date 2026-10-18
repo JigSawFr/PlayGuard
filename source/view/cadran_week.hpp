@@ -26,6 +26,9 @@ class CadranWeekView : public brls::Box
     // `days`: the limits as they will be; `live`: as the console has them (a
     // day that differs is drawn as unsaved). 0 = Sunday, laid out Monday first.
     void show(const uint16_t days[7], const uint16_t live[7]);
+    // The time played on each weekday's last occurrence (today's included),
+    // in minutes, drawn inside its bar against its limit; `ok` false: none.
+    void show_played(const uint32_t minutes[7], bool ok);
     void set_on_change(std::function<void(int day, uint16_t minutes)> on_change);   // stick edits, Y
     void set_on_pick(std::function<void(int day)> on_pick);                         // X
     void set_on_copy(std::function<void(int day, bool weekend)> on_copy);           // L / R
@@ -47,12 +50,15 @@ class CadranWeekView : public brls::Box
         CadranIcon*   up    = nullptr;
         CadranDigits* value = nullptr;
         brls::Box*    bar   = nullptr;
+        brls::Box*    fill  = nullptr;   // the time played, from the bar's foot
         brls::Label*  day   = nullptr;
         CadranIcon*   down  = nullptr;
     };
     Col      cols[7];
     uint16_t days[7] = {};
     uint16_t live[7] = {};
+    uint32_t played[7] = {};
+    bool     played_ok = false;
     bool     valid = false;
     int      focused = -1;
     bool     edit = false;

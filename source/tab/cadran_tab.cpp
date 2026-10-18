@@ -22,6 +22,7 @@
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "view/cadran_icon.hpp"
+#include "view/made_in_france.hpp"
 #include "view/title_state.hpp"
 
 using namespace brls::literals;
@@ -468,6 +469,7 @@ CadranTab::CadranTab()
     }
     column->addView(hero, at);
     YGNodeStyleSetFlexWrap(pills->getYGNode(), YGWrapWrap);
+    this->build_outside_card(column, at);
 
     // The gauge's own words under the ring's title; the timer's warnings with them.
     auto* gauge_text = dynamic_cast<brls::Label*>(this->getView("dash_gauge_text"));
@@ -502,14 +504,17 @@ CadranTab::CadranTab()
     today_text->addView(this->next, 2);
     this->list.park({ "dash_gauge", "dash_extra", "dash_stop", "dash_remaining", "dash_bedtime", "dash_pc", "dash_pin",
                       "dash_level", "dash_clock", "dash_pairing", "dash_serial", "dash_patches", "dash_fw", "dash_compat",
-                      "dash_today_limit", "dash_unlocked_banner" });
+                      "dash_today_limit", "dash_unlocked_banner", "dash_outside_text", "dash_outside", "dash_updated",
+                      "dash_counted" });
+    // Its signature is About's (and the first steps'), not the parent's page.
+    for (brls::View* line : column->getChildren())
+        if (dynamic_cast<MadeInFrance*>(line)) line->setVisibility(brls::Visibility::GONE);
     if (gauge_box) gauge_box->setVisibility(brls::Visibility::GONE);   // emptied
     // The Overview's section titles: their lines are up there now.
     for (brls::View* line : column->getChildren())
         if (dynamic_cast<brls::Header*>(line)) line->setVisibility(brls::Visibility::GONE);
-    this->list.apply({ { "dash_first_steps", "sparkle" }, { "dash_outside", "alert" },
-                       { "dash_extra_pending", "refresh" }, { "dash_alarm", "bell" } });
-    this->list.banners({ "dash_first_steps", "dash_outside" });
+    this->list.apply({ { "dash_first_steps", "sparkle" }, { "dash_extra_pending", "refresh" }, { "dash_alarm", "bell" } });
+    this->list.banners({ "dash_first_steps" });
 
     // The buttons' icons, before their label.
     CadranIcon* plus = kit::icon("plus", 20, "cadran/navy");
@@ -683,6 +688,99 @@ void CadranTab::show_next(bool unlocked)
     ui::set_visible(this->next, !text.empty());
 }
 
+void CadranTab::build_outside_card(brls::Box* column, int at)
+{
+    namespace kit = cadran::kit;
+    brls::Theme theme = brls::Application::getTheme();
+    // What changed outside PlayGuard, as one card above the ring: its title,
+    // the changes one under the other, Ⓐ to dismiss it (the Overview's line).
+    auto* card = kit::card(true, false);
+    card->setAxis(brls::Axis::ROW);
+    card->setAlignItems(brls::AlignItems::FLEX_START);
+    card->setBackgroundColor(theme["cadran/amber_surf"]);
+    card->setBorderColor(theme["cadran/amber_line"]);
+    card->setPadding(18, 24, 18, 20);
+    card->setMarginBottom(16);
+    card->setVisibility(brls::Visibility::GONE);
+    CadranIcon* icon = kit::icon("alert", 22, "cadran/amber");
+    icon->setMarginTop(1);
+    icon->setMarginRight(14);
+    icon->setShrink(0);
+    card->addView(icon);
+    auto* text = new brls::Box(brls::Axis::COLUMN);
+    text->setGrow(1.0f);
+    text->setWidth(0);
+    text->addView(kit::label("playguard/notices/outside"_i18n, 18, "cadran/amber"));
+    this->outside_lines = new brls::Box(brls::Axis::COLUMN);
+    this->outside_lines->setMarginTop(6);
+    text->addView(this->outside_lines);
+    // Ⓐ and what it does, as on the network clock's card.
+    auto* hint = new brls::Box(brls::Axis::ROW);
+    hint->setAlignItems(brls::AlignItems::CENTER);
+    hint->setMarginTop(10);
+    auto* key = new brls::Box(brls::Axis::ROW);
+    key->setAlignItems(brls::AlignItems::CENTER);
+    key->setJustifyContent(brls::JustifyContent::CENTER);
+    key->setWidth(22);
+    key->setHeight(22);
+    key->setCornerRadius(11);
+    key->setBackgroundColor(theme["cadran/key_bg"]);
+    key->setMarginRight(8);
+    auto* letter = new CadranDigits();
+    letter->setFontSize(12);
+    letter->setTextColor(theme["cadran/key_fg"]);
+    letter->setText("A");
+    key->addView(letter);
+    hint->addView(key);
+    hint->addView(kit::label("playguard/dashboard/outside_dismiss"_i18n, 15, "cadran/text2"));
+    text->addView(hint);
+    card->addView(text);
+    card->registerClickAction([this](brls::View*) {
+        kit::press(this->getView("dash_outside"));
+        return true;
+    });
+    column->addView(card, at);
+    this->outside_card = card;
+}
+
+void CadranTab::show_outside_card()
+{
+    namespace kit = cadran::kit;
+    brls::View* line = this->getView("dash_outside");
+    auto* source = dynamic_cast<brls::Label*>(this->getView("dash_outside_text"));
+    const bool shown = line && source && line->getVisibility() == brls::Visibility::VISIBLE;
+    const std::string text = shown ? source->getFullText() : "";
+    if (text != this->outside_shown) {
+        this->outside_shown = text;
+        while (!this->outside_lines->getChildren().empty())
+            this->outside_lines->removeView(this->outside_lines->getChildren().back());
+        brls::Theme theme = brls::Application::getTheme();
+        size_t from = 0;
+        while (from < text.size()) {
+            size_t to = text.find('\n', from);
+            if (to == std::string::npos) to = text.size();
+            auto* row = new brls::Box(brls::Axis::ROW);
+            row->setAlignItems(brls::AlignItems::FLEX_START);
+            row->setMarginTop(4);
+            auto* dot = new brls::Rectangle(theme["cadran/amber_fill"]);
+            dot->setWidth(6);
+            dot->setHeight(6);
+            dot->setCornerRadius(3);
+            dot->setMarginTop(7);
+            dot->setMarginRight(10);
+            dot->setShrink(0);
+            row->addView(dot);
+            brls::Label* label = kit::label(text.substr(from, to - from), 16, "cadran/text2");
+            label->setGrow(1.0f);
+            label->setWidth(0);
+            row->addView(label);
+            this->outside_lines->addView(row);
+            from = to + 1;
+        }
+    }
+    ui::set_visible(this->outside_card, shown);
+}
+
 void CadranTab::show_low(bool unlocked)
 {
     // Little or no time left today: the first amount stands out, the one
@@ -797,10 +895,20 @@ void CadranTab::show_pills()
                 d.box->setFocusable(true);
                 d.box->setHideHighlightBackground(true);
                 d.text = dynamic_cast<brls::Label*>(d.box->getChildren()[1]);
+                d.dot = dynamic_cast<brls::Rectangle*>(d.box->getChildren()[0]);
                 d.box->registerClickAction([](brls::View*) {
-                    std::string body = "playguard/cadran/today/dns_title"_i18n + "\n\n" + "playguard/cadran/today/dns_intro"_i18n;
-                    if (nintendo_dns::pctl_blocked()) body += "\n\n" + "playguard/cadran/today/dns_sync_note"_i18n;
-                    if (nintendo_dns::time_blocked())
+                    // The dialogs' layout (cadran::dialog_body): a title, the
+                    // two servers as a table, what that changes as notes.
+                    const bool sync = nintendo_dns::pctl_blocked(), time = nintendo_dns::time_blocked();
+                    const auto state = [](bool blocked) {
+                        return blocked ? "playguard/cadran/today/dns_blocked"_i18n : "playguard/cadran/today/dns_reachable"_i18n;
+                    };
+                    std::string body = "playguard/cadran/today/dns_title"_i18n + "\n\n" +
+                                       (sync || time ? "playguard/cadran/today/dns_intro"_i18n : "playguard/cadran/today/dns_intro_open"_i18n) +
+                                       "\n\n" + brls::getStr("playguard/common/line", "playguard/cadran/today/dns_row_sync"_i18n, state(sync)) +
+                                       "\n" + brls::getStr("playguard/common/line", "playguard/cadran/today/dns_row_time"_i18n, state(time));
+                    if (sync) body += "\n\n" + "playguard/cadran/today/dns_sync_note"_i18n;
+                    if (time)
                         body += "\n\n" + brls::getStr("playguard/cadran/today/dns_time_note",
                                                      "playguard/tabs/console"_i18n + " › " + "playguard/tabs/clock"_i18n);
                     ui::info(body);
@@ -809,6 +917,17 @@ void CadranTab::show_pills()
                 pills->addView(d.box);
             }
         }
+        // Opened over a game, PlayGuard's own time counts: the Overview's
+        // paragraph at length on Ⓐ.
+        Pill& g = this->counted_pill;
+        g.box = kit::pill("playguard/cadran/today/counted_pill"_i18n, "cadran/amber_fill");
+        g.box->setFocusable(true);
+        g.box->setHideHighlightBackground(true);
+        g.box->registerClickAction([](brls::View*) {
+            ui::info("playguard/cadran/today/counted_title"_i18n + "\n\n" + "playguard/dashboard/counted"_i18n);
+            return true;
+        });
+        pills->addView(g.box);
     }
     const SysInfo& si = this->sys;
     NVGcolor c = ui::color_neutral();
@@ -830,12 +949,16 @@ void CadranTab::show_pills()
     }
     const bool sync = nintendo_dns::pctl_blocked(), time = nintendo_dns::time_blocked();
     if (this->dns_pill.text) {
+        // Blocking nothing, said too: the parent who set up the redirection
+        // sees whether it holds.
         ui::set_text(this->dns_pill.text, sync && time ? "playguard/cadran/today/dns_nintendo"_i18n
                                           : sync       ? "playguard/cadran/today/dns_sync"_i18n
                                           : time       ? "playguard/cadran/today/dns_time"_i18n
-                                                       : "");
-        ui::set_visible(this->dns_pill.box, sync || time);
+                                                       : "playguard/cadran/today/dns_open"_i18n);
+        if (this->dns_pill.dot) this->dns_pill.dot->setColor(theme[sync || time ? "cadran/teal_fill" : "cadran/text3"]);
     }
+    brls::View* counted = this->getView("dash_counted");
+    ui::set_visible(this->counted_pill.box, counted && counted->getVisibility() == brls::Visibility::VISIBLE);
 }
 
 void CadranTab::refresh()
@@ -868,6 +991,7 @@ void CadranTab::refresh()
     cadran::kit::follow(limit.getView(), this->getView("dash_today_limit"));
     ui::set_visible(relock.getView(), unlocked && !app::read_only());
     this->show_low(unlocked);
+    this->show_outside_card();
 }
 
 brls::View* CadranTab::create() { return new CadranTab(); }

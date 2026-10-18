@@ -1540,7 +1540,15 @@
             "dns_title": "AtmosphèreのDNSリダイレクト",
             "dns_intro": "hostsファイル（atmosphere/hosts）がNintendoのサーバーへの接続を別の宛先に向けています。",
             "dns_sync_note": "スマホアプリは同期できないため、ここでの設定を上書きしません。",
-            "dns_time_note": "ネットワーク時計は自動で合わせられません。PlayGuardが時刻サーバーから合わせます（{}）。"
+            "dns_time_note": "ネットワーク時計は自動で合わせられません。PlayGuardが時刻サーバーから合わせます（{}）。",
+            "dns_open": "DNS · Nintendoはブロックしていません",
+            "dns_intro_open": "ここで関係するNintendoのサーバーへの接続はそのまま通します。",
+            "dns_row_sync": "みまもり設定のサーバー",
+            "dns_row_time": "時刻サーバー",
+            "dns_blocked": "ブロック中",
+            "dns_reachable": "接続可能",
+            "counted_title": "ここでの時間も加算されます",
+            "counted_pill": "ゲームの上で開いています · タイマーに加算"
         },
         "pill": {
             "pc_on": "みまもり設定 有効",
@@ -1572,7 +1580,8 @@
             "no_changes": "未保存の変更なし・＋で保存",
             "discard": "破棄",
             "remove": "制限を削除",
-            "save_title": "今週の上限を保存しますか？"
+            "save_title": "今週の上限を保存しますか？",
+            "played_key": "直近7日間のプレイ"
         },
         "tabs": {
             "today": "今日"
@@ -1584,7 +1593,6 @@
             "per_day": "1日{}",
             "top": "最多プレイ・{}",
             "card_today": "今日",
-            "card_week": "今日・7日間で{}",
             "card_total": "今日・合計{}",
             "empty_note": "この本体で遊んだソフトが、ユーザーごとにここに表示されます。",
             "see_all": "これまでの合計を見る"

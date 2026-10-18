@@ -1540,7 +1540,15 @@
             "dns_title": "DNS-Umleitung von Atmosphère",
             "dns_intro": "Seine Hosts-Datei (atmosphere/hosts) leitet Server von Nintendo um.",
             "dns_sync_note": "Die Smart-Geräte-App kann sich nicht synchronisieren und überschreibt daher nicht, was hier eingestellt ist.",
-            "dns_time_note": "Die Netzwerkuhr kann sich nicht selbst einstellen: PlayGuard stellt sie über einen Zeitserver ein ({})."
+            "dns_time_note": "Die Netzwerkuhr kann sich nicht selbst einstellen: PlayGuard stellt sie über einen Zeitserver ein ({}).",
+            "dns_open": "DNS · Nintendo nicht blockiert",
+            "dns_intro_open": "Sie lässt die hier wichtigen Server von Nintendo durch.",
+            "dns_row_sync": "Jugendschutz-Server",
+            "dns_row_time": "Zeitserver",
+            "dns_blocked": "Blockiert",
+            "dns_reachable": "Erreichbar",
+            "counted_title": "Die Zeit hier wird mitgezählt",
+            "counted_pill": "Über einem Spiel geöffnet · zählt zum Timer"
         },
         "pill": {
             "pc_on": "Jugendschutz aktiv",
@@ -1572,7 +1580,8 @@
             "no_changes": "Keine offenen Änderungen · + speichert",
             "discard": "Verwerfen",
             "remove": "Limit entfernen",
-            "save_title": "Die Limits der Woche speichern?"
+            "save_title": "Die Limits der Woche speichern?",
+            "played_key": "gespielt, letzte 7 Tage"
         },
         "tabs": {
             "today": "Heute"
@@ -1584,7 +1593,6 @@
             "per_day": "{} pro Tag",
             "top": "am meisten gespielt · {}",
             "card_today": "heute",
-            "card_week": "heute · {} in 7 Tagen",
             "card_total": "heute · {} insgesamt",
             "empty_note": "Auf dieser Konsole gespielte Spiele erscheinen hier, Konto für Konto.",
             "see_all": "Gesamt ansehen"

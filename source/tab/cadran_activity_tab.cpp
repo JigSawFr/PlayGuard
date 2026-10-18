@@ -333,9 +333,9 @@ void CadranActivityTab::show_hero()
         c.name->setText(game_name(g));
         c.today->setText(s.windows_ok && g.today_s ? ui::fmt_play_time(g.today_s) : "—");
         c.today->setTextColor(g.today_s ? theme["cadran/text"] : theme["cadran/text3"]);
+        // The period is the section's title: "in all" over it.
         c.rest->setText(p == Today ? "playguard/cadran/activity/card_today"_i18n
-                        : p == Week ? brls::getStr("playguard/cadran/activity/card_week", ui::fmt_play_time(g.week_s))
-                                    : brls::getStr("playguard/cadran/activity/card_total", ui::fmt_play_time(g.total_s)));
+                                   : brls::getStr("playguard/cadran/activity/card_total", ui::fmt_play_time(p == Week ? g.week_s : g.total_s)));
         std::vector<brls::View*> bars(std::begin(c.bars), std::end(c.bars));
         show_bars(bars, g.day_s, SPARK_MAX);
     }

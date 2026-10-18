@@ -1540,7 +1540,15 @@
             "dns_title": "Atmosphère's DNS redirection",
             "dns_intro": "Its hosts file (atmosphere/hosts) sends Nintendo's servers elsewhere.",
             "dns_sync_note": "The companion app cannot synchronize, so it does not overwrite what is set here.",
-            "dns_time_note": "The network clock cannot set itself: PlayGuard sets it from a time server ({})."
+            "dns_time_note": "The network clock cannot set itself: PlayGuard sets it from a time server ({}).",
+            "dns_open": "DNS · Nintendo not blocked",
+            "dns_intro_open": "It leaves the Nintendo servers that matter here alone.",
+            "dns_row_sync": "Parental controls server",
+            "dns_row_time": "Time server",
+            "dns_blocked": "Blocked",
+            "dns_reachable": "Reachable",
+            "counted_title": "Time spent here counts",
+            "counted_pill": "Opened over a game · counts on the timer"
         },
         "pill": {
             "pc_on": "Parental controls on",
@@ -1572,7 +1580,8 @@
             "no_changes": "No changes waiting · + saves",
             "discard": "Discard",
             "remove": "Remove the limit",
-            "save_title": "Save the week's limits?"
+            "save_title": "Save the week's limits?",
+            "played_key": "played, last 7 days"
         },
         "tabs": {
             "today": "Today"
@@ -1584,7 +1593,6 @@
             "per_day": "{} a day",
             "top": "most played · {}",
             "card_today": "today",
-            "card_week": "today · {} over 7 days",
             "card_total": "today · {} in all",
             "empty_note": "Games played on this console show up here, account by account.",
             "see_all": "See all time"

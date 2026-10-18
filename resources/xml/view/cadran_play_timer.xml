@@ -2,8 +2,9 @@
 
 <!-- The top of the Cadran Play timer (tab/cadran_play_timer_tab.cpp, over
      the tab's own lines): the week's summary with the profile and "same limit
-     every day" chips, the week as the editor with its keys, the changes not
-     saved yet, then bedtime, time's up and removal as chips. -->
+     every day" chips, the week as the editor (the time played in its bars)
+     with its keys, the changes not saved yet, then bedtime, time's up and
+     removal as chips. -->
 
 <brls:Box
     width="auto"
@@ -36,6 +37,11 @@
                 <CadranDigits text="X" fontSize="13" textColor="@theme/cadran/key_fg"/>
             </brls:Box>
             <brls:Label text="@i18n/playguard/cadran/week/pick_day" fontSize="15" textColor="@theme/cadran/text2"/>
+            <brls:Box grow="1.0"/>
+            <brls:Box id="cpt_played_key" axis="row" alignItems="center" visibility="gone">
+                <brls:Rectangle width="12" height="12" cornerRadius="3" color="@theme/cadran/teal_fill" marginRight="8"/>
+                <brls:Label text="@i18n/playguard/cadran/week/played_key" fontSize="15" textColor="@theme/cadran/text2" singleLine="true"/>
+            </brls:Box>
         </brls:Box>
         <brls:Box id="cpt_keys_edit" axis="row" alignItems="center" paddingTop="8" lineColor="@theme/cadran/line" lineTop="1px" visibility="gone">
             <brls:Box axis="row" alignItems="center" justifyContent="center" width="36" height="26" cornerRadius="13" backgroundColor="@theme/cadran/key_bg" marginRight="8">

@@ -90,6 +90,14 @@ CadranWeekView::CadranWeekView()
         c.bar->setHeight(BAR_MIN);
         c.bar->setCornerRadius(12);
         c.bar->setMarginBottom(8);
+        c.bar->setAxis(brls::Axis::COLUMN);
+        c.bar->setJustifyContent(brls::JustifyContent::FLEX_END);
+        c.bar->setAlignItems(brls::AlignItems::STRETCH);
+        c.fill = new brls::Box();
+        c.fill->setCornerRadius(12);
+        c.fill->setHeight(0);
+        c.fill->setVisibility(brls::Visibility::GONE);
+        c.bar->addView(c.fill);
         c.box->addView(c.bar);
         c.day = new brls::Label();
         c.day->setFontSize(16);
@@ -223,6 +231,13 @@ void CadranWeekView::show(const uint16_t days[7], const uint16_t live[7])
     this->render();
 }
 
+void CadranWeekView::show_played(const uint32_t minutes[7], bool ok)
+{
+    for (int d = 0; d < 7; d++) this->played[d] = ok ? minutes[d] : 0;
+    this->played_ok = ok;
+    this->render();
+}
+
 void CadranWeekView::set_on_change(std::function<void(int, uint16_t)> f) { this->on_change = std::move(f); }
 void CadranWeekView::set_on_pick(std::function<void(int)> f) { this->on_pick = std::move(f); }
 void CadranWeekView::set_on_copy(std::function<void(int, bool)> f) { this->on_copy = std::move(f); }
@@ -243,8 +258,21 @@ void CadranWeekView::render()
         const bool changed = this->valid && m != this->live[d];
         c.value->setText(!this->valid ? "—" : m == PT_DAY_NOLIMIT ? "—" : ui::fmt_played(m));
         c.value->setTextColor(focused ? theme["cadran/teal"] : changed ? theme["cadran/amber"] : theme["cadran/text"]);
-        c.bar->setHeight(!this->valid || m == PT_DAY_NOLIMIT ? BAR_MIN : std::max(BAR_MIN, BAR_MAX * (float)m / (float)top));
+        const float bar = !this->valid || m == PT_DAY_NOLIMIT ? BAR_MIN : std::max(BAR_MIN, BAR_MAX * (float)m / (float)top);
+        c.bar->setHeight(bar);
         c.bar->setBackgroundColor(focused ? theme["cadran/teal_fill"] : d == today ? theme["cadran/bar_today"] : theme["cadran/bar"]);
+        // What was played that day, against its limit: up to the top, coral
+        // once the limit is reached. Nothing on a day without one.
+        const bool fills = this->valid && this->played_ok && m != PT_DAY_NOLIMIT && m > 0 && this->played[d] > 0;
+        if (fills) {
+            const bool over = this->played[d] >= m;
+            c.fill->setHeight(std::max(6.0f, bar * std::min(1.0f, (float)this->played[d] / (float)m)));
+            // On the focused bar (teal itself), the teal darkened.
+            NVGcolor shade = theme["cadran/navy"];
+            shade.a = 0.35f;
+            c.fill->setBackgroundColor(over ? theme["cadran/coral_fill"] : focused ? shade : theme["cadran/teal_fill"]);
+        }
+        c.fill->setVisibility(fills ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
         c.day->setTextColor(d == today ? theme["cadran/teal"] : theme["cadran/text3"]);
         // The day being edited on the soft teal, its arrows shown.
         const bool editing = focused && this->edit;

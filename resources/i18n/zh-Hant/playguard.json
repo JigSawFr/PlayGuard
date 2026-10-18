@@ -1540,7 +1540,15 @@
             "dns_title": "Atmosphère 的 DNS 重新導向",
             "dns_intro": "其 hosts 檔案（atmosphere/hosts）將 Nintendo 的伺服器重新導向到別處。",
             "dns_sync_note": "手機應用程式無法同步，因此不會覆寫在此處所做的設定。",
-            "dns_time_note": "網路時鐘無法自行校準：PlayGuard 透過時間伺服器校準（{}）。"
+            "dns_time_note": "網路時鐘無法自行校準：PlayGuard 透過時間伺服器校準（{}）。",
+            "dns_open": "DNS · 未封鎖Nintendo",
+            "dns_intro_open": "它不會封鎖此處相關的 Nintendo 伺服器。",
+            "dns_row_sync": "家長監護伺服器",
+            "dns_row_time": "時間伺服器",
+            "dns_blocked": "已封鎖",
+            "dns_reachable": "可連線",
+            "counted_title": "在此處的時間也會計入",
+            "counted_pill": "在遊戲上開啟 · 計入計時器"
         },
         "pill": {
             "pc_on": "家長監護已開啟",
@@ -1572,7 +1580,8 @@
             "no_changes": "無待儲存的變更 · + 儲存",
             "discard": "放棄",
             "remove": "刪除限制",
-            "save_title": "儲存本週的限制？"
+            "save_title": "儲存本週的限制？",
+            "played_key": "最近7天的遊玩"
         },
         "tabs": {
             "today": "今天"
@@ -1584,7 +1593,6 @@
             "per_day": "每天 {}",
             "top": "玩得最多 · {}",
             "card_today": "今天",
-            "card_week": "今天 · 7天共 {}",
             "card_total": "今天 · 共 {}",
             "empty_note": "在這台主機上玩過的遊戲會依帳號顯示在此處。",
             "see_all": "查看全部期間"

@@ -1540,7 +1540,15 @@
             "dns_title": "DNS-omleiding van Atmosphère",
             "dns_intro": "Het hosts-bestand (atmosphere/hosts) leidt servers van Nintendo om.",
             "dns_sync_note": "De smartphone-app kan niet synchroniseren en overschrijft dus niet wat hier is ingesteld.",
-            "dns_time_note": "De netwerkklok kan zichzelf niet instellen: PlayGuard stelt hem in via een tijdserver ({})."
+            "dns_time_note": "De netwerkklok kan zichzelf niet instellen: PlayGuard stelt hem in via een tijdserver ({}).",
+            "dns_open": "DNS · Nintendo niet geblokkeerd",
+            "dns_intro_open": "Ze laat de servers van Nintendo die hier tellen door.",
+            "dns_row_sync": "Server voor ouderlijk toezicht",
+            "dns_row_time": "Tijdserver",
+            "dns_blocked": "Geblokkeerd",
+            "dns_reachable": "Bereikbaar",
+            "counted_title": "De tijd hier telt mee",
+            "counted_pill": "Over een spel geopend · telt mee voor de timer"
         },
         "pill": {
             "pc_on": "Ouderlijk toezicht actief",
@@ -1572,7 +1580,8 @@
             "no_changes": "Geen wijzigingen in behandeling · + slaat op",
             "discard": "Verwerpen",
             "remove": "Limiet verwijderen",
-            "save_title": "De limieten van de week opslaan?"
+            "save_title": "De limieten van de week opslaan?",
+            "played_key": "gespeeld, laatste 7 dagen"
         },
         "tabs": {
             "today": "Vandaag"
@@ -1584,7 +1593,6 @@
             "per_day": "{} per dag",
             "top": "meest gespeeld · {}",
             "card_today": "vandaag",
-            "card_week": "vandaag · {} in 7 dagen",
             "card_total": "vandaag · {} in totaal",
             "empty_note": "Games die op deze console gespeeld worden, verschijnen hier, per account.",
             "see_all": "Totaal bekijken"

@@ -4,6 +4,7 @@
 #include <array>
 #include <fmt/format.h>
 
+#include "action/play_data.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_logic.hpp"
 #include "tab/cadran_tab.hpp"
@@ -175,6 +176,29 @@ void CadranPlayTimerTab::discard()
     });
 }
 
+CadranPlayTimerTab::~CadranPlayTimerTab()
+{
+    play_data::unlisten(this->play_listener);
+}
+
+void CadranPlayTimerTab::show_played()
+{
+    // Every account's play, the last seven days (today's included), on their
+    // weekdays: what the week's limits held, as Activity counts it.
+    const auto stats = play_data::latest("");
+    uint32_t minutes[7] = {};
+    const bool ok = stats && stats->windows_ok;
+    if (ok)
+        for (int k = 0; k < 7; k++) {
+            uint64_t s = 0;
+            for (uint32_t g = 0; g < stats->count; g++) s += stats->games[g].day_s[k];
+            if (stats->day_wday[k] < 7) minutes[stats->day_wday[k]] = (uint32_t)(s / 60);
+        }
+    this->week_editor->show_played(minutes, ok);
+    ui::set_visible(played_key.getView(), ok);
+    if (!play_data::fresh("", std::chrono::minutes(5)) && !play_data::busy("")) play_data::fetch(nullptr);
+}
+
 void CadranPlayTimerTab::refresh()
 {
     // The changes not saved yet stay over a new read, as in the per-day editor.
@@ -193,6 +217,8 @@ void CadranPlayTimerTab::refresh()
                                       { time_up_chip, "pt_time_up" }, { remove_chip, "pt_remove" } })
         cadran::kit::follow(chip, this->getView(line));
     this->rerender();
+    if (this->play_listener < 0) this->play_listener = play_data::listen([this]() { this->show_played(); });
+    this->show_played();
 }
 
 void CadranPlayTimerTab::rerender()

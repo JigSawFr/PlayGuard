@@ -1540,7 +1540,15 @@
             "dns_title": "Atmosphère의 DNS 리디렉션",
             "dns_intro": "hosts 파일(atmosphere/hosts)이 Nintendo 서버로의 연결을 다른 곳으로 돌립니다.",
             "dns_sync_note": "스마트폰 앱이 동기화할 수 없으므로 여기서 설정한 내용을 덮어쓰지 않습니다.",
-            "dns_time_note": "네트워크 시계가 스스로 맞춰지지 않습니다. PlayGuard가 시간 서버에서 맞춥니다({})."
+            "dns_time_note": "네트워크 시계가 스스로 맞춰지지 않습니다. PlayGuard가 시간 서버에서 맞춥니다({}).",
+            "dns_open": "DNS · Nintendo 차단 안 됨",
+            "dns_intro_open": "여기서 중요한 Nintendo 서버로의 연결은 그대로 통과시킵니다.",
+            "dns_row_sync": "자녀 보호 서버",
+            "dns_row_time": "시간 서버",
+            "dns_blocked": "차단됨",
+            "dns_reachable": "접속 가능",
+            "counted_title": "여기서 보낸 시간도 집계됩니다",
+            "counted_pill": "게임 위에서 열림 · 타이머에 포함"
         },
         "pill": {
             "pc_on": "자녀 보호 켜짐",
@@ -1572,7 +1580,8 @@
             "no_changes": "대기 중인 변경 없음 · +로 저장",
             "discard": "취소",
             "remove": "제한 삭제",
-            "save_title": "이번 주 제한을 저장할까요?"
+            "save_title": "이번 주 제한을 저장할까요?",
+            "played_key": "최근 7일 플레이"
         },
         "tabs": {
             "today": "오늘"
@@ -1584,7 +1593,6 @@
             "per_day": "하루 {}",
             "top": "가장 많이 플레이 · {}",
             "card_today": "오늘",
-            "card_week": "오늘 · 7일간 {}",
             "card_total": "오늘 · 총 {}",
             "empty_note": "이 본체에서 플레이한 게임이 계정별로 여기에 표시됩니다.",
             "see_all": "전체 기간 보기"

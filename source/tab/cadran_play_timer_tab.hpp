@@ -18,6 +18,7 @@ class CadranPlayTimerTab : public PlayTimerTab
 {
   public:
     CadranPlayTimerTab();
+    ~CadranPlayTimerTab() override;
     static brls::View* create();
 
   protected:
@@ -28,8 +29,10 @@ class CadranPlayTimerTab : public PlayTimerTab
     brls::View*  hero = nullptr;
     uint16_t     pending[7] = {};
     brls::ActionIdentifier save_action = 0;   // + while there is something to save
+    int          play_listener = -1;            // play_data: the week's time played
 
     bool changes() const;
+    void show_played();
     void rerender();
     void save();
     void discard();
@@ -41,6 +44,7 @@ class CadranPlayTimerTab : public PlayTimerTab
     BRLS_BIND(brls::Box,       uniform_chip,  "cpt_uniform");
     BRLS_BIND(CadranWeekView,  week_editor,   "cpt_week");
     BRLS_BIND(brls::Box,       keys_idle,     "cpt_keys_idle");
+    BRLS_BIND(brls::Box,       played_key,    "cpt_played_key");
     BRLS_BIND(brls::Box,       keys_edit,     "cpt_keys_edit");
     BRLS_BIND(brls::Rectangle, pending_dot,   "cpt_pending_dot");
     BRLS_BIND(brls::Label,     pending_text,  "cpt_pending");
