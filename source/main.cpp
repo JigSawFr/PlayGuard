@@ -384,7 +384,9 @@ int main(int argc, char* argv[])
     app::set_self_path(argc > 0 ? argv[0] : nullptr);
 
     start_up_migrations();
+    startup_mark(StartupStep_Migrations);
     start_session();
+    startup_mark(StartupStep_Session);
     // A way out of main() that skips the end of this function.
     std::atexit([]() { session_log::end("exit"); });
     // Before anything that could crash: the last start of a build just
@@ -394,7 +396,9 @@ int main(int argc, char* argv[])
         session_log::end("exit at start-up (the start-up screen of the previous build)");
         return EXIT_SUCCESS;
     }
+    startup_mark(StartupStep_Rollback);
     select_nand_and_log_system();
+    startup_mark(StartupStep_System);
 
     // Preferences first: the locale must be chosen before borealis loads i18n.
     config::load();
