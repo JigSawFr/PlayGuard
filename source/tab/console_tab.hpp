@@ -22,6 +22,7 @@ class ConsoleTab : public TabBase
     bool        serial_revealed = false;   // until the tab is left (tabs are rebuilt when reopened)
     std::string storage_note;              // the other system's, shown by A on the storage row
     InfoIcon*   storage_info = nullptr;
+    InfoIcon*   blank_info   = nullptr;   // the serial number not blanked on emuMMC, by A
 
     BRLS_BIND(brls::DetailCell,  clock,        "cn_clock");
     BRLS_BIND(brls::DetailCell,  games,        "cn_games");
@@ -33,7 +34,6 @@ class ConsoleTab : public TabBase
     BRLS_BIND(brls::DetailCell,  storage,      "cn_storage");
     BRLS_BIND(brls::DetailCell,  blank,        "cn_blank");
     BRLS_BIND(brls::DetailCell,  serial,       "cn_serial");
-    BRLS_BIND(brls::Label,       serial_note,  "cn_serial_note");
     BRLS_BIND(brls::DetailCell,  game_patches, "cn_patches");
     BRLS_BIND(brls::Label,       patches_note, "cn_patches_note");
 };

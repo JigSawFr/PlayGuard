@@ -16,7 +16,6 @@ using namespace brls::literals;
 ConsoleTab::ConsoleTab()
     : TabBase("xml/tab/console.xml")
 {
-    serial_note->setSingleLine(false);
     patches_note->setSingleLine(false);
 
     clock->setDetailText(ui::opens());
@@ -65,6 +64,13 @@ ConsoleTab::ConsoleTab()
         if (!this->storage_note.empty()) ui::info(this->storage_note);
         return true;
     });
+    // The same for the serial number not blanked on emuMMC, on the row that
+    // says so (A on the serial number's row shows / hides its digits).
+    blank_info = InfoIcon::on_row(blank.getView());
+    blank->registerClickAction([](brls::View*) {
+        ui::info("playguard/tools/serial_note_emummc"_i18n);
+        return true;
+    });
 
     // On a firmware newer than the checked one, the firmware screen again.
     compat->registerClickAction([](brls::View*) {
@@ -109,6 +115,8 @@ void ConsoleTab::refresh()
     c = ui::color_neutral();
     blank->setDetailText(ui::blank_text(si, &c));
     blank->setDetailTextColor(c);
+    blank->setFocusable(ui::serial_warning(si));
+    blank_info->set_shown(ui::serial_warning(si));
     const bool maskable = si.serial_valid && si.serial[0] && !(si.blank_valid && si.blank);
     serial->setDetailText(ui::serial_text(si, this->serial_revealed));
     serial->setDetailTextColor(ui::serial_warning(si) ? ui::color_warn() : ui::color_neutral());
@@ -126,7 +134,6 @@ void ConsoleTab::refresh()
     patches_note->setText(note);
     patches_note->setTextColor(warn ? ui::color_warn() : ui::color_note());
     ui::set_visible_all({ { sys_advice.getView(), !advice.empty() },
-                          { serial_note.getView(), ui::serial_warning(si) },
                           { patches_note.getView(), !note.empty() } });
 }
 
