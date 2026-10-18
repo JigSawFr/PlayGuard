@@ -16,8 +16,13 @@ class RestrictionsTab : public TabBase
   protected:
     void refresh() override;
 
+    PctlStatus st = {};   // what the last refresh read
+
+    // Asks to set this restriction level (0 none … 4 custom), saying what a
+    // preset restricts, then sets it.
+    void choose_level(int level);
+
   private:
-    PctlStatus st = {};
 
     // `loosens`: what the change allows; asked first when not empty (B or
     // Cancel puts the switch back). Tightening applies at once.

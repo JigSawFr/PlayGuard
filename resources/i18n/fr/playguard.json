@@ -1508,7 +1508,8 @@
             "unlocked": "Déverrouillé temporairement",
             "timer_on": "Minuteur actif",
             "timer_off": "Décompte en pause",
-            "timer_none": "Pas de limite de temps de jeu"
+            "timer_none": "Pas de limite de temps de jeu",
+            "level": "Niveau · {}"
         },
         "week": {
             "no_limit": "pas de limite",
@@ -1542,6 +1543,19 @@
             "card_today": "aujourd'hui",
             "card_week": "aujourd'hui · {} sur 7 jours",
             "card_total": "aujourd'hui · {} en tout"
+        },
+        "restrictions": {
+            "choose": "Choisir ce niveau",
+            "custom": "chaque réglage se choisit ci-dessous",
+            "up_to": "logiciels jusqu'à {} {}",
+            "any_age": "logiciels de tout âge",
+            "sns_blocked": "Réseaux sociaux · bloqués",
+            "sns_allowed": "Réseaux sociaux · autorisés",
+            "sns_unknown": "Réseaux sociaux · —",
+            "comm_blocked": "Communication · bloquée",
+            "comm_allowed": "Communication · autorisée",
+            "comm_unknown": "Communication · —",
+            "none": "logiciels de tout âge, réseaux sociaux et communication permis"
         }
     }
 }

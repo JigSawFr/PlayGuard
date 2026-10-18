@@ -25,28 +25,7 @@ RestrictionsTab::RestrictionsTab()
         std::vector<std::string> names;
         for (uint32_t i = 0; i <= 4; i++) names.push_back(ui::level_name(i));
         ui::pick("playguard/restrictions/level"_i18n, names, this->st.safety_level_ok ? (int)this->st.safety_level : 0,
-                 [this](int index) {
-                     // A preset: say what it restricts (1034) before choosing it.
-                     std::string body = brls::getStr("playguard/restrictions/confirm_level", ui::level_name((uint32_t)index));
-                     PctlCustomSettings preset;
-                     if (index >= PctlSafetyLevel_YoungChild && R_SUCCEEDED(pctl_get_level_settings((uint32_t)index, &preset)))
-                         body += "\n\n" + this->settings_text(preset);
-                     else if (index == PctlSafetyLevel_Custom)
-                         body += "\n\n" + "playguard/restrictions/custom_hint"_i18n;
-                     else if (index == PctlSafetyLevel_None)   // say what goes
-                         body += "\n\n" + "playguard/restrictions/none_body"_i18n;
-                     body = pt_flow::with_link_note(body, &this->st);
-                     const int before = this->st.safety_level_ok ? (int)this->st.safety_level : -1;
-                     ui::confirm(body, "playguard/play_timer/confirm_set"_i18n, [this, index, before]() {
-                                     Result rc = pctl_set_safety_level((uint32_t)index);
-                                     if (R_SUCCEEDED(rc) && before >= 0) history_flow::record_values("level", { before }, { index });
-                                     if (R_FAILED(rc))
-                                         history_flow::record_failure("level", rc, before >= 0 ? std::vector<int>{ before } : std::vector<int>{},
-                                                                      { index });
-                                     ui::notify_result(rc, "playguard/restrictions/saved"_i18n, "playguard/restrictions/save_err"_i18n);
-                                     this->refresh();
-                                 });
-                 });
+                 [this](int index) { this->choose_level(index); });
         return true;
     });
 
@@ -114,6 +93,30 @@ RestrictionsTab::RestrictionsTab()
     ui::guard_switch(sns);
     ui::guard_switch(comm);
     ui::guard_switch(vr);
+}
+
+void RestrictionsTab::choose_level(int index)
+{
+    // A preset: say what it restricts (1034) before choosing it.
+    std::string body = brls::getStr("playguard/restrictions/confirm_level", ui::level_name((uint32_t)index));
+    PctlCustomSettings preset;
+    if (index >= PctlSafetyLevel_YoungChild && R_SUCCEEDED(pctl_get_level_settings((uint32_t)index, &preset)))
+        body += "\n\n" + this->settings_text(preset);
+    else if (index == PctlSafetyLevel_Custom)
+        body += "\n\n" + "playguard/restrictions/custom_hint"_i18n;
+    else if (index == PctlSafetyLevel_None)   // say what goes
+        body += "\n\n" + "playguard/restrictions/none_body"_i18n;
+    body = pt_flow::with_link_note(body, &this->st);
+    const int before = this->st.safety_level_ok ? (int)this->st.safety_level : -1;
+    ui::confirm(body, "playguard/play_timer/confirm_set"_i18n, [this, index, before]() {
+                    Result rc = pctl_set_safety_level((uint32_t)index);
+                    if (R_SUCCEEDED(rc) && before >= 0) history_flow::record_values("level", { before }, { index });
+                    if (R_FAILED(rc))
+                        history_flow::record_failure("level", rc, before >= 0 ? std::vector<int>{ before } : std::vector<int>{},
+                                                     { index });
+                    ui::notify_result(rc, "playguard/restrictions/saved"_i18n, "playguard/restrictions/save_err"_i18n);
+                    this->refresh();
+                });
 }
 
 std::string RestrictionsTab::settings_text(const PctlCustomSettings& s) const
