@@ -225,7 +225,7 @@ void ActivityTab::rebuild()
     const std::shared_ptr<const PlayStats> data = shown_stats();
     if (!data) {
         // Nothing read for this account yet: no figures, not the previous ones.
-        games->setDetailText("");
+        games->setDetailText(ui::opens());
         ui::set_visible(capped, false);
         this->show_summary(nullptr);
         ui::set_visible(progress.getView(), reading);
@@ -238,7 +238,7 @@ void ActivityTab::rebuild()
     size_t played = 0;
     for (uint32_t i = 0; i < s.count; i++)
         if (value_of(s.games[i], this->period) > 0) played++;
-    games->setDetailText(std::to_string(played));
+    games->setDetailText(ui::opens(std::to_string(played)));
     ui::set_visible(progress.getView(), reading && this->spinner);
     // Under it: the games the read itself could not hold (PLAYSTATS_MAX),
     // which the totals above miss too.

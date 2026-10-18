@@ -53,6 +53,16 @@ void GameTile::set_detail(const std::string& text)
     this->detail->setText(text);
 }
 
+void GameTile::set_name_color(NVGcolor color)
+{
+    this->name->setTextColor(color);
+}
+
+void GameTile::set_detail_color(NVGcolor color)
+{
+    this->detail->setTextColor(color);
+}
+
 void GameTile::set_icon_texture(int texture, bool owned)
 {
     if (texture == 0) return;
@@ -61,4 +71,11 @@ void GameTile::set_icon_texture(int texture, bool owned)
     this->icon->innerSetImage(texture);
     this->icon->setFreeTexture(owned);
     this->iconed = true;
+}
+
+void GameTile::clear_icon()
+{
+    if (!this->iconed) return;
+    this->icon->clear();
+    this->iconed = false;
 }

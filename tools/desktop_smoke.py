@@ -1430,8 +1430,16 @@ key("Escape")
 key("Return")
 time.sleep(0.6)
 shot("27_games_cached")
-# Robot Factory (the focus, the first game): only its update needs a newer
-# firmware; removing the update (the fix, the first button) makes it work again.
+# The same games as covers, then back to the list.
+key("Up", 7)               # Display, above the sections
+key("Return")
+time.sleep(0.6)
+shot("27_games_grid")      # covers with their problem, by section
+key("Return")
+time.sleep(0.6)
+# Robot Factory (the first game): only its update needs a newer firmware;
+# removing the update (the fix, the first button) makes it work again.
+key("Down", 2)             # past Several games at once
 key("Return")
 shot("27_games_update")    # Remove the update (version 2.1.0)
 key("Return")              # the fix
@@ -1443,8 +1451,8 @@ if not any(m.endswith("works again.") and m.startswith("Robot Factory") for m in
     fail("the update removal did not fix the game: " + repr(messages()[-3:]))
 # Moon Racer: the console asks for a removed update; accepting the installed
 # version again (the fix, no question) makes it work again.
-key("Up", 6)               # Several games at once, above the sections
-key("Down")                # the first game
+key("Up", 7)               # Display, above the sections
+key("Down", 2)             # past Several games at once: the first game
 key("Return")
 shot("27_games_launch")
 key("Return")              # Accept the installed version again
@@ -1453,8 +1461,8 @@ if not any(m.endswith("works again.") and m.startswith("Moon Racer") for m in me
     fail("the launch version reset did not fix the game: " + repr(messages()[-3:]))
 # Forest Tales: the console found corrupt data; its check runs in a dialog
 # with its progress and Cancel, here cancelled.
-key("Up", 6)
-key("Down", 2)             # past Check these 2 games, above them: the first game of To check
+key("Up", 7)
+key("Down", 3)             # past Several games at once, Check these 2 games: the first game of To check
 key("Return")              # icon, why, what to do
 shot("27_games_details")   # Check the data (the fix, focused), Other actions
 key("Return")              # Check the data (the fix)
@@ -1465,7 +1473,8 @@ if not any(m == "Check cancelled." for m in messages()):
 # Both games of To check picked at once (the keyboard has no Y), then their
 # data checked one after the other: Forest Tales corrupt, the unnamed game
 # intact; both kept as such, out of To check.
-key("Up", 6)               # Several games at once
+key("Up", 7)               # Display, above the sections
+key("Down")                # Several games at once
 key("Return")
 shot("27_games_select_menu")   # Select all of: To check (2), Reinstall (4), Firmware or SD card (1)
 key("Return")
@@ -1484,7 +1493,8 @@ with open(games_cache, "rb") as f:
     if f.read(8)[4:8] != (2).to_bytes(4, "little"):
         fail("the games cache is not the version that keeps what the check found")
 # The two games picked, removed at once (their list saved first).
-key("Up", 6)               # 2 games selected
+key("Up", 7)
+key("Down")                # 2 games selected
 key("Return")
 key("Down")                # Remove these games (2)
 key("Return")
@@ -1495,8 +1505,8 @@ time.sleep(2)
 if not any(m.startswith("2 games removed.") for m in messages()):
     fail("the games picked were not removed: " + repr(messages()[-3:]))
 # To reinstall: Garden Defenders (an update without its game), removed.
-key("Up", 6)               # Several games at once
-key("Down", 3)             # past Reinstall's buttons, Hedgehog Rush
+key("Up", 7)               # Display, above the sections
+key("Down", 4)             # past Several games at once, Reinstall's buttons: Hedgehog Rush
 shot("27_games_reinstall")
 key("Return")
 shot("27_games_actions")   # Remove the game (the fix), Other actions

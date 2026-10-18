@@ -15,7 +15,8 @@
 // to install again; intact: out of the list) until another version is
 // installed. Ⓨ selects games, for one action on them all: check their data
 // one after the other, or remove them; "Check these games" does the same for
-// the whole section to check.
+// the whole section to check. "Display" above them shows the games as a list
+// or as covers (kept in the config), as Activity › All games does.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -47,7 +48,8 @@ class GameCheckActivity : public brls::Activity
         brls::Box*    box   = nullptr;
         brls::Header* title = nullptr;
         brls::Label*  note  = nullptr;
-        brls::Box*    list  = nullptr;
+        brls::Box*    list  = nullptr;      // the cells, or the rows of covers
+        std::vector<brls::View*> tiles;     // as covers: in order, along the rows
         brls::Button* save       = nullptr;   // Reinstall only: save the list
         brls::Button* send       = nullptr;   // Reinstall only: send the list to a gist
         brls::Button* remove_all = nullptr;   // Reinstall only: remove them all
@@ -79,6 +81,16 @@ class GameCheckActivity : public brls::Activity
     bool removing = false;              // remove_games() under way
     std::set<u64> selected;             // the games picked with Ⓨ
     brls::DetailCell* selection = nullptr;   // above the sections: what is picked, A for what to do
+    brls::DetailCell* view_cell = nullptr;   // above it: a list or covers
+    bool grid = false;
+
+    // A list or covers: every section's games built again, next frame.
+    void switch_view();
+    // A section's games as covers: rebuilt when their number changes (the
+    // up and down routes go with it), else updated in place.
+    void show_tiles(Group& group, size_t count);
+    // The icons of the covers shown, read off the main thread.
+    void load_icons();
 
     // A section's box, title, note, actions and list, hidden until it has a game.
     void build_group(GameCategory category);
