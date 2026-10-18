@@ -243,7 +243,7 @@ static void test_preferences()
     // Defaults.
     config::Config d;
     CHECK(d.start_tab == "dashboard" && d.extra_amounts == std::vector<int>({ 15, 30, 60 }));
-    CHECK(d.activity_period == 1 && d.games_grid && d.export_format == 0 && d.backup_keep == 0);
+    CHECK(d.activity_period == 1 && d.games_grid && !d.check_grid && d.export_format == 0 && d.backup_keep == 0);
     CHECK(d.activity_account == "last" && d.activity_account_last.empty());
     CHECK(d.logs_keep == 20 && d.logs_keep_days == 0 && d.logs_keep_mb == 0);
     CHECK(!d.update_daily && d.update_checked.empty() && !d.clock_check_at_start && d.pin_lock == "changes" && !d.pin_ask_again);
@@ -279,7 +279,7 @@ static void test_preferences()
     // Values from the lists are kept.
     write_config(R"({"start_tab": "activity", "extra_amounts": [30, 60, 90], "activity_period": 2,
                     "activity_account": "0123456789ABCDEF0123456789ABCDEF", "activity_account_last": "",
-                    "games_grid": false, "export_format": 3, "backup_keep": 10, "update_daily": true,
+                    "games_grid": false, "check_grid": true, "export_format": 3, "backup_keep": 10, "update_daily": true,
                     "update_checked": "2026-10-07", "clock_check_at_start": true, "intro": false,
                     "logs_keep": 0, "logs_keep_days": 30, "logs_keep_mb": 5, "dev_builds_order": "number",
                     "update_via": "inplace", "update_latest": "1.2.0", "update_snooze_version": "1.2.0",
@@ -291,7 +291,7 @@ static void test_preferences()
     CHECK(!c.intro && c.dev_builds_order == "number");
     CHECK(c.logs_keep == 0 && c.logs_keep_days == 30 && c.logs_keep_mb == 5);
     CHECK(c.start_tab == "activity" && c.extra_amounts == std::vector<int>({ 30, 60, 90 }));
-    CHECK(c.activity_period == 2 && !c.games_grid && c.export_format == 3 && c.backup_keep == 10);
+    CHECK(c.activity_period == 2 && !c.games_grid && c.check_grid && c.export_format == 3 && c.backup_keep == 10);
     CHECK(c.activity_account == "0123456789ABCDEF0123456789ABCDEF" && c.activity_account_last.empty());
     CHECK(c.update_daily && c.update_checked == "2026-10-07" && c.clock_check_at_start);
 

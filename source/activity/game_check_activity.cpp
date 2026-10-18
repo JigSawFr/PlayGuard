@@ -12,16 +12,20 @@
 #include <vector>
 
 #include "action/game_check_text.hpp"
+#include "action/game_icons.hpp"
 #include "action/game_notice.hpp"
 #include "action/game_scan.hpp"
 #include "action/game_verify_flow.hpp"
 #include "action/history_flow.hpp"
+#include "action/games_logic.hpp"
 #include "action/upload_flow.hpp"
 #include "app.hpp"
+#include "util/config.hpp"
 #include "util/paths.hpp"
 #include "util/perf.hpp"
 #include "util/table_export.hpp"
 #include "ui/ui.hpp"
+#include "view/game_tile.hpp"
 
 using namespace brls::literals;
 
@@ -41,6 +45,9 @@ using game_check_text::warn_only;
 using game_verify_flow::Verified;
 
 constexpr float ICON_SIZE = 72;
+
+// Covers a row, as in All games: as many as the screen's width takes.
+constexpr int COLUMNS = (int)((1280 - 2 * 60) / GameTile::WIDTH);
 
 // A game without a name: its ID.
 std::string unnamed_text(const std::string& id)
@@ -178,6 +185,38 @@ class IssueCell : public brls::DetailCell
     brls::CheckBox* check;
 };
 
+// The same game as a cover: its icon, name and problem, borealis' check
+// mark over the icon while it is picked.
+class IssueTile : public GameTile
+{
+  public:
+    IssueTile()
+    {
+        this->check = new brls::CheckBox();
+        this->check->setPositionType(brls::PositionType::ABSOLUTE);
+        this->check->setPositionTop(14);
+        this->check->setPositionRight(14);
+        this->addView(this->check);
+        ui::set_visible(this->check, false);
+    }
+
+    void set_selected(bool on)
+    {
+        ui::set_visible(this->check, on);
+        this->set_name_color(on ? brls::Application::getTheme()["brls/list/listItem_value_color"] : ui::color_text());
+    }
+
+    u64 app_id = 0;
+
+  private:
+    brls::CheckBox* check;
+};
+
+std::string view_label(bool grid)
+{
+    return brls::getStr(fmt::format("playguard/library/views/{}", grid ? 1 : 0));
+}
+
 // The details: the icon, the name and the problem, then why and what to do
 // in two blocks read from the left, the ID and version underneath.
 brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, const std::vector<unsigned char>& icon)
@@ -244,6 +283,16 @@ void GameCheckActivity::onContentAvailable()
     note->setSingleLine(false);
     status->setSingleLine(false);
     hint->setSingleLine(false);
+    // A list or covers, as All games.
+    this->grid = config::get().check_grid;
+    this->view_cell = new brls::DetailCell();
+    this->view_cell->setText("playguard/library/view"_i18n);
+    this->view_cell->setDetailText(view_label(this->grid));
+    this->view_cell->registerClickAction([this](brls::View*) {
+        this->switch_view();
+        return true;
+    });
+    list->addView(this->view_cell);
     // The games picked with Ⓨ: how many, and A for what to do with them.
     this->selection = new brls::DetailCell();
     this->selection->setMarginTop(10);
@@ -333,7 +382,7 @@ void GameCheckActivity::build_group(GameCategory category)
         group.box->addView(group.verify_all);
     }
     group.list = new brls::Box(brls::Axis::COLUMN);
-    group.list->setAlignItems(brls::AlignItems::STRETCH);
+    group.list->setAlignItems(this->grid ? brls::AlignItems::CENTER : brls::AlignItems::STRETCH);
     group.box->addView(group.list);
     list->addView(group.box);
     ui::set_visible(group.box, false);
@@ -538,33 +587,52 @@ void GameCheckActivity::show()
         Group& group = this->groups[category];
         auto& cells = group.list->getChildren();
         group.games.clear();
+        if (this->grid) this->show_tiles(group, shown.size());
         for (size_t i = 0; i < shown.size(); i++) {
-            IssueCell* cell;
-            if (i < cells.size()) {
-                cell = (IssueCell*)cells[i];
-            } else {
-                cell = new IssueCell();
-                group.list->addView(cell);
-            }
             const Broken b = shown[i];
             const bool picked = this->selected.count(b.game.app_id) != 0;
+            const NVGcolor color = warn_only(b.issue) ? ui::color_warn() : ui::color_bad();
             group.games.push_back(b.game);
-            cell->setText(line_names[b.game.app_id]);
-            cell->set_selected(picked);
-            cell->setDetailText(short_text(b.game, b.issue));
-            cell->setDetailTextColor(warn_only(b.issue) ? ui::color_warn() : ui::color_bad());
-            cell->registerClickAction([this, b, hos](brls::View*) {
+            brls::View* view;
+            if (this->grid) {
+                auto* tile = (IssueTile*)group.tiles[i];
+                if (tile->app_id != b.game.app_id) {
+                    // Another game in this place: not its icon.
+                    tile->app_id = b.game.app_id;
+                    tile->clear_icon();
+                }
+                tile->set_name(line_names[b.game.app_id]);
+                tile->set_selected(picked);
+                tile->set_detail(short_text(b.game, b.issue));
+                tile->set_detail_color(color);
+                view = tile;
+            } else {
+                IssueCell* cell;
+                if (i < cells.size()) {
+                    cell = (IssueCell*)cells[i];
+                } else {
+                    cell = new IssueCell();
+                    group.list->addView(cell);
+                }
+                cell->setText(line_names[b.game.app_id]);
+                cell->set_selected(picked);
+                cell->setDetailText(short_text(b.game, b.issue));
+                cell->setDetailTextColor(color);
+                view = cell;
+            }
+            view->registerClickAction([this, b, hos](brls::View*) {
                 this->open(b.game, b.issue, hos);
                 return true;
             });
-            cell->registerAction(picked ? "playguard/games/unselect"_i18n : "playguard/games/select"_i18n, brls::BUTTON_Y,
+            view->registerAction(picked ? "playguard/games/unselect"_i18n : "playguard/games/select"_i18n, brls::BUTTON_Y,
                                  [this, id = b.game.app_id](brls::View*) {
                                      this->toggle(id);
                                      return true;
                                  });
-            ui::set_visible(cell, true);
+            ui::set_visible(view, true);
         }
-        for (size_t i = shown.size(); i < cells.size(); i++) ui::set_visible(cells[i], false);
+        if (!this->grid)
+            for (size_t i = shown.size(); i < cells.size(); i++) ui::set_visible(cells[i], false);
         group.title->setTitle(brls::getStr(std::string("playguard/games/groups/") + category_key(category), (int)shown.size()));
         // A section's own cells go with it: borealis would still give the
         // focus to a visible cell inside a box that is gone.
@@ -626,6 +694,90 @@ void GameCheckActivity::show()
     }
     hint->setText(brls::getStr("playguard/games/many", ui::storage_short(si)));
     ui::set_visible(hint.getView(), broken.size() >= MANY);
+    this->load_icons();
+}
+
+void GameCheckActivity::show_tiles(Group& group, size_t count)
+{
+    if (group.tiles.size() == count) return;
+    // The focus on one of these covers, about to be deleted: kept on the
+    // same place, or the first game.
+    bool focus_in = false;
+    for (brls::View* v = brls::Application::getCurrentFocus(); v && !focus_in; v = v->getParent())
+        focus_in = v == group.list;
+    size_t at = 0;
+    if (focus_in) {
+        const auto it = std::find(group.tiles.begin(), group.tiles.end(), brls::Application::getCurrentFocus());
+        if (it != group.tiles.end()) at = (size_t)(it - group.tiles.begin());
+        brls::Application::giveFocus(this->view_cell);
+    }
+    const bool was_auto = focus_in && this->auto_focus;
+    group.list->clearViews();
+    group.tiles.clear();
+    brls::Box* row = nullptr;
+    for (size_t i = 0; i < count; i++) {
+        if (!row || (int)row->getChildren().size() >= COLUMNS) {
+            row = new brls::Box(brls::Axis::ROW);
+            row->setWidth(COLUMNS * GameTile::WIDTH);
+            group.list->addView(row);
+        }
+        auto* tile = new IssueTile();
+        row->addView(tile);
+        group.tiles.push_back(tile);
+    }
+    // Up and down to the same column (games_logic).
+    const int n = (int)count;
+    for (int i = 0; i < n; i++) {
+        const int up = games_logic::grid_neighbour(i, n, COLUMNS, -1);
+        const int down = games_logic::grid_neighbour(i, n, COLUMNS, 1);
+        if (up >= 0) group.tiles[i]->setCustomNavigationRoute(brls::FocusDirection::UP, group.tiles[up]);
+        if (down >= 0) group.tiles[i]->setCustomNavigationRoute(brls::FocusDirection::DOWN, group.tiles[down]);
+    }
+    if (focus_in && count) {
+        brls::View* to = group.tiles[std::min(at, count - 1)];
+        brls::Application::giveFocus(to);
+        if (was_auto) this->auto_focus = to;
+    }
+}
+
+void GameCheckActivity::switch_view()
+{
+    this->grid = !this->grid;
+    config::get().check_grid = this->grid;   // the next visit opens on it
+    ui::save_config();
+    this->view_cell->setDetailText(view_label(this->grid));
+    // Next frame: the focus is on this cell, out of the sections rebuilt.
+    std::weak_ptr<bool> weak = this->alive;
+    brls::sync([this, weak]() {
+        if (weak.expired()) return;
+        this->auto_focus = nullptr;
+        for (Group& group : this->groups) {
+            if (!group.list) continue;
+            group.list->clearViews();
+            group.tiles.clear();
+            group.list->setAlignItems(this->grid ? brls::AlignItems::CENTER : brls::AlignItems::STRETCH);
+        }
+        this->show();
+    });
+}
+
+void GameCheckActivity::load_icons()
+{
+    if (!this->grid || !game_icons::wanted()) return;
+    std::vector<u64> ids;
+    for (const Group& group : this->groups)
+        for (brls::View* v : group.tiles) {
+            auto* tile = (IssueTile*)v;
+            if (v->getVisibility() != brls::Visibility::VISIBLE || tile->has_icon()) continue;
+            bool owned = false;
+            if (const int tex = game_icons::texture(tile->app_id, owned)) tile->set_icon_texture(tex, owned);
+            else if (!game_icons::known(tile->app_id)) ids.push_back(tile->app_id);
+        }
+    if (ids.empty()) return;
+    std::weak_ptr<bool> weak = this->alive;
+    game_icons::load(ids, [this, weak]() {
+        if (!weak.expired()) this->load_icons();
+    });
 }
 
 // The first game of the list, in the first section shown.
@@ -634,6 +786,10 @@ brls::View* GameCheckActivity::first_game() const
     for (GameCategory category : GROUPS) {
         const Group& group = this->groups[category];
         if (group.box->getVisibility() != brls::Visibility::VISIBLE) continue;
+        if (this->grid) {
+            if (!group.tiles.empty()) return group.tiles[0];
+            continue;
+        }
         for (brls::View* cell : group.list->getChildren())
             if (cell->getVisibility() == brls::Visibility::VISIBLE) return cell;
     }

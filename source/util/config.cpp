@@ -278,6 +278,7 @@ static void load_shared()
     read_string(j, "start_tab", c.start_tab);
     read_int(j, "activity_period", c.activity_period);
     read_bool(j, "games_grid", c.games_grid);
+    read_bool(j, "check_grid", c.check_grid);
     read_string(j, "activity_account", c.activity_account);
     read_string(j, "activity_account_last", c.activity_account_last);
     read_int(j, "export_format", c.export_format);
@@ -386,6 +387,7 @@ bool snapshot(Snapshot& snap)
     j["extra_amounts"]   = s_config.extra_amounts;
     j["activity_period"] = s_config.activity_period;
     j["games_grid"]      = s_config.games_grid;
+    j["check_grid"]      = s_config.check_grid;
     j["activity_account"]      = s_config.activity_account;
     j["activity_account_last"] = s_config.activity_account_last;
     j["export_format"]   = s_config.export_format;

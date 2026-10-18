@@ -54,6 +54,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `intro` | boolean | the loading screen stays 2 seconds at start-up (Ⓐ or Ⓑ skips it); off, the first screen comes as soon as it is ready | `true` | Preferences (*Show the intro for 2 seconds*) |
 | `activity_period` | integer | Activity's period: `0` today, `1` last 7 days, `2` all time | `1` | Activity, Activity › All games |
 | `games_grid` | boolean | *Activity › All games* shows the games as a grid of covers; off, as a list | `true` | Activity › All games (Ⓨ) |
+| `check_grid` | boolean | *Console › Check the installed games* shows the games as covers; off, as a list | `false` | Console › Check the installed games (*View*) |
 | `activity_account` | string | the account Activity shows when PlayGuard starts: `"last"` (the one shown last, `activity_account_last`), `""` every account, or one user account's uid as 32 upper-case hex digits; an account no longer on the console reads as every account | `"last"` | Activity (*Account by default*) |
 | `activity_account_last` | string | the account Activity showed last: `""` every account, or a uid as above | `""` | Activity (*Account*) |
 | `export_format` | integer | the last export format: `0` CSV, `1` JSON, `2` XLSX, `3` PDF | `0` | Activity › Export |
