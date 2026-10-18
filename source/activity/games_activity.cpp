@@ -207,9 +207,12 @@ void GamesActivity::build(u64 focus_id)
     list->setAxis(brls::Axis::COLUMN);
     list->setAlignItems(this->grid ? brls::AlignItems::CENTER : brls::AlignItems::STRETCH);
 
+    // Built out of the screen's layout, laid out once (ui::batch_layout).
     const size_t shown_n = std::min(this->rows.size(), this->cap());
-    for (size_t i = 0; i < shown_n; i++) this->add_entry(i);
-    if (!this->show_all && shown_n < this->rows.size()) this->add_more();
+    ui::batch_layout(list, [&]() {
+        for (size_t i = 0; i < shown_n; i++) this->add_entry(i);
+        if (!this->show_all && shown_n < this->rows.size()) this->add_more();
+    });
 
     // The grid: up and down to the same column (games_logic).
     if (this->grid) {

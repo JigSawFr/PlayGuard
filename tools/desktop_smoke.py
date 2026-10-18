@@ -3,9 +3,10 @@
 
 Starts build-desktop/playguard on an X display (Xvfb), opens every tab, the
 extra-time picker, the per-day editor (the week chart's day picker and the
-number pad), a bedtime alarm change and the settings backup, and fails if the
-app dies on the way (borealis throws on unknown XML attributes, missing
-views, …). Screenshots of each screen are written to the output folder.
+number pad), a bedtime alarm change, the settings backup and the change
+history (filtered, then not), and fails if the app dies on the way (borealis
+throws on unknown XML attributes, missing views, …). Screenshots of each
+screen are written to the output folder.
 
 The "games" scenario is the rest of that tour, in a run of its own so CI can
 run both halves side by side: a report sent online (GitHub sign-in first),
@@ -1321,6 +1322,36 @@ if not GAMES:
     shot("26_backup_restore")
     key("Escape")
     shot("27_back")
+
+    # The change history (the bedtime alarm changed above): every change,
+    # then only the refused ones (none: the line hidden), then every change
+    # again (the same line shown again).
+    def history_listed(text, times=1):
+        """Whether the list was built `times` times showing `text` (logged)."""
+        for _ in range(20):
+            log.flush()
+            if sum(("history list: " + text) in l for l in open(os.path.join(OUT, "app.log"), errors="replace")) >= times:
+                return True
+            time.sleep(0.25)
+        return False
+    key("Up", 2)               # Changes made with PlayGuard
+    key("Return")
+    shot("27_history")
+    if not history_listed("1 of 1 changes"):
+        fail("the change history did not list the bedtime alarm change")
+    key("Return")              # Show: the kinds of change
+    key("Down", 5)             # Refused by the console
+    key("Return")
+    shot("27_history_refused")
+    if not history_listed("0 of 1 changes"):
+        fail("the change history did not filter the refused changes")
+    key("Return")
+    key("Up", 5)               # Everything
+    key("Return")
+    if not history_listed("1 of 1 changes", times=2):
+        fail("the change history did not list every change again")
+    shot("27_history_again")
+    key("Escape")
     finish()
 
 # The "games" scenario, from the sidebar on the Overview.
