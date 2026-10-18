@@ -16,7 +16,6 @@ using namespace brls::literals;
 ConsoleTab::ConsoleTab()
     : TabBase("xml/tab/console.xml")
 {
-    patches_note->setSingleLine(false);
 
     clock->setDetailText(ui::opens());
     clock->registerClickAction([](brls::View*) {
@@ -49,7 +48,6 @@ ConsoleTab::ConsoleTab()
             return true;
         });
     }
-    sys_advice->setSingleLine(false);
 
     // What the notification bell says is to do here, on its row.
     this->mark(clock.getView(), { "clock" });
@@ -69,6 +67,17 @@ ConsoleTab::ConsoleTab()
     blank_warn = RowIcon::on_row(blank.getView(), RowIcon::Kind::Warning);
     blank->registerClickAction([](brls::View*) {
         ui::info("playguard/tools/serial_note_emummc"_i18n);
+        return true;
+    });
+
+    // A newer firmware Atmosphère or hekate does not support yet: a warning
+    // icon on the firmware's row, the advice in its release notes (A).
+    fw_warn = RowIcon::on_row(fw.getView(), RowIcon::Kind::Warning);
+    // What the game patches found: an icon (a warning when something needs a
+    // look), the text by A.
+    patches_icon = RowIcon::on_row(game_patches.getView(), RowIcon::Kind::Info);
+    game_patches->registerClickAction([this](brls::View*) {
+        if (!this->patches_note.empty()) ui::info(this->patches_note);
         return true;
     });
 
@@ -102,8 +111,7 @@ void ConsoleTab::refresh()
     ui::set_visible(hekate.getView(), !hk.empty());
     // A newer firmware Atmosphère or hekate does not support yet, or only in
     // a newer release (their notes say).
-    const std::string advice = sys_notes_flow::firmware_advice();
-    sys_advice->setText(advice);
+    fw_warn->set_shown(!sys_notes_flow::firmware_advice().empty());
     NVGcolor c = ui::color_neutral();
     compat->setDetailText(ui::compat_text(si, &c));
     compat->setDetailTextColor(c);
@@ -130,11 +138,9 @@ void ConsoleTab::refresh()
     game_patches->setDetailText(ui::patches_text(report, &c));
     game_patches->setDetailTextColor(c);
     bool warn = false;
-    const std::string note = ui::patches_note(report, si, &warn);
-    patches_note->setText(note);
-    patches_note->setTextColor(warn ? ui::color_warn() : ui::color_note());
-    ui::set_visible_all({ { sys_advice.getView(), !advice.empty() },
-                          { patches_note.getView(), !note.empty() } });
+    this->patches_note = ui::patches_note(report, si, &warn);
+    patches_icon->set_kind(warn ? RowIcon::Kind::Warning : RowIcon::Kind::Info);
+    patches_icon->set_shown(!this->patches_note.empty());
 }
 
 brls::View* ConsoleTab::create()

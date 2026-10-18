@@ -1,4 +1,4 @@
-// RowIcon — an icon on a row (a DetailCell), just before its value: there is
+// RowIcon — an icon on a row (a DetailCell), just after its value: there is
 // more to read, Ⓐ on the row shows it (a dialog), so the row keeps one line
 // instead of a paragraph under it. An "i" in a disc for a note, an amber
 // triangle with "!" for a warning. Gone while there is nothing to say.
@@ -15,12 +15,12 @@ class RowIcon : public brls::View
     explicit RowIcon(Kind kind);
 
     void set_shown(bool shown);
+    void set_kind(Kind kind);
 
     void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
               brls::FrameContext* ctx) override;
 
-    // The row's, added the first time it is asked for: between its title and
-    // its value.
+    // The row's, added the first time it is asked for: after its value.
     static RowIcon* on_row(brls::Box* row, Kind kind);
 
   private:

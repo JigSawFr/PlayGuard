@@ -14,13 +14,18 @@ RowIcon::RowIcon(Kind kind)
     this->setWidth(SIZE);
     this->setHeight(SIZE);
     this->setAlignSelf(brls::AlignSelf::CENTER);
-    this->setMarginRight(12);
+    this->setMarginLeft(12);
     this->setVisibility(brls::Visibility::GONE);
 }
 
 void RowIcon::set_shown(bool shown)
 {
     this->setVisibility(shown ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+}
+
+void RowIcon::set_kind(Kind kind)
+{
+    this->kind = kind;
 }
 
 void RowIcon::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
@@ -64,7 +69,8 @@ RowIcon* RowIcon::on_row(brls::Box* row, Kind kind)
     if (!row) return nullptr;
     if (auto* icon = dynamic_cast<RowIcon*>(row->getView(ICON_ID))) return icon;
     auto* icon = new RowIcon(kind);
-    // After the title (which grows), so it sits right before the value.
-    row->addView(icon, 1);
+    // Right after the value (before a badge): a long value overflows its
+    // box to the left, over anything put before it.
+    row->addView(icon, 2);
     return icon;
 }

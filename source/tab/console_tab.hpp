@@ -22,18 +22,19 @@ class ConsoleTab : public TabBase
     bool        serial_revealed = false;   // until the tab is left (tabs are rebuilt when reopened)
     std::string storage_note;              // the other system's, shown by A on the storage row
     RowIcon*    storage_info = nullptr;
-    RowIcon*    blank_warn   = nullptr;   // the serial number not blanked on emuMMC, by A
+    RowIcon*    blank_warn   = nullptr;    // the serial number not blanked on emuMMC, by A
+    std::string patches_note;              // what the game patches found, shown by A on their row
+    RowIcon*    patches_icon = nullptr;
+    RowIcon*    fw_warn      = nullptr;    // a newer firmware not supported yet (its notes say why)
 
     BRLS_BIND(brls::DetailCell,  clock,        "cn_clock");
     BRLS_BIND(brls::DetailCell,  games,        "cn_games");
     BRLS_BIND(brls::DetailCell,  fw,           "cn_fw");
     BRLS_BIND(brls::DetailCell,  ams,          "cn_ams");
     BRLS_BIND(brls::DetailCell,  hekate,       "cn_hekate");
-    BRLS_BIND(brls::Label,       sys_advice,   "cn_sys_advice");
     BRLS_BIND(brls::DetailCell,  compat,       "cn_compat");
     BRLS_BIND(brls::DetailCell,  storage,      "cn_storage");
     BRLS_BIND(brls::DetailCell,  blank,        "cn_blank");
     BRLS_BIND(brls::DetailCell,  serial,       "cn_serial");
     BRLS_BIND(brls::DetailCell,  game_patches, "cn_patches");
-    BRLS_BIND(brls::Label,       patches_note, "cn_patches_note");
 };
