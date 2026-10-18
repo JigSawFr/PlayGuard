@@ -69,14 +69,16 @@ the stick and saved, a restriction level's confirmation, the appearance
 picker, the network clock's screen, a game's screen from its card and the
 notification bell's list. The "cadranstates" one shows Cadran's Today and
 Play timer in the states "alarm" and "outside" set up, together: the time
-over the limit (a warning only) and the changes made outside PlayGuard.
+over the limit (a warning only) and the changes made outside PlayGuard. The
+"cadranunlocked" one shows them while parental controls are temporarily
+unlocked: "Turn back on" first on Today, the header's pill saying so.
 
 The "loading" scenario stops the start-up on the loading screen
 (PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates]   (needs DISPLAY, xdotool, ImageMagick)
+Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -111,6 +113,7 @@ ROLLBACK = SCENARIO == "rollback"
 GAMES = SCENARIO == "games"
 CADRAN = SCENARIO == "cadran"
 CADRANSTATES = SCENARIO == "cadranstates"
+CADRANUNLOCKED = SCENARIO == "cadranunlocked"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
@@ -159,7 +162,7 @@ env.setdefault("PLAYGUARD_SIM_STILL_FOCUS", "1")
 env.setdefault("PLAYGUARD_SIM_VERSION", "1.0.0:1a2b3c4")
 # The appearance, whatever config.json says: the classic lists, which every
 # scenario's key presses follow, but in the one that tours Cadran.
-env.setdefault("PLAYGUARD_SIM_APPEARANCE", "cadran" if CADRAN or CADRANSTATES else "classic")
+env.setdefault("PLAYGUARD_SIM_APPEARANCE", "cadran" if CADRAN or CADRANSTATES or CADRANUNLOCKED else "classic")
 # The installed games are checked at start-up for the notification bell:
 # at once in every scenario but the default one and "games", which watches a
 # check go game by game (150 ms each) and waits for the start-up one first.
@@ -342,6 +345,11 @@ if FORGED:
     report = os.path.join(run_dir, "playguard_data", "rescue_report.txt")
     os.makedirs(os.path.dirname(report), exist_ok=True)
     open(report, "w").write("mode=unlock\nresult=ok\nrc=0x00000000\nunlocks=1\n")
+    json.dump({"schema": 1, "pin_lock": "open"}, open(config_file, "w"))
+if CADRANUNLOCKED:
+    # A parent unlocked parental controls for now (1453 answers false).
+    env.setdefault("PLAYGUARD_SIM_UNLOCKED", "1")
+    os.makedirs(os.path.dirname(config_file), exist_ok=True)
     json.dump({"schema": 1, "pin_lock": "open"}, open(config_file, "w"))
 if LIBRARY:
     # A large library: All games builds its first covers, then the rest on
@@ -1200,6 +1208,16 @@ if CADRANSTATES:
     # lists: the time over the limit (a warning only) and the changes made
     # outside PlayGuard.
     shot("01_today")
+    key("Down")
+    key("Right")
+    shot("02_play_timer")
+    finish()
+if CADRANUNLOCKED:
+    # Parental controls temporarily unlocked: Today offers to turn them back
+    # on first, the pill says so on every tab.
+    key("Right")               # Today's first action: Turn back on
+    shot("01_today")
+    key("Left")
     key("Down")
     key("Right")
     shot("02_play_timer")
