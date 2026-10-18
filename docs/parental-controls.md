@@ -375,6 +375,10 @@ readable:
 
 ### A free-communication list entry (1044)
 
+The report prints one line per entry: the application ID, then the eight
+bytes after it as returned (`0100C9A00ECE6000  01 00 00 00 00 00 00 00`).
+Byte by byte:
+
 ```
 00 60 CE 0E A0 C9 00 01   01   00 00 00 00 00 00 00
 └──────── u64 LE ───────┘  │   └─────── zeros ─────┘

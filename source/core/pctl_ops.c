@@ -29,7 +29,7 @@
  *   1037 GetDefaultRatingOrganization     -> u32       1038 SetDefaultRatingOrganization <- u32
  *   1039 GetFreeCommunicationApplicationListCount -> u32
  *   1044 GetFreeCommunicationApplicationList <- u32 offset -> u32 count + Out|MapAlias buffer
- *        (FreeCommunicationApplicationInfo, layout not documented: only dumped raw)
+ *        (FreeCommunicationApplicationInfo, 16 bytes: the application ID, then 8 bytes not understood)
  *   1043 DeleteSettings                   (no args) privileged -- IRREVERSIBLE
  *   1903 GetExemptApplicationListCountForDebug [5.0.0+] -> u32, and
  *   1904 GetExemptApplicationListForDebug [5.0.0+], read like 1039 / 1044
