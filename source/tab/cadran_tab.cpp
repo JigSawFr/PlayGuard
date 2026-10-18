@@ -233,6 +233,12 @@ void tint_rail(const std::vector<brls::SidebarItem*>& items, brls::SidebarItem* 
 
 namespace
 {
+// The rail's items (style_rail): their inner padding and their icons' size;
+// and the header's mark.
+constexpr float RAIL_ITEM_PAD = 12.0f;
+constexpr float RAIL_ICON     = 22.0f;
+constexpr float MARK_SIZE     = 38.0f;
+
 // The header's pill: not focusable, but a tap reaches it (brls::View::hitTest
 // skips a view that cannot take the focus).
 class HeaderPill : public brls::Box
@@ -302,9 +308,17 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
     if (left) {
         left->setAlignItems(brls::AlignItems::CENTER);
         left->setGrow(1.0f);
-        CadranIcon* mark = icon("mark", 38, theme["cadran/text"]);
+        CadranIcon* mark = icon("mark", MARK_SIZE, theme["cadran/text"]);
         mark->setId("cadran_mark");
         mark->setMarginRight(14);
+        if (with_date) {
+            // The main screen: the mark centred over the rail's icons.
+            brls::Style style = brls::getStyle();
+            const float icons = style["brls/sidebar/padding_left"] + RAIL_ITEM_PAD + RAIL_ICON / 2;
+            const float start = style["brls/applet_frame/padding_sides"] + style["brls/applet_frame/header_padding_sides"];
+            mark->setMarginLeft(icons - MARK_SIZE / 2 - start);
+            mark->setCulled(false);   // left of its box, which borealis would take for off-screen
+        }
         left->addView(mark, 0);
     }
     if (auto* title = dynamic_cast<brls::Label*>(frame->getView("brls/applet_frame/title_label"))) {
@@ -405,8 +419,8 @@ void cadran::style_rail(brls::View* tab_frame)
         }
         item->setHeight(52);
         item->setCornerRadius(14);
-        item->setPaddingLeft(12);
-        item->setPaddingRight(12);
+        item->setPaddingLeft(RAIL_ITEM_PAD);
+        item->setPaddingRight(RAIL_ITEM_PAD);
         item->setMarginBottom(4);
         item->setAlignItems(brls::AlignItems::CENTER);
         if (brls::View* accent = item->getView("brls/sidebar/item_accent")) accent->setVisibility(brls::Visibility::GONE);
@@ -418,7 +432,7 @@ void cadran::style_rail(brls::View* tab_frame)
             label->setMarginLeft(10);
             label->setSingleLine(true);
         }
-        item->addView(icon(name, 22, theme["cadran/text2"]), 0);
+        item->addView(icon(name, RAIL_ICON, theme["cadran/text2"]), 0);
         items.push_back(item);
     }
     for (brls::SidebarItem* item : items) {

@@ -253,7 +253,10 @@ void cadran::List::banners(const std::vector<const char*>& ids)
         }
         card->setFill(theme["cadran/amber_surf"]);
         card->setAccent(theme["cadran/amber_line"]);
-        card->setMarginBottom(6);
+        // The line's own margin under the card, not in it: the card ends
+        // where the line and its focus do.
+        card->setMarginBottom(12);
+        cell->setMarginBottom(0);
         cell->setBackgroundColor(theme["cadran/none"]);
         cell->title->setTextColor(theme["cadran/amber"]);
         cell->detail->setTextColor(theme["cadran/amber"]);
