@@ -8,6 +8,7 @@
 
 #include "action/sys_update_flow.hpp"
 #include "activity/sys_notes_activity.hpp"
+#include "app.hpp"
 #include "tab/tab_base.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -32,10 +33,10 @@ namespace
 enum class Load { NotStarted, Running, Done };
 sys_notes::Cache s_cache;
 Load             s_load = Load::NotStarted;
-bool             s_fetching[3] = { false, false, false };
+bool             s_fetching[sys_notes::COUNT] = {};
 // refresh() asked while the lists were being read, and whether forced.
-bool             s_asked[3] = { false, false, false };
-bool             s_asked_force[3] = { false, false, false };
+bool             s_asked[sys_notes::COUNT] = {};
+bool             s_asked_force[sys_notes::COUNT] = {};
 // keep() asked while the lists were being read: the lists it was given.
 sys_notes::Cache s_waiting;
 bool             s_waiting_any = false;
@@ -61,23 +62,23 @@ void save()
 // The lists read (UI thread): what was asked meanwhile, then what shows them.
 void on_loaded(sys_notes::Cache read)
 {
-    const bool any = !read.of(Which::Atmosphere).releases.empty() || !read.of(Which::Hekate).releases.empty() ||
-                     !read.of(Which::Firmware).releases.empty();
+    bool any = false;
+    for (Which w : sys_notes::ALL) any = any || !read.of(w).releases.empty();
     s_cache = std::move(read);
     s_load = Load::Done;
     if (s_waiting_any) {
         s_waiting_any = false;
         keep(std::exchange(s_waiting, sys_notes::Cache{}));
     }
-    for (Which w : { Which::Atmosphere, Which::Hekate, Which::Firmware }) {
+    for (Which w : sys_notes::ALL) {
         if (!std::exchange(s_asked[index(w)], false)) continue;
         refresh(w, std::exchange(s_asked_force[index(w)], false));
     }
     SysNotesActivity::loaded();
     // The firmware's entry of the notification bell, with its advice.
     sys_update_flow::refresh_entries();
-    // Tools › Console: how far behind each one is, the firmware's advice
-    // (nothing kept: nothing to say there either).
+    // Tools › Console: how far behind each one is, the firmware's advice;
+    // About: how far behind PlayGuard is (nothing kept: nothing to say there either).
     if (any) TabBase::refresh_shown();
 }
 }   // namespace
@@ -104,6 +105,7 @@ bool ready()
 
 std::string installed(Which which)
 {
+    if (which == Which::PlayGuard) return app::version();
     if (which == Which::Hekate) return sys_update_flow::installed_hekate();
     SysInfo si;
     sysinfo_get(&si);
@@ -115,6 +117,8 @@ std::string installed(Which which)
 
 std::string latest(Which which)
 {
+    // PlayGuard's own update check (action/update_flow) keeps what it found.
+    if (which == Which::PlayGuard) return config::get().update_latest;
     const sys_updates::Latest l = sys_updates::from_text(config::get().sys_latest);
     return which == Which::Atmosphere ? l.atmosphere : which == Which::Hekate ? l.hekate : l.firmware;
 }
@@ -222,7 +226,14 @@ void keep(const sys_notes::Cache& fresh)
 std::string status_text(Which which, bool* newer)
 {
     const std::string mine = installed(which);
-    const std::string text = sys_update_flow::with_latest(sys_notes::key(which), mine, newer);
+    std::string text;
+    if (which == Which::PlayGuard) {
+        const std::string newest = latest(which);
+        *newer = !newest.empty() && !mine.empty() && update::compare_versions(newest, mine) > 0;
+        text = *newer ? brls::getStr("playguard/tools/available", mine, newest) : mine;
+    } else {
+        text = sys_update_flow::with_latest(sys_notes::key(which), mine, newer);
+    }
     if (!*newer) return text;
     // Behind by more than one release: how many (the list kept knows; once
     // it is read, the Console tab is refreshed).

@@ -299,6 +299,64 @@ static void test_support()
     CHECK(need_for(ams, "1.12.0", "", &v) == Need::Nothing);
 }
 
+// PlayGuard's release page, as the release workflow writes it (shortened).
+static const char PLAYGUARD_110[] =
+    "## [1.1.0](https://github.com/JigSawFr/PlayGuard/compare/v1.0.0...v1.1.0) \xc2\xb7 2026-10-14\n\n"
+    "<p>\xe2\xac\x87\xef\xb8\x8f <a href=\"https://x/playguard.zip\"><b>Download playguard.zip</b></a> (2.4 MB)</p>\n\n"
+    "<p>\xf0\x9f\x9a\x80 <b>4</b> features</p>\n\n<hr>\n\n"
+    "### \xf0\x9f\x8c\x9f Highlights\n\nThis release lets you choose.\n\n"
+    "* \xe2\x8f\xb0 **When time is up**:  \n  Choose what the console does.\n\n"
+    "<!-- console:hide -->\n> [!IMPORTANT]\n> Summary written automatically.\n<!-- /console -->\n"
+    "<!-- console: Summary written by a robot. -->\n\n<hr>\n\n"
+    "<!-- console:hide -->\n### \xf0\x9f\x93\x9c What changed\n<!-- /console -->\n\n"
+    "<a name=\"every-change\"></a>\n\n<details>\n<summary><b>Every change in 1.1.0</b> (9 changes)</summary>\n\n"
+    "### \xf0\x9f\x9a\x80 Features\n\n"
+    "* **about:** the release highlights with icons ([#122](https://github.com/JigSawFr/PlayGuard/issues/122)) "
+    "([0b8bd5d](https://github.com/JigSawFr/PlayGuard/commit/0b8bd5d9468946608d197c9c70440a5cf6c76084))\n"
+    "* a link to [the guide](https://github.com/JigSawFr/PlayGuard/blob/main/docs/guide.md) (kept)\n\n"
+    "</details>\n\n## \xf0\x9f\x96\xbc\xef\xb8\x8f On screen\n\n| Screen | Before |\n|---|---|\n\n"
+    "## \xf0\x9f\x93\xa6 Install\n\n1. **New install**: download it.\n\n"
+    "> [!NOTE]\n> Requires custom firmware (**Atmosph\xc3\xa8re**). Checked on firmware **21.0.0 \xe2\x86\x92 22.5.0**, supported.\n";
+
+static void test_playguard_notes()
+{
+    const std::string notes = trim_notes(Which::PlayGuard, PLAYGUARD_110);
+    // Its heading, the download and count lines and the anchor go.
+    CHECK(notes.find("1.1.0](") == std::string::npos);
+    CHECK(notes.find("Download") == std::string::npos && notes.find("<p>") == std::string::npos);
+    CHECK(notes.find("every-change") == std::string::npos);
+    // The highlights and every change stay; the console's own lines read.
+    CHECK(notes.find("Highlights") != std::string::npos && notes.find("When time is up") != std::string::npos);
+    CHECK(notes.find("Summary written by a robot.") != std::string::npos);
+    CHECK(notes.find("Summary written automatically") == std::string::npos);
+    CHECK(notes.find("What changed") == std::string::npos);
+    CHECK(notes.find("Every change in 1.1.0") != std::string::npos);
+    // A change without its pull request and commit; another link kept.
+    CHECK(notes.find("* **about:** the release highlights with icons\n") != std::string::npos);
+    CHECK(notes.find("#122") == std::string::npos && notes.find("0b8bd5d") == std::string::npos);
+    CHECK(notes.find("[the guide](") != std::string::npos && notes.find("(kept)") != std::string::npos);
+    // What follows the notes: left out.
+    CHECK(notes.find("On screen") == std::string::npos && notes.find("Install") == std::string::npos);
+    CHECK(notes.find("</details>") != std::string::npos);
+
+    // From a release list: no firmware it "supports" (its notes say what it was checked on).
+    std::vector<Release> out;
+    CHECK(parse_github("[" + release_json("v1.1.0", PLAYGUARD_110) + "]", Which::PlayGuard, &out));
+    if (!CHECK(out.size() == 1)) return;
+    CHECK(out[0].version == "1.1.0" && out[0].supports.empty() && out[0].notes == notes);
+    CHECK(std::string(key(Which::PlayGuard)) == "playguard" && std::string(repo(Which::PlayGuard)) == "JigSawFr/PlayGuard");
+
+    // Kept in the cache with the others.
+    Cache c;
+    c.playguard.releases = out;
+    c.playguard.fetched = "2026-10-18";
+    Cache back;
+    CHECK(decode(encode(c), &back));
+    CHECK(back.playguard.fetched == "2026-10-18" && back.playguard.releases.size() == 1);
+    CHECK(back.playguard.releases[0].notes == notes && back.of(Which::PlayGuard).releases[0].version == "1.1.0");
+    CHECK(back.atmosphere.releases.empty());
+}
+
 static void test_cache()
 {
     Cache c;
@@ -353,6 +411,7 @@ int main()
 {
     test_parse_github();
     test_hekate_notes();
+    test_playguard_notes();
     test_supported_firmware();
     test_versions();
     test_firmware_page();

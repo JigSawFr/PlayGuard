@@ -96,6 +96,73 @@ bool image_only(const std::string& line)
     const std::string t = text::trim_space(line);
     return text::starts_with(t, "![") && t.back() == ')' && t.find("](") != std::string::npos;
 }
+// " ([#12](https://…))" or " ([abc1234](https://…))" at the end of `line`
+// (a change's pull request or commit): where it starts, else npos.
+size_t trailing_reference(const std::string& line)
+{
+    if (line.size() < 8 || line.compare(line.size() - 2, 2, "))") != 0) return std::string::npos;
+    const size_t at = line.rfind(" ([");
+    if (at == std::string::npos) return std::string::npos;
+    const size_t close = line.find("](", at);
+    if (close == std::string::npos || line.find(' ', close) != std::string::npos) return std::string::npos;
+    const std::string ref = line.substr(at + 3, close - at - 3);
+    bool ok = ref.size() > 1 && ref[0] == '#';
+    for (size_t i = 1; ok && i < ref.size(); i++) ok = std::isdigit((unsigned char)ref[i]) != 0;
+    if (!ok && ref.size() >= 7 && ref.size() <= 40)
+        ok = std::all_of(ref.begin(), ref.end(), [](char c) { return std::isxdigit((unsigned char)c) != 0; });
+    return ok ? at : std::string::npos;
+}
+
+// PlayGuard's release page (.github/workflows: its heading, the download and
+// count lines, the highlights, every change folded, then screenshots,
+// install and build) as the console reads it: see trim_notes().
+std::string trim_playguard(const std::string& md)
+{
+    std::vector<std::string> out;
+    enum { Plain, Comment, Hide, Only } block = Plain;
+    bool heading_seen = false;
+    for (const std::string& raw : text::lines(md)) {
+        const std::string t = text::trim_space(raw);
+        if (block == Comment) {
+            if (t.find("-->") != std::string::npos) block = Plain;
+            continue;
+        }
+        if (block == Hide) {
+            if (t == "<!-- /console -->") block = Plain;
+            continue;
+        }
+        if (block == Only && t == "-->") {
+            block = Plain;
+            continue;
+        }
+        if (block == Plain && text::starts_with(t, "<!--")) {
+            const bool closed = t.size() >= 7 && t.compare(t.size() - 3, 3, "-->") == 0;
+            if (t == "<!-- console:hide -->") block = Hide;
+            else if (t == "<!-- console:only") block = Only;
+            else if (closed && text::starts_with(t, "<!-- console:"))
+                out.push_back(text::trim_space(t.substr(13, t.size() - 16)));
+            else if (!closed) block = Comment;
+            continue;
+        }
+        // Its own heading; the next one ("## 🖼️ On screen") ends the notes.
+        if (text::starts_with(t, "## ")) {
+            if (heading_seen) break;
+            heading_seen = true;
+            continue;
+        }
+        // The download and count lines, the anchors: GitHub's page only.
+        if (text::starts_with(t, "<p>") || text::starts_with(t, "<a name=")) continue;
+        std::string line = raw;
+        for (size_t at; (at = trailing_reference(line)) != std::string::npos;) line.erase(at);
+        out.push_back(line);
+    }
+    while (!out.empty() && text::trim_space(out.back()).empty()) out.pop_back();
+    size_t first = 0;
+    while (first < out.size() && text::trim_space(out[first]).empty()) first++;
+    std::string text = join(std::vector<std::string>(out.begin() + (long)first, out.end()));
+    if (!text.empty()) text.pop_back();
+    return text;
+}
 }   // namespace
 
 const char* key(Which which)
@@ -104,6 +171,7 @@ const char* key(Which which)
         case Which::Atmosphere: return "atmosphere";
         case Which::Hekate: return "hekate";
         case Which::Firmware: return "firmware";
+        case Which::PlayGuard: return "playguard";
     }
     return "";
 }
@@ -114,23 +182,36 @@ const char* product(Which which)
         case Which::Atmosphere: return "Atmosphère";
         case Which::Hekate: return "hekate";
         case Which::Firmware: return "";
+        case Which::PlayGuard: return "PlayGuard";
     }
     return "";
 }
 
 List& Cache::of(Which which)
 {
-    return which == Which::Atmosphere ? atmosphere : which == Which::Hekate ? hekate : firmware;
+    switch (which) {
+        case Which::Atmosphere: return atmosphere;
+        case Which::Hekate: return hekate;
+        case Which::PlayGuard: return playguard;
+        case Which::Firmware: break;
+    }
+    return firmware;
 }
 
 const List& Cache::of(Which which) const
 {
-    return which == Which::Atmosphere ? atmosphere : which == Which::Hekate ? hekate : firmware;
+    return const_cast<Cache*>(this)->of(which);
 }
 
 const char* repo(Which which)
 {
-    return which == Which::Atmosphere ? "Atmosphere-NX/Atmosphere" : which == Which::Hekate ? "CTCaer/hekate" : "";
+    switch (which) {
+        case Which::Atmosphere: return "Atmosphere-NX/Atmosphere";
+        case Which::Hekate: return "CTCaer/hekate";
+        case Which::PlayGuard: return "JigSawFr/PlayGuard";
+        case Which::Firmware: break;
+    }
+    return "";
 }
 
 bool parse_github(const std::string& text, Which which, std::vector<Release>* out, size_t keep)
@@ -151,7 +232,8 @@ bool parse_github(const std::string& text, Which which, std::vector<Release>* ou
             const std::string page = json_util::string_at(r, "html_url");
             if (https_on(page, "github.com")) x.page = safe_text::clean(page, 512, false);
             const std::string body = cut_notes(json_util::string_at(r, "body"));
-            x.supports = supported_firmware(body);
+            // PlayGuard's notes name the firmware it was checked on, not one it needs.
+            if (which != Which::PlayGuard) x.supports = supported_firmware(body);
             x.notes = trim_notes(which, body);
             out->push_back(x);
         }
@@ -161,6 +243,7 @@ bool parse_github(const std::string& text, Which which, std::vector<Release>* ou
 
 std::string trim_notes(Which which, const std::string& md)
 {
+    if (which == Which::PlayGuard) return trim_playguard(md);
     const std::vector<std::string> lines = text::lines(md);
     std::vector<std::string> out;
     bool skipping = false;
@@ -465,7 +548,7 @@ Need need_for(const List& list, const std::string& installed, const std::string&
 std::string encode(const Cache& cache)
 {
     json j = json::object();
-    for (Which w : { Which::Atmosphere, Which::Hekate, Which::Firmware }) {
+    for (Which w : ALL) {
         const List& l = cache.of(w);
         json releases = json::array();
         for (const Release& r : l.releases) {
@@ -485,7 +568,7 @@ bool decode(const std::string& text, Cache* out)
     Cache c;
     const bool ok = json_util::parse_with(text, [&c](const json& j) {
         if (!j.is_object()) return false;
-        for (Which w : { Which::Atmosphere, Which::Hekate, Which::Firmware }) {
+        for (Which w : ALL) {
             const auto it = j.find(key(w));
             if (it == j.end() || !it->is_object()) continue;
             List& l = c.of(w);

@@ -1,4 +1,5 @@
-// SysNotesActivity — Console › Atmosphère, hekate or Firmware: the
+// SysNotesActivity — Console › Atmosphère, hekate or Firmware, or About ›
+// Release notes (PlayGuard's): the
 // release notes of the installed version, of each newer one and, in the
 // tabs left, of the older ones, a tab each (util/sys_notes.hpp's tabs(): at
 // most five newer ones, six tabs). Ⓛ / Ⓡ move from one tab to the next

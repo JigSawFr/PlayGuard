@@ -1,6 +1,6 @@
 // sys_notes — the release notes of what the console runs on, for the
-// Console tab (activity/sys_notes_activity.hpp): Atmosphère's and hekate's from
-// their GitHub releases (GET /repos/…/releases: one request, each release's
+// Console tab (activity/sys_notes_activity.hpp), and of PlayGuard itself, for
+// About: Atmosphère's, hekate's and PlayGuard's from their GitHub releases (GET /repos/…/releases: one request, each release's
 // notes included), the firmware's from switchbrew (its System_Versions table,
 // then one page per version, as wikitext). Each release keeps the newest
 // firmware its notes say it supports, so the Console tab can say when a firmware is
@@ -22,11 +22,15 @@ enum class Which
     Atmosphere,
     Hekate,
     Firmware,
+    PlayGuard,
 };
+constexpr Which ALL[] = { Which::Atmosphere, Which::Hekate, Which::Firmware, Which::PlayGuard };
+constexpr size_t COUNT = sizeof(ALL) / sizeof(ALL[0]);
 
-// "atmosphere", "hekate", "firmware" (the keys of the cache and of sys_updates).
+// "atmosphere", "hekate", "firmware", "playguard" (the keys of the cache and,
+// but for PlayGuard, of sys_updates).
 const char* key(Which which);
-// "Atmosphère", "hekate", "" (the firmware's name is translated).
+// "Atmosphère", "hekate", "", "PlayGuard" (the firmware's name is translated).
 const char* product(Which which);
 
 // The releases kept per product, the newer ones a screen shows at most
@@ -54,14 +58,14 @@ struct List
 
 struct Cache
 {
-    List atmosphere, hekate, firmware;
+    List atmosphere, hekate, firmware, playguard;
     List&       of(Which which);
     const List& of(Which which) const;
 };
 
 // --- GitHub -------------------------------------------------------------------
 
-// The repository of Atmosphère or hekate ("Atmosphere-NX/Atmosphere").
+// The repository of Atmosphère, hekate or PlayGuard ("Atmosphere-NX/Atmosphere").
 const char* repo(Which which);
 
 // A release list (GET /repos/…/releases) into `out`, newest first as listed:
@@ -73,6 +77,11 @@ bool parse_github(const std::string& json, Which which, std::vector<Release>* ou
 // stand alone (hekate's banner) go, and so do what does not describe the
 // release (hekate's FAQ and empty Download section; Atmosphère's notes of
 // the previous release, repeated under "And the following was changed in").
+// PlayGuard's: the console's own lines read as changelog.hpp reads them
+// ("<!-- console: … -->", "console:only", "console:hide"), its heading (the
+// screen's title says it) and the download and count lines dropped, and
+// what follows the notes (screenshots, install, build) left out; each
+// change without its pull-request and commit references.
 std::string trim_notes(Which which, const std::string& md);
 
 // The newest firmware a release's notes say it supports ("" when none is

@@ -35,6 +35,7 @@ class AboutTab : public TabBase
     BRLS_BIND(brls::Header,      changelog_header, "ab_changelog_header");
     BRLS_BIND(brls::Box,         changelog,        "ab_changelog");
     BRLS_BIND(brls::DetailCell,  changelog_full,   "ab_changelog_full");
+    BRLS_BIND(brls::DetailCell,  notes,            "ab_notes");
     BRLS_BIND(brls::Label,       changelog_note,   "ab_changelog_note");
     BRLS_BIND(brls::DetailCell,  help,             "ab_help");
     BRLS_BIND(brls::DetailCell,  author,           "ab_author");

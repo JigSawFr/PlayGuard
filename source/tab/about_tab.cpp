@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/about_tab.hpp"
 
+#include "action/sys_notes_flow.hpp"
 #include "action/update_flow.hpp"
 #include "activity/changelog_activity.hpp"
 #include "app.hpp"
@@ -77,6 +78,12 @@ void AboutTab::fill_changelog()
         brls::Application::pushActivity(new ChangelogActivity());
         return true;
     });
+    // Every version's notes, from the releases on GitHub, as for Atmosphère
+    // and hekate (Console): the installed one, the newer and the older ones.
+    notes->registerClickAction([](brls::View*) {
+        sys_notes_flow::open(sys_notes::Which::PlayGuard);
+        return true;
+    });
 }
 
 void AboutTab::count_version_press()
@@ -107,6 +114,10 @@ void AboutTab::refresh()
     update_cell->setDetailText(cfg.update_checked.empty() ? "" : brls::getStr("playguard/tools/update_last", cfg.update_checked));
     update_daily->setOn(cfg.update_daily, false);
     update_via->setDetailText(update_flow::method_text());
+    // With the newer release the last update check found, as in Console.
+    bool newer = false;
+    notes->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::PlayGuard, &newer)));
+    notes->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
 
     SysInfo si;
     sysinfo_get(&si);
