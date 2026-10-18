@@ -66,7 +66,8 @@ other scenario runs the classic lists, which their key presses follow, and
 the Cadran tabs are those same tabs under their boards' tops): every tab,
 then the child screen and back with the PIN, a day of the week edited with
 the stick and saved, a restriction level's confirmation, the appearance
-picker, the network clock's screen and a game's screen from its card.
+picker, the network clock's screen, a game's screen from its card and the
+notification bell's list.
 
 The "loading" scenario stops the start-up on the loading screen
 (PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
@@ -1183,6 +1184,12 @@ if CADRAN:
     key("Return")
     time.sleep(1)              # the screen's own entrance over
     shot("19_game")
+    key("Escape")
+
+    # The notification bell's list (Y, the keyboard's y), its entries in cards.
+    key("y")
+    time.sleep(1)              # the screen's own entrance over
+    shot("20_notices")
     key("Escape")
     finish()
 if ALARM:

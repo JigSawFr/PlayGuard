@@ -73,6 +73,10 @@ class List
     // column): a tab (`sub_screen` false: the rail at its left) or a screen
     // of its own (wider margins).
     explicit List(brls::View* tab, bool sub_screen = false);
+    // A column built by its screen's own code (`column`, under `screen`, whose
+    // ids it looks up), its padding left as it is: a list rebuilt as its
+    // entries change dresses each new column before showing it.
+    List(brls::View* screen, brls::Box* column);
 
     // The column of lines (nullptr when the tab has none).
     brls::Box* content() const { return this->box; }

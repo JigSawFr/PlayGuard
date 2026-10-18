@@ -211,6 +211,11 @@ cadran::List::List(brls::View* tab, bool sub_screen)
     else this->box->setPadding(4, 48, 32, 28);
 }
 
+cadran::List::List(brls::View* screen, brls::Box* column)
+    : tab(screen), box(column)
+{
+}
+
 void cadran::List::park(const std::vector<const char*>& ids)
 {
     if (!this->box) return;
