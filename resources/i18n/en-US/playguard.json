@@ -1516,7 +1516,9 @@
             "next_with_extra": "With {} more, time is up around {}",
             "next_with_extra_bed": "With {} more, the bedtime alarm at {} still comes first",
             "head_unlocked": "{} limit on hold",
-            "pc_lifted": "Lifted until turned back on"
+            "pc_lifted": "Lifted until turned back on",
+            "limit": "Today's limit…",
+            "bed_in": "in {}"
         },
         "pill": {
             "pc_on": "Parental controls on",

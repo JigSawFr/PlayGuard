@@ -46,10 +46,13 @@ TitleState::TitleState(Kind kind)
     this->setAlignSelf(brls::AlignSelf::CENTER);
     this->setMarginLeft(14);
     // A tap goes where it is undone (hitTest finds it, focusable or not).
-    this->addGestureRecognizer(new brls::TapGestureRecognizer(this, [kind]() {
-        if (kind == Kind::UNLOCKED) open_unlocked();
-        else open_read_only();
-    }));
+    this->addGestureRecognizer(new brls::TapGestureRecognizer(this, [kind]() { open(kind); }));
+}
+
+void TitleState::open(Kind kind)
+{
+    if (kind == Kind::UNLOCKED) open_unlocked();
+    else open_read_only();
 }
 
 void TitleState::show(brls::AppletFrame* frame, Kind kind, bool shown)

@@ -22,6 +22,7 @@
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "view/cadran_icon.hpp"
+#include "view/title_state.hpp"
 
 using namespace brls::literals;
 
@@ -232,6 +233,20 @@ void tint_rail(const std::vector<brls::SidebarItem*>& items, brls::SidebarItem* 
 
 namespace
 {
+// The header's pill: not focusable, but a tap reaches it (brls::View::hitTest
+// skips a view that cannot take the focus).
+class HeaderPill : public brls::Box
+{
+  public:
+    HeaderPill() : brls::Box(brls::Axis::ROW) {}
+
+    brls::View* hitTest(brls::Point point) override
+    {
+        if (this->getAlpha() == 0.0f || this->getVisibility() != brls::Visibility::VISIBLE) return nullptr;
+        return this->getFrame().pointInside(point) ? this : nullptr;
+    }
+};
+
 // The main screen's pill (style_frame): its label and icon, and the pill for
 // hiding and colouring it.
 brls::Box*   s_main_pill = nullptr;
@@ -300,7 +315,7 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
     auto* right = new brls::Box(brls::Axis::ROW);
     right->setAlignItems(brls::AlignItems::CENTER);
     const NVGcolor ink = filled ? theme["cadran/pill_ok_ink"] : theme["cadran/text2"];
-    auto* pill = new brls::Box(brls::Axis::ROW);
+    auto* pill = new HeaderPill();
     pill->setAlignItems(brls::AlignItems::CENTER);
     pill->setHeight(32);
     pill->setPaddingLeft(14);
@@ -322,6 +337,10 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
     pill->addView(pill_label);
     right->addView(pill);
     if (with_date) {   // the main screen: its pill is the one set_pill() changes
+        // Touched while unlocked, it goes where the padlock it replaces went.
+        pill->addGestureRecognizer(new brls::TapGestureRecognizer(pill, []() {
+            if (ui::known_unlocked()) TitleState::open(TitleState::Kind::UNLOCKED);
+        }));
         s_main_pill = pill;
         s_main_pill_label = pill_label;
         s_main_pill_icon = glyph;
@@ -468,14 +487,15 @@ CadranTab::CadranTab()
     this->next->setVisibility(brls::Visibility::GONE);
     today_text->addView(this->next, 2);
     this->list.park({ "dash_gauge", "dash_extra", "dash_stop", "dash_remaining", "dash_bedtime", "dash_pc", "dash_pin",
-                      "dash_level", "dash_clock", "dash_pairing", "dash_serial", "dash_patches", "dash_fw", "dash_compat" });
+                      "dash_level", "dash_clock", "dash_pairing", "dash_serial", "dash_patches", "dash_fw", "dash_compat",
+                      "dash_today_limit", "dash_unlocked_banner" });
     if (gauge_box) gauge_box->setVisibility(brls::Visibility::GONE);   // emptied
     // The Overview's section titles: their lines are up there now.
     for (brls::View* line : column->getChildren())
         if (dynamic_cast<brls::Header*>(line)) line->setVisibility(brls::Visibility::GONE);
-    this->list.apply({ { "dash_first_steps", "sparkle" }, { "dash_outside", "alert" }, { "dash_today_limit", "timer" },
-                       { "dash_extra_pending", "refresh" }, { "dash_alarm", "bell" }, { "dash_unlocked_banner", "unlock" } });
-    this->list.banners({ "dash_first_steps", "dash_unlocked_banner", "dash_outside" });
+    this->list.apply({ { "dash_first_steps", "sparkle" }, { "dash_outside", "alert" },
+                       { "dash_extra_pending", "refresh" }, { "dash_alarm", "bell" } });
+    this->list.banners({ "dash_first_steps", "dash_outside" });
 
     // The buttons' icons, before their label.
     CadranIcon* plus = kit::icon("plus", 20, "cadran/navy");
@@ -490,8 +510,31 @@ CadranTab::CadranTab()
     eye->setMarginRight(10);
     child->addView(eye, 0);
     child->setAlignItems(brls::AlignItems::CENTER);
+    CadranIcon* lock = kit::icon("lock", 20, "cadran/navy");
+    lock->setMarginRight(10);
+    relock->addView(lock, 0);
+    relock->setAlignItems(brls::AlignItems::CENTER);
+    CadranIcon* timer = kit::icon("timer", 18, "cadran/text2");
+    timer->setMarginRight(10);
+    limit->addView(timer, 0);
+    limit->setAlignItems(brls::AlignItems::CENTER);
+    // Stop, the child screen, today's limit: on a second line when a
+    // language needs the room.
+    kit::wrap(actions2.getView());
+    YGNodeStyleSetGap(actions2->getYGNode(), YGGutterColumn, 12);
+    YGNodeStyleSetGap(actions2->getYGNode(), YGGutterRow, 10);
 
-    // The Overview's own actions, from where they are shown now.
+    // The Overview's own actions, from where they are shown now: turning
+    // parental controls back on (its banner's) and today's limit (its line's)
+    // with them.
+    relock->registerClickAction([this](brls::View*) {
+        kit::press(this->getView("dash_unlocked_banner"));
+        return true;
+    });
+    limit->registerClickAction([this](brls::View*) {
+        kit::press(this->getView("dash_today_limit"));
+        return true;
+    });
     extra->registerClickAction([this](brls::View*) {
         kit::press(this->getView("dash_extra"));
         return true;
@@ -514,6 +557,7 @@ CadranTab::CadranTab()
             this->show_next(this->unlocked_now);
         });
         chips->addView(amount);
+        this->amount_chips.push_back(amount);
     }
     stop->registerClickAction([this](brls::View*) {
         kit::press(this->getView("dash_stop"));
@@ -625,6 +669,29 @@ void CadranTab::show_next(bool unlocked)
     ui::set_visible(this->next, !text.empty());
 }
 
+void CadranTab::show_low(bool unlocked)
+{
+    // Little or no time left today: the first amount stands out, the one
+    // most likely wanted.
+    const PtState& pt = this->pt;
+    const int today = ui::today_weekday();
+    bool low = false;
+    if (!unlocked && pt.fw_supported && pt.valid && pt.enabled_valid && pt.enabled && pt.day_min[today] != PT_DAY_NOLIMIT) {
+        constexpr int64_t QUARTER_NS = 15LL * 60 * 1000000000LL;
+        const bool up = pt_logic::over_limit_min(pt, today) >= 0 || (pt.restricted_valid && pt.restricted);
+        low = up || (pt.remaining_valid && pt.remaining_ns > 0 && pt.remaining_ns <= QUARTER_NS);
+    }
+    brls::Theme theme = brls::Application::getTheme();
+    for (size_t i = 0; i < this->amount_chips.size(); i++) {
+        brls::Box* chip = this->amount_chips[i];
+        const bool lit = low && i == 0;
+        chip->setBackgroundColor(lit ? theme["cadran/teal_fill"] : theme["cadran/surf2"]);
+        chip->setBorderThickness(lit ? 0 : 1);
+        for (brls::View* v : chip->getChildren())
+            if (auto* digits = dynamic_cast<CadranDigits*>(v)) digits->setTextColor(lit ? theme["cadran/navy"] : theme["cadran/text"]);
+    }
+}
+
 void CadranTab::show_cards(bool unlocked, bool has_pin)
 {
     brls::Theme theme = brls::Application::getTheme();
@@ -637,9 +704,16 @@ void CadranTab::show_cards(bool unlocked, bool has_pin)
         bed_value->setText(fmt::format("{:02d}:{:02d}", pt.bedtime_hour, pt.bedtime_minute));
         bed_state->setText(pt.bedtime_enabled ? "playguard/cadran/today/on"_i18n : "playguard/cadran/today/off"_i18n);
         bed_state->setTextColor(pt.bedtime_enabled ? theme["cadran/teal"] : theme["cadran/text2"]);
-        bed_sub->setText(pt.bedtime_reset_valid ? brls::getStr("playguard/cadran/today/bed_sub",
-                                                               fmt::format("{:02d}:{:02d}", pt.bedtime_reset_hour, pt.bedtime_reset_minute))
-                                                : "");
+        std::string sub;
+        if (pt.bedtime_reset_valid) {
+            sub = brls::getStr("playguard/cadran/today/bed_sub", fmt::format("{:02d}:{:02d}", pt.bedtime_reset_hour, pt.bedtime_reset_minute));
+        } else if (pt.bedtime_enabled) {
+            // No morning time from the console: in how long the alarm rings.
+            const LocalTime now = ui::local_now();
+            const int in = (pt.bedtime_hour * 60 + pt.bedtime_minute) - (now.hour * 60 + now.minute);
+            if (in > 0) sub = brls::getStr("playguard/cadran/today/bed_in", ui::fmt_minutes((uint16_t)in));
+        }
+        bed_sub->setText(sub);
     } else {
         bed_value->setText("—");
         bed_state->setText("");
@@ -751,6 +825,9 @@ void CadranTab::refresh()
     cadran::kit::follow(extra.getView(), this->getView("dash_extra"));
     cadran::kit::follow(chips.getView(), this->getView("dash_extra"));
     cadran::kit::follow(stop.getView(), this->getView("dash_stop"));
+    cadran::kit::follow(limit.getView(), this->getView("dash_today_limit"));
+    ui::set_visible(relock.getView(), unlocked && !app::read_only());
+    this->show_low(unlocked);
 }
 
 brls::View* CadranTab::create() { return new CadranTab(); }

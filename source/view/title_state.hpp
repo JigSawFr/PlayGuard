@@ -19,6 +19,9 @@ class TitleState : public brls::View
     // The icon of `kind` in `frame`'s title row (both added after the title
     // the first time), shown or hidden.
     static void show(brls::AppletFrame* frame, Kind kind, bool shown);
+    // Where `kind` is undone, as a tap on its icon goes (Cadran's header pill
+    // says "unlocked" instead of the padlock, and goes there too).
+    static void open(Kind kind);
 
     void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
               brls::FrameContext* ctx) override;

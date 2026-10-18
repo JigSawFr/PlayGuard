@@ -1516,7 +1516,9 @@
             "next_with_extra": "Mit {} mehr ist die Zeit gegen {} um",
             "next_with_extra_bed": "Auch mit {} mehr kommt der Gute-Nacht-Alarm um {} zuerst",
             "head_unlocked": "Limit von {} ausgesetzt",
-            "pc_lifted": "Aufgehoben bis zur Reaktivierung"
+            "pc_lifted": "Aufgehoben bis zur Reaktivierung",
+            "limit": "Heutiges Limit…",
+            "bed_in": "in {}"
         },
         "pill": {
             "pc_on": "Jugendschutz aktiv",

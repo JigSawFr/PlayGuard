@@ -1516,7 +1516,9 @@
             "next_with_extra": "Con {} in più, il tempo scade verso le {}",
             "next_with_extra_bed": "Con {} in più, Sogni d'oro alle {} arriva prima",
             "head_unlocked": "Limite di {} in pausa",
-            "pc_lifted": "Sospeso fino alla riattivazione"
+            "pc_lifted": "Sospeso fino alla riattivazione",
+            "limit": "Limite di oggi…",
+            "bed_in": "tra {}"
         },
         "pill": {
             "pc_on": "Filtro famiglia attivo",

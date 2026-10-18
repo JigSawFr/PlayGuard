@@ -88,9 +88,13 @@ class CadranTab : public DashboardTab
     // and whether parental controls were unlocked at the last refresh.
     int  preview_extra = 0;
     bool unlocked_now  = false;
+    // The extra-time amounts' chips, the first one standing out when little
+    // time is left (show_low).
+    std::vector<brls::Box*> amount_chips;
 
     void show_ring(bool unlocked);
     void show_next(bool unlocked);
+    void show_low(bool unlocked);
     void show_cards(bool unlocked, bool has_pin);
     void show_pills();
 
@@ -98,10 +102,13 @@ class CadranTab : public DashboardTab
     BRLS_BIND(brls::Label,  kicker,      "cad_kicker");
     BRLS_BIND(brls::Box,    today_text,  "cad_today_text");
     BRLS_BIND(brls::Box,    actions,     "cad_actions");
+    BRLS_BIND(brls::Button, relock,      "cad_relock");
     BRLS_BIND(brls::Button, extra,       "cad_extra");
     BRLS_BIND(brls::Box,    chips,       "cad_chips");
     BRLS_BIND(brls::Button, stop,        "cad_stop");
     BRLS_BIND(brls::Button, child,       "cad_child");
+    BRLS_BIND(brls::Box,    actions2,    "cad_actions2");
+    BRLS_BIND(brls::Button, limit,       "cad_limit");
     BRLS_BIND(brls::Box,    bed_card,    "cad_bed_card");
     BRLS_BIND(brls::Label,  bed_state,   "cad_bed_state");
     BRLS_BIND(CadranDigits, bed_value,   "cad_bed_value");

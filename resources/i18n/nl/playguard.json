@@ -1516,7 +1516,9 @@
             "next_with_extra": "Met {} extra is de tijd om rond {}",
             "next_with_extra_bed": "Met {} extra komt het bedtijdalarm om {} eerst",
             "head_unlocked": "Limiet van {} gepauzeerd",
-            "pc_lifted": "Opgeheven tot het weer aan staat"
+            "pc_lifted": "Opgeheven tot het weer aan staat",
+            "limit": "Limiet vandaag…",
+            "bed_in": "over {}"
         },
         "pill": {
             "pc_on": "Ouderlijk toezicht actief",

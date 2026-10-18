@@ -1516,7 +1516,9 @@
             "next_with_extra": "Con {} más, se acaba el tiempo hacia las {}",
             "next_with_extra_bed": "Con {} más, la alarma de hora de dormir de las {} llega antes",
             "head_unlocked": "Límite de {} en pausa",
-            "pc_lifted": "Desactivado hasta reactivarlo"
+            "pc_lifted": "Desactivado hasta reactivarlo",
+            "limit": "Límite de hoy…",
+            "bed_in": "dentro de {}"
         },
         "pill": {
             "pc_on": "Control parental activo",

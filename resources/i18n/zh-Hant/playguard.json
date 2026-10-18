@@ -1516,7 +1516,9 @@
             "next_with_extra": "增加{}後，約{}時間到",
             "next_with_extra_bed": "即使增加{}，{}的就寢鬧鐘也會先響",
             "head_unlocked": "{}的限制已暫停",
-            "pc_lifted": "已解除，直到重新啟用"
+            "pc_lifted": "已解除，直到重新啟用",
+            "limit": "今天的上限…",
+            "bed_in": "還有{}"
         },
         "pill": {
             "pc_on": "家長監護已開啟",
