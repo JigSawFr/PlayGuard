@@ -294,6 +294,11 @@ int tab_count(const std::string& tab)
     return s_store.tab_count(tab);
 }
 
+int count_of(const std::vector<std::string>& ids)
+{
+    return s_store.count_of(ids);
+}
+
 int listen(std::function<void()> fn)
 {
     const int id = s_next_listener++;

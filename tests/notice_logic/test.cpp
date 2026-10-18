@@ -79,6 +79,11 @@ static void test_tabs()
     CHECK(s.tab_count("security") == 1);
     s.clear("unlocked");
     CHECK(s.tab_count("security") == 0);
+
+    // A row's badge: the entries to do among its ids.
+    CHECK(s.count_of({ "games", "clock" }) == 2);
+    CHECK(s.count_of({ "pin_weak", "pairing" }) == 0);   // ignored, for information
+    CHECK(s.count_of({}) == 0);
 }
 
 static void test_fixed_order()

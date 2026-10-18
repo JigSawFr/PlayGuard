@@ -52,6 +52,12 @@ ConsoleTab::ConsoleTab()
     }
     sys_advice->setSingleLine(false);
 
+    // What the notification bell says is to do here, on its row.
+    this->mark(clock.getView(), { "clock" });
+    this->mark(games.getView(), { "games" });
+    this->mark(storage.getView(), { "sd_space" });
+    this->mark(game_patches.getView(), { "patches" });
+
     // On a firmware newer than the checked one, the firmware screen again.
     compat->registerClickAction([](brls::View*) {
         if (fw_gate::needed()) brls::Application::pushActivity(new FirmwareGateActivity());

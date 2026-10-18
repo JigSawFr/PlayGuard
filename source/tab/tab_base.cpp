@@ -1,8 +1,10 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/tab_base.hpp"
 
+#include "action/notices.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
+#include "view/tab_badge.hpp"
 
 using namespace brls::literals;
 
@@ -23,6 +25,36 @@ TabBase::TabBase(const std::string& xml_res, bool refreshes)
 TabBase::~TabBase()
 {
     if (s_shown == this) s_shown = nullptr;
+    if (this->notice_listener) notices::unlisten(this->notice_listener);
+}
+
+void TabBase::mark(brls::Box* row, std::vector<std::string> ids)
+{
+    TabBadge* badge = TabBadge::on_row(row);
+    if (!badge) return;
+    this->marks.push_back({ row, badge, std::move(ids) });
+    if (!this->notice_listener) this->notice_listener = notices::listen([this]() { this->update_marks(); });
+    this->update_marks();
+}
+
+void TabBase::update_marks()
+{
+    for (const auto& m : this->marks) m.badge->set_count(notices::count_of(m.ids));
+}
+
+brls::View* TabBase::getDefaultFocus()
+{
+    // Only the first time: back from the sidebar later, the row left.
+    if (!this->focused_once)
+        for (const auto& m : this->marks)
+            if (m.row->getVisibility() == brls::Visibility::VISIBLE && notices::count_of(m.ids) > 0) return m.row;
+    return brls::Box::getDefaultFocus();
+}
+
+void TabBase::onChildFocusGained(brls::View* directChild, brls::View* focusedView)
+{
+    brls::Box::onChildFocusGained(directChild, focusedView);
+    this->focused_once = true;
 }
 
 void TabBase::update_ro_note()

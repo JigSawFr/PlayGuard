@@ -7,6 +7,9 @@
 
 #include <borealis.hpp>
 #include <string>
+#include <vector>
+
+class TabBadge;
 
 class TabBase : public brls::Box
 {
@@ -24,6 +27,11 @@ class TabBase : public brls::Box
     // mode changed).
     static void refresh_shown();
 
+    // Entered from the sidebar for the first time: the first row marked with
+    // something to do (mark), else the first row.
+    brls::View* getDefaultFocus() override;
+    void        onChildFocusGained(brls::View* directChild, brls::View* focusedView) override;
+
   protected:
     virtual void refresh() = 0;
 
@@ -32,8 +40,25 @@ class TabBase : public brls::Box
     // editor). Tabs are deleted when another one is opened, which stops it.
     void enable_auto_refresh(int period_ms);
 
+    // `row` (a DetailCell) is where the notification bell's entries `ids`
+    // are fixed: while some are to do, their number on a badge by its title,
+    // as the sidebar has by the tab's name. Marked in the order of the tab.
+    void mark(brls::Box* row, std::vector<std::string> ids);
+
   private:
     brls::RepeatingTimer auto_timer;
+
+    struct Mark
+    {
+        brls::Box*               row;
+        TabBadge*                badge;
+        std::vector<std::string> ids;
+    };
+    std::vector<Mark> marks;
+    int               notice_listener = 0;
+    bool              focused_once    = false;
+
+    void update_marks();
 
     void update_ro_note();
 };

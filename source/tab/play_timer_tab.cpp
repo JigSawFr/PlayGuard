@@ -43,6 +43,8 @@ PlayTimerTab::PlayTimerTab()
     bedtime_note->setSingleLine(false);
     limit_note->setSingleLine(false);
     ui::init_unlock_banner(unlocked_banner, [this]() { this->refresh(); });
+    // The "time's up" alarm is a switch of Advanced.
+    this->mark(advanced.getView(), { "alarm_off" });
     this->enable_auto_refresh(5000);
 
     // ←/→ pick a day, A opens the per-day editor on it (its picker open):
