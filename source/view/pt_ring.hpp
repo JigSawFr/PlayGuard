@@ -1,5 +1,6 @@
 // PtRing — Cadran: today's play time as a ring (the brand mark),
-// the time left in big digits in the middle. Teal → amber (≥ 75 %) → coral
+// the time left in big digits in the middle, made smaller when they would
+// come near the ring (a margin inside it). Teal → amber (≥ 75 %) → coral
 // (limit reached); the numbers are always written too, never colour alone.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -32,6 +33,9 @@ class PtRing : public brls::Box
 
   private:
     float used = -1.0f;
+    // The figure's width at most: what the ring's inside leaves at its height,
+    // less a margin (from the ring's size, as set).
+    void fit();
     bool show_left = false;
     CadranDigits* value  = nullptr;
     brls::Label* caption = nullptr;

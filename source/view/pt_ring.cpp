@@ -4,6 +4,18 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
+#include <yoga/Yoga.h>
+
+namespace
+{
+// The ring's stroke and radius for its size (the boards: a 20 stroke at 256,
+// 26 at 340).
+float stroke_of(float size) { return size * 20.0f / 256.0f; }
+float radius_of(float size) { return size / 2.0f - stroke_of(size) / 2.0f - 4.0f; }
+// The share of the inside's diameter the figure may take: about 30 px of the
+// inside left on each side of "40 min" on the Overview's ring.
+constexpr float FIGURE_SHARE = 0.70f;
+}   // namespace
 
 PtRing::PtRing()
 {
@@ -22,6 +34,7 @@ PtRing::PtRing()
     this->setFocusable(false);
 
     this->value = new CadranDigits();
+    this->value->setSmallUnits(true);   // "40 min": the figures large
     this->value->setFontSize(58);
     this->value->setText("—");
     this->addView(this->value);
@@ -35,10 +48,26 @@ PtRing::PtRing()
 }
 
 void PtRing::setFraction(float value) { this->used = value > 1.0f ? 1.0f : value; }
-void PtRing::setValue(const std::string& text) { this->value->setText(text); }
+void PtRing::setValue(const std::string& text)
+{
+    this->value->setText(text);
+    this->fit();
+}
 void PtRing::setCaption(const std::string& text) { this->caption->setText(text); }
 void PtRing::setShowLeft(bool left) { this->show_left = left; }
-void PtRing::setValueSize(float size) { this->value->setFontSize(size); }
+void PtRing::setValueSize(float size)
+{
+    this->value->setFontSize(size);
+    this->fit();
+}
+
+void PtRing::fit()
+{
+    const YGValue width = YGNodeStyleGetWidth(this->getYGNode());
+    const float size = width.unit == YGUnitPoint ? width.value : 256.0f;
+    const float inside = 2.0f * (radius_of(size) - stroke_of(size) / 2.0f);
+    this->value->setFitWidth(inside * FIGURE_SHARE);
+}
 void PtRing::setCaptionSize(float size) { this->caption->setFontSize(size); }
 
 void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
@@ -47,9 +76,9 @@ void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
     // PLAYGUARD_SIM_CADRAN_NORING=1 draws the labels alone (cost of the arcs).
     static const bool no_ring = std::getenv("PLAYGUARD_SIM_CADRAN_NORING") != nullptr;
     if (no_ring) { brls::Box::draw(vg, x, y, width, height, style, ctx); return; }
-    const float stroke = std::min(width, height) * 20.0f / 256.0f;   // the boards: 20 at 256, 26 at 340
+    const float stroke = stroke_of(std::min(width, height));
     const float cx = x + width / 2.0f, cy = y + height / 2.0f;
-    const float r = std::min(width, height) / 2.0f - stroke / 2.0f - 4.0f;
+    const float r = radius_of(std::min(width, height));
 
     nvgBeginPath(vg);
     nvgCircle(vg, cx, cy, r);
