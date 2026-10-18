@@ -570,7 +570,9 @@
         "unlink_err": "Smart-Geräte-App konnte nicht getrennt werden",
         "note": "Solange die Konsole verknüpft bleibt, überschreibt die Smart-Geräte-App die hier vorgenommenen Einstellungen bei ihrer nächsten Synchronisierung.",
         "decode": "Vor dem Trennen: zwei Einstellungen entschlüsseln",
-        "decode_note": "Vor dem Trennen kann diese Konsole helfen, „nur Alarm“ und den Gute-Nacht-Alarm pro Tag zu entschlüsseln (Geheimzahl, 2 Min.): Nach dem Trennen geht das nicht mehr."
+        "decode_note": "Vor dem Trennen kann diese Konsole helfen, „nur Alarm“ und den Gute-Nacht-Alarm pro Tag zu entschlüsseln (Geheimzahl, 2 Min.): Nach dem Trennen geht das nicht mehr.",
+        "dns_blocked": "Sync blockiert (DNS)",
+        "dns_note": "Die DNS-Umleitung von Atmosphère (atmosphere/hosts) leitet Nintendos Jugendschutz-Server um: Die Smart-Geräte-App kann sich nicht synchronisieren und überschreibt die hier vorgenommenen Einstellungen daher nicht."
     },
     "security": {
         "section_status": "Status",

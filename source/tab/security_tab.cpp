@@ -4,6 +4,7 @@
 #include "action/console_actions.hpp"
 #include "action/console_lock.hpp"
 #include "action/history_flow.hpp"
+#include "action/pairing_state.hpp"
 #include "action/pin_lock.hpp"
 #include "action/pt_block_flow.hpp"
 #include "action/pt_flow.hpp"
@@ -143,13 +144,17 @@ void SecurityTab::refresh()
                                        "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
     temp->setDetailTextColor(s.temp_unlocked_ok && s.temp_unlocked ? ui::color_warn() : ui::color_neutral());
 
-    // Companion app: while linked, its next sync overwrites what is set here.
+    // Companion app: while linked, its next sync overwrites what is set here,
+    // unless Atmosphère's DNS blocks its server (then the note says so).
     const bool paired = s.pairing_active_ok && s.pairing_active;
-    ui::set_detail(pr_active, ui::bool_text(s.pairing_active_ok, s.pairing_active,
-                                            "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
-    pr_active->setDetailTextColor(paired ? ui::color_warn() : ui::color_neutral());
+    const bool syncs = pairing_state::syncs(s);
+    std::string active = ui::bool_text(s.pairing_active_ok, s.pairing_active, "playguard/common/yes"_i18n, "playguard/common/no"_i18n);
+    if (paired && !syncs) active += " · " + "playguard/pairing/dns_blocked"_i18n;
+    ui::set_detail(pr_active, active);
+    pr_active->setDetailTextColor(syncs ? ui::color_warn() : ui::color_neutral());
     ui::set_detail(pr_updated, s.last_updated_ok ? ui::time_text(s.last_updated) : "playguard/common/unavailable"_i18n);
-    pr_note->setTextColor(paired ? ui::color_warn() : ui::color_note());
+    ui::set_text(pr_note, paired && !syncs ? "playguard/pairing/dns_note"_i18n : "playguard/pairing/note"_i18n);
+    pr_note->setTextColor(syncs ? ui::color_warn() : ui::color_note());
 
     ui::set_detail(pin_lock_cell, pin_lock::mode_text());
     ui::set_text(pin_lock_note, pin_lock::note_text());

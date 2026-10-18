@@ -570,7 +570,9 @@
         "unlink_err": "Kan de smartphone-app niet ontkoppelen",
         "note": "Zolang de console gekoppeld blijft, overschrijft de smartphone-app bij de volgende synchronisatie de instellingen die hier zijn gemaakt.",
         "decode": "Vóór het ontkoppelen: twee instellingen ontcijferen",
-        "decode_note": "Vóór het ontkoppelen kan deze console helpen 'alleen alarm' en bedtijd per dag te ontcijferen (Pincode, 2 min): na het ontkoppelen kan dat niet meer."
+        "decode_note": "Vóór het ontkoppelen kan deze console helpen 'alleen alarm' en bedtijd per dag te ontcijferen (Pincode, 2 min): na het ontkoppelen kan dat niet meer.",
+        "dns_blocked": "synchronisatie geblokkeerd (DNS)",
+        "dns_note": "De DNS-omleiding van Atmosphère (atmosphere/hosts) stuurt de server voor ouderlijk toezicht van Nintendo ergens anders heen: de smartphone-app kan niet synchroniseren en overschrijft de instellingen hier dus niet."
     },
     "security": {
         "section_status": "Status",

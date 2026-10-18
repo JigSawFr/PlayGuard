@@ -10,6 +10,7 @@
 
 #include "action/console_lock.hpp"
 #include "action/history_flow.hpp"
+#include "action/pairing_state.hpp"
 #include "action/pt_flow_internal.hpp"
 #include "action/pt_logic.hpp"
 #include "ui/ui.hpp"
@@ -28,7 +29,8 @@ std::string with_link_note(const std::string& body, const PctlStatus* st)
         pctl_status_fetch(&read);
         st = &read;
     }
-    if (!st->pairing_active_ok || !st->pairing_active) return body;
+    // Unlinked, or its server blocked by Atmosphère's DNS: nothing to say.
+    if (!pairing_state::syncs(*st)) return body;
     return body.empty() ? "playguard/pairing/note"_i18n : body + "\n\n" + "playguard/pairing/note"_i18n;
 }
 

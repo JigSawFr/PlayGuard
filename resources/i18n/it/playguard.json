@@ -570,7 +570,9 @@
         "unlink_err": "Impossibile scollegare l'app Filtro famiglia",
         "note": "Finché la console resta collegata, l'app Filtro famiglia sovrascrive le impostazioni effettuate qui alla sincronizzazione successiva.",
         "decode": "Prima di scollegare: decifra due impostazioni",
-        "decode_note": "Prima di scollegarla, questa console può aiutare a decifrare «solo notifica» e Sogni d'oro per giorno (PIN, 2 min): una volta scollegata, non potrà più farlo."
+        "decode_note": "Prima di scollegarla, questa console può aiutare a decifrare «solo notifica» e Sogni d'oro per giorno (PIN, 2 min): una volta scollegata, non potrà più farlo.",
+        "dns_blocked": "sincronizzazione bloccata (DNS)",
+        "dns_note": "Il reindirizzamento DNS di Atmosphère (atmosphere/hosts) devia il server del filtro famiglia di Nintendo: l'app non può sincronizzarsi, quindi non sovrascrive le impostazioni fatte qui."
     },
     "security": {
         "section_status": "Stato",

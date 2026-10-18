@@ -150,6 +150,7 @@ sys_updates_net_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net
 sys_updates_net_FLAGS := -std=c++17 -Isource -D__SWITCH__
 sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp source/sim/sim_net.cpp source/util/paths.cpp tests/sys_updates_net/test.cpp
 ntp_servers_SRC   := source/util/ntp_servers.cpp tests/ntp_servers/test.cpp
+dns_hosts_SRC   := source/util/dns_hosts.cpp tests/dns_hosts/test.cpp
 sys_notes_SRC   := source/util/date.cpp source/util/safe_text.cpp source/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
 icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp

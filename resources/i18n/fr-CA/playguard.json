@@ -570,7 +570,9 @@
         "unlink_err": "Impossible de dissocier l'application mobile",
         "note": "Tant que la console reste associée, l'application mobile écrase les réglages faits ici à sa prochaine synchronisation.",
         "decode": "Avant de dissocier : aidez à décoder deux réglages",
-        "decode_note": "Avant de dissocier, cette console peut aider à décoder « alarme seule » et le coucher par jour (NIP, 2 min) : une fois dissociée, elle ne le peut plus."
+        "decode_note": "Avant de dissocier, cette console peut aider à décoder « alarme seule » et le coucher par jour (NIP, 2 min) : une fois dissociée, elle ne le peut plus.",
+        "dns_blocked": "synchro bloquée (DNS)",
+        "dns_note": "La redirection DNS d'Atmosphère (atmosphere/hosts) détourne le serveur du contrôle parental de Nintendo : l'application mobile ne peut pas se synchroniser, elle n'écrase donc pas les réglages faits ici."
     },
     "security": {
         "section_status": "État",

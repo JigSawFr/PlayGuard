@@ -12,6 +12,7 @@
 #include "action/clock_flow.hpp"
 #include "action/console_actions.hpp"
 #include "action/outside_watch.hpp"
+#include "action/pairing_state.hpp"
 #include "action/pin_lock.hpp"
 #include "action/play_data.hpp"
 #include "action/pt_flow.hpp"
@@ -341,8 +342,9 @@ void note_security(const PctlStatus& s, bool writable)
                });
            });
 
-    // A linked phone app overwrites what is set here at its next sync.
-    toggle(s.pairing_active_ok && s.pairing_active, "pairing", Level::Info, "playguard/notices/pairing"_i18n,
+    // A linked phone app overwrites what is set here at its next sync (not
+    // when Atmosphère's DNS blocks its server).
+    toggle(pairing_state::syncs(s), "pairing", Level::Info, "playguard/notices/pairing"_i18n,
            "playguard/notices/pairing_detail"_i18n, open_label("security"), []() { open_tab(ui::tab::security); });
 
     const auto& cfg = config::get();

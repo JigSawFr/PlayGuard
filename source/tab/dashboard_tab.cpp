@@ -7,6 +7,7 @@
 #include "action/clock_flow.hpp"
 #include "action/notices.hpp"
 #include "action/outside_watch.hpp"
+#include "action/pairing_state.hpp"
 #include "action/play_data.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_logic.hpp"
@@ -278,10 +279,13 @@ DashboardTab::SystemIssues DashboardTab::show_system(const PctlStatus& s, const 
         linked(clock, accurate ? "playguard/dashboard/clock_ok"_i18n : "playguard/dashboard/clock_bad"_i18n);
         clock->setDetailTextColor(accurate ? ui::color_ok() : ui::color_warn());
     }
-    const bool paired = s.pairing_active_ok && s.pairing_active;
-    linked(pairing, ui::bool_text(s.pairing_active_ok, s.pairing_active,
-        "playguard/dashboard/pairing_on"_i18n, "playguard/dashboard/pairing_off"_i18n));
-    // A linked phone overwrites everything set here at its next sync.
+    const bool paired = pairing_state::syncs(s);
+    std::string pairing_text = ui::bool_text(s.pairing_active_ok, s.pairing_active,
+        "playguard/dashboard/pairing_on"_i18n, "playguard/dashboard/pairing_off"_i18n);
+    if (s.pairing_active_ok && s.pairing_active && !paired) pairing_text += " · " + "playguard/pairing/dns_blocked"_i18n;
+    linked(pairing, pairing_text);
+    // A linked phone overwrites everything set here at its next sync (unless
+    // Atmosphère's DNS blocks its server).
     pairing->setDetailTextColor(paired ? ui::color_warn() : ui::color_neutral());
 
     // Firmware and compatibility appear here only when there is something to

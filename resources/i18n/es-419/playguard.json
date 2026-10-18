@@ -570,7 +570,9 @@
         "unlink_err": "No se pudo desvincular la app para celular",
         "note": "Mientras la consola siga vinculada, la app para celular sobrescribirá la configuración hecha aquí en su próxima sincronización.",
         "decode": "Antes de desvincular: ayude a descifrar dos ajustes",
-        "decode_note": "Antes de desvincularla, esta consola puede ayudar a descifrar “solo alarma” y la hora de dormir por día (PIN, 2 min): una vez desvinculada, ya no podrá."
+        "decode_note": "Antes de desvincularla, esta consola puede ayudar a descifrar “solo alarma” y la hora de dormir por día (PIN, 2 min): una vez desvinculada, ya no podrá.",
+        "dns_blocked": "sincronización bloqueada (DNS)",
+        "dns_note": "La redirección DNS de Atmosphère (atmosphere/hosts) desvía el servidor del control parental de Nintendo: la app para móvil no puede sincronizarse, así que no sobrescribe los ajustes hechos aquí."
     },
     "security": {
         "section_status": "Estado",

@@ -570,7 +570,9 @@
         "unlink_err": "Não foi possível desvincular a aplicação móvel",
         "note": "Enquanto a consola estiver vinculada, a aplicação móvel substitui as definições feitas aqui na próxima sincronização.",
         "decode": "Antes de desvincular: decifre duas definições",
-        "decode_note": "Antes de desvincular, esta consola pode ajudar a decifrar «só alarme» e a hora de dormir por dia (PIN, 2 min): depois de desvinculada, já não pode."
+        "decode_note": "Antes de desvincular, esta consola pode ajudar a decifrar «só alarme» e a hora de dormir por dia (PIN, 2 min): depois de desvinculada, já não pode.",
+        "dns_blocked": "sincronização bloqueada (DNS)",
+        "dns_note": "O redirecionamento DNS do Atmosphère (atmosphere/hosts) desvia o servidor do controlo parental da Nintendo: a aplicação móvel não consegue sincronizar, por isso não substitui as definições feitas aqui."
     },
     "security": {
         "section_status": "Estado",

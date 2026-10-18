@@ -570,7 +570,9 @@
         "unlink_err": "Could not unlink the companion app",
         "note": "While the console stays linked, the companion app overwrites the settings made here at its next synchronization.",
         "decode": "Before unlinking: help decode two settings",
-        "decode_note": "Before unlinking, this console can help decode \"alarm only\" and per-day bedtime (PIN, 2 min): once unlinked, it no longer can."
+        "decode_note": "Before unlinking, this console can help decode \"alarm only\" and per-day bedtime (PIN, 2 min): once unlinked, it no longer can.",
+        "dns_blocked": "sync blocked (DNS)",
+        "dns_note": "Atmosphère's DNS redirection (atmosphere/hosts) sends Nintendo's parental-control server elsewhere: the companion app cannot synchronize, so it does not overwrite what is set here."
     },
     "security": {
         "section_status": "Status",

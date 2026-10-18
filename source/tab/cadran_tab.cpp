@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "action/clock_flow.hpp"
+#include "action/pairing_state.hpp"
 #include "activity/cadran_child_activity.hpp"
 #include "action/pt_flow.hpp"
 #include "app.hpp"
@@ -645,8 +646,10 @@ void CadranTab::show_pills()
     for (Pill& p : this->pill_slots) {
         auto* cell = dynamic_cast<brls::DetailCell*>(this->getView(p.line));
         if (!cell) continue;
-        // A line shown says there is something to look at; else the all-fine words.
-        const bool shown = cell->getVisibility() == brls::Visibility::VISIBLE;
+        // A line shown says there is something to look at; else the all-fine
+        // words. The phone app only while it can overwrite what is set here.
+        bool shown = cell->getVisibility() == brls::Visibility::VISIBLE;
+        if (p.line == std::string("dash_pairing")) shown = shown && pairing_state::syncs(this->status);
         std::string ok;
         if (p.line == std::string("dash_compat")) ok = ui::fw_text(si) + " · " + compat;
         else if (p.line == std::string("dash_serial")) ok = "playguard/cadran/today/serial_hidden"_i18n;
