@@ -250,6 +250,12 @@ void set_visible_all(std::initializer_list<std::pair<brls::View*, bool>> changes
 void set_text(brls::Label* label, const std::string& text);
 void set_detail(brls::DetailCell* cell, const std::string& text);
 
+// Runs `fill`, which adds many views to `box` (or changes them), with the box
+// out of the screen's layout, then lays the screen out once. borealis lays
+// the whole screen out again on each addView and setText: a list of n rows
+// built in place cost n layouts of the whole screen, n of them on screen.
+void batch_layout(brls::Box* box, const std::function<void()>& fill);
+
 // For an activity's onResume(): borealis then gives the focus back to the
 // view that opened the dialog (or screen) just closed, and gives none when
 // that view was hidden meanwhile; the focus would stay on the closed

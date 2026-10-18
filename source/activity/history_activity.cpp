@@ -87,40 +87,44 @@ void HistoryActivity::rebuild()
     // The slots are reused in place: one of them has the focus when this runs
     // after a change, and borealis would keep a pointer to a deleted cell.
     // There are only ever as many as the most shown at once (up to
-    // history::MAX_ENTRIES); those past what is shown are hidden.
+    // history::MAX_ENTRIES); those past what is shown are hidden. Filled out
+    // of the screen's layout, laid out once (ui::batch_layout).
     auto& slots = list->getChildren();
-    std::string day;
-    for (size_t i = 0; i < this->shown.size(); i++) {
-        if (i >= slots.size()) list->addView(new_slot());
-        brls::View* slot = slots[i];
-        const history::Entry e = this->shown[i];
-        // A day's title over its first change.
-        const std::string this_day = history_logic::day_key(e);
-        brls::Header* header = day_of_slot(slot);
-        const bool starts_day = i == 0 || this_day != day;
-        if (starts_day) header->setTitle(history_flow::day_title(this_day));
-        ui::set_visible(header, starts_day);
-        day = this_day;
-
-        brls::DetailCell* cell = cell_of_slot(slot);
-        cell->setText(history_flow::title(e));
-        cell->setDetailText(history_flow::time_of(e));
-        // A change the console refused stands out.
-        cell->setDetailTextColor(e.result.empty() ? ui::color_neutral() : ui::color_warn());
-        cell->registerClickAction([this, e](brls::View*) {
-            history_flow::open(e, [this]() { this->rebuild(); });
-            return true;
-        });
-    }
     // A hidden line must not keep the focus: it goes to the filter.
     brls::View* focus = brls::Application::getCurrentFocus();
     bool focus_hidden = false;
-    for (size_t i = this->shown.size(); i < slots.size(); i++) {
-        if (focus == cell_of_slot(slots[i])) focus_hidden = true;
-        ui::set_visible(slots[i], false);
-    }
-    for (size_t i = 0; i < this->shown.size(); i++) ui::set_visible(slots[i], true);
+    ui::batch_layout(list, [&]() {
+        std::string day;
+        for (size_t i = 0; i < this->shown.size(); i++) {
+            if (i >= slots.size()) list->addView(new_slot());
+            brls::View* slot = slots[i];
+            const history::Entry e = this->shown[i];
+            // A day's title over its first change.
+            const std::string this_day = history_logic::day_key(e);
+            brls::Header* header = day_of_slot(slot);
+            const bool starts_day = i == 0 || this_day != day;
+            if (starts_day) header->setTitle(history_flow::day_title(this_day));
+            ui::set_visible(header, starts_day);
+            day = this_day;
+
+            brls::DetailCell* cell = cell_of_slot(slot);
+            cell->setText(history_flow::title(e));
+            cell->setDetailText(history_flow::time_of(e));
+            // A change the console refused stands out.
+            cell->setDetailTextColor(e.result.empty() ? ui::color_neutral() : ui::color_warn());
+            cell->registerClickAction([this, e](brls::View*) {
+                history_flow::open(e, [this]() { this->rebuild(); });
+                return true;
+            });
+        }
+        for (size_t i = this->shown.size(); i < slots.size(); i++) {
+            if (focus == cell_of_slot(slots[i])) focus_hidden = true;
+            ui::set_visible(slots[i], false);
+        }
+        for (size_t i = 0; i < this->shown.size(); i++) ui::set_visible(slots[i], true);
+    });
     ui::set_visible(empty.getView(), this->shown.empty());
     empty->setText(this->filter == Filter::All ? "playguard/history/none"_i18n : "playguard/history/none_shown"_i18n);
     if (focus_hidden) brls::Application::giveFocus(filter_cell.getView());
+    brls::Logger::info("history list: {} of {} changes", this->shown.size(), this->all.size());
 }

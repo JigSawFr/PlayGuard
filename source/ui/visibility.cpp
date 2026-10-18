@@ -7,6 +7,7 @@
 #include "app.hpp"
 
 #include <algorithm>
+#include <yoga/Yoga.h>
 
 using namespace brls::literals;
 
@@ -91,6 +92,24 @@ void set_text(brls::Label* label, const std::string& text)
 void set_detail(brls::DetailCell* cell, const std::string& text)
 {
     if (cell) set_text(cell->detail, text);
+}
+
+void batch_layout(brls::Box* box, const std::function<void()>& fill)
+{
+    // Out of its parent's Yoga node only: borealis' views, their parents and
+    // the focus stay as they are, and a change inside stops at the box.
+    YGNodeRef node = box ? box->getYGNode() : nullptr;
+    YGNodeRef owner = node ? YGNodeGetOwner(node) : nullptr;
+    uint32_t index = 0;
+    while (owner && index < YGNodeGetChildCount(owner) && YGNodeGetChild(owner, index) != node) index++;
+    if (!owner || index == YGNodeGetChildCount(owner)) {
+        fill();
+        return;
+    }
+    YGNodeRemoveChild(owner, node);
+    fill();
+    YGNodeInsertChild(owner, node, index);
+    box->invalidate();
 }
 
 void keep_focus(brls::Activity* activity, brls::View* fallback)
