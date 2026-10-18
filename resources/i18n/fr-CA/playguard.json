@@ -1098,7 +1098,7 @@
         "forgotten": "Le choix pour le firmware sera redemandé au prochain lancement.",
         "forget_body": "Oublier le choix fait sur l'écran du firmware ? Il sera redemandé au prochain lancement.",
         "forget_confirm": "Oublier",
-        "mode_off_body": "Désactiver le mode développeur ? Ses outils quittent la fin de l'onglet À propos › Aide et diagnostic et l'enregistrement du temps de jeu s'arrête. Sept appuis sur À propos › Version les font revenir.",
+        "mode_off_body": "Désactiver le mode développeur ? Ses outils quittent la fin de l'onglet À propos › Aide et diagnostic et l'enregistrement du temps de jeu s'arrête. Sept appuis sur Y dans À propos › Version les font revenir.",
         "mode_off_confirm": "Désactiver",
         "read_only_off_body": "Quitter le mode lecture seule ? PlayGuard pourra de nouveau modifier le contrôle parental et l'horloge de la console.",
         "read_only_off_confirm": "Autoriser les modifications",

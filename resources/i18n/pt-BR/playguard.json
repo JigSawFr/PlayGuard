@@ -1098,7 +1098,7 @@
         "forgotten": "A escolha de firmware será pedida de novo na próxima vez que o app for aberto.",
         "forget_body": "Esquecer a escolha feita na tela do firmware? Ela será perguntada de novo na próxima inicialização.",
         "forget_confirm": "Esquecer",
-        "mode_off_body": "Desativar o modo de desenvolvedor? As ferramentas saem do final de Sobre › Ajuda e diagnóstico e a gravação do tempo de jogo para. Sete toques em Sobre › Versão as trazem de volta.",
+        "mode_off_body": "Desativar o modo de desenvolvedor? As ferramentas saem do final de Sobre › Ajuda e diagnóstico e a gravação do tempo de jogo para. Sete toques em Y em Sobre › Versão as trazem de volta.",
         "mode_off_confirm": "Desativar",
         "read_only_off_body": "Sair do modo somente leitura? O PlayGuard poderá voltar a alterar o controle dos pais e o relógio do console.",
         "read_only_off_confirm": "Permitir alterações",

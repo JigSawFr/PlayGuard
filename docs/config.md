@@ -135,7 +135,7 @@ Set in *About › Help & diagnostics › Developer*, shown once developer mode i
 
 | Key | Type | Values | Default |
 |---|---|---|---|
-| `dev_mode` | boolean | the developer tools at the end of *About › Help & diagnostics* (seven presses on *About › Version* turn them on, *Developer mode* there turns them off) | `false` |
+| `dev_mode` | boolean | the developer tools at the end of *About › Help & diagnostics* (seven presses of Ⓨ on *About › Version* turn them on, *Developer mode* there turns them off) | `false` |
 | `pt_log` | boolean | *Record the play timer* (`logs/play_timer/log.csv`) | `false` |
 | `dev_builds_order` | string | how *Install another build* orders the pull requests (A on their tab when it is shown): `"newest"` (the newest build first) or `"number"` (the highest number first); main's commits are always newest first | `"newest"` |
 

@@ -1098,7 +1098,7 @@
         "forgotten": "La scelta per il firmware verrà richiesta di nuovo al prossimo avvio.",
         "forget_body": "Dimenticare la scelta fatta nella schermata del firmware? Verrà chiesta di nuovo al prossimo avvio.",
         "forget_confirm": "Dimentica",
-        "mode_off_body": "Disattivare la modalità sviluppatore? I suoi strumenti spariscono dalla fine di Informazioni › Aiuto e diagnostica e la registrazione del tempo di gioco si ferma. Sette pressioni su Informazioni › Versione li riportano.",
+        "mode_off_body": "Disattivare la modalità sviluppatore? I suoi strumenti spariscono dalla fine di Informazioni › Aiuto e diagnostica e la registrazione del tempo di gioco si ferma. Sette pressioni di Y su Informazioni › Versione li riportano.",
         "mode_off_confirm": "Disattiva",
         "read_only_off_body": "Uscire dalla modalità sola lettura? PlayGuard potrà di nuovo modificare il filtro famiglia e l'orologio della console.",
         "read_only_off_confirm": "Consenti le modifiche",

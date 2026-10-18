@@ -1098,7 +1098,7 @@
         "forgotten": "Die Firmware-Wahl wird beim nächsten Start erneut abgefragt.",
         "forget_body": "Die auf dem Firmware-Bildschirm getroffene Wahl vergessen? Sie wird beim nächsten Start erneut abgefragt.",
         "forget_confirm": "Vergessen",
-        "mode_off_body": "Entwicklermodus ausschalten? Seine Werkzeuge verschwinden vom Ende von Info › Hilfe & Diagnose und die Spielzeit-Aufzeichnung endet. Sieben Drücke auf Info › Version holen sie zurück.",
+        "mode_off_body": "Entwicklermodus ausschalten? Seine Werkzeuge verschwinden vom Ende von Info › Hilfe & Diagnose und die Spielzeit-Aufzeichnung endet. Sieben Drücke auf Y bei Info › Version holen sie zurück.",
         "mode_off_confirm": "Ausschalten",
         "read_only_off_body": "Schreibschutzmodus verlassen? PlayGuard kann dann die Altersbeschränkungen und die Uhr der Konsole wieder ändern.",
         "read_only_off_confirm": "Änderungen erlauben",
