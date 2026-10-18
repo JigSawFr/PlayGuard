@@ -2,10 +2,8 @@
 
 <!-- Activity: play time (today, last 7 days, all time), read from the
      console's play data for every account, its summary over the chosen period,
-     the games to rediscover, every game of the period on a screen of its own
-     (activity/games.xml) and its export to the SD card. The games to
-     rediscover are added in code; A on one opens its screen
-     (activity/game.xml). -->
+     every game of the period on a screen of its own (activity/games.xml) and
+     its export to the SD card. -->
 
 <brls:Box
     width="auto"
@@ -41,11 +39,6 @@
             <brls:DetailCell id="ac_days_played" focusable="false" title="@i18n/playguard/activity/summary/days_played"/>
             <brls:DetailCell id="ac_busiest" focusable="false" title="@i18n/playguard/activity/summary/busiest"/>
             <brls:DetailCell id="ac_session" focusable="false" title="@i18n/playguard/activity/summary/session"/>
-            <brls:Box id="ac_rediscover" width="auto" height="auto" axis="column" alignItems="stretch">
-                <brls:Header title="@i18n/playguard/activity/section_rediscover" marginTop="24" marginBottom="8"/>
-                <brls:Box id="ac_rediscover_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
-                <brls:Label text="@i18n/playguard/activity/rediscover_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
-            </brls:Box>
             <brls:Header title="@i18n/playguard/activity/section_games" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="ac_games" title="@i18n/playguard/library/open"/>
             <brls:DetailCell id="ac_export" title="@i18n/playguard/activity/export"/>

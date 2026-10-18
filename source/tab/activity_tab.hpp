@@ -1,6 +1,6 @@
 // ActivityTab — play time (today, last 7 days, all time) from the console's
-// play data, for every account or one, its summary over the chosen period and
-// the games to rediscover (util/activity_summary.hpp), the way to every game
+// play data, for every account or one, its summary over the chosen period
+// (util/activity_summary.hpp), the way to every game
 // of the period (activity/games_activity: a list or covers) and its export
 // to the SD card (CSV, JSON, XLSX or PDF). Read-only, so also in read-only
 // mode. The data comes from play_data (read off the main thread, shared with
@@ -20,7 +20,6 @@
 
 #include "tab/tab_base.hpp"
 #include "util/pctl_ops_c.hpp"
-#include "view/game_cell.hpp"
 #include "view/play_days.hpp"
 
 class ActivityTab : public TabBase
@@ -50,18 +49,14 @@ class ActivityTab : public TabBase
     // another screen), on Ⓧ and once a minute, not at every rebuild (a pctl
     // session and about ten requests on the UI thread).
     const PtState& play_timer();
-    // The summary over the period, and the games to rediscover.
+    // The summary over the period.
     void show_summary(const std::shared_ptr<const PlayStats>& data);
-    // What Ⓐ on a game's cell opens (its own screen, with this read's data).
-    static void on_click(GameCell* cell, const GameStat& game, const std::shared_ptr<const PlayStats>& data);
     void export_to_sd() const;
 
-    std::vector<u64> rediscover_ids;                  // the games to rediscover on screen, in order
     int listener = 0;                                 // play_data::listen id
     // Data arrived while another screen (a game's own screen, All games, a
     // dialog) was on top, or All games changed the period: the tab is rebuilt
-    // once it is back. Deleting the games to rediscover sooner would free the
-    // cell borealis gives the focus back to.
+    // once it is back.
     bool stale = false;
     bool spinner = false;   // Ⓧ pressed: the spinner stays until its read ends
     PtState pt = {};
@@ -82,8 +77,6 @@ class ActivityTab : public TabBase
     BRLS_BIND(brls::DetailCell, days_played, "ac_days_played");
     BRLS_BIND(brls::DetailCell, busiest,     "ac_busiest");
     BRLS_BIND(brls::DetailCell, session,     "ac_session");
-    BRLS_BIND(brls::Box,        rediscover,  "ac_rediscover");
-    BRLS_BIND(brls::Box,        rediscover_list, "ac_rediscover_list");
     BRLS_BIND(brls::DetailCell, games,       "ac_games");
     BRLS_BIND(brls::DetailCell, export_cell, "ac_export");
     BRLS_BIND(brls::Box,        progress,    "ac_progress");

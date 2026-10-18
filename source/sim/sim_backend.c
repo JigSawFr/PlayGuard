@@ -639,7 +639,7 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         return;
     }
     // Made-up games; one was deleted since (no name, no totals), the last one is
-    // to rediscover (little played, left aside for months).
+    // little played and left aside for months.
     static const struct {
         u64 id; const char *name; u32 total_min, launches, today_min, week_min, days_ago;
     } games[] = {

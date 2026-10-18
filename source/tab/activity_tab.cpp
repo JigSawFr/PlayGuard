@@ -6,10 +6,8 @@
 #include <vector>
 
 #include "action/export_flow.hpp"
-#include "action/game_icons.hpp"
 #include "action/outside_watch.hpp"
 #include "action/play_data.hpp"
-#include "activity/game_activity.hpp"
 #include "activity/games_activity.hpp"
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
@@ -72,9 +70,6 @@ uint64_t value_of(const GameStat& g, int period)
 {
     return activity_summary::value(g, period);
 }
-
-// Games shown under "To rediscover", at most.
-constexpr size_t REDISCOVER_SHOWN = 3;
 
 std::string game_name(const GameStat& g)
 {
@@ -329,43 +324,6 @@ void ActivityTab::show_summary(const std::shared_ptr<const PlayStats>& data)
         { days_played.getView(), sum.known && sum.days_played >= 0 },
         { busiest.getView(), sum.known && sum.busiest >= 0 },
         { session.getView(), sum.known && sum.session_s > 0 },
-    });
-
-    // To rediscover: the same games again (a read in the background) keep
-    // their cells and the focus; others replace them.
-    const std::vector<int> picks = data ? activity_summary::rediscover(*data, REDISCOVER_SHOWN) : std::vector<int>();
-    std::vector<u64> ids;
-    for (int i : picks) ids.push_back(data->games[i].app_id);
-    if (ids != this->rediscover_ids) {
-        bool focus_in = false;
-        for (brls::View* v = brls::Application::getCurrentFocus(); v && !focus_in; v = v->getParent())
-            focus_in = v == rediscover_list.getView();
-        if (focus_in) brls::Application::giveFocus(sort);
-        rediscover_list->clearViews();
-        for (size_t n = 0; n < picks.size(); n++) rediscover_list->addView(new GameCell(false));
-        this->rediscover_ids = ids;
-    }
-    const auto& cells_on_screen = rediscover_list->getChildren();
-    for (size_t n = 0; n < picks.size() && n < cells_on_screen.size(); n++) {
-        auto* cell = static_cast<GameCell*>(cells_on_screen[n]);
-        const GameStat& g = data->games[picks[n]];
-        cell->setText(game_name(g));
-        cell->setDetailText(ui::fmt_play_time(g.total_s));
-        this->on_click(cell, g, data);
-    }
-    ui::set_visible(rediscover.getView(), !picks.empty());
-}
-
-void ActivityTab::on_click(GameCell* cell, const GameStat& game, const std::shared_ptr<const PlayStats>& data)
-{
-    const GameStat copy = game;
-    const bool every = chosen_account() == nullptr;
-    cell->registerClickAction([copy, data, every](brls::View*) {
-        // Its own screen: the seven days as bars, the figures, each account.
-        std::vector<unsigned char> icon;
-        if (const auto* bytes = game_icons::bytes(copy.app_id)) icon = *bytes;
-        brls::Application::pushActivity(new GameActivity(copy, data, std::move(icon), every));
-        return true;
     });
 }
 

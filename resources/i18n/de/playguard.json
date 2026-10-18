@@ -434,8 +434,6 @@
         "note": "Aus dem Aktivitätsprotokoll der Konsole gelesen, für alle Nutzer. Die Zeiten sind ungefähr, wenn die Konsolenuhr geändert wurde. PlayGuard über einem Spiel geöffnet zählt als dieses Spiel für den beim Start gewählten Nutzer: Öffnen Sie es mit dem Nutzer eines Elternteils.",
         "show_all": "Alle Spiele anzeigen",
         "section_summary": "Übersicht",
-        "section_rediscover": "Wiederentdecken",
-        "rediscover_note": "Installiert, insgesamt unter 3 Std. und seit mindestens einem Monat nicht gespielt: einen neuen Versuch wert?",
         "summary": {
             "per_day": "Durchschnitt pro Tag",
             "per_day_over": "{} über {} Tage",
