@@ -314,10 +314,8 @@ void CadranActivityTab::show_hero()
     const bool none   = games.empty() && !unread;
     ui::set_visible(games_note, false);
     ui::set_visible(this->empty.box, none);
-    if (none) {
-        this->empty.title->setText(brls::getStr(fmt::format("playguard/activity/none/{}", p)));
-        ui::set_visible(this->see_all, p != AllTime && all.known && all.total_s > 0);
-    }
+    ui::set_visible(this->see_all, p != AllTime && all.known && all.total_s > 0);
+    if (none) this->empty.title->setText(brls::getStr(fmt::format("playguard/activity/none/{}", p)));
     if (brls::View* status = this->getView("ac_status"); status && none) ui::set_visible(status, false);
     std::vector<u64> ids;
     for (size_t i = 0; i < this->cards.size(); i++) {
