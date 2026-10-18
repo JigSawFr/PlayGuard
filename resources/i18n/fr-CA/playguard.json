@@ -488,7 +488,22 @@
         "none_body": "Plus rien ne sera restreint : les logiciels de tout âge pourront être lancés, et les publications sur les réseaux sociaux comme la communication avec d'autres joueurs seront autorisées. Les limites de temps de jeu restent appliquées.",
         "confirm_age": "Passer la limite d'âge à « {} »? Des logiciels classés pour un âge plus élevé qu'aujourd'hui pourront alors être lancés.",
         "confirm_sns_off": "Ne plus restreindre les publications sur les réseaux sociaux? Captures et vidéos pourront alors être publiées depuis la console.",
-        "confirm_comm_off": "Ne plus restreindre la communication avec d'autres joueurs? Les logiciels pourront alors laisser l'enfant clavarder et échanger des contenus avec d'autres joueurs."
+        "confirm_comm_off": "Ne plus restreindre la communication avec d'autres joueurs? Les logiciels pourront alors laisser l'enfant clavarder et échanger des contenus avec d'autres joueurs.",
+        "org_where": {
+            "cero": "Japon",
+            "grac": "Corée du Sud",
+            "gsrmr": "Taïwan",
+            "esrb": "États-Unis, Canada, Amérique latine (hors Brésil)",
+            "classind": "Brésil",
+            "usk": "Allemagne",
+            "pegi": "Europe : France, Belgique, Suisse, Espagne, Italie, Pays-Bas, Autriche…",
+            "pegi_portugal": "Portugal",
+            "pegi_bbfc": "Royaume-Uni",
+            "russian": "Russie",
+            "acb": "Australie",
+            "oflc": "Nouvelle-Zélande",
+            "iarc": "Autres pays"
+        }
     },
     "clock": {
         "section_now": "Horloges",

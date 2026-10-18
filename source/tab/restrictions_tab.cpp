@@ -61,8 +61,15 @@ RestrictionsTab::RestrictionsTab()
     });
     org->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
-        std::vector<std::string> names;
-        for (uint32_t i = 0; i < 13; i++) names.push_back(pctl_rating_org_name(i));
+        // Each with the countries it rates for (nn::ns::RatingOrganization's
+        // order), as a parent may not know which is theirs.
+        static const char* ORG_WHERE[] = { "cero", "grac", "gsrmr", "esrb", "classind", "usk", "pegi",
+                                           "pegi_portugal", "pegi_bbfc", "russian", "acb", "oflc", "iarc" };
+        std::vector<std::string> names, countries;
+        for (uint32_t i = 0; i < 13; i++) {
+            names.push_back(pctl_rating_org_name(i));
+            countries.push_back(brls::getStr(std::string("playguard/restrictions/org_where/") + ORG_WHERE[i]));
+        }
         ui::pick("playguard/restrictions/org"_i18n, names, this->st.rating_org_ok && this->st.rating_org < 13 ? (int)this->st.rating_org : 0,
                  [this](int index) {
                      if (this->st.rating_org_ok && (int)this->st.rating_org == index) return;
@@ -79,7 +86,7 @@ RestrictionsTab::RestrictionsTab()
                                      ui::notify_result(rc, "playguard/restrictions/saved"_i18n, "playguard/restrictions/save_err"_i18n);
                                      this->refresh();
                                  });
-                 });
+                 }, true, countries);
         return true;
     });
 

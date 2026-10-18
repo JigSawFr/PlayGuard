@@ -159,9 +159,10 @@ void add_cancel(brls::Dialog* dialog, std::function<void()> cancel);
 
 // Dropdown list; `on_pick(index)` runs after the list has closed. The row
 // `selected` has the focus and is checked as the current value, unless
-// `checked` is false (a list of things to do, not of values).
+// `checked` is false (a list of things to do, not of values). `details`, when
+// given, says more about each row, after its label and quieter.
 void pick(const std::string& title, const std::vector<std::string>& values, int selected,
-          std::function<void(int)> on_pick, bool checked = true);
+          std::function<void(int)> on_pick, bool checked = true, const std::vector<std::string>& details = {});
 // A list of things to do: each line's label, and what it runs once the
 // list has closed. The first line is selected; none, no list.
 struct Choice

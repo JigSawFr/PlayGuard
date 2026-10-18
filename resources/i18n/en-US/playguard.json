@@ -488,7 +488,22 @@
         "none_body": "Nothing will be restricted: software of any age rating can be played, and posting to social media and communicating with others are allowed. The daily play-time limits still apply.",
         "confirm_age": "Change the age limit to \"{}\"? Software with a higher age rating than now can then be played.",
         "confirm_sns_off": "Stop restricting posting to social media? Screenshots and videos can then be posted from the console.",
-        "confirm_comm_off": "Stop restricting communicating with others? Software can then let the child chat and share content with other players."
+        "confirm_comm_off": "Stop restricting communicating with others? Software can then let the child chat and share content with other players.",
+        "org_where": {
+            "cero": "Japan",
+            "grac": "South Korea",
+            "gsrmr": "Taiwan",
+            "esrb": "United States, Canada, Latin America (not Brazil)",
+            "classind": "Brazil",
+            "usk": "Germany",
+            "pegi": "Europe: France, Belgium, Switzerland, Spain, Italy, Netherlands, Austria…",
+            "pegi_portugal": "Portugal",
+            "pegi_bbfc": "United Kingdom",
+            "russian": "Russia",
+            "acb": "Australia",
+            "oflc": "New Zealand",
+            "iarc": "Other countries"
+        }
     },
     "clock": {
         "section_now": "Clocks",

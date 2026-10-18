@@ -98,7 +98,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 
 - Niveau de restriction : Aucun, Jeune enfant, Enfant, Adolescent, Personnalisé. Ce qu'impose un préréglage (limite d'âge, publications, communication) est affiché en lecture seule, et dit avant de le choisir.
 - En Personnalisé : classification par âge, publications sur les réseaux sociaux, communication avec d'autres joueurs.
-- Mode VR, **organisme de classification** (PEGI, ESRB, USK, CERO…).
+- Mode VR, **organisme de classification** (PEGI, ESRB, USK, CERO…) : la liste dit pour quels pays chacun classe les jeux (PEGI : la plupart de l'Europe, ESRB : États-Unis, Canada et Amérique latine, USK : Allemagne, PEGI BBFC : Royaume-Uni…).
 - Le nombre de jeux autorisés à communiquer (la liste elle-même figure, brute, dans le rapport de diagnostic tant que sa structure n'est pas connue).
 
 ## Code PIN — code PIN, déverrouillage, blocage des jeux, application mobile

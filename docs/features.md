@@ -98,7 +98,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 - Restriction level: None, Young child, Child, Teen, Custom. What a preset restricts (age limit, posting, communication) is shown read-only, and said before you pick it.
 - In Custom: age rating, social-media posting, communication with others.
-- VR mode, **rating organisation** (PEGI, ESRB, USK, CERO …).
+- VR mode, **rating organisation** (PEGI, ESRB, USK, CERO …): the list says the countries each one rates for (PEGI: most of Europe, ESRB: the United States, Canada and Latin America, USK: Germany, PEGI BBFC: the United Kingdom…).
 - The number of games allowed to communicate (the list itself is in the diagnostic report, raw, until its layout is known).
 
 ## PIN — the PIN, unlocking, blocking games, companion app

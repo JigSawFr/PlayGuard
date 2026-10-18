@@ -253,7 +253,7 @@ class Picker : public brls::Dropdown
 {
   public:
     Picker(const std::string& title, const std::vector<std::string>& values, int checked, int focus,
-           std::function<void(int)> on_pick)
+           std::function<void(int)> on_pick, std::vector<std::string> details = {})
         : brls::Dropdown(
               title, values, [this](int index) { this->chosen = index; }, focus,
               [this, on_pick](int) {
@@ -262,7 +262,7 @@ class Picker : public brls::Dropdown
                       brls::sync([on_pick, index]() { on_pick(index); });
                   }
               }),
-          labels(values), checked(checked)
+          labels(values), details(std::move(details)), checked(checked)
     {
         // The rows Dropdown's constructor already made used its own
         // cellForRow (this one did not exist yet): set again here.
@@ -272,6 +272,7 @@ class Picker : public brls::Dropdown
 
   private:
     std::vector<std::string> labels;
+    std::vector<std::string> details;
     int checked;
     int chosen = -1;
 
@@ -281,9 +282,32 @@ class Picker : public brls::Dropdown
         if (cadran::enabled()) cadran::style_pick_row(cell, on);
     }
 
+    // A row's detail, after its label, quieter (none: no detail at all).
+    void detail(brls::RadioCell* cell, size_t index)
+    {
+        if (this->details.empty()) return;
+        auto* text = dynamic_cast<brls::Label*>(cell->getView("pick_detail"));
+        if (!text) {
+            brls::Theme theme = brls::Application::getTheme();
+            text = new brls::Label();
+            text->setId("pick_detail");
+            text->setFontSize(16);
+            text->setSingleLine(true);
+            text->setTextColor(cadran::enabled() ? theme["cadran/text2"] : theme["brand/note"]);
+            text->setMarginRight(brls::getStyle()["brls/listitem/descriptionIndent"]);
+            cell->addView(text, 1);
+        }
+        text->setText(index < this->details.size() ? this->details[index] : "");
+    }
+
     void restyle(brls::View* view)
     {
-        if (auto* cell = dynamic_cast<brls::RadioCell*>(view)) this->row(cell, this->checked >= 0 && cell->getSelected());
+        if (auto* cell = dynamic_cast<brls::RadioCell*>(view)) {
+            this->row(cell, this->checked >= 0 && cell->getSelected());
+            // A row made before this class existed: found by its label.
+            const auto at = std::find(this->labels.begin(), this->labels.end(), cell->title->getFullText());
+            if (at != this->labels.end()) this->detail(cell, (size_t)(at - this->labels.begin()));
+        }
         if (auto* box = dynamic_cast<brls::Box*>(view))
             for (brls::View* child : box->getChildren()) this->restyle(child);
     }
@@ -293,16 +317,17 @@ class Picker : public brls::Dropdown
         auto* cell = (brls::RadioCell*)recycler->dequeueReusableCell("Cell");
         cell->title->setText(this->labels[index.row]);
         this->row(cell, index.row == this->checked);
+        this->detail(cell, (size_t)index.row);
         return cell;
     }
 };
 
 void pick(const std::string& title, const std::vector<std::string>& values, int selected,
-          std::function<void(int)> on_pick, bool checked)
+          std::function<void(int)> on_pick, bool checked, const std::vector<std::string>& details)
 {
     if (values.empty()) return;
     const int focus = selected < 0 ? 0 : selected;
-    auto* list = new Picker(title, values, checked ? focus : -1, focus, std::move(on_pick));
+    auto* list = new Picker(title, values, checked ? focus : -1, focus, std::move(on_pick), details);
     brls::Application::pushActivity(new brls::Activity(list));
 }
 

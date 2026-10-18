@@ -488,7 +488,22 @@
         "none_body": "Er wordt niets meer beperkt: software van elke leeftijd kan worden gespeeld, en berichten op sociale media en communicatie met anderen zijn toegestaan. De dagelijkse speeltijdlimieten blijven gelden.",
         "confirm_age": "De leeftijdsgrens wijzigen in \"{}\"? Dan kan software met een hogere leeftijdsclassificatie dan nu worden gespeeld.",
         "confirm_sns_off": "Berichten op sociale media niet meer beperken? Dan kunnen schermafbeeldingen en video's vanaf de console worden geplaatst.",
-        "confirm_comm_off": "Communicatie met anderen niet meer beperken? Dan kan software het kind laten chatten en inhoud laten delen met andere spelers."
+        "confirm_comm_off": "Communicatie met anderen niet meer beperken? Dan kan software het kind laten chatten en inhoud laten delen met andere spelers.",
+        "org_where": {
+            "cero": "Japan",
+            "grac": "Zuid-Korea",
+            "gsrmr": "Taiwan",
+            "esrb": "Verenigde Staten, Canada, Latijns-Amerika (behalve Brazilië)",
+            "classind": "Brazilië",
+            "usk": "Duitsland",
+            "pegi": "Europa: Frankrijk, België, Zwitserland, Spanje, Italië, Nederland, Oostenrijk…",
+            "pegi_portugal": "Portugal",
+            "pegi_bbfc": "Verenigd Koninkrijk",
+            "russian": "Rusland",
+            "acb": "Australië",
+            "oflc": "Nieuw-Zeeland",
+            "iarc": "Andere landen"
+        }
     },
     "clock": {
         "section_now": "Klokken",

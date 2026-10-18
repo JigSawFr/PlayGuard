@@ -488,7 +488,22 @@
         "none_body": "Nada será restringido: poderá ser usado software de qualquer idade, e as publicações nas redes sociais e a comunicação com outros serão permitidas. Os limites diários de tempo de jogo continuam a aplicar-se.",
         "confirm_age": "Alterar o limite de idade para \"{}\"? Poderá então ser usado software com uma classificação etária mais alta do que agora.",
         "confirm_sns_off": "Deixar de restringir as publicações nas redes sociais? Capturas de ecrã e vídeos poderão então ser publicados a partir da consola.",
-        "confirm_comm_off": "Deixar de restringir a comunicação com outros? O software poderá então deixar a criança conversar e partilhar conteúdos com outros jogadores."
+        "confirm_comm_off": "Deixar de restringir a comunicação com outros? O software poderá então deixar a criança conversar e partilhar conteúdos com outros jogadores.",
+        "org_where": {
+            "cero": "Japão",
+            "grac": "Coreia do Sul",
+            "gsrmr": "Taiwan",
+            "esrb": "Estados Unidos, Canadá, América Latina (exceto Brasil)",
+            "classind": "Brasil",
+            "usk": "Alemanha",
+            "pegi": "Europa: França, Bélgica, Suíça, Espanha, Itália, Países Baixos, Áustria…",
+            "pegi_portugal": "Portugal",
+            "pegi_bbfc": "Reino Unido",
+            "russian": "Rússia",
+            "acb": "Austrália",
+            "oflc": "Nova Zelândia",
+            "iarc": "Outros países"
+        }
     },
     "clock": {
         "section_now": "Relógios",

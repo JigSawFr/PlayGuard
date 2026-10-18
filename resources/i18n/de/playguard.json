@@ -488,7 +488,22 @@
         "none_body": "Dann ist nichts mehr eingeschränkt: Software jeder Altersstufe kann gespielt werden, und Posten in sozialen Netzwerken sowie Kommunikation mit anderen Nutzern sind erlaubt. Die täglichen Spielzeitlimits gelten weiterhin.",
         "confirm_age": "Altersgrenze auf „{}“ ändern? Dann kann Software mit einer höheren Alterseinstufung als bisher gespielt werden.",
         "confirm_sns_off": "Posten in sozialen Netzwerken nicht mehr sperren? Dann können Screenshots und Videos von der Konsole aus gepostet werden.",
-        "confirm_comm_off": "Kommunikation mit anderen Nutzern nicht mehr sperren? Dann kann Software das Kind mit anderen Spielern chatten und Inhalte austauschen lassen."
+        "confirm_comm_off": "Kommunikation mit anderen Nutzern nicht mehr sperren? Dann kann Software das Kind mit anderen Spielern chatten und Inhalte austauschen lassen.",
+        "org_where": {
+            "cero": "Japan",
+            "grac": "Südkorea",
+            "gsrmr": "Taiwan",
+            "esrb": "USA, Kanada, Lateinamerika (außer Brasilien)",
+            "classind": "Brasilien",
+            "usk": "Deutschland",
+            "pegi": "Europa: Frankreich, Belgien, Schweiz, Spanien, Italien, Niederlande, Österreich…",
+            "pegi_portugal": "Portugal",
+            "pegi_bbfc": "Vereinigtes Königreich",
+            "russian": "Russland",
+            "acb": "Australien",
+            "oflc": "Neuseeland",
+            "iarc": "Andere Länder"
+        }
     },
     "clock": {
         "section_now": "Uhren",

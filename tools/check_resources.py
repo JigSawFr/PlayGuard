@@ -263,6 +263,7 @@ DYNAMIC_KEYS = {
     "tools/languages/": array_of("source/util/config.hpp", "LANGUAGES"),
     "tools/themes/": array_of("source/util/config.hpp", "THEMES"),
     "prefs/appearances/": array_of("source/util/config.hpp", "APPEARANCES"),
+    "restrictions/org_where/": array_of("source/tab/restrictions_tab.cpp", "ORG_WHERE"),
     "tools/update_via_values/": array_of("source/action/update_flow.cpp", "METHODS"),
 }
 for prefix, values in sorted(DYNAMIC_KEYS.items()):
