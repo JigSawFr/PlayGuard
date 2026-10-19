@@ -239,11 +239,9 @@ jobs:
       # change can be meant. A screen main does not have yet is left out.
       - name: The screens against main's
         if: github.event_name == 'pull_request' && env.BUILD_SIMULATOR == '1'
-        env:
-          OWNER: ${{ github.repository_owner }}
-          NAME: ${{ github.event.repository.name }}
         run: |
-          main="https://${OWNER,,}.github.io/$NAME/simulator/shots/"
+          # MAIN_SITE: main's published site (the site's address, above).
+          main="${MAIN_SITE}simulator/shots/"
           mkdir -p build-web/main-shots
           for f in build-web/shots/*.png; do
             n=$(basename "$f")
@@ -275,7 +273,8 @@ jobs:
           TITLE: ${{ github.event.pull_request.title }}
         run: |
           # SITE_URL, SITE_BASE, SITE_NOINDEX: the site's address (above).
-          export SITE_SCREENSHOTS=shots
+          # SITE_SIMULATOR: what it downloads, said on its buttons.
+          export SITE_SCREENSHOTS=shots SITE_SIMULATOR=build-web/simulator
           python3 tools/build_site.py out .
           # Every link of the site to the site, and every #anchor (a heading
           # renamed, a translation's anchors), must lead somewhere.

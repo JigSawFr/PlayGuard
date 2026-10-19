@@ -95,6 +95,55 @@
     for (const f of figures) seen.observe(f);
   }
 
+  // What the simulator downloads, on its buttons: "· 4 MB" in the page's
+  // language (build_site.py's simulator_size()).
+  for (const size of document.querySelectorAll('.size[data-bytes]')) {
+    try {
+      const mb = Math.max(1, Math.round(Number(size.dataset.bytes) / 1e6));
+      size.textContent = `· ${new Intl.NumberFormat(document.documentElement.lang, { style: 'unit', unit: 'megabyte' }).format(mb)}`;
+    } catch { /* no size then */ }
+  }
+
+  // Tabs: the panels' names become buttons, one panel shown at a time;
+  // without this script, every panel under its name.
+  for (const tabs of document.querySelectorAll('.tabs')) {
+    const panels = [...tabs.querySelectorAll(':scope > .tab-panel')];
+    const list = document.createElement('div');
+    list.className = 'tab-list';
+    list.setAttribute('role', 'tablist');
+    const buttons = panels.map((panel, i) => {
+      const title = panel.querySelector('.tab-title');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.id = `${panel.id}-tab`;
+      button.textContent = title.textContent;
+      button.setAttribute('role', 'tab');
+      button.setAttribute('aria-controls', panel.id);
+      panel.setAttribute('role', 'tabpanel');
+      panel.setAttribute('aria-labelledby', button.id);
+      title.hidden = true;
+      button.addEventListener('click', () => select(i, false));
+      return button;
+    });
+    const select = (n, focus) => {
+      buttons.forEach((b, i) => {
+        b.setAttribute('aria-selected', String(i === n));
+        b.tabIndex = i === n ? 0 : -1;
+        panels[i].hidden = i !== n;
+      });
+      if (focus) buttons[n].focus();
+    };
+    // The arrows from one tab to the next, as for any tab list.
+    list.addEventListener('keydown', (e) => {
+      const i = buttons.indexOf(document.activeElement);
+      if (e.key === 'ArrowRight') select((i + 1) % buttons.length, true);
+      if (e.key === 'ArrowLeft') select((i - 1 + buttons.length) % buttons.length, true);
+    });
+    list.append(...buttons);
+    tabs.prepend(list);
+    select(0, false);
+  }
+
   // Dates (a release's) as the page's language writes them.
   for (const time of document.querySelectorAll('time[datetime]')) {
     const date = new Date(`${time.dateTime}T12:00:00`);

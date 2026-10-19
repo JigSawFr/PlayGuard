@@ -34,6 +34,11 @@ PlayGuard's website, on GitHub Pages: <https://playguard.link/>.
   page that prints as its text alone (its folded parts open); an icon for an
   iPhone's home screen (`images/apple-touch-icon.png`,
   `tools/render_branding.mjs`).
+- **The home page's install**: two tabs (`site.js`, both under their names
+  without it), the app store or by hand; the release's date links to its notes.
+  The buttons to the simulator say what it downloads (`SITE_SIMULATOR`, the
+  built simulator: its files compressed as GitHub Pages sends them; nothing for
+  a local build without it).
 - **The documentation's search**: a box above its pages (`site.js`), over
   `docs/search.json`, each section of the language's pages; every word typed
   must be in the section, accents or not, and is marked in the results; `/` to search, the

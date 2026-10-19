@@ -156,6 +156,18 @@ kbd {
   text-align: center;
 }
 .control-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+/* The tools (simulator.js' setUpTools()): a row, behind a button on a phone. */
+.tools > summary { display: none; list-style: none; cursor: pointer; }
+.tools > summary::-webkit-details-marker { display: none; }
+.tool-list { display: flex; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 600px) {
+  .tools > summary { display: inline-block; }
+  .tools > summary::after { content: " ▾"; }
+  .tools[open] > summary::after { content: " ▴"; }
+  .tools[open] .tool-list { margin-top: 8px; }
+}
+/* Data saver: the start waits for a touch (simulator.js' waitForTap()). */
+.overlay.waiting .spinner { display: none; }
 #record[aria-pressed="true"] { border-color: #d1495b; color: #d1495b; }
 #record[aria-pressed="true"]::before { content: "● "; }
 
