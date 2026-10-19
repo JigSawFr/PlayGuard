@@ -109,7 +109,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 *[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=restrictions)*
 
-- **The restriction level:** Young child, Child, Teen and Custom side by side as tiles, each with what it restricts (Ⓐ sets it; on *Custom* in force, Ⓐ goes to its settings below); *None* under them. What a level restricts (age limit, posting, communication) is said again before it is set.
+- **The restriction level:** Young child, Child, Teen and Custom side by side as tiles, each with what it restricts (a padlock for restricted, a check for allowed, and the installed games it blocks; Ⓐ sets it; on *Custom* in force, Ⓐ goes to its settings below); *None* under them. What a level restricts (age limit, posting, communication) is said again before it is set.
 - In Custom: age rating, social-media posting, communication with others.
 - VR mode, **rating organisation** (PEGI, ESRB, USK, CERO …): the list says the countries each one rates for (PEGI: most of Europe, ESRB: the United States, Canada and Latin America, USK: Germany, PEGI BBFC: the United Kingdom…).
 - The number of games allowed to communicate (the list itself is in the diagnostic report, raw, until its layout is known).

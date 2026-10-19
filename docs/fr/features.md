@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 2ea50338bc2a -->
+<!-- translated from docs/features.md, sha256 d80ab637e39a -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Retour au [README](../../README.fr.md).
@@ -110,7 +110,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 
 *[L'essayer dans le simulateur ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=restrictions)*
 
-- **Le niveau de restriction :** Jeune enfant, Enfant, Adolescent et Personnalisé côte à côte en tuiles, chacun avec ce qu'il restreint (Ⓐ le choisit ; sur *Personnalisé* en vigueur, Ⓐ mène à ses réglages en dessous) ; *Aucun* en dessous. Ce qu'impose un niveau (limite d'âge, publications, communication) est redit avant de l'appliquer.
+- **Le niveau de restriction :** Jeune enfant, Enfant, Adolescent et Personnalisé côte à côte en tuiles, chacun avec ce qu'il restreint (un cadenas pour restreint, une coche pour autorisé, et les jeux installés qu'il bloque ; Ⓐ le choisit ; sur *Personnalisé* en vigueur, Ⓐ mène à ses réglages en dessous) ; *Aucun* en dessous. Ce qu'impose un niveau (limite d'âge, publications, communication) est redit avant de l'appliquer.
 - En Personnalisé : classification par âge, publications sur les réseaux sociaux, communication avec d'autres joueurs.
 - Mode VR, **organisme de classification** (PEGI, ESRB, USK, CERO…) : la liste dit pour quels pays chacun classe les jeux (PEGI : la plupart de l'Europe, ESRB : États-Unis, Canada et Amérique latine, USK : Allemagne, PEGI BBFC : Royaume-Uni…).
 - Le nombre de jeux autorisés à communiquer (la liste elle-même figure, brute, dans le rapport de diagnostic tant que sa structure n'est pas connue).
