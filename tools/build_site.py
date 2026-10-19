@@ -17,7 +17,7 @@ languages, English at the root and the others in /<language>/.
   names the folder tools/site_screenshots.mjs wrote them to (CI), else the
   English ones of images/screenshots/.
 - For search engines and AI assistants: absolute links (SITE_URL, the site's
-  address), a sitemap, structured data (JSON-LD), and each page of the
+  address), a sitemap (and robots.txt at a domain's root), structured data (JSON-LD), and each page of the
   documentation in Markdown next to it, listed in llms.txt (llms-full.txt has
   them all in one file). SITE_NOINDEX=1 keeps a pull request's preview out of
   search engines.
@@ -669,6 +669,11 @@ def main():
             write(out, f"{base}llms-full.txt", llms_txt(t, version, descriptions, markdown))
         pages += 1
     write(out, "sitemap.xml", sitemap([""] + [f"docs/{name}/" for name, _ in DOCS]))
+    # robots.txt counts only at a domain's root: on a custom domain (not
+    # <owner>.github.io/<repo>/, nor a preview's folder). Every crawler,
+    # search engines' and AI assistants' alike, is welcome.
+    if urlsplit(SITE_URL).path == "/":
+        write(out, "robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {SITE_URL}sitemap.xml\n")
     # GitHub Pages serves 404.html at any path: its links start from the site's root.
     t = Texts("en-US", version)
     base_url = os.environ.get("SITE_BASE", "/PlayGuard/")

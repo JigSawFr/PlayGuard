@@ -35,6 +35,9 @@ jobs:
   build:
     runs-on: ubuntu-26.04
     timeout-minutes: 60
+    permissions:
+      contents: read
+      pages: read   # the site's address (its custom domain)
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -92,14 +95,21 @@ jobs:
           REF: ${{ github.event.pull_request.head.ref || github.ref_name }}
           PR: ${{ github.event.pull_request.number }}
           TITLE: ${{ github.event.pull_request.title }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          # GitHub Pages serves 404.html at any path: its links start from the
-          # site's root, a pull request's folder for its preview. The pages'
-          # absolute links (canonical, other languages, sitemap, llms.txt) are
-          # its address; a preview is kept out of search engines.
-          export SITE_BASE="/${REPO#*/}/${PR:+pr-$PR/}"
+          # The site's address, as GitHub Pages serves it: its custom domain
+          # when it has one (Settings › Pages), else <owner>.github.io/<repo>/;
+          # a pull request's preview in pr-<number>/. The pages' absolute links
+          # (canonical, other languages, sitemap, llms.txt) are that address,
+          # and 404.html, served at any path, starts its links from its path.
+          # A preview is kept out of search engines.
+          pages=$(gh api "repos/$REPO/pages" --jq .html_url 2>/dev/null || true)
           owner="${REPO%%/*}"
-          export SITE_URL="https://${owner,,}.github.io$SITE_BASE"
+          pages="${pages:-https://${owner,,}.github.io/${REPO#*/}/}"
+          pages="${pages%/}/"
+          export SITE_URL="$pages${PR:+pr-$PR/}"
+          export SITE_BASE="/${pages#*://*/}${PR:+pr-$PR/}"
+          echo "site: $SITE_URL (404.html from $SITE_BASE)"
           export SITE_NOINDEX="${PR:+1}"
           export SITE_SCREENSHOTS=shots
           python3 tools/build_site.py out .

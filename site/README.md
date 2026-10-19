@@ -18,9 +18,9 @@ PlayGuard's website, on GitHub Pages: <https://jigsawfr.github.io/PlayGuard/>.
   each page of the documentation as an article), each page of the
   documentation in Markdown next to it (`docs/<page>.md`, in English and in
   `/fr/`), listed in [`llms.txt`](https://llmstxt.org) (`llms-full.txt`: the
-  whole documentation in one file). A pull request's preview says `noindex`.
-  A `robots.txt` would have to be at the root of `jigsawfr.github.io`, not of
-  this site, so there is none.
+  whole documentation in one file), and `robots.txt` when the site is at its
+  domain's root (a custom domain: it counts nowhere else). A pull request's
+  preview says `noindex`.
 - **The web simulator** in `/simulator/` ([`web/README.md`](../web/README.md)).
 - **Each open pull request's preview** in `/pr-<number>/`: its website and
   its simulator, linked in a comment on the pull request.
@@ -59,7 +59,9 @@ pages; no framework, nothing to install but that.
   documentation. A new screen in the gallery is a name in both files: its
   tab, and the keys that lead to it from there.
 - **The site's address**: `SITE_URL` (`https://jigsawfr.github.io/PlayGuard/`
-  by default; a preview's in CI), `SITE_NOINDEX=1` for a preview.
+  by default). CI asks GitHub Pages for it (its custom domain, when it has
+  one) and adds a preview's folder; `SITE_BASE` is its path, for 404.html;
+  `SITE_NOINDEX=1` for a preview.
 - **A Content-Security-Policy** on every page (a `<meta>`: GitHub Pages sends
   no headers): only the site's own files, no inline script or style. The
   JSON-LD blocks are data, not scripts: the policy does not apply to them. A page
