@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "core/sim_env.h"
 #ifndef __SWITCH__
 #include "sim/sim_net.hpp"
 #endif
@@ -34,7 +35,7 @@ Latest fetch(std::string* error)
 #ifndef __SWITCH__
     // Desktop simulation: "1.12.0:6.5.4:23.0.1" (Atmosphère : hekate : firmware).
     // Without it, nothing: a smoke test never depends on the network.
-    const char* sim = std::getenv("PLAYGUARD_SIM_SYS_LATEST");
+    const char* sim = sim_env("PLAYGUARD_SIM_SYS_LATEST");
     if (!sim || std::strcmp(sim, "offline") == 0) {
         sim_net::offline(error);
         return out;

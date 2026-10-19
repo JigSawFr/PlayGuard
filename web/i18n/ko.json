@@ -40,7 +40,20 @@
   "record": "녹화",
   "stop_recording": "중지",
   "forget": "저장된 상태 지우기",
-  "live_applied": "재시작 없이 변경됨"
+  "live_applied": "재시작 없이 변경됨",
+  "stop": "중지",
+  "steps_copy": "단계 링크",
+  "steps_help": "여기서처럼 PlayGuard를 시작하고 그 후에 한 일을 다시 재생하는 링크",
+  "steps_copied": "단계가 담긴 링크를 복사했습니다",
+  "replaying": "단계 재생 중: {n} / {total}",
+  "tour": "둘러보기",
+  "report": "문제 신고",
+  "tour_overview": "개요: 오늘의 플레이 시간, 제한, 남은 시간, 취침 시간.",
+  "tour_play_timer": "플레이 타이머: 주간 그래프가 곧 편집기입니다. 매일 같은 제한 또는 요일별 제한.",
+  "tour_activity": "활동: 본체 기록을 바탕으로 누가 무엇을 얼마나 플레이했는지.",
+  "tour_console": "본체: 네트워크 시계, 설치된 게임, 본체에서 실행 중인 것.",
+  "tour_time": "시간이 흐릅니다: 한 시간 플레이 후 오늘의 시간을 다 썼습니다.",
+  "tour_end": "이제 직접 해 보세요: 화살표로 이동, Enter는 A, Esc는 B. 패널에서 어떤 상태든 설정할 수 있습니다."
  },
  "groups": {
   "app": "PlayGuard",

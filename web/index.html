@@ -12,12 +12,15 @@
   <title>PlayGuard simulator</title>
   <meta name="description" content="PlayGuard running in the browser against a simulated console.">
   <link rel="icon" href="icon.jpg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0a705f">
   <link rel="stylesheet" href="simulator.css">
   <!-- The theme before the first paint (theme.js). -->
   <script src="theme.js"></script>
   <!-- Threads need a cross-origin isolated page; GitHub Pages cannot send the
-       headers, so this service worker adds them (and reloads once). -->
-  <script src="coi-serviceworker.js"></script>
+       headers, so this service worker adds them (and reloads once). It also
+       keeps PlayGuard's files for the next visits, and offline. -->
+  <script src="sw.js"></script>
 </head>
 <body>
   <header class="top">
@@ -55,6 +58,12 @@
         <div class="toast" id="toast" role="status" hidden></div>
       </div>
 
+      <!-- Steps being replayed (rec=, the tour): what, and a way out. -->
+      <div class="notice" id="steps-notice" role="status" hidden>
+        <span id="steps-text"></span>
+        <button type="button" class="btn" id="steps-stop" data-i18n="stop">Stop</button>
+      </div>
+
       <div class="notice" id="theme-notice" role="status" hidden>
         <span data-i18n="theme_changed"></span>
         <button type="button" class="btn" id="theme-restart" data-i18n="restart">Restart</button>
@@ -66,6 +75,9 @@
           <button type="button" class="btn ghost" id="pad-toggle" aria-pressed="false" data-i18n="pad">Pad</button>
           <button type="button" class="btn ghost" id="shot" data-i18n="screenshot">Screenshot</button>
           <button type="button" class="btn ghost" id="record" aria-pressed="false" data-i18n="record" hidden>Record</button>
+          <button type="button" class="btn ghost" id="steps-copy" data-i18n="steps_copy" data-i18n-title="steps_help">Steps link</button>
+          <button type="button" class="btn ghost" id="tour" data-i18n="tour">Tour</button>
+          <button type="button" class="btn ghost" id="report" data-i18n="report">Report a problem</button>
         </div>
       </div>
 

@@ -40,7 +40,20 @@
   "record": "Aufnehmen",
   "stop_recording": "Stopp",
   "forget": "Gespeicherten Zustand vergessen",
-  "live_applied": "Ohne Neustart geändert"
+  "live_applied": "Ohne Neustart geändert",
+  "stop": "Stopp",
+  "steps_copy": "Schritte-Link",
+  "steps_help": "Ein Link, der PlayGuard wie hier startet und wiederholt, was du seitdem getan hast",
+  "steps_copied": "Link mit den Schritten kopiert",
+  "replaying": "Schritte werden wiederholt: {n} von {total}",
+  "tour": "Rundgang",
+  "report": "Problem melden",
+  "tour_overview": "Übersicht: heutige Spielzeit, das Limit, die Restzeit und die Schlafenszeit.",
+  "tour_play_timer": "Spielzeit: Das Wochendiagramm ist der Editor, ein Limit für jeden Tag oder eines pro Tag.",
+  "tour_activity": "Aktivität: wer was wie lange gespielt hat, aus dem Protokoll der Konsole.",
+  "tour_console": "Konsole: die Netzwerkuhr, die installierten Spiele und was die Konsole ausführt.",
+  "tour_time": "Die Zeit vergeht: eine Stunde Spielzeit später ist die heutige Zeit aufgebraucht.",
+  "tour_end": "Du bist dran: Pfeiltasten bewegen, Eingabe ist A, Esc ist B. Der Bereich stellt jeden Zustand ein."
  },
  "groups": {
   "app": "PlayGuard",

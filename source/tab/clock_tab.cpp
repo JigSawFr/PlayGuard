@@ -8,6 +8,7 @@
 
 #include "action/offline_clock_logic.hpp"
 #include "app.hpp"
+#include "core/sim_env.h"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/ntp_servers.hpp"
@@ -103,7 +104,7 @@ void ClockTab::refresh()
 #ifndef __SWITCH__
     // Desktop simulation: a console time frozen by PLAYGUARD_SIM_NOW stays
     // frozen here too, or a screenshot would depend on when it was taken.
-    if (std::getenv("PLAYGUARD_SIM_NOW")) ticked = 0;
+    if (sim_env("PLAYGUARD_SIM_NOW")) ticked = 0;
 #endif
     const std::string na = "playguard/common/unavailable"_i18n;
     ui::set_detail(user, R_SUCCEEDED(s.user_rc) ? ui::time_text(s.user_time + ticked) : na);

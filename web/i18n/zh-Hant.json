@@ -40,7 +40,20 @@
   "record": "錄影",
   "stop_recording": "停止",
   "forget": "清除保留的狀態",
-  "live_applied": "已變更，無需重新啟動"
+  "live_applied": "已變更，無需重新啟動",
+  "stop": "停止",
+  "steps_copy": "步驟連結",
+  "steps_help": "一個連結：像這裡一樣啟動 PlayGuard，並重播之後的操作",
+  "steps_copied": "已複製含步驟的連結",
+  "replaying": "正在重播步驟：第 {n} 步，共 {total} 步",
+  "tour": "導覽",
+  "report": "回報問題",
+  "tour_overview": "概覽：今天的遊玩時間、限制、剩餘時間與就寢時間。",
+  "tour_play_timer": "遊玩時間限制：每週圖表就是編輯器，每天相同的限制或每天各自的限制。",
+  "tour_activity": "活動：根據主機自己的記錄，誰玩了什麼、玩了多久。",
+  "tour_console": "主機：網路時鐘、已安裝的遊戲以及主機執行的內容。",
+  "tour_time": "時間流逝：玩了一個小時後，今天的時間用完了。",
+  "tour_end": "輪到你了：方向鍵移動，Enter 為 A，Esc 為 B。面板可設定任何狀態。"
  },
  "groups": {
   "app": "PlayGuard",

@@ -65,7 +65,7 @@ def main():
         if name in names:
             errors.append(f"{where}: twice")
         names.add(name)
-        if not p.get("config"):
+        if not p.get("config") and not p.get("page"):
             variables.add(name.upper())
         if p.get("group") not in groups:
             errors.append(f"{where}: no group {p.get('group')!r}")
@@ -78,9 +78,9 @@ def main():
         for o in p.get("values") or {}:
             if o not in (p.get("options") or []):
                 errors.append(f"{where}: values for {o!r}, which is not one of its options")
-        if p.get("live") and p.get("config"):
-            errors.append(f"{where}: live, but no variable (config)")
-        if p.get("panel") is False:
+        if p.get("live") and (p.get("config") or p.get("page")):
+            errors.append(f"{where}: live, but no variable (config or page)")
+        if p.get("panel") is False or p.get("page"):
             continue
         needed.add(f"params/{name}/label")
         for o in p.get("options") or []:

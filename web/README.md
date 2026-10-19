@@ -44,9 +44,10 @@ a screen without a build on the console.
 - **Live settings**: the variables PlayGuard reads at each use (`live` in
   `params.json`: the failures, the network's answers, `idle`, `now`, `skip`,
   `accounts`, …) change without a restart when **Apply** changes nothing
-  else: the page sets them in PlayGuard's environment
-  (`playguard_web_setenv()`, `source/sim/web_page.cpp`) and the URL follows.
-  PlayGuard sees the new value at its next read (a screen's next refresh).
+  else: the page hands them to PlayGuard (`playguard_web_setenv()`,
+  `source/sim/web_page.cpp`, kept by `core/sim_env.h` under a lock, the
+  process environment left alone) and the URL follows. PlayGuard sees the
+  new value at its next read (a screen's next refresh).
 - **The time**: the buttons under the screen move the console's time on by
   5 min, 15 min or 1 h (`skip=`, in seconds; **Now** goes back), live, with a
   game played all along: the time left goes down by as much, to the limit and
@@ -64,6 +65,22 @@ a screen without a build on the console.
   screen). A gamepad works through the browser.
 - **Screenshot** saves the screen as it is (1280×720); **Record** saves a
   video of it (WebM) until **Stop**; **Log** shows what PlayGuard logs.
+- **Steps**: from the first screen on, the page notes each button pressed
+  (keys, the pad), each touch and each live change, with the time between.
+  **Steps link** gives a link with the settings PlayGuard started with and
+  those steps (`rec=`); a page opening it replays them once the first screen
+  is up, a notice above the screen saying how far it is (**Stop** ends it),
+  then drops `rec=` from its URL. A step is a button (`up`, `down`, `left`,
+  `right`, `a`, `b`, `x`, `y`, `l`, `r`, `zl`, `zr`, `plus`, `minus`; `down*3`
+  three times), `wN` (wait N tenths of a second), `tX,Y` (a touch, in
+  1280×720), `s:name=value` (a live setting) or `say:key` (a line of the
+  tour); `runSteps()` plays them for the smoke test. With *Keep the state*,
+  a link replays from the kept state of whoever opens it.
+- **Tour** (`tour=1`): steps through the tabs, then an hour of play, a line
+  above the screen for each, in the page's language.
+- **Report a problem** opens GitHub's bug form with its *How to reproduce*
+  filled in: the steps link, the build, the browser and the end of the log
+  (as much as a URL takes).
 - The network is a console without a connection: GitHub and switchbrew send
   no CORS headers, so a page cannot reach them (`source/sim/web_http.cpp`).
   The `PLAYGUARD_SIM_*` folders the desktop reads its answers from are
@@ -86,7 +103,10 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   SDL2 and zlib from Emscripten's ports; no libcurl; the resources packaged at
   `/app/resources` and `web/samples/` at `/app/samples` (`playguard.data`); a
   pool of 16 threads started with the page (a thread asked for later waits
-  for the browser, which a busy main thread never lets it have); IDBFS for
+  for the browser, which a busy main thread never lets it have); growable
+  shared memory where the browser has it (`GROWABLE_ARRAYBUFFERS=1`: no
+  slower JS views of threads + memory growth, and still runs where it does
+  not); IDBFS for
   *Keep the state*; `source/sim/web_page.cpp`, what the page calls while
   PlayGuard runs (`ccall`).
 - `source/main.cpp`: in a browser a frame must hand the thread back to the
@@ -117,10 +137,18 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   catalog, or English lacks a text; it warns about a text another catalog has
   not translated yet (the page shows the English one meanwhile).
 - **Threads need a cross-origin isolated page** (the COOP / COEP headers).
-  GitHub Pages cannot send them, so `coi-serviceworker.js` (vendored, MIT)
-  adds them from a service worker, which reloads the page once on the first
-  visit (the page waits up to 30 s for it: a first visit on a slow connection
-  takes a while). `serve.py` sends them itself.
+  GitHub Pages cannot send them, so `sw.js` adds them from a service worker
+  (as coi-serviceworker, MIT, did before it), which reloads the page once on
+  the first visit (the page waits up to 30 s for it: a first visit on a slow
+  connection takes a while). `serve.py` sends them itself.
+- **The next visits, and offline**: `sw.js` keeps PlayGuard's files
+  (`playguard.js`, `.wasm`, `.data`, `cjk.otf`, asked for with the commit in
+  their URL) once fetched, a commit's copy replacing the one before, and
+  takes them from its cache from then on: the page starts without
+  downloading them again. The page's own files come from the network, from
+  the cache without one, so the simulator opens offline once visited.
+  `manifest.webmanifest` (the icon from `branding/icon.svg`) makes it
+  installable as an app.
 - **A Content-Security-Policy** (`index.html`'s `<meta>`): only the page's
   own files, no inline script or style; `'wasm-unsafe-eval'` compiles
   PlayGuard and `blob:` workers are Emscripten's threads. The theme is set
@@ -133,13 +161,23 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
 - **The smoke test** (`tools/web_smoke.py`, CI's *The simulator in a
   browser*): the build in headless Chromium (Playwright, WebGL 2 from
   SwiftShader) must reach its first screen in each kind of start (Overview,
-  Play timer, Activity, Console, limit reached, start-up error, Japanese),
-  move the time on and take a live setting without a restart, add the CJK
-  font after the start, and keep `sim_console.bin` across a reload with
-  `keep=1`; a page error fails it. Its screens (`shots/`) go with the site,
-  and the pull request's comment shows them. Locally, after `make web`:
-  `python3 tools/web_smoke.py build-web/simulator build-web/shots` (with
-  `pip install playwright` and `playwright install chromium`).
+  Play timer, Activity, Console, limit reached, start-up error, Japanese);
+  play desktop smoke scenarios as steps (every tab, *alarm*, the first half
+  of *errors*); move the time on and take a live setting without a restart;
+  note keys and replay their steps link, play the tour, fill a report link;
+  add the CJK font after the start; keep `sim_console.bin` across a reload
+  with `keep=1`; and, served without the headers as GitHub Pages does, be
+  isolated by `sw.js`, keep PlayGuard's files and start offline. A page
+  error fails it. Its screens (`shots/`) and the time each start took
+  (`shots/timings.json`, in the run's summary) go with the site.
+- **The screens against main's** (CI, pull requests only): each screen is
+  compared with main's, published with its site, by `tools/visual_check.py`
+  (the footer clock masked); `shots/compare.json` lists the ones that
+  changed and `shots/visual_diff/` shows them side by side. The pull
+  request's comment says which: a report, not a gate.
+- Locally, after `make web`: `python3 tools/web_smoke.py build-web/simulator
+  build-web/shots` (with `pip install playwright` and `playwright install
+  chromium`).
 
 ## GitHub Pages
 
