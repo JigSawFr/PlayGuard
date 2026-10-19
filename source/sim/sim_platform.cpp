@@ -4,6 +4,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "core/platform.h"
 
+#include "core/sim_env.h"
 #include "util/sha256.hpp"
 
 #include <cstdio>
@@ -14,7 +15,7 @@
 
 PlatformInput platform_numpad(const char* header, const char*, const char*, int max_len, char* out, size_t out_size)
 {
-    const char* typed = std::getenv("PLAYGUARD_SIM_NUMPAD");
+    const char* typed = sim_env("PLAYGUARD_SIM_NUMPAD");
     if (!typed) return PLATFORM_INPUT_NONE;   // borealis' own text input
     if (!out || out_size == 0 || std::strcmp(typed, "cancel") == 0) return PLATFORM_INPUT_CANCELLED;
     size_t n = std::strlen(typed);
@@ -29,12 +30,12 @@ PlatformInput platform_numpad(const char* header, const char*, const char*, int 
 
 bool platform_in_focus(void)
 {
-    return std::getenv("PLAYGUARD_SIM_BACKGROUND") == nullptr;
+    return sim_env("PLAYGUARD_SIM_BACKGROUND") == nullptr;
 }
 
 bool platform_can_launch(void)
 {
-    return std::getenv("PLAYGUARD_SIM_HBLOADER") != nullptr;
+    return sim_env("PLAYGUARD_SIM_HBLOADER") != nullptr;
 }
 
 bool platform_set_next_load(const char* path)
@@ -47,14 +48,14 @@ bool platform_set_next_load(const char* path)
 
 void platform_exit_to_home(void)
 {
-    if (std::getenv("PLAYGUARD_SIM_APPLET")) return;
+    if (sim_env("PLAYGUARD_SIM_APPLET")) return;
     std::printf("exit to HOME\n");
     std::fflush(stdout);
 }
 
 bool platform_boot_choice(const char* text)
 {
-    const char* choice = std::getenv("PLAYGUARD_SIM_BOOT_CHOICE");
+    const char* choice = sim_env("PLAYGUARD_SIM_BOOT_CHOICE");
     const bool a = choice && std::strcmp(choice, "a") == 0;
     std::printf("boot screen:\n%s\nboot screen: %s\n", text ? text : "", a ? "A" : "B");
     std::fflush(stdout);
@@ -66,7 +67,7 @@ void platform_romfs_mount(void) {}
 
 bool platform_region(int* region)
 {
-    const char* value = std::getenv("PLAYGUARD_SIM_REGION");
+    const char* value = sim_env("PLAYGUARD_SIM_REGION");
     if (!region || !value || !*value) return false;
     char* end = nullptr;
     const long r = std::strtol(value, &end, 10);

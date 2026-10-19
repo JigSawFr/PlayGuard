@@ -59,7 +59,7 @@ jobs:
       # Noto Sans CJK with fontTools (tools/web_cjk_font.py); the website's
       # documentation is Markdown (tools/build_site.py).
       - name: Noto Sans CJK, fontTools and Python-Markdown
-        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends fonts-noto-cjk python3-fonttools python3-markdown
+        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends fonts-noto-cjk python3-fonttools python3-markdown imagemagick
       - name: The simulator
         env:
           PLAYGUARD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -88,6 +88,40 @@ jobs:
           npx playwright install chromium
           version=$(python3 -c 'import json; print(json.load(open(".release-please-manifest.json"))["."])')
           SITE_SCREENSHOT_JOBS="$(nproc)" node tools/site_screenshots.mjs build-web/simulator shots "$version"
+      # The screens against main's, published with its site: which ones this
+      # pull request changes (tools/visual_check.py, the footer clock masked;
+      # side by side in shots/visual_diff/), for its comment (pages.yml,
+      # shots/compare.json) and the run's summary. A report, not a gate: a
+      # change can be meant. A screen main does not have yet is left out.
+      - name: The screens against main's
+        if: github.event_name == 'pull_request'
+        env:
+          OWNER: ${{ github.repository_owner }}
+          NAME: ${{ github.event.repository.name }}
+        run: |
+          main="https://${OWNER,,}.github.io/$NAME/simulator/shots/"
+          mkdir -p build-web/main-shots
+          for f in build-web/shots/*.png; do
+            n=$(basename "$f")
+            curl -sfL -o "build-web/main-shots/$n" "$main$n" || rm -f "build-web/main-shots/$n"
+          done
+          if ! ls build-web/main-shots/*.png > /dev/null 2>&1; then
+            echo "No screens on main's site yet: nothing to compare."
+            exit 0
+          fi
+          python3 tools/visual_check.py build-web/shots build-web/main-shots > build-web/compare.txt 2>&1 || true
+          cat build-web/compare.txt
+          python3 - <<'EOF'
+          import json, os, re
+          lines = open("build-web/compare.txt").read().splitlines()
+          compared = [l for l in lines if re.match(r"(ok   |FAIL )", l)]
+          changed = [re.match(r"FAIL (\w+)", l).group(1) for l in compared if l.startswith("FAIL ")]
+          json.dump({"base": "main", "compared": len(compared), "changed": changed},
+                    open("build-web/shots/compare.json", "w"))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as f:
+              f.write("### The web simulator's screens against main's\n\n")
+              f.write(f"{len(changed)} of {len(compared)} changed" + (": " + ", ".join(changed) if changed else "") + "\n\n")
+          EOF
       - name: The website, the simulator in it
         env:
           REPO: ${{ github.repository }}
@@ -132,6 +166,12 @@ jobs:
             for f in out/simulator/playguard.wasm out/simulator/playguard.data out/simulator/playguard.js out/simulator/cjk.otf; do
               echo "| \`$(basename "$f")\` | $(( $(stat -c %s "$f") / 1024 )) KiB | $(( $(gzip -9c "$f" | wc -c) / 1024 )) KiB |"
             done
+            echo
+            echo "Starts in headless Chromium (s, page load to first screen, tools/web_smoke.py):"
+            echo
+            echo '```'
+            cat build-web/shots/timings.json
+            echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

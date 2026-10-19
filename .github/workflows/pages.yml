@@ -102,6 +102,18 @@ jobs:
           url="${SITE%/}/pr-$pr/"
           sim="${url}simulator/"
           shots="${sim}shots/"
+          # The screens against main's (web.yml's shots/compare.json).
+          compare="site/pr-$pr/simulator/shots/compare.json"
+          changes=""
+          if [ -f "$compare" ]; then
+            n=$(jq '.changed | length' "$compare")
+            total=$(jq '.compared' "$compare")
+            if [ "$n" -gt 0 ]; then
+              changes="**Screens changed against main** ($n of $total, main | this pull request | the changes): $(jq -r --arg d "${shots}visual_diff/" '.changed | map("[\(.)](\($d)\(.).png)") | join(" · ")' "$compare")"
+            else
+              changes="Screens against main: the $total compared are unchanged."
+            fi
+          fi
           marker='<!-- playguard-web-simulator -->'
           body=$(cat <<EOF
           $marker
@@ -110,6 +122,8 @@ jobs:
           **[The web simulator](${sim})** · [the website](${url}) — commit \`${SHA::7}\`, updated at each push (allow a minute for GitHub Pages).
 
           Straight to a state: [unlocked](${sim}?unlocked=1) · [limit reached](${sim}?restricted=1) · [no PIN yet](${sim}?not_set_up=1) · [updates to install](${sim}?fw=22.5.0&latest=1.1.0:24.0.0&sys_latest=1.12.1:6.5.4:23.0.1&sys_notes=sample&dev_builds=sample&github_login=ok&hbloader=1) · [in French, dark](${sim}?lang=fr&theme=dark). The side panel sets the rest, **Copy link** gives a link to what it shows, and the buttons under the screen move the console's time on.
+
+          ${changes}
 
           <details><summary>The screens of this build (web smoke test)</summary>
 

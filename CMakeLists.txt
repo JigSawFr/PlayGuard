@@ -251,6 +251,9 @@ if (PLAYGUARD_WEB)
     target_link_options(${PROJECT_NAME} PRIVATE
         -pthread -fexceptions -sUSE_SDL=2 -sUSE_ZLIB=1
         -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sFULL_ES3
+        # Not -sGROWABLE_ARRAYBUFFERS, which Emscripten suggests for threads
+        # with memory growth: WebGL refuses views of a resizable buffer
+        # ("The provided ArrayBuffer value must not be resizable", Chrome).
         -sALLOW_MEMORY_GROWTH -sINITIAL_MEMORY=128MB -sSTACK_SIZE=1MB -sDEFAULT_PTHREAD_STACK_SIZE=1MB
         -sPTHREAD_POOL_SIZE=16
         -sEXIT_RUNTIME=0
@@ -364,10 +367,11 @@ if (PLAYGUARD_WEB)
         COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_CURRENT_SOURCE_DIR}/web/index.html ${CMAKE_CURRENT_SOURCE_DIR}/web/theme.js ${CMAKE_CURRENT_SOURCE_DIR}/web/simulator.js
                 ${CMAKE_CURRENT_SOURCE_DIR}/web/simulator.css ${CMAKE_CURRENT_SOURCE_DIR}/web/params.json
-                ${CMAKE_CURRENT_SOURCE_DIR}/web/coi-serviceworker.js ${PROJECT_ICON}
+                ${CMAKE_CURRENT_SOURCE_DIR}/web/sw.js ${CMAKE_CURRENT_SOURCE_DIR}/web/manifest.webmanifest ${PROJECT_ICON}
                 ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.js ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.wasm
                 ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.data
                 ${PLAYGUARD_SITE}
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/branding/icon.svg ${PLAYGUARD_SITE}/icon.svg
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/web/i18n ${PLAYGUARD_SITE}/i18n
         ${PLAYGUARD_SITE_CJK}
         COMMENT "Assembling the web simulator's site in ${PLAYGUARD_SITE}")

@@ -11,6 +11,7 @@
 #endif
 
 #include "app.hpp"
+#include "core/sim_env.h"
 #include "util/dev_builds.hpp"
 #include "util/github_auth.hpp"
 #include "util/http.hpp"
@@ -49,7 +50,7 @@ bool api_get(const std::string& path, const char* name, const std::string& token
 #ifndef __SWITCH__
     if (const char* folder = sim()) {
         // PLAYGUARD_SIM_DEV_BUILDS_DELAY: each answer takes that many ms (the bar shows).
-        if (const char* delay = std::getenv("PLAYGUARD_SIM_DEV_BUILDS_DELAY"))
+        if (const char* delay = sim_env("PLAYGUARD_SIM_DEV_BUILDS_DELAY"))
             std::this_thread::sleep_for(std::chrono::milliseconds(std::atoi(delay)));
         return sim_net::get(folder, name, body, error);
     }
