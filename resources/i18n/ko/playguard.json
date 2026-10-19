@@ -1518,7 +1518,6 @@
             "child": "아이에게 보여주기",
             "bed_title": "취침 알람",
             "on": "켜짐",
-            "off": "꺼짐",
             "bed_sub": "{}부터 다시 플레이 가능",
             "pc_title": "자녀 보호",
             "pc_unlocked": "해제됨",
@@ -1571,7 +1570,9 @@
             "home_pill": "HOME에서 게임 열림 · 계속 계산",
             "home_title": "게임이 아직 열려 있습니다",
             "steps_count": "{} / {}",
-            "tl_bed_first": "취침이 먼저"
+            "tl_bed_first": "취침이 먼저",
+            "bed_off_value": "꺼짐",
+            "bed_set": "설정하기"
         },
         "pill": {
             "pc_on": "자녀 보호 켜짐",

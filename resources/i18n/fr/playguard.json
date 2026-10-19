@@ -1518,7 +1518,6 @@
             "child": "Montrer à l'enfant",
             "bed_title": "Alarme du coucher",
             "on": "activée",
-            "off": "désactivée",
             "bed_sub": "jeu de nouveau permis à {}",
             "pc_title": "Contrôle parental",
             "pc_unlocked": "déverrouillé",
@@ -1571,7 +1570,9 @@
             "home_pill": "Jeu ouvert sur HOME · toujours décompté",
             "home_title": "Un jeu est encore ouvert",
             "steps_count": "{} sur {}",
-            "tl_bed_first": "le coucher d'abord"
+            "tl_bed_first": "le coucher d'abord",
+            "bed_off_value": "Désactivée",
+            "bed_set": "La régler"
         },
         "pill": {
             "pc_on": "Contrôle parental actif",

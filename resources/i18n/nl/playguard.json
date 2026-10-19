@@ -1518,7 +1518,6 @@
             "child": "Aan het kind tonen",
             "bed_title": "Bedtijdalarm",
             "on": "aan",
-            "off": "uit",
             "bed_sub": "weer spelen vanaf {}",
             "pc_title": "Ouderlijk toezicht",
             "pc_unlocked": "ontgrendeld",
@@ -1571,7 +1570,9 @@
             "home_pill": "Spel open in HOME · telt door",
             "home_title": "Er staat nog een spel open",
             "steps_count": "{} van {}",
-            "tl_bed_first": "bedtijd komt eerst"
+            "tl_bed_first": "bedtijd komt eerst",
+            "bed_off_value": "Uit",
+            "bed_set": "Instellen"
         },
         "pill": {
             "pc_on": "Ouderlijk toezicht actief",

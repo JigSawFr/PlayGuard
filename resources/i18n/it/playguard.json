@@ -1518,7 +1518,6 @@
             "child": "Mostra al bambino",
             "bed_title": "Sogni d'oro",
             "on": "attivo",
-            "off": "disattivato",
             "bed_sub": "si può giocare di nuovo alle {}",
             "pc_title": "Filtro famiglia",
             "pc_unlocked": "sbloccato",
@@ -1571,7 +1570,9 @@
             "home_pill": "Gioco aperto nel menu HOME · continua a contare",
             "home_title": "Un gioco è ancora aperto",
             "steps_count": "{} di {}",
-            "tl_bed_first": "prima l'ora di dormire"
+            "tl_bed_first": "prima l'ora di dormire",
+            "bed_off_value": "Disattivata",
+            "bed_set": "Impostarla"
         },
         "pill": {
             "pc_on": "Filtro famiglia attivo",

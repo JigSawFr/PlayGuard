@@ -1080,11 +1080,19 @@ void CadranTab::show_cards(bool unlocked, bool has_pin)
     const PtState& pt = this->pt;
     const PctlStatus& s = this->status;
 
-    // Bedtime.
-    if (pt.bedtime_valid) {
+    // Bedtime. Off, the card says so in large rather than an alarm time that
+    // does not ring, and A sets it.
+    const bool bed_off = pt.bedtime_valid && !pt.bedtime_enabled;
+    ui::set_visible(bed_key.getView(), bed_off && !app::read_only());
+    bed_value->setTextColor(theme[bed_off ? "cadran/text2" : "cadran/text"]);
+    if (bed_off) {
+        bed_value->setText("playguard/cadran/today/bed_off_value"_i18n);
+        bed_state->setText("");
+        bed_sub->setText(app::read_only() ? "" : "playguard/cadran/today/bed_set"_i18n);
+    } else if (pt.bedtime_valid) {
         bed_value->setText(fmt::format("{:02d}:{:02d}", pt.bedtime_hour, pt.bedtime_minute));
-        bed_state->setText(pt.bedtime_enabled ? "playguard/cadran/today/on"_i18n : "playguard/cadran/today/off"_i18n);
-        bed_state->setTextColor(pt.bedtime_enabled ? theme["cadran/teal"] : theme["cadran/text2"]);
+        bed_state->setText("playguard/cadran/today/on"_i18n);
+        bed_state->setTextColor(theme["cadran/teal"]);
         std::string sub;
         if (pt.bedtime_reset_valid) {
             sub = brls::getStr("playguard/cadran/today/bed_sub", fmt::format("{:02d}:{:02d}", pt.bedtime_reset_hour, pt.bedtime_reset_minute));

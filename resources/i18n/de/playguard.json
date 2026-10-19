@@ -1518,7 +1518,6 @@
             "child": "Dem Kind zeigen",
             "bed_title": "Gute-Nacht-Alarm",
             "on": "an",
-            "off": "aus",
             "bed_sub": "Spielen wieder erlaubt ab {}",
             "pc_title": "Jugendschutz",
             "pc_unlocked": "aufgehoben",
@@ -1571,7 +1570,9 @@
             "home_pill": "Spiel im HOME-Menü offen · zählt weiter",
             "home_title": "Ein Spiel ist noch geöffnet",
             "steps_count": "{} von {}",
-            "tl_bed_first": "Schlafenszeit kommt zuerst"
+            "tl_bed_first": "Schlafenszeit kommt zuerst",
+            "bed_off_value": "Aus",
+            "bed_set": "Einstellen"
         },
         "pill": {
             "pc_on": "Jugendschutz aktiv",

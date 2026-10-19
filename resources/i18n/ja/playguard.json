@@ -1518,7 +1518,6 @@
             "child": "子どもに見せる",
             "bed_title": "おやすみアラーム",
             "on": "ON",
-            "off": "OFF",
             "bed_sub": "{}から再びプレイ可能",
             "pc_title": "みまもり設定",
             "pc_unlocked": "解除中",
@@ -1571,7 +1570,9 @@
             "home_pill": "HOMEでゲームが開いています · カウント継続",
             "home_title": "ゲームがまだ開いています",
             "steps_count": "{} / {}",
-            "tl_bed_first": "就寝が先"
+            "tl_bed_first": "就寝が先",
+            "bed_off_value": "オフ",
+            "bed_set": "設定する"
         },
         "pill": {
             "pc_on": "みまもり設定 有効",

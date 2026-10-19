@@ -1518,7 +1518,6 @@
             "child": "Mostrar à criança",
             "bed_title": "Alarme de hora de dormir",
             "on": "ativado",
-            "off": "desativado",
             "bed_sub": "pode voltar a jogar às {}",
             "pc_title": "Controlo parental",
             "pc_unlocked": "desbloqueado",
@@ -1571,7 +1570,9 @@
             "home_pill": "Jogo aberto no HOME · continua a contar",
             "home_title": "Ainda há um jogo aberto",
             "steps_count": "{} de {}",
-            "tl_bed_first": "a hora de dormir vem primeiro"
+            "tl_bed_first": "a hora de dormir vem primeiro",
+            "bed_off_value": "Desativado",
+            "bed_set": "Defini-lo"
         },
         "pill": {
             "pc_on": "Controlo parental ativo",

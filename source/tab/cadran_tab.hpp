@@ -152,6 +152,7 @@ class CadranTab : public DashboardTab
     BRLS_BIND(brls::Label,  bed_state,   "cad_bed_state");
     BRLS_BIND(CadranDigits, bed_value,   "cad_bed_value");
     BRLS_BIND(brls::Label,  bed_sub,     "cad_bed_sub");
+    BRLS_BIND(brls::Box,    bed_key,     "cad_bed_key");
     BRLS_BIND(brls::Box,    pc_card,     "cad_pc_card");
     BRLS_BIND(brls::Label,  pc_state,    "cad_pc_state");
     BRLS_BIND(CadranDigits, pc_value,    "cad_pc_value");

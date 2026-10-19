@@ -1518,7 +1518,6 @@
             "child": "給孩子看",
             "bed_title": "就寢鬧鐘",
             "on": "已開啟",
-            "off": "已關閉",
             "bed_sub": "{}起可再次遊玩",
             "pc_title": "家長監護",
             "pc_unlocked": "已解除",
@@ -1571,7 +1570,9 @@
             "home_pill": "遊戲在HOME中開啟 · 仍在計時",
             "home_title": "仍有遊戲處於開啟狀態",
             "steps_count": "{} / {}",
-            "tl_bed_first": "就寢在先"
+            "tl_bed_first": "就寢在先",
+            "bed_off_value": "已關閉",
+            "bed_set": "設定"
         },
         "pill": {
             "pc_on": "家長監護已開啟",

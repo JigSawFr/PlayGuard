@@ -1518,7 +1518,6 @@
             "child": "给孩子看",
             "bed_title": "就寝提醒",
             "on": "已开启",
-            "off": "已关闭",
             "bed_sub": "{}起可再次游玩",
             "pc_title": "家长控制",
             "pc_unlocked": "已解除",
@@ -1571,7 +1570,9 @@
             "home_pill": "游戏在HOME中打开 · 仍在计时",
             "home_title": "仍有游戏处于打开状态",
             "steps_count": "{} / {}",
-            "tl_bed_first": "就寝在先"
+            "tl_bed_first": "就寝在先",
+            "bed_off_value": "已关闭",
+            "bed_set": "设置"
         },
         "pill": {
             "pc_on": "家长控制已开启",

@@ -1518,7 +1518,6 @@
             "child": "Show the child",
             "bed_title": "Bedtime alarm",
             "on": "on",
-            "off": "off",
             "bed_sub": "games allowed again at {}",
             "pc_title": "Parental controls",
             "pc_unlocked": "unlocked",
@@ -1571,7 +1570,9 @@
             "home_pill": "A game open on HOME · still counts",
             "home_title": "A game is still open",
             "steps_count": "{} of {}",
-            "tl_bed_first": "bedtime comes first"
+            "tl_bed_first": "bedtime comes first",
+            "bed_off_value": "Off",
+            "bed_set": "Set it"
         },
         "pill": {
             "pc_on": "Parental controls on",
