@@ -5,6 +5,7 @@
 
 #include "action/frame_stats_flow.hpp"
 #include "action/pin_lock.hpp"
+#include "action/pt_flow.hpp"
 #include "action/pt_logic.hpp"
 #include "activity/main_activity.hpp"
 #include "tab/cadran_tab.hpp"
@@ -56,6 +57,29 @@ void CadranChildActivity::onContentAvailable()
         MainActivity::quit_or_relock();
         return true;
     });
+    // Extra time from here, the parent by the child: the PIN, then the
+    // amounts, and the child screen stays.
+    const auto extra = [this](brls::View*) {
+        if (ui::refuse_read_only()) return true;
+        PtState pt;
+        pctl_play_timer_query(&pt);
+        const int wd = ui::today_weekday();
+        if (!pt.fw_supported || !pt.valid || pt.day_min[wd] == PT_DAY_NOLIMIT || ui::known_unlocked()) {
+            ui::notify("playguard/cadran/child/no_extra"_i18n);
+            return true;
+        }
+        if (!pin_lock::ask()) {
+            ui::notify(pin_lock::refusal_text());
+            return true;
+        }
+        pt_flow::add_extra_time(pt, [this]() { this->refresh(); });
+        return true;
+    };
+    this->getContentView()->registerAction("playguard/cadran/child/extra"_i18n, brls::BUTTON_Y, extra);
+#if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
+    // The desktop build: the keyboard has no Ⓨ, so the Y key (as the main screen).
+    this->getContentView()->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Y), extra);
+#endif
 
     this->refresh();
     this->timer.setPeriod(5000);

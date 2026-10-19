@@ -1661,7 +1661,9 @@
             "back": "Back to the parent · PIN",
             "play": "Hand the console over and play",
             "on_hold": "limit on hold",
-            "end": "Ends around {}"
+            "end": "Ends around {}",
+            "extra": "Extra time",
+            "no_extra": "No limit counts right now: there is nothing to add to."
         },
         "dialog": {
             "unlock_short": "Parental controls are unlocked with the stored PIN for the change, then locked again."

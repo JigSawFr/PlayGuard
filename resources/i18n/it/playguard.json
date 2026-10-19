@@ -1661,7 +1661,9 @@
             "back": "Torna al genitore · PIN",
             "play": "Consegna la console e gioca",
             "on_hold": "limite in pausa",
-            "end": "Finisce verso le {}"
+            "end": "Finisce verso le {}",
+            "extra": "Tempo extra",
+            "no_extra": "Al momento non conta nessun limite: non c'è niente da prolungare."
         },
         "dialog": {
             "unlock_short": "Il filtro famiglia viene sbloccato con il PIN salvato per la modifica, poi bloccato di nuovo."

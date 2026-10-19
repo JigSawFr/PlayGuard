@@ -1661,7 +1661,9 @@
             "back": "Voltar ao adulto · PIN",
             "play": "Entregar a consola e jogar",
             "on_hold": "limite em pausa",
-            "end": "Termina por volta das {}"
+            "end": "Termina por volta das {}",
+            "extra": "Tempo extra",
+            "no_extra": "Nenhum limite está contando agora: não há nada a prolongar."
         },
         "dialog": {
             "unlock_short": "O controle parental é desbloqueado com o PIN salvo durante a alteração e depois volta a ser bloqueado."

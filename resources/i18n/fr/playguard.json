@@ -1661,7 +1661,9 @@
             "back": "Retour parent · code PIN",
             "play": "Rendre la console et jouer",
             "on_hold": "limite en pause",
-            "end": "Fin vers {}"
+            "end": "Fin vers {}",
+            "extra": "Temps en plus",
+            "no_extra": "Aucune limite ne compte en ce moment : rien à prolonger."
         },
         "dialog": {
             "unlock_short": "Le contrôle parental est déverrouillé avec le code PIN enregistré le temps de la modification, puis reverrouillé."

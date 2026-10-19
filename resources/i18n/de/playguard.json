@@ -1661,7 +1661,9 @@
             "back": "Zurück zu den Eltern · PIN",
             "play": "Konsole übergeben und spielen",
             "on_hold": "Limit ausgesetzt",
-            "end": "Ende gegen {}"
+            "end": "Ende gegen {}",
+            "extra": "Zusatzzeit",
+            "no_extra": "Gerade zählt kein Limit: Es gibt nichts zu verlängern."
         },
         "dialog": {
             "unlock_short": "Die Altersbeschränkungen werden für die Änderung mit der gespeicherten Geheimzahl aufgehoben und danach wieder aktiviert."

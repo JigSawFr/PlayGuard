@@ -1661,7 +1661,9 @@
             "back": "Terug naar de ouder · pincode",
             "play": "Console geven en spelen",
             "on_hold": "limiet gepauzeerd",
-            "end": "Eindigt rond {}"
+            "end": "Eindigt rond {}",
+            "extra": "Extra tijd",
+            "no_extra": "Er telt nu geen limiet: er valt niets te verlengen."
         },
         "dialog": {
             "unlock_short": "Ouderlijk toezicht wordt voor de wijziging ontgrendeld met de opgeslagen pincode en daarna weer vergrendeld."
