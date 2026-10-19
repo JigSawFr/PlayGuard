@@ -5,6 +5,7 @@
 
 #include "action/notices.hpp"
 #include "action/sys_update_flow.hpp"
+#include "tab/cadran_tab.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 
@@ -18,6 +19,13 @@ int index_of(const char* const (&list)[N], const std::string& value)
     for (size_t i = 0; i < N; i++)
         if (value == list[i]) return (int)i;
     return 0;
+}
+
+// A tab as the rail or the sidebar names it: the Overview is Cadran's Today.
+std::string tab_name(const std::string& tab)
+{
+    if (tab == "dashboard" && cadran::enabled()) return "playguard/cadran/tabs/today"_i18n;
+    return brls::getStr("playguard/tabs/" + tab);
 }
 }   // namespace
 
@@ -44,7 +52,7 @@ PreferencesTab::PreferencesTab()
 
     start_tab->registerClickAction([this](brls::View*) {
         std::vector<std::string> labels;
-        for (const char* t : config::START_TABS) labels.push_back(brls::getStr(std::string("playguard/tabs/") + t));
+        for (const char* t : config::START_TABS) labels.push_back(tab_name(t));
         ui::pick("playguard/tools/start_tab"_i18n, labels, index_of(config::START_TABS, config::get().start_tab), [this](int i) {
             config::get().start_tab = config::START_TABS[i];
             ui::save_config();
@@ -93,7 +101,7 @@ void PreferencesTab::refresh()
     theme->setDetailText(ui::theme_name());
     appearance->setDetailText(ui::appearance_name());
     text_size->setDetailText(ui::text_size_name());
-    start_tab->setDetailText(brls::getStr(std::string("playguard/tabs/") + config::START_TABS[index_of(config::START_TABS, cfg.start_tab)]));
+    start_tab->setDetailText(tab_name(config::START_TABS[index_of(config::START_TABS, cfg.start_tab)]));
     intro->setOn(cfg.intro, false);
     notices_system->setOn(cfg.notices_system, false);
     notices_summary->setOn(cfg.notices_summary, false);

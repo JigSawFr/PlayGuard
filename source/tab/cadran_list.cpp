@@ -309,7 +309,10 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         cell->detail->setMaxWidth(10000);
         cell->detail->setFontSize(status ? 22.0f : 15.0f);
         cell->detail->setMarginTop(status ? 4 : 2);
-        cell->detail->setSingleLine(true);
+        // A status tile's value is a figure, on one line; another's words
+        // (a language's name, "Español (Latinoamérica)") take two rather than
+        // end in "…".
+        cell->detail->setSingleLine(status);
         if (!status) cell->detail->setTextColor(theme["cadran/text2"]);
     }
     return row;
