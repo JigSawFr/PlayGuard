@@ -39,13 +39,6 @@
             <brls:DetailCell id="ac_days_played" focusable="false" title="@i18n/playguard/activity/summary/days_played"/>
             <brls:DetailCell id="ac_busiest" focusable="false" title="@i18n/playguard/activity/summary/busiest"/>
             <brls:DetailCell id="ac_session" focusable="false" title="@i18n/playguard/activity/summary/session"/>
-            <brls:Header id="ac_hours_header" title="@i18n/playguard/activity/section_hours" marginTop="24" marginBottom="8"/>
-            <PlayHoursView id="ac_hours" width="auto" marginTop="8" marginBottom="8"/>
-            <brls:Label id="ac_hours_legend" text="@i18n/playguard/activity/hours/legend" fontSize="18" marginBottom="6" textColor="@theme/brand/note"/>
-            <brls:DetailCell id="ac_sessions" focusable="false" title="@i18n/playguard/activity/hours/sessions"/>
-            <brls:DetailCell id="ac_longest" focusable="false" title="@i18n/playguard/activity/hours/longest"/>
-            <brls:DetailCell id="ac_busy_hours" focusable="false" title="@i18n/playguard/activity/hours/busy"/>
-            <brls:DetailCell id="ac_late" focusable="false" title="@i18n/playguard/activity/hours/late"/>
             <brls:Header title="@i18n/playguard/activity/section_games" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="ac_games" title="@i18n/playguard/library/open"/>
             <brls:DetailCell id="ac_export" title="@i18n/playguard/activity/export"/>
@@ -56,6 +49,13 @@
             </brls:Box>
             <brls:Label id="ac_capped" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note" visibility="gone"/>
             <brls:Label id="ac_status" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:Header id="ac_hours_header" title="@i18n/playguard/activity/section_hours" marginTop="24" marginBottom="8"/>
+            <PlayHoursView id="ac_hours" width="auto" marginTop="8" marginBottom="8"/>
+            <brls:Label id="ac_hours_legend" text="@i18n/playguard/activity/hours/legend" fontSize="18" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:DetailCell id="ac_sessions" focusable="false" title="@i18n/playguard/activity/hours/sessions"/>
+            <brls:DetailCell id="ac_longest" focusable="false" title="@i18n/playguard/activity/hours/longest"/>
+            <brls:DetailCell id="ac_busy_hours" focusable="false" title="@i18n/playguard/activity/hours/busy"/>
+            <brls:DetailCell id="ac_late" focusable="false" title="@i18n/playguard/activity/hours/late"/>
             <brls:Label id="ac_note" text="@i18n/playguard/activity/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
 
         </brls:Box>
