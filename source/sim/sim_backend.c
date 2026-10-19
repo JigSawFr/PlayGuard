@@ -77,7 +77,7 @@
 #include "../core/write_guard.h"
 #include "sim_icons.h"
 
-static struct {
+typedef struct {
     bool init;
     u32  hos;
     u32  safety_level;
@@ -90,18 +90,20 @@ static struct {
     s64  clock_offset;     // the console clock against base_now()
     s64  network_offset;   // the network clock against the console clock, until set
     bool network_set;      // PlayGuard set the network clock
-} S;
+} SimConsole;
+static SimConsole S;
 
 // What Console › Check the installed games changed (gamecheck below): kept
 // with S by PLAYGUARD_SIM_KEEP, as the console keeps it.
-static struct {
+typedef struct {
     u64    removed[32];        // whole games and single contents, by ID
     size_t removed_count;
     u64    launch_reset[16];
     size_t launch_reset_count;
     u64    bumps[32];          // each change to a game bumps its entry
     size_t bump_count;
-} G;
+} SimFixes;
+static SimFixes G;
 
 // PLAYGUARD_SIM_KEEP: S and G as the last run left them, in the simulated
 // data folder (the web page keeps that folder in the browser). A file from
@@ -109,7 +111,11 @@ static struct {
 #define SIM_KEEP_FILE "./playguard_data/sim_console.bin"
 static const char SIM_KEEP_MAGIC[8] = "PGSIM02";
 static pthread_mutex_t s_keep_lock = PTHREAD_MUTEX_INITIALIZER;
-static unsigned char s_kept[sizeof(S) + sizeof(G)];   // what the file holds
+typedef struct {
+    SimConsole console;
+    SimFixes   fixes;
+} SimKept;
+static SimKept s_kept;   // what the file holds
 
 static bool sim_keeping(void)
 {
@@ -122,12 +128,12 @@ static void sim_keep_load(void)
     if (!f) return;
     char magic[sizeof(SIM_KEEP_MAGIC)];
     u32 size = 0;
-    unsigned char kept[sizeof(s_kept)];
+    SimKept kept;
     if (fread(magic, 1, sizeof(magic), f) == sizeof(magic) && memcmp(magic, SIM_KEEP_MAGIC, sizeof(magic)) == 0 &&
-        fread(&size, sizeof(size), 1, f) == 1 && size == sizeof(kept) && fread(kept, 1, sizeof(kept), f) == sizeof(kept)) {
-        memcpy(&S, kept, sizeof(S));
-        memcpy(&G, kept + sizeof(S), sizeof(G));
-        memcpy(s_kept, kept, sizeof(kept));
+        fread(&size, sizeof(size), 1, f) == 1 && size == sizeof(kept) && fread(&kept, 1, sizeof(kept), f) == sizeof(kept)) {
+        memcpy(&S, &kept.console, sizeof(S));
+        memcpy(&G, &kept.fixes, sizeof(G));
+        memcpy(&s_kept, &kept, sizeof(kept));
         S.init = true;
     }
     fclose(f);
@@ -139,19 +145,20 @@ static void sim_keep_save(void)
 {
     if (!sim_keeping()) return;
     pthread_mutex_lock(&s_keep_lock);
-    unsigned char now[sizeof(s_kept)];
-    memcpy(now, &S, sizeof(S));
-    memcpy(now + sizeof(S), &G, sizeof(G));
-    if (memcmp(now, s_kept, sizeof(now)) != 0) {
+    SimKept now;
+    memset(&now, 0, sizeof(now));   // the padding too: compared byte for byte
+    memcpy(&now.console, &S, sizeof(S));
+    memcpy(&now.fixes, &G, sizeof(G));
+    if (memcmp(&now, &s_kept, sizeof(now)) != 0) {
         // Not world-writable (fopen creates with 0666, less the umask).
         const int fd = open(SIM_KEEP_FILE ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
         FILE *f = fd >= 0 ? fdopen(fd, "wb") : NULL;
         if (fd >= 0 && !f) close(fd);
         const u32 size = sizeof(now);
         bool ok = f && fwrite(SIM_KEEP_MAGIC, 1, sizeof(SIM_KEEP_MAGIC), f) == sizeof(SIM_KEEP_MAGIC) &&
-                  fwrite(&size, sizeof(size), 1, f) == 1 && fwrite(now, 1, sizeof(now), f) == sizeof(now);
+                  fwrite(&size, sizeof(size), 1, f) == 1 && fwrite(&now, 1, sizeof(now), f) == sizeof(now);
         if (f) ok = fclose(f) == 0 && ok;
-        if (ok && rename(SIM_KEEP_FILE ".tmp", SIM_KEEP_FILE) == 0) memcpy(s_kept, now, sizeof(now));
+        if (ok && rename(SIM_KEEP_FILE ".tmp", SIM_KEEP_FILE) == 0) memcpy(&s_kept, &now, sizeof(now));
         else remove(SIM_KEEP_FILE ".tmp");
     }
     pthread_mutex_unlock(&s_keep_lock);
