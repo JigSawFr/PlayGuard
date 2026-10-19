@@ -50,7 +50,9 @@
         <div class="overlay" id="overlay">
           <div class="spinner" aria-hidden="true"></div>
           <p id="status" data-i18n="loading">Loading…</p>
+          <progress id="progress" hidden></progress>
         </div>
+        <div class="toast" id="toast" role="status" hidden></div>
       </div>
 
       <div class="notice" id="theme-notice" role="status" hidden>
@@ -63,7 +65,16 @@
         <div class="control-actions">
           <button type="button" class="btn ghost" id="pad-toggle" aria-pressed="false" data-i18n="pad">Pad</button>
           <button type="button" class="btn ghost" id="shot" data-i18n="screenshot">Screenshot</button>
+          <button type="button" class="btn ghost" id="record" aria-pressed="false" data-i18n="record" hidden>Record</button>
         </div>
+      </div>
+
+      <!-- The console's time moved on while PlayGuard runs (skip=). -->
+      <div class="time" data-i18n-title="time_help">
+        <span class="time-label" data-i18n="time_label">Time passes</span>
+        <div class="time-buttons" id="time-buttons"></div>
+        <button type="button" class="btn ghost" id="skip-reset" data-i18n="time_now">Now</button>
+        <span class="skip-shown" id="skip-shown" aria-live="polite"></span>
       </div>
 
       <div class="pad" id="pad" hidden>
@@ -121,6 +132,7 @@
         <button type="button" class="btn primary" id="apply" data-i18n="apply">Apply</button>
         <button type="button" class="btn" id="copy" data-i18n="copy">Copy link</button>
         <button type="button" class="btn ghost" id="reset" data-i18n="reset">Reset</button>
+        <button type="button" class="btn ghost" id="forget" data-i18n="forget" hidden>Forget the kept state</button>
       </div>
       <p class="note" data-i18n="note"></p>
     </aside>

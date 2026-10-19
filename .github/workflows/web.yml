@@ -60,7 +60,20 @@ jobs:
           export EM_CACHE="$HOME/.emscripten_cache"
           source "$RUNNER_TEMP/emsdk/emsdk_env.sh"
           make web JOBS="$(nproc)"
-          test -f build-web/resources/font/cjk.otf || { echo "::error::no CJK font in the web build"; exit 1; }
+          test -f build-web/simulator/cjk.otf || { echo "::error::no CJK font in the web build"; exit 1; }
+      # The simulator in headless Chromium (tools/web_smoke.py): it must reach
+      # its first screen in each kind of start, move the time on and take a
+      # live setting without a restart, add the CJK font, keep its state with
+      # keep=1. Its screens go with the site, for the pull request's comment
+      # (pages.yml). Playwright, pinned, in a venv of its own.
+      - name: The simulator in a browser
+        env:
+          PLAYWRIGHT_VERSION: 1.64.0
+        run: |
+          python3 -m venv "$RUNNER_TEMP/playwright"
+          "$RUNNER_TEMP/playwright/bin/pip" install -q "playwright==$PLAYWRIGHT_VERSION"
+          "$RUNNER_TEMP/playwright/bin/python" -m playwright install --with-deps chromium
+          "$RUNNER_TEMP/playwright/bin/python" tools/web_smoke.py build-web/simulator build-web/shots
       - name: The website, the simulator in it
         env:
           REPO: ${{ github.repository }}
@@ -74,6 +87,7 @@ jobs:
           export SITE_BASE="/${REPO#*/}/${PR:+pr-$PR/}"
           python3 tools/build_site.py out .
           cp -r build-web/simulator out/simulator
+          cp -r build-web/shots out/simulator/shots
           python3 - <<'EOF'
           import json, os
           build = {k.lower(): os.environ[k] for k in ("REPO", "SHA", "REF", "TITLE")}
@@ -88,7 +102,7 @@ jobs:
             echo
             echo "| Simulator file | Size | gzip |"
             echo "|---|---|---|"
-            for f in out/simulator/playguard.wasm out/simulator/playguard.data out/simulator/playguard.js; do
+            for f in out/simulator/playguard.wasm out/simulator/playguard.data out/simulator/playguard.js out/simulator/cjk.otf; do
               echo "| \`$(basename "$f")\` | $(( $(stat -c %s "$f") / 1024 )) KiB | $(( $(gzip -9c "$f" | wc -c) / 1024 )) KiB |"
             done
           } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,18 @@
+[
+ {
+  "tag_name": "v1.1.0",
+  "html_url": "https://github.com/JigSawFr/PlayGuard/releases/tag/v1.1.0",
+  "draft": false,
+  "prerelease": false,
+  "published_at": "2026-10-14T22:31:37Z",
+  "body": "## [1.1.0](https://github.com/JigSawFr/PlayGuard/compare/v1.0.0...v1.1.0) · 2026-10-14\r\n\r\n<hr>\r\n\r\n### 🌟 Highlights\r\n\r\n* ⏰ **When time is up**:  \r\n  Choose what the console does when the play-time limit is reached.\r\n\r\n<hr>\r\n\r\n<details>\r\n<summary><b>Every change in 1.1.0</b> (1 change)</summary>\r\n\r\n### 🚀 Features\r\n\r\n* **play-timer:** choose what the console does when the time is up\r\n\r\n</details>\r\n"
+ },
+ {
+  "tag_name": "v1.0.0",
+  "html_url": "https://github.com/JigSawFr/PlayGuard/releases/tag/v1.0.0",
+  "draft": false,
+  "prerelease": false,
+  "published_at": "2026-10-12T20:17:06Z",
+  "body": "## [1.0.0](https://github.com/JigSawFr/PlayGuard/compare/v1.0.0...v1.0.0) · 2026-10-14\r\n\r\n<hr>\r\n\r\n### 🌟 Highlights\r\n\r\n* ⏰ **Play-time limit**:  \r\n  Choose what the console does when the play-time limit is reached.\r\n\r\n<hr>\r\n\r\n<details>\r\n<summary><b>Every change in 1.0.0</b> (1 change)</summary>\r\n\r\n### 🚀 Features\r\n\r\n* **play-timer:** the same every day or one per day\r\n\r\n</details>\r\n"
+ }
+]

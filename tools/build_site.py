@@ -29,6 +29,9 @@ from urllib.parse import urlsplit
 import markdown
 
 REPO_URL = "https://github.com/JigSawFr/PlayGuard"
+# The documentation's "Try it in the simulator" links (main's simulator, as
+# GitHub shows them): the site's own simulator on the site, in its language.
+SIMULATOR_URL = "https://jigsawfr.github.io/PlayGuard/simulator/"
 # The console's languages: config.json's code, the site's folder ('' for the
 # root), the name in its own words, the html lang.
 LANGUAGES = [
@@ -146,6 +149,9 @@ def rewrite_links(body, source, lang, to_root, assets):
 
     def target(url):
         parts = urlsplit(url)
+        if url.startswith(SIMULATOR_URL) and not parts.fragment:
+            query = "&".join(q for q in [parts.query, f"lang={lang}"] if q)
+            return f"{to_root}simulator/?{query}"
         if parts.scheme or url.startswith(("#", "mailto:")):
             return url
         path = os.path.normpath(os.path.join(folder, parts.path)).replace(os.sep, "/")

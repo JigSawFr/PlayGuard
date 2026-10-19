@@ -8,6 +8,12 @@
 // The page speaks the console's languages (i18n/<language>.json): the
 // browser's, unless the URL says `lang=`; its theme is the browser's (Auto),
 // or the one chosen in its header or set by `theme=`. PlayGuard takes both.
+//
+// While PlayGuard runs, the `live` settings change without a restart
+// (source/sim/web_page.cpp), the buttons under the screen move the console's
+// time on (`skip`), and with `keep` its data folder stays in the browser
+// (IndexedDB). <body data-playguard> says where it is: loading, running,
+// ready (its first screen is up), error.
 'use strict';
 
 // The console's languages, as PlayGuard's config.json names them, in their own words.
@@ -18,6 +24,14 @@ const LANGUAGES = [
   ['ko', '한국어'], ['zh-Hans', '简体中文'], ['zh-Hant', '繁體中文'],
 ];
 const THEMES = ['auto', 'light', 'dark'];
+// The languages PlayGuard draws with the CJK font (cjk.otf, next to the page):
+// waited for before it starts; fetched once it runs in the others.
+const CJK = new Set(['ja', 'ko', 'zh-Hans', 'zh-Hant']);
+const CJK_FILE = '/app/resources/font/cjk.otf';
+// The data folder (source/util/paths.cpp), kept in IndexedDB under that name with `keep`.
+const DATA = '/playguard_data';
+// What the time buttons add to `skip`, in minutes.
+const SKIPS = [5, 15, 60];
 
 // A language tag (the URL's, or the browser's) to one of the console's; null when none fits.
 function consoleLanguage(tag) {
@@ -65,6 +79,8 @@ let started = false;
 let text = { ui: {}, groups: {}, params: {}, presets: {} };   // the page's language, English underneath
 let language = 'en-US';         // the page's, and PlayGuard's
 let consoleTheme = 'light';     // what PlayGuard was started with
+let running = false;            // PlayGuard's runtime is up: ccall works
+let version = '';               // the build's commit, for the files' URLs
 
 // ---- Texts ------------------------------------------------------------
 
@@ -216,7 +232,7 @@ function fieldFor(p, value) {
   } else {
     input = el('input', {
       type: p.type === 'number' ? 'number' : 'text', id, 'data-name': p.name,
-      placeholder: p.placeholder ?? '', min: p.min, inputmode: p.type === 'number' ? 'numeric' : null,
+      placeholder: p.placeholder ?? '', min: p.min, max: p.max, inputmode: p.type === 'number' ? 'numeric' : null,
       list: p.suggestions ? `${id}-list` : null,
     });
     input.value = value ?? '';
@@ -288,15 +304,42 @@ function markChanges() {
   }
 }
 
+// The settings whose value differs between `a` and `b`.
+function changedNames(a, b) {
+  const qa = new URLSearchParams(toQuery(a)), qb = new URLSearchParams(toQuery(b));
+  return [...new Set([...qa.keys(), ...qb.keys()])].filter((n) => qa.get(n) !== qb.get(n));
+}
+
+// Only `live` settings changed, PlayGuard running: they reach it at once and
+// the URL follows; otherwise the page reloads with them.
 function apply(values) {
+  const changed = changedNames(values, current);
+  if (running && changed.length && changed.every((n) => known.get(n)?.live)) {
+    for (const name of changed) setLive(name, values.get(name));
+    current = new Map(values);
+    history.replaceState(null, '', linkFor(current));
+    buildForm(current);
+    showSkip();
+    toast(t('live_applied'));
+    return;
+  }
   const query = toQuery(values);
   if (query === location.search || (query === '' && location.search === '')) { location.reload(); return; }
   location.search = query;   // reloads: PlayGuard starts again from scratch
 }
 
-// The page's language and theme stay; the rest is what `keep` says.
+// The page's language and theme stay, and the `sticky` settings; the rest is what `keep` says.
 function keepingHeader(keep) {
-  return new Map([...current].filter(([n]) => n === 'lang' || n === 'theme' || keep(n)));
+  return new Map([...current].filter(([n]) => n === 'lang' || n === 'theme' || known.get(n)?.sticky || keep(n)));
+}
+
+// A preset's datetime `@21:30`: today at that time, in the browser's time zone.
+function presetValue(name, value) {
+  const m = known.get(name)?.type === 'datetime' && /^@(\d\d):(\d\d)$/.exec(value);
+  if (!m) return value;
+  const d = new Date();
+  d.setHours(Number(m[1]), Number(m[2]), 0, 0);
+  return String(Math.round(d.getTime() / 1000));
 }
 
 function buildPresets() {
@@ -308,7 +351,7 @@ function buildPresets() {
     if (!preset) return;
     // The first tab stays too.
     const values = keepingHeader((n) => known.get(n)?.config);
-    for (const [n, v] of Object.entries(preset.params)) values.set(n, v);
+    for (const [n, v] of Object.entries(preset.params)) values.set(n, presetValue(n, v));
     apply(values);
   });
 }
@@ -342,7 +385,26 @@ function showStatus(message) {
   $('status').textContent = message;
 }
 
+function showProgress(done, total) {
+  const bar = $('progress');
+  if (!bar || !total) return;
+  bar.hidden = false;
+  bar.max = total;
+  bar.value = done;
+}
+
+let toastTimer = 0;
+function toast(message) {
+  const box = $('toast');
+  box.textContent = message;
+  box.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { box.hidden = true; }, 2500);
+}
+
 function showError(message) {
+  running = false;   // nothing to call into any more: Apply reloads
+  document.body.dataset.playguard = 'error';
   const overlay = $('overlay');
   overlay.hidden = false;
   overlay.classList.add('error');
@@ -350,6 +412,15 @@ function showError(message) {
   button.addEventListener('click', () => location.reload());
   overlay.replaceChildren(el('div', { class: 'spinner', 'aria-hidden': 'true' }), el('p', { text: message }), button);
 }
+
+// A setting as its PLAYGUARD_SIM_* variable has it: '' for none.
+function envValue(name, value) {
+  const p = known.get(name);
+  if (value == null || value === '') return '';
+  if (p?.type === 'bool') return FALSY.has(String(value).toLowerCase()) ? '' : '1';
+  return p?.values?.[value] ?? value;
+}
+const envName = (name) => `PLAYGUARD_SIM_${name.toUpperCase()}`;
 
 // The variables and the config.json PlayGuard starts with: the page's
 // language and theme, whatever else the URL sets.
@@ -360,13 +431,83 @@ function startEnvironment(values) {
     if (name === 'lang' || name === 'theme') continue;
     const p = known.get(name);
     if (p?.config) { if (value) config[p.config] = value; continue; }
-    if (p?.type === 'bool' && FALSY.has(String(value).toLowerCase())) continue;
-    env[`PLAYGUARD_SIM_${name.toUpperCase()}`] = p?.type === 'bool' ? '1' : value;
+    const v = envValue(name, value);
+    if (v !== '') env[envName(name)] = v;
   }
   return { env, config };
 }
 
-function start(version) {
+// A variable changed while PlayGuard runs (source/sim/web_page.cpp).
+function setLive(name, value) {
+  window.Module.ccall('playguard_web_setenv', 'number', ['string', 'string'], [envName(name), envValue(name, value)]);
+  log(`live: ${name}=${value ?? ''}`);
+}
+
+// ---- Keeping the state (keep=1) ------------------------------------------------
+
+let syncing = false;
+let forgetting = false;
+// The data folder to IndexedDB, at most one write at a time.
+function saveData() {
+  const FS = window.Module?.FS;
+  if (!FS || syncing || forgetting) return;
+  syncing = true;
+  FS.syncfs(false, (e) => { syncing = false; if (e) log(`keep: ${e}`, true); });
+}
+
+// Before PlayGuard starts: the data folder from IndexedDB, then config.json
+// with the page's language, theme and first tab over what it kept.
+function mountKept(m, config) {
+  m.FS.mkdirTree(DATA);
+  m.FS.mount(m.FS.filesystems.IDBFS, {}, DATA);
+  m.addRunDependency('keep');
+  m.FS.syncfs(true, (e) => {
+    if (e) log(`keep: ${e}`, true);
+    let kept = {};
+    try { kept = JSON.parse(m.FS.readFile(`${DATA}/config.json`, { encoding: 'utf8' })); } catch { /* first run */ }
+    m.FS.writeFile(`${DATA}/config.json`, JSON.stringify({ ...kept, ...config }));
+    setInterval(saveData, 3000);
+    addEventListener('pagehide', saveData);
+    addEventListener('visibilitychange', () => { if (document.hidden) saveData(); });
+    m.removeRunDependency('keep');
+  });
+}
+
+function forget() {
+  forgetting = true;
+  const done = () => location.reload();
+  const req = indexedDB.deleteDatabase(DATA);
+  req.onsuccess = req.onerror = req.onblocked = done;
+}
+
+// ---- The CJK font ------------------------------------------------------------
+
+async function fetchCjk() {
+  const res = await fetch(`cjk.otf${version ? `?v=${version}` : ''}`);
+  if (!res.ok) throw new Error(`cjk.otf: ${res.status}`);
+  return new Uint8Array(await res.arrayBuffer());
+}
+function writeCjk(m, bytes) {
+  m.FS.mkdirTree(CJK_FILE.slice(0, CJK_FILE.lastIndexOf('/')));
+  m.FS.writeFile(CJK_FILE, bytes);
+}
+// In Japanese, Korean or Chinese, PlayGuard starts once the font is there.
+function preloadCjk(m) {
+  m.addRunDependency('cjk');
+  fetchCjk().then((bytes) => writeCjk(m, bytes), (e) => log(String(e), true)).finally(() => m.removeRunDependency('cjk'));
+}
+// In the others, it comes behind the Latin font once PlayGuard runs.
+async function laterCjk() {
+  try {
+    const bytes = await fetchCjk();
+    writeCjk(window.Module, bytes);
+    window.Module.ccall('playguard_web_cjk_font', 'number', ['string'], [CJK_FILE]);
+  } catch (e) {
+    log(String(e), true);
+  }
+}
+
+function start() {
   if (!self.crossOriginIsolated) {
     // coi-serviceworker reloads the page once its service worker is
     // installed (twice at most), which a first visit on a slow connection can
@@ -389,22 +530,41 @@ function start(version) {
   const { env, config } = startEnvironment(current);
   log(`settings: ${decodeURIComponent(toQuery(current)) || '(defaults)'}; language ${language}, theme ${consoleTheme}`);
   showStatus(t('downloading'));
+  const keep = current.has('keep') && !FALSY.has(String(current.get('keep')).toLowerCase());
   window.Module = {
     canvas,
     // GitHub Pages lets browsers keep files 10 minutes: after a push, the
     // commit in their URL keeps an old .wasm from meeting a new .js.
     locateFile: (path, prefix) => `${prefix}${path}${version ? `?v=${version}` : ''}`,
-    print: (line) => log(line),
+    print: (line) => {
+      log(line);
+      if (line.includes('start-up: first screen ready')) document.body.dataset.playguard = 'ready';
+    },
     printErr: (line) => log(line, true),
-    setStatus: (status) => { if (status) showStatus(status.replace(/^Downloading data\.\.\./, t('downloading'))); },
+    setStatus: (status) => {
+      if (!status) return;
+      // "Downloading data... (1234/5678)": how far the download is.
+      const m = /\((\d+)\/(\d+)\)/.exec(status);
+      if (m) showProgress(Number(m[1]), Number(m[2]));
+      showStatus(status.startsWith('Downloading data') ? t('downloading') : status);
+    },
     preRun: [(m) => {
       Object.assign(m.ENV, env);
-      m.FS.mkdirTree('/playguard_data');
-      m.FS.writeFile('/playguard_data/config.json', JSON.stringify(config));
+      if (keep) {
+        mountKept(m, config);
+      } else {
+        m.FS.mkdirTree(DATA);
+        m.FS.writeFile(`${DATA}/config.json`, JSON.stringify(config));
+      }
+      if (CJK.has(language)) preloadCjk(m);
     }],
     onRuntimeInitialized: () => {
+      running = true;
+      document.body.dataset.playguard = 'running';
       showStatus(t('starting'));
+      showProgress(1, 1);
       requestAnimationFrame(() => requestAnimationFrame(() => { $('overlay').hidden = true; canvas.focus(); }));
+      if (!CJK.has(language)) laterCjk();
     },
     onAbort: (what) => showError(`${t('error')} ${what ?? ''}`),
   };
@@ -468,13 +628,72 @@ function setUpPad() {
   toggle.addEventListener('click', () => show($('pad').hidden));
 }
 
+// A file name that says the state: playguard_unlocked_1.png.
+const fileName = (ext) => `playguard${decodeURIComponent(toQuery(current)).replace(/[^a-z0-9.]+/gi, '_')}.${ext}`;
+
+function download(blob, name) {
+  const a = el('a', { href: URL.createObjectURL(blob), download: name });
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
 function screenshot() {
-  canvas.toBlob((blob) => {
-    if (!blob) return;
-    const a = el('a', { href: URL.createObjectURL(blob), download: `playguard${decodeURIComponent(toQuery(current)).replace(/[^a-z0-9.]+/gi, '_')}.png` });
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  }, 'image/png');
+  canvas.toBlob((blob) => { if (blob) download(blob, fileName('png')); }, 'image/png');
+}
+
+// A video of the screen (WebM, 30 frames a second) until Stop.
+let recorder = null;
+function record() {
+  const button = $('record');
+  if (recorder) { recorder.stop(); return; }
+  const type = ['video/webm;codecs=vp9', 'video/webm'].find((m) => MediaRecorder.isTypeSupported(m));
+  const chunks = [];
+  recorder = new MediaRecorder(canvas.captureStream(30), type ? { mimeType: type } : {});
+  recorder.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+  recorder.onstop = () => {
+    recorder = null;
+    button.textContent = t('record');
+    button.setAttribute('aria-pressed', 'false');
+    download(new Blob(chunks, { type: 'video/webm' }), fileName('webm'));
+  };
+  recorder.start(1000);
+  button.textContent = t('stop_recording');
+  button.setAttribute('aria-pressed', 'true');
+  canvas.focus();
+}
+
+// ---- The time ------------------------------------------------------------
+
+const skipNow = () => Math.max(0, Number(current.get('skip')) || 0);
+
+function showSkip() {
+  const s = skipNow();
+  const h = Math.floor(s / 3600), min = Math.floor((s % 3600) / 60);
+  $('skip-shown').textContent = s ? `+${h ? `${h} h ` : ''}${min || !h ? `${min} min` : ''}`.trim() : '';
+  $('skip-reset').disabled = !s;
+}
+
+// The console's time moved on by `seconds` (0: back to now), a game played
+// all along: live, so PlayGuard keeps running.
+function moveTime(seconds) {
+  const values = new Map(current);
+  const s = seconds ? skipNow() + seconds : 0;
+  if (s) values.set('skip', String(s)); else values.delete('skip');
+  apply(values);
+  showSkip();
+  canvas.focus();
+}
+
+function setUpTime() {
+  const box = $('time-buttons');
+  for (const min of SKIPS) {
+    const label = min % 60 ? t('plus_min').replace('{n}', min) : t('plus_hour').replace('{n}', min / 60);
+    const button = el('button', { type: 'button', class: 'btn ghost', text: label });
+    button.addEventListener('click', () => moveTime(min * 60));
+    box.append(button);
+  }
+  $('skip-reset').addEventListener('click', () => moveTime(0));
+  showSkip();
 }
 
 // ---- The page ------------------------------------------------------------
@@ -554,6 +773,9 @@ function setUpPanel() {
   $('form').addEventListener('submit', (e) => { e.preventDefault(); apply(readForm()); });
   $('apply').addEventListener('click', () => apply(readForm()));
   $('reset').addEventListener('click', () => apply(keepingHeader(() => false)));
+  const keeping = current.has('keep') && !FALSY.has(String(current.get('keep')).toLowerCase());
+  $('forget').hidden = !keeping;
+  $('forget').addEventListener('click', forget);
   $('copy').addEventListener('click', async () => {
     const link = linkFor(readForm());
     try { await navigator.clipboard.writeText(link); } catch { prompt(t('copy'), link); return; }
@@ -571,6 +793,8 @@ function setUpPanel() {
     markChanges();
   });
   $('shot').addEventListener('click', screenshot);
+  $('record').hidden = typeof MediaRecorder === 'undefined' || !canvas.captureStream;
+  $('record').addEventListener('click', record);
 }
 
 async function main() {
@@ -585,7 +809,7 @@ async function main() {
   }
   known = new Map(manifest.params.map((p) => [p.name, p]));
   await loadTexts(language);
-  const version = showBuild();
+  const build = showBuild();
   translatePage();
   homeLink();
   setUpHeader();
@@ -594,8 +818,11 @@ async function main() {
   setUpPad();
   buildPresets();
   buildForm(current);
-  start(await version);
+  setUpTime();
+  version = await build;
+  start();
   showTheme();
 }
 
+document.body.dataset.playguard = 'loading';
 main();

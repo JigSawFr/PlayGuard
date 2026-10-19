@@ -1,0 +1,11 @@
+The Switch 22.5.0 system update was released on June 16, 2026 (UTC).
+
+Security flaws fixed: no.
+
+==Change-log==
+[https://en-americas-support.nintendo.com/ Official] ALL change-log:
+* General system stability improvements to enhance the user's experience.
+
+==System Titles==
+* The following titles were updated:
+** Sysmodules: sdb.

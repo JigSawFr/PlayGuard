@@ -1,0 +1,18 @@
+[
+ {
+  "tag_name": "v6.5.4",
+  "html_url": "https://github.com/CTCaer/hekate/releases/tag/v6.5.4",
+  "draft": false,
+  "prerelease": false,
+  "published_at": "2026-09-28T00:06:10Z",
+  "body": "**Supports booting ALL current CFWs, Android, Linux and payload tools.**\r\n\r\n### Latest HOS supported: 23.0.1\r\n\r\n\r\nhekate v6.5.4 changes\r\n-------------\r\n- **HOS 23.0.1 support**\r\n\r\n\r\n# How to update:\r\n- Drag n drop `bootloader` folder into sd card root.\r\n"
+ },
+ {
+  "tag_name": "v6.5.3",
+  "html_url": "https://github.com/CTCaer/hekate/releases/tag/v6.5.3",
+  "draft": false,
+  "prerelease": false,
+  "published_at": "2026-06-16T22:14:44Z",
+  "body": "**Supports booting ALL current CFWs, Android, Linux and payload tools.**\r\n\r\n### Latest HOS supported: 22.5.0\r\n\r\n\r\nhekate v6.5.3 changes\r\n-------------\r\n- **HOS 22.5.0 support**\r\n\r\n\r\n# How to update:\r\n- Drag n drop `bootloader` folder into sd card root.\r\n"
+ }
+]
