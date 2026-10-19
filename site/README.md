@@ -38,9 +38,14 @@ pages; no framework, nothing to install but that.
   named as on the console, and follows the app when it changes;
   `{{version}}` is the latest release (`.release-please-manifest.json`).
 - **The documentation is `docs/`**, converted from its Markdown at each
-  build (without its "Back to the README", GitHub's way back): French and Canadian French read `docs/fr/` where it has the page,
-  every other language the English page, with a note saying it is not
-  translated yet. GitHub's `> [!WARNING]` blocks become callouts, headings
+  build (without its "Back to the README", GitHub's way back): each language
+  reads `docs/<language>/` where it has the page (Canadian French reads
+  `docs/fr/`), else the English page, with a note saying it is not
+  translated yet. A translation's first line,
+  `<!-- translated from docs/<page>.md, sha256 <12 hex> -->`
+  (`tools/doc_stamp.py docs/<language>/<page>.md`), is the English page it
+  matches: once that page changes, the site says under the translation that
+  the English one may be more recent, and links to it. GitHub's `> [!WARNING]` blocks become callouts, headings
   keep GitHub's anchors, links between the docs and to the README become the
   site's pages, and any other file of the repository links to GitHub. A
   change to `docs/` is a change to the site.
