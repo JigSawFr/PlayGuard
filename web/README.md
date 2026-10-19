@@ -160,15 +160,19 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
 - **The smoke test** (`tools/web_smoke.py`, CI's *The simulator in a
   browser*): the build in headless Chromium (Playwright, WebGL 2 from
   SwiftShader) must reach its first screen in each kind of start (Today,
-  Play timer, Activity, Console, limit reached, start-up error, Japanese);
-  play desktop smoke scenarios as steps (every tab, *alarm*, the first half
-  of *errors*); move the time on and take a live setting without a restart;
+  a tab of its own, limit reached, start-up error, Japanese);
+  play desktop smoke scenarios as steps (every tab, its screens the comment's
+  Play timer, Activity and Console; *alarm*, the first half of *errors*); move the time on and take a live setting without a restart;
   note keys and replay their steps link, play the tour, fill a report link;
   add the CJK font after the start; keep `sim_console.bin` across a reload
   with `keep=1`; and, served without the headers as GitHub Pages does, be
   isolated by `sw.js`, keep PlayGuard's files and start offline. A page
-  error fails it. Its screens (`shots/`) and the time each start took
-  (`shots/timings.json`, in the run's summary) go with the site.
+  error fails it. Its scenarios run a few at once, each in a process and
+  browser of its own (`WEB_SMOKE_JOBS`: the processors by default), and one
+  still running after 5 minutes is stopped and fails: about a minute in all
+  on a CI runner. `WEB_SMOKE_ONLY=tour,keep` runs some of them. Its screens
+  (`shots/`) and the time each start took (`shots/timings.json`, in the
+  run's summary) go with the site.
 - **The screens against main's** (CI, pull requests only): each screen is
   compared with main's, published with its site, by `tools/visual_check.py`
   (the footer clock masked); `shots/compare.json` lists the ones that
