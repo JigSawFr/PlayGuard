@@ -96,13 +96,21 @@ jobs:
             --image "$(sed -n 's/^ *image: \(devkitpro\/devkita64@sha256:[0-9a-f]*\)$/\1/p' .github/workflows/build.yml)" \
             >> "$GITHUB_STEP_SUMMARY"
 
-  # What a pull request changes. When it is only the documentation, the
-  # website, the web simulator's page or other workflows (the `docs` pattern
-  # below), `code` is false and the jobs that build or run the app are
-  # skipped: host-tests still runs (the resources, CONTRIBUTING.md and
-  # docs/config.md checks), a skipped job counts as passed for the branch
-  # rules, and desktop-smoke accepts it. Every push, schedule, release or run
-  # by hand, and a pull request whose files cannot be listed: `code` true.
+  # What a pull request changes, for the jobs it needs. Each output is true
+  # unless every file changed is one that job does not read:
+  # - `host`: the clang and coverage host tests: not for documentation (the
+  #   `docs` pattern: the website, the web simulator's page, other
+  #   workflows) nor for the desktop smoke test's own files (its scripts,
+  #   tests/visual/, tests/cut_text/);
+  # - `desktop`: the desktop build and its smoke test: not for documentation
+  #   nor the host tests' suites (tests/ but tests/visual/, tests/cut_text/);
+  # - `switch`: the Switch build: not for documentation, tests/, the
+  #   simulator (source/sim/, not built for the Switch) nor the smoke test's
+  #   scripts.
+  # host-tests always runs (the resources, CONTRIBUTING.md and docs/config.md
+  # checks). A skipped job counts as passed for the branch rules, and
+  # desktop-smoke accepts its shards skipped. Every push, schedule, release
+  # or run by hand, and a pull request whose files cannot be listed: all true.
   changes:
     runs-on: ubuntu-26.04
     timeout-minutes: 5
@@ -110,7 +118,9 @@ jobs:
       contents: read
       pull-requests: read
     outputs:
-      code: ${{ steps.files.outputs.code }}
+      host: ${{ steps.files.outputs.host }}
+      desktop: ${{ steps.files.outputs.desktop }}
+      switch: ${{ steps.files.outputs.switch }}
     steps:
       - name: Files changed
         id: files
@@ -119,22 +129,37 @@ jobs:
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
         run: |
-          code=true
+          host=true desktop=true switch=true
           docs='^(docs|site|branding|images|web)/|^(README(\.fr)?|ROADMAP|CONTRIBUTING|CODE_OF_CONDUCT|SECURITY)\.md$|^LICENSE$'
           docs="$docs"'|^\.github/(ISSUE_TEMPLATE|DISCUSSION_TEMPLATE)/|^\.github/(CODEOWNERS|FUNDING\.yml|SUPPORT\.md|labels\.json|dependabot\.yml|pull_request_template\.md)$'
           docs="$docs"'|^\.github/workflows/(web|pages|codeql|labels|pr-title|release-page|release-please|toolchain-watch)\.yml$'
           docs="$docs"'|^tools/(build_site|check_site_links|web_[a-z_]+)\.py$|^tools/(site_screenshots|site_social|render_tour|render_branding)\.mjs$'
+          smoke='^tests/(visual|cut_text)/|^tools/(desktop_smoke|cut_text_check|visual_check)\.py$'
+          # needed <skip> [<but>]: true when a file is neither documentation
+          # nor <skip>, or matches <but>.
+          needed() {
+            if grep -vE "$docs" <<< "$files" | grep -qvE "$1" || { [ -n "${2:-}" ] && grep -qE "$2" <<< "$files"; }; then
+              echo true
+            else
+              echo false
+            fi
+          }
           # The API lists 3000 files at most: more, and some may be code.
           if [ -n "$PR" ] && files=$(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[] | .filename, (.previous_filename // empty)') \
               && [ -n "$files" ] && [ "$(wc -l <<< "$files")" -lt 3000 ]; then
-            other=$(grep -vE "$docs" <<< "$files" || true)
-            if [ -z "$other" ]; then code=false; fi
-            echo "$(wc -l <<< "$files") files; not documentation only:"
-            echo "${other:-  (none)}"
+            host=$(needed "$smoke")
+            desktop=$(needed '^tests/' '^tests/(visual|cut_text)/')
+            switch=$(needed "^tests/|^source/sim/|$smoke")
+            echo "$(wc -l <<< "$files") files changed:"
+            sed 's/^/  /' <<< "$files"
           fi
-          echo "code=$code" | tee -a "$GITHUB_OUTPUT"
-          if [ "$code" = false ]; then
-            echo "Documentation only: the builds, the desktop smoke test and the coverage are skipped." >> "$GITHUB_STEP_SUMMARY"
+          { echo "host=$host"; echo "desktop=$desktop"; echo "switch=$switch"; } | tee -a "$GITHUB_OUTPUT"
+          skipped=""
+          [ "$host" = true ] || skipped="$skipped, the clang and coverage host tests"
+          [ "$desktop" = true ] || skipped="$skipped, the desktop build and smoke test"
+          [ "$switch" = true ] || skipped="$skipped, the Switch build"
+          if [ -n "$skipped" ]; then
+            echo "Not needed by what this pull request changes: ${skipped#, }." >> "$GITHUB_STEP_SUMMARY"
           fi
 
   # Fast checks with no toolchain: C service layer unit tests (under
@@ -182,7 +207,7 @@ jobs:
   # libFuzzer, tests/fuzz/).
   host-tests-clang-coverage:
     needs: [ changes ]
-    if: needs.changes.outputs.code == 'true'
+    if: needs.changes.outputs.host == 'true'
     runs-on: ubuntu-26.04
     timeout-minutes: 20
     steps:
@@ -255,7 +280,7 @@ jobs:
   # folder, the same path on every runner).
   desktop-build:
     needs: [ changes ]
-    if: needs.changes.outputs.code == 'true'
+    if: needs.changes.outputs.desktop == 'true'
     runs-on: ubuntu-26.04
     timeout-minutes: 20
     env:
@@ -335,8 +360,8 @@ jobs:
 
   # Clicks through every screen of that build headlessly: catches borealis
   # XML / view errors without a console. The scenarios run in parallel
-  # shards of about the same length, 2 to 4 minutes under software GL (the
-  # default tour is split in two, `smoke` and `games`; the text check in
+  # shards of about the same length, under 3 minutes each under software GL
+  # (the default tour is split in two, `smoke` and `games`; the text check in
   # three, five languages each). The desktop-smoke job below gathers them
   # under one name for the release job and branch rules.
   desktop-smoke-shard:
@@ -352,12 +377,15 @@ jobs:
             scenarios: smoke
           - shard: games
             scenarios: games
+          # The other scenarios in three shards of about 170 s each, by their
+          # times on a runner (s): cadran 125, gate 93, devbuild 79, outside 62,
+          # library 27, update 25, errors 23, sysnotes 22, the others 15 or less.
+          - shard: cadran
+            scenarios: cadran rescue cadranlarge cadranunlocked forged lock loading
           - shard: states
-            scenarios: gate errors rescue forged lock loading alarm cadranstates cadranunlocked cadranlarge
+            scenarios: gate outside alarm cadranstates rollback
           - shard: developer
-            scenarios: devbuild update library rollback
-          - shard: outside
-            scenarios: outside sysnotes cadran
+            scenarios: devbuild library update errors sysnotes
           # Every Cadran tab in the 15 languages, normal and larger text: no
           # text cut short (tools/cut_text_check.py, tests/cut_text/), five
           # languages a shard (about 3 minutes each).
@@ -479,7 +507,8 @@ jobs:
 
   # One result for the shards above, under the name the release job and the
   # branch rules wait for.
-  # Skipped as a whole for a pull request of documentation only (`changes`).
+  # Its shards skipped as a whole when the pull request does not need them
+  # (`changes`).
   desktop-smoke:
     if: ${{ !cancelled() }}
     needs: [ changes, desktop-smoke-shard ]
@@ -488,9 +517,9 @@ jobs:
     steps:
       - name: Every shard passed
         env:
-          CODE: ${{ needs.changes.outputs.code }}
+          NEEDED: ${{ needs.changes.outputs.desktop }}
           RESULT: ${{ needs.desktop-smoke-shard.result }}
-        run: test "$RESULT" = success || { test "$CODE" = false && test "$RESULT" = skipped; }
+        run: test "$RESULT" = success || { test "$NEEDED" = false && test "$RESULT" = skipped; }
 
   # The real .nro, built in the official devkitPro image, and compat.json
   # (what the app's update check reads from the latest release).
@@ -511,7 +540,7 @@ jobs:
   # The image has no bash: the steps are POSIX sh.
   switch:
     needs: [ meta, changes ]
-    if: needs.changes.outputs.code == 'true'
+    if: needs.changes.outputs.switch == 'true'
     runs-on: ubuntu-26.04
     # A release builds twice from scratch (no ccache, below): longer.
     timeout-minutes: ${{ inputs.tag && 45 || 20 }}
