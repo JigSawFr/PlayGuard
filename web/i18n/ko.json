@@ -1,6 +1,9 @@
 {
  "ui": {
   "title": "시뮬레이터",
+  "nav_features": "기능",
+  "nav_install": "설치",
+  "nav_docs": "문서",
   "loading": "불러오는 중…",
   "downloading": "PlayGuard 다운로드 중…",
   "starting": "시작하는 중…",

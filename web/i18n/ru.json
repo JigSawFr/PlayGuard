@@ -1,6 +1,9 @@
 {
  "ui": {
   "title": "Симулятор",
+  "nav_features": "Возможности",
+  "nav_install": "Установка",
+  "nav_docs": "Документация",
   "loading": "Загрузка…",
   "downloading": "Загрузка PlayGuard…",
   "starting": "Запуск…",
