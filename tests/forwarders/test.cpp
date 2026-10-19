@@ -1,7 +1,8 @@
 // Host tests for Console › Forwarders' UI-free parts: util/nro.cpp (an .nro's
 // icon and NACP, a JPEG's size, the .nro files of /switch), util/
 // forwarders.cpp (what PlayGuard remembers making: saved, replaced,
-// forgotten, a damaged file) and action/forwarders_logic.cpp (the rows from
+// forgotten, a damaged file), util/forwarder_icon.cpp (any icon made the
+// HOME menu's 256 x 256 JPEG) and action/forwarders_logic.cpp (the rows from
 // the HOME menu and the file, a new forwarder's name, whether the console
 // can start one).
 #include "check.h"
@@ -12,8 +13,12 @@
 #include <vector>
 
 #include "action/forwarders_logic.hpp"
+#include "util/forwarder_icon.hpp"
 #include "util/forwarders.hpp"
 #include "util/nro.hpp"
+
+#include <stb_image.h>
+#include <stb_image_write.h>
 #include "util/paths.hpp"
 
 namespace
@@ -281,8 +286,66 @@ static void test_patches()
     CHECK(patches_state(s) == Patches::Missing);
 }
 
+static void append(void* ctx, void* data, int size)
+{
+    auto* out = static_cast<std::vector<uint8_t>*>(ctx);
+    out->insert(out->end(), (uint8_t*)data, (uint8_t*)data + size);
+}
+
+// The pixel (x, y) of a decoded image, RGB.
+static bool colour_near(const std::vector<uint8_t>& jpeg, int x, int y, int r, int g, int b)
+{
+    int w = 0, h = 0, comp = 0;
+    uint8_t* px = stbi_load_from_memory(jpeg.data(), (int)jpeg.size(), &w, &h, &comp, 3);
+    if (!px) return false;
+    const uint8_t* p = px + ((size_t)y * w + x) * 3;
+    const bool near = std::abs(p[0] - r) < 24 && std::abs(p[1] - g) < 24 && std::abs(p[2] - b) < 24;
+    stbi_image_free(px);
+    return near;
+}
+
+static void test_icon()
+{
+    // A 64 x 64 PNG, its left half red, its right half transparent: a
+    // 256 x 256 JPEG, red on the left, white on the right.
+    std::vector<uint8_t> rgba(64 * 64 * 4, 0);
+    for (int y = 0; y < 64; y++)
+        for (int x = 0; x < 32; x++) {
+            uint8_t* p = &rgba[((size_t)y * 64 + x) * 4];
+            p[0] = 220, p[1] = 30, p[2] = 30, p[3] = 255;
+        }
+    std::vector<uint8_t> png;
+    REQUIRE(stbi_write_png_to_func(append, &png, 64, 64, 4, rgba.data(), 64 * 4));
+    const std::vector<uint8_t> made = forwarder_icon::normalize(png);
+    CHECK(nro::icon_usable(made));
+    CHECK(colour_near(made, 40, 128, 220, 30, 30) && colour_near(made, 216, 128, 255, 255, 255));
+
+    // A JPEG of another size, shrunk: 512 x 300 of blue.
+    std::vector<uint8_t> blue(512 * 300 * 3);
+    for (size_t i = 0; i < blue.size(); i += 3) blue[i] = 20, blue[i + 1] = 60, blue[i + 2] = 200;
+    std::vector<uint8_t> big;
+    REQUIRE(stbi_write_jpg_to_func(append, &big, 512, 300, 3, blue.data(), 90));
+    CHECK(!nro::icon_usable(big));
+    const std::vector<uint8_t> shrunk = forwarder_icon::normalize(big);
+    CHECK(nro::icon_usable(shrunk) && colour_near(shrunk, 128, 128, 20, 60, 200));
+
+    // A 256 x 256 JPEG already: kept byte for byte.
+    CHECK(forwarder_icon::normalize(shrunk) == shrunk);
+    // No image: nothing.
+    CHECK(forwarder_icon::normalize({}).empty());
+    CHECK(forwarder_icon::normalize({ 1, 2, 3, 4, 5 }).empty());
+    CHECK(forwarder_icon::jpeg_from_rgba(nullptr, 1, 1).empty());
+
+    // The stand-in: the PNG in the middle of the pale square.
+    const std::vector<uint8_t> stand_in = forwarder_icon::placeholder(png);
+    CHECK(nro::icon_usable(stand_in));
+    CHECK(colour_near(stand_in, 4, 4, 0xE8, 0xEC, 0xF1) && colour_near(stand_in, 60, 128, 220, 30, 30));
+    CHECK(forwarder_icon::placeholder({ 9, 9 }).empty());
+}
+
 int main()
 {
+    test_icon();
     test_jpeg();
     test_parse();
     test_files();

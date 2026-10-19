@@ -190,15 +190,17 @@ endif ()
 
 # QR codes of the funding links in About (MIT, vendored: extern/qrcodegen).
 list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/extern/qrcodegen/qrcodegen.cpp)
+# JPEG writing for the NRO forwarders' icons (public domain, vendored: extern/stb).
+list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/extern/stb/stb_image_write.c)
 
 program_target(${PROJECT_NAME} "${PLAYGUARD_SRC}")
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 
-target_include_directories(${PROJECT_NAME} PRIVATE source extern/qrcodegen ${APP_PLATFORM_INCLUDE})
+target_include_directories(${PROJECT_NAME} PRIVATE source extern/qrcodegen extern/stb ${APP_PLATFORM_INCLUDE})
 # -ffunction-sections / -fdata-sections come from borealis (PUBLIC) and
 # --gc-sections from libnx's switch.specs.
 # Warnings on PlayGuard's own sources (not borealis, not the vendored
-# qrcodegen); CI turns them into errors with -DPLAYGUARD_WERROR=ON.
+# qrcodegen and stb); CI turns them into errors with -DPLAYGUARD_WERROR=ON.
 option(PLAYGUARD_WERROR "Treat PlayGuard's compiler warnings as errors" OFF)
 set(PLAYGUARD_WARNINGS -Wall -Wextra)
 if (PLAYGUARD_WERROR)
@@ -206,6 +208,7 @@ if (PLAYGUARD_WERROR)
 endif ()
 target_compile_options(${PROJECT_NAME} PRIVATE ${APP_PLATFORM_OPTION} ${PLAYGUARD_WARNINGS})
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/qrcodegen/qrcodegen.cpp PROPERTIES COMPILE_OPTIONS "-w")
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/stb/stb_image_write.c PROPERTIES COMPILE_OPTIONS "-w")
 # The commit built (at configure time): development builds are told apart by
 # it (util/dev_builds.hpp). PLAYGUARD_COMMIT (CI: a pull request's head)
 # wins over the checkout's. Empty outside a git checkout.

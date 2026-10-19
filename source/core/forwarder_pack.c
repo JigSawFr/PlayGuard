@@ -115,14 +115,20 @@ static uint64_t align_up(uint64_t v, uint64_t align)
 uint64_t forwarder_id(const char *nro_path, const char *argv)
 {
     // sphaira hashes the path followed by the argv (which starts with the
-    // path again), and keeps the first eight bytes, little-endian.
+    // path again), and keeps the first eight bytes, little-endian. A path
+    // with a space, it has quoted (nro_add_arg_file): quoted here too.
+    const bool quote = strchr(nro_path, ' ') != NULL;
     const size_t a = strlen(nro_path), b = strlen(argv);
-    char *both = (char *)malloc(a + b + 1);
+    char *both = (char *)malloc(a + b + 3);
     if (!both) return 0;
-    memcpy(both, nro_path, a);
-    memcpy(both + a, argv, b + 1);
+    size_t n = 0;
+    if (quote) both[n++] = '"';
+    memcpy(both + n, nro_path, a);
+    n += a;
+    if (quote) both[n++] = '"';
+    memcpy(both + n, argv, b + 1);
     uint8_t hash[32];
-    forwarder_sha256(both, a + b, hash);
+    forwarder_sha256(both, n + b, hash);
     free(both);
     uint64_t low = 0;
     for (int i = 7; i >= 0; i--) low = low << 8 | hash[i];

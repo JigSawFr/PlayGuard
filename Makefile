@@ -184,7 +184,11 @@ table_export_LIBS  := -lz
 update_SRC   := source/util/date.cpp source/util/update.cpp tests/update/test.cpp
 config_SRC   := source/util/paths.cpp source/util/date.cpp source/util/config.cpp tests/config/test.cpp
 profiles_SRC   := source/util/paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
-forwarders_SRC   := source/util/paths.cpp source/util/nro.cpp source/util/forwarders.cpp source/util/patches.cpp source/action/forwarders_logic.cpp tests/forwarders/test.cpp
+forwarders_SRC    := source/util/paths.cpp source/util/nro.cpp source/util/forwarders.cpp source/util/forwarder_icon.cpp source/util/patches.cpp source/action/forwarders_logic.cpp tests/forwarders/test.cpp
+forwarders_FLAGS  := $(TEST_CXXFLAGS) -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
+forwarders_CSRC   := tests/forwarders/stb.c
+forwarders_CFLAGS := -std=c11 -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
+forwarders_LIBS   := -lm
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
 launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
 markdown_SRC   := source/util/safe_text.cpp source/util/markdown.cpp tests/markdown/test.cpp

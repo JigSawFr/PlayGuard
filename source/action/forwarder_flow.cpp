@@ -8,6 +8,7 @@
 #include "app.hpp"
 #include "core/forwarder.h"
 #include "ui/ui.hpp"
+#include "util/forwarder_icon.hpp"
 #include "util/forwarders.hpp"
 #include "util/nro.hpp"
 #include "util/paths.hpp"
@@ -34,6 +35,13 @@ bool nro_exists(const std::string& sdmc)
 {
     const std::string p = nro::sd_path(sdmc);
     return !p.empty() && paths::file_exists(on_sd(p));
+}
+
+// The argv a forwarder hands its .nro: its path, quoted when it holds a
+// space (libnx splits the argv there), as sphaira writes it.
+std::string argv_of(const std::string& sdmc)
+{
+    return sdmc.find(' ') == std::string::npos ? sdmc : "\"" + sdmc + "\"";
 }
 
 // The detail the history keeps: the name, and the program ID.
@@ -63,6 +71,14 @@ bool assets_of(const std::string& sdmc, bool self, nro::Info& info, std::string&
     if (!read) {
         error = brls::getStr("playguard/forwarders/nro_unreadable", path.empty() ? sdmc : path);
         return false;
+    }
+    // As sphaira does: another size or a PNG made a 256 x 256 JPEG, none
+    // at all a stand-in (the controller of img/emoji).
+    info.icon = forwarder_icon::normalize(info.icon);
+    if (info.icon.empty()) {
+        std::string png;
+        if (paths::read_file(BRLS_ASSET("img/emoji/1f3ae.png"), png))
+            info.icon = forwarder_icon::placeholder(std::vector<uint8_t>(png.begin(), png.end()));
     }
     if (!nro::icon_usable(info.icon)) {
         error = brls::getStr("playguard/forwarders/no_icon", path);
@@ -165,7 +181,8 @@ void create(const std::string& sd_path, std::function<void(bool)> done)
         ui::confirm(brls::getStr("playguard/forwarders/confirm_add", name, sd_path), "playguard/forwarders/add"_i18n,
                     [sdmc, name, author, done]() {
                         forwarders::Made m;
-                        m.nro = m.argv = sdmc;
+                        m.nro = sdmc;
+                        m.argv = argv_of(sdmc);
                         m.name = name;
                         m.author = author;
                         const bool ok = install(m, false);
@@ -188,7 +205,8 @@ void create_self(std::function<void(bool)> done)
     ui::confirm(brls::getStr("playguard/forwarders/confirm_self", nro::sd_path(sdmc)), "playguard/forwarders/add"_i18n,
                 [sdmc, done]() {
                     forwarders::Made m;
-                    m.nro = m.argv = sdmc;
+                    m.nro = sdmc;
+                        m.argv = argv_of(sdmc);
                     m.name = "PlayGuard";
                     m.author = "JigSawFr";
                     const bool ok = install(m, true);
@@ -205,7 +223,8 @@ void rebuild(const forwarders_logic::Row& row, const std::string& name, const st
     forwarders::Made m;
     if (!forwarders::find(row.id, &m)) {
         m.id = row.id;
-        m.nro = m.argv = row.nro;
+        m.nro = row.nro;
+        m.argv = argv_of(row.nro);
     }
     m.name = name.empty() ? row.name : name;
     m.author = author.empty() ? row.author : author;

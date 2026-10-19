@@ -289,6 +289,8 @@ static void test_id(void)
     CHECK(forwarder_id(PATH, PATH) == 0x050537E2542E2000ull);
     CHECK(forwarder_id("sdmc:/switch/Checkpoint/Checkpoint.nro", "sdmc:/switch/Checkpoint/Checkpoint.nro") ==
           0x052736A5B3AFA000ull);
+    // A path with a space: quoted, as sphaira hashes it (python3 hashlib).
+    CHECK(forwarder_id("sdmc:/switch/My App/app.nro", "\"sdmc:/switch/My App/app.nro\"") == 0x0535CFDDDB0FF000ull);
     const uint64_t other = forwarder_id(PATH, PATH " --child");
     CHECK(other != forwarder_id(PATH, PATH));
     CHECK(other >> 56 == FWD_ID_PREFIX && (other & 0xFFF) == 0);

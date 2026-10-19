@@ -41,7 +41,8 @@ void forwarder_sha256(const void *data, size_t size, uint8_t out[32]);
 
 // The program ID of the forwarder that starts `nro_path` with `argv`, as
 // sphaira derives it (a SHA-256 of both): the same .nro gives the same ID,
-// whichever tool made its forwarder, so a new one replaces the old.
+// whichever tool made its forwarder, so a new one replaces the old. A path
+// with a space is hashed quoted, as sphaira passes it.
 uint64_t forwarder_id(const char *nro_path, const char *argv);
 
 // A growing buffer.
