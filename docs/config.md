@@ -46,6 +46,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `language` | string | `"system"` (the console's language), `"en-US"`, `"fr"`, `"fr-CA"`, `"de"`, `"es"`, `"es-419"`, `"it"`, `"nl"`, `"pt"`, `"pt-BR"`, `"ru"`, `"ja"`, `"ko"`, `"zh-Hans"`, `"zh-Hant"` | `"system"` | Preferences |
 | `theme` | string | `"system"`, `"light"`, `"dark"` | `"system"` | Preferences |
 | `appearance` | string | `"cadran"` (the screens after the design boards: an icon rail, today's time as a ring, cards and tiles) or `"classic"` (the lists of earlier versions); read at start-up, so a change asks to restart | `"cadran"` | Preferences |
+| `appearance_offered` | boolean | the new look was said once after an update: missing from a config.json written before the appearance could be chosen (one with no `appearance`), the main screen offers to keep Cadran or go back to Classic, then sets it | `true` | the offer at start-up |
 | `text_size` | string | `"auto"` (larger while the console is docked, on a TV), `"normal"` or `"large"`; with the Cadran appearance, larger text draws every label 25 % bigger but the header's, the sidebar's and the footer's, at once (no restart) | `"auto"` | Preferences › Text size, the header's AA |
 | `start_tab` | string | the tab shown at start-up: `"dashboard"` (Overview), `"play_timer"`, `"activity"`, `"restrictions"`, `"security"` (PIN), `"console"`, `"history"`, `"preferences"`, `"about"`; `"clock"` and `"tools"`, from before they became Console, read as `"console"` | `"dashboard"` | Preferences |
 | `advanced` | boolean | shows the play timer's debug-class actions | `false` | Play timer › Advanced |
@@ -213,6 +214,7 @@ line; the order does not matter when it reads them:
   "language": "fr",
   "theme": "system",
   "appearance": "cadran",
+  "appearance_offered": true,
   "text_size": "auto",
   "start_tab": "dashboard",
   "advanced": false,

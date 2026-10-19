@@ -1664,6 +1664,11 @@
         },
         "dialog": {
             "unlock_short": "Il filtro famiglia viene sbloccato con il PIN salvato per la modifica, poi bloccato di nuovo."
+        },
+        "intro": {
+            "body": "Un nuovo aspetto: Cadran\n\nIl tempo rimasto in un anello, la settimana modificata con lo stick, schede leggibili dal divano, testo più grande sulla TV. Gli elenchi delle versioni precedenti ci sono ancora:\nPreferenze › Aspetto › Classica",
+            "classic": "Torna a Classica",
+            "keep": "Tieni Cadran"
         }
     }
 }

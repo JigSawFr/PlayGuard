@@ -1664,6 +1664,11 @@
         },
         "dialog": {
             "unlock_short": "Le contrôle parental est déverrouillé avec le code PIN enregistré le temps de la modification, puis reverrouillé."
+        },
+        "intro": {
+            "body": "Nouvelle apparence : Cadran\n\nLe temps restant en anneau, la semaine modifiée au stick, des cartes lisibles depuis le canapé, un texte plus grand sur la TV. Les listes des versions précédentes sont toujours là :\nPréférences › Apparence › Classique",
+            "classic": "Revenir à Classique",
+            "keep": "Garder Cadran"
         }
     }
 }

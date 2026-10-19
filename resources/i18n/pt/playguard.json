@@ -1664,6 +1664,11 @@
         },
         "dialog": {
             "unlock_short": "O controlo parental é desbloqueado com o PIN guardado durante a alteração e depois volta a ser bloqueado."
+        },
+        "intro": {
+            "body": "Um novo aspeto: Cadran\n\nO tempo restante num anel, a semana editada com o stick, cartões legíveis do sofá, texto maior na TV. As listas das versões anteriores continuam lá:\nPreferências › Aparência › Clássica",
+            "classic": "Voltar à Clássica",
+            "keep": "Manter Cadran"
         }
     }
 }

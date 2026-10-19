@@ -265,6 +265,10 @@ static void load_shared()
     read_string(j, "theme", c.theme);
     read_string(j, "appearance", c.appearance);
     read_string(j, "text_size", c.text_size);
+    // Not in the file: offered already when the file has an appearance (this
+    // version's), not yet when it has none (one from before the choice).
+    if (j.contains("appearance_offered")) read_bool(j, "appearance_offered", c.appearance_offered);
+    else c.appearance_offered = j.contains("appearance");
     read_string(j, "ntp_server", c.ntp_server);
     read_bool(j, "advanced", c.advanced);
     read_bool(j, "auto_relock", c.auto_relock);
@@ -376,6 +380,7 @@ bool snapshot(Snapshot& snap)
     j["theme"]           = s_config.theme;
     j["appearance"]      = s_config.appearance;
     j["text_size"]       = s_config.text_size;
+    j["appearance_offered"] = s_config.appearance_offered;
     j["ntp_server"]      = s_config.ntp_server;
     j["custom_servers"]  = s_config.custom_servers;
     j["advanced"]        = s_config.advanced;

@@ -1664,6 +1664,11 @@
         },
         "dialog": {
             "unlock_short": "El control parental se desbloquea con el PIN guardado durante el cambio y luego se vuelve a bloquear."
+        },
+        "intro": {
+            "body": "Un aspecto nuevo: Cadran\n\nEl tiempo restante en un anillo, la semana editada con el stick, tarjetas que se leen desde el sofá y texto más grande en la tele. Las listas de las versiones anteriores siguen ahí:\nPreferencias › Apariencia › Clásica",
+            "classic": "Volver a Clásica",
+            "keep": "Mantener Cadran"
         }
     }
 }

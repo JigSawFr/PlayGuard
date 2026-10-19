@@ -1664,6 +1664,11 @@
         },
         "dialog": {
             "unlock_short": "Die Altersbeschränkungen werden für die Änderung mit der gespeicherten Geheimzahl aufgehoben und danach wieder aktiviert."
+        },
+        "intro": {
+            "body": "Ein neues Aussehen: Cadran\n\nDie verbleibende Zeit als Ring, die Woche mit dem Stick bearbeitet, Karten, die sich vom Sofa aus lesen lassen, größerer Text am Fernseher. Die Listen der früheren Versionen gibt es weiterhin:\nOptionen › Erscheinungsbild › Klassisch",
+            "classic": "Zurück zu Klassisch",
+            "keep": "Cadran behalten"
         }
     }
 }

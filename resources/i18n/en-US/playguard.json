@@ -1664,6 +1664,11 @@
         },
         "dialog": {
             "unlock_short": "Parental controls are unlocked with the stored PIN for the change, then locked again."
+        },
+        "intro": {
+            "body": "A new look: Cadran\n\nThe time left as a ring, the week edited with the stick, cards to read from the couch, larger text on the TV. The lists of the earlier versions are still there:\nPreferences › Appearance › Classic",
+            "classic": "Back to Classic",
+            "keep": "Keep Cadran"
         }
     }
 }

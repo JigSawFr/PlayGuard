@@ -20,6 +20,10 @@ struct Config
     // The text of the Cadran appearance: "auto" (larger while docked),
     // "normal" or "large" (ui/text_size).
     std::string text_size = "auto";
+    // Cadran said once to whom knew the lists: false in a config written
+    // before the appearance could be chosen (no "appearance" in it), so the
+    // main screen offers to keep it or go back to Classic (appearance_flow).
+    bool appearance_offered = true;
     std::string ntp_server;            // empty: pick from the console region
     std::vector<std::string> custom_servers;
     bool advanced = false;             // show debug-class play-timer actions

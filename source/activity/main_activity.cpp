@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 
+#include "action/appearance_flow.hpp"
 #include "action/clock_check.hpp"
 #include "action/data_notice.hpp"
 #include "action/fw_gate.hpp"
@@ -167,6 +168,9 @@ void MainActivity::onContentAvailable()
 
     // Firmware newer than the verified one: the firmware screen (or the remembered choice).
     fw_gate::on_main_screen();
+    // After an update from before the Cadran appearance: the new look said
+    // once, Classic one press away (before the first steps: once only).
+    appearance_flow::at_start(this);
     // Nothing set up yet (no PIN): the first steps, once per start, unless the
     // firmware screen opens (one screen per start: ui::claim_start_screen).
     if (OnboardingActivity::wanted_at_start() && ui::claim_start_screen("first steps"))
