@@ -49,6 +49,10 @@ u64 sim_played_today_s(void);
 // The game's icon (a copy to free), NULL when it has none.
 unsigned char *sim_game_icon(u64 id, size_t *size);
 
+// The icon the forwarder `id` was installed with in this run (malloc'd, the
+// caller frees it); NULL when none (sim_forwarder.cpp).
+unsigned char *sim_forwarder_icon(u64 id, size_t *size);
+
 #ifdef __cplusplus
 }
 #endif

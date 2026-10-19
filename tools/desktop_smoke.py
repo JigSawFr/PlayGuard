@@ -74,12 +74,17 @@ unlocked: "Turn back on" first on Today, the header's pill saying so. The
 with Preferences › Text size › Larger (as on a TV): Today on one screen, the
 child screen keeping its own sizes.
 
+The "forwarders" scenario opens Console › Forwarders: the forwarder another
+app made (its details), PlayGuard itself put on the HOME menu in one press,
+a homebrew of the simulated /switch folder picked from the list, then both
+deleted; forwarders.json and the change history must follow each step.
+
 The "loading" scenario stops the start-up on the loading screen
 (PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge]   (needs DISPLAY, xdotool, ImageMagick)
+Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge|forwarders]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -116,6 +121,7 @@ CADRAN = SCENARIO == "cadran"
 CADRANSTATES = SCENARIO == "cadranstates"
 CADRANUNLOCKED = SCENARIO == "cadranunlocked"
 CADRANLARGE = SCENARIO == "cadranlarge"
+FORWARDERS = SCENARIO == "forwarders"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
@@ -353,6 +359,14 @@ if CADRANLARGE:
     # The text 25 % bigger, as the console docked draws it by default.
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
     json.dump({"schema": 1, "text_size": "large"}, open(config_file, "w"))
+if FORWARDERS:
+    # Nothing made in an earlier local run: the simulated HOME menu starts
+    # with the one another app made (PLAYGUARD_SIM_KEEP is off), PlayGuard's
+    # file with none, the made-up .nro files written again.
+    for f in (os.path.join(nand_dir, "forwarders.json"), os.path.join(nand_dir, "history.json")):
+        if os.path.exists(f):
+            os.remove(f)
+    shutil.rmtree(os.path.join(run_dir, "playguard_data", "sd", "switch"), ignore_errors=True)
 if LIBRARY:
     # A large library: All games builds its first covers, then the rest on
     # "Show every game".
@@ -1022,6 +1036,81 @@ def main_opened():
     return any("main screen opened" in l for l in open(os.path.join(OUT, "app.log"), errors="replace"))
 
 
+if FORWARDERS:
+    # Console › Forwarders: the one another app made (its details), PlayGuard
+    # itself put on the HOME menu in one press, a homebrew of /switch from the
+    # list (named as its .nro names itself), then both deleted; each change in
+    # forwarders.json (PlayGuard's own) and in the change history.
+    made_file = os.path.join(nand_dir, "forwarders.json")
+    history_file = os.path.join(nand_dir, "history.json")
+    def made():
+        try:
+            return [(e.get("id"), e.get("name")) for e in json.load(open(made_file)).get("forwarders", [])]
+        except (OSError, ValueError):
+            return []
+    def recorded(kind):
+        try:
+            return [e.get("detail", "") for e in json.load(open(history_file)).get("entries", []) if e.get("kind") == kind]
+        except (OSError, ValueError):
+            return []
+    self_id = "050537e2542e2000"   # forwarder_id() of sdmc:/switch/playguard/playguard.nro
+    key("Down", steps("dashboard", "console"))
+    key("Right")               # Network clock
+    key("Down", 2)             # Forwarders, under Homebrew
+    shot("00_console")
+    key("Return")
+    shot("01_forwarders")      # Save Keeper (another app's), PlayGuard to add, no signature patches
+    key("Return")              # Save Keeper: Details or Delete
+    shot("02_actions_elsewhere")
+    key("Return")              # Details
+    shot("03_details_elsewhere")
+    key("Return")              # OK
+    key("Down")                # PlayGuard, to add
+    key("Return")
+    shot("04_add_self")        # the confirmation, with its .nro
+    key("Right")               # Add
+    key("Return")
+    time.sleep(3)              # the toast gone
+    if made() != [(self_id, "PlayGuard")]:
+        fail("PlayGuard's forwarder was not remembered: " + repr(made()))
+    if recorded("add_forwarder") != ["PlayGuard (" + self_id + ")"]:
+        fail("the forwarder added is not in the change history: " + repr(recorded("add_forwarder")))
+    shot("05_self_added")      # PlayGuard on the HOME menu with its icon, the focus on it
+    key("Down", 3)             # Save Keeper, PlayGuard's line, Another homebrew
+    key("Return")
+    shot("06_pick")            # the made-up homebrew of /switch, PlayGuard's own among them
+    key("Down", 4)             # Star Atlas
+    key("Return")
+    shot("07_name")            # its name from its .nro, to change or keep
+    key("Return")              # kept
+    shot("08_confirm")
+    key("Right")               # Add
+    key("Return")
+    time.sleep(3)
+    if [n for _, n in made()] != ["PlayGuard", "Star Atlas"]:
+        fail("Star Atlas's forwarder was not remembered: " + repr(made()))
+    shot("09_two")             # PlayGuard, Save Keeper, Star Atlas
+    key("Down", 2)             # Star Atlas
+    key("Return")
+    shot("10_actions")         # Details, Rename, Change the publisher, Install again, Delete
+    key("Down", 4)             # Delete
+    key("Return")
+    key("Right")               # Delete, in the confirmation
+    key("Return")
+    time.sleep(3)
+    if [n for _, n in made()] != ["PlayGuard"] or len(recorded("remove_forwarder")) != 1:
+        fail("Star Atlas's forwarder was not deleted: " + repr(made()) + " " + repr(recorded("remove_forwarder")))
+    key("Down")                # Save Keeper
+    key("Return")
+    key("Down")                # Delete
+    key("Return")
+    key("Right")
+    key("Return")
+    time.sleep(3)
+    if len(recorded("remove_forwarder")) != 2 or made() != [(self_id, "PlayGuard")]:
+        fail("the other app's forwarder was not deleted: " + repr(recorded("remove_forwarder")))
+    shot("11_left")            # PlayGuard alone
+    finish()
 if LIBRARY:
     def listed():
         log.flush()

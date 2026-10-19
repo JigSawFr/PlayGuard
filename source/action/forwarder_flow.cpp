@@ -1,0 +1,240 @@
+// Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
+#include "action/forwarder_flow.hpp"
+
+#include <algorithm>
+#include <borealis.hpp>
+
+#include "action/history_flow.hpp"
+#include "app.hpp"
+#include "core/forwarder.h"
+#include "ui/ui.hpp"
+#include "util/forwarders.hpp"
+#include "util/nro.hpp"
+#include "util/paths.hpp"
+#ifndef __SWITCH__
+#include "sim/sim_homebrew.hpp"
+#endif
+
+using namespace brls::literals;
+
+namespace forwarder_flow
+{
+
+namespace
+{
+
+// "/switch/…" under the SD card's root as the app reads it.
+std::string on_sd(const std::string& sd_path)
+{
+    const std::string root = paths::sd_root();
+    return root == "/" ? sd_path : root + sd_path;
+}
+
+bool nro_exists(const std::string& sdmc)
+{
+    const std::string p = nro::sd_path(sdmc);
+    return !p.empty() && paths::file_exists(on_sd(p));
+}
+
+// The detail the history keeps: the name, and the program ID.
+std::string history_label(const std::string& name, uint64_t id)
+{
+    return name + " (" + forwarders::hex_id(id) + ")";
+}
+
+// What a forwarder is built from: the .nro's icon and NACP. PlayGuard's own
+// falls back to the icon it ships with when its .nro cannot be read (the
+// desktop has none).
+bool assets_of(const std::string& sdmc, bool self, nro::Info& info, std::string& error)
+{
+    const std::string path = nro::sd_path(sdmc);
+    const bool read = !path.empty() && nro::read(on_sd(path), info);
+    if (self && (!read || !nro::icon_usable(info.icon))) {
+        std::string icon;
+        if (paths::read_file(BRLS_ASSET("img/app_icon.jpg"), icon)) info.icon.assign(icon.begin(), icon.end());
+        // Its version, as the HOME menu's data management shows it.
+        if (info.version.empty()) {
+            if (info.nacp.size() < nro::NACP_SIZE) info.nacp.assign(nro::NACP_SIZE, 0);
+            const std::string v = app::version();
+            std::copy(v.begin(), v.begin() + (long)std::min<size_t>(v.size(), 0xF), info.nacp.begin() + 0x3060);
+        }
+        return nro::icon_usable(info.icon);
+    }
+    if (!read) {
+        error = brls::getStr("playguard/forwarders/nro_unreadable", path.empty() ? sdmc : path);
+        return false;
+    }
+    if (!nro::icon_usable(info.icon)) {
+        error = brls::getStr("playguard/forwarders/no_icon", path);
+        return false;
+    }
+    return true;
+}
+
+// Builds and installs `m` from its .nro; says how it went.
+bool install(const forwarders::Made& m, bool self)
+{
+    nro::Info info;
+    std::string error;
+    if (!assets_of(m.nro, self, info, error)) {
+        ui::error("playguard/forwarders/add_err"_i18n + " — " + error);
+        return false;
+    }
+    const ForwarderSpec spec = {
+        m.nro.c_str(), m.argv.c_str(), m.name.c_str(), m.author.c_str(),
+        info.nacp.size() >= nro::NACP_SIZE ? info.nacp.data() : nullptr, info.icon.data(), info.icon.size(),
+    };
+    u64 id = 0;
+    const Result rc = forwarder_install(&spec, &id);
+    if (R_SUCCEEDED(rc)) {
+        forwarders::Made saved = m;
+        saved.id = id;
+        std::string werr;
+        if (!forwarders::save(saved, &werr)) brls::Logger::warning("forwarders: not remembered ({})", werr);
+        history_flow::record_event("add_forwarder", "", history_label(m.name, id));
+    } else {
+        brls::Logger::warning("forwarders: {} not installed ({})", m.nro, ui::rc_text(rc, false));
+    }
+    ui::notify_result(rc, brls::getStr("playguard/forwarders/added", m.name), "playguard/forwarders/add_err"_i18n);
+    return R_SUCCEEDED(rc);
+}
+
+}   // namespace
+
+std::vector<forwarders_logic::Row> rows()
+{
+#ifndef __SWITCH__
+    sim_homebrew::seed(paths::sd_root());   // PlayGuard's own .nro among them
+#endif
+    std::vector<ForwarderRecord> records(FORWARDER_MAX);
+    u32 count = 0;
+    const Result rc = forwarder_list(records.data(), FORWARDER_MAX, &count);
+    if (R_FAILED(rc)) brls::Logger::warning("forwarders: HOME menu not read ({})", ui::rc_text(rc, false));
+    std::vector<forwarders_logic::Installed> installed;
+    for (u32 i = 0; i < count; i++)
+        installed.push_back({ records[i].id, records[i].name, records[i].author, records[i].version });
+    return forwarders_logic::merge(forwarders::list(), installed, nro_exists, self_nro());
+}
+
+std::vector<std::string> homebrew()
+{
+#ifndef __SWITCH__
+    sim_homebrew::seed(paths::sd_root());
+#endif
+    return nro::find(paths::sd_root());
+}
+
+std::string self_nro()
+{
+    const std::string self = app::self_path();
+#ifdef __SWITCH__
+    return nro::sdmc_path(self);
+#else
+    return nro::sdmc_path(self.empty() ? std::string("/switch/playguard/playguard.nro") : self);
+#endif
+}
+
+bool loader_present()
+{
+#ifdef __SWITCH__
+    return paths::file_exists(BRLS_ASSET("forwarder/main")) && paths::file_exists(BRLS_ASSET("forwarder/main.npdm"));
+#else
+    return true;
+#endif
+}
+
+void create(const std::string& sd_path, std::function<void(bool)> done)
+{
+    nro::Info info;
+    std::string error;
+    const std::string sdmc = nro::sdmc_path(sd_path);
+    if (!assets_of(sdmc, false, info, error)) {
+        ui::error("playguard/forwarders/add_err"_i18n + " — " + error);
+        if (done) done(false);
+        return;
+    }
+    const std::string initial = forwarders_logic::default_name(info.name, sd_path);
+    const std::string author = forwarders::clean_text(info.author, forwarders::MAX_AUTHOR);
+    ui::prompt_text("playguard/forwarders/name"_i18n, initial, (int)forwarders::MAX_NAME,
+                    [sdmc, sd_path, author, done](std::string typed) {
+        const std::string name = forwarders::clean_text(typed, forwarders::MAX_NAME);
+        if (name.empty()) {
+            if (done) done(false);
+            return;
+        }
+        ui::confirm(brls::getStr("playguard/forwarders/confirm_add", name, sd_path), "playguard/forwarders/add"_i18n,
+                    [sdmc, name, author, done]() {
+                        forwarders::Made m;
+                        m.nro = m.argv = sdmc;
+                        m.name = name;
+                        m.author = author;
+                        const bool ok = install(m, false);
+                        if (done) done(ok);
+                    },
+                    [done]() {
+                        if (done) done(false);
+                    });
+    });
+}
+
+void create_self(std::function<void(bool)> done)
+{
+    const std::string sdmc = self_nro();
+    if (sdmc.empty()) {
+        ui::error("playguard/forwarders/add_err"_i18n + " — " + "playguard/forwarders/self_unknown"_i18n);
+        if (done) done(false);
+        return;
+    }
+    ui::confirm(brls::getStr("playguard/forwarders/confirm_self", nro::sd_path(sdmc)), "playguard/forwarders/add"_i18n,
+                [sdmc, done]() {
+                    forwarders::Made m;
+                    m.nro = m.argv = sdmc;
+                    m.name = "PlayGuard";
+                    m.author = "JigSawFr";
+                    const bool ok = install(m, true);
+                    if (done) done(ok);
+                },
+                [done]() {
+                    if (done) done(false);
+                });
+}
+
+void rebuild(const forwarders_logic::Row& row, const std::string& name, const std::string& author,
+             std::function<void(bool)> done)
+{
+    forwarders::Made m;
+    if (!forwarders::find(row.id, &m)) {
+        m.id = row.id;
+        m.nro = m.argv = row.nro;
+    }
+    m.name = name.empty() ? row.name : name;
+    m.author = author.empty() ? row.author : author;
+    const bool ok = !m.nro.empty() && install(m, row.self || m.nro == self_nro());
+    if (done) done(ok);
+}
+
+void remove(const forwarders_logic::Row& row, std::function<void(bool)> done)
+{
+    const forwarders_logic::Row r = row;
+    ui::confirm_danger(brls::getStr("playguard/forwarders/delete_body", r.name), "playguard/common/delete"_i18n, [r, done]() {
+        const Result rc = forwarder_remove(r.id);
+        if (R_SUCCEEDED(rc)) {
+            std::string err;
+            if (!forwarders::forget(r.id, &err)) brls::Logger::warning("forwarders: not forgotten ({})", err);
+            history_flow::record_event("remove_forwarder", "", history_label(r.name, r.id));
+        }
+        ui::notify_result(rc, brls::getStr("playguard/forwarders/deleted", r.name), "playguard/forwarders/delete_err"_i18n);
+        if (done) done(R_SUCCEEDED(rc));
+    });
+}
+
+void forget(const forwarders_logic::Row& row, std::function<void(bool)> done)
+{
+    std::string err;
+    const bool ok = forwarders::forget(row.id, &err);
+    if (ok) ui::notify(brls::getStr("playguard/forwarders/forgotten", row.name), ui::Toast::Done);
+    else ui::error("playguard/forwarders/delete_err"_i18n + " — " + err);
+    if (done) done(ok);
+}
+
+}   // namespace forwarder_flow

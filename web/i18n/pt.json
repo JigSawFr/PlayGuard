@@ -110,7 +110,7 @@
   "dev_builds_delay": {"label": "Cada resposta do GitHub atrasada (ms)"},
   "github_login": {"label": "Início de sessão no GitHub", "options": {"": "Inacessível", "ok": "Aprovado", "denied": "Recusado", "offline": "Sem ligação"}},
   "paste": {"label": "Resposta a «Enviar um relatório online»"},
-  "fail": {"label": "Fazer falhar", "options": {"unlock": "Desbloqueio", "unverified": "Desbloqueio não confirmado", "relock": "Novo bloqueio", "write": "Toda a escrita de definições", "timer": "Leitura do temporizador", "clock": "Acerto do relógio", "pin": "Leitura do PIN", "pin_entry": "Ecrã do PIN cancelado", "bedtime": "Hora de deitar", "remove": "Remoção de um jogo", "launch": "Reposição da versão de arranque", "verify": "Verificação de integridade"}},
+  "fail": {"label": "Fazer falhar", "options": {"unlock": "Desbloqueio", "unverified": "Desbloqueio não confirmado", "relock": "Novo bloqueio", "write": "Toda a escrita de definições", "timer": "Leitura do temporizador", "clock": "Acerto do relógio", "pin": "Leitura do PIN", "pin_entry": "Ecrã do PIN cancelado", "bedtime": "Hora de deitar", "remove": "Remoção de um jogo", "launch": "Reposição da versão de arranque", "verify": "Verificação de integridade", "forwarder": "Instalar ou retirar um forwarder"}},
   "still_focus": {"label": "Realce do foco sem animação"},
   "version": {"label": "Versão mostrada no cabeçalho"},
   "hold_loading": {"label": "Ficar no ecrã de carregamento"},

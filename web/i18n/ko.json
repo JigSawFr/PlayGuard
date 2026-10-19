@@ -110,7 +110,7 @@
   "dev_builds_delay": {"label": "GitHub 응답마다 지연(ms)"},
   "github_login": {"label": "GitHub 로그인", "options": {"": "연결 불가", "ok": "승인됨", "denied": "거부됨", "offline": "오프라인"}},
   "paste": {"label": "'온라인으로 보고서 보내기'의 응답"},
-  "fail": {"label": "실패시킬 항목", "options": {"unlock": "해제", "unverified": "해제 확인 안 됨", "relock": "다시 잠금", "write": "모든 설정 쓰기", "timer": "타이머 읽기", "clock": "시계 설정", "pin": "PIN 읽기", "pin_entry": "PIN 화면 취소", "bedtime": "취침 시간", "remove": "게임 삭제", "launch": "실행 버전 초기화", "verify": "무결성 검사"}},
+  "fail": {"label": "실패시킬 항목", "options": {"unlock": "해제", "unverified": "해제 확인 안 됨", "relock": "다시 잠금", "write": "모든 설정 쓰기", "timer": "타이머 읽기", "clock": "시계 설정", "pin": "PIN 읽기", "pin_entry": "PIN 화면 취소", "bedtime": "취침 시간", "remove": "게임 삭제", "launch": "실행 버전 초기화", "verify": "무결성 검사", "forwarder": "포워더 설치 또는 제거"}},
   "still_focus": {"label": "포커스 강조 고정"},
   "version": {"label": "헤더에 표시할 버전"},
   "hold_loading": {"label": "로딩 화면에서 멈추기"},

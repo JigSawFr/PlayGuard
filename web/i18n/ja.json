@@ -110,7 +110,7 @@
   "dev_builds_delay": {"label": "GitHub の応答ごとの遅延（ミリ秒）"},
   "github_login": {"label": "GitHub へのサインイン", "options": {"": "接続できない", "ok": "承認", "denied": "拒否", "offline": "オフライン"}},
   "paste": {"label": "「レポートをオンラインで送信」の応答"},
-  "fail": {"label": "失敗させる操作", "options": {"unlock": "解除", "unverified": "解除が確認されない", "relock": "再ロック", "write": "設定の書き込みすべて", "timer": "タイマーの読み込み", "clock": "時計の設定", "pin": "暗証番号の読み込み", "pin_entry": "暗証番号の画面をキャンセル", "bedtime": "おやすみ時間", "remove": "ソフトの削除", "launch": "起動バージョンのリセット", "verify": "整合性チェック"}},
+  "fail": {"label": "失敗させる操作", "options": {"unlock": "解除", "unverified": "解除が確認されない", "relock": "再ロック", "write": "設定の書き込みすべて", "timer": "タイマーの読み込み", "clock": "時計の設定", "pin": "暗証番号の読み込み", "pin_entry": "暗証番号の画面をキャンセル", "bedtime": "おやすみ時間", "remove": "ソフトの削除", "launch": "起動バージョンのリセット", "verify": "整合性チェック", "forwarder": "フォワーダーのインストール・削除"}},
   "still_focus": {"label": "フォーカスの強調を静止"},
   "version": {"label": "ヘッダーに表示するバージョン"},
   "hold_loading": {"label": "読み込み画面で止める"},

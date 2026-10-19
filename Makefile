@@ -123,6 +123,8 @@ calendar_SRC   := source/core/calendar.c tests/calendar/test.c
 calendar_FLAGS := -std=gnu11 -Isource/core
 rescue_SRC   := source/core/rescue.c tests/rescue/test.c
 rescue_FLAGS := -std=c11 -Isource/core
+forwarder_pack_SRC   := source/core/forwarder_pack.c tests/forwarder_pack/test.c
+forwarder_pack_FLAGS := -std=c11 -Isource/core
 ntp_SRC   := source/util/ntp_packet.c tests/ntp_packet/test.c
 ntp_FLAGS := -std=c11 -Isource/util
 playlog_SRC   := source/util/playlog.c tests/playlog/test.c
@@ -182,6 +184,7 @@ table_export_LIBS  := -lz
 update_SRC   := source/util/date.cpp source/util/update.cpp tests/update/test.cpp
 config_SRC   := source/util/paths.cpp source/util/date.cpp source/util/config.cpp tests/config/test.cpp
 profiles_SRC   := source/util/paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
+forwarders_SRC   := source/util/paths.cpp source/util/nro.cpp source/util/forwarders.cpp source/util/patches.cpp source/action/forwarders_logic.cpp tests/forwarders/test.cpp
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
 launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
 markdown_SRC   := source/util/safe_text.cpp source/util/markdown.cpp tests/markdown/test.cpp
@@ -218,9 +221,9 @@ crash_dump_FLAGS := -std=c11 -Isource/util
 # The desktop and web simulators' console (source/sim/*.c, sim_state.h) and
 # their PLAYGUARD_SIM_* variables (core/sim_env.h), with the console-free
 # parts of the service layer they share with the console.
-sim_backend_SRC    := source/sim/sim_env.cpp source/sim/sim_platform.cpp source/util/sha256.cpp tests/sim_backend/test.cpp
+sim_backend_SRC    := source/sim/sim_env.cpp source/sim/sim_platform.cpp source/sim/sim_forwarder.cpp source/util/paths.cpp source/util/sha256.cpp source/util/nro.cpp tests/sim_backend/test.cpp
 sim_backend_CSRC   := $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c sim_time.c sim_playstats.c sim_gamecheck.c) \
-                      $(addprefix source/core/,pure.c calendar.c write_guard.c) source/util/playlog.c
+                      $(addprefix source/core/,pure.c calendar.c write_guard.c forwarder_pack.c) source/util/playlog.c
 # Atomic coverage counters: the suite runs the same code from several threads
 # at once, and gcov's plain counters then come out wrong (negative ones, that
 # gcovr refuses).
@@ -338,6 +341,7 @@ clean:
 	@echo clean ...
 	@rm -rf $(BUILD) $(DESKTOP) $(WEB) out out-rescue $(TARGET).zip playguard-rescue.zip $(TARGET).nro $(TARGET).nacp $(TARGET).elf
 	@$(MAKE) --no-print-directory -C sysmodule clean 2>/dev/null || true
+	@$(MAKE) --no-print-directory -C forwarder clean 2>/dev/null || true
 
 nxlink: all
 	nxlink $(BUILD)/$(TARGET).nro

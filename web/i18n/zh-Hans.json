@@ -110,7 +110,7 @@
   "dev_builds_delay": {"label": "GitHub 每次响应延迟（毫秒）"},
   "github_login": {"label": "登录 GitHub", "options": {"": "无法访问", "ok": "已批准", "denied": "已拒绝", "offline": "离线"}},
   "paste": {"label": "“在线发送报告”的响应"},
-  "fail": {"label": "让以下操作失败", "options": {"unlock": "解除", "unverified": "解除未确认", "relock": "重新锁定", "write": "所有设置写入", "timer": "读取计时器", "clock": "设置时钟", "pin": "读取 PIN", "pin_entry": "取消 PIN 画面", "bedtime": "就寝时间", "remove": "删除游戏", "launch": "重置启动版本", "verify": "完整性检查"}},
+  "fail": {"label": "让以下操作失败", "options": {"unlock": "解除", "unverified": "解除未确认", "relock": "重新锁定", "write": "所有设置写入", "timer": "读取计时器", "clock": "设置时钟", "pin": "读取 PIN", "pin_entry": "取消 PIN 画面", "bedtime": "就寝时间", "remove": "删除游戏", "launch": "重置启动版本", "verify": "完整性检查", "forwarder": "安装或移除转发器"}},
   "still_focus": {"label": "焦点高亮静止"},
   "version": {"label": "标题栏显示的版本"},
   "hold_loading": {"label": "停在加载画面"},

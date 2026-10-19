@@ -1,5 +1,6 @@
 // ConsoleTab — the console PlayGuard runs on: the network clock (its own
-// screen, ClockTab), the installed games check, the firmware, Atmosphère and
+// screen, ClockTab), the installed games check, the forwarders (homebrew on
+// the HOME menu, ForwardersActivity), the firmware, Atmosphère and
 // hekate (A on each opens its release notes), compatibility, storage, the
 // serial number and the game patches.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
@@ -31,6 +32,7 @@ class ConsoleTab : public TabBase
 
     BRLS_BIND(brls::DetailCell,  clock,        "cn_clock");
     BRLS_BIND(brls::DetailCell,  games,        "cn_games");
+    BRLS_BIND(brls::DetailCell,  forwarders,   "cn_forwarders");
     BRLS_BIND(brls::DetailCell,  fw,           "cn_fw");
     BRLS_BIND(brls::DetailCell,  ams,          "cn_ams");
     BRLS_BIND(brls::DetailCell,  hekate,       "cn_hekate");

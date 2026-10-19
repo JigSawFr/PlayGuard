@@ -110,7 +110,7 @@
   "dev_builds_delay": {"label": "GitHub 每次回應延遲（毫秒）"},
   "github_login": {"label": "登入 GitHub", "options": {"": "無法連線", "ok": "已核准", "denied": "已拒絕", "offline": "離線"}},
   "paste": {"label": "「線上傳送報告」的回應"},
-  "fail": {"label": "讓以下操作失敗", "options": {"unlock": "解除", "unverified": "解除未確認", "relock": "重新鎖定", "write": "所有設定寫入", "timer": "讀取計時器", "clock": "設定時鐘", "pin": "讀取 PIN碼", "pin_entry": "取消 PIN碼畫面", "bedtime": "就寢時間", "remove": "刪除遊戲", "launch": "重設啟動版本", "verify": "完整性檢查"}},
+  "fail": {"label": "讓以下操作失敗", "options": {"unlock": "解除", "unverified": "解除未確認", "relock": "重新鎖定", "write": "所有設定寫入", "timer": "讀取計時器", "clock": "設定時鐘", "pin": "讀取 PIN碼", "pin_entry": "取消 PIN碼畫面", "bedtime": "就寢時間", "remove": "刪除遊戲", "launch": "重設啟動版本", "verify": "完整性檢查", "forwarder": "安裝或移除轉發器"}},
   "still_focus": {"label": "焦點醒目提示靜止"},
   "version": {"label": "標題列顯示的版本"},
   "hold_loading": {"label": "停在載入畫面"},

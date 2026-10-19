@@ -183,6 +183,7 @@ else ()
     list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/source/core/pure.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/calendar.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gamecheck_rules.c
+                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/forwarder_pack.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/rescue.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/write_guard.c)
 endif ()
@@ -341,13 +342,24 @@ if (PLATFORM_SWITCH)
         COMMAND ${PLAYGUARD_MAKE} --no-print-directory -C ${CMAKE_CURRENT_SOURCE_DIR}/sysmodule
         BYPRODUCTS ${RESCUE_NSP}
         COMMENT "Building the recovery sysmodule")
-    add_custom_target(${PROJECT_NAME}.nro ALL DEPENDS ${PROJECT_NAME} playguard_rescue
+    # The program of the NRO forwarders PlayGuard installs (core/forwarder.h)
+    # rides in it too (romfs:/forwarder/main and main.npdm), built by
+    # forwarder/'s Makefile.
+    set(FORWARDER_OUT ${CMAKE_CURRENT_SOURCE_DIR}/forwarder/out)
+    add_custom_target(playguard_forwarder
+        COMMAND ${PLAYGUARD_MAKE} --no-print-directory -C ${CMAKE_CURRENT_SOURCE_DIR}/forwarder
+        BYPRODUCTS ${FORWARDER_OUT}/forwarder.nso ${FORWARDER_OUT}/forwarder.npdm
+        COMMENT "Building the NRO forwarders' loader")
+    add_custom_target(${PROJECT_NAME}.nro ALL DEPENDS ${PROJECT_NAME} playguard_rescue playguard_forwarder
         COMMAND ${NX_NACPTOOL_EXE} --create "PlayGuard" "${PROJECT_AUTHOR}"
                 "${APP_VERSION}" ${PROJECT_NAME}.nacp --titleid=${PROJECT_TITLEID}
         ${ASSEMBLE_RESOURCES}
         ${PLAYGUARD_COPY_SHADERS}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${MERGED_RESOURCES}/rescue
         COMMAND ${CMAKE_COMMAND} -E copy ${RESCUE_NSP} ${MERGED_RESOURCES}/rescue/exefs.nsp
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${MERGED_RESOURCES}/forwarder
+        COMMAND ${CMAKE_COMMAND} -E copy ${FORWARDER_OUT}/forwarder.nso ${MERGED_RESOURCES}/forwarder/main
+        COMMAND ${CMAKE_COMMAND} -E copy ${FORWARDER_OUT}/forwarder.npdm ${MERGED_RESOURCES}/forwarder/main.npdm
         COMMAND ${CMAKE_COMMAND} -E remove -f ${MERGED_RESOURCES}/font/switch_font.ttf ${MERGED_RESOURCES}/font/switch_icons.ttf
         COMMAND ${NX_ELF2NRO_EXE} ${PROJECT_NAME}.elf ${PROJECT_NAME}.nro
                 --icon=${PROJECT_ICON} --nacp=${PROJECT_NAME}.nacp

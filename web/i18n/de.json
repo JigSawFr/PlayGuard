@@ -110,7 +110,7 @@
   "dev_builds_delay": {"label": "Jede Antwort von GitHub verzögert um (ms)"},
   "github_login": {"label": "GitHub-Anmeldung", "options": {"": "Nicht erreichbar", "ok": "Bestätigt", "denied": "Abgelehnt", "offline": "Offline"}},
   "paste": {"label": "Antwort auf „Bericht online senden“"},
-  "fail": {"label": "Fehlschlagen lassen", "options": {"unlock": "Entsperren", "unverified": "Entsperren nicht bestätigt", "relock": "Erneutes Sperren", "write": "Jedes Schreiben einer Einstellung", "timer": "Lesen des Timers", "clock": "Stellen der Uhr", "pin": "Lesen der Geheimzahl", "pin_entry": "Geheimzahl-Bildschirm abgebrochen", "bedtime": "Schlafenszeit", "remove": "Löschen eines Spiels", "launch": "Zurücksetzen der Startversion", "verify": "Integritätsprüfung"}},
+  "fail": {"label": "Fehlschlagen lassen", "options": {"unlock": "Entsperren", "unverified": "Entsperren nicht bestätigt", "relock": "Erneutes Sperren", "write": "Jedes Schreiben einer Einstellung", "timer": "Lesen des Timers", "clock": "Stellen der Uhr", "pin": "Lesen der Geheimzahl", "pin_entry": "Geheimzahl-Bildschirm abgebrochen", "bedtime": "Schlafenszeit", "remove": "Löschen eines Spiels", "launch": "Zurücksetzen der Startversion", "verify": "Integritätsprüfung", "forwarder": "Installieren oder Entfernen eines Forwarders"}},
   "still_focus": {"label": "Fokus-Hervorhebung ohne Bewegung"},
   "version": {"label": "Im Kopfbereich angezeigte Version"},
   "hold_loading": {"label": "Auf dem Ladebildschirm bleiben"},
