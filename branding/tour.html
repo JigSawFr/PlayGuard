@@ -1,5 +1,6 @@
 <!doctype html>
-<!-- PlayGuard 30-second tour: window.render(t) draws the frame at t seconds; tools/render_tour.mjs turns it into images/video/playguard-tour.mp4. -->
+<!-- PlayGuard 30-second tour: window.render(t) draws the frame at t seconds; tools/render_tour.mjs turns it into images/video/playguard-tour.mp4.
+     window.TOUR, set before the page's script (tools/render_tour.mjs), is the website's tour in another language: its texts and its screenshots. -->
 <html><head><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -73,7 +74,7 @@
 </div>
 
 <script>
-const SCENES = [
+let SCENES = [
   { img:'dashboard.png',        h:'Today, <em>at a glance</em>',        p:'Time played, time left, extra time, bedtime alarm',          ox:'60%', oy:'35%' },
   { img:'play_timer.png',       h:'<em>Play-time</em> limits',          p:'The same every day, or one per day of the week',              ox:'65%', oy:'35%' },
   { img:'activity.png',         h:'See the <em>activity</em>',          p:'Per game & per account · export CSV, JSON, XLSX or PDF',      ox:'65%', oy:'40%' },
@@ -82,6 +83,19 @@ const SCENES = [
   { img:'console.png',          h:'The <em>console</em>, checked',      p:'Installed games that won’t start, firmware & Atmosphère',      ox:'65%', oy:'35%' },
   { img:'dashboard_fr_dark.png',h:'Every <em>language</em>, light & dark', p:'All the console’s languages · every change logged & undoable', ox:'50%', oy:'50%' },
 ];
+// Another language's tour: its texts (plain text, no markup) and its screenshots.
+const TOUR = window.TOUR;
+if (TOUR) {
+  document.documentElement.lang = TOUR.lang;
+  const text = (id, value) => { document.getElementById(id).textContent = value; };
+  text('tag', TOUR.tag);
+  ['h1', 'h2', 'h3'].forEach((id, i) => text(id, TOUR.hooks[i] || ''));
+  text('hooksub', TOUR.hooksub);
+  text('oline1', TOUR.line1);
+  document.getElementById('onote').replaceChildren(`${TOUR.stores} · `, Object.assign(document.createElement('b'), { textContent: TOUR.cfw }));
+  const escape = (s) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+  SCENES = TOUR.scenes.map((s) => ({ ...s, h: escape(s.h), p: escape(s.p) }));
+}
 // ?still: no drifting glow and no zoom on the screenshots, so a GIF only redraws what changes.
 const STILL = new URLSearchParams(location.search).has('still');
 const T_INTRO = 3.6, T_HOOK = 3.6, T_SCENE = 3.4, T_OUTRO = 4.6;
@@ -94,7 +108,7 @@ const els = SCENES.map((s, i) => {
   const d = document.createElement('div');
   d.className = 'layer';
   d.innerHTML = `<div class="cap"><h2>${s.h}</h2><p>${s.p}</p></div>
-    <div class="shot"><img src="../images/screenshots/${s.img}" style="--ox:${s.ox};--oy:${s.oy}"></div>
+    <div class="shot"><img src="${s.src || `../images/screenshots/${s.img}`}" style="--ox:${s.ox};--oy:${s.oy}"></div>
     <div class="step">${String(i+1).padStart(2,'0')} / ${String(SCENES.length).padStart(2,'0')}</div>`;
   box.appendChild(d);
   return d;

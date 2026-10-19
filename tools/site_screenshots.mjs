@@ -1,9 +1,11 @@
 // The website's screenshots in each of the console's languages (site/README.md):
 // the web simulator (web/README.md, `make web`) in a headless Chromium,
-// written as <out-dir>/<language>/<screen>.webp for tools/build_site.py to use
+// written as <out-dir>/<language>/<screen>.webp (the light theme) and
+// <screen>-dark.webp (the dark one) for tools/build_site.py to use
 // (SITE_SCREENSHOTS=<out-dir>). The same console as the desktop smoke test's
 // (tools/desktop_smoke.py): Thursday 8 October 2026, 16:00 UTC, the focus
-// without its glow, a release's version badge.
+// without its glow, a release's version badge. SITE_SCREENSHOT_THEMES:
+// the themes to take (light,dark by default).
 // Needs Node and Playwright (Chromium).
 //   node tools/site_screenshots.mjs build-web/simulator <out-dir> [version] [language...]
 // (every language when none is named; the version is the header's badge, 1.2.0).
@@ -23,17 +25,22 @@ const LANGUAGES = ['en-US', 'fr', 'fr-CA', 'de', 'es', 'es-419', 'it', 'nl', 'pt
 // per start of PlayGuard (a start takes the longest): the tab it opens on,
 // then each screen with the keys to it from the one before.
 const RUNS = [
-  // The tabs, down the sidebar.
+  // The tabs, down the sidebar, then Console's first row, Network clock.
   { tab: '', screens: [['dashboard'], ['play_timer', 'ArrowDown'], ['activity', 'ArrowDown'],
-    ['restrictions', 'ArrowDown'], ['security', 'ArrowDown'], ['console', 'ArrowDown']] },
+    ['restrictions', 'ArrowDown'], ['security', 'ArrowDown'], ['console', 'ArrowDown'],
+    ['clock', 'ArrowRight', 'Enter']] },
+  // The week chart on today, tomorrow, its editor (its picker open), the picker closed.
+  { tab: 'play_timer', screens: [['per_day', 'ArrowRight', 'ArrowRight', 'Enter', 'Escape']] },
   // Not past History: on a busy machine it can take long enough to build
   // that a press seems missed, and pressed again goes one tab too far.
   { tab: 'preferences', screens: [['preferences']] },
-  // The week chart on today, tomorrow, its editor (its picker open), the picker closed.
-  { tab: 'play_timer', screens: [['per_day', 'ArrowRight', 'ArrowRight', 'Enter', 'Escape']] },
-  // Console's first row, Network clock.
-  { tab: 'console', screens: [['clock', 'ArrowRight', 'Enter']] },
+  // Activity's games (past Account, Account by default and Period), the
+  // first one's own screen: the documentation's "A game".
+  { tab: 'activity', screens: [['activity_game', 'ArrowRight', 'ArrowDown', 'ArrowDown', 'ArrowDown', 'ArrowDown',
+    'Enter', 'Enter']] },
 ];
+const THEMES = (process.env.SITE_SCREENSHOT_THEMES || 'light,dark').split(',').filter(Boolean);
+const file = (name, theme) => `${name}${theme === 'dark' ? '-dark' : ''}.webp`;
 const NOW = 1791475200;   // tools/desktop_smoke.py's PLAYGUARD_SIM_NOW
 
 // SITE_SCREENSHOTS_FROM=<a published site's address>: its screenshots,
@@ -45,11 +52,13 @@ if (from) {
   let count = 0;
   for (const lang of only.length ? only : LANGUAGES) {
     for (const [name] of RUNS.flatMap((r) => r.screens)) {
-      const res = await fetch(new URL(`assets/images/screenshots/${lang}/${name}.webp`, from)).catch(() => null);
-      if (!res?.ok || !res.headers.get('content-type')?.startsWith('image/')) continue;
-      await mkdir(join(out, lang), { recursive: true });
-      await writeFile(join(out, lang, `${name}.webp`), Buffer.from(await res.arrayBuffer()));
-      count++;
+      for (const theme of THEMES) {
+        const res = await fetch(new URL(`assets/images/screenshots/${lang}/${file(name, theme)}`, from)).catch(() => null);
+        if (!res?.ok || !res.headers.get('content-type')?.startsWith('image/')) continue;
+        await mkdir(join(out, lang), { recursive: true });
+        await writeFile(join(out, lang, file(name, theme)), Buffer.from(await res.arrayBuffer()));
+        count++;
+      }
     }
   }
   console.log(`${count} screenshots from ${from} in ${out}`);
@@ -105,31 +114,32 @@ async function still(page) {
 // One start of PlayGuard in `lang` and its screens. A browser of its own:
 // SwiftShader's WebGL can crash one (its GPU process), which then opens no
 // page; it takes nothing else along.
-async function run(lang, { tab, screens }) {
+async function run(lang, theme, { tab, screens }) {
   const browser = await chromium.launch({
     executablePath: process.env.CHROMIUM_PATH || undefined,
     // WebGL 2 without a GPU; and no proxy for a page served from this machine.
     args: ['--no-proxy-server', '--ignore-gpu-blocklist', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
   });
   try {
-    const context = await browser.newContext({ viewport: { width: 1600, height: 1000 }, timezoneId: 'UTC', colorScheme: 'light' });
+    const context = await browser.newContext({ viewport: { width: 1600, height: 1000 }, timezoneId: 'UTC', colorScheme: theme });
     const page = await context.newPage();
     // The footer's clock follows the browser's: from the smoke test's 16:00 too.
     await page.clock.install({ time: new Date(NOW * 1000) });
     await page.clock.resume();
-    const query = new URLSearchParams({ lang, theme: 'light', still_focus: '1', now: String(NOW) });
+    const query = new URLSearchParams({ lang, theme, still_focus: '1', now: String(NOW) });
     if (tab) query.set('tab', tab);
     if (version) query.set('version', `${version}:`);
     await page.goto(`${base}?${query}`);
     await page.waitForFunction(() => document.getElementById('overlay')?.hidden, null, { timeout: 120000 });
-    // PlayGuard's loading screen is dark, its light theme is not: wait for the
-    // first screen (a corner of the header), then for its icons.
+    // PlayGuard's loading screen is navy (red 11), either theme of its first
+    // screen is grey (red 45 dark, 235 light): wait for the first screen (a
+    // corner of the header), then for its icons.
     await page.waitForFunction(() => {
       const c = document.createElement('canvas');
       c.width = c.height = 1;
       const g = c.getContext('2d');
       g.drawImage(document.getElementById('canvas'), 8, 8, 1, 1, 0, 0, 1, 1);
-      return g.getImageData(0, 0, 1, 1).data[0] > 128;
+      return g.getImageData(0, 0, 1, 1).data[0] > 25;
     }, null, { timeout: 120000, polling: 250 });
     await sleep(1000);
     await page.focus('#canvas');
@@ -156,7 +166,7 @@ async function run(lang, { tab, screens }) {
       const url = await page.evaluate(() => document.getElementById('canvas').toDataURL('image/webp', 0.9));
       if (!url.startsWith('data:image/webp')) throw new Error(`${lang}/${name}: no WebP from the canvas`);
       await mkdir(join(out, lang), { recursive: true });
-      await writeFile(join(out, lang, `${name}.webp`), Buffer.from(url.split(',')[1], 'base64'));
+      await writeFile(join(out, lang, file(name, theme)), Buffer.from(url.split(',')[1], 'base64'));
     }
   } finally {
     await browser.close().catch(() => {});
@@ -164,13 +174,13 @@ async function run(lang, { tab, screens }) {
 }
 
 // Three tries: a start that never finished, or a browser that crashed, is taken again.
-async function runAgain(lang, screens) {
+async function runAgain(lang, theme, screens) {
   for (let attempt = 1; ; attempt++) {
     try {
-      return await run(lang, screens);
+      return await run(lang, theme, screens);
     } catch (e) {
       if (attempt === 3) throw e;
-      console.warn(`${lang}/${screens.screens[0][0]}: ${String(e.message).split('\n')[0]} (try ${attempt + 1})`);
+      console.warn(`${lang}/${theme}/${screens.screens[0][0]}: ${String(e.message).split('\n')[0]} (try ${attempt + 1})`);
     }
   }
 }
@@ -183,9 +193,11 @@ let count = 0;
 try {
   await Promise.all(Array.from({ length: jobs }, async () => {
     for (let lang; (lang = queue.shift());) {
-      for (const screens of RUNS) {
-        await runAgain(lang, screens);
-        count += screens.screens.length;
+      for (const theme of THEMES) {
+        for (const screens of RUNS) {
+          await runAgain(lang, theme, screens);
+          count += screens.screens.length;
+        }
       }
       console.log(`${lang}: done`);
     }
