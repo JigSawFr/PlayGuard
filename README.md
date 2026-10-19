@@ -15,7 +15,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 
 [![PlayGuard in 30 seconds](images/video/playguard-tour.gif)](images/video/playguard-tour.gif)
 
-▶️ **[Try it in your browser](https://jigsawfr.github.io/PlayGuard/simulator/)**, the real app against a simulated console: [unlocked for now](https://jigsawfr.github.io/PlayGuard/simulator/?unlocked=1) · [time's up](https://jigsawfr.github.io/PlayGuard/simulator/?restricted=1) · [first start, no PIN](https://jigsawfr.github.io/PlayGuard/simulator/?not_set_up=1) · [on the TV, larger text](https://jigsawfr.github.io/PlayGuard/simulator/?docked=1) · [Classic](https://jigsawfr.github.io/PlayGuard/simulator/?appearance=classic).
+▶️ **[Try it in your browser](https://jigsawfr.github.io/PlayGuard/simulator/)**, the real app against a simulated console: [unlocked for now](https://jigsawfr.github.io/PlayGuard/simulator/?unlocked=1) · [time's up](https://jigsawfr.github.io/PlayGuard/simulator/?restricted=1) · [first start, no PIN](https://jigsawfr.github.io/PlayGuard/simulator/?not_set_up=1) · [on the TV, larger text](https://jigsawfr.github.io/PlayGuard/simulator/?docked=1).
 
 > [!WARNING]
 > **Requires custom firmware (Atmosphère).** PlayGuard uses the restricted `pctl` service, some of it through `*ForDebug` commands. **Use at your own risk.**
@@ -29,7 +29,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 - 📱 **Companion app** — unlink it, even on a second-hand console.
 - ↩️ **History and backups** — every change is logged and can be undone.
 - 🔔 **Notifications** — a bell gathers what needs you (an alarm off, a clock drifting, changes made elsewhere), with the fix one press away.
-- 🌍 Every console language, light and dark themes, two appearances: Cadran (cards, today's time as a ring, the week edited with the stick) or the classic lists.
+- 🌍 Every console language, light and dark themes, larger text on the TV; cards, today's time as a ring, the week edited with the stick.
 
 ## Compatibility
 

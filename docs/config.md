@@ -45,9 +45,9 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `schema` | integer | `1` | `1` | written by PlayGuard, not read |
 | `language` | string | `"system"` (the console's language), `"en-US"`, `"fr"`, `"fr-CA"`, `"de"`, `"es"`, `"es-419"`, `"it"`, `"nl"`, `"pt"`, `"pt-BR"`, `"ru"`, `"ja"`, `"ko"`, `"zh-Hans"`, `"zh-Hant"` | `"system"` | Preferences |
 | `theme` | string | `"system"`, `"light"`, `"dark"` | `"system"` | Preferences |
-| `effects` | string | `"auto"` (lighter on the battery: no background glow, no pulse of the child screen's ring, no animation of the rings' arc while no charger is connected) or `"full"`; Cadran only | `"auto"` | Preferences › Visual effects |
+| `effects` | string | `"auto"` (lighter on the battery: no background glow, no pulse of the child screen's ring, no animation of the rings' arc while no charger is connected) or `"full"` | `"auto"` | Preferences › Visual effects |
 | `text_size` | string | `"auto"` (larger while the console is docked, on a TV), `"normal"` or `"large"`; larger text draws every label 25 % bigger but the header's, the sidebar's and the footer's, at once (no restart) | `"auto"` | Preferences › Text size, the header's AA |
-| `start_tab` | string | the tab shown at start-up: `"dashboard"` (Overview), `"play_timer"`, `"activity"`, `"restrictions"`, `"security"` (PIN), `"console"`, `"history"`, `"preferences"`, `"about"`; `"clock"` and `"tools"`, from before they became Console, read as `"console"` | `"dashboard"` | Preferences |
+| `start_tab` | string | the tab shown at start-up: `"dashboard"` (Today), `"play_timer"`, `"activity"`, `"restrictions"`, `"security"` (PIN), `"console"`, `"history"`, `"preferences"`, `"about"`; `"clock"` and `"tools"`, from before they became Console, read as `"console"` | `"dashboard"` | Preferences |
 | `advanced` | boolean | shows the play timer's debug-class actions | `false` | Play timer › Advanced |
 | `auto_relock` | boolean | turns parental controls back on right after a change that needed the temporary unlock | `true` | PIN |
 | `pin_ask_again` | boolean | the PIN, once entered, holds 5 minutes instead of until PlayGuard closes: *Before a change* asks again after them, *To open PlayGuard* locks again after 5 minutes or more out of focus | `false` | PIN (*Ask for the PIN again after 5 minutes*) |
@@ -141,7 +141,7 @@ Set in *About › Help & diagnostics › Developer*, shown once developer mode i
 | `pt_log` | boolean | *Record the play timer* (`logs/play_timer/log.csv`) | `false` |
 | `dev_builds_order` | string | how *Install another build* orders the pull requests (A on their tab when it is shown): `"newest"` (the newest build first) or `"number"` (the highest number first); main's commits are always newest first | `"newest"` |
 | `frame_stats` | boolean | *About › Help & diagnostics › Developer › Frame statistics* (`logs/frame_stats.txt`: one line per second, the UI thread's time per frame and the late frames, to weigh one screen against another on the console) | `false` |
-| `cadran_glow` | boolean | *About › Help & diagnostics › Developer › Background glow*: the Cadran screens' soft light behind the top left (or the child screen's ring); off, the frame statistics' mode says `docked-noglow` (`handheld-noglow`), to weigh what it costs | `true` |
+| `cadran_glow` | boolean | *About › Help & diagnostics › Developer › Background glow*: the screens' soft light behind the top left (or the child screen's ring); off, the frame statistics' mode says `docked-noglow` (`handheld-noglow`), to weigh what it costs | `true` |
 
 ## State kept between launches
 
@@ -325,13 +325,13 @@ default.
 One per system, next to its `state.json`, in
 `sd:/config/playguard/nand/<system>/watch.json`: what PlayGuard
 last saw of the console, to tell the parent what changed outside it (the
-Overview's amber notice, the `outside_*` and `new_account` entries of the
+amber card on *Today*, the `outside_*` and `new_account` entries of the
 change history, the Activity tab's new-account flag).
 The code: `source/action/outside_change_logic.cpp` (the rules),
 `source/action/outside_watch.cpp` (the readings).
 
 **Only what PlayGuard sees.** Nothing runs in the background: the file is
-compared with the console at each refresh of the Overview or the Play timer
+compared with the console at each refresh of *Today* or the Play timer
 (every 5 s while one is on screen) and at the next start. A change made and
 undone while PlayGuard was closed, or a clock changed and the day over before
 PlayGuard opens again, goes unseen.
@@ -344,7 +344,7 @@ PlayGuard opens again, goes unseen.
 | `offset_s` | integer | the user clock minus the steady clock (which neither a clock change nor sleep mode moves), in seconds |
 | `steady_id` | string | the steady clock's source; another one is not compared |
 | `limits` | array of 7 integers | the limits PlayGuard last saw, Sunday to Saturday, in minutes (`0` to `1440`, or `65535` for no limit) |
-| `notice` | integer | what the Overview says: `1` the play time started over, `2` the clock was changed, `4` the limits were changed outside PlayGuard (added up) |
+| `notice` | integer | what *Today* says: `1` the play time started over, `2` the clock was changed, `4` the limits were changed outside PlayGuard (added up) |
 | `notice_date` | string | `"YYYY-MM-DD"` the notice belongs to: it goes the next day, or when dismissed |
 | `reset_at` | string | `"HH:MM"` the play time was seen starting over |
 | `accounts` | array of objects | the user accounts PlayGuard has seen, oldest first (32 at most): `id` (the account's 32 hex digits), `since` (`"YYYY-MM-DD"` first seen), `new` (`true`: it appeared after the first listing) |
@@ -359,8 +359,8 @@ PlayGuard opens again, goes unseen.
 - **The limits were changed outside PlayGuard:** they differ from `limits`.
 - **A new user account:** the console lists one that is not in `accounts`
   (read once per start). It goes in the change history (`new_account`) and is
-  flagged under the Activity tab's account filter for 30 days after `since`,
-  not on the Overview. Without `accounts` (a first run, or a file from an
+  flagged on the Activity tab for 30 days after `since`,
+  not on *Today*. Without `accounts` (a first run, or a file from an
   older version) the accounts listed are only recorded.
 - Every change PlayGuard makes itself (anything it records in the change
   history) makes it take what it reads next as is, so its own limit and clock

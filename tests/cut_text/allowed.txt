@@ -1,2 +1,2 @@
-# Texts the Cadran appearance cuts short on purpose (tools/cut_text_check.py):
+# Texts PlayGuard cuts short on purpose (tools/cut_text_check.py):
 # "<language>\t<size>\t<screen>\t<text>", "*" for any language or size.

@@ -2,8 +2,8 @@
 
 What `tools/desktop_smoke.py` shows on screens that come out the same in every
 run (console time fixed, footer clock redrawn at the console's time, 16:00:00), one folder per scenario:
-`smoke/`, `games/`, `errors/`, `gate/`, `rescue/`, `forged/`, `lock/`, `outside/`, `library/`, `devbuild/`, `alarm/`, `cadran/`, `cadranstates/`, `cadranunlocked/`, `cadranlarge/`
-(the Cadran appearance; every other folder is the classic one, which those scenarios run). CI compares each new run with them
+`smoke/`, `games/`, `errors/`, `gate/`, `rescue/`, `forged/`, `lock/`, `outside/`, `library/`, `devbuild/`, `alarm/`, `cadran/`, `cadranstates/`, `cadranunlocked/`, `cadranlarge/`.
+CI compares each new run with them
 (`tools/visual_check.py`) and uploads the side-by-side images of any screen
 that changed. A changed screen fails the build, with the details in the job
 summary; the smoke test draws the focus without its moving glow
