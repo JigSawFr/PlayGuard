@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 2ea50338bc2a -->
+<!-- translated from docs/features.md, sha256 d80ab637e39a -->
 # Recursos
 
 O que cada aba faz, como o PlayGuard grava as configurações com segurança e o que o console conta como tempo de jogo. Volte ao [README](../../README.md).
@@ -110,7 +110,7 @@ Um sino no cabeçalho, à esquerda da versão, reúne o que precisa do responsá
 
 *[Experimente no simulador ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=restrictions)*
 
-- **O nível de restrição:** Criança pequena, Criança, Adolescente e Personalizado lado a lado como blocos, cada um com o que restringe (Ⓐ o define; em *Personalizado* em vigor, Ⓐ vai para as configurações dele abaixo); *Nenhum* embaixo deles. O que um nível restringe (limite de idade, publicações, comunicação) é dito de novo antes de ele ser definido.
+- **O nível de restrição:** Criança pequena, Criança, Adolescente e Personalizado lado a lado como blocos, cada um com o que restringe (um cadeado para restrito, uma marca de seleção para permitido e os jogos instalados que ele bloqueia; Ⓐ o define; em *Personalizado* em vigor, Ⓐ vai para as configurações dele abaixo); *Nenhum* embaixo deles. O que um nível restringe (limite de idade, publicações, comunicação) é dito de novo antes de ele ser definido.
 - Em Personalizado: classificação indicativa, publicação em redes sociais, comunicação com outras pessoas.
 - Modo VR, **sistema de classificação** (PEGI, ESRB, USK, CERO …): a lista diz os países para os quais cada um classifica (PEGI: a maior parte da Europa, ESRB: os Estados Unidos, o Canadá e a América Latina, USK: a Alemanha, PEGI BBFC: o Reino Unido…).
 - O número de jogos com permissão para se comunicar (a lista em si está no relatório de diagnóstico, em formato bruto, até a estrutura dela ser conhecida).

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 2ea50338bc2a -->
+<!-- translated from docs/features.md, sha256 d80ab637e39a -->
 # Funktionen
 
 Was jeder Tab macht, wie PlayGuard sicher schreibt, und was die Konsole als Spielzeit zählt. Zurück zum [README](../../README.md).
@@ -110,7 +110,7 @@ Links von der Glocke die Sprache (ihr Kürzel, *FR*, *EN*…) und das Design (ei
 
 *[Im Simulator ausprobieren ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=restrictions)*
 
-- **Die Einschränkungskategorie:** Kleinkinder, Kinder, Jugendliche und Nutzerdefiniert nebeneinander als Kacheln, jede mit dem, was sie einschränkt (Ⓐ legt sie fest; auf dem geltenden *Nutzerdefiniert* führt Ⓐ zu seinen Einstellungen darunter); *Keine* darunter. Was eine Stufe einschränkt (Altersgrenze, Posten, Kommunikation), wird vor dem Festlegen noch einmal gesagt.
+- **Die Einschränkungskategorie:** Kleinkinder, Kinder, Jugendliche und Nutzerdefiniert nebeneinander als Kacheln, jede mit dem, was sie einschränkt (ein Schloss für eingeschränkt, ein Haken für erlaubt und die installierten Spiele, die sie sperrt; Ⓐ legt sie fest; auf dem geltenden *Nutzerdefiniert* führt Ⓐ zu seinen Einstellungen darunter); *Keine* darunter. Was eine Stufe einschränkt (Altersgrenze, Posten, Kommunikation), wird vor dem Festlegen noch einmal gesagt.
 - Bei Nutzerdefiniert: Altersfreigabe, Posten in sozialen Netzwerken, Kommunikation mit anderen.
 - VR-Modus, **Alterseinstufungssystem** (PEGI, ESRB, USK, CERO …): Die Liste nennt die Länder, für die jedes einstuft (PEGI: der größte Teil Europas, ESRB: die Vereinigten Staaten, Kanada und Lateinamerika, USK: Deutschland, PEGI BBFC: das Vereinigte Königreich…).
 - Die Anzahl der Spiele, die kommunizieren dürfen (die Liste selbst steht im Diagnosebericht, roh, bis ihr Aufbau bekannt ist).

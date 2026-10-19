@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 2ea50338bc2a -->
+<!-- translated from docs/features.md, sha256 d80ab637e39a -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Terug naar de [README](../../README.md).
@@ -110,7 +110,7 @@ Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon vo
 
 *[Probeer het in de simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=restrictions)*
 
-- **Het beperkingsniveau:** Jong kind, Kind, Tiener en Aangepast naast elkaar als tegels, elk met wat het beperkt (Ⓐ stelt het in; op *Aangepast*, als dat geldt, gaat Ⓐ naar de instellingen eronder); *Geen* eronder. Wat een niveau beperkt (leeftijdsgrens, berichten plaatsen, communicatie), wordt nog eens gemeld voordat het wordt ingesteld.
+- **Het beperkingsniveau:** Jong kind, Kind, Tiener en Aangepast naast elkaar als tegels, elk met wat het beperkt (een slotje voor beperkt, een vinkje voor toegestaan en de geïnstalleerde games die het blokkeert; Ⓐ stelt het in; op *Aangepast*, als dat geldt, gaat Ⓐ naar de instellingen eronder); *Geen* eronder. Wat een niveau beperkt (leeftijdsgrens, berichten plaatsen, communicatie), wordt nog eens gemeld voordat het wordt ingesteld.
 - Bij Aangepast: leeftijdsclassificatie, berichten plaatsen op sociale media, communicatie met anderen.
 - VR-modus, **classificatie-instantie** (PEGI, ESRB, USK, CERO …): de lijst zegt voor welke landen elke instantie classificeert (PEGI: het grootste deel van Europa, ESRB: de Verenigde Staten, Canada en Latijns-Amerika, USK: Duitsland, PEGI BBFC: het Verenigd Koninkrijk…).
 - Het aantal games dat mag communiceren (de lijst zelf staat ruw in het diagnoserapport, tot de opbouw ervan bekend is).

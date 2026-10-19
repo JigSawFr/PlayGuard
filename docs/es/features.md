@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 2ea50338bc2a -->
+<!-- translated from docs/features.md, sha256 d80ab637e39a -->
 # Funciones
 
 Qué hace cada pestaña, cómo escribe PlayGuard sin riesgos y qué cuenta la consola como tiempo de juego. Volver al [README](../../README.md).
@@ -110,7 +110,7 @@ A la izquierda de la campana, el idioma (su código, *FR*, *EN*…) y el tema (u
 
 *[Pruébalo en el simulador ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=restrictions)*
 
-- **El nivel de restricción:** Niños pequeños, Niños, Adolescentes y Personalizado uno al lado del otro como mosaicos, cada uno con lo que restringe (Ⓐ lo aplica; en *Personalizado* ya en vigor, Ⓐ lleva a sus ajustes, más abajo); *Ninguno* debajo. Lo que restringe un nivel (límite de edad, publicaciones, comunicación) se vuelve a indicar antes de aplicarlo.
+- **El nivel de restricción:** Niños pequeños, Niños, Adolescentes y Personalizado uno al lado del otro como mosaicos, cada uno con lo que restringe (un candado para restringido, una marca de verificación para permitido y los juegos instalados que bloquea; Ⓐ lo aplica; en *Personalizado* ya en vigor, Ⓐ lleva a sus ajustes, más abajo); *Ninguno* debajo. Lo que restringe un nivel (límite de edad, publicaciones, comunicación) se vuelve a indicar antes de aplicarlo.
 - En Personalizado: clasificación por edades, publicación en redes sociales, comunicación con otros usuarios.
 - Modo RV, **sistema de clasificación** (PEGI, ESRB, USK, CERO …): la lista indica los países para los que clasifica cada uno (PEGI: la mayor parte de Europa, ESRB: Estados Unidos, Canadá y Latinoamérica, USK: Alemania, PEGI BBFC: el Reino Unido…).
 - El número de juegos a los que se permite comunicarse (la lista en sí está en el informe de diagnóstico, en bruto, hasta que se conozca su estructura).
