@@ -106,6 +106,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 - En Personnalisé : classification par âge, publications sur les réseaux sociaux, communication avec d'autres joueurs.
 - Mode VR, **organisme de classification** (PEGI, ESRB, USK, CERO…) : la liste dit pour quels pays chacun classe les jeux (PEGI : la plupart de l'Europe, ESRB : États-Unis, Canada et Amérique latine, USK : Allemagne, PEGI BBFC : Royaume-Uni…).
 - Le nombre de jeux autorisés à communiquer (la liste elle-même figure, brute, dans le rapport de diagnostic tant que sa structure n'est pas connue).
+- **Jeux installés bloqués :** combien de jeux installés le niveau en vigueur bloque selon leur classification par âge (*3 sur 15*), Ⓐ les liste avec leur classification (*PEGI 16*) ; dans Cadran, la tuile de chaque niveau l'indique aussi (*Jeux bloqués · 3*). Les classifications sont celles de chaque jeu (ses données de contrôle, lues par la vérification des jeux installés au démarrage ou depuis *Console › Vérifier les jeux installés*), selon l'organisme qu'utilise la console ; un jeu que cet organisme ne classe pas n'est pas compté, ni les exceptions réglées dans l'application mobile. L'écran d'un jeu dans Activité affiche sa classification, et *bloqué au niveau actuel* le cas échéant.
 
 ## Code PIN — code PIN, déverrouillage, blocage des jeux, application mobile
 

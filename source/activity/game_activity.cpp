@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "action/rating_flow.hpp"
+#include "action/rating_logic.hpp"
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
 
@@ -36,6 +38,19 @@ void GameActivity::onContentAvailable()
     launches->setDetailText(g.totals_ok ? std::to_string(g.launches) : na);
     first->setDetailText(g.totals_ok && g.first_played ? ui::time_text(g.first_played) : "—");
     last->setDetailText(g.totals_ok && g.last_played ? ui::time_text(g.last_played) : "—");
+    // Its age rating by the console's organisation (the last game check), and
+    // whether the level in force blocks it.
+    std::string rated;
+    if (const GameFacts* facts = rating_flow::facts_of(g.app_id)) {
+        PctlStatus st = {};
+        pctl_status_fetch(&st);
+        rated = rating_flow::game_rating(st, *facts);
+        const int age = st.safety_level_ok ? rating_flow::level_age(st, st.safety_level) : -1;
+        if (!rated.empty() && age > 0 && rating_logic::blocked(*facts, st.rating_org, (uint8_t)age))
+            rated = brls::getStr("playguard/activity/rating_blocked", rated);
+    }
+    rating->setDetailText(rated);
+    ui::set_visible(rating.getView(), !rated.empty());
 
     // All time per user account: up to eight statistics and profile reads,
     // off the UI thread (the screen is up meanwhile, the note says so).

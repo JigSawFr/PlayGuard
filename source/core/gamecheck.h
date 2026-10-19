@@ -52,6 +52,8 @@ typedef struct {
     u64  app_id;
     char name[GAMECHECK_NAME_LEN];   // UTF-8, console language; empty when unreadable
     char display_version[0x10];      // "1.4.0": the installed version as the game shows it; empty when unreadable
+    int8_t rating_age[0x20];         // the age each rating organisation rates it for (pctl_rating_org_name's
+                                     // order), -1 when it does not; read with the name (control_ok)
     bool control_ok;                 // name and icon read (what the HOME menu draws)
     u8   record_event;               // the HOME menu entry's last event (ns ApplicationRecord)
     u64  record_updated;             // when the entry last changed (its LastUpdated): a cached check of it is stale otherwise

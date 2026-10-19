@@ -850,16 +850,25 @@ typedef struct {
     GameFacts games[GAMECHECK_MAX];
 } SimGames;
 
+// The same age from the 13 rating organisations, none from the others.
+static void sim_rate(GameFacts *g, int age)
+{
+    memset(g->rating_age, 0xFF, sizeof(g->rating_age));
+    for (int org = 0; org < RATING_ORG_COUNT; org++) g->rating_age[org] = (int8_t)age;
+}
+
 static void sim_games(SimGames *out)
 {
     memset(out, 0, sizeof(*out));
     static const char *fine[] = { "Star Kart Racers", "Island Builders", "Pixel Quest Deluxe",
                                   "Dragon Valley Legends", "Puzzle Garden" };
+    static const int fine_age[] = { 3, 7, 12, 16, 3 };
     for (size_t i = 0; i < sizeof(fine) / sizeof(fine[0]); i++) {
         GameFacts *g = &out->games[out->count++];
         g->app_id = 0x0100A1B2C3D40000ULL + i * 0x1000;
         snprintf(g->name, sizeof(g->name), "%s", fine[i]);
         snprintf(g->display_version, sizeof(g->display_version), "1.3.0");
+        sim_rate(g, fine_age[i]);
         g->control_ok = true;
         g->record_event = 3;
         sim_add_content(g, g->app_id, 0, GC_META_APPLICATION, GC_STORAGE_SD);
@@ -875,22 +884,23 @@ static void sim_games(SimGames *out)
     GameFacts *card = &out->games[out->count++];
     card->app_id = 0x0100A1B2C3D4A000ULL;
     snprintf(card->name, sizeof(card->name), "Sky Kingdom");
+    sim_rate(card, 7);
     card->control_ok = true;
     card->record_event = 5;
     sim_add_content(card, card->app_id, 0, GC_META_APPLICATION, GC_STORAGE_GAMECARD);
     card->card_only = true;
     if (getenv("PLAYGUARD_SIM_GAMES_OK")) return;
 
-    static const struct { u64 id; const char *name; GameIssue issue; } broken[] = {
-        { 0x0100A1B2C3D46000ULL, "",                 GC_NO_CONTROL },
-        { 0x0100A1B2C3D47000ULL, "Garden Defenders", GC_NO_BASE },
-        { 0x0100A1B2C3D48000ULL, "Hedgehog Rush",    GC_ARCHIVED },
-        { 0x0100A1B2C3D49000ULL, "Robot Factory",    GC_FIRMWARE_TOO_OLD },
-        { 0x0100A1B2C3D4B000ULL, "Ocean Explorer",   GC_FILES_MISSING },
-        { 0x0100A1B2C3D4C000ULL, "Castle Siege",     GC_TICKET_MISSING },
-        { 0x0100A1B2C3D4D000ULL, "Moon Racer",       GC_LAUNCH_VERSION },
-        { 0x0100A1B2C3D4E000ULL, "Forest Tales: Legends of the Ancient Grove for Nintendo Switch™",     GC_NEEDS_VERIFY },
-        { 0x0100A1B2C3D4F000ULL, "Star Pilots",      GC_KEY_TOO_NEW },
+    static const struct { u64 id; const char *name; GameIssue issue; int age; } broken[] = {
+        { 0x0100A1B2C3D46000ULL, "",                 GC_NO_CONTROL, -1 },
+        { 0x0100A1B2C3D47000ULL, "Garden Defenders", GC_NO_BASE, 7 },
+        { 0x0100A1B2C3D48000ULL, "Hedgehog Rush",    GC_ARCHIVED, 7 },
+        { 0x0100A1B2C3D49000ULL, "Robot Factory",    GC_FIRMWARE_TOO_OLD, 12 },
+        { 0x0100A1B2C3D4B000ULL, "Ocean Explorer",   GC_FILES_MISSING, 3 },
+        { 0x0100A1B2C3D4C000ULL, "Castle Siege",     GC_TICKET_MISSING, 16 },
+        { 0x0100A1B2C3D4D000ULL, "Moon Racer",       GC_LAUNCH_VERSION, 3 },
+        { 0x0100A1B2C3D4E000ULL, "Forest Tales: Legends of the Ancient Grove for Nintendo Switch™",     GC_NEEDS_VERIFY, 12 },
+        { 0x0100A1B2C3D4F000ULL, "Star Pilots",      GC_KEY_TOO_NEW, 18 },
     };
     for (size_t i = 0; i < sizeof(broken) / sizeof(broken[0]); i++) {
         const u64 id = broken[i].id;
@@ -900,6 +910,7 @@ static void sim_games(SimGames *out)
         snprintf(g->name, sizeof(g->name), "%s", broken[i].name);
         g->control_ok = broken[i].name[0] != '\0';
         if (g->control_ok) snprintf(g->display_version, sizeof(g->display_version), "1.0.0");
+        sim_rate(g, broken[i].age);
         g->record_event = broken[i].issue == GC_ARCHIVED ? 11 : 3;
         g->view_ok = true;
         g->view_flags = GC_VIEW_HAS_MAIN_CONTENTS | GC_VIEW_CAN_LAUNCH;

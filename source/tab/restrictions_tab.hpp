@@ -1,6 +1,9 @@
 // RestrictionsTab — restriction level, what the chosen preset imposes (age
 // rating, social media posting, communication; read-only) or the same three
 // settings editable in Custom, VR mode. Same settings as System Settings.
+// Then how many installed games the level blocks
+// by their age rating (the last game check's, action/rating_flow), A listing
+// them.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -17,6 +20,7 @@ class RestrictionsTab : public TabBase
     void refresh() override;
 
     PctlStatus st = {};   // what the last refresh read
+    int age_now = -1;     // the age the level in force restricts to (0 none), -1 unknown
 
     // Asks to set this restriction level (0 none … 4 custom), saying what a
     // preset restricts, then sets it.
@@ -41,6 +45,8 @@ class RestrictionsTab : public TabBase
     BRLS_BIND(brls::Label,       custom_note,   "rs_custom_note");
     BRLS_BIND(brls::BooleanCell, vr,            "rs_vr");
     BRLS_BIND(brls::DetailCell,  org,           "rs_org");
+    BRLS_BIND(brls::DetailCell,  blocked,       "rs_blocked");
+    BRLS_BIND(brls::Label,       blocked_note,  "rs_blocked_note");
     BRLS_BIND(brls::DetailCell,  free_comm,     "rs_free_comm");
     BRLS_BIND(brls::Label,       note,          "rs_note");
 };

@@ -198,6 +198,7 @@ static void check_game(GameFacts *g, NsApplicationControlData *cd, Scan *sc)
         nacp_name(&cd->nacp, sizeof(cd->nacp), sc->title_index, g->name, sizeof(g->name))) {
         g->control_ok = true;
         nacp_copy_utf8(g->display_version, sizeof(g->display_version), cd->nacp.display_version);
+        nacp_rating_ages(&cd->nacp, sizeof(cd->nacp), g->rating_age);
     }
     u64 t2 = now_ns();
     s_timing.control_ns += t2 - t;

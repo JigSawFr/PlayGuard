@@ -465,7 +465,9 @@
             "busy": "最常遊玩的時段",
             "busy_value": "{} 至 {}",
             "late": "21:00 至 06:00 之間的遊玩"
-        }
+        },
+        "rating": "年齡分級",
+        "rating_blocked": "{} · 目前限制等級下被限制"
     },
     "library": {
         "title": "遊戲",
@@ -523,7 +525,13 @@
             "acb": "澳洲",
             "oflc": "紐西蘭",
             "iarc": "其他國家"
-        }
+        },
+        "blocked": "被限制的已安裝遊戲",
+        "blocked_value": "{} / {}",
+        "blocked_title": "{} 分級高於 {} 歲",
+        "blocked_none": "{}：沒有分級高於 {} 歲的已安裝遊戲。",
+        "blocked_no_age": "此限制等級不依年齡限制遊戲。",
+        "blocked_note": "根據最近一次已安裝遊戲檢查。分級機構未分級的遊戲不計入，手機應用程式中設定的例外也不計入。"
     },
     "clock": {
         "section_now": "時鐘",
@@ -1662,7 +1670,9 @@
             "comm_allowed": "交流 · 允許",
             "comm_unknown": "交流 · —",
             "none": "所有年齡的軟體，允許社群媒體與交流",
-            "to_settings": "查看設定"
+            "to_settings": "查看設定",
+            "games_blocked": "被限制的遊戲 · {}",
+            "games_none": "被限制的遊戲 · 無"
         },
         "clock": {
             "console": "主機",

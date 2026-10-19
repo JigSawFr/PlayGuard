@@ -465,7 +465,9 @@
             "busy": "Horas com mais jogo",
             "busy_value": "Das {} às {}",
             "late": "Jogado entre as 21:00 e as 06:00"
-        }
+        },
+        "rating": "Classificação etária",
+        "rating_blocked": "{} · bloqueado no nível atual"
     },
     "library": {
         "title": "Jogos",
@@ -523,7 +525,13 @@
             "acb": "Austrália",
             "oflc": "Nova Zelândia",
             "iarc": "Outros países"
-        }
+        },
+        "blocked": "Jogos instalados bloqueados",
+        "blocked_value": "{} de {}",
+        "blocked_title": "{} classifica-os acima de {}",
+        "blocked_none": "{}: nenhum jogo instalado está classificado acima de {}.",
+        "blocked_no_age": "Este nível não restringe os jogos por idade.",
+        "blocked_note": "Segundo a última verificação dos jogos instalados. Um jogo que a organização de classificação não classifica não é contado, nem as exceções definidas na aplicação para smartphones."
     },
     "clock": {
         "section_now": "Relógios",
@@ -1662,7 +1670,9 @@
             "comm_allowed": "Comunicação · permitida",
             "comm_unknown": "Comunicação · —",
             "none": "software para todas as idades, redes sociais e comunicação permitidas",
-            "to_settings": "As suas definições"
+            "to_settings": "As suas definições",
+            "games_blocked": "Jogos bloqueados · {}",
+            "games_none": "Jogos bloqueados · nenhum"
         },
         "clock": {
             "console": "Consola",

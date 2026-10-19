@@ -1,6 +1,7 @@
 // CadranRestrictionsTab — Restrictions after its board: the restriction
-// levels side by side as tiles, each with its age limit and whether social
-// media posting and communication are restricted, the one in force in teal
+// levels side by side as tiles, each with its age limit, whether social
+// media posting and communication are restricted and how many installed
+// games it blocks, the one in force in teal
 // (A on another asks to set it, as the level picker does). It is
 // RestrictionsTab: the level line stays the tab's, out of sight; the custom
 // settings, VR mode, the rating organisation and the notes stay lines under
@@ -35,6 +36,9 @@ class CadranRestrictionsTab : public RestrictionsTab
         brls::Label*     sns      = nullptr;
         brls::Rectangle* comm_dot = nullptr;
         brls::Label*     comm     = nullptr;
+        brls::Box*       games_row = nullptr;   // the installed games it blocks (a game check made)
+        brls::Rectangle* games_dot = nullptr;
+        brls::Label*     games     = nullptr;
         bool             to_settings = false;   // A goes to Custom's settings
     };
     cadran::List list;

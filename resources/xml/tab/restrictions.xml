@@ -37,6 +37,8 @@
             <brls:BooleanCell id="rs_vr"/>
             <brls:DetailCell id="rs_org" title="@i18n/playguard/restrictions/org"/>
             <brls:DetailCell id="rs_free_comm" focusable="false" title="@i18n/playguard/restrictions/free_comm"/>
+            <brls:DetailCell id="rs_blocked" title="@i18n/playguard/restrictions/blocked"/>
+            <brls:Label id="rs_blocked_note" text="@i18n/playguard/restrictions/blocked_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
             <brls:Label id="rs_note" text="@i18n/playguard/restrictions/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
 
         </brls:Box>

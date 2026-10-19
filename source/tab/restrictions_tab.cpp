@@ -3,6 +3,7 @@
 
 #include "action/history_flow.hpp"
 #include "action/pt_flow.hpp"
+#include "action/rating_flow.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 
@@ -19,6 +20,12 @@ RestrictionsTab::RestrictionsTab()
 {
     custom_note->setSingleLine(false);
     note->setSingleLine(false);
+    blocked_note->setSingleLine(false);
+
+    blocked->registerClickAction([this](brls::View*) {
+        rating_flow::show_blocked(this->st, this->age_now);
+        return true;
+    });
 
     level->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
@@ -192,6 +199,13 @@ void RestrictionsTab::refresh()
     if (this->st.stereo_vision_ok) vr->setOn(this->st.stereo_vision_restricted, false);
 
     org->setDetailText(this->st.rating_org_ok ? pctl_rating_org_name(this->st.rating_org) : na);
+    // The installed games the level blocks: from the last game check.
+    this->age_now = custom ? this->st.settings.rating_age : preset_ok ? preset.rating_age : -1;
+    size_t n = 0, of = 0;
+    const bool counted = rating_flow::count_blocked(this->st, this->age_now, &n, &of);
+    if (counted) blocked->setDetailText(ui::opens(brls::getStr("playguard/restrictions/blocked_value", (int)n, (int)of)));
+    ui::set_visible(blocked.getView(), counted);
+    ui::set_visible(blocked_note.getView(), counted);
     // Read-only: everything stays in sight, greyed; A says why nothing changes.
     const bool writable = !app::read_only();
     for (brls::DetailCell* c : { (brls::DetailCell*)level.getView(), (brls::DetailCell*)age.getView(),

@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "tab/cadran_restrictions_tab.hpp"
 
+#include "action/rating_flow.hpp"
 #include "app.hpp"
 #include "tab/cadran_tab.hpp"
 #include "ui/cadran_kit.hpp"
@@ -116,6 +117,8 @@ CadranRestrictionsTab::Tile CadranRestrictionsTab::make_tile(uint32_t level, boo
         };
         row(t.sns_dot, t.sns);
         row(t.comm_dot, t.comm);
+        row(t.games_dot, t.games);
+        t.games_row = static_cast<brls::Box*>(t.games->getParent());
     }
 
     t.box->registerAction("playguard/cadran/restrictions/choose"_i18n, brls::BUTTON_A, [this, level](brls::View*) {
@@ -154,7 +157,7 @@ CadranRestrictionsTab::CadranRestrictionsTab()
     this->list.hide_header_before("rs_level");
     this->list.park({ "rs_level", "rs_preset_age", "rs_preset_sns", "rs_preset_comm" });
     this->list.apply({ { "rs_age", "calendar" }, { "rs_sns", "user" }, { "rs_comm", "phone" }, { "rs_vr", "eye" },
-                       { "rs_org", "flag" }, { "rs_free_comm", "gamepad" } });
+                       { "rs_org", "flag" }, { "rs_free_comm", "gamepad" }, { "rs_blocked", "list" } });
     dynamic_cast<brls::Label*>(hero->getView("crs_kicker"))->setText(cadran::upper("playguard/restrictions/section_level"_i18n));
 }
 
@@ -206,6 +209,15 @@ void CadranRestrictionsTab::refresh()
                                                            : "playguard/cadran/restrictions/comm_allowed"_i18n);
         t.sns_dot->setColor(!known ? theme["cadran/text3"] : s.sns_post_restriction ? theme["cadran/coral_fill"] : theme["cadran/teal_fill"]);
         t.comm_dot->setColor(!known ? theme["cadran/text3"] : s.free_communication_restriction ? theme["cadran/coral_fill"] : theme["cadran/teal_fill"]);
+        // The installed games it blocks, once a game check was made.
+        size_t n = 0, of = 0;
+        const bool counted = known && rating_flow::count_blocked(st, s.rating_age, &n, &of);
+        ui::set_visible(t.games_row, counted);
+        if (counted) {
+            t.games->setText(n ? brls::getStr("playguard/cadran/restrictions/games_blocked", (int)n)
+                               : "playguard/cadran/restrictions/games_none"_i18n);
+            t.games_dot->setColor(n ? theme["cadran/coral_fill"] : theme["cadran/teal_fill"]);
+        }
     }
 }
 

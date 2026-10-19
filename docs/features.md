@@ -106,6 +106,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 - In Custom: age rating, social-media posting, communication with others.
 - VR mode, **rating organisation** (PEGI, ESRB, USK, CERO …): the list says the countries each one rates for (PEGI: most of Europe, ESRB: the United States, Canada and Latin America, USK: Germany, PEGI BBFC: the United Kingdom…).
 - The number of games allowed to communicate (the list itself is in the diagnostic report, raw, until its layout is known).
+- **Installed games it blocks:** how many of the installed games the level in force blocks by their age rating (*3 of 15*), Ⓐ listing them with their rating (*PEGI 16*); in Cadran, each level's tile says it too (*Games blocked · 3*). The ratings are each game's own (its control data, read by the check of the installed games at start-up or from *Console › Check the installed games*), by the organisation the console uses; a game that organisation does not rate is not counted, nor the exceptions set in the companion app. A game's screen in Activity shows its rating, and *blocked at the current level* when it is.
 
 ## PIN — the PIN, unlocking, blocking games, companion app
 
