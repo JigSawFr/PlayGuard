@@ -213,8 +213,9 @@ with sync_playwright() as p:
         print("ok   alarm")
 
     # desktop_smoke's "errors", its first half: a limit change while the
-    # unlock fails ends in the "could not unlock" dialog, not a toast.
-    if open_page(page, FIXED + "&fail=unlock&restricted=1&autosync_off=1&ntp=offline&network_offset=1411", "errors"):
+    # unlock fails ends in the "could not unlock" dialog, not a toast. In the
+    # classic appearance, as desktop_smoke runs it: the steps follow its lines.
+    if open_page(page, FIXED + "&appearance=classic&fail=unlock&restricted=1&autosync_off=1&ntp=offline&network_offset=1411", "errors"):
         steps(page, "down.right.down.a")   # Play timer › the week chart › Same limit every day
         shot(page, "errors_picker")
         steps(page, "up.a")                # No play (0 min): the change needs the unlock
