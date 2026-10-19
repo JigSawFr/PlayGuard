@@ -5,8 +5,8 @@ branch), left at an upstream commit. The fixes PlayGuard needs before
 upstream has them are kept here as patches, applied in name order to the
 submodule's files when CMake configures (`CMakeLists.txt`). A patch already
 in place is left as it is; one that no longer applies stops the configure,
-so a borealis bump cannot silently drop a fix. `git status` shows the
-submodule as modified once they are applied: that is expected.
+so a borealis bump cannot silently drop a fix. `git status` does not show
+them (`.gitmodules`: `ignore = dirty`); `git -C extern/borealis diff` does.
 
 To change one: edit the file in `extern/borealis`, then
 `git -C extern/borealis diff > patches/borealis/NNNN-name.patch` (one fix
