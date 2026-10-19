@@ -9,6 +9,18 @@
   <meta name="description" content="PlayGuard running in the browser against a simulated console.">
   <link rel="icon" href="icon.jpg">
   <link rel="stylesheet" href="simulator.css">
+  <!-- The theme before the first paint (simulator.js keeps it up to date):
+       the URL's, else the one chosen on an earlier visit, else the system's. -->
+  <script>
+    (function () {
+      var choice = new URLSearchParams(location.search).get('theme');
+      if (choice !== 'light' && choice !== 'dark') {
+        try { choice = localStorage.getItem('pg-theme'); } catch (e) { choice = null; }
+      }
+      if (choice !== 'light' && choice !== 'dark') choice = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.dataset.theme = choice;
+    })();
+  </script>
   <!-- Threads need a cross-origin isolated page; GitHub Pages cannot send the
        headers, so this service worker adds them (and reloads once). -->
   <script src="coi-serviceworker.js"></script>
@@ -21,6 +33,16 @@
       <span class="tag" data-i18n="title">Simulator</span>
     </div>
     <div class="build" id="build"></div>
+    <div class="header-settings">
+      <label class="compact">
+        <span class="sr-only" data-i18n="language">Language</span>
+        <select id="language-select" data-i18n-label="language"></select>
+      </label>
+      <label class="compact">
+        <span class="sr-only" data-i18n="theme">Theme</span>
+        <select id="theme-select" data-i18n-label="theme"></select>
+      </label>
+    </div>
     <button class="icon-btn panel-toggle" id="panel-toggle" type="button" aria-controls="panel" aria-expanded="true"
             data-i18n-title="settings" title="Settings">⚙</button>
   </header>
@@ -34,6 +56,11 @@
           <div class="spinner" aria-hidden="true"></div>
           <p id="status" data-i18n="loading">Loading…</p>
         </div>
+      </div>
+
+      <div class="notice" id="theme-notice" role="status" hidden>
+        <span data-i18n="theme_changed"></span>
+        <button type="button" class="btn" id="theme-restart" data-i18n="restart">Restart</button>
       </div>
 
       <div class="controls">

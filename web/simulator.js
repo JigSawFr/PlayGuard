@@ -4,68 +4,44 @@
 // config.json for the language, the theme and the first tab. Applying new
 // settings reloads the page with them in the URL, so a link always opens the
 // same state.
+//
+// The page speaks the console's languages (i18n/<language>.json): the
+// browser's, unless the URL says `lang=`; its theme is the browser's (Auto),
+// or the one chosen in its header or set by `theme=`. PlayGuard takes both.
 'use strict';
 
-const LANG = (navigator.language || 'en').toLowerCase().startsWith('fr') ? 'fr' : 'en';
+// The console's languages, as PlayGuard's config.json names them, in their own words.
+const LANGUAGES = [
+  ['en-US', 'English'], ['fr', 'Français'], ['fr-CA', 'Français (Canada)'], ['de', 'Deutsch'],
+  ['es', 'Español'], ['es-419', 'Español (Latinoamérica)'], ['it', 'Italiano'], ['nl', 'Nederlands'],
+  ['pt', 'Português'], ['pt-BR', 'Português (Brasil)'], ['ru', 'Русский'], ['ja', '日本語'],
+  ['ko', '한국어'], ['zh-Hans', '简体中文'], ['zh-Hant', '繁體中文'],
+];
+const THEMES = ['auto', 'light', 'dark'];
 
-const TEXT = {
-  en: {
-    title: 'Simulator',
-    loading: 'Loading…',
-    downloading: 'Downloading PlayGuard…',
-    starting: 'Starting…',
-    settings: 'Settings',
-    log: 'Log',
-    preset: 'Preset',
-    preset_none: 'Choose a preset…',
-    other: 'Other parameters',
-    other_help: 'Any other PLAYGUARD_SIM_* variable, by its name in lower case without the prefix: a variable this page does not know yet (from a newer build) still reaches PlayGuard.',
-    add: 'Add',
-    apply: 'Apply',
-    copy: 'Copy link',
-    copied: 'Link copied',
-    reset: 'Reset',
-    pad: 'Pad',
-    screenshot: 'Screenshot',
-    note: 'Apply restarts PlayGuard from a fresh state with these settings; what you change inside it is not kept.',
-    keys: '<kbd>↑↓←→</kbd> move · <kbd>Enter</kbd> A · <kbd>Esc</kbd> B · <kbd>X</kbd> <kbd>Y</kbd> · <kbd>L</kbd> <kbd>R</kbd> · <kbd>⇧L</kbd> ZL · <kbd>⇧R</kbd> ZR · <kbd>+</kbd> <kbd>−</kbd> · a click is a touch',
-    error: 'PlayGuard stopped:',
-    reload: 'Reload',
-    no_isolation: 'This browser does not let the page run threads (no cross-origin isolation). Try a recent Chrome, Edge or Firefox, outside a private window.',
-    no_webgl: 'This browser has no WebGL 2, which PlayGuard draws with.',
-    unknown_build: 'local build',
-    remove: 'Remove',
-  },
-  fr: {
-    title: 'Simulateur',
-    loading: 'Chargement…',
-    downloading: 'Téléchargement de PlayGuard…',
-    starting: 'Démarrage…',
-    settings: 'Réglages',
-    log: 'Journal',
-    preset: 'Préréglage',
-    preset_none: 'Choisir un préréglage…',
-    other: 'Autres paramètres',
-    other_help: 'Toute autre variable PLAYGUARD_SIM_*, par son nom en minuscules sans le préfixe : une variable que cette page ne connaît pas encore (d’une build plus récente) arrive quand même à PlayGuard.',
-    add: 'Ajouter',
-    apply: 'Appliquer',
-    copy: 'Copier le lien',
-    copied: 'Lien copié',
-    reset: 'Réinitialiser',
-    pad: 'Manette',
-    screenshot: 'Capture',
-    note: 'Appliquer redémarre PlayGuard d’un état neuf avec ces réglages ; ce que vous changez dans l’appli n’est pas conservé.',
-    keys: '<kbd>↑↓←→</kbd> déplacer · <kbd>Entrée</kbd> A · <kbd>Échap</kbd> B · <kbd>X</kbd> <kbd>Y</kbd> · <kbd>L</kbd> <kbd>R</kbd> · <kbd>⇧L</kbd> ZL · <kbd>⇧R</kbd> ZR · <kbd>+</kbd> <kbd>−</kbd> · un clic est un toucher',
-    error: 'PlayGuard s’est arrêté :',
-    reload: 'Recharger',
-    no_isolation: 'Ce navigateur ne permet pas à la page d’utiliser des threads (pas d’isolation cross-origin). Essayez un Chrome, Edge ou Firefox récent, hors navigation privée.',
-    no_webgl: 'Ce navigateur n’a pas WebGL 2, avec lequel PlayGuard dessine.',
-    unknown_build: 'build locale',
-    remove: 'Retirer',
-  },
-};
-const t = (key) => TEXT[LANG][key] ?? TEXT.en[key] ?? key;
-const tr = (value) => (value && typeof value === 'object' ? value[LANG] ?? value.en : value ?? '');
+// A language tag (the URL's, or the browser's) to one of the console's; null when none fits.
+function consoleLanguage(tag) {
+  const t = String(tag || '').toLowerCase();
+  const exact = LANGUAGES.find(([code]) => code.toLowerCase() === t);
+  if (exact) return exact[0];
+  const [base, region = ''] = t.split('-');
+  switch (base) {
+    case 'en': return 'en-US';
+    case 'fr': return region === 'ca' ? 'fr-CA' : 'fr';
+    case 'es': return !region || region === 'es' ? 'es' : 'es-419';
+    case 'pt': return region === 'br' ? 'pt-BR' : 'pt';
+    case 'zh': return ['tw', 'hk', 'mo', 'hant'].includes(region) || t.includes('hant') ? 'zh-Hant' : 'zh-Hans';
+    case 'de': case 'it': case 'nl': case 'ru': case 'ja': case 'ko': return base;
+    default: return null;
+  }
+}
+function browserLanguage() {
+  for (const tag of navigator.languages?.length ? navigator.languages : [navigator.language]) {
+    const code = consoleLanguage(tag);
+    if (code) return code;
+  }
+  return 'en-US';
+}
 
 // borealis' ControllerButton values (patches/borealis/0090-sdl-in-a-browser.patch).
 const BUTTON = { ZL: 0, L: 1, UP: 3, RIGHT: 4, DOWN: 5, LEFT: 6, MINUS: 7, PLUS: 9, Y: 11, B: 12, A: 13, X: 14, R: 15, ZR: 16 };
@@ -86,6 +62,74 @@ let manifest = { groups: [], params: [], presets: [] };
 let known = new Map();          // name -> param
 let current = new Map();        // what the URL says (applied)
 let started = false;
+let text = { ui: {}, groups: {}, params: {}, presets: {} };   // the page's language, English underneath
+let language = 'en-US';         // the page's, and PlayGuard's
+let consoleTheme = 'light';     // what PlayGuard was started with
+
+// ---- Texts ------------------------------------------------------------
+
+const t = (key) => text.ui[key] ?? key;
+const paramText = (p, key) => text.params[p.name]?.[key] ?? '';
+const optionText = (p, value) => text.params[p.name]?.options?.[value] ?? value;
+
+async function loadTexts(code) {
+  const get = async (c) => {
+    try {
+      const res = await fetch(`i18n/${c}.json`);
+      return res.ok ? await res.json() : {};
+    } catch { return {}; }
+  };
+  const [en, own] = await Promise.all([get('en-US'), code === 'en-US' ? {} : get(code)]);
+  const merged = { ui: {}, groups: {}, params: {}, presets: {} };
+  for (const part of Object.keys(merged)) {
+    Object.assign(merged[part], en[part]);
+    for (const [k, v] of Object.entries(own[part] ?? {})) {
+      merged[part][k] = part === 'params' ? { ...merged.params[k], ...v, options: { ...merged.params[k]?.options, ...v.options } } : v;
+    }
+  }
+  text = merged;
+}
+
+// ---- The theme ------------------------------------------------------------
+
+const dark = matchMedia('(prefers-color-scheme: dark)');
+
+function storedTheme() {
+  try { return localStorage.getItem('pg-theme'); } catch { return null; }
+}
+// What the header chose: the URL's theme, else the one kept from an earlier
+// visit, else Auto.
+function chosenTheme() {
+  const fromUrl = current.get('theme');
+  if (fromUrl === 'light' || fromUrl === 'dark') return fromUrl;
+  const kept = storedTheme();
+  return THEMES.includes(kept) ? kept : 'auto';
+}
+const effectiveTheme = (choice) => (choice === 'auto' ? (dark.matches ? 'dark' : 'light') : choice);
+
+function showTheme() {
+  const effective = effectiveTheme(chosenTheme());
+  document.documentElement.dataset.theme = effective;
+  // Started with the other one (Auto following a change of the system's):
+  // PlayGuard reads its theme at start-up, so offer to start it again.
+  $('theme-notice').hidden = !started || effective === consoleTheme;
+}
+
+function chooseTheme(choice) {
+  try { localStorage.setItem('pg-theme', choice); } catch { /* storage refused */ }
+  const values = new Map(current);
+  if (choice === 'auto') values.delete('theme');
+  else values.set('theme', choice);
+  if (effectiveTheme(choice) === consoleTheme) {
+    // PlayGuard already has it: only the URL changes.
+    current = values;
+    history.replaceState(null, '', `${location.pathname}${toQuery(values)}`);
+    showTheme();
+    markChanges();
+    return;
+  }
+  apply(values);
+}
 
 // ---- The URL ------------------------------------------------------------
 
@@ -143,8 +187,8 @@ function toLocalInput(seconds) {
 
 function fieldFor(p, value) {
   const id = `p-${p.name}`;
-  const label = tr(p.label);
-  const help = p.help ? el('p', { class: 'help', text: tr(p.help) }) : null;
+  const label = paramText(p, 'label') || p.name;
+  const help = paramText(p, 'help') ? el('p', { class: 'help', text: paramText(p, 'help') }) : null;
   if (p.type === 'bool') {
     const input = el('input', { type: 'checkbox', id, 'data-name': p.name });
     input.checked = value != null && !FALSY.has(String(value).toLowerCase());
@@ -154,17 +198,17 @@ function fieldFor(p, value) {
     const chosen = new Set(String(value ?? '').split(',').filter(Boolean));
     const box = el('div', { class: 'multi', 'data-multi': p.name });
     for (const o of p.options) {
-      const input = el('input', { type: 'checkbox', value: o.value, 'data-of': p.name });
-      input.checked = chosen.has(o.value);
-      box.append(el('label', { class: 'field check' }, input, el('span', { text: tr(o.label) })));
+      const input = el('input', { type: 'checkbox', value: o, 'data-of': p.name });
+      input.checked = chosen.has(o);
+      box.append(el('label', { class: 'field check' }, input, el('span', { text: optionText(p, o) })));
     }
     return [el('div', { class: 'field' }, el('span', { text: label })), box, help];
   }
   let input;
   if (p.type === 'select') {
     input = el('select', { id, 'data-name': p.name });
-    for (const o of p.options) input.append(el('option', { value: o.value, text: tr(o.label) }));
-    if (value != null && !p.options.some((o) => o.value === value)) input.append(el('option', { value, text: value }));
+    for (const o of p.options) input.append(el('option', { value: o, text: optionText(p, o) }));
+    if (value != null && !p.options.includes(value)) input.append(el('option', { value, text: value }));
     input.value = value ?? '';
   } else if (p.type === 'datetime') {
     input = el('input', { type: 'datetime-local', id, 'data-name': p.name, 'data-datetime': true });
@@ -185,11 +229,11 @@ function buildForm(values) {
   const form = $('form');
   form.replaceChildren();
   for (const g of manifest.groups) {
-    const params = manifest.params.filter((p) => p.group === g.id);
+    const params = manifest.params.filter((p) => p.group === g.id && p.panel !== false);
     if (!params.length) continue;
     const set = params.filter((p) => values.has(p.name)).length;
     const details = el('details', { class: 'group', 'data-group': g.id },
-      el('summary', {}, tr(g.label), set ? el('span', { class: 'count', text: String(set) }) : null));
+      el('summary', {}, text.groups[g.id] ?? g.id, set ? el('span', { class: 'count', text: String(set) }) : null));
     if (g.id === 'app' || g.id === 'parental' || set) details.open = true;
     for (const p of params) for (const node of fieldFor(p, values.get(p.name))) if (node) details.append(node);
     form.append(details);
@@ -212,9 +256,10 @@ function buildOther(values) {
   $('other-group').open = others.length > 0;
 }
 
-// What the panel says now.
+// What the panel says now, with the header's language and theme as the URL has them.
 function readForm() {
   const out = new Map();
+  for (const name of ['lang', 'theme']) if (current.has(name)) out.set(name, current.get(name));
   for (const input of $('form').querySelectorAll('[data-name]')) {
     const name = input.dataset.name;
     if (input.type === 'checkbox') { if (input.checked) out.set(name, '1'); continue; }
@@ -249,15 +294,20 @@ function apply(values) {
   location.search = query;   // reloads: PlayGuard starts again from scratch
 }
 
+// The page's language and theme stay; the rest is what `keep` says.
+function keepingHeader(keep) {
+  return new Map([...current].filter(([n]) => n === 'lang' || n === 'theme' || keep(n)));
+}
+
 function buildPresets() {
   const select = $('preset');
   select.append(el('option', { value: '', text: t('preset_none') }));
-  manifest.presets.forEach((p, i) => select.append(el('option', { value: String(i), text: tr(p.label) })));
+  for (const p of manifest.presets) select.append(el('option', { value: p.id, text: text.presets[p.id] ?? p.id }));
   select.addEventListener('change', () => {
-    const preset = manifest.presets[Number(select.value)];
+    const preset = manifest.presets.find((p) => p.id === select.value);
     if (!preset) return;
-    // The language, theme and first tab stay; the rest is the preset's.
-    const values = new Map([...readForm()].filter(([n]) => known.get(n)?.config));
+    // The first tab stays too.
+    const values = keepingHeader((n) => known.get(n)?.config);
     for (const [n, v] of Object.entries(preset.params)) values.set(n, v);
     apply(values);
   });
@@ -266,9 +316,9 @@ function buildPresets() {
 // ---- PlayGuard ------------------------------------------------------------
 
 let logLines = [];
-function log(text, error) {
+function log(line0, error) {
   // eslint-disable-next-line no-control-regex
-  const line = String(text).replace(/\x1b\[[0-9;]*m/g, '');
+  const line = String(line0).replace(/\x1b\[[0-9;]*m/g, '');
   logLines.push([line, error]);
   if (logLines.length > 1000) logLines = logLines.slice(-800);
   const pre = $('log');
@@ -288,8 +338,8 @@ function renderLog() {
   for (const [line, error] of logLines) appendLog(pre, line, error);
 }
 
-function showStatus(text) {
-  $('status').textContent = text;
+function showStatus(message) {
+  $('status').textContent = message;
 }
 
 function showError(message) {
@@ -301,11 +351,13 @@ function showError(message) {
   overlay.replaceChildren(el('div', { class: 'spinner', 'aria-hidden': 'true' }), el('p', { text: message }), button);
 }
 
-// The variables and the config.json PlayGuard starts with.
+// The variables and the config.json PlayGuard starts with: the page's
+// language and theme, whatever else the URL sets.
 function startEnvironment(values) {
   const env = { SDL_EMSCRIPTEN_KEYBOARD_ELEMENT: '#canvas' };
-  const config = {};
+  const config = { language, theme: consoleTheme };
   for (const [name, value] of values) {
+    if (name === 'lang' || name === 'theme') continue;
     const p = known.get(name);
     if (p?.config) { if (value) config[p.config] = value; continue; }
     if (p?.type === 'bool' && FALSY.has(String(value).toLowerCase())) continue;
@@ -330,23 +382,22 @@ function start(version) {
     return getContext.call(this, type, attrs);
   };
 
+  consoleTheme = effectiveTheme(chosenTheme());
   const { env, config } = startEnvironment(current);
-  log(`settings: ${decodeURIComponent(toQuery(current)) || "(defaults)"}`);
+  log(`settings: ${decodeURIComponent(toQuery(current)) || '(defaults)'}; language ${language}, theme ${consoleTheme}`);
   showStatus(t('downloading'));
   window.Module = {
     canvas,
     // GitHub Pages lets browsers keep files 10 minutes: after a push, the
     // commit in their URL keeps an old .wasm from meeting a new .js.
     locateFile: (path, prefix) => `${prefix}${path}${version ? `?v=${version}` : ''}`,
-    print: (text) => log(text),
-    printErr: (text) => log(text, true),
-    setStatus: (text) => { if (text) showStatus(text.replace(/^Downloading data\.\.\./, t('downloading'))); },
+    print: (line) => log(line),
+    printErr: (line) => log(line, true),
+    setStatus: (status) => { if (status) showStatus(status.replace(/^Downloading data\.\.\./, t('downloading'))); },
     preRun: [(m) => {
       Object.assign(m.ENV, env);
-      if (Object.keys(config).length) {
-        m.FS.mkdirTree('/playguard_data');
-        m.FS.writeFile('/playguard_data/config.json', JSON.stringify(config));
-      }
+      m.FS.mkdirTree('/playguard_data');
+      m.FS.writeFile('/playguard_data/config.json', JSON.stringify(config));
     }],
     onRuntimeInitialized: () => {
       showStatus(t('starting'));
@@ -426,11 +477,29 @@ function screenshot() {
 // ---- The page ------------------------------------------------------------
 
 function translatePage() {
-  document.documentElement.lang = LANG;
+  document.documentElement.lang = language;
   document.title = `PlayGuard · ${t('title')}`;
   for (const node of document.querySelectorAll('[data-i18n]')) node.textContent = t(node.dataset.i18n);
   for (const node of document.querySelectorAll('[data-i18n-html]')) node.innerHTML = t(node.dataset.i18nHtml);
   for (const node of document.querySelectorAll('[data-i18n-title]')) node.title = t(node.dataset.i18nTitle);
+  for (const node of document.querySelectorAll('[data-i18n-label]')) node.setAttribute('aria-label', t(node.dataset.i18nLabel));
+}
+
+function setUpHeader() {
+  const lang = $('language-select');
+  for (const [code, name] of LANGUAGES) lang.append(el('option', { value: code, text: name, lang: code }));
+  lang.value = language;
+  lang.addEventListener('change', () => {
+    const values = new Map(current);
+    values.set('lang', lang.value);
+    apply(values);
+  });
+  const theme = $('theme-select');
+  for (const choice of THEMES) theme.append(el('option', { value: choice, text: t(`theme_${choice}`) }));
+  theme.value = chosenTheme();
+  theme.addEventListener('change', () => chooseTheme(theme.value));
+  dark.addEventListener('change', showTheme);
+  $('theme-restart').addEventListener('click', () => location.reload());
 }
 
 // The build's commit (build.json, written by CI), or '' for a local build.
@@ -475,7 +544,7 @@ function setUpPanel() {
   $('other').addEventListener('input', markChanges);
   $('form').addEventListener('submit', (e) => { e.preventDefault(); apply(readForm()); });
   $('apply').addEventListener('click', () => apply(readForm()));
-  $('reset').addEventListener('click', () => apply(new Map()));
+  $('reset').addEventListener('click', () => apply(keepingHeader(() => false)));
   $('copy').addEventListener('click', async () => {
     const link = linkFor(readForm());
     try { await navigator.clipboard.writeText(link); } catch { prompt(t('copy'), link); return; }
@@ -496,11 +565,9 @@ function setUpPanel() {
 }
 
 async function main() {
-  translatePage();
-  setUpPanel();
-  setUpKeys();
-  setUpPad();
-  const version = showBuild();
+  current = readUrl();
+  language = consoleLanguage(current.get('lang')) ?? browserLanguage();
+  showTheme();
   try {
     const res = await fetch('params.json', { cache: 'no-cache' });
     manifest = await res.json();
@@ -508,10 +575,17 @@ async function main() {
     log(`params.json: ${e}`, true);
   }
   known = new Map(manifest.params.map((p) => [p.name, p]));
-  current = readUrl();
+  await loadTexts(language);
+  const version = showBuild();
+  translatePage();
+  setUpHeader();
+  setUpPanel();
+  setUpKeys();
+  setUpPad();
   buildPresets();
   buildForm(current);
   start(await version);
+  showTheme();
 }
 
 main();

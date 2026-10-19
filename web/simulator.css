@@ -1,5 +1,7 @@
 /* The web simulator's page (web/README.md). PlayGuard's colours: the teal
    of the focus highlight, on a navy that frames the console's screen. */
+/* Light by default; dark when the page says so (data-theme, set before the
+   first paint from the URL, the choice kept or the system's). */
 :root {
   --bg: #f3f5f8;
   --surface: #ffffff;
@@ -13,19 +15,17 @@
   --radius: 10px;
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b111b;
-    --surface: #131b28;
-    --surface-2: #1a2433;
-    --text: #e6ebf2;
-    --muted: #8392aa;
-    --line: #273245;
-    --accent: #22b39a;
-    --accent-text: #04140f;
-    --frame: #05090f;
-    color-scheme: dark;
-  }
+:root[data-theme="dark"] {
+  --bg: #0b111b;
+  --surface: #131b28;
+  --surface-2: #1a2433;
+  --text: #e6ebf2;
+  --muted: #8392aa;
+  --line: #273245;
+  --accent: #22b39a;
+  --accent-text: #04140f;
+  --frame: #05090f;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -256,7 +256,23 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
 .btn.primary.pending { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
 .btn.ghost { background: transparent; }
-.panel-toggle { margin-left: auto; }
+.header-settings { display: flex; gap: 8px; margin-left: auto; }
+.header-settings select { width: auto; padding: 5px 8px; font-size: 13px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.notice {
+  width: 100%;
+  max-width: calc((100vh - 190px) * 16 / 9);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 13px;
+}
 .icon-btn { border: 0; background: none; font-size: 20px; cursor: pointer; padding: 4px 8px; border-radius: 8px; }
 .icon-btn:hover { background: var(--surface-2); }
 
@@ -270,5 +286,7 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
   .panel { border-left: 0; border-top: 1px solid var(--line); }
   .tab-body { max-height: none; overflow: visible; }
   .build { display: none; }
+  .top { flex-wrap: wrap; }
+  .notice { max-width: none; }
   .panel-actions { position: sticky; bottom: 0; background: var(--surface); }
 }

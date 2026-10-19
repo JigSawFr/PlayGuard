@@ -50,6 +50,10 @@ jobs:
           git clone --depth 1 https://github.com/emscripten-core/emsdk.git "$RUNNER_TEMP/emsdk"
           "$RUNNER_TEMP/emsdk/emsdk" install "$EMSDK_VERSION"
           "$RUNNER_TEMP/emsdk/emsdk" activate "$EMSDK_VERSION"
+      # Japanese, Korean and Chinese in the browser: a CJK font cut out of
+      # Noto Sans CJK with fontTools (tools/web_cjk_font.py).
+      - name: Noto Sans CJK and fontTools
+        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends fonts-noto-cjk python3-fonttools
       - name: Build
         env:
           PLAYGUARD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -57,6 +61,7 @@ jobs:
           export EM_CACHE="$HOME/.emscripten_cache"
           source "$RUNNER_TEMP/emsdk/emsdk_env.sh"
           make web JOBS="$(nproc)"
+          test -f build-web/resources/font/cjk.otf || { echo "::error::no CJK font in the web build"; exit 1; }
       - name: What was built (build.json, read by the page)
         env:
           REPO: ${{ github.repository }}

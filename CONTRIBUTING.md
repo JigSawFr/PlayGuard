@@ -70,7 +70,7 @@ Game patches are read from `./playguard_data/sd/`, the simulated SD card root.
 
 ### In a browser
 
-The same simulator runs in a browser, with these variables in the URL (`?unlocked=1&fw=20.5.0`) and a panel to change them: [main's](https://jigsawfr.github.io/PlayGuard/), and each pull request's, linked in a comment on it (`.github/workflows/web.yml`). See [`web/README.md`](web/README.md). A new `PLAYGUARD_SIM_*` variable needs its entry in `web/params.json` (`tools/check_web_params.py` fails CI without it).
+The same simulator runs in a browser, with these variables in the URL (`?unlocked=1&fw=20.5.0`) and a panel to change them: [main's](https://jigsawfr.github.io/PlayGuard/), and each pull request's, linked in a comment on it (`.github/workflows/web.yml`). See [`web/README.md`](web/README.md). The page is in the console's 15 languages, the browser's unless the URL says `lang=`, with an *Auto* / *Light* / *Dark* theme, and PlayGuard starts in both. A new `PLAYGUARD_SIM_*` variable needs its entry in `web/params.json` and its label in `web/i18n/en-US.json` (`tools/check_web_params.py` fails CI without them); the other catalogs show the English one until they have theirs.
 
 ## Tests and CI
 

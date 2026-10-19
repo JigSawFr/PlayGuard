@@ -1,3 +1,21 @@
+diff --git a/library/lib/platforms/desktop/desktop_font.cpp b/library/lib/platforms/desktop/desktop_font.cpp
+index b6f2d72..cacbcf4 100644
+--- a/library/lib/platforms/desktop/desktop_font.cpp
++++ b/library/lib/platforms/desktop/desktop_font.cpp
+@@ -118,6 +118,13 @@ void DesktopFontLoader::loadFonts()
+     std::vector<std::string> simplifiedChineseFonts = {
+         prefix+"msyh",
+     };
++#elif defined(__EMSCRIPTEN__)
++    // A browser has no system font to read: the page's build packages one
++    // with the han, kana and hangul PlayGuard's catalogs use.
++    std::vector<std::string> koreanFonts;
++    std::vector<std::string> simplifiedChineseFonts = {
++        BRLS_ASSET("font/cjk"),
++    };
+ #elif defined(ANDROID)
+     std::vector<std::string> koreanFonts;
+     std::vector<std::string> simplifiedChineseFonts = {
 diff --git a/library/lib/platforms/sdl/sdl_input.cpp b/library/lib/platforms/sdl/sdl_input.cpp
 index 52b31e1..2c4ca78 100644
 --- a/library/lib/platforms/sdl/sdl_input.cpp
