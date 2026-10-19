@@ -546,8 +546,12 @@ def doc_body(t, lang, to_root, page_name, assets):
     if toc_items:
         folded = (f'<details class="toc-mobile"><summary>{t("on_this_page")}</summary>'
                   f'<ul>{toc_items}</ul></details>\n')
-        intro = re.match(r"(?:\s|<!--.*?-->)*<p>.*?</p>\n?", body, re.S)
-        end = intro.end() if intro else 0
+        # After the first paragraph when nothing but comments comes before it.
+        start = body.find("<p>")
+        end = 0
+        if start >= 0 and not re.sub(r"<!--.*?-->", "", body[:start], flags=re.S).strip():
+            end = body.find("</p>", start) + len("</p>")
+            end += body[end:end + 1] == "\n"
         shown = body[:end] + folded + body[end:]
     # The page's description: its first paragraph (the one under the title).
     first = re.search(r"<p>(.*?)</p>", body, re.S)
