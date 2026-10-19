@@ -51,6 +51,7 @@ Code PIN oublié ou console d'occasion : [Console bloquée ?](docs/fr/troublesho
 
 ## Documentation
 
+- **Site :** [jigsawfr.github.io/PlayGuard](https://jigsawfr.github.io/PlayGuard/fr/) — cette documentation dans les 15 langues de la console, et [PlayGuard dans le navigateur](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr) face à une console simulée
 - **Guide :** [fonctions](docs/fr/features.md) · [installation](docs/fr/install.md) · [compatibilité](docs/fr/compatibility.md) · [dépannage](docs/fr/troubleshooting.md)
 - **Référence (en anglais) :** [application mobile](docs/companion-app.md) · [`config.json`](docs/config.md) · [fonctionnement du contrôle parental](docs/parental-controls.md) · [module de récupération](sysmodule/README.md)
 - **Contribuer (en anglais) :** [CONTRIBUTING.md](CONTRIBUTING.md) · [feuille de route](ROADMAP.md) · [changelog](CHANGELOG.md)

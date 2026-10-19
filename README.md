@@ -51,6 +51,7 @@ Forgotten PIN or second-hand console: [Locked out?](docs/troubleshooting.md#lock
 
 ## Documentation
 
+- **Website:** [jigsawfr.github.io/PlayGuard](https://jigsawfr.github.io/PlayGuard/) — this documentation in the console's 15 languages, and [PlayGuard in your browser](https://jigsawfr.github.io/PlayGuard/simulator/) against a simulated console
 - **User guide:** [features](docs/features.md) · [install](docs/install.md) · [compatibility](docs/compatibility.md) · [troubleshooting](docs/troubleshooting.md)
 - **Reference:** [companion app](docs/companion-app.md) · [`config.json`](docs/config.md) · [how parental controls work](docs/parental-controls.md) · [recovery sysmodule](sysmodule/README.md)
 - **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md) · [roadmap](ROADMAP.md) · [changelog](CHANGELOG.md)

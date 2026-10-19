@@ -12,6 +12,7 @@ Two minutes, if your console is still linked to the phone app: *PIN › Before u
 |---|---|---|
 | `make test` | Host unit tests of the C service layer and of the UI-free C++ helpers and flow logic, with ASan + UBSan (`SAN=` to turn them off); the suites run in parallel, all of them even when one fails | gcc and g++ with the sanitizers, zlib headers, the borealis submodule — no devkitPro |
 | `make desktop` | The real UI on Linux, against a simulated console | GLFW / X11 / D-Bus dev packages |
+| `make web` | The same in a browser: `build-web/simulator/` (`make web-serve` serves it at localhost:8000) | Emscripten (`source <emsdk>/emsdk_env.sh`) |
 | `make` | `./playguard.nro` — drawn with deko3d (`GL=1` for OpenGL) | devkitPro `switch-dev`, `DEVKITPRO` set |
 | `make dist` | `./playguard.zip` (SD-card layout) | as above |
 | `make dist-rescue` | `./playguard-rescue.zip`, the optional recovery sysmodule | as above |
@@ -73,6 +74,10 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 
 Game patches are read from `./playguard_data/sd/`, the simulated SD card root.
 
+### In a browser
+
+The same simulator runs in a browser, with these variables in the URL (`?unlocked=1&fw=20.5.0`) and a panel to change them: [main's](https://jigsawfr.github.io/PlayGuard/simulator/), on PlayGuard's website, and each pull request's, linked in a comment on it. See [`web/README.md`](web/README.md). The page is in the console's 15 languages, the browser's unless the URL says `lang=`, with an *Auto* / *Light* / *Dark* theme, and PlayGuard starts in both. A new `PLAYGUARD_SIM_*` variable needs its entry in `web/params.json` and its label in `web/i18n/en-US.json` (`tools/check_web_params.py` fails CI without them); the other catalogs show the English one until they have theirs.
+
 ## Tests and CI
 
 - `make test` — host unit tests (`tests/`, see [`tests/README.md`](tests/README.md)), including the recovery sysmodule logic (`tests/rescue/`); every suite runs, in parallel, and leaves its output in `build/host-tests/<suite>.log`.
@@ -80,6 +85,8 @@ Game patches are read from `./playguard_data/sd/`, the simulated SD card root.
 - `tools/visual_check.py` — compares those screenshots with the references in `tests/visual/`. A screen that changed fails CI; see [`tests/visual/README.md`](tests/visual/README.md) to update them.
 - `tools/perf_frames.sh <name> [VAR=value …]` — the per-frame cost of one screen of the desktop build, headlessly (same needs as the smoke test, plus `dbus-run-session`): the median and p95 frame time over the steady state, and nanovg's draw calls and triangles once `tools/perf_nanovg_stats.patch` is applied in `extern/borealis` (`git -C extern/borealis apply ../../tools/perf_nanovg_stats.patch`; a local patch, never committed). `PERF_KEYS="Down Right"` presses keys first to reach another screen (xdotool names; Return is A, Escape B), `PERF_THEME=light` runs the light variant. Software GL rasterises on the CPU, so the figures weigh pixels far more than the console's GPU does: compare screens with each other, not with the console.
 - `python3 tools/check_resources.py .` — checks the XML layouts and translation catalogs.
+- `python3 tools/build_site.py <out-dir>` — builds the website (`site/README.md`); CI's `web` workflow builds it with the simulator for every pull request and `pages` publishes it.
+- `python3 tools/check_web_params.py .` — checks that the web simulator's panel (`web/params.json`) has every `PLAYGUARD_SIM_*` variable.
 
 CI (`.github/workflows/build.yml`) runs all of the above plus the Switch build, the smoke scenarios in parallel shards, on every pull request, every push to main and once a week. The visual check compares the sets in `tests/visual/` and fails on a changed screen (the simulator keeps the console time and the focus highlight still, so the screens come out the same in every run). The desktop and Switch builds turn PlayGuard's compiler warnings into errors (`make desktop CMAKE_ARGS=-DPLAYGUARD_WERROR=ON`, `make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON`), and a compiler message is annotated on its line of the pull request; the Switch job also fails on a libnx older than 4.12.0 or an `.nro` without libnx's `LNY2` marker (`tools/check_nro.py`), and checks that a second build gives byte-identical zips; `check_resources.py` warns about sentences a catalog still has in English.
 
@@ -96,7 +103,9 @@ Each job writes a summary on the run page (`tools/ci_summary.py`): what is being
 | `source/view/` | Widgets: the week chart, the gauge, the play-timer state line, the day bars, the game cell and cover, the QR codes and funding links, release notes and the Markdown view, a development build's cell, the version badge, the scrolling frame, the loading screen's icon and progress bar, the notification bell |
 | `source/ui/` | Dialogs, formatting, theme colours, the console's state as text, read-only greying and visibility |
 | `source/util/` | NTP, HTTP, config, profiles, settings backups, change history, play-log folding, the play-data cache, the Activity summary, table export, diagnostics, the session logs and crash files (and the CPU exception dump), sending reports online, the play-timer recorder and block reference, update check, newer Atmosphère / hekate / firmware releases and their release notes (GitHub, switchbrew), store launcher, GitHub sign-in and development builds (zip, SHA-256), going back to the previous build, Markdown and text from outside made safe to show, game patches, the bundled changelog, the start-up reminders and times, the background threads (joined, never detached: the console cannot) and which files the cache and the logs are; the helpers the rest shares: `date`, `text`, `utf8`, `emoji`, `json_util` |
-| `source/sim/` | The simulated console for the desktop build (`sim_backend.c`, `sim_platform.cpp`) and its simulated network (`sim_net`, which the `util/*_net.cpp` files read) |
+| `source/sim/` | The simulated console for the desktop build (`sim_backend.c`, `sim_platform.cpp`) and its simulated network (`sim_net`, which the `util/*_net.cpp` files read; `web_http` answers every request offline in a browser) |
+| `site/` | The website: its pages' texts in the 15 languages and its stylesheet; `tools/build_site.py` adds `docs/` to it; see [`site/README.md`](site/README.md) |
+| `web/` | The web simulator's page and the panel's entries (`params.json`); see [`web/README.md`](web/README.md) |
 | `resources/` | XML layouts and `i18n/<language>/playguard.json` |
 | `sysmodule/` | The optional recovery boot sysmodule; shares `source/core/rescue.c` and the pctl calls of `pctl_ops_internal.h` with the app. See [`sysmodule/README.md`](sysmodule/README.md) |
 | `packaging/` | Store and sphaira entries. See [`packaging/README.md`](packaging/README.md) |

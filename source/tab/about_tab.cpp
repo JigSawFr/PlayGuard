@@ -27,8 +27,9 @@ AboutTab::AboutTab()
         this->count_version_press();
         return true;
     }, true, false, brls::SOUND_CLICK);
-#ifndef __SWITCH__
-    // The desktop build: the keyboard has no Ⓨ, so the Y key (smoke test).
+#if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
+    // The desktop build: the keyboard has no Ⓨ, so the Y key (smoke test). Not in
+    // a browser, where the page presses Ⓨ itself for the Y key (web/README.md).
     version->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Y), [this](brls::View*) {
         this->count_version_press();
         return true;

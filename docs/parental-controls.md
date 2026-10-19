@@ -70,6 +70,8 @@ Public reference: [switchbrew, Parental Control services](https://switchbrew.org
   `RevertRestrictionTemporaryUnlocked` when it cannot tell.
 - While temporarily unlocked, 1453 `IsPlayTimerEnabled` reads `false`
   (observed, 22.0.0).
+- A restart of the console ends a temporary unlock: the console comes back
+  locked, PlayGuard or not (observed, 23.0.1).
 - Registering or changing the PIN goes through the `pctlauth` applet; the
   direct `SetPinCode` command is refused.
 - The rescue sysmodule uses the same 1208 → 1201 sequence at boot, with no

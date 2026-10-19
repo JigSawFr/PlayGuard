@@ -15,6 +15,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #endif
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "action/fw_gate.hpp"
 #include "action/log_prune_flow.hpp"
@@ -413,7 +416,42 @@ void shut_down()
     brls::Logger::info("quit: after {} s", session_log::uptime_s());
     session_log::end("clean exit");
 }
+
+#ifndef __SWITCH__
+FILE* s_stats = nullptr;   // PLAYGUARD_SIM_STATS's file, when asked (main())
+brls::Time s_stats_last = 0;
+#endif
+
+void close_stats()
+{
+#ifndef __SWITCH__
+    if (s_stats) std::fclose(s_stats);
+    s_stats = nullptr;
+#endif
+}
+
+// One frame; false once PlayGuard quits.
+bool run_frame()
+{
+    if (!brls::Application::mainLoop()) return false;
+    // The lines the session file waits for, written off the UI thread
+    // once they waited long enough (util/session_log.hpp).
+    if (session_log::due()) ui::write_later("session log", []() { session_log::flush(); }, "session_log");
+    frame_stats_flow::sample();   // Developer › Frame statistics, when on
+#ifndef __SWITCH__
+    if (s_stats) {
+        int draws = 0, fill = 0, stroke = 0, text = 0;
+        if (nvgDebugGetStats) nvgDebugGetStats(brls::Application::getNVGContext(), &draws, &fill, &stroke, &text);
+        const brls::Time now = brls::getCPUTimeUsec();
+        std::fprintf(s_stats, "%lld %lld %d %d %d %d\n", (long long)now, (long long)(now - s_stats_last), draws, fill,
+                     stroke, text);
+        s_stats_last = now;
+    }
+#endif
+    return true;
+}
 }   // namespace
+
 
 int main(int argc, char* argv[])
 {
@@ -504,36 +542,32 @@ int main(int argc, char* argv[])
     // <stroke tris> <text tris>", the counters from nanovg's own (zero without
     // tools/perf_nanovg_stats.patch). The FPS limiter is turned off so the
     // frame time is the work alone.
-    FILE* stats = nullptr;
     if (const char* path = std::getenv("PLAYGUARD_SIM_STATS")) {
         // Created with an explicit mode (CodeQL: fopen's depends on the umask).
         const int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
         if (fd >= 0) {
-            stats = fdopen(fd, "w");
-            if (!stats) close(fd);
+            s_stats = fdopen(fd, "w");
+            if (!s_stats) close(fd);
         }
         brls::Application::setLimitedFPS(0);
     }
-    brls::Time stats_last = brls::getCPUTimeUsec();
+    s_stats_last = brls::getCPUTimeUsec();
 #endif
-    while (brls::Application::mainLoop()) {
-        // The lines the session file waits for, written off the UI thread
-        // once they waited long enough (util/session_log.hpp).
-        if (session_log::due()) ui::write_later("session log", []() { session_log::flush(); }, "session_log");
-        frame_stats_flow::sample();   // Developer › Frame statistics, when on
-#ifndef __SWITCH__
-        if (!stats) continue;
-        int draws = 0, fill = 0, stroke = 0, text = 0;
-        if (nvgDebugGetStats) nvgDebugGetStats(brls::Application::getNVGContext(), &draws, &fill, &stroke, &text);
-        const brls::Time now = brls::getCPUTimeUsec();
-        std::fprintf(stats, "%lld %lld %d %d %d %d\n", (long long)now, (long long)(now - stats_last), draws, fill, stroke, text);
-        stats_last = now;
-#endif
-    }
-#ifndef __SWITCH__
-    if (stats) std::fclose(stats);
-#endif
+#ifdef __EMSCRIPTEN__
+    // In a browser a frame must hand the thread back to the page (web/README.md):
+    // the browser calls one per display refresh, and main() returns at once.
+    emscripten_set_main_loop([]() {
+        if (run_frame()) return;
+        emscripten_cancel_main_loop();
+        close_stats();
+        shut_down();
+    }, 0, false);
+    return EXIT_SUCCESS;
+#else
+    while (run_frame()) {}
+    close_stats();
 
     shut_down();
     return EXIT_SUCCESS;
+#endif
 }
