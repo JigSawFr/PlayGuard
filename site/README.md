@@ -56,7 +56,10 @@ pages; no framework, nothing to install but that.
   `<out-dir>/<language>/<screen>.webp`, on the desktop smoke test's console
   (8 October 2026, 16:00 UTC; the focus without its glow). `SITE_SCREENSHOTS=<out-dir>`
   tells `build_site.py` to use them, on the home page and in the
-  documentation. A new screen in the gallery is a name in both files: its
+  documentation. Taking them all takes about half an hour on a CI
+  runner: a pull request that changes nothing the screens are made of (the
+  app, its resources, the simulator, the version) downloads main's published
+  ones instead (`SITE_SCREENSHOTS_FROM=<site>`). A new screen in the gallery is a name in both files: its
   tab, and the keys that lead to it from there.
 - **The site's address**: `SITE_URL` (`https://jigsawfr.github.io/PlayGuard/`
   by default). CI asks GitHub Pages for it (its custom domain, when it has
@@ -79,7 +82,7 @@ then `SITE_SCREENSHOTS=/tmp/shots python3 tools/build_site.py /tmp/site`.
 ## Publishing
 
 `.github/workflows/web.yml` builds the simulator, takes the screenshots with
-it, then builds the site with the simulator in it for main and for each pull
+it (or main's, above), then builds the site with the simulator in it for main and for each pull
 request (the `site` artifact, kept 30 days), which checks that it builds. `.github/workflows/pages.yml` publishes them, with GitHub
 Actions as the source of GitHub Pages: main's at the root, each open pull
 request's in `pr-<number>/` (not a fork's: its pages would be served from this

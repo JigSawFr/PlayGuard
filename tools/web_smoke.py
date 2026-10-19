@@ -170,16 +170,26 @@ def shot(page, name):
 
 
 with sync_playwright() as p:
-    browser = p.chromium.launch(
-        executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM") or None,
-        # WebGL 2 without a GPU: SwiftShader.
-        args=["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"])
-    # The page allows no eval (its Content-Security-Policy); the test's own
-    # wait_for_function needs one.
-    context = browser.new_context(viewport={"width": 1600, "height": 1000}, locale="en-US", bypass_csp=True)
-    page = context.new_page()
     errors = []
-    page.on("pageerror", lambda e: errors.append(str(e)))
+    browser = None
+
+    def new_page():
+        """A browser of its own for each start, the last one closed: on a
+        runner, SwiftShader's GPU process can crash after a few starts in one
+        browser, which then answers nothing more (an evaluate() waits forever)."""
+        global browser
+        if browser:
+            browser.close()
+        browser = p.chromium.launch(
+            executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM") or None,
+            # WebGL 2 without a GPU: SwiftShader.
+            args=["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"])
+        # The page allows no eval (its Content-Security-Policy); the test's own
+        # wait_for_function needs one.
+        context = browser.new_context(viewport={"width": 1600, "height": 1000}, locale="en-US", bypass_csp=True)
+        page = context.new_page()
+        page.on("pageerror", lambda e: errors.append(str(e)))
+        return page
 
     # The screens of the preview comment.
     screens = [
@@ -191,11 +201,13 @@ with sync_playwright() as p:
         ("init_error", "&no_cfw=1"),
     ]
     for name, extra in screens:
+        page = new_page()
         if open_page(page, FIXED + extra, name):
             shot(page, name)
             print(f"ok   {name}")
 
     # desktop_smoke's tour of the tabs: each one in turn from the sidebar.
+    page = new_page()
     if open_page(page, FIXED, "tabs"):
         for name in ["play_timer", "activity", "restrictions", "security", "console", "history", "preferences", "about"]:
             steps(page, "down")
@@ -206,6 +218,7 @@ with sync_playwright() as p:
             print("ok   every tab")
 
     # desktop_smoke's "alarm": a warning only, the limit passed.
+    page = new_page()
     if open_page(page, FIXED + "&alarm_only=1&restricted=1", "alarm"):
         shot(page, "alarm_overview_over")
         steps(page, "down")
@@ -214,6 +227,7 @@ with sync_playwright() as p:
 
     # desktop_smoke's "errors", its first half: a limit change while the
     # unlock fails ends in the "could not unlock" dialog, not a toast.
+    page = new_page()
     if open_page(page, FIXED + "&fail=unlock&restricted=1&autosync_off=1&ntp=offline&network_offset=1411", "errors"):
         steps(page, "down.right.down.a")   # Play timer › the week chart › Same limit every day
         shot(page, "errors_picker")
@@ -228,6 +242,7 @@ with sync_playwright() as p:
             print("ok   errors")
 
     # The time moved on, live: no reload, the URL and the log follow.
+    page = new_page()
     if open_page(page, FIXED, "time"):
         page.evaluate("window.notReloaded = true")
         page.click("#time-buttons button:last-child")   # +1 h
@@ -254,6 +269,7 @@ with sync_playwright() as p:
             print("ok   CJK font added after the start")
 
     # The steps: two presses noted, their link replays them.
+    page = new_page()
     if open_page(page, FIXED, "steps"):
         page.focus("#canvas")
         for key in ("ArrowDown", "ArrowDown"):
@@ -277,6 +293,7 @@ with sync_playwright() as p:
             print("ok   report link")
 
     # The tour.
+    page = new_page()
     if open_page(page, FIXED + "&tour=1", "tour"):
         if not wait_logged(page, "steps: done", 90) or "live: skip=3600" not in log_text(page):
             fail("tour: it did not play to its end")
@@ -284,6 +301,7 @@ with sync_playwright() as p:
             print("ok   tour")
 
     # The CJK font waited for in Japanese.
+    page = new_page()
     if open_page(page, "lang=ja&theme=light&now=1791471600&still_focus=1&version=1.0.0:1a2b3c4", "japanese"):
         log = log_text(page)
         if "Using zh-Hans font" not in log or log.index("Using zh-Hans font") > log.index("start-up: first screen ready"):
@@ -293,6 +311,7 @@ with sync_playwright() as p:
             print("ok   japanese")
 
     # keep=1: the simulated console's settings survive a reload.
+    page = new_page()
     if open_page(page, FIXED + "&keep=1", "keep"):
         time.sleep(4)   # the page writes IndexedDB every 3 s
         page.evaluate("saveData()")
@@ -305,6 +324,7 @@ with sync_playwright() as p:
                 print("ok   keep")
 
     # The service worker, as on GitHub Pages: no headers from the server.
+    new_page()
     sw_context = browser.new_context(viewport={"width": 1600, "height": 1000}, locale="en-US", bypass_csp=True)
     sw_page = sw_context.new_page()
     sw_page.on("pageerror", lambda e: errors.append(str(e)))

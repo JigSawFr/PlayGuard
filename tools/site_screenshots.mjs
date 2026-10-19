@@ -7,6 +7,7 @@
 // Needs Node and Playwright (Chromium).
 //   node tools/site_screenshots.mjs build-web/simulator <out-dir> [version] [language...]
 // (every language when none is named; the version is the header's badge, 1.2.0).
+// SITE_SCREENSHOTS_FROM=<site> downloads a published site's instead (below).
 import { chromium } from 'playwright';
 import { createServer } from 'node:http';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -34,6 +35,26 @@ const RUNS = [
   { tab: 'console', screens: [['clock', 'ArrowRight', 'Enter']] },
 ];
 const NOW = 1791475200;   // tools/desktop_smoke.py's PLAYGUARD_SIM_NOW
+
+// SITE_SCREENSHOTS_FROM=<a published site's address>: its screenshots,
+// downloaded rather than taken, for a pull request that changes nothing the
+// screens are made of (taking them is most of the web job's time). One the
+// site does not have stays missing: tools/build_site.py shows the English one.
+const from = process.env.SITE_SCREENSHOTS_FROM;
+if (from) {
+  let count = 0;
+  for (const lang of only.length ? only : LANGUAGES) {
+    for (const [name] of RUNS.flatMap((r) => r.screens)) {
+      const res = await fetch(new URL(`assets/images/screenshots/${lang}/${name}.webp`, from)).catch(() => null);
+      if (!res?.ok || !res.headers.get('content-type')?.startsWith('image/')) continue;
+      await mkdir(join(out, lang), { recursive: true });
+      await writeFile(join(out, lang, `${name}.webp`), Buffer.from(await res.arrayBuffer()));
+      count++;
+    }
+  }
+  console.log(`${count} screenshots from ${from} in ${out}`);
+  process.exit(0);
+}
 
 // The simulator needs threads, so a cross-origin isolated page (web/serve.py's headers).
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json',
