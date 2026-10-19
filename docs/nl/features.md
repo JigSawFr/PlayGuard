@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 d0ed03f4c86c -->
+<!-- translated from docs/features.md, sha256 b31fb46c871d -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Terug naar de [README](../../README.md).
@@ -54,7 +54,7 @@ Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon vo
 
 ## Vandaag — de dag in één oogopslag
 
-*[Probeer het in de simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/)*
+*[Probeer het in de simulator ›](https://playguard.link/simulator/)*
 
 - **De resterende tijd** als ring (een dag zonder spelen toont *Niet spelen*, niet *0 min*; de extra tijd die vandaag is gegeven, verschijnt als lichter segment aan het einde, en de ring schuift naar elke nieuwe waarde), en daaronder wat het spelen het eerst stopt: vóór het einde van de tijd of het bedtijdalarm de rest van de dag als lijn, met het huidige moment links, elk ervan een markering met het tijdstip (*16:40 tijd om*, *21:00 bedtijd*), blauwgroen tot de eerste, oranje in de laatste 15 minuten; anders in woorden (het bedtijdalarm zodra de tijd van de dag op is, wanneer er weer gespeeld mag worden; zolang ouderlijk toezicht ontgrendeld is, de limiet van vandaag gepauzeerd en waarom).
 - **De acties ernaast:** *Extra tijd* met de hoeveelheden op één druk afstand (een geselecteerde hoeveelheid schuift het einde van de tijd op de lijn op, *met 15 min extra*, of zegt bij de markering van het bedtijdalarm dat dat toch eerst komt; de eerste springt eruit in blauwgroen zodra er 15 min of minder over is, of niets meer), *Stoppen voor vandaag*, *Aan het kind tonen*, *Limiet vandaag…* (de limiet van vandaag ter plekke gekozen, geschreven na één bevestiging); zodra er een profiel is opgeslagen, het geldende profiel met zijn naam (*Profielen…* als er geen overeenkomt): Ⓐ toont ze, het geldende aangevinkt, om na één bevestiging een ander toe te passen (de dagen die veranderen), of *Profielen beheren…*; zolang ouderlijk toezicht ontgrendeld is, komt *Weer inschakelen* eerst, over de hele breedte van de rij, en gaat *Extra tijd* opzij. Staat er op geen enkele dag een limiet, dan opent *Limieten van de week instellen* de week in *Speeltijdtimer*.
@@ -72,7 +72,7 @@ Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon vo
 
 ## Speeltijdtimer — de week is de editor
 
-*[Probeer het in de simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=play_timer)*
+*[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=play_timer)*
 
 - **De week is de editor:** Ⓐ op een dag bewerkt hem: ↑/↓ wijzigen hem met 15 min, ←/→ gaan naar de volgende dag, Ⓛ kopieert hem naar maandag–vrijdag, Ⓡ naar het weekend, Ⓨ zet geen limiet, Ⓐ of Ⓑ beëindigt het bewerken; Ⓧ kiest een exacte duur (*Een duur invoeren…* stelt die in met ↑/↓ per 15 min en Ⓛ/Ⓡ per 5 min, met OK geselecteerd). Met aanraken wordt een aangetikte dag bewerkt, waarna een tik op de boven- of onderkant hem met 15 min wijzigt. De wijzigingen worden samen opgeslagen, met **+** of *Opslaan*, zoals in de editor per dag (de bevestiging toont de gewijzigde dagen, voor → na); *Verwerpen* draait ze terug. In de balk van elke dag de tijd die de laatste keer op die dag van de week is gespeeld (vandaag inbegrepen, alle accounts), in koraalrood zodra de limiet werd bereikt; onder de week de cijfers van de geselecteerde dag (*donderdag: 1 u 20 gespeeld van 2 u*).
 - **Chips** boven en onder de week openen meteen hun keuzes: de profielen (hoeveel er zijn opgeslagen), elke dag dezelfde limiet, het bedtijdalarm, *Als de tijd om is* en het verwijderen.
@@ -91,7 +91,7 @@ Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon vo
 
 ## Activiteit — wie wat speelde, en hoe lang
 
-*[Probeer het in de simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=activity)*
+*[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=activity)*
 
 - Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het activiteitenlog van de console zelf — voor alle accounts of voor **één gebruikersaccount** (de accounts als chips bovenaan, als de console er meerdere heeft). PlayGuard start op het laatst getoonde account, of op het account dat bij *Standaardaccount* is gekozen (alle accounts, of één).
 - **Bovenaan:** de accounts als chips, de periode en de export, vandaag, de afgelopen 7 dagen en altijd als cijfers (onder de afgelopen 7 dagen de vergelijking met de 7 ervoor, per dag: *+20 min/dag t.o.v. vorige week* in oranje, minder in blauwgroen, *zoals vorige week* bij hoogstens 5 minuten verschil), de vier meest gespeelde games als kaarten (Ⓐ opent er een; over de afgelopen 7 dagen zegt de game die het meest meer is gespeeld dan de week ervoor met hoeveel, vanaf een half uur: *+2 u t.o.v. vorige week*). Niets gespeeld in de periode: een kaart zegt dat, met *Totaal bekijken* als er iets te zien is.
@@ -108,7 +108,7 @@ Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon vo
 
 ## Beperkingen — niveau, leeftijdsclassificatie, communicatie
 
-*[Probeer het in de simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=restrictions)*
+*[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=restrictions)*
 
 - **Het beperkingsniveau:** Jong kind, Kind, Tiener en Aangepast naast elkaar als tegels, elk met wat het beperkt (Ⓐ stelt het in; geldt *Aangepast* al, dan gaat Ⓐ naar de instellingen eronder); *Geen* eronder. Wat een niveau beperkt (leeftijdsgrens, berichten plaatsen, communicatie), wordt nog eens gemeld voordat het wordt ingesteld.
 - Bij Aangepast: leeftijdsclassificatie, berichten plaatsen op sociale media, communicatie met anderen.
@@ -118,7 +118,7 @@ Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon vo
 
 ## Pincode — de pincode, ontgrendelen, games blokkeren, smartphone-app
 
-*[Probeer het in de simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=security)*
+*[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=security)*
 
 - **Pincode instellen of wijzigen** (pincodescherm van het systeem), **pincode tonen** (na een waarschuwing en de pincode zelf, die elke keer wordt gevraagd; vastgelegd in de geschiedenis, daarna wordt een nieuwe pincode voorgesteld), **tijdelijk ontgrendelen**, **ouderlijk toezicht weer inschakelen**, en of PlayGuard het vanzelf weer inschakelt meteen na een wijziging waarvoor het ontgrendeld moest worden (standaard aan).
 - **PlayGuard beveiligen met de pincode** in PlayGuard zelf: *Nooit*, *Vóór een wijziging* (de standaard: iedereen kan kijken, alleen de ouder wijzigt iets) of *Om PlayGuard te openen* (een vergrendelscherm bij het opstarten). Eenmaal ingevoerd, geldt de pincode tot PlayGuard wordt gesloten; *Na 5 minuten opnieuw om de pincode vragen* (standaard uit) vraagt er daarna opnieuw om, en brengt het vergrendelscherm van *Om PlayGuard te openen* terug als PlayGuard na 5 min of langer op de achtergrond weer op de voorgrond komt. Gecontroleerd in de servicelaag, dus geen enkele wijziging slaat het over; opnieuw vergrendelen vraagt er nooit om. *Pincode tonen* vraagt er elke keer om, in elke modus en zelfs vlak nadat hij is ingevoerd, en een ontbrekend of beschadigd `config.json` geldt als *Vóór een wijziging*. Afsluiten terwijl ouderlijk toezicht nog ontgrendeld is, vraagt of het weer moet worden vergrendeld (*Weer inschakelen en afsluiten* sluit ook de game waarboven PlayGuard werd geopend, terug naar het HOME-menu in plaats van hbmenu); wordt PlayGuard in plaats daarvan via het HOME-menu gesloten, dan vergrendelt het bij de volgende start opnieuw, en een herstart van de console vergrendelt vanzelf.
@@ -128,7 +128,7 @@ Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon vo
 
 ## Console — de netwerkklok, de geïnstalleerde games, wat de console draait
 
-*[Probeer het in de simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=console)*
+*[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=console)*
 
 - **Bovenaan** wat de console draait, als tegels (de firmware, Atmosphère, en hekate als het op de SD-kaart staat; Ⓐ opent de release-opmerkingen), dan de diagnose, dan de regels van de console, compatibiliteit eerst.
 - **Netwerkklok ›**, een eigen scherm — de klok waarop de speeltijdtimer vertrouwt:
@@ -143,14 +143,14 @@ Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon vo
 
 ## Geschiedenis — wijzigingen en back-ups
 
-*[Probeer het in de simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=history)*
+*[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=history)*
 
 - **Wijzigingsgeschiedenis:** de nieuwste 500 wijzigingen die PlayGuard heeft gedaan (limieten, beperkingsniveau, pincode, ontgrendelingen, ontkoppelen, de klok, terugzettingen, het aftellen pauzeren of hervatten …) en wat het buiten zichzelf zag veranderen, per dag gegroepeerd (*Vandaag*, *Gisteren*, daarna de dag en de datum), met het tijdstip en de bron; een limiet die voor één dag is gewijzigd, noemt die dag. Een wijziging die de console **weigerde**, staat er ook, in oranje, met de foutmelding van de console en wat er werd geprobeerd (nooit terugzetten: er is niets veranderd). *Tonen* houdt één soort over (speeltijd, beperkingen, beveiliging en app, gezien buiten PlayGuard, geweigerd door de console); *Getoonde exporteren* schrijft dat naar `exports/` als CSV, JSON, XLSX of PDF. Elke wijziging bewaart de PlayGuard-versie die haar deed. Ⓐ op een wijziging toont haar en, voor een waarde, **zet de vorige terug** — met hetzelfde ontgrendelen en dezelfde pincode als elke wijziging, en met de melding als de waarde sindsdien is veranderd. Een wijziging die door een nieuwere versie van PlayGuard is vastgelegd, verschijnt als *Andere wijziging*.
 - **Back-up maken / terugzetten van de instellingen** op de SD-kaart: beperkingsniveau, aangepaste instellingen, VR-modus, classificatie-instantie, daglimieten, het alarm "Tijd is om" (met de geavanceerde acties aan), en ter registratie het ruwe blok van de speeltijdtimer — nooit de pincode. Een terugzetting toont alleen wat er zou veranderen (niets te veranderen: dan zegt het dat gewoon, zonder ontgrendelen en zonder iets te schrijven), en meldt wanneer de back-up een bedtijdalarm aan had (dat wordt niet teruggeschreven). Kies hoeveel back-ups er bewaard blijven.
 
 ## Voorkeuren
 
-*[Probeer het in de simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=preferences)*
+*[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=preferences)*
 
 - Wat PlayGuard zelf instelt:
   - Taal (elke taal van de console, of die van de console zelf), thema (licht / donker), tekstgrootte (automatisch / normaal / groter, meteen); de andere met het aanbod om opnieuw te starten.
@@ -163,7 +163,7 @@ Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon vo
 
 ## Info
 
-*[Probeer het in de simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=about)*
+*[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=about)*
 
 - De geïnstalleerde PlayGuard: versie (in oranje als er een nieuwere is; Ⓐ opent de **release-opmerkingen**), startmodus en gegevensmap; nu **op updates controleren**; *Elke dag op updates controleren* bij het opstarten, en *Bijwerken met*: in PlayGuard, dat de release downloadt, controleert, zichzelf vervangt en herstart, of sphaira, Homebrew App Store of met de hand (gevraagd bij de eerste update als er nog niets is gekozen). Zolang er een nieuwere release bekend is, opent PlayGuard op **PlayGuard X.Y.Z is beschikbaar** (de datum en de opmerkingen): *Bijwerken*, of *Later* voor 1 dag, 1 week of hoogstens 30 dagen; de release-opmerkingen zijn die van PlayGuard zelf, op hetzelfde scherm als die van Atmosphère en hekate in *Console*: uit de GitHub-releases, een tabblad per versie (de geïnstalleerde, de nieuwere, de oudere), elk met de hoogtepunten als kaarten en alle wijzigingen, bewaard op de SD-kaart om offline te lezen (die van de geïnstalleerde versie zitten ook in de app, voor als er nog niets is opgehaald). Na een update opent PlayGuard één keer op **Nieuw in X.Y.Z** (dezelfde hoogtepunten, daarna de QR-codes).
 - **Hulp en diagnose ›**, een eigen scherm, onder *Bijwerken met*:

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 d0ed03f4c86c -->
+<!-- translated from docs/features.md, sha256 b31fb46c871d -->
 # Funzioni
 
 Cosa fa ogni scheda, come PlayGuard scrive senza rischi, e cosa la console conta come tempo di gioco. Torna al [README](../../README.md).
@@ -54,7 +54,7 @@ A sinistra della campanella, la lingua (il suo codice, *FR*, *EN*…) e il tema 
 
 ## Oggi — la giornata a colpo d'occhio
 
-*[Provalo nel simulatore ›](https://jigsawfr.github.io/PlayGuard/simulator/)*
+*[Provalo nel simulatore ›](https://playguard.link/simulator/)*
 
 - **Il tempo rimanente** come anello (un giorno senza gioco indica *Niente gioco*, non *0 min*; il tempo extra dato oggi appare come un segmento più chiaro alla sua estremità, e l'anello scorre verso ogni nuovo valore), e sotto ciò che fermerà il gioco per primo: prima dello scadere del tempo o di Sogni d'oro, il resto della giornata come una linea, con il momento attuale alla sua sinistra, e ognuno dei due come un segno con la sua ora (*16:40 tempo scaduto*, *21:00 ora di dormire*), in verde acqua fino al primo, in ambra nei suoi ultimi 15 minuti; altrimenti a parole (Sogni d'oro una volta esaurito il tempo del giorno, quando si può giocare di nuovo; mentre il filtro famiglia è sbloccato, il limite di oggi in pausa e il perché).
 - **Le azioni accanto:** *Tempo extra* con le sue quantità a portata di una sola pressione (una quantità selezionata sposta in avanti sulla linea lo scadere del tempo, *con 15 min in più*, o dice sul segno di Sogni d'oro che questo arriva comunque prima; la prima risalta in verde acqua quando restano 15 min o meno, o niente), *Basta per oggi*, *Mostra al bambino*, *Limite di oggi…* (il limite di oggi scelto sul momento, scritto dopo una sola conferma); una volta salvato un profilo, il profilo in vigore con il suo nome (*Profili…* quando nessuno corrisponde): Ⓐ li elenca, quello in vigore spuntato, per metterne in vigore un altro dopo una sola conferma (i giorni che cambiano), o *Gestisci i profili…*; mentre il filtro famiglia è sbloccato, *Riattiva* viene per primo, su tutta la larghezza della riga, e *Tempo extra* si fa da parte. Senza limiti in nessun giorno, *Impostare i limiti della settimana* apre la settimana in *Tempo di gioco*.
@@ -72,7 +72,7 @@ A sinistra della campanella, la lingua (il suo codice, *FR*, *EN*…) e il tema 
 
 ## Tempo di gioco — la settimana è l'editor
 
-*[Provalo nel simulatore ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=play_timer)*
+*[Provalo nel simulatore ›](https://playguard.link/simulator/?tab=play_timer)*
 
 - **La settimana è l'editor:** Ⓐ su un giorno lo modifica: ↑/↓ lo cambiano di 15 min, ←/→ passano al giorno successivo, Ⓛ lo copia da lunedì a venerdì, Ⓡ sul weekend, Ⓨ imposta "nessun limite", Ⓐ o Ⓑ terminano la modifica; Ⓧ sceglie una durata esatta (*Inserisci una durata…* la imposta con ↑/↓ di 15 min e Ⓛ/Ⓡ di 5 min, con OK selezionato). Al tocco, un giorno toccato passa in modifica, poi un tocco sulla sua parte alta o bassa lo cambia di 15 min. Le modifiche si salvano insieme, con **+** o *Salva*, come nell'editor per giorno (la conferma elenca i giorni cambiati, prima → dopo); *Annulla* le rimette com'erano. Dentro la barra di ogni giorno, il tempo giocato nella sua ultima occorrenza (oggi compreso, tutti gli utenti), in corallo una volta raggiunto il limite; sotto la settimana, i dati del giorno selezionato (*Giovedì: 1 h 20 giocato su 2 h*).
 - **Chip** sopra e sotto la settimana aprono subito le loro scelte: i profili (quanti ne sono salvati), lo stesso limite ogni giorno, Sogni d'oro, *Quando il tempo è scaduto* e la rimozione.
@@ -91,7 +91,7 @@ A sinistra della campanella, la lingua (il suo codice, *FR*, *EN*…) e il tema 
 
 ## Attività — chi ha giocato a cosa, e per quanto
 
-*[Provalo nel simulatore ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=activity)*
+*[Provalo nel simulatore ›](https://playguard.link/simulator/?tab=activity)*
 
 - Tempo per gioco **oggi**, negli **ultimi 7 giorni** e **in totale**, dal registro attività della console stessa — per tutti gli utenti o per **un solo utente** (gli utenti come chip in alto, quando la console ne ha più di uno). PlayGuard si apre sull'utente mostrato per ultimo, o su quello scelto in *Account predefinito* (tutti gli utenti, o uno solo).
 - **In alto:** gli utenti come chip, il periodo e l'esportazione, oggi, gli ultimi 7 giorni e da sempre come cifre (sotto gli ultimi 7 giorni, il confronto con i 7 precedenti, al giorno: *+20 min/giorno vs settimana prima* in ambra, in meno in verde acqua, *come la settimana prima* entro 5 minuti), i quattro giochi più giocati come riquadri (Ⓐ ne apre uno; sugli ultimi 7 giorni, quello giocato più della settimana prima dice di quanto, a partire da mezz'ora: *+2 h vs settimana prima*). Niente giocato nel periodo: un riquadro lo dice, con *Vedi da sempre* quando c'è qualcosa da vedere.
@@ -108,7 +108,7 @@ A sinistra della campanella, la lingua (il suo codice, *FR*, *EN*…) e il tema 
 
 ## Limitazioni — livello, classificazione per età, comunicazione
 
-*[Provalo nel simulatore ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=restrictions)*
+*[Provalo nel simulatore ›](https://playguard.link/simulator/?tab=restrictions)*
 
 - **Il livello limitazioni:** Bambino piccolo, Bambino, Adolescente e Personalizzato affiancati come tessere, ognuno con ciò che limita (Ⓐ lo imposta; con *Personalizzato* in vigore, Ⓐ porta alle sue impostazioni qui sotto); *Nessuno* sotto di esse. Ciò che un livello limita (limite di età, pubblicazione, comunicazione) viene ripetuto prima di impostarlo.
 - In Personalizzato: classificazione per età, pubblicazione sui social media, comunicazione con altri utenti.
@@ -118,7 +118,7 @@ A sinistra della campanella, la lingua (il suo codice, *FR*, *EN*…) e il tema 
 
 ## PIN — il PIN, lo sblocco, il blocco dei giochi, l'app Filtro famiglia
 
-*[Provalo nel simulatore ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=security)*
+*[Provalo nel simulatore ›](https://playguard.link/simulator/?tab=security)*
 
 - **Imposta o cambia il PIN** (schermata PIN del sistema), **mostra il PIN** (dopo un avviso e il PIN stesso, chiesto ogni volta; registrato nella cronologia, poi viene proposto un nuovo PIN), **sblocca temporaneamente**, **riattiva il filtro famiglia**, e se PlayGuard lo riattiva da solo subito dopo una modifica che ha richiesto lo sblocco (attivo per impostazione predefinita).
 - **Proteggi PlayGuard con il PIN** in PlayGuard stesso: *Mai*, *Prima di una modifica* (l'impostazione predefinita: tutti possono consultare, solo il genitore modifica) o *Per aprire PlayGuard* (una schermata di blocco all'avvio). Una volta inserito, il PIN vale fino alla chiusura di PlayGuard; *Richiedi di nuovo il PIN dopo 5 minuti* (disattivato per impostazione predefinita) lo richiede trascorso quel tempo, e riporta la schermata di blocco di *Per aprire PlayGuard* quando PlayGuard torna in primo piano dopo 5 min o più. Controllato nel livello dei servizi, quindi nessuna modifica lo salta; bloccare di nuovo non lo chiede mai. *Mostra il PIN* lo chiede ogni volta, in ogni modalità e anche subito dopo averlo inserito, e un `config.json` mancante o danneggiato vale come *Prima di una modifica*. Uscire mentre il filtro famiglia è ancora sbloccato chiede se bloccarlo di nuovo (*Riattiva ed esci* chiude anche il gioco sopra cui PlayGuard è stato aperto, tornando al menu HOME anziché a hbmenu); se invece viene chiuso dal menu HOME, PlayGuard lo blocca di nuovo al prossimo avvio, e un riavvio della console lo blocca da solo.
@@ -128,7 +128,7 @@ A sinistra della campanella, la lingua (il suo codice, *FR*, *EN*…) e il tema 
 
 ## Console — l'orologio di rete, i giochi installati, cosa esegue la console
 
-*[Provalo nel simulatore ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=console)*
+*[Provalo nel simulatore ›](https://playguard.link/simulator/?tab=console)*
 
 - **In alto**, ciò che esegue la console come tessere (il firmware, Atmosphère, e hekate quando è sulla scheda SD; Ⓐ apre le sue note di rilascio), poi la diagnostica, poi le righe della console, prima la compatibilità.
 - **Orologio di rete ›**, una schermata a parte — l'orologio su cui si basa il tempo di gioco:
@@ -143,14 +143,14 @@ A sinistra della campanella, la lingua (il suo codice, *FR*, *EN*…) e il tema 
 
 ## Cronologia — modifiche e backup
 
-*[Provalo nel simulatore ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=history)*
+*[Provalo nel simulatore ›](https://playguard.link/simulator/?tab=history)*
 
 - **Cronologia delle modifiche:** le 500 modifiche più recenti fatte da PlayGuard (limiti, livello limitazioni, PIN, sblocchi, scollegamento, l'orologio, ripristini, pausa o ripresa del conto alla rovescia …) e ciò che ha visto cambiare fuori da lui, raggruppate per giorno (*Oggi*, *Ieri*, poi il giorno e la data), con l'ora e da dove; un limite cambiato per un solo giorno nomina quel giorno. Anche una modifica **rifiutata** dalla console è elencata, in ambra, con l'errore della console e ciò che si è tentato (mai rimessa: non è cambiato nulla). *Mostra* tiene un solo tipo (tempo di gioco, restrizioni, sicurezza e app, visto fuori da PlayGuard, rifiutato dalla console); *Esporta ciò che è mostrato* lo scrive in `exports/` in CSV, JSON, XLSX o PDF. Ogni modifica conserva la versione di PlayGuard che l'ha fatta. Ⓐ su una modifica la mostra e, per un valore, **rimette quello precedente** — con lo stesso sblocco e lo stesso PIN di ogni modifica, segnalando se nel frattempo è cambiato. Una modifica registrata da una versione più recente di PlayGuard compare come *Altra modifica*.
 - **Backup / ripristino delle impostazioni** sulla scheda SD: livello limitazioni, impostazioni personalizzate, modalità VR, sistema di classificazione, limiti giornalieri, l'avviso "Tempo scaduto" (con le azioni avanzate attive), e il blocco grezzo del timer per memoria — mai il PIN. Un ripristino elenca solo ciò che cambierebbe (niente da cambiare: lo dice e basta, senza sblocco e senza scrivere nulla), e segnala quando il backup aveva Sogni d'oro attivo (non viene riscritto). Scegli quanti backup conservare.
 
 ## Preferenze
 
-*[Provalo nel simulatore ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=preferences)*
+*[Provalo nel simulatore ›](https://playguard.link/simulator/?tab=preferences)*
 
 - Ciò che configura PlayGuard stesso:
   - Lingua (tutte le lingue della console, o quella della console), tema (chiaro / scuro), dimensione del testo (automatica / normale / più grande, subito); gli altri con la proposta di riavviare.
@@ -163,7 +163,7 @@ A sinistra della campanella, la lingua (il suo codice, *FR*, *EN*…) e il tema 
 
 ## Informazioni
 
-*[Provalo nel simulatore ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=about)*
+*[Provalo nel simulatore ›](https://playguard.link/simulator/?tab=about)*
 
 - Il PlayGuard installato: versione (in ambra quando ne è uscita una più recente; Ⓐ apre le sue **note di rilascio**), modalità di avvio e cartella dei dati; **cerca aggiornamenti** ora; *Cerca aggiornamenti ogni giorno* all'avvio, e *Aggiorna con*: in PlayGuard, che scarica la versione, la verifica, si sostituisce e si riavvia, oppure sphaira, Homebrew App Store o manualmente (chiesto al primo aggiornamento se non è stato scelto nulla). Finché è nota una versione più recente, PlayGuard si apre su **PlayGuard X.Y.Z è disponibile** (la sua data e le sue note): *Aggiorna*, o *Più tardi* per 1 giorno, 1 settimana o al massimo 30 giorni; le note di rilascio sono quelle di PlayGuard, sulla stessa schermata di quelle di Atmosphère e hekate in *Console*: dalle sue release su GitHub, una scheda per versione (quella installata, le più recenti, le più vecchie), ognuna con i suoi punti salienti come schede e tutte le modifiche, conservate sulla scheda SD per la lettura offline (quelle della versione installata sono anche nell'app, per quando non è stato ancora recuperato nulla). Dopo un aggiornamento, PlayGuard si apre una volta su **Novità della X.Y.Z** (gli stessi punti salienti, poi i codici QR).
 - **Aiuto e diagnostica ›**, una schermata a parte, sotto *Aggiorna con*:
