@@ -1,0 +1,140 @@
+#!/usr/bin/env python3
+"""The website's layout on a phone, a tablet and a desktop (site/README.md).
+
+Serves a built site (tools/build_site.py <out-dir>) and opens its pages in
+headless Chromium (Playwright), failing when one:
+
+- is wider than the screen (a long word, a table, a header that does not
+  fit): the page scrolls sideways;
+- throws (site.js);
+- has a field under 16px on a phone (iOS zooms into it when it is touched).
+
+Every page on an iPhone (402x874); the pages most likely to be too wide (the
+home page, the documentation's widest, the changelog) in each language also
+on a small phone (320), a phone in landscape (874x402), a tablet (1024) and
+a desktop (1440). The images and the video are not loaded: their boxes are
+in the pages (width, height), and the check takes seconds, not minutes.
+
+Usage: tools/site_layout.py <site-dir>   (needs Playwright for Python with
+Chromium; SITE_LAYOUT_JOBS pages at once, 6 by default)
+"""
+import asyncio
+import functools
+import http.server
+import os
+import sys
+import threading
+
+from playwright.async_api import async_playwright
+
+SITE = sys.argv[1]
+JOBS = int(os.environ.get("SITE_LAYOUT_JOBS", "6"))
+
+# (name, width, height, a phone): the screens.
+PHONE = ("iPhone", 402, 874, True)
+OTHERS = [("small phone", 320, 640, True), ("phone in landscape", 874, 402, True),
+          ("tablet", 1024, 768, False), ("desktop", 1440, 900, False)]
+# The pages every screen sees, under each language's folder.
+WIDEST = ["", "docs/config/", "docs/parental-controls/", "docs/features/", "changelog/"]
+
+# What a page reports: how wide it is, what is wider than the screen (its
+# width: on a phone, the page's viewport widens to the page), the fields
+# under 16px.
+MEASURE = """(screen) => {
+  const out = { width: document.documentElement.scrollWidth, wide: [], small: [] };
+  if (out.width > screen + 1) {
+    // The widest elements not inside something that scrolls on its own.
+    for (const e of document.querySelectorAll('body *')) {
+      if (e.getBoundingClientRect().right <= screen + 1) continue;
+      let a = e.parentElement, clipped = false;
+      for (; a && a !== document.body; a = a.parentElement) {
+        if (getComputedStyle(a).overflowX !== 'visible') { clipped = true; break; }
+      }
+      if (!clipped) out.wide.push(`${e.tagName.toLowerCase()}${e.className ? '.' + String(e.className).trim().split(/\\s+/).join('.') : ''}`
+                                  + ` "${(e.textContent || '').trim().slice(0, 40)}"`);
+      if (out.wide.length >= 3) break;
+    }
+  }
+  for (const e of document.querySelectorAll('input, select, textarea')) {
+    if (e.type === 'checkbox' || e.type === 'radio' || e.type === 'hidden') continue;
+    if (parseFloat(getComputedStyle(e).fontSize) < 16) out.small.push(e.id || e.name || e.tagName.toLowerCase());
+  }
+  return out;
+}"""
+
+
+def pages():
+    """Each language's folder ('' for English) and its pages, from the built site."""
+    folders = [""] + sorted(d + "/" for d in os.listdir(SITE)
+                            if os.path.isfile(os.path.join(SITE, d, "index.html")) and d not in ("simulator", "changelog", "docs"))
+    every = []
+    for root, dirs, files in os.walk(SITE):
+        dirs[:] = [d for d in dirs if d not in ("simulator", "assets")]
+        if "index.html" in files:
+            every.append(os.path.relpath(root, SITE).replace(os.sep, "/").removeprefix(".") + "/")
+    every = sorted(p.lstrip("/") for p in every)
+    widest = [f + p for f in folders for p in WIDEST if os.path.isfile(os.path.join(SITE, f + p, "index.html"))]
+    return every, widest
+
+
+class Quiet(http.server.SimpleHTTPRequestHandler):
+    def log_message(self, *args):
+        pass
+
+
+def serve():
+    handler = functools.partial(Quiet, directory=SITE)
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    return f"http://127.0.0.1:{server.server_address[1]}/"
+
+
+async def check(browser, base, screen, paths, failures):
+    name, width, height, phone = screen
+    context = await browser.new_context(viewport={"width": width, "height": height},
+                                        is_mobile=phone, has_touch=phone)
+    # No images nor video: their boxes are in the pages.
+    await context.route("**/*.{png,webp,jpg,jpeg,gif,mp4}", lambda route: route.abort())
+    queue = list(paths)
+
+    async def worker():
+        page = await context.new_page()
+        errors = []
+        page.on("pageerror", lambda e: errors.append(str(e)))
+        while queue:
+            path = queue.pop()
+            errors.clear()
+            await page.goto(base + path, wait_until="load")
+            m = await page.evaluate(MEASURE, width)
+            where = f"{name} ({width}px) /{path}"
+            if m["width"] > width + 1:
+                failures.append(f"{where}: {m['width']}px wide: " + ", ".join(m["wide"]))
+            if phone and m["small"]:
+                failures.append(f"{where}: fields under 16px (iOS zooms into them): {', '.join(m['small'])}")
+            for e in errors:
+                failures.append(f"{where}: {e}")
+
+    await asyncio.gather(*(worker() for _ in range(min(JOBS, len(paths)))))
+    await context.close()
+    return len(paths)
+
+
+async def main():
+    every, widest = pages()
+    base = serve()
+    failures = []
+    async with async_playwright() as p:
+        browser = await p.chromium.launch()
+        count = await check(browser, base, PHONE, every, failures)
+        for screen in OTHERS:
+            count += await check(browser, base, screen, widest, failures)
+        await browser.close()
+    for f in failures:
+        print(f"::error::{f}" if os.environ.get("GITHUB_ACTIONS") else f)
+    print(f"site layout: {count} pages checked ({len(every)} on an iPhone, {len(widest)} on each of {len(OTHERS)} other screens), "
+          f"{len(failures)} problem(s)")
+    return 1 if failures else 0
+
+
+if __name__ == "__main__":
+    sys.exit(asyncio.run(main()))

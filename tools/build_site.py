@@ -385,6 +385,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#111d31" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="{to_root}assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{to_root}assets/apple-touch-icon.png">
   <link rel="sitemap" type="application/xml" href="{SITE_URL}sitemap.xml">
   <link rel="alternate" type="application/atom+xml" title="PlayGuard releases" href="{SITE_URL}releases.atom">
 {"".join(json_ld(d) for d in structured)}  <script src="{to_root}assets/theme.js"></script>
@@ -489,6 +490,7 @@ def home_body(t, lang, to_root):
         </div>
         <p class="source"><a href="{REPO_URL}/releases/latest">{t('download')}</a>
           · <time class="release-date" datetime="{date}">{date}</time></p>
+        <p class="source"><a href="{home}docs/troubleshooting/#{locked_out_anchor(lang)}">{t('locked_out_link')}</a></p>
       </div>
       <div class="hero-video">
         <video src="{to_root}assets/{tour_video(lang)}" muted loop playsinline preload="none"
@@ -576,6 +578,30 @@ def home_body(t, lang, to_root):
 """
 
 
+def firmware(macro):
+    """A firmware version of source/core/sysinfo.h ('21.0.0'), as tools/gen_compat.py reads it."""
+    with open(os.path.join(ROOT, "source", "core", "sysinfo.h"), encoding="utf-8") as f:
+        m = re.search(rf"#define {macro}\s+MAKEHOSVERSION\((\d+),\s*(\d+),\s*(\d+)\)", f.read())
+    if not m:
+        raise SystemExit(f"site: {macro} not found in source/core/sysinfo.h")
+    return ".".join(m.groups())
+
+
+def compat_check(t):
+    """The compatibility page's check: a firmware typed, what PlayGuard does
+    on it (site.js), from the app's own limits so that it never disagrees."""
+    low, high = firmware("PCTL_FW_MIN_PLAYTIMER"), firmware("PCTL_FW_TESTED_MAX")
+    def text(key):
+        return t(key).replace("{{min}}", low).replace("{{max}}", high)
+    return (f'<div class="compat-check" hidden data-min="{low}" data-max="{high}" data-full="{text("compat_full")}"'
+            f' data-no-timer="{text("compat_no_timer")}" data-newer="{text("compat_newer")}"'
+            f' data-invalid="{text("compat_invalid")}">'
+            f'<p><strong>{t("compat_check")}</strong></p>'
+            f'<label for="compat-fw">{t("compat_field")}</label>'
+            f'<input id="compat-fw" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="{high}">'
+            f'<p class="compat-result" aria-live="polite"></p></div>\n')
+
+
 def mark(t, yes):
     """A cell of the comparison: a tick or a cross, its word for a screen reader."""
     return (f'<td class="{"yes" if yes else "no"}"><span aria-hidden="true">{"✓" if yes else "✕"}</span>'
@@ -642,6 +668,8 @@ def doc_body(t, lang, to_root, page_name, assets):
         if start >= 0 and not re.sub(r"<!--.*?-->", "", body[:start], flags=re.S).strip():
             end = body.find("</p>", start) + len("</p>")
             end += body[end:end + 1] == "\n"
+        if page_name == "compatibility":
+            folded = compat_check(t) + folded
         shown = body[:end] + folded + body[end:]
     # A link to each section, to share it.
     shown = re.sub(r'<(h[23]) id="([^"]+)">(.*?)</h[23]>',
@@ -664,7 +692,7 @@ def doc_body(t, lang, to_root, page_name, assets):
 {docs_search(t, lang, to_root)}
 {docs_list(t, lang, to_root, page_name)}
       </nav>
-      <article class="prose">
+      <article class="prose" data-copy="{t('copy')}" data-copied="{t('copied')}">
         <h1>{html.escape(title)}</h1>
 {note}{shown}
         <nav class="pager" aria-label="{t('docs_title')}">{pager}</nav>
@@ -982,6 +1010,8 @@ def main():
     shutil.copytree(os.path.join(ROOT, "site", "assets"), os.path.join(out, "assets"), dirs_exist_ok=True)
     for name in ("icon.svg", "mark.svg"):
         shutil.copy(os.path.join(ROOT, "branding", name), os.path.join(out, "assets", name))
+    # An iPhone's home screen takes a PNG, not the SVG (tools/render_branding.mjs).
+    shutil.copy(os.path.join(ROOT, "images", "apple-touch-icon.png"), os.path.join(out, "assets", "apple-touch-icon.png"))
     for path in sorted(assets):
         os.makedirs(os.path.dirname(os.path.join(out, "assets", path)), exist_ok=True)
         if path.startswith("images/screenshots/") and path.count("/") == 3:
