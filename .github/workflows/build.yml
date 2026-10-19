@@ -228,7 +228,7 @@ jobs:
           - shard: games
             scenarios: games
           - shard: states
-            scenarios: gate errors rescue forged lock loading alarm cadranstates cadranunlocked
+            scenarios: gate errors rescue forged lock loading alarm cadranstates cadranunlocked cadranlarge
           - shard: developer
             scenarios: devbuild update library rollback
           - shard: outside
