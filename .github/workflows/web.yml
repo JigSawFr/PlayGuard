@@ -10,15 +10,25 @@ on:
   push:
     branches: [ main ]
   pull_request:
+  # By hand (Actions › web › Run workflow): `all` builds the simulator, takes
+  # every screenshot and renders every tour again, whatever changed.
   workflow_dispatch:
+    inputs:
+      screens:
+        description: "auto (what changed, a release) or all (everything again)"
+        type: choice
+        options: [ auto, all ]
+        default: auto
 
 permissions:
   contents: read
 
 # A new push to a pull request cancels the build of the commit it replaces.
+# main's builds run one at a time, in order: each starts from the last one's
+# site (below), a release's screenshots too.
 concurrency:
-  group: web-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
-  cancel-in-progress: true
+  group: web-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   # Emscripten, pinned: a new one is a pull request of its own (its ports, its
@@ -34,22 +44,79 @@ env:
 jobs:
   build:
     runs-on: ubuntu-26.04
-    # main takes every screenshot in both themes and renders the tours (below): longer.
-    timeout-minutes: ${{ github.event_name == 'push' && 120 || 60 }}
+    # Taking every screenshot in both themes and rendering the tours (a
+    # release, or by hand): up to an hour and a half.
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 30 || 120 }}
     permissions:
       contents: read
-      pages: read   # the site's address (its custom domain)
+      pages: read     # the site's address (its custom domain)
+      actions: read   # main's last site, to take what did not change from it
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: true
+      # What this build makes, and what it takes from main's last one (its
+      # `site` artifact): a few minutes for most changes, the long work only
+      # where it is needed.
+      # - The simulator (Emscripten, then its smoke test in Chromium, about
+      #   ten minutes): built when what it is made of changed since the commit
+      #   main's last site was built from: the app, its resources, the
+      #   simulator, this workflow.
+      #   Otherwise main's, its smoke test's screens with it.
+      # - The website's screenshots (both themes, every language, about an
+      #   hour) and the tours and preview images made from them: taken on main
+      #   for a release (its version changed: the header's badge) and by hand
+      #   (`all`); otherwise main's published ones, in seconds.
+      # The website itself is built every time (seconds).
+      - name: What to build
+        env:
+          FORCE: ${{ inputs.screens == 'all' }}
+          IS_PR: ${{ github.event_name == 'pull_request' }}
+          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Main's last site: a run of main's own (pushed or by hand) in this
+          # repository, never a fork's pull request from a branch it named main.
+          read -r run sha < <(gh api "repos/$REPO/actions/workflows/web.yml/runs?branch=main&status=success&per_page=20" \
+            --jq "([.workflow_runs[] | select((.event == \"push\" or .event == \"workflow_dispatch\") and .head_repository.full_name == \"$REPO\")][0] // empty) | \"\(.id) \(.head_sha)\"" 2>/dev/null || true)
+          if [ -n "$run" ] && gh run download "$run" -R "$REPO" -n site -D main-site 2>/dev/null \
+              && git fetch -q --depth=1 origin "$sha" 2>/dev/null; then
+            # What changed since the commit it was built from.
+            changed=$(git diff --name-only "$sha" HEAD)
+            echo "Main's site: run $run, commit ${sha::7}; $(wc -l <<< "$changed") files changed since."
+          else
+            # None (an artifact lasts 30 days): the simulator built, the
+            # screenshots from the published site (below).
+            echo "::warning::No site of main's to start from."
+            changed=all-but-screens
+          fi
+          [ "$FORCE" = true ] && changed=all
+          simulator='^(source|resources|web|extern|patches)/|^(CMakeLists\.txt|Makefile|\.release-please-manifest\.json|\.github/workflows/web\.yml)$|^tools/web_'
+          build=0; screens=0
+          if [[ "$changed" == all* ]] || grep -qE "$simulator" <<< "$changed"; then build=1; fi
+          # A release: its version (the header's badge) changed, on main.
+          if [ "$changed" = all ] || { [ "$IS_PR" != true ] && grep -qx '\.release-please-manifest\.json' <<< "$changed"; }; then screens=1; fi
+          {
+            echo "BUILD_SIMULATOR=$build"
+            echo "TAKE_SCREENS=$screens"
+          } | tee -a "$GITHUB_ENV"
       # Emscripten's cache: its system libraries and ports (SDL2, zlib), built
       # for threads and exceptions on first use, which takes minutes.
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: env.BUILD_SIMULATOR == '1'
         with:
           path: ~/.emscripten_cache
           key: emscripten-${{ env.EMSDK_VERSION }}
+      # The compiler's own cache (ccache): the files a change leaves alone
+      # are not compiled again.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: env.BUILD_SIMULATOR == '1'
+        with:
+          path: ~/.cache/ccache
+          key: ccache-web-${{ env.EMSDK_VERSION }}-${{ github.sha }}
+          restore-keys: ccache-web-${{ env.EMSDK_VERSION }}-
       - name: Emscripten ${{ env.EMSDK_VERSION }}
+        if: env.BUILD_SIMULATOR == '1'
         run: |
           git clone --depth 1 --branch "$EMSDK_VERSION" https://github.com/emscripten-core/emsdk.git "$RUNNER_TEMP/emsdk"
           test "$(git -C "$RUNNER_TEMP/emsdk" rev-parse HEAD)" = "$EMSDK_COMMIT" \
@@ -60,8 +127,9 @@ jobs:
       # Noto Sans CJK with fontTools (tools/web_cjk_font.py); the website's
       # documentation is Markdown (tools/build_site.py).
       - name: Noto Sans CJK, fontTools and Python-Markdown
-        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends fonts-noto-cjk python3-fonttools python3-markdown imagemagick
+        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends fonts-noto-cjk python3-fonttools python3-markdown imagemagick ccache
       - name: The simulator
+        if: env.BUILD_SIMULATOR == '1'
         env:
           PLAYGUARD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
@@ -70,23 +138,34 @@ jobs:
           # emsdk's own folder and the cache above stayed empty.
           source "$RUNNER_TEMP/emsdk/emsdk_env.sh"
           export EM_CACHE="$HOME/.emscripten_cache"
-          make web JOBS="$(nproc)"
+          make web JOBS="$(nproc)" CMAKE_ARGS="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+          ccache --show-stats || true
           test -f build-web/simulator/cjk.otf || { echo "::error::no CJK font in the web build"; exit 1; }
       # The simulator in headless Chromium (tools/web_smoke.py): it must reach
       # its first screen in each kind of start, move the time on and take a
       # live setting without a restart, add the CJK font, keep its state with
       # keep=1. Its screens go with the site, for the pull request's comment
       # (pages.yml). Playwright, pinned, in a venv of its own.
-      # A few minutes when it works: one that hangs (a browser that stopped
-      # answering) fails here rather than at the job's timeout, its log
-      # unbuffered so that it says where.
+      # About a minute, its scenarios a few at once: one that hangs (a browser
+      # that stopped answering) is stopped and fails, rather than the job's
+      # timeout, its log unbuffered so that it says where.
       - name: The simulator in a browser
+        if: env.BUILD_SIMULATOR == '1'
         timeout-minutes: 15
         run: |
           python3 -m venv "$RUNNER_TEMP/playwright"
           "$RUNNER_TEMP/playwright/bin/pip" install -q "playwright==$PLAYWRIGHT_VERSION"
           "$RUNNER_TEMP/playwright/bin/python" -m playwright install --with-deps chromium
           "$RUNNER_TEMP/playwright/bin/python" -u tools/web_smoke.py build-web/simulator build-web/shots
+      # Main's simulator and its smoke test's screens, when this build does
+      # not make its own.
+      - name: Main's simulator
+        if: env.BUILD_SIMULATOR != '1'
+        run: |
+          mkdir -p build-web
+          cp -r main-site/simulator build-web/simulator
+          mv build-web/simulator/shots build-web/shots
+          rm -rf build-web/simulator/build.json build-web/shots/compare.json build-web/shots/visual_diff
       # The site's address, as GitHub Pages serves it: its custom domain when
       # it has one (Settings › Pages), else <owner>.github.io/<repo>/; a pull
       # request's preview in pr-<number>/. The pages' absolute links
@@ -112,59 +191,49 @@ jobs:
             echo "SITE_NOINDEX=${PR:+1}"
           } | tee -a "$GITHUB_ENV"
       # The website's screenshots, each screen in each language and in both
-      # themes (tools/site_screenshots.mjs): the simulator just built, in the
-      # Chromium the step above installed. A pull request that changes nothing
-      # the screens are made of (the app, its resources, the simulator, the
-      # version) takes main's published ones instead, in seconds; one that
-      # does takes the light theme's (about half an hour) and main's dark
-      # ones, which main takes again once merged. Then the preview image of
-      # each language (tools/site_social.mjs). Nothing of Playwright goes
-      # into the site.
-      - name: The screenshots in each language
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      # themes (tools/site_screenshots.mjs), from the simulator just built in
+      # the Chromium the step above installed; the preview image of each
+      # language (tools/site_social.mjs) and the home page's tour in each
+      # language but English (tools/render_tour.mjs) made from them. For a
+      # release, or by hand (above); otherwise main's, as published. Nothing
+      # of Playwright goes into the site.
+      - name: The screenshots, preview images and tours in each language
+        if: env.TAKE_SCREENS == '1'
         run: |
           npm install --no-save --no-package-lock --no-audit --no-fund "playwright@$PLAYWRIGHT_VERSION"
-          if [ -n "$BASE_SHA" ]; then
-            git fetch -q --depth=1 origin "$BASE_SHA"
-            screens='^(source|resources|web|extern|patches)/|^(CMakeLists\.txt|Makefile|\.release-please-manifest\.json|tools/site_screenshots\.mjs)$'
-            if ! git diff --name-only "$BASE_SHA" HEAD | grep -qE "$screens"; then
-              echo "Nothing the screens are made of changed: main's screenshots."
-              export SITE_SCREENSHOTS_FROM="$MAIN_SITE"
-            fi
-          fi
           npx playwright install chromium
+          sudo apt-get install -y -q --no-install-recommends ffmpeg
           version=$(python3 -c 'import json; print(json.load(open(".release-please-manifest.json"))["."])')
-          if [ -n "$BASE_SHA" ] && [ -z "${SITE_SCREENSHOTS_FROM:-}" ]; then
-            SITE_SCREENSHOT_THEMES=light SITE_SCREENSHOT_JOBS="$(nproc)" node tools/site_screenshots.mjs build-web/simulator shots "$version"
-            SITE_SCREENSHOTS_FROM="$MAIN_SITE" SITE_SCREENSHOT_THEMES=dark node tools/site_screenshots.mjs build-web/simulator shots
-          else
-            SITE_SCREENSHOT_JOBS="$(nproc)" node tools/site_screenshots.mjs build-web/simulator shots "$version"
-          fi
+          SITE_SCREENSHOT_JOBS="$(nproc)" node tools/site_screenshots.mjs build-web/simulator shots "$version"
           node tools/site_social.mjs shots
-      # The home page's tour in each language but English (branding/tour.html
-      # over the language's screenshots, tools/render_tour.mjs): main renders
-      # them, a pull request takes main's (one missing there: the English tour).
-      - name: The tour in each language
-        env:
-          IS_PR: ${{ github.event_name == 'pull_request' }}
+          TOUR_JOBS="$(nproc)" node tools/render_tour.mjs shots
+      - name: Main's screenshots, preview images and tours
+        if: env.TAKE_SCREENS != '1'
         run: |
-          if [ "$IS_PR" = true ]; then
-            for lang in fr fr-CA de es es-419 it nl pt pt-BR ru ja ko zh-Hans zh-Hant; do
-              curl -sfL -o "shots/$lang/tour.mp4" "${MAIN_SITE}assets/images/screenshots/$lang/tour.mp4" || rm -f "shots/$lang/tour.mp4"
-            done
+          mkdir -p shots
+          if [ -d main-site/assets/images/screenshots ]; then
+            cp -r main-site/assets/images/screenshots/. shots/
+            # build_site.py's own English images are in the repository.
+            find shots -maxdepth 1 -type f -delete
           else
-            sudo apt-get install -y -q --no-install-recommends ffmpeg
-            TOUR_JOBS="$(nproc)" node tools/render_tour.mjs shots
+            # No artifact of main's: the published site's screenshots and tours.
+            npm install --no-save --no-package-lock --no-audit --no-fund "playwright@$PLAYWRIGHT_VERSION"
+            SITE_SCREENSHOTS_FROM="$MAIN_SITE" node tools/site_screenshots.mjs build-web/simulator shots
+            for lang in fr fr-CA de es es-419 it nl pt pt-BR ru ja ko zh-Hans zh-Hant; do
+              [ -d "shots/$lang" ] || continue
+              for f in tour.mp4 social.png; do
+                curl -sfL -o "shots/$lang/$f" "${MAIN_SITE}assets/images/screenshots/$lang/$f" || rm -f "shots/$lang/$f"
+              done
+            done
           fi
-          ls shots/*/tour.mp4 2>/dev/null | wc -l | xargs -I{} echo "{} tours"
+          echo "$(find shots -type f | wc -l) files from main's site"
       # The screens against main's, published with its site: which ones this
       # pull request changes (tools/visual_check.py, the footer clock masked;
       # side by side in shots/visual_diff/), for its comment (pages.yml,
       # shots/compare.json) and the run's summary. A report, not a gate: a
       # change can be meant. A screen main does not have yet is left out.
       - name: The screens against main's
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && env.BUILD_SIMULATOR == '1'
         env:
           OWNER: ${{ github.repository_owner }}
           NAME: ${{ github.event.repository.name }}
