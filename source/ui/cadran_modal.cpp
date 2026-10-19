@@ -8,6 +8,7 @@
 #include <yoga/Yoga.h>
 
 #include "ui/cadran_kit.hpp"
+#include "ui/cadran_text.hpp"
 #include "ui/ui.hpp"
 #include "view/cadran_digits.hpp"
 #include "view/cadran_icon.hpp"
@@ -232,16 +233,7 @@ brls::Box* cadran::dialog_body(const std::string& text)
         if (table_of(paragraph, &rows)) {
             // A week of lines: the days that change alike on one line
             // ("Monday – Friday  2 h → 0 min").
-            if (rows.size() >= 5) {
-                std::vector<std::pair<std::string, std::string>> runs;
-                for (size_t i = 0; i < rows.size();) {
-                    size_t j = i;
-                    while (j + 1 < rows.size() && rows[j + 1].second == rows[i].second) j++;
-                    runs.push_back({ j > i ? rows[i].first + " \u2013 " + rows[j].first : rows[i].first, rows[i].second });
-                    i = j + 1;
-                }
-                rows = std::move(runs);
-            }
+            rows = cadran_text::group_rows(rows);
             auto* table = new brls::Box(brls::Axis::COLUMN);
             table->setAlignItems(brls::AlignItems::STRETCH);
             table->setBackgroundColor(theme["cadran/surf2"]);

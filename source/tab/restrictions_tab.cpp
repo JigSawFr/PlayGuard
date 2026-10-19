@@ -7,6 +7,7 @@
 #include "app.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/cadran_kit.hpp"
+#include "ui/cadran_text.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -348,14 +349,7 @@ namespace
 void line(brls::Label* name, brls::Label* state, CadranIcon* icon, const std::string& text, bool known,
           bool restricts, bool words)
 {
-    std::string what = text, how;
-    for (const char* sep : { " \u00B7 ", "\u30FB" }) {
-        const size_t at = text.rfind(sep);
-        if (at == std::string::npos) continue;
-        what = text.substr(0, at);
-        how = text.substr(at + std::string(sep).size());
-        break;
-    }
+    const auto [what, how] = cadran_text::split_state(text);
     name->setText(what);
     state->setText(!known || words ? how : "");
     ui::set_visible(state, !state->getFullText().empty());
