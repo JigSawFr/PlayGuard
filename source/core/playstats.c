@@ -281,7 +281,13 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
             // start of the last 7 (each game's week_s is then that week's).
             size_t prev = playlog_fold_days(events, event_count, day_starts[6], day_starts + 7, totals, PLAYSTATS_MAX + 1);
             u64 prev_s = 0;
-            for (size_t i = 0; i < prev; i++) prev_s += totals[i].week_s;
+            for (size_t i = 0; i < prev; i++) {
+                prev_s += totals[i].week_s;
+                // Each game of the last 7 days its own (Activity's cards); a
+                // game played only the week before is not added for it.
+                for (u32 k = 0; k < out->count; k++)
+                    if (out->games[k].app_id == totals[i].app_id) out->games[k].prev_week_s = totals[i].week_s;
+            }
             out->prev_week_s  = (u32)(prev_s > 0xFFFFFFFFu ? 0xFFFFFFFFu : prev_s);
             out->prev_week_ok = !playstats_cancelled();
         }

@@ -1487,7 +1487,10 @@
         "week_top": "Il più giocato: {} ({}).",
         "over_limit": "Il limite è stato superato in {} degli ultimi 7 giorni",
         "over_limit_detail": "Quando il tempo è scaduto, la console avvisa soltanto: si continua a giocare oltre il limite (Tempo di gioco › Quando il tempo è scaduto).",
-        "clock_detail_dns": "Il DNS di Atmosphère blocca il server orario di Nintendo, quindi la console non può regolarlo da sola: regolalo da un server orario."
+        "clock_detail_dns": "Il DNS di Atmosphère blocca il server orario di Nintendo, quindi la console non può regolarlo da sola: regolalo da un server orario.",
+        "week_more": "{} in più al giorno rispetto alla settimana prima.",
+        "week_less": "{} in meno al giorno rispetto alla settimana prima.",
+        "week_same": "Più o meno come la settimana prima."
     },
     "cadran": {
         "date": "{1} {2} {3}",
@@ -1622,9 +1625,10 @@
             "card_total": "oggi · {} in tutto",
             "empty_note": "I giochi usati su questa console compaiono qui, account per account.",
             "see_all": "Vedi da sempre",
-            "trend_up": "{} in più al giorno rispetto alla settimana prima",
-            "trend_down": "{} in meno al giorno rispetto alla settimana prima",
-            "trend_same": "come la settimana prima"
+            "trend_up": "+{}/giorno vs settimana prima",
+            "trend_down": "-{}/giorno vs settimana prima",
+            "trend_same": "come la settimana prima",
+            "card_grew": "+{} vs settimana prima"
         },
         "restrictions": {
             "choose": "Scegli questo livello",

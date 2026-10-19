@@ -1487,7 +1487,10 @@
         "week_top": "玩得最多：{}（{}）。",
         "over_limit": "最近 7 天中有 {} 天超过了限制",
         "over_limit_detail": "时间到时主机只会提醒：超过限制后仍可继续游玩（游戏时间 › 时间到时）。",
-        "clock_detail_dns": "Atmosphère 的 DNS 拦截了任天堂的时间服务器，主机无法自行校准：请通过时间服务器校准。"
+        "clock_detail_dns": "Atmosphère 的 DNS 拦截了任天堂的时间服务器，主机无法自行校准：请通过时间服务器校准。",
+        "week_more": "比上周每天多 {}。",
+        "week_less": "比上周每天少 {}。",
+        "week_same": "与上周大致相当。"
     },
     "cadran": {
         "date": "{3}{2}日 {0}",
@@ -1622,9 +1625,10 @@
             "card_total": "今天 · 共 {}",
             "empty_note": "在这台主机上玩过的游戏会按账号显示在这里。",
             "see_all": "查看累计",
-            "trend_up": "比上周每天多 {}",
-            "trend_down": "比上周每天少 {}",
-            "trend_same": "与上周相当"
+            "trend_up": "比上周每天 +{}",
+            "trend_down": "比上周每天 -{}",
+            "trend_same": "与上周相当",
+            "card_grew": "比上周 +{}"
         },
         "restrictions": {
             "choose": "选择此级别",

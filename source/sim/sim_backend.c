@@ -645,15 +645,15 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
     // Made-up games; one was deleted since (no name, no totals), the last one is
     // little played and left aside for months.
     static const struct {
-        u64 id; const char *name; u32 total_min, launches, today_min, week_min, days_ago;
+        u64 id; const char *name; u32 total_min, launches, today_min, week_min, days_ago, prev_week_min;
     } games[] = {
-        { 0x0100A1B2C3D40000ULL, "Star Kart Racers",      3650, 300, 45, 310, 0 },
-        { 0x0100A1B2C3D41000ULL, "Island Builders",       2980, 160, 20, 140, 0 },
-        { 0x0100A1B2C3D42000ULL, "Pixel Quest Deluxe",    1210,  45,  0,  95, 2 },
-        { 0x0100A1B2C3D43000ULL, "Dragon Valley Legends", 6100, 120,  0,   0, 12 },
-        { 0x0100A1B2C3D44000ULL, "Puzzle Garden",          380,  52,  0,  30, 5 },
-        { 0x0100A1B2C3D45000ULL, "",                          0,   0, 15,  15, 0 },
-        { 0x0100A1B2C3D46000ULL, "Space Farm Tales",        95,   4,  0,   0, 75 },
+        { 0x0100A1B2C3D40000ULL, "Star Kart Racers",      3650, 300, 45, 310, 0, 190 },
+        { 0x0100A1B2C3D41000ULL, "Island Builders",       2980, 160, 20, 140, 0, 160 },
+        { 0x0100A1B2C3D42000ULL, "Pixel Quest Deluxe",    1210,  45,  0,  95, 2,  95 },
+        { 0x0100A1B2C3D43000ULL, "Dragon Valley Legends", 6100, 120,  0,   0, 12,  0 },
+        { 0x0100A1B2C3D44000ULL, "Puzzle Garden",          380,  52,  0,  30, 5,  35 },
+        { 0x0100A1B2C3D45000ULL, "",                          0,   0, 15,  15, 0,  0 },
+        { 0x0100A1B2C3D46000ULL, "Space Farm Tales",        95,   4,  0,   0, 75,  0 },
     };
     const bool idle_weeks = getenv("PLAYGUARD_SIM_NO_PLAY") != NULL;
     out->windows_ok = true;
@@ -686,11 +686,12 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         g->launches = (u32)share(g->launches, account);
         g->today_s  = (u32)share(g->today_s, account);
         g->week_s   = (u32)share(g->week_s, account);
+        g->prev_week_s = idle_weeks ? 0 : (u32)share((u64)games[i].prev_week_min * 60, account);
         for (int k = 0; k < 7; k++) g->day_s[k] = (u32)share(g->day_s[k], account);
         if (account && !g->week_s && !g->total_s) out->count--;
     }
-    // The week before: 8 h in all (the last 7 days have 9 h 50), none after
-    // weeks without play.
+    // The week before: 8 h in all (the last 7 days have 9 h 50; Star Kart
+    // Racers 2 h more), none after weeks without play.
     out->prev_week_ok = true;
     out->prev_week_s = idle_weeks ? 0 : (u32)share(480ULL * 60, account);
     // A large library: filler games, each played a little this week.

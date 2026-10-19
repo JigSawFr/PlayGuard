@@ -1487,7 +1487,10 @@
         "week_top": "Most played: {} ({}).",
         "over_limit": "The limit was passed on {} of the last 7 days",
         "over_limit_detail": "When the time is up, the console only warns: play goes on past the limit (Play timer › When the time is up).",
-        "clock_detail_dns": "Atmosphère's DNS blocks Nintendo's time server, so the console cannot set it itself: set it from a time server."
+        "clock_detail_dns": "Atmosphère's DNS blocks Nintendo's time server, so the console cannot set it itself: set it from a time server.",
+        "week_more": "{} a day more than the week before.",
+        "week_less": "{} a day less than the week before.",
+        "week_same": "About the same as the week before."
     },
     "cadran": {
         "date": "{0}, {3} {2}",
@@ -1622,9 +1625,10 @@
             "card_total": "today · {} in all",
             "empty_note": "Games played on this console show up here, account by account.",
             "see_all": "See all time",
-            "trend_up": "{} a day more than the week before",
-            "trend_down": "{} a day less than the week before",
-            "trend_same": "about the same as the week before"
+            "trend_up": "+{}/day vs last week",
+            "trend_down": "-{}/day vs last week",
+            "trend_same": "same as last week",
+            "card_grew": "+{} vs last week"
         },
         "restrictions": {
             "choose": "Choose this level",

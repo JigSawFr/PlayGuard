@@ -64,6 +64,22 @@ static void test_periods()
     CHECK(all.days_played == -1 && all.busiest == -1);
 }
 
+static void test_week_trend()
+{
+    auto s = sample();   // 150 min over the last 7 days
+    int64_t d = 99;
+    CHECK(!week_trend_min(*s, d) && d == 99);           // the week before not read
+    s->prev_week_ok = true;
+    s->prev_week_s = 10 * 60;                           // 140 min more: 20 a day
+    CHECK(week_trend_min(*s, d) && d == 20);
+    s->prev_week_s = 290 * 60;                          // 140 min fewer
+    CHECK(week_trend_min(*s, d) && d == -20);
+    s->prev_week_s = 150 * 60;
+    CHECK(week_trend_min(*s, d) && d == 0);
+    s->windows_ok = false;                              // the last 7 days not read
+    CHECK(!week_trend_min(*s, d));
+}
+
 static void test_edges()
 {
     // A tie: the one played last first, as the list.
@@ -262,6 +278,7 @@ static void test_start_account()
 int main()
 {
     test_periods();
+    test_week_trend();
     test_edges();
     test_unattributed();
     test_sort();

@@ -20,6 +20,7 @@ namespace
 constexpr size_t CARDS = 4;
 constexpr float  WEEK_BAR_MAX = 56.0f;
 constexpr float  SPARK_MAX = 40.0f;
+constexpr long   GREW_MIN = 30;    // a game card says "+1 h vs last week" from half an hour more
 // The accounts' avatars, in turn (no picture of theirs is read).
 const NVGcolor AVATARS[] = { nvgRGB(0x7C, 0x6C, 0xF2), nvgRGB(0xFF, 0xB5, 0x47), nvgRGB(0x4F, 0xA3, 0xFF), nvgRGB(0xE9, 0x6A, 0xA8) };
 
@@ -100,6 +101,11 @@ CadranActivityTab::CadranActivityTab()
         c.rest->setWidth(0);
         line->addView(c.rest);
         text->addView(line);
+        c.grew = kit::label("", 15, "cadran/amber");
+        c.grew->setSingleLine(true);
+        c.grew->setMarginTop(2);
+        c.grew->setVisibility(brls::Visibility::GONE);
+        text->addView(c.grew);
         c.box->addView(text);
         auto* spark = new brls::Box(brls::Axis::ROW);
         spark->setAlignItems(brls::AlignItems::FLEX_END);
@@ -297,15 +303,16 @@ void CadranActivityTab::show_hero()
                           : "");
     // Against the 7 days before, per day: more (amber), less (teal) or about
     // the same (under 5 minutes either way).
-    const bool trend = s.windows_ok && s.prev_week_ok;
+    int64_t diff = 0;
+    const bool trend = activity_summary::week_trend_min(s, diff);
     if (trend) {
-        const int64_t diff = ((int64_t)week.total_s - (int64_t)s.prev_week_s) / 7 / 60;
+        const int64_t same = activity_summary::TREND_SAME_MIN;
         brls::Theme theme = brls::Application::getTheme();
         const uint16_t amount = (uint16_t)std::min<int64_t>(24 * 60, diff < 0 ? -diff : diff);
-        ui::set_text(week_trend, diff >= 5    ? brls::getStr("playguard/cadran/activity/trend_up", ui::fmt_minutes(amount))
-                                 : diff <= -5 ? brls::getStr("playguard/cadran/activity/trend_down", ui::fmt_minutes(amount))
-                                              : "playguard/cadran/activity/trend_same"_i18n);
-        week_trend->setTextColor(theme[diff >= 5 ? "cadran/amber" : diff <= -5 ? "cadran/teal" : "cadran/text3"]);
+        ui::set_text(week_trend, diff >= same    ? brls::getStr("playguard/cadran/activity/trend_up", ui::fmt_minutes(amount))
+                                 : diff <= -same ? brls::getStr("playguard/cadran/activity/trend_down", ui::fmt_minutes(amount))
+                                                 : "playguard/cadran/activity/trend_same"_i18n);
+        week_trend->setTextColor(theme[diff >= same ? "cadran/amber" : diff <= -same ? "cadran/teal" : "cadran/text3"]);
     }
     ui::set_visible(week_trend.getView(), trend);
     uint64_t day_total[7] = {};
@@ -334,12 +341,27 @@ void CadranActivityTab::show_hero()
     ui::set_visible(this->see_all, p != AllTime && all.known && all.total_s > 0);
     if (none) this->empty.title->setText(brls::getStr(fmt::format("playguard/activity/none/{}", p)));
     if (brls::View* status = this->getView("ac_status"); status && none) ui::set_visible(status, false);
+    // Over the last 7 days, the card of the game played most more than the
+    // week before says by how much (half an hour at least).
+    const GameStat* grew = nullptr;
+    long grew_s = GREW_MIN * 60 - 1;
+    if (p == Week && s.windows_ok && s.prev_week_ok)
+        for (size_t i = 0; i < games.size() && i < this->cards.size(); i++) {
+            const long d = (long)games[i]->week_s - (long)games[i]->prev_week_s;
+            if (d > grew_s) {
+                grew   = games[i];
+                grew_s = d;
+            }
+        }
     std::vector<u64> ids;
     for (size_t i = 0; i < this->cards.size(); i++) {
         Card& c = this->cards[i];
         const bool shown = i < games.size();
         ui::set_visible(c.box, shown);
         if (!shown) continue;
+        ui::set_visible(c.grew, games[i] == grew);
+        if (games[i] == grew)
+            ui::set_text(c.grew, brls::getStr("playguard/cadran/activity/card_grew", ui::fmt_play_time((u64)grew_s)));
         const GameStat& g = *games[i];
         c.app_id = g.app_id;
         ids.push_back(g.app_id);

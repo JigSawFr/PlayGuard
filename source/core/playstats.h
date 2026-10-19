@@ -33,6 +33,7 @@ typedef struct {
 
     u32  today_s, week_s;            // valid when PlayStats.windows_ok
     u32  day_s[7];                   // same, per day: [0] today … [6] six days ago
+    u32  prev_week_s;                // the 7 days before those, when PlayStats.prev_week_ok
 } GameStat;
 
 typedef struct {

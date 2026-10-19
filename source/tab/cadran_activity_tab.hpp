@@ -37,6 +37,7 @@ class CadranActivityTab : public ActivityTab
         brls::Label*  name   = nullptr;
         CadranDigits* today  = nullptr;
         brls::Label*  rest   = nullptr;
+        brls::Label*  grew   = nullptr;   // the game played most more than the week before
         brls::Box*    bars[7] = {};
     };
     cadran::List list;

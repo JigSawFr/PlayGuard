@@ -1487,7 +1487,10 @@
         "week_top": "玩得最多：{}（{}）。",
         "over_limit": "最近 7 天中有 {} 天超過了限制",
         "over_limit_detail": "時間到時主機只會提醒：超過限制後仍可繼續遊玩（遊戲時間 › 時間到時）。",
-        "clock_detail_dns": "Atmosphère 的 DNS 封鎖了任天堂的時間伺服器，主機無法自行校準：請透過時間伺服器校準。"
+        "clock_detail_dns": "Atmosphère 的 DNS 封鎖了任天堂的時間伺服器，主機無法自行校準：請透過時間伺服器校準。",
+        "week_more": "比上週每天多 {}。",
+        "week_less": "比上週每天少 {}。",
+        "week_same": "與上週大致相當。"
     },
     "cadran": {
         "date": "{3}{2}日 {0}",
@@ -1622,9 +1625,10 @@
             "card_total": "今天 · 共 {}",
             "empty_note": "在這台主機上玩過的遊戲會依帳號顯示在此處。",
             "see_all": "查看全部期間",
-            "trend_up": "比上週每天多 {}",
-            "trend_down": "比上週每天少 {}",
-            "trend_same": "與上週相當"
+            "trend_up": "比上週每天 +{}",
+            "trend_down": "比上週每天 -{}",
+            "trend_same": "與上週相當",
+            "card_grew": "比上週 +{}"
         },
         "restrictions": {
             "choose": "選擇此級別",

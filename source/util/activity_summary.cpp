@@ -64,6 +64,14 @@ Summary summarize(const PlayStats& s, int period)
     return out;
 }
 
+bool week_trend_min(const PlayStats& s, int64_t& per_day_min)
+{
+    const Summary week = summarize(s, Week);
+    if (!week.known || !s.prev_week_ok) return false;
+    per_day_min = ((int64_t)week.total_s - (int64_t)s.prev_week_s) / 7 / 60;
+    return true;
+}
+
 uint64_t unattributed_s(uint64_t total_s, const AccountPlay* accounts, size_t count)
 {
     uint64_t gap = total_s;

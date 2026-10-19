@@ -44,6 +44,12 @@ struct Summary
 
 Summary summarize(const PlayStats& stats, int period);
 
+// The last 7 days against the 7 before, in minutes a day (fewer: negative),
+// in `per_day_min`; false when either week was not read (or the days moved
+// on since). Within TREND_SAME_MIN either way, it is about the same.
+constexpr int64_t TREND_SAME_MIN = 5;
+bool week_trend_min(const PlayStats& stats, int64_t& per_day_min);
+
 // A game's all-time play time that no user account holds (`total_s` is the
 // game's, every account): played without choosing an account (some games
 // never ask) or by an account deleted since. Never negative: several accounts

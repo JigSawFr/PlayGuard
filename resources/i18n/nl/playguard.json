@@ -1487,7 +1487,10 @@
         "week_top": "Meest gespeeld: {} ({}).",
         "over_limit": "De limiet is overschreden op {} van de afgelopen 7 dagen",
         "over_limit_detail": "Als de tijd om is, waarschuwt de console alleen: er wordt verder gespeeld na de limiet (Speeltijd › Als de tijd om is).",
-        "clock_detail_dns": "De DNS van Atmosphère blokkeert de tijdserver van Nintendo, dus de console kan hem niet zelf instellen: stel hem in via een tijdserver."
+        "clock_detail_dns": "De DNS van Atmosphère blokkeert de tijdserver van Nintendo, dus de console kan hem niet zelf instellen: stel hem in via een tijdserver.",
+        "week_more": "{} per dag meer dan de week ervoor.",
+        "week_less": "{} per dag minder dan de week ervoor.",
+        "week_same": "Ongeveer als de week ervoor."
     },
     "cadran": {
         "date": "{1} {2} {3}",
@@ -1622,9 +1625,10 @@
             "card_total": "vandaag · {} in totaal",
             "empty_note": "Games die op deze console gespeeld worden, verschijnen hier, per account.",
             "see_all": "Totaal bekijken",
-            "trend_up": "{} per dag meer dan de week ervoor",
-            "trend_down": "{} per dag minder dan de week ervoor",
-            "trend_same": "ongeveer als de week ervoor"
+            "trend_up": "+{}/dag t.o.v. vorige week",
+            "trend_down": "-{}/dag t.o.v. vorige week",
+            "trend_same": "zoals vorige week",
+            "card_grew": "+{} t.o.v. vorige week"
         },
         "restrictions": {
             "choose": "Dit niveau kiezen",
