@@ -10,7 +10,15 @@ on:
   push:
     branches: [ main ]
   pull_request:
+  # By hand (Actions › web › Run workflow): `all` takes every screenshot and
+  # renders every tour again, whatever changed.
   workflow_dispatch:
+    inputs:
+      screens:
+        description: "Screenshots and tours: auto (when what they show changed) or all"
+        type: choice
+        options: [ auto, all ]
+        default: auto
 
 permissions:
   contents: read
@@ -34,8 +42,9 @@ env:
 jobs:
   build:
     runs-on: ubuntu-26.04
-    # main takes every screenshot in both themes and renders the tours (below): longer.
-    timeout-minutes: ${{ github.event_name == 'push' && 120 || 60 }}
+    # Taking every screenshot in both themes and rendering the tours (below,
+    # main when the screens change, or by hand): longer.
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 60 || 120 }}
     permissions:
       contents: read
       pages: read   # the site's address (its custom domain)
@@ -112,50 +121,68 @@ jobs:
             echo "SITE_NOINDEX=${PR:+1}"
           } | tee -a "$GITHUB_ENV"
       # The website's screenshots, each screen in each language and in both
-      # themes (tools/site_screenshots.mjs): the simulator just built, in the
-      # Chromium the step above installed. A pull request that changes nothing
-      # the screens are made of (the app, its resources, the simulator, the
-      # version) takes main's published ones instead, in seconds; one that
-      # does takes the light theme's (about half an hour) and main's dark
-      # ones, which main takes again once merged. Then the preview image of
-      # each language (tools/site_social.mjs). Nothing of Playwright goes
-      # into the site.
+      # themes (tools/site_screenshots.mjs), and the home page's tour in each
+      # language but English (tools/render_tour.mjs, over them): the
+      # simulator just built, in the Chromium the step above installed. Taken
+      # only when what they show changed since the last build (a pull
+      # request's base, the commit main was at before this push): the app,
+      # its resources, the simulator, the version (its badge); the tours also
+      # when their page, their script or the site's texts change. Otherwise
+      # main's published ones, in seconds. A pull request takes the light
+      # theme only (about half an hour) and main's dark screenshots and tours,
+      # which main takes again once merged (up to an hour and a half). By
+      # hand, `all` takes everything. Then the preview image of each language
+      # (tools/site_social.mjs, seconds). Nothing of Playwright goes into the site.
+      - name: What the screenshots and tours need
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          FORCE: ${{ inputs.screens == 'all' }}
+          IS_PR: ${{ github.event_name == 'pull_request' }}
+        run: |
+          screens='^(source|resources|web|extern|patches)/|^(CMakeLists\.txt|Makefile|\.release-please-manifest\.json|tools/site_screenshots\.mjs)$'
+          tours='^(branding/tour\.html|tools/render_tour\.mjs|site/i18n/)'
+          if [ "$FORCE" = true ]; then
+            changed=all
+          elif [ -z "$BASE" ] || [ "$BASE" = 0000000000000000000000000000000000000000 ] \
+              || ! git fetch -q --depth=1 origin "$BASE" 2>/dev/null; then
+            changed=none   # by hand, or a base out of reach: what is published
+          else
+            changed=$(git diff --name-only "$BASE" HEAD)
+          fi
+          take=0; render=0
+          if [ "$changed" = all ] || grep -qE "$screens" <<< "$changed"; then take=1; render=1; fi
+          if grep -qE "$tours" <<< "$changed"; then render=1; fi
+          # A pull request's tours are main's: rendering them is for main.
+          [ "$IS_PR" = true ] && render=0
+          echo "TAKE_SCREENS=$take" >> "$GITHUB_ENV"
+          echo "RENDER_TOURS=$render" >> "$GITHUB_ENV"
+          echo "Screenshots: $([ $take = 1 ] && echo taken || echo "main's"). Tours: $([ $render = 1 ] && echo rendered || echo "main's")."
       - name: The screenshots in each language
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          IS_PR: ${{ github.event_name == 'pull_request' }}
         run: |
           npm install --no-save --no-package-lock --no-audit --no-fund "playwright@$PLAYWRIGHT_VERSION"
-          if [ -n "$BASE_SHA" ]; then
-            git fetch -q --depth=1 origin "$BASE_SHA"
-            screens='^(source|resources|web|extern|patches)/|^(CMakeLists\.txt|Makefile|\.release-please-manifest\.json|tools/site_screenshots\.mjs)$'
-            if ! git diff --name-only "$BASE_SHA" HEAD | grep -qE "$screens"; then
-              echo "Nothing the screens are made of changed: main's screenshots."
-              export SITE_SCREENSHOTS_FROM="$MAIN_SITE"
-            fi
-          fi
           npx playwright install chromium
           version=$(python3 -c 'import json; print(json.load(open(".release-please-manifest.json"))["."])')
-          if [ -n "$BASE_SHA" ] && [ -z "${SITE_SCREENSHOTS_FROM:-}" ]; then
+          if [ "$TAKE_SCREENS" != 1 ]; then
+            SITE_SCREENSHOTS_FROM="$MAIN_SITE" node tools/site_screenshots.mjs build-web/simulator shots
+          elif [ "$IS_PR" = true ]; then
             SITE_SCREENSHOT_THEMES=light SITE_SCREENSHOT_JOBS="$(nproc)" node tools/site_screenshots.mjs build-web/simulator shots "$version"
             SITE_SCREENSHOTS_FROM="$MAIN_SITE" SITE_SCREENSHOT_THEMES=dark node tools/site_screenshots.mjs build-web/simulator shots
           else
             SITE_SCREENSHOT_JOBS="$(nproc)" node tools/site_screenshots.mjs build-web/simulator shots "$version"
           fi
           node tools/site_social.mjs shots
-      # The home page's tour in each language but English (branding/tour.html
-      # over the language's screenshots, tools/render_tour.mjs): main renders
-      # them, a pull request takes main's (one missing there: the English tour).
       - name: The tour in each language
-        env:
-          IS_PR: ${{ github.event_name == 'pull_request' }}
         run: |
-          if [ "$IS_PR" = true ]; then
-            for lang in fr fr-CA de es es-419 it nl pt pt-BR ru ja ko zh-Hans zh-Hant; do
-              curl -sfL -o "shots/$lang/tour.mp4" "${MAIN_SITE}assets/images/screenshots/$lang/tour.mp4" || rm -f "shots/$lang/tour.mp4"
-            done
-          else
+          if [ "$RENDER_TOURS" = 1 ]; then
             sudo apt-get install -y -q --no-install-recommends ffmpeg
             TOUR_JOBS="$(nproc)" node tools/render_tour.mjs shots
+          else
+            for lang in fr fr-CA de es es-419 it nl pt pt-BR ru ja ko zh-Hans zh-Hant; do
+              [ -d "shots/$lang" ] || continue
+              curl -sfL -o "shots/$lang/tour.mp4" "${MAIN_SITE}assets/images/screenshots/$lang/tour.mp4" || rm -f "shots/$lang/tour.mp4"
+            done
           fi
           ls shots/*/tour.mp4 2>/dev/null | wc -l | xargs -I{} echo "{} tours"
       # The screens against main's, published with its site: which ones this

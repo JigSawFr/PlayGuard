@@ -70,12 +70,14 @@ pages; no framework, nothing to install but that.
   `<out-dir>/<language>/<screen>.webp`, on the desktop smoke test's console
   (8 October 2026, 16:00 UTC; the focus without its glow). `SITE_SCREENSHOTS=<out-dir>`
   tells `build_site.py` to use them, on the home page and in the
-  documentation. Taking them all takes about half an hour on a CI
-  runner: a pull request that changes nothing the screens are made of (the
-  app, its resources, the simulator, the version) downloads main's published
-  ones instead (`SITE_SCREENSHOTS_FROM=<site>`); one that does takes the
-  light theme's and main's dark ones (`SITE_SCREENSHOT_THEMES=light`, then
-  `dark` from main), main both. A new screen in the gallery is a name in both files: its
+  documentation. Taking them takes about half an hour per theme on a CI
+  runner, so CI takes them only when what they show changed since the last
+  build (a pull request's base, or the commit main was at before the push):
+  the app, its resources, the simulator, the version. Otherwise it downloads
+  main's published ones (`SITE_SCREENSHOTS_FROM=<site>`), in seconds. A pull
+  request that changes the screens takes the light theme's and main's dark
+  ones (`SITE_SCREENSHOT_THEMES=light`, then `dark` from main); main, both.
+  *Actions › web › Run workflow* with `all` takes everything again. A new screen in the gallery is a name in both files: its
   tab, and the keys that lead to it from there.
 - **The preview images**: `tools/site_social.mjs <out-dir>` (Node and
   Playwright) writes `<out-dir>/<language>/social.png` (1280×640) from the
@@ -85,8 +87,9 @@ pages; no framework, nothing to install but that.
   Playwright and ffmpeg) renders `branding/tour.html` with the language's
   texts (its catalog) over its screenshots, `<out-dir>/<language>/tour.mp4`
   (1280×720), the home page's video in that language; English keeps
-  `images/video/playguard-tour.mp4`. A few minutes each: main renders them,
-  a pull request takes main's.
+  `images/video/playguard-tour.mp4`. A few minutes each: main renders them
+  when the screenshots are taken or the tour's page, its script or the
+  site's texts change, else keeps the published ones; a pull request takes main's.
 - **The site's address**: `SITE_URL` (`https://jigsawfr.github.io/PlayGuard/`
   by default). CI asks GitHub Pages for it (its custom domain, when it has
   one) and adds a preview's folder; `SITE_BASE` is its path, for 404.html;
