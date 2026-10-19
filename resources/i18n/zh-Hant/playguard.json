@@ -206,7 +206,17 @@
         "outside_reset": "今天的遊玩時間在{}左右重新開始計算（時鐘被更改了？）。",
         "outside_clock": "主機時鐘已被更改。",
         "outside_limits": "上限在PlayGuard之外被更改了，例如透過手機應用程式。",
-        "outside_dismiss": "關閉此提示"
+        "outside_dismiss": "關閉此提示",
+        "bonus_row": "其他日子…",
+        "bonus_planned_row": "{}：已排定 {}（取消…）",
+        "bonus_day_title": "要延長哪一天？",
+        "bonus_amount_title": "延長時間：{}",
+        "bonus_no_limit": "{}：當天沒有設定上限，無需延長。",
+        "bonus_body": "{}：上限從 {} 改為 {}，僅限當天。\n\n那天過後，PlayGuard 下次開啟時會改回 {}。",
+        "bonus_done": "{}：已排定 {}。",
+        "bonus_cancel_body": "{}：取消已排定的延長（{}）？上限改回 {}。",
+        "bonus_cancel": "取消延長",
+        "bonus_cancelled": "已取消排定的延長。"
     },
     "onboarding": {
         "title": "初始設定",
@@ -1342,7 +1352,9 @@
             "profile": "設定檔「{}」",
             "console_lock": "封鎖所有遊戲",
             "notices": "通知",
-            "rescue": "復原"
+            "rescue": "復原",
+            "bonus": "排定延長",
+            "restore_bonus": "已改回排定延長前的上限"
         },
         "when": "時間",
         "how": "來源",
@@ -1646,7 +1658,8 @@
             "save_title": "儲存本週的限制？",
             "played_key": "最近7天的遊玩",
             "played_day": "{}：已玩 {} / {}",
-            "played_day_free": "{}：已玩 {}（不限）"
+            "played_day_free": "{}：已玩 {}（不限）",
+            "bonus": "{}：當天排定延長 {}"
         },
         "tabs": {
             "today": "今天"

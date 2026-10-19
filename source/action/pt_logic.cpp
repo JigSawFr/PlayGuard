@@ -3,6 +3,8 @@
 
 #include <algorithm>
 
+#include "util/date.hpp"
+
 namespace pt_logic
 {
 
@@ -87,6 +89,33 @@ Restore restore_action(const ExtraRecord& rec, const std::string& today, const P
     if (read_only || !pt.fw_supported || !pt.valid) return Restore::Later;
     if (pt.day_min[rec.weekday] != rec.value) return Restore::Forget;
     return Restore::Offer;
+}
+
+Restore bonus_action(const BonusRecord& rec, const std::string& today, const PtState& pt, bool read_only)
+{
+    if (rec.weekday < 0 || rec.weekday > 6) return Restore::None;
+    int days = 0;
+    if (!date::days_between(rec.date, today, &days) || days <= 0) return Restore::None;   // the day not over yet
+    if (read_only || !pt.fw_supported || !pt.valid) return Restore::Later;
+    if (pt.day_min[rec.weekday] != rec.value) return Restore::Forget;
+    return Restore::Offer;
+}
+
+std::vector<PlanDay> bonus_days(const std::string& today, int today_weekday)
+{
+    std::vector<PlanDay> out;
+    for (int n = 1; n <= 6; n++) {
+        const std::string d = date::add_days(today, n);
+        if (d.empty()) return {};
+        out.push_back({ d, (today_weekday + n) % 7 });
+    }
+    return out;
+}
+
+bool can_plan_bonus(const PtState& pt, int weekday, bool read_only)
+{
+    return !read_only && pt.fw_supported && pt.valid && weekday >= 0 && weekday <= 6 &&
+           pt.day_min[weekday] != PT_DAY_NOLIMIT && pt.day_min[weekday] < 1440;
 }
 
 bool restore_tightens(const ExtraRecord& rec)

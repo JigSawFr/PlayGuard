@@ -185,6 +185,19 @@ day only. All four keys go together.
 | `extra_value` | integer | the limit for that day, `0` to `1440` minutes | `0` |
 | `extra_auto_restore` | boolean | after *No more play today*, put the limit back the next day as any change instead of asking (the temporary unlock and the PIN are still asked when needed; "no limit" is always asked); extra time comes back without asking whatever this says (either the next time PlayGuard is opened, from the next day on); set in Play timer | `false` |
 
+### Extra time on another day
+
+*Extra time › Another day…*: a later day's limit raised now, for that date
+only, and put back by itself the next time PlayGuard is opened once the day is
+over (unless that day's limit was changed since). All four keys go together.
+
+| Key | Type | Values | Default |
+|---|---|---|---|
+| `bonus_weekday` | integer | the day raised, `0` (Sunday) to `6`; `-1`: nothing planned | `-1` |
+| `bonus_date` | string | `"YYYY-MM-DD"` of the day it is for | `""` |
+| `bonus_base` | integer | the limit before, `0` to `1440` minutes (never no limit) | `0` |
+| `bonus_value` | integer | the limit for that day, above `bonus_base`, at most `1440` minutes | `0` |
+
 ### Firmware not supported yet
 
 The choice made on that screen, remembered for one firmware with one app
@@ -274,6 +287,10 @@ line; the order does not matter when it reads them:
   "extra_date": "",
   "extra_base": 0,
   "extra_value": 0,
+  "bonus_weekday": -1,
+  "bonus_date": "",
+  "bonus_base": 0,
+  "bonus_value": 0,
   "fw_gate_fw": "",
   "fw_gate_app": "",
   "fw_gate_choice": "",

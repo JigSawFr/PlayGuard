@@ -206,7 +206,17 @@
         "outside_reset": "De speeltijd van vandaag begon rond {} opnieuw (klok gewijzigd?).",
         "outside_clock": "De klok van de console is gewijzigd.",
         "outside_limits": "De limieten zijn buiten PlayGuard gewijzigd, bijvoorbeeld via de app op de telefoon.",
-        "outside_dismiss": "Deze melding verbergen"
+        "outside_dismiss": "Deze melding verbergen",
+        "bonus_row": "Een andere dag...",
+        "bonus_planned_row": "{}: {} gepland (verwijderen...)",
+        "bonus_day_title": "Extra tijd op welke dag?",
+        "bonus_amount_title": "Extra tijd: {}",
+        "bonus_no_limit": "{}: op die dag is geen limiet ingesteld, er is dus geen tijd toe te voegen.",
+        "bonus_body": "{}: de limiet gaat van {} naar {}, alleen die dag.\n\nIs de dag voorbij, dan zet PlayGuard {} terug de volgende keer dat het wordt geopend.",
+        "bonus_done": "{}: {} gepland.",
+        "bonus_cancel_body": "{}: de geplande {} verwijderen? De limiet gaat terug naar {}.",
+        "bonus_cancel": "Verwijderen",
+        "bonus_cancelled": "Geplande extra tijd verwijderd."
     },
     "onboarding": {
         "title": "Eerste stappen",
@@ -1342,7 +1352,9 @@
             "profile": "Profiel \"{}\"",
             "console_lock": "Alle games blokkeren",
             "notices": "Meldingen",
-            "rescue": "Herstel"
+            "rescue": "Herstel",
+            "bonus": "Extra tijd gepland",
+            "restore_bonus": "Geplande extra tijd teruggezet"
         },
         "when": "Wanneer",
         "how": "Bron",
@@ -1646,7 +1658,8 @@
             "save_title": "De limieten van de week opslaan?",
             "played_key": "gespeeld, laatste 7 dagen",
             "played_day": "{}: {} gespeeld van {}",
-            "played_day_free": "{}: {} gespeeld, geen limiet"
+            "played_day_free": "{}: {} gespeeld, geen limiet",
+            "bonus": "{}: {} gepland voor die dag"
         },
         "tabs": {
             "today": "Vandaag"

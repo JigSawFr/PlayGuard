@@ -206,7 +206,17 @@
         "outside_reset": "今天的游戏时间在{}左右重新开始计算（时钟被更改了？）。",
         "outside_clock": "主机时钟已被更改。",
         "outside_limits": "限制在PlayGuard之外被更改了，例如通过手机应用。",
-        "outside_dismiss": "关闭此提示"
+        "outside_dismiss": "关闭此提示",
+        "bonus_row": "其他日子…",
+        "bonus_planned_row": "{}：已计划 {}（取消…）",
+        "bonus_day_title": "在哪天加时？",
+        "bonus_amount_title": "加时：{}",
+        "bonus_no_limit": "{}：当天没有设置限制，无需加时。",
+        "bonus_body": "{}：限制从 {} 改为 {}，仅限当天。\n\n那天过后，PlayGuard 下次打开时会恢复为 {}。",
+        "bonus_done": "{}：已计划 {}。",
+        "bonus_cancel_body": "{}：取消已计划的加时（{}）？限制恢复为 {}。",
+        "bonus_cancel": "取消加时",
+        "bonus_cancelled": "已取消计划的加时。"
     },
     "onboarding": {
         "title": "入门",
@@ -1342,7 +1352,9 @@
             "profile": "配置“{}”",
             "console_lock": "阻止所有游戏",
             "notices": "通知",
-            "rescue": "恢复"
+            "rescue": "恢复",
+            "bonus": "计划加时",
+            "restore_bonus": "已恢复计划加时前的限制"
         },
         "when": "时间",
         "how": "来源",
@@ -1646,7 +1658,8 @@
             "save_title": "保存本周的限制？",
             "played_key": "最近7天的游玩",
             "played_day": "{}：已玩 {} / {}",
-            "played_day_free": "{}：已玩 {}（不限）"
+            "played_day_free": "{}：已玩 {}（不限）",
+            "bonus": "{}：当天计划加时 {}"
         },
         "tabs": {
             "today": "今天"

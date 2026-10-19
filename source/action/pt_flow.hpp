@@ -89,6 +89,9 @@ void retry_extra_time_restore();
 // the line the Overview shows for it ("Put Saturday's limit back to 2 h").
 bool restore_pending(const PtState& pt);
 std::string restore_label();
+// Extra time planned for a later day (Extra time › Another day…): "Sunday:
+// +1 h planned for that day", "" when none is.
+std::string bonus_text();
 // Putting that limit back lowers it (pt_logic::restore_tightens): extra time
 // still raises it. False for "No more play today", which lowered it.
 bool restore_lowers();

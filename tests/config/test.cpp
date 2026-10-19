@@ -118,6 +118,7 @@ static void test_fields()
     write_config(R"({"language": 5, "theme": "dark", "dev_mode": 1, "auto_relock": false, "pt_log": "yes",
                     "fw_gate_fw": "24.0.0", "fw_gate_app": "1.0.0", "fw_gate_choice": "risk",
                     "extra_weekday": 3, "extra_date": "2026-10-06", "extra_base": 60, "extra_value": 90,
+                    "bonus_weekday": 6, "bonus_date": "2026-10-10", "bonus_base": 180, "bonus_value": 240,
                     "relock_pending": true, "extra_auto_restore": true,
                     "custom_servers": ["a.example", 7, "b.example"]})");
     config::load();
@@ -125,6 +126,7 @@ static void test_fields()
     CHECK(c.language == "system" && c.theme == "dark" && !c.dev_mode && !c.auto_relock && !c.pt_log);
     CHECK(c.fw_gate_fw == "24.0.0" && c.fw_gate_app == "1.0.0" && c.fw_gate_choice == "risk");
     CHECK(c.extra_weekday == 3 && c.extra_date == "2026-10-06" && c.extra_base == 60 && c.extra_value == 90);
+    CHECK(c.bonus_weekday == 6 && c.bonus_date == "2026-10-10" && c.bonus_base == 180 && c.bonus_value == 240);
     CHECK(c.relock_pending && c.extra_auto_restore);
     CHECK(c.custom_servers.size() == 2 && c.custom_servers[1] == "b.example");
 
@@ -152,6 +154,20 @@ static void test_fields()
         config::load();
         c = config::get();
         CHECK(c.extra_weekday == -1 && c.extra_date.empty() && c.extra_base == 0 && c.extra_value == 0);
+    }
+    // A planned bonus too, and it only ever raises a real limit.
+    const char* bonuses[] = {
+        R"({"bonus_weekday": 6, "bonus_date": "2026-10-10", "bonus_base": 65535, "bonus_value": 240})",
+        R"({"bonus_weekday": 6, "bonus_date": "2026-10-10", "bonus_base": 240, "bonus_value": 180})",
+        R"({"bonus_weekday": 7, "bonus_date": "2026-10-10", "bonus_base": 180, "bonus_value": 240})",
+        R"({"bonus_weekday": 6, "bonus_date": "soon", "bonus_base": 180, "bonus_value": 240})",
+        R"({"bonus_weekday": 6, "bonus_date": "2026-10-10", "bonus_base": 180})",
+    };
+    for (const char* r : bonuses) {
+        write_config(r);
+        config::load();
+        c = config::get();
+        CHECK(c.bonus_weekday == -1 && c.bonus_date.empty() && c.bonus_base == 0 && c.bonus_value == 0);
     }
 
     // No more play today on a day without a limit: "no limit" (0xFFFF) is

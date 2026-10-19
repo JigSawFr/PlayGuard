@@ -206,7 +206,17 @@
         "outside_reset": "今日のプレイ時間が{}ごろにリセットされました（時計が変更された？）。",
         "outside_clock": "本体の時計が変更されました。",
         "outside_limits": "上限がPlayGuardの外で変更されました（スマホアプリなど）。",
-        "outside_dismiss": "このお知らせを閉じる"
+        "outside_dismiss": "このお知らせを閉じる",
+        "bonus_row": "別の日…",
+        "bonus_planned_row": "{}：{}予定（取り消す…）",
+        "bonus_day_title": "どの日の時間を延長しますか？",
+        "bonus_amount_title": "延長：{}",
+        "bonus_no_limit": "{}：この日は上限が設定されていないため、延長する時間はありません。",
+        "bonus_body": "{}：上限が{}から{}になります（この日のみ）。\n\nその日が過ぎたら、次にPlayGuardを開いたときに{}に戻します。",
+        "bonus_done": "{}：{}を予定しました。",
+        "bonus_cancel_body": "{}：予定の延長（{}）を取り消しますか？上限は{}に戻ります。",
+        "bonus_cancel": "取り消す",
+        "bonus_cancelled": "予定の延長を取り消しました。"
     },
     "onboarding": {
         "title": "はじめに",
@@ -1342,7 +1352,9 @@
             "profile": "プリセット「{}」",
             "console_lock": "すべてのソフトをブロック",
             "notices": "お知らせ",
-            "rescue": "復旧"
+            "rescue": "復旧",
+            "bonus": "延長を予定",
+            "restore_bonus": "予定の延長を元に戻した"
         },
         "when": "日時",
         "how": "操作元",
@@ -1646,7 +1658,8 @@
             "save_title": "今週の上限を保存しますか？",
             "played_key": "直近7日間のプレイ",
             "played_day": "{}：{}／{} プレイ",
-            "played_day_free": "{}：{} プレイ（上限なし）"
+            "played_day_free": "{}：{} プレイ（上限なし）",
+            "bonus": "{}：この日だけ{}延長予定"
         },
         "tabs": {
             "today": "今日"

@@ -134,6 +134,14 @@ struct Config
     std::string extra_date;
     int         extra_base  = 0;
     int         extra_value = 0;
+    // Extra time planned for a later day (Today › Extra time › Another day):
+    // weekday bonus_weekday's limit raised from bonus_base to bonus_value
+    // minutes for bonus_date (YYYY-MM-DD) only, put back once that day is
+    // over. bonus_weekday < 0: none planned.
+    int         bonus_weekday = -1;
+    std::string bonus_date;
+    int         bonus_base  = 0;
+    int         bonus_value = 0;
     // Put that limit back by itself the next day (when the timer needs the
     // temporary unlock, that is still asked) instead of asking keep / put back.
     bool        extra_auto_restore = false;

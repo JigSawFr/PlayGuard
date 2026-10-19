@@ -206,7 +206,17 @@
         "outside_reset": "오늘의 플레이 시간이 {}쯤 처음부터 다시 시작되었습니다(시계가 바뀌었나요?).",
         "outside_clock": "본체 시계가 변경되었습니다.",
         "outside_limits": "PlayGuard 밖에서 제한이 변경되었습니다(예: 스마트폰 앱).",
-        "outside_dismiss": "이 알림 닫기"
+        "outside_dismiss": "이 알림 닫기",
+        "bonus_row": "다른 날...",
+        "bonus_planned_row": "{}: {} 예정 (취소...)",
+        "bonus_day_title": "어느 날에 시간을 추가할까요?",
+        "bonus_amount_title": "시간 추가: {}",
+        "bonus_no_limit": "{}: 이날은 제한이 설정되어 있지 않아 추가할 시간이 없습니다.",
+        "bonus_body": "{}: 제한이 {}에서 {}(으)로 바뀝니다(이날만).\n\n그날이 지나면 다음에 PlayGuard를 열 때 {}(으)로 되돌립니다.",
+        "bonus_done": "{}: {} 예정됨.",
+        "bonus_cancel_body": "{}: 예정된 추가 시간({})을 취소할까요? 제한이 {}(으)로 돌아갑니다.",
+        "bonus_cancel": "취소하기",
+        "bonus_cancelled": "예정된 추가 시간을 취소했습니다."
     },
     "onboarding": {
         "title": "시작하기",
@@ -1342,7 +1352,9 @@
             "profile": "\"{}\" 프로필",
             "console_lock": "모든 소프트웨어 차단",
             "notices": "알림",
-            "rescue": "복구"
+            "rescue": "복구",
+            "bonus": "추가 시간 예정",
+            "restore_bonus": "예정된 추가 시간 복원"
         },
         "when": "일시",
         "how": "경로",
@@ -1646,7 +1658,8 @@
             "save_title": "이번 주 제한을 저장할까요?",
             "played_key": "최근 7일 플레이",
             "played_day": "{}: {} / {} 플레이",
-            "played_day_free": "{}: {} 플레이 (제한 없음)"
+            "played_day_free": "{}: {} 플레이 (제한 없음)",
+            "bonus": "{}: 이날 {} 추가 예정"
         },
         "tabs": {
             "today": "오늘"

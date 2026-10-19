@@ -275,7 +275,9 @@ void CadranPlayTimerTab::rerender()
                                            limit_text(pt.day_min[first]), limit_text(this->pending[first])));
         pending_text->setTextColor(theme["cadran/amber"]);
     } else {
-        pending_text->setText("playguard/cadran/week/no_changes"_i18n);
+        // A bonus planned raises its day for now: said, so that day's bar is understood.
+        const std::string bonus = pt_flow::bonus_text();
+        pending_text->setText("playguard/cadran/week/no_changes"_i18n + (bonus.empty() ? "" : " · " + bonus));
         pending_text->setTextColor(theme["cadran/text3"]);
     }
     pending_dot->setVisibility(changed ? brls::Visibility::VISIBLE : brls::Visibility::GONE);

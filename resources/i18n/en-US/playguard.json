@@ -206,7 +206,17 @@
         "outside_reset": "Today's play time started over at about {} (clock changed?).",
         "outside_clock": "The console clock was changed.",
         "outside_limits": "Limits were changed outside PlayGuard, e.g. by the phone app.",
-        "outside_dismiss": "Dismiss this notice"
+        "outside_dismiss": "Dismiss this notice",
+        "bonus_row": "Another day...",
+        "bonus_planned_row": "{}: {} planned (remove...)",
+        "bonus_day_title": "Extra time on which day?",
+        "bonus_amount_title": "Extra time: {}",
+        "bonus_no_limit": "{}: no limit is set that day, so there is no time to add.",
+        "bonus_body": "{}: the limit goes from {} to {}, that day only.\n\nOnce the day is over, PlayGuard puts {} back the next time it is opened.",
+        "bonus_done": "{}: {} planned.",
+        "bonus_cancel_body": "{}: remove the {} planned? The limit goes back to {}.",
+        "bonus_cancel": "Remove it",
+        "bonus_cancelled": "Planned extra time removed."
     },
     "onboarding": {
         "title": "First steps",
@@ -1342,7 +1352,9 @@
             "profile": "Profile \"{}\"",
             "console_lock": "Block all games",
             "notices": "Notifications",
-            "rescue": "Recovery"
+            "rescue": "Recovery",
+            "bonus": "Extra time planned",
+            "restore_bonus": "Planned extra time put back"
         },
         "when": "When",
         "how": "From",
@@ -1646,7 +1658,8 @@
             "save_title": "Save the week's limits?",
             "played_key": "played, last 7 days",
             "played_day": "{}: {} played of {}",
-            "played_day_free": "{}: {} played, no limit"
+            "played_day_free": "{}: {} played, no limit",
+            "bonus": "{}: {} planned for that day"
         },
         "tabs": {
             "today": "Today"

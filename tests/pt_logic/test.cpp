@@ -199,6 +199,44 @@ static void test_stop()
     CHECK(pt_logic::restore_action(rec, "2026-10-08", pt, false) == pt_logic::Restore::Offer);
 }
 
+// Extra time planned for a later day: put back once that day is over.
+static void test_bonus()
+{
+    using pt_logic::Restore;
+    pt_logic::BonusRecord rec;
+    PtState pt = counting();
+    CHECK(pt_logic::bonus_action(rec, "2026-10-08", pt, false) == Restore::None);    // nothing planned
+    rec.weekday = 6;
+    rec.date = "2026-10-10";   // a Saturday
+    rec.base = 180;
+    rec.value = 240;
+    pt.day_min[6] = 240;
+    CHECK(pt_logic::bonus_action(rec, "2026-10-08", pt, false) == Restore::None);    // before the day
+    CHECK(pt_logic::bonus_action(rec, "2026-10-10", pt, false) == Restore::None);    // the day itself
+    CHECK(pt_logic::bonus_action(rec, "2026-10-11", pt, false) == Restore::Offer);   // over
+    CHECK(pt_logic::bonus_action(rec, "2026-10-17", pt, false) == Restore::Offer);   // a week on, still put back
+    CHECK(pt_logic::bonus_action(rec, "2026-10-11", pt, true) == Restore::Later);    // read-only
+    pt.day_min[6] = 200;
+    CHECK(pt_logic::bonus_action(rec, "2026-10-11", pt, false) == Restore::Forget);  // changed since
+    rec.date = "soon";
+    CHECK(pt_logic::bonus_action(rec, "2026-10-11", pt, false) == Restore::None);
+
+    // The days offered: tomorrow and the five after, with their weekdays.
+    const auto days = pt_logic::bonus_days("2026-10-08", 4);   // a Thursday
+    CHECK(days.size() == 6 && days[0].date == "2026-10-09" && days[0].weekday == 5);
+    CHECK(days[2].date == "2026-10-11" && days[2].weekday == 0 && days[5].date == "2026-10-14" && days[5].weekday == 3);
+    CHECK(pt_logic::bonus_days("today", 4).empty());
+
+    // Only on a day with a limit below 24 h, the state read and writable.
+    pt = counting();
+    pt.day_min[6] = 180;
+    CHECK(pt_logic::can_plan_bonus(pt, 6, false) && !pt_logic::can_plan_bonus(pt, 6, true));
+    pt.day_min[6] = PT_DAY_NOLIMIT;
+    CHECK(!pt_logic::can_plan_bonus(pt, 6, false));
+    pt.day_min[6] = 1440;
+    CHECK(!pt_logic::can_plan_bonus(pt, 6, false) && !pt_logic::can_plan_bonus(pt, 7, false));
+}
+
 static void test_restore()
 {
     pt_logic::ExtraRecord rec;
@@ -519,11 +557,12 @@ int main()
     test_extra();
     test_stop();
     test_restore();
+    test_bonus();
     test_restore_way();
     test_bedtime();
     test_pickers();
     test_extra_today();
     test_pending_relock();
     test_next_stop();
-    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, bedtime, picker, pending-relock and next-stop assertions passed");
+    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, planned bonus, bedtime, picker, pending-relock and next-stop assertions passed");
 }

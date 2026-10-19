@@ -83,6 +83,13 @@ void clear_extra(Config& c)
     c.extra_base = c.extra_value = 0;
 }
 
+void clear_bonus(Config& c)
+{
+    c.bonus_weekday = -1;
+    c.bonus_date.clear();
+    c.bonus_base = c.bonus_value = 0;
+}
+
 void one_of(std::string& value, std::initializer_list<const char*> allowed, const char* fallback)
 {
     for (const char* a : allowed)
@@ -181,6 +188,10 @@ void sanitize(Config& c)
     const bool base_ok    = (c.extra_base >= 0 && c.extra_base <= 1440) || c.extra_base == 0xFFFF;
     const bool values_ok  = base_ok && c.extra_value >= 0 && c.extra_value <= 1440 && c.extra_date.size() == 10;
     if (!weekday_ok || !values_ok) clear_extra(c);
+    // A planned bonus raises a real limit (never "no limit") for one date.
+    const bool bonus_ok = c.bonus_weekday >= 0 && c.bonus_weekday <= 6 && c.bonus_base >= 0 &&
+                          c.bonus_base < c.bonus_value && c.bonus_value <= 1440 && c.bonus_date.size() == 10;
+    if (!bonus_ok) clear_bonus(c);
 
     // The limits console lock saved to put back: exactly seven, each a real
     // limit (0..1440 min) or "no limit" (0xFFFF). Otherwise drop them (turning
@@ -192,8 +203,8 @@ void sanitize(Config& c)
 }
 
 // What belongs to the system PlayGuard runs on (state.json, util/nand.hpp):
-// the console lock, the extra-time record, a pending relock and the
-// firmware choice. Read from state.json, or from config.json when this
+// the console lock, the extra-time record, a planned bonus, a pending
+// relock and the firmware choice. Read from state.json, or from config.json when this
 // system has no state.json yet (the versions before it kept them there).
 static void clear_system(Config& c)
 {
@@ -203,6 +214,7 @@ static void clear_system(Config& c)
     c.relock_pending = false;
     c.fw_gate_fw.clear(), c.fw_gate_app.clear(), c.fw_gate_choice.clear();
     clear_extra(c);
+    clear_bonus(c);
 }
 
 static void read_system(const nlohmann::json& j, Config& c)
@@ -225,6 +237,11 @@ static void read_system(const nlohmann::json& j, Config& c)
     extra_ok &= read_int(j, "extra_base", c.extra_base);
     extra_ok &= read_int(j, "extra_value", c.extra_value);
     if (!extra_ok) clear_extra(c);
+    bool bonus_ok = read_int(j, "bonus_weekday", c.bonus_weekday);
+    bonus_ok &= read_string(j, "bonus_date", c.bonus_date);
+    bonus_ok &= read_int(j, "bonus_base", c.bonus_base);
+    bonus_ok &= read_int(j, "bonus_value", c.bonus_value);
+    if (!bonus_ok) clear_bonus(c);
 }
 
 // The file as JSON, or null when it is not a JSON object.
@@ -444,6 +461,10 @@ bool snapshot(Snapshot& snap)
     st["extra_date"]        = s_config.extra_date;
     st["extra_base"]        = s_config.extra_base;
     st["extra_value"]       = s_config.extra_value;
+    st["bonus_weekday"]     = s_config.bonus_weekday;
+    st["bonus_date"]        = s_config.bonus_date;
+    st["bonus_base"]        = s_config.bonus_base;
+    st["bonus_value"]       = s_config.bonus_value;
     st["relock_pending"]    = s_config.relock_pending;
     snap.system = dump(st);
     return true;

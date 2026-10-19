@@ -206,7 +206,17 @@
         "outside_reset": "O tempo de jogo de hoje recomeçou do zero por volta das {} (relógio alterado?).",
         "outside_clock": "O relógio da consola foi alterado.",
         "outside_limits": "Os limites foram alterados fora do PlayGuard, por exemplo pela aplicação do telemóvel.",
-        "outside_dismiss": "Ocultar este aviso"
+        "outside_dismiss": "Ocultar este aviso",
+        "bonus_row": "Outro dia...",
+        "bonus_planned_row": "{}: {} previsto (retirar...)",
+        "bonus_day_title": "Tempo extra em que dia?",
+        "bonus_amount_title": "Tempo extra: {}",
+        "bonus_no_limit": "{}: não há limite nesse dia, por isso não há tempo a acrescentar.",
+        "bonus_body": "{}: o limite passa de {} para {}, só nesse dia.\n\nTerminado o dia, o PlayGuard repõe {} da próxima vez que for aberto.",
+        "bonus_done": "{}: {} previsto.",
+        "bonus_cancel_body": "{}: retirar o tempo previsto ({})? O limite volta a {}.",
+        "bonus_cancel": "Retirar",
+        "bonus_cancelled": "Tempo extra previsto retirado."
     },
     "onboarding": {
         "title": "Primeiros passos",
@@ -1342,7 +1352,9 @@
             "profile": "Perfil \"{}\"",
             "console_lock": "Bloquear todos os jogos",
             "notices": "Notificações",
-            "rescue": "Recuperação"
+            "rescue": "Recuperação",
+            "bonus": "Tempo extra previsto",
+            "restore_bonus": "Tempo extra previsto reposto"
         },
         "when": "Quando",
         "how": "Origem",
@@ -1646,7 +1658,8 @@
             "save_title": "Guardar os limites da semana?",
             "played_key": "jogado, últimos 7 dias",
             "played_day": "{}: {} jogado de {}",
-            "played_day_free": "{}: {} jogado, sem limite"
+            "played_day_free": "{}: {} jogado, sem limite",
+            "bonus": "{}: {} previsto para esse dia"
         },
         "tabs": {
             "today": "Hoje"

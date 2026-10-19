@@ -82,6 +82,31 @@ enum class Restore
 };
 Restore restore_action(const ExtraRecord& rec, const std::string& today, const PtState& pt, bool read_only);
 
+// Extra time planned for a later day (config bonus_*): that weekday's limit
+// is raised now, for `date` only, and put back once that day is over.
+struct BonusRecord
+{
+    int         weekday = -1;   // -1: nothing planned
+    std::string date;           // "YYYY-MM-DD" of the day it is for
+    uint16_t    base  = 0;      // limit before
+    uint16_t    value = 0;      // limit written
+};
+// What a check on `today` does with it, as restore_action: None while the day
+// is not over (or nothing planned), Later when the state cannot be read,
+// Forget when the limit changed since, Offer to put `base` back.
+Restore bonus_action(const BonusRecord& rec, const std::string& today, const PtState& pt, bool read_only);
+// The days a bonus can be planned for: tomorrow and the five after (the
+// same weekday a week on would be today's), as dates and weekdays.
+struct PlanDay
+{
+    std::string date;
+    int         weekday;
+};
+std::vector<PlanDay> bonus_days(const std::string& today, int today_weekday);
+// A bonus can be planned for `weekday`: the play timer read, a limit set that
+// day, below 24 h.
+bool can_plan_bonus(const PtState& pt, int weekday, bool read_only);
+
 // How a record restore_action() offers to put back is put back. `weekday`:
 // today's (0 = Sunday); `by_itself`: the preference to put back "no more
 // play today" with no question (config extra_auto_restore).
