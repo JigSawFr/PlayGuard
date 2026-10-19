@@ -180,6 +180,52 @@
     });
   }
 
+  // A copy button on each block of code (a path, a config.json).
+  const prose = document.querySelector('.prose[data-copy]');
+  if (prose && navigator.clipboard) {
+    for (const pre of prose.querySelectorAll('pre')) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'copy';
+      button.textContent = prose.dataset.copy;
+      button.addEventListener('click', () => {
+        navigator.clipboard.writeText(pre.querySelector('code')?.textContent ?? pre.textContent).then(() => {
+          button.textContent = prose.dataset.copied;
+          setTimeout(() => { button.textContent = prose.dataset.copy; }, 1500);
+        }, () => {});
+      });
+      pre.classList.add('has-copy');
+      pre.append(button);
+    }
+  }
+
+  // Printed: every folded part open (the questions, a page's details).
+  addEventListener('beforeprint', () => {
+    for (const d of document.querySelectorAll('details:not(.toc-mobile)')) d.open = true;
+  });
+
+  // The compatibility page's check: what PlayGuard does on the firmware typed.
+  const check = document.querySelector('.compat-check');
+  if (check) {
+    const field = check.querySelector('input');
+    const result = check.querySelector('.compat-result');
+    const parse = (v) => (/^\s*(\d{1,2})(?:\.(\d{1,2}))?(?:\.(\d{1,2}))?\s*$/.exec(v) || []).slice(1).map((n) => Number(n || 0));
+    const order = ([a, b, c]) => a * 10000 + b * 100 + c;
+    const min = order(parse(check.dataset.min));
+    const max = order(parse(check.dataset.max));
+    field.addEventListener('input', () => {
+      const v = parse(field.value);
+      result.className = 'compat-result';
+      if (!field.value.trim()) { result.textContent = ''; return; }
+      if (!v.length) { result.textContent = check.dataset.invalid; return; }
+      const n = order(v);
+      const [text, kind] = n > max ? [check.dataset.newer, 'warn'] : n < min ? [check.dataset.noTimer, 'warn'] : [check.dataset.full, 'ok'];
+      result.textContent = text;
+      result.classList.add(kind);
+    });
+    check.hidden = false;
+  }
+
   // On a phone, the documentation's pages are a row to scroll: this one in view.
   const current = document.querySelector('.doc-nav [aria-current]');
   const pages = current?.closest('.doc-list');

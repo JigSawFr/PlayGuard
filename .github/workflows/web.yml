@@ -67,7 +67,9 @@ jobs:
       #   hour) and the tours and preview images made from them: taken on main
       #   for a release (its version changed: the header's badge) and by hand
       #   (`all`); otherwise main's published ones, in seconds.
-      # The website itself is built every time (seconds).
+      # The website itself is built every time (seconds); its layout on a
+      # phone, a tablet and a desktop is checked for a pull request that
+      # changes what it is made of (about half a minute, below).
       - name: What to build
         env:
           FORCE: ${{ inputs.screens == 'all' }}
@@ -92,13 +94,16 @@ jobs:
           fi
           [ "$FORCE" = true ] && changed=all
           simulator='^(source|resources|web|extern|patches)/|^(CMakeLists\.txt|Makefile|\.release-please-manifest\.json|\.github/workflows/web\.yml)$|^tools/web_'
-          build=0; screens=0
+          site='^(site|docs|images|branding)/|^resources/i18n/|^tools/(build_site|site_layout|check_site_links)\.py$|^CHANGELOG\.md$|^\.github/workflows/web\.yml$'
+          build=0; screens=0; layout=0
           if [[ "$changed" == all* ]] || grep -qE "$simulator" <<< "$changed"; then build=1; fi
+          if [[ "$changed" == all* ]] || grep -qE "$site" <<< "$changed"; then layout=1; fi
           # A release: its version (the header's badge) changed, on main.
           if [ "$changed" = all ] || { [ "$IS_PR" != true ] && grep -qx '\.release-please-manifest\.json' <<< "$changed"; }; then screens=1; fi
           {
             echo "BUILD_SIMULATOR=$build"
             echo "TAKE_SCREENS=$screens"
+            echo "CHECK_LAYOUT=$layout"
           } | tee -a "$GITHUB_ENV"
       # Emscripten's cache: its system libraries and ports (SDL2, zlib), built
       # for threads and exceptions on first use, which takes minutes.
@@ -301,6 +306,23 @@ jobs:
             cat build-web/shots/timings.json
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+      # The website's layout (tools/site_layout.py): no page wider than the
+      # screen on a phone, a tablet or a desktop, no field iOS zooms into, no
+      # script that throws. For a pull request (or by hand) that changes the
+      # site, its documentation or its texts; main has had it. In the
+      # Playwright of the simulator's smoke test when this build made it,
+      # else Chromium's headless shell alone.
+      - name: The website on a phone, a tablet and a desktop
+        if: github.event_name != 'push' && env.CHECK_LAYOUT == '1'
+        timeout-minutes: 5
+        run: |
+          py="$RUNNER_TEMP/playwright/bin/python"
+          if [ ! -x "$py" ]; then
+            python3 -m venv "$RUNNER_TEMP/playwright"
+            "$RUNNER_TEMP/playwright/bin/pip" install -q "playwright==$PLAYWRIGHT_VERSION"
+            "$py" -m playwright install --with-deps --only-shell chromium
+          fi
+          "$py" -u tools/site_layout.py out
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: site
