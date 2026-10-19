@@ -90,6 +90,8 @@
  "doc_config": "config.json",
  "doc_parental-controls": "家長監護的運作方式",
  "doc_untranslated": "此頁面尚未翻譯，以下為英文版。",
+ "doc_outdated": "本頁翻譯之後，英文頁面已有更新，內容可能更多。",
+ "doc_english": "閱讀英文版",
  "doc_on_github": "在 GitHub 上檢視",
  "support": "支持本專案",
  "footer_license": "以 GNU GPL v3 授權的自由軟體。",

@@ -177,6 +177,9 @@ jobs:
           # SITE_URL, SITE_BASE, SITE_NOINDEX: the site's address (above).
           export SITE_SCREENSHOTS=shots
           python3 tools/build_site.py out .
+          # Every link of the site to the site, and every #anchor (a heading
+          # renamed, a translation's anchors), must lead somewhere.
+          python3 tools/check_site_links.py out "$SITE_URL"
           cp -r build-web/simulator out/simulator
           cp -r build-web/shots out/simulator/shots
           python3 - <<'EOF'

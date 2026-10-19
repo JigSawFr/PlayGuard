@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Builds PlayGuard's website (site/README.md) into <out-dir>: a home page and
-the documentation (docs/*.md, docs/fr/*.md) in each of the console's 15
+the documentation (docs/*.md, docs/<language>/*.md) in each of the console's 15
 languages, English at the root and the others in /<language>/.
 
 - The home page's texts are site/i18n/<language>.json (en-US.json the
@@ -9,9 +9,12 @@ languages, English at the root and the others in /<language>/.
   (resources/i18n/<language>/playguard.json), so a menu named on the site is
   named as on the console; `{{version}}` the latest release
   (.release-please-manifest.json).
-- The documentation is the Markdown of docs/: French (and Canadian French)
-  read docs/fr/ where it has the page, every other language the English one,
-  with a note saying so. Links between the docs and to the README become the
+- The documentation is the Markdown of docs/: a language reads
+  docs/<language>/ where it has the page (Canadian French reads docs/fr/),
+  else the English one, with a note saying so. A translation starts with
+  `<!-- translated from docs/<page>.md, sha256 <12 hex> -->`
+  (tools/doc_stamp.py writes it): when the English page no longer has that
+  hash, the page says that the English one has changed since. Links between the docs and to the README become the
   site's pages; other files of the repository link to GitHub.
 - The screenshots are the console's in each language when SITE_SCREENSHOTS
   names the folder tools/site_screenshots.mjs wrote them to (CI), else the
@@ -26,6 +29,7 @@ languages, English at the root and the others in /<language>/.
 
 Usage: tools/build_site.py <out-dir> [repo-root]          (needs Python-Markdown)
 """
+import hashlib
 import html
 import json
 import os
@@ -73,8 +77,8 @@ OG_LOCALES = {"en-US": "en_US", "fr": "fr_FR", "fr-CA": "fr_CA", "de": "de_DE", 
 # The documentation, in the sidebar's order.
 DOCS = [("features", "guide"), ("install", "guide"), ("compatibility", "guide"), ("troubleshooting", "guide"),
         ("companion-app", "reference"), ("config", "reference"), ("parental-controls", "reference")]
-# The languages that read docs/fr/.
-FRENCH = {"fr", "fr-CA"}
+# The documentation's folder of a language (docs/<folder>/), when not its own code.
+DOC_FOLDERS = {"fr-CA": "fr"}
 # The pages' Content-Security-Policy (GitHub Pages sends no headers): only the
 # site's own files, no inline script, nothing from elsewhere.
 CSP = ("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; "
@@ -206,8 +210,17 @@ def screenshot(lang, name):
 
 
 def back_to_readme(text):
-    """Without the docs' "Back to the README." (GitHub's way back, not the site's)."""
-    return re.sub(r" ?(?:Back to the|Retour au) \[README\]\([^)]*\)\.", "", text)
+    """Without the docs' "Back to the README." (GitHub's way back, not the
+    site's): the sentence that ends with the link to the README, in any language."""
+    return re.sub(r"[ \u3000]?[^.!?。！？\n]*\[README\]\([^)]*\)[.。]?", "", text, count=1)
+
+
+TRANSLATED = re.compile(r"<!-- translated from (docs/[\w-]+\.md), sha256 ([0-9a-f]{12}) -->")
+
+
+def english_hash(source):
+    with open(os.path.join(ROOT, source), "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()[:12]
 
 
 def plain(html_text):
@@ -215,12 +228,24 @@ def plain(html_text):
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", html_text))).strip()
 
 
+def doc_folder(lang):
+    """docs/<folder>/: the documentation in `lang`, where it has the page."""
+    return DOC_FOLDERS.get(lang, lang)
+
+
 def doc_source(page, lang):
     """The Markdown `lang` reads for docs/<page>.md, and whether it is in that language."""
-    source = f"docs/{page}.md"
-    if lang in FRENCH and os.path.exists(os.path.join(ROOT, "docs", "fr", f"{page}.md")):
-        source = f"docs/fr/{page}.md"
-    return source, lang == "en-US" or source.startswith("docs/fr/")
+    folder = doc_folder(lang)
+    if lang != "en-US" and os.path.exists(os.path.join(ROOT, "docs", folder, f"{page}.md")):
+        return f"docs/{folder}/{page}.md", True
+    return f"docs/{page}.md", lang == "en-US"
+
+
+def outdated(source):
+    """Whether a translation's English page changed since it was translated."""
+    with open(os.path.join(ROOT, source), encoding="utf-8") as f:
+        mark = TRANSLATED.search(f.readline())
+    return bool(mark) and english_hash(mark.group(1)) != mark.group(2)
 
 
 def render_doc(page, lang, to_root, assets):
@@ -433,11 +458,12 @@ def home_body(t, lang, to_root):
 
 
 def locked_out_anchor(lang):
-    # The anchor of "Locked out?" in the troubleshooting page the language reads.
-    source = "docs/fr/troubleshooting.md" if lang in FRENCH else "docs/troubleshooting.md"
+    # The anchor of "Locked out?", the first section of the troubleshooting
+    # page the language reads.
+    source, _ = doc_source("troubleshooting", lang)
     with open(os.path.join(ROOT, source), encoding="utf-8") as f:
         for line in f:
-            if line.startswith("## ") and ("Locked out" in line or "bloquée" in line):
+            if line.startswith("## "):
                 return github_slug(line[3:].strip())
     return ""
 
@@ -456,6 +482,9 @@ def docs_list(t, lang, to_root, current):
 def doc_body(t, lang, to_root, page_name, assets):
     title, body, toc, translated, source = render_doc(page_name, lang, to_root, assets)
     note = "" if translated else f'      <p class="callout note">{t("doc_untranslated")}</p>\n'
+    if translated and lang != "en-US" and outdated(source):
+        note = (f'      <p class="callout note">{t("doc_outdated")} '
+                f'<a href="{to_root}docs/{page_name}/" hreflang="en">{t("doc_english")}</a></p>\n')
     # The page's sections (its h2: toc_depth leaves the h1 out).
     toc_items = "".join(f'<li><a href="#{h["id"]}">{h["name"]}</a></li>' for h in toc)
     # The page's description: its first paragraph (the one under the title).
@@ -481,7 +510,15 @@ def doc_body(t, lang, to_root, page_name, assets):
 
 def markdown_lang(page, lang):
     """The language of the Markdown `lang`'s page of docs/<page>.md is published in."""
-    return "fr" if doc_source(page, lang)[0].startswith("docs/fr/") else "en-US"
+    source, _ = doc_source(page, lang)
+    folder = source.split("/")[1] if source.count("/") == 2 else ""
+    return next((code for code, *_ in LANGUAGES if code == folder), "en-US")
+
+
+def markdown_langs():
+    """The languages the documentation is written in: its Markdown and llms.txt are theirs."""
+    return ["en-US"] + [code for code, *_ in LANGUAGES
+                        if code != "en-US" and doc_folder(code) == code and os.path.isdir(os.path.join(ROOT, "docs", code))]
 
 
 def markdown_doc(page, lang, assets):
@@ -584,7 +621,8 @@ def llms_txt(t, version, descriptions, full_docs=None):
         " also in the Homebrew App Store and sphaira).",
         f"- Free software under the GNU GPL v3: {REPO_URL}",
         f"- Try it in a browser, against a simulated console: {SITE_URL}simulator/",
-        f"- The website in the console's 15 languages: {SITE_URL} (French documentation: {SITE_URL}fr/llms.txt)"
+        f"- The website in the console's 15 languages: {SITE_URL}; the documentation in other languages: "
+        + ", ".join(f"{SITE_URL}{lang_dir(code)}llms.txt" for code in markdown_langs() if code != "en-US")
         if t.lang == "en-US" else f"- English: {SITE_URL}llms.txt",
         "",
         "## Documentation", "",
@@ -638,6 +676,7 @@ def main():
     os.makedirs(out, exist_ok=True)
     assets = {"images/social-preview.png", "images/video/playguard-tour.mp4"}
     pages = 0
+    md_langs = markdown_langs()
     for lang, folder, _, _ in LANGUAGES:
         t = Texts(lang, version)
         base = f"{folder}/" if folder else ""
@@ -659,12 +698,12 @@ def main():
                        structured=doc_data(t, lang, name, shown, description, translated),
                        markdown_url=f"{SITE_URL}{lang_dir(md_lang)}docs/{name}.md"))
             # The Markdown of each page, in the languages it is written in.
-            if lang in ("en-US", "fr"):
+            if lang in md_langs:
                 text = markdown_doc(name, lang, assets)
                 write(out, f"{base}docs/{name}.md", text)
                 markdown.append(text)
             pages += 1
-        if lang in ("en-US", "fr"):
+        if lang in md_langs:
             write(out, f"{base}llms.txt", llms_txt(t, version, descriptions))
             write(out, f"{base}llms-full.txt", llms_txt(t, version, descriptions, markdown))
         pages += 1

@@ -90,6 +90,8 @@
  "doc_config": "config.json",
  "doc_parental-controls": "Como funciona o controlo parental",
  "doc_untranslated": "Esta página ainda não está traduzida: aqui está em inglês.",
+ "doc_outdated": "A página em inglês mudou desde que esta foi traduzida: pode dizer mais.",
+ "doc_english": "Lê-la em inglês",
  "doc_on_github": "Ver no GitHub",
  "support": "Apoiar o projeto",
  "footer_license": "Software livre sob a GNU GPL v3.",
