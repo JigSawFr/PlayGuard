@@ -94,6 +94,8 @@
  "doc_config": "config.json",
  "doc_parental-controls": "Hoe ouderlijk toezicht werkt",
  "doc_untranslated": "Deze pagina is nog niet vertaald: hier is ze in het Engels.",
+ "doc_outdated": "De Engelse pagina is gewijzigd sinds deze werd vertaald: daar kan meer staan.",
+ "doc_english": "Lees hem in het Engels",
  "doc_on_github": "Bekijken op GitHub",
  "support": "Steun het project",
  "footer_license": "Vrije software onder de GNU GPL v3.",

@@ -94,6 +94,8 @@
  "doc_config": "config.json",
  "doc_parental-controls": "見守り機能のしくみ",
  "doc_untranslated": "このページはまだ翻訳されていません。英語版を表示しています。",
+ "doc_outdated": "このページの翻訳後に英語版のページが更新されています。英語版の方が詳しい場合があります。",
+ "doc_english": "英語版を読む",
  "doc_on_github": "GitHub で見る",
  "support": "プロジェクトを支援",
  "footer_license": "GNU GPL v3 のフリーソフトウェアです。",

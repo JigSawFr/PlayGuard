@@ -94,6 +94,8 @@
  "doc_config": "config.json",
  "doc_parental-controls": "Wie der Jugendschutz funktioniert",
  "doc_untranslated": "Diese Seite ist noch nicht übersetzt: Hier ist sie auf Englisch.",
+ "doc_outdated": "Die englische Seite wurde seit dieser Übersetzung geändert: Sie kann mehr enthalten.",
+ "doc_english": "Auf Englisch lesen",
  "doc_on_github": "Auf GitHub ansehen",
  "support": "Das Projekt unterstützen",
  "footer_license": "Freie Software unter der GNU GPL v3.",
