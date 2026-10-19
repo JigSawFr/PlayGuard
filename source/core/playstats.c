@@ -241,16 +241,17 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         // Midnights through the console's rule: a day with a daylight-saving
         // change is 23 or 25 h long, and the week counts it as one day.
         const TimeRule *rule = time_console_rule();
-        // The 7 days before too, for the week's trend (Activity).
-        u64 day_starts[14];
-        for (int k = 0; k < 14; k++) day_starts[k] = local_midnight(rule, out->now, k);
+        // The 7 days before too, for the week's trend (Activity), and the
+        // last 30 (Activity's month).
+        u64 day_starts[30];
+        for (int k = 0; k < 30; k++) day_starts[k] = local_midnight(rule, out->now, k);
         LocalTime today;   // the weekday of the same instant, not a second read
         const int wday = rule->to_local(rule->ctx, out->now, &today) ? today.wday : 0;
         for (int k = 0; k < 7; k++) out->day_wday[k] = (u8)((wday - k + 7) % 7);
         PlayLogEvent *events = NULL;
         size_t event_count = 0;
         bool capped = false;
-        out->events_rc = read_events(day_starts[13] >= DAY_S ? day_starts[13] - DAY_S : 0, &events, &event_count, &capped);
+        out->events_rc = read_events(day_starts[29] >= DAY_S ? day_starts[29] - DAY_S : 0, &events, &event_count, &capped);
         out->approximate = capped;
         // One account: only the time it was open in the game (in place: the
         // log of a clock set back months can be large).
@@ -290,6 +291,24 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
             }
             out->prev_week_s  = (u32)(prev_s > 0xFFFFFFFFu ? 0xFFFFFFFFu : prev_s);
             out->prev_week_ok = !playstats_cancelled();
+            // When the week's play happened (Activity's hours and sessions).
+            playlog_fold_hours(events, event_count, out->now, day_starts, &out->hours);
+            out->hours_ok = !playstats_cancelled();
+            // The last 30 days: the games of the week, then those played only
+            // before it (their all-time totals too).
+            size_t month = playlog_fold_since(events, event_count, out->now, day_starts[29], totals, PLAYSTATS_MAX + 1);
+            for (size_t i = 0; i < month && !playstats_cancelled(); i++) {
+                GameStat *g = find_or_add(out, totals[i].app_id);
+                if (!g) {
+                    out->truncated = true;
+                    break;
+                }
+                g->month_s = totals[i].week_s;
+                PdmPlayStatistics st;
+                if (!g->totals_ok && R_SUCCEEDED(query_totals(g->app_id, account, &st)) && (st.playtime || st.total_launches))
+                    set_totals(g, &st);
+            }
+            out->month_ok = !playstats_cancelled();
         }
         // Then the all-time totals of every other installed game ever played,
         // while there is room: the games of this week come first, so a large

@@ -127,7 +127,7 @@ void sanitize(Config& c)
     for (const auto& set : EXTRA_SETS)
         set_ok |= c.extra_amounts == std::vector<int>(std::begin(set), std::end(set));
     if (!set_ok) c.extra_amounts = { 15, 30, 60 };
-    if (c.activity_period < 0 || c.activity_period > 2) c.activity_period = 1;
+    if (c.activity_period < 0 || c.activity_period > 3) c.activity_period = 1;
     if (c.activity_account != "last" && !account_key_ok(c.activity_account)) c.activity_account = "last";
     if (!account_key_ok(c.activity_account_last)) c.activity_account_last.clear();
     if (c.export_format < 0 || c.export_format > 3) c.export_format = 0;

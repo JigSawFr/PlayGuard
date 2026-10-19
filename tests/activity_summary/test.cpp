@@ -40,6 +40,9 @@ static std::unique_ptr<PlayStats> sample()
     a.week_s = 70 * 60;
     GameStat& b = add(*s, "Farm", 400, 20, 2);   // this week 80 min, all on day 2
     b.day_s[2] = b.week_s = 80 * 60;
+    s->month_ok = true;                         // the last 30 days: Kart 5 h, Farm 80 min
+    a.month_s = 300 * 60;
+    b.month_s = 80 * 60;
     return s;
 }
 
@@ -56,6 +59,17 @@ static void test_periods()
     CHECK(w.top == 1 && w.top_s == 80 * 60);            // Farm, 80 min
     CHECK(w.days_played == 2 && w.busiest == 2 && w.busiest_s == 120 * 60);
     CHECK(w.session_s == 0);
+
+    Summary m = summarize(*s, Month);
+    CHECK(m.known && m.total_s == 380 * 60 && m.top == 0 && m.top_s == 300 * 60);
+    CHECK(m.days == 30 && m.per_day_s == 380 * 60 / 30);
+    CHECK(m.days_played == -1 && m.busiest == -1 && m.session_s == 0);
+    s->month_ok = false;                                 // the month not read: unknown
+    CHECK(!summarize(*s, Month).known && summarize(*s, Week).known);
+    s->month_ok = true;
+
+    // The order periods are offered in: Month between the week and all time.
+    CHECK(PERIOD_COUNT == 4 && PERIODS[0] == Today && PERIODS[1] == Week && PERIODS[2] == Month && PERIODS[3] == AllTime);
 
     Summary all = summarize(*s, AllTime);
     CHECK(all.known && all.total_s == 1000 * 60 && all.top == 0);
@@ -78,6 +92,31 @@ static void test_week_trend()
     CHECK(week_trend_min(*s, d) && d == 0);
     s->windows_ok = false;                              // the last 7 days not read
     CHECK(!week_trend_min(*s, d));
+}
+
+static void test_hours()
+{
+    auto s = sample();
+    CHECK(!hours(*s).known);                              // not read
+    s->hours_ok = true;
+    Hours none = hours(*s);
+    CHECK(none.known && none.sessions == 0 && none.busy_from == -1 && none.late_s == 0 && none.longest_day == -1);
+    s->hours.sessions = 4;
+    s->hours.session_s = 4 * 3000;
+    s->hours.longest_s = 5400;
+    s->hours.longest_day = 2;
+    s->hours.hour_s[0][17] = 1800;                        // today 17:00, 18:00
+    s->hours.hour_s[0][18] = 3600;
+    s->hours.hour_s[2][18] = 600;                         // two days ago 18:00
+    s->hours.hour_s[2][22] = 1200;                        // late: 22:00 and 05:00
+    s->hours.hour_s[5][5] = 900;
+    s->hours.hour_s[5][6] = 4000;                         // 06:00: not late
+    Hours h = hours(*s);
+    CHECK(h.sessions == 4 && h.average_s == 3000 && h.longest_s == 5400 && h.longest_day == 2);
+    CHECK(h.busy_from == 17 && h.busy_s == 1800 + 3600 + 600);
+    CHECK(h.late_s == 1200 + 900);
+    s->windows_ok = false;
+    CHECK(!hours(*s).known);
 }
 
 static void test_edges()
@@ -199,6 +238,7 @@ static ExportText words()
     t.id = "ID";
     t.today = "Today";
     t.week = "Week";
+    t.month = "Month";
     t.total = "Total";
     t.launches = "Launches";
     t.first = "First";
@@ -223,44 +263,51 @@ static void test_export()
     CHECK(t.title == "T" && t.subtitle == "S" && t.sheet == "Sheet");
 
     // The columns: the game, today, the six days before (most recent first,
-    // named after their weekday), the week, all time, launches, plays.
-    if (!CHECK(t.columns.size() == 14)) return;
+    // named after their weekday), the week, the last 30 days, all time,
+    // launches, plays.
+    if (!CHECK(t.columns.size() == 15)) return;
     const char* keys[] = { "game", "title_id", "today_min", "day_1_min", "day_2_min", "day_3_min", "day_4_min",
-                           "day_5_min", "day_6_min", "week_min", "total_min", "launches", "first_played", "last_played" };
-    for (size_t i = 0; i < 14; i++) CHECK(t.columns[i].key == keys[i]);
+                           "day_5_min", "day_6_min", "week_min", "month_min", "total_min", "launches",
+                           "first_played", "last_played" };
+    for (size_t i = 0; i < 15; i++) CHECK(t.columns[i].key == keys[i]);
     CHECK(t.columns[0].label == "Game" && t.columns[1].label == "ID" && t.columns[2].label == "Today");
     CHECK(t.columns[3].label == "d2" && t.columns[4].label == "d1" && t.columns[8].label == "d4");
-    CHECK(t.columns[9].label == "Week" && t.columns[13].label == "Last");
+    CHECK(t.columns[9].label == "Week" && t.columns[10].label == "Month" && t.columns[14].label == "Last");
     CHECK(!t.columns[0].numeric && !t.columns[1].numeric && t.columns[2].numeric && t.columns[8].numeric);
-    CHECK(t.columns[11].numeric && !t.columns[12].numeric && !t.columns[13].numeric);
+    CHECK(t.columns[10].numeric && t.columns[12].numeric && !t.columns[13].numeric && !t.columns[14].numeric);
 
     // The rows: the export's order, every column.
     if (!CHECK(t.rows.size() == 3)) return;
-    for (const auto& r : t.rows) CHECK(r.size() == 14);
+    for (const auto& r : t.rows) CHECK(r.size() == 15);
     const std::vector<std::string> farm = { "Farm", "0100000000012000", "0", "0", "80", "0", "0", "0", "0",
-                                            "80", "400", "20", "t" + std::to_string(NOW - 99 * DAY - 3600),
+                                            "80", "80", "400", "20", "t" + std::to_string(NOW - 99 * DAY - 3600),
                                             "t" + std::to_string(NOW - 2 * DAY) };
     CHECK(t.rows[0] == farm);
-    CHECK(t.rows[1][0] == "Kart" && t.rows[1][2] == "30" && t.rows[1][4] == "40" && t.rows[1][9] == "70");
-    CHECK(t.rows[2][0] == "(deleted)" && t.rows[2][2] == "1" && t.rows[2][3] == "2");
-    CHECK(t.rows[2][12].empty() && t.rows[2][13] == "t" + std::to_string(NOW - 40 * DAY));
+    CHECK(t.rows[1][0] == "Kart" && t.rows[1][2] == "30" && t.rows[1][4] == "40" && t.rows[1][9] == "70" && t.rows[1][10] == "300");
+    CHECK(t.rows[2][0] == "(deleted)" && t.rows[2][2] == "1" && t.rows[2][3] == "2" && t.rows[2][10] == "0");
+    CHECK(t.rows[2][13].empty() && t.rows[2][14] == "t" + std::to_string(NOW - 40 * DAY));
 
-    // The log unread: no figure of the week; the statistics unread for a
-    // game: none of its totals.
+    // The log unread: no figure of the week or the month; the statistics
+    // unread for a game: none of its totals.
     s->windows_ok = false;
     s->games[0].totals_ok = false;
     t = export_table(*s, AllTime, words());
     if (!CHECK(t.rows.size() == 3)) return;
     CHECK(t.rows[0][0] == "Farm" && t.rows[1][0] == "(deleted)" && t.rows[2][0] == "Kart");
     for (const auto& r : t.rows)
-        for (size_t i = 2; i <= 9; i++) CHECK(r[i].empty());
-    for (size_t i = 10; i < 14; i++) CHECK(t.rows[2][i].empty());
-    CHECK(t.rows[0][10] == "400" && t.rows[0][11] == "20");
+        for (size_t i = 2; i <= 10; i++) CHECK(r[i].empty());
+    for (size_t i = 11; i < 15; i++) CHECK(t.rows[2][i].empty());
+    CHECK(t.rows[0][11] == "400" && t.rows[0][12] == "20");
+    // Only the month unread: its column empty, the week's there.
+    s->windows_ok = true;
+    s->month_ok = false;
+    t = export_table(*s, Week, words());
+    CHECK(t.rows[0][9] == "80" && t.rows[0][10].empty());
 
     // No game: the columns only.
     s->count = 0;
     t = export_table(*s, Week, words());
-    CHECK(t.columns.size() == 14 && t.rows.empty());
+    CHECK(t.columns.size() == 15 && t.rows.empty());
 }
 
 static void test_start_account()
@@ -279,6 +326,7 @@ int main()
 {
     test_periods();
     test_week_trend();
+    test_hours();
     test_edges();
     test_unattributed();
     test_sort();

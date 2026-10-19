@@ -413,18 +413,21 @@
             "today": "Hoje (min)",
             "week": "Últimos 7 dias (min)",
             "day": "{} (min)",
-            "total": "Desde sempre (min)"
+            "total": "Desde sempre (min)",
+            "month": "Últimos 30 dias (min)"
         },
         "periods": {
             "0": "Hoje",
             "1": "Últimos 7 dias",
-            "2": "Desde sempre"
+            "2": "Desde sempre",
+            "3": "Últimos 30 dias"
         },
         "loading": "A ler os dados de jogo da consola...",
         "none": {
             "0": "Nenhum jogo foi jogado hoje.",
             "1": "Nenhum jogo foi jogado nos últimos 7 dias.",
-            "2": "Ainda não foi jogado nenhum jogo."
+            "2": "Ainda não foi jogado nenhum jogo.",
+            "3": "Nenhum jogo foi jogado nos últimos 30 dias."
         },
         "err_list": "Não foi possível listar os jogos",
         "err_stats": "Não foi possível ler as estatísticas de jogo",
@@ -452,7 +455,17 @@
         "applet_cap": "Não listados, para poupar memória no modo applet (aberto a partir do álbum): mais {}. A exportação inclui todos os jogos; para a lista completa, abra o PlayGuard mantendo premido o botão R ao iniciar um jogo.",
         "account_nobody": "Sem conta (ou uma conta eliminada)",
         "account_new": "Conta nova desde {}: {}",
-        "truncated": "Só é possível listar {} jogos: faltam alguns que não foram jogados esta semana, e o total desde sempre não os conta."
+        "truncated": "Só é possível listar {} jogos: faltam alguns que não foram jogados esta semana, e o total desde sempre não os conta.",
+        "section_hours": "Horas de jogo, últimos 7 dias",
+        "hours": {
+            "legend": "Um quadrado por cada hora de cada dia: quanto mais forte, mais se jogou.",
+            "sessions": "Sessões",
+            "sessions_value": "{} · {} em média",
+            "longest": "Sessão mais longa",
+            "busy": "Horas com mais jogo",
+            "busy_value": "Das {} às {}",
+            "late": "Jogado entre as 21:00 e as 06:00"
+        }
     },
     "library": {
         "title": "Jogos",

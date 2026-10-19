@@ -413,18 +413,21 @@
             "today": "Aujourd'hui (min)",
             "week": "7 derniers jours (min)",
             "day": "{} (min)",
-            "total": "Depuis toujours (min)"
+            "total": "Depuis toujours (min)",
+            "month": "30 derniers jours (min)"
         },
         "periods": {
             "0": "Aujourd'hui",
             "1": "7 derniers jours",
-            "2": "Depuis toujours"
+            "2": "Depuis toujours",
+            "3": "30 derniers jours"
         },
         "loading": "Lecture des données de jeu de la console...",
         "none": {
             "0": "Aucun jeu joué aujourd'hui.",
             "1": "Aucun jeu joué ces 7 derniers jours.",
-            "2": "Aucun jeu joué pour l'instant."
+            "2": "Aucun jeu joué pour l'instant.",
+            "3": "Aucun jeu joué ces 30 derniers jours."
         },
         "err_list": "Impossible de lister les jeux",
         "err_stats": "Impossible de lire les statistiques de jeu",
@@ -452,7 +455,17 @@
         "applet_cap": "Non listés, pour économiser la mémoire en mode applet (ouvert depuis l'album) : {} de plus. L'export contient tous les jeux; pour la liste complète, ouvrez PlayGuard en maintenant R au lancement d'un jeu.",
         "account_nobody": "Sans compte (ou compte supprimé)",
         "account_new": "Nouveau compte depuis le {} : {}",
-        "truncated": "Seuls {} jeux peuvent être listés : certains, pas joués cette semaine, manquent, et le total depuis toujours ne les compte pas."
+        "truncated": "Seuls {} jeux peuvent être listés : certains, pas joués cette semaine, manquent, et le total depuis toujours ne les compte pas.",
+        "section_hours": "Heures de jeu, 7 derniers jours",
+        "hours": {
+            "legend": "Un carré par heure de chaque jour : plus il est vif, plus on a joué.",
+            "sessions": "Sessions",
+            "sessions_value": "{} · {} en moyenne",
+            "longest": "Session la plus longue",
+            "busy": "Heures les plus jouées",
+            "busy_value": "{} à {}",
+            "late": "Joué entre 21:00 et 06:00"
+        }
     },
     "library": {
         "title": "Jeux",

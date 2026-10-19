@@ -413,18 +413,21 @@
             "today": "Vandaag (min)",
             "week": "Afgelopen 7 dagen (min)",
             "day": "{} (min)",
-            "total": "Totaal (min)"
+            "total": "Totaal (min)",
+            "month": "Afgelopen 30 dagen (min)"
         },
         "periods": {
             "0": "Vandaag",
             "1": "Afgelopen 7 dagen",
-            "2": "Totaal"
+            "2": "Totaal",
+            "3": "Afgelopen 30 dagen"
         },
         "loading": "Speelgegevens van de console lezen...",
         "none": {
             "0": "Vandaag geen game gespeeld.",
             "1": "De afgelopen 7 dagen geen game gespeeld.",
-            "2": "Nog geen game gespeeld."
+            "2": "Nog geen game gespeeld.",
+            "3": "De afgelopen 30 dagen geen game gespeeld."
         },
         "err_list": "Kan de games niet weergeven",
         "err_stats": "Kan de speelstatistieken niet lezen",
@@ -452,7 +455,17 @@
         "applet_cap": "Niet getoond, om geheugen te sparen in de appletmodus (geopend vanuit het album): nog {}. De export bevat alle games; open PlayGuard voor de volledige lijst door R ingedrukt te houden terwijl je een game start.",
         "account_nobody": "Zonder account (of een verwijderd account)",
         "account_new": "Nieuw account sinds {}: {}",
-        "truncated": "Er kunnen maar {} games worden getoond: sommige die deze week niet zijn gespeeld ontbreken, ook in het totaal."
+        "truncated": "Er kunnen maar {} games worden getoond: sommige die deze week niet zijn gespeeld ontbreken, ook in het totaal.",
+        "section_hours": "Speeltijden, afgelopen 7 dagen",
+        "hours": {
+            "legend": "Een vakje per uur van elke dag: hoe feller, hoe meer er gespeeld is.",
+            "sessions": "Sessies",
+            "sessions_value": "{} · gemiddeld {}",
+            "longest": "Langste sessie",
+            "busy": "Drukste uren",
+            "busy_value": "{} tot {}",
+            "late": "Gespeeld tussen 21:00 en 06:00"
+        }
     },
     "library": {
         "title": "Games",

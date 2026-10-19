@@ -334,7 +334,7 @@ void CadranActivityTab::show_hero()
     });
     // Unread (the line under All games says why), or nothing played: the
     // empty card says so instead of that line.
-    const bool unread = R_FAILED(s.rc) || (p != AllTime && !s.windows_ok) || (p == AllTime && R_FAILED(s.stats_rc));
+    const bool unread = R_FAILED(s.rc) || !activity_summary::period_read(s, p);
     const bool none   = games.empty() && !unread;
     ui::set_visible(games_note, false);
     ui::set_visible(this->empty.box, none);
@@ -370,7 +370,7 @@ void CadranActivityTab::show_hero()
         c.today->setTextColor(g.today_s ? theme["cadran/text"] : theme["cadran/text3"]);
         // The period is the section's title: "in all" over it.
         c.rest->setText(p == Today ? "playguard/cadran/activity/card_today"_i18n
-                                   : brls::getStr("playguard/cadran/activity/card_total", ui::fmt_play_time(p == Week ? g.week_s : g.total_s)));
+                                   : brls::getStr("playguard/cadran/activity/card_total", ui::fmt_play_time(activity_summary::value(g, p))));
         std::vector<brls::View*> bars(std::begin(c.bars), std::end(c.bars));
         show_bars(bars, g.day_s, SPARK_MAX);
     }

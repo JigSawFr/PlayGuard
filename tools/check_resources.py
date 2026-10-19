@@ -240,8 +240,8 @@ def issue_suffixes():
 DYNAMIC_KEYS = {
     # Loops over 0..N-1 (the screens' pickers and the week).
     "activity/formats/": numbers(4),     # history_activity.cpp, activity_tab.cpp: f < 4
-    "activity/none/": numbers(3),        # activity_tab.cpp: one per period
-    "activity/periods/": numbers(3),     # activity_tab.cpp: p < 3
+    "activity/none/": numbers(4),        # activity_tab.cpp: one per period (activity_summary::PERIODS)
+    "activity/periods/": numbers(4),     # activity_tab.cpp: activity_summary::PERIODS
     "days/": numbers(7),
     "library/views/": numbers(2),        # games_activity.cpp: list, covers
     "days_lower/": numbers(7),

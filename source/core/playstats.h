@@ -2,7 +2,8 @@
 // (pdm:qry) for every account on the console: all-time totals
 // (QueryPlayStatisticsByApplicationId, for every game installed, in an
 // earlier read or named in the play log: deleted ones too) and today / last
-// 7 days, folded from the play-event log (QueryPlayEvent, see
+// 7 days / last 30 days, and when the week's play happened, folded from the
+// play-event log (QueryPlayEvent, see
 // util/playlog.h). Names come from each game's control data (ns). Read-only:
 // nothing here changes the console.
 //
@@ -34,6 +35,7 @@ typedef struct {
     u32  today_s, week_s;            // valid when PlayStats.windows_ok
     u32  day_s[7];                   // same, per day: [0] today … [6] six days ago
     u32  prev_week_s;                // the 7 days before those, when PlayStats.prev_week_ok
+    u32  month_s;                    // the last 30 days, today's included, when PlayStats.month_ok
 } GameStat;
 
 typedef struct {
@@ -48,6 +50,9 @@ typedef struct {
     u8     day_wday[7]; // weekday (0 = Sunday) of day_s[k], when windows_ok
     bool   prev_week_ok; // prev_week_s is meaningful (read with the windows, not shifted since)
     u32    prev_week_s;  // every game added up over the 7 days before the last 7
+    bool   month_ok;     // each game's month_s is meaningful (same)
+    bool   hours_ok;     // hours is meaningful (same)
+    PlayLogHours hours;  // when the last 7 days' play happened, every game together
     u32    count;       // games with any play time, in no particular order
     GameStat games[PLAYSTATS_MAX];
 } PlayStats;

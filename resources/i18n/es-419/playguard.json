@@ -413,18 +413,21 @@
             "today": "Hoy (min)",
             "week": "Últimos 7 días (min)",
             "day": "{} (min)",
-            "total": "Total (min)"
+            "total": "Total (min)",
+            "month": "Últimos 30 días (min)"
         },
         "periods": {
             "0": "Hoy",
             "1": "Últimos 7 días",
-            "2": "Total"
+            "2": "Total",
+            "3": "Últimos 30 días"
         },
         "loading": "Leyendo los datos de juego de la consola...",
         "none": {
             "0": "No se jugó ningún juego hoy.",
             "1": "No se jugó ningún juego en los últimos 7 días.",
-            "2": "Aún no se ha jugado ningún juego."
+            "2": "Aún no se ha jugado ningún juego.",
+            "3": "No se jugó ningún juego en los últimos 30 días."
         },
         "err_list": "No se pudieron listar los juegos",
         "err_stats": "No se pudieron leer las estadísticas de juego",
@@ -452,7 +455,17 @@
         "applet_cap": "No se muestran, para ahorrar memoria en modo applet (abierto desde el Álbum): {} más. La exportación incluye todos los juegos; para ver la lista completa, abra PlayGuard manteniendo presionado R al iniciar un juego.",
         "account_nobody": "Sin cuenta (o una cuenta eliminada)",
         "account_new": "Cuenta nueva desde el {}: {}",
-        "truncated": "Solo se pueden mostrar {} juegos: faltan algunos que no se jugaron esta semana, y el total no los cuenta."
+        "truncated": "Solo se pueden mostrar {} juegos: faltan algunos que no se jugaron esta semana, y el total no los cuenta.",
+        "section_hours": "Horas de juego, últimos 7 días",
+        "hours": {
+            "legend": "Un cuadro por cada hora de cada día: cuanto más intenso, más se jugó.",
+            "sessions": "Sesiones",
+            "sessions_value": "{} · {} en promedio",
+            "longest": "Sesión más larga",
+            "busy": "Horas con más juego",
+            "busy_value": "De {} a {}",
+            "late": "Jugado entre las 21:00 y las 06:00"
+        }
     },
     "library": {
         "title": "Juegos",

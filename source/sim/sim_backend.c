@@ -51,6 +51,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "../core/calendar.h"
 #include "../core/gamecheck.h"
 #include "../core/pctl_ops.h"
 #include "../core/playstats.h"
@@ -634,6 +635,45 @@ void playstats_fetch(PlayStats *out)
     playstats_fetch_for(out, NULL);
 }
 
+// When the made-up week was played: each day's games one after the other,
+// half from 16:30 and half from 19:00 on school days, from 10:00 and 15:00 at
+// the weekend, today's in one stretch ending before now; folded as the
+// console's log is (util/playlog.h).
+static void sim_hours(PlayStats *out)
+{
+    const TimeRule *rule = time_console_rule();
+    u64 starts[7];
+    for (int k = 0; k < 7; k++) starts[k] = local_midnight(rule, out->now, k);
+    enum { GAMES = 16 };
+    PlayLogEvent ev[7 * GAMES * 2];
+    size_t n = 0;
+    for (int k = 6; k >= 0; k--) {
+        const bool weekend = out->day_wday[k] == 0 || out->day_wday[k] == 6;
+        u64 today_s = 0;
+        for (u32 i = 0; i < out->count && i < GAMES; i++) today_s += out->games[i].day_s[0];
+        for (int block = 0; block < (k == 0 ? 1 : 2); block++) {
+            u64 at;
+            if (k == 0) {
+                const u64 latest = out->now > today_s + 3600 ? out->now - today_s - 3600 : starts[0];
+                at = starts[0] + 13 * 3600 + 1800;
+                if (at > latest) at = latest > starts[0] ? latest : starts[0];
+            } else {
+                at = starts[k] + (u64)(weekend ? (block ? 15 * 60 : 10 * 60) : (block ? 19 * 60 : 16 * 60 + 30)) * 60;
+            }
+            for (u32 i = 0; i < out->count && i < GAMES; i++) {
+                const u32 s = out->games[i].day_s[k];
+                if (!s || (k != 0 && (int)(i % 2) != block)) continue;
+                ev[n++] = (PlayLogEvent){ out->games[i].app_id, PlayLogEv_Focus, at, 0, { 0, 0 } };
+                at += s;
+                ev[n++] = (PlayLogEvent){ out->games[i].app_id, PlayLogEv_Unfocus, at, 0, { 0, 0 } };
+                at += 120;   // two minutes to change games: the same session
+            }
+        }
+    }
+    playlog_fold_hours(ev, n, out->now, starts, &out->hours);
+    out->hours_ok = true;
+}
+
 void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
 {
     memset(out, 0, sizeof(*out));
@@ -687,6 +727,10 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         g->today_s  = (u32)share(g->today_s, account);
         g->week_s   = (u32)share(g->week_s, account);
         g->prev_week_s = idle_weeks ? 0 : (u32)share((u64)games[i].prev_week_min * 60, account);
+        // The month: the last 7 days, and the 23 before at the rate of the
+        // week before them; 1 h 30 for a game last played 7 to 29 days ago.
+        g->month_s = g->week_s + (u32)((u64)g->prev_week_s * 23 / 7);
+        if (!g->week_s && !g->prev_week_s && days_ago >= 7 && days_ago < 30) g->month_s = (u32)share(90 * 60, account);
         for (int k = 0; k < 7; k++) g->day_s[k] = (u32)share(g->day_s[k], account);
         if (account && !g->week_s && !g->total_s) out->count--;
     }
@@ -694,6 +738,7 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
     // Racers 2 h more), none after weeks without play.
     out->prev_week_ok = true;
     out->prev_week_s = idle_weeks ? 0 : (u32)share(480ULL * 60, account);
+    out->month_ok = true;
     // A large library: filler games, each played a little this week.
     const char *more = getenv("PLAYGUARD_SIM_GAMES");
     const int n = more ? atoi(more) : 0;
@@ -703,13 +748,14 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         g->app_id = 0x0100B00000000000ULL + ((u64)i << 12);
         snprintf(g->name, sizeof(g->name), "Game %03d", i + 1);
         g->totals_ok = true;
-        g->week_s = g->day_s[1] = (u32)(60 * (n - i));
+        g->week_s = g->month_s = g->day_s[1] = (u32)(60 * (n - i));
         g->total_s = g->week_s * 10;
         g->launches = 3;
         g->last_played = out->now - 86400;
         g->first_played = out->now - 30ULL * 86400;
     }
     out->truncated = i < n;   // more than the list holds, as on a console
+    sim_hours(out);
 }
 
 // The made-up games have their names already; no SD card icons either.

@@ -296,6 +296,55 @@ static void test_accounts(void)
     CHECK(k == 2 && find(t, k, A)->today_s == 600 + 300 && find(t, k, B)->today_s == 300);
 }
 
+// When the week's play happened (Activity's hours): each hour of each day,
+// and the sessions, games and short breaks together.
+static void test_hours(void)
+{
+    uint64_t starts[7];
+    for (int k = 0; k < 7; k++) starts[k] = DAY_START - (uint64_t)k * DAY;
+    const PlayLogEvent log[] = {
+        ev(A, PlayLogEv_Focus, DAY_START + 9 * H + 1800), ev(B, PlayLogEv_Focus, DAY_START + 10 * H + 600),   // A then B: one session
+        ev(0, PlayLogEv_Away, DAY_START + 11 * H),
+        ev(A, PlayLogEv_Focus, DAY_START + 11 * H + 240), ev(A, PlayLogEv_Unfocus, DAY_START + 11 * H + 600), // 4 min later: the same
+        ev(C, PlayLogEv_Focus, DAY_START - H), ev(C, PlayLogEv_Unfocus, DAY_START + 1200),                  // across midnight
+        ev(B, PlayLogEv_Focus, starts[3] + 20 * H), ev(B, PlayLogEv_Unfocus, starts[3] + 22 * H + 1800),    // 3 days back
+        ev(A, PlayLogEv_Focus, starts[6] - H), ev(A, PlayLogEv_Unfocus, starts[6] + 1800),                  // from before the week
+        ev(A, PlayLogEv_Focus, NOW - 600),                                                                  // still playing
+    };
+    // Oldest first, as the log is.
+    const PlayLogEvent sorted[] = { log[9], log[10], log[7], log[8], log[5], log[6], log[0], log[1], log[2], log[3], log[4], log[11] };
+    PlayLogHours h;
+    playlog_fold_hours(sorted, 12, NOW, starts, &h);
+    CHECK(h.hour_s[0][9] == 1800 && h.hour_s[0][10] == H && h.hour_s[0][11] == 360);
+    CHECK(h.hour_s[0][0] == 1200 && h.hour_s[1][23] == H);
+    CHECK(h.hour_s[3][20] == H && h.hour_s[3][21] == H && h.hour_s[3][22] == 1800);
+    CHECK(h.hour_s[6][0] == 1800);   // only the part inside the week
+    CHECK(h.hour_s[0][17] == 600);
+    // The sessions: before the week (its part inside), 3 days back, across
+    // midnight, the morning's (A, B and A again), the one going on.
+    CHECK(h.sessions == 5);
+    CHECK(h.longest_s == 2 * H + 1800 && h.longest_day == 3);
+    CHECK(h.session_s == 1800 + (2 * H + 1800) + (H + 1200) + (2 * H - 1800 + 600) + 600);
+    uint64_t sum = 0;
+    for (int k = 0; k < 7; k++)
+        for (int hr = 0; hr < 24; hr++) sum += h.hour_s[k][hr];
+    CHECK(sum == h.session_s - 240);   // the 4-minute break is not play
+}
+
+// Activity's last 30 days: the same fold over a longer window.
+static void test_since(void)
+{
+    PlayLogTotal t[8];
+    const uint64_t today = 100 * DAY, now = today + 18 * H;   // far enough from 0 for 40 days back
+    const PlayLogEvent log[] = {
+        ev(B, PlayLogEv_Focus, today - 40 * DAY), ev(B, PlayLogEv_Unfocus, today - 40 * DAY + H),
+        ev(A, PlayLogEv_Focus, today - 20 * DAY), ev(A, PlayLogEv_Unfocus, today - 20 * DAY + H),
+        ev(A, PlayLogEv_Focus, today + H), ev(A, PlayLogEv_Unfocus, today + 2 * H),
+    };
+    const size_t n = playlog_fold_since(log, 6, now, today - 29 * DAY, t, 8);
+    CHECK(n == 1 && t[0].app_id == A && t[0].week_s == 2 * H && t[0].today_s == 0 && t[0].day_s[0] == 0);
+}
+
 int main(void)
 {
     test_sessions();
@@ -306,5 +355,7 @@ int main(void)
     test_days();
     test_week_before();
     test_accounts();
+    test_hours();
+    test_since();
     return CHECK_DONE("playlog session, window and per-account assertions passed");
 }

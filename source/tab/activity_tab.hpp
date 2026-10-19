@@ -21,6 +21,7 @@
 #include "tab/tab_base.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "view/play_days.hpp"
+#include "view/play_hours.hpp"
 
 class ActivityTab : public TabBase
 {
@@ -37,7 +38,7 @@ class ActivityTab : public TabBase
   protected:
     void refresh() override;
 
-    enum Period { Today = 0, Week = 1, AllTime = 2 };
+    enum Period { Today = 0, Week = 1, AllTime = 2, Month = 3 };   // as activity_summary's
     int period = Week;
 
     // Shows this account (-1: every account), remembered for the next run
@@ -65,6 +66,9 @@ class ActivityTab : public TabBase
     void show_status(const PlayStats& s, bool empty);
     // The summary over the period.
     void show_summary(const std::shared_ptr<const PlayStats>& data);
+    // When the last 7 days were played: the hours, the sessions (whatever
+    // the period).
+    void show_hours(const std::shared_ptr<const PlayStats>& data);
     void export_to_sd() const;
 
     int listener = 0;                                 // play_data::listen id
@@ -91,6 +95,13 @@ class ActivityTab : public TabBase
     BRLS_BIND(brls::DetailCell, days_played, "ac_days_played");
     BRLS_BIND(brls::DetailCell, busiest,     "ac_busiest");
     BRLS_BIND(brls::DetailCell, session,     "ac_session");
+    BRLS_BIND(brls::Header,     hours_header, "ac_hours_header");
+    BRLS_BIND(PlayHoursView,    hours,       "ac_hours");
+    BRLS_BIND(brls::Label,      hours_legend, "ac_hours_legend");
+    BRLS_BIND(brls::DetailCell, sessions,    "ac_sessions");
+    BRLS_BIND(brls::DetailCell, longest,     "ac_longest");
+    BRLS_BIND(brls::DetailCell, busy_hours,  "ac_busy_hours");
+    BRLS_BIND(brls::DetailCell, late,        "ac_late");
     BRLS_BIND(brls::DetailCell, games,       "ac_games");
     BRLS_BIND(brls::DetailCell, export_cell, "ac_export");
     BRLS_BIND(brls::Box,        progress,    "ac_progress");

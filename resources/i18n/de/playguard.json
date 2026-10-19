@@ -413,18 +413,21 @@
             "today": "Heute (min)",
             "week": "Letzte 7 Tage (min)",
             "day": "{} (min)",
-            "total": "Gesamt (min)"
+            "total": "Gesamt (min)",
+            "month": "Letzte 30 Tage (min)"
         },
         "periods": {
             "0": "Heute",
             "1": "Letzte 7 Tage",
-            "2": "Gesamt"
+            "2": "Gesamt",
+            "3": "Letzte 30 Tage"
         },
         "loading": "Spieldaten der Konsole werden gelesen...",
         "none": {
             "0": "Heute wurde kein Spiel gespielt.",
             "1": "In den letzten 7 Tagen wurde kein Spiel gespielt.",
-            "2": "Noch kein Spiel gespielt."
+            "2": "Noch kein Spiel gespielt.",
+            "3": "In den letzten 30 Tagen wurde kein Spiel gespielt."
         },
         "err_list": "Spiele konnten nicht aufgelistet werden",
         "err_stats": "Spielstatistik konnte nicht gelesen werden",
@@ -452,7 +455,17 @@
         "applet_cap": "Nicht aufgeführt, um im Applet-Modus (aus dem Album geöffnet) Speicher zu sparen: {} weitere. Der Export enthält alle Spiele; für die vollständige Liste öffnen Sie PlayGuard, indem Sie beim Starten eines Spiels R gedrückt halten.",
         "account_nobody": "Ohne Nutzer (oder gelöschter Nutzer)",
         "account_new": "Neuer Nutzer seit {}: {}",
-        "truncated": "Nur {} Spiele können aufgeführt werden: Einige, die diese Woche nicht gespielt wurden, fehlen, auch in der Gesamtzeit."
+        "truncated": "Nur {} Spiele können aufgeführt werden: Einige, die diese Woche nicht gespielt wurden, fehlen, auch in der Gesamtzeit.",
+        "section_hours": "Spielzeiten, letzte 7 Tage",
+        "hours": {
+            "legend": "Ein Feld pro Stunde jedes Tages: je kräftiger, desto mehr wurde gespielt.",
+            "sessions": "Sitzungen",
+            "sessions_value": "{} · im Schnitt {}",
+            "longest": "Längste Sitzung",
+            "busy": "Meistgespielte Stunden",
+            "busy_value": "{} bis {}",
+            "late": "Gespielt zwischen 21:00 und 06:00"
+        }
     },
     "library": {
         "title": "Spiele",

@@ -117,10 +117,15 @@ ActivityTab::ActivityTab()
     });
     sort->registerClickAction([this](brls::View*) {
         std::vector<std::string> labels;
-        for (int p = 0; p < 3; p++) labels.push_back(brls::getStr(fmt::format("playguard/activity/periods/{}", p)));
-        ui::pick("playguard/activity/period"_i18n, labels, this->period, [this](int index) {
-            this->period = index;
-            config::get().activity_period = index;   // the next visit starts there
+        int selected = 0;
+        for (int i = 0; i < activity_summary::PERIOD_COUNT; i++) {
+            const int p = activity_summary::PERIODS[i];
+            labels.push_back(brls::getStr(fmt::format("playguard/activity/periods/{}", p)));
+            if (p == this->period) selected = i;
+        }
+        ui::pick("playguard/activity/period"_i18n, labels, selected, [this](int index) {
+            this->period = activity_summary::PERIODS[index];
+            config::get().activity_period = this->period;   // the next visit starts there
             ui::save_config();
             this->rebuild();
         });
@@ -238,6 +243,7 @@ void ActivityTab::rebuild()
         games->setDetailText(ui::opens());
         ui::set_visible(capped, false);
         this->show_summary(nullptr);
+        this->show_hours(nullptr);
         ui::set_visible(progress.getView(), reading);
         return;
     }
@@ -256,6 +262,7 @@ void ActivityTab::rebuild()
     ui::set_visible(capped, s.truncated);
 
     this->show_summary(data);
+    this->show_hours(data);
     this->show_status(s, played == 0);
 }
 
@@ -293,7 +300,7 @@ void ActivityTab::show_status(const PlayStats& s, bool empty)
     bool error = true;
     if (R_FAILED(s.rc))
         text = "playguard/activity/err_list"_i18n + " — " + ui::rc_text(s.rc);
-    else if (p != AllTime && !s.windows_ok)
+    else if (p != AllTime && !activity_summary::period_read(s, p))
         text = "playguard/activity/err_log"_i18n + " — " + ui::rc_text(s.events_rc);
     else if (p == AllTime && R_FAILED(s.stats_rc))
         text = "playguard/activity/err_stats"_i18n + " — " + ui::rc_text(s.stats_rc);
@@ -342,6 +349,31 @@ void ActivityTab::show_summary(const std::shared_ptr<const PlayStats>& data)
     });
 }
 
+void ActivityTab::show_hours(const std::shared_ptr<const PlayStats>& data)
+{
+    const activity_summary::Hours h = data ? activity_summary::hours(*data) : activity_summary::Hours();
+    if (data) hours->show(*data);
+    if (h.sessions)
+        sessions->setDetailText(brls::getStr("playguard/activity/hours/sessions_value", (int)h.sessions,
+                                             ui::fmt_play_time(h.average_s)));
+    if (h.longest_day >= 0)
+        longest->setDetailText(ui::fmt_play_time(h.longest_s) + " · " +
+                               brls::getStr(fmt::format("playguard/days/{}", (int)data->day_wday[h.longest_day] % 7)));
+    if (h.busy_from >= 0)
+        busy_hours->setDetailText(brls::getStr("playguard/activity/hours/busy_value", fmt::format("{:02d}:00", h.busy_from),
+                                               fmt::format("{:02d}:00", h.busy_from + 2)));
+    late->setDetailText(ui::fmt_play_time(h.late_s));
+    ui::set_visible_all({
+        { hours_header.getView(), h.known },
+        { hours.getView(), h.known },
+        { hours_legend.getView(), h.known },
+        { sessions.getView(), h.known && h.sessions > 0 },
+        { longest.getView(), h.known && h.longest_day >= 0 },
+        { busy_hours.getView(), h.known && h.busy_from >= 0 },
+        { late.getView(), h.known && h.sessions > 0 },
+    });
+}
+
 // Every game with any figure, in the order of the list on screen; minutes as
 // numbers, so a spreadsheet can add them up.
 void ActivityTab::export_to_sd() const
@@ -367,6 +399,7 @@ void ActivityTab::export_stats(std::shared_ptr<const PlayStats> data, int p, con
         text.id       = "playguard/activity/columns/id"_i18n;
         text.today    = "playguard/activity/columns/today"_i18n;
         text.week     = "playguard/activity/columns/week"_i18n;
+        text.month    = "playguard/activity/columns/month"_i18n;
         text.total    = "playguard/activity/columns/total"_i18n;
         text.launches = "playguard/activity/launches"_i18n;
         text.first    = "playguard/activity/first"_i18n;

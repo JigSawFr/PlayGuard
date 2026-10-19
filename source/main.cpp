@@ -83,6 +83,7 @@ extern "C" void nvgDebugGetStats(NVGcontext*, int*, int*, int*, int*) __attribut
 #include "view/version_badge.hpp"
 #include "view/scroll_view.hpp"
 #include "view/play_days.hpp"
+#include "view/play_hours.hpp"
 #include "view/pt_gauge.hpp"
 #include "view/pt_ring.hpp"
 #include "view/pt_state_header.hpp"
@@ -361,6 +362,7 @@ void register_views()
     brls::Application::registerXMLView("PtRing",          PtRing::create);
     brls::Application::registerXMLView("PtWeekView",      PtWeekView::create);
     brls::Application::registerXMLView("PlayDaysView",    PlayDaysView::create);
+    brls::Application::registerXMLView("PlayHoursView",   PlayHoursView::create);
     brls::Application::registerXMLView("MadeInFrance",    MadeInFrance::create);
     brls::Application::registerXMLView("DashboardTab",    DashboardTab::create);
     brls::Application::registerXMLView("CadranTab",       CadranTab::create);

@@ -27,6 +27,11 @@ int main()
     s->games[1].week_s = 60;
     s->prev_week_ok = true;
     s->prev_week_s = 4321;
+    s->month_ok = true;
+    s->games[0].month_s = 9000;
+    s->hours_ok = true;
+    s->hours.hour_s[0][17] = 1800;
+    s->hours.sessions = 3;
 
     // Round trip; only the games held are written.
     const std::string bytes = play_cache::encode(*s);
@@ -35,6 +40,8 @@ int main()
     CHECK(play_cache::decode(bytes, *back));
     CHECK(back->count == 2 && back->now == s->now && back->windows_ok);
     CHECK(back->prev_week_ok && back->prev_week_s == 4321);
+    CHECK(back->month_ok && back->games[0].month_s == 9000);
+    CHECK(back->hours_ok && back->hours.hour_s[0][17] == 1800 && back->hours.sessions == 3);
     CHECK(std::strcmp(back->games[0].name, "Game A") == 0 && back->games[0].total_s == 99999);
     CHECK(back->games[1].day_s[6] == 60);
 
@@ -55,6 +62,7 @@ int main()
     CHECK(a.day_s[0] == 0 && a.day_s[1] == 0 && a.day_s[2] == 100 && a.day_s[6] == 500);
     CHECK(a.today_s == 0 && a.week_s == 100 + 200 + 300 + 400 + 500);
     CHECK(!back->prev_week_ok);   // the week before is not known day by day
+    CHECK(!back->month_ok && !back->hours_ok);   // nor the month and the hours
     CHECK(back->games[1].week_s == 0);
     CHECK(back->day_wday[0] == 5 && back->day_wday[2] == 3 && back->day_wday[6] == 6);   // Friday first
     CHECK(a.total_s == 99999);   // all time untouched

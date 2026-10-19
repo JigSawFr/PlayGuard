@@ -52,7 +52,7 @@ struct Config
     std::string sys_checked;
     std::string start_tab = "dashboard";   // tab shown at start-up (main.xml order: START_TABS)
     std::vector<int> extra_amounts = { 15, 30, 60 };   // "Extra time today" choices, minutes
-    int  activity_period = 1;          // Activity's period: 0 today, 1 last 7 days, 2 all time
+    int  activity_period = 1;          // Activity's period: 0 today, 1 last 7 days, 2 all time, 3 last 30 days
     bool games_grid      = true;       // Activity › All games as covers (false: a list)
     bool check_grid      = false;      // Console › Check the installed games as covers (false: a list)
     // Activity's account when PlayGuard starts: "last" (the one shown last,

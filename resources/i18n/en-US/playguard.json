@@ -413,18 +413,21 @@
             "today": "Today (min)",
             "week": "Last 7 days (min)",
             "day": "{} (min)",
-            "total": "All time (min)"
+            "total": "All time (min)",
+            "month": "Last 30 days (min)"
         },
         "periods": {
             "0": "Today",
             "1": "Last 7 days",
-            "2": "All time"
+            "2": "All time",
+            "3": "Last 30 days"
         },
         "loading": "Reading the console's play data...",
         "none": {
             "0": "No game played today.",
             "1": "No game played in the last 7 days.",
-            "2": "No game played yet."
+            "2": "No game played yet.",
+            "3": "No game played in the last 30 days."
         },
         "err_list": "Could not list the games",
         "err_stats": "Could not read the play statistics",
@@ -452,7 +455,17 @@
         "applet_cap": "Not listed, to save memory in applet mode (opened from the album): {} more. The export has every game; for the full list, open PlayGuard while holding R as you start a game.",
         "account_nobody": "No account (or a deleted one)",
         "account_new": "New account since {}: {}",
-        "truncated": "Only {} games can be listed: some not played this week are missing, and the all-time total leaves them out."
+        "truncated": "Only {} games can be listed: some not played this week are missing, and the all-time total leaves them out.",
+        "section_hours": "Hours played, last 7 days",
+        "hours": {
+            "legend": "A square for each hour of each day: the stronger, the more was played.",
+            "sessions": "Sessions",
+            "sessions_value": "{} · {} on average",
+            "longest": "Longest session",
+            "busy": "Busiest hours",
+            "busy_value": "{} to {}",
+            "late": "Played from 21:00 to 06:00"
+        }
     },
     "library": {
         "title": "Games",
