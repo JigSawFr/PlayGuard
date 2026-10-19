@@ -256,8 +256,9 @@ if (PLAYGUARD_WEB)
         -sEXIT_RUNTIME=0
         -sEXPORTED_RUNTIME_METHODS=ENV,FS,ccall,addRunDependency,removeRunDependency
         -lidbfs.js
-        --preload-file ${CMAKE_BINARY_DIR}/resources@/app/resources
-        --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/web/samples@/app/samples)
+        # SHELL: keeps each pair together (CMake drops a repeated option).
+        "SHELL:--preload-file ${CMAKE_BINARY_DIR}/resources@/app/resources"
+        "SHELL:--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/web/samples@/app/samples")
 endif ()
 # On the Switch: borealis' userAppInit, which libnx calls before main, timed
 # for the diagnostic report's start-up section (source/core/startup_hook.c).
