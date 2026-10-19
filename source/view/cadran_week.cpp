@@ -300,16 +300,20 @@ void CadranWeekView::render()
         const uint16_t m = this->days[d];
         const bool focused = d == this->focused;
         const bool changed = this->valid && m != this->live[d];
+        const bool over = this->valid && this->played_ok && m != PT_DAY_NOLIMIT && m > 0 && this->played[d] >= m;
         c.value->setText(!this->valid ? "—" : m == PT_DAY_NOLIMIT ? "—" : ui::fmt_played(m));
-        c.value->setTextColor(focused ? theme["cadran/teal"] : changed ? theme["cadran/amber"] : theme["cadran/text"]);
+        // A limit gone past in coral, as its bar (the key says so); one not
+        // saved in amber, its bar ringed in amber too.
+        c.value->setTextColor(focused ? theme["cadran/teal"] : changed ? theme["cadran/amber"] : over ? theme["cadran/coral"] : theme["cadran/text"]);
         const float bar = !this->valid || m == PT_DAY_NOLIMIT ? BAR_MIN : std::max(BAR_MIN, BAR_MAX * (float)m / (float)top);
         c.bar->setHeight(bar);
         c.bar->setBackgroundColor(focused ? theme["cadran/teal_fill"] : d == today ? theme["cadran/bar_today"] : theme["cadran/bar"]);
+        c.bar->setBorderColor(theme["cadran/amber_fill"]);
+        c.bar->setBorderThickness(changed ? 2 : 0);
         // What was played that day, against its limit: up to the top, coral
         // once the limit is reached. Nothing on a day without one.
         const bool fills = this->valid && this->played_ok && m != PT_DAY_NOLIMIT && m > 0 && this->played[d] > 0;
         if (fills) {
-            const bool over = this->played[d] >= m;
             c.fill->setHeight(std::max(6.0f, bar * std::min(1.0f, (float)this->played[d] / (float)m)));
             // On the focused bar (teal itself), the teal darkened.
             NVGcolor shade = theme["cadran/navy"];

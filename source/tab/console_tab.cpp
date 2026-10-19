@@ -8,10 +8,12 @@
 #include "action/sys_update_flow.hpp"
 #include "activity/firmware_gate_activity.hpp"
 #include "activity/game_check_activity.hpp"
+#include "core/sysinfo.h"
 #include "tab/clock_tab.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/patches.hpp"
+#include "view/cadran_icon.hpp"
 #include "view/row_icon.hpp"
 
 using namespace brls::literals;
@@ -128,8 +130,20 @@ void ConsoleTab::refresh()
     // a newer release (their notes say).
     fw_warn->set_shown(!sys_notes_flow::firmware_advice().empty());
     NVGcolor c = ui::color_neutral();
-    compat->setDetailText(ui::compat_text(si, &c));
+    const std::string compat_value = ui::compat_text(si, &c);
+    // Checked: the line's icon says it (a teal check) and no word is needed;
+    // anything else, a warning in the value's colour and the words.
+    const bool compat_ok = sysinfo_compat(&si) == SysCompat_Ok;
+    compat->setDetailText(compat_ok ? "" : compat_value);
     compat->setDetailTextColor(c);
+    if (auto* square = compat->getChildren().empty() ? nullptr : dynamic_cast<brls::Box*>(compat->getChildren()[0])) {
+        brls::Theme theme = brls::Application::getTheme();
+        for (brls::View* v : square->getChildren())
+            if (auto* icon = dynamic_cast<CadranIcon*>(v)) {
+                icon->setIcon(compat_ok ? "check" : "alert");
+                icon->setColor(compat_ok ? theme["cadran/teal"] : c);
+            }
+    }
 
     storage->setDetailText(ui::storage_text(si));
     this->storage_note = ui::other_storage_note(si);

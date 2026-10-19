@@ -23,6 +23,11 @@ class CadranDigits : public brls::View
     // any language) at half of it, on the same baseline: "40 min", "1 h 20"
     // as a dial writes them. A text with no figure keeps one size.
     void setSmallUnits(bool small);
+    // Drawn Preferences › Text size's times larger, as the labels are
+    // (ui/text_size); off by default, the figures sized for their place.
+    void setFollowsTextSize(bool follows);
+    // The size taken again after the text size changed (ui/text_size).
+    void remeasure() { this->measure(); }
 
     void draw(NVGcontext* vg, float x, float y, float width, float height,
               brls::Style style, brls::FrameContext* ctx) override;
@@ -35,6 +40,7 @@ class CadranDigits : public brls::View
     float drawSize = 32.0f;   // fontSize, or less to fit fitWidth
     float fitWidth = 0.0f;
     bool smallUnits = false;
+    bool followsTextSize = false;
     NVGcolor color;
     int font;
 

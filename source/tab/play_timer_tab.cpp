@@ -80,14 +80,13 @@ PlayTimerTab::PlayTimerTab()
 {
     namespace kit = cadran::kit;
     static_cast<brls::Box*>(this->getView("pt_week_card"))->addView(brls::View::createFromXMLResource("view/cadran_week_card.xml"));
+    // The keys and the bars' key on two lines when the text is larger.
+    kit::wrap(this->getView("cpt_keys_idle"));
     kit::wrap(this->getView("pt_chips"));
     this->list.apply({ { "pt_unlocked_banner", "unlock" }, { "pt_extra", "plus" }, { "pt_stop", "stop" },
                        { "pt_split", "calendar" }, { "pt_bedtime_reset", "moon" }, { "pt_extra_amounts", "plus" },
                        { "pt_extra_auto", "refresh" }, { "pt_advanced", "settings" } });
     this->list.banners({ "pt_unlocked_banner" });
-    // The timer's state is the header's pill and the week's summary now; its
-    // warnings stay.
-    if (brls::View* state = this->getView("pt_state_header")->getView("pt_summary")) state->setVisibility(brls::Visibility::GONE);
 
     // The week: edited here, saved together (+ or Save), as in the per-day editor.
     week_editor->set_can_edit([this]() {
@@ -356,6 +355,11 @@ void PlayTimerTab::show_played_key(int day)
     bool limits = false;
     for (int d = 0; d < 7; d++) limits = limits || this->pending[d] != PT_DAY_NOLIMIT;
     ui::set_visible(played_key.getView(), this->played_ok && (limits || day >= 0));
+    // A day played past its limit: its bar in coral, said by the key.
+    bool over = false;
+    for (int d = 0; d < 7; d++)
+        over = over || (this->pending[d] != PT_DAY_NOLIMIT && this->pending[d] > 0 && this->played_min[d] >= this->pending[d]);
+    ui::set_visible(over_key.getView(), this->played_ok && over && day < 0);
     if (!this->played_ok) return;
     std::string text = "playguard/cadran/week/played_key"_i18n;
     if (day >= 0 && day < 7) {
@@ -394,17 +398,20 @@ void PlayTimerTab::rerender()
             if (first < 0) first = d;
         }
     if (changed) {
-        pending_text->setText(brls::getStr("playguard/play_timer/perday/unsaved_count", changed) + " · " +
+        pending_text->setText((changed == 1 ? "playguard/play_timer/perday/unsaved_count_one"_i18n : brls::getStr("playguard/play_timer/perday/unsaved_count", changed)) + " · " +
                               brls::getStr("playguard/cadran/week/first_change",
                                            brls::getStr(fmt::format("playguard/days_short/{}", first)),
                                            limit_text(pt.day_min[first]), limit_text(this->pending[first])));
         pending_text->setTextColor(theme["cadran/amber"]);
     } else {
-        // A bonus planned raises its day for now: said, so that day's bar is understood.
+        // A bonus planned raises its day for now: said, so that day's bar is
+        // understood. Nothing waiting and no bonus: no line.
         const std::string bonus = pt_flow::bonus_text();
-        pending_text->setText("playguard/cadran/week/no_changes"_i18n + (bonus.empty() ? "" : " · " + bonus));
+        pending_text->setText(bonus);
         pending_text->setTextColor(theme["cadran/text3"]);
     }
+    ui::set_visible(this->getView("pt_pending_row"), changed > 0 || !pt_flow::bonus_text().empty());
+    this->show_played_key(this->week_editor->focused_day());   // a day over its limit may no longer be
     pending_dot->setVisibility(changed ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
     // The buttons go with the changes; the focus they had to the week.
     brls::View* focus = brls::Application::getCurrentFocus();

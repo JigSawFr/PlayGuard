@@ -197,29 +197,30 @@ RestrictionsTab::Tile RestrictionsTab::make_tile(uint32_t level, bool last)
         rule->setMarginTop(10);
         rule->setMarginBottom(10);
         t.box->addView(rule);
-        const auto row = [&](brls::Rectangle*& dot, brls::Label*& text) {
+        const auto row = [&](brls::Label*& text, brls::Label*& state, CadranIcon*& icon) {
             auto* r = new brls::Box(brls::Axis::ROW);
-            r->setAlignItems(brls::AlignItems::FLEX_START);   // the dot by the first line
+            r->setAlignItems(brls::AlignItems::CENTER);
             r->setMarginBottom(6);
-            dot = new brls::Rectangle(theme["cadran/text3"]);
-            dot->setWidth(8);
-            dot->setHeight(8);
-            dot->setCornerRadius(4);
-            dot->setMarginTop(5);
-            dot->setMarginRight(6);
-            dot->setShrink(0);
-            r->addView(dot);
-            // On two lines when a language needs them (the tiles of the row
-            // grow together).
+            // What it is about, on two lines when a language needs them (the
+            // tiles of the row grow together); its state at the right.
             text = kit::label("", 15, "cadran/text2");
             text->setGrow(1.0f);
             text->setWidth(0);
+            text->setMarginRight(6);
             r->addView(text);
+            state = kit::label("", 15, "cadran/text");
+            state->setSingleLine(true);
+            state->setShrink(0);
+            state->setMarginRight(6);
+            r->addView(state);
+            icon = kit::icon("check", 18, "cadran/teal_fill");
+            icon->setShrink(0);
+            r->addView(icon);
             t.box->addView(r);
         };
-        row(t.sns_dot, t.sns);
-        row(t.comm_dot, t.comm);
-        row(t.games_dot, t.games);
+        row(t.sns, t.sns_state, t.sns_icon);
+        row(t.comm, t.comm_state, t.comm_icon);
+        row(t.games, t.games_state, t.games_icon);
         t.games_row = static_cast<brls::Box*>(t.games->getParent());
     }
 
@@ -331,10 +332,38 @@ void RestrictionsTab::refresh()
                                  (brls::DetailCell*)org.getView() })
         ui::show_writable(c, writable);
     free_comm->setDetailText(this->st.free_comm_count_ok
-        ? brls::getStr("playguard/restrictions/free_comm_value", (int)this->st.free_comm_count) : na);
+        ? (this->st.free_comm_count == 1 ? "playguard/restrictions/free_comm_value_one"_i18n
+                                         : brls::getStr("playguard/restrictions/free_comm_value", (int)this->st.free_comm_count))
+        : na);
     this->list.sync();
     this->show_tiles(custom);
 }
+
+namespace
+{
+// "Communication · restricted" (or "交流・制限"): what it is about in
+// `name`; its state as `icon` (a padlock in coral when `restricts`, a check
+// in teal), the words after the separator kept only when `words` (a count,
+// or "—" when unknown, the icon then hidden).
+void line(brls::Label* name, brls::Label* state, CadranIcon* icon, const std::string& text, bool known,
+          bool restricts, bool words)
+{
+    std::string what = text, how;
+    for (const char* sep : { " \u00B7 ", "\u30FB" }) {
+        const size_t at = text.rfind(sep);
+        if (at == std::string::npos) continue;
+        what = text.substr(0, at);
+        how = text.substr(at + std::string(sep).size());
+        break;
+    }
+    name->setText(what);
+    state->setText(!known || words ? how : "");
+    ui::set_visible(state, !state->getFullText().empty());
+    icon->setIcon(restricts ? "lock" : "check");
+    icon->setColor(brls::Application::getTheme()[restricts ? "cadran/coral_fill" : "cadran/teal_fill"]);
+    icon->setVisibility(known ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+}
+}   // namespace
 
 void RestrictionsTab::show_tiles(bool custom)
 {
@@ -351,8 +380,10 @@ void RestrictionsTab::show_tiles(bool custom)
         } else if (t.level != PctlSafetyLevel_None) {
             known = R_SUCCEEDED(pctl_get_level_settings(t.level, &s));
         }
+        // The level in force: a soft fill and its check; the teal ring is
+        // the focus's alone.
         t.box->setBackgroundColor(selected ? theme["cadran/teal_soft"] : theme["cadran/surf"]);
-        t.box->setBorderColor(selected ? theme["cadran/teal_fill"] : theme["cadran/line"]);
+        t.box->setBorderColor(theme["cadran/line"]);
         t.badge->setVisibility(selected ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
         if (t.level == PctlSafetyLevel_Custom && t.to_settings != custom) {
             t.to_settings = custom;
@@ -365,25 +396,30 @@ void RestrictionsTab::show_tiles(bool custom)
         if (!t.age) continue;   // no restriction: its words say it all
         t.age->setTextColor(selected ? theme["cadran/teal"] : theme["cadran/text"]);
         t.age->setText(!known ? "—" : ui::age_text(s.rating_age));
-        if (t.level == PctlSafetyLevel_Custom) t.note->setText("playguard/cadran/restrictions/custom"_i18n);
-        else if (known && s.rating_age) t.note->setText(brls::getStr("playguard/cadran/restrictions/up_to", org.empty() ? "—" : org, (int)s.rating_age));
-        else t.note->setText("playguard/cadran/restrictions/any_age"_i18n);
-        t.sns->setText(!known ? "playguard/cadran/restrictions/sns_unknown"_i18n
-                       : s.sns_post_restriction ? "playguard/cadran/restrictions/sns_blocked"_i18n
-                                                : "playguard/cadran/restrictions/sns_allowed"_i18n);
-        t.comm->setText(!known ? "playguard/cadran/restrictions/comm_unknown"_i18n
-                        : s.free_communication_restriction ? "playguard/cadran/restrictions/comm_blocked"_i18n
-                                                           : "playguard/cadran/restrictions/comm_allowed"_i18n);
-        t.sns_dot->setColor(!known ? theme["cadran/text3"] : s.sns_post_restriction ? theme["cadran/coral_fill"] : theme["cadran/teal_fill"]);
-        t.comm_dot->setColor(!known ? theme["cadran/text3"] : s.free_communication_restriction ? theme["cadran/coral_fill"] : theme["cadran/teal_fill"]);
+        // "PEGI 12" kept on one line; Custom says its own settings too.
+        const std::string rated = known && s.rating_age
+            ? brls::getStr("playguard/cadran/restrictions/up_to", (org.empty() ? "—" : org) + "\u00A0" + std::to_string((int)s.rating_age))
+            : "playguard/cadran/restrictions/any_age"_i18n;
+        t.note->setText(t.level == PctlSafetyLevel_Custom ? rated + "\n" + "playguard/cadran/restrictions/custom"_i18n : rated);
+        line(t.sns, t.sns_state, t.sns_icon,
+             !known ? "playguard/cadran/restrictions/sns_unknown"_i18n
+             : s.sns_post_restriction ? "playguard/cadran/restrictions/sns_blocked"_i18n
+                                      : "playguard/cadran/restrictions/sns_allowed"_i18n,
+             known, s.sns_post_restriction, false);
+        line(t.comm, t.comm_state, t.comm_icon,
+             !known ? "playguard/cadran/restrictions/comm_unknown"_i18n
+             : s.free_communication_restriction ? "playguard/cadran/restrictions/comm_blocked"_i18n
+                                                : "playguard/cadran/restrictions/comm_allowed"_i18n,
+             known, s.free_communication_restriction, false);
         // The installed games it blocks, once a game check was made.
         size_t n = 0, of = 0;
         const bool counted = known && rating_flow::count_blocked(st, s.rating_age, &n, &of);
         ui::set_visible(t.games_row, counted);
         if (counted) {
-            t.games->setText(n ? brls::getStr("playguard/cadran/restrictions/games_blocked", (int)n)
-                               : "playguard/cadran/restrictions/games_none"_i18n);
-            t.games_dot->setColor(n ? theme["cadran/coral_fill"] : theme["cadran/teal_fill"]);
+            line(t.games, t.games_state, t.games_icon,
+                 n ? brls::getStr("playguard/cadran/restrictions/games_blocked", (int)n)
+                   : "playguard/cadran/restrictions/games_none"_i18n,
+                 true, n > 0, true);
         }
     }
 }

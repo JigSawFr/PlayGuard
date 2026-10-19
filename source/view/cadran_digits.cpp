@@ -14,6 +14,7 @@ CadranDigits::CadranDigits()
     this->registerFloatXMLAttribute("fontSize", [this](float value) { this->setFontSize(value); });
     this->registerColorXMLAttribute("textColor", [this](NVGcolor value) { this->setTextColor(value); });
     this->registerFloatXMLAttribute("fitWidth", [this](float value) { this->setFitWidth(value); });
+    this->registerBoolXMLAttribute("followsTextSize", [this](bool value) { this->setFollowsTextSize(value); });
     this->measure();
 }
 
@@ -30,6 +31,12 @@ void CadranDigits::setFontSize(float value)
 }
 
 void CadranDigits::setTextColor(NVGcolor value) { this->color = value; }
+
+void CadranDigits::setFollowsTextSize(bool follows)
+{
+    this->followsTextSize = follows;
+    this->measure();
+}
 
 void CadranDigits::setFitWidth(float width)
 {
@@ -79,14 +86,15 @@ void CadranDigits::measure()
 {
     NVGcontext* vg = brls::Application::getNVGContext();
     nvgFontFaceId(vg, this->font);
-    float width = this->advance(vg, this->fontSize);
-    this->drawSize = this->fontSize;
+    const float size = this->fontSize * (this->followsTextSize ? brls::Label::getFontScale() : 1.0f);
+    float width = this->advance(vg, size);
+    this->drawSize = size;
     if (this->fitWidth > 0.0f && width > this->fitWidth) {
-        this->drawSize = std::max(10.0f, this->fontSize * this->fitWidth / width);
+        this->drawSize = std::max(10.0f, size * this->fitWidth / width);
         width = this->advance(vg, this->drawSize);
     }
     this->setWidth(std::ceil(width));
-    this->setHeight(std::ceil(this->fontSize * 1.15f));
+    this->setHeight(std::ceil(size * 1.15f));
     this->invalidate();
 }
 

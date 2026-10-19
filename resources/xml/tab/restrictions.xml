@@ -26,7 +26,7 @@
 
             <brls:Label id="tab_ro_note" text="@i18n/playguard/common/read_only_note" fontSize="20" marginBottom="16" textColor="@theme/brand/warn"/>
             <brls:Box id="rs_levels" axis="column" alignItems="stretch" marginBottom="8">
-                <brls:Label id="rs_kicker" text="" fontSize="15" textColor="@theme/cadran/text3" marginBottom="10"/>
+                <brls:Label id="rs_kicker" text="" fontSize="16" textColor="@theme/cadran/text2" marginBottom="10"/>
                 <brls:Box id="rs_tiles" axis="row" alignItems="stretch"/>
             </brls:Box>
             <brls:Header id="rs_custom_header" title="@i18n/playguard/restrictions/section_custom" marginTop="24" marginBottom="8"/>

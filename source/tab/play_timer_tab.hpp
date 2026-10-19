@@ -67,6 +67,7 @@ class PlayTimerTab : public TabBase
     BRLS_BIND(CadranWeekView,    week_editor,     "cpt_week");
     BRLS_BIND(brls::Box,         keys_idle,       "cpt_keys_idle");
     BRLS_BIND(brls::Box,         played_key,      "cpt_played_key");
+    BRLS_BIND(brls::Box,         over_key,        "cpt_over_key");
     BRLS_BIND(brls::Label,       played_text,     "cpt_played_text");
     BRLS_BIND(brls::Box,         keys_edit,       "cpt_keys_edit");
     BRLS_BIND(brls::Rectangle,   pending_dot,     "pt_pending_dot");

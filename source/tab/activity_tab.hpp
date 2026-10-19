@@ -57,7 +57,8 @@ class ActivityTab : public TabBase
         brls::Label*  name   = nullptr;
         CadranDigits* today  = nullptr;
         brls::Label*  rest   = nullptr;
-        brls::Label*  grew   = nullptr;   // the game played most more than the week before
+        brls::Box*    grew_row = nullptr; // the game played most more than the week before: ▲ and how much
+        brls::Label*  grew   = nullptr;
         brls::Box*    bars[7] = {};
     };
     cadran::List list;
@@ -144,6 +145,8 @@ class ActivityTab : public TabBase
     BRLS_BIND(CadranDigits,     week_value,   "ac_week");
     BRLS_BIND(brls::Label,      week_sub,     "ac_week_sub");
     BRLS_BIND(brls::Label,      week_trend,   "ac_week_trend");
+    BRLS_BIND(brls::Box,        week_trend_row, "ac_week_trend_row");
+    BRLS_BIND(CadranIcon,       week_trend_icon, "ac_week_trend_icon");
     BRLS_BIND(brls::Box,        week_bars,    "ac_week_bars");
     BRLS_BIND(CadranDigits,     total_value,  "ac_total");
     BRLS_BIND(brls::Label,      total_sub,    "ac_total_sub");

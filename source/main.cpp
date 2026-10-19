@@ -19,11 +19,11 @@
 #include <emscripten.h>
 #endif
 
+#include "action/frame_stats_flow.hpp"
 #include "action/fw_gate.hpp"
 #include "action/log_prune_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/pt_flow.hpp"
-#include "action/frame_stats_flow.hpp"
 #include "action/pt_log_flow.hpp"
 #include "action/rescue.hpp"
 #include "action/rollback_flow.hpp"
@@ -36,7 +36,6 @@
 #include "core/platform.h"
 #include "core/sim_env.h"
 #include "tab/about_tab.hpp"
-#include "ui/cadran_frame.hpp"
 #include "tab/activity_tab.hpp"
 #include "tab/console_tab.hpp"
 #include "tab/dashboard_tab.hpp"
@@ -45,44 +44,42 @@
 #include "tab/preferences_tab.hpp"
 #include "tab/restrictions_tab.hpp"
 #include "tab/security_tab.hpp"
-#include "ui/ui.hpp"
+#include "ui/cadran_frame.hpp"
 #include "ui/cut_text.hpp"
 #include "ui/text_size.hpp"
+#include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/crash_dump.h"
 #include "util/crash_report.hpp"
+#include "util/data_move.hpp"
 #include "util/diagnostics.hpp"
 #include "util/http.hpp"
-#include "util/data_move.hpp"
 #include "util/log_files.hpp"
 #include "util/nand.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/session_log.hpp"
 #include "util/startup.h"
+#include "view/cadran_digits.hpp"
+#include "view/cadran_icon.hpp"
+#include "view/cadran_week.hpp"
+#include "view/footer_hints.hpp"
+#include "view/header_settings.hpp"
 #include "view/loading_bar.hpp"
 #include "view/loading_mark.hpp"
+#include "view/made_in_france.hpp"
+#include "view/notice_bell.hpp"
+#include "view/play_days.hpp"
+#include "view/play_hours.hpp"
+#include "view/pt_ring.hpp"
+#include "view/pt_state_header.hpp"
+#include "view/scroll_view.hpp"
+#include "view/version_badge.hpp"
 
 // nanovg's per-frame counters, through the getter
 // tools/perf_nanovg_stats.patch adds to the borealis tree. Weak: without the
 // patch, the frame time alone is recorded.
 extern "C" void nvgDebugGetStats(NVGcontext*, int*, int*, int*, int*) __attribute__((weak));
-#include "view/cadran_digits.hpp"
-#include "view/cadran_icon.hpp"
-#include "view/cadran_week.hpp"
-#include "util/startup.h"
-#include "view/loading_bar.hpp"
-#include "view/loading_mark.hpp"
-#include "view/made_in_france.hpp"
-#include "view/footer_hints.hpp"
-#include "view/header_settings.hpp"
-#include "view/notice_bell.hpp"
-#include "view/version_badge.hpp"
-#include "view/scroll_view.hpp"
-#include "view/play_days.hpp"
-#include "view/play_hours.hpp"
-#include "view/pt_ring.hpp"
-#include "view/pt_state_header.hpp"
 
 using namespace brls::literals;
 
@@ -337,8 +334,8 @@ void apply_locale()
         brls::Platform::APP_LOCALE_DEFAULT = brls::LOCALE_AUTO;
 }
 
-// Follows the console theme unless a preference says otherwise (once the
-// window exists).
+// Dark by default (config Config::theme), light when chosen, or the console's
+// own theme for "system" (once the window exists).
 void apply_theme()
 {
     const auto& cfg = config::get();
@@ -489,7 +486,7 @@ int main(int argc, char* argv[])
     // picker's takes half of it.
     brls::getStyle().addMetric("brls/animations/show", 2.0f);
 
-    // PlayGuard status colours (light / dark variants), before any view exists.
+    // The colours the palettes leave out, before any view exists.
     ui::register_theme_colors();
     // The palettes after the design boards (navy on dark, cool white on light).
     cadran::install_theme();

@@ -15,6 +15,7 @@
 #include "tab/tab_base.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "view/cadran_digits.hpp"
+#include "view/cadran_icon.hpp"
 
 class RestrictionsTab : public TabBase
 {
@@ -33,13 +34,19 @@ class RestrictionsTab : public TabBase
         brls::Box*       badge = nullptr;
         CadranDigits*    age   = nullptr;
         brls::Label*     note  = nullptr;
-        brls::Rectangle* sns_dot  = nullptr;
-        brls::Label*     sns      = nullptr;
-        brls::Rectangle* comm_dot = nullptr;
-        brls::Label*     comm     = nullptr;
-        brls::Box*       games_row = nullptr;   // the installed games it blocks (a game check made)
-        brls::Rectangle* games_dot = nullptr;
-        brls::Label*     games     = nullptr;
+        // Each line: what it is about, then at the right its state as an
+        // icon (a padlock: restricted; a check: allowed), with a count or
+        // "—" in words where there is one.
+        brls::Label*     sns       = nullptr;
+        brls::Label*     sns_state = nullptr;
+        CadranIcon*      sns_icon  = nullptr;
+        brls::Label*     comm       = nullptr;
+        brls::Label*     comm_state = nullptr;
+        CadranIcon*      comm_icon  = nullptr;
+        brls::Box*       games_row   = nullptr;   // the installed games it blocks (a game check made)
+        brls::Label*     games       = nullptr;
+        brls::Label*     games_state = nullptr;
+        CadranIcon*      games_icon  = nullptr;
         bool             to_settings = false;   // A goes to Custom's settings
     };
 

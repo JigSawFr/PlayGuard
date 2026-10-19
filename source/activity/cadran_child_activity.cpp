@@ -23,6 +23,7 @@ void keep_size(brls::View* view)
 }
 
 constexpr int LAST_MINUTES = 5;   // the end chip in amber, the ring beating
+constexpr int BED_SOON     = 30;  // the bedtime chip in amber from then on
 }   // namespace
 
 void CadranChildActivity::onContentAvailable()
@@ -140,7 +141,14 @@ void CadranChildActivity::refresh()
     ring->setPulse(last);
     const bool bed = pt.bedtime_valid && pt.bedtime_enabled;
     ui::set_visible(bed_chip.getView(), bed);
-    if (bed) bedtime->setText(fmt::format("{:02d}:{:02d}", pt.bedtime_hour, pt.bedtime_minute));
+    if (bed) {
+        bedtime->setText(fmt::format("{:02d}:{:02d}", pt.bedtime_hour, pt.bedtime_minute));
+        // Amber only once it is near: before, nothing calls for attention.
+        const int until = (pt.bedtime_hour * 60 + pt.bedtime_minute - (now.hour * 60 + now.minute) + 24 * 60) % (24 * 60);
+        const bool soon = until <= BED_SOON;
+        bed_icon->setColor(theme[soon ? "cadran/amber" : "cadran/text2"]);
+        bedtime->setTextColor(theme[soon ? "cadran/amber" : "cadran/text"]);
+    }
     // What the console does then (When the time is up).
     time_up->setText(pt.valid && pt.alarm_only ? "playguard/cadran/child/warns"_i18n : "playguard/cadran/child/stops"_i18n);
 }
