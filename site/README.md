@@ -12,9 +12,25 @@ PlayGuard's website, on GitHub Pages: <https://jigsawfr.github.io/PlayGuard/>.
 - **The screenshots in each language**: the console's screens as the
   simulator shows them in that language (below), English where there are
   none (a local build); under the site's dark theme, the console's dark one.
+- **On a phone** (an iPhone in Safari or Edge, the same WebKit): no field
+  under 16px (iOS zooms into one), 44px to touch, the page beside the notch
+  in landscape (`viewport-fit=cover`, `env(safe-area-inset-*)`), each page's
+  sections folded under its first paragraph, and nothing wider than the
+  screen (a long `code` breaks). The header goes on two rows up to 1080px,
+  where its links no longer fit beside the menus in every language.
+- **The home page**: install first (the download under it, with the
+  release's date), the three main features then the others, PlayGuard
+  beside Nintendo's app on what each needs, the questions each with its own
+  address (`#faq-<question>`, opened by a link to it). The screenshots open
+  larger over the page (`site.js`: swipe or the arrows, down or Esc to
+  close), the documentation's too: its tables of screenshots under their
+  names become captioned figures (`screenshot_table()`), one per row on a
+  phone. Each section of the documentation has a link to share it, each
+  page the previous and next ones; the changelog folds the older releases.
 - **The documentation's search**: a box above its pages (`site.js`), over
   `docs/search.json`, each section of the language's pages; every word typed
-  must be in the section, accents or not.
+  must be in the section, accents or not, and is marked in the results; `/` to search, the
+  arrows through them.
 - **The changelog** (`/changelog/`, `CHANGELOG.md` in each language's page,
   its notes in English) and `releases.atom`, a feed of the releases.
 - **The page not found** (`404.html`, served at any address) in every
@@ -59,7 +75,9 @@ pages; no framework, nothing to install but that.
   site's pages, and any other file of the repository links to GitHub. A
   change to `docs/` is a change to the site.
 - `site/assets/` — `site.css` (the branding's navy, teal and amber, light and
-  dark), `site.js` (the language and theme menus), `theme.js` (the theme
+  dark), `site.js` (the language and theme menus; on a phone, the header
+  out of the way while scrolling down, the gallery's dots, the way back to
+  the top), `theme.js` (the theme, and the browser's bar in its colour,
   before the first paint) and `fonts/sora.woff2`, the Sora headings' font
   (SIL Open Font License, `fonts/OFL.txt`; its Latin letters, cut out of
   google/fonts' `ofl/sora/Sora[wght].ttf`), served with the site so that no
