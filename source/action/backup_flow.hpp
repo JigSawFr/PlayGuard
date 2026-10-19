@@ -22,7 +22,7 @@ void save_now();
 
 // The backups on the SD card, file names newest first (backup::list). Listed
 // once, then again after a save here (which prunes too) and at each restore
-// list (the Overview asks every 5 s, the History tab refreshes often).
+// list (Today asks every 5 s, the History tab refreshes often).
 const std::vector<std::string>& names();
 // How many there are.
 size_t count();

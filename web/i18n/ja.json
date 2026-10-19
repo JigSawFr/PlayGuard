@@ -48,7 +48,7 @@
   "replaying": "手順を再生中：{n} / {total}",
   "tour": "ツアー",
   "report": "問題を報告",
-  "tour_overview": "概要：今日のプレイ時間、制限時間、残り時間、おやすみ時刻。",
+  "tour_overview": "今日：今日のプレイ時間、制限時間、残り時間、おやすみ時刻。",
   "tour_play_timer": "プレイ時間：週のグラフがそのまま編集画面です。毎日同じ制限か、曜日ごとの制限。",
   "tour_activity": "アクティビティー：本体の記録から、誰が何をどれだけ遊んだか。",
   "tour_console": "本体：ネットワーク時計、インストールしたソフト、本体で動いているもの。",
@@ -66,7 +66,7 @@
   "capture": "スクリーンショット"
  },
  "params": {
-  "tab": {"label": "最初に開くタブ", "options": {"": "概要", "play_timer": "プレイ時間", "activity": "プレイ記録", "restrictions": "制限", "security": "暗証番号", "console": "本体", "history": "履歴", "preferences": "オプション", "about": "情報"}},
+  "tab": {"label": "最初に開くタブ", "options": {"": "今日", "play_timer": "プレイ時間", "activity": "プレイ記録", "restrictions": "制限", "security": "暗証番号", "console": "本体", "history": "履歴", "preferences": "オプション", "about": "情報"}},
   "keep": {"label": "訪問をまたいで状態を保持", "help": "PlayGuard のデータと、シミュレートした本体の設定（暗証番号、制限、時計）がこのブラウザーに残ります。このパネルの本体の設定は初回起動時にだけ使われます。"},
   "not_set_up": {"label": "未設定（暗証番号なし）"},
   "unlocked": {"label": "一時的に解除中"},
@@ -76,6 +76,7 @@
   "alarm_off": {"label": "「時間です」のアラームなし"},
   "not_counting": {"label": "残り時間が減らない", "help": "時計が戻された状態：画面に 90 秒表示されると概要がそれを知らせます。"},
   "unpaired": {"label": "スマートフォンアプリと未連携"},
+  "left_min": {"label": "今日の残り時間（分）"},
   "fw": {"label": "システムバージョン", "help": "確認済みの最新より新しいと、システムバージョンの画面になります。"},
   "no_cfw": {"label": "Atmosphère なし"},
   "emummc": {"label": "emuMMC"},
@@ -85,7 +86,8 @@
   "applet": {"label": "アプレットモード（アルバムから起動）"},
   "background": {"label": "PlayGuard がバックグラウンド"},
   "hbloader": {"label": "更新をストアに引き継げるローダー"},
-  "numpad": {"label": "数字キーボードが返す値"},
+  "docked": {"label": "ドックに挿している（テレビ）"},
+  "battery": {"label": "バッテリーで動作（充電器なし）"},
   "boot_choice": {"label": "起動時の「前のビルド？」への回答", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "ネットワーク時計が正確"},
   "autosync_off": {"label": "「インターネットで時計を合わせる」がオフ"},
@@ -94,6 +96,8 @@
   "now": {"label": "本体の時刻を固定", "help": "ブラウザーのタイムゾーンで指定します。"},
   "skip": {"label": "本体の時刻を進める（秒）", "help": "その間ずっとゲームを遊んでいたものとして、残り時間も同じだけ減ります。画面の下のボタンで進められます。"},
   "idle": {"label": "ソフトを起動していない"},
+  "no_game": {"label": "PlayGuardの裏で何も開いていない"},
+  "no_play": {"label": "何週間も遊んでいない"},
   "no_pdm": {"label": "プレイ記録なし"},
   "games": {"label": "今週追加で遊んだソフトの数"},
   "accounts": {"label": "ユーザー", "help": "0～8（既定は 2）。それぞれ次のユーザーの 2 倍遊びます。"},
@@ -109,7 +113,9 @@
   "fail": {"label": "失敗させる操作", "options": {"unlock": "解除", "unverified": "解除が確認されない", "relock": "再ロック", "write": "設定の書き込みすべて", "timer": "タイマーの読み込み", "clock": "時計の設定", "pin": "暗証番号の読み込み", "pin_entry": "暗証番号の画面をキャンセル", "bedtime": "おやすみ時間", "remove": "ソフトの削除", "launch": "起動バージョンのリセット", "verify": "整合性チェック"}},
   "still_focus": {"label": "フォーカスの強調を静止"},
   "version": {"label": "ヘッダーに表示するバージョン"},
-  "hold_loading": {"label": "読み込み画面で止める"}
+  "hold_loading": {"label": "読み込み画面で止める"},
+  "cadran_noglow": {"label": "背景の光なし"},
+  "cadran_noring": {"label": "円弧なしのリング"}
  },
  "presets": {
   "default": "既定",

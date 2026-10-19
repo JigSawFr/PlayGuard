@@ -10,6 +10,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <string>
 
 #include "util/game_cache.hpp"
@@ -24,6 +25,11 @@ std::string cache_file();
 // often none: no wait). False, `out` left as it is, when there is none or it
 // cannot be read.
 bool load(game_cache::Cache* out);
+
+// The last check as it stands: the one saved this run, else the SD card's
+// (read once); nullptr when there is none. What Restrictions and a game's
+// screen tell the age ratings from.
+std::shared_ptr<const game_cache::Cache> latest();
 
 // `cache` on the SD card, off the UI thread.
 void save(const game_cache::Cache& cache);

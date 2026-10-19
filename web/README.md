@@ -159,8 +159,8 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   minutes, and an old `.wasm` with a new `.js` would not start.
 - **The smoke test** (`tools/web_smoke.py`, CI's *The simulator in a
   browser*): the build in headless Chromium (Playwright, WebGL 2 from
-  SwiftShader) must reach its first screen in each kind of start (the
-  Overview, a tab of its own, limit reached, start-up error, Japanese);
+  SwiftShader) must reach its first screen in each kind of start (Today,
+  a tab of its own, limit reached, start-up error, Japanese);
   play desktop smoke scenarios as steps (every tab, its screens the comment's
   Play timer, Activity and Console; *alarm*, the first half of *errors*); move the time on and take a live setting without a restart;
   note keys and replay their steps link, play the tour, fill a report link;

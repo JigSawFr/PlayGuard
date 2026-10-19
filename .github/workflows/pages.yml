@@ -127,9 +127,9 @@ jobs:
 
           <details><summary>The screens of this build (web smoke test)</summary>
 
-          | Overview | Play timer | Activity |
+          | Today | Play timer | Activity |
           |---|---|---|
-          | <img src="${shots}overview.png?v=${SHA::7}" width="300" alt="Overview"> | <img src="${shots}play_timer.png?v=${SHA::7}" width="300" alt="Play timer"> | <img src="${shots}activity.png?v=${SHA::7}" width="300" alt="Activity"> |
+          | <img src="${shots}overview.png?v=${SHA::7}" width="300" alt="Today"> | <img src="${shots}play_timer.png?v=${SHA::7}" width="300" alt="Play timer"> | <img src="${shots}activity.png?v=${SHA::7}" width="300" alt="Activity"> |
           | **Console** | **Limit reached** | **Japanese** |
           | <img src="${shots}console.png?v=${SHA::7}" width="300" alt="Console"> | <img src="${shots}limit_reached.png?v=${SHA::7}" width="300" alt="Limit reached"> | <img src="${shots}japanese.png?v=${SHA::7}" width="300" alt="Japanese"> |
 

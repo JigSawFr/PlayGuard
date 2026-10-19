@@ -1,12 +1,15 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/console_tab.hpp"
 
+#include <yoga/Yoga.h>
+
 #include "action/fw_gate.hpp"
 #include "action/sys_notes_flow.hpp"
 #include "action/sys_update_flow.hpp"
 #include "activity/firmware_gate_activity.hpp"
 #include "activity/game_check_activity.hpp"
 #include "tab/clock_tab.hpp"
+#include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/patches.hpp"
 #include "view/row_icon.hpp"
@@ -14,7 +17,7 @@
 using namespace brls::literals;
 
 ConsoleTab::ConsoleTab()
-    : TabBase("xml/tab/console.xml")
+    : TabBase("xml/tab/console.xml"), list(this)
 {
 
     clock->setDetailText(ui::opens());
@@ -87,6 +90,18 @@ ConsoleTab::ConsoleTab()
         else ui::info("playguard/tools/compat_ok_info"_i18n);
         return true;
     });
+    if (brls::Box* tiles = this->list.tiles({ { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_hekate", "flag" } }, true)) {
+        // Spaced by the row, not by their margins: hekate's tile comes and goes.
+        for (brls::View* tile : tiles->getChildren()) tile->setMarginRight(0);
+        YGNodeStyleSetGap(tiles->getYGNode(), YGGutterColumn, 12);
+        tiles->setMarginBottom(20);
+        if (brls::Box* column = tiles->getParent()) {
+            column->removeView(tiles, false);
+            column->addView(tiles, 0);
+        }
+    }
+    this->list.apply({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_compat", "check" }, { "cn_storage", "folder" },
+                       { "cn_blank", "code" }, { "cn_serial", "tag" }, { "cn_patches", "shield" } });
 }
 
 void ConsoleTab::refresh()
@@ -141,6 +156,8 @@ void ConsoleTab::refresh()
     this->patches_note = ui::patches_note(report, si, &warn);
     patches_icon->set_kind(warn ? RowIcon::Kind::Warning : RowIcon::Kind::Info);
     patches_icon->set_shown(!this->patches_note.empty());
+    this->list.sync();
+    cadran::set_pill("");
 }
 
 brls::View* ConsoleTab::create()

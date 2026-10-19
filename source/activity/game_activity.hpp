@@ -1,8 +1,9 @@
 // GameActivity — one game of the Activity tab on its own screen: icon and
 // name, the last seven days as bars, today / 7 days / all time, launches,
-// first and last play, and the all-time play time of each user account (read
-// in the background when the screen opens: a few requests for this game
-// only), with the time no account holds.
+// first and last play, its age rating (and whether the level in force blocks
+// it), and the all-time play time of each user account (read in the
+// background when the screen opens: a few requests for this game only), with
+// the time no account holds.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -46,6 +47,7 @@ class GameActivity : public brls::Activity
     BRLS_BIND(brls::DetailCell, launches, "ga_launches");
     BRLS_BIND(brls::DetailCell, first,    "ga_first");
     BRLS_BIND(brls::DetailCell, last,     "ga_last");
+    BRLS_BIND(brls::DetailCell, rating,   "ga_rating");
     BRLS_BIND(brls::Header,     accounts_header, "ga_accounts_header");
     BRLS_BIND(brls::Box,        accounts, "ga_accounts");
     BRLS_BIND(brls::Label,      accounts_note, "ga_accounts_note");

@@ -1,4 +1,4 @@
-// Host tests for source/action/timer_health_logic.cpp: when the Overview says
+// Host tests for source/action/timer_health_logic.cpp: when Today says
 // the console is not counting play time, and when it stops saying so.
 #include "check.h"
 #include <cstring>

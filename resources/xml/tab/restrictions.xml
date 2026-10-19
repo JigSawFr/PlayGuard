@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Restrictions: level, what a preset imposes (read-only) or the custom
-     settings (editable), VR mode (same as System Settings). -->
+<!-- Restrictions: the levels side by side as tiles, each with what it
+     restricts, the one in force in teal (tab/restrictions_tab.cpp adds
+     them to rs_tiles); Custom's settings (editable), VR mode, the rating
+     organisation (same as System Settings) and the games a level blocks. -->
 
 <brls:Box
     width="auto"
@@ -23,12 +25,11 @@
             paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
 
             <brls:Label id="tab_ro_note" text="@i18n/playguard/common/read_only_note" fontSize="20" marginBottom="16" textColor="@theme/brand/warn"/>
-            <brls:Header title="@i18n/playguard/restrictions/section_level" marginBottom="8"/>
-            <brls:DetailCell id="rs_level" title="@i18n/playguard/restrictions/level"/>
+            <brls:Box id="rs_levels" axis="column" alignItems="stretch" marginBottom="8">
+                <brls:Label id="rs_kicker" text="" fontSize="15" textColor="@theme/cadran/text3" marginBottom="10"/>
+                <brls:Box id="rs_tiles" axis="row" alignItems="stretch"/>
+            </brls:Box>
             <brls:Header id="rs_custom_header" title="@i18n/playguard/restrictions/section_custom" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="rs_preset_age" focusable="false" title="@i18n/playguard/restrictions/age"/>
-            <brls:DetailCell id="rs_preset_sns" focusable="false" title="@i18n/playguard/restrictions/sns"/>
-            <brls:DetailCell id="rs_preset_comm" focusable="false" title="@i18n/playguard/restrictions/comm"/>
             <brls:DetailCell id="rs_age" title="@i18n/playguard/restrictions/age"/>
             <brls:BooleanCell id="rs_sns"/>
             <brls:BooleanCell id="rs_comm"/>
@@ -37,6 +38,8 @@
             <brls:BooleanCell id="rs_vr"/>
             <brls:DetailCell id="rs_org" title="@i18n/playguard/restrictions/org"/>
             <brls:DetailCell id="rs_free_comm" focusable="false" title="@i18n/playguard/restrictions/free_comm"/>
+            <brls:DetailCell id="rs_blocked" title="@i18n/playguard/restrictions/blocked"/>
+            <brls:Label id="rs_blocked_note" text="@i18n/playguard/restrictions/blocked_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
             <brls:Label id="rs_note" text="@i18n/playguard/restrictions/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
 
         </brls:Box>

@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "activity/main_activity.hpp"
 
+#include <cstdlib>
+
 #include "action/clock_check.hpp"
 #include "action/data_notice.hpp"
 #include "action/fw_gate.hpp"
@@ -9,6 +11,7 @@
 #include "action/pt_flow.hpp"
 #include "action/rescue.hpp"
 #include "action/rollback_flow.hpp"
+#include "action/schedule_flow.hpp"
 #include "action/support_flow.hpp"
 #include "action/update_flow.hpp"
 #include "activity/loading_activity.hpp"
@@ -16,6 +19,7 @@
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
 #include "tab/tab_base.hpp"
+#include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -48,7 +52,7 @@ static void compact_sidebar(brls::View* tab_frame)
 // Locking again waits for the screen to be gone, and closes the game PlayGuard
 // runs over too (pt_flow::lock_at_exit): back to the HOME menu, locked. Until
 // then, the closing screen.
-static void quit_or_relock()
+void MainActivity::quit_or_relock()
 {
     bool unlocked = false;
     if (app::read_only() || R_FAILED(pctl_lock_state(nullptr, &unlocked)) || !unlocked) {
@@ -77,12 +81,19 @@ static void quit_or_relock()
     dialog->open();
 }
 
+brls::View* MainActivity::createContentView()
+{
+    return brls::View::createFromXMLResource("activity/main.xml");
+}
+
 void MainActivity::onContentAvailable()
 {
     // For the desktop smoke test: the start screens (lock, rescue) lead here.
     brls::Logger::info("main screen opened");
     this->update_title();
     compact_sidebar(this->getView("main_tabs"));
+    // The frame after the design boards.
+    cadran::style_frame(dynamic_cast<brls::AppletFrame*>(this->getContentView()), this->getView("main_tabs"));
 
     // B on the sidebar quits (the tabs themselves send B back to the sidebar),
     // but only when pressed twice within 2 s: one stray B never closes the app.
@@ -126,7 +137,7 @@ void MainActivity::onContentAvailable()
     this->notice_listener = notices::listen([this]() { this->update_notice_hint(); });
     this->update_notice_hint();
 
-    // Preferences › Start on: that tab rather than the Overview (first, so the
+    // Preferences › Start on: that tab rather than Today (first, so the
     // questions below keep the focus they take).
     int start = 0;
     for (const char* t : config::START_TABS) {
@@ -146,6 +157,7 @@ void MainActivity::onContentAvailable()
     brls::sync([]() {
         pt_flow::relock_if_interrupted();
         pt_flow::offer_extra_time_restore();
+        schedule_flow::check(true);   // a profile scheduled for a period: its start or its end
     });
     // Background checks: a newer version (daily when opted in, and while one
     // is known and not installed: its screen), a network clock off (opt-in).
@@ -169,8 +181,8 @@ void MainActivity::onContentAvailable()
     // monthly "Support PlayGuard" reminder.
     support_flow::at_start(this);
 
-    // What the bell shows, read now and every minute after that: the
-    // Overview reads the same every 5 s while it is shown.
+    // What the bell shows, read now and every minute after that: Today
+    // reads the same every 5 s while it is shown.
     brls::sync([]() { notices::sweep(); });
     this->notice_timer.setPeriod(60000);
     this->notice_timer.setCallback([this]() {
@@ -186,6 +198,7 @@ void MainActivity::onContentAvailable()
         // again at the next tick otherwise.
         if (!app::in_focus() || !ui::on_top(this)) return;
         const std::string today = ui::today_date();
+        schedule_flow::check(false);   // asked once a day, when nothing else was in front
         if (today == this->day) {
             pt_flow::retry_extra_time_restore();   // only after a state that could not be read
             return;
@@ -244,12 +257,13 @@ void MainActivity::update_title()
     auto* frame = dynamic_cast<brls::AppletFrame*>(this->getContentView());
     if (!frame) return;
     frame->setTitle("playguard/title"_i18n);
-    TitleState::show(frame, TitleState::Kind::UNLOCKED, ui::known_unlocked());
-    TitleState::show(frame, TitleState::Kind::READ_ONLY, app::read_only());
+    // The header's pill says when parental controls are unlocked, on every screen.
+    TitleState::show(frame, app::read_only());
+    cadran::refresh_pill();
 }
 
 // Back from a dialog or a screen: a tab may have hidden the view that opened
-// it meanwhile (the Overview's refresh, every 5 s and on new play data).
+// it meanwhile (Today's refresh, every 5 s and on new play data).
 void MainActivity::onResume()
 {
     ui::keep_focus(this);

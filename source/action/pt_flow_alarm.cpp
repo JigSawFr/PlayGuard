@@ -37,11 +37,11 @@ void choose_time_up(const PtState& pt, std::function<void()> refresh)
 {
     if (ui::refuse_read_only()) return;
     if (!pt.fw_supported) {
-        ui::notify(ui::rc_text(NXM_RC_FW_UNSUPPORTED));
+        ui::notify(ui::rc_text(NXM_RC_FW_UNSUPPORTED), ui::Toast::Refused);
         return;
     }
     if (!pt.valid) {
-        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN));
+        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN), ui::Toast::Refused);
         return;
     }
     if (!pt_configured(pt.block)) {

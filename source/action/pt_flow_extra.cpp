@@ -1,8 +1,10 @@
-// pt_flow: extra time today, no more play today, and putting the usual
-// limit back afterwards (the record in config extra_*).
+// pt_flow: extra time today, no more play today, extra time planned for a
+// later day, and putting the usual limit back afterwards (the records in
+// config extra_* and bonus_*).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "action/pt_flow.hpp"
 
+#include <algorithm>
 #include <borealis.hpp>
 
 #include "action/console_lock.hpp"
@@ -73,47 +75,75 @@ static void put_back_extra_record(const pt_logic::ExtraRecord& prev)
     ui::save_config();
 }
 
-// A list of actions, not of values: no row is checked as the current one
-// (borealis' Dropdown checks one, ui::pick the `selected`). The first row
-// takes the focus.
-class ActionList : public brls::Dropdown
+static pt_logic::BonusRecord bonus_record()
 {
-  public:
-    ActionList(const std::string& title, const std::vector<std::string>& values, std::function<void(int)> on_pick)
-        : brls::Dropdown(
-              title, values, [this](int index) { this->chosen = index; }, 0,
-              [this, on_pick](int) {
-                  if (this->chosen >= 0 && on_pick) {
-                      const int index = this->chosen;
-                      brls::sync([on_pick, index]() { on_pick(index); });
-                  }
-              }),
-          labels(values)
-    {
-        // The rows Dropdown's constructor already made used its own
-        // cellForRow (this one did not exist yet): unchecked here.
-        uncheck(this);
-    }
+    const auto& cfg = config::get();
+    pt_logic::BonusRecord rec;
+    rec.weekday = cfg.bonus_weekday;
+    rec.date    = cfg.bonus_date;
+    rec.base    = (uint16_t)cfg.bonus_base;
+    rec.value   = (uint16_t)cfg.bonus_value;
+    return rec;
+}
 
-  private:
-    std::vector<std::string> labels;
-    int chosen = -1;
+static void clear_bonus_record()
+{
+    auto& cfg = config::get();
+    cfg.bonus_weekday = -1;
+    cfg.bonus_date.clear();
+    cfg.bonus_base = cfg.bonus_value = 0;
+    ui::save_config();
+}
 
-    static void uncheck(brls::View* view)
-    {
-        if (auto* cell = dynamic_cast<brls::RadioCell*>(view)) cell->setSelected(false);
-        if (auto* box = dynamic_cast<brls::Box*>(view))
-            for (brls::View* child : box->getChildren()) uncheck(child);
-    }
+// Saved before the write, as the extra-time record (and put back as it was
+// when the write fails).
+static bool save_bonus_record(const pt_logic::BonusRecord& rec)
+{
+    auto& c = config::get();
+    c.bonus_weekday = rec.weekday;
+    c.bonus_date    = rec.date;
+    c.bonus_base    = rec.base;
+    c.bonus_value   = rec.value;
+    return ui::save_config_now();
+}
 
-    brls::RecyclerCell* cellForRow(brls::RecyclerFrame* recycler, brls::IndexPath index) override
-    {
-        auto* cell = (brls::RadioCell*)recycler->dequeueReusableCell("Cell");
-        cell->title->setText(this->labels[index.row]);
-        cell->setSelected(false);
-        return cell;
-    }
-};
+static void plan_bonus(std::function<void()> refresh);
+static void cancel_bonus(std::function<void()> refresh);
+
+// `extra` minutes more today, after the confirmation (the picker below, or an
+// amount's chip on Today).
+static void add_extra(int wd, uint16_t base, uint16_t extra, std::function<void()> refresh)
+{
+    // What gets put back later is the limit before any extra time today.
+    const pt_logic::ExtraRecord rec = extra_record();
+    const bool again = pt_logic::recorded_today(rec, wd, ui::today_date());
+    const pt_logic::ExtraPlan plan = pt_logic::plan_extra(base, extra, again, rec.base);
+    const uint16_t value = plan.value, original = plan.original;
+    // Put back by itself the next day, whatever the preference (pt_logic::restore_way).
+    const std::string body = brls::getStr("playguard/dashboard/extra_body_auto", ui::fmt_minutes(extra),
+                                          ui::day_name_in_text(wd), ui::fmt_minutes(base), ui::fmt_minutes(value),
+                                          ui::fmt_minutes(original));
+    confirm_write(body, "playguard/dashboard/extra_confirm"_i18n, [refresh, wd, base, value, original](bool did_unlock) {
+        PtState now;
+        pctl_play_timer_query(&now);
+        if (!now.valid || now.day_min[wd] != base) {   // changed meanwhile: write nothing
+            finish_write(NXM_RC_STATE_UNKNOWN, did_unlock, "", "playguard/play_timer/write_err"_i18n, refresh);
+            return;
+        }
+        uint16_t days[7];
+        for (int i = 0; i < 7; i++) days[i] = now.day_min[i];
+        days[wd] = value;
+        const pt_logic::ExtraRecord prev = extra_record();
+        if (!save_extra_record(wd, original, value)) {
+            finish_write(NXM_RC_NOT_SAVED, did_unlock, "", "playguard/play_timer/write_err"_i18n, refresh);
+            return;
+        }
+        Result rc = write_days(days, "extra");
+        if (R_FAILED(rc)) put_back_extra_record(prev);
+        finish_write(rc, did_unlock, brls::getStr("playguard/dashboard/extra_done", ui::fmt_minutes(value)),
+                     "playguard/play_timer/write_err"_i18n, refresh);
+    });
+}
 
 void add_extra_time(const PtState& pt, std::function<void()> refresh)
 {
@@ -124,40 +154,123 @@ void add_extra_time(const PtState& pt, std::function<void()> refresh)
     const std::vector<int> amounts = config::get().extra_amounts;
     std::vector<std::string> labels;
     for (int e : amounts) labels.push_back("+" + ui::fmt_minutes((uint16_t)e));
+    // Then another day: a bonus planned for it, or the one planned already
+    // (which can be cancelled).
+    const pt_logic::BonusRecord bonus = bonus_record();
+    const bool planned = bonus.weekday >= 0;
+    labels.push_back(planned ? brls::getStr("playguard/dashboard/bonus_planned_row", ui::day_name(bonus.weekday),
+                                            "+" + ui::fmt_minutes((uint16_t)(bonus.value - bonus.base)))
+                             : "playguard/dashboard/bonus_row"_i18n);
     const uint16_t base = pt.day_min[wd];
-    auto* list = new ActionList("playguard/dashboard/extra_title"_i18n, labels, [refresh, wd, base, amounts](int index) {
-        const uint16_t extra = (uint16_t)amounts[index];
-        // What gets put back later is the limit before any extra time today.
-        const pt_logic::ExtraRecord rec = extra_record();
-        const bool again = pt_logic::recorded_today(rec, wd, ui::today_date());
-        const pt_logic::ExtraPlan plan = pt_logic::plan_extra(base, extra, again, rec.base);
-        const uint16_t value = plan.value, original = plan.original;
-        // Put back by itself the next day, whatever the preference (pt_logic::restore_way).
-        const std::string body = brls::getStr("playguard/dashboard/extra_body_auto", ui::fmt_minutes(extra),
-                                              ui::day_name_in_text(wd), ui::fmt_minutes(base), ui::fmt_minutes(value),
-                                              ui::fmt_minutes(original));
-        confirm_write(body, "playguard/dashboard/extra_confirm"_i18n, [refresh, wd, base, value, original](bool did_unlock) {
-            PtState now;
-            pctl_play_timer_query(&now);
-            if (!now.valid || now.day_min[wd] != base) {   // changed meanwhile: write nothing
-                finish_write(NXM_RC_STATE_UNKNOWN, did_unlock, "", "playguard/play_timer/write_err"_i18n, refresh);
-                return;
-            }
-            uint16_t days[7];
-            for (int i = 0; i < 7; i++) days[i] = now.day_min[i];
-            days[wd] = value;
-            const pt_logic::ExtraRecord prev = extra_record();
-            if (!save_extra_record(wd, original, value)) {
-                finish_write(NXM_RC_NOT_SAVED, did_unlock, "", "playguard/play_timer/write_err"_i18n, refresh);
-                return;
-            }
-            Result rc = write_days(days, "extra");
-            if (R_FAILED(rc)) put_back_extra_record(prev);
-            finish_write(rc, did_unlock, brls::getStr("playguard/dashboard/extra_done", ui::fmt_minutes(value)),
-                         "playguard/play_timer/write_err"_i18n, refresh);
-        });
+    // A list of actions, not of values: no row is checked.
+    ui::pick("playguard/dashboard/extra_title"_i18n, labels, 0, [refresh, wd, base, amounts, planned](int index) {
+        if ((size_t)index == amounts.size()) {
+            if (planned) cancel_bonus(refresh);
+            else plan_bonus(refresh);
+            return;
+        }
+        add_extra(wd, base, (uint16_t)amounts[index], refresh);
+    }, false);
+}
+
+// Extra time on a later day: the day (tomorrow and the five after, each with
+// its limit), the amount, the confirmation; that day's limit is raised now
+// and put back once the day is over.
+static void plan_bonus(std::function<void()> refresh)
+{
+    PtState pt;
+    pctl_play_timer_query(&pt);
+    const std::vector<pt_logic::PlanDay> days = pt_logic::bonus_days(ui::today_date(), ui::today_weekday());
+    if (!pt.valid || days.empty()) {
+        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN), ui::Toast::Refused);
+        return;
+    }
+    std::vector<std::string> labels, details;
+    for (const pt_logic::PlanDay& d : days) {
+        labels.push_back(ui::day_name(d.weekday));
+        details.push_back(ui::fmt_minutes(pt.day_min[d.weekday]));
+    }
+    ui::pick("playguard/dashboard/bonus_day_title"_i18n, labels, 0, [days, pt, refresh](int index) {
+        const pt_logic::PlanDay day = days[(size_t)index];
+        if (!pt_logic::can_plan_bonus(pt, day.weekday, app::read_only())) {
+            ui::info(brls::getStr("playguard/dashboard/bonus_no_limit", ui::day_name(day.weekday)));
+            return;
+        }
+        const std::vector<int> amounts = config::get().extra_amounts;
+        std::vector<std::string> labels;
+        for (int e : amounts) labels.push_back("+" + ui::fmt_minutes((uint16_t)e));
+        const uint16_t base = pt.day_min[day.weekday];
+        ui::pick(brls::getStr("playguard/dashboard/bonus_amount_title", ui::day_name(day.weekday)), labels, 0,
+                 [day, base, amounts, refresh](int i) {
+            const uint16_t value = (uint16_t)std::min(1440, base + amounts[(size_t)i]);
+            const std::string body = brls::getStr("playguard/dashboard/bonus_body", ui::day_name(day.weekday),
+                                                  ui::fmt_minutes(base), ui::fmt_minutes(value), ui::fmt_minutes(base));
+            confirm_write(body, "playguard/dashboard/extra_confirm"_i18n, [day, base, value, refresh](bool did_unlock) {
+                PtState now;
+                pctl_play_timer_query(&now);
+                if (!now.valid || now.day_min[day.weekday] != base) {   // changed meanwhile: write nothing
+                    finish_write(NXM_RC_STATE_UNKNOWN, did_unlock, "", "playguard/play_timer/write_err"_i18n, refresh);
+                    return;
+                }
+                uint16_t days[7];
+                for (int d = 0; d < 7; d++) days[d] = now.day_min[d];
+                days[day.weekday] = value;
+                const pt_logic::BonusRecord prev = bonus_record();
+                pt_logic::BonusRecord rec;
+                rec.weekday = day.weekday;
+                rec.date    = day.date;
+                rec.base    = base;
+                rec.value   = value;
+                if (!save_bonus_record(rec)) {
+                    finish_write(NXM_RC_NOT_SAVED, did_unlock, "", "playguard/play_timer/write_err"_i18n, refresh);
+                    return;
+                }
+                const Result rc = write_days(days, "bonus");
+                if (R_FAILED(rc)) save_bonus_record(prev);
+                finish_write(rc, did_unlock,
+                             brls::getStr("playguard/dashboard/bonus_done", ui::day_name(day.weekday),
+                                          "+" + ui::fmt_minutes((uint16_t)(value - base))),
+                             "playguard/play_timer/write_err"_i18n, refresh);
+            });
+        }, false);
+    }, false, details);
+}
+
+// The bonus planned, cancelled before its day: the limit put back now (a
+// tightening, asked as any change).
+static void cancel_bonus(std::function<void()> refresh)
+{
+    const pt_logic::BonusRecord rec = bonus_record();
+    if (rec.weekday < 0) return;
+    const std::string body = brls::getStr("playguard/dashboard/bonus_cancel_body", ui::day_name(rec.weekday),
+                                          "+" + ui::fmt_minutes((uint16_t)(rec.value - rec.base)), ui::fmt_minutes(rec.base));
+    confirm_write(body, "playguard/dashboard/bonus_cancel"_i18n, [rec, refresh](bool did_unlock) {
+        PtState now;
+        pctl_play_timer_query(&now);
+        if (!now.valid) {
+            finish_write(NXM_RC_STATE_UNKNOWN, did_unlock, "", "playguard/play_timer/write_err"_i18n, refresh);
+            return;
+        }
+        if (now.day_min[rec.weekday] != rec.value) {   // changed since: nothing to put back
+            clear_bonus_record();
+            finish_write(0, did_unlock, "playguard/dashboard/bonus_cancelled"_i18n, "", refresh);
+            return;
+        }
+        uint16_t days[7];
+        for (int d = 0; d < 7; d++) days[d] = now.day_min[d];
+        days[rec.weekday] = rec.base;
+        const Result rc = write_days(days, "restore_bonus");
+        if (R_SUCCEEDED(rc)) clear_bonus_record();
+        finish_write(rc, did_unlock, "playguard/dashboard/bonus_cancelled"_i18n, "playguard/play_timer/write_err"_i18n, refresh);
     });
-    brls::Application::pushActivity(new brls::Activity(list));
+}
+
+void add_extra_minutes(const PtState& pt, uint16_t minutes, std::function<void()> refresh)
+{
+    if (refuse_console_lock()) return;
+    const int wd = ui::today_weekday();
+    if (!pt.valid || pt.day_min[wd] == PT_DAY_NOLIMIT) return;
+    add_extra(wd, pt.day_min[wd], minutes, refresh);
 }
 
 // Today's limit to `value`: 0 (no more play now) or a few minutes more than
@@ -219,10 +332,9 @@ void stop_today(const PtState& pt, std::function<void()> refresh)
         return;
     }
     const PtState copy = pt;
-    auto* list = new ActionList("playguard/dashboard/stop_title"_i18n,
-                                { "playguard/dashboard/stop_now"_i18n, "playguard/dashboard/stop_soon"_i18n },
-                                [copy, soon, refresh](int index) { stop_at(copy, index == 0 ? 0 : (uint16_t)soon, refresh); });
-    brls::Application::pushActivity(new brls::Activity(list));
+    ui::pick("playguard/dashboard/stop_title"_i18n,
+             { "playguard/dashboard/stop_now"_i18n, "playguard/dashboard/stop_soon"_i18n }, 0,
+             [copy, soon, refresh](int index) { stop_at(copy, index == 0 ? 0 : (uint16_t)soon, refresh); }, false);
 }
 
 // Puts `base` back on weekday `wd`, if it still holds the extra time (`value`).
@@ -257,8 +369,13 @@ bool restore_pending(const PtState& pt)
 
 std::string extra_today_text(const PtState& pt)
 {
-    const int extra = pt_logic::extra_today_min(extra_record(), ui::today_date(), ui::today_weekday(), pt);
+    const int extra = extra_today_minutes(pt);
     return extra > 0 ? "+" + ui::fmt_minutes((uint16_t)extra) : "";
+}
+
+int extra_today_minutes(const PtState& pt)
+{
+    return pt_logic::extra_today_min(extra_record(), ui::today_date(), ui::today_weekday(), pt);
 }
 
 std::string restore_label()
@@ -266,6 +383,13 @@ std::string restore_label()
     const pt_logic::ExtraRecord rec = extra_record();
     if (rec.weekday < 0 || rec.weekday > 6) return "";
     return brls::getStr("playguard/dashboard/extra_pending", ui::day_name_in_text(rec.weekday), ui::fmt_minutes(rec.base));
+}
+
+std::string bonus_text()
+{
+    const pt_logic::BonusRecord rec = bonus_record();
+    if (rec.weekday < 0) return "";
+    return brls::getStr("playguard/cadran/week/bonus", ui::day_name(rec.weekday), "+" + ui::fmt_minutes((uint16_t)(rec.value - rec.base)));
 }
 
 bool restore_lowers()
@@ -282,15 +406,17 @@ static bool s_restore_retry = false;
 // (pin_lock::Tightening), and nobody keeps the extra time by answering a
 // dialog. The play timer is still never written while it counts down: the
 // temporary unlock comes first, and the console is locked again right after.
-// `pt` was just read (restore_action said Offer). `asked`: from the Overview
+// `pt` was just read (restore_action said Offer). `asked`: from Today
 // or the bell, where a failure is said; at start-up it is only logged, and the
-// bell keeps its entry.
+// bell keeps its entry. `clear` drops the record once put back, `source` names
+// the change in the history (a planned bonus is put back the same way).
 static void put_back_by_itself(const pt_logic::ExtraRecord& rec, const PtState& pt, bool asked,
-                               std::function<void()> refresh)
+                               std::function<void()> refresh, std::function<void()> clear = clear_extra_record,
+                               const char* source = "restore_extra")
 {
     if (!pt_logic::state_known(pt)) {
         s_restore_retry = true;
-        if (asked) ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN));
+        if (asked) ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN), ui::Toast::Refused);
         return;
     }
     const int wd = rec.weekday;
@@ -317,8 +443,8 @@ static void put_back_by_itself(const pt_logic::ExtraRecord& rec, const PtState& 
             return;
         }
     }
-    const Result rc = write_days(days, "restore_extra");
-    if (R_SUCCEEDED(rc)) clear_extra_record();
+    const Result rc = write_days(days, source);
+    if (R_SUCCEEDED(rc)) clear();
     // The unlock was this function's own, never the user's: locked again
     // whatever the "lock again automatically" preference says.
     Result relock = 0;
@@ -341,10 +467,39 @@ static void put_back_by_itself(const pt_logic::ExtraRecord& rec, const PtState& 
     if (refresh) refresh();
 }
 
+// A bonus planned for a day now over: its limit put back by itself (it only
+// goes down), once no extra-time record waits on its own day's limit.
+static void offer_bonus_restore(std::function<void()> refresh, bool asked)
+{
+    const pt_logic::BonusRecord bonus = bonus_record();
+    if (bonus.weekday < 0 || app::read_only() || console_lock::active()) return;
+    s_restore_retry = false;
+    PtState pt;
+    pctl_play_timer_query(&pt);
+    switch (pt_logic::bonus_action(bonus, ui::today_date(), pt, app::read_only())) {
+        case pt_logic::Restore::None:   return;
+        case pt_logic::Restore::Later:  s_restore_retry = pt.fw_supported; return;
+        case pt_logic::Restore::Forget: clear_bonus_record(); return;   // changed since
+        case pt_logic::Restore::Offer:  break;
+    }
+    pt_logic::ExtraRecord rec;
+    rec.weekday = bonus.weekday;
+    rec.date    = bonus.date;
+    rec.base    = bonus.base;
+    rec.value   = bonus.value;
+    // On its weekday again (a week on) and below the time played: the next day.
+    if (pt_logic::restore_way(rec, pt, ui::today_weekday(), false) == pt_logic::RestoreWay::Wait) return;
+    put_back_by_itself(rec, pt, asked, refresh, clear_bonus_record, "restore_bonus");
+}
+
 void offer_extra_time_restore(std::function<void()> refresh, bool asked)
 {
     const pt_logic::ExtraRecord rec = extra_record();
-    if (rec.weekday < 0 || rec.weekday > 6 || rec.date == ui::today_date()) return;
+    // No extra time to put back: a bonus planned may be.
+    if (rec.weekday < 0 || rec.weekday > 6 || rec.date == ui::today_date()) {
+        offer_bonus_restore(refresh, asked);
+        return;
+    }
     // Kept for when the firmware screen leaves read-only mode.
     if (app::read_only()) {
         if (asked) ui::refuse_read_only();
@@ -360,9 +515,12 @@ void offer_extra_time_restore(std::function<void()> refresh, bool asked)
         case pt_logic::Restore::None:   return;
         case pt_logic::Restore::Later:                                  // not read: again soon
             s_restore_retry = pt.fw_supported;
-            if (asked) ui::notify(ui::rc_text(pt.fw_supported ? NXM_RC_STATE_UNKNOWN : NXM_RC_FW_UNSUPPORTED));
+            if (asked) ui::notify(ui::rc_text(pt.fw_supported ? NXM_RC_STATE_UNKNOWN : NXM_RC_FW_UNSUPPORTED), ui::Toast::Refused);
             return;
-        case pt_logic::Restore::Forget: clear_extra_record(); return;  // changed since
+        case pt_logic::Restore::Forget:                                 // changed since
+            clear_extra_record();
+            offer_bonus_restore(refresh, asked);
+            return;
         case pt_logic::Restore::Offer:  break;
     }
     const int wd = rec.weekday;
@@ -370,6 +528,7 @@ void offer_extra_time_restore(std::function<void()> refresh, bool asked)
     switch (pt_logic::restore_way(rec, pt, ui::today_weekday(), config::get().extra_auto_restore)) {
         case pt_logic::RestoreWay::ByItself:
             put_back_by_itself(rec, pt, asked, refresh);
+            if (config::get().extra_weekday < 0) offer_bonus_restore(refresh, asked);   // put back: the bonus next
             return;
         case pt_logic::RestoreWay::Wait:
             // Asked for: as any change, the suspend warning first (and the PIN).
@@ -392,7 +551,7 @@ void offer_extra_time_restore(std::function<void()> refresh, bool asked)
     dialog->addButton("playguard/dashboard/extra_restore"_i18n, [wd, base, value, refresh]() {
         brls::sync([wd, base, value, refresh]() { restore_extra(wd, base, value, refresh); });
     });
-    // B: decide later (the record stays; the Overview keeps a line for it).
+    // B: decide later (the record stays; Today keeps a line for it).
     dialog->setCancelable(true);
     dialog->open();
 }

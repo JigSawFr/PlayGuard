@@ -10,7 +10,6 @@
 using namespace brls::literals;
 
 static constexpr float SIZE = 40;
-static constexpr const char* UNLOCKED_ID  = "title_state_unlocked";
 static constexpr const char* READ_ONLY_ID = "title_state_read_only";
 
 // Where the state is undone.
@@ -36,37 +35,32 @@ static void open_read_only()
     });
 }
 
-TitleState::TitleState(Kind kind)
-    : kind(kind)
+TitleState::TitleState()
 {
-    this->setId(kind == Kind::UNLOCKED ? UNLOCKED_ID : READ_ONLY_ID);
+    this->setId(READ_ONLY_ID);
     this->setFocusable(false);
     this->setWidth(SIZE);
     this->setHeight(SIZE);
     this->setAlignSelf(brls::AlignSelf::CENTER);
     this->setMarginLeft(14);
     // A tap goes where it is undone (hitTest finds it, focusable or not).
-    this->addGestureRecognizer(new brls::TapGestureRecognizer(this, [kind]() {
-        if (kind == Kind::UNLOCKED) open_unlocked();
-        else open_read_only();
-    }));
+    this->addGestureRecognizer(new brls::TapGestureRecognizer(this, []() { open(Kind::READ_ONLY); }));
 }
 
-void TitleState::show(brls::AppletFrame* frame, Kind kind, bool shown)
+void TitleState::open(Kind kind)
+{
+    if (kind == Kind::UNLOCKED) open_unlocked();
+    else open_read_only();
+}
+
+void TitleState::show(brls::AppletFrame* frame, bool shown)
 {
     auto* label = frame ? frame->getView("brls/applet_frame/title_label") : nullptr;
     auto* row   = label ? dynamic_cast<brls::Box*>(label->getParent()) : nullptr;
     if (!row) return;
-    // Both added at once, hidden, so the padlock always comes first.
-    if (!row->getView(UNLOCKED_ID)) {
-        for (Kind k : { Kind::UNLOCKED, Kind::READ_ONLY }) {
-            auto* icon = new TitleState(k);
-            icon->setVisibility(brls::Visibility::GONE);
-            row->addView(icon);
-        }
-    }
-    if (brls::View* icon = row->getView(kind == Kind::UNLOCKED ? UNLOCKED_ID : READ_ONLY_ID))
-        icon->setVisibility(shown ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    brls::View* icon = row->getView(READ_ONLY_ID);
+    if (!icon) row->addView(icon = new TitleState());
+    icon->setVisibility(shown ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
 }
 
 brls::View* TitleState::hitTest(brls::Point point)
@@ -81,39 +75,7 @@ void TitleState::draw(NVGcontext* vg, float x, float y, float width, float heigh
 {
     (void)style;
     (void)ctx;
-    if (this->kind == Kind::UNLOCKED) this->draw_padlock(vg, x, y, width, height);
-    else this->draw_read_only(vg, x, y, width, height);
-}
-
-void TitleState::draw_padlock(NVGcontext* vg, float x, float y, float width, float height)
-{
-    // An open padlock in amber: the body, its keyhole cut out, and the
-    // shackle out of its left socket, swung up.
-    const NVGcolor ink = ui::color_warn();
-    const float bw = width * 0.62f, bh = height * 0.42f;
-    const float bx = x + (width - bw) / 2, by = y + height * 0.5f;
-    nvgBeginPath(vg);
-    nvgRoundedRect(vg, bx, by, bw, bh, height * 0.07f);
-    nvgFillColor(vg, ink);
-    nvgFill(vg);
-    nvgBeginPath(vg);
-    nvgCircle(vg, bx + bw / 2, by + bh * 0.42f, height * 0.06f);
-    nvgRect(vg, bx + bw / 2 - height * 0.025f, by + bh * 0.42f, height * 0.05f, bh * 0.32f);
-    nvgFillColor(vg, brls::Application::getTheme()["brls/background"]);
-    nvgFill(vg);
-
-    // The shackle: an arch over the right half of the body, its right leg in
-    // its socket, its left one lifted out.
-    const float r = bw * 0.28f, sw = height * 0.075f;
-    const float cx = bx + bw * 0.68f, cy = by - height * 0.16f;
-    nvgBeginPath(vg);
-    nvgMoveTo(vg, cx - r, cy + height * 0.05f);
-    nvgArc(vg, cx, cy, r, NVG_PI, 0, NVG_CW);
-    nvgLineTo(vg, cx + r, by);
-    nvgStrokeColor(vg, ink);
-    nvgStrokeWidth(vg, sw);
-    nvgLineCap(vg, NVG_BUTT);
-    nvgStroke(vg);
+    this->draw_read_only(vg, x, y, width, height);
 }
 
 void TitleState::draw_read_only(NVGcontext* vg, float x, float y, float width, float height)

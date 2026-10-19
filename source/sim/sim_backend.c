@@ -13,11 +13,12 @@
 //   PLAYGUARD_SIM_BLANK=1       PRODINFO blanked (serial XAW00000000000)
 //   PLAYGUARD_SIM_NO_PDM=1      the play-data service (Activity tab) fails
 //   PLAYGUARD_SIM_GAMES=200     that many more games played this week (a large library)
+//   PLAYGUARD_SIM_NO_PLAY=1     nothing played for weeks (the all-time totals stay)
 //   PLAYGUARD_SIM_NOT_SET_UP=1  parental controls never set up (no PIN, no restriction)
 //   PLAYGUARD_SIM_APPLET=1      started from the album (applet mode)
 //   PLAYGUARD_SIM_RESTRICTED=1  today's limit is reached (the console says "Time's up")
 //   PLAYGUARD_SIM_NOT_COUNTING=1 the time left does not go down (a clock set back):
-//                               the Overview says so after 90 s on screen
+//                               Today says so after 90 s on screen
 //   PLAYGUARD_SIM_AUTOSYNC_OFF=1 "Synchronise clock via Internet" is off
 //   PLAYGUARD_SIM_NETWORK_OFFSET=1411  the network clock is that many seconds
 //                               ahead of the console clock until it is set
@@ -26,7 +27,7 @@
 //   PLAYGUARD_SIM_NOW=1791471600  the console's time, frozen (POSIX seconds):
 //                               the same screens at every run (visual check)
 //   PLAYGUARD_SIM_IDLE=1        no game running: the timer reports no time left
-//                               yet (the Overview falls back on the activity log)
+//                               yet (Today falls back on the activity log)
 //   PLAYGUARD_SIM_SKIP=900      the console's time that many seconds later, a
 //                               game played all along (unless IDLE): the time
 //                               left goes down by as much, to the limit and
@@ -67,6 +68,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "../core/calendar.h"
 #include "../core/gamecheck.h"
 #include "../core/pctl_ops.h"
 #include "../core/playstats.h"
@@ -476,6 +478,9 @@ void pctl_play_timer_query(PtState *o)
     o->remaining_valid = true;
     o->remaining_ns = o->enabled && !reached && limit != PT_DAY_NOLIMIT && !sim_env("PLAYGUARD_SIM_IDLE")
                           ? ((s64)limit * 60 - played) * 1000000000LL + 20000000000LL - (s64)counting_ns() : 0;
+    // The last minutes of the day's time, whatever the limit (the child screen's end).
+    const char *left_min = sim_env("PLAYGUARD_SIM_LEFT_MIN");
+    if (left_min && o->remaining_ns > 0) o->remaining_ns = (s64)atoi(left_min) * 60 * 1000000000LL + 20000000000LL;
     // A warning only: the console does not restrict, and 1454 goes below 0
     // by the time played over the limit (as observed; 2 min when the limit is
     // only said to be reached).
@@ -782,6 +787,45 @@ void playstats_fetch(PlayStats *out)
     playstats_fetch_for(out, NULL);
 }
 
+// When the made-up week was played: each day's games one after the other,
+// half from 16:30 and half from 19:00 on school days, from 10:00 and 15:00 at
+// the weekend, today's in one stretch ending before now; folded as the
+// console's log is (util/playlog.h).
+static void sim_hours(PlayStats *out)
+{
+    const TimeRule *rule = time_console_rule();
+    u64 starts[7];
+    for (int k = 0; k < 7; k++) starts[k] = local_midnight(rule, out->now, k);
+    enum { GAMES = 16 };
+    PlayLogEvent ev[7 * GAMES * 2];
+    size_t n = 0;
+    for (int k = 6; k >= 0; k--) {
+        const bool weekend = out->day_wday[k] == 0 || out->day_wday[k] == 6;
+        u64 today_s = 0;
+        for (u32 i = 0; i < out->count && i < GAMES; i++) today_s += out->games[i].day_s[0];
+        for (int block = 0; block < (k == 0 ? 1 : 2); block++) {
+            u64 at;
+            if (k == 0) {
+                const u64 latest = out->now > today_s + 3600 ? out->now - today_s - 3600 : starts[0];
+                at = starts[0] + 13 * 3600 + 1800;
+                if (at > latest) at = latest > starts[0] ? latest : starts[0];
+            } else {
+                at = starts[k] + (u64)(weekend ? (block ? 15 * 60 : 10 * 60) : (block ? 19 * 60 : 16 * 60 + 30)) * 60;
+            }
+            for (u32 i = 0; i < out->count && i < GAMES; i++) {
+                const u32 s = out->games[i].day_s[k];
+                if (!s || (k != 0 && (int)(i % 2) != block)) continue;
+                ev[n++] = (PlayLogEvent){ out->games[i].app_id, PlayLogEv_Focus, at, 0, { 0, 0 } };
+                at += s;
+                ev[n++] = (PlayLogEvent){ out->games[i].app_id, PlayLogEv_Unfocus, at, 0, { 0, 0 } };
+                at += 120;   // two minutes to change games: the same session
+            }
+        }
+    }
+    playlog_fold_hours(ev, n, out->now, starts, &out->hours);
+    out->hours_ok = true;
+}
+
 void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
 {
     memset(out, 0, sizeof(*out));
@@ -793,16 +837,17 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
     // Made-up games; one was deleted since (no name, no totals), the last one is
     // little played and left aside for months.
     static const struct {
-        u64 id; const char *name; u32 total_min, launches, today_min, week_min, days_ago;
+        u64 id; const char *name; u32 total_min, launches, today_min, week_min, days_ago, prev_week_min;
     } games[] = {
-        { 0x0100A1B2C3D40000ULL, "Star Kart Racers",      3650, 300, 45, 310, 0 },
-        { 0x0100A1B2C3D41000ULL, "Island Builders",       2980, 160, 20, 140, 0 },
-        { 0x0100A1B2C3D42000ULL, "Pixel Quest Deluxe",    1210,  45,  0,  95, 2 },
-        { 0x0100A1B2C3D43000ULL, "Dragon Valley Legends", 6100, 120,  0,   0, 12 },
-        { 0x0100A1B2C3D44000ULL, "Puzzle Garden",          380,  52,  0,  30, 5 },
-        { 0x0100A1B2C3D45000ULL, "",                          0,   0, 15,  15, 0 },
-        { 0x0100A1B2C3D46000ULL, "Space Farm Tales",        95,   4,  0,   0, 75 },
+        { 0x0100A1B2C3D40000ULL, "Star Kart Racers",      3650, 300, 45, 310, 0, 190 },
+        { 0x0100A1B2C3D41000ULL, "Island Builders",       2980, 160, 20, 140, 0, 160 },
+        { 0x0100A1B2C3D42000ULL, "Pixel Quest Deluxe",    1210,  45,  0,  95, 2,  95 },
+        { 0x0100A1B2C3D43000ULL, "Dragon Valley Legends", 6100, 120,  0,   0, 12,  0 },
+        { 0x0100A1B2C3D44000ULL, "Puzzle Garden",          380,  52,  0,  30, 5,  35 },
+        { 0x0100A1B2C3D45000ULL, "",                          0,   0, 15,  15, 0,  0 },
+        { 0x0100A1B2C3D46000ULL, "Space Farm Tales",        95,   4,  0,   0, 75,  0 },
     };
+    const bool idle_weeks = sim_env("PLAYGUARD_SIM_NO_PLAY") != NULL;
     out->windows_ok = true;
     LocalTime today;
     const int wday = host_to_local(NULL, out->now, &today) ? today.wday : 0;
@@ -814,13 +859,14 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         g->totals_ok = games[i].total_min > 0;
         g->total_s = (u64)games[i].total_min * 60;
         g->launches = games[i].launches;
-        g->last_played = g->totals_ok ? out->now - (u64)games[i].days_ago * 86400 - 3600 : 0;
+        const u32 days_ago = idle_weeks ? games[i].days_ago + 30 : games[i].days_ago;
+        g->last_played = g->totals_ok ? out->now - (u64)days_ago * 86400 - 3600 : 0;
         g->first_played = g->totals_ok ? out->now - 400ULL * 86400 : 0;
-        g->today_s = games[i].today_min * 60;
-        g->week_s = games[i].week_min * 60;
+        g->today_s = idle_weeks ? 0 : games[i].today_min * 60;
+        g->week_s = idle_weeks ? 0 : games[i].week_min * 60;
         // PLAYGUARD_SIM_SKIP's time played today, on the first game (the
         // timer counts the same).
-        if (i == 0) {
+        if (i == 0 && !idle_weeks) {
             const u64 more = played_today_s() > SIM_PLAYED_TODAY_MIN * 60ULL ? played_today_s() - SIM_PLAYED_TODAY_MIN * 60ULL : 0;
             g->today_s += (u32)more;
             g->week_s += (u32)more;
@@ -840,9 +886,19 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         g->launches = (u32)share(g->launches, account);
         g->today_s  = (u32)share(g->today_s, account);
         g->week_s   = (u32)share(g->week_s, account);
+        g->prev_week_s = idle_weeks ? 0 : (u32)share((u64)games[i].prev_week_min * 60, account);
+        // The month: the last 7 days, and the 23 before at the rate of the
+        // week before them; 1 h 30 for a game last played 7 to 29 days ago.
+        g->month_s = g->week_s + (u32)((u64)g->prev_week_s * 23 / 7);
+        if (!g->week_s && !g->prev_week_s && days_ago >= 7 && days_ago < 30) g->month_s = (u32)share(90 * 60, account);
         for (int k = 0; k < 7; k++) g->day_s[k] = (u32)share(g->day_s[k], account);
         if (account && !g->week_s && !g->total_s) out->count--;
     }
+    // The week before: 8 h in all (the last 7 days have 9 h 50; Star Kart
+    // Racers 2 h more), none after weeks without play.
+    out->prev_week_ok = true;
+    out->prev_week_s = idle_weeks ? 0 : (u32)share(480ULL * 60, account);
+    out->month_ok = true;
     // A large library: filler games, each played a little this week.
     const char *more = sim_env("PLAYGUARD_SIM_GAMES");
     const int n = more ? atoi(more) : 0;
@@ -852,13 +908,14 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         g->app_id = 0x0100B00000000000ULL + ((u64)i << 12);
         snprintf(g->name, sizeof(g->name), "Game %03d", i + 1);
         g->totals_ok = true;
-        g->week_s = g->day_s[1] = (u32)(60 * (n - i));
+        g->week_s = g->month_s = g->day_s[1] = (u32)(60 * (n - i));
         g->total_s = g->week_s * 10;
         g->launches = 3;
         g->last_played = out->now - 86400;
         g->first_played = out->now - 30ULL * 86400;
     }
     out->truncated = i < n;   // more than the list holds, as on a console
+    sim_hours(out);
 }
 
 // The made-up games have their names already; no SD card icons either.
@@ -950,16 +1007,25 @@ typedef struct {
     GameFacts games[GAMECHECK_MAX];
 } SimGames;
 
+// The same age from the 13 rating organisations, none from the others.
+static void sim_rate(GameFacts *g, int age)
+{
+    memset(g->rating_age, 0xFF, sizeof(g->rating_age));
+    for (int org = 0; org < RATING_ORG_COUNT; org++) g->rating_age[org] = (int8_t)age;
+}
+
 static void sim_games(SimGames *out)
 {
     memset(out, 0, sizeof(*out));
     static const char *fine[] = { "Star Kart Racers", "Island Builders", "Pixel Quest Deluxe",
                                   "Dragon Valley Legends", "Puzzle Garden" };
+    static const int fine_age[] = { 3, 7, 12, 16, 3 };
     for (size_t i = 0; i < sizeof(fine) / sizeof(fine[0]); i++) {
         GameFacts *g = &out->games[out->count++];
         g->app_id = 0x0100A1B2C3D40000ULL + i * 0x1000;
         snprintf(g->name, sizeof(g->name), "%s", fine[i]);
         snprintf(g->display_version, sizeof(g->display_version), "1.3.0");
+        sim_rate(g, fine_age[i]);
         g->control_ok = true;
         g->record_event = 3;
         sim_add_content(g, g->app_id, 0, GC_META_APPLICATION, GC_STORAGE_SD);
@@ -975,22 +1041,23 @@ static void sim_games(SimGames *out)
     GameFacts *card = &out->games[out->count++];
     card->app_id = 0x0100A1B2C3D4A000ULL;
     snprintf(card->name, sizeof(card->name), "Sky Kingdom");
+    sim_rate(card, 7);
     card->control_ok = true;
     card->record_event = 5;
     sim_add_content(card, card->app_id, 0, GC_META_APPLICATION, GC_STORAGE_GAMECARD);
     card->card_only = true;
     if (sim_env("PLAYGUARD_SIM_GAMES_OK")) return;
 
-    static const struct { u64 id; const char *name; GameIssue issue; } broken[] = {
-        { 0x0100A1B2C3D46000ULL, "",                 GC_NO_CONTROL },
-        { 0x0100A1B2C3D47000ULL, "Garden Defenders", GC_NO_BASE },
-        { 0x0100A1B2C3D48000ULL, "Hedgehog Rush",    GC_ARCHIVED },
-        { 0x0100A1B2C3D49000ULL, "Robot Factory",    GC_FIRMWARE_TOO_OLD },
-        { 0x0100A1B2C3D4B000ULL, "Ocean Explorer",   GC_FILES_MISSING },
-        { 0x0100A1B2C3D4C000ULL, "Castle Siege",     GC_TICKET_MISSING },
-        { 0x0100A1B2C3D4D000ULL, "Moon Racer",       GC_LAUNCH_VERSION },
-        { 0x0100A1B2C3D4E000ULL, "Forest Tales: Legends of the Ancient Grove for Nintendo Switch™",     GC_NEEDS_VERIFY },
-        { 0x0100A1B2C3D4F000ULL, "Star Pilots",      GC_KEY_TOO_NEW },
+    static const struct { u64 id; const char *name; GameIssue issue; int age; } broken[] = {
+        { 0x0100A1B2C3D46000ULL, "",                 GC_NO_CONTROL, -1 },
+        { 0x0100A1B2C3D47000ULL, "Garden Defenders", GC_NO_BASE, 7 },
+        { 0x0100A1B2C3D48000ULL, "Hedgehog Rush",    GC_ARCHIVED, 7 },
+        { 0x0100A1B2C3D49000ULL, "Robot Factory",    GC_FIRMWARE_TOO_OLD, 12 },
+        { 0x0100A1B2C3D4B000ULL, "Ocean Explorer",   GC_FILES_MISSING, 3 },
+        { 0x0100A1B2C3D4C000ULL, "Castle Siege",     GC_TICKET_MISSING, 16 },
+        { 0x0100A1B2C3D4D000ULL, "Moon Racer",       GC_LAUNCH_VERSION, 3 },
+        { 0x0100A1B2C3D4E000ULL, "Forest Tales: Legends of the Ancient Grove for Nintendo Switch™",     GC_NEEDS_VERIFY, 12 },
+        { 0x0100A1B2C3D4F000ULL, "Star Pilots",      GC_KEY_TOO_NEW, 18 },
     };
     for (size_t i = 0; i < sizeof(broken) / sizeof(broken[0]); i++) {
         const u64 id = broken[i].id;
@@ -1000,6 +1067,7 @@ static void sim_games(SimGames *out)
         snprintf(g->name, sizeof(g->name), "%s", broken[i].name);
         g->control_ok = broken[i].name[0] != '\0';
         if (g->control_ok) snprintf(g->display_version, sizeof(g->display_version), "1.0.0");
+        sim_rate(g, broken[i].age);
         g->record_event = broken[i].issue == GC_ARCHIVED ? 11 : 3;
         g->view_ok = true;
         g->view_flags = GC_VIEW_HAS_MAIN_CONTENTS | GC_VIEW_CAN_LAUNCH;

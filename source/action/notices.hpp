@@ -4,7 +4,7 @@
 // the bell in the header counts what is to do. Each entry can carry an
 // action: the fix itself, or the screen where it is made. UI thread only.
 //
-// The sources: the Overview's readings and a sweep of the main screen every
+// The sources: Today's readings and a sweep of the main screen every
 // minute (refresh_status), the network clock check at start-up, the update
 // check, PlayGuard's own damaged files at start-up (data_notice).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -71,7 +71,7 @@ int count_of(const std::vector<std::string>& ids);   // the entries to do among 
 int  listen(std::function<void()> fn);
 void unlisten(int id);
 
-// The Overview's readings, and the main screen's sweep: the state of the
+// Today's readings, and the main screen's sweep: the state of the
 // parental controls, the play timer, the clock and the system, as entries.
 void refresh_status(const PctlStatus& s, const PtState& pt, const SysInfo& si, Result accuracy_rc, bool accurate);
 // What timer_health said, from the screens that ask it (they show the play
@@ -83,7 +83,7 @@ void note_pin_strength(const PctlStatus& s);
 // The main screen's own sweep (a minute apart, only while it is on top and
 // in focus): reads what refresh_status needs, in one pctl session.
 void sweep();
-// The same, unless the Overview gave refresh_status its readings in the last
+// The same, unless Today gave refresh_status its readings in the last
 // seconds: the main screen's minute timer.
 void sweep_if_stale();
 

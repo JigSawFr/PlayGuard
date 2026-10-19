@@ -40,6 +40,7 @@
             <brls:DetailCell id="ga_launches" focusable="false" title="@i18n/playguard/activity/launches"/>
             <brls:DetailCell id="ga_first" focusable="false" title="@i18n/playguard/activity/first"/>
             <brls:DetailCell id="ga_last" focusable="false" title="@i18n/playguard/activity/last"/>
+            <brls:DetailCell id="ga_rating" focusable="false" title="@i18n/playguard/activity/rating"/>
             <brls:Header id="ga_accounts_header" title="@i18n/playguard/activity/section_accounts" marginTop="24" marginBottom="8"/>
             <brls:Box id="ga_accounts" width="auto" height="auto" axis="column" alignItems="stretch"/>
             <brls:Label id="ga_accounts_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>

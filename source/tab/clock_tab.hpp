@@ -1,8 +1,9 @@
-// ClockTab — shows the system clocks and sets the network clock from a public
-// NTP server (the play timer relies on the network clock). The measurement
-// and the write are clock_flow's; this screen adds the server choice, the
-// result text, the 2-minute countdown, a spinner while measuring and, when
-// no server answers, "Set the network clock to the console clock".
+// ClockTab — shows the system clocks, both large, the network one amber while
+// it is inaccurate, and sets the network clock from a public NTP server (the
+// play timer relies on the network clock). The measurement and the write are
+// clock_flow's; this screen adds the server choice, the result text, the
+// 2-minute countdown, a spinner while measuring and, when no server answers,
+// "Set the network clock to the console clock".
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -11,8 +12,10 @@
 #include <string>
 
 #include "action/clock_flow.hpp"
+#include "tab/cadran_list.hpp"
 #include "tab/tab_base.hpp"
 #include "util/pctl_ops_c.hpp"
+#include "view/cadran_digits.hpp"
 
 class ClockTab : public TabBase
 {
@@ -25,6 +28,13 @@ class ClockTab : public TabBase
     void refresh() override;
 
   private:
+    cadran::List list;
+    brls::Box*    network_card = nullptr;
+    CadranDigits* user_time = nullptr;
+    CadranDigits* network_time = nullptr;
+    brls::Label*  user_date = nullptr;
+    brls::Label*  network_state = nullptr;
+    brls::Rectangle* network_dot = nullptr;
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
     bool busy = false;
     bool autosync_off = false;   // "Synchronise Clock via Internet" read as off
@@ -45,10 +55,10 @@ class ClockTab : public TabBase
     void measure();
     void apply();
     void copy();
+    // Both clocks large, the network one amber while it is inaccurate
+    // (`known` false: not read).
+    void show_clocks(const std::string& user_text, const std::string& network_text, bool known, bool accurate);
 
-    BRLS_BIND(brls::DetailCell, user,     "ck_user");
-    BRLS_BIND(brls::DetailCell, network,  "ck_network");
-    BRLS_BIND(brls::DetailCell, accuracy, "ck_accuracy");
     BRLS_BIND(brls::DetailCell, autosync, "ck_auto");
     BRLS_BIND(brls::DetailCell, zone,     "ck_zone");
     BRLS_BIND(brls::Label,      why,      "ck_why");

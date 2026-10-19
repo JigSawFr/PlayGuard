@@ -285,8 +285,8 @@ What PlayGuard does with this:
   time counts while it runs as an application, the time left must go down
   while it is on screen. With the timer on, a limit above 0 today, not
   reached, not temporarily unlocked and PlayGuard not opened from the album,
-  a time left that has not moved by 5 s over about 90 s on screen makes the
-  Overview and the Play timer say the console is not counting. The likely
+  a time left that has not moved by 5 s over about 90 s on screen makes
+  *Today* and the Play timer say the console is not counting. The likely
   causes it gives come from above (a clock set back) and from other tools'
   users ([NX-Pctl-Manager #2](https://github.com/tailiang2008/NX-Pctl-Manager/issues/2),
   a network clock never set; #3 and #7, a limit just written). Not seen on a
@@ -313,7 +313,7 @@ controls* (the second asks for the PIN).
   time already played then warns of no suspension). `ALARM` verified on a
   console (2026-10-14): at the limit the console warned and the game went
   on; 1455 stayed `false` and 1454 went below 0, by the time over the limit,
-  which the Overview and the Play timer tab show. Suspending can lose unsaved
+  which *Today* and the Play timer tab show. Suspending can lose unsaved
   progress (Nintendo: [time limit settings](https://www.nintendo.com/sg/parents/switch/time/settings.html)),
   so its confirmations say so, and *No more play today* can wait 5 minutes.
 - The PIN prompt behind *Disable parental controls* is the system's: a child

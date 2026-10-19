@@ -15,6 +15,8 @@ PlayGuard ramène sur une console modifiée les réglages de l'application mobil
 
 [![PlayGuard en 30 secondes](images/video/playguard-tour.gif)](images/video/playguard-tour.gif)
 
+▶️ **[L'essayer dans le navigateur](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr)**, la vraie app face à une console simulée : [déverrouillé pour l'instant](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr&unlocked=1) · [temps écoulé](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr&restricted=1) · [premier lancement, sans code PIN](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr&not_set_up=1) · [sur la TV, texte plus grand](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr&docked=1).
+
 > [!WARNING]
 > **Nécessite un firmware personnalisé (Atmosphère).** PlayGuard utilise le service restreint `pctl`, en partie via des commandes `*ForDebug`. **À utiliser à vos risques.**
 
@@ -27,7 +29,7 @@ PlayGuard ramène sur une console modifiée les réglages de l'application mobil
 - 📱 **Application mobile** — la dissocier, même sur une console d'occasion.
 - ↩️ **Historique et sauvegardes** — chaque modification est consignée et peut être annulée.
 - 🔔 **Notifications** — une cloche regroupe ce qui demande votre attention (alarme désactivée, horloge décalée, modifications faites ailleurs), avec la correction à portée d'un appui.
-- 🌍 Toutes les langues de la console, thèmes clair et sombre.
+- 🌍 Toutes les langues de la console, thèmes clair et sombre, texte plus grand sur la TV ; des cartes, le temps du jour en anneau, la semaine réglée au stick.
 
 ## Compatibilité
 

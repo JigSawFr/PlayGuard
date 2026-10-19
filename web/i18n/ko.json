@@ -48,7 +48,7 @@
   "replaying": "단계 재생 중: {n} / {total}",
   "tour": "둘러보기",
   "report": "문제 신고",
-  "tour_overview": "개요: 오늘의 플레이 시간, 제한, 남은 시간, 취침 시간.",
+  "tour_overview": "오늘: 오늘의 플레이 시간, 제한, 남은 시간, 취침 시간.",
   "tour_play_timer": "플레이 타이머: 주간 그래프가 곧 편집기입니다. 매일 같은 제한 또는 요일별 제한.",
   "tour_activity": "활동: 본체 기록을 바탕으로 누가 무엇을 얼마나 플레이했는지.",
   "tour_console": "본체: 네트워크 시계, 설치된 게임, 본체에서 실행 중인 것.",
@@ -66,7 +66,7 @@
   "capture": "스크린샷"
  },
  "params": {
-  "tab": {"label": "처음 여는 탭", "options": {"": "개요", "play_timer": "플레이 타이머", "activity": "플레이 기록", "restrictions": "제한", "security": "PIN", "console": "본체", "history": "변경 기록", "preferences": "환경 설정", "about": "정보"}},
+  "tab": {"label": "처음 여는 탭", "options": {"": "오늘", "play_timer": "플레이 타이머", "activity": "플레이 기록", "restrictions": "제한", "security": "PIN", "console": "본체", "history": "변경 기록", "preferences": "환경 설정", "about": "정보"}},
   "keep": {"label": "방문 사이에 상태 유지", "help": "PlayGuard 데이터와 시뮬레이션 본체의 설정(PIN, 제한, 시계)이 이 브라우저에 남습니다. 이 패널의 본체 설정은 처음 시작할 때만 적용됩니다."},
   "not_set_up": {"label": "설정한 적 없음(PIN 없음)"},
   "unlocked": {"label": "일시적으로 해제됨"},
@@ -76,6 +76,7 @@
   "alarm_off": {"label": "'시간 종료' 알람 꺼짐"},
   "not_counting": {"label": "남은 시간이 줄지 않음", "help": "시계를 뒤로 돌린 상태: 화면에 90초 표시되면 개요가 알려 줍니다."},
   "unpaired": {"label": "연동된 앱 없음"},
+  "left_min": {"label": "오늘 남은 시간(분)"},
   "fw": {"label": "펌웨어", "help": "확인된 최신 버전보다 높으면 펌웨어 화면이 나옵니다."},
   "no_cfw": {"label": "Atmosphère 없음"},
   "emummc": {"label": "emuMMC"},
@@ -85,7 +86,8 @@
   "applet": {"label": "애플릿 모드(앨범에서 실행)"},
   "background": {"label": "PlayGuard가 백그라운드에 있음"},
   "hbloader": {"label": "업데이트를 스토어에 넘길 수 있는 로더"},
-  "numpad": {"label": "숫자 키패드가 돌려주는 값"},
+  "docked": {"label": "독에 연결(TV)"},
+  "battery": {"label": "배터리 사용(충전기 없음)"},
   "boot_choice": {"label": "시작할 때 '이전 빌드?'에 대한 답", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "네트워크 시계 정확함"},
   "autosync_off": {"label": "'인터넷으로 시계 맞추기' 꺼짐"},
@@ -94,6 +96,8 @@
   "now": {"label": "본체 시각 고정", "help": "브라우저의 시간대 기준입니다."},
   "skip": {"label": "본체 시각 앞당기기(초)", "help": "그동안 계속 게임을 플레이한 것으로 보고 남은 시간도 그만큼 줄어듭니다. 화면 아래 버튼으로 앞당길 수 있습니다."},
   "idle": {"label": "실행 중인 게임 없음"},
+  "no_game": {"label": "PlayGuard 뒤에 열린 것 없음"},
+  "no_play": {"label": "몇 주째 플레이 없음"},
   "no_pdm": {"label": "플레이 기록 없음"},
   "games": {"label": "이번 주에 추가로 플레이한 게임 수"},
   "accounts": {"label": "사용자 계정", "help": "0~8개(기본 2개), 각 계정은 다음 계정의 두 배를 플레이합니다."},
@@ -109,7 +113,9 @@
   "fail": {"label": "실패시킬 항목", "options": {"unlock": "해제", "unverified": "해제 확인 안 됨", "relock": "다시 잠금", "write": "모든 설정 쓰기", "timer": "타이머 읽기", "clock": "시계 설정", "pin": "PIN 읽기", "pin_entry": "PIN 화면 취소", "bedtime": "취침 시간", "remove": "게임 삭제", "launch": "실행 버전 초기화", "verify": "무결성 검사"}},
   "still_focus": {"label": "포커스 강조 고정"},
   "version": {"label": "헤더에 표시할 버전"},
-  "hold_loading": {"label": "로딩 화면에서 멈추기"}
+  "hold_loading": {"label": "로딩 화면에서 멈추기"},
+  "cadran_noglow": {"label": "배경 빛 없음"},
+  "cadran_noring": {"label": "호 없는 링"}
  },
  "presets": {
   "default": "기본값",

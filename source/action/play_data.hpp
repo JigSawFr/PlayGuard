@@ -1,6 +1,6 @@
 // play_data — the console's play data (core/playstats.h) read off the main
 // thread and kept for the whole app: the Activity tab, its account filter and
-// the Overview's "played today" share it, so the log is walked once per
+// Today's "played today" share it, so the log is walked once per
 // account and per few minutes rather than once per screen. The last read of
 // each is also kept on the SD card (data_dir()/cache/, util/play_cache.hpp),
 // so the next run shows it at once while it reads the log again. UI thread

@@ -8,7 +8,7 @@
         "step_closing": "Ouderlijk toezicht vergrendelen, terug naar het HOME-menu..."
     },
     "tabs": {
-        "dashboard": "Overzicht",
+        "dashboard": "Vandaag",
         "play_timer": "Speeltijdtimer",
         "activity": "Activiteit",
         "restrictions": "Beperkingen",
@@ -21,7 +21,6 @@
     },
     "hints": {
         "refresh": "Vernieuwen",
-        "open": "Openen",
         "exit_again": "Druk nogmaals op B om af te sluiten",
         "exit_unlocked": "Ouderlijk toezicht is nog tijdelijk ontgrendeld: er kan zonder limiet worden gespeeld tot het weer wordt ingeschakeld of de console opnieuw start.\n\nWeer inschakelen voor het afsluiten?",
         "exit_lock": "Weer inschakelen en afsluiten",
@@ -77,9 +76,6 @@
         "4": "Do",
         "5": "Vr",
         "6": "Za"
-    },
-    "numpad": {
-        "guide": "Uren:minuten (1:30) of minuten (90), tot 24:00. 0 = die dag niet spelen."
     },
     "error": {
         "code": "fout {}",
@@ -138,35 +134,20 @@
         "update_toast": "PlayGuard {} ondersteunt firmware {}: Info › Op updates controleren."
     },
     "dashboard": {
-        "section_status": "Ouderlijk toezicht",
-        "section_today": "Vandaag",
-        "section_system": "Systeem",
-        "pc": "Ouderlijk toezicht",
         "pc_active": "Actief",
-        "pc_unlocked": "Tijdelijk ontgrendeld",
         "pc_off": "Niet ingesteld",
         "pc_pin_only": "Pincode ingesteld, geen beperking",
-        "pin": "Pincode",
         "pin_set": "Ingesteld",
-        "level": "Beperkingsniveau",
-        "today_limit": "Limiet vandaag ({})",
-        "remaining": "Resterende tijd vandaag",
-        "remaining_idle": "Getoond tijdens het spelen",
-        "remaining_unlocked": "Telt mogelijk niet",
         "gauge_known": "{} van {} gespeeld",
         "gauge_none": "Vandaag geen speeltijdlimiet",
         "gauge_none_played": "Vandaag geen speeltijdlimiet · {} gespeeld",
         "gauge_log": "≈ {} van {} gespeeld (activiteitenlog)",
-        "remaining_log": "≈ {}",
-        "remaining_over": "{} erover",
         "gauge_unknown": "Speeltijd niet beschikbaar",
         "gauge_reached": "De limiet van vandaag is bereikt",
         "gauge_over": "{} van {} gespeeld, {} erover (alleen een waarschuwing)",
         "gauge_idle": "De resterende tijd wordt getoond terwijl er een game draait.",
         "gauge_unlocked": "Speeltijd wordt mogelijk niet geteld zolang het ouderlijk toezicht ontgrendeld is.",
-        "bedtime": "Bedtijdalarm",
         "alarm_off": "Uit",
-        "clock": "Netwerkklok",
         "clock_ok": "Nauwkeurig",
         "clock_bad": "Niet nauwkeurig",
         "pairing": "Smartphone-app",
@@ -175,9 +156,7 @@
         "serial": "Serienummer",
         "serial_visible": "Niet afgeschermd (emuMMC)",
         "patches": "Gamepatches",
-        "firmware": "Firmware",
         "compat": "Compatibiliteit",
-        "updated": "Bijgewerkt om {}",
         "extra": "Extra tijd vandaag...",
         "extra_title": "Extra tijd vandaag",
         "extra_body_auto": "Vandaag {} toevoegen?\n\nDe limiet voor {} gaat van {} naar {}. Vanaf de volgende dag zet PlayGuard deze terug naar {} zodra het weer wordt geopend.",
@@ -206,12 +185,21 @@
         "outside_reset": "De speeltijd van vandaag begon rond {} opnieuw (klok gewijzigd?).",
         "outside_clock": "De klok van de console is gewijzigd.",
         "outside_limits": "De limieten zijn buiten PlayGuard gewijzigd, bijvoorbeeld via de app op de telefoon.",
-        "outside_dismiss": "Deze melding verbergen"
+        "outside_dismiss": "Deze melding verbergen",
+        "bonus_row": "Een andere dag...",
+        "bonus_planned_row": "{}: {} gepland (verwijderen...)",
+        "bonus_day_title": "Extra tijd op welke dag?",
+        "bonus_amount_title": "Extra tijd: {}",
+        "bonus_no_limit": "{}: op die dag is geen limiet ingesteld, er is dus geen tijd toe te voegen.",
+        "bonus_body": "{}: de limiet gaat van {} naar {}, alleen die dag.\n\nIs de dag voorbij, dan zet PlayGuard {} terug de volgende keer dat het wordt geopend.",
+        "bonus_done": "{}: {} gepland.",
+        "bonus_cancel_body": "{}: de geplande {} verwijderen? De limiet gaat terug naar {}.",
+        "bonus_cancel": "Verwijderen",
+        "bonus_cancelled": "Geplande extra tijd verwijderd."
     },
     "onboarding": {
         "title": "Eerste stappen",
         "open": "Eerste stappen",
-        "pin_missing": "Nog geen pincode",
         "headline": "Drie stappen en de console is beschermd. Druk op A bij een stap om die uit te voeren.",
         "all_done": "Alles is klaar: de console is beschermd. Je kunt hier altijd naar terugkeren via Info › Hulp en diagnose.",
         "section_steps": "Stappen",
@@ -251,12 +239,10 @@
         },
         "section_limit": "Daglimiet",
         "week_title": "Limieten van deze week",
-        "week_title_edit": "Limieten van deze week (A: dag wijzigen)",
         "quick": "Elke dag dezelfde limiet",
         "quick_title": "Daglimiet voor elke dag",
         "quick_title_varies": "Daglimiet voor elke dag (dagen verschillen nu)",
         "split": "Doordeweeks en weekend",
-        "remove": "Speeltijdlimiet verwijderen...",
         "profile_save": "Opslaan als profiel...",
         "profile_new": "Nieuw profiel...",
         "profile_name": "Profielnaam",
@@ -291,11 +277,8 @@
         "profile_action_rename": "Hernoemen...",
         "profile_edit_title": "Profiel: {}",
         "section_bedtime": "Bedtijd",
-        "bedtime": "Bedtijdalarm",
-        "bedtime_value_on": "{} (aan)",
-        "bedtime_value_off": "{} (uit)",
         "bedtime_reset": "Weer spelen vanaf",
-        "bedtime_note": "Geldt voor elke dag. Op bedtijd toont de console het alarm, en onderbreekt hij misschien ook de software (zie \"Als de tijd om is\"), totdat er weer gespeeld mag worden. PlayGuard controleert of de console de nieuwe tijd meldt, en zet anders de vorige instellingen terug.",
+        "bedtime_note": "Voor elke dag, of per dag van de week. Op bedtijd toont de console het alarm, en onderbreekt hij misschien ook de software (zie \"Als de tijd om is\"), totdat er weer gespeeld mag worden. PlayGuard controleert of de console de nieuwe tijd meldt, en zet anders de vorige instellingen terug.",
         "bedtime_title": "Bedtijdalarm, elke dag",
         "bedtime_end_title": "Weer spelen vanaf (elke dag)",
         "bedtime_summary": "{}, weer spelen vanaf {}",
@@ -342,7 +325,6 @@
         },
         "perday": {
             "title": "Limieten per dag",
-            "section_days": "Dagen (A: dag wijzigen)",
             "section_presets": "Snel invullen",
             "weekdays": "Maandag t/m vrijdag instellen...",
             "weekend": "Zaterdag en zondag instellen...",
@@ -371,11 +353,18 @@
         "remove_err": "Kan de speeltijdlimiet niet verwijderen",
         "not_counting": "De console telt op dit moment geen speeltijd. Waarschijnlijke oorzaken: de klok is teruggezet (later telt hij weer), de netwerkklok is nooit ingesteld (Console › Netwerkklok), of er is net een limiet geschreven (start een game voor een minuut en kijk dan opnieuw).",
         "limit_note": "Bij de limiet toont de console \"Tijd is om\" en onderbreekt hij daarna de game of waarschuwt hij alleen, volgens \"Als de tijd om is\".",
-        "unsaved": "Niet-opgeslagen voortgang kan verloren gaan: laat het kind eerst opslaan."
+        "unsaved": "Niet-opgeslagen voortgang kan verloren gaan: laat het kind eerst opslaan.",
+        "profile_already": "Het profiel ‘{}’ is al toegepast.",
+        "bedtime_by_day": "Per dag van de week...",
+        "bedtime_by_day_title": "Bedtijdalarm, per dag",
+        "bedtime_weekdays": "Maandag tot en met vrijdag",
+        "bedtime_weekend": "Zaterdag en zondag",
+        "bedtime_days_title": "Bedtijdalarm: {}",
+        "bedtime_days_confirm": "{}: bedtijdalarm op {} zetten?\n\nEr mag weer gespeeld worden vanaf {}.",
+        "bedtime_days_confirm_off": "{}: bedtijdalarm uitzetten?"
     },
     "activity": {
         "section_totals": "Speeltijd",
-        "account": "Account",
         "account_all": "Alle accounts",
         "account_default": "Standaardaccount",
         "account_last": "Het laatst getoonde",
@@ -387,7 +376,6 @@
         "accounts_none": "Geen enkel account heeft gegevens voor deze game (verwijderde games behouden alleen hun totalen).",
         "section_games": "Games",
         "period": "Periode",
-        "export": "Exporteren naar de SD-kaart...",
         "export_title": "Exportformaat",
         "formats": {
             "0": "CSV (spreadsheet)",
@@ -405,18 +393,21 @@
             "today": "Vandaag (min)",
             "week": "Afgelopen 7 dagen (min)",
             "day": "{} (min)",
-            "total": "Totaal (min)"
+            "total": "Totaal (min)",
+            "month": "Afgelopen 30 dagen (min)"
         },
         "periods": {
             "0": "Vandaag",
             "1": "Afgelopen 7 dagen",
-            "2": "Totaal"
+            "2": "Totaal",
+            "3": "Afgelopen 30 dagen"
         },
         "loading": "Speelgegevens van de console lezen...",
         "none": {
             "0": "Vandaag geen game gespeeld.",
             "1": "De afgelopen 7 dagen geen game gespeeld.",
-            "2": "Nog geen game gespeeld."
+            "2": "Nog geen game gespeeld.",
+            "3": "De afgelopen 30 dagen geen game gespeeld."
         },
         "err_list": "Kan de games niet weergeven",
         "err_stats": "Kan de speelstatistieken niet lezen",
@@ -444,7 +435,22 @@
         "applet_cap": "Niet getoond, om geheugen te sparen in de appletmodus (geopend vanuit het album): nog {}. De export bevat alle games; open PlayGuard voor de volledige lijst door R ingedrukt te houden terwijl je een game start.",
         "account_nobody": "Zonder account (of een verwijderd account)",
         "account_new": "Nieuw account sinds {}: {}",
-        "truncated": "Er kunnen maar {} games worden getoond: sommige die deze week niet zijn gespeeld ontbreken, ook in het totaal."
+        "truncated": "Er kunnen maar {} games worden getoond: sommige die deze week niet zijn gespeeld ontbreken, ook in het totaal.",
+        "section_hours": "Speeltijden, afgelopen 7 dagen",
+        "hours": {
+            "legend": "Een vakje per uur van elke dag: hoe feller, hoe meer er gespeeld is.",
+            "sessions": "Sessies",
+            "sessions_value": "{} · gemiddeld {}",
+            "longest": "Langste sessie",
+            "busy": "Drukste uren",
+            "busy_value": "{} tot {}",
+            "late": "Gespeeld tussen 21:00 en 06:00"
+        },
+        "rating": "Leeftijdsclassificatie",
+        "rating_blocked": "{} · geblokkeerd op het huidige niveau",
+        "qr": "Weekoverzicht als QR-code",
+        "qr_body": "Scan hem met de camera van een telefoon: de afgelopen 7 dagen verschijnen als tekst. Er gaat niets online.",
+        "qr_days": "Per dag"
     },
     "library": {
         "title": "Games",
@@ -457,7 +463,6 @@
     },
     "restrictions": {
         "section_level": "Beperkingsniveau",
-        "level": "Niveau",
         "levels": {
             "0": "Geen",
             "1": "Aangepast",
@@ -468,7 +473,6 @@
         "confirm_level": "Het beperkingsniveau wijzigen in \"{}\"?",
         "custom_hint": "Kies daarna hieronder elke beperking.",
         "section_custom": "Aangepaste instellingen",
-        "section_level_settings": "Wat dit niveau beperkt",
         "age": "Software beperken op leeftijd",
         "age_none": "Geen beperking",
         "age_value": "Tot {} jaar",
@@ -487,13 +491,31 @@
         "none_body": "Er wordt niets meer beperkt: software van elke leeftijd kan worden gespeeld, en berichten op sociale media en communicatie met anderen zijn toegestaan. De dagelijkse speeltijdlimieten blijven gelden.",
         "confirm_age": "De leeftijdsgrens wijzigen in \"{}\"? Dan kan software met een hogere leeftijdsclassificatie dan nu worden gespeeld.",
         "confirm_sns_off": "Berichten op sociale media niet meer beperken? Dan kunnen schermafbeeldingen en video's vanaf de console worden geplaatst.",
-        "confirm_comm_off": "Communicatie met anderen niet meer beperken? Dan kan software het kind laten chatten en inhoud laten delen met andere spelers."
+        "confirm_comm_off": "Communicatie met anderen niet meer beperken? Dan kan software het kind laten chatten en inhoud laten delen met andere spelers.",
+        "org_where": {
+            "cero": "Japan",
+            "grac": "Zuid-Korea",
+            "gsrmr": "Taiwan",
+            "esrb": "Verenigde Staten, Canada, Latijns-Amerika (behalve Brazilië)",
+            "classind": "Brazilië",
+            "usk": "Duitsland",
+            "pegi": "Europa: Frankrijk, België, Zwitserland, Spanje, Italië, Nederland, Oostenrijk…",
+            "pegi_portugal": "Portugal",
+            "pegi_bbfc": "Verenigd Koninkrijk",
+            "russian": "Rusland",
+            "acb": "Australië",
+            "oflc": "Nieuw-Zeeland",
+            "iarc": "Andere landen"
+        },
+        "blocked": "Geblokkeerde geïnstalleerde games",
+        "blocked_value": "{} van {}",
+        "blocked_title": "{} classificeert ze boven {}",
+        "blocked_none": "{}: geen geïnstalleerde game is boven {} geclassificeerd.",
+        "blocked_no_age": "Dit niveau beperkt games niet op leeftijd.",
+        "blocked_note": "Uit de laatste controle van de geïnstalleerde games. Een game die de classificatie-instantie niet classificeert, telt niet mee, en ook de uitzonderingen in de app niet."
     },
     "clock": {
         "section_now": "Klokken",
-        "user": "Consoleklok",
-        "network": "Netwerkklok",
-        "accuracy": "Netwerkklok nauwkeurig",
         "auto": "Klok synchroniseren via internet",
         "zone": "Tijdzone",
         "why": "De speeltijdtimer is afhankelijk van de netwerkklok. Als die onnauwkeurig is (bij een console die nooit verbinding maakt met de servers van Nintendo), stel je hem hier in via een openbare tijdserver.",
@@ -557,7 +579,8 @@
         "confirm_copy_follows": "\n\n\"Klok synchroniseren via internet\" staat aan, dus de consoleklok volgt de netwerkklok en kan net zo fout zijn. Zo ja: zet de instelling uit, stel datum en tijd in bij Systeeminstellingen › Systeem › Datum en tijd en kom dan hier terug.",
         "confirm_copy_sync_after": "\n\n\"Klok synchroniseren via internet\" staat uit: de consoleklok blijft zoals hij is. Als je de instelling daarna aanzet, verspringt hij niet meer, omdat beide klokken dan dezelfde tijd tonen.",
         "copied_sync_on": "\n\nJe kunt nu \"Klok synchroniseren via internet\" aanzetten (Systeeminstellingen › Systeem › Datum en tijd): de consoleklok verspringt niet.",
-        "copy_implausible": "De consoleklok geeft {} aan: hij lijkt niet ingesteld. Stel eerst datum en tijd in bij Systeeminstellingen › Systeem › Datum en tijd (met \"Klok synchroniseren via internet\" uit) en kom dan hier terug."
+        "copy_implausible": "De consoleklok geeft {} aan: hij lijkt niet ingesteld. Stel eerst datum en tijd in bij Systeeminstellingen › Systeem › Datum en tijd (met \"Klok synchroniseren via internet\" uit) en kom dan hier terug.",
+        "dns_note": "Op deze console blokkeert de DNS-omleiding van Atmosphère (atmosphere/hosts) de tijdserver van Nintendo: de netwerkklok kan zichzelf niet instellen."
     },
     "pairing": {
         "section": "App Nintendo Switch Ouderlijk toezicht",
@@ -570,7 +593,9 @@
         "unlink_err": "Kan de smartphone-app niet ontkoppelen",
         "note": "Zolang de console gekoppeld blijft, overschrijft de smartphone-app bij de volgende synchronisatie de instellingen die hier zijn gemaakt.",
         "decode": "Vóór het ontkoppelen: twee instellingen ontcijferen",
-        "decode_note": "Vóór het ontkoppelen kan deze console helpen 'alleen alarm' en bedtijd per dag te ontcijferen (Pincode, 2 min): na het ontkoppelen kan dat niet meer."
+        "decode_note": "Vóór het ontkoppelen kan deze console helpen 'alleen alarm' en bedtijd per dag te ontcijferen (Pincode, 2 min): na het ontkoppelen kan dat niet meer.",
+        "dns_blocked": "synchronisatie geblokkeerd (DNS)",
+        "dns_note": "De DNS-omleiding van Atmosphère (atmosphere/hosts) stuurt de server voor ouderlijk toezicht van Nintendo ergens anders heen: de smartphone-app kan niet synchroniseren en overschrijft de instellingen hier dus niet."
     },
     "security": {
         "section_status": "Status",
@@ -983,7 +1008,18 @@
         "notices_summary": "De speeltijd van de week",
         "notices_reminders": "Herinneringen: back-ups, ander systeem, games op slot",
         "notices_ack_remind": "Genegeerde waarschuwingen na 30 dagen weer meetellen",
-        "help": "Hulp en diagnose"
+        "help": "Hulp en diagnose",
+        "text_size": "Tekstgrootte",
+        "text_sizes": {
+            "normal": "Normaal",
+            "large": "Groter",
+            "auto": "Automatisch: groter op de tv"
+        },
+        "effects": "Visuele effecten",
+        "effects_values": {
+            "auto": "Lichter op de accu",
+            "full": "Altijd volledig"
+        }
     },
     "backup": {
         "saved": "Back-up van instellingen gemaakt: {}",
@@ -1093,6 +1129,10 @@
         "size_kb": "{} KB",
         "size_mb": "{} MB",
         "pt_log_on": "Elke 30 s vastgelegd in {}",
+        "frame_stats": "Beeldstatistieken",
+        "frame_stats_note": "Eén regel per seconde zolang PlayGuard open is, in logs/frame_stats.txt: de modus (tv of handheld) en de beeldgrootte, het getoonde scherm, de beelden per seconde, de rekentijd van de interface per beeld (gemiddeld en maximaal, in ms), de tijd tussen twee beelden (gemiddeld en maximaal) en hoeveel beelden te laat kwamen (meer dan 20 ms). Om schermen te vergelijken, of de achtergrondgloed aan en uit: laat elk scherm 30 s staan zonder iets aan te raken, in tv-modus en dan handheld. Het bestand begint opnieuw bij elke keer aanzetten.",
+        "frame_stats_on": "Eén regel per seconde in {}",
+        "frame_stats_wait": "Eerste regel over een seconde…",
         "gate": "Firmwarescherm opnieuw tonen",
         "forget": "Firmwarekeuze vergeten",
         "forgotten": "Bij de volgende start wordt opnieuw naar de firmwarekeuze gevraagd.",
@@ -1106,7 +1146,8 @@
         "enabled": "De ontwikkelaarsmodus staat aan: zie het einde van Info › Hulp en diagnose.",
         "presses_left": "Nog {} keer drukken om de ontwikkelaarsmodus aan te zetten.",
         "presses_left_one": "Nog 1 keer drukken om de ontwikkelaarsmodus aan te zetten.",
-        "report_upload": "Online versturen"
+        "report_upload": "Online versturen",
+        "glow": "Achtergrondgloed"
     },
     "dev_build": {
         "open": "Andere build installeren",
@@ -1267,11 +1308,14 @@
             "backup": "Back-up teruggezet",
             "undo": "Teruggezet vanuit de geschiedenis",
             "first_steps": "Eerste stappen",
-            "overview": "Overzicht",
+            "overview": "Vandaag",
             "profile": "Profiel \"{}\"",
             "console_lock": "Alle games blokkeren",
             "notices": "Meldingen",
-            "rescue": "Herstel"
+            "rescue": "Herstel",
+            "bonus": "Extra tijd gepland",
+            "restore_bonus": "Geplande extra tijd teruggezet",
+            "schedule_end": "Einde van een gepland profiel"
         },
         "when": "Wanneer",
         "how": "Bron",
@@ -1310,14 +1354,15 @@
             "kind": "Code",
             "done": "Uitgevoerd",
             "refused": "Geweigerd ({})"
-        }
+        },
+        "undo_hint": "Ongedaan maken",
+        "empty_title": "Nog niets vastgelegd",
+        "empty_text": "Elke wijziging die PlayGuard op de console maakt (limieten, beperkingsniveau, pincode, ontgrendelingen...) wordt hier vermeld."
     },
     "chart": {
         "last_days": "De laatste 7 dagen, vandaag rechts",
         "limit_line": "De lijn over een balk is de limiet van deze week voor die dag",
-        "limit_over": "De lijn is de limiet van deze week voor die dag · ! in oranje: langer gespeeld",
-        "week_order": "Maandag tot zondag, vandaag onderstreept",
-        "unsaved": "* in oranje: gewijzigd, nog niet opgeslagen"
+        "limit_over": "De lijn is de limiet van deze week voor die dag · ! in oranje: langer gespeeld"
     },
     "data_notice": {
         "config_reset": "De voorkeuren van PlayGuard konden niet worden gelezen en zijn teruggezet. Het beschadigde bestand is bewaard als config.json.bad.",
@@ -1351,8 +1396,8 @@
         "failed": "De opmerkingen konden niet worden opgehaald. Druk op X om het opnieuw te proberen."
     },
     "quick": {
-        "title": "Taal en thema",
-        "hint": "Taal en thema"
+        "hint": "Taal en thema",
+        "title_text": "Taal, thema en tekstgrootte"
     },
     "notices": {
         "title": "Meldingen",
@@ -1447,6 +1492,216 @@
         "week_detail": "Gemiddeld {} per dag.",
         "week_top": "Meest gespeeld: {} ({}).",
         "over_limit": "De limiet is overschreden op {} van de afgelopen 7 dagen",
-        "over_limit_detail": "Als de tijd om is, waarschuwt de console alleen: er wordt verder gespeeld na de limiet (Speeltijd › Als de tijd om is)."
+        "over_limit_detail": "Als de tijd om is, waarschuwt de console alleen: er wordt verder gespeeld na de limiet (Speeltijd › Als de tijd om is).",
+        "clock_detail_dns": "De DNS van Atmosphère blokkeert de tijdserver van Nintendo, dus de console kan hem niet zelf instellen: stel hem in via een tijdserver.",
+        "week_more": "{} per dag meer dan de week ervoor.",
+        "week_less": "{} per dag minder dan de week ervoor.",
+        "week_same": "Ongeveer als de week ervoor."
+    },
+    "cadran": {
+        "date": "{1} {2} {3}",
+        "months": {
+            "1": "januari",
+            "2": "februari",
+            "3": "maart",
+            "4": "april",
+            "5": "mei",
+            "6": "juni",
+            "7": "juli",
+            "8": "augustus",
+            "9": "september",
+            "10": "oktober",
+            "11": "november",
+            "12": "december"
+        },
+        "today": {
+            "kicker": "Vandaag · limiet voor {}",
+            "free": "vrij",
+            "no_limit": "geen limiet",
+            "unlocked": "ontgrendeld",
+            "time_up": "tijd is om",
+            "left": "over",
+            "today": "vandaag",
+            "extra": "Extra tijd",
+            "stop": "Stoppen voor vandaag",
+            "child": "Aan het kind tonen",
+            "bed_title": "Bedtijdalarm",
+            "on": "aan",
+            "bed_sub": "weer spelen vanaf {}",
+            "pc_title": "Ouderlijk toezicht",
+            "pc_unlocked": "ontgrendeld",
+            "pin_set": "pincode ingesteld",
+            "no_pin": "geen pincode",
+            "clock_title": "Netwerkklok",
+            "clock_ok": "Nauwkeurig",
+            "clock_bad": "Onnauwkeurig",
+            "to_set": "instellen",
+            "ok": "ok",
+            "clock_fix": "Nu meten en instellen",
+            "clock_fine": "de timer telt goed",
+            "serial_hidden": "Serienummer verborgen",
+            "next_time_up": "Als er verder gespeeld wordt, is de tijd om rond {}",
+            "next_bedtime": "Bedtijdalarm om {}, over {}",
+            "next_bedtime_now": "Bedtijd: weer spelen vanaf {}",
+            "clock_fix_dns": "Geblokkeerd door de DNS: meten en instellen",
+            "next_with_extra": "Met {} extra is de tijd om rond {}",
+            "next_with_extra_bed": "Met {} extra komt het bedtijdalarm om {} eerst",
+            "head_unlocked": "Limiet van {} gepauzeerd",
+            "pc_lifted": "Opgeheven tot het weer aan staat",
+            "limit": "Limiet vandaag…",
+            "bed_in": "over {}",
+            "dns_nintendo": "DNS · Nintendo geblokkeerd",
+            "dns_sync": "DNS · app-synchronisatie geblokkeerd",
+            "dns_time": "DNS · tijdserver geblokkeerd",
+            "dns_title": "DNS-omleiding van Atmosphère",
+            "dns_intro": "Het hosts-bestand (atmosphere/hosts) leidt servers van Nintendo om.",
+            "dns_sync_note": "De smartphone-app kan niet synchroniseren en overschrijft dus niet wat hier is ingesteld.",
+            "dns_time_note": "De netwerkklok kan zichzelf niet instellen: PlayGuard stelt hem in via een tijdserver ({}).",
+            "dns_open": "DNS · Nintendo niet geblokkeerd",
+            "dns_intro_open": "Ze laat de servers van Nintendo die hier tellen door.",
+            "dns_row_sync": "Server voor ouderlijk toezicht",
+            "dns_row_time": "Tijdserver",
+            "dns_blocked": "Geblokkeerd",
+            "dns_reachable": "Bereikbaar",
+            "counted_title": "De tijd hier telt mee",
+            "counted_pill": "Over een spel geopend · telt mee voor de timer",
+            "no_play": "Niet spelen",
+            "head_no_play": "Vandaag niet spelen",
+            "head_unlocked_no_play": "Vandaag niet spelen, gepauzeerd",
+            "limit_title": "Limiet voor {} wijzigen?",
+            "setup": "Limieten van de week instellen",
+            "profiles": "Profielen…",
+            "profiles_title": "Profiel toepassen",
+            "profiles_manage": "Profielen beheren…",
+            "tl_time_up": "tijd om",
+            "tl_with": "met {} extra",
+            "tl_bedtime": "bedtijd",
+            "home_pill": "Spel open in HOME · telt door",
+            "home_title": "Er staat nog een spel open",
+            "steps_count": "{} van {}",
+            "tl_bed_first": "bedtijd komt eerst",
+            "bed_off_value": "Uit",
+            "bed_set": "Instellen"
+        },
+        "pill": {
+            "pc_on": "Ouderlijk toezicht actief",
+            "pc_off": "Ouderlijk toezicht niet ingesteld",
+            "unlocked": "Tijdelijk ontgrendeld",
+            "timer_on": "Timer actief",
+            "timer_off": "Aftellen gepauzeerd",
+            "timer_none": "Geen speeltijdlimiet",
+            "level": "Niveau · {}",
+            "pin_set": "Pincode ingesteld",
+            "pin_none": "Geen pincode"
+        },
+        "week": {
+            "no_limit": "geen limiet",
+            "every_day": "{} elke dag",
+            "summary": "{} doordeweeks · {} in het weekend",
+            "profile": "Profiel · {}",
+            "edit": "Wijzigen",
+            "done": "Klaar",
+            "pick": "Exacte duur",
+            "edit_day": "een dag wijzigen",
+            "pick_day": "exacte duur of geen limiet",
+            "step": "± 15 min",
+            "day": "andere dag",
+            "weekdays": "kopiëren naar ma → vr",
+            "weekend": "kopiëren naar za · zo",
+            "none": "geen limiet",
+            "first_change": "{} {} → {}",
+            "no_changes": "Geen wijzigingen in behandeling · + slaat op",
+            "discard": "Verwerpen",
+            "remove": "Limiet verwijderen",
+            "save_title": "De limieten van de week opslaan?",
+            "played_key": "gespeeld, laatste 7 dagen",
+            "played_day": "{}: {} gespeeld van {}",
+            "played_day_free": "{}: {} gespeeld, geen limiet",
+            "bonus": "{}: {} gepland voor die dag"
+        },
+        "activity": {
+            "export": "Exporteren",
+            "games": "{} spel(len)",
+            "on_limit": "van {} limiet",
+            "per_day": "{} per dag",
+            "top": "meest gespeeld · {}",
+            "card_today": "vandaag",
+            "card_total": "vandaag · {} in totaal",
+            "empty_note": "Games die op deze console gespeeld worden, verschijnen hier, per account.",
+            "see_all": "Totaal bekijken",
+            "trend_up": "+{}/dag t.o.v. vorige week",
+            "trend_down": "-{}/dag t.o.v. vorige week",
+            "trend_same": "zoals vorige week",
+            "card_grew": "+{} t.o.v. vorige week"
+        },
+        "restrictions": {
+            "choose": "Dit niveau kiezen",
+            "custom": "elke instelling kies je hieronder",
+            "up_to": "software tot {} {}",
+            "any_age": "software voor elke leeftijd",
+            "sns_blocked": "Sociale media · beperkt",
+            "sns_allowed": "Sociale media · toegestaan",
+            "sns_unknown": "Sociale media · —",
+            "comm_blocked": "Communicatie · beperkt",
+            "comm_allowed": "Communicatie · toegestaan",
+            "comm_unknown": "Communicatie · —",
+            "none": "software voor elke leeftijd, sociale media en communicatie toegestaan",
+            "to_settings": "De instellingen",
+            "games_blocked": "Geblokkeerde games · {}",
+            "games_none": "Geblokkeerde games · geen"
+        },
+        "clock": {
+            "console": "Console",
+            "network": "Netwerk · gebruikt door de timer",
+            "accurate": "nauwkeurig",
+            "inaccurate": "onnauwkeurig · stel hieronder in"
+        },
+        "about": {
+            "tagline": "Ouderlijk toezicht voor Nintendo Switch · vrije software (GPLv3)",
+            "version": "Versie {}"
+        },
+        "child": {
+            "header": "Kinderscherm · pincode om terug te gaan",
+            "title": "Vandaag heb je nog",
+            "bed": "Naar bed om",
+            "stops": "De console stopt vanzelf als de tijd om is",
+            "warns": "De console waarschuwt als de tijd om is",
+            "enjoy": "Veel plezier!",
+            "of": "van {}",
+            "back": "Terug naar de ouder · pincode",
+            "play": "Console geven en spelen",
+            "on_hold": "limiet gepauzeerd",
+            "end": "Eindigt rond {}",
+            "extra": "Extra tijd",
+            "no_extra": "Er telt nu geen limiet: er valt niets te verlengen."
+        },
+        "dialog": {
+            "unlock_short": "Ouderlijk toezicht wordt voor de wijziging ontgrendeld met de opgeslagen pincode en daarna weer vergrendeld."
+        }
+    },
+    "schedule": {
+        "date": "{0} {1}",
+        "cell": "Gepland profiel",
+        "note": "Een profiel voor een periode (vakantie, een reis): bij het openen stelt PlayGuard voor het toe te passen als de periode begint, en de vorige limieten terug te zetten als ze voorbij is.",
+        "none": "Geen",
+        "value": "{} · {} tot {}",
+        "pick_profile": "Profiel voor de periode",
+        "pick_from": "Eerste dag",
+        "pick_to": "Laatste dag",
+        "saved": "{} gepland van {} tot {}.",
+        "no_profile": "Sla eerst een profiel op: de periode past er een toe.",
+        "profile_gone": "Het profiel \"{}\" bestaat niet meer: de planning wordt verwijderd.",
+        "apply_body": "Van {} tot {}: het profiel \"{}\" nu toepassen?\n\nNa {} stelt PlayGuard voor de vervangen limieten terug te zetten.",
+        "not_now": "Niet nu",
+        "apply": "Toepassen",
+        "over_body": "De periode van \"{}\" eindigde op {}. De vorige limieten ({}) terugzetten?",
+        "keep": "Deze limieten houden",
+        "put_back": "Terugzetten",
+        "put_back_body": "De limieten van vóór \"{}\" terugzetten?",
+        "put_back_now": "Nu beëindigen: vorige limieten terugzetten",
+        "keep_remove": "Deze limieten houden en verwijderen",
+        "change": "Wijzigen...",
+        "remove": "Verwijderen",
+        "removed": "Gepland profiel verwijderd."
     }
 }

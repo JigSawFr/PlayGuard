@@ -26,11 +26,25 @@ static std::string bed_text(const PtBedtime& b)
                 : "playguard/common/off"_i18n;
 }
 
+std::string bedtime_days_text(const PtState& pt)
+{
+    // Up to three runs of days, each with its alarm: "Mon–Fri 21:30, Sat–Sun 22:30".
+    const std::vector<pt_logic::BedRun> runs = pt_logic::bedtime_runs(pt);
+    if (runs.size() < 2 || runs.size() > 3) return "playguard/play_timer/bedtime_varies"_i18n;
+    std::string text;
+    for (const pt_logic::BedRun& r : runs) {
+        if (!text.empty()) text += ", ";
+        text += brls::getStr(fmt::format("playguard/days_short/{}", r.first));
+        if (r.last != r.first) text += "–" + brls::getStr(fmt::format("playguard/days_short/{}", r.last));
+        text += " " + (r.bed.on ? hm(r.bed.hour, r.bed.minute) : "playguard/common/off"_i18n);
+    }
+    return text;
+}
+
 std::string bedtime_text(const PtState& pt)
 {
     PtBedtime b;
-    if (!pt_logic::bedtime_uniform(pt, &b)) return "playguard/play_timer/bedtime_varies"_i18n;
-    return bed_text(b);
+    return pt_logic::bedtime_uniform(pt, &b) ? bed_text(b) : bedtime_days_text(pt);
 }
 
 Result write_bedtime(const PtBedtime bed[7], const std::string& source)
@@ -58,7 +72,7 @@ static bool bedtime_editable(const PtState& pt)
 {
     if (ui::refuse_read_only()) return false;
     if (!pt.fw_supported) {
-        ui::notify(ui::rc_text(NXM_RC_FW_UNSUPPORTED));
+        ui::notify(ui::rc_text(NXM_RC_FW_UNSUPPORTED), ui::Toast::Refused);
         return false;
     }
     if (!pt_logic::bedtime_layout_ok(pt, ui::today_weekday())) {
@@ -77,16 +91,82 @@ static void apply_bedtime(const std::array<PtBedtime, 7>& bed, const std::string
     });
 }
 
-void choose_bedtime(const PtState& pt, std::function<void()> refresh)
+// The days a choice of "By day of the week…" stands for, and its name.
+struct DaySet
 {
-    if (!bedtime_editable(pt)) return;
-    // Off, then 16:00 to 23:45 every quarter of an hour.
+    uint8_t     days;
+    std::string name;
+};
+
+static std::vector<DaySet> day_sets()
+{
+    std::vector<DaySet> sets = { { pt_logic::WEEKDAYS, "playguard/play_timer/bedtime_weekdays"_i18n },
+                                 { pt_logic::WEEKEND, "playguard/play_timer/bedtime_weekend"_i18n } };
+    for (int i = 0; i < 7; i++) {
+        const int d = (i + 1) % 7;   // Monday first
+        sets.push_back({ (uint8_t)(1u << d), brls::getStr(fmt::format("playguard/days/{}", d)) });
+    }
+    return sets;
+}
+
+// The bedtime picker for the days of `days`, then confirm_write and
+// write_bedtime; the other days keep theirs.
+static void choose_bedtime_days(const PtState& pt, uint8_t days, const std::string& name, std::function<void()> refresh)
+{
     const std::vector<int> times = pt_logic::bedtime_times();
     std::vector<std::string> labels;
     for (int t : times) labels.push_back(t < 0 ? "playguard/common/off"_i18n : hm(t / 60, t % 60));
-    const int selected = pt_logic::bedtime_selected(pt, times);
+    const int selected = pt_logic::bedtime_selected_days(pt, days, times);
+    const PtState copy = pt;
+    ui::pick(brls::getStr("playguard/play_timer/bedtime_days_title", name), labels, selected,
+             [copy, days, name, times, refresh](int index) {
+        const int t = times[(size_t)index];
+        std::array<PtBedtime, 7> bed;
+        pt_logic::bedtime_days(copy, days, t >= 0, (uint8_t)(t >= 0 ? t / 60 : 0), (uint8_t)(t >= 0 ? t % 60 : 0), bed.data());
+        int first = 0;
+        while (!(days & (1u << first))) first++;
+        const std::string body = t < 0 ? brls::getStr("playguard/play_timer/bedtime_days_confirm_off", name)
+                                       : brls::getStr("playguard/play_timer/bedtime_days_confirm", name, hm(t / 60, t % 60),
+                                                      hm(bed[first].end_hour, bed[first].end_minute));
+        apply_bedtime(bed, body, refresh);
+    });
+}
+
+// "By day of the week…": Monday to Friday, the weekend or one day, each
+// with what it has now, then its bedtime picker.
+static void choose_bedtime_by_day(const PtState& pt, std::function<void()> refresh)
+{
+    const std::vector<DaySet> sets = day_sets();
+    std::vector<std::string> labels, details;
+    for (const DaySet& set : sets) {
+        labels.push_back(set.name);
+        PtBedtime b;
+        details.push_back(!pt_logic::bedtime_shared(pt, set.days, &b) ? "playguard/play_timer/bedtime_varies"_i18n
+                          : b.on ? hm(b.hour, b.minute) : "playguard/common/off"_i18n);
+    }
+    const PtState copy = pt;
+    ui::pick("playguard/play_timer/bedtime_by_day_title"_i18n, labels, 0, [copy, sets, refresh](int index) {
+        const DaySet& set = sets[(size_t)index];
+        choose_bedtime_days(copy, set.days, set.name, refresh);
+    }, false, details);
+}
+
+void choose_bedtime(const PtState& pt, std::function<void()> refresh)
+{
+    if (!bedtime_editable(pt)) return;
+    // Every day: off, 16:00 to 23:45; then by day of the week.
+    const std::vector<int> times = pt_logic::bedtime_times();
+    std::vector<std::string> labels;
+    for (int t : times) labels.push_back(t < 0 ? "playguard/common/off"_i18n : hm(t / 60, t % 60));
+    labels.push_back("playguard/play_timer/bedtime_by_day"_i18n);
+    // The days differ: the list opens on them.
+    const int selected = pt_logic::bedtime_uniform(pt, nullptr) ? pt_logic::bedtime_selected(pt, times) : (int)times.size();
     const PtState copy = pt;
     ui::pick("playguard/play_timer/bedtime_title"_i18n, labels, selected, [copy, times, refresh](int index) {
+        if ((size_t)index == times.size()) {
+            choose_bedtime_by_day(copy, refresh);
+            return;
+        }
         const int t = times[(size_t)index];
         std::array<PtBedtime, 7> bed;
         pt_logic::bedtime_every_day(copy, t >= 0, (uint8_t)(t >= 0 ? t / 60 : 0), (uint8_t)(t >= 0 ? t % 60 : 0), bed.data());

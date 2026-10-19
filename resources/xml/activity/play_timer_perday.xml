@@ -28,9 +28,10 @@
 
             <PtStateHeader id="pt_state_header"/>
 
-            <brls:Header title="@i18n/playguard/play_timer/perday/section_days" marginBottom="8"/>
+            <brls:Header title="@i18n/playguard/play_timer/week_title" marginBottom="8"/>
 
-            <PtWeekView id="pt_week" width="auto" height="auto" marginTop="8" marginBottom="8"/>
+            <!-- The week and its keys: view/cadran_week_card.xml, added here. -->
+            <brls:Box id="pt_week_card" axis="column" alignItems="stretch"/>
             <brls:Label id="pt_unavailable" text="@i18n/playguard/play_timer/perday/unavailable" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/warn"/>
 
             <brls:Header title="@i18n/playguard/play_timer/perday/section_presets" marginTop="16" marginBottom="8"/>

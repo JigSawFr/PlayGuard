@@ -5,6 +5,7 @@
 
 #include "action/notices.hpp"
 #include "action/sys_update_flow.hpp"
+#include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 
@@ -19,10 +20,15 @@ int index_of(const char* const (&list)[N], const std::string& value)
         if (value == list[i]) return (int)i;
     return 0;
 }
+
+std::string tab_name(const std::string& tab)
+{
+    return brls::getStr("playguard/tabs/" + tab);
+}
 }   // namespace
 
 PreferencesTab::PreferencesTab()
-    : TabBase("xml/tab/preferences.xml", false)
+    : TabBase("xml/tab/preferences.xml", false), list(this)
 {
     language->registerClickAction([this](brls::View*) {
         ui::pick_language([this]() { this->refresh(); });
@@ -33,10 +39,24 @@ PreferencesTab::PreferencesTab()
         ui::pick_theme([this]() { this->refresh(); });
         return true;
     });
+    text_size->registerClickAction([this](brls::View*) {
+        ui::pick_text_size([this]() { this->refresh(); });
+        return true;
+    });
+    effects->registerClickAction([this](brls::View*) {
+        std::vector<std::string> labels;
+        for (const char* e : config::EFFECTS) labels.push_back(brls::getStr(std::string("playguard/prefs/effects_values/") + e));
+        ui::pick("playguard/prefs/effects"_i18n, labels, index_of(config::EFFECTS, config::get().effects), [this](int i) {
+            config::get().effects = config::EFFECTS[i];   // the next frame draws by it
+            ui::save_config();
+            this->refresh();
+        });
+        return true;
+    });
 
     start_tab->registerClickAction([this](brls::View*) {
         std::vector<std::string> labels;
-        for (const char* t : config::START_TABS) labels.push_back(brls::getStr(std::string("playguard/tabs/") + t));
+        for (const char* t : config::START_TABS) labels.push_back(tab_name(t));
         ui::pick("playguard/tools/start_tab"_i18n, labels, index_of(config::START_TABS, config::get().start_tab), [this](int i) {
             config::get().start_tab = config::START_TABS[i];
             ui::save_config();
@@ -76,6 +96,11 @@ PreferencesTab::PreferencesTab()
         config::get().support_reminder = on;
         ui::save_config();
     });
+    this->list.tiles({ { "pf_language", "language" }, { "pf_theme", "contrast" }, { "pf_text_size", "eye" },
+                       { "pf_start_tab", "home" } }, false);
+    this->list.apply({ { "pf_effects", "sparkle" }, { "pf_intro", "bolt" }, { "pf_notices_system", "chip" }, { "pf_notices_summary", "calendar" },
+                       { "pf_notices_reminders", "bell" }, { "pf_notices_ack_remind", "alert" },
+                       { "pf_support_reminder", "heart" } });
 }
 
 void PreferencesTab::refresh()
@@ -83,13 +108,17 @@ void PreferencesTab::refresh()
     const auto& cfg = config::get();
     language->setDetailText(ui::language_name());
     theme->setDetailText(ui::theme_name());
-    start_tab->setDetailText(brls::getStr(std::string("playguard/tabs/") + config::START_TABS[index_of(config::START_TABS, cfg.start_tab)]));
+    text_size->setDetailText(ui::text_size_name());
+    effects->setDetailText(brls::getStr("playguard/prefs/effects_values/" + std::string(config::EFFECTS[index_of(config::EFFECTS, cfg.effects)])));
+    start_tab->setDetailText(tab_name(config::START_TABS[index_of(config::START_TABS, cfg.start_tab)]));
     intro->setOn(cfg.intro, false);
     notices_system->setOn(cfg.notices_system, false);
     notices_summary->setOn(cfg.notices_summary, false);
     notices_reminders->setOn(cfg.notices_reminders, false);
     notices_ack_remind->setOn(cfg.notices_ack_remind, false);
     support_reminder->setOn(cfg.support_reminder, false);
+    this->list.sync();
+    cadran::set_pill("");
 }
 
 brls::View* PreferencesTab::create()

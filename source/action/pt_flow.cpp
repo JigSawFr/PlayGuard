@@ -10,11 +10,13 @@
 
 #include "action/console_lock.hpp"
 #include "action/history_flow.hpp"
+#include "action/pairing_state.hpp"
 #include "action/pt_flow_internal.hpp"
 #include "action/pt_logic.hpp"
+#include "core/platform.h"
+#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
-#include "view/pt_week.hpp"
 
 using namespace brls::literals;
 
@@ -28,30 +30,33 @@ std::string with_link_note(const std::string& body, const PctlStatus* st)
         pctl_status_fetch(&read);
         st = &read;
     }
-    if (!st->pairing_active_ok || !st->pairing_active) return body;
+    // Unlinked, or its server blocked by Atmosphère's DNS: nothing to say.
+    if (!pairing_state::syncs(*st)) return body;
     return body.empty() ? "playguard/pairing/note"_i18n : body + "\n\n" + "playguard/pairing/note"_i18n;
 }
 
 void confirm_write(const std::string& body_in, const std::string& confirm_label,
-                   std::function<void(bool did_unlock)> write, const uint16_t* new_days, bool danger)
+                   std::function<void(bool did_unlock)> write, const uint16_t* new_days, bool danger,
+                   const std::string& title)
 {
     if (ui::refuse_read_only()) return;
 
     PtState pt;
     pctl_play_timer_query(&pt);
     if (!pt.fw_supported) {
-        ui::notify(ui::rc_text(NXM_RC_FW_UNSUPPORTED));
+        ui::notify(ui::rc_text(NXM_RC_FW_UNSUPPORTED), ui::Toast::Refused);
         return;
     }
     if (!pt_logic::state_known(pt)) {
-        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN));
+        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN), ui::Toast::Refused);
         return;
     }
 
-    // A limit below what was already played suspends the game at the relock.
+    // A limit below what was already played suspends the game at the relock
+    // (no word of it when no game is open: nothing to suspend).
     std::string body = body_in;
     const int played = pt_logic::suspend_warning_min(pt, ui::today_weekday(), new_days);
-    if (played > 0) {
+    if (played > 0 && platform_game_open(nullptr)) {
         const std::string warning = brls::getStr("playguard/play_timer/suspend_warning", ui::fmt_minutes((uint16_t)played)) +
                                     " " + "playguard/play_timer/unsaved"_i18n;
         body = body.empty() ? warning : body + "\n\n" + warning;
@@ -60,18 +65,28 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
     const bool unlock = pt_logic::needs_unlock(pt);
     if (!body.empty() || unlock) body = with_link_note(body);
 
-    // The week as it will be: the days that change in amber.
-    auto preview = [&pt, new_days]() -> brls::View* {
-        if (!new_days || !pt.valid) return nullptr;
-        auto* week = new PtWeekView();
-        week->show(new_days, pt.day_min);
-        return week;
+    // The days that change as a table ("Monday: 2 h → 2 h 30") in place of
+    // the week (cadran::dialog_body draws "label: value" lines so).
+    std::string changes;
+    if (new_days && pt.valid)
+        for (int i = 1; i <= 7; i++) {
+            const int d = i % 7;   // Monday first
+            if (new_days[d] == pt.day_min[d]) continue;
+            changes += (changes.empty() ? "" : "\n") +
+                       brls::getStr("playguard/common/line", ui::day_name(d),
+                                    ui::fmt_minutes(pt.day_min[d]) + " → " + ui::fmt_minutes(new_days[d]));
+        }
+    const auto titled = [&title, &changes](const std::string& text) {
+        const std::string with = changes.empty() ? text : text.empty() ? changes : text + "\n\n" + changes;
+        return title.empty() ? with : title + "\n\n" + with;
     };
-
     if (!unlock) {
-        if (body.empty()) write(false);
-        else if (brls::View* week = preview()) ui::confirm_with(body, week, confirm_label, [write]() { write(false); }, nullptr, danger);
-        else ui::confirm(body, confirm_label, [write]() { write(false); }, nullptr, danger);
+        if (body.empty()) {
+            write(false);
+            return;
+        }
+        body = titled(body);
+        ui::confirm(body, confirm_label, [write]() { write(false); }, nullptr, danger);
         return;
     }
 
@@ -79,6 +94,7 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
     text += "playguard/play_timer/gate/body"_i18n + " " +
             (config::get().auto_relock ? "playguard/play_timer/gate/relock_auto"_i18n
                                        : "playguard/play_timer/gate/relock_manual"_i18n);
+    text = titled(text);
     auto unlock_and_write = [write]() {
         // Should the app stop before finish_write, the next start locks again:
         // without that record saved, no unlock (as for the extra time).
@@ -95,8 +111,7 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
         }
         write(true);
     };
-    if (brls::View* week = preview()) ui::confirm_with(text, week, "playguard/play_timer/gate/confirm"_i18n, unlock_and_write, nullptr, danger);
-    else ui::confirm(text, "playguard/play_timer/gate/confirm"_i18n, unlock_and_write, nullptr, danger);
+    ui::confirm(text, "playguard/play_timer/gate/confirm"_i18n, unlock_and_write, nullptr, danger);
 }
 
 // Limits written by anything but the console lock replace it: its record
@@ -160,6 +175,7 @@ static void offer_relock(std::function<void()> after)
 void finish_write(Result rc, bool did_unlock, const std::string& ok_text,
                   const std::string& error_prefix, std::function<void()> refresh)
 {
+    if (R_SUCCEEDED(rc)) history_flow::offer_undo(refresh);
     if (!did_unlock) {
         ui::notify_result(rc, ok_text, error_prefix);
         if (refresh) refresh();
@@ -172,7 +188,7 @@ void finish_write(Result rc, bool did_unlock, const std::string& ok_text,
         Result relock = pctl_relock();
         if (R_SUCCEEDED(relock)) set_relock_pending(false);
         if (R_SUCCEEDED(rc) && R_SUCCEEDED(relock)) {
-            ui::notify(ok_text + " " + "playguard/toast/relocked"_i18n);
+            ui::notify(ok_text + " " + "playguard/toast/relocked"_i18n, ui::Toast::Done);
         } else {
             // One dialog says it all: what failed, and what went through.
             std::string text;

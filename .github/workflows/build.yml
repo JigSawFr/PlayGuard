@@ -228,11 +228,15 @@ jobs:
           - shard: games
             scenarios: games
           - shard: states
-            scenarios: gate errors rescue forged lock loading alarm
+            scenarios: gate errors rescue forged lock loading alarm cadranstates cadranunlocked cadranlarge
           - shard: developer
             scenarios: devbuild update library rollback
           - shard: outside
-            scenarios: outside sysnotes
+            scenarios: outside sysnotes cadran
+          # Every Cadran tab in the 15 languages, normal and larger text: no
+          # text cut short (tools/cut_text_check.py, tests/cut_text/).
+          - shard: languages
+            scenarios: cuttext
     env:
       CMAKE_C_COMPILER_LAUNCHER: ccache
       CMAKE_CXX_COMPILER_LAUNCHER: ccache
@@ -311,7 +315,8 @@ jobs:
             if [ "$sc" = smoke ]; then out=smoke; arg=""; else out="smoke-$sc"; arg="$sc"; fi
             echo "::group::$sc"
             start=$SECONDS
-            if xvfb-run -s "-screen 0 1280x720x24" python3 tools/desktop_smoke.py "$out" $arg; then result=ok; else result=fail; failed="$failed $sc"; fi
+            if [ "$sc" = cuttext ]; then cmd="tools/cut_text_check.py $out"; else cmd="tools/desktop_smoke.py $out $arg"; fi
+            if xvfb-run -s "-screen 0 1280x720x24" python3 $cmd; then result=ok; else result=fail; failed="$failed $sc"; fi
             screens=$(ls "$out"/*.png 2>/dev/null | grep -vc contact-sheet || true)
             printf '%s\t%s\t%s\t%s\n' "$sc" "$result" "$((SECONDS - start))" "$screens" >> smoke-results.tsv
             echo "::endgroup::"

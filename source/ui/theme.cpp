@@ -46,9 +46,11 @@ void register_theme_colors()
     dark.addColor("brand/note", nvgRGB(0xB8, 0xB8, 0xB8));
 #ifndef __SWITCH__
     // Desktop simulation, PLAYGUARD_SIM_STILL_FOCUS=1 (the smoke test): the
-    // glow borealis moves around the focus with the clock takes the stroke's
-    // own colour, so a screenshot does not depend on when it was taken.
+    // glow borealis moves around the focus with the clock stays where it is
+    // (patches/borealis/0009), in the stroke's own colour, so a screenshot
+    // does not depend on when it was taken.
     if (sim_env("PLAYGUARD_SIM_STILL_FOCUS")) {
+        brls::setHighlightAnimationStill(true);
         light.addColor("brls/highlight/color2", light["brls/highlight/color1"]);
         dark.addColor("brls/highlight/color2", dark["brls/highlight/color1"]);
     }

@@ -387,7 +387,7 @@ static void test_every()
     CHECK(e.due(0));                 // never taken: due at once
     e.taken(1000);
     CHECK(!e.due(1000));
-    CHECK(!e.due(6000));             // the Overview's next refresh: kept
+    CHECK(!e.due(6000));             // Today's next refresh: kept
     CHECK(!e.due(60999));
     CHECK(e.due(61000));             // a minute later: due
     e.taken(61000);

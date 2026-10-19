@@ -5,6 +5,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include "tab/cadran_list.hpp"
 #include "tab/tab_base.hpp"
 
 class RowIcon;
@@ -19,6 +20,7 @@ class ConsoleTab : public TabBase
     void refresh() override;
 
   private:
+    cadran::List list;
     bool        serial_revealed = false;   // until the tab is left (tabs are rebuilt when reopened)
     std::string storage_note;              // the other system's, shown by A on the storage row
     RowIcon*    storage_info = nullptr;

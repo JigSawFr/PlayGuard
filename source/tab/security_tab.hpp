@@ -3,6 +3,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include "tab/cadran_list.hpp"
 #include "tab/tab_base.hpp"
 
 class SecurityTab : public TabBase
@@ -15,6 +16,7 @@ class SecurityTab : public TabBase
     void refresh() override;
 
   private:
+    cadran::List list;
     // Set or change the PIN (the system PIN screen), recorded in the history.
     void change_pin();
 

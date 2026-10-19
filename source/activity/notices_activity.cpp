@@ -4,6 +4,8 @@
 #include "action/notices.hpp"
 #include "action/notice_logic.hpp"
 #include "action/pin_lock.hpp"
+#include "tab/cadran_list.hpp"
+#include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 
@@ -51,6 +53,8 @@ void NoticesActivity::onContentAvailable()
         notices::dismiss_all();
         return true;
     });
+    // A screen's margins, as the other screens have.
+    root->setPadding(10, 72, 32, 72);
     this->rebuild();
     // A change while the list is open (a source cleared what it fixed):
     // rebuilt on the next frame, outside the source's own call.
@@ -236,6 +240,8 @@ void NoticesActivity::rebuild()
         }
     }
 
+    // The entries in cards, before they are shown.
+    cadran::List(this->getContentView(), box).apply({});
     root->addView(box);
     brls::Application::giveFocus(focus ? focus : first);
     if (this->content) root->removeView(this->content);

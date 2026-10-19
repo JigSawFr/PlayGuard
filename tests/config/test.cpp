@@ -118,6 +118,9 @@ static void test_fields()
     write_config(R"({"language": 5, "theme": "dark", "dev_mode": 1, "auto_relock": false, "pt_log": "yes",
                     "fw_gate_fw": "24.0.0", "fw_gate_app": "1.0.0", "fw_gate_choice": "risk",
                     "extra_weekday": 3, "extra_date": "2026-10-06", "extra_base": 60, "extra_value": 90,
+                    "bonus_weekday": 6, "bonus_date": "2026-10-10", "bonus_base": 180, "bonus_value": 240,
+                    "schedule_file": "holidays", "schedule_name": "Holidays", "schedule_from": "2026-10-19",
+                    "schedule_to": "2026-11-02", "schedule_applied": true, "schedule_prev": [60, 60, 60, 60, 60, 60, 120],
                     "relock_pending": true, "extra_auto_restore": true,
                     "custom_servers": ["a.example", 7, "b.example"]})");
     config::load();
@@ -125,6 +128,9 @@ static void test_fields()
     CHECK(c.language == "system" && c.theme == "dark" && !c.dev_mode && !c.auto_relock && !c.pt_log);
     CHECK(c.fw_gate_fw == "24.0.0" && c.fw_gate_app == "1.0.0" && c.fw_gate_choice == "risk");
     CHECK(c.extra_weekday == 3 && c.extra_date == "2026-10-06" && c.extra_base == 60 && c.extra_value == 90);
+    CHECK(c.bonus_weekday == 6 && c.bonus_date == "2026-10-10" && c.bonus_base == 180 && c.bonus_value == 240);
+    CHECK(c.schedule_file == "holidays" && c.schedule_name == "Holidays" && c.schedule_from == "2026-10-19");
+    CHECK(c.schedule_to == "2026-11-02" && c.schedule_applied && c.schedule_prev.size() == 7 && c.schedule_prev[6] == 120);
     CHECK(c.relock_pending && c.extra_auto_restore);
     CHECK(c.custom_servers.size() == 2 && c.custom_servers[1] == "b.example");
 
@@ -152,6 +158,37 @@ static void test_fields()
         config::load();
         c = config::get();
         CHECK(c.extra_weekday == -1 && c.extra_date.empty() && c.extra_base == 0 && c.extra_value == 0);
+    }
+    // A planned bonus too, and it only ever raises a real limit.
+    const char* bonuses[] = {
+        R"({"bonus_weekday": 6, "bonus_date": "2026-10-10", "bonus_base": 65535, "bonus_value": 240})",
+        R"({"bonus_weekday": 6, "bonus_date": "2026-10-10", "bonus_base": 240, "bonus_value": 180})",
+        R"({"bonus_weekday": 7, "bonus_date": "2026-10-10", "bonus_base": 180, "bonus_value": 240})",
+        R"({"bonus_weekday": 6, "bonus_date": "soon", "bonus_base": 180, "bonus_value": 240})",
+        R"({"bonus_weekday": 6, "bonus_date": "2026-10-10", "bonus_base": 180})",
+    };
+    for (const char* r : bonuses) {
+        write_config(r);
+        config::load();
+        c = config::get();
+        CHECK(c.bonus_weekday == -1 && c.bonus_date.empty() && c.bonus_base == 0 && c.bonus_value == 0);
+    }
+    // A scheduled profile: its period in order, and in force, the seven
+    // limits to put back.
+    const char* schedules[] = {
+        R"({"schedule_file": "", "schedule_from": "2026-10-19", "schedule_to": "2026-11-02"})",
+        R"({"schedule_file": "h", "schedule_from": "2026-11-02", "schedule_to": "2026-10-19"})",
+        R"({"schedule_file": "h", "schedule_from": "soon", "schedule_to": "2026-10-19"})",
+        R"({"schedule_file": "h", "schedule_from": "2026-10-19", "schedule_to": "2026-11-02", "schedule_applied": true})",
+        R"({"schedule_file": "h", "schedule_from": "2026-10-19", "schedule_to": "2026-11-02", "schedule_applied": true,
+            "schedule_prev": [60, 60, 60, 60, 60, 60, 2000]})",
+        R"({"schedule_file": "h", "schedule_from": "2026-10-19", "schedule_to": "2026-11-02", "schedule_applied": 1})",
+    };
+    for (const char* r : schedules) {
+        write_config(r);
+        config::load();
+        c = config::get();
+        CHECK(c.schedule_file.empty() && c.schedule_from.empty() && !c.schedule_applied && c.schedule_prev.empty());
     }
 
     // No more play today on a day without a limit: "no limit" (0xFFFF) is
@@ -248,6 +285,7 @@ static void test_preferences()
     CHECK(d.logs_keep == 20 && d.logs_keep_days == 0 && d.logs_keep_mb == 0);
     CHECK(!d.update_daily && d.update_checked.empty() && !d.clock_check_at_start && d.pin_lock == "changes" && !d.pin_ask_again);
     CHECK(d.onboarding_at_start && d.intro && d.dev_builds_order == "newest");
+    CHECK(d.effects == "auto");
     CHECK(d.support_reminder && d.support_reminded.empty() && d.seen_version.empty());
     write_config(R"({"support_reminder": false, "support_reminded": "2026-10-09", "seen_version": "1.1.0"})");
     config::load();
@@ -277,7 +315,7 @@ static void test_preferences()
     CHECK(config::get().pin_lock == "changes");
 
     // Values from the lists are kept.
-    write_config(R"({"start_tab": "activity", "extra_amounts": [30, 60, 90], "activity_period": 2,
+    write_config(R"({"start_tab": "activity", "extra_amounts": [30, 60, 90], "activity_period": 3, "effects": "full",
                     "activity_account": "0123456789ABCDEF0123456789ABCDEF", "activity_account_last": "",
                     "games_grid": false, "check_grid": true, "export_format": 3, "backup_keep": 10, "update_daily": true,
                     "update_checked": "2026-10-07", "clock_check_at_start": true, "intro": false,
@@ -291,13 +329,14 @@ static void test_preferences()
     CHECK(!c.intro && c.dev_builds_order == "number");
     CHECK(c.logs_keep == 0 && c.logs_keep_days == 30 && c.logs_keep_mb == 5);
     CHECK(c.start_tab == "activity" && c.extra_amounts == std::vector<int>({ 30, 60, 90 }));
-    CHECK(c.activity_period == 2 && !c.games_grid && c.check_grid && c.export_format == 3 && c.backup_keep == 10);
+    CHECK(c.activity_period == 3 && !c.games_grid && c.check_grid && c.export_format == 3 && c.backup_keep == 10);
+    CHECK(c.effects == "full");
     CHECK(c.activity_account == "0123456789ABCDEF0123456789ABCDEF" && c.activity_account_last.empty());
     CHECK(c.update_daily && c.update_checked == "2026-10-07" && c.clock_check_at_start);
 
     // Anything else goes back to the default: no 7-minute keep, no 999-minute
     // extra time, no tab that does not exist.
-    write_config(R"({"start_tab": "hidden", "extra_amounts": [15, 30, 999], "activity_period": 5,
+    write_config(R"({"start_tab": "hidden", "extra_amounts": [15, 30, 999], "activity_period": 5, "effects": "some",
                     "activity_account": "first", "activity_account_last": "0123456789abcdef0123456789abcdef",
                     "export_format": -1, "backup_keep": 7, "update_checked": "yesterday", "dev_builds_order": "size",
                     "logs_keep": 3, "logs_keep_days": -7, "logs_keep_mb": "5",
@@ -309,6 +348,7 @@ static void test_preferences()
     CHECK(c.logs_keep == 20 && c.logs_keep_days == 0 && c.logs_keep_mb == 0);
     CHECK(c.start_tab == "dashboard" && c.extra_amounts == std::vector<int>({ 15, 30, 60 }));
     CHECK(c.activity_period == 1 && c.export_format == 0 && c.backup_keep == 0 && c.update_checked.empty());
+    CHECK(c.effects == "auto");
     CHECK(c.activity_account == "last" && c.activity_account_last.empty());
     // The tabs that became Console: the network clock and the console part of Tools.
     for (const char* old_tab : { "clock", "tools" }) {
@@ -417,10 +457,7 @@ static void test_tmp_recovery()
     // A first write cut short (no file before it) leaves a ".part", never a
     // ".tmp": nothing is read in its place, it is not taken for a damaged
     // file, and the next write drops it.
-    {
-        FILE* f = std::fopen((file + ".part").c_str(), "wb");
-        CHECK(f && std::fputs("{\"theme\": \"da", f) >= 0 && std::fclose(f) == 0);
-    }
+    fs::write(file + ".part", "{\"theme\": \"da");
     CHECK(!paths::read_file(file, text) && !paths::exists_or_pending(file) && !paths::file_exists(file));
     config::get() = config::Config{};
     config::load();
@@ -438,10 +475,7 @@ static void test_tmp_recovery()
     // A file and an older ".tmp" next to it (a write stopped before its last
     // step): the next write replaces both with its own content.
     write_config(R"({"theme": "light"})");
-    {
-        FILE* f = std::fopen((file + ".tmp").c_str(), "wb");
-        CHECK(f && std::fputs("{\"theme\": \"dark\"}", f) >= 0 && std::fclose(f) == 0);
-    }
+    fs::write(file + ".tmp", "{\"theme\": \"dark\"}");
     CHECK(paths::atomic_write(file, R"({"theme": "system"})"));
     CHECK(paths::read_file(file, text) && text == R"({"theme": "system"})" && !exists(file + ".tmp"));
 }

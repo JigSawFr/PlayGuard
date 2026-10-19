@@ -54,7 +54,7 @@ int rank_of(const std::string& id)
 
 std::string tab_of(const std::string& id)
 {
-    // The network clock is a screen of the Console tab, and the Overview
+    // The network clock is a screen of the Console tab, and Today
     // says the changes seen outside and the limits to put back.
     if (group_of(id) == Group::Console || id == "clock" || id == "clock_off") return "console";
     if (id == "pin_missing" || id == "unlocked" || id == "pin_weak" || id == "pin_lock_off" || id == "pairing" ||

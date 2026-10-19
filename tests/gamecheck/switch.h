@@ -86,9 +86,10 @@ Result avmGetLaunchRequiredVersion(u64 application_id, u32 *version);
 Result avmPushLaunchVersion(u64 application_id, u32 version);
 
 typedef struct { char name[0x200]; char author[0x100]; } NacpLanguageEntry;
-// libnx's layout where nacp.c reads it: the title entries at 0, the display
-// version at 0x3060, the titles' format at 0x3215, 0x4000 bytes in all.
-typedef struct { NacpLanguageEntry lang[16]; u8 x3000[0x60]; char display_version[0x10]; u8 rest[0xF90]; } NacpStruct;
+// libnx's layout where nacp.c reads it: the title entries at 0, the ages at
+// 0x3040, the display version at 0x3060, the titles' format at 0x3215, 0x4000
+// bytes in all.
+typedef struct { NacpLanguageEntry lang[16]; u8 x3000[0x40]; int8_t rating_age[0x20]; char display_version[0x10]; u8 rest[0xF90]; } NacpStruct;
 typedef struct { NacpStruct nacp; u8 icon[0x20000]; } NsApplicationControlData;
 typedef enum { NsApplicationControlSource_CacheOnly = 0, NsApplicationControlSource_Storage = 1 } NsApplicationControlSource;
 typedef struct {

@@ -4,6 +4,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include "tab/cadran_list.hpp"
 #include "tab/tab_base.hpp"
 
 class HistoryTab : public TabBase
@@ -16,6 +17,7 @@ class HistoryTab : public TabBase
     void refresh() override;
 
   private:
+    cadran::List list;
     BRLS_BIND(brls::DetailCell, history,        "hs_history");
     BRLS_BIND(brls::DetailCell, backup_save,    "hs_backup_save");
     BRLS_BIND(brls::DetailCell, backup_restore, "hs_backup_restore");

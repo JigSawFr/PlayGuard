@@ -5,7 +5,9 @@
 #include <cmath>
 #include <string>
 
+#include "tab/cadran_list.hpp"
 #include "tab/tab_base.hpp"
+#include "ui/text_size.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "view/version_badge.hpp"
@@ -13,6 +15,7 @@
 static constexpr float SIZE = 40;
 static constexpr const char* LANGUAGE_ID = "header_language";
 static constexpr const char* THEME_ID    = "header_theme";
+static constexpr const char* TEXT_ID     = "header_text_size";
 
 // "FR" for "fr" and "fr-CA", "ZH" for "zh-Hans": the language, not the region
 // (the list says which one). "system": the language the console gave borealis.
@@ -31,7 +34,7 @@ static std::string language_code()
 HeaderSetting::HeaderSetting(Kind kind)
     : kind(kind)
 {
-    this->setId(kind == Kind::LANGUAGE ? LANGUAGE_ID : THEME_ID);
+    this->setId(kind == Kind::LANGUAGE ? LANGUAGE_ID : kind == Kind::THEME ? THEME_ID : TEXT_ID);
     this->setFocusable(false);
     this->setWidth(kind == Kind::LANGUAGE ? SIZE * 1.3f : SIZE);
     this->setHeight(SIZE);
@@ -41,7 +44,8 @@ HeaderSetting::HeaderSetting(Kind kind)
     // screen shows the new choice (Preferences says it too).
     this->addGestureRecognizer(new brls::TapGestureRecognizer(this, [kind]() {
         if (kind == Kind::LANGUAGE) ui::pick_language(TabBase::refresh_shown);
-        else ui::pick_theme(TabBase::refresh_shown);
+        else if (kind == Kind::THEME) ui::pick_theme(TabBase::refresh_shown);
+        else ui::pick_text_size(TabBase::refresh_shown);
     }));
 }
 
@@ -58,7 +62,8 @@ void HeaderSetting::draw(NVGcontext* vg, float x, float y, float width, float he
     (void)style;
     (void)ctx;
     if (this->kind == Kind::LANGUAGE) this->draw_language(vg, x, y, width, height);
-    else this->draw_theme(vg, x, y, width, height);
+    else if (this->kind == Kind::THEME) this->draw_theme(vg, x, y, width, height);
+    else this->draw_text_size(vg, x, y, width, height);
 }
 
 void HeaderSetting::draw_language(NVGcontext* vg, float x, float y, float width, float height)
@@ -134,6 +139,29 @@ void HeaderSetting::draw_theme(NVGcontext* vg, float x, float y, float width, fl
     }
 }
 
+void HeaderSetting::draw_text_size(NVGcontext* vg, float x, float y, float width, float height)
+{
+    // "AA": a small A, then a large one on the same baseline, teal while
+    // the text is larger.
+    const NVGcolor ink = ui::color_text();
+    const float base = y + height * 0.78f;
+    nvgFontFaceId(vg, brls::Application::getDefaultFont());
+    nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE);
+    nvgFontSize(vg, height * 0.5f);
+    float bounds[4];
+    const float small = nvgTextBounds(vg, 0, 0, "A", nullptr, bounds);
+    nvgFontSize(vg, height * 0.78f);
+    const float large = nvgTextBounds(vg, 0, 0, "A", nullptr, bounds);
+    const float gap = height * 0.04f;
+    const float left = x + (width - small - gap - large) / 2;
+    nvgFontSize(vg, height * 0.5f);
+    nvgFillColor(vg, ink);
+    nvgText(vg, left, base, "A", nullptr);
+    nvgFontSize(vg, height * 0.78f);
+    nvgFillColor(vg, text_size::larger() ? brls::Application::getTheme()["cadran/teal"] : ink);
+    nvgText(vg, left + small + gap, base, "A", nullptr);
+}
+
 // The main screen (its tab frame) holding `focus`: the language then the
 // theme go first in the header's row at the right (the bell is there
 // already), unless it has them.
@@ -147,6 +175,7 @@ static void settings_screen_of(brls::View* focus)
     if (!tools || tools->getView(LANGUAGE_ID)) return;
     tools->addView(new HeaderSetting(HeaderSetting::Kind::LANGUAGE), 0);
     tools->addView(new HeaderSetting(HeaderSetting::Kind::THEME), 1);
+    tools->addView(new HeaderSetting(HeaderSetting::Kind::TEXT_SIZE), 2);
 }
 
 void HeaderSetting::install()

@@ -48,7 +48,7 @@
   "replaying": "Rejeu des étapes : {n} sur {total}",
   "tour": "Visite",
   "report": "Signaler un problème",
-  "tour_overview": "Vue d'ensemble : le temps de jeu du jour, la limite, le temps restant et l'heure du coucher.",
+  "tour_overview": "Aujourd'hui : le temps de jeu du jour, la limite, le temps restant et l'heure du coucher.",
   "tour_play_timer": "Temps de jeu : le graphique de la semaine sert d'éditeur, une limite pour tous les jours ou une par jour.",
   "tour_activity": "Activité : qui a joué à quoi, et combien de temps, d'après le journal de la console.",
   "tour_console": "Console : l'horloge réseau, les jeux installés et ce que fait tourner la console.",
@@ -66,7 +66,7 @@
   "capture": "Captures"
  },
  "params": {
-  "tab": {"label": "Ouvre sur", "options": {"": "Vue d'ensemble", "play_timer": "Temps de jeu", "activity": "Activité", "restrictions": "Restrictions", "security": "NIP", "console": "Console", "history": "Historique", "preferences": "Préférences", "about": "À propos"}},
+  "tab": {"label": "Ouvre sur", "options": {"": "Aujourd'hui", "play_timer": "Temps de jeu", "activity": "Activité", "restrictions": "Restrictions", "security": "NIP", "console": "Console", "history": "Historique", "preferences": "Préférences", "about": "À propos"}},
   "keep": {"label": "Conserver l’état entre les visites", "help": "Les données de PlayGuard et les paramètres de la console simulée (NIP, limites, horloges) restent dans ce navigateur; les paramètres de console de ce panneau ne comptent alors qu’au premier lancement."},
   "not_set_up": {"label": "Jamais configuré (pas de NIP)"},
   "unlocked": {"label": "Déverrouillé temporairement"},
@@ -76,6 +76,7 @@
   "alarm_off": {"label": "Alarme « temps écoulé » désactivée"},
   "not_counting": {"label": "Le temps restant ne baisse pas", "help": "Une horloge reculée : la vue d'ensemble le signale après 90 s à l'écran."},
   "unpaired": {"label": "Application mobile non associée"},
+  "left_min": {"label": "Minutes restantes aujourd'hui"},
   "fw": {"label": "Firmware", "help": "Au-delà du dernier vérifié, l'écran du firmware."},
   "no_cfw": {"label": "Sans Atmosphère"},
   "emummc": {"label": "emuMMC"},
@@ -85,7 +86,8 @@
   "applet": {"label": "Mode applet (depuis l'album)"},
   "background": {"label": "PlayGuard en arrière-plan"},
   "hbloader": {"label": "Un lanceur qui peut confier une mise à jour à un store"},
-  "numpad": {"label": "Ce que renvoie le pavé numérique"},
+  "docked": {"label": "Sur la station (sur la TV)"},
+  "battery": {"label": "Sur batterie (sans chargeur)"},
   "boot_choice": {"label": "Réponse à « build précédente ? » au démarrage", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "Horloge réseau exacte"},
   "autosync_off": {"label": "« Synchroniser l'horloge via Internet » désactivé"},
@@ -94,6 +96,8 @@
   "now": {"label": "Heure de la console, figée", "help": "Dans le fuseau horaire du navigateur."},
   "skip": {"label": "Heure de la console avancée de (s)", "help": "Un jeu lancé pendant tout ce temps : le temps restant baisse d’autant. Les boutons sous l’écran l’avancent."},
   "idle": {"label": "Aucun jeu en cours"},
+  "no_game": {"label": "Rien d'ouvert derrière PlayGuard"},
+  "no_play": {"label": "Rien joué depuis des semaines"},
   "no_pdm": {"label": "Pas de journal d'activité"},
   "games": {"label": "Jeux joués en plus cette semaine"},
   "accounts": {"label": "Comptes utilisateur", "help": "De 0 à 8 (2 par défaut), chacun jouant deux fois plus que le suivant."},
@@ -109,7 +113,9 @@
   "fail": {"label": "Faire échouer", "options": {"unlock": "Déverrouillage", "unverified": "Déverrouillage non confirmé", "relock": "Reverrouillage", "write": "Toute écriture de réglage", "timer": "Lecture du minuteur", "clock": "Réglage de l'horloge", "pin": "Lecture du NIP", "pin_entry": "Écran du NIP annulé", "bedtime": "Heure du coucher", "remove": "Suppression d'un jeu", "launch": "Réinitialisation de version", "verify": "Vérification d'intégrité"}},
   "still_focus": {"label": "Surbrillance du focus figée"},
   "version": {"label": "Version affichée dans l'en-tête"},
-  "hold_loading": {"label": "Rester sur l'écran de chargement"}
+  "hold_loading": {"label": "Rester sur l'écran de chargement"},
+  "cadran_noglow": {"label": "Sans halo d'arrière-plan"},
+  "cadran_noring": {"label": "L'anneau sans ses arcs"}
  },
  "presets": {
   "default": "Par défaut",

@@ -10,6 +10,7 @@
 #include "action/games_logic.hpp"
 #include "action/play_data.hpp"
 #include "activity/game_activity.hpp"
+#include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
 #include "util/config.hpp"
@@ -72,6 +73,19 @@ void GamesActivity::onContentAvailable()
         this->pick_period();
         return true;
     });
+    // The game's figures in a card, the view and the period as two rows of
+    // their own.
+    brls::Theme theme = brls::Application::getTheme();
+    auto* head = static_cast<brls::Box*>(this->getView("gs_head"));
+    head->setLineBottom(0);
+    head->setMargins(16, 60, 0, 60);
+    head->setPadding(18, 24, 18, 24);
+    head->setCornerRadius(20);
+    head->setBackgroundColor(theme["cadran/surf"]);
+    head->setBorderColor(theme["cadran/line"]);
+    head->setBorderThickness(1);
+    cadran::List::row(view_cell, "list", true);
+    cadran::List::row(period_cell, "calendar", true);
     this->set_hints();
     this->listener = play_data::listen([this]() {
         if (!ui::on_top(this)) {
@@ -151,10 +165,14 @@ void GamesActivity::switch_view()
 void GamesActivity::pick_period()
 {
     std::vector<std::string> labels;
-    for (int p = 0; p < 3; p++) labels.push_back(period_label(p));
-    ui::pick("playguard/activity/period"_i18n, labels, this->period, [this](int index) {
-        if (index == this->period) return;
-        this->period = index;
+    int selected = 0;
+    for (int i = 0; i < activity_summary::PERIOD_COUNT; i++) {
+        labels.push_back(period_label(activity_summary::PERIODS[i]));
+        if (activity_summary::PERIODS[i] == this->period) selected = i;
+    }
+    ui::pick("playguard/activity/period"_i18n, labels, selected, [this](int index) {
+        if (activity_summary::PERIODS[index] == this->period) return;
+        this->period = activity_summary::PERIODS[index];
         this->show_all = false;
         config::get().activity_period = index;   // the Activity tab's too
         ui::save_config();
@@ -377,8 +395,8 @@ void GamesActivity::show_selected(const GameStat* g)
         return;
     }
     name->setText(game_name(*g));
-    const bool windows = this->data && this->data->windows_ok;
-    const bool known = this->period == 2 ? g->totals_ok : windows;
+    const bool known = this->period == activity_summary::AllTime ? g->totals_ok
+                                                                  : this->data && activity_summary::period_read(*this->data, this->period);
     period_value->setText(known ? ui::fmt_play_time(activity_summary::value(*g, this->period)) : na);
     total->setText(g->totals_ok ? ui::fmt_play_time(g->total_s) : na);
     launches->setText(g->totals_ok ? std::to_string(g->launches) : na);
@@ -405,9 +423,9 @@ void GamesActivity::show_status()
         text = "";
     } else if (R_FAILED(this->data->rc)) {
         text = "playguard/activity/err_list"_i18n + " — " + ui::rc_text(this->data->rc);
-    } else if (this->period != 2 && !this->data->windows_ok) {
+    } else if (this->period != activity_summary::AllTime && !activity_summary::period_read(*this->data, this->period)) {
         text = "playguard/activity/err_log"_i18n + " — " + ui::rc_text(this->data->events_rc);
-    } else if (this->period == 2 && R_FAILED(this->data->stats_rc)) {
+    } else if (this->period == activity_summary::AllTime && R_FAILED(this->data->stats_rc)) {
         text = "playguard/activity/err_stats"_i18n + " — " + ui::rc_text(this->data->stats_rc);
     } else if (this->rows.empty()) {
         text = brls::getStr(fmt::format("playguard/activity/none/{}", this->period));

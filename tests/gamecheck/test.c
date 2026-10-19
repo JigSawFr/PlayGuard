@@ -41,6 +41,7 @@ typedef struct {
     const char *name_fr;      // its French title entry (3), NULL: none
     bool uncached;            // ns' cache has no control data for it
     const char *display_version;
+    int8_t pegi;              // its PEGI age (organisation 6), 0: rated by none
     u8 record_event;
     u64 record_updated;
     bool record;              // the HOME menu entry exists
@@ -216,6 +217,8 @@ Result nsGetApplicationControlData(NsApplicationControlSource source, u64 id, Ns
     if (g->name_fr) snprintf(buffer->nacp.lang[3].name, sizeof(buffer->nacp.lang[3].name), "%s", g->name_fr);
     snprintf(buffer->nacp.display_version, sizeof(buffer->nacp.display_version), "%s",
              g->display_version ? g->display_version : "");
+    memset(buffer->nacp.rating_age, 0xFF, sizeof(buffer->nacp.rating_age));
+    if (g->pegi) buffer->nacp.rating_age[6] = g->pegi;
     *actual = sizeof(buffer->nacp) + 0x1000;
     return 0;
 }
@@ -840,6 +843,7 @@ static void test_every_problem(void)
     g = add_game(0x0100000000010000ULL, "Fine");   // game + update on the SD card, add-on, tickets
     g->uncached = true;   // its name read from the storage
     g->display_version = "1.4.0";
+    g->pegi = 12;
     g->record_updated = 1791471600;
     m = add_meta(g, NcmContentMetaType_Application, NcmStorageId_SdCard, 0);
     m->required_sysver = SYSVER(12, 0, 0);
@@ -896,6 +900,7 @@ static void test_every_problem(void)
 
     const GameFacts *f = facts(0x0100000000010000ULL);
     CHECK(f->control_ok && strcmp(f->name, "Fine") == 0 && strcmp(f->display_version, "1.4.0") == 0 && f->record_event == 3);
+    CHECK(f->rating_age[6] == 12 && f->rating_age[3] == -1 && f->rating_age[0x1F] == -1);   // PEGI 12, no ESRB
     CHECK(f->record_updated == 1791471600);
     CHECK(f->meta_count == 3 && f->content_count == 3 && f->has_base && f->has_patch && f->patch_version == 0x30000);
     CHECK(f->contents[1].type == GC_META_PATCH && f->contents[1].id == 0x0100000000010800ULL &&

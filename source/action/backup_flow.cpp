@@ -232,7 +232,7 @@ void save_now()
 void choose_and_restore(std::function<void()> refresh)
 {
     // Listed again (what the parent picks from must be on the SD card now),
-    // and kept for the Overview and the count.
+    // and kept for Today and the count.
     const auto names = backup::list();
     s_listing.set(names);
     if (names.empty()) {
