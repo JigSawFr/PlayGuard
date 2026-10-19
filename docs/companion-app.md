@@ -23,7 +23,7 @@ How the settings are stored on the console is in
 | Daily play-time limit, the same every day or one per day | *Play timer* | Plus saved profiles, and the week chart as the editor |
 | "Extend today's play time" (+5 min … +1 h, added in 2.4.0 for +1 h); undo today's changes | *Extra time today*, *No more play today*; the usual limit comes back the next day | Amounts in *Play timer › Extra time*, including +5/+10/+15 |
 | Alarm only, or suspend the software, when the time is up | *Play timer › When the time is up* | Shown once a limit or a bedtime is set (see gap 1) |
-| Bedtime alarm and the time play is allowed again (2.1.0) | *Play timer › Bedtime alarm* | Partly: one time for every day (see gap 2) |
+| Bedtime alarm and the time play is allowed again (2.1.0) | *Play timer › Bedtime alarm* | Every day, or by day of the week; the time play is allowed again, one for every day (see gap 2) |
 | Restriction level, age rating, rating organisation, posting to social media, communicating with other players, VR mode (1.10.0) | *Restrictions* | |
 | Play history per game | *Activity* | Plus per user account, all-time totals and export (CSV, JSON, XLSX, PDF) |
 | Parental-controls PIN | *PIN* | Plus showing the PIN (asked first) and a PIN to open PlayGuard itself; for a forgotten PIN, the recovery sysmodule |
@@ -50,15 +50,17 @@ of the gaps below stay the same.
 
 Since 2.4.0 the companion app sets a different start time for each day
 (*Detailed end-of-day settings*), and each day's rule has its own bedtime.
-PlayGuard writes one bedtime, the same every day.
+PlayGuard sets the bedtime alarm for every day or by day of the week
+(Monday to Friday, the weekend, or one day); the time play is allowed
+again, one for every day.
 
 - The per-day bedtime bytes are **verified** on 22.0.0 (2026-10-14: a
   bedtime set by PlayGuard, read back from the block and from 1954–1959);
   PlayGuard still checks every bedtime write against what the console
   reports and reverts it otherwise.
-- **Needs:** only code: the per-day editor showing and setting a bedtime per
-  day. A block from the companion app with different bedtimes on two days
-  would confirm that the console takes each day's own.
+- **Needs:** a console check: a block with different bedtimes on two days
+  (set by PlayGuard, or by the companion app) would confirm that the console
+  rings each day's own; and code for a start time per day.
 
 ### 3. Exceptions for specific software
 

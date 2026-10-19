@@ -295,7 +295,7 @@
         "bedtime_value_on": "{} (on)",
         "bedtime_value_off": "{} (off)",
         "bedtime_reset": "Play allowed again at",
-        "bedtime_note": "Applies to every day. At bedtime the console shows the alarm, and may also suspend the software (see \"When the time is up\"), until play is allowed again. PlayGuard checks that the console reports the new time, and puts the previous settings back if it does not.",
+        "bedtime_note": "Every day, or by day of the week. At bedtime the console shows the alarm, and may also suspend the software (see \"When the time is up\"), until play is allowed again. PlayGuard checks that the console reports the new time, and puts the previous settings back if it does not.",
         "bedtime_title": "Bedtime alarm, every day",
         "bedtime_end_title": "Play allowed again at (every day)",
         "bedtime_summary": "{}, play allowed again at {}",
@@ -372,7 +372,14 @@
         "not_counting": "The console is not counting play time right now. Likely causes: the clock was set back (it counts again later), the network clock was never set (Console › Network clock), or a limit was just written (start a game for a minute, then check).",
         "limit_note": "At the limit the console shows \"Time's up\", then suspends the game or only warns, as set in \"When the time is up\".",
         "unsaved": "Unsaved progress may be lost: let the child save first.",
-        "profile_already": "The profile \"{}\" is already in place."
+        "profile_already": "The profile \"{}\" is already in place.",
+        "bedtime_by_day": "By day of the week...",
+        "bedtime_by_day_title": "Bedtime alarm, by day",
+        "bedtime_weekdays": "Monday to Friday",
+        "bedtime_weekend": "Saturday and Sunday",
+        "bedtime_days_title": "Bedtime alarm: {}",
+        "bedtime_days_confirm": "{}: set the bedtime alarm to {}?\n\nPlay is allowed again at {}.",
+        "bedtime_days_confirm_off": "{}: turn off the bedtime alarm?"
     },
     "activity": {
         "section_totals": "Play time",

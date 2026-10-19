@@ -302,7 +302,7 @@ void CadranPlayTimerTab::rerender()
     PtBedtime same;
     std::string start = "—", end;
     if (pt_logic::bedtime_layout_ok(pt, ui::today_weekday())) {
-        if (!pt_logic::bedtime_uniform(pt, &same)) start = "playguard/play_timer/bedtime_varies"_i18n;
+        if (!pt_logic::bedtime_uniform(pt, &same)) start = pt_flow::bedtime_days_text(pt);
         else if (!same.on) start = "playguard/common/off"_i18n;
         else {
             start = fmt::format("{:02d}:{:02d}", same.hour, same.minute);
@@ -311,6 +311,11 @@ void CadranPlayTimerTab::rerender()
     } else if (pt.bedtime_valid) {
         start = pt.bedtime_enabled ? fmt::format("{:02d}:{:02d}", pt.bedtime_hour, pt.bedtime_minute) : "playguard/common/off"_i18n;
     }
+    // Each day's under the week, when they differ.
+    std::string beds[7];
+    if (pt_logic::bedtime_layout_ok(pt, ui::today_weekday()) && pt.valid && !pt_logic::bedtime_uniform(pt, nullptr))
+        for (int d = 0; d < 7; d++) beds[d] = pt.bed[d].on ? fmt::format("{:02d}:{:02d}", pt.bed[d].hour, pt.bed[d].minute) : "—";
+    week_editor->show_bedtimes(beds);
     bed_value->setText(start);
     bed_end->setText(end);
     bed_arrow->setVisibility(end.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);

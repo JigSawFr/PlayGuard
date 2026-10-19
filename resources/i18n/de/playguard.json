@@ -295,7 +295,7 @@
         "bedtime_value_on": "{} (an)",
         "bedtime_value_off": "{} (aus)",
         "bedtime_reset": "Spielen wieder erlaubt ab",
-        "bedtime_note": "Gilt für jeden Tag. Zur Schlafenszeit zeigt die Konsole den Alarm an und unterbricht womöglich auch die Software (siehe „Wenn die Zeit um ist“), bis das Spielen wieder erlaubt ist. PlayGuard prüft, ob die Konsole die neue Uhrzeit meldet, und stellt sonst die vorherigen Einstellungen wieder her.",
+        "bedtime_note": "Für jeden Tag oder nach Wochentag. Zur Schlafenszeit zeigt die Konsole den Alarm an und unterbricht womöglich auch die Software (siehe „Wenn die Zeit um ist“), bis das Spielen wieder erlaubt ist. PlayGuard prüft, ob die Konsole die neue Uhrzeit meldet, und stellt sonst die vorherigen Einstellungen wieder her.",
         "bedtime_title": "Gute-Nacht-Alarm, jeden Tag",
         "bedtime_end_title": "Spielen wieder erlaubt ab (jeden Tag)",
         "bedtime_summary": "{}, Spielen wieder erlaubt ab {}",
@@ -372,7 +372,14 @@
         "not_counting": "Die Konsole zählt die Spielzeit gerade nicht. Mögliche Ursachen: Die Uhr wurde zurückgestellt (sie zählt später wieder), die Netzwerkuhr wurde nie gestellt (Konsole › Netzwerkuhr), oder ein Limit wurde gerade geschrieben (starten Sie ein Spiel für eine Minute und prüfen Sie dann erneut).",
         "limit_note": "Beim Limit zeigt die Konsole „Zeit ist um“ an und unterbricht dann das Spiel oder warnt nur, je nach „Wenn die Zeit um ist“.",
         "unsaved": "Nicht gespeicherter Fortschritt kann verloren gehen: Lassen Sie das Kind zuerst speichern.",
-        "profile_already": "Das Profil „{}“ ist bereits aktiv."
+        "profile_already": "Das Profil „{}“ ist bereits aktiv.",
+        "bedtime_by_day": "Nach Wochentag...",
+        "bedtime_by_day_title": "Gute-Nacht-Alarm, nach Tag",
+        "bedtime_weekdays": "Montag bis Freitag",
+        "bedtime_weekend": "Samstag und Sonntag",
+        "bedtime_days_title": "Gute-Nacht-Alarm: {}",
+        "bedtime_days_confirm": "{}: Gute-Nacht-Alarm auf {} stellen?\n\nSpielen ist ab {} wieder erlaubt.",
+        "bedtime_days_confirm_off": "{}: Gute-Nacht-Alarm ausschalten?"
     },
     "activity": {
         "section_totals": "Spielzeit",

@@ -295,7 +295,7 @@
         "bedtime_value_on": "{} (aan)",
         "bedtime_value_off": "{} (uit)",
         "bedtime_reset": "Weer spelen vanaf",
-        "bedtime_note": "Geldt voor elke dag. Op bedtijd toont de console het alarm, en onderbreekt hij misschien ook de software (zie \"Als de tijd om is\"), totdat er weer gespeeld mag worden. PlayGuard controleert of de console de nieuwe tijd meldt, en zet anders de vorige instellingen terug.",
+        "bedtime_note": "Voor elke dag, of per dag van de week. Op bedtijd toont de console het alarm, en onderbreekt hij misschien ook de software (zie \"Als de tijd om is\"), totdat er weer gespeeld mag worden. PlayGuard controleert of de console de nieuwe tijd meldt, en zet anders de vorige instellingen terug.",
         "bedtime_title": "Bedtijdalarm, elke dag",
         "bedtime_end_title": "Weer spelen vanaf (elke dag)",
         "bedtime_summary": "{}, weer spelen vanaf {}",
@@ -372,7 +372,14 @@
         "not_counting": "De console telt op dit moment geen speeltijd. Waarschijnlijke oorzaken: de klok is teruggezet (later telt hij weer), de netwerkklok is nooit ingesteld (Console › Netwerkklok), of er is net een limiet geschreven (start een game voor een minuut en kijk dan opnieuw).",
         "limit_note": "Bij de limiet toont de console \"Tijd is om\" en onderbreekt hij daarna de game of waarschuwt hij alleen, volgens \"Als de tijd om is\".",
         "unsaved": "Niet-opgeslagen voortgang kan verloren gaan: laat het kind eerst opslaan.",
-        "profile_already": "Het profiel ‘{}’ is al toegepast."
+        "profile_already": "Het profiel ‘{}’ is al toegepast.",
+        "bedtime_by_day": "Per dag van de week...",
+        "bedtime_by_day_title": "Bedtijdalarm, per dag",
+        "bedtime_weekdays": "Maandag tot en met vrijdag",
+        "bedtime_weekend": "Zaterdag en zondag",
+        "bedtime_days_title": "Bedtijdalarm: {}",
+        "bedtime_days_confirm": "{}: bedtijdalarm op {} zetten?\n\nEr mag weer gespeeld worden vanaf {}.",
+        "bedtime_days_confirm_off": "{}: bedtijdalarm uitzetten?"
     },
     "activity": {
         "section_totals": "Speeltijd",

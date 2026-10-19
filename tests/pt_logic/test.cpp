@@ -322,6 +322,40 @@ static void test_bedtime()
     for (int n = 0; n < 7; n++) pt.bed[n] = out[n];
     CHECK(pt_logic::bedtime_uniform(pt, &u) && !u.on);
     CHECK(!pt_logic::bedtime_end_every_day(pt, 7, 0, out));   // no bedtime on
+
+    // One set of days: Monday to Friday at 21:00, the weekend kept off.
+    pt_logic::bedtime_days(pt, pt_logic::WEEKDAYS, true, 21, 0, out);
+    for (int n = 1; n <= 5; n++) CHECK(out[n].on && out[n].hour == 21 && out[n].end_hour == 8);
+    CHECK(!out[0].on && !out[6].on && out[6].end_hour == 8);
+    for (int n = 0; n < 7; n++) pt.bed[n] = out[n];
+    CHECK(pt_logic::bedtime_shared(pt, pt_logic::WEEKDAYS, &u) && u.on && u.hour == 21);
+    CHECK(pt_logic::bedtime_shared(pt, pt_logic::WEEKEND, &u) && !u.on);
+    CHECK(!pt_logic::bedtime_shared(pt, pt_logic::ALL_DAYS, &u) && !pt_logic::bedtime_uniform(pt, &u));
+    CHECK(!pt_logic::bedtime_shared(pt, 0, &u));
+    // Then Friday alone later: 22:30.
+    pt_logic::bedtime_days(pt, 1u << 5, true, 22, 30, out);
+    CHECK(out[5].hour == 22 && out[5].minute == 30 && out[4].hour == 21 && !out[6].on);
+    for (int n = 0; n < 7; n++) pt.bed[n] = out[n];
+    const std::vector<int> times = pt_logic::bedtime_times();
+    CHECK(times[(size_t)pt_logic::bedtime_selected_days(pt, 1u << 5, times)] == 22 * 60 + 30);
+    CHECK(times[(size_t)pt_logic::bedtime_selected_days(pt, pt_logic::WEEKDAYS, times)] == 21 * 60);   // they differ
+    CHECK(pt_logic::bedtime_selected_days(pt, pt_logic::WEEKEND, times) == 0);                          // off
+
+    // The runs, Monday first: Monday to Thursday at 21:00, Friday 22:30, the
+    // weekend off (Saturday and Sunday one run, Sunday last).
+    auto runs = pt_logic::bedtime_runs(pt);
+    CHECK(runs.size() == 3);
+    CHECK(runs[0].first == 1 && runs[0].last == 4 && runs[0].bed.hour == 21);
+    CHECK(runs[1].first == 5 && runs[1].last == 5 && runs[1].bed.minute == 30);
+    CHECK(runs[2].first == 6 && runs[2].last == 0 && !runs[2].bed.on);
+    // The same alarm, another allowed-again time: still one run.
+    pt_logic::bedtime_every_day(pt, true, 21, 0, out);
+    for (int n = 0; n < 7; n++) pt.bed[n] = out[n];
+    pt.bed[2].end_hour = 7;
+    runs = pt_logic::bedtime_runs(pt);
+    CHECK(runs.size() == 1 && runs[0].first == 1 && runs[0].last == 0);
+    pt.valid = false;
+    CHECK(pt_logic::bedtime_runs(pt).empty());
 }
 
 // What the pickers start on (pt_flow's quick values, the per-day picker, the bedtimes).

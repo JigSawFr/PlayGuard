@@ -1473,6 +1473,22 @@ if not GAMES:
     if not any(m.startswith("Bedtime alarm changed.") for m in messages()):
         fail("the bedtime alarm was not changed: " + repr(messages()[-3:]))
 
+    # By day of the week (the list's last line): the weekend alone at 22:30;
+    # the weekdays keep 21:30, and the tab says the days differ.
+    key("Return")
+    key("Down", 12)            # By day of the week...
+    key("Return")
+    shot("23_bedtime_by_day")  # each set of days with its time
+    key("Down")                # Saturday and Sunday
+    key("Return")
+    key("Down", 4)             # 21:30 → 22:30
+    key("Return")
+    key("Right")               # Unlock and apply
+    key("Return")
+    if sum(m.startswith("Bedtime alarm changed.") for m in messages()) < 2:
+        fail("the weekend's bedtime alarm was not changed: " + repr(messages()[-3:]))
+    time.sleep(4.5)            # its toast gone: the next screens are references
+
     # Play timer › Advanced: its own screen, the switch next to the actions it
     # shows; turned on, then off again (backups restore the alarm only with it on).
     key("Down", 4)             # past Allowed again at, the extra-time amounts and switch: Advanced
@@ -1516,7 +1532,7 @@ if not GAMES:
     key("Escape")
     shot("27_back")
 
-    # The change history (the bedtime alarm changed above): every change,
+    # The change history (the bedtime alarm changed twice above): every change,
     # then only the refused ones (none: the line hidden), then every change
     # again (the same line shown again).
     def history_listed(text, times=1):
@@ -1530,18 +1546,18 @@ if not GAMES:
     key("Up", 2)               # Changes made with PlayGuard
     key("Return")
     shot("27_history")
-    if not history_listed("1 of 1 changes"):
-        fail("the change history did not list the bedtime alarm change")
+    if not history_listed("2 of 2 changes"):
+        fail("the change history did not list the bedtime alarm changes")
     key("Return")              # Show: the kinds of change
     key("Down", 5)             # Refused by the console
     key("Return")
     shot("27_history_refused")
-    if not history_listed("0 of 1 changes"):
+    if not history_listed("0 of 2 changes"):
         fail("the change history did not filter the refused changes")
     key("Return")
     key("Up", 5)               # Everything
     key("Return")
-    if not history_listed("1 of 1 changes", times=2):
+    if not history_listed("2 of 2 changes", times=2):
         fail("the change history did not list every change again")
     shot("27_history_again")
     key("Escape")

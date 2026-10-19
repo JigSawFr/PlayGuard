@@ -126,11 +126,7 @@ static bool same(const PtBedtime& a, const PtBedtime& b)
 
 bool bedtime_uniform(const PtState& pt, PtBedtime* out)
 {
-    if (!pt.valid) return false;
-    for (int n = 1; n < 7; n++)
-        if (!same(pt.bed[n], pt.bed[0])) return false;
-    if (out) *out = pt.bed[0];
-    return true;
+    return bedtime_shared(pt, ALL_DAYS, out);
 }
 
 static bool end_in_range(uint8_t hour, uint8_t minute)
@@ -141,8 +137,50 @@ static bool end_in_range(uint8_t hour, uint8_t minute)
 
 void bedtime_every_day(const PtState& pt, bool on, uint8_t hour, uint8_t minute, PtBedtime out[7])
 {
+    bedtime_days(pt, ALL_DAYS, on, hour, minute, out);
+}
+
+bool bedtime_shared(const PtState& pt, uint8_t days, PtBedtime* out)
+{
+    if (!pt.valid) return false;
+    int first = -1;
+    for (int n = 0; n < 7; n++) {
+        if (!(days & (1u << n))) continue;
+        if (first < 0) first = n;
+        else if (!same(pt.bed[n], pt.bed[first])) return false;
+    }
+    if (first < 0) return false;
+    if (out) *out = pt.bed[first];
+    return true;
+}
+
+std::vector<BedRun> bedtime_runs(const PtState& pt)
+{
+    std::vector<BedRun> runs;
+    if (!pt.valid) return runs;
+    for (int i = 0; i < 7; i++) {
+        const int d = (i + 1) % 7;   // Monday first
+        const PtBedtime& b = pt.bed[d];
+        if (!runs.empty()) {
+            const PtBedtime& r = runs.back().bed;
+            if (r.on == b.on && (!b.on || (r.hour == b.hour && r.minute == b.minute))) {
+                runs.back().last = d;
+                continue;
+            }
+        }
+        runs.push_back({ d, d, b });
+    }
+    return runs;
+}
+
+void bedtime_days(const PtState& pt, uint8_t days, bool on, uint8_t hour, uint8_t minute, PtBedtime out[7])
+{
     for (int n = 0; n < 7; n++) {
         PtBedtime b = pt.bed[n];
+        if (!(days & (1u << n))) {
+            out[n] = b;
+            continue;
+        }
         b.on = on;
         b.hour = on ? hour : 0;
         b.minute = on ? minute : 0;
@@ -226,9 +264,14 @@ std::vector<int> bedtime_times()
 
 int bedtime_selected(const PtState& pt, const std::vector<int>& times)
 {
+    return bedtime_selected_days(pt, ALL_DAYS, times);
+}
+
+int bedtime_selected_days(const PtState& pt, uint8_t days, const std::vector<int>& times)
+{
     PtBedtime now;
-    if (bedtime_uniform(pt, &now) && now.on) return index_of(times, now.hour * 60 + now.minute, 0);
-    if (!bedtime_uniform(pt, nullptr)) return index_of(times, 21 * 60, 0);   // days differ: start on 21:00
+    if (bedtime_shared(pt, days, &now) && now.on) return index_of(times, now.hour * 60 + now.minute, 0);
+    if (!bedtime_shared(pt, days, nullptr)) return index_of(times, 21 * 60, 0);   // days differ: start on 21:00
     return 0;
 }
 

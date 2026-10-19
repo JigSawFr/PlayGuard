@@ -14,6 +14,7 @@
 #include <borealis.hpp>
 #include <cstdint>
 #include <functional>
+#include <string>
 
 #include "view/cadran_digits.hpp"
 #include "view/cadran_icon.hpp"
@@ -29,6 +30,9 @@ class CadranWeekView : public brls::Box
     // The time played on each weekday's last occurrence (today's included),
     // in minutes, drawn inside its bar against its limit; `ok` false: none.
     void show_played(const uint32_t minutes[7], bool ok);
+    // Each day's bedtime alarm, under its name ("21:00", "—"), when the days
+    // differ; all empty: none shown, and the week is as tall as before.
+    void show_bedtimes(const std::string texts[7]);
     void set_on_change(std::function<void(int day, uint16_t minutes)> on_change);   // stick edits, Y
     void set_on_pick(std::function<void(int day)> on_pick);                         // X
     void set_on_copy(std::function<void(int day, bool weekend)> on_copy);           // L / R
@@ -56,6 +60,8 @@ class CadranWeekView : public brls::Box
         brls::Box*    fill  = nullptr;   // the time played, from the bar's foot
         brls::Label*  day   = nullptr;
         CadranIcon*   down  = nullptr;
+        brls::Box*    bed   = nullptr;   // the bedtime: a moon and the time
+        brls::Label*  bed_time = nullptr;
     };
     Col      cols[7];
     uint16_t days[7] = {};

@@ -198,7 +198,7 @@ void PlayTimerTab::refresh()
     PtBedtime same;
     if (pt_logic::bedtime_layout_ok(this->pt, wd)) {
         const bool uniform = pt_logic::bedtime_uniform(this->pt, &same);
-        ui::set_detail(bedtime, !uniform ? "playguard/play_timer/bedtime_varies"_i18n
+        ui::set_detail(bedtime, !uniform ? pt_flow::bedtime_days_text(this->pt)
                                 : same.on ? fmt::format("{:02d}:{:02d}", same.hour, same.minute)
                                           : "playguard/common/off"_i18n);
         ui::set_detail(bedtime_reset, uniform && same.on ? fmt::format("{:02d}:{:02d}", same.end_hour, same.end_minute)

@@ -295,7 +295,7 @@
         "bedtime_value_on": "{} (activada)",
         "bedtime_value_off": "{} (desactivada)",
         "bedtime_reset": "Se puede volver a jugar a las",
-        "bedtime_note": "Se aplica a todos los días. A la hora de dormir, la consola muestra la alarma, y puede que también suspenda el programa (ver “Cuando se acabe el tiempo”), hasta que se pueda volver a jugar. PlayGuard verifica que la consola indique la nueva hora y, si no, restablece la configuración anterior.",
+        "bedtime_note": "Todos los días, o por día de la semana. A la hora de dormir, la consola muestra la alarma, y puede que también suspenda el programa (ver “Cuando se acabe el tiempo”), hasta que se pueda volver a jugar. PlayGuard verifica que la consola indique la nueva hora y, si no, restablece la configuración anterior.",
         "bedtime_title": "Alarma de hora de dormir, todos los días",
         "bedtime_end_title": "Se puede volver a jugar a las (todos los días)",
         "bedtime_summary": "{}, se puede volver a jugar a las {}",
@@ -372,7 +372,14 @@
         "not_counting": "La consola no está contando el tiempo de juego en este momento. Causas probables: el reloj se atrasó (volverá a contar más tarde), el reloj de red nunca se ajustó (Consola › Reloj de red) o se acaba de escribir un límite (inicia un juego un minuto y vuelve a revisar).",
         "limit_note": "Al llegar al límite, la consola muestra “Se acabó el tiempo” y luego suspende el juego o solo avisa, según “Cuando se acabe el tiempo”.",
         "unsaved": "Se puede perder el progreso no guardado: deja que el niño guarde antes.",
-        "profile_already": "El perfil «{}» ya está aplicado."
+        "profile_already": "El perfil «{}» ya está aplicado.",
+        "bedtime_by_day": "Por día de la semana...",
+        "bedtime_by_day_title": "Alarma de hora de dormir, por día",
+        "bedtime_weekdays": "De lunes a viernes",
+        "bedtime_weekend": "Sábado y domingo",
+        "bedtime_days_title": "Alarma de hora de dormir: {}",
+        "bedtime_days_confirm": "{}: ¿poner la alarma de hora de dormir a las {}?\n\nSe puede volver a jugar a las {}.",
+        "bedtime_days_confirm_off": "{}: ¿desactivar la alarma de hora de dormir?"
     },
     "activity": {
         "section_totals": "Tiempo de juego",

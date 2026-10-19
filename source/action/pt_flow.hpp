@@ -125,9 +125,10 @@ void choose_time_up(const PtState& pt, std::function<void()> refresh);
 // Writes the choice and records it in the history ("time_up") with `source`.
 Result write_alarm_only(bool alarm_only, const std::string& source);
 
-// Bedtime, for every day. choose_bedtime: the alarm (16:00 to 23:45, or
-// off); choose_bedtime_end: when play is allowed again (05:00 to 09:00), on
-// the days whose alarm is on. Both refuse while the block's bedtime is not
+// Bedtime. choose_bedtime: the alarm (16:00 to 23:45, or off) for every
+// day, or by day of the week (Monday to Friday, the weekend, or one day, the
+// others keeping theirs); choose_bedtime_end: when play is allowed again
+// (05:00 to 09:00), on the days whose alarm is on. Both refuse while the block's bedtime is not
 // what the console reports (pt_logic::bedtime_layout_ok), then go through
 // confirm_write and write_bedtime.
 void choose_bedtime(const PtState& pt, std::function<void()> refresh);
@@ -135,8 +136,11 @@ void choose_bedtime_end(const PtState& pt, std::function<void()> refresh);
 // Writes the bedtimes (pctl_play_timer_set_bedtime, checked by the console's
 // answer) and records the change in the history with `source`.
 Result write_bedtime(const PtBedtime bed[7], const std::string& source);
-// "21:00, allowed again at 06:00", "Off", or "Varies by day".
+// "21:00, allowed again at 06:00", "Off", or the days' (bedtime_days_text).
 std::string bedtime_text(const PtState& pt);
+// The days' alarms when they differ: "Mon–Fri 21:30, Sat–Sun 22:30" (up to
+// three runs of days), else "Varies by day".
+std::string bedtime_days_text(const PtState& pt);
 
 // At start-up, before the first screen (and again on the main screen): an
 // earlier run unlocked (for a change, or PIN › Unlock temporarily) and

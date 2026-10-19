@@ -295,7 +295,7 @@
         "bedtime_value_on": "{} (activée)",
         "bedtime_value_off": "{} (désactivée)",
         "bedtime_reset": "Jeu de nouveau permis à",
-        "bedtime_note": "S'applique à tous les jours. À l'heure du coucher, la console affiche l'alarme, et peut aussi suspendre le logiciel (voir « Quand le temps est écoulé »), jusqu'à ce que le jeu soit de nouveau permis. PlayGuard vérifie que la console indique la nouvelle heure, et remet les réglages précédents sinon.",
+        "bedtime_note": "Tous les jours, ou par jour de la semaine. À l'heure du coucher, la console affiche l'alarme, et peut aussi suspendre le logiciel (voir « Quand le temps est écoulé »), jusqu'à ce que le jeu soit de nouveau permis. PlayGuard vérifie que la console indique la nouvelle heure, et remet les réglages précédents sinon.",
         "bedtime_title": "Alarme du coucher, tous les jours",
         "bedtime_end_title": "Jeu de nouveau permis à (tous les jours)",
         "bedtime_summary": "{}, jeu de nouveau permis à {}",
@@ -372,7 +372,14 @@
         "not_counting": "La console ne décompte pas le temps de jeu en ce moment. Causes probables : l'horloge a été reculée (le décompte reprendra plus tard), l'horloge réseau n'a jamais été réglée (Console › Horloge réseau), ou une limite vient d'être écrite (lancez un jeu une minute, puis vérifiez).",
         "limit_note": "À la limite, la console affiche « temps écoulé », puis suspend le jeu ou se contente d'avertir, selon « Quand le temps est écoulé ».",
         "unsaved": "La progression non sauvegardée peut être perdue : laissez l'enfant sauvegarder d'abord.",
-        "profile_already": "Le profil « {} » est déjà appliqué."
+        "profile_already": "Le profil « {} » est déjà appliqué.",
+        "bedtime_by_day": "Par jour de la semaine...",
+        "bedtime_by_day_title": "Alarme du coucher, par jour",
+        "bedtime_weekdays": "Du lundi au vendredi",
+        "bedtime_weekend": "Samedi et dimanche",
+        "bedtime_days_title": "Alarme du coucher : {}",
+        "bedtime_days_confirm": "{} : régler l'alarme du coucher à {} ?\n\nLe jeu est de nouveau permis à {}.",
+        "bedtime_days_confirm_off": "{} : désactiver l'alarme du coucher ?"
     },
     "activity": {
         "section_totals": "Temps de jeu",

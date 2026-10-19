@@ -295,7 +295,7 @@
         "bedtime_value_on": "{}（开启）",
         "bedtime_value_off": "{}（关闭）",
         "bedtime_reset": "可再次游玩的时间",
-        "bedtime_note": "适用于每一天。到就寝时间时，主机会显示提醒，也可能中断软件（见“时间到时”），直到可以再次游玩。PlayGuard 会检查主机是否报告新的时间，否则会恢复之前的设置。",
+        "bedtime_note": "适用于每一天，或按星期设置。到就寝时间时，主机会显示提醒，也可能中断软件（见“时间到时”），直到可以再次游玩。PlayGuard 会检查主机是否报告新的时间，否则会恢复之前的设置。",
         "bedtime_title": "就寝提醒（每天）",
         "bedtime_end_title": "可再次游玩的时间（每天）",
         "bedtime_summary": "{}，{} 起可再次游玩",
@@ -372,7 +372,14 @@
         "not_counting": "主机目前没有计算游戏时间。可能的原因：时钟被调回（之后会重新计时）、网络时钟从未设置（“主机 › 网络时钟”），或刚刚写入了限制（启动一个游戏玩一分钟后再查看）。",
         "limit_note": "达到限制时，主机会显示“时间到”，然后按照“时间到时”的设置中断游戏或仅提醒。",
         "unsaved": "未保存的进度可能会丢失：请先让孩子存档。",
-        "profile_already": "配置“{}”已经应用。"
+        "profile_already": "配置“{}”已经应用。",
+        "bedtime_by_day": "按星期设置…",
+        "bedtime_by_day_title": "就寝提醒（按星期）",
+        "bedtime_weekdays": "周一至周五",
+        "bedtime_weekend": "周六和周日",
+        "bedtime_days_title": "就寝提醒：{}",
+        "bedtime_days_confirm": "{}：将就寝提醒设为 {}？\n\n{} 起可再次游玩。",
+        "bedtime_days_confirm_off": "{}：关闭就寝提醒？"
     },
     "activity": {
         "section_totals": "游戏时间",

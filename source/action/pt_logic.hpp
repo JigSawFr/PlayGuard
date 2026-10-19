@@ -128,6 +128,21 @@ bool bedtime_uniform(const PtState& pt, PtBedtime* out);
 // allowed-again time when it is in range (05:00 to 09:00), else gets 06:00,
 // the companion app's default.
 void bedtime_every_day(const PtState& pt, bool on, uint8_t hour, uint8_t minute, PtBedtime out[7]);
+// The same for the days of `days` only (bit n: weekday n, 0 = Sunday); the
+// other days keep theirs.
+constexpr uint8_t ALL_DAYS = 0x7F, WEEKDAYS = 0x3E, WEEKEND = 0x41;
+void bedtime_days(const PtState& pt, uint8_t days, bool on, uint8_t hour, uint8_t minute, PtBedtime out[7]);
+// The bedtime the days of `days` share (false when they differ, or nothing was read).
+bool bedtime_shared(const PtState& pt, uint8_t days, PtBedtime* out);
+// The week's alarms as runs of days in a row, Monday first, with the same
+// alarm (on, hour, minute; the allowed-again time aside): Monday to Friday at
+// 21:30 and the weekend at 22:30 are two. Days as 0 = Sunday.
+struct BedRun
+{
+    int       first, last;
+    PtBedtime bed;
+};
+std::vector<BedRun> bedtime_runs(const PtState& pt);
 
 // Play allowed again at hour:minute on every day whose bedtime is on. False
 // (out untouched) when none is.
@@ -164,6 +179,8 @@ uint16_t limit_seed(uint16_t current);
 // when every day has the same, 21:00 when the days differ, else off).
 std::vector<int> bedtime_times();
 int bedtime_selected(const PtState& pt, const std::vector<int>& times);
+// The same for the days of `days`.
+int bedtime_selected_days(const PtState& pt, uint8_t days, const std::vector<int>& times);
 // The same for the allowed-again time: 05:00 to 09:00, 06:00 unless every day
 // has the same one in the list.
 std::vector<int> bedtime_end_times();

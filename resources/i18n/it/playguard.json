@@ -295,7 +295,7 @@
         "bedtime_value_on": "{} (attivato)",
         "bedtime_value_off": "{} (disattivato)",
         "bedtime_reset": "Si può giocare di nuovo dalle",
-        "bedtime_note": "Vale per ogni giorno. All'ora di andare a letto la console mostra l'avviso, e potrebbe anche sospendere il software (vedi \"Quando il tempo è scaduto\"), finché non si può giocare di nuovo. PlayGuard verifica che la console indichi il nuovo orario e, in caso contrario, ripristina le impostazioni precedenti.",
+        "bedtime_note": "Ogni giorno, o per giorno della settimana. All'ora di andare a letto la console mostra l'avviso, e potrebbe anche sospendere il software (vedi \"Quando il tempo è scaduto\"), finché non si può giocare di nuovo. PlayGuard verifica che la console indichi il nuovo orario e, in caso contrario, ripristina le impostazioni precedenti.",
         "bedtime_title": "Sogni d'oro, ogni giorno",
         "bedtime_end_title": "Si può giocare di nuovo dalle (ogni giorno)",
         "bedtime_summary": "{}, si può giocare di nuovo dalle {}",
@@ -372,7 +372,14 @@
         "not_counting": "La console non sta conteggiando il tempo di gioco in questo momento. Cause probabili: l'orologio è stato portato indietro (riprenderà a contare più tardi), l'orologio di rete non è mai stato impostato (Console › Orologio di rete), oppure è appena stato scritto un limite (avvia un gioco per un minuto, poi controlla).",
         "limit_note": "Al limite la console mostra \"Tempo scaduto\", poi sospende il gioco o si limita ad avvisare, secondo \"Quando il tempo è scaduto\".",
         "unsaved": "I progressi non salvati potrebbero andare persi: lascia prima salvare il bambino.",
-        "profile_already": "Il profilo «{}» è già applicato."
+        "profile_already": "Il profilo «{}» è già applicato.",
+        "bedtime_by_day": "Per giorno della settimana...",
+        "bedtime_by_day_title": "Sogni d'oro, per giorno",
+        "bedtime_weekdays": "Da lunedì a venerdì",
+        "bedtime_weekend": "Sabato e domenica",
+        "bedtime_days_title": "Sogni d'oro: {}",
+        "bedtime_days_confirm": "{}: impostare Sogni d'oro alle {}?\n\nSi può giocare di nuovo dalle {}.",
+        "bedtime_days_confirm_off": "{}: disattivare Sogni d'oro?"
     },
     "activity": {
         "section_totals": "Tempo di gioco",

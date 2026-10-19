@@ -11,7 +11,11 @@ using namespace brls::literals;
 namespace
 {
 constexpr float COL_HEIGHT = 262.0f;
-constexpr float BAR_MAX    = 170.0f;
+constexpr float BED_HEIGHT = 24.0f;   // the bedtimes' line, when shown
+// The tallest bar still leaves room in its column (262 less its padding, 18,
+// the arrows, 52, the value, 31, the day's name, 16, and 8 under the bar):
+// taller, the day's name was squeezed to nothing.
+constexpr float BAR_MAX    = 136.0f;
 constexpr float BAR_MIN    = 6.0f;
 constexpr int   STEP       = 15;
 }   // namespace
@@ -113,6 +117,24 @@ CadranWeekView::CadranWeekView()
         c.down->setColor(theme["cadran/teal"]);
         c.down->setMarginTop(4);
         c.box->addView(c.down);
+        c.bed = new brls::Box(brls::Axis::ROW);
+        c.bed->setAlignItems(brls::AlignItems::CENTER);
+        c.bed->setHeight(BED_HEIGHT - 4);
+        c.bed->setMarginTop(4);
+        c.bed->setVisibility(brls::Visibility::GONE);
+        CadranIcon* moon = new CadranIcon();
+        moon->setIcon("moon");
+        moon->setWidth(13);
+        moon->setHeight(13);
+        moon->setColor(theme["cadran/text3"]);
+        moon->setMarginRight(4);
+        c.bed->addView(moon);
+        c.bed_time = new brls::Label();
+        c.bed_time->setFontSize(14);
+        c.bed_time->setSingleLine(true);
+        c.bed_time->setTextColor(theme["cadran/text2"]);
+        c.bed->addView(c.bed_time);
+        c.box->addView(c.bed);
 
         // A starts and ends the edit; editing, the stick and the shoulders
         // edit the day (their hints are on the screen, under the week), and
@@ -243,6 +265,20 @@ void CadranWeekView::show_played(const uint32_t minutes[7], bool ok)
     for (int d = 0; d < 7; d++) this->played[d] = ok ? minutes[d] : 0;
     this->played_ok = ok;
     this->render();
+}
+
+void CadranWeekView::show_bedtimes(const std::string texts[7])
+{
+    bool any = false;
+    for (int d = 0; d < 7; d++) any = any || !texts[d].empty();
+    const float height = COL_HEIGHT + (any ? BED_HEIGHT : 0);
+    this->setHeight(height);
+    for (int d = 0; d < 7; d++) {
+        Col& c = this->cols[d];
+        c.box->setHeight(height);
+        c.bed_time->setText(texts[d]);
+        c.bed->setVisibility(any ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    }
 }
 
 void CadranWeekView::set_on_change(std::function<void(int, uint16_t)> f) { this->on_change = std::move(f); }

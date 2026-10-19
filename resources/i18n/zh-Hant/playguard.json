@@ -295,7 +295,7 @@
         "bedtime_value_on": "{}（開啟）",
         "bedtime_value_off": "{}（關閉）",
         "bedtime_reset": "可再次遊玩的時間",
-        "bedtime_note": "適用於每一天。到就寢時間時，主機會顯示鬧鐘，也可能中斷軟體（見「時間到時」），直到可以再次遊玩。PlayGuard 會檢查主機是否回報新的時間，否則會還原先前的設定。",
+        "bedtime_note": "適用於每一天，或依星期設定。到就寢時間時，主機會顯示鬧鐘，也可能中斷軟體（見「時間到時」），直到可以再次遊玩。PlayGuard 會檢查主機是否回報新的時間，否則會還原先前的設定。",
         "bedtime_title": "就寢鬧鐘（每天）",
         "bedtime_end_title": "可再次遊玩的時間（每天）",
         "bedtime_summary": "{}，{} 起可再次遊玩",
@@ -372,7 +372,14 @@
         "not_counting": "主機目前沒有計算遊玩時間。可能的原因：時鐘被調回（之後會重新計時）、網路時鐘從未設定（「主機 › 網路時鐘」），或剛寫入上限（啟動遊戲玩一分鐘後再查看）。",
         "limit_note": "達到上限時，主機會顯示「時間到」，然後依照「時間到時」的設定中斷遊戲或僅提醒。",
         "unsaved": "未儲存的進度可能會遺失：請先讓孩子存檔。",
-        "profile_already": "設定檔「{}」已經套用。"
+        "profile_already": "設定檔「{}」已經套用。",
+        "bedtime_by_day": "依星期設定…",
+        "bedtime_by_day_title": "就寢鬧鐘（依星期）",
+        "bedtime_weekdays": "週一至週五",
+        "bedtime_weekend": "週六和週日",
+        "bedtime_days_title": "就寢鬧鐘：{}",
+        "bedtime_days_confirm": "{}：將就寢鬧鐘設為 {}？\n\n{} 起可再次遊玩。",
+        "bedtime_days_confirm_off": "{}：關閉就寢鬧鐘？"
     },
     "activity": {
         "section_totals": "遊玩時間",
