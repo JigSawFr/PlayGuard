@@ -70,15 +70,11 @@ pages; no framework, nothing to install but that.
   `<out-dir>/<language>/<screen>.webp`, on the desktop smoke test's console
   (8 October 2026, 16:00 UTC; the focus without its glow). `SITE_SCREENSHOTS=<out-dir>`
   tells `build_site.py` to use them, on the home page and in the
-  documentation. Taking them takes about half an hour per theme on a CI
-  runner, so CI takes them only when what they show changed since the last
-  build (a pull request's base, or the commit main was at before the push):
-  the app, its resources, the simulator, the version (so each release, the
-  merge of release-please's pull request, takes them all). Otherwise it downloads
-  main's published ones (`SITE_SCREENSHOTS_FROM=<site>`), in seconds. A pull
-  request that changes the screens takes the light theme's and main's dark
-  ones (`SITE_SCREENSHOT_THEMES=light`, then `dark` from main); main, both.
-  *Actions › web › Run workflow* with `all` takes everything again. A new screen in the gallery is a name in both files: its
+  documentation. Taking them takes about an hour on a CI runner (both
+  themes), so CI takes them for a release (main, its version changed: the
+  header's badge) and by hand (*Actions › web › Run workflow*, `all`); any
+  other build takes main's (its `site` artifact). A change to the screenshots'
+  script, or to a screen between releases, shows once taken by hand. A new screen in the gallery is a name in both files: its
   tab, and the keys that lead to it from there.
 - **The preview images**: `tools/site_social.mjs <out-dir>` (Node and
   Playwright) writes `<out-dir>/<language>/social.png` (1280×640) from the
@@ -88,9 +84,8 @@ pages; no framework, nothing to install but that.
   Playwright and ffmpeg) renders `branding/tour.html` with the language's
   texts (its catalog) over its screenshots, `<out-dir>/<language>/tour.mp4`
   (1280×720), the home page's video in that language; English keeps
-  `images/video/playguard-tour.mp4`. A few minutes each: main renders them
-  when the screenshots are taken or the tour's page, its script or the
-  site's texts change, else keeps the published ones; a pull request takes main's.
+  `images/video/playguard-tour.mp4`. A few minutes each: rendered with the
+  screenshots (a release, or by hand), else main's.
 - **The site's address**: `SITE_URL` (`https://jigsawfr.github.io/PlayGuard/`
   by default). CI asks GitHub Pages for it (its custom domain, when it has
   one) and adds a preview's folder; `SITE_BASE` is its path, for 404.html;
@@ -111,9 +106,14 @@ then `SITE_SCREENSHOTS=/tmp/shots python3 tools/build_site.py /tmp/site`.
 
 ## Publishing
 
-`.github/workflows/web.yml` builds the simulator, takes the screenshots with
-it (or main's, above), then builds the site with the simulator in it for main and for each pull
-request (the `site` artifact, kept 30 days), which checks that it builds. `.github/workflows/pages.yml` publishes them, with GitHub
+`.github/workflows/web.yml` builds the site with the simulator in it for main
+and for each pull request (the `site` artifact, kept 30 days), which checks
+that it builds. It starts from main's last site and makes only what changed
+since the commit that one was built from: the simulator (and its smoke test,
+about ten minutes) when the app, its resources, the simulator or the workflow
+changed; the screenshots and tours for a release or by hand (above); the
+website itself, every time, in seconds. A change to the docs or the site
+takes a few minutes. main's builds run one at a time, each from the last. `.github/workflows/pages.yml` publishes them, with GitHub
 Actions as the source of GitHub Pages: main's at the root, each open pull
 request's in `pr-<number>/` (not a fork's: its pages would be served from this
 site), then edits the pull request's comment with the links. It runs where
