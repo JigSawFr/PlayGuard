@@ -1,13 +1,16 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "activity/play_timer_perday_activity.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cstring>
 #include <fmt/format.h>
 #include <vector>
 
 #include "action/pt_flow.hpp"
+#include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
+#include "view/cadran_week.hpp"
 
 using namespace brls::literals;
 
@@ -129,6 +132,7 @@ void PlayTimerPerDayActivity::onContentAvailable()
     unavailable->setSingleLine(false);
     this->bind_cells();
     this->bind_buttons();
+    if (cadran::enabled()) this->dress_cadran();
 
     if (this->profile_mode) {
         // The console's state is not what this screen edits: no header.
@@ -141,7 +145,8 @@ void PlayTimerPerDayActivity::onContentAvailable()
     // Opened for one day, or for the week / weekend split: that picker first
     // (once the screen is up), the edit staged like any other.
     if (this->start_day >= 0) {
-        week->focus_day(this->start_day);
+        if (this->cadran_week) this->cadran_week->focus_day(this->start_day);
+        else week->focus_day(this->start_day);
         const int d = this->start_day;
         brls::sync([this, d]() { this->edit_day(d); });
     } else if (this->start_split) {
@@ -151,6 +156,52 @@ void PlayTimerPerDayActivity::onContentAvailable()
             });
         });
     }
+}
+
+// The Cadran look: the week edited in place as on the Play timer (the stick,
+// L, R, Y; X opens the day's picker), the quick fills as tiles, the rest in a
+// card; the timer's state keeps its warnings only.
+void PlayTimerPerDayActivity::dress_cadran()
+{
+    brls::View* chart = week.getView();
+    brls::Box* column = chart->getParent();
+    this->cadran_card = brls::View::createFromXMLResource("view/cadran_week_card.xml");
+    const auto& lines = column->getChildren();
+    const size_t at = std::find(lines.begin(), lines.end(), chart) - lines.begin();
+    // Its section's "A on a day changes it": the keys under the week say it now.
+    if (auto* header = at > 0 ? dynamic_cast<brls::Header*>(lines[at - 1]) : nullptr)
+        header->setTitle("playguard/play_timer/week_title"_i18n);
+    column->addView(this->cadran_card, at);
+    chart->setVisibility(brls::Visibility::GONE);
+    if (brls::View* summary = state_header->getView("pt_summary")) summary->setVisibility(brls::Visibility::GONE);
+
+    auto* w = dynamic_cast<CadranWeekView*>(this->cadran_card->getView("cpt_week"));
+    brls::View* keys_idle = this->cadran_card->getView("cpt_keys_idle");
+    brls::View* keys_edit = this->cadran_card->getView("cpt_keys_edit");
+    this->cadran_week = w;
+    w->set_can_edit([this]() {
+        if (this->live.valid) return true;
+        ui::notify("playguard/play_timer/perday/unavailable"_i18n);
+        return false;
+    });
+    w->set_on_change([this](int day, uint16_t minutes) {
+        this->pending[day] = minutes;
+        this->rerender();
+    });
+    w->set_on_pick([this](int day) { this->edit_day(day); });
+    w->set_on_copy([this](int day, bool weekend) {
+        for (int d = 0; d < 7; d++)
+            if ((d == 0 || d == 6) == weekend) this->pending[d] = this->pending[day];
+        this->rerender();
+    });
+    w->set_on_mode([keys_idle, keys_edit](bool editing) {
+        keys_idle->setVisibility(editing ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
+        keys_edit->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    });
+
+    cadran::List list(this->getContentView(), true);
+    list.tiles({ { "pt_weekdays", "calendar" }, { "pt_weekend", "moon" }, { "pt_copy_today", "today" } }, false);
+    list.apply({ { "pt_revert", "restore" }, { "pt_save", "save" } });
 }
 
 void PlayTimerPerDayActivity::reload_from_service()
@@ -173,8 +224,13 @@ void PlayTimerPerDayActivity::rerender()
 {
     if (!this->profile_mode) state_header->show(this->live);
     ui::set_visible(unavailable.getView(), !this->live.valid);
-    ui::set_visible(week.getView(), this->live.valid);
-    if (this->live.valid) week->show(this->pending, this->live.day_min);
+    if (this->cadran_week) {
+        ui::set_visible(this->cadran_card, this->live.valid);
+        if (this->live.valid) this->cadran_week->show(this->pending, this->live.day_min);
+    } else {
+        ui::set_visible(week.getView(), this->live.valid);
+        if (this->live.valid) week->show(this->pending, this->live.day_min);
+    }
     int unsaved = 0;
     for (int d = 0; d < 7 && this->live.valid; d++) unsaved += this->pending[d] != this->live.day_min[d];
     pt_save->setDetailText(unsaved ? brls::getStr("playguard/play_timer/perday/unsaved_count", unsaved) : "");

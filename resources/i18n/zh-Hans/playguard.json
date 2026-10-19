@@ -1556,7 +1556,9 @@
             "counted_pill": "在游戏上打开 · 计入计时器",
             "no_play": "不可游玩",
             "head_no_play": "今天不可游玩",
-            "head_unlocked_no_play": "今天不可游玩，已暂停"
+            "head_unlocked_no_play": "今天不可游玩，已暂停",
+            "limit_title": "更改{}的限制？",
+            "setup": "设置每周限制"
         },
         "pill": {
             "pc_on": "家长控制已开启",
@@ -1589,7 +1591,9 @@
             "discard": "放弃",
             "remove": "删除限制",
             "save_title": "保存本周的限制？",
-            "played_key": "最近7天的游玩"
+            "played_key": "最近7天的游玩",
+            "played_day": "{}：已玩 {} / {}",
+            "played_day_free": "{}：已玩 {}（不限）"
         },
         "tabs": {
             "today": "今天"
@@ -1638,7 +1642,8 @@
             "enjoy": "玩得开心！",
             "of": "共 {}",
             "back": "返回家长 · PIN",
-            "play": "交出主机去玩"
+            "play": "交出主机去玩",
+            "on_hold": "限制已暂停"
         },
         "dialog": {
             "unlock_short": "修改期间使用已保存的PIN码暂时解除家长控制，随后立即恢复。"

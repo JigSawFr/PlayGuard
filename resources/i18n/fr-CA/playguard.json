@@ -1556,7 +1556,9 @@
             "counted_pill": "Ouvert par-dessus un jeu · compte dans le minuteur",
             "no_play": "Pas de jeu",
             "head_no_play": "Pas de jeu aujourd'hui",
-            "head_unlocked_no_play": "Pas de jeu aujourd'hui, en pause"
+            "head_unlocked_no_play": "Pas de jeu aujourd'hui, en pause",
+            "limit_title": "Changer la limite du {} ?",
+            "setup": "Définir les limites de la semaine"
         },
         "pill": {
             "pc_on": "Contrôle parental actif",
@@ -1589,7 +1591,9 @@
             "discard": "Annuler",
             "remove": "Supprimer la limite",
             "save_title": "Enregistrer les limites de la semaine ?",
-            "played_key": "joué ces 7 derniers jours"
+            "played_key": "joué ces 7 derniers jours",
+            "played_day": "{} : {} joué sur {}",
+            "played_day_free": "{} : {} joué, sans limite"
         },
         "tabs": {
             "today": "Aujourd'hui"
@@ -1638,7 +1642,8 @@
             "enjoy": "Bonne partie !",
             "of": "sur {}",
             "back": "Retour parent · code PIN",
-            "play": "Rendre la console et jouer"
+            "play": "Rendre la console et jouer",
+            "on_hold": "limite en pause"
         },
         "dialog": {
             "unlock_short": "Le contrôle parental est déverrouillé avec le code PIN enregistré le temps de la modification, puis reverrouillé."

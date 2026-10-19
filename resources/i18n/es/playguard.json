@@ -1556,7 +1556,9 @@
             "counted_pill": "Abierto sobre un juego · cuenta en el temporizador",
             "no_play": "Sin jugar",
             "head_no_play": "Hoy, sin jugar",
-            "head_unlocked_no_play": "Hoy sin jugar, en pausa"
+            "head_unlocked_no_play": "Hoy sin jugar, en pausa",
+            "limit_title": "¿Cambiar el límite del {}?",
+            "setup": "Definir los límites de la semana"
         },
         "pill": {
             "pc_on": "Control parental activo",
@@ -1589,7 +1591,9 @@
             "discard": "Descartar",
             "remove": "Quitar el límite",
             "save_title": "¿Guardar los límites de la semana?",
-            "played_key": "jugado, últimos 7 días"
+            "played_key": "jugado, últimos 7 días",
+            "played_day": "{}: {} jugado de {}",
+            "played_day_free": "{}: {} jugado, sin límite"
         },
         "tabs": {
             "today": "Hoy"
@@ -1638,7 +1642,8 @@
             "enjoy": "¡Que te diviertas!",
             "of": "de {}",
             "back": "Volver al adulto · PIN",
-            "play": "Entregar la consola y jugar"
+            "play": "Entregar la consola y jugar",
+            "on_hold": "límite en pausa"
         },
         "dialog": {
             "unlock_short": "El control parental se desbloquea con el PIN guardado durante el cambio y luego se vuelve a bloquear."

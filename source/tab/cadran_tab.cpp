@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "tab/cadran_tab.hpp"
 
+#include <array>
 #include <cctype>
 #include <algorithm>
 #include <yoga/Yoga.h>
@@ -13,6 +14,7 @@
 #include "action/nintendo_dns.hpp"
 #include "action/pairing_state.hpp"
 #include "activity/cadran_child_activity.hpp"
+#include "activity/main_activity.hpp"
 #include "action/pt_flow.hpp"
 #include "app.hpp"
 #include "action/pt_logic.hpp"
@@ -537,6 +539,16 @@ CadranTab::CadranTab()
     lock->setMarginRight(10);
     relock->addView(lock, 0);
     relock->setAlignItems(brls::AlignItems::CENTER);
+    CadranIcon* week = kit::icon("timer", 20, "cadran/navy");
+    week->setMarginRight(10);
+    setup->addView(week, 0);
+    setup->setAlignItems(brls::AlignItems::CENTER);
+    // No limit yet: the Play timer, on its week, where the days are set.
+    setup->registerClickAction([](brls::View* view) {
+        if (MainActivity* main = ui::main_activity()) main->open_tab(ui::tab::play_timer, "cpt_week");
+        else ui::go_to_tab(view, ui::tab::play_timer);
+        return true;
+    });
     CadranIcon* timer = kit::icon("timer", 18, "cadran/text2");
     timer->setMarginRight(10);
     limit->addView(timer, 0);
@@ -574,7 +586,7 @@ CadranTab::CadranTab()
         return true;
     });
     limit->registerClickAction([this](brls::View*) {
-        kit::press(this->getView("dash_today_limit"));
+        this->choose_today_limit();
         return true;
     });
     extra->registerClickAction([this](brls::View*) {
@@ -662,6 +674,10 @@ void CadranTab::show_ring(bool unlocked)
         }
     }
     ring->setFraction(frac);
+    // Today's extra time, the end of today's limit.
+    const uint16_t limit = pt.valid ? pt.day_min[today] : PT_DAY_NOLIMIT;
+    const int extra = pt.valid ? pt_flow::extra_today_minutes(pt) : 0;
+    ring->setExtra(!unlocked && extra > 0 && limit != PT_DAY_NOLIMIT && limit > 0 ? (float)extra / (float)limit : 0.0f);
     ring->setValue(left);
     ring->setCaption(caption);
 }
@@ -714,6 +730,31 @@ void CadranTab::show_next(bool unlocked)
         this->next_icon->setIcon(glyph);
     }
     ui::set_visible(this->next, !text.empty());
+}
+
+void CadranTab::choose_today_limit()
+{
+    // Not writable (read-only, an unknown state): the Overview's line says
+    // why, or goes to the Play timer.
+    if (app::read_only() || !this->pt.fw_supported || !this->pt.valid) {
+        cadran::kit::press(this->getView("dash_today_limit"));
+        return;
+    }
+    // Right here, without the per-day editor: the day's picker, then the one
+    // confirmation the week's save asks (the day before → after).
+    const int today = ui::today_weekday();
+    std::array<uint16_t, 7> days;
+    for (int d = 0; d < 7; d++) days[d] = this->pt.day_min[d];
+    pt_flow::pick_limit(brls::getStr("playguard/play_timer/perday/pick_title", ui::day_name(today)), days[today],
+                        [this, today, days](uint16_t v) mutable {
+        if (v == days[today]) return;
+        days[today] = v;
+        pt_flow::confirm_write("", "playguard/play_timer/confirm_set"_i18n, [this, days](bool did_unlock) {
+            Result rc = pt_flow::write_days(days.data(), "per_day");
+            pt_flow::finish_write(rc, did_unlock, "playguard/play_timer/written_days"_i18n,
+                                  "playguard/play_timer/write_err"_i18n, [this]() { this->refresh(); });
+        }, days.data(), false, brls::getStr("playguard/cadran/today/limit_title", ui::day_name_in_text(today)));
+    });
 }
 
 void CadranTab::build_outside_card(brls::Box* column, int at)
@@ -972,7 +1013,9 @@ void CadranTab::show_pills()
         else if (p.line == std::string("dash_serial")) ok = "playguard/cadran/today/serial_hidden"_i18n;
         const std::string text = shown ? cell->title->getFullText() + " · " + kit::without_chevron(cell->detail->getFullText()) : ok;
         ui::set_text(p.text, text);
-        p.dot->setColor(theme[shown ? kit::dot_of(cell->detail->getTextColor()) : "cadran/teal_fill"]);
+        const std::string dot = shown ? kit::dot_of(cell->detail->getTextColor()) : "cadran/teal_fill";
+        p.dot->setColor(theme[dot]);
+        p.rank = dot == "cadran/teal_fill" ? 1 : dot == "cadran/text3" ? 2 : 0;
         ui::set_visible(p.box, !text.empty());
     }
     const bool sync = nintendo_dns::pctl_blocked(), time = nintendo_dns::time_blocked();
@@ -984,9 +1027,32 @@ void CadranTab::show_pills()
                                           : time       ? "playguard/cadran/today/dns_time"_i18n
                                                        : "playguard/cadran/today/dns_open"_i18n);
         if (this->dns_pill.dot) this->dns_pill.dot->setColor(theme[sync || time ? "cadran/teal_fill" : "cadran/text3"]);
+        this->dns_pill.rank = sync || time ? 1 : 2;
     }
+    this->counted_pill.rank = 0;
     brls::View* counted = this->getView("dash_counted");
     ui::set_visible(this->counted_pill.box, counted && counted->getVisibility() == brls::Visibility::VISIBLE);
+    this->order_pills();
+}
+
+void CadranTab::order_pills()
+{
+    // What needs the parent first (amber, coral), then what is fine (teal),
+    // then what is only said (grey); in their usual order within each.
+    std::vector<Pill*> all;
+    for (Pill& p : this->pill_slots) all.push_back(&p);
+    all.insert(all.begin() + std::min<size_t>(3, all.size()), &this->dns_pill);   // after the serial number's
+    all.push_back(&this->counted_pill);
+    std::stable_sort(all.begin(), all.end(), [](const Pill* a, const Pill* b) { return a->rank < b->rank; });
+    std::vector<brls::View*> wanted;
+    for (const Pill* p : all)
+        if (p->box) wanted.push_back(p->box);
+    if (wanted == pills->getChildren()) return;
+    // Not under the focus: moved, a focused pill would lose it.
+    for (brls::View* v : wanted)
+        if (v->isFocused()) return;
+    for (brls::View* v : wanted) pills->removeView(v, false);
+    for (brls::View* v : wanted) pills->addView(v);
 }
 
 void CadranTab::refresh()
@@ -1021,6 +1087,8 @@ void CadranTab::refresh()
     cadran::kit::follow(stop.getView(), this->getView("dash_stop"));
     cadran::kit::follow(limit.getView(), this->getView("dash_today_limit"));
     ui::set_visible(relock.getView(), unlocked && !app::read_only());
+    ui::set_visible(setup.getView(), !unlocked && !app::read_only() && this->pt.fw_supported && this->pt.valid &&
+                                         !pt_configured(this->pt.block));
     this->show_low(unlocked);
     this->show_outside_card();
 }

@@ -1556,7 +1556,9 @@
             "counted_pill": "Über einem Spiel geöffnet · zählt zum Timer",
             "no_play": "Kein Spielen",
             "head_no_play": "Heute kein Spielen",
-            "head_unlocked_no_play": "Heute kein Spielen, ausgesetzt"
+            "head_unlocked_no_play": "Heute kein Spielen, ausgesetzt",
+            "limit_title": "Limit für {} ändern?",
+            "setup": "Limits der Woche festlegen"
         },
         "pill": {
             "pc_on": "Jugendschutz aktiv",
@@ -1589,7 +1591,9 @@
             "discard": "Verwerfen",
             "remove": "Limit entfernen",
             "save_title": "Die Limits der Woche speichern?",
-            "played_key": "gespielt, letzte 7 Tage"
+            "played_key": "gespielt, letzte 7 Tage",
+            "played_day": "{}: {} von {} gespielt",
+            "played_day_free": "{}: {} gespielt, ohne Limit"
         },
         "tabs": {
             "today": "Heute"
@@ -1638,7 +1642,8 @@
             "enjoy": "Viel Spaß!",
             "of": "von {}",
             "back": "Zurück zu den Eltern · PIN",
-            "play": "Konsole übergeben und spielen"
+            "play": "Konsole übergeben und spielen",
+            "on_hold": "Limit ausgesetzt"
         },
         "dialog": {
             "unlock_short": "Die Altersbeschränkungen werden für die Änderung mit der gespeicherten Geheimzahl aufgehoben und danach wieder aktiviert."

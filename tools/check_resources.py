@@ -319,7 +319,7 @@ for path, text in sorted(code_text.items()):
 # nearer; in the header or in its .cpp.
 xml_dir = f"{ROOT}/resources/xml"
 code_files = glob.glob(f"{ROOT}/source/**/*.[ch]pp", recursive=True)
-class_xml = {}      # class name -> XML path, relative to resources/xml
+class_xml = {}      # class name -> the XML paths it inflates, relative to resources/xml
 class_binds = {}    # class name -> (file, [ids])
 loaded_xml = set()
 OWNER = re.compile(r"^\s*class\s+(\w+)\b[^;]*$|^(?:[A-Za-z_][^\n;{}]*?[\s*&])?([A-Za-z_]\w*)::~?\w+\s*\(", re.M)
@@ -340,7 +340,7 @@ for stem in pairs:
         for m in re.finditer(r'(?:CONTENT_FROM_XML_RES|createFromXMLResource)\(\s*"([^"]+)"|(?:TabBase|inflateFromXMLRes)\(\s*"xml/([^"]+)"', text):
             name = owner_at(text, m.start())
             if name:
-                class_xml.setdefault(name, m.group(1) or m.group(2))
+                class_xml.setdefault(name, []).append(m.group(1) or m.group(2))
         for m in re.finditer(r'BRLS_BIND\([^;]*?,\s*\w+\s*,\s*"([^"]+)"\s*\)', text):
             name = owner_at(text, m.start())
             if name:
@@ -377,23 +377,27 @@ def ids_of(res, seen):
     ids, tags = xml_ids[res]
     out = set(ids)
     for tag in tags:
-        if tag in class_xml:
-            out |= ids_of(class_xml[tag], seen)
+        for inflated in class_xml.get(tag, []):
+            out |= ids_of(inflated, seen)
     return out
 
 
 for name, (path, binds) in sorted(class_binds.items()):
-    res = class_xml.get(name)
-    if res is None:
+    inflated = class_xml.get(name)
+    if not inflated:
         warnings.append(f"{path}: {name} binds views but no XML it inflates was found")
         continue
-    if res not in xml_ids:
+    missing = [res for res in inflated if res not in xml_ids]
+    for res in missing:
         errors.append(f"{path}: {name} inflates {res}, which is not in resources/xml")
+    if missing:
         continue
-    ids = ids_of(res, set())
+    ids = set()
+    for res in inflated:   # a screen may put one layout inside another
+        ids |= ids_of(res, set())
     for i in binds:
         if i not in ids:
-            errors.append(f"{path}: BRLS_BIND id \"{i}\" is not in resources/xml/{res}")
+            errors.append(f"{path}: BRLS_BIND id \"{i}\" is not in resources/xml/{' or '.join(inflated)}")
 
 # The lines a Cadran screen finds by id (getView, park, apply, tiles,
 # banners, press...): each one an id some layout or the code still gives a

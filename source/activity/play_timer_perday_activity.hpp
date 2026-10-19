@@ -18,6 +18,8 @@
 #include "view/pt_state_header.hpp"
 #include "view/pt_week.hpp"
 
+class CadranWeekView;
+
 class PlayTimerPerDayActivity : public brls::Activity
 {
   public:
@@ -48,9 +50,15 @@ class PlayTimerPerDayActivity : public brls::Activity
     u16     pending[7] = { PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT,
                            PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT };
 
+    // The Cadran appearance: the week as on its Play timer, in place of
+    // pt_week (view/cadran_week_card.xml).
+    brls::View*     cadran_card = nullptr;
+    CadranWeekView* cadran_week = nullptr;
+
     // onContentAvailable()'s actions: the cells', then the screen's buttons.
     void bind_cells();
     void bind_buttons();
+    void dress_cadran();
     void reload_from_service();
     void rerender();
     bool has_changes() const;

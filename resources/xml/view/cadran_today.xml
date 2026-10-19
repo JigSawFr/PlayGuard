@@ -3,7 +3,8 @@
 <!-- The top of the Cadran Overview (tab/cadran_tab.cpp, over the Overview's
      own lines): today's time left as a ring with the everyday actions beside
      it (turning parental controls back on first, the row's whole width,
-     while they are unlocked; today's limit with them, the second row's
+     while they are unlocked, or setting the week's limits while there are
+     none; today's limit with them, the second row's
      buttons sharing its width), three state cards, the console's state as
      pills. Filled by CadranTab::refresh() from the Overview's readings. -->
 
@@ -19,6 +20,7 @@
             <brls:Label id="cad_kicker" text="" fontSize="15" textColor="@theme/cadran/text3" marginBottom="10"/>
             <brls:Box id="cad_actions" axis="row" alignItems="center" alignSelf="stretch" marginTop="14" marginBottom="12">
                 <brls:Button id="cad_relock" style="primary" text="@i18n/playguard/security/banner_action" fontSize="19" height="56" cornerRadius="28" highlightCornerRadius="30" paddingLeft="22" paddingRight="22" grow="1.0" visibility="gone"/>
+                <brls:Button id="cad_setup" style="primary" text="@i18n/playguard/cadran/today/setup" fontSize="19" height="56" cornerRadius="28" highlightCornerRadius="30" paddingLeft="22" paddingRight="22" grow="1.0" visibility="gone"/>
                 <brls:Button id="cad_extra" style="primary" text="@i18n/playguard/cadran/today/extra" fontSize="19" height="56" cornerRadius="28" highlightCornerRadius="30" paddingLeft="22" paddingRight="22" marginRight="12"/>
                 <brls:Box id="cad_chips" axis="row" alignItems="center"/>
             </brls:Box>

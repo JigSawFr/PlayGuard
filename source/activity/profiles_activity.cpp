@@ -23,6 +23,7 @@ void ProfilesActivity::onContentAvailable()
         return true;
     });
     pctl_play_timer_query(&this->live);
+    if (cadran::enabled()) cadran::List(this->getContentView(), true).apply({ { "pf_save", "save" }, { "pf_new", "plus" } });
     this->rebuild();
 }
 
@@ -52,7 +53,7 @@ void ProfilesActivity::rebuild(const std::string& focus_file)
             return true;
         });
         rows->addView(cell);
-        if (cadran::enabled()) cadran::List::row(cell);
+        if (cadran::enabled()) cadran::List::row(cell, "list");
         if (!focus || p.file == focus_file) focus = cell;
     }
     ui::set_visible(empty.getView(), all.empty());

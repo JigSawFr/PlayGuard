@@ -57,7 +57,14 @@ void CadranChildActivity::refresh()
     std::string left = "—", caption = "";
     if (pt.fw_supported && pt.valid && pt.enabled_valid) {
         const uint16_t limit = pt.day_min[today];
-        if (limit == PT_DAY_NOLIMIT || !pt.enabled) {
+        // Unlocked first, as on Today: the console reports the timer off
+        // while unlocked, though today's limit still stands.
+        const bool unlocked = ui::known_unlocked() && limit != PT_DAY_NOLIMIT;
+        if (limit == 0 || unlocked) {
+            frac = unlocked ? -1.0f : 1.0f;
+            left = limit == 0 ? "playguard/cadran/today/no_play"_i18n : ui::fmt_minutes(limit);
+            caption = unlocked ? "playguard/cadran/child/on_hold"_i18n : "playguard/cadran/today/today"_i18n;
+        } else if (limit == PT_DAY_NOLIMIT || !pt.enabled) {
             left = "playguard/cadran/today/free"_i18n;
             caption = "playguard/cadran/today/no_limit"_i18n;
         } else if (pt.restricted_valid && pt.restricted) {

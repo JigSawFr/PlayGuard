@@ -37,7 +37,10 @@ class CadranWeekView : public brls::Box
     void set_can_edit(std::function<bool()> can_edit);
     // The edit starts or ends (the screen's key hints follow).
     void set_on_mode(std::function<void(bool editing)> on_mode);
+    // The focused day changes (-1: none any more).
+    void set_on_focus(std::function<void(int day)> on_focus);
     bool editing() const { return this->edit; }
+    void focus_day(int day);   // 0 = Sunday
     int  focused_day() const { return this->focused; }
 
     static brls::View* create();
@@ -68,6 +71,7 @@ class CadranWeekView : public brls::Box
     std::function<void(int, bool)>     on_copy;
     std::function<bool()>              can_edit;
     std::function<void(bool)>          on_mode;
+    std::function<void(int)>           on_focus;
 
     void render();
     void nudge(int day, int delta);

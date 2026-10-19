@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "tab/cadran_play_timer_tab.hpp"
 
+#include <algorithm>
 #include <array>
 #include <fmt/format.h>
 
@@ -57,6 +58,7 @@ CadranPlayTimerTab::CadranPlayTimerTab()
     namespace kit = cadran::kit;
     brls::Box* column = this->list.content();
     this->hero = brls::View::createFromXMLResource("view/cadran_play_timer.xml");
+    static_cast<brls::Box*>(this->hero->getView("cpt_week_card"))->addView(brls::View::createFromXMLResource("view/cadran_week_card.xml"));
     // Under the read-only note, the unlock banner and the timer's state (its
     // warnings: the limit reached, a timer that does not count).
     int at = 0;
@@ -99,6 +101,7 @@ CadranPlayTimerTab::CadranPlayTimerTab()
             if ((d == 0 || d == 6) == weekend) this->pending[d] = this->pending[day];
         this->rerender();
     });
+    week_editor->set_on_focus([this](int day) { this->show_played_key(day); });
     week_editor->set_on_mode([this](bool editing) {
         keys_idle->setVisibility(editing ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
         keys_edit->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
@@ -194,9 +197,30 @@ void CadranPlayTimerTab::show_played()
             for (uint32_t g = 0; g < stats->count; g++) s += stats->games[g].day_s[k];
             if (stats->day_wday[k] < 7) minutes[stats->day_wday[k]] = (uint32_t)(s / 60);
         }
+    for (int d = 0; d < 7; d++) this->played_min[d] = minutes[d];
+    this->played_ok = ok;
     this->week_editor->show_played(minutes, ok);
-    ui::set_visible(played_key.getView(), ok);
+    this->show_played_key(this->week_editor->focused_day());
     if (!play_data::fresh("", std::chrono::minutes(5)) && !play_data::busy("")) play_data::fetch(nullptr);
+}
+
+void CadranPlayTimerTab::show_played_key(int day)
+{
+    // A day focused: its figures (played, against the limit shown); else
+    // what the bars' fill is.
+    // No day with a limit: nothing is filled, no key.
+    bool limits = false;
+    for (int d = 0; d < 7; d++) limits = limits || this->pending[d] != PT_DAY_NOLIMIT;
+    ui::set_visible(played_key.getView(), this->played_ok && (limits || day >= 0));
+    if (!this->played_ok) return;
+    std::string text = "playguard/cadran/week/played_key"_i18n;
+    if (day >= 0 && day < 7) {
+        const std::string played = ui::fmt_played((uint16_t)std::min<uint32_t>(this->played_min[day], 24 * 60));
+        text = this->pending[day] == PT_DAY_NOLIMIT
+                   ? brls::getStr("playguard/cadran/week/played_day_free", ui::day_name(day), played)
+                   : brls::getStr("playguard/cadran/week/played_day", ui::day_name(day), played, ui::fmt_played(this->pending[day]));
+    }
+    ui::set_text(played_text, text);
 }
 
 void CadranPlayTimerTab::refresh()

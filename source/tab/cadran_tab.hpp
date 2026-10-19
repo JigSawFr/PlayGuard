@@ -77,6 +77,7 @@ class CadranTab : public DashboardTab
         brls::Box*       box  = nullptr;
         brls::Rectangle* dot  = nullptr;
         brls::Label*     text = nullptr;
+        int              rank = 1;   // 0 needs the parent (amber, coral), 1 fine (teal), 2 for the record (grey)
     };
     cadran::List list;
     std::vector<Pill> pill_slots;
@@ -105,16 +106,19 @@ class CadranTab : public DashboardTab
     void show_ring(bool unlocked);
     void show_next(bool unlocked);
     void show_low(bool unlocked);
+    void choose_today_limit();
     void build_outside_card(brls::Box* column, int at);
     void show_outside_card();
     void show_cards(bool unlocked, bool has_pin);
     void show_pills();
+    void order_pills();
 
     BRLS_BIND(PtRing,       ring,        "cad_ring");
     BRLS_BIND(brls::Label,  kicker,      "cad_kicker");
     BRLS_BIND(brls::Box,    today_text,  "cad_today_text");
     BRLS_BIND(brls::Box,    actions,     "cad_actions");
     BRLS_BIND(brls::Button, relock,      "cad_relock");
+    BRLS_BIND(brls::Button, setup,       "cad_setup");
     BRLS_BIND(brls::Button, extra,       "cad_extra");
     BRLS_BIND(brls::Box,    chips,       "cad_chips");
     BRLS_BIND(brls::Button, stop,        "cad_stop");

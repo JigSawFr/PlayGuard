@@ -1556,7 +1556,9 @@
             "counted_pill": "Over een spel geopend · telt mee voor de timer",
             "no_play": "Niet spelen",
             "head_no_play": "Vandaag niet spelen",
-            "head_unlocked_no_play": "Vandaag niet spelen, gepauzeerd"
+            "head_unlocked_no_play": "Vandaag niet spelen, gepauzeerd",
+            "limit_title": "Limiet voor {} wijzigen?",
+            "setup": "Limieten van de week instellen"
         },
         "pill": {
             "pc_on": "Ouderlijk toezicht actief",
@@ -1589,7 +1591,9 @@
             "discard": "Verwerpen",
             "remove": "Limiet verwijderen",
             "save_title": "De limieten van de week opslaan?",
-            "played_key": "gespeeld, laatste 7 dagen"
+            "played_key": "gespeeld, laatste 7 dagen",
+            "played_day": "{}: {} gespeeld van {}",
+            "played_day_free": "{}: {} gespeeld, geen limiet"
         },
         "tabs": {
             "today": "Vandaag"
@@ -1638,7 +1642,8 @@
             "enjoy": "Veel plezier!",
             "of": "van {}",
             "back": "Terug naar de ouder · pincode",
-            "play": "Console geven en spelen"
+            "play": "Console geven en spelen",
+            "on_hold": "limiet gepauzeerd"
         },
         "dialog": {
             "unlock_short": "Ouderlijk toezicht wordt voor de wijziging ontgrendeld met de opgeslagen pincode en daarna weer vergrendeld."

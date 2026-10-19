@@ -30,9 +30,12 @@ class CadranPlayTimerTab : public PlayTimerTab
     uint16_t     pending[7] = {};
     brls::ActionIdentifier save_action = 0;   // + while there is something to save
     int          play_listener = -1;            // play_data: the week's time played
+    uint32_t     played_min[7] = {};            // its minutes, per weekday
+    bool         played_ok = false;
 
     bool changes() const;
     void show_played();
+    void show_played_key(int day);   // the focused day's figures, else the key
     void rerender();
     void save();
     void discard();
@@ -45,6 +48,7 @@ class CadranPlayTimerTab : public PlayTimerTab
     BRLS_BIND(CadranWeekView,  week_editor,   "cpt_week");
     BRLS_BIND(brls::Box,       keys_idle,     "cpt_keys_idle");
     BRLS_BIND(brls::Box,       played_key,    "cpt_played_key");
+    BRLS_BIND(brls::Label,     played_text,   "cpt_played_text");
     BRLS_BIND(brls::Box,       keys_edit,     "cpt_keys_edit");
     BRLS_BIND(brls::Rectangle, pending_dot,   "cpt_pending_dot");
     BRLS_BIND(brls::Label,     pending_text,  "cpt_pending");

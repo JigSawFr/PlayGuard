@@ -1556,7 +1556,9 @@
             "counted_pill": "在遊戲上開啟 · 計入計時器",
             "no_play": "不能遊玩",
             "head_no_play": "今天不能遊玩",
-            "head_unlocked_no_play": "今天不能遊玩，已暫停"
+            "head_unlocked_no_play": "今天不能遊玩，已暫停",
+            "limit_title": "更改{}的上限？",
+            "setup": "設定每週上限"
         },
         "pill": {
             "pc_on": "家長監護已開啟",
@@ -1589,7 +1591,9 @@
             "discard": "放棄",
             "remove": "刪除限制",
             "save_title": "儲存本週的限制？",
-            "played_key": "最近7天的遊玩"
+            "played_key": "最近7天的遊玩",
+            "played_day": "{}：已玩 {} / {}",
+            "played_day_free": "{}：已玩 {}（不限）"
         },
         "tabs": {
             "today": "今天"
@@ -1638,7 +1642,8 @@
             "enjoy": "玩得開心！",
             "of": "共 {}",
             "back": "返回家長 · PIN",
-            "play": "交出主機去玩"
+            "play": "交出主機去玩",
+            "on_hold": "限制已暫停"
         },
         "dialog": {
             "unlock_short": "修改期間使用已儲存的PIN碼暫時解除家長監護，隨後立即恢復。"

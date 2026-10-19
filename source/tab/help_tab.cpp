@@ -18,6 +18,7 @@
 #include "activity/firmware_gate_activity.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
+#include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
@@ -198,6 +199,17 @@ HelpTab::HelpTab()
         });
         return true;
     });
+
+    // The Cadran look, with an icon per line (the screen's skin would dress
+    // it without).
+    if (cadran::enabled())
+        cadran::List(this, true).apply({ { "hp_first_steps", "sparkle" }, { "hp_export", "file" }, { "hp_upload", "upload" },
+                                         { "hp_github", "user" }, { "hp_logs_keep", "folder" }, { "hp_logs_keep_days", "calendar" },
+                                         { "hp_logs_keep_mb", "save" }, { "hp_dev_mode", "code" }, { "hp_dev_read_only", "eye" },
+                                         { "hp_dev_pt_log", "list" }, { "hp_dev_frame_stats", "activity" },
+                                         { "hp_dev_clear_cache", "trash" }, { "hp_dev_clear_logs", "trash" },
+                                         { "hp_dev_report", "file" }, { "hp_dev_pt_block", "timer" }, { "hp_dev_gate", "shield" },
+                                         { "hp_dev_forget", "refresh" }, { "hp_dev_build", "download" } });
 }
 
 void HelpTab::refresh()

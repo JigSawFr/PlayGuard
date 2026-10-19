@@ -1556,7 +1556,9 @@
             "counted_pill": "Aperto sopra un gioco · conta nel timer",
             "no_play": "Niente gioco",
             "head_no_play": "Oggi niente gioco",
-            "head_unlocked_no_play": "Oggi niente gioco, in pausa"
+            "head_unlocked_no_play": "Oggi niente gioco, in pausa",
+            "limit_title": "Cambiare il limite di {}?",
+            "setup": "Impostare i limiti della settimana"
         },
         "pill": {
             "pc_on": "Filtro famiglia attivo",
@@ -1589,7 +1591,9 @@
             "discard": "Annulla",
             "remove": "Rimuovi il limite",
             "save_title": "Salvare i limiti della settimana?",
-            "played_key": "giocato, ultimi 7 giorni"
+            "played_key": "giocato, ultimi 7 giorni",
+            "played_day": "{}: {} giocato su {}",
+            "played_day_free": "{}: {} giocato, senza limite"
         },
         "tabs": {
             "today": "Oggi"
@@ -1638,7 +1642,8 @@
             "enjoy": "Buon divertimento!",
             "of": "su {}",
             "back": "Torna al genitore · PIN",
-            "play": "Consegna la console e gioca"
+            "play": "Consegna la console e gioca",
+            "on_hold": "limite in pausa"
         },
         "dialog": {
             "unlock_short": "Il filtro famiglia viene sbloccato con il PIN salvato per la modifica, poi bloccato di nuovo."

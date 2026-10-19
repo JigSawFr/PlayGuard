@@ -95,6 +95,8 @@ bool restore_lowers();
 
 // "+30 min" when extra time was added today and is still there, else "".
 std::string extra_today_text(const PtState& pt);
+// The same in minutes (0: none).
+int extra_today_minutes(const PtState& pt);
 
 // The timer is on and its "time's up" alarm is off: the console says nothing
 // when time is up. The Overview and First steps point it out.

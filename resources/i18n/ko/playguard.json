@@ -1556,7 +1556,9 @@
             "counted_pill": "게임 위에서 열림 · 타이머에 포함",
             "no_play": "플레이 불가",
             "head_no_play": "오늘은 플레이 불가",
-            "head_unlocked_no_play": "오늘은 플레이 불가, 일시 중지됨"
+            "head_unlocked_no_play": "오늘은 플레이 불가, 일시 중지됨",
+            "limit_title": "{} 제한을 변경할까요?",
+            "setup": "주간 제한 설정"
         },
         "pill": {
             "pc_on": "자녀 보호 켜짐",
@@ -1589,7 +1591,9 @@
             "discard": "취소",
             "remove": "제한 삭제",
             "save_title": "이번 주 제한을 저장할까요?",
-            "played_key": "최근 7일 플레이"
+            "played_key": "최근 7일 플레이",
+            "played_day": "{}: {} / {} 플레이",
+            "played_day_free": "{}: {} 플레이 (제한 없음)"
         },
         "tabs": {
             "today": "오늘"
@@ -1638,7 +1642,8 @@
             "enjoy": "재미있게 놀아요!",
             "of": "{} 중",
             "back": "보호자로 돌아가기 · PIN",
-            "play": "본체를 건네고 플레이"
+            "play": "본체를 건네고 플레이",
+            "on_hold": "제한 일시 중지됨"
         },
         "dialog": {
             "unlock_short": "변경하는 동안 저장된 PIN으로 자녀 보호 기능을 해제하고, 바로 다시 잠급니다."

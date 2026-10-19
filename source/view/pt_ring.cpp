@@ -47,7 +47,26 @@ PtRing::PtRing()
     this->addView(this->caption);
 }
 
-void PtRing::setFraction(float value) { this->used = value > 1.0f ? 1.0f : value; }
+void PtRing::setFraction(float value)
+{
+    value = value > 1.0f ? 1.0f : value;
+    if (value == this->used) return;
+    // From one known value to another: the arc travels there.
+    const bool travel = this->used >= 0.0f && value >= 0.0f;
+    this->used = value;
+    if (travel) {
+        const float from = this->shown.getValue();
+        this->shown.stop();
+        this->shown.reset(from);
+        this->shown.addStep(value, 450, brls::EasingFunction::quadraticOut);
+        this->shown.start();
+    } else {
+        this->shown.stop();
+        this->shown.reset(value);
+    }
+}
+
+void PtRing::setExtra(float value) { this->extra = value < 0.0f ? 0.0f : value > 1.0f ? 1.0f : value; }
 void PtRing::setValue(const std::string& text)
 {
     this->value->setText(text);
@@ -86,9 +105,22 @@ void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
     nvgStrokeColor(vg, this->track);
     nvgStroke(vg);
 
+    // Today's extra time: the end of the limit, before the top, lightly tinted.
+    if (this->used >= 0.0f && this->extra > 0.0f && !this->show_left) {
+        NVGcolor tint = this->teal;
+        tint.a *= 0.35f;
+        nvgBeginPath(vg);
+        nvgArc(vg, cx, cy, r, -NVG_PI / 2.0f + (1.0f - this->extra) * 2.0f * NVG_PI, -NVG_PI / 2.0f + 2.0f * NVG_PI, NVG_CW);
+        nvgStrokeWidth(vg, stroke);
+        nvgStrokeColor(vg, tint);
+        nvgStroke(vg);
+    }
+
     if (this->used > 0.0f) {
-        const float f = this->used;
-        const NVGcolor color = f >= 1.0f ? this->coral : f >= 0.75f ? this->amber : this->teal;
+        // The colour of where the arc goes; its length on the way there.
+        const float f = this->shown.getValue();
+        const float to = this->used;
+        const NVGcolor color = to >= 1.0f ? this->coral : to >= 0.75f ? this->amber : this->teal;
         const float arc = this->show_left ? 1.0f - f : f;
         if (arc <= 0.0f) { brls::Box::draw(vg, x, y, width, height, style, ctx); return; }
         nvgBeginPath(vg);

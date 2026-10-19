@@ -30,12 +30,14 @@ class CadranWeekView::Column : public brls::Box
         // from elsewhere, back from a dialog): not editing.
         if (!this->owner->moving) this->owner->set_edit(false);
         this->owner->render();
+        if (this->owner->on_focus) this->owner->on_focus(this->day);
     }
     void onFocusLost() override
     {
         brls::Box::onFocusLost();
         if (this->owner->focused == this->day) this->owner->focused = -1;
         this->owner->render();
+        if (this->owner->on_focus) this->owner->on_focus(this->owner->focused);
     }
 
   private:
@@ -199,6 +201,11 @@ void CadranWeekView::set_edit(bool on)
     if (this->on_mode) this->on_mode(on);
 }
 
+void CadranWeekView::focus_day(int day)
+{
+    if (day >= 0 && day <= 6) brls::Application::giveFocus(this->cols[day].box);
+}
+
 bool CadranWeekView::step(int day, int direction)
 {
     if (!this->edit) return false;
@@ -243,6 +250,7 @@ void CadranWeekView::set_on_pick(std::function<void(int)> f) { this->on_pick = s
 void CadranWeekView::set_on_copy(std::function<void(int, bool)> f) { this->on_copy = std::move(f); }
 void CadranWeekView::set_can_edit(std::function<bool()> f) { this->can_edit = std::move(f); }
 void CadranWeekView::set_on_mode(std::function<void(bool)> f) { this->on_mode = std::move(f); }
+void CadranWeekView::set_on_focus(std::function<void(int)> f) { this->on_focus = std::move(f); }
 
 void CadranWeekView::render()
 {
