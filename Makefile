@@ -221,7 +221,11 @@ crash_dump_FLAGS := -std=c11 -Isource/util
 sim_backend_SRC    := source/sim/sim_env.cpp source/sim/sim_platform.cpp source/util/sha256.cpp tests/sim_backend/test.cpp
 sim_backend_CSRC   := $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c sim_time.c sim_playstats.c sim_gamecheck.c) \
                       $(addprefix source/core/,pure.c calendar.c write_guard.c) source/util/playlog.c
-sim_backend_CFLAGS := -std=gnu11 -Isource/core
+# Atomic coverage counters: the suite runs the same code from several threads
+# at once, and gcov's plain counters then come out wrong (negative ones, that
+# gcovr refuses).
+sim_backend_FLAGS  := $(TEST_CXXFLAGS) -fprofile-update=atomic
+sim_backend_CFLAGS := -std=gnu11 -Isource/core -fprofile-update=atomic
 sim_backend_LIBS   := -pthread
 frame_stats_SRC   := source/util/paths.cpp source/util/frame_stats.cpp tests/frame_stats/test.cpp
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
