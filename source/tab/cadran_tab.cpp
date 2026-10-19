@@ -1148,7 +1148,6 @@ void CadranTab::show_cards(bool unlocked, bool has_pin)
 void CadranTab::show_pills()
 {
     namespace kit = cadran::kit;
-    brls::Theme theme = brls::Application::getTheme();
     if (this->pill_slots.empty()) {
         for (const char* line : { "dash_compat", "dash_pairing", "dash_serial", "dash_patches" }) {
             Pill p;
@@ -1156,7 +1155,7 @@ void CadranTab::show_pills()
             p.box = kit::pill("", "cadran/teal_fill");
             p.box->setFocusable(true);
             p.box->setHideHighlightBackground(true);
-            p.dot = dynamic_cast<brls::Rectangle*>(p.box->getChildren()[0]);
+            p.dot = dynamic_cast<kit::Mark*>(p.box->getChildren()[0]);
             p.text = dynamic_cast<brls::Label*>(p.box->getChildren()[1]);
             brls::View* cell = this->getView(line);
             p.box->registerClickAction([cell](brls::View*) {
@@ -1172,7 +1171,7 @@ void CadranTab::show_pills()
                 d.box->setFocusable(true);
                 d.box->setHideHighlightBackground(true);
                 d.text = dynamic_cast<brls::Label*>(d.box->getChildren()[1]);
-                d.dot = dynamic_cast<brls::Rectangle*>(d.box->getChildren()[0]);
+                d.dot = dynamic_cast<kit::Mark*>(d.box->getChildren()[0]);
                 d.box->registerClickAction([](brls::View*) {
                     // The dialogs' layout (cadran::dialog_body): a title, the
                     // two servers as a table, what that changes as notes.
@@ -1235,7 +1234,7 @@ void CadranTab::show_pills()
         const std::string text = shown ? cell->title->getFullText() + " · " + kit::without_chevron(cell->detail->getFullText()) : ok;
         ui::set_text(p.text, text);
         const std::string dot = shown ? kit::dot_of(cell->detail->getTextColor()) : "cadran/teal_fill";
-        p.dot->setColor(theme[dot]);
+        p.dot->set(dot.c_str());
         p.rank = dot == "cadran/teal_fill" ? 1 : dot == "cadran/text3" ? 2 : 0;
         ui::set_visible(p.box, !text.empty());
     }
@@ -1247,7 +1246,7 @@ void CadranTab::show_pills()
                                           : sync       ? "playguard/cadran/today/dns_sync"_i18n
                                           : time       ? "playguard/cadran/today/dns_time"_i18n
                                                        : "playguard/cadran/today/dns_open"_i18n);
-        if (this->dns_pill.dot) this->dns_pill.dot->setColor(theme[sync || time ? "cadran/teal_fill" : "cadran/text3"]);
+        if (this->dns_pill.dot) this->dns_pill.dot->set(sync || time ? "cadran/teal_fill" : "cadran/text3");
         this->dns_pill.rank = sync || time ? 1 : 2;
     }
     this->counted_pill.rank = 0;

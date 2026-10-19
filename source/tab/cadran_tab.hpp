@@ -18,6 +18,7 @@
 #include "tab/cadran_list.hpp"
 #include "tab/dashboard_tab.hpp"
 #include "tab/tab_base.hpp"
+#include "ui/cadran_kit.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "view/cadran_digits.hpp"
 #include "view/cadran_icon.hpp"
@@ -76,7 +77,7 @@ class CadranTab : public DashboardTab
     {
         const char*      line = nullptr;
         brls::Box*       box  = nullptr;
-        brls::Rectangle* dot  = nullptr;
+        cadran::kit::Mark* dot = nullptr;
         brls::Label*     text = nullptr;
         int              rank = 1;   // 0 needs the parent (amber, coral), 1 fine (teal), 2 for the record (grey)
     };

@@ -53,6 +53,62 @@ brls::Box* card(bool focusable, bool grow)
     return box;
 }
 
+Mark::Mark(const char* color_key)
+{
+    this->setFocusable(false);
+    this->setWidth(12);
+    this->setHeight(12);
+    this->set(color_key);
+}
+
+void Mark::set(const char* color_key)
+{
+    const std::string key = color_key;
+    this->color = brls::Application::getTheme()[color_key];
+    this->shape = key.rfind("cadran/teal", 0) == 0                                          ? Shape::CHECK
+                  : key.rfind("cadran/amber", 0) == 0 || key.rfind("cadran/coral", 0) == 0 ? Shape::WARN
+                                                                                           : Shape::DOT;
+}
+
+void Mark::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style, brls::FrameContext*)
+{
+    const float cx = x + width / 2, cy = y + height / 2;
+    nvgBeginPath(vg);
+    switch (this->shape) {
+        case Shape::DOT:
+            nvgCircle(vg, cx, cy, 4);
+            nvgFillColor(vg, this->a(this->color));
+            nvgFill(vg);
+            break;
+        case Shape::CHECK:
+            nvgMoveTo(vg, x + 1.5f, cy + 0.5f);
+            nvgLineTo(vg, x + 4.8f, cy + 3.6f);
+            nvgLineTo(vg, x + width - 1.2f, y + 2.6f);
+            nvgStrokeColor(vg, this->a(this->color));
+            nvgStrokeWidth(vg, 2.2f);
+            nvgLineCap(vg, NVG_ROUND);
+            nvgLineJoin(vg, NVG_ROUND);
+            nvgStroke(vg);
+            break;
+        case Shape::WARN: {
+            // A rounded triangle, an exclamation mark cut out of it.
+            nvgMoveTo(vg, cx, y + 0.5f);
+            nvgLineTo(vg, x + width, y + height - 0.5f);
+            nvgLineTo(vg, x, y + height - 0.5f);
+            nvgClosePath(vg);
+            nvgFillColor(vg, this->a(this->color));
+            nvgFill(vg);
+            const NVGcolor cut = this->a(brls::Application::getTheme()["brls/background"]);
+            nvgBeginPath(vg);
+            nvgRoundedRect(vg, cx - 0.8f, y + 4.2f, 1.6f, 3.8f, 0.8f);
+            nvgCircle(vg, cx, y + height - 2.6f, 0.95f);
+            nvgFillColor(vg, cut);
+            nvgFill(vg);
+            break;
+        }
+    }
+}
+
 brls::Box* pill(const std::string& text, const char* dot_key)
 {
     brls::Theme theme = brls::Application::getTheme();
@@ -67,12 +123,9 @@ brls::Box* pill(const std::string& text, const char* dot_key)
     box->setMarginRight(10);
     box->setMarginBottom(8);
     box->setHighlightCornerRadius(15);
-    auto* dot = new brls::Rectangle(theme[dot_key]);
-    dot->setWidth(8);
-    dot->setHeight(8);
-    dot->setCornerRadius(4);
-    dot->setMarginRight(7);
-    box->addView(dot);
+    auto* mark = new Mark(dot_key);
+    mark->setMarginRight(7);
+    box->addView(mark);
     brls::Label* l = label(text, 15, "cadran/text2");
     l->setSingleLine(true);
     box->addView(l);
