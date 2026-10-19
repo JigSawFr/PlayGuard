@@ -12,7 +12,10 @@
   const theme = document.getElementById('site-theme');
   const show = () => {
     const choice = theme.value;
-    document.documentElement.dataset.theme = choice === 'auto' ? (dark.matches ? 'dark' : 'light') : choice;
+    const shown = choice === 'auto' ? (dark.matches ? 'dark' : 'light') : choice;
+    document.documentElement.dataset.theme = shown;
+    // The browser's bar the colour of the header (as theme.js).
+    for (const m of document.querySelectorAll('meta[name="theme-color"]')) m.content = shown === 'dark' ? '#111d31' : '#ffffff';
   };
   const kept = store.get('pg-theme');
   theme.value = kept === 'light' || kept === 'dark' ? kept : 'auto';
@@ -36,6 +39,59 @@
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData
       || matchMedia('(max-width: 860px)').matches;
     if (!still) video.play().catch(() => {});
+  }
+
+  // On a phone or a small tablet (the header on two rows): the header out
+  // of the way while scrolling down, back when scrolling up. The way back
+  // to the top, far down any page.
+  const phone = matchMedia('(max-width: 1080px)');
+  const header = document.querySelector('.top');
+  const toTop = document.querySelector('.to-top');
+  let lastY = scrollY;
+  let ticking = false;
+  const scrolled = () => {
+    ticking = false;
+    const y = Math.max(0, scrollY);
+    // Not while a field of the header is in use, nor for a few pixels.
+    if (Math.abs(y - lastY) < 8) return;
+    const away = phone.matches && y > lastY && y > header.offsetHeight && !header.contains(document.activeElement);
+    header.classList.toggle('away', away);
+    toTop.hidden = y < innerHeight * 2;
+    lastY = y;
+  };
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(scrolled); } }, { passive: true });
+  phone.addEventListener('change', () => header.classList.remove('away'));
+
+  // The header's links on a phone, a row to scroll: its edge fades while
+  // there are more of them to scroll to.
+  const nav = document.querySelector('.nav');
+  const fade = () => nav.classList.toggle('more', nav.scrollLeft + nav.clientWidth < nav.scrollWidth - 2);
+  nav.addEventListener('scroll', fade, { passive: true });
+  addEventListener('resize', fade);
+  fade();
+
+  // The gallery on a phone, a row to scroll: a dot for each screen, the one
+  // in view lit.
+  const gallery = document.querySelector('.gallery');
+  if (gallery && 'IntersectionObserver' in window) {
+    const figures = [...gallery.querySelectorAll('figure')];
+    const dots = document.createElement('div');
+    dots.className = 'gallery-dots';
+    dots.setAttribute('aria-hidden', 'true');
+    dots.append(...figures.map(() => document.createElement('span')));
+    gallery.after(dots);
+    const sync = () => { dots.hidden = gallery.scrollWidth <= gallery.clientWidth; };
+    addEventListener('resize', sync);
+    sync();
+    const seen = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          for (const d of dots.children) d.classList.remove('on');
+          dots.children[figures.indexOf(e.target)].classList.add('on');
+        }
+      }
+    }, { root: gallery, threshold: 0.6 });
+    for (const f of figures) seen.observe(f);
   }
 
   // On a phone, the documentation's pages are a row to scroll: this one in view.

@@ -334,7 +334,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy" content="{CSP}">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{html.escape(full_title)}</title>
   <meta name="description" content="{description}">
 {head_extra}
@@ -348,7 +348,8 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <meta property="og:image:height" content="640">
   <meta property="og:image:alt" content="PlayGuard">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="theme-color" content="#0b1424">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111d31" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="{to_root}assets/icon.svg" type="image/svg+xml">
   <link rel="sitemap" type="application/xml" href="{SITE_URL}sitemap.xml">
   <link rel="alternate" type="application/atom+xml" title="PlayGuard releases" href="{SITE_URL}releases.atom">
@@ -388,6 +389,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
       <p class="fine">{t('footer_nintendo')}</p>
     </div>
   </footer>
+  <a class="to-top" href="#main" aria-label="{t('back_to_top')}" hidden></a>
   <script src="{to_root}assets/site.js"></script>
 </body>
 </html>
@@ -538,6 +540,15 @@ def doc_body(t, lang, to_root, page_name, assets):
                 f'<a href="{to_root}docs/{page_name}/" hreflang="en">{t("doc_english")}</a></p>\n')
     # The page's sections (its h2: toc_depth leaves the h1 out).
     toc_items = "".join(f'<li><a href="#{h["id"]}">{h["name"]}</a></li>' for h in toc)
+    # The same under the page's first paragraph where there is no room for
+    # them beside the page (a phone, a tablet): folded.
+    shown = body
+    if toc_items:
+        folded = (f'<details class="toc-mobile"><summary>{t("on_this_page")}</summary>'
+                  f'<ul>{toc_items}</ul></details>\n')
+        intro = re.match(r"(?:\s|<!--.*?-->)*<p>.*?</p>\n?", body, re.S)
+        end = intro.end() if intro else 0
+        shown = body[:end] + folded + body[end:]
     # The page's description: its first paragraph (the one under the title).
     first = re.search(r"<p>(.*?)</p>", body, re.S)
     description = plain(first.group(1)) if first else ""
@@ -550,7 +561,7 @@ def doc_body(t, lang, to_root, page_name, assets):
       </nav>
       <article class="prose">
         <h1>{html.escape(title)}</h1>
-{note}{body}
+{note}{shown}
         <p class="edit"><a href="{REPO_URL}/blob/main/{source}">{t('doc_on_github')}</a></p>
       </article>
       {f'<nav class="toc" aria-label="{html.escape(title)}"><ul>{toc_items}</ul></nav>' if toc_items else ''}
