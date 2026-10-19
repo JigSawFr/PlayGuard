@@ -485,6 +485,12 @@ function translatePage() {
   for (const node of document.querySelectorAll('[data-i18n-label]')) node.setAttribute('aria-label', t(node.dataset.i18nLabel));
 }
 
+// The website's home page in the page's language (tools/build_site.py's folders).
+function homeLink() {
+  const folder = language === 'en-US' ? '' : `${language.toLowerCase()}/`;
+  $('home-link').href = `../${folder}`;
+}
+
 function setUpHeader() {
   const lang = $('language-select');
   for (const [code, name] of LANGUAGES) lang.append(el('option', { value: code, text: name, lang: code }));
@@ -578,6 +584,7 @@ async function main() {
   await loadTexts(language);
   const version = showBuild();
   translatePage();
+  homeLink();
   setUpHeader();
   setUpPanel();
   setUpKeys();

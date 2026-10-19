@@ -5,11 +5,12 @@ The desktop simulator (`make desktop`, `source/sim/`), compiled with
 against a simulated console, to click through a change, try a state or show
 a screen without a build on the console.
 
-- **main**: <https://jigsawfr.github.io/PlayGuard/>
-- **a pull request**: `https://jigsawfr.github.io/PlayGuard/pr-<number>/`, linked in a
-  comment on the pull request and updated at each push (`.github/workflows/web.yml`).
-  It goes when the pull request is closed. Pull requests from forks are built
-  but not published (their token cannot write to the repository).
+- **main**: <https://jigsawfr.github.io/PlayGuard/simulator/>, on PlayGuard's
+  website ([`site/README.md`](../site/README.md)).
+- **a pull request**: `https://jigsawfr.github.io/PlayGuard/pr-<number>/simulator/`,
+  linked in a comment on the pull request and updated at each push. It goes
+  when the pull request is closed. Pull requests from forks are built but not
+  published (their pages would be served from this site).
 
 ## The page
 
@@ -53,7 +54,7 @@ a screen without a build on the console.
 ## How it is built
 
 `make web` (needs Emscripten's `emcmake` on the `PATH`: `source <emsdk>/emsdk_env.sh`)
-builds `build-web/site/`; `make web-serve` serves it at <http://localhost:8000>.
+builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8000>.
 
 - `CMakeLists.txt`, under `emcmake` (`PLAYGUARD_WEB`): the desktop build on
   borealis' SDL2 platform with OpenGL ES 3, which Emscripten maps to WebGL 2;
@@ -94,11 +95,10 @@ builds `build-web/site/`; `make web-serve` serves it at <http://localhost:8000>.
 
 ## GitHub Pages
 
-The site is the `gh-pages` branch, which `web.yml` writes: main's build at its
-root, each pull request's in `pr-<number>/`. The branch holds a single commit,
-pushed again at each deployment, so the previews' `.wasm` files do not pile up
-in its history. Once the first run has created it, GitHub Pages must serve it:
-*Settings › Pages › Build and deployment › Deploy from a branch › `gh-pages` / (root)*.
+The simulator is published with the website: `.github/workflows/web.yml`
+builds both into one artifact, the simulator in `simulator/`, and
+`.github/workflows/pages.yml` publishes main's and each open pull request's
+([`site/README.md`](../site/README.md#publishing)).
 
 Downloaded, a build is about 4 MB compressed (the `.wasm` 1.5 MB, the
 resources with the CJK font 2.5 MB; the run page's summary gives the sizes of

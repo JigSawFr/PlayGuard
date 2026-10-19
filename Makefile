@@ -3,7 +3,7 @@
 #   make              -> ./playguard.nro            (needs devkitPro, DEVKITPRO set)
 #   make dist         -> ./playguard.zip            (unzip onto the SD card root)
 #   make desktop      -> ./build-desktop/playguard  (UI with a simulated backend; needs GLFW)
-#   make web          -> ./build-web/site/          (the same in a browser; needs Emscripten's emcmake)
+#   make web          -> ./build-web/simulator/          (the same in a browser; needs Emscripten's emcmake)
 #   make web-serve    -> serves it at http://localhost:8000 (with the headers its threads need)
 #   make test         -> host unit tests (plain gcc/g++, ASan + UBSan; parallel, all suites)
 #   make fuzz         -> libFuzzer runs of the parsers (clang; FUZZ_SECONDS=30 each, parallel)
@@ -95,7 +95,7 @@ web:
 	@"$$(command -v cmake)" --build $(WEB) -j $(JOBS)
 
 web-serve: web
-	@python3 web/serve.py $(WEB)/site 8000
+	@python3 web/serve.py $(WEB)/simulator 8000
 
 # Host tests: one program per suite, built straight from its sources (no
 # object files, so gcov's .gcno/.gcda sit next to the program in

@@ -350,10 +350,10 @@ else ()
 endif ()
 
 # The web simulator's site, ready to serve (web/README.md): the page from
-# web/, PlayGuard and its packaged resources, in <build>/site/.
+# web/, PlayGuard and its packaged resources, in <build>/simulator/.
 if (PLAYGUARD_WEB)
-    set(PLAYGUARD_SITE ${CMAKE_BINARY_DIR}/site)
-    add_custom_target(${PROJECT_NAME}_site ALL DEPENDS ${PROJECT_NAME}
+    set(PLAYGUARD_SITE ${CMAKE_BINARY_DIR}/simulator)
+    add_custom_target(${PROJECT_NAME}_simulator ALL DEPENDS ${PROJECT_NAME}
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${PLAYGUARD_SITE}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${PLAYGUARD_SITE}
         COMMAND ${CMAKE_COMMAND} -E copy
