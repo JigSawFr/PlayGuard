@@ -3,7 +3,8 @@ name: web
 # PlayGuard's website (site/README.md) with the web simulator in it
 # (web/README.md), built for main and for each pull request into one artifact,
 # `site`: the home page and the documentation in the console's 15 languages,
-# and the simulator in simulator/. pages.yml publishes them on GitHub Pages:
+# their screenshots taken in each language from the simulator, and the
+# simulator in simulator/. pages.yml publishes them on GitHub Pages:
 # main's at the root, each open pull request's in pr-<number>/.
 on:
   push:
@@ -30,7 +31,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-26.04
-    timeout-minutes: 30
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -61,6 +62,15 @@ jobs:
           source "$RUNNER_TEMP/emsdk/emsdk_env.sh"
           make web JOBS="$(nproc)"
           test -f build-web/resources/font/cjk.otf || { echo "::error::no CJK font in the web build"; exit 1; }
+      # The website's screenshots, each screen in each language: the simulator
+      # just built, in a headless Chromium (tools/site_screenshots.mjs).
+      # Playwright pinned; nothing of it goes into the site.
+      - name: The screenshots in each language
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          npx playwright install --with-deps chromium
+          version=$(python3 -c 'import json; print(json.load(open(".release-please-manifest.json"))["."])')
+          SITE_SCREENSHOT_JOBS="$(nproc)" node tools/site_screenshots.mjs build-web/simulator shots "$version"
       - name: The website, the simulator in it
         env:
           REPO: ${{ github.repository }}
@@ -70,8 +80,14 @@ jobs:
           TITLE: ${{ github.event.pull_request.title }}
         run: |
           # GitHub Pages serves 404.html at any path: its links start from the
-          # site's root, a pull request's folder for its preview.
+          # site's root, a pull request's folder for its preview. The pages'
+          # absolute links (canonical, other languages, sitemap, llms.txt) are
+          # its address; a preview is kept out of search engines.
           export SITE_BASE="/${REPO#*/}/${PR:+pr-$PR/}"
+          owner="${REPO%%/*}"
+          export SITE_URL="https://${owner,,}.github.io$SITE_BASE"
+          export SITE_NOINDEX="${PR:+1}"
+          export SITE_SCREENSHOTS=shots
           python3 tools/build_site.py out .
           cp -r build-web/simulator out/simulator
           python3 - <<'EOF'
@@ -84,7 +100,7 @@ jobs:
           {
             echo "### Website and web simulator"
             echo
-            echo "$(find out -name index.html | wc -l) pages, $(du -sh out | cut -f1) in all."
+            echo "$(find out -name index.html | wc -l) pages, $(find out/assets/images/screenshots -name '*.webp' | wc -l) screenshots of the console in its languages, $(du -sh out | cut -f1) in all."
             echo
             echo "| Simulator file | Size | gzip |"
             echo "|---|---|---|"

@@ -108,7 +108,6 @@ pre code { background: none; padding: 0; }
   font-weight: 600;
 }
 .button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
-.button.ghost { background: transparent; }
 .button:hover { filter: brightness(1.06); }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
@@ -134,7 +133,27 @@ pre code { background: none; padding: 0; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 .hero .button { background: transparent; color: var(--hero-text); border-color: #2a3854; }
 .hero .button.primary { background: #2ec4a6; border-color: #2ec4a6; color: #05140f; }
+.hero .source { margin: 14px 0 0; font-size: 15px; }
+.hero .source a { color: var(--hero-muted); }
+.hero .source a:hover { color: var(--hero-text); }
+.hero-video { position: relative; }
 .hero-video video { width: 100%; border-radius: 16px; box-shadow: 0 30px 80px rgb(0 0 0 / 0.5), 0 0 0 1px #2a3854; display: block; }
+/* The tour's play / pause (site.js): it plays by itself only where motion
+   and data are welcome (not on a phone, nor with reduced motion). */
+.video-toggle {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid #2a3854;
+  background: rgb(8 16 29 / 0.8);
+  color: #e8eef7;
+  cursor: pointer;
+}
+.video-toggle::before { content: ""; display: block; margin: auto; width: 0; height: 0; border-style: solid; border-width: 8px 0 8px 13px; border-color: transparent transparent transparent currentColor; transform: translateX(2px); }
+.video-toggle.playing::before { width: 12px; height: 16px; border: solid currentColor; border-width: 0 4px; transform: none; }
 
 .section { max-width: 1180px; margin: 0 auto; padding: 56px 16px 0; }
 .section > h2 { font-size: clamp(24px, 3vw, 32px); margin: 0 0 22px; }
@@ -145,10 +164,19 @@ pre code { background: none; padding: 0; }
 .card p { margin: 0; color: var(--muted); font-size: 15px; }
 .emoji { font-size: 26px; }
 
-.gallery { display: grid; grid-auto-flow: column; grid-auto-columns: min(440px, 80%); gap: 16px; overflow-x: auto; padding-bottom: 12px; scroll-snap-type: x mandatory; }
+/* Every screen at once on a large screen; one after the other on a phone,
+   the next one showing at the edge. */
+.gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 16px; }
 .gallery figure { margin: 0; scroll-snap-align: start; }
+.gallery a { display: block; }
 .gallery img { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); display: block; }
 .gallery figcaption { color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+.faq { display: grid; gap: 10px; max-width: 860px; }
+.faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 0 18px; }
+.faq summary { cursor: pointer; padding: 14px 0; font-weight: 600; }
+.faq details[open] summary { color: var(--accent); }
+.faq details p { margin: 0 0 16px; color: var(--muted); }
 
 .band {
   margin-top: 56px;
@@ -214,11 +242,27 @@ pre code { background: none; padding: 0; }
 }
 @media (max-width: 860px) {
   .top { flex-wrap: wrap; gap: 10px 16px; }
-  .nav { order: 3; flex-basis: 100%; overflow-x: auto; gap: 16px; }
-  .settings { margin-left: auto; }
+  /* The links on a row of their own, Try first; GitHub is in the footer.
+     The edge fades when there are more to scroll to. */
+  .nav { order: 3; flex-basis: 100%; overflow-x: auto; gap: 16px; scrollbar-width: none;
+         mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent); }
+  .nav .nav-try { order: -1; font-weight: 600; }
+  .nav .nav-gh { display: none; }
+  .settings { margin-left: auto; gap: 6px; }
+  .settings select { max-width: 112px; }
+  #site-theme { max-width: 76px; }
+  .brand { font-size: 18px; gap: 8px; }
+  .brand img { width: 28px; height: 28px; }
+  .gallery { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 82%; overflow-x: auto; padding-bottom: 12px; scroll-snap-type: x mandatory; }
   .hero, .columns { grid-template-columns: 1fr; }
   .hero { padding-top: 36px; }
   .band { flex-direction: column; align-items: flex-start; margin: 56px 16px 0; }
-  .doc { grid-template-columns: 1fr; }
-  .doc-nav { position: static; max-height: none; order: 2; border-top: 1px solid var(--line); padding-top: 16px; }
+  .doc { grid-template-columns: minmax(0, 1fr); }
+  /* The documentation's pages at the top, in a row to scroll. */
+  .doc { gap: 20px; padding-top: 16px; }
+  .doc-nav { position: static; max-height: none; overflow: visible; }
+  .doc-nav .doc-list { position: relative; display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+  .doc-nav .doc-group, .doc-nav .doc-group ul { display: contents; }
+  .doc-nav .doc-group h3 { display: none; }
+  .doc-nav .doc-group li a { white-space: nowrap; border: 1px solid var(--line); background: var(--surface); padding: 5px 12px; border-radius: 999px; font-size: 15px; }
 }
