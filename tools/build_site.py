@@ -53,6 +53,10 @@ DOCS = [("features", "guide"), ("install", "guide"), ("compatibility", "guide"),
         ("companion-app", "reference"), ("config", "reference"), ("parental-controls", "reference")]
 # The languages that read docs/fr/.
 FRENCH = {"fr", "fr-CA"}
+# The pages' Content-Security-Policy (GitHub Pages sends no headers): only the
+# site's own files, no inline script, nothing from elsewhere.
+CSP = ("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; "
+       "font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'")
 SCREENSHOTS = ["dashboard", "play_timer", "per_day", "activity", "restrictions", "security", "console", "clock",
                "preferences"]
 FEATURES = [("timer", "⏱️"), ("activity", "📊"), ("restrictions", "🔒"), ("console", "🕒"), ("app", "📱"),
@@ -202,6 +206,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class=""):
 <html lang="{html_lang}" data-lang="{code}">
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="{CSP}">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{html.escape(full_title)}</title>
   <meta name="description" content="{description or t('meta_description')}">
@@ -211,14 +216,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class=""):
   <meta name="theme-color" content="#0b1424">
   <link rel="icon" href="{to_root}assets/icon.svg" type="image/svg+xml">
 {alternates}
-  <script>
-    (function () {{
-      var c = null;
-      try {{ c = localStorage.getItem('pg-theme'); }} catch (e) {{}}
-      if (c !== 'light' && c !== 'dark') c = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      document.documentElement.dataset.theme = c;
-    }})();
-  </script>
+  <script src="{to_root}assets/theme.js"></script>
   <link rel="stylesheet" href="{to_root}assets/site.css">
 </head>
 <body class="{body_class}">
@@ -424,8 +422,7 @@ def main():
                                 f'<p><a class="button primary" href="{base_url}">{t("home")}</a></p></section>'))
     # The site's own files, then what the pages use from the repository.
     os.makedirs(os.path.join(out, "assets"), exist_ok=True)
-    for name in os.listdir(os.path.join(ROOT, "site", "assets")):
-        shutil.copy(os.path.join(ROOT, "site", "assets", name), os.path.join(out, "assets", name))
+    shutil.copytree(os.path.join(ROOT, "site", "assets"), os.path.join(out, "assets"), dirs_exist_ok=True)
     for name in ("icon.svg", "mark.svg"):
         shutil.copy(os.path.join(ROOT, "branding", name), os.path.join(out, "assets", name))
     for path in sorted(assets):

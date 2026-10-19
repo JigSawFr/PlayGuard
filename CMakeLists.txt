@@ -357,7 +357,7 @@ if (PLAYGUARD_WEB)
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${PLAYGUARD_SITE}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${PLAYGUARD_SITE}
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_CURRENT_SOURCE_DIR}/web/index.html ${CMAKE_CURRENT_SOURCE_DIR}/web/simulator.js
+                ${CMAKE_CURRENT_SOURCE_DIR}/web/index.html ${CMAKE_CURRENT_SOURCE_DIR}/web/theme.js ${CMAKE_CURRENT_SOURCE_DIR}/web/simulator.js
                 ${CMAKE_CURRENT_SOURCE_DIR}/web/simulator.css ${CMAKE_CURRENT_SOURCE_DIR}/web/params.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/web/coi-serviceworker.js ${PROJECT_ICON}
                 ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.js ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.wasm

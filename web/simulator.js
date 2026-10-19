@@ -368,9 +368,12 @@ function startEnvironment(values) {
 
 function start(version) {
   if (!self.crossOriginIsolated) {
-    // coi-serviceworker reloads the page once it is installed (twice at
-    // most); still here after that, this browser will not isolate it.
-    setTimeout(() => showError(t('no_isolation')), 6000);
+    // coi-serviceworker reloads the page once its service worker is
+    // installed (twice at most), which a first visit on a slow connection can
+    // take a while to do. Without service workers (a private window in some
+    // browsers) it never will; otherwise give it time before saying so.
+    if (!('serviceWorker' in navigator) || !self.isSecureContext) { showError(t('no_isolation')); return; }
+    setTimeout(() => showError(t('no_isolation')), 30000);
     return;
   }
   if (!document.createElement('canvas').getContext('webgl2')) { showError(t('no_webgl')); return; }

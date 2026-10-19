@@ -87,7 +87,13 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
 - **Threads need a cross-origin isolated page** (the COOP / COEP headers).
   GitHub Pages cannot send them, so `coi-serviceworker.js` (vendored, MIT)
   adds them from a service worker, which reloads the page once on the first
-  visit. `serve.py` sends them itself.
+  visit (the page waits up to 30 s for it: a first visit on a slow connection
+  takes a while). `serve.py` sends them itself.
+- **A Content-Security-Policy** (`index.html`'s `<meta>`): only the page's
+  own files, no inline script or style; `'wasm-unsafe-eval'` compiles
+  PlayGuard and `blob:` workers are Emscripten's threads. The theme is set
+  before the first paint by `theme.js`, a file rather than an inline script
+  for that reason. The page loads nothing from elsewhere.
 - CI writes `build.json` (the repository, commit, branch, pull request and
   its title) for the page's header, and the page asks for PlayGuard's files
   with the commit in their URL: GitHub Pages lets browsers keep them 10
