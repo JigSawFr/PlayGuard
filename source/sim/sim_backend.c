@@ -56,12 +56,14 @@
 // Game patches are read from ./playguard_data/sd/ (the simulated SD card root).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #define _POSIX_C_SOURCE 200809L
+#include <fcntl.h>
 #include <pthread.h>
 #include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "../core/gamecheck.h"
 #include "../core/pctl_ops.h"
@@ -123,7 +125,10 @@ static void sim_keep_save(void)
     if (!sim_keeping()) return;
     pthread_mutex_lock(&s_keep_lock);
     if (memcmp(&S, s_kept, sizeof(S)) != 0) {
-        FILE *f = fopen(SIM_KEEP_FILE ".tmp", "wb");
+        // Not world-writable (fopen creates with 0666, less the umask).
+        const int fd = open(SIM_KEEP_FILE ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        FILE *f = fd >= 0 ? fdopen(fd, "wb") : NULL;
+        if (fd >= 0 && !f) close(fd);
         const u32 size = sizeof(S);
         bool ok = f && fwrite(SIM_KEEP_MAGIC, 1, sizeof(SIM_KEEP_MAGIC), f) == sizeof(SIM_KEEP_MAGIC) &&
                   fwrite(&size, sizeof(size), 1, f) == 1 && fwrite(&S, 1, sizeof(S), f) == sizeof(S);
