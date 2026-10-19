@@ -23,8 +23,7 @@ bool docked()
 #ifdef __SWITCH__
     return appletGetOperationMode() == AppletOperationMode_Console;
 #else
-    const char* sim = sim_env("PLAYGUARD_SIM_DOCKED");
-    return sim && *sim && std::string(sim) != "0";
+    return sim_env_flag("PLAYGUARD_SIM_DOCKED");
 #endif
 }
 

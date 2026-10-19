@@ -128,9 +128,12 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   `/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc` (Debian and
   Ubuntu's `fonts-noto-cjk`), or `-DPLAYGUARD_WEB_CJK_FONT=<file>`; without
   one, the build goes on with a warning and those languages show boxes.
-- The page: `index.html`, `simulator.js`, `simulator.css`; `params.json`, the
-  panel's entries; `i18n/<language>.json`, its texts, one catalog per language
-  of the console (`en-US.json` the reference). `tools/check_web_params.py` (CI)
+- The page: `index.html`, `simulator.js`, `simulator.css`; `sim_logic.js`,
+  what of it touches neither the page nor PlayGuard (the languages, the URL,
+  the variables, the steps' format), tested with Node (`node --test
+  tests/web_page/*.test.js`, CI); `params.json`, the panel's entries;
+  `i18n/<language>.json`, its texts, one catalog per language of the console
+  (`en-US.json` the reference). `tools/check_web_params.py` (CI)
   fails when a `PLAYGUARD_SIM_*` variable read in `source/` has no entry, an
   entry no longer matches a variable, a language of the console has no
   catalog, or English lacks a text; it warns about a text another catalog has

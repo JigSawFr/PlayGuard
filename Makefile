@@ -215,6 +215,18 @@ session_log_CSRC  := source/util/crash_dump.c
 session_log_CFLAGS := -std=c11 -Isource/util
 crash_dump_SRC   := source/util/crash_dump.c tests/crash_dump/test.c
 crash_dump_FLAGS := -std=c11 -Isource/util
+# The desktop and web simulators' console (source/sim/*.c, sim_state.h) and
+# their PLAYGUARD_SIM_* variables (core/sim_env.h), with the console-free
+# parts of the service layer they share with the console.
+sim_backend_SRC    := source/sim/sim_env.cpp source/sim/sim_platform.cpp source/util/sha256.cpp tests/sim_backend/test.cpp
+sim_backend_CSRC   := $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c sim_time.c sim_playstats.c sim_gamecheck.c) \
+                      $(addprefix source/core/,pure.c calendar.c write_guard.c) source/util/playlog.c
+# Atomic coverage counters: the suite runs the same code from several threads
+# at once, and gcov's plain counters then come out wrong (negative ones, that
+# gcovr refuses).
+sim_backend_FLAGS  := $(TEST_CXXFLAGS) -fprofile-update=atomic
+sim_backend_CFLAGS := -std=gnu11 -Isource/core -fprofile-update=atomic
+sim_backend_LIBS   := -pthread
 frame_stats_SRC   := source/util/paths.cpp source/util/frame_stats.cpp tests/frame_stats/test.cpp
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
 
@@ -238,15 +250,17 @@ FORCE:
 # The suite's program. Second expansion: the pattern's stem names the
 # variables above.
 .SECONDEXPANSION:
-# An optional <name>_CSRC (one C file, with <name>_CFLAGS) is built by $(CC)
-# into <name>.c.o and linked into a C++ suite; one that links util/date.cpp
-# gets CALENDAR_C (with CALENDAR_CFLAGS) when it names none.
+# An optional <name>_CSRC (C files, with <name>_CFLAGS) is built by $(CC)
+# into <name>.<file>.o each and linked into a C++ suite; one that links
+# util/date.cpp gets CALENDAR_C (with CALENDAR_CFLAGS) when it names none.
 test_flags  = $(or $($1_FLAGS),$(if $(filter %.cpp,$($1_SRC)),$(TEST_CXXFLAGS)))
 test_csrc   = $(or $($1_CSRC),$(if $(filter source/util/date.cpp,$($1_SRC)),$(CALENDAR_C)))
 test_cflags = $(if $($1_CSRC),$($1_CFLAGS),$(CALENDAR_CFLAGS))
+test_cobj   = $(TESTOUT)/$1.$(basename $(notdir $2)).o
+test_cobjs  = $(foreach c,$(call test_csrc,$1),$(call test_cobj,$1,$c))
 $(TEST_PROGRAMS): $(TESTOUT)/%: $$($$*_SRC) $$(call test_csrc,$$*) $(TEST_HEADERS) $(TEST_FLAGS_FILE) | $(TESTOUT)
-	$(if $(call test_csrc,$*),$(CC) $(call test_cflags,$*) $(CWARN) -c $(call test_csrc,$*) -o $@.c.o)
-	$(if $(filter %.cpp,$($*_SRC)),$(CXX),$(CC)) $(call test_flags,$*) $(CWARN) $($*_SRC) $(if $(call test_csrc,$*),$@.c.o) $($*_LIBS) -o $@
+	$(foreach c,$(call test_csrc,$*),$(CC) $(call test_cflags,$*) $(CWARN) -c $c -o $(call test_cobj,$*,$c) &&) true
+	$(if $(filter %.cpp,$($*_SRC)),$(CXX),$(CC)) $(call test_flags,$*) $(CWARN) $($*_SRC) $(call test_cobjs,$*) $($*_LIBS) -o $@
 
 # Running it: the output goes to <name>.log and the terminal; <name>.ok only
 # when it passed.

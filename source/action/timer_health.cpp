@@ -3,7 +3,6 @@
 
 #include <borealis.hpp>
 #include <chrono>
-#include <cstdlib>
 
 #include "action/timer_health_logic.hpp"
 #include "app.hpp"
@@ -23,9 +22,8 @@ timer_health_logic::State s_state;
 uint64_t stall_ms()
 {
     static const uint64_t ms = [] {
-        const char* s = sim_env("PLAYGUARD_SIM_STALL_S");
-        const long v = s ? std::strtol(s, nullptr, 10) : 0;
-        return v > 0 ? (uint64_t)v * 1000 : timer_health_logic::STALL_MS;
+        const long long s = sim_env_int("PLAYGUARD_SIM_STALL_S", 0, 0, 24 * 3600);
+        return s > 0 ? (uint64_t)s * 1000 : timer_health_logic::STALL_MS;
     }();
     return ms;
 }

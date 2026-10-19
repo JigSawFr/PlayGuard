@@ -29,8 +29,7 @@ bool read_battery()
     psmExit();
     return ok && charger == PsmChargerType_Unconnected;
 #else
-    const char* sim = sim_env("PLAYGUARD_SIM_BATTERY");
-    return sim && *sim && std::string(sim) != "0";
+    return sim_env_flag("PLAYGUARD_SIM_BATTERY");
 #endif
 }
 }   // namespace

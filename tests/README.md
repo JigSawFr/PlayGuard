@@ -17,6 +17,10 @@ CXX=clang++` builds them with clang (its sanitizer runtime: `libclang-rt-dev`);
 `make test SAN= COV=--coverage` with gcc leaves the `.gcda` files for `gcovr`
 in `build/host-tests/`. CI runs all three.
 
+The web simulator's page logic (`web/sim_logic.js`) is tested with Node
+instead, in `web_page/`: `node --test tests/web_page/*.test.js` (CI runs it
+with the resource checks).
+
 The suites build and run in parallel (`JOBS=n` for fewer jobs), every one of
 them even when one fails: each leaves its output in `build/host-tests/<suite>.log`
 and a `<suite>.ok` when it passed, and `make` fails at the end if any did. A
@@ -24,7 +28,7 @@ suite is three variables in the Makefile (`<name>_SRC`, `<name>_FLAGS`, an
 optional `<name>_LIBS`); a new one is three lines there, next to the others.
 A C++ suite leaves out `<name>_FLAGS` when `TEST_CXXFLAGS` (C++17, `source/`
 and borealis' headers) is all it needs, so it is often one line. A C++ suite
-that needs one C source names it in `<name>_CSRC` (with `<name>_CFLAGS`): it
+that needs C sources names them in `<name>_CSRC` (with `<name>_CFLAGS`): each
 is built by `$(CC)` and linked in, as clang++ refuses to build a `.c` file as
 C++. One that links `source/util/date.cpp` gets `source/core/calendar.c` that
 way without naming it.
@@ -75,6 +79,7 @@ services its code calls.
 | `timer_health_logic/` | `source/action/timer_health_logic.cpp`: when *Today* says the console is not counting play time (the timer on and not unlocked, a limit today above 0 and not reached nor passed, PlayGuard run as an application; the time left not moving by 5 s over 90 s on screen, a gap of over 15 s between two readings not counted as time on screen), and when it stops saying so. |
 | `sys_updates/` | `source/util/sys_updates.cpp`: release tags as versions (`v6.5.4`, `1.12.0`; one number, four, empty parts or a suffix refused), the tag at the end of a release page's URL, hekate's version in `bootloader/update.bin` (its `ICTC` magic and digit bytes within the first kilobyte, a minor of 10, noise before it, a cut file), and the text `config.json` keeps (round trip, missing ones left out, unknown keys and bad versions ignored). |
 | `sys_updates_net/` | `source/util/sys_updates_net.cpp`, built twice: `sys_updates_net` (`-D__SWITCH__`, against a fake `http::redirect`) for each repository's `releases/latest` redirect read as a version, in order, a page that does not redirect leaving its version empty and the first failure in the error, the others still asked, a redirect elsewhere or to a tag that is not a version giving nothing; `sys_updates_sim` for the desktop's `PLAYGUARD_SIM_SYS_LATEST` (three versions, nothing without it or with `offline`, a malformed value refused). |
+| `sim_backend/` | `source/sim/`, the simulated console of the desktop and web builds, and `source/sim/sim_env.cpp`: the values a flag and a number take (empty, `0`, `false`, `off`, `no`; out of range brought within it, not a number the default), the web page's changes over the environment's, each value kept once; `PLAYGUARD_SIM_KEEP` (a first run's state written, its changes too, the next run starting from them whatever the variables say, a file of another layout ignored, nothing without it; each run in a process of its own); the time left today at a frozen time (`PLAYGUARD_SIM_NOW`): the made-up 80 minutes against the day's limit, moved on by `PLAYGUARD_SIM_SKIP` to the limit, past it and past midnight, `IDLE`, `LEFT_MIN`, a warning only going below 0; the clocks; the changes (the play timer's gate, `PLAYGUARD_SIM_FAIL`, the read-only switch and the change check first, custom settings only at the custom level); the made-up games, the Activity tab's and the installed ones from one table (icons, accounts sharing 2:1 less the time on no account, a removal kept, `GAMES_OK`); the state read and changed from several threads at once. |
 | `ntp_servers/` | `source/util/ntp_servers.cpp` against a fake `platform_region()`: the server picked for each console region (an unknown one, or none read, giving `pool.ntp.org`), the built-in list (region ids and hosts unique, every host a plain name `config.json` can keep, each region's default in it), and the two cross-check servers (never the primary). |
 | `dns_hosts/` | `source/util/dns_hosts.cpp`: Atmosphère's hosts-file names (`*`, `%` as `lp1`, either case), a hosts file sending the parental-control server elsewhere or not (comments, several names a line, the telemetry defaults alone), `system_settings.ini` turning DNS.mitm off, the emuMMC's id from `emummc.ini`, and the hosts files tried for each system. |
 | `sys_notes/` | `source/util/sys_notes.cpp`: GitHub release lists (drafts, pre-releases, tags that are not versions and repeated ones left out; dates; pages elsewhere than github.com dropped; not a list refused), the notes trimmed (hekate's banner, FAQ and empty Download section; Atmosphère's notes of the previous release), the firmware each release says it supports ("Support was added for", "Latest HOS supported:", "HOS … support"; mentions that are not claims ignored), switchbrew's version table and dates, a version's page (its change-log as Markdown, security fixes, pctl updated), the tabs a screen shows (the installed version, then at most five newer ones), what updating the firmware needs (nothing, update first, wait), and the cache file (round trip, an edited file's bad values left out, a fresh list keeping the notes read before). |
