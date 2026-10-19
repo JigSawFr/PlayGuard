@@ -284,7 +284,7 @@ with sync_playwright() as p:
             print("ok   tour")
 
     # The CJK font waited for in Japanese.
-    if open_page(page, "lang=ja&now=1791471600&still_focus=1", "japanese"):
+    if open_page(page, "lang=ja&theme=light&now=1791471600&still_focus=1&version=1.0.0:1a2b3c4", "japanese"):
         log = log_text(page)
         if "Using zh-Hans font" not in log or log.index("Using zh-Hans font") > log.index("start-up: first screen ready"):
             fail("japanese: the CJK font was not there at start-up")
