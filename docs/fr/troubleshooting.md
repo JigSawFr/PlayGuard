@@ -1,3 +1,4 @@
+<!-- translated from docs/troubleshooting.md, sha256 a1ee9d0e3f69 -->
 # Dépannage
 
 Reprendre la main sur une console bloquée, signaler un bug, et le mode développeur. Retour au [README](../../README.fr.md).

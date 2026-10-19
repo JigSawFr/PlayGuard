@@ -1,3 +1,4 @@
+<!-- translated from docs/install.md, sha256 f12b746bb6b9 -->
 # Installation
 
 Comment installer PlayGuard, et ce qu'il écrit sur la carte SD. Retour au [README](../../README.fr.md).
