@@ -5,7 +5,7 @@
 #include "action/notice_logic.hpp"
 #include "action/pin_lock.hpp"
 #include "tab/cadran_list.hpp"
-#include "tab/cadran_tab.hpp"
+#include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 

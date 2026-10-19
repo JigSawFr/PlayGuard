@@ -19,7 +19,7 @@
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
 #include "tab/tab_base.hpp"
-#include "tab/cadran_tab.hpp"
+#include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"

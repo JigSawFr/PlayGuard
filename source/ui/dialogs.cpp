@@ -60,11 +60,11 @@ static void scroll_with(brls::Dialog* dialog, brls::ScrollingFrame* frame, brls:
     }
 }
 
-// The text laid out by cadran::dialog_body (and `extra` in it), scrolling
-// when taller than the dialog's room.
-static brls::Dialog* body_dialog(const std::string& text, brls::View* extra)
+// The text laid out by cadran::dialog_body, scrolling when taller than the
+// dialog's room.
+static brls::Dialog* body_dialog(const std::string& text)
 {
-    brls::Box* body = cadran::dialog_body(text, extra);
+    brls::Box* body = cadran::dialog_body(text);
     YGNodeCalculateLayout(body->getYGNode(), 720, YGUndefined, YGDirectionLTR);
     const float room = content_height();
     if (YGNodeLayoutGetHeight(body->getYGNode()) <= room) return new brls::Dialog(body);
@@ -82,14 +82,13 @@ static brls::Dialog* body_dialog(const std::string& text, brls::View* extra)
 
 brls::Dialog* dialog(const std::string& text)
 {
-    return body_dialog(text, nullptr);
+    return body_dialog(text);
 }
 
 static void open_confirm(const std::string& body, const std::string& confirm_label,
-                         std::function<void()> on_yes, std::function<void()> on_no, bool danger,
-                         brls::View* extra = nullptr)
+                         std::function<void()> on_yes, std::function<void()> on_no, bool danger)
 {
-    auto* dialog = body_dialog(body, extra);
+    auto* dialog = body_dialog(body);
     dialog->addButton("hints/cancel"_i18n, [on_no]() { if (on_no) on_no(); });
     dialog->addButton(confirm_label, [on_yes]() { if (on_yes) on_yes(); });
     on_cancel(dialog, on_no);
@@ -101,12 +100,6 @@ void confirm(const std::string& body, const std::string& confirm_label,
              std::function<void()> on_yes, std::function<void()> on_no, bool danger)
 {
     open_confirm(body, confirm_label, std::move(on_yes), std::move(on_no), danger);
-}
-
-void confirm_with(const std::string& body, brls::View* extra, const std::string& confirm_label,
-                  std::function<void()> on_yes, std::function<void()> on_no, bool danger)
-{
-    open_confirm(body, confirm_label, std::move(on_yes), std::move(on_no), danger, extra);
 }
 
 void confirm_danger(const std::string& body, const std::string& confirm_label, std::function<void()> on_yes)

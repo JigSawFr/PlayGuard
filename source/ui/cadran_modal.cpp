@@ -177,7 +177,7 @@ const char* note_icon(const std::string& paragraph, bool* warn)
 }
 }   // namespace
 
-brls::Box* cadran::dialog_body(const std::string& text, brls::View* extra)
+brls::Box* cadran::dialog_body(const std::string& text)
 {
     namespace kit = cadran::kit;
     brls::Theme theme = brls::Application::getTheme();
@@ -263,10 +263,6 @@ brls::Box* cadran::dialog_body(const std::string& text, brls::View* extra)
         brls::Label* label = kit::label(paragraph, 19, "cadran/text2");
         label->setMarginTop(body->getChildren().empty() ? 0 : 14);
         body->addView(label);
-    }
-    if (extra) {
-        extra->setMarginTop(body->getChildren().empty() ? 0 : 18);
-        body->addView(extra);
     }
     // The notes under a line, each with its icon.
     for (size_t i = 0; i < notes.size(); i++) {

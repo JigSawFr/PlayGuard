@@ -5,6 +5,8 @@
 #include "action/pt_flow.hpp"
 #include "action/rating_flow.hpp"
 #include "app.hpp"
+#include "ui/cadran_frame.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -13,26 +15,46 @@ namespace
 {
 const uint8_t AGES[] = { 0, 3, 4, 6, 7, 8, 10, 12, 13, 14, 15, 16, 17, 18 };
 
+// The check on the level in force.
+brls::Box* badge()
+{
+    brls::Theme theme = brls::Application::getTheme();
+    auto* box = new brls::Box(brls::Axis::ROW);
+    box->setWidth(26);
+    box->setHeight(26);
+    box->setShrink(0);
+    box->setCornerRadius(13);
+    box->setBackgroundColor(theme["cadran/teal_fill"]);
+    box->setAlignItems(brls::AlignItems::CENTER);
+    box->setJustifyContent(brls::JustifyContent::CENTER);
+    box->setMarginLeft(6);
+    box->addView(cadran::kit::icon("check", 15, "cadran/navy"));
+    return box;
+}
 }   // namespace
 
 RestrictionsTab::RestrictionsTab()
-    : TabBase("xml/tab/restrictions.xml")
+    : TabBase("xml/tab/restrictions.xml"), list(this)
 {
+    // The levels: four tiles in a row, no restriction as a slim card under them.
+    auto* levels = static_cast<brls::Box*>(this->getView("rs_levels"));
+    auto* row = static_cast<brls::Box*>(this->getView("rs_tiles"));
+    for (uint32_t level : { PctlSafetyLevel_YoungChild, PctlSafetyLevel_Child, PctlSafetyLevel_Teen, PctlSafetyLevel_Custom,
+                            PctlSafetyLevel_None }) {
+        this->tiles.push_back(this->make_tile(level, level == PctlSafetyLevel_Custom));
+        if (level == PctlSafetyLevel_None) levels->addView(this->tiles.back().box);
+        else row->addView(this->tiles.back().box);
+    }
+    static_cast<brls::Label*>(this->getView("rs_kicker"))->setText(cadran::upper("playguard/restrictions/section_level"_i18n));
+    this->list.apply({ { "rs_age", "calendar" }, { "rs_sns", "user" }, { "rs_comm", "phone" }, { "rs_vr", "eye" },
+                       { "rs_org", "flag" }, { "rs_free_comm", "gamepad" }, { "rs_blocked", "list" } });
+
     custom_note->setSingleLine(false);
     note->setSingleLine(false);
     blocked_note->setSingleLine(false);
 
     blocked->registerClickAction([this](brls::View*) {
         rating_flow::show_blocked(this->st, this->age_now);
-        return true;
-    });
-
-    level->registerClickAction([this](brls::View*) {
-        if (ui::refuse_read_only()) return true;
-        std::vector<std::string> names;
-        for (uint32_t i = 0; i <= 4; i++) names.push_back(ui::level_name(i));
-        ui::pick("playguard/restrictions/level"_i18n, names, this->st.safety_level_ok ? (int)this->st.safety_level : 0,
-                 [this](int index) { this->choose_level(index); });
         return true;
     });
 
@@ -109,6 +131,112 @@ RestrictionsTab::RestrictionsTab()
     ui::guard_switch(vr);
 }
 
+RestrictionsTab::Tile RestrictionsTab::make_tile(uint32_t level, bool last)
+{
+    namespace kit = cadran::kit;
+    brls::Theme theme = brls::Application::getTheme();
+    Tile t;
+    t.level = level;
+    if (level == PctlSafetyLevel_None) {
+        // No restriction: a slim card under the levels, its words, its check.
+        t.box = kit::card(true, false);
+        t.box->setAxis(brls::Axis::ROW);
+        t.box->setAlignItems(brls::AlignItems::CENTER);
+        t.box->setCornerRadius(18);
+        t.box->setHighlightCornerRadius(18);
+        t.box->setPadding(14, 22, 14, 24);
+        t.box->setBorderThickness(2);
+        t.box->setMarginTop(12);
+        brls::Label* title = kit::label(ui::level_name(level), 17);
+        title->setSingleLine(true);
+        title->setMarginRight(14);
+        t.box->addView(title);
+        t.note = kit::label("playguard/cadran/restrictions/none"_i18n, 15, "cadran/text3");
+        t.note->setGrow(1.0f);
+        t.note->setWidth(0);
+        t.box->addView(t.note);
+        t.badge = badge();
+        t.box->addView(t.badge);
+    } else {
+        t.box = kit::card(true, true);
+        t.box->setMinHeight(226);
+        t.box->setCornerRadius(22);
+        t.box->setHighlightCornerRadius(22);
+        t.box->setPadding(18, 18, 16, 18);
+        t.box->setBorderThickness(2);
+        if (!last) t.box->setMarginRight(12);
+
+        auto* head = new brls::Box(brls::Axis::ROW);
+        head->setAlignItems(brls::AlignItems::FLEX_START);
+        brls::Label* title = kit::label(ui::level_name(level), 19);
+        // Large already; a quarter of the row has no room for larger text
+        // ("Nutzerdefiniert" would break inside the word).
+        title->setFontScaled(false);
+        title->setGrow(1.0f);
+        title->setWidth(0);
+        head->addView(title);
+        t.badge = badge();
+        head->addView(t.badge);
+        t.box->addView(head);
+
+        t.age = new CadranDigits();
+        t.age->setFontSize(26);
+        t.age->setMarginTop(10);
+        t.age->setFitWidth(200);
+        t.box->addView(t.age);
+        t.note = kit::label("", 15, "cadran/text3");
+        t.note->setMarginTop(4);
+        t.box->addView(t.note);
+
+        auto* spacer = new brls::Box();
+        spacer->setGrow(1.0f);
+        t.box->addView(spacer);
+        auto* rule = new brls::Box();
+        rule->setHeight(1);
+        rule->setBackgroundColor(theme["cadran/line"]);
+        rule->setMarginTop(10);
+        rule->setMarginBottom(10);
+        t.box->addView(rule);
+        const auto row = [&](brls::Rectangle*& dot, brls::Label*& text) {
+            auto* r = new brls::Box(brls::Axis::ROW);
+            r->setAlignItems(brls::AlignItems::FLEX_START);   // the dot by the first line
+            r->setMarginBottom(6);
+            dot = new brls::Rectangle(theme["cadran/text3"]);
+            dot->setWidth(8);
+            dot->setHeight(8);
+            dot->setCornerRadius(4);
+            dot->setMarginTop(5);
+            dot->setMarginRight(6);
+            dot->setShrink(0);
+            r->addView(dot);
+            // On two lines when a language needs them (the tiles of the row
+            // grow together).
+            text = kit::label("", 15, "cadran/text2");
+            text->setGrow(1.0f);
+            text->setWidth(0);
+            r->addView(text);
+            t.box->addView(r);
+        };
+        row(t.sns_dot, t.sns);
+        row(t.comm_dot, t.comm);
+        row(t.games_dot, t.games);
+        t.games_row = static_cast<brls::Box*>(t.games->getParent());
+    }
+
+    t.box->registerAction("playguard/cadran/restrictions/choose"_i18n, brls::BUTTON_A, [this, level](brls::View*) {
+        if (this->st.safety_level_ok && this->st.safety_level == level) {
+            // Custom in force: its settings, the lines under the tiles.
+            brls::View* first = level == PctlSafetyLevel_Custom ? this->getView("rs_age") : nullptr;
+            if (first && first->getVisibility() == brls::Visibility::VISIBLE) brls::Application::giveFocus(first);
+            return true;
+        }
+        if (ui::refuse_read_only()) return true;
+        this->choose_level((int)level);
+        return true;
+    });
+    return t;
+}
+
 void RestrictionsTab::choose_level(int index)
 {
     // A preset: say what it restricts (1034) before choosing it.
@@ -164,27 +292,17 @@ void RestrictionsTab::refresh()
     pctl_status_fetch(&this->st);
     ui::note_unlocked(this->st.temp_unlocked_ok, this->st.temp_unlocked);
     const std::string na = "playguard/common/unavailable"_i18n;
+    if (this->st.safety_level_ok) cadran::set_pill(brls::getStr("playguard/cadran/pill/level", ui::level_name(this->st.safety_level)), "shield");
+    else cadran::set_pill("");
 
-    level->setDetailText(this->st.safety_level_ok ? ui::level_name(this->st.safety_level) : na);
-
+    // Custom in force: its settings, editable, under the tiles (a preset's
+    // are in its tile).
     const bool custom = this->st.safety_level_ok && this->st.safety_level == PctlSafetyLevel_Custom &&
                         this->st.settings_ok;
-    // A preset: what it imposes, read-only, instead of a note saying the
-    // settings are hidden (the parent sees what applies without the picker).
     PctlCustomSettings preset = {};
     const bool preset_ok = !custom && this->st.safety_level_ok && this->st.safety_level != PctlSafetyLevel_Custom &&
                            R_SUCCEEDED(pctl_get_level_settings(this->st.safety_level, &preset));
-    custom_header->setTitle(custom ? "playguard/restrictions/section_custom"_i18n
-                                   : "playguard/restrictions/section_level_settings"_i18n);
-    ui::set_visible(custom_header.getView(), custom || preset_ok);
-    ui::set_visible(preset_age.getView(), preset_ok);
-    ui::set_visible(preset_sns.getView(), preset_ok);
-    ui::set_visible(preset_comm.getView(), preset_ok);
-    if (preset_ok) {
-        preset_age->setDetailText(ui::age_text(preset.rating_age));
-        preset_sns->setDetailText(ui::yes_no(preset.sns_post_restriction));
-        preset_comm->setDetailText(ui::yes_no(preset.free_communication_restriction));
-    }
+    ui::set_visible(custom_header.getView(), custom);
     ui::set_visible(age.getView(), custom);
     ui::set_visible(sns.getView(), custom);
     ui::set_visible(comm.getView(), custom);
@@ -208,12 +326,66 @@ void RestrictionsTab::refresh()
     ui::set_visible(blocked_note.getView(), counted);
     // Read-only: everything stays in sight, greyed; A says why nothing changes.
     const bool writable = !app::read_only();
-    for (brls::DetailCell* c : { (brls::DetailCell*)level.getView(), (brls::DetailCell*)age.getView(),
-                                 (brls::DetailCell*)sns.getView(), (brls::DetailCell*)comm.getView(),
-                                 (brls::DetailCell*)vr.getView(), (brls::DetailCell*)org.getView() })
+    for (brls::DetailCell* c : { (brls::DetailCell*)age.getView(), (brls::DetailCell*)sns.getView(),
+                                 (brls::DetailCell*)comm.getView(), (brls::DetailCell*)vr.getView(),
+                                 (brls::DetailCell*)org.getView() })
         ui::show_writable(c, writable);
     free_comm->setDetailText(this->st.free_comm_count_ok
         ? brls::getStr("playguard/restrictions/free_comm_value", (int)this->st.free_comm_count) : na);
+    this->list.sync();
+    this->show_tiles(custom);
+}
+
+void RestrictionsTab::show_tiles(bool custom)
+{
+    brls::Theme theme = brls::Application::getTheme();
+    const PctlStatus& st = this->st;
+    const std::string org = st.rating_org_ok ? pctl_rating_org_name(st.rating_org) : "";
+    for (Tile& t : this->tiles) {
+        const bool selected = st.safety_level_ok && st.safety_level == t.level;
+        PctlCustomSettings s = {};
+        bool known = true;   // no restriction: nothing restricted
+        if (t.level == PctlSafetyLevel_Custom) {
+            known = st.settings_ok;
+            s = st.settings;
+        } else if (t.level != PctlSafetyLevel_None) {
+            known = R_SUCCEEDED(pctl_get_level_settings(t.level, &s));
+        }
+        t.box->setBackgroundColor(selected ? theme["cadran/teal_soft"] : theme["cadran/surf"]);
+        t.box->setBorderColor(selected ? theme["cadran/teal_fill"] : theme["cadran/line"]);
+        t.badge->setVisibility(selected ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
+        if (t.level == PctlSafetyLevel_Custom && t.to_settings != custom) {
+            t.to_settings = custom;
+            t.box->updateActionHint(brls::BUTTON_A, custom ? "playguard/cadran/restrictions/to_settings"_i18n
+                                                           : "playguard/cadran/restrictions/choose"_i18n);
+            brls::Application::getGlobalHintsUpdateEvent()->fire();
+        }
+        // Read-only: the levels stay, dimmed; A says why nothing changes.
+        t.box->setAlpha(app::read_only() && !selected ? 0.6f : 1.0f);
+        if (!t.age) continue;   // no restriction: its words say it all
+        t.age->setTextColor(selected ? theme["cadran/teal"] : theme["cadran/text"]);
+        t.age->setText(!known ? "—" : ui::age_text(s.rating_age));
+        if (t.level == PctlSafetyLevel_Custom) t.note->setText("playguard/cadran/restrictions/custom"_i18n);
+        else if (known && s.rating_age) t.note->setText(brls::getStr("playguard/cadran/restrictions/up_to", org.empty() ? "—" : org, (int)s.rating_age));
+        else t.note->setText("playguard/cadran/restrictions/any_age"_i18n);
+        t.sns->setText(!known ? "playguard/cadran/restrictions/sns_unknown"_i18n
+                       : s.sns_post_restriction ? "playguard/cadran/restrictions/sns_blocked"_i18n
+                                                : "playguard/cadran/restrictions/sns_allowed"_i18n);
+        t.comm->setText(!known ? "playguard/cadran/restrictions/comm_unknown"_i18n
+                        : s.free_communication_restriction ? "playguard/cadran/restrictions/comm_blocked"_i18n
+                                                           : "playguard/cadran/restrictions/comm_allowed"_i18n);
+        t.sns_dot->setColor(!known ? theme["cadran/text3"] : s.sns_post_restriction ? theme["cadran/coral_fill"] : theme["cadran/teal_fill"]);
+        t.comm_dot->setColor(!known ? theme["cadran/text3"] : s.free_communication_restriction ? theme["cadran/coral_fill"] : theme["cadran/teal_fill"]);
+        // The installed games it blocks, once a game check was made.
+        size_t n = 0, of = 0;
+        const bool counted = known && rating_flow::count_blocked(st, s.rating_age, &n, &of);
+        ui::set_visible(t.games_row, counted);
+        if (counted) {
+            t.games->setText(n ? brls::getStr("playguard/cadran/restrictions/games_blocked", (int)n)
+                               : "playguard/cadran/restrictions/games_none"_i18n);
+            t.games_dot->setColor(n ? theme["cadran/coral_fill"] : theme["cadran/teal_fill"]);
+        }
+    }
 }
 
 brls::View* RestrictionsTab::create()

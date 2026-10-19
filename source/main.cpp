@@ -36,11 +36,7 @@
 #include "core/platform.h"
 #include "core/sim_env.h"
 #include "tab/about_tab.hpp"
-#include "tab/cadran_activity_tab.hpp"
-#include "tab/cadran_play_timer_tab.hpp"
-#include "tab/cadran_lists.hpp"
-#include "tab/cadran_restrictions_tab.hpp"
-#include "tab/cadran_tab.hpp"
+#include "ui/cadran_frame.hpp"
 #include "tab/activity_tab.hpp"
 #include "tab/console_tab.hpp"
 #include "tab/dashboard_tab.hpp"
@@ -85,10 +81,8 @@ extern "C" void nvgDebugGetStats(NVGcontext*, int*, int*, int*, int*) __attribut
 #include "view/scroll_view.hpp"
 #include "view/play_days.hpp"
 #include "view/play_hours.hpp"
-#include "view/pt_gauge.hpp"
 #include "view/pt_ring.hpp"
 #include "view/pt_state_header.hpp"
-#include "view/pt_week.hpp"
 
 using namespace brls::literals;
 
@@ -359,14 +353,11 @@ void register_views()
 {
     brls::Application::registerXMLView("ScrollView",      ScrollView::create);
     brls::Application::registerXMLView("PtStateHeader",   PtStateHeader::create);
-    brls::Application::registerXMLView("PtGauge",         PtGauge::create);
     brls::Application::registerXMLView("PtRing",          PtRing::create);
-    brls::Application::registerXMLView("PtWeekView",      PtWeekView::create);
     brls::Application::registerXMLView("PlayDaysView",    PlayDaysView::create);
     brls::Application::registerXMLView("PlayHoursView",   PlayHoursView::create);
     brls::Application::registerXMLView("MadeInFrance",    MadeInFrance::create);
     brls::Application::registerXMLView("DashboardTab",    DashboardTab::create);
-    brls::Application::registerXMLView("CadranTab",       CadranTab::create);
     brls::Application::registerXMLView("PlayTimerTab",    PlayTimerTab::create);
     brls::Application::registerXMLView("ActivityTab",     ActivityTab::create);
     brls::Application::registerXMLView("RestrictionsTab", RestrictionsTab::create);
@@ -380,15 +371,7 @@ void register_views()
     brls::Application::registerXMLView("LoadingBar",      LoadingBar::create);
     brls::Application::registerXMLView("CadranIcon",      CadranIcon::create);
     brls::Application::registerXMLView("CadranDigits",    CadranDigits::create);
-    brls::Application::registerXMLView("CadranRestrictionsTab", CadranRestrictionsTab::create);
-    brls::Application::registerXMLView("CadranPlayTimerTab", CadranPlayTimerTab::create);
-    brls::Application::registerXMLView("CadranActivityTab", CadranActivityTab::create);
     brls::Application::registerXMLView("CadranWeekView",  CadranWeekView::create);
-    brls::Application::registerXMLView("CadranConsoleTab", CadranConsoleTab::create);
-    brls::Application::registerXMLView("CadranHistoryTab", CadranHistoryTab::create);
-    brls::Application::registerXMLView("CadranSecurityTab", CadranSecurityTab::create);
-    brls::Application::registerXMLView("CadranPreferencesTab", CadranPreferencesTab::create);
-    brls::Application::registerXMLView("CadranAboutTab",  CadranAboutTab::create);
 
     // In place of borealis' brls:Hints: the footer's clock on one line.
     FooterHints::install();

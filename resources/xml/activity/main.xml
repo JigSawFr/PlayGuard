@@ -13,45 +13,45 @@
         icon="@res/img/app_icon.jpg">
 
         <brls:Tab label="@i18n/playguard/cadran/tabs/today">
-            <CadranTab/>
+            <DashboardTab/>
         </brls:Tab>
 
         <brls:Separator/>
 
         <brls:Tab label="@i18n/playguard/tabs/play_timer">
-            <CadranPlayTimerTab/>
+            <PlayTimerTab/>
         </brls:Tab>
 
         <brls:Tab label="@i18n/playguard/tabs/activity">
-            <CadranActivityTab/>
+            <ActivityTab/>
         </brls:Tab>
 
         <brls:Tab label="@i18n/playguard/tabs/restrictions">
-            <CadranRestrictionsTab/>
+            <RestrictionsTab/>
         </brls:Tab>
 
         <brls:Tab label="@i18n/playguard/tabs/security">
-            <CadranSecurityTab/>
+            <SecurityTab/>
         </brls:Tab>
 
         <brls:Separator/>
 
         <brls:Tab label="@i18n/playguard/tabs/console">
-            <CadranConsoleTab/>
+            <ConsoleTab/>
         </brls:Tab>
 
         <brls:Separator/>
 
         <brls:Tab label="@i18n/playguard/tabs/history">
-            <CadranHistoryTab/>
+            <HistoryTab/>
         </brls:Tab>
 
         <brls:Tab label="@i18n/playguard/tabs/preferences">
-            <CadranPreferencesTab/>
+            <PreferencesTab/>
         </brls:Tab>
 
         <brls:Tab label="@i18n/playguard/tabs/about">
-            <CadranAboutTab/>
+            <AboutTab/>
         </brls:Tab>
 
     </brls:TabFrame>

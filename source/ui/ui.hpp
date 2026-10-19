@@ -129,9 +129,6 @@ void notify_result(Result rc, const std::string& ok_text, const std::string& err
 // `danger`: the confirm button is drawn in the "bad" colour (see below).
 void confirm(const std::string& body, const std::string& confirm_label,
              std::function<void()> on_yes, std::function<void()> on_no = nullptr, bool danger = false);
-// Same with `extra` (a chart, …) under the text; ui takes ownership of it.
-void confirm_with(const std::string& body, brls::View* extra, const std::string& confirm_label,
-                  std::function<void()> on_yes, std::function<void()> on_no = nullptr, bool danger = false);
 // Same, for actions that delete something: the confirm button is drawn in the
 // "bad" colour so it never looks like an ordinary OK.
 void confirm_danger(const std::string& body, const std::string& confirm_label, std::function<void()> on_yes);

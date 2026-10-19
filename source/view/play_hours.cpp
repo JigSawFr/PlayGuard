@@ -5,7 +5,7 @@
 #include <cmath>
 #include <fmt/format.h>
 
-#include "tab/cadran_tab.hpp"
+#include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 
 namespace

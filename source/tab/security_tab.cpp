@@ -10,6 +10,7 @@
 #include "action/pt_flow.hpp"
 #include "action/rescue.hpp"
 #include "app.hpp"
+#include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/perf.hpp"
@@ -17,7 +18,7 @@
 using namespace brls::literals;
 
 SecurityTab::SecurityTab()
-    : TabBase("xml/tab/security.xml")
+    : TabBase("xml/tab/security.xml"), list(this)
 {
     this->enable_auto_refresh(5000);
     // What the notification bell says is to do here, on its row.
@@ -119,6 +120,13 @@ SecurityTab::SecurityTab()
         console_actions::delete_all("", [this]() { this->refresh(); });
         return true;
     });
+    this->list.tiles({ { "sc_pin", "key" }, { "sc_restrictions", "shield" }, { "sc_temp", "unlock" } }, true);
+    this->list.apply({ { "sc_set_pin", "key" }, { "sc_pin_lock", "lock" }, { "sc_pin_ask_again", "timer" },
+                       { "sc_show_pin", "eye" }, { "sc_unlock", "unlock" }, { "sc_relock", "lock" },
+                       { "sc_auto_relock", "refresh" }, { "sc_console_lock", "gamepad" }, { "pr_active", "phone" },
+                       { "pr_updated", "refresh" }, { "pr_decode", "code" }, { "pr_unlink", "stop" }, { "sc_delete", "trash" } });
+    if (cadran::Card* danger = this->list.card_of("sc_delete"))
+        danger->setAccent(brls::Application::getTheme()["cadran/coral_line"]);
 }
 
 void SecurityTab::change_pin()
@@ -183,6 +191,11 @@ void SecurityTab::refresh()
         ui::show_writable(c, writable);
     auto_relock->setOn(config::get().auto_relock, false);
     ui::show_writable(del, writable, ui::color_bad(), ui::color_neutral());
+    this->list.sync();
+    if (unlocked) cadran::set_pill("playguard/cadran/pill/unlocked"_i18n, "unlock", true);
+    else if (has_pin) cadran::set_pill("playguard/cadran/pill/pin_set"_i18n, "key");
+    else if (s.pin_length_ok) cadran::set_pill("playguard/cadran/pill/pin_none"_i18n, "key", true);
+    else cadran::set_pill("");
 }
 
 brls::View* SecurityTab::create()

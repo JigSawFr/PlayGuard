@@ -144,12 +144,6 @@ cadran::Card::Card()
 void cadran::Card::setAccent(NVGcolor color) { this->border = color; }
 void cadran::Card::setFill(NVGcolor color) { this->fill = color; }
 
-cadran::Parking::Parking()
-{
-    this->setVisibility(brls::Visibility::GONE);
-    this->setFocusable(false);
-}
-
 void cadran::Card::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style, brls::FrameContext* ctx)
 {
     if (height < 1) return;   // every row hidden
@@ -222,17 +216,6 @@ cadran::List::List(brls::View* tab, bool sub_screen)
 cadran::List::List(brls::View* screen, brls::Box* column)
     : tab(screen), box(column)
 {
-}
-
-void cadran::List::park(const std::vector<const char*>& ids)
-{
-    if (!this->box) return;
-    if (!this->parking) {
-        this->parking = new Parking();
-        this->box->addView(this->parking);
-    }
-    for (const char* id : ids)
-        if (brls::View* view = this->tab->getView(id)) move_to(view, this->parking);
 }
 
 void cadran::List::banners(const std::vector<const char*>& ids)
@@ -417,15 +400,6 @@ brls::Box* cadran::List::rows_in(brls::Box* list)
     auto* card = new Card();
     list->addView(card);
     return card;
-}
-
-void cadran::List::hide_header_before(const char* id)
-{
-    brls::View* line = this->box ? this->tab->getView(id) : nullptr;
-    const int at = line ? index_in(this->box, line) : -1;
-    if (at <= 0) return;
-    if (auto* header = dynamic_cast<brls::Header*>(this->box->getChildren()[at - 1]))
-        header->setVisibility(brls::Visibility::GONE);
 }
 
 cadran::Card* cadran::List::wrap(const char* id)

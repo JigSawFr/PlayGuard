@@ -55,17 +55,6 @@ class Switch : public brls::View
     NVGcolor on, off, knob_on, knob_off;
 };
 
-// A box that holds the lines a Cadran screen shows its own way (a hero, a
-// tile): hidden, never focused, so the screen's own code still finds, fills
-// and shows or hides them as it always did.
-class Parking : public brls::Box
-{
-  public:
-    Parking();
-    brls::View* getDefaultFocus() override { return nullptr; }
-    brls::View* getNextFocus(brls::FocusDirection, brls::View*) override { return nullptr; }
-};
-
 class List
 {
   public:
@@ -86,12 +75,6 @@ class List
     // value large, no chevron), the others an action (icon, title). Before
     // apply(). Returns the row.
     brls::Box* tiles(const std::vector<std::pair<const char*, const char*>>& cells, bool status);
-
-    // Hides the section header just above this line (its lines went to tiles).
-    void hide_header_before(const char* id);
-
-    // Moves these lines (any view, found by id) out of sight (see Parking).
-    void park(const std::vector<const char*>& ids);
 
     // These cells as amber banners, each a card of its own (after apply()).
     void banners(const std::vector<const char*>& ids);
@@ -123,7 +106,6 @@ class List
   private:
     brls::View* tab;
     brls::Box*  box = nullptr;
-    Parking*    parking = nullptr;
     std::vector<brls::Header*> headers;
     std::vector<brls::DetailCell*> readings;   // the status tiles
 };

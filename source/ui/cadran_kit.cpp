@@ -6,6 +6,7 @@
 #include <fmt/format.h>
 #include <yoga/Yoga.h>
 
+#include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
 #include "view/cadran_digits.hpp"
 
@@ -51,6 +52,26 @@ brls::Box* card(bool focusable, bool grow)
         box->setWidth(0);
     }
     return box;
+}
+
+brls::Box* top_card(bool grow)
+{
+    brls::Box* box = card(false, grow);
+    box->setCornerRadius(22);
+    box->setPadding(22, 26, 22, 26);
+    return box;
+}
+
+brls::Box* kicker(const char* icon_name, const std::string& title)
+{
+    auto* head = new brls::Box(brls::Axis::ROW);
+    head->setAlignItems(brls::AlignItems::CENTER);
+    head->addView(icon(icon_name, 18, "cadran/text3"));
+    brls::Label* text = label(cadran::upper(title), 15, "cadran/text3");
+    text->setSingleLine(true);
+    text->setMarginLeft(8);
+    head->addView(text);
+    return head;
 }
 
 Mark::Mark(const char* color_key)
@@ -186,27 +207,6 @@ Empty empty(const char* icon_name)
 void wrap(brls::View* row)
 {
     if (row) YGNodeStyleSetFlexWrap(row->getYGNode(), YGWrapWrap);
-}
-
-bool press(brls::View* line)
-{
-    if (!line) {
-        // A line renamed or gone (check_resources checks the ids it knows).
-        brls::Logger::warning("cadran: no line to press");
-        return false;
-    }
-    for (const std::shared_ptr<brls::Action>& action : line->getActions()) {
-        if (!(*action == brls::BUTTON_A) || !action->isAvailable()) continue;
-        action->getActionListener()(line);
-        return true;
-    }
-    return false;
-}
-
-void follow(brls::View* view, brls::View* line)
-{
-    if (!view || !line) return;
-    ui::set_visible(view, line->getVisibility() == brls::Visibility::VISIBLE);
 }
 
 std::string without_chevron(const std::string& value)

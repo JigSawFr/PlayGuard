@@ -5,6 +5,7 @@
 #include "action/history_flow.hpp"
 #include "activity/history_activity.hpp"
 #include "app.hpp"
+#include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
@@ -20,7 +21,7 @@ std::string keep_text(int keep)
 }   // namespace
 
 HistoryTab::HistoryTab()
-    : TabBase("xml/tab/history.xml", false)
+    : TabBase("xml/tab/history.xml", false), list(this)
 {
     backup_note->setSingleLine(false);
 
@@ -56,6 +57,8 @@ HistoryTab::HistoryTab()
         });
         return true;
     });
+    this->list.tiles({ { "hs_backup_save", "save" }, { "hs_backup_restore", "restore" } }, false);
+    this->list.apply({ { "hs_history", "history" }, { "hs_backup_keep", "folder" } });
 }
 
 void HistoryTab::refresh()
@@ -68,6 +71,8 @@ void HistoryTab::refresh()
     history->setDetailText(ui::opens(changes ? brls::getStr("playguard/history/count", (int)changes) : ""));
     // Read-only: restoring would write; it stays in sight, greyed.
     ui::show_writable(backup_restore, !app::read_only());
+    this->list.sync();
+    cadran::set_pill("");
 }
 
 brls::View* HistoryTab::create()

@@ -399,18 +399,17 @@ for name, (path, binds) in sorted(class_binds.items()):
         if i not in ids:
             errors.append(f"{path}: BRLS_BIND id \"{i}\" is not in resources/xml/{' or '.join(inflated)}")
 
-# The lines a Cadran screen finds by id (getView, park, apply, tiles,
-# banners, press...): each one an id some layout or the code still gives a
-# view. A renamed line is otherwise a chip or a button that does nothing.
-# A literal counts as a line's id when it starts like the layouts' ids do
-# ("dash_", "cn_"...).
+# The lines a screen finds by id (getView, apply, tiles, banners, open_tab...):
+# each one an id some layout or the code still gives a view. A renamed line
+# is otherwise a chip or a button that does nothing. A literal counts as a
+# line's id when it starts like the layouts' ids do ("dash_", "cn_"...).
 all_ids = set()
 for path in glob.glob(f"{ROOT}/resources/xml/**/*.xml", recursive=True):
     all_ids |= set(re.findall(r'\bid="([^"]+)"', read(path)))
 id_prefixes = {i.split("_")[0] for i in all_ids if "_" in i and "/" not in i}
 for text in code_text.values():
     all_ids |= set(re.findall(r'setId\("([^"]+)"\)', text)) | set(re.findall(r'\bid="([^"]+)"', text))
-for path in sorted(glob.glob(f"{ROOT}/source/**/cadran_*.cpp", recursive=True)):
+for path in sorted(set(glob.glob(f"{ROOT}/source/tab/*.cpp")) | set(glob.glob(f"{ROOT}/source/**/cadran_*.cpp", recursive=True))):
     for i in sorted(set(re.findall(r'"([a-z]+_[a-z0-9_]+)"', read(path)))):
         if i.split("_")[0] in id_prefixes and i not in all_ids:
             errors.append(f"{path}: \"{i}\" names no view (no layout's id, no setId): a renamed line?")

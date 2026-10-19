@@ -10,8 +10,8 @@
 #include "action/offline_clock_logic.hpp"
 #include "app.hpp"
 #include "core/sim_env.h"
-#include "tab/cadran_lists.hpp"
-#include "tab/cadran_tab.hpp"
+#include "ui/cadran_frame.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/ntp_servers.hpp"
@@ -36,6 +36,14 @@ std::string find_region(const std::string& host)
     return "custom";
 }
 
+// "2026-10-08 16:00:00" -> { "2026-10-08", "16:00:00" }; else { "", text }.
+std::pair<std::string, std::string> split_time(const std::string& text)
+{
+    const size_t space = text.find(' ');
+    if (space == std::string::npos || space != 10) return { "", text };
+    return { text.substr(0, space), text.substr(space + 1) };
+}
+
 bool plausible_host(const std::string& h)
 {
     if (h.empty() || h.size() > 253) return false;
@@ -46,8 +54,9 @@ bool plausible_host(const std::string& h)
 }   // namespace
 
 ClockTab::ClockTab()
-    : TabBase("xml/tab/clock.xml")
+    : TabBase("xml/tab/clock.xml"), list(this, true)
 {
+    namespace kit = cadran::kit;
     why->setSingleLine(false);
     // Nintendo's time server blocked here: the clock will not set itself.
     if (nintendo_dns::time_blocked()) why->setText("playguard/clock/why"_i18n + "\n\n" + "playguard/clock/dns_note"_i18n);
@@ -93,6 +102,52 @@ ClockTab::ClockTab()
         this->refresh();
         return true;
     });
+    // Both clocks large, side by side.
+    if (brls::Box* column = this->list.content()) {
+        auto* row = new brls::Box(brls::Axis::ROW);
+        row->setAlignItems(brls::AlignItems::STRETCH);
+        row->setMarginBottom(12);
+
+        brls::Box* console = kit::top_card(true);
+        console->setMarginRight(12);
+        console->addView(kit::kicker("gamepad", "playguard/cadran/clock/console"_i18n));
+        this->user_time = new CadranDigits();
+        this->user_time->setFontSize(46);
+        this->user_time->setMarginTop(10);
+        console->addView(this->user_time);
+        this->user_date = kit::label("", 15.5f, "cadran/text2");
+        this->user_date->setMarginTop(4);
+        console->addView(this->user_date);
+        row->addView(console);
+
+        this->network_card = kit::top_card(true);
+        this->network_card->addView(kit::kicker("globe", "playguard/cadran/clock/network"_i18n));
+        this->network_time = new CadranDigits();
+        this->network_time->setFontSize(46);
+        this->network_time->setMarginTop(10);
+        this->network_card->addView(this->network_time);
+        auto* state = new brls::Box(brls::Axis::ROW);
+        state->setAlignItems(brls::AlignItems::CENTER);
+        state->setMarginTop(4);
+        this->network_dot = new brls::Rectangle(brls::Application::getTheme()["cadran/teal_fill"]);
+        this->network_dot->setWidth(9);
+        this->network_dot->setHeight(9);
+        this->network_dot->setCornerRadius(4.5f);
+        this->network_dot->setMarginRight(8);
+        state->addView(this->network_dot);
+        this->network_state = kit::label("", 15.5f, "cadran/teal");
+        state->addView(this->network_state);
+        this->network_card->addView(state);
+        row->addView(this->network_card);
+
+        // Under the section's title.
+        const auto& lines = column->getChildren();
+        const auto at = std::find(lines.begin(), lines.end(), autosync.getView());
+        column->addView(row, at == lines.end() ? 0 : (size_t)(at - lines.begin()));
+    }
+    this->list.apply({ { "ck_auto", "refresh" }, { "ck_zone", "pin" }, { "ck_region", "globe" }, { "ck_server", "server" },
+                       { "ck_custom", "pencil" }, { "ck_measure", "timer" }, { "ck_apply", "check" }, { "ck_copy", "today" },
+                       { "ck_check_at_start", "bolt" } });
 }
 
 void ClockTab::refresh()
@@ -112,12 +167,9 @@ void ClockTab::refresh()
     if (sim_env("PLAYGUARD_SIM_NOW")) ticked = 0;
 #endif
     const std::string na = "playguard/common/unavailable"_i18n;
-    ui::set_detail(user, R_SUCCEEDED(s.user_rc) ? ui::time_text(s.user_time + ticked) : na);
-    ui::set_detail(network, R_SUCCEEDED(s.network_rc) ? ui::time_text(s.network_time + ticked) : na);
-    ui::set_detail(accuracy, ui::bool_text(R_SUCCEEDED(s.accuracy_rc), s.accuracy,
-                                           "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
-    accuracy->setDetailTextColor(R_SUCCEEDED(s.accuracy_rc) ? (s.accuracy ? ui::color_ok() : ui::color_warn())
-                                                            : ui::color_neutral());
+    this->show_clocks(R_SUCCEEDED(s.user_rc) ? ui::time_text(s.user_time + ticked) : na,
+                      R_SUCCEEDED(s.network_rc) ? ui::time_text(s.network_time + ticked) : na,
+                      R_SUCCEEDED(s.accuracy_rc), s.accuracy);
     ui::set_detail(autosync, ui::bool_text(R_SUCCEEDED(s.automatic_rc), s.automatic,
                                            "playguard/common/on"_i18n, "playguard/common/off"_i18n));
     this->autosync_off = R_SUCCEEDED(s.automatic_rc) && !s.automatic;
@@ -148,6 +200,7 @@ void ClockTab::refresh()
     // No server answered: the console clock instead (its time is at the top).
     ui::set_visible(copy_cell.getView(), this->offline);
     ui::show_writable(copy_cell, !app::read_only());
+    this->list.sync();
 }
 
 void ClockTab::set_server(const std::string& host, const std::string& reg)
@@ -162,6 +215,29 @@ void ClockTab::set_server(const std::string& host, const std::string& reg)
     cfg.ntp_server = host;
     ui::save_config();
     this->refresh();
+}
+
+void ClockTab::show_clocks(const std::string& user_text, const std::string& network_text, bool known, bool accurate)
+{
+    namespace kit = cadran::kit;
+    if (!this->user_time) return;
+    brls::Theme theme = brls::Application::getTheme();
+    const auto user = split_time(user_text);
+    const auto network = split_time(network_text);
+    this->user_time->setText(user.second);
+    this->user_date->setText(user.first.empty() ? "" : kit::long_date(user.first));
+    this->network_time->setText(network.second);
+
+    const bool bad = known && !accurate;
+    std::string state = !known ? "playguard/common/unavailable"_i18n
+                        : bad  ? "playguard/cadran/clock/inaccurate"_i18n : "playguard/cadran/clock/accurate"_i18n;
+    if (known && !network.first.empty() && network.first != user.first) state += " · " + kit::long_date(network.first);
+    this->network_state->setText(state);
+    this->network_state->setTextColor(!known ? theme["cadran/text3"] : bad ? theme["cadran/amber"] : theme["cadran/teal"]);
+    this->network_dot->setColor(!known ? theme["cadran/text3"] : bad ? theme["cadran/amber_fill"] : theme["cadran/teal_fill"]);
+    this->network_time->setTextColor(bad ? theme["cadran/amber"] : theme["cadran/text"]);
+    this->network_card->setBackgroundColor(bad ? theme["cadran/amber_surf"] : theme["cadran/surf"]);
+    this->network_card->setBorderColor(bad ? theme["cadran/amber_line"] : theme["cadran/line"]);
 }
 
 void ClockTab::choose_region()
@@ -270,6 +346,5 @@ void ClockTab::copy()
 
 void ClockTab::open_screen()
 {
-    // The same screen with both clocks large.
-    ui::open_screen(new CadranClockTab(), "playguard/tabs/clock"_i18n);
+    ui::open_screen(new ClockTab(), "playguard/tabs/clock"_i18n);
 }

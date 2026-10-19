@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Activity: play time (today, last 7 days, all time), read from the
-     console's play data for every account, its summary over the chosen period,
-     every game of the period on a screen of its own (activity/games.xml) and
-     its export to the SD card. -->
+<!-- Activity: the accounts as chips, the period and the export, three
+     figures (today, the last 7 days with their bars, all time) read from the
+     console's play data, the games most played over the period as cards
+     (tab/activity_tab.cpp fills ac_cards); under them the chart, the summary
+     over the period, every game of the period on a screen of its own
+     (activity/games.xml) and when the week was played. -->
 
 <brls:Box
     width="auto"
@@ -24,16 +26,62 @@
             paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
             paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
 
+            <brls:Box id="ac_head" axis="column" alignItems="stretch">
+                <brls:Box axis="row" alignItems="center" marginBottom="14">
+                    <brls:Box id="ac_accounts" axis="row" alignItems="center" grow="1.0" width="0"/>
+                    <brls:Box id="ac_period" focusable="true" hideHighlightBackground="true" highlightCornerRadius="22" shrink="0" axis="row" alignItems="center" height="44" paddingLeft="18" paddingRight="18" cornerRadius="22" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" marginRight="10">
+                        <brls:Label id="ac_period_label" text="" fontSize="16" marginRight="8" singleLine="true"/>
+                        <CadranIcon icon="chevron-down" width="16" height="16"/>
+                    </brls:Box>
+                    <brls:Box id="ac_export" focusable="true" hideHighlightBackground="true" highlightCornerRadius="22" shrink="0" axis="row" alignItems="center" height="44" paddingLeft="18" paddingRight="18" cornerRadius="22" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1">
+                        <CadranIcon icon="download" width="18" height="18" marginRight="10"/>
+                        <brls:Label text="@i18n/playguard/cadran/activity/export" fontSize="16" singleLine="true"/>
+                    </brls:Box>
+                </brls:Box>
+
+                <brls:Box axis="row" alignItems="stretch" marginBottom="14">
+                    <brls:Box axis="column" alignItems="flexStart" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24" marginRight="14">
+                        <brls:Label text="@i18n/playguard/activity/today" fontSize="15" textColor="@theme/cadran/text3" singleLine="true"/>
+                        <CadranDigits id="ac_today" text="—" fontSize="36" marginTop="6" marginBottom="6"/>
+                        <brls:Label id="ac_today_sub" text="" fontSize="15" textColor="@theme/cadran/text2" alignSelf="stretch"/>
+                    </brls:Box>
+                    <brls:Box axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24" marginRight="14">
+                        <brls:Box axis="row" alignItems="flexEnd">
+                            <brls:Box axis="column" alignItems="flexStart" grow="1.0" width="0">
+                                <brls:Label text="@i18n/playguard/activity/week" fontSize="15" textColor="@theme/cadran/text3" singleLine="true"/>
+                                <CadranDigits id="ac_week" text="—" fontSize="36" marginTop="6" marginBottom="6"/>
+                                <brls:Label id="ac_week_sub" text="" fontSize="15" textColor="@theme/cadran/text2" alignSelf="stretch"/>
+                            </brls:Box>
+                            <brls:Box id="ac_week_bars" axis="row" alignItems="flexEnd" height="56" marginLeft="10" shrink="0">
+                                <brls:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
+                                <brls:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
+                                <brls:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
+                                <brls:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
+                                <brls:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
+                                <brls:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
+                                <brls:Box width="8" height="3" cornerRadius="3"/>
+                            </brls:Box>
+                        </brls:Box>
+                        <!-- Against the 7 days before, the tile's whole width. -->
+                        <brls:Label id="ac_week_trend" text="" fontSize="15" textColor="@theme/cadran/text3" marginTop="6" visibility="gone"/>
+                    </brls:Box>
+                    <brls:Box axis="column" alignItems="flexStart" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24">
+                        <brls:Label text="@i18n/playguard/activity/all_time" fontSize="15" textColor="@theme/cadran/text3" singleLine="true"/>
+                        <CadranDigits id="ac_total" text="—" fontSize="36" marginTop="6" marginBottom="6"/>
+                        <brls:Label id="ac_total_sub" text="" fontSize="15" textColor="@theme/cadran/text2" alignSelf="stretch"/>
+                    </brls:Box>
+                </brls:Box>
+
+                <brls:Label id="ac_games_title" text="" fontSize="15" textColor="@theme/cadran/text3" marginBottom="10"/>
+                <brls:Label id="ac_games_note" text="" fontSize="16" textColor="@theme/cadran/text2" marginBottom="6"/>
+                <brls:Box id="ac_cards" axis="column" alignItems="stretch"/>
+            </brls:Box>
+
             <brls:Header title="@i18n/playguard/activity/section_totals" marginBottom="8"/>
-            <brls:DetailCell id="ac_account" title="@i18n/playguard/activity/account"/>
             <brls:Label id="ac_new_account" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/warn"/>
             <brls:DetailCell id="ac_account_default" title="@i18n/playguard/activity/account_default"/>
             <PlayDaysView id="ac_days" width="auto" height="auto" marginTop="8" marginBottom="16"/>
-            <brls:DetailCell id="ac_today" focusable="false" title="@i18n/playguard/activity/today"/>
-            <brls:DetailCell id="ac_week" focusable="false" title="@i18n/playguard/activity/week"/>
-            <brls:DetailCell id="ac_total" focusable="false" title="@i18n/playguard/activity/all_time"/>
             <brls:Header title="@i18n/playguard/activity/section_summary" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="ac_period" title="@i18n/playguard/activity/period"/>
             <brls:DetailCell id="ac_per_day" focusable="false" title="@i18n/playguard/activity/summary/per_day"/>
             <brls:DetailCell id="ac_top" focusable="false" title="@i18n/playguard/activity/summary/top"/>
             <brls:DetailCell id="ac_days_played" focusable="false" title="@i18n/playguard/activity/summary/days_played"/>
@@ -41,7 +89,6 @@
             <brls:DetailCell id="ac_session" focusable="false" title="@i18n/playguard/activity/summary/session"/>
             <brls:Header title="@i18n/playguard/activity/section_games" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="ac_games" title="@i18n/playguard/library/open"/>
-            <brls:DetailCell id="ac_export" title="@i18n/playguard/activity/export"/>
             <brls:DetailCell id="ac_qr" title="@i18n/playguard/activity/qr"/>
             <brls:Box id="ac_progress" axis="row" alignItems="center" marginTop="10" marginBottom="6" marginLeft="16" marginRight="16">
                 <brls:ProgressSpinner width="30" height="30" marginRight="14"/>

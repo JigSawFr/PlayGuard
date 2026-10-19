@@ -1,7 +1,6 @@
 // cadran::kit — the small pieces every Cadran screen builds with: a label, an
-// icon, a card, a pill, a chip; and the glue to the screen it dresses: run a
-// line's own A action (a card standing for a line that is out of sight), show
-// a view while a line is shown, a line's value without its "›".
+// icon, a card, a pill, a chip, an empty state; a line's value without its
+// "›", a dot for a value's colour, a date in words.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -22,6 +21,12 @@ CadranIcon* icon(const char* name, float size, const char* color_key = "cadran/t
 // A card: the surface, a 1 px line, rounded; `focusable` takes the focus
 // ring (no highlight fill); `grow` shares a row with its neighbours.
 brls::Box* card(bool focusable, bool grow);
+
+// A card at the top of a screen (not a list: no rows), larger, `grow`
+// shares a row.
+brls::Box* top_card(bool grow);
+// A kicker: an icon and a title in capitals.
+brls::Box* kicker(const char* icon_name, const std::string& title);
 
 // A pill's mark: its colour, and a shape that says the same to whom the
 // colours look alike (WCAG 1.4.1): a check for what is on (teal), a
@@ -66,13 +71,6 @@ Empty empty(const char* icon_name);
 // A row whose items go on to the next line when they do not fit (the XML
 // has no attribute for it).
 void wrap(brls::View* row);
-
-// Runs the A action `line` registered (its own code, its own checks). False
-// when it has none.
-bool press(brls::View* line);
-
-// `view` shown while `line` is (after the screen's own refresh).
-void follow(brls::View* view, brls::View* line);
 
 // "12 changes  ›" -> "12 changes"; "›" -> "".
 std::string without_chevron(const std::string& value);

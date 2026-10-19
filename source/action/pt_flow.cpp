@@ -17,7 +17,6 @@
 #include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
-#include "view/pt_week.hpp"
 
 using namespace brls::literals;
 
@@ -66,14 +65,6 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
     const bool unlock = pt_logic::needs_unlock(pt);
     if (!body.empty() || unlock) body = with_link_note(body);
 
-    // The week as it will be: the days that change in amber.
-    auto preview = [&pt, new_days]() -> brls::View* {
-        if (!new_days || !pt.valid) return nullptr;
-        auto* week = new PtWeekView();
-        week->show(new_days, pt.day_min);
-        return week;
-    };
-
     // The days that change as a table ("Monday: 2 h → 2 h 30") in place of
     // the week (cadran::dialog_body draws "label: value" lines so).
     std::string changes;
@@ -89,15 +80,13 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
         const std::string with = changes.empty() ? text : text.empty() ? changes : text + "\n\n" + changes;
         return title.empty() ? with : title + "\n\n" + with;
     };
-    const auto week = [&preview, &changes]() { return changes.empty() ? preview() : nullptr; };
     if (!unlock) {
         if (body.empty()) {
             write(false);
             return;
         }
         body = titled(body);
-        if (brls::View* chart = week()) ui::confirm_with(body, chart, confirm_label, [write]() { write(false); }, nullptr, danger);
-        else ui::confirm(body, confirm_label, [write]() { write(false); }, nullptr, danger);
+        ui::confirm(body, confirm_label, [write]() { write(false); }, nullptr, danger);
         return;
     }
 
@@ -122,8 +111,7 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
         }
         write(true);
     };
-    if (brls::View* chart = week()) ui::confirm_with(text, chart, "playguard/play_timer/gate/confirm"_i18n, unlock_and_write, nullptr, danger);
-    else ui::confirm(text, "playguard/play_timer/gate/confirm"_i18n, unlock_and_write, nullptr, danger);
+    ui::confirm(text, "playguard/play_timer/gate/confirm"_i18n, unlock_and_write, nullptr, danger);
 }
 
 // Limits written by anything but the console lock replace it: its record

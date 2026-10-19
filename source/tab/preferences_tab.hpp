@@ -5,6 +5,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include "tab/cadran_list.hpp"
 #include "tab/tab_base.hpp"
 
 class PreferencesTab : public TabBase
@@ -17,6 +18,7 @@ class PreferencesTab : public TabBase
     void refresh() override;
 
   private:
+    cadran::List list;
     BRLS_BIND(brls::DetailCell,  language,      "pf_language");
     BRLS_BIND(brls::DetailCell,  theme,         "pf_theme");
     BRLS_BIND(brls::DetailCell,  start_tab,     "pf_start_tab");

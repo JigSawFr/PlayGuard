@@ -25,13 +25,13 @@ enum class Emphasis
     DANGER,    // the same, in coral
 };
 
-// A dialog's text laid out as the boards do (ui::dialog under Cadran),
-// left-aligned: its question as a title, a paragraph of "label: value" lines
+// A dialog's text laid out as the boards do (ui::dialog), left-aligned: its
+// question as a title, a paragraph of "label: value" lines
 // (playguard/common/line) as a table, the notes the app adds (the linked
 // phone app and its help before unlinking, the temporary unlock, a game about
-// to be suspended) at the bottom, small, each with its icon; any other paragraph as text. `extra`
-// (the week as it will be) goes after the text, before the notes.
-brls::Box* dialog_body(const std::string& text, brls::View* extra = nullptr);
+// to be suspended) at the bottom, small, each with its icon; any other
+// paragraph as text.
+brls::Box* dialog_body(const std::string& text);
 
 // `dialog` as a card, its buttons as pills. Once: a dressed dialog is left as
 // it is (every screen that takes the focus comes through here, see

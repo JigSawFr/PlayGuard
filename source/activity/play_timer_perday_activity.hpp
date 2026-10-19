@@ -1,11 +1,12 @@
 // PlayTimerPerDayActivity — per-day limits editor, the one place the week's
-// limits are changed day by day (the Play timer tab's chart opens it on the
-// day picked). The week chart is the editor: A on a day stages an edit into `pending[]` (a quick value, "Enter
-// minutes…" or "No limit"), drawn in the warning colour until saved; presets
-// fill several days at once; "Save" (also +) writes the seven values through
-// the play-timer gate. X re-reads the state, B leaves (asking first when there
-// are unsaved edits). The same screen edits a saved profile: it then starts from
-// the profile's days and "Save" hands them back instead of writing anything.
+// limits are changed day by day, and a saved profile's. The week is the
+// editor, as on the Play timer (CadranWeekView: the stick changes a day, X
+// opens its picker: a quick value, an exact duration or "No limit"); the
+// edits are staged into `pending[]`, drawn in the warning colour until saved;
+// presets fill several days at once; "Save" (also +) writes the seven values
+// through the play-timer gate. B leaves (asking first when there are unsaved
+// edits). For a saved profile, it starts from the profile's days and "Save"
+// hands them back instead of writing anything.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -16,7 +17,6 @@
 
 #include "util/pctl_ops_c.hpp"
 #include "view/pt_state_header.hpp"
-#include "view/pt_week.hpp"
 
 class CadranWeekView;
 
@@ -50,15 +50,14 @@ class PlayTimerPerDayActivity : public brls::Activity
     u16     pending[7] = { PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT,
                            PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT };
 
-    // The Cadran appearance: the week as on its Play timer, in place of
-    // pt_week (view/cadran_week_card.xml).
+    // The week as on the Play timer (view/cadran_week_card.xml).
     brls::View*     cadran_card = nullptr;
     CadranWeekView* cadran_week = nullptr;
 
     // onContentAvailable()'s actions: the cells', then the screen's buttons.
     void bind_cells();
     void bind_buttons();
-    void dress_cadran();
+    void build_week();
     void reload_from_service();
     void rerender();
     bool has_changes() const;
@@ -67,7 +66,6 @@ class PlayTimerPerDayActivity : public brls::Activity
     void save();
 
     BRLS_BIND(PtStateHeader,    state_header, "pt_state_header");
-    BRLS_BIND(PtWeekView,       week,         "pt_week");
     BRLS_BIND(brls::Label,      unavailable,  "pt_unavailable");
     BRLS_BIND(brls::DetailCell, pt_weekdays,  "pt_weekdays");
     BRLS_BIND(brls::DetailCell, pt_weekend,   "pt_weekend");

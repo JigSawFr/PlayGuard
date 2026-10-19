@@ -8,7 +8,7 @@
 #include "action/pt_flow.hpp"
 #include "action/pt_logic.hpp"
 #include "activity/main_activity.hpp"
-#include "tab/cadran_tab.hpp"
+#include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
