@@ -33,7 +33,15 @@ pages; no framework, nothing to install but that.
   site's pages, and any other file of the repository links to GitHub. A
   change to `docs/` is a change to the site.
 - `site/assets/` — `site.css` (the branding's navy, teal and amber, light and
-  dark) and `site.js` (the language and theme menus). The pages also use
+  dark), `site.js` (the language and theme menus), `theme.js` (the theme
+  before the first paint) and `fonts/sora.woff2`, the Sora headings' font
+  (SIL Open Font License, `fonts/OFL.txt`; its Latin letters, cut out of
+  google/fonts' `ofl/sora/Sora[wght].ttf`), served with the site so that no
+  visitor's browser asks Google Fonts or anyone else for anything.
+- **A Content-Security-Policy** on every page (a `<meta>`: GitHub Pages sends
+  no headers): only the site's own files, no inline script or style. A page
+  needing something else (a script inline, a file from another site) is
+  blocked: put it in `site/assets/`. The pages also use
   `branding/` (the mark, the icon), `images/screenshots/` and the 30-second
   tour (`images/video/playguard-tour.mp4`).
 
@@ -53,5 +61,12 @@ main's workflows run (after each `web` run, when a pull request is closed, or
 by hand), as the `github-pages` environment requires, and only puts in place
 the files `web.yml` built. Each run publishes everything again, so a closed
 pull request's preview goes at the next one.
+
+GitHub lists a workflow's runs by branch *name*, whatever repository the
+branch is in: a fork's pull request from a branch named as one of ours
+(`main`, or an open pull request's) would come up with them. `pages.yml` takes
+only runs of this repository (`head_repository`), so a fork can never have its
+files served from the site, and comments only on this repository's pull
+requests.
 
 Once: *Settings › Pages › Build and deployment › Source: GitHub Actions*.

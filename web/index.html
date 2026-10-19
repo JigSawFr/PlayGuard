@@ -4,23 +4,17 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <!-- Only this page's own files: no inline script, nothing from elsewhere.
+       'wasm-unsafe-eval' compiles PlayGuard; blob: workers are Emscripten's
+       threads. GitHub Pages sends no headers, so the policy is here. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PlayGuard simulator</title>
   <meta name="description" content="PlayGuard running in the browser against a simulated console.">
   <link rel="icon" href="icon.jpg">
   <link rel="stylesheet" href="simulator.css">
-  <!-- The theme before the first paint (simulator.js keeps it up to date):
-       the URL's, else the one chosen on an earlier visit, else the system's. -->
-  <script>
-    (function () {
-      var choice = new URLSearchParams(location.search).get('theme');
-      if (choice !== 'light' && choice !== 'dark') {
-        try { choice = localStorage.getItem('pg-theme'); } catch (e) { choice = null; }
-      }
-      if (choice !== 'light' && choice !== 'dark') choice = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      document.documentElement.dataset.theme = choice;
-    })();
-  </script>
+  <!-- The theme before the first paint (theme.js). -->
+  <script src="theme.js"></script>
   <!-- Threads need a cross-origin isolated page; GitHub Pages cannot send the
        headers, so this service worker adds them (and reloads once). -->
   <script src="coi-serviceworker.js"></script>

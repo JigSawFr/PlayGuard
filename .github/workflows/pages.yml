@@ -51,7 +51,12 @@ jobs:
           set -euo pipefail
           runs="repos/$REPO/actions/workflows/web.yml/runs"
           mkdir site
-          main=$(gh api "$runs?branch=main&event=push&status=success&per_page=1" --jq '.workflow_runs[0].id // empty')
+          # Runs are listed by branch name alone, whatever repository they
+          # come from: a fork can name a branch as one of ours (main, or an
+          # open pull request's) and its pull request's web run would come up
+          # too. Only runs of this repository are taken.
+          ours=".workflow_runs | map(select(.head_repository.full_name == \"$REPO\")) | .[0].id // empty"
+          main=$(gh api -X GET "$runs" -f branch=main -f event=push -f status=success -f per_page=20 --jq "$ours")
           if [ -n "$main" ]; then
             gh run download "$main" -R "$REPO" -n site -D site
             echo "main: run $main" >> "$GITHUB_STEP_SUMMARY"
@@ -63,8 +68,8 @@ jobs:
                         --jq ".[] | select(.head.repo.full_name == \"$REPO\") | \"\(.number):\(.head.ref)\""); do
             number=${pr%%:*}
             branch=${pr#*:}
-            run=$(gh api -X GET "$runs" -f branch="$branch" -f event=pull_request -f status=success -f per_page=1 \
-                    --jq '.workflow_runs[0].id // empty')
+            run=$(gh api -X GET "$runs" -f branch="$branch" -f event=pull_request -f status=success -f per_page=20 \
+                    --jq "$ours")
             [ -n "$run" ] || continue
             gh run download "$run" -R "$REPO" -n site -D "site/pr-$number"
             previews="$previews $number"
@@ -80,7 +85,9 @@ jobs:
       # The pull request whose build started this run: its comment points to
       # its preview (one comment, edited at each push).
       - name: Link on the pull request
-        if: github.event_name == 'workflow_run' && github.event.workflow_run.event == 'pull_request'
+        if: >-
+          github.event_name == 'workflow_run' && github.event.workflow_run.event == 'pull_request' &&
+          github.event.workflow_run.head_repository.full_name == github.repository
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}

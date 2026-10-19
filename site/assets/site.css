@@ -1,7 +1,15 @@
 /* PlayGuard's website (site/README.md): the branding's navy, teal and amber
    (branding/), in a light and a dark theme (data-theme, set before the first
    paint by each page: the choice kept, else the system's). */
-@import url("https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&display=swap");
+/* Sora (SIL Open Font License, fonts/OFL.txt), served with the site rather
+   than by Google Fonts, which would see every visitor: its Latin letters,
+   cut out of google/fonts' ofl/sora/Sora[wght].ttf, every weight. */
+@font-face {
+  font-family: "Sora";
+  src: url("fonts/sora.woff2") format("woff2");
+  font-weight: 100 800;
+  font-display: swap;
+}
 
 :root {
   --bg: #f5f7fb;
