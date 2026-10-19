@@ -40,7 +40,20 @@
   "record": "Opnemen",
   "stop_recording": "Stoppen",
   "forget": "Bewaarde staat vergeten",
-  "live_applied": "Gewijzigd zonder herstart"
+  "live_applied": "Gewijzigd zonder herstart",
+  "stop": "Stoppen",
+  "steps_copy": "Stappenlink",
+  "steps_help": "Een link die PlayGuard start zoals hier en herhaalt wat je sindsdien hebt gedaan",
+  "steps_copied": "Link met de stappen gekopieerd",
+  "replaying": "Stappen worden herhaald: {n} van {total}",
+  "tour": "Rondleiding",
+  "report": "Een probleem melden",
+  "tour_overview": "Overzicht: de speeltijd van vandaag, de limiet, de resterende tijd en bedtijd.",
+  "tour_play_timer": "Speeltijdtimer: de weekgrafiek is de editor, één limiet voor elke dag of één per dag.",
+  "tour_activity": "Activiteit: wie wat speelde, en hoe lang, uit het logboek van de console.",
+  "tour_console": "Console: de netwerkklok, de geïnstalleerde games en wat de console draait.",
+  "tour_time": "De tijd verstrijkt: een uur spelen later is de tijd van vandaag op.",
+  "tour_end": "Nu jij: de pijlen bewegen, Enter is A, Esc is B. Het paneel stelt elke staat in."
  },
  "groups": {
   "app": "PlayGuard",

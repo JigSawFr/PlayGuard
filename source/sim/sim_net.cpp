@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "core/sim_env.h"
 #include "util/paths.hpp"
 
 namespace sim_net
@@ -11,7 +12,7 @@ namespace sim_net
 
 const char* value(const char* name)
 {
-    const char* v = std::getenv(name);
+    const char* v = sim_env(name);
     return v && *v ? v : nullptr;
 }
 

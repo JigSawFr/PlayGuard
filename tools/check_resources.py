@@ -476,14 +476,14 @@ for k in sorted(code_read - code_written):
     warnings.append(f"source/util/config.cpp reads `{k}` but never writes it (lost at the next save)")
 
 # CONTRIBUTING.md against the code: the simulator's PLAYGUARD_SIM_* variables
-# (read with getenv or sim_net::value) and the smoke scenarios of
+# (read with sim_env, getenv or sim_net::value) and the smoke scenarios of
 # tools/desktop_smoke.py (SCENARIO == "name"), against its list of them.
 contributing = read(f"{ROOT}/CONTRIBUTING.md")
 sim_read = set()
 for path, text in code_text.items():
-    sim_read |= set(re.findall(r'(?:getenv|sim_net::value)\(\s*"(PLAYGUARD_SIM_\w+)"', text))
+    sim_read |= set(re.findall(r'(?:sim_env|getenv|sim_net::value)\(\s*"(PLAYGUARD_SIM_\w+)"', text))
 for path in glob.glob(f"{ROOT}/source/**/*.[ch]", recursive=True):
-    sim_read |= set(re.findall(r'getenv\(\s*"(PLAYGUARD_SIM_\w+)"', read(path)))
+    sim_read |= set(re.findall(r'(?:sim_env|getenv)\(\s*"(PLAYGUARD_SIM_\w+)"', read(path)))
 sim_documented = set(re.findall(r"`(PLAYGUARD_SIM_\w+)", contributing))
 if not sim_read or not sim_documented:
     errors.append("no PLAYGUARD_SIM_* variable found in the code or in CONTRIBUTING.md")

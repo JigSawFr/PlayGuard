@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <string>
 
+#include "core/sim_env.h"
 #include "util/config.hpp"
 
 #ifdef __SWITCH__
@@ -28,7 +29,7 @@ bool read_battery()
     psmExit();
     return ok && charger == PsmChargerType_Unconnected;
 #else
-    const char* sim = std::getenv("PLAYGUARD_SIM_BATTERY");
+    const char* sim = sim_env("PLAYGUARD_SIM_BATTERY");
     return sim && *sim && std::string(sim) != "0";
 #endif
 }

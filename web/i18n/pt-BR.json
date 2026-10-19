@@ -40,7 +40,20 @@
   "record": "Gravar",
   "stop_recording": "Parar",
   "forget": "Esquecer o estado salvo",
-  "live_applied": "Alterado sem reiniciar"
+  "live_applied": "Alterado sem reiniciar",
+  "stop": "Parar",
+  "steps_copy": "Link dos passos",
+  "steps_help": "Um link que inicia o PlayGuard como aqui e repete o que você fez desde então",
+  "steps_copied": "Link com os passos copiado",
+  "replaying": "Repetindo os passos: {n} de {total}",
+  "tour": "Tour",
+  "report": "Relatar um problema",
+  "tour_overview": "Visão geral: o tempo de jogo de hoje, o limite, o tempo restante e a hora de dormir.",
+  "tour_play_timer": "Tempo de jogo: o gráfico da semana é o editor, um limite para todos os dias ou um por dia.",
+  "tour_activity": "Atividade: quem jogou o quê, e por quanto tempo, segundo o registro do console.",
+  "tour_console": "Console: o relógio de rede, os jogos instalados e o que o console executa.",
+  "tour_time": "O tempo passa: uma hora de jogo depois, o tempo de hoje acabou.",
+  "tour_end": "Sua vez: as setas movem, Enter é A, Esc é B. O painel define qualquer estado."
  },
  "groups": {
   "app": "PlayGuard",

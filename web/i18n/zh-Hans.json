@@ -40,7 +40,20 @@
   "record": "录制",
   "stop_recording": "停止",
   "forget": "清除保留的状态",
-  "live_applied": "已更改，无需重启"
+  "live_applied": "已更改，无需重启",
+  "stop": "停止",
+  "steps_copy": "步骤链接",
+  "steps_help": "一个链接：像这里一样启动 PlayGuard，并重放之后的操作",
+  "steps_copied": "已复制带步骤的链接",
+  "replaying": "正在重放步骤：第 {n} 步，共 {total} 步",
+  "tour": "导览",
+  "report": "报告问题",
+  "tour_overview": "概览：今天的游戏时间、限制、剩余时间和就寝时间。",
+  "tour_play_timer": "游戏时间：每周图表就是编辑器，每天相同的限制或每天各自的限制。",
+  "tour_activity": "活动：根据主机自己的记录，谁玩了什么、玩了多久。",
+  "tour_console": "主机：网络时钟、已安装的游戏以及主机运行的内容。",
+  "tour_time": "时间流逝：玩了一个小时后，今天的时间用完了。",
+  "tour_end": "轮到你了：方向键移动，Enter 为 A，Esc 为 B。面板可设置任意状态。"
  },
  "groups": {
   "app": "PlayGuard",

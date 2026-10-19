@@ -40,7 +40,20 @@
   "record": "録画",
   "stop_recording": "停止",
   "forget": "保持した状態を消去",
-  "live_applied": "再起動せずに変更しました"
+  "live_applied": "再起動せずに変更しました",
+  "stop": "停止",
+  "steps_copy": "手順のリンク",
+  "steps_help": "ここと同じ状態で PlayGuard を起動し、その後の操作を再生するリンク",
+  "steps_copied": "手順付きのリンクをコピーしました",
+  "replaying": "手順を再生中：{n} / {total}",
+  "tour": "ツアー",
+  "report": "問題を報告",
+  "tour_overview": "概要：今日のプレイ時間、制限時間、残り時間、おやすみ時刻。",
+  "tour_play_timer": "プレイ時間：週のグラフがそのまま編集画面です。毎日同じ制限か、曜日ごとの制限。",
+  "tour_activity": "アクティビティー：本体の記録から、誰が何をどれだけ遊んだか。",
+  "tour_console": "本体：ネットワーク時計、インストールしたソフト、本体で動いているもの。",
+  "tour_time": "時間が進む：1 時間遊んだあと、今日の時間は使い切りです。",
+  "tour_end": "あなたの番：矢印で移動、Enter が A、Esc が B。パネルで好きな状態にできます。"
  },
  "groups": {
   "app": "PlayGuard",

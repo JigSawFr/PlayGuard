@@ -14,6 +14,11 @@
 // time on (`skip`), and with `keep` its data folder stays in the browser
 // (IndexedDB). <body data-playguard> says where it is: loading, running,
 // ready (its first screen is up), error.
+//
+// Steps: what is pressed, touched and changed live is noted, with the time
+// between; **Steps link** gives the settings PlayGuard started with and
+// them (`rec=`), which a page opening it replays. The tour (`tour=1`) and
+// the smoke test (tools/web_smoke.py, runSteps()) are steps too.
 'use strict';
 
 // The console's languages, as PlayGuard's config.json names them, in their own words.
@@ -32,6 +37,8 @@ const CJK_FILE = '/app/resources/font/cjk.otf';
 const DATA = '/playguard_data';
 // What the time buttons add to `skip`, in minutes.
 const SKIPS = [5, 15, 60];
+// Where a report goes without build.json (a local build).
+const REPO = 'JigSawFr/PlayGuard';
 
 // A language tag (the URL's, or the browser's) to one of the console's; null when none fits.
 function consoleLanguage(tag) {
@@ -81,6 +88,8 @@ let language = 'en-US';         // the page's, and PlayGuard's
 let consoleTheme = 'light';     // what PlayGuard was started with
 let running = false;            // PlayGuard's runtime is up: ccall works
 let version = '';               // the build's commit, for the files' URLs
+let buildInfo = null;           // build.json, for a report
+let startValues = new Map();    // the settings PlayGuard started with, for a steps link
 
 // ---- Texts ------------------------------------------------------------
 
@@ -245,7 +254,7 @@ function buildForm(values) {
   const form = $('form');
   form.replaceChildren();
   for (const g of manifest.groups) {
-    const params = manifest.params.filter((p) => p.group === g.id && p.panel !== false);
+    const params = manifest.params.filter((p) => p.group === g.id && p.panel !== false && !p.page);
     if (!params.length) continue;
     const set = params.filter((p) => values.has(p.name)).length;
     const details = el('details', { class: 'group', 'data-group': g.id },
@@ -313,9 +322,9 @@ function changedNames(a, b) {
 // Only `live` settings changed, PlayGuard running: they reach it at once and
 // the URL follows; otherwise the page reloads with them.
 function apply(values) {
-  const changed = changedNames(values, current);
+  const changed = changedNames(values, current).filter((n) => !known.get(n)?.page);
   if (running && changed.length && changed.every((n) => known.get(n)?.live)) {
-    for (const name of changed) setLive(name, values.get(name));
+    for (const name of changed) { setLive(name, values.get(name)); noteStep(`s:${stepValue(name, values.get(name))}`); }
     current = new Map(values);
     history.replaceState(null, '', linkFor(current));
     buildForm(current);
@@ -430,6 +439,7 @@ function startEnvironment(values) {
   for (const [name, value] of values) {
     if (name === 'lang' || name === 'theme') continue;
     const p = known.get(name);
+    if (p?.page) continue;
     if (p?.config) { if (value) config[p.config] = value; continue; }
     const v = envValue(name, value);
     if (v !== '') env[envName(name)] = v;
@@ -509,9 +519,8 @@ async function laterCjk() {
 
 function start() {
   if (!self.crossOriginIsolated) {
-    // coi-serviceworker reloads the page once its service worker is
-    // installed (twice at most), which a first visit on a slow connection can
-    // take a while to do. Without service workers (a private window in some
+    // sw.js reloads the page once its service worker is installed, which a
+    // first visit on a slow connection can take a while to do. Without service workers (a private window in some
     // browsers) it never will; otherwise give it time before saying so.
     if (!('serviceWorker' in navigator) || !self.isSecureContext) { showError(t('no_isolation')); return; }
     setTimeout(() => showError(t('no_isolation')), 30000);
@@ -538,7 +547,10 @@ function start() {
     locateFile: (path, prefix) => `${prefix}${path}${version ? `?v=${version}` : ''}`,
     print: (line) => {
       log(line);
-      if (line.includes('start-up: first screen ready')) document.body.dataset.playguard = 'ready';
+      if (line.includes('start-up: first screen ready') && document.body.dataset.playguard !== 'ready') {
+        document.body.dataset.playguard = 'ready';
+        ready();
+      }
     },
     printErr: (line) => log(line, true),
     setStatus: (status) => {
@@ -581,10 +593,14 @@ function press(button, down) {
   window.Module?._brls_web_button?.(button, down ? 1 : 0);
 }
 
+// The keys SDL reads itself, as the buttons they press, for the steps.
+const SDL_KEYS = { ArrowUp: BUTTON.UP, ArrowDown: BUTTON.DOWN, ArrowLeft: BUTTON.LEFT, ArrowRight: BUTTON.RIGHT, Enter: BUTTON.A, Escape: BUTTON.B };
+
 function setUpKeys() {
   const held = new Map();
   canvas.addEventListener('keydown', (e) => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (!e.repeat) noteButton(SDL_KEYS[e.key] ?? KEYS[e.key]);
     const button = KEYS[e.key];
     if (button == null) return;
     e.preventDefault();
@@ -599,7 +615,13 @@ function setUpKeys() {
     press(button, false);
   });
   canvas.addEventListener('blur', () => { for (const b of held.values()) press(b, false); held.clear(); });
-  canvas.addEventListener('pointerdown', () => canvas.focus());
+  canvas.addEventListener('pointerdown', (e) => {
+    canvas.focus();
+    // A touch, in the console's 1280x720.
+    const r = canvas.getBoundingClientRect();
+    if (!e.isTrusted || !r.width) return;
+    noteStep(`t${Math.round((e.clientX - r.left) / r.width * 1280)},${Math.round((e.clientY - r.top) / r.height * 720)}`);
+  });
 }
 
 function setUpPad() {
@@ -609,6 +631,7 @@ function setUpPad() {
     button.addEventListener('pointerdown', (e) => {
       button.setPointerCapture(e.pointerId);
       button.classList.add('active');
+      noteButton(code);
       press(code, true);
       e.preventDefault();
     });
@@ -696,6 +719,168 @@ function setUpTime() {
   showSkip();
 }
 
+// ---- Steps ------------------------------------------------------------
+//
+// One step per dot: a button (up, down, left, right, a, b, x, y, l, r, zl,
+// zr, plus, minus), `*N` to press it N times; `wN` waits N tenths of a
+// second; `tX,Y` touches the screen (1280x720); `s:name=value` changes a live
+// setting; `say:key` shows the page's text `tour_<key>` (the tour).
+
+const STEP_BUTTONS = {
+  up: BUTTON.UP, down: BUTTON.DOWN, left: BUTTON.LEFT, right: BUTTON.RIGHT, a: BUTTON.A, b: BUTTON.B,
+  x: BUTTON.X, y: BUTTON.Y, l: BUTTON.L, r: BUTTON.R, zl: BUTTON.ZL, zr: BUTTON.ZR, plus: BUTTON.PLUS, minus: BUTTON.MINUS,
+};
+const BUTTON_STEP = Object.fromEntries(Object.entries(STEP_BUTTONS).map(([name, code]) => [code, name]));
+// A press, and the pause after it: borealis' animations last 300 ms.
+const PRESS_MS = 60;
+const AFTER_MS = 400;
+// The tour (tour=1): the tabs, then an hour of play.
+const TOUR = 'w10.say:overview.w45.down.say:play_timer.w45.down.say:activity.w45.down*3.say:console.w45' +
+             '.up*5.say:time.w15.s:skip=3600.w45.say:end.w60';
+
+const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
+// A live value in a step: its dots are escaped too.
+const stepValue = (name, value) => `${name}=${encodeURIComponent(value ?? '').replace(/\./g, '%2E')}`;
+
+let steps = [];                 // what was done since the first screen
+let lastStep = 0;
+let replaying = null;           // the steps being replayed: { stop }
+
+function noteStep(step) {
+  if (!lastStep || replaying) return;
+  const now = performance.now();
+  const wait = Math.round((now - lastStep) / 100);
+  if (wait >= 2) steps.push(`w${Math.min(wait, 600)}`);
+  steps.push(step);
+  lastStep = now;
+}
+function noteButton(code) {
+  if (code != null && BUTTON_STEP[code]) noteStep(BUTTON_STEP[code]);
+}
+
+// The steps as a string: the same button pressed in a row, once with *N.
+function stepsText(list) {
+  const out = [];
+  for (const step of list) {
+    const last = out[out.length - 1];
+    const m = last && /^([a-z]+)(?:\*(\d+))?$/.exec(last);
+    if (m && m[1] === step && STEP_BUTTONS[step] != null) out[out.length - 1] = `${step}*${Number(m[2] || 1) + 1}`;
+    else out.push(step);
+  }
+  return out.join('.');
+}
+
+function touch(x, y) {
+  const r = canvas.getBoundingClientRect();
+  const at = { clientX: r.left + x / 1280 * r.width, clientY: r.top + y / 720 * r.height, bubbles: true, button: 0 };
+  canvas.dispatchEvent(new MouseEvent('mousedown', at));
+  return sleep(PRESS_MS).then(() => canvas.dispatchEvent(new MouseEvent('mouseup', at)));
+}
+
+// Plays `text` (the steps above); `onStep(n, total, step)` before each.
+// Resolves when done or stopped; throws on a step it does not know.
+async function runSteps(text, onStep) {
+  const list = String(text ?? '').split('.').filter(Boolean);
+  const run = { stopped: false };
+  replaying = run;
+  try {
+    for (let i = 0; i < list.length && !run.stopped; i++) {
+      const step = list[i];
+      onStep?.(i + 1, list.length, step);
+      let m;
+      if ((m = /^([a-z]+)(?:\*(\d+))?$/.exec(step)) && STEP_BUTTONS[m[1]] != null) {
+        for (let n = Number(m[2] || 1); n > 0 && !run.stopped; n--) {
+          press(STEP_BUTTONS[m[1]], true);
+          await sleep(PRESS_MS);
+          press(STEP_BUTTONS[m[1]], false);
+          await sleep(AFTER_MS);
+        }
+      } else if ((m = /^w(\d+)$/.exec(step))) {
+        await sleep(Number(m[1]) * 100);
+      } else if ((m = /^t(\d+),(\d+)$/.exec(step))) {
+        await touch(Number(m[1]), Number(m[2]));
+        await sleep(AFTER_MS);
+      } else if ((m = /^s:([a-z0-9_]+)=(.*)$/.exec(step))) {
+        const values = new Map(current);
+        const value = decodeURIComponent(m[2]);
+        if (value) values.set(m[1], value); else values.delete(m[1]);
+        apply(values);
+        showSkip();
+      } else if ((m = /^say:([a-z_]+)$/.exec(step))) {
+        $('steps-text').textContent = t(`tour_${m[1]}`);
+      } else {
+        throw new Error(`steps: no such step "${step}"`);
+      }
+    }
+  } finally {
+    if (replaying === run) replaying = null;
+  }
+}
+
+// Replays steps with the notice above the screen, and Stop.
+async function replay(text, tour) {
+  const notice = $('steps-notice');
+  notice.hidden = false;
+  $('steps-stop').onclick = () => { if (replaying) replaying.stopped = true; };
+  log(`steps: ${tour ? 'tour' : 'replaying'} ${text}`);
+  try {
+    await runSteps(text, (n, total, step) => {
+      if (!tour && !step.startsWith('w')) $('steps-text').textContent = t('replaying').replace('{n}', n).replace('{total}', total);
+    });
+    log('steps: done');
+  } catch (e) {
+    log(String(e), true);
+  } finally {
+    notice.hidden = true;
+    canvas.focus();
+  }
+}
+
+// Once the first screen is up: steps are noted from now on, and those of
+// the URL (rec=, tour=1) played. They leave the URL: a reload starts plain.
+function ready() {
+  lastStep = performance.now();
+  const rec = current.get('rec');
+  const tour = current.has('tour') && !FALSY.has(String(current.get('tour')).toLowerCase());
+  if (rec || tour) {
+    current.delete('rec');
+    current.delete('tour');
+    history.replaceState(null, '', linkFor(current));
+    setTimeout(() => replay(tour ? TOUR : rec, tour), 1000);
+  }
+}
+
+// The link: the settings PlayGuard started with, and the steps since.
+function stepsLink() {
+  const values = new Map(startValues);
+  const text = stepsText(steps);
+  if (text) values.set('rec', text);
+  return linkFor(values);
+}
+
+async function copySteps() {
+  const link = stepsLink();
+  try { await navigator.clipboard.writeText(link); } catch { prompt(t('steps_copy'), link); return; }
+  toast(t('steps_copied'));
+}
+
+// A bug report on GitHub, its form filled in: the steps link, the build, the
+// browser and the end of the log. GitHub takes a URL of 8 KB or so.
+function report() {
+  const repo = buildInfo?.repo || REPO;
+  const build = buildInfo ? `commit ${buildInfo.sha.slice(0, 7)}${buildInfo.pr ? `, pull request #${buildInfo.pr}` : ''}` : t('unknown_build');
+  const url = (lines) => {
+    const tail = logLines.slice(-lines).map(([line]) => line).join('\n');
+    const body = `In the web simulator (${build}), these steps:\n${stepsLink()}\n\n` +
+                  `Browser: ${navigator.userAgent}\n\nThe end of the log:\n\`\`\`\n${tail}\n\`\`\``;
+    const q = new URLSearchParams({ template: '1-bug.yml', title: '[simulator] ', steps: body, version: `simulator, ${build}`, launcher: 'web simulator' });
+    return `https://github.com/${repo}/issues/new?${q}`;
+  };
+  let lines = 40;
+  while (lines > 0 && url(lines).length > 8000) lines -= 5;
+  window.open(url(lines), '_blank', 'noopener');
+}
+
 // ---- The page ------------------------------------------------------------
 
 function translatePage() {
@@ -742,6 +927,7 @@ async function showBuild() {
     const sha = el('a', { href: `${repo}/commit/${b.sha}` }, el('code', { text: b.sha.slice(0, 7) }));
     box.replaceChildren(where, ' · ', sha, b.title ? ` · ${b.title}` : '');
     box.title = b.title ?? '';
+    buildInfo = b;
     return b.sha;
   } catch {
     box.textContent = t('unknown_build');
@@ -795,10 +981,14 @@ function setUpPanel() {
   $('shot').addEventListener('click', screenshot);
   $('record').hidden = typeof MediaRecorder === 'undefined' || !canvas.captureStream;
   $('record').addEventListener('click', record);
+  $('steps-copy').addEventListener('click', copySteps);
+  $('tour').addEventListener('click', () => { if (running && !replaying) replay(TOUR, true); });
+  $('report').addEventListener('click', report);
 }
 
 async function main() {
   current = readUrl();
+  startValues = new Map([...current].filter(([n]) => n !== 'rec' && n !== 'tour'));
   language = consoleLanguage(current.get('lang')) ?? browserLanguage();
   showTheme();
   try {

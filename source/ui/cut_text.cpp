@@ -9,6 +9,7 @@
 #include <string>
 
 #include "action/frame_stats_flow.hpp"
+#include "core/sim_env.h"
 
 namespace cut_text
 {
@@ -40,7 +41,7 @@ void walk(brls::View* view, const std::string& screen, FILE* out)
 void sample()
 {
 #if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
-    static const char* path = std::getenv("PLAYGUARD_SIM_CUT_TEXT");
+    static const char* path = sim_env("PLAYGUARD_SIM_CUT_TEXT");
     if (!path) return;
     static FILE* out = std::fopen(path, "a");
     if (!out) return;

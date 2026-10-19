@@ -21,6 +21,7 @@
 #include "activity/main_activity.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
+#include "core/sim_env.h"
 #include "tab/clock_tab.hpp"
 #include "tab/tab_base.hpp"
 #include "ui/ui.hpp"
@@ -120,7 +121,7 @@ Entry entry_of(const notice_logic::Item& item)
 bool sd_free(uint64_t* bytes)
 {
 #ifndef __SWITCH__
-    const char* sim = std::getenv("PLAYGUARD_SIM_SD_FREE_MB");
+    const char* sim = sim_env("PLAYGUARD_SIM_SD_FREE_MB");
     if (!sim) return false;
     *bytes = (uint64_t)std::strtoull(sim, nullptr, 10) << 20;
     return true;

@@ -34,6 +34,7 @@
 #include "activity/rescue_activity.hpp"
 #include "app.hpp"
 #include "core/platform.h"
+#include "core/sim_env.h"
 #include "tab/about_tab.hpp"
 #include "tab/cadran_activity_tab.hpp"
 #include "tab/cadran_play_timer_tab.hpp"
@@ -303,7 +304,7 @@ void start(LoadingActivity* loading)
         loading->show(LoadingActivity::Step::Screen);
 #ifndef __SWITCH__
         // Desktop simulation, for a screenshot of the loading screen.
-        if (std::getenv("PLAYGUARD_SIM_HOLD_LOADING")) {
+        if (sim_env("PLAYGUARD_SIM_HOLD_LOADING")) {
             brls::Logger::info("start-up: held on the loading screen (PLAYGUARD_SIM_HOLD_LOADING)");
             delete first;
             return;
@@ -546,7 +547,7 @@ int main(int argc, char* argv[])
     // <stroke tris> <text tris>", the counters from nanovg's own (zero without
     // tools/perf_nanovg_stats.patch). The FPS limiter is turned off so the
     // frame time is the work alone.
-    if (const char* path = std::getenv("PLAYGUARD_SIM_STATS")) {
+    if (const char* path = sim_env("PLAYGUARD_SIM_STATS")) {
         // Created with an explicit mode (CodeQL: fopen's depends on the umask).
         const int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
         if (fd >= 0) {

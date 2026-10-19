@@ -17,6 +17,7 @@
 #include "activity/dev_builds_activity.hpp"
 #include "app.hpp"
 #include "core/platform.h"
+#include "core/sim_env.h"
 #include "ui/ui.hpp"
 #include "util/dev_builds.hpp"
 #include "util/github_auth.hpp"
@@ -251,7 +252,7 @@ int64_t now()
 {
 #ifndef __SWITCH__
     // Desktop simulation: the console's frozen time, so ages stay the same in screenshots.
-    if (const char* frozen = std::getenv("PLAYGUARD_SIM_NOW"))
+    if (const char* frozen = sim_env("PLAYGUARD_SIM_NOW"))
         if (const long long v = std::atoll(frozen)) return v;
 #endif
     return (int64_t)std::time(nullptr);

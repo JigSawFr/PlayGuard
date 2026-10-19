@@ -7,6 +7,7 @@
 #include <vector>
 #include <yoga/Yoga.h>
 
+#include "core/sim_env.h"
 #include "tab/cadran_list.hpp"
 #include "tab/tab_base.hpp"
 #include "util/config.hpp"
@@ -22,7 +23,7 @@ bool docked()
 #ifdef __SWITCH__
     return appletGetOperationMode() == AppletOperationMode_Console;
 #else
-    const char* sim = std::getenv("PLAYGUARD_SIM_DOCKED");
+    const char* sim = sim_env("PLAYGUARD_SIM_DOCKED");
     return sim && *sim && std::string(sim) != "0";
 #endif
 }

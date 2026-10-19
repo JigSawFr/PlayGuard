@@ -40,7 +40,20 @@
   "record": "Enregistrer",
   "stop_recording": "Arrêter",
   "forget": "Oublier l’état conservé",
-  "live_applied": "Changé sans redémarrer"
+  "live_applied": "Changé sans redémarrer",
+  "stop": "Arrêter",
+  "steps_copy": "Lien des étapes",
+  "steps_help": "Un lien qui démarre PlayGuard comme ici et rejoue ce que vous avez fait depuis",
+  "steps_copied": "Lien avec les étapes copié",
+  "replaying": "Rejeu des étapes : {n} sur {total}",
+  "tour": "Visite",
+  "report": "Signaler un problème",
+  "tour_overview": "Vue d'ensemble : le temps de jeu du jour, la limite, le temps restant et l'heure du coucher.",
+  "tour_play_timer": "Temps de jeu : le graphique de la semaine sert d'éditeur, une limite pour tous les jours ou une par jour.",
+  "tour_activity": "Activité : qui a joué à quoi, et combien de temps, d'après le journal de la console.",
+  "tour_console": "Console : l'horloge réseau, les jeux installés et ce que fait tourner la console.",
+  "tour_time": "Le temps passe : une heure de jeu plus tard, le temps du jour est écoulé.",
+  "tour_end": "À vous : les flèches déplacent, Entrée fait A, Échap fait B. Le panneau règle n'importe quel état."
  },
  "groups": {
   "app": "PlayGuard",

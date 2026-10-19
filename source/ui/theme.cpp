@@ -8,6 +8,7 @@
 #include <cstdlib>
 #endif
 
+#include "core/sim_env.h"
 #include "util/text.hpp"
 
 namespace ui
@@ -47,7 +48,7 @@ void register_theme_colors()
     // Desktop simulation, PLAYGUARD_SIM_STILL_FOCUS=1 (the smoke test): the
     // glow borealis moves around the focus with the clock takes the stroke's
     // own colour, so a screenshot does not depend on when it was taken.
-    if (std::getenv("PLAYGUARD_SIM_STILL_FOCUS")) {
+    if (sim_env("PLAYGUARD_SIM_STILL_FOCUS")) {
         light.addColor("brls/highlight/color2", light["brls/highlight/color1"]);
         dark.addColor("brls/highlight/color2", dark["brls/highlight/color1"]);
     }

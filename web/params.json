@@ -1,5 +1,5 @@
 {
- "_comment": "The web simulator's settings panel (web/README.md): every PLAYGUARD_SIM_* variable of the desktop simulator (tools/check_web_params.py checks that none is missing), as a URL parameter: its name in lower case without the prefix (unlocked=1 is PLAYGUARD_SIM_UNLOCKED=1). `config` entries are not variables: the page writes them into the simulated config.json before PlayGuard starts. `panel: false`: set from the page's header (the language, the theme), not the panel. `live`: read by PlayGuard at each use, so Apply changes it without a restart when nothing else changed. `sticky`: kept by a preset, as the first tab is. `values`: what an option stands for (`sample`, the answers packaged from web/samples/). A preset's datetime `@21:30` is today at 21:30 in the browser's time zone. The texts are in web/i18n/<language>.json.",
+ "_comment": "The web simulator's settings panel (web/README.md): every PLAYGUARD_SIM_* variable of the desktop simulator (tools/check_web_params.py checks that none is missing), as a URL parameter: its name in lower case without the prefix (unlocked=1 is PLAYGUARD_SIM_UNLOCKED=1). `config` entries are not variables: the page writes them into the simulated config.json before PlayGuard starts. `panel: false`: set from the page's header (the language, the theme), not the panel. `live`: read by PlayGuard at each use, so Apply changes it without a restart when nothing else changed. `sticky`: kept by a preset, as the first tab is. `values`: what an option stands for (`sample`, the answers packaged from web/samples/). A preset's datetime `@21:30` is today at 21:30 in the browser's time zone. `page`: the page's own (the steps to replay, the tour), neither a variable nor in the panel. The texts are in web/i18n/<language>.json.",
  "groups": [{"id": "app"}, {"id": "parental"}, {"id": "console"}, {"id": "clock"}, {"id": "games"}, {"id": "updates"}, {"id": "failures"}, {"id": "capture"}],
  "params": [
   {"name": "lang", "config": "language", "group": "app", "type": "select", "options": ["en-US", "fr", "fr-CA", "de", "es", "es-419", "it", "nl", "pt", "pt-BR", "ru", "ja", "ko", "zh-Hans", "zh-Hant"], "panel": false},
@@ -7,6 +7,8 @@
   {"name": "tab", "config": "start_tab", "group": "app", "type": "select", "options": ["", "play_timer", "activity", "restrictions", "security", "console", "history", "preferences", "about"]},
   {"name": "appearance", "group": "app", "type": "select", "options": ["", "cadran", "classic"]},
   {"name": "keep", "group": "app", "type": "bool", "sticky": true},
+  {"name": "rec", "page": true, "group": "app", "type": "text"},
+  {"name": "tour", "page": true, "group": "app", "type": "bool"},
   {"name": "not_set_up", "group": "parental", "type": "bool"},
   {"name": "unlocked", "group": "parental", "type": "bool"},
   {"name": "timer_off", "group": "parental", "type": "bool"},

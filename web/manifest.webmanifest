@@ -1,0 +1,14 @@
+{
+  "name": "PlayGuard simulator",
+  "short_name": "PlayGuard",
+  "description": "PlayGuard running in the browser against a simulated console.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b111b",
+  "theme_color": "#0a705f",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "icon.jpg", "sizes": "256x256", "type": "image/jpeg" }
+  ]
+}

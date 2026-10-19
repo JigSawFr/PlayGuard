@@ -31,12 +31,14 @@
 //   PLAYGUARD_SIM_SKIP=900      the console's time that many seconds later, a
 //                               game played all along (unless IDLE): the time
 //                               left goes down by as much, to the limit and
-//                               past it; read at each call, so the web page
+//                               past it, and the activity log's first game
+//                               has it; read at each call, so the web page
 //                               moves it while PlayGuard runs
 //   PLAYGUARD_SIM_ACCOUNTS=2    that many user accounts (0 to 8), sharing the
 //                               play time 2:1 between each and the next
 //   PLAYGUARD_SIM_KEEP=1        the simulated console's settings (PIN, limits,
-//                               bedtime, clocks, …) kept in
+//                               bedtime, clocks, …) and the installed games'
+//                               fixes kept in
 //                               playguard_data/sim_console.bin from one run to
 //                               the next: the variables above that set its
 //                               starting state count for the first run only
@@ -70,13 +72,14 @@
 #include "../core/gamecheck.h"
 #include "../core/pctl_ops.h"
 #include "../core/playstats.h"
+#include "../core/sim_env.h"
 #include "../core/sysinfo.h"
 #include "../core/pure.h"
 #include "../core/time_ops.h"
 #include "../core/write_guard.h"
 #include "sim_icons.h"
 
-static struct {
+typedef struct {
     bool init;
     u32  hos;
     u32  safety_level;
@@ -89,19 +92,36 @@ static struct {
     s64  clock_offset;     // the console clock against base_now()
     s64  network_offset;   // the network clock against the console clock, until set
     bool network_set;      // PlayGuard set the network clock
-} S;
+} SimConsole;
+static SimConsole S;
 
-// PLAYGUARD_SIM_KEEP: S as the last run left it, in the simulated data folder
-// (the web page keeps that folder in the browser). A file from another build,
-// whose S has another size, is not read.
+// What Console › Check the installed games changed (gamecheck below): kept
+// with S by PLAYGUARD_SIM_KEEP, as the console keeps it.
+typedef struct {
+    u64    removed[32];        // whole games and single contents, by ID
+    size_t removed_count;
+    u64    launch_reset[16];
+    size_t launch_reset_count;
+    u64    bumps[32];          // each change to a game bumps its entry
+    size_t bump_count;
+} SimFixes;
+static SimFixes G;
+
+// PLAYGUARD_SIM_KEEP: S and G as the last run left them, in the simulated
+// data folder (the web page keeps that folder in the browser). A file from
+// another build, whose S or G has another size, is not read.
 #define SIM_KEEP_FILE "./playguard_data/sim_console.bin"
-static const char SIM_KEEP_MAGIC[8] = "PGSIM01";
+static const char SIM_KEEP_MAGIC[8] = "PGSIM02";
 static pthread_mutex_t s_keep_lock = PTHREAD_MUTEX_INITIALIZER;
-static unsigned char s_kept[sizeof(S)];   // what the file holds
+typedef struct {
+    SimConsole console;
+    SimFixes   fixes;
+} SimKept;
+static SimKept s_kept;   // what the file holds
 
 static bool sim_keeping(void)
 {
-    return getenv("PLAYGUARD_SIM_KEEP") != NULL;
+    return sim_env("PLAYGUARD_SIM_KEEP") != NULL;
 }
 
 static void sim_keep_load(void)
@@ -110,32 +130,37 @@ static void sim_keep_load(void)
     if (!f) return;
     char magic[sizeof(SIM_KEEP_MAGIC)];
     u32 size = 0;
-    unsigned char kept[sizeof(S)];
+    SimKept kept;
     if (fread(magic, 1, sizeof(magic), f) == sizeof(magic) && memcmp(magic, SIM_KEEP_MAGIC, sizeof(magic)) == 0 &&
-        fread(&size, sizeof(size), 1, f) == 1 && size == sizeof(S) && fread(kept, 1, sizeof(kept), f) == sizeof(kept)) {
-        memcpy(&S, kept, sizeof(S));
-        memcpy(s_kept, kept, sizeof(kept));
+        fread(&size, sizeof(size), 1, f) == 1 && size == sizeof(kept) && fread(&kept, 1, sizeof(kept), f) == sizeof(kept)) {
+        memcpy(&S, &kept.console, sizeof(S));
+        memcpy(&G, &kept.fixes, sizeof(G));
+        memcpy(&s_kept, &kept, sizeof(kept));
         S.init = true;
     }
     fclose(f);
 }
 
-// Writes S when it changed since the file was written: called where the UI
-// reads the console's state, which it does after each change.
+// Writes S and G when they changed since the file was written: called where
+// the UI reads the console's state, which it does after each change.
 static void sim_keep_save(void)
 {
     if (!sim_keeping()) return;
     pthread_mutex_lock(&s_keep_lock);
-    if (memcmp(&S, s_kept, sizeof(S)) != 0) {
+    SimKept now;
+    memset(&now, 0, sizeof(now));   // the padding too: compared byte for byte
+    memcpy(&now.console, &S, sizeof(S));
+    memcpy(&now.fixes, &G, sizeof(G));
+    if (memcmp(&now, &s_kept, sizeof(now)) != 0) {
         // Not world-writable (fopen creates with 0666, less the umask).
         const int fd = open(SIM_KEEP_FILE ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
         FILE *f = fd >= 0 ? fdopen(fd, "wb") : NULL;
         if (fd >= 0 && !f) close(fd);
-        const u32 size = sizeof(S);
+        const u32 size = sizeof(now);
         bool ok = f && fwrite(SIM_KEEP_MAGIC, 1, sizeof(SIM_KEEP_MAGIC), f) == sizeof(SIM_KEEP_MAGIC) &&
-                  fwrite(&size, sizeof(size), 1, f) == 1 && fwrite(&S, 1, sizeof(S), f) == sizeof(S);
+                  fwrite(&size, sizeof(size), 1, f) == 1 && fwrite(&now, 1, sizeof(now), f) == sizeof(now);
         if (f) ok = fclose(f) == 0 && ok;
-        if (ok && rename(SIM_KEEP_FILE ".tmp", SIM_KEEP_FILE) == 0) memcpy(s_kept, &S, sizeof(S));
+        if (ok && rename(SIM_KEEP_FILE ".tmp", SIM_KEEP_FILE) == 0) memcpy(&s_kept, &now, sizeof(now));
         else remove(SIM_KEEP_FILE ".tmp");
     }
     pthread_mutex_unlock(&s_keep_lock);
@@ -148,7 +173,7 @@ static void sim_keep_save(void)
 // PLAYGUARD_SIM_SKIP: seconds the console's time is moved on (0 without it).
 static u64 sim_skip(void)
 {
-    const char *skip = getenv("PLAYGUARD_SIM_SKIP");
+    const char *skip = sim_env("PLAYGUARD_SIM_SKIP");
     if (!skip || !*skip) return 0;
     char *end = NULL;
     const long long v = strtoll(skip, &end, 10);
@@ -158,7 +183,7 @@ static u64 sim_skip(void)
 // "Now" before PLAYGUARD_SIM_SKIP: frozen by PLAYGUARD_SIM_NOW, else the host's.
 static u64 start_now(void)
 {
-    const char *frozen = getenv("PLAYGUARD_SIM_NOW");
+    const char *frozen = sim_env("PLAYGUARD_SIM_NOW");
     if (frozen && *frozen) {
         char *end = NULL;
         const unsigned long long v = strtoull(frozen, &end, 10);
@@ -180,7 +205,7 @@ static u64 base_now(void)
 // True when PLAYGUARD_SIM_FAIL lists `what` (comma separated).
 static bool fails(const char *what)
 {
-    const char *list = getenv("PLAYGUARD_SIM_FAIL");
+    const char *list = sim_env("PLAYGUARD_SIM_FAIL");
     const size_t n = strlen(what);
     for (const char *p = list; p && *p;) {
         const char *end = strchr(p, ',');
@@ -196,24 +221,24 @@ static void sim_init(void)
     if (S.init) return;
     S.init = true;
     S.hos = PCTL_FW_TESTED_MAX;   // the newest verified one: no firmware gate
-    const char *fw = getenv("PLAYGUARD_SIM_FW");
+    const char *fw = sim_env("PLAYGUARD_SIM_FW");
     unsigned a, b, c;
     if (fw && sscanf(fw, "%u.%u.%u", &a, &b, &c) == 3) S.hos = MAKEHOSVERSION(a, b, c);
-    const bool blank = getenv("PLAYGUARD_SIM_NOT_SET_UP") != NULL;
+    const bool blank = sim_env("PLAYGUARD_SIM_NOT_SET_UP") != NULL;
     S.safety_level = blank ? PctlSafetyLevel_None : PctlSafetyLevel_Child;
     S.pin_length = blank ? 0 : 4;
     S.restriction_enabled = !blank;
-    S.pairing_active = !blank && getenv("PLAYGUARD_SIM_UNPAIRED") == NULL;
-    S.temp_unlocked = getenv("PLAYGUARD_SIM_UNLOCKED") != NULL;
+    S.pairing_active = !blank && sim_env("PLAYGUARD_SIM_UNPAIRED") == NULL;
+    S.temp_unlocked = sim_env("PLAYGUARD_SIM_UNLOCKED") != NULL;
     S.custom.rating_age = 12;
     S.rating_org = 6;   // PEGI
     S.custom.sns_post_restriction = true;
-    S.limit_reached = getenv("PLAYGUARD_SIM_RESTRICTED") != NULL;
-    S.autosync_off = getenv("PLAYGUARD_SIM_AUTOSYNC_OFF") != NULL;
-    S.alarm_disabled = getenv("PLAYGUARD_SIM_ALARM_OFF") != NULL;
-    const char *net = getenv("PLAYGUARD_SIM_NETWORK_OFFSET");
+    S.limit_reached = sim_env("PLAYGUARD_SIM_RESTRICTED") != NULL;
+    S.autosync_off = sim_env("PLAYGUARD_SIM_AUTOSYNC_OFF") != NULL;
+    S.alarm_disabled = sim_env("PLAYGUARD_SIM_ALARM_OFF") != NULL;
+    const char *net = sim_env("PLAYGUARD_SIM_NETWORK_OFFSET");
     if (net) S.network_offset = strtoll(net, NULL, 10);
-    bool off = blank || getenv("PLAYGUARD_SIM_TIMER_OFF") != NULL;
+    bool off = blank || sim_env("PLAYGUARD_SIM_TIMER_OFF") != NULL;
     u16 days[7];
     for (int i = 0; i < 7; i++) days[i] = off ? PT_DAY_NOLIMIT : ((i == 0 || i == 6) ? 180 : 120);
     pt_encode(S.block, days);
@@ -222,7 +247,7 @@ static void sim_init(void)
         for (int i = 0; i < 7; i++) bed[i] = (PtBedtime){ true, 21, 0, 6, 0 };
         pt_bedtime_encode(S.block, bed);
     }
-    if (getenv("PLAYGUARD_SIM_ALARM_ONLY")) pt_set_suspends(S.block, false);
+    if (sim_env("PLAYGUARD_SIM_ALARM_ONLY")) pt_set_suspends(S.block, false);
     if (sim_keeping()) sim_keep_load();
 }
 
@@ -232,7 +257,7 @@ static void sim_init(void)
 // health check (action/timer_health_logic) sees it count.
 static u64 counting_ns(void)
 {
-    if (getenv("PLAYGUARD_SIM_NOT_COUNTING")) return 0;
+    if (sim_env("PLAYGUARD_SIM_NOT_COUNTING")) return 0;
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (u64)(ts.tv_sec % 20) * 1000000000ULL;
@@ -244,7 +269,7 @@ static u64 played_today_s(void)
 {
     const u64 played = (u64)SIM_PLAYED_TODAY_MIN * 60;
     const u64 skip = sim_skip();
-    if (!skip || getenv("PLAYGUARD_SIM_IDLE")) return played;
+    if (!skip || sim_env("PLAYGUARD_SIM_IDLE")) return played;
     const time_t from = (time_t)start_now(), to = (time_t)(start_now() + skip);
     struct tm a, b;
     if (!localtime_r(&from, &a) || !localtime_r(&to, &b)) return played + skip;
@@ -274,10 +299,10 @@ void sysinfo_get(SysInfo *out)
     out->ams_valid = true;
     out->ams_major = 1; out->ams_minor = 12; out->ams_micro = 0;
     out->emummc_valid = true;
-    out->emummc = getenv("PLAYGUARD_SIM_EMUMMC") != NULL;
+    out->emummc = sim_env("PLAYGUARD_SIM_EMUMMC") != NULL;
     out->blank_valid = true;
-    out->blank = getenv("PLAYGUARD_SIM_BLANK") != NULL;
-    out->applet_mode = getenv("PLAYGUARD_SIM_APPLET") != NULL;
+    out->blank = sim_env("PLAYGUARD_SIM_BLANK") != NULL;
+    out->applet_mode = sim_env("PLAYGUARD_SIM_APPLET") != NULL;
     out->serial_valid = true;
     snprintf(out->serial, sizeof(out->serial), "%s", out->blank ? SYSINFO_BLANK_SERIAL : "XAW10000000001");
 }
@@ -288,7 +313,7 @@ void sysinfo_version_string(u32 v, char *buf, size_t size)
 }
 
 // ---------------------------------------------------------------- pctl
-Result pctl_ops_init(void)   { sim_init(); return getenv("PLAYGUARD_SIM_NO_CFW") ? (Result)0x0C15 : 0; }
+Result pctl_ops_init(void)   { sim_init(); return sim_env("PLAYGUARD_SIM_NO_CFW") ? (Result)0x0C15 : 0; }
 void   pctl_ops_exit(void)   {}
 Result pctl_ops_reinit(void) { return pctl_ops_init(); }
 
@@ -451,10 +476,10 @@ void pctl_play_timer_query(PtState *o)
     const s64 played = (s64)played_today_s();
     const bool reached = o->enabled && (S.limit_reached || (limit != PT_DAY_NOLIMIT && (s64)limit * 60 <= played));
     o->remaining_valid = true;
-    o->remaining_ns = o->enabled && !reached && limit != PT_DAY_NOLIMIT && !getenv("PLAYGUARD_SIM_IDLE")
+    o->remaining_ns = o->enabled && !reached && limit != PT_DAY_NOLIMIT && !sim_env("PLAYGUARD_SIM_IDLE")
                           ? ((s64)limit * 60 - played) * 1000000000LL + 20000000000LL - (s64)counting_ns() : 0;
     // The last minutes of the day's time, whatever the limit (the child screen's end).
-    const char *left_min = getenv("PLAYGUARD_SIM_LEFT_MIN");
+    const char *left_min = sim_env("PLAYGUARD_SIM_LEFT_MIN");
     if (left_min && o->remaining_ns > 0) o->remaining_ns = (s64)atoi(left_min) * 60 * 1000000000LL + 20000000000LL;
     // A warning only: the console does not restrict, and 1454 goes below 0
     // by the time played over the limit (as observed; 2 min when the limit is
@@ -597,7 +622,7 @@ void time_clock_snapshot(TimeSnapshot *o)
     // With "Synchronise" on, the console clock follows the network clock.
     o->user_time = o->automatic ? o->network_time : now + S.clock_offset;
     o->local_time = now;
-    o->accuracy = S.network_set || getenv("PLAYGUARD_SIM_ACCURATE");
+    o->accuracy = S.network_set || sim_env("PLAYGUARD_SIM_ACCURATE");
     snprintf(o->location, sizeof(o->location), "Europe/Paris");
 }
 // Both writes, once allowed: the network clock becomes `utc`, the console
@@ -712,7 +737,7 @@ static const char *const SIM_ACCOUNT_NAMES[] = { "Alice", "Léo", "Maya", "Noah"
 
 static size_t sim_accounts(void)
 {
-    const char *n = getenv("PLAYGUARD_SIM_ACCOUNTS");
+    const char *n = sim_env("PLAYGUARD_SIM_ACCOUNTS");
     if (!n || !*n) return 2;
     const int v = atoi(n);
     return v < 0 ? 0 : (size_t)v > SIM_ACCOUNTS_MAX ? SIM_ACCOUNTS_MAX : (size_t)v;
@@ -805,7 +830,7 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
 {
     memset(out, 0, sizeof(*out));
     time_local_now(&out->now, NULL);
-    if (getenv("PLAYGUARD_SIM_NO_PDM")) {
+    if (sim_env("PLAYGUARD_SIM_NO_PDM")) {
         out->stats_rc = out->events_rc = (Result)0x1A0C;
         return;
     }
@@ -822,7 +847,7 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         { 0x0100A1B2C3D45000ULL, "",                          0,   0, 15,  15, 0,  0 },
         { 0x0100A1B2C3D46000ULL, "Space Farm Tales",        95,   4,  0,   0, 75,  0 },
     };
-    const bool idle_weeks = getenv("PLAYGUARD_SIM_NO_PLAY") != NULL;
+    const bool idle_weeks = sim_env("PLAYGUARD_SIM_NO_PLAY") != NULL;
     out->windows_ok = true;
     LocalTime today;
     const int wday = host_to_local(NULL, out->now, &today) ? today.wday : 0;
@@ -839,6 +864,14 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         g->first_played = g->totals_ok ? out->now - 400ULL * 86400 : 0;
         g->today_s = idle_weeks ? 0 : games[i].today_min * 60;
         g->week_s = idle_weeks ? 0 : games[i].week_min * 60;
+        // PLAYGUARD_SIM_SKIP's time played today, on the first game (the
+        // timer counts the same).
+        if (i == 0 && !idle_weeks) {
+            const u64 more = played_today_s() > SIM_PLAYED_TODAY_MIN * 60ULL ? played_today_s() - SIM_PLAYED_TODAY_MIN * 60ULL : 0;
+            g->today_s += (u32)more;
+            g->week_s += (u32)more;
+            g->total_s += more;
+        }
         // The rest of the week spread over the six days before, unevenly.
         static const u32 spread[6] = { 30, 0, 25, 15, 0, 30 };
         g->day_s[0] = g->today_s;
@@ -867,7 +900,7 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
     out->prev_week_s = idle_weeks ? 0 : (u32)share(480ULL * 60, account);
     out->month_ok = true;
     // A large library: filler games, each played a little this week.
-    const char *more = getenv("PLAYGUARD_SIM_GAMES");
+    const char *more = sim_env("PLAYGUARD_SIM_GAMES");
     const int n = more ? atoi(more) : 0;
     int i = 0;
     for (; i < n && out->count < PLAYSTATS_MAX; i++) {
@@ -914,9 +947,9 @@ void playstats_icons(PlayIcon *icons, size_t count)
 
 size_t playstats_by_account(u64 app_id, AccountPlay *out, size_t max, Result *rc)
 {
-    if (rc) *rc = getenv("PLAYGUARD_SIM_NO_PDM") ? (Result)0x1A0C : 0;
+    if (rc) *rc = sim_env("PLAYGUARD_SIM_NO_PDM") ? (Result)0x1A0C : 0;
     const size_t n = sim_accounts();
-    if (getenv("PLAYGUARD_SIM_NO_PDM") || max < n) return 0;
+    if (sim_env("PLAYGUARD_SIM_NO_PDM") || max < n) return 0;
     // The made-up accounts sharing the play time 2:1 (none for a deleted
     // game), less the time on no account.
     PlayStats all;
@@ -937,12 +970,9 @@ size_t playstats_by_account(u64 app_id, AccountPlay *out, size_t max, Result *rc
 // ---------------------------------------------------------------- gamecheck
 // The made-up games of the Activity tab, fine, then one of each problem the
 // HOME menu shows (an icon that keeps loading, "!", a dotted frame, …),
-// unless PLAYGUARD_SIM_GAMES_OK. What the actions change stays until the app
-// quits: a removed game or content is gone, a launch version reset sticks.
-static u64 s_removed[32];        // whole games and single contents, by ID
-static size_t s_removed_count;
-static u64 s_launch_reset[16];
-static size_t s_launch_reset_count;
+// unless PLAYGUARD_SIM_GAMES_OK. What the actions change (G) stays until the
+// app quits, or from one run to the next with PLAYGUARD_SIM_KEEP: a removed
+// game or content is gone, a launch version reset sticks.
 
 static bool sim_in(const u64 *list, size_t n, u64 id)
 {
@@ -953,7 +983,7 @@ static bool sim_in(const u64 *list, size_t n, u64 id)
 
 static void sim_add_content(GameFacts *g, u64 id, u32 version, u8 type, u8 storage)
 {
-    if (sim_in(s_removed, s_removed_count, id)) return;
+    if (sim_in(G.removed, G.removed_count, id)) return;
     GameContent *c = &g->contents[g->content_count++];
     c->id = id;
     c->version = version;
@@ -1016,7 +1046,7 @@ static void sim_games(SimGames *out)
     card->record_event = 5;
     sim_add_content(card, card->app_id, 0, GC_META_APPLICATION, GC_STORAGE_GAMECARD);
     card->card_only = true;
-    if (getenv("PLAYGUARD_SIM_GAMES_OK")) return;
+    if (sim_env("PLAYGUARD_SIM_GAMES_OK")) return;
 
     static const struct { u64 id; const char *name; GameIssue issue; int age; } broken[] = {
         { 0x0100A1B2C3D46000ULL, "",                 GC_NO_CONTROL, -1 },
@@ -1031,7 +1061,7 @@ static void sim_games(SimGames *out)
     };
     for (size_t i = 0; i < sizeof(broken) / sizeof(broken[0]); i++) {
         const u64 id = broken[i].id;
-        if (sim_in(s_removed, s_removed_count, id)) continue;
+        if (sim_in(G.removed, G.removed_count, id)) continue;
         GameFacts *g = &out->games[out->count++];
         g->app_id = id;
         snprintf(g->name, sizeof(g->name), "%s", broken[i].name);
@@ -1061,7 +1091,7 @@ static void sim_games(SimGames *out)
             case GC_LAUNCH_VERSION:   // its update was removed outside the console
                 sim_add_content(g, id, 0, GC_META_APPLICATION, GC_STORAGE_SD);
                 g->launch_checked = true;
-                g->launch_required = sim_in(s_launch_reset, s_launch_reset_count, id) ? 0 : 0x40000;
+                g->launch_required = sim_in(G.launch_reset, G.launch_reset_count, id) ? 0 : 0x40000;
                 g->launch_rc = g->launch_required ? (Result)0x1F0C : 0;   // refused until then
                 break;
             case GC_TICKET_MISSING:
@@ -1096,7 +1126,8 @@ Result gamecheck_remove(u64 app_id)
 {
     RO_GUARD();
     FAIL_IF("remove");
-    sim_remember(s_removed, &s_removed_count, sizeof(s_removed) / sizeof(s_removed[0]), app_id);
+    sim_remember(G.removed, &G.removed_count, sizeof(G.removed) / sizeof(G.removed[0]), app_id);
+    sim_keep_save();
     return 0;
 }
 
@@ -1109,8 +1140,9 @@ Result gamecheck_remove_content(u64 app_id, const GameContent *content)
         return NXM_RC_INVALID_ARGUMENT;
     RO_GUARD();
     FAIL_IF("remove");
-    sim_remember(s_removed, &s_removed_count, sizeof(s_removed) / sizeof(s_removed[0]), content->id);
+    sim_remember(G.removed, &G.removed_count, sizeof(G.removed) / sizeof(G.removed[0]), content->id);
     sim_bump(app_id);
+    sim_keep_save();
     return 0;
 }
 
@@ -1119,8 +1151,9 @@ Result gamecheck_reset_launch_version(u64 app_id, u32 version)
     (void)version;
     RO_GUARD();
     FAIL_IF("launch");
-    sim_remember(s_launch_reset, &s_launch_reset_count, sizeof(s_launch_reset) / sizeof(s_launch_reset[0]), app_id);
+    sim_remember(G.launch_reset, &G.launch_reset_count, sizeof(G.launch_reset) / sizeof(G.launch_reset[0]), app_id);
     sim_bump(app_id);
+    sim_keep_save();
     return 0;
 }
 
@@ -1144,20 +1177,18 @@ Result gamecheck_verify(u64 app_id, bool (*progress)(void *ctx, u64 current, u64
 
 // Each change to a game (a removal, a launch version reset) bumps its entry,
 // as the console's LastUpdated does.
-static u64 s_bumps[32];
-static size_t s_bump_count;
 
 static u64 sim_updated(u64 id)
 {
     u64 n = 1791400000ULL + (id & 0xFFFFF);
-    for (size_t i = 0; i < s_bump_count; i++)
-        if (s_bumps[i] == id) n++;
+    for (size_t i = 0; i < G.bump_count; i++)
+        if (G.bumps[i] == id) n++;
     return n;
 }
 
 static void sim_bump(u64 id)
 {
-    if (s_bump_count < sizeof(s_bumps) / sizeof(s_bumps[0])) s_bumps[s_bump_count++] = id;
+    if (G.bump_count < sizeof(G.bumps) / sizeof(G.bumps[0])) G.bumps[G.bump_count++] = id;
 }
 
 Result gamecheck_records(GameRecord *out, u32 max, u32 *count, bool *truncated)
@@ -1192,7 +1223,7 @@ u32 gamecheck_check(const GameRecord *records, u32 count, GameFacts *out,
 {
     static SimGames all;
     sim_games(&all);
-    const char *ms_env = getenv("PLAYGUARD_SIM_CHECK_MS");
+    const char *ms_env = sim_env("PLAYGUARD_SIM_CHECK_MS");
     const long ms = ms_env ? strtol(ms_env, NULL, 10) : 150;
     memset(out, 0, (size_t)count * sizeof(*out));
     memset(&s_sim_timing, 0, sizeof s_sim_timing);

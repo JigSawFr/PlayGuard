@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 
+#include "core/sim_env.h"
 #include "tab/cadran_tab.hpp"
 #include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
@@ -21,7 +22,7 @@ constexpr long START_DELAY_MS = 1500;
 void at_start(brls::Activity* main)
 {
     // An appearance forced on the desktop (PLAYGUARD_SIM_APPEARANCE) is no choice.
-    if (config::get().appearance_offered || !cadran::enabled() || std::getenv("PLAYGUARD_SIM_APPEARANCE")) return;
+    if (config::get().appearance_offered || !cadran::enabled() || sim_env("PLAYGUARD_SIM_APPEARANCE")) return;
     if (!ui::claim_start_screen("the new look")) return;
     brls::delay(START_DELAY_MS, [main]() {
         if (!ui::on_top(main)) return;   // something else first: the next start
