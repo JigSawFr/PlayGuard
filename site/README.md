@@ -18,9 +18,19 @@ PlayGuard's website, on GitHub Pages: <https://jigsawfr.github.io/PlayGuard/>.
   sections folded under its first paragraph, and nothing wider than the
   screen (a long `code` breaks). The header goes on two rows up to 1080px,
   where its links no longer fit beside the menus in every language.
+- **The home page**: install first (the download under it, with the
+  release's date), the three main features then the others, PlayGuard
+  beside Nintendo's app on what each needs, the questions each with its own
+  address (`#faq-<question>`, opened by a link to it). The screenshots open
+  larger over the page (`site.js`: swipe or the arrows, down or Esc to
+  close), the documentation's too: its tables of screenshots under their
+  names become captioned figures (`screenshot_table()`), one per row on a
+  phone. Each section of the documentation has a link to share it, each
+  page the previous and next ones; the changelog folds the older releases.
 - **The documentation's search**: a box above its pages (`site.js`), over
   `docs/search.json`, each section of the language's pages; every word typed
-  must be in the section, accents or not.
+  must be in the section, accents or not, and is marked in the results; `/` to search, the
+  arrows through them.
 - **The changelog** (`/changelog/`, `CHANGELOG.md` in each language's page,
   its notes in English) and `releases.atom`, a feed of the releases.
 - **The page not found** (`404.html`, served at any address) in every

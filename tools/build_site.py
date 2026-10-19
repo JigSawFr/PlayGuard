@@ -88,8 +88,25 @@ SCREENSHOTS = ["dashboard", "play_timer", "per_day", "activity", "restrictions",
 # The screenshots in each language: the gallery's, and the documentation's "A game".
 LOCALIZED_SHOTS = SCREENSHOTS + ["activity_game"]
 FAQ = ["closed", "offline", "ban", "children", "sysmodule", "emummc", "switch2", "free"]
-FEATURES = [("timer", "⏱️"), ("activity", "📊"), ("restrictions", "🔒"), ("console", "🕒"), ("app", "📱"),
-            ("history", "↩️"), ("notices", "🔔"), ("languages", "🌍")]
+FEATURES = ["timer", "activity", "restrictions", "console", "app", "history", "notices", "languages"]
+# The three the home page puts first; the others in a shorter list under them.
+FEATURED = ["timer", "restrictions", "console"]
+# Each feature's icon: a line drawing on a 24px grid, in the text's colour.
+ICONS = {
+    "timer": '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/>',
+    "activity": '<path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/>',
+    "restrictions": '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+    "console": '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    "app": '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2M3 3l18 18"/>',
+    "history": '<path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
+    "notices": '<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',
+    "languages": '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18"/>',
+}
+
+
+def icon(name):
+    return (f'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
+            f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{ICONS[name]}</svg>')
 
 ROOT = "."
 APP_TEXTS = {}
@@ -292,8 +309,25 @@ def render_doc(page, lang, to_root, assets):
     title = re.sub(r"<[^>]+>", "", title_match.group(1)) if title_match else page
     body = re.sub(r"<h1[^>]*>.*?</h1>", "", body, count=1, flags=re.S)
     body = alerts(rewrite_links(body, source, lang, to_root, assets))
+    body = re.sub(r"<table>.*?</table>", screenshot_table, body, flags=re.S)
     body = re.sub(r"<table>", '<div class="table"><table>', body).replace("</table>", "</table></div>")
     return html.unescape(title), body, md.toc_tokens, translated, source
+
+
+def screenshot_table(m):
+    """A table of screenshots under their names (a row of names, a row of
+    images, and so on): a grid of figures, each image with its name, which a
+    phone shows one under the other. Any other table as it is."""
+    rows = [re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", row, re.S)
+            for row in re.findall(r"<tr>(.*?)</tr>", m.group(0), re.S)]
+    pairs = list(zip(rows[0::2], rows[1::2]))
+    if len(rows) < 2 or len(rows) % 2 or not all(
+            len(names) == len(images) and all(re.fullmatch(r"\s*<img [^>]*>\s*", c) for c in images)
+            for names, images in pairs):
+        return m.group(0)
+    figures = "\n".join(f"<figure>{image.strip()}<figcaption>{name.strip()}</figcaption></figure>"
+                       for names, images in pairs for name, image in zip(names, images))
+    return f'<div class="shots">\n{figures}\n</div>'
 
 
 # ---- Pages ------------------------------------------------------------
@@ -368,14 +402,16 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
       <a href="{REPO_URL}" class="nav-gh">GitHub</a>
     </nav>
     <div class="settings">
+      <span class="picker picker-lang"><span class="picker-face" aria-hidden="true">{code.split("-")[0].upper()}</span>
       <select id="site-language" aria-label="{t('language')}">
 {options}
-      </select>
+      </select></span>
+      <span class="picker picker-theme"><span class="picker-face" aria-hidden="true"></span>
       <select id="site-theme" aria-label="{t('theme')}">
         <option value="auto">{t('theme_auto')}</option>
         <option value="light">{t('theme_light')}</option>
         <option value="dark">{t('theme_dark')}</option>
-      </select>
+      </select></span>
     </div>
   </header>
   <main id="main">
@@ -383,12 +419,35 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   </main>
   <footer class="footer">
     <div class="footer-inner">
-      <p><img src="{to_root}assets/mark.svg" alt="" width="20" height="20"> <strong>PlayGuard</strong> · {t('footer_license')}
-        · <a href="{REPO_URL}">GitHub</a> · <a href="{home}changelog/">{t('footer_changelog')}</a></p>
-      <p>{t('support')} — <a href="https://github.com/sponsors/JigSawFr">GitHub Sponsors</a> · <a href="https://ko-fi.com/jigsawfr">Ko-fi</a></p>
+      <div class="footer-cols">
+        <div>
+          <p><img src="{to_root}assets/mark.svg" alt="" width="20" height="20"> <strong>PlayGuard</strong></p>
+          <p>{t('footer_license')}</p>
+        </div>
+        <div>
+          <h2>{t('docs_title')}</h2>
+          <ul>{"".join(f'<li><a href="{home}docs/{p}/">{t(f"doc_{p}")}</a></li>' for p, s in DOCS if s == "guide")}</ul>
+        </div>
+        <div>
+          <h2>PlayGuard</h2>
+          <ul><li><a href="{REPO_URL}">GitHub</a></li><li><a href="{home}changelog/">{t('footer_changelog')}</a></li>
+            <li><a href="{SITE_URL}releases.atom">{t('releases_feed')}</a></li>
+            <li><a href="{REPO_URL}/issues/new/choose">{t('report_bug')}</a></li></ul>
+        </div>
+        <div>
+          <h2>{t('support')}</h2>
+          <ul><li><a href="https://github.com/sponsors/JigSawFr">GitHub Sponsors</a></li><li><a href="https://ko-fi.com/jigsawfr">Ko-fi</a></li></ul>
+        </div>
+      </div>
       <p class="fine">{t('footer_nintendo')}</p>
     </div>
   </footer>
+  <dialog class="lightbox" aria-label="{t('screens_title')}">
+    <figure><img alt=""><figcaption></figcaption></figure>
+    <button type="button" class="lightbox-close" aria-label="{t('close')}"></button>
+    <button type="button" class="lightbox-prev" aria-label="{t('previous')}"></button>
+    <button type="button" class="lightbox-next" aria-label="{t('next')}"></button>
+  </dialog>
   <a class="to-top" href="#main" aria-label="{t('back_to_top')}" hidden></a>
   <script src="{to_root}assets/site.js"></script>
 </body>
@@ -398,16 +457,24 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
 
 def home_body(t, lang, to_root):
     code = lang
-    features = "\n".join(
-        f'      <li class="card"><span class="emoji" aria-hidden="true">{emoji}</span>'
-        f'<h3>{t(f"f_{key}_title")}</h3><p>{t(f"f_{key}_text")}</p></li>'
-        for key, emoji in FEATURES)
+    def feature(key):
+        return (f'      <li class="card">{icon(key)}'
+                f'<h3>{t(f"f_{key}_title")}</h3><p>{t(f"f_{key}_text")}</p></li>')
+    featured = "\n".join(feature(k) for k in FEATURES if k in FEATURED)
+    others = "\n".join(feature(k) for k in FEATURES if k not in FEATURED)
+    # PlayGuard and Nintendo's app on what each needs: PlayGuard needs none of
+    # it but a custom firmware, which the app does not.
+    compare = "\n".join(
+        f'          <tr><th scope="row">{t(f"compare_{row}")}</th>{mark(t, pg)}{mark(t, not pg)}</tr>'
+        for row, pg in (("phone", True), ("account", True), ("internet", True), ("cfw", False)))
+    version, date, _ = changelog_releases()[0]
     shots = "\n".join(
         f'      <figure><a href="{to_root}assets/{screenshot(lang, s)}">{gallery_image(t, lang, to_root, s)}</a>'
         f'<figcaption>{t(f"shot_{s}")}</figcaption></figure>'
         for s in SCREENSHOTS)
     faq = "\n".join(
-        f'      <details><summary>{t(f"faq_{q}_q")}</summary><p>{t(f"faq_{q}_a")}</p></details>' for q in FAQ)
+        f'      <details id="faq-{q}"><summary>{t(f"faq_{q}_q")}</summary><p>{t(f"faq_{q}_a")}</p></details>'
+        for q in FAQ)
     docs = docs_list(t, lang, to_root, None)
     home = f"{to_root}{lang_dir(lang)}"
     return f"""    <section class="hero">
@@ -417,10 +484,11 @@ def home_body(t, lang, to_root):
         <p class="sub">{t('hero_sub')}</p>
         <p>{t('hero_text')}</p>
         <div class="actions">
-          <a class="button primary" href="{REPO_URL}/releases/latest">{t('download')}</a>
+          <a class="button primary" href="#install">{t('install_cta')}</a>
           <a class="button" href="{to_root}simulator/?lang={code}">{t('try')}</a>
         </div>
-        <p class="source"><a href="{REPO_URL}">{t('source')}</a></p>
+        <p class="source"><a href="{REPO_URL}/releases/latest">{t('download')}</a>
+          · <time class="release-date" datetime="{date}">{date}</time></p>
       </div>
       <div class="hero-video">
         <video src="{to_root}assets/{tour_video(lang)}" muted loop playsinline preload="none"
@@ -434,8 +502,24 @@ def home_body(t, lang, to_root):
     <section id="features" class="section">
       <h2>{t('features_title')}</h2>
       <ul class="cards">
-{features}
+{featured}
       </ul>
+      <h3 class="more-title">{t('features_more')}</h3>
+      <ul class="cards cards-small">
+{others}
+      </ul>
+    </section>
+
+    <section id="compare" class="section">
+      <h2>{t('compare_title')}</h2>
+      <div class="table compare">
+        <table>
+          <thead><tr><td></td><th scope="col">PlayGuard</th><th scope="col">{t('compare_app')}</th></tr></thead>
+          <tbody>
+{compare}
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section id="screens" class="section">
@@ -490,6 +574,12 @@ def home_body(t, lang, to_root):
 {docs}
     </section>
 """
+
+
+def mark(t, yes):
+    """A cell of the comparison: a tick or a cross, its word for a screen reader."""
+    return (f'<td class="{"yes" if yes else "no"}"><span aria-hidden="true">{"✓" if yes else "✕"}</span>'
+            f'<span class="sr">{t("yes" if yes else "no")}</span></td>')
 
 
 def locked_out_anchor(lang):
@@ -553,6 +643,17 @@ def doc_body(t, lang, to_root, page_name, assets):
             end = body.find("</p>", start) + len("</p>")
             end += body[end:end + 1] == "\n"
         shown = body[:end] + folded + body[end:]
+    # A link to each section, to share it.
+    shown = re.sub(r'<(h[23]) id="([^"]+)">(.*?)</h[23]>',
+                   lambda m: f'<{m.group(1)} id="{m.group(2)}">{m.group(3)}<a class="anchor" href="#{m.group(2)}"'
+                             f' aria-label="{t("anchor_link")}"></a></{m.group(1)}>', shown, flags=re.S)
+    # The pages before and after this one, in the sidebar's order.
+    names = [p for p, _ in DOCS]
+    at = names.index(page_name)
+    home = f"{to_root}{lang_dir(lang)}"
+    pager = "".join(
+        f'<a class="{cls}" href="{home}docs/{names[i]}/"><span>{t(label)}</span>{t(f"doc_{names[i]}")}</a>'
+        for cls, label, i in (("prev", "previous", at - 1), ("next", "next", at + 1)) if 0 <= i < len(names))
     # The page's description: its first paragraph (the one under the title).
     first = re.search(r"<p>(.*?)</p>", body, re.S)
     description = plain(first.group(1)) if first else ""
@@ -566,6 +667,7 @@ def doc_body(t, lang, to_root, page_name, assets):
       <article class="prose">
         <h1>{html.escape(title)}</h1>
 {note}{shown}
+        <nav class="pager" aria-label="{t('docs_title')}">{pager}</nav>
         <p class="edit"><a href="{REPO_URL}/blob/main/{source}">{t('doc_on_github')}</a></p>
       </article>
       {f'<nav class="toc" aria-label="{html.escape(title)}"><ul>{toc_items}</ul></nav>' if toc_items else ''}
@@ -637,7 +739,7 @@ def software(t, lang, version, url):
         "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
         "image": f"{SITE_URL}assets/{social_image(lang)}",
         "screenshot": [f"{SITE_URL}assets/{screenshot(lang, s)}" for s in SCREENSHOTS],
-        "featureList": [t(f"f_{key}_title", escape=False) for key, _ in FEATURES],
+        "featureList": [t(f"f_{key}_title", escape=False) for key in FEATURES],
         "inLanguage": [hl for _, _, _, hl in LANGUAGES],
         "author": {"@type": "Person", "name": "JigSawFr", "url": "https://github.com/JigSawFr"},
         "sameAs": [REPO_URL],
@@ -734,10 +836,17 @@ def changelog_body(t, lang):
     """The changelog page: each release, its date, its notes (in English) and its download."""
     note = "" if lang == "en-US" else f'      <p class="callout note">{t("changelog_english")}</p>\n'
     parts = []
-    for version, date, body in changelog_releases():
-        parts.append(f'      <h2 id="v{version}">{version} <small><time datetime="{date}">{date}</time></small></h2>\n'
-                     f'{body.replace("<h4>", "<h3>").replace("</h4>", "</h3>")}\n'
-                     f'      <p><a href="{REPO_URL}/releases/tag/v{version}">GitHub · v{version}</a></p>')
+    for i, (version, date, body) in enumerate(changelog_releases()):
+        notes = (f'{body.replace("<h4>", "<h3>").replace("</h4>", "</h3>")}\n'
+                 f'      <p><a href="{REPO_URL}/releases/tag/v{version}">GitHub · v{version}</a></p>')
+        when = f'<small><time datetime="{date}">{date}</time></small>'
+        if i == 0:
+            parts.append(f'      <h2 id="v{version}">{version} {when}</h2>\n{notes}')
+            continue
+        # The older ones folded, each open from a link to it (site.js).
+        if i == 1:
+            parts.append(f'      <h2 id="older">{t("changelog_older")}</h2>')
+        parts.append(f'      <details class="release" id="v{version}"><summary>{version} {when}</summary>\n{notes}\n      </details>')
     return f"""    <section class="section narrow">
       <article class="prose">
         <h1>{t('footer_changelog')}</h1>
