@@ -49,6 +49,7 @@
 #include "tab/restrictions_tab.hpp"
 #include "tab/security_tab.hpp"
 #include "ui/ui.hpp"
+#include "ui/cut_text.hpp"
 #include "ui/text_size.hpp"
 #include "util/config.hpp"
 #include "util/crash_dump.h"
@@ -438,6 +439,7 @@ bool run_frame()
     // once they waited long enough (util/session_log.hpp).
     if (session_log::due()) ui::write_later("session log", []() { session_log::flush(); }, "session_log");
     frame_stats_flow::sample();   // Developer › Frame statistics, when on
+    cut_text::sample();           // the desktop's texts cut short (PLAYGUARD_SIM_CUT_TEXT)
 #ifndef __SWITCH__
     if (s_stats) {
         int draws = 0, fill = 0, stroke = 0, text = 0;

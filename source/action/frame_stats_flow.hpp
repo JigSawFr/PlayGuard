@@ -26,6 +26,8 @@ void sample();
 // it appears, and by the screens worth measuring on their own. A change
 // starts a new second, so no line mixes two screens.
 void set_screen(const std::string& name);
+// The name set last ("" before the first).
+std::string screen();
 
 // The last line written, without its newline; "" until the first.
 std::string last();

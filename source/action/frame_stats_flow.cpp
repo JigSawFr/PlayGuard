@@ -187,4 +187,6 @@ void set_screen(const std::string& name)
 
 std::string last() { return s_last; }
 
+std::string screen() { return s_screen; }
+
 }   // namespace frame_stats_flow
