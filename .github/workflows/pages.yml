@@ -101,6 +101,7 @@ jobs:
           [ -n "$pr" ] && [[ " $PREVIEWS " == *" $pr "* ]] || exit 0
           url="${SITE%/}/pr-$pr/"
           sim="${url}simulator/"
+          shots="${sim}shots/"
           marker='<!-- playguard-web-simulator -->'
           body=$(cat <<EOF
           $marker
@@ -108,7 +109,17 @@ jobs:
 
           **[The web simulator](${sim})** · [the website](${url}) — commit \`${SHA::7}\`, updated at each push (allow a minute for GitHub Pages).
 
-          Straight to a state: [unlocked](${sim}?unlocked=1) · [limit reached](${sim}?restricted=1) · [no PIN yet](${sim}?not_set_up=1) · [in French, dark](${sim}?lang=fr&theme=dark). The side panel sets the rest, and **Copy link** gives a link to what it shows.
+          Straight to a state: [unlocked](${sim}?unlocked=1) · [limit reached](${sim}?restricted=1) · [no PIN yet](${sim}?not_set_up=1) · [updates to install](${sim}?fw=22.5.0&latest=1.1.0:24.0.0&sys_latest=1.12.1:6.5.4:23.0.1&sys_notes=sample&dev_builds=sample&github_login=ok&hbloader=1) · [in French, dark](${sim}?lang=fr&theme=dark). The side panel sets the rest, **Copy link** gives a link to what it shows, and the buttons under the screen move the console's time on.
+
+          <details><summary>The screens of this build (web smoke test)</summary>
+
+          | Overview | Play timer | Activity |
+          |---|---|---|
+          | <img src="${shots}overview.png?v=${SHA::7}" width="300" alt="Overview"> | <img src="${shots}play_timer.png?v=${SHA::7}" width="300" alt="Play timer"> | <img src="${shots}activity.png?v=${SHA::7}" width="300" alt="Activity"> |
+          | **Console** | **Limit reached** | **Japanese** |
+          | <img src="${shots}console.png?v=${SHA::7}" width="300" alt="Console"> | <img src="${shots}limit_reached.png?v=${SHA::7}" width="300" alt="Limit reached"> | <img src="${shots}japanese.png?v=${SHA::7}" width="300" alt="Japanese"> |
+
+          </details>
 
           <sub>Keyboard: arrows, Enter (A), Esc (B), X, Y, L, R, ⇧L (ZL), ⇧R (ZR), + and −; a click is a touch; an on-screen pad on phones. See [web/README.md](https://github.com/${REPO}/blob/${SHA}/web/README.md). The preview goes when the pull request is closed.</sub>
           EOF

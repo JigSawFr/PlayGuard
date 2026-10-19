@@ -1,0 +1,30 @@
+[
+ {
+  "tag_name": "v1.1.0-rc.1",
+  "prerelease": true,
+  "draft": false,
+  "body": "## [1.1.0-rc.1](https://github.com/JigSawFr/PlayGuard/releases/tag/v1.1.0-rc.1) (2026-10-05)\n\n### Features\n\n* **play-timer:** choose what the console does when the time is up\n",
+  "assets": [
+   {
+    "name": "playguard.nro",
+    "size": 10,
+    "updated_at": "2026-10-05T00:00:00Z",
+    "browser_download_url": "https:///missing"
+   }
+  ]
+ },
+ {
+  "tag_name": "v1.0.0",
+  "prerelease": false,
+  "draft": false,
+  "body": "## [1.0.0](https://github.com/JigSawFr/PlayGuard/releases/tag/v1.0.0) (2026-10-01)\n\n### Features\n\n* **play-timer:** choose what the console does when the time is up\n",
+  "assets": [
+   {
+    "name": "playguard.nro",
+    "size": 10,
+    "updated_at": "2026-10-01T00:00:00Z",
+    "browser_download_url": "https:///missing"
+   }
+  ]
+ }
+]

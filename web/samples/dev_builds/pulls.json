@@ -1,0 +1,20 @@
+[
+ {
+  "number": 38,
+  "title": "feat(diagnostic): send a report online",
+  "body": "## What this changes, and why\n\n- a report can be sent online, as a gist\n  - from *Tools › Diagnostics*\n\n## Checklist\n\n- [x] `make test` passes\n- [ ] tried on a console\n",
+  "head": {
+   "ref": "feat/report",
+   "sha": "cccccccccccccccccccccccccccccccccccccccc",
+   "repo": {
+    "id": 1
+   }
+  },
+  "base": {
+   "ref": "main",
+   "repo": {
+    "id": 1
+   }
+  }
+ }
+]

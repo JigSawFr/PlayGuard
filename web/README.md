@@ -36,20 +36,45 @@ a screen without a build on the console.
 - **The side panel** shows the variables and changes them; **Apply** reloads
   the page with the new URL, so PlayGuard starts again from a fresh state, and
   **Copy link** gives a link that opens that state. **Presets** set common
-  states in one go (keeping the language, theme and first tab). What is changed inside
-  PlayGuard (a limit, the language in Preferences) lives in memory only and
-  goes with the next reload.
+  states in one go (keeping the language, theme, first tab and *Keep the
+  state*); `@21:30` in a preset's time is today at 21:30 in the browser's
+  time zone. What is changed inside PlayGuard (a limit, the language in
+  Preferences) lives in memory only and goes with the next reload, unless
+  *Keep the state* is on (below).
+- **Live settings**: the variables PlayGuard reads at each use (`live` in
+  `params.json`: the failures, the network's answers, `idle`, `now`, `skip`,
+  `accounts`, …) change without a restart when **Apply** changes nothing
+  else: the page sets them in PlayGuard's environment
+  (`playguard_web_setenv()`, `source/sim/web_page.cpp`) and the URL follows.
+  PlayGuard sees the new value at its next read (a screen's next refresh).
+- **The time**: the buttons under the screen move the console's time on by
+  5 min, 15 min or 1 h (`skip=`, in seconds; **Now** goes back), live, with a
+  game played all along: the time left goes down by as much, to the limit and
+  past it, and past 21:00 the simulated bedtime begins.
+- **Keep the state** (`keep=1`): PlayGuard's data folder (`playguard_data`:
+  its settings, history, caches, and the simulated console's settings in
+  `sim_console.bin`, `PLAYGUARD_SIM_KEEP`) is kept in the browser's IndexedDB,
+  written every 3 s and when the page is left. The console settings of the
+  panel then count for a first start only; **Forget the kept state** starts
+  over.
 - **Controls**: the arrows, Enter (Ⓐ) and Esc (Ⓑ) reach SDL directly; the
   page presses the other buttons by what the key says, on any layout: X, Y,
   L, R, Shift+L (ZL), Shift+R (ZR), + or P, − or M, Backspace (Ⓑ). A click is
   a touch. **Pad** shows an on-screen controller (shown by default on a touch
   screen). A gamepad works through the browser.
-- **Screenshot** saves the screen as it is (1280×720); **Log** shows what
-  PlayGuard logs.
+- **Screenshot** saves the screen as it is (1280×720); **Record** saves a
+  video of it (WebM) until **Stop**; **Log** shows what PlayGuard logs.
 - The network is a console without a connection: GitHub and switchbrew send
   no CORS headers, so a page cannot reach them (`source/sim/web_http.cpp`).
-  The `PLAYGUARD_SIM_*` folders the desktop reads its answers from do not
-  exist here either: their variables take `offline` or nothing.
+  The `PLAYGUARD_SIM_*` folders the desktop reads its answers from are
+  packaged instead (`web/samples/`, at `/app/samples`): `sys_notes=sample`
+  gives the release notes of Atmosphère 1.12.1, hekate 6.5.4 and firmware
+  23.0.0 and 23.0.1, `dev_builds=sample` two releases, main's builds and a
+  pull request's, installable (the *Updates to install* preset sets them with
+  the rest). Their variables also take `offline` or nothing.
+- `<body data-playguard>` says where PlayGuard is: `loading`, `running`,
+  `ready` (its first screen is up, `start-up: first screen ready` in its
+  log), `error`.
 
 ## How it is built
 
@@ -59,24 +84,31 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
 - `CMakeLists.txt`, under `emcmake` (`PLAYGUARD_WEB`): the desktop build on
   borealis' SDL2 platform with OpenGL ES 3, which Emscripten maps to WebGL 2;
   SDL2 and zlib from Emscripten's ports; no libcurl; the resources packaged at
-  `/app/resources` (`playguard.data`); a pool of 16 threads started with the
-  page (a thread asked for later waits for the browser, which a busy main
-  thread never lets it have).
+  `/app/resources` and `web/samples/` at `/app/samples` (`playguard.data`); a
+  pool of 16 threads started with the page (a thread asked for later waits
+  for the browser, which a busy main thread never lets it have); IDBFS for
+  *Keep the state*; `source/sim/web_page.cpp`, what the page calls while
+  PlayGuard runs (`ccall`).
 - `source/main.cpp`: in a browser a frame must hand the thread back to the
   page, so the main loop is `emscripten_set_main_loop`, one `run_frame()` per
   display refresh.
 - `patches/borealis/0090-sdl-in-a-browser.patch`: no SDL haptic in a browser;
   a window fixed at the console's 1280×720 (the page scales the canvas);
   `brls_web_button()`, which the page calls to press a button; the CJK font
-  below as borealis' fallback.
+  below as borealis' fallback when it is there at start-up.
 - **Japanese, Korean and Chinese**: a browser has no system font for borealis
   to fall back on, and PlayGuard's Latin font has no han, kana or hangul. The
   web build cuts the characters the four catalogs use out of Noto Sans CJK
   (SIL Open Font License; about 660 KiB, `tools/web_cjk_font.py`, which needs
-  fontTools) into `font/cjk.otf`. It takes `/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc`
-  (Debian and Ubuntu's `fonts-noto-cjk`), or `-DPLAYGUARD_WEB_CJK_FONT=<file>`;
-  without one, the build goes on with a warning and those languages show
-  boxes.
+  fontTools) into `cjk.otf`, served next to the page rather than packaged:
+  in those four languages the page fetches it before PlayGuard starts, into
+  `/app/resources/font/cjk.otf`; in the others, once PlayGuard runs, and adds
+  it behind the Latin font (`playguard_web_cjk_font()`,
+  `source/sim/web_page.cpp`), so the first download is that much smaller and
+  a language chosen in Preferences still has its characters. It takes
+  `/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc` (Debian and
+  Ubuntu's `fonts-noto-cjk`), or `-DPLAYGUARD_WEB_CJK_FONT=<file>`; without
+  one, the build goes on with a warning and those languages show boxes.
 - The page: `index.html`, `simulator.js`, `simulator.css`; `params.json`, the
   panel's entries; `i18n/<language>.json`, its texts, one catalog per language
   of the console (`en-US.json` the reference). `tools/check_web_params.py` (CI)
@@ -98,6 +130,16 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   its title) for the page's header, and the page asks for PlayGuard's files
   with the commit in their URL: GitHub Pages lets browsers keep them 10
   minutes, and an old `.wasm` with a new `.js` would not start.
+- **The smoke test** (`tools/web_smoke.py`, CI's *The simulator in a
+  browser*): the build in headless Chromium (Playwright, WebGL 2 from
+  SwiftShader) must reach its first screen in each kind of start (Overview,
+  Play timer, Activity, Console, limit reached, start-up error, Japanese),
+  move the time on and take a live setting without a restart, add the CJK
+  font after the start, and keep `sim_console.bin` across a reload with
+  `keep=1`; a page error fails it. Its screens (`shots/`) go with the site,
+  and the pull request's comment shows them. Locally, after `make web`:
+  `python3 tools/web_smoke.py build-web/simulator build-web/shots` (with
+  `pip install playwright` and `playwright install chromium`).
 
 ## GitHub Pages
 
@@ -107,5 +149,5 @@ builds both into one artifact, the simulator in `simulator/`, and
 ([`site/README.md`](../site/README.md#publishing)).
 
 Downloaded, a build is about 4 MB compressed (the `.wasm` 1.5 MB, the
-resources with the CJK font 2.5 MB; the run page's summary gives the sizes of
-each build).
+resources 1.8 MB and the CJK font 0.7 MB, fetched after the start in all but
+four languages; the run page's summary gives the sizes of each build).

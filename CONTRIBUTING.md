@@ -50,6 +50,9 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_NO_PDM=1` | No activity log |
 | `PLAYGUARD_SIM_GAMES=200` | That many more games played this week (a large library) |
 | `PLAYGUARD_SIM_IDLE=1` | No game running |
+| `PLAYGUARD_SIM_SKIP=900` | The console's time that many seconds later, a game played all along (unless `IDLE`): the time left goes down by as much, to the limit and past it (read at each call: the web page's time buttons move it while PlayGuard runs) |
+| `PLAYGUARD_SIM_ACCOUNTS=5` | That many user accounts, 0 to 8 (default 2: Alice and Léo), each playing twice as much as the next |
+| `PLAYGUARD_SIM_KEEP=1` | The simulated console's settings (PIN, limits, bedtime, clocks) kept in `playguard_data/sim_console.bin` from one run to the next; the variables that set its starting state then count for the first run only |
 | `PLAYGUARD_SIM_BACKGROUND=1` | PlayGuard out of focus |
 | `PLAYGUARD_SIM_REGION=2` | The console region |
 | `PLAYGUARD_SIM_LATEST=1.1.0:24.0.0` | The latest release and the newest firmware it supports, for the update check (`offline` for no network) |
@@ -70,7 +73,7 @@ Game patches are read from `./playguard_data/sd/`, the simulated SD card root.
 
 ### In a browser
 
-The same simulator runs in a browser, with these variables in the URL (`?unlocked=1&fw=20.5.0`) and a panel to change them: [main's](https://jigsawfr.github.io/PlayGuard/simulator/), on PlayGuard's website, and each pull request's, linked in a comment on it. See [`web/README.md`](web/README.md). The page is in the console's 15 languages, the browser's unless the URL says `lang=`, with an *Auto* / *Light* / *Dark* theme, and PlayGuard starts in both. A new `PLAYGUARD_SIM_*` variable needs its entry in `web/params.json` and its label in `web/i18n/en-US.json` (`tools/check_web_params.py` fails CI without them); the other catalogs show the English one until they have theirs.
+The same simulator runs in a browser, with these variables in the URL (`?unlocked=1&fw=20.5.0`) and a panel to change them: [main's](https://jigsawfr.github.io/PlayGuard/simulator/), on PlayGuard's website, and each pull request's, linked in a comment on it. See [`web/README.md`](web/README.md). The page is in the console's 15 languages, the browser's unless the URL says `lang=`, with an *Auto* / *Light* / *Dark* theme, and PlayGuard starts in both. A new `PLAYGUARD_SIM_*` variable needs its entry in `web/params.json` and its label in `web/i18n/en-US.json` (`tools/check_web_params.py` fails CI without them); the other catalogs show the English one until they have theirs. Mark it `"live": true` when PlayGuard reads it at each use (not once at start-up): the page then changes it without a restart. CI opens the build in headless Chromium (`tools/web_smoke.py`), and the pull request's comment shows its screens.
 
 ## Tests and CI
 
