@@ -80,6 +80,8 @@ PlayTimerTab::PlayTimerTab()
 {
     namespace kit = cadran::kit;
     static_cast<brls::Box*>(this->getView("pt_week_card"))->addView(brls::View::createFromXMLResource("view/cadran_week_card.xml"));
+    // The keys and the bars' key on two lines when the text is larger.
+    kit::wrap(this->getView("cpt_keys_idle"));
     kit::wrap(this->getView("pt_chips"));
     this->list.apply({ { "pt_unlocked_banner", "unlock" }, { "pt_extra", "plus" }, { "pt_stop", "stop" },
                        { "pt_split", "calendar" }, { "pt_bedtime_reset", "moon" }, { "pt_extra_amounts", "plus" },
