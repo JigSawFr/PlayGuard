@@ -15,7 +15,7 @@ PlayGuard ramène sur une console modifiée les réglages de l'application mobil
 
 [![PlayGuard en 30 secondes](images/video/playguard-tour.gif)](images/video/playguard-tour.gif)
 
-▶️ **[L'essayer dans le navigateur](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr)**, la vraie app face à une console simulée : [déverrouillé pour l'instant](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr&unlocked=1) · [temps écoulé](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr&restricted=1) · [premier lancement, sans code PIN](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr&not_set_up=1) · [sur la TV, texte plus grand](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr&docked=1).
+▶️ **[L'essayer dans le navigateur](https://playguard.link/simulator/?lang=fr)**, la vraie app face à une console simulée : [déverrouillé pour l'instant](https://playguard.link/simulator/?lang=fr&unlocked=1) · [temps écoulé](https://playguard.link/simulator/?lang=fr&restricted=1) · [premier lancement, sans code PIN](https://playguard.link/simulator/?lang=fr&not_set_up=1) · [sur la TV, texte plus grand](https://playguard.link/simulator/?lang=fr&docked=1).
 
 > [!WARNING]
 > **Nécessite un firmware personnalisé (Atmosphère).** PlayGuard utilise le service restreint `pctl`, en partie via des commandes `*ForDebug`. **À utiliser à vos risques.**
@@ -53,7 +53,7 @@ Code PIN oublié ou console d'occasion : [Console bloquée ?](docs/fr/troublesho
 
 ## Documentation
 
-- **Site :** [jigsawfr.github.io/PlayGuard](https://jigsawfr.github.io/PlayGuard/fr/) — cette documentation dans les 15 langues de la console, et [PlayGuard dans le navigateur](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr) face à une console simulée
+- **Site :** [playguard.link](https://playguard.link/fr/) — cette documentation dans les 15 langues de la console, et [PlayGuard dans le navigateur](https://playguard.link/simulator/?lang=fr) face à une console simulée
 - **Guide :** [fonctions](docs/fr/features.md) · [installation](docs/fr/install.md) · [compatibilité](docs/fr/compatibility.md) · [dépannage](docs/fr/troubleshooting.md)
 - **Référence (en anglais) :** [application mobile](docs/companion-app.md) · [`config.json`](docs/config.md) · [fonctionnement du contrôle parental](docs/parental-controls.md) · [module de récupération](sysmodule/README.md)
 - **Contribuer (en anglais) :** [CONTRIBUTING.md](CONTRIBUTING.md) · [feuille de route](ROADMAP.md) · [changelog](CHANGELOG.md)

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 d0ed03f4c86c -->
+<!-- translated from docs/features.md, sha256 b31fb46c871d -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Retour au [README](../../README.fr.md).
@@ -54,7 +54,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 
 ## Aujourd'hui — la journée en un coup d'œil
 
-*[L'essayer dans le simulateur ›](https://jigsawfr.github.io/PlayGuard/simulator/)*
+*[L'essayer dans le simulateur ›](https://playguard.link/simulator/)*
 
 - **Le temps restant** en anneau (un jour sans jeu dit *Pas de jeu*, pas *0 min* ; le temps en plus donné aujourd'hui y forme un segment plus clair à son extrémité, et l'anneau glisse vers chaque nouvelle valeur), et dessous ce qui arrêtera le jeu en premier : avant la fin du temps ou l'alarme du coucher, le reste de la journée sur une ligne, maintenant à gauche, chacune d'elles une marque avec son heure (*16:40 temps écoulé*, *21:00 coucher*), en sarcelle jusqu'à la première, en orange dans ses 15 dernières minutes ; sinon en mots (l'alarme du coucher une fois le temps du jour épuisé, l'heure où le jeu est de nouveau permis ; contrôle parental déverrouillé, la limite du jour en pause et pourquoi).
 - **Les actions à côté :** *Temps en plus* avec ses montants à portée d'un appui (un montant sélectionné déplace la fin du temps sur la ligne, *avec 15 min de plus*, ou dit sur la marque de l'alarme du coucher qu'elle arrive d'abord ; le premier ressort en sarcelle dès qu'il reste 15 min ou moins, ou plus rien), *Arrêter pour aujourd'hui*, *Montrer à l'enfant*, *Limite d'aujourd'hui…* (la limite du jour choisie sur place, écrite après une confirmation) ; dès qu'un profil est enregistré, le profil en vigueur par son nom (*Profils…* quand aucun ne correspond) : Ⓐ les liste, celui en vigueur coché, pour en appliquer un autre après une confirmation (les jours qui changent), ou *Gérer les profils…* ; contrôle parental déverrouillé, *Réactiver* passe en premier, sur toute la largeur, et *Temps en plus* s'efface. Sans limite sur aucun jour, *Définir les limites de la semaine* ouvre la semaine de *Temps de jeu*.
@@ -72,7 +72,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 
 ## Temps de jeu — la semaine sert d'éditeur
 
-*[L'essayer dans le simulateur ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=play_timer)*
+*[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=play_timer)*
 
 - **La semaine est l'éditeur :** Ⓐ sur un jour le modifie : ↑/↓ le changent de 15 min, ←/→ passent au jour suivant, Ⓛ le copie du lundi au vendredi, Ⓡ sur le week-end, Ⓨ met « pas de limite », Ⓐ ou Ⓑ terminent ; Ⓧ choisit une durée exacte (*Saisir une durée…* la règle avec ↑/↓ par 15 min et Ⓛ/Ⓡ par 5 min, OK sélectionné). Au toucher, un jour touché passe en modification, puis toucher son haut ou son bas le change de 15 min. Les modifications s'enregistrent ensemble, avec **+** ou *Enregistrer*, comme dans l'éditeur par jour (la confirmation liste les jours modifiés, avant → après) ; *Annuler* les remet. Dans la barre de chaque jour, le temps joué à sa dernière occurrence (aujourd'hui compris, tous comptes confondus), en corail une fois la limite atteinte ; sous la semaine, les chiffres du jour sélectionné (*jeudi : 1 h 20 joué sur 2 h*).
 - **Des puces** au-dessus et en dessous de la semaine ouvrent directement leurs choix : les profils (combien sont enregistrés), la même limite tous les jours, l'alarme du coucher, *Quand le temps est écoulé* et la suppression.
@@ -91,7 +91,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 
 ## Activité — qui a joué à quoi, et combien de temps
 
-*[L'essayer dans le simulateur ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=activity)*
+*[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=activity)*
 
 - Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **depuis toujours**, lu dans le journal d'activité de la console — pour tous les comptes ou **un seul compte utilisateur** (les comptes en puces en haut, quand la console en a plusieurs). PlayGuard s'ouvre sur le dernier compte affiché, ou sur celui choisi dans *Compte par défaut* (tous les comptes, ou un seul).
 - **En haut :** les comptes en puces, la période et l'export, aujourd'hui, les 7 derniers jours et depuis toujours en chiffres (sous les 7 derniers jours, la comparaison avec les 7 d'avant, par jour : *+20 min/jour vs semaine d'avant* en orange, de moins en sarcelle, *comme la semaine d'avant* à 5 minutes près), les quatre jeux les plus joués en cartes (Ⓐ en ouvre un ; sur les 7 derniers jours, celui qui a le plus augmenté par rapport à la semaine d'avant le dit, dès une demi-heure : *+2 h vs semaine d'avant*). Rien de joué sur la période : une carte le dit, avec *Voir depuis toujours* quand il y a quelque chose à voir.
@@ -108,7 +108,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 
 ## Restrictions — niveau, classification par âge, communication
 
-*[L'essayer dans le simulateur ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=restrictions)*
+*[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=restrictions)*
 
 - **Le niveau de restriction :** Jeune enfant, Enfant, Adolescent et Personnalisé côte à côte en tuiles, chacun avec ce qu'il restreint (Ⓐ le choisit ; sur *Personnalisé* en vigueur, Ⓐ mène à ses réglages en dessous) ; *Aucun* en dessous. Ce qu'impose un niveau (limite d'âge, publications, communication) est redit avant de l'appliquer.
 - En Personnalisé : classification par âge, publications sur les réseaux sociaux, communication avec d'autres joueurs.
@@ -118,7 +118,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 
 ## Code PIN — code PIN, déverrouillage, blocage des jeux, application mobile
 
-*[L'essayer dans le simulateur ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=security)*
+*[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=security)*
 
 - **Définir ou changer le code PIN** (écran système), **afficher le code PIN** (après un avertissement et le code PIN lui-même, demandé à chaque fois ; noté dans l'historique, puis un nouveau code PIN est proposé), **déverrouiller temporairement**, **réactiver le contrôle parental**, et si PlayGuard le réactive de lui-même juste après une modification qui a demandé le déverrouillage (activé par défaut).
 - **Protéger PlayGuard par le code PIN** dans PlayGuard lui-même : *Jamais*, *Avant une modification* (par défaut : tout le monde peut regarder, seul le parent modifie) ou *Pour ouvrir PlayGuard* (un écran verrouillé au lancement). Une fois saisi, le code vaut jusqu'à la fermeture de PlayGuard ; *Redemander le code PIN après 5 minutes* (désactivé par défaut) le redemande après ce délai, et ramène l'écran verrouillé de *Pour ouvrir PlayGuard* quand PlayGuard revient après 5 min ou plus hors de l'écran. Vérifié dans la couche service, donc aucune modification n'y échappe ; reverrouiller ne le demande jamais. *Afficher le code PIN* le demande à chaque fois, dans tous les modes et même juste après sa saisie, et un `config.json` absent ou abîmé compte comme *Avant une modification*. Quitter alors que le contrôle parental est encore déverrouillé propose de le reverrouiller (*Réactiver et quitter* ferme aussi le jeu par-dessus lequel PlayGuard a été ouvert, retour au menu HOME plutôt qu'à hbmenu) ; fermé depuis le menu HOME à la place, PlayGuard le reverrouille à son prochain lancement, et un redémarrage de la console le reverrouille de lui-même.
@@ -128,7 +128,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 
 ## Console — l'horloge réseau, les jeux installés, ce que fait tourner la console
 
-*[L'essayer dans le simulateur ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=console)*
+*[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=console)*
 
 - **En haut**, ce que fait tourner la console en tuiles (le firmware, Atmosphère, et hekate quand il est sur la carte SD ; Ⓐ ouvre ses notes de version), puis le diagnostic, puis les lignes de la console, la compatibilité en premier.
 - **Horloge réseau ›**, un écran à part — l'horloge dont dépend le minuteur :
@@ -143,14 +143,14 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 
 ## Historique — modifications et sauvegardes
 
-*[L'essayer dans le simulateur ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=history)*
+*[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=history)*
 
 - **Historique des modifications :** les 500 dernières modifications faites par PlayGuard (limites, niveau de restriction, code PIN, déverrouillages, dissociation, horloge, restaurations, mise en pause ou reprise du décompte…) et ce qu'il a vu changer en dehors de lui, regroupées par jour (*Aujourd'hui*, *Hier*, puis le jour et la date), avec l'heure et depuis où ; une limite changée pour un seul jour nomme ce jour. Une modification **refusée** par la console apparaît aussi, en orange, avec l'erreur de la console et ce qui était demandé (jamais remise : rien n'a changé). *Afficher* ne garde qu'un type (temps de jeu, restrictions, sécurité et appli, vu en dehors de PlayGuard, refusé par la console) ; *Exporter ce qui est affiché* l'écrit dans `exports/` en CSV, JSON, XLSX ou PDF. Chaque modification garde la version de PlayGuard qui l'a faite. Ⓐ sur une modification l'affiche et, pour une valeur, **remet la précédente** — avec le même déverrouillage et le même code PIN que toute modification, en signalant si elle a changé depuis. Une modification enregistrée par une version plus récente de PlayGuard apparaît comme *Autre modification*.
 - **Sauvegarder / restaurer les réglages** sur la carte SD : niveau de restriction, réglages personnalisés, mode VR, organisme de classification, limites quotidiennes, alarme « temps écoulé » (avec les actions avancées activées), et pour mémoire le bloc brut du minuteur — jamais le code PIN. La restauration ne liste que ce qui changerait (rien à changer : elle le dit simplement, sans déverrouillage ni écriture), et signale quand la sauvegarde avait une alarme du coucher (elle n'est pas réécrite). Nombre de sauvegardes conservées au choix.
 
 ## Préférences
 
-*[L'essayer dans le simulateur ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=preferences)*
+*[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=preferences)*
 
 - Ce qui règle PlayGuard lui-même :
   - Langue (toutes celles de la console, ou celle de la console), thème (clair / sombre), taille du texte (automatique / normale / plus grande, tout de suite) ; les autres avec proposition de relancer.
@@ -163,7 +163,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 
 ## À propos
 
-*[L'essayer dans le simulateur ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=about)*
+*[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=about)*
 
 - PlayGuard installé : version (en ambre quand une plus récente est sortie ; Ⓐ ouvre ses **notes de version**), mode de lancement et dossier des données ; **recherche d'une mise à jour** maintenant ; *Rechercher les mises à jour chaque jour* au lancement, et *Mettre à jour avec* : dans PlayGuard, qui télécharge la version, la vérifie, se remplace et redémarre, ou sphaira, le Homebrew App Store ou à la main (demandé à la première mise à jour si rien n'est choisi). Tant qu'une version plus récente est connue, PlayGuard s'ouvre sur **PlayGuard X.Y.Z est disponible** (sa date et ses notes) : *Mettre à jour*, ou *Plus tard* pour 1 jour, 1 semaine ou 30 jours au plus ; ces notes de version sont celles de PlayGuard, sur le même écran que celles d'Atmosphère et de hekate dans *Console* : depuis ses versions GitHub, un onglet par version (l'installée, les plus récentes, les plus anciennes), chacune avec ses points forts en cartes et tous ses changements, gardées sur la carte SD pour une lecture hors ligne (celles de la version installée sont aussi dans l'application, quand rien n'a encore été récupéré). Après une mise à jour, PlayGuard s'ouvre une fois sur **Nouveautés de la X.Y.Z** (les mêmes points forts, puis les QR codes).
 - **Aide et diagnostic ›**, un écran à part, sous *Mettre à jour avec* :
