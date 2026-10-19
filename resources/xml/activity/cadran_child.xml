@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- The Cadran child screen (Overview › Show the child): the time left today
-     as one big ring, the bedtime, nothing to change. Filled by
-     source/activity/cadran_child_activity.cpp. -->
+     as one big ring, when it ends, the bedtime, nothing to change. Sized to be
+     read from across the room, whatever the text size (its labels keep
+     theirs). Filled by source/activity/cadran_child_activity.cpp. -->
 
 <brls:AppletFrame
     iconInterpolation="linear">
@@ -19,19 +20,21 @@
         justifyContent="center"
         grow="1.0">
 
-        <brls:Label text="@i18n/playguard/cadran/child/title" fontSize="30" textColor="@theme/cadran/text2" marginBottom="22"/>
-        <PtRing id="child_ring" width="340" height="340" marginBottom="22"/>
-        <brls:Box axis="row" alignItems="center" marginBottom="18">
-            <brls:Box id="child_bed_chip" axis="row" alignItems="center" height="48" paddingLeft="22" paddingRight="22" cornerRadius="24" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" marginRight="12">
-                <CadranIcon icon="moon" width="20" height="20" color="@theme/cadran/amber" marginRight="10"/>
-                <brls:Label text="@i18n/playguard/cadran/child/bed" fontSize="18" marginRight="8"/>
-                <CadranDigits id="child_bedtime" text="21:00" fontSize="18" textColor="@theme/cadran/amber"/>
+        <brls:Label text="@i18n/playguard/cadran/child/title" fontSize="34" textColor="@theme/cadran/text2" marginBottom="18"/>
+        <PtRing id="child_ring" width="350" height="350" marginBottom="20"/>
+        <brls:Box axis="row" alignItems="center" marginBottom="12">
+            <brls:Box id="child_end_chip" axis="row" alignItems="center" height="56" paddingLeft="24" paddingRight="24" cornerRadius="28" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" marginRight="14">
+                <CadranIcon id="child_end_icon" icon="timer" width="24" height="24" color="@theme/cadran/teal" marginRight="12"/>
+                <brls:Label id="child_end" text="" fontSize="22"/>
             </brls:Box>
-            <brls:Box axis="row" alignItems="center" height="48" paddingLeft="22" paddingRight="22" cornerRadius="24" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1">
-                <brls:Label id="child_time_up" text="" fontSize="18" textColor="@theme/cadran/text2"/>
+            <brls:Box id="child_bed_chip" axis="row" alignItems="center" height="56" paddingLeft="24" paddingRight="24" cornerRadius="28" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1">
+                <CadranIcon icon="moon" width="24" height="24" color="@theme/cadran/amber" marginRight="12"/>
+                <brls:Label text="@i18n/playguard/cadran/child/bed" fontSize="22" marginRight="10"/>
+                <CadranDigits id="child_bedtime" text="21:00" fontSize="22" textColor="@theme/cadran/amber"/>
             </brls:Box>
         </brls:Box>
-        <brls:Label text="@i18n/playguard/cadran/child/enjoy" fontSize="16" textColor="@theme/cadran/text3"/>
+        <brls:Label id="child_time_up" text="" fontSize="19" textColor="@theme/cadran/text2" marginBottom="8"/>
+        <brls:Label text="@i18n/playguard/cadran/child/enjoy" fontSize="19" textColor="@theme/cadran/text3"/>
 
     </brls:Box>
 

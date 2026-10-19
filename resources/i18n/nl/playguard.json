@@ -1649,7 +1649,8 @@
             "of": "van {}",
             "back": "Terug naar de ouder · pincode",
             "play": "Console geven en spelen",
-            "on_hold": "limiet gepauzeerd"
+            "on_hold": "limiet gepauzeerd",
+            "end": "Eindigt rond {}"
         },
         "dialog": {
             "unlock_short": "Ouderlijk toezicht wordt voor de wijziging ontgrendeld met de opgeslagen pincode en daarna weer vergrendeld."

@@ -11,6 +11,18 @@
 
 using namespace brls::literals;
 
+namespace
+{
+void keep_size(brls::View* view)
+{
+    if (auto* label = dynamic_cast<brls::Label*>(view)) label->setFontScaled(false);
+    if (auto* box = dynamic_cast<brls::Box*>(view))
+        for (brls::View* child : box->getChildren()) keep_size(child);
+}
+
+constexpr int LAST_MINUTES = 5;   // the end chip in amber, the ring beating
+}   // namespace
+
 void CadranChildActivity::onContentAvailable()
 {
     frame_stats_flow::set_screen("activity/cadran_child");
@@ -19,8 +31,10 @@ void CadranChildActivity::onContentAvailable()
     cadran::style_header(frame, "lock", "playguard/cadran/child/header"_i18n, false, false);
 
     ring->setShowLeft(true);
-    ring->setValueSize(92);
-    ring->setCaptionSize(20);
+    ring->setValueSize(96);
+    ring->setCaptionSize(22);
+    // Already sized for the room: the larger text leaves it as it is.
+    if (brls::View* root = this->getView("child_root")) keep_size(root);
 
     // The screen itself takes the focus (highlight hidden): otherwise the
     // previous screen's focused button keeps its ring, drawn over this one.
@@ -55,6 +69,7 @@ void CadranChildActivity::refresh()
     const int today = ui::today_weekday();
     float frac = -1.0f;
     std::string left = "—", caption = "";
+    int left_min = -1;   // counting down: the minutes left
     if (pt.fw_supported && pt.valid && pt.enabled_valid) {
         const uint16_t limit = pt.day_min[today];
         // Unlocked first, as on Today: the console reports the timer off
@@ -72,7 +87,7 @@ void CadranChildActivity::refresh()
             left = ui::fmt_played(0);
             caption = brls::getStr("playguard/cadran/child/of", ui::fmt_minutes(limit)) + " · " + "playguard/cadran/today/time_up"_i18n;
         } else if (pt.remaining_valid && pt.remaining_ns > 0 && limit > 0) {
-            const uint64_t left_min = pt.remaining_ns / 60000000000ULL;
+            left_min = (int)(pt.remaining_ns / 60000000000ULL);
             const uint16_t used = left_min >= limit ? 0 : (uint16_t)(limit - left_min);
             frac = (float)used / (float)limit;
             left = ui::fmt_duration_ns(pt.remaining_ns);
@@ -86,6 +101,17 @@ void CadranChildActivity::refresh()
     ring->setFraction(frac);
     ring->setValue(left);
     ring->setCaption(caption);
+    // When it ends, by the clock; amber and the ring beating near the end.
+    const LocalTime now = ui::local_now();
+    const int end = now.hour * 60 + now.minute + left_min;
+    const bool ending = left_min >= 0 && end < 24 * 60;
+    const bool last = ending && left_min <= LAST_MINUTES;
+    if (ending) ui::set_text(end_text, brls::getStr("playguard/cadran/child/end", fmt::format("{:02d}:{:02d}", end / 60, end % 60)));
+    brls::Theme theme = brls::Application::getTheme();
+    end_icon->setColor(theme[last ? "cadran/amber" : "cadran/teal"]);
+    end_text->setTextColor(theme[last ? "cadran/amber" : "cadran/text"]);
+    ui::set_visible(end_chip.getView(), ending);
+    ring->setPulse(last);
     const bool bed = pt.bedtime_valid && pt.bedtime_enabled;
     ui::set_visible(bed_chip.getView(), bed);
     if (bed) bedtime->setText(fmt::format("{:02d}:{:02d}", pt.bedtime_hour, pt.bedtime_minute));

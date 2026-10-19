@@ -1649,7 +1649,8 @@
             "of": "of {}",
             "back": "Back to the parent · PIN",
             "play": "Hand the console over and play",
-            "on_hold": "limit on hold"
+            "on_hold": "limit on hold",
+            "end": "Ends around {}"
         },
         "dialog": {
             "unlock_short": "Parental controls are unlocked with the stored PIN for the change, then locked again."

@@ -27,6 +27,8 @@ class PtRing : public brls::Box
     // The arc shows what is left rather than what was played (the child
     // screen); the colour still follows what was played.
     void setShowLeft(bool left);
+    // The last minutes (the child screen): the arc beats, slowly.
+    void setPulse(bool pulse);
     void setValueSize(float size);
     void setCaptionSize(float size);
 
@@ -43,6 +45,7 @@ class PtRing : public brls::Box
     // less a margin (from the ring's size, as set).
     void fit();
     bool show_left = false;
+    bool pulse = false;
     CadranDigits* value  = nullptr;
     brls::Label* caption = nullptr;
     NVGcolor track, teal, amber, coral;

@@ -1649,7 +1649,8 @@
             "of": "de {}",
             "back": "Voltar ao adulto · PIN",
             "play": "Entregar a consola e jogar",
-            "on_hold": "limite em pausa"
+            "on_hold": "limite em pausa",
+            "end": "Termina por volta das {}"
         },
         "dialog": {
             "unlock_short": "O controlo parental é desbloqueado com o PIN guardado durante a alteração e depois volta a ser bloqueado."

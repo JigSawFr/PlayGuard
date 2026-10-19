@@ -74,6 +74,7 @@ void PtRing::setValue(const std::string& text)
 }
 void PtRing::setCaption(const std::string& text) { this->caption->setText(text); }
 void PtRing::setShowLeft(bool left) { this->show_left = left; }
+void PtRing::setPulse(bool on) { this->pulse = on; }
 void PtRing::setValueSize(float size)
 {
     this->value->setFontSize(size);
@@ -120,7 +121,12 @@ void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
         // The colour of where the arc goes; its length on the way there.
         const float f = this->shown.getValue();
         const float to = this->used;
-        const NVGcolor color = to >= 1.0f ? this->coral : to >= 0.75f ? this->amber : this->teal;
+        NVGcolor color = to >= 1.0f ? this->coral : to >= 0.75f ? this->amber : this->teal;
+        if (this->pulse) {
+            // Once every 1.4 s, from full to a little over half, and back.
+            const double t = (double)(brls::getCPUTimeUsec() % 1400000) / 1400000.0;
+            color.a *= 0.55f + 0.45f * (0.5f + 0.5f * (float)std::cos(t * 2.0 * NVG_PI));
+        }
         const float arc = this->show_left ? 1.0f - f : f;
         if (arc <= 0.0f) { brls::Box::draw(vg, x, y, width, height, style, ctx); return; }
         nvgBeginPath(vg);

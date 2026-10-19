@@ -355,6 +355,9 @@ void pctl_play_timer_query(PtState *o)
     o->remaining_valid = true;
     o->remaining_ns = o->enabled && !reached && limit != PT_DAY_NOLIMIT && !getenv("PLAYGUARD_SIM_IDLE")
                           ? (s64)(limit - SIM_PLAYED_TODAY_MIN) * 60 * 1000000000LL + 20000000000LL - (s64)counting_ns() : 0;
+    // The last minutes of the day's time, whatever the limit (the child screen's end).
+    const char *left_min = getenv("PLAYGUARD_SIM_LEFT_MIN");
+    if (left_min && o->remaining_ns > 0) o->remaining_ns = (s64)atoi(left_min) * 60 * 1000000000LL + 20000000000LL;
     // A warning only: the console does not restrict, and 1454 goes below 0
     // by the time played over the limit (as observed; 2 min when the limit is
     // only said to be reached).

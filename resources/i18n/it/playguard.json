@@ -1649,7 +1649,8 @@
             "of": "su {}",
             "back": "Torna al genitore · PIN",
             "play": "Consegna la console e gioca",
-            "on_hold": "limite in pausa"
+            "on_hold": "limite in pausa",
+            "end": "Finisce verso le {}"
         },
         "dialog": {
             "unlock_short": "Il filtro famiglia viene sbloccato con il PIN salvato per la modifica, poi bloccato di nuovo."
