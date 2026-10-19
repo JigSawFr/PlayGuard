@@ -2,7 +2,8 @@
 //   icon.jpg (256x256, NRO icon), images/store/icon.png (256x150),
 //   images/store/banner.png (848x208), images/social-preview.png (1280x640, the
 //   repository's social preview, uploaded by hand in Settings › General),
-//   resources/img/wordmark.png (720x176, transparent: the loading screen's).
+//   resources/img/wordmark.png (720x176, transparent: the loading screen's),
+//   images/apple-touch-icon.png (180x180: an iPhone's home screen, the website's and the simulator's).
 // Needs Node + Playwright (Chromium); loads the Sora font from Google Fonts.
 //   node tools/render_branding.mjs
 import { chromium } from 'playwright';
@@ -17,6 +18,7 @@ const jobs = [
   { svg: 'branding/banner.svg',     out: 'images/store/banner.png', w: 848, h: 208, type: 'png' },
   { svg: 'branding/social-preview.svg', out: 'images/social-preview.png', w: 1280, h: 640, type: 'png' },
   { svg: 'branding/wordmark.svg',   out: 'resources/img/wordmark.png', w: 720, h: 176, type: 'png', transparent: true },
+  { svg: 'branding/icon.svg',       out: 'images/apple-touch-icon.png', w: 180, h: 180, type: 'png' },
 ];
 
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
@@ -26,7 +28,7 @@ for (const job of jobs) {
   await page.setViewportSize({ width: job.w, height: job.h });
   await page.setContent(`<!doctype html><html><head>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700&display=swap" rel="stylesheet">
-<style>html,body{margin:0;overflow:hidden}svg{display:block}</style></head><body>${svg}</body></html>`,
+<style>html,body{margin:0;overflow:hidden}svg{display:block;width:100vw;height:100vh}</style></head><body>${svg}</body></html>`,
     { waitUntil: 'networkidle' });
   await page.evaluate(async () => {
     await document.fonts.load('700 30px Sora');
