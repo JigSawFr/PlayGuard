@@ -13,10 +13,10 @@
 # 4 s, the steady state. Everything lands in build-desktop/perf/<name>/.
 #
 # PERF_THEME=light runs the light variant, PERF_KEYS the keys to press first
-# (see below). Extra VAR=value pairs go to the app: PLAYGUARD_SIM_CADRAN=1 for the
-# "Cadran" prototype of the Overview, PLAYGUARD_SIM_CADRAN_NOGLOW=1 and
-# PLAYGUARD_SIM_CADRAN_NORING=1 to leave out its two custom draws, any
-# PLAYGUARD_SIM_* knob of the simulated console.
+# (see below). Extra VAR=value pairs go to the app: PLAYGUARD_SIM_CADRAN_NOGLOW=1
+# and PLAYGUARD_SIM_CADRAN_NORING=1 to leave out the look's two custom draws
+# (the background glow, the ring's arcs), any PLAYGUARD_SIM_* knob of the
+# simulated console.
 #
 # Software GL rasterises on the CPU, so these figures weigh fills (pixels)
 # far more than the console's GPU does; compare screens with each other,

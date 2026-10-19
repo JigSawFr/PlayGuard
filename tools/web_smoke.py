@@ -7,7 +7,7 @@ not reach its first screen ("start-up: first screen ready" in its log, which
 the page says in <body data-playguard="ready">), when the page throws, or
 when what the page does while PlayGuard runs does not work:
 
-- a page in each kind of start: the Overview, the Play timer, Activity,
+- a page in each kind of start: Today, the Play timer, Activity,
   Console, today's limit reached, the start-up error (no Atmosphère);
 - desktop smoke scenarios (tools/desktop_smoke.py) played as steps
   (runSteps(), web/simulator.js): every tab in turn, "alarm" (the time over
@@ -213,10 +213,9 @@ with sync_playwright() as p:
         print("ok   alarm")
 
     # desktop_smoke's "errors", its first half: a limit change while the
-    # unlock fails ends in the "could not unlock" dialog, not a toast. In the
-    # classic appearance, as desktop_smoke runs it: the steps follow its lines.
-    if open_page(page, FIXED + "&appearance=classic&fail=unlock&restricted=1&autosync_off=1&ntp=offline&network_offset=1411", "errors"):
-        steps(page, "down.right.down.a")   # Play timer › the week chart › Same limit every day
+    # unlock fails ends in the "could not unlock" dialog, not a toast.
+    if open_page(page, FIXED + "&fail=unlock&restricted=1&autosync_off=1&ntp=offline&network_offset=1411", "errors"):
+        steps(page, "down.right.right.a")  # Play timer › the profile chip › Same limit every day
         shot(page, "errors_picker")
         steps(page, "up.a")                # No play (0 min): the change needs the unlock
         shot(page, "errors_gate")
