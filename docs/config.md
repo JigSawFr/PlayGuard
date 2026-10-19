@@ -198,6 +198,23 @@ over (unless that day's limit was changed since). All four keys go together.
 | `bonus_base` | integer | the limit before, `0` to `1440` minutes (never no limit) | `0` |
 | `bonus_value` | integer | the limit for that day, above `bonus_base`, at most `1440` minutes | `0` |
 
+### Scheduled profile
+
+*Play timer › Profiles › Scheduled profile*: a profile for a period. When the
+period begins, PlayGuard asks to put it in force (once a day, when it is
+opened); once it is over, to put back the limits it replaced. A period that
+went by with the profile never in force is forgotten. The six keys go
+together.
+
+| Key | Type | Values | Default |
+|---|---|---|---|
+| `schedule_file` | string | the profile's file (its stem, under `profiles/`); `""`: none scheduled | `""` |
+| `schedule_name` | string | its name, as said in the questions | `""` |
+| `schedule_from` | string | `"YYYY-MM-DD"` of the period's first day | `""` |
+| `schedule_to` | string | `"YYYY-MM-DD"` of its last day, not before `schedule_from` | `""` |
+| `schedule_applied` | boolean | the profile was put in force for the period | `false` |
+| `schedule_prev` | array of 7 integers | once in force, the limits it replaced, Sunday to Saturday: `0` to `1440`, or `65535` for no limit | `[]` |
+
 ### Firmware not supported yet
 
 The choice made on that screen, remembered for one firmware with one app
@@ -291,6 +308,12 @@ line; the order does not matter when it reads them:
   "bonus_date": "",
   "bonus_base": 0,
   "bonus_value": 0,
+  "schedule_file": "",
+  "schedule_name": "",
+  "schedule_from": "",
+  "schedule_to": "",
+  "schedule_applied": false,
+  "schedule_prev": [],
   "fw_gate_fw": "",
   "fw_gate_app": "",
   "fw_gate_choice": "",

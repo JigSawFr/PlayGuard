@@ -1354,7 +1354,8 @@
             "notices": "Notifications",
             "rescue": "Recovery",
             "bonus": "Extra time planned",
-            "restore_bonus": "Planned extra time put back"
+            "restore_bonus": "Planned extra time put back",
+            "schedule_end": "End of a scheduled profile"
         },
         "when": "When",
         "how": "From",
@@ -1728,5 +1729,30 @@
             "classic": "Back to Classic",
             "keep": "Keep Cadran"
         }
+    },
+    "schedule": {
+        "date": "{1} {0}",
+        "cell": "Scheduled profile",
+        "note": "A profile for a period (holidays, a trip): PlayGuard offers to put it in force when the period begins, and the limits from before back once it is over, when it is opened.",
+        "none": "None",
+        "value": "{} · {} to {}",
+        "pick_profile": "Profile for the period",
+        "pick_from": "First day",
+        "pick_to": "Last day",
+        "saved": "{} scheduled from {} to {}.",
+        "no_profile": "Save a profile first: the period puts one in force.",
+        "profile_gone": "The profile \"{}\" no longer exists: its schedule is removed.",
+        "apply_body": "From {} to {}: put the profile \"{}\" in force now?\n\nAfter {}, PlayGuard offers to put back the limits it replaces.",
+        "not_now": "Not now",
+        "apply": "Put it in force",
+        "over_body": "The period of \"{}\" ended on {}. Put back the limits from before ({})?",
+        "keep": "Keep these limits",
+        "put_back": "Put them back",
+        "put_back_body": "Put back the limits from before \"{}\"?",
+        "put_back_now": "End it now: the limits from before back",
+        "keep_remove": "Keep these limits and remove it",
+        "change": "Change...",
+        "remove": "Remove it",
+        "removed": "Scheduled profile removed."
     }
 }

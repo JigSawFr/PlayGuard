@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "action/profile_flow.hpp"
+#include "action/schedule_flow.hpp"
 #include "activity/play_timer_perday_activity.hpp"
 #include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
@@ -22,9 +23,30 @@ void ProfilesActivity::onContentAvailable()
         this->create();
         return true;
     });
+    // A profile for a period (holidays): offered when it begins, the limits
+    // from before once it is over.
+    schedule_note->setSingleLine(false);
+    schedule->registerClickAction([this](brls::View*) {
+        schedule_flow::choose([this]() {
+            // The profile put in force, or the limits back: the list's mark too.
+            pctl_play_timer_query(&this->live);
+            this->rebuild();
+            this->show_schedule();
+            brls::Application::giveFocus(schedule);
+        });
+        return true;
+    });
+    this->show_schedule();
     pctl_play_timer_query(&this->live);
-    if (cadran::enabled()) cadran::List(this->getContentView(), true).apply({ { "pf_save", "save" }, { "pf_new", "plus" } });
+    if (cadran::enabled())
+        cadran::List(this->getContentView(), true).apply({ { "pf_save", "save" }, { "pf_new", "plus" }, { "pf_schedule", "calendar" } });
     this->rebuild();
+}
+
+void ProfilesActivity::show_schedule()
+{
+    const std::string s = schedule_flow::summary();
+    schedule->setDetailText(ui::opens(s.empty() ? "playguard/schedule/none"_i18n : s));
 }
 
 void ProfilesActivity::rebuild(const std::string& focus_file)

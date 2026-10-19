@@ -1354,7 +1354,8 @@
             "notices": "Notifications",
             "rescue": "Récupération",
             "bonus": "Temps en plus prévu",
-            "restore_bonus": "Temps en plus prévu remis"
+            "restore_bonus": "Temps en plus prévu remis",
+            "schedule_end": "Fin d'un profil programmé"
         },
         "when": "Quand",
         "how": "Origine",
@@ -1728,5 +1729,30 @@
             "classic": "Revenir à Classique",
             "keep": "Garder Cadran"
         }
+    },
+    "schedule": {
+        "date": "{0} {1}",
+        "cell": "Profil programmé",
+        "note": "Un profil pour une période (vacances, un voyage) : PlayGuard propose de l'appliquer quand la période commence, et de remettre les limites d'avant une fois qu'elle est finie, à son ouverture.",
+        "none": "Aucun",
+        "value": "{} · du {} au {}",
+        "pick_profile": "Profil pour la période",
+        "pick_from": "Premier jour",
+        "pick_to": "Dernier jour",
+        "saved": "{} programmé du {} au {}.",
+        "no_profile": "Enregistrez d'abord un profil : la période en applique un.",
+        "profile_gone": "Le profil « {} » n'existe plus : sa programmation est retirée.",
+        "apply_body": "Du {} au {} : appliquer le profil « {} » maintenant ?\n\nAprès le {}, PlayGuard proposera de remettre les limites qu'il remplace.",
+        "not_now": "Pas maintenant",
+        "apply": "L'appliquer",
+        "over_body": "La période de « {} » s'est terminée le {}. Remettre les limites d'avant ({}) ?",
+        "keep": "Garder ces limites",
+        "put_back": "Les remettre",
+        "put_back_body": "Remettre les limites d'avant « {} » ?",
+        "put_back_now": "Y mettre fin : remettre les limites d'avant",
+        "keep_remove": "Garder ces limites et la retirer",
+        "change": "Modifier...",
+        "remove": "La retirer",
+        "removed": "Profil programmé retiré."
     }
 }

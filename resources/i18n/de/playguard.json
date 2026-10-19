@@ -1354,7 +1354,8 @@
             "notices": "Benachrichtigungen",
             "rescue": "Wiederherstellung",
             "bonus": "Zusatzzeit geplant",
-            "restore_bonus": "Geplante Zusatzzeit zurückgesetzt"
+            "restore_bonus": "Geplante Zusatzzeit zurückgesetzt",
+            "schedule_end": "Ende eines geplanten Profils"
         },
         "when": "Wann",
         "how": "Quelle",
@@ -1728,5 +1729,30 @@
             "classic": "Zurück zu Klassisch",
             "keep": "Cadran behalten"
         }
+    },
+    "schedule": {
+        "date": "{0}. {1}",
+        "cell": "Geplantes Profil",
+        "note": "Ein Profil für einen Zeitraum (Ferien, eine Reise): PlayGuard bietet beim Öffnen an, es zu Beginn anzuwenden und danach die vorherigen Limits wiederherzustellen.",
+        "none": "Keins",
+        "value": "{} · {} bis {}",
+        "pick_profile": "Profil für den Zeitraum",
+        "pick_from": "Erster Tag",
+        "pick_to": "Letzter Tag",
+        "saved": "{} geplant vom {} bis {}.",
+        "no_profile": "Speichere zuerst ein Profil: Der Zeitraum wendet eines an.",
+        "profile_gone": "Das Profil „{}“ gibt es nicht mehr: Seine Planung wird entfernt.",
+        "apply_body": "Vom {} bis {}: Das Profil „{}“ jetzt anwenden?\n\nNach dem {} bietet PlayGuard an, die ersetzten Limits wiederherzustellen.",
+        "not_now": "Nicht jetzt",
+        "apply": "Anwenden",
+        "over_body": "Der Zeitraum von „{}“ endete am {}. Die vorherigen Limits ({}) wiederherstellen?",
+        "keep": "Diese Limits behalten",
+        "put_back": "Wiederherstellen",
+        "put_back_body": "Die Limits von vor „{}“ wiederherstellen?",
+        "put_back_now": "Jetzt beenden: vorherige Limits wiederherstellen",
+        "keep_remove": "Diese Limits behalten und entfernen",
+        "change": "Ändern...",
+        "remove": "Entfernen",
+        "removed": "Geplantes Profil entfernt."
     }
 }

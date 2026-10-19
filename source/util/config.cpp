@@ -83,6 +83,16 @@ void clear_extra(Config& c)
     c.extra_base = c.extra_value = 0;
 }
 
+void clear_schedule(Config& c)
+{
+    c.schedule_file.clear();
+    c.schedule_name.clear();
+    c.schedule_from.clear();
+    c.schedule_to.clear();
+    c.schedule_applied = false;
+    c.schedule_prev.clear();
+}
+
 void clear_bonus(Config& c)
 {
     c.bonus_weekday = -1;
@@ -192,6 +202,15 @@ void sanitize(Config& c)
     const bool bonus_ok = c.bonus_weekday >= 0 && c.bonus_weekday <= 6 && c.bonus_base >= 0 &&
                           c.bonus_base < c.bonus_value && c.bonus_value <= 1440 && c.bonus_date.size() == 10;
     if (!bonus_ok) clear_bonus(c);
+    // A scheduled profile: a profile file, two dates in order, and once in
+    // force the seven limits to put back (else it could put back nonsense).
+    bool schedule_ok = !c.schedule_file.empty() && c.schedule_from.size() == 10 && c.schedule_to.size() == 10 &&
+                       c.schedule_from <= c.schedule_to;
+    if (schedule_ok && c.schedule_applied) {
+        schedule_ok = c.schedule_prev.size() == 7;
+        for (int v : c.schedule_prev) schedule_ok = schedule_ok && ((v >= 0 && v <= 1440) || v == 0xFFFF);
+    }
+    if (!schedule_ok) clear_schedule(c);
 
     // The limits console lock saved to put back: exactly seven, each a real
     // limit (0..1440 min) or "no limit" (0xFFFF). Otherwise drop them (turning
@@ -203,8 +222,8 @@ void sanitize(Config& c)
 }
 
 // What belongs to the system PlayGuard runs on (state.json, util/nand.hpp):
-// the console lock, the extra-time record, a planned bonus, a pending
-// relock and the firmware choice. Read from state.json, or from config.json when this
+// the console lock, the extra-time record, a planned bonus, a scheduled
+// profile, a pending relock and the firmware choice. Read from state.json, or from config.json when this
 // system has no state.json yet (the versions before it kept them there).
 static void clear_system(Config& c)
 {
@@ -215,6 +234,7 @@ static void clear_system(Config& c)
     c.fw_gate_fw.clear(), c.fw_gate_app.clear(), c.fw_gate_choice.clear();
     clear_extra(c);
     clear_bonus(c);
+    clear_schedule(c);
 }
 
 static void read_system(const nlohmann::json& j, Config& c)
@@ -242,6 +262,13 @@ static void read_system(const nlohmann::json& j, Config& c)
     bonus_ok &= read_int(j, "bonus_base", c.bonus_base);
     bonus_ok &= read_int(j, "bonus_value", c.bonus_value);
     if (!bonus_ok) clear_bonus(c);
+    bool schedule_ok = read_string(j, "schedule_file", c.schedule_file);
+    schedule_ok &= read_string(j, "schedule_name", c.schedule_name);
+    schedule_ok &= read_string(j, "schedule_from", c.schedule_from);
+    schedule_ok &= read_string(j, "schedule_to", c.schedule_to);
+    schedule_ok &= read_bool(j, "schedule_applied", c.schedule_applied);
+    if (auto sp = j.find("schedule_prev"); sp != j.end() && sp->is_array()) c.schedule_prev = read_int_list(*sp);
+    if (!schedule_ok) clear_schedule(c);
 }
 
 // The file as JSON, or null when it is not a JSON object.
@@ -465,6 +492,12 @@ bool snapshot(Snapshot& snap)
     st["bonus_date"]        = s_config.bonus_date;
     st["bonus_base"]        = s_config.bonus_base;
     st["bonus_value"]       = s_config.bonus_value;
+    st["schedule_file"]     = s_config.schedule_file;
+    st["schedule_name"]     = s_config.schedule_name;
+    st["schedule_from"]     = s_config.schedule_from;
+    st["schedule_to"]       = s_config.schedule_to;
+    st["schedule_applied"]  = s_config.schedule_applied;
+    st["schedule_prev"]     = s_config.schedule_prev;
     st["relock_pending"]    = s_config.relock_pending;
     snap.system = dump(st);
     return true;

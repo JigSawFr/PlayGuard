@@ -1354,7 +1354,8 @@
             "notices": "通知",
             "rescue": "恢复",
             "bonus": "计划加时",
-            "restore_bonus": "已恢复计划加时前的限制"
+            "restore_bonus": "已恢复计划加时前的限制",
+            "schedule_end": "计划配置结束"
         },
         "when": "时间",
         "how": "来源",
@@ -1728,5 +1729,30 @@
             "classic": "返回经典",
             "keep": "保留 Cadran"
         }
+    },
+    "schedule": {
+        "date": "{1}{0}日",
+        "cell": "计划的配置",
+        "note": "为一段时间（假期、旅行）设置的配置：打开 PlayGuard 时，会在开始时提议应用它，结束后提议恢复之前的限制。",
+        "none": "无",
+        "value": "{} · {} 至 {}",
+        "pick_profile": "这段时间的配置",
+        "pick_from": "第一天",
+        "pick_to": "最后一天",
+        "saved": "已将 {} 计划在 {} 至 {}。",
+        "no_profile": "请先保存一个配置：这段时间会应用它。",
+        "profile_gone": "配置“{}”已不存在：已移除其计划。",
+        "apply_body": "{} 至 {}：现在应用配置“{}”吗？\n\n{} 之后，PlayGuard 会提议恢复被替换的限制。",
+        "not_now": "暂不",
+        "apply": "应用",
+        "over_body": "“{}”的时间已于 {} 结束。恢复之前的限制（{}）吗？",
+        "keep": "保留当前限制",
+        "put_back": "恢复",
+        "put_back_body": "恢复“{}”之前的限制吗？",
+        "put_back_now": "立即结束：恢复之前的限制",
+        "keep_remove": "保留当前限制并移除计划",
+        "change": "更改…",
+        "remove": "移除",
+        "removed": "已移除计划的配置。"
     }
 }

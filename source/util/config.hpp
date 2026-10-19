@@ -142,6 +142,16 @@ struct Config
     std::string bonus_date;
     int         bonus_base  = 0;
     int         bonus_value = 0;
+    // A profile scheduled for a period (Play timer › Profiles › Scheduled
+    // profile): the profile's file and name, the period (both days included),
+    // whether it was put in force, and then the limits it replaced (Sun..Sat,
+    // to offer back once the period is over). schedule_from empty: none.
+    std::string schedule_file;
+    std::string schedule_name;
+    std::string schedule_from;
+    std::string schedule_to;
+    bool        schedule_applied = false;
+    std::vector<int> schedule_prev;
     // Put that limit back by itself the next day (when the timer needs the
     // temporary unlock, that is still asked) instead of asking keep / put back.
     bool        extra_auto_restore = false;

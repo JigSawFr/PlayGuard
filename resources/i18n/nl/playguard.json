@@ -1354,7 +1354,8 @@
             "notices": "Meldingen",
             "rescue": "Herstel",
             "bonus": "Extra tijd gepland",
-            "restore_bonus": "Geplande extra tijd teruggezet"
+            "restore_bonus": "Geplande extra tijd teruggezet",
+            "schedule_end": "Einde van een gepland profiel"
         },
         "when": "Wanneer",
         "how": "Bron",
@@ -1728,5 +1729,30 @@
             "classic": "Terug naar Klassiek",
             "keep": "Cadran houden"
         }
+    },
+    "schedule": {
+        "date": "{0} {1}",
+        "cell": "Gepland profiel",
+        "note": "Een profiel voor een periode (vakantie, een reis): bij het openen stelt PlayGuard voor het toe te passen als de periode begint, en de vorige limieten terug te zetten als ze voorbij is.",
+        "none": "Geen",
+        "value": "{} · {} tot {}",
+        "pick_profile": "Profiel voor de periode",
+        "pick_from": "Eerste dag",
+        "pick_to": "Laatste dag",
+        "saved": "{} gepland van {} tot {}.",
+        "no_profile": "Sla eerst een profiel op: de periode past er een toe.",
+        "profile_gone": "Het profiel \"{}\" bestaat niet meer: de planning wordt verwijderd.",
+        "apply_body": "Van {} tot {}: het profiel \"{}\" nu toepassen?\n\nNa {} stelt PlayGuard voor de vervangen limieten terug te zetten.",
+        "not_now": "Niet nu",
+        "apply": "Toepassen",
+        "over_body": "De periode van \"{}\" eindigde op {}. De vorige limieten ({}) terugzetten?",
+        "keep": "Deze limieten houden",
+        "put_back": "Terugzetten",
+        "put_back_body": "De limieten van vóór \"{}\" terugzetten?",
+        "put_back_now": "Nu beëindigen: vorige limieten terugzetten",
+        "keep_remove": "Deze limieten houden en verwijderen",
+        "change": "Wijzigen...",
+        "remove": "Verwijderen",
+        "removed": "Gepland profiel verwijderd."
     }
 }

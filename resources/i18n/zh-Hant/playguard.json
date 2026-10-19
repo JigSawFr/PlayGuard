@@ -1354,7 +1354,8 @@
             "notices": "通知",
             "rescue": "復原",
             "bonus": "排定延長",
-            "restore_bonus": "已改回排定延長前的上限"
+            "restore_bonus": "已改回排定延長前的上限",
+            "schedule_end": "排定設定檔結束"
         },
         "when": "時間",
         "how": "來源",
@@ -1728,5 +1729,30 @@
             "classic": "返回經典",
             "keep": "保留 Cadran"
         }
+    },
+    "schedule": {
+        "date": "{1}{0}日",
+        "cell": "排定的設定檔",
+        "note": "為一段時間（假期、旅行）設定的設定檔：開啟 PlayGuard 時，會在開始時提議套用，結束後提議改回之前的上限。",
+        "none": "無",
+        "value": "{} · {} 至 {}",
+        "pick_profile": "這段時間的設定檔",
+        "pick_from": "第一天",
+        "pick_to": "最後一天",
+        "saved": "已將 {} 排定在 {} 至 {}。",
+        "no_profile": "請先儲存一個設定檔：這段時間會套用它。",
+        "profile_gone": "設定檔「{}」已不存在：已移除其排程。",
+        "apply_body": "{} 至 {}：現在套用設定檔「{}」嗎？\n\n{} 之後，PlayGuard 會提議改回被取代的上限。",
+        "not_now": "暫不",
+        "apply": "套用",
+        "over_body": "「{}」的期間已於 {} 結束。改回之前的上限（{}）嗎？",
+        "keep": "保留目前上限",
+        "put_back": "改回",
+        "put_back_body": "改回「{}」之前的上限嗎？",
+        "put_back_now": "立即結束：改回之前的上限",
+        "keep_remove": "保留目前上限並移除排程",
+        "change": "變更…",
+        "remove": "移除",
+        "removed": "已移除排定的設定檔。"
     }
 }

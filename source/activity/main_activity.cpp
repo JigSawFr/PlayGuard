@@ -12,6 +12,7 @@
 #include "action/pt_flow.hpp"
 #include "action/rescue.hpp"
 #include "action/rollback_flow.hpp"
+#include "action/schedule_flow.hpp"
 #include "action/support_flow.hpp"
 #include "action/update_flow.hpp"
 #include "activity/loading_activity.hpp"
@@ -159,6 +160,7 @@ void MainActivity::onContentAvailable()
     brls::sync([]() {
         pt_flow::relock_if_interrupted();
         pt_flow::offer_extra_time_restore();
+        schedule_flow::check(true);   // a profile scheduled for a period: its start or its end
     });
     // Background checks: a newer version (daily when opted in, and while one
     // is known and not installed: its screen), a network clock off (opt-in).
@@ -202,6 +204,7 @@ void MainActivity::onContentAvailable()
         // again at the next tick otherwise.
         if (!app::in_focus() || !ui::on_top(this)) return;
         const std::string today = ui::today_date();
+        schedule_flow::check(false);   // asked once a day, when nothing else was in front
         if (today == this->day) {
             pt_flow::retry_extra_time_restore();   // only after a state that could not be read
             return;
