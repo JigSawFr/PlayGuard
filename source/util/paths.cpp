@@ -109,7 +109,15 @@ bool atomic_write(const std::string& path, const std::string& content, std::stri
     if (ok && std::fflush(f) != 0) { ok = false; err = errno; }
     // On the card before the old file is removed: else a power loss after
     // the rename can leave an empty file in its place.
+#ifndef __EMSCRIPTEN__
     if (ok && fsync(fileno(f)) != 0) { ok = false; err = errno; }
+#else
+    // Not in a browser (web/README.md): there a thread's fsync is a call to
+    // the page answered once the page's thread is free again, which it never
+    // is while the UI thread waits for this write (ui::save_config_now): both
+    // wait for good. Nothing to flush there anyway: the files are in memory,
+    // and with keep=1 the page saves them to IndexedDB every 3 s itself.
+#endif
     if (std::fclose(f) != 0 && ok) { ok = false; err = errno; }
     if (!ok) {
         std::remove(part.c_str());
