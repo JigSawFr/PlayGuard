@@ -1,7 +1,9 @@
-<!-- translated from docs/features.md, sha256 b31fb46c871d -->
+<!-- translated from docs/features.md, sha256 21ea7b8f6690 -->
 # Funciones
 
 Qué hace cada pestaña, cómo escribe PlayGuard sin riesgos y qué cuenta la consola como tiempo de juego. Volver al [README](../../README.md).
+
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
 
 Las capturas muestran el tema claro (en inglés).
 

@@ -1,7 +1,9 @@
-<!-- translated from docs/features.md, sha256 b31fb46c871d -->
+<!-- translated from docs/features.md, sha256 21ea7b8f6690 -->
 # 功能
 
 每個分頁能做什麼、PlayGuard 如何安全地寫入設定，以及主機把哪些時間算作遊玩時間。返回 [README](../../README.md)。
+
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
 
 截圖顯示的是淺色主題。
 
