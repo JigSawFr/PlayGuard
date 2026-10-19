@@ -17,9 +17,9 @@ struct Config
     // The look: "cadran" (the design after the 2026 boards, source/tab/cadran_*)
     // or "classic" (the lists of 1.x), read at start-up.
     std::string appearance = "cadran";
-    // The text of the Cadran appearance: "normal" or "large" (every label
-    // 15 % bigger, brls::Label::setFontScale), read at start-up.
-    std::string text_size = "normal";
+    // The text of the Cadran appearance: "auto" (larger while docked),
+    // "normal" or "large" (ui/text_size).
+    std::string text_size = "auto";
     std::string ntp_server;            // empty: pick from the console region
     std::vector<std::string> custom_servers;
     bool advanced = false;             // show debug-class play-timer actions
@@ -148,7 +148,7 @@ constexpr const char* THEMES[] = { "system", "light", "dark" };
 // What appearance may be: the default first.
 constexpr const char* APPEARANCES[] = { "cadran", "classic" };
 // What text_size may be: the default first.
-constexpr const char* TEXT_SIZES[] = { "normal", "large" };
+constexpr const char* TEXT_SIZES[] = { "auto", "normal", "large" };
 // What start_tab may be, in the sidebar's order.
 constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "restrictions",
                                        "security", "console", "history", "preferences", "about" };

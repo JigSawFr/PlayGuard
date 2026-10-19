@@ -66,6 +66,9 @@ CadranRestrictionsTab::Tile CadranRestrictionsTab::make_tile(uint32_t level, boo
         auto* head = new brls::Box(brls::Axis::ROW);
         head->setAlignItems(brls::AlignItems::FLEX_START);
         brls::Label* title = kit::label(ui::level_name(level), 19);
+        // Large already; a quarter of the row has no room for larger text
+        // ("Nutzerdefiniert" would break inside the word).
+        title->setFontScaled(false);
         title->setGrow(1.0f);
         title->setWidth(0);
         head->addView(title);

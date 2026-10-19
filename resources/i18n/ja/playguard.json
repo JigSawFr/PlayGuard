@@ -1011,7 +1011,8 @@
         "text_size": "文字の大きさ",
         "text_sizes": {
             "normal": "標準",
-            "large": "大きめ"
+            "large": "大きめ",
+            "auto": "自動：テレビでは大きめ"
         }
     },
     "backup": {
@@ -1388,7 +1389,8 @@
     },
     "quick": {
         "title": "言語とテーマ",
-        "hint": "言語とテーマ"
+        "hint": "言語とテーマ",
+        "title_text": "言語、テーマ、文字の大きさ"
     },
     "notices": {
         "title": "お知らせ",

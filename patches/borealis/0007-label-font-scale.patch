@@ -1,18 +1,22 @@
 diff --git a/library/include/borealis/views/label.hpp b/library/include/borealis/views/label.hpp
 --- a/library/include/borealis/views/label.hpp
 +++ b/library/include/borealis/views/label.hpp
-@@ -96,6 +96,10 @@
+@@ -96,6 +96,14 @@
      void setVerticalAlign(VerticalAlign align);
  
      void setFontSize(float value);
-+    // Every label's size times `scale` (1 by default: as asked), set before
-+    // the first view is made; getFontSize() still gives the size asked.
++    // Every label drawn `scale` times its size (1 by default), but those
++    // that keep theirs (setFontScaled(false)). It can change at any time:
++    // the labels then need laying out again (their nodes marked dirty).
++    // getFontSize() gives the size asked.
 +    static void setFontScale(float scale);
 +    static float getFontScale();
++    void setFontScaled(bool scaled);
++    float getDrawnFontSize();
      void setFontQuality(float value);
      void setLineHeight(float value);
      void setTextColor(NVGcolor color);
-@@ -150,6 +154,7 @@
+@@ -150,6 +158,7 @@
      static std::string STConverter(const std::string& text);
  
      static inline bool OPENCC_ON = true;
@@ -20,6 +24,14 @@ diff --git a/library/include/borealis/views/label.hpp b/library/include/borealis
      void setCursor(int cursor);
  
    protected:
+@@ -158,6 +167,7 @@
+ 
+     int font;
+     float fontSize;
++    bool fontScaled = true;
+     float lineHeight;
+     float fontQuality;
+ 
 diff --git a/library/lib/views/bottom_bar.cpp b/library/lib/views/bottom_bar.cpp
 --- a/library/lib/views/bottom_bar.cpp
 +++ b/library/lib/views/bottom_bar.cpp
@@ -28,7 +40,7 @@ diff --git a/library/lib/views/bottom_bar.cpp b/library/lib/views/bottom_bar.cpp
  {
      this->inflateFromXMLString(bottomBarXML);
 +    // No room to grow: the clock keeps its size, like the hints.
-+    time->setFontSize(21.5f / Label::getFontScale());
++    time->setFontScaled(false);
  
      Platform* platform = Application::getPlatform();
      battery->setVisibility(platform->canShowBatteryLevel() ? Visibility::VISIBLE : Visibility::GONE);
@@ -40,8 +52,8 @@ diff --git a/library/lib/views/hint.cpp b/library/lib/views/hint.cpp
      this->inflateFromXMLString(hintXML);
      this->setFocusable(false);
 +    // The bottom bar has no room to grow: its hints keep their size.
-+    icon->setFontSize(25.5f / Label::getFontScale());
-+    hint->setFontSize(21.5f / Label::getFontScale());
++    icon->setFontScaled(false);
++    hint->setFontScaled(false);
  
      icon->setText(getKeyIcon(static_cast<ControllerButton>(action->getButton())));
      hint->setText(action->getHintText());
@@ -53,26 +65,11 @@ diff --git a/library/lib/views/label.cpp b/library/lib/views/label.cpp
  
      // Setup nvg state for the measurements
 -    nvgFontSize(vg, label->getFontSize());
-+    nvgFontSize(vg, label->getFontSize() * Label::getFontScale());
++    nvgFontSize(vg, label->getDrawnFontSize());
      nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
      nvgFontFaceId(vg, label->getFont());
      nvgTextLineHeight(vg, label->getLineHeight());
-@@ -212,7 +212,7 @@
- 
-     // Default attributes
-     this->font        = Application::getDefaultFont();
--    this->fontSize    = style["brls/label/default_font_size"];
-+    this->fontSize    = style["brls/label/default_font_size"] * FONT_SCALE;
-     this->lineHeight  = style["brls/label/default_line_height"];
-     this->textColor   = theme["brls/text"];
-     this->fontQuality = 1.0f;
-@@ -393,11 +393,21 @@
- 
- void Label::setFontSize(float value)
- {
--    this->fontSize = value;
-+    this->fontSize = value * FONT_SCALE;
- 
+@@ -398,6 +398,28 @@
      this->invalidate();
  }
  
@@ -86,15 +83,45 @@ diff --git a/library/lib/views/label.cpp b/library/lib/views/label.cpp
 +    return FONT_SCALE;
 +}
 +
++void Label::setFontScaled(bool scaled)
++{
++    this->fontScaled = scaled;
++
++    this->invalidate();
++}
++
++float Label::getDrawnFontSize()
++{
++    return this->fontScaled ? this->fontSize * FONT_SCALE : this->fontSize;
++}
++
  void Label::setFontQuality(float value)
  {
      this->fontQuality = value;
-@@ -646,7 +656,7 @@
+@@ -461,7 +483,7 @@
+     enum NVGalign vertAlign  = this->getNVGVerticalAlign();
+     int cursor_position = -1;
  
- float Label::getFontSize()
- {
--    return this->fontSize;
-+    return this->fontSize / FONT_SCALE;
- }
+-    nvgFontSize(vg, this->fontSize);
++    nvgFontSize(vg, this->getDrawnFontSize());
+     nvgTextAlign(vg, horizAlign | vertAlign);
+     nvgFontFaceId(vg, this->font);
+     nvgFontQuality(vg, this->fontQuality);
+@@ -480,7 +502,7 @@
+     if (this->animating)
+     {
+         nvgSave(vg);
+-        float scissorHeight = fontSize * lineHeight;
++        float scissorHeight = this->getDrawnFontSize() * lineHeight;
+         nvgIntersectScissor(vg, x, y, width, scissorHeight < height ? height : scissorHeight);
  
- float Label::getFontQuality()
+         float baseX   = x - this->scrollingAnimation;
+@@ -607,7 +629,7 @@
+         // Compute the position of the ellipsis (in chars), should the string be truncated
+         // Cannot do it in the measure function because the margins are not applied yet there
+         auto vg = Application::getNVGContext();
+-        nvgFontSize(vg, this->fontSize);
++        nvgFontSize(vg, this->getDrawnFontSize());
+         nvgTextAlign(vg, this->getNVGHorizontalAlign() | this->getNVGVerticalAlign());
+         nvgFontFaceId(vg, this->font);
+         nvgTextLineHeight(vg, this->lineHeight);

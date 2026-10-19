@@ -4,6 +4,7 @@
 
 #include "core/platform.h"
 #include "ui/cadran_modal.hpp"
+#include "ui/text_size.hpp"
 #include "util/config.hpp"
 #include "util/duration.hpp"
 #include "util/text.hpp"
@@ -444,7 +445,11 @@ void pick_text_size(std::function<void()> after)
     std::vector<std::string> labels;
     for (const char* t : config::TEXT_SIZES) labels.push_back(brls::getStr(std::string("playguard/prefs/text_sizes/") + t));
     pick("playguard/prefs/text_size"_i18n, labels, index_of(config::TEXT_SIZES, config::get().text_size), [after](int i) {
-        choose(config::get().text_size, config::TEXT_SIZES[i], after);
+        // At once, no restart: every screen is laid out again.
+        config::get().text_size = config::TEXT_SIZES[i];
+        save_config();
+        text_size::apply();
+        if (after) after();
     });
 }
 
@@ -465,11 +470,14 @@ std::string theme_name()
 
 void quick_settings(std::function<void()> after)
 {
-    const std::vector<std::string> labels = { "playguard/tools/language"_i18n + " · " + language_name(),
-                                              "playguard/tools/theme"_i18n + " · " + theme_name() };
-    pick("playguard/quick/title"_i18n, labels, 0, [after](int i) {
+    std::vector<std::string> labels = { "playguard/tools/language"_i18n + " · " + language_name(),
+                                        "playguard/tools/theme"_i18n + " · " + theme_name() };
+    // Cadran: the text size too (the header's AA).
+    if (cadran::enabled()) labels.push_back("playguard/prefs/text_size"_i18n + " · " + text_size_name());
+    pick(cadran::enabled() ? "playguard/quick/title_text"_i18n : "playguard/quick/title"_i18n, labels, 0, [after](int i) {
         if (i == 0) pick_language(after);
-        else pick_theme(after);
+        else if (i == 1) pick_theme(after);
+        else pick_text_size(after);
     });
 }
 

@@ -1011,7 +1011,8 @@
         "text_size": "글자 크기",
         "text_sizes": {
             "normal": "보통",
-            "large": "크게"
+            "large": "크게",
+            "auto": "자동: TV에서는 크게"
         }
     },
     "backup": {
@@ -1388,7 +1389,8 @@
     },
     "quick": {
         "title": "언어 및 테마",
-        "hint": "언어 및 테마"
+        "hint": "언어 및 테마",
+        "title_text": "언어, 테마, 글자 크기"
     },
     "notices": {
         "title": "알림",

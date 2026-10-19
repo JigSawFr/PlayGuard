@@ -111,7 +111,7 @@ void sanitize(Config& c)
     if (!language_ok) c.language = "system";
     one_of(c.theme, { "system", "light", "dark" }, "system");
     one_of(c.appearance, { "cadran", "classic" }, "cadran");
-    one_of(c.text_size, { "normal", "large" }, "normal");
+    one_of(c.text_size, { "auto", "normal", "large" }, "auto");
     one_of(c.update_via, { "", "inplace", "auto", "sphaira", "appstore", "manual" }, "");
     one_of(c.pin_lock, { "off", "changes", "open" }, "changes");
     one_of(c.dev_builds_order, { "newest", "number" }, "newest");

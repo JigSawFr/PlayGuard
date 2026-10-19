@@ -1011,7 +1011,8 @@
         "text_size": "Tekstgrootte",
         "text_sizes": {
             "normal": "Normaal",
-            "large": "Groter"
+            "large": "Groter",
+            "auto": "Automatisch: groter op de tv"
         }
     },
     "backup": {
@@ -1388,7 +1389,8 @@
     },
     "quick": {
         "title": "Taal en thema",
-        "hint": "Taal en thema"
+        "hint": "Taal en thema",
+        "title_text": "Taal, thema en tekstgrootte"
     },
     "notices": {
         "title": "Meldingen",

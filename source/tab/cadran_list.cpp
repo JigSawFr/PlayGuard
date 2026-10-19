@@ -283,7 +283,9 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         cell->setJustifyContent(brls::JustifyContent::FLEX_START);
         cell->setGrow(1.0f);
         cell->setWidth(0);
-        cell->setHeight(status ? 128 : 120);
+        // At least this tall, taller when a title takes two lines (larger text).
+        cell->setHeight(brls::View::AUTO);
+        cell->setMinHeight(status ? 128 : 120);
         if (status) this->readings.push_back(cell);
         cell->setPadding(20, 22, 18, 22);
         cell->setMarginRight(i + 1 < cells.size() ? 12 : 0);
@@ -300,7 +302,7 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         cell->addView(head, 0);
         cell->title->setGrow(0);
         cell->title->setMarginRight(0);
-        cell->title->setSingleLine(status);
+        cell->title->setSingleLine(false);
         cell->title->setFontSize(status ? 15.0f : 17.0f);
         if (status) cell->title->setTextColor(theme["cadran/text3"]);
         cell->detail->setHorizontalAlign(brls::HorizontalAlign::LEFT);

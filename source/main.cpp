@@ -46,6 +46,7 @@
 #include "tab/restrictions_tab.hpp"
 #include "tab/security_tab.hpp"
 #include "ui/ui.hpp"
+#include "ui/text_size.hpp"
 #include "util/config.hpp"
 #include "util/crash_dump.h"
 #include "util/crash_report.hpp"
@@ -467,9 +468,9 @@ int main(int argc, char* argv[])
     // The Cadran appearance's palettes (Preferences › Appearance, the default).
     if (cadran::enabled()) {
         cadran::install_theme();
-        // Preferences › Text size: every label 15 % bigger (patches/borealis/
-        // 0007), before the first one exists.
-        if (config::get().text_size == "large") brls::Label::setFontScale(1.15f);
+        // Preferences › Text size (larger on a TV by default), before the
+        // first label exists; then on and off the dock.
+        text_size::install();
         // The console clears the screen with a colour deko3d records once
         // (SwitchVideoContext::recordStaticCommands: at start-up and on a theme
         // change), so before this palette: the space behind the tabs stayed

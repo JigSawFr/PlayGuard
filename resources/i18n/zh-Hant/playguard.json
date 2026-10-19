@@ -1011,7 +1011,8 @@
         "text_size": "文字大小",
         "text_sizes": {
             "normal": "標準",
-            "large": "較大"
+            "large": "較大",
+            "auto": "自動：電視上較大"
         }
     },
     "backup": {
@@ -1388,7 +1389,8 @@
     },
     "quick": {
         "title": "語言和主題",
-        "hint": "語言和主題"
+        "hint": "語言和主題",
+        "title_text": "語言、主題和文字大小"
     },
     "notices": {
         "title": "通知",

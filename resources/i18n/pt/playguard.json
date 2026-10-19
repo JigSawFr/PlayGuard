@@ -1011,7 +1011,8 @@
         "text_size": "Tamanho do texto",
         "text_sizes": {
             "normal": "Normal",
-            "large": "Maior"
+            "large": "Maior",
+            "auto": "Automático: maior na TV"
         }
     },
     "backup": {
@@ -1388,7 +1389,8 @@
     },
     "quick": {
         "title": "Idioma e tema",
-        "hint": "Idioma e tema"
+        "hint": "Idioma e tema",
+        "title_text": "Idioma, tema e tamanho do texto"
     },
     "notices": {
         "title": "Notificações",

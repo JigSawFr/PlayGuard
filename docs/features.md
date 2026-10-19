@@ -36,7 +36,7 @@ PlayGuard has two looks, chosen in *Preferences › Appearance* (taken at the ne
   - **The child screen** (*Show the child* on *Today*): only the time left (while parental controls are unlocked, today's limit, on hold), the bedtime and what happens when time is up, to hand the console over. Ⓐ goes back to the parent's screens with the PIN; Ⓑ leaves PlayGuard (asking first to turn parental controls back on, as quitting does).
   - Dialogs are cards with their buttons as pills, the confirmation in teal (in coral when it removes or stops something); the choices open as a card above the hints, the current one in teal; messages appear as cards under the header, with a teal check for what was done and an amber mark for what was refused.
   - The other screens take the same look: a profile's per-day editor shows the week as on *Play timer* (edited the same way, the quick fills as tiles); *Check the installed games* and *All games* put their lines in cards; *Profiles* and *Help & diagnostics* give each line its icon.
-  - **Text size** (*Preferences*): *Larger* makes every text 15 % bigger, but the header, the sidebar and the footer, which have no room for it; read at start-up.
+  - **Text size** (*Preferences*, or **AA** in the header): *Automatic*, the default, makes every text 25 % bigger while the console is docked, on the TV, and puts it back in handheld mode; *Larger* keeps it bigger, *Normal* never. The header, the sidebar and the footer keep their size (they have no room for more), and so do the Restrictions levels' names, large already. It changes at once, on every screen, with no restart. The 25 % come from a 55" TV in 4K: the smallest text (15 px) is then 14.6 mm high in capitals, 20′ of arc from 2.5 m, where reading is comfortable (16′ in normal size, the bare minimum).
   - After a change is saved, **ZR** *Undo* stays in the footer for a few seconds: it opens that change in the change history, to put the previous value back. An empty change history says so in a card.
 - **Classic**: the lists of earlier versions, as the screenshots above show them.
 
@@ -44,7 +44,7 @@ PlayGuard has two looks, chosen in *Preferences › Appearance* (taken at the ne
 
 A bell in the header, left of the version, gathers what needs the parent; Ⓨ opens the list from any tab (the footer says *Notifications (2)* when two things are to do).
 
-Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun for light, a moon for dark, a half-filled circle when it follows the console): a tap opens the same list as *Preferences*, and **−** offers both from any tab. Either change takes effect once PlayGuard is started again.
+Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun for light, a moon for dark, a half-filled circle when it follows the console), then in Cadran the text size (**AA**, its large A in teal while the text is larger): a tap opens the same list as *Preferences*, and **−** offers them from any tab. A new language or theme takes effect once PlayGuard is started again; the text size at once.
 
 - **To do**, counted on the bell in amber, stays until it is fixed: no PIN yet, a PIN anyone would try first (0000, 1234, 1212, 2580…: judged on the console, never shown), a PIN on the console while PlayGuard itself opens without it (*Protect PlayGuard with the PIN* on *Never*), parental controls temporarily unlocked (*Turn back on*), extra time from an earlier day still to put back, the "time's up" alarm off, changes made outside PlayGuard, the console not counting play time, an inaccurate network clock.
 - **For information**, a dot on the bell, can be marked as read: a limit still lowered by *No more play today* on an earlier day (*Put back*), a new version installed (*What's new*; after an update in place, the previous build kept), a report sent online (*Show the link*), the week's play time (every 7 days until read) and a limit passed on two or more of the last 7 days while the console only warns, a settings backup to make (none yet, or none for 30 days), all games blocked for a week, a new user account, PlayGuard closed unexpectedly last time (*Send a report*), the companion app linked, a newer version of PlayGuard, the network clock found off at start-up.
@@ -132,7 +132,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 ## Preferences
 
 - What sets PlayGuard itself up:
-  - Language (every console language, or the console's own), theme (light / dark), appearance (Cadran / Classic, see above) and, in Cadran, text size (normal / larger), each with an offer to restart.
+  - Language (every console language, or the console's own), theme (light / dark), appearance (Cadran / Classic, see above) and, in Cadran, text size (automatic / normal / larger, at once); the others with an offer to restart.
   - The tab to start on.
   - **The intro** at start-up: the loading screen for 2 seconds (on by default; Ⓐ or Ⓑ skips it; off, PlayGuard opens as soon as it is ready).
 - The messages it shows:
