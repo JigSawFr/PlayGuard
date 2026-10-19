@@ -220,6 +220,7 @@ RestrictionsTab::Tile RestrictionsTab::make_tile(uint32_t level, bool last)
             text = kit::label("", 15, "cadran/text2");
             text->setSingleLine(true);
             text->setMarginRight(6);
+            text->setMarginBottom(3);   // apart from its state once that goes under it
             words->addView(text);
             auto* gap = new brls::Box();
             gap->setGrow(1.0f);
