@@ -439,6 +439,20 @@ std::string appearance_name()
     return brls::getStr("playguard/prefs/appearances/" + std::string(config::APPEARANCES[index_of(config::APPEARANCES, config::get().appearance)]));
 }
 
+void pick_text_size(std::function<void()> after)
+{
+    std::vector<std::string> labels;
+    for (const char* t : config::TEXT_SIZES) labels.push_back(brls::getStr(std::string("playguard/prefs/text_sizes/") + t));
+    pick("playguard/prefs/text_size"_i18n, labels, index_of(config::TEXT_SIZES, config::get().text_size), [after](int i) {
+        choose(config::get().text_size, config::TEXT_SIZES[i], after);
+    });
+}
+
+std::string text_size_name()
+{
+    return brls::getStr("playguard/prefs/text_sizes/" + std::string(config::TEXT_SIZES[index_of(config::TEXT_SIZES, config::get().text_size)]));
+}
+
 std::string language_name()
 {
     return brls::getStr("playguard/tools/languages/" + std::string(config::LANGUAGES[index_of(config::LANGUAGES, config::get().language)]));

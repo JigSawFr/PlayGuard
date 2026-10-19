@@ -1007,6 +1007,11 @@
         "appearances": {
             "cadran": "Cadran",
             "classic": "Classic"
+        },
+        "text_size": "Text size",
+        "text_sizes": {
+            "normal": "Normal",
+            "large": "Larger"
         }
     },
     "backup": {

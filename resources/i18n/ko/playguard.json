@@ -1007,6 +1007,11 @@
         "appearances": {
             "cadran": "Cadran",
             "classic": "클래식"
+        },
+        "text_size": "글자 크기",
+        "text_sizes": {
+            "normal": "보통",
+            "large": "크게"
         }
     },
     "backup": {

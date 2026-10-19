@@ -266,6 +266,7 @@ DYNAMIC_KEYS = {
     "tools/languages/": array_of("source/util/config.hpp", "LANGUAGES"),
     "tools/themes/": array_of("source/util/config.hpp", "THEMES"),
     "prefs/appearances/": array_of("source/util/config.hpp", "APPEARANCES"),
+    "prefs/text_sizes/": array_of("source/util/config.hpp", "TEXT_SIZES"),
     "restrictions/org_where/": array_of("source/tab/restrictions_tab.cpp", "ORG_WHERE"),
     "tools/update_via_values/": array_of("source/action/update_flow.cpp", "METHODS"),
 }

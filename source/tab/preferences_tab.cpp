@@ -37,6 +37,10 @@ PreferencesTab::PreferencesTab()
         ui::pick_theme([this]() { this->refresh(); });
         return true;
     });
+    text_size->registerClickAction([this](brls::View*) {
+        ui::pick_text_size([this]() { this->refresh(); });
+        return true;
+    });
 
     start_tab->registerClickAction([this](brls::View*) {
         std::vector<std::string> labels;
@@ -88,6 +92,7 @@ void PreferencesTab::refresh()
     language->setDetailText(ui::language_name());
     theme->setDetailText(ui::theme_name());
     appearance->setDetailText(ui::appearance_name());
+    text_size->setDetailText(ui::text_size_name());
     start_tab->setDetailText(brls::getStr(std::string("playguard/tabs/") + config::START_TABS[index_of(config::START_TABS, cfg.start_tab)]));
     intro->setOn(cfg.intro, false);
     notices_system->setOn(cfg.notices_system, false);

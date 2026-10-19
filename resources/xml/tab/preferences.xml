@@ -31,6 +31,8 @@
             <brls:DetailCell id="pf_theme" title="@i18n/playguard/tools/theme"/>
             <brls:DetailCell id="pf_appearance" title="@i18n/playguard/prefs/appearance"/>
             <brls:DetailCell id="pf_start_tab" title="@i18n/playguard/tools/start_tab"/>
+            <!-- The Cadran appearance only (CadranPreferencesTab shows it). -->
+            <brls:DetailCell id="pf_text_size" title="@i18n/playguard/prefs/text_size" visibility="gone"/>
             <brls:BooleanCell id="pf_intro"/>
             <brls:Header title="@i18n/playguard/prefs/section_notices" marginTop="24" marginBottom="8"/>
             <brls:BooleanCell id="pf_notices_system"/>

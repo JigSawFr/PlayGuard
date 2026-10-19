@@ -330,6 +330,8 @@ void        pick_language(std::function<void()> after = nullptr);
 void        pick_theme(std::function<void()> after = nullptr);
 void        pick_appearance(std::function<void()> after = nullptr);
 std::string appearance_name();
+void        pick_text_size(std::function<void()> after = nullptr);
+std::string text_size_name();
 std::string language_name();
 std::string theme_name();
 // − on the main screen: a list of the two, each opening its picker.

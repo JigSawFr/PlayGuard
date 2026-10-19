@@ -1007,6 +1007,11 @@
         "appearances": {
             "cadran": "Cadran",
             "classic": "クラシック"
+        },
+        "text_size": "文字の大きさ",
+        "text_sizes": {
+            "normal": "標準",
+            "large": "大きめ"
         }
     },
     "backup": {

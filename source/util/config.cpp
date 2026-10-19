@@ -111,6 +111,7 @@ void sanitize(Config& c)
     if (!language_ok) c.language = "system";
     one_of(c.theme, { "system", "light", "dark" }, "system");
     one_of(c.appearance, { "cadran", "classic" }, "cadran");
+    one_of(c.text_size, { "normal", "large" }, "normal");
     one_of(c.update_via, { "", "inplace", "auto", "sphaira", "appstore", "manual" }, "");
     one_of(c.pin_lock, { "off", "changes", "open" }, "changes");
     one_of(c.dev_builds_order, { "newest", "number" }, "newest");
@@ -263,6 +264,7 @@ static void load_shared()
     read_string(j, "language", c.language);
     read_string(j, "theme", c.theme);
     read_string(j, "appearance", c.appearance);
+    read_string(j, "text_size", c.text_size);
     read_string(j, "ntp_server", c.ntp_server);
     read_bool(j, "advanced", c.advanced);
     read_bool(j, "auto_relock", c.auto_relock);
@@ -372,6 +374,7 @@ bool snapshot(Snapshot& snap)
     j["language"]        = s_config.language;
     j["theme"]           = s_config.theme;
     j["appearance"]      = s_config.appearance;
+    j["text_size"]       = s_config.text_size;
     j["ntp_server"]      = s_config.ntp_server;
     j["custom_servers"]  = s_config.custom_servers;
     j["advanced"]        = s_config.advanced;

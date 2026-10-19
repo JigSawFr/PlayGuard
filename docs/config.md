@@ -46,6 +46,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `language` | string | `"system"` (the console's language), `"en-US"`, `"fr"`, `"fr-CA"`, `"de"`, `"es"`, `"es-419"`, `"it"`, `"nl"`, `"pt"`, `"pt-BR"`, `"ru"`, `"ja"`, `"ko"`, `"zh-Hans"`, `"zh-Hant"` | `"system"` | Preferences |
 | `theme` | string | `"system"`, `"light"`, `"dark"` | `"system"` | Preferences |
 | `appearance` | string | `"cadran"` (the screens after the design boards: an icon rail, today's time as a ring, cards and tiles) or `"classic"` (the lists of earlier versions); read at start-up, so a change asks to restart | `"cadran"` | Preferences |
+| `text_size` | string | `"normal"` or `"large"` (with the Cadran appearance, every label 15 % bigger); read at start-up, so a change asks to restart | `"normal"` | Preferences › Text size |
 | `start_tab` | string | the tab shown at start-up: `"dashboard"` (Overview), `"play_timer"`, `"activity"`, `"restrictions"`, `"security"` (PIN), `"console"`, `"history"`, `"preferences"`, `"about"`; `"clock"` and `"tools"`, from before they became Console, read as `"console"` | `"dashboard"` | Preferences |
 | `advanced` | boolean | shows the play timer's debug-class actions | `false` | Play timer › Advanced |
 | `auto_relock` | boolean | turns parental controls back on right after a change that needed the temporary unlock | `true` | PIN |
@@ -211,6 +212,7 @@ line; the order does not matter when it reads them:
   "language": "fr",
   "theme": "system",
   "appearance": "cadran",
+  "text_size": "normal",
   "start_tab": "dashboard",
   "advanced": false,
   "auto_relock": true,

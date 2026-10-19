@@ -1,0 +1,100 @@
+diff --git a/library/include/borealis/views/label.hpp b/library/include/borealis/views/label.hpp
+--- a/library/include/borealis/views/label.hpp
++++ b/library/include/borealis/views/label.hpp
+@@ -96,6 +96,10 @@
+     void setVerticalAlign(VerticalAlign align);
+ 
+     void setFontSize(float value);
++    // Every label's size times `scale` (1 by default: as asked), set before
++    // the first view is made; getFontSize() still gives the size asked.
++    static void setFontScale(float scale);
++    static float getFontScale();
+     void setFontQuality(float value);
+     void setLineHeight(float value);
+     void setTextColor(NVGcolor color);
+@@ -150,6 +154,7 @@
+     static std::string STConverter(const std::string& text);
+ 
+     static inline bool OPENCC_ON = true;
++    static inline float FONT_SCALE = 1.0f;
+     void setCursor(int cursor);
+ 
+   protected:
+diff --git a/library/lib/views/bottom_bar.cpp b/library/lib/views/bottom_bar.cpp
+--- a/library/lib/views/bottom_bar.cpp
++++ b/library/lib/views/bottom_bar.cpp
+@@ -91,6 +91,8 @@
+ BottomBar::BottomBar()
+ {
+     this->inflateFromXMLString(bottomBarXML);
++    // No room to grow: the clock keeps its size, like the hints.
++    time->setFontSize(21.5f / Label::getFontScale());
+ 
+     Platform* platform = Application::getPlatform();
+     battery->setVisibility(platform->canShowBatteryLevel() ? Visibility::VISIBLE : Visibility::GONE);
+diff --git a/library/lib/views/hint.cpp b/library/lib/views/hint.cpp
+--- a/library/lib/views/hint.cpp
++++ b/library/lib/views/hint.cpp
+@@ -59,6 +59,9 @@
+ {
+     this->inflateFromXMLString(hintXML);
+     this->setFocusable(false);
++    // The bottom bar has no room to grow: its hints keep their size.
++    icon->setFontSize(25.5f / Label::getFontScale());
++    hint->setFontSize(21.5f / Label::getFontScale());
+ 
+     icon->setText(getKeyIcon(static_cast<ControllerButton>(action->getButton())));
+     hint->setText(action->getHintText());
+diff --git a/library/lib/views/label.cpp b/library/lib/views/label.cpp
+--- a/library/lib/views/label.cpp
++++ b/library/lib/views/label.cpp
+@@ -106,7 +106,7 @@
+     }
+ 
+     // Setup nvg state for the measurements
+-    nvgFontSize(vg, label->getFontSize());
++    nvgFontSize(vg, label->getFontSize() * Label::getFontScale());
+     nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+     nvgFontFaceId(vg, label->getFont());
+     nvgTextLineHeight(vg, label->getLineHeight());
+@@ -212,7 +212,7 @@
+ 
+     // Default attributes
+     this->font        = Application::getDefaultFont();
+-    this->fontSize    = style["brls/label/default_font_size"];
++    this->fontSize    = style["brls/label/default_font_size"] * FONT_SCALE;
+     this->lineHeight  = style["brls/label/default_line_height"];
+     this->textColor   = theme["brls/text"];
+     this->fontQuality = 1.0f;
+@@ -393,11 +393,21 @@
+ 
+ void Label::setFontSize(float value)
+ {
+-    this->fontSize = value;
++    this->fontSize = value * FONT_SCALE;
+ 
+     this->invalidate();
+ }
+ 
++void Label::setFontScale(float scale)
++{
++    FONT_SCALE = scale;
++}
++
++float Label::getFontScale()
++{
++    return FONT_SCALE;
++}
++
+ void Label::setFontQuality(float value)
+ {
+     this->fontQuality = value;
+@@ -646,7 +656,7 @@
+ 
+ float Label::getFontSize()
+ {
+-    return this->fontSize;
++    return this->fontSize / FONT_SCALE;
+ }
+ 
+ float Label::getFontQuality()

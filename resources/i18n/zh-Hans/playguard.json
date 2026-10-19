@@ -1007,6 +1007,11 @@
         "appearances": {
             "cadran": "Cadran",
             "classic": "经典"
+        },
+        "text_size": "文字大小",
+        "text_sizes": {
+            "normal": "标准",
+            "large": "较大"
         }
     },
     "backup": {

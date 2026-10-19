@@ -467,6 +467,9 @@ int main(int argc, char* argv[])
     // The Cadran appearance's palettes (Preferences › Appearance, the default).
     if (cadran::enabled()) {
         cadran::install_theme();
+        // Preferences › Text size: every label 15 % bigger (patches/borealis/
+        // 0007), before the first one exists.
+        if (config::get().text_size == "large") brls::Label::setFontScale(1.15f);
         // The console clears the screen with a colour deko3d records once
         // (SwitchVideoContext::recordStaticCommands: at start-up and on a theme
         // change), so before this palette: the space behind the tabs stayed

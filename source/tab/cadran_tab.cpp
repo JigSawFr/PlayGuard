@@ -175,6 +175,10 @@ void cadran::install_theme()
 
 namespace
 {
+// The frame (header, rail) keeps its size with Preferences › Text size
+// "Larger": it has no room to grow (brls::Label::setFontScale).
+float chrome(float size) { return size / brls::Label::getFontScale(); }
+
 class Glow : public brls::View
 {
   public:
@@ -323,7 +327,7 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
         left->addView(mark, 0);
     }
     if (auto* title = dynamic_cast<brls::Label*>(frame->getView("brls/applet_frame/title_label"))) {
-        title->setFontSize(24);
+        title->setFontSize(chrome(24));
         title->setMarginTop(0);
     }
     if (!pill_icon) return;   // a screen of its own: the mark and the title
@@ -347,7 +351,7 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
     pill->addView(glyph);
     auto* pill_label = new brls::Label();
     pill_label->setText(pill_text);
-    pill_label->setFontSize(15);
+    pill_label->setFontSize(chrome(15));
     pill_label->setTextColor(ink);
     pill->addView(pill_label);
     right->addView(pill);
@@ -361,7 +365,7 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
         s_main_pill_icon = glyph;
         auto* date = new brls::Label();
         date->setText(cadran::kit::long_date());
-        date->setFontSize(16);
+        date->setFontSize(chrome(16));
         date->setTextColor(theme["cadran/text3"]);
         date->setMarginLeft(10);
         right->addView(date);
@@ -426,7 +430,7 @@ void cadran::style_rail(brls::View* tab_frame)
         item->setAlignItems(brls::AlignItems::CENTER);
         if (brls::View* accent = item->getView("brls/sidebar/item_accent")) accent->setVisibility(brls::Visibility::GONE);
         if (auto* label = dynamic_cast<brls::Label*>(item->getView("brls/sidebar/item_label"))) {
-            label->setFontSize(17);
+            label->setFontSize(chrome(17));
             label->setMarginTop(0);
             label->setMarginBottom(0);
             label->setMarginRight(0);
