@@ -45,7 +45,7 @@
  },
  "params": {
   "tab": {"label": "처음 여는 탭", "options": {"": "개요", "play_timer": "플레이 타이머", "activity": "플레이 기록", "restrictions": "제한", "security": "PIN", "console": "본체", "history": "변경 기록", "preferences": "환경 설정", "about": "정보"}},
-  "appearance": {"label": "모양", "options": {"": "환경설정대로", "cadran": "Cadran", "classic": "클래식"}},
+  "appearance": {"label": "모양", "options": {"": "환경 설정대로", "cadran": "Cadran", "classic": "클래식"}},
   "not_set_up": {"label": "설정한 적 없음(PIN 없음)"},
   "unlocked": {"label": "일시적으로 해제됨"},
   "timer_off": {"label": "플레이 시간 제한 없음"},

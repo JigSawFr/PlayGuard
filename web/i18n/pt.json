@@ -45,7 +45,7 @@
  },
  "params": {
   "tab": {"label": "Abre em", "options": {"": "Visão geral", "play_timer": "Tempo de jogo", "activity": "Atividade", "restrictions": "Restrições", "security": "PIN", "console": "Consola", "history": "Histórico", "preferences": "Preferências", "about": "Sobre"}},
-  "appearance": {"label": "Aspeto", "options": {"": "Como nas Preferências", "cadran": "Cadran", "classic": "Clássico"}},
+  "appearance": {"label": "Aparência", "options": {"": "Como nas Preferências", "cadran": "Cadran", "classic": "Clássica"}},
   "not_set_up": {"label": "Nunca configurado (sem PIN)"},
   "unlocked": {"label": "Desbloqueado temporariamente"},
   "timer_off": {"label": "Sem limite de tempo de jogo"},

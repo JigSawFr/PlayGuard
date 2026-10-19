@@ -45,7 +45,7 @@
  },
  "params": {
   "tab": {"label": "最初に開くタブ", "options": {"": "概要", "play_timer": "プレイ時間", "activity": "プレイ記録", "restrictions": "制限", "security": "暗証番号", "console": "本体", "history": "履歴", "preferences": "オプション", "about": "情報"}},
-  "appearance": {"label": "外観", "options": {"": "設定のとおり", "cadran": "Cadran", "classic": "クラシック"}},
+  "appearance": {"label": "外観", "options": {"": "オプションのとおり", "cadran": "Cadran", "classic": "クラシック"}},
   "not_set_up": {"label": "未設定（暗証番号なし）"},
   "unlocked": {"label": "一時的に解除中"},
   "timer_off": {"label": "プレイ時間の制限なし"},
