@@ -3,9 +3,11 @@
 
 #include <borealis.hpp>
 #include <chrono>
+#include <cstdlib>
 
 #include "action/timer_health_logic.hpp"
 #include "app.hpp"
+#include "core/sim_env.h"
 #include "ui/ui.hpp"
 
 namespace timer_health
@@ -14,6 +16,19 @@ namespace timer_health
 namespace
 {
 timer_health_logic::State s_state;
+
+// How long the time left may stay still on screen: STALL_MS, or
+// PLAYGUARD_SIM_STALL_S seconds in the simulator (the smoke test's "outside"
+// scenario, which would otherwise wait 90 s).
+uint64_t stall_ms()
+{
+    static const uint64_t ms = [] {
+        const char* s = sim_env("PLAYGUARD_SIM_STALL_S");
+        const long v = s ? std::strtol(s, nullptr, 10) : 0;
+        return v > 0 ? (uint64_t)v * 1000 : timer_health_logic::STALL_MS;
+    }();
+    return ms;
+}
 }
 
 bool observe(const PtState& pt)
@@ -26,7 +41,7 @@ bool observe(const PtState& pt)
                                 std::chrono::steady_clock::now().time_since_epoch()).count();
     const bool was = s_state.stalled;
     const bool stalled = timer_health_logic::step(s_state, should, should ? (uint64_t)pt.remaining_ns : 0, should ? pt.day_min[wd] : 0,
-                                                  now_ms, app::in_focus());
+                                                  now_ms, app::in_focus(), stall_ms());
     if (stalled != was) brls::Logger::info("timer health: {}", stalled ? "not counting" : "counting");
     return stalled;
 }

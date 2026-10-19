@@ -19,6 +19,7 @@
 //   PLAYGUARD_SIM_RESTRICTED=1  today's limit is reached (the console says "Time's up")
 //   PLAYGUARD_SIM_NOT_COUNTING=1 the time left does not go down (a clock set back):
 //                               Today says so after 90 s on screen
+//   PLAYGUARD_SIM_STALL_S=20    ... or after that many seconds (source/action/timer_health.cpp)
 //   PLAYGUARD_SIM_AUTOSYNC_OFF=1 "Synchronise clock via Internet" is off
 //   PLAYGUARD_SIM_NETWORK_OFFSET=1411  the network clock is that many seconds
 //                               ahead of the console clock until it is set

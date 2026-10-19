@@ -43,8 +43,10 @@ struct State
 
 // One reading, `now_ms` from a steady clock; `in_focus`: PlayGuard had the
 // screen. Returns whether the console is not counting (the time left has
-// not gone down over STALL_MS on screen). Any reading where it should not
-// count starts the wait again, as does a new limit or the time left going up.
-bool step(State& s, bool should, uint64_t remaining_ns, uint16_t limit, uint64_t now_ms, bool in_focus);
+// not gone down over `stall_ms` on screen: STALL_MS, shorter in the
+// simulator's tests). Any reading where it should not count starts the wait
+// again, as does a new limit or the time left going up.
+bool step(State& s, bool should, uint64_t remaining_ns, uint16_t limit, uint64_t now_ms, bool in_focus,
+          uint64_t stall_ms = STALL_MS);
 
 }   // namespace timer_health_logic

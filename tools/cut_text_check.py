@@ -125,8 +125,10 @@ def main():
                 if not hit:
                     new.append(cut)
             print(f"{lang} {size}: {len(cuts)} cut")
+    # A "*" rule only when every language ran (CI splits them in shards).
+    every = set(langs) >= set(languages())
     for rule in rules:
-        if rule not in used and (rule[0] == "*" or rule[0] in langs):
+        if rule not in used and ((rule[0] == "*" and every) or rule[0] in langs):
             print(f"note: no longer cut, the line can go: {chr(9).join(rule)}")
     if new:
         print(f"{len(new)} text(s) cut short (add a line to tests/cut_text/allowed.txt only if it is meant):")
