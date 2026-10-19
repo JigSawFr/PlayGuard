@@ -3,26 +3,22 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include <emscripten.h>
 
-#include <cstdlib>
 #include <cstring>
-#include <string>
 
 #include <borealis.hpp>
 
+#include "core/sim_env.h"
+
 // A PLAYGUARD_SIM_* variable changed without a restart: the ones read at each
 // call (web/params.json's `live` entries) take it at their next read. An
-// empty or null value removes it. The "NAME=value" strings are never freed:
-// another thread may be reading the one it replaces. A name not set yet
-// grows the environment's table, which a thread reading it at that very
-// moment can miss for that read: a simulator's race, not a console's.
+// empty or null value removes it. Kept by core/sim_env.h, under its lock:
+// the process environment, which other threads read, stays as it was.
 extern "C" EMSCRIPTEN_KEEPALIVE int playguard_web_setenv(const char* name, const char* value)
 {
-    if (!name || std::strncmp(name, "PLAYGUARD_SIM_", 14) != 0 || std::strchr(name, '='))
+    if (!name || std::strncmp(name, "PLAYGUARD_SIM_", 14) != 0)
         return 0;
-    if (!value || !*value)
-        return unsetenv(name) == 0;
-    const std::string entry = std::string(name) + "=" + value;
-    return putenv(strdup(entry.c_str())) == 0;
+    sim_env_set(name, value);
+    return 1;
 }
 
 // The CJK font, fetched by the page after PlayGuard started (it is only

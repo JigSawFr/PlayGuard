@@ -40,7 +40,20 @@
   "record": "Record",
   "stop_recording": "Stop",
   "forget": "Forget the kept state",
-  "live_applied": "Changed without a restart"
+  "live_applied": "Changed without a restart",
+  "stop": "Stop",
+  "steps_copy": "Steps link",
+  "steps_help": "A link that starts PlayGuard as it started here and replays what you did since",
+  "steps_copied": "Link with the steps copied",
+  "replaying": "Replaying the steps: {n} of {total}",
+  "tour": "Tour",
+  "report": "Report a problem",
+  "tour_overview": "Overview: today's play time, the limit, the time left and bedtime.",
+  "tour_play_timer": "Play timer: the week chart is the editor, one limit for every day or one per day.",
+  "tour_activity": "Activity: who played what, and how long, from the console's own log.",
+  "tour_console": "Console: the network clock, the installed games and what the console runs.",
+  "tour_time": "Time passes: an hour of play later, today's time is used up.",
+  "tour_end": "Your turn: the arrows move, Enter is A, Esc is B. The panel sets any state."
  },
  "groups": {
   "app": "PlayGuard",

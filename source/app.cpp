@@ -4,6 +4,7 @@
 #include <cstdlib>
 
 #include "core/platform.h"
+#include "core/sim_env.h"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -44,7 +45,7 @@ uint32_t    pctl_init_result() { return s_init_result; }
 // build's version and commit (PLAYGUARD_SIM_VERSION="1.0.0:abcdef0", or "1.0.0:"
 // for a release), so its screenshots and its update offer (a simulated 1.1.0)
 // do not change with each release.
-static const char* sim_version() { return std::getenv("PLAYGUARD_SIM_VERSION"); }
+static const char* sim_version() { return sim_env("PLAYGUARD_SIM_VERSION"); }
 static std::string sim_part(bool want_commit)
 {
     const std::string s = sim_version();

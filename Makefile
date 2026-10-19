@@ -160,7 +160,7 @@ sys_updates_SRC   := source/util/sys_updates.cpp tests/sys_updates/test.cpp
 # (a fake http::redirect in the test), without it for the desktop's simulation.
 sys_updates_net_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp tests/sys_updates_net/test.cpp
 sys_updates_net_FLAGS := -std=c++17 -Isource -D__SWITCH__
-sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp source/sim/sim_net.cpp source/util/paths.cpp tests/sys_updates_net/test.cpp
+sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp source/sim/sim_net.cpp source/sim/sim_env.cpp source/util/paths.cpp tests/sys_updates_net/test.cpp
 ntp_servers_SRC   := source/util/ntp_servers.cpp tests/ntp_servers/test.cpp
 sys_notes_SRC   := source/util/date.cpp source/util/safe_text.cpp source/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
@@ -192,7 +192,7 @@ dev_builds_LIBS  := -lz
 # The download and its resume: without PLAYGUARD_SIM_DEV_BUILDS the desktop
 # build takes the console's path, here against a fake http::download and
 # http::redirect in the test (-D__SWITCH__ would reach date.cpp's switch.h).
-dev_builds_net_SRC   := $(filter-out tests/%,$(dev_builds_SRC)) source/util/http_logic.cpp source/util/zip_write.cpp source/sim/sim_net.cpp source/util/dev_builds_net.cpp tests/dev_builds_net/test.cpp
+dev_builds_net_SRC   := $(filter-out tests/%,$(dev_builds_SRC)) source/util/http_logic.cpp source/util/zip_write.cpp source/sim/sim_net.cpp source/sim/sim_env.cpp source/util/dev_builds_net.cpp tests/dev_builds_net/test.cpp
 dev_builds_net_LIBS  := -lz
 play_cache_SRC   := source/util/play_cache.cpp tests/play_cache/test.cpp
 game_cache_SRC   := source/util/game_cache.cpp tests/game_cache/test.cpp

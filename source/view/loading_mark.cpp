@@ -4,6 +4,7 @@
 #include <cmath>
 #ifndef __SWITCH__
 #include <cstdlib>
+#include "core/sim_env.h"
 #endif
 
 namespace
@@ -27,7 +28,7 @@ LoadingMark::LoadingMark()
     this->setFocusable(false);
 #ifndef __SWITCH__
     // The desktop smoke test compares screenshots: no movement there.
-    this->still = std::getenv("PLAYGUARD_SIM_STILL_FOCUS") != nullptr;
+    this->still = sim_env("PLAYGUARD_SIM_STILL_FOCUS") != nullptr;
 #endif
 }
 

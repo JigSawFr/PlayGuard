@@ -29,6 +29,7 @@
 #include "activity/rescue_activity.hpp"
 #include "app.hpp"
 #include "core/platform.h"
+#include "core/sim_env.h"
 #include "tab/about_tab.hpp"
 #include "tab/activity_tab.hpp"
 #include "tab/console_tab.hpp"
@@ -277,7 +278,7 @@ void start(LoadingActivity* loading)
         loading->show(LoadingActivity::Step::Screen);
 #ifndef __SWITCH__
         // Desktop simulation, for a screenshot of the loading screen.
-        if (std::getenv("PLAYGUARD_SIM_HOLD_LOADING")) {
+        if (sim_env("PLAYGUARD_SIM_HOLD_LOADING")) {
             brls::Logger::info("start-up: held on the loading screen (PLAYGUARD_SIM_HOLD_LOADING)");
             delete first;
             return;
