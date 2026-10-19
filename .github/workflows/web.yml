@@ -64,8 +64,11 @@ jobs:
         env:
           PLAYGUARD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          export EM_CACHE="$HOME/.emscripten_cache"
+          # After emsdk_env.sh, which unsets EM_CACHE (emsdk.py's
+          # construct_env_with_vars()): set before, the ports were built in
+          # emsdk's own folder and the cache above stayed empty.
           source "$RUNNER_TEMP/emsdk/emsdk_env.sh"
+          export EM_CACHE="$HOME/.emscripten_cache"
           make web JOBS="$(nproc)"
           test -f build-web/simulator/cjk.otf || { echo "::error::no CJK font in the web build"; exit 1; }
       # The simulator in headless Chromium (tools/web_smoke.py): it must reach
@@ -95,7 +98,9 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          pages=$(gh api "repos/$REPO/pages" --jq .html_url 2>/dev/null || true)
+          # https when Pages enforces it, whatever html_url says meanwhile.
+          pages=$(gh api "repos/$REPO/pages" \
+                    --jq 'if .https_enforced then (.html_url | sub("^http:"; "https:")) else .html_url end' 2>/dev/null || true)
           owner="${REPO%%/*}"
           pages="${pages:-https://${owner,,}.github.io/${REPO#*/}/}"
           pages="${pages%/}/"
