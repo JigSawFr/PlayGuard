@@ -20,6 +20,8 @@ namespace cut_text
 #if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
 namespace
 {
+// In the working directory (the desktop's run folder).
+const char* const FILE_NAME = "cut_text.txt";
 std::set<std::string> s_seen;
 
 // The labels shown under `view` that are cut; a hidden box hides its own.
@@ -45,11 +47,13 @@ void walk(brls::View* view, const std::string& screen, FILE* out)
 void sample()
 {
 #if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
-    static const char* path = sim_env("PLAYGUARD_SIM_CUT_TEXT");
-    if (!path) return;
-    // Created with an explicit mode (CodeQL: fopen's depends on the umask).
+    static const bool on = sim_env("PLAYGUARD_SIM_CUT_TEXT") != nullptr;
+    if (!on) return;
+    // A fixed name in the working directory, not a path from the environment
+    // (CodeQL: path injection), created with an explicit mode (fopen's
+    // depends on the umask).
     static FILE* out = [] {
-        const int fd = ::open(path, O_WRONLY | O_CREAT | O_APPEND, 0600);
+        const int fd = ::open(FILE_NAME, O_WRONLY | O_CREAT | O_APPEND, 0600);
         if (fd < 0) return static_cast<FILE*>(nullptr);
         FILE* f = ::fdopen(fd, "a");
         if (!f) ::close(fd);

@@ -73,7 +73,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_VERSION=1.0.0:1a2b3c4` | Not the console: the version and commit the header's badge shows (`1.0.0:` for a release), not the build's own, for screenshots that compare |
 | `PLAYGUARD_SIM_HOLD_LOADING=1` | Not the console: the start-up stops on the loading screen, at its last step (the `loading` smoke scenario's screenshot) |
 | `PLAYGUARD_SIM_CADRAN_NOGLOW=1` | Not the console: no background glow (`PLAYGUARD_SIM_CADRAN_NORING=1`: no ring on Today), the two custom draws of the look after the design boards (`source/view/cadran_*.cpp`: the rail's icons, today's ring, the figures in Sora from `resources/font/`, OFL), to weigh them |
-| `PLAYGUARD_SIM_CUT_TEXT=<file>` | Not the console: once a second, every label the screen on top cuts short ("…") goes to the file with the screen's name, once each (`tools/cut_text_check.py`) |
+| `PLAYGUARD_SIM_CUT_TEXT=1` | Not the console: once a second, every label the screen on top cuts short ("…") goes to `cut_text.txt` in the working directory with the screen's name, once each (`tools/cut_text_check.py`) |
 | `PLAYGUARD_SIM_STATS=<file>` | Not the console: one line per frame (frame time with the FPS limiter off; nanovg's draw calls and triangles with `tools/perf_nanovg_stats.patch`), see `tools/perf_frames.sh`. On the console (and the desktop), *About › Help & diagnostics › Developer › Frame statistics* writes one line per second to `logs/frame_stats.txt` instead: the mode (docked, handheld), the UI thread's own time per frame and the late frames (`source/action/frame_stats_flow.cpp`) |
 
 Game patches are read from `./playguard_data/sd/`, the simulated SD card root.

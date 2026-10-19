@@ -3,9 +3,9 @@
 console's 15 languages, at the normal text size and the larger one.
 
 For each language and size, starts the desktop build (build-desktop/playguard)
-on the Cadran tabs, shows every tab of the rail, and reads what
-PLAYGUARD_SIM_CUT_TEXT gathered (source/ui/cut_text.cpp: every label its box
-cuts, by screen). A cut not listed in tests/cut_text/allowed.txt fails the
+on the tabs, shows every tab of the rail, and reads what PLAYGUARD_SIM_CUT_TEXT=1
+gathered in the run folder's cut_text.txt (source/ui/cut_text.cpp: every label
+its box cuts, by screen). A cut not listed in tests/cut_text/allowed.txt fails the
 check; a listed one that no longer happens is reported (the line can go).
 
 Usage: tools/cut_text_check.py <out-dir> [language ...]
@@ -67,11 +67,11 @@ def run(out, lang, size):
     with open(os.path.join(data, "config.json"), "w") as f:
         f.write('{"schema": 1, "language": "%s", "theme": "dark", "text_size": "%s"}'
                 % (lang, size))
-    cuts = os.path.join(base, "cut_text.txt")
+    cuts = os.path.join(base, "run", "cut_text.txt")   # the app's working directory
     log = os.path.join(base, "app.log")
     env = dict(os.environ, LIBGL_ALWAYS_SOFTWARE="1", TZ="UTC", PLAYGUARD_SIM_NOW="1791475200",
                PLAYGUARD_SIM_STILL_FOCUS="1", PLAYGUARD_SIM_VERSION="1.0.0:1a2b3c4",
-               PLAYGUARD_SIM_CHECK_MS="0", PLAYGUARD_SIM_CUT_TEXT=cuts)
+               PLAYGUARD_SIM_CHECK_MS="0", PLAYGUARD_SIM_CUT_TEXT="1")
     with open(log, "w") as lf:
         # Line-buffered, so "first screen ready" reaches the log at once; in
         # a D-Bus session of its own, as tools/desktop_smoke.py starts it.
