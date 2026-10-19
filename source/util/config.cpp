@@ -272,6 +272,7 @@ static void load_shared()
     read_bool(j, "dev_mode", c.dev_mode);
     read_bool(j, "pt_log", c.pt_log);
     read_bool(j, "frame_stats", c.frame_stats);
+    read_bool(j, "cadran_glow", c.cadran_glow);
     read_string(j, "update_via", c.update_via);
     read_bool(j, "update_daily", c.update_daily);
     read_string(j, "update_checked", c.update_checked);
@@ -383,6 +384,7 @@ bool snapshot(Snapshot& snap)
     j["dev_mode"]        = s_config.dev_mode;
     j["pt_log"]          = s_config.pt_log;
     j["frame_stats"]     = s_config.frame_stats;
+    j["cadran_glow"]     = s_config.cadran_glow;
     j["update_via"]      = s_config.update_via;
     j["update_daily"]    = s_config.update_daily;
     j["update_checked"]  = s_config.update_checked;

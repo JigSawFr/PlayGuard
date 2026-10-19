@@ -1140,7 +1140,8 @@
         "enabled": "开发者模式已开启：请查看“关于 › 帮助与诊断”末尾。",
         "presses_left": "再按{}次即可开启开发者模式。",
         "presses_left_one": "再按1次即可开启开发者模式。",
-        "report_upload": "在线发送"
+        "report_upload": "在线发送",
+        "glow": "背景光晕 (Cadran)"
     },
     "dev_build": {
         "open": "安装其他构建",

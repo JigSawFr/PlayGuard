@@ -166,6 +166,11 @@ HelpTab::HelpTab()
         this->update_frame_stats();
     });
     dev_frame_stats_last->setSingleLine(false);
+    // Cadran's background glow, off to weigh it with the frame statistics.
+    dev_glow->init("playguard/dev/glow"_i18n, config::get().cadran_glow, [](bool on) {
+        config::get().cadran_glow = on;
+        ui::save_config();
+    });
     this->stats_timer.setPeriod(1000);
     this->stats_timer.setCallback([this]() { this->update_frame_stats(); });
     dev_clear_cache->registerClickAction([](brls::View*) {
@@ -206,7 +211,7 @@ HelpTab::HelpTab()
         cadran::List(this, true).apply({ { "hp_first_steps", "sparkle" }, { "hp_export", "file" }, { "hp_upload", "upload" },
                                          { "hp_github", "user" }, { "hp_logs_keep", "folder" }, { "hp_logs_keep_days", "calendar" },
                                          { "hp_logs_keep_mb", "save" }, { "hp_dev_mode", "code" }, { "hp_dev_read_only", "eye" },
-                                         { "hp_dev_pt_log", "list" }, { "hp_dev_frame_stats", "activity" },
+                                         { "hp_dev_pt_log", "list" }, { "hp_dev_frame_stats", "activity" }, { "hp_dev_glow", "sparkle" },
                                          { "hp_dev_clear_cache", "trash" }, { "hp_dev_clear_logs", "trash" },
                                          { "hp_dev_report", "file" }, { "hp_dev_pt_block", "timer" }, { "hp_dev_gate", "shield" },
                                          { "hp_dev_forget", "refresh" }, { "hp_dev_build", "download" } });
@@ -224,6 +229,7 @@ void HelpTab::refresh()
     dev_read_only->setOn(ro, false);
     dev_pt_log->setOn(cfg.pt_log, false);
     dev_frame_stats->setOn(cfg.frame_stats, false);
+    dev_glow->setOn(cfg.cadran_glow, false);
     this->update_frame_stats();
     const bool signed_in = !github_auth::token().empty();
     // The block comparison reads what the phone app changes: only while it
@@ -243,6 +249,7 @@ void HelpTab::refresh()
                           { dev_frame_stats.getView(), dev },
                           { dev_frame_stats_note.getView(), dev },
                           { dev_frame_stats_last.getView(), dev && frame_stats_flow::running() },
+                          { dev_glow.getView(), dev && cadran::enabled() },
                           { dev_clear_cache.getView(), dev },
                           { dev_clear_logs.getView(), dev },
                           { dev_report.getView(), dev },

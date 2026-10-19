@@ -1140,7 +1140,8 @@
         "enabled": "Entwicklermodus aktiv: siehe Ende des Tabs Info › Hilfe & Diagnose.",
         "presses_left": "Noch {} Mal drücken, um den Entwicklermodus zu aktivieren.",
         "presses_left_one": "Noch 1 Mal drücken, um den Entwicklermodus zu aktivieren.",
-        "report_upload": "Online senden"
+        "report_upload": "Online senden",
+        "glow": "Hintergrundschein (Cadran)"
     },
     "dev_build": {
         "open": "Anderen Build installieren",

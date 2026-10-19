@@ -1140,7 +1140,8 @@
         "enabled": "開発者モードをONにしました。「情報 › ヘルプと診断」の最後を見てください。",
         "presses_left": "あと{}回押すと開発者モードになります。",
         "presses_left_one": "あと1回押すと開発者モードになります。",
-        "report_upload": "オンラインで送信"
+        "report_upload": "オンラインで送信",
+        "glow": "背景のグロー (Cadran)"
     },
     "dev_build": {
         "open": "別のビルドをインストール",

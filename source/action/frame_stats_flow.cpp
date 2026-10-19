@@ -17,6 +17,7 @@
 
 #include "app.hpp"
 #include "ui/ui.hpp"
+#include "tab/cadran_list.hpp"
 #include "util/config.hpp"
 #include "util/frame_stats.hpp"
 #include "util/paths.hpp"
@@ -77,10 +78,13 @@ uint64_t cpu_us()
 std::string mode()
 {
 #ifdef __SWITCH__
-    return appletGetOperationMode() == AppletOperationMode_Handheld ? "handheld" : "docked";
+    std::string m = appletGetOperationMode() == AppletOperationMode_Handheld ? "handheld" : "docked";
 #else
-    return "desktop";
+    std::string m = "desktop";
 #endif
+    // Cadran's glow turned off (Developer): its cost is the difference.
+    if (cadran::enabled() && !config::get().cadran_glow) m += "-noglow";
+    return m;
 }
 
 std::string stamp()

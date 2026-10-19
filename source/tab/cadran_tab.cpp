@@ -201,10 +201,16 @@ class Glow : public brls::View
     void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style, brls::FrameContext*) override
     {
         static const bool off = std::getenv("PLAYGUARD_SIM_CADRAN_NOGLOW") != nullptr;
-        if (off) return;
+        if (off || !config::get().cadran_glow) return;
         const NVGpaint paint = nvgRadialGradient(vg, x + this->cx, y + this->cy, 0.0f, this->radius, this->glow, this->clear);
+        // Only the square around the light: past its radius it is clear, so
+        // the screen's other pixels are left alone (the same picture, about
+        // half the fill).
+        const float left = std::max(x, x + this->cx - this->radius), top = std::max(y, y + this->cy - this->radius);
+        const float right = std::min(x + width, x + this->cx + this->radius), bottom = std::min(y + height, y + this->cy + this->radius);
+        if (right <= left || bottom <= top) return;
         nvgBeginPath(vg);
-        nvgRect(vg, x, y, width, height);
+        nvgRect(vg, left, top, right - left, bottom - top);
         nvgFillPaint(vg, paint);
         nvgFill(vg);
     }

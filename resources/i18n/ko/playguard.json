@@ -1140,7 +1140,8 @@
         "enabled": "개발자 모드를 켰습니다: 정보 › 도움말 및 진단 탭 맨 아래를 확인하세요.",
         "presses_left": "{}번 더 누르면 개발자 모드가 켜집니다.",
         "presses_left_one": "1번 더 누르면 개발자 모드가 켜집니다.",
-        "report_upload": "온라인으로 보내기"
+        "report_upload": "온라인으로 보내기",
+        "glow": "배경 광채 (Cadran)"
     },
     "dev_build": {
         "open": "다른 빌드 설치",

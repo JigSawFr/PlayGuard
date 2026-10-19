@@ -38,6 +38,7 @@ class HelpTab : public TabBase
     BRLS_BIND(brls::BooleanCell, dev_pt_log,  "hp_dev_pt_log");
     BRLS_BIND(brls::Label,       dev_pt_log_note, "hp_dev_pt_log_note");
     BRLS_BIND(brls::BooleanCell, dev_frame_stats, "hp_dev_frame_stats");
+    BRLS_BIND(brls::BooleanCell, dev_glow, "hp_dev_glow");
     BRLS_BIND(brls::Label,       dev_frame_stats_note, "hp_dev_frame_stats_note");
     BRLS_BIND(brls::Label,       dev_frame_stats_last, "hp_dev_frame_stats_last");
     BRLS_BIND(brls::DetailCell,  dev_clear_cache, "hp_dev_clear_cache");

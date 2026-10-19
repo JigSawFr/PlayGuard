@@ -1140,7 +1140,8 @@
         "enabled": "Modo de desenvolvedor ativado: veja o final de Sobre › Ajuda e diagnóstico.",
         "presses_left": "Pressione mais {} vezes para ativar o modo de desenvolvedor.",
         "presses_left_one": "Pressione mais 1 vez para ativar o modo de desenvolvedor.",
-        "report_upload": "Enviar online"
+        "report_upload": "Enviar online",
+        "glow": "Halo de fundo (Cadran)"
     },
     "dev_build": {
         "open": "Instalar outra compilação",

@@ -1140,7 +1140,8 @@
         "enabled": "Developer mode is on: see the end of About › Help & diagnostics.",
         "presses_left": "{} more presses to turn on developer mode.",
         "presses_left_one": "1 more press to turn on developer mode.",
-        "report_upload": "Send online"
+        "report_upload": "Send online",
+        "glow": "Background glow (Cadran)"
     },
     "dev_build": {
         "open": "Install another build",

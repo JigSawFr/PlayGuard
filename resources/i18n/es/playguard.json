@@ -1140,7 +1140,8 @@
         "enabled": "Modo desarrollador activado: consulte el final de Acerca de › Ayuda y diagnóstico.",
         "presses_left": "Faltan {} pulsaciones para activar el modo desarrollador.",
         "presses_left_one": "Falta 1 pulsación para activar el modo desarrollador.",
-        "report_upload": "Enviar en línea"
+        "report_upload": "Enviar en línea",
+        "glow": "Halo de fondo (Cadran)"
     },
     "dev_build": {
         "open": "Instalar otra compilación",

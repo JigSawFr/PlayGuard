@@ -1140,7 +1140,8 @@
         "enabled": "開發者模式已開啟：請查看「關於 › 說明與診斷」底部。",
         "presses_left": "再按{}次即可開啟開發者模式。",
         "presses_left_one": "再按1次即可開啟開發者模式。",
-        "report_upload": "線上傳送"
+        "report_upload": "線上傳送",
+        "glow": "背景光暈 (Cadran)"
     },
     "dev_build": {
         "open": "安裝其他建置",

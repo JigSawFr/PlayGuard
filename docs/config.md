@@ -141,6 +141,7 @@ Set in *About › Help & diagnostics › Developer*, shown once developer mode i
 | `pt_log` | boolean | *Record the play timer* (`logs/play_timer/log.csv`) | `false` |
 | `dev_builds_order` | string | how *Install another build* orders the pull requests (A on their tab when it is shown): `"newest"` (the newest build first) or `"number"` (the highest number first); main's commits are always newest first | `"newest"` |
 | `frame_stats` | boolean | *About › Help & diagnostics › Developer › Frame statistics* (`logs/frame_stats.txt`: one line per second, the UI thread's time per frame and the late frames, to weigh one screen against another on the console) | `false` |
+| `cadran_glow` | boolean | *About › Help & diagnostics › Developer › Background glow*: the Cadran screens' soft light behind the top left (or the child screen's ring); off, the frame statistics' mode says `docked-noglow` (`handheld-noglow`), to weigh what it costs | `true` |
 
 ## State kept between launches
 
@@ -253,6 +254,7 @@ line; the order does not matter when it reads them:
   "dev_mode": false,
   "pt_log": false,
   "frame_stats": false,
+  "cadran_glow": true,
   "dev_builds_order": "newest",
   "extra_auto_restore": false
 }

@@ -1140,7 +1140,8 @@
         "enabled": "Mode développeur activé : voir la fin de l'onglet À propos › Aide et diagnostic.",
         "presses_left": "Encore {} appuis pour activer le mode développeur.",
         "presses_left_one": "Encore 1 appui pour activer le mode développeur.",
-        "report_upload": "Envoyer en ligne"
+        "report_upload": "Envoyer en ligne",
+        "glow": "Halo d'arrière-plan (Cadran)"
     },
     "dev_build": {
         "open": "Installer un autre build",

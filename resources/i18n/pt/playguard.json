@@ -1140,7 +1140,8 @@
         "enabled": "Modo de programador ativo: veja o fim de Sobre › Ajuda e diagnóstico.",
         "presses_left": "Prima mais {} vezes para ativar o modo de programador.",
         "presses_left_one": "Prima mais 1 vez para ativar o modo de programador.",
-        "report_upload": "Enviar online"
+        "report_upload": "Enviar online",
+        "glow": "Halo de fundo (Cadran)"
     },
     "dev_build": {
         "open": "Instalar outra compilação",

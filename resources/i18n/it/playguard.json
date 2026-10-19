@@ -1140,7 +1140,8 @@
         "enabled": "Modalità sviluppatore attiva: vedi la fine della scheda Informazioni › Aiuto e diagnostica.",
         "presses_left": "Premi ancora {} volte per attivare la modalità sviluppatore.",
         "presses_left_one": "Premi ancora una volta per attivare la modalità sviluppatore.",
-        "report_upload": "Invia online"
+        "report_upload": "Invia online",
+        "glow": "Alone di sfondo (Cadran)"
     },
     "dev_build": {
         "open": "Installa un'altra build",

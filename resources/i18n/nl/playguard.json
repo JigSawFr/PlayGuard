@@ -1140,7 +1140,8 @@
         "enabled": "De ontwikkelaarsmodus staat aan: zie het einde van Info › Hulp en diagnose.",
         "presses_left": "Nog {} keer drukken om de ontwikkelaarsmodus aan te zetten.",
         "presses_left_one": "Nog 1 keer drukken om de ontwikkelaarsmodus aan te zetten.",
-        "report_upload": "Online versturen"
+        "report_upload": "Online versturen",
+        "glow": "Achtergrondgloed (Cadran)"
     },
     "dev_build": {
         "open": "Andere build installeren",
