@@ -731,7 +731,8 @@ const STEP_BUTTONS = {
   x: BUTTON.X, y: BUTTON.Y, l: BUTTON.L, r: BUTTON.R, zl: BUTTON.ZL, zr: BUTTON.ZR, plus: BUTTON.PLUS, minus: BUTTON.MINUS,
 };
 const BUTTON_STEP = Object.fromEntries(Object.entries(STEP_BUTTONS).map(([name, code]) => [code, name]));
-// A press, and the pause after it: borealis' animations last 300 ms.
+// A touch's press, and the pause after a step: borealis' animations last
+// 300 ms.
 const PRESS_MS = 60;
 const AFTER_MS = 400;
 // The tour (tour=1): the tabs, then an hour of play.
@@ -739,6 +740,9 @@ const TOUR = 'w10.say:overview.w45.down.say:play_timer.w45.down.say:activity.w45
              '.up*5.say:time.w15.s:skip=3600.w45.say:end.w60';
 
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
+// The next display refresh, which runs one of PlayGuard's frames
+// (emscripten_set_main_loop, source/main.cpp).
+const frame = () => new Promise((done) => requestAnimationFrame(() => done()));
 // A live value in a step: its dots are escaped too.
 const stepValue = (name, value) => `${name}=${encodeURIComponent(value ?? '').replace(/\./g, '%2E')}`;
 
@@ -789,10 +793,17 @@ async function runSteps(text, onStep) {
       onStep?.(i + 1, list.length, step);
       let m;
       if ((m = /^([a-z]+)(?:\*(\d+))?$/.exec(step)) && STEP_BUTTONS[m[1]] != null) {
+        // A button is tapped: down and up at once, which brls_web_button()
+        // keeps for the next frame as one press. Held for a while instead,
+        // its release could come late on a busy page (SwiftShader's frames,
+        // a timer run late) and borealis repeat the press: the smoke test's
+        // tabs one off. Two refreshes then, so that a frame has read it
+        // before the next tap.
         for (let n = Number(m[2] || 1); n > 0 && !run.stopped; n--) {
           press(STEP_BUTTONS[m[1]], true);
-          await sleep(PRESS_MS);
           press(STEP_BUTTONS[m[1]], false);
+          await frame();
+          await frame();
           await sleep(AFTER_MS);
         }
       } else if ((m = /^w(\d+)$/.exec(step))) {
