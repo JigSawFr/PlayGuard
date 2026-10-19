@@ -73,7 +73,8 @@ pages; no framework, nothing to install but that.
   documentation. Taking them takes about half an hour per theme on a CI
   runner, so CI takes them only when what they show changed since the last
   build (a pull request's base, or the commit main was at before the push):
-  the app, its resources, the simulator, the version. Otherwise it downloads
+  the app, its resources, the simulator, the version (so each release, the
+  merge of release-please's pull request, takes them all). Otherwise it downloads
   main's published ones (`SITE_SCREENSHOTS_FROM=<site>`), in seconds. A pull
   request that changes the screens takes the light theme's and main's dark
   ones (`SITE_SCREENSHOT_THEMES=light`, then `dark` from main); main, both.

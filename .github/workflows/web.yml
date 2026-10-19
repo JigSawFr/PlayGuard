@@ -126,7 +126,8 @@ jobs:
       # simulator just built, in the Chromium the step above installed. Taken
       # only when what they show changed since the last build (a pull
       # request's base, the commit main was at before this push): the app,
-      # its resources, the simulator, the version (its badge); the tours also
+      # its resources, the simulator, the version (its badge: a release, its
+      # pull request merged, takes them all, automatically); the tours also
       # when their page, their script or the site's texts change. Otherwise
       # main's published ones, in seconds. A pull request takes the light
       # theme only (about half an hour) and main's dark screenshots and tours,
