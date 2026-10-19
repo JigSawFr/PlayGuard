@@ -217,6 +217,14 @@ def social_image(lang):
     return "images/social-preview.png"
 
 
+def tour_video(lang):
+    """The home page's tour under assets/: `lang`'s own (tools/render_tour.mjs)
+    when SITE_SCREENSHOTS has it, else the English one."""
+    if SCREENSHOT_DIR and os.path.exists(os.path.join(SCREENSHOT_DIR, lang, "tour.mp4")):
+        return f"images/screenshots/{lang}/tour.mp4"
+    return "images/video/playguard-tour.mp4"
+
+
 def gallery_image(t, lang, to_root, name):
     """A screenshot of the gallery, in the page's theme: its dark one under
     the dark theme (site.css), when there is one."""
@@ -388,7 +396,7 @@ def home_body(t, lang, to_root):
         <p class="source"><a href="{REPO_URL}">{t('source')}</a></p>
       </div>
       <div class="hero-video">
-        <video src="{to_root}assets/images/video/playguard-tour.mp4" muted loop playsinline preload="none"
+        <video src="{to_root}assets/{tour_video(lang)}" muted loop playsinline preload="none"
                poster="{to_root}assets/{screenshot(lang, 'dashboard')}" aria-label="{t('tour_title')}"></video>
         <button class="video-toggle" type="button" hidden data-play="{t('video_play')}" data-pause="{t('video_pause')}"></button>
       </div>
@@ -752,7 +760,7 @@ def main():
         base = f"{folder}/" if folder else ""
         to_root = "../" if folder else ""
         assets.update(screenshot(lang, s) for s in SCREENSHOTS)
-        assets.add(social_image(lang))
+        assets.update((social_image(lang), tour_video(lang)))
         assets.update(filter(None, (screenshot(lang, s, dark=True) for s in SCREENSHOTS)))
         write(out, f"{base}index.html", page(t, lang, to_root, "", "", home_body(t, lang, to_root), body_class="home",
                                              full_title=f"PlayGuard — {t('hero_title', escape=False)}",

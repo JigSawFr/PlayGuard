@@ -34,8 +34,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-26.04
-    # main takes every screenshot in both themes (below): longer.
-    timeout-minutes: ${{ github.event_name == 'push' && 90 || 60 }}
+    # main takes every screenshot in both themes and renders the tours (below): longer.
+    timeout-minutes: ${{ github.event_name == 'push' && 120 || 60 }}
     permissions:
       contents: read
       pages: read   # the site's address (its custom domain)
@@ -137,6 +137,22 @@ jobs:
             SITE_SCREENSHOT_JOBS="$(nproc)" node tools/site_screenshots.mjs build-web/simulator shots "$version"
           fi
           node tools/site_social.mjs shots
+      # The home page's tour in each language but English (branding/tour.html
+      # over the language's screenshots, tools/render_tour.mjs): main renders
+      # them, a pull request takes main's (one missing there: the English tour).
+      - name: The tour in each language
+        env:
+          IS_PR: ${{ github.event_name == 'pull_request' }}
+        run: |
+          if [ "$IS_PR" = true ]; then
+            for lang in fr fr-CA de es es-419 it nl pt pt-BR ru ja ko zh-Hans zh-Hant; do
+              curl -sfL -o "shots/$lang/tour.mp4" "${MAIN_SITE}assets/images/screenshots/$lang/tour.mp4" || rm -f "shots/$lang/tour.mp4"
+            done
+          else
+            sudo apt-get install -y -q --no-install-recommends ffmpeg
+            TOUR_JOBS="$(nproc)" node tools/render_tour.mjs shots
+          fi
+          ls shots/*/tour.mp4 2>/dev/null | wc -l | xargs -I{} echo "{} tours"
       # The screens against main's, published with its site: which ones this
       # pull request changes (tools/visual_check.py, the footer clock masked;
       # side by side in shots/visual_diff/), for its comment (pages.yml,

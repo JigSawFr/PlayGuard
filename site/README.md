@@ -76,6 +76,12 @@ pages; no framework, nothing to install but that.
   Playwright) writes `<out-dir>/<language>/social.png` (1280×640) from the
   catalog's title and that language's dashboard; `build_site.py` makes it the
   language's `og:image`, else the repository's `images/social-preview.png`.
+- **The tour in each language**: `tools/render_tour.mjs <out-dir>` (Node,
+  Playwright and ffmpeg) renders `branding/tour.html` with the language's
+  texts (its catalog) over its screenshots, `<out-dir>/<language>/tour.mp4`
+  (1280×720), the home page's video in that language; English keeps
+  `images/video/playguard-tour.mp4`. A few minutes each: main renders them,
+  a pull request takes main's.
 - **The site's address**: `SITE_URL` (`https://jigsawfr.github.io/PlayGuard/`
   by default). CI asks GitHub Pages for it (its custom domain, when it has
   one) and adds a preview's folder; `SITE_BASE` is its path, for 404.html;
