@@ -97,6 +97,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 - Ⓐ on a game: its last seven days as bars, launches, first and last play, time per user account. Deleted games keep their all-time figures, even one deleted before PlayGuard was installed as long as the console's play log still names it, and their name once PlayGuard has seen it (else *Deleted game* and its title ID).
 - **Time on no account and new accounts:** a game's time that no user account holds (some games never ask for one, or the account was deleted since) shows as *No account*, from a minute up; a user account PlayGuard never saw before is flagged in amber under *Account* for 30 days (*New account since …*, a fresh account is a known way to start over) and recorded in the change history; the accounts there when PlayGuard first lists them are not flagged.
 - **Export to the SD card** as CSV, JSON, XLSX (Excel) or PDF, one column per day, then the last 7 days, the last 30 days and all time.
+- **The week's summary as a QR code:** a phone's camera reads it as a few lines of text, in the language shown — the last 7 days and their average, the trend, each day, the three games most played, the sessions, the longest one and the time played between 21:00 and 06:00. Nothing goes online.
 - Opens at once on the last figures read (kept on the SD card between runs), refreshed in the background when over a minute old; Ⓧ reads them again now, with a spinner.
 - Times are approximate if the console clock was changed.
 

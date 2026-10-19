@@ -8,6 +8,7 @@
 #include "action/export_flow.hpp"
 #include "action/outside_watch.hpp"
 #include "action/play_data.hpp"
+#include "action/week_qr.hpp"
 #include "activity/games_activity.hpp"
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
@@ -138,6 +139,12 @@ ActivityTab::ActivityTab()
     });
     export_cell->registerClickAction([this](brls::View*) {
         this->export_to_sd();
+        return true;
+    });
+    qr->setDetailText(ui::opens());
+    qr->registerClickAction([](brls::View*) {
+        if (const auto data = shown_stats()) week_qr::show(*data, account_label(chosen_account()));
+        else ui::notify("playguard/activity/export_not_ready"_i18n);
         return true;
     });
     this->period = config::get().activity_period;

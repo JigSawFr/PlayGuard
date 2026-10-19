@@ -467,7 +467,10 @@
             "late": "Gespielt zwischen 21:00 und 06:00"
         },
         "rating": "Alterseinstufung",
-        "rating_blocked": "{} · auf der aktuellen Stufe blockiert"
+        "rating_blocked": "{} · auf der aktuellen Stufe blockiert",
+        "qr": "Wochenübersicht als QR-Code",
+        "qr_body": "Mit der Kamera eines Smartphones scannen: Die letzten 7 Tage erscheinen als Text. Nichts geht ins Internet.",
+        "qr_days": "Jeder Tag"
     },
     "library": {
         "title": "Spiele",

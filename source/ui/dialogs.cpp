@@ -248,6 +248,20 @@ void qr_dialog(const std::string& body, const std::string& url)
     dialog->open();
 }
 
+void qr_text_dialog(const std::string& body, const std::string& text)
+{
+    auto* box = new brls::Box(brls::Axis::COLUMN);
+    box->setAlignItems(brls::AlignItems::CENTER);
+    box->setPadding(20, 32, 16, 32);
+    box->addView(centered_label(body, 20, color_text()));
+    auto* qr = new QrView(text, 400);
+    qr->setMarginTop(12);
+    box->addView(qr);
+    auto* dialog = new brls::Dialog(box);
+    dialog->addButton("hints/ok"_i18n, []() {});
+    dialog->open();
+}
+
 // borealis' Dropdown with the row `checked` (−1: none) checked and the
 // focus on `focus`; in the Cadran look, a card and its rows (cadran_modal).
 class Picker : public brls::Dropdown

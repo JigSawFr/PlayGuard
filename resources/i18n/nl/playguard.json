@@ -467,7 +467,10 @@
             "late": "Gespeeld tussen 21:00 en 06:00"
         },
         "rating": "Leeftijdsclassificatie",
-        "rating_blocked": "{} · geblokkeerd op het huidige niveau"
+        "rating_blocked": "{} · geblokkeerd op het huidige niveau",
+        "qr": "Weekoverzicht als QR-code",
+        "qr_body": "Scan hem met de camera van een telefoon: de afgelopen 7 dagen verschijnen als tekst. Er gaat niets online.",
+        "qr_days": "Per dag"
     },
     "library": {
         "title": "Games",

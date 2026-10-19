@@ -139,6 +139,9 @@ void info(const std::string& body);
 // A web page to open on a phone: `body`, the QR code of `url`, then `url`
 // itself, shortened (text::short_url), and OK.
 void qr_dialog(const std::string& body, const std::string& url);
+// The same for a text to read on a phone (not a link): larger, without the
+// line under the code.
+void qr_text_dialog(const std::string& body, const std::string& text);
 
 // Reads the stored PIN (pctl_get_pin) and shows it in large digits, or a
 // dialog with the error. The app's copies are wiped as soon as the label

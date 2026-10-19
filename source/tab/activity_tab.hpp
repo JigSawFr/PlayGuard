@@ -104,6 +104,7 @@ class ActivityTab : public TabBase
     BRLS_BIND(brls::DetailCell, late,        "ac_late");
     BRLS_BIND(brls::DetailCell, games,       "ac_games");
     BRLS_BIND(brls::DetailCell, export_cell, "ac_export");
+    BRLS_BIND(brls::DetailCell, qr,          "ac_qr");
     BRLS_BIND(brls::Box,        progress,    "ac_progress");
     BRLS_BIND(brls::Label,      capped,      "ac_capped");
     BRLS_BIND(brls::Label,      status,      "ac_status");

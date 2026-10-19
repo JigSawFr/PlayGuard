@@ -467,7 +467,10 @@
             "late": "Giocato tra le 21:00 e le 06:00"
         },
         "rating": "Classificazione per età",
-        "rating_blocked": "{} · bloccato al livello attuale"
+        "rating_blocked": "{} · bloccato al livello attuale",
+        "qr": "Riepilogo della settimana come codice QR",
+        "qr_body": "Inquadralo con la fotocamera di un telefono: gli ultimi 7 giorni appaiono come testo. Niente passa da Internet.",
+        "qr_days": "Ogni giorno"
     },
     "library": {
         "title": "Giochi",

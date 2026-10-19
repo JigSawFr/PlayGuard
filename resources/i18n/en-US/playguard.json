@@ -467,7 +467,10 @@
             "late": "Played from 21:00 to 06:00"
         },
         "rating": "Age rating",
-        "rating_blocked": "{} · blocked at the current level"
+        "rating_blocked": "{} · blocked at the current level",
+        "qr": "The week's summary as a QR code",
+        "qr_body": "Scan it with a phone's camera: the last 7 days appear as text. Nothing goes online.",
+        "qr_days": "Each day"
     },
     "library": {
         "title": "Games",

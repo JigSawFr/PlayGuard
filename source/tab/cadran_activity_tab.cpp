@@ -53,7 +53,7 @@ CadranActivityTab::CadranActivityTab()
     brls::Box* column = this->list.content();
     column->addView(brls::View::createFromXMLResource("view/cadran_activity.xml"), 0);
     this->list.park({ "ac_account", "ac_today", "ac_week", "ac_total", "ac_period", "ac_export" });
-    this->list.apply({ { "ac_account_default", "user" }, { "ac_games", "list" } });
+    this->list.apply({ { "ac_account_default", "user" }, { "ac_games", "list" }, { "ac_qr", "phone" } });
 
     // The game cards, built once, two rows of two; filled by show_hero().
     brls::Box* row = nullptr;
