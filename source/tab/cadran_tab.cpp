@@ -731,9 +731,11 @@ void CadranTab::show_next(bool unlocked)
     pt_logic::NextStop n;
     bool with_extra = false;
     int left = -1, now_min = 0;
+    bool no_limit = false;
     // Unlocked, or the timer off: nothing stops play.
     if (!unlocked && pt.fw_supported && pt.valid && pt.enabled_valid && pt.enabled) {
         const uint16_t limit = pt.day_min[today];
+        no_limit = limit == PT_DAY_NOLIMIT;
         const int over = pt_logic::over_limit_min(pt, today);
         if (limit != PT_DAY_NOLIMIT && pt.remaining_valid && pt.remaining_ns > 0 && over < 0)
             left = (int)((uint64_t)pt.remaining_ns / 60000000000ULL);
@@ -773,8 +775,11 @@ void CadranTab::show_next(bool unlocked)
         this->next_icon->setIcon(glyph);
     }
     // Before the time up or the bedtime alarm, the rest of the day as a line
-    // in place of the words: now, then each of them that is today's.
-    const bool line = n.kind == pt_logic::NextStop::TIME_UP || n.kind == pt_logic::NextStop::BEDTIME;
+    // in place of the words: now, then each of them that is today's. Its
+    // teal says play is allowed until then: not once the day's time is
+    // spent (a warning only, no play today), where the words stay.
+    const bool line = n.kind == pt_logic::NextStop::TIME_UP ||
+                      (n.kind == pt_logic::NextStop::BEDTIME && (no_limit || left >= 0));
     if (line) {
         const PtBedtime& bed = pt.bed[today];
         const int start = bed.hour * 60 + bed.minute, end = bed.end_hour * 60 + bed.end_minute;
