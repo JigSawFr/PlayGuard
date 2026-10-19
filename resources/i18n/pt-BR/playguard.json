@@ -868,7 +868,7 @@
             "needs_verify": {
                 "short": "Dados corrompidos",
                 "cause": "O console encontrou dados corrompidos neste jogo e pede para verificá-los.",
-                "fix": "Verifique os dados (primeiro botão): o PlayGuard guarda o resultado. Intactos, o jogo sai da lista; danificados, vai para Reinstalar."
+                "fix": "Verifique os dados (primeiro botão): o PlayGuard salva o resultado. Intactos, o jogo sai da lista; danificados, vai para Reinstalar."
             },
             "key_too_new": {
                 "short": "Chaves novas demais",
@@ -935,13 +935,13 @@
         "verify_code": "Código do console: {}",
         "groups": {
             "fix": "Reparáveis aqui ({})",
-            "verify": "A verificar ({})",
+            "verify": "Para verificar ({})",
             "reinstall": "Reinstalar ({})",
             "system": "Firmware ou cartão SD ({})"
         },
         "group_note": {
             "fix": "O PlayGuard pode repará-los: A em um jogo e depois o primeiro botão.",
-            "verify": "O console suspeita dos dados. A verificação lê cada arquivo e diz se é preciso reinstalar o jogo; o PlayGuard guarda o resultado.",
+            "verify": "O console suspeita dos dados. A verificação lê cada arquivo e diz se é preciso reinstalar o jogo; o PlayGuard salva o resultado.",
             "reinstall": "Os arquivos estão faltando ou inutilizáveis. Salve a lista, remova-os aqui (até lá um instalador os considera instalados) e reinstale-os buscando pelo nome.",
             "system": "Os jogos estão bem: o problema é o firmware do console ou o cartão SD. Atualize o firmware ou inicie na memória em que foram instalados."
         },
@@ -1130,7 +1130,7 @@
         "size_mb": "{} MB",
         "pt_log_on": "Registrando a cada 30 s em {}",
         "frame_stats": "Estatísticas de imagem",
-        "frame_stats_note": "Uma linha por segundo enquanto o PlayGuard está aberto, em logs/frame_stats.txt: o modo (TV ou portátil) e o tamanho da imagem, o ecrã mostrado, as imagens por segundo, o tempo de cálculo da interface por imagem (média e máximo, em ms), o intervalo entre duas imagens (média e máximo) e quantas imagens chegaram atrasadas (mais de 20 ms). Para comparar telas, ou o halo de fundo ligado e desligado: deixe cada ecrã 30 s sem tocar em nada, em modo TV e depois portátil. O ficheiro recomeça sempre que isto é ativado.",
+        "frame_stats_note": "Uma linha por segundo enquanto o PlayGuard está aberto, em logs/frame_stats.txt: o modo (TV ou portátil) e o tamanho da imagem, a tela mostrada, as imagens por segundo, o tempo de cálculo da interface por imagem (média e máximo, em ms), o intervalo entre duas imagens (média e máximo) e quantas imagens chegaram atrasadas (mais de 20 ms). Para comparar telas, ou o halo de fundo ligado e desligado: deixe cada tela 30 s sem tocar em nada, em modo TV e depois portátil. O arquivo recomeça sempre que isto é ativado.",
         "frame_stats_on": "Uma linha por segundo em {}",
         "frame_stats_wait": "Primeira linha dentro de um segundo…",
         "gate": "Mostrar de novo a tela de firmware",
@@ -1528,7 +1528,7 @@
             "bed_title": "Alarme de hora de dormir",
             "on": "ativado",
             "bed_sub": "pode voltar a jogar às {}",
-            "pc_title": "Controlo parental",
+            "pc_title": "Controle dos pais",
             "pc_unlocked": "desbloqueado",
             "pin_set": "PIN definido",
             "no_pin": "sem PIN",
@@ -1584,8 +1584,8 @@
             "bed_set": "Definir"
         },
         "pill": {
-            "pc_on": "Controlo parental ativo",
-            "pc_off": "Controlo parental por configurar",
+            "pc_on": "Controle dos pais ativo",
+            "pc_off": "Controle dos pais não configurado",
             "unlocked": "Desbloqueado por agora",
             "timer_on": "Temporizador ativo",
             "timer_off": "Contagem em pausa",
@@ -1610,7 +1610,7 @@
             "weekend": "copiar para sáb · dom",
             "none": "sem limite",
             "first_change": "{} {} → {}",
-            "no_changes": "Sem alterações pendentes · + guarda",
+            "no_changes": "Sem alterações pendentes · + salva",
             "discard": "Descartar",
             "remove": "Remover o limite",
             "save_title": "Salvar os limites da semana?",
@@ -1651,25 +1651,25 @@
             "games_none": "Jogos bloqueados · nenhum"
         },
         "clock": {
-            "console": "Consola",
+            "console": "Console",
             "network": "Rede · usada pelo temporizador",
             "accurate": "exato",
             "inaccurate": "inexato · acerte-o abaixo"
         },
         "about": {
-            "tagline": "Controlo parental para Nintendo Switch · software livre (GPLv3)",
+            "tagline": "Controle dos pais para Nintendo Switch · software livre (GPLv3)",
             "version": "Versão {}"
         },
         "child": {
-            "header": "Ecrã da criança · PIN para voltar",
+            "header": "Tela da criança · PIN para voltar",
             "title": "Hoje ainda tens",
             "bed": "Para a cama às",
-            "stops": "A consola para sozinha quando o tempo acabar",
-            "warns": "A consola avisa quando o tempo acabar",
+            "stops": "O console para sozinho quando o tempo acabar",
+            "warns": "O console avisa quando o tempo acabar",
             "enjoy": "Diverte-te!",
             "of": "de {}",
             "back": "Voltar ao adulto · PIN",
-            "play": "Entregar a consola e jogar",
+            "play": "Entregar o console e jogar",
             "on_hold": "limite em pausa",
             "end": "Termina por volta das {}",
             "extra": "Tempo extra",
