@@ -5,6 +5,7 @@
 
 #include "action/frame_stats_flow.hpp"
 #include "action/pin_lock.hpp"
+#include "action/pt_logic.hpp"
 #include "activity/main_activity.hpp"
 #include "tab/cadran_tab.hpp"
 #include "ui/ui.hpp"
@@ -101,12 +102,13 @@ void CadranChildActivity::refresh()
     ring->setFraction(frac);
     ring->setValue(left);
     ring->setCaption(caption);
-    // When it ends, by the clock; amber and the ring beating near the end.
+    // When it ends, by the clock, as Today says it (not after the bedtime
+    // alarm: its chip says when); amber and the ring beating near the end.
     const LocalTime now = ui::local_now();
-    const int end = now.hour * 60 + now.minute + left_min;
-    const bool ending = left_min >= 0 && end < 24 * 60;
-    const bool last = ending && left_min <= LAST_MINUTES;
-    if (ending) ui::set_text(end_text, brls::getStr("playguard/cadran/child/end", fmt::format("{:02d}:{:02d}", end / 60, end % 60)));
+    const pt_logic::NextStop n = pt_logic::next_stop(now.hour * 60 + now.minute, left_min, pt.bed[today]);
+    const bool ending = n.kind == pt_logic::NextStop::TIME_UP;
+    const bool last = ending && n.in <= LAST_MINUTES;
+    if (ending) ui::set_text(end_text, brls::getStr("playguard/cadran/child/end", fmt::format("{:02d}:{:02d}", n.at / 60, n.at % 60)));
     brls::Theme theme = brls::Application::getTheme();
     end_icon->setColor(theme[last ? "cadran/amber" : "cadran/teal"]);
     end_text->setTextColor(theme[last ? "cadran/amber" : "cadran/text"]);
