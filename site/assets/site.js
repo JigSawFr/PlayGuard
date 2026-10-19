@@ -19,6 +19,32 @@
   theme.addEventListener('change', () => { store.set('pg-theme', theme.value); show(); });
   dark.addEventListener('change', show);
 
+  // The home page's tour: it plays by itself unless the visitor asked for
+  // less motion or less data, or is on a phone; the button plays or pauses it.
+  const video = document.querySelector('.hero-video video');
+  const toggle = document.querySelector('.video-toggle');
+  if (video && toggle) {
+    const label = () => {
+      toggle.classList.toggle('playing', !video.paused);
+      toggle.setAttribute('aria-label', video.paused ? toggle.dataset.play : toggle.dataset.pause);
+    };
+    video.addEventListener('play', label);
+    video.addEventListener('pause', label);
+    toggle.addEventListener('click', () => { if (video.paused) video.play().catch(() => {}); else video.pause(); });
+    toggle.hidden = false;
+    label();
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData
+      || matchMedia('(max-width: 860px)').matches;
+    if (!still) video.play().catch(() => {});
+  }
+
+  // On a phone, the documentation's pages are a row to scroll: this one in view.
+  const current = document.querySelector('.doc-nav [aria-current]');
+  const pages = current?.closest('.doc-list');
+  if (pages && pages.scrollWidth > pages.clientWidth) {
+    pages.scrollLeft = current.offsetLeft - (pages.clientWidth - current.offsetWidth) / 2;
+  }
+
   const language = document.getElementById('site-language');
   language.addEventListener('change', () => {
     store.set('pg-site-lang', language.selectedOptions[0].dataset.lang);
