@@ -78,11 +78,18 @@
         <p class="keys" data-i18n-html="keys"></p>
         <div class="control-actions">
           <button type="button" class="btn ghost" id="pad-toggle" aria-pressed="false" data-i18n="pad">Pad</button>
-          <button type="button" class="btn ghost" id="shot" data-i18n="screenshot">Screenshot</button>
-          <button type="button" class="btn ghost" id="record" aria-pressed="false" data-i18n="record" hidden>Record</button>
-          <button type="button" class="btn ghost" id="steps-copy" data-i18n="steps_copy" data-i18n-title="steps_help">Steps link</button>
-          <button type="button" class="btn ghost" id="tour" data-i18n="tour">Tour</button>
-          <button type="button" class="btn ghost" id="report" data-i18n="report">Report a problem</button>
+          <!-- The tools: in a row on a large screen, behind a button on a phone
+               (simulator.js opens it where there is room). -->
+          <details class="tools" id="tools">
+            <summary class="btn ghost" data-i18n="tools">Tools</summary>
+            <div class="tool-list">
+              <button type="button" class="btn ghost" id="shot" data-i18n="screenshot">Screenshot</button>
+              <button type="button" class="btn ghost" id="record" aria-pressed="false" data-i18n="record" hidden>Record</button>
+              <button type="button" class="btn ghost" id="steps-copy" data-i18n="steps_copy" data-i18n-title="steps_help">Steps link</button>
+              <button type="button" class="btn ghost" id="tour" data-i18n="tour">Tour</button>
+              <button type="button" class="btn ghost" id="report" data-i18n="report">Report a problem</button>
+            </div>
+          </details>
         </div>
       </div>
 

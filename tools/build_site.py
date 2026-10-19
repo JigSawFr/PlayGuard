@@ -29,6 +29,7 @@ languages, English at the root and the others in /<language>/.
 
 Usage: tools/build_site.py <out-dir> [repo-root]          (needs Python-Markdown)
 """
+import gzip
 import hashlib
 import html
 import json
@@ -48,6 +49,9 @@ SITE_URL = os.environ.get("SITE_URL", "https://playguard.link/").rstrip("/") + "
 NOINDEX = os.environ.get("SITE_NOINDEX") == "1"
 # The screenshots of tools/site_screenshots.mjs: <folder>/<language>/<screen>.webp.
 SCREENSHOT_DIR = os.environ.get("SITE_SCREENSHOTS", "")
+# The built simulator (CI's build-web/simulator), to say on its buttons how
+# much it downloads; none for a local build.
+SIMULATOR_DIR = os.environ.get("SITE_SIMULATOR", "")
 # The documentation's "Try it in the simulator" links (main's simulator, as
 # GitHub shows them): the site's own simulator on the site, in its language.
 SIMULATOR_URL = "https://playguard.link/simulator/"
@@ -469,6 +473,8 @@ def home_body(t, lang, to_root):
         f'          <tr><th scope="row">{t(f"compare_{row}")}</th>{mark(t, pg)}{mark(t, not pg)}</tr>'
         for row, pg in (("phone", True), ("account", True), ("internet", True), ("cfw", False)))
     version, date, _ = changelog_releases()[0]
+    weight = simulator_size()
+    size = f' <span class="size" data-bytes="{weight}"></span>' if weight else ""
     shots = "\n".join(
         f'      <figure><a href="{to_root}assets/{screenshot(lang, s)}">{gallery_image(t, lang, to_root, s)}</a>'
         f'<figcaption>{t(f"shot_{s}")}</figcaption></figure>'
@@ -486,10 +492,10 @@ def home_body(t, lang, to_root):
         <p>{t('hero_text')}</p>
         <div class="actions">
           <a class="button primary" href="#install">{t('install_cta')}</a>
-          <a class="button" href="{to_root}simulator/?lang={code}">{t('try')}</a>
+          <a class="button" href="{to_root}simulator/?lang={code}">{t('try')}{size}</a>
         </div>
         <p class="source"><a href="{REPO_URL}/releases/latest">{t('download')}</a>
-          · <time class="release-date" datetime="{date}">{date}</time></p>
+          · <a href="{home}changelog/#v{version}"><time class="release-date" datetime="{date}">{date}</time></a></p>
         <p class="source"><a href="{home}docs/troubleshooting/#{locked_out_anchor(lang)}">{t('locked_out_link')}</a></p>
       </div>
       <div class="hero-video">
@@ -536,17 +542,29 @@ def home_body(t, lang, to_root):
         <h2>{t('simulator_title')}</h2>
         <p>{t('simulator_text')}</p>
       </div>
-      <a class="button primary" href="{to_root}simulator/?lang={code}">{t('simulator_button')}</a>
+      <a class="button primary" href="{to_root}simulator/?lang={code}">{t('simulator_button')}{size}</a>
     </section>
 
     <section id="install" class="section columns">
       <div>
         <h2>{t('install_title')}</h2>
-        <ol class="steps">
-          <li>{t('install_1')}</li>
-          <li>{t('install_2')} <a href="{REPO_URL}/releases/latest">{t('download')}</a></li>
-          <li>{t('install_3')}</li>
-        </ol>
+        <!-- One way or the other: tabs (site.js), else both under their names. -->
+        <div class="tabs">
+          <div class="tab-panel" id="install-store">
+            <h3 class="tab-title">{t('tab_store')}</h3>
+            <ol class="steps">
+              <li>{t('install_1')}</li>
+              <li>{t('install_3')}</li>
+            </ol>
+          </div>
+          <div class="tab-panel" id="install-manual">
+            <h3 class="tab-title">{t('tab_manual')}</h3>
+            <ol class="steps">
+              <li>{t('install_2')} <a href="{REPO_URL}/releases/latest">{t('download')}</a></li>
+              <li>{t('install_3')}</li>
+            </ol>
+          </div>
+        </div>
       </div>
       <div>
         <h2>{t('start_title')}</h2>
@@ -600,6 +618,21 @@ def compat_check(t):
             f'<label for="compat-fw">{t("compat_field")}</label>'
             f'<input id="compat-fw" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="{high}">'
             f'<p class="compat-result" aria-live="polite"></p></div>\n')
+
+
+def simulator_size():
+    """What a first visit to the simulator downloads, compressed as GitHub
+    Pages sends it (bytes; 0 without a built simulator): PlayGuard, its data
+    and its script. The CJK font, for Japanese, Korean and Chinese only, is not
+    counted."""
+    total = 0
+    for name in ("playguard.wasm", "playguard.data", "playguard.js"):
+        path = os.path.join(SIMULATOR_DIR, name)
+        if not SIMULATOR_DIR or not os.path.isfile(path):
+            return 0
+        with open(path, "rb") as f:
+            total += len(gzip.compress(f.read(), 6))
+    return total
 
 
 def mark(t, yes):

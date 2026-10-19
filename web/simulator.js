@@ -548,6 +548,19 @@ function setUpKeys() {
   });
 }
 
+// The tools under the screen: in a row where there is room, behind a
+// button on a phone (closed again once one is used).
+function setUpTools() {
+  const tools = $('tools');
+  const narrow = matchMedia('(max-width: 600px)');
+  const fit = () => { tools.open = !narrow.matches; };
+  fit();
+  narrow.addEventListener('change', fit);
+  tools.querySelector('.tool-list').addEventListener('click', (e) => {
+    if (narrow.matches && e.target.closest('button')) tools.open = false;
+  });
+}
+
 function setUpPad() {
   for (const button of $('pad').querySelectorAll('[data-button]')) {
     const code = Number(button.dataset.button);
@@ -927,12 +940,40 @@ async function main() {
   setUpPanel();
   setUpKeys();
   setUpPad();
+  setUpTools();
   buildPresets();
   buildForm(current);
   setUpTime();
   version = await build;
-  start();
+  if (await saveData()) waitForTap();
+  else start();
   showTheme();
+}
+
+// Data saver on (navigator.connection.saveData, where the browser says so)
+// and PlayGuard not kept yet by the service worker: a few megabytes to
+// download, so on a touch, not by itself.
+async function saveData() {
+  if (!navigator.connection?.saveData) return false;
+  try {
+    const kept = await (await caches.open('playguard-simulator')).keys();
+    return !kept.some((r) => r.url.includes('playguard.wasm'));
+  } catch {
+    return true;
+  }
+}
+
+function waitForTap() {
+  const overlay = $('overlay');
+  overlay.classList.add('waiting');
+  showStatus(t('save_data'));
+  const button = el('button', { type: 'button', class: 'btn primary', text: t('start') });
+  button.addEventListener('click', () => {
+    button.remove();
+    overlay.classList.remove('waiting');
+    start();
+  });
+  overlay.append(button);
 }
 
 document.body.dataset.playguard = 'loading';
