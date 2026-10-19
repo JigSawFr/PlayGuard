@@ -323,3 +323,55 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
   .notice { max-width: none; }
   .panel-actions { position: sticky; bottom: 0; background: var(--surface); }
 }
+
+/* A narrow screen: the name and the settings' button on a row, the menus
+   on the next one, sharing it. */
+@media (max-width: 600px) {
+  .header-settings { order: 3; flex-basis: 100%; margin-left: 0; }
+  .header-settings label { flex: 1; min-width: 0; }
+  .header-settings select { width: 100%; }
+  .panel-toggle { margin-left: auto; }
+}
+
+/* A touch screen (a phone, a tablet). */
+@media (pointer: coarse) {
+  /* 16px: iOS zooms into a smaller field when it is touched. */
+  input:not([type="checkbox"]), select, textarea, .header-settings select { font-size: 16px; }
+  /* The pad right under the screen, the time and the tools after it. */
+  .pad { order: 1; }
+  .time { order: 2; }
+  .controls { order: 3; }
+}
+
+/* A phone in landscape: the screen as high as it can be, the pad on either
+   side of it as on a Switch (the shoulders and − / + above and under its
+   stick and buttons); the rest under it. */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 540px) {
+  html, body { height: auto; }
+  .top { padding: 4px 12px; flex-wrap: nowrap; }
+  .brand .tag, .build { display: none; }
+  .layout { display: block; }
+  .stage {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr) 140px;
+    grid-template-areas: "lsh screen rsh" "dpad screen face" "lmid screen rmid";
+    align-items: center;
+    gap: 8px 12px;
+    padding: 8px 12px;
+    overflow: visible;
+  }
+  .stage:has(> .pad[hidden]) { grid-template-columns: 0 minmax(0, 1fr) 0; column-gap: 0; }
+  .screen { grid-area: screen; width: 100%; max-width: calc((100dvh - 76px) * 16 / 9); padding: 6px; border-radius: 10px; }
+  .overlay { inset: 6px; }
+  .stage > .notice, .stage > .controls, .stage > .time { grid-column: 1 / -1; max-width: none; }
+  .pad, .pad-row { display: contents; }
+  .dpad, .face { grid-template: repeat(3, 44px) / repeat(3, 44px); }
+  .dpad { grid-area: dpad; }
+  .face { grid-area: face; }
+  .pad [data-button="0"] { grid-area: lsh; justify-self: start; }
+  .pad [data-button="1"] { grid-area: lsh; justify-self: end; }
+  .pad [data-button="15"] { grid-area: rsh; justify-self: start; }
+  .pad [data-button="16"] { grid-area: rsh; justify-self: end; }
+  .pad [data-button="7"] { grid-area: lmid; justify-self: center; }
+  .pad [data-button="9"] { grid-area: rmid; justify-self: center; }
+}

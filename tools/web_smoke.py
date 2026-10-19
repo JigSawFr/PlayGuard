@@ -21,6 +21,9 @@ when what the page does while PlayGuard runs does not work:
 - the CJK font: waited for in Japanese, added after the start in English;
 - keep=1: the simulated console's settings file is still there after a
   reload;
+- on a phone (an iPhone, touch): the pad under the screen in portrait, on
+  either side of it in landscape, everything on the screen, no field iOS
+  zooms into (under 16px);
 - the service worker (web/sw.js), served without the headers as GitHub Pages
   does: it makes the page cross-origin isolated, keeps PlayGuard's files, and
   the simulator starts offline.
@@ -204,7 +207,7 @@ def run(fn):
     with sync_playwright() as p:
         browsers = []
 
-        def new_page():
+        def new_page(**options):
             while browsers:
                 browsers.pop().close()
             browser = p.chromium.launch(
@@ -214,7 +217,8 @@ def run(fn):
             browsers.append(browser)
             # The page allows no eval (its Content-Security-Policy); the test's
             # own wait_for_function needs one.
-            context = browser.new_context(viewport={"width": 1600, "height": 1000}, locale="en-US", bypass_csp=True)
+            context = browser.new_context(**{"viewport": {"width": 1600, "height": 1000}, "locale": "en-US",
+                                             "bypass_csp": True, **options})
             page = context.new_page()
             page.on("pageerror", lambda e: errors.append(str(e)))
             return page
@@ -387,6 +391,47 @@ def keep(new_page):
                 fail("keep: sim_console.bin is not there after a reload")
             else:
                 print("ok   keep")
+
+
+# On a phone: the page laid out for a finger, in portrait and in landscape
+# (web/simulator.css), the pad shown by default on a touch screen.
+LAYOUT = """() => {
+  const box = (s) => { const r = document.querySelector(s).getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom]; };
+  const small = [...document.querySelectorAll('input, select, textarea')]
+    .filter((e) => e.type !== 'checkbox' && e.offsetParent && parseFloat(getComputedStyle(e).fontSize) < 16)
+    .map((e) => e.id || e.name || e.tagName);
+  return { wide: document.documentElement.scrollWidth > innerWidth + 1, small, screen: box('.screen'),
+           dpad: box('.dpad'), face: box('.face'), time: box('.time'), shown: !document.querySelector('#pad').hidden };
+}"""
+
+
+@scenario
+def phone(new_page):
+    page = new_page(viewport={"width": 402, "height": 874}, is_mobile=True, has_touch=True)
+    if not open_page(page, FIXED, "phone"):
+        return
+    m = page.evaluate(LAYOUT)
+    if not m["shown"]:
+        return fail("phone: no pad on a touch screen")
+    problems = []
+    if m["wide"]:
+        problems.append("portrait: wider than the screen")
+    if m["small"]:
+        problems.append(f"fields under 16px (iOS zooms into them): {', '.join(m['small'])}")
+    if not m["screen"][3] <= m["dpad"][1] < m["time"][1]:
+        problems.append("portrait: the pad is not right under the screen")
+    page.set_viewport_size({"width": 874, "height": 402})
+    m = page.evaluate(LAYOUT)
+    if m["wide"]:
+        problems.append("landscape: wider than the screen")
+    if not (m["dpad"][2] <= m["screen"][0] and m["face"][0] >= m["screen"][2]):
+        problems.append("landscape: the pad is not on either side of the screen")
+    if max(m["screen"][3], m["dpad"][3], m["face"][3]) > 402:
+        problems.append("landscape: the screen or the pad below the screen's bottom")
+    for p in problems:
+        fail(f"phone: {p}")
+    if not problems:
+        print("ok   phone: portrait and landscape")
 
 
 # The service worker, as on GitHub Pages: no headers from the server.

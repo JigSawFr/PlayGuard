@@ -62,7 +62,10 @@ a screen without a build on the console.
   page presses the other buttons by what the key says, on any layout: X, Y,
   L, R, Shift+L (ZL), Shift+R (ZR), + or P, − or M, Backspace (Ⓑ). A click is
   a touch. **Pad** shows an on-screen controller (shown by default on a touch
-  screen). A gamepad works through the browser.
+  screen): right under the screen on a phone in portrait, on either side of it
+  in landscape, as on a Switch. A gamepad works through the browser. On a
+  touch screen the fields are 16px, so that iOS does not zoom into them, and an
+  iPhone's home screen takes `apple-touch-icon.png`.
 - **Screenshot** saves the screen as it is (1280×720); **Record** saves a
   video of it (WebM) until **Stop**; **Log** shows what PlayGuard logs.
 - **Steps**: from the first screen on, the page notes each button pressed
