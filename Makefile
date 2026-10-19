@@ -3,6 +3,8 @@
 #   make              -> ./playguard.nro            (needs devkitPro, DEVKITPRO set)
 #   make dist         -> ./playguard.zip            (unzip onto the SD card root)
 #   make desktop      -> ./build-desktop/playguard  (UI with a simulated backend; needs GLFW)
+#   make web          -> ./build-web/simulator/          (the same in a browser; needs Emscripten's emcmake)
+#   make web-serve    -> serves it at http://localhost:8000 (with the headers its threads need)
 #   make test         -> host unit tests (plain gcc/g++, ASan + UBSan; parallel, all suites)
 #   make fuzz         -> libFuzzer runs of the parsers (clang; FUZZ_SECONDS=30 each, parallel)
 #   make nxlink       -> push to a Switch running hbmenu (press Y there first)
@@ -22,6 +24,7 @@
 TARGET  := playguard
 BUILD   := build
 DESKTOP := build-desktop
+WEB     := build-web
 CC      ?= gcc
 CXX     ?= g++
 TESTOUT := $(BUILD)/host-tests
@@ -38,7 +41,7 @@ ZIP_TREE = find . -exec touch -h -d @$(SOURCE_DATE_EPOCH) {} + && find . -mindep
 CMAKE_ARGS ?=
 JSON_HPP := extern/borealis/library/include/borealis/extern/nlohmann/json.hpp
 
-.PHONY: all clean dist nxlink desktop test fuzz check rescue dist-rescue FORCE
+.PHONY: all clean dist nxlink desktop web web-serve test fuzz check rescue dist-rescue FORCE
 
 RENDERER := $(if $(GL),-DUSE_DEKO3D=OFF,-DUSE_DEKO3D=ON)
 
@@ -84,6 +87,15 @@ dist-rescue: rescue
 desktop:
 	@cmake -B $(DESKTOP) -S . -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release $(CMAKE_ARGS)
 	@cmake --build $(DESKTOP) -j $(JOBS)
+
+# The web simulator (web/README.md). cmake found by the shell: emsdk_env.sh
+# puts Emscripten's folder on the PATH, whose cmake/ folder make would run.
+web:
+	@emcmake cmake -B $(WEB) -S . -DCMAKE_BUILD_TYPE=Release $(CMAKE_ARGS)
+	@"$$(command -v cmake)" --build $(WEB) -j $(JOBS)
+
+web-serve: web
+	@python3 web/serve.py $(WEB)/simulator 8000
 
 # Host tests: one program per suite, built straight from its sources (no
 # object files, so gcov's .gcno/.gcda sit next to the program in
@@ -306,7 +318,7 @@ check: test
 
 clean:
 	@echo clean ...
-	@rm -rf $(BUILD) $(DESKTOP) out out-rescue $(TARGET).zip playguard-rescue.zip $(TARGET).nro $(TARGET).nacp $(TARGET).elf
+	@rm -rf $(BUILD) $(DESKTOP) $(WEB) out out-rescue $(TARGET).zip playguard-rescue.zip $(TARGET).nro $(TARGET).nacp $(TARGET).elf
 	@$(MAKE) --no-print-directory -C sysmodule clean 2>/dev/null || true
 
 nxlink: all

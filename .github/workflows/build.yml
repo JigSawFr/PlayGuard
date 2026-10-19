@@ -117,7 +117,7 @@ jobs:
       - name: Test summary
         if: always()
         run: python3 tools/ci_summary.py host-tests build/host-tests --compiler "gcc $(gcc -dumpfullversion)" --flags "ASan + UBSan" >> "$GITHUB_STEP_SUMMARY"
-      - name: Resources (i18n keys, translations, XML layouts), compat.json generator, Python tools
+      - name: Resources (i18n keys, translations, XML layouts), the web simulator's settings, compat.json generator, Python tools
         run: |
           status=0
           # check <label> <command...>: runs it; its last line goes to the summary.
@@ -129,6 +129,7 @@ jobs:
             echo "$mark **$label**${last:+ — $last}" >> "$GITHUB_STEP_SUMMARY"
           }
           check "Resources (i18n keys, translations, XML layouts)" python3 tools/check_resources.py .
+          check "Web simulator's settings (every PLAYGUARD_SIM_* variable)" python3 tools/check_web_params.py .
           check "compat.json generator" python3 tools/gen_compat.py . build/compat.json
           check "Python tools compile" python3 -m py_compile tools/*.py
           exit $status

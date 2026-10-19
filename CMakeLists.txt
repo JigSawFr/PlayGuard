@@ -9,6 +9,23 @@ set(BOREALIS_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/extern/borealis/library)
 # Declared before borealis' options so this default wins; ignored on desktop.
 option(USE_DEKO3D "Switch: draw with deko3d instead of OpenGL (mesa)" ON)
 
+# The web simulator (web/README.md): the desktop build, compiled by
+# Emscripten for a browser, with SDL2 and OpenGL ES 3 (WebGL 2) from
+# Emscripten's own ports instead of GLFW and the system's OpenGL. Its
+# toolchain file (emcmake) is only read by project(), below.
+set(PLAYGUARD_WEB OFF)
+if (CMAKE_TOOLCHAIN_FILE MATCHES "Emscripten\\.cmake$")
+    set(PLAYGUARD_WEB ON)
+endif ()
+if (PLAYGUARD_WEB)
+    set(PLATFORM_DESKTOP ON CACHE BOOL "" FORCE)
+    set(USE_SDL2 ON CACHE BOOL "" FORCE)
+    set(USE_SYSTEM_SDL2 ON CACHE BOOL "" FORCE)
+    set(USE_GLES3 ON CACHE BOOL "" FORCE)
+    set(SDL2_DIR ${CMAKE_CURRENT_SOURCE_DIR}/web/cmake)
+    add_compile_options(-pthread -sUSE_SDL=2 -sUSE_ZLIB=1 -fexceptions)
+endif ()
+
 # PLATFORM_SWITCH / PLATFORM_DESKTOP / USE_DEKO3D … options.
 include(${BOREALIS_LIBRARY}/cmake/commonOption.cmake)
 
@@ -90,7 +107,10 @@ set(CMAKE_C_EXTENSIONS ON)
 
 # On desktop borealis looks for "<BRLS_RESOURCES_DIR>/resources/" at runtime:
 # point it at the merged copy assembled below.
-if (PLATFORM_DESKTOP)
+if (PLAYGUARD_WEB)
+    # Packaged into the page's file system at /app/resources (web/CMakeLists).
+    set(BRLS_RESOURCES_DIR /app)
+elseif (PLATFORM_DESKTOP)
     set(BRLS_RESOURCES_DIR ${CMAKE_BINARY_DIR})
 endif ()
 
@@ -121,6 +141,12 @@ foreach (patch ${PLAYGUARD_BOREALIS_PATCHES})
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${patch})
 endforeach ()
 
+# borealis links stdc++fs under clang, which Emscripten's libc++ has no
+# need of: an empty stand-in.
+if (PLAYGUARD_WEB)
+    add_library(stdc++fs INTERFACE)
+endif ()
+
 add_subdirectory(${BOREALIS_LIBRARY} ${CMAKE_BINARY_DIR}/borealis_library)
 
 find_package(Threads REQUIRED)
@@ -131,6 +157,8 @@ list(APPEND APP_PLATFORM_LIB ${CMAKE_THREAD_LIBS_INIT})
 # own dependencies are listed after it.
 if (PLATFORM_SWITCH)
     list(APPEND APP_PLATFORM_LIB curl z nx)
+elseif (PLAYGUARD_WEB)
+    # No libcurl in a browser: source/sim/web_http.cpp answers offline.
 else ()
     find_package(CURL REQUIRED)
     find_package(ZLIB REQUIRED)   # util/zip_read.cpp (the Switch links z above)
@@ -146,6 +174,11 @@ if (PLATFORM_SWITCH)
     list(APPEND PLAYGUARD_SRC ${BOREALIS_LIBRARY}/lib/platforms/switch/switch_wrapper.c)
 else ()
     list(FILTER PLAYGUARD_SRC EXCLUDE REGEX ".*/source/core/.*\\.c$")
+    if (PLAYGUARD_WEB)
+        list(FILTER PLAYGUARD_SRC EXCLUDE REGEX ".*/source/util/http\\.cpp$")
+    else ()
+        list(FILTER PLAYGUARD_SRC EXCLUDE REGEX ".*/source/sim/web_.*")
+    endif ()
     # The console-free parts are shared with the simulator: one implementation.
     list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/source/core/pure.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/calendar.c
@@ -205,6 +238,21 @@ get_target_property(BOREALIS_INCLUDES borealis INTERFACE_INCLUDE_DIRECTORIES)
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${BOREALIS_INCLUDES})
 # On the Switch: a linker map (build/borealis.map) to see what makes the .nro big.
 target_link_options(${PROJECT_NAME} PRIVATE ${APP_PLATFORM_LINK_OPTION})
+# The web simulator: WebGL 2, threads from a pool started with the page (a
+# thread asked for later waits for the browser, which a busy main thread never
+# lets it have), the resources packaged at /app/resources, and ENV and FS for
+# the page to set the PLAYGUARD_SIM_* variables and write config.json before
+# main() (web/simulator.js).
+if (PLAYGUARD_WEB)
+    target_link_options(${PROJECT_NAME} PRIVATE
+        -pthread -fexceptions -sUSE_SDL=2 -sUSE_ZLIB=1
+        -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sFULL_ES3
+        -sALLOW_MEMORY_GROWTH -sINITIAL_MEMORY=128MB -sSTACK_SIZE=1MB -sDEFAULT_PTHREAD_STACK_SIZE=1MB
+        -sPTHREAD_POOL_SIZE=16
+        -sEXIT_RUNTIME=0
+        -sEXPORTED_RUNTIME_METHODS=ENV,FS
+        --preload-file ${CMAKE_BINARY_DIR}/resources@/app/resources)
+endif ()
 # On the Switch: borealis' userAppInit, which libnx calls before main, timed
 # for the diagnostic report's start-up section (source/core/startup_hook.c).
 if (PLATFORM_SWITCH)
@@ -236,6 +284,36 @@ set(ASSEMBLE_RESOURCES
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_ICON} ${MERGED_RESOURCES}/img/app_icon.jpg)
 
 set(PLAYGUARD_COPY_SHADERS)
+# The web simulator: Japanese, Korean and Chinese drawn with the characters
+# the catalogs use, cut out of Noto Sans CJK (tools/web_cjk_font.py), as the
+# console draws them with its system fonts. Without the font or fontTools, the
+# build goes on and those languages show boxes.
+if (PLAYGUARD_WEB)
+    set(PLAYGUARD_WEB_CJK_FONT "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc" CACHE FILEPATH
+        "Web simulator: Noto Sans CJK (a .ttc) to take the CJK font from")
+    find_package(Python3 COMPONENTS Interpreter)
+    if (Python3_FOUND)
+        execute_process(COMMAND ${Python3_EXECUTABLE} -c "import fontTools" RESULT_VARIABLE PLAYGUARD_NO_FONTTOOLS
+                        OUTPUT_QUIET ERROR_QUIET)
+    endif ()
+    if (Python3_FOUND AND NOT PLAYGUARD_NO_FONTTOOLS AND EXISTS "${PLAYGUARD_WEB_CJK_FONT}")
+        file(GLOB PLAYGUARD_CJK_CATALOGS ${PROJECT_RESOURCES}/i18n/ja/*.json ${PROJECT_RESOURCES}/i18n/ko/*.json
+             ${PROJECT_RESOURCES}/i18n/zh-Hans/*.json ${PROJECT_RESOURCES}/i18n/zh-Hant/*.json)
+        add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/cjk.otf
+            COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/web_cjk_font.py
+                    ${PLAYGUARD_WEB_CJK_FONT} ${CMAKE_BINARY_DIR}/cjk.otf ${CMAKE_CURRENT_SOURCE_DIR}
+            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/web_cjk_font.py ${PLAYGUARD_CJK_CATALOGS}
+            COMMENT "Cutting the web simulator's CJK font out of ${PLAYGUARD_WEB_CJK_FONT}")
+        add_custom_target(${PROJECT_NAME}_cjk DEPENDS ${CMAKE_BINARY_DIR}/cjk.otf)
+        list(APPEND ASSEMBLE_RESOURCES
+             COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/cjk.otf ${MERGED_RESOURCES}/font/cjk.otf)
+        message(STATUS "Web simulator CJK font: from ${PLAYGUARD_WEB_CJK_FONT}")
+    else ()
+        message(WARNING "Web simulator: no CJK font (needs Python 3 with fontTools and ${PLAYGUARD_WEB_CJK_FONT}): "
+                        "Japanese, Korean and Chinese will show boxes")
+    endif ()
+endif ()
+
 if (PLATFORM_SWITCH AND USE_DEKO3D)
     set(PLAYGUARD_COPY_SHADERS COMMAND ${CMAKE_COMMAND} -E copy_directory ${PLAYGUARD_DKSH_DIR} ${MERGED_RESOURCES}/shaders)
 endif ()
@@ -266,4 +344,25 @@ if (PLATFORM_SWITCH)
 else ()
     add_custom_target(${PROJECT_NAME}_resources ALL ${ASSEMBLE_RESOURCES})
     add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_resources)
+    if (TARGET ${PROJECT_NAME}_cjk)
+        add_dependencies(${PROJECT_NAME}_resources ${PROJECT_NAME}_cjk)
+    endif ()
+endif ()
+
+# The web simulator's site, ready to serve (web/README.md): the page from
+# web/, PlayGuard and its packaged resources, in <build>/simulator/.
+if (PLAYGUARD_WEB)
+    set(PLAYGUARD_SITE ${CMAKE_BINARY_DIR}/simulator)
+    add_custom_target(${PROJECT_NAME}_simulator ALL DEPENDS ${PROJECT_NAME}
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${PLAYGUARD_SITE}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${PLAYGUARD_SITE}
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_CURRENT_SOURCE_DIR}/web/index.html ${CMAKE_CURRENT_SOURCE_DIR}/web/simulator.js
+                ${CMAKE_CURRENT_SOURCE_DIR}/web/simulator.css ${CMAKE_CURRENT_SOURCE_DIR}/web/params.json
+                ${CMAKE_CURRENT_SOURCE_DIR}/web/coi-serviceworker.js ${PROJECT_ICON}
+                ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.js ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.wasm
+                ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.data
+                ${PLAYGUARD_SITE}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/web/i18n ${PLAYGUARD_SITE}/i18n
+        COMMENT "Assembling the web simulator's site in ${PLAYGUARD_SITE}")
 endif ()
