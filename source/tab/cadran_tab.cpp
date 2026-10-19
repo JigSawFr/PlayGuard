@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cctype>
+#include <cmath>
 #include <algorithm>
 #include <yoga/Yoga.h>
 #include <cstdlib>
@@ -11,10 +12,12 @@
 #include <vector>
 
 #include "action/clock_flow.hpp"
+#include "action/console_actions.hpp"
 #include "action/nintendo_dns.hpp"
 #include "action/pairing_state.hpp"
 #include "activity/cadran_child_activity.hpp"
 #include "activity/main_activity.hpp"
+#include "action/profile_flow.hpp"
 #include "action/pt_flow.hpp"
 #include "app.hpp"
 #include "action/pt_logic.hpp"
@@ -23,7 +26,9 @@
 #include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/profiles.hpp"
 #include "view/cadran_icon.hpp"
+#include "view/cadran_timeline.hpp"
 #include "view/made_in_france.hpp"
 #include "view/title_state.hpp"
 
@@ -486,12 +491,13 @@ CadranTab::CadranTab()
     column->addView(hero, at);
     YGNodeStyleSetFlexWrap(pills->getYGNode(), YGWrapWrap);
     this->build_outside_card(column, at);
+    this->build_steps_card(column, at);
 
     // The gauge's own words under the ring's title; the timer's warnings with them.
     auto* gauge_text = dynamic_cast<brls::Label*>(this->getView("dash_gauge_text"));
     brls::Box* gauge_box = gauge_text ? gauge_text->getParent() : nullptr;
     int slot = 1;
-    for (const char* id : { "dash_gauge_text", "dash_not_counting", "dash_home_hint" }) {
+    for (const char* id : { "dash_gauge_text", "dash_not_counting" }) {
         auto* text = dynamic_cast<brls::Label*>(this->getView(id));
         if (!text) continue;
         if (text->getParent()) text->getParent()->removeView(text, false);
@@ -518,10 +524,17 @@ CadranTab::CadranTab()
     this->next->addView(this->next_text);
     this->next->setVisibility(brls::Visibility::GONE);
     today_text->addView(this->next, 2);
+    // Or, before the time up or the bedtime alarm, the rest of the day as a line.
+    this->timeline = new CadranTimeline();
+    this->timeline->setAlignSelf(brls::AlignSelf::STRETCH);
+    this->timeline->setMarginTop(14);
+    this->timeline->setMarginBottom(4);
+    this->timeline->setVisibility(brls::Visibility::GONE);
+    today_text->addView(this->timeline, 3);
     this->list.park({ "dash_gauge", "dash_extra", "dash_stop", "dash_remaining", "dash_bedtime", "dash_pc", "dash_pin",
                       "dash_level", "dash_clock", "dash_pairing", "dash_serial", "dash_patches", "dash_fw", "dash_compat",
                       "dash_today_limit", "dash_unlocked_banner", "dash_outside_text", "dash_outside", "dash_updated",
-                      "dash_counted" });
+                      "dash_counted", "dash_home_hint", "dash_first_steps" });
     // Its signature is About's (and the first steps'), not the parent's page.
     for (brls::View* line : column->getChildren())
         if (dynamic_cast<MadeInFrance*>(line)) line->setVisibility(brls::Visibility::GONE);
@@ -529,8 +542,7 @@ CadranTab::CadranTab()
     // The Overview's section titles: their lines are up there now.
     for (brls::View* line : column->getChildren())
         if (dynamic_cast<brls::Header*>(line)) line->setVisibility(brls::Visibility::GONE);
-    this->list.apply({ { "dash_first_steps", "sparkle" }, { "dash_extra_pending", "refresh" }, { "dash_alarm", "bell" } });
-    this->list.banners({ "dash_first_steps" });
+    this->list.apply({ { "dash_extra_pending", "refresh" }, { "dash_alarm", "bell" } });
 
     // The buttons' icons, before their label.
     CadranIcon* plus = kit::icon("plus", 20, "cadran/navy");
@@ -563,30 +575,50 @@ CadranTab::CadranTab()
     timer->setMarginRight(10);
     limit->addView(timer, 0);
     limit->setAlignItems(brls::AlignItems::CENTER);
-    // Stop, the child screen, today's limit: on a second line when a
-    // language needs the room.
+    CadranIcon* list_icon = kit::icon("list", 18, "cadran/text2");
+    list_icon->setMarginRight(10);
+    profile->addView(list_icon, 0);
+    profile->setAlignItems(brls::AlignItems::CENTER);
+    if (auto* text = dynamic_cast<brls::Label*>(profile->getView("brls/button/label"))) text->setSingleLine(true);
+    // The saved profiles, the one in force checked: one press to change week.
+    profile->registerClickAction([this](brls::View*) {
+        if (ui::refuse_read_only()) return true;
+        profile_flow::pick([this]() { this->refresh(); });
+        return true;
+    });
+    // Stop, the child screen, today's limit, the profile: on a second line
+    // when a language needs the room.
     kit::wrap(actions2.getView());
     YGNodeStyleSetGap(actions2->getYGNode(), YGGutterColumn, 12);
     YGNodeStyleSetGap(actions2->getYGNode(), YGGutterRow, 10);
     // Wrapped, the row's buttons are one line to borealis: ↓ would leave it
-    // past today's limit, on the line under. Between its lines, ↑ and ↓.
-    const auto below = [](brls::View* from, brls::View* to) {
-        return to->getVisibility() == brls::Visibility::VISIBLE && to->getY() > from->getY() + 1;
-    };
-    for (brls::View* above : { stop.getView(), child.getView() })
-        above->registerAction("", brls::BUTTON_NAV_DOWN, [this, below](brls::View* view) {
-            if (!below(view, limit.getView())) return false;
-            brls::Application::giveFocus(limit.getView());
-            return true;
-        }, true);
-    limit->registerAction("", brls::BUTTON_NAV_UP, [this, below](brls::View* view) {
-        for (brls::View* above : { child.getView(), stop.getView() })
-            if (above->getVisibility() == brls::Visibility::VISIBLE && below(above, view)) {
-                brls::Application::giveFocus(above);
-                return true;
+    // past the last button, on the line under. Between its lines, ↑ and ↓ go
+    // to the nearest button of the next line.
+    const std::vector<brls::View*> row2 = { stop.getView(), child.getView(), limit.getView(), profile.getView() };
+    const auto line_move = [row2](brls::View* from, bool down) {
+        brls::View* best = nullptr;
+        float best_line = 0, best_dx = 0;
+        const float cx = from->getX() + from->getWidth() / 2;
+        for (brls::View* to : row2) {
+            if (to == from || to->getVisibility() != brls::Visibility::VISIBLE) continue;
+            const float dy = to->getY() - from->getY();
+            if (down ? dy <= 1 : dy >= -1) continue;
+            const float dx = std::abs(to->getX() + to->getWidth() / 2 - cx);
+            const float line = std::abs(dy);
+            if (!best || line < best_line - 1 || (std::abs(line - best_line) <= 1 && dx < best_dx)) {
+                best = to;
+                best_line = line;
+                best_dx = dx;
             }
-        return false;
-    }, true);
+        }
+        if (!best) return false;
+        brls::Application::giveFocus(best);
+        return true;
+    };
+    for (brls::View* button : row2) {
+        button->registerAction("", brls::BUTTON_NAV_DOWN, [line_move](brls::View* view) { return line_move(view, true); }, true);
+        button->registerAction("", brls::BUTTON_NAV_UP, [line_move](brls::View* view) { return line_move(view, false); }, true);
+    }
 
     // The Overview's own actions, from where they are shown now: turning
     // parental controls back on (its banner's) and today's limit (its line's)
@@ -698,11 +730,11 @@ void CadranTab::show_next(bool unlocked)
     const int today = ui::today_weekday();
     pt_logic::NextStop n;
     bool with_extra = false;
+    int left = -1, now_min = 0;
     // Unlocked, or the timer off: nothing stops play.
     if (!unlocked && pt.fw_supported && pt.valid && pt.enabled_valid && pt.enabled) {
         const uint16_t limit = pt.day_min[today];
         const int over = pt_logic::over_limit_min(pt, today);
-        int left = -1;
         if (limit != PT_DAY_NOLIMIT && pt.remaining_valid && pt.remaining_ns > 0 && over < 0)
             left = (int)((uint64_t)pt.remaining_ns / 60000000000ULL);
         // A chip's amount added to the limit (24 h at most, as add_extra_minutes
@@ -716,7 +748,8 @@ void CadranTab::show_next(bool unlocked)
             }
         }
         const LocalTime now = ui::local_now();
-        n = pt_logic::next_stop(now.hour * 60 + now.minute, left, pt.bed[today]);
+        now_min = now.hour * 60 + now.minute;
+        n = pt_logic::next_stop(now_min, left, pt.bed[today]);
     }
     const auto clock = [](int minutes) { return fmt::format("{:02d}:{:02d}", minutes / 60, minutes % 60); };
     const std::string amount = ui::fmt_minutes((uint16_t)this->preview_extra);
@@ -739,7 +772,59 @@ void CadranTab::show_next(bool unlocked)
         ui::set_text(this->next_text, text);
         this->next_icon->setIcon(glyph);
     }
-    ui::set_visible(this->next, !text.empty());
+    // Before the time up or the bedtime alarm, the rest of the day as a line
+    // in place of the words: now, then each of them that is today's.
+    const bool line = n.kind == pt_logic::NextStop::TIME_UP || n.kind == pt_logic::NextStop::BEDTIME;
+    if (line) {
+        const PtBedtime& bed = pt.bed[today];
+        const int start = bed.hour * 60 + bed.minute, end = bed.end_hour * 60 + bed.end_minute;
+        const int bed_at = bed.on && start > end && now_min < start ? start : -1;
+        int up = left >= 0 && now_min + left < 24 * 60 ? now_min + left : -1;
+        if (up >= 0 && bed_at >= 0 && up >= bed_at) up = -1;   // the alarm comes first
+        // An amount focused that the alarm would cut short: the alarm says so.
+        const bool bed_first = with_extra && n.kind == pt_logic::NextStop::BEDTIME;
+        this->timeline->show(now_min, up, bed_at,
+                             with_extra ? brls::getStr("playguard/cadran/today/tl_with", amount)
+                                        : "playguard/cadran/today/tl_time_up"_i18n,
+                             bed_first ? "playguard/cadran/today/tl_bed_first"_i18n : "");
+    }
+    ui::set_visible(this->timeline, line);
+    ui::set_visible(this->next, !text.empty() && !line);
+}
+
+void CadranTab::fit_text_size()
+{
+    // Larger text (on the TV): the same screen in the same height. The kicker
+    // goes (the headline and the line under it say the day's limit), the
+    // buttons and the cards are a little tighter.
+    const bool larger = brls::Label::getFontScale() > 1.0f;
+    ui::set_visible(kicker.getView(), !larger);
+    actions->setMarginTop(larger ? 10 : 14);
+    actions->setMarginBottom(larger ? 8 : 12);
+    for (brls::View* button : { stop.getView(), child.getView(), limit.getView(), profile.getView() })
+        button->setHeight(larger ? 44 : 48);
+    for (brls::View* card : { bed_card.getView(), pc_card.getView(), clock_card.getView() }) {
+        static_cast<brls::Box*>(card)->setPaddingTop(larger ? 14 : 20);
+        static_cast<brls::Box*>(card)->setPaddingBottom(larger ? 14 : 20);
+    }
+}
+
+bool CadranTab::home_counts()
+{
+    brls::View* hint = this->getView("dash_home_hint");
+    return hint && hint->getVisibility() == brls::Visibility::VISIBLE;
+}
+
+void CadranTab::show_profile()
+{
+    // Once there is a profile: the one in force by its name, else the list.
+    const bool any = profiles::count() > 0 && this->pt.fw_supported && this->pt.valid;
+    if (any) {
+        const std::string current = profiles::match(this->pt.day_min);
+        const std::string text = current.empty() ? "playguard/cadran/today/profiles"_i18n : current;
+        if (profile->getText() != text) profile->setText(text);
+    }
+    ui::set_visible(profile.getView(), any);
 }
 
 void CadranTab::choose_today_limit()
@@ -820,6 +905,106 @@ void CadranTab::build_outside_card(brls::Box* column, int at)
     });
     column->addView(card, at);
     this->outside_card = card;
+}
+
+void CadranTab::build_steps_card(brls::Box* column, int at)
+{
+    namespace kit = cadran::kit;
+    brls::Theme theme = brls::Application::getTheme();
+    auto* card = kit::card(false, false);
+    card->setPadding(16, 16, 10, 16);
+    card->setMarginBottom(16);
+    card->setVisibility(brls::Visibility::GONE);
+    auto* head = new brls::Box(brls::Axis::ROW);
+    head->setAlignItems(brls::AlignItems::CENTER);
+    head->setPadding(0, 8, 6, 8);
+    CadranIcon* icon = kit::icon("sparkle", 22, "cadran/teal");
+    icon->setMarginRight(12);
+    head->addView(icon);
+    brls::Label* title = kit::label("playguard/onboarding/title"_i18n, 18);
+    title->setGrow(1.0f);
+    head->addView(title);
+    this->steps_count = kit::label("", 15, "cadran/text3");
+    head->addView(this->steps_count);
+    card->addView(head);
+
+    // The onboarding's steps, their words; Ⓐ does each one as it does.
+    const char* words[3] = { "playguard/onboarding/step_pin", "playguard/onboarding/step_limit",
+                             "playguard/onboarding/step_clock" };
+    for (int i = 0; i < 3; i++) {
+        Step& s = this->steps[i];
+        s.row = new brls::Box(brls::Axis::ROW);
+        s.row->setAlignItems(brls::AlignItems::CENTER);
+        s.row->setPadding(10, 8, 10, 8);
+        s.row->setFocusable(true);
+        s.row->setHideHighlightBackground(true);
+        s.row->setHighlightCornerRadius(12);
+        s.done = kit::icon("check", 20, "cadran/teal");
+        s.done->setMarginRight(12);
+        s.row->addView(s.done);
+        s.todo = new brls::Box();
+        s.todo->setWidth(20);
+        s.todo->setHeight(20);
+        s.todo->setCornerRadius(10);
+        s.todo->setBorderColor(theme["cadran/amber"]);
+        s.todo->setBorderThickness(2);
+        s.todo->setMarginRight(12);
+        s.row->addView(s.todo);
+        brls::Label* text = kit::label(brls::getStr(words[i]), 17);
+        text->setGrow(1.0f);
+        text->setWidth(0);
+        s.row->addView(text);
+        s.state = kit::label("", 15, "cadran/text3");
+        s.state->setMarginLeft(12);
+        s.state->setSingleLine(true);
+        s.row->addView(s.state);
+        card->addView(s.row);
+    }
+    steps[0].row->registerClickAction([this](brls::View*) {
+        console_actions::set_pin("first_steps", [this]() { this->refresh(); });
+        return true;
+    });
+    steps[1].row->registerClickAction([this](brls::View*) {
+        if (!this->pt.fw_supported) ui::error(ui::rc_text(NXM_RC_FW_UNSUPPORTED));
+        else pt_flow::choose_uniform_limit(this->pt, [this]() { this->refresh(); });
+        return true;
+    });
+    steps[2].row->registerClickAction([this](brls::View*) {
+        if (this->clock_inaccurate) clock_flow::guided([this]() { this->refresh(); });
+        else ui::info("playguard/clock/guided_fine"_i18n);
+        return true;
+    });
+    column->addView(card, at);
+    this->steps_card = card;
+}
+
+void CadranTab::show_steps_card(bool has_pin)
+{
+    // Until the PIN and the limits are set (the clock is Today's own card
+    // afterwards); not in read-only mode, where none can be done.
+    const bool limits = this->pt.valid && pt_configured(this->pt.block);
+    const bool shown = !app::read_only() && this->status.pin_length_ok && this->pt.fw_supported && this->pt.valid &&
+                       (!has_pin || !limits);
+    ui::set_visible(this->steps_card, shown);
+    if (!shown) return;
+    brls::Theme theme = brls::Application::getTheme();
+    const bool clock_ok = R_SUCCEEDED(this->accuracy_rc) && this->accurate;
+    const bool done[3] = { has_pin, limits, clock_ok };
+    const std::string state[3] = {
+        has_pin ? "playguard/dashboard/pin_set"_i18n : "playguard/onboarding/todo"_i18n,
+        limits ? ui::days_summary(this->pt.day_min) : "playguard/onboarding/todo"_i18n,
+        clock_ok ? "playguard/dashboard/clock_ok"_i18n : "playguard/dashboard/clock_bad"_i18n,
+    };
+    int count = 0;
+    for (int i = 0; i < 3; i++) {
+        Step& s = this->steps[i];
+        count += done[i];
+        ui::set_visible(s.done, done[i]);
+        ui::set_visible(s.todo, !done[i]);
+        ui::set_text(s.state, state[i]);
+        s.state->setTextColor(theme[done[i] ? "cadran/teal" : "cadran/amber"]);
+    }
+    ui::set_text(this->steps_count, brls::getStr("playguard/cadran/today/steps_count", count, 3));
 }
 
 void CadranTab::show_outside_card()
@@ -1002,11 +1187,24 @@ void CadranTab::show_pills()
         g.box = kit::pill("playguard/cadran/today/counted_pill"_i18n, "cadran/amber_fill");
         g.box->setFocusable(true);
         g.box->setHideHighlightBackground(true);
-        g.box->registerClickAction([](brls::View*) {
-            ui::info("playguard/cadran/today/counted_title"_i18n + "\n\n" + "playguard/dashboard/counted"_i18n);
+        g.box->registerClickAction([this](brls::View*) {
+            std::string body = "playguard/cadran/today/counted_title"_i18n + "\n\n" + "playguard/dashboard/counted"_i18n;
+            if (this->home_counts()) body += "\n\n" + "playguard/dashboard/home_counts"_i18n;
+            ui::info(body);
             return true;
         });
         pills->addView(g.box);
+        // A game left open on HOME keeps counting: a pill, not a line under
+        // the time played (the opened-over-a-game one says it too, when shown).
+        Pill& h = this->home_pill;
+        h.box = kit::pill("playguard/cadran/today/home_pill"_i18n, "cadran/amber_fill");
+        h.box->setFocusable(true);
+        h.box->setHideHighlightBackground(true);
+        h.box->registerClickAction([](brls::View*) {
+            ui::info("playguard/cadran/today/home_title"_i18n + "\n\n" + "playguard/dashboard/home_counts"_i18n);
+            return true;
+        });
+        pills->addView(h.box);
     }
     const SysInfo& si = this->sys;
     NVGcolor c = ui::color_neutral();
@@ -1040,8 +1238,11 @@ void CadranTab::show_pills()
         this->dns_pill.rank = sync || time ? 1 : 2;
     }
     this->counted_pill.rank = 0;
+    this->home_pill.rank = 0;
     brls::View* counted = this->getView("dash_counted");
-    ui::set_visible(this->counted_pill.box, counted && counted->getVisibility() == brls::Visibility::VISIBLE);
+    const bool counted_shown = counted && counted->getVisibility() == brls::Visibility::VISIBLE;
+    ui::set_visible(this->counted_pill.box, counted_shown);
+    ui::set_visible(this->home_pill.box, this->home_counts() && !counted_shown);
     this->order_pills();
 }
 
@@ -1053,6 +1254,7 @@ void CadranTab::order_pills()
     for (Pill& p : this->pill_slots) all.push_back(&p);
     all.insert(all.begin() + std::min<size_t>(3, all.size()), &this->dns_pill);   // after the serial number's
     all.push_back(&this->counted_pill);
+    all.push_back(&this->home_pill);
     std::stable_sort(all.begin(), all.end(), [](const Pill* a, const Pill* b) { return a->rank < b->rank; });
     std::vector<brls::View*> wanted;
     for (const Pill* p : all)
@@ -1099,8 +1301,11 @@ void CadranTab::refresh()
     ui::set_visible(relock.getView(), unlocked && !app::read_only());
     ui::set_visible(setup.getView(), !unlocked && !app::read_only() && this->pt.fw_supported && this->pt.valid &&
                                          !pt_configured(this->pt.block));
+    this->show_profile();
+    this->fit_text_size();
     this->show_low(unlocked);
     this->show_outside_card();
+    this->show_steps_card(has_pin);
 }
 
 brls::View* CadranTab::create() { return new CadranTab(); }

@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include "action/pt_flow.hpp"
+#include "action/profile_flow.hpp"
 #include "activity/play_timer_perday_activity.hpp"
 #include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
@@ -80,23 +80,10 @@ void ProfilesActivity::actions(const profiles::Profile& p)
 void ProfilesActivity::apply(const profiles::Profile& p)
 {
     const std::string file = p.file;
-    auto days = p.days;
-    // Already the console's limits: nothing to write, nothing to ask.
-    pctl_play_timer_query(&this->live);
-    if (this->live.valid && std::equal(days.begin(), days.end(), this->live.day_min)) {
-        ui::notify(brls::getStr("playguard/play_timer/profile_already", p.name));
-        return;
-    }
-    // The week as the profile sets it is drawn under the question.
-    pt_flow::confirm_write(brls::getStr("playguard/play_timer/profile_apply", p.name),
-                           "playguard/play_timer/confirm_set"_i18n, [this, file, days, name = p.name](bool did_unlock) {
-                               Result rc = pt_flow::write_days(days.data(), "profile", name);
-                               pt_flow::finish_write(rc, did_unlock, "playguard/play_timer/written_days"_i18n,
-                                                     "playguard/play_timer/write_err"_i18n, [this, file]() {
-                                                         pctl_play_timer_query(&this->live);
-                                                         this->rebuild(file);
-                                                     });
-                           }, days.data());
+    profile_flow::apply(p, [this, file]() {
+        pctl_play_timer_query(&this->live);
+        this->rebuild(file);
+    });
 }
 
 bool ProfilesActivity::store(const profiles::Profile& p, const std::string& ok_text)

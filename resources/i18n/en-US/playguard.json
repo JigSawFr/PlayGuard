@@ -1561,7 +1561,17 @@
             "head_no_play": "No play today",
             "head_unlocked_no_play": "No play today, on hold",
             "limit_title": "Change {}'s limit?",
-            "setup": "Set the week's limits"
+            "setup": "Set the week's limits",
+            "profiles": "Profiles…",
+            "profiles_title": "Put a profile in force",
+            "profiles_manage": "Manage the profiles…",
+            "tl_time_up": "time is up",
+            "tl_with": "with {} more",
+            "tl_bedtime": "bedtime",
+            "home_pill": "A game open on HOME · still counts",
+            "home_title": "A game is still open",
+            "steps_count": "{} of {}",
+            "tl_bed_first": "bedtime comes first"
         },
         "pill": {
             "pc_on": "Parental controls on",

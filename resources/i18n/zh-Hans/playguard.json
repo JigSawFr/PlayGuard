@@ -1561,7 +1561,17 @@
             "head_no_play": "今天不可游玩",
             "head_unlocked_no_play": "今天不可游玩，已暂停",
             "limit_title": "更改{}的限制？",
-            "setup": "设置每周限制"
+            "setup": "设置每周限制",
+            "profiles": "配置…",
+            "profiles_title": "应用配置",
+            "profiles_manage": "管理配置…",
+            "tl_time_up": "时间到",
+            "tl_with": "再加 {}",
+            "tl_bedtime": "就寝",
+            "home_pill": "游戏在HOME中打开 · 仍在计时",
+            "home_title": "仍有游戏处于打开状态",
+            "steps_count": "{} / {}",
+            "tl_bed_first": "就寝在先"
         },
         "pill": {
             "pc_on": "家长控制已开启",

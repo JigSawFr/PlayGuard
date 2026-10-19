@@ -1561,7 +1561,17 @@
             "head_no_play": "Hoje, sem jogar",
             "head_unlocked_no_play": "Hoje sem jogar, em pausa",
             "limit_title": "Alterar o limite ({})?",
-            "setup": "Definir os limites da semana"
+            "setup": "Definir os limites da semana",
+            "profiles": "Perfis…",
+            "profiles_title": "Aplicar um perfil",
+            "profiles_manage": "Gerir os perfis…",
+            "tl_time_up": "tempo esgotado",
+            "tl_with": "com mais {}",
+            "tl_bedtime": "hora de dormir",
+            "home_pill": "Jogo aberto no HOME · continua a contar",
+            "home_title": "Ainda há um jogo aberto",
+            "steps_count": "{} de {}",
+            "tl_bed_first": "a hora de dormir vem primeiro"
         },
         "pill": {
             "pc_on": "Controlo parental ativo",

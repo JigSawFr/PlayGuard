@@ -4,9 +4,9 @@
      own lines): today's time left as a ring with the everyday actions beside
      it (turning parental controls back on first, the row's whole width,
      while they are unlocked, or setting the week's limits while there are
-     none; today's limit with them, the second row's
-     buttons sharing its width), three state cards, the console's state as
-     pills. Filled by CadranTab::refresh() from the Overview's readings. -->
+     none; today's limit and the profile in force with them, the second
+     row's buttons sharing its width), three state cards, the console's state
+     as pills. Filled by CadranTab::refresh() from the Overview's readings. -->
 
 <brls:Box
     width="auto"
@@ -28,6 +28,7 @@
                 <brls:Button id="cad_stop" style="bordered" text="@i18n/playguard/cadran/today/stop" fontSize="17" height="48" cornerRadius="24" highlightCornerRadius="24" grow="1.0" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/coral" borderColor="@theme/cadran/coral_line" borderThickness="2"/>
                 <brls:Button id="cad_child" style="bordered" text="@i18n/playguard/cadran/today/child" fontSize="17" height="48" cornerRadius="24" highlightCornerRadius="24" grow="1.0" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line" borderThickness="2"/>
                 <brls:Button id="cad_limit" style="bordered" text="@i18n/playguard/cadran/today/limit" fontSize="17" height="48" cornerRadius="24" highlightCornerRadius="24" grow="1.0" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line" borderThickness="2"/>
+                <brls:Button id="cad_profile" style="bordered" text="" fontSize="17" height="48" cornerRadius="24" highlightCornerRadius="24" grow="1.0" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line" borderThickness="2" visibility="gone"/>
             </brls:Box>
         </brls:Box>
     </brls:Box>

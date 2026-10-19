@@ -1561,7 +1561,17 @@
             "head_no_play": "今日はプレイ不可",
             "head_unlocked_no_play": "今日はプレイ不可（一時停止中）",
             "limit_title": "{}の上限を変更しますか？",
-            "setup": "週の上限を設定"
+            "setup": "週の上限を設定",
+            "profiles": "プリセット…",
+            "profiles_title": "プリセットを適用",
+            "profiles_manage": "プリセットを管理…",
+            "tl_time_up": "時間切れ",
+            "tl_with": "{}追加で",
+            "tl_bedtime": "就寝",
+            "home_pill": "HOMEでゲームが開いています · カウント継続",
+            "home_title": "ゲームがまだ開いています",
+            "steps_count": "{} / {}",
+            "tl_bed_first": "就寝が先"
         },
         "pill": {
             "pc_on": "みまもり設定 有効",

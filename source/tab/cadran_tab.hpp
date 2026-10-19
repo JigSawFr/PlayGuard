@@ -21,6 +21,7 @@
 #include "util/pctl_ops_c.hpp"
 #include "view/cadran_digits.hpp"
 #include "view/cadran_icon.hpp"
+#include "view/cadran_timeline.hpp"
 #include "view/pt_ring.hpp"
 
 namespace cadran
@@ -84,17 +85,33 @@ class CadranTab : public DashboardTab
     // Atmosphère's DNS sending Nintendo's servers elsewhere (nintendo_dns):
     // a pill of its own, after the serial number's, while it does.
     Pill dns_pill;
-    // Opened over a game (the Overview's paragraph, Ⓐ for it).
+    // Opened over a game (the Overview's paragraph, Ⓐ for it); a game left
+    // open on HOME, which keeps counting (the Overview's line).
     Pill counted_pill;
+    Pill home_pill;
     // What changed outside PlayGuard: a card of its own above the ring, its
     // lines rebuilt when the Overview's text changes.
     brls::Box*  outside_card  = nullptr;
     brls::Box*  outside_lines = nullptr;
+    // First steps, while the PIN or the limits are missing: the three steps
+    // as a list to tick, each one done on Ⓐ.
+    struct Step
+    {
+        brls::Box*   row  = nullptr;
+        CadranIcon*  done = nullptr;   // a check once done
+        brls::Box*   todo = nullptr;   // an empty ring until then
+        brls::Label* state = nullptr;
+    };
+    brls::Box*   steps_card  = nullptr;
+    brls::Label* steps_count = nullptr;
+    Step         steps[3];
     std::string outside_shown;
     // What stops play first today, under the time played (show_next).
     brls::Box*   next      = nullptr;
     CadranIcon*  next_icon = nullptr;
     brls::Label* next_text = nullptr;
+    // Or, before the time up or the bedtime alarm, the rest of the day as a line.
+    CadranTimeline* timeline = nullptr;
     // The extra time whose chip has the focus (show_next says where it ends),
     // and whether parental controls were unlocked at the last refresh.
     int  preview_extra = 0;
@@ -107,7 +124,12 @@ class CadranTab : public DashboardTab
     void show_next(bool unlocked);
     void show_low(bool unlocked);
     void choose_today_limit();
+    void show_profile();
+    bool home_counts();   // a game is open on HOME, its time still counting
+    void fit_text_size();
     void build_outside_card(brls::Box* column, int at);
+    void build_steps_card(brls::Box* column, int at);
+    void show_steps_card(bool has_pin);
     void show_outside_card();
     void show_cards(bool unlocked, bool has_pin);
     void show_pills();
@@ -125,6 +147,7 @@ class CadranTab : public DashboardTab
     BRLS_BIND(brls::Button, child,       "cad_child");
     BRLS_BIND(brls::Box,    actions2,    "cad_actions2");
     BRLS_BIND(brls::Button, limit,       "cad_limit");
+    BRLS_BIND(brls::Button, profile,     "cad_profile");
     BRLS_BIND(brls::Box,    bed_card,    "cad_bed_card");
     BRLS_BIND(brls::Label,  bed_state,   "cad_bed_state");
     BRLS_BIND(CadranDigits, bed_value,   "cad_bed_value");

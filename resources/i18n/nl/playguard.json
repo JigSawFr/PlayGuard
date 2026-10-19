@@ -1561,7 +1561,17 @@
             "head_no_play": "Vandaag niet spelen",
             "head_unlocked_no_play": "Vandaag niet spelen, gepauzeerd",
             "limit_title": "Limiet voor {} wijzigen?",
-            "setup": "Limieten van de week instellen"
+            "setup": "Limieten van de week instellen",
+            "profiles": "Profielen…",
+            "profiles_title": "Profiel toepassen",
+            "profiles_manage": "Profielen beheren…",
+            "tl_time_up": "tijd om",
+            "tl_with": "met {} extra",
+            "tl_bedtime": "bedtijd",
+            "home_pill": "Spel open in HOME · telt door",
+            "home_title": "Er staat nog een spel open",
+            "steps_count": "{} van {}",
+            "tl_bed_first": "bedtijd komt eerst"
         },
         "pill": {
             "pc_on": "Ouderlijk toezicht actief",

@@ -1561,7 +1561,17 @@
             "head_no_play": "오늘은 플레이 불가",
             "head_unlocked_no_play": "오늘은 플레이 불가, 일시 중지됨",
             "limit_title": "{} 제한을 변경할까요?",
-            "setup": "주간 제한 설정"
+            "setup": "주간 제한 설정",
+            "profiles": "프로필…",
+            "profiles_title": "프로필 적용",
+            "profiles_manage": "프로필 관리…",
+            "tl_time_up": "시간 종료",
+            "tl_with": "{} 추가 시",
+            "tl_bedtime": "취침",
+            "home_pill": "HOME에서 게임 열림 · 계속 계산",
+            "home_title": "게임이 아직 열려 있습니다",
+            "steps_count": "{} / {}",
+            "tl_bed_first": "취침이 먼저"
         },
         "pill": {
             "pc_on": "자녀 보호 켜짐",

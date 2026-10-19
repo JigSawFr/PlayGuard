@@ -8,6 +8,7 @@
 #include <yoga/Yoga.h>
 
 #include "tab/cadran_list.hpp"
+#include "tab/tab_base.hpp"
 #include "util/config.hpp"
 
 #ifdef __SWITCH__
@@ -70,6 +71,8 @@ void apply()
         root->invalidate();
         for (brls::View* detached : roots) detached->invalidate();
     }
+    // The tab on screen, for what it lays out by the size (Today's room).
+    TabBase::refresh_shown();
 }
 
 void install()

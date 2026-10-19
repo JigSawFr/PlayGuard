@@ -1561,7 +1561,17 @@
             "head_no_play": "今天不能遊玩",
             "head_unlocked_no_play": "今天不能遊玩，已暫停",
             "limit_title": "更改{}的上限？",
-            "setup": "設定每週上限"
+            "setup": "設定每週上限",
+            "profiles": "設定檔…",
+            "profiles_title": "套用設定檔",
+            "profiles_manage": "管理設定檔…",
+            "tl_time_up": "時間到",
+            "tl_with": "再加 {}",
+            "tl_bedtime": "就寢",
+            "home_pill": "遊戲在HOME中開啟 · 仍在計時",
+            "home_title": "仍有遊戲處於開啟狀態",
+            "steps_count": "{} / {}",
+            "tl_bed_first": "就寢在先"
         },
         "pill": {
             "pc_on": "家長監護已開啟",

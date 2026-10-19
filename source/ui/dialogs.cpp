@@ -298,7 +298,10 @@ class Picker : public brls::Dropdown
             text->setMarginRight(brls::getStyle()["brls/listitem/descriptionIndent"]);
             cell->addView(text, 1);
         }
-        text->setText(index < this->details.size() ? this->details[index] : "");
+        const std::string value = index < this->details.size() ? this->details[index] : "";
+        text->setText(value);
+        // None for this row: no room taken, its label has the row's width.
+        text->setVisibility(value.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
     }
 
     void restyle(brls::View* view)
