@@ -13,8 +13,6 @@
 
 namespace cadran
 {
-bool enabled();   // tab/cadran_tab.cpp
-
 // Under a dressed dialog's content: its button row (a 56 px pill and 24 px
 // below), and what the card keeps from the screen's top and bottom.
 constexpr float DIALOG_BUTTONS = 80;

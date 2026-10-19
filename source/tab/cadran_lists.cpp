@@ -214,17 +214,15 @@ void CadranHistoryTab::refresh()
 brls::View* CadranHistoryTab::create() { return new CadranHistoryTab(); }
 
 // ---------------------------------------------------------------------------
-// Preferences: the language, the theme, the appearance and the start screen
-// as tiles, the text size and the switches below.
+// Preferences: the language, the theme, the text size and the start screen
+// as tiles, the visual effects and the switches below.
 
 CadranPreferencesTab::CadranPreferencesTab()
     : list(this)
 {
-    this->getView("pf_text_size")->setVisibility(brls::Visibility::VISIBLE);
-    this->getView("pf_effects")->setVisibility(brls::Visibility::VISIBLE);
-    this->list.tiles({ { "pf_language", "language" }, { "pf_theme", "contrast" }, { "pf_appearance", "sparkle" },
+    this->list.tiles({ { "pf_language", "language" }, { "pf_theme", "contrast" }, { "pf_text_size", "eye" },
                        { "pf_start_tab", "home" } }, false);
-    this->list.apply({ { "pf_text_size", "eye" }, { "pf_effects", "sparkle" }, { "pf_intro", "bolt" }, { "pf_notices_system", "chip" }, { "pf_notices_summary", "calendar" },
+    this->list.apply({ { "pf_effects", "sparkle" }, { "pf_intro", "bolt" }, { "pf_notices_system", "chip" }, { "pf_notices_summary", "calendar" },
                        { "pf_notices_reminders", "bell" }, { "pf_notices_ack_remind", "alert" },
                        { "pf_support_reminder", "heart" } });
 }

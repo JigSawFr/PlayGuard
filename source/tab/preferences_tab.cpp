@@ -21,10 +21,10 @@ int index_of(const char* const (&list)[N], const std::string& value)
     return 0;
 }
 
-// A tab as the rail or the sidebar names it: the Overview is Cadran's Today.
+// A tab as the rail names it: the Overview is Today.
 std::string tab_name(const std::string& tab)
 {
-    if (tab == "dashboard" && cadran::enabled()) return "playguard/cadran/tabs/today"_i18n;
+    if (tab == "dashboard") return "playguard/cadran/tabs/today"_i18n;
     return brls::getStr("playguard/tabs/" + tab);
 }
 }   // namespace
@@ -37,10 +37,6 @@ PreferencesTab::PreferencesTab()
         return true;
     });
 
-    appearance->registerClickAction([this](brls::View*) {
-        ui::pick_appearance([this]() { this->refresh(); });
-        return true;
-    });
     theme->registerClickAction([this](brls::View*) {
         ui::pick_theme([this]() { this->refresh(); });
         return true;
@@ -109,7 +105,6 @@ void PreferencesTab::refresh()
     const auto& cfg = config::get();
     language->setDetailText(ui::language_name());
     theme->setDetailText(ui::theme_name());
-    appearance->setDetailText(ui::appearance_name());
     text_size->setDetailText(ui::text_size_name());
     effects->setDetailText(brls::getStr("playguard/prefs/effects_values/" + std::string(config::EFFECTS[index_of(config::EFFECTS, cfg.effects)])));
     start_tab->setDetailText(tab_name(config::START_TABS[index_of(config::START_TABS, cfg.start_tab)]));

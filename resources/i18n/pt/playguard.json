@@ -78,9 +78,6 @@
         "5": "Sex",
         "6": "Sáb"
     },
-    "numpad": {
-        "guide": "Horas:minutos (1:30) ou minutos (90), até 24:00. 0 = sem jogar nesse dia."
-    },
     "error": {
         "code": "erro {}",
         "code_hint": "erro {}: {}",
@@ -1044,11 +1041,6 @@
         "notices_reminders": "Avisos: cópias, outro sistema, jogos bloqueados",
         "notices_ack_remind": "Voltar a contar os avisos ignorados após 30 dias",
         "help": "Ajuda e diagnóstico",
-        "appearance": "Aparência",
-        "appearances": {
-            "cadran": "Cadran",
-            "classic": "Clássica"
-        },
         "text_size": "Tamanho do texto",
         "text_sizes": {
             "normal": "Normal",
@@ -1438,7 +1430,6 @@
         "failed": "Não foi possível obter as notas. Prime X para tentar de novo."
     },
     "quick": {
-        "title": "Idioma e tema",
         "hint": "Idioma e tema",
         "title_text": "Idioma, tema e tamanho do texto"
     },
@@ -1723,11 +1714,6 @@
         },
         "dialog": {
             "unlock_short": "O controlo parental é desbloqueado com o PIN guardado durante a alteração e depois volta a ser bloqueado."
-        },
-        "intro": {
-            "body": "Um novo aspeto: Cadran\n\nO tempo restante num anel, a semana editada com o stick, cartões legíveis do sofá, texto maior na TV. As listas das versões anteriores continuam lá:\nPreferências › Aparência › Clássica",
-            "classic": "Voltar à Clássica",
-            "keep": "Manter Cadran"
         }
     },
     "schedule": {

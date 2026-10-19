@@ -13,21 +13,6 @@
 #include <exception>
 #include <random>
 
-PlatformInput platform_numpad(const char* header, const char*, const char*, int max_len, char* out, size_t out_size)
-{
-    const char* typed = sim_env("PLAYGUARD_SIM_NUMPAD");
-    if (!typed) return PLATFORM_INPUT_NONE;   // borealis' own text input
-    if (!out || out_size == 0 || std::strcmp(typed, "cancel") == 0) return PLATFORM_INPUT_CANCELLED;
-    size_t n = std::strlen(typed);
-    if (max_len >= 0 && n > (size_t)max_len) n = (size_t)max_len;
-    if (n >= out_size) n = out_size - 1;
-    std::memcpy(out, typed, n);
-    out[n] = '\0';
-    std::printf("numpad: %s -> %s\n", header ? header : "", out);
-    std::fflush(stdout);
-    return out[0] ? PLATFORM_INPUT_OK : PLATFORM_INPUT_CANCELLED;
-}
-
 bool platform_in_focus(void)
 {
     return sim_env("PLAYGUARD_SIM_BACKGROUND") == nullptr;

@@ -27,11 +27,6 @@
 
 namespace cadran
 {
-// Whether the app wears Cadran (Preferences › Appearance, config appearance,
-// the default) rather than the classic lists; PLAYGUARD_SIM_APPEARANCE=classic
-// or =cadran forces it on the desktop. Read once, at start-up: a change takes
-// effect at the next launch.
-bool enabled();
 // The boards' two palettes on borealis' two variants (dark: navy; light:
 // cool white), the rail's metrics and the display font: before any view.
 void install_theme();

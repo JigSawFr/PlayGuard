@@ -74,10 +74,10 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
         return week;
     };
 
-    // Cadran: the days that change as a table ("Monday: 2 h → 2 h 30") in
-    // place of the week (cadran::dialog_body draws "label: value" lines so).
+    // The days that change as a table ("Monday: 2 h → 2 h 30") in place of
+    // the week (cadran::dialog_body draws "label: value" lines so).
     std::string changes;
-    if (cadran::enabled() && new_days && pt.valid)
+    if (new_days && pt.valid)
         for (int i = 1; i <= 7; i++) {
             const int d = i % 7;   // Monday first
             if (new_days[d] == pt.day_min[d]) continue;

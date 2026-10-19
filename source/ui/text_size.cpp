@@ -60,7 +60,6 @@ void on_applet_hook(AppletHookType hook, void*)
 
 void apply()
 {
-    if (!cadran::enabled()) return;
     const float scale = larger() ? LARGE : 1.0f;
     if (scale == brls::Label::getFontScale()) return;
     brls::Label::setFontScale(scale);

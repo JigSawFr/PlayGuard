@@ -205,10 +205,8 @@ HelpTab::HelpTab()
         return true;
     });
 
-    // The Cadran look, with an icon per line (the screen's skin would dress
-    // it without).
-    if (cadran::enabled())
-        cadran::List(this, true).apply({ { "hp_first_steps", "sparkle" }, { "hp_export", "file" }, { "hp_upload", "upload" },
+    // An icon per line (the screen's skin would dress it without).
+    cadran::List(this, true).apply({ { "hp_first_steps", "sparkle" }, { "hp_export", "file" }, { "hp_upload", "upload" },
                                          { "hp_github", "user" }, { "hp_logs_keep", "folder" }, { "hp_logs_keep_days", "calendar" },
                                          { "hp_logs_keep_mb", "save" }, { "hp_dev_mode", "code" }, { "hp_dev_read_only", "eye" },
                                          { "hp_dev_pt_log", "list" }, { "hp_dev_frame_stats", "activity" }, { "hp_dev_glow", "sparkle" },
@@ -249,7 +247,7 @@ void HelpTab::refresh()
                           { dev_frame_stats.getView(), dev },
                           { dev_frame_stats_note.getView(), dev },
                           { dev_frame_stats_last.getView(), dev && frame_stats_flow::running() },
-                          { dev_glow.getView(), dev && cadran::enabled() },
+                          { dev_glow.getView(), dev },
                           { dev_clear_cache.getView(), dev },
                           { dev_clear_logs.getView(), dev },
                           { dev_report.getView(), dev },

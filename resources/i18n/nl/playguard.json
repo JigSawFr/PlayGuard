@@ -78,9 +78,6 @@
         "5": "Vr",
         "6": "Za"
     },
-    "numpad": {
-        "guide": "Uren:minuten (1:30) of minuten (90), tot 24:00. 0 = die dag niet spelen."
-    },
     "error": {
         "code": "fout {}",
         "code_hint": "fout {}: {}",
@@ -1044,11 +1041,6 @@
         "notices_reminders": "Herinneringen: back-ups, ander systeem, games op slot",
         "notices_ack_remind": "Genegeerde waarschuwingen na 30 dagen weer meetellen",
         "help": "Hulp en diagnose",
-        "appearance": "Weergave",
-        "appearances": {
-            "cadran": "Cadran",
-            "classic": "Klassiek"
-        },
         "text_size": "Tekstgrootte",
         "text_sizes": {
             "normal": "Normaal",
@@ -1438,7 +1430,6 @@
         "failed": "De opmerkingen konden niet worden opgehaald. Druk op X om het opnieuw te proberen."
     },
     "quick": {
-        "title": "Taal en thema",
         "hint": "Taal en thema",
         "title_text": "Taal, thema en tekstgrootte"
     },
@@ -1723,11 +1714,6 @@
         },
         "dialog": {
             "unlock_short": "Ouderlijk toezicht wordt voor de wijziging ontgrendeld met de opgeslagen pincode en daarna weer vergrendeld."
-        },
-        "intro": {
-            "body": "Een nieuwe weergave: Cadran\n\nDe resterende tijd als ring, de week bewerkt met de stick, kaarten die je vanaf de bank leest, grotere tekst op de tv. De lijsten van de eerdere versies zijn er nog:\nVoorkeuren › Weergave › Klassiek",
-            "classic": "Terug naar Klassiek",
-            "keep": "Cadran houden"
         }
     },
     "schedule": {

@@ -411,7 +411,7 @@ void cadran::List::row(brls::DetailCell* cell, const char* icon, bool alone)
 
 brls::Box* cadran::List::rows_in(brls::Box* list)
 {
-    if (!cadran::enabled() || !list) return list;
+    if (!list) return list;
     for (brls::View* child : list->getChildren())
         if (auto* card = dynamic_cast<Card*>(child)) return card;
     auto* card = new Card();

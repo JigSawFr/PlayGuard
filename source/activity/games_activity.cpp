@@ -73,21 +73,19 @@ void GamesActivity::onContentAvailable()
         this->pick_period();
         return true;
     });
-    if (cadran::enabled()) {
-        // The Cadran look: the game's figures in a card, the view and the
-        // period as two rows of their own.
-        brls::Theme theme = brls::Application::getTheme();
-        auto* head = static_cast<brls::Box*>(this->getView("gs_head"));
-        head->setLineBottom(0);
-        head->setMargins(16, 60, 0, 60);
-        head->setPadding(18, 24, 18, 24);
-        head->setCornerRadius(20);
-        head->setBackgroundColor(theme["cadran/surf"]);
-        head->setBorderColor(theme["cadran/line"]);
-        head->setBorderThickness(1);
-        cadran::List::row(view_cell, "list", true);
-        cadran::List::row(period_cell, "calendar", true);
-    }
+    // The game's figures in a card, the view and the period as two rows of
+    // their own.
+    brls::Theme theme = brls::Application::getTheme();
+    auto* head = static_cast<brls::Box*>(this->getView("gs_head"));
+    head->setLineBottom(0);
+    head->setMargins(16, 60, 0, 60);
+    head->setPadding(18, 24, 18, 24);
+    head->setCornerRadius(20);
+    head->setBackgroundColor(theme["cadran/surf"]);
+    head->setBorderColor(theme["cadran/line"]);
+    head->setBorderThickness(1);
+    cadran::List::row(view_cell, "list", true);
+    cadran::List::row(period_cell, "calendar", true);
     this->set_hints();
     this->listener = play_data::listen([this]() {
         if (!ui::on_top(this)) {

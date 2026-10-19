@@ -8,8 +8,7 @@
 class MainActivity : public brls::Activity
 {
   public:
-    // activity/main.xml, or activity/main_cadran.xml in the Cadran appearance
-    // (cadran::enabled(): Preferences › Appearance).
+    // activity/main.xml.
     brls::View* createContentView() override;
 
     void onContentAvailable() override;

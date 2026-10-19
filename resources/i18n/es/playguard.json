@@ -78,9 +78,6 @@
         "5": "Vie",
         "6": "Sáb"
     },
-    "numpad": {
-        "guide": "Horas:minutos (1:30) o minutos (90), hasta 24:00. 0 = sin juego ese día."
-    },
     "error": {
         "code": "error {}",
         "code_hint": "error {}: {}",
@@ -1044,11 +1041,6 @@
         "notices_reminders": "Avisos: copias, otro sistema, juegos bloqueados",
         "notices_ack_remind": "Volver a contar los avisos ignorados tras 30 días",
         "help": "Ayuda y diagnóstico",
-        "appearance": "Apariencia",
-        "appearances": {
-            "cadran": "Cadran",
-            "classic": "Clásica"
-        },
         "text_size": "Tamaño del texto",
         "text_sizes": {
             "normal": "Normal",
@@ -1438,7 +1430,6 @@
         "failed": "No se pudieron obtener las notas. Pulsa X para reintentar."
     },
     "quick": {
-        "title": "Idioma y tema",
         "hint": "Idioma y tema",
         "title_text": "Idioma, tema y tamaño del texto"
     },
@@ -1723,11 +1714,6 @@
         },
         "dialog": {
             "unlock_short": "El control parental se desbloquea con el PIN guardado durante el cambio y luego se vuelve a bloquear."
-        },
-        "intro": {
-            "body": "Un aspecto nuevo: Cadran\n\nEl tiempo restante en un anillo, la semana editada con el stick, tarjetas que se leen desde el sofá y texto más grande en la tele. Las listas de las versiones anteriores siguen ahí:\nPreferencias › Apariencia › Clásica",
-            "classic": "Volver a Clásica",
-            "keep": "Mantener Cadran"
         }
     },
     "schedule": {

@@ -53,8 +53,8 @@ void NoticesActivity::onContentAvailable()
         notices::dismiss_all();
         return true;
     });
-    // The Cadran appearance: a screen's margins, as its other screens have.
-    if (cadran::enabled()) root->setPadding(10, 72, 32, 72);
+    // A screen's margins, as the other screens have.
+    root->setPadding(10, 72, 32, 72);
     this->rebuild();
     // A change while the list is open (a source cleared what it fixed):
     // rebuilt on the next frame, outside the source's own call.
@@ -240,8 +240,8 @@ void NoticesActivity::rebuild()
         }
     }
 
-    // The Cadran appearance: the entries in cards, before they are shown.
-    if (cadran::enabled()) cadran::List(this->getContentView(), box).apply({});
+    // The entries in cards, before they are shown.
+    cadran::List(this->getContentView(), box).apply({});
     root->addView(box);
     brls::Application::giveFocus(focus ? focus : first);
     if (this->content) root->removeView(this->content);

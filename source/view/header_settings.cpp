@@ -175,7 +175,7 @@ static void settings_screen_of(brls::View* focus)
     if (!tools || tools->getView(LANGUAGE_ID)) return;
     tools->addView(new HeaderSetting(HeaderSetting::Kind::LANGUAGE), 0);
     tools->addView(new HeaderSetting(HeaderSetting::Kind::THEME), 1);
-    if (cadran::enabled()) tools->addView(new HeaderSetting(HeaderSetting::Kind::TEXT_SIZE), 2);
+    tools->addView(new HeaderSetting(HeaderSetting::Kind::TEXT_SIZE), 2);
 }
 
 void HeaderSetting::install()

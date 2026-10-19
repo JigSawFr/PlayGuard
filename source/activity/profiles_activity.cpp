@@ -38,8 +38,7 @@ void ProfilesActivity::onContentAvailable()
     });
     this->show_schedule();
     pctl_play_timer_query(&this->live);
-    if (cadran::enabled())
-        cadran::List(this->getContentView(), true).apply({ { "pf_save", "save" }, { "pf_new", "plus" }, { "pf_schedule", "calendar" } });
+    cadran::List(this->getContentView(), true).apply({ { "pf_save", "save" }, { "pf_new", "plus" }, { "pf_schedule", "calendar" } });
     this->rebuild();
 }
 
@@ -75,7 +74,7 @@ void ProfilesActivity::rebuild(const std::string& focus_file)
             return true;
         });
         rows->addView(cell);
-        if (cadran::enabled()) cadran::List::row(cell, "list");
+        cadran::List::row(cell, "list");
         if (!focus || p.file == focus_file) focus = cell;
     }
     ui::set_visible(empty.getView(), all.empty());

@@ -78,9 +78,6 @@
         "5": "Ven",
         "6": "Sam"
     },
-    "numpad": {
-        "guide": "Heures:minutes (1:30) ou minutes (90), jusqu'à 24:00. 0 = pas de jeu ce jour-là."
-    },
     "error": {
         "code": "erreur {}",
         "code_hint": "erreur {} : {}",
@@ -1044,11 +1041,6 @@
         "notices_reminders": "Rappels : sauvegardes, autre système, jeux bloqués",
         "notices_ack_remind": "Rappeler les avertissements ignorés après 30 jours",
         "help": "Aide et diagnostic",
-        "appearance": "Apparence",
-        "appearances": {
-            "cadran": "Cadran",
-            "classic": "Classique"
-        },
         "text_size": "Taille du texte",
         "text_sizes": {
             "normal": "Normale",
@@ -1438,7 +1430,6 @@
         "failed": "Les notes n'ont pas pu être récupérées. Appuyez sur X pour réessayer."
     },
     "quick": {
-        "title": "Langue et thème",
         "hint": "Langue et thème",
         "title_text": "Langue, thème et taille du texte"
     },
@@ -1723,11 +1714,6 @@
         },
         "dialog": {
             "unlock_short": "Le contrôle parental est déverrouillé avec le code PIN enregistré le temps de la modification, puis reverrouillé."
-        },
-        "intro": {
-            "body": "Nouvelle apparence : Cadran\n\nLe temps restant en anneau, la semaine modifiée au stick, des cartes lisibles depuis le canapé, un texte plus grand sur la TV. Les listes des versions précédentes sont toujours là :\nPréférences › Apparence › Classique",
-            "classic": "Revenir à Classique",
-            "keep": "Garder Cadran"
         }
     },
     "schedule": {

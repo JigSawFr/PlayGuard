@@ -78,9 +78,6 @@
         "5": "Ven",
         "6": "Sab"
     },
-    "numpad": {
-        "guide": "Ore:minuti (1:30) o minuti (90), fino a 24:00. 0 = niente gioco quel giorno."
-    },
     "error": {
         "code": "errore {}",
         "code_hint": "errore {}: {}",
@@ -1044,11 +1041,6 @@
         "notices_reminders": "Promemoria: backup, l'altro sistema, i giochi bloccati",
         "notices_ack_remind": "Conta di nuovo gli avvisi ignorati dopo 30 giorni",
         "help": "Aiuto e diagnostica",
-        "appearance": "Aspetto",
-        "appearances": {
-            "cadran": "Cadran",
-            "classic": "Classica"
-        },
         "text_size": "Dimensione del testo",
         "text_sizes": {
             "normal": "Normale",
@@ -1438,7 +1430,6 @@
         "failed": "Impossibile recuperare le note. Premi X per riprovare."
     },
     "quick": {
-        "title": "Lingua e tema",
         "hint": "Lingua e tema",
         "title_text": "Lingua, tema e dimensione del testo"
     },
@@ -1723,11 +1714,6 @@
         },
         "dialog": {
             "unlock_short": "Il filtro famiglia viene sbloccato con il PIN salvato per la modifica, poi bloccato di nuovo."
-        },
-        "intro": {
-            "body": "Un nuovo aspetto: Cadran\n\nIl tempo rimasto in un anello, la settimana modificata con lo stick, schede leggibili dal divano, testo più grande sulla TV. Gli elenchi delle versioni precedenti ci sono ancora:\nPreferenze › Aspetto › Classica",
-            "classic": "Torna a Classica",
-            "keep": "Tieni Cadran"
         }
     },
     "schedule": {

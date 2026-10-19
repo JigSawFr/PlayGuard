@@ -67,7 +67,6 @@
  },
  "params": {
   "tab": {"label": "Si apre su", "options": {"": "Panoramica", "play_timer": "Tempo di gioco", "activity": "Attività", "restrictions": "Limitazioni", "security": "PIN", "console": "Console", "history": "Cronologia", "preferences": "Preferenze", "about": "Informazioni"}},
-  "appearance": {"label": "Aspetto", "options": {"": "Come nelle Preferenze", "cadran": "Cadran", "classic": "Classica"}},
   "keep": {"label": "Conserva lo stato tra le visite", "help": "I dati di PlayGuard e le impostazioni della console simulata (PIN, limiti, orologi) restano in questo browser; le impostazioni di console di questo pannello contano solo al primo avvio."},
   "not_set_up": {"label": "Mai configurato (nessun PIN)"},
   "unlocked": {"label": "Sbloccato temporaneamente"},
@@ -89,7 +88,6 @@
   "hbloader": {"label": "Un loader che può passare un aggiornamento a uno store"},
   "docked": {"label": "Nella base (sulla TV)"},
   "battery": {"label": "A batteria (senza caricatore)"},
-  "numpad": {"label": "Cosa restituisce il tastierino numerico"},
   "boot_choice": {"label": "Risposta a «build precedente?» all'avvio", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "Orologio di rete preciso"},
   "autosync_off": {"label": "«Sincronizza l'orologio via Internet» disattivato"},

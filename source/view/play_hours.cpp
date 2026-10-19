@@ -49,9 +49,8 @@ void PlayHoursView::draw(NVGcontext* vg, float x, float y, float width, float he
     (void)ctx;
     (void)height;
     const float s = this->scale();
-    // Cadran's teal, else the values' colour.
     const NVGcolor ink = ui::color_text();
-    const NVGcolor fill = cadran::enabled() ? brls::Application::getTheme()["cadran/teal"] : ui::color_neutral();
+    const NVGcolor fill = brls::Application::getTheme()["cadran/teal"];
     const float name_w = NAME_W * s;
     const float cell_w = (width - name_w) / 24.0f;
     nvgFontFaceId(vg, this->font);

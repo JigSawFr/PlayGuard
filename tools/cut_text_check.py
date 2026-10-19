@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Checks that no text of the Cadran appearance is cut short ("…"), in the
+"""Checks that no text of the main screen's tabs is cut short ("…"), in the
 console's 15 languages, at the normal text size and the larger one.
 
 For each language and size, starts the desktop build (build-desktop/playguard)
@@ -65,13 +65,13 @@ def run(out, lang, size):
     data = os.path.join(base, "run", "playguard_data")
     os.makedirs(data)
     with open(os.path.join(data, "config.json"), "w") as f:
-        f.write('{"schema": 1, "language": "%s", "theme": "dark", "text_size": "%s", "appearance_offered": true}'
+        f.write('{"schema": 1, "language": "%s", "theme": "dark", "text_size": "%s"}'
                 % (lang, size))
     cuts = os.path.join(base, "cut_text.txt")
     log = os.path.join(base, "app.log")
     env = dict(os.environ, LIBGL_ALWAYS_SOFTWARE="1", TZ="UTC", PLAYGUARD_SIM_NOW="1791475200",
                PLAYGUARD_SIM_STILL_FOCUS="1", PLAYGUARD_SIM_VERSION="1.0.0:1a2b3c4",
-               PLAYGUARD_SIM_APPEARANCE="cadran", PLAYGUARD_SIM_CHECK_MS="0", PLAYGUARD_SIM_CUT_TEXT=cuts)
+               PLAYGUARD_SIM_CHECK_MS="0", PLAYGUARD_SIM_CUT_TEXT=cuts)
     with open(log, "w") as lf:
         # Line-buffered, so "first screen ready" reaches the log at once; in
         # a D-Bus session of its own, as tools/desktop_smoke.py starts it.

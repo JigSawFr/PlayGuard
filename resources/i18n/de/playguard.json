@@ -78,9 +78,6 @@
         "5": "Fr",
         "6": "Sa"
     },
-    "numpad": {
-        "guide": "Stunden:Minuten (1:30) oder Minuten (90), bis 24:00. 0 = an diesem Tag kein Spielen."
-    },
     "error": {
         "code": "Fehler {}",
         "code_hint": "Fehler {}: {}",
@@ -1044,11 +1041,6 @@
         "notices_reminders": "Erinnerungen: Sicherungen, anderes System, Spielsperre",
         "notices_ack_remind": "Ignorierte Warnungen nach 30 Tagen wieder zählen",
         "help": "Hilfe & Diagnose",
-        "appearance": "Erscheinungsbild",
-        "appearances": {
-            "cadran": "Cadran",
-            "classic": "Klassisch"
-        },
         "text_size": "Textgröße",
         "text_sizes": {
             "normal": "Normal",
@@ -1438,7 +1430,6 @@
         "failed": "Die Hinweise konnten nicht abgerufen werden. Drücken Sie X, um es erneut zu versuchen."
     },
     "quick": {
-        "title": "Sprache und Design",
         "hint": "Sprache & Design",
         "title_text": "Sprache, Design und Textgröße"
     },
@@ -1723,11 +1714,6 @@
         },
         "dialog": {
             "unlock_short": "Die Altersbeschränkungen werden für die Änderung mit der gespeicherten Geheimzahl aufgehoben und danach wieder aktiviert."
-        },
-        "intro": {
-            "body": "Ein neues Aussehen: Cadran\n\nDie verbleibende Zeit als Ring, die Woche mit dem Stick bearbeitet, Karten, die sich vom Sofa aus lesen lassen, größerer Text am Fernseher. Die Listen der früheren Versionen gibt es weiterhin:\nOptionen › Erscheinungsbild › Klassisch",
-            "classic": "Zurück zu Klassisch",
-            "keep": "Cadran behalten"
         }
     },
     "schedule": {

@@ -1,9 +1,8 @@
 // platform — the console services the UI needs besides pctl, time and pdm:
-// the system number pad, the focus state, hbloader's "next homebrew", the
-// console region and random bytes. The Switch build implements them with
+// the focus state, hbloader's "next homebrew", the console region and random
+// bytes. The Switch build implements them with
 // libnx (core/platform.c); the desktop build in the simulator
 // (sim/sim_platform.cpp), where PLAYGUARD_SIM_* variables play the console:
-//   PLAYGUARD_SIM_NUMPAD=1:30   the number pad returns "1:30" ("cancel": B)
 //   PLAYGUARD_SIM_BACKGROUND=1  PlayGuard is not in focus (HOME menu)
 //   PLAYGUARD_SIM_HBLOADER=1    started through hbloader: a store can be launched
 //   PLAYGUARD_SIM_APPLET=1      applet (album) mode: no game to close on exit
@@ -17,17 +16,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef enum {
-    PLATFORM_INPUT_OK,          // `out` holds what was typed (not empty)
-    PLATFORM_INPUT_CANCELLED,   // B, or nothing typed
-    PLATFORM_INPUT_NONE,        // no system keyboard: the caller uses the UI's own
-} PlatformInput;
-
-// The system number pad with an extra ':' key ("1:30"), at most `max_len`
-// characters, starting from `initial`.
-PlatformInput platform_numpad(const char *header, const char *guide, const char *initial, int max_len,
-                              char *out, size_t out_size);
 
 // False while the HOME menu or another applet has the screen.
 bool platform_in_focus(void);

@@ -67,7 +67,6 @@
  },
  "params": {
   "tab": {"label": "Öffnet mit", "options": {"": "Übersicht", "play_timer": "Spielzeit", "activity": "Aktivität", "restrictions": "Einschränkungen", "security": "Geheimzahl", "console": "Konsole", "history": "Verlauf", "preferences": "Optionen", "about": "Info"}},
-  "appearance": {"label": "Erscheinungsbild", "options": {"": "Wie in den Optionen", "cadran": "Cadran", "classic": "Klassisch"}},
   "keep": {"label": "Zustand zwischen Besuchen behalten", "help": "Die Daten von PlayGuard und die Einstellungen der simulierten Konsole (Geheimzahl, Limits, Uhren) bleiben in diesem Browser; die Konsolen-Einstellungen dieses Bereichs gelten dann nur beim ersten Start."},
   "not_set_up": {"label": "Nie eingerichtet (keine Geheimzahl)"},
   "unlocked": {"label": "Vorübergehend entsperrt"},
@@ -89,7 +88,6 @@
   "hbloader": {"label": "Ein Loader, der ein Update an einen Store übergeben kann"},
   "docked": {"label": "In der Station (am Fernseher)"},
   "battery": {"label": "Im Akkubetrieb (kein Ladegerät)"},
-  "numpad": {"label": "Was der Ziffernblock zurückgibt"},
   "boot_choice": {"label": "Antwort auf „vorheriger Build?“ beim Start", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "Netzwerkuhr genau"},
   "autosync_off": {"label": "„Uhr über das Internet synchronisieren“ aus"},

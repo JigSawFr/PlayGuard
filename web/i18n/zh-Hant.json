@@ -67,7 +67,6 @@
  },
  "params": {
   "tab": {"label": "開啟時顯示", "options": {"": "總覽", "play_timer": "遊玩時間限制", "activity": "活動紀錄", "restrictions": "限制", "security": "PIN碼", "console": "主機", "history": "紀錄", "preferences": "偏好設定", "about": "關於"}},
-  "appearance": {"label": "外觀", "options": {"": "依偏好設定", "cadran": "Cadran", "classic": "經典"}},
   "keep": {"label": "在造訪之間保留狀態", "help": "PlayGuard 的資料和模擬主機的設定（PIN碼、限制、時鐘）保留在此瀏覽器中；此面板中的主機設定只在首次啟動時生效。"},
   "not_set_up": {"label": "從未設定（沒有 PIN碼）"},
   "unlocked": {"label": "暫時解除"},
@@ -89,7 +88,6 @@
   "hbloader": {"label": "能把更新交給商店的載入器"},
   "docked": {"label": "插在底座上（電視）"},
   "battery": {"label": "電池供電（未接充電器）"},
-  "numpad": {"label": "數字鍵盤傳回的內容"},
   "boot_choice": {"label": "啟動時對「上一個版本？」的回答", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "網路時鐘準確"},
   "autosync_off": {"label": "「透過網際網路同步時鐘」已關閉"},

@@ -21,8 +21,6 @@
 
 namespace cadran
 {
-bool enabled();   // tab/cadran_tab.cpp: the Cadran appearance is on
-
 // "Sécurité" -> "SÉCURITÉ": ASCII, Latin-1, œ and Cyrillic (the catalogs' scripts
 // with a case); anything else is kept.
 std::string upper(const std::string& text);

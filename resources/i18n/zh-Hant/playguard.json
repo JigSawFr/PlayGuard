@@ -78,9 +78,6 @@
         "5": "週五",
         "6": "週六"
     },
-    "numpad": {
-        "guide": "時:分（1:30）或分鐘數（90），最多24:00。0 = 當天不能遊玩。"
-    },
     "error": {
         "code": "錯誤{}",
         "code_hint": "錯誤{}：{}",
@@ -1044,11 +1041,6 @@
         "notices_reminders": "提醒：備份、另一個系統、封鎖遊戲",
         "notices_ack_remind": "30 天後重新計入已忽略的警告",
         "help": "說明與診斷",
-        "appearance": "外觀",
-        "appearances": {
-            "cadran": "Cadran",
-            "classic": "經典"
-        },
         "text_size": "文字大小",
         "text_sizes": {
             "normal": "標準",
@@ -1438,7 +1430,6 @@
         "failed": "無法取得說明。按 X 重試。"
     },
     "quick": {
-        "title": "語言和主題",
         "hint": "語言和主題",
         "title_text": "語言、主題和文字大小"
     },
@@ -1723,11 +1714,6 @@
         },
         "dialog": {
             "unlock_short": "修改期間使用已儲存的PIN碼暫時解除家長監護，隨後立即恢復。"
-        },
-        "intro": {
-            "body": "全新外觀：Cadran\n\n剩餘時間以圓環顯示，用搖桿編輯一週，在沙發上也能看清的卡片，電視上文字更大。以前版本的清單仍在：\n偏好設定 › 外觀 › 經典",
-            "classic": "返回經典",
-            "keep": "保留 Cadran"
         }
     },
     "schedule": {

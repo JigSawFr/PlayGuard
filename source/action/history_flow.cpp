@@ -421,7 +421,7 @@ void offer_undo(std::function<void()> refresh)
 {
     constexpr long OFFER_MS = 8000;
     MainActivity* main = ui::main_activity();
-    if (!cadran::enabled() || !main || brls::Application::getActivitiesStack().back() != main) return;
+    if (!main || brls::Application::getActivitiesStack().back() != main) return;
     withdraw_undo();
     // The change just recorded (a write records it before it ends), when it
     // can be put back; not an undo itself, and nothing when the write

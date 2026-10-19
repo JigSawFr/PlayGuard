@@ -67,7 +67,6 @@
  },
  "params": {
   "tab": {"label": "처음 여는 탭", "options": {"": "개요", "play_timer": "플레이 타이머", "activity": "플레이 기록", "restrictions": "제한", "security": "PIN", "console": "본체", "history": "변경 기록", "preferences": "환경 설정", "about": "정보"}},
-  "appearance": {"label": "모양", "options": {"": "환경 설정대로", "cadran": "Cadran", "classic": "클래식"}},
   "keep": {"label": "방문 사이에 상태 유지", "help": "PlayGuard 데이터와 시뮬레이션 본체의 설정(PIN, 제한, 시계)이 이 브라우저에 남습니다. 이 패널의 본체 설정은 처음 시작할 때만 적용됩니다."},
   "not_set_up": {"label": "설정한 적 없음(PIN 없음)"},
   "unlocked": {"label": "일시적으로 해제됨"},
@@ -89,7 +88,6 @@
   "hbloader": {"label": "업데이트를 스토어에 넘길 수 있는 로더"},
   "docked": {"label": "독에 연결(TV)"},
   "battery": {"label": "배터리 사용(충전기 없음)"},
-  "numpad": {"label": "숫자 키패드가 돌려주는 값"},
   "boot_choice": {"label": "시작할 때 '이전 빌드?'에 대한 답", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "네트워크 시계 정확함"},
   "autosync_off": {"label": "'인터넷으로 시계 맞추기' 꺼짐"},

@@ -78,9 +78,6 @@
         "5": "Fri",
         "6": "Sat"
     },
-    "numpad": {
-        "guide": "Hours:minutes (1:30) or minutes (90), up to 24:00. 0 = no play that day."
-    },
     "error": {
         "code": "error {}",
         "code_hint": "error {}: {}",
@@ -1044,11 +1041,6 @@
         "notices_reminders": "Reminders: backups, the other system, all games blocked",
         "notices_ack_remind": "Count ignored warnings again after 30 days",
         "help": "Help & diagnostics",
-        "appearance": "Appearance",
-        "appearances": {
-            "cadran": "Cadran",
-            "classic": "Classic"
-        },
         "text_size": "Text size",
         "text_sizes": {
             "normal": "Normal",
@@ -1438,7 +1430,6 @@
         "failed": "The notes could not be fetched. Press X to try again."
     },
     "quick": {
-        "title": "Language and theme",
         "hint": "Language & theme",
         "title_text": "Language, theme and text size"
     },
@@ -1723,11 +1714,6 @@
         },
         "dialog": {
             "unlock_short": "Parental controls are unlocked with the stored PIN for the change, then locked again."
-        },
-        "intro": {
-            "body": "A new look: Cadran\n\nThe time left as a ring, the week edited with the stick, cards to read from the couch, larger text on the TV. The lists of the earlier versions are still there:\nPreferences › Appearance › Classic",
-            "classic": "Back to Classic",
-            "keep": "Keep Cadran"
         }
     },
     "schedule": {

@@ -67,7 +67,6 @@
  },
  "params": {
   "tab": {"label": "Ouvre sur", "options": {"": "Vue d'ensemble", "play_timer": "Temps de jeu", "activity": "Activité", "restrictions": "Restrictions", "security": "NIP", "console": "Console", "history": "Historique", "preferences": "Préférences", "about": "À propos"}},
-  "appearance": {"label": "Apparence", "options": {"": "Comme dans les Préférences", "cadran": "Cadran", "classic": "Classique"}},
   "keep": {"label": "Conserver l’état entre les visites", "help": "Les données de PlayGuard et les paramètres de la console simulée (NIP, limites, horloges) restent dans ce navigateur; les paramètres de console de ce panneau ne comptent alors qu’au premier lancement."},
   "not_set_up": {"label": "Jamais configuré (pas de NIP)"},
   "unlocked": {"label": "Déverrouillé temporairement"},
@@ -89,7 +88,6 @@
   "hbloader": {"label": "Un lanceur qui peut confier une mise à jour à un store"},
   "docked": {"label": "Sur la station (sur la TV)"},
   "battery": {"label": "Sur batterie (sans chargeur)"},
-  "numpad": {"label": "Ce que renvoie le pavé numérique"},
   "boot_choice": {"label": "Réponse à « build précédente ? » au démarrage", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "Horloge réseau exacte"},
   "autosync_off": {"label": "« Synchroniser l'horloge via Internet » désactivé"},

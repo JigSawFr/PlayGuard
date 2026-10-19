@@ -270,6 +270,6 @@ void ClockTab::copy()
 
 void ClockTab::open_screen()
 {
-    // The Cadran appearance: the same screen with both clocks large.
-    ui::open_screen(cadran::enabled() ? new CadranClockTab() : new ClockTab(), "playguard/tabs/clock"_i18n);
+    // The same screen with both clocks large.
+    ui::open_screen(new CadranClockTab(), "playguard/tabs/clock"_i18n);
 }

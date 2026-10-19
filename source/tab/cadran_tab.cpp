@@ -36,18 +36,6 @@
 
 using namespace brls::literals;
 
-bool cadran::enabled()
-{
-    // Read once: a change in Preferences takes effect at the next launch.
-    static const bool on = []() {
-#ifndef __SWITCH__
-        if (const char* forced = sim_env("PLAYGUARD_SIM_APPEARANCE")) return std::string(forced) != "classic";
-#endif
-        return config::get().appearance != "classic";
-    }();
-    return on;
-}
-
 void cadran::install_theme()
 {
     const NVGcolor navy = nvgRGB(0x0B, 0x14, 0x24);

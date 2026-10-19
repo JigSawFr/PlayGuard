@@ -67,7 +67,6 @@
  },
  "params": {
   "tab": {"label": "打开时显示", "options": {"": "概览", "play_timer": "游戏时间", "activity": "游玩记录", "restrictions": "限制", "security": "PIN", "console": "主机", "history": "历史记录", "preferences": "偏好设置", "about": "关于"}},
-  "appearance": {"label": "外观", "options": {"": "按偏好设置", "cadran": "Cadran", "classic": "经典"}},
   "keep": {"label": "在访问之间保留状态", "help": "PlayGuard 的数据和模拟主机的设置（PIN、限制、时钟）保留在此浏览器中；此面板中的主机设置只在首次启动时生效。"},
   "not_set_up": {"label": "从未设置（没有 PIN）"},
   "unlocked": {"label": "暂时解除"},
@@ -89,7 +88,6 @@
   "hbloader": {"label": "能把更新交给商店的加载器"},
   "docked": {"label": "插在底座上（电视）"},
   "battery": {"label": "电池供电（未接充电器）"},
-  "numpad": {"label": "数字键盘返回的内容"},
   "boot_choice": {"label": "启动时对“上一个版本？”的回答", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "网络时钟准确"},
   "autosync_off": {"label": "“通过互联网同步时钟”已关闭"},

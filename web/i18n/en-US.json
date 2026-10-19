@@ -67,7 +67,6 @@
  },
  "params": {
   "tab": {"label": "Opens on", "options": {"": "Overview", "play_timer": "Play timer", "activity": "Activity", "restrictions": "Restrictions", "security": "PIN", "console": "Console", "history": "History", "preferences": "Preferences", "about": "About"}},
-  "appearance": {"label": "Appearance", "options": {"": "As in Preferences", "cadran": "Cadran", "classic": "Classic"}},
   "keep": {"label": "Keep the state between visits", "help": "PlayGuard's data and the simulated console's settings (PIN, limits, clocks) stay in this browser; the console settings of this panel then count for a first start only."},
   "not_set_up": {"label": "Never set up (no PIN)"},
   "unlocked": {"label": "Temporarily unlocked"},
@@ -89,7 +88,6 @@
   "hbloader": {"label": "A loader that can hand an update to a store"},
   "docked": {"label": "On the dock (on the TV)"},
   "battery": {"label": "On the battery (no charger)"},
-  "numpad": {"label": "What the number pad returns"},
   "boot_choice": {"label": "Answer to \"previous build?\" at start-up", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "Network clock accurate"},
   "autosync_off": {"label": "\"Synchronise Clock via Internet\" off"},

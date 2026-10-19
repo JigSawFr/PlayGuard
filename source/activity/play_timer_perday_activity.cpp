@@ -132,7 +132,7 @@ void PlayTimerPerDayActivity::onContentAvailable()
     unavailable->setSingleLine(false);
     this->bind_cells();
     this->bind_buttons();
-    if (cadran::enabled()) this->dress_cadran();
+    this->dress_cadran();
 
     if (this->profile_mode) {
         // The console's state is not what this screen edits: no header.

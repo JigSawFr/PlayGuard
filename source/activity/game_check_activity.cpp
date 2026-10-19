@@ -291,7 +291,6 @@ void card_look(brls::Box* list, bool grid)
 
 void round_button(brls::Button* button)
 {
-    if (!cadran::enabled()) return;
     button->setHeight(48);
     button->setCornerRadius(24);
     button->setHighlightCornerRadius(24);
@@ -323,10 +322,8 @@ void GameCheckActivity::onContentAvailable()
     });
     list->addView(this->selection);
     ui::set_visible(this->selection, false);
-    if (cadran::enabled()) {
-        cadran::List::row(this->view_cell, "list", true);
-        cadran::List::row(this->selection, "check", true);
-    }
+    cadran::List::row(this->view_cell, "list", true);
+    cadran::List::row(this->selection, "check", true);
     // A section per way out, under its title and what to do; each hidden
     // while it has no game.
     for (GameCategory category : GROUPS) this->build_group(category);
@@ -353,12 +350,10 @@ void GameCheckActivity::build_group(GameCategory category)
     group.note = ui::text_label(brls::getStr(std::string("playguard/games/group_note/") + category_key(category)), 18, ui::color_note());
     group.note->setMarginBottom(8);
     group.box->addView(group.note);
-    if (cadran::enabled()) {
-        cadran::List::section(group.title);
-        group.note->setFontSize(15.5f);
-        group.note->setTextColor(brls::Application::getTheme()["cadran/text3"]);
-        group.note->setMarginLeft(8);
-    }
+    cadran::List::section(group.title);
+    group.note->setFontSize(15.5f);
+    group.note->setTextColor(brls::Application::getTheme()["cadran/text3"]);
+    group.note->setMarginLeft(8);
     // The games to install again: their list kept on the SD card, then
     // all of them removed at once (an installer counts them as installed
     // until then). Side by side, above the games, in reach however long
@@ -413,7 +408,7 @@ void GameCheckActivity::build_group(GameCategory category)
         round_button(group.verify_all);
         group.box->addView(group.verify_all);
     }
-    group.list = cadran::enabled() ? new cadran::Card() : new brls::Box(brls::Axis::COLUMN);
+    group.list = new cadran::Card();
     group.list->setAlignItems(this->grid ? brls::AlignItems::CENTER : brls::AlignItems::STRETCH);
     card_look(group.list, this->grid);
     group.box->addView(group.list);
@@ -645,7 +640,7 @@ void GameCheckActivity::show()
                     cell = (IssueCell*)cells[i];
                 } else {
                     cell = new IssueCell();
-                    if (cadran::enabled()) cadran::List::row(cell);
+                    cadran::List::row(cell);
                     group.list->addView(cell);
                 }
                 cell->setText(line_names[b.game.app_id]);
@@ -668,7 +663,7 @@ void GameCheckActivity::show()
         if (!this->grid)
             for (size_t i = shown.size(); i < cells.size(); i++) ui::set_visible(cells[i], false);
         const std::string title = brls::getStr(std::string("playguard/games/groups/") + category_key(category), (int)shown.size());
-        group.title->setTitle(cadran::enabled() ? cadran::upper(title) : title);
+        group.title->setTitle(cadran::upper(title));
         // A section's own cells go with it: borealis would still give the
         // focus to a visible cell inside a box that is gone.
         if (category == GC_CAT_REINSTALL) {

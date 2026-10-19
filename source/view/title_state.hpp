@@ -1,9 +1,10 @@
 // TitleState — what the user must know whatever the tab, as an icon right of
-// the main screen's title: an open padlock (amber) while parental controls
-// are temporarily unlocked, a crossed-out pencil in read-only mode. A tap
-// goes where it is undone: PIN › Lock again, the firmware screen (read-only
-// for an untested firmware) or the developer switch in Help & diagnostics.
-// Not focusable, like the bell. MainActivity::update_title shows and hides them.
+// the main screen's title: a crossed-out pencil in read-only mode. A tap goes
+// where it is undone: the firmware screen (read-only for an untested
+// firmware) or the developer switch in Help & diagnostics. Not focusable,
+// like the bell. MainActivity::update_title shows and hides it. While
+// parental controls are unlocked, the header's pill says so instead, and its
+// tap goes where that is undone (open(Kind::UNLOCKED): PIN › Lock again).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -14,13 +15,12 @@ class TitleState : public brls::View
   public:
     enum class Kind { UNLOCKED, READ_ONLY };
 
-    explicit TitleState(Kind kind);
+    TitleState();
 
-    // The icon of `kind` in `frame`'s title row (both added after the title
-    // the first time), shown or hidden.
-    static void show(brls::AppletFrame* frame, Kind kind, bool shown);
-    // Where `kind` is undone, as a tap on its icon goes (Cadran's header pill
-    // says "unlocked" instead of the padlock, and goes there too).
+    // The read-only icon in `frame`'s title row (added after the title the
+    // first time), shown or hidden.
+    static void show(brls::AppletFrame* frame, bool shown);
+    // Where `kind` is undone, as a tap on its icon (or the header's pill) goes.
     static void open(Kind kind);
 
     void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
@@ -29,8 +29,5 @@ class TitleState : public brls::View
     brls::View* hitTest(brls::Point point) override;
 
   private:
-    Kind kind;
-
-    void draw_padlock(NVGcontext* vg, float x, float y, float width, float height);
     void draw_read_only(NVGcontext* vg, float x, float y, float width, float height);
 };

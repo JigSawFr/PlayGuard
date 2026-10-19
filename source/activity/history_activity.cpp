@@ -32,10 +32,9 @@ brls::Box* new_slot()
     auto* cell = new brls::DetailCell();
     cell->setDetailTextColor(ui::color_neutral());
     slot->addView(cell);
-    if (cadran::enabled()) {   // each change a card of its own, under its day
-        cadran::List::section(day);
-        cadran::List::row(cell, nullptr, true);
-    }
+    // Each change a card of its own, under its day.
+    cadran::List::section(day);
+    cadran::List::row(cell, nullptr, true);
     return slot;
 }
 }   // namespace
@@ -53,11 +52,9 @@ void HistoryActivity::onContentAvailable()
         this->export_shown();
         return true;
     });
-    if (cadran::enabled()) {
-        this->empty_card = cadran::kit::empty("history");
-        this->empty_card.box->setMarginTop(16);
-        if (auto* root = dynamic_cast<brls::Box*>(empty->getParent())) root->addView(this->empty_card.box);
-    }
+    this->empty_card = cadran::kit::empty("history");
+    this->empty_card.box->setMarginTop(16);
+    if (auto* root = dynamic_cast<brls::Box*>(empty->getParent())) root->addView(this->empty_card.box);
     this->rebuild();
 }
 
@@ -118,7 +115,7 @@ void HistoryActivity::rebuild()
             const bool starts_day = i == 0 || this_day != day;
             if (starts_day) {
                 const std::string title = history_flow::day_title(this_day);
-                header->setTitle(cadran::enabled() ? cadran::upper(title) : title);
+                header->setTitle(cadran::upper(title));
             }
             ui::set_visible(header, starts_day);
             day = this_day;

@@ -398,7 +398,7 @@ void register_views()
     VersionBadge::install();
     NoticeBell::install();   // the bell goes in the header's row at the right
     HeaderSetting::install();   // after the bell: the language and theme go left of it
-    if (cadran::enabled()) cadran::install_screens();   // the other screens after the boards
+    cadran::install_screens();   // the other screens after the boards
 }
 
 // After the main loop: the play timer locked again if asked, the tasks and
@@ -508,20 +508,18 @@ int main(int argc, char* argv[])
 
     // PlayGuard status colours (light / dark variants), before any view exists.
     ui::register_theme_colors();
-    // The Cadran appearance's palettes (Preferences › Appearance, the default).
-    if (cadran::enabled()) {
-        cadran::install_theme();
-        // Preferences › Text size (larger on a TV by default), before the
-        // first label exists; then on and off the dock.
-        text_size::install();
-        // The console clears the screen with a colour deko3d records once
-        // (SwitchVideoContext::recordStaticCommands: at start-up and on a theme
-        // change), so before this palette: the space behind the tabs stayed
-        // borealis' grey next to the rail's navy. A theme change records it
-        // again (the desktop clears with the theme's colour every frame).
-        brls::Platform* platform = brls::Application::getPlatform();
-        platform->setThemeVariant(platform->getThemeVariant());
-    }
+    // The palettes after the design boards (navy on dark, cool white on light).
+    cadran::install_theme();
+    // Preferences › Text size (larger on a TV by default), before the
+    // first label exists; then on and off the dock.
+    text_size::install();
+    // The console clears the screen with a colour deko3d records once
+    // (SwitchVideoContext::recordStaticCommands: at start-up and on a theme
+    // change), so before this palette: the space behind the tabs stayed
+    // borealis' grey next to the rail's navy. A theme change records it
+    // again (the desktop clears with the theme's colour every frame).
+    brls::Platform* platform = brls::Application::getPlatform();
+    platform->setThemeVariant(platform->getThemeVariant());
 
     // We own the quit path (B on the sidebar / error screen).
     brls::Application::setGlobalQuit(false);

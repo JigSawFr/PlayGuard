@@ -83,10 +83,10 @@ std::string mode()
 #else
     std::string m = "desktop";
 #endif
-    // Cadran's glow turned off (Developer): its cost is the difference; the
+    // The glow turned off (Developer): its cost is the difference; the
     // lighter effects on the battery (ui/effects) leave it out too.
-    if (cadran::enabled() && !config::get().cadran_glow) m += "-noglow";
-    else if (cadran::enabled() && effects::light()) m += "-light";
+    if (!config::get().cadran_glow) m += "-noglow";
+    else if (effects::light()) m += "-light";
     return m;
 }
 

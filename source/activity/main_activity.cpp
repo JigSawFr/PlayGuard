@@ -3,7 +3,6 @@
 
 #include <cstdlib>
 
-#include "action/appearance_flow.hpp"
 #include "action/clock_check.hpp"
 #include "action/data_notice.hpp"
 #include "action/fw_gate.hpp"
@@ -84,7 +83,6 @@ void MainActivity::quit_or_relock()
 
 brls::View* MainActivity::createContentView()
 {
-    if (cadran::enabled()) return brls::View::createFromXMLResource("activity/main_cadran.xml");
     return brls::View::createFromXMLResource("activity/main.xml");
 }
 
@@ -94,9 +92,8 @@ void MainActivity::onContentAvailable()
     brls::Logger::info("main screen opened");
     this->update_title();
     compact_sidebar(this->getView("main_tabs"));
-    // The Cadran appearance: the frame after the design boards.
-    if (cadran::enabled())
-        cadran::style_frame(dynamic_cast<brls::AppletFrame*>(this->getContentView()), this->getView("main_tabs"));
+    // The frame after the design boards.
+    cadran::style_frame(dynamic_cast<brls::AppletFrame*>(this->getContentView()), this->getView("main_tabs"));
 
     // B on the sidebar quits (the tabs themselves send B back to the sidebar),
     // but only when pressed twice within 2 s: one stray B never closes the app.
@@ -170,9 +167,6 @@ void MainActivity::onContentAvailable()
 
     // Firmware newer than the verified one: the firmware screen (or the remembered choice).
     fw_gate::on_main_screen();
-    // After an update from before the Cadran appearance: the new look said
-    // once, Classic one press away (before the first steps: once only).
-    appearance_flow::at_start(this);
     // Nothing set up yet (no PIN): the first steps, once per start, unless the
     // firmware screen opens (one screen per start: ui::claim_start_screen).
     if (OnboardingActivity::wanted_at_start() && ui::claim_start_screen("first steps"))
@@ -263,10 +257,9 @@ void MainActivity::update_title()
     auto* frame = dynamic_cast<brls::AppletFrame*>(this->getContentView());
     if (!frame) return;
     frame->setTitle("playguard/title"_i18n);
-    // Cadran says it in the header's pill, on every screen.
-    TitleState::show(frame, TitleState::Kind::UNLOCKED, ui::known_unlocked() && !cadran::enabled());
-    TitleState::show(frame, TitleState::Kind::READ_ONLY, app::read_only());
-    if (cadran::enabled()) cadran::refresh_pill();
+    // The header's pill says when parental controls are unlocked, on every screen.
+    TitleState::show(frame, app::read_only());
+    cadran::refresh_pill();
 }
 
 // Back from a dialog or a screen: a tab may have hidden the view that opened

@@ -454,7 +454,6 @@ void cadran::prompt_minutes(const std::string& header, uint16_t initial, std::fu
 
 brls::View* cadran::toast_icon(bool done)
 {
-    if (!enabled()) return nullptr;
     CadranIcon* icon = cadran::kit::icon(done ? "check" : "alert", 22, done ? "cadran/teal_fill" : "cadran/amber_fill");
     icon->setMarginRight(14);
     icon->setShrink(0);

@@ -14,18 +14,11 @@ struct Config
 {
     std::string language = "system";   // "system" or one of LANGUAGES
     std::string theme    = "system";   // "system", "light", "dark"
-    // The look: "cadran" (the design after the 2026 boards, source/tab/cadran_*)
-    // or "classic" (the lists of 1.x), read at start-up.
-    std::string appearance = "cadran";
-    // The text of the Cadran appearance: "auto" (larger while docked),
-    // "normal" or "large" (ui/text_size).
+    // The text: "auto" (larger while docked), "normal" or "large"
+    // (ui/text_size).
     std::string text_size = "auto";
     // "auto" (lighter effects on the battery) or "full" (ui/effects).
     std::string effects = "auto";
-    // Cadran said once to whom knew the lists: false in a config written
-    // before the appearance could be chosen (no "appearance" in it), so the
-    // main screen offers to keep it or go back to Classic (appearance_flow).
-    bool appearance_offered = true;
     std::string ntp_server;            // empty: pick from the console region
     std::vector<std::string> custom_servers;
     bool advanced = false;             // show debug-class play-timer actions
@@ -170,8 +163,6 @@ constexpr int    SCHEMA             = 1;    // "schema" in config.json
 constexpr const char* LANGUAGES[] = { "system", "en-US", "fr", "fr-CA", "de", "es", "es-419", "it", "nl", "pt", "pt-BR", "ru", "ja", "ko", "zh-Hans", "zh-Hant" };
 // What theme may be: the console's own, then the two forced ones.
 constexpr const char* THEMES[] = { "system", "light", "dark" };
-// What appearance may be: the default first.
-constexpr const char* APPEARANCES[] = { "cadran", "classic" };
 // What text_size may be: the default first.
 constexpr const char* TEXT_SIZES[] = { "auto", "normal", "large" };
 // What effects may be: the default first.

@@ -2,11 +2,9 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
-#include "core/platform.h"
 #include "ui/cadran_modal.hpp"
 #include "ui/text_size.hpp"
 #include "util/config.hpp"
-#include "util/duration.hpp"
 #include "util/text.hpp"
 #include "view/qr_view.hpp"
 
@@ -38,67 +36,11 @@ void add_cancel(brls::Dialog* dialog, std::function<void()> cancel)
     on_cancel(dialog, cancel);
 }
 
-// A dialog's text has to fit: borealis' Label stops wrapping when the height
-// it is offered is below what its wrapped text needs, and draws the whole
-// text on one line across the screen instead (label.cpp, labelMeasureFunc).
-// So the font size is chosen from the text's real wrapped height, measured
-// the way the Label measures it, never from a character count (French and
-// German lines hold fewer characters than English ones).
-
-// Height of the dialog's content above its button row (72 px; Cadran's is
-// taller, and its card keeps a margin from the screen's top and bottom).
+// Height of the dialog's content above its button row (its card keeps a
+// margin from the screen's top and bottom).
 static float content_height()
 {
-    if (cadran::enabled()) return brls::Application::contentHeight - cadran::DIALOG_BUTTONS - 2 * cadran::DIALOG_MARGIN;
-    return brls::Application::contentHeight - 72;
-}
-
-// Wrapped height of `text` at `size` in `width`, as labelMeasureFunc does it.
-static float text_height(brls::Label* label, const std::string& text, float size, float width)
-{
-    NVGcontext* vg = brls::Application::getNVGContext();
-    nvgFontSize(vg, size);
-    nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
-    nvgFontFaceId(vg, label->getFont());
-    nvgTextLineHeight(vg, label->getLineHeight());
-    float bounds[4];
-    nvgTextBoxBounds(vg, 0, 0, width, text.c_str(), nullptr, bounds);
-    return bounds[3] - bounds[1];
-}
-
-// The largest of `sizes` at which `text` fits `height` in `width` (a few
-// pixels spare), else the smallest (*fits false then).
-static float fitting_size(brls::Label* label, const std::string& text, std::initializer_list<float> sizes,
-                          float width, float height, bool* fits)
-{
-    *fits = true;
-    for (float size : sizes)
-        if (text_height(label, text, size, width) + 4 <= height) return size;
-    *fits = false;
-    return *(sizes.end() - 1);
-}
-
-static brls::Label* wrapping_label(const std::string& text)
-{
-    auto* label = new brls::Label();
-    label->setText(text);
-    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    label->setSingleLine(false);
-    return label;
-}
-
-// The smallest font is 18 px: a text still too tall for the dialog scrolls,
-// in a frame of `height`, rather than going smaller. The frame holds the
-// label (wrapped at its width, its own height unbounded); a finger drags it,
-// and the D-pad's up and down scroll it half a frame (scroll_with), the
-// buttons keeping the focus.
-static brls::ScrollingFrame* scrolling_text(brls::Label* label, float height)
-{
-    auto* frame = new brls::ScrollingFrame();
-    frame->setHeight(height);
-    frame->setScrollingBehavior(brls::ScrollingBehavior::NATURAL);
-    frame->setContentView(label);
-    return frame;
+    return brls::Application::contentHeight - cadran::DIALOG_BUTTONS - 2 * cadran::DIALOG_MARGIN;
 }
 
 static void scroll_with(brls::Dialog* dialog, brls::ScrollingFrame* frame, brls::View* text)
@@ -118,9 +60,9 @@ static void scroll_with(brls::Dialog* dialog, brls::ScrollingFrame* frame, brls:
     }
 }
 
-// Cadran: the text laid out by cadran::dialog_body (and `extra` in it),
-// scrolling when taller than the dialog's room.
-static brls::Dialog* cadran_dialog(const std::string& text, brls::View* extra)
+// The text laid out by cadran::dialog_body (and `extra` in it), scrolling
+// when taller than the dialog's room.
+static brls::Dialog* body_dialog(const std::string& text, brls::View* extra)
 {
     brls::Box* body = cadran::dialog_body(text, extra);
     YGNodeCalculateLayout(body->getYGNode(), 720, YGUndefined, YGDirectionLTR);
@@ -140,71 +82,18 @@ static brls::Dialog* cadran_dialog(const std::string& text, brls::View* extra)
 
 brls::Dialog* dialog(const std::string& text)
 {
-    if (cadran::enabled()) return cadran_dialog(text, nullptr);
-    // borealis' own layout first (24 px, 65 / 115 px margins, as
-    // brls::Dialog(text)); a longer text gets narrower margins and a
-    // smaller font, down to 18 px, then scrolls. Never brls::Dialog(text)
-    // itself: its label sits in a row, which Yoga may measure at a width of 0.
-    auto* label = wrapping_label(text);
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::STRETCH);   // the dialog's width: the label wraps
-    box->setJustifyContent(brls::JustifyContent::CENTER);
-    const float h = content_height();
-    brls::ScrollingFrame* frame = nullptr;
-    if (text_height(label, text, 24, 720 - 2 * 115) + 4 <= h - 2 * 65) {
-        label->setFontSize(24);
-        box->setPadding(65, 115, 65, 115);
-        box->addView(label);
-    } else {
-        bool fits = true;
-        label->setFontSize(fitting_size(label, text, { 21, 19, 18 }, 720 - 2 * 40, h - 2 * 28, &fits));
-        box->setPadding(28, 40, 28, 40);
-        if (fits) box->addView(label);
-        else box->addView(frame = scrolling_text(label, h - 2 * 28));
-    }
-    auto* dialog = new brls::Dialog(box);
-    if (frame) scroll_with(dialog, frame, label);
-    return dialog;
-}
-
-// The text and `extra` (a week chart) under it, the font as large as fits
-// (20 px down to 18: German, with every note, then the text scrolls),
-// `extra` measured first.
-static brls::Dialog* dialog_with(const std::string& text, brls::View* extra)
-{
-    if (cadran::enabled()) return cadran_dialog(text, extra);
-    const float width = 720 - 2 * 40;
-    extra->setMarginTop(18);
-    YGNodeCalculateLayout(extra->getYGNode(), width, YGUndefined, YGDirectionLTR);
-    const float extra_h = YGNodeLayoutGetHeight(extra->getYGNode()) + 18;
-    auto* label = wrapping_label(text);
-    const float text_h = content_height() - 26 - 18 - extra_h;
-    bool fits = true;
-    label->setFontSize(fitting_size(label, text, { 20, 18 }, width, text_h, &fits));
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::STRETCH);
-    box->setPadding(26, 40, 18, 40);
-    brls::ScrollingFrame* frame = fits ? nullptr : scrolling_text(label, text_h);
-    box->addView(frame ? (brls::View*)frame : label);
-    box->addView(extra);
-    auto* dialog = new brls::Dialog(box);
-    if (frame) scroll_with(dialog, frame, label);
-    return dialog;
+    return body_dialog(text, nullptr);
 }
 
 static void open_confirm(const std::string& body, const std::string& confirm_label,
                          std::function<void()> on_yes, std::function<void()> on_no, bool danger,
                          brls::View* extra = nullptr)
 {
-    auto* dialog = extra ? dialog_with(body, extra) : ui::dialog(body);
+    auto* dialog = body_dialog(body, extra);
     dialog->addButton("hints/cancel"_i18n, [on_no]() { if (on_no) on_no(); });
     dialog->addButton(confirm_label, [on_yes]() { if (on_yes) on_yes(); });
     on_cancel(dialog, on_no);
-    if (cadran::enabled())
-        cadran::style_dialog(dialog, danger ? cadran::Emphasis::DANGER : cadran::Emphasis::PRIMARY);
-    else if (danger)
-        if (auto* button = dynamic_cast<brls::Button*>(dialog->getView("brls/dialog/button2")))
-            button->setTextColor(color_bad());
+    cadran::style_dialog(dialog, danger ? cadran::Emphasis::DANGER : cadran::Emphasis::PRIMARY);
     dialog->open();
 }
 
@@ -282,7 +171,7 @@ class Picker : public brls::Dropdown
         // The rows Dropdown's constructor already made used its own
         // cellForRow (this one did not exist yet): set again here.
         this->restyle(this);
-        if (cadran::enabled()) cadran::style_picker(this);
+        cadran::style_picker(this);
     }
 
   private:
@@ -294,7 +183,7 @@ class Picker : public brls::Dropdown
     void row(brls::RadioCell* cell, bool on)
     {
         cell->setSelected(on);
-        if (cadran::enabled()) cadran::style_pick_row(cell, on);
+        cadran::style_pick_row(cell, on);
     }
 
     // A row's detail, after its label, quieter (none: no detail at all).
@@ -308,7 +197,7 @@ class Picker : public brls::Dropdown
             text->setId("pick_detail");
             text->setFontSize(16);
             text->setSingleLine(true);
-            text->setTextColor(cadran::enabled() ? theme["cadran/text2"] : theme["brand/note"]);
+            text->setTextColor(theme["cadran/text2"]);
             text->setMarginRight(brls::getStyle()["brls/listitem/descriptionIndent"]);
             cell->addView(text, 1);
         }
@@ -360,31 +249,8 @@ void pick_actions(const std::string& title, const std::vector<Choice>& choices)
 
 void prompt_minutes(const std::string& header, uint16_t current, std::function<void(uint16_t)> on_value)
 {
-    // Cadran: the stick, not the number pad.
-    if (cadran::enabled()) {
-        cadran::prompt_minutes(header, current == PT_DAY_NOLIMIT ? 60 : current, std::move(on_value));
-        return;
-    }
-    const std::string guide   = "playguard/numpad/guide"_i18n;
-    const std::string initial = duration::format_hm(current == PT_DAY_NOLIMIT ? 60 : current);
-    auto handle = [on_value](const std::string& text) {
-        uint16_t minutes = 0;
-        if (!duration::parse(text, &minutes)) {
-            notify(rc_text(NXM_RC_INVALID_ARGUMENT), Toast::Refused);
-            return;
-        }
-        on_value(minutes);
-    };
-    // The system number pad, with a ":" key (core/platform.h); borealis' own
-    // text input where there is none.
-    char out[16] = {};
-    switch (platform_numpad(header.c_str(), guide.c_str(), initial.c_str(), 5, out, sizeof(out))) {
-        case PLATFORM_INPUT_OK:        handle(out); return;
-        case PLATFORM_INPUT_CANCELLED: return;
-        case PLATFORM_INPUT_NONE:      break;
-    }
-    brls::Application::getImeManager()->openForText([handle](std::string text) { handle(text); },
-                                                   header, guide, 5, initial);
+    // The stick, not the number pad.
+    cadran::prompt_minutes(header, current == PT_DAY_NOLIMIT ? 60 : current, std::move(on_value));
 }
 
 void prompt_text(const std::string& header, const std::string& initial, int max_len,
@@ -443,20 +309,6 @@ void pick_theme(std::function<void()> after)
     });
 }
 
-void pick_appearance(std::function<void()> after)
-{
-    std::vector<std::string> labels;
-    for (const char* a : config::APPEARANCES) labels.push_back(brls::getStr(std::string("playguard/prefs/appearances/") + a));
-    pick("playguard/prefs/appearance"_i18n, labels, index_of(config::APPEARANCES, config::get().appearance), [after](int i) {
-        choose(config::get().appearance, config::APPEARANCES[i], after);
-    });
-}
-
-std::string appearance_name()
-{
-    return brls::getStr("playguard/prefs/appearances/" + std::string(config::APPEARANCES[index_of(config::APPEARANCES, config::get().appearance)]));
-}
-
 void pick_text_size(std::function<void()> after)
 {
     std::vector<std::string> labels;
@@ -487,11 +339,10 @@ std::string theme_name()
 
 void quick_settings(std::function<void()> after)
 {
-    std::vector<std::string> labels = { "playguard/tools/language"_i18n + " · " + language_name(),
-                                        "playguard/tools/theme"_i18n + " · " + theme_name() };
-    // Cadran: the text size too (the header's AA).
-    if (cadran::enabled()) labels.push_back("playguard/prefs/text_size"_i18n + " · " + text_size_name());
-    pick(cadran::enabled() ? "playguard/quick/title_text"_i18n : "playguard/quick/title"_i18n, labels, 0, [after](int i) {
+    const std::vector<std::string> labels = { "playguard/tools/language"_i18n + " · " + language_name(),
+                                              "playguard/tools/theme"_i18n + " · " + theme_name(),
+                                              "playguard/prefs/text_size"_i18n + " · " + text_size_name() };
+    pick("playguard/quick/title_text"_i18n, labels, 0, [after](int i) {
         if (i == 0) pick_language(after);
         else if (i == 1) pick_theme(after);
         else pick_text_size(after);
