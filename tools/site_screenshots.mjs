@@ -25,19 +25,20 @@ const LANGUAGES = ['en-US', 'fr', 'fr-CA', 'de', 'es', 'es-419', 'it', 'nl', 'pt
 // per start of PlayGuard (a start takes the longest): the tab it opens on,
 // then each screen with the keys to it from the one before.
 const RUNS = [
-  // The tabs, down the sidebar, then Console's first row, Network clock.
+  // The tabs, down the sidebar, then Console's Network clock (the row with its
+  // badge, where the tab opens: the simulated clock is off).
   { tab: '', screens: [['dashboard'], ['play_timer', 'ArrowDown'], ['activity', 'ArrowDown'],
     ['restrictions', 'ArrowDown'], ['security', 'ArrowDown'], ['console', 'ArrowDown'],
     ['clock', 'ArrowRight', 'Enter']] },
-  // The week chart on today, tomorrow, its editor (its picker open), the picker closed.
-  { tab: 'play_timer', screens: [['per_day', 'ArrowRight', 'ArrowRight', 'Enter', 'Escape']] },
+  // The week: the profiles' chip, Monday, Monday edited (the documentation's
+  // "Play timer › editing a day").
+  { tab: 'play_timer', screens: [['per_day', 'ArrowRight', 'ArrowDown', 'Enter']] },
   // Not past History: on a busy machine it can take long enough to build
   // that a press seems missed, and pressed again goes one tab too far.
   { tab: 'preferences', screens: [['preferences']] },
-  // Activity's games (past Account, Account by default and Period), the
-  // first one's own screen: the documentation's "A game".
-  { tab: 'activity', screens: [['activity_game', 'ArrowRight', 'ArrowDown', 'ArrowDown', 'ArrowDown', 'ArrowDown',
-    'Enter', 'Enter']] },
+  // Activity's first game card (under the accounts' chips), its own screen:
+  // the documentation's "A game".
+  { tab: 'activity', screens: [['activity_game', 'ArrowRight', 'ArrowDown', 'Enter']] },
 ];
 const THEMES = (process.env.SITE_SCREENSHOT_THEMES || 'light,dark').split(',').filter(Boolean);
 const file = (name, theme) => `${name}${theme === 'dark' ? '-dark' : ''}.webp`;
