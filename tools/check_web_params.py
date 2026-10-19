@@ -7,7 +7,9 @@ Errors:
   params.json (its name in lower case without the prefix), or an entry no
   variable matches any more;
 - an entry of an unknown group or type, a select or a list without options,
-  a preset naming an unknown entry;
+  `values` for an option it does not offer, `live` on an entry that is no
+  variable, a preset naming an unknown entry, or giving a datetime entry
+  neither POSIX seconds nor `@HH:MM`;
 - a language of the console (config::LANGUAGES, but "system") without its
   catalog web/i18n/<language>.json, or not in the page's `lang` entry;
 - a text English (web/i18n/en-US.json) lacks: a group, a panel entry's label,
@@ -73,6 +75,11 @@ def main():
             options = p.get("options") or []
             if not options or not all(isinstance(o, str) for o in options):
                 errors.append(f"{where}: its options, a list of values")
+        for o in p.get("values") or {}:
+            if o not in (p.get("options") or []):
+                errors.append(f"{where}: values for {o!r}, which is not one of its options")
+        if p.get("live") and p.get("config"):
+            errors.append(f"{where}: live, but no variable (config)")
         if p.get("panel") is False:
             continue
         needed.add(f"params/{name}/label")
@@ -84,11 +91,14 @@ def main():
     for v in sorted(variables - read):
         errors.append(f"web/params.json: {v.lower()} is no PLAYGUARD_SIM_* variable read in source/ any more")
 
+    types = {p.get("name"): p.get("type") for p in manifest["params"]}
     for preset in manifest.get("presets", []):
         needed.add(f"presets/{preset.get('id')}")
-        for name in preset.get("params", {}):
+        for name, value in preset.get("params", {}).items():
             if name not in names:
                 errors.append(f"preset {preset.get('id')}: no entry {name!r}")
+            elif types[name] == "datetime" and not re.fullmatch(r"\d+|@([01]\d|2[0-3]):[0-5]\d", str(value)):
+                errors.append(f"preset {preset.get('id')}: {name} {value!r} is neither POSIX seconds nor @HH:MM")
 
     # The console's languages: one catalog each, all in the page's `lang` entry.
     with open(os.path.join(root, "source", "util", "config.hpp"), encoding="utf-8") as f:

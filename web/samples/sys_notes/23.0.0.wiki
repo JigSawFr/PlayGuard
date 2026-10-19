@@ -1,0 +1,13 @@
+The Switch 23.0.0 system update was released on September 10, 2026 (UTC).
+
+Security flaws fixed: yes.
+
+==Change-log==
+[https://en-americas-support.nintendo.com/ Official] ALL change-log:
+* Added “Settings” to Virtual Game Cards from the HOME Menu.
+** You can review and edit which of your systems can use virtual game cards.
+* General system stability improvements to enhance the user's experience.
+
+==System Titles==
+* The following titles were updated:
+** Sysmodules: usb, pctl, ns.

@@ -40,6 +40,8 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 ## Overview — today at a glance
 
+*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/)*
+
 - **Today first:** a gauge of today's play time (while no game is running, the time from the activity log, marked ≈), today's limit, time left, bedtime alarm. The "time's up" alarm shows in amber while it is off — Ⓐ turns it back on. Under the gauge, a reminder: a game left open on the HOME menu keeps counting (see [What counts as play time](#what-counts-as-play-time)).
 - **Is the console counting?** PlayGuard's own time counts while it runs as an application, so with a limit today the time left should go down while it is open. When it has not moved for about 90 s on screen (timer on, a limit today, not unlocked, not opened from the album), an amber line says *The console is not counting play time right now*, with the likely causes: the clock was set back (it counts again later), the network clock was never set (*Console › Network clock*), or a limit was just written (start a game for a minute, then check). It goes as soon as the time left moves again. The Play timer's state line says it too.
 - **Changed outside PlayGuard:** today's play time starting over on the same day (a clock change does that), the console clock moved by more than 5 minutes, limits that differ from the ones PlayGuard last saw (the phone app, another tool). An amber notice until dismissed or the next day, and an entry in the change history. PlayGuard does not run in the background: it only sees what changed while it was open, or since it last was, when it reads the console again.
@@ -53,6 +55,8 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 - Refreshes every 5 s, with the time of the last refresh (Ⓧ refreshes now).
 
 ## Play timer — the week chart is the editor
+
+*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=play_timer)*
 
 - A state line: active, time left, today's limit, the matching profile (red while the limit is reached).
 - **The week chart:** ←/→ pick a day, Ⓐ opens the per-day editor on it, its picker already open. The editor is the one place for a limit per day: change several days, they stay in amber and marked \* until **+** (from anywhere) saves them all at once, with one confirmation; quick values, "no limit" per day, Monday–Friday / weekend presets, copy today to every day.
@@ -69,6 +73,8 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 ## Activity — who played what, and how long
 
+*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=activity)*
+
 - Time per game **today**, in the **last 7 days** and **in all**, from the console's own activity log — for every account or **one user account** (*Account*, when the console has several). PlayGuard starts on the account shown last, or on the one set under *Account by default* (every account, or one).
 - A chart of the last seven days (today on the right, a legend under it), with this week's limit for each day as a line and the time over it in amber, marked !; today's, the week's and all-time totals.
 - A **summary** over the chosen period, for the account shown: average per day, the most played game, the days played and the busiest one (last 7 days), the average session (all time).
@@ -81,12 +87,16 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 ## Restrictions — level, age rating, communication
 
+*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=restrictions)*
+
 - Restriction level: None, Young child, Child, Teen, Custom. What a preset restricts (age limit, posting, communication) is shown read-only, and said before you pick it.
 - In Custom: age rating, social-media posting, communication with others.
 - VR mode, **rating organisation** (PEGI, ESRB, USK, CERO …).
 - The number of games allowed to communicate (the list itself is in the diagnostic report, raw, until its layout is known).
 
 ## PIN — the PIN, unlocking, blocking games, companion app
+
+*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=security)*
 
 - **Set / change the PIN** (system PIN screen), **show the PIN** (after a warning and the PIN itself, asked every time; recorded in the history, then a new PIN is offered), **unlock temporarily**, **turn parental controls back on**, and whether PlayGuard turns them back on by itself right after a change that needed the unlock (on by default).
 - **Protect PlayGuard with the PIN** in PlayGuard itself: *Never*, *Before a change* (the default: anyone can look, only the parent changes something) or *To open PlayGuard* (a lock screen at start). Once entered, the PIN holds until PlayGuard closes; *Ask for the PIN again after 5 minutes* (off by default) asks again after them, and brings *To open PlayGuard*'s lock screen back when PlayGuard returns after 5 min or more out of focus. Checked in the service layer, so no change skips it; locking again never asks. *Show the PIN* asks for it every time, in every mode and even right after it was entered, and a missing or damaged `config.json` counts as *Before a change*. Quitting while parental controls are still unlocked asks whether to lock them again (*Turn back on and quit* also closes the game PlayGuard was opened over, back to the HOME menu rather than hbmenu); closed from the HOME menu instead, PlayGuard locks them again the next time it starts, and a restart of the console locks them by itself.
@@ -95,6 +105,8 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 - **Delete all parental controls:** two confirmations, irreversible; a backup of the settings is saved first.
 
 ## Console — the network clock, the installed games, what the console runs
+
+*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=console)*
 
 - **Network clock ›**, a screen of its own — the clock the play timer relies on:
   - Console and network clocks, time zone, accuracy.
@@ -108,10 +120,14 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 ## History — changes and backups
 
+*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=history)*
+
 - **Change history:** the newest 500 changes PlayGuard made (limits, restriction level, PIN, unlocks, unlinking, the clock, restores, pausing or resuming the countdown …) and what it saw changed outside it, grouped by day (*Today*, *Yesterday*, then the day and date), with the time and from where; a limit changed on one day names that day. A change the console **refused** is listed too, in amber, with the console's error and what was tried (never put back: nothing changed). *Show* keeps one kind (play time, restrictions, security and app, seen outside PlayGuard, refused by the console); *Export what is shown* writes it to `exports/` as CSV, JSON, XLSX or PDF. Each change keeps the PlayGuard version that made it. Ⓐ on a change shows it and, for a value, **puts the previous one back** — through the same unlock and PIN as any change, saying if it changed since. A change recorded by a newer version of PlayGuard shows as *Other change*.
 - **Back up / restore the settings** on the SD card: restriction level, custom settings, VR mode, rating organisation, daily limits, the "time's up" alarm (with the advanced actions on), and the raw play-timer block for the record — never the PIN. A restore lists only what would change (nothing to change: it just says so, with no unlock and nothing written), and says when the backup had a bedtime alarm on (it is not written back). Choose how many backups to keep.
 
 ## Preferences
+
+*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=preferences)*
 
 - What sets PlayGuard itself up:
   - Language (every console language, or the console's own) and theme (light / dark, with an offer to restart).
@@ -123,6 +139,8 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 - A setting that shapes one feature sits with it: extra time in *Play timer*, turning parental controls back on in *PIN*, the clock check in *Console › Network clock*. The updates and *Help & diagnostics* are in *About*.
 
 ## About
+
+*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=about)*
 
 - The installed PlayGuard: version (in amber when a newer one is out; Ⓐ opens its **release notes**), launch mode and data folder; **check for updates** now; *Check for updates every day* at start-up, and *Update with*: in PlayGuard, which downloads the release, checks it, replaces itself and restarts, or sphaira, Homebrew App Store or by hand (asked on the first update when none is chosen). While a newer release is known, PlayGuard opens on **PlayGuard X.Y.Z is available** (its date and notes): *Update*, or *Later* for 1 day, 1 week or 30 days at most; the release notes are PlayGuard's own, on the same screen as Atmosphère's and hekate's in *Console*: from its GitHub releases, a tab per version (the installed one, the newer ones, the older ones), each with its highlights as cards and every change, kept on the SD card for offline reading (the installed version's are in the app too, for when nothing was fetched yet). After an update, PlayGuard opens once on **What's new in X.Y.Z** (the same highlights, then the QR codes).
 - **Help & diagnostics ›**, a screen of its own, below *Update with*:

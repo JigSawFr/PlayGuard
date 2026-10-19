@@ -67,6 +67,8 @@ HB_APPSTORE_SUBMISSION.md
 *.nro
 *.elf
 *.zip
+# The web simulator's sample pull-request build (web/samples/, dev_builds=sample).
+!/web/samples/dev_builds/pr.zip
 .DS_Store
 /build-desktop
 /build-*
