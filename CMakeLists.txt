@@ -251,11 +251,10 @@ if (PLAYGUARD_WEB)
     target_link_options(${PROJECT_NAME} PRIVATE
         -pthread -fexceptions -sUSE_SDL=2 -sUSE_ZLIB=1
         -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sFULL_ES3
+        # Not -sGROWABLE_ARRAYBUFFERS, which Emscripten suggests for threads
+        # with memory growth: WebGL refuses views of a resizable buffer
+        # ("The provided ArrayBuffer value must not be resizable", Chrome).
         -sALLOW_MEMORY_GROWTH -sINITIAL_MEMORY=128MB -sSTACK_SIZE=1MB -sDEFAULT_PTHREAD_STACK_SIZE=1MB
-        # Growable SharedArrayBuffers where the browser has them: memory that
-        # grows without the slower JS views of threads + growth; 1, not 2,
-        # so a browser without them (Firefox before 154) still runs it.
-        -sGROWABLE_ARRAYBUFFERS=1
         -sPTHREAD_POOL_SIZE=16
         -sEXIT_RUNTIME=0
         -sEXPORTED_RUNTIME_METHODS=ENV,FS,ccall,addRunDependency,removeRunDependency

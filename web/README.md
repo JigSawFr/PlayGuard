@@ -103,11 +103,10 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   SDL2 and zlib from Emscripten's ports; no libcurl; the resources packaged at
   `/app/resources` and `web/samples/` at `/app/samples` (`playguard.data`); a
   pool of 16 threads started with the page (a thread asked for later waits
-  for the browser, which a busy main thread never lets it have); growable
-  shared memory where the browser has it (`GROWABLE_ARRAYBUFFERS=1`: no
-  slower JS views of threads + memory growth, and still runs where it does
-  not); IDBFS for
-  *Keep the state*; `source/sim/web_page.cpp`, what the page calls while
+  for the browser, which a busy main thread never lets it have); memory
+  growth without `GROWABLE_ARRAYBUFFERS`, which the link suggests for
+  threads: WebGL refuses views of a resizable buffer; IDBFS for *Keep the
+  state*; `source/sim/web_page.cpp`, what the page calls while
   PlayGuard runs (`ccall`).
 - `source/main.cpp`: in a browser a frame must hand the thread back to the
   page, so the main loop is `emscripten_set_main_loop`, one `run_frame()` per
