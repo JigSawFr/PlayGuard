@@ -240,9 +240,13 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${BOREALIS_INCLUDES})
 target_link_options(${PROJECT_NAME} PRIVATE ${APP_PLATFORM_LINK_OPTION})
 # The web simulator: WebGL 2, threads from a pool started with the page (a
 # thread asked for later waits for the browser, which a busy main thread never
-# lets it have), the resources packaged at /app/resources, and ENV and FS for
-# the page to set the PLAYGUARD_SIM_* variables and write config.json before
-# main() (web/simulator.js).
+# lets it have), the resources packaged at /app/resources and the answers of a
+# simulated GitHub and switchbrew at /app/samples (web/samples/), ENV and FS
+# for the page to set the PLAYGUARD_SIM_* variables and write config.json
+# before main() (and run dependencies to make main() wait for the data folder
+# or the CJK font), IDBFS to keep the data folder in the browser, and ccall
+# for what the page calls while PlayGuard runs (source/sim/web_page.cpp,
+# web/simulator.js).
 if (PLAYGUARD_WEB)
     target_link_options(${PROJECT_NAME} PRIVATE
         -pthread -fexceptions -sUSE_SDL=2 -sUSE_ZLIB=1
@@ -250,8 +254,11 @@ if (PLAYGUARD_WEB)
         -sALLOW_MEMORY_GROWTH -sINITIAL_MEMORY=128MB -sSTACK_SIZE=1MB -sDEFAULT_PTHREAD_STACK_SIZE=1MB
         -sPTHREAD_POOL_SIZE=16
         -sEXIT_RUNTIME=0
-        -sEXPORTED_RUNTIME_METHODS=ENV,FS
-        --preload-file ${CMAKE_BINARY_DIR}/resources@/app/resources)
+        -sEXPORTED_RUNTIME_METHODS=ENV,FS,ccall,addRunDependency,removeRunDependency
+        -lidbfs.js
+        # SHELL: keeps each pair together (CMake drops a repeated option).
+        "SHELL:--preload-file ${CMAKE_BINARY_DIR}/resources@/app/resources"
+        "SHELL:--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/web/samples@/app/samples")
 endif ()
 # On the Switch: borealis' userAppInit, which libnx calls before main, timed
 # for the diagnostic report's start-up section (source/core/startup_hook.c).
@@ -287,8 +294,10 @@ set(ASSEMBLE_RESOURCES
 set(PLAYGUARD_COPY_SHADERS)
 # The web simulator: Japanese, Korean and Chinese drawn with the characters
 # the catalogs use, cut out of Noto Sans CJK (tools/web_cjk_font.py), as the
-# console draws them with its system fonts. Without the font or fontTools, the
-# build goes on and those languages show boxes.
+# console draws them with its system fonts. It is served next to the page, not
+# packaged: the page waits for it only in those languages, and fetches it
+# after PlayGuard started in the others (web/README.md). Without the font or
+# fontTools, the build goes on and those languages show boxes.
 if (PLAYGUARD_WEB)
     set(PLAYGUARD_WEB_CJK_FONT "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc" CACHE FILEPATH
         "Web simulator: Noto Sans CJK (a .ttc) to take the CJK font from")
@@ -306,8 +315,7 @@ if (PLAYGUARD_WEB)
             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/web_cjk_font.py ${PLAYGUARD_CJK_CATALOGS}
             COMMENT "Cutting the web simulator's CJK font out of ${PLAYGUARD_WEB_CJK_FONT}")
         add_custom_target(${PROJECT_NAME}_cjk DEPENDS ${CMAKE_BINARY_DIR}/cjk.otf)
-        list(APPEND ASSEMBLE_RESOURCES
-             COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/cjk.otf ${MERGED_RESOURCES}/font/cjk.otf)
+        set(PLAYGUARD_SITE_CJK COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/cjk.otf ${CMAKE_BINARY_DIR}/simulator/cjk.otf)
         message(STATUS "Web simulator CJK font: from ${PLAYGUARD_WEB_CJK_FONT}")
     else ()
         message(WARNING "Web simulator: no CJK font (needs Python 3 with fontTools and ${PLAYGUARD_WEB_CJK_FONT}): "
@@ -345,9 +353,6 @@ if (PLATFORM_SWITCH)
 else ()
     add_custom_target(${PROJECT_NAME}_resources ALL ${ASSEMBLE_RESOURCES})
     add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_resources)
-    if (TARGET ${PROJECT_NAME}_cjk)
-        add_dependencies(${PROJECT_NAME}_resources ${PROJECT_NAME}_cjk)
-    endif ()
 endif ()
 
 # The web simulator's site, ready to serve (web/README.md): the page from
@@ -365,5 +370,9 @@ if (PLAYGUARD_WEB)
                 ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.data
                 ${PLAYGUARD_SITE}
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/web/i18n ${PLAYGUARD_SITE}/i18n
+        ${PLAYGUARD_SITE_CJK}
         COMMENT "Assembling the web simulator's site in ${PLAYGUARD_SITE}")
+    if (TARGET ${PROJECT_NAME}_cjk)
+        add_dependencies(${PROJECT_NAME}_simulator ${PROJECT_NAME}_cjk)
+    endif ()
 endif ()

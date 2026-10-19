@@ -28,6 +28,18 @@
 //                               the same screens at every run (visual check)
 //   PLAYGUARD_SIM_IDLE=1        no game running: the timer reports no time left
 //                               yet (the Overview falls back on the activity log)
+//   PLAYGUARD_SIM_SKIP=900      the console's time that many seconds later, a
+//                               game played all along (unless IDLE): the time
+//                               left goes down by as much, to the limit and
+//                               past it; read at each call, so the web page
+//                               moves it while PlayGuard runs
+//   PLAYGUARD_SIM_ACCOUNTS=2    that many user accounts (0 to 8), sharing the
+//                               play time 2:1 between each and the next
+//   PLAYGUARD_SIM_KEEP=1        the simulated console's settings (PIN, limits,
+//                               bedtime, clocks, …) kept in
+//                               playguard_data/sim_console.bin from one run to
+//                               the next: the variables above that set its
+//                               starting state count for the first run only
 //   PLAYGUARD_SIM_FAIL=a,b,...  make these fail: unlock (1201), unverified
 //                               (1201 fine, 1006 still false), write (every
 //                               setting write), relock (1007), timer (145601
@@ -45,11 +57,14 @@
 // Game patches are read from ./playguard_data/sd/ (the simulated SD card root).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #define _POSIX_C_SOURCE 200809L
+#include <fcntl.h>
+#include <pthread.h>
 #include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "../core/calendar.h"
 #include "../core/gamecheck.h"
@@ -76,13 +91,72 @@ static struct {
     bool network_set;      // PlayGuard set the network clock
 } S;
 
+// PLAYGUARD_SIM_KEEP: S as the last run left it, in the simulated data folder
+// (the web page keeps that folder in the browser). A file from another build,
+// whose S has another size, is not read.
+#define SIM_KEEP_FILE "./playguard_data/sim_console.bin"
+static const char SIM_KEEP_MAGIC[8] = "PGSIM01";
+static pthread_mutex_t s_keep_lock = PTHREAD_MUTEX_INITIALIZER;
+static unsigned char s_kept[sizeof(S)];   // what the file holds
+
+static bool sim_keeping(void)
+{
+    return getenv("PLAYGUARD_SIM_KEEP") != NULL;
+}
+
+static void sim_keep_load(void)
+{
+    FILE *f = fopen(SIM_KEEP_FILE, "rb");
+    if (!f) return;
+    char magic[sizeof(SIM_KEEP_MAGIC)];
+    u32 size = 0;
+    unsigned char kept[sizeof(S)];
+    if (fread(magic, 1, sizeof(magic), f) == sizeof(magic) && memcmp(magic, SIM_KEEP_MAGIC, sizeof(magic)) == 0 &&
+        fread(&size, sizeof(size), 1, f) == 1 && size == sizeof(S) && fread(kept, 1, sizeof(kept), f) == sizeof(kept)) {
+        memcpy(&S, kept, sizeof(S));
+        memcpy(s_kept, kept, sizeof(kept));
+        S.init = true;
+    }
+    fclose(f);
+}
+
+// Writes S when it changed since the file was written: called where the UI
+// reads the console's state, which it does after each change.
+static void sim_keep_save(void)
+{
+    if (!sim_keeping()) return;
+    pthread_mutex_lock(&s_keep_lock);
+    if (memcmp(&S, s_kept, sizeof(S)) != 0) {
+        // Not world-writable (fopen creates with 0666, less the umask).
+        const int fd = open(SIM_KEEP_FILE ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        FILE *f = fd >= 0 ? fdopen(fd, "wb") : NULL;
+        if (fd >= 0 && !f) close(fd);
+        const u32 size = sizeof(S);
+        bool ok = f && fwrite(SIM_KEEP_MAGIC, 1, sizeof(SIM_KEEP_MAGIC), f) == sizeof(SIM_KEEP_MAGIC) &&
+                  fwrite(&size, sizeof(size), 1, f) == 1 && fwrite(&S, 1, sizeof(S), f) == sizeof(S);
+        if (f) ok = fclose(f) == 0 && ok;
+        if (ok && rename(SIM_KEEP_FILE ".tmp", SIM_KEEP_FILE) == 0) memcpy(s_kept, &S, sizeof(S));
+        else remove(SIM_KEEP_FILE ".tmp");
+    }
+    pthread_mutex_unlock(&s_keep_lock);
+}
+
 // Minutes played today in the made-up activity log below (45 + 20 + 15): the
-// timer's time left is the day's limit minus this.
+// timer's time left is the day's limit minus this (and PLAYGUARD_SIM_SKIP).
 #define SIM_PLAYED_TODAY_MIN 80
 
-// "Now" before any network-clock change: frozen by PLAYGUARD_SIM_NOW, else
-// the host's.
-static u64 base_now(void)
+// PLAYGUARD_SIM_SKIP: seconds the console's time is moved on (0 without it).
+static u64 sim_skip(void)
+{
+    const char *skip = getenv("PLAYGUARD_SIM_SKIP");
+    if (!skip || !*skip) return 0;
+    char *end = NULL;
+    const long long v = strtoll(skip, &end, 10);
+    return end && !*end && v > 0 ? (u64)v : 0;
+}
+
+// "Now" before PLAYGUARD_SIM_SKIP: frozen by PLAYGUARD_SIM_NOW, else the host's.
+static u64 start_now(void)
 {
     const char *frozen = getenv("PLAYGUARD_SIM_NOW");
     if (frozen && *frozen) {
@@ -91,6 +165,12 @@ static u64 base_now(void)
         if (end && !*end && v) return (u64)v;
     }
     return (u64)time(NULL);
+}
+
+// "Now" before any network-clock change.
+static u64 base_now(void)
+{
+    return start_now() + sim_skip();
 }
 
 // A service error the UI does not translate (pctl module 142), as the console
@@ -143,6 +223,7 @@ static void sim_init(void)
         pt_bedtime_encode(S.block, bed);
     }
     if (getenv("PLAYGUARD_SIM_ALARM_ONLY")) pt_set_suspends(S.block, false);
+    if (sim_keeping()) sim_keep_load();
 }
 
 // The time left goes down as on a console that counts PlayGuard's own time,
@@ -155,6 +236,20 @@ static u64 counting_ns(void)
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (u64)(ts.tv_sec % 20) * 1000000000ULL;
+}
+
+// Seconds played today: the made-up log's, and PLAYGUARD_SIM_SKIP's played
+// all along unless no game runs; past midnight, since midnight.
+static u64 played_today_s(void)
+{
+    const u64 played = (u64)SIM_PLAYED_TODAY_MIN * 60;
+    const u64 skip = sim_skip();
+    if (!skip || getenv("PLAYGUARD_SIM_IDLE")) return played;
+    const time_t from = (time_t)start_now(), to = (time_t)(start_now() + skip);
+    struct tm a, b;
+    if (!localtime_r(&from, &a) || !localtime_r(&to, &b)) return played + skip;
+    if (a.tm_year == b.tm_year && a.tm_yday == b.tm_yday) return played + skip;
+    return (u64)(b.tm_hour * 3600 + b.tm_min * 60 + b.tm_sec);
 }
 
 static int sim_weekday(void)
@@ -211,6 +306,7 @@ void pctl_status_fetch(PctlStatus *o)
     o->stereo_vision_ok = true;       o->stereo_vision_restricted = S.stereo_restricted;
     o->free_comm_count_ok = true;     o->free_comm_count = 3;
     o->last_updated_ok = true;        o->last_updated = base_now() - 3600 * 26;
+    sim_keep_save();
 }
 
 // Read-only, then the change check (write_guard.h), as pctl_ops.c does.
@@ -352,10 +448,11 @@ void pctl_play_timer_query(PtState *o)
     u16 days[7];
     pt_decode(S.block, days);
     const u16 limit = days[wd];
-    const bool reached = o->enabled && (S.limit_reached || (limit != PT_DAY_NOLIMIT && limit <= SIM_PLAYED_TODAY_MIN));
+    const s64 played = (s64)played_today_s();
+    const bool reached = o->enabled && (S.limit_reached || (limit != PT_DAY_NOLIMIT && (s64)limit * 60 <= played));
     o->remaining_valid = true;
     o->remaining_ns = o->enabled && !reached && limit != PT_DAY_NOLIMIT && !getenv("PLAYGUARD_SIM_IDLE")
-                          ? (s64)(limit - SIM_PLAYED_TODAY_MIN) * 60 * 1000000000LL + 20000000000LL - (s64)counting_ns() : 0;
+                          ? ((s64)limit * 60 - played) * 1000000000LL + 20000000000LL - (s64)counting_ns() : 0;
     // The last minutes of the day's time, whatever the limit (the child screen's end).
     const char *left_min = getenv("PLAYGUARD_SIM_LEFT_MIN");
     if (left_min && o->remaining_ns > 0) o->remaining_ns = (s64)atoi(left_min) * 60 * 1000000000LL + 20000000000LL;
@@ -364,8 +461,8 @@ void pctl_play_timer_query(PtState *o)
     // only said to be reached).
     const bool warn_only = !pt_suspends(S.block);
     if (reached && warn_only) {
-        const int over = limit != PT_DAY_NOLIMIT && SIM_PLAYED_TODAY_MIN > limit ? SIM_PLAYED_TODAY_MIN - limit : 2;
-        o->remaining_ns = -(s64)over * 60 * 1000000000LL;
+        const s64 over = limit != PT_DAY_NOLIMIT && played > (s64)limit * 60 ? played - (s64)limit * 60 : 2 * 60;
+        o->remaining_ns = -over * 1000000000LL;
     }
     o->restricted_valid = true; o->restricted = reached && !warn_only;
     o->alarm_disabled_valid = true; o->alarm_disabled = S.alarm_disabled;
@@ -378,6 +475,7 @@ void pctl_play_timer_query(PtState *o)
     o->bedtime_reset_valid = true;
     o->bedtime_reset_hour = bed[wd].on ? bed[wd].end_hour : 6;
     o->bedtime_reset_minute = bed[wd].on ? bed[wd].end_minute : 0;
+    sim_keep_save();
 }
 
 // The recorder's reading, built on the query above. 1459 as seen on hardware
@@ -411,7 +509,7 @@ void pctl_play_timer_sample(PtSample *o)
     }
     // 1454 + 1952 = today's limit, as observed (docs/parental-controls.md).
     o->spent_ns = pt.remaining_ns ? (u64)((s64)pt.day_min[wd] * 60 * 1000000000LL - pt.remaining_ns)
-                                  : (u64)SIM_PLAYED_TODAY_MIN * 60 * 1000000000ULL;
+                                  : played_today_s() * 1000000000ULL;
 }
 
 // What a block write (195101) meets once its arguments are checked: the gate,
@@ -490,6 +588,8 @@ Result time_network_accuracy(bool *accurate)
 
 void time_clock_snapshot(TimeSnapshot *o)
 {
+    sim_init();
+    sim_keep_save();
     memset(o, 0, sizeof(*o));
     u64 now = base_now();
     o->automatic = !S.autosync_off;
@@ -604,23 +704,50 @@ void time_format_local(u64 posix, char *buf, size_t size)
 }
 
 // ---------------------------------------------------------------- playstats
-// Two made-up accounts: Alice played 2/3 of everything, Léo 1/3 (but the
-// time on no account, nobody_s()).
-static const PlayAccount SIM_ACCOUNTS[] = { { { 1, 1 }, "Alice" }, { { 2, 2 }, "Léo" } };
+// Made-up accounts (PLAYGUARD_SIM_ACCOUNTS, 2 by default: Alice and Léo),
+// each playing twice what the next one does: Alice 2/3 of everything and
+// Léo 1/3 (but the time on no account, nobody_s()).
+static const char *const SIM_ACCOUNT_NAMES[] = { "Alice", "Léo", "Maya", "Noah", "Inès", "Hugo", "Zoé", "Sam" };
+#define SIM_ACCOUNTS_MAX (sizeof(SIM_ACCOUNT_NAMES) / sizeof(SIM_ACCOUNT_NAMES[0]))
+
+static size_t sim_accounts(void)
+{
+    const char *n = getenv("PLAYGUARD_SIM_ACCOUNTS");
+    if (!n || !*n) return 2;
+    const int v = atoi(n);
+    return v < 0 ? 0 : (size_t)v > SIM_ACCOUNTS_MAX ? SIM_ACCOUNTS_MAX : (size_t)v;
+}
 
 size_t playstats_accounts(PlayAccount *out, size_t max, Result *rc)
 {
     if (rc) *rc = 0;
     size_t n = 0;
-    for (; n < max && n < 2; n++) out[n] = SIM_ACCOUNTS[n];
+    for (; n < max && n < sim_accounts(); n++) {
+        memset(&out[n], 0, sizeof(out[n]));
+        out[n].uid[0] = out[n].uid[1] = n + 1;
+        snprintf(out[n].nickname, sizeof(out[n].nickname), "%s", SIM_ACCOUNT_NAMES[n]);
+    }
     return n;
+}
+
+// The share of `v` the k-th of `n` accounts played (weights 2^(n-1-k)), the
+// last one taking what the others leave so that the shares add up to `v`.
+static u64 share_of(u64 v, size_t k, size_t n)
+{
+    const u64 total = (1ULL << n) - 1;
+    if (k + 1 < n) return v * (1ULL << (n - 1 - k)) / total;
+    u64 given = 0;
+    for (size_t j = 0; j + 1 < n; j++) given += v * (1ULL << (n - 1 - j)) / total;
+    return v - given;
 }
 
 // The share of `v` that `account` played (NULL: all of it).
 static u64 share(u64 v, const PlayAccount *account)
 {
     if (!account) return v;
-    return account->uid[0] == 1 ? v * 2 / 3 : v - v * 2 / 3;
+    const size_t n = sim_accounts();
+    const u64 k = account->uid[0] - 1;
+    return k < n ? share_of(v, (size_t)k, n) : 0;
 }
 
 // All-time seconds of a game played with no account chosen (a party mode
@@ -788,21 +915,21 @@ void playstats_icons(PlayIcon *icons, size_t count)
 size_t playstats_by_account(u64 app_id, AccountPlay *out, size_t max, Result *rc)
 {
     if (rc) *rc = getenv("PLAYGUARD_SIM_NO_PDM") ? (Result)0x1A0C : 0;
-    if (getenv("PLAYGUARD_SIM_NO_PDM") || max < 2) return 0;
-    // Two made-up accounts sharing the play time 2:1 (none for a deleted game),
-    // less the time on no account.
+    const size_t n = sim_accounts();
+    if (getenv("PLAYGUARD_SIM_NO_PDM") || max < n) return 0;
+    // The made-up accounts sharing the play time 2:1 (none for a deleted
+    // game), less the time on no account.
     PlayStats all;
     playstats_fetch(&all);
     for (u32 i = 0; i < all.count; i++) {
         if (all.games[i].app_id != app_id || !all.games[i].totals_ok) continue;
         const u64 t = all.games[i].total_s - nobody_s(app_id);
-        snprintf(out[0].nickname, sizeof(out[0].nickname), "Alice");
-        out[0].total_s = t * 2 / 3;
-        out[0].launches = all.games[i].launches * 2 / 3;
-        snprintf(out[1].nickname, sizeof(out[1].nickname), "Léo");
-        out[1].total_s = t - out[0].total_s;
-        out[1].launches = all.games[i].launches - out[0].launches;
-        return 2;
+        for (size_t k = 0; k < n; k++) {
+            snprintf(out[k].nickname, sizeof(out[k].nickname), "%s", SIM_ACCOUNT_NAMES[k]);
+            out[k].total_s = share_of(t, k, n);
+            out[k].launches = (u32)share_of(all.games[i].launches, k, n);
+        }
+        return n;
     }
     return 0;
 }

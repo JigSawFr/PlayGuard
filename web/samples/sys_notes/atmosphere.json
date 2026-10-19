@@ -1,0 +1,26 @@
+[
+ {
+  "tag_name": "1.12.1",
+  "html_url": "https://github.com/Atmosphere-NX/Atmosphere/releases/tag/1.12.1",
+  "draft": false,
+  "prerelease": false,
+  "published_at": "2026-10-06T00:05:51Z",
+  "body": "**1.12.1** is Atmosphère's ninety-fourth official release.\r\n\r\nThe following was changed since the last release:\r\n* Support was added for the new \"BatchRead\" storage in `fs.mitm`.\r\n  * Firmware 23.0.0 introduced a new type of filesystem storage.\r\n* General system stability improvements to enhance the user's experience.\r\n\r\nAnd the following was changed in 1.12.0:\r\n* Support was added for 23.0.0."
+ },
+ {
+  "tag_name": "1.12.0",
+  "html_url": "https://github.com/Atmosphere-NX/Atmosphere/releases/tag/1.12.0",
+  "draft": false,
+  "prerelease": false,
+  "published_at": "2026-09-27T23:21:53Z",
+  "body": "**1.12.0** is Atmosphère's ninety-third official release.\r\n\r\nThe following was changed since the last release:\r\n\r\n* Support was added for 23.0.0.\r\n    * `mesosphère` was updated to reflect the latest official kernel behavior.\r\n* General system stability improvements to enhance the user's experience."
+ },
+ {
+  "tag_name": "1.11.2",
+  "html_url": "https://github.com/Atmosphere-NX/Atmosphere/releases/tag/1.11.2",
+  "draft": false,
+  "prerelease": false,
+  "published_at": "2026-06-16T22:01:02Z",
+  "body": "* Basic support was added for 22.5.0."
+ }
+]
