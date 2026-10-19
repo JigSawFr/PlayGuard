@@ -7,11 +7,12 @@ not reach its first screen ("start-up: first screen ready" in its log, which
 the page says in <body data-playguard="ready">), when the page throws, or
 when what the page does while PlayGuard runs does not work:
 
-- a page in each kind of start: the Overview, the Play timer, Activity,
-  Console, today's limit reached, the start-up error (no Atmosphère);
+- a page in each kind of start: the Overview, a tab of its own (tab=),
+  today's limit reached, the start-up error (no Atmosphère);
 - desktop smoke scenarios (tools/desktop_smoke.py) played as steps
-  (runSteps(), web/simulator.js): every tab in turn, "alarm" (the time over
-  the limit), "errors" (an unlock that fails ends in its dialog);
+  (runSteps(), web/simulator.js): every tab in turn (the preview comment's
+  Play timer, Activity and Console), "alarm" (the time over the limit),
+  "errors" (an unlock that fails ends in its dialog);
 - the time moved on from the buttons under the screen (skip=), without a
   restart: the URL follows, the page is not reloaded;
 - a `live` setting changed from the panel without a restart;
@@ -23,6 +24,12 @@ when what the page does while PlayGuard runs does not work:
 - the service worker (web/sw.js), served without the headers as GitHub Pages
   does: it makes the page cross-origin isolated, keeps PlayGuard's files, and
   the simulator starts offline.
+
+Each of them in a process and browser of its own, a few at once
+(WEB_SMOKE_JOBS, the machine's processors by default: PlayGuard runs on the
+CPU, WebGL through SwiftShader), and stopped when it takes longer than any
+should (SCENARIO_S): a browser that stopped answering fails its scenario
+rather than the job's timeout.
 
 The screens are written to <out-dir>/<name>.png (1280x720, the canvas), for
 the pull request's preview comment (.github/workflows/pages.yml), and the
@@ -37,7 +44,10 @@ import functools
 import http.server
 import json
 import os
+import signal
+import subprocess
 import sys
+import tempfile
 import threading
 import time
 
@@ -52,6 +62,9 @@ FIXED = "lang=en-US&theme=light&now=1791471600&still_focus=1&version=1.0.0:1a2b3
 # What a start may take on a CI runner (software WebGL): the download, the
 # intro (2 s) and the start-up itself.
 START_S = 120
+# What a scenario may take at most: a start, its steps, its screens (the tour
+# plays for about a minute), with the others on the other cores.
+SCENARIO_S = 300
 # build.json for the service worker's server: a commit in the files' URLs.
 BUILD = {"repo": "JigSawFr/PlayGuard", "sha": "0000000smoke", "ref": "smoke", "title": "", "pr": None}
 
@@ -99,9 +112,14 @@ def serve(handler, host):
     return server, f"http://{host}:{server.server_address[1]}/"
 
 
-server, BASE = serve(Handler, "127.0.0.1")
-# Another origin, so its service worker starts from nothing.
-pages_server, PAGES = serve(PagesHandler, "localhost")
+# A scenario's own process (below) uses the servers of the run that started it.
+CHILD = os.environ.get("WEB_SMOKE_CHILD")
+if CHILD:
+    BASE, PAGES = os.environ["WEB_SMOKE_BASE"], os.environ["WEB_SMOKE_PAGES"]
+else:
+    server, BASE = serve(Handler, "127.0.0.1")
+    # Another origin, so its service worker starts from nothing.
+    pages_server, PAGES = serve(PagesHandler, "localhost")
 
 failures = []
 timings = {}
@@ -169,55 +187,84 @@ def shot(page, name):
         f.write(base64.b64decode(data.split(",", 1)[1]))
 
 
-with sync_playwright() as p:
-    errors = []
-    browser = None
+errors = []
+SCENARIOS = []
 
-    def new_page():
-        """A browser of its own for each start, the last one closed: on a
-        runner, SwiftShader's GPU process can crash after a few starts in one
-        browser, which then answers nothing more (an evaluate() waits forever)."""
-        global browser
-        if browser:
-            browser.close()
-        browser = p.chromium.launch(
-            executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM") or None,
-            # WebGL 2 without a GPU: SwiftShader.
-            args=["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"])
-        # The page allows no eval (its Content-Security-Policy); the test's own
-        # wait_for_function needs one.
-        context = browser.new_context(viewport={"width": 1600, "height": 1000}, locale="en-US", bypass_csp=True)
-        page = context.new_page()
-        page.on("pageerror", lambda e: errors.append(str(e)))
-        return page
 
-    # The screens of the preview comment.
-    screens = [
-        ("overview", ""),
-        ("play_timer", "&tab=play_timer"),
-        ("activity", "&tab=activity"),
-        ("console", "&tab=console"),
-        ("limit_reached", "&restricted=1"),
-        ("init_error", "&no_cfw=1"),
-    ]
-    for name, extra in screens:
-        page = new_page()
-        if open_page(page, FIXED + extra, name):
-            shot(page, name)
-            print(f"ok   {name}")
+def scenario(fn):
+    SCENARIOS.append(fn)
+    return fn
 
-    # desktop_smoke's tour of the tabs: each one in turn from the sidebar.
+
+def run(fn):
+    """One scenario, in a Playwright and browsers of its own (its thread's).
+    A browser for each start, the last one closed: on a runner, SwiftShader's
+    GPU process can crash after a few starts in one browser, which then
+    answers nothing more (an evaluate() waits forever)."""
+    with sync_playwright() as p:
+        browsers = []
+
+        def new_page():
+            while browsers:
+                browsers.pop().close()
+            browser = p.chromium.launch(
+                executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM") or None,
+                # WebGL 2 without a GPU: SwiftShader.
+                args=["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"])
+            browsers.append(browser)
+            # The page allows no eval (its Content-Security-Policy); the test's
+            # own wait_for_function needs one.
+            context = browser.new_context(viewport={"width": 1600, "height": 1000}, locale="en-US", bypass_csp=True)
+            page = context.new_page()
+            page.on("pageerror", lambda e: errors.append(str(e)))
+            return page
+
+        try:
+            fn(new_page)
+        except Exception as e:   # a timeout, a browser gone: the scenario fails, not the others
+            fail(f"{fn.__name__}: {str(e).splitlines()[0]}")
+        finally:
+            for browser in browsers:
+                browser.close()
+
+
+# desktop_smoke's tour of the tabs, each one in turn from the sidebar: the
+# preview comment's Overview, Play timer, Activity and Console on the way.
+@scenario
+def tabs(new_page):
     page = new_page()
     if open_page(page, FIXED, "tabs"):
+        shot(page, "overview")
         for name in ["play_timer", "activity", "restrictions", "security", "console", "history", "preferences", "about"]:
             steps(page, "down")
-            shot(page, f"tabs_{name}")
+            shot(page, name if name in ("play_timer", "activity", "console") else f"tabs_{name}")
         if page.evaluate("document.body.dataset.playguard") != "ready":
             fail("tabs: PlayGuard stopped on the way")
         else:
             print("ok   every tab")
 
-    # desktop_smoke's "alarm": a warning only, the limit passed.
+
+# The other kinds of start of the preview comment: today's limit reached,
+# the start-up error (no Atmosphère).
+@scenario
+def limit_reached(new_page):
+    page = new_page()
+    if open_page(page, FIXED + "&restricted=1", "limit_reached"):
+        shot(page, "limit_reached")
+        print("ok   limit_reached")
+
+
+@scenario
+def init_error(new_page):
+    page = new_page()
+    if open_page(page, FIXED + "&no_cfw=1", "init_error"):
+        shot(page, "init_error")
+        print("ok   init_error")
+
+
+# desktop_smoke's "alarm": a warning only, the limit passed.
+@scenario
+def alarm(new_page):
     page = new_page()
     if open_page(page, FIXED + "&alarm_only=1&restricted=1", "alarm"):
         shot(page, "alarm_overview_over")
@@ -225,8 +272,11 @@ with sync_playwright() as p:
         shot(page, "alarm_play_timer_over")
         print("ok   alarm")
 
-    # desktop_smoke's "errors", its first half: a limit change while the
-    # unlock fails ends in the "could not unlock" dialog, not a toast.
+
+# desktop_smoke's "errors", its first half: a limit change while the
+# unlock fails ends in the "could not unlock" dialog, not a toast.
+@scenario
+def unlock_error(new_page):
     page = new_page()
     if open_page(page, FIXED + "&fail=unlock&restricted=1&autosync_off=1&ntp=offline&network_offset=1411", "errors"):
         steps(page, "down.right.down.a")   # Play timer › the week chart › Same limit every day
@@ -241,7 +291,10 @@ with sync_playwright() as p:
             steps(page, "a")
             print("ok   errors")
 
-    # The time moved on, live: no reload, the URL and the log follow.
+
+# The time moved on, live: no reload, the URL and the log follow.
+@scenario
+def live(new_page):
     page = new_page()
     if open_page(page, FIXED, "time"):
         page.evaluate("window.notReloaded = true")
@@ -268,9 +321,13 @@ with sync_playwright() as p:
         else:
             print("ok   CJK font added after the start")
 
-    # The steps: two presses noted, their link replays them.
+
+# The steps: two presses noted, their link replays them. A start on a tab
+# of its own (tab=).
+@scenario
+def steps_link(new_page):
     page = new_page()
-    if open_page(page, FIXED, "steps"):
+    if open_page(page, FIXED + "&tab=activity", "steps"):
         page.focus("#canvas")
         for key in ("ArrowDown", "ArrowDown"):
             time.sleep(0.5)
@@ -292,7 +349,9 @@ with sync_playwright() as p:
         else:
             print("ok   report link")
 
-    # The tour.
+
+@scenario
+def tour(new_page):
     page = new_page()
     if open_page(page, FIXED + "&tour=1", "tour"):
         if not wait_logged(page, "steps: done", 90) or "live: skip=3600" not in log_text(page):
@@ -300,7 +359,10 @@ with sync_playwright() as p:
         else:
             print("ok   tour")
 
-    # The CJK font waited for in Japanese.
+
+# The CJK font waited for in Japanese.
+@scenario
+def japanese(new_page):
     page = new_page()
     if open_page(page, "lang=ja&theme=light&now=1791471600&still_focus=1&version=1.0.0:1a2b3c4", "japanese"):
         log = log_text(page)
@@ -310,7 +372,10 @@ with sync_playwright() as p:
             shot(page, "japanese")
             print("ok   japanese")
 
-    # keep=1: the simulated console's settings survive a reload.
+
+# keep=1: the simulated console's settings survive a reload.
+@scenario
+def keep(new_page):
     page = new_page()
     if open_page(page, FIXED + "&keep=1", "keep"):
         time.sleep(4)   # the page writes IndexedDB every 3 s
@@ -323,11 +388,12 @@ with sync_playwright() as p:
             else:
                 print("ok   keep")
 
-    # The service worker, as on GitHub Pages: no headers from the server.
-    new_page()
-    sw_context = browser.new_context(viewport={"width": 1600, "height": 1000}, locale="en-US", bypass_csp=True)
-    sw_page = sw_context.new_page()
-    sw_page.on("pageerror", lambda e: errors.append(str(e)))
+
+# The service worker, as on GitHub Pages: no headers from the server.
+@scenario
+def service_worker(new_page):
+    sw_page = new_page()
+    sw_context = sw_page.context
     if open_page(sw_page, FIXED, "service worker", PAGES):
         if not sw_page.evaluate("self.crossOriginIsolated && !!navigator.serviceWorker.controller"):
             fail("service worker: the page is not isolated by it")
@@ -342,11 +408,59 @@ with sync_playwright() as p:
         if open_page(sw_page, FIXED, "offline", PAGES):
             print("ok   offline")
         sw_context.set_offline(False)
-    sw_context.close()
 
-    for e in errors:
-        fail(f"page error: {e}")
-    browser.close()
+
+if CHILD:
+    # One scenario (WEB_SMOKE_CHILD), its results in a file for the run.
+    name, result = CHILD.split(":", 1)
+    run(next(fn for fn in SCENARIOS if fn.__name__ == name))
+    with open(result, "w") as f:
+        json.dump({"failures": failures, "timings": timings, "errors": errors}, f)
+    sys.exit(0)
+
+# The longest first, so that they do not end the run alone. WEB_SMOKE_ONLY:
+# some of them, by name (unlock_error,tour).
+SCENARIOS.sort(key=lambda fn: fn not in (tour, tabs))
+if os.environ.get("WEB_SMOKE_ONLY"):
+    SCENARIOS = [fn for fn in SCENARIOS if fn.__name__ in os.environ["WEB_SMOKE_ONLY"].split(",")]
+jobs = max(1, int(os.environ.get("WEB_SMOKE_JOBS") or os.cpu_count() or 2))
+results = tempfile.mkdtemp()
+queue, running = list(SCENARIOS), []
+while queue or running:
+    while queue and len(running) < jobs:
+        fn = queue.pop(0)
+        result = os.path.join(results, fn.__name__ + ".json")
+        # In a process group of its own, with its browsers: stopped all at once.
+        proc = subprocess.Popen([sys.executable, "-u", __file__, SITE, OUT], start_new_session=True,
+                                env={**os.environ, "WEB_SMOKE_CHILD": f"{fn.__name__}:{result}",
+                                     "WEB_SMOKE_BASE": BASE, "WEB_SMOKE_PAGES": PAGES})
+        running.append((proc, fn, result, time.time()))
+    time.sleep(0.5)
+    for item in list(running):
+        proc, fn, result, started = item
+        if proc.poll() is None:
+            if time.time() - started <= SCENARIO_S:
+                continue
+            # The scenario and its browsers: Playwright closes them on
+            # SIGTERM; what is left, killed.
+            os.killpg(proc.pid, signal.SIGTERM)
+            try:
+                proc.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                os.killpg(proc.pid, signal.SIGKILL)
+                proc.wait()
+            fail(f"{fn.__name__}: still running after {SCENARIO_S} s, stopped")
+        elif os.path.exists(result):
+            with open(result) as f:
+                r = json.load(f)
+            failures += r["failures"]
+            timings.update(r["timings"])
+            errors += r["errors"]
+        else:
+            fail(f"{fn.__name__}: its process ended without a result ({proc.returncode})")
+        running.remove(item)
+for e in errors:
+    fail(f"page error: {e}")
 
 server.shutdown()
 pages_server.shutdown()

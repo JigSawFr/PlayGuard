@@ -146,9 +146,9 @@ jobs:
       # live setting without a restart, add the CJK font, keep its state with
       # keep=1. Its screens go with the site, for the pull request's comment
       # (pages.yml). Playwright, pinned, in a venv of its own.
-      # A few minutes when it works: one that hangs (a browser that stopped
-      # answering) fails here rather than at the job's timeout, its log
-      # unbuffered so that it says where.
+      # About a minute, its scenarios a few at once: one that hangs (a browser
+      # that stopped answering) is stopped and fails, rather than the job's
+      # timeout, its log unbuffered so that it says where.
       - name: The simulator in a browser
         if: env.BUILD_SIMULATOR == '1'
         timeout-minutes: 15
