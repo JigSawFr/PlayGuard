@@ -18,7 +18,7 @@ The screenshots show the light theme.
 
 ## Controls
 
-↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh (on the tabs that read the console) · Ⓨ notifications · **−** language and theme · **+** saves per-day limits (and the week edited on *Play timer*).
+↑/↓ move · Ⓐ confirm · Ⓑ back or cancel (twice on the sidebar to exit) · Ⓧ refresh (on the tabs that read the console) · Ⓨ notifications · **−** language and theme (these two from any tab; the footer leaves them out, the header's bell, language and theme show them) · **+** saves per-day limits (and the week edited on *Play timer*).
 
 What failed is said in a dialog, what worked in a toast. A dialog only says what applies to this console now: that the game in progress would be suspended, only while a game is open; that the companion app could overwrite a change, only while it is linked and can sync. The header's pill says while parental controls are temporarily unlocked, on every tab, and a crossed-out pencil right of the title when the app is read-only; a tap on either goes where it is undone (PIN › Turn parental controls back on, the firmware screen); in read-only mode, actions stay in place, greyed, and say why when pressed.
 
@@ -29,7 +29,7 @@ The app is organised in tabs, like System Settings; each has its section below.
 PlayGuard's look is called Cadran: an icon rail for the tabs, a navy or cool-white palette (with the theme), cards instead of lists. Each tab opens on what matters most (a ring, tiles, cards, chips), its other settings underneath.
 
 - The header's pill says what the tab is about (*Parental controls on*, *Play timer on*…); while parental controls are unlocked it says so on every tab, and a tap on it opens *PIN › Turn parental controls back on*. Secondary text is never under 15 px, to read from the couch on a TV.
-- Dialogs are cards with their buttons as pills, the confirmation in teal (in coral when it removes or stops something); the choices open as a card above the hints, the current one in teal; messages appear as cards under the header, with a teal check for what was done and an amber mark for what was refused.
+- Dialogs are cards with their buttons as pills, the confirmation in teal (in coral when it removes or stops something); the choices open as a card above the hints, the current one on a soft teal with its check (the teal ring is the focus's alone, everywhere: a level, an account, a choice in force keeps the soft fill); a long dialog fades at its foot while more follows, and its warning (a game about to be suspended) comes first, in an amber card; a failure names what failed as its title, the error code small under the reason, and offers *Send a report* when one helps; messages appear as cards under the header, with a teal check for what was done and an amber mark for what was refused.
 - The other screens take the same look: a profile's per-day editor shows the week as on *Play timer* (edited the same way, the quick fills as tiles); *Check the installed games* and *All games* put their lines in cards; *Profiles* and *Help & diagnostics* give each line its icon.
 - **Text size** (*Preferences*, or **AA** in the header): *Automatic*, the default, makes every text 25 % bigger while the console is docked, on the TV, and puts it back in handheld mode; *Larger* keeps it bigger, *Normal* never. The header, the sidebar and the footer keep their size (they have no room for more), and so do the Restrictions levels' names, large already. It changes at once, on every screen, with no restart. The 25 % come from a 55" TV in 4K: the smallest text (15 px) is then 14.6 mm high in capitals, 20′ of arc from 2.5 m, where reading is comfortable (16′ in normal size, the bare minimum).
 - **Visual effects** (*Preferences*): *Lighter on battery*, the default, leaves out the background glow, the beat of the child screen's ring in its last minutes and the arc's sweep to a new value while no charger is connected (handheld, unplugged); *Always full* keeps them. Read again every 5 seconds, so plugging the console in brings them back.
@@ -37,7 +37,7 @@ PlayGuard's look is called Cadran: an icon rail for the tabs, a navy or cool-whi
 
 ## Notifications — what needs you, from any tab
 
-A bell in the header, left of the version, gathers what needs the parent; Ⓨ opens the list from any tab (the footer says *Notifications (2)* when two things are to do).
+A bell in the header, left of the version, gathers what needs the parent; Ⓨ opens the list from any tab (the bell's badge says *2* when two things are to do).
 
 Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun for light, a moon for dark, a half-filled circle when it follows the console), then the text size (**AA**, its large A in teal while the text is larger): a tap opens the same list as *Preferences*, and **−** offers them from any tab. A new language or theme takes effect once PlayGuard is started again; the text size at once.
 
@@ -73,7 +73,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 *[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=play_timer)*
 
-- **The week is the editor:** Ⓐ on a day edits it: ↑/↓ change it by 15 min, ←/→ move to the next day, Ⓛ copies it to Monday–Friday, Ⓡ to the weekend, Ⓨ sets no limit, Ⓐ or Ⓑ ends the edit; Ⓧ picks an exact time (*Enter a duration…* sets it with ↑/↓ by 15 min and Ⓛ/Ⓡ by 5 min, OK focused). By touch, a day tapped is edited, then a tap on its top or bottom changes it by 15 min. The changes are saved together, with **+** or *Save*, as in the per-day editor (the confirmation lists the days changed, before → after); *Discard* puts them back. Inside each day's bar, the time played on its last occurrence (today's included, every account), in coral once the limit was reached; under the week, the focused day's figures (*Thursday: 1 h 20 played of 2 h*).
+- **The week is the editor:** Ⓐ on a day edits it: ↑/↓ change it by 15 min, ←/→ move to the next day, Ⓛ copies it to Monday–Friday, Ⓡ to the weekend, Ⓨ sets no limit, Ⓐ or Ⓑ ends the edit; Ⓧ picks an exact time (*Enter a duration…* sets it with ↑/↓ by 15 min and Ⓛ/Ⓡ by 5 min, OK focused). By touch, a day tapped is edited, then a tap on its top or bottom changes it by 15 min. The changes are saved together, with **+** or *Save*, as in the per-day editor (the confirmation lists the days changed, before → after); *Discard* puts them back. Inside each day's bar, the time played on its last occurrence (today's included, every account), in coral once the limit was reached, its limit too, and a key under the week says so (*over the limit*); a day changed and not saved yet has its limit in amber and its bar ringed in amber; under the week, the focused day's figures (*Thursday: 1 h 20 played of 2 h*).
 - **Chips** above and below the week open their choices at once: the profiles (how many are saved), the same limit every day, the bedtime alarm, *When the time is up* and the removal.
 - Above the week, in amber, a limit reached and what the console does then, or the console not counting play time.
 - **Same limit every day:** a quick list or an exact duration (*Enter a duration…*: ↑/↓ by 15 min, Ⓛ/Ⓡ by 5 min).
@@ -152,7 +152,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 *[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=preferences)*
 
 - What sets PlayGuard itself up:
-  - Language (every console language, or the console's own), theme (light / dark), text size (automatic / normal / larger, at once); the others with an offer to restart.
+  - Language (every console language, or the console's own), theme (dark by default, light, or the console's), text size (automatic / normal / larger, at once); the others with an offer to restart.
   - The tab to start on.
   - **The intro** at start-up: the loading screen for 2 seconds (on by default; Ⓐ or Ⓑ skips it; off, PlayGuard opens as soon as it is ready).
 - The messages it shows:

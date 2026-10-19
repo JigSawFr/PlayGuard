@@ -74,7 +74,7 @@
   "restricted": {"label": "已達今天的限制"},
   "alarm_only": {"label": "時間到時：僅提醒", "help": "達到限制後，剩餘時間會低於 0。"},
   "alarm_off": {"label": "「時間到」提醒已關閉"},
-  "not_counting": {"label": "剩餘時間不減少", "help": "時鐘被調回：在畫面上顯示 90 秒後，總覽會提示。"},
+  "not_counting": {"label": "剩餘時間不減少", "help": "時鐘被調回：在畫面上顯示 90 秒後，「今天」會提示。"},
   "unpaired": {"label": "未連結手機應用程式"},
   "left_min": {"label": "今天剩餘分鐘數"},
   "fw": {"label": "系統版本", "help": "高於已驗證的最新版本時，顯示系統版本畫面。"},

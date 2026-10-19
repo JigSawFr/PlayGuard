@@ -126,7 +126,7 @@ void sanitize(Config& c)
     bool language_ok = false;
     for (const char* l : LANGUAGES) language_ok |= c.language == l;
     if (!language_ok) c.language = "system";
-    one_of(c.theme, { "system", "light", "dark" }, "system");
+    one_of(c.theme, { "system", "light", "dark" }, "dark");
     one_of(c.text_size, { "auto", "normal", "large" }, "auto");
     one_of(c.effects, { "auto", "full" }, "auto");
     one_of(c.update_via, { "", "inplace", "auto", "sphaira", "appstore", "manual" }, "");

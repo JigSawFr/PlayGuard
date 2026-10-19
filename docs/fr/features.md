@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 d0ed03f4c86c -->
+<!-- translated from docs/features.md, sha256 2ea50338bc2a -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Retour au [README](../../README.fr.md).
@@ -19,7 +19,7 @@ Les captures montrent le thème clair (en anglais).
 
 ## Commandes
 
-↑/↓ déplacer · Ⓐ valider · Ⓑ retour ou annuler (deux fois sur la barre latérale pour quitter) · Ⓧ actualiser (sur les onglets qui relisent la console) · Ⓨ notifications · **−** langue et thème · **+** enregistre les limites par jour (et la semaine modifiée dans *Temps de jeu*).
+↑/↓ déplacer · Ⓐ valider · Ⓑ retour ou annuler (deux fois sur la barre latérale pour quitter) · Ⓧ actualiser (sur les onglets qui relisent la console) · Ⓨ notifications · **−** langue et thème (ces deux-là depuis n'importe quel onglet ; le pied de page ne les montre pas, la cloche, la langue et le thème de l'en-tête le font) · **+** enregistre les limites par jour (et la semaine modifiée dans *Temps de jeu*).
 
 Ce qui a échoué est dit dans une boîte de dialogue, ce qui a réussi dans une notification. Un dialogue ne dit que ce qui s'applique à cette console maintenant : que le jeu en cours serait suspendu, seulement quand un jeu est ouvert ; que l'application compagnon pourrait écraser une modification, seulement quand elle est associée et peut se synchroniser. La pastille de l'en-tête indique, sur chaque onglet, que le contrôle parental est déverrouillé temporairement, et un crayon barré à droite du titre que l'application est en lecture seule ; toucher l'un ou l'autre mène là où on l'annule (Code PIN › Réactiver le contrôle parental, l'écran du firmware) ; en lecture seule, les actions restent à leur place, grisées, et disent pourquoi quand on les choisit.
 
@@ -30,7 +30,7 @@ L'application est organisée en onglets, comme les paramètres de la console ; c
 L'apparence de PlayGuard s'appelle Cadran : une barre d'icônes pour les onglets, une palette bleu nuit ou blanc froid (selon le thème), des cartes au lieu des listes. Chaque onglet s'ouvre sur l'essentiel (un anneau, des tuiles, des cartes, des puces), ses autres réglages en dessous.
 
 - La pastille de l'en-tête dit de quoi parle l'onglet (*Contrôle parental actif*, *Minuteur actif*…) ; contrôle parental déverrouillé, elle le dit sur chaque onglet, et la toucher ouvre *Code PIN › Réactiver le contrôle parental*. Le texte secondaire ne descend jamais sous 15 px, pour se lire depuis le canapé sur une télé.
-- Les dialogues sont des cartes aux boutons en pilules, la confirmation en turquoise (en corail quand elle supprime ou arrête quelque chose) ; les choix s'ouvrent en carte au-dessus des aides, le choix actuel en turquoise ; les messages apparaissent en cartes sous l'en-tête, avec une coche turquoise pour ce qui a été fait et une marque orange pour ce qui a été refusé.
+- Les dialogues sont des cartes aux boutons en pilules, la confirmation en turquoise (en corail quand elle supprime ou arrête quelque chose) ; les choix s'ouvrent en carte au-dessus des aides, le choix actuel sur un turquoise léger avec sa coche (le contour turquoise n'est qu'au focus, partout : un niveau, un compte, un choix en vigueur garde le fond léger) ; un long dialogue s'estompe en bas tant que la suite continue, et son avertissement (une partie sur le point d'être suspendue) vient en premier, dans une carte orange ; un échec a pour titre ce qui a échoué, le code d'erreur en petit sous la raison, et propose *Envoyer un rapport* quand c'est utile ; les messages apparaissent en cartes sous l'en-tête, avec une coche turquoise pour ce qui a été fait et une marque orange pour ce qui a été refusé.
 - Les autres écrans prennent la même allure : l'éditeur par jour d'un profil montre la semaine comme *Temps de jeu* (modifiée de la même façon, les remplissages rapides en tuiles) ; *Vérifier les jeux installés* et *Tous les jeux* mettent leurs lignes en cartes ; *Profils* et *Aide et diagnostic* donnent son icône à chaque ligne.
 - **Taille du texte** (*Préférences*, ou **AA** dans l'en-tête) : *Automatique*, par défaut, agrandit tous les textes de 25 % quand la console est sur sa station, sur la TV, et les remet en mode portable ; *Plus grande* les garde agrandis, *Normale* jamais. L'en-tête, la barre latérale et le pied de page gardent leur taille (ils n'ont pas la place), comme les noms des niveaux de *Restrictions*, déjà grands. Le changement est immédiat, sur tous les écrans, sans relancer. Les 25 % viennent d'une TV 55" en 4K : le plus petit texte (15 px) y fait alors 14,6 mm de haut en capitales, 20′ d'arc à 2,5 m, où la lecture est confortable (16′ en taille normale, le strict minimum).
 - **Effets visuels** (*Préférences*) : *Allégés sur batterie*, par défaut, retire le halo de fond, le battement de l'anneau de l'écran enfant dans ses dernières minutes et le glissement de l'arc vers une nouvelle valeur tant qu'aucun chargeur n'est branché (en portable, débranchée) ; *Toujours complets* les garde. Relu toutes les 5 secondes : brancher la console les fait revenir.
@@ -38,7 +38,7 @@ L'apparence de PlayGuard s'appelle Cadran : une barre d'icônes pour les onglets
 
 ## Notifications — ce qui demande votre attention, depuis n'importe quel onglet
 
-Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'intervention du parent ; Ⓨ ouvre la liste depuis n'importe quel onglet (le pied de page indique *Notifications (2)* quand deux choses sont à faire).
+Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'intervention du parent ; Ⓨ ouvre la liste depuis n'importe quel onglet (le badge de la cloche indique *2* quand deux choses sont à faire).
 
 À gauche de la cloche, la langue (son code, *FR*, *EN*…) et le thème (un soleil pour clair, une lune pour sombre, un cercle à moitié plein quand il suit la console), puis la taille du texte (**AA**, son grand A en turquoise quand le texte est agrandi) : un appui ouvre la même liste que dans *Préférences*, et **−** les propose depuis n'importe quel onglet. Une nouvelle langue ou un nouveau thème prend effet au prochain lancement de PlayGuard ; la taille du texte tout de suite.
 
@@ -74,7 +74,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 
 *[L'essayer dans le simulateur ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=play_timer)*
 
-- **La semaine est l'éditeur :** Ⓐ sur un jour le modifie : ↑/↓ le changent de 15 min, ←/→ passent au jour suivant, Ⓛ le copie du lundi au vendredi, Ⓡ sur le week-end, Ⓨ met « pas de limite », Ⓐ ou Ⓑ terminent ; Ⓧ choisit une durée exacte (*Saisir une durée…* la règle avec ↑/↓ par 15 min et Ⓛ/Ⓡ par 5 min, OK sélectionné). Au toucher, un jour touché passe en modification, puis toucher son haut ou son bas le change de 15 min. Les modifications s'enregistrent ensemble, avec **+** ou *Enregistrer*, comme dans l'éditeur par jour (la confirmation liste les jours modifiés, avant → après) ; *Annuler* les remet. Dans la barre de chaque jour, le temps joué à sa dernière occurrence (aujourd'hui compris, tous comptes confondus), en corail une fois la limite atteinte ; sous la semaine, les chiffres du jour sélectionné (*jeudi : 1 h 20 joué sur 2 h*).
+- **La semaine est l'éditeur :** Ⓐ sur un jour le modifie : ↑/↓ le changent de 15 min, ←/→ passent au jour suivant, Ⓛ le copie du lundi au vendredi, Ⓡ sur le week-end, Ⓨ met « pas de limite », Ⓐ ou Ⓑ terminent ; Ⓧ choisit une durée exacte (*Saisir une durée…* la règle avec ↑/↓ par 15 min et Ⓛ/Ⓡ par 5 min, OK sélectionné). Au toucher, un jour touché passe en modification, puis toucher son haut ou son bas le change de 15 min. Les modifications s'enregistrent ensemble, avec **+** ou *Enregistrer*, comme dans l'éditeur par jour (la confirmation liste les jours modifiés, avant → après) ; *Annuler* les remet. Dans la barre de chaque jour, le temps joué à sa dernière occurrence (aujourd'hui compris, tous comptes confondus), en corail une fois la limite atteinte, sa limite aussi, et une légende sous la semaine le dit (*limite dépassée*) ; un jour modifié et pas encore enregistré a sa limite en orange et sa barre cerclée d'orange ; sous la semaine, les chiffres du jour sélectionné (*jeudi : 1 h 20 joué sur 2 h*).
 - **Des puces** au-dessus et en dessous de la semaine ouvrent directement leurs choix : les profils (combien sont enregistrés), la même limite tous les jours, l'alarme du coucher, *Quand le temps est écoulé* et la suppression.
 - Au-dessus de la semaine, en orange, une limite atteinte et ce que fait alors la console, ou la console qui ne décompte pas le temps de jeu.
 - **Même limite tous les jours :** liste rapide ou durée exacte (*Saisir une durée…* : ↑/↓ par 15 min, Ⓛ/Ⓡ par 5 min).
@@ -153,7 +153,7 @@ Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'i
 *[L'essayer dans le simulateur ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=preferences)*
 
 - Ce qui règle PlayGuard lui-même :
-  - Langue (toutes celles de la console, ou celle de la console), thème (clair / sombre), taille du texte (automatique / normale / plus grande, tout de suite) ; les autres avec proposition de relancer.
+  - Langue (toutes celles de la console, ou celle de la console), thème (sombre par défaut, clair, ou celui de la console), taille du texte (automatique / normale / plus grande, tout de suite) ; les autres avec proposition de relancer.
   - L'onglet d'ouverture.
   - **L'intro** au lancement : l'écran de chargement pendant 2 secondes (activée par défaut ; Ⓐ ou Ⓑ la passe ; désactivée, PlayGuard s'ouvre dès qu'il est prêt).
 - Les messages qu'il affiche :

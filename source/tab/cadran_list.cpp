@@ -67,6 +67,12 @@ float margin_top(brls::View* view)
     return margin.unit == YGUnitPoint ? margin.value : 0.0f;
 }
 
+float margin_bottom(brls::View* view)
+{
+    const YGValue margin = YGNodeStyleGetMargin(view->getYGNode(), YGEdgeBottom);
+    return margin.unit == YGUnitPoint ? margin.value : 0.0f;
+}
+
 // A row of a card that starts with its icon (row_icon(): the only box among a cell's lines).
 bool has_icon(brls::View* row)
 {
@@ -178,8 +184,9 @@ cadran::Switch::Switch(brls::BooleanCell* cell)
     brls::Theme theme = brls::Application::getTheme();
     this->on = theme["cadran/teal_fill"];
     this->off = theme["cadran/track"];
-    this->knob_on = theme["cadran/navy"];
-    this->knob_off = theme["cadran/text2"];
+    // A white knob either way: the track's colour says on or off.
+    this->knob_on = nvgRGB(0xFF, 0xFF, 0xFF);
+    this->knob_off = nvgRGB(0xFF, 0xFF, 0xFF);
     this->setFocusable(false);
     this->setWidth(50);
     this->setHeight(28);
@@ -198,6 +205,12 @@ void cadran::Switch::draw(NVGcontext* vg, float x, float y, float width, float h
     nvgCircle(vg, state ? x + width - r : x + r, y + r, r - 4);
     nvgFillColor(vg, this->a(state ? this->knob_on : this->knob_off));
     nvgFill(vg);
+    // Off on a light track, a hairline keeps the knob's edge.
+    if (!state) {
+        nvgStrokeColor(vg, this->a(nvgRGBA(0x0B, 0x14, 0x24, 40)));
+        nvgStrokeWidth(vg, 1.0f);
+        nvgStroke(vg);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -318,6 +331,7 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
     Card* card = nullptr;   // the card the next cell joins, while cells follow each other
     const std::vector<brls::View*> lines = this->box->getChildren();
     for (brls::View* line : lines) {
+        Card* above = card;   // the card just before this line, if any
         if (auto* header = dynamic_cast<brls::Header*>(line)) {
             card = nullptr;
             this->headers.push_back(header);
@@ -333,6 +347,12 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
                 note->setMarginLeft(10);
                 note->setMarginRight(10);
                 if (margin_top(note) >= 10) note->setMarginTop(10);
+                // Right under a card it explains: close to it, and the next
+                // card further away, so it reads as that card's.
+                if (above) {
+                    note->setMarginTop(6);
+                    note->setMarginBottom(std::max(margin_bottom(note), 18.0f));
+                }
             }
             continue;
         }
@@ -360,8 +380,9 @@ void cadran::List::section(brls::Header* header)
     if (!header->getChildren().empty()) header->getChildren()[0]->setVisibility(brls::Visibility::GONE);   // the bar
     for (const char* part : { "brls/header/title", "brls/header/subtitle" }) {
         if (auto* text = dynamic_cast<brls::Label*>(header->getView(part))) {
-            text->setFontSize(15);
-            text->setTextColor(theme["cadran/text3"]);
+            // 16 px in the second ink: read from across the room.
+            text->setFontSize(16);
+            text->setTextColor(theme["cadran/text2"]);
         }
     }
 }

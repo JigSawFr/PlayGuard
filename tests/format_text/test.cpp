@@ -69,63 +69,63 @@ static void test_minutes()
 {
     CHECK(ui::fmt_minutes(PT_DAY_NOLIMIT) == "No limit");
     CHECK(ui::fmt_minutes(0) == "0 min (no play)");
-    CHECK(ui::fmt_minutes(1) == "1 min" && ui::fmt_minutes(59) == "59 min");
-    CHECK(ui::fmt_minutes(60) == "1 h" && ui::fmt_minutes(120) == "2 h" && ui::fmt_minutes(1440) == "24 h");
-    CHECK(ui::fmt_minutes(125) == "2 h 05" && ui::fmt_minutes(150) == "2 h 30" && ui::fmt_minutes(61) == "1 h 01");
+    CHECK(ui::fmt_minutes(1) == "1\u00A0min" && ui::fmt_minutes(59) == "59\u00A0min");
+    CHECK(ui::fmt_minutes(60) == "1\u00A0h" && ui::fmt_minutes(120) == "2\u00A0h" && ui::fmt_minutes(1440) == "24\u00A0h");
+    CHECK(ui::fmt_minutes(125) == "2\u00A0h\u00A005" && ui::fmt_minutes(150) == "2\u00A0h\u00A030" && ui::fmt_minutes(61) == "1\u00A0h\u00A001");
 
     // Played: no "(no play)" for none.
-    CHECK(ui::fmt_played(0) == "0 min");
-    CHECK(ui::fmt_played(45) == "45 min" && ui::fmt_played(150) == "2 h 30");
+    CHECK(ui::fmt_played(0) == "0\u00A0min");
+    CHECK(ui::fmt_played(45) == "45\u00A0min" && ui::fmt_played(150) == "2\u00A0h\u00A030");
 
     // Left, from nanoseconds: rounded to the nearest minute, at most a day.
     const uint64_t MIN = 60000000000ULL;
-    CHECK(ui::fmt_duration_ns(0) == "0 min");
-    CHECK(ui::fmt_duration_ns(29 * 1000000000ULL) == "0 min");
-    CHECK(ui::fmt_duration_ns(30 * 1000000000ULL) == "1 min");
-    CHECK(ui::fmt_duration_ns(90 * MIN + 29 * 1000000000ULL) == "1 h 30");
-    CHECK(ui::fmt_duration_ns(90 * MIN + 30 * 1000000000ULL) == "1 h 31");
-    CHECK(ui::fmt_duration_ns(1440 * MIN) == "24 h" && ui::fmt_duration_ns(5000 * MIN) == "24 h");
-    CHECK(ui::fmt_duration_ns(UINT64_MAX / 2) == "24 h");
+    CHECK(ui::fmt_duration_ns(0) == "0\u00A0min");
+    CHECK(ui::fmt_duration_ns(29 * 1000000000ULL) == "0\u00A0min");
+    CHECK(ui::fmt_duration_ns(30 * 1000000000ULL) == "1\u00A0min");
+    CHECK(ui::fmt_duration_ns(90 * MIN + 29 * 1000000000ULL) == "1\u00A0h\u00A030");
+    CHECK(ui::fmt_duration_ns(90 * MIN + 30 * 1000000000ULL) == "1\u00A0h\u00A031");
+    CHECK(ui::fmt_duration_ns(1440 * MIN) == "24\u00A0h" && ui::fmt_duration_ns(5000 * MIN) == "24\u00A0h");
+    CHECK(ui::fmt_duration_ns(UINT64_MAX / 2) == "24\u00A0h");
 
     // Play time, from seconds: "< 1 min" under a minute (not for none), no cap.
-    CHECK(ui::fmt_play_time(0) == "0 min");
+    CHECK(ui::fmt_play_time(0) == "0\u00A0min");
     CHECK(ui::fmt_play_time(1) == "< 1 min" && ui::fmt_play_time(59) == "< 1 min");
-    CHECK(ui::fmt_play_time(60) == "1 min" && ui::fmt_play_time(89) == "1 min" && ui::fmt_play_time(90) == "2 min");
-    CHECK(ui::fmt_play_time(3600) == "1 h" && ui::fmt_play_time(3600 + 5 * 60) == "1 h 05");
-    CHECK(ui::fmt_play_time(99 * 3600 + 59 * 60) == "99 h 59");
+    CHECK(ui::fmt_play_time(60) == "1\u00A0min" && ui::fmt_play_time(89) == "1\u00A0min" && ui::fmt_play_time(90) == "2\u00A0min");
+    CHECK(ui::fmt_play_time(3600) == "1\u00A0h" && ui::fmt_play_time(3600 + 5 * 60) == "1\u00A0h\u00A005");
+    CHECK(ui::fmt_play_time(99 * 3600 + 59 * 60) == "99\u00A0h\u00A059");
     // From 100 h, whole hours, rounded.
-    CHECK(ui::fmt_play_time(152 * 3600 + 29 * 60) == "152 h" && ui::fmt_play_time(152 * 3600 + 30 * 60) == "153 h");
-    CHECK(ui::fmt_play_time(277 * 3600 + 58 * 60) == "278 h");
-    CHECK(ui::fmt_play_time(100000ULL * 3600) == "100000 h");
+    CHECK(ui::fmt_play_time(152 * 3600 + 29 * 60) == "152\u00A0h" && ui::fmt_play_time(152 * 3600 + 30 * 60) == "153\u00A0h");
+    CHECK(ui::fmt_play_time(277 * 3600 + 58 * 60) == "278\u00A0h");
+    CHECK(ui::fmt_play_time(100000ULL * 3600) == "100000\u00A0h");
 
     // A daily average over its days: days under two months, then months, then years.
-    CHECK(ui::fmt_per_day_over(53 * 60, 45) == "53 min over 45 days");
-    CHECK(ui::fmt_per_day_over(53 * 60, 59) == "53 min over 59 days");
-    CHECK(ui::fmt_per_day_over(53 * 60, 60) == "53 min over 2 months");
-    CHECK(ui::fmt_per_day_over(53 * 60, 548) == "53 min over 18 months");
-    CHECK(ui::fmt_per_day_over(53 * 60, 729) == "53 min over 24 months");
-    CHECK(ui::fmt_per_day_over(53 * 60, 730) == "53 min over 2 years");
-    CHECK(ui::fmt_per_day_over(53 * 60, 2199) == "53 min over 6 years");
+    CHECK(ui::fmt_per_day_over(53 * 60, 45) == "53\u00A0min over 45 days");
+    CHECK(ui::fmt_per_day_over(53 * 60, 59) == "53\u00A0min over 59 days");
+    CHECK(ui::fmt_per_day_over(53 * 60, 60) == "53\u00A0min over 2 months");
+    CHECK(ui::fmt_per_day_over(53 * 60, 548) == "53\u00A0min over 18 months");
+    CHECK(ui::fmt_per_day_over(53 * 60, 729) == "53\u00A0min over 24 months");
+    CHECK(ui::fmt_per_day_over(53 * 60, 730) == "53\u00A0min over 2 years");
+    CHECK(ui::fmt_per_day_over(53 * 60, 2199) == "53\u00A0min over 6 years");
 }
 
 static void test_days_summary()
 {
     const uint16_t N = PT_DAY_NOLIMIT;
     const uint16_t same[7] = { 120, 120, 120, 120, 120, 120, 120 };
-    CHECK(ui::days_summary(same) == "2 h every day");
+    CHECK(ui::days_summary(same) == "2\u00A0h every day");
     const uint16_t zero[7] = { 0, 0, 0, 0, 0, 0, 0 };
     CHECK(ui::days_summary(zero) == "0 min (no play) every day");
     const uint16_t none[7] = { N, N, N, N, N, N, N };
     CHECK(ui::days_summary(none) == "No limit");
     const uint16_t range[7] = { 180, 60, 60, 90, 60, 60, 180 };
-    CHECK(ui::days_summary(range) == "1 h to 3 h");
+    CHECK(ui::days_summary(range) == "1\u00A0h to 3\u00A0h");
     // A day without a limit tops the range, in the sentence's case.
     const uint16_t open[7] = { N, 60, 60, 90, 60, 60, N };
-    CHECK(ui::days_summary(open) == "1 h to no limit");
+    CHECK(ui::days_summary(open) == "1\u00A0h to no limit");
     const uint16_t one_open[7] = { 45, 45, 45, 45, 45, 45, N };
-    CHECK(ui::days_summary(one_open) == "45 min to no limit");
+    CHECK(ui::days_summary(one_open) == "45\u00A0min to no limit");
     const uint16_t with_zero[7] = { 0, 30, 30, 30, 30, 30, 0 };
-    CHECK(ui::days_summary(with_zero) == "0 min (no play) to 30 min");
+    CHECK(ui::days_summary(with_zero) == "0 min (no play) to 30\u00A0min");
 }
 
 static void test_names()
@@ -151,8 +151,8 @@ static void test_french()
     REQUIRE(load("fr"));
     CHECK(ui::day_name(1) == s_catalog["playguard/days/1"]);
     CHECK(ui::day_name_in_text(1) == "lundi");
-    CHECK(ui::fmt_minutes(125) == "2 h 05");
-    CHECK(ui::fmt_per_day_over(53 * 60, 2199) == "53 min sur 6 ans");
+    CHECK(ui::fmt_minutes(125) == "2\u00A0h\u00A005");
+    CHECK(ui::fmt_per_day_over(53 * 60, 2199) == "53\u00A0min sur 6 ans");
     CHECK(ui::fmt_minutes(PT_DAY_NOLIMIT) == s_catalog["playguard/common/no_limit"]);
 }
 

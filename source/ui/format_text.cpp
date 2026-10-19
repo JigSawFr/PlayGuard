@@ -10,6 +10,17 @@
 
 using namespace brls::literals;
 
+namespace
+{
+// "2 h 30" with no-break spaces: a line never ends on "2 h" before its "30"
+// (patches/borealis/0010).
+std::string glued(std::string text)
+{
+    for (size_t at = text.find(' '); at != std::string::npos; at = text.find(' ', at + 2)) text.replace(at, 1, "\u00A0");
+    return text;
+}
+}   // namespace
+
 namespace ui
 {
 
@@ -17,9 +28,9 @@ std::string fmt_minutes(uint16_t m)
 {
     if (m == PT_DAY_NOLIMIT) return "playguard/common/no_limit"_i18n;
     if (m == 0) return "playguard/common/zero_minutes"_i18n;
-    if (m < 60) return brls::getStr("playguard/common/minutes", (int)m);
-    if (m % 60 == 0) return brls::getStr("playguard/common/hours", (int)(m / 60));
-    return brls::getStr("playguard/common/hours_minutes", (int)(m / 60), fmt::format("{:02d}", (int)(m % 60)));
+    if (m < 60) return glued(brls::getStr("playguard/common/minutes", (int)m));
+    if (m % 60 == 0) return glued(brls::getStr("playguard/common/hours", (int)(m / 60)));
+    return glued(brls::getStr("playguard/common/hours_minutes", (int)(m / 60), fmt::format("{:02d}", (int)(m % 60))));
 }
 
 std::string days_summary(const uint16_t days[7])
@@ -46,7 +57,7 @@ std::string days_summary(const uint16_t days[7])
 
 std::string fmt_played(uint16_t m)
 {
-    if (m == 0) return brls::getStr("playguard/common/minutes", 0);
+    if (m == 0) return glued(brls::getStr("playguard/common/minutes", 0));
     return fmt_minutes(m);
 }
 
@@ -61,10 +72,10 @@ std::string fmt_play_time(uint64_t seconds)
 {
     if (seconds > 0 && seconds < 60) return "playguard/activity/less_than_minute"_i18n;
     const uint64_t m = (seconds + 30) / 60;
-    if (m < 60) return brls::getStr("playguard/common/minutes", (int)m);
+    if (m < 60) return glued(brls::getStr("playguard/common/minutes", (int)m));
     // From 100 h, the minutes are noise: whole hours, rounded.
-    if (m % 60 == 0 || m >= 100 * 60) return brls::getStr("playguard/common/hours", (unsigned long long)((m + 30) / 60));
-    return brls::getStr("playguard/common/hours_minutes", (unsigned long long)(m / 60), fmt::format("{:02d}", (int)(m % 60)));
+    if (m % 60 == 0 || m >= 100 * 60) return glued(brls::getStr("playguard/common/hours", (unsigned long long)((m + 30) / 60)));
+    return glued(brls::getStr("playguard/common/hours_minutes", (unsigned long long)(m / 60), fmt::format("{:02d}", (int)(m % 60))));
 }
 
 std::string fmt_per_day_over(uint64_t per_day_s, int days)

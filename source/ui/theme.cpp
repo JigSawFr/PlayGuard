@@ -16,44 +16,17 @@ namespace ui
 
 void register_theme_colors()
 {
-    // PlayGuard brand teal / amber, darkened on the light theme so every status
-    // value keeps a contrast of at least 4.5:1 on the borealis backgrounds.
-    auto& light = brls::Theme::getLightTheme();
-    // The focus highlight, the click pulse and the active sidebar item in the
-    // icon's teal (borealis' defaults are the Switch's cyan / blue), so the
-    // app looks like its icon. Values keep borealis' blue: teal values would
-    // read as the "ok" state.
-    light.addColor("brls/highlight/color1", nvgRGB(0x14, 0xA3, 0x8A));
-    light.addColor("brls/highlight/color2", nvgRGB(0x4A, 0xD6, 0xBA));
-    light.addColor("brls/click_pulse", nvgRGBA(0x14, 0xA3, 0x8A, 38));
-    light.addColor("brls/sidebar/active_item", nvgRGB(0x0F, 0x8A, 0x74));
-    light.addColor("brand/ok", nvgRGB(0x0A, 0x6E, 0x5C));
-    light.addColor("brand/warn", nvgRGB(0x8A, 0x52, 0x00));
-    light.addColor("brand/bad", nvgRGB(0xB7, 0x1C, 0x1C));
-    light.addColor("brand/gauge_track", nvgRGBA(0, 0, 0, 34));
-    light.addColor("brand/note", nvgRGB(0x5C, 0x5C, 0x5C));
-    auto& dark = brls::Theme::getDarkTheme();
-    dark.addColor("brls/highlight/color1", nvgRGB(0x2E, 0xC4, 0xA6));
-    dark.addColor("brls/highlight/color2", nvgRGB(0x9A, 0xF0, 0xDC));
-    dark.addColor("brls/click_pulse", nvgRGBA(0x2E, 0xC4, 0xA6, 38));
-    dark.addColor("brls/sidebar/active_item", nvgRGB(0x2E, 0xC4, 0xA6));
-    // A clear green, not the logo teal: the dark theme's default value colour is
-    // already teal, so "OK" would not stand out from plain values.
-    dark.addColor("brand/ok", nvgRGB(0x7E, 0xD9, 0x57));
-    dark.addColor("brand/warn", nvgRGB(0xFF, 0xB5, 0x47));
-    dark.addColor("brand/bad", nvgRGB(0xFF, 0x7A, 0x7A));
-    dark.addColor("brand/gauge_track", nvgRGBA(255, 255, 255, 46));
-    dark.addColor("brand/note", nvgRGB(0xB8, 0xB8, 0xB8));
+    // What cadran::install_theme() does not set: the empty part of a
+    // progress bar and of a game's missing cover. The rest of the palette is
+    // the boards' (ui/cadran_frame.cpp).
+    brls::Theme::getLightTheme().addColor("brand/gauge_track", nvgRGBA(0, 0, 0, 34));
+    brls::Theme::getDarkTheme().addColor("brand/gauge_track", nvgRGBA(255, 255, 255, 46));
 #ifndef __SWITCH__
     // Desktop simulation, PLAYGUARD_SIM_STILL_FOCUS=1 (the smoke test): the
     // glow borealis moves around the focus with the clock stays where it is
-    // (patches/borealis/0009), in the stroke's own colour, so a screenshot
-    // does not depend on when it was taken.
-    if (sim_env("PLAYGUARD_SIM_STILL_FOCUS")) {
-        brls::setHighlightAnimationStill(true);
-        light.addColor("brls/highlight/color2", light["brls/highlight/color1"]);
-        dark.addColor("brls/highlight/color2", dark["brls/highlight/color1"]);
-    }
+    // (patches/borealis/0009); cadran::install_theme() draws it in the
+    // stroke's own colour, so a screenshot does not depend on when it was taken.
+    if (sim_env("PLAYGUARD_SIM_STILL_FOCUS")) brls::setHighlightAnimationStill(true);
 #endif
 }
 

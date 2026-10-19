@@ -74,7 +74,7 @@
   "restricted": {"label": "Limite de hoje atingido"},
   "alarm_only": {"label": "Quando o tempo acaba: só um aviso", "help": "Com o limite atingido, o tempo restante fica abaixo de 0."},
   "alarm_off": {"label": "Alarme «tempo esgotado» desativado"},
-  "not_counting": {"label": "O tempo restante não desce", "help": "Um relógio atrasado: a visão geral indica-o após 90 s no ecrã."},
+  "not_counting": {"label": "O tempo restante não desce", "help": "Um relógio atrasado: «Hoje» indica-o após 90 s no ecrã."},
   "unpaired": {"label": "Nenhuma aplicação associada"},
   "left_min": {"label": "Minutos restantes hoje"},
   "fw": {"label": "Firmware", "help": "Acima do mais recente verificado, o ecrã do firmware."},

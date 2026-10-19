@@ -74,7 +74,7 @@
   "restricted": {"label": "Limite di oggi raggiunto"},
   "alarm_only": {"label": "Allo scadere del tempo: solo un avviso", "help": "Con il limite raggiunto, il tempo rimanente scende sotto 0."},
   "alarm_off": {"label": "Allarme «tempo scaduto» disattivato"},
-  "not_counting": {"label": "Il tempo rimanente non diminuisce", "help": "Un orologio portato indietro: la panoramica lo segnala dopo 90 s sullo schermo."},
+  "not_counting": {"label": "Il tempo rimanente non diminuisce", "help": "Un orologio portato indietro: «Oggi» lo segnala dopo 90 s sullo schermo."},
   "unpaired": {"label": "Nessuna app collegata"},
   "left_min": {"label": "Minuti rimasti oggi"},
   "fw": {"label": "Firmware", "help": "Oltre il più recente verificato, la schermata del firmware."},

@@ -8,6 +8,7 @@
 #include <yoga/Yoga.h>
 
 #include "core/sim_env.h"
+#include "view/cadran_digits.hpp"
 #include "tab/cadran_list.hpp"
 #include "tab/tab_base.hpp"
 #include "util/config.hpp"
@@ -42,6 +43,7 @@ namespace
 void mark(brls::View* view, std::vector<brls::View*>& roots)
 {
     if (dynamic_cast<brls::Label*>(view) && YGNodeHasMeasureFunc(view->getYGNode())) YGNodeMarkDirty(view->getYGNode());
+    if (auto* digits = dynamic_cast<CadranDigits*>(view)) digits->remeasure();
     if (view->isDetached()) roots.push_back(view);
     if (auto* box = dynamic_cast<brls::Box*>(view))
         for (brls::View* child : box->getChildren()) mark(child, roots);

@@ -72,6 +72,12 @@ Empty empty(const char* icon_name);
 // has no attribute for it).
 void wrap(brls::View* row);
 
+// Over the foot of a scrolling frame drawn at (x, y, width, height): the
+// background (`color_key`) fading in over 32 px while there is more below,
+// so a line cut by the frame's edge reads as "more", not as the end.
+void draw_more_below(NVGcontext* vg, brls::ScrollingFrame* frame, float x, float y, float width, float height,
+                     const char* color_key);
+
 // "12 changes  ›" -> "12 changes"; "›" -> "".
 std::string without_chevron(const std::string& value);
 

@@ -648,7 +648,8 @@ void DashboardTab::show_outside_card(const std::vector<std::string>& lines)
 void DashboardTab::show_low(bool unlocked)
 {
     // Little or no time left today: the first amount stands out, the one
-    // most likely wanted.
+    // most likely wanted: ringed in teal on the soft fill, not filled (a
+    // filled pill is the screen's main action, and a chosen chip).
     const PtState& pt = this->pt;
     const int today = ui::today_weekday();
     bool low = false;
@@ -661,10 +662,11 @@ void DashboardTab::show_low(bool unlocked)
     for (size_t i = 0; i < this->amount_chips.size(); i++) {
         brls::Box* chip = this->amount_chips[i];
         const bool lit = low && i == 0;
-        chip->setBackgroundColor(lit ? theme["cadran/teal_fill"] : theme["cadran/surf2"]);
-        chip->setBorderThickness(lit ? 0 : 1);
+        chip->setBackgroundColor(lit ? theme["cadran/teal_soft"] : theme["cadran/surf2"]);
+        chip->setBorderColor(lit ? theme["cadran/teal_fill"] : theme["cadran/line"]);
+        chip->setBorderThickness(lit ? 2 : 1);
         for (brls::View* v : chip->getChildren())
-            if (auto* digits = dynamic_cast<CadranDigits*>(v)) digits->setTextColor(lit ? theme["cadran/navy"] : theme["cadran/text"]);
+            if (auto* digits = dynamic_cast<CadranDigits*>(v)) digits->setTextColor(lit ? theme["cadran/teal"] : theme["cadran/text"]);
     }
 }
 
@@ -690,7 +692,12 @@ void DashboardTab::show_cards(bool unlocked, bool has_pin)
         bed_state->setTextColor(theme["cadran/teal"]);
         std::string sub;
         if (pt.bedtime_reset_valid) {
-            sub = brls::getStr("playguard/cadran/today/bed_sub", fmt::format("{:02d}:{:02d}", pt.bedtime_reset_hour, pt.bedtime_reset_minute));
+            // The time kept with the word before it: "again at / 06:00" never
+            // breaks there (patches/borealis/0010).
+            const std::string at = fmt::format("{:02d}:{:02d}", pt.bedtime_reset_hour, pt.bedtime_reset_minute);
+            sub = brls::getStr("playguard/cadran/today/bed_sub", at);
+            const size_t pos = sub.find(" " + at);
+            if (pos != std::string::npos) sub.replace(pos, 1, "\u00A0");
         } else if (pt.bedtime_enabled) {
             // No morning time from the console: in how long the alarm rings.
             const LocalTime now = ui::local_now();

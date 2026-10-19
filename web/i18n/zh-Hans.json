@@ -74,7 +74,7 @@
   "restricted": {"label": "已达到今天的限制"},
   "alarm_only": {"label": "时间到时：仅提醒", "help": "达到限制后，剩余时间会低于 0。"},
   "alarm_off": {"label": "“时间到”提醒已关闭"},
-  "not_counting": {"label": "剩余时间不减少", "help": "时钟被调回：在屏幕上显示 90 秒后，概览会提示。"},
+  "not_counting": {"label": "剩余时间不减少", "help": "时钟被调回：在屏幕上显示 90 秒后，“今天”会提示。"},
   "unpaired": {"label": "未关联手机应用"},
   "left_min": {"label": "今天剩余分钟数"},
   "fw": {"label": "系统版本", "help": "高于已验证的最新版本时，显示系统版本画面。"},

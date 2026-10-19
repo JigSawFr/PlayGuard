@@ -30,6 +30,7 @@ class CadranChildActivity : public brls::Activity
     BRLS_BIND(PtRing,       ring,     "child_ring");
     BRLS_BIND(CadranDigits, bedtime,  "child_bedtime");
     BRLS_BIND(brls::Box,    bed_chip, "child_bed_chip");
+    BRLS_BIND(CadranIcon,   bed_icon, "child_bed_icon");
     BRLS_BIND(brls::Label,  time_up,  "child_time_up");
     BRLS_BIND(brls::Box,    end_chip, "child_end_chip");
     BRLS_BIND(CadranIcon,   end_icon, "child_end_icon");

@@ -38,7 +38,7 @@ static void test_defaults()
     std::remove(paths::config_file().c_str());
     config::load();
     const auto& c = config::get();
-    CHECK(c.language == "system" && c.theme == "system" && c.auto_relock && !c.dev_mode && !c.pt_log);
+    CHECK(c.language == "system" && c.theme == "dark" && c.auto_relock && !c.dev_mode && !c.pt_log);
     CHECK(!c.extra_auto_restore);
     CHECK(c.extra_weekday == -1 && !c.relock_pending && c.fw_gate_choice.empty());
     CHECK(c.update_via.empty() && c.update_latest.empty());   // the update method: asked the first time
@@ -139,7 +139,7 @@ static void test_fields()
                     "fw_gate_app": "1.0.0", "fw_gate_choice": "maybe"})");
     config::load();
     c = config::get();
-    CHECK(c.language == "system" && c.theme == "system" && c.update_via.empty());
+    CHECK(c.language == "system" && c.theme == "dark" && c.update_via.empty());
     CHECK(c.fw_gate_choice.empty() && c.fw_gate_fw.empty() && c.fw_gate_app.empty());
 
     // The extra-time record is all or nothing: a base of -1 would otherwise
@@ -461,7 +461,7 @@ static void test_tmp_recovery()
     CHECK(!paths::read_file(file, text) && !paths::exists_or_pending(file) && !paths::file_exists(file));
     config::get() = config::Config{};
     config::load();
-    CHECK(config::loaded() == config::Loaded::Missing && config::get().theme == "system");
+    CHECK(config::loaded() == config::Loaded::Missing && config::get().theme == "dark");
     CHECK(paths::atomic_write(file, R"({"theme": "dark"})"));
     CHECK(paths::read_file(file, text) && text == R"({"theme": "dark"})");
     CHECK(!exists(file + ".part") && !exists(file + ".tmp"));

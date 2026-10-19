@@ -515,6 +515,11 @@ void ActivityTab::build_chips()
     const auto& accounts = play_data::accounts();
     // No account to choose between on a console with one (as the tab's line).
     if (accounts.size() < 2) return;
+    // Many accounts go on to a second line, clear of the period and export;
+    // one line keeps its place (the chips' margins taken back).
+    cadran::kit::wrap(accounts_row);
+    accounts_row->setMarginTop(-4);
+    accounts_row->setMarginBottom(-4);
     for (int i = -1; i < (int)accounts.size(); i++) {
         auto* chip = new brls::Box(brls::Axis::ROW);
         chip->setAlignItems(brls::AlignItems::CENTER);
@@ -525,6 +530,8 @@ void ActivityTab::build_chips()
         chip->setHideHighlightBackground(true);   // the ring alone: a chosen chip keeps its fill
         chip->setHighlightCornerRadius(22);
         chip->setMarginRight(10);
+        chip->setMarginTop(4);   // apart once on two lines (up to 8 accounts)
+        chip->setMarginBottom(4);
         chip->setShrink(0);
         if (i < 0) {
             chip->addView(cadran::kit::label("playguard/activity/account_all"_i18n, 16));
@@ -565,12 +572,14 @@ void ActivityTab::show_top()
     brls::Theme theme = brls::Application::getTheme();
     const int who = shown_account();
     for (size_t i = 0; i < this->chips.size(); i++) {
+        // The account shown: a soft fill and its ink, the hairline kept; the
+        // teal ring is the focus's alone.
         const bool on = (int)i - 1 == who;
-        this->chips[i]->setBackgroundColor(on ? theme["cadran/teal_fill"] : theme["cadran/surf"]);
-        this->chips[i]->setBorderColor(on ? theme["cadran/none"] : theme["cadran/line"]);
-        this->chips[i]->setBorderThickness(on ? 0 : 1);
+        this->chips[i]->setBackgroundColor(on ? theme["cadran/teal_soft"] : theme["cadran/surf"]);
+        this->chips[i]->setBorderColor(theme["cadran/line"]);
+        this->chips[i]->setBorderThickness(1);
         for (brls::View* v : this->chips[i]->getChildren())
-            if (auto* l = dynamic_cast<brls::Label*>(v)) l->setTextColor(on ? theme["cadran/navy"] : theme["cadran/text"]);
+            if (auto* l = dynamic_cast<brls::Label*>(v)) l->setTextColor(on ? theme["cadran/teal"] : theme["cadran/text"]);
     }
     const int p = this->period;
     const std::string period_name = brls::getStr(fmt::format("playguard/activity/periods/{}", p));
@@ -597,7 +606,8 @@ void ActivityTab::show_top()
         today_s += s.games[g].today_s;
         games_today += s.games[g].today_s > 0;
     }
-    std::string sub = brls::getStr("playguard/cadran/activity/games", games_today);
+    std::string sub = games_today == 1 ? "playguard/cadran/activity/games_one"_i18n
+                                       : brls::getStr("playguard/cadran/activity/games", games_today);
     if (who < 0) {
         const PtState& pt = this->play_timer();
         const uint16_t limit = pt.fw_supported && pt.valid ? pt.day_min[ui::today_weekday()] : PT_DAY_NOLIMIT;

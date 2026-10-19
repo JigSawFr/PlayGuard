@@ -74,7 +74,7 @@
   "restricted": {"label": "Limite du jour atteinte"},
   "alarm_only": {"label": "Temps écoulé : avertissement seulement", "help": "Avec la limite atteinte, le temps restant passe sous 0."},
   "alarm_off": {"label": "Alarme « temps écoulé » désactivée"},
-  "not_counting": {"label": "Le temps restant ne baisse pas", "help": "Une horloge reculée : la vue d'ensemble le signale après 90 s à l'écran."},
+  "not_counting": {"label": "Le temps restant ne baisse pas", "help": "Une horloge reculée : « Aujourd'hui » le signale après 90 s à l'écran."},
   "unpaired": {"label": "Application mobile non associée"},
   "left_min": {"label": "Minutes restantes aujourd'hui"},
   "fw": {"label": "Firmware", "help": "Au-delà du dernier vérifié, l'écran du firmware."},

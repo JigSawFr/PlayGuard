@@ -61,6 +61,7 @@ ClockTab::ClockTab()
     // Nintendo's time server blocked here: the clock will not set itself.
     if (nintendo_dns::time_blocked()) why->setText("playguard/clock/why"_i18n + "\n\n" + "playguard/clock/dns_note"_i18n);
     result->setSingleLine(false);
+    result_title->setSingleLine(false);
     warning->setSingleLine(false);
     progress_text->setSingleLine(false);
     // Only a notification at start-up (it never sets the clock): PlayGuard's own setting.
@@ -184,7 +185,7 @@ void ClockTab::refresh()
         const int64_t left = clock_flow::seconds_left(this->last);
         if (left <= 0) {
             this->last = clock_flow::Measurement{};
-            ui::set_text(this->result, "playguard/clock/expired"_i18n);
+            this->show_result("playguard/clock/expired"_i18n);
             ui::set_visible(warning.getView(), false);
         } else {
             // Counts down every second (the tab refreshes itself each second).
@@ -209,7 +210,7 @@ void ClockTab::set_server(const std::string& host, const std::string& reg)
     this->region_id = reg;
     this->last = clock_flow::Measurement{};
     this->offline = false;
-    ui::set_text(this->result, "");
+    this->show_result("");
     ui::set_visible(warning.getView(), false);
     auto& cfg = config::get();
     cfg.ntp_server = host;
@@ -300,7 +301,7 @@ void ClockTab::measure()
     ui::set_visible(apply_cell.getView(), false);
     ui::set_visible(copy_cell.getView(), false);
     ui::set_visible(warning.getView(), false);
-    ui::set_text(this->result, "");
+    this->show_result("");
     // A spinner says it is working; the text says with whom.
     ui::set_text(progress_text, brls::getStr("playguard/clock/measuring", this->server));
     ui::set_visible(progress.getView(), true);
@@ -312,7 +313,7 @@ void ClockTab::measure()
         ui::set_visible(progress.getView(), false);
         this->last = m;
         this->offline = offline_clock_logic::offer(m.ok, this->snap) != offline_clock_logic::Offer::None;
-        ui::set_text(this->result, this->offline ? m.report + "\n\n" + "playguard/clock/offline_hint"_i18n : m.report);
+        this->show_result(m.report, this->offline);
         // The servers disagreeing, and a write that would be refused, in amber.
         std::string warn = m.warning;
         if (m.ok && this->autosync_off) warn += (warn.empty() ? "" : "\n") + "playguard/clock/autosync_off_note"_i18n;
@@ -322,11 +323,32 @@ void ClockTab::measure()
     });
 }
 
+void ClockTab::show_result(const std::string& text, bool offline)
+{
+    brls::Theme theme = brls::Application::getTheme();
+    std::string title, body = text;
+    if (offline) {
+        // The report's last line ("No server answered…") is what matters.
+        const size_t last = text.find_last_of('\n');
+        title = last == std::string::npos ? text : text.substr(last + 1);
+        body = (last == std::string::npos ? "" : text.substr(0, last) + "\n\n") + "playguard/clock/offline_hint"_i18n;
+    }
+    ui::set_text(result_title, title);
+    ui::set_visible(result_title.getView(), !title.empty());
+    ui::set_text(result, body);
+    result->setTextColor(theme[offline ? "cadran/text2" : "cadran/text"]);
+    result_card->setBackgroundColor(theme[offline ? "cadran/amber_surf" : "cadran/none"]);
+    result_card->setBorderColor(theme["cadran/amber_line"]);
+    result_card->setBorderThickness(offline ? 1 : 0);
+    const float pad = offline ? 18 : 0;
+    result_card->setPadding(pad - 4, pad, pad - 4, pad);
+}
+
 void ClockTab::apply()
 {
     clock_flow::apply(this->last, [this](const std::string& message) {
         this->last = clock_flow::Measurement{};
-        ui::set_text(this->result, message);
+        this->show_result(message);
         ui::set_visible(warning.getView(), false);
         this->snap_ok = false;   // the network clock just changed: read it again
         this->refresh();
@@ -337,7 +359,7 @@ void ClockTab::copy()
 {
     clock_flow::apply_console_clock([this](const std::string& message) {
         this->offline = false;
-        ui::set_text(this->result, message);
+        this->show_result(message);
         ui::set_visible(warning.getView(), false);
         this->snap_ok = false;   // the network clock just changed: read it again
         this->refresh();

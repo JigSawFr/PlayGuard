@@ -33,13 +33,17 @@ class RestrictionsTab : public TabBase
         brls::Box*       badge = nullptr;
         CadranDigits*    age   = nullptr;
         brls::Label*     note  = nullptr;
+        // Each line: its dot, what it is about, and its state at the right.
         brls::Rectangle* sns_dot  = nullptr;
         brls::Label*     sns      = nullptr;
+        brls::Label*     sns_state = nullptr;
         brls::Rectangle* comm_dot = nullptr;
         brls::Label*     comm     = nullptr;
+        brls::Label*     comm_state = nullptr;
         brls::Box*       games_row = nullptr;   // the installed games it blocks (a game check made)
         brls::Rectangle* games_dot = nullptr;
         brls::Label*     games     = nullptr;
+        brls::Label*     games_state = nullptr;
         bool             to_settings = false;   // A goes to Custom's settings
     };
 
