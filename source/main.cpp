@@ -298,7 +298,7 @@ void start(LoadingActivity* loading)
         loading->show(LoadingActivity::Step::Screen);
 #ifndef __SWITCH__
         // Desktop simulation, for a screenshot of the loading screen.
-        if (sim_env("PLAYGUARD_SIM_HOLD_LOADING")) {
+        if (sim_env_flag("PLAYGUARD_SIM_HOLD_LOADING")) {
             brls::Logger::info("start-up: held on the loading screen (PLAYGUARD_SIM_HOLD_LOADING)");
             delete first;
             return;

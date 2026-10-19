@@ -28,7 +28,7 @@ LoadingMark::LoadingMark()
     this->setFocusable(false);
 #ifndef __SWITCH__
     // The desktop smoke test compares screenshots: no movement there.
-    this->still = sim_env("PLAYGUARD_SIM_STILL_FOCUS") != nullptr;
+    this->still = sim_env_flag("PLAYGUARD_SIM_STILL_FOCUS");
 #endif
 }
 

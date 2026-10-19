@@ -47,7 +47,7 @@ void walk(brls::View* view, const std::string& screen, FILE* out)
 void sample()
 {
 #if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
-    static const bool on = sim_env("PLAYGUARD_SIM_CUT_TEXT") != nullptr;
+    static const bool on = sim_env_flag("PLAYGUARD_SIM_CUT_TEXT");
     if (!on) return;
     // A fixed name in the working directory, not a path from the environment
     // (CodeQL: path injection), created with an explicit mode (fopen's

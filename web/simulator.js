@@ -19,15 +19,14 @@
 // between; **Steps link** gives the settings PlayGuard started with and
 // them (`rec=`), which a page opening it replays. The tour (`tour=1`) and
 // the smoke test (tools/web_smoke.py, runSteps()) are steps too.
+//
+// What touches neither the page nor PlayGuard (the languages, the URL, the
+// variables, the steps' format) is in sim_logic.js (`SimLogic`), loaded
+// before this file and tested on its own (tests/web_page/).
 'use strict';
 
-// The console's languages, as PlayGuard's config.json names them, in their own words.
-const LANGUAGES = [
-  ['en-US', 'English'], ['fr', 'Français'], ['fr-CA', 'Français (Canada)'], ['de', 'Deutsch'],
-  ['es', 'Español'], ['es-419', 'Español (Latinoamérica)'], ['it', 'Italiano'], ['nl', 'Nederlands'],
-  ['pt', 'Português'], ['pt-BR', 'Português (Brasil)'], ['ru', 'Русский'], ['ja', '日本語'],
-  ['ko', '한국어'], ['zh-Hans', '简体中文'], ['zh-Hant', '繁體中文'],
-];
+const { LANGUAGES, isOn } = SimLogic;
+
 const THEMES = ['auto', 'light', 'dark'];
 // The languages PlayGuard draws with the CJK font (cjk.otf, next to the page):
 // waited for before it starts; fetched once it runs in the others.
@@ -40,28 +39,8 @@ const SKIPS = [5, 15, 60];
 // Where a report goes without build.json (a local build).
 const REPO = 'JigSawFr/PlayGuard';
 
-// A language tag (the URL's, or the browser's) to one of the console's; null when none fits.
-function consoleLanguage(tag) {
-  const t = String(tag || '').toLowerCase();
-  const exact = LANGUAGES.find(([code]) => code.toLowerCase() === t);
-  if (exact) return exact[0];
-  const [base, region = ''] = t.split('-');
-  switch (base) {
-    case 'en': return 'en-US';
-    case 'fr': return region === 'ca' ? 'fr-CA' : 'fr';
-    case 'es': return !region || region === 'es' ? 'es' : 'es-419';
-    case 'pt': return region === 'br' ? 'pt-BR' : 'pt';
-    case 'zh': return ['tw', 'hk', 'mo', 'hant'].includes(region) || t.includes('hant') ? 'zh-Hant' : 'zh-Hans';
-    case 'de': case 'it': case 'nl': case 'ru': case 'ja': case 'ko': return base;
-    default: return null;
-  }
-}
 function browserLanguage() {
-  for (const tag of navigator.languages?.length ? navigator.languages : [navigator.language]) {
-    const code = consoleLanguage(tag);
-    if (code) return code;
-  }
-  return 'en-US';
+  return SimLogic.firstConsoleLanguage(navigator.languages?.length ? navigator.languages : [navigator.language]);
 }
 
 // borealis' ControllerButton values (patches/borealis/0090-sdl-in-a-browser.patch).
@@ -75,7 +54,6 @@ const KEYS = {
   Backspace: BUTTON.B,
 };
 const NAME = /^[a-z0-9_]+$/;
-const FALSY = new Set(['', '0', 'false', 'off', 'no']);
 
 const $ = (id) => document.getElementById(id);
 const canvas = $('canvas');
@@ -158,33 +136,8 @@ function chooseTheme(choice) {
 
 // ---- The URL ------------------------------------------------------------
 
-function readUrl() {
-  const out = new Map();
-  for (const [k, v] of new URLSearchParams(location.search)) {
-    const name = k.toLowerCase();
-    if (NAME.test(name)) out.set(name, v);
-  }
-  return out;
-}
-
-// Only what differs from the defaults goes in the URL, in the panel's order.
-function toQuery(values) {
-  const q = new URLSearchParams();
-  const names = [...known.keys(), ...[...values.keys()].filter((n) => !known.has(n)).sort()];
-  for (const name of names) {
-    if (!values.has(name)) continue;
-    const p = known.get(name);
-    let v = values.get(name);
-    if (p?.type === 'bool') {
-      if (FALSY.has(String(v).toLowerCase())) continue;
-      v = '1';
-    }
-    if (v === '' || v == null) continue;
-    q.set(name, v);
-  }
-  const s = q.toString();
-  return s ? `?${s}` : '';
-}
+const readUrl = () => SimLogic.readQuery(location.search);
+const toQuery = (values) => SimLogic.toQuery(values, known);
 
 function linkFor(values) {
   return `${location.origin}${location.pathname}${toQuery(values)}`;
@@ -216,7 +169,7 @@ function fieldFor(p, value) {
   const help = paramText(p, 'help') ? el('p', { class: 'help', text: paramText(p, 'help') }) : null;
   if (p.type === 'bool') {
     const input = el('input', { type: 'checkbox', id, 'data-name': p.name });
-    input.checked = value != null && !FALSY.has(String(value).toLowerCase());
+    input.checked = isOn(value);
     return [el('label', { class: 'field check', for: id }, input, el('span', { text: label })), help];
   }
   if (p.type === 'multi') {
@@ -313,18 +266,12 @@ function markChanges() {
   }
 }
 
-// The settings whose value differs between `a` and `b`.
-function changedNames(a, b) {
-  const qa = new URLSearchParams(toQuery(a)), qb = new URLSearchParams(toQuery(b));
-  return [...new Set([...qa.keys(), ...qb.keys()])].filter((n) => qa.get(n) !== qb.get(n));
-}
-
 // Only `live` settings changed, PlayGuard running: they reach it at once and
 // the URL follows; otherwise the page reloads with them.
 function apply(values) {
-  const changed = changedNames(values, current).filter((n) => !known.get(n)?.page);
+  const changed = SimLogic.changedNames(values, current, known).filter((n) => !known.get(n)?.page);
   if (running && changed.length && changed.every((n) => known.get(n)?.live)) {
-    for (const name of changed) { setLive(name, values.get(name)); noteStep(`s:${stepValue(name, values.get(name))}`); }
+    for (const name of changed) { setLive(name, values.get(name)); noteStep(`s:${SimLogic.stepValue(name, values.get(name))}`); }
     current = new Map(values);
     history.replaceState(null, '', linkFor(current));
     buildForm(current);
@@ -422,34 +369,9 @@ function showError(message) {
   overlay.replaceChildren(el('div', { class: 'spinner', 'aria-hidden': 'true' }), el('p', { text: message }), button);
 }
 
-// A setting as its PLAYGUARD_SIM_* variable has it: '' for none.
-function envValue(name, value) {
-  const p = known.get(name);
-  if (value == null || value === '') return '';
-  if (p?.type === 'bool') return FALSY.has(String(value).toLowerCase()) ? '' : '1';
-  return p?.values?.[value] ?? value;
-}
-const envName = (name) => `PLAYGUARD_SIM_${name.toUpperCase()}`;
-
-// The variables and the config.json PlayGuard starts with: the page's
-// language and theme, whatever else the URL sets.
-function startEnvironment(values) {
-  const env = { SDL_EMSCRIPTEN_KEYBOARD_ELEMENT: '#canvas' };
-  const config = { language, theme: consoleTheme };
-  for (const [name, value] of values) {
-    if (name === 'lang' || name === 'theme') continue;
-    const p = known.get(name);
-    if (p?.page) continue;
-    if (p?.config) { if (value) config[p.config] = value; continue; }
-    const v = envValue(name, value);
-    if (v !== '') env[envName(name)] = v;
-  }
-  return { env, config };
-}
-
 // A variable changed while PlayGuard runs (source/sim/web_page.cpp).
 function setLive(name, value) {
-  window.Module.ccall('playguard_web_setenv', 'number', ['string', 'string'], [envName(name), envValue(name, value)]);
+  window.Module.ccall('playguard_web_setenv', 'number', ['string', 'string'], [SimLogic.envName(name), SimLogic.envValue(known.get(name), value)]);
   log(`live: ${name}=${value ?? ''}`);
 }
 
@@ -536,10 +458,10 @@ function start() {
   };
 
   consoleTheme = effectiveTheme(chosenTheme());
-  const { env, config } = startEnvironment(current);
+  const { env, config } = SimLogic.startEnvironment(current, known, language, consoleTheme);
   log(`settings: ${decodeURIComponent(toQuery(current)) || '(defaults)'}; language ${language}, theme ${consoleTheme}`);
   showStatus(t('downloading'));
-  const keep = current.has('keep') && !FALSY.has(String(current.get('keep')).toLowerCase());
+  const keep = isOn(current.get('keep'));
   window.Module = {
     canvas,
     // GitHub Pages lets browsers keep files 10 minutes: after a push, the
@@ -690,10 +612,8 @@ function record() {
 const skipNow = () => Math.max(0, Number(current.get('skip')) || 0);
 
 function showSkip() {
-  const s = skipNow();
-  const h = Math.floor(s / 3600), min = Math.floor((s % 3600) / 60);
-  $('skip-shown').textContent = s ? `+${h ? `${h} h ` : ''}${min || !h ? `${min} min` : ''}`.trim() : '';
-  $('skip-reset').disabled = !s;
+  $('skip-shown').textContent = SimLogic.skipText(skipNow());
+  $('skip-reset').disabled = !skipNow();
 }
 
 // The console's time moved on by `seconds` (0: back to now), a game played
@@ -721,10 +641,8 @@ function setUpTime() {
 
 // ---- Steps ------------------------------------------------------------
 //
-// One step per dot: a button (up, down, left, right, a, b, x, y, l, r, zl,
-// zr, plus, minus), `*N` to press it N times; `wN` waits N tenths of a
-// second; `tX,Y` touches the screen (1280x720); `s:name=value` changes a live
-// setting; `say:key` shows the page's text `tour_<key>` (the tour).
+// Their format is SimLogic's (sim_logic.js): buttons, waits, touches, live
+// settings and the tour's lines, one per dot.
 
 const STEP_BUTTONS = {
   up: BUTTON.UP, down: BUTTON.DOWN, left: BUTTON.LEFT, right: BUTTON.RIGHT, a: BUTTON.A, b: BUTTON.B,
@@ -739,8 +657,6 @@ const TOUR = 'w10.say:overview.w45.down.say:play_timer.w45.down.say:activity.w45
              '.up*5.say:time.w15.s:skip=3600.w45.say:end.w60';
 
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
-// A live value in a step: its dots are escaped too.
-const stepValue = (name, value) => `${name}=${encodeURIComponent(value ?? '').replace(/\./g, '%2E')}`;
 
 let steps = [];                 // what was done since the first screen
 let lastStep = 0;
@@ -758,18 +674,6 @@ function noteButton(code) {
   if (code != null && BUTTON_STEP[code]) noteStep(BUTTON_STEP[code]);
 }
 
-// The steps as a string: the same button pressed in a row, once with *N.
-function stepsText(list) {
-  const out = [];
-  for (const step of list) {
-    const last = out[out.length - 1];
-    const m = last && /^([a-z]+)(?:\*(\d+))?$/.exec(last);
-    if (m && m[1] === step && STEP_BUTTONS[step] != null) out[out.length - 1] = `${step}*${Number(m[2] || 1) + 1}`;
-    else out.push(step);
-  }
-  return out.join('.');
-}
-
 function touch(x, y) {
   const r = canvas.getBoundingClientRect();
   const at = { clientX: r.left + x / 1280 * r.width, clientY: r.top + y / 720 * r.height, bubbles: true, button: 0 };
@@ -777,39 +681,37 @@ function touch(x, y) {
   return sleep(PRESS_MS).then(() => canvas.dispatchEvent(new MouseEvent('mouseup', at)));
 }
 
-// Plays `text` (the steps above); `onStep(n, total, step)` before each.
-// Resolves when done or stopped; throws on a step it does not know.
+// Plays `text` (SimLogic.parseSteps()); `onStep(n, total, step)` before
+// each. Resolves when done or stopped; rejects on a step it does not know,
+// before playing any.
 async function runSteps(text, onStep) {
-  const list = String(text ?? '').split('.').filter(Boolean);
+  const list = SimLogic.parseSteps(text);
   const run = { stopped: false };
   replaying = run;
   try {
     for (let i = 0; i < list.length && !run.stopped; i++) {
       const step = list[i];
-      onStep?.(i + 1, list.length, step);
-      let m;
-      if ((m = /^([a-z]+)(?:\*(\d+))?$/.exec(step)) && STEP_BUTTONS[m[1]] != null) {
-        for (let n = Number(m[2] || 1); n > 0 && !run.stopped; n--) {
-          press(STEP_BUTTONS[m[1]], true);
+      onStep?.(i + 1, list.length, step.step);
+      if (step.button) {
+        for (let n = step.times; n > 0 && !run.stopped; n--) {
+          press(STEP_BUTTONS[step.button], true);
           await sleep(PRESS_MS);
-          press(STEP_BUTTONS[m[1]], false);
+          press(STEP_BUTTONS[step.button], false);
           await sleep(AFTER_MS);
         }
-      } else if ((m = /^w(\d+)$/.exec(step))) {
-        await sleep(Number(m[1]) * 100);
-      } else if ((m = /^t(\d+),(\d+)$/.exec(step))) {
-        await touch(Number(m[1]), Number(m[2]));
+      } else if (step.wait != null) {
+        await sleep(step.wait);
+      } else if (step.touch) {
+        await touch(...step.touch);
         await sleep(AFTER_MS);
-      } else if ((m = /^s:([a-z0-9_]+)=(.*)$/.exec(step))) {
+      } else if (step.set) {
+        const [name, value] = step.set;
         const values = new Map(current);
-        const value = decodeURIComponent(m[2]);
-        if (value) values.set(m[1], value); else values.delete(m[1]);
+        if (value) values.set(name, value); else values.delete(name);
         apply(values);
         showSkip();
-      } else if ((m = /^say:([a-z_]+)$/.exec(step))) {
-        $('steps-text').textContent = t(`tour_${m[1]}`);
-      } else {
-        throw new Error(`steps: no such step "${step}"`);
+      } else if (step.say) {
+        $('steps-text').textContent = t(`tour_${step.say}`);
       }
     }
   } finally {
@@ -841,7 +743,7 @@ async function replay(text, tour) {
 function ready() {
   lastStep = performance.now();
   const rec = current.get('rec');
-  const tour = current.has('tour') && !FALSY.has(String(current.get('tour')).toLowerCase());
+  const tour = isOn(current.get('tour'));
   if (rec || tour) {
     current.delete('rec');
     current.delete('tour');
@@ -853,7 +755,7 @@ function ready() {
 // The link: the settings PlayGuard started with, and the steps since.
 function stepsLink() {
   const values = new Map(startValues);
-  const text = stepsText(steps);
+  const text = SimLogic.stepsText(steps);
   if (text) values.set('rec', text);
   return linkFor(values);
 }
@@ -959,7 +861,7 @@ function setUpPanel() {
   $('form').addEventListener('submit', (e) => { e.preventDefault(); apply(readForm()); });
   $('apply').addEventListener('click', () => apply(readForm()));
   $('reset').addEventListener('click', () => apply(keepingHeader(() => false)));
-  const keeping = current.has('keep') && !FALSY.has(String(current.get('keep')).toLowerCase());
+  const keeping = isOn(current.get('keep'));
   $('forget').hidden = !keeping;
   $('forget').addEventListener('click', forget);
   $('copy').addEventListener('click', async () => {
@@ -989,7 +891,7 @@ function setUpPanel() {
 async function main() {
   current = readUrl();
   startValues = new Map([...current].filter(([n]) => n !== 'rec' && n !== 'tour'));
-  language = consoleLanguage(current.get('lang')) ?? browserLanguage();
+  language = SimLogic.consoleLanguage(current.get('lang')) ?? browserLanguage();
   showTheme();
   try {
     const res = await fetch('params.json', { cache: 'no-cache' });

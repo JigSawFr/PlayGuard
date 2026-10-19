@@ -50,8 +50,8 @@ bool api_get(const std::string& path, const char* name, const std::string& token
 #ifndef __SWITCH__
     if (const char* folder = sim()) {
         // PLAYGUARD_SIM_DEV_BUILDS_DELAY: each answer takes that many ms (the bar shows).
-        if (const char* delay = sim_env("PLAYGUARD_SIM_DEV_BUILDS_DELAY"))
-            std::this_thread::sleep_for(std::chrono::milliseconds(std::atoi(delay)));
+        if (const long long delay = sim_env_int("PLAYGUARD_SIM_DEV_BUILDS_DELAY", 0, 0, 60000))
+            std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         return sim_net::get(folder, name, body, error);
     }
 #endif

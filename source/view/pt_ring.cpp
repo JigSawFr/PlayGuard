@@ -98,7 +98,7 @@ void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
                   brls::Style style, brls::FrameContext* ctx)
 {
     // PLAYGUARD_SIM_CADRAN_NORING=1 draws the labels alone (cost of the arcs).
-    static const bool no_ring = sim_env("PLAYGUARD_SIM_CADRAN_NORING") != nullptr;
+    static const bool no_ring = sim_env_flag("PLAYGUARD_SIM_CADRAN_NORING");
     if (no_ring) { brls::Box::draw(vg, x, y, width, height, style, ctx); return; }
     const float stroke = stroke_of(std::min(width, height));
     const float cx = x + width / 2.0f, cy = y + height / 2.0f;

@@ -15,18 +15,18 @@
 
 bool platform_in_focus(void)
 {
-    return sim_env("PLAYGUARD_SIM_BACKGROUND") == nullptr;
+    return !sim_env_flag("PLAYGUARD_SIM_BACKGROUND");
 }
 
 bool platform_game_open(bool* known)
 {
     if (known) *known = true;
-    return sim_env("PLAYGUARD_SIM_NO_GAME") == nullptr;
+    return !sim_env_flag("PLAYGUARD_SIM_NO_GAME");
 }
 
 bool platform_can_launch(void)
 {
-    return sim_env("PLAYGUARD_SIM_HBLOADER") != nullptr;
+    return sim_env_flag("PLAYGUARD_SIM_HBLOADER");
 }
 
 bool platform_set_next_load(const char* path)
@@ -39,7 +39,7 @@ bool platform_set_next_load(const char* path)
 
 void platform_exit_to_home(void)
 {
-    if (sim_env("PLAYGUARD_SIM_APPLET")) return;
+    if (sim_env_flag("PLAYGUARD_SIM_APPLET")) return;
     std::printf("exit to HOME\n");
     std::fflush(stdout);
 }
@@ -58,11 +58,8 @@ void platform_romfs_mount(void) {}
 
 bool platform_region(int* region)
 {
-    const char* value = sim_env("PLAYGUARD_SIM_REGION");
-    if (!region || !value || !*value) return false;
-    char* end = nullptr;
-    const long r = std::strtol(value, &end, 10);
-    if (*end || r < 0 || r > 255) return false;
+    const long long r = sim_env_int("PLAYGUARD_SIM_REGION", -1, 0, 255);
+    if (!region || r < 0) return false;
     *region = (int)r;
     return true;
 }
@@ -80,7 +77,7 @@ bool platform_random(void* buf, size_t size)
     }
 }
 
-// For sim_backend.c's pctl_pin_hmac: `dst` gets 32 bytes.
+// For sim_pctl.c's pctl_pin_hmac: `dst` gets 32 bytes.
 extern "C" void sim_hmac_sha256(void* dst, const void* key, size_t key_size, const void* msg, size_t size)
 {
     const std::array<uint8_t, 32> mac = hmac_sha256(key, key_size, msg, size);

@@ -252,8 +252,7 @@ int64_t now()
 {
 #ifndef __SWITCH__
     // Desktop simulation: the console's frozen time, so ages stay the same in screenshots.
-    if (const char* frozen = sim_env("PLAYGUARD_SIM_NOW"))
-        if (const long long v = std::atoll(frozen)) return v;
+    if (const long long frozen = sim_env_int("PLAYGUARD_SIM_NOW", 0, 0, INT64_MAX)) return frozen;
 #endif
     return (int64_t)std::time(nullptr);
 }
