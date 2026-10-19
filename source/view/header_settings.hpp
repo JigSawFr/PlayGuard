@@ -1,8 +1,8 @@
 // HeaderSetting — the language and the theme in the main screen's header,
 // left of the notification bell: the language's code ("FR", "EN", the
 // console's own one for "system") in a rounded frame, and the theme as a
-// sun (light), a moon (dark) or a half-filled disc (the console's); with
-// the Cadran appearance, the text size after them, as "AA" (a small A and
+// sun (light), a moon (dark) or a half-filled disc (the console's); the
+// text size after them, as "AA" (a small A and
 // a large one, the large one teal while the text is larger). A code
 // rather than a flag: a flag names a country, not a language, and fr-CA,
 // es-419 or zh-Hant have none that fits. A tap opens the same list as

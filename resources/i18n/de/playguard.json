@@ -8,7 +8,7 @@
         "step_closing": "Jugendschutz wird aktiviert, zurück zum HOME-Menü..."
     },
     "tabs": {
-        "dashboard": "Übersicht",
+        "dashboard": "Heute",
         "play_timer": "Spielzeit",
         "activity": "Aktivität",
         "restrictions": "Einschränkungen",
@@ -1130,7 +1130,7 @@
         "size_mb": "{} MB",
         "pt_log_on": "Aufzeichnung alle 30 s in {}",
         "frame_stats": "Bildstatistik",
-        "frame_stats_note": "Eine Zeile pro Sekunde, solange PlayGuard offen ist, in logs/frame_stats.txt: der Modus (TV oder Handheld) und die Bildgröße, der angezeigte Bildschirm, die Bilder pro Sekunde, die Rechenzeit der Oberfläche pro Bild (Mittel und Maximum, in ms), der Abstand zwischen zwei Bildern (Mittel und Maximum) und wie viele Bilder zu spät kamen (über 20 ms). Um die beiden Erscheinungsbilder zu vergleichen (Optionen › Erscheinungsbild): jeden Bildschirm 30 s ohne Eingabe stehen lassen, im TV-Modus, dann im Handheld-Modus. Die Datei beginnt bei jedem Einschalten neu.",
+        "frame_stats_note": "Eine Zeile pro Sekunde, solange PlayGuard offen ist, in logs/frame_stats.txt: der Modus (TV oder Handheld) und die Bildgröße, der angezeigte Bildschirm, die Bilder pro Sekunde, die Rechenzeit der Oberfläche pro Bild (Mittel und Maximum, in ms), der Abstand zwischen zwei Bildern (Mittel und Maximum) und wie viele Bilder zu spät kamen (über 20 ms). Um Bildschirme oder den Hintergrundschein an und aus zu vergleichen: jeden Bildschirm 30 s ohne Eingabe stehen lassen, im TV-Modus, dann im Handheld-Modus. Die Datei beginnt bei jedem Einschalten neu.",
         "frame_stats_on": "Eine Zeile pro Sekunde in {}",
         "frame_stats_wait": "Erste Zeile in einer Sekunde…",
         "gate": "Firmware-Bildschirm wieder zeigen",
@@ -1147,7 +1147,7 @@
         "presses_left": "Noch {} Mal drücken, um den Entwicklermodus zu aktivieren.",
         "presses_left_one": "Noch 1 Mal drücken, um den Entwicklermodus zu aktivieren.",
         "report_upload": "Online senden",
-        "glow": "Hintergrundschein (Cadran)"
+        "glow": "Hintergrundschein"
     },
     "dev_build": {
         "open": "Anderen Build installieren",
@@ -1308,7 +1308,7 @@
             "backup": "Sicherung wiederhergestellt",
             "undo": "Aus dem Verlauf wiederhergestellt",
             "first_steps": "Erste Schritte",
-            "overview": "Übersicht",
+            "overview": "Heute",
             "profile": "Profil „{}“",
             "console_lock": "Alle Spiele sperren",
             "notices": "Benachrichtigungen",
@@ -1618,9 +1618,6 @@
             "played_day": "{}: {} von {} gespielt",
             "played_day_free": "{}: {} gespielt, ohne Limit",
             "bonus": "{}: {} für diesen Tag geplant"
-        },
-        "tabs": {
-            "today": "Heute"
         },
         "activity": {
             "export": "Exportieren",

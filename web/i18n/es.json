@@ -48,7 +48,7 @@
   "replaying": "Repitiendo los pasos: {n} de {total}",
   "tour": "Recorrido",
   "report": "Informar de un problema",
-  "tour_overview": "Resumen: el tiempo de juego de hoy, el límite, el tiempo restante y la hora de dormir.",
+  "tour_overview": "Hoy: el tiempo de juego de hoy, el límite, el tiempo restante y la hora de dormir.",
   "tour_play_timer": "Tiempo de juego: el gráfico de la semana es el editor, un límite para todos los días o uno por día.",
   "tour_activity": "Actividad: quién jugó a qué y cuánto tiempo, según el registro de la consola.",
   "tour_console": "Consola: el reloj de red, los juegos instalados y lo que ejecuta la consola.",
@@ -66,7 +66,7 @@
   "capture": "Capturas"
  },
  "params": {
-  "tab": {"label": "Se abre en", "options": {"": "Resumen", "play_timer": "Tiempo de juego", "activity": "Actividad", "restrictions": "Restricciones", "security": "PIN", "console": "Consola", "history": "Historial", "preferences": "Preferencias", "about": "Acerca de"}},
+  "tab": {"label": "Se abre en", "options": {"": "Hoy", "play_timer": "Tiempo de juego", "activity": "Actividad", "restrictions": "Restricciones", "security": "PIN", "console": "Consola", "history": "Historial", "preferences": "Preferencias", "about": "Acerca de"}},
   "keep": {"label": "Conservar el estado entre visitas", "help": "Los datos de PlayGuard y los ajustes de la consola simulada (PIN, límites, relojes) se quedan en este navegador; los ajustes de consola de este panel solo cuentan en el primer inicio."},
   "not_set_up": {"label": "Nunca configurado (sin PIN)"},
   "unlocked": {"label": "Desbloqueado temporalmente"},
@@ -114,8 +114,8 @@
   "still_focus": {"label": "Resaltado del foco sin animación"},
   "version": {"label": "Versión mostrada en la cabecera"},
   "hold_loading": {"label": "Quedarse en la pantalla de carga"},
-  "cadran_noglow": {"label": "Sin brillo de fondo (Cadran)"},
-  "cadran_noring": {"label": "El anillo sin sus arcos (Cadran)"}
+  "cadran_noglow": {"label": "Sin brillo de fondo"},
+  "cadran_noring": {"label": "El anillo sin sus arcos"}
  },
  "presets": {
   "default": "Predeterminado",

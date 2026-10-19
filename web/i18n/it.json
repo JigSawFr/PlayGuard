@@ -48,7 +48,7 @@
   "replaying": "Ripetizione dei passaggi: {n} di {total}",
   "tour": "Tour",
   "report": "Segnala un problema",
-  "tour_overview": "Riepilogo: il tempo di gioco di oggi, il limite, il tempo rimanente e l'ora di andare a letto.",
+  "tour_overview": "Oggi: il tempo di gioco di oggi, il limite, il tempo rimanente e l'ora di andare a letto.",
   "tour_play_timer": "Tempo di gioco: il grafico della settimana è l'editor, un limite per tutti i giorni o uno per giorno.",
   "tour_activity": "Attività: chi ha giocato a cosa, e per quanto, dal registro della console.",
   "tour_console": "Console: l'orologio di rete, i giochi installati e ciò che esegue la console.",
@@ -66,7 +66,7 @@
   "capture": "Screenshot"
  },
  "params": {
-  "tab": {"label": "Si apre su", "options": {"": "Panoramica", "play_timer": "Tempo di gioco", "activity": "Attività", "restrictions": "Limitazioni", "security": "PIN", "console": "Console", "history": "Cronologia", "preferences": "Preferenze", "about": "Informazioni"}},
+  "tab": {"label": "Si apre su", "options": {"": "Oggi", "play_timer": "Tempo di gioco", "activity": "Attività", "restrictions": "Limitazioni", "security": "PIN", "console": "Console", "history": "Cronologia", "preferences": "Preferenze", "about": "Informazioni"}},
   "keep": {"label": "Conserva lo stato tra le visite", "help": "I dati di PlayGuard e le impostazioni della console simulata (PIN, limiti, orologi) restano in questo browser; le impostazioni di console di questo pannello contano solo al primo avvio."},
   "not_set_up": {"label": "Mai configurato (nessun PIN)"},
   "unlocked": {"label": "Sbloccato temporaneamente"},
@@ -114,8 +114,8 @@
   "still_focus": {"label": "Evidenziazione del focus ferma"},
   "version": {"label": "Versione mostrata nell'intestazione"},
   "hold_loading": {"label": "Restare sulla schermata di caricamento"},
-  "cadran_noglow": {"label": "Senza alone di sfondo (Cadran)"},
-  "cadran_noring": {"label": "L'anello senza i suoi archi (Cadran)"}
+  "cadran_noglow": {"label": "Senza alone di sfondo"},
+  "cadran_noring": {"label": "L'anello senza i suoi archi"}
  },
  "presets": {
   "default": "Predefinito",

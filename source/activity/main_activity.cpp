@@ -137,7 +137,7 @@ void MainActivity::onContentAvailable()
     this->notice_listener = notices::listen([this]() { this->update_notice_hint(); });
     this->update_notice_hint();
 
-    // Preferences › Start on: that tab rather than the Overview (first, so the
+    // Preferences › Start on: that tab rather than Today (first, so the
     // questions below keep the focus they take).
     int start = 0;
     for (const char* t : config::START_TABS) {
@@ -181,8 +181,8 @@ void MainActivity::onContentAvailable()
     // monthly "Support PlayGuard" reminder.
     support_flow::at_start(this);
 
-    // What the bell shows, read now and every minute after that: the
-    // Overview reads the same every 5 s while it is shown.
+    // What the bell shows, read now and every minute after that: Today
+    // reads the same every 5 s while it is shown.
     brls::sync([]() { notices::sweep(); });
     this->notice_timer.setPeriod(60000);
     this->notice_timer.setCallback([this]() {
@@ -263,7 +263,7 @@ void MainActivity::update_title()
 }
 
 // Back from a dialog or a screen: a tab may have hidden the view that opened
-// it meanwhile (the Overview's refresh, every 5 s and on new play data).
+// it meanwhile (Today's refresh, every 5 s and on new play data).
 void MainActivity::onResume()
 {
     ui::keep_focus(this);

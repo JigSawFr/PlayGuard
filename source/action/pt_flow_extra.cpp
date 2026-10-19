@@ -110,8 +110,8 @@ static bool save_bonus_record(const pt_logic::BonusRecord& rec)
 static void plan_bonus(std::function<void()> refresh);
 static void cancel_bonus(std::function<void()> refresh);
 
-// `extra` minutes more today, after the confirmation (the picker below, or a
-// chip of the Cadran Overview).
+// `extra` minutes more today, after the confirmation (the picker below, or an
+// amount's chip on Today).
 static void add_extra(int wd, uint16_t base, uint16_t extra, std::function<void()> refresh)
 {
     // What gets put back later is the limit before any extra time today.
@@ -406,7 +406,7 @@ static bool s_restore_retry = false;
 // (pin_lock::Tightening), and nobody keeps the extra time by answering a
 // dialog. The play timer is still never written while it counts down: the
 // temporary unlock comes first, and the console is locked again right after.
-// `pt` was just read (restore_action said Offer). `asked`: from the Overview
+// `pt` was just read (restore_action said Offer). `asked`: from Today
 // or the bell, where a failure is said; at start-up it is only logged, and the
 // bell keeps its entry. `clear` drops the record once put back, `source` names
 // the change in the history (a planned bonus is put back the same way).
@@ -551,7 +551,7 @@ void offer_extra_time_restore(std::function<void()> refresh, bool asked)
     dialog->addButton("playguard/dashboard/extra_restore"_i18n, [wd, base, value, refresh]() {
         brls::sync([wd, base, value, refresh]() { restore_extra(wd, base, value, refresh); });
     });
-    // B: decide later (the record stays; the Overview keeps a line for it).
+    // B: decide later (the record stays; Today keeps a line for it).
     dialog->setCancelable(true);
     dialog->open();
 }

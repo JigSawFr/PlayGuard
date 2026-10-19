@@ -216,7 +216,7 @@ void PlayTimerTab::refresh()
     const bool keep = this->changes();
     perf::Timed timed("Play timer refresh");   // the diagnostic report's timings
     // The time of day, for every helper below (the state, the week chart,
-    // the outside watch, the timer health), read once, as on the Overview.
+    // the outside watch, the timer health), read once, as on Today.
     ui::SameTime same_time;
 
     pctl_play_timer_query(&this->pt);

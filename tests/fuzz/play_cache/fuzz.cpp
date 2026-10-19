@@ -25,7 +25,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     FUZZ_ASSERT(play_cache::decode(again, *back));
     FUZZ_ASSERT(play_cache::encode(*back) == again);
 
-    // What the Activity tab and the Overview read of it.
+    // What the Activity tab and Today read of it.
     uint64_t sum = stats->windows_ok + stats->approximate + stats->truncated;
     for (uint32_t i = 0; i < stats->count; i++) sum += stats->games[i].totals_ok;
     (void)sum;

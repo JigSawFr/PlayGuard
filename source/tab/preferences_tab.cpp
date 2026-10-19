@@ -21,10 +21,8 @@ int index_of(const char* const (&list)[N], const std::string& value)
     return 0;
 }
 
-// A tab as the rail names it: the Overview is Today.
 std::string tab_name(const std::string& tab)
 {
-    if (tab == "dashboard") return "playguard/cadran/tabs/today"_i18n;
     return brls::getStr("playguard/tabs/" + tab);
 }
 }   // namespace

@@ -8,7 +8,7 @@
         "step_closing": "Verrouillage du contrôle parental, retour au menu HOME..."
     },
     "tabs": {
-        "dashboard": "Vue d'ensemble",
+        "dashboard": "Aujourd'hui",
         "play_timer": "Temps de jeu",
         "activity": "Activité",
         "restrictions": "Restrictions",
@@ -1130,7 +1130,7 @@
         "size_mb": "{} Mo",
         "pt_log_on": "Enregistrement toutes les 30 s dans {}",
         "frame_stats": "Statistiques d'image",
-        "frame_stats_note": "Une ligne par seconde tant que PlayGuard est ouvert, dans logs/frame_stats.txt : le mode (dock ou portable) et la taille de l'image, l'écran affiché, les images par seconde, le temps de calcul de l'interface par image (moyenne et maximum, en ms), l'intervalle entre deux images (moyenne et maximum) et le nombre d'images en retard (plus de 20 ms). Pour comparer les deux apparences (Préférences › Apparence) : laisser chaque écran affiché 30 s sans rien toucher, en dock puis en portable. Le fichier repart de zéro à chaque activation.",
+        "frame_stats_note": "Une ligne par seconde tant que PlayGuard est ouvert, dans logs/frame_stats.txt : le mode (dock ou portable) et la taille de l'image, l'écran affiché, les images par seconde, le temps de calcul de l'interface par image (moyenne et maximum, en ms), l'intervalle entre deux images (moyenne et maximum) et le nombre d'images en retard (plus de 20 ms). Pour comparer des écrans, ou le halo d'arrière-plan allumé et éteint : laisser chaque écran affiché 30 s sans rien toucher, en dock puis en portable. Le fichier repart de zéro à chaque activation.",
         "frame_stats_on": "Une ligne par seconde dans {}",
         "frame_stats_wait": "Première ligne dans une seconde…",
         "gate": "Revoir l'écran firmware",
@@ -1147,7 +1147,7 @@
         "presses_left": "Encore {} appuis pour activer le mode développeur.",
         "presses_left_one": "Encore 1 appui pour activer le mode développeur.",
         "report_upload": "Envoyer en ligne",
-        "glow": "Halo d'arrière-plan (Cadran)"
+        "glow": "Halo d'arrière-plan"
     },
     "dev_build": {
         "open": "Installer un autre build",
@@ -1308,7 +1308,7 @@
             "backup": "Sauvegarde restaurée",
             "undo": "Remis depuis l'historique",
             "first_steps": "Premiers pas",
-            "overview": "Vue d'ensemble",
+            "overview": "Aujourd'hui",
             "profile": "Profil « {} »",
             "console_lock": "Bloquer tous les jeux",
             "notices": "Notifications",
@@ -1618,9 +1618,6 @@
             "played_day": "{} : {} joué sur {}",
             "played_day_free": "{} : {} joué, sans limite",
             "bonus": "{} : {} prévu pour ce jour-là"
-        },
-        "tabs": {
-            "today": "Aujourd'hui"
         },
         "activity": {
             "export": "Exporter",

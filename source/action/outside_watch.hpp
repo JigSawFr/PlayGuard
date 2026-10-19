@@ -1,7 +1,7 @@
 // outside_watch — changes made outside PlayGuard (outside_change_logic has
-// the rules): fed by the Overview's and the Play timer's refreshes, kept in
+// the rules): fed by Today's and the Play timer's refreshes, kept in
 // watch.json, each change seen once in the change history, and a notice on
-// the Overview until it is dismissed or the day ends. A new user account is
+// Today until it is dismissed or the day ends. A new user account is
 // flagged in the Activity tab instead (where the accounts are chosen).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -21,7 +21,7 @@ void observe(const PtState& pt);
 // controls (history_flow calls it for every change it records).
 void own_change();
 
-// The Overview's notice, one line per change seen today; empty: none.
+// Today's notice, one line per change seen today; empty: none.
 std::vector<std::string> notice_lines();
 void dismiss();
 

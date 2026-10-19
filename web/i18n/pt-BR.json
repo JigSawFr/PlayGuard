@@ -48,7 +48,7 @@
   "replaying": "Repetindo os passos: {n} de {total}",
   "tour": "Tour",
   "report": "Relatar um problema",
-  "tour_overview": "Visão geral: o tempo de jogo de hoje, o limite, o tempo restante e a hora de dormir.",
+  "tour_overview": "Hoje: o tempo de jogo de hoje, o limite, o tempo restante e a hora de dormir.",
   "tour_play_timer": "Tempo de jogo: o gráfico da semana é o editor, um limite para todos os dias ou um por dia.",
   "tour_activity": "Atividade: quem jogou o quê, e por quanto tempo, segundo o registro do console.",
   "tour_console": "Console: o relógio de rede, os jogos instalados e o que o console executa.",
@@ -66,7 +66,7 @@
   "capture": "Capturas"
  },
  "params": {
-  "tab": {"label": "Abre em", "options": {"": "Visão geral", "play_timer": "Tempo de jogo", "activity": "Atividade", "restrictions": "Restrições", "security": "PIN", "console": "Console", "history": "Histórico", "preferences": "Preferências", "about": "Sobre"}},
+  "tab": {"label": "Abre em", "options": {"": "Hoje", "play_timer": "Tempo de jogo", "activity": "Atividade", "restrictions": "Restrições", "security": "PIN", "console": "Console", "history": "Histórico", "preferences": "Preferências", "about": "Sobre"}},
   "keep": {"label": "Manter o estado entre visitas", "help": "Os dados do PlayGuard e as configurações do console simulado (PIN, limites, relógios) ficam neste navegador; as configurações de console deste painel só valem na primeira inicialização."},
   "not_set_up": {"label": "Nunca configurado (sem PIN)"},
   "unlocked": {"label": "Desbloqueado temporariamente"},
@@ -114,8 +114,8 @@
   "still_focus": {"label": "Destaque do foco sem animação"},
   "version": {"label": "Versão exibida no cabeçalho"},
   "hold_loading": {"label": "Ficar na tela de carregamento"},
-  "cadran_noglow": {"label": "Sem brilho de fundo (Cadran)"},
-  "cadran_noring": {"label": "O anel sem seus arcos (Cadran)"}
+  "cadran_noglow": {"label": "Sem brilho de fundo"},
+  "cadran_noring": {"label": "O anel sem seus arcos"}
  },
  "presets": {
   "default": "Padrão",

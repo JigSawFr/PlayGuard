@@ -8,7 +8,7 @@
         "step_closing": "Bloqueando el control parental, volviendo al menú HOME..."
     },
     "tabs": {
-        "dashboard": "Resumen",
+        "dashboard": "Hoy",
         "play_timer": "Tiempo de juego",
         "activity": "Actividad",
         "restrictions": "Restricciones",
@@ -1130,7 +1130,7 @@
         "size_mb": "{} MB",
         "pt_log_on": "Registrando cada 30 s en {}",
         "frame_stats": "Estadísticas de imagen",
-        "frame_stats_note": "Una línea por segundo mientras PlayGuard está abierto, en logs/frame_stats.txt: el modo (televisor o portátil) y el tamaño de imagen, la pantalla mostrada, las imágenes por segundo, el tiempo de cálculo de la interfaz por imagen (media y máximo, en ms), el intervalo entre dos imágenes (media y máximo) y cuántas imágenes llegaron tarde (más de 20 ms). Para comparar las dos apariencias (Preferencias › Apariencia): deja cada pantalla 30 s sin tocar nada, en modo televisor y luego en portátil. El archivo empieza de cero cada vez que se activa.",
+        "frame_stats_note": "Una línea por segundo mientras PlayGuard está abierto, en logs/frame_stats.txt: el modo (televisor o portátil) y el tamaño de imagen, la pantalla mostrada, las imágenes por segundo, el tiempo de cálculo de la interfaz por imagen (media y máximo, en ms), el intervalo entre dos imágenes (media y máximo) y cuántas imágenes llegaron tarde (más de 20 ms). Para comparar pantallas, o el halo de fondo activado y desactivado: deja cada pantalla 30 s sin tocar nada, en modo televisor y luego en portátil. El archivo empieza de cero cada vez que se activa.",
         "frame_stats_on": "Una línea por segundo en {}",
         "frame_stats_wait": "Primera línea en un segundo…",
         "gate": "Volver a la pantalla de firmware",
@@ -1147,7 +1147,7 @@
         "presses_left": "Faltan {} pulsaciones para activar el modo desarrollador.",
         "presses_left_one": "Falta 1 pulsación para activar el modo desarrollador.",
         "report_upload": "Enviar en línea",
-        "glow": "Halo de fondo (Cadran)"
+        "glow": "Halo de fondo"
     },
     "dev_build": {
         "open": "Instalar otra compilación",
@@ -1308,7 +1308,7 @@
             "backup": "Respaldo restaurado",
             "undo": "Restablecido desde el historial",
             "first_steps": "Primeros pasos",
-            "overview": "Resumen",
+            "overview": "Hoy",
             "profile": "Perfil “{}”",
             "console_lock": "Bloquear todos los juegos",
             "notices": "Notificaciones",
@@ -1618,9 +1618,6 @@
             "played_day": "{}: {} jugado de {}",
             "played_day_free": "{}: {} jugado, sin límite",
             "bonus": "{}: {} previsto para ese día"
-        },
-        "tabs": {
-            "today": "Hoy"
         },
         "activity": {
             "export": "Exportar",

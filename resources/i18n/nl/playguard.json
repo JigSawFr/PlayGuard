@@ -8,7 +8,7 @@
         "step_closing": "Ouderlijk toezicht vergrendelen, terug naar het HOME-menu..."
     },
     "tabs": {
-        "dashboard": "Overzicht",
+        "dashboard": "Vandaag",
         "play_timer": "Speeltijdtimer",
         "activity": "Activiteit",
         "restrictions": "Beperkingen",
@@ -1130,7 +1130,7 @@
         "size_mb": "{} MB",
         "pt_log_on": "Elke 30 s vastgelegd in {}",
         "frame_stats": "Beeldstatistieken",
-        "frame_stats_note": "Eén regel per seconde zolang PlayGuard open is, in logs/frame_stats.txt: de modus (tv of handheld) en de beeldgrootte, het getoonde scherm, de beelden per seconde, de rekentijd van de interface per beeld (gemiddeld en maximaal, in ms), de tijd tussen twee beelden (gemiddeld en maximaal) en hoeveel beelden te laat kwamen (meer dan 20 ms). Om de twee weergaven te vergelijken (Voorkeuren › Weergave): laat elk scherm 30 s staan zonder iets aan te raken, in tv-modus en dan handheld. Het bestand begint opnieuw bij elke keer aanzetten.",
+        "frame_stats_note": "Eén regel per seconde zolang PlayGuard open is, in logs/frame_stats.txt: de modus (tv of handheld) en de beeldgrootte, het getoonde scherm, de beelden per seconde, de rekentijd van de interface per beeld (gemiddeld en maximaal, in ms), de tijd tussen twee beelden (gemiddeld en maximaal) en hoeveel beelden te laat kwamen (meer dan 20 ms). Om schermen te vergelijken, of de achtergrondgloed aan en uit: laat elk scherm 30 s staan zonder iets aan te raken, in tv-modus en dan handheld. Het bestand begint opnieuw bij elke keer aanzetten.",
         "frame_stats_on": "Eén regel per seconde in {}",
         "frame_stats_wait": "Eerste regel over een seconde…",
         "gate": "Firmwarescherm opnieuw tonen",
@@ -1147,7 +1147,7 @@
         "presses_left": "Nog {} keer drukken om de ontwikkelaarsmodus aan te zetten.",
         "presses_left_one": "Nog 1 keer drukken om de ontwikkelaarsmodus aan te zetten.",
         "report_upload": "Online versturen",
-        "glow": "Achtergrondgloed (Cadran)"
+        "glow": "Achtergrondgloed"
     },
     "dev_build": {
         "open": "Andere build installeren",
@@ -1308,7 +1308,7 @@
             "backup": "Back-up teruggezet",
             "undo": "Teruggezet vanuit de geschiedenis",
             "first_steps": "Eerste stappen",
-            "overview": "Overzicht",
+            "overview": "Vandaag",
             "profile": "Profiel \"{}\"",
             "console_lock": "Alle games blokkeren",
             "notices": "Meldingen",
@@ -1618,9 +1618,6 @@
             "played_day": "{}: {} gespeeld van {}",
             "played_day_free": "{}: {} gespeeld, geen limiet",
             "bonus": "{}: {} gepland voor die dag"
-        },
-        "tabs": {
-            "today": "Vandaag"
         },
         "activity": {
             "export": "Exporteren",

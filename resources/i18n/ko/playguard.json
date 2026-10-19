@@ -8,7 +8,7 @@
         "step_closing": "자녀 보호 기능을 잠그고 HOME 메뉴로 돌아가는 중..."
     },
     "tabs": {
-        "dashboard": "개요",
+        "dashboard": "오늘",
         "play_timer": "플레이 타이머",
         "activity": "플레이 기록",
         "restrictions": "제한",
@@ -1130,7 +1130,7 @@
         "size_mb": "{} MB",
         "pt_log_on": "30초마다 {}에 기록 중",
         "frame_stats": "프레임 통계",
-        "frame_stats_note": "PlayGuard가 열려 있는 동안 1초마다 한 줄씩 logs/frame_stats.txt에 기록합니다: 모드(TV 또는 휴대)와 화면 크기, 표시 중인 화면, 초당 프레임 수, 프레임당 UI 계산 시간(평균과 최대, ms), 두 프레임 사이 간격(평균과 최대), 늦게 온 프레임 수(20ms 초과). 두 모양을 비교하려면(환경 설정 › 모양): 각 화면을 아무것도 누르지 않고 30초간 TV 모드, 이어서 휴대 모드로 띄워 두세요. 켤 때마다 파일은 처음부터 다시 쓰입니다.",
+        "frame_stats_note": "PlayGuard가 열려 있는 동안 1초마다 한 줄씩 logs/frame_stats.txt에 기록합니다: 모드(TV 또는 휴대)와 화면 크기, 표시 중인 화면, 초당 프레임 수, 프레임당 UI 계산 시간(평균과 최대, ms), 두 프레임 사이 간격(평균과 최대), 늦게 온 프레임 수(20ms 초과). 화면끼리, 또는 배경 광채를 켠 상태와 끈 상태를 비교하려면: 각 화면을 아무것도 누르지 않고 30초간 TV 모드, 이어서 휴대 모드로 띄워 두세요. 켤 때마다 파일은 처음부터 다시 쓰입니다.",
         "frame_stats_on": "1초마다 한 줄: {}",
         "frame_stats_wait": "1초 뒤 첫 줄…",
         "gate": "펌웨어 화면 다시 보기",
@@ -1147,7 +1147,7 @@
         "presses_left": "{}번 더 누르면 개발자 모드가 켜집니다.",
         "presses_left_one": "1번 더 누르면 개발자 모드가 켜집니다.",
         "report_upload": "온라인으로 보내기",
-        "glow": "배경 광채 (Cadran)"
+        "glow": "배경 광채"
     },
     "dev_build": {
         "open": "다른 빌드 설치",
@@ -1308,7 +1308,7 @@
             "backup": "백업 복원",
             "undo": "기록에서 되돌림",
             "first_steps": "시작하기",
-            "overview": "개요",
+            "overview": "오늘",
             "profile": "\"{}\" 프로필",
             "console_lock": "모든 소프트웨어 차단",
             "notices": "알림",
@@ -1618,9 +1618,6 @@
             "played_day": "{}: {} / {} 플레이",
             "played_day_free": "{}: {} 플레이 (제한 없음)",
             "bonus": "{}: 이날 {} 추가 예정"
-        },
-        "tabs": {
-            "today": "오늘"
         },
         "activity": {
             "export": "내보내기",

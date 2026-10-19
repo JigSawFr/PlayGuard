@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- The Cadran child screen (Overview › Show the child): the time left today
+<!-- The child screen (Today › Show the child): the time left today
      as one big ring, when it ends, the bedtime, nothing to change. Sized to be
      read from across the room, whatever the text size (its labels keep
      theirs). Filled by source/activity/cadran_child_activity.cpp. -->

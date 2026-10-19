@@ -12,7 +12,7 @@
         title="@i18n/playguard/title"
         icon="@res/img/app_icon.jpg">
 
-        <brls:Tab label="@i18n/playguard/cadran/tabs/today">
+        <brls:Tab label="@i18n/playguard/tabs/dashboard">
             <DashboardTab/>
         </brls:Tab>
 

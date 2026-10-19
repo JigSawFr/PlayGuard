@@ -144,7 +144,7 @@ typedef struct {
 
 void pctl_play_timer_query(PtState *out);
 
-// The Overview's periodic read, in one session: of PctlStatus only safety
+// Today's periodic read, in one session: of PctlStatus only safety
 // level, PIN length, restriction enabled, temporarily unlocked and pairing;
 // of PtState everything but the bedtime reset time (1958/1959). 1006 is read
 // once for both. What is not read stays *_ok false.

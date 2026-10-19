@@ -8,7 +8,7 @@
         "step_closing": "Bloqueando o controle dos pais, voltando ao menu HOME..."
     },
     "tabs": {
-        "dashboard": "Visão geral",
+        "dashboard": "Hoje",
         "play_timer": "Tempo de jogo",
         "activity": "Atividade",
         "restrictions": "Restrições",
@@ -1130,7 +1130,7 @@
         "size_mb": "{} MB",
         "pt_log_on": "Registrando a cada 30 s em {}",
         "frame_stats": "Estatísticas de imagem",
-        "frame_stats_note": "Uma linha por segundo enquanto o PlayGuard está aberto, em logs/frame_stats.txt: o modo (TV ou portátil) e o tamanho da imagem, o ecrã mostrado, as imagens por segundo, o tempo de cálculo da interface por imagem (média e máximo, em ms), o intervalo entre duas imagens (média e máximo) e quantas imagens chegaram atrasadas (mais de 20 ms). Para comparar as duas aparências (Preferências › Aparência): deixe cada ecrã 30 s sem tocar em nada, em modo TV e depois portátil. O ficheiro recomeça sempre que isto é ativado.",
+        "frame_stats_note": "Uma linha por segundo enquanto o PlayGuard está aberto, em logs/frame_stats.txt: o modo (TV ou portátil) e o tamanho da imagem, o ecrã mostrado, as imagens por segundo, o tempo de cálculo da interface por imagem (média e máximo, em ms), o intervalo entre duas imagens (média e máximo) e quantas imagens chegaram atrasadas (mais de 20 ms). Para comparar telas, ou o halo de fundo ligado e desligado: deixe cada ecrã 30 s sem tocar em nada, em modo TV e depois portátil. O ficheiro recomeça sempre que isto é ativado.",
         "frame_stats_on": "Uma linha por segundo em {}",
         "frame_stats_wait": "Primeira linha dentro de um segundo…",
         "gate": "Mostrar de novo a tela de firmware",
@@ -1147,7 +1147,7 @@
         "presses_left": "Pressione mais {} vezes para ativar o modo de desenvolvedor.",
         "presses_left_one": "Pressione mais 1 vez para ativar o modo de desenvolvedor.",
         "report_upload": "Enviar online",
-        "glow": "Halo de fundo (Cadran)"
+        "glow": "Halo de fundo"
     },
     "dev_build": {
         "open": "Instalar outra compilação",
@@ -1308,7 +1308,7 @@
             "backup": "Backup restaurado",
             "undo": "Restaurado pelo histórico",
             "first_steps": "Primeiros passos",
-            "overview": "Visão geral",
+            "overview": "Hoje",
             "profile": "Perfil \"{}\"",
             "console_lock": "Bloquear todos os jogos",
             "notices": "Notificações",
@@ -1618,9 +1618,6 @@
             "played_day": "{}: {} jogado de {}",
             "played_day_free": "{}: {} jogado, sem limite",
             "bonus": "{}: {} previsto para esse dia"
-        },
-        "tabs": {
-            "today": "Hoje"
         },
         "activity": {
             "export": "Exportar",

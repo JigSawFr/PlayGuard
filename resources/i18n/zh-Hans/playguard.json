@@ -8,7 +8,7 @@
         "step_closing": "正在锁定家长控制，返回HOME菜单…"
     },
     "tabs": {
-        "dashboard": "概览",
+        "dashboard": "今天",
         "play_timer": "游戏时间",
         "activity": "游玩记录",
         "restrictions": "限制",
@@ -1130,7 +1130,7 @@
         "size_mb": "{} MB",
         "pt_log_on": "每 30 秒记录到 {}",
         "frame_stats": "帧统计",
-        "frame_stats_note": "PlayGuard 打开期间，每秒在 logs/frame_stats.txt 写一行：模式（电视或掌机）与画面尺寸、显示的画面、每秒帧数、界面每帧的计算时间（平均与最大，毫秒）、两帧间隔（平均与最大）以及迟到的帧数（超过 20 毫秒）。要比较两种外观（偏好设置 › 外观）：每个画面不做任何操作停留 30 秒，先电视模式再掌机模式。每次开启时文件都会重新开始。",
+        "frame_stats_note": "PlayGuard 打开期间，每秒在 logs/frame_stats.txt 写一行：模式（电视或掌机）与画面尺寸、显示的画面、每秒帧数、界面每帧的计算时间（平均与最大，毫秒）、两帧间隔（平均与最大）以及迟到的帧数（超过 20 毫秒）。要比较不同画面，或背景光晕开启与关闭：每个画面不做任何操作停留 30 秒，先电视模式再掌机模式。每次开启时文件都会重新开始。",
         "frame_stats_on": "每秒一行，写入 {}",
         "frame_stats_wait": "一秒后出现第一行…",
         "gate": "再次显示系统版本画面",
@@ -1147,7 +1147,7 @@
         "presses_left": "再按{}次即可开启开发者模式。",
         "presses_left_one": "再按1次即可开启开发者模式。",
         "report_upload": "在线发送",
-        "glow": "背景光晕 (Cadran)"
+        "glow": "背景光晕"
     },
     "dev_build": {
         "open": "安装其他构建",
@@ -1308,7 +1308,7 @@
             "backup": "已恢复备份",
             "undo": "从历史记录恢复",
             "first_steps": "入门",
-            "overview": "概览",
+            "overview": "今天",
             "profile": "配置“{}”",
             "console_lock": "阻止所有游戏",
             "notices": "通知",
@@ -1618,9 +1618,6 @@
             "played_day": "{}：已玩 {} / {}",
             "played_day_free": "{}：已玩 {}（不限）",
             "bonus": "{}：当天计划加时 {}"
-        },
-        "tabs": {
-            "today": "今天"
         },
         "activity": {
             "export": "导出",

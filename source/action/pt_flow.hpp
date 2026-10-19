@@ -78,7 +78,7 @@ void stop_today(const PtState& pt, std::function<void()> refresh);
 // "by itself" preference is on, else asked (keep it, or put it back); "no
 // limit" to put back is always asked. Called at start-up, when the date
 // changes while the app is open and when read-only mode ends; `asked`: from
-// the Overview or the bell, where what stops it is said. `refresh` runs after
+// Today or the bell, where what stops it is said. `refresh` runs after
 // a change.
 void offer_extra_time_restore(std::function<void()> refresh = nullptr, bool asked = false);
 // The last restore waited for a state it could not read: try again (the main
@@ -86,7 +86,7 @@ void offer_extra_time_restore(std::function<void()> refresh = nullptr, bool aske
 void retry_extra_time_restore();
 
 // That offer is pending (what offer_extra_time_restore would ask now), and
-// the line the Overview shows for it ("Put Saturday's limit back to 2 h").
+// the line Today shows for it ("Put Saturday's limit back to 2 h").
 bool restore_pending(const PtState& pt);
 std::string restore_label();
 // Extra time planned for a later day (Extra time › Another day…): "Sunday:
@@ -102,7 +102,7 @@ std::string extra_today_text(const PtState& pt);
 int extra_today_minutes(const PtState& pt);
 
 // The timer is on and its "time's up" alarm is off: the console says nothing
-// when time is up. The Overview and First steps point it out.
+// when time is up. Today and First steps point it out.
 bool alarm_off(const PtState& pt);
 // Turns that alarm back on after a confirmation (the PIN asked before a
 // change, read-only mode: as for any change), recorded with `source`.

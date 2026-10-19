@@ -45,7 +45,7 @@ void style_dialog(brls::Dialog* dialog, Emphasis emphasis = Emphasis::NONE);
 void prompt_minutes(const std::string& header, uint16_t initial, std::function<void(uint16_t)> on_value);
 
 // A toast's icon: a check for something done, a warning for something not
-// done; nullptr in the classic look.
+// done.
 brls::View* toast_icon(bool done);
 
 // A picker's frame as a card above the hints.

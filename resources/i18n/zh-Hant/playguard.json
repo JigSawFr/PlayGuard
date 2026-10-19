@@ -8,7 +8,7 @@
         "step_closing": "正在鎖定家長監護，返回HOME選單…"
     },
     "tabs": {
-        "dashboard": "總覽",
+        "dashboard": "今天",
         "play_timer": "遊玩時間限制",
         "activity": "活動紀錄",
         "restrictions": "限制",
@@ -1130,7 +1130,7 @@
         "size_mb": "{} MB",
         "pt_log_on": "每 30 秒記錄到 {}",
         "frame_stats": "影格統計",
-        "frame_stats_note": "PlayGuard 開啟期間，每秒在 logs/frame_stats.txt 寫一行：模式（電視或手提）與畫面尺寸、顯示的畫面、每秒影格數、介面每影格的計算時間（平均與最大，毫秒）、兩影格間隔（平均與最大）以及延遲的影格數（超過 20 毫秒）。要比較兩種外觀（偏好設定 › 外觀）：每個畫面不做任何操作停留 30 秒，先電視模式再手提模式。每次開啟時檔案都會重新開始。",
+        "frame_stats_note": "PlayGuard 開啟期間，每秒在 logs/frame_stats.txt 寫一行：模式（電視或手提）與畫面尺寸、顯示的畫面、每秒影格數、介面每影格的計算時間（平均與最大，毫秒）、兩影格間隔（平均與最大）以及延遲的影格數（超過 20 毫秒）。要比較不同畫面，或背景光暈開啟與關閉：每個畫面不做任何操作停留 30 秒，先電視模式再手提模式。每次開啟時檔案都會重新開始。",
         "frame_stats_on": "每秒一行，寫入 {}",
         "frame_stats_wait": "一秒後出現第一行…",
         "gate": "再次顯示韌體畫面",
@@ -1147,7 +1147,7 @@
         "presses_left": "再按{}次即可開啟開發者模式。",
         "presses_left_one": "再按1次即可開啟開發者模式。",
         "report_upload": "線上傳送",
-        "glow": "背景光暈 (Cadran)"
+        "glow": "背景光暈"
     },
     "dev_build": {
         "open": "安裝其他建置",
@@ -1308,7 +1308,7 @@
             "backup": "已還原備份",
             "undo": "從紀錄改回",
             "first_steps": "初始設定",
-            "overview": "總覽",
+            "overview": "今天",
             "profile": "設定檔「{}」",
             "console_lock": "封鎖所有遊戲",
             "notices": "通知",
@@ -1618,9 +1618,6 @@
             "played_day": "{}：已玩 {} / {}",
             "played_day_free": "{}：已玩 {}（不限）",
             "bonus": "{}：當天排定延長 {}"
-        },
-        "tabs": {
-            "today": "今天"
         },
         "activity": {
             "export": "匯出",

@@ -48,7 +48,7 @@
   "replaying": "A repetir os passos: {n} de {total}",
   "tour": "Visita",
   "report": "Comunicar um problema",
-  "tour_overview": "Resumo: o tempo de jogo de hoje, o limite, o tempo restante e a hora de dormir.",
+  "tour_overview": "Hoje: o tempo de jogo de hoje, o limite, o tempo restante e a hora de dormir.",
   "tour_play_timer": "Tempo de jogo: o gráfico da semana é o editor, um limite para todos os dias ou um por dia.",
   "tour_activity": "Atividade: quem jogou o quê, e durante quanto tempo, segundo o registo da consola.",
   "tour_console": "Consola: o relógio de rede, os jogos instalados e o que a consola executa.",
@@ -66,7 +66,7 @@
   "capture": "Capturas"
  },
  "params": {
-  "tab": {"label": "Abre em", "options": {"": "Visão geral", "play_timer": "Tempo de jogo", "activity": "Atividade", "restrictions": "Restrições", "security": "PIN", "console": "Consola", "history": "Histórico", "preferences": "Preferências", "about": "Sobre"}},
+  "tab": {"label": "Abre em", "options": {"": "Hoje", "play_timer": "Tempo de jogo", "activity": "Atividade", "restrictions": "Restrições", "security": "PIN", "console": "Consola", "history": "Histórico", "preferences": "Preferências", "about": "Sobre"}},
   "keep": {"label": "Guardar o estado entre visitas", "help": "Os dados do PlayGuard e as definições da consola simulada (PIN, limites, relógios) ficam neste navegador; as definições de consola deste painel só contam no primeiro arranque."},
   "not_set_up": {"label": "Nunca configurado (sem PIN)"},
   "unlocked": {"label": "Desbloqueado temporariamente"},
@@ -114,8 +114,8 @@
   "still_focus": {"label": "Realce do foco sem animação"},
   "version": {"label": "Versão mostrada no cabeçalho"},
   "hold_loading": {"label": "Ficar no ecrã de carregamento"},
-  "cadran_noglow": {"label": "Sem brilho de fundo (Cadran)"},
-  "cadran_noring": {"label": "O anel sem os seus arcos (Cadran)"}
+  "cadran_noglow": {"label": "Sem brilho de fundo"},
+  "cadran_noring": {"label": "O anel sem os seus arcos"}
  },
  "presets": {
   "default": "Predefinido",

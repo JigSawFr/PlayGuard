@@ -290,8 +290,8 @@ void DashboardTab::show_ring(bool unlocked)
     if (pt.fw_supported && pt.valid && pt.enabled_valid) {
         const uint16_t limit = pt.day_min[today];
         const int over = pt_logic::over_limit_min(pt, today);
-        // Unlocked first, as the Overview's gauge: the console reports the
-        // timer off while unlocked, though today's limit still stands.
+        // Unlocked first: the console reports the timer off while
+        // unlocked, though today's limit still stands.
         if (limit == 0) {
             // A day without play: said in words, not as "0 min".
             frac = unlocked ? -1.0f : 1.0f;

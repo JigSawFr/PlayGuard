@@ -16,7 +16,7 @@ namespace
 float stroke_of(float size) { return size * 20.0f / 256.0f; }
 float radius_of(float size) { return size / 2.0f - stroke_of(size) / 2.0f - 4.0f; }
 // The share of the inside's diameter the figure may take: about 30 px of the
-// inside left on each side of "40 min" on the Overview's ring.
+// inside left on each side of "40 min" on Today's ring.
 constexpr float FIGURE_SHARE = 0.70f;
 }   // namespace
 

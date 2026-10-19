@@ -216,7 +216,7 @@ int bedtime_end_selected(const PtState& pt, const std::vector<int>& times);
 bool recorded_today(const ExtraRecord& rec, int weekday, const std::string& today);
 
 // The minutes of extra time added today that `weekday`'s limit still holds
-// (the Overview's "+30 min"), else 0.
+// (Today's "+30 min"), else 0.
 int extra_today_min(const ExtraRecord& rec, const std::string& today, int weekday, const PtState& pt);
 
 // The timer is on and its "time's up" alarm is off.

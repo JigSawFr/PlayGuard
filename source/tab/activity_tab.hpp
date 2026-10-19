@@ -7,7 +7,7 @@
 // covers), the week as a QR code and when the week was played. The export
 // goes to the SD card (CSV, JSON, XLSX or PDF). Read-only, so also in read-only
 // mode. The data comes from play_data (read off the main thread, shared with
-// the Overview, and kept on the SD card for the next run): what is known
+// Today, and kept on the SD card for the next run): what is known
 // shows at once, and is read again in the background when over a minute old,
 // without a spinner; Ⓧ reads it again with one. The chart marks each day's
 // current limit (every account only). It starts on the account shown last,

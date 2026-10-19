@@ -1,7 +1,7 @@
 // pairing_state — whether the phone app (Nintendo Switch Parental Controls)
 // can overwrite what is set here: linked, and its server not sent elsewhere
 // by Atmosphère's DNS.mitm (util/dns_hosts, a hosts file blocking Nintendo).
-// Only then do the dialogs, the bell, the Overview and the first steps
+// Only then do the dialogs, the bell, Today and the first steps
 // mention it.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once

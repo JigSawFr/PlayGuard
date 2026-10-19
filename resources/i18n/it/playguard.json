@@ -8,7 +8,7 @@
         "step_closing": "Blocco del filtro famiglia, ritorno al menu HOME..."
     },
     "tabs": {
-        "dashboard": "Panoramica",
+        "dashboard": "Oggi",
         "play_timer": "Tempo di gioco",
         "activity": "Attività",
         "restrictions": "Limitazioni",
@@ -1130,7 +1130,7 @@
         "size_mb": "{} MB",
         "pt_log_on": "Registrazione ogni 30 s in {}",
         "frame_stats": "Statistiche dei fotogrammi",
-        "frame_stats_note": "Una riga al secondo finché PlayGuard è aperto, in logs/frame_stats.txt: la modalità (TV o portatile) e la dimensione dell'immagine, la schermata mostrata, i fotogrammi al secondo, il tempo di calcolo dell'interfaccia per fotogramma (media e massimo, in ms), l'intervallo tra due fotogrammi (media e massimo) e quanti fotogrammi sono arrivati in ritardo (oltre 20 ms). Per confrontare i due aspetti (Preferenze › Aspetto): lascia ogni schermata visibile 30 s senza toccare nulla, in modalità TV e poi portatile. Il file ricomincia da zero a ogni attivazione.",
+        "frame_stats_note": "Una riga al secondo finché PlayGuard è aperto, in logs/frame_stats.txt: la modalità (TV o portatile) e la dimensione dell'immagine, la schermata mostrata, i fotogrammi al secondo, il tempo di calcolo dell'interfaccia per fotogramma (media e massimo, in ms), l'intervallo tra due fotogrammi (media e massimo) e quanti fotogrammi sono arrivati in ritardo (oltre 20 ms). Per confrontare le schermate, o l'alone di sfondo attivo e disattivato: lascia ogni schermata visibile 30 s senza toccare nulla, in modalità TV e poi portatile. Il file ricomincia da zero a ogni attivazione.",
         "frame_stats_on": "Una riga al secondo in {}",
         "frame_stats_wait": "Prima riga tra un secondo…",
         "gate": "Rivedi la schermata del firmware",
@@ -1147,7 +1147,7 @@
         "presses_left": "Premi ancora {} volte per attivare la modalità sviluppatore.",
         "presses_left_one": "Premi ancora una volta per attivare la modalità sviluppatore.",
         "report_upload": "Invia online",
-        "glow": "Alone di sfondo (Cadran)"
+        "glow": "Alone di sfondo"
     },
     "dev_build": {
         "open": "Installa un'altra build",
@@ -1308,7 +1308,7 @@
             "backup": "Backup ripristinato",
             "undo": "Ripristinato dalla cronologia",
             "first_steps": "Primi passi",
-            "overview": "Panoramica",
+            "overview": "Oggi",
             "profile": "Profilo \"{}\"",
             "console_lock": "Blocca tutti i giochi",
             "notices": "Notifiche",
@@ -1618,9 +1618,6 @@
             "played_day": "{}: {} giocato su {}",
             "played_day_free": "{}: {} giocato, senza limite",
             "bonus": "{}: {} previsto per quel giorno"
-        },
-        "tabs": {
-            "today": "Oggi"
         },
         "activity": {
             "export": "Esporta",

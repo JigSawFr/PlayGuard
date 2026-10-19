@@ -207,7 +207,7 @@ std::string hos_text(u32 version);                        // "23.0.1" (MAKEHOSVE
 std::string fw_text(const SysInfo& info);                 // "23.0.1 · Atmosphère 1.12.0"
 std::string compat_text(const SysInfo& info, NVGcolor* color = nullptr);
 
-// The Console tab's and the Overview's warnings.
+// The Console tab's and Today's warnings.
 std::string storage_text(const SysInfo& info);             // "emuMMC (Atmosphère)"
 std::string storage_short(const SysInfo& info);            // "emuMMC" / "sysMMC" / "—"
 // The other system (sysMMC from emuMMC, or an emuMMC set up on the card from
@@ -221,7 +221,7 @@ std::string blank_text(const SysInfo& info, NVGcolor* color = nullptr);
 std::string serial_text(const SysInfo& info, bool reveal);
 bool        patches_warning(const patches::Report& report);
 // The game-patch report of this boot, read from the SD card once per run (it
-// only changes with a reboot): the Overview and the Console tab no longer rescan it
+// only changes with a reboot): Today and the Console tab no longer rescan it
 // each time they are opened.
 const patches::Report& patch_report();
 std::string patches_text(const patches::Report& report, NVGcolor* color = nullptr);
@@ -298,7 +298,7 @@ constexpr int console      = 7;   // the network clock, installed games, firmwar
 constexpr int history      = 9;   // changes and settings backups
 constexpr int preferences  = 10;
 constexpr int about        = 11;  // version, credits, changelog
-// The n-th tab (0 = Overview) as a sidebar position (separators count).
+// The n-th tab (0 = Today) as a sidebar position (separators count).
 constexpr int of(int n)
 {
     constexpr int positions[] = { dashboard, play_timer, activity, restrictions, security, console, history, preferences, about };
@@ -315,7 +315,7 @@ void go_to_tab(brls::View* from, int position);
 void open_screen(brls::View* content, const std::string& title);
 
 // "Parental controls are temporarily unlocked — Lock now" cell shown at the
-// top of the Overview and Play timer tabs (no "Lock now" in read-only mode).
+// top of the Play timer tab (no "Lock now" in read-only mode).
 // `after` runs once it relocked.
 void init_unlock_banner(brls::DetailCell* cell, std::function<void()> after);
 void show_unlock_banner(brls::DetailCell* cell, bool unlocked);

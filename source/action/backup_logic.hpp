@@ -41,7 +41,7 @@ struct Tally
 
 // The backups on the SD card (file names, newest first), as backup_flow
 // keeps them: listed on first use, again only once forgotten (a save, a
-// prune) or replaced by a listing made anyway (the restore's). The Overview
+// prune) or replaced by a listing made anyway (the restore's). Today
 // asks every 5 s for the newest, the backups tab for the count.
 class Listing
 {

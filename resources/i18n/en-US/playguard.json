@@ -8,7 +8,7 @@
         "step_closing": "Locking parental controls, back to the HOME menu..."
     },
     "tabs": {
-        "dashboard": "Overview",
+        "dashboard": "Today",
         "play_timer": "Play timer",
         "activity": "Activity",
         "restrictions": "Restrictions",
@@ -1130,7 +1130,7 @@
         "size_mb": "{} MB",
         "pt_log_on": "Recording every 30 s in {}",
         "frame_stats": "Frame statistics",
-        "frame_stats_note": "One line every second while PlayGuard is open, in logs/frame_stats.txt: the mode (docked or handheld) and the frame size, the screen shown, the frames per second, the UI's own computing time per frame (mean and maximum, in ms), the interval between two frames (mean and maximum) and how many frames came late (more than 20 ms). To compare the two appearances (Preferences › Appearance): leave each screen shown for 30 s without touching anything, docked then handheld. The file starts over each time this is turned on.",
+        "frame_stats_note": "One line every second while PlayGuard is open, in logs/frame_stats.txt: the mode (docked or handheld) and the frame size, the screen shown, the frames per second, the UI's own computing time per frame (mean and maximum, in ms), the interval between two frames (mean and maximum) and how many frames came late (more than 20 ms). To compare screens, or the background glow on and off: leave each screen shown for 30 s without touching anything, docked then handheld. The file starts over each time this is turned on.",
         "frame_stats_on": "One line every second in {}",
         "frame_stats_wait": "First line in a second…",
         "gate": "Show the firmware screen again",
@@ -1147,7 +1147,7 @@
         "presses_left": "{} more presses to turn on developer mode.",
         "presses_left_one": "1 more press to turn on developer mode.",
         "report_upload": "Send online",
-        "glow": "Background glow (Cadran)"
+        "glow": "Background glow"
     },
     "dev_build": {
         "open": "Install another build",
@@ -1308,7 +1308,7 @@
             "backup": "Backup restored",
             "undo": "Put back from the history",
             "first_steps": "First steps",
-            "overview": "Overview",
+            "overview": "Today",
             "profile": "Profile \"{}\"",
             "console_lock": "Block all games",
             "notices": "Notifications",
@@ -1618,9 +1618,6 @@
             "played_day": "{}: {} played of {}",
             "played_day_free": "{}: {} played, no limit",
             "bonus": "{}: {} planned for that day"
-        },
-        "tabs": {
-            "today": "Today"
         },
         "activity": {
             "export": "Export",

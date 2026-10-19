@@ -18,7 +18,7 @@
 //   PLAYGUARD_SIM_APPLET=1      started from the album (applet mode)
 //   PLAYGUARD_SIM_RESTRICTED=1  today's limit is reached (the console says "Time's up")
 //   PLAYGUARD_SIM_NOT_COUNTING=1 the time left does not go down (a clock set back):
-//                               the Overview says so after 90 s on screen
+//                               Today says so after 90 s on screen
 //   PLAYGUARD_SIM_AUTOSYNC_OFF=1 "Synchronise clock via Internet" is off
 //   PLAYGUARD_SIM_NETWORK_OFFSET=1411  the network clock is that many seconds
 //                               ahead of the console clock until it is set
@@ -27,7 +27,7 @@
 //   PLAYGUARD_SIM_NOW=1791471600  the console's time, frozen (POSIX seconds):
 //                               the same screens at every run (visual check)
 //   PLAYGUARD_SIM_IDLE=1        no game running: the timer reports no time left
-//                               yet (the Overview falls back on the activity log)
+//                               yet (Today falls back on the activity log)
 //   PLAYGUARD_SIM_SKIP=900      the console's time that many seconds later, a
 //                               game played all along (unless IDLE): the time
 //                               left goes down by as much, to the limit and

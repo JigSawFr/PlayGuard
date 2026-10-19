@@ -99,8 +99,8 @@ class List
     // of a card (apply()'s own), or as a card of its own (`alone`).
     static void section(brls::Header* header);
     static void row(brls::DetailCell* cell, const char* icon = nullptr, bool alone = false);
-    // The box a screen's rows go in: `list` itself in the classic look, else
-    // a card in it (made the first time). The screen clears and fills that one.
+    // The box a screen's rows go in: a card in `list` (made the first time).
+    // The screen clears and fills that one.
     static brls::Box* rows_in(brls::Box* list);
 
   private:

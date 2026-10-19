@@ -48,7 +48,7 @@
   "replaying": "단계 재생 중: {n} / {total}",
   "tour": "둘러보기",
   "report": "문제 신고",
-  "tour_overview": "개요: 오늘의 플레이 시간, 제한, 남은 시간, 취침 시간.",
+  "tour_overview": "오늘: 오늘의 플레이 시간, 제한, 남은 시간, 취침 시간.",
   "tour_play_timer": "플레이 타이머: 주간 그래프가 곧 편집기입니다. 매일 같은 제한 또는 요일별 제한.",
   "tour_activity": "활동: 본체 기록을 바탕으로 누가 무엇을 얼마나 플레이했는지.",
   "tour_console": "본체: 네트워크 시계, 설치된 게임, 본체에서 실행 중인 것.",
@@ -66,7 +66,7 @@
   "capture": "스크린샷"
  },
  "params": {
-  "tab": {"label": "처음 여는 탭", "options": {"": "개요", "play_timer": "플레이 타이머", "activity": "플레이 기록", "restrictions": "제한", "security": "PIN", "console": "본체", "history": "변경 기록", "preferences": "환경 설정", "about": "정보"}},
+  "tab": {"label": "처음 여는 탭", "options": {"": "오늘", "play_timer": "플레이 타이머", "activity": "플레이 기록", "restrictions": "제한", "security": "PIN", "console": "본체", "history": "변경 기록", "preferences": "환경 설정", "about": "정보"}},
   "keep": {"label": "방문 사이에 상태 유지", "help": "PlayGuard 데이터와 시뮬레이션 본체의 설정(PIN, 제한, 시계)이 이 브라우저에 남습니다. 이 패널의 본체 설정은 처음 시작할 때만 적용됩니다."},
   "not_set_up": {"label": "설정한 적 없음(PIN 없음)"},
   "unlocked": {"label": "일시적으로 해제됨"},
@@ -114,8 +114,8 @@
   "still_focus": {"label": "포커스 강조 고정"},
   "version": {"label": "헤더에 표시할 버전"},
   "hold_loading": {"label": "로딩 화면에서 멈추기"},
-  "cadran_noglow": {"label": "배경 빛 없음 (Cadran)"},
-  "cadran_noring": {"label": "호 없는 링 (Cadran)"}
+  "cadran_noglow": {"label": "배경 빛 없음"},
+  "cadran_noring": {"label": "호 없는 링"}
  },
  "presets": {
   "default": "기본값",

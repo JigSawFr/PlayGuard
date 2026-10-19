@@ -1,4 +1,4 @@
-// CadranChildActivity — the Cadran child screen (Overview › Show the child):
+// CadranChildActivity — the child screen (Today › Show the child):
 // what the parent shows before handing the console over. One big ring of
 // the time left today, when it ends (amber, the ring beating, in the last
 // five minutes), the bedtime, what the console does when time is up, nothing

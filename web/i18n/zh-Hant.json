@@ -48,7 +48,7 @@
   "replaying": "正在重播步驟：第 {n} 步，共 {total} 步",
   "tour": "導覽",
   "report": "回報問題",
-  "tour_overview": "概覽：今天的遊玩時間、限制、剩餘時間與就寢時間。",
+  "tour_overview": "今天：今天的遊玩時間、限制、剩餘時間與就寢時間。",
   "tour_play_timer": "遊玩時間限制：每週圖表就是編輯器，每天相同的限制或每天各自的限制。",
   "tour_activity": "活動：根據主機自己的記錄，誰玩了什麼、玩了多久。",
   "tour_console": "主機：網路時鐘、已安裝的遊戲以及主機執行的內容。",
@@ -66,7 +66,7 @@
   "capture": "截圖"
  },
  "params": {
-  "tab": {"label": "開啟時顯示", "options": {"": "總覽", "play_timer": "遊玩時間限制", "activity": "活動紀錄", "restrictions": "限制", "security": "PIN碼", "console": "主機", "history": "紀錄", "preferences": "偏好設定", "about": "關於"}},
+  "tab": {"label": "開啟時顯示", "options": {"": "今天", "play_timer": "遊玩時間限制", "activity": "活動紀錄", "restrictions": "限制", "security": "PIN碼", "console": "主機", "history": "紀錄", "preferences": "偏好設定", "about": "關於"}},
   "keep": {"label": "在造訪之間保留狀態", "help": "PlayGuard 的資料和模擬主機的設定（PIN碼、限制、時鐘）保留在此瀏覽器中；此面板中的主機設定只在首次啟動時生效。"},
   "not_set_up": {"label": "從未設定（沒有 PIN碼）"},
   "unlocked": {"label": "暫時解除"},
@@ -114,8 +114,8 @@
   "still_focus": {"label": "焦點醒目提示靜止"},
   "version": {"label": "標題列顯示的版本"},
   "hold_loading": {"label": "停在載入畫面"},
-  "cadran_noglow": {"label": "無背景光暈（Cadran）"},
-  "cadran_noring": {"label": "沒有弧線的圓環（Cadran）"}
+  "cadran_noglow": {"label": "無背景光暈"},
+  "cadran_noring": {"label": "沒有弧線的圓環"}
  },
  "presets": {
   "default": "預設",

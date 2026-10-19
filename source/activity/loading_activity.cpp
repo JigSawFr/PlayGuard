@@ -16,7 +16,7 @@ void LoadingActivity::onContentAvailable()
 void LoadingActivity::show(Step step)
 {
     // How far the bar is while the step runs: the first screen showing is the
-    // end. Its build (the Overview's first reading) is the longest part.
+    // end. Its build (Today's first reading) is the longest part.
     float share = 0.0f;
     switch (step) {
         case Step::Console:

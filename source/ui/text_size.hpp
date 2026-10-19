@@ -1,4 +1,4 @@
-// text_size — Preferences › Text size, with the Cadran appearance: "auto"
+// text_size — Preferences › Text size: "auto"
 // (the default: larger while the console is docked, on a TV), "normal" or
 // "large". Larger draws every label LARGE times its size, but the header's,
 // the rail's and the footer's, which have no room for it

@@ -48,7 +48,7 @@
   "replaying": "正在重放步骤：第 {n} 步，共 {total} 步",
   "tour": "导览",
   "report": "报告问题",
-  "tour_overview": "概览：今天的游戏时间、限制、剩余时间和就寝时间。",
+  "tour_overview": "今天：今天的游戏时间、限制、剩余时间和就寝时间。",
   "tour_play_timer": "游戏时间：每周图表就是编辑器，每天相同的限制或每天各自的限制。",
   "tour_activity": "活动：根据主机自己的记录，谁玩了什么、玩了多久。",
   "tour_console": "主机：网络时钟、已安装的游戏以及主机运行的内容。",
@@ -66,7 +66,7 @@
   "capture": "截图"
  },
  "params": {
-  "tab": {"label": "打开时显示", "options": {"": "概览", "play_timer": "游戏时间", "activity": "游玩记录", "restrictions": "限制", "security": "PIN", "console": "主机", "history": "历史记录", "preferences": "偏好设置", "about": "关于"}},
+  "tab": {"label": "打开时显示", "options": {"": "今天", "play_timer": "游戏时间", "activity": "游玩记录", "restrictions": "限制", "security": "PIN", "console": "主机", "history": "历史记录", "preferences": "偏好设置", "about": "关于"}},
   "keep": {"label": "在访问之间保留状态", "help": "PlayGuard 的数据和模拟主机的设置（PIN、限制、时钟）保留在此浏览器中；此面板中的主机设置只在首次启动时生效。"},
   "not_set_up": {"label": "从未设置（没有 PIN）"},
   "unlocked": {"label": "暂时解除"},
@@ -114,8 +114,8 @@
   "still_focus": {"label": "焦点高亮静止"},
   "version": {"label": "标题栏显示的版本"},
   "hold_loading": {"label": "停在加载画面"},
-  "cadran_noglow": {"label": "无背景光晕（Cadran）"},
-  "cadran_noring": {"label": "没有弧线的圆环（Cadran）"}
+  "cadran_noglow": {"label": "无背景光晕"},
+  "cadran_noring": {"label": "没有弧线的圆环"}
  },
  "presets": {
   "default": "默认",

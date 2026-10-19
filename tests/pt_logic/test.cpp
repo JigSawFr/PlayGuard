@@ -474,7 +474,7 @@ static void test_pending_relock()
     CHECK(pt_logic::pending_relock(true, false, true, true, true) == P::None);
 }
 
-// The Overview's "+30 min" and the alarm notice.
+// Today's "+30 min" and the alarm notice.
 static void test_extra_today()
 {
     pt_logic::ExtraRecord rec;

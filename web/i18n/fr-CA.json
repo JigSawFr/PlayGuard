@@ -48,7 +48,7 @@
   "replaying": "Rejeu des étapes : {n} sur {total}",
   "tour": "Visite",
   "report": "Signaler un problème",
-  "tour_overview": "Vue d'ensemble : le temps de jeu du jour, la limite, le temps restant et l'heure du coucher.",
+  "tour_overview": "Aujourd'hui : le temps de jeu du jour, la limite, le temps restant et l'heure du coucher.",
   "tour_play_timer": "Temps de jeu : le graphique de la semaine sert d'éditeur, une limite pour tous les jours ou une par jour.",
   "tour_activity": "Activité : qui a joué à quoi, et combien de temps, d'après le journal de la console.",
   "tour_console": "Console : l'horloge réseau, les jeux installés et ce que fait tourner la console.",
@@ -66,7 +66,7 @@
   "capture": "Captures"
  },
  "params": {
-  "tab": {"label": "Ouvre sur", "options": {"": "Vue d'ensemble", "play_timer": "Temps de jeu", "activity": "Activité", "restrictions": "Restrictions", "security": "NIP", "console": "Console", "history": "Historique", "preferences": "Préférences", "about": "À propos"}},
+  "tab": {"label": "Ouvre sur", "options": {"": "Aujourd'hui", "play_timer": "Temps de jeu", "activity": "Activité", "restrictions": "Restrictions", "security": "NIP", "console": "Console", "history": "Historique", "preferences": "Préférences", "about": "À propos"}},
   "keep": {"label": "Conserver l’état entre les visites", "help": "Les données de PlayGuard et les paramètres de la console simulée (NIP, limites, horloges) restent dans ce navigateur; les paramètres de console de ce panneau ne comptent alors qu’au premier lancement."},
   "not_set_up": {"label": "Jamais configuré (pas de NIP)"},
   "unlocked": {"label": "Déverrouillé temporairement"},
@@ -114,8 +114,8 @@
   "still_focus": {"label": "Surbrillance du focus figée"},
   "version": {"label": "Version affichée dans l'en-tête"},
   "hold_loading": {"label": "Rester sur l'écran de chargement"},
-  "cadran_noglow": {"label": "Sans halo d'arrière-plan (Cadran)"},
-  "cadran_noring": {"label": "L'anneau sans ses arcs (Cadran)"}
+  "cadran_noglow": {"label": "Sans halo d'arrière-plan"},
+  "cadran_noring": {"label": "L'anneau sans ses arcs"}
  },
  "presets": {
   "default": "Par défaut",

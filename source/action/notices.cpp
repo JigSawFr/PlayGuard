@@ -134,7 +134,7 @@ bool sd_free(uint64_t* bytes)
 }
 
 // sd_free(), asked again at most once a minute, or after a backup written
-// (sd_written()): the Overview refreshes every 5 s.
+// (sd_written()): Today refreshes every 5 s.
 notice_logic::Every s_free_every(60 * 1000);
 bool                s_free_known = false;
 uint64_t            s_free_bytes = 0;
@@ -393,13 +393,13 @@ void note_timer(const PtState& pt, Result accuracy_rc, bool accurate, bool writa
                           else open_tab(ui::tab::play_timer);
                       });
 
-    // Changes seen outside PlayGuard today (the Overview says them too).
+    // Changes seen outside PlayGuard today (Today says them too).
     const std::vector<std::string> outside = outside_watch::notice_lines();
     toggle(!outside.empty(), "outside", Level::Action, "playguard/notices/outside"_i18n, text::join(outside, "\n"),
            "playguard/dashboard/outside_dismiss"_i18n, []() {
                outside_watch::dismiss();
                clear("outside");
-               TabBase::refresh_shown();   // the Overview's notice goes too
+               TabBase::refresh_shown();   // Today's notice goes too
            });
 
     // The network clock the play timer counts on.
@@ -413,7 +413,7 @@ void note_timer(const PtState& pt, Result accuracy_rc, bool accurate, bool writa
                });
 }
 
-// The system: what the Overview shows in amber, and the other system's
+// The system: what Today shows in amber, and the other system's
 // parental controls.
 void note_system(const SysInfo& si)
 {
@@ -464,7 +464,7 @@ void note_play_data(const PtState& pt)
     toggle(!accounts.empty(), "new_account", Level::Info, "playguard/notices/new_account"_i18n, text::join(accounts, "\n"),
            open_label("activity"), []() { open_tab(ui::tab::activity); });
 
-    // The play data (read in the background for the Overview).
+    // The play data (read in the background for Today).
     const auto stats = play_data::latest("");
     if (!stats || !stats->windows_ok) return;
     // The week, once every 7 days until read.
@@ -583,7 +583,7 @@ void sd_written()
 
 void sweep_if_stale()
 {
-    // The Overview read the same a moment ago (every 5 s while it is shown):
+    // Today read the same a moment ago (every 5 s while it is shown):
     // nothing new to ask the console.
     if (s_status_known && std::chrono::steady_clock::now() - s_status_at < std::chrono::seconds(10)) {
         note_pin_strength(s_status);

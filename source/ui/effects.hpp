@@ -1,4 +1,4 @@
-// effects — Preferences › Visual effects, with the Cadran appearance: "auto"
+// effects — Preferences › Visual effects: "auto"
 // (the default: lighter while the console runs on its battery, the
 // background glow, the ring's pulse and its arc's animation left out) or
 // "full". On the battery: no charger connected (psm), read again every few

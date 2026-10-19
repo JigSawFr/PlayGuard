@@ -265,7 +265,7 @@ static void test_ownership(void)
     CHECK(model.exit_calls == 2 && model.refs == 0);
 }
 
-/* The Overview's read: one session, 1006 once, nothing it does not show. */
+/* Today's read: one session, 1006 once, nothing it does not show. */
 static void test_overview(void)
 {
     PctlStatus s;
