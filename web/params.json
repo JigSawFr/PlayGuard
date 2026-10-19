@@ -25,6 +25,7 @@
   {"name": "background", "group": "console", "type": "bool"},
   {"name": "hbloader", "group": "console", "type": "bool"},
   {"name": "docked", "group": "console", "type": "bool"},
+  {"name": "battery", "group": "console", "type": "bool"},
   {"name": "numpad", "group": "console", "type": "text", "placeholder": "1:30"},
   {"name": "boot_choice", "group": "console", "type": "select", "options": ["", "a"]},
   {"name": "accurate", "group": "clock", "type": "bool"},

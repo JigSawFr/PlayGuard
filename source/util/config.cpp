@@ -112,6 +112,7 @@ void sanitize(Config& c)
     one_of(c.theme, { "system", "light", "dark" }, "system");
     one_of(c.appearance, { "cadran", "classic" }, "cadran");
     one_of(c.text_size, { "auto", "normal", "large" }, "auto");
+    one_of(c.effects, { "auto", "full" }, "auto");
     one_of(c.update_via, { "", "inplace", "auto", "sphaira", "appstore", "manual" }, "");
     one_of(c.pin_lock, { "off", "changes", "open" }, "changes");
     one_of(c.dev_builds_order, { "newest", "number" }, "newest");
@@ -265,6 +266,7 @@ static void load_shared()
     read_string(j, "theme", c.theme);
     read_string(j, "appearance", c.appearance);
     read_string(j, "text_size", c.text_size);
+    read_string(j, "effects", c.effects);
     // Not in the file: offered already when the file has an appearance (this
     // version's), not yet when it has none (one from before the choice).
     if (j.contains("appearance_offered")) read_bool(j, "appearance_offered", c.appearance_offered);
@@ -380,6 +382,7 @@ bool snapshot(Snapshot& snap)
     j["theme"]           = s_config.theme;
     j["appearance"]      = s_config.appearance;
     j["text_size"]       = s_config.text_size;
+    j["effects"]         = s_config.effects;
     j["appearance_offered"] = s_config.appearance_offered;
     j["ntp_server"]      = s_config.ntp_server;
     j["custom_servers"]  = s_config.custom_servers;

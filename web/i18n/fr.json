@@ -65,6 +65,7 @@
   "background": {"label": "PlayGuard en arrière-plan"},
   "hbloader": {"label": "Un lanceur qui peut confier une mise à jour à un store"},
   "docked": {"label": "Sur la station (sur la TV)"},
+  "battery": {"label": "Sur batterie (sans chargeur)"},
   "numpad": {"label": "Ce que renvoie le pavé numérique"},
   "boot_choice": {"label": "Réponse à « build précédente ? » au démarrage", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "Horloge réseau exacte"},

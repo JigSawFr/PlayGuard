@@ -1044,6 +1044,11 @@
             "normal": "標準",
             "large": "大きめ",
             "auto": "自動：テレビでは大きめ"
+        },
+        "effects": "視覚効果",
+        "effects_values": {
+            "auto": "バッテリー時は軽く",
+            "full": "常にすべて"
         }
     },
     "backup": {

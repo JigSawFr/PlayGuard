@@ -22,6 +22,7 @@ class PreferencesTab : public TabBase
     BRLS_BIND(brls::DetailCell,  appearance,    "pf_appearance");
     BRLS_BIND(brls::DetailCell,  start_tab,     "pf_start_tab");
     BRLS_BIND(brls::DetailCell,  text_size,     "pf_text_size");
+    BRLS_BIND(brls::DetailCell,  effects,       "pf_effects");
     BRLS_BIND(brls::BooleanCell, intro,         "pf_intro");
     BRLS_BIND(brls::BooleanCell, support_reminder, "pf_support_reminder");
     BRLS_BIND(brls::BooleanCell, notices_system, "pf_notices_system");

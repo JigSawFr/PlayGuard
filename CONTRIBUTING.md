@@ -49,6 +49,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_APPLET=1` | Applet (album) mode |
 | `PLAYGUARD_SIM_NO_GAME=1` | No game open (applet mode with nothing behind it): no "game left open keeps counting" line, no "the game in progress is suspended" warning |
 | `PLAYGUARD_SIM_DOCKED=1` | The console on its dock: *Text size › Automatic* draws the larger text (Cadran) |
+| `PLAYGUARD_SIM_BATTERY=1` | The console on its battery (no charger): *Visual effects › Lighter on battery* leaves out the glow, the ring's pulse and its arc's animation (Cadran) |
 | `PLAYGUARD_SIM_LEFT_MIN=4` | That many minutes left today while the timer counts (the child screen's last minutes) |
 | `PLAYGUARD_SIM_NO_PDM=1` | No activity log |
 | `PLAYGUARD_SIM_NO_PLAY=1` | Nothing played for weeks (the all-time totals stay): the Activity tab's empty state |

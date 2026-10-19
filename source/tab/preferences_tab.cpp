@@ -49,6 +49,16 @@ PreferencesTab::PreferencesTab()
         ui::pick_text_size([this]() { this->refresh(); });
         return true;
     });
+    effects->registerClickAction([this](brls::View*) {
+        std::vector<std::string> labels;
+        for (const char* e : config::EFFECTS) labels.push_back(brls::getStr(std::string("playguard/prefs/effects_values/") + e));
+        ui::pick("playguard/prefs/effects"_i18n, labels, index_of(config::EFFECTS, config::get().effects), [this](int i) {
+            config::get().effects = config::EFFECTS[i];   // the next frame draws by it
+            ui::save_config();
+            this->refresh();
+        });
+        return true;
+    });
 
     start_tab->registerClickAction([this](brls::View*) {
         std::vector<std::string> labels;
@@ -101,6 +111,7 @@ void PreferencesTab::refresh()
     theme->setDetailText(ui::theme_name());
     appearance->setDetailText(ui::appearance_name());
     text_size->setDetailText(ui::text_size_name());
+    effects->setDetailText(brls::getStr("playguard/prefs/effects_values/" + std::string(config::EFFECTS[index_of(config::EFFECTS, cfg.effects)])));
     start_tab->setDetailText(tab_name(config::START_TABS[index_of(config::START_TABS, cfg.start_tab)]));
     intro->setOn(cfg.intro, false);
     notices_system->setOn(cfg.notices_system, false);

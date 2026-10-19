@@ -1044,6 +1044,11 @@
             "normal": "보통",
             "large": "크게",
             "auto": "자동: TV에서는 크게"
+        },
+        "effects": "시각 효과",
+        "effects_values": {
+            "auto": "배터리 사용 시 가볍게",
+            "full": "항상 전체"
         }
     },
     "backup": {

@@ -18,7 +18,8 @@ class PtRing : public brls::Box
     PtRing();
 
     // used: 0..1 fraction of today's limit already played. Negative == unknown
-    // (the track alone is drawn).
+    // (the track alone is drawn). From one known value to another, the arc
+    // travels there, but with the lighter effects (ui/effects).
     void setFraction(float used);
     // extra: the fraction of today's limit that is extra time (0: none).
     void setExtra(float extra);
@@ -27,7 +28,8 @@ class PtRing : public brls::Box
     // The arc shows what is left rather than what was played (the child
     // screen); the colour still follows what was played.
     void setShowLeft(bool left);
-    // The last minutes (the child screen): the arc beats, slowly.
+    // The last minutes (the child screen): the arc beats, slowly (steady
+    // with the lighter effects).
     void setPulse(bool pulse);
     void setValueSize(float size);
     void setCaptionSize(float size);

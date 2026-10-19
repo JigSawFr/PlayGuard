@@ -65,6 +65,7 @@
   "background": {"label": "PlayGuard out of focus"},
   "hbloader": {"label": "A loader that can hand an update to a store"},
   "docked": {"label": "On the dock (on the TV)"},
+  "battery": {"label": "On the battery (no charger)"},
   "numpad": {"label": "What the number pad returns"},
   "boot_choice": {"label": "Answer to \"previous build?\" at start-up", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "Network clock accurate"},

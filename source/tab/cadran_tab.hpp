@@ -58,7 +58,8 @@ void set_pill(const std::string& text, const char* icon = "check", bool warn = f
 void refresh_pill();
 // The soft glow of the boards, an absolute full-screen view to add first in
 // a frame: a radial gradient of `color_key` centred on (cx, cy), `radius`
-// wide. PLAYGUARD_SIM_CADRAN_NOGLOW=1 draws nothing.
+// wide. Nothing with the lighter effects (ui/effects) or with
+// PLAYGUARD_SIM_CADRAN_NOGLOW=1.
 brls::View* make_glow(float cx, float cy, float radius, const char* color_key);
 }
 

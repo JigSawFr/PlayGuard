@@ -16,6 +16,7 @@
 #endif
 
 #include "app.hpp"
+#include "ui/effects.hpp"
 #include "ui/ui.hpp"
 #include "tab/cadran_list.hpp"
 #include "util/config.hpp"
@@ -82,8 +83,10 @@ std::string mode()
 #else
     std::string m = "desktop";
 #endif
-    // Cadran's glow turned off (Developer): its cost is the difference.
+    // Cadran's glow turned off (Developer): its cost is the difference; the
+    // lighter effects on the battery (ui/effects) leave it out too.
     if (cadran::enabled() && !config::get().cadran_glow) m += "-noglow";
+    else if (cadran::enabled() && effects::light()) m += "-light";
     return m;
 }
 

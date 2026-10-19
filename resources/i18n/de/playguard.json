@@ -1044,6 +1044,11 @@
             "normal": "Normal",
             "large": "Größer",
             "auto": "Automatisch: größer am Fernseher"
+        },
+        "effects": "Visuelle Effekte",
+        "effects_values": {
+            "auto": "Sparsamer im Akkubetrieb",
+            "full": "Immer vollständig"
         }
     },
     "backup": {

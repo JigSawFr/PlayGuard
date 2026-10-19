@@ -1044,6 +1044,11 @@
             "normal": "标准",
             "large": "较大",
             "auto": "自动：电视上较大"
+        },
+        "effects": "视觉效果",
+        "effects_values": {
+            "auto": "电池供电时精简",
+            "full": "始终完整"
         }
     },
     "backup": {

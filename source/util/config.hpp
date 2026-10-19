@@ -20,6 +20,8 @@ struct Config
     // The text of the Cadran appearance: "auto" (larger while docked),
     // "normal" or "large" (ui/text_size).
     std::string text_size = "auto";
+    // "auto" (lighter effects on the battery) or "full" (ui/effects).
+    std::string effects = "auto";
     // Cadran said once to whom knew the lists: false in a config written
     // before the appearance could be chosen (no "appearance" in it), so the
     // main screen offers to keep it or go back to Classic (appearance_flow).
@@ -154,6 +156,8 @@ constexpr const char* THEMES[] = { "system", "light", "dark" };
 constexpr const char* APPEARANCES[] = { "cadran", "classic" };
 // What text_size may be: the default first.
 constexpr const char* TEXT_SIZES[] = { "auto", "normal", "large" };
+// What effects may be: the default first.
+constexpr const char* EFFECTS[] = { "auto", "full" };
 // What start_tab may be, in the sidebar's order.
 constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "restrictions",
                                        "security", "console", "history", "preferences", "about" };

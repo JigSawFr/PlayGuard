@@ -65,6 +65,7 @@
   "background": {"label": "PlayGuard 在背景"},
   "hbloader": {"label": "能把更新交給商店的載入器"},
   "docked": {"label": "插在底座上（電視）"},
+  "battery": {"label": "電池供電（未接充電器）"},
   "numpad": {"label": "數字鍵盤傳回的內容"},
   "boot_choice": {"label": "啟動時對「上一個版本？」的回答", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "網路時鐘準確"},

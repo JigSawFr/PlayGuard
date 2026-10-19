@@ -1044,6 +1044,11 @@
             "normal": "Normale",
             "large": "Plus grande",
             "auto": "Automatique : plus grande sur la TV"
+        },
+        "effects": "Effets visuels",
+        "effects_values": {
+            "auto": "Allégés sur batterie",
+            "full": "Toujours complets"
         }
     },
     "backup": {

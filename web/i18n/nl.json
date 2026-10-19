@@ -65,6 +65,7 @@
   "background": {"label": "PlayGuard op de achtergrond"},
   "hbloader": {"label": "Een loader die een update aan een store kan doorgeven"},
   "docked": {"label": "In het dock (op de tv)"},
+  "battery": {"label": "Op de accu (geen lader)"},
   "numpad": {"label": "Wat het numerieke toetsenblok teruggeeft"},
   "boot_choice": {"label": "Antwoord op 'vorige build?' bij het opstarten", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "Netwerkklok nauwkeurig"},

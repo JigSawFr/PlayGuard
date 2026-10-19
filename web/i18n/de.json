@@ -65,6 +65,7 @@
   "background": {"label": "PlayGuard im Hintergrund"},
   "hbloader": {"label": "Ein Loader, der ein Update an einen Store übergeben kann"},
   "docked": {"label": "In der Station (am Fernseher)"},
+  "battery": {"label": "Im Akkubetrieb (kein Ladegerät)"},
   "numpad": {"label": "Was der Ziffernblock zurückgibt"},
   "boot_choice": {"label": "Antwort auf „vorheriger Build?“ beim Start", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "Netzwerkuhr genau"},

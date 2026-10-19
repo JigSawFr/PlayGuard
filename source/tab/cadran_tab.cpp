@@ -22,6 +22,7 @@
 #include "app.hpp"
 #include "action/pt_logic.hpp"
 #include "ui/cadran_kit.hpp"
+#include "ui/effects.hpp"
 #include "ui/cadran_modal.hpp"
 #include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
@@ -206,7 +207,7 @@ class Glow : public brls::View
     void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style, brls::FrameContext*) override
     {
         static const bool off = std::getenv("PLAYGUARD_SIM_CADRAN_NOGLOW") != nullptr;
-        if (off || !config::get().cadran_glow) return;
+        if (off || !config::get().cadran_glow || effects::light()) return;
         const NVGpaint paint = nvgRadialGradient(vg, x + this->cx, y + this->cy, 0.0f, this->radius, this->glow, this->clear);
         // Only the square around the light: past its radius it is clear, so
         // the screen's other pixels are left alone (the same picture, about

@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <yoga/Yoga.h>
 
+#include "ui/effects.hpp"
+
 namespace
 {
 // The ring's stroke and radius for its size (the boards: a 20 stroke at 256,
@@ -51,8 +53,9 @@ void PtRing::setFraction(float value)
 {
     value = value > 1.0f ? 1.0f : value;
     if (value == this->used) return;
-    // From one known value to another: the arc travels there.
-    const bool travel = this->used >= 0.0f && value >= 0.0f;
+    // From one known value to another: the arc travels there (not with the
+    // lighter effects).
+    const bool travel = this->used >= 0.0f && value >= 0.0f && !effects::light();
     this->used = value;
     if (travel) {
         const float from = this->shown.getValue();
@@ -122,7 +125,7 @@ void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
         const float f = this->shown.getValue();
         const float to = this->used;
         NVGcolor color = to >= 1.0f ? this->coral : to >= 0.75f ? this->amber : this->teal;
-        if (this->pulse) {
+        if (this->pulse && !effects::light()) {
             // Once every 1.4 s, from full to a little over half, and back.
             const double t = (double)(brls::getCPUTimeUsec() % 1400000) / 1400000.0;
             color.a *= 0.55f + 0.45f * (0.5f + 0.5f * (float)std::cos(t * 2.0 * NVG_PI));

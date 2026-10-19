@@ -65,6 +65,7 @@
   "background": {"label": "PlayGuard en segundo plano"},
   "hbloader": {"label": "Un cargador que puede pasar una actualización a una tienda"},
   "docked": {"label": "En la base (en la TV)"},
+  "battery": {"label": "Con batería (sin cargador)"},
   "numpad": {"label": "Lo que devuelve el teclado numérico"},
   "boot_choice": {"label": "Respuesta a «¿versión anterior?» al iniciar", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "Reloj de red exacto"},
