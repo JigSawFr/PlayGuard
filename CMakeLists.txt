@@ -374,6 +374,8 @@ if (PLAYGUARD_WEB)
                 ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.data
                 ${PLAYGUARD_SITE}
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/branding/icon.svg ${PLAYGUARD_SITE}/icon.svg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/branding/mark.svg ${PLAYGUARD_SITE}/mark.svg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/site/assets/fonts/sora.woff2 ${PLAYGUARD_SITE}/sora.woff2
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/images/apple-touch-icon.png ${PLAYGUARD_SITE}/apple-touch-icon.png
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/web/i18n ${PLAYGUARD_SITE}/i18n
         ${PLAYGUARD_SITE_CJK}

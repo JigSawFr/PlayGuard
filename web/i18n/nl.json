@@ -1,6 +1,9 @@
 {
  "ui": {
   "title": "Simulator",
+  "nav_features": "Functies",
+  "nav_install": "Installatie",
+  "nav_docs": "Documentatie",
   "loading": "Laden…",
   "downloading": "PlayGuard downloaden…",
   "starting": "Starten…",

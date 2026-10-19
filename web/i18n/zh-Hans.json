@@ -1,6 +1,9 @@
 {
  "ui": {
   "title": "模拟器",
+  "nav_features": "功能",
+  "nav_install": "安装",
+  "nav_docs": "文档",
   "loading": "正在加载…",
   "downloading": "正在下载 PlayGuard…",
   "starting": "正在启动…",

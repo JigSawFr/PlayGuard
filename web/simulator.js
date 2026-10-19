@@ -112,6 +112,8 @@ const effectiveTheme = (choice) => (choice === 'auto' ? (dark.matches ? 'dark' :
 
 function showTheme() {
   const effective = effectiveTheme(chosenTheme());
+  // The choice (the header's icon on a phone), then the theme it gives.
+  document.documentElement.dataset.themeChoice = chosenTheme();
   document.documentElement.dataset.theme = effective;
   // Started with the other one (Auto following a change of the system's):
   // PlayGuard reads its theme at start-up, so offer to start it again.
@@ -805,10 +807,16 @@ function translatePage() {
   for (const node of document.querySelectorAll('[data-i18n-label]')) node.setAttribute('aria-label', t(node.dataset.i18nLabel));
 }
 
-// The website's home page in the page's language (tools/build_site.py's folders).
+// The website's pages in the page's language (tools/build_site.py's
+// folders): its home, and the header's links as on the website. The
+// language menu's face on a phone: the language's code.
 function homeLink() {
-  const folder = language === 'en-US' ? '' : `${language.toLowerCase()}/`;
-  $('home-link').href = `../${folder}`;
+  const home = `../${language === 'en-US' ? '' : `${language.toLowerCase()}/`}`;
+  $('home-link').href = home;
+  $('nav-features').href = `${home}#features`;
+  $('nav-install').href = `${home}#install`;
+  $('nav-docs').href = `${home}docs/features/`;
+  $('language-face').textContent = language.split('-')[0].toUpperCase();
 }
 
 function setUpHeader() {
