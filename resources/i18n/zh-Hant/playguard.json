@@ -1609,7 +1609,10 @@
             "card_today": "今天",
             "card_total": "今天 · 共 {}",
             "empty_note": "在這台主機上玩過的遊戲會依帳號顯示在此處。",
-            "see_all": "查看全部期間"
+            "see_all": "查看全部期間",
+            "trend_up": "比上週每天多 {}",
+            "trend_down": "比上週每天少 {}",
+            "trend_same": "與上週相當"
         },
         "restrictions": {
             "choose": "選擇此級別",

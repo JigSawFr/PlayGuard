@@ -686,6 +686,10 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         for (int k = 0; k < 7; k++) g->day_s[k] = (u32)share(g->day_s[k], account);
         if (account && !g->week_s && !g->total_s) out->count--;
     }
+    // The week before: 8 h in all (the last 7 days have 9 h 50), none after
+    // weeks without play.
+    out->prev_week_ok = true;
+    out->prev_week_s = idle_weeks ? 0 : (u32)share(480ULL * 60, account);
     // A large library: filler games, each played a little this week.
     const char *more = getenv("PLAYGUARD_SIM_GAMES");
     const int n = more ? atoi(more) : 0;

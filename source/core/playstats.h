@@ -45,6 +45,8 @@ typedef struct {
     bool   truncated;   // more games have play time than PLAYSTATS_MAX: some not played this week are left out
     u64    now;         // when the data was read (user clock)
     u8     day_wday[7]; // weekday (0 = Sunday) of day_s[k], when windows_ok
+    bool   prev_week_ok; // prev_week_s is meaningful (read with the windows, not shifted since)
+    u32    prev_week_s;  // every game added up over the 7 days before the last 7
     u32    count;       // games with any play time, in no particular order
     GameStat games[PLAYSTATS_MAX];
 } PlayStats;

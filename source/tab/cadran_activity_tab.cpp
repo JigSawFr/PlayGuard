@@ -295,6 +295,19 @@ void CadranActivityTab::show_hero()
                           ? brls::getStr("playguard/activity/summary/days_played_value", week.days_played) + " · " +
                                 brls::getStr("playguard/cadran/activity/per_day", ui::fmt_play_time(week.per_day_s))
                           : "");
+    // Against the 7 days before, per day: more (amber), less (teal) or about
+    // the same (under 5 minutes either way).
+    const bool trend = s.windows_ok && s.prev_week_ok;
+    if (trend) {
+        const int64_t diff = ((int64_t)week.total_s - (int64_t)s.prev_week_s) / 7 / 60;
+        brls::Theme theme = brls::Application::getTheme();
+        const uint16_t amount = (uint16_t)std::min<int64_t>(24 * 60, diff < 0 ? -diff : diff);
+        ui::set_text(week_trend, diff >= 5    ? brls::getStr("playguard/cadran/activity/trend_up", ui::fmt_minutes(amount))
+                                 : diff <= -5 ? brls::getStr("playguard/cadran/activity/trend_down", ui::fmt_minutes(amount))
+                                              : "playguard/cadran/activity/trend_same"_i18n);
+        week_trend->setTextColor(theme[diff >= 5 ? "cadran/amber" : diff <= -5 ? "cadran/teal" : "cadran/text3"]);
+    }
+    ui::set_visible(week_trend.getView(), trend);
     uint64_t day_total[7] = {};
     for (uint32_t g = 0; g < s.count; g++)
         for (int k = 0; k < 7; k++) day_total[k] += s.games[g].day_s[k];

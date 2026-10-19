@@ -1609,7 +1609,10 @@
             "card_today": "今日",
             "card_total": "今日・合計{}",
             "empty_note": "この本体で遊んだソフトが、ユーザーごとにここに表示されます。",
-            "see_all": "これまでの合計を見る"
+            "see_all": "これまでの合計を見る",
+            "trend_up": "前の週より1日{}多い",
+            "trend_down": "前の週より1日{}少ない",
+            "trend_same": "前の週と同じくらい"
         },
         "restrictions": {
             "choose": "このレベルにする",

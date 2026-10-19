@@ -60,6 +60,7 @@ class CadranActivityTab : public ActivityTab
     BRLS_BIND(brls::Label,  today_sub,    "cac_today_sub");
     BRLS_BIND(CadranDigits, week_value,   "cac_week");
     BRLS_BIND(brls::Label,  week_sub,     "cac_week_sub");
+    BRLS_BIND(brls::Label,  week_trend,   "cac_week_trend");
     BRLS_BIND(brls::Box,    week_bars,    "cac_week_bars");
     BRLS_BIND(CadranDigits, total_value,  "cac_total");
     BRLS_BIND(brls::Label,  total_sub,    "cac_total_sub");

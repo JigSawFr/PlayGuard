@@ -1609,7 +1609,10 @@
             "card_today": "oggi",
             "card_total": "oggi · {} in tutto",
             "empty_note": "I giochi usati su questa console compaiono qui, account per account.",
-            "see_all": "Vedi da sempre"
+            "see_all": "Vedi da sempre",
+            "trend_up": "{} in più al giorno rispetto alla settimana prima",
+            "trend_down": "{} in meno al giorno rispetto alla settimana prima",
+            "trend_same": "come la settimana prima"
         },
         "restrictions": {
             "choose": "Scegli questo livello",

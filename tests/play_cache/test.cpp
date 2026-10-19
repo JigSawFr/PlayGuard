@@ -25,6 +25,8 @@ int main()
     s->games[1].app_id = 0x0100000000020000ULL;
     s->games[1].day_s[6] = 60;
     s->games[1].week_s = 60;
+    s->prev_week_ok = true;
+    s->prev_week_s = 4321;
 
     // Round trip; only the games held are written.
     const std::string bytes = play_cache::encode(*s);
@@ -32,6 +34,7 @@ int main()
     auto back = std::make_unique<PlayStats>();
     CHECK(play_cache::decode(bytes, *back));
     CHECK(back->count == 2 && back->now == s->now && back->windows_ok);
+    CHECK(back->prev_week_ok && back->prev_week_s == 4321);
     CHECK(std::strcmp(back->games[0].name, "Game A") == 0 && back->games[0].total_s == 99999);
     CHECK(back->games[1].day_s[6] == 60);
 
@@ -51,6 +54,7 @@ int main()
     const GameStat& a = back->games[0];
     CHECK(a.day_s[0] == 0 && a.day_s[1] == 0 && a.day_s[2] == 100 && a.day_s[6] == 500);
     CHECK(a.today_s == 0 && a.week_s == 100 + 200 + 300 + 400 + 500);
+    CHECK(!back->prev_week_ok);   // the week before is not known day by day
     CHECK(back->games[1].week_s == 0);
     CHECK(back->day_wday[0] == 5 && back->day_wday[2] == 3 && back->day_wday[6] == 6);   // Friday first
     CHECK(a.total_s == 99999);   // all time untouched
@@ -61,7 +65,7 @@ int main()
     CHECK(back->windows_ok && back->games[0].week_s == 0 && back->games[0].today_s == 0);
     CHECK(play_cache::decode(bytes, *back));
     play_cache::shift_days(*back, 0);
-    CHECK(back->games[0].week_s == 2800);
+    CHECK(back->games[0].week_s == 2800 && back->prev_week_ok);
 
     // The clock went back: the windows are not shown.
     play_cache::shift_days(*back, -1);

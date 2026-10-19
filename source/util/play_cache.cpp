@@ -66,6 +66,7 @@ bool decode(const std::string& bytes, PlayStats& out)
     }
     bytes.copy(reinterpret_cast<char*>(out.games), out.count * sizeof(GameStat), sizeof h + HEAD_SIZE);
     fix_bool(out.windows_ok);
+    fix_bool(out.prev_week_ok);
     fix_bool(out.approximate);
     fix_bool(out.truncated);
     for (uint32_t i = 0; i < out.count; i++) {
@@ -78,6 +79,8 @@ bool decode(const std::string& bytes, PlayStats& out)
 void shift_days(PlayStats& stats, int days)
 {
     if (days == 0 || !stats.windows_ok) return;
+    // The week before the last 7 is not known any more day by day.
+    stats.prev_week_ok = false;
     if (days < 0) {
         stats.windows_ok = false;
         return;

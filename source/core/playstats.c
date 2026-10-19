@@ -241,15 +241,16 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
         // Midnights through the console's rule: a day with a daylight-saving
         // change is 23 or 25 h long, and the week counts it as one day.
         const TimeRule *rule = time_console_rule();
-        u64 day_starts[7];
-        for (int k = 0; k < 7; k++) day_starts[k] = local_midnight(rule, out->now, k);
+        // The 7 days before too, for the week's trend (Activity).
+        u64 day_starts[14];
+        for (int k = 0; k < 14; k++) day_starts[k] = local_midnight(rule, out->now, k);
         LocalTime today;   // the weekday of the same instant, not a second read
         const int wday = rule->to_local(rule->ctx, out->now, &today) ? today.wday : 0;
         for (int k = 0; k < 7; k++) out->day_wday[k] = (u8)((wday - k + 7) % 7);
         PlayLogEvent *events = NULL;
         size_t event_count = 0;
         bool capped = false;
-        out->events_rc = read_events(day_starts[6] >= DAY_S ? day_starts[6] - DAY_S : 0, &events, &event_count, &capped);
+        out->events_rc = read_events(day_starts[13] >= DAY_S ? day_starts[13] - DAY_S : 0, &events, &event_count, &capped);
         out->approximate = capped;
         // One account: only the time it was open in the game (in place: the
         // log of a clock set back months can be large).
@@ -276,6 +277,13 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
                     set_totals(g, &st);
             }
             out->windows_ok = true;
+            // The week before: the same log folded over its days, up to the
+            // start of the last 7 (each game's week_s is then that week's).
+            size_t prev = playlog_fold_days(events, event_count, day_starts[6], day_starts + 7, totals, PLAYSTATS_MAX + 1);
+            u64 prev_s = 0;
+            for (size_t i = 0; i < prev; i++) prev_s += totals[i].week_s;
+            out->prev_week_s  = (u32)(prev_s > 0xFFFFFFFFu ? 0xFFFFFFFFu : prev_s);
+            out->prev_week_ok = !playstats_cancelled();
         }
         // Then the all-time totals of every other installed game ever played,
         // while there is room: the games of this week come first, so a large

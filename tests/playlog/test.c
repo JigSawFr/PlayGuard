@@ -193,6 +193,32 @@ static void test_days(void)
     CHECK(sum == t[0].week_s);
 }
 
+// The week before the last 7 (Activity's trend, core/playstats.c): the same
+// log folded over the 7 days before, up to the start of the last 7.
+static void test_week_before(void)
+{
+    PlayLogTotal t[8];
+    // Today is day 20 here, so that 14 days back is still after day 0.
+    const uint64_t day_start = 20 * DAY, now = day_start + 18 * H;
+    uint64_t starts[14];
+    for (int k = 0; k < 14; k++) starts[k] = day_start - (uint64_t)k * DAY;
+    const PlayLogEvent log[] = {
+        ev(C, PlayLogEv_Focus, starts[13] - 2 * H), ev(C, PlayLogEv_Unfocus, starts[13] - H),        // before both
+        ev(A, PlayLogEv_Focus, starts[10] + 9 * H), ev(A, PlayLogEv_Unfocus, starts[10] + 11 * H),   // 10 days back
+        ev(B, PlayLogEv_Focus, starts[6] - H),      ev(B, PlayLogEv_Unfocus, starts[6] + H),         // across the two weeks
+        ev(A, PlayLogEv_Focus, day_start + 9 * H),  ev(A, PlayLogEv_Unfocus, day_start + 10 * H),    // today
+        ev(C, PlayLogEv_Focus, now - H),                                                              // still in focus
+    };
+    size_t n = playlog_fold_days(log, 9, starts[6], starts + 7, t, 8);
+    uint32_t prev = 0;
+    for (size_t i = 0; i < n; i++) prev += t[i].week_s;
+    CHECK(prev == 2 * H + H);   // A's 2 h and B's hour before the last 7 days, nothing of today's
+    CHECK(find(t, n, A)->week_s == 2 * H && find(t, n, B)->week_s == H && find(t, n, C) == NULL);
+    // And the last 7 days, from the same log: B's other hour, A today, C now.
+    n = playlog_fold_days(log, 9, now, starts, t, 8);
+    CHECK(find(t, n, B)->week_s == H && find(t, n, A)->week_s == H && find(t, n, C)->today_s == H);
+}
+
 static PlayLogEvent acc(uint8_t kind, uint64_t user, uint64_t who)
 {
     PlayLogEvent e = { 0, kind, user, user + 5000, { who, who + 100 } };
@@ -278,6 +304,7 @@ int main(void)
     test_clock_changes();
     test_limits();
     test_days();
+    test_week_before();
     test_accounts();
     return CHECK_DONE("playlog session, window and per-account assertions passed");
 }

@@ -1609,7 +1609,10 @@
             "card_today": "today",
             "card_total": "today · {} in all",
             "empty_note": "Games played on this console show up here, account by account.",
-            "see_all": "See all time"
+            "see_all": "See all time",
+            "trend_up": "{} a day more than the week before",
+            "trend_down": "{} a day less than the week before",
+            "trend_same": "about the same as the week before"
         },
         "restrictions": {
             "choose": "Choose this level",

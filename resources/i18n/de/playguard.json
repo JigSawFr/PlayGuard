@@ -1609,7 +1609,10 @@
             "card_today": "heute",
             "card_total": "heute · {} insgesamt",
             "empty_note": "Auf dieser Konsole gespielte Spiele erscheinen hier, Konto für Konto.",
-            "see_all": "Gesamt ansehen"
+            "see_all": "Gesamt ansehen",
+            "trend_up": "{} mehr pro Tag als in der Vorwoche",
+            "trend_down": "{} weniger pro Tag als in der Vorwoche",
+            "trend_same": "etwa wie in der Vorwoche"
         },
         "restrictions": {
             "choose": "Diese Stufe wählen",

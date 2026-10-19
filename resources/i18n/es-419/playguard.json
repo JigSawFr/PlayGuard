@@ -1609,7 +1609,10 @@
             "card_today": "hoy",
             "card_total": "hoy · {} en total",
             "empty_note": "Los juegos jugados en esta consola aparecen aquí, cuenta por cuenta.",
-            "see_all": "Ver el total"
+            "see_all": "Ver el total",
+            "trend_up": "{} más al día que la semana anterior",
+            "trend_down": "{} menos al día que la semana anterior",
+            "trend_same": "como la semana anterior"
         },
         "restrictions": {
             "choose": "Elegir este nivel",

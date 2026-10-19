@@ -1609,7 +1609,10 @@
             "card_today": "vandaag",
             "card_total": "vandaag · {} in totaal",
             "empty_note": "Games die op deze console gespeeld worden, verschijnen hier, per account.",
-            "see_all": "Totaal bekijken"
+            "see_all": "Totaal bekijken",
+            "trend_up": "{} per dag meer dan de week ervoor",
+            "trend_down": "{} per dag minder dan de week ervoor",
+            "trend_same": "ongeveer als de week ervoor"
         },
         "restrictions": {
             "choose": "Dit niveau kiezen",

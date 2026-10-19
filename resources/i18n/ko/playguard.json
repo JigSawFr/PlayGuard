@@ -1609,7 +1609,10 @@
             "card_today": "오늘",
             "card_total": "오늘 · 총 {}",
             "empty_note": "이 본체에서 플레이한 게임이 계정별로 여기에 표시됩니다.",
-            "see_all": "전체 기간 보기"
+            "see_all": "전체 기간 보기",
+            "trend_up": "지난주보다 하루 {} 많음",
+            "trend_down": "지난주보다 하루 {} 적음",
+            "trend_same": "지난주와 비슷"
         },
         "restrictions": {
             "choose": "이 단계 선택",
