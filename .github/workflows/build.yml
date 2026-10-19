@@ -96,6 +96,47 @@ jobs:
             --image "$(sed -n 's/^ *image: \(devkitpro\/devkita64@sha256:[0-9a-f]*\)$/\1/p' .github/workflows/build.yml)" \
             >> "$GITHUB_STEP_SUMMARY"
 
+  # What a pull request changes. When it is only the documentation, the
+  # website, the web simulator's page or other workflows (the `docs` pattern
+  # below), `code` is false and the jobs that build or run the app are
+  # skipped: host-tests still runs (the resources, CONTRIBUTING.md and
+  # docs/config.md checks), a skipped job counts as passed for the branch
+  # rules, and desktop-smoke accepts it. Every push, schedule, release or run
+  # by hand, and a pull request whose files cannot be listed: `code` true.
+  changes:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      code: ${{ steps.files.outputs.code }}
+    steps:
+      - name: Files changed
+        id: files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          code=true
+          docs='^(docs|site|branding|images|web)/|^(README(\.fr)?|ROADMAP|CONTRIBUTING|CODE_OF_CONDUCT|SECURITY)\.md$|^LICENSE$'
+          docs="$docs"'|^\.github/(ISSUE_TEMPLATE|DISCUSSION_TEMPLATE)/|^\.github/(CODEOWNERS|FUNDING\.yml|SUPPORT\.md|labels\.json|dependabot\.yml|pull_request_template\.md)$'
+          docs="$docs"'|^\.github/workflows/(web|pages|codeql|labels|pr-title|release-page|release-please|toolchain-watch)\.yml$'
+          docs="$docs"'|^tools/(build_site|check_site_links|web_[a-z_]+)\.py$|^tools/(site_screenshots|site_social|render_tour|render_branding)\.mjs$'
+          # The API lists 3000 files at most: more, and some may be code.
+          if [ -n "$PR" ] && files=$(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[] | .filename, (.previous_filename // empty)') \
+              && [ -n "$files" ] && [ "$(wc -l <<< "$files")" -lt 3000 ]; then
+            other=$(grep -vE "$docs" <<< "$files" || true)
+            if [ -z "$other" ]; then code=false; fi
+            echo "$(wc -l <<< "$files") files; not documentation only:"
+            echo "${other:-  (none)}"
+          fi
+          echo "code=$code" | tee -a "$GITHUB_OUTPUT"
+          if [ "$code" = false ]; then
+            echo "Documentation only: the builds, the desktop smoke test and the coverage are skipped." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
   # Fast checks with no toolchain: C service layer unit tests (under
   # AddressSanitizer and UndefinedBehaviorSanitizer) + resources.
   host-tests:
@@ -140,6 +181,8 @@ jobs:
   # coverage is a report, not a gate), then the fuzz targets (clang's
   # libFuzzer, tests/fuzz/).
   host-tests-clang-coverage:
+    needs: [ changes ]
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-26.04
     timeout-minutes: 20
     steps:
@@ -206,37 +249,15 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
-  # Builds the UI on Linux against the simulated backend and clicks through
-  # every screen headlessly: catches borealis XML / view errors without a console.
-  # The scenarios run in parallel shards of about the same length, 3 to 4
-  # minutes under software GL (the default tour is split in two, `smoke`
-  # and `games`, and `outside` waits 90 s on screen by design); each shard
-  # builds with the shared ccache (about 12 s warm), and only the first
-  # saves it back. The desktop-smoke job below gathers them
-  # under one name for the release job and branch rules.
-  desktop-smoke-shard:
-    name: desktop-smoke (${{ matrix.shard }})
-    needs: [ meta ]
+  # Builds the UI on Linux against the simulated backend (once, with the
+  # shared ccache), for the shards below: the program and its resources go
+  # to them as a short-lived artifact (BRLS_RESOURCES_DIR is this build
+  # folder, the same path on every runner).
+  desktop-build:
+    needs: [ changes ]
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-26.04
-    timeout-minutes: 25
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - shard: default
-            scenarios: smoke
-          - shard: games
-            scenarios: games
-          - shard: states
-            scenarios: gate errors rescue forged lock loading alarm cadranstates cadranunlocked cadranlarge
-          - shard: developer
-            scenarios: devbuild update library rollback
-          - shard: outside
-            scenarios: outside sysnotes cadran
-          # Every Cadran tab in the 15 languages, normal and larger text: no
-          # text cut short (tools/cut_text_check.py, tests/cut_text/).
-          - shard: languages
-            scenarios: cuttext
+    timeout-minutes: 20
     env:
       CMAKE_C_COMPILER_LAUNCHER: ccache
       CMAKE_CXX_COMPILER_LAUNCHER: ccache
@@ -244,7 +265,6 @@ jobs:
       CCACHE_BASEDIR: ${{ github.workspace }}
       CCACHE_COMPRESS: "1"
       CCACHE_MAXSIZE: 400M
-      ARTIFACT: playguard-${{ needs.meta.outputs.label }}-screenshots-${{ matrix.shard }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -262,10 +282,10 @@ jobs:
           key: apt-desktop-${{ github.sha }}
           restore-keys: apt-desktop-
       # Without the recommended packages (ImageMagick's ghostscript and fonts,
-      # for one): xauth is what xvfb-run needs, libgl1-mesa-dri is llvmpipe
-      # (LIBGL_ALWAYS_SOFTWARE=1), dbus the session the app's portals ask for.
-      # man-db's index is not rebuilt (2 s of every install, for no reader);
-      # autoclean drops the packages a newer version replaced.
+      # for one): man-db's index is not rebuilt (2 s of every install, for no
+      # reader); autoclean drops the packages a newer version replaced. The
+      # shards install the same list (the X and GL libraries, xvfb, xdotool…)
+      # from this cache.
       - name: Dependencies
         run: |
           sudo rm -f /var/lib/man-db/auto-update
@@ -279,7 +299,6 @@ jobs:
           sudo chown -R "$USER" .apt-archives
           rm -f .apt-archives/lock
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        if: matrix.shard == 'default'
         with:
           path: .apt-archives
           key: apt-desktop-${{ github.sha }}
@@ -290,32 +309,113 @@ jobs:
           restore-keys: ccache-desktop-
       # Only what this build used goes back to the cache (a hit refreshes an
       # object's date): one build's objects, about 25 MB, not 400 MB of builds
-      # gone by that every shard restored.
+      # gone by.
       - name: Build (desktop simulation)
         run: |
           start=$(date +%s)
           make desktop CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
           ccache --show-stats
           ccache --evict-older-than "$(( $(date +%s) - start + 60 ))s"
+          tar -cf desktop-build.tar build-desktop/playguard build-desktop/resources
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        if: matrix.shard == 'default'
         with:
           path: .ccache
           key: ccache-desktop-${{ github.sha }}
+      # A tar keeps the program executable (an artifact's zip does not). Named
+      # after the run, not the attempt: a shard re-run on its own finds it;
+      # a re-run of this job replaces it.
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: desktop-build-${{ github.run_id }}
+          path: desktop-build.tar
+          overwrite: true
+          retention-days: 1
+          compression-level: 1
+          if-no-files-found: error
+
+  # Clicks through every screen of that build headlessly: catches borealis
+  # XML / view errors without a console. The scenarios run in parallel
+  # shards of about the same length, 2 to 4 minutes under software GL (the
+  # default tour is split in two, `smoke` and `games`; the text check in
+  # three, five languages each). The desktop-smoke job below gathers them
+  # under one name for the release job and branch rules.
+  desktop-smoke-shard:
+    name: desktop-smoke (${{ matrix.shard }})
+    needs: [ meta, desktop-build ]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: default
+            scenarios: smoke
+          - shard: games
+            scenarios: games
+          - shard: states
+            scenarios: gate errors rescue forged lock loading alarm cadranstates cadranunlocked cadranlarge
+          - shard: developer
+            scenarios: devbuild update library rollback
+          - shard: outside
+            scenarios: outside sysnotes cadran
+          # Every Cadran tab in the 15 languages, normal and larger text: no
+          # text cut short (tools/cut_text_check.py, tests/cut_text/), five
+          # languages a shard (about 3 minutes each).
+          - shard: languages-1
+            scenarios: cuttext
+            languages: en-US fr fr-CA de es
+          - shard: languages-2
+            scenarios: cuttext
+            languages: es-419 it nl pt pt-BR
+          - shard: languages-3
+            scenarios: cuttext
+            languages: ru ja ko zh-Hans zh-Hant
+    env:
+      ARTIFACT: playguard-${{ needs.meta.outputs.label }}-screenshots-${{ matrix.shard }}
+    steps:
+      # Only what the scenarios read (tools/, tests/, the source tree the
+      # checks look at): no submodules, the program comes built.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: desktop-build-${{ github.run_id }}
+      - name: The desktop build
+        run: tar -xf desktop-build.tar && rm desktop-build.tar && test -x build-desktop/playguard
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .apt-archives
+          key: apt-desktop-${{ github.sha }}
+          restore-keys: apt-desktop-
+      # desktop-build's list but the compilers' tools, from its package cache
+      # (the libraries the program links come with their -dev packages):
+      # xauth is what xvfb-run needs, libgl1-mesa-dri is llvmpipe
+      # (LIBGL_ALWAYS_SOFTWARE=1), dbus the session the app's portals ask for.
+      - name: Dependencies
+        run: |
+          sudo rm -f /var/lib/man-db/auto-update
+          archives="-o Dir::Cache::Archives=$GITHUB_WORKSPACE/.apt-archives"
+          mkdir -p .apt-archives/partial
+          sudo apt-get update
+          sudo apt-get install $archives -y --no-install-recommends libgl1-mesa-dev libgl1-mesa-dri \
+            libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxkbcommon-dev libwayland-dev \
+            libdbus-1-dev libcurl4-openssl-dev zlib1g-dev xvfb xauth xdotool imagemagick dbus
       # Each scenario writes its screenshots (and a contact sheet of them) to
       # smoke/ (the default one) or smoke-<scenario>/. Every scenario of the
       # shard runs; the step fails at the end if one did. smoke-results.tsv
       # (scenario, result, seconds, screens) feeds the summary.
-      - name: Smoke test (${{ matrix.scenarios }})
+      - name: Smoke test (${{ matrix.scenarios }} ${{ matrix.languages }})
         env:
           SCENARIOS: ${{ matrix.scenarios }}
+          LANGUAGES: ${{ matrix.languages }}
         run: |
           failed=""
           for sc in $SCENARIOS; do
             if [ "$sc" = smoke ]; then out=smoke; arg=""; else out="smoke-$sc"; arg="$sc"; fi
             echo "::group::$sc"
             start=$SECONDS
-            if [ "$sc" = cuttext ]; then cmd="tools/cut_text_check.py $out"; else cmd="tools/desktop_smoke.py $out $arg"; fi
+            if [ "$sc" = cuttext ]; then cmd="tools/cut_text_check.py $out $LANGUAGES"; else cmd="tools/desktop_smoke.py $out $arg"; fi
             if xvfb-run -s "-screen 0 1280x720x24" python3 $cmd; then result=ok; else result=fail; failed="$failed $sc"; fi
             screens=$(ls "$out"/*.png 2>/dev/null | grep -vc contact-sheet || true)
             printf '%s\t%s\t%s\t%s\n' "$sc" "$result" "$((SECONDS - start))" "$screens" >> smoke-results.tsv
@@ -378,16 +478,18 @@ jobs:
 
   # One result for the shards above, under the name the release job and the
   # branch rules wait for.
+  # Skipped as a whole for a pull request of documentation only (`changes`).
   desktop-smoke:
     if: ${{ !cancelled() }}
-    needs: [ desktop-smoke-shard ]
+    needs: [ changes, desktop-smoke-shard ]
     runs-on: ubuntu-26.04
     timeout-minutes: 5
     steps:
       - name: Every shard passed
         env:
+          CODE: ${{ needs.changes.outputs.code }}
           RESULT: ${{ needs.desktop-smoke-shard.result }}
-        run: test "$RESULT" = success
+        run: test "$RESULT" = success || { test "$CODE" = false && test "$RESULT" = skipped; }
 
   # The real .nro, built in the official devkitPro image, and compat.json
   # (what the app's update check reads from the latest release).
@@ -407,7 +509,8 @@ jobs:
   # mapping, and the runner skips the login when it has no username.
   # The image has no bash: the steps are POSIX sh.
   switch:
-    needs: [ meta ]
+    needs: [ meta, changes ]
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-26.04
     # A release builds twice from scratch (no ccache, below): longer.
     timeout-minutes: ${{ inputs.tag && 45 || 20 }}
@@ -448,6 +551,11 @@ jobs:
           # A release (a vX.Y.Z tag, from release-please.yml): the header's
           # version badge shows it as stable; every other build as a development one.
           PLAYGUARD_RELEASE: ${{ inputs.tag && '1' || '0' }}
+          # The reproducibility check (below) on main, a release, a schedule
+          # or a run by hand: on a pull request the second build takes every
+          # object from the first's ccache, which proves little for a minute
+          # or two of the run.
+          REPRO: ${{ github.event_name != 'pull_request' && '1' || '0' }}
         run: |
           # The checkout belongs to another user than the container's root: git
           # refuses it without this, and CMake reads the commit the app shows.
@@ -477,13 +585,15 @@ jobs:
             cp build/dksh/*.dksh "$1/dksh/"
             (cd build/resources && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > "$1/resources.sha256"
           }
-          keep repro/first
-          make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
-          make dist-rescue
-          keep repro/second
-          if ! python3 tools/repro_diff.py repro/first repro/second; then
-            echo "::error title=Reproducible zips::the second build differs from the first (what differs is above; both builds are in the repro-diff artifact)"
-            exit 1
+          if [ "$REPRO" = 1 ]; then
+            keep repro/first
+            make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
+            make dist-rescue
+            keep repro/second
+            if ! python3 tools/repro_diff.py repro/first repro/second; then
+              echo "::error title=Reproducible zips::the second build differs from the first (what differs is above; both builds are in the repro-diff artifact)"
+              exit 1
+            fi
           fi
           # The raw sysmodule next to its zip, for the rescue artifact.
           cp sysmodule/out/playguard-rescue.nsp playguard-rescue.nsp

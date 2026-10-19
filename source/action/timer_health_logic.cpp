@@ -27,7 +27,8 @@ static void restart(State& s, uint64_t remaining_ns, uint16_t limit, uint64_t no
     s.stalled = false;
 }
 
-bool step(State& s, bool should, uint64_t remaining_ns, uint16_t limit, uint64_t now_ms, bool in_focus)
+bool step(State& s, bool should, uint64_t remaining_ns, uint16_t limit, uint64_t now_ms, bool in_focus,
+          uint64_t stall_ms)
 {
     if (!should) {
         s = State();
@@ -46,7 +47,7 @@ bool step(State& s, bool should, uint64_t remaining_ns, uint16_t limit, uint64_t
         restart(s, remaining_ns, limit, now_ms);
         return false;
     }
-    if (s.still_ms >= STALL_MS) s.stalled = true;
+    if (s.still_ms >= stall_ms) s.stalled = true;
     return s.stalled;
 }
 
