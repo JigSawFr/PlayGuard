@@ -48,7 +48,7 @@
   "replaying": "正在重播步驟：第 {n} 步，共 {total} 步",
   "tour": "導覽",
   "report": "回報問題",
-  "tour_overview": "概覽：今天的遊玩時間、限制、剩餘時間與就寢時間。",
+  "tour_overview": "今天：今天的遊玩時間、限制、剩餘時間與就寢時間。",
   "tour_play_timer": "遊玩時間限制：每週圖表就是編輯器，每天相同的限制或每天各自的限制。",
   "tour_activity": "活動：根據主機自己的記錄，誰玩了什麼、玩了多久。",
   "tour_console": "主機：網路時鐘、已安裝的遊戲以及主機執行的內容。",
@@ -66,7 +66,7 @@
   "capture": "截圖"
  },
  "params": {
-  "tab": {"label": "開啟時顯示", "options": {"": "總覽", "play_timer": "遊玩時間限制", "activity": "活動紀錄", "restrictions": "限制", "security": "PIN碼", "console": "主機", "history": "紀錄", "preferences": "偏好設定", "about": "關於"}},
+  "tab": {"label": "開啟時顯示", "options": {"": "今天", "play_timer": "遊玩時間限制", "activity": "活動紀錄", "restrictions": "限制", "security": "PIN碼", "console": "主機", "history": "紀錄", "preferences": "偏好設定", "about": "關於"}},
   "keep": {"label": "在造訪之間保留狀態", "help": "PlayGuard 的資料和模擬主機的設定（PIN碼、限制、時鐘）保留在此瀏覽器中；此面板中的主機設定只在首次啟動時生效。"},
   "not_set_up": {"label": "從未設定（沒有 PIN碼）"},
   "unlocked": {"label": "暫時解除"},
@@ -76,6 +76,7 @@
   "alarm_off": {"label": "「時間到」提醒已關閉"},
   "not_counting": {"label": "剩餘時間不減少", "help": "時鐘被調回：在畫面上顯示 90 秒後，總覽會提示。"},
   "unpaired": {"label": "未連結手機應用程式"},
+  "left_min": {"label": "今天剩餘分鐘數"},
   "fw": {"label": "系統版本", "help": "高於已驗證的最新版本時，顯示系統版本畫面。"},
   "no_cfw": {"label": "沒有 Atmosphère"},
   "emummc": {"label": "emuMMC"},
@@ -85,7 +86,8 @@
   "applet": {"label": "小程式模式（從相簿啟動）"},
   "background": {"label": "PlayGuard 在背景"},
   "hbloader": {"label": "能把更新交給商店的載入器"},
-  "numpad": {"label": "數字鍵盤傳回的內容"},
+  "docked": {"label": "插在底座上（電視）"},
+  "battery": {"label": "電池供電（未接充電器）"},
   "boot_choice": {"label": "啟動時對「上一個版本？」的回答", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "網路時鐘準確"},
   "autosync_off": {"label": "「透過網際網路同步時鐘」已關閉"},
@@ -94,6 +96,8 @@
   "now": {"label": "固定主機時間", "help": "依瀏覽器的時區。"},
   "skip": {"label": "主機時間往後推（秒）", "help": "期間一直在玩遊戲：剩餘時間也減少同樣多。畫面下方的按鈕可以往後推。"},
   "idle": {"label": "沒有執行中的遊戲"},
+  "no_game": {"label": "PlayGuard 後面沒有開啟任何內容"},
+  "no_play": {"label": "幾週沒有遊玩"},
   "no_pdm": {"label": "沒有活動紀錄"},
   "games": {"label": "本週額外玩過的遊戲數"},
   "accounts": {"label": "使用者帳號", "help": "0 到 8 個（預設 2 個），每個帳號玩的時間是下一個的兩倍。"},
@@ -109,7 +113,9 @@
   "fail": {"label": "讓以下操作失敗", "options": {"unlock": "解除", "unverified": "解除未確認", "relock": "重新鎖定", "write": "所有設定寫入", "timer": "讀取計時器", "clock": "設定時鐘", "pin": "讀取 PIN碼", "pin_entry": "取消 PIN碼畫面", "bedtime": "就寢時間", "remove": "刪除遊戲", "launch": "重設啟動版本", "verify": "完整性檢查"}},
   "still_focus": {"label": "焦點醒目提示靜止"},
   "version": {"label": "標題列顯示的版本"},
-  "hold_loading": {"label": "停在載入畫面"}
+  "hold_loading": {"label": "停在載入畫面"},
+  "cadran_noglow": {"label": "無背景光暈"},
+  "cadran_noring": {"label": "沒有弧線的圓環"}
  },
  "presets": {
   "default": "預設",

@@ -49,7 +49,7 @@ void open()
     PtState pt;
     pctl_play_timer_query(&pt);
     if (!pt.fw_supported) {
-        ui::notify(ui::rc_text(NXM_RC_FW_UNSUPPORTED));
+        ui::notify(ui::rc_text(NXM_RC_FW_UNSUPPORTED), ui::Toast::Refused);
         return;
     }
     if (!pt.valid) {

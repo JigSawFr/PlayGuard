@@ -18,6 +18,10 @@ class HelpTab : public TabBase
     void refresh() override;
 
   private:
+    brls::RepeatingTimer stats_timer;   // the frame statistics' last line, every second while they run
+
+    void update_frame_stats();
+
     BRLS_BIND(brls::DetailCell,  first_steps, "hp_first_steps");
     BRLS_BIND(brls::DetailCell,  export_cell, "hp_export");
     BRLS_BIND(brls::Label,       export_note, "hp_export_note");
@@ -33,6 +37,10 @@ class HelpTab : public TabBase
     BRLS_BIND(brls::BooleanCell, dev_read_only, "hp_dev_read_only");
     BRLS_BIND(brls::BooleanCell, dev_pt_log,  "hp_dev_pt_log");
     BRLS_BIND(brls::Label,       dev_pt_log_note, "hp_dev_pt_log_note");
+    BRLS_BIND(brls::BooleanCell, dev_frame_stats, "hp_dev_frame_stats");
+    BRLS_BIND(brls::BooleanCell, dev_glow, "hp_dev_glow");
+    BRLS_BIND(brls::Label,       dev_frame_stats_note, "hp_dev_frame_stats_note");
+    BRLS_BIND(brls::Label,       dev_frame_stats_last, "hp_dev_frame_stats_last");
     BRLS_BIND(brls::DetailCell,  dev_clear_cache, "hp_dev_clear_cache");
     BRLS_BIND(brls::DetailCell,  dev_clear_logs, "hp_dev_clear_logs");
     BRLS_BIND(brls::DetailCell,  dev_report,  "hp_dev_report");

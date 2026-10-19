@@ -4,6 +4,7 @@
 #include "action/clock_flow.hpp"
 #include "action/console_actions.hpp"
 #include "action/fw_gate.hpp"
+#include "action/pairing_state.hpp"
 #include "action/pin_lock.hpp"
 #include "action/pt_flow.hpp"
 #include "app.hpp"
@@ -126,8 +127,9 @@ void OnboardingActivity::refresh()
                          : accurate ? "playguard/dashboard/clock_ok"_i18n : "playguard/dashboard/clock_bad"_i18n);
     clock->setDetailTextColor(R_FAILED(accuracy_rc) ? ui::color_neutral() : accurate ? ui::color_ok() : ui::color_warn());
 
-    // Step 4 only while the phone app is linked: its next sync would undo the rest.
-    const bool paired = s.pairing_active_ok && s.pairing_active;
+    // Step 4 only while the phone app is linked: its next sync would undo the
+    // rest (none when Atmosphère's DNS blocks its server).
+    const bool paired = pairing_state::syncs(s);
     unlink->setDetailText("playguard/dashboard/pairing_on"_i18n);
     unlink->setDetailTextColor(ui::color_warn());
     ui::set_visible(unlink.getView(), paired);

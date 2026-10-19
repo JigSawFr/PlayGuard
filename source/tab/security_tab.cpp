@@ -4,11 +4,13 @@
 #include "action/console_actions.hpp"
 #include "action/console_lock.hpp"
 #include "action/history_flow.hpp"
+#include "action/pairing_state.hpp"
 #include "action/pin_lock.hpp"
 #include "action/pt_block_flow.hpp"
 #include "action/pt_flow.hpp"
 #include "action/rescue.hpp"
 #include "app.hpp"
+#include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/perf.hpp"
@@ -16,7 +18,7 @@
 using namespace brls::literals;
 
 SecurityTab::SecurityTab()
-    : TabBase("xml/tab/security.xml")
+    : TabBase("xml/tab/security.xml"), list(this)
 {
     this->enable_auto_refresh(5000);
     // What the notification bell says is to do here, on its row.
@@ -118,6 +120,13 @@ SecurityTab::SecurityTab()
         console_actions::delete_all("", [this]() { this->refresh(); });
         return true;
     });
+    this->list.tiles({ { "sc_pin", "key" }, { "sc_restrictions", "shield" }, { "sc_temp", "unlock" } }, true);
+    this->list.apply({ { "sc_set_pin", "key" }, { "sc_pin_lock", "lock" }, { "sc_pin_ask_again", "timer" },
+                       { "sc_show_pin", "eye" }, { "sc_unlock", "unlock" }, { "sc_relock", "lock" },
+                       { "sc_auto_relock", "refresh" }, { "sc_console_lock", "gamepad" }, { "pr_active", "phone" },
+                       { "pr_updated", "refresh" }, { "pr_decode", "code" }, { "pr_unlink", "stop" }, { "sc_delete", "trash" } });
+    if (cadran::Card* danger = this->list.card_of("sc_delete"))
+        danger->setAccent(brls::Application::getTheme()["cadran/coral_line"]);
 }
 
 void SecurityTab::change_pin()
@@ -143,13 +152,17 @@ void SecurityTab::refresh()
                                        "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
     temp->setDetailTextColor(s.temp_unlocked_ok && s.temp_unlocked ? ui::color_warn() : ui::color_neutral());
 
-    // Companion app: while linked, its next sync overwrites what is set here.
+    // Companion app: while linked, its next sync overwrites what is set here,
+    // unless Atmosphère's DNS blocks its server (then the note says so).
     const bool paired = s.pairing_active_ok && s.pairing_active;
-    ui::set_detail(pr_active, ui::bool_text(s.pairing_active_ok, s.pairing_active,
-                                            "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
-    pr_active->setDetailTextColor(paired ? ui::color_warn() : ui::color_neutral());
+    const bool syncs = pairing_state::syncs(s);
+    std::string active = ui::bool_text(s.pairing_active_ok, s.pairing_active, "playguard/common/yes"_i18n, "playguard/common/no"_i18n);
+    if (paired && !syncs) active += " · " + "playguard/pairing/dns_blocked"_i18n;
+    ui::set_detail(pr_active, active);
+    pr_active->setDetailTextColor(syncs ? ui::color_warn() : ui::color_neutral());
     ui::set_detail(pr_updated, s.last_updated_ok ? ui::time_text(s.last_updated) : "playguard/common/unavailable"_i18n);
-    pr_note->setTextColor(paired ? ui::color_warn() : ui::color_note());
+    ui::set_text(pr_note, paired && !syncs ? "playguard/pairing/dns_note"_i18n : "playguard/pairing/note"_i18n);
+    pr_note->setTextColor(syncs ? ui::color_warn() : ui::color_note());
 
     ui::set_detail(pin_lock_cell, pin_lock::mode_text());
     ui::set_text(pin_lock_note, pin_lock::note_text());
@@ -169,7 +182,8 @@ void SecurityTab::refresh()
                           { relock.getView(), unlocked },
                           // Nothing to unlink when the read says not linked.
                           { pr_unlink.getView(), !s.pairing_active_ok || paired },
-                          { pr_decode.getView(), paired } });
+                          // The block comparison needs the app to sync.
+                          { pr_decode.getView(), syncs } });
     for (brls::DetailCell* c : { (brls::DetailCell*)set_pin.getView(), (brls::DetailCell*)show_pin.getView(),
                                  (brls::DetailCell*)unlock.getView(), (brls::DetailCell*)relock.getView(),
                                  (brls::DetailCell*)console_lock_cell.getView(), (brls::DetailCell*)pr_unlink.getView(),
@@ -177,6 +191,11 @@ void SecurityTab::refresh()
         ui::show_writable(c, writable);
     auto_relock->setOn(config::get().auto_relock, false);
     ui::show_writable(del, writable, ui::color_bad(), ui::color_neutral());
+    this->list.sync();
+    if (unlocked) cadran::set_pill("playguard/cadran/pill/unlocked"_i18n, "unlock", true);
+    else if (has_pin) cadran::set_pill("playguard/cadran/pill/pin_set"_i18n, "key");
+    else if (s.pin_length_ok) cadran::set_pill("playguard/cadran/pill/pin_none"_i18n, "key", true);
+    else cadran::set_pill("");
 }
 
 brls::View* SecurityTab::create()

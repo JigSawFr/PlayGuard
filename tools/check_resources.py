@@ -18,10 +18,14 @@
   so a non-namespace-aware parser is used);
 - brls:Label never carries padding attributes (borealis throws at runtime);
 - every BRLS_BIND(type, name, "id") names an id of the XML its class
-  inflates (CONTENT_FROM_XML_RES, TabBase("xml/..."), inflateFromXMLRes), or
+  inflates (CONTENT_FROM_XML_RES, TabBase("xml/..."), inflateFromXMLRes,
+  createFromXMLResource), or
   of a custom view that XML holds (<PtStateHeader/>): a missing one is a null
   view at runtime, the first use of which crashes. Every class of a header
   and of its .cpp counts.
+- every line id a Cadran screen names (source/**/cadran_*.cpp: getView,
+  park, apply, tiles, press...) is an id of a layout or of a view the code
+  makes (setId): a renamed line would leave a chip that does nothing;
 - every sidebar tab name (playguard/tabs/) fits on one line: at most
   TAB_WIDTH columns, a wide (CJK) character counting as two.
 
@@ -236,12 +240,13 @@ def issue_suffixes():
 DYNAMIC_KEYS = {
     # Loops over 0..N-1 (the screens' pickers and the week).
     "activity/formats/": numbers(4),     # history_activity.cpp, activity_tab.cpp: f < 4
-    "activity/none/": numbers(3),        # activity_tab.cpp: one per period
-    "activity/periods/": numbers(3),     # activity_tab.cpp: p < 3
+    "activity/none/": numbers(4),        # activity_tab.cpp: one per period (activity_summary::PERIODS)
+    "activity/periods/": numbers(4),     # activity_tab.cpp: activity_summary::PERIODS
     "days/": numbers(7),
     "library/views/": numbers(2),        # games_activity.cpp: list, covers
     "days_lower/": numbers(7),
     "days_short/": numbers(7),
+    "cadran/months/": [str(m) for m in range(1, 13)],   # cadran_kit.cpp, long_date: 1..12
     "restrictions/levels/": numbers(5),  # format_text.cpp, level_name: up to 4
     "history/filters/": numbers(enum_count("source/action/history_logic.hpp", "Filter")),
     # The code's lists.
@@ -260,6 +265,9 @@ DYNAMIC_KEYS = {
     re.findall(r'open_label\("(\w+)"\)', read(f"{ROOT}/source/action/notices.cpp")),
     "tools/languages/": array_of("source/util/config.hpp", "LANGUAGES"),
     "tools/themes/": array_of("source/util/config.hpp", "THEMES"),
+    "prefs/text_sizes/": array_of("source/util/config.hpp", "TEXT_SIZES"),
+    "prefs/effects_values/": array_of("source/util/config.hpp", "EFFECTS"),
+    "restrictions/org_where/": array_of("source/tab/restrictions_tab.cpp", "ORG_WHERE"),
     "tools/update_via_values/": array_of("source/action/update_flow.cpp", "METHODS"),
 }
 for prefix, values in sorted(DYNAMIC_KEYS.items()):
@@ -304,13 +312,14 @@ for path, text in sorted(code_text.items()):
 # BRLS_BIND ids against the XML each class inflates. A class's XML is named in
 # its header (an activity's CONTENT_FROM_XML_RES("activity/x.xml"), under
 # resources/xml/) or in its .cpp (a tab's TabBase("xml/tab/x.xml"), a view's
-# inflateFromXMLRes("xml/view/x.xml"), under resources/). Each one, and each
+# inflateFromXMLRes("xml/view/x.xml"), under resources/; a Cadran tab's top,
+# createFromXMLResource("view/x.xml"), under resources/xml/). Each one, and each
 # BRLS_BIND, belongs to the class around it: the last "class X" before it, or
 # the last "X::f(" a definition at the start of a line opens, whichever is
 # nearer; in the header or in its .cpp.
 xml_dir = f"{ROOT}/resources/xml"
 code_files = glob.glob(f"{ROOT}/source/**/*.[ch]pp", recursive=True)
-class_xml = {}      # class name -> XML path, relative to resources/xml
+class_xml = {}      # class name -> the XML paths it inflates, relative to resources/xml
 class_binds = {}    # class name -> (file, [ids])
 loaded_xml = set()
 OWNER = re.compile(r"^\s*class\s+(\w+)\b[^;]*$|^(?:[A-Za-z_][^\n;{}]*?[\s*&])?([A-Za-z_]\w*)::~?\w+\s*\(", re.M)
@@ -328,10 +337,10 @@ pairs = sorted({p[:-len(".hpp")] if p.endswith(".hpp") else p[:-len(".cpp")]
 for stem in pairs:
     for path in (stem + ".hpp", stem + ".cpp"):
         text = read(path)
-        for m in re.finditer(r'CONTENT_FROM_XML_RES\(\s*"([^"]+)"|(?:TabBase|inflateFromXMLRes)\(\s*"xml/([^"]+)"', text):
+        for m in re.finditer(r'(?:CONTENT_FROM_XML_RES|createFromXMLResource)\(\s*"([^"]+)"|(?:TabBase|inflateFromXMLRes)\(\s*"xml/([^"]+)"', text):
             name = owner_at(text, m.start())
             if name:
-                class_xml.setdefault(name, m.group(1) or m.group(2))
+                class_xml.setdefault(name, []).append(m.group(1) or m.group(2))
         for m in re.finditer(r'BRLS_BIND\([^;]*?,\s*\w+\s*,\s*"([^"]+)"\s*\)', text):
             name = owner_at(text, m.start())
             if name:
@@ -340,6 +349,7 @@ for path in code_files:
     text = read(path)
     loaded_xml.update(re.findall(r'CONTENT_FROM_XML_RES\(\s*"([^"]+)"', text))
     loaded_xml.update(re.findall(r'"xml/([^"]+\.xml)"', text))   # TabBase, inflateFromXMLRes
+    loaded_xml.update(re.findall(r'createFromXMLResource\(\s*"([^"]+\.xml)"', text))
 
 xml_ids = {}    # XML path -> (ids, element names)
 for path in glob.glob(f"{xml_dir}/**/*.xml", recursive=True):
@@ -367,27 +377,46 @@ def ids_of(res, seen):
     ids, tags = xml_ids[res]
     out = set(ids)
     for tag in tags:
-        if tag in class_xml:
-            out |= ids_of(class_xml[tag], seen)
+        for inflated in class_xml.get(tag, []):
+            out |= ids_of(inflated, seen)
     return out
 
 
 for name, (path, binds) in sorted(class_binds.items()):
-    res = class_xml.get(name)
-    if res is None:
+    inflated = class_xml.get(name)
+    if not inflated:
         warnings.append(f"{path}: {name} binds views but no XML it inflates was found")
         continue
-    if res not in xml_ids:
+    missing = [res for res in inflated if res not in xml_ids]
+    for res in missing:
         errors.append(f"{path}: {name} inflates {res}, which is not in resources/xml")
+    if missing:
         continue
-    ids = ids_of(res, set())
+    ids = set()
+    for res in inflated:   # a screen may put one layout inside another
+        ids |= ids_of(res, set())
     for i in binds:
         if i not in ids:
-            errors.append(f"{path}: BRLS_BIND id \"{i}\" is not in resources/xml/{res}")
+            errors.append(f"{path}: BRLS_BIND id \"{i}\" is not in resources/xml/{' or '.join(inflated)}")
+
+# The lines a screen finds by id (getView, apply, tiles, banners, open_tab...):
+# each one an id some layout or the code still gives a view. A renamed line
+# is otherwise a chip or a button that does nothing. A literal counts as a
+# line's id when it starts like the layouts' ids do ("dash_", "cn_"...).
+all_ids = set()
+for path in glob.glob(f"{ROOT}/resources/xml/**/*.xml", recursive=True):
+    all_ids |= set(re.findall(r'\bid="([^"]+)"', read(path)))
+id_prefixes = {i.split("_")[0] for i in all_ids if "_" in i and "/" not in i}
+for text in code_text.values():
+    all_ids |= set(re.findall(r'setId\("([^"]+)"\)', text)) | set(re.findall(r'\bid="([^"]+)"', text))
+for path in sorted(set(glob.glob(f"{ROOT}/source/tab/*.cpp")) | set(glob.glob(f"{ROOT}/source/**/cadran_*.cpp", recursive=True))):
+    for i in sorted(set(re.findall(r'"([a-z]+_[a-z0-9_]+)"', read(path)))):
+        if i.split("_")[0] in id_prefixes and i not in all_ids:
+            errors.append(f"{path}: \"{i}\" names no view (no layout's id, no setId): a renamed line?")
 
 # XML layouts nothing loads.
 for res in sorted(set(xml_ids) - loaded_xml):
-    warnings.append(f"resources/xml/{res} is never loaded (no CONTENT_FROM_XML_RES, TabBase or inflateFromXMLRes)")
+    warnings.append(f"resources/xml/{res} is never loaded (no CONTENT_FROM_XML_RES, TabBase, inflateFromXMLRes or createFromXMLResource)")
 
 # Images nothing names ("img/x.png" in the code, "@res/img/x.png" in a layout).
 # The emoji are a palette for the release notes (img/emoji/README.md): an
@@ -445,14 +474,14 @@ for k in sorted(code_read - code_written):
     warnings.append(f"source/util/config.cpp reads `{k}` but never writes it (lost at the next save)")
 
 # CONTRIBUTING.md against the code: the simulator's PLAYGUARD_SIM_* variables
-# (read with getenv or sim_net::value) and the smoke scenarios of
+# (read with sim_env, getenv or sim_net::value) and the smoke scenarios of
 # tools/desktop_smoke.py (SCENARIO == "name"), against its list of them.
 contributing = read(f"{ROOT}/CONTRIBUTING.md")
 sim_read = set()
 for path, text in code_text.items():
-    sim_read |= set(re.findall(r'(?:getenv|sim_net::value)\(\s*"(PLAYGUARD_SIM_\w+)"', text))
+    sim_read |= set(re.findall(r'(?:sim_env|getenv|sim_net::value)\(\s*"(PLAYGUARD_SIM_\w+)"', text))
 for path in glob.glob(f"{ROOT}/source/**/*.[ch]", recursive=True):
-    sim_read |= set(re.findall(r'getenv\(\s*"(PLAYGUARD_SIM_\w+)"', read(path)))
+    sim_read |= set(re.findall(r'(?:sim_env|getenv)\(\s*"(PLAYGUARD_SIM_\w+)"', read(path)))
 sim_documented = set(re.findall(r"`(PLAYGUARD_SIM_\w+)", contributing))
 if not sim_read or not sim_documented:
     errors.append("no PLAYGUARD_SIM_* variable found in the code or in CONTRIBUTING.md")

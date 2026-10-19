@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Play timer: state, daily limit, profiles, bedtime, the extra-time
-     settings and a line to Advanced (activity/play_timer_advanced.xml). -->
+<!-- Play timer: the timer's warnings, the week's summary with the profile
+     and "same limit every day" chips, the week as the editor (the time played
+     in its bars) with its keys, the changes not saved yet, then bedtime,
+     time's up and removal as chips (pt_top); under them the day's actions,
+     when play is allowed again, the extra-time settings and a line to
+     Advanced (activity/play_timer_advanced.xml). -->
 
 <brls:Box
     width="auto"
@@ -25,20 +29,57 @@
             <brls:Label id="tab_ro_note" text="@i18n/playguard/common/read_only_note" fontSize="20" marginBottom="16" textColor="@theme/brand/warn"/>
             <brls:DetailCell id="pt_unlocked_banner" marginBottom="12"/>
             <PtStateHeader id="pt_state_header"/>
-            <brls:Header id="pt_week_header" title="@i18n/playguard/play_timer/week_title" marginTop="8" marginBottom="8"/>
-            <PtWeekView id="pt_week" width="auto" height="auto" marginBottom="12"/>
+            <brls:Box id="pt_top" axis="column" alignItems="stretch">
+                <brls:Box axis="row" alignItems="flexEnd" marginBottom="14">
+                    <brls:Box axis="column" alignItems="flexStart" grow="1.0" width="0" marginRight="12">
+                        <brls:Label id="pt_kicker" text="" fontSize="15" textColor="@theme/cadran/text3" marginBottom="6"/>
+                        <CadranDigits id="pt_week_summary" text="—" fontSize="28" fitWidth="520"/>
+                    </brls:Box>
+                    <brls:Box id="pt_profile" focusable="true" hideHighlightBackground="true" highlightCornerRadius="23" shrink="0" axis="row" alignItems="center" height="46" paddingLeft="18" paddingRight="18" cornerRadius="23" backgroundColor="@theme/cadran/surf2" borderColor="@theme/cadran/line" borderThickness="1" marginRight="10">
+                        <CadranIcon icon="list" width="18" height="18" marginRight="10"/>
+                        <brls:Label id="pt_profile_name" text="" fontSize="15" singleLine="true"/>
+                    </brls:Box>
+                    <brls:Box id="pt_uniform" focusable="true" hideHighlightBackground="true" highlightCornerRadius="23" shrink="0" axis="row" alignItems="center" height="46" paddingLeft="18" paddingRight="18" cornerRadius="23" backgroundColor="@theme/cadran/surf2" borderColor="@theme/cadran/line" borderThickness="1">
+                        <brls:Label text="@i18n/playguard/play_timer/quick" fontSize="15" singleLine="true"/>
+                    </brls:Box>
+                </brls:Box>
+
+                <!-- The week and its keys: view/cadran_week_card.xml, added here. -->
+                <brls:Box id="pt_week_card" axis="column" alignItems="stretch"/>
+
+                <brls:Box axis="row" alignItems="center" marginBottom="12" height="44">
+                    <brls:Rectangle id="pt_pending_dot" width="9" height="9" cornerRadius="4.5" color="@theme/cadran/amber_fill" marginRight="8"/>
+                    <brls:Label id="pt_pending" text="" fontSize="15" textColor="@theme/cadran/text3" grow="1.0" width="0" singleLine="true"/>
+                    <brls:Button id="pt_discard" style="bordered" text="@i18n/playguard/cadran/week/discard" fontSize="15" height="40" cornerRadius="20" highlightCornerRadius="20" paddingLeft="18" paddingRight="18" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line" borderThickness="2" marginRight="10"/>
+                    <brls:Button id="pt_save" style="primary" text="@i18n/playguard/play_timer/perday/section_save" fontSize="15" height="40" cornerRadius="20" highlightCornerRadius="22" paddingLeft="20" paddingRight="20"/>
+                </brls:Box>
+
+                <brls:Box id="pt_chips" axis="row" alignItems="center" marginBottom="8">
+                    <brls:Box id="pt_bed" focusable="true" hideHighlightBackground="true" highlightCornerRadius="23" shrink="0" axis="row" alignItems="center" height="46" paddingLeft="18" paddingRight="18" cornerRadius="23" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" marginRight="10" marginBottom="8">
+                        <CadranIcon icon="moon" width="18" height="18" marginRight="10"/>
+                        <brls:Label text="@i18n/playguard/play_timer/section_bedtime" fontSize="15" marginRight="8" singleLine="true"/>
+                        <CadranDigits id="pt_bed_value" text="—" fontSize="15" textColor="@theme/cadran/teal"/>
+                        <CadranIcon id="pt_bed_arrow" icon="chevron-right" width="14" height="14" color="@theme/cadran/teal" marginLeft="4" marginRight="4"/>
+                        <CadranDigits id="pt_bed_end" text="" fontSize="15" textColor="@theme/cadran/teal"/>
+                    </brls:Box>
+                    <brls:Box id="pt_time_up" focusable="true" hideHighlightBackground="true" highlightCornerRadius="23" shrink="0" axis="row" alignItems="center" height="46" paddingLeft="18" paddingRight="18" cornerRadius="23" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" marginRight="10" marginBottom="8">
+                        <CadranIcon icon="bell" width="18" height="18" marginRight="10"/>
+                        <brls:Label text="@i18n/playguard/play_timer/time_up" fontSize="15" marginRight="8" singleLine="true"/>
+                        <brls:Label id="pt_time_up_value" text="" fontSize="15" textColor="@theme/cadran/teal" singleLine="true"/>
+                    </brls:Box>
+                    <brls:Box id="pt_remove" focusable="true" hideHighlightBackground="true" highlightCornerRadius="23" shrink="0" axis="row" alignItems="center" height="46" paddingLeft="18" paddingRight="18" cornerRadius="23" borderColor="@theme/cadran/coral_line" borderThickness="2" marginBottom="8">
+                        <CadranIcon icon="trash" width="18" height="18" marginRight="10" color="@theme/cadran/coral"/>
+                        <brls:Label text="@i18n/playguard/cadran/week/remove" fontSize="15" textColor="@theme/cadran/coral" singleLine="true"/>
+                    </brls:Box>
+                </brls:Box>
+            </brls:Box>
             <brls:Label id="pt_fw_note" text="@i18n/playguard/play_timer/fw_too_old" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
             <brls:Header id="pt_limit_header" title="@i18n/playguard/play_timer/section_limit" marginBottom="8"/>
-            <brls:DetailCell id="pt_quick" title="@i18n/playguard/play_timer/quick"/>
             <brls:DetailCell id="pt_extra" title="@i18n/playguard/dashboard/extra"/>
             <brls:DetailCell id="pt_stop" title="@i18n/playguard/dashboard/stop"/>
             <brls:DetailCell id="pt_split" title="@i18n/playguard/play_timer/split"/>
-            <brls:DetailCell id="pt_remove" title="@i18n/playguard/play_timer/remove"/>
-            <brls:DetailCell id="pt_profiles" title="@i18n/playguard/play_timer/profiles"/>
-            <brls:DetailCell id="pt_time_up" title="@i18n/playguard/play_timer/time_up"/>
             <brls:Label id="pt_limit_note" text="@i18n/playguard/play_timer/limit_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
             <brls:Header id="pt_bedtime_header" title="@i18n/playguard/play_timer/section_bedtime" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="pt_bedtime" title="@i18n/playguard/play_timer/bedtime"/>
             <brls:DetailCell id="pt_bedtime_reset" title="@i18n/playguard/play_timer/bedtime_reset"/>
             <brls:Label id="pt_bedtime_note" text="@i18n/playguard/play_timer/bedtime_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
             <brls:Header id="pt_extra_header" title="@i18n/playguard/play_timer/section_extra" marginTop="24" marginBottom="8"/>

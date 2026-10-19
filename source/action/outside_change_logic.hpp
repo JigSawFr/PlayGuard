@@ -29,7 +29,7 @@ constexpr int64_t SPENT_SAVE_S = 300;
 // The clock offset is written back when it drifted at least this much.
 constexpr int64_t OFFSET_SAVE_S = 60;
 
-// What the Overview says, as bits.
+// What Today says, as bits.
 constexpr unsigned NOTICE_RESET  = 1;   // today's play time started over
 constexpr unsigned NOTICE_CLOCK  = 2;   // the console clock was changed
 constexpr unsigned NOTICE_LIMITS = 4;   // the limits were changed outside PlayGuard
@@ -56,7 +56,7 @@ struct Record
     std::string steady_id;          // the steady clock's source: another one is not compared
     bool        limits_known = false;
     uint16_t    limits[7] = {};     // Sun..Sat minutes, 65535 no limit
-    unsigned    notice = 0;         // NOTICE_* bits shown on the Overview
+    unsigned    notice = 0;         // NOTICE_* bits shown on Today
     std::string notice_date;        // the day they were seen: cleared the next day
     std::string reset_at;           // "HH:MM" the play time started over
     bool        accounts_known = false;   // the accounts were listed once
@@ -93,7 +93,7 @@ Findings check(Record& rec, const Observation& ob);
 // it reads next is taken as is, not as a change made outside.
 void own_change(Record& rec);
 
-// The Overview's notice was dismissed.
+// Today's notice was dismissed.
 void dismiss(Record& rec);
 
 // The console's user accounts now (`ids`, as KnownAccount::id), on `date`:

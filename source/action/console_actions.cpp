@@ -6,6 +6,7 @@
 
 #include "action/backup_flow.hpp"
 #include "action/history_flow.hpp"
+#include "action/pairing_state.hpp"
 #include "ui/ui.hpp"
 #include "util/pctl_ops_c.hpp"
 
@@ -40,8 +41,12 @@ void set_pin(const std::string& source, std::function<void()> after)
 void unlink(const std::string& source, std::function<void()> after)
 {
     if (ui::refuse_read_only()) return;
-    // The block comparison needs the link: last chance to help decode the settings.
-    const std::string body = "playguard/pairing/unlink_body"_i18n + "\n\n" + "playguard/pairing/decode_note"_i18n;
+    // The block comparison needs the link: last chance to help decode the
+    // settings. With Atmosphère's DNS blocking its server, the app neither
+    // overwrites anything nor helps decode: the question alone.
+    const std::string question = "playguard/pairing/unlink_body"_i18n;
+    const std::string body = pairing_state::dns_blocked() ? question.substr(0, question.find("\n\n"))
+                                                          : question + "\n\n" + "playguard/pairing/decode_note"_i18n;
     ui::confirm_danger(body, "playguard/pairing/unlink_confirm"_i18n, [source, after]() {
         Result rc = pctl_delete_pairing();
         record("unlink", rc, source);

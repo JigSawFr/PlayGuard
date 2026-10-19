@@ -5,16 +5,20 @@
 #include "action/update_flow.hpp"
 #include "app.hpp"
 #include "tab/help_tab.hpp"
+#include "ui/cadran_frame.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
+#include "view/cadran_digits.hpp"
 #include "view/funding.hpp"
 
 using namespace brls::literals;
 
 AboutTab::AboutTab()
-    : TabBase("xml/tab/about.xml", false)
+    : TabBase("xml/tab/about.xml", false), list(this)
 {
+    namespace kit = cadran::kit;
     support_note->setSingleLine(false);
     // Every version's notes, from the releases on GitHub, as for Atmosphère
     // and hekate on their rows in Console: the installed one, the newer and
@@ -63,6 +67,46 @@ AboutTab::AboutTab()
     license->setDetailText("GPLv3");
     source->setDetailText(app::repo_url());
     funding->addView(funding::cards(180, true));
+    // The mark, the name and the version first.
+    if (brls::Box* column = this->list.content()) {
+        brls::Box* hero = kit::top_card(false);
+        hero->setAxis(brls::Axis::ROW);
+        hero->setAlignItems(brls::AlignItems::CENTER);
+        hero->setMarginTop(10);
+        hero->setMarginBottom(6);
+        hero->setPadding(24, 30, 24, 30);
+        auto* badge = new brls::Box(brls::Axis::ROW);
+        badge->setWidth(84);
+        badge->setHeight(84);
+        badge->setCornerRadius(24);
+        badge->setShrink(0);
+        badge->setBackgroundColor(brls::Application::getTheme()["cadran/teal_soft"]);
+        badge->setAlignItems(brls::AlignItems::CENTER);
+        badge->setJustifyContent(brls::JustifyContent::CENTER);
+        badge->setMarginRight(22);
+        badge->addView(kit::icon("mark", 52, "cadran/teal"));
+        hero->addView(badge);
+        auto* text = new brls::Box(brls::Axis::COLUMN);
+        text->setGrow(1.0f);
+        text->setWidth(0);
+        auto* name = new CadranDigits();
+        name->setText("PlayGuard");
+        name->setFontSize(36);
+        text->addView(name);
+        this->version_line = kit::label("", 16, "cadran/text2");
+        this->version_line->setMarginTop(4);
+        text->addView(this->version_line);
+        brls::Label* tagline = kit::label("playguard/cadran/about/tagline"_i18n, 15, "cadran/text3");
+        tagline->setMarginTop(6);
+        text->addView(tagline);
+        hero->addView(text);
+        column->addView(hero, 0);
+    }
+    this->list.apply({ { "ab_version", "info" }, { "ab_mode", "gamepad" }, { "ab_data", "folder" },
+                       { "ab_update", "download" }, { "ab_update_daily", "calendar" }, { "ab_update_via", "server" },
+                       { "ab_help", "tools" },
+                       { "ab_author", "user" }, { "ab_upstream", "flag" }, { "ab_fixes", "check" }, { "ab_ui", "contrast" },
+                       { "ab_license", "file" }, { "ab_source", "code" } });
 }
 
 void AboutTab::count_version_press()
@@ -106,6 +150,12 @@ void AboutTab::refresh()
     version->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
     mode->setDetailText(si.applet_mode ? "playguard/tools/mode_applet"_i18n : "playguard/tools/mode_app"_i18n);
     data->setDetailText(paths::data_dir());
+    this->list.sync();
+    if (this->version_line) {
+        const std::string version = app::commit().empty() ? app::version() : app::version() + " · " + app::commit();
+        this->version_line->setText(brls::getStr("playguard/cadran/about/version", version));
+    }
+    cadran::set_pill("");
 }
 
 brls::View* AboutTab::create()

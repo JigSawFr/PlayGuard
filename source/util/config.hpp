@@ -14,12 +14,19 @@ struct Config
 {
     std::string language = "system";   // "system" or one of LANGUAGES
     std::string theme    = "system";   // "system", "light", "dark"
+    // The text: "auto" (larger while docked), "normal" or "large"
+    // (ui/text_size).
+    std::string text_size = "auto";
+    // "auto" (lighter effects on the battery) or "full" (ui/effects).
+    std::string effects = "auto";
     std::string ntp_server;            // empty: pick from the console region
     std::vector<std::string> custom_servers;
     bool advanced = false;             // show debug-class play-timer actions
     bool auto_relock = true;           // lock again right after a change that needed an unlock
     bool dev_mode = false;             // developer tools (7 presses on About > Version)
     bool pt_log = false;               // Developer › record the play timer (action/pt_log_flow)
+    bool frame_stats = false;          // Developer › frame statistics (action/frame_stats_flow)
+    bool cadran_glow = true;           // Developer › the Cadran screens' background glow
     // How an update is installed: "" (not chosen yet: asked on the first
     // update), "inplace" (PlayGuard downloads it and replaces itself),
     // "auto", "sphaira", "appstore", "manual".
@@ -40,7 +47,7 @@ struct Config
     std::string sys_checked;
     std::string start_tab = "dashboard";   // tab shown at start-up (main.xml order: START_TABS)
     std::vector<int> extra_amounts = { 15, 30, 60 };   // "Extra time today" choices, minutes
-    int  activity_period = 1;          // Activity's period: 0 today, 1 last 7 days, 2 all time
+    int  activity_period = 1;          // Activity's period: 0 today, 1 last 7 days, 2 all time, 3 last 30 days
     bool games_grid      = true;       // Activity › All games as covers (false: a list)
     bool check_grid      = false;      // Console › Check the installed games as covers (false: a list)
     // Activity's account when PlayGuard starts: "last" (the one shown last,
@@ -120,6 +127,24 @@ struct Config
     std::string extra_date;
     int         extra_base  = 0;
     int         extra_value = 0;
+    // Extra time planned for a later day (Today › Extra time › Another day):
+    // weekday bonus_weekday's limit raised from bonus_base to bonus_value
+    // minutes for bonus_date (YYYY-MM-DD) only, put back once that day is
+    // over. bonus_weekday < 0: none planned.
+    int         bonus_weekday = -1;
+    std::string bonus_date;
+    int         bonus_base  = 0;
+    int         bonus_value = 0;
+    // A profile scheduled for a period (Play timer › Profiles › Scheduled
+    // profile): the profile's file and name, the period (both days included),
+    // whether it was put in force, and then the limits it replaced (Sun..Sat,
+    // to offer back once the period is over). schedule_from empty: none.
+    std::string schedule_file;
+    std::string schedule_name;
+    std::string schedule_from;
+    std::string schedule_to;
+    bool        schedule_applied = false;
+    std::vector<int> schedule_prev;
     // Put that limit back by itself the next day (when the timer needs the
     // temporary unlock, that is still asked) instead of asking keep / put back.
     bool        extra_auto_restore = false;
@@ -138,6 +163,10 @@ constexpr int    SCHEMA             = 1;    // "schema" in config.json
 constexpr const char* LANGUAGES[] = { "system", "en-US", "fr", "fr-CA", "de", "es", "es-419", "it", "nl", "pt", "pt-BR", "ru", "ja", "ko", "zh-Hans", "zh-Hant" };
 // What theme may be: the console's own, then the two forced ones.
 constexpr const char* THEMES[] = { "system", "light", "dark" };
+// What text_size may be: the default first.
+constexpr const char* TEXT_SIZES[] = { "auto", "normal", "large" };
+// What effects may be: the default first.
+constexpr const char* EFFECTS[] = { "auto", "full" };
 // What start_tab may be, in the sidebar's order.
 constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "restrictions",
                                        "security", "console", "history", "preferences", "about" };

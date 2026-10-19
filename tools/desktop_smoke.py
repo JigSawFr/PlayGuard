@@ -2,11 +2,11 @@
 """Headless UI smoke test of the desktop build (simulated backend).
 
 Starts build-desktop/playguard on an X display (Xvfb), opens every tab, the
-extra-time picker, the per-day editor (the week chart's day picker and the
-number pad), a bedtime alarm change, the settings backup and the change
-history (filtered, then not), and fails if the app dies on the way (borealis
-throws on unknown XML attributes, missing views, …). Screenshots of each
-screen are written to the output folder.
+extra-time picker, the per-day editor (a day's picker and the stepper of an
+exact duration), the time-up choice, a bedtime alarm change, the settings
+backup and the change history (filtered, then not), and fails if the app
+dies on the way (borealis throws on unknown XML attributes, missing views,
+…). Screenshots of each screen are written to the output folder.
 
 The "games" scenario is the rest of that tour, in a run of its own so CI can
 run both halves side by side: a report sent online (GitHub sign-in first),
@@ -44,14 +44,14 @@ tab must then offer the console clock instead, and set it once confirmed.
 The "outside" scenario starts with a watch.json from an earlier run that the
 console no longer matches (more time played, another clock offset, other
 limits, one of the two accounts unknown) and a time left that does not go
-down (PLAYGUARD_SIM_NOT_COUNTING): the Overview must say what changed
+down (PLAYGUARD_SIM_NOT_COUNTING): Today must say what changed
 outside PlayGuard, record it in the change history, then, after 90 s on
 screen, that the console is not counting; the notice must go when
 dismissed, and the Activity tab flag the new account.
 
 The "alarm" scenario starts with "When the time is up" on a warning only and
 today's limit passed (PLAYGUARD_SIM_ALARM_ONLY, PLAYGUARD_SIM_RESTRICTED):
-the Overview and the Play timer tab must show the time over the limit.
+Today and the Play timer tab must show the time over the limit.
 
 The "sysnotes" scenario checks for updates at start-up against a simulated
 GitHub and switchbrew (PLAYGUARD_SIM_SYS_LATEST, PLAYGUARD_SIM_SYS_NOTES),
@@ -61,12 +61,25 @@ release notes of the firmware (the closest newer version, then the
 installed one), of Atmosphère, of hekate and, from About, of PlayGuard
 itself, and keep them in the cache.
 
+The "cadran" scenario tours the boards on top of the tabs: every tab, then
+the child screen and back with the PIN, a day of the week edited with the
+stick and saved, a restriction level's confirmation, the text size, the
+network clock's screen, a game's screen from its card and the notification
+bell's list. The "cadranstates" one shows Cadran's Today and
+Play timer in the states "alarm" and "outside" set up, together: the time
+over the limit (a warning only) and the changes made outside PlayGuard. The
+"cadranunlocked" one shows them while parental controls are temporarily
+unlocked: "Turn back on" first on Today, the header's pill saying so. The
+"cadranlarge" one shows Today, the Play timer, Activity and the child screen
+with Preferences › Text size › Larger (as on a TV): Today on one screen, the
+child screen keeping its own sizes.
+
 The "loading" scenario stops the start-up on the loading screen
 (PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes]   (needs DISPLAY, xdotool, ImageMagick)
+Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -99,6 +112,10 @@ ALARM = SCENARIO == "alarm"
 SYSNOTES = SCENARIO == "sysnotes"
 ROLLBACK = SCENARIO == "rollback"
 GAMES = SCENARIO == "games"
+CADRAN = SCENARIO == "cadran"
+CADRANSTATES = SCENARIO == "cadranstates"
+CADRANUNLOCKED = SCENARIO == "cadranunlocked"
+CADRANLARGE = SCENARIO == "cadranlarge"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
@@ -273,12 +290,11 @@ if UPDATE:
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
     json.dump({"schema": 1, "update_daily": True}, open(config_file, "w"))
 if not GATE and not ERRORS and not DEVBUILD and not UPDATE:
-    env.setdefault("PLAYGUARD_SIM_NUMPAD", "1:30")   # what the system number pad returns
     env.setdefault("PLAYGUARD_SIM_PASTE", "https://gist.github.com/smoke/ab12")   # what GitHub answers
     github_token = os.path.join(run_dir, "playguard_data", "github_token")
     if os.path.exists(github_token):
         os.remove(github_token)   # signed out: Send a report online offers to sign in first
-if ALARM:
+if ALARM or CADRANSTATES:
     # "When the time is up" on a warning only, today's limit passed: the
     # console does not restrict, and its time left reads below 0.
     env.setdefault("PLAYGUARD_SIM_ALARM_ONLY", "1")
@@ -328,11 +344,20 @@ if FORGED:
     os.makedirs(os.path.dirname(report), exist_ok=True)
     open(report, "w").write("mode=unlock\nresult=ok\nrc=0x00000000\nunlocks=1\n")
     json.dump({"schema": 1, "pin_lock": "open"}, open(config_file, "w"))
+if CADRANUNLOCKED:
+    # A parent unlocked parental controls for now (1453 answers false).
+    env.setdefault("PLAYGUARD_SIM_UNLOCKED", "1")
+    os.makedirs(os.path.dirname(config_file), exist_ok=True)
+    json.dump({"schema": 1, "pin_lock": "open"}, open(config_file, "w"))
+if CADRANLARGE:
+    # The text 25 % bigger, as the console docked draws it by default.
+    os.makedirs(os.path.dirname(config_file), exist_ok=True)
+    json.dump({"schema": 1, "text_size": "large"}, open(config_file, "w"))
 if LIBRARY:
     # A large library: All games builds its first covers, then the rest on
     # "Show every game".
     env.setdefault("PLAYGUARD_SIM_GAMES", "120")
-if OUTSIDE:
+if OUTSIDE or CADRANSTATES:
     # What PlayGuard saw last time (outside_change_logic): 100 min played
     # today (the console says 80), a clock 15 min off the steady one (the
     # simulated steady clock's source is 16 bytes of 0x53), 1 h 30 on
@@ -720,7 +745,7 @@ if GATE:
     shot("05_dev_tools")
     # Turning a developer switch off asks first; B keeps it on (the end of
     # the scenario checks developer mode was saved on).
-    key("Up", 8)               # past the cleanup cells and the recorder: Read-only mode
+    key("Up", 10)              # past the cleanup cells, the glow and statistics switches and the recorder: Read-only mode
     key("Return")
     shot("06a_read_only_off")  # untested firmware: the "own risk" warning
     key("Escape")
@@ -728,7 +753,7 @@ if GATE:
     key("Return")
     shot("06b_dev_mode_off")
     key("Escape")
-    key("Down", 5)             # Read-only, the recorder, the two cleanup cells: Show the diagnostic report
+    key("Down", 7)             # Read-only, the recorder, the statistics and glow switches, the two cleanup cells: Show the diagnostic report
     key("Return")
     shot("06_dev_report")
     key("Escape")
@@ -943,10 +968,10 @@ if UPDATE:
         fail("the way to update was not saved")
     finish()
 if ERRORS:
-    shot("01_limit_reached")   # Overview: today's limit reached
+    shot("01_limit_reached")   # Today: today's limit reached
     key("Down")                # Play timer: the state line says the limit is reached
-    key("Right")               # the week chart (today)
-    key("Down")                # Same limit every day
+    key("Right")               # the profile chip
+    key("Right")               # Same limit every day
     key("Return")
     shot("02_picker")          # the days differ: "Custom…" is selected
     key("Up")                  # No play (0 min)
@@ -956,7 +981,7 @@ if ERRORS:
     key("Return")
     shot("04_unlock_failed")   # a dialog, not a toast
     key("Return")              # OK
-    key("Left")                # back to the sidebar
+    key("Left", 2)             # the profile chip, then the sidebar
     key("Down", steps("play_timer", "console"))
     key("Right")               # Network clock, its own screen
     key("Return")
@@ -999,8 +1024,9 @@ if LIBRARY:
         return [l.split("games list: ", 1)[1].strip()
                 for l in open(os.path.join(OUT, "app.log"), errors="replace") if "games list: " in l]
     key("Down", steps("dashboard", "activity"))
-    key("Right")               # Account (the simulated console has two)
-    key("Down", 4)             # a scroll, then past Account by default and Period: All games
+    key("Right")               # Every account, the first chip
+    key_to_end("Down", hold=0.15)   # the end of the tab, the focus on its last line (the QR code)
+    key("Up", 3)               # scrolled back to that line, then All games
     key("Return")
     shot("01_games")           # the covers, the first one's figures on top
     if not listed() or not listed()[-1].startswith("50 of ") or not listed()[-1].endswith("(grid)"):
@@ -1030,7 +1056,7 @@ if OUTSIDE:
     for kind in ("outside_reset", "outside_clock", "outside_limits", "new_account"):
         if kinds.count(kind) != 1:
             fail(f"{kind} recorded {kinds.count(kind)} times in the history: {kinds!r}")
-    # The time left stays the same: after 90 s on screen, the Overview says
+    # The time left stays the same: after 90 s on screen, Today says
     # the console is not counting.
     for _ in range(150):
         if "timer health: not counting" in log_text():
@@ -1039,7 +1065,7 @@ if OUTSIDE:
             fail("app exited while waiting for the timer health check")
         time.sleep(1)
     else:
-        fail("the Overview never said the console is not counting")
+        fail("Today never said the console is not counting")
     time.sleep(6)              # the next refresh shows it
     shot("02_not_counting")
     key("y")                   # the notification bell's list (the keyboard's Y): both, the
@@ -1072,7 +1098,7 @@ if OUTSIDE:
     shot("04_play_timer_not_counting")
     key("Down")                # off the week chart (←/→ pick a day there)
     key("Left")
-    key("Up")                  # back to the Overview, on the notice's Dismiss line
+    key("Up")                  # back to Today, on the notice's Dismiss line
     key("Right")
     key("Return")
     shot("05_dismissed")
@@ -1089,8 +1115,138 @@ if OUTSIDE:
     key("Right")
     shot("06_new_account")
     finish()
+if CADRAN:
+    shot("01_today")
+    for i, tab in enumerate(tabs[1:], start=2):
+        key("Down")
+        key("Right")
+        shot(f"{i:02d}_{tab}")
+        key("Down", 12)        # scroll through the whole tab
+        shot(f"{i:02d}_{tab}_end")
+        key("Left")            # back to the sidebar
+
+    # The child screen, then back to the parent's with the PIN (the simulated
+    # PIN screen accepts at once).
+    key("Up", steps("dashboard", tabs[-1]))
+    key("Right")               # Extra time, the hero's first action
+    key("Down")                # Stop for today
+    key("Right")               # Show the child
+    key("Return")
+    time.sleep(1)              # the screen's own entrance over
+    shot("11_child")
+    key("Return")              # A: back to the parent, the PIN first
+    time.sleep(1)
+    if not alive() or not logged("pctl_ask_pin returned"):
+        fail("the child screen did not ask for the PIN to go back")
+    shot("12_today_again")
+
+    # The week edited with the stick: Monday +30 min, saved with the unlock the
+    # running timer needs.
+    key("Left", 3)             # the sidebar (Escape there would ask to quit)
+    key("Down", steps("dashboard", "play_timer"))
+    key("Right")               # the profile chip
+    key("Down")                # the week, on Monday
+    key("Return")              # A: edit the day
+    key("Up", 2)               # +30 min
+    shot("13_week_edit")
+    key("Return")              # A: done
+    key("Down")                # Discard, then Save
+    key("Right")
+    key("Return")
+    shot("14_week_confirm")
+    key("Right")               # Unlock and apply
+    key("Return")
+    time.sleep(1)
+    written = json.load(open(os.path.join(ROOT, "resources", "i18n", "en-US", "playguard.json")))["play_timer"]["written_days"]
+    if not any(m.startswith(written) for m in messages()):
+        fail("the week's change was not saved: " + repr(messages()[-3:]))
+    time.sleep(3.5)            # the toast gone: the next screen is a reference
+    shot("15_week_saved")
+
+    # A restriction level from its tile: the confirmation, cancelled.
+    key("Left", 2)
+    key("Down", steps("play_timer", "restrictions"))
+    key("Right")               # Young child, the first tile
+    key("Right", 2)            # Teen
+    key("Return")
+    shot("16_level_confirm")
+    key("Escape")
+
+    # Preferences › Text size: its three choices.
+    key("Left", 3)
+    key("Down", steps("restrictions", "preferences"))
+    key("Right")               # Language, the first tile
+    key("Right", 2)            # Text size
+    key("Return")
+    shot("17_text_size")
+    key("Escape")
+
+    # Console › Network clock: both clocks large.
+    key("Left", 3)
+    key("Up", steps("console", "preferences"))
+    key("Right")               # Network clock, the first line
+    key("Return")
+    time.sleep(1)              # the screen's own entrance over
+    shot("18_clock")
+    key("Escape")
+
+    # Activity: a game's own screen from its card.
+    key("Left")
+    key("Up", steps("activity", "console"))
+    key("Right")               # Every account, the first chip
+    key("Down")                # the first game's card
+    key("Return")
+    time.sleep(1)              # the screen's own entrance over
+    shot("19_game")
+    key("Escape")
+
+    # The notification bell's list (Y, the keyboard's y), its entries in cards.
+    key("y")
+    time.sleep(1)              # the screen's own entrance over
+    shot("20_notices")
+    key("Escape")
+    finish()
+if CADRANSTATES:
+    # Today and the Play timer in the states "alarm" and "outside" set up:
+    # the time over the limit (a warning only) and the changes made outside
+    # PlayGuard.
+    shot("01_today")
+    key("Down")
+    key("Right")
+    shot("02_play_timer")
+    finish()
+if CADRANUNLOCKED:
+    # Parental controls temporarily unlocked: Today offers to turn them back
+    # on first, the pill says so on every tab.
+    key("Right")               # Today's first action: Turn back on
+    shot("01_today")
+    key("Left")
+    key("Down")
+    key("Right")
+    shot("02_play_timer")
+    finish()
+if CADRANLARGE:
+    # Larger text: Today still on one screen, the other tabs' tops laid out
+    # again, the child screen at its own sizes.
+    shot("01_today")
+    key("Down")                # Play timer
+    key("Right")
+    shot("02_play_timer")
+    key("Left")
+    key("Down")                # Activity
+    key("Right")
+    shot("03_activity")
+    key("Left")
+    key("Up", 2)               # Today
+    key("Right")               # Extra time, the hero's first action
+    key("Down")                # Stop for today
+    key("Right")               # Show the child
+    key("Return")
+    time.sleep(1)              # the screen's own entrance over
+    shot("04_child")
+    finish()
 if ALARM:
-    shot("01_overview_over")   # Overview: the time over the limit, not a time left
+    shot("01_overview_over")   # Today: the time over the limit, not a time left
     key("Down")                # Play timer: the state line and the banner say so
     shot("02_play_timer_over")
     finish()
@@ -1106,9 +1262,8 @@ if SYSNOTES:
     wait_logged("release notes: lists kept", "release lists from the start-up check")
     key("Down", steps("dashboard", "console"))
     key("Right")               # Network clock
-    key("Down", 4)             # past the installed games, Firmware, Atmosphère: hekate, the warning under it
-    shot("01_tools_console")   # 2 versions behind, and 23.0.1 needs hekate 6.5.4 first
-    key("Up", 2)               # Firmware
+    shot("01_tools_console")   # the tiles: 2 versions behind, and 23.0.1 needs hekate 6.5.4 first
+    key("Up")                  # Firmware, the first tile
     key("Return")
     wait_logged("release notes: firmware fetched", "firmware notes")
     shot("02_firmware_next")   # the closest newer one, 23.0.0: security fixes, parental controls changed
@@ -1116,19 +1271,20 @@ if SYSNOTES:
     key("Return")
     shot("03_firmware_installed")
     key("Escape")
-    key("Down")                # Atmosphère
+    key("Right")               # Atmosphère
     key("Return")
     # Its list came with the start-up check, today: shown, not fetched again.
     wait_logged("release notes: atmosphere opened", "Atmosphère notes")
     shot("04_atmosphere")
     key("Escape")
-    key("Down")                # hekate
+    key("Right")               # hekate
     key("Return")
     wait_logged("release notes: hekate opened", "hekate notes")
     shot("05_hekate")
     # PlayGuard's own, from About › Version (its first line): the closest
     # newer one first.
     key("Escape")
+    key("Down")                # off the tiles' row
     key("Left")
     key("Down", steps("console", "about"))
     key("Right")
@@ -1167,7 +1323,7 @@ if LOADING:
     shot("01_loading")         # the icon, the wordmark, the bar at its last step
     finish()
 if LOCK:
-    shot("01_unlocked")        # the PIN screen answered at once: the Overview
+    shot("01_unlocked")        # the PIN screen answered at once: Today
     if not main_opened():
         fail("the right PIN left the lock screen up; messages: " + repr(messages()))
     finish()
@@ -1191,7 +1347,7 @@ if RESCUE:
     shot("01_recovery")        # the recovery screen, in place of the usual first screen
     key("Down", 2)             # past Set a new PIN / Delete: Open PlayGuard
     key("Return")              # proceed to the app
-    shot("02_opened")          # the Overview: the app opened after the rescue
+    shot("02_opened")          # Today: the app opened after the rescue
     if not alive():
         fail("app exited instead of opening after recovery")
     if not main_opened():
@@ -1254,31 +1410,12 @@ if not GAMES:
         shot(f"{i:02d}_{tab}_end")
         key("Left")       # back to the sidebar
 
-    # The per-day editor, opened from the tab's week chart on the day picked
-    # (its picker already open), then the extra-time picker and the
-    # Weekdays and weekend row (the editor, Monday–Friday picker first).
+    # Play timer: the extra-time picker, then the per-day editor from Weekdays
+    # and weekend (its Monday–Friday picker first), a day's picker there and
+    # an exact duration with the stepper, discarded.
     key("Up", steps("play_timer", tabs[-1]))   # from the last tab back to Play timer
-    key("Right")               # the week chart, on today
-    key("Right")               # tomorrow's day
-    key("Return")              # the per-day editor on that day, its picker open
-    shot("19_day_picker")
-    key("Escape")
-    shot("21_per_day")         # the editor, tomorrow focused
-    key("Return")              # tomorrow's limit again
-    shot("22_dropdown")
-    key("Down", 15)            # to the end of the list (No limit) …
-    key("Up")                  # … then Enter minutes…: the number pad types "1:30"
-    key("Return")
-    shot("22_numpad")          # tomorrow: 1 h 30, drawn as unsaved; "+ Save (1)" in the footer
-    if not any("numpad: " in l and l.rstrip().endswith("-> 1:30") for l in open(os.path.join(OUT, "app.log"), errors="replace")):
-        fail("the number pad was not asked for the minutes")
-    key("Escape")              # unsaved: asks before leaving
-    shot("23_discard")
-    key("Right")               # Discard
-    key("Return")
-    shot("23_back")            # the tab, on the chart again
-    key("Down")                # Same limit every day
-    key("Down")                # Extra time today…
+    key("Right")               # the profile chip
+    key("Down", 3)             # the week, the bedtime chip: Extra time today...
     key("Return")
     shot("20_extra_time")
     key("Escape")
@@ -1286,11 +1423,26 @@ if not GAMES:
     key("Return")
     shot("21_split")           # the editor, Monday–Friday picker open
     key("Escape")              # no value: no weekend picker either
-    key("Escape")              # nothing staged: leaves without asking
+    shot("21_per_day")         # the editor, on Monday
+    button_x()                 # Ⓧ: Monday's picker
+    shot("19_day_picker")
+    key("Down", 15)            # to the end of the list (No limit) …
+    key("Up")                  # … then Enter a duration...: the stepper
+    key("Return")
+    shot("22_stepper")
+    key("Up", 2)               # 2 h → 2 h 30
+    key("Return")              # OK
+    shot("22_staged")          # Monday: 2 h 30, drawn as unsaved; "+ Save (1)" in the footer
+    key("Escape")              # unsaved: asks before leaving
+    shot("23_discard")
+    key("Right")               # Discard
+    key("Return")
+    shot("23_back")            # the tab, on Weekdays and weekend again
 
     # When the time is up: its two choices (on "Suspend the software"), and the
     # confirmation of the other one, cancelled.
-    key("Down", 3)             # past Remove and Profiles…: When the time is up
+    key("Up", 3)               # No more play today, Extra time today: the bedtime chip
+    key("Right")               # When the time is up
     key("Return")
     shot("23_time_up_picker")
     key("Down")                # Warning only: a long confirmation, with the unlock
@@ -1300,7 +1452,7 @@ if not GAMES:
 
     # Bedtime: the alarm picker (on 21:00), 21:30, confirmed with the unlock the
     # running timer needs; the tab must then show it.
-    key("Down")                # Bedtime alarm
+    key("Left")                # the bedtime chip
     key("Return")
     shot("23_bedtime_picker")
     key("Down", 2)             # 21:30
@@ -1312,9 +1464,25 @@ if not GAMES:
     if not any(m.startswith("Bedtime alarm changed.") for m in messages()):
         fail("the bedtime alarm was not changed: " + repr(messages()[-3:]))
 
+    # By day of the week (the list's last line): the weekend alone at 22:30;
+    # the weekdays keep 21:30, and the tab says the days differ.
+    key("Return")
+    key("Down", 12)            # By day of the week...
+    key("Return")
+    shot("23_bedtime_by_day")  # each set of days with its time
+    key("Down")                # Saturday and Sunday
+    key("Return")
+    key("Down", 4)             # 21:30 → 22:30
+    key("Return")
+    key("Right")               # Unlock and apply
+    key("Return")
+    if sum(m.startswith("Bedtime alarm changed.") for m in messages()) < 2:
+        fail("the weekend's bedtime alarm was not changed: " + repr(messages()[-3:]))
+    time.sleep(4.5)            # its toast gone: the next screens are references
+
     # Play timer › Advanced: its own screen, the switch next to the actions it
     # shows; turned on, then off again (backups restore the alarm only with it on).
-    key("Down", 4)             # past Allowed again at, the extra-time amounts and switch: Advanced
+    key("Down", 7)             # past the day's lines, Allowed again at, the extra-time amounts and switch: Advanced
     key("Return")
     shot("23_advanced")
     def advanced_saved(on):
@@ -1340,14 +1508,14 @@ if not GAMES:
     key("Left")                # back to the sidebar
     key("Down", steps("play_timer", "history"))
     key("Right")               # Changes made with PlayGuard
-    key("Down")                # Back up the settings
+    key("Down")                # Back up the settings, the first tile
     backups = os.path.join(nand_dir, "backups")
     before = len(os.listdir(backups)) if os.path.isdir(backups) else 0
     key("Return")              # Back up the settings
     shot("24_backup_saved")
     if (len(os.listdir(backups)) if os.path.isdir(backups) else 0) != before + 1:
         fail("Return on 'Back up the settings' saved no backup (wrong cell focused?)")
-    key("Down")                # Restore a backup…
+    key("Right")               # Restore a backup...
     key("Return")
     shot("25_backup_list")
     key("Return")
@@ -1355,7 +1523,7 @@ if not GAMES:
     key("Escape")
     shot("27_back")
 
-    # The change history (the bedtime alarm changed above): every change,
+    # The change history (the bedtime alarm changed twice above): every change,
     # then only the refused ones (none: the line hidden), then every change
     # again (the same line shown again).
     def history_listed(text, times=1):
@@ -1366,27 +1534,27 @@ if not GAMES:
                 return True
             time.sleep(0.25)
         return False
-    key("Up", 2)               # Changes made with PlayGuard
+    key("Up")                  # Changes made with PlayGuard
     key("Return")
     shot("27_history")
-    if not history_listed("1 of 1 changes"):
-        fail("the change history did not list the bedtime alarm change")
+    if not history_listed("2 of 2 changes"):
+        fail("the change history did not list the bedtime alarm changes")
     key("Return")              # Show: the kinds of change
     key("Down", 5)             # Refused by the console
     key("Return")
     shot("27_history_refused")
-    if not history_listed("0 of 1 changes"):
+    if not history_listed("0 of 2 changes"):
         fail("the change history did not filter the refused changes")
     key("Return")
     key("Up", 5)               # Everything
     key("Return")
-    if not history_listed("1 of 1 changes", times=2):
+    if not history_listed("2 of 2 changes", times=2):
         fail("the change history did not list every change again")
     shot("27_history_again")
     key("Escape")
     finish()
 
-# The "games" scenario, from the sidebar on the Overview.
+# The "games" scenario, from the sidebar on Today.
 # Send a report online: signing in to GitHub first, the confirmation, then the link and its QR codes.
 uploads = os.path.join(run_dir, "playguard_data", "logs", "uploads")
 def upload_count():
@@ -1587,8 +1755,9 @@ def pdfs():
 pdfs_before = pdfs()   # the run folder is kept between local runs
 key("Left")                # back to the sidebar
 key("Up", steps("activity", "console"))
-key("Right")               # Account (the simulated console has two; the totals are not focusable)
-key("Down", 4)             # a scroll, then past Account by default and Period: All games
+key("Right")               # Every account, the first chip
+key_to_end("Down", hold=0.15)   # the end of the tab, the focus on its last line (the QR code)
+key("Up", 3)               # scrolled back to that line, then All games
 key("Return")              # the covers, on the first game
 shot("28_activity_games")
 key("Return")
@@ -1600,7 +1769,8 @@ key("y")                   # All games as a list
 shot("28c_activity_games_list")
 key("y")                   # covers again (the config keeps the choice)
 key("Escape")
-key("Down")                # Export to the SD card…
+key_to_end("Up", hold=0.15)   # the top: the accounts' chips
+key_to_end("Right")        # the row's last chip: Export
 key("Return")
 key("Down", 3)             # PDF
 key("Return")

@@ -5,31 +5,24 @@
 #include <malloc.h>
 #include <stdio.h>
 
-PlatformInput platform_numpad(const char *header, const char *guide, const char *initial, int max_len,
-                              char *out, size_t out_size)
-{
-    if (!out || out_size == 0) return PLATFORM_INPUT_CANCELLED;
-    out[0] = '\0';
-    // The number pad with a ':' key, so "1:30" can be typed. borealis'
-    // openForNumber reads the result with stoll and would stop at the colon.
-    SwkbdConfig kbd;
-    if (R_FAILED(swkbdCreate(&kbd, 0))) return PLATFORM_INPUT_NONE;
-    swkbdConfigMakePresetDefault(&kbd);
-    swkbdConfigSetType(&kbd, SwkbdType_NumPad);
-    swkbdConfigSetLeftOptionalSymbolKey(&kbd, ":");
-    swkbdConfigSetHeaderText(&kbd, header);
-    swkbdConfigSetSubText(&kbd, guide);
-    swkbdConfigSetStringLenMax(&kbd, (u32)max_len);
-    swkbdConfigSetInitialText(&kbd, initial);
-    swkbdConfigSetBlurBackground(&kbd, true);
-    const Result rc = swkbdShow(&kbd, out, out_size);
-    swkbdClose(&kbd);
-    return R_SUCCEEDED(rc) && out[0] ? PLATFORM_INPUT_OK : PLATFORM_INPUT_CANCELLED;
-}
-
 bool platform_in_focus(void)
 {
     return appletGetFocusState() == AppletFocusState_InFocus;
+}
+
+bool platform_game_open(bool *known)
+{
+    if (known) *known = true;
+    // Run over a game, PlayGuard is the application that counts.
+    if (appletGetAppletType() == AppletType_Application) return true;
+    u64 pid = 0;
+    if (R_FAILED(pmdmntInitialize())) {
+        if (known) *known = false;
+        return true;
+    }
+    const bool open = R_SUCCEEDED(pmdmntGetApplicationProcessId(&pid));
+    pmdmntExit();
+    return open;
 }
 
 bool platform_can_launch(void)

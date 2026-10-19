@@ -48,7 +48,7 @@
   "replaying": "Stappen worden herhaald: {n} van {total}",
   "tour": "Rondleiding",
   "report": "Een probleem melden",
-  "tour_overview": "Overzicht: de speeltijd van vandaag, de limiet, de resterende tijd en bedtijd.",
+  "tour_overview": "Vandaag: de speeltijd van vandaag, de limiet, de resterende tijd en bedtijd.",
   "tour_play_timer": "Speeltijdtimer: de weekgrafiek is de editor, één limiet voor elke dag of één per dag.",
   "tour_activity": "Activiteit: wie wat speelde, en hoe lang, uit het logboek van de console.",
   "tour_console": "Console: de netwerkklok, de geïnstalleerde games en wat de console draait.",
@@ -66,7 +66,7 @@
   "capture": "Schermafbeeldingen"
  },
  "params": {
-  "tab": {"label": "Opent op", "options": {"": "Overzicht", "play_timer": "Speeltijdtimer", "activity": "Activiteit", "restrictions": "Beperkingen", "security": "Pincode", "console": "Console", "history": "Geschiedenis", "preferences": "Voorkeuren", "about": "Info"}},
+  "tab": {"label": "Opent op", "options": {"": "Vandaag", "play_timer": "Speeltijdtimer", "activity": "Activiteit", "restrictions": "Beperkingen", "security": "Pincode", "console": "Console", "history": "Geschiedenis", "preferences": "Voorkeuren", "about": "Info"}},
   "keep": {"label": "Staat bewaren tussen bezoeken", "help": "De gegevens van PlayGuard en de instellingen van de gesimuleerde console (pincode, limieten, klokken) blijven in deze browser; de console-instellingen van dit paneel tellen dan alleen bij de eerste start."},
   "not_set_up": {"label": "Nooit ingesteld (geen pincode)"},
   "unlocked": {"label": "Tijdelijk ontgrendeld"},
@@ -76,6 +76,7 @@
   "alarm_off": {"label": "Alarm 'tijd is om' uit"},
   "not_counting": {"label": "Resterende tijd daalt niet", "help": "Een teruggezette klok: het overzicht meldt het na 90 s op het scherm."},
   "unpaired": {"label": "Geen app gekoppeld"},
+  "left_min": {"label": "Minuten over vandaag"},
   "fw": {"label": "Firmware", "help": "Boven de nieuwste gecontroleerde: het firmwarescherm."},
   "no_cfw": {"label": "Zonder Atmosphère"},
   "emummc": {"label": "emuMMC"},
@@ -85,7 +86,8 @@
   "applet": {"label": "Appletmodus (vanuit het album)"},
   "background": {"label": "PlayGuard op de achtergrond"},
   "hbloader": {"label": "Een loader die een update aan een store kan doorgeven"},
-  "numpad": {"label": "Wat het numerieke toetsenblok teruggeeft"},
+  "docked": {"label": "In het dock (op de tv)"},
+  "battery": {"label": "Op de accu (geen lader)"},
   "boot_choice": {"label": "Antwoord op 'vorige build?' bij het opstarten", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "Netwerkklok nauwkeurig"},
   "autosync_off": {"label": "'Klok synchroniseren via internet' uit"},
@@ -94,6 +96,8 @@
   "now": {"label": "Tijd van de console, bevroren", "help": "In de tijdzone van de browser."},
   "skip": {"label": "Tijd van de console vooruitgezet met (s)", "help": "Al die tijd wordt er gespeeld: de resterende tijd daalt evenveel. De knoppen onder het scherm zetten hem vooruit."},
   "idle": {"label": "Er draait geen game"},
+  "no_game": {"label": "Niets open achter PlayGuard"},
+  "no_play": {"label": "Al weken niets gespeeld"},
   "no_pdm": {"label": "Geen activiteitenlogboek"},
   "games": {"label": "Extra games gespeeld deze week"},
   "accounts": {"label": "Gebruikersaccounts", "help": "0 tot 8 (standaard 2), elk speelt twee keer zoveel als het volgende."},
@@ -109,7 +113,9 @@
   "fail": {"label": "Laten mislukken", "options": {"unlock": "Ontgrendelen", "unverified": "Ontgrendelen niet bevestigd", "relock": "Opnieuw vergrendelen", "write": "Elke instelling wegschrijven", "timer": "Timer lezen", "clock": "Klok instellen", "pin": "Pincode lezen", "pin_entry": "Pincodescherm geannuleerd", "bedtime": "Bedtijd", "remove": "Een game verwijderen", "launch": "Startversie herstellen", "verify": "Integriteitscontrole"}},
   "still_focus": {"label": "Focusmarkering zonder beweging"},
   "version": {"label": "Versie in de koptekst"},
-  "hold_loading": {"label": "Op het laadscherm blijven"}
+  "hold_loading": {"label": "Op het laadscherm blijven"},
+  "cadran_noglow": {"label": "Zonder achtergrondgloed"},
+  "cadran_noring": {"label": "De ring zonder zijn bogen"}
  },
  "presets": {
   "default": "Standaard",

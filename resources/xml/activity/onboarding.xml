@@ -8,8 +8,8 @@
      by itself at start-up; below Close, Support PlayGuard (the funding QR
      codes). Under the note, on emuMMC (or on sysMMC with an emuMMC set up),
      that the other system has its own parental controls.
-     Shown at start-up while no PIN is set; Overview › First steps and
-     Preferences › Help & diagnostics › First steps bring it back. Filled by onboarding_activity.cpp. -->
+     Shown at start-up while no PIN is set; the bell's "no PIN" entry and
+     About › Help & diagnostics › First steps bring it back. Filled by onboarding_activity.cpp. -->
 
 <brls:AppletFrame
     iconInterpolation="linear">

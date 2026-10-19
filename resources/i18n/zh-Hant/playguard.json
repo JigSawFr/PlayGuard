@@ -8,7 +8,7 @@
         "step_closing": "正在鎖定家長監護，返回HOME選單…"
     },
     "tabs": {
-        "dashboard": "總覽",
+        "dashboard": "今天",
         "play_timer": "遊玩時間限制",
         "activity": "活動紀錄",
         "restrictions": "限制",
@@ -21,7 +21,6 @@
     },
     "hints": {
         "refresh": "重新整理",
-        "open": "開啟",
         "exit_again": "再按一次B即可結束",
         "exit_unlocked": "家長監護仍處於暫時解除狀態：在重新啟用或主機重新啟動前，可以不受限制地遊玩。\n\n結束前重新啟用？",
         "exit_lock": "重新啟用並結束",
@@ -77,9 +76,6 @@
         "4": "週四",
         "5": "週五",
         "6": "週六"
-    },
-    "numpad": {
-        "guide": "時:分（1:30）或分鐘數（90），最多24:00。0 = 當天不能遊玩。"
     },
     "error": {
         "code": "錯誤{}",
@@ -138,35 +134,20 @@
         "update_toast": "PlayGuard {}支援韌體{}：請前往「關於 › 檢查更新」。"
     },
     "dashboard": {
-        "section_status": "家長監護",
-        "section_today": "今天",
-        "section_system": "系統",
-        "pc": "家長監護",
         "pc_active": "啟用中",
-        "pc_unlocked": "已暫時解除",
         "pc_off": "未設定",
         "pc_pin_only": "已設定PIN碼，無限制",
-        "pin": "PIN碼",
         "pin_set": "已設定",
-        "level": "限制等級",
-        "today_limit": "今天的上限（{}）",
-        "remaining": "今天剩餘時間",
-        "remaining_idle": "遊戲執行時顯示",
-        "remaining_unlocked": "可能不計時",
         "gauge_known": "已遊玩{}／上限{}",
         "gauge_none": "今天無遊玩時間限制",
         "gauge_none_played": "今天無遊玩時間限制 · 已遊玩{}",
         "gauge_log": "≈ 已遊玩{}／上限{}（活動紀錄）",
-        "remaining_log": "≈ {}",
-        "remaining_over": "超出{}",
         "gauge_unknown": "無法取得遊玩時間",
         "gauge_reached": "已達今天的上限",
         "gauge_over": "已遊玩{}／上限{}，超出{}（僅提醒）",
         "gauge_idle": "遊戲執行時才會顯示剩餘時間。",
         "gauge_unlocked": "家長監護解除期間，可能不計算遊玩時間。",
-        "bedtime": "就寢鬧鐘",
         "alarm_off": "已關閉",
-        "clock": "網路時鐘",
         "clock_ok": "準確",
         "clock_bad": "不準確",
         "pairing": "手機應用程式",
@@ -175,9 +156,7 @@
         "serial": "序號",
         "serial_visible": "未遮蔽（emuMMC）",
         "patches": "遊戲修補",
-        "firmware": "韌體",
         "compat": "相容性",
-        "updated": "更新於{}",
         "extra": "今天延長時間…",
         "extra_title": "今天延長時間",
         "extra_body_auto": "今天要增加{}嗎？\n\n{}的上限將從{}改為{}。隔天起，下次開啟PlayGuard時會改回{}。",
@@ -206,12 +185,21 @@
         "outside_reset": "今天的遊玩時間在{}左右重新開始計算（時鐘被更改了？）。",
         "outside_clock": "主機時鐘已被更改。",
         "outside_limits": "上限在PlayGuard之外被更改了，例如透過手機應用程式。",
-        "outside_dismiss": "關閉此提示"
+        "outside_dismiss": "關閉此提示",
+        "bonus_row": "其他日子…",
+        "bonus_planned_row": "{}：已排定 {}（取消…）",
+        "bonus_day_title": "要延長哪一天？",
+        "bonus_amount_title": "延長時間：{}",
+        "bonus_no_limit": "{}：當天沒有設定上限，無需延長。",
+        "bonus_body": "{}：上限從 {} 改為 {}，僅限當天。\n\n那天過後，PlayGuard 下次開啟時會改回 {}。",
+        "bonus_done": "{}：已排定 {}。",
+        "bonus_cancel_body": "{}：取消已排定的延長（{}）？上限改回 {}。",
+        "bonus_cancel": "取消延長",
+        "bonus_cancelled": "已取消排定的延長。"
     },
     "onboarding": {
         "title": "初始設定",
         "open": "初始設定",
-        "pin_missing": "尚未設定PIN碼",
         "headline": "只要三個步驟即可保護主機。在步驟上按A即可執行。",
         "all_done": "設定完成：主機已受到保護。隨時可從「關於 › 說明與診斷」回到此處。",
         "section_steps": "步驟",
@@ -251,12 +239,10 @@
         },
         "section_limit": "每天的上限",
         "week_title": "本週的上限",
-        "week_title_edit": "本週的上限（在某天上按A即可變更）",
         "quick": "每天相同上限",
         "quick_title": "每天的遊玩時間上限",
         "quick_title_varies": "每天的遊玩時間上限（目前每天不同）",
         "split": "平日與週末",
-        "remove": "移除遊玩時間限制…",
         "profile_save": "儲存為設定檔…",
         "profile_new": "新增設定檔…",
         "profile_name": "設定檔名稱",
@@ -291,11 +277,8 @@
         "profile_action_rename": "重新命名…",
         "profile_edit_title": "設定檔：{}",
         "section_bedtime": "就寢時間",
-        "bedtime": "就寢鬧鐘",
-        "bedtime_value_on": "{}（開啟）",
-        "bedtime_value_off": "{}（關閉）",
         "bedtime_reset": "可再次遊玩的時間",
-        "bedtime_note": "適用於每一天。到就寢時間時，主機會顯示鬧鐘，也可能中斷軟體（見「時間到時」），直到可以再次遊玩。PlayGuard 會檢查主機是否回報新的時間，否則會還原先前的設定。",
+        "bedtime_note": "適用於每一天，或依星期設定。到就寢時間時，主機會顯示鬧鐘，也可能中斷軟體（見「時間到時」），直到可以再次遊玩。PlayGuard 會檢查主機是否回報新的時間，否則會還原先前的設定。",
         "bedtime_title": "就寢鬧鐘（每天）",
         "bedtime_end_title": "可再次遊玩的時間（每天）",
         "bedtime_summary": "{}，{} 起可再次遊玩",
@@ -342,7 +325,6 @@
         },
         "perday": {
             "title": "依星期設定上限",
-            "section_days": "星期（在某天上按A即可變更）",
             "section_presets": "快速設定",
             "weekdays": "設定星期一至星期五…",
             "weekend": "設定星期六與星期日…",
@@ -371,11 +353,18 @@
         "remove_err": "無法移除遊玩時間限制",
         "not_counting": "主機目前沒有計算遊玩時間。可能的原因：時鐘被調回（之後會重新計時）、網路時鐘從未設定（「主機 › 網路時鐘」），或剛寫入上限（啟動遊戲玩一分鐘後再查看）。",
         "limit_note": "達到上限時，主機會顯示「時間到」，然後依照「時間到時」的設定中斷遊戲或僅提醒。",
-        "unsaved": "未儲存的進度可能會遺失：請先讓孩子存檔。"
+        "unsaved": "未儲存的進度可能會遺失：請先讓孩子存檔。",
+        "profile_already": "設定檔「{}」已經套用。",
+        "bedtime_by_day": "依星期設定…",
+        "bedtime_by_day_title": "就寢鬧鐘（依星期）",
+        "bedtime_weekdays": "週一至週五",
+        "bedtime_weekend": "週六和週日",
+        "bedtime_days_title": "就寢鬧鐘：{}",
+        "bedtime_days_confirm": "{}：將就寢鬧鐘設為 {}？\n\n{} 起可再次遊玩。",
+        "bedtime_days_confirm_off": "{}：關閉就寢鬧鐘？"
     },
     "activity": {
         "section_totals": "遊玩時間",
-        "account": "帳號",
         "account_all": "所有帳號",
         "account_default": "預設帳號",
         "account_last": "上次顯示的帳號",
@@ -387,7 +376,6 @@
         "accounts_none": "沒有任何帳號有此遊戲的紀錄（已刪除的遊戲僅保留總計）。",
         "section_games": "遊戲",
         "period": "期間",
-        "export": "匯出至SD卡…",
         "export_title": "匯出格式",
         "formats": {
             "0": "CSV（試算表）",
@@ -405,18 +393,21 @@
             "today": "今天（分鐘）",
             "week": "過去7天（分鐘）",
             "day": "{}（分鐘）",
-            "total": "全部期間（分鐘）"
+            "total": "全部期間（分鐘）",
+            "month": "過去30天（分鐘）"
         },
         "periods": {
             "0": "今天",
             "1": "過去7天",
-            "2": "全部期間"
+            "2": "全部期間",
+            "3": "過去30天"
         },
         "loading": "正在讀取主機的遊玩資料…",
         "none": {
             "0": "今天沒有遊玩任何遊戲。",
             "1": "過去7天沒有遊玩任何遊戲。",
-            "2": "尚未遊玩任何遊戲。"
+            "2": "尚未遊玩任何遊戲。",
+            "3": "過去30天沒有遊玩任何遊戲。"
         },
         "err_list": "無法列出遊戲",
         "err_stats": "無法讀取遊玩統計資料",
@@ -444,7 +435,22 @@
         "applet_cap": "為節省Applet模式（從相簿開啟）下的記憶體，另有{}款遊戲未列出。匯出檔包含所有遊戲；若要完整清單，請在啟動遊戲時按住R來開啟PlayGuard。",
         "account_nobody": "無帳號（或已刪除的帳號）",
         "account_new": "新帳號（自{}起）：{}",
-        "truncated": "最多只能列出{}款遊戲：部分本週未玩的遊戲未列出，也未計入全部期間的總計。"
+        "truncated": "最多只能列出{}款遊戲：部分本週未玩的遊戲未列出，也未計入全部期間的總計。",
+        "section_hours": "遊玩時段（過去7天）",
+        "hours": {
+            "legend": "每天每小時一格：顏色越深，玩得越多。",
+            "sessions": "遊玩次數",
+            "sessions_value": "{} 次 · 平均 {}",
+            "longest": "最長一次",
+            "busy": "最常遊玩的時段",
+            "busy_value": "{} 至 {}",
+            "late": "21:00 至 06:00 之間的遊玩"
+        },
+        "rating": "年齡分級",
+        "rating_blocked": "{} · 目前限制等級下被限制",
+        "qr": "以 QR 碼顯示本週摘要",
+        "qr_body": "用手機相機掃描：過去7天會以文字顯示。不會上傳任何內容。",
+        "qr_days": "每天"
     },
     "library": {
         "title": "遊戲",
@@ -457,7 +463,6 @@
     },
     "restrictions": {
         "section_level": "限制等級",
-        "level": "等級",
         "levels": {
             "0": "無",
             "1": "自訂",
@@ -468,7 +473,6 @@
         "confirm_level": "要將限制等級變更為「{}」嗎？",
         "custom_hint": "接著請在下方逐項選擇限制。",
         "section_custom": "自訂設定",
-        "section_level_settings": "此等級的限制內容",
         "age": "依年齡分級限制軟體",
         "age_none": "無限制",
         "age_value": "{}歲以下",
@@ -487,13 +491,31 @@
         "none_body": "將不再有任何限制：任何年齡分級的軟體都能遊玩，在社群網站上發文及與他人交流也都會被允許。每天的遊玩時間上限仍然有效。",
         "confirm_age": "要將年齡上限變更為「{}」嗎？屆時可以遊玩年齡分級比現在更高的軟體。",
         "confirm_sns_off": "要取消限制在社群網站上發文嗎？屆時可以從主機發布螢幕截圖和影片。",
-        "confirm_comm_off": "要取消限制與他人交流嗎？屆時軟體可以讓孩子與其他玩家聊天及分享內容。"
+        "confirm_comm_off": "要取消限制與他人交流嗎？屆時軟體可以讓孩子與其他玩家聊天及分享內容。",
+        "org_where": {
+            "cero": "日本",
+            "grac": "韓國",
+            "gsrmr": "台灣",
+            "esrb": "美國、加拿大、拉丁美洲（巴西除外）",
+            "classind": "巴西",
+            "usk": "德國",
+            "pegi": "歐洲：法國、比利時、瑞士、西班牙、義大利、荷蘭、奧地利等",
+            "pegi_portugal": "葡萄牙",
+            "pegi_bbfc": "英國",
+            "russian": "俄羅斯",
+            "acb": "澳洲",
+            "oflc": "紐西蘭",
+            "iarc": "其他國家"
+        },
+        "blocked": "被限制的已安裝遊戲",
+        "blocked_value": "{} / {}",
+        "blocked_title": "{} 分級高於 {} 歲",
+        "blocked_none": "{}：沒有分級高於 {} 歲的已安裝遊戲。",
+        "blocked_no_age": "此限制等級不依年齡限制遊戲。",
+        "blocked_note": "根據最近一次已安裝遊戲檢查。分級機構未分級的遊戲不計入，手機應用程式中設定的例外也不計入。"
     },
     "clock": {
         "section_now": "時鐘",
-        "user": "主機時鐘",
-        "network": "網路時鐘",
-        "accuracy": "網路時鐘準確",
         "auto": "透過網際網路同步時鐘",
         "zone": "時區",
         "why": "遊玩時間限制依據網路時鐘計算。若網路時鐘不準確（例如主機從未連線至任天堂伺服器），可在此透過公用時間伺服器設定。",
@@ -557,7 +579,8 @@
         "confirm_copy_follows": "\n\n「透過網際網路同步時鐘」已開啟，因此主機時鐘會跟隨網路時鐘，可能同樣不準。如果是這樣：請關閉此設定，在「系統設定 › 主機 › 日期與時間」中設定日期與時間，然後再回到這裡。",
         "confirm_copy_sync_after": "\n\n「透過網際網路同步時鐘」已關閉：主機時鐘維持不變。之後再開啟它，主機時鐘也不會再跳動，因為兩個時鐘將顯示相同的時間。",
         "copied_sync_on": "\n\n現在可以開啟「透過網際網路同步時鐘」（系統設定 › 主機 › 日期與時間）：主機時鐘不會跳動。",
-        "copy_implausible": "主機時鐘顯示為{}：似乎尚未設定。請先關閉「透過網際網路同步時鐘」，在「系統設定 › 主機 › 日期與時間」中設定日期與時間，然後再回到這裡。"
+        "copy_implausible": "主機時鐘顯示為{}：似乎尚未設定。請先關閉「透過網際網路同步時鐘」，在「系統設定 › 主機 › 日期與時間」中設定日期與時間，然後再回到這裡。",
+        "dns_note": "在這台主機上，Atmosphère 的 DNS 重新導向（atmosphere/hosts）封鎖了任天堂的時間伺服器：網路時鐘無法自行校準。"
     },
     "pairing": {
         "section": "「Nintendo Switch 家長監護」應用程式",
@@ -570,7 +593,9 @@
         "unlink_err": "無法解除手機應用程式的連動",
         "note": "只要主機仍處於連動狀態，手機應用程式下次同步時就會覆蓋在此所做的設定。",
         "decode": "解除連動前：協助解讀兩項設定",
-        "decode_note": "解除連動前，這台主機可以協助解讀「僅鬧鐘提醒」與每天的就寢時間（PIN碼，2分鐘）：解除後就無法再做了。"
+        "decode_note": "解除連動前，這台主機可以協助解讀「僅鬧鐘提醒」與每天的就寢時間（PIN碼，2分鐘）：解除後就無法再做了。",
+        "dns_blocked": "同步已被封鎖（DNS）",
+        "dns_note": "Atmosphère 的 DNS 重新導向（atmosphere/hosts）將任天堂的家長監護伺服器導向別處：手機應用程式無法同步，因此不會覆蓋在此所做的設定。"
     },
     "security": {
         "section_status": "狀態",
@@ -983,7 +1008,18 @@
         "notices_summary": "本週遊戲時間",
         "notices_reminders": "提醒：備份、另一個系統、封鎖遊戲",
         "notices_ack_remind": "30 天後重新計入已忽略的警告",
-        "help": "說明與診斷"
+        "help": "說明與診斷",
+        "text_size": "文字大小",
+        "text_sizes": {
+            "normal": "標準",
+            "large": "較大",
+            "auto": "自動：電視上較大"
+        },
+        "effects": "視覺效果",
+        "effects_values": {
+            "auto": "電池供電時精簡",
+            "full": "始終完整"
+        }
     },
     "backup": {
         "saved": "已備份設定：{}",
@@ -1093,6 +1129,10 @@
         "size_kb": "{} KB",
         "size_mb": "{} MB",
         "pt_log_on": "每 30 秒記錄到 {}",
+        "frame_stats": "影格統計",
+        "frame_stats_note": "PlayGuard 開啟期間，每秒在 logs/frame_stats.txt 寫一行：模式（電視或手提）與畫面尺寸、顯示的畫面、每秒影格數、介面每影格的計算時間（平均與最大，毫秒）、兩影格間隔（平均與最大）以及延遲的影格數（超過 20 毫秒）。要比較不同畫面，或背景光暈開啟與關閉：每個畫面不做任何操作停留 30 秒，先電視模式再手提模式。每次開啟時檔案都會重新開始。",
+        "frame_stats_on": "每秒一行，寫入 {}",
+        "frame_stats_wait": "一秒後出現第一行…",
         "gate": "再次顯示韌體畫面",
         "forget": "清除韌體的選擇",
         "forgotten": "下次啟動時會再次詢問韌體的選擇。",
@@ -1106,7 +1146,8 @@
         "enabled": "開發者模式已開啟：請查看「關於 › 說明與診斷」底部。",
         "presses_left": "再按{}次即可開啟開發者模式。",
         "presses_left_one": "再按1次即可開啟開發者模式。",
-        "report_upload": "線上傳送"
+        "report_upload": "線上傳送",
+        "glow": "背景光暈"
     },
     "dev_build": {
         "open": "安裝其他建置",
@@ -1267,11 +1308,14 @@
             "backup": "已還原備份",
             "undo": "從紀錄改回",
             "first_steps": "初始設定",
-            "overview": "總覽",
+            "overview": "今天",
             "profile": "設定檔「{}」",
             "console_lock": "封鎖所有遊戲",
             "notices": "通知",
-            "rescue": "復原"
+            "rescue": "復原",
+            "bonus": "排定延長",
+            "restore_bonus": "已改回排定延長前的上限",
+            "schedule_end": "排定設定檔結束"
         },
         "when": "時間",
         "how": "來源",
@@ -1310,14 +1354,15 @@
             "kind": "代碼",
             "done": "已完成",
             "refused": "遭拒絕（{}）"
-        }
+        },
+        "undo_hint": "復原",
+        "empty_title": "尚無紀錄",
+        "empty_text": "PlayGuard對主機所做的每項變更（上限、限制等級、PIN碼、解除…）都會列在此處。"
     },
     "chart": {
         "last_days": "最近 7 天，最右邊是今天",
         "limit_line": "長條上的線是本週該日的上限",
-        "limit_over": "線是本週該日的上限 · 橘色 !：超過了上限",
-        "week_order": "週一到週日，有底線的是今天",
-        "unsaved": "橘色 *：已變更，尚未儲存"
+        "limit_over": "線是本週該日的上限 · 橘色 !：超過了上限"
     },
     "data_notice": {
         "config_reset": "無法讀取PlayGuard的偏好設定，已將其重設。損壞的檔案已保留為config.json.bad。",
@@ -1351,8 +1396,8 @@
         "failed": "無法取得說明。按 X 重試。"
     },
     "quick": {
-        "title": "語言和主題",
-        "hint": "語言和主題"
+        "hint": "語言和主題",
+        "title_text": "語言、主題和文字大小"
     },
     "notices": {
         "title": "通知",
@@ -1447,6 +1492,216 @@
         "week_detail": "平均每天 {}。",
         "week_top": "玩得最多：{}（{}）。",
         "over_limit": "最近 7 天中有 {} 天超過了限制",
-        "over_limit_detail": "時間到時主機只會提醒：超過限制後仍可繼續遊玩（遊戲時間 › 時間到時）。"
+        "over_limit_detail": "時間到時主機只會提醒：超過限制後仍可繼續遊玩（遊戲時間 › 時間到時）。",
+        "clock_detail_dns": "Atmosphère 的 DNS 封鎖了任天堂的時間伺服器，主機無法自行校準：請透過時間伺服器校準。",
+        "week_more": "比上週每天多 {}。",
+        "week_less": "比上週每天少 {}。",
+        "week_same": "與上週大致相當。"
+    },
+    "cadran": {
+        "date": "{3}{2}日 {0}",
+        "months": {
+            "1": "1月",
+            "2": "2月",
+            "3": "3月",
+            "4": "4月",
+            "5": "5月",
+            "6": "6月",
+            "7": "7月",
+            "8": "8月",
+            "9": "9月",
+            "10": "10月",
+            "11": "11月",
+            "12": "12月"
+        },
+        "today": {
+            "kicker": "今天 · {}的限制",
+            "free": "不限",
+            "no_limit": "無限制",
+            "unlocked": "已解除",
+            "time_up": "時間到",
+            "left": "剩餘",
+            "today": "今天",
+            "extra": "延長時間",
+            "stop": "今天到此為止",
+            "child": "給孩子看",
+            "bed_title": "就寢鬧鐘",
+            "on": "已開啟",
+            "bed_sub": "{}起可再次遊玩",
+            "pc_title": "家長監護",
+            "pc_unlocked": "已解除",
+            "pin_set": "已設 PIN",
+            "no_pin": "未設 PIN",
+            "clock_title": "網路時鐘",
+            "clock_ok": "準確",
+            "clock_bad": "不準",
+            "to_set": "需設定",
+            "ok": "正常",
+            "clock_fix": "立即測量並設定",
+            "clock_fine": "計時準確",
+            "serial_hidden": "序號已隱藏",
+            "next_time_up": "繼續遊玩的話，約{}時間到",
+            "next_bedtime": "就寢鬧鐘{}（還有{}）",
+            "next_bedtime_now": "就寢時間：{}起可再次遊玩",
+            "clock_fix_dns": "已被DNS封鎖：測量並校準",
+            "next_with_extra": "增加{}後，約{}時間到",
+            "next_with_extra_bed": "即使增加{}，{}的就寢鬧鐘也會先響",
+            "head_unlocked": "{}的限制已暫停",
+            "pc_lifted": "已解除，直到重新啟用",
+            "limit": "今天的上限…",
+            "bed_in": "還有{}",
+            "dns_nintendo": "DNS · 已封鎖Nintendo",
+            "dns_sync": "DNS · 已封鎖應用程式同步",
+            "dns_time": "DNS · 已封鎖時間伺服器",
+            "dns_title": "Atmosphère 的 DNS 重新導向",
+            "dns_intro": "其 hosts 檔案（atmosphere/hosts）將 Nintendo 的伺服器重新導向到別處。",
+            "dns_sync_note": "手機應用程式無法同步，因此不會覆寫在此處所做的設定。",
+            "dns_time_note": "網路時鐘無法自行校準：PlayGuard 透過時間伺服器校準（{}）。",
+            "dns_open": "DNS · 未封鎖Nintendo",
+            "dns_intro_open": "它不會封鎖此處相關的 Nintendo 伺服器。",
+            "dns_row_sync": "家長監護伺服器",
+            "dns_row_time": "時間伺服器",
+            "dns_blocked": "已封鎖",
+            "dns_reachable": "可連線",
+            "counted_title": "在此處的時間也會計入",
+            "counted_pill": "在遊戲上開啟 · 計入計時器",
+            "no_play": "不能遊玩",
+            "head_no_play": "今天不能遊玩",
+            "head_unlocked_no_play": "今天不能遊玩，已暫停",
+            "limit_title": "更改{}的上限？",
+            "setup": "設定每週上限",
+            "profiles": "設定檔…",
+            "profiles_title": "套用設定檔",
+            "profiles_manage": "管理設定檔…",
+            "tl_time_up": "時間到",
+            "tl_with": "再加 {}",
+            "tl_bedtime": "就寢",
+            "home_pill": "遊戲在HOME中開啟 · 仍在計時",
+            "home_title": "仍有遊戲處於開啟狀態",
+            "steps_count": "{} / {}",
+            "tl_bed_first": "就寢在先",
+            "bed_off_value": "已關閉",
+            "bed_set": "設定"
+        },
+        "pill": {
+            "pc_on": "家長監護已開啟",
+            "pc_off": "家長監護未設定",
+            "unlocked": "已暫時解除",
+            "timer_on": "計時中",
+            "timer_off": "計時已暫停",
+            "timer_none": "無遊玩時間限制",
+            "level": "級別 · {}",
+            "pin_set": "已設 PIN",
+            "pin_none": "未設 PIN"
+        },
+        "week": {
+            "no_limit": "無限制",
+            "every_day": "每天 {}",
+            "summary": "平日 {} · 週末 {}",
+            "profile": "設定檔 · {}",
+            "edit": "修改",
+            "done": "完成",
+            "pick": "精確時長",
+            "edit_day": "修改某天",
+            "pick_day": "精確時長或無限制",
+            "step": "± 15 分鐘",
+            "day": "切換日期",
+            "weekdays": "複製到週一至週五",
+            "weekend": "複製到週六 · 週日",
+            "none": "無限制",
+            "first_change": "{} {} → {}",
+            "no_changes": "無待儲存的變更 · + 儲存",
+            "discard": "放棄",
+            "remove": "刪除限制",
+            "save_title": "儲存本週的限制？",
+            "played_key": "最近7天的遊玩",
+            "played_day": "{}：已玩 {} / {}",
+            "played_day_free": "{}：已玩 {}（不限）",
+            "bonus": "{}：當天排定延長 {}"
+        },
+        "activity": {
+            "export": "匯出",
+            "games": "{} 款遊戲",
+            "on_limit": "限制 {}",
+            "per_day": "每天 {}",
+            "top": "玩得最多 · {}",
+            "card_today": "今天",
+            "card_total": "今天 · 共 {}",
+            "empty_note": "在這台主機上玩過的遊戲會依帳號顯示在此處。",
+            "see_all": "查看全部期間",
+            "trend_up": "比上週每天 +{}",
+            "trend_down": "比上週每天 -{}",
+            "trend_same": "與上週相當",
+            "card_grew": "比上週 +{}"
+        },
+        "restrictions": {
+            "choose": "選擇此級別",
+            "custom": "每項設定在下方選擇",
+            "up_to": "至 {} {} 的軟體",
+            "any_age": "所有年齡的軟體",
+            "sns_blocked": "社群媒體 · 受限",
+            "sns_allowed": "社群媒體 · 允許",
+            "sns_unknown": "社群媒體 · —",
+            "comm_blocked": "交流 · 受限",
+            "comm_allowed": "交流 · 允許",
+            "comm_unknown": "交流 · —",
+            "none": "所有年齡的軟體，允許社群媒體與交流",
+            "to_settings": "查看設定",
+            "games_blocked": "被限制的遊戲 · {}",
+            "games_none": "被限制的遊戲 · 無"
+        },
+        "clock": {
+            "console": "主機",
+            "network": "網路 · 計時器使用",
+            "accurate": "準確",
+            "inaccurate": "不準 · 請在下方設定"
+        },
+        "about": {
+            "tagline": "Nintendo Switch 家長監護 · 自由軟體（GPLv3）",
+            "version": "版本 {}"
+        },
+        "child": {
+            "header": "兒童畫面 · 返回需 PIN",
+            "title": "今天還剩",
+            "bed": "睡覺時間",
+            "stops": "時間到時主機會自動暫停",
+            "warns": "時間到時主機會提醒",
+            "enjoy": "玩得開心！",
+            "of": "共 {}",
+            "back": "返回家長 · PIN",
+            "play": "交出主機去玩",
+            "on_hold": "限制已暫停",
+            "end": "約 {} 結束",
+            "extra": "加時",
+            "no_extra": "現在沒有生效的限制：無需加時。"
+        },
+        "dialog": {
+            "unlock_short": "修改期間使用已儲存的PIN碼暫時解除家長監護，隨後立即恢復。"
+        }
+    },
+    "schedule": {
+        "date": "{1}{0}日",
+        "cell": "排定的設定檔",
+        "note": "為一段時間（假期、旅行）設定的設定檔：開啟 PlayGuard 時，會在開始時提議套用，結束後提議改回之前的上限。",
+        "none": "無",
+        "value": "{} · {} 至 {}",
+        "pick_profile": "這段時間的設定檔",
+        "pick_from": "第一天",
+        "pick_to": "最後一天",
+        "saved": "已將 {} 排定在 {} 至 {}。",
+        "no_profile": "請先儲存一個設定檔：這段時間會套用它。",
+        "profile_gone": "設定檔「{}」已不存在：已移除其排程。",
+        "apply_body": "{} 至 {}：現在套用設定檔「{}」嗎？\n\n{} 之後，PlayGuard 會提議改回被取代的上限。",
+        "not_now": "暫不",
+        "apply": "套用",
+        "over_body": "「{}」的期間已於 {} 結束。改回之前的上限（{}）嗎？",
+        "keep": "保留目前上限",
+        "put_back": "改回",
+        "put_back_body": "改回「{}」之前的上限嗎？",
+        "put_back_now": "立即結束：改回之前的上限",
+        "keep_remove": "保留目前上限並移除排程",
+        "change": "變更…",
+        "remove": "移除",
+        "removed": "已移除排定的設定檔。"
     }
 }

@@ -59,6 +59,28 @@ typedef struct {
 size_t playlog_fold_days(const PlayLogEvent *events, size_t n, uint64_t now,
                          const uint64_t day_starts[7], PlayLogTotal *out, size_t max);
 
+// Every game's time in [from, now), in its week_s (today_s and day_s left
+// at 0): the same fold over another window (Activity's last 30 days).
+size_t playlog_fold_since(const PlayLogEvent *events, size_t n, uint64_t now, uint64_t from,
+                          PlayLogTotal *out, size_t max);
+
+// When the play happened over the same 7 days, every game together: the
+// seconds in each hour of each day ([k][h]: k days back, hour h of that day,
+// counted from its midnight; on a 25 h day the last hour holds two), and the
+// sessions: stretches of play less than PLAYLOG_SESSION_GAP_S apart are one
+// (a game changed, a short break), counted on the day they start.
+#define PLAYLOG_SESSION_GAP_S (5u * 60u)
+typedef struct {
+    uint32_t hour_s[7][24];
+    uint32_t sessions;      // how many
+    uint32_t session_s;     // their time together (sessions * average)
+    uint32_t longest_s;     // the longest one
+    uint8_t  longest_day;   // the day it started, days back
+} PlayLogHours;
+
+void playlog_fold_hours(const PlayLogEvent *events, size_t n, uint64_t now,
+                        const uint64_t day_starts[7], PlayLogHours *out);
+
 // The log as one user account played it: a game counts for `uid` while it has
 // the focus AND that account is open in it (selected when the game started,
 // until the game closes it, or until another game is launched). The focus

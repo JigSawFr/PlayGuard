@@ -82,6 +82,31 @@ enum class Restore
 };
 Restore restore_action(const ExtraRecord& rec, const std::string& today, const PtState& pt, bool read_only);
 
+// Extra time planned for a later day (config bonus_*): that weekday's limit
+// is raised now, for `date` only, and put back once that day is over.
+struct BonusRecord
+{
+    int         weekday = -1;   // -1: nothing planned
+    std::string date;           // "YYYY-MM-DD" of the day it is for
+    uint16_t    base  = 0;      // limit before
+    uint16_t    value = 0;      // limit written
+};
+// What a check on `today` does with it, as restore_action: None while the day
+// is not over (or nothing planned), Later when the state cannot be read,
+// Forget when the limit changed since, Offer to put `base` back.
+Restore bonus_action(const BonusRecord& rec, const std::string& today, const PtState& pt, bool read_only);
+// The days a bonus can be planned for: tomorrow and the five after (the
+// same weekday a week on would be today's), as dates and weekdays.
+struct PlanDay
+{
+    std::string date;
+    int         weekday;
+};
+std::vector<PlanDay> bonus_days(const std::string& today, int today_weekday);
+// A bonus can be planned for `weekday`: the play timer read, a limit set that
+// day, below 24 h.
+bool can_plan_bonus(const PtState& pt, int weekday, bool read_only);
+
 // How a record restore_action() offers to put back is put back. `weekday`:
 // today's (0 = Sunday); `by_itself`: the preference to put back "no more
 // play today" with no question (config extra_auto_restore).
@@ -128,6 +153,21 @@ bool bedtime_uniform(const PtState& pt, PtBedtime* out);
 // allowed-again time when it is in range (05:00 to 09:00), else gets 06:00,
 // the companion app's default.
 void bedtime_every_day(const PtState& pt, bool on, uint8_t hour, uint8_t minute, PtBedtime out[7]);
+// The same for the days of `days` only (bit n: weekday n, 0 = Sunday); the
+// other days keep theirs.
+constexpr uint8_t ALL_DAYS = 0x7F, WEEKDAYS = 0x3E, WEEKEND = 0x41;
+void bedtime_days(const PtState& pt, uint8_t days, bool on, uint8_t hour, uint8_t minute, PtBedtime out[7]);
+// The bedtime the days of `days` share (false when they differ, or nothing was read).
+bool bedtime_shared(const PtState& pt, uint8_t days, PtBedtime* out);
+// The week's alarms as runs of days in a row, Monday first, with the same
+// alarm (on, hour, minute; the allowed-again time aside): Monday to Friday at
+// 21:30 and the weekend at 22:30 are two. Days as 0 = Sunday.
+struct BedRun
+{
+    int       first, last;
+    PtBedtime bed;
+};
+std::vector<BedRun> bedtime_runs(const PtState& pt);
 
 // Play allowed again at hour:minute on every day whose bedtime is on. False
 // (out untouched) when none is.
@@ -164,6 +204,8 @@ uint16_t limit_seed(uint16_t current);
 // when every day has the same, 21:00 when the days differ, else off).
 std::vector<int> bedtime_times();
 int bedtime_selected(const PtState& pt, const std::vector<int>& times);
+// The same for the days of `days`.
+int bedtime_selected_days(const PtState& pt, uint8_t days, const std::vector<int>& times);
 // The same for the allowed-again time: 05:00 to 09:00, 06:00 unless every day
 // has the same one in the list.
 std::vector<int> bedtime_end_times();
@@ -174,10 +216,28 @@ int bedtime_end_selected(const PtState& pt, const std::vector<int>& times);
 bool recorded_today(const ExtraRecord& rec, int weekday, const std::string& today);
 
 // The minutes of extra time added today that `weekday`'s limit still holds
-// (the Overview's "+30 min"), else 0.
+// (Today's "+30 min"), else 0.
 int extra_today_min(const ExtraRecord& rec, const std::string& today, int weekday, const PtState& pt);
 
 // The timer is on and its "time's up" alarm is off.
 bool alarm_off(const PtState& pt);
+
+// What stops play first today, as Cadran's Today says it: at `now` (minutes
+// after midnight), with `left` minutes of play left (-1: none counting down)
+// and today's bedtime `bed` (an evening alarm, play allowed again the next
+// morning). Before the morning's end, the night is the day before's: its
+// bedtime is not this one's to tell.
+struct NextStop
+{
+    enum Kind
+    {
+        NONE,
+        TIME_UP,       // `at`, `in` minutes of play from now
+        BEDTIME,       // at `at`, in `in` minutes
+        BEDTIME_NOW,   // play allowed again at `at`
+    } kind = NONE;
+    int at = 0, in = 0;
+};
+NextStop next_stop(int now, int left, const PtBedtime& bed);
 
 }   // namespace pt_logic

@@ -17,7 +17,7 @@ namespace ui
 bool refuse_read_only()
 {
     if (!app::read_only()) return false;
-    notify(rc_text(NXM_RC_READ_ONLY));
+    notify(rc_text(NXM_RC_READ_ONLY), Toast::Refused);
     return true;
 }
 
@@ -56,22 +56,27 @@ void set_visible(brls::View* view, bool visible)
     if (!had_focus) return;
 
     // Never leave the focus on a view that just disappeared: prefer the
-    // nearest focusable sibling, then the container.
+    // nearest focusable sibling, then the nearest one of each enclosing box in
+    // turn (the line may sit in a card of its own), then the container.
     brls::Box* parent = view->getParent();
     if (!parent) return;
-    const auto& children = parent->getChildren();
-    const int count = (int)children.size();
-    int index = -1;
-    for (int i = 0; i < count; i++)
-        if (children[i] == view) index = i;
-    for (int distance = 1; index >= 0 && distance < count; distance++) {
-        for (int i : { index + distance, index - distance }) {
-            if (i < 0 || i >= count) continue;
-            if (brls::View* target = children[i]->getDefaultFocus()) {
-                brls::Application::giveFocus(target);
-                return;
+    for (brls::View* node = view; node->getParent(); node = node->getParent()) {
+        const auto& children = node->getParent()->getChildren();
+        const int count = (int)children.size();
+        int index = -1;
+        for (int i = 0; i < count; i++)
+            if (children[i] == node) index = i;
+        for (int distance = 1; index >= 0 && distance < count; distance++) {
+            for (int i : { index + distance, index - distance }) {
+                if (i < 0 || i >= count) continue;
+                if (brls::View* target = children[i]->getDefaultFocus()) {
+                    brls::Application::giveFocus(target);
+                    return;
+                }
             }
         }
+        // Not past the scrolling frame: the rest of the screen is another list.
+        if (dynamic_cast<brls::ScrollingFrame*>(node->getParent())) break;
     }
     brls::Application::giveFocus(parent);
 }

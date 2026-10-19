@@ -48,7 +48,7 @@
   "replaying": "正在重放步骤：第 {n} 步，共 {total} 步",
   "tour": "导览",
   "report": "报告问题",
-  "tour_overview": "概览：今天的游戏时间、限制、剩余时间和就寝时间。",
+  "tour_overview": "今天：今天的游戏时间、限制、剩余时间和就寝时间。",
   "tour_play_timer": "游戏时间：每周图表就是编辑器，每天相同的限制或每天各自的限制。",
   "tour_activity": "活动：根据主机自己的记录，谁玩了什么、玩了多久。",
   "tour_console": "主机：网络时钟、已安装的游戏以及主机运行的内容。",
@@ -66,7 +66,7 @@
   "capture": "截图"
  },
  "params": {
-  "tab": {"label": "打开时显示", "options": {"": "概览", "play_timer": "游戏时间", "activity": "游玩记录", "restrictions": "限制", "security": "PIN", "console": "主机", "history": "历史记录", "preferences": "偏好设置", "about": "关于"}},
+  "tab": {"label": "打开时显示", "options": {"": "今天", "play_timer": "游戏时间", "activity": "游玩记录", "restrictions": "限制", "security": "PIN", "console": "主机", "history": "历史记录", "preferences": "偏好设置", "about": "关于"}},
   "keep": {"label": "在访问之间保留状态", "help": "PlayGuard 的数据和模拟主机的设置（PIN、限制、时钟）保留在此浏览器中；此面板中的主机设置只在首次启动时生效。"},
   "not_set_up": {"label": "从未设置（没有 PIN）"},
   "unlocked": {"label": "暂时解除"},
@@ -76,6 +76,7 @@
   "alarm_off": {"label": "“时间到”提醒已关闭"},
   "not_counting": {"label": "剩余时间不减少", "help": "时钟被调回：在屏幕上显示 90 秒后，概览会提示。"},
   "unpaired": {"label": "未关联手机应用"},
+  "left_min": {"label": "今天剩余分钟数"},
   "fw": {"label": "系统版本", "help": "高于已验证的最新版本时，显示系统版本画面。"},
   "no_cfw": {"label": "没有 Atmosphère"},
   "emummc": {"label": "emuMMC"},
@@ -85,7 +86,8 @@
   "applet": {"label": "小程序模式（从相册启动）"},
   "background": {"label": "PlayGuard 在后台"},
   "hbloader": {"label": "能把更新交给商店的加载器"},
-  "numpad": {"label": "数字键盘返回的内容"},
+  "docked": {"label": "插在底座上（电视）"},
+  "battery": {"label": "电池供电（未接充电器）"},
   "boot_choice": {"label": "启动时对“上一个版本？”的回答", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "网络时钟准确"},
   "autosync_off": {"label": "“通过互联网同步时钟”已关闭"},
@@ -94,6 +96,8 @@
   "now": {"label": "固定主机时间", "help": "按浏览器的时区。"},
   "skip": {"label": "主机时间向后推（秒）", "help": "期间一直在玩游戏：剩余时间也减少同样多。屏幕下方的按钮可以向后推。"},
   "idle": {"label": "没有正在运行的游戏"},
+  "no_game": {"label": "PlayGuard 后面没有打开任何内容"},
+  "no_play": {"label": "几周没有游玩"},
   "no_pdm": {"label": "没有游玩记录"},
   "games": {"label": "本周额外玩过的游戏数"},
   "accounts": {"label": "用户账户", "help": "0 到 8 个（默认 2 个），每个账户玩的时间是下一个的两倍。"},
@@ -109,7 +113,9 @@
   "fail": {"label": "让以下操作失败", "options": {"unlock": "解除", "unverified": "解除未确认", "relock": "重新锁定", "write": "所有设置写入", "timer": "读取计时器", "clock": "设置时钟", "pin": "读取 PIN", "pin_entry": "取消 PIN 画面", "bedtime": "就寝时间", "remove": "删除游戏", "launch": "重置启动版本", "verify": "完整性检查"}},
   "still_focus": {"label": "焦点高亮静止"},
   "version": {"label": "标题栏显示的版本"},
-  "hold_loading": {"label": "停在加载画面"}
+  "hold_loading": {"label": "停在加载画面"},
+  "cadran_noglow": {"label": "无背景光晕"},
+  "cadran_noring": {"label": "没有弧线的圆环"}
  },
  "presets": {
   "default": "默认",

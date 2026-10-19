@@ -48,7 +48,7 @@
   "replaying": "Schritte werden wiederholt: {n} von {total}",
   "tour": "Rundgang",
   "report": "Problem melden",
-  "tour_overview": "Übersicht: heutige Spielzeit, das Limit, die Restzeit und die Schlafenszeit.",
+  "tour_overview": "Heute: heutige Spielzeit, das Limit, die Restzeit und die Schlafenszeit.",
   "tour_play_timer": "Spielzeit: Das Wochendiagramm ist der Editor, ein Limit für jeden Tag oder eines pro Tag.",
   "tour_activity": "Aktivität: wer was wie lange gespielt hat, aus dem Protokoll der Konsole.",
   "tour_console": "Konsole: die Netzwerkuhr, die installierten Spiele und was die Konsole ausführt.",
@@ -66,7 +66,7 @@
   "capture": "Screenshots"
  },
  "params": {
-  "tab": {"label": "Öffnet mit", "options": {"": "Übersicht", "play_timer": "Spielzeit", "activity": "Aktivität", "restrictions": "Einschränkungen", "security": "Geheimzahl", "console": "Konsole", "history": "Verlauf", "preferences": "Optionen", "about": "Info"}},
+  "tab": {"label": "Öffnet mit", "options": {"": "Heute", "play_timer": "Spielzeit", "activity": "Aktivität", "restrictions": "Einschränkungen", "security": "Geheimzahl", "console": "Konsole", "history": "Verlauf", "preferences": "Optionen", "about": "Info"}},
   "keep": {"label": "Zustand zwischen Besuchen behalten", "help": "Die Daten von PlayGuard und die Einstellungen der simulierten Konsole (Geheimzahl, Limits, Uhren) bleiben in diesem Browser; die Konsolen-Einstellungen dieses Bereichs gelten dann nur beim ersten Start."},
   "not_set_up": {"label": "Nie eingerichtet (keine Geheimzahl)"},
   "unlocked": {"label": "Vorübergehend entsperrt"},
@@ -76,6 +76,7 @@
   "alarm_off": {"label": "Alarm „Zeit um“ aus"},
   "not_counting": {"label": "Restzeit sinkt nicht", "help": "Eine zurückgestellte Uhr: Die Übersicht meldet es nach 90 s auf dem Bildschirm."},
   "unpaired": {"label": "Keine App verknüpft"},
+  "left_min": {"label": "Heute verbleibende Minuten"},
   "fw": {"label": "Firmware", "help": "Über der neuesten geprüften: der Firmware-Bildschirm."},
   "no_cfw": {"label": "Ohne Atmosphère"},
   "emummc": {"label": "emuMMC"},
@@ -85,7 +86,8 @@
   "applet": {"label": "Applet-Modus (aus dem Album)"},
   "background": {"label": "PlayGuard im Hintergrund"},
   "hbloader": {"label": "Ein Loader, der ein Update an einen Store übergeben kann"},
-  "numpad": {"label": "Was der Ziffernblock zurückgibt"},
+  "docked": {"label": "In der Station (am Fernseher)"},
+  "battery": {"label": "Im Akkubetrieb (kein Ladegerät)"},
   "boot_choice": {"label": "Antwort auf „vorheriger Build?“ beim Start", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "Netzwerkuhr genau"},
   "autosync_off": {"label": "„Uhr über das Internet synchronisieren“ aus"},
@@ -94,6 +96,8 @@
   "now": {"label": "Uhrzeit der Konsole, eingefroren", "help": "In der Zeitzone des Browsers."},
   "skip": {"label": "Uhrzeit der Konsole vorgestellt um (s)", "help": "Die ganze Zeit wird gespielt: Die Restzeit sinkt um ebenso viel. Die Tasten unter dem Bildschirm stellen sie vor."},
   "idle": {"label": "Kein Spiel läuft"},
+  "no_game": {"label": "Nichts hinter PlayGuard geöffnet"},
+  "no_play": {"label": "Seit Wochen nichts gespielt"},
   "no_pdm": {"label": "Kein Aktivitätsprotokoll"},
   "games": {"label": "Weitere Spiele diese Woche gespielt"},
   "accounts": {"label": "Benutzerkonten", "help": "0 bis 8 (standardmäßig 2), jedes spielt doppelt so viel wie das nächste."},
@@ -109,7 +113,9 @@
   "fail": {"label": "Fehlschlagen lassen", "options": {"unlock": "Entsperren", "unverified": "Entsperren nicht bestätigt", "relock": "Erneutes Sperren", "write": "Jedes Schreiben einer Einstellung", "timer": "Lesen des Timers", "clock": "Stellen der Uhr", "pin": "Lesen der Geheimzahl", "pin_entry": "Geheimzahl-Bildschirm abgebrochen", "bedtime": "Schlafenszeit", "remove": "Löschen eines Spiels", "launch": "Zurücksetzen der Startversion", "verify": "Integritätsprüfung"}},
   "still_focus": {"label": "Fokus-Hervorhebung ohne Bewegung"},
   "version": {"label": "Im Kopfbereich angezeigte Version"},
-  "hold_loading": {"label": "Auf dem Ladebildschirm bleiben"}
+  "hold_loading": {"label": "Auf dem Ladebildschirm bleiben"},
+  "cadran_noglow": {"label": "Ohne Hintergrundschein"},
+  "cadran_noring": {"label": "Der Ring ohne seine Bögen"}
  },
  "presets": {
   "default": "Standard",

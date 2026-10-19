@@ -30,10 +30,11 @@ std::string with_link_note(const std::string& body, const PctlStatus* st = nullp
 // `write` runs at once. `write(did_unlock)` only runs when it is safe to
 // write; otherwise the user has already been told why.
 // `danger`: the confirm button is drawn in the "bad" colour (removing or
-// overwriting limits).
+// overwriting limits). `title`: the dialog's first line, when there is one
+// (no dialog only for it).
 void confirm_write(const std::string& body, const std::string& confirm_label,
                    std::function<void(bool did_unlock)> write, const uint16_t* new_days = nullptr,
-                   bool danger = false);
+                   bool danger = false, const std::string& title = "");
 
 // Writes the seven limits (pctl_play_timer_set_days) and records the change
 // in the history with `source` ("uniform", "profile" …) and `detail` (a
@@ -59,6 +60,8 @@ void pick_limit(const std::string& title, uint16_t current, std::function<void(u
 // "Extra time today": raises today's weekday limit by 15 / 30 / 60 min and
 // remembers the previous value (config extra_*), so that it can be put back.
 void add_extra_time(const PtState& pt, std::function<void()> refresh);
+// The same for one amount (its confirmation only, no picker).
+void add_extra_minutes(const PtState& pt, uint16_t minutes, std::function<void()> refresh);
 
 // "No more play today": today's weekday limit to 0 for today only (through
 // confirm_write: the suspend warning says the game in progress stops at the
@@ -75,7 +78,7 @@ void stop_today(const PtState& pt, std::function<void()> refresh);
 // "by itself" preference is on, else asked (keep it, or put it back); "no
 // limit" to put back is always asked. Called at start-up, when the date
 // changes while the app is open and when read-only mode ends; `asked`: from
-// the Overview or the bell, where what stops it is said. `refresh` runs after
+// Today or the bell, where what stops it is said. `refresh` runs after
 // a change.
 void offer_extra_time_restore(std::function<void()> refresh = nullptr, bool asked = false);
 // The last restore waited for a state it could not read: try again (the main
@@ -83,18 +86,23 @@ void offer_extra_time_restore(std::function<void()> refresh = nullptr, bool aske
 void retry_extra_time_restore();
 
 // That offer is pending (what offer_extra_time_restore would ask now), and
-// the line the Overview shows for it ("Put Saturday's limit back to 2 h").
+// the line Today shows for it ("Put Saturday's limit back to 2 h").
 bool restore_pending(const PtState& pt);
 std::string restore_label();
+// Extra time planned for a later day (Extra time › Another day…): "Sunday:
+// +1 h planned for that day", "" when none is.
+std::string bonus_text();
 // Putting that limit back lowers it (pt_logic::restore_tightens): extra time
 // still raises it. False for "No more play today", which lowered it.
 bool restore_lowers();
 
 // "+30 min" when extra time was added today and is still there, else "".
 std::string extra_today_text(const PtState& pt);
+// The same in minutes (0: none).
+int extra_today_minutes(const PtState& pt);
 
 // The timer is on and its "time's up" alarm is off: the console says nothing
-// when time is up. The Overview and First steps point it out.
+// when time is up. Today and First steps point it out.
 bool alarm_off(const PtState& pt);
 // Turns that alarm back on after a confirmation (the PIN asked before a
 // change, read-only mode: as for any change), recorded with `source`.
@@ -120,9 +128,10 @@ void choose_time_up(const PtState& pt, std::function<void()> refresh);
 // Writes the choice and records it in the history ("time_up") with `source`.
 Result write_alarm_only(bool alarm_only, const std::string& source);
 
-// Bedtime, for every day. choose_bedtime: the alarm (16:00 to 23:45, or
-// off); choose_bedtime_end: when play is allowed again (05:00 to 09:00), on
-// the days whose alarm is on. Both refuse while the block's bedtime is not
+// Bedtime. choose_bedtime: the alarm (16:00 to 23:45, or off) for every
+// day, or by day of the week (Monday to Friday, the weekend, or one day, the
+// others keeping theirs); choose_bedtime_end: when play is allowed again
+// (05:00 to 09:00), on the days whose alarm is on. Both refuse while the block's bedtime is not
 // what the console reports (pt_logic::bedtime_layout_ok), then go through
 // confirm_write and write_bedtime.
 void choose_bedtime(const PtState& pt, std::function<void()> refresh);
@@ -130,8 +139,11 @@ void choose_bedtime_end(const PtState& pt, std::function<void()> refresh);
 // Writes the bedtimes (pctl_play_timer_set_bedtime, checked by the console's
 // answer) and records the change in the history with `source`.
 Result write_bedtime(const PtBedtime bed[7], const std::string& source);
-// "21:00, allowed again at 06:00", "Off", or "Varies by day".
+// "21:00, allowed again at 06:00", "Off", or the days' (bedtime_days_text).
 std::string bedtime_text(const PtState& pt);
+// The days' alarms when they differ: "Mon–Fri 21:30, Sat–Sun 22:30" (up to
+// three runs of days), else "Varies by day".
+std::string bedtime_days_text(const PtState& pt);
 
 // At start-up, before the first screen (and again on the main screen): an
 // earlier run unlocked (for a change, or PIN › Unlock temporarily) and

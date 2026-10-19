@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Overview: today's play time first, then the parental-control state and
-     system warnings. Refreshed every few seconds; A on a line opens its tab. -->
+<!-- Today: today's time left as a ring with the everyday actions beside it
+     (turning parental controls back on first, the row's whole width, while
+     they are unlocked, or setting the week's limits while there are none;
+     today's limit and the profile in force with them, the second row's
+     buttons sharing its width), three state cards, the console's state as
+     pills (dash_top). Above it, in applet mode, why PlayGuard opened over a
+     game counts; tab/dashboard_tab.cpp adds the first steps and the changes
+     seen outside PlayGuard under that. Under it, the extra time to put back
+     and the alarm turned off. Refreshed every few seconds. -->
 
 <brls:Box
     width="auto"
@@ -23,38 +30,69 @@
             paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
 
             <brls:Label id="dash_applet" text="@i18n/playguard/dashboard/applet" fontSize="20" marginBottom="12" textColor="@theme/brand/warn"/>
-            <brls:DetailCell id="dash_first_steps" title="@i18n/playguard/onboarding/open" marginBottom="12"/>
-            <brls:DetailCell id="dash_unlocked_banner" marginBottom="12"/>
-            <brls:Label id="dash_outside_text" text="" fontSize="20" marginBottom="6" textColor="@theme/brand/warn"/>
-            <brls:DetailCell id="dash_outside" title="@i18n/playguard/dashboard/outside_dismiss" marginBottom="12"/>
-            <brls:Header title="@i18n/playguard/dashboard/section_today" marginBottom="8"/>
-            <brls:Box axis="column" alignItems="stretch" marginTop="8" marginBottom="12" paddingLeft="16" paddingRight="16">
-                <PtGauge id="dash_gauge" width="auto" height="14" marginBottom="8"/>
-                <brls:Label id="dash_gauge_text" text=""/>
-                <brls:Label id="dash_not_counting" text="@i18n/playguard/play_timer/not_counting" fontSize="20" marginTop="8" textColor="@theme/brand/warn"/>
-                <brls:Label id="dash_home_hint" text="@i18n/playguard/dashboard/home_counts" fontSize="18" marginTop="6" textColor="@theme/brand/note"/>
+            <brls:Box id="dash_top" axis="column" alignItems="stretch">
+                <brls:Box axis="row" alignItems="center" marginBottom="18">
+                    <PtRing id="dash_ring" width="248" height="248" marginRight="36"/>
+                    <brls:Box id="dash_today_text" axis="column" alignItems="flexStart" grow="1.0" width="0">
+                        <brls:Label id="dash_kicker" text="" fontSize="15" textColor="@theme/cadran/text3" marginBottom="10"/>
+                        <brls:Label id="dash_gauge_text" text="" fontSize="30" textColor="@theme/cadran/text"/>
+                        <brls:Label id="dash_not_counting" text="@i18n/playguard/play_timer/not_counting" fontSize="16.5" marginTop="6" textColor="@theme/brand/warn"/>
+                        <brls:Box id="dash_actions" axis="row" alignItems="center" alignSelf="stretch" marginTop="14" marginBottom="12">
+                            <brls:Button id="dash_relock" style="primary" text="@i18n/playguard/security/banner_action" fontSize="19" height="56" cornerRadius="28" highlightCornerRadius="30" paddingLeft="22" paddingRight="22" grow="1.0" visibility="gone"/>
+                            <brls:Button id="dash_setup" style="primary" text="@i18n/playguard/cadran/today/setup" fontSize="19" height="56" cornerRadius="28" highlightCornerRadius="30" paddingLeft="22" paddingRight="22" grow="1.0" visibility="gone"/>
+                            <brls:Button id="dash_extra" style="primary" text="@i18n/playguard/cadran/today/extra" fontSize="19" height="56" cornerRadius="28" highlightCornerRadius="30" paddingLeft="22" paddingRight="22" marginRight="12"/>
+                            <brls:Box id="dash_chips" axis="row" alignItems="center"/>
+                        </brls:Box>
+                        <brls:Box id="dash_actions2" axis="row" alignItems="center" alignSelf="stretch">
+                            <brls:Button id="dash_stop" style="bordered" text="@i18n/playguard/cadran/today/stop" fontSize="17" height="48" cornerRadius="24" highlightCornerRadius="24" grow="1.0" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/coral" borderColor="@theme/cadran/coral_line" borderThickness="2"/>
+                            <brls:Button id="dash_child" style="bordered" text="@i18n/playguard/cadran/today/child" fontSize="17" height="48" cornerRadius="24" highlightCornerRadius="24" grow="1.0" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line" borderThickness="2"/>
+                            <brls:Button id="dash_limit" style="bordered" text="@i18n/playguard/cadran/today/limit" fontSize="17" height="48" cornerRadius="24" highlightCornerRadius="24" grow="1.0" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line" borderThickness="2"/>
+                            <brls:Button id="dash_profile" style="bordered" text="" fontSize="17" height="48" cornerRadius="24" highlightCornerRadius="24" grow="1.0" paddingLeft="20" paddingRight="20" textColor="@theme/cadran/text2" borderColor="@theme/cadran/line" borderThickness="2" visibility="gone"/>
+                        </brls:Box>
+                    </brls:Box>
+                </brls:Box>
+
+                <brls:Box axis="row" alignItems="stretch" marginBottom="14">
+                    <brls:Box id="dash_bed_card" focusable="true" hideHighlightBackground="true" highlightCornerRadius="20" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="20" paddingBottom="20" paddingLeft="24" paddingRight="24" marginRight="16">
+                        <brls:Box axis="row" justifyContent="spaceBetween" alignItems="center">
+                            <brls:Label text="@i18n/playguard/cadran/today/bed_title" fontSize="15" textColor="@theme/cadran/text3"/>
+                            <brls:Label id="dash_bed_state" text="" fontSize="15" textColor="@theme/cadran/teal"/>
+                        </brls:Box>
+                        <CadranDigits id="dash_bed_value" text="—" fontSize="32" marginTop="6" marginBottom="6" fitWidth="250"/>
+                        <brls:Box axis="row" alignItems="center">
+                            <brls:Box id="dash_bed_key" axis="row" alignItems="center" justifyContent="center" width="22" height="22" cornerRadius="11" backgroundColor="@theme/cadran/key_bg" marginRight="8" visibility="gone">
+                                <CadranDigits text="A" fontSize="12" textColor="@theme/cadran/key_fg"/>
+                            </brls:Box>
+                            <brls:Label id="dash_bed_sub" text="" fontSize="15" textColor="@theme/cadran/text2"/>
+                        </brls:Box>
+                    </brls:Box>
+                    <brls:Box id="dash_pc_card" focusable="true" hideHighlightBackground="true" highlightCornerRadius="20" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="20" paddingBottom="20" paddingLeft="24" paddingRight="24" marginRight="16">
+                        <brls:Box axis="row" justifyContent="spaceBetween" alignItems="center">
+                            <brls:Label text="@i18n/playguard/cadran/today/pc_title" fontSize="15" textColor="@theme/cadran/text3"/>
+                            <brls:Label id="dash_pc_state" text="" fontSize="15" textColor="@theme/cadran/teal"/>
+                        </brls:Box>
+                        <CadranDigits id="dash_pc_value" text="—" fontSize="32" marginTop="6" marginBottom="6" fitWidth="250"/>
+                        <brls:Label id="dash_pc_sub" text="" fontSize="15" textColor="@theme/cadran/text2"/>
+                    </brls:Box>
+                    <brls:Box id="dash_clock_card" focusable="true" hideHighlightBackground="true" highlightCornerRadius="20" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="20" paddingBottom="20" paddingLeft="24" paddingRight="24">
+                        <brls:Box axis="row" justifyContent="spaceBetween" alignItems="center">
+                            <brls:Label id="dash_clock_title" text="@i18n/playguard/cadran/today/clock_title" fontSize="15" textColor="@theme/cadran/text3"/>
+                            <brls:Label id="dash_clock_state" text="" fontSize="15" textColor="@theme/cadran/teal"/>
+                        </brls:Box>
+                        <CadranDigits id="dash_clock_value" text="—" fontSize="32" marginTop="6" marginBottom="6" fitWidth="250"/>
+                        <brls:Box axis="row" alignItems="center">
+                            <brls:Box id="dash_clock_key" axis="row" alignItems="center" justifyContent="center" width="22" height="22" cornerRadius="11" backgroundColor="@theme/cadran/key_bg" marginRight="8">
+                                <CadranDigits text="A" fontSize="12" textColor="@theme/cadran/key_fg"/>
+                            </brls:Box>
+                            <brls:Label id="dash_clock_sub" text="" fontSize="15" textColor="@theme/cadran/text2"/>
+                        </brls:Box>
+                    </brls:Box>
+                </brls:Box>
+
+                <brls:Box id="dash_pills" axis="row" alignItems="center" marginBottom="6"/>
             </brls:Box>
-            <brls:DetailCell id="dash_today_limit"/>
-            <brls:DetailCell id="dash_extra" title="@i18n/playguard/dashboard/extra"/>
-            <brls:DetailCell id="dash_stop" title="@i18n/playguard/dashboard/stop"/>
             <brls:DetailCell id="dash_extra_pending"/>
-            <brls:DetailCell id="dash_remaining" title="@i18n/playguard/dashboard/remaining"/>
-            <brls:DetailCell id="dash_bedtime" title="@i18n/playguard/dashboard/bedtime"/>
             <brls:DetailCell id="dash_alarm" title="@i18n/playguard/play_timer/alarm"/>
-            <brls:Header title="@i18n/playguard/dashboard/section_status" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="dash_pc" title="@i18n/playguard/dashboard/pc"/>
-            <brls:DetailCell id="dash_pin" title="@i18n/playguard/dashboard/pin"/>
-            <brls:DetailCell id="dash_level" title="@i18n/playguard/dashboard/level"/>
-            <brls:Header title="@i18n/playguard/dashboard/section_system" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="dash_clock" title="@i18n/playguard/dashboard/clock"/>
-            <brls:DetailCell id="dash_pairing" title="@i18n/playguard/dashboard/pairing"/>
-            <brls:DetailCell id="dash_serial" title="@i18n/playguard/dashboard/serial"/>
-            <brls:DetailCell id="dash_patches" title="@i18n/playguard/dashboard/patches"/>
-            <brls:DetailCell id="dash_fw" title="@i18n/playguard/dashboard/firmware"/>
-            <brls:DetailCell id="dash_compat" title="@i18n/playguard/dashboard/compat"/>
-            <brls:Label id="dash_updated" text="" fontSize="20" marginTop="10" textColor="@theme/brand/note"/>
-            <brls:Label id="dash_counted" text="@i18n/playguard/dashboard/counted" fontSize="18" marginTop="10" textColor="@theme/brand/note"/>
-            <MadeInFrance marginTop="24"/>
 
         </brls:Box>
 

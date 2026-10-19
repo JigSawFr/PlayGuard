@@ -8,7 +8,7 @@
         "step_closing": "Locking parental controls, back to the HOME menu..."
     },
     "tabs": {
-        "dashboard": "Overview",
+        "dashboard": "Today",
         "play_timer": "Play timer",
         "activity": "Activity",
         "restrictions": "Restrictions",
@@ -21,7 +21,6 @@
     },
     "hints": {
         "refresh": "Refresh",
-        "open": "Open",
         "exit_again": "Press B again to quit",
         "exit_unlocked": "Parental controls are still temporarily unlocked: games can be played without a limit until they are turned back on or the console restarts.\n\nTurn them back on before quitting?",
         "exit_lock": "Turn back on and quit",
@@ -77,9 +76,6 @@
         "4": "Thu",
         "5": "Fri",
         "6": "Sat"
-    },
-    "numpad": {
-        "guide": "Hours:minutes (1:30) or minutes (90), up to 24:00. 0 = no play that day."
     },
     "error": {
         "code": "error {}",
@@ -138,35 +134,20 @@
         "update_toast": "PlayGuard {} supports firmware {}: About › Check for updates."
     },
     "dashboard": {
-        "section_status": "Parental controls",
-        "section_today": "Today",
-        "section_system": "System",
-        "pc": "Parental controls",
         "pc_active": "Active",
-        "pc_unlocked": "Temporarily unlocked",
         "pc_off": "Not set up",
         "pc_pin_only": "PIN set, no restriction",
-        "pin": "PIN",
         "pin_set": "Set",
-        "level": "Restriction level",
-        "today_limit": "Today's limit ({})",
-        "remaining": "Time left today",
-        "remaining_idle": "Shown while a game runs",
-        "remaining_unlocked": "May not be counted",
         "gauge_known": "{} played of {}",
         "gauge_none": "No play-time limit today",
         "gauge_none_played": "No play-time limit today · {} played",
         "gauge_log": "≈ {} played of {} (activity log)",
-        "remaining_log": "≈ {}",
-        "remaining_over": "{} over",
         "gauge_unknown": "Play time not available",
         "gauge_reached": "Today's limit has been reached",
         "gauge_over": "{} played of {}: {} over, a warning only",
         "gauge_idle": "Time left is reported while a game is running.",
         "gauge_unlocked": "Play time may not be counted while parental controls are unlocked.",
-        "bedtime": "Bedtime alarm",
         "alarm_off": "Off",
-        "clock": "Network clock",
         "clock_ok": "Accurate",
         "clock_bad": "Not accurate",
         "pairing": "Companion app",
@@ -175,9 +156,7 @@
         "serial": "Serial number",
         "serial_visible": "Not blanked (emuMMC)",
         "patches": "Game patches",
-        "firmware": "Firmware",
         "compat": "Compatibility",
-        "updated": "Updated at {}",
         "extra": "Extra time today...",
         "extra_title": "Extra time today",
         "extra_body_auto": "Add {} today?\n\nThe {} limit goes from {} to {}. From the next day, PlayGuard puts it back to {} the next time it is opened.",
@@ -206,12 +185,21 @@
         "outside_reset": "Today's play time started over at about {} (clock changed?).",
         "outside_clock": "The console clock was changed.",
         "outside_limits": "Limits were changed outside PlayGuard, e.g. by the phone app.",
-        "outside_dismiss": "Dismiss this notice"
+        "outside_dismiss": "Dismiss this notice",
+        "bonus_row": "Another day...",
+        "bonus_planned_row": "{}: {} planned (remove...)",
+        "bonus_day_title": "Extra time on which day?",
+        "bonus_amount_title": "Extra time: {}",
+        "bonus_no_limit": "{}: no limit is set that day, so there is no time to add.",
+        "bonus_body": "{}: the limit goes from {} to {}, that day only.\n\nOnce the day is over, PlayGuard puts {} back the next time it is opened.",
+        "bonus_done": "{}: {} planned.",
+        "bonus_cancel_body": "{}: remove the {} planned? The limit goes back to {}.",
+        "bonus_cancel": "Remove it",
+        "bonus_cancelled": "Planned extra time removed."
     },
     "onboarding": {
         "title": "First steps",
         "open": "First steps",
-        "pin_missing": "No PIN yet",
         "headline": "Three steps and the console is protected. A on a step does it.",
         "all_done": "All set: the console is protected. Come back here any time from About › Help & diagnostics.",
         "section_steps": "Steps",
@@ -251,12 +239,10 @@
         },
         "section_limit": "Daily limit",
         "week_title": "This week's limits",
-        "week_title_edit": "This week's limits (A on a day changes it)",
         "quick": "Same limit every day",
         "quick_title": "Daily limit for every day",
         "quick_title_varies": "Daily limit for every day (days differ now)",
         "split": "Weekdays and weekend",
-        "remove": "Remove the play-time limit...",
         "profile_save": "Save as a profile...",
         "profile_new": "New profile...",
         "profile_name": "Profile name",
@@ -291,11 +277,8 @@
         "profile_action_rename": "Rename...",
         "profile_edit_title": "Profile: {}",
         "section_bedtime": "Bedtime",
-        "bedtime": "Bedtime alarm",
-        "bedtime_value_on": "{} (on)",
-        "bedtime_value_off": "{} (off)",
         "bedtime_reset": "Play allowed again at",
-        "bedtime_note": "Applies to every day. At bedtime the console shows the alarm, and may also suspend the software (see \"When the time is up\"), until play is allowed again. PlayGuard checks that the console reports the new time, and puts the previous settings back if it does not.",
+        "bedtime_note": "Every day, or by day of the week. At bedtime the console shows the alarm, and may also suspend the software (see \"When the time is up\"), until play is allowed again. PlayGuard checks that the console reports the new time, and puts the previous settings back if it does not.",
         "bedtime_title": "Bedtime alarm, every day",
         "bedtime_end_title": "Play allowed again at (every day)",
         "bedtime_summary": "{}, play allowed again at {}",
@@ -342,7 +325,6 @@
         },
         "perday": {
             "title": "Per-day limits",
-            "section_days": "Days (A on a day changes it)",
             "section_presets": "Quick fill",
             "weekdays": "Set Monday to Friday...",
             "weekend": "Set Saturday and Sunday...",
@@ -371,11 +353,18 @@
         "remove_err": "Could not remove the play-time limit",
         "not_counting": "The console is not counting play time right now. Likely causes: the clock was set back (it counts again later), the network clock was never set (Console › Network clock), or a limit was just written (start a game for a minute, then check).",
         "limit_note": "At the limit the console shows \"Time's up\", then suspends the game or only warns, as set in \"When the time is up\".",
-        "unsaved": "Unsaved progress may be lost: let the child save first."
+        "unsaved": "Unsaved progress may be lost: let the child save first.",
+        "profile_already": "The profile \"{}\" is already in place.",
+        "bedtime_by_day": "By day of the week...",
+        "bedtime_by_day_title": "Bedtime alarm, by day",
+        "bedtime_weekdays": "Monday to Friday",
+        "bedtime_weekend": "Saturday and Sunday",
+        "bedtime_days_title": "Bedtime alarm: {}",
+        "bedtime_days_confirm": "{}: set the bedtime alarm to {}?\n\nPlay is allowed again at {}.",
+        "bedtime_days_confirm_off": "{}: turn off the bedtime alarm?"
     },
     "activity": {
         "section_totals": "Play time",
-        "account": "Account",
         "account_all": "All accounts",
         "account_default": "Account by default",
         "account_last": "The last one shown",
@@ -387,7 +376,6 @@
         "accounts_none": "No account has a figure for this game (deleted games keep only their totals).",
         "section_games": "Games",
         "period": "Period",
-        "export": "Export to the SD card...",
         "export_title": "Export format",
         "formats": {
             "0": "CSV (spreadsheet)",
@@ -405,18 +393,21 @@
             "today": "Today (min)",
             "week": "Last 7 days (min)",
             "day": "{} (min)",
-            "total": "All time (min)"
+            "total": "All time (min)",
+            "month": "Last 30 days (min)"
         },
         "periods": {
             "0": "Today",
             "1": "Last 7 days",
-            "2": "All time"
+            "2": "All time",
+            "3": "Last 30 days"
         },
         "loading": "Reading the console's play data...",
         "none": {
             "0": "No game played today.",
             "1": "No game played in the last 7 days.",
-            "2": "No game played yet."
+            "2": "No game played yet.",
+            "3": "No game played in the last 30 days."
         },
         "err_list": "Could not list the games",
         "err_stats": "Could not read the play statistics",
@@ -444,7 +435,22 @@
         "applet_cap": "Not listed, to save memory in applet mode (opened from the album): {} more. The export has every game; for the full list, open PlayGuard while holding R as you start a game.",
         "account_nobody": "No account (or a deleted one)",
         "account_new": "New account since {}: {}",
-        "truncated": "Only {} games can be listed: some not played this week are missing, and the all-time total leaves them out."
+        "truncated": "Only {} games can be listed: some not played this week are missing, and the all-time total leaves them out.",
+        "section_hours": "Hours played, last 7 days",
+        "hours": {
+            "legend": "A square for each hour of each day: the stronger, the more was played.",
+            "sessions": "Sessions",
+            "sessions_value": "{} · {} on average",
+            "longest": "Longest session",
+            "busy": "Busiest hours",
+            "busy_value": "{} to {}",
+            "late": "Played from 21:00 to 06:00"
+        },
+        "rating": "Age rating",
+        "rating_blocked": "{} · blocked at the current level",
+        "qr": "The week's summary as a QR code",
+        "qr_body": "Scan it with a phone's camera: the last 7 days appear as text. Nothing goes online.",
+        "qr_days": "Each day"
     },
     "library": {
         "title": "Games",
@@ -457,7 +463,6 @@
     },
     "restrictions": {
         "section_level": "Restriction level",
-        "level": "Level",
         "levels": {
             "0": "None",
             "1": "Custom",
@@ -468,7 +473,6 @@
         "confirm_level": "Change the restriction level to \"{}\"?",
         "custom_hint": "Then choose each restriction below.",
         "section_custom": "Custom settings",
-        "section_level_settings": "What this level restricts",
         "age": "Restrict software by age rating",
         "age_none": "No restriction",
         "age_value": "Up to {} years",
@@ -487,13 +491,31 @@
         "none_body": "Nothing will be restricted: software of any age rating can be played, and posting to social media and communicating with others are allowed. The daily play-time limits still apply.",
         "confirm_age": "Change the age limit to \"{}\"? Software with a higher age rating than now can then be played.",
         "confirm_sns_off": "Stop restricting posting to social media? Screenshots and videos can then be posted from the console.",
-        "confirm_comm_off": "Stop restricting communicating with others? Software can then let the child chat and share content with other players."
+        "confirm_comm_off": "Stop restricting communicating with others? Software can then let the child chat and share content with other players.",
+        "org_where": {
+            "cero": "Japan",
+            "grac": "South Korea",
+            "gsrmr": "Taiwan",
+            "esrb": "United States, Canada, Latin America (not Brazil)",
+            "classind": "Brazil",
+            "usk": "Germany",
+            "pegi": "Europe: France, Belgium, Switzerland, Spain, Italy, Netherlands, Austria…",
+            "pegi_portugal": "Portugal",
+            "pegi_bbfc": "United Kingdom",
+            "russian": "Russia",
+            "acb": "Australia",
+            "oflc": "New Zealand",
+            "iarc": "Other countries"
+        },
+        "blocked": "Installed games it blocks",
+        "blocked_value": "{} of {}",
+        "blocked_title": "{} rates them above {}",
+        "blocked_none": "{}: no installed game is rated above {}.",
+        "blocked_no_age": "This level does not restrict games by age.",
+        "blocked_note": "From the last check of the installed games. A game the rating organisation does not rate is not counted, nor the exceptions set in the companion app."
     },
     "clock": {
         "section_now": "Clocks",
-        "user": "Console clock",
-        "network": "Network clock",
-        "accuracy": "Network clock accurate",
         "auto": "Synchronize Clock via Internet",
         "zone": "Time zone",
         "why": "The play timer relies on the network clock. When it is inaccurate (a console that never reaches Nintendo's servers), set it here from a public time server.",
@@ -557,7 +579,8 @@
         "confirm_copy_follows": "\n\n\"Synchronize Clock via Internet\" is on, so the console clock follows the network clock and may be just as wrong. If it is: turn the setting off, set the date and time in System Settings › System › Date and Time, then come back here.",
         "confirm_copy_sync_after": "\n\n\"Synchronize Clock via Internet\" is off: the console clock stays as it is. Turning it on afterwards will no longer make it jump, both clocks then showing the same time.",
         "copied_sync_on": "\n\nYou can now turn on \"Synchronize Clock via Internet\" (System Settings › System › Date and Time): the console clock will not jump.",
-        "copy_implausible": "The console clock reads {}: it does not look set. Set the date and time in System Settings › System › Date and Time first (with \"Synchronize Clock via Internet\" off), then come back here."
+        "copy_implausible": "The console clock reads {}: it does not look set. Set the date and time in System Settings › System › Date and Time first (with \"Synchronize Clock via Internet\" off), then come back here.",
+        "dns_note": "On this console, Atmosphère's DNS redirection (atmosphere/hosts) blocks Nintendo's time server: the network clock cannot set itself."
     },
     "pairing": {
         "section": "Nintendo Switch Parental Controls app",
@@ -570,7 +593,9 @@
         "unlink_err": "Could not unlink the companion app",
         "note": "While the console stays linked, the companion app overwrites the settings made here at its next synchronization.",
         "decode": "Before unlinking: help decode two settings",
-        "decode_note": "Before unlinking, this console can help decode \"alarm only\" and per-day bedtime (PIN, 2 min): once unlinked, it no longer can."
+        "decode_note": "Before unlinking, this console can help decode \"alarm only\" and per-day bedtime (PIN, 2 min): once unlinked, it no longer can.",
+        "dns_blocked": "sync blocked (DNS)",
+        "dns_note": "Atmosphère's DNS redirection (atmosphere/hosts) sends Nintendo's parental-control server elsewhere: the companion app cannot synchronize, so it does not overwrite what is set here."
     },
     "security": {
         "section_status": "Status",
@@ -983,7 +1008,18 @@
         "notices_summary": "The week's play time",
         "notices_reminders": "Reminders: backups, the other system, all games blocked",
         "notices_ack_remind": "Count ignored warnings again after 30 days",
-        "help": "Help & diagnostics"
+        "help": "Help & diagnostics",
+        "text_size": "Text size",
+        "text_sizes": {
+            "normal": "Normal",
+            "large": "Larger",
+            "auto": "Automatic: larger on the TV"
+        },
+        "effects": "Visual effects",
+        "effects_values": {
+            "auto": "Lighter on battery",
+            "full": "Always full"
+        }
     },
     "backup": {
         "saved": "Settings backed up: {}",
@@ -1093,6 +1129,10 @@
         "size_kb": "{} KB",
         "size_mb": "{} MB",
         "pt_log_on": "Recording every 30 s in {}",
+        "frame_stats": "Frame statistics",
+        "frame_stats_note": "One line every second while PlayGuard is open, in logs/frame_stats.txt: the mode (docked or handheld) and the frame size, the screen shown, the frames per second, the UI's own computing time per frame (mean and maximum, in ms), the interval between two frames (mean and maximum) and how many frames came late (more than 20 ms). To compare screens, or the background glow on and off: leave each screen shown for 30 s without touching anything, docked then handheld. The file starts over each time this is turned on.",
+        "frame_stats_on": "One line every second in {}",
+        "frame_stats_wait": "First line in a second…",
         "gate": "Show the firmware screen again",
         "forget": "Forget the firmware choice",
         "forgotten": "The firmware choice will be asked again at the next launch.",
@@ -1106,7 +1146,8 @@
         "enabled": "Developer mode is on: see the end of About › Help & diagnostics.",
         "presses_left": "{} more presses to turn on developer mode.",
         "presses_left_one": "1 more press to turn on developer mode.",
-        "report_upload": "Send online"
+        "report_upload": "Send online",
+        "glow": "Background glow"
     },
     "dev_build": {
         "open": "Install another build",
@@ -1267,11 +1308,14 @@
             "backup": "Backup restored",
             "undo": "Put back from the history",
             "first_steps": "First steps",
-            "overview": "Overview",
+            "overview": "Today",
             "profile": "Profile \"{}\"",
             "console_lock": "Block all games",
             "notices": "Notifications",
-            "rescue": "Recovery"
+            "rescue": "Recovery",
+            "bonus": "Extra time planned",
+            "restore_bonus": "Planned extra time put back",
+            "schedule_end": "End of a scheduled profile"
         },
         "when": "When",
         "how": "From",
@@ -1310,14 +1354,15 @@
             "kind": "Code",
             "done": "Done",
             "refused": "Refused ({})"
-        }
+        },
+        "undo_hint": "Undo",
+        "empty_title": "Nothing recorded yet",
+        "empty_text": "Every change PlayGuard makes on the console (limits, restriction level, PIN, unlocks...) is listed here."
     },
     "chart": {
         "last_days": "The last 7 days, today on the right",
         "limit_line": "The line across a bar is this week's limit for that day",
-        "limit_over": "The line is this week's limit for that day · ! in amber: played over it",
-        "week_order": "Monday to Sunday, today underlined",
-        "unsaved": "* in amber: changed, not saved yet"
+        "limit_over": "The line is this week's limit for that day · ! in amber: played over it"
     },
     "data_notice": {
         "config_reset": "PlayGuard's settings could not be read and were reset; the damaged file was kept as config.json.bad.",
@@ -1351,8 +1396,8 @@
         "failed": "The notes could not be fetched. Press X to try again."
     },
     "quick": {
-        "title": "Language and theme",
-        "hint": "Language & theme"
+        "hint": "Language & theme",
+        "title_text": "Language, theme and text size"
     },
     "notices": {
         "title": "Notifications",
@@ -1447,6 +1492,216 @@
         "week_detail": "{} a day on average.",
         "week_top": "Most played: {} ({}).",
         "over_limit": "The limit was passed on {} of the last 7 days",
-        "over_limit_detail": "When the time is up, the console only warns: play goes on past the limit (Play timer › When the time is up)."
+        "over_limit_detail": "When the time is up, the console only warns: play goes on past the limit (Play timer › When the time is up).",
+        "clock_detail_dns": "Atmosphère's DNS blocks Nintendo's time server, so the console cannot set it itself: set it from a time server.",
+        "week_more": "{} a day more than the week before.",
+        "week_less": "{} a day less than the week before.",
+        "week_same": "About the same as the week before."
+    },
+    "cadran": {
+        "date": "{0}, {3} {2}",
+        "months": {
+            "1": "January",
+            "2": "February",
+            "3": "March",
+            "4": "April",
+            "5": "May",
+            "6": "June",
+            "7": "July",
+            "8": "August",
+            "9": "September",
+            "10": "October",
+            "11": "November",
+            "12": "December"
+        },
+        "today": {
+            "kicker": "Today · {}'s limit",
+            "free": "free",
+            "no_limit": "no limit",
+            "unlocked": "unlocked",
+            "time_up": "time's up",
+            "left": "left",
+            "today": "today",
+            "extra": "Extra time",
+            "stop": "Stop for today",
+            "child": "Show the child",
+            "bed_title": "Bedtime alarm",
+            "on": "on",
+            "bed_sub": "games allowed again at {}",
+            "pc_title": "Parental controls",
+            "pc_unlocked": "unlocked",
+            "pin_set": "PIN set",
+            "no_pin": "no PIN",
+            "clock_title": "Network clock",
+            "clock_ok": "Accurate",
+            "clock_bad": "Inaccurate",
+            "to_set": "to set",
+            "ok": "ok",
+            "clock_fix": "Measure and set it now",
+            "clock_fine": "the timer counts right",
+            "serial_hidden": "Serial number hidden",
+            "next_time_up": "If play goes on, time is up around {}",
+            "next_bedtime": "Bedtime alarm at {}, in {}",
+            "next_bedtime_now": "Bedtime: games allowed again at {}",
+            "clock_fix_dns": "Blocked by the DNS: measure and set it",
+            "next_with_extra": "With {} more, time is up around {}",
+            "next_with_extra_bed": "With {} more, the bedtime alarm at {} still comes first",
+            "head_unlocked": "{} limit on hold",
+            "pc_lifted": "Lifted until turned back on",
+            "limit": "Today's limit…",
+            "bed_in": "in {}",
+            "dns_nintendo": "DNS · Nintendo blocked",
+            "dns_sync": "DNS · app sync blocked",
+            "dns_time": "DNS · time server blocked",
+            "dns_title": "Atmosphère's DNS redirection",
+            "dns_intro": "Its hosts file (atmosphere/hosts) sends Nintendo's servers elsewhere.",
+            "dns_sync_note": "The companion app cannot synchronize, so it does not overwrite what is set here.",
+            "dns_time_note": "The network clock cannot set itself: PlayGuard sets it from a time server ({}).",
+            "dns_open": "DNS · Nintendo not blocked",
+            "dns_intro_open": "It leaves the Nintendo servers that matter here alone.",
+            "dns_row_sync": "Parental controls server",
+            "dns_row_time": "Time server",
+            "dns_blocked": "Blocked",
+            "dns_reachable": "Reachable",
+            "counted_title": "Time spent here counts",
+            "counted_pill": "Opened over a game · counts on the timer",
+            "no_play": "No play",
+            "head_no_play": "No play today",
+            "head_unlocked_no_play": "No play today, on hold",
+            "limit_title": "Change {}'s limit?",
+            "setup": "Set the week's limits",
+            "profiles": "Profiles…",
+            "profiles_title": "Put a profile in force",
+            "profiles_manage": "Manage the profiles…",
+            "tl_time_up": "time is up",
+            "tl_with": "with {} more",
+            "tl_bedtime": "bedtime",
+            "home_pill": "A game open on HOME · still counts",
+            "home_title": "A game is still open",
+            "steps_count": "{} of {}",
+            "tl_bed_first": "bedtime comes first",
+            "bed_off_value": "Off",
+            "bed_set": "Set it"
+        },
+        "pill": {
+            "pc_on": "Parental controls on",
+            "pc_off": "Parental controls not set up",
+            "unlocked": "Unlocked for now",
+            "timer_on": "Play timer on",
+            "timer_off": "Countdown paused",
+            "timer_none": "No play-time limit",
+            "level": "Level · {}",
+            "pin_set": "PIN set",
+            "pin_none": "No PIN"
+        },
+        "week": {
+            "no_limit": "no limit",
+            "every_day": "{} every day",
+            "summary": "{} on weekdays · {} at the weekend",
+            "profile": "Profile · {}",
+            "edit": "Edit",
+            "done": "Done",
+            "pick": "Exact time",
+            "edit_day": "edit a day",
+            "pick_day": "exact time or no limit",
+            "step": "± 15 min",
+            "day": "change day",
+            "weekdays": "copy to Mon → Fri",
+            "weekend": "copy to Sat · Sun",
+            "none": "no limit",
+            "first_change": "{} {} → {}",
+            "no_changes": "No changes waiting · + saves",
+            "discard": "Discard",
+            "remove": "Remove the limit",
+            "save_title": "Save the week's limits?",
+            "played_key": "played, last 7 days",
+            "played_day": "{}: {} played of {}",
+            "played_day_free": "{}: {} played, no limit",
+            "bonus": "{}: {} planned for that day"
+        },
+        "activity": {
+            "export": "Export",
+            "games": "{} game(s)",
+            "on_limit": "of a {} limit",
+            "per_day": "{} a day",
+            "top": "most played · {}",
+            "card_today": "today",
+            "card_total": "today · {} in all",
+            "empty_note": "Games played on this console show up here, account by account.",
+            "see_all": "See all time",
+            "trend_up": "+{}/day vs last week",
+            "trend_down": "-{}/day vs last week",
+            "trend_same": "same as last week",
+            "card_grew": "+{} vs last week"
+        },
+        "restrictions": {
+            "choose": "Choose this level",
+            "custom": "each setting chosen below",
+            "up_to": "software rated up to {} {}",
+            "any_age": "software of any rating",
+            "sns_blocked": "Social media · restricted",
+            "sns_allowed": "Social media · allowed",
+            "sns_unknown": "Social media · —",
+            "comm_blocked": "Communication · restricted",
+            "comm_allowed": "Communication · allowed",
+            "comm_unknown": "Communication · —",
+            "none": "software of any rating, social media and communication allowed",
+            "to_settings": "Its settings",
+            "games_blocked": "Games blocked · {}",
+            "games_none": "Games blocked · none"
+        },
+        "clock": {
+            "console": "Console",
+            "network": "Network · used by the play timer",
+            "accurate": "accurate",
+            "inaccurate": "inaccurate · set it below"
+        },
+        "about": {
+            "tagline": "Parental controls for Nintendo Switch · free software (GPLv3)",
+            "version": "Version {}"
+        },
+        "child": {
+            "header": "Child screen · PIN to come back",
+            "title": "Time left today",
+            "bed": "Bed at",
+            "stops": "The console stops by itself when time is up",
+            "warns": "The console tells you when time is up",
+            "enjoy": "Have fun!",
+            "of": "of {}",
+            "back": "Back to the parent · PIN",
+            "play": "Hand the console over and play",
+            "on_hold": "limit on hold",
+            "end": "Ends around {}",
+            "extra": "Extra time",
+            "no_extra": "No limit counts right now: there is nothing to add to."
+        },
+        "dialog": {
+            "unlock_short": "Parental controls are unlocked with the stored PIN for the change, then locked again."
+        }
+    },
+    "schedule": {
+        "date": "{1} {0}",
+        "cell": "Scheduled profile",
+        "note": "A profile for a period (holidays, a trip): PlayGuard offers to put it in force when the period begins, and the limits from before back once it is over, when it is opened.",
+        "none": "None",
+        "value": "{} · {} to {}",
+        "pick_profile": "Profile for the period",
+        "pick_from": "First day",
+        "pick_to": "Last day",
+        "saved": "{} scheduled from {} to {}.",
+        "no_profile": "Save a profile first: the period puts one in force.",
+        "profile_gone": "The profile \"{}\" no longer exists: its schedule is removed.",
+        "apply_body": "From {} to {}: put the profile \"{}\" in force now?\n\nAfter {}, PlayGuard offers to put back the limits it replaces.",
+        "not_now": "Not now",
+        "apply": "Put it in force",
+        "over_body": "The period of \"{}\" ended on {}. Put back the limits from before ({})?",
+        "keep": "Keep these limits",
+        "put_back": "Put them back",
+        "put_back_body": "Put back the limits from before \"{}\"?",
+        "put_back_now": "End it now: the limits from before back",
+        "keep_remove": "Keep these limits and remove it",
+        "change": "Change...",
+        "remove": "Remove it",
+        "removed": "Scheduled profile removed."
     }
 }

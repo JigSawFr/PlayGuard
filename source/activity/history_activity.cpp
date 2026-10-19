@@ -3,6 +3,8 @@
 
 #include "action/export_flow.hpp"
 #include "action/history_flow.hpp"
+#include "tab/cadran_list.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
 #include "util/perf.hpp"
@@ -30,6 +32,9 @@ brls::Box* new_slot()
     auto* cell = new brls::DetailCell();
     cell->setDetailTextColor(ui::color_neutral());
     slot->addView(cell);
+    // Each change a card of its own, under its day.
+    cadran::List::section(day);
+    cadran::List::row(cell, nullptr, true);
     return slot;
 }
 }   // namespace
@@ -47,6 +52,9 @@ void HistoryActivity::onContentAvailable()
         this->export_shown();
         return true;
     });
+    this->empty_card = cadran::kit::empty("history");
+    this->empty_card.box->setMarginTop(16);
+    if (auto* root = dynamic_cast<brls::Box*>(empty->getParent())) root->addView(this->empty_card.box);
     this->rebuild();
 }
 
@@ -105,7 +113,10 @@ void HistoryActivity::rebuild()
             const std::string this_day = history_logic::day_key(e);
             brls::Header* header = day_of_slot(slot);
             const bool starts_day = i == 0 || this_day != day;
-            if (starts_day) header->setTitle(history_flow::day_title(this_day));
+            if (starts_day) {
+                const std::string title = history_flow::day_title(this_day);
+                header->setTitle(cadran::upper(title));
+            }
             ui::set_visible(header, starts_day);
             day = this_day;
 
@@ -125,8 +136,17 @@ void HistoryActivity::rebuild()
         }
         for (size_t i = 0; i < this->shown.size(); i++) ui::set_visible(slots[i], true);
     });
-    ui::set_visible(empty.getView(), this->shown.empty());
-    empty->setText(this->filter == Filter::All ? "playguard/history/none"_i18n : "playguard/history/none_shown"_i18n);
+    if (this->empty_card.box) {
+        const bool all = this->filter == Filter::All;
+        ui::set_visible(empty.getView(), false);
+        ui::set_visible(this->empty_card.box, this->shown.empty());
+        this->empty_card.title->setText(all ? "playguard/history/empty_title"_i18n : "playguard/history/none_shown"_i18n);
+        this->empty_card.text->setText(all ? "playguard/history/empty_text"_i18n : "");
+        ui::set_visible(this->empty_card.text, all);
+    } else {
+        ui::set_visible(empty.getView(), this->shown.empty());
+        empty->setText(this->filter == Filter::All ? "playguard/history/none"_i18n : "playguard/history/none_shown"_i18n);
+    }
     if (focus_hidden) brls::Application::giveFocus(filter_cell.getView());
     brls::Logger::info("history list: {} of {} changes", this->shown.size(), this->all.size());
 }

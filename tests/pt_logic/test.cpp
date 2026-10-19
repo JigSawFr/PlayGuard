@@ -1,6 +1,7 @@
 // Host tests for source/action/pt_logic.cpp: when a play-timer write needs the
 // temporary unlock, how much was played today, extra time and putting it back,
-// what pt_flow's pickers start on, and an unlock left on by an earlier run.
+// what pt_flow's pickers start on, an unlock left on by an earlier run, and
+// what stops play first today (Cadran's Today).
 #include "check.h"
 #include <cstdio>
 #include <cstring>
@@ -198,6 +199,44 @@ static void test_stop()
     CHECK(pt_logic::restore_action(rec, "2026-10-08", pt, false) == pt_logic::Restore::Offer);
 }
 
+// Extra time planned for a later day: put back once that day is over.
+static void test_bonus()
+{
+    using pt_logic::Restore;
+    pt_logic::BonusRecord rec;
+    PtState pt = counting();
+    CHECK(pt_logic::bonus_action(rec, "2026-10-08", pt, false) == Restore::None);    // nothing planned
+    rec.weekday = 6;
+    rec.date = "2026-10-10";   // a Saturday
+    rec.base = 180;
+    rec.value = 240;
+    pt.day_min[6] = 240;
+    CHECK(pt_logic::bonus_action(rec, "2026-10-08", pt, false) == Restore::None);    // before the day
+    CHECK(pt_logic::bonus_action(rec, "2026-10-10", pt, false) == Restore::None);    // the day itself
+    CHECK(pt_logic::bonus_action(rec, "2026-10-11", pt, false) == Restore::Offer);   // over
+    CHECK(pt_logic::bonus_action(rec, "2026-10-17", pt, false) == Restore::Offer);   // a week on, still put back
+    CHECK(pt_logic::bonus_action(rec, "2026-10-11", pt, true) == Restore::Later);    // read-only
+    pt.day_min[6] = 200;
+    CHECK(pt_logic::bonus_action(rec, "2026-10-11", pt, false) == Restore::Forget);  // changed since
+    rec.date = "soon";
+    CHECK(pt_logic::bonus_action(rec, "2026-10-11", pt, false) == Restore::None);
+
+    // The days offered: tomorrow and the five after, with their weekdays.
+    const auto days = pt_logic::bonus_days("2026-10-08", 4);   // a Thursday
+    CHECK(days.size() == 6 && days[0].date == "2026-10-09" && days[0].weekday == 5);
+    CHECK(days[2].date == "2026-10-11" && days[2].weekday == 0 && days[5].date == "2026-10-14" && days[5].weekday == 3);
+    CHECK(pt_logic::bonus_days("today", 4).empty());
+
+    // Only on a day with a limit below 24 h, the state read and writable.
+    pt = counting();
+    pt.day_min[6] = 180;
+    CHECK(pt_logic::can_plan_bonus(pt, 6, false) && !pt_logic::can_plan_bonus(pt, 6, true));
+    pt.day_min[6] = PT_DAY_NOLIMIT;
+    CHECK(!pt_logic::can_plan_bonus(pt, 6, false));
+    pt.day_min[6] = 1440;
+    CHECK(!pt_logic::can_plan_bonus(pt, 6, false) && !pt_logic::can_plan_bonus(pt, 7, false));
+}
+
 static void test_restore()
 {
     pt_logic::ExtraRecord rec;
@@ -321,6 +360,40 @@ static void test_bedtime()
     for (int n = 0; n < 7; n++) pt.bed[n] = out[n];
     CHECK(pt_logic::bedtime_uniform(pt, &u) && !u.on);
     CHECK(!pt_logic::bedtime_end_every_day(pt, 7, 0, out));   // no bedtime on
+
+    // One set of days: Monday to Friday at 21:00, the weekend kept off.
+    pt_logic::bedtime_days(pt, pt_logic::WEEKDAYS, true, 21, 0, out);
+    for (int n = 1; n <= 5; n++) CHECK(out[n].on && out[n].hour == 21 && out[n].end_hour == 8);
+    CHECK(!out[0].on && !out[6].on && out[6].end_hour == 8);
+    for (int n = 0; n < 7; n++) pt.bed[n] = out[n];
+    CHECK(pt_logic::bedtime_shared(pt, pt_logic::WEEKDAYS, &u) && u.on && u.hour == 21);
+    CHECK(pt_logic::bedtime_shared(pt, pt_logic::WEEKEND, &u) && !u.on);
+    CHECK(!pt_logic::bedtime_shared(pt, pt_logic::ALL_DAYS, &u) && !pt_logic::bedtime_uniform(pt, &u));
+    CHECK(!pt_logic::bedtime_shared(pt, 0, &u));
+    // Then Friday alone later: 22:30.
+    pt_logic::bedtime_days(pt, 1u << 5, true, 22, 30, out);
+    CHECK(out[5].hour == 22 && out[5].minute == 30 && out[4].hour == 21 && !out[6].on);
+    for (int n = 0; n < 7; n++) pt.bed[n] = out[n];
+    const std::vector<int> times = pt_logic::bedtime_times();
+    CHECK(times[(size_t)pt_logic::bedtime_selected_days(pt, 1u << 5, times)] == 22 * 60 + 30);
+    CHECK(times[(size_t)pt_logic::bedtime_selected_days(pt, pt_logic::WEEKDAYS, times)] == 21 * 60);   // they differ
+    CHECK(pt_logic::bedtime_selected_days(pt, pt_logic::WEEKEND, times) == 0);                          // off
+
+    // The runs, Monday first: Monday to Thursday at 21:00, Friday 22:30, the
+    // weekend off (Saturday and Sunday one run, Sunday last).
+    auto runs = pt_logic::bedtime_runs(pt);
+    CHECK(runs.size() == 3);
+    CHECK(runs[0].first == 1 && runs[0].last == 4 && runs[0].bed.hour == 21);
+    CHECK(runs[1].first == 5 && runs[1].last == 5 && runs[1].bed.minute == 30);
+    CHECK(runs[2].first == 6 && runs[2].last == 0 && !runs[2].bed.on);
+    // The same alarm, another allowed-again time: still one run.
+    pt_logic::bedtime_every_day(pt, true, 21, 0, out);
+    for (int n = 0; n < 7; n++) pt.bed[n] = out[n];
+    pt.bed[2].end_hour = 7;
+    runs = pt_logic::bedtime_runs(pt);
+    CHECK(runs.size() == 1 && runs[0].first == 1 && runs[0].last == 0);
+    pt.valid = false;
+    CHECK(pt_logic::bedtime_runs(pt).empty());
 }
 
 // What the pickers start on (pt_flow's quick values, the per-day picker, the bedtimes).
@@ -401,7 +474,7 @@ static void test_pending_relock()
     CHECK(pt_logic::pending_relock(true, false, true, true, true) == P::None);
 }
 
-// The Overview's "+30 min" and the alarm notice.
+// Today's "+30 min" and the alarm notice.
 static void test_extra_today()
 {
     pt_logic::ExtraRecord rec;
@@ -441,6 +514,41 @@ static void test_extra_today()
     CHECK(!pt_logic::alarm_off(pt));
 }
 
+static void test_next_stop()
+{
+    using pt_logic::NextStop;
+    PtBedtime off = {};
+    PtBedtime bed = {};
+    bed.on = true;
+    bed.hour = 21;
+    bed.end_hour = 6;
+    // 16:00, 40 min left: the time up first, at 16:40.
+    NextStop n = pt_logic::next_stop(16 * 60, 40, bed);
+    CHECK(n.kind == NextStop::TIME_UP && n.at == 16 * 60 + 40 && n.in == 40);
+    // 20:30, 40 min left: the bedtime comes first.
+    n = pt_logic::next_stop(20 * 60 + 30, 40, bed);
+    CHECK(n.kind == NextStop::BEDTIME && n.at == 21 * 60 && n.in == 30);
+    // Nothing counting down: the bedtime, or nothing without one.
+    n = pt_logic::next_stop(10 * 60, -1, bed);
+    CHECK(n.kind == NextStop::BEDTIME && n.in == 11 * 60);
+    CHECK(pt_logic::next_stop(10 * 60, -1, off).kind == NextStop::NONE);
+    // Past the bedtime: play again at 06:00.
+    n = pt_logic::next_stop(22 * 60, 40, bed);
+    CHECK(n.kind == NextStop::BEDTIME_NOW && n.at == 6 * 60);
+    // Before the morning's end: the night before's, not told.
+    CHECK(pt_logic::next_stop(5 * 60, 40, bed).kind == NextStop::NONE);
+    // A time up after midnight, without a bedtime: the limit counts again by then.
+    CHECK(pt_logic::next_stop(23 * 60 + 30, 40, off).kind == NextStop::NONE);
+    n = pt_logic::next_stop(23 * 60, 40, off);
+    CHECK(n.kind == NextStop::TIME_UP && n.at == 23 * 60 + 40);
+    // A bedtime that does not run from an evening to a morning: not placed.
+    PtBedtime odd = bed;
+    odd.hour = 5;
+    odd.end_hour = 6;
+    n = pt_logic::next_stop(10 * 60, 40, odd);
+    CHECK(n.kind == NextStop::TIME_UP);
+}
+
 int main()
 {
     test_gate();
@@ -449,10 +557,12 @@ int main()
     test_extra();
     test_stop();
     test_restore();
+    test_bonus();
     test_restore_way();
     test_bedtime();
     test_pickers();
     test_extra_today();
     test_pending_relock();
-    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, bedtime, picker and pending-relock assertions passed");
+    test_next_stop();
+    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, planned bonus, bedtime, picker, pending-relock and next-stop assertions passed");
 }

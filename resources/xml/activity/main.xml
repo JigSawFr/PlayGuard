@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Root screen: a sidebar of tabs (Horizon "System Settings" style). Each tab
-     is a custom view registered in main.cpp and implemented in source/tab/. -->
+<!-- Root screen: a rail of tabs (cadran::style_rail gives it its icons), each
+     tab a custom view registered in main.cpp and implemented in source/tab/. -->
 
 <brls:AppletFrame
     iconInterpolation="linear"

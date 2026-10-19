@@ -132,7 +132,7 @@ static void test_listing()
         return on_card;
     };
 
-    // Listed on first use, then kept: the Overview asking every 5 s reads nothing.
+    // Listed on first use, then kept: Today asking every 5 s reads nothing.
     CHECK(l.names(list) == on_card && listed == 1);
     on_card.insert(on_card.begin(), "c.json");     // a file another tool put there: not seen yet
     CHECK(l.names(list).size() == 2 && listed == 1);

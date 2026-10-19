@@ -48,7 +48,7 @@
   "replaying": "Replaying the steps: {n} of {total}",
   "tour": "Tour",
   "report": "Report a problem",
-  "tour_overview": "Overview: today's play time, the limit, the time left and bedtime.",
+  "tour_overview": "Today: today's play time, the limit, the time left and bedtime.",
   "tour_play_timer": "Play timer: the week chart is the editor, one limit for every day or one per day.",
   "tour_activity": "Activity: who played what, and how long, from the console's own log.",
   "tour_console": "Console: the network clock, the installed games and what the console runs.",
@@ -66,7 +66,7 @@
   "capture": "Screenshots"
  },
  "params": {
-  "tab": {"label": "Opens on", "options": {"": "Overview", "play_timer": "Play timer", "activity": "Activity", "restrictions": "Restrictions", "security": "PIN", "console": "Console", "history": "History", "preferences": "Preferences", "about": "About"}},
+  "tab": {"label": "Opens on", "options": {"": "Today", "play_timer": "Play timer", "activity": "Activity", "restrictions": "Restrictions", "security": "PIN", "console": "Console", "history": "History", "preferences": "Preferences", "about": "About"}},
   "keep": {"label": "Keep the state between visits", "help": "PlayGuard's data and the simulated console's settings (PIN, limits, clocks) stay in this browser; the console settings of this panel then count for a first start only."},
   "not_set_up": {"label": "Never set up (no PIN)"},
   "unlocked": {"label": "Temporarily unlocked"},
@@ -74,8 +74,9 @@
   "restricted": {"label": "Today's limit reached"},
   "alarm_only": {"label": "When time is up: a warning only", "help": "With the limit reached, the time left reads below 0."},
   "alarm_off": {"label": "\"Time's up\" alarm off"},
-  "not_counting": {"label": "Time left not going down", "help": "A clock set back: the Overview says so after 90 s on screen."},
+  "not_counting": {"label": "Time left not going down", "help": "A clock set back: Today says so after 90 s on screen."},
   "unpaired": {"label": "No companion app linked"},
+  "left_min": {"label": "Minutes left today"},
   "fw": {"label": "Firmware", "help": "Above the newest verified one, the firmware screen."},
   "no_cfw": {"label": "No Atmosphère"},
   "emummc": {"label": "emuMMC"},
@@ -85,7 +86,8 @@
   "applet": {"label": "Applet mode (from the album)"},
   "background": {"label": "PlayGuard out of focus"},
   "hbloader": {"label": "A loader that can hand an update to a store"},
-  "numpad": {"label": "What the number pad returns"},
+  "docked": {"label": "On the dock (on the TV)"},
+  "battery": {"label": "On the battery (no charger)"},
   "boot_choice": {"label": "Answer to \"previous build?\" at start-up", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "Network clock accurate"},
   "autosync_off": {"label": "\"Synchronise Clock via Internet\" off"},
@@ -94,6 +96,8 @@
   "now": {"label": "Console time, frozen", "help": "In your browser's time zone."},
   "skip": {"label": "Console time moved on by (s)", "help": "A game played all along: the time left goes down by as much. The buttons under the screen move it on."},
   "idle": {"label": "No game running"},
+  "no_game": {"label": "Nothing open behind PlayGuard"},
+  "no_play": {"label": "Nothing played for weeks"},
   "no_pdm": {"label": "No activity log"},
   "games": {"label": "More games played this week"},
   "accounts": {"label": "User accounts", "help": "0 to 8 (2 by default), each playing twice as much as the next one."},
@@ -109,7 +113,9 @@
   "fail": {"label": "Make these fail", "options": {"unlock": "Unlock", "unverified": "Unlock not confirmed", "relock": "Locking again", "write": "Every setting write", "timer": "Play-timer read", "clock": "Setting the clock", "pin": "PIN read", "pin_entry": "PIN screen cancelled", "bedtime": "Bedtime", "remove": "Removing a game", "launch": "Launch version reset", "verify": "Integrity check"}},
   "still_focus": {"label": "Still focus highlight"},
   "version": {"label": "Version shown in the header"},
-  "hold_loading": {"label": "Stop on the loading screen"}
+  "hold_loading": {"label": "Stop on the loading screen"},
+  "cadran_noglow": {"label": "No background glow"},
+  "cadran_noring": {"label": "The ring without its arcs"}
  },
  "presets": {
   "default": "Default",

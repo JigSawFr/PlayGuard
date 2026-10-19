@@ -11,6 +11,10 @@
 #include <ctime>
 #include <exception>
 #include <typeinfo>
+#ifndef __SWITCH__
+#include <fcntl.h>
+#include <unistd.h>
+#endif
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -19,6 +23,7 @@
 #include "action/log_prune_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/pt_flow.hpp"
+#include "action/frame_stats_flow.hpp"
 #include "action/pt_log_flow.hpp"
 #include "action/rescue.hpp"
 #include "action/rollback_flow.hpp"
@@ -31,6 +36,7 @@
 #include "core/platform.h"
 #include "core/sim_env.h"
 #include "tab/about_tab.hpp"
+#include "ui/cadran_frame.hpp"
 #include "tab/activity_tab.hpp"
 #include "tab/console_tab.hpp"
 #include "tab/dashboard_tab.hpp"
@@ -40,6 +46,8 @@
 #include "tab/restrictions_tab.hpp"
 #include "tab/security_tab.hpp"
 #include "ui/ui.hpp"
+#include "ui/cut_text.hpp"
+#include "ui/text_size.hpp"
 #include "util/config.hpp"
 #include "util/crash_dump.h"
 #include "util/crash_report.hpp"
@@ -54,6 +62,17 @@
 #include "util/startup.h"
 #include "view/loading_bar.hpp"
 #include "view/loading_mark.hpp"
+
+// nanovg's per-frame counters, through the getter
+// tools/perf_nanovg_stats.patch adds to the borealis tree. Weak: without the
+// patch, the frame time alone is recorded.
+extern "C" void nvgDebugGetStats(NVGcontext*, int*, int*, int*, int*) __attribute__((weak));
+#include "view/cadran_digits.hpp"
+#include "view/cadran_icon.hpp"
+#include "view/cadran_week.hpp"
+#include "util/startup.h"
+#include "view/loading_bar.hpp"
+#include "view/loading_mark.hpp"
 #include "view/made_in_france.hpp"
 #include "view/footer_hints.hpp"
 #include "view/header_settings.hpp"
@@ -61,9 +80,9 @@
 #include "view/version_badge.hpp"
 #include "view/scroll_view.hpp"
 #include "view/play_days.hpp"
-#include "view/pt_gauge.hpp"
+#include "view/play_hours.hpp"
+#include "view/pt_ring.hpp"
 #include "view/pt_state_header.hpp"
-#include "view/pt_week.hpp"
 
 using namespace brls::literals;
 
@@ -209,6 +228,7 @@ void show_first(brls::Activity* first)
 {
     brls::Application::pushActivity(first, brls::TransitionAnimation::NONE);
     pt_log_flow::apply();   // Help & diagnostics › Developer › Record the play timer, when on (after fw_gate::prepare)
+    frame_stats_flow::apply();  // Help & diagnostics › Developer › Frame statistics, when on
     log_prune_flow::run();  // the reports and crashes past the limits of About › Help & diagnostics
     startup_mark(StartupStep_FirstScreen);
     rollback_flow::started();   // this build starts: nothing to go back from
@@ -333,9 +353,9 @@ void register_views()
 {
     brls::Application::registerXMLView("ScrollView",      ScrollView::create);
     brls::Application::registerXMLView("PtStateHeader",   PtStateHeader::create);
-    brls::Application::registerXMLView("PtGauge",         PtGauge::create);
-    brls::Application::registerXMLView("PtWeekView",      PtWeekView::create);
+    brls::Application::registerXMLView("PtRing",          PtRing::create);
     brls::Application::registerXMLView("PlayDaysView",    PlayDaysView::create);
+    brls::Application::registerXMLView("PlayHoursView",   PlayHoursView::create);
     brls::Application::registerXMLView("MadeInFrance",    MadeInFrance::create);
     brls::Application::registerXMLView("DashboardTab",    DashboardTab::create);
     brls::Application::registerXMLView("PlayTimerTab",    PlayTimerTab::create);
@@ -349,6 +369,9 @@ void register_views()
 
     brls::Application::registerXMLView("LoadingMark",     LoadingMark::create);
     brls::Application::registerXMLView("LoadingBar",      LoadingBar::create);
+    brls::Application::registerXMLView("CadranIcon",      CadranIcon::create);
+    brls::Application::registerXMLView("CadranDigits",    CadranDigits::create);
+    brls::Application::registerXMLView("CadranWeekView",  CadranWeekView::create);
 
     // In place of borealis' brls:Hints: the footer's clock on one line.
     FooterHints::install();
@@ -358,6 +381,7 @@ void register_views()
     VersionBadge::install();
     NoticeBell::install();   // the bell goes in the header's row at the right
     HeaderSetting::install();   // after the bell: the language and theme go left of it
+    cadran::install_screens();   // the other screens after the boards
 }
 
 // After the main loop: the play timer locked again if asked, the tasks and
@@ -373,10 +397,24 @@ void shut_down()
     http::abort_all();
     ui::finish_background(std::chrono::seconds(3));
     pt_log_flow::stop();
+    frame_stats_flow::stop();
     app::shutdown();
     http::cleanup();
     brls::Logger::info("quit: after {} s", session_log::uptime_s());
     session_log::end("clean exit");
+}
+
+#ifndef __SWITCH__
+FILE* s_stats = nullptr;   // PLAYGUARD_SIM_STATS's file, when asked (main())
+brls::Time s_stats_last = 0;
+#endif
+
+void close_stats()
+{
+#ifndef __SWITCH__
+    if (s_stats) std::fclose(s_stats);
+    s_stats = nullptr;
+#endif
 }
 
 // One frame; false once PlayGuard quits.
@@ -386,6 +424,18 @@ bool run_frame()
     // The lines the session file waits for, written off the UI thread
     // once they waited long enough (util/session_log.hpp).
     if (session_log::due()) ui::write_later("session log", []() { session_log::flush(); }, "session_log");
+    frame_stats_flow::sample();   // Developer › Frame statistics, when on
+    cut_text::sample();           // the desktop's texts cut short (PLAYGUARD_SIM_CUT_TEXT)
+#ifndef __SWITCH__
+    if (s_stats) {
+        int draws = 0, fill = 0, stroke = 0, text = 0;
+        if (nvgDebugGetStats) nvgDebugGetStats(brls::Application::getNVGContext(), &draws, &fill, &stroke, &text);
+        const brls::Time now = brls::getCPUTimeUsec();
+        std::fprintf(s_stats, "%lld %lld %d %d %d %d\n", (long long)now, (long long)(now - s_stats_last), draws, fill,
+                     stroke, text);
+        s_stats_last = now;
+    }
+#endif
     return true;
 }
 }   // namespace
@@ -441,6 +491,18 @@ int main(int argc, char* argv[])
 
     // PlayGuard status colours (light / dark variants), before any view exists.
     ui::register_theme_colors();
+    // The palettes after the design boards (navy on dark, cool white on light).
+    cadran::install_theme();
+    // Preferences › Text size (larger on a TV by default), before the
+    // first label exists; then on and off the dock.
+    text_size::install();
+    // The console clears the screen with a colour deko3d records once
+    // (SwitchVideoContext::recordStaticCommands: at start-up and on a theme
+    // change), so before this palette: the space behind the tabs stayed
+    // borealis' grey next to the rail's navy. A theme change records it
+    // again (the desktop clears with the theme's colour every frame).
+    brls::Platform* platform = brls::Application::getPlatform();
+    platform->setThemeVariant(platform->getThemeVariant());
 
     // We own the quit path (B on the sidebar / error screen).
     brls::Application::setGlobalQuit(false);
@@ -460,17 +522,36 @@ int main(int argc, char* argv[])
     // or icon read running there stops now, not after every game is read.
     brls::Application::getExitEvent()->subscribe([]() { playstats_cancel(); });
 
+#ifndef __SWITCH__
+    // Desktop measurement (PLAYGUARD_SIM_STATS=<file>, tools/perf_frames.sh):
+    // one line per frame, "<time us> <frame us> <draw calls> <fill tris>
+    // <stroke tris> <text tris>", the counters from nanovg's own (zero without
+    // tools/perf_nanovg_stats.patch). The FPS limiter is turned off so the
+    // frame time is the work alone.
+    if (const char* path = sim_env("PLAYGUARD_SIM_STATS")) {
+        // Created with an explicit mode (CodeQL: fopen's depends on the umask).
+        const int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+        if (fd >= 0) {
+            s_stats = fdopen(fd, "w");
+            if (!s_stats) close(fd);
+        }
+        brls::Application::setLimitedFPS(0);
+    }
+    s_stats_last = brls::getCPUTimeUsec();
+#endif
 #ifdef __EMSCRIPTEN__
     // In a browser a frame must hand the thread back to the page (web/README.md):
     // the browser calls one per display refresh, and main() returns at once.
     emscripten_set_main_loop([]() {
         if (run_frame()) return;
         emscripten_cancel_main_loop();
+        close_stats();
         shut_down();
     }, 0, false);
     return EXIT_SUCCESS;
 #else
     while (run_frame()) {}
+    close_stats();
 
     shut_down();
     return EXIT_SUCCESS;

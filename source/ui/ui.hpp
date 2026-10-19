@@ -93,7 +93,15 @@ void settle_writes(const std::string& key);
 
 // Deferred to the next frame (toasts fired right after a system applet returns
 // were dropped on fw 22.1.0).
-void notify(const std::string& text);
+// What a toast says: news (plain), something done (a check), or something
+// not done because of how things are (a warning); the icon in the Cadran look.
+enum class Toast
+{
+    Info,
+    Done,
+    Refused,
+};
+void notify(const std::string& text, Toast kind = Toast::Info);
 // A failure the user asked for something and did not get: a dialog, not a
 // toast (a toast is gone before "error 0x…" is read). Next frame, so it can
 // be called from a dialog button. Logged as "error: " for the smoke test.
@@ -121,9 +129,6 @@ void notify_result(Result rc, const std::string& ok_text, const std::string& err
 // `danger`: the confirm button is drawn in the "bad" colour (see below).
 void confirm(const std::string& body, const std::string& confirm_label,
              std::function<void()> on_yes, std::function<void()> on_no = nullptr, bool danger = false);
-// Same with `extra` (a chart, …) under the text; ui takes ownership of it.
-void confirm_with(const std::string& body, brls::View* extra, const std::string& confirm_label,
-                  std::function<void()> on_yes, std::function<void()> on_no = nullptr, bool danger = false);
 // Same, for actions that delete something: the confirm button is drawn in the
 // "bad" colour so it never looks like an ordinary OK.
 void confirm_danger(const std::string& body, const std::string& confirm_label, std::function<void()> on_yes);
@@ -131,6 +136,9 @@ void info(const std::string& body);
 // A web page to open on a phone: `body`, the QR code of `url`, then `url`
 // itself, shortened (text::short_url), and OK.
 void qr_dialog(const std::string& body, const std::string& url);
+// The same for a text to read on a phone (not a link): larger, without the
+// line under the code.
+void qr_text_dialog(const std::string& body, const std::string& text);
 
 // Reads the stored PIN (pctl_get_pin) and shows it in large digits, or a
 // dialog with the error. The app's copies are wiped as soon as the label
@@ -149,9 +157,12 @@ void on_cancel(brls::Dialog* dialog, std::function<void()> on_cancel);
 // dialog that waits for something (a check, an answer from the network).
 void add_cancel(brls::Dialog* dialog, std::function<void()> cancel);
 
-// Dropdown list; `on_pick(index)` runs after the list has closed.
+// Dropdown list; `on_pick(index)` runs after the list has closed. The row
+// `selected` has the focus and is checked as the current value, unless
+// `checked` is false (a list of things to do, not of values). `details`, when
+// given, says more about each row, after its label and quieter.
 void pick(const std::string& title, const std::vector<std::string>& values, int selected,
-          std::function<void(int)> on_pick);
+          std::function<void(int)> on_pick, bool checked = true, const std::vector<std::string>& details = {});
 // A list of things to do: each line's label, and what it runs once the
 // list has closed. The first line is selected; none, no list.
 struct Choice
@@ -196,7 +207,7 @@ std::string hos_text(u32 version);                        // "23.0.1" (MAKEHOSVE
 std::string fw_text(const SysInfo& info);                 // "23.0.1 · Atmosphère 1.12.0"
 std::string compat_text(const SysInfo& info, NVGcolor* color = nullptr);
 
-// The Console tab's and the Overview's warnings.
+// The Console tab's and Today's warnings.
 std::string storage_text(const SysInfo& info);             // "emuMMC (Atmosphère)"
 std::string storage_short(const SysInfo& info);            // "emuMMC" / "sysMMC" / "—"
 // The other system (sysMMC from emuMMC, or an emuMMC set up on the card from
@@ -210,7 +221,7 @@ std::string blank_text(const SysInfo& info, NVGcolor* color = nullptr);
 std::string serial_text(const SysInfo& info, bool reveal);
 bool        patches_warning(const patches::Report& report);
 // The game-patch report of this boot, read from the SD card once per run (it
-// only changes with a reboot): the Overview and the Console tab no longer rescan it
+// only changes with a reboot): Today and the Console tab no longer rescan it
 // each time they are opened.
 const patches::Report& patch_report();
 std::string patches_text(const patches::Report& report, NVGcolor* color = nullptr);
@@ -287,7 +298,7 @@ constexpr int console      = 7;   // the network clock, installed games, firmwar
 constexpr int history      = 9;   // changes and settings backups
 constexpr int preferences  = 10;
 constexpr int about        = 11;  // version, credits, changelog
-// The n-th tab (0 = Overview) as a sidebar position (separators count).
+// The n-th tab (0 = Today) as a sidebar position (separators count).
 constexpr int of(int n)
 {
     constexpr int positions[] = { dashboard, play_timer, activity, restrictions, security, console, history, preferences, about };
@@ -304,7 +315,7 @@ void go_to_tab(brls::View* from, int position);
 void open_screen(brls::View* content, const std::string& title);
 
 // "Parental controls are temporarily unlocked — Lock now" cell shown at the
-// top of the Overview and Play timer tabs (no "Lock now" in read-only mode).
+// top of the Play timer tab (no "Lock now" in read-only mode).
 // `after` runs once it relocked.
 void init_unlock_banner(brls::DetailCell* cell, std::function<void()> after);
 void show_unlock_banner(brls::DetailCell* cell, bool unlocked);
@@ -317,6 +328,8 @@ void offer_restart();
 // restart it needs. language_name / theme_name: the choice saved, as text.
 void        pick_language(std::function<void()> after = nullptr);
 void        pick_theme(std::function<void()> after = nullptr);
+void        pick_text_size(std::function<void()> after = nullptr);
+std::string text_size_name();
 std::string language_name();
 std::string theme_name();
 // − on the main screen: a list of the two, each opening its picker.

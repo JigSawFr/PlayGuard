@@ -23,6 +23,11 @@ void nacp_copy_utf8(char *dst, size_t n, const char *src);
 // up to 32 language entries of 0x300 bytes.
 #define NACP_SIZE          0x4000
 #define NACP_TITLES_FORMAT 0x3215
+// RatingAge: 0x20 signed bytes from 0x3040, the age each rating organisation
+// (nn::ns::RatingOrganization, pctl_rating_org_name's order) rates the game
+// for, -1 when it does not.
+#define NACP_RATING_AGE    0x3040
+#define NACP_RATING_COUNT  0x20
 
 // The game's name from its control.nacp (`size` bytes, at least NACP_SIZE):
 // the entry of language `lang` (an index into the title entries,
@@ -30,6 +35,10 @@ void nacp_copy_utf8(char *dst, size_t n, const char *src);
 // nacpGetLanguageEntry() picks it. False, `out` empty, when there is none or
 // it is not valid UTF-8 (the UI then names the game by its title ID).
 bool nacp_name(const void *nacp, size_t size, u32 lang, char *out, size_t out_size);
+
+// The game's ages from its control.nacp (`size` bytes, at least NACP_SIZE)
+// into `out` (NACP_RATING_COUNT of them); false, every one -1, when too short.
+bool nacp_rating_ages(const void *nacp, size_t size, int8_t *out);
 
 // nacp_read.c, on the console (ns initialized by the caller): the control
 // data of `app_id` into `control`, an NsApplicationControlData, ns' cache

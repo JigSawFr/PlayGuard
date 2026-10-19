@@ -105,3 +105,11 @@ bool nacp_name(const void *nacp, size_t size, u32 lang, char *out, size_t out_si
     free(inflated);
     return ok;
 }
+
+bool nacp_rating_ages(const void *nacp, size_t size, int8_t *out)
+{
+    memset(out, 0xFF, NACP_RATING_COUNT);
+    if (!nacp || size < NACP_RATING_AGE + NACP_RATING_COUNT) return false;
+    memcpy(out, (const u8 *)nacp + NACP_RATING_AGE, NACP_RATING_COUNT);
+    return true;
+}

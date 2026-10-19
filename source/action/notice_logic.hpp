@@ -164,8 +164,8 @@ bool week_due(bool known, uint64_t total_s, const std::string& seen, const std::
 // console only warns at the limit (alarm only); 0 otherwise.
 int over_limit_days(const PtState& pt, const PlayStats& stats);
 
-// A reading kept for `period_ms` (the SD card's free space, which the
-// Overview would otherwise ask for every 5 s): due again once that long has
+// A reading kept for `period_ms` (the SD card's free space, which
+// Today would otherwise ask for every 5 s): due again once that long has
 // gone by since it was taken, or once forgotten (something was written).
 // Times in milliseconds of a steady clock.
 class Every

@@ -69,4 +69,9 @@ table_export::Table table(const std::vector<history::Entry>& entries);
 // "undo". Says why not when it cannot be.
 void open(const history::Entry& e, std::function<void()> refresh);
 
+// After a change just made (Cadran, the main screen): for a few seconds ZR
+// opens the newest change that can be put back, as open() does, and the
+// footer says so.
+void offer_undo(std::function<void()> refresh);
+
 }   // namespace history_flow

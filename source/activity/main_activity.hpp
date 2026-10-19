@@ -8,7 +8,8 @@
 class MainActivity : public brls::Activity
 {
   public:
-    CONTENT_FROM_XML_RES("activity/main.xml");
+    // activity/main.xml.
+    brls::View* createContentView() override;
 
     void onContentAvailable() override;
     void onResume() override;
@@ -22,6 +23,10 @@ class MainActivity : public brls::Activity
     // Shows tab `position` (ui::tab) and focuses its content: the view
     // with id `row` when given and shown, else its first one.
     void open_tab(int position, const std::string& row = "");
+
+    // Quits, but first asks to lock again when parental controls are still
+    // temporarily unlocked (B twice on the sidebar, the child screen's B).
+    static void quit_or_relock();
 
   private:
     // Midnight while the app is open: what start-up does for a new day

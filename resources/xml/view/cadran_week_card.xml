@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- The week as the editor, in its card (view/cadran_week.cpp), with its
+     keys: A and X while no day is edited (and what the bars' fill means),
+     the stick, L, R and Y while one is. The Cadran Play timer
+     (view/cadran_play_timer.xml's cpt_week_card) and the per-day editor of a
+     profile (activity/play_timer_perday_activity.cpp) show it. -->
+
+<brls:Box axis="column" alignItems="stretch" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="24" paddingTop="16" paddingBottom="14" paddingLeft="22" paddingRight="22" marginBottom="10">
+    <CadranWeekView id="cpt_week" width="auto" height="262" marginBottom="8"/>
+    <brls:Box id="cpt_keys_idle" axis="row" alignItems="center" paddingTop="8" lineColor="@theme/cadran/line" lineTop="1px">
+        <brls:Box axis="row" alignItems="center" justifyContent="center" width="26" height="26" cornerRadius="13" backgroundColor="@theme/cadran/key_bg" marginRight="8">
+            <CadranDigits text="A" fontSize="13" textColor="@theme/cadran/key_fg"/>
+        </brls:Box>
+        <brls:Label text="@i18n/playguard/cadran/week/edit_day" fontSize="15" textColor="@theme/cadran/text2" marginRight="18"/>
+        <brls:Box axis="row" alignItems="center" justifyContent="center" width="26" height="26" cornerRadius="13" backgroundColor="@theme/cadran/key_bg" marginRight="8">
+            <CadranDigits text="X" fontSize="13" textColor="@theme/cadran/key_fg"/>
+        </brls:Box>
+        <brls:Label text="@i18n/playguard/cadran/week/pick_day" fontSize="15" textColor="@theme/cadran/text2"/>
+        <brls:Box grow="1.0"/>
+        <brls:Box id="cpt_played_key" axis="row" alignItems="center" visibility="gone">
+            <brls:Rectangle width="12" height="12" cornerRadius="3" color="@theme/cadran/teal_fill" marginRight="8"/>
+            <brls:Label id="cpt_played_text" text="@i18n/playguard/cadran/week/played_key" fontSize="15" textColor="@theme/cadran/text2" singleLine="true"/>
+        </brls:Box>
+    </brls:Box>
+    <brls:Box id="cpt_keys_edit" axis="row" alignItems="center" paddingTop="8" lineColor="@theme/cadran/line" lineTop="1px" visibility="gone">
+        <brls:Box axis="row" alignItems="center" justifyContent="center" width="36" height="26" cornerRadius="13" backgroundColor="@theme/cadran/key_bg" marginRight="8">
+            <CadranIcon icon="caret-up" width="12" height="12" color="@theme/cadran/key_fg"/>
+            <CadranIcon icon="caret-down" width="12" height="12" color="@theme/cadran/key_fg"/>
+        </brls:Box>
+        <brls:Label text="@i18n/playguard/cadran/week/step" fontSize="15" textColor="@theme/cadran/text2" marginRight="16"/>
+        <brls:Box axis="row" alignItems="center" justifyContent="center" width="36" height="26" cornerRadius="13" backgroundColor="@theme/cadran/key_bg" marginRight="8">
+            <CadranIcon icon="chevron-left" width="12" height="12" color="@theme/cadran/key_fg"/>
+            <CadranIcon icon="chevron-right" width="12" height="12" color="@theme/cadran/key_fg"/>
+        </brls:Box>
+        <brls:Label text="@i18n/playguard/cadran/week/day" fontSize="15" textColor="@theme/cadran/text2" marginRight="16"/>
+        <brls:Box axis="row" alignItems="center" justifyContent="center" width="26" height="26" cornerRadius="13" backgroundColor="@theme/cadran/key_bg" marginRight="8">
+            <CadranDigits text="L" fontSize="13" textColor="@theme/cadran/key_fg"/>
+        </brls:Box>
+        <brls:Label text="@i18n/playguard/cadran/week/weekdays" fontSize="15" textColor="@theme/cadran/text2" marginRight="16"/>
+        <brls:Box axis="row" alignItems="center" justifyContent="center" width="26" height="26" cornerRadius="13" backgroundColor="@theme/cadran/key_bg" marginRight="8">
+            <CadranDigits text="R" fontSize="13" textColor="@theme/cadran/key_fg"/>
+        </brls:Box>
+        <brls:Label text="@i18n/playguard/cadran/week/weekend" fontSize="15" textColor="@theme/cadran/text2" marginRight="16"/>
+        <brls:Box axis="row" alignItems="center" justifyContent="center" width="26" height="26" cornerRadius="13" backgroundColor="@theme/cadran/key_bg" marginRight="8">
+            <CadranDigits text="Y" fontSize="13" textColor="@theme/cadran/key_fg"/>
+        </brls:Box>
+        <brls:Label text="@i18n/playguard/cadran/week/none" fontSize="15" textColor="@theme/cadran/text2"/>
+    </brls:Box>
+</brls:Box>

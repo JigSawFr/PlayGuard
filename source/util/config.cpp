@@ -83,6 +83,23 @@ void clear_extra(Config& c)
     c.extra_base = c.extra_value = 0;
 }
 
+void clear_schedule(Config& c)
+{
+    c.schedule_file.clear();
+    c.schedule_name.clear();
+    c.schedule_from.clear();
+    c.schedule_to.clear();
+    c.schedule_applied = false;
+    c.schedule_prev.clear();
+}
+
+void clear_bonus(Config& c)
+{
+    c.bonus_weekday = -1;
+    c.bonus_date.clear();
+    c.bonus_base = c.bonus_value = 0;
+}
+
 void one_of(std::string& value, std::initializer_list<const char*> allowed, const char* fallback)
 {
     for (const char* a : allowed)
@@ -110,6 +127,8 @@ void sanitize(Config& c)
     for (const char* l : LANGUAGES) language_ok |= c.language == l;
     if (!language_ok) c.language = "system";
     one_of(c.theme, { "system", "light", "dark" }, "system");
+    one_of(c.text_size, { "auto", "normal", "large" }, "auto");
+    one_of(c.effects, { "auto", "full" }, "auto");
     one_of(c.update_via, { "", "inplace", "auto", "sphaira", "appstore", "manual" }, "");
     one_of(c.pin_lock, { "off", "changes", "open" }, "changes");
     one_of(c.dev_builds_order, { "newest", "number" }, "newest");
@@ -125,7 +144,7 @@ void sanitize(Config& c)
     for (const auto& set : EXTRA_SETS)
         set_ok |= c.extra_amounts == std::vector<int>(std::begin(set), std::end(set));
     if (!set_ok) c.extra_amounts = { 15, 30, 60 };
-    if (c.activity_period < 0 || c.activity_period > 2) c.activity_period = 1;
+    if (c.activity_period < 0 || c.activity_period > 3) c.activity_period = 1;
     if (c.activity_account != "last" && !account_key_ok(c.activity_account)) c.activity_account = "last";
     if (!account_key_ok(c.activity_account_last)) c.activity_account_last.clear();
     if (c.export_format < 0 || c.export_format > 3) c.export_format = 0;
@@ -178,6 +197,19 @@ void sanitize(Config& c)
     const bool base_ok    = (c.extra_base >= 0 && c.extra_base <= 1440) || c.extra_base == 0xFFFF;
     const bool values_ok  = base_ok && c.extra_value >= 0 && c.extra_value <= 1440 && c.extra_date.size() == 10;
     if (!weekday_ok || !values_ok) clear_extra(c);
+    // A planned bonus raises a real limit (never "no limit") for one date.
+    const bool bonus_ok = c.bonus_weekday >= 0 && c.bonus_weekday <= 6 && c.bonus_base >= 0 &&
+                          c.bonus_base < c.bonus_value && c.bonus_value <= 1440 && c.bonus_date.size() == 10;
+    if (!bonus_ok) clear_bonus(c);
+    // A scheduled profile: a profile file, two dates in order, and once in
+    // force the seven limits to put back (else it could put back nonsense).
+    bool schedule_ok = !c.schedule_file.empty() && c.schedule_from.size() == 10 && c.schedule_to.size() == 10 &&
+                       c.schedule_from <= c.schedule_to;
+    if (schedule_ok && c.schedule_applied) {
+        schedule_ok = c.schedule_prev.size() == 7;
+        for (int v : c.schedule_prev) schedule_ok = schedule_ok && ((v >= 0 && v <= 1440) || v == 0xFFFF);
+    }
+    if (!schedule_ok) clear_schedule(c);
 
     // The limits console lock saved to put back: exactly seven, each a real
     // limit (0..1440 min) or "no limit" (0xFFFF). Otherwise drop them (turning
@@ -189,8 +221,8 @@ void sanitize(Config& c)
 }
 
 // What belongs to the system PlayGuard runs on (state.json, util/nand.hpp):
-// the console lock, the extra-time record, a pending relock and the
-// firmware choice. Read from state.json, or from config.json when this
+// the console lock, the extra-time record, a planned bonus, a scheduled
+// profile, a pending relock and the firmware choice. Read from state.json, or from config.json when this
 // system has no state.json yet (the versions before it kept them there).
 static void clear_system(Config& c)
 {
@@ -200,6 +232,8 @@ static void clear_system(Config& c)
     c.relock_pending = false;
     c.fw_gate_fw.clear(), c.fw_gate_app.clear(), c.fw_gate_choice.clear();
     clear_extra(c);
+    clear_bonus(c);
+    clear_schedule(c);
 }
 
 static void read_system(const nlohmann::json& j, Config& c)
@@ -222,6 +256,18 @@ static void read_system(const nlohmann::json& j, Config& c)
     extra_ok &= read_int(j, "extra_base", c.extra_base);
     extra_ok &= read_int(j, "extra_value", c.extra_value);
     if (!extra_ok) clear_extra(c);
+    bool bonus_ok = read_int(j, "bonus_weekday", c.bonus_weekday);
+    bonus_ok &= read_string(j, "bonus_date", c.bonus_date);
+    bonus_ok &= read_int(j, "bonus_base", c.bonus_base);
+    bonus_ok &= read_int(j, "bonus_value", c.bonus_value);
+    if (!bonus_ok) clear_bonus(c);
+    bool schedule_ok = read_string(j, "schedule_file", c.schedule_file);
+    schedule_ok &= read_string(j, "schedule_name", c.schedule_name);
+    schedule_ok &= read_string(j, "schedule_from", c.schedule_from);
+    schedule_ok &= read_string(j, "schedule_to", c.schedule_to);
+    schedule_ok &= read_bool(j, "schedule_applied", c.schedule_applied);
+    if (auto sp = j.find("schedule_prev"); sp != j.end() && sp->is_array()) c.schedule_prev = read_int_list(*sp);
+    if (!schedule_ok) clear_schedule(c);
 }
 
 // The file as JSON, or null when it is not a JSON object.
@@ -261,12 +307,16 @@ static void load_shared()
     Config& c = s_config;
     read_string(j, "language", c.language);
     read_string(j, "theme", c.theme);
+    read_string(j, "text_size", c.text_size);
+    read_string(j, "effects", c.effects);
     read_string(j, "ntp_server", c.ntp_server);
     read_bool(j, "advanced", c.advanced);
     read_bool(j, "auto_relock", c.auto_relock);
     read_bool(j, "extra_auto_restore", c.extra_auto_restore);
     read_bool(j, "dev_mode", c.dev_mode);
     read_bool(j, "pt_log", c.pt_log);
+    read_bool(j, "frame_stats", c.frame_stats);
+    read_bool(j, "cadran_glow", c.cadran_glow);
     read_string(j, "update_via", c.update_via);
     read_bool(j, "update_daily", c.update_daily);
     read_string(j, "update_checked", c.update_checked);
@@ -368,6 +418,8 @@ bool snapshot(Snapshot& snap)
     j["schema"]          = SCHEMA;
     j["language"]        = s_config.language;
     j["theme"]           = s_config.theme;
+    j["text_size"]       = s_config.text_size;
+    j["effects"]         = s_config.effects;
     j["ntp_server"]      = s_config.ntp_server;
     j["custom_servers"]  = s_config.custom_servers;
     j["advanced"]        = s_config.advanced;
@@ -375,6 +427,8 @@ bool snapshot(Snapshot& snap)
     j["extra_auto_restore"] = s_config.extra_auto_restore;
     j["dev_mode"]        = s_config.dev_mode;
     j["pt_log"]          = s_config.pt_log;
+    j["frame_stats"]     = s_config.frame_stats;
+    j["cadran_glow"]     = s_config.cadran_glow;
     j["update_via"]      = s_config.update_via;
     j["update_daily"]    = s_config.update_daily;
     j["update_checked"]  = s_config.update_checked;
@@ -426,6 +480,16 @@ bool snapshot(Snapshot& snap)
     st["extra_date"]        = s_config.extra_date;
     st["extra_base"]        = s_config.extra_base;
     st["extra_value"]       = s_config.extra_value;
+    st["bonus_weekday"]     = s_config.bonus_weekday;
+    st["bonus_date"]        = s_config.bonus_date;
+    st["bonus_base"]        = s_config.bonus_base;
+    st["bonus_value"]       = s_config.bonus_value;
+    st["schedule_file"]     = s_config.schedule_file;
+    st["schedule_name"]     = s_config.schedule_name;
+    st["schedule_from"]     = s_config.schedule_from;
+    st["schedule_to"]       = s_config.schedule_to;
+    st["schedule_applied"]  = s_config.schedule_applied;
+    st["schedule_prev"]     = s_config.schedule_prev;
     st["relock_pending"]    = s_config.relock_pending;
     snap.system = dump(st);
     return true;

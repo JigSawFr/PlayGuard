@@ -3,6 +3,8 @@
 
 #include <algorithm>
 
+#include "util/date.hpp"
+
 namespace pt_logic
 {
 
@@ -89,6 +91,33 @@ Restore restore_action(const ExtraRecord& rec, const std::string& today, const P
     return Restore::Offer;
 }
 
+Restore bonus_action(const BonusRecord& rec, const std::string& today, const PtState& pt, bool read_only)
+{
+    if (rec.weekday < 0 || rec.weekday > 6) return Restore::None;
+    int days = 0;
+    if (!date::days_between(rec.date, today, &days) || days <= 0) return Restore::None;   // the day not over yet
+    if (read_only || !pt.fw_supported || !pt.valid) return Restore::Later;
+    if (pt.day_min[rec.weekday] != rec.value) return Restore::Forget;
+    return Restore::Offer;
+}
+
+std::vector<PlanDay> bonus_days(const std::string& today, int today_weekday)
+{
+    std::vector<PlanDay> out;
+    for (int n = 1; n <= 6; n++) {
+        const std::string d = date::add_days(today, n);
+        if (d.empty()) return {};
+        out.push_back({ d, (today_weekday + n) % 7 });
+    }
+    return out;
+}
+
+bool can_plan_bonus(const PtState& pt, int weekday, bool read_only)
+{
+    return !read_only && pt.fw_supported && pt.valid && weekday >= 0 && weekday <= 6 &&
+           pt.day_min[weekday] != PT_DAY_NOLIMIT && pt.day_min[weekday] < 1440;
+}
+
 bool restore_tightens(const ExtraRecord& rec)
 {
     return rec.base != PT_DAY_NOLIMIT && rec.base < rec.value;
@@ -126,11 +155,7 @@ static bool same(const PtBedtime& a, const PtBedtime& b)
 
 bool bedtime_uniform(const PtState& pt, PtBedtime* out)
 {
-    if (!pt.valid) return false;
-    for (int n = 1; n < 7; n++)
-        if (!same(pt.bed[n], pt.bed[0])) return false;
-    if (out) *out = pt.bed[0];
-    return true;
+    return bedtime_shared(pt, ALL_DAYS, out);
 }
 
 static bool end_in_range(uint8_t hour, uint8_t minute)
@@ -141,8 +166,50 @@ static bool end_in_range(uint8_t hour, uint8_t minute)
 
 void bedtime_every_day(const PtState& pt, bool on, uint8_t hour, uint8_t minute, PtBedtime out[7])
 {
+    bedtime_days(pt, ALL_DAYS, on, hour, minute, out);
+}
+
+bool bedtime_shared(const PtState& pt, uint8_t days, PtBedtime* out)
+{
+    if (!pt.valid) return false;
+    int first = -1;
+    for (int n = 0; n < 7; n++) {
+        if (!(days & (1u << n))) continue;
+        if (first < 0) first = n;
+        else if (!same(pt.bed[n], pt.bed[first])) return false;
+    }
+    if (first < 0) return false;
+    if (out) *out = pt.bed[first];
+    return true;
+}
+
+std::vector<BedRun> bedtime_runs(const PtState& pt)
+{
+    std::vector<BedRun> runs;
+    if (!pt.valid) return runs;
+    for (int i = 0; i < 7; i++) {
+        const int d = (i + 1) % 7;   // Monday first
+        const PtBedtime& b = pt.bed[d];
+        if (!runs.empty()) {
+            const PtBedtime& r = runs.back().bed;
+            if (r.on == b.on && (!b.on || (r.hour == b.hour && r.minute == b.minute))) {
+                runs.back().last = d;
+                continue;
+            }
+        }
+        runs.push_back({ d, d, b });
+    }
+    return runs;
+}
+
+void bedtime_days(const PtState& pt, uint8_t days, bool on, uint8_t hour, uint8_t minute, PtBedtime out[7])
+{
     for (int n = 0; n < 7; n++) {
         PtBedtime b = pt.bed[n];
+        if (!(days & (1u << n))) {
+            out[n] = b;
+            continue;
+        }
         b.on = on;
         b.hour = on ? hour : 0;
         b.minute = on ? minute : 0;
@@ -226,9 +293,14 @@ std::vector<int> bedtime_times()
 
 int bedtime_selected(const PtState& pt, const std::vector<int>& times)
 {
+    return bedtime_selected_days(pt, ALL_DAYS, times);
+}
+
+int bedtime_selected_days(const PtState& pt, uint8_t days, const std::vector<int>& times)
+{
     PtBedtime now;
-    if (bedtime_uniform(pt, &now) && now.on) return index_of(times, now.hour * 60 + now.minute, 0);
-    if (!bedtime_uniform(pt, nullptr)) return index_of(times, 21 * 60, 0);   // days differ: start on 21:00
+    if (bedtime_shared(pt, days, &now) && now.on) return index_of(times, now.hour * 60 + now.minute, 0);
+    if (!bedtime_shared(pt, days, nullptr)) return index_of(times, 21 * 60, 0);   // days differ: start on 21:00
     return 0;
 }
 
@@ -275,6 +347,20 @@ PendingRelock pending_relock(bool pending, bool this_run, bool read_only, bool s
 bool alarm_off(const PtState& pt)
 {
     return pt.fw_supported && pt.enabled_valid && pt.enabled && pt.alarm_disabled_valid && pt.alarm_disabled;
+}
+
+NextStop next_stop(int now, int left, const PtBedtime& bed)
+{
+    const int start = bed.hour * 60 + bed.minute, end = bed.end_hour * 60 + bed.end_minute;
+    // An evening to the next morning, as the console sets it; anything else is
+    // not one this can place.
+    const bool night = bed.on && start > end;
+    if (night && now >= start) return { NextStop::BEDTIME_NOW, end, 0 };
+    if (night && now < end) return {};
+    // The limit counts again from midnight: a time up after it is not today's.
+    if (left >= 0 && now + left < 24 * 60 && (!night || now + left < start)) return { NextStop::TIME_UP, now + left, left };
+    if (night) return { NextStop::BEDTIME, start, start - now };
+    return {};
 }
 
 }   // namespace pt_logic

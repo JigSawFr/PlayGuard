@@ -1,8 +1,12 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/profiles_activity.hpp"
 
-#include "action/pt_flow.hpp"
+#include <algorithm>
+
+#include "action/profile_flow.hpp"
+#include "action/schedule_flow.hpp"
 #include "activity/play_timer_perday_activity.hpp"
+#include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -19,8 +23,29 @@ void ProfilesActivity::onContentAvailable()
         this->create();
         return true;
     });
+    // A profile for a period (holidays): offered when it begins, the limits
+    // from before once it is over.
+    schedule_note->setSingleLine(false);
+    schedule->registerClickAction([this](brls::View*) {
+        schedule_flow::choose([this]() {
+            // The profile put in force, or the limits back: the list's mark too.
+            pctl_play_timer_query(&this->live);
+            this->rebuild();
+            this->show_schedule();
+            brls::Application::giveFocus(schedule);
+        });
+        return true;
+    });
+    this->show_schedule();
     pctl_play_timer_query(&this->live);
+    cadran::List(this->getContentView(), true).apply({ { "pf_save", "save" }, { "pf_new", "plus" }, { "pf_schedule", "calendar" } });
     this->rebuild();
+}
+
+void ProfilesActivity::show_schedule()
+{
+    const std::string s = schedule_flow::summary();
+    schedule->setDetailText(ui::opens(s.empty() ? "playguard/schedule/none"_i18n : s));
 }
 
 void ProfilesActivity::rebuild(const std::string& focus_file)
@@ -28,7 +53,8 @@ void ProfilesActivity::rebuild(const std::string& focus_file)
     // Move the focus to a cell that survives before deleting the old list,
     // so borealis never holds a pointer to a deleted cell.
     brls::Application::giveFocus(save_cell);
-    list->clearViews();
+    brls::Box* rows = cadran::List::rows_in(list);   // a card in the Cadran look
+    rows->clearViews();
 
     const auto all = profiles::list();
     const std::string current = this->live.valid ? profiles::match(this->live.day_min) : "";
@@ -47,7 +73,8 @@ void ProfilesActivity::rebuild(const std::string& focus_file)
             this->actions(p);
             return true;
         });
-        list->addView(cell);
+        rows->addView(cell);
+        cadran::List::row(cell, "list");
         if (!focus || p.file == focus_file) focus = cell;
     }
     ui::set_visible(empty.getView(), all.empty());
@@ -74,17 +101,10 @@ void ProfilesActivity::actions(const profiles::Profile& p)
 void ProfilesActivity::apply(const profiles::Profile& p)
 {
     const std::string file = p.file;
-    auto days = p.days;
-    // The week as the profile sets it is drawn under the question.
-    pt_flow::confirm_write(brls::getStr("playguard/play_timer/profile_apply", p.name),
-                           "playguard/play_timer/confirm_set"_i18n, [this, file, days, name = p.name](bool did_unlock) {
-                               Result rc = pt_flow::write_days(days.data(), "profile", name);
-                               pt_flow::finish_write(rc, did_unlock, "playguard/play_timer/written_days"_i18n,
-                                                     "playguard/play_timer/write_err"_i18n, [this, file]() {
-                                                         pctl_play_timer_query(&this->live);
-                                                         this->rebuild(file);
-                                                     });
-                           }, days.data());
+    profile_flow::apply(p, [this, file]() {
+        pctl_play_timer_query(&this->live);
+        this->rebuild(file);
+    });
 }
 
 bool ProfilesActivity::store(const profiles::Profile& p, const std::string& ok_text)
@@ -179,7 +199,7 @@ void ProfilesActivity::save_current()
 {
     pctl_play_timer_query(&this->live);
     if (!this->live.valid) {
-        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN));
+        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN), ui::Toast::Refused);
         return;
     }
     std::array<uint16_t, 7> days;

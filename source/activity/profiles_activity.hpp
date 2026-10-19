@@ -28,6 +28,8 @@ class ProfilesActivity : public brls::Activity
     bool relist_pending = false;
     std::string relist_focus;
 
+    // The scheduled profile line: its profile and period, or none.
+    void show_schedule();
     void rebuild(const std::string& focus_file = "");
     void actions(const profiles::Profile& p);
     void apply(const profiles::Profile& p);
@@ -48,4 +50,6 @@ class ProfilesActivity : public brls::Activity
     BRLS_BIND(brls::Label,      hint,      "pf_hint");
     BRLS_BIND(brls::DetailCell, save_cell, "pf_save");
     BRLS_BIND(brls::DetailCell, new_cell,  "pf_new");
+    BRLS_BIND(brls::DetailCell, schedule,  "pf_schedule");
+    BRLS_BIND(brls::Label,      schedule_note, "pf_schedule_note");
 };

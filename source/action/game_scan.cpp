@@ -82,6 +82,19 @@ bool load(game_cache::Cache* out)
     return read(out);
 }
 
+std::shared_ptr<const game_cache::Cache> latest()
+{
+    {
+        std::lock_guard<std::mutex> lock(s_mutex);
+        if (s_saved) return s_saved;
+    }
+    auto cache = std::make_shared<game_cache::Cache>();
+    if (!load(cache.get())) return nullptr;
+    std::lock_guard<std::mutex> lock(s_mutex);
+    if (!s_saved) s_saved = cache;   // a save meanwhile is newer
+    return s_saved;
+}
+
 void save(const game_cache::Cache& cache)
 {
     store(cache, false);

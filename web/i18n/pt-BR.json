@@ -48,7 +48,7 @@
   "replaying": "Repetindo os passos: {n} de {total}",
   "tour": "Tour",
   "report": "Relatar um problema",
-  "tour_overview": "Visão geral: o tempo de jogo de hoje, o limite, o tempo restante e a hora de dormir.",
+  "tour_overview": "Hoje: o tempo de jogo de hoje, o limite, o tempo restante e a hora de dormir.",
   "tour_play_timer": "Tempo de jogo: o gráfico da semana é o editor, um limite para todos os dias ou um por dia.",
   "tour_activity": "Atividade: quem jogou o quê, e por quanto tempo, segundo o registro do console.",
   "tour_console": "Console: o relógio de rede, os jogos instalados e o que o console executa.",
@@ -66,7 +66,7 @@
   "capture": "Capturas"
  },
  "params": {
-  "tab": {"label": "Abre em", "options": {"": "Visão geral", "play_timer": "Tempo de jogo", "activity": "Atividade", "restrictions": "Restrições", "security": "PIN", "console": "Console", "history": "Histórico", "preferences": "Preferências", "about": "Sobre"}},
+  "tab": {"label": "Abre em", "options": {"": "Hoje", "play_timer": "Tempo de jogo", "activity": "Atividade", "restrictions": "Restrições", "security": "PIN", "console": "Console", "history": "Histórico", "preferences": "Preferências", "about": "Sobre"}},
   "keep": {"label": "Manter o estado entre visitas", "help": "Os dados do PlayGuard e as configurações do console simulado (PIN, limites, relógios) ficam neste navegador; as configurações de console deste painel só valem na primeira inicialização."},
   "not_set_up": {"label": "Nunca configurado (sem PIN)"},
   "unlocked": {"label": "Desbloqueado temporariamente"},
@@ -76,6 +76,7 @@
   "alarm_off": {"label": "Alarme \"tempo esgotado\" desativado"},
   "not_counting": {"label": "O tempo restante não diminui", "help": "Um relógio atrasado: a visão geral indica isso após 90 s na tela."},
   "unpaired": {"label": "Nenhum aplicativo vinculado"},
+  "left_min": {"label": "Minutos restantes hoje"},
   "fw": {"label": "Firmware", "help": "Acima do mais recente verificado, a tela do firmware."},
   "no_cfw": {"label": "Sem Atmosphère"},
   "emummc": {"label": "emuMMC"},
@@ -85,7 +86,8 @@
   "applet": {"label": "Modo applet (a partir do álbum)"},
   "background": {"label": "PlayGuard em segundo plano"},
   "hbloader": {"label": "Um carregador que pode passar uma atualização a uma loja"},
-  "numpad": {"label": "O que o teclado numérico retorna"},
+  "docked": {"label": "Na base (na TV)"},
+  "battery": {"label": "Na bateria (sem carregador)"},
   "boot_choice": {"label": "Resposta a \"build anterior?\" ao iniciar", "options": {"": "B", "a": "A"}},
   "accurate": {"label": "Relógio de rede exato"},
   "autosync_off": {"label": "\"Sincronizar o relógio pela internet\" desativado"},
@@ -94,6 +96,8 @@
   "now": {"label": "Horário do console, congelado", "help": "No fuso horário do navegador."},
   "skip": {"label": "Hora do console adiantada em (s)", "help": "Um jogo rodando o tempo todo: o tempo restante cai na mesma medida. Os botões abaixo da tela a adiantam."},
   "idle": {"label": "Nenhum jogo em andamento"},
+  "no_game": {"label": "Nada aberto por trás do PlayGuard"},
+  "no_play": {"label": "Nada jogado há semanas"},
   "no_pdm": {"label": "Sem registro de atividade"},
   "games": {"label": "Jogos a mais jogados nesta semana"},
   "accounts": {"label": "Contas de usuário", "help": "De 0 a 8 (2 por padrão), cada uma joga o dobro da seguinte."},
@@ -109,7 +113,9 @@
   "fail": {"label": "Fazer falhar", "options": {"unlock": "Desbloqueio", "unverified": "Desbloqueio não confirmado", "relock": "Novo bloqueio", "write": "Toda gravação de configuração", "timer": "Leitura do temporizador", "clock": "Ajuste do relógio", "pin": "Leitura do PIN", "pin_entry": "Tela do PIN cancelada", "bedtime": "Hora de dormir", "remove": "Remoção de um jogo", "launch": "Redefinição da versão de inicialização", "verify": "Verificação de integridade"}},
   "still_focus": {"label": "Destaque do foco sem animação"},
   "version": {"label": "Versão exibida no cabeçalho"},
-  "hold_loading": {"label": "Ficar na tela de carregamento"}
+  "hold_loading": {"label": "Ficar na tela de carregamento"},
+  "cadran_noglow": {"label": "Sem brilho de fundo"},
+  "cadran_noring": {"label": "O anel sem seus arcos"}
  },
  "presets": {
   "default": "Padrão",

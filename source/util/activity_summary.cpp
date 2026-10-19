@@ -12,14 +12,21 @@ uint64_t value(const GameStat& g, int period)
     switch (period) {
         case Today: return g.today_s;
         case Week:  return g.week_s;
+        case Month: return g.month_s;
         default:    return g.totals_ok ? g.total_s : 0;
     }
+}
+
+bool period_read(const PlayStats& s, int period)
+{
+    if (period == AllTime) return R_SUCCEEDED(s.stats_rc);
+    return s.windows_ok && (period != Month || s.month_ok);
 }
 
 Summary summarize(const PlayStats& s, int period)
 {
     Summary out;
-    out.known = period == AllTime ? R_SUCCEEDED(s.stats_rc) : s.windows_ok;
+    out.known = period_read(s, period);
     if (R_FAILED(s.rc) || !out.known) {
         out.known = false;
         return out;
@@ -52,6 +59,9 @@ Summary summarize(const PlayStats& s, int period)
                 out.busiest_s = per_day[k];
             }
         }
+    } else if (period == Month) {
+        out.days = 30;
+        out.per_day_s = out.total_s / 30;
     } else if (period == AllTime) {
         if (first) {
             // Whole days since the first play, today included; a first play
@@ -62,6 +72,42 @@ Summary summarize(const PlayStats& s, int period)
         if (launches) out.session_s = out.total_s / launches;
     }
     return out;
+}
+
+Hours hours(const PlayStats& s)
+{
+    Hours out;
+    if (R_FAILED(s.rc) || !s.windows_ok || !s.hours_ok) return out;
+    out.known = true;
+    const PlayLogHours& h = s.hours;
+    out.sessions = h.sessions;
+    if (h.sessions) {
+        out.average_s   = h.session_s / h.sessions;
+        out.longest_s   = h.longest_s;
+        out.longest_day = h.longest_day;
+    }
+    uint64_t by_hour[24] = {};
+    for (int k = 0; k < 7; k++)
+        for (int hr = 0; hr < 24; hr++) {
+            by_hour[hr] += h.hour_s[k][hr];
+            if (hr >= LATE_FROM || hr < LATE_TO) out.late_s += h.hour_s[k][hr];
+        }
+    for (int hr = 0; hr < 23; hr++) {   // the earlier two on a tie
+        const uint64_t two = by_hour[hr] + by_hour[hr + 1];
+        if (two > out.busy_s) {
+            out.busy_s = two;
+            out.busy_from = hr;
+        }
+    }
+    return out;
+}
+
+bool week_trend_min(const PlayStats& s, int64_t& per_day_min)
+{
+    const Summary week = summarize(s, Week);
+    if (!week.known || !s.prev_week_ok) return false;
+    per_day_min = ((int64_t)week.total_s - (int64_t)s.prev_week_s) / 7 / 60;
+    return true;
 }
 
 uint64_t unattributed_s(uint64_t total_s, const AccountPlay* accounts, size_t count)
@@ -96,6 +142,7 @@ table_export::Table export_table(const PlayStats& s, int period, const ExportTex
     for (int k = 1; k < 7; k++) t.columns.push_back({ "day_" + std::to_string(k) + "_min", text.day((int)s.day_wday[k]), true });
     t.columns.insert(t.columns.end(), {
         { "week_min", text.week, true },
+        { "month_min", text.month, true },
         { "total_min", text.total, true },
         { "launches", text.launches, true },
         { "first_played", text.first, false },
@@ -116,6 +163,7 @@ table_export::Table export_table(const PlayStats& s, int period, const ExportTex
         for (int k = 1; k < 7; k++) t.rows.back().push_back(s.windows_ok ? minutes(g->day_s[k]) : "");
         t.rows.back().insert(t.rows.back().end(), {
             s.windows_ok ? minutes(g->week_s) : "",
+            s.windows_ok && s.month_ok ? minutes(g->month_s) : "",
             g->totals_ok ? minutes(g->total_s) : "",
             g->totals_ok ? std::to_string(g->launches) : "",
             g->totals_ok && g->first_played ? text.time(g->first_played) : "",
