@@ -90,6 +90,8 @@
  "doc_config": "config.json",
  "doc_parental-controls": "Come funziona il filtro famiglia",
  "doc_untranslated": "Questa pagina non è ancora tradotta: eccola in inglese.",
+ "doc_outdated": "La pagina inglese è cambiata da quando questa è stata tradotta: potrebbe dire di più.",
+ "doc_english": "Leggila in inglese",
  "doc_on_github": "Vedi su GitHub",
  "support": "Sostieni il progetto",
  "footer_license": "Software libero sotto licenza GNU GPL v3.",
