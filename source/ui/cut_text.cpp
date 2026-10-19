@@ -7,6 +7,10 @@
 #include <cstdlib>
 #include <set>
 #include <string>
+#if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
+#include <fcntl.h>
+#include <unistd.h>
+#endif
 
 #include "action/frame_stats_flow.hpp"
 #include "core/sim_env.h"
@@ -43,7 +47,14 @@ void sample()
 #if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
     static const char* path = sim_env("PLAYGUARD_SIM_CUT_TEXT");
     if (!path) return;
-    static FILE* out = std::fopen(path, "a");
+    // Created with an explicit mode (CodeQL: fopen's depends on the umask).
+    static FILE* out = [] {
+        const int fd = ::open(path, O_WRONLY | O_CREAT | O_APPEND, 0600);
+        if (fd < 0) return static_cast<FILE*>(nullptr);
+        FILE* f = ::fdopen(fd, "a");
+        if (!f) ::close(fd);
+        return f;
+    }();
     if (!out) return;
     static auto last = std::chrono::steady_clock::now();
     const auto now = std::chrono::steady_clock::now();
