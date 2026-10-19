@@ -12,7 +12,11 @@
   const theme = document.getElementById('site-theme');
   const show = () => {
     const choice = theme.value;
-    document.documentElement.dataset.theme = choice === 'auto' ? (dark.matches ? 'dark' : 'light') : choice;
+    const shown = choice === 'auto' ? (dark.matches ? 'dark' : 'light') : choice;
+    document.documentElement.dataset.themeChoice = choice;
+    document.documentElement.dataset.theme = shown;
+    // The browser's bar the colour of the header (as theme.js).
+    for (const m of document.querySelectorAll('meta[name="theme-color"]')) m.content = shown === 'dark' ? '#111d31' : '#ffffff';
   };
   const kept = store.get('pg-theme');
   theme.value = kept === 'light' || kept === 'dark' ? kept : 'auto';
@@ -38,6 +42,190 @@
     if (!still) video.play().catch(() => {});
   }
 
+  // On a phone or a small tablet (the header on two rows): the header out
+  // of the way while scrolling down, back when scrolling up. The way back
+  // to the top, far down any page.
+  const phone = matchMedia('(max-width: 1080px)');
+  const header = document.querySelector('.top');
+  const toTop = document.querySelector('.to-top');
+  let lastY = scrollY;
+  let ticking = false;
+  const scrolled = () => {
+    ticking = false;
+    const y = Math.max(0, scrollY);
+    // Not while a field of the header is in use, nor for a few pixels.
+    if (Math.abs(y - lastY) < 8) return;
+    const away = phone.matches && y > lastY && y > header.offsetHeight && !header.contains(document.activeElement);
+    header.classList.toggle('away', away);
+    toTop.hidden = y < innerHeight * 2;
+    lastY = y;
+  };
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(scrolled); } }, { passive: true });
+  phone.addEventListener('change', () => header.classList.remove('away'));
+
+  // The header's links on a phone, a row to scroll: its edge fades while
+  // there are more of them to scroll to.
+  const nav = document.querySelector('.nav');
+  const fade = () => nav.classList.toggle('more', nav.scrollLeft + nav.clientWidth < nav.scrollWidth - 2);
+  nav.addEventListener('scroll', fade, { passive: true });
+  addEventListener('resize', fade);
+  fade();
+
+  // The gallery on a phone, a row to scroll: a dot for each screen, the one
+  // in view lit.
+  const gallery = document.querySelector('.gallery');
+  if (gallery && 'IntersectionObserver' in window) {
+    const figures = [...gallery.querySelectorAll('figure')];
+    const dots = document.createElement('div');
+    dots.className = 'gallery-dots';
+    dots.setAttribute('aria-hidden', 'true');
+    dots.append(...figures.map(() => document.createElement('span')));
+    gallery.after(dots);
+    const sync = () => { dots.hidden = gallery.scrollWidth <= gallery.clientWidth; };
+    addEventListener('resize', sync);
+    sync();
+    const seen = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          for (const d of dots.children) d.classList.remove('on');
+          dots.children[figures.indexOf(e.target)].classList.add('on');
+        }
+      }
+    }, { root: gallery, threshold: 0.6 });
+    for (const f of figures) seen.observe(f);
+  }
+
+  // Dates (a release's) as the page's language writes them.
+  for (const time of document.querySelectorAll('time[datetime]')) {
+    const date = new Date(`${time.dateTime}T12:00:00`);
+    if (!Number.isNaN(date.getTime())) {
+      try {
+        time.textContent = new Intl.DateTimeFormat(document.documentElement.lang, { dateStyle: 'long' }).format(date);
+      } catch { /* the ISO date stays */ }
+    }
+  }
+
+  // A link to a question or an older release opens it.
+  const reveal = () => {
+    let target = null;
+    try { target = location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null; } catch { /* a bad address */ }
+    const folded = target?.closest('details');
+    if (folded && !folded.open) {
+      folded.open = true;
+      target.scrollIntoView();
+    }
+  };
+  addEventListener('hashchange', reveal);
+  reveal();
+
+  // A screenshot larger (the gallery's, the documentation's): the others of
+  // its row with the arrows or a swipe, down or Esc to close.
+  const box = document.querySelector('.lightbox');
+  if (box && typeof box.showModal === 'function') {
+    const big = box.querySelector('img');
+    const caption = box.querySelector('figcaption');
+    const back = box.querySelector('.lightbox-prev');
+    const forward = box.querySelector('.lightbox-next');
+    let group = [];
+    let at = 0;
+    const show = () => {
+      const figure = group[at];
+      // The screenshot in the theme shown (its light or its dark one).
+      const img = [...figure.querySelectorAll('img')].find((i) => getComputedStyle(i).display !== 'none');
+      big.src = img.currentSrc || img.src;
+      big.alt = img.alt;
+      caption.textContent = figure.querySelector('figcaption')?.textContent || '';
+      back.hidden = at === 0;
+      forward.hidden = at === group.length - 1;
+    };
+    const step = (by) => { if (group[at + by]) { at += by; show(); } };
+    const open = (figure) => {
+      group = [...figure.parentElement.children].filter((f) => f.tagName === 'FIGURE');
+      at = group.indexOf(figure);
+      show();
+      box.showModal();
+    };
+    document.addEventListener('click', (e) => {
+      const figure = e.target.closest('.gallery figure, .shots figure');
+      if (!figure || !e.target.closest('a, img') || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      e.preventDefault();
+      open(figure);
+    });
+    // The documentation's screenshots are not links: a key opens them too.
+    for (const img of document.querySelectorAll('.shots img')) {
+      img.tabIndex = 0;
+      img.setAttribute('role', 'button');
+      img.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(img.closest('figure')); }
+      });
+    }
+    back.addEventListener('click', () => step(-1));
+    forward.addEventListener('click', () => step(1));
+    box.querySelector('.lightbox-close').addEventListener('click', () => box.close());
+    // A touch beside the screenshot closes it.
+    box.addEventListener('click', (e) => { if (e.target === box || e.target.tagName === 'FIGURE') box.close(); });
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') step(-1);
+      if (e.key === 'ArrowRight') step(1);
+    });
+    let touch = null;
+    box.addEventListener('touchstart', (e) => { touch = e.touches.length === 1 ? e.touches[0] : null; }, { passive: true });
+    box.addEventListener('touchend', (e) => {
+      if (!touch) return;
+      const dx = e.changedTouches[0].clientX - touch.clientX;
+      const dy = e.changedTouches[0].clientY - touch.clientY;
+      touch = null;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) step(dx < 0 ? 1 : -1);
+      else if (dy > 80) box.close();
+    });
+  }
+
+  // A copy button on each block of code (a path, a config.json).
+  const prose = document.querySelector('.prose[data-copy]');
+  if (prose && navigator.clipboard) {
+    for (const pre of prose.querySelectorAll('pre')) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'copy';
+      button.textContent = prose.dataset.copy;
+      button.addEventListener('click', () => {
+        navigator.clipboard.writeText(pre.querySelector('code')?.textContent ?? pre.textContent).then(() => {
+          button.textContent = prose.dataset.copied;
+          setTimeout(() => { button.textContent = prose.dataset.copy; }, 1500);
+        }, () => {});
+      });
+      pre.classList.add('has-copy');
+      pre.append(button);
+    }
+  }
+
+  // Printed: every folded part open (the questions, a page's details).
+  addEventListener('beforeprint', () => {
+    for (const d of document.querySelectorAll('details:not(.toc-mobile)')) d.open = true;
+  });
+
+  // The compatibility page's check: what PlayGuard does on the firmware typed.
+  const check = document.querySelector('.compat-check');
+  if (check) {
+    const field = check.querySelector('input');
+    const result = check.querySelector('.compat-result');
+    const parse = (v) => (/^\s*(\d{1,2})(?:\.(\d{1,2}))?(?:\.(\d{1,2}))?\s*$/.exec(v) || []).slice(1).map((n) => Number(n || 0));
+    const order = ([a, b, c]) => a * 10000 + b * 100 + c;
+    const min = order(parse(check.dataset.min));
+    const max = order(parse(check.dataset.max));
+    field.addEventListener('input', () => {
+      const v = parse(field.value);
+      result.className = 'compat-result';
+      if (!field.value.trim()) { result.textContent = ''; return; }
+      if (!v.length) { result.textContent = check.dataset.invalid; return; }
+      const n = order(v);
+      const [text, kind] = n > max ? [check.dataset.newer, 'warn'] : n < min ? [check.dataset.noTimer, 'warn'] : [check.dataset.full, 'ok'];
+      result.textContent = text;
+      result.classList.add(kind);
+    });
+    check.hidden = false;
+  }
+
   // On a phone, the documentation's pages are a row to scroll: this one in view.
   const current = document.querySelector('.doc-nav [aria-current]');
   const pages = current?.closest('.doc-list');
@@ -55,6 +243,35 @@
     const indexUrl = new URL(input.dataset.index, location.href);
     let index = null;
     const fold = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    // A text with the words found in it marked, accents or not.
+    const marked = (tag, text, words) => {
+      const el = document.createElement(tag);
+      let folded = '';
+      const from = [];
+      for (let i = 0; i < text.length; i++) {
+        const f = fold(text[i]);
+        folded += f;
+        for (let k = 0; k < f.length; k++) from.push(i);
+      }
+      const spans = [];
+      for (const w of words) {
+        for (let at = folded.indexOf(w); at >= 0; at = folded.indexOf(w, at + w.length)) {
+          spans.push([from[at], from[at + w.length - 1] + 1]);
+        }
+      }
+      spans.sort((a, b) => a[0] - b[0]);
+      let done = 0;
+      for (const [start, end] of spans) {
+        if (start < done) continue;
+        el.append(text.slice(done, start));
+        const m = document.createElement('mark');
+        m.textContent = text.slice(start, end);
+        el.append(m);
+        done = end;
+      }
+      el.append(text.slice(done));
+      return el;
+    };
     const show = () => {
       const words = fold(input.value).split(/\s+/).filter(Boolean);
       list.replaceChildren();
@@ -71,11 +288,9 @@
       for (const [, e, at] of hits.slice(0, 8)) {
         const a = document.createElement('a');
         a.href = new URL(`../${e.u}`, indexUrl).href;
-        const title = document.createElement('strong');
-        title.textContent = e.h ? `${e.p} › ${e.h}` : e.p;
-        const extract = document.createElement('span');
+        const title = marked('strong', e.h ? `${e.p} › ${e.h}` : e.p, words);
         const from = Math.max(0, at - 40);
-        extract.textContent = (from ? '…' : '') + e.t.slice(from, from + 120) + '…';
+        const extract = marked('span', (from ? '…' : '') + e.t.slice(from, from + 120) + '…', words);
         a.append(title, extract);
         const li = document.createElement('li');
         li.append(a);
@@ -95,6 +310,26 @@
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') { input.value = ''; show(); }
       if (e.key === 'Enter') list.querySelector('a')?.click();
+      if (e.key === 'ArrowDown') { e.preventDefault(); list.querySelector('a')?.focus(); }
+    });
+    // Up and down through the results, back to the box from the first.
+    list.addEventListener('keydown', (e) => {
+      const links = [...list.querySelectorAll('a')];
+      const i = links.indexOf(document.activeElement);
+      if (i < 0) return;
+      if (e.key === 'ArrowDown' && links[i + 1]) { e.preventDefault(); links[i + 1].focus(); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); (links[i - 1] || input).focus(); }
+      if (e.key === 'Escape') { input.focus(); }
+    });
+    // Closed when one leaves it (a phone shows the results over the page).
+    document.addEventListener('click', (e) => { if (!search.contains(e.target)) list.hidden = true; });
+    input.addEventListener('focus', () => { if (input.value.trim() && index) show(); });
+    // / searches, as on many sites, unless one is typing somewhere.
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.target.closest('input, textarea, select, [contenteditable]')) return;
+      e.preventDefault();
+      input.focus();
     });
     search.hidden = false;
   }

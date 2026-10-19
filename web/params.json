@@ -57,7 +57,8 @@
   {"name": "cadran_noglow", "group": "capture", "type": "bool"},
   {"name": "cadran_noring", "group": "capture", "type": "bool"},
   {"name": "stats", "group": "capture", "type": "text", "panel": false},
-  {"name": "cut_text", "group": "capture", "type": "text", "panel": false}
+  {"name": "cut_text", "group": "capture", "type": "text", "panel": false},
+  {"name": "stall_s", "group": "capture", "type": "number", "min": 1, "panel": false}
  ],
  "presets": [
   {"id": "default", "params": {}},

@@ -4,10 +4,14 @@ The desktop simulator (`make desktop`, `source/sim/`), compiled with
 [Emscripten](https://emscripten.org) for a browser: the real borealis UI
 against a simulated console, to click through a change, try a state or show
 a screen without a build on the console.
+In the website's look (`site/assets/site.css`): its colours, its header (the
+name, the links to the website, the language and theme menus, a short face of
+them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
+`branding/mark.svg`, copied by CMake).
 
-- **main**: <https://jigsawfr.github.io/PlayGuard/simulator/>, on PlayGuard's
+- **main**: <https://playguard.link/simulator/>, on PlayGuard's
   website ([`site/README.md`](../site/README.md)).
-- **a pull request**: `https://jigsawfr.github.io/PlayGuard/pr-<number>/simulator/`,
+- **a pull request**: `https://playguard.link/pr-<number>/simulator/`,
   linked in a comment on the pull request and updated at each push. It goes
   when the pull request is closed. Pull requests from forks are built but not
   published (their pages would be served from this site).
@@ -62,7 +66,10 @@ a screen without a build on the console.
   page presses the other buttons by what the key says, on any layout: X, Y,
   L, R, Shift+L (ZL), Shift+R (ZR), + or P, − or M, Backspace (Ⓑ). A click is
   a touch. **Pad** shows an on-screen controller (shown by default on a touch
-  screen). A gamepad works through the browser.
+  screen): right under the screen on a phone in portrait, on either side of it
+  in landscape, as on a Switch. A gamepad works through the browser. On a
+  touch screen the fields are 16px, so that iOS does not zoom into them, and an
+  iPhone's home screen takes `apple-touch-icon.png`.
 - **Screenshot** saves the screen as it is (1280×720); **Record** saves a
   video of it (WebM) until **Stop**; **Log** shows what PlayGuard logs.
 - **Steps**: from the first screen on, the page notes each button pressed
@@ -128,9 +135,12 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   `/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc` (Debian and
   Ubuntu's `fonts-noto-cjk`), or `-DPLAYGUARD_WEB_CJK_FONT=<file>`; without
   one, the build goes on with a warning and those languages show boxes.
-- The page: `index.html`, `simulator.js`, `simulator.css`; `params.json`, the
-  panel's entries; `i18n/<language>.json`, its texts, one catalog per language
-  of the console (`en-US.json` the reference). `tools/check_web_params.py` (CI)
+- The page: `index.html`, `simulator.js`, `simulator.css`; `sim_logic.js`,
+  what of it touches neither the page nor PlayGuard (the languages, the URL,
+  the variables, the steps' format), tested with Node (`node --test
+  tests/web_page/*.test.js`, CI); `params.json`, the panel's entries;
+  `i18n/<language>.json`, its texts, one catalog per language of the console
+  (`en-US.json` the reference). `tools/check_web_params.py` (CI)
   fails when a `PLAYGUARD_SIM_*` variable read in `source/` has no entry, an
   entry no longer matches a variable, a language of the console has no
   catalog, or English lacks a text; it warns about a text another catalog has

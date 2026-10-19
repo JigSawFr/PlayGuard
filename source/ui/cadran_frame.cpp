@@ -67,7 +67,7 @@ void cadran::install_theme()
 #ifndef __SWITCH__
         // The smoke test's still focus (ui::register_theme_colors): the glow
         // in the stroke's own colour, so a screenshot does not depend on when.
-        if (sim_env("PLAYGUARD_SIM_STILL_FOCUS")) t->addColor("brls/highlight/color2", p->hl1);
+        if (sim_env_flag("PLAYGUARD_SIM_STILL_FOCUS")) t->addColor("brls/highlight/color2", p->hl1);
 #endif
         t->addColor("brls/click_pulse", nvgRGBA(0x2E, 0xC4, 0xA6, 38));
         t->addColor("brls/button/primary_enabled_background", p->teal_fill);
@@ -182,7 +182,7 @@ class Glow : public brls::View
     }
     void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style, brls::FrameContext*) override
     {
-        static const bool off = sim_env("PLAYGUARD_SIM_CADRAN_NOGLOW") != nullptr;
+        static const bool off = sim_env_flag("PLAYGUARD_SIM_CADRAN_NOGLOW");
         if (off || !config::get().cadran_glow || effects::light()) return;
         const NVGpaint paint = nvgRadialGradient(vg, x + this->cx, y + this->cy, 0.0f, this->radius, this->glow, this->clear);
         // Only the square around the light: past its radius it is clear, so

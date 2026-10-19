@@ -141,6 +141,20 @@ static void test_foreground_only()
     CHECK(g.stalled);
 }
 
+static void test_shorter_wait()
+{
+    // The simulator's tests wait less (PLAYGUARD_SIM_STALL_S): 20 s on
+    // screen are enough then, never with the default.
+    State s, d;
+    uint64_t t = 0;
+    for (; t < 20000; t += 5000) {
+        CHECK(!step(s, true, 1000 * S_NS, 120, t, true, 20000));
+        step(d, true, 1000 * S_NS, 120, t, true);
+    }
+    CHECK(step(s, true, 1000 * S_NS, 120, t, true, 20000));
+    CHECK(!step(d, true, 1000 * S_NS, 120, t, true));
+}
+
 int main()
 {
     test_should_count();
@@ -148,5 +162,6 @@ int main()
     test_counting();
     test_restarts();
     test_foreground_only();
+    test_shorter_wait();
     return CHECK_DONE("timer_health_logic tests passed");
 }

@@ -53,7 +53,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 ## Today — the day at a glance
 
-*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/)*
+*[Try it in the simulator ›](https://playguard.link/simulator/)*
 
 - **The time left** as a ring (a day without play says *No play*, not *0 min*; the extra time given today shows as a lighter segment at its end, and the ring moves to each new value), and under it what stops play first: before the time up or the bedtime alarm, the rest of the day as a line, now at its left, each of them a mark with its time (*16:40 time is up*, *21:00 bedtime*), teal up to the first, amber in its last 15 minutes; otherwise in words (the bedtime alarm once the day's time is spent, when games are allowed again; while parental controls are unlocked, today's limit on hold and why).
 - **The actions beside it:** *Extra time* with its amounts one press away (an amount focused moves the time up on the line, *with 15 min more*, or says on the bedtime alarm's mark that it still comes first; the first one stands out in teal once 15 min or less are left, or none), *Stop for today*, *Show the child*, *Today's limit…* (today's limit picked there and then, written after one confirmation); once a profile is saved, the profile in force by its name (*Profiles…* when none matches): Ⓐ lists them, the one in force ticked, to put another in force after one confirmation (the days that change), or *Manage the profiles…*; while parental controls are unlocked, *Turn back on* comes first, the row's whole width, and *Extra time* steps aside. With no limit on any day, *Set the week's limits* opens the week on *Play timer*.
@@ -71,7 +71,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 ## Play timer — the week is the editor
 
-*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=play_timer)*
+*[Try it in the simulator ›](https://playguard.link/simulator/?tab=play_timer)*
 
 - **The week is the editor:** Ⓐ on a day edits it: ↑/↓ change it by 15 min, ←/→ move to the next day, Ⓛ copies it to Monday–Friday, Ⓡ to the weekend, Ⓨ sets no limit, Ⓐ or Ⓑ ends the edit; Ⓧ picks an exact time (*Enter a duration…* sets it with ↑/↓ by 15 min and Ⓛ/Ⓡ by 5 min, OK focused). By touch, a day tapped is edited, then a tap on its top or bottom changes it by 15 min. The changes are saved together, with **+** or *Save*, as in the per-day editor (the confirmation lists the days changed, before → after); *Discard* puts them back. Inside each day's bar, the time played on its last occurrence (today's included, every account), in coral once the limit was reached, its limit too, and a key under the week says so (*over the limit*); a day changed and not saved yet has its limit in amber and its bar ringed in amber; under the week, the focused day's figures (*Thursday: 1 h 20 played of 2 h*).
 - **Chips** above and below the week open their choices at once: the profiles (how many are saved), the same limit every day, the bedtime alarm, *When the time is up* and the removal.
@@ -90,7 +90,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 ## Activity — who played what, and how long
 
-*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=activity)*
+*[Try it in the simulator ›](https://playguard.link/simulator/?tab=activity)*
 
 - Time per game **today**, in the **last 7 days** and **in all**, from the console's own activity log — for every account or **one user account** (the accounts as chips at the top, when the console has several). PlayGuard starts on the account shown last, or on the one set under *Account by default* (every account, or one).
 - **At the top:** the accounts as chips, the period and the export, today, the last 7 days and all time as figures (under the last 7 days, how they compare with the 7 before, per day: ▲ *+20 min/day vs last week* in amber, ▼ less in teal, *same as last week* within 5 minutes), the four games most played as cards (Ⓐ opens one; over the last 7 days, the one played most more than the week before says by how much, from half an hour: ▲ *+2 h*). Nothing played over the period: a card says so, with *See all time* when there is something to see.
@@ -107,7 +107,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 ## Restrictions — level, age rating, communication
 
-*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=restrictions)*
+*[Try it in the simulator ›](https://playguard.link/simulator/?tab=restrictions)*
 
 - **The restriction level:** Young child, Child, Teen and Custom side by side as tiles, each with what it restricts (a padlock for restricted, a check for allowed, and the installed games it blocks; Ⓐ sets it; on *Custom* in force, Ⓐ goes to its settings below); *None* under them. What a level restricts (age limit, posting, communication) is said again before it is set.
 - In Custom: age rating, social-media posting, communication with others.
@@ -117,7 +117,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 ## PIN — the PIN, unlocking, blocking games, companion app
 
-*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=security)*
+*[Try it in the simulator ›](https://playguard.link/simulator/?tab=security)*
 
 - **At the top**, three tiles: the PIN, the restrictions and the temporary unlock, each with a teal check when it is as it should be (a PIN set, restrictions on, locked) or an amber warning when it needs you.
 - **Set / change the PIN** (system PIN screen), **show the PIN** (after a warning and the PIN itself, asked every time; recorded in the history, then a new PIN is offered), **unlock temporarily**, **turn parental controls back on**, and whether PlayGuard turns them back on by itself right after a change that needed the unlock (on by default).
@@ -128,7 +128,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 ## Console — the network clock, the installed games, what the console runs
 
-*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=console)*
+*[Try it in the simulator ›](https://playguard.link/simulator/?tab=console)*
 
 - **At the top**, what the console runs as tiles (the firmware, Atmosphère, and hekate when it is on the SD card; Ⓐ opens its release notes), then the diagnostics, then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
 - **Network clock ›**, a screen of its own — the clock the play timer relies on:
@@ -143,14 +143,14 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 ## History — changes and backups
 
-*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=history)*
+*[Try it in the simulator ›](https://playguard.link/simulator/?tab=history)*
 
 - **Change history:** the newest 500 changes PlayGuard made (limits, restriction level, PIN, unlocks, unlinking, the clock, restores, pausing or resuming the countdown …) and what it saw changed outside it, grouped by day (*Today*, *Yesterday*, then the day and date), with the time and from where; a limit changed on one day names that day. A change the console **refused** is listed too, in amber, with the console's error and what was tried (never put back: nothing changed). *Show* keeps one kind (play time, restrictions, security and app, seen outside PlayGuard, refused by the console); *Export what is shown* writes it to `exports/` as CSV, JSON, XLSX or PDF. Each change keeps the PlayGuard version that made it. Ⓐ on a change shows it and, for a value, **puts the previous one back** — through the same unlock and PIN as any change, saying if it changed since. A change recorded by a newer version of PlayGuard shows as *Other change*.
 - **Back up / restore the settings** on the SD card: restriction level, custom settings, VR mode, rating organisation, daily limits, the "time's up" alarm (with the advanced actions on), and the raw play-timer block for the record — never the PIN. A restore lists only what would change (nothing to change: it just says so, with no unlock and nothing written), and says when the backup had a bedtime alarm on (it is not written back). Choose how many backups to keep.
 
 ## Preferences
 
-*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=preferences)*
+*[Try it in the simulator ›](https://playguard.link/simulator/?tab=preferences)*
 
 - What sets PlayGuard itself up:
   - Language (every console language, or the console's own), theme (dark by default, light, or the console's), text size (automatic / normal / larger, at once); the others with an offer to restart.
@@ -163,7 +163,7 @@ Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun fo
 
 ## About
 
-*[Try it in the simulator ›](https://jigsawfr.github.io/PlayGuard/simulator/?tab=about)*
+*[Try it in the simulator ›](https://playguard.link/simulator/?tab=about)*
 
 - The installed PlayGuard: version (in amber when a newer one is out; Ⓐ opens its **release notes**), launch mode and data folder; **check for updates** now; *Check for updates every day* at start-up, and *Update with*: in PlayGuard, which downloads the release, checks it, replaces itself and restarts, or sphaira, Homebrew App Store or by hand (asked on the first update when none is chosen). While a newer release is known, PlayGuard opens on **PlayGuard X.Y.Z is available** (its date and notes): *Update*, or *Later* for 1 day, 1 week or 30 days at most; the release notes are PlayGuard's own, on the same screen as Atmosphère's and hekate's in *Console*: from its GitHub releases, a tab per version (the installed one, the newer ones, the older ones), each with its highlights as cards and every change, kept on the SD card for offline reading (the installed version's are in the app too, for when nothing was fetched yet). After an update, PlayGuard opens once on **What's new in X.Y.Z** (the same highlights, then the QR codes).
 - **Help & diagnostics ›**, a screen of its own, below *Update with*:

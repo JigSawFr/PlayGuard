@@ -1,29 +1,37 @@
-/* The web simulator's page (web/README.md). PlayGuard's colours: the teal
-   of the focus highlight, on a navy that frames the console's screen. */
+/* The web simulator's page (web/README.md), in the website's look
+   (site/assets/site.css): its colours, its header, Sora for the name. The
+   teal of the focus highlight, on a navy that frames the console's screen. */
 /* Light by default; dark when the page says so (data-theme, set before the
    first paint from the URL, the choice kept or the system's). */
+@font-face {
+  font-family: "Sora";
+  src: url("sora.woff2") format("woff2");
+  font-weight: 100 800;
+  font-display: swap;
+}
 :root {
-  --bg: #f3f5f8;
+  --bg: #f5f7fb;
   --surface: #ffffff;
-  --surface-2: #eef1f5;
-  --text: #17202e;
-  --muted: #5b6678;
-  --line: #d9dee6;
+  --surface-2: #eef2f8;
+  --text: #121b2c;
+  --muted: #536079;
+  --line: #dbe2ec;
   --accent: #0a705f;
   --accent-text: #ffffff;
   --frame: #0f1724;
   --radius: 10px;
+  --display: "Sora", system-ui, -apple-system, "Segoe UI", sans-serif;
   color-scheme: light;
 }
 :root[data-theme="dark"] {
-  --bg: #0b111b;
-  --surface: #131b28;
-  --surface-2: #1a2433;
-  --text: #e6ebf2;
-  --muted: #8392aa;
-  --line: #273245;
-  --accent: #22b39a;
-  --accent-text: #04140f;
+  --bg: #0b1424;
+  --surface: #111d31;
+  --surface-2: #17253d;
+  --text: #e8eef7;
+  --muted: #a9b6cc;
+  --line: #22324f;
+  --accent: #2ec4a6;
+  --accent-text: #05140f;
   --frame: #05090f;
   color-scheme: dark;
 }
@@ -33,7 +41,7 @@ html, body { margin: 0; height: 100%; }
 body {
   background: var(--bg);
   color: var(--text);
-  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
   display: flex;
   flex-direction: column;
 }
@@ -43,13 +51,16 @@ button, input, select { font: inherit; color: inherit; }
 .top {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
   padding: 10px 16px;
   border-bottom: 1px solid var(--line);
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
 }
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 600; color: inherit; text-decoration: none; }
-.brand img { border-radius: 6px; }
+.brand { display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; font: 700 20px var(--display); letter-spacing: -0.01em; }
+.brand b { color: var(--accent); font-weight: 700; }
+.nav { display: flex; gap: 18px; }
+.nav a { color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; white-space: nowrap; }
+.nav a:hover { color: var(--text); }
 .brand .tag {
   font-size: 12px;
   font-weight: 500;
@@ -290,7 +301,9 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .btn.primary.pending { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
 .btn.ghost { background: transparent; }
 .header-settings { display: flex; gap: 8px; margin-left: auto; }
-.header-settings select { width: auto; padding: 5px 8px; font-size: 13px; }
+.header-settings select { width: auto; padding: 5px 8px; font-size: 14px; color: var(--text); background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; }
+.picker { position: relative; display: inline-flex; }
+.picker-face { display: none; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .notice {
   width: 100%;
@@ -319,7 +332,73 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
   .panel { border-left: 0; border-top: 1px solid var(--line); }
   .tab-body { max-height: none; overflow: visible; }
   .build { display: none; }
-  .top { flex-wrap: wrap; }
   .notice { max-width: none; }
   .panel-actions { position: sticky; bottom: 0; background: var(--surface); }
+}
+
+/* The header on a tablet or a phone, as the website's: no links (the name
+   leads to it), the menus as a short face (the language's code, the
+   theme's icon) over the system's list, on the name's row. */
+@media (max-width: 900px) {
+  .nav { display: none; }
+  .top { flex-wrap: nowrap; gap: 10px; }
+  .header-settings { gap: 6px; }
+  .picker-face { display: flex; align-items: center; justify-content: center; gap: 5px; min-width: 44px; height: 40px; padding: 0 10px;
+                 border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); color: var(--text); font: 600 14px system-ui, sans-serif; }
+  .picker-face::before { content: ""; width: 18px; height: 18px; background: currentColor;
+                         -webkit-mask: var(--glyph) center / contain no-repeat; mask: var(--glyph) center / contain no-repeat; }
+  .picker-lang .picker-face { --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M3 12h18M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18'/%3E%3C/svg%3E"); }
+  .picker-theme .picker-face { --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M12 3a9 9 0 0 1 0 18z'/%3E%3C/svg%3E"); }
+  :root[data-theme-choice="light"] .picker-theme .picker-face { --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4'/%3E%3C/svg%3E"); }
+  :root[data-theme-choice="dark"] .picker-theme .picker-face { --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z'/%3E%3C/svg%3E"); }
+  .picker select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; font-size: 16px; cursor: pointer; }
+  .picker:focus-within .picker-face { outline: 2px solid var(--accent); outline-offset: 2px; }
+}
+@media (max-width: 480px) {
+  .brand { font-size: 18px; gap: 8px; }
+  .brand img { width: 28px; height: 28px; }
+  .brand .tag { display: none; }
+}
+
+/* A touch screen (a phone, a tablet). */
+@media (pointer: coarse) {
+  /* 16px: iOS zooms into a smaller field when it is touched. */
+  input:not([type="checkbox"]), select, textarea, .header-settings select { font-size: 16px; }
+  /* The pad right under the screen, the time and the tools after it. */
+  .pad { order: 1; }
+  .time { order: 2; }
+  .controls { order: 3; }
+}
+
+/* A phone in landscape: the screen as high as it can be, the pad on either
+   side of it as on a Switch (the shoulders and − / + above and under its
+   stick and buttons); the rest under it. */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 540px) {
+  html, body { height: auto; }
+  .top { padding: 4px 12px; flex-wrap: nowrap; }
+  .brand .tag, .build, .nav { display: none; }
+  .layout { display: block; }
+  .stage {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr) 140px;
+    grid-template-areas: "lsh screen rsh" "dpad screen face" "lmid screen rmid";
+    align-items: center;
+    gap: 8px 12px;
+    padding: 8px 12px;
+    overflow: visible;
+  }
+  .stage:has(> .pad[hidden]) { grid-template-columns: 0 minmax(0, 1fr) 0; column-gap: 0; }
+  .screen { grid-area: screen; width: 100%; max-width: calc((100dvh - 76px) * 16 / 9); padding: 6px; border-radius: 10px; }
+  .overlay { inset: 6px; }
+  .stage > .notice, .stage > .controls, .stage > .time { grid-column: 1 / -1; max-width: none; }
+  .pad, .pad-row { display: contents; }
+  .dpad, .face { grid-template: repeat(3, 44px) / repeat(3, 44px); }
+  .dpad { grid-area: dpad; }
+  .face { grid-area: face; }
+  .pad [data-button="0"] { grid-area: lsh; justify-self: start; }
+  .pad [data-button="1"] { grid-area: lsh; justify-self: end; }
+  .pad [data-button="15"] { grid-area: rsh; justify-self: start; }
+  .pad [data-button="16"] { grid-area: rsh; justify-self: end; }
+  .pad [data-button="7"] { grid-area: lmid; justify-self: center; }
+  .pad [data-button="9"] { grid-area: rmid; justify-self: center; }
 }

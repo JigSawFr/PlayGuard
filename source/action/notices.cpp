@@ -121,9 +121,9 @@ Entry entry_of(const notice_logic::Item& item)
 bool sd_free(uint64_t* bytes)
 {
 #ifndef __SWITCH__
-    const char* sim = sim_env("PLAYGUARD_SIM_SD_FREE_MB");
-    if (!sim) return false;
-    *bytes = (uint64_t)std::strtoull(sim, nullptr, 10) << 20;
+    const long long mb = sim_env_int("PLAYGUARD_SIM_SD_FREE_MB", -1, 0, 1LL << 40);
+    if (mb < 0) return false;
+    *bytes = (uint64_t)mb << 20;
     return true;
 #else
     struct statvfs st;

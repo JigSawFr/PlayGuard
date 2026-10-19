@@ -366,13 +366,17 @@ if (PLAYGUARD_WEB)
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${PLAYGUARD_SITE}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${PLAYGUARD_SITE}
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_CURRENT_SOURCE_DIR}/web/index.html ${CMAKE_CURRENT_SOURCE_DIR}/web/theme.js ${CMAKE_CURRENT_SOURCE_DIR}/web/simulator.js
+                ${CMAKE_CURRENT_SOURCE_DIR}/web/index.html ${CMAKE_CURRENT_SOURCE_DIR}/web/theme.js ${CMAKE_CURRENT_SOURCE_DIR}/web/sim_logic.js
+                ${CMAKE_CURRENT_SOURCE_DIR}/web/simulator.js
                 ${CMAKE_CURRENT_SOURCE_DIR}/web/simulator.css ${CMAKE_CURRENT_SOURCE_DIR}/web/params.json
                 ${CMAKE_CURRENT_SOURCE_DIR}/web/sw.js ${CMAKE_CURRENT_SOURCE_DIR}/web/manifest.webmanifest ${PROJECT_ICON}
                 ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.js ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.wasm
                 ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.data
                 ${PLAYGUARD_SITE}
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/branding/icon.svg ${PLAYGUARD_SITE}/icon.svg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/branding/mark.svg ${PLAYGUARD_SITE}/mark.svg
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/site/assets/fonts/sora.woff2 ${PLAYGUARD_SITE}/sora.woff2
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/images/apple-touch-icon.png ${PLAYGUARD_SITE}/apple-touch-icon.png
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/web/i18n ${PLAYGUARD_SITE}/i18n
         ${PLAYGUARD_SITE_CJK}
         COMMENT "Assembling the web simulator's site in ${PLAYGUARD_SITE}")

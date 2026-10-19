@@ -165,7 +165,7 @@ void ClockTab::refresh()
 #ifndef __SWITCH__
     // Desktop simulation: a console time frozen by PLAYGUARD_SIM_NOW stays
     // frozen here too, or a screenshot would depend on when it was taken.
-    if (sim_env("PLAYGUARD_SIM_NOW")) ticked = 0;
+    if (sim_env_int("PLAYGUARD_SIM_NOW", 0, 0, INT64_MAX)) ticked = 0;
 #endif
     const std::string na = "playguard/common/unavailable"_i18n;
     this->show_clocks(R_SUCCEEDED(s.user_rc) ? ui::time_text(s.user_time + ticked) : na,

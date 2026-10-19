@@ -6,6 +6,10 @@ Errors:
 - a PLAYGUARD_SIM_* variable read anywhere in source/ without its entry in
   params.json (its name in lower case without the prefix), or an entry no
   variable matches any more;
+- a variable read in source/ that CONTRIBUTING.md's table of the desktop
+  simulator does not describe, or one it describes that nothing reads;
+- `live` on a variable PlayGuard reads once only: in the simulated console's
+  first state (sim_defaults(), source/sim/sim_state.c) or into a static;
 - an entry of an unknown group or type, a select or a list without options,
   `values` for an option it does not offer, `live` on an entry that is no
   variable, a preset naming an unknown entry, or giving a datetime entry
@@ -44,12 +48,29 @@ def main():
     root = sys.argv[1] if len(sys.argv) > 1 else "."
     errors, warnings = [], []
 
-    read = set()
+    read, once = set(), set()
     for folder, _, files in os.walk(os.path.join(root, "source")):
         for name in files:
             if name.endswith((".c", ".cpp", ".h", ".hpp")):
                 with open(os.path.join(folder, name), encoding="utf-8", errors="replace") as f:
-                    read |= set(re.findall(r"PLAYGUARD_SIM_([A-Z0-9_]+)", f.read()))
+                    text = f.read()
+                read |= set(re.findall(r"PLAYGUARD_SIM_([A-Z0-9_]+)", text))
+                # Read once: into a static, or into the console's first state.
+                once |= set(re.findall(r"static\s+const\s+[\w:*\s]+=\s*sim_env\w*\(\s*\"PLAYGUARD_SIM_([A-Z0-9_]+)", text))
+                m = re.search(r"\nstatic void sim_defaults\([^)]*\)\n\{(.*?)\n\}", text, re.S)
+                if m:
+                    once |= set(re.findall(r"PLAYGUARD_SIM_([A-Z0-9_]+)", m.group(1)))
+
+    # CONTRIBUTING.md's table of the variables, under "The desktop simulator".
+    with open(os.path.join(root, "CONTRIBUTING.md"), encoding="utf-8") as f:
+        m = re.search(r"\n## The desktop simulator\n(.*?)\n## ", f.read(), re.S)
+    documented = set(re.findall(r"PLAYGUARD_SIM_([A-Z0-9_]+)", m.group(1))) if m else set()
+    if not m:
+        errors.append("CONTRIBUTING.md: no section \"The desktop simulator\"")
+    for v in sorted(read - documented):
+        errors.append(f"PLAYGUARD_SIM_{v} is read in source/ but CONTRIBUTING.md's table does not describe it")
+    for v in sorted(documented - read):
+        errors.append(f"CONTRIBUTING.md describes PLAYGUARD_SIM_{v}, which nothing in source/ reads any more")
 
     with open(os.path.join(root, "web", "params.json"), encoding="utf-8") as f:
         manifest = json.load(f)
@@ -80,6 +101,8 @@ def main():
                 errors.append(f"{where}: values for {o!r}, which is not one of its options")
         if p.get("live") and (p.get("config") or p.get("page")):
             errors.append(f"{where}: live, but no variable (config or page)")
+        if p.get("live") and name.upper() in once:
+            errors.append(f"{where}: live, but PlayGuard reads PLAYGUARD_SIM_{name.upper()} once only")
         if p.get("panel") is False or p.get("page"):
             continue
         needed.add(f"params/{name}/label")

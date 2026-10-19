@@ -45,9 +45,9 @@ The "outside" scenario starts with a watch.json from an earlier run that the
 console no longer matches (more time played, another clock offset, other
 limits, one of the two accounts unknown) and a time left that does not go
 down (PLAYGUARD_SIM_NOT_COUNTING): Today must say what changed
-outside PlayGuard, record it in the change history, then, after 90 s on
-screen, that the console is not counting; the notice must go when
-dismissed, and the Activity tab flag the new account.
+outside PlayGuard, record it in the change history, then, after 30 s on
+screen (PLAYGUARD_SIM_STALL_S), that the console is not counting; the
+notice must go when dismissed, and the Activity tab flag the new account.
 
 The "alarm" scenario starts with "When the time is up" on a warning only and
 today's limit passed (PLAYGUARD_SIM_ALARM_ONLY, PLAYGUARD_SIM_RESTRICTED):
@@ -365,6 +365,10 @@ if OUTSIDE or CADRANSTATES:
     # Saturday (the console has 3 h), and only Alice of the two accounts
     # (Léo is new).
     env.setdefault("PLAYGUARD_SIM_NOT_COUNTING", "1")
+    if OUTSIDE:
+        # "Not counting" after 30 s on screen rather than 90: the same
+        # screens, a minute sooner (01_outside is taken well before).
+        env.setdefault("PLAYGUARD_SIM_STALL_S", "30")
     watch_file = os.path.join(nand_dir, "watch.json")
     os.makedirs(os.path.dirname(watch_file), exist_ok=True)
     json.dump({"schema": 1, "date": "2026-10-08", "spent_s": 6000, "offset_s": 900, "steady_id": "53" * 16,
@@ -1057,8 +1061,8 @@ if OUTSIDE:
     for kind in ("outside_reset", "outside_clock", "outside_limits", "new_account"):
         if kinds.count(kind) != 1:
             fail(f"{kind} recorded {kinds.count(kind)} times in the history: {kinds!r}")
-    # The time left stays the same: after 90 s on screen, Today says
-    # the console is not counting.
+    # The time left stays the same: after 30 s on screen
+    # (PLAYGUARD_SIM_STALL_S, above), Today says the console is not counting.
     for _ in range(150):
         if "timer health: not counting" in log_text():
             break

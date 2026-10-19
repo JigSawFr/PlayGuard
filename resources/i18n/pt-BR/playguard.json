@@ -862,7 +862,7 @@
             "needs_verify": {
                 "short": "Dados corrompidos",
                 "cause": "O console encontrou dados corrompidos neste jogo e pede para verificá-los.",
-                "fix": "Verifique os dados (primeiro botão): o PlayGuard guarda o resultado. Intactos, o jogo sai da lista; danificados, vai para Reinstalar."
+                "fix": "Verifique os dados (primeiro botão): o PlayGuard salva o resultado. Intactos, o jogo sai da lista; danificados, vai para Reinstalar."
             },
             "key_too_new": {
                 "short": "Chaves novas demais",
@@ -935,7 +935,7 @@
         },
         "group_note": {
             "fix": "O PlayGuard pode repará-los: A em um jogo e depois o primeiro botão.",
-            "verify": "O console suspeita dos dados. A verificação lê cada arquivo e diz se é preciso reinstalar o jogo; o PlayGuard guarda o resultado.",
+            "verify": "O console suspeita dos dados. A verificação lê cada arquivo e diz se é preciso reinstalar o jogo; o PlayGuard salva o resultado.",
             "reinstall": "Os arquivos estão faltando ou inutilizáveis. Salve a lista, remova-os aqui (até lá um instalador os considera instalados) e reinstale-os buscando pelo nome.",
             "system": "Os jogos estão bem: o problema é o firmware do console ou o cartão SD. Atualize o firmware ou inicie na memória em que foram instalados."
         },

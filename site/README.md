@@ -1,6 +1,6 @@
 # The website
 
-PlayGuard's website, on GitHub Pages: <https://jigsawfr.github.io/PlayGuard/>.
+PlayGuard's website, on GitHub Pages: <https://playguard.link/>.
 
 - **A home page and the documentation in the console's 15 languages**:
   English at the root, the others in `/fr/`, `/fr-ca/`, `/de/`, `/es/`,
@@ -12,9 +12,32 @@ PlayGuard's website, on GitHub Pages: <https://jigsawfr.github.io/PlayGuard/>.
 - **The screenshots in each language**: the console's screens as the
   simulator shows them in that language (below), English where there are
   none (a local build); under the site's dark theme, the console's dark one.
+- **On a phone** (an iPhone in Safari or Edge, the same WebKit): no field
+  under 16px (iOS zooms into one), 44px to touch, the page beside the notch
+  in landscape (`viewport-fit=cover`, `env(safe-area-inset-*)`), each page's
+  sections folded under its first paragraph, and nothing wider than the
+  screen (a long `code` breaks). The header goes on two rows up to 1080px,
+  where its links no longer fit beside the menus in every language.
+- **The home page**: install first (the download under it, with the
+  release's date), the three main features then the others, PlayGuard
+  beside Nintendo's app on what each needs, the questions each with its own
+  address (`#faq-<question>`, opened by a link to it). The screenshots open
+  larger over the page (`site.js`: swipe or the arrows, down or Esc to
+  close), the documentation's too: its tables of screenshots under their
+  names become captioned figures (`screenshot_table()`), one per row on a
+  phone. Each section of the documentation has a link to share it, each
+  page the previous and next ones; the changelog folds the older releases.
+- **For a parent in a hurry**: *Locked out?* under the home page's
+  buttons; a check on the compatibility page (a firmware typed, what
+  PlayGuard does on it, from `source/core/sysinfo.h`'s limits as
+  `tools/gen_compat.py` reads them); a copy button on each block of code; a
+  page that prints as its text alone (its folded parts open); an icon for an
+  iPhone's home screen (`images/apple-touch-icon.png`,
+  `tools/render_branding.mjs`).
 - **The documentation's search**: a box above its pages (`site.js`), over
   `docs/search.json`, each section of the language's pages; every word typed
-  must be in the section, accents or not.
+  must be in the section, accents or not, and is marked in the results; `/` to search, the
+  arrows through them.
 - **The changelog** (`/changelog/`, `CHANGELOG.md` in each language's page,
   its notes in English) and `releases.atom`, a feed of the releases.
 - **The page not found** (`404.html`, served at any address) in every
@@ -59,7 +82,9 @@ pages; no framework, nothing to install but that.
   site's pages, and any other file of the repository links to GitHub. A
   change to `docs/` is a change to the site.
 - `site/assets/` — `site.css` (the branding's navy, teal and amber, light and
-  dark), `site.js` (the language and theme menus), `theme.js` (the theme
+  dark), `site.js` (the language and theme menus; on a phone, the header
+  out of the way while scrolling down, the gallery's dots, the way back to
+  the top), `theme.js` (the theme, and the browser's bar in its colour,
   before the first paint) and `fonts/sora.woff2`, the Sora headings' font
   (SIL Open Font License, `fonts/OFL.txt`; its Latin letters, cut out of
   google/fonts' `ofl/sora/Sora[wght].ttf`), served with the site so that no
@@ -86,7 +111,7 @@ pages; no framework, nothing to install but that.
   (1280×720), the home page's video in that language; English keeps
   `images/video/playguard-tour.mp4`. A few minutes each: rendered with the
   screenshots (a release, or by hand), else main's.
-- **The site's address**: `SITE_URL` (`https://jigsawfr.github.io/PlayGuard/`
+- **The site's address**: `SITE_URL` (`https://playguard.link/`
   by default). CI asks GitHub Pages for it (its custom domain, when it has
   one) and adds a preview's folder; `SITE_BASE` is its path, for 404.html;
   `SITE_NOINDEX=1` for a preview.
@@ -113,7 +138,10 @@ since the commit that one was built from: the simulator (and its smoke test,
 about ten minutes) when the app, its resources, the simulator or the workflow
 changed; the screenshots and tours for a release or by hand (above); the
 website itself, every time, in seconds. A change to the docs or the site
-takes a few minutes. main's builds run one at a time, each from the last. `.github/workflows/pages.yml` publishes them, with GitHub
+takes a few minutes. A pull request that changes the site, its documentation or its texts
+also has its layout checked (`tools/site_layout.py`, about half a minute): no
+page wider than the screen on a phone, a tablet or a desktop, no field iOS
+zooms into, no script that throws. main's builds run one at a time, each from the last. `.github/workflows/pages.yml` publishes them, with GitHub
 Actions as the source of GitHub Pages: main's at the root, each open pull
 request's in `pr-<number>/` (not a fork's: its pages would be served from this
 site), then edits the pull request's comment with the links. It runs where
