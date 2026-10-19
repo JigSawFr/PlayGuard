@@ -231,6 +231,16 @@ cadran::List::List(brls::View* screen, brls::Box* column)
 {
 }
 
+void cadran::List::state(const char* id, const char* color_key)
+{
+    for (auto& [cell, view] : this->marks) {
+        if (cell != this->tab->getView(id)) continue;
+        auto* mark = static_cast<kit::Mark*>(view);
+        if (color_key) mark->set(color_key);
+        mark->setVisibility(color_key ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    }
+}
+
 void cadran::List::banners(const std::vector<const char*>& ids)
 {
     brls::Theme theme = brls::Application::getTheme();
@@ -310,6 +320,23 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         // end in "…".
         cell->detail->setSingleLine(status);
         if (!status) cell->detail->setTextColor(theme["cadran/text2"]);
+        if (status) {
+            // Its value after a mark of its state (state()), hidden until set.
+            auto* value = new brls::Box(brls::Axis::ROW);
+            value->setAlignItems(brls::AlignItems::CENTER);
+            value->setMarginTop(4);
+            cell->detail->setMarginTop(0);
+            auto* mark = new kit::Mark("cadran/text3");
+            mark->setMarginRight(10);
+            mark->setShrink(0);
+            mark->setVisibility(brls::Visibility::GONE);
+            const int at = index_in(cell, cell->detail);
+            cell->removeView(cell->detail, false);
+            value->addView(mark);
+            value->addView(cell->detail);
+            cell->addView(value, at);
+            this->marks.push_back({ cell, mark });
+        }
     }
     return row;
 }

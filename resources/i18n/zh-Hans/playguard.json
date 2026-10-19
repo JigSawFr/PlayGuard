@@ -1627,8 +1627,7 @@
             "see_all": "查看累计",
             "trend_up": "比上周每天 +{}",
             "trend_down": "比上周每天 -{}",
-            "trend_same": "与上周相当",
-            "card_grew": "比上周 +{}"
+            "trend_same": "与上周相当"
         },
         "restrictions": {
             "choose": "选择此级别",

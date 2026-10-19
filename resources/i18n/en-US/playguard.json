@@ -1627,8 +1627,7 @@
             "see_all": "See all time",
             "trend_up": "+{}/day vs last week",
             "trend_down": "-{}/day vs last week",
-            "trend_same": "same as last week",
-            "card_grew": "+{} vs last week"
+            "trend_same": "same as last week"
         },
         "restrictions": {
             "choose": "Choose this level",

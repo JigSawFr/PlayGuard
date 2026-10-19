@@ -1627,8 +1627,7 @@
             "see_all": "Voir depuis toujours",
             "trend_up": "+{}/jour vs semaine d'avant",
             "trend_down": "-{}/jour vs semaine d'avant",
-            "trend_same": "comme la semaine d'avant",
-            "card_grew": "+{} vs semaine d'avant"
+            "trend_same": "comme la semaine d'avant"
         },
         "restrictions": {
             "choose": "Choisir ce niveau",

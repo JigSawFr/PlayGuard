@@ -444,11 +444,19 @@ void ActivityTab::build_cards()
         c.rest->setWidth(0);
         line->addView(c.rest);
         text->addView(line);
+        // Against the week before, as the week's tile says it ("vs last
+        // week" there): a caret and the amount.
+        c.grew_row = new brls::Box(brls::Axis::ROW);
+        c.grew_row->setAlignItems(brls::AlignItems::CENTER);
+        c.grew_row->setMarginTop(2);
+        CadranIcon* up = kit::icon("caret-up", 14, "cadran/amber");
+        up->setMarginRight(4);
+        c.grew_row->addView(up);
         c.grew = kit::label("", 15, "cadran/amber");
         c.grew->setSingleLine(true);
-        c.grew->setMarginTop(2);
-        c.grew->setVisibility(brls::Visibility::GONE);
-        text->addView(c.grew);
+        c.grew_row->addView(c.grew);
+        c.grew_row->setVisibility(brls::Visibility::GONE);
+        text->addView(c.grew_row);
         c.box->addView(text);
         auto* spark = new brls::Box(brls::Axis::ROW);
         spark->setAlignItems(brls::AlignItems::FLEX_END);
@@ -636,8 +644,12 @@ void ActivityTab::show_top()
                                  : diff <= -same ? brls::getStr("playguard/cadran/activity/trend_down", ui::fmt_minutes(amount))
                                                  : "playguard/cadran/activity/trend_same"_i18n);
         week_trend->setTextColor(theme[diff >= same ? "cadran/amber" : diff <= -same ? "cadran/teal" : "cadran/text3"]);
+        // Up or down said by the shape too, not by the colour alone.
+        week_trend_icon->setIcon(diff >= 0 ? "caret-up" : "caret-down");
+        week_trend_icon->setColor(theme[diff >= same ? "cadran/amber" : "cadran/teal"]);
+        ui::set_visible(week_trend_icon.getView(), diff >= same || diff <= -same);
     }
-    ui::set_visible(week_trend.getView(), trend);
+    ui::set_visible(week_trend_row.getView(), trend);
     uint64_t day_total[7] = {};
     for (uint32_t g = 0; g < s.count; g++)
         for (int k = 0; k < 7; k++) day_total[k] += s.games[g].day_s[k];
@@ -682,9 +694,8 @@ void ActivityTab::show_top()
         const bool shown = i < games.size();
         ui::set_visible(c.box, shown);
         if (!shown) continue;
-        ui::set_visible(c.grew, games[i] == grew);
-        if (games[i] == grew)
-            ui::set_text(c.grew, brls::getStr("playguard/cadran/activity/card_grew", ui::fmt_play_time((u64)grew_s)));
+        ui::set_visible(c.grew_row, games[i] == grew);
+        if (games[i] == grew) ui::set_text(c.grew, "+" + ui::fmt_play_time((u64)grew_s));
         const GameStat& g = *games[i];
         c.app_id = g.app_id;
         ids.push_back(g.app_id);

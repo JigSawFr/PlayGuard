@@ -151,6 +151,13 @@ void SecurityTab::refresh()
     ui::set_detail(temp, ui::bool_text(s.temp_unlocked_ok, s.temp_unlocked,
                                        "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
     temp->setDetailTextColor(s.temp_unlocked_ok && s.temp_unlocked ? ui::color_warn() : ui::color_neutral());
+    // Each tile's state at a glance: a check when it is as it should be, a
+    // warning when it needs the parent; nothing when it could not be read.
+    constexpr const char* OK = "cadran/teal_fill";
+    constexpr const char* WARN = "cadran/amber_fill";
+    this->list.state("sc_pin", !s.pin_length_ok ? nullptr : s.pin_length ? OK : WARN);
+    this->list.state("sc_restrictions", !s.restriction_enabled_ok ? nullptr : s.restriction_enabled ? OK : WARN);
+    this->list.state("sc_temp", !s.temp_unlocked_ok ? nullptr : s.temp_unlocked ? WARN : OK);
 
     // Companion app: while linked, its next sync overwrites what is set here,
     // unless Atmosphère's DNS blocks its server (then the note says so).

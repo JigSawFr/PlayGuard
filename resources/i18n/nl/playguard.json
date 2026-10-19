@@ -1627,8 +1627,7 @@
             "see_all": "Totaal bekijken",
             "trend_up": "+{}/dag t.o.v. vorige week",
             "trend_down": "-{}/dag t.o.v. vorige week",
-            "trend_same": "zoals vorige week",
-            "card_grew": "+{} t.o.v. vorige week"
+            "trend_same": "zoals vorige week"
         },
         "restrictions": {
             "choose": "Dit niveau kiezen",

@@ -1627,8 +1627,7 @@
             "see_all": "전체 기간 보기",
             "trend_up": "지난주 대비 하루 +{}",
             "trend_down": "지난주 대비 하루 -{}",
-            "trend_same": "지난주와 비슷",
-            "card_grew": "지난주 대비 +{}"
+            "trend_same": "지난주와 비슷"
         },
         "restrictions": {
             "choose": "이 단계 선택",

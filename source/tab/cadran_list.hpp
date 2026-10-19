@@ -76,6 +76,11 @@ class List
     // apply(). Returns the row.
     brls::Box* tiles(const std::vector<std::pair<const char*, const char*>>& cells, bool status);
 
+    // A status tile's state beside its value, by its shape and colour as
+    // Today's pills: "cadran/teal_fill" a check (as it should be),
+    // "cadran/amber_fill" a warning (needs the parent); nullptr: none.
+    void state(const char* id, const char* color_key);
+
     // These cells as amber banners, each a card of its own (after apply()).
     void banners(const std::vector<const char*>& ids);
 
@@ -108,5 +113,6 @@ class List
     brls::Box*  box = nullptr;
     std::vector<brls::Header*> headers;
     std::vector<brls::DetailCell*> readings;   // the status tiles
+    std::vector<std::pair<brls::DetailCell*, brls::View*>> marks;   // each one's state (a kit::Mark)
 };
 }   // namespace cadran

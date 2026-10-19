@@ -1627,8 +1627,7 @@
             "see_all": "これまでの合計を見る",
             "trend_up": "前週比 1日 +{}",
             "trend_down": "前週比 1日 -{}",
-            "trend_same": "前週と同じくらい",
-            "card_grew": "前週比 +{}"
+            "trend_same": "前週と同じくらい"
         },
         "restrictions": {
             "choose": "このレベルにする",
