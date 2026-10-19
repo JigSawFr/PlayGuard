@@ -11,11 +11,20 @@ PlayGuard's website, on GitHub Pages: <https://jigsawfr.github.io/PlayGuard/>.
   remembered as the web simulator remembers it (both read `pg-theme`).
 - **The screenshots in each language**: the console's screens as the
   simulator shows them in that language (below), English where there are
-  none (a local build).
+  none (a local build); under the site's dark theme, the console's dark one.
+- **The documentation's search**: a box above its pages (`site.js`), over
+  `docs/search.json`, each section of the language's pages; every word typed
+  must be in the section, accents or not.
+- **The changelog** (`/changelog/`, `CHANGELOG.md` in each language's page,
+  its notes in English) and `releases.atom`, a feed of the releases.
+- **The page not found** (`404.html`, served at any address) in every
+  language: `site.js` shows the one of the address' folder (`/fr/…`), else
+  the visitor's.
 - **For search engines and AI assistants**: absolute links (the canonical
   page, each language's, the preview image), `sitemap.xml`, structured data
   (schema.org JSON-LD: the application and the questions on the home page,
-  each page of the documentation as an article), each page of the
+  each page of the documentation as an article), a preview image in each
+  language (the site's title over the console's dashboard), each page of the
   documentation in Markdown next to it (`docs/<page>.md`, in English and in
   `/fr/`), listed in [`llms.txt`](https://llmstxt.org) (`llms-full.txt`: the
   whole documentation in one file), and `robots.txt` when the site is at its
@@ -59,8 +68,14 @@ pages; no framework, nothing to install but that.
   documentation. Taking them all takes about half an hour on a CI
   runner: a pull request that changes nothing the screens are made of (the
   app, its resources, the simulator, the version) downloads main's published
-  ones instead (`SITE_SCREENSHOTS_FROM=<site>`). A new screen in the gallery is a name in both files: its
+  ones instead (`SITE_SCREENSHOTS_FROM=<site>`); one that does takes the
+  light theme's and main's dark ones (`SITE_SCREENSHOT_THEMES=light`, then
+  `dark` from main), main both. A new screen in the gallery is a name in both files: its
   tab, and the keys that lead to it from there.
+- **The preview images**: `tools/site_social.mjs <out-dir>` (Node and
+  Playwright) writes `<out-dir>/<language>/social.png` (1280×640) from the
+  catalog's title and that language's dashboard; `build_site.py` makes it the
+  language's `og:image`, else the repository's `images/social-preview.png`.
 - **The site's address**: `SITE_URL` (`https://jigsawfr.github.io/PlayGuard/`
   by default). CI asks GitHub Pages for it (its custom domain, when it has
   one) and adds a preview's folder; `SITE_BASE` is its path, for 404.html;

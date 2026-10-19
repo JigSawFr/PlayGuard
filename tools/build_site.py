@@ -81,7 +81,9 @@ CSP = ("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' 
        "font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'")
 SCREENSHOTS = ["dashboard", "play_timer", "per_day", "activity", "restrictions", "security", "console", "clock",
                "preferences"]
-FAQ = ["closed", "offline", "ban", "children", "emummc", "switch2", "free"]
+# The screenshots in each language: the gallery's, and the documentation's "A game".
+LOCALIZED_SHOTS = SCREENSHOTS + ["activity_game"]
+FAQ = ["closed", "offline", "ban", "children", "sysmodule", "emummc", "switch2", "free"]
 FEATURES = [("timer", "⏱️"), ("activity", "📊"), ("restrictions", "🔒"), ("console", "🕒"), ("app", "📱"),
             ("history", "↩️"), ("notices", "🔔"), ("languages", "🌍")]
 
@@ -181,7 +183,7 @@ def rewrite_links(body, source, lang, to_root, assets):
             return f"{to_root}{lang_dir(lang)}docs/{name[:-3]}/{anchor}"
         if path in ("README.md", "README.fr.md"):
             return f"{to_root}{lang_dir(lang)}{anchor}"
-        if path.startswith("images/screenshots/") and name[:-4] in SCREENSHOTS:
+        if path.startswith("images/screenshots/") and name[:-4] in LOCALIZED_SHOTS:
             path = screenshot(lang, name[:-4])
         if path.startswith("images/"):
             assets.add(path)
@@ -197,12 +199,34 @@ def lang_dir(lang):
     return f"{folder}/" if folder else ""
 
 
-def screenshot(lang, name):
+def screenshot(lang, name, dark=False):
     """The screenshot `name` under assets/: the console's in `lang` when
-    SITE_SCREENSHOTS has it, else the English one of images/screenshots/."""
-    if SCREENSHOT_DIR and os.path.exists(os.path.join(SCREENSHOT_DIR, lang, f"{name}.webp")):
-        return f"images/screenshots/{lang}/{name}.webp"
-    return f"images/screenshots/{name}.png"
+    SITE_SCREENSHOTS has it, else the English one of images/screenshots/.
+    With `dark`, its dark theme's, or None."""
+    file = f"{name}-dark.webp" if dark else f"{name}.webp"
+    if SCREENSHOT_DIR and os.path.exists(os.path.join(SCREENSHOT_DIR, lang, file)):
+        return f"images/screenshots/{lang}/{file}"
+    return None if dark else f"images/screenshots/{name}.png"
+
+
+def social_image(lang):
+    """The preview image of `lang`'s pages (og:image) under assets/: its own
+    (tools/site_social.mjs) when SITE_SCREENSHOTS has it, else the repository's."""
+    if SCREENSHOT_DIR and os.path.exists(os.path.join(SCREENSHOT_DIR, lang, "social.png")):
+        return f"images/screenshots/{lang}/social.png"
+    return "images/social-preview.png"
+
+
+def gallery_image(t, lang, to_root, name):
+    """A screenshot of the gallery, in the page's theme: its dark one under
+    the dark theme (site.css), when there is one."""
+    light, dark = screenshot(lang, name), screenshot(lang, name, dark=True)
+    alt = t(f"shot_{name}")
+    img = f'<img src="{to_root}assets/{light}" alt="{alt}" width="1280" height="720" loading="lazy"'
+    if not dark:
+        return img + ">"
+    return (img + ' class="shot-light">'
+            f'<img src="{to_root}assets/{dark}" alt="{alt}" width="1280" height="720" loading="lazy" class="shot-dark">')
 
 
 def back_to_readme(text):
@@ -286,7 +310,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <meta property="og:locale" content="{OG_LOCALES[code]}">
   <meta property="og:title" content="{html.escape(full_title)}">
   <meta property="og:description" content="{description}">
-  <meta property="og:image" content="{SITE_URL}assets/images/social-preview.png">
+  <meta property="og:image" content="{SITE_URL}assets/{social_image(code)}">
   <meta property="og:image:width" content="1280">
   <meta property="og:image:height" content="640">
   <meta property="og:image:alt" content="PlayGuard">
@@ -294,6 +318,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <meta name="theme-color" content="#0b1424">
   <link rel="icon" href="{to_root}assets/icon.svg" type="image/svg+xml">
   <link rel="sitemap" type="application/xml" href="{SITE_URL}sitemap.xml">
+  <link rel="alternate" type="application/atom+xml" title="PlayGuard releases" href="{SITE_URL}releases.atom">
 {"".join(json_ld(d) for d in structured)}  <script src="{to_root}assets/theme.js"></script>
   <link rel="stylesheet" href="{to_root}assets/site.css">
 </head>
@@ -325,7 +350,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <footer class="footer">
     <div class="footer-inner">
       <p><img src="{to_root}assets/mark.svg" alt="" width="20" height="20"> <strong>PlayGuard</strong> · {t('footer_license')}
-        · <a href="{REPO_URL}">GitHub</a> · <a href="{REPO_URL}/blob/main/CHANGELOG.md">{t('footer_changelog')}</a></p>
+        · <a href="{REPO_URL}">GitHub</a> · <a href="{home}changelog/">{t('footer_changelog')}</a></p>
       <p>{t('support')} — <a href="https://github.com/sponsors/JigSawFr">GitHub Sponsors</a> · <a href="https://ko-fi.com/jigsawfr">Ko-fi</a></p>
       <p class="fine">{t('footer_nintendo')}</p>
     </div>
@@ -343,8 +368,8 @@ def home_body(t, lang, to_root):
         f'<h3>{t(f"f_{key}_title")}</h3><p>{t(f"f_{key}_text")}</p></li>'
         for key, emoji in FEATURES)
     shots = "\n".join(
-        f'      <figure><a href="{to_root}assets/{screenshot(lang, s)}"><img src="{to_root}assets/{screenshot(lang, s)}" '
-        f'alt="{t(f"shot_{s}")}" width="1280" height="720" loading="lazy"></a><figcaption>{t(f"shot_{s}")}</figcaption></figure>'
+        f'      <figure><a href="{to_root}assets/{screenshot(lang, s)}">{gallery_image(t, lang, to_root, s)}</a>'
+        f'<figcaption>{t(f"shot_{s}")}</figcaption></figure>'
         for s in SCREENSHOTS)
     faq = "\n".join(
         f'      <details><summary>{t(f"faq_{q}_q")}</summary><p>{t(f"faq_{q}_a")}</p></details>' for q in FAQ)
@@ -442,6 +467,24 @@ def locked_out_anchor(lang):
     return ""
 
 
+def docs_search(t, lang, to_root):
+    """The documentation's search box: site.js shows it, and searches docs/search.json."""
+    return (f'      <div class="doc-search" hidden><input type="search" placeholder="{t("search_placeholder")}"'
+            f' aria-label="{t("search_placeholder")}" aria-controls="doc-results" autocomplete="off"'
+            f' data-index="{to_root}{lang_dir(lang)}docs/search.json" data-none="{t("search_none")}">'
+            f'<ol id="doc-results" class="doc-results" hidden></ol></div>')
+
+
+def search_entries(page_name, title, body):
+    """The search index' entries of a page: its introduction, then each section (h2)."""
+    parts = re.split(r'<h2 id="([^"]*)">(.*?)</h2>', body, flags=re.S)
+    entries = [{"p": title, "h": "", "u": f"docs/{page_name}/", "t": plain(parts[0])[:1500]}]
+    for i in range(1, len(parts), 3):
+        entries.append({"p": title, "h": plain(parts[i + 1]), "u": f"docs/{page_name}/#{parts[i]}",
+                        "t": plain(parts[i + 2])[:3000]})
+    return entries
+
+
 def docs_list(t, lang, to_root, current):
     home = f"{to_root}{lang_dir(lang)}"
     out = []
@@ -463,8 +506,9 @@ def doc_body(t, lang, to_root, page_name, assets):
     description = plain(first.group(1)) if first else ""
     if len(description) > 180:
         description = description[:177].rsplit(" ", 1)[0] + "…"
-    return title, translated, description, f"""    <div class="doc">
+    return title, translated, description, body, f"""    <div class="doc">
       <nav class="doc-nav" aria-label="{t('docs_title')}">
+{docs_search(t, lang, to_root)}
 {docs_list(t, lang, to_root, page_name)}
       </nav>
       <article class="prose">
@@ -531,7 +575,7 @@ def software(t, lang, version, url):
         "license": "https://www.gnu.org/licenses/gpl-3.0.html",
         "isAccessibleForFree": True,
         "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
-        "image": f"{SITE_URL}assets/images/social-preview.png",
+        "image": f"{SITE_URL}assets/{social_image(lang)}",
         "screenshot": [f"{SITE_URL}assets/{screenshot(lang, s)}" for s in SCREENSHOTS],
         "featureList": [t(f"f_{key}_title", escape=False) for key, _ in FEATURES],
         "inLanguage": [hl for _, _, _, hl in LANGUAGES],
@@ -595,7 +639,7 @@ def llms_txt(t, version, descriptions, full_docs=None):
     for q in FAQ:
         lines += [f"### {p(f'faq_{q}_q')}", "", p(f"faq_{q}_a"), ""]
     lines += ["## Optional", "",
-              f"- [Changelog]({REPO_URL}/blob/main/CHANGELOG.md)",
+              f"- [Changelog]({SITE_URL}changelog/): every release's changes (Atom feed: {SITE_URL}releases.atom)",
               f"- [Roadmap]({REPO_URL}/blob/main/ROADMAP.md)",
               f"- [Recovery sysmodule]({REPO_URL}/blob/main/sysmodule/README.md)",
               f"- [Contributing]({REPO_URL}/blob/main/CONTRIBUTING.md)"]
@@ -603,6 +647,71 @@ def llms_txt(t, version, descriptions, full_docs=None):
         lines += [f"- [Every page of the documentation in one file]({SITE_URL}{lang_dir(t.lang)}llms-full.txt)"]
         return "\n".join(lines) + "\n"
     return "\n".join(lines) + "\n\n" + "\n\n".join(full_docs) + "\n"
+
+
+# ---- The changelog --------------------------------------------------------
+
+# A release's heading in CHANGELOG.md (release-please's): "## [1.2.0](compare link) (2026-10-18)" or "## 1.0.0 (2026-10-12)".
+RELEASE = re.compile(r"^## \[?(\d+\.\d+\.\d+)\]?(?:\([^)]*\))? \((\d{4}-\d\d-\d\d)\)\s*$", re.M)
+
+
+def changelog_releases():
+    """[(version, date, html)] of CHANGELOG.md, the newest first."""
+    with open(os.path.join(ROOT, "CHANGELOG.md"), encoding="utf-8") as f:
+        text = f.read()
+    heads = list(RELEASE.finditer(text))
+    releases = []
+    for i, m in enumerate(heads):
+        end = heads[i + 1].start() if i + 1 < len(heads) else len(text)
+        # Its sections one level up: h3 under the release's h2.
+        body = markdown.markdown(text[m.end():end].replace("\n### ", "\n#### ").strip(), extensions=["sane_lists"])
+        releases.append((m.group(1), m.group(2), body))
+    return releases
+
+
+def changelog_body(t, lang):
+    """The changelog page: each release, its date, its notes (in English) and its download."""
+    note = "" if lang == "en-US" else f'      <p class="callout note">{t("changelog_english")}</p>\n'
+    parts = []
+    for version, date, body in changelog_releases():
+        parts.append(f'      <h2 id="v{version}">{version} <small><time datetime="{date}">{date}</time></small></h2>\n'
+                     f'{body.replace("<h4>", "<h3>").replace("</h4>", "</h3>")}\n'
+                     f'      <p><a href="{REPO_URL}/releases/tag/v{version}">GitHub · v{version}</a></p>')
+    return f"""    <section class="section narrow">
+      <article class="prose">
+        <h1>{t('footer_changelog')}</h1>
+{note}{chr(10).join(parts)}
+        <p class="edit"><a href="{SITE_URL}releases.atom">Atom</a> · <a href="{REPO_URL}/blob/main/CHANGELOG.md">CHANGELOG.md</a></p>
+      </article>
+    </section>
+"""
+
+
+def releases_atom():
+    """An Atom feed of the releases: a reader, or an assistant, follows PlayGuard's new versions."""
+    releases = changelog_releases()
+    entries = "".join(
+        f"""  <entry>
+    <title>PlayGuard {version}</title>
+    <id>{REPO_URL}/releases/tag/v{version}</id>
+    <link rel="alternate" type="text/html" href="{SITE_URL}changelog/#v{version}"/>
+    <updated>{date}T00:00:00Z</updated>
+    <content type="html">{html.escape(body)}</content>
+  </entry>
+""" for version, date, body in releases)
+    updated = releases[0][1] if releases else "2026-01-01"
+    return f"""<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>PlayGuard releases</title>
+  <subtitle>Parental controls for a Nintendo Switch with Atmosphère</subtitle>
+  <id>{SITE_URL}releases.atom</id>
+  <link rel="self" href="{SITE_URL}releases.atom"/>
+  <link rel="alternate" type="text/html" href="{SITE_URL}changelog/"/>
+  <updated>{updated}T00:00:00Z</updated>
+  <author><name>JigSawFr</name><uri>{REPO_URL}</uri></author>
+  <icon>{SITE_URL}assets/icon.svg</icon>
+{entries}</feed>
+"""
 
 
 def sitemap(paths):
@@ -643,13 +752,16 @@ def main():
         base = f"{folder}/" if folder else ""
         to_root = "../" if folder else ""
         assets.update(screenshot(lang, s) for s in SCREENSHOTS)
+        assets.add(social_image(lang))
+        assets.update(filter(None, (screenshot(lang, s, dark=True) for s in SCREENSHOTS)))
         write(out, f"{base}index.html", page(t, lang, to_root, "", "", home_body(t, lang, to_root), body_class="home",
                                              full_title=f"PlayGuard — {t('hero_title', escape=False)}",
                                              structured=home_data(t, lang, version)))
-        descriptions, markdown = {}, []
+        descriptions, markdown, index = {}, [], []
         for name, _ in DOCS:
             doc_root = to_root + "../../"
-            title, translated, description, body = doc_body(t, lang, doc_root, name, assets)
+            title, translated, description, content, body = doc_body(t, lang, doc_root, name, assets)
+            index += search_entries(name, t(f"doc_{name}", escape=False), content)
             descriptions[name] = description
             md_lang = markdown_lang(name, lang)
             # A page not translated yet is named in the reader's language (its sidebar's name).
@@ -664,11 +776,16 @@ def main():
                 write(out, f"{base}docs/{name}.md", text)
                 markdown.append(text)
             pages += 1
+        write(out, f"{base}docs/search.json", json.dumps(index, ensure_ascii=False, separators=(",", ":")))
+        write(out, f"{base}changelog/index.html",
+              page(t, lang, to_root + "../", "changelog/", t("footer_changelog", escape=False), changelog_body(t, lang)))
+        pages += 1
         if lang in ("en-US", "fr"):
             write(out, f"{base}llms.txt", llms_txt(t, version, descriptions))
             write(out, f"{base}llms-full.txt", llms_txt(t, version, descriptions, markdown))
         pages += 1
-    write(out, "sitemap.xml", sitemap([""] + [f"docs/{name}/" for name, _ in DOCS]))
+    write(out, "sitemap.xml", sitemap([""] + [f"docs/{name}/" for name, _ in DOCS] + ["changelog/"]))
+    write(out, "releases.atom", releases_atom())
     # robots.txt counts only at a domain's root: on a custom domain (not
     # <owner>.github.io/<repo>/, nor a preview's folder). Every crawler,
     # search engines' and AI assistants' alike, is welcome.
@@ -677,10 +794,17 @@ def main():
     # GitHub Pages serves 404.html at any path: its links start from the site's root.
     t = Texts("en-US", version)
     base_url = os.environ.get("SITE_BASE", "/PlayGuard/")
+    # Its text in every language, the English one shown: site.js shows the
+    # one of the address' folder (/fr/…), else the visitor's.
+    blocks = []
+    for lang, folder, _, html_lang in LANGUAGES:
+        tl = Texts(lang, version)
+        blocks.append(f'      <div class="not-found" data-lang="{lang}" lang="{html_lang}"{" hidden" if lang != "en-US" else ""}>'
+                      f'<h1>{tl("not_found_title")}</h1><p>{tl("not_found_text")}</p>'
+                      f'<p><a class="button primary" href="{base_url}{f"{folder}/" if folder else ""}">{tl("home")}</a></p></div>')
     write(out, "404.html", page(t, "en-US", base_url, "", t("not_found_title"),
-                                f'    <section class="section narrow"><h1>{t("not_found_title")}</h1><p>{t("not_found_text")}</p>'
-                                f'<p><a class="button primary" href="{base_url}">{t("home")}</a></p></section>',
-                                indexed=False))
+                                '    <section class="section narrow">\n' + "\n".join(blocks) + "\n    </section>",
+                                body_class="not-found-page", indexed=False))
     # The site's own files, then what the pages use from the repository and
     # the screenshots of tools/site_screenshots.mjs.
     os.makedirs(os.path.join(out, "assets"), exist_ok=True)
@@ -689,7 +813,7 @@ def main():
         shutil.copy(os.path.join(ROOT, "branding", name), os.path.join(out, "assets", name))
     for path in sorted(assets):
         os.makedirs(os.path.dirname(os.path.join(out, "assets", path)), exist_ok=True)
-        if path.endswith(".webp"):
+        if path.startswith("images/screenshots/") and path.count("/") == 3:
             source = os.path.join(SCREENSHOT_DIR, *path.split("/")[2:])
         else:
             source = os.path.join(ROOT, path)

@@ -170,6 +170,10 @@ pre code { background: none; padding: 0; }
 .gallery figure { margin: 0; scroll-snap-align: start; }
 .gallery a { display: block; }
 .gallery img { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); display: block; }
+/* A screenshot's dark one under the dark theme (build_site.py's gallery_image()). */
+.shot-dark { display: none !important; }
+:root[data-theme="dark"] .shot-dark { display: block !important; }
+:root[data-theme="dark"] .shot-light { display: none !important; }
 .gallery figcaption { color: var(--muted); font-size: 14px; margin-top: 6px; }
 
 .faq { display: grid; gap: 10px; max-width: 860px; }
@@ -203,6 +207,16 @@ pre code { background: none; padding: 0; }
 .doc-group li a[aria-current] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 
 /* Documentation */
+.doc-search { margin-bottom: 14px; }
+.doc-search input { width: 100%; box-sizing: border-box; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line);
+                    background: var(--surface); color: var(--text); font: inherit; font-size: 15px; }
+.doc-search input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.doc-results { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; }
+.doc-results a { display: block; padding: 6px 10px; border-radius: 8px; text-decoration: none; color: var(--text); font-size: 14px; }
+.doc-results a:hover, .doc-results a:focus { background: var(--surface-2); }
+.doc-results strong { display: block; }
+.doc-results span { color: var(--muted); font-size: 13px; }
+.doc-results .none { color: var(--muted); font-size: 14px; padding: 6px 10px; }
 .doc {
   max-width: 1280px;
   margin: 0 auto;
