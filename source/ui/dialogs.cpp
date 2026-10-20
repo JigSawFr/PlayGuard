@@ -333,15 +333,6 @@ void prompt_text(const std::string& header, const std::string& initial, int max_
         header, "", max_len, initial);
 }
 
-void offer_restart()
-{
-    auto* dialog = ui::dialog("playguard/common/restart_body"_i18n);
-    dialog->addButton("playguard/common/later"_i18n, []() {});
-    dialog->addButton("playguard/common/quit"_i18n, []() { brls::Application::quit(); });
-    dialog->setCancelable(true);
-    dialog->open();
-}
-
 namespace
 {
 template <size_t N>
@@ -352,9 +343,9 @@ int index_of(const char* const (&list)[N], const std::string& value)
     return 0;
 }
 
-// Saves `value` in `field`, then applies it (`live`: false when it needs a
-// restart, offered then) or refreshes when nothing changed.
-void choose(std::string& field, const char* value, std::function<void()> after, bool (*live)())
+// Saves `value` in `field`, then applies it at once (`apply`: every screen
+// made again), or refreshes when nothing changed.
+void choose(std::string& field, const char* value, std::function<void()> after, void (*apply)())
 {
     if (field == value) {
         if (after) after();
@@ -362,9 +353,7 @@ void choose(std::string& field, const char* value, std::function<void()> after, 
     }
     field = value;
     save_config();
-    if (live()) return;   // every screen made again
-    if (after) after();
-    offer_restart();
+    apply();
 }
 }   // namespace
 

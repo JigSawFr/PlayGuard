@@ -24,10 +24,12 @@ namespace ui
 // The status colours below are the boards' inks (cadran::install_theme(),
 // which must run before the first lookup: borealis aborts on an unknown
 // theme key), one shade per theme (>= 4.5:1).
-// On the console: the system's Latin / Japanese font as the default font of
-// every label, the Chinese one only as a fallback (except for Chinese). Right
-// after createWindow(), before the first label exists.
-void     use_latin_font();
+// On the console: the default font of the labels made from now on, for the
+// strings' language `locale`: the system's Latin / Japanese font, the Chinese
+// one only as a fallback; for Chinese, the Chinese one. Right after
+// createWindow(), before the first label exists, then again when the language
+// changes while PlayGuard runs (live_prefs, which builds the screens again).
+void     use_font_for(const std::string& locale);
 NVGcolor color_ok();
 NVGcolor color_warn();
 NVGcolor color_bad();
@@ -336,12 +338,10 @@ void open_screen(brls::View* content, const std::string& title);
 void init_unlock_banner(brls::DetailCell* cell, std::function<void()> after);
 void show_unlock_banner(brls::DetailCell* cell, bool unlocked);
 
-// Asks before quitting so a language / theme change can take effect.
-void offer_restart();
-
 // The language and theme pickers, shared by Preferences and the main
-// screen's header: save the choice, run `after` (a refresh), then offer the
-// restart it needs. language_name / theme_name: the choice saved, as text.
+// screen's header: save the choice and apply it at once (a language or a
+// theme makes every screen again, live_prefs; the text size runs `after`, a
+// refresh). language_name / theme_name: the choice saved, as text.
 void        pick_language(std::function<void()> after = nullptr);
 void        pick_theme(std::function<void()> after = nullptr);
 void        pick_text_size(std::function<void()> after = nullptr);

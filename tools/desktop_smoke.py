@@ -1341,7 +1341,8 @@ if CADRAN:
     key("Escape")
 
     # Preferences › Theme and Language, applied at once: every screen made
-    # again in the light theme, then in French, on Preferences, no restart.
+    # again in the light theme, then in French, on Preferences, the focus on
+    # the line it was on, no restart.
     key("Left")
     key("Down", steps("activity", "preferences"))
     key("Right")               # Language, the first tile
@@ -1350,12 +1351,21 @@ if CADRAN:
     key("Up")                  # Light, above Dark
     key("Return")
     time.sleep(1)
-    shot("21_live_theme")
-    key("Return")              # Language, focused again on the new screen
+    shot("21_live_theme")      # the focus back on Theme
+    key("Left")                # Language
+    key("Return")
     key("Down", 2)             # Français, after the console's and English
     key("Return")
     time.sleep(1)
     shot("22_live_language")
+    # To Chinese, with its own font on the console, still without a restart
+    # (no screenshot: the desktop's font has no simplified han).
+    key("Return")
+    key("Down", 12)            # 简体中文, after Français
+    key("Return")
+    time.sleep(1)
+    if json.load(open(config_file)).get("language") != "zh-Hans":
+        fail("the language was not set to Chinese")
     finish()
 if CADRANSTATES:
     # Today and the Play timer in the states "alarm" and "outside" set up:

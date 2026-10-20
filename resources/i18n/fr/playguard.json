@@ -47,7 +47,6 @@
         "quit": "Quitter",
         "delete": "Supprimer",
         "applied": "Enregistré.",
-        "restart_body": "Enregistré. Le changement s'appliquera au prochain lancement.\n\nQuitter maintenant ?",
         "read_only_note": "Mode lecture seule : rien ne peut être modifié depuis l'application pour le moment."
     },
     "days": {

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 e1805c25bee2 -->
+<!-- translated from docs/features.md, sha256 0adcb09f77ee -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Nieuw met PlayGuard? Begin met [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
@@ -61,7 +61,7 @@ Het uiterlijk van PlayGuard heet Cadran: een smalle balk met iconen voor de tabb
 
 Een bel in de kopregel, links van de versie, verzamelt wat de ouder moet doen; Ⓨ opent de lijst vanuit elk tabblad (de teller op de bel toont *2* als er twee dingen te doen zijn).
 
-Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon voor licht, een maan voor donker, een half gevulde cirkel als het de console volgt), en daarna de tekstgrootte (**AA**, met de grote A in blauwgroen zolang de tekst groter is): een tik opent dezelfde lijst als in *Voorkeuren*, en **−** biedt ze aan vanuit elk tabblad. Een nieuw thema of een nieuwe taal geldt meteen, en elk scherm wordt op hetzelfde tabblad opnieuw opgebouwd; alleen een wissel naar of van Chinees, of terug naar de taal van de console als PlayGuard in een andere is gestart, wacht tot PlayGuard opnieuw is gestart.
+Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon voor licht, een maan voor donker, een half gevulde cirkel als het de console volgt), en daarna de tekstgrootte (**AA**, met de grote A in blauwgroen zolang de tekst groter is): een tik opent dezelfde lijst als in *Voorkeuren*, en **−** biedt ze aan vanuit elk tabblad. Een nieuw thema of een nieuwe taal geldt meteen, en elk scherm wordt op hetzelfde tabblad opnieuw opgebouwd met de focus op dezelfde regel, Chinees en zijn eigen lettertype inbegrepen.
 
 ### Te doen
 
@@ -198,7 +198,7 @@ Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de k
 
 | Knop | Tijdens het bewerken |
 |---|---|
-| ↑/↓ | Met 15 min wijzigen |
+| ↑/↓ | Met 15 min wijzigen, per uur zodra je ze ingedrukt houdt |
 | ←/→ | Naar de volgende dag |
 | Ⓛ | Naar maandag–vrijdag kopiëren |
 | Ⓡ | Naar het weekend kopiëren |
@@ -389,6 +389,7 @@ Op een console zonder internet verschijnt *Netwerkklok instellen op de consolekl
 - **PlayGuard** met één druk: zijn eigen icoon en naam, waarbij de forwarder de `.nro` start waarvandaan PlayGuard is geopend.
 - **Andere homebrew**: elke `.nro` in de map `/switch` van de SD-kaart (en één map dieper), waarbij eerst om de naam wordt gevraagd (die van de `.nro` zelf, om te houden of te wijzigen). Het icoon is dat van de `.nro`, omgezet naar de JPEG van 256 × 256 die het HOME-menu toont als het een andere grootte heeft of een PNG is (een controller in de plaats ervan als de `.nro` er geen heeft), zoals sphaira dat doet. Een pad met een spatie wordt tussen aanhalingstekens aan de homebrew doorgegeven.
 - **De forwarders in het HOME-menu**, elk met zijn icoon: die PlayGuard heeft gemaakt (Ⓐ: details, naam wijzigen, uitgever wijzigen, opnieuw installeren, verwijderen) en die een andere app heeft gemaakt (details, verwijderen). Een forwarder waarvan de `.nro` weg is, meldt dat; een die in de systeeminstellingen is verwijderd, blijft in de lijst staan tot hij opnieuw wordt geïnstalleerd of vergeten. Opnieuw installeren houdt zijn programma-ID, dus het item in het HOME-menu wordt vervangen, niet verdubbeld; een forwarder die een ander hulpmiddel voor dezelfde `.nro` heeft gemaakt, wordt ook vervangen.
+- **Iconen en talen:** een icoon van een andere grootte, een PNG, of een JPEG met EXIF-gegevens of progressieve codering (het HOME-menu toont die als een "?") wordt een gewone JPEG van 256 × 256. De controlegegevens van de forwarder vermelden alleen Amerikaans Engels, de taal van zijn enige icoon: zo verschijnt het icoon op een console die op elke taal is ingesteld.
 - **Signaturepatches:** de console start een forwarder alleen met signaturepatches voor fs en loader (sys-patch of sigpatch-bestanden): zonder die patches meldt het scherm dat boven de lijst (*Console › Gamepatches* geeft de details). De `.nro` blijft waar hij is; een forwarder verwijderen raakt hem nooit aan.
 - **Speeltijd:** gestart vanaf zijn icoon draait een homebrew als een game: de speeltijdtimer telt hem mee en schort hem op zoals elke game zodra de tijd om is, en *Activiteit* toont hem. PlayGuard blijft bereikbaar via het homebrew-menu.
 - Elke wijziging vraagt om de pincode als *PlayGuard beveiligen met de pincode* dat doet, wordt in de alleen-lezenmodus geweigerd en staat in de wijzigingsgeschiedenis. Wat PlayGuard heeft gemaakt, wordt per systeem (sysMMC / emuMMC) bewaard, in `forwarders.json`.

@@ -159,7 +159,7 @@ void CadranChildActivity::refresh()
     const bool ending = n.kind == pt_logic::NextStop::TIME_UP;
     // The bedtime before the time is up (or on a day without a limit, its
     // last hour): the ring counts down to it instead.
-    const bool to_bed = n.kind == pt_logic::NextStop::BEDTIME && (left_min >= 0 || (free && n.in <= 60));
+    const bool to_bed = pt_logic::counts_to_bed(n, left_min, free);
     if (to_bed) {
         left = ui::fmt_played((uint16_t)n.in);
         caption = "playguard/cadran/child/until_bed"_i18n;

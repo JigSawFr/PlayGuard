@@ -2,12 +2,12 @@
 #include "ui/cadran_modal.hpp"
 
 #include <algorithm>
-#include <cstdlib>
 #include <functional>
 #include <memory>
 #include <vector>
 #include <yoga/Yoga.h>
 
+#include "action/pt_logic.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/cadran_text.hpp"
 #include "ui/ui.hpp"
@@ -373,9 +373,6 @@ void cadran::style_dialog(brls::Dialog* dialog, Emphasis emphasis)
     }
 }
 
-// An arrow repeating more than this many times in a row steps by the hour.
-static constexpr int HOLD_TO_HOURS = 5;
-
 void cadran::prompt_minutes(const std::string& header, uint16_t initial, std::function<void(uint16_t)> on_value)
 {
     namespace kit = cadran::kit;
@@ -429,24 +426,12 @@ void cadran::prompt_minutes(const std::string& header, uint16_t initial, std::fu
         value->setText(ui::fmt_played((uint16_t)*minutes));
     };
     brls::View* frame = dialog->getAppletFrame();
-    // An arrow held: 15 min at a time, then whole hours once it has repeated
-    // for most of a second (borealis repeats every 100 ms once held): from
-    // 30 min to 4 h without fourteen presses.
-    auto held = std::make_shared<std::pair<int, brls::Time>>(0, 0);   // repeats in a row, the last one
+    // An arrow held: 15 min at a time, then whole hours (pt_logic::held_step).
+    auto held = std::make_shared<pt_logic::Held>();
     for (const auto& [button, delta] : { std::pair<brls::ControllerButton, int>{ brls::BUTTON_NAV_UP, 15 },
                                          { brls::BUTTON_NAV_DOWN, -15 }, { brls::BUTTON_RB, 5 }, { brls::BUTTON_LB, -5 } })
         frame->registerAction("", button, [step, held, minutes, delta = delta](brls::View*) {
-            const brls::Time now = brls::getCPUTimeUsec();
-            const bool repeat = now - held->second < 150000 && (held->first > 0) == (delta > 0);
-            held->first = repeat ? held->first + (delta > 0 ? 1 : -1) : (delta > 0 ? 1 : -1);
-            held->second = now;
-            if (std::abs(delta) == 15 && std::abs(held->first) > HOLD_TO_HOURS) {
-                // To the next whole hour that way.
-                const int hour = delta > 0 ? (*minutes / 60 + 1) * 60 : ((*minutes + 59) / 60 - 1) * 60;
-                step(hour - *minutes);
-            } else {
-                step(delta);
-            }
+            step(pt_logic::held_step(*held, *minutes, delta, brls::getCPUTimeUsec()) - *minutes);
             return true;
         }, true, true, brls::SOUND_FOCUS_CHANGE);
     up->addGestureRecognizer(new brls::TapGestureRecognizer(up, [step]() { step(15); }));

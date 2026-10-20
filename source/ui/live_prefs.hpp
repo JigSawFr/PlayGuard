@@ -1,11 +1,9 @@
 // live_prefs — Preferences › Theme and Language applied at once, without
 // restarting: the theme's variant set, the language's strings loaded again
 // (patches/borealis/0012), then the main screen built again on the tab that
-// was shown (every view takes its colours and words when it is made). Two
-// changes still need a restart, offered as before: to or from Chinese (the
-// system font is chosen for it at start-up, ui::use_latin_font), and back to
-// the console's language when PlayGuard started in another one (it is not
-// known then).
+// was shown, the focus on the line it was on (every view takes its colours,
+// words and font when it is made; Chinese has its own font, ui::use_font_for
+// and patches/borealis/0013).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -13,9 +11,10 @@
 
 namespace live_prefs
 {
-// At start-up, before the preferences' theme replaces it: the console's own
-// theme and language (what "system" means).
-void remember_system();
+// Right after borealis starts, which reads the console's own theme and
+// language (what "system" means): those kept, and the strings loaded in the
+// preferences' language.
+void start();
 
 // The variant of the theme in the preferences (config::Config::theme).
 void apply_theme();
@@ -24,7 +23,7 @@ void apply_theme();
 std::string locale();
 
 // After the preferences' theme or language changed: applied, and the screens
-// built again. False when it needs a restart instead (nothing done).
-bool theme_changed();
-bool language_changed();
+// built again.
+void theme_changed();
+void language_changed();
 }   // namespace live_prefs
