@@ -1,7 +1,9 @@
-<!-- translated from docs/features.md, sha256 d10adcdce8c8 -->
+<!-- translated from docs/features.md, sha256 da24da46023d -->
 # Recursos
 
 O que cada aba faz, como o PlayGuard grava as configurações com segurança e o que o console conta como tempo de jogo. Volte ao [README](../../README.md).
+
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
 
 As capturas de tela mostram o tema claro (em inglês).
 

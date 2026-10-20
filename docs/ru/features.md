@@ -1,7 +1,9 @@
-<!-- translated from docs/features.md, sha256 d10adcdce8c8 -->
+<!-- translated from docs/features.md, sha256 da24da46023d -->
 # Возможности
 
 Что делает каждая вкладка, как PlayGuard безопасно записывает настройки и что консоль считает игровым временем. Назад к [README](../../README.md).
+
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
 
 На снимках экрана — светлая тема (интерфейс на английском).
 

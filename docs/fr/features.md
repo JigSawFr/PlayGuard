@@ -1,7 +1,9 @@
-<!-- translated from docs/features.md, sha256 d289da855924 -->
+<!-- translated from docs/features.md, sha256 d39d4a849af5 -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Retour au [README](../../README.fr.md).
+
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
 
 Les captures montrent le thème clair (en anglais).
 
