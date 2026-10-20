@@ -45,16 +45,16 @@ Search for *PlayGuard* in the Homebrew App Store or sphaira, or extract `playgua
 
 ## Quick start
 
-1. Open PlayGuard: the *First steps* guide sets the PIN and the daily limit.
+1. Open PlayGuard over a game, with a parent's user: the *First steps* guide sets the PIN and the daily limit.
 2. Still linked to the phone app? *PIN › Unlink the companion app*, or its next sync overwrites what you set.
-3. Network clock inaccurate? *Console › Network clock › Measure the time difference*, then set it. Without Internet, read [this first](docs/compatibility.md#supported-versions).
+3. Network clock inaccurate? *Console › Network clock › Measure the time difference*, then set it. Without Internet, read [this first](docs/compatibility.md#a-console-without-internet).
 
-Forgotten PIN or second-hand console: [Locked out?](docs/troubleshooting.md#locked-out)
+The whole walk-through, and the everyday tasks: [getting started](docs/getting-started.md). Forgotten PIN or second-hand console: [Locked out?](docs/troubleshooting.md#locked-out)
 
 ## Documentation
 
 - **Website:** [playguard.link](https://playguard.link/) — this documentation in the console's 15 languages, and [PlayGuard in your browser](https://playguard.link/simulator/) against a simulated console
-- **User guide:** [features](docs/features.md) · [install](docs/install.md) · [compatibility](docs/compatibility.md) · [troubleshooting](docs/troubleshooting.md)
+- **User guide:** [getting started](docs/getting-started.md) · [features](docs/features.md) · [install](docs/install.md) · [compatibility](docs/compatibility.md) · [troubleshooting](docs/troubleshooting.md)
 - **Reference:** [companion app](docs/companion-app.md) · [`config.json`](docs/config.md) · [how parental controls work](docs/parental-controls.md) · [recovery sysmodule](sysmodule/README.md)
 - **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md) · [roadmap](ROADMAP.md) · [changelog](CHANGELOG.md)
 
