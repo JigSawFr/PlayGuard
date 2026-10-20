@@ -401,11 +401,11 @@ jobs:
           # The other scenarios in three shards of about 170 s each, by their
           # times on a runner (s): cadran 125, gate 93, devbuild 79, outside 62,
           # forwarders 40 (locally; to check on a runner), library 27, update
-          # 25, errors 23, sysnotes 22, the others 15 or less.
+          # 25, errors 23, sysnotes 22, the others 15 or less (bedtime 10).
           - shard: cadran
             scenarios: cadran rescue cadranlarge cadranunlocked forged lock loading
           - shard: states
-            scenarios: gate outside alarm cadranstates rollback
+            scenarios: gate outside alarm cadranstates rollback bedtime
           - shard: developer
             scenarios: devbuild library update errors sysnotes forwarders
           # Every Cadran tab in the 15 languages, normal and larger text: no
