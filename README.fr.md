@@ -45,16 +45,16 @@ Cherchez *PlayGuard* dans le Homebrew App Store ou sphaira, ou extrayez `playgua
 
 ## Premiers pas
 
-1. Ouvrez PlayGuard : le guide *Premiers pas* règle le code PIN et la limite quotidienne.
+1. Ouvrez PlayGuard par-dessus un jeu, avec le compte d'un parent : le guide *Premiers pas* règle le code PIN et la limite quotidienne.
 2. Encore associé à l'application mobile ? *Code PIN › Dissocier l'application mobile*, sinon sa prochaine synchronisation écrase vos réglages.
-3. Horloge réseau imprécise ? *Console › Horloge réseau › Mesurer l'écart*, puis réglez-la. Sans Internet, lisez d'abord [ceci](docs/fr/compatibility.md#versions-prises-en-charge).
+3. Horloge réseau imprécise ? *Console › Horloge réseau › Mesurer l'écart*, puis réglez-la. Sans Internet, lisez d'abord [ceci](docs/fr/compatibility.md#une-console-sans-internet).
 
-Code PIN oublié ou console d'occasion : [Console bloquée ?](docs/fr/troubleshooting.md#console-bloquée-)
+Le pas-à-pas complet, et les tâches du quotidien : [prise en main](docs/fr/getting-started.md). Code PIN oublié ou console d'occasion : [Console bloquée ?](docs/fr/troubleshooting.md#console-bloquée-)
 
 ## Documentation
 
 - **Site :** [playguard.link](https://playguard.link/fr/) — cette documentation dans les 15 langues de la console, et [PlayGuard dans le navigateur](https://playguard.link/simulator/?lang=fr) face à une console simulée
-- **Guide :** [fonctions](docs/fr/features.md) · [installation](docs/fr/install.md) · [compatibilité](docs/fr/compatibility.md) · [dépannage](docs/fr/troubleshooting.md)
+- **Guide :** [prise en main](docs/fr/getting-started.md) · [fonctions](docs/fr/features.md) · [installation](docs/fr/install.md) · [compatibilité](docs/fr/compatibility.md) · [dépannage](docs/fr/troubleshooting.md)
 - **Référence (en anglais) :** [application mobile](docs/companion-app.md) · [`config.json`](docs/config.md) · [fonctionnement du contrôle parental](docs/parental-controls.md) · [module de récupération](sysmodule/README.md)
 - **Contribuer (en anglais) :** [CONTRIBUTING.md](CONTRIBUTING.md) · [feuille de route](ROADMAP.md) · [changelog](CHANGELOG.md)
 

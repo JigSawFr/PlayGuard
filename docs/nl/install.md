@@ -1,7 +1,7 @@
-<!-- translated from docs/install.md, sha256 f12b746bb6b9 -->
+<!-- translated from docs/install.md, sha256 291d4702e4db -->
 # Installatie
 
-Hoe je PlayGuard installeert, en wat het op de SD-kaart schrijft. Terug naar de [README](../../README.md).
+Hoe je PlayGuard installeert, bijwerkt en verwijdert, en wat het op de SD-kaart schrijft. Eenmaal geïnstalleerd: [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
 
 ## Waar je het vindt
 
@@ -11,7 +11,19 @@ Kies er één:
 - **sphaira › GitHub** — De zip van de release bevat de vermelding al (`/config/sphaira/github/playguard.json`): werk na een eerste installatie bij via *GitHub* in sphaira.
 - **Handmatig** — Download `playguard.zip` van de [nieuwste release](https://github.com/JigSawFr/PlayGuard/releases/latest) en pak het uit in de **hoofdmap** van de SD-kaart. De app komt in `sd:/switch/playguard/`, zijn bestanden in `sd:/config/playguard/`.
 
-De optionele **herstel-sysmodule** (`playguard-rescue.zip`) is een aparte download — zie [Buitengesloten?](troubleshooting.md#buitengesloten).
+De optionele **herstel-sysmodule** (`playguard-rescue.zip`) is een aparte download: pak die ook uit in de hoofdmap van de SD-kaart en start de console daarna opnieuw op. Hij komt in `atmosphere/contents/4200000000505247/` en doet alleen iets als een `RESCUE`-bestand daarom vraagt — zie [Buitengesloten?](troubleshooting.md#buitengesloten).
+
+Open PlayGuard daarna **boven een game**, met de gebruiker van een ouder ([waarom](compatibility.md#launchers)).
+
+## Bijwerken
+
+- **In PlayGuard:** *Info › Bijwerken met* kiest hoe — in PlayGuard zelf (het downloadt de release, controleert hem, vervangt zichzelf en herstart), sphaira, de Homebrew App Store of met de hand. Met *Elke dag op updates controleren* aan opent PlayGuard op de nieuwe release als die er is.
+- **De herstel-sysmodule** volgt de versie van PlayGuard: pak na elke update de `playguard-rescue.zip` van die release opnieuw uit (of *Bijwerken* bij *De herstel-sysmodule is verouderd* onder de bel), en start de console daarna opnieuw op.
+- Instellingen, geschiedenis, profielen en back-ups blijven bewaard: ze staan in `sd:/config/playguard/`, niet naast de app.
+
+## Verwijderen
+
+Verwijder `sd:/switch/playguard/` (de app) en, om ook zijn bestanden te verwijderen, `sd:/config/playguard/`; met de herstel-sysmodule ook `sd:/atmosphere/contents/4200000000505247/`. De limieten, de pincode en de beperkingen zijn die van de console zelf: ze **blijven op de console**. Wil je ook die verwijderen, gebruik dan eerst *Pincode › Ouderlijk toezicht wissen*.
 
 ## Bestanden op de SD-kaart
 
