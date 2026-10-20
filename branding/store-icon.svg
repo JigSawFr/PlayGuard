@@ -1,12 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="150" viewBox="0 0 256 150">
-  <!-- Homebrew App Store icon (256x150). -->
+  <!-- Homebrew App Store icon (256x150): the app's mark on the left, the name
+       on the right, clear of it (the mark spans x 24-110, the words 137-231: centred, 27 px apart). -->
   <rect width="256" height="150" fill="#FFB547"/>
-  <g transform="translate(14 11) scale(0.5)">
+  <g transform="translate(-3.6 4.6) scale(0.55)">
     <circle cx="128" cy="128" r="78" fill="#0B1424"/>
     <circle cx="128" cy="128" r="62" fill="none" stroke="#1F3355" stroke-width="16"/>
     <circle cx="128" cy="128" r="62" fill="none" stroke="#2EC4A6" stroke-width="16" stroke-linecap="round" stroke-dasharray="292 390" transform="rotate(-90 128 128)"/>
     <path d="M112 100 L160 128 L112 156 Z" fill="#E8EEF7" stroke="#E8EEF7" stroke-width="8" stroke-linejoin="round"/>
   </g>
-  <text x="152" y="70" text-anchor="middle" font-family="Sora" font-weight="700" font-size="30" letter-spacing="-0.5" fill="#0B1424">Play</text>
-  <text x="152" y="102" text-anchor="middle" font-family="Sora" font-weight="700" font-size="30" letter-spacing="-0.5" fill="#0B1424">Guard</text>
+  <text x="184" y="71" text-anchor="middle" font-family="Sora" font-weight="700" font-size="30" letter-spacing="-0.5" fill="#0B1424">Play</text>
+  <text x="184" y="103" text-anchor="middle" font-family="Sora" font-weight="700" font-size="30" letter-spacing="-0.5" fill="#0B1424">Guard</text>
 </svg>
