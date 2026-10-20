@@ -126,20 +126,15 @@ void confirm_danger(const std::string& body, const std::string& confirm_label, s
     open_confirm(body, confirm_label, std::move(on_yes), nullptr, true);
 }
 
-void failure(const std::string& text)
+void show_failure(const cadran_text::Failure& f)
 {
-    // "Could not unlock — error 0x0000C88E: refused by …\n\nIf it happens
-    // again, send a report: …" as the boards' error: what failed as the
-    // title, why as the text, the code small under it, and the report as a
-    // button rather than a path through the menus.
-    const cadran_text::Failure f = cadran_text::failure(text);
     const std::string& title = f.title;
     const std::string& rest = f.reason;
     const std::string& code = f.code;
     const bool report = f.report;
-    std::string body = title.empty() ? rest : rest.empty() ? title : title + "\n\n" + rest;
-    auto* dialog = body_dialog(body.empty() ? text : body);
-    if (!code.empty()) {
+    const std::string body = title.empty() ? rest : rest.empty() ? title : title + "\n\n" + rest;
+    auto* dialog = body_dialog(body.empty() ? code : body);
+    if (!code.empty() && !body.empty()) {
         if (auto* box = dynamic_cast<brls::Box*>(dialog->getView("cadran_dialog_body"))) {
             brls::Label* small = cadran::kit::label(code, 15, "cadran/text3");
             small->setMarginTop(10);

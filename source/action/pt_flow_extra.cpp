@@ -432,14 +432,14 @@ static void put_back_by_itself(const pt_logic::ExtraRecord& rec, const PtState& 
         if (!set_relock_pending(true)) {
             config::get().relock_pending = false;   // not on the card: not in memory either
             brls::Logger::warning("extra time: not put back, the unlock could not be recorded");
-            if (asked) ui::error("playguard/play_timer/write_err"_i18n + " — " + ui::rc_text(NXM_RC_NOT_SAVED));
+            if (asked) ui::error("playguard/play_timer/write_err"_i18n, NXM_RC_NOT_SAVED);
             return;
         }
         const Result rc = pctl_unlock_restriction_temporarily();
         if (R_FAILED(rc)) {
             settle_failed_unlock();
             brls::Logger::warning("extra time: not put back, the unlock failed ({:#x})", (unsigned)rc);
-            if (asked) ui::error("playguard/play_timer/gate/failed"_i18n + " — " + ui::rc_text(rc));
+            if (asked) ui::error("playguard/play_timer/gate/failed"_i18n, rc);
             return;
         }
     }
@@ -456,8 +456,8 @@ static void put_back_by_itself(const pt_logic::ExtraRecord& rec, const PtState& 
         brls::getStr("playguard/dashboard/extra_restored", ui::day_name_in_text(wd), ui::fmt_minutes(rec.base));
     if (R_FAILED(relock)) {
         // Said even at start-up: the console may be left unlocked.
-        const std::string text = R_SUCCEEDED(rc) ? done : "playguard/play_timer/write_err"_i18n + " — " + ui::rc_text(rc);
-        ui::error(text + "\n\n" + "playguard/toast/relock_err"_i18n + " — " + ui::rc_text(relock));
+        ui::error("playguard/toast/relock_err"_i18n, relock,
+                  R_SUCCEEDED(rc) ? done : "playguard/play_timer/write_err"_i18n + " — " + ui::rc_text(rc, false));
     } else if (R_SUCCEEDED(rc)) {
         ui::notify(done);
     } else {

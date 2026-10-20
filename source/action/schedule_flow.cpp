@@ -102,7 +102,7 @@ void apply(std::function<void()> after)
         return;
     }
     if (!ui::save_config_now()) {
-        ui::error("playguard/play_timer/write_err"_i18n + " — " + ui::rc_text(NXM_RC_NOT_SAVED));
+        ui::error("playguard/play_timer/write_err"_i18n, NXM_RC_NOT_SAVED);
         return;
     }
     profile_flow::apply(p, [after]() {

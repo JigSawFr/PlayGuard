@@ -1634,16 +1634,12 @@
             "custom": "每項設定在下方選擇",
             "up_to": "至 {} 的軟體",
             "any_age": "所有年齡的軟體",
-            "sns_blocked": "社群媒體 · 受限",
-            "sns_allowed": "社群媒體 · 允許",
-            "sns_unknown": "社群媒體 · —",
-            "comm_blocked": "交流 · 受限",
-            "comm_allowed": "交流 · 允許",
-            "comm_unknown": "交流 · —",
+            "sns": "社群媒體",
+            "comm": "交流",
             "none": "所有年齡的軟體，允許社群媒體與交流",
             "to_settings": "查看設定",
-            "games_blocked": "被限制的遊戲 · {}",
-            "games_none": "被限制的遊戲 · 無"
+            "games": "被限制的遊戲",
+            "games_none": "無"
         },
         "clock": {
             "console": "主機",

@@ -36,7 +36,7 @@ SecurityTab::SecurityTab()
         PtState pt;
         pctl_play_timer_query(&pt);
         if (!pt.fw_supported) {
-            ui::error(ui::rc_text(NXM_RC_FW_UNSUPPORTED));
+            ui::error("", NXM_RC_FW_UNSUPPORTED);
             return true;
         }
         PctlStatus s;

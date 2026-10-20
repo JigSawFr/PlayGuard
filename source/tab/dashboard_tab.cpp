@@ -24,6 +24,7 @@
 #include "app.hpp"
 #include "core/platform.h"
 #include "tab/clock_tab.hpp"
+#include "ui/cadran_text.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -556,7 +557,7 @@ void DashboardTab::build_steps_card(brls::Box* column, int at)
         return true;
     });
     steps[1].row->registerClickAction([this](brls::View*) {
-        if (!this->pt.fw_supported) ui::error(ui::rc_text(NXM_RC_FW_UNSUPPORTED));
+        if (!this->pt.fw_supported) ui::error("", NXM_RC_FW_UNSUPPORTED);
         else pt_flow::choose_uniform_limit(this->pt, [this]() { this->refresh(); });
         return true;
     });
@@ -772,8 +773,8 @@ void DashboardTab::build_pills()
         };
         std::string body = "playguard/cadran/today/dns_title"_i18n + "\n\n" +
                            (sync || time ? "playguard/cadran/today/dns_intro"_i18n : "playguard/cadran/today/dns_intro_open"_i18n) +
-                           "\n\n" + brls::getStr("playguard/common/line", "playguard/cadran/today/dns_row_sync"_i18n, state(sync)) +
-                           "\n" + brls::getStr("playguard/common/line", "playguard/cadran/today/dns_row_time"_i18n, state(time));
+                           "\n\n" + cadran_text::table({ { "playguard/cadran/today/dns_row_sync"_i18n, state(sync) },
+                                                            { "playguard/cadran/today/dns_row_time"_i18n, state(time) } });
         if (sync) body += "\n\n" + "playguard/cadran/today/dns_sync_note"_i18n;
         if (time)
             body += "\n\n" + brls::getStr("playguard/cadran/today/dns_time_note",

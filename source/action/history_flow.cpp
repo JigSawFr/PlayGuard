@@ -15,6 +15,7 @@
 #include "action/pt_log_flow.hpp"
 #include "activity/main_activity.hpp"
 #include "app.hpp"
+#include "ui/cadran_text.hpp"
 #include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -256,14 +257,16 @@ std::string title(const history::Entry& e)
 
 std::string details(const history::Entry& e)
 {
-    std::string out = kind_label(e.kind) + "\n";
-    out += "\n" + brls::getStr("playguard/common/line", "playguard/history/when"_i18n, e.when.empty() ? "?" : e.when);
+    // The change's facts as a table; a detail in words of its own under it.
+    cadran_text::Rows rows = { { "playguard/history/when"_i18n, e.when.empty() ? "?" : e.when } };
     const std::string from = source_label(e);
-    if (!from.empty()) out += "\n" + brls::getStr("playguard/common/line", "playguard/history/how"_i18n, from);
-    else if (!e.detail.empty()) out += "\n" + e.detail;
+    if (!from.empty()) rows.push_back({ "playguard/history/how"_i18n, from });
     const std::string before = value_text(e.kind, e.before), after = value_text(e.kind, e.after);
-    if (!before.empty()) out += "\n" + brls::getStr("playguard/common/line", "playguard/history/before"_i18n, before);
-    if (!after.empty()) out += "\n" + brls::getStr("playguard/common/line", "playguard/history/after"_i18n, after);
+    if (!before.empty()) rows.push_back({ "playguard/history/before"_i18n, before });
+    if (!after.empty()) rows.push_back({ "playguard/history/after"_i18n, after });
+    if (!e.version.empty()) rows.push_back({ "playguard/history/version"_i18n, e.version });
+    std::string out = kind_label(e.kind) + "\n\n" + cadran_text::table(rows);
+    if (from.empty() && !e.detail.empty()) out += "\n\n" + e.detail;
     // The week's limits: each day that changed, as it was and became.
     const std::vector<int> days = history_logic::changed_days(e);
     if (!days.empty()) {
@@ -272,8 +275,6 @@ std::string details(const history::Entry& e)
             out += "\n" + brls::getStr("playguard/history/day_change", ui::day_name(d), ui::fmt_minutes((uint16_t)e.before[d]),
                                         ui::fmt_minutes((uint16_t)e.after[d]));
     }
-    if (!e.version.empty())
-        out += "\n" + brls::getStr("playguard/common/line", "playguard/history/version"_i18n, e.version);
     if (!e.result.empty())
         out += "\n\n" + brls::getStr("playguard/history/failed_note", ui::rc_text(result_of(e), false));
     if (!history_logic::known_kind(e.kind)) out += "\n\n" + "playguard/history/unknown_note"_i18n;

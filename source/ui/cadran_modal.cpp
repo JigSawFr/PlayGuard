@@ -130,33 +130,6 @@ std::string question_of(const std::string& paragraph)
     return paragraph.substr(0, end);
 }
 
-bool ends_sentence(const std::string& text)
-{
-    return !text.empty() && (text.back() == '.' || text.back() == '!' ||
-                             (text.size() >= 3 && text.compare(text.size() - 3, 3, "\xE3\x80\x82") == 0));   // "。"
-}
-
-// "label: value" lines, as playguard/common/line writes them: every line of
-// the paragraph, each value short and not a sentence (a sentence with a
-// colon in it is text); a line alone, shorter still.
-bool table_of(const std::string& paragraph, std::vector<std::pair<std::string, std::string>>* rows)
-{
-    const std::string format = "playguard/common/line"_i18n;
-    const size_t first = format.find("{}"), second = format.find("{}", first + 2);
-    if (first == std::string::npos || second == std::string::npos) return false;
-    const std::string sep = format.substr(first + 2, second - first - 2);
-    if (sep.empty()) return false;
-    rows->clear();
-    for (const std::string& line : split(paragraph, "\n")) {
-        const size_t at = line.find(sep);
-        if (at == std::string::npos || at == 0 || at > 90) return false;
-        const std::string value = trim(line.substr(at + sep.size()));
-        if (value.empty() || value.size() > 60 || ends_sentence(value)) return false;
-        rows->push_back({ trim(line.substr(0, at)), value });
-    }
-    return rows->size() > 1 || (rows->size() == 1 && rows->front().second.size() <= 30);
-}
-
 // A note the app adds to its dialogs, and its icon (nullptr: not one): the
 // linked phone app, the help it can give before unlinking, the unlock, a game
 // about to be suspended, what the DNS's blocking changes.
@@ -230,7 +203,7 @@ brls::Box* cadran::dialog_body(const std::string& text)
             continue;
         }
         std::vector<std::pair<std::string, std::string>> rows;
-        if (table_of(paragraph, &rows)) {
+        if (cadran_text::table_rows(paragraph, &rows)) {
             // A week of lines: the days that change alike on one line
             // ("Monday – Friday  2 h → 0 min").
             rows = cadran_text::group_rows(rows);

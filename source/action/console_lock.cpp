@@ -92,7 +92,7 @@ bool active()
 void set(bool on, const PtState& pt, std::function<void()> refresh)
 {
     if (on && !pt.valid) {
-        ui::error(ui::rc_text(NXM_RC_STATE_UNKNOWN));
+        ui::error("", NXM_RC_STATE_UNKNOWN);
         return;
     }
     if (on) lock(refresh);

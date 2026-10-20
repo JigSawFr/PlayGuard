@@ -1634,16 +1634,12 @@
             "custom": "各設定は下で選択",
             "up_to": "{}までのソフト",
             "any_age": "全年齢のソフト",
-            "sns_blocked": "SNS投稿・制限",
-            "sns_allowed": "SNS投稿・許可",
-            "sns_unknown": "SNS投稿・—",
-            "comm_blocked": "交流・制限",
-            "comm_allowed": "交流・許可",
-            "comm_unknown": "交流・—",
+            "sns": "SNS投稿",
+            "comm": "交流",
             "none": "全年齢のソフト、SNS投稿・交流も許可",
             "to_settings": "設定を見る",
-            "games_blocked": "制限されるソフト・{}",
-            "games_none": "制限されるソフト・なし"
+            "games": "制限されるソフト",
+            "games_none": "なし"
         },
         "clock": {
             "console": "本体",

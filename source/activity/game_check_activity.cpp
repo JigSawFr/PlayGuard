@@ -105,7 +105,7 @@ std::string list_text(const std::vector<GameFacts>& games)
 // The list of the games to install again could not be saved: why.
 void list_error(const std::string& error)
 {
-    ui::error("playguard/games/list_err"_i18n + (error.empty() ? "" : ": " + error));
+    ui::error("playguard/games/list_err"_i18n, error);
 }
 
 std::string cause_text(const GameFacts& g, GameIssue issue, u32 current_hos)
@@ -1144,7 +1144,7 @@ void GameCheckActivity::report_verified(GameCheckActivity* self, const std::weak
         const Verified& v = results.front();
         const std::string name = game_name(v.game);
         if (R_FAILED(v.rc)) {
-            ui::error("playguard/games/verify_err"_i18n + " — " + ui::rc_text(v.rc));
+            ui::error("playguard/games/verify_err"_i18n, v.rc);
         } else if (!v.corrupt) {
             ui::info(brls::getStr("playguard/games/verify_ok", name));
         } else {

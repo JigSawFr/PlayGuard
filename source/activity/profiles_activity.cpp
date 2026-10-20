@@ -111,7 +111,7 @@ bool ProfilesActivity::store(const profiles::Profile& p, const std::string& ok_t
 {
     std::string err;
     if (!profiles::save(p, &err)) {
-        ui::error("playguard/play_timer/profile_save_err"_i18n + ": " + err);
+        ui::error("playguard/play_timer/profile_save_err"_i18n, err);
         return false;
     }
     ui::notify(ok_text);

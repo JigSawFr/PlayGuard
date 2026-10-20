@@ -1,9 +1,9 @@
 // Host tests for source/ui/cadran_text.cpp, translated by the real catalogs
 // (resources/i18n/<lang>/playguard.json, read from the repository root `make
-// test` runs in) through ui/tr.hpp's stand-in for borealis: a restriction's
-// line and its state in each script's separator, a week's identical lines as
-// one (and a short table left alone), and a failure's title, reason, code and
-// report, in English and French, with or without each part.
+// test` runs in) through ui/tr.hpp's stand-in for borealis: a dialog's table
+// marked and read back, a week's identical lines as one (and a short table
+// left alone), and a failure's title, reason, code and report, in English and
+// French, with or without each part.
 #include "check.h"
 #include <fstream>
 #include <map>
@@ -63,17 +63,16 @@ std::string operator""_i18n(const char* str, size_t len)
 
 using Rows = std::vector<std::pair<std::string, std::string>>;
 
-static void test_split_state()
+static void test_table()
 {
-    using cadran_text::split_state;
-    CHECK(split_state(s_catalog["playguard/cadran/restrictions/comm_blocked"]) ==
-          std::make_pair(std::string("Communication"), std::string("restricted")));
-    CHECK(split_state("Games blocked \u00B7 10").second == "10");
-    CHECK(split_state("\u4EA4\u6D41\u30FB\u5236\u9650") ==   // 交流・制限
-          std::make_pair(std::string("\u4EA4\u6D41"), std::string("\u5236\u9650")));
-    CHECK(split_state("A \u00B7 B \u00B7 C").first == "A \u00B7 B");
-    CHECK(split_state("No separator") == std::make_pair(std::string("No separator"), std::string()));
-    CHECK(split_state("") == std::make_pair(std::string(), std::string()));
+    const Rows rows = { { "When", "Monday 14:02" }, { "Before", "1 h" }, { "After", "" }, { "Ver\u00A0\u00B7 x", "1.2" } };
+    Rows back;
+    CHECK(cadran_text::table_rows(cadran_text::table(rows), &back) && back == rows);
+    // Words, even with a tab or "a: b" in them, are no table.
+    CHECK(!cadran_text::table_rows("When\tMonday", &back));
+    CHECK(!cadran_text::table_rows("When: Monday", &back));
+    CHECK(!cadran_text::table_rows("", &back));
+    CHECK(!cadran_text::table_rows(cadran_text::table({}), &back));
 }
 
 static void test_group_rows()
@@ -99,48 +98,39 @@ static void test_group_rows()
 static void test_failure()
 {
     using cadran_text::failure;
-    const std::string next = "\n\n" + s_catalog["playguard/error/next_step"];
-    const std::string code = brls::getStr("playguard/error/code_hint", "0x0000C88E", "refused by the service");
-    cadran_text::Failure f = failure("Could not unlock parental controls \u2014 " + code + next);
+    // The console's code: its hint as the reason, the code small, a report.
+    cadran_text::Failure f = failure("Could not unlock parental controls", "refused by the service", 0xC88E, false);
     CHECK(f.title == "Could not unlock parental controls");
     CHECK(f.reason == "Refused by the service");
     CHECK(f.code == brls::getStr("playguard/error/code", "0x0000C88E"));
     CHECK(f.report);
 
-    // The code alone: no reason left; no report asked.
-    f = failure("Could not save \u2014 " + brls::getStr("playguard/error/code", "0x00001234"));
-    CHECK(f.title == "Could not save" && f.reason.empty() && !f.code.empty() && !f.report);
+    // No hint known: the code alone.
+    f = failure("Could not save", "", 0x1234, false);
+    CHECK(f.title == "Could not save" && f.reason.empty() && f.code == brls::getStr("playguard/error/code", "0x00001234"));
 
-    // A sentence with no dash nor code: all of it is the reason.
-    f = failure("The SD card is full.");
+    // One of PlayGuard's own results: its words, no code nor report.
+    f = failure("", "The SD card is full.", 0x5678, true);
     CHECK(f.title.empty() && f.reason == "The SD card is full." && f.code.empty() && !f.report);
 
-    // A dash too far into the text is part of the sentence, not a title.
-    const std::string long_start(130, 'x');
-    f = failure(long_start + " \u2014 more");
-    CHECK(f.title.empty() && f.reason == long_start + " \u2014 more");
-
-    // "0x" that is not a code after "error": the text as it is.
-    f = failure("Value 0x12345678 out of range");
-    CHECK(f.code.empty() && f.reason == "Value 0x12345678 out of range");
+    // A hint starting with a digit or a capital stays as it is.
+    CHECK(failure("x", "3 tries left", 1, true).reason == "3 tries left");
 }
 
-// French: its own words for "error" and the next step.
+// French: its own words for the code.
 static void test_french()
 {
     REQUIRE(load("fr"));
-    const std::string next = "\n\n" + s_catalog["playguard/error/next_step"];
-    const std::string code = brls::getStr("playguard/error/code_hint", "0x0000C88E", "refus\u00E9");
-    const cadran_text::Failure f = cadran_text::failure("Impossible de d\u00E9verrouiller \u2014 " + code + next);
-    CHECK(f.title == "Impossible de d\u00E9verrouiller" && f.report);
+    const cadran_text::Failure f = cadran_text::failure("Impossible de d\u00E9verrouiller", "refus\u00E9", 0xC88E, false);
+    CHECK(f.title == "Impossible de d\u00E9verrouiller" && f.reason == "Refus\u00E9" && f.report);
     CHECK(f.code == brls::getStr("playguard/error/code", "0x0000C88E"));
-    CHECK(cadran_text::split_state(s_catalog["playguard/cadran/restrictions/sns_allowed"]).second == "autoris\u00E9s");
+    CHECK(f.code.find("0x0000C88E") != std::string::npos);
 }
 
 int main()
 {
     REQUIRE(load("en-US"));
-    test_split_state();
+    test_table();
     test_group_rows();
     test_failure();
     test_french();

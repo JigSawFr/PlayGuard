@@ -1634,16 +1634,12 @@
             "custom": "each setting chosen below",
             "up_to": "software rated up to {}",
             "any_age": "software of any rating",
-            "sns_blocked": "Social media · restricted",
-            "sns_allowed": "Social media · allowed",
-            "sns_unknown": "Social media · —",
-            "comm_blocked": "Communication · restricted",
-            "comm_allowed": "Communication · allowed",
-            "comm_unknown": "Communication · —",
+            "sns": "Social media",
+            "comm": "Communication",
             "none": "software of any rating, social media and communication allowed",
             "to_settings": "Its settings",
-            "games_blocked": "Games blocked · {}",
-            "games_none": "Games blocked · none"
+            "games": "Games blocked",
+            "games_none": "none"
         },
         "clock": {
             "console": "Console",
