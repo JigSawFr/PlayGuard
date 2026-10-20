@@ -66,6 +66,17 @@ only shown and recorded, and there is no route that sets the clock to a given
 time (one that moved the day forward would hand the child a new daily limit).
 `POST /clock/sync` only puts back the time NTP servers give.
 
+A PIN asked for by a request is the same PIN screen as anywhere else: a wrong
+PIN counts towards the same lockout, so an app that opens the PIN screen again
+and again gains no extra attempts.
+
+### What the parent sees
+
+*Preferences › Other homebrews* lists the last 20 calls: when, the `caller`,
+the route, and the status (`200`, `403 permission_denied` …). **Turn it all
+off** sets every group back to *None* in one press. Calls that changed
+something (`POST`) are also in the change history, as every change is.
+
 ## Launching PlayGuard
 
 PlayGuard reads its arguments (`argv`) at start-up. A homebrew passes them
@@ -110,11 +121,42 @@ mode; there is no `return_to`, so PlayGuard exits when done.
 | `return_to` | no | The `.nro` to launch when done. It must exist, end in `.nro` and be under `sdmc:/switch/`; anything else is ignored (and said in the response). |
 | `response` | no | Where to write the response: a `.json` path under `sdmc:/switch/` or `sdmc:/config/`. Default `sdmc:/config/playguard/api/response.json`. |
 | `caller` | no | A name to show and record in the history, at most 64 characters. Not checked, so not trusted. |
+| `dry_run` | no | `true`: check the request and its permission, answer `200` (or the error it would get) with `"dry_run": true`, and do nothing. No PIN asked, no history, not kept in `handled.json`. |
 
 The request file is **deleted as soon as it is read**, before anything is
 done, so a request left on the card is never replayed at the next start (if
 it cannot be deleted, it is not done: `500 request_not_consumed`). A file over
 16 KiB, not JSON, or without the required keys gets `400 bad_request`.
+
+### Several requests in one launch
+
+Each launch is a round trip, so a request file may hold up to 8 requests,
+done in order:
+
+```json
+{
+  "api": "v1",
+  "id": "c4ca4238",
+  "return_to": "sdmc:/switch/myapp/myapp.nro",
+  "caller": "MyApp 1.2",
+  "requests": [
+    { "method": "POST", "path": "/clock/sync" },
+    { "method": "GET", "path": "/status" }
+  ]
+}
+```
+
+- `requests` replaces `mode`, `method`, `path`, `body` and `dry_run` at the top;
+  each entry takes those keys. `id`, `return_to`, `response` and `caller` stay
+  at the top and apply to the whole file.
+- Each entry needs its own permission; one refused does not stop the next,
+  unless the file says `"stop_on_error": true` (the rest then get
+  `424 not_done`).
+- Only the last entry may be `open`: the screen is where the launch ends.
+- The response has `"status": 200` (the file was read) and `responses`, one per
+  entry in the same order, each with its own `status` and `body`.
+- The file's `id` is the one that [acts once](#each-request-acts-once): a
+  relaunch with it does none of the entries again.
 
 ## The response
 
@@ -137,6 +179,17 @@ launched, so the caller finds it at its next start:
 
 A caller should check that `id` is the one it sent: a response from an earlier
 request may still be on the card.
+
+PlayGuard launches `return_to` with two arguments, so the caller knows it is
+coming back from PlayGuard and where to look:
+
+```
+sdmc:/switch/myapp/myapp.nro --playguard-response sdmc:/switch/myapp/pg_response.json --playguard-status 200
+```
+
+`--playguard-status` is the response's `status` (for several requests, the
+first status that is not `200`, or `200`). The file is still the answer; the
+arguments only point to it.
 
 ### Errors
 
@@ -167,6 +220,7 @@ console's language, ready to show:
 | `404` | `no_route`, `no_game` | Unknown path, or no such game installed. |
 | `422` | `bad_body` | A parameter is missing or out of range. |
 | `423` | `read_only` | The firmware is newer than PlayGuard supports: it [opens read only](compatibility.md#newer-firmware) and changes nothing. |
+| `424` | `not_done` | Several requests with `stop_on_error`: an earlier one failed. |
 | `500` | `request_not_consumed`, `failed` | The request file could not be deleted, or the system refused (the `detail` says which call and its result). |
 | `503` | `no_network`, `applet_mode` | No network, or not enough memory: PlayGuard was started from the Album instead of over a game. |
 
@@ -255,6 +309,31 @@ It is only as fresh as `written_at`: the timer keeps counting after PlayGuard
 closes. No activity goes in it. A homebrew that needs the live time left can
 also read it from the system itself (`pctl`), as PlayGuard does.
 
+## Versions
+
+- **Within v1, only additions**: new routes, new keys in a body, new `code`
+  values. A caller ignores keys it does not know; PlayGuard ignores keys it
+  does not know in a request.
+- **Anything that would break a caller** (a key removed or renamed, a meaning
+  changed, a stricter check) is `v2`, under `/v2/…` and `"api": "v2"`.
+  PlayGuard keeps answering `v1` for at least one year after `v2` ships, and
+  `GET /v1` lists the versions it answers.
+- The changelog says which PlayGuard version added each route.
+
+## Trying it
+
+- **In the browser.** The [simulator](https://playguard.link/simulator/)
+  takes the short form as a parameter, against its simulated console, and
+  shows the response it would write:
+  `https://playguard.link/simulator/?api=POST%20/v1/clock/sync` (add
+  `&api_permissions=clock:read_write` to set the permissions, which are
+  *None* there too by default). The site's smoke test plays every route this
+  way, so the simulator and this page stay in step.
+- **On a console.** `examples/api-caller/` is a small homebrew, built by CI,
+  that calls each route with `playguard_api.h` and shows the response. Use
+  `dry_run` first: it says whether the permission is there without doing
+  anything.
+
 ## Out of scope for v1
 
 - **Starting the game afterwards.** `OPEN /v1/games/{program_id}` returns to
@@ -263,6 +342,12 @@ also read it from the system itself (`pctl`), as PlayGuard does.
   separate program, not a launch.
 - **A resident service** (a sysmodule answering IPC): it would run all the
   time, which PlayGuard avoids.
+- **Permissions per app.** What names the caller (`caller`, the path of
+  `return_to`) is written by the caller, so anything can claim to be anything:
+  a permission tied to it would protect nothing. The groups are the barrier.
+- **An events file** (the limit changed, the clock was set) for apps to
+  follow: handy, but it would leave on the card what happens to the child's
+  play, readable by anything. Not without a real need.
 
 ## In the code (when built)
 
@@ -274,4 +359,6 @@ also read it from the system itself (`pctl`), as PlayGuard does.
 - `docs/api.schema.json`: the request and response schemas the tests check
   the router against.
 - `playguard_api.h`: a single-header C helper for callers (write a request,
-  launch PlayGuard, read the response).
+  launch PlayGuard, read the response, read `--playguard-response`).
+- `examples/api-caller/`: the example homebrew, built by CI.
+- `web/`: the simulator's `?api=` parameter, and the routes in its smoke test.
