@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 e1805c25bee2 -->
+<!-- translated from docs/features.md, sha256 91481ad14111 -->
 # Funcionalidades
 
 O que faz cada separador, como o PlayGuard escreve em segurança e o que a consola conta como tempo de jogo. Novo no PlayGuard? Comece por [como começar](getting-started.md). Voltar ao [README](../../README.md).
@@ -61,7 +61,7 @@ O aspeto do PlayGuard chama-se Cadran: uma barra de ícones para os separadores,
 
 Um sino no cabeçalho, à esquerda da versão, reúne o que precisa da intervenção do pai ou da mãe; Ⓨ abre a lista a partir de qualquer separador (o contador do sino indica *2* quando há duas coisas a fazer).
 
-À esquerda do sino, o idioma (o seu código, *FR*, *EN*…) e o tema (um sol para claro, uma lua para escuro, um círculo meio preenchido quando segue a consola), depois o tamanho do texto (**AA**, com o A grande a verde-azulado enquanto o texto está maior): um toque abre a mesma lista que em *Preferências*, e **−** propõe-nos a partir de qualquer separador. Um novo tema ou idioma tem efeito de imediato, com cada ecrã refeito no mesmo separador; só a mudança para o chinês ou a partir do chinês, ou o regresso ao idioma da consola quando o PlayGuard abriu noutro, espera que o PlayGuard seja aberto de novo.
+À esquerda do sino, o idioma (o seu código, *FR*, *EN*…) e o tema (um sol para claro, uma lua para escuro, um círculo meio preenchido quando segue a consola), depois o tamanho do texto (**AA**, com o A grande a verde-azulado enquanto o texto está maior): um toque abre a mesma lista que em *Preferências*, e **−** propõe-nos a partir de qualquer separador. Um novo tema ou idioma tem efeito de imediato, com cada ecrã refeito no mesmo separador e o foco na mesma linha, chinês e o seu próprio tipo de letra incluídos.
 
 ### A fazer
 
@@ -198,7 +198,7 @@ Com o texto maior, *Hoje* continua a caber num só ecrã: a linha por cima do t�
 
 | Botão | Na edição |
 |---|---|
-| ↑/↓ | Alterá-lo em 15 min |
+| ↑/↓ | Alterá-lo em 15 min, de hora em hora quando mantidos premidos |
 | ←/→ | Passar ao dia seguinte |
 | Ⓛ | Copiá-lo para segunda–sexta |
 | Ⓡ | Copiá-lo para o fim de semana |

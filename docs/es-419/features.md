@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 e1805c25bee2 -->
+<!-- translated from docs/features.md, sha256 91481ad14111 -->
 # Funciones
 
 Qué hace cada pestaña, cómo escribe PlayGuard sin riesgos y qué cuenta la consola como tiempo de juego. ¿Es nuevo en PlayGuard? Empiece por [primeros pasos](getting-started.md). Volver al [README](../../README.md).
@@ -61,7 +61,7 @@ El aspecto de PlayGuard se llama Cadran: una barra de íconos para las pestañas
 
 Una campana en el encabezado, a la izquierda de la versión, reúne lo que requiere la intervención del adulto; Ⓨ abre la lista desde cualquier pestaña (el contador de la campana indica *2* cuando hay dos cosas pendientes).
 
-A la izquierda de la campana, el idioma (su código, *FR*, *EN*…) y el tema (un sol para el claro, una luna para el oscuro, un círculo medio lleno cuando sigue a la consola), y luego el tamaño del texto (**AA**, con su A grande en turquesa mientras el texto está agrandado): al tocarlos se abre la misma lista que en *Preferencias*, y **−** los ofrece desde cualquier pestaña. Un nuevo tema o idioma se aplica de inmediato, y cada pantalla se vuelve a crear en la misma pestaña; solo un cambio al chino o desde el chino, o el regreso al idioma de la consola cuando PlayGuard se inició en otro, espera a que PlayGuard se vuelva a iniciar.
+A la izquierda de la campana, el idioma (su código, *FR*, *EN*…) y el tema (un sol para el claro, una luna para el oscuro, un círculo medio lleno cuando sigue a la consola), y luego el tamaño del texto (**AA**, con su A grande en turquesa mientras el texto está agrandado): al tocarlos se abre la misma lista que en *Preferencias*, y **−** los ofrece desde cualquier pestaña. Un nuevo tema o idioma se aplica de inmediato, y cada pantalla se vuelve a crear en la misma pestaña con el foco en la misma línea, chino y su propia fuente incluidos.
 
 ### Pendiente
 
@@ -198,7 +198,7 @@ Con el texto más grande, la pestaña Hoy sigue cabiendo en una sola pantalla: l
 
 | Botón | En la edición |
 |---|---|
-| ↑/↓ | Lo cambia de 15 en 15 min |
+| ↑/↓ | Lo cambia de 15 en 15 min, de hora en hora al mantenerlos presionados |
 | ←/→ | Pasa al día siguiente |
 | Ⓛ | Lo copia de lunes a viernes |
 | Ⓡ | Lo copia al fin de semana |

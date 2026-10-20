@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 e1805c25bee2 -->
+<!-- translated from docs/features.md, sha256 91481ad14111 -->
 # Recursos
 
 O que cada aba faz, como o PlayGuard grava as configurações com segurança e o que o console conta como tempo de jogo. Novo no PlayGuard? Comece pelos [primeiros passos](getting-started.md). Volte ao [README](../../README.md).
@@ -61,7 +61,7 @@ O visual do PlayGuard se chama Cadran: uma barra de ícones para as abas, uma pa
 
 Um sino no cabeçalho, à esquerda da versão, reúne o que precisa do responsável; Ⓨ abre a lista em qualquer aba (o contador do sino mostra *2* quando há duas coisas a fazer).
 
-À esquerda do sino, o idioma (o código dele, *FR*, *EN*…) e o tema (um sol para claro, uma lua para escuro, um círculo meio preenchido quando segue o console), depois o tamanho do texto (**AA**, com o A grande em verde-azulado enquanto o texto estiver maior): um toque abre a mesma lista de *Preferências*, e **−** oferece essas opções em qualquer aba. Um novo tema ou idioma vale na hora, com cada tela refeita na mesma aba; só a troca para o chinês ou a partir do chinês, ou a volta ao idioma do console quando o PlayGuard abriu em outro, espera o PlayGuard ser aberto de novo.
+À esquerda do sino, o idioma (o código dele, *FR*, *EN*…) e o tema (um sol para claro, uma lua para escuro, um círculo meio preenchido quando segue o console), depois o tamanho do texto (**AA**, com o A grande em verde-azulado enquanto o texto estiver maior): um toque abre a mesma lista de *Preferências*, e **−** oferece essas opções em qualquer aba. Um novo tema ou idioma vale na hora, com cada tela refeita na mesma aba e o foco na mesma linha, chinês e sua própria fonte incluídos.
 
 ### A fazer
 
@@ -198,7 +198,7 @@ Com o texto maior, *Hoje* continua cabendo em uma só tela: a linha acima do tí
 
 | Botão | Na edição |
 |---|---|
-| ↑/↓ | Muda o limite em 15 min |
+| ↑/↓ | Muda o limite em 15 min, de hora em hora quando mantidos pressionados |
 | ←/→ | Passa para o dia seguinte |
 | Ⓛ | Copia o limite para segunda a sexta |
 | Ⓡ | Copia o limite para o fim de semana |

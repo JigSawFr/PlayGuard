@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 e1805c25bee2 -->
+<!-- translated from docs/features.md, sha256 91481ad14111 -->
 # Funktionen
 
 Was jeder Tab macht, wie PlayGuard sicher schreibt, und was die Konsole als Spielzeit zählt. Neu bei PlayGuard? Beginne mit dem [Einstieg](getting-started.md). Zurück zum [README](../../README.md).
@@ -61,7 +61,7 @@ Das Aussehen von PlayGuard heißt Cadran: eine schmale Leiste mit Symbolen für 
 
 Eine Glocke in der Kopfzeile, links von der Version, sammelt, was den Elternteil braucht; Ⓨ öffnet die Liste aus jedem Tab (der Zähler an der Glocke zeigt *2*, wenn zwei Dinge zu tun sind).
 
-Links von der Glocke die Sprache (ihr Kürzel, *FR*, *EN*…) und das Design (eine Sonne für hell, ein Mond für dunkel, ein halb gefüllter Kreis, wenn es der Konsole folgt), dann die Textgröße (**AA**, dessen großes A in Petrol, solange der Text vergrößert ist): Ein Tippen öffnet dieselbe Liste wie in *Optionen*, und **−** bietet sie aus jedem Tab an. Ein neues Design oder eine neue Sprache wirkt sofort, jeder Bildschirm wird auf demselben Tab neu aufgebaut; nur ein Wechsel zu oder von Chinesisch, oder zurück zur Sprache der Konsole, wenn PlayGuard in einer anderen gestartet wurde, wartet, bis PlayGuard neu gestartet wird.
+Links von der Glocke die Sprache (ihr Kürzel, *FR*, *EN*…) und das Design (eine Sonne für hell, ein Mond für dunkel, ein halb gefüllter Kreis, wenn es der Konsole folgt), dann die Textgröße (**AA**, dessen großes A in Petrol, solange der Text vergrößert ist): Ein Tippen öffnet dieselbe Liste wie in *Optionen*, und **−** bietet sie aus jedem Tab an. Ein neues Design oder eine neue Sprache wirkt sofort, jeder Bildschirm wird auf demselben Tab neu aufgebaut, mit dem Fokus auf derselben Zeile, Chinesisch und seine eigene Schrift eingeschlossen.
 
 ### Zu erledigen
 
@@ -198,7 +198,7 @@ Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile übe
 
 | Taste | Bei der Bearbeitung |
 |---|---|
-| ↑/↓ | Um 15 min ändern |
+| ↑/↓ | Um 15 min ändern, gehalten in Stundenschritten |
 | ←/→ | Zum nächsten Tag gehen |
 | Ⓛ | Auf Montag–Freitag kopieren |
 | Ⓡ | Aufs Wochenende kopieren |

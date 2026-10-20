@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 e1805c25bee2 -->
+<!-- translated from docs/features.md, sha256 91481ad14111 -->
 # Funciones
 
 Qué hace cada pestaña, cómo escribe PlayGuard sin riesgos y qué cuenta la consola como tiempo de juego. ¿Nuevo en PlayGuard? Empieza por la [guía de inicio](getting-started.md). Volver al [README](../../README.md).
@@ -61,7 +61,7 @@ El aspecto de PlayGuard se llama Cadran: una barra de iconos para las pestañas,
 
 Una campana en la cabecera, a la izquierda de la versión, reúne lo que requiere la atención del padre o la madre; Ⓨ abre la lista desde cualquier pestaña (el contador de la campana indica *2* cuando hay dos cosas por hacer).
 
-A la izquierda de la campana, el idioma (su código, *FR*, *EN*…) y el tema (un sol para el claro, una luna para el oscuro, un círculo medio lleno cuando sigue a la consola), y luego el tamaño del texto (**AA**, con su A grande en turquesa mientras el texto está agrandado): al tocarlos se abre la misma lista que en *Preferencias*, y **−** los ofrece desde cualquier pestaña. Un nuevo tema o idioma se aplica al instante, y cada pantalla se rehace en la misma pestaña; solo un cambio al chino o desde el chino, o la vuelta al idioma de la consola cuando PlayGuard se inició en otro, espera a la próxima vez que se inicie PlayGuard.
+A la izquierda de la campana, el idioma (su código, *FR*, *EN*…) y el tema (un sol para el claro, una luna para el oscuro, un círculo medio lleno cuando sigue a la consola), y luego el tamaño del texto (**AA**, con su A grande en turquesa mientras el texto está agrandado): al tocarlos se abre la misma lista que en *Preferencias*, y **−** los ofrece desde cualquier pestaña. Un nuevo tema o idioma se aplica al instante, y cada pantalla se rehace en la misma pestaña con el foco en la misma línea, chino y su propia fuente incluidos.
 
 ### Por hacer
 
@@ -198,7 +198,7 @@ Con el texto más grande, la pestaña Hoy sigue cabiendo en una sola pantalla: l
 
 | Botón | En la edición |
 |---|---|
-| ↑/↓ | Cambiarlo de 15 en 15 min |
+| ↑/↓ | Cambiarlo de 15 en 15 min, de hora en hora al mantenerlos pulsados |
 | ←/→ | Pasar al día siguiente |
 | Ⓛ | Copiarlo de lunes a viernes |
 | Ⓡ | Copiarlo al fin de semana |

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 e1805c25bee2 -->
+<!-- translated from docs/features.md, sha256 91481ad14111 -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Nieuw met PlayGuard? Begin met [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
@@ -61,7 +61,7 @@ Het uiterlijk van PlayGuard heet Cadran: een smalle balk met iconen voor de tabb
 
 Een bel in de kopregel, links van de versie, verzamelt wat de ouder moet doen; Ⓨ opent de lijst vanuit elk tabblad (de teller op de bel toont *2* als er twee dingen te doen zijn).
 
-Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon voor licht, een maan voor donker, een half gevulde cirkel als het de console volgt), en daarna de tekstgrootte (**AA**, met de grote A in blauwgroen zolang de tekst groter is): een tik opent dezelfde lijst als in *Voorkeuren*, en **−** biedt ze aan vanuit elk tabblad. Een nieuw thema of een nieuwe taal geldt meteen, en elk scherm wordt op hetzelfde tabblad opnieuw opgebouwd; alleen een wissel naar of van Chinees, of terug naar de taal van de console als PlayGuard in een andere is gestart, wacht tot PlayGuard opnieuw is gestart.
+Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon voor licht, een maan voor donker, een half gevulde cirkel als het de console volgt), en daarna de tekstgrootte (**AA**, met de grote A in blauwgroen zolang de tekst groter is): een tik opent dezelfde lijst als in *Voorkeuren*, en **−** biedt ze aan vanuit elk tabblad. Een nieuw thema of een nieuwe taal geldt meteen, en elk scherm wordt op hetzelfde tabblad opnieuw opgebouwd met de focus op dezelfde regel, Chinees en zijn eigen lettertype inbegrepen.
 
 ### Te doen
 
@@ -198,7 +198,7 @@ Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de k
 
 | Knop | Tijdens het bewerken |
 |---|---|
-| ↑/↓ | Met 15 min wijzigen |
+| ↑/↓ | Met 15 min wijzigen, per uur zodra je ze ingedrukt houdt |
 | ←/→ | Naar de volgende dag |
 | Ⓛ | Naar maandag–vrijdag kopiëren |
 | Ⓡ | Naar het weekend kopiëren |

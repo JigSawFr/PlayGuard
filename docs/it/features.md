@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 e1805c25bee2 -->
+<!-- translated from docs/features.md, sha256 91481ad14111 -->
 # Funzioni
 
 Cosa fa ogni scheda, come PlayGuard scrive senza rischi, e cosa la console conta come tempo di gioco. Nuovo su PlayGuard? Comincia da [Per iniziare](getting-started.md). Torna al [README](../../README.md).
@@ -61,7 +61,7 @@ L'aspetto di PlayGuard si chiama Cadran: una barra di icone per le schede, una t
 
 Una campanella nell'intestazione, a sinistra della versione, raccoglie ciò che richiede l'intervento del genitore; Ⓨ apre l'elenco da qualsiasi scheda (il contatore della campanella indica *2* quando ci sono due cose da fare).
 
-A sinistra della campanella, la lingua (il suo codice, *FR*, *EN*…) e il tema (un sole per il chiaro, una luna per lo scuro, un cerchio pieno a metà quando segue la console), poi la dimensione del testo (**AA**, con la A grande in verde acqua quando il testo è ingrandito): un tocco apre lo stesso elenco di *Preferenze*, e **−** li offre da qualsiasi scheda. Un nuovo tema o una nuova lingua ha effetto subito, con ogni schermata rifatta sulla stessa scheda; solo il passaggio al cinese o dal cinese, o il ritorno alla lingua della console quando PlayGuard è stato avviato in un'altra, attende il successivo avvio di PlayGuard.
+A sinistra della campanella, la lingua (il suo codice, *FR*, *EN*…) e il tema (un sole per il chiaro, una luna per lo scuro, un cerchio pieno a metà quando segue la console), poi la dimensione del testo (**AA**, con la A grande in verde acqua quando il testo è ingrandito): un tocco apre lo stesso elenco di *Preferenze*, e **−** li offre da qualsiasi scheda. Un nuovo tema o una nuova lingua ha effetto subito, con ogni schermata rifatta sulla stessa scheda e il focus sulla stessa riga, cinese e il suo carattere compresi.
 
 ### Da fare
 
@@ -198,7 +198,7 @@ Con il testo più grande, Oggi sta ancora in una sola schermata: la riga sopra i
 
 | Tasto | Nella modifica |
 |---|---|
-| ↑/↓ | Lo cambia di 15 min |
+| ↑/↓ | Lo cambia di 15 min, di un'ora se tenuti premuti |
 | ←/→ | Passa al giorno successivo |
 | Ⓛ | Lo copia da lunedì a venerdì |
 | Ⓡ | Lo copia sul weekend |
