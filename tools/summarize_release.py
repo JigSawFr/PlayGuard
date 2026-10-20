@@ -4,7 +4,11 @@ OpenRouter, for when no one wrote .github/release-notes/<version>.md.
 
   OPENROUTER_API_KEY=… tools/summarize_release.py VERSION [EXAMPLES_DIR [EMOJI_DIR]] < notes.md > summary.md
 
-notes.md is the list release-please wrote (one line per commit). The other
+notes.md is the list release-please wrote (one line per commit). With
+GH_TOKEN and GH_REPO set, the descriptions of the pull requests the notes
+name (in the sections a user notices) are read from the GitHub API and given
+too: a commit title says what changed, the description what it is for. A
+pull request that cannot be read is left out. The other
 summaries in EXAMPLES_DIR (.github/release-notes/*.md) are given as examples
 of the tone and the form; the emoji EMOJI_DIR (resources/img/emoji/) has an
 image of are the ones a bullet may open on (the console draws them as
@@ -24,7 +28,9 @@ OPENROUTER_MODEL picks the model (default below). Standard library only.
 import glob
 import json
 import os
+import re
 import sys
+from concurrent.futures import ThreadPoolExecutor
 import urllib.error
 import urllib.request
 
@@ -33,6 +39,8 @@ from release_notes import CONTRIBUTOR_SECTIONS, items, sections
 URL = "https://openrouter.ai/api/v1/chat/completions"
 DEFAULT_MODEL = "anthropic/claude-sonnet-5.5"
 MAX_NOTES = 120_000   # characters of notes sent; 1.0.0's are about 28 000
+MAX_PR = 4_000        # characters of one pull request's description sent
+MAX_PRS = 150_000     # characters of descriptions sent; 1.2.0's are about 128 000
 MAX_SUMMARY = 3_000   # characters of summary accepted
 NOTHING = 3           # the exit code when there is nothing to highlight
 
@@ -53,7 +61,13 @@ Otherwise, the form, exactly:
 
 {examples}The notes of {version}:
 
-{notes}"""
+{notes}{prs}"""
+
+PRS = """
+
+The descriptions of the pull requests behind these notes (#number as in the notes), for context: what a change is for and what a user sees. They are written for reviewers: leave out how a change was built or tested, and trust the notes when they disagree.
+
+{descriptions}"""
 
 
 def examples(folder: str, version: str) -> str:
@@ -83,6 +97,65 @@ def noticeable(notes: str) -> bool:
     sections for contributors (build, tests, docs)."""
     return any(title and title not in CONTRIBUTOR_SECTIONS and items(block)
                for title, block in sections(notes))
+
+
+def pr_numbers(notes: str) -> list:
+    """The pull requests of the sections a user notices, in the order of the
+    notes: release-please links each as "([#123](…))"."""
+    out = []
+    for title, block in sections(notes):
+        if title and title not in CONTRIBUTOR_SECTIONS:
+            out += [int(n) for n in re.findall(r"\[#(\d+)\]", block) if int(n) not in out]
+    return out
+
+
+def description(body: str) -> str:
+    """The part of a description that says what a change is for: its "What
+    this changes" section (.github/pull_request_template.md) when it has one,
+    else the whole, without the template's comments, the checklist and the
+    footer."""
+    body = re.sub(r"<!--.*?-->", "", body or "", flags=re.S).replace("\r\n", "\n")
+    parts = re.split(r"^## +", body, flags=re.M)
+    what = [p for p in parts[1:] if p.lower().startswith("what this changes")]
+    text = what[0].partition("\n")[2] if what else re.split(r"^(?:## +Checklist|---\s*$)", body, flags=re.M | re.I)[0]
+    text = text.strip()
+    return text if len(text) <= MAX_PR else text[:MAX_PR].rstrip() + " […]"
+
+
+def pull_request(number: int, repo: str, token: str):
+    api = os.environ.get("GITHUB_API_URL", "https://api.github.com")
+    req = urllib.request.Request(f"{api}/repos/{repo}/pulls/{number}", headers={
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            pr = json.load(r)
+    except (OSError, ValueError) as e:
+        print(f"#{number}: {e}", file=sys.stderr)
+        return None
+    text = description(pr.get("body") or "")
+    return f"#{number} {pr.get('title', '')}\n\n{text}" if text else None
+
+
+def pull_requests(notes: str) -> str:
+    """The descriptions of the notes' pull requests, for the prompt; "" without
+    GH_TOKEN and GH_REPO."""
+    repo, token = os.environ.get("GH_REPO", ""), os.environ.get("GH_TOKEN", "")
+    numbers = pr_numbers(notes)
+    if not (repo and token and numbers):
+        return ""
+    with ThreadPoolExecutor(8) as pool:
+        found = [d for d in pool.map(lambda n: pull_request(n, repo, token), numbers) if d]
+    out, size = [], 0
+    for d in found:
+        if size + len(d) > MAX_PRS:
+            break
+        out.append(d)
+        size += len(d)
+    print(f"{len(out)} of {len(numbers)} pull request descriptions given", file=sys.stderr)
+    return PRS.format(descriptions="\n\n---\n\n".join(out)) if out else ""
 
 
 def nothing(answer: str) -> bool:
@@ -115,7 +188,7 @@ def main() -> int:
     if not key:
         print("no OPENROUTER_API_KEY", file=sys.stderr)
         return 1
-    prompt = PROMPT.format(version=version, notes=notes,
+    prompt = PROMPT.format(version=version, notes=notes, prs=pull_requests(notes),
                            examples=examples(sys.argv[2], version) if len(sys.argv) >= 3 else "",
                            emoji_list=emoji_list(sys.argv[3]) if len(sys.argv) == 4 else "")
     body = {

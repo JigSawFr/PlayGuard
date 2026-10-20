@@ -781,6 +781,8 @@ jobs:
       attestations: write
       # The release's discussion (tools/release_page.sh).
       discussions: write
+      # The descriptions of the release's pull requests, for its summary.
+      pull-requests: read
     env:
       LABEL: ${{ needs.meta.outputs.label }}
     steps:
@@ -831,7 +833,8 @@ jobs:
       # (what users notice, what contributors do), the screens that changed,
       # the install section, this run's report, and a discussion. The summary is the hand-written one
       # (.github/release-notes/<version>.md, see its README), else, with the
-      # OPENROUTER_API_KEY secret set, one written by a language model
+      # OPENROUTER_API_KEY secret set, one written by a language model from
+      # the notes and the descriptions of their pull requests
       # (tools/summarize_release.py; the OPENROUTER_MODEL variable picks the
       # model). Read from the commit this run is for (main), not the tag: a
       # summary merged after the release pull request still counts when the

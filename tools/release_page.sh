@@ -5,7 +5,8 @@
 # the install section with the assets' sizes, the build report and the
 # contributors. The summary is .github/release-notes/<version>.md, else one a
 # language model writes through OpenRouter when OPENROUTER_API_KEY is set
-# (tools/summarize_release.py) when the release has something to highlight,
+# (tools/summarize_release.py, from the notes and the descriptions of their
+# pull requests) when the release has something to highlight,
 # else none. With --apply, the release also gets
 # a discussion in the RELEASE_DISCUSSION_CATEGORY category (default
 # Announcements; "none" for none), and the discussion's post kept the same

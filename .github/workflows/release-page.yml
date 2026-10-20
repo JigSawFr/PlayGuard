@@ -25,6 +25,7 @@ permissions:
   contents: write
   discussions: write
   actions: read   # the release-please run that built it, for the build report
+  pull-requests: read   # the descriptions of its pull requests, for the summary
 
 jobs:
   page:

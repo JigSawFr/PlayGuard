@@ -53,6 +53,7 @@ jobs:
       id-token: write
       attestations: write
       discussions: write
+      pull-requests: read
     uses: ./.github/workflows/build.yml
     # Only the secrets the build asks for (its workflow_call secrets), not
     # every secret of the repository: the Docker Hub login for the switch
