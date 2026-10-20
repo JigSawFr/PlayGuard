@@ -32,6 +32,8 @@ class ForwardersActivity : public brls::Activity
 
     // The list again: the focus on `keep`, else on the forwarder `focus_id`.
     void rebuild(uint64_t focus_id = 0, brls::View* keep = nullptr);
+    // The same, now (rebuild waits for the dialogs over the screen to close).
+    void build(uint64_t focus_id = 0, brls::View* keep = nullptr);
     // A on the card: what it says, each a press away.
     void fixes();
     // Deleted, then ZR a few seconds to put it back.
