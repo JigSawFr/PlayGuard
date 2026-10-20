@@ -57,9 +57,14 @@ bool assets_of(const std::string& sdmc, bool self, nro::Info& info, std::string&
 {
     const std::string path = nro::sd_path(sdmc);
     const bool read = !path.empty() && nro::read(on_sd(path), info);
-    if (self && (!read || !nro::icon_usable(info.icon))) {
-        std::string icon;
-        if (paths::read_file(BRLS_ASSET("img/app_icon.jpg"), icon)) info.icon.assign(icon.begin(), icon.end());
+    if (self) {
+        // Its .nro's icon, else the app's own (a build without one).
+        info.icon = forwarder_icon::normalize(info.icon);
+        if (info.icon.empty()) {
+            std::string icon;
+            if (paths::read_file(BRLS_ASSET("img/app_icon.jpg"), icon))
+                info.icon = forwarder_icon::normalize(std::vector<uint8_t>(icon.begin(), icon.end()));
+        }
         // Its version, as the HOME menu's data management shows it.
         if (info.version.empty()) {
             if (info.nacp.size() < nro::NACP_SIZE) info.nacp.assign(nro::NACP_SIZE, 0);
@@ -72,8 +77,9 @@ bool assets_of(const std::string& sdmc, bool self, nro::Info& info, std::string&
         error = brls::getStr("playguard/forwarders/nro_unreadable", path.empty() ? sdmc : path);
         return false;
     }
-    // As sphaira does: another size or a PNG made a 256 x 256 JPEG, none
-    // at all a stand-in (the controller of img/emoji).
+    // As sphaira does: another size or a PNG made a 256 x 256 JPEG, and so
+    // is one with EXIF data or progressive coding; none at all, a stand-in
+    // (the controller of img/emoji).
     info.icon = forwarder_icon::normalize(info.icon);
     if (info.icon.empty()) {
         std::string png;

@@ -206,6 +206,12 @@ void fwd_patch_nacp(uint8_t *nacp, const char *name, const char *author, uint64_
             if (author && *author) put_text(entry + NACP_AUTHOR, NACP_LANG_SIZE - NACP_AUTHOR, author);
         }
     }
+    // supported_language_flag: American English alone. The HOME menu reads
+    // the icon and the name of the console's language when the NACP says it
+    // supports it, and there is only icon_AmericanEnglish.dat: a .nro whose
+    // NACP lists French would show no icon on a French console. As NTON
+    // fixed it; with no language listed, the console takes this one anyway.
+    put_u32(nacp + 0x302C, 1);
     nacp[0x3025] = 0;      // startup_user_account: no account picked at start
     nacp[0x3026] = 0;      // user_account_switch_lock
     nacp[0x3027] = 1;      // add_on_content_registration_type: on demand
