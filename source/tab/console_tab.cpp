@@ -1,8 +1,6 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/console_tab.hpp"
 
-#include <yoga/Yoga.h>
-
 #include "action/fw_gate.hpp"
 #include "action/sys_notes_flow.hpp"
 #include "action/sys_update_flow.hpp"
@@ -91,16 +89,9 @@ ConsoleTab::ConsoleTab()
         else ui::info("playguard/tools/compat_ok_info"_i18n);
         return true;
     });
-    if (brls::Box* tiles = this->list.tiles({ { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_hekate", "flag" } }, true)) {
-        // Spaced by the row, not by their margins: hekate's tile comes and goes.
-        for (brls::View* tile : tiles->getChildren()) tile->setMarginRight(0);
-        YGNodeStyleSetGap(tiles->getYGNode(), YGGutterColumn, 12);
+    // What the console runs, as tiles above the rest (first in the XML).
+    if (brls::Box* tiles = this->list.tiles({ { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_hekate", "flag" } }, true))
         tiles->setMarginBottom(20);
-        if (brls::Box* column = tiles->getParent()) {
-            column->removeView(tiles, false);
-            column->addView(tiles, 0);
-        }
-    }
     this->list.apply({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_compat", "check" }, { "cn_storage", "folder" },
                        { "cn_blank", "code" }, { "cn_serial", "tag" }, { "cn_patches", "shield" } });
 }

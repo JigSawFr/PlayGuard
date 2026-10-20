@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Console: under Diagnostics, the network clock (its own screen, the
-     former tab) and the installed games check, then what the console runs
-     (firmware, Atmosphère, hekate: A on each opens its release notes),
+<!-- Console: what it runs (firmware, Atmosphère, hekate: tiles, A on each
+     opens its release notes), under Diagnostics the network clock (its own
+     screen, the former tab) and the installed games check, then
      compatibility, storage, the serial number and the game patches. -->
 
 <brls:Box
@@ -24,14 +24,14 @@
             paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
             paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
 
-            <brls:Header title="@i18n/playguard/tools/section_diag" marginBottom="8"/>
-            <brls:DetailCell id="cn_clock" title="@i18n/playguard/tabs/clock"/>
-            <brls:DetailCell id="cn_games" title="@i18n/playguard/games/open"/>
-            <brls:Header title="@i18n/playguard/tools/section_console" marginTop="24" marginBottom="8"/>
             <!-- A on each: its release notes (activity/sys_notes_activity.hpp). -->
             <brls:DetailCell id="cn_fw" title="@i18n/playguard/tools/firmware"/>
             <brls:DetailCell id="cn_ams" title="@i18n/playguard/tools/atmosphere"/>
             <brls:DetailCell id="cn_hekate" title="hekate"/>
+            <brls:Header title="@i18n/playguard/tools/section_diag" marginBottom="8"/>
+            <brls:DetailCell id="cn_clock" title="@i18n/playguard/tabs/clock"/>
+            <brls:DetailCell id="cn_games" title="@i18n/playguard/games/open"/>
+            <brls:Header title="@i18n/playguard/tools/section_console" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="cn_compat" title="@i18n/playguard/tools/compat"/>
             <brls:DetailCell id="cn_storage" focusable="false" title="@i18n/playguard/tools/storage"/>
             <brls:DetailCell id="cn_blank" focusable="false" title="@i18n/playguard/tools/blank"/>
