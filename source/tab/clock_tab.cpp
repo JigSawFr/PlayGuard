@@ -278,7 +278,7 @@ void ClockTab::enter_custom()
 {
     ui::prompt_text("playguard/clock/custom_header"_i18n, this->server, 253, [this](std::string host) {
         if (!plausible_host(host)) {
-            ui::notify(ui::rc_text(NXM_RC_INVALID_ARGUMENT), ui::Toast::Refused);
+            ui::refuse(NXM_RC_INVALID_ARGUMENT);
             return;
         }
         auto& list = config::get().custom_servers;

@@ -30,8 +30,8 @@ enum class Emphasis
 };
 
 // A dialog's text laid out as the boards do (ui::dialog), left-aligned: its
-// question as a title, a paragraph of "label: value" lines
-// (playguard/common/line) as a table, the notes the app adds (the linked
+// question as a title, a paragraph made with cadran_text::table as a table
+// (its mark says so, not its words), the notes the app adds (the linked
 // phone app and its help before unlinking, the temporary unlock, a game about
 // to be suspended) at the bottom, small, each with its icon; any other
 // paragraph as text.

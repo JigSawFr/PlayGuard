@@ -17,7 +17,7 @@ namespace ui
 bool refuse_read_only()
 {
     if (!app::read_only()) return false;
-    notify(rc_text(NXM_RC_READ_ONLY), Toast::Refused);
+    refuse(NXM_RC_READ_ONLY);
     return true;
 }
 

@@ -246,7 +246,7 @@ void install(const dev_builds::Build& b)
             progress->close();
             // The one reason a user can act on, said in their language.
             if (err == dev_builds::NO_DIGEST) err = "playguard/dev_build/no_digest"_i18n;
-            if (!ok) ui::info(brls::getStr("playguard/dev_build/failed", err));
+            if (!ok) ui::error(brls::getStr("playguard/dev_build/failed", err));
             else installed_now(b);
         });
     });
@@ -351,7 +351,7 @@ void install_now(const dev_builds::Build& b)
     // whenever one is set, whatever Protect PlayGuard with the PIN says
     // (unless it was entered since PlayGuard opened).
     if (!pin_lock::confirm()) {
-        ui::notify(pin_lock::refusal_text());
+        ui::refuse(pin_lock::refusal_text());
         return;
     }
     install(b);
@@ -372,7 +372,7 @@ void go_back()
                 []() {
                     // As for an install: whatever Protect PlayGuard with the PIN says.
                     if (!pin_lock::confirm()) {
-                        ui::notify(pin_lock::refusal_text());
+                        ui::refuse(pin_lock::refusal_text());
                         return;
                     }
                     rollback_flow::go_back_now();
@@ -404,7 +404,7 @@ void find()
                 s_busy = false;
                 DevBuildsActivity::loaded();
                 if (ok) choose(b);
-                else ui::info(brls::getStr("playguard/dev_build/find_failed", err));
+                else ui::error(brls::getStr("playguard/dev_build/find_failed", err));
             });
         });
     });

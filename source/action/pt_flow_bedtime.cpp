@@ -72,7 +72,7 @@ static bool bedtime_editable(const PtState& pt)
 {
     if (ui::refuse_read_only()) return false;
     if (!pt.fw_supported) {
-        ui::notify(ui::rc_text(NXM_RC_FW_UNSUPPORTED), ui::Toast::Refused);
+        ui::refuse(NXM_RC_FW_UNSUPPORTED);
         return false;
     }
     if (!pt_logic::bedtime_layout_ok(pt, ui::today_weekday())) {

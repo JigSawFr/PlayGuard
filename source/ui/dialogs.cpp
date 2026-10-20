@@ -316,7 +316,7 @@ void pick_actions(const std::string& title, const std::vector<Choice>& choices)
     for (const Choice& c : choices) labels.push_back(c.label);
     pick(title, labels, 0, [choices](int i) {
         if (i >= 0 && i < (int)choices.size()) choices[i].run();
-    });
+    }, false);
 }
 
 void prompt_minutes(const std::string& header, uint16_t current, std::function<void(uint16_t)> on_value)
@@ -412,7 +412,7 @@ void quick_settings(std::function<void()> after)
         if (i == 0) pick_language(after);
         else if (i == 1) pick_theme(after);
         else pick_text_size(after);
-    });
+    }, false);
 }
 
 namespace

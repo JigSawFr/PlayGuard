@@ -95,7 +95,7 @@ void ProfilesActivity::actions(const profiles::Profile& p)
             case 2: this->rename(p); break;
             default: this->remove(p); break;
         }
-    });
+    }, false);
 }
 
 void ProfilesActivity::apply(const profiles::Profile& p)
@@ -188,7 +188,7 @@ void ProfilesActivity::ask_name(const std::string& initial, const std::string& e
             // FAT ignores case (and the file name drops accents): this would
             // overwrite another profile.
             ui::confirm(brls::getStr("playguard/play_timer/profile_replace", existing.name),
-                        "playguard/play_timer/profile_replace_confirm"_i18n, [done, name]() { done(name); });
+                        "playguard/play_timer/profile_replace_confirm"_i18n, [done, name]() { done(name); }, nullptr, true);
             return;
         }
         done(name);
@@ -199,7 +199,7 @@ void ProfilesActivity::save_current()
 {
     pctl_play_timer_query(&this->live);
     if (!this->live.valid) {
-        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN), ui::Toast::Refused);
+        ui::refuse(NXM_RC_STATE_UNKNOWN);
         return;
     }
     std::array<uint16_t, 7> days;

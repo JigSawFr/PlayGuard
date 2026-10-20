@@ -77,7 +77,7 @@ void PlayTimerPerDayActivity::bind_cells()
                     [this]() {
                         for (int i = 0; i < 7; i++) this->pending[i] = this->live.day_min[i];
                         this->rerender();
-                    });
+                    }, nullptr, true);
         return true;
     });
     pt_save->registerClickAction([this](brls::View*) {
@@ -120,7 +120,7 @@ void PlayTimerPerDayActivity::bind_buttons()
             return true;
         }
         ui::confirm("playguard/play_timer/perday/discard_body"_i18n, "playguard/play_timer/perday/discard_confirm"_i18n,
-                    []() { brls::sync([]() { brls::Application::popActivity(); }); });
+                    []() { brls::sync([]() { brls::Application::popActivity(); }); }, nullptr, true);
         return true;
     });
 }

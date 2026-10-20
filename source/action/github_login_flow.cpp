@@ -70,17 +70,17 @@ void show_code(const github_auth::DeviceCode& code, std::function<void()> done)
                         ui::notify("playguard/github/signed_in"_i18n);
                         if (done) done();
                     } else {
-                        ui::info(brls::getStr("playguard/github/failed", err));
+                        ui::error(brls::getStr("playguard/github/failed", err));
                     }
                     break;
                 case github_auth::Poll::Denied:
                     ui::info("playguard/github/denied"_i18n);
                     break;
                 case github_auth::Poll::Failed:
-                    ui::info(brls::getStr("playguard/github/failed", err));
+                    ui::error(brls::getStr("playguard/github/failed", err));
                     break;
                 default:   // expired (or still pending at the deadline)
-                    ui::info("playguard/github/expired"_i18n);
+                    ui::error("playguard/github/expired"_i18n);
                     break;
             }
         });
@@ -100,7 +100,7 @@ void sign_in(std::function<void()> done)
         brls::sync([ok, code, err, done]() {
             if (!ok) {
                 s_busy = false;
-                ui::info(brls::getStr("playguard/github/failed", err));
+                ui::error(brls::getStr("playguard/github/failed", err));
                 return;
             }
             show_code(code, done);   // s_busy until it ends
@@ -118,7 +118,7 @@ void open(std::function<void()> done)
         github_auth::forget_token();
         ui::notify("playguard/github/signed_out"_i18n);
         if (done) done();
-    });
+    }, nullptr, true);
 }
 
 }   // namespace github_login_flow

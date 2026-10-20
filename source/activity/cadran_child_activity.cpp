@@ -74,7 +74,7 @@ void CadranChildActivity::onContentAvailable()
     // Back to the parent's screens only with the PIN (none on the console: at once).
     this->getContentView()->registerAction("playguard/cadran/child/back"_i18n, brls::BUTTON_A, [](brls::View*) {
         if (!pin_lock::ask()) {
-            ui::notify(pin_lock::refusal_text());
+            ui::refuse(pin_lock::refusal_text());
             return true;
         }
         brls::Application::popActivity();
@@ -96,7 +96,7 @@ void CadranChildActivity::onContentAvailable()
             return true;
         }
         if (!pin_lock::ask()) {
-            ui::notify(pin_lock::refusal_text());
+            ui::refuse(pin_lock::refusal_text());
             return true;
         }
         pt_flow::add_extra_time(pt, [this]() { this->refresh(); });

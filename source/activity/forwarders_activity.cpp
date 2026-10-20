@@ -5,6 +5,7 @@
 #include "action/game_icons.hpp"
 #include "app.hpp"
 #include "tab/cadran_list.hpp"
+#include "ui/cadran_text.hpp"
 #include "ui/format_text.hpp"
 #include "ui/ui.hpp"
 #include "util/forwarders.hpp"
@@ -198,9 +199,12 @@ void ForwardersActivity::details(const Row& r)
     const std::string nro = r.nro.empty() ? unknown : nro::sd_path(r.nro);
     const std::string made = r.state == State::Elsewhere ? "playguard/forwarders/state_elsewhere"_i18n
                                                          : "playguard/forwarders/made_here"_i18n;
-    ui::info(brls::getStr("playguard/forwarders/details", r.name, r.author.empty() ? unknown : r.author,
-                          r.version.empty() ? unknown : r.version, nro, forwarders::hex_id(r.id),
-                          r.state == State::Elsewhere ? made : made + " · " + state_text(r)));
+    ui::info(r.name + "\n\n" +
+             cadran_text::table({ { "playguard/forwarders/author"_i18n, r.author.empty() ? unknown : r.author },
+                                  { "playguard/tools/version"_i18n, r.version.empty() ? unknown : r.version },
+                                  { ".nro", nro },
+                                  { "playguard/forwarders/program_id"_i18n, forwarders::hex_id(r.id) } }) +
+             "\n\n" + (r.state == State::Elsewhere ? made : made + " · " + state_text(r)));
 }
 
 void ForwardersActivity::rename(const Row& row)

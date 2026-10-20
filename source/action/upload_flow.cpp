@@ -150,7 +150,7 @@ void send_gist(const Parts& parts, const Kind& kind)
                     return;
                 }
                 if (!r.ok) {
-                    ui::info(brls::getStr(kind.report ? "playguard/upload/failed" : "playguard/upload/failed_list",
+                    ui::error(brls::getStr(kind.report ? "playguard/upload/failed" : "playguard/upload/failed_list",
                                           r.error));
                     return;
                 }
@@ -243,11 +243,11 @@ void choose()
         const std::string name = saved[(size_t)i - 1];
         std::string content;
         if (!paths::read_file(paths::reports_dir() + "/" + name, content)) {
-            ui::info(brls::getStr("playguard/upload/failed", "cannot read " + name));
+            ui::error(brls::getStr("playguard/upload/failed", "cannot read " + name));
             return;
         }
         send(parts_of({ { "logs/reports/" + name, std::move(content) } }));
-    });
+    }, false);
 }
 
 }   // namespace upload_flow
