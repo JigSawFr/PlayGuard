@@ -514,6 +514,14 @@ function start() {
     onAbort: (what) => showError(`${t('error')} ${what ?? ''}`),
   };
   window.addEventListener('error', (e) => {
+    // Not the page's: "Script error." and nothing else (a script the page
+    // may not read: iOS' share sheet, an extension), or another site's
+    // script. PlayGuard still runs: noted in the log, not shown as its end.
+    const elsewhere = e.filename && new URL(e.filename, location.href).origin !== location.origin;
+    if (elsewhere || (!e.error && !e.filename && /^Script error\.?$/.test(e.message ?? ''))) {
+      log(`page: ${e.message || 'an error'}${e.filename ? ` (${e.filename})` : ''}, not PlayGuard's`, true);
+      return;
+    }
     if (started) showError(`${t('error')} ${e.message ?? e.error ?? ''}`);
   });
   started = true;
