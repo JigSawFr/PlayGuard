@@ -1,7 +1,9 @@
-<!-- translated from docs/features.md, sha256 d10adcdce8c8 -->
+<!-- translated from docs/features.md, sha256 da24da46023d -->
 # Funzioni
 
 Cosa fa ogni scheda, come PlayGuard scrive senza rischi, e cosa la console conta come tempo di gioco. Torna al [README](../../README.md).
+
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
 
 Le schermate mostrano il tema chiaro (in inglese).
 

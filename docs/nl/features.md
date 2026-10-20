@@ -1,7 +1,9 @@
-<!-- translated from docs/features.md, sha256 d10adcdce8c8 -->
+<!-- translated from docs/features.md, sha256 da24da46023d -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Terug naar de [README](../../README.md).
+
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
 
 De schermafbeeldingen tonen het lichte thema (in het Engels).
 
