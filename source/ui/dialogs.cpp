@@ -5,6 +5,7 @@
 #include "action/upload_flow.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/cadran_modal.hpp"
+#include "ui/cadran_text.hpp"
 #include "ui/text_size.hpp"
 #include "util/config.hpp"
 #include "util/text.hpp"
@@ -131,31 +132,11 @@ void failure(const std::string& text)
     // again, send a report: …" as the boards' error: what failed as the
     // title, why as the text, the code small under it, and the report as a
     // button rather than a path through the menus.
-    std::string rest = text;
-    const std::string next = "\n\n" + "playguard/error/next_step"_i18n;
-    const size_t step = rest.find(next);
-    const bool report = step != std::string::npos;
-    if (report) rest.erase(step, next.size());
-    std::string title, code;
-    const size_t dash = rest.find(" \u2014 ");
-    if (dash != std::string::npos && dash <= 120) {
-        title = rest.substr(0, dash);
-        rest = rest.substr(dash + std::string(" \u2014 ").size());
-    }
-    const size_t hex = rest.find("0x");
-    if (hex != std::string::npos && hex + 10 <= rest.size()) {
-        const std::string number = rest.substr(hex, 10);
-        const std::string with_hint = brls::getStr("playguard/error/code_hint", number, "");
-        const std::string alone = brls::getStr("playguard/error/code", number);
-        if (rest.compare(0, with_hint.size(), with_hint) == 0 && rest.size() > with_hint.size()) {
-            code = alone;
-            rest = rest.substr(with_hint.size());
-            if (rest[0] >= 'a' && rest[0] <= 'z') rest[0] = (char)(rest[0] - 'a' + 'A');
-        } else if (rest == alone) {
-            code = alone;
-            rest.clear();
-        }
-    }
+    const cadran_text::Failure f = cadran_text::failure(text);
+    const std::string& title = f.title;
+    const std::string& rest = f.reason;
+    const std::string& code = f.code;
+    const bool report = f.report;
     std::string body = title.empty() ? rest : rest.empty() ? title : title + "\n\n" + rest;
     auto* dialog = body_dialog(body.empty() ? text : body);
     if (!code.empty()) {

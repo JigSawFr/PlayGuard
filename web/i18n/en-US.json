@@ -116,7 +116,7 @@
   "dev_builds_delay": {"label": "Each GitHub answer delayed by (ms)"},
   "github_login": {"label": "GitHub sign-in", "options": {"": "Unreachable", "ok": "Approved", "denied": "Refused", "offline": "Offline"}},
   "paste": {"label": "\"Send a report online\" answers"},
-  "fail": {"label": "Make these fail", "options": {"unlock": "Unlock", "unverified": "Unlock not confirmed", "relock": "Locking again", "write": "Every setting write", "timer": "Play-timer read", "clock": "Setting the clock", "pin": "PIN read", "pin_entry": "PIN screen cancelled", "bedtime": "Bedtime", "remove": "Removing a game", "launch": "Launch version reset", "verify": "Integrity check"}},
+  "fail": {"label": "Make these fail", "options": {"unlock": "Unlock", "unverified": "Unlock not confirmed", "relock": "Locking again", "write": "Every setting write", "timer": "Play-timer read", "clock": "Setting the clock", "pin": "PIN read", "pin_entry": "PIN screen cancelled", "bedtime": "Bedtime", "remove": "Removing a game", "launch": "Launch version reset", "verify": "Integrity check", "forwarder": "Installing or removing a forwarder"}},
   "still_focus": {"label": "Still focus highlight"},
   "version": {"label": "Version shown in the header"},
   "hold_loading": {"label": "Stop on the loading screen"},

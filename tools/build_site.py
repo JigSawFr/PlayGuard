@@ -314,9 +314,27 @@ def render_doc(page, lang, to_root, assets):
     title = re.sub(r"<[^>]+>", "", title_match.group(1)) if title_match else page
     body = re.sub(r"<h1[^>]*>.*?</h1>", "", body, count=1, flags=re.S)
     body = alerts(rewrite_links(body, source, lang, to_root, assets))
+    # A paragraph for GitHub only (<!-- github-only --> before it): what the
+    # site shows otherwise, such as screenshots in the page's language.
+    body = re.sub(r"<!-- github-only[^>]*-->\s*<p>.*?</p>\s*", "", body, flags=re.S)
     body = re.sub(r"<table>.*?</table>", screenshot_table, body, flags=re.S)
     body = re.sub(r"<table>", '<div class="table"><table>', body).replace("</table>", "</table></div>")
+    body = re.sub(r"<img [^>]*>", lambda m: dark_twin(m.group(0), lang, assets), body)
     return html.unescape(title), body, md.toc_tokens, translated, source
+
+
+def dark_twin(img, lang, assets):
+    """A screenshot of the documentation in the page's theme: its dark one
+    beside it under the dark theme (site.css), as the gallery's, when there
+    is one."""
+    src = re.search(r'src="([^"]*)"', img)
+    name = re.search(r"images/screenshots/[^/]+/(\w+)\.webp$", src.group(1)) if src else None
+    dark = screenshot(lang, name.group(1), dark=True) if name else None
+    if not dark:
+        return img
+    assets.add(dark)
+    twin = img.replace(src.group(1), src.group(1).rsplit("images/", 1)[0] + dark)
+    return img.replace("<img ", '<img class="shot-light" ', 1) + twin.replace("<img ", '<img class="shot-dark" ', 1)
 
 
 def screenshot_table(m):
@@ -671,6 +689,18 @@ def search_entries(page_name, title, body):
     return entries
 
 
+def other_entries(t):
+    """The search index' entries beside the documentation: the home page's
+    questions (a parent types those) and each release of the changelog,
+    their addresses from the language's folder (site.js opens a question or
+    an older release a link leads to)."""
+    entries = [{"p": t("faq_title", escape=False), "h": t(f"faq_{q}_q", escape=False), "u": f"#faq-{q}",
+                "t": t(f"faq_{q}_a", escape=False)} for q in FAQ]
+    entries += [{"p": t("footer_changelog", escape=False), "h": version, "u": f"changelog/#v{version}",
+                 "t": plain(body)[:3000]} for version, _, body in changelog_releases()]
+    return entries
+
+
 def docs_list(t, lang, to_root, current):
     home = f"{to_root}{lang_dir(lang)}"
     out = []
@@ -1009,6 +1039,7 @@ def main():
                 write(out, f"{base}docs/{name}.md", text)
                 markdown.append(text)
             pages += 1
+        index += other_entries(t)
         write(out, f"{base}docs/search.json", json.dumps(index, ensure_ascii=False, separators=(",", ":")))
         write(out, f"{base}changelog/index.html",
               page(t, lang, to_root + "../", "changelog/", t("footer_changelog", escape=False), changelog_body(t, lang)))

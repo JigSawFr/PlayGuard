@@ -1,9 +1,11 @@
-<!-- translated from docs/features.md, sha256 4c0967e4aeae -->
+<!-- translated from docs/features.md, sha256 86931c8e4205 -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Nieuw met PlayGuard? Begin met [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
 
-De schermafbeeldingen tonen het lichte thema (in het Engels).
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
+
+De schermafbeeldingen tonen het donkere thema, de standaard van PlayGuard (in het Engels).
 
 | Vandaag | Console |
 |---|---|
@@ -180,7 +182,8 @@ De console toont "Tijd is om" en onderbreekt daarna de game (geen "doorgaan") of
 
 - alleen de resterende tijd (zolang ouderlijk toezicht ontgrendeld is, de limiet van vandaag, gepauzeerd), wanneer het spelen eindigt (*Eindigt rond 16:40*; niet als het bedtijdalarm eerst komt), de bedtijd en wat er gebeurt als de tijd om is;
 - groot genoeg om vanaf de andere kant van de kamer op de tv te lezen; de tekst houdt zijn grootte, welke tekstgrootte ook is ingesteld;
-- in de laatste 5 minuten wordt het einde oranje en pulseert de ring langzaam;
+- in de laatste 5 minuten wordt het einde oranje en pulseert de ring langzaam; de bedtijd wordt oranje in de laatste 30;
+- Ⓐ en Ⓨ, de knoppen van de ouder, staan klein rechtsboven, zodat de voettekst alleen die van het kind toont;
 - Ⓐ gaat met de pincode terug naar de schermen van de ouder; Ⓨ geeft van daaruit extra tijd, na de pincode (de hoeveelheden van *Extra tijd*, terwijl het kinderscherm blijft staan); Ⓑ sluit PlayGuard af (en vraagt eerst of ouderlijk toezicht weer moet worden ingeschakeld, zoals bij afsluiten).
 
 Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de kop verdwijnt, de knoppen en de kaarten staan iets dichter op elkaar. Het wordt elke 5 s vernieuwd (Ⓧ vernieuwt nu).
@@ -378,6 +381,17 @@ Op een console zonder internet verschijnt *Netwerkklok instellen op de consolekl
 - **Wanneer het controleert:** de laatste controle verschijnt meteen; daarna worden alleen de games waarvan de vermelding is veranderd opnieuw gecontroleerd (alle games één keer per dag, na een firmware-update, of met Ⓧ *Opnieuw controleren*), elk getoond zodra hij is gecontroleerd.
 - Meerdere kapotte games tegelijk wijzen op de SD-kaart of op een game die vanaf de andere opslag (sysMMC / emuMMC) is geïnstalleerd.
 - *Weergave*, boven de secties, toont de games als **lijst** of als **covers** (icoon, naam en probleem; de keuze wordt onthouden), zoals *Alle games* dat doet.
+
+### Forwarders
+
+*Forwarders ›*, een eigen scherm onder *Homebrew* — een homebrew in het HOME-menu, met zijn icoon en zijn naam, van daaruit gestart als een game (een NRO-forwarder, zoals sphaira ze maakt).
+
+- **PlayGuard** met één druk: zijn eigen icoon en naam, waarbij de forwarder de `.nro` start waarvandaan PlayGuard is geopend.
+- **Andere homebrew**: elke `.nro` in de map `/switch` van de SD-kaart (en één map dieper), waarbij eerst om de naam wordt gevraagd (die van de `.nro` zelf, om te houden of te wijzigen). Het icoon is dat van de `.nro`, omgezet naar de JPEG van 256 × 256 die het HOME-menu toont als het een andere grootte heeft of een PNG is (een controller in de plaats ervan als de `.nro` er geen heeft), zoals sphaira dat doet. Een pad met een spatie wordt tussen aanhalingstekens aan de homebrew doorgegeven.
+- **De forwarders in het HOME-menu**, elk met zijn icoon: die PlayGuard heeft gemaakt (Ⓐ: details, naam wijzigen, uitgever wijzigen, opnieuw installeren, verwijderen) en die een andere app heeft gemaakt (details, verwijderen). Een forwarder waarvan de `.nro` weg is, meldt dat; een die in de systeeminstellingen is verwijderd, blijft in de lijst staan tot hij opnieuw wordt geïnstalleerd of vergeten. Opnieuw installeren houdt zijn programma-ID, dus het item in het HOME-menu wordt vervangen, niet verdubbeld; een forwarder die een ander hulpmiddel voor dezelfde `.nro` heeft gemaakt, wordt ook vervangen.
+- **Signaturepatches:** de console start een forwarder alleen met signaturepatches voor fs en loader (sys-patch of sigpatch-bestanden): zonder die patches meldt het scherm dat boven de lijst (*Console › Gamepatches* geeft de details). De `.nro` blijft waar hij is; een forwarder verwijderen raakt hem nooit aan.
+- **Speeltijd:** gestart vanaf zijn icoon draait een homebrew als een game: de speeltijdtimer telt hem mee en schort hem op zoals elke game zodra de tijd om is, en *Activiteit* toont hem. PlayGuard blijft bereikbaar via het homebrew-menu.
+- Elke wijziging vraagt om de pincode als *PlayGuard beveiligen met de pincode* dat doet, wordt in de alleen-lezenmodus geweigerd en staat in de wijzigingsgeschiedenis. Wat PlayGuard heeft gemaakt, wordt per systeem (sysMMC / emuMMC) bewaard, in `forwarders.json`.
 
 ### De regels van de console
 

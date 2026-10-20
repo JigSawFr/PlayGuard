@@ -2,7 +2,9 @@
 
 What each tab does, how PlayGuard writes safely, and what the console counts as play time. New to PlayGuard? Start with [getting started](getting-started.md). Back to the [README](../README.md).
 
-The screenshots show the light theme.
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
+
+The screenshots show the dark theme, PlayGuard's default.
 
 | Today | Console |
 |---|---|
@@ -179,7 +181,8 @@ The console shows "Time's up", then suspends the game (no "continue") or only wa
 
 - only the time left (while parental controls are unlocked, today's limit, on hold), when play ends (*Ends around 16:40*; not when the bedtime alarm comes first), the bedtime and what happens when time is up;
 - sized to be read from across the room, on the TV; its text keeps its size whatever the text size;
-- in the last 5 minutes, the end turns amber and the ring pulses slowly;
+- in the last 5 minutes, the end turns amber and the ring pulses slowly; the bedtime turns amber in its last 30;
+- Ⓐ and Ⓨ, the parent's keys, are said small at the top right, so the footer shows the child's alone;
 - Ⓐ goes back to the parent's screens with the PIN; Ⓨ gives extra time from there, after the PIN (the amounts of *Extra time*, the child screen staying); Ⓑ leaves PlayGuard (asking first to turn parental controls back on, as quitting does).
 
 In larger text, Today still fits on one screen: the line above the headline goes, the buttons and the cards are a little tighter. It refreshes every 5 s (Ⓧ refreshes now).
@@ -377,6 +380,17 @@ On a console without Internet, *Set the network clock to the console clock* appe
 - **When it checks:** the last check shows at once; then only the games whose entry changed are checked again (every game once a day, after a firmware update, or with Ⓧ *Check again*), each shown as soon as it is checked.
 - Several broken games at once points to the SD card or to a game installed from the other storage (sysMMC / emuMMC).
 - *View*, above the sections, shows the games as a **list** or as **covers** (icon, name and problem; the choice is kept), as *All games* does.
+
+### Forwarders
+
+*Forwarders ›*, a screen of its own under *Homebrew* — a homebrew on the HOME menu, with its icon and its name, started from there like a game (an NRO forwarder, as sphaira makes them).
+
+- **PlayGuard** in one press: its own icon and name, the forwarder starting the `.nro` PlayGuard was opened from.
+- **Another homebrew**: any `.nro` of the SD card's `/switch` folder (and one folder down), its name asked first (the `.nro`'s own, to keep or change). Its icon is the `.nro`'s, made the 256 × 256 JPEG the HOME menu draws when it is another size or a PNG (a controller in its place when the `.nro` has none), as sphaira does. A path with a space is handed to the homebrew quoted.
+- **The forwarders on the HOME menu**, each with its icon: those PlayGuard made (Ⓐ: details, rename, change the publisher, install again, delete) and those another app made (details, delete). One whose `.nro` is gone says so; one deleted in System Settings stays listed until it is installed again or forgotten. Installing again keeps its program ID, so the HOME menu's entry is replaced, not doubled; a forwarder another tool made for the same `.nro` is replaced too.
+- **Signature patches:** the console starts a forwarder only with fs and loader signature patches (sys-patch, or sigpatch files): without them, the screen says so above the list (*Console › Game patches* has the details). The `.nro` stays where it is; deleting a forwarder never touches it.
+- **Play time:** started from its icon, a homebrew runs as a game: the play timer counts it and suspends it like any game once the time is up, and Activity lists it. PlayGuard stays at hand from the homebrew menu.
+- Every change asks for the PIN when *Protect PlayGuard with the PIN* does, is refused in read-only mode, and is in the change history. What PlayGuard made is kept per system (sysMMC / emuMMC), in `forwarders.json`.
 
 ### The console's lines
 

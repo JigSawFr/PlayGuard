@@ -1,9 +1,11 @@
-<!-- translated from docs/features.md, sha256 4c0967e4aeae -->
+<!-- translated from docs/features.md, sha256 86931c8e4205 -->
 # Recursos
 
 O que cada aba faz, como o PlayGuard grava as configurações com segurança e o que o console conta como tempo de jogo. Novo no PlayGuard? Comece pelos [primeiros passos](getting-started.md). Volte ao [README](../../README.md).
 
-As capturas de tela mostram o tema claro (em inglês).
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
+
+As capturas de tela mostram o tema escuro, o padrão do PlayGuard (em inglês).
 
 | Hoje | Console |
 |---|---|
@@ -180,7 +182,8 @@ O console mostra "Tempo esgotado" e depois suspende o jogo (sem "continuar") ou 
 
 - só o tempo restante (enquanto o controle parental estiver desbloqueado, o limite de hoje, em pausa), quando o jogo termina (*Termina por volta das 16:40*; não quando o alarme de hora de dormir vem antes), a hora de dormir e o que acontece quando o tempo acaba;
 - feita para ser lida do outro lado da sala, na TV; o texto dela mantém o tamanho seja qual for o tamanho do texto;
-- nos últimos 5 minutos, o fim fica âmbar e o anel pulsa devagar;
+- nos últimos 5 minutos, o fim fica âmbar e o anel pulsa devagar; a hora de dormir fica âmbar nos últimos 30;
+- Ⓐ e Ⓨ, os botões do responsável, aparecem em tamanho pequeno no canto superior direito, para que o rodapé mostre só o da criança;
 - Ⓐ volta às telas do responsável com o PIN; Ⓨ dá tempo extra dali mesmo, depois do PIN (os valores de *Tempo extra*, sem sair da tela da criança); Ⓑ sai do PlayGuard (perguntando antes se deve reativar o controle parental, como ao sair).
 
 Com o texto maior, *Hoje* continua cabendo em uma só tela: a linha acima do título some, e os botões e os cartões ficam um pouco mais apertados. A tela se atualiza a cada 5 s (Ⓧ atualiza agora).
@@ -378,6 +381,17 @@ Em um console sem internet, *Ajustar o relógio de rede pelo relógio do console
 - **Quando ela verifica:** a última verificação aparece na hora; depois, só os jogos cuja entrada mudou são verificados de novo (todos os jogos uma vez por dia, depois de uma atualização do firmware, ou com Ⓧ *Verificar de novo*), cada um mostrado assim que é verificado.
 - Vários jogos com problema ao mesmo tempo apontam para o cartão SD ou para um jogo instalado pelo outro armazenamento (sysMMC / emuMMC).
 - *Visualização*, acima das seções, mostra os jogos como **lista** ou como **capas** (ícone, nome e problema; a escolha é mantida), como em *Todos os jogos*.
+
+### Forwarders
+
+*Forwarders ›*, uma tela própria em *Homebrew* — um homebrew no menu HOME, com o ícone e o nome dele, aberto dali como um jogo (um forwarder de NRO, como os que o sphaira cria).
+
+- **PlayGuard** com um toque só: o próprio ícone e nome, com o forwarder abrindo o `.nro` pelo qual o PlayGuard foi aberto.
+- **Outro homebrew**: qualquer `.nro` da pasta `/switch` do cartão SD (e uma pasta abaixo), com o nome pedido antes (o do próprio `.nro`, para manter ou mudar). O ícone é o do `.nro`, convertido no JPEG de 256 × 256 que o menu HOME mostra quando ele tem outro tamanho ou é um PNG (um controle no lugar dele quando o `.nro` não tem nenhum), como o sphaira faz. Um caminho com espaço é passado ao homebrew entre aspas.
+- **Os forwarders do menu HOME**, cada um com o seu ícone: os que o PlayGuard criou (Ⓐ: detalhes, mudar o nome, mudar a editora, instalar novamente, excluir) e os que outro app criou (detalhes, excluir). Um cujo `.nro` sumiu avisa isso; um excluído nas Configurações do console continua na lista até ser instalado novamente ou esquecido. Instalar novamente mantém o ID do programa, então a entrada do menu HOME é substituída, não duplicada; um forwarder criado por outra ferramenta para o mesmo `.nro` também é substituído.
+- **Patches de assinatura:** o console só abre um forwarder com patches de assinatura do fs e do loader (sys-patch, ou arquivos de sigpatch): sem eles, a tela avisa isso acima da lista (*Console › Patches de jogos* tem os detalhes). O `.nro` fica onde está; excluir um forwarder nunca mexe nele.
+- **Tempo de jogo:** aberto pelo ícone, um homebrew roda como um jogo: o tempo de jogo o conta e o suspende como qualquer jogo quando o tempo acaba, e *Atividade* o lista. O PlayGuard continua à mão pelo menu de homebrew.
+- Cada alteração pede o PIN quando *Proteger o PlayGuard com o PIN* pede, é recusada no modo somente leitura e fica no histórico de alterações. O que o PlayGuard criou é guardado por sistema (sysMMC / emuMMC), em `forwarders.json`.
 
 ### As linhas do console
 

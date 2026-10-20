@@ -6,8 +6,9 @@
 // same state.
 //
 // The page speaks the console's languages (i18n/<language>.json): the
-// browser's, unless the URL says `lang=`; its theme is the browser's (Auto),
-// or the one chosen in its header or set by `theme=`. PlayGuard takes both.
+// browser's, unless the URL says `lang=`; its theme is dark, as PlayGuard on
+// a console, or the one chosen in its header (Auto: the browser's) or set by
+// `theme=`. PlayGuard takes both.
 //
 // While PlayGuard runs, the `live` settings change without a restart
 // (source/sim/web_page.cpp), the buttons under the screen move the console's
@@ -101,12 +102,13 @@ function storedTheme() {
   try { return localStorage.getItem('pg-theme'); } catch { return null; }
 }
 // What the header chose: the URL's theme, else the one kept from an earlier
-// visit, else Auto.
+// visit, else dark (PlayGuard's own default).
+const DEFAULT_THEME = 'dark';
 function chosenTheme() {
   const fromUrl = current.get('theme');
-  if (fromUrl === 'light' || fromUrl === 'dark') return fromUrl;
+  if (THEMES.includes(fromUrl)) return fromUrl;
   const kept = storedTheme();
-  return THEMES.includes(kept) ? kept : 'auto';
+  return THEMES.includes(kept) ? kept : DEFAULT_THEME;
 }
 const effectiveTheme = (choice) => (choice === 'auto' ? (dark.matches ? 'dark' : 'light') : choice);
 
@@ -123,7 +125,7 @@ function showTheme() {
 function chooseTheme(choice) {
   try { localStorage.setItem('pg-theme', choice); } catch { /* storage refused */ }
   const values = new Map(current);
-  if (choice === 'auto') values.delete('theme');
+  if (choice === DEFAULT_THEME) values.delete('theme');
   else values.set('theme', choice);
   if (effectiveTheme(choice) === consoleTheme) {
     // PlayGuard already has it: only the URL changes.
@@ -786,10 +788,19 @@ function stepsLink() {
   return linkFor(values);
 }
 
+// A link handed on: the system's share sheet on a phone (Messages, mail…),
+// else the clipboard. True once copied, false when shared or given up.
+async function handOn(link, label) {
+  if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+    try { await navigator.share({ title: `PlayGuard · ${t('title')}`, url: link }); } catch { /* closed */ }
+    return false;
+  }
+  try { await navigator.clipboard.writeText(link); } catch { prompt(label, link); return false; }
+  return true;
+}
+
 async function copySteps() {
-  const link = stepsLink();
-  try { await navigator.clipboard.writeText(link); } catch { prompt(t('steps_copy'), link); return; }
-  toast(t('steps_copied'));
+  if (await handOn(stepsLink(), t('steps_copy'))) toast(t('steps_copied'));
 }
 
 // A bug report on GitHub, its form filled in: the steps link, the build, the
@@ -897,8 +908,7 @@ function setUpPanel() {
   $('forget').hidden = !keeping;
   $('forget').addEventListener('click', forget);
   $('copy').addEventListener('click', async () => {
-    const link = linkFor(readForm());
-    try { await navigator.clipboard.writeText(link); } catch { prompt(t('copy'), link); return; }
+    if (!await handOn(linkFor(readForm()), t('copy'))) return;
     const button = $('copy');
     button.textContent = t('copied');
     setTimeout(() => { button.textContent = t('copy'); }, 1500);

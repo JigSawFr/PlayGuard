@@ -116,7 +116,7 @@
   "dev_builds_delay": {"label": "Chaque réponse de GitHub retardée de (ms)"},
   "github_login": {"label": "Connexion GitHub", "options": {"": "Injoignable", "ok": "Approuvée", "denied": "Refusée", "offline": "Hors ligne"}},
   "paste": {"label": "Réponse à « Envoyer un rapport en ligne »"},
-  "fail": {"label": "Faire échouer", "options": {"unlock": "Déverrouillage", "unverified": "Déverrouillage non confirmé", "relock": "Reverrouillage", "write": "Toute écriture de réglage", "timer": "Lecture du minuteur", "clock": "Réglage de l'horloge", "pin": "Lecture du NIP", "pin_entry": "Écran du NIP annulé", "bedtime": "Heure du coucher", "remove": "Suppression d'un jeu", "launch": "Réinitialisation de version", "verify": "Vérification d'intégrité"}},
+  "fail": {"label": "Faire échouer", "options": {"unlock": "Déverrouillage", "unverified": "Déverrouillage non confirmé", "relock": "Reverrouillage", "write": "Toute écriture de réglage", "timer": "Lecture du minuteur", "clock": "Réglage de l'horloge", "pin": "Lecture du NIP", "pin_entry": "Écran du NIP annulé", "bedtime": "Heure du coucher", "remove": "Suppression d'un jeu", "launch": "Réinitialisation de version", "verify": "Vérification d'intégrité", "forwarder": "Installation ou retrait d'un forwarder"}},
   "still_focus": {"label": "Surbrillance du focus figée"},
   "version": {"label": "Version affichée dans l'en-tête"},
   "hold_loading": {"label": "Rester sur l'écran de chargement"},

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Console › Forwarders: the homebrew on the HOME menu as games, A on one
+     for its details, a new name or publisher, installing it again or
+     deleting it; below, PlayGuard itself on the HOME menu, or another
+     homebrew. The list is rebuilt by source/activity/forwarders_activity.cpp. -->
+
+<brls:AppletFrame
+    iconInterpolation="linear">
+
+    <ScrollView
+        title="@i18n/playguard/forwarders/open"
+        icon="@res/img/app_icon.jpg"
+        width="auto"
+        height="auto"
+        axis="column"
+        alignItems="stretch"
+        grow="1.0">
+
+        <brls:Box
+            width="auto"
+            height="auto"
+            axis="column"
+            alignItems="stretch"
+            paddingTop="@style/brls/sidebar/padding_top"
+            paddingRight="@style/brls/sidebar/padding_right"
+            paddingBottom="@style/brls/sidebar/padding_bottom"
+            paddingLeft="@style/brls/sidebar/padding_left">
+
+            <brls:Label id="fw_note" text="@i18n/playguard/forwarders/intro" fontSize="20" marginBottom="10" textColor="@theme/brand/note"/>
+            <brls:Label id="fw_patches" text="" fontSize="20" marginBottom="10" visibility="gone" textColor="@theme/brand/warn"/>
+            <brls:Header title="@i18n/playguard/forwarders/section_list" marginTop="14" marginBottom="8"/>
+            <brls:Box id="fw_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
+            <brls:Label id="fw_empty" text="@i18n/playguard/forwarders/none" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:Header title="@i18n/playguard/forwarders/section_add" marginTop="24" marginBottom="8"/>
+            <brls:DetailCell id="fw_self" title="PlayGuard"/>
+            <brls:DetailCell id="fw_other" title="@i18n/playguard/forwarders/other"/>
+            <brls:Label id="fw_game_note" text="@i18n/playguard/forwarders/game_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
+
+        </brls:Box>
+
+    </ScrollView>
+
+</brls:AppletFrame>

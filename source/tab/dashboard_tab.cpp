@@ -86,7 +86,9 @@ DashboardTab::DashboardTab()
         return true;
     });
     this->enable_auto_refresh(5000);
-    this->listener = play_data::listen([this]() { this->refresh(); });
+    // Only while shown: replaced by another tab and waiting to be freed, its
+    // pill would cover the new tab's.
+    this->listener = play_data::listen([this]() { if (this->shown()) this->refresh(); });
     this->build_pills();
 
     // The buttons' icons, before their label.

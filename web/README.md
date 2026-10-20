@@ -31,10 +31,10 @@ them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
   English), unless the URL says `lang=` (`fr`, `de`, `zh-Hans`, …) or the
   header's list picks another. The page is in the 15 languages of the
   console, and PlayGuard always starts in the page's.
-- **The theme** is *Auto* by default: the browser's (light or dark). The
-  header chooses *Light* or *Dark* instead (kept for the next visits, and put
-  in the URL so a copied link shows it), and `theme=light` / `theme=dark` in
-  the URL wins over both. PlayGuard starts with the page's theme. It reads it
+- **The theme** is *Dark* by default, as PlayGuard on a console. The
+  header chooses *Auto* (the browser's) or *Light* instead (kept for the next
+  visits, and put in the URL so a copied link shows it), and `theme=auto` /
+  `theme=light` / `theme=dark` in the URL wins over both. PlayGuard starts with the page's theme. It reads it
   only at start-up: when the system's changes while it runs, under *Auto*, the
   page follows at once and offers to restart PlayGuard with it.
 - **The side panel** shows the variables and changes them; **Apply** reloads
@@ -70,7 +70,8 @@ them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
   in landscape, as on a Switch. On a phone, the tools under it (Screenshot, Steps
   link, Tour…) are behind **Tools**. With the browser's data saver on, the page
   waits for a touch before downloading PlayGuard (a few megabytes), unless its
-  service worker already keeps it. A gamepad works through the browser. On a
+  service worker already keeps it. On a phone, **Copy link** and **Steps link** open the
+  system's share sheet (Messages, mail…) where there is one. A gamepad works through the browser. On a
   touch screen the fields are 16px, so that iOS does not zoom into them, and an
   iPhone's home screen takes `apple-touch-icon.png`.
 - **Screenshot** saves the screen as it is (1280×720); **Record** saves a

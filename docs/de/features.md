@@ -1,9 +1,11 @@
-<!-- translated from docs/features.md, sha256 4c0967e4aeae -->
+<!-- translated from docs/features.md, sha256 86931c8e4205 -->
 # Funktionen
 
 Was jeder Tab macht, wie PlayGuard sicher schreibt, und was die Konsole als Spielzeit zählt. Neu bei PlayGuard? Beginne mit dem [Einstieg](getting-started.md). Zurück zum [README](../../README.md).
 
-Die Screenshots zeigen das helle Design (auf Englisch).
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
+
+Die Screenshots zeigen das dunkle Design, die Voreinstellung von PlayGuard (auf Englisch).
 
 | Heute | Konsole |
 |---|---|
@@ -180,7 +182,8 @@ Die Konsole zeigt „Zeit ist um“ an und unterbricht dann das Spiel (ohne „W
 
 - nur die verbleibende Zeit (solange der Jugendschutz aufgehoben ist, das heutige Limit, ausgesetzt), wann das Spielen endet (*Ende gegen 16:40*; nicht, wenn der Gute-Nacht-Alarm zuerst kommt), die Schlafenszeit und was passiert, wenn die Zeit um ist;
 - so groß, dass er quer durch den Raum lesbar ist, am Fernseher; sein Text behält seine Größe, egal welche Textgröße eingestellt ist;
-- in den letzten 5 Minuten wird das Ende bernsteinfarben und der Ring pulsiert langsam;
+- in den letzten 5 Minuten wird das Ende bernsteinfarben und der Ring pulsiert langsam; die Schlafenszeit wird in ihren letzten 30 bernsteinfarben;
+- Ⓐ und Ⓨ, die Tasten der Eltern, stehen klein oben rechts, sodass die Fußzeile nur die des Kindes zeigt;
 - Ⓐ kehrt mit der Geheimzahl zu den Bildschirmen der Eltern zurück; Ⓨ gibt von dort aus Zusatzzeit, nach der Geheimzahl (die Mengen von *Zusatzzeit*, der Kinderbildschirm bleibt stehen); Ⓑ verlässt PlayGuard (und fragt zuerst, ob der Jugendschutz wieder aktiviert werden soll, wie beim Beenden).
 
 Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile über der Überschrift entfällt, die Schaltflächen und die Karten rücken etwas enger zusammen. Aktualisiert sich alle 5 s (Ⓧ aktualisiert sofort).
@@ -378,6 +381,17 @@ Auf einer Konsole ohne Internet erscheint *Netzwerkuhr auf die Konsolenuhr stell
 - **Wann es prüft:** Die letzte Prüfung wird sofort angezeigt; dann werden nur die Spiele erneut geprüft, deren Eintrag sich geändert hat (jedes Spiel einmal am Tag, nach einem Firmware-Update oder mit Ⓧ *Erneut prüfen*), jedes angezeigt, sobald es geprüft ist.
 - Mehrere defekte Spiele auf einmal deuten auf die SD-Karte oder auf ein Spiel, das aus dem anderen Speicher installiert wurde (sysMMC / emuMMC).
 - *Ansicht*, über den Abschnitten, zeigt die Spiele als **Liste** oder als **Cover** (Symbol, Name und Problem; die Wahl wird gemerkt), wie *Alle Spiele*.
+
+### Forwarder
+
+*Forwarder ›*, ein eigener Bildschirm unter *Homebrew* — ein Homebrew im HOME-Menü, mit seinem Symbol und seinem Namen, von dort wie ein Spiel gestartet (ein NRO-Forwarder, wie sphaira sie erstellt).
+
+- **PlayGuard** mit einem Druck: sein eigenes Symbol und sein Name, der Forwarder startet die `.nro`, von der aus PlayGuard geöffnet wurde.
+- **Ein anderes Homebrew**: jede `.nro` aus dem Ordner `/switch` der SD-Karte (und einen Ordner tiefer), zuerst wird nach ihrem Namen gefragt (dem der `.nro`, zum Behalten oder Ändern). Ihr Symbol ist das der `.nro`, umgewandelt in das JPEG mit 256 × 256, das das HOME-Menü anzeigt, wenn es eine andere Größe hat oder ein PNG ist (ein Controller an seiner Stelle, wenn die `.nro` keines hat), wie es sphaira tut. Ein Pfad mit einem Leerzeichen wird dem Homebrew in Anführungszeichen übergeben.
+- **Die Forwarder im HOME-Menü**, jeder mit seinem Symbol: die, die PlayGuard erstellt hat (Ⓐ: Details, umbenennen, den Herausgeber ändern, neu installieren, löschen), und die einer anderen App (Details, löschen). Einer, dessen `.nro` verschwunden ist, sagt das; einer, der in den Systemeinstellungen gelöscht wurde, bleibt aufgeführt, bis er neu installiert oder vergessen wird. Neu installieren behält seine Programm-ID, sodass der Eintrag im HOME-Menü ersetzt und nicht verdoppelt wird; ein Forwarder, den ein anderes Werkzeug für dieselbe `.nro` erstellt hat, wird ebenfalls ersetzt.
+- **Signatur-Patches:** Die Konsole startet einen Forwarder nur mit Signatur-Patches für fs und loader (sys-patch oder sigpatch-Dateien): Ohne sie sagt der Bildschirm das über der Liste (*Konsole › Spiel-Patches* hat die Details). Die `.nro` bleibt, wo sie ist; das Löschen eines Forwarders berührt sie nie.
+- **Spielzeit:** Von seinem Symbol aus gestartet, läuft ein Homebrew wie ein Spiel: Der Timer zählt es und unterbricht es wie jedes Spiel, sobald die Zeit um ist, und *Aktivität* führt es auf. PlayGuard bleibt über das Homebrew-Menü erreichbar.
+- Jede Änderung fragt nach der Geheimzahl, wenn *PlayGuard mit der Geheimzahl schützen* das vorsieht, wird im schreibgeschützten Modus abgelehnt und steht im Änderungsverlauf. Was PlayGuard erstellt hat, wird pro System (sysMMC / emuMMC) in `forwarders.json` gespeichert.
 
 ### Die Zeilen der Konsole
 
