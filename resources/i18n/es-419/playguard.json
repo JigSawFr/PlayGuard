@@ -47,7 +47,6 @@
         "quit": "Salir",
         "delete": "Eliminar",
         "applied": "Guardado.",
-        "restart_body": "Guardado. El cambio se aplicará la próxima vez que se inicie la aplicación.\n\n¿Salir ahora?",
         "read_only_note": "Modo de solo lectura: por ahora no se puede cambiar nada desde esta aplicación."
     },
     "days": {

@@ -16,6 +16,7 @@
 #include <functional>
 #include <string>
 
+#include "action/pt_logic.hpp"
 #include "view/cadran_digits.hpp"
 #include "view/cadran_icon.hpp"
 
@@ -81,6 +82,7 @@ class CadranWeekView : public brls::Box
 
     void render();
     void nudge(int day, int delta);
+    pt_logic::Held held;   // ↑/↓ held (nudge())
     void set_edit(bool on);
     bool step(int day, int direction);   // left / right while editing
     void tap(int day, float y);          // a touch on a day, at height y

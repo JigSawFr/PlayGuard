@@ -47,7 +47,6 @@
         "quit": "Afsluiten",
         "delete": "Verwijderen",
         "applied": "Opgeslagen.",
-        "restart_body": "Opgeslagen. De wijziging geldt vanaf de volgende keer dat de app start.\n\nNu afsluiten?",
         "read_only_note": "Alleen-lezenmodus: voorlopig kan er niets worden gewijzigd vanuit deze app."
     },
     "days": {

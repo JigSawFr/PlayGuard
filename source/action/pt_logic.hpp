@@ -240,4 +240,20 @@ struct NextStop
 };
 NextStop next_stop(int now, int left, const PtBedtime& bed);
 
+// The child screen counts down to the bedtime instead of the play time left:
+// the bedtime comes first while play counts down (`left` >= 0), or, on a day
+// without a limit (`free`), in its last hour.
+bool counts_to_bed(const NextStop& n, int left, bool free);
+
+// A duration changed with an arrow held (the minutes prompt, the week): 15 min
+// a press, then whole hours once borealis repeats it for most of a second (a
+// repeat every 100 ms, after 250 ms); `now_us`, the press's time. Kept between
+// presses in `held`. Returns the new value, 0 to 24 h.
+struct Held
+{
+    int     presses = 0;   // in a row, signed by their way
+    int64_t last_us = 0;
+};
+int held_step(Held& held, int minutes, int delta, int64_t now_us);
+
 }   // namespace pt_logic

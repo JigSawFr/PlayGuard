@@ -47,7 +47,6 @@
         "quit": "Sair",
         "delete": "Eliminar",
         "applied": "Guardado.",
-        "restart_body": "Guardado. A alteração aplica-se da próxima vez que a aplicação for iniciada.\n\nSair agora?",
         "read_only_note": "Modo só de leitura: por enquanto, nada pode ser alterado a partir desta aplicação."
     },
     "days": {

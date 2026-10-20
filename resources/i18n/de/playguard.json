@@ -47,7 +47,6 @@
         "quit": "Beenden",
         "delete": "Löschen",
         "applied": "Gespeichert.",
-        "restart_body": "Gespeichert. Die Änderung gilt ab dem nächsten Start der App.\n\nJetzt beenden?",
         "read_only_note": "Schreibschutzmodus: Über diese App kann derzeit nichts geändert werden."
     },
     "days": {

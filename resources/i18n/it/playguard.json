@@ -47,7 +47,6 @@
         "quit": "Esci",
         "delete": "Elimina",
         "applied": "Salvato.",
-        "restart_body": "Salvato. La modifica avrà effetto al prossimo avvio dell'applicazione.\n\nVuoi uscire ora?",
         "read_only_note": "Modalità sola lettura: al momento non è possibile modificare nulla da questa applicazione."
     },
     "days": {

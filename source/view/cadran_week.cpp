@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <fmt/format.h>
 
+#include "action/pt_logic.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -245,9 +246,9 @@ void CadranWeekView::nudge(int day, int delta)
 {
     if (!this->valid || !this->on_change) return;
     const uint16_t cur = this->days[day];
-    int v = cur == PT_DAY_NOLIMIT ? (delta > 0 ? 0 : 1440) : (int)cur;
-    v = std::max(0, std::min(1440, v + delta));
-    this->on_change(day, (uint16_t)v);
+    const int v = cur == PT_DAY_NOLIMIT ? (delta > 0 ? 0 : 1440) : (int)cur;
+    // Held: 15 min a press, then whole hours, as the minutes prompt.
+    this->on_change(day, (uint16_t)pt_logic::held_step(this->held, v, delta, brls::getCPUTimeUsec()));
 }
 
 void CadranWeekView::show(const uint16_t days[7], const uint16_t live[7])

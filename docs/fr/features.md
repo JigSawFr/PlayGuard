@@ -61,7 +61,7 @@ L'apparence de PlayGuard s'appelle Cadran : une barre d'icônes pour les onglets
 
 Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'intervention du parent ; Ⓨ ouvre la liste depuis n'importe quel onglet (le badge de la cloche indique *2* quand deux choses sont à faire).
 
-À gauche de la cloche, la langue (son code, *FR*, *EN*…) et le thème (un soleil pour clair, une lune pour sombre, un cercle à moitié plein quand il suit la console), puis la taille du texte (**AA**, son grand A en turquoise quand le texte est agrandi) : un appui ouvre la même liste que dans *Préférences*, et **−** les propose depuis n'importe quel onglet. Un nouveau thème ou une nouvelle langue prend effet tout de suite, chaque écran refait sur le même onglet ; seul un passage vers le chinois ou depuis le chinois, ou le retour à la langue de la console quand PlayGuard a démarré dans une autre, attend le prochain lancement de PlayGuard.
+À gauche de la cloche, la langue (son code, *FR*, *EN*…) et le thème (un soleil pour clair, une lune pour sombre, un cercle à moitié plein quand il suit la console), puis la taille du texte (**AA**, son grand A en turquoise quand le texte est agrandi) : un appui ouvre la même liste que dans *Préférences*, et **−** les propose depuis n'importe quel onglet. Un nouveau thème ou une nouvelle langue prend effet tout de suite, chaque écran refait sur le même onglet avec la sélection sur la même ligne, chinois et sa police compris.
 
 ### À faire
 
@@ -198,7 +198,7 @@ En texte plus grand, *Aujourd'hui* tient toujours sur un écran : la ligne au-de
 
 | Bouton | Pendant la modification |
 |---|---|
-| ↑/↓ | Le changer de 15 min |
+| ↑/↓ | Le changer de 15 min, par heure une fois maintenus |
 | ←/→ | Passer au jour suivant |
 | Ⓛ | Le copier du lundi au vendredi |
 | Ⓡ | Le copier sur le week-end |

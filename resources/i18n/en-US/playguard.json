@@ -47,7 +47,6 @@
         "quit": "Quit",
         "delete": "Delete",
         "applied": "Saved.",
-        "restart_body": "Saved. The change applies the next time the app starts.\n\nQuit now?",
         "read_only_note": "Read-only mode: nothing can be changed from this app for now."
     },
     "days": {

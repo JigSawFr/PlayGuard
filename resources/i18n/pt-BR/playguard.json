@@ -47,7 +47,6 @@
         "quit": "Sair",
         "delete": "Excluir",
         "applied": "Salvo.",
-        "restart_body": "Salvo. A alteração vale a partir da próxima vez que o app for aberto.\n\nSair agora?",
         "read_only_note": "Modo somente leitura: por enquanto, nada pode ser alterado por este app."
     },
     "days": {

@@ -22,7 +22,8 @@ constexpr float FIGURE_SHARE = 0.70f;
 
 PtRing::PtRing()
 {
-    // Looked up once (a theme change needs a restart; each lookup builds a key).
+    // Looked up once (a theme change makes every view again, live_prefs; each
+    // lookup builds a key).
     brls::Theme theme = brls::Application::getTheme();
     this->track = theme["cadran/track"];
     this->teal  = theme["cadran/teal_fill"];

@@ -549,6 +549,68 @@ static void test_next_stop()
     CHECK(n.kind == NextStop::TIME_UP);
 }
 
+// The child screen's ring: to the bedtime when it comes first, or in a free
+// day's last hour; the time left otherwise.
+static void test_counts_to_bed()
+{
+    using pt_logic::NextStop;
+    PtBedtime bed = {};
+    bed.on = true;
+    bed.hour = 21;
+    bed.end_hour = 6;
+    // 20:30, 40 min of play left: the bedtime in 30 min comes first.
+    CHECK(pt_logic::counts_to_bed(pt_logic::next_stop(20 * 60 + 30, 40, bed), 40, false));
+    // 16:00, 40 min left: the time up first.
+    CHECK(!pt_logic::counts_to_bed(pt_logic::next_stop(16 * 60, 40, bed), 40, false));
+    // No limit today: only the bedtime's last hour.
+    CHECK(pt_logic::counts_to_bed(pt_logic::next_stop(20 * 60 + 15, -1, bed), -1, true));
+    CHECK(!pt_logic::counts_to_bed(pt_logic::next_stop(18 * 60, -1, bed), -1, true));
+    // Nothing counting down and no free day (the time is up, unlocked): never.
+    CHECK(!pt_logic::counts_to_bed(pt_logic::next_stop(20 * 60 + 30, -1, bed), -1, false));
+    // Past the bedtime: nothing to count down to.
+    CHECK(!pt_logic::counts_to_bed(pt_logic::next_stop(22 * 60, 40, bed), 40, false));
+}
+
+// An arrow held: 15 min a press, whole hours once it repeats for long enough;
+// a pause or the other way starts again at 15 min.
+static void test_held_step()
+{
+    pt_logic::Held held;
+    int64_t t = 0;
+    int m = pt_logic::held_step(held, 30, 15, t);
+    CHECK(m == 45);
+    // Held: the first repeat after 250 ms starts the count, then every 100 ms.
+    t += 250000;
+    m = pt_logic::held_step(held, m, 15, t);
+    CHECK(m == 60);
+    for (int i = 0; i < 4; i++) m = pt_logic::held_step(held, m, 15, t += 100000);
+    CHECK(m == 120);   // 15 min a press so far
+    m = pt_logic::held_step(held, m, 15, t += 100000);
+    CHECK(m == 180);   // then the next whole hour
+    m = pt_logic::held_step(held, 190, 15, t += 100000);
+    CHECK(m == 240);
+    // Down, held, from 3 h 10: 2 h 55 … then whole hours down.
+    pt_logic::Held down;
+    t = 0;
+    m = pt_logic::held_step(down, 190, -15, t);
+    CHECK(m == 175);
+    t += 250000;
+    for (int i = 0; i < 5; i++) m = pt_logic::held_step(down, m, -15, t += 100000);
+    CHECK(m == 100);
+    m = pt_logic::held_step(down, m, -15, t += 100000);
+    CHECK(m == 60);
+    // The other way, or a pause: 15 min again.
+    CHECK(pt_logic::held_step(down, 60, 15, t += 100000) == 75);
+    CHECK(pt_logic::held_step(down, 75, 15, t += 1000000) == 90);
+    // L/R (5 min) never jump; the limits hold.
+    pt_logic::Held five;
+    t = 0;
+    for (int i = 0; i < 10; i++) m = pt_logic::held_step(five, 100, 5, t += 100000);
+    CHECK(m == 105);
+    CHECK(pt_logic::held_step(five, 1435, 15, 0) == 1440);
+    CHECK(pt_logic::held_step(five, 10, -15, 10000000) == 0);
+}
+
 int main()
 {
     test_gate();
@@ -564,5 +626,7 @@ int main()
     test_extra_today();
     test_pending_relock();
     test_next_stop();
-    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, planned bonus, bedtime, picker, pending-relock and next-stop assertions passed");
+    test_counts_to_bed();
+    test_held_step();
+    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, planned bonus, bedtime, picker, pending-relock, next-stop, child-ring and held-arrow assertions passed");
 }
