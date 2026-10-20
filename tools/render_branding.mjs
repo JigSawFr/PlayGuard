@@ -3,7 +3,9 @@
 //   images/store/banner.png (848x208), images/social-preview.png (1280x640, the
 //   repository's social preview, uploaded by hand in Settings › General),
 //   resources/img/wordmark.png (720x176, transparent: the loading screen's),
-//   images/apple-touch-icon.png (180x180: an iPhone's home screen, the website's and the simulator's).
+//   images/apple-touch-icon.png (180x180: an iPhone's home screen, the website's and the simulator's),
+//   images/icon-192.png and images/icon-512.png (Android's home screen and splash, from both manifests;
+//   maskable as they are: the logo is inside the middle 80 % Android may crop to).
 // Needs Node + Playwright (Chromium); loads the Sora font from Google Fonts.
 //   node tools/render_branding.mjs
 import { chromium } from 'playwright';
@@ -19,6 +21,8 @@ const jobs = [
   { svg: 'branding/social-preview.svg', out: 'images/social-preview.png', w: 1280, h: 640, type: 'png' },
   { svg: 'branding/wordmark.svg',   out: 'resources/img/wordmark.png', w: 720, h: 176, type: 'png', transparent: true },
   { svg: 'branding/icon.svg',       out: 'images/apple-touch-icon.png', w: 180, h: 180, type: 'png' },
+  { svg: 'branding/icon.svg',       out: 'images/icon-192.png',     w: 192, h: 192, type: 'png' },
+  { svg: 'branding/icon.svg',       out: 'images/icon-512.png',     w: 512, h: 512, type: 'png' },
 ];
 
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});

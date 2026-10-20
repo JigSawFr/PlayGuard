@@ -72,8 +72,12 @@ them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
   waits for a touch before downloading PlayGuard (a few megabytes), unless its
   service worker already keeps it. On a phone, **Copy link** and **Steps link** open the
   system's share sheet (Messages, mail…) where there is one. A gamepad works through the browser. On a
-  touch screen the fields are 16px, so that iOS does not zoom into them, and an
-  iPhone's home screen takes `apple-touch-icon.png`.
+  touch screen the fields are 16px, so that iOS does not zoom into them, and
+  a pad button pressed with a finger vibrates briefly (Android). Added to a
+  phone's home screen, it is "PlayGuard" in a window of its own: an iPhone
+  takes `apple-touch-icon.png`, Android `icon-192.png` and `icon-512.png`
+  (maskable: the logo stays inside the part Android may crop), both from
+  `tools/render_branding.mjs`.
 - **Screenshot** saves the screen as it is (1280×720); **Record** saves a
   video of it (WebM) until **Stop**; **Log** shows what PlayGuard logs.
 - **Steps**: from the first screen on, the page notes each button pressed
