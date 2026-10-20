@@ -6,9 +6,11 @@
 // the lines in its own font, which has every language) and a made-up
 // homebrew's icon (source/sim/sim_homebrew_icons.h).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "gate_screen.h"
 #include "gate_text.h"
@@ -65,8 +67,11 @@ int main(int argc, char **argv)
         gate_screen_draw(px, GATE_SCREEN_W, GATE_SCREEN_H, GATE_SCREEN_W, &s);
         char path[512];
         snprintf(path, sizeof(path), "%s/%s.png", out, SHOTS[i].file);
-        FILE *f = fopen(path, "wb");
+        // Owner-writable only (fopen would ask for 0666).
+        const int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        FILE *f = fd >= 0 ? fdopen(fd, "wb") : NULL;
         if (!f) {
+            if (fd >= 0) close(fd);
             fprintf(stderr, "%s cannot be written\n", path);
             return 1;
         }
