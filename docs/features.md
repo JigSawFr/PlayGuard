@@ -2,6 +2,8 @@
 
 What each tab does, how PlayGuard writes safely, and what the console counts as play time. Back to the [README](../README.md).
 
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
+
 The screenshots show the dark theme, PlayGuard's default.
 
 | Today | Console |

@@ -70,7 +70,8 @@ them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
   in landscape, as on a Switch. On a phone, the tools under it (Screenshot, Steps
   link, Tour…) are behind **Tools**. With the browser's data saver on, the page
   waits for a touch before downloading PlayGuard (a few megabytes), unless its
-  service worker already keeps it. A gamepad works through the browser. On a
+  service worker already keeps it. On a phone, **Copy link** and **Steps link** open the
+  system's share sheet (Messages, mail…) where there is one. A gamepad works through the browser. On a
   touch screen the fields are 16px, so that iOS does not zoom into them, and an
   iPhone's home screen takes `apple-touch-icon.png`.
 - **Screenshot** saves the screen as it is (1280×720); **Record** saves a

@@ -1,7 +1,9 @@
-<!-- translated from docs/features.md, sha256 a59745a10580 -->
+<!-- translated from docs/features.md, sha256 356b22ffdf7c -->
 # 功能
 
 每个标签页的作用、PlayGuard 如何安全地写入设置，以及主机把什么算作游戏时间。返回 [README](../../README.md)。
+
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
 
 截图显示的是深色主题，即 PlayGuard 的默认主题。
 

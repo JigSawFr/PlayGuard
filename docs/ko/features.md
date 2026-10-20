@@ -1,7 +1,9 @@
-<!-- translated from docs/features.md, sha256 a59745a10580 -->
+<!-- translated from docs/features.md, sha256 356b22ffdf7c -->
 # 기능
 
 각 탭에서 하는 일, PlayGuard가 안전하게 설정을 쓰는 방법, 본체가 플레이 시간으로 계산하는 것을 설명합니다. 처음으로 돌아가기: [README](../../README.md).
+
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
 
 스크린샷은 PlayGuard의 기본 테마인 어두운 테마로 찍었습니다(영어 화면).
 

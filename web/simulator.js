@@ -788,10 +788,19 @@ function stepsLink() {
   return linkFor(values);
 }
 
+// A link handed on: the system's share sheet on a phone (Messages, mail…),
+// else the clipboard. True once copied, false when shared or given up.
+async function handOn(link, label) {
+  if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+    try { await navigator.share({ title: `PlayGuard · ${t('title')}`, url: link }); } catch { /* closed */ }
+    return false;
+  }
+  try { await navigator.clipboard.writeText(link); } catch { prompt(label, link); return false; }
+  return true;
+}
+
 async function copySteps() {
-  const link = stepsLink();
-  try { await navigator.clipboard.writeText(link); } catch { prompt(t('steps_copy'), link); return; }
-  toast(t('steps_copied'));
+  if (await handOn(stepsLink(), t('steps_copy'))) toast(t('steps_copied'));
 }
 
 // A bug report on GitHub, its form filled in: the steps link, the build, the
@@ -899,8 +908,7 @@ function setUpPanel() {
   $('forget').hidden = !keeping;
   $('forget').addEventListener('click', forget);
   $('copy').addEventListener('click', async () => {
-    const link = linkFor(readForm());
-    try { await navigator.clipboard.writeText(link); } catch { prompt(t('copy'), link); return; }
+    if (!await handOn(linkFor(readForm()), t('copy'))) return;
     const button = $('copy');
     button.textContent = t('copied');
     setTimeout(() => { button.textContent = t('copy'); }, 1500);

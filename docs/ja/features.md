@@ -1,7 +1,9 @@
-<!-- translated from docs/features.md, sha256 a59745a10580 -->
+<!-- translated from docs/features.md, sha256 356b22ffdf7c -->
 # 機能
 
 各タブでできること、PlayGuard が安全に書き込むしくみ、本体がプレイ時間として数えるものについて説明します。トップページは [README](../../README.md)。
+
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
 
 スクリーンショットは PlayGuard の初期設定であるベーシックブラックのテーマです（英語表示）。
 

@@ -1,7 +1,9 @@
-<!-- translated from docs/features.md, sha256 a59745a10580 -->
+<!-- translated from docs/features.md, sha256 356b22ffdf7c -->
 # Funcionalidades
 
 O que faz cada separador, como o PlayGuard escreve em segurança e o que a consola conta como tempo de jogo. Voltar ao [README](../../README.md).
+
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
 
 As capturas de ecrã mostram o tema escuro, o predefinido do PlayGuard (em inglês).
 

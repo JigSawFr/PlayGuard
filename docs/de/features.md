@@ -1,7 +1,9 @@
-<!-- translated from docs/features.md, sha256 a59745a10580 -->
+<!-- translated from docs/features.md, sha256 356b22ffdf7c -->
 # Funktionen
 
 Was jeder Tab macht, wie PlayGuard sicher schreibt, und was die Konsole als Spielzeit zählt. Zurück zum [README](../../README.md).
+
+<!-- github-only: the website shows each language's screenshots, in the page's theme -->
 
 Die Screenshots zeigen das dunkle Design, die Voreinstellung von PlayGuard (auf Englisch).
 

@@ -40,7 +40,8 @@ PlayGuard's website, on GitHub Pages: <https://playguard.link/>.
   built simulator: its files compressed as GitHub Pages sends them; nothing for
   a local build without it).
 - **The documentation's search**: a box above its pages (`site.js`), over
-  `docs/search.json`, each section of the language's pages; every word typed
+  `docs/search.json`, each section of the language's pages, the home page's
+  questions and each release of the changelog; every word typed
   must be in the section, accents or not, and is marked in the results; `/` to search, the
   arrows through them.
 - **The changelog** (`/changelog/`, `CHANGELOG.md` in each language's page,
@@ -83,7 +84,9 @@ pages; no framework, nothing to install but that.
   (`tools/doc_stamp.py docs/<language>/<page>.md`), is the English page it
   matches: once that page changes, the site says under the translation that
   the English one may be more recent, and links to it. GitHub's `> [!WARNING]` blocks become callouts, headings
-  keep GitHub's anchors, links between the docs and to the README become the
+  keep GitHub's anchors, a paragraph after `<!-- github-only -->` is left out
+  (what the site shows otherwise: its screenshots are the page's language's,
+  their dark ones under the dark theme), links between the docs and to the README become the
   site's pages, and any other file of the repository links to GitHub. A
   change to `docs/` is a change to the site.
 - `site/assets/` — `site.css` (the branding's navy, teal and amber, light and
