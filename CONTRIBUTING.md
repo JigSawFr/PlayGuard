@@ -70,7 +70,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_GITHUB_LOGIN=ok` | The GitHub device flow of *GitHub account*: `ok` approves at once, `denied` refuses, `offline` fails |
 | `PLAYGUARD_SIM_HBLOADER=1` | A homebrew loader that can hand an update over to a store |
 | `PLAYGUARD_SIM_NOW=<POSIX seconds>` | A frozen console time (with `TZ=` for its time zone) |
-| `PLAYGUARD_SIM_STILL_FOCUS=1` | Not the console: the focus highlight without its moving glow, and the loading screen's ring still, for screenshots that compare |
+| `PLAYGUARD_SIM_STILL_FOCUS=1` | Not the console: the focus highlight without its moving glow, the loading screen's ring still, and the footer's hints never greyed while a screen or a dialog opens or closes (borealis patch `0014`), for screenshots that compare |
 | `PLAYGUARD_SIM_VERSION=1.0.0:1a2b3c4` | Not the console: the version and commit the header's badge shows (`1.0.0:` for a release), not the build's own, for screenshots that compare |
 | `PLAYGUARD_SIM_HOLD_LOADING=1` | Not the console: the start-up stops on the loading screen, at its last step (the `loading` smoke scenario's screenshot) |
 | `PLAYGUARD_SIM_CADRAN_NOGLOW=1` | Not the console: no background glow (`PLAYGUARD_SIM_CADRAN_NORING=1`: no ring on Today), the two custom draws of the look after the design boards (`source/view/cadran_*.cpp`: the rail's icons, today's ring, the figures in Sora from `resources/font/`, OFL), to weigh them |
