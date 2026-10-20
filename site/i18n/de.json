@@ -134,5 +134,22 @@
  "changelog_english": "Die Versionshinweise sind auf Englisch.",
  "not_found_title": "Seite nicht gefunden",
  "not_found_text": "Diese Seite gibt es nicht oder nicht mehr.",
- "home": "Startseite"
+ "home": "Startseite",
+ "doc_version": "Version",
+ "doc_dev": "In Entwicklung",
+ "doc_dev_note": "Diese Seite beschreibt die Entwicklungsversion: Einiges davon ist noch nicht in {{release}}.",
+ "doc_dev_see_release": "Diese Seite in {{release}}",
+ "doc_dev_whats_new": "Was kommt",
+ "doc_release_note": "Diese Seite beschreibt {{release}}, die neueste Version.",
+ "doc_release_see_dev": "Die Entwicklungsversion",
+ "doc_release_untranslated": "Die Dokumentation von {{release}} gab es nicht in dieser Sprache: hier auf Englisch.",
+ "changelog_dev": "In Entwicklung",
+ "changelog_dev_intro": "Auf main, noch nicht in {{release}}: in der nächsten Version oder schon jetzt in einem Entwicklungs-Build.",
+ "changelog_dev_try": "Einen Entwicklungs-Build installieren",
+ "doc_dev_new_page": "Diese Seite ist neu seit {{release}}: Sie beschreibt die Entwicklungsversion.",
+ "doc_new": "Neu",
+ "since_label": "Deine Version",
+ "since_many": "{n} Version(en) seit deiner, dann was in Entwicklung ist.",
+ "since_latest": "Du hast die neueste Version: Was als Nächstes kommt, steht unter „In Entwicklung“.",
+ "since_unknown": "Keine Version von PlayGuard (1.0.0, 1.2.0…)."
 }

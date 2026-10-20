@@ -270,6 +270,10 @@ pre code { background: none; padding: 0; }
 .doc-group li a[aria-current] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 
 /* Documentation */
+/* The documentation's versions: the latest release's, main's. */
+.doc-versions { display: flex; gap: 4px; padding: 4px; margin-bottom: 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); }
+.doc-versions a { flex: 1; text-align: center; padding: 6px 8px; border-radius: 7px; text-decoration: none; color: var(--muted); font-weight: 600; font-size: 14px; }
+.doc-versions a[aria-current] { background: var(--surface); color: var(--accent); box-shadow: 0 1px 3px rgb(0 0 0 / 0.12); }
 .doc-search { margin-bottom: 14px; }
 .doc-search input { width: 100%; box-sizing: border-box; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line);
                     background: var(--surface); color: var(--text); font: inherit; font-size: 15px; }
@@ -324,10 +328,15 @@ pre.has-copy { position: relative; padding-right: 76px; }
 .copy { position: absolute; top: 8px; right: 8px; padding: 4px 10px; min-height: 32px; border-radius: 8px; border: 1px solid var(--line);
         background: var(--surface); color: var(--text); font: 600 13px system-ui, sans-serif; cursor: pointer; }
 /* The compatibility page's check (site.js). */
-.compat-check { margin: 20px 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.compat-check, .since { margin: 20px 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
 .compat-check p { margin: 0 0 8px; }
-.compat-check label { display: block; font-size: 14px; color: var(--muted); margin-bottom: 4px; }
-.compat-check input { width: 12em; max-width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px;
+.compat-check label, .since label { display: block; font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+.since-result:empty { display: none; }
+.since-result { margin: 10px 0 0 !important; padding: 8px 12px; border-radius: 8px; background: var(--accent-soft); }
+/* A section main has and the latest release had not. */
+.new-badge { display: inline-block; vertical-align: middle; margin-left: 8px; padding: 1px 8px; border-radius: 999px;
+             background: var(--accent-soft); color: var(--accent); font: 600 12px/1.6 system-ui, sans-serif; letter-spacing: 0.02em; }
+.compat-check input, .since input { width: 12em; max-width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px;
                       background: var(--bg); color: var(--text); font: inherit; font-size: 16px; }
 .compat-result:empty { display: none; }
 .compat-result { margin: 10px 0 0 !important; padding: 8px 12px; border-radius: 8px; }

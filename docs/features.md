@@ -464,7 +464,7 @@ On a console without Internet, *Set the network clock to the console clock* appe
 
 - The installed PlayGuard: version (in amber when a newer one is out; Ⓐ opens its **release notes**), launch mode and data folder.
 - **Check for updates** now; *Check for updates every day* at start-up.
-- *Update with*: in PlayGuard, which downloads the release, checks it, replaces itself and restarts, or sphaira, Homebrew App Store or by hand (asked on the first update when none is chosen).
+- *Update with*: in PlayGuard, which downloads the release, checks it, replaces itself and restarts, or sphaira, Homebrew App Store or by hand (asked on the first update when none is chosen). Installed from the Homebrew App Store or sphaira's App Store, the store is the way recommended there, so it keeps track of the version; when its catalogue does not have the new release yet (it publishes one after a review, often a few days later), PlayGuard says so and offers to update in place instead.
 - While a newer release is known, PlayGuard opens on **PlayGuard X.Y.Z is available** (its date and notes): *Update*, or *Later* for 1 day, 1 week or 30 days at most.
 - The release notes are PlayGuard's own, on the same screen as Atmosphère's and hekate's in *Console*: from its GitHub releases, a tab per version (the installed one, the newer ones, the older ones), each with its highlights as cards and every change, kept on the SD card for offline reading (the installed version's are in the app too, for when nothing was fetched yet).
 - After an update, PlayGuard opens once on **What's new in X.Y.Z** (the same highlights, then the QR codes).

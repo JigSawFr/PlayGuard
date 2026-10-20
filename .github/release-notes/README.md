@@ -63,8 +63,11 @@ cell, not above the list itself: no "the full list follows".
 With no file for the version, and the `OPENROUTER_API_KEY` secret set
 (Settings › Secrets and variables › Actions), the release job asks a model
 through [OpenRouter](https://openrouter.ai) for one, from the notes
-release-please wrote, with the files here as examples of the form and the
-emoji of `resources/img/emoji/` as the icons it may use
+release-please wrote and the descriptions of their pull requests (their
+*What this changes, and why* section, for the changes a user notices: a
+commit title says what changed, the description what it is for), with the
+files here as examples of the form and the emoji of `resources/img/emoji/`
+as the icons it may use
 (`tools/summarize_release.py`). The `OPENROUTER_MODEL` variable picks the
 model (default `anthropic/claude-sonnet-5.5`). It is published without being
 read first, so it ends with "Summary written automatically."; the run page

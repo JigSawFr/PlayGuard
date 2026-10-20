@@ -289,6 +289,34 @@
     check.hidden = false;
   }
 
+  // The changelog: what changed since the version typed (a console's), the
+  // releases after it shown and open, the others hidden.
+  const since = document.querySelector('.since');
+  if (since) {
+    const field = since.querySelector('input');
+    const result = since.querySelector('.since-result');
+    const parse = (v) => (/^\s*v?(\d{1,3})(?:\.(\d{1,3}))?(?:\.(\d{1,3}))?\s*$/i.exec(v) || []).slice(1).map((n) => Number(n || 0));
+    const order = ([a, b, c]) => a * 1e6 + b * 1e3 + c;
+    const releases = [...document.querySelectorAll('[data-version]')];
+    const older = document.getElementById('older');
+    const latest = Math.max(...releases.map((r) => order(parse(r.dataset.version))));
+    field.addEventListener('input', () => {
+      const v = parse(field.value);
+      const known = v.length && order(v) <= latest;
+      let after = 0;
+      for (const r of releases) {
+        const newer = !known || order(parse(r.dataset.version)) > order(v);
+        r.hidden = !newer;
+        if (newer && known) after++;
+        if (r.tagName === 'DETAILS') r.open = Boolean(known && newer);
+      }
+      if (older) older.hidden = Boolean(known) && !releases.some((r) => r.tagName === 'DETAILS' && !r.hidden);
+      result.textContent = !field.value.trim() ? '' : !known ? since.dataset.unknown
+        : after ? since.dataset.many.replace('{n}', after) : since.dataset.latest;
+    });
+    since.hidden = false;
+  }
+
   // On a phone, the documentation's pages are a row to scroll: this one in view.
   const current = document.querySelector('.doc-nav [aria-current]');
   const pages = current?.closest('.doc-list');

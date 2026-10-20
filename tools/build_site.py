@@ -36,7 +36,10 @@ import json
 import os
 import re
 import shutil
+import struct
+import subprocess
 import sys
+import tempfile
 from urllib.parse import urlsplit
 
 import markdown
@@ -159,6 +162,122 @@ class Texts:
         return html.escape(value) if escape else value
 
 
+# ---- The documentation's versions ----------------------------------------
+
+class DocSet:
+    """The documentation being built: main's (from the repository), or the
+    latest release's (from the files of its tag, its own screenshots under
+    assets/<tag>/), at `prefix`: docs/ (the site's, the latest release's
+    where it has the page in the language, main's otherwise), docs/dev/,
+    docs/<tag>/."""
+
+    def __init__(self, root, pages, tag=None, prefix=None):
+        self.root, self.pages, self.tag = root, pages, tag
+        self.prefix = prefix or (f"docs/{tag}/" if tag else "docs/")
+
+    def asset(self, path):
+        return f"{self.tag}/{path}" if self.tag else path
+
+
+DEV_DOCS = DocSet(".", [])
+LATEST_TAG = None        # the latest release's tag, when git has it
+DOCSET = DEV_DOCS        # the one being built
+RELEASE_DOCS = None      # the latest release's, when git has its tag
+RELEASE_FILES = {}       # the release's images: their path under assets/ -> their file
+UNRELEASED = []          # [(section, [(scope, subject, pull request)])]: main since the release
+CHANGED = set()          # main's pages that are not the release's: new, or their English changed
+NEW_SECTIONS = {}        # page -> the places (in its sections' order) of main's sections the release had not
+
+
+def git(*args):
+    """git's output in the repository, or None (no git, no history: a tarball,
+    a shallow clone)."""
+    try:
+        return subprocess.run(["git", "-C", ROOT, *args], capture_output=True, text=True, check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def latest_tag():
+    """The latest release's tag reachable from here (v1.2.0), or None."""
+    out = git("describe", "--tags", "--abbrev=0", "--match", "v[0-9]*", "HEAD")
+    return out.strip() if out else None
+
+
+def release_docs(tag, into):
+    """The release's documentation, its Markdown and screenshots out of its
+    tag into `into`: a DocSet of the pages it had, or None."""
+    listing = git("ls-tree", "-r", "--name-only", tag, "docs", "images/screenshots")
+    if not listing:
+        return None
+    root = os.path.realpath(into)
+    for path in listing.splitlines():
+        target = os.path.realpath(os.path.join(root, path))
+        if not target.startswith(root + os.sep):   # nothing outside `into`
+            continue
+        try:
+            data = subprocess.run(["git", "-C", ROOT, "show", f"{tag}:{path}"], capture_output=True, check=True).stdout
+        except (OSError, subprocess.CalledProcessError):
+            return None
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        with open(target, "wb") as f:
+            f.write(data)
+    pages = [(p, s) for p, s in DOCS if os.path.exists(os.path.join(into, "docs", f"{p}.md"))]
+    return DocSet(into, pages, tag) if pages else None
+
+
+# A commit's subject: "feat(console): protect a forwarder with the PIN (#263)".
+COMMIT = re.compile(r"^(\w+)(?:\(([^)]*)\))?!?: (.+?)(?: \(#(\d+)\))?$")
+
+
+def unreleased(tag):
+    """What main has since `tag`, as the next release's notes will say it
+    (release-please-config.json's sections, its hidden types left out)."""
+    out = git("log", "--first-parent", "--format=%s", f"{tag}..HEAD")
+    if not out:
+        return []
+    config = read_json("release-please-config.json")
+    sections = {s["type"]: s["section"] for s in config["changelog-sections"] if not s.get("hidden")}
+    order = list(dict.fromkeys(sections.values()))
+    grouped = {}
+    for subject in out.splitlines():
+        m = COMMIT.match(subject)
+        if not m or m.group(1) not in sections or subject.startswith("chore(main): release"):
+            continue
+        grouped.setdefault(sections[m.group(1)], []).append((m.group(2) or "", m.group(3), m.group(4)))
+    return [(s, grouped[s]) for s in order if s in grouped]
+
+
+def english_headings(root, page_name):
+    """The sections of docs/<page>.md under `root`, in order (their anchors)."""
+    with open(os.path.join(root, "docs", f"{page_name}.md"), encoding="utf-8") as f:
+        return [github_slug(m) for m in re.findall(r"^#{2,3} (.+?)\s*$", f.read(), re.M)]
+
+
+def compare_release():
+    """Which of main's pages are not the release's (new, or their English
+    changed), and in those the release had, which sections are new."""
+    for page_name, _ in DOCS:
+        if page_name not in dict(RELEASE_DOCS.pages):
+            CHANGED.add(page_name)
+            continue
+        with open(os.path.join(DEV_DOCS.root, "docs", f"{page_name}.md"), encoding="utf-8") as f, \
+                open(os.path.join(RELEASE_DOCS.root, "docs", f"{page_name}.md"), encoding="utf-8") as g:
+            if f.read().rstrip() == g.read().rstrip():
+                continue
+        CHANGED.add(page_name)
+        had = set(english_headings(RELEASE_DOCS.root, page_name))
+        NEW_SECTIONS[page_name] = {i for i, h in enumerate(english_headings(DEV_DOCS.root, page_name)) if h not in had}
+
+
+def release_serves(page_name, lang):
+    """Whether the site's page (docs/<page>/) in `lang` is the latest
+    release's: it had the page, written in that language."""
+    if not RELEASE_DOCS or page_name not in dict(RELEASE_DOCS.pages):
+        return False
+    return lang == "en-US" or os.path.exists(os.path.join(RELEASE_DOCS.root, "docs", doc_folder(lang), f"{page_name}.md"))
+
+
 # ---- Markdown ------------------------------------------------------------
 
 def github_slug(value, separator="-"):
@@ -205,16 +324,25 @@ def rewrite_links(body, source, lang, to_root, assets):
         path = os.path.normpath(os.path.join(folder, parts.path)).replace(os.sep, "/")
         anchor = f"#{parts.fragment}" if parts.fragment else ""
         name = os.path.basename(path)
-        if path.startswith("docs/") and name.endswith(".md") and name[:-3] in dict(DOCS):
-            return f"{to_root}{lang_dir(lang)}docs/{name[:-3]}/{anchor}"
+        if path.startswith("docs/") and name.endswith(".md") and name[:-3] in dict(DOCSET.pages):
+            # From main's page on docs/, to a page docs/ shows as the
+            # release's: main's, at docs/dev/ (its sections, its anchors).
+            prefix = DOCSET.prefix
+            if prefix == "docs/" and not DOCSET.tag and release_serves(name[:-3], lang):
+                prefix = "docs/dev/"
+            return f"{to_root}{lang_dir(lang)}{prefix}{name[:-3]}/{anchor}"
         if path in ("README.md", "README.fr.md"):
             return f"{to_root}{lang_dir(lang)}{anchor}"
-        if path.startswith("images/screenshots/") and name[:-4] in LOCALIZED_SHOTS:
+        # The console's in the page's language: main's only (a release keeps its own).
+        if not DOCSET.tag and path.startswith("images/screenshots/") and name[:-4] in LOCALIZED_SHOTS:
             path = screenshot(lang, name[:-4])
         if path.startswith("images/"):
-            assets.add(path)
-            return f"{to_root}assets/{path}"
-        return f"{REPO_URL}/blob/main/{path}{anchor}"
+            asset = DOCSET.asset(path)
+            if DOCSET.tag:
+                RELEASE_FILES[asset] = os.path.join(DOCSET.root, path)
+            assets.add(asset)
+            return f"{to_root}assets/{asset}"
+        return f"{REPO_URL}/blob/{DOCSET.tag or 'main'}/{path}{anchor}"
 
     body = re.sub(r'(href|src)="([^"]+)"', lambda m: f'{m.group(1)}="{html.escape(target(html.unescape(m.group(2))))}"', body)
     return body
@@ -273,7 +401,7 @@ TRANSLATED = re.compile(r"<!-- translated from (docs/[\w-]+\.md), sha256 ([0-9a-
 
 
 def english_hash(source):
-    with open(os.path.join(ROOT, source), "rb") as f:
+    with open(os.path.join(DOCSET.root, source), "rb") as f:
         return hashlib.sha256(f.read()).hexdigest()[:12]
 
 
@@ -290,14 +418,14 @@ def doc_folder(lang):
 def doc_source(page, lang):
     """The Markdown `lang` reads for docs/<page>.md, and whether it is in that language."""
     folder = doc_folder(lang)
-    if lang != "en-US" and os.path.exists(os.path.join(ROOT, "docs", folder, f"{page}.md")):
+    if lang != "en-US" and os.path.exists(os.path.join(DOCSET.root, "docs", folder, f"{page}.md")):
         return f"docs/{folder}/{page}.md", True
     return f"docs/{page}.md", lang == "en-US"
 
 
 def outdated(source):
     """Whether a translation's English page changed since it was translated."""
-    with open(os.path.join(ROOT, source), encoding="utf-8") as f:
+    with open(os.path.join(DOCSET.root, source), encoding="utf-8") as f:
         mark = TRANSLATED.search(f.readline())
     return bool(mark) and english_hash(mark.group(1)) != mark.group(2)
 
@@ -305,7 +433,7 @@ def outdated(source):
 def render_doc(page, lang, to_root, assets):
     """(title, html, toc, translated, source path) of docs/<page>.md for `lang`."""
     source, translated = doc_source(page, lang)
-    with open(os.path.join(ROOT, source), encoding="utf-8") as f:
+    with open(os.path.join(DOCSET.root, source), encoding="utf-8") as f:
         text = back_to_readme(f.read())
     md = markdown.Markdown(extensions=["tables", "fenced_code", "sane_lists", "toc"],
                            extension_configs={"toc": {"slugify": github_slug, "toc_depth": "2-3"}})
@@ -409,6 +537,10 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <meta name="theme-color" content="#111d31" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="{to_root}assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="{to_root}assets/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="PlayGuard">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="application-name" content="PlayGuard">
+  <link rel="manifest" href="{to_root}assets/site.webmanifest">
   <link rel="sitemap" type="application/xml" href="{SITE_URL}sitemap.xml">
   <link rel="alternate" type="application/atom+xml" title="PlayGuard releases" href="{SITE_URL}releases.atom">
 {"".join(json_ld(d) for d in structured)}  <script src="{to_root}assets/theme.js"></script>
@@ -635,7 +767,7 @@ def compat_check(t):
             f' data-invalid="{text("compat_invalid")}">'
             f'<p><strong>{t("compat_check")}</strong></p>'
             f'<label for="compat-fw">{t("compat_field")}</label>'
-            f'<input id="compat-fw" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="{high}">'
+            f'<input id="compat-fw" type="text" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="{high}">'
             f'<p class="compat-result" aria-live="polite"></p></div>\n')
 
 
@@ -675,6 +807,7 @@ def docs_search(t, lang, to_root):
     """The documentation's search box: site.js shows it, and searches docs/search.json."""
     return (f'      <div class="doc-search" hidden><input type="search" placeholder="{t("search_placeholder")}"'
             f' aria-label="{t("search_placeholder")}" aria-controls="doc-results" autocomplete="off"'
+            f' autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search"'
             f' data-index="{to_root}{lang_dir(lang)}docs/search.json" data-none="{t("search_none")}">'
             f'<ol id="doc-results" class="doc-results" hidden></ol></div>')
 
@@ -706,18 +839,69 @@ def docs_list(t, lang, to_root, current):
     out = []
     for section in ("guide", "reference"):
         items = "".join(
-            f'<li><a href="{home}docs/{p}/"{" aria-current=\"page\"" if p == current else ""}>{t(f"doc_{p}")}</a></li>'
-            for p, s in DOCS if s == section)
+            f'<li><a href="{home}{DOCSET.prefix}{p}/"{" aria-current=\"page\"" if p == current else ""}>{t(f"doc_{p}")}</a></li>'
+            for p, s in DOCSET.pages if s == section)
+        if not items:
+            continue
         out.append(f'      <div class="doc-group"><h3>{t(f"docs_{section}")}</h3><ul>{items}</ul></div>')
     return f'      <div class="doc-list">\n' + "\n".join(out) + "\n      </div>"
 
 
+def doc_versions(t, lang, to_root, page_name):
+    """The documentation's two versions, the latest release's and main's, as
+    links to this page in each (to the first page of the release's when it
+    did not have this one): (the switch, the release's link, main's link)."""
+    if not RELEASE_DOCS:
+        return "", "", ""
+    home = f"{to_root}{lang_dir(lang)}"
+    released = [p for p, _ in RELEASE_DOCS.pages]
+    release = f"{home}{RELEASE_DOCS.prefix}{page_name if page_name in released else released[0]}/"
+    main_page = f"{home}docs/dev/{page_name}/"
+    current = ' aria-current="page"'
+    switch = (f'      <nav class="doc-versions" aria-label="{t("doc_version")}">'
+              f'<a href="{release}"{current if DOCSET.tag else ""}>{RELEASE_DOCS.tag}</a>'
+              f'<a href="{main_page}"{"" if DOCSET.tag else current}>{t("doc_dev")}</a></nav>')
+    return switch, release, main_page
+
+
+def release_text(t, key):
+    """A text naming the latest release (its tag, v1.2.0)."""
+    return t(key).replace("{{release}}", LATEST_TAG or "")
+
+
+def section_anchor(page_name, lang, english_id):
+    """The anchor in `lang`'s page of the section English calls `english_id`:
+    the heading at the same place (a translation keeps the page's sections),
+    else the page itself."""
+    def headings(source):
+        with open(os.path.join(DEV_DOCS.root, source), encoding="utf-8") as f:
+            return [github_slug(m) for m in re.findall(r"^#{2,3} (.+?)\s*$", f.read(), re.M)]
+    english = headings(f"docs/{page_name}.md")
+    source, _ = doc_source(page_name, lang)
+    own = headings(source)
+    if english_id not in english or len(own) != len(english):
+        return ""
+    return f"#{own[english.index(english_id)]}"
+
+
 def doc_body(t, lang, to_root, page_name, assets):
     title, body, toc, translated, source = render_doc(page_name, lang, to_root, assets)
-    note = "" if translated else f'      <p class="callout note">{t("doc_untranslated")}</p>\n'
+    versions, release_page, main_page = doc_versions(t, lang, to_root, page_name)
+    untranslated = release_text(t, "doc_release_untranslated") if DOCSET.tag else t("doc_untranslated")
+    note = "" if translated else f'      <p class="callout note">{untranslated}</p>\n'
     if translated and lang != "en-US" and outdated(source):
         note = (f'      <p class="callout note">{t("doc_outdated")} '
-                f'<a href="{to_root}docs/{page_name}/" hreflang="en">{t("doc_english")}</a></p>\n')
+                f'<a href="{to_root}{DOCSET.prefix}{page_name}/" hreflang="en">{t("doc_english")}</a></p>\n')
+    # Which version this page describes, and the other one: main's says so
+    # where it is not the release's (a new page, or one that changed).
+    if DOCSET.tag:
+        note = (f'      <p class="callout tip">{release_text(t, "doc_release_note")} '
+                f'<a href="{main_page}">{t("doc_release_see_dev")}</a></p>\n') + note
+    elif RELEASE_DOCS and page_name in CHANGED:
+        new_page = page_name not in dict(RELEASE_DOCS.pages)
+        other = "" if new_page else f'<a href="{release_page}">{release_text(t, "doc_dev_see_release")}</a> · '
+        note = (f'      <p class="callout note">{release_text(t, "doc_dev_new_page" if new_page else "doc_dev_note")} '
+                f'{other}<a href="{to_root}{lang_dir(lang)}changelog/#dev">{t("doc_dev_whats_new")}</a></p>\n') + note
     # The page's sections (its h2: toc_depth leaves the h1 out).
     toc_items = "".join(f'<li><a href="#{h["id"]}">{h["name"]}</a></li>' for h in toc)
     # The same under the page's first paragraph where there is no room for
@@ -735,16 +919,25 @@ def doc_body(t, lang, to_root, page_name, assets):
         if page_name == "compatibility":
             folded = compat_check(t) + folded
         shown = body[:end] + folded + body[end:]
+    # main's sections the release had not: "New", in any language (a
+    # translation keeps the English page's sections, in the same order).
+    new = set() if DOCSET.tag else NEW_SECTIONS.get(page_name, set())
+    count = len(re.findall(r'<h[23] id="', shown))
+    if new and count != len(english_headings(DEV_DOCS.root, page_name)):
+        new = set()
+    places = iter(range(count))
+    badge = f' <span class="new-badge">{t("doc_new")}</span>'
     # A link to each section, to share it.
     shown = re.sub(r'<(h[23]) id="([^"]+)">(.*?)</h[23]>',
-                   lambda m: f'<{m.group(1)} id="{m.group(2)}">{m.group(3)}<a class="anchor" href="#{m.group(2)}"'
+                   lambda m: f'<{m.group(1)} id="{m.group(2)}">{m.group(3)}{badge if next(places) in new else ""}'
+                             f'<a class="anchor" href="#{m.group(2)}"'
                              f' aria-label="{t("anchor_link")}"></a></{m.group(1)}>', shown, flags=re.S)
     # The pages before and after this one, in the sidebar's order.
-    names = [p for p, _ in DOCS]
+    names = [p for p, _ in DOCSET.pages]
     at = names.index(page_name)
     home = f"{to_root}{lang_dir(lang)}"
     pager = "".join(
-        f'<a class="{cls}" href="{home}docs/{names[i]}/"><span>{t(label)}</span>{t(f"doc_{names[i]}")}</a>'
+        f'<a class="{cls}" href="{home}{DOCSET.prefix}{names[i]}/"><span>{t(label)}</span>{t(f"doc_{names[i]}")}</a>'
         for cls, label, i in (("prev", "previous", at - 1), ("next", "next", at + 1)) if 0 <= i < len(names))
     # The page's description: its first paragraph (the one under the title).
     first = re.search(r"<p>(.*?)</p>", body, re.S)
@@ -753,14 +946,15 @@ def doc_body(t, lang, to_root, page_name, assets):
         description = description[:177].rsplit(" ", 1)[0] + "…"
     return title, translated, description, body, f"""    <div class="doc">
       <nav class="doc-nav" aria-label="{t('docs_title')}">
-{docs_search(t, lang, to_root)}
+{versions}
+{docs_search(t, lang, to_root) if DOCSET.prefix == "docs/" else ""}
 {docs_list(t, lang, to_root, page_name)}
       </nav>
       <article class="prose" data-copy="{t('copy')}" data-copied="{t('copied')}">
         <h1>{html.escape(title)}</h1>
 {note}{shown}
         <nav class="pager" aria-label="{t('docs_title')}">{pager}</nav>
-        <p class="edit"><a href="{REPO_URL}/blob/main/{source}">{t('doc_on_github')}</a></p>
+        <p class="edit"><a href="{REPO_URL}/blob/{DOCSET.tag or 'main'}/{source}">{t('doc_on_github')}</a></p>
       </article>
       {f'<nav class="toc" aria-label="{html.escape(title)}"><ul>{toc_items}</ul></nav>' if toc_items else ''}
     </div>
@@ -924,25 +1118,55 @@ def changelog_releases():
     return releases
 
 
+def unreleased_body(t, lang):
+    """What main has that no release has yet, as its notes will say it, and
+    how to try it now: a development build."""
+    if not UNRELEASED:
+        return ""
+    sections = []
+    for section, entries in UNRELEASED:
+        items = "".join(
+            f'<li>{f"<strong>{html.escape(scope)}:</strong> " if scope else ""}{html.escape(subject)}'
+            f'{f" (<a href=\"{REPO_URL}/pull/{pr}\">#{pr}</a>)" if pr else ""}</li>'
+            for scope, subject, pr in entries)
+        sections.append(f"      <h3>{html.escape(section)}</h3>\n      <ul>{items}</ul>")
+    # main's page: the release's may not have the section yet.
+    folder = "dev/" if release_serves("troubleshooting", lang) else ""
+    try_it = f'../docs/{folder}troubleshooting/{section_anchor("troubleshooting", lang, "installing-another-build")}'
+    return (f'      <h2 id="dev">{t("changelog_dev")}</h2>\n'
+            f'      <p>{release_text(t, "changelog_dev_intro")} <a href="{try_it}">{t("changelog_dev_try")}</a></p>\n'
+            + "\n".join(sections) + "\n")
+
+
 def changelog_body(t, lang):
-    """The changelog page: each release, its date, its notes (in English) and its download."""
+    """The changelog page: what main has since the latest release, then each
+    release, its date, its notes (in English) and its download."""
     note = "" if lang == "en-US" else f'      <p class="callout note">{t("changelog_english")}</p>\n'
-    parts = []
+    parts = [unreleased_body(t, lang)] if UNRELEASED else []
     for i, (version, date, body) in enumerate(changelog_releases()):
         notes = (f'{body.replace("<h4>", "<h3>").replace("</h4>", "</h3>")}\n'
                  f'      <p><a href="{REPO_URL}/releases/tag/v{version}">GitHub · v{version}</a></p>')
         when = f'<small><time datetime="{date}">{date}</time></small>'
         if i == 0:
-            parts.append(f'      <h2 id="v{version}">{version} {when}</h2>\n{notes}')
+            parts.append(f'      <div class="release-latest" data-version="{version}">'
+                         f'<h2 id="v{version}">{version} {when}</h2>\n{notes}</div>')
             continue
         # The older ones folded, each open from a link to it (site.js).
         if i == 1:
             parts.append(f'      <h2 id="older">{t("changelog_older")}</h2>')
-        parts.append(f'      <details class="release" id="v{version}"><summary>{version} {when}</summary>\n{notes}\n      </details>')
+        parts.append(f'      <details class="release" id="v{version}" data-version="{version}"><summary>{version} {when}</summary>\n{notes}\n      </details>')
+    # What changed since the version a console has (site.js): the releases
+    # after it, the others hidden.
+    since = (f'      <div class="since" hidden data-many="{t("since_many")}" data-latest="{t("since_latest")}"'
+             f' data-unknown="{t("since_unknown")}">\n'
+             f'        <label for="since-version">{t("since_label")}</label>\n'
+             f'        <input id="since-version" type="text" inputmode="decimal" autocomplete="off" autocorrect="off"'
+             f' spellcheck="false" enterkeyhint="done" placeholder="1.0.0">\n'
+             f'        <p class="since-result" aria-live="polite"></p>\n      </div>\n')
     return f"""    <section class="section narrow">
       <article class="prose">
         <h1>{t('footer_changelog')}</h1>
-{note}{chr(10).join(parts)}
+{note}{since}{chr(10).join(parts)}
         <p class="edit"><a href="{SITE_URL}releases.atom">Atom</a> · <a href="{REPO_URL}/blob/main/CHANGELOG.md">CHANGELOG.md</a></p>
       </article>
     </section>
@@ -991,6 +1215,22 @@ def sitemap(paths):
             + "\n".join(entries) + "\n</urlset>\n")
 
 
+def redirect_page(to, canonical, html_lang):
+    """A page that sends its visitor on at once (GitHub Pages has no
+    redirects of its own): no script, which the CSP refuses inline."""
+    return (f'<!doctype html>\n<html lang="{html_lang}">\n<meta charset="utf-8">\n'
+            f'<meta name="robots" content="noindex">\n<meta http-equiv="refresh" content="0; url={to}">\n'
+            f'<link rel="canonical" href="{canonical}">\n<title>PlayGuard</title>\n<a href="{to}">{canonical}</a>\n')
+
+
+def favicon_ico(png):
+    """An ICO holding one PNG, which every browser reads: what a domain's
+    root is asked for without the page's <link rel="icon">."""
+    width, height = struct.unpack(">II", png[16:24])   # the PNG's IHDR
+    return (struct.pack("<HHH", 0, 1, 1)
+            + struct.pack("<BBBBHHII", width % 256, height % 256, 0, 0, 1, 32, len(png), 22) + png)
+
+
 def write(out, rel, text):
     path = os.path.join(out, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -1006,11 +1246,23 @@ def main():
     out = sys.argv[1]
     ROOT = sys.argv[2] if len(sys.argv) > 2 else "."
     version = "v" + read_json(".release-please-manifest.json")["."]
+    # The documentation in two versions: main's, and the latest release's
+    # out of its tag, with what main has since (git's history: none in a
+    # tarball or a shallow clone, and the site has main's alone).
+    global DOCSET, DEV_DOCS, RELEASE_DOCS, LATEST_TAG, UNRELEASED
+    DEV_DOCS = DOCSET = DocSet(ROOT, list(DOCS))
+    LATEST_TAG = latest_tag()
+    release_dir = tempfile.mkdtemp(prefix="playguard-release-")
+    if LATEST_TAG:
+        RELEASE_DOCS = release_docs(LATEST_TAG, release_dir)
+        UNRELEASED = unreleased(LATEST_TAG)
+    if RELEASE_DOCS:
+        compare_release()
     os.makedirs(out, exist_ok=True)
     assets = {"images/social-preview.png", "images/video/playguard-tour.mp4"}
     pages = 0
     md_langs = markdown_langs()
-    for lang, folder, _, _ in LANGUAGES:
+    for lang, folder, _, html_lang in LANGUAGES:
         t = Texts(lang, version)
         base = f"{folder}/" if folder else ""
         to_root = "../" if folder else ""
@@ -1023,7 +1275,12 @@ def main():
         descriptions, markdown, index = {}, [], []
         for name, _ in DOCS:
             doc_root = to_root + "../../"
+            # The site's page: the latest release's where it has it in this
+            # language (what a console runs), else main's.
+            source = RELEASE_DOCS if release_serves(name, lang) else DEV_DOCS
+            DOCSET = DocSet(source.root, list(DOCS), source.tag, "docs/")
             title, translated, description, content, body = doc_body(t, lang, doc_root, name, assets)
+            DOCSET = DEV_DOCS
             index += search_entries(name, t(f"doc_{name}", escape=False), content)
             descriptions[name] = description
             md_lang = markdown_lang(name, lang)
@@ -1039,11 +1296,31 @@ def main():
                 write(out, f"{base}docs/{name}.md", text)
                 markdown.append(text)
             pages += 1
+        # docs/ itself (an address typed or cut short by hand): the guide's
+        # first page, not the page not found.
+        first = DOCS[0][0]
+        write(out, f"{base}docs/index.html", redirect_page(f"{first}/", f"{SITE_URL}{base}docs/{first}/", html_lang))
         index += other_entries(t)
         write(out, f"{base}docs/search.json", json.dumps(index, ensure_ascii=False, separators=(",", ":")))
         write(out, f"{base}changelog/index.html",
               page(t, lang, to_root + "../", "changelog/", t("footer_changelog", escape=False), changelog_body(t, lang)))
         pages += 1
+        # Each version at its own address, the one docs/ does not show beside
+        # it: main's (docs/dev/) and the latest release's (docs/<tag>/, its
+        # pages in its own languages, English otherwise, said so). Not
+        # indexed: docs/ is the site's.
+        if RELEASE_DOCS:
+            for docset, label in ((DocSet(DEV_DOCS.root, list(DOCS), None, "docs/dev/"), t("doc_dev", escape=False)),
+                                  (RELEASE_DOCS, RELEASE_DOCS.tag)):
+                DOCSET = docset
+                for name, _ in docset.pages:
+                    title, translated, description, _, body = doc_body(t, lang, to_root + "../../../", name, assets)
+                    shown = title if translated else t(f"doc_{name}", escape=False)
+                    write(out, f"{base}{docset.prefix}{name}/index.html",
+                          page(t, lang, to_root + "../../../", f"{docset.prefix}{name}/", f"{shown} · {label}",
+                               body, description=html.escape(description), indexed=False))
+                    pages += 1
+            DOCSET = DEV_DOCS
         if lang in md_langs:
             write(out, f"{base}llms.txt", llms_txt(t, version, descriptions))
             write(out, f"{base}llms-full.txt", llms_txt(t, version, descriptions, markdown))
@@ -1076,14 +1353,41 @@ def main():
     for name in ("icon.svg", "mark.svg"):
         shutil.copy(os.path.join(ROOT, "branding", name), os.path.join(out, "assets", name))
     # An iPhone's home screen takes a PNG, not the SVG (tools/render_branding.mjs).
-    shutil.copy(os.path.join(ROOT, "images", "apple-touch-icon.png"), os.path.join(out, "assets", "apple-touch-icon.png"))
+    touch = os.path.join(ROOT, "images", "apple-touch-icon.png")
+    shutil.copy(touch, os.path.join(out, "assets", "apple-touch-icon.png"))
+    # Added to a phone's home screen: "PlayGuard", not the page's whole title
+    # (Android reads the manifest, iOS apple-mobile-web-app-title). The site
+    # opens in the browser, at its root (the visitor's language from there).
+    write(out, "assets/site.webmanifest", json.dumps({
+        "name": "PlayGuard", "short_name": "PlayGuard", "start_url": "../", "scope": "../", "display": "browser",
+        "background_color": "#ffffff", "theme_color": "#0a705f",
+        "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml"},
+                  {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+                  {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+                  {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}],
+        # A long press on the icon (Android): the simulator, in the phone's
+        # language (one manifest for every language: a page of the
+        # documentation would be the English one).
+        "shortcuts": [{"name": "Simulator", "url": "../simulator/",
+                       "icons": [{"src": "icon-192.png", "sizes": "192x192", "type": "image/png"}]}]}, indent=1) + "\n")
+    for name in ("icon-192.png", "icon-512.png"):
+        shutil.copy(os.path.join(ROOT, "images", name), os.path.join(out, "assets", name))
+    # At a domain's root (as robots.txt), what browsers, bookmarks, iOS and
+    # link previews ask for there without reading the page.
+    if urlsplit(SITE_URL).path == "/":
+        shutil.copy(touch, os.path.join(out, "apple-touch-icon.png"))
+        with open(touch, "rb") as f, open(os.path.join(out, "favicon.ico"), "wb") as ico:
+            ico.write(favicon_ico(f.read()))
     for path in sorted(assets):
         os.makedirs(os.path.dirname(os.path.join(out, "assets", path)), exist_ok=True)
-        if path.startswith("images/screenshots/") and path.count("/") == 3:
+        if path in RELEASE_FILES:
+            source = RELEASE_FILES[path]
+        elif path.startswith("images/screenshots/") and path.count("/") == 3:
             source = os.path.join(SCREENSHOT_DIR, *path.split("/")[2:])
         else:
             source = os.path.join(ROOT, path)
         shutil.copy(source, os.path.join(out, "assets", path))
+    shutil.rmtree(release_dir, ignore_errors=True)
     open(os.path.join(out, ".nojekyll"), "w").close()
     print(f"site: {pages} pages in {len(LANGUAGES)} languages, {len(assets)} images and videos, in {out}")
     return 0

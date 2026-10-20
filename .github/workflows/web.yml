@@ -59,6 +59,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: true
+          # The history and the tags, without old files' contents (fetched
+          # when read): the site's documentation of the latest release, out
+          # of its tag, and what main has since (tools/build_site.py).
+          fetch-depth: 0
+          filter: blob:none
       # What this build makes, and what it takes from main's last one (its
       # `site` artifact): a few minutes for most changes, the long work only
       # where it is needed.
@@ -86,7 +91,9 @@ jobs:
           read -r run sha < <(gh api "repos/$REPO/actions/workflows/web.yml/runs?branch=main&status=success&per_page=20" \
             --jq "([.workflow_runs[] | select((.event == \"push\" or .event == \"workflow_dispatch\") and .head_repository.full_name == \"$REPO\")][0] // empty) | \"\(.id) \(.head_sha)\"" 2>/dev/null || true)
           if [ -n "$run" ] && gh run download "$run" -R "$REPO" -n site -D main-site 2>/dev/null \
-              && git fetch -q --depth=1 origin "$sha" 2>/dev/null; then
+              && { git cat-file -e "$sha^{commit}" 2>/dev/null || git fetch -q origin "$sha" 2>/dev/null; }; then
+            # (The whole history is here: --depth would cut it at that commit,
+            # and the site would no longer reach the latest release's tag.)
             # What changed since the commit it was built from.
             changed=$(git diff --name-only "$sha" HEAD)
             echo "Main's site: run $run, commit ${sha::7}; $(wc -l <<< "$changed") files changed since."

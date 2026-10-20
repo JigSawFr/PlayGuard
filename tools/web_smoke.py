@@ -23,7 +23,9 @@ when what the page does while PlayGuard runs does not work:
   reload;
 - on a phone (an iPhone, touch): the pad under the screen in portrait, on
   either side of it in landscape, everything on the screen, no field iOS
-  zooms into (under 16px);
+  zooms into (under 16px); a "Script error." not of the page's (iOS'
+  share sheet) does not stop it; Full screen: only the screen and the pad,
+  and back;
 - the service worker (web/sw.js), served without the headers as GitHub Pages
   does: it makes the page cross-origin isolated, keeps PlayGuard's files, and
   the simulator starts offline.
@@ -434,10 +436,24 @@ def phone(new_page):
         problems.append("landscape: the pad is not on either side of the screen")
     if max(m["screen"][3], m["dpad"][3], m["face"][3]) > 402:
         problems.append("landscape: the screen or the pad below the screen's bottom")
+    # What iOS' share sheet (Add to Home Screen) can leave the page: an error
+    # of a script it may not read. Not PlayGuard's: it goes on.
+    page.evaluate("window.dispatchEvent(new ErrorEvent('error', {message: 'Script error.'}))")
+    if page.evaluate("document.body.dataset.playguard") == "error":
+        problems.append("a 'Script error.' not of the page's stopped PlayGuard")
+    # Full screen (Android): only the screen and the pad, then back.
+    page.tap("#fullscreen")
+    page.wait_for_function("document.documentElement.classList.contains('game')", timeout=5000)
+    if page.is_visible(".top") or page.is_visible(".controls"):
+        problems.append("full screen: the header or the tools still shown")
+    page.tap("#fs-exit")
+    page.wait_for_function("!document.documentElement.classList.contains('game')", timeout=5000)
+    if not page.is_visible(".top"):
+        problems.append("full screen left: no header")
     for p in problems:
         fail(f"phone: {p}")
     if not problems:
-        print("ok   phone: portrait and landscape")
+        print("ok   phone: portrait, landscape and full screen")
 
 
 # The service worker, as on GitHub Pages: no headers from the server.
