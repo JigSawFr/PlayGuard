@@ -1699,7 +1699,6 @@
             "version": "Versie {}"
         },
         "child": {
-            "header": "Kinderscherm · pincode om terug te gaan",
             "title": "Vandaag heb je nog",
             "bed": "Naar bed om",
             "stops": "De console stopt vanzelf als de tijd om is",

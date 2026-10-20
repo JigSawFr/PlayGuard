@@ -209,6 +209,8 @@ activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summar
 # borealis' getStr and fmt header-only (the catalogs read by the test).
 format_text_SRC   := source/ui/format_text.cpp tests/format_text/test.cpp
 format_text_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DPLAYGUARD_HOST_I18N
+cadran_text_SRC   := source/ui/cadran_text.cpp tests/cadran_text/test.cpp
+cadran_text_FLAGS := $(format_text_FLAGS)
 game_check_text_SRC   := source/action/game_check_text.cpp tests/game_check_text/test.cpp
 game_check_text_CSRC   := source/core/gamecheck_rules.c
 game_check_text_CFLAGS := -std=gnu11 -Isource/core

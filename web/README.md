@@ -31,10 +31,10 @@ them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
   English), unless the URL says `lang=` (`fr`, `de`, `zh-Hans`, …) or the
   header's list picks another. The page is in the 15 languages of the
   console, and PlayGuard always starts in the page's.
-- **The theme** is *Auto* by default: the browser's (light or dark). The
-  header chooses *Light* or *Dark* instead (kept for the next visits, and put
-  in the URL so a copied link shows it), and `theme=light` / `theme=dark` in
-  the URL wins over both. PlayGuard starts with the page's theme. It reads it
+- **The theme** is *Dark* by default, as PlayGuard on a console. The
+  header chooses *Auto* (the browser's) or *Light* instead (kept for the next
+  visits, and put in the URL so a copied link shows it), and `theme=auto` /
+  `theme=light` / `theme=dark` in the URL wins over both. PlayGuard starts with the page's theme. It reads it
   only at start-up: when the system's changes while it runs, under *Auto*, the
   page follows at once and offers to restart PlayGuard with it.
 - **The side panel** shows the variables and changes them; **Apply** reloads

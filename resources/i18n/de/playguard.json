@@ -1699,7 +1699,6 @@
             "version": "Version {}"
         },
         "child": {
-            "header": "Kinderbildschirm · PIN zum Zurückkehren",
             "title": "Heute bleibt dir noch",
             "bed": "Ins Bett um",
             "stops": "Die Konsole stoppt von selbst, wenn die Zeit um ist",

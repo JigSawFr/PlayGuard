@@ -1699,7 +1699,6 @@
             "version": "Version {}"
         },
         "child": {
-            "header": "Child screen · PIN to come back",
             "title": "Time left today",
             "bed": "Bed at",
             "stops": "The console stops by itself when time is up",
