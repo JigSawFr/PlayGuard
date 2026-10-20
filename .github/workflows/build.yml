@@ -582,7 +582,7 @@ jobs:
           ref: ${{ inputs.tag || github.ref }}
           submodules: true
       - name: ccache
-        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends ccache
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends ccache ca-certificates
       - name: Compiler messages as annotations
         run: echo "::add-matcher::.github/problem-matchers/gcc.json"
       # Not for a release: its two builds compile everything, so the
@@ -693,6 +693,24 @@ jobs:
           cat build-info.txt
           unzip -l playguard.zip
           unzip -l playguard-rescue.zip
+      # The Homebrew App Store listing (packaging/hb-appstore/pkgbuild.json),
+      # written for this build's version and checked against its zip: every
+      # file installed or left out on purpose, the binary among them. Then
+      # built by the store's own tool, spinarak (the commit switch-hbas-repo
+      # runs, pinned by its checksum), from that zip: a listing the store
+      # would refuse fails here, not after it was submitted.
+      - name: Homebrew App Store listing
+        env:
+          SPINARAK_COMMIT: 5c2497261d42dbac0ba64ee298a1ee6d1d7c0d0b
+          SPINARAK_SHA256: 361b9a848ffb1debce4fad9bed91078372e363090cd3fc44bb8028c9019a4ca4
+        run: |
+          python3 -c 'import sys, urllib.request; urllib.request.urlretrieve(sys.argv[1], sys.argv[2])' \
+            "https://raw.githubusercontent.com/fortheusers/spinarak/$SPINARAK_COMMIT/spinarak.py" build/spinarak.py
+          echo "$SPINARAK_SHA256  build/spinarak.py" | sha256sum -c -
+          if out=$(python3 tools/hbas_package.py build/hbas --zip playguard.zip --spinarak build/spinarak.py 2>&1); then mark=✅; else mark=❌; fi
+          printf '%s\n' "$out"
+          echo "$mark **Homebrew App Store listing** — $(printf '%s\n' "$out" | tail -n 1)" >> "$GITHUB_STEP_SUMMARY"
+          [ "$mark" = ✅ ]
       # One artifact per component, named after the build (playguard-<label>-…):
       # -nro is what Developer › Install another build downloads on the
       # console (source/util/dev_builds.hpp: the raw .nro and the small text
@@ -726,6 +744,15 @@ jobs:
           path: playguard.zip
           compression-level: 0   # a zip already
           if-no-files-found: error
+      # The folder a Homebrew App Store submission adds to switch-hbas-repo's
+      # packages/ (packaging/hb-appstore/README.md).
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        id: hbas
+        with:
+          name: playguard-${{ env.LABEL }}-hbas
+          path: build/hbas/
+          retention-days: ${{ inputs.tag && 90 || 14 }}
+          if-no-files-found: error
       - name: Linker map (what makes the .nro big)
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         id: map
@@ -746,11 +773,13 @@ jobs:
           NRO_URL: ${{ steps.nro.outputs.artifact-url }}
           RESCUE_URL: ${{ steps.rescue.outputs.artifact-url }}
           SDCARD_URL: ${{ steps.sdcard.outputs.artifact-url }}
+          HBAS_URL: ${{ steps.hbas.outputs.artifact-url }}
           MAP_URL: ${{ steps.map.outputs.artifact-url }}
         run: |
           set -- --artifact "playguard-$LABEL-nro|$NRO_URL|playguard.nro · compat.json · build-info.txt · SHA256SUMS.txt — what the console's *Install another build* downloads" \
                  --artifact "playguard-$LABEL-rescue|$RESCUE_URL|playguard-rescue.zip (unzip at the SD-card root) · playguard-rescue.nsp"
           if [ -n "$SDCARD_URL" ]; then set -- "$@" --artifact "playguard-$LABEL-sdcard|$SDCARD_URL|playguard.zip (the store package: unzip at the SD-card root)"; fi
+          set -- "$@" --artifact "playguard-$LABEL-hbas|$HBAS_URL|PlayGuard/ (the Homebrew App Store listing: pkgbuild.json and its images)"
           set -- "$@" --artifact "playguard-$LABEL-linker-map|$MAP_URL|borealis.map (14 days)"
           python3 tools/ci_summary.py build --version "${{ needs.meta.outputs.version }}" --ref "${{ needs.meta.outputs.ref }}" \
             --sha "${{ needs.meta.outputs.sha }}" --ccache ccache-stats.txt --gcc "$(/opt/devkitpro/devkitA64/bin/aarch64-none-elf-gcc -dumpfullversion)" \
