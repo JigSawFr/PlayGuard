@@ -5,6 +5,7 @@
 //   sim_time.c       core/time_ops.h
 //   sim_playstats.c  core/playstats.h
 //   sim_gamecheck.c  core/gamecheck.h
+//   sim_forwarder.cpp core/forwarder.h
 //   sim_games.c      the made-up games the last two share
 // Never compiled for the Switch.
 //
@@ -49,9 +50,24 @@ typedef struct {
     u32 removed_count, launch_reset_count, bump_count, reserved;
 } SimFixes;
 
+// The NRO forwarders on the simulated HOME menu (sim_forwarder.cpp): one
+// another tool made, then those PlayGuard installs. A full list takes no more.
 typedef struct {
-    SimConsole console;
-    SimFixes   fixes;
+    u64  id;
+    char name[0x100];
+    char author[0x100];
+    char version[0x10];
+} SimForwarder;
+
+typedef struct {
+    SimForwarder list[8];
+    u32 count, reserved;
+} SimForwarders;
+
+typedef struct {
+    SimConsole    console;
+    SimFixes      fixes;
+    SimForwarders forwarders;
 } SimState;
 
 // The state as it is now (a copy: read it without the lock).
@@ -60,6 +76,9 @@ SimState sim_state(void);
 // anything else in between. sim_end() saves it (PLAYGUARD_SIM_KEEP).
 SimState *sim_begin(void);
 void sim_end(void);
+
+// The forwarders a first run starts with (sim_forwarder.cpp).
+void sim_forwarder_defaults(SimForwarders *f);
 
 // Sets the console up from the variables (or the kept file) on first use;
 // sim_state() and sim_begin() call it, which is all most callers need.

@@ -116,7 +116,7 @@
   "dev_builds_delay": {"label": "Elk antwoord van GitHub vertraagd met (ms)"},
   "github_login": {"label": "Aanmelden bij GitHub", "options": {"": "Onbereikbaar", "ok": "Goedgekeurd", "denied": "Geweigerd", "offline": "Offline"}},
   "paste": {"label": "Antwoord op 'Een rapport online versturen'"},
-  "fail": {"label": "Laten mislukken", "options": {"unlock": "Ontgrendelen", "unverified": "Ontgrendelen niet bevestigd", "relock": "Opnieuw vergrendelen", "write": "Elke instelling wegschrijven", "timer": "Timer lezen", "clock": "Klok instellen", "pin": "Pincode lezen", "pin_entry": "Pincodescherm geannuleerd", "bedtime": "Bedtijd", "remove": "Een game verwijderen", "launch": "Startversie herstellen", "verify": "Integriteitscontrole"}},
+  "fail": {"label": "Laten mislukken", "options": {"unlock": "Ontgrendelen", "unverified": "Ontgrendelen niet bevestigd", "relock": "Opnieuw vergrendelen", "write": "Elke instelling wegschrijven", "timer": "Timer lezen", "clock": "Klok instellen", "pin": "Pincode lezen", "pin_entry": "Pincodescherm geannuleerd", "bedtime": "Bedtijd", "remove": "Een game verwijderen", "launch": "Startversie herstellen", "verify": "Integriteitscontrole", "forwarder": "Een forwarder installeren of verwijderen"}},
   "still_focus": {"label": "Focusmarkering zonder beweging"},
   "version": {"label": "Versie in de koptekst"},
   "hold_loading": {"label": "Op het laadscherm blijven"},

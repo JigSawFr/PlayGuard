@@ -116,7 +116,7 @@
   "dev_builds_delay": {"label": "Ogni risposta di GitHub ritardata di (ms)"},
   "github_login": {"label": "Accesso a GitHub", "options": {"": "Irraggiungibile", "ok": "Approvato", "denied": "Rifiutato", "offline": "Offline"}},
   "paste": {"label": "Risposta a «Invia un rapporto online»"},
-  "fail": {"label": "Far fallire", "options": {"unlock": "Sblocco", "unverified": "Sblocco non confermato", "relock": "Nuovo blocco", "write": "Ogni scrittura di impostazioni", "timer": "Lettura del timer", "clock": "Impostazione dell'orologio", "pin": "Lettura del PIN", "pin_entry": "Schermata del PIN annullata", "bedtime": "Ora di andare a letto", "remove": "Rimozione di un gioco", "launch": "Ripristino della versione di avvio", "verify": "Verifica dell'integrità"}},
+  "fail": {"label": "Far fallire", "options": {"unlock": "Sblocco", "unverified": "Sblocco non confermato", "relock": "Nuovo blocco", "write": "Ogni scrittura di impostazioni", "timer": "Lettura del timer", "clock": "Impostazione dell'orologio", "pin": "Lettura del PIN", "pin_entry": "Schermata del PIN annullata", "bedtime": "Ora di andare a letto", "remove": "Rimozione di un gioco", "launch": "Ripristino della versione di avvio", "verify": "Verifica dell'integrità", "forwarder": "Installazione o rimozione di un forwarder"}},
   "still_focus": {"label": "Evidenziazione del focus ferma"},
   "version": {"label": "Versione mostrata nell'intestazione"},
   "hold_loading": {"label": "Restare sulla schermata di caricamento"},
