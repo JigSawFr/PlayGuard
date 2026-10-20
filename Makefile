@@ -185,8 +185,8 @@ config_SRC   := source/util/paths.cpp source/util/date.cpp source/util/config.cp
 profiles_SRC   := source/util/paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
 forwarders_SRC    := source/util/paths.cpp source/util/nro.cpp source/util/forwarders.cpp source/util/forwarder_icon.cpp source/util/patches.cpp source/action/forwarders_logic.cpp tests/forwarders/test.cpp
 forwarders_FLAGS  := $(TEST_CXXFLAGS) -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
-forwarders_CSRC   := tests/forwarders/stb.c
-forwarders_CFLAGS := -std=c11 -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
+forwarders_CSRC   := tests/forwarders/stb.c extern/stb/stb_image_write.c
+forwarders_CFLAGS := -std=c11 -w -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
 forwarders_LIBS   := -lm
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
 launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
