@@ -1656,7 +1656,6 @@
             "version": "Versione {}"
         },
         "child": {
-            "header": "Schermata bambino · PIN per tornare",
             "title": "Oggi ti rimane",
             "bed": "A letto alle",
             "stops": "La console si ferma da sola quando il tempo è scaduto",

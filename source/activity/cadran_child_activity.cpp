@@ -2,6 +2,8 @@
 #include "activity/cadran_child_activity.hpp"
 
 #include <fmt/format.h>
+#include <string>
+#include <utility>
 
 #include "action/frame_stats_flow.hpp"
 #include "action/pin_lock.hpp"
@@ -10,6 +12,7 @@
 #include "activity/main_activity.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
+#include "view/cadran_digits.hpp"
 
 using namespace brls::literals;
 
@@ -31,7 +34,41 @@ void CadranChildActivity::onContentAvailable()
     frame_stats_flow::set_screen("activity/cadran_child");
     auto* frame = dynamic_cast<brls::AppletFrame*>(this->getContentView());
     if (frame) frame->addView(cadran::make_glow(640.0f, 330.0f, 330.0f, "cadran/glow_strong"), 0);
-    cadran::style_header(frame, "lock", "playguard/cadran/child/header"_i18n, false, false);
+    // The mark and the title; at the right, the parent's keys, small (the
+    // footer keeps the child's own, alone).
+    cadran::style_header(frame, nullptr, "", false, false);
+    if (brls::Box* header = frame ? frame->getHeader() : nullptr) {
+        brls::Theme theme = brls::Application::getTheme();
+        auto* keys = new brls::Box(brls::Axis::ROW);
+        keys->setAlignItems(brls::AlignItems::CENTER);
+        keys->setMarginRight(16);
+        for (const auto& [letter, text] : { std::pair<const char*, std::string>{ "A", "playguard/cadran/child/back"_i18n },
+                                            { "Y", "playguard/cadran/child/extra"_i18n } }) {
+            auto* bubble = new brls::Box(brls::Axis::ROW);
+            bubble->setWidth(24);
+            bubble->setHeight(24);
+            bubble->setCornerRadius(12);
+            bubble->setBackgroundColor(theme["cadran/key_bg"]);
+            bubble->setAlignItems(brls::AlignItems::CENTER);
+            bubble->setJustifyContent(brls::JustifyContent::CENTER);
+            bubble->setMarginLeft(18);
+            bubble->setMarginRight(8);
+            auto* key = new CadranDigits();
+            key->setFontSize(12);
+            key->setTextColor(theme["cadran/key_fg"]);
+            key->setText(letter);
+            bubble->addView(key);
+            keys->addView(bubble);
+            auto* label = new brls::Label();
+            label->setText(text);
+            label->setFontSize(15);
+            label->setFontScaled(false);
+            label->setSingleLine(true);
+            label->setTextColor(theme["cadran/text2"]);
+            keys->addView(label);
+        }
+        header->addView(keys, 1);
+    }
 
     ring->setShowLeft(true);
     ring->setValueSize(96);
@@ -53,7 +90,7 @@ void CadranChildActivity::onContentAvailable()
         }
         brls::Application::popActivity();
         return true;
-    });
+    }, true);
     this->getContentView()->registerAction("playguard/cadran/child/play"_i18n, brls::BUTTON_B, [](brls::View*) {
         MainActivity::quit_or_relock();
         return true;
@@ -76,7 +113,7 @@ void CadranChildActivity::onContentAvailable()
         pt_flow::add_extra_time(pt, [this]() { this->refresh(); });
         return true;
     };
-    this->getContentView()->registerAction("playguard/cadran/child/extra"_i18n, brls::BUTTON_Y, extra);
+    this->getContentView()->registerAction("playguard/cadran/child/extra"_i18n, brls::BUTTON_Y, extra, true);
 #if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
     // The desktop build: the keyboard has no Ⓨ, so the Y key (as the main screen).
     this->getContentView()->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Y), extra);

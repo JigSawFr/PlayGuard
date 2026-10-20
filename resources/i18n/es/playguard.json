@@ -1656,7 +1656,6 @@
             "version": "Versión {}"
         },
         "child": {
-            "header": "Pantalla del niño · PIN para volver",
             "title": "Te queda hoy",
             "bed": "A la cama a las",
             "stops": "La consola se detiene sola cuando se acaba el tiempo",

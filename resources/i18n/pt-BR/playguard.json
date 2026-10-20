@@ -1656,7 +1656,6 @@
             "version": "Versão {}"
         },
         "child": {
-            "header": "Tela da criança · PIN para voltar",
             "title": "Hoje você ainda tem",
             "bed": "Para a cama às",
             "stops": "O console para sozinho quando o tempo acabar",

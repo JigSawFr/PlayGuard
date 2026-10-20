@@ -18,7 +18,7 @@ Two minutes, if your console is still linked to the phone app: *PIN › Before u
 | `make dist-rescue` | `./playguard-rescue.zip`, the optional recovery sysmodule | as above |
 | `./run.sh [ip]` | Builds in the `devkitpro/devkita64` Docker image, at the digest CI uses (read from `build.yml`), optionally `nxlink`s to a console | Docker |
 
-Clone with submodules (`git clone --recursive`, or `git submodule update --init`): borealis is pinned at `extern/borealis/`. The fixes PlayGuard needs in it before upstream has them are patches in `patches/borealis/` (its README says why each one), applied to the submodule when CMake configures: `git status` then shows `extern/borealis` as modified, which is expected.
+Clone with submodules (`git clone --recursive`, or `git submodule update --init`): borealis is pinned at `extern/borealis/`. The fixes PlayGuard needs in it before upstream has them are patches in `patches/borealis/` (its README says why each one), applied to the submodule when CMake configures. `.gitmodules` says `ignore = dirty`, so `git status` leaves those changes out (a new borealis commit still shows); `git -C extern/borealis diff` shows them.
 
 ## The desktop simulator
 

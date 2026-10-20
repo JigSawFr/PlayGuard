@@ -5,8 +5,8 @@ branch), left at an upstream commit. The fixes PlayGuard needs before
 upstream has them are kept here as patches, applied in name order to the
 submodule's files when CMake configures (`CMakeLists.txt`). A patch already
 in place is left as it is; one that no longer applies stops the configure,
-so a borealis bump cannot silently drop a fix. `git status` shows the
-submodule as modified once they are applied: that is expected.
+so a borealis bump cannot silently drop a fix. `git status` does not show
+them (`.gitmodules`: `ignore = dirty`); `git -C extern/borealis diff` does.
 
 To change one: edit the file in `extern/borealis`, then
 `git -C extern/borealis diff > patches/borealis/NNNN-name.patch` (one fix
@@ -25,4 +25,5 @@ Once upstream has a fix, the bump that brings it removes its patch.
 | `0008-label-says-when-it-is-cut.patch` | A label cut short (drawn with "…") could not tell it was: `Label::isTruncated()` says so, for the desktop's check that no text of the 15 languages is cut (`source/ui/cut_text.cpp`, `tools/cut_text_check.py`). Nothing else changes. |
 | `0009-highlight-still-on-request.patch` | The focus highlight's glow moves with the clock, two soft spots of its second colour along the frame; the smoke test gives that colour the stroke's own, but where they pass, the frame's anti-aliased edges come out darker, so the same screen differed from one run to the next by a few hundred pixels. `setHighlightAnimationStill(true)` holds them where they are (`PLAYGUARD_SIM_STILL_FOCUS`, `source/ui/theme.cpp`). |
 | `0010-nbsp-keeps-words-together.patch` | nanovg broke a line at a no-break space (U+00A0) as at any space, so "PEGI 12" or "1 h 24" could end a line with "PEGI" or "1 h" and start the next with the number. A no-break space is now part of the word around it: the line breaks before or after the whole, never inside it. |
+| `0011-wrapped-line-starts-after-the-space.patch` | borealis keeps the spaces in a line's measure (its cursor needs them), so a space also began the next word: a text wrapped at a space started its next line with it ("Dragon Valley" / " Legends", one space to the right). The word after a space now begins with its first letter, and the space where a line breaks is drawn on neither line. |
 | `0090-sdl-in-a-browser.patch` | The web simulator (`web/README.md`) runs on borealis' SDL platform, which asked SDL for haptic support (none in a browser) and stopped without it; it no longer asks there. The window is not resizable there either: the page scales the canvas, and borealis keeps the console's 1280×720 rather than the page's size. And `brls_web_button()`, exported to the page, presses a controller button: the page maps the keys by their meaning (X, Y, L, R… on any keyboard layout) and draws an on-screen pad, where SDL's keyboard only gives A, B and the arrows. And, a browser having no system font, borealis takes the CJK font the web build packages (`font/cjk.otf`, `tools/web_cjk_font.py`) as its fallback. All only under `__EMSCRIPTEN__`. |
