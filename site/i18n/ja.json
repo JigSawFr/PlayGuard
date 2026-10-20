@@ -134,5 +134,16 @@
  "changelog_english": "リリースノートは英語で書かれています。",
  "not_found_title": "ページが見つかりません",
  "not_found_text": "このページは存在しないか、なくなりました。",
- "home": "ホーム"
+ "home": "ホーム",
+ "doc_version": "バージョン",
+ "doc_dev": "開発中",
+ "doc_dev_note": "このページは開発中のバージョンについて説明しています。一部はまだ {{release}} に含まれていません。",
+ "doc_dev_see_release": "{{release}} のこのページ",
+ "doc_dev_whats_new": "今後の予定",
+ "doc_release_note": "このページは最新リリースの {{release}} について説明しています。",
+ "doc_release_see_dev": "開発中のバージョン",
+ "doc_release_untranslated": "{{release}} のドキュメントはこの言語ではありませんでした。英語版を表示しています。",
+ "changelog_dev": "開発中",
+ "changelog_dev_intro": "main にあり、まだ {{release}} には含まれていないもの：次のリリース、または今すぐ開発ビルドで。",
+ "changelog_dev_try": "開発ビルドをインストール"
 }

@@ -65,6 +65,19 @@ PlayGuard's website, on GitHub Pages: <https://playguard.link/>.
   Android's icon offers the simulator. `docs/` itself, in each
   language, sends its visitor on to the guide's first page. A pull request's
   preview says `noindex`.
+- **The documentation in two versions**: main's (`docs/<page>/`), and the
+  latest release's (`docs/<tag>/<page>/`, `noindex`), made from the
+  Markdown and the screenshots of its tag (`git archive`: no file kept for
+  it in the repository, the next release's taken the same way). A switch
+  above each page's list goes from one to the other; the release's pages
+  in a language it was not written in are the English ones, which a note
+  says. While main has something the release has not, main's pages say so
+  and link to the release's page and to the changelog's **In development**:
+  main's commits since the tag, under the sections the next release's notes
+  will have (`release-please-config.json`), with a link to install a
+  development build. Without git's history (a tarball), the site has
+  main's documentation alone; CI clones the history without old files'
+  contents (`fetch-depth: 0`, `filter: blob:none`).
 - **The web simulator** in `/simulator/` ([`web/README.md`](../web/README.md)).
 - **Each open pull request's preview** in `/pr-<number>/`: its website and
   its simulator, linked in a comment on the pull request.

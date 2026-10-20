@@ -134,5 +134,16 @@
  "changelog_english": "릴리스 노트는 영어로 작성되어 있습니다.",
  "not_found_title": "페이지를 찾을 수 없습니다",
  "not_found_text": "이 페이지는 없거나 더 이상 없습니다.",
- "home": "홈"
+ "home": "홈",
+ "doc_version": "버전",
+ "doc_dev": "개발 중",
+ "doc_dev_note": "이 페이지는 개발 중인 버전을 설명합니다. 일부는 아직 {{release}}에 포함되지 않았습니다.",
+ "doc_dev_see_release": "{{release}}의 이 페이지",
+ "doc_dev_whats_new": "예정된 변경 사항",
+ "doc_release_note": "이 페이지는 최신 릴리스인 {{release}}를 설명합니다.",
+ "doc_release_see_dev": "개발 중인 버전",
+ "doc_release_untranslated": "{{release}}의 문서는 이 언어로 제공되지 않았습니다. 영어로 표시합니다.",
+ "changelog_dev": "개발 중",
+ "changelog_dev_intro": "main에는 있지만 아직 {{release}}에는 없는 것: 다음 릴리스에서, 또는 지금 개발 빌드로.",
+ "changelog_dev_try": "개발 빌드 설치"
 }

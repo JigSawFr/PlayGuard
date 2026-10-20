@@ -134,5 +134,16 @@
  "changelog_english": "De release-opmerkingen zijn in het Engels.",
  "not_found_title": "Pagina niet gevonden",
  "not_found_text": "Deze pagina bestaat niet, of niet meer.",
- "home": "Start"
+ "home": "Start",
+ "doc_version": "Versie",
+ "doc_dev": "In ontwikkeling",
+ "doc_dev_note": "Deze pagina beschrijft de ontwikkelversie: een deel ervan zit nog niet in {{release}}.",
+ "doc_dev_see_release": "Deze pagina in {{release}}",
+ "doc_dev_whats_new": "Wat er komt",
+ "doc_release_note": "Deze pagina beschrijft {{release}}, de nieuwste uitgave.",
+ "doc_release_see_dev": "De ontwikkelversie",
+ "doc_release_untranslated": "De documentatie van {{release}} bestond niet in deze taal: hier in het Engels.",
+ "changelog_dev": "In ontwikkeling",
+ "changelog_dev_intro": "Op main, nog niet in {{release}}: in de volgende uitgave, of nu al in een ontwikkelbuild.",
+ "changelog_dev_try": "Een ontwikkelbuild installeren"
 }

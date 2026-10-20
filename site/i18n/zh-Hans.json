@@ -134,5 +134,16 @@
  "changelog_english": "版本说明以英文撰写。",
  "not_found_title": "找不到页面",
  "not_found_text": "此页面不存在，或已不存在。",
- "home": "首页"
+ "home": "首页",
+ "doc_version": "版本",
+ "doc_dev": "开发中",
+ "doc_dev_note": "本页介绍开发中的版本：其中部分内容尚未包含在 {{release}} 中。",
+ "doc_dev_see_release": "{{release}} 中的本页",
+ "doc_dev_whats_new": "即将推出",
+ "doc_release_note": "本页介绍最新发布的版本 {{release}}。",
+ "doc_release_see_dev": "开发中的版本",
+ "doc_release_untranslated": "{{release}} 的文档没有此语言版本：以下为英文版。",
+ "changelog_dev": "开发中",
+ "changelog_dev_intro": "已在 main 中、尚未进入 {{release}}：将在下一个版本中提供，或现在就通过开发版本体验。",
+ "changelog_dev_try": "安装开发版本"
 }

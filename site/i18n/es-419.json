@@ -134,5 +134,16 @@
  "changelog_english": "Las notas de versión están en inglés.",
  "not_found_title": "Página no encontrada",
  "not_found_text": "Esta página no existe, o ya no.",
- "home": "Inicio"
+ "home": "Inicio",
+ "doc_version": "Versión",
+ "doc_dev": "En desarrollo",
+ "doc_dev_note": "Esta página describe la versión en desarrollo: parte de ella todavía no está en la {{release}}.",
+ "doc_dev_see_release": "Esta página en la {{release}}",
+ "doc_dev_whats_new": "Lo que viene",
+ "doc_release_note": "Esta página describe la {{release}}, la última versión publicada.",
+ "doc_release_see_dev": "La versión en desarrollo",
+ "doc_release_untranslated": "La documentación de la {{release}} no existía en este idioma: aquí está en inglés.",
+ "changelog_dev": "En desarrollo",
+ "changelog_dev_intro": "En main, todavía no en la {{release}}: en la próxima versión, o ya en una versión de desarrollo.",
+ "changelog_dev_try": "Instalar una versión de desarrollo"
 }

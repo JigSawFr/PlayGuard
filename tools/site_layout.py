@@ -26,6 +26,7 @@ Chromium; SITE_LAYOUT_JOBS pages at once, 6 by default)
 """
 import asyncio
 import functools
+import re
 import http.server
 import os
 import sys
@@ -81,7 +82,10 @@ def pages():
         # Not a page that sends its visitor on (docs/: the guide's first page).
         if "index.html" in files and 'http-equiv="refresh"' not in open(os.path.join(root, "index.html"), encoding="utf-8").read():
             every.append(os.path.relpath(root, SITE).replace(os.sep, "/").removeprefix(".") + "/")
-    every = sorted(p.lstrip("/") for p in every)
+    # The latest release's documentation (docs/v<x>/) in English and French,
+    # the languages it was written in; elsewhere it is the same English page.
+    every = sorted(p.lstrip("/") for p in every
+                   if not re.search(r"(^|/)docs/v\d", p.lstrip("/")) or p.lstrip("/").split("/")[0] in ("docs", "fr"))
     widest = [f + p for f in folders for p in WIDEST if os.path.isfile(os.path.join(SITE, f + p, "index.html"))]
     english = [p for p in every if p.split("/", 1)[0] + "/" not in folders[1:]]
     return every, widest, english

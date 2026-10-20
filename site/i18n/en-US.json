@@ -134,5 +134,16 @@
  "changelog_english": "The release notes are written in English.",
  "not_found_title": "Page not found",
  "not_found_text": "This page does not exist, or not any more.",
- "home": "Home"
+ "home": "Home",
+ "doc_version": "Version",
+ "doc_dev": "In development",
+ "doc_dev_note": "This page describes the development version: some of it is not in {{release}} yet.",
+ "doc_dev_see_release": "This page in {{release}}",
+ "doc_dev_whats_new": "What's coming",
+ "doc_release_note": "This page describes {{release}}, the latest release.",
+ "doc_release_see_dev": "The development version",
+ "doc_release_untranslated": "The documentation of {{release}} was not written in this language: here it is in English.",
+ "changelog_dev": "In development",
+ "changelog_dev_intro": "On main, not in {{release}} yet: in the next release, or now in a development build.",
+ "changelog_dev_try": "Install a development build"
 }

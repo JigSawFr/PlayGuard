@@ -270,6 +270,10 @@ pre code { background: none; padding: 0; }
 .doc-group li a[aria-current] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 
 /* Documentation */
+/* The documentation's versions: the latest release's, main's. */
+.doc-versions { display: flex; gap: 4px; padding: 4px; margin-bottom: 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); }
+.doc-versions a { flex: 1; text-align: center; padding: 6px 8px; border-radius: 7px; text-decoration: none; color: var(--muted); font-weight: 600; font-size: 14px; }
+.doc-versions a[aria-current] { background: var(--surface); color: var(--accent); box-shadow: 0 1px 3px rgb(0 0 0 / 0.12); }
 .doc-search { margin-bottom: 14px; }
 .doc-search input { width: 100%; box-sizing: border-box; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line);
                     background: var(--surface); color: var(--text); font: inherit; font-size: 15px; }
