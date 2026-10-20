@@ -34,14 +34,21 @@ void put64(std::vector<uint8_t>& b, size_t at, uint64_t v)
     for (int i = 0; i < 8; i++) b[at + i] = (uint8_t)(v >> (8 * i));
 }
 
-// The start of a JPEG: SOI, an APP0, a frame header of `w` x `h`.
+// The start of a JPEG: SOI, an APP0, a frame header of `w` x `h`, the start
+// of its image data.
 std::vector<uint8_t> jpeg(int w, int h, uint8_t sof = 0xC0)
 {
     std::vector<uint8_t> j = { 0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 'J', 'F', 'I', 'F', 0, 1, 1, 0, 0, 1, 0, 1, 0, 0,
                                0xFF, sof, 0x00, 0x11, 0x08, (uint8_t)(h >> 8), (uint8_t)h, (uint8_t)(w >> 8), (uint8_t)w, 3 };
     j.resize(j.size() + 9, 0x11);
-    j.push_back(0xFF);
-    j.push_back(0xD9);
+    j.insert(j.end(), { 0xFF, 0xDA, 0x00, 0x02, 0x00, 0xFF, 0xD9 });
+    return j;
+}
+
+// `j` with an APP1 (EXIF) segment after its SOI.
+std::vector<uint8_t> with_exif(std::vector<uint8_t> j)
+{
+    j.insert(j.begin() + 2, { 0xFF, 0xE1, 0x00, 0x08, 'E', 'x', 'i', 'f', 0, 0 });
     return j;
 }
 
@@ -100,6 +107,18 @@ static void test_jpeg()
     std::vector<uint8_t> big = jpeg(256, 256);
     big.resize(nro::ICON_MAX + 1, 0);
     CHECK(!nro::icon_usable(big));
+
+    // Only what the HOME menu decodes: no EXIF, no progressive coding.
+    CHECK(nro::jpeg_plain(jpeg(256, 256)) && nro::jpeg_plain(jpeg(256, 256, 0xC1)));
+    CHECK(!nro::jpeg_plain(jpeg(256, 256, 0xC2)) && !nro::icon_usable(jpeg(256, 256, 0xC2)));
+    CHECK(!nro::jpeg_plain(with_exif(jpeg(256, 256))) && !nro::icon_usable(with_exif(jpeg(256, 256))));
+    std::vector<uint8_t> comment = jpeg(256, 256);
+    comment.insert(comment.begin() + 2, { 0xFF, 0xFE, 0x00, 0x04, 'h', 'i' });
+    CHECK(nro::jpeg_plain(comment));
+    std::vector<uint8_t> no_data = jpeg(256, 256);
+    no_data.resize(no_data.size() - 7);
+    CHECK(!nro::jpeg_plain(no_data));                                            // no image data
+    CHECK(!nro::jpeg_plain({ 0xFF, 0xD8, 0xFF, 0xDA, 0x00, 0x02 }));            // image data, no frame
 }
 
 static void test_parse()
@@ -331,6 +350,11 @@ static void test_icon()
 
     // A 256 x 256 JPEG already: kept byte for byte.
     CHECK(forwarder_icon::normalize(shrunk) == shrunk);
+    // One with EXIF data: made again, without it.
+    const std::vector<uint8_t> exif = with_exif(shrunk);
+    const std::vector<uint8_t> again = forwarder_icon::normalize(exif);
+    CHECK(!nro::icon_usable(exif) && nro::icon_usable(again) && again != exif);
+    CHECK(colour_near(again, 128, 128, 20, 60, 200));
     // No image: nothing.
     CHECK(forwarder_icon::normalize({}).empty());
     CHECK(forwarder_icon::normalize({ 1, 2, 3, 4, 5 }).empty());
