@@ -570,6 +570,8 @@ function setUpPad() {
     button.addEventListener('pointerdown', (e) => {
       button.setPointerCapture(e.pointerId);
       button.classList.add('active');
+      // A finger's press felt, as on a controller (Android; iOS has no vibration).
+      if (e.pointerType === 'touch') navigator.vibrate?.(10);
       noteButton(code);
       press(code, true);
       e.preventDefault();

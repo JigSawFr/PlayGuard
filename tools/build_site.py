@@ -411,6 +411,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <link rel="icon" href="{to_root}assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="{to_root}assets/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-title" content="PlayGuard">
+  <meta name="format-detection" content="telephone=no">
   <meta name="application-name" content="PlayGuard">
   <link rel="manifest" href="{to_root}assets/site.webmanifest">
   <link rel="sitemap" type="application/xml" href="{SITE_URL}sitemap.xml">
@@ -639,7 +640,7 @@ def compat_check(t):
             f' data-invalid="{text("compat_invalid")}">'
             f'<p><strong>{t("compat_check")}</strong></p>'
             f'<label for="compat-fw">{t("compat_field")}</label>'
-            f'<input id="compat-fw" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="{high}">'
+            f'<input id="compat-fw" type="text" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="{high}">'
             f'<p class="compat-result" aria-live="polite"></p></div>\n')
 
 
@@ -679,6 +680,7 @@ def docs_search(t, lang, to_root):
     """The documentation's search box: site.js shows it, and searches docs/search.json."""
     return (f'      <div class="doc-search" hidden><input type="search" placeholder="{t("search_placeholder")}"'
             f' aria-label="{t("search_placeholder")}" aria-controls="doc-results" autocomplete="off"'
+            f' autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search"'
             f' data-index="{to_root}{lang_dir(lang)}docs/search.json" data-none="{t("search_none")}">'
             f'<ol id="doc-results" class="doc-results" hidden></ol></div>')
 
@@ -1109,7 +1111,11 @@ def main():
         "name": "PlayGuard", "short_name": "PlayGuard", "start_url": "../", "scope": "../", "display": "browser",
         "background_color": "#ffffff", "theme_color": "#0a705f",
         "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml"},
-                  {"src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png"}]}, indent=1) + "\n")
+                  {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+                  {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+                  {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}]}, indent=1) + "\n")
+    for name in ("icon-192.png", "icon-512.png"):
+        shutil.copy(os.path.join(ROOT, "images", name), os.path.join(out, "assets", name))
     # At a domain's root (as robots.txt), what browsers, bookmarks, iOS and
     # link previews ask for there without reading the page.
     if urlsplit(SITE_URL).path == "/":
