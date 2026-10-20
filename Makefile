@@ -41,7 +41,7 @@ ZIP_TREE = find . -exec touch -h -d @$(SOURCE_DATE_EPOCH) {} + && find . -mindep
 CMAKE_ARGS ?=
 JSON_HPP := extern/borealis/library/include/borealis/extern/nlohmann/json.hpp
 
-.PHONY: all clean dist nxlink desktop web web-serve test fuzz check rescue dist-rescue FORCE
+.PHONY: all clean dist nxlink desktop web web-serve test fuzz check rescue dist-rescue gate-preview FORCE
 
 RENDERER := $(if $(GL),-DUSE_DEKO3D=OFF,-DUSE_DEKO3D=ON)
 
@@ -73,6 +73,14 @@ RESCUE_TID := 4200000000505247
 RESCUE_VERSION := $(shell sed -n 's/^set(VERSION_[A-Z]* "\([0-9]*\)").*/\1/p' CMakeLists.txt | paste -sd.)
 rescue:
 	@$(MAKE) --no-print-directory -C sysmodule
+
+# The PIN gate's screen as PNG files, one per state (tools/gate_preview.c).
+gate-preview:
+	@mkdir -p build/gate-preview
+	@$(CC) -std=gnu11 -O2 -Isource/core -Iextern/stb -isystem extern/borealis/library/include tools/gate_preview.c \
+		source/core/gate_screen.c source/core/gate_text.c extern/stb/pg_stb.c extern/stb/stb_image_write.c -lm \
+		-o build/gate-preview/gate_preview
+	@build/gate-preview/gate_preview build/gate-preview $(or $(GATE_LANG),1)
 
 dist-rescue: rescue
 	@echo making rescue dist ...
@@ -123,6 +131,9 @@ calendar_SRC   := source/core/calendar.c tests/calendar/test.c
 calendar_FLAGS := -std=gnu11 -Isource/core
 rescue_SRC   := source/core/rescue.c tests/rescue/test.c
 rescue_FLAGS := -std=c11 -Isource/core
+gate_screen_SRC   := source/core/gate_screen.c source/core/gate_text.c extern/stb/pg_stb.c tests/gate_screen/test.c
+gate_screen_FLAGS := -std=gnu11 -Isource/core -Iextern/stb -isystem extern/borealis/library/include
+gate_screen_LIBS  := -lm
 gate_SRC   := source/core/gate.c tests/gate/test.c
 gate_FLAGS := -std=gnu11 -Isource/core
 hbl_lock_SRC   := source/core/hbl_lock.c tests/hbl_lock/test.c

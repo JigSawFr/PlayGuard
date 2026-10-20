@@ -11,6 +11,9 @@ int main(int argc, char *argv[])
 {
     (void)argc;
     (void)argv;
+    // Its romfs carries PlayGuard's font for the screen (romfs:/font/).
+    const bool romfs = R_SUCCEEDED(romfsInit());
     gate_nx_run();
+    if (romfs) romfsExit();
     return 0;
 }

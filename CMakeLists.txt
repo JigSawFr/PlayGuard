@@ -194,6 +194,10 @@ endif ()
 list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/extern/qrcodegen/qrcodegen.cpp)
 # JPEG writing for the NRO forwarders' icons (public domain, vendored: extern/stb).
 list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/extern/stb/stb_image_write.c)
+# Fonts and JPEGs for the PIN gate's screen (core/gate_screen.c), on the console.
+if (PLATFORM_SWITCH)
+    list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/extern/stb/pg_stb.c)
+endif ()
 
 program_target(${PROJECT_NAME} "${PLAYGUARD_SRC}")
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
@@ -211,6 +215,7 @@ endif ()
 target_compile_options(${PROJECT_NAME} PRIVATE ${APP_PLATFORM_OPTION} ${PLAYGUARD_WARNINGS})
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/qrcodegen/qrcodegen.cpp PROPERTIES COMPILE_OPTIONS "-w")
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/stb/stb_image_write.c PROPERTIES COMPILE_OPTIONS "-w")
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/stb/pg_stb.c PROPERTIES COMPILE_OPTIONS "-w")
 # The commit built (at configure time): development builds are told apart by
 # it (util/dev_builds.hpp). PLAYGUARD_COMMIT (CI: a pull request's head)
 # wins over the checkout's. Empty outside a git checkout.
