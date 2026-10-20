@@ -40,6 +40,10 @@ env:
   # Playwright, pinned, for the simulator's smoke test (Python) and the
   # website's screenshots (Node): one version, one Chromium for both.
   PLAYWRIGHT_VERSION: 1.64.0
+  # axe-core, for the website's accessibility (tools/site_layout.py): its
+  # npm package, checked against the hash it had when pinned.
+  AXE_VERSION: 4.13.0
+  AXE_SHA256: 096912f6e77b4b695fc9304b7be65091db42d98de054da674ae222a11cb33f70
 
 jobs:
   build:
@@ -307,10 +311,11 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
       # The website's layout (tools/site_layout.py): no page wider than the
       # screen on a phone, a tablet or a desktop, no field iOS zooms into, no
-      # script that throws. For a pull request (or by hand) that changes the
-      # site, its documentation or its texts; main has had it. In the
-      # Playwright of the simulator's smoke test when this build made it,
-      # else Chromium's headless shell alone.
+      # script that throws, nothing axe finds against WCAG 2.2 AA (about 15 s
+      # of it). For a pull request (or by hand) that changes the site, its
+      # documentation or its texts; main has had it. In the Playwright of the
+      # simulator's smoke test when this build made it, else Chromium's
+      # headless shell alone.
       - name: The website on a phone, a tablet and a desktop
         if: github.event_name != 'push' && env.CHECK_LAYOUT == '1'
         timeout-minutes: 5
@@ -321,7 +326,10 @@ jobs:
             "$RUNNER_TEMP/playwright/bin/pip" install -q "playwright==$PLAYWRIGHT_VERSION"
             "$py" -m playwright install --with-deps --only-shell chromium
           fi
-          "$py" -u tools/site_layout.py out
+          curl -sfL --retry 3 -o "$RUNNER_TEMP/axe.tgz" "https://registry.npmjs.org/axe-core/-/axe-core-$AXE_VERSION.tgz"
+          echo "$AXE_SHA256  $RUNNER_TEMP/axe.tgz" | sha256sum -c --quiet
+          tar -xzf "$RUNNER_TEMP/axe.tgz" -C "$RUNNER_TEMP" package/axe.min.js
+          SITE_AXE="$RUNNER_TEMP/package/axe.min.js" "$py" -u tools/site_layout.py out
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: site
