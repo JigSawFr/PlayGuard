@@ -16,6 +16,7 @@
 #include "activity/api_settings_activity.hpp"
 #include "app.hpp"
 #include "core/platform.h"
+#include "core/sim_env.h"
 #include "core/time_ops.h"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -154,9 +155,22 @@ std::string call_name(const Call& c)
     return key.empty() ? route_text(c) : brls::getStr("playguard/api/routes/" + key);
 }
 
-std::string signed_seconds(int64_t s)
+// How far off the network clock is, as a parent says it: "5 min behind",
+// "12 s ahead", "on time". `offset_s`: the server time minus the network
+// clock (more than 0: the clock is behind).
+std::string offset_text(int64_t offset_s)
 {
-    return brls::getStr("playguard/clock/seconds", (s > 0 ? "+" : "") + std::to_string(s));
+    if (!clock_needs_write(offset_s)) return "playguard/api/on_time"_i18n;
+    const uint64_t a = offset_s < 0 ? (uint64_t)(-(offset_s + 1)) + 1 : (uint64_t)offset_s;
+    std::string span;
+    if (a < 60) span = brls::getStr("playguard/api/span_s", std::to_string(a));
+    else if (a < 3600) span = brls::getStr("playguard/api/span_min", std::to_string((a + 30) / 60));
+    else if (a < 48 * 3600) {
+        const uint64_t minutes = (a + 30) / 60;
+        span = brls::getStr("playguard/api/span_h_min", std::to_string(minutes / 60), std::to_string(minutes % 60));
+    }
+    else span = brls::getStr("playguard/api/span_days", std::to_string(a / 86400));
+    return brls::getStr(offset_s > 0 ? "playguard/api/behind" : "playguard/api/ahead", span);
 }
 
 using Done = std::function<void(const Answer& a, const std::string& line)>;
@@ -173,7 +187,7 @@ void get_clock(const Call& c, Done done)
         Answer a;
         a.body = { { "offset_s", lm.offset_s }, { "server", lm.server }, { "measured_at", iso_utc(lm.at_utc) },
                    { "cached", true } };
-        done(a, brls::getStr("playguard/api/result/clock", signed_seconds(lm.offset_s)));
+        done(a, brls::getStr("playguard/api/result/clock", offset_text(lm.offset_s)));
         return;
     }
     Problem p;
@@ -194,7 +208,7 @@ void get_clock(const Call& c, Done done)
         Answer a;
         a.body = { { "offset_s", m.offset_s }, { "server", m.server }, { "measured_at", iso_utc(m.unix_seconds) },
                    { "cached", false } };
-        done(a, brls::getStr("playguard/api/result/clock", signed_seconds(m.offset_s)));
+        done(a, brls::getStr("playguard/api/result/clock", offset_text(m.offset_s)));
     }, timeout);
 }
 
@@ -256,9 +270,9 @@ void sync_clock(const Call& c, Done done)
         }
         // Who asks, what changes and what it costs, before the PIN: the
         // parent approves this change, not only "a PIN".
-        const std::string who = s_request.caller.empty() ? "playguard/api/unnamed"_i18n : s_request.caller;
-        const std::string off = m.offset_known ? signed_seconds(m.offset_s) : "?";
-        std::string body = brls::getStr("playguard/api/confirm_sync", who, off);
+        const std::string off = m.offset_known ? offset_text(m.offset_s) : "playguard/api/off_unknown"_i18n;
+        std::string body = s_request.caller.empty() ? brls::getStr("playguard/api/confirm_sync_unnamed", off)
+                                                    : brls::getStr("playguard/api/confirm_sync", s_request.caller, off);
         body += "playguard/clock/confirm_apply_resets"_i18n;
         ui::confirm(body, "playguard/api/confirm_sync_yes"_i18n,
                     [m, done]() { brls::sync([m, done]() { approved_sync(m, done); }); },
@@ -402,7 +416,11 @@ void step(std::shared_ptr<Run> run, size_t i)
         return;
     }
     const Call& c = s_request.calls[i];
-    run->screen->set_line(i, brls::getStr("playguard/api/working"));
+    // What it is doing, in words: the clock routes wait for time servers.
+    const std::string key = route_key(c);
+    run->screen->set_line(i, key == "clock" || key == "clock_sync"
+                                 ? brls::getStr("playguard/api/measuring", clock_flow::current_server())
+                                 : "playguard/api/working"_i18n);
     if (run->failed && s_request.stop_on_error) {
         const Answer a = fail(problem(424, "not_done", "an earlier request failed (stop_on_error)"));
         run->answers.push_back(a);
@@ -425,8 +443,32 @@ void at_start(int argc, const char* const* argv)
 {
     Launch launch;
     std::string warning;
-    const bool found = from_argv(argc, argv, &launch, &warning);
+    bool found = from_argv(argc, argv, &launch, &warning);
     if (!warning.empty()) brls::Logger::warning("api: {}", warning);
+#ifndef __SWITCH__
+    // The simulators: PLAYGUARD_SIM_API is the short form (the web page's
+    // ?api=), PLAYGUARD_SIM_API_PERMISSIONS ("clock:read_write,status:read")
+    // turns the API on with those levels, for this run only.
+    if (!found)
+        if (const char* sim = sim_env("PLAYGUARD_SIM_API"); sim && *sim) {
+            launch.short_form = sim;
+            found             = true;
+        }
+    if (const char* perms = sim_env("PLAYGUARD_SIM_API_PERMISSIONS"); perms && *perms) {
+        auto& cfg = config::get();
+        cfg.api_enabled = true;
+        std::string rest = perms;
+        while (!rest.empty()) {
+            const size_t comma = rest.find(',');
+            const std::string pair = rest.substr(0, comma);
+            rest = comma == std::string::npos ? "" : rest.substr(comma + 1);
+            const size_t colon = pair.find(':');
+            Level l;
+            if (colon != std::string::npos && known_group(pair.substr(0, colon)) && parse_level(pair.substr(colon + 1), &l))
+                cfg.api_permissions[pair.substr(0, colon)] = level_name(l);
+        }
+    }
+#endif
     if (!found) {
         forget_child_data();
         return;
@@ -557,6 +599,16 @@ void turn_all_off()
     auto& cfg = config::get();
     for (const char* g : GROUPS) cfg.api_permissions[g] = level_name(Level::None);
     ui::save_config();
+}
+
+bool clear_calls()
+{
+    const bool ok = std::remove(calls_file().c_str()) == 0 || !is_file(calls_file());
+    if (ok) {
+        notices::clear("api_changes");
+        notices::clear("api_refused");
+    }
+    return ok;
 }
 
 std::string group_name(const std::string& group)

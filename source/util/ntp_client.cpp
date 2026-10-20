@@ -53,10 +53,10 @@ bool make_cookie(std::uint8_t cookie[NTP_COOKIE_SIZE], std::string& error)
 }
 }
 
-Reply fetch(const std::string& host, int timeout_ms, unsigned max_addresses, bool (*stop)())
+Reply fetch(const std::string& host, int timeout_ms, unsigned max_addresses, const std::function<bool()>& stop)
 {
     Reply reply;
-    const auto stopped = [&reply, stop]() {
+    const auto stopped = [&reply, &stop]() {
         if (!stop || !stop()) return false;
         reply.kind = Error::Timeout;
         reply.error = "Stopped: PlayGuard is quitting";

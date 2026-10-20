@@ -13,6 +13,13 @@ ApiActivity::ApiActivity(const std::string& caller, const std::vector<Row>& rows
 {
 }
 
+ApiActivity::~ApiActivity()
+{
+    if (!this->watching) return;
+    brls::Application::getGlobalFocusChangeEvent()->unsubscribe(this->focus_watch);
+    brls::Application::getRunLoopEvent()->unsubscribe(this->frame_watch);
+}
+
 void ApiActivity::onContentAvailable()
 {
     from->setSingleLine(false);
@@ -28,8 +35,10 @@ void ApiActivity::onContentAvailable()
         icon->setMarginRight(16);
         icon->setMarginTop(2);
         row->addView(icon);
+        // A width of its own: a label wraps only within a known width, and a
+        // long text (German, larger text on a TV) would otherwise run off.
         auto* text = new brls::Box(brls::Axis::COLUMN);
-        text->setGrow(1.0f);
+        text->setWidth(TEXT_WIDTH);
         text->addView(ui::text_label(r.name, 22, ui::color_text()));
         text->addView(ui::text_label(r.route, 16, ui::color_note()));
         brls::Label* result = ui::text_label("", 20, ui::color_neutral());
@@ -46,8 +55,7 @@ void ApiActivity::onContentAvailable()
     });
     allow->registerClickAction([this](brls::View*) {
         // The countdown stops: the parent is here, and goes back with Continue.
-        this->counting = false;
-        this->show_next();
+        this->pause();
         api_flow::open_settings();
         return true;
     });
@@ -55,7 +63,29 @@ void ApiActivity::onContentAvailable()
         if (this->finished) this->leave();
         return true;
     });
+    // The focus moving (the stick, a touch on a button), or any button but
+    // A and B (which answer) held at a frame: the parent is there, the
+    // countdown waits for Continue.
+    this->focus_watch = brls::Application::getGlobalFocusChangeEvent()->subscribe([this](brls::View*) { this->pause(); });
+    this->frame_watch = brls::Application::getRunLoopEvent()->subscribe([this]() {
+        if (!this->counting) return;
+        const brls::ControllerState& s = brls::Application::getControllerState();
+        for (int b = 0; b < brls::_BUTTON_MAX; b++)
+            if (s.buttons[b] && b != brls::BUTTON_A && b != brls::BUTTON_B) {
+                this->pause();
+                return;
+            }
+    });
+    this->watching = true;
     brls::sync([this]() { this->start(this); });
+}
+
+void ApiActivity::pause()
+{
+    if (!this->counting || this->left) return;
+    this->counting = false;
+    brls::Logger::info("api: countdown stopped, the parent is reading");
+    this->show_next();
 }
 
 void ApiActivity::set_line(size_t i, const std::string& text)
@@ -86,7 +116,7 @@ void ApiActivity::set_message(const std::string& text)
     icon->setMarginRight(16);
     row->addView(icon);
     brls::Label* label = ui::text_label(text, 22, ui::color_bad());
-    label->setGrow(1.0f);
+    label->setWidth(TEXT_WIDTH);
     row->addView(label);
     list->addView(row);
 }
@@ -99,7 +129,7 @@ void ApiActivity::done(const std::string& return_to, bool offer_allow)
     if (slash != std::string::npos) this->target = this->target.substr(slash + 1);
     ui::set_visible(go_on.getView(), true);
     ui::set_visible(allow.getView(), offer_allow);
-    brls::Application::giveFocus(go_on.getView());
+    brls::Application::giveFocus(go_on.getView());   // before the countdown: not taken for the parent's move
     this->counting     = true;
     this->seconds_left = LEAVE_S;
     this->show_next();

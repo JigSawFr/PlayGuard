@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <mutex>
 #include <borealis.hpp>
 #include <fmt/format.h>
 #include <memory>
@@ -188,26 +189,44 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
         // timeout (one after the other in applet mode, or when no thread can
         // be had).
         std::vector<ntp::Reply> replies(hosts.size());
-        // Each stops waiting when the app quits: it waits for this thread.
+        // Two servers that agree (within 2 s) are enough: the others stop
+        // waiting, so a server that does not answer no longer holds the
+        // measure for its whole timeout. Each also stops when the app quits:
+        // it waits for this thread.
+        std::mutex lock;
+        std::vector<int64_t> origins;   // each answer's server time at the steady clock's 0
+        std::atomic<bool> enough{ false };
+        const auto stop = [&enough]() { return enough.load() || ui::quitting(); };
+        const auto fetch = [&](size_t i) {
+            ntp::Reply r = ntp::fetch(hosts[i], per_address, 2, stop);
+            if (r.ok) {
+                const int64_t origin = (int64_t)r.unix_seconds -
+                    std::chrono::duration_cast<std::chrono::seconds>(r.received_at.time_since_epoch()).count();
+                std::lock_guard<std::mutex> g(lock);
+                for (int64_t o : origins)
+                    if (o - origin <= 2 && origin - o <= 2) enough = true;
+                origins.push_back(origin);
+            }
+            replies[i] = r;
+        };
         std::vector<std::thread> workers;
         for (size_t i = 0; i < hosts.size(); i++) {
             if (in_series) {
-                if (ui::quitting()) break;
-                replies[i] = ntp::fetch(hosts[i], per_address, 2, ui::quitting);
+                if (stop()) break;
+                fetch(i);
                 continue;
             }
             try {
-                workers.emplace_back([&replies, &hosts, i, per_address]() {
-                    replies[i] = ntp::fetch(hosts[i], per_address, 2, ui::quitting);
-                });
+                workers.emplace_back([&fetch, i]() { fetch(i); });
             } catch (const std::system_error& e) {
                 brls::Logger::warning("NTP: no thread for {} ({}), querying it here", hosts[i], e.what());
-                replies[i] = ntp::fetch(hosts[i], per_address, 2, ui::quitting);
+                fetch(i);
             }
         }
         for (auto& w : workers) w.join();
         if (ui::quitting()) return;
-        brls::sync([hosts, replies, done]() {
+        const bool cut_short = enough.load();
+        brls::sync([hosts, replies, done, cut_short]() {
             // Bring every sample to the same instant, then take the median.
             const auto ref = std::chrono::steady_clock::now();
             std::vector<int64_t> estimates;
@@ -228,6 +247,8 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
                         std::chrono::duration_cast<std::chrono::seconds>(ref - r.received_at).count();
                     const std::string diff = R_SUCCEEDED(s.network_rc) ? signed_seconds(now_est - (int64_t)s.network_time) : "?";
                     m.report += brls::getStr("playguard/clock/result_line_ok", hosts[i], ui::time_text((uint64_t)now_est), diff);
+                } else if (cut_short) {
+                    continue;   // not waited for: two others agreed
                 } else {
                     m.report += brls::getStr("playguard/clock/result_line_err", hosts[i], ntp_error_text(r));
                     brls::Logger::info("NTP {}: {}", hosts[i], r.error);

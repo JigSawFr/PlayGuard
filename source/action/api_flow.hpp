@@ -51,6 +51,8 @@ api_logic::Settings settings();
 std::vector<api_logic::LogEntry> calls();
 // Every group back to None (the switch stays as it is). Saves the settings.
 void turn_all_off();
+// Forgets the last calls (calls.json): the list, and the bell's entries.
+bool clear_calls();
 // "Network clock", "Status" …
 std::string group_name(const std::string& group);
 // "Not allowed", "Read", "Read and change".

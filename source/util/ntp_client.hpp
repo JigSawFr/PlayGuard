@@ -4,6 +4,7 @@
 #pragma once
 #include <cstdint>
 #include <chrono>
+#include <functional>
 #include <string>
 
 namespace ntp {
@@ -23,5 +24,6 @@ struct Reply {
 // Tries at most `max_addresses` resolved addresses, waiting `timeout_ms` each,
 // and gives up within 0.1 s once `stop` (if any) returns true; the address
 // lookup itself cannot be cut short.
-Reply fetch(const std::string& host, int timeout_ms = 2500, unsigned max_addresses = 2, bool (*stop)() = nullptr);
+Reply fetch(const std::string& host, int timeout_ms = 2500, unsigned max_addresses = 2,
+            const std::function<bool()>& stop = nullptr);
 }

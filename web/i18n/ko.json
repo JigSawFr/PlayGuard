@@ -92,6 +92,8 @@
   "applet": {"label": "애플릿 모드(앨범에서 실행)"},
   "background": {"label": "PlayGuard가 백그라운드에 있음"},
   "hbloader": {"label": "업데이트를 스토어에 넘길 수 있는 로더"},
+  "api": {"label": "시작할 때의 실행 API 요청(다른 홈브루에서)"},
+  "api_permissions": {"label": "허용한 다른 홈브루(그룹:수준)"},
   "docked": {"label": "독에 연결(TV)"},
   "battery": {"label": "배터리 사용(충전기 없음)"},
   "boot_choice": {"label": "시작할 때 '이전 빌드?'에 대한 답", "options": {"": "B", "a": "A"}},

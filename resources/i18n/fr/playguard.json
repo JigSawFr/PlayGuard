@@ -1765,7 +1765,7 @@
         "closing": "PlayGuard se ferme dans {} s.",
         "returning": "Retour à {} dans {} s.",
         "settings_title": "Autres homebrews",
-        "settings_note": "D'autres homebrews peuvent lancer PlayGuard pour lui demander quelque chose, comme régler l'horloge réseau. Rien n'est permis tant que vous ne le choisissez pas ci-dessous, groupe par groupe. Quoi que demande un homebrew, une modification qui demande le code PIN le demande. Les détails : playguard.link, API de lancement.",
+        "settings_note": "D'autres homebrews peuvent lancer PlayGuard pour lui demander quelque chose, comme régler l'horloge réseau. Rien n'est permis tant que vous ne le choisissez pas ci-dessous. Une modification vous est toujours demandée d'abord, puis le code PIN.",
         "enabled": "Permettre aux autres homebrews d'appeler PlayGuard",
         "section_permissions": "Ce qu'ils peuvent faire",
         "section_calls": "Derniers appels",
@@ -1775,7 +1775,7 @@
         "on": "Activé",
         "off": "Désactivé",
         "result": {
-            "clock": "L'horloge réseau est décalée de {}.",
+            "clock": "L'horloge réseau est {}.",
             "clock_right": "L'horloge réseau est à l'heure : rien à changer.",
             "clock_set": "Horloge réseau réglée.",
             "discovery": "Fait.",
@@ -1821,7 +1821,7 @@
             "clock": "Mesurer l'horloge réseau",
             "clock_sync": "Régler l'horloge réseau"
         },
-        "confirm_sync": "« {} » demande à régler l'horloge réseau (décalée de {}).",
+        "confirm_sync": "« {} » demande à régler l'horloge réseau ({}).",
         "confirm_sync_yes": "Régler (code PIN)",
         "home_icon": "Ajouter « Régler l'horloge » au menu HOME",
         "home_icon_name": "Régler l'horloge",
@@ -1854,6 +1854,21 @@
         "notice_refused": "D'autres homebrews ont été refusés",
         "notice_refused_line": "{} : refusé {} fois",
         "nothing_allowed": "rien d'autorisé",
-        "notice_line_many": "{} ({} fois)"
+        "notice_line_many": "{} ({} fois)",
+        "measuring": "Mesure de l'horloge réseau avec {}…",
+        "on_time": "à l'heure",
+        "span_s": "{} s",
+        "span_min": "{} min",
+        "span_h_min": "{} h {} min",
+        "span_days": "{} jours",
+        "behind": "en retard de {}",
+        "ahead": "en avance de {}",
+        "off_unknown": "décalage inconnu",
+        "confirm_sync_unnamed": "Un homebrew qui ne s'est pas nommé demande à régler l'horloge réseau ({}).",
+        "turn_on_first": "Activez d'abord « Permettre aux autres homebrews d'appeler PlayGuard ».",
+        "clear_calls": "Effacer la liste",
+        "clear_calls_confirm": "Effacer la liste des appels ? La cloche de notifications les oublie aussi.",
+        "clear_calls_done": "La liste des appels est vide.",
+        "clear_calls_err": "La liste des appels n'a pas pu être effacée."
     }
 }

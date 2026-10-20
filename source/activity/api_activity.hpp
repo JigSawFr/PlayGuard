@@ -2,7 +2,8 @@
 // a request (action/api_flow, docs/api.md): who asks (by the name it gives
 // itself), each request by its name with how it went (an icon, not only a
 // colour), then back to the caller (or out of PlayGuard) after a countdown,
-// or at once with Continue. A request refused because the parent has not
+// or at once with Continue. The countdown stops at the first move of the
+// focus, press of another button or touch: the parent is reading. A request refused because the parent has not
 // allowed it offers Allow…, which opens Preferences › Other homebrews behind
 // the PIN. Shown instead of the main screen; never covered by the lock
 // screen (what needs the PIN asks for it here).
@@ -30,6 +31,8 @@ class ApiActivity : public brls::Activity
     // `start` runs once the screen is up.
     ApiActivity(const std::string& caller, const std::vector<Row>& rows, std::function<void(ApiActivity*)> start);
 
+    ~ApiActivity() override;
+
     void onContentAvailable() override;
 
     // Under request `i`: what is happening, then how it went.
@@ -43,6 +46,8 @@ class ApiActivity : public brls::Activity
 
     // Seconds the result stays before PlayGuard goes on.
     static constexpr int LEAVE_S = 5;
+    // The rows' text, next to their icon (the list is 760 wide).
+    static constexpr float TEXT_WIDTH = 700;
 
   private:
     std::string caller;
@@ -56,7 +61,13 @@ class ApiActivity : public brls::Activity
     bool counting = false;  // the countdown runs (stopped by Allow…)
     int seconds_left = LEAVE_S;
 
+    brls::GenericEvent::Subscription focus_watch;
+    brls::VoidEvent::Subscription frame_watch;
+    bool watching = false;
+
     void tick();
+    // The parent is reading or choosing: no more countdown, Continue goes on.
+    void pause();
     void show_next();
     void leave();
 

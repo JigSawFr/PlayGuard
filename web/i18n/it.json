@@ -92,6 +92,8 @@
   "applet": {"label": "Modalità applet (dall'album)"},
   "background": {"label": "PlayGuard in secondo piano"},
   "hbloader": {"label": "Un loader che può passare un aggiornamento a uno store"},
+  "api": {"label": "Una richiesta dell'API di avvio all'avvio (di un altro homebrew)"},
+  "api_permissions": {"label": "Altri homebrew autorizzati (gruppo:livello)"},
   "docked": {"label": "Nella base (sulla TV)"},
   "battery": {"label": "A batteria (senza caricatore)"},
   "boot_choice": {"label": "Risposta a «build precedente?» all'avvio", "options": {"": "B", "a": "A"}},

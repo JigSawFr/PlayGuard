@@ -1765,7 +1765,7 @@
         "closing": "PlayGuard closes in {} s.",
         "returning": "Back to {} in {} s.",
         "settings_title": "Other homebrews",
-        "settings_note": "Other homebrews can start PlayGuard to ask it something, such as setting the network clock. Nothing is allowed until you choose it below, group by group. Whatever a homebrew asks, a change that needs the PIN asks for it. The details: playguard.link, Launch API.",
+        "settings_note": "Other homebrews can start PlayGuard to ask it something, such as setting the network clock. Nothing is allowed until you choose it below. A change always asks you first, then the PIN.",
         "enabled": "Let other homebrews call PlayGuard",
         "section_permissions": "What they may do",
         "section_calls": "Last calls",
@@ -1775,7 +1775,7 @@
         "on": "On",
         "off": "Off",
         "result": {
-            "clock": "The network clock is {} off.",
+            "clock": "The network clock is {}.",
             "clock_right": "The network clock is right: nothing to change.",
             "clock_set": "Network clock set.",
             "discovery": "Done.",
@@ -1821,7 +1821,7 @@
             "clock": "Measure the network clock",
             "clock_sync": "Set the network clock"
         },
-        "confirm_sync": "“{}” asks to set the network clock (off by {}).",
+        "confirm_sync": "“{}” asks to set the network clock ({}).",
         "confirm_sync_yes": "Set it (PIN)",
         "home_icon": "Add “Set the clock” to the HOME menu",
         "home_icon_name": "Set the clock",
@@ -1854,6 +1854,21 @@
         "notice_refused": "Other homebrews were refused",
         "notice_refused_line": "{}: refused {} times",
         "nothing_allowed": "nothing allowed",
-        "notice_line_many": "{} ({} times)"
+        "notice_line_many": "{} ({} times)",
+        "measuring": "Measuring the network clock with {}…",
+        "on_time": "on time",
+        "span_s": "{} s",
+        "span_min": "{} min",
+        "span_h_min": "{} h {} min",
+        "span_days": "{} days",
+        "behind": "{} behind",
+        "ahead": "{} ahead",
+        "off_unknown": "how far off is unknown",
+        "confirm_sync_unnamed": "A homebrew that gave no name asks to set the network clock ({}).",
+        "turn_on_first": "Turn on “Let other homebrews call PlayGuard” first.",
+        "clear_calls": "Clear the list",
+        "clear_calls_confirm": "Clear the list of calls? The notification bell forgets them too.",
+        "clear_calls_done": "The list of calls is empty.",
+        "clear_calls_err": "The list of calls could not be cleared."
     }
 }

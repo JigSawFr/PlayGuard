@@ -92,6 +92,8 @@
   "applet": {"label": "小程序模式（从相册启动）"},
   "background": {"label": "PlayGuard 在后台"},
   "hbloader": {"label": "能把更新交给商店的加载器"},
+  "api": {"label": "启动时的启动 API 请求(来自其他自制软件)"},
+  "api_permissions": {"label": "允许的其他自制软件(组:级别)"},
   "docked": {"label": "插在底座上（电视）"},
   "battery": {"label": "电池供电（未接充电器）"},
   "boot_choice": {"label": "启动时对“上一个版本？”的回答", "options": {"": "B", "a": "A"}},

@@ -92,6 +92,8 @@
   "applet": {"label": "Applet mode (from the album)"},
   "background": {"label": "PlayGuard out of focus"},
   "hbloader": {"label": "A loader that can hand an update to a store"},
+  "api": {"label": "A launch-API request at start-up (another homebrew's)"},
+  "api_permissions": {"label": "Other homebrews allowed (group:level)"},
   "docked": {"label": "On the dock (on the TV)"},
   "battery": {"label": "On the battery (no charger)"},
   "boot_choice": {"label": "Answer to \"previous build?\" at start-up", "options": {"": "B", "a": "A"}},

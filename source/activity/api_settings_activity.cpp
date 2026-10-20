@@ -68,7 +68,8 @@ void ApiSettingsActivity::onContentAvailable()
     for (const auto& g : groups_in_build()) {
         auto* cell = card_cell(perms, api_flow::group_name(g), g == "clock" ? "globe" : nullptr);
         cell->registerClickAction([this, g](brls::View*) {
-            this->choose(g);
+            if (!api_flow::settings().enabled) ui::notify("playguard/api/turn_on_first"_i18n, ui::Toast::Refused);
+            else this->choose(g);
             return true;
         });
         this->groups.push_back({ g, cell });
@@ -158,9 +159,10 @@ void ApiSettingsActivity::refresh()
 {
     const Settings s = api_flow::settings();
     enabled->setOn(s.enabled, false);
+    // Off, the groups stay in sight, greyed: what turning it on would offer.
     for (auto& [group, cell] : this->groups) {
         cell->setDetailText(api_flow::level_text(s.level(group)));
-        ui::set_visible(cell, s.enabled);
+        ui::show_writable(cell, s.enabled);
     }
     ui::set_visible(home, forwarder_flow::loader_present());
     all_off->setText(this->before_off.empty() ? "playguard/api/all_off"_i18n : "playguard/api/all_back"_i18n);
@@ -204,4 +206,17 @@ void ApiSettingsActivity::refresh_calls()
             return true;
         });
     }
+    auto* clear = card_cell(calls, "playguard/api/clear_calls"_i18n, "trash");
+    clear->registerClickAction([this](brls::View*) {
+        ui::confirm_danger("playguard/api/clear_calls_confirm"_i18n, "playguard/api/clear_calls"_i18n, [this]() {
+            if (api_flow::clear_calls()) ui::notify("playguard/api/clear_calls_done"_i18n, ui::Toast::Done);
+            else ui::error("playguard/api/clear_calls_err"_i18n);
+            // The focus leaves the list first: its rows are made again.
+            brls::sync([this]() {
+                brls::Application::giveFocus(this->enabled.getView());
+                this->refresh();
+            });
+        });
+        return true;
+    });
 }

@@ -22,12 +22,14 @@
 
         <brls:Label
             text="@i18n/playguard/api/screen_title"
+            width="760"
             fontSize="28"
             horizontalAlign="center"
             marginBottom="12"/>
 
         <brls:Label
             id="api_from"
+            width="760"
             horizontalAlign="center"
             marginBottom="28"
             textColor="@theme/cadran/text3"/>
@@ -41,6 +43,7 @@
 
         <brls:Label
             id="api_next"
+            width="760"
             horizontalAlign="center"
             marginTop="24"
             marginBottom="20"

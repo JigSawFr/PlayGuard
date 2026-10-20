@@ -364,15 +364,16 @@ also read it from the system itself (`pctl`), as PlayGuard does.
 
 ## Trying it
 
-*Both planned, soon after the first routes.*
+*The simulator's parameters are there; the example homebrew is planned.*
 
 - **In the browser.** The [simulator](https://playguard.link/simulator/)
-  takes the short form as a parameter, against its simulated console, and
-  shows the response it would write:
+  takes the short form as a parameter, against its simulated console
+  (`PLAYGUARD_SIM_API` and `PLAYGUARD_SIM_API_PERMISSIONS` on the desktop
+  build); the browser has no time server, so the clock routes answer
+  `503 no_network` there:
   `https://playguard.link/simulator/?api=POST%20/v1/clock/sync` (add
   `&api_permissions=clock:read_write` to set the permissions, which are
-  *None* there too by default). The site's smoke test plays every route this
-  way, so the simulator and this page stay in step.
+  *None* there too by default).
 - **On a console.** `examples/api-caller/` is a small homebrew, built by CI,
   that calls each route with `playguard_api.h` and shows the response. Use
   `dry_run` first: it says whether the permission is there without doing
@@ -404,4 +405,6 @@ also read it from the system itself (`pctl`), as PlayGuard does.
 - `source/activity/api_settings_activity.cpp`: *Preferences › Other homebrews*.
 - Planned: `playguard_api.h`, a single-header C helper for callers (write a
   request, launch PlayGuard, read the response); `examples/api-caller/`, the
-  example homebrew; the simulator's `?api=` parameter.
+  example homebrew.
+- The simulators' `?api=` and `?api_permissions=` (`web/params.json`):
+  `PLAYGUARD_SIM_API` and `PLAYGUARD_SIM_API_PERMISSIONS`, read in `api_flow`.
