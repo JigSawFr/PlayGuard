@@ -27,11 +27,17 @@
   park, apply, tiles, press...) is an id of a layout or of a view the code
   makes (setId): a renamed line would leave a chip that does nothing;
 - every sidebar tab name (playguard/tabs/) fits on one line: at most
-  TAB_WIDTH columns, a wide (CJK) character counting as two.
+  TAB_WIDTH columns, a wide (CJK) character counting as two;
+- every key ending in "_one" (the text for exactly one) has the key without
+  it next to it (the text for any other count), in every language.
 
 It also warns, without failing:
 - about sentence-like values a catalog still has in English (English is a
   fine placeholder for a new string);
+- about a value that marks a plural in brackets ("{} saved(s)", "Tag(e)"):
+  the code picks the text for the count (a "_one" key for 1) instead;
+- about a Cadran value of pt-BR in European Portuguese ("ecrã", "ficheiro"):
+  Brazil says "tela", "arquivo";
 - about an XML layout of resources/xml no class inflates, and an image of
   resources/img nothing names (the emoji of img/emoji/ aside: a palette for
   the release notes, kept whole on purpose);
@@ -110,6 +116,33 @@ for lang, cat in sorted(catalogs.items()):
     for k in sorted(set(base) & set(cat)):
         if str(base[k]).count("{}") != str(cat[k]).count("{}"):
             errors.append(f"{lang}: placeholder count differs for {k}")
+
+# A text for exactly one ("files_one") goes with the text for any other count
+# ("files"): the code reads the second one for every count but 1.
+for lang, cat in sorted(catalogs.items()):
+    for k in sorted(cat):
+        if k.endswith("_one") and k[:-len("_one")] not in cat:
+            errors.append(f"{lang}: {k} has no {k[:-len('_one')]} (the text for any other count)")
+
+# A plural marked in brackets ("enregistré(s)", "Tag(e)", "salvo(s)") reads
+# badly: the code gives the count, so the catalog can have one text for 1
+# ("_one") and one for more.
+PLURAL_MARK = re.compile(r"\w\((?:s|e|es|en|n|x|ões)\)")
+for lang, cat in sorted(catalogs.items()):
+    for k, v in sorted(cat.items()):
+        m = PLURAL_MARK.search(str(v))
+        if m:
+            warnings.append(f"{lang}: {k} marks a plural in brackets (\"{m.group(0)[1:]}\"): a \"_one\" key for 1 reads better")
+
+# pt-BR is Brazilian Portuguese: the Cadran screens, translated from pt,
+# must not keep the words only Portugal uses (Brazil says "tela",
+# "arquivo", "celular", "por enquanto", "Controle").
+EUROPEAN_PORTUGUESE = ["ecrã", "ficheiro", "telemóvel", "por agora", "controlo"]
+for k, v in sorted(catalogs.get("pt-BR", {}).items()):
+    if k.startswith("cadran/"):
+        for word in EUROPEAN_PORTUGUESE:
+            if re.search(r"\b" + re.escape(word) + r"\b", str(v), re.I):
+                warnings.append(f"pt-BR: {k} says \"{word}\", which is European Portuguese (pt), not Brazilian")
 
 # The sidebar's tab names stay on one line in every language.
 TAB_WIDTH = 16
