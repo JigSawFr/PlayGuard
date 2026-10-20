@@ -31,3 +31,12 @@ keep out screens with a toast, a held-key scroll that can stop anywhere
 (one held to the end of a list stops on its last row: `library/`), the app
 version (`devbuild/` keeps the build list, not the install confirmation) or
 SD-card content (backups) that piles up between local runs.
+
+Every scenario at once instead, three at a time (`-j` for more), with the
+references of each set whose screens changed replaced, and a summary of
+which ones did:
+
+```sh
+make desktop
+python3 tools/smoke_all.py smoke-all --update
+```
