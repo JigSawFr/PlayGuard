@@ -1,0 +1,45 @@
+{
+    "package": "PlayGuard",
+    "info": {
+        "title": "PlayGuard",
+        "author": "JigSawFr",
+        "category": "tool",
+        "version": "{version}",
+        "url": "https://github.com/JigSawFr/PlayGuard",
+        "license": "GPLv3",
+        "description": "Offline parental controls & play activity",
+        "details": [
+            "PlayGuard sets the Nintendo Switch's own parental controls on the console, offline: no phone app, no Nintendo account. The countdown, the PIN prompt and the suspension at the limit stay the console's own, nothing runs in the background, and the limits stay if PlayGuard is removed.",
+            "• Play-time limit: the same every day or one per weekday, saved profiles, extra time or no more play today, a bedtime alarm and a one-switch console lock.\n• Activity: play time per game and per user account, day by day, exported to CSV, JSON, XLSX or PDF.\n• Restrictions and PIN: restriction level, age rating, show or change the PIN, an optional PIN to open PlayGuard.\n• Network clock: set from NTP servers, so the play timer counts right on a console that never reaches Nintendo.\n• Safe: every change is logged and can be undone, settings are backed up to the SD card.\n• Unlinks the phone app on a second-hand console. Every console language, light and dark themes.",
+            "PlayGuard carries on Pctl Manager by Taylor, of which it is a fork. It installs to /switch/playguard/ and keeps its files in /config/playguard/.",
+            "A recovery sysmodule for a forgotten PIN is a separate, optional download: playguard-rescue.zip on the GitHub releases page.",
+            "Requires Atmosphère. Play-time limit on firmware {fw_min_play_timer} and later, tested on a console up to {fw_tested_max}; a newer firmware opens read-only until a release supports it."
+        ],
+        "binary": "/switch/playguard/playguard.nro"
+    },
+    "assets": [
+        {
+            "url": "https://github.com/JigSawFr/PlayGuard/releases/download/v{version}/playguard.zip",
+            "type": "zip",
+            "zip": [
+                {
+                    "path": "/switch/playguard/*",
+                    "dest": "/switch/playguard",
+                    "type": "update"
+                }
+            ],
+            "leaves_out": [
+                "config/sphaira/github/playguard.json"
+            ]
+        },
+        { "type": "icon", "url": "icon.png", "from": "images/store/icon.png" },
+        { "type": "banner", "url": "screen.png", "from": "images/store/banner.png" },
+        { "type": "screenshot", "url": "screen1.png", "from": "images/screenshots/dashboard.png" },
+        { "type": "screenshot", "url": "screen2.png", "from": "images/screenshots/play_timer.png" },
+        { "type": "screenshot", "url": "screen3.png", "from": "images/screenshots/per_day.png" },
+        { "type": "screenshot", "url": "screen4.png", "from": "images/screenshots/activity.png" },
+        { "type": "screenshot", "url": "screen5.png", "from": "images/screenshots/restrictions.png" },
+        { "type": "screenshot", "url": "screen6.png", "from": "images/screenshots/dashboard_fr_dark.png" }
+    ],
+    "changelog": "{changelog}"
+}
