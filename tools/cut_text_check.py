@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
-"""Checks that no text of the main screen's tabs is cut short ("…"), in the
-console's 15 languages, at the normal text size and the larger one.
+"""Checks that no text of the main screen's tabs, of a few common dialogs and
+of the child screen is cut short ("…"), in the console's 15 languages, at the
+normal text size and the larger one.
 
 For each language and size, starts the desktop build (build-desktop/playguard)
-on the tabs, shows every tab of the rail, and reads what PLAYGUARD_SIM_CUT_TEXT=1
-gathered in the run folder's cut_text.txt (source/ui/cut_text.cpp: every label
-its box cuts, by screen). A cut not listed in tests/cut_text/allowed.txt fails the
-check; a listed one that no longer happens is reported (the line can go).
+on the tabs, shows every tab of the rail, then, from Today, Stop for today:
+its picker, the confirmation of the unlock it needs and the failure dialog
+of that unlock (PLAYGUARD_SIM_FAIL=unlock); then Show the child. It reads
+what PLAYGUARD_SIM_CUT_TEXT=1 gathered in the run folder's cut_text.txt
+(source/ui/cut_text.cpp: every label its box cuts, by screen; "dashboard ›
+dialog" for a dialog over Today). A cut not listed in
+tests/cut_text/allowed.txt fails the check; a listed one that no longer
+happens is reported (the line can go).
 
 Usage: tools/cut_text_check.py <out-dir> [language ...]
        (needs DISPLAY and xdotool: xvfb-run in CI)
@@ -27,6 +32,9 @@ ALLOWED = os.path.join(ROOT, "tests", "cut_text", "allowed.txt")
 SIZES = ("normal", "large")
 TABS = 9                 # the rail: Today … About
 TAB_WAIT_S = 1.3         # a tab drawn, then a sample (once a second)
+# The failure dialog's line in the log (ui::error), whatever the language:
+# the simulated service's refusal, as rc_text gives it.
+FAILURE_LOGGED = "0x0000C88E"
 
 
 def languages():
@@ -58,6 +66,29 @@ def key(name):
     subprocess.run(["xdotool", "key", "--delay", "60", name], check=False)
 
 
+# A press held this long, then this long for the screen to follow: under
+# software GL on a busy machine, a press shorter than a frame can be missed.
+HOLD_S = 0.06
+MOVE_S = 0.35
+
+
+def press(name):
+    subprocess.run(["xdotool", "keydown", name, "sleep", str(HOLD_S), "keyup", name], check=False)
+    time.sleep(MOVE_S)
+
+
+def logged(log, text, seconds):
+    """Whether `text` reaches the app's log within `seconds`."""
+    end = time.time() + seconds
+    while True:
+        with open(log, encoding="utf-8", errors="replace") as lf:
+            if text in lf.read():
+                return True
+        if time.time() > end:
+            return False
+        time.sleep(0.25)
+
+
 def run(out, lang, size):
     """The cuts of one language at one size: (lang, size, screen, text)."""
     base = os.path.join(out, f"{lang}-{size}")
@@ -71,7 +102,9 @@ def run(out, lang, size):
     log = os.path.join(base, "app.log")
     env = dict(os.environ, LIBGL_ALWAYS_SOFTWARE="1", TZ="UTC", PLAYGUARD_SIM_NOW="1791475200",
                PLAYGUARD_SIM_STILL_FOCUS="1", PLAYGUARD_SIM_VERSION="1.0.0:1a2b3c4",
-               PLAYGUARD_SIM_CHECK_MS="0", PLAYGUARD_SIM_CUT_TEXT="1")
+               PLAYGUARD_SIM_CHECK_MS="0", PLAYGUARD_SIM_CUT_TEXT="1",
+               # The unlock Stop for today needs fails: its failure dialog.
+               PLAYGUARD_SIM_FAIL="unlock")
     with open(log, "w") as lf:
         # Line-buffered, so "first screen ready" reaches the log at once; in
         # a D-Bus session of its own, as tools/desktop_smoke.py starts it.
@@ -93,6 +126,21 @@ def run(out, lang, size):
         for _ in range(TABS - 1):
             key("Down")
             time.sleep(TAB_WAIT_S)
+        # Today's hero: Extra time, then Stop for today below it.
+        for name in ["Up"] * (TABS - 1) + ["Right", "Down", "Return"]:
+            press(name)
+        time.sleep(TAB_WAIT_S)          # its picker: now, or in 5 minutes
+        press("Return")                 # now
+        time.sleep(TAB_WAIT_S)          # the confirmation, with the unlock it needs
+        press("Right")
+        press("Return")                 # Unlock and apply: the unlock fails
+        if not logged(log, FAILURE_LOGGED, 10):
+            sys.exit(f"{lang} {size}: the failure dialog did not open (see {log})")
+        time.sleep(TAB_WAIT_S)          # the failure dialog
+        press("Return")                 # OK
+        press("Right")                  # Show the child
+        press("Return")
+        time.sleep(TAB_WAIT_S + 0.5)    # its entrance, then a sample
     finally:
         app.terminate()
         try:
