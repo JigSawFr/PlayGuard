@@ -33,6 +33,11 @@ struct Entry
     //   "add_forwarder", "remove_forwarder", "protect_forwarder",
     //   "unprotect_forwarder" (the PIN asked at its start, or no longer;
     //   detail: its name and program ID): no values
+    //   "forwarder_gone" (one PlayGuard made, no longer on the HOME menu: seen,
+    //   not made; detail: its name and program ID): no values
+    //   "lock_hbmenu", "unlock_hbmenu" (the homebrew menu, action/hbmenu_lock):
+    //   no values; "hbmenu_restored" (unlocked at boot by the rescue
+    //   sysmodule: seen, not made; detail: why): no values
     std::string kind;
     // Where from: "uniform", "day", "per_day", "extra", "stop", "restore_extra",
     // "profile", "remove", "backup", "undo", "first_steps" … ("" when plain).

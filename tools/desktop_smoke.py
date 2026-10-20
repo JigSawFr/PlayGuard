@@ -87,12 +87,19 @@ a homebrew of the simulated /switch folder picked from the list and protected
 with the PIN, then both deleted; forwarders.json and the change history must
 follow each step.
 
+The "hbmenu" scenario locks the homebrew menu (with signature patches on the
+simulated SD card), the rescue sysmodule's report of a lift at boot taken at
+start-up: refused first (no way back yet), then PlayGuard's own
+forwarder and sphaira's, protected with the PIN, made; locked, then
+unlocked: override_config.ini, the state file and the change history must
+follow.
+
 The "loading" scenario stops the start-up on the loading screen
 (PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge|bedtime|forwarders]   (needs DISPLAY, xdotool, ImageMagick)
+Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge|bedtime|forwarders|hbmenu]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -131,6 +138,7 @@ CADRANUNLOCKED = SCENARIO == "cadranunlocked"
 CADRANLARGE = SCENARIO == "cadranlarge"
 BEDTIME = SCENARIO == "bedtime"
 FORWARDERS = SCENARIO == "forwarders"
+HBMENU = SCENARIO == "hbmenu"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
@@ -375,7 +383,7 @@ if BEDTIME:
     # 20:00 (above), an hour before the simulated bedtime (21:00 every day),
     # with 90 minutes left: the bedtime stops play first.
     env.setdefault("PLAYGUARD_SIM_LEFT_MIN", "90")
-if FORWARDERS:
+if FORWARDERS or HBMENU:
     # Nothing made in an earlier local run: the simulated HOME menu starts
     # with the one another app made (PLAYGUARD_SIM_KEEP is off), PlayGuard's
     # file with none, the made-up .nro files written again.
@@ -383,6 +391,23 @@ if FORWARDERS:
         if os.path.exists(f):
             os.remove(f)
     shutil.rmtree(os.path.join(run_dir, "playguard_data", "sd", "switch"), ignore_errors=True)
+sd_override = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "config", "override_config.ini")
+hbmenu_state = os.path.join(run_dir, "playguard_data", "hbmenu_lock.txt")
+if HBMENU:
+    # The homebrew menu never locked in an earlier run; the signature patches
+    # forwarders need (sigpatch files for fs and the loader).
+    for f in (sd_override, hbmenu_state):
+        if os.path.exists(f):
+            os.remove(f)
+    # What the rescue sysmodule leaves after lifting it at boot (Atmosphère
+    # updated since): told and recorded at start-up, then removed.
+    os.makedirs(os.path.join(run_dir, "playguard_data"), exist_ok=True)
+    open(os.path.join(run_dir, "playguard_data", "hbmenu_lock_report.txt"), "w").write(
+        "reason=atmosphere\nresult=ok\nfrom=1.9.4\nto=1.9.5\n")
+    for kind in ("fs_patches", "loader_patches"):
+        d = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "kip_patches", kind)
+        os.makedirs(d, exist_ok=True)
+        open(os.path.join(d, "0000000000000000.ips"), "wb").write(b"PATCHEOF")
 if LIBRARY:
     # A large library: All games builds its first covers, then the rest on
     # "Show every game".
@@ -1131,7 +1156,7 @@ if FORWARDERS:
     key("Down", 3)             # Save Keeper, PlayGuard's line, Another homebrew
     key("Return")
     shot("06_pick")            # the made-up homebrew of /switch, PlayGuard's own among them
-    key("Down", 4)             # Star Atlas
+    key("Down", 5)             # Star Atlas, after sphaira
     key("Return")
     shot("07_name")            # its name from its .nro, to change or keep
     key("Return")              # kept
@@ -1174,6 +1199,80 @@ if FORWARDERS:
     if len(recorded("remove_forwarder")) != 2 or made() != [(self_id, "PlayGuard")]:
         fail("the other app's forwarder was not deleted: " + repr(recorded("remove_forwarder")))
     shot("13_left")            # PlayGuard alone
+    finish()
+if HBMENU:
+    # Console › Forwarders › Lock the homebrew menu: refused with no way back,
+    # then PlayGuard's forwarder and sphaira's (protected with the PIN) made,
+    # locked, unlocked.
+    made_file = os.path.join(nand_dir, "forwarders.json")
+    history_file = os.path.join(nand_dir, "history.json")
+    def recorded(kind):
+        try:
+            return [e for e in json.load(open(history_file)).get("entries", []) if e.get("kind") == kind]
+        except (OSError, ValueError):
+            return []
+    def override():
+        try:
+            return open(sd_override).read()
+        except OSError:
+            return ""
+    restored = recorded("hbmenu_restored")
+    if len(restored) != 1 or restored[0].get("detail") != "Atmosphère 1.9.4 → 1.9.5" or \
+            os.path.exists(os.path.join(run_dir, "playguard_data", "hbmenu_lock_report.txt")):
+        fail("the sysmodule's report was not taken: " + repr(restored))
+    key("Down", steps("dashboard", "console"))
+    key("Right")               # Network clock
+    key("Down", 2)             # Forwarders, under Homebrew
+    key("Return")
+    key("Down", 3)             # PlayGuard's line, Another homebrew, Lock the homebrew menu
+    key("Return")
+    shot("01_not_ready")       # what it takes first: PlayGuard's forwarder, a protected menu
+    if override():
+        fail("the homebrew menu was locked without a way back: " + repr(override()))
+    key("Return")              # OK
+    key("Up", 2)               # PlayGuard's line
+    key("Return")
+    key("Right")               # Add
+    key("Return")
+    time.sleep(3)
+    key("Down", 3)             # Save Keeper, PlayGuard's line, Another homebrew
+    key("Return")
+    key("Down", 4)             # sphaira (by name: Pixel Paint, PlayGuard, Quick Notes, Save Keeper, sphaira)
+    key("Return")
+    key("Return")              # its name kept
+    key("Right")               # Add
+    key("Return")
+    time.sleep(3)
+    key("Down", 2)             # PlayGuard, Save Keeper, sphaira
+    key("Return")
+    key("Down", 3)             # Protect with the PIN
+    key("Return")
+    key("Right")
+    key("Return")
+    time.sleep(3)
+    pinned = [e.get("name") for e in json.load(open(made_file)).get("forwarders", []) if e.get("pin")]
+    if pinned != ["sphaira"]:
+        fail("sphaira was not protected with the PIN: " + repr(pinned))
+    key("Down", 3)             # PlayGuard's line, Another homebrew, Lock the homebrew menu
+    key("Return")
+    shot("02_confirm")         # what it changes, Save Keeper still open, the way back from a computer
+    key("Right")               # Lock
+    key("Return")
+    time.sleep(3)
+    text = override()
+    if "; >>> PlayGuard: the homebrew menu is locked" not in text or "override_any_app=false" not in text:
+        fail("override_config.ini is not locked: " + repr(text))
+    if not os.path.exists(hbmenu_state) or len(recorded("lock_hbmenu")) != 1:
+        fail("the lock's state file or its history entry is missing")
+    shot("03_locked")          # Lock the homebrew menu: Locked
+    key("Return")              # unlocked at once (the PIN asked)
+    time.sleep(3)
+    text = override()
+    if "the homebrew menu is locked" in text or "override_any_app=true" not in text or "010000000000100D" not in text:
+        fail("override_config.ini is not unlocked: " + repr(text))
+    if os.path.exists(hbmenu_state) or len(recorded("unlock_hbmenu")) != 1:
+        fail("the state file stayed, or the unlock is not in the history")
+    shot("04_unlocked")
     finish()
 if LIBRARY:
     def listed():

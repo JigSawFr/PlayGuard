@@ -184,6 +184,7 @@ else ()
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/calendar.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gamecheck_rules.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/forwarder_pack.c
+                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/hbl_lock.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/rescue.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/write_guard.c)
 endif ()

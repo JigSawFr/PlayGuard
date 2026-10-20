@@ -29,6 +29,7 @@ bool write_all(const std::vector<Made>& all, std::string* error)
             e["pin"] = true;
             e["gate"] = m.gate;
         }
+        if (m.gone) e["gone"] = true;
         list.push_back(e);
     }
     const nlohmann::json doc = { { "forwarders", list } };
@@ -63,6 +64,7 @@ std::vector<Made> list()
         if (m.argv.empty()) m.argv = m.nro;
         m.gate = json_util::string_at(e, "gate");
         m.pin  = json_util::flag_at(e, "pin") && !m.gate.empty();
+        m.gone = json_util::flag_at(e, "gone");
         bool seen = false;
         for (const Made& o : out) seen = seen || o.id == m.id;
         if (!seen) out.push_back(m);

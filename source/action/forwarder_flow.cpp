@@ -129,6 +129,7 @@ bool install(const forwarders::Made& m, bool self, const char* kind = "add_forwa
     const Result rc = forwarder_install(&spec, &id);
     if (R_SUCCEEDED(rc)) {
         made.id = id;
+        made.gone = false;   // on the HOME menu again
         std::string werr;
         if (!forwarders::save(made, &werr)) brls::Logger::warning("forwarders: not remembered ({})", werr);
         history_flow::record_event(kind, "", history_label(made.name, id));

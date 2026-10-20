@@ -30,6 +30,9 @@ struct Made
     // "sdmc:/…") first, which asks for it (util/forwarder_gate.hpp).
     bool        pin = false;
     std::string gate;
+    // No longer on the HOME menu, and the parent told so (the change
+    // history, the bell): told once (action/hbmenu_lock.hpp).
+    bool        gone = false;
 };
 
 // Every one remembered, in the file's order. A damaged file reads as none;

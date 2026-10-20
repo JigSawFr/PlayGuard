@@ -212,6 +212,13 @@ static void test_registry()
     b.pin = false;
     CHECK(forwarders::save(b));
     CHECK(forwarders::find(b.id, &found) && !found.pin && found.gate.empty());
+    // Told gone once: kept, and dropped once it is false again.
+    b.gone = true;
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.gone);
+    b.gone = false;
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && !found.gone);
 
     CHECK(forwarders::forget(a.id));
     all = forwarders::list();
@@ -289,7 +296,10 @@ static void test_merge()
     pinned = merge({ locked }, one, exists, "");
     CHECK(pinned.size() == 1 && pinned[0].pin && pinned[0].state == State::Ready);
     pinned = merge({ locked }, {}, exists, "");
-    CHECK(pinned.size() == 1 && pinned[0].pin && pinned[0].state == State::NotInstalled);
+    CHECK(pinned.size() == 1 && pinned[0].pin && pinned[0].state == State::NotInstalled && !pinned[0].gone_seen);
+    locked.gone = true;
+    pinned = merge({ locked }, {}, exists, "");
+    CHECK(pinned.size() == 1 && pinned[0].gone_seen);
     const Row* self = self_row(rows);
     CHECK(self && self->id == 3);
     CHECK(!self_row(merge({}, on, exists, "")));
@@ -300,6 +310,59 @@ static void test_merge()
     CHECK(default_name("  Goldleaf ", "sdmc:/switch/Goldleaf.nro") == "Goldleaf");
     CHECK(default_name("", "sdmc:/switch/hb/hb-menu.nro") == "hb-menu");
     CHECK(default_name(std::string(100, 'n'), "x").size() == forwarders::MAX_NAME);
+}
+
+static void test_lock_check()
+{
+    using namespace forwarders_logic;
+    CHECK(is_menu("sdmc:/hbmenu.nro") && is_menu("sdmc:/switch/sphaira/sphaira.nro") && is_menu("sdmc:/x/HBMENU.NRO"));
+    CHECK(!is_menu("sdmc:/switch/cyberfoil.nro") && !is_menu("") && !is_menu("sdmc:/switch/sphaira/old_sphaira.nro"));
+
+    Row self;
+    self.id = 1;
+    self.name = "PlayGuard";
+    self.nro = "sdmc:/switch/playguard/playguard.nro";
+    self.self = true;
+    Row menu;
+    menu.id = 2;
+    menu.name = "sphaira";
+    menu.nro = "sdmc:/switch/sphaira/sphaira.nro";
+    menu.pin = true;
+    Row game;
+    game.id = 3;
+    game.name = "Cyberfoil";
+    game.nro = "sdmc:/switch/cyberfoil.nro";
+    LockCheck c = lock_check({ self, menu, game }, true, Patches::Ready);
+    CHECK(c.ready() && c.routes() && c.menus == std::vector<std::string>{ "sphaira" } && c.open_doors.empty());
+    // Each missing piece refuses it.
+    CHECK(!lock_check({ self, menu }, false, Patches::Ready).ready());
+    CHECK(!lock_check({ self, menu }, true, Patches::Missing).ready());
+    CHECK(lock_check({ self, menu }, true, Patches::Unknown).ready());   // sys-patch there, its log silent
+    c = lock_check({ menu, game }, true, Patches::Ready);
+    CHECK(!c.ready() && !c.self && !c.routes());
+    c = lock_check({ self, game }, true, Patches::Ready);
+    CHECK(!c.ready() && c.menus.empty());
+    // A menu not protected, or not there: no way back, and an open door.
+    Row open_menu = menu;
+    open_menu.pin = false;
+    c = lock_check({ self, open_menu }, true, Patches::Ready);
+    CHECK(c.menus.empty() && c.open_doors == std::vector<std::string>{ "sphaira" });
+    Row gone_menu = menu;
+    gone_menu.state = State::NroMissing;
+    CHECK(lock_check({ self, gone_menu }, true, Patches::Ready).menus.empty());
+    gone_menu.state = State::NotInstalled;
+    c = lock_check({ self, gone_menu }, true, Patches::Ready);
+    CHECK(c.menus.empty() && c.open_doors.empty());
+    Row self_broken = self;
+    self_broken.state = State::GateMissing;
+    CHECK(!lock_check({ self_broken, menu }, true, Patches::Ready).self);
+    // Another app's forwarder: what it starts is unknown, it is told.
+    Row other;
+    other.id = 4;
+    other.name = "Save Keeper";
+    other.state = State::Elsewhere;
+    c = lock_check({ self, menu, other }, true, Patches::Ready);
+    CHECK(c.ready() && c.open_doors == std::vector<std::string>{ "Save Keeper" });
 }
 
 static void test_gate()
@@ -431,6 +494,7 @@ int main()
     test_text();
     test_merge();
     test_gate();
+    test_lock_check();
     test_patches();
     return CHECK_DONE("forwarders tests passed");
 }

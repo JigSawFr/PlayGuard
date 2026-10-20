@@ -397,7 +397,7 @@ static void test_forwarders()
     TempDir sd("sim_sd");
     sim_homebrew::seed(sd.path());
     const auto found = nro::find(sd.path());
-    CHECK(found.size() == 5);   // and PlayGuard's own
+    CHECK(found.size() == 6);   // and PlayGuard's own, and a homebrew menu (sphaira)
     nro::Info info;
     CHECK(nro::read(sd.path() + "/switch/StarAtlas.nro", info) && info.name == "Star Atlas" && info.version == "0.9.4");
     CHECK(nro::icon_usable(info.icon));

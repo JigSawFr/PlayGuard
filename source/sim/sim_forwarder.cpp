@@ -39,7 +39,8 @@ void copy(char* dst, size_t size, const char* src)
 }
 
 // The made-up homebrew on the simulated SD card (the fourth has the
-// forwarder another tool made), and PlayGuard's own .nro where the console
+// forwarder another tool made), a homebrew menu (sphaira, by its file name:
+// forwarders_logic::is_menu), and PlayGuard's own .nro where the console
 // keeps it, without an icon (the app's own stands in, forwarder_flow.cpp).
 struct Homebrew
 {
@@ -53,6 +54,7 @@ const Homebrew HOMEBREW[] = {
     { "/switch/QuickNotes/QuickNotes.nro", "Quick Notes", "Paper Fox", "1.3.0", SIM_HB_ICON_NOTES, sizeof(SIM_HB_ICON_NOTES) },
     { "/switch/SaveKeeper/SaveKeeper.nro", "Save Keeper", "Hollow Tools", "3.10.1", SIM_HB_ICON_KEEPER, sizeof(SIM_HB_ICON_KEEPER) },
     { "/switch/playguard/playguard.nro", "PlayGuard", "JigSawFr", "", nullptr, 0 },
+    { "/switch/sphaira/sphaira.nro", "sphaira", "ITotalJustice", "1.0.0", SIM_HB_ICON_NOTES, sizeof(SIM_HB_ICON_NOTES) },
 };
 const Homebrew& KEPT = HOMEBREW[3];
 

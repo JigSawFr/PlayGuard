@@ -3,6 +3,7 @@
 
 #include "action/forwarder_flow.hpp"
 #include "action/game_icons.hpp"
+#include "action/hbmenu_lock.hpp"
 #include "app.hpp"
 #include "tab/cadran_list.hpp"
 #include "ui/format_text.hpp"
@@ -63,7 +64,20 @@ void ForwardersActivity::onContentAvailable()
         return true;
     });
     ui::show_writable(other, !app::read_only());
-    cadran::List(this->getContentView(), true).apply({ { "fw_self", "home" }, { "fw_other", "plus" } });
+    lock_note->setSingleLine(false);
+    lock_cell->registerClickAction([this](brls::View*) {
+        std::weak_ptr<bool> weak = this->alive;
+        const auto after = [this, weak](bool) {
+            brls::sync([this, weak]() {
+                if (!weak.expired()) this->show_lock();
+            });
+        };
+        if (hbmenu_lock::locked()) hbmenu_lock::unlock(after);
+        else hbmenu_lock::lock(after);
+        return true;
+    });
+    cadran::List(this->getContentView(), true)
+        .apply({ { "fw_self", "home" }, { "fw_other", "plus" }, { "fw_lock", "lock" } });
     // Without the forwarders' program (a build from elsewhere), nothing can
     // be added: said instead of the two lines.
     if (!forwarder_flow::loader_present()) {
@@ -71,10 +85,21 @@ void ForwardersActivity::onContentAvailable()
         ui::set_visible(warning.getView(), true);
         ui::set_visible(self_cell.getView(), false);
         ui::set_visible(other.getView(), false);
+        ui::set_visible(lock_header.getView(), false);
+        ui::set_visible(lock_cell.getView(), false);
+        ui::set_visible(lock_note.getView(), false);
     } else {
         this->show_patches();
     }
     this->rebuild();
+    this->show_lock();
+}
+
+void ForwardersActivity::show_lock()
+{
+    const bool on = hbmenu_lock::locked();
+    lock_cell->setDetailText(on ? "playguard/hbmenu/state_locked"_i18n : "playguard/hbmenu/state_open"_i18n);
+    ui::show_writable(lock_cell, !app::read_only(), ui::color_text(), on ? ui::color_ok() : ui::color_neutral());
 }
 
 void ForwardersActivity::show_patches()

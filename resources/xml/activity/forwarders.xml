@@ -3,7 +3,9 @@
 <!-- Console › Forwarders: the homebrew on the HOME menu as games, A on one
      for its details, a new name or publisher, installing it again or
      deleting it; below, PlayGuard itself on the HOME menu, or another
-     homebrew. The list is rebuilt by source/activity/forwarders_activity.cpp. -->
+     homebrew; last, the homebrew menu locked, so that a homebrew starts only
+     from its forwarder. The list is rebuilt by
+     source/activity/forwarders_activity.cpp. -->
 
 <brls:AppletFrame
     iconInterpolation="linear">
@@ -36,6 +38,9 @@
             <brls:DetailCell id="fw_self" title="PlayGuard"/>
             <brls:DetailCell id="fw_other" title="@i18n/playguard/forwarders/other"/>
             <brls:Label id="fw_game_note" text="@i18n/playguard/forwarders/game_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <brls:Header id="fw_lock_header" title="@i18n/playguard/hbmenu/section" marginTop="24" marginBottom="8"/>
+            <brls:DetailCell id="fw_lock" title="@i18n/playguard/hbmenu/cell"/>
+            <brls:Label id="fw_lock_note" text="@i18n/playguard/hbmenu/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
         </brls:Box>
 

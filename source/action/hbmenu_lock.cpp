@@ -1,0 +1,280 @@
+// Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
+#include "action/hbmenu_lock.hpp"
+
+#include <borealis.hpp>
+#include <cstdio>
+#include <sys/stat.h>
+
+#include "action/forwarder_flow.hpp"
+#include "action/forwarders_logic.hpp"
+#include "action/history_flow.hpp"
+#include "action/notices.hpp"
+#include "action/pin_lock.hpp"
+#include "app.hpp"
+#include "core/hbl_lock.h"
+#include "core/rescue.h"
+#include "ui/ui.hpp"
+#include "util/forwarders.hpp"
+#include "util/paths.hpp"
+#include "util/pctl_ops_c.hpp"
+
+using namespace brls::literals;
+
+namespace hbmenu_lock
+{
+
+namespace
+{
+
+// `rel` from the SD card root ("/" on the console).
+std::string on_sd(const char* rel)
+{
+    std::string path = paths::sd_root();
+    if (path.empty() || path.back() != '/') path += '/';
+    return path + rel;
+}
+
+std::string config_path()
+{
+    return on_sd(HBL_LOCK_CONFIG_PATH);
+}
+
+std::string in_data(const char* name)
+{
+    return paths::data_dir() + "/" + name;
+}
+
+// uLaunch, which replaces the HOME menu and starts homebrew its own way:
+// the lock does not reach it.
+bool ulaunch_present()
+{
+    struct stat st;
+    return stat(on_sd("atmosphere/contents/0100000000001000/exefs.nsp").c_str(), &st) == 0;
+}
+
+std::string read_config()
+{
+    std::string text;
+    if (!paths::read_file(config_path(), text)) text.clear();
+    return text;
+}
+
+// The file after `op`; false (logged) when it is too large to handle.
+bool apply(const std::string& text, HblLockOp op, std::string& out)
+{
+    std::string buf(HBL_LOCK_MAX_FILE + 2048, '\0');
+    size_t n = 0;
+    if (text.size() > HBL_LOCK_MAX_FILE ||
+        !hbl_lock_apply(text.data(), text.size(), op, &buf[0], buf.size(), &n)) {
+        brls::Logger::error("hbmenu lock: {} is too large ({} bytes)", HBL_LOCK_CONFIG_PATH, text.size());
+        return false;
+    }
+    out.assign(buf.data(), n);
+    return true;
+}
+
+// The Atmosphère version, for the sysmodule to tell an update.
+void write_state()
+{
+    SysInfo si;
+    sysinfo_get(&si);
+    std::string error;
+    char text[32];
+    const std::string path = in_data(HBL_LOCK_STATE_NAME);
+    if (!si.ams_valid || !hbl_lock_state_format(si.ams_major, si.ams_minor, si.ams_micro, text, sizeof(text))) {
+        std::remove(path.c_str());
+        return;
+    }
+    if (!paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(path, text, &error))
+        brls::Logger::warning("hbmenu lock: {} not written: {}", HBL_LOCK_STATE_NAME, error);
+}
+
+// The checks, read now.
+forwarders_logic::LockCheck check()
+{
+    u32 pin_length = 0;
+    const bool pin = R_SUCCEEDED(pctl_lock_state(&pin_length, nullptr)) && pin_length > 0;
+    return forwarders_logic::lock_check(forwarder_flow::rows(), pin,
+                                        forwarders_logic::patches_state(ui::patch_report()));
+}
+
+std::string joined(const std::vector<std::string>& names)
+{
+    std::string out;
+    for (const std::string& n : names) out += (out.empty() ? "" : ", ") + n;
+    return out;
+}
+
+// What locking still needs, one line each.
+std::string missing(const forwarders_logic::LockCheck& c)
+{
+    std::string out;
+    const auto add = [&out](const std::string& line) { out += "\n• " + line; };
+    if (!c.pin) add("playguard/hbmenu/need_pin"_i18n);
+    if (!c.patches) add("playguard/hbmenu/need_patches"_i18n);
+    if (!c.self) add("playguard/hbmenu/need_self"_i18n);
+    if (c.menus.empty()) add("playguard/hbmenu/need_menu"_i18n);
+    return out;
+}
+
+bool write_config(const std::string& text, std::string* error)
+{
+    return paths::ensure_dir(on_sd("atmosphere/config")) && paths::atomic_write(config_path(), text, error);
+}
+
+// The sysmodule's report, told and recorded, then removed.
+void take_report(const std::function<void()>& open)
+{
+    const std::string path = in_data(HBL_LOCK_REPORT_NAME);
+    std::string text;
+    if (!paths::read_file(path, text)) return;
+    std::remove(path.c_str());
+    std::remove((path + ".tmp").c_str());
+    HblLockReport r;
+    if (!hbl_lock_report_parse(text.c_str(), text.size(), &r)) {
+        brls::Logger::warning("hbmenu lock: the sysmodule's report is unreadable");
+        return;
+    }
+    brls::Logger::info("hbmenu lock: lifted at boot by the sysmodule ({}, {})",
+                       r.reason == HblLockReason_Atmosphere ? "Atmosphère updated" : "rescue", r.ok ? "ok" : "failed");
+    if (!r.ok) {
+        notices::set("hbmenu_lifted", notices::Level::Action, "playguard/hbmenu/lift_failed"_i18n,
+                     "playguard/hbmenu/lift_failed_detail"_i18n, "playguard/hbmenu/open"_i18n, open);
+        return;
+    }
+    history_flow::record_event("hbmenu_restored", "",
+                               r.reason == HblLockReason_Atmosphere ? "Atmosphère " + std::string(r.from) + " → " + r.to
+                                                                    : std::string(RESCUE_REQUEST_NAME));
+    const std::string detail = r.reason == HblLockReason_Atmosphere
+        ? brls::getStr("playguard/hbmenu/lifted_atmosphere", r.from, r.to)
+        : "playguard/hbmenu/lifted_rescue"_i18n;
+    notices::set("hbmenu_lifted", notices::Level::Info, "playguard/hbmenu/lifted"_i18n, detail,
+                 "playguard/hbmenu/open"_i18n, open);
+}
+
+}   // namespace
+
+bool locked()
+{
+    const std::string text = read_config();
+    return hbl_lock_locked(text.data(), text.size());
+}
+
+void lock(std::function<void(bool)> done)
+{
+    const auto finish = [done](bool changed) {
+        if (done) done(changed);
+    };
+    if (ui::refuse_read_only()) return finish(false);
+    const forwarders_logic::LockCheck c = check();
+    if (!c.ready()) {
+        ui::info("playguard/hbmenu/not_ready"_i18n + missing(c));
+        return finish(false);
+    }
+    std::string body = brls::getStr("playguard/hbmenu/confirm", joined(c.menus));
+    if (!c.open_doors.empty()) body += "\n\n" + brls::getStr("playguard/hbmenu/open_doors", joined(c.open_doors));
+    if (ulaunch_present()) body += "\n\n" + "playguard/hbmenu/ulaunch"_i18n;
+    body += "\n\n" + brls::getStr("playguard/hbmenu/escape", HBL_LOCK_CONFIG_PATH);
+    ui::confirm(body, "playguard/hbmenu/lock"_i18n, [finish]() {
+        // The PIN whatever PlayGuard's own lock says, then the change check
+        // (read-only mode).
+        if (!pin_lock::confirm() || R_FAILED(core_change_allowed())) return finish(false);
+        const std::string before = read_config();
+        std::string after, error;
+        if (!apply(before, HblLock_Lock, after)) {
+            ui::error("playguard/hbmenu/lock_err"_i18n, "playguard/hbmenu/too_large"_i18n);
+            return finish(false);
+        }
+        // The file as it was, once: not one already locked.
+        if (!before.empty() && !hbl_lock_locked(before.data(), before.size())) {
+            std::string berr;
+            if (!paths::ensure_dir(paths::data_dir()) ||
+                !paths::atomic_write(in_data(HBL_LOCK_BACKUP_NAME), before, &berr))
+                brls::Logger::warning("hbmenu lock: the backup was not written: {}", berr);
+        }
+        if (!write_config(after, &error)) {
+            ui::error("playguard/hbmenu/lock_err"_i18n, error);
+            return finish(false);
+        }
+        write_state();
+        notices::clear("hbmenu_lifted");
+        history_flow::record_event("lock_hbmenu");
+        brls::Logger::info("hbmenu lock: locked");
+        ui::notify("playguard/hbmenu/locked_done"_i18n, ui::Toast::Done);
+        finish(true);
+    }, [finish]() { finish(false); });
+}
+
+void unlock(std::function<void(bool)> done)
+{
+    const auto finish = [done](bool changed) {
+        if (done) done(changed);
+    };
+    if (ui::refuse_read_only()) return finish(false);
+    if (!pin_lock::confirm() || R_FAILED(core_change_allowed())) return finish(false);
+    std::string after, error;
+    if (!apply(read_config(), HblLock_Unlock, after)) {
+        ui::error("playguard/hbmenu/unlock_err"_i18n, "playguard/hbmenu/too_large"_i18n);
+        return finish(false);
+    }
+    if (!write_config(after, &error)) {
+        ui::error("playguard/hbmenu/unlock_err"_i18n, error);
+        return finish(false);
+    }
+    std::remove(in_data(HBL_LOCK_STATE_NAME).c_str());
+    notices::clear("hbmenu_route");
+    history_flow::record_event("unlock_hbmenu");
+    brls::Logger::info("hbmenu lock: unlocked");
+    ui::notify("playguard/hbmenu/unlocked_done"_i18n, ui::Toast::Done);
+    finish(true);
+}
+
+void at_start(std::function<void()> open)
+{
+    take_report(open);
+    const bool is_locked = locked();
+    // Nothing made here and nothing locked: the HOME menu is not read.
+    if (!is_locked && forwarders::list().empty()) {
+        notices::clear("hbmenu_route");
+        notices::clear("forwarder_gone");
+        return;
+    }
+    const std::vector<forwarders_logic::Row> rows = forwarder_flow::rows();
+
+    // Made here, no longer on the HOME menu (deleted in System Settings):
+    // recorded once, told while it lasts.
+    std::vector<std::string> gone;
+    for (const auto& r : rows) {
+        if (r.state != forwarders_logic::State::NotInstalled) continue;
+        gone.push_back(r.name);
+        if (r.gone_seen) continue;
+        forwarders::Made m;
+        if (forwarders::find(r.id, &m)) {
+            m.gone = true;
+            std::string err;
+            if (!forwarders::save(m, &err)) brls::Logger::warning("forwarders: not remembered ({})", err);
+        }
+        history_flow::record_event("forwarder_gone", "", r.name + " (" + forwarders::hex_id(r.id) + ")");
+    }
+    if (gone.empty()) notices::clear("forwarder_gone");
+    else
+        notices::set("forwarder_gone", notices::Level::Info, "playguard/hbmenu/gone"_i18n,
+                     brls::getStr("playguard/hbmenu/gone_detail", joined(gone)), "playguard/hbmenu/open"_i18n, open);
+
+    if (!is_locked) {
+        notices::clear("hbmenu_route");
+        return;
+    }
+    u32 pin_length = 0;
+    const bool pin = R_SUCCEEDED(pctl_lock_state(&pin_length, nullptr)) && pin_length > 0;
+    const forwarders_logic::LockCheck c =
+        forwarders_logic::lock_check(rows, pin, forwarders_logic::patches_state(ui::patch_report()));
+    if (c.routes()) {
+        notices::clear("hbmenu_route");
+        return;
+    }
+    notices::set("hbmenu_route", notices::Level::Action, "playguard/hbmenu/route"_i18n,
+                 "playguard/hbmenu/route_detail"_i18n + missing(c), "playguard/hbmenu/open"_i18n, open);
+}
+
+}   // namespace hbmenu_lock

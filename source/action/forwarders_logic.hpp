@@ -41,6 +41,7 @@ struct Row
     State       state = State::Ready;
     bool        self = false;   // PlayGuard's own
     bool        pin = false;    // made here, protected with the PIN
+    bool        gone_seen = false;   // NotInstalled, and already told (forwarders::Made::gone)
 };
 
 // One row per forwarder on the HOME menu and per one remembered that is no
@@ -72,5 +73,29 @@ enum class Patches
     Missing,
 };
 Patches patches_state(const patches::Report& report);
+
+// Whether `nro` ("sdmc:/…") is a homebrew menu, which starts any other
+// .nro: hbmenu (sdmc:/hbmenu.nro, the one the album starts, or a copy of
+// it elsewhere) or sphaira, by their file names.
+bool is_menu(const std::string& nro);
+
+// What locking the homebrew menu (core/hbl_lock.h) needs: two ways back to
+// PlayGuard, each starting from the HOME menu: its own forwarder, and a menu
+// of homebrew protected with the PIN, which starts PlayGuard's .nro too (and
+// keeps a homebrew store usable). And what it should warn of.
+struct LockCheck
+{
+    bool pin = false;       // a PIN on the console (to ask for)
+    bool patches = false;   // forwarders can start: signature patches not missing
+    bool self = false;      // PlayGuard's own forwarder ready
+    std::vector<std::string> menus;   // the protected menus ready, by name
+    // Forwarders that would open the homebrew menu without the PIN: a menu
+    // not protected, and those another app made (what they start is unknown).
+    std::vector<std::string> open_doors;
+    bool ready() const { return this->pin && this->patches && this->self && !this->menus.empty(); }
+    // While locked: both ways still there (else the parent is told).
+    bool routes() const { return this->self && !this->menus.empty(); }
+};
+LockCheck lock_check(const std::vector<Row>& rows, bool pin_set, Patches patches);
 
 }   // namespace forwarders_logic

@@ -19,6 +19,16 @@
 // which PlayGuard leaves when it updates the module: the bell says to restart
 // the console until the new module has run.
 //
+// And the homebrew menu PlayGuard locked (core/hbl_lock.h), a way out of it
+// for the parent: lifted at boot when a RESCUE request is there, or when
+// Atmosphère was updated since it was locked (its signature patches may lag,
+// and no forwarder starts without them), both things a child cannot do from
+// the console. Deleting a forwarder, which a child can, lifts nothing. The
+// outcome goes to hbmenu_lock_report.txt for PlayGuard. The block of
+// defaults an unlock leaves is taken away at the next boot, when Atmosphère
+// starts from its own defaults again. A file without PlayGuard's blocks is
+// never written.
+//
 // This needs no applet and no screen, which is why it can run while everything
 // else is blocked. It only reads a PIN the console already stores; it never
 // writes one anywhere (only the MAC made with it). The pctl command IDs and
@@ -33,6 +43,7 @@
 #include <unistd.h>
 #include <switch.h>
 
+#include "hbl_lock.h"
 #include "pctl_ops_internal.h"
 #include "rescue.h"
 
@@ -42,6 +53,9 @@
 #define PATH_DONE   DATA_DIR "/" RESCUE_REQUEST_NAME_DONE
 #define PATH_REPORT DATA_DIR "/" RESCUE_REPORT_NAME
 #define PATH_NONCE  DATA_DIR "/" RESCUE_NONCE_NAME
+#define PATH_HBL_CONFIG "sdmc:/" HBL_LOCK_CONFIG_PATH
+#define PATH_HBL_STATE  DATA_DIR "/" HBL_LOCK_STATE_NAME
+#define PATH_HBL_REPORT DATA_DIR "/" HBL_LOCK_REPORT_NAME
 
 // A sysmodule, not an application: no applet, one fs session, a small heap.
 u32 __nx_applet_type = AppletType_None;
@@ -196,29 +210,90 @@ static RescueRequest consume_requests(void)
     return a > b ? a : b;
 }
 
+// `n` bytes to `path` through a "<path>.tmp" sibling, as the app's own
+// files: a file cut short (power off, SD card full) is never read as a whole
+// one. PlayGuard reads the ".tmp" when the file itself is missing
+// (paths::read_file); Atmosphère, without the file, takes its defaults.
+// Owner-writable only (fopen would ask for 0666).
+static bool write_whole(const char* path, const char* data, size_t n)
+{
+    char tmp[FS_MAX_PATH];
+    if (snprintf(tmp, sizeof(tmp), "%s.tmp", path) >= (int)sizeof(tmp)) return false;
+    const int fd = open(tmp, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    FILE* f = fd >= 0 ? fdopen(fd, "wb") : NULL;
+    if (!f) {
+        if (fd >= 0) close(fd);
+        return false;
+    }
+    const bool written = fwrite(data, 1, n, f) == n;
+    if (fclose(f) != 0 || !written) {
+        remove(tmp);
+        return false;
+    }
+    remove(path);
+    return rename(tmp, path) == 0;
+}
+
 static void write_report(const RescueReport* r, const RescueProof* proof)
 {
     static char buf[256];
     size_t n = rescue_report_format(r, buf, sizeof(buf));
     if (n == 0) return;
     n += rescue_proof_format(proof, buf + n, sizeof(buf) - n);   // nothing when absent
-    // Through a ".tmp" sibling, as the app's own files: a report cut short
-    // (power off, SD card full) is never read as a whole one. PlayGuard reads
-    // the ".tmp" when the report itself is missing (paths::read_file).
-    // Owner-writable only (fopen would ask for 0666).
-    const int fd = open(PATH_REPORT ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    FILE* f = fd >= 0 ? fdopen(fd, "wb") : NULL;
-    if (!f) {
-        if (fd >= 0) close(fd);
+    write_whole(PATH_REPORT, buf, n);
+}
+
+// ---- the homebrew menu's lock (core/hbl_lock.h) ----
+
+// Atmosphère's version, from exosphère (spl config item 65000, as the app's
+// sysinfo.c reads it); false when it cannot be read.
+static bool ams_version(u8* major, u8* minor, u8* micro)
+{
+    if (R_FAILED(splInitialize())) return false;
+    u64 v = 0;
+    const bool ok = R_SUCCEEDED(splGetConfig((SplConfigItem)65000, &v));
+    splExit();
+    if (!ok) return false;
+    *major = (u8)((v >> 56) & 0xFF);
+    *minor = (u8)((v >> 48) & 0xFF);
+    *micro = (u8)((v >> 40) & 0xFF);
+    return true;
+}
+
+// Locked, and lifted at this boot: why (core/hbl_lock.h), or false to leave
+// it. `rescue`: a RESCUE request was there.
+static bool lift_reason(bool rescue, HblLockReport* report)
+{
+    static char buf[64];
+    size_t n = 0;
+    u8 locked_on[3] = { 0 }, now[3] = { 0 };
+    const bool state = !rescue && read_small(PATH_HBL_STATE, buf, sizeof(buf), &n) &&
+                       hbl_lock_state_parse(buf, n, &locked_on[0], &locked_on[1], &locked_on[2]);
+    const bool known = state && ams_version(&now[0], &now[1], &now[2]);
+    return hbl_lock_boot_lift(rescue, state, locked_on, known, now, report);
+}
+
+static void hbl_lock_at_boot(bool rescue)
+{
+    static char in[HBL_LOCK_MAX_FILE + 1];
+    static char out[HBL_LOCK_MAX_FILE + 2048];
+    size_t n = 0, k = 0;
+    if (!read_small(PATH_HBL_CONFIG, in, sizeof(in), &n) || n >= sizeof(in) - 1) return;   // none, or too large
+    if (hbl_lock_locked(in, n)) {
+        HblLockReport report;
+        if (!lift_reason(rescue, &report)) return;
+        // With the defaults written back, as the app does: Atmosphère may
+        // have read the locked file already at this boot (the HOME menu up
+        // and a program started before this runs). The next boot takes them away.
+        report.ok = hbl_lock_apply(in, n, HblLock_Unlock, out, sizeof(out), &k) && write_whole(PATH_HBL_CONFIG, out, k);
+        if (report.ok) remove(PATH_HBL_STATE);
+        static char text[128];
+        const size_t t = hbl_lock_report_format(&report, text, sizeof(text));
+        if (t) write_whole(PATH_HBL_REPORT, text, t);
         return;
     }
-    const bool written = fwrite(buf, 1, n, f) == n;
-    if (fclose(f) != 0 || !written) {
-        remove(PATH_REPORT ".tmp");
-        return;
-    }
-    remove(PATH_REPORT);
-    rename(PATH_REPORT ".tmp", PATH_REPORT);
+    if (hbl_lock_has_defaults(in, n) && hbl_lock_apply(in, n, HblLock_DropDefaults, out, sizeof(out), &k))
+        write_whole(PATH_HBL_CONFIG, out, k);
 }
 
 // pctl can take a moment to come up at boot; the SD card too. Try for a while.
@@ -280,7 +355,8 @@ int main(int argc, char* argv[])
     remove("sdmc:/" RESCUE_RESTART_PATH);
 
     RescueMode mode;
-    if (take_request(&mode)) {
+    const bool requested = take_request(&mode);
+    if (requested) {
         // Take the request away first: it is acted on once, present or not next
         // boot. A delete still there would run again at every boot, so it is
         // not done; an unlock is (the parent needs PlayGuard to open), and the
@@ -312,6 +388,7 @@ int main(int argc, char* argv[])
         }
         write_report(&report, &proof);
     }
+    hbl_lock_at_boot(requested);
 
     return 0;   // boot2 reclaims the process; nothing stays resident
 }

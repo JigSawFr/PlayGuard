@@ -49,6 +49,7 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
         r.author = m.author;
         r.nro = m.nro;
         r.pin = m.pin;
+        r.gone_seen = m.gone;
         r.state = State::NotInstalled;
         rows.push_back(r);
     }
@@ -101,6 +102,29 @@ Patches patches_state(const patches::Report& r)
         }
         default: return Patches::Missing;
     }
+}
+
+bool is_menu(const std::string& nro)
+{
+    if (nro.empty()) return false;
+    const std::string name = text::lower_ascii(file_title(nro));
+    return name == "hbmenu" || name == "sphaira";
+}
+
+LockCheck lock_check(const std::vector<Row>& rows, bool pin_set, Patches patches)
+{
+    LockCheck c;
+    c.pin = pin_set;
+    c.patches = patches != Patches::Missing;
+    for (const Row& r : rows) {
+        if (r.state == State::NotInstalled) continue;
+        if (r.self && r.state == State::Ready) c.self = true;
+        if (r.state == State::Elsewhere) c.open_doors.push_back(r.name);
+        if (!is_menu(r.nro)) continue;
+        if (!r.pin) c.open_doors.push_back(r.name);
+        else if (r.state == State::Ready) c.menus.push_back(r.name);
+    }
+    return c;
 }
 
 }   // namespace forwarders_logic

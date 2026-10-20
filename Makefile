@@ -123,6 +123,8 @@ calendar_SRC   := source/core/calendar.c tests/calendar/test.c
 calendar_FLAGS := -std=gnu11 -Isource/core
 rescue_SRC   := source/core/rescue.c tests/rescue/test.c
 rescue_FLAGS := -std=c11 -Isource/core
+hbl_lock_SRC   := source/core/hbl_lock.c tests/hbl_lock/test.c
+hbl_lock_FLAGS := -std=gnu11 -Isource/core
 forwarder_pack_SRC   := source/core/forwarder_pack.c tests/forwarder_pack/test.c
 forwarder_pack_FLAGS := -std=c11 -Isource/core
 ntp_SRC   := source/util/ntp_packet.c tests/ntp_packet/test.c
