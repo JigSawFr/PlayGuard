@@ -149,10 +149,10 @@ void keep_log_lines()
     });
 }
 
-// One line in the log for each step of util/migrations.hpp that ran.
-void log_migration(const migrations::Step& step, size_t moved)
+// The log's lines of util/migrations.hpp: each step that ran, a later build seen.
+void log_migration(const std::string& line)
 {
-    brls::Logger::info("start-up: migration {} ({}): {} entries moved", step.level, step.name, moved);
+    brls::Logger::info("start-up: {}", line);
 }
 
 // The shims for the layouts of earlier versions (util/data_move.hpp,
@@ -176,7 +176,7 @@ void start_up_migrations()
                         // logs/ before its subfolders (reports/, crashes/, uploads/, play_timer/).
                         { migrations::LogsDirs, "logs subfolders", []() { return log_files::migrate(paths::logs_dir()); } },
                     },
-                    log_migration);
+                    app::version(), log_migration);
 }
 
 // What the versions before the per-system folders kept for every system,
@@ -187,7 +187,7 @@ void nand_migration()
     migrations::run(paths::migrations_file(),
                     { { migrations::NandDirs, "per-system folder",
                         []() { return data_move::to_nand(paths::data_dir(), paths::nand_dir()); } } },
-                    log_migration);
+                    app::version(), log_migration);
 }
 
 // This run's session file, and a crash file for the run before it when it

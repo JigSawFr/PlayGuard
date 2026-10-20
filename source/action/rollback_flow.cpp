@@ -11,6 +11,7 @@
 #include "core/platform.h"
 #include "ui/ui.hpp"
 #include "util/launcher.hpp"
+#include "util/migrations.hpp"
 #include "util/paths.hpp"
 #include "util/rollback.hpp"
 
@@ -36,6 +37,9 @@ std::string running_label()
 // is read from the running .nro and holds it open: released around it.
 bool swap(const std::string& nro, std::string* error, bool crashed)
 {
+    // The previous build may write the data in an earlier layout: the
+    // migrations run again when this one is back (util/migrations.hpp).
+    migrations::earlier_build_next(paths::migrations_file());
     platform_romfs_release();
     const bool ok = rollback::swap(nro, error);
     platform_romfs_mount();

@@ -22,6 +22,7 @@
 #include "util/dev_builds.hpp"
 #include "util/github_auth.hpp"
 #include "util/launcher.hpp"
+#include "util/migrations.hpp"
 #include "util/paths.hpp"
 #include "util/rollback.hpp"
 
@@ -181,6 +182,10 @@ void installed_now(const dev_builds::Build& b)
 {
     // The build replaced is kept, and the next start checked (rollback_flow).
     rollback_flow::installed(label(b));
+    // Not a newer release: its layout may be an earlier one, the migrations
+    // run again when a later build is back (util/migrations.hpp).
+    if (migrations::is_earlier(b.kind == dev_builds::Kind::Release ? b.version : "", app::version()))
+        migrations::earlier_build_next(paths::migrations_file());
     if (launcher::can_launch() && launcher::launch_nro(sd_path())) {
         // hbloader starts the new .nro as soon as this one exits.
         brls::Application::quit();
