@@ -48,7 +48,7 @@
         "delete": "Excluir",
         "applied": "Salvo.",
         "read_only_note": "Modo somente leitura: por enquanto, nada pode ser alterado por este app.",
-        "hold_to": "Segure A em “{}” por 2 segundos"
+        "hold_hint": "Segure “{}” por 2 segundos"
     },
     "days": {
         "0": "Domingo",
@@ -1073,7 +1073,6 @@
         "need_patches": "os patches de assinatura de que os forwarders precisam (sys-patch: veja Console › Patches de jogos)",
         "need_self": "o forwarder do PlayGuard no menu HOME (acima)",
         "need_menu": "um forwarder do sphaira ou do hbmenu protegido com o PIN (Outro homebrew, depois Proteger com o PIN)",
-        "confirm": "Bloquear o menu homebrew? Nem o álbum nem um jogo iniciado segurando R vão abri-lo: os homebrew só vão iniciar pelos seus forwarders.",
         "open_doors": "Estes forwarders ainda iniciariam homebrew sem o PIN: {}. Proteja ou exclua esses forwarders.",
         "ulaunch": "O uLaunch está instalado: ele inicia os homebrew do jeito dele, que este bloqueio não alcança.",
         "escape": "Para desfazer pelo computador: exclua {} do cartão SD (o PlayGuard guarda o arquivo original em config/playguard) e reinicie o console.",
@@ -1122,9 +1121,6 @@
         "hint_full": "O cartão SD parece cheio: libere espaço e tente de novo.",
         "hint_read_only": "Não dá para gravar nada no cartão SD: confira a trava dele, ou corrija o bit de arquivo das pastas (hekate › Tools › Arch bit · RCM · Touch · Partitions › Fix archive bit), e tente de novo.",
         "rescue": "Folha de resgate",
-        "rescue_body": "Se o console não conseguir mais abrir o PlayGuard ou um homebrew:\n• Pelo computador: exclua {} do cartão SD e reinicie o console.",
-        "rescue_module": "• O módulo de resgate está instalado: um arquivo vazio chamado {} em config/playguard no cartão SD, e uma reinicialização, também desbloqueiam.",
-        "rescue_no_module": "• O módulo de resgate (opcional) também pode desbloquear na inicialização: a ajuda explica como.",
         "guard_self": "{} é o caminho de volta para o PlayGuard enquanto o menu homebrew está bloqueado: desbloqueie o menu homebrew primeiro.",
         "guard_last": "{} é o último menu homebrew protegido com o PIN enquanto o menu homebrew está bloqueado: desbloqueie o menu homebrew primeiro.",
         "guard_confirm": "{} é um dos caminhos de volta enquanto o menu homebrew está bloqueado. Continuam: {}.",
@@ -1144,7 +1140,25 @@
         "setup_title": "Bloquear o menu homebrew, passo a passo",
         "setup_note": "Cada passo continua feito: volte aqui quando quiser. Com todos feitos, bloquear pede para segurar A por 2 segundos.",
         "setup_next": "Próximo passo",
-        "card_fix": "A: o que fazer"
+        "card_fix": "O que fazer",
+        "confirm_title": "Bloquear o menu homebrew?",
+        "confirm_sub": "Nem o álbum nem um jogo iniciado segurando R vão abri-lo: os homebrew só vão iniciar pelos seus forwarders.",
+        "sec_ready": "Pronto",
+        "sec_open": "Ainda aberto",
+        "sec_reads": "O que o Atmosphère lê",
+        "sec_system": "Sistema",
+        "rescue_sub": "Como desfazer o bloqueio sem o console. Deixe por perto.",
+        "rescue_pc_title": "Pelo computador",
+        "rescue_pc": "Exclua {} do cartão SD e reinicie o console.",
+        "rescue_mod_title": "Com o módulo de resgate",
+        "rescue_mod": "Coloque um arquivo vazio chamado {} em config/playguard no cartão SD e reinicie.",
+        "rescue_mod_none": "Opcional: instalado, também pode desfazer o bloqueio na inicialização.",
+        "rescue_qr": "A ajuda, no celular",
+        "guard_title": "Desbloqueie primeiro",
+        "setup_progress": "Passo {} de {}",
+        "verify_title": "Iniciar {} uma vez pelo menu HOME",
+        "verify_how": "Saia do PlayGuard, inicie {} pelo ícone no menu HOME e digite o PIN: quando o menu abrir, o PlayGuard sabe que este caminho de volta funciona. Depois volte aqui.",
+        "summary_doors": "Abre sem o PIN: {}"
     },
     "about": {
         "section_changelog": "Novidades da {}",

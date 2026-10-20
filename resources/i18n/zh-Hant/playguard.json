@@ -48,7 +48,7 @@
         "delete": "刪除",
         "applied": "已儲存。",
         "read_only_note": "唯讀模式：目前無法透過本軟體變更任何設定。",
-        "hold_to": "在「{}」上按住A 2秒"
+        "hold_hint": "按住「{}」2秒"
     },
     "days": {
         "0": "星期日",
@@ -1073,7 +1073,6 @@
         "need_patches": "轉發器需要的簽章修補（sys-patch：見 主機 › 遊戲修補）",
         "need_self": "HOME選單上PlayGuard的轉發器（上方）",
         "need_menu": "一個以PIN碼保護的sphaira或hbmenu轉發器（其他Homebrew，然後 以PIN碼保護）",
-        "confirm": "要鎖定自製軟體選單嗎？相簿和按住R啟動的遊戲都將無法開啟它：自製軟體只能透過各自的轉發器啟動。",
         "open_doors": "這些轉發器仍可不經PIN碼啟動自製軟體：{}。請保護或刪除它們。",
         "ulaunch": "已安裝uLaunch：它以自己的方式啟動自製軟體，此鎖定無法涵蓋。",
         "escape": "從電腦復原：刪除SD卡上的{}（PlayGuard在config/playguard中保存了原檔案），然後重新啟動主機。",
@@ -1122,9 +1121,6 @@
         "hint_full": "SD卡似乎已滿：請騰出空間後重試。",
         "hint_read_only": "無法寫入SD卡：請檢查其防寫開關，或修復其資料夾的封存位元（hekate › Tools › Arch bit · RCM · Touch · Partitions › Fix archive bit），然後重試。",
         "rescue": "救援說明",
-        "rescue_body": "如果主機無法再開啟PlayGuard或自製軟體：\n• 用電腦：刪除SD卡上的{}，然後重新啟動主機。",
-        "rescue_module": "• 已安裝救援模組：在SD卡的config/playguard中放一個名為{}的空檔案，然後重新啟動，也可解除鎖定。",
-        "rescue_no_module": "• 救援模組（選用）也可在啟動時解除鎖定：方法見說明。",
         "guard_self": "自製軟體選單鎖定期間，{}是返回PlayGuard的途徑：請先解鎖自製軟體選單。",
         "guard_last": "自製軟體選單鎖定期間，{}是最後一個以PIN碼保護的自製軟體選單：請先解鎖。",
         "guard_confirm": "自製軟體選單鎖定期間，{}是返回途徑之一。仍保留：{}。",
@@ -1144,7 +1140,25 @@
         "setup_title": "逐步鎖定自製軟體選單",
         "setup_note": "已完成的步驟會保留：隨時可回到這裡。全部完成後，鎖定需按住A 2秒。",
         "setup_next": "下一步",
-        "card_fix": "A：處理"
+        "card_fix": "處理",
+        "confirm_title": "要鎖定自製軟體選單嗎？",
+        "confirm_sub": "相簿和按住R啟動的遊戲都將無法開啟它：自製軟體只能透過各自的轉發器啟動。",
+        "sec_ready": "已就緒",
+        "sec_open": "仍未關閉",
+        "sec_reads": "Atmosphère讀取的內容",
+        "sec_system": "系統",
+        "rescue_sub": "不用主機也能解除鎖定的方法。請妥善保留。",
+        "rescue_pc_title": "用電腦",
+        "rescue_pc": "刪除SD卡上的{}，然後重新啟動主機。",
+        "rescue_mod_title": "用救援模組",
+        "rescue_mod": "在SD卡的config/playguard中放一個名為{}的空檔案，然後重新啟動。",
+        "rescue_mod_none": "選用：安裝後也可在啟動時解除鎖定。",
+        "rescue_qr": "說明（在手機上）",
+        "guard_title": "請先解鎖",
+        "setup_progress": "第{}步，共{}步",
+        "verify_title": "從HOME選單啟動{}一次",
+        "verify_how": "退出PlayGuard，在HOME選單點{}的圖示啟動並輸入PIN碼：選單開啟後，PlayGuard就知道這條返回途徑可用。然後回到這裡。",
+        "summary_doors": "無需PIN碼即可開啟：{}"
     },
     "about": {
         "section_changelog": "{} 更新內容",

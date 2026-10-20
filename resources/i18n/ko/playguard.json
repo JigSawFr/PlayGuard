@@ -48,7 +48,7 @@
         "delete": "삭제",
         "applied": "저장했습니다.",
         "read_only_note": "읽기 전용 모드: 지금은 이 앱에서 아무것도 변경할 수 없습니다.",
-        "hold_to": "“{}”에서 A를 2초간 누르고 계세요"
+        "hold_hint": "“{}”을(를) 2초간 누르고 계세요"
     },
     "days": {
         "0": "일요일",
@@ -1073,7 +1073,6 @@
         "need_patches": "포워더에 필요한 서명 패치 (sys-patch: 본체 › 게임 패치 참고)",
         "need_self": "HOME 메뉴에 있는 PlayGuard의 포워더 (위)",
         "need_menu": "PIN으로 보호한 sphaira 또는 hbmenu 포워더 (다른 Homebrew → PIN으로 보호)",
-        "confirm": "Homebrew 메뉴를 잠글까요? 앨범이나 R을 누른 채 시작한 게임으로는 열리지 않으며, Homebrew는 포워더로만 시작됩니다.",
         "open_doors": "이 포워더들은 여전히 PIN 없이 Homebrew를 시작할 수 있습니다: {}. 보호하거나 삭제하세요.",
         "ulaunch": "uLaunch가 설치되어 있습니다. uLaunch는 자체 방식으로 Homebrew를 시작하므로 이 잠금이 미치지 않습니다.",
         "escape": "컴퓨터에서 되돌리려면: SD 카드의 {}을(를) 삭제하고(원래 파일은 PlayGuard가 config/playguard에 보관합니다) 본체를 다시 시작하세요.",
@@ -1122,9 +1121,6 @@
         "hint_full": "SD 카드가 가득 찬 것 같습니다: 공간을 확보한 뒤 다시 시도하세요.",
         "hint_read_only": "SD 카드에 아무것도 쓸 수 없습니다: 잠금 스위치를 확인하거나 폴더의 아카이브 비트를 고친 뒤(hekate › Tools › Arch bit · RCM · Touch · Partitions › Fix archive bit) 다시 시도하세요.",
         "rescue": "복구 안내",
-        "rescue_body": "본체에서 PlayGuard나 Homebrew를 열 수 없게 되면:\n• 컴퓨터에서: SD 카드의 {}을(를) 삭제하고 본체를 다시 시작하세요.",
-        "rescue_module": "• 복구 모듈이 설치되어 있습니다: SD 카드의 config/playguard에 {}라는 빈 파일을 넣고 다시 시작해도 해제됩니다.",
-        "rescue_no_module": "• 복구 모듈(선택)로도 시작 시 해제할 수 있습니다: 방법은 도움말을 참고하세요.",
         "guard_self": "Homebrew 메뉴가 잠겨 있는 동안 {}은(는) PlayGuard로 돌아오는 길입니다: 먼저 Homebrew 메뉴 잠금을 해제하세요.",
         "guard_last": "Homebrew 메뉴가 잠겨 있는 동안 {}은(는) PIN으로 보호된 마지막 Homebrew 메뉴입니다: 먼저 잠금을 해제하세요.",
         "guard_confirm": "Homebrew 메뉴가 잠겨 있는 동안 {}은(는) 돌아오는 길 중 하나입니다. 남는 것: {}.",
@@ -1144,7 +1140,25 @@
         "setup_title": "Homebrew 메뉴를 단계별로 잠그기",
         "setup_note": "끝낸 단계는 그대로 남습니다: 언제든 여기로 돌아오세요. 모두 끝나면 잠글 때 A를 2초간 눌러야 합니다.",
         "setup_next": "다음 단계",
-        "card_fix": "A: 할 일"
+        "card_fix": "할 일",
+        "confirm_title": "Homebrew 메뉴를 잠글까요?",
+        "confirm_sub": "앨범이나 R을 누른 채 시작한 게임으로는 열리지 않으며, Homebrew는 포워더로만 시작됩니다.",
+        "sec_ready": "준비됨",
+        "sec_open": "아직 열림",
+        "sec_reads": "Atmosphère가 읽는 내용",
+        "sec_system": "시스템",
+        "rescue_sub": "본체 없이 잠금을 푸는 방법입니다. 가까이 두세요.",
+        "rescue_pc_title": "컴퓨터에서",
+        "rescue_pc": "SD 카드의 {}을(를) 삭제하고 본체를 다시 시작하세요.",
+        "rescue_mod_title": "복구 모듈로",
+        "rescue_mod": "SD 카드의 config/playguard에 {}라는 빈 파일을 넣고 다시 시작하세요.",
+        "rescue_mod_none": "선택: 설치하면 시작 시 잠금을 해제할 수도 있습니다.",
+        "rescue_qr": "도움말(휴대폰에서)",
+        "guard_title": "먼저 잠금 해제",
+        "setup_progress": "{}/{}단계",
+        "verify_title": "{}을(를) HOME 메뉴에서 한 번 시작",
+        "verify_how": "PlayGuard를 나가 HOME 메뉴의 {} 아이콘으로 시작하고 PIN을 입력하세요. 메뉴가 열리면 PlayGuard가 이 돌아오는 길이 작동함을 알게 됩니다. 그런 다음 여기로 돌아오세요.",
+        "summary_doors": "PIN 없이 열림: {}"
     },
     "about": {
         "section_changelog": "{}의 새로운 기능",

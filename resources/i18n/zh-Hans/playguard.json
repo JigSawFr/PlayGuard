@@ -48,7 +48,7 @@
         "delete": "删除",
         "applied": "已保存。",
         "read_only_note": "只读模式：目前无法通过本应用进行任何更改。",
-        "hold_to": "在“{}”上按住A 2秒"
+        "hold_hint": "按住“{}”2秒"
     },
     "days": {
         "0": "星期日",
@@ -1073,7 +1073,6 @@
         "need_patches": "转发器需要的签名补丁（sys-patch：见 主机 › 游戏补丁）",
         "need_self": "HOME菜单上PlayGuard的转发器（上方）",
         "need_menu": "一个用PIN保护的sphaira或hbmenu转发器（其他Homebrew，然后 用PIN保护）",
-        "confirm": "要锁定自制软件菜单吗？相册和按住R启动的游戏都将无法打开它：自制软件只能通过各自的转发器启动。",
         "open_doors": "这些转发器仍可不经PIN启动自制软件：{}。请保护或删除它们。",
         "ulaunch": "已安装uLaunch：它以自己的方式启动自制软件，此锁定无法覆盖。",
         "escape": "从电脑撤销：删除SD卡上的{}（PlayGuard在config/playguard中保存了原文件），然后重新启动主机。",
@@ -1122,9 +1121,6 @@
         "hint_full": "SD卡似乎已满：请腾出空间后重试。",
         "hint_read_only": "无法向SD卡写入任何内容：请检查其写保护开关，或修复其文件夹的归档位（hekate › Tools › Arch bit · RCM · Touch · Partitions › Fix archive bit），然后重试。",
         "rescue": "救援说明",
-        "rescue_body": "如果主机无法再打开PlayGuard或自制软件：\n• 用电脑：删除SD卡上的{}，然后重新启动主机。",
-        "rescue_module": "• 已安装救援模块：在SD卡的config/playguard中放一个名为{}的空文件，然后重启，也可解除锁定。",
-        "rescue_no_module": "• 救援模块（可选）也可在启动时解除锁定：方法见帮助。",
         "guard_self": "自制软件菜单锁定期间，{}是返回PlayGuard的途径：请先解锁自制软件菜单。",
         "guard_last": "自制软件菜单锁定期间，{}是最后一个用PIN保护的自制软件菜单：请先解锁。",
         "guard_confirm": "自制软件菜单锁定期间，{}是返回途径之一。仍保留：{}。",
@@ -1144,7 +1140,25 @@
         "setup_title": "逐步锁定自制软件菜单",
         "setup_note": "已完成的步骤会保留：随时可回到这里。全部完成后，锁定需按住A 2秒。",
         "setup_next": "下一步",
-        "card_fix": "A：处理"
+        "card_fix": "处理",
+        "confirm_title": "要锁定自制软件菜单吗？",
+        "confirm_sub": "相册和按住R启动的游戏都将无法打开它：自制软件只能通过各自的转发器启动。",
+        "sec_ready": "已就绪",
+        "sec_open": "仍未关闭",
+        "sec_reads": "Atmosphère读取的内容",
+        "sec_system": "系统",
+        "rescue_sub": "不用主机也能解除锁定的方法。请妥善保留。",
+        "rescue_pc_title": "用电脑",
+        "rescue_pc": "删除SD卡上的{}，然后重新启动主机。",
+        "rescue_mod_title": "用救援模块",
+        "rescue_mod": "在SD卡的config/playguard中放一个名为{}的空文件，然后重启。",
+        "rescue_mod_none": "可选：安装后也可在启动时解除锁定。",
+        "rescue_qr": "帮助（在手机上）",
+        "guard_title": "请先解锁",
+        "setup_progress": "第{}步，共{}步",
+        "verify_title": "从HOME菜单启动{}一次",
+        "verify_how": "退出PlayGuard，在HOME菜单点{}的图标启动并输入PIN：菜单打开后，PlayGuard就知道这条返回途径可用。然后回到这里。",
+        "summary_doors": "无需PIN即可打开：{}"
     },
     "about": {
         "section_changelog": "{} 更新内容",

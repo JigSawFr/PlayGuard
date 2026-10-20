@@ -48,7 +48,7 @@
         "delete": "Verwijderen",
         "applied": "Opgeslagen.",
         "read_only_note": "Alleen-lezenmodus: voorlopig kan er niets worden gewijzigd vanuit deze app.",
-        "hold_to": "Houd A 2 seconden ingedrukt op “{}”"
+        "hold_hint": "Houd “{}” 2 seconden ingedrukt"
     },
     "days": {
         "0": "Zondag",
@@ -1073,7 +1073,6 @@
         "need_patches": "de handtekeningpatches die forwarders nodig hebben (sys-patch: zie Console › Gamepatches)",
         "need_self": "de forwarder van PlayGuard in het HOME-menu (hierboven)",
         "need_menu": "een forwarder van sphaira of hbmenu beveiligd met de pincode (Andere homebrew, dan Beveiligen met de pincode)",
-        "confirm": "Het homebrewmenu vergrendelen? Noch het album noch een game gestart terwijl R ingedrukt wordt opent het dan: homebrew start alleen nog via hun forwarders.",
         "open_doors": "Deze forwarders zouden homebrew nog steeds zonder pincode starten: {}. Beveilig of verwijder ze.",
         "ulaunch": "uLaunch is geïnstalleerd: het start homebrew op zijn eigen manier, waar deze vergrendeling niet bij komt.",
         "escape": "Ongedaan maken vanaf een computer: verwijder {} op de SD-kaart (PlayGuard bewaart het oorspronkelijke bestand in config/playguard) en start de console opnieuw op.",
@@ -1122,9 +1121,6 @@
         "hint_full": "De SD-kaart lijkt vol: maak ruimte vrij en probeer het opnieuw.",
         "hint_read_only": "Er kan niets naar de SD-kaart geschreven worden: controleer het slotje, of herstel de archiefbit van de mappen (hekate › Tools › Arch bit · RCM · Touch · Partitions › Fix archive bit), en probeer het opnieuw.",
         "rescue": "Noodblad",
-        "rescue_body": "Als de console PlayGuard of een homebrew ooit niet meer kan openen:\n• Vanaf een computer: verwijder {} op de SD-kaart en start de console opnieuw op.",
-        "rescue_module": "• De reddingsmodule is geïnstalleerd: een leeg bestand met de naam {} in config/playguard op de SD-kaart, en een herstart, ontgrendelen het ook.",
-        "rescue_no_module": "• De reddingsmodule (optioneel) kan het ook bij het opstarten ontgrendelen: de hulp legt uit hoe.",
         "guard_self": "{} is de weg terug naar PlayGuard zolang het homebrewmenu vergrendeld is: ontgrendel eerst het homebrewmenu.",
         "guard_last": "{} is het laatste homebrewmenu beveiligd met de pincode zolang het homebrewmenu vergrendeld is: ontgrendel eerst het homebrewmenu.",
         "guard_confirm": "{} is een van de wegen terug zolang het homebrewmenu vergrendeld is. Er blijven over: {}.",
@@ -1144,7 +1140,25 @@
         "setup_title": "Het homebrewmenu stap voor stap vergrendelen",
         "setup_note": "Elke stap blijft gedaan: kom hier terug wanneer je wilt. Zijn ze allemaal gedaan, dan vraagt vergrendelen om A 2 seconden ingedrukt te houden.",
         "setup_next": "Volgende stap",
-        "card_fix": "A: wat te doen"
+        "card_fix": "Wat te doen",
+        "confirm_title": "Het homebrewmenu vergrendelen?",
+        "confirm_sub": "Noch het album noch een game gestart terwijl R ingedrukt wordt opent het dan: homebrew start alleen nog via hun forwarders.",
+        "sec_ready": "Klaar",
+        "sec_open": "Nog open",
+        "sec_reads": "Wat Atmosphère leest",
+        "sec_system": "Systeem",
+        "rescue_sub": "Hoe je de vergrendeling zonder de console ongedaan maakt. Houd dit bij de hand.",
+        "rescue_pc_title": "Vanaf een computer",
+        "rescue_pc": "Verwijder {} op de SD-kaart en start de console opnieuw op.",
+        "rescue_mod_title": "Met de reddingsmodule",
+        "rescue_mod": "Zet een leeg bestand met de naam {} in config/playguard op de SD-kaart en start opnieuw op.",
+        "rescue_mod_none": "Optioneel: geïnstalleerd kan het de vergrendeling ook bij het opstarten opheffen.",
+        "rescue_qr": "De hulp, op een telefoon",
+        "guard_title": "Eerst ontgrendelen",
+        "setup_progress": "Stap {} van {}",
+        "verify_title": "{} één keer vanuit het HOME-menu starten",
+        "verify_how": "Verlaat PlayGuard, start {} via het pictogram in het HOME-menu en voer de pincode in: zodra het menu opent, weet PlayGuard dat deze weg terug werkt. Kom daarna hier terug.",
+        "summary_doors": "Opent zonder pincode: {}"
     },
     "about": {
         "section_changelog": "Nieuw in {}",

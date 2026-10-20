@@ -48,7 +48,7 @@
         "delete": "Eliminar",
         "applied": "Guardado.",
         "read_only_note": "Modo só de leitura: por enquanto, nada pode ser alterado a partir desta aplicação.",
-        "hold_to": "Mantenha A premido em «{}» durante 2 segundos"
+        "hold_hint": "Mantenha «{}» premido durante 2 segundos"
     },
     "days": {
         "0": "Domingo",
@@ -1073,7 +1073,6 @@
         "need_patches": "os patches de assinatura de que os forwarders precisam (sys-patch: ver Consola › Patches de jogos)",
         "need_self": "o forwarder do PlayGuard no menu HOME (acima)",
         "need_menu": "um forwarder do sphaira ou do hbmenu protegido com o PIN (Outro homebrew, depois Proteger com o PIN)",
-        "confirm": "Bloquear o menu homebrew? Nem o álbum nem um jogo iniciado a manter R premido o vão abrir: os homebrew só se iniciam a partir dos seus forwarders.",
         "open_doors": "Estes forwarders continuariam a iniciar homebrew sem o PIN: {}. Proteja-os ou elimine-os.",
         "ulaunch": "O uLaunch está instalado: inicia os homebrew à sua maneira, que este bloqueio não alcança.",
         "escape": "Para anular a partir de um computador: elimine {} do cartão SD (o PlayGuard guarda o ficheiro original em config/playguard) e reinicie a consola.",
@@ -1122,9 +1121,6 @@
         "hint_full": "O cartão SD parece cheio: liberte espaço e tente novamente.",
         "hint_read_only": "Não é possível escrever no cartão SD: verifique o seu bloqueio, ou corrija o bit de arquivo das pastas (hekate › Tools › Arch bit · RCM · Touch · Partitions › Fix archive bit), e tente novamente.",
         "rescue": "Folha de recuperação",
-        "rescue_body": "Se a consola deixar de conseguir abrir o PlayGuard ou um homebrew:\n• A partir de um computador: elimine {} do cartão SD e reinicie a consola.",
-        "rescue_module": "• O módulo de recuperação está instalado: um ficheiro vazio chamado {} em config/playguard no cartão SD, e um reinício, também o desbloqueiam.",
-        "rescue_no_module": "• O módulo de recuperação (opcional) também o pode desbloquear no arranque: a ajuda explica como.",
         "guard_self": "{} é o caminho de volta para o PlayGuard enquanto o menu homebrew está bloqueado: desbloqueie primeiro o menu homebrew.",
         "guard_last": "{} é o último menu homebrew protegido com o PIN enquanto o menu homebrew está bloqueado: desbloqueie primeiro o menu homebrew.",
         "guard_confirm": "{} é um dos caminhos de volta enquanto o menu homebrew está bloqueado. Ficam: {}.",
@@ -1144,7 +1140,25 @@
         "setup_title": "Bloquear o menu homebrew, passo a passo",
         "setup_note": "Cada passo fica feito: volte aqui quando quiser. Feitos todos, bloquear pede para manter A premido 2 segundos.",
         "setup_next": "Passo seguinte",
-        "card_fix": "A: o que fazer"
+        "card_fix": "O que fazer",
+        "confirm_title": "Bloquear o menu homebrew?",
+        "confirm_sub": "Nem o álbum nem um jogo iniciado a manter R premido o vão abrir: os homebrew só se iniciam a partir dos seus forwarders.",
+        "sec_ready": "Pronto",
+        "sec_open": "Ainda aberto",
+        "sec_reads": "O que o Atmosphère lê",
+        "sec_system": "Sistema",
+        "rescue_sub": "Como anular o bloqueio sem a consola. Tenha-a à mão.",
+        "rescue_pc_title": "A partir de um computador",
+        "rescue_pc": "Elimine {} do cartão SD e reinicie a consola.",
+        "rescue_mod_title": "Com o módulo de recuperação",
+        "rescue_mod": "Coloque um ficheiro vazio chamado {} em config/playguard no cartão SD e reinicie.",
+        "rescue_mod_none": "Opcional: instalado, também pode levantar o bloqueio no arranque.",
+        "rescue_qr": "A ajuda, num telemóvel",
+        "guard_title": "Desbloqueie primeiro",
+        "setup_progress": "Passo {} de {}",
+        "verify_title": "Iniciar {} uma vez a partir do menu HOME",
+        "verify_how": "Saia do PlayGuard, inicie {} pelo seu ícone no menu HOME e introduza o PIN: quando o menu abrir, o PlayGuard sabe que este caminho de volta funciona. Depois volte aqui.",
+        "summary_doors": "Abre sem o PIN: {}"
     },
     "about": {
         "section_changelog": "Novidades da {}",

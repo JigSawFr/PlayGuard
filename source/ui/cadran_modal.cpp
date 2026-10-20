@@ -306,6 +306,30 @@ brls::Box* cadran::dialog_body(const std::string& text)
     return body;
 }
 
+brls::Label* cadran::dialog_title(const std::string& text)
+{
+    auto* label = new DisplayLabel();
+    label->setText(text);
+    label->setFontSize(23);
+    label->setTextColor(brls::Application::getTheme()["cadran/text"]);
+    return label;
+}
+
+brls::Box* cadran::dialog_badge(const char* icon, const char* color_key, const char* soft_key)
+{
+    brls::Theme theme = brls::Application::getTheme();
+    auto* badge = new brls::Box(brls::Axis::ROW);
+    badge->setWidth(44);
+    badge->setHeight(44);
+    badge->setShrink(0);
+    badge->setCornerRadius(22);
+    badge->setBackgroundColor(theme[soft_key]);
+    badge->setAlignItems(brls::AlignItems::CENTER);
+    badge->setJustifyContent(brls::JustifyContent::CENTER);
+    badge->addView(cadran::kit::icon(icon, 22, color_key));
+    return badge;
+}
+
 void cadran::style_dialog(brls::Dialog* dialog, Emphasis emphasis)
 {
     if (!dialog || dialog->getView("cadran_dialog")) return;

@@ -48,7 +48,7 @@
         "delete": "削除",
         "applied": "保存しました。",
         "read_only_note": "閲覧のみモードです。現在、このアプリからは何も変更できません。",
-        "hold_to": "「{}」でAを2秒間押し続けてください"
+        "hold_hint": "「{}」を2秒間押し続けてください"
     },
     "days": {
         "0": "日曜日",
@@ -1073,7 +1073,6 @@
         "need_patches": "フォワーダーに必要な署名パッチ（sys-patch：本体 › ゲーム用パッチを参照）",
         "need_self": "HOMEメニューにあるPlayGuardのフォワーダー（上記）",
         "need_menu": "暗証番号で保護したsphairaまたはhbmenuのフォワーダー（ほかのHomebrew → 暗証番号で保護）",
-        "confirm": "Homebrewメニューをロックしますか？アルバムからも、Rを押しながら起動したゲームからも開かなくなり、Homebrewはフォワーダーからのみ起動します。",
         "open_doors": "次のフォワーダーは暗証番号なしでHomebrewを起動できてしまいます：{}。保護するか削除してください。",
         "ulaunch": "uLaunchがインストールされています。uLaunchは独自の方法でHomebrewを起動するため、このロックは及びません。",
         "escape": "パソコンから元に戻すには：SDカードの{}を削除し（元のファイルはPlayGuardがconfig/playguardに保存しています）、本体を再起動してください。",
@@ -1122,9 +1121,6 @@
         "hint_full": "SDカードがいっぱいのようです：空き容量を作ってからもう一度お試しください。",
         "hint_read_only": "SDカードに書き込めません：ロックスイッチを確認するか、フォルダーのアーカイブビットを修正してください（hekate › Tools › Arch bit · RCM · Touch · Partitions › Fix archive bit）。その後もう一度お試しください。",
         "rescue": "レスキューシート",
-        "rescue_body": "本体でPlayGuardやHomebrewが開けなくなったら：\n• パソコンから：SDカードの{}を削除し、本体を再起動します。",
-        "rescue_module": "• レスキューモジュールがインストールされています：SDカードのconfig/playguardに{}という空のファイルを置いて再起動しても解除できます。",
-        "rescue_no_module": "• レスキューモジュール（任意）でも起動時に解除できます：方法はヘルプを参照してください。",
         "guard_self": "Homebrewメニューのロック中、{}はPlayGuardへの戻り道です：先にHomebrewメニューのロックを解除してください。",
         "guard_last": "Homebrewメニューのロック中、{}は暗証番号で保護された最後のHomebrewメニューです：先にロックを解除してください。",
         "guard_confirm": "Homebrewメニューのロック中、{}は戻り道のひとつです。残るもの：{}。",
@@ -1144,7 +1140,25 @@
         "setup_title": "Homebrewメニューを順番にロック",
         "setup_note": "済んだ手順はそのままです：いつでもここに戻れます。すべて済むと、ロックにはAを2秒押し続ける必要があります。",
         "setup_next": "次の手順",
-        "card_fix": "A：対処"
+        "card_fix": "対処",
+        "confirm_title": "Homebrewメニューをロックしますか？",
+        "confirm_sub": "アルバムからも、Rを押しながら起動したゲームからも開かなくなり、Homebrewはフォワーダーからのみ起動します。",
+        "sec_ready": "準備完了",
+        "sec_open": "まだ開いている",
+        "sec_reads": "Atmosphèreが読む内容",
+        "sec_system": "システム",
+        "rescue_sub": "本体なしでロックを解除する方法です。手元に控えておいてください。",
+        "rescue_pc_title": "パソコンから",
+        "rescue_pc": "SDカードの{}を削除し、本体を再起動します。",
+        "rescue_mod_title": "レスキューモジュールで",
+        "rescue_mod": "SDカードのconfig/playguardに{}という空のファイルを置き、再起動します。",
+        "rescue_mod_none": "任意：インストールすると、起動時にロックを解除することもできます。",
+        "rescue_qr": "ヘルプ（スマートフォンで）",
+        "guard_title": "先にロックを解除",
+        "setup_progress": "手順 {}/{}",
+        "verify_title": "{}をHOMEメニューから一度起動",
+        "verify_how": "PlayGuardを終了し、HOMEメニューの{}のアイコンから起動して暗証番号を入力してください。メニューが開けば、PlayGuardはこの戻り道が使えることを確認できます。その後ここに戻ってください。",
+        "summary_doors": "暗証番号なしで開く：{}"
     },
     "about": {
         "section_changelog": "{}の更新内容",

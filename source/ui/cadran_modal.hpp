@@ -37,6 +37,11 @@ enum class Emphasis
 // paragraph as text.
 brls::Box* dialog_body(const std::string& text);
 
+// A dialog's title as dialog_body sets it (the display face, 23 px).
+brls::Label* dialog_title(const std::string& text);
+// A round badge before a title: `icon` in `color_key` on `soft_key`.
+brls::Box* dialog_badge(const char* icon, const char* color_key, const char* soft_key);
+
 // `dialog` as a card, its buttons as pills. Once: a dressed dialog is left as
 // it is (every screen that takes the focus comes through here, see
 // install_screens). Call it after the dialog's last addButton. DANGER and

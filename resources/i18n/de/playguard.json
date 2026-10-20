@@ -48,7 +48,7 @@
         "delete": "Löschen",
         "applied": "Gespeichert.",
         "read_only_note": "Schreibschutzmodus: Über diese App kann derzeit nichts geändert werden.",
-        "hold_to": "Halte A auf „{}“ 2 Sekunden lang gedrückt"
+        "hold_hint": "Halte „{}“ 2 Sekunden lang gedrückt"
     },
     "days": {
         "0": "Sonntag",
@@ -1073,7 +1073,6 @@
         "need_patches": "die Signatur-Patches, die Forwarder brauchen (sys-patch: siehe Konsole › Spiel-Patches)",
         "need_self": "den Forwarder von PlayGuard im HOME-Menü (oben)",
         "need_menu": "einen mit der Geheimzahl geschützten Forwarder von sphaira oder hbmenu (Andere Homebrew-App, dann Mit der Geheimzahl schützen)",
-        "confirm": "Das Homebrew-Menü sperren? Weder das Album noch ein mit gedrückter R-Taste gestartetes Spiel öffnet es dann: Homebrew startet nur noch über ihre Forwarder.",
         "open_doors": "Diese Forwarder würden Homebrew weiterhin ohne Geheimzahl starten: {}. Schütze oder lösche sie.",
         "ulaunch": "uLaunch ist installiert: Es startet Homebrew auf eigenem Weg, den diese Sperre nicht erreicht.",
         "escape": "Rückgängig machen am Computer: {} auf der SD-Karte löschen (PlayGuard hebt die ursprüngliche Datei in config/playguard auf), dann die Konsole neu starten.",
@@ -1122,9 +1121,6 @@
         "hint_full": "Die SD-Karte scheint voll zu sein: schaffe Platz und versuche es erneut.",
         "hint_read_only": "Auf die SD-Karte kann nichts geschrieben werden: prüfe ihren Schreibschutzschalter oder korrigiere das Archiv-Bit ihrer Ordner (hekate › Tools › Arch bit · RCM · Touch · Partitions › Fix archive bit), dann versuche es erneut.",
         "rescue": "Notfallblatt",
-        "rescue_body": "Falls die Konsole PlayGuard oder eine Homebrew-App einmal nicht mehr öffnen kann:\n• Am Computer: {} auf der SD-Karte löschen, dann die Konsole neu starten.",
-        "rescue_module": "• Das Rettungsmodul ist installiert: eine leere Datei namens {} in config/playguard auf der SD-Karte und ein Neustart entsperren es ebenfalls.",
-        "rescue_no_module": "• Das Rettungsmodul (optional) kann es auch beim Start entsperren: die Hilfe erklärt, wie.",
         "guard_self": "{} ist der Rückweg zu PlayGuard, solange das Homebrew-Menü gesperrt ist: entsperre zuerst das Homebrew-Menü.",
         "guard_last": "{} ist das letzte mit der Geheimzahl geschützte Homebrew-Menü, solange das Homebrew-Menü gesperrt ist: entsperre zuerst das Homebrew-Menü.",
         "guard_confirm": "{} ist einer der Rückwege, solange das Homebrew-Menü gesperrt ist. Es bleiben: {}.",
@@ -1144,7 +1140,25 @@
         "setup_title": "Das Homebrew-Menü Schritt für Schritt sperren",
         "setup_note": "Jeder Schritt bleibt erledigt: komm jederzeit hierher zurück. Sind alle erledigt, verlangt das Sperren, A 2 Sekunden lang zu halten.",
         "setup_next": "Nächster Schritt",
-        "card_fix": "A: was tun"
+        "card_fix": "Was tun",
+        "confirm_title": "Das Homebrew-Menü sperren?",
+        "confirm_sub": "Weder das Album noch ein mit gedrückter R-Taste gestartetes Spiel öffnet es dann: Homebrew startet nur noch über ihre Forwarder.",
+        "sec_ready": "Bereit",
+        "sec_open": "Noch offen",
+        "sec_reads": "Was Atmosphère liest",
+        "sec_system": "System",
+        "rescue_sub": "So hebst du die Sperre ohne die Konsole auf. Bewahre es auf.",
+        "rescue_pc_title": "Am Computer",
+        "rescue_pc": "{} auf der SD-Karte löschen, dann die Konsole neu starten.",
+        "rescue_mod_title": "Mit dem Rettungsmodul",
+        "rescue_mod": "Eine leere Datei namens {} in config/playguard auf der SD-Karte ablegen, dann neu starten.",
+        "rescue_mod_none": "Optional: installiert, kann es die Sperre auch beim Start aufheben.",
+        "rescue_qr": "Die Hilfe, auf einem Handy",
+        "guard_title": "Zuerst entsperren",
+        "setup_progress": "Schritt {} von {}",
+        "verify_title": "{} einmal über das HOME-Menü starten",
+        "verify_how": "Verlasse PlayGuard, starte {} über sein Symbol im HOME-Menü und gib die Geheimzahl ein: sobald sich das Menü öffnet, weiß PlayGuard, dass dieser Rückweg funktioniert. Komm dann hierher zurück.",
+        "summary_doors": "Öffnet ohne Geheimzahl: {}"
     },
     "about": {
         "section_changelog": "Neu in {}",

@@ -25,6 +25,7 @@
 #include "util/diagnostics.hpp"
 #include "util/forwarders.hpp"
 #include "util/paths.hpp"
+#include "view/qr_view.hpp"
 #include "util/pctl_ops_c.hpp"
 
 using namespace brls::literals;
@@ -164,6 +165,7 @@ std::vector<ui::CheckLine> check_lines(const forwarders_logic::LockCheck& c)
 {
     using ui::Check;
     std::vector<ui::CheckLine> out;
+    out.push_back({ Check::Header, "playguard/hbmenu/sec_ready"_i18n });
     out.push_back({ c.pin ? Check::Ok : Check::Bad, c.pin ? "playguard/hbmenu/line_pin"_i18n : "playguard/hbmenu/need_pin"_i18n });
     out.push_back({ c.patches ? Check::Ok : Check::Bad,
                     c.patches ? "playguard/hbmenu/line_patches"_i18n : "playguard/hbmenu/need_patches"_i18n });
@@ -174,6 +176,7 @@ std::vector<ui::CheckLine> check_lines(const forwarders_logic::LockCheck& c)
         out.push_back({ Check::Bad, brls::getStr("playguard/hbmenu/need_verified", joined(c.menus)) });
     else
         out.push_back({ Check::Bad, "playguard/hbmenu/need_menu"_i18n });
+    out.push_back({ Check::Header, "playguard/hbmenu/sec_open"_i18n });
     if (c.open_doors.empty()) out.push_back({ Check::Ok, "playguard/hbmenu/line_no_doors"_i18n });
     else out.push_back({ Check::Warn, brls::getStr("playguard/hbmenu/open_doors", joined(c.open_doors)) });
     if (!c.sd_writers.empty()) out.push_back({ Check::Warn, brls::getStr("playguard/hbmenu/sd_writers", joined(c.sd_writers)) });
@@ -257,12 +260,95 @@ std::string write_hint(const std::string& dir)
     return hint_for(at);
 }
 
+namespace
+{
+// A step of the rescue sheet: its number in a bubble, its title, its text.
+brls::Box* rescue_step(const char* number, const std::string& title, const std::string& text)
+{
+    namespace kit = cadran::kit;
+    auto* row = new brls::Box(brls::Axis::ROW);
+    row->setAlignItems(brls::AlignItems::FLEX_START);
+    brls::Box* n = kit::key(number, 26);
+    n->setMarginRight(14);
+    n->setMarginTop(1);
+    row->addView(n);
+    auto* words = new brls::Box(brls::Axis::COLUMN);
+    words->setGrow(1.0f);
+    words->setWidth(0);
+    words->addView(kit::label(title, 18, "cadran/text"));
+    brls::Label* detail = kit::label(text, 15.5f, "cadran/text2");
+    detail->setMarginTop(3);
+    words->addView(detail);
+    row->addView(words);
+    return row;
+}
+
+// The rescue sheet; `locked`: just locked, said in its title.
+void rescue_sheet(bool locked)
+{
+    namespace kit = cadran::kit;
+    auto* body = new brls::Box(brls::Axis::COLUMN);
+    body->setAlignItems(brls::AlignItems::STRETCH);
+    body->setPadding(30, 40, 22, 40);
+    auto* head = new brls::Box(brls::Axis::ROW);
+    head->setAlignItems(brls::AlignItems::CENTER);
+    brls::Box* badge = locked ? cadran::dialog_badge("check", "cadran/teal", "cadran/teal_soft")
+                              : cadran::dialog_badge("shield", "cadran/teal", "cadran/teal_soft");
+    badge->setMarginRight(16);
+    head->addView(badge);
+    auto* titles = new brls::Box(brls::Axis::COLUMN);
+    titles->setGrow(1.0f);
+    titles->setWidth(0);
+    titles->addView(cadran::dialog_title(locked ? "playguard/hbmenu/locked_done"_i18n : "playguard/hbmenu/rescue"_i18n));
+    brls::Label* sub = kit::label("playguard/hbmenu/rescue_sub"_i18n, 16, "cadran/text2");
+    sub->setMarginTop(4);
+    titles->addView(sub);
+    head->addView(titles);
+    body->addView(head);
+
+    // The ways, numbered, beside the help's QR code.
+    auto* main = new brls::Box(brls::Axis::ROW);
+    main->setAlignItems(brls::AlignItems::FLEX_START);
+    main->setMarginTop(20);
+    auto* steps = new brls::Box(brls::Axis::COLUMN);
+    steps->setGrow(1.0f);
+    steps->setWidth(0);
+    steps->setBackgroundColor(brls::Application::getTheme()["cadran/surf2"]);
+    steps->setCornerRadius(14);
+    steps->setPadding(16, 18, 16, 18);
+    steps->addView(rescue_step("1", "playguard/hbmenu/rescue_pc_title"_i18n,
+                               brls::getStr("playguard/hbmenu/rescue_pc", HBL_LOCK_CONFIG_PATH)));
+    brls::Box* second = rescue_step("2", "playguard/hbmenu/rescue_mod_title"_i18n,
+                                    rescue::installed() ? brls::getStr("playguard/hbmenu/rescue_mod", RESCUE_REQUEST_NAME)
+                                                        : "playguard/hbmenu/rescue_mod_none"_i18n);
+    second->setMarginTop(14);
+    steps->addView(second);
+    main->addView(steps);
+    auto* side = new brls::Box(brls::Axis::COLUMN);
+    side->setAlignItems(brls::AlignItems::CENTER);
+    side->setMarginLeft(20);
+    side->setShrink(0);
+    auto* qr = new QrView(std::string(app::repo_url()) + "/blob/main/docs/troubleshooting.md#homebrew-menu-locked", 168);
+    side->addView(qr);
+    brls::Label* caption = kit::label("playguard/hbmenu/rescue_qr"_i18n, 13.5f, "cadran/text3");
+    caption->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    caption->setMaxWidth(168);
+    caption->setMarginTop(8);
+    side->addView(caption);
+    main->addView(side);
+    body->addView(main);
+
+    auto* dialog = ui::box_dialog(body);
+    dialog->addButton("hints/ok"_i18n, []() {});
+    dialog->setCancelable(true);
+    cadran::style_dialog(dialog, cadran::Emphasis::NONE);
+    dialog->open();
+}
+}   // namespace
+
 void show_rescue()
 {
-    std::string body = brls::getStr("playguard/hbmenu/rescue_body", HBL_LOCK_CONFIG_PATH);
-    body += "\n\n" + (rescue::installed() ? brls::getStr("playguard/hbmenu/rescue_module", RESCUE_REQUEST_NAME)
-                                           : "playguard/hbmenu/rescue_no_module"_i18n);
-    ui::qr_dialog(body, std::string(app::repo_url()) + "/blob/main/docs/troubleshooting.md#homebrew-menu-locked");
+    rescue_sheet(false);
 }
 
 bool locked()
@@ -301,9 +387,9 @@ void apply_lock(std::function<void(bool)> finish)
     notices::clear("hbmenu_removed");
     history_flow::record_event("lock_hbmenu");
     brls::Logger::info("hbmenu lock: locked");
-    ui::notify("playguard/hbmenu/locked_done"_i18n, ui::Toast::Done);
-    // How to undo it without the console, while it is fresh.
-    brls::sync([]() { show_rescue(); });
+    // Said by the rescue sheet's title: how to undo it without the
+    // console, while it is fresh.
+    brls::sync([]() { rescue_sheet(true); });
     finish(true);
 }
 
@@ -312,8 +398,9 @@ void confirm_lock(std::function<void(bool)> finish)
 {
     const forwarders_logic::LockCheck c = check();
     if (!c.ready()) return setup(finish);
-    ui::hold_confirm(ui::checklist_body("playguard/hbmenu/confirm"_i18n, check_lines(c),
-                                        brls::getStr("playguard/hbmenu/escape", HBL_LOCK_CONFIG_PATH)),
+    ui::hold_confirm(ui::checklist_body("playguard/hbmenu/confirm_title"_i18n, check_lines(c),
+                                        brls::getStr("playguard/hbmenu/escape", HBL_LOCK_CONFIG_PATH),
+                                        "playguard/hbmenu/confirm_sub"_i18n),
                      "playguard/hbmenu/lock"_i18n, [finish]() { apply_lock(finish); }, [finish]() { finish(false); });
 }
 
@@ -340,14 +427,21 @@ void run_step(SetupStep::Kind kind, std::function<void(bool)> done)
     // Said only (nothing changes): no `done`, which would rebuild the screen
     // under the dialog.
     switch (kind) {
-        case SetupStep::Pin: ui::info("playguard/hbmenu/need_pin"_i18n); return;
-        case SetupStep::Patches: ui::info("playguard/hbmenu/need_patches"_i18n); return;
+        case SetupStep::Pin:
+            ui::notice("key", ui::Check::Warn, "playguard/hbmenu/step_pin"_i18n, "playguard/hbmenu/need_pin"_i18n);
+            return;
+        case SetupStep::Patches:
+            ui::notice("chip", ui::Check::Warn, "playguard/hbmenu/step_patches"_i18n, "playguard/hbmenu/need_patches"_i18n);
+            return;
         case SetupStep::Self: return forwarder_flow::create_self(finish);
         case SetupStep::Menu: return forwarder_flow::protect_a_menu(finish);
         case SetupStep::Verify: {
             const forwarders_logic::LockCheck c = check();
-            ui::info(c.menus.empty() ? "playguard/hbmenu/need_menu"_i18n
-                                     : brls::getStr("playguard/hbmenu/need_verified", joined(c.menus)));
+            if (c.menus.empty())
+                ui::notice("home", ui::Check::Warn, "playguard/hbmenu/step_menu"_i18n, "playguard/hbmenu/need_menu"_i18n);
+            else
+                ui::notice("home", ui::Check::Info, brls::getStr("playguard/hbmenu/verify_title", joined(c.menus)),
+                           brls::getStr("playguard/hbmenu/verify_how", joined(c.menus)));
             return;
         }
     }
@@ -372,8 +466,10 @@ void setup(std::function<void(bool)> done)
     }
     lines.push_back({ ui::Check::Info, fmt::format("{}. {}", steps.size() + 1, "playguard/hbmenu/step_lock"_i18n) });
     const SetupStep::Kind kind = steps[(size_t)next].kind;
-    auto* dialog = new brls::Dialog(ui::checklist_body("playguard/hbmenu/setup_title"_i18n, lines,
-                                                       "playguard/hbmenu/setup_note"_i18n));
+    auto* dialog = ui::box_dialog(ui::checklist_body("playguard/hbmenu/setup_title"_i18n, lines,
+                                                       "playguard/hbmenu/setup_note"_i18n,
+                                                       brls::getStr("playguard/hbmenu/setup_progress", next + 1,
+                                                                    (int)steps.size() + 1)));
     dialog->addButton("hints/cancel"_i18n, [finish]() { finish(false); });
     dialog->addButton("playguard/hbmenu/setup_next"_i18n, [kind, done, finish]() {
         brls::sync([kind, done, finish]() {
@@ -546,14 +642,17 @@ void show_check()
     const State st = read_state(true);
     const std::string unknown = "playguard/forwarders/unknown"_i18n;
     std::vector<ui::CheckLine> lines;
+    // What Atmosphère will read, then the checks, then the system's.
+    lines.push_back({ Check::Header, "playguard/hbmenu/sec_reads"_i18n });
     lines.push_back({ st.lock_block ? Check::Ok : Check::Info,
                       brls::getStr("playguard/hbmenu/check_file", HBL_LOCK_CONFIG_PATH,
                                    !st.file ? "playguard/hbmenu/check_none"_i18n
                                    : st.lock_block ? "playguard/hbmenu/state_locked"_i18n
                                                    : "playguard/hbmenu/state_open"_i18n) });
-    lines.push_back({ Check::Info, brls::getStr("playguard/hbmenu/check_album", yes_no(st.album)) + " · " +
-                                       brls::getStr("playguard/hbmenu/check_r", yes_no(st.any_app)) });
+    lines.push_back({ st.album ? Check::Info : Check::Ok, brls::getStr("playguard/hbmenu/check_album", yes_no(st.album)) });
+    lines.push_back({ st.any_app ? Check::Info : Check::Ok, brls::getStr("playguard/hbmenu/check_r", yes_no(st.any_app)) });
     for (const ui::CheckLine& l : check_lines(st.c)) lines.push_back(l);
+    lines.push_back({ Check::Header, "playguard/hbmenu/sec_system"_i18n });
     lines.push_back({ Check::Info, brls::getStr("playguard/hbmenu/check_ams", st.ams.empty() ? unknown : st.ams,
                                                 st.locked_on.empty() ? unknown : st.locked_on) });
     lines.push_back({ st.module == "outdated" ? Check::Warn : Check::Info,
@@ -561,7 +660,7 @@ void show_check()
                                    st.module == "none"      ? "playguard/hbmenu/check_none"_i18n
                                    : st.module == "current" ? "playguard/hbmenu/check_current"_i18n
                                                             : "playguard/hbmenu/check_outdated"_i18n) });
-    auto* dialog = new brls::Dialog(ui::checklist_body("playguard/hbmenu/check"_i18n, lines));
+    auto* dialog = ui::box_dialog(ui::checklist_body("playguard/hbmenu/check"_i18n, lines));
     dialog->addButton("playguard/hbmenu/rescue"_i18n, []() { brls::sync([]() { show_rescue(); }); });
     dialog->addButton("hints/ok"_i18n, []() {});
     dialog->setCancelable(true);

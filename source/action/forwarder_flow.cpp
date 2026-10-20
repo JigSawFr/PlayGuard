@@ -241,7 +241,8 @@ void guard_way_back(const forwarders_logic::Row& row, const std::string& what, s
     switch (forwarders_logic::way_back_guard(all, row, hbmenu_lock::locked())) {
         case forwarders_logic::Guard::Allowed: return go();
         case forwarders_logic::Guard::Refused:
-            ui::info(brls::getStr(row.self ? "playguard/hbmenu/guard_self" : "playguard/hbmenu/guard_last", row.name));
+            ui::notice("lock", ui::Check::Warn, "playguard/hbmenu/guard_title"_i18n,
+                       brls::getStr(row.self ? "playguard/hbmenu/guard_self" : "playguard/hbmenu/guard_last", row.name));
             return stop();
         case forwarders_logic::Guard::Confirm: {
             std::string others;
@@ -337,7 +338,7 @@ void confirm_preview(const std::vector<uint8_t>& icon, const std::string& name, 
     brls::Label* text = kit::label(body, 18, "cadran/text2");
     text->setMarginTop(16);
     box->addView(text);
-    auto* dialog = new brls::Dialog(box);
+    auto* dialog = ui::box_dialog(box);
     dialog->addButton("hints/cancel"_i18n, [no]() { if (no) no(); });
     dialog->addButton("playguard/forwarders/add"_i18n, [yes]() { if (yes) yes(); });
     ui::on_cancel(dialog, no);
@@ -417,7 +418,7 @@ void protect_a_menu(std::function<void(bool)> done)
         if (forwarders_logic::is_menu(r.nro) && !r.pin && r.state == forwarders_logic::State::Ready) return set_pin(r, true, done);
     const std::string path = menu_nro();
     if (path.empty()) {
-        ui::info("playguard/forwarders/no_menu"_i18n);
+        ui::notice("home", ui::Check::Warn, "playguard/hbmenu/step_menu"_i18n, "playguard/forwarders/no_menu"_i18n);
         if (done) done(false);
         return;
     }

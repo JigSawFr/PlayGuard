@@ -48,7 +48,7 @@
         "delete": "Elimina",
         "applied": "Salvato.",
         "read_only_note": "Modalità sola lettura: al momento non è possibile modificare nulla da questa applicazione.",
-        "hold_to": "Tieni premuto A su «{}» per 2 secondi"
+        "hold_hint": "Tieni premuto «{}» per 2 secondi"
     },
     "days": {
         "0": "Domenica",
@@ -1073,7 +1073,6 @@
         "need_patches": "le patch delle firme di cui hanno bisogno i forwarder (sys-patch: vedi Console › Patch dei giochi)",
         "need_self": "il forwarder di PlayGuard nel menu HOME (sopra)",
         "need_menu": "un forwarder di sphaira o di hbmenu protetto con il PIN (Un altro homebrew, poi Proteggi con il PIN)",
-        "confirm": "Bloccare il menu homebrew? Né l'album né un gioco avviato tenendo premuto R lo apriranno: gli homebrew si avvieranno solo dai loro forwarder.",
         "open_doors": "Questi forwarder avvierebbero ancora homebrew senza PIN: {}. Proteggili o eliminali.",
         "ulaunch": "uLaunch è installato: avvia gli homebrew a modo suo, e questo blocco non lo raggiunge.",
         "escape": "Per annullarlo da un computer: elimina {} dalla scheda SD (PlayGuard conserva il file originale in config/playguard), poi riavvia la console.",
@@ -1122,9 +1121,6 @@
         "hint_full": "La scheda SD sembra piena: libera spazio, poi riprova.",
         "hint_read_only": "Non si può scrivere nulla sulla scheda SD: controlla il suo blocco, o correggi il bit archivio delle sue cartelle (hekate › Tools › Arch bit · RCM · Touch · Partitions › Fix archive bit), poi riprova.",
         "rescue": "Scheda di soccorso",
-        "rescue_body": "Se la console non riesce più ad aprire PlayGuard o un homebrew:\n• Da un computer: elimina {} dalla scheda SD, poi riavvia la console.",
-        "rescue_module": "• Il modulo di soccorso è installato: un file vuoto chiamato {} in config/playguard sulla scheda SD, poi un riavvio, lo sbloccano anche.",
-        "rescue_no_module": "• Il modulo di soccorso (facoltativo) può anche sbloccarlo all'avvio: la guida spiega come.",
         "guard_self": "{} è la via di ritorno a PlayGuard finché il menu homebrew è bloccato: sblocca prima il menu homebrew.",
         "guard_last": "{} è l'ultimo menu homebrew protetto con il PIN finché il menu homebrew è bloccato: sblocca prima il menu homebrew.",
         "guard_confirm": "{} è una delle vie di ritorno finché il menu homebrew è bloccato. Resteranno: {}.",
@@ -1144,7 +1140,25 @@
         "setup_title": "Bloccare il menu homebrew, passo dopo passo",
         "setup_note": "Ogni passo resta fatto: torna qui quando vuoi. Fatti tutti, il blocco chiede di tenere premuto A per 2 secondi.",
         "setup_next": "Passo successivo",
-        "card_fix": "A: cosa fare"
+        "card_fix": "Cosa fare",
+        "confirm_title": "Bloccare il menu homebrew?",
+        "confirm_sub": "Né l'album né un gioco avviato tenendo premuto R lo apriranno: gli homebrew si avvieranno solo dai loro forwarder.",
+        "sec_ready": "Pronto",
+        "sec_open": "Ancora aperto",
+        "sec_reads": "Cosa legge Atmosphère",
+        "sec_system": "Sistema",
+        "rescue_sub": "Come annullare il blocco senza la console. Tienila a portata di mano.",
+        "rescue_pc_title": "Da un computer",
+        "rescue_pc": "Elimina {} dalla scheda SD, poi riavvia la console.",
+        "rescue_mod_title": "Con il modulo di soccorso",
+        "rescue_mod": "Metti un file vuoto chiamato {} in config/playguard sulla scheda SD, poi riavvia.",
+        "rescue_mod_none": "Facoltativo: se installato, può anche togliere il blocco all'avvio.",
+        "rescue_qr": "La guida, su un telefono",
+        "guard_title": "Prima sblocca",
+        "setup_progress": "Passo {} di {}",
+        "verify_title": "Avviare {} una volta dal menu HOME",
+        "verify_how": "Esci da PlayGuard, avvia {} dalla sua icona nel menu HOME e inserisci il PIN: quando il menu si apre, PlayGuard sa che questa via di ritorno funziona. Poi torna qui.",
+        "summary_doors": "Si apre senza PIN: {}"
     },
     "about": {
         "section_changelog": "Novità della {}",

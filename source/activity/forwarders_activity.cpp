@@ -268,7 +268,7 @@ void ForwardersActivity::show_lock()
     else {
         std::string doors;
         for (const std::string& d : c.open_doors) doors += (doors.empty() ? "" : ", ") + d;
-        lines.push_back({ Check::Warn, brls::getStr("playguard/hbmenu/open_doors", doors) });
+        lines.push_back({ Check::Warn, brls::getStr("playguard/hbmenu/summary_doors", doors) });
     }
     lines.push_back({ Check::Info, s.module ? "playguard/hbmenu/summary_module"_i18n : "playguard/hbmenu/summary_no_module"_i18n });
     ui::batch_layout(summary.getView(), [this, &lines, on]() {
@@ -288,7 +288,10 @@ void ForwardersActivity::show_lock()
         brls::Box* kick = cadran::kit::kicker(on ? "lock" : "unlock", "playguard/hbmenu/section"_i18n);
         kick->setGrow(1.0f);
         head->addView(kick);
-        head->addView(cadran::kit::label("playguard/hbmenu/card_fix"_i18n, 15, "cadran/teal"));
+        brls::Box* a = cadran::kit::key("A", 20);
+        a->setMarginRight(6);
+        head->addView(a);
+        head->addView(cadran::kit::label("playguard/hbmenu/card_fix"_i18n, 15, "cadran/text2"));
         card->addView(head);
         for (const ui::CheckLine& l : lines) {
             brls::Box* row = ui::check_row(l);
