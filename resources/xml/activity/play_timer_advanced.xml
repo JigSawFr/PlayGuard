@@ -28,7 +28,7 @@
             paddingLeft="@style/brls/sidebar/padding_left">
 
             <brls:BooleanCell id="pa_show"/>
-            <brls:Label id="pa_note" text="@i18n/playguard/play_timer/advanced_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:Label id="pa_note" text="@i18n/playguard/play_timer/advanced_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:BooleanCell id="pa_alarm" marginTop="16"/>
             <brls:DetailCell id="pa_pause" title="@i18n/playguard/play_timer/pause"/>
             <brls:DetailCell id="pa_resume" title="@i18n/playguard/play_timer/resume"/>

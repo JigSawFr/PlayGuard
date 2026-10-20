@@ -156,7 +156,7 @@ IM = ["magick"] if shutil.which("magick") else []
 # 8 October 2026, 16:00 UTC. Only the footer clock follows the host.
 env.setdefault("PLAYGUARD_SIM_NOW", "1791475200")
 env.setdefault("TZ", "UTC")
-# And the focus highlight without its moving glow (ui/theme.cpp).
+# And the focus highlight without its moving glow (ui/cadran_frame.cpp).
 env.setdefault("PLAYGUARD_SIM_STILL_FOCUS", "1")
 # And one made-up development build, not this build's version and commit
 # (app.cpp): the header's version badge, and the update offers (1.1.0 below)

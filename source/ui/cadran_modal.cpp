@@ -428,20 +428,9 @@ void cadran::prompt_minutes(const std::string& header, uint16_t initial, std::fu
     auto* keys = new brls::Box(brls::Axis::ROW);
     keys->setAlignItems(brls::AlignItems::CENTER);
     keys->setMarginTop(16);
-    const auto key = [&theme](const char* letter) {
-        auto* bubble = new brls::Box(brls::Axis::ROW);
-        bubble->setWidth(24);
-        bubble->setHeight(24);
-        bubble->setCornerRadius(12);
-        bubble->setBackgroundColor(theme["cadran/key_bg"]);
-        bubble->setAlignItems(brls::AlignItems::CENTER);
-        bubble->setJustifyContent(brls::JustifyContent::CENTER);
+    const auto key = [](const char* letter) {
+        brls::Box* bubble = kit::key(letter);
         bubble->setMarginRight(4);
-        auto* text = new CadranDigits();
-        text->setFontSize(12);
-        text->setTextColor(theme["cadran/key_fg"]);
-        text->setText(letter);
-        bubble->addView(text);
         return bubble;
     };
     keys->addView(kit::icon("caret-up", 18, "cadran/text3"));

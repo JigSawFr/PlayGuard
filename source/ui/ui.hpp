@@ -20,12 +20,9 @@ class MainActivity;
 namespace ui
 {
 
-// The colours cadran::install_theme() leaves out (brand/gauge_track) and the
-// smoke test's still focus. The status colours below are the boards' inks,
-// one shade per theme (>= 4.5:1). register_theme_colors() and
-// cadran::install_theme() must run before the first lookup (borealis aborts
-// on an unknown theme key).
-void     register_theme_colors();
+// The status colours below are the boards' inks (cadran::install_theme(),
+// which must run before the first lookup: borealis aborts on an unknown
+// theme key), one shade per theme (>= 4.5:1).
 // On the console: the system's Latin / Japanese font as the default font of
 // every label, the Chinese one only as a fallback (except for Chinese). Right
 // after createWindow(), before the first label exists.

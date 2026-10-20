@@ -32,24 +32,24 @@
             lineBottom="1"
             lineColor="@theme/brls/header/border">
 
-            <brls:Image id="gs_icon" width="96" height="96" cornerRadius="12" marginRight="24" backgroundColor="@theme/brand/gauge_track"/>
+            <brls:Image id="gs_icon" width="96" height="96" cornerRadius="12" marginRight="24" backgroundColor="@theme/cadran/well"/>
             <brls:Box axis="column" alignItems="stretch" grow="1.0">
                 <brls:Label id="gs_name" text=" " fontSize="26" singleLine="true"/>
                 <brls:Box axis="row" alignItems="flexStart" marginTop="10">
                     <brls:Box axis="column" width="220" marginRight="16">
-                        <brls:Label id="gs_period_caption" text=" " fontSize="16" singleLine="true" textColor="@theme/brand/note"/>
+                        <brls:Label id="gs_period_caption" text=" " fontSize="16" singleLine="true" textColor="@theme/cadran/text3"/>
                         <brls:Label id="gs_period" text="—" fontSize="22" marginTop="4" singleLine="true"/>
                     </brls:Box>
                     <brls:Box axis="column" width="220" marginRight="16">
-                        <brls:Label text="@i18n/playguard/activity/all_time" fontSize="16" singleLine="true" textColor="@theme/brand/note"/>
+                        <brls:Label text="@i18n/playguard/activity/all_time" fontSize="16" singleLine="true" textColor="@theme/cadran/text3"/>
                         <brls:Label id="gs_total" text="—" fontSize="22" marginTop="4" singleLine="true"/>
                     </brls:Box>
                     <brls:Box axis="column" width="140" marginRight="16">
-                        <brls:Label text="@i18n/playguard/activity/launches" fontSize="16" singleLine="true" textColor="@theme/brand/note"/>
+                        <brls:Label text="@i18n/playguard/activity/launches" fontSize="16" singleLine="true" textColor="@theme/cadran/text3"/>
                         <brls:Label id="gs_launches" text="—" fontSize="22" marginTop="4" singleLine="true"/>
                     </brls:Box>
                     <brls:Box axis="column" grow="1.0">
-                        <brls:Label text="@i18n/playguard/activity/last" fontSize="16" singleLine="true" textColor="@theme/brand/note"/>
+                        <brls:Label text="@i18n/playguard/activity/last" fontSize="16" singleLine="true" textColor="@theme/cadran/text3"/>
                         <brls:Label id="gs_last" text="—" fontSize="22" marginTop="4" singleLine="true"/>
                     </brls:Box>
                 </brls:Box>
@@ -79,11 +79,11 @@
                 </brls:Box>
                 <brls:Box id="gs_progress" axis="row" alignItems="center" marginTop="10" marginBottom="6" marginLeft="16" marginRight="16">
                     <brls:ProgressSpinner width="30" height="30" marginRight="14"/>
-                    <brls:Label text="@i18n/playguard/activity/loading" fontSize="20" grow="1.0" textColor="@theme/brand/note"/>
+                    <brls:Label text="@i18n/playguard/activity/loading" fontSize="20" grow="1.0" textColor="@theme/cadran/text3"/>
                 </brls:Box>
                 <brls:Box id="gs_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
-                <brls:Label id="gs_capped" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note" visibility="gone"/>
-                <brls:Label id="gs_status" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note" visibility="gone"/>
+                <brls:Label id="gs_capped" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3" visibility="gone"/>
+                <brls:Label id="gs_status" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3" visibility="gone"/>
 
             </brls:Box>
 

@@ -440,6 +440,19 @@ void cadran::List::row(brls::DetailCell* cell, const char* icon, bool alone)
     }
 }
 
+void cadran::List::recolor_icon(brls::DetailCell* cell, const char* icon, const char* color_key, const char* square_key)
+{
+    auto* square = cell && !cell->getChildren().empty() ? dynamic_cast<brls::Box*>(cell->getChildren()[0]) : nullptr;
+    if (!square) return;   // a row without its icon
+    brls::Theme theme = brls::Application::getTheme();
+    square->setBackgroundColor(theme[square_key ? square_key : "cadran/surf2"]);
+    for (brls::View* v : square->getChildren())
+        if (auto* glyph = dynamic_cast<CadranIcon*>(v)) {
+            if (icon) glyph->setIcon(icon);
+            glyph->setColor(theme[color_key]);
+        }
+}
+
 brls::Box* cadran::List::rows_in(brls::Box* list)
 {
     if (!list) return list;

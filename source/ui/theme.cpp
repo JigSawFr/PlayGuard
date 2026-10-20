@@ -1,34 +1,15 @@
-// ui — the theme colours and the console's system font (see ui.hpp).
+// ui — the palette's colours by role, and the console's system font (see ui.hpp).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
 #ifdef __SWITCH__
 #include <switch.h>
-#else
-#include <cstdlib>
 #endif
 
-#include "core/sim_env.h"
 #include "util/text.hpp"
 
 namespace ui
 {
-
-void register_theme_colors()
-{
-    // What cadran::install_theme() does not set: the empty part of a
-    // progress bar and of a game's missing cover. The rest of the palette is
-    // the boards' (ui/cadran_frame.cpp).
-    brls::Theme::getLightTheme().addColor("brand/gauge_track", nvgRGBA(0, 0, 0, 34));
-    brls::Theme::getDarkTheme().addColor("brand/gauge_track", nvgRGBA(255, 255, 255, 46));
-#ifndef __SWITCH__
-    // Desktop simulation, PLAYGUARD_SIM_STILL_FOCUS=1 (the smoke test): the
-    // glow borealis moves around the focus with the clock stays where it is
-    // (patches/borealis/0009); cadran::install_theme() draws it in the
-    // stroke's own colour, so a screenshot does not depend on when it was taken.
-    if (sim_env_flag("PLAYGUARD_SIM_STILL_FOCUS")) brls::setHighlightAnimationStill(true);
-#endif
-}
 
 void use_latin_font()
 {
@@ -60,11 +41,11 @@ void use_latin_font()
 #endif
 }
 
-NVGcolor color_ok()      { return brls::Application::getTheme()["brand/ok"]; }
-NVGcolor color_warn()    { return brls::Application::getTheme()["brand/warn"]; }
-NVGcolor color_bad()     { return brls::Application::getTheme()["brand/bad"]; }
-NVGcolor color_track()   { return brls::Application::getTheme()["brand/gauge_track"]; }
-NVGcolor color_note()    { return brls::Application::getTheme()["brand/note"]; }
+NVGcolor color_ok()      { return brls::Application::getTheme()["cadran/teal"]; }
+NVGcolor color_warn()    { return brls::Application::getTheme()["cadran/amber"]; }
+NVGcolor color_bad()     { return brls::Application::getTheme()["cadran/coral"]; }
+NVGcolor color_track()   { return brls::Application::getTheme()["cadran/well"]; }
+NVGcolor color_note()    { return brls::Application::getTheme()["cadran/text3"]; }
 NVGcolor color_neutral() { return brls::Application::getTheme()["brls/list/listItem_value_color"]; }
 NVGcolor color_text()    { return brls::Application::getTheme()["brls/text"]; }
 NVGcolor color_accent()  { return brls::Application::getTheme()["brls/sidebar/active_item"]; }

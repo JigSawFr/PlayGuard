@@ -28,14 +28,14 @@
 
             <brls:Label id="fg_headline" text="" fontSize="26" marginBottom="12"/>
             <brls:Label id="fg_body" text="" marginBottom="16"/>
-            <brls:Label id="fg_status" text="@i18n/playguard/fw_gate/status_checking" fontSize="20" marginBottom="16" textColor="@theme/brand/note"/>
+            <brls:Label id="fg_status" text="@i18n/playguard/fw_gate/status_checking" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
             <brls:DetailCell id="fg_update"/>
             <brls:Header title="@i18n/playguard/fw_gate/section_continue" marginTop="16" marginBottom="8"/>
             <brls:DetailCell id="fg_read_only" title="@i18n/playguard/fw_gate/read_only"/>
             <brls:DetailCell id="fg_probe" title="@i18n/playguard/fw_gate/probe"/>
             <brls:DetailCell id="fg_risk" title="@i18n/playguard/fw_gate/risk"/>
             <brls:BooleanCell id="fg_remember"/>
-            <brls:Label id="fg_note" text="@i18n/playguard/fw_gate/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:Label id="fg_note" text="@i18n/playguard/fw_gate/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:DetailCell id="fg_quit" title="@i18n/playguard/common/quit" marginTop="16"/>
 
         </brls:Box>

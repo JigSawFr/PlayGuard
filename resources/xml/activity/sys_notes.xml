@@ -33,27 +33,27 @@
                 marginTop="8" marginBottom="24" visibility="gone">
                 <LoadingBar id="sn_loading_bar" width="420" height="8" marginBottom="14"/>
                 <brls:Label id="sn_loading_text" text=" " fontSize="18" horizontalAlign="center"
-                    textColor="@theme/brand/note"/>
+                    textColor="@theme/cadran/text3"/>
             </brls:Box>
             <!-- Between the L and R icons (set in the code); the tabs themselves
                  are made in the code, one per version. -->
             <brls:Box id="sn_tabs" width="auto" height="auto" axis="row" alignItems="center" marginBottom="16">
-                <brls:Label id="sn_tab_l" text=" " fontSize="25.5" marginRight="12" textColor="@theme/brand/note"/>
+                <brls:Label id="sn_tab_l" text=" " fontSize="25.5" marginRight="12" textColor="@theme/cadran/text3"/>
                 <brls:Box id="sn_tab_list" width="auto" height="auto" axis="row" alignItems="center"/>
-                <brls:Label id="sn_tab_r" text=" " fontSize="25.5" textColor="@theme/brand/note"/>
+                <brls:Label id="sn_tab_r" text=" " fontSize="25.5" textColor="@theme/cadran/text3"/>
             </brls:Box>
-            <brls:Label id="sn_advice" text="" fontSize="20" marginBottom="16" textColor="@theme/brand/warn"/>
+            <brls:Label id="sn_advice" text="" fontSize="20" marginBottom="16" textColor="@theme/cadran/amber"/>
             <brls:Box id="sn_tags" width="auto" height="auto" axis="row" marginBottom="10"/>
             <brls:Header id="sn_header" marginBottom="8"/>
             <brls:Label id="sn_language" text="@i18n/playguard/sys_notes/english" fontSize="18" marginBottom="12"
-                textColor="@theme/brand/note"/>
+                textColor="@theme/cadran/text3"/>
             <brls:Box id="sn_notes" width="auto" height="auto" axis="column" alignItems="stretch"/>
-            <brls:Label id="sn_empty" text="" fontSize="20" marginTop="8" textColor="@theme/brand/note"/>
-            <brls:Label id="sn_more" text="" fontSize="18" marginTop="16" textColor="@theme/brand/note"/>
+            <brls:Label id="sn_empty" text="" fontSize="20" marginTop="8" textColor="@theme/cadran/text3"/>
+            <brls:Label id="sn_more" text="" fontSize="18" marginTop="16" textColor="@theme/cadran/text3"/>
             <brls:Box width="auto" height="auto" axis="row" marginTop="24">
                 <brls:Button id="sn_online" style="default" text="@i18n/playguard/sys_notes/online"/>
             </brls:Box>
-            <brls:Label id="sn_checked" text=" " fontSize="18" marginTop="16" textColor="@theme/brand/note"/>
+            <brls:Label id="sn_checked" text=" " fontSize="18" marginTop="16" textColor="@theme/cadran/text3"/>
 
         </brls:Box>
 

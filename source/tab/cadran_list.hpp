@@ -104,6 +104,10 @@ class List
     // of a card (apply()'s own), or as a card of its own (`alone`).
     static void section(brls::Header* header);
     static void row(brls::DetailCell* cell, const char* icon = nullptr, bool alone = false);
+    // A row's icon (row()'s, at its start) changed: another `icon` (nullptr:
+    // the same), in `color_key`, on `square_key` (nullptr: the usual square).
+    static void recolor_icon(brls::DetailCell* cell, const char* icon, const char* color_key,
+                         const char* square_key = nullptr);
     // The box a screen's rows go in: a card in `list` (made the first time).
     // The screen clears and fills that one.
     static brls::Box* rows_in(brls::Box* list);

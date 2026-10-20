@@ -45,7 +45,7 @@
             <brls:DetailCell id="ab_license" focusable="false" title="@i18n/playguard/tools/license"/>
             <brls:DetailCell id="ab_source" title="@i18n/playguard/tools/source"/>
             <brls:Header title="@i18n/playguard/about/section_support" marginTop="24" marginBottom="8"/>
-            <brls:Label id="ab_support_note" text="@i18n/playguard/about/support_note" fontSize="20" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:Label id="ab_support_note" text="@i18n/playguard/about/support_note" fontSize="20" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:Box id="ab_funding" width="auto" height="auto" axis="row" justifyContent="spaceEvenly" marginTop="8"/>
             <MadeInFrance marginTop="32" marginBottom="8"/>
 

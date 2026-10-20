@@ -81,7 +81,7 @@
             </brls:Box>
 
             <brls:Header title="@i18n/playguard/activity/section_totals" marginBottom="8"/>
-            <brls:Label id="ac_new_account" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/warn"/>
+            <brls:Label id="ac_new_account" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/amber"/>
             <brls:DetailCell id="ac_account_default" title="@i18n/playguard/activity/account_default"/>
             <PlayDaysView id="ac_days" width="auto" height="auto" marginTop="8" marginBottom="16"/>
             <brls:Header title="@i18n/playguard/activity/section_summary" marginTop="24" marginBottom="8"/>
@@ -95,18 +95,18 @@
             <brls:DetailCell id="ac_qr" title="@i18n/playguard/activity/qr"/>
             <brls:Box id="ac_progress" axis="row" alignItems="center" marginTop="10" marginBottom="6" marginLeft="16" marginRight="16">
                 <brls:ProgressSpinner width="30" height="30" marginRight="14"/>
-                <brls:Label text="@i18n/playguard/activity/loading" fontSize="20" grow="1.0" textColor="@theme/brand/note"/>
+                <brls:Label text="@i18n/playguard/activity/loading" fontSize="20" grow="1.0" textColor="@theme/cadran/text3"/>
             </brls:Box>
-            <brls:Label id="ac_capped" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note" visibility="gone"/>
-            <brls:Label id="ac_status" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:Label id="ac_capped" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3" visibility="gone"/>
+            <brls:Label id="ac_status" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:Header id="ac_hours_header" title="@i18n/playguard/activity/section_hours" marginTop="24" marginBottom="8"/>
             <PlayHoursView id="ac_hours" width="auto" marginTop="8" marginBottom="8"/>
-            <brls:Label id="ac_hours_legend" text="@i18n/playguard/activity/hours/legend" fontSize="18" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:Label id="ac_hours_legend" text="@i18n/playguard/activity/hours/legend" fontSize="18" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:DetailCell id="ac_sessions" focusable="false" title="@i18n/playguard/activity/hours/sessions"/>
             <brls:DetailCell id="ac_longest" focusable="false" title="@i18n/playguard/activity/hours/longest"/>
             <brls:DetailCell id="ac_busy_hours" focusable="false" title="@i18n/playguard/activity/hours/busy"/>
             <brls:DetailCell id="ac_late" focusable="false" title="@i18n/playguard/activity/hours/late"/>
-            <brls:Label id="ac_note" text="@i18n/playguard/activity/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:Label id="ac_note" text="@i18n/playguard/activity/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
         </brls:Box>
 

@@ -11,7 +11,6 @@
 #include "tab/cadran_list.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
-#include "view/cadran_icon.hpp"
 #include "util/config.hpp"
 
 using namespace brls::literals;
@@ -263,14 +262,7 @@ void NoticesActivity::rebuild()
         icons.push_back({ ids[i].c_str(), todo ? "alert" : "info" });
     }
     cadran::List(box, box).apply(icons);   // the icons found in the box, not on screen yet
-    brls::Theme theme = brls::Application::getTheme();
-    for (brls::DetailCell* cell : todos) {
-        auto* square = cell->getChildren().empty() ? nullptr : dynamic_cast<brls::Box*>(cell->getChildren()[0]);
-        if (!square) continue;
-        square->setBackgroundColor(theme["cadran/amber_surf"]);
-        for (brls::View* v : square->getChildren())
-            if (auto* icon = dynamic_cast<CadranIcon*>(v)) icon->setColor(theme["cadran/amber"]);
-    }
+    for (brls::DetailCell* cell : todos) cadran::List::recolor_icon(cell, nullptr, "cadran/amber", "cadran/amber_surf");
     root->addView(box);
     brls::Application::giveFocus(focus ? focus : first);
     if (this->content) root->removeView(this->content);

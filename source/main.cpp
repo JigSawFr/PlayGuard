@@ -486,8 +486,6 @@ int main(int argc, char* argv[])
     // picker's takes half of it.
     brls::getStyle().addMetric("brls/animations/show", 2.0f);
 
-    // The colours the palettes leave out, before any view exists.
-    ui::register_theme_colors();
     // The palettes after the design boards (navy on dark, cool white on light).
     cadran::install_theme();
     // Preferences › Text size (larger on a TV by default), before the

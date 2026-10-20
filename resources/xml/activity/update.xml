@@ -27,13 +27,13 @@
             paddingLeft="@style/brls/sidebar/padding_left">
 
             <brls:Label id="up_headline" text="" fontSize="26" marginBottom="12"/>
-            <brls:Label id="up_body" text="" fontSize="20" marginBottom="16" textColor="@theme/brand/note"/>
+            <brls:Label id="up_body" text="" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
             <brls:DetailCell id="up_update"/>
             <brls:DetailCell id="up_method" title="@i18n/playguard/tools/update_via"/>
             <brls:DetailCell id="up_later" title="@i18n/playguard/common/later"/>
             <brls:Header id="up_notes_header" marginTop="32" marginBottom="8"/>
             <brls:Box id="up_notes" width="auto" height="auto" axis="column" alignItems="stretch"/>
-            <brls:Label id="up_notes_none" text="" fontSize="20" textColor="@theme/brand/note"/>
+            <brls:Label id="up_notes_none" text="" fontSize="20" textColor="@theme/cadran/text3"/>
 
         </brls:Box>
 
