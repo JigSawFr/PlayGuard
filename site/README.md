@@ -61,7 +61,8 @@ PlayGuard's website, on GitHub Pages: <https://playguard.link/>.
   domain: they count nowhere else; browsers, bookmarks and link previews ask
   for the icons there without reading the page). Added to a phone's home
   screen, the site is named "PlayGuard" (`assets/site.webmanifest`,
-  `apple-mobile-web-app-title`), not by its page's title. `docs/` itself, in each
+  `apple-mobile-web-app-title`), not by its page's title; a long press on
+  Android's icon offers the simulator. `docs/` itself, in each
   language, sends its visitor on to the guide's first page. A pull request's
   preview says `noindex`.
 - **The web simulator** in `/simulator/` ([`web/README.md`](../web/README.md)).

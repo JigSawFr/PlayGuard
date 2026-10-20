@@ -73,11 +73,21 @@ them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
   service worker already keeps it. On a phone, **Copy link** and **Steps link** open the
   system's share sheet (Messages, mail…) where there is one. A gamepad works through the browser. On a
   touch screen the fields are 16px, so that iOS does not zoom into them, and
-  a pad button pressed with a finger vibrates briefly (Android). Added to a
-  phone's home screen, it is "PlayGuard" in a window of its own: an iPhone
-  takes `apple-touch-icon.png`, Android `icon-192.png` and `icon-512.png`
-  (maskable: the logo stays inside the part Android may crop), both from
-  `tools/render_branding.mjs`.
+  a pad button pressed with a finger vibrates briefly (Android). A long
+  press on the screen or the pad opens no loupe, selection or menu (iOS).
+  **Full screen** (where the browser allows it: Android, a computer; not an
+  iPhone's Safari) shows only the screen and the pad, turned to landscape on
+  a phone, ✕ or Back to leave it. Added to a phone's home screen, it is
+  "PlayGuard" in a window of its own, under the status bar and around the
+  notch (`viewport-fit=cover`, the safe areas kept clear); held in
+  landscape there, only the screen and the pad too, everything back when
+  turned upright. An iPhone takes `apple-touch-icon.png`, Android
+  `icon-192.png` and `icon-512.png` (maskable: the logo stays inside the
+  part Android may crop), both from `tools/render_branding.mjs`; a long
+  press on Android's icon offers four states (limit reached, unlocked, no
+  PIN yet, the tour). The browser's bar takes the header's colour in the
+  page's theme. While the tour or a steps link plays, nobody touches the
+  phone: its screen is kept on (Wake Lock).
 - **Screenshot** saves the screen as it is (1280×720); **Record** saves a
   video of it (WebM) until **Stop**; **Log** shows what PlayGuard logs.
 - **Steps**: from the first screen on, the page notes each button pressed

@@ -8,7 +8,7 @@
        'wasm-unsafe-eval' compiles PlayGuard; blob: workers are Emscripten's
        threads. GitHub Pages sends no headers, so the policy is here. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>PlayGuard simulator</title>
   <meta name="description" content="PlayGuard running in the browser against a simulated console.">
   <link rel="icon" href="icon.jpg">
@@ -19,9 +19,10 @@
        taken for a phone number. -->
   <meta name="apple-mobile-web-app-title" content="PlayGuard">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
-  <meta name="theme-color" content="#0a705f">
+  <meta name="theme-color" content="#111d31">
   <link rel="stylesheet" href="simulator.css">
   <!-- The theme before the first paint (theme.js). -->
   <script src="theme.js"></script>
@@ -69,6 +70,7 @@
         </div>
         <div class="toast" id="toast" role="status" hidden></div>
       </div>
+      <button type="button" class="fs-exit" id="fs-exit" data-i18n-label="fullscreen_exit" aria-label="Exit full screen">✕</button>
 
       <!-- Steps being replayed (rec=, the tour): what, and a way out. -->
       <div class="notice" id="steps-notice" role="status" hidden>
@@ -85,6 +87,8 @@
         <p class="keys" data-i18n-html="keys"></p>
         <div class="control-actions">
           <button type="button" class="btn ghost" id="pad-toggle" aria-pressed="false" data-i18n="pad">Pad</button>
+          <!-- Where the browser allows it (not an iPhone's Safari). -->
+          <button type="button" class="btn ghost" id="fullscreen" data-i18n="fullscreen" hidden>Full screen</button>
           <!-- The tools: in a row on a large screen, behind a button on a phone
                (simulator.js opens it where there is room). -->
           <details class="tools" id="tools">

@@ -1113,7 +1113,12 @@ def main():
         "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml"},
                   {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
                   {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
-                  {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}]}, indent=1) + "\n")
+                  {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}],
+        # A long press on the icon (Android): the simulator, in the phone's
+        # language (one manifest for every language: a page of the
+        # documentation would be the English one).
+        "shortcuts": [{"name": "Simulator", "url": "../simulator/",
+                       "icons": [{"src": "icon-192.png", "sizes": "192x192", "type": "image/png"}]}]}, indent=1) + "\n")
     for name in ("icon-192.png", "icon-512.png"):
         shutil.copy(os.path.join(ROOT, "images", name), os.path.join(out, "assets", name))
     # At a domain's root (as robots.txt), what browsers, bookmarks, iOS and

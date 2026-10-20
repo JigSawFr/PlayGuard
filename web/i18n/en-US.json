@@ -30,6 +30,8 @@
   "copied": "Link copied",
   "reset": "Reset",
   "pad": "Pad",
+  "fullscreen": "Full screen",
+  "fullscreen_exit": "Exit full screen",
   "screenshot": "Screenshot",
   "note": "Apply restarts PlayGuard from a fresh state with these settings; what you change inside it is not kept, unless “Keep the state” is on. The console takes the page's language and theme.",
   "keys": "<kbd>↑↓←→</kbd> move · <kbd>Enter</kbd> A · <kbd>Esc</kbd> B · <kbd>X</kbd> <kbd>Y</kbd> · <kbd>L</kbd> <kbd>R</kbd> · <kbd>⇧L</kbd> ZL · <kbd>⇧R</kbd> ZR · <kbd>+</kbd> <kbd>−</kbd> · a click is a touch",

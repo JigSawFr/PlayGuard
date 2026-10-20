@@ -30,6 +30,8 @@
   "copied": "Ligação copiada",
   "reset": "Repor",
   "pad": "Comando",
+  "fullscreen": "Ecrã inteiro",
+  "fullscreen_exit": "Sair do ecrã inteiro",
   "screenshot": "Captura",
   "note": "Aplicar reinicia o PlayGuard do zero com estas definições; o que alterar lá dentro não é guardado, exceto com «Guardar o estado». A consola usa o idioma e o tema da página.",
   "keys": "<kbd>↑↓←→</kbd> mover · <kbd>Enter</kbd> A · <kbd>Esc</kbd> B · <kbd>X</kbd> <kbd>Y</kbd> · <kbd>L</kbd> <kbd>R</kbd> · <kbd>⇧L</kbd> ZL · <kbd>⇧R</kbd> ZR · <kbd>+</kbd> <kbd>−</kbd> · um clique é um toque",

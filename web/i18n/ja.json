@@ -30,6 +30,8 @@
   "copied": "リンクをコピーしました",
   "reset": "リセット",
   "pad": "コントローラー",
+  "fullscreen": "全画面",
+  "fullscreen_exit": "全画面を終了",
   "screenshot": "スクリーンショット",
   "note": "「適用」はこの設定で PlayGuard を最初から起動し直します。中で変更した内容は「状態を保持」がオンでない限り残りません。本体はページの言語とテーマを使います。",
   "keys": "<kbd>↑↓←→</kbd> 移動 · <kbd>Enter</kbd> A · <kbd>Esc</kbd> B · <kbd>X</kbd> <kbd>Y</kbd> · <kbd>L</kbd> <kbd>R</kbd> · <kbd>⇧L</kbd> ZL · <kbd>⇧R</kbd> ZR · <kbd>+</kbd> <kbd>−</kbd> · クリックはタッチになります",

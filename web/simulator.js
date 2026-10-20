@@ -117,9 +117,16 @@ function showTheme() {
   // The choice (the header's icon on a phone), then the theme it gives.
   document.documentElement.dataset.themeChoice = chosenTheme();
   document.documentElement.dataset.theme = effective;
+  barColour(effective);
   // Started with the other one (Auto following a change of the system's):
   // PlayGuard reads its theme at start-up, so offer to start it again.
   $('theme-notice').hidden = !started || effective === consoleTheme;
+}
+
+// The browser's bar (Android) and the home-screen app's, in the page's
+// theme: the header's colour (simulator.css' --surface).
+function barColour(theme) {
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#111d31' : '#ffffff');
 }
 
 function chooseTheme(choice) {
@@ -563,6 +570,29 @@ function setUpTools() {
   });
 }
 
+// Full screen, where the browser allows it (Android, a computer; not an
+// iPhone's Safari, whose home-screen app plays in landscape instead):
+// only the screen and the pad (html.game), turned to landscape on a phone.
+function setUpFullscreen() {
+  const root = document.documentElement;
+  if (!document.fullscreenEnabled || !root.requestFullscreen) return;
+  const button = $('fullscreen');
+  button.hidden = false;
+  button.addEventListener('click', async () => {
+    try {
+      await root.requestFullscreen({ navigationUI: 'hide' });
+      if (matchMedia('(pointer: coarse)').matches) await screen.orientation?.lock?.('landscape');
+    } catch { /* refused, or no orientation lock: full screen as it is */ }
+  });
+  $('fs-exit').addEventListener('click', () => document.exitFullscreen().catch(() => {}));
+  document.addEventListener('fullscreenchange', () => {
+    const on = document.fullscreenElement === root;
+    root.classList.toggle('game', on);
+    if (!on) screen.orientation?.unlock?.();
+    canvas.focus();
+  });
+}
+
 function setUpPad() {
   for (const button of $('pad').querySelectorAll('[data-button]')) {
     const code = Number(button.dataset.button);
@@ -711,6 +741,8 @@ async function runSteps(text, onStep) {
   const list = SimLogic.parseSteps(text);
   const run = { stopped: false };
   replaying = run;
+  // Nobody touches the phone while the tour plays: its screen kept on.
+  const awake = keepAwake();
   try {
     for (let i = 0; i < list.length && !run.stopped; i++) {
       const step = list[i];
@@ -745,8 +777,32 @@ async function runSteps(text, onStep) {
       }
     }
   } finally {
+    awake.release();
     if (replaying === run) replaying = null;
   }
+}
+
+// The screen kept on (Wake Lock: Android, iOS 16.4+) until release(); taken
+// again when the page comes back into view, which drops it.
+function keepAwake() {
+  let lock = null;
+  let done = false;
+  const take = () => {
+    if (done || document.visibilityState !== 'visible' || !navigator.wakeLock) return;
+    navigator.wakeLock.request('screen').then((l) => {
+      if (done) l.release().catch(() => {});
+      else lock = l;
+    }, () => { /* refused (battery saver, a page without focus): no matter */ });
+  };
+  document.addEventListener('visibilitychange', take);
+  take();
+  return {
+    release() {
+      done = true;
+      document.removeEventListener('visibilitychange', take);
+      lock?.release().catch(() => {});
+    },
+  };
 }
 
 // Replays steps with the notice above the screen, and Stop.
@@ -952,6 +1008,7 @@ async function main() {
   setUpPanel();
   setUpKeys();
   setUpPad();
+  setUpFullscreen();
   setUpTools();
   buildPresets();
   buildForm(current);

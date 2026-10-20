@@ -53,6 +53,11 @@ button, input, select { font: inherit; color: inherit; }
   align-items: center;
   gap: 20px;
   padding: 10px 16px;
+  /* Under an iPhone's notch or status bar (viewport-fit=cover; from the
+     home screen, the status bar over the page): kept clear of them. */
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
   border-bottom: 1px solid var(--line);
   background: color-mix(in srgb, var(--surface) 88%, transparent);
 }
@@ -209,8 +214,14 @@ kbd {
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+/* The screen and the pad are played with: a long press opens no loupe,
+   selection or menu (iOS), a tap leaves no grey flash. */
+.screen, .pad {
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 .pad button {
   touch-action: none;
@@ -396,7 +407,7 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
     grid-template-areas: "lsh screen rsh" "dpad screen face" "lmid screen rmid";
     align-items: center;
     gap: 8px 12px;
-    padding: 8px 12px;
+    padding: 8px max(12px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
     overflow: visible;
   }
   .stage:has(> .pad[hidden]) { grid-template-columns: 0 minmax(0, 1fr) 0; column-gap: 0; }
@@ -414,3 +425,34 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
   .pad [data-button="7"] { grid-area: lmid; justify-self: center; }
   .pad [data-button="9"] { grid-area: rmid; justify-self: center; }
 }
+
+/* Playing: in full screen (the Fullscreen button, simulator.js: html.game),
+   or from the home screen held in landscape. Only the screen and the pad,
+   as on a Switch; turned back upright (or out of full screen), the rest is
+   there again. */
+@media (display-mode: standalone) and (pointer: coarse) and (orientation: landscape) and (max-height: 540px) {
+  .top, .panel, .stage > .notice:not(#steps-notice), .stage > .controls, .stage > .time { display: none !important; }
+  .stage { min-height: 100dvh; align-content: center; }
+  .screen { max-width: calc((100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 16 / 9); }
+}
+html.game, html.game body { background: #000; }
+html.game .top, html.game .panel, html.game .stage > .notice:not(#steps-notice),
+html.game .stage > .controls, html.game .stage > .time { display: none !important; }
+html.game .layout { display: block; }
+html.game .stage { min-height: 100dvh; justify-content: center; align-content: center; }
+html.game .screen { max-width: calc((100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 16 / 9); }
+.fs-exit {
+  position: fixed;
+  top: max(8px, env(safe-area-inset-top));
+  right: max(8px, env(safe-area-inset-right));
+  z-index: 5;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+  font-size: 18px;
+}
+html:not(.game) .fs-exit { display: none; }
+

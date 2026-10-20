@@ -30,6 +30,8 @@
   "copied": "Lien copié",
   "reset": "Réinitialiser",
   "pad": "Manette",
+  "fullscreen": "Plein écran",
+  "fullscreen_exit": "Quitter le plein écran",
   "screenshot": "Capture",
   "note": "Appliquer redémarre PlayGuard d’un état neuf avec ces paramètres; ce que vous changez dans l’appli n’est pas conservé, sauf avec « Conserver l’état ». La console prend la langue et le thème de la page.",
   "keys": "<kbd>↑↓←→</kbd> déplacer · <kbd>Entrée</kbd> A · <kbd>Échap</kbd> B · <kbd>X</kbd> <kbd>Y</kbd> · <kbd>L</kbd> <kbd>R</kbd> · <kbd>⇧L</kbd> ZL · <kbd>⇧R</kbd> ZR · <kbd>+</kbd> <kbd>−</kbd> · un clic est un toucher",

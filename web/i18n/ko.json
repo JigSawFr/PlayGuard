@@ -30,6 +30,8 @@
   "copied": "링크를 복사했습니다",
   "reset": "초기화",
   "pad": "컨트롤러",
+  "fullscreen": "전체 화면",
+  "fullscreen_exit": "전체 화면 종료",
   "screenshot": "스크린샷",
   "note": "적용하면 이 설정으로 PlayGuard를 처음 상태부터 다시 시작합니다. 안에서 바꾼 내용은 '상태 유지'가 켜져 있지 않으면 남지 않습니다. 본체는 페이지의 언어와 테마를 사용합니다.",
   "keys": "<kbd>↑↓←→</kbd> 이동 · <kbd>Enter</kbd> A · <kbd>Esc</kbd> B · <kbd>X</kbd> <kbd>Y</kbd> · <kbd>L</kbd> <kbd>R</kbd> · <kbd>⇧L</kbd> ZL · <kbd>⇧R</kbd> ZR · <kbd>+</kbd> <kbd>−</kbd> · 클릭은 터치입니다",
