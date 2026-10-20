@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 e1805c25bee2 -->
+<!-- translated from docs/features.md, sha256 0adcb09f77ee -->
 # Funktionen
 
 Was jeder Tab macht, wie PlayGuard sicher schreibt, und was die Konsole als Spielzeit zählt. Neu bei PlayGuard? Beginne mit dem [Einstieg](getting-started.md). Zurück zum [README](../../README.md).
@@ -61,7 +61,7 @@ Das Aussehen von PlayGuard heißt Cadran: eine schmale Leiste mit Symbolen für 
 
 Eine Glocke in der Kopfzeile, links von der Version, sammelt, was den Elternteil braucht; Ⓨ öffnet die Liste aus jedem Tab (der Zähler an der Glocke zeigt *2*, wenn zwei Dinge zu tun sind).
 
-Links von der Glocke die Sprache (ihr Kürzel, *FR*, *EN*…) und das Design (eine Sonne für hell, ein Mond für dunkel, ein halb gefüllter Kreis, wenn es der Konsole folgt), dann die Textgröße (**AA**, dessen großes A in Petrol, solange der Text vergrößert ist): Ein Tippen öffnet dieselbe Liste wie in *Optionen*, und **−** bietet sie aus jedem Tab an. Ein neues Design oder eine neue Sprache wirkt sofort, jeder Bildschirm wird auf demselben Tab neu aufgebaut; nur ein Wechsel zu oder von Chinesisch, oder zurück zur Sprache der Konsole, wenn PlayGuard in einer anderen gestartet wurde, wartet, bis PlayGuard neu gestartet wird.
+Links von der Glocke die Sprache (ihr Kürzel, *FR*, *EN*…) und das Design (eine Sonne für hell, ein Mond für dunkel, ein halb gefüllter Kreis, wenn es der Konsole folgt), dann die Textgröße (**AA**, dessen großes A in Petrol, solange der Text vergrößert ist): Ein Tippen öffnet dieselbe Liste wie in *Optionen*, und **−** bietet sie aus jedem Tab an. Ein neues Design oder eine neue Sprache wirkt sofort, jeder Bildschirm wird auf demselben Tab neu aufgebaut, mit dem Fokus auf derselben Zeile, Chinesisch und seine eigene Schrift eingeschlossen.
 
 ### Zu erledigen
 
@@ -198,7 +198,7 @@ Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile übe
 
 | Taste | Bei der Bearbeitung |
 |---|---|
-| ↑/↓ | Um 15 min ändern |
+| ↑/↓ | Um 15 min ändern, gehalten in Stundenschritten |
 | ←/→ | Zum nächsten Tag gehen |
 | Ⓛ | Auf Montag–Freitag kopieren |
 | Ⓡ | Aufs Wochenende kopieren |
@@ -389,6 +389,7 @@ Auf einer Konsole ohne Internet erscheint *Netzwerkuhr auf die Konsolenuhr stell
 - **PlayGuard** mit einem Druck: sein eigenes Symbol und sein Name, der Forwarder startet die `.nro`, von der aus PlayGuard geöffnet wurde.
 - **Ein anderes Homebrew**: jede `.nro` aus dem Ordner `/switch` der SD-Karte (und einen Ordner tiefer), zuerst wird nach ihrem Namen gefragt (dem der `.nro`, zum Behalten oder Ändern). Ihr Symbol ist das der `.nro`, umgewandelt in das JPEG mit 256 × 256, das das HOME-Menü anzeigt, wenn es eine andere Größe hat oder ein PNG ist (ein Controller an seiner Stelle, wenn die `.nro` keines hat), wie es sphaira tut. Ein Pfad mit einem Leerzeichen wird dem Homebrew in Anführungszeichen übergeben.
 - **Die Forwarder im HOME-Menü**, jeder mit seinem Symbol: die, die PlayGuard erstellt hat (Ⓐ: Details, umbenennen, den Herausgeber ändern, neu installieren, löschen), und die einer anderen App (Details, löschen). Einer, dessen `.nro` verschwunden ist, sagt das; einer, der in den Systemeinstellungen gelöscht wurde, bleibt aufgeführt, bis er neu installiert oder vergessen wird. Neu installieren behält seine Programm-ID, sodass der Eintrag im HOME-Menü ersetzt und nicht verdoppelt wird; ein Forwarder, den ein anderes Werkzeug für dieselbe `.nro` erstellt hat, wird ebenfalls ersetzt.
+- **Symbole und Sprachen:** Ein Symbol einer anderen Größe, ein PNG oder ein JPEG mit EXIF-Daten oder progressiver Kodierung (das HOME-Menü zeigt diese als „?“) wird zu einem einfachen JPEG mit 256 × 256. Die Steuerdaten des Forwarders führen nur amerikanisches Englisch auf, die Sprache seines einzigen Symbols: So erscheint das Symbol auf einer Konsole, die auf eine beliebige Sprache eingestellt ist.
 - **Signatur-Patches:** Die Konsole startet einen Forwarder nur mit Signatur-Patches für fs und loader (sys-patch oder sigpatch-Dateien): Ohne sie sagt der Bildschirm das über der Liste (*Konsole › Spiel-Patches* hat die Details). Die `.nro` bleibt, wo sie ist; das Löschen eines Forwarders berührt sie nie.
 - **Spielzeit:** Von seinem Symbol aus gestartet, läuft ein Homebrew wie ein Spiel: Der Timer zählt es und unterbricht es wie jedes Spiel, sobald die Zeit um ist, und *Aktivität* führt es auf. PlayGuard bleibt über das Homebrew-Menü erreichbar.
 - Jede Änderung fragt nach der Geheimzahl, wenn *PlayGuard mit der Geheimzahl schützen* das vorsieht, wird im schreibgeschützten Modus abgelehnt und steht im Änderungsverlauf. Was PlayGuard erstellt hat, wird pro System (sysMMC / emuMMC) in `forwarders.json` gespeichert.

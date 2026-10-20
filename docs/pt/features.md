@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 e1805c25bee2 -->
+<!-- translated from docs/features.md, sha256 0adcb09f77ee -->
 # Funcionalidades
 
 O que faz cada separador, como o PlayGuard escreve em segurança e o que a consola conta como tempo de jogo. Novo no PlayGuard? Comece por [como começar](getting-started.md). Voltar ao [README](../../README.md).
@@ -61,7 +61,7 @@ O aspeto do PlayGuard chama-se Cadran: uma barra de ícones para os separadores,
 
 Um sino no cabeçalho, à esquerda da versão, reúne o que precisa da intervenção do pai ou da mãe; Ⓨ abre a lista a partir de qualquer separador (o contador do sino indica *2* quando há duas coisas a fazer).
 
-À esquerda do sino, o idioma (o seu código, *FR*, *EN*…) e o tema (um sol para claro, uma lua para escuro, um círculo meio preenchido quando segue a consola), depois o tamanho do texto (**AA**, com o A grande a verde-azulado enquanto o texto está maior): um toque abre a mesma lista que em *Preferências*, e **−** propõe-nos a partir de qualquer separador. Um novo tema ou idioma tem efeito de imediato, com cada ecrã refeito no mesmo separador; só a mudança para o chinês ou a partir do chinês, ou o regresso ao idioma da consola quando o PlayGuard abriu noutro, espera que o PlayGuard seja aberto de novo.
+À esquerda do sino, o idioma (o seu código, *FR*, *EN*…) e o tema (um sol para claro, uma lua para escuro, um círculo meio preenchido quando segue a consola), depois o tamanho do texto (**AA**, com o A grande a verde-azulado enquanto o texto está maior): um toque abre a mesma lista que em *Preferências*, e **−** propõe-nos a partir de qualquer separador. Um novo tema ou idioma tem efeito de imediato, com cada ecrã refeito no mesmo separador e o foco na mesma linha, chinês e o seu próprio tipo de letra incluídos.
 
 ### A fazer
 
@@ -198,7 +198,7 @@ Com o texto maior, *Hoje* continua a caber num só ecrã: a linha por cima do t�
 
 | Botão | Na edição |
 |---|---|
-| ↑/↓ | Alterá-lo em 15 min |
+| ↑/↓ | Alterá-lo em 15 min, de hora em hora quando mantidos premidos |
 | ←/→ | Passar ao dia seguinte |
 | Ⓛ | Copiá-lo para segunda–sexta |
 | Ⓡ | Copiá-lo para o fim de semana |
@@ -389,6 +389,7 @@ Numa consola sem Internet, *Acertar o relógio de rede pelo relógio da consola*
 - **PlayGuard** com um só toque: o seu próprio ícone e nome, com o forwarder a iniciar o `.nro` a partir do qual o PlayGuard foi aberto.
 - **Outro homebrew**: qualquer `.nro` da pasta `/switch` do cartão SD (e uma pasta abaixo), com o nome pedido primeiro (o do próprio `.nro`, para manter ou alterar). O ícone é o do `.nro`, convertido no JPEG de 256 × 256 que o menu HOME mostra quando tem outro tamanho ou é um PNG (um comando no seu lugar quando o `.nro` não tem nenhum), como faz o sphaira. Um caminho com um espaço é passado ao homebrew entre aspas.
 - **Os forwarders do menu HOME**, cada um com o seu ícone: os que o PlayGuard criou (Ⓐ: detalhes, mudar o nome, mudar a editora, instalar novamente, eliminar) e os que outra aplicação criou (detalhes, eliminar). Um cujo `.nro` desapareceu indica-o; um eliminado nas Definições da consola continua na lista até ser instalado novamente ou esquecido. Instalar novamente mantém o seu ID de programa, por isso a entrada do menu HOME é substituída, não duplicada; um forwarder criado por outra ferramenta para o mesmo `.nro` também é substituído.
+- **Ícones e idiomas:** um ícone de outro tamanho, um PNG, ou um JPEG com dados EXIF ou codificação progressiva (o menu HOME mostra-os como um "?") passa a ser um JPEG de 256 × 256 simples. Os dados de controlo do forwarder só declaram o inglês americano, o idioma do seu único ícone: assim, o ícone aparece numa consola configurada em qualquer idioma.
 - **Patches de assinatura:** a consola só inicia um forwarder com patches de assinatura do fs e do loader (sys-patch, ou ficheiros sigpatch): sem eles, o ecrã indica-o por cima da lista (*Consola › Patches de jogos* tem os detalhes). O `.nro` fica onde está; eliminar um forwarder nunca lhe toca.
 - **Tempo de jogo:** iniciado a partir do seu ícone, um homebrew corre como um jogo: o tempo de jogo conta-o e suspende-o como qualquer jogo quando o tempo acaba, e *Atividade* lista-o. O PlayGuard continua à mão a partir do menu de homebrew.
 - Cada alteração pede o PIN quando *Proteger o PlayGuard com o PIN* o pede, é recusada no modo só de leitura e fica no histórico de alterações. O que o PlayGuard criou é guardado por sistema (sysMMC / emuMMC), em `forwarders.json`.

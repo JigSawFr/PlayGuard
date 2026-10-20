@@ -9,14 +9,13 @@
 #include "tab/tab_base.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
-#include "util/text.hpp"
 
 namespace live_prefs
 {
 namespace
 {
 brls::ThemeVariant s_system_theme = brls::ThemeVariant::DARK;
-std::string s_system_locale;   // "" when PlayGuard started in another language
+std::string s_system_locale;   // the console's language
 std::string s_locale;          // the strings' language now
 
 // The tab shown, as a sidebar position (ui::tab).
@@ -41,33 +40,48 @@ void close_all(std::function<void()> next)
     if (!brls::Application::popActivity(brls::TransitionAnimation::NONE, [next]() { close_all(next); })) next();
 }
 
-// Every screen made again, the main one on the tab that was shown: the
-// screens above it (a sub-screen the header's setting was changed from) go.
+// The focused line of the shown tab: its id (or its nearest parent's that
+// has one), "" when the focus is elsewhere (the rail, the header).
+std::string focused_row()
+{
+    for (brls::View* v = brls::Application::getCurrentFocus(); v; v = v->getParent()) {
+        if (dynamic_cast<TabBase*>(v)) return "";
+        if (!v->getId().empty()) {
+            for (brls::View* up = v->getParent(); up; up = up->getParent())
+                if (dynamic_cast<TabBase*>(up)) return v->getId();
+            return "";
+        }
+    }
+    return "";
+}
+
+// Every screen made again, the main one on the tab that was shown, the focus
+// back on its line: the screens above it (a sub-screen the header's setting
+// was changed from) go.
 void rebuild()
 {
-    const int tab = shown_tab();
-    brls::sync([tab]() {
-        close_all([tab]() {
+    brls::sync([]() {
+        const int tab = shown_tab();
+        const std::string row = focused_row();
+        close_all([tab, row]() {
             auto* main = new MainActivity();
             brls::Application::pushActivity(main, brls::TransitionAnimation::NONE);
-            main->open_tab(tab);
+            main->open_tab(tab, row);
         });
     });
 }
 
-bool chinese(const std::string& locale)
-{
-    return text::starts_with(locale, "zh");
-}
 }   // namespace
 
-void remember_system()
+void start()
 {
+    // The platform read the console's language (main.cpp leaves borealis'
+    // locale on auto), and the strings are in it: the preferences' instead.
     s_system_theme = brls::Application::getPlatform()->getThemeVariant();
-    // The platform's locale is the preferences' when one was set (main.cpp's
-    // apply_locale): the console's own only when none was.
-    s_locale = brls::Application::getLocale();
-    if (config::get().language == "system") s_system_locale = s_locale;
+    s_system_locale = brls::Application::getLocale();
+    const std::string& chosen = config::get().language;
+    s_locale = chosen == "system" ? s_system_locale : chosen;
+    if (s_locale != s_system_locale) brls::loadTranslations(s_locale);
 }
 
 void apply_theme()
@@ -83,23 +97,18 @@ std::string locale()
     return s_locale;
 }
 
-bool theme_changed()
+void theme_changed()
 {
     apply_theme();
     rebuild();
-    return true;
 }
 
-bool language_changed()
+void language_changed()
 {
     const std::string& chosen = config::get().language;
-    const std::string next = chosen == "system" ? s_system_locale : chosen;
-    // Chinese, either way: its font and its characters' forms are chosen once
-    // (ui::use_latin_font, borealis' Label).
-    if (next.empty() || chinese(next) || chinese(s_locale)) return false;
-    s_locale = next;
-    brls::loadTranslations(next);
+    s_locale = chosen == "system" ? s_system_locale : chosen;
+    brls::loadTranslations(s_locale);
+    ui::use_font_for(s_locale);   // Chinese has its own (made again with the screens)
     rebuild();
-    return true;
 }
 }   // namespace live_prefs

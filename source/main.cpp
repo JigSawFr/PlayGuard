@@ -300,17 +300,6 @@ void select_nand_and_log_system()
     crash_report::prepare(paths::crashes_dir(), build_name(), system, session_log::current_name());
 }
 
-// The language of the preferences, before borealis loads i18n.
-void apply_locale()
-{
-    // config::sanitize() keeps the language to config::LANGUAGES.
-    const auto& cfg = config::get();
-    if (cfg.language != "system")
-        brls::Platform::APP_LOCALE_DEFAULT = cfg.language;
-    else
-        brls::Platform::APP_LOCALE_DEFAULT = brls::LOCALE_AUTO;
-}
-
 // The views the XML layouts name, and what goes in every screen's header.
 void register_views()
 {
@@ -428,10 +417,10 @@ int main(int argc, char* argv[])
     select_nand_and_log_system();
     startup_mark(StartupStep_System);
 
-    // Preferences first: the locale must be chosen before borealis loads i18n.
+    // Preferences first: their language replaces the console's once borealis
+    // has read it (live_prefs::start).
     config::load();
     startup_mark(StartupStep_Preferences);
-    apply_locale();
 
     if (!brls::Application::init()) {
         brls::Logger::error("Unable to init borealis Application");
@@ -439,14 +428,14 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     startup_mark(StartupStep_Borealis);
+    live_prefs::start();
 
     brls::Application::createWindow("playguard/title"_i18n);
-    ui::use_latin_font();
+    ui::use_font_for(live_prefs::locale());
     startup_mark(StartupStep_Window);
 
-    // The console's own theme and language first ("system"), then the
-    // preferences' theme: dark by default, light when chosen.
-    live_prefs::remember_system();
+    // The preferences' theme: dark by default, light when chosen, or the
+    // console's.
     live_prefs::apply_theme();
 
     // No cross-fade when a screen opens or closes: on the console's LCD the

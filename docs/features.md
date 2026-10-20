@@ -60,7 +60,7 @@ PlayGuard's look is called Cadran: an icon rail for the tabs, a navy or cool-whi
 
 A bell in the header, left of the version, gathers what needs the parent; Ⓨ opens the list from any tab (the bell's badge says *2* when two things are to do).
 
-Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun for light, a moon for dark, a half-filled circle when it follows the console), then the text size (**AA**, its large A in teal while the text is larger): a tap opens the same list as *Preferences*, and **−** offers them from any tab. A new theme or language takes effect at once, every screen made again on the same tab; only a change to or from Chinese, or back to the console's language when PlayGuard started in another one, waits for PlayGuard to start again.
+Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun for light, a moon for dark, a half-filled circle when it follows the console), then the text size (**AA**, its large A in teal while the text is larger): a tap opens the same list as *Preferences*, and **−** offers them from any tab. A new theme or language takes effect at once, every screen made again on the same tab with the focus on the same line, Chinese and its own font included.
 
 ### To do
 
@@ -197,7 +197,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 | Button | In the edit |
 |---|---|
-| ↑/↓ | Change it by 15 min |
+| ↑/↓ | Change it by 15 min, by the hour once held |
 | ←/→ | Move to the next day |
 | Ⓛ | Copy it to Monday–Friday |
 | Ⓡ | Copy it to the weekend |

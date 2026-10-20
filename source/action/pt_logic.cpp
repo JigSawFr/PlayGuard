@@ -2,6 +2,7 @@
 #include "action/pt_logic.hpp"
 
 #include <algorithm>
+#include <cstdlib>
 
 #include "util/date.hpp"
 
@@ -361,6 +362,27 @@ NextStop next_stop(int now, int left, const PtBedtime& bed)
     if (left >= 0 && now + left < 24 * 60 && (!night || now + left < start)) return { NextStop::TIME_UP, now + left, left };
     if (night) return { NextStop::BEDTIME, start, start - now };
     return {};
+}
+
+bool counts_to_bed(const NextStop& n, int left, bool free)
+{
+    return n.kind == NextStop::BEDTIME && (left >= 0 || (free && n.in <= 60));
+}
+
+int held_step(Held& held, int minutes, int delta, int64_t now_us)
+{
+    // A repeat comes 100 ms after the last; the first one 250 ms after the
+    // press, which starts the count again.
+    constexpr int64_t REPEAT_US = 150000;
+    constexpr int HOURS_AFTER = 5;   // repeats in a row
+    const bool up = delta > 0;
+    const bool repeat = now_us - held.last_us < REPEAT_US && held.presses != 0 && (held.presses > 0) == up;
+    held.presses = repeat ? held.presses + (up ? 1 : -1) : (up ? 1 : -1);
+    held.last_us = now_us;
+    int next = minutes + delta;
+    if (std::abs(delta) == 15 && std::abs(held.presses) > HOURS_AFTER)
+        next = up ? (minutes / 60 + 1) * 60 : ((minutes + 59) / 60 - 1) * 60;   // the next whole hour that way
+    return std::max(0, std::min(24 * 60, next));
 }
 
 }   // namespace pt_logic
