@@ -1,7 +1,7 @@
-<!-- translated from docs/troubleshooting.md, sha256 93378334f3c8 -->
+<!-- translated from docs/troubleshooting.md, sha256 b9da08e73591 -->
 # Solución de problemas
 
-Recuperar el acceso a una consola bloqueada, reportar un error y el modo desarrollador. Volver al [README](../../README.md).
+Recuperar el acceso a una consola bloqueada, los problemas frecuentes, reportar un error y el modo desarrollador. Volver al [README](../../README.md).
 
 ## ¿Consola bloqueada?
 
@@ -27,6 +27,50 @@ El módulo debe ir a la par de la versión de PlayGuard: con cada actualización
 
 PlayGuard no puede ayudar: necesita Atmosphère. El procedimiento de la clave maestra del soporte de Nintendo es la vía oficial.
 
+## Problemas frecuentes
+
+### El tiempo restante no baja
+
+*Hoy* indica *La consola no está contando el tiempo de juego en este momento* cuando no se movió durante unos 90 s. Las causas probables:
+
+- **El reloj de red nunca se ajustó.** *Consola › Reloj de red › Medir la diferencia horaria* y luego ajústelo ([reloj de red](features.md#reloj-de-red)).
+- **El reloj se atrasó.** Tras un salto hacia atrás, el conteo se detiene hasta que el reloj pasa la hora anterior; no hay nada que hacer.
+- **Se acaba de escribir un límite.** Inicie un juego un minuto y vuelva a revisar.
+- **El control parental está desbloqueado temporalmente.** Es posible que entonces no se cuente el tiempo de juego: *PIN › Reactivar el control parental*.
+
+### Mis límites cambiaron solos
+
+- **La app para celular sigue vinculada.** Su próxima sincronización sobrescribe lo que configuró PlayGuard: *PIN › Desvincular la app para celular*.
+- **Otra herramienta, o un perfil.** *Hoy* muestra una tarjeta ámbar para los límites distintos de los que PlayGuard vio la última vez, y *Historial › Historial de cambios* enumera cada cambio visto fuera de PlayGuard. Ⓐ en uno restablece el valor anterior.
+- **Un perfil programado** que se aplicó, o que se revirtió al terminar su período (*Tiempo de juego › Perfiles › Perfil programado*).
+
+### El niño jugó más allá del límite
+
+- **La consola solo avisa.** *Tiempo de juego › Cuando se acabe el tiempo*: elija *Suspender el programa*.
+- **El control parental quedó desbloqueado.** Mientras lo está, el límite de hoy queda en pausa: la píldora del encabezado lo indica en todas las pestañas; *PIN › Reactivar el control parental*. Un reinicio de la consola también lo bloquea.
+- **El reloj se atrasó.** El conteo se detiene hasta que el reloj pasa la hora anterior ([qué cuenta](features.md#qué-cuenta-como-tiempo-de-juego)).
+- **El otro sistema.** La emuMMC y la sysMMC tienen cada una su propio control parental: configúrelo en ambas, u oculte el menú de arranque de hekate ([compatibilidad](compatibility.md#emummc-y-sysmmc)).
+
+### Todo el límite vuelve a estar disponible hoy
+
+Cambiar el reloj (el reloj de red o el de la consola) pone a cero el tiempo de juego de hoy. Ajuste el reloj antes de que el niño juegue, no después.
+
+### PlayGuard se abre en solo lectura
+
+La consola ejecuta un firmware más reciente que el más reciente probado: PlayGuard comprueba si una versión más reciente es compatible con él y ofrece actualizar ([firmware más reciente](compatibility.md#firmware-más-reciente)). Un lápiz tachado a la derecha del título indica que la aplicación está en solo lectura; al tocarlo se abre la pantalla del firmware.
+
+### PlayGuard pide el PIN todo el tiempo, o nunca
+
+*PIN › Proteger PlayGuard con el PIN*: *Antes de un cambio* (lo predeterminado) lo pide una vez, antes del primer cambio, y el PIN vale hasta que se cierra PlayGuard. *Volver a pedir el PIN tras 5 minutos* lo vuelve a pedir pasado ese tiempo. *Mostrar el PIN* siempre lo pide.
+
+### Un juego no se inicia, o muestra un “!” en el menú HOME
+
+*Consola › Comprobar los juegos instalados* indica qué falla en cada uno y qué hacer; los datos de guardado siempre se conservan ([juegos instalados](features.md#juegos-instalados)).
+
+### La campana o una pestaña muestra una insignia ámbar
+
+Algo requiere su atención: Ⓨ abre la lista, y Ⓐ en una entrada aplica la solución o abre donde se hace ([notificaciones](features.md#notificaciones--lo-que-requiere-su-atención-desde-cualquier-pestaña)).
+
 ## Reportar un error
 
 Un error muestra el código del sistema (por ejemplo, `0x0001088E`) con lo que se sabe de él: qué hacer, para los códigos cuyo significado está documentado; si no, un informe ayuda.
@@ -34,7 +78,19 @@ Un error muestra el código del sistema (por ejemplo, `0x0001088E`) con lo que s
 1. *Información › Ayuda y diagnóstico › Exportar un informe de diagnóstico* guarda un archivo de texto en `sd:/config/playguard/logs/reports/`: firmware, versión de Atmosphère, cuánto tardó el inicio y cuánto tardaron las pantallas lentas (el historial de cambios, *Todos los juegos*, la comprobación de los juegos instalados, las pestañas que se actualizan solas), relojes, almacenamiento, estado del ocultamiento del número de serie y de los parches de juegos, el resultado sin procesar de cada consulta al control parental, y los registros: cómo terminó la última sesión, la memoria y el espacio libre en la tarjeta SD, los archivos de fallo más recientes y las últimas 80 líneas registradas. **Nunca contiene el PIN ni el número de serie.**
 2. [Abra un issue](https://github.com/JigSawFr/PlayGuard/issues/new) y adjúntelo.
 
-O bien, con la consola conectada a Internet, *Información › Ayuda y diagnóstico › Enviar un informe en línea* (Ⓧ en el informe de diagnóstico, en modo desarrollador) lo envía, junto con los informes de fallo más recientes (los 3 últimos de PlayGuard en `logs/crashes/`, y los 2 últimos de Atmosphère de un homebrew de la última semana, en `sd:/atmosphere/crash_reports/`: puede incluirse el fallo de otro homebrew, y la lista que se muestra antes de enviar indica cuáles), los registros de esta sesión y de la anterior (`logs/sessions/`; de uno largo, su comienzo y sus últimos 64 KiB) y los archivos de depuración (la referencia del bloque del temporizador de juego, el final del registro del temporizador mientras *Registrar el temporizador de juego* está activado, los últimos 20 cambios del historial, sin nombres (de juegos, cuentas o perfiles) y solo con su fecha, y la configuración de PlayGuard), a un gist secreto en su cuenta de GitHub (el informe y cada archivo como archivos separados; sin sesión iniciada, PlayGuard ofrece iniciarla primero; *Cuenta de GitHub*, justo debajo una vez iniciada la sesión, la cierra; si GitHub rechaza el gist, PlayGuard ofrece volver a iniciar sesión), después de indicar exactamente qué se envía. Muestra el enlace y dos códigos QR: el informe, y el formulario de reporte de error con el enlace, sus versiones, cómo se inició PlayGuard (sobre un juego o desde el Álbum; agregue el menú) y el sistema (sysMMC o emuMMC) ya completados. Cualquier persona con el enlace puede leer el informe hasta que usted elimine el gist en GitHub, y un reporte de error abierto con él es público: la confirmación lo indica. Cada enlace se guarda en `logs/uploads/` como un acceso directo de Internet (`.url`) que una computadora abre en su navegador. Un informe guardado antes en `logs/reports/` se puede enviar de la misma forma.
+### Enviar un informe en línea
+
+Con la consola conectada a Internet, *Información › Ayuda y diagnóstico › Enviar un informe en línea* (Ⓧ en el informe de diagnóstico, en modo desarrollador) lo envía a un gist secreto en su cuenta de GitHub, después de indicar exactamente qué se envía. Un informe guardado antes en `logs/reports/` se puede enviar de la misma forma.
+
+- **Qué se envía:** el informe y cada archivo como archivos separados:
+  - los informes de fallo más recientes: los 3 últimos de PlayGuard en `logs/crashes/`, y los 2 últimos de Atmosphère de un homebrew de la última semana, en `sd:/atmosphere/crash_reports/` (puede incluirse el fallo de otro homebrew: la lista que se muestra antes de enviar indica cuáles);
+  - los registros de esta sesión y de la anterior (`logs/sessions/`; de uno largo, su comienzo y sus últimos 64 KiB);
+  - los archivos de depuración: la referencia del bloque del temporizador de juego, el final del registro del temporizador mientras *Registrar el temporizador de juego* está activado, los últimos 20 cambios del historial de cambios (sin nombres de juegos, cuentas ni perfiles, y solo con su fecha), y la configuración de PlayGuard.
+- **Inicio de sesión:** sin sesión iniciada, PlayGuard ofrece iniciarla primero; *Cuenta de GitHub*, justo debajo una vez iniciada la sesión, la cierra; si GitHub rechaza el gist, PlayGuard ofrece volver a iniciar sesión.
+- **Después:** muestra el enlace y dos códigos QR: el informe, y el formulario de reporte de error con el enlace, sus versiones, cómo se inició PlayGuard (sobre un juego o desde el Álbum; agregue el menú) y el sistema (sysMMC o emuMMC) ya completados. Cada enlace se guarda en `logs/uploads/` como un acceso directo de Internet (`.url`) que una computadora abre en su navegador.
+
+> [!WARNING]
+> Cualquier persona con el enlace puede leer el informe hasta que usted elimine el gist en GitHub, y un reporte de error abierto con él es público: la confirmación lo indica.
 
 ### Lo que PlayGuard guarda en la tarjeta SD
 
@@ -57,8 +113,34 @@ Presione Ⓨ siete veces en *Información › Versión*; las herramientas de des
 
 - un interruptor de **solo lectura**: activado, la aplicación no puede cambiar nada; es la forma segura de investigar un firmware nuevo (la pantalla del firmware lo ofrece directamente);
 - el informe de diagnóstico en pantalla (Ⓨ lo guarda, Ⓧ lo envía en línea), y un acceso directo para exportarlo desde la pestaña Tiempo de juego;
-- **Instalar otra compilación** en su lugar, para probar una corrección antes de que se publique: una de las 20 últimas versiones (incluidas las preliminares, etiquetadas), uno de los 20 últimos commits de `main`, o la compilación más reciente de una pull request abierta desde una rama de este repositorio (nunca desde un fork: su código todavía no se revisó), cada tipo en su propia pestaña (Ⓛ / Ⓡ, que se muestran a cada lado de las pestañas, pasan de una a otra; la pantalla se abre en la de la compilación instalada, y cada pestaña cuenta las compilaciones más recientes que la instalada). Cada compilación muestra su título (el asunto de un commit o de una pull request; el mensaje completo de un commit es su descripción) sobre etiquetas: el tipo de cambio (*Novedad*, *Corrección*, *Docs*…) y su alcance, *Incompatible*, la pull request de la que vino un commit, cómo terminaron sus comprobaciones (*CI OK*, *CI fallida*, *CI en curso*), preliminar, *instalada* o *nueva*; su antigüedad y su commit a la derecha. A en la pestaña de las pull requests, cuando se muestra, las ordena al revés (compilación más reciente primero, o por número). Una compilación abre primero su página: etiquetas (su tipo, sus comprobaciones, instalada o nueva), una tarjeta de datos (compilación, tamaño, commit, suma de verificación, cuándo la borra GitHub), **Instalar**, **Ver en GitHub** (su página como código QR para un celular), y luego las notas de una versión o la descripción de una pull request, presentadas a partir del Markdown de GitHub (títulos, listas, casillas de tareas, código, citas y alertas, tablas). Todo lo que viene de GitHub se muestra como texto simple: no se abre ningún enlace, no se ejecuta HTML ni scripts, y se eliminan los caracteres invisibles que podrían disfrazar un título (inversiones de derecha a izquierda, caracteres de ancho cero, caracteres de control, UTF-8 no válido). Con la sesión iniciada, Ⓨ (*Buscar*) acepta el número de una pull request (abierta o cerrada) o un commit (de 7 a 40 dígitos hexadecimales) y encuentra su compilación, solo desde una rama de este repositorio. Las versiones publicadas no necesitan nada; las demás son los artefactos del workflow de compilación, que GitHub solo entrega a usuarios con sesión iniciada: **Cuenta de GitHub** inicia sesión con un código y un código QR para escanear con un celular (los únicos permisos que se piden son leer los archivos del workflow de compilación (Actions) y crear gists, para *Enviar un informe en línea*; por lo demás, el token solo puede leer lo que es público; se guarda en `github_token`, nunca se envía con un informe, y *Cuenta de GitHub* cierra la sesión). PlayGuard descarga la compilación, la verifica (tamaño, el SHA-256 que registra GitHub, el encabezado NRO), la pone en lugar de su propio `.nro` y se reinicia con ella (antes pide el PIN si hay uno definido). La lista se conserva 10 minutos y se muestra de inmediato, con su antigüedad (Ⓧ la vuelve a obtener); mientras se obtiene, una barra muestra el avance. Una descarga interrumpida (se perdió la red) continúa desde donde se detuvo la próxima vez que se instala la misma compilación. La compilación reemplazada se conserva (`playguard.nro.previous`): **Volver a la compilación anterior**, en la misma lista, las intercambia de nuevo. Si una compilación instalada desde aquí (o con *Actualizar* desde PlayGuard) falla antes de su primera pantalla, el siguiente inicio de PlayGuard ofrece volver a la compilación anterior en una pantalla de texto simple, antes de cargar cualquier otra cosa (A vuelve atrás, B la inicia de todos modos), sin el PIN, ya que la propia pantalla del PIN podría ser lo que falla. En cualquier otro momento, *Volver a la compilación anterior* (arriba) lo hace, después del PIN. La misma lista permite volver a cualquier versión publicada en cualquier momento; *Información › Versión* muestra el commit en modo desarrollador. El encabezado de cada pantalla muestra la versión en ejecución junto al título: la de una versión publicada en una etiqueta gris (`1.2.0`), la de cualquier otra compilación en una etiqueta ámbar seguida de su commit, para que una compilación de prueba nunca se confunda con la versión publicada. Los artefactos vencen a los 90 días;
+- **Instalar otra compilación** en su lugar, para probar una corrección antes de que se publique ([más abajo](#instalar-otra-compilación));
 - **Comparar bloque del temporizador** (solo mientras la app para celular está vinculada y puede sincronizarse, no con un archivo hosts que bloquee a Nintendo; también en *PIN*), para descifrar ajustes que PlayGuard todavía no muestra: guarde el bloque sin procesar como referencia, cambie un ajuste en la app para celular, vuelva: PlayGuard enumera los valores que cambiaron (guardados en `logs/reports/` si lo pide). Así se podrían confirmar horas de dormir distintas para cada día, configuradas desde la app para celular. Adjunte ese archivo a un issue, o envíelo con el informe (*Enviar un informe en línea*).
 - **Registrar el temporizador de juego**: cada 30 s mientras PlayGuard está abierto, una línea de lo que informa el temporizador de juego (tiempo restante, tiempo jugado, el bloque de configuración sin procesar…) en `logs/play_timer/log.csv`, un archivo listo para una hoja de cálculo, más una línea justo después de cada cambio que hace PlayGuard, que indica cuál (su última columna, `event`), y una nota cuando el reloj se movió más que el tiempo transcurrido. Si se deja abierto pasada la medianoche, o hasta que se acaba el tiempo, muestra lo que un solo informe no puede: cuándo se reinicia el tiempo jugado, qué dice la consola cerca del final. El interruptor se recuerda; solo registra en modo desarrollador. Lo que se sabe hasta ahora está en [parental-controls.md](../parental-controls.md) (en inglés).
 - **Vaciar la caché** y **Eliminar los archivos de registro**, cada uno tras una confirmación que indica cuántos archivos y cuánto espacio: la caché (`cache/` y el `nand/<system>/cache/` de cada sistema: nombres e íconos de los juegos, los últimos datos de Actividad, la lista de compilaciones) se vuelve a leer de la consola cuando hace falta; los archivos de registro son los archivos de fallo, los registros de sesión (salvo el de esta sesión, que aún se está escribiendo), los informes guardados y el registro del temporizador de juego, mientras que `uploads/` (los enlaces para eliminar los informes enviados en línea) y la referencia del bloque se conservan. La configuración, el historial, los respaldos, los perfiles y las exportaciones nunca se tocan.
 - **Estadísticas de imagen**: una línea por segundo en `logs/frame_stats.txt`, con el tiempo que tardó la pantalla en dibujarse y las imágenes que llegaron tarde, para comparar una pantalla con otra en la consola. **Halo de fondo** apaga la luz suave detrás de las pantallas (el modo de la línea termina entonces en `-noglow`), para medir cuánto cuesta.
+
+### Instalar otra compilación
+
+*Instalar otra compilación* pone una compilación en lugar del propio `.nro` de PlayGuard, para probar una corrección antes de que se publique.
+
+**Lo que enumera**, cada tipo en su propia pestaña (Ⓛ / Ⓡ, que se muestran a cada lado de las pestañas, pasan de una a otra; la pantalla se abre en la de la compilación instalada, y cada pestaña cuenta las compilaciones más recientes que la instalada):
+
+- una de las 20 últimas versiones (incluidas las preliminares, etiquetadas);
+- uno de los 20 últimos commits de `main`;
+- la compilación más reciente de una pull request abierta desde una rama de este repositorio (nunca desde un fork: su código todavía no se revisó). A en la pestaña de las pull requests, cuando se muestra, las ordena al revés (compilación más reciente primero, o por número).
+
+**Cada compilación** muestra su título (el asunto de un commit o de una pull request; el mensaje completo de un commit es su descripción) sobre etiquetas: el tipo de cambio (*Novedad*, *Corrección*, *Docs*…) y su alcance, *Incompatible*, la pull request de la que vino un commit, cómo terminaron sus comprobaciones (*CI OK*, *CI fallida*, *CI en curso*), preliminar, *instalada* o *nueva*; su antigüedad y su commit a la derecha. Una compilación abre primero su página: etiquetas (su tipo, sus comprobaciones, instalada o nueva), una tarjeta de datos (compilación, tamaño, commit, suma de verificación, cuándo la borra GitHub), **Instalar**, **Ver en GitHub** (su página como código QR para un celular), y luego las notas de una versión o la descripción de una pull request, presentadas a partir del Markdown de GitHub (títulos, listas, casillas de tareas, código, citas y alertas, tablas).
+
+**Lectura segura:** todo lo que viene de GitHub se muestra como texto simple: no se abre ningún enlace, no se ejecuta HTML ni scripts, y se eliminan los caracteres invisibles que podrían disfrazar un título (inversiones de derecha a izquierda, caracteres de ancho cero, caracteres de control, UTF-8 no válido).
+
+**Inicio de sesión.** Las versiones publicadas no necesitan nada; las demás son los artefactos del workflow de compilación, que GitHub solo entrega a usuarios con sesión iniciada. **Cuenta de GitHub** inicia sesión con un código y un código QR para escanear con un celular. Los únicos permisos que se piden son leer los archivos del workflow de compilación (Actions) y crear gists, para *Enviar un informe en línea*; por lo demás, el token solo puede leer lo que es público. Se guarda en `github_token`, nunca se envía con un informe, y *Cuenta de GitHub* cierra la sesión. Con la sesión iniciada, Ⓨ (*Buscar*) acepta el número de una pull request (abierta o cerrada) o un commit (de 7 a 40 dígitos hexadecimales) y encuentra su compilación, solo desde una rama de este repositorio.
+
+**Instalación:** PlayGuard descarga la compilación, la verifica (tamaño, el SHA-256 que registra GitHub, el encabezado NRO), la pone en lugar de su propio `.nro` y se reinicia con ella (antes pide el PIN si hay uno definido).
+
+- La lista se conserva 10 minutos y se muestra de inmediato, con su antigüedad (Ⓧ la vuelve a obtener); mientras se obtiene, una barra muestra el avance.
+- Una descarga interrumpida (se perdió la red) continúa desde donde se detuvo la próxima vez que se instala la misma compilación.
+- Los artefactos vencen a los 90 días.
+
+**Volver atrás.** La compilación reemplazada se conserva (`playguard.nro.previous`): **Volver a la compilación anterior**, en la misma lista, las intercambia de nuevo, después del PIN. Si una compilación instalada desde aquí (o con *Actualizar* desde PlayGuard) falla antes de su primera pantalla, el siguiente inicio de PlayGuard ofrece volver a la compilación anterior en una pantalla de texto simple, antes de cargar cualquier otra cosa (A vuelve atrás, B la inicia de todos modos), sin el PIN, ya que la propia pantalla del PIN podría ser lo que falla. La misma lista permite volver a cualquier versión publicada en cualquier momento.
+
+**Qué compilación se ejecuta:** *Información › Versión* muestra el commit en modo desarrollador. El encabezado de cada pantalla muestra la versión en ejecución junto al título: la de una versión publicada en una etiqueta gris (`1.2.0`), la de cualquier otra compilación en una etiqueta ámbar seguida de su commit, para que una compilación de prueba nunca se confunda con la versión publicada.

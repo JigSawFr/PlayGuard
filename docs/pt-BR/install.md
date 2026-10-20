@@ -1,7 +1,7 @@
-<!-- translated from docs/install.md, sha256 f12b746bb6b9 -->
+<!-- translated from docs/install.md, sha256 291d4702e4db -->
 # Instalação
 
-Como instalar o PlayGuard e o que ele grava no cartão SD. Volte ao [README](../../README.md).
+Como instalar, atualizar e remover o PlayGuard, e o que ele grava no cartão SD. Depois de instalado: [primeiros passos](getting-started.md). Volte ao [README](../../README.md).
 
 ## Onde obter
 
@@ -11,7 +11,19 @@ Escolha uma opção:
 - **sphaira › GitHub** — O zip da versão já contém a entrada (`/config/sphaira/github/playguard.json`): depois de uma primeira instalação, atualize pelo *GitHub* no sphaira.
 - **Manual** — Baixe o `playguard.zip` da [versão mais recente](https://github.com/JigSawFr/PlayGuard/releases/latest) e extraia-o na **raiz** do cartão SD. O app fica em `sd:/switch/playguard/`, e os arquivos dele em `sd:/config/playguard/`.
 
-O **sysmodule de recuperação** opcional (`playguard-rescue.zip`) é baixado à parte — veja [Console bloqueado?](troubleshooting.md#console-bloqueado).
+O **sysmodule de recuperação** opcional (`playguard-rescue.zip`) é baixado à parte: extraia-o também na raiz do cartão SD e depois reinicie o console. Ele fica em `atmosphere/contents/4200000000505247/` e só age quando um arquivo `RESCUE` pede — veja [Console bloqueado?](troubleshooting.md#console-bloqueado).
+
+Depois, abra o PlayGuard **por cima de um jogo**, com o usuário de um responsável ([por quê](compatibility.md#launchers)).
+
+## Atualizar
+
+- **No PlayGuard:** *Sobre › Atualizar com* escolhe como — no próprio PlayGuard (ele baixa a versão, verifica, se substitui e reinicia), pelo sphaira, pela Homebrew App Store ou manualmente. Com *Procurar atualizações todos os dias* ativado, o PlayGuard abre mostrando a nova versão quando houver uma.
+- **O sysmodule de recuperação** acompanha a versão do PlayGuard: depois de cada atualização, extraia de novo o `playguard-rescue.zip` dessa versão (ou *Atualizar* na entrada *O sysmodule de recuperação está desatualizado* do sino) e depois reinicie o console.
+- As configurações, o histórico, os perfis e os backups ficam: eles estão em `sd:/config/playguard/`, não ao lado do app.
+
+## Remover
+
+Apague `sd:/switch/playguard/` (o app) e, para remover também os arquivos dele, `sd:/config/playguard/`; com o sysmodule de recuperação, apague também `sd:/atmosphere/contents/4200000000505247/`. Os limites, o PIN e as restrições são do próprio console: eles **continuam no console**. Para removê-los também, use antes *PIN › Excluir todo o controle dos pais*.
 
 ## Arquivos no cartão SD
 

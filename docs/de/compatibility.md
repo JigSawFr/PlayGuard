@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 1fe10bbb78d4 -->
+<!-- translated from docs/compatibility.md, sha256 33251c660faf -->
 # Kompatibilität
 
 Unterstützte Firmware, Atmosphère und Launcher, emuMMC und sysMMC, und wie PlayGuard sich mit einem Ersatz-Sysmodul vergleicht. Zurück zum [README](../../README.md).
@@ -30,19 +30,35 @@ Unterstützte Firmware, Atmosphère und Launcher, emuMMC und sysMMC, und wie Pla
 
 PlayGuard prüft, dass Atmosphère läuft, nicht welche Version: Was zählt, ist die Firmware, die es startet. *Konsole* zeigt beides.
 
-**Launcher.** Empfohlen ist das Starten über ein Spiel (Title Override). Die App sagt, ob sie als Anwendung oder als Applet (Album) läuft. Über einem Spiel zählt die Konsole die Zeit in PlayGuard als die dieses Spiels. In der Aktivität geht sie an den Benutzer, der beim Start gewählt wurde: Öffne es mit dem Benutzer eines Elternteils, nicht mit dem eines Kindes. Der Timer ist der der Konsole, für jeden Benutzer derselbe: Er zählt diese Zeit, egal wer PlayGuard geöffnet hat (außer der Timer ist aus).
+## Gut zu wissen
 
-**Nintendo Switch 2.** Nicht unterstützt: Für sie gibt es kein Atmosphère.
+### Launcher
 
-<a id="neuere-firmware"></a>**Neuere Firmware?** Oberhalb der neuesten auf einer Konsole getesteten Firmware öffnet PlayGuard **schreibgeschützt** und prüft, ob eine neuere Version sie unterstützt. Wenn ja, bietet es ein Update an (in PlayGuard selbst, über sphaira oder den Homebrew App Store). Sonst wählst du: schreibgeschützt, schreibgeschützt mit den Entwicklerwerkzeugen (um die Firmware zu untersuchen) oder alle Funktionen auf eigene Gefahr. Die Wahl kann für diese Firmware und App-Version gemerkt werden; *Konsole › Kompatibilität* bringt den Bildschirm zurück.
+Empfohlen ist das Starten über ein Spiel (Title Override). Die App sagt, ob sie als Anwendung oder als Applet (Album) läuft. Über einem Spiel zählt die Konsole die Zeit in PlayGuard als die dieses Spiels. In der Aktivität geht sie an den Benutzer, der beim Start gewählt wurde: Öffne es mit dem Benutzer eines Elternteils, nicht mit dem eines Kindes. Der Timer ist der der Konsole, für jeden Benutzer derselbe: Er zählt diese Zeit, egal wer PlayGuard geöffnet hat (außer der Timer ist aus).
 
-**emuMMC und sysMMC.** Jede hat ihren eigenen Jugendschutz, und PlayGuard sieht nur den des Systems, auf dem es läuft. Auf emuMMC sagen *Konsole* und *Erste Schritte* das; auf sysMMC ebenfalls, wenn eine emuMMC auf der SD-Karte eingerichtet ist. Stelle den Jugendschutz auf beiden ein oder blende das Bootmenü von hekate aus, damit ein Kind nicht das andere System wählen kann. PlayGuard hält Verlauf, Sicherungen und Zustand jedes Systems getrennt (die sysMMC und die emuMMC, in `nand/`); die Einstellungen und Profile sind gemeinsam.
+### Nintendo Switch 2
 
-**Kann die Konsole dadurch gesperrt werden?** PlayGuard kontaktiert nie Nintendo: Online erreicht es nur öffentliche Zeitserver und GitHub (Updates und die Berichte, die du sendest). Gesperrt werden Konsolen, deren Custom Firmware oder emuMMC sich mit Nintendo verbindet ([switchbrew-FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), auf Englisch). Eine Sperre wegen Änderungen am Jugendschutz oder an der Uhr ist nicht dokumentiert; eine Garantie ist das nicht.
+Nicht unterstützt: Für sie gibt es kein Atmosphère.
 
-**Eine Konsole ohne Internet?** Genau dafür ist PlayGuard da, und der Timer braucht trotzdem eine Netzwerkuhr, die gestellt wurde. Ohne Zeitserver, den es fragen kann, bietet *Konsole › Netzwerkuhr › Zeitabweichung messen* an, sie stattdessen auf die Konsolenuhr zu stellen: Prüfe zuerst die Konsolenuhr, mit *Uhr mithilfe des Internets synchronisieren* aus, und schalte diese Einstellung erst danach ein (siehe [Konsole](features.md#konsole--die-netzwerkuhr-die-installierten-spiele-was-auf-der-konsole-läuft)).
+### Neuere Firmware
 
-**Benachrichtigungen auf dem Handy.** Seit 22.0.0 kann eine Konsole, die noch mit der Smart-Geräte-App verknüpft ist, den Elternteil benachrichtigen, wenn die Geheimzahl an der Konsole eingegeben wird ([switchbrew](https://switchbrew.org/wiki/22.0.0), auf Englisch). Ob das Aufheben durch PlayGuard das auslöst, ist unbekannt.
+Oberhalb der neuesten auf einer Konsole getesteten Firmware öffnet PlayGuard **schreibgeschützt** und prüft, ob eine neuere Version sie unterstützt. Wenn ja, bietet es ein Update an (in PlayGuard selbst, über sphaira oder den Homebrew App Store). Sonst wählst du: schreibgeschützt, schreibgeschützt mit den Entwicklerwerkzeugen (um die Firmware zu untersuchen) oder alle Funktionen auf eigene Gefahr. Die Wahl kann für diese Firmware und App-Version gemerkt werden; *Konsole › Kompatibilität* bringt den Bildschirm zurück.
+
+### emuMMC und sysMMC
+
+Jede hat ihren eigenen Jugendschutz, und PlayGuard sieht nur den des Systems, auf dem es läuft. Auf emuMMC sagen *Konsole* und *Erste Schritte* das; auf sysMMC ebenfalls, wenn eine emuMMC auf der SD-Karte eingerichtet ist. Stelle den Jugendschutz auf beiden ein oder blende das Bootmenü von hekate aus, damit ein Kind nicht das andere System wählen kann. PlayGuard hält Verlauf, Sicherungen und Zustand jedes Systems getrennt (die sysMMC und die emuMMC, in `nand/`); die Einstellungen und Profile sind gemeinsam.
+
+### Kann die Konsole dadurch gesperrt werden?
+
+PlayGuard kontaktiert nie Nintendo: Online erreicht es nur öffentliche Zeitserver und GitHub (Updates und die Berichte, die du sendest). Gesperrt werden Konsolen, deren Custom Firmware oder emuMMC sich mit Nintendo verbindet ([switchbrew-FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), auf Englisch). Eine Sperre wegen Änderungen am Jugendschutz oder an der Uhr ist nicht dokumentiert; eine Garantie ist das nicht.
+
+### Eine Konsole ohne Internet
+
+Genau dafür ist PlayGuard da, und der Timer braucht trotzdem eine Netzwerkuhr, die gestellt wurde. Ohne Zeitserver, den es fragen kann, bietet *Konsole › Netzwerkuhr › Zeitabweichung messen* an, sie stattdessen auf die Konsolenuhr zu stellen: Prüfe zuerst die Konsolenuhr, mit *Uhr mithilfe des Internets synchronisieren* aus, und schalte diese Einstellung erst danach ein (siehe [Netzwerkuhr](features.md#kein-server-antwortet)).
+
+### Benachrichtigungen auf dem Handy
+
+Seit 22.0.0 kann eine Konsole, die noch mit der Smart-Geräte-App verknüpft ist, den Elternteil benachrichtigen, wenn die Geheimzahl an der Konsole eingegeben wird ([switchbrew](https://switchbrew.org/wiki/22.0.0), auf Englisch). Ob das Aufheben durch PlayGuard das auslöst, ist unbekannt.
 
 ## Warum PlayGuard
 
@@ -56,10 +72,12 @@ Die Jugendschutzfunktionen der Konsole selbst zu steuern, öffnet auch die Tür 
 
 PlayGuard steuert den in die Konsole eingebauten Jugendschutz (den Dienst `pctl`), offline. Der andere Ansatz ersetzt ihn durch ein Sysmodul, zum Beispiel [NS Parental Control](https://github.com/TristanIsrael/NSParentalControl) (ein Sysmodul und ein Tesla- / Ultrahand-Overlay).
 
-- **Spielzeitlimit** — PlayGuard: Eines für die Konsole (der eigene Timer der Konsole). Ein Ersatz-Sysmodul: Eines pro Benutzerkonto.
-- **Geheimzahl, Warnungen, Unterbrechung** — PlayGuard: Die der Konsole. Ein Ersatz-Sysmodul: Seine eigenen.
-- **Im Hintergrund** — PlayGuard: Nichts (das optionale Wiederherstellungs-Sysmodul wirkt nur beim Start, wenn eine Datei `RESCUE` es verlangt). Ein Ersatz-Sysmodul: Ein Sysmodul, ab dem Start.
-- **Nach einem Firmware-Update** — PlayGuard: Der Jugendschutz der Konsole funktioniert weiter; PlayGuard öffnet schreibgeschützt, bis eine Version die Firmware unterstützt. Ein Ersatz-Sysmodul: Der Jugendschutz hängt davon ab, dass das Sysmodul weiter funktioniert.
-- **Von der SD-Karte gelöscht** — PlayGuard: Die Limits bleiben auf der Konsole. Ein Ersatz-Sysmodul: Der Jugendschutz verschwindet mit ihm.
+| | PlayGuard | Ein Ersatz-Sysmodul |
+|---|---|---|
+| **Spielzeitlimit** | Eines für die Konsole (der eigene Timer der Konsole) | Eines pro Benutzerkonto |
+| **Geheimzahl, Warnungen, Unterbrechung** | Die der Konsole | Seine eigenen |
+| **Im Hintergrund** | Nichts (das optionale Wiederherstellungs-Sysmodul wirkt nur beim Start, wenn eine Datei `RESCUE` es verlangt) | Ein Sysmodul, ab dem Start |
+| **Nach einem Firmware-Update** | Der Jugendschutz der Konsole funktioniert weiter; PlayGuard öffnet schreibgeschützt, bis eine Version die Firmware unterstützt | Der Jugendschutz hängt davon ab, dass das Sysmodul weiter funktioniert |
+| **Von der SD-Karte gelöscht** | Die Limits bleiben auf der Konsole | Der Jugendschutz verschwindet mit ihm |
 
 **Brauchst du für jedes Kind ein anderes Limit?** Wähle ein Ersatz-Sysmodul — der Timer der Konsole hat ein Limit für die ganze Konsole. Sonst behält PlayGuard den Jugendschutz von Nintendo und bringt nur seine Einstellungen auf die Konsole.

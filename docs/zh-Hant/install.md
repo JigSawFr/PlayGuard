@@ -1,7 +1,7 @@
-<!-- translated from docs/install.md, sha256 f12b746bb6b9 -->
+<!-- translated from docs/install.md, sha256 291d4702e4db -->
 # 安裝
 
-如何安裝 PlayGuard，以及它會在 SD 卡上寫入哪些檔案。返回 [README](../../README.md)。
+如何安裝、更新和移除 PlayGuard，以及它會在 SD 卡上寫入哪些檔案。安裝之後：[開始使用](getting-started.md)。返回 [README](../../README.md)。
 
 ## 取得方式
 
@@ -11,7 +11,19 @@
 - **sphaira › GitHub**——版本的 zip 檔已包含對應的項目（`/config/sphaira/github/playguard.json`）：第一次安裝之後，在 sphaira 中從 *GitHub* 更新即可。
 - **手動**——從[最新版本](https://github.com/JigSawFr/PlayGuard/releases/latest)下載 `playguard.zip`，解壓縮到 SD 卡的**根目錄**。應用程式會放在 `sd:/switch/playguard/`，它的檔案則在 `sd:/config/playguard/`。
 
-選用的**復原 sysmodule**（`playguard-rescue.zip`）需要另外下載——請見[被鎖在外面？](troubleshooting.md#被鎖在外面)。
+選用的**復原 sysmodule**（`playguard-rescue.zip`）需要另外下載：同樣解壓縮到 SD 卡的根目錄，然後重新啟動主機。它會放在 `atmosphere/contents/4200000000505247/`，只有在 `RESCUE` 檔案要求時才會動作——請見[被鎖在外面？](troubleshooting.md#被鎖在外面)。
+
+接著請**在遊戲之上**、用家長的使用者開啟 PlayGuard（[原因](compatibility.md#啟動器)）。
+
+## 更新
+
+- **在 PlayGuard 中：** *關於 › 更新方式*可以選擇更新的方式——在 PlayGuard 內（它會下載版本、檢查、取代自己並重新啟動）、sphaira、Homebrew App Store 或手動。開啟*每天檢查更新*時，有新版本時 PlayGuard 會開在新版本的畫面上。
+- **復原 sysmodule** 要跟上 PlayGuard 的版本：每次更新後，都要重新解壓縮該版本的 `playguard-rescue.zip`（或在通知鈴鐺的*復原 sysmodule 不是最新版本*上選*更新*），然後重新啟動主機。
+- 設定、紀錄、設定檔和備份都會保留：它們在 `sd:/config/playguard/`，不在應用程式旁邊。
+
+## 移除
+
+刪除 `sd:/switch/playguard/`（應用程式），如果也要移除它的檔案，再刪除 `sd:/config/playguard/`；裝了復原 sysmodule 的話，也要刪除 `sd:/atmosphere/contents/4200000000505247/`。上限、PIN碼和限制都是主機本身的：它們**會留在主機上**。如果也要移除這些，請先使用*PIN碼 › 刪除所有家長監護設定*。
 
 ## SD 卡上的檔案
 
