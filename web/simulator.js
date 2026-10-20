@@ -56,6 +56,11 @@ const KEYS = {
 };
 const NAME = /^[a-z0-9_]+$/;
 
+// A release's simulator is in simulator/<tag>/ (pages.yml), main's in
+// simulator/: the site one or two folders up.
+const RELEASE_TAG = /\/simulator\/(v\d+\.\d+\.\d+)\/$/.exec(location.pathname)?.[1] ?? null;
+const SITE_UP = RELEASE_TAG ? '../../' : '../';
+
 const $ = (id) => document.getElementById(id);
 const canvas = $('canvas');
 let manifest = { groups: [], params: [], presets: [] };
@@ -901,7 +906,7 @@ function translatePage() {
 // folders): its home, and the header's links as on the website. The
 // language menu's face on a phone: the language's code.
 function homeLink() {
-  const home = `../${language === 'en-US' ? '' : `${language.toLowerCase()}/`}`;
+  const home = `${SITE_UP}${language === 'en-US' ? '' : `${language.toLowerCase()}/`}`;
   $('home-link').href = home;
   $('nav-features').href = `${home}#features`;
   $('nav-install').href = `${home}#install`;
@@ -944,6 +949,26 @@ async function showBuild() {
     box.textContent = t('unknown_build');
     return '';
   }
+}
+
+// The simulator of each release beside main's (releases.json, pages.yml):
+// the one chosen opens with the same settings.
+async function setUpVersions() {
+  const field = $('version-field');
+  const select = $('version-select');
+  const up = RELEASE_TAG ? '../' : '';
+  let tags = [];
+  try {
+    const res = await fetch(`${up}releases.json`, { cache: 'no-cache' });
+    if (res.ok) tags = (await res.json()).map((r) => r.tag).filter((tag) => /^v\d+\.\d+\.\d+$/.test(tag));
+  } catch { /* none: main's alone */ }
+  if (!tags.length) return;
+  select.append(el('option', { value: '', text: t('version_dev') }), ...tags.map((tag) => el('option', { value: tag, text: tag })));
+  select.value = RELEASE_TAG ?? '';
+  select.addEventListener('change', () => {
+    location.href = `${up}${select.value ? `${select.value}/` : ''}${location.search}`;
+  });
+  field.hidden = false;
 }
 
 function setUpPanel() {
@@ -1014,6 +1039,7 @@ async function main() {
   homeLink();
   setUpHeader();
   setUpPanel();
+  setUpVersions();
   setUpKeys();
   setUpPad();
   setUpFullscreen();

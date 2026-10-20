@@ -30,6 +30,8 @@
   "copied": "Ligação copiada",
   "reset": "Repor",
   "pad": "Comando",
+  "version": "Versão",
+  "version_dev": "Em desenvolvimento",
   "fullscreen": "Ecrã inteiro",
   "fullscreen_exit": "Sair do ecrã inteiro",
   "screenshot": "Captura",

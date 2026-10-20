@@ -30,6 +30,8 @@
   "copied": "링크를 복사했습니다",
   "reset": "초기화",
   "pad": "컨트롤러",
+  "version": "버전",
+  "version_dev": "개발 중",
   "fullscreen": "전체 화면",
   "fullscreen_exit": "전체 화면 종료",
   "screenshot": "스크린샷",

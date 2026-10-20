@@ -28,9 +28,53 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Each release's simulator, kept with the release (an artifact lasts 30
+  # days): the one web.yml built for the release's commit on main, attached
+  # as playguard-simulator.zip to the latest releases that have none yet
+  # (from 1.3.0 on: 1.2.0 had no simulator), then published below in
+  # simulator/<tag>/, which the simulator offers beside main's.
+  release-simulator:
+    if: >-
+      github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    permissions:
+      contents: write   # the release's asset
+      actions: read     # web.yml's artifacts
+    steps:
+      - name: The simulator attached to the releases that have none
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          runs="repos/$REPO/actions/workflows/web.yml/runs"
+          for tag in $(gh release list -R "$REPO" --limit 3 --exclude-drafts --json tagName --jq '.[].tagName'); do
+            if gh release view "$tag" -R "$REPO" --json assets --jq '.assets[].name' | grep -qx playguard-simulator.zip; then
+              continue
+            fi
+            sha=$(gh api "repos/$REPO/commits/$tag" --jq .sha)
+            run=$(gh api -X GET "$runs" -f head_sha="$sha" -f event=push -f status=success \
+                    --jq "[.workflow_runs[] | select(.head_repository.full_name == \"$REPO\")][0].id // empty")
+            if [ -z "$run" ]; then echo "$tag: no web build of ${sha::7}"; continue; fi
+            rm -rf build playguard-simulator.zip
+            if ! gh run download "$run" -R "$REPO" -n site -D build || [ ! -f build/simulator/playguard.wasm ]; then
+              echo "$tag: no simulator in web run $run (gone after 30 days, or none built)"
+              continue
+            fi
+            (cd build/simulator && rm -rf shots && zip -qr ../../playguard-simulator.zip .)
+            gh release upload "$tag" playguard-simulator.zip -R "$REPO"
+            echo "$tag: its simulator attached (web run $run)" >> "$GITHUB_STEP_SUMMARY"
+          done
+
   deploy:
-    # A web build that failed changes nothing.
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    needs: release-simulator
+    # A web build that failed changes nothing; the job above may be skipped.
+    if: >-
+      !cancelled() &&
+      (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     permissions:
@@ -60,6 +104,24 @@ jobs:
           if [ -n "$main" ]; then
             gh run download "$main" -R "$REPO" -n site -D site
             echo "main: run $main" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          # Each release's simulator (the job above) in simulator/<tag>/, its
+          # header naming the release, and their list for the simulator's
+          # Version (simulator/releases.json, the newest first).
+          if [ -d site/simulator ]; then
+            releases='[]'
+            for tag in $(gh release list -R "$REPO" --limit 20 --exclude-drafts --json tagName --jq '.[].tagName'); do
+              gh release download "$tag" -R "$REPO" -p playguard-simulator.zip -D "release-$tag" 2>/dev/null || continue
+              mkdir -p "site/simulator/$tag"
+              unzip -q "release-$tag/playguard-simulator.zip" -d "site/simulator/$tag"
+              if [ -f "site/simulator/$tag/build.json" ]; then
+                jq --arg tag "$tag" '.ref = $tag | .pr = null' "site/simulator/$tag/build.json" > build.json
+                mv build.json "site/simulator/$tag/build.json"
+              fi
+              releases=$(jq -c --arg tag "$tag" '. + [{tag: $tag}]' <<< "$releases")
+              echo "simulator/$tag: its release's" >> "$GITHUB_STEP_SUMMARY"
+            done
+            echo "$releases" > site/simulator/releases.json
           fi
           previews=""
           # A pull request's newest successful build: the one before its last

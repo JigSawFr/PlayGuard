@@ -84,6 +84,11 @@ PlayGuard's website, on GitHub Pages: <https://playguard.link/>.
   documentation alone; CI clones the history without old files' contents
   (`fetch-depth: 0`, `filter: blob:none`).
 - **The web simulator** in `/simulator/` ([`web/README.md`](../web/README.md)).
+- **Each release's simulator** in `/simulator/<tag>/` (from 1.3.0 on):
+  `pages.yml` attaches the simulator web.yml built for the release's commit
+  to the release (`playguard-simulator.zip`: an artifact lasts 30 days, a
+  release's asset stays), then publishes each release's beside main's, with
+  their list in `simulator/releases.json` for the simulator's **Version**.
 - **Each open pull request's preview** in `/pr-<number>/`: its website and
   its simulator, linked in a comment on the pull request.
 

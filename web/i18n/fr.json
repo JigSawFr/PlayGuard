@@ -30,6 +30,8 @@
   "copied": "Lien copié",
   "reset": "Réinitialiser",
   "pad": "Manette",
+  "version": "Version",
+  "version_dev": "En développement",
   "fullscreen": "Plein écran",
   "fullscreen_exit": "Quitter le plein écran",
   "screenshot": "Capture",
