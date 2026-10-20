@@ -1,7 +1,7 @@
-<!-- translated from docs/install.md, sha256 f12b746bb6b9 -->
+<!-- translated from docs/install.md, sha256 291d4702e4db -->
 # インストール
 
-PlayGuard のインストール方法と、PlayGuard が SD カードに書き込むファイルについて説明します。トップページは [README](../../README.md)。
+PlayGuard のインストール、アップデート、削除の方法と、PlayGuard が SD カードに書き込むファイルについて説明します。インストールしたら、[はじめに](getting-started.md)へ。トップページは [README](../../README.md)。
 
 ## 入手方法
 
@@ -11,7 +11,19 @@ PlayGuard のインストール方法と、PlayGuard が SD カードに書き�
 - **sphaira › GitHub** — リリースの zip にはエントリー（`/config/sphaira/github/playguard.json`）が入っています。一度インストールしたあとは、sphaira の *GitHub* からアップデートできます。
 - **手動** — [最新リリース](https://github.com/JigSawFr/PlayGuard/releases/latest)から `playguard.zip` をダウンロードし、SD カードの**ルート**に展開します。アプリは `sd:/switch/playguard/` に、アプリのファイルは `sd:/config/playguard/` に入ります。
 
-オプションの**リカバリー sysmodule**（`playguard-rescue.zip`）は別にダウンロードします。[ロックされて入れない？](troubleshooting.md#ロックされて入れない)を参照してください。
+オプションの**リカバリー sysmodule**（`playguard-rescue.zip`）は別にダウンロードします。これも SD カードのルートに展開し、本体を再起動してください。`atmosphere/contents/4200000000505247/` に入り、`RESCUE` ファイルで求められたときにだけ動きます。[ロックされて入れない？](troubleshooting.md#ロックされて入れない)を参照してください。
+
+そのあと、PlayGuard を**ゲームの上から**、保護者のユーザーで開きます（[理由](compatibility.md#ランチャー)）。
+
+## アップデート
+
+- **PlayGuard で：** *情報 › アップデート方法* で方法を選びます。PlayGuard 内で（リリースをダウンロードして確認し、自分を置き換えて再起動します）、sphaira、Homebrew App Store、手動のどれかです。*毎日アップデートを確認* がオンなら、新しいリリースがあるとき、PlayGuard はそのリリースの画面で開きます。
+- **リカバリー sysmodule** は PlayGuard のバージョンに合わせます。アップデートのたびに、そのリリースの `playguard-rescue.zip` を展開し直し（またはベルの *リカバリー sysmodule が最新ではありません* で *更新*）、本体を再起動してください。
+- 設定、履歴、プリセット、バックアップはそのまま残ります。アプリの隣ではなく、`sd:/config/playguard/` にあるからです。
+
+## 削除
+
+`sd:/switch/playguard/`（アプリ）を削除します。アプリのファイルも消すなら `sd:/config/playguard/` も、リカバリー sysmodule を入れていれば `sd:/atmosphere/contents/4200000000505247/` も削除します。上限、暗証番号、制限は本体自身のものなので、**本体に残ります**。それらも消すには、先に *暗証番号 › みまもり設定をすべて削除* を使ってください。
 
 ## SD カード上のファイル
 

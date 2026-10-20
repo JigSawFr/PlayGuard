@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 1fe10bbb78d4 -->
+<!-- translated from docs/compatibility.md, sha256 33251c660faf -->
 # Compatibilità
 
 Firmware, Atmosphère e launcher supportati, emuMMC e sysMMC, e come PlayGuard si confronta con un sysmodule sostitutivo. Torna al [README](../../README.md).
@@ -30,19 +30,35 @@ Firmware, Atmosphère e launcher supportati, emuMMC e sysMMC, e come PlayGuard s
 
 PlayGuard controlla che Atmosphère sia in esecuzione, non quale versione: conta il firmware che avvia. *Console* mostra entrambi.
 
-**Launcher.** È consigliato l'avvio sopra un gioco (title override). L'app indica se gira come applicazione o come applet (album). Sopra un gioco, la console conta il tempo di PlayGuard come tempo di quel gioco. Nell'attività, va all'utente scelto all'avvio: aprilo con l'utente di un genitore, non di un bambino. Il timer è quello della console, lo stesso per tutti gli utenti: conta quel tempo chiunque abbia aperto PlayGuard (a meno che il timer non sia disattivato).
+## Da sapere
 
-**Nintendo Switch 2.** Non supportata: Atmosphère non esiste per lei.
+### Launcher
 
-<a id="firmware-piu-recente"></a>**Firmware più recente?** Oltre il firmware più recente testato su una console, PlayGuard si apre in **sola lettura** e controlla se una versione più recente lo supporta. Se c'è, propone di aggiornare (in PlayGuard stesso, con sphaira o con l'Homebrew App Store). Altrimenti scegli tu: sola lettura, sola lettura con gli strumenti per sviluppatori (per indagare sul firmware), o tutte le funzioni a tuo rischio. La scelta può essere ricordata per quel firmware e quella versione dell'app; *Console › Compatibilità* riapre la schermata.
+È consigliato l'avvio sopra un gioco (title override). L'app indica se gira come applicazione o come applet (album). Sopra un gioco, la console conta il tempo di PlayGuard come tempo di quel gioco. Nell'attività, va all'utente scelto all'avvio: aprilo con l'utente di un genitore, non di un bambino. Il timer è quello della console, lo stesso per tutti gli utenti: conta quel tempo chiunque abbia aperto PlayGuard (a meno che il timer non sia disattivato).
 
-**emuMMC e sysMMC.** Ognuno ha il proprio filtro famiglia, e PlayGuard vede solo quello del sistema su cui gira. Su emuMMC, *Console* e *Primi passi* lo dicono; anche su sysMMC, quando sulla scheda SD è configurata un'emuMMC. Imposta il filtro famiglia su entrambi, o nascondi il menu di avvio di hekate perché un bambino non possa scegliere l'altro sistema. PlayGuard tiene separati la cronologia, i backup e lo stato di ogni sistema (il sysMMC e l'emuMMC, in `nand/`); le preferenze e i profili sono comuni.
+### Nintendo Switch 2
 
-**La console rischia il ban?** PlayGuard non contatta mai Nintendo: online raggiunge solo server dell'ora pubblici e GitHub (aggiornamenti, e i rapporti che invii). A far bannare le console è un firmware personalizzato o un'emuMMC che si collega a Nintendo ([FAQ di switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), in inglese). Nessun ban legato a modifiche del filtro famiglia o dell'orologio è documentato; non è una garanzia.
+Non supportata: Atmosphère non esiste per lei.
 
-**Una console senza Internet?** È proprio lo scopo di PlayGuard, e il timer ha comunque bisogno di un orologio di rete che sia stato impostato. Senza un server dell'ora da interrogare, *Console › Orologio di rete › Misura la differenza oraria* propone invece di impostarlo sull'orologio della console: controlla prima l'orologio della console, con *Sincronizza l'orologio tramite Internet* disattivato, e attiva quell'impostazione solo dopo (vedi [Console](features.md#console--lorologio-di-rete-i-giochi-installati-cosa-esegue-la-console)).
+### Firmware più recente
 
-**Notifiche sul telefono.** Dalla 22.0.0, una console ancora collegata all'app Filtro famiglia può avvisare il genitore quando il PIN viene inserito sulla console ([switchbrew](https://switchbrew.org/wiki/22.0.0), in inglese). Non si sa se gli sblocchi di PlayGuard lo attivino.
+Oltre il firmware più recente testato su una console, PlayGuard si apre in **sola lettura** e controlla se una versione più recente lo supporta. Se c'è, propone di aggiornare (in PlayGuard stesso, con sphaira o con l'Homebrew App Store). Altrimenti scegli tu: sola lettura, sola lettura con gli strumenti per sviluppatori (per indagare sul firmware), o tutte le funzioni a tuo rischio. La scelta può essere ricordata per quel firmware e quella versione dell'app; *Console › Compatibilità* riapre la schermata.
+
+### emuMMC e sysMMC
+
+Ognuno ha il proprio filtro famiglia, e PlayGuard vede solo quello del sistema su cui gira. Su emuMMC, *Console* e *Primi passi* lo dicono; anche su sysMMC, quando sulla scheda SD è configurata un'emuMMC. Imposta il filtro famiglia su entrambi, o nascondi il menu di avvio di hekate perché un bambino non possa scegliere l'altro sistema. PlayGuard tiene separati la cronologia, i backup e lo stato di ogni sistema (il sysMMC e l'emuMMC, in `nand/`); le preferenze e i profili sono comuni.
+
+### La console rischia il ban?
+
+PlayGuard non contatta mai Nintendo: online raggiunge solo server dell'ora pubblici e GitHub (aggiornamenti, e i rapporti che invii). A far bannare le console è un firmware personalizzato o un'emuMMC che si collega a Nintendo ([FAQ di switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), in inglese). Nessun ban legato a modifiche del filtro famiglia o dell'orologio è documentato; non è una garanzia.
+
+### Una console senza Internet
+
+È proprio lo scopo di PlayGuard, e il timer ha comunque bisogno di un orologio di rete che sia stato impostato. Senza un server dell'ora da interrogare, *Console › Orologio di rete › Misura la differenza oraria* propone invece di impostarlo sull'orologio della console: controlla prima l'orologio della console, con *Sincronizza l'orologio tramite Internet* disattivato, e attiva quell'impostazione solo dopo (vedi [orologio di rete](features.md#nessun-server-risponde)).
+
+### Notifiche sul telefono
+
+Dalla 22.0.0, una console ancora collegata all'app Filtro famiglia può avvisare il genitore quando il PIN viene inserito sulla console ([switchbrew](https://switchbrew.org/wiki/22.0.0), in inglese). Non si sa se gli sblocchi di PlayGuard lo attivino.
 
 ## Perché PlayGuard
 
@@ -56,10 +72,12 @@ Gestire il filtro famiglia della console stessa apre anche la porta a molto di p
 
 PlayGuard gestisce il filtro famiglia integrato nella console (il servizio `pctl`), offline. L'altro approccio lo sostituisce con un sysmodule, per esempio [NS Parental Control](https://github.com/TristanIsrael/NSParentalControl) (un sysmodule e un overlay Tesla / Ultrahand).
 
-- **Limite di tempo di gioco** — PlayGuard: Uno per la console (il timer della console stessa). Un sysmodule sostitutivo: Uno per utente.
-- **PIN, avvisi, sospensione** — PlayGuard: Quelli della console. Un sysmodule sostitutivo: I propri.
-- **In background** — PlayGuard: Niente (il sysmodule di ripristino facoltativo agisce solo all'avvio della console, quando un file `RESCUE` glielo chiede). Un sysmodule sostitutivo: Un sysmodule, dall'avvio.
-- **Dopo un aggiornamento del firmware** — PlayGuard: Il filtro famiglia della console continua a funzionare; PlayGuard si apre in sola lettura finché una versione non supporta il firmware. Un sysmodule sostitutivo: Il controllo dipende dal fatto che il sysmodule funzioni ancora.
-- **Eliminato dalla scheda SD** — PlayGuard: I limiti restano sulla console. Un sysmodule sostitutivo: Il controllo sparisce con lui.
+| | PlayGuard | Un sysmodule sostitutivo |
+|---|---|---|
+| **Limite di tempo di gioco** | Uno per la console (il timer della console stessa) | Uno per utente |
+| **PIN, avvisi, sospensione** | Quelli della console | I propri |
+| **In background** | Niente (il sysmodule di ripristino facoltativo agisce solo all'avvio della console, quando un file `RESCUE` glielo chiede) | Un sysmodule, dall'avvio |
+| **Dopo un aggiornamento del firmware** | Il filtro famiglia della console continua a funzionare; PlayGuard si apre in sola lettura finché una versione non supporta il firmware | Il controllo dipende dal fatto che il sysmodule funzioni ancora |
+| **Eliminato dalla scheda SD** | I limiti restano sulla console | Il controllo sparisce con lui |
 
 **Serve un limite diverso per ogni bambino?** Scegli un sysmodule sostitutivo — il timer della console ha un solo limite per tutta la console. Altrimenti, PlayGuard mantiene il filtro famiglia di Nintendo e porta semplicemente le sue impostazioni sulla console.

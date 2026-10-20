@@ -839,7 +839,7 @@ function homeLink() {
   $('home-link').href = home;
   $('nav-features').href = `${home}#features`;
   $('nav-install').href = `${home}#install`;
-  $('nav-docs').href = `${home}docs/features/`;
+  $('nav-docs').href = `${home}docs/getting-started/`;
   $('language-face').textContent = language.split('-')[0].toUpperCase();
 }
 

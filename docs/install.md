@@ -1,6 +1,6 @@
 # Install
 
-How to install PlayGuard, and what it writes on the SD card. Back to the [README](../README.md).
+How to install, update and remove PlayGuard, and what it writes on the SD card. Once installed: [getting started](getting-started.md). Back to the [README](../README.md).
 
 ## Where to get it
 
@@ -10,7 +10,19 @@ Pick one:
 - **sphaira › GitHub** — The release zip already contains the entry (`/config/sphaira/github/playguard.json`): after a first install, update from *GitHub* in sphaira.
 - **Manual** — Download `playguard.zip` from the [latest release](https://github.com/JigSawFr/PlayGuard/releases/latest) and extract it to the **root** of the SD card. The app lands in `sd:/switch/playguard/`, its files in `sd:/config/playguard/`.
 
-The optional **recovery sysmodule** (`playguard-rescue.zip`) is a separate download — see [Locked out?](troubleshooting.md#locked-out).
+The optional **recovery sysmodule** (`playguard-rescue.zip`) is a separate download: extract it to the root of the SD card too, then restart the console. It lands in `atmosphere/contents/4200000000505247/` and only acts when a `RESCUE` file asks it to — see [Locked out?](troubleshooting.md#locked-out).
+
+Then open PlayGuard **over a game**, with a parent's user ([why](compatibility.md#launchers)).
+
+## Updating
+
+- **In PlayGuard:** *About › Update with* picks how — in PlayGuard itself (it downloads the release, checks it, replaces itself and restarts), sphaira, the Homebrew App Store or by hand. With *Check for updates every day* on, PlayGuard opens on the new release when there is one.
+- **The recovery sysmodule** follows PlayGuard's version: after each update, extract that release's `playguard-rescue.zip` again (or *Update* on the bell's *The recovery sysmodule is out of date*), then restart the console.
+- Settings, history, profiles and backups stay: they are in `sd:/config/playguard/`, not next to the app.
+
+## Removing it
+
+Delete `sd:/switch/playguard/` (the app) and, to remove its files too, `sd:/config/playguard/`; with the recovery sysmodule, also `sd:/atmosphere/contents/4200000000505247/`. The limits, the PIN and the restrictions are the console's own: they **stay on the console**. To remove them as well, use *PIN › Delete all parental controls* first.
 
 ## Files on the SD card
 

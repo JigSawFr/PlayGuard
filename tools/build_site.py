@@ -79,7 +79,8 @@ OG_LOCALES = {"en-US": "en_US", "fr": "fr_FR", "fr-CA": "fr_CA", "de": "de_DE", 
               "it": "it_IT", "nl": "nl_NL", "pt": "pt_PT", "pt-BR": "pt_BR", "ru": "ru_RU", "ja": "ja_JP",
               "ko": "ko_KR", "zh-Hans": "zh_CN", "zh-Hant": "zh_TW"}
 # The documentation, in the sidebar's order.
-DOCS = [("features", "guide"), ("install", "guide"), ("compatibility", "guide"), ("troubleshooting", "guide"),
+DOCS = [("getting-started", "guide"), ("features", "guide"), ("install", "guide"), ("compatibility", "guide"),
+        ("troubleshooting", "guide"),
         ("companion-app", "reference"), ("config", "reference"), ("parental-controls", "reference")]
 # The documentation's folder of a language (docs/<folder>/), when not its own code.
 DOC_FOLDERS = {"fr-CA": "fr"}
@@ -420,7 +421,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
     <nav class="nav" aria-label="PlayGuard">
       <a href="{home}#features">{t('nav_features')}</a>
       <a href="{home}#install">{t('nav_install')}</a>
-      <a href="{home}docs/features/">{t('nav_docs')}</a>
+      <a href="{home}docs/getting-started/">{t('nav_docs')}</a>
       <a href="{to_root}simulator/?lang={code}" class="nav-try">{t('nav_simulator')}</a>
       <a href="{REPO_URL}" class="nav-gh">GitHub</a>
     </nav>
@@ -861,7 +862,7 @@ def doc_data(t, lang, page_name, title, description, translated):
          "isPartOf": {"@type": "WebSite", "name": "PlayGuard", "url": home}},
         {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "PlayGuard", "item": home},
-            {"@type": "ListItem", "position": 2, "name": t("docs_title", escape=False), "item": f"{home}docs/features/"},
+            {"@type": "ListItem", "position": 2, "name": t("docs_title", escape=False), "item": f"{home}docs/getting-started/"},
             {"@type": "ListItem", "position": 3, "name": title, "item": url}]},
     ]
 
