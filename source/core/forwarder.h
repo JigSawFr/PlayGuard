@@ -37,6 +37,8 @@ Result forwarder_list(ForwarderRecord *out, u32 max, u32 *count);
 typedef struct {
     const char *nro_path;   // "sdmc:/switch/x/x.nro"
     const char *argv;       // its argv, its path first
+    const char *gate_path;  // NULL, or PlayGuard's .nro, asking for the PIN first (FwdInput)
+    const char *gate_argv;
     const char *name;       // the HOME menu's name
     const char *author;
     const void *nacp;

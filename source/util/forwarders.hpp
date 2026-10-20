@@ -26,6 +26,10 @@ struct Made
     std::string argv;     // what the .nro gets, its path first
     std::string name;
     std::string author;
+    // Protected with the PIN: the loader starts `gate` (PlayGuard's .nro,
+    // "sdmc:/…") first, which asks for it (util/forwarder_gate.hpp).
+    bool        pin = false;
+    std::string gate;
 };
 
 // Every one remembered, in the file's order. A damaged file reads as none;

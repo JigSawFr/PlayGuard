@@ -30,8 +30,9 @@ struct Entry
     //   "countdown" 1 value, 0/1: the play-time countdown running (pause / resume)
     //   "remove_game", "remove_update", "remove_addon", "launch_version"
     //   (detail: the game's name and ID, and the add-on's): no values
-    //   "add_forwarder", "remove_forwarder" (detail: its name and program
-    //   ID): no values
+    //   "add_forwarder", "remove_forwarder", "protect_forwarder",
+    //   "unprotect_forwarder" (the PIN asked at its start, or no longer;
+    //   detail: its name and program ID): no values
     std::string kind;
     // Where from: "uniform", "day", "per_day", "extra", "stop", "restore_extra",
     // "profile", "remove", "backup", "undo", "first_steps" … ("" when plain).

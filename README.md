@@ -25,7 +25,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 - ⏱️ **Play-time limit** — the same every day or one per day, profiles, extra time or no more play today in one press.
 - 📊 **Activity** — time per game and per account, charts, export to CSV, JSON, XLSX or PDF.
 - 🔒 **Restrictions and PIN** — restriction level, age rating, PIN, temporary unlock, *Block all games* in one switch.
-- 🕒 **Console** — the network clock set from public NTP servers, so the timer counts right on a console that never reaches Nintendo, a check of the installed games, and homebrew (PlayGuard first) put on the HOME menu as games, with their icon (NRO forwarders).
+- 🕒 **Console** — the network clock set from public NTP servers, so the timer counts right on a console that never reaches Nintendo, a check of the installed games, and homebrew (PlayGuard first) put on the HOME menu as games, with their icon (NRO forwarders), the PIN asked at their start when wanted.
 - 📱 **Companion app** — unlink it, even on a second-hand console.
 - ↩️ **History and backups** — every change is logged and can be undone.
 - 🔔 **Notifications** — a bell gathers what needs you (an alarm off, a clock drifting, changes made elsewhere), with the fix one press away.

@@ -222,7 +222,8 @@ Result forwarder_install(const ForwarderSpec *spec, u64 *id)
     memset(&p, 0, sizeof(p));
     if (R_SUCCEEDED(rc)) {
         const FwdInput in = {
-            .nro_path = spec->nro_path, .argv = spec->argv, .name = spec->name, .author = spec->author,
+            .nro_path = spec->nro_path, .argv = spec->argv, .gate_path = spec->gate_path, .gate_argv = spec->gate_argv,
+            .name = spec->name, .author = spec->author,
             .nacp = spec->nacp, .icon = spec->icon, .icon_size = spec->icon_size,
             .exefs_main = main, .main_size = main_size, .exefs_npdm = npdm, .npdm_size = npdm_size,
             .force_debug = ams_180(), .seal = seal_header, .seal_ctx = key,

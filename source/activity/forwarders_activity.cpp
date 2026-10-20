@@ -19,15 +19,22 @@ using forwarders_logic::State;
 namespace
 {
 
-std::string state_text(const Row& r)
+std::string state_only(const Row& r)
 {
     switch (r.state) {
         case State::Ready:        return "playguard/forwarders/state_ready"_i18n;
         case State::NroMissing:   return "playguard/forwarders/state_nro_missing"_i18n;
+        case State::GateMissing:  return "playguard/forwarders/state_gate_missing"_i18n;
         case State::NotInstalled: return "playguard/forwarders/state_not_installed"_i18n;
         case State::Elsewhere:    return "playguard/forwarders/state_elsewhere"_i18n;
     }
     return "";
+}
+
+// Its state, and whether it asks for the PIN.
+std::string state_text(const Row& r)
+{
+    return r.pin ? state_only(r) + " · " + "playguard/forwarders/state_pin"_i18n : state_only(r);
 }
 
 }   // namespace
@@ -165,9 +172,12 @@ void ForwardersActivity::actions(const Row& row)
     }
     std::vector<ui::Choice> choices;
     choices.push_back({ "playguard/forwarders/action_details"_i18n, [this, r]() { this->details(r); } });
-    if (r.state == State::Ready || r.state == State::NroMissing) {
+    if (r.state == State::Ready || r.state == State::NroMissing || r.state == State::GateMissing) {
         choices.push_back({ "playguard/forwarders/action_rename"_i18n, [this, r]() { this->rename(r); } });
         choices.push_back({ "playguard/forwarders/action_author"_i18n, [this, r]() { this->change_author(r); } });
+        if (!r.self)
+            choices.push_back({ r.pin ? "playguard/forwarders/action_pin_off"_i18n : "playguard/forwarders/action_pin_on"_i18n,
+                                [this, r]() { forwarder_flow::set_pin(r, !r.pin, this->then_rebuild(r.id)); } });
         choices.push_back({ "playguard/forwarders/action_rebuild"_i18n,
                             [this, r]() { forwarder_flow::rebuild(r, "", "", this->then_rebuild(r.id)); } });
     }

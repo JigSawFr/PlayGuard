@@ -4,7 +4,8 @@
 // forgotten, a damaged file), util/forwarder_icon.cpp (any icon made the
 // HOME menu's 256 x 256 JPEG) and action/forwarders_logic.cpp (the rows from
 // the HOME menu and the file, a new forwarder's name, whether the console
-// can start one).
+// can start one), util/forwarder_gate.cpp (the argv of a forwarder that
+// asks for the PIN).
 #include "check.h"
 #include "fs.hpp"
 #include "temp_dir.hpp"
@@ -13,6 +14,7 @@
 #include <vector>
 
 #include "action/forwarders_logic.hpp"
+#include "util/forwarder_gate.hpp"
 #include "util/forwarder_icon.hpp"
 #include "util/forwarders.hpp"
 #include "util/nro.hpp"
@@ -201,6 +203,16 @@ static void test_registry()
     CHECK(forwarders::find(b.id, &found) && found.nro == b.nro);
     CHECK(!forwarders::find(1, &found));
 
+    // Protected with the PIN: its gate kept; a flag without a gate is none.
+    b.pin = true;
+    b.gate = "sdmc:/switch/playguard/playguard.nro";
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.pin && found.gate == b.gate);
+    CHECK(forwarders::find(a.id, &found) && !found.pin && found.gate.empty());
+    b.pin = false;
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && !found.pin && found.gate.empty());
+
     CHECK(forwarders::forget(a.id));
     all = forwarders::list();
     CHECK(all.size() == 1 && all[0].id == b.id);
@@ -214,10 +226,11 @@ static void test_registry()
     CHECK(forwarders::list().empty());
     fs::write(file, R"({"forwarders": [{"id": "zz", "nro": "sdmc:/a.nro"}, {"id": "0512345678abc000"},
                        {"id": "0512345678abc000", "nro": "sdmc:/b.nro", "name": "  B\u0001  b  "}, 7,
-                       {"id": "0512345678abc000", "nro": "sdmc:/dup.nro"}]})");
+                       {"id": "0512345678abc000", "nro": "sdmc:/dup.nro"},
+                       {"id": "0512345678abd000", "nro": "sdmc:/c.nro", "pin": true}]})");
     all = forwarders::list();
-    CHECK(all.size() == 1);
-    if (all.size() == 1) CHECK(all[0].argv == "sdmc:/b.nro" && all[0].name == "B b");
+    CHECK(all.size() == 2);
+    if (all.size() == 2) CHECK(all[0].argv == "sdmc:/b.nro" && all[0].name == "B b" && !all[1].pin);
 }
 
 static void test_text()
@@ -264,6 +277,19 @@ static void test_merge()
     CHECK(rows[3].id == 3 && rows[3].name == "PlayGuard" && rows[3].state == State::Ready && rows[3].self);
     CHECK(rows[3].version == "1.4.0" && rows[3].author == "JigSawFr");
     CHECK(rows[4].id == 4 && rows[4].state == State::NotInstalled && rows[4].name == "zeta" && !rows[4].self);
+    CHECK(!rows[3].pin && !rows[2].pin);
+    // Protected with the PIN: its gate gone, it would not start either.
+    forwarders::Made locked = gone;
+    locked.pin = true;
+    locked.gate = "sdmc:/switch/moved/moved.nro";
+    std::vector<Installed> one = { { 4, "zeta", "", "" } };
+    auto pinned = merge({ locked }, one, exists, "");
+    CHECK(pinned.size() == 1 && pinned[0].pin && pinned[0].state == State::GateMissing);
+    locked.gate = "sdmc:/switch/playguard/playguard.nro";
+    pinned = merge({ locked }, one, exists, "");
+    CHECK(pinned.size() == 1 && pinned[0].pin && pinned[0].state == State::Ready);
+    pinned = merge({ locked }, {}, exists, "");
+    CHECK(pinned.size() == 1 && pinned[0].pin && pinned[0].state == State::NotInstalled);
     const Row* self = self_row(rows);
     CHECK(self && self->id == 3);
     CHECK(!self_row(merge({}, on, exists, "")));
@@ -274,6 +300,34 @@ static void test_merge()
     CHECK(default_name("  Goldleaf ", "sdmc:/switch/Goldleaf.nro") == "Goldleaf");
     CHECK(default_name("", "sdmc:/switch/hb/hb-menu.nro") == "hb-menu");
     CHECK(default_name(std::string(100, 'n'), "x").size() == forwarders::MAX_NAME);
+}
+
+static void test_gate()
+{
+    using forwarder_gate::argv_for;
+    using forwarder_gate::parse;
+    const std::string self = "sdmc:/switch/playguard/playguard.nro";
+    CHECK(argv_for(self, "sdmc:/switch/cyberfoil.nro") ==
+          "sdmc:/switch/playguard/playguard.nro --pin-gate sdmc:/switch/cyberfoil.nro");
+    CHECK(argv_for("sdmc:/switch/play guard.nro", "\"sdmc:/switch/a b.nro\"") ==
+          "\"sdmc:/switch/play guard.nro\" --pin-gate \"sdmc:/switch/a b.nro\"");
+
+    std::string nro, argv;
+    CHECK(parse(argv_for(self, "sdmc:/switch/cyberfoil.nro"), nro, argv));
+    CHECK(nro == "sdmc:/switch/cyberfoil.nro" && argv == "sdmc:/switch/cyberfoil.nro");
+    CHECK(parse(argv_for("sdmc:/switch/play guard.nro", "\"sdmc:/switch/a b.nro\" -x"), nro, argv));
+    CHECK(nro == "sdmc:/switch/a b.nro" && argv == "\"sdmc:/switch/a b.nro\" -x");
+    CHECK(parse(argv_for(self, "sdmc:/x.nro --flag 2"), nro, argv) && nro == "sdmc:/x.nro" && argv == "sdmc:/x.nro --flag 2");
+
+    // Not a gate: started from a menu, or anything else.
+    CHECK(!parse("sdmc:/switch/playguard/playguard.nro", nro, argv) && nro.empty() && argv.empty());
+    CHECK(!parse("", nro, argv));
+    CHECK(!parse(self + " --other sdmc:/x.nro", nro, argv));
+    CHECK(!parse(self + " --pin-gate", nro, argv));
+    CHECK(!parse(self + " --pin-gate ", nro, argv));
+    CHECK(!parse(self + " --pin-gate /x.nro", nro, argv) && argv.empty());   // not on the SD card
+    CHECK(!parse(self + " --pin-gate \"sdmc:/x.nro", nro, argv));           // unclosed quote
+    CHECK(!parse("\"sdmc:/play guard.nro --pin-gate sdmc:/x.nro", nro, argv));
 }
 
 static void test_patches()
@@ -376,6 +430,7 @@ int main()
     test_registry();
     test_text();
     test_merge();
+    test_gate();
     test_patches();
     return CHECK_DONE("forwarders tests passed");
 }

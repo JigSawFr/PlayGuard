@@ -5,9 +5,12 @@
 #include <borealis.hpp>
 
 #include "action/history_flow.hpp"
+#include "action/pin_lock.hpp"
 #include "app.hpp"
 #include "core/forwarder.h"
+#include "core/pctl_ops.h"
 #include "ui/ui.hpp"
+#include "util/forwarder_gate.hpp"
 #include "util/forwarder_icon.hpp"
 #include "util/forwarders.hpp"
 #include "util/nro.hpp"
@@ -93,8 +96,11 @@ bool assets_of(const std::string& sdmc, bool self, nro::Info& info, std::string&
     return true;
 }
 
-// Builds and installs `m` from its .nro; says how it went.
-bool install(const forwarders::Made& m, bool self)
+// Builds and installs `m` from its .nro; says how it went (`done_text`, the
+// change history's `kind`). Protected with the PIN, it goes through
+// PlayGuard's .nro as it is now.
+bool install(const forwarders::Made& m, bool self, const char* kind = "add_forwarder",
+             const std::string& done_text = "")
 {
     nro::Info info;
     std::string error;
@@ -102,23 +108,49 @@ bool install(const forwarders::Made& m, bool self)
         ui::error("playguard/forwarders/add_err"_i18n, error);
         return false;
     }
+    forwarders::Made made = m;
+    std::string gate_argv;
+    if (made.pin) {
+        made.gate = self_nro();
+        if (made.gate.empty() || !nro_exists(made.gate)) {
+            ui::error("playguard/forwarders/add_err"_i18n, "playguard/forwarders/self_unknown"_i18n);
+            return false;
+        }
+        gate_argv = forwarder_gate::argv_for(made.gate, made.argv);
+    } else {
+        made.gate.clear();
+    }
     const ForwarderSpec spec = {
-        m.nro.c_str(), m.argv.c_str(), m.name.c_str(), m.author.c_str(),
+        made.nro.c_str(), made.argv.c_str(), made.pin ? made.gate.c_str() : nullptr,
+        made.pin ? gate_argv.c_str() : nullptr, made.name.c_str(), made.author.c_str(),
         info.nacp.size() >= nro::NACP_SIZE ? info.nacp.data() : nullptr, info.icon.data(), info.icon.size(),
     };
     u64 id = 0;
     const Result rc = forwarder_install(&spec, &id);
     if (R_SUCCEEDED(rc)) {
-        forwarders::Made saved = m;
-        saved.id = id;
+        made.id = id;
         std::string werr;
-        if (!forwarders::save(saved, &werr)) brls::Logger::warning("forwarders: not remembered ({})", werr);
-        history_flow::record_event("add_forwarder", "", history_label(m.name, id));
+        if (!forwarders::save(made, &werr)) brls::Logger::warning("forwarders: not remembered ({})", werr);
+        history_flow::record_event(kind, "", history_label(made.name, id));
     } else {
-        brls::Logger::warning("forwarders: {} not installed ({})", m.nro, ui::rc_text(rc, false));
+        brls::Logger::warning("forwarders: {} not installed ({})", made.nro, ui::rc_text(rc, false));
     }
-    ui::notify_result(rc, brls::getStr("playguard/forwarders/added", m.name), "playguard/forwarders/add_err"_i18n);
+    ui::notify_result(rc, done_text.empty() ? brls::getStr("playguard/forwarders/added", made.name) : done_text,
+                      "playguard/forwarders/add_err"_i18n);
     return R_SUCCEEDED(rc);
+}
+
+// The forwarder `row` remembered, or as the row says it (made here before
+// PlayGuard remembered it).
+forwarders::Made made_of(const forwarders_logic::Row& row)
+{
+    forwarders::Made m;
+    if (!forwarders::find(row.id, &m)) {
+        m.id = row.id;
+        m.nro = row.nro;
+        m.argv = argv_of(row.nro);
+    }
+    return m;
 }
 
 }   // namespace
@@ -212,7 +244,7 @@ void create_self(std::function<void(bool)> done)
                 [sdmc, done]() {
                     forwarders::Made m;
                     m.nro = sdmc;
-                        m.argv = argv_of(sdmc);
+                    m.argv = argv_of(sdmc);
                     m.name = "PlayGuard";
                     m.author = "JigSawFr";
                     const bool ok = install(m, true);
@@ -226,16 +258,51 @@ void create_self(std::function<void(bool)> done)
 void rebuild(const forwarders_logic::Row& row, const std::string& name, const std::string& author,
              std::function<void(bool)> done)
 {
-    forwarders::Made m;
-    if (!forwarders::find(row.id, &m)) {
-        m.id = row.id;
-        m.nro = row.nro;
-        m.argv = argv_of(row.nro);
-    }
+    forwarders::Made m = made_of(row);
     m.name = name.empty() ? row.name : name;
     m.author = author.empty() ? row.author : author;
     const bool ok = !m.nro.empty() && install(m, row.self || m.nro == self_nro());
     if (done) done(ok);
+}
+
+void set_pin(const forwarders_logic::Row& row, bool on, std::function<void(bool)> done)
+{
+    forwarders::Made m = made_of(row);
+    if (m.nro.empty() || row.self) {
+        if (done) done(false);
+        return;
+    }
+    if (!on) {
+        // The PIN first, whatever PlayGuard's own lock says: the protection
+        // is the parent's to lift.
+        if (!pin_lock::confirm()) {
+            if (done) done(false);
+            return;
+        }
+        m.pin = false;
+        const bool ok =
+            install(m, false, "unprotect_forwarder", brls::getStr("playguard/forwarders/pin_removed", row.name));
+        if (done) done(ok);
+        return;
+    }
+    // Without a PIN on the console, there is nothing to ask for.
+    u32 pin_length = 0;
+    if (R_SUCCEEDED(pctl_lock_state(&pin_length, nullptr)) && pin_length == 0) {
+        ui::info("playguard/forwarders/pin_no_pin"_i18n);
+        if (done) done(false);
+        return;
+    }
+    const std::string name = row.name;
+    ui::confirm(brls::getStr("playguard/forwarders/pin_confirm", name), "playguard/forwarders/action_pin_on"_i18n,
+                [m, name, done]() mutable {
+                    m.pin = true;
+                    const bool ok =
+                        install(m, false, "protect_forwarder", brls::getStr("playguard/forwarders/pin_added", name));
+                    if (done) done(ok);
+                },
+                [done]() {
+                    if (done) done(false);
+                });
 }
 
 void remove(const forwarders_logic::Row& row, std::function<void(bool)> done)

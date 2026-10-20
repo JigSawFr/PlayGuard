@@ -1013,7 +1013,15 @@
         "forgotten": "已忘記{}",
         "details": "{}\n\n發行商：{}\n版本：{}\n.nro：{}\n程式ID：{}\n{}",
         "made_here": "由PlayGuard建立",
-        "unknown": "未知"
+        "unknown": "未知",
+        "state_gate_missing": "PlayGuard的.nro已移動：請重新安裝",
+        "state_pin": "PIN碼",
+        "action_pin_on": "以PIN碼保護",
+        "action_pin_off": "不再詢問PIN碼",
+        "pin_confirm": "每次從HOME選單啟動{}時都詢問家長監護PIN碼嗎？PlayGuard會先開啟主機的PIN碼畫面，因此它的.nro必須留在原位置。從自製軟體選單啟動時，.nro仍然不需要PIN碼。",
+        "pin_added": "{}會詢問PIN碼",
+        "pin_removed": "{}不再詢問PIN碼",
+        "pin_no_pin": "請先設定家長監護PIN碼（PIN碼 › 設定或變更PIN碼）：沒有PIN碼就無從詢問。"
     },
     "about": {
         "section_changelog": "{} 更新內容",
@@ -1346,7 +1354,9 @@
             "launch_version": "已重設啟動版本",
             "countdown": "遊玩時間倒數",
             "add_forwarder": "已將轉發器新增到HOME選單",
-            "remove_forwarder": "已將轉發器從HOME選單移除"
+            "remove_forwarder": "已將轉發器從HOME選單移除",
+            "protect_forwarder": "轉發器已以PIN碼保護",
+            "unprotect_forwarder": "轉發器不再受PIN碼保護"
         },
         "sources": {
             "uniform": "每天相同上限",

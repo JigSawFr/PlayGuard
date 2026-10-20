@@ -541,6 +541,9 @@ FwdError forwarder_pack(const FwdInput *in, FwdPackage *out)
         !fits(in->name ? in->name : "", FWD_NAME_MAX) || !fits(in->author ? in->author : "", FWD_AUTHOR_MAX) ||
         !in->icon || !in->icon_size || !in->exefs_main || !in->main_size || !in->exefs_npdm || !in->npdm_size)
         return FWD_BAD_INPUT;
+    const bool gate = in->gate_path != NULL;
+    if (gate && (!*in->gate_path || !fits(in->gate_path, FWD_PATH_MAX) || !fits(in->gate_argv, FWD_ARGV_MAX)))
+        return FWD_BAD_INPUT;
     const uint64_t id = forwarder_id(in->nro_path, in->argv);
     if (!id) return FWD_NO_MEMORY;
     out->id = id;
@@ -555,9 +558,14 @@ FwdError forwarder_pack(const FwdInput *in, FwdPackage *out)
         return FWD_BAD_NPDM;
     }
     const FwdFile exefs[] = { { "main", in->exefs_main, in->main_size }, { "main.npdm", npdm, in->npdm_size } };
-    const FwdFile args[] = { { "nextArgv", in->argv, strlen(in->argv) },
-                             { "nextNroPath", in->nro_path, strlen(in->nro_path) } };
-    bool ok = nca_begin(&n) && nca_pfs0(&n, 0, exefs, 2, PFS0_EXEFS_BLOCK) && nca_romfs(&n, 1, args, 2) &&
+    // With a gate, the gate first, and the .nro as where the loader returns
+    // (sphaira's hbl: returnNroPath, returnArgv).
+    const char *first = gate ? in->gate_path : in->nro_path, *first_argv = gate ? in->gate_argv : in->argv;
+    const FwdFile args[] = { { "nextArgv", first_argv, strlen(first_argv) },
+                             { "nextNroPath", first, strlen(first) },
+                             { "returnArgv", in->argv, strlen(in->argv) },
+                             { "returnNroPath", in->nro_path, strlen(in->nro_path) } };
+    bool ok = nca_begin(&n) && nca_pfs0(&n, 0, exefs, 2, PFS0_EXEFS_BLOCK) && nca_romfs(&n, 1, args, gate ? 4 : 2) &&
               nca_finish(&n, in, id, NCA_PROGRAM, FWD_CONTENT_PROGRAM, &out->contents[0]);
     free(npdm);
     fwd_buf_free(&n.body);

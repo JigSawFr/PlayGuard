@@ -70,6 +70,13 @@ void forwarder_package_free(FwdPackage *p);
 typedef struct {
     const char *nro_path;   // as hbmenu passes it: "sdmc:/switch/x/x.nro"
     const char *argv;       // what the .nro gets as its argv, its path first
+    // Started first instead, when not NULL: an .nro that starts the one above
+    // itself (envSetNextLoad, with its path and argv) or ends the forwarder,
+    // PlayGuard asking for the PIN (util/forwarder_gate.hpp). The loader then
+    // goes back to the .nro above, not to it, once that one exits: the
+    // forwarder ends. The program ID stays the .nro's.
+    const char *gate_path;
+    const char *gate_argv;
     const char *name;       // the HOME menu's name, in every language (empty: the NACP's)
     const char *author;     // its publisher (empty: the NACP's)
     const void *nacp;       // the .nro's control.nacp (FWD_NACP_SIZE bytes), or NULL for a blank one
@@ -88,7 +95,7 @@ typedef struct {
 
 typedef enum {
     FWD_OK = 0,
-    FWD_BAD_INPUT,      // a path, argv, name or author too long, no icon, no loader
+    FWD_BAD_INPUT,      // a path, argv, name or author too long, no icon, no loader, a gate without its argv
     FWD_BAD_NPDM,       // the loader's NPDM is not one this code can patch
     FWD_NO_MEMORY,
 } FwdError;

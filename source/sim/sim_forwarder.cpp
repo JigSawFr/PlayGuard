@@ -171,6 +171,9 @@ Result forwarder_install(const ForwarderSpec* spec, u64* id)
     if (!spec->nro_path || !spec->argv || !spec->icon || !spec->icon_size) return NXM_RC_INVALID_ARGUMENT;
     if (std::strlen(spec->nro_path) > FWD_PATH_MAX || std::strlen(spec->argv) > FWD_ARGV_MAX)
         return NXM_RC_INVALID_ARGUMENT;
+    if (spec->gate_path && (!spec->gate_argv || std::strlen(spec->gate_path) > FWD_PATH_MAX ||
+                            std::strlen(spec->gate_argv) > FWD_ARGV_MAX))
+        return NXM_RC_INVALID_ARGUMENT;
     *id = forwarder_id(spec->nro_path, spec->argv);
     const Result gate = core_change_allowed();
     if (R_FAILED(gate)) return gate;
