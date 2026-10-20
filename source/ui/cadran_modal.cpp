@@ -230,6 +230,18 @@ brls::Box* cadran::dialog_body(const std::string& text)
         }
         std::vector<std::pair<std::string, std::string>> rows;
         if (table_of(paragraph, &rows)) {
+            // A week of lines: the days that change alike on one line
+            // ("Monday – Friday  2 h → 0 min").
+            if (rows.size() >= 5) {
+                std::vector<std::pair<std::string, std::string>> runs;
+                for (size_t i = 0; i < rows.size();) {
+                    size_t j = i;
+                    while (j + 1 < rows.size() && rows[j + 1].second == rows[i].second) j++;
+                    runs.push_back({ j > i ? rows[i].first + " \u2013 " + rows[j].first : rows[i].first, rows[i].second });
+                    i = j + 1;
+                }
+                rows = std::move(runs);
+            }
             auto* table = new brls::Box(brls::Axis::COLUMN);
             table->setAlignItems(brls::AlignItems::STRETCH);
             table->setBackgroundColor(theme["cadran/surf2"]);
@@ -264,7 +276,34 @@ brls::Box* cadran::dialog_body(const std::string& text)
         label->setMarginTop(body->getChildren().empty() ? 0 : 14);
         body->addView(label);
     }
-    // The notes under a line, each with its icon.
+    // A warning first, in an amber card under the title (a game about to be
+    // suspended matters before the details); the other notes under a line,
+    // each with its icon.
+    size_t at = body->getView("cadran_dialog_head") ? 1 : 0;
+    for (const Note& note : notes) {
+        if (!note.warn) continue;
+        auto* card = new brls::Box(brls::Axis::ROW);
+        card->setAlignItems(brls::AlignItems::FLEX_START);
+        card->setBackgroundColor(theme["cadran/amber_surf"]);
+        card->setBorderColor(theme["cadran/amber_line"]);
+        card->setBorderThickness(1);
+        card->setCornerRadius(14);
+        card->setPadding(12, 18, 12, 16);
+        card->setMarginTop(at > 0 ? 14 : 0);
+        CadranIcon* icon = kit::icon(note.icon, 20, "cadran/amber");
+        icon->setMarginTop(2);
+        icon->setMarginRight(12);
+        icon->setShrink(0);
+        card->addView(icon);
+        brls::Label* label = kit::label(note.text, 17, "cadran/amber");
+        label->setGrow(1.0f);
+        label->setWidth(0);
+        card->addView(label);
+        body->addView(card, at++);
+    }
+    notes.erase(std::remove_if(notes.begin(), notes.end(), [](const Note& n) { return n.warn; }), notes.end());
+    // What follows the warning, apart from it.
+    if (at > 0 && at < body->getChildren().size()) body->getChildren()[at]->setMarginTop(14);
     for (size_t i = 0; i < notes.size(); i++) {
         auto* row = new brls::Box(brls::Axis::ROW);
         row->setAlignItems(brls::AlignItems::FLEX_START);
@@ -318,12 +357,13 @@ void cadran::style_dialog(brls::Dialog* dialog, Emphasis emphasis)
     // the text when it has none).
     auto* head = dynamic_cast<brls::Box*>(dialog->getView("cadran_dialog_head"));
     auto* body = dynamic_cast<brls::Box*>(dialog->getView("cadran_dialog_body"));
-    if (emphasis == Emphasis::DANGER && !head && body) {
+    const bool warns = emphasis == Emphasis::DANGER || emphasis == Emphasis::FAILURE;
+    if (warns && !head && body) {
         head = new brls::Box(brls::Axis::ROW);
         head->setMarginBottom(14);
         body->addView(head, 0);
     }
-    if (emphasis == Emphasis::DANGER && head) {
+    if (warns && head) {
         auto* badge = new brls::Box(brls::Axis::ROW);
         badge->setWidth(44);
         badge->setHeight(44);
@@ -348,8 +388,10 @@ void cadran::style_dialog(brls::Dialog* dialog, Emphasis emphasis)
         const brls::ButtonStyle* look = &PLAIN;
         if (b == last && emphasis == Emphasis::PRIMARY) look = &PRIMARY;
         else if (b == last && emphasis == Emphasis::DANGER) look = &DANGER;
-        else if (emphasis == Emphasis::NONE && b->getText() == ok) look = &PRIMARY;
+        else if ((emphasis == Emphasis::NONE || emphasis == Emphasis::FAILURE) && b->getText() == ok) look = &PRIMARY;
         pill(b, look);
+        // A says what the focused button does ("A Cancel"), not borealis' "OK".
+        b->updateActionHint(brls::BUTTON_A, b->getText());
     }
     hide(dialog, "brls/dialog/button2/separator");
     hide(dialog, "brls/dialog/button3/separator");
@@ -486,8 +528,10 @@ void cadran::style_pick_row(brls::RadioCell* cell, bool checked)
     brls::Theme theme = brls::Application::getTheme();
     cell->setCornerRadius(14);
     cell->setHighlightCornerRadius(14);
+    // The row chosen: a soft fill and its check, the text as the others'
+    // (borealis gives the focused row the teal).
     cell->setBackgroundColor(checked ? theme["cadran/teal_soft"] : theme["cadran/none"]);
-    cell->title->setTextColor(checked ? theme["cadran/teal"] : theme["cadran/text"]);
+    cell->title->setTextColor(theme["cadran/text"]);
     cell->checkbox->setVisibility(brls::Visibility::GONE);
     auto* check = dynamic_cast<CadranIcon*>(cell->getView("cadran_check"));
     if (!check) {

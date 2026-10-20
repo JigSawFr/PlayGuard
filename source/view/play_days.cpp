@@ -113,7 +113,8 @@ void PlayDaysView::show(const uint32_t day_s[7], const uint8_t day_wday[7], cons
         const bool has_limit = limits && limits[k] != PT_DAY_NOLIMIT;
         const bool over = has_limit && day_s[k] > (uint64_t)limits[k] * 60;
         c.bar->setHeight(bar_height(day_s[k], top));
-        NVGcolor colour = over ? ui::color_warn() : ui::color_neutral();
+        // Played in the teal it is everywhere else (the week, Activity's cards).
+        NVGcolor colour = over ? ui::color_warn() : brls::Application::getTheme()["cadran/teal_fill"];
         if (!day_s[k]) colour = nvgTransRGBA(colour, 40);   // nothing played: a faint stub
         else if (!today && !over) colour = nvgTransRGBA(colour, 120);
         c.bar->setColor(colour);

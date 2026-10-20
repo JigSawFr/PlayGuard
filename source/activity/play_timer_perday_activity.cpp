@@ -162,7 +162,6 @@ void PlayTimerPerDayActivity::build_week()
 {
     this->cadran_card = brls::View::createFromXMLResource("view/cadran_week_card.xml");
     static_cast<brls::Box*>(this->getContentView()->getView("pt_week_card"))->addView(this->cadran_card);
-    if (brls::View* summary = state_header->getView("pt_summary")) summary->setVisibility(brls::Visibility::GONE);
 
     auto* w = dynamic_cast<CadranWeekView*>(this->cadran_card->getView("cpt_week"));
     brls::View* keys_idle = this->cadran_card->getView("cpt_keys_idle");
@@ -217,7 +216,7 @@ void PlayTimerPerDayActivity::rerender()
     if (this->live.valid) this->cadran_week->show(this->pending, this->live.day_min);
     int unsaved = 0;
     for (int d = 0; d < 7 && this->live.valid; d++) unsaved += this->pending[d] != this->live.day_min[d];
-    pt_save->setDetailText(unsaved ? brls::getStr("playguard/play_timer/perday/unsaved_count", unsaved) : "");
+    pt_save->setDetailText(unsaved ? (unsaved == 1 ? "playguard/play_timer/perday/unsaved_count_one"_i18n : brls::getStr("playguard/play_timer/perday/unsaved_count", unsaved)) : "");
     pt_save->setDetailTextColor(unsaved ? ui::color_warn() : ui::color_neutral());
     // The footer's + hint carries the count too: it is visible from any row.
     this->getContentView()->updateActionHint(brls::BUTTON_START, unsaved ? brls::getStr("playguard/play_timer/perday/save_hint", unsaved)

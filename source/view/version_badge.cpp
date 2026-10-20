@@ -59,6 +59,9 @@ static void badge_screen_of(brls::View* focus)
     if (!focus) return;
     while (focus->hasParent()) focus = focus->getParent();
     auto* frame = dynamic_cast<brls::AppletFrame*>(focus);
+    // Not on the child screen: a version means nothing to a child, and its
+    // amber reads as a warning.
+    if (frame && frame->getView("child_root")) return;
     auto* label = frame ? frame->getView("brls/applet_frame/title_label") : nullptr;
     auto* row   = label ? dynamic_cast<brls::Box*>(label->getParent()) : nullptr;
     if (!row || row->getView(BADGE_ID)) return;

@@ -35,7 +35,10 @@
                 <brls:ProgressSpinner width="30" height="30" marginRight="14"/>
                 <brls:Label id="ck_progress_text" text="" fontSize="20" grow="1.0" textColor="@theme/brand/note"/>
             </brls:Box>
-            <brls:Label id="ck_result" text="" marginTop="8" marginBottom="8" marginLeft="16" marginRight="16"/>
+            <brls:Box id="ck_result_card" axis="column" alignItems="stretch" marginTop="8" marginBottom="8" marginLeft="10" marginRight="10" cornerRadius="18">
+                <brls:Label id="ck_result_title" text="" fontSize="18" textColor="@theme/cadran/amber" marginBottom="8" visibility="gone"/>
+                <brls:Label id="ck_result" text="" fontSize="16.5"/>
+            </brls:Box>
             <brls:Label id="ck_warning" text="" fontSize="20" marginBottom="8" marginLeft="16" marginRight="16" textColor="@theme/brand/warn"/>
             <brls:DetailCell id="ck_apply" title="@i18n/playguard/clock/apply"/>
             <brls:DetailCell id="ck_copy" title="@i18n/playguard/clock/copy"/>

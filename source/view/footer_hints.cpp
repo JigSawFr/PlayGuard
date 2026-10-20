@@ -16,6 +16,9 @@ static constexpr float CLOCK_GAP = 16;
 
 FooterHints::FooterHints()
 {
+    // No greyed "A OK" where A does nothing: the footer says only what the
+    // keys do.
+    this->setAddUnableAButtonAction(false);
     // After brls::Hints' own subscription (its constructor's): the hints are
     // refilled when this runs. Their layout is computed at once (View::
     // invalidate), so fit() reads their width before the next frame.
@@ -74,6 +77,8 @@ void FooterHints::fit()
         hint->setPaddingRight(HINT_PADDING - padding_cut);
         if (brls::View* text = hint->getView("hint"))
             text->setMarginLeft(HINT_GAP - gap_cut);
+        // The button's glyph whole: only the text is cut below.
+        if (brls::View* icon = hint->getView("icon")) icon->setShrink(0);
     }
     // Still too wide: the texts are cut ("…"), the clock is not.
     if (this->getWidth() > room)

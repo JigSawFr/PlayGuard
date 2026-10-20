@@ -20,9 +20,11 @@ class MainActivity;
 namespace ui
 {
 
-// Status colours from the PlayGuard palette, one shade per theme (>= 4.5:1),
-// and the focus highlight in the icon's teal. register_theme_colors() must
-// run before the first lookup (borealis aborts on an unknown theme key).
+// The colours cadran::install_theme() leaves out (brand/gauge_track) and the
+// smoke test's still focus. The status colours below are the boards' inks,
+// one shade per theme (>= 4.5:1). register_theme_colors() and
+// cadran::install_theme() must run before the first lookup (borealis aborts
+// on an unknown theme key).
 void     register_theme_colors();
 // On the console: the system's Latin / Japanese font as the default font of
 // every label, the Chinese one only as a fallback (except for Chinese). Right
@@ -31,7 +33,7 @@ void     use_latin_font();
 NVGcolor color_ok();
 NVGcolor color_warn();
 NVGcolor color_bad();
-NVGcolor color_track();     // empty part of the play-time gauge
+NVGcolor color_track();     // empty part of a progress bar, a missing cover
 NVGcolor color_note();      // explanatory notes under a section
 NVGcolor color_neutral();   // DetailCell value colour
 NVGcolor color_text();      // plain label text colour
@@ -106,6 +108,9 @@ void notify(const std::string& text, Toast kind = Toast::Info);
 // toast (a toast is gone before "error 0x…" is read). Next frame, so it can
 // be called from a dialog button. Logged as "error: " for the smoke test.
 void error(const std::string& text);
+// The dialog error() opens: what failed as its title (before " — "), why as
+// its text, the error code small, "Send a report" when the text says to.
+void failure(const std::string& text);
 // Saves the settings (config::snapshot, then config::write off the UI
 // thread: write_later): `saved_text` as a toast once it is on the SD card,
 // `failed_text` (default: the config_err toast) when the card refused it.
@@ -172,8 +177,9 @@ struct Choice
 };
 void pick_actions(const std::string& title, const std::vector<Choice>& choices);
 
-// System keyboard prompts (callback only on confirm). prompt_minutes accepts
-// minutes ("90") or hours:minutes ("1:30"), up to 24:00.
+// A duration set with the stick (cadran::prompt_minutes: 15 min a step, 5
+// with L and R, up to 24:00; "no limit" starts at 1 h), and the system
+// keyboard for a text. The callback only on confirm.
 void prompt_minutes(const std::string& header, uint16_t current, std::function<void(uint16_t)> on_value);
 void prompt_text(const std::string& header, const std::string& initial, int max_len,
                  std::function<void(std::string)> on_value);

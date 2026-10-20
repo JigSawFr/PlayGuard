@@ -13,7 +13,7 @@ namespace config
 struct Config
 {
     std::string language = "system";   // "system" or one of LANGUAGES
-    std::string theme    = "system";   // "system", "light", "dark"
+    std::string theme    = "dark";     // "dark" (the default), "system", "light"
     // The text: "auto" (larger while docked), "normal" or "large"
     // (ui/text_size).
     std::string text_size = "auto";
@@ -161,7 +161,8 @@ constexpr int    SCHEMA             = 1;    // "schema" in config.json
 // playguard/tools/languages/. tools/check_resources.py checks both; README
 // "Translating PlayGuard" lists the steps to add one.
 constexpr const char* LANGUAGES[] = { "system", "en-US", "fr", "fr-CA", "de", "es", "es-419", "it", "nl", "pt", "pt-BR", "ru", "ja", "ko", "zh-Hans", "zh-Hant" };
-// What theme may be: the console's own, then the two forced ones.
+// What theme may be, in the pickers' order: the console's own, then the two
+// forced ones. Dark unless the parent chooses otherwise (Config::theme).
 constexpr const char* THEMES[] = { "system", "light", "dark" };
 // What text_size may be: the default first.
 constexpr const char* TEXT_SIZES[] = { "auto", "normal", "large" };

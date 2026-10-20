@@ -1,12 +1,17 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/notices_activity.hpp"
 
+#include <algorithm>
+#include <string>
+#include <vector>
+
 #include "action/notices.hpp"
 #include "action/notice_logic.hpp"
 #include "action/pin_lock.hpp"
 #include "tab/cadran_list.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
+#include "view/cadran_icon.hpp"
 #include "util/config.hpp"
 
 using namespace brls::literals;
@@ -194,6 +199,14 @@ void NoticesActivity::rebuild()
     // there is.
     const bool console_shown = this->console_open || !parental;
     enum Section { None, Todo, Info, Console } section = None;
+    // Each entry's icon, as Today's pills mark them: a warning for what is to
+    // do (amber), an "i" for what is only said, so the colour is not alone.
+    std::vector<std::string> ids;
+    std::vector<brls::DetailCell*> todos;
+    const auto mark = [&ids](brls::DetailCell* cell) {
+        ids.push_back("notice_line_" + std::to_string(ids.size()));
+        cell->setId(ids.back());
+    };
     const auto header = [&](const std::string& title) {
         auto* h = new brls::Header();
         h->setTitle(title);
@@ -219,6 +232,8 @@ void NoticesActivity::rebuild()
         }
 
         brls::DetailCell* cell = this->entry_cell(e, todo);
+        mark(cell);
+        if (todo) todos.push_back(cell);
         box->addView(cell);
         if (!first) first = cell;
         // Just opened: the focus on the console's first entry.
@@ -241,7 +256,21 @@ void NoticesActivity::rebuild()
     }
 
     // The entries in cards, before they are shown.
-    cadran::List(this->getContentView(), box).apply({});
+    std::vector<std::pair<const char*, const char*>> icons;
+    for (size_t i = 0; i < ids.size(); i++) {
+        auto* cell = static_cast<brls::DetailCell*>(box->getView(ids[i]));
+        const bool todo = std::find(todos.begin(), todos.end(), cell) != todos.end();
+        icons.push_back({ ids[i].c_str(), todo ? "alert" : "info" });
+    }
+    cadran::List(box, box).apply(icons);   // the icons found in the box, not on screen yet
+    brls::Theme theme = brls::Application::getTheme();
+    for (brls::DetailCell* cell : todos) {
+        auto* square = cell->getChildren().empty() ? nullptr : dynamic_cast<brls::Box*>(cell->getChildren()[0]);
+        if (!square) continue;
+        square->setBackgroundColor(theme["cadran/amber_surf"]);
+        for (brls::View* v : square->getChildren())
+            if (auto* icon = dynamic_cast<CadranIcon*>(v)) icon->setColor(theme["cadran/amber"]);
+    }
     root->addView(box);
     brls::Application::giveFocus(focus ? focus : first);
     if (this->content) root->removeView(this->content);

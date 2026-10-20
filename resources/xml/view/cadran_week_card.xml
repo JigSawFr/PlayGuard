@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- The week as the editor, in its card (view/cadran_week.cpp), with its
-     keys: A and X while no day is edited (and what the bars' fill means),
-     the stick, L, R and Y while one is. The Cadran Play timer
-     (view/cadran_play_timer.xml's cpt_week_card) and the per-day editor of a
+     keys: A and X while no day is edited (and what the bars' fill and
+     its coral, a limit gone past, mean),
+     the stick, L, R and Y while one is. The Play timer tab
+     (tab/play_timer.xml's pt_week_card) and the per-day editor of a
      profile (activity/play_timer_perday_activity.cpp) show it. -->
 
 <brls:Box axis="column" alignItems="stretch" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="24" paddingTop="16" paddingBottom="14" paddingLeft="22" paddingRight="22" marginBottom="10">
@@ -18,6 +19,10 @@
         </brls:Box>
         <brls:Label text="@i18n/playguard/cadran/week/pick_day" fontSize="15" textColor="@theme/cadran/text2"/>
         <brls:Box grow="1.0"/>
+        <brls:Box id="cpt_over_key" axis="row" alignItems="center" visibility="gone" marginRight="16">
+            <brls:Rectangle width="12" height="12" cornerRadius="3" color="@theme/cadran/coral_fill" marginRight="8"/>
+            <brls:Label text="@i18n/playguard/cadran/week/over_key" fontSize="15" textColor="@theme/cadran/text2" singleLine="true"/>
+        </brls:Box>
         <brls:Box id="cpt_played_key" axis="row" alignItems="center" visibility="gone">
             <brls:Rectangle width="12" height="12" cornerRadius="3" color="@theme/cadran/teal_fill" marginRight="8"/>
             <brls:Label id="cpt_played_text" text="@i18n/playguard/cadran/week/played_key" fontSize="15" textColor="@theme/cadran/text2" singleLine="true"/>

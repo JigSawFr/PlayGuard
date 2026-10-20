@@ -66,8 +66,8 @@ brls::Box* kicker(const char* icon_name, const std::string& title)
 {
     auto* head = new brls::Box(brls::Axis::ROW);
     head->setAlignItems(brls::AlignItems::CENTER);
-    head->addView(icon(icon_name, 18, "cadran/text3"));
-    brls::Label* text = label(cadran::upper(title), 15, "cadran/text3");
+    head->addView(icon(icon_name, 18, "cadran/text2"));
+    brls::Label* text = label(cadran::upper(title), 16, "cadran/text2");
     text->setSingleLine(true);
     text->setMarginLeft(8);
     head->addView(text);
@@ -171,6 +171,7 @@ brls::Box* chip(const std::string& text, float height)
     auto* digits = new CadranDigits();
     digits->setText(text);
     digits->setFontSize(17);
+    digits->setFollowsTextSize(true);
     box->addView(digits);
     return box;
 }
@@ -207,6 +208,29 @@ Empty empty(const char* icon_name)
 void wrap(brls::View* row)
 {
     if (row) YGNodeStyleSetFlexWrap(row->getYGNode(), YGWrapWrap);
+}
+
+void draw_more_below(NVGcontext* vg, brls::ScrollingFrame* frame, float x, float y, float width, float height,
+                     const char* color_key)
+{
+    // The content: the frame's tallest child (the other is its scroll bar).
+    brls::View* content = nullptr;
+    if (frame)
+        for (brls::View* child : frame->getChildren())
+            if (!content || child->getHeight() > content->getHeight()) content = child;
+    if (!content) return;
+    const float below = content->getHeight() - frame->getContentOffsetY() - height;
+    if (below <= 1.0f) return;
+    constexpr float FADE = 32.0f;
+    NVGcolor solid = brls::Application::getTheme()[color_key];
+    solid.a *= frame->getAlpha();
+    NVGcolor clear = solid;
+    clear.a = 0.0f;
+    const float top = y + height - FADE;
+    nvgBeginPath(vg);
+    nvgRect(vg, x, top, width, FADE);
+    nvgFillPaint(vg, nvgLinearGradient(vg, x, top, x, y + height, clear, solid));
+    nvgFill(vg);
 }
 
 std::string without_chevron(const std::string& value)
