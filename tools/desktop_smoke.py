@@ -51,7 +51,9 @@ notice must go when dismissed, and the Activity tab flag the new account.
 
 The "alarm" scenario starts with "When the time is up" on a warning only and
 today's limit passed (PLAYGUARD_SIM_ALARM_ONLY, PLAYGUARD_SIM_RESTRICTED):
-Today and the Play timer tab must show the time over the limit.
+Today and the Play timer tab must show the time over the limit. A read of the
+play data ends as each tab opens, Today not freed yet (PLAYGUARD_SIM_TAB_RACE):
+the header's pill must still be the Play timer's.
 
 The "sysnotes" scenario checks for updates at start-up against a simulated
 GitHub and switchbrew (PLAYGUARD_SIM_SYS_LATEST, PLAYGUARD_SIM_SYS_NOTES),
@@ -305,6 +307,8 @@ if ALARM or CADRANSTATES:
     # console does not restrict, and its time left reads below 0.
     env.setdefault("PLAYGUARD_SIM_ALARM_ONLY", "1")
     env.setdefault("PLAYGUARD_SIM_RESTRICTED", "1")
+if ALARM:
+    env.setdefault("PLAYGUARD_SIM_TAB_RACE", "1")
 if ERRORS:
     env.setdefault("PLAYGUARD_SIM_FAIL", "unlock")
     env.setdefault("PLAYGUARD_SIM_RESTRICTED", "1")
@@ -1398,7 +1402,7 @@ if CADRANLARGE:
     finish()
 if ALARM:
     shot("01_overview_over")   # Today: the time over the limit, not a time left
-    key("Down")                # Play timer: the state line and the banner say so
+    key("Down")                # Play timer: the state line and the banner say so; its pill, not Today's
     shot("02_play_timer_over")
     finish()
 if SYSNOTES:

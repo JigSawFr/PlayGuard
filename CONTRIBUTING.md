@@ -34,6 +34,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_ALARM_ONLY=1` | *When the time is up* on a warning only: past the limit, the console does not restrict and the time left reads below 0 |
 | `PLAYGUARD_SIM_NOT_COUNTING=1` | The time left not going down (a clock set back): *Today* says the console is not counting after 90 s on screen |
 | `PLAYGUARD_SIM_STALL_S=20` | With `PLAYGUARD_SIM_NOT_COUNTING`: *Today* says so after that many seconds on screen instead of 90 (the smoke test's `outside` scenario) |
+| `PLAYGUARD_SIM_TAB_RACE=1` | A read of the play data ending as each tab opens, the tab it replaces not freed yet (the smoke test's `alarm` scenario): the header's pill must still be the new tab's |
 | `PLAYGUARD_SIM_UNLOCKED=1` | Parental controls temporarily unlocked |
 | `PLAYGUARD_SIM_UNPAIRED=1` | No companion app linked |
 | `PLAYGUARD_SIM_ALARM_OFF=1` | The "time's up" alarm off |

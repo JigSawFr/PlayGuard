@@ -183,8 +183,14 @@ def steps(page, text):
 
 def shot(page, name):
     # A moment for the screen to settle (borealis' animations last 300 ms),
-    # then the canvas as PlayGuard drew it.
+    # and as long again as borealis still holds the input (a screen opening
+    # on a busy runner: the footer's hints greyed), up to 5 s; then, two
+    # frames later, the canvas as PlayGuard drew it.
     time.sleep(1.5)
+    end = time.time() + 5
+    while time.time() < end and page.evaluate("Module.ccall('playguard_web_busy', 'number', [], [])"):
+        time.sleep(0.1)
+    page.evaluate("new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))")
     data = page.evaluate("canvas.toDataURL('image/png')")
     with open(os.path.join(OUT, name + ".png"), "wb") as f:
         f.write(base64.b64decode(data.split(",", 1)[1]))
