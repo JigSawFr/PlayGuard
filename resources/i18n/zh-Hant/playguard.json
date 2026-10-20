@@ -1528,6 +1528,7 @@
         "sd_space_detail": "剩餘 {} MB：PlayGuard 可能無法儲存設定、記錄和日誌。",
         "week": "最近 7 天：遊玩 {}",
         "week_detail": "平均每天 {}。",
+        "week_qr": "顯示 QR 碼",
         "week_top": "玩得最多：{}（{}）。",
         "over_limit": "最近 7 天中有 {} 天超過了限制",
         "over_limit_detail": "時間到時主機只會提醒：超過限制後仍可繼續遊玩（遊戲時間 › 時間到時）。",
@@ -1554,6 +1555,7 @@
         },
         "today": {
             "kicker": "今天 · {}的限制",
+            "kicker_short": "{} · {}",
             "free": "不限",
             "no_limit": "無限制",
             "unlocked": "已解除",
@@ -1704,6 +1706,7 @@
             "back": "返回家長 · PIN",
             "play": "交出主機去玩",
             "on_hold": "限制已暫停",
+            "until_bed": "距離就寢時間",
             "end": "約 {} 結束",
             "extra": "加時",
             "no_extra": "現在沒有生效的限制：無需加時。"

@@ -7,6 +7,7 @@
 
 #include "tab/cadran_list.hpp"
 #include "tab/tab_base.hpp"
+#include "ui/live_prefs.hpp"
 #include "ui/text_size.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -22,7 +23,7 @@ static constexpr const char* TEXT_ID     = "header_text_size";
 static std::string language_code()
 {
     std::string locale = config::get().language;
-    if (locale == "system") locale = brls::Application::getLocale();
+    if (locale == "system") locale = live_prefs::locale();
     std::string code;
     for (char c : locale) {
         if (c == '-' || c == '_') break;

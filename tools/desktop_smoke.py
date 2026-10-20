@@ -1299,6 +1299,23 @@ if CADRAN:
     time.sleep(1)              # the screen's own entrance over
     shot("20_notices")
     key("Escape")
+
+    # Preferences › Theme and Language, applied at once: every screen made
+    # again in the light theme, then in French, on Preferences, no restart.
+    key("Left")
+    key("Down", steps("activity", "preferences"))
+    key("Right")               # Language, the first tile
+    key("Right")               # Theme
+    key("Return")
+    key("Up")                  # Light, above Dark
+    key("Return")
+    time.sleep(1)
+    shot("21_live_theme")
+    key("Return")              # Language, focused again on the new screen
+    key("Down", 2)             # Français, after the console's and English
+    key("Return")
+    time.sleep(1)
+    shot("22_live_language")
     finish()
 if CADRANSTATES:
     # Today and the Play timer in the states "alarm" and "outside" set up:

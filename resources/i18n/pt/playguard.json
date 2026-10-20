@@ -1528,6 +1528,7 @@
         "sd_space_detail": "Restam {} MB: o PlayGuard pode deixar de conseguir guardar as definições, o histórico e os registos.",
         "week": "Últimos 7 dias: {} de jogo",
         "week_detail": "{} por dia em média.",
+        "week_qr": "Mostrar o código QR",
         "week_top": "O mais jogado: {} ({}).",
         "over_limit": "O limite foi ultrapassado em {} dos últimos 7 dias",
         "over_limit_detail": "Quando o tempo acaba, a consola apenas avisa: continua-se a jogar além do limite (Tempo de jogo › Quando o tempo acaba).",
@@ -1554,6 +1555,7 @@
         },
         "today": {
             "kicker": "Hoje · limite de {}",
+            "kicker_short": "{} · {}",
             "free": "livre",
             "no_limit": "sem limite",
             "unlocked": "desbloqueado",
@@ -1704,6 +1706,7 @@
             "back": "Voltar ao adulto · PIN",
             "play": "Entregar a consola e jogar",
             "on_hold": "limite em pausa",
+            "until_bed": "até à hora de dormir",
             "end": "Termina por volta das {}",
             "extra": "Tempo extra",
             "no_extra": "Nenhum limite está a contar agora: não há nada a prolongar."

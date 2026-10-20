@@ -46,6 +46,7 @@
 #include "tab/security_tab.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/cut_text.hpp"
+#include "ui/live_prefs.hpp"
 #include "ui/text_size.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -334,17 +335,6 @@ void apply_locale()
         brls::Platform::APP_LOCALE_DEFAULT = brls::LOCALE_AUTO;
 }
 
-// Dark by default (config Config::theme), light when chosen, or the console's
-// own theme for "system" (once the window exists).
-void apply_theme()
-{
-    const auto& cfg = config::get();
-    if (cfg.theme == "dark")
-        brls::Application::getPlatform()->setThemeVariant(brls::ThemeVariant::DARK);
-    else if (cfg.theme == "light")
-        brls::Application::getPlatform()->setThemeVariant(brls::ThemeVariant::LIGHT);
-}
-
 // The views the XML layouts name, and what goes in every screen's header.
 void register_views()
 {
@@ -478,7 +468,10 @@ int main(int argc, char* argv[])
     ui::use_latin_font();
     startup_mark(StartupStep_Window);
 
-    apply_theme();
+    // The console's own theme and language first ("system"), then the
+    // preferences' theme: dark by default, light when chosen.
+    live_prefs::remember_system();
+    live_prefs::apply_theme();
 
     // No cross-fade when a screen opens or closes: on the console's LCD the
     // two screens blended for 200 ms read as ghosting. 2 ms, not 0: borealis
