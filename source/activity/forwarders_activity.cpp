@@ -175,7 +175,8 @@ void ForwardersActivity::onContentAvailable()
         ui::qr_dialog("playguard/forwarders/help_body"_i18n, std::string(app::repo_url()) + "/blob/main/docs/features.md#forwarders");
         return true;
     });
-    this->rebuild();
+    // The first list at once: the screen is not on top yet while it opens.
+    this->build();
 }
 
 void ForwardersActivity::fixes()
@@ -360,6 +361,11 @@ void ForwardersActivity::rebuild(uint64_t focus_id, brls::View* keep)
         });
         return;
     }
+    this->build(focus_id, keep);
+}
+
+void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
+{
     // The focus to a cell that stays before the old rows go.
     brls::Application::giveFocus(keep ? keep : (brls::View*)self_cell.getView());
     this->cells.clear();
