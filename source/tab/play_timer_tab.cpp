@@ -385,6 +385,7 @@ void PlayTimerTab::rerender()
     const std::string current = pt.valid ? profiles::match(pt.day_min) : "";
     const size_t count = current.empty() ? profiles::count() : 0;
     const std::string saved = !current.empty() ? current
+                              : count == 1 ? "playguard/play_timer/profiles_count_one"_i18n
                               : count ? brls::getStr("playguard/play_timer/profiles_count", (int)count) : "";
     if (!profile.empty()) profile_name->setText(brls::getStr("playguard/cadran/week/profile", profile));
     else if (!saved.empty() && !this->changes()) profile_name->setText("playguard/play_timer/profiles"_i18n + " · " + saved);

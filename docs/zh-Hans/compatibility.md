@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 1fe10bbb78d4 -->
+<!-- translated from docs/compatibility.md, sha256 33251c660faf -->
 # 兼容性
 
 支持的系统版本、Atmosphère 和启动器，emuMMC 和 sysMMC，以及 PlayGuard 与替代型 sysmodule 的比较。返回 [README](../../README.md)。
@@ -30,19 +30,35 @@
 
 PlayGuard 检查的是 Atmosphère 是否在运行，而不是它的版本：重要的是它启动的系统版本。*主机* 会同时显示两者。
 
-**启动器**。建议在游戏之上启动（title override）。应用会显示它是作为应用还是作为小程序（相册）运行。在游戏之上启动时，主机会把 PlayGuard 的时间算作那个游戏的时间。在游玩记录中，这些时间记在启动时选择的用户名下：请用家长的用户打开它，而不是孩子的。游戏时间计时器是主机的，对所有用户都一样：无论谁打开 PlayGuard，这段时间都会计入（除非计时器已关闭）。
+## 需要了解的事项
 
-**Nintendo Switch 2**。不支持：它没有 Atmosphère。
+### 启动器
 
-<a id="newer-firmware"></a>**更新的系统版本**？系统版本比在主机上测试过的最新版本还新时，PlayGuard 会以**只读**方式打开，并检查是否有更新的发布版本支持它。如果有，它会提示更新（在 PlayGuard 内，或通过 sphaira 或 Homebrew App Store）。否则由你选择：只读、只读并带开发者工具（用于研究这个系统版本），或使用所有功能，风险自负。可以针对该系统版本和应用版本记住这个选择；*主机 › 兼容性* 会重新显示这个画面。
+建议在游戏之上启动（title override）。应用会显示它是作为应用还是作为小程序（相册）运行。在游戏之上启动时，主机会把 PlayGuard 的时间算作那个游戏的时间。在游玩记录中，这些时间记在启动时选择的用户名下：请用家长的用户打开它，而不是孩子的。游戏时间计时器是主机的，对所有用户都一样：无论谁打开 PlayGuard，这段时间都会计入（除非计时器已关闭）。
 
-**emuMMC 和 sysMMC**。两者各有各的家长控制，PlayGuard 只能看到它所运行的系统的设置。在 emuMMC 上，*主机* 和 *入门* 会说明这一点；在 sysMMC 上，如果 SD 卡上设置了 emuMMC，也会说明。请在两边都设置家长控制，或者隐藏 hekate 的启动菜单，让孩子无法选择另一个系统。PlayGuard 把每个系统的历史记录、备份和状态分开保存（sysMMC 和 emuMMC，在 `nand/` 中）；偏好设置和配置是共用的。
+### Nintendo Switch 2
 
-**主机会被封禁吗**？PlayGuard 从不连接任天堂：联网时，它只访问公共时间服务器和 GitHub（更新，以及你发送的报告）。导致主机被封的是带着自制固件或 emuMMC 连接任天堂（[switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)）。目前没有因修改家长控制或时钟而被封的记录；但这不是保证。
+不支持：它没有 Atmosphère。
 
-**不联网的主机**？PlayGuard 正是为此而做的，而游戏时间计时器仍然需要一个设置过的网络时钟。没有时间服务器可以询问时，*主机 › 网络时钟 › 测量时间差* 会提示改为把它设为主机时钟：请先检查主机时钟，同时让 *通过互联网同步时钟* 保持关闭，之后再开启这个设置（见[主机](features.md#主机网络时钟已安装的游戏主机运行的系统)）。
+### 更新的系统版本
 
-**手机通知**。从 22.0.0 起，仍然关联着手机应用的主机在输入 PIN 时，可能会通知家长（[switchbrew](https://switchbrew.org/wiki/22.0.0)）。PlayGuard 自己的解除是否会触发通知，目前还不清楚。
+系统版本比在主机上测试过的最新版本还新时，PlayGuard 会以**只读**方式打开，并检查是否有更新的发布版本支持它。如果有，它会提示更新（在 PlayGuard 内，或通过 sphaira 或 Homebrew App Store）。否则由你选择：只读、只读并带开发者工具（用于研究这个系统版本），或使用所有功能，风险自负。可以针对该系统版本和应用版本记住这个选择；*主机 › 兼容性* 会重新显示这个画面。
+
+### emuMMC 和 sysMMC
+
+两者各有各的家长控制，PlayGuard 只能看到它所运行的系统的设置。在 emuMMC 上，*主机* 和 *入门* 会说明这一点；在 sysMMC 上，如果 SD 卡上设置了 emuMMC，也会说明。请在两边都设置家长控制，或者隐藏 hekate 的启动菜单，让孩子无法选择另一个系统。PlayGuard 把每个系统的历史记录、备份和状态分开保存（sysMMC 和 emuMMC，在 `nand/` 中）；偏好设置和配置是共用的。
+
+### 主机会被封禁吗？
+
+PlayGuard 从不连接任天堂：联网时，它只访问公共时间服务器和 GitHub（更新，以及你发送的报告）。导致主机被封的是带着自制固件或 emuMMC 连接任天堂（[switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)）。目前没有因修改家长控制或时钟而被封的记录；但这不是保证。
+
+### 不联网的主机
+
+PlayGuard 正是为此而做的，而游戏时间计时器仍然需要一个设置过的网络时钟。没有时间服务器可以询问时，*主机 › 网络时钟 › 测量时间差* 会提示改为把它设为主机时钟：请先检查主机时钟，同时让 *通过互联网同步时钟* 保持关闭，之后再开启这个设置（见[网络时钟](features.md#没有服务器回应)）。
+
+### 手机通知
+
+从 22.0.0 起，仍然关联着手机应用的主机在输入 PIN 时，可能会通知家长（[switchbrew](https://switchbrew.org/wiki/22.0.0)）。PlayGuard 自己的解除是否会触发通知，目前还不清楚。
 
 ## 为什么做 PlayGuard
 
@@ -56,10 +72,12 @@ PlayGuard 检查的是 Atmosphère 是否在运行，而不是它的版本：重
 
 PlayGuard 离线操作主机内置的家长控制（`pctl` 服务）。另一种做法是用 sysmodule 取代它们，例如 [NS Parental Control](https://github.com/TristanIsrael/NSParentalControl)（一个 sysmodule 加一个 Tesla / Ultrahand 覆盖层）。
 
-- **游戏时间限制**——PlayGuard：整台主机一个（主机自身的计时器）。替代型 sysmodule：每个用户一个。
-- **PIN、提醒、中断**——PlayGuard：主机的。替代型 sysmodule：它自己的。
-- **在后台**——PlayGuard：没有任何东西（可选的恢复 sysmodule 只在启动时、有 `RESCUE` 文件要求时才起作用）。替代型 sysmodule：一个 sysmodule，从开机起运行。
-- **系统版本更新之后**——PlayGuard：主机的家长控制继续有效；PlayGuard 以只读方式打开，直到有版本支持该系统版本。替代型 sysmodule：家长控制取决于 sysmodule 是否仍然能用。
-- **从 SD 卡删除后**——PlayGuard：限制仍然留在主机上。替代型 sysmodule：家长控制随之消失。
+| | PlayGuard | 替代型 sysmodule |
+|---|---|---|
+| **游戏时间限制** | 整台主机一个（主机自身的计时器） | 每个用户一个 |
+| **PIN、提醒、中断** | 主机的 | 它自己的 |
+| **在后台** | 没有任何东西（可选的恢复 sysmodule 只在启动时、有 `RESCUE` 文件要求时才起作用） | 一个 sysmodule，从开机起运行 |
+| **系统版本更新之后** | 主机的家长控制继续有效；PlayGuard 以只读方式打开，直到有版本支持该系统版本 | 家长控制取决于 sysmodule 是否仍然能用 |
+| **从 SD 卡删除后** | 限制仍然留在主机上 | 家长控制随之消失 |
 
 **每个孩子需要不同的限制**？请选择替代型 sysmodule——主机的计时器整台主机只有一个限制。否则，PlayGuard 保留任天堂的家长控制，只是把它们的设置带到主机上。

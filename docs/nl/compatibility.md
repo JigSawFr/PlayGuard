@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 1fe10bbb78d4 -->
+<!-- translated from docs/compatibility.md, sha256 33251c660faf -->
 # Compatibiliteit
 
 Ondersteunde firmware, Atmosphère en launchers, emuMMC en sysMMC, en hoe PlayGuard zich verhoudt tot een vervangende sysmodule. Terug naar de [README](../../README.md).
@@ -30,19 +30,35 @@ Ondersteunde firmware, Atmosphère en launchers, emuMMC en sysMMC, en hoe PlayGu
 
 PlayGuard controleert of Atmosphère draait, niet welke versie: wat telt, is de firmware die het opstart. *Console* toont beide.
 
-**Launchers.** Starten boven een game (title override) wordt aanbevolen. De app zegt of hij als applicatie of als applet (album) draait. Boven een game telt de console de tijd in PlayGuard als tijd van die game. In de activiteit gaat die naar de gebruiker die bij het starten is gekozen: open het met de gebruiker van een ouder, niet van een kind. De speeltijdtimer is die van de console, dezelfde voor elke gebruiker: hij telt die tijd mee, wie PlayGuard ook opende (tenzij de timer uit staat).
+## Goed om te weten
 
-**Nintendo Switch 2.** Niet ondersteund: er bestaat geen Atmosphère voor.
+### Launchers
 
-<a id="nieuwere-firmware"></a>**Nieuwere firmware?** Boven de nieuwste firmware die op een console is getest, opent PlayGuard **alleen-lezen** en controleert het of een nieuwere release hem ondersteunt. Zo ja, dan stelt het voor om bij te werken (in PlayGuard zelf, via sphaira of de Homebrew App Store). Anders kies je: alleen-lezen, alleen-lezen met de ontwikkelaarstools (om de firmware te onderzoeken), of alle functies op eigen risico. De keuze kan worden onthouden voor die firmware en die versie van de app; *Console › Compatibiliteit* brengt het scherm terug.
+Starten boven een game (title override) wordt aanbevolen. De app zegt of hij als applicatie of als applet (album) draait. Boven een game telt de console de tijd in PlayGuard als tijd van die game. In de activiteit gaat die naar de gebruiker die bij het starten is gekozen: open het met de gebruiker van een ouder, niet van een kind. De speeltijdtimer is die van de console, dezelfde voor elke gebruiker: hij telt die tijd mee, wie PlayGuard ook opende (tenzij de timer uit staat).
 
-**emuMMC en sysMMC.** Elk heeft zijn eigen ouderlijk toezicht, en PlayGuard ziet alleen dat van het systeem waarop het draait. Op emuMMC melden *Console* en *Eerste stappen* dat; op sysMMC ook, als er een emuMMC op de SD-kaart is ingesteld. Stel het toezicht op beide in, of verberg het opstartmenu van hekate zodat een kind het andere systeem niet kan kiezen. PlayGuard houdt de geschiedenis, back-ups en toestand van elk systeem gescheiden (de sysMMC en de emuMMC, in `nand/`); de voorkeuren en profielen worden gedeeld.
+### Nintendo Switch 2
 
-**Kan de console hierdoor een ban krijgen?** PlayGuard neemt nooit contact op met Nintendo: online bereikt het alleen openbare tijdservers en GitHub (updates, en de rapporten die je verstuurt). Consoles krijgen een ban door custom firmware of een emuMMC die online gaat naar Nintendo ([FAQ van switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), in het Engels). Er is geen ban gedocumenteerd die samenhangt met wijzigingen aan ouderlijk toezicht of de klok; dat is geen garantie.
+Niet ondersteund: er bestaat geen Atmosphère voor.
 
-**Een console zonder internet?** Daar is PlayGuard voor, en de speeltijdtimer heeft toch een netwerkklok nodig die is ingesteld. Zonder tijdserver om te raadplegen biedt *Console › Netwerkklok › Tijdsverschil meten* aan om hem in plaats daarvan op de consoleklok in te stellen: controleer eerst de consoleklok, met *Klok synchroniseren via internet* uit, en zet die instelling pas daarna aan (zie [Console](features.md#console--de-netwerkklok-de-geïnstalleerde-games-wat-de-console-draait)).
+### Nieuwere firmware
 
-**Meldingen op de telefoon.** Sinds 22.0.0 kan een console die nog aan de app op de telefoon gekoppeld is, de ouder waarschuwen als de pincode op de console wordt ingevoerd ([switchbrew](https://switchbrew.org/wiki/22.0.0), in het Engels). Of de ontgrendelingen van PlayGuard dat ook doen, is niet bekend.
+Boven de nieuwste firmware die op een console is getest, opent PlayGuard **alleen-lezen** en controleert het of een nieuwere release hem ondersteunt. Zo ja, dan stelt het voor om bij te werken (in PlayGuard zelf, via sphaira of de Homebrew App Store). Anders kies je: alleen-lezen, alleen-lezen met de ontwikkelaarstools (om de firmware te onderzoeken), of alle functies op eigen risico. De keuze kan worden onthouden voor die firmware en die versie van de app; *Console › Compatibiliteit* brengt het scherm terug.
+
+### emuMMC en sysMMC
+
+Elk heeft zijn eigen ouderlijk toezicht, en PlayGuard ziet alleen dat van het systeem waarop het draait. Op emuMMC melden *Console* en *Eerste stappen* dat; op sysMMC ook, als er een emuMMC op de SD-kaart is ingesteld. Stel het toezicht op beide in, of verberg het opstartmenu van hekate zodat een kind het andere systeem niet kan kiezen. PlayGuard houdt de geschiedenis, back-ups en toestand van elk systeem gescheiden (de sysMMC en de emuMMC, in `nand/`); de voorkeuren en profielen worden gedeeld.
+
+### Kan de console hierdoor een ban krijgen?
+
+PlayGuard neemt nooit contact op met Nintendo: online bereikt het alleen openbare tijdservers en GitHub (updates, en de rapporten die je verstuurt). Consoles krijgen een ban door custom firmware of een emuMMC die online gaat naar Nintendo ([FAQ van switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), in het Engels). Er is geen ban gedocumenteerd die samenhangt met wijzigingen aan ouderlijk toezicht of de klok; dat is geen garantie.
+
+### Een console zonder internet
+
+Daar is PlayGuard voor, en de speeltijdtimer heeft toch een netwerkklok nodig die is ingesteld. Zonder tijdserver om te raadplegen biedt *Console › Netwerkklok › Tijdsverschil meten* aan om hem in plaats daarvan op de consoleklok in te stellen: controleer eerst de consoleklok, met *Klok synchroniseren via internet* uit, en zet die instelling pas daarna aan (zie [netwerkklok](features.md#geen-enkele-server-antwoordt)).
+
+### Meldingen op de telefoon
+
+Sinds 22.0.0 kan een console die nog aan de app op de telefoon gekoppeld is, de ouder waarschuwen als de pincode op de console wordt ingevoerd ([switchbrew](https://switchbrew.org/wiki/22.0.0), in het Engels). Of de ontgrendelingen van PlayGuard dat ook doen, is niet bekend.
 
 ## Waarom PlayGuard
 
@@ -56,10 +72,12 @@ Door het toezicht van de console zelf aan te sturen, gaat ook de deur open naar 
 
 PlayGuard stuurt het ouderlijk toezicht aan dat in de console zit (de dienst `pctl`), offline. De andere aanpak vervangt het door een sysmodule, bijvoorbeeld [NS Parental Control](https://github.com/TristanIsrael/NSParentalControl) (een sysmodule en een Tesla / Ultrahand-overlay).
 
-- **Speeltijdlimiet** — PlayGuard: Eén voor de console (de eigen timer van de console). Een vervangende sysmodule: Eén per gebruikersaccount.
-- **Pincode, waarschuwingen, onderbreking** — PlayGuard: Die van de console. Een vervangende sysmodule: Zijn eigen.
-- **Op de achtergrond** — PlayGuard: Niets (de optionele herstel-sysmodule doet alleen iets bij het opstarten, als een `RESCUE`-bestand daarom vraagt). Een vervangende sysmodule: Een sysmodule, vanaf het opstarten.
-- **Na een firmware-update** — PlayGuard: Het toezicht van de console blijft werken; PlayGuard opent alleen-lezen tot een versie de firmware ondersteunt. Een vervangende sysmodule: Het toezicht hangt ervan af of de sysmodule nog werkt.
-- **Verwijderd van de SD-kaart** — PlayGuard: De limieten blijven op de console. Een vervangende sysmodule: Het toezicht verdwijnt mee.
+| | PlayGuard | Een vervangende sysmodule |
+|---|---|---|
+| **Speeltijdlimiet** | Eén voor de console (de eigen timer van de console) | Eén per gebruikersaccount |
+| **Pincode, waarschuwingen, onderbreking** | Die van de console | Zijn eigen |
+| **Op de achtergrond** | Niets (de optionele herstel-sysmodule doet alleen iets bij het opstarten, als een `RESCUE`-bestand daarom vraagt) | Een sysmodule, vanaf het opstarten |
+| **Na een firmware-update** | Het toezicht van de console blijft werken; PlayGuard opent alleen-lezen tot een versie de firmware ondersteunt | Het toezicht hangt ervan af of de sysmodule nog werkt |
+| **Verwijderd van de SD-kaart** | De limieten blijven op de console | Het toezicht verdwijnt mee |
 
 **Een andere limiet nodig voor elk kind?** Kies een vervangende sysmodule — de timer van de console heeft één limiet voor de hele console. Anders behoudt PlayGuard het toezicht van Nintendo en brengt het alleen de instellingen ervan naar de console.

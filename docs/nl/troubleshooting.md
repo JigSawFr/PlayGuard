@@ -1,7 +1,7 @@
-<!-- translated from docs/troubleshooting.md, sha256 93378334f3c8 -->
+<!-- translated from docs/troubleshooting.md, sha256 b9da08e73591 -->
 # Problemen oplossen
 
-Weer toegang krijgen tot een vergrendelde console, een bug melden, en de ontwikkelaarsmodus. Terug naar de [README](../../README.md).
+Weer toegang krijgen tot een vergrendelde console, de veelvoorkomende problemen, een bug melden, en de ontwikkelaarsmodus. Terug naar de [README](../../README.md).
 
 ## Buitengesloten?
 
@@ -27,6 +27,50 @@ De module moet de versie van PlayGuard volgen: pak bij elke update van PlayGuard
 
 PlayGuard kan niet helpen: het heeft Atmosphère nodig. De master-key-procedure van de klantenservice van Nintendo is de officiële weg.
 
+## Veelvoorkomende problemen
+
+### De resterende tijd daalt niet
+
+*Vandaag* meldt *De console telt op dit moment geen speeltijd* als die ongeveer 90 s niet is veranderd. De waarschijnlijke oorzaken:
+
+- **De netwerkklok is nooit ingesteld.** *Console › Netwerkklok › Tijdsverschil meten*, en stel hem daarna in ([netwerkklok](features.md#netwerkklok)).
+- **De klok is teruggezet.** Na een sprong terug stopt de telling tot de klok het oude tijdstip voorbij is; je hoeft niets te doen.
+- **Er is net een limiet geschreven.** Start een game voor een minuut en kijk dan opnieuw.
+- **Ouderlijk toezicht is tijdelijk ontgrendeld.** Speeltijd wordt dan mogelijk niet geteld: *Pincode › Ouderlijk toezicht weer inschakelen*.
+
+### Mijn limieten zijn vanzelf veranderd
+
+- **De app op de telefoon is nog gekoppeld.** De volgende synchronisatie overschrijft wat PlayGuard heeft ingesteld: *Pincode › Smartphone-app ontkoppelen*.
+- **Een ander hulpmiddel, of een profiel.** *Vandaag* toont een oranje kaart voor limieten die afwijken van wat PlayGuard het laatst zag, en *Geschiedenis › Wijzigingsgeschiedenis* toont elke wijziging die buiten PlayGuard is gezien. Ⓐ op een wijziging zet de vorige waarde terug.
+- **Een gepland profiel** dat is toegepast, of teruggezet zodra zijn periode voorbij was (*Speeltijdtimer › Profielen › Gepland profiel*).
+
+### Het kind speelde langer dan de limiet
+
+- **De console waarschuwt alleen.** *Speeltijdtimer › Als de tijd om is*: kies *Software onderbreken*.
+- **Ouderlijk toezicht bleef ontgrendeld.** Zolang dat zo is, is de limiet van vandaag gepauzeerd: de pil in de kopregel zegt dat op elk tabblad; *Pincode › Ouderlijk toezicht weer inschakelen*. Een herstart van de console vergrendelt het ook.
+- **De klok is teruggezet.** De telling stopt tot de klok het oude tijdstip voorbij is ([wat telt](features.md#wat-telt-als-speeltijd)).
+- **Het andere systeem.** emuMMC en sysMMC hebben elk hun eigen ouderlijk toezicht: stel het op beide in, of verberg het opstartmenu van hekate ([compatibiliteit](compatibility.md#emummc-en-sysmmc)).
+
+### De hele limiet is vandaag weer beschikbaar
+
+De klok wijzigen (de netwerkklok of de consoleklok) zet de speeltijd van vandaag terug op nul. Stel de klok in voordat het kind speelt, niet erna.
+
+### PlayGuard opent alleen-lezen
+
+De console draait een firmware die nieuwer is dan de nieuwste geteste: PlayGuard controleert of een nieuwere release hem ondersteunt en stelt voor om bij te werken ([nieuwere firmware](compatibility.md#nieuwere-firmware)). Een doorgestreept potlood rechts van de titel geeft aan dat de app alleen-lezen is; erop tikken opent het firmwarescherm.
+
+### PlayGuard vraagt steeds om de pincode, of nooit
+
+*Pincode › PlayGuard beveiligen met de pincode*: *Vóór een wijziging* (de standaard) vraagt er één keer om, vóór de eerste wijziging, en de pincode geldt tot PlayGuard wordt gesloten. *Na 5 minuten opnieuw om de pincode vragen* vraagt er daarna opnieuw om. *Pincode tonen* vraagt er altijd om.
+
+### Een game start niet, of toont een "!" in het HOME-menu
+
+*Console › Geïnstalleerde games controleren* zegt wat er met elke game mis is en wat je moet doen; opgeslagen spelgegevens blijven altijd staan ([geïnstalleerde games](features.md#geïnstalleerde-games)).
+
+### De bel of een tabblad toont een oranje badge
+
+Er moet iets gebeuren: Ⓨ opent de lijst, en Ⓐ op een melding voert de oplossing uit of opent de plek waar je het oplost ([meldingen](features.md#meldingen--wat-je-aandacht-vraagt-vanuit-elk-tabblad)).
+
 ## Een bug melden
 
 Een fout toont de code van het systeem (zoals `0x0001088E`) met wat erover bekend is: wat je moet doen bij de codes waarvan de betekenis bekend is, anders helpt een rapport.
@@ -34,7 +78,19 @@ Een fout toont de code van het systeem (zoals `0x0001088E`) met wat erover beken
 1. *Info › Hulp en diagnose › Een diagnoserapport exporteren* slaat een tekstbestand op in `sd:/config/playguard/logs/reports/`: firmware, Atmosphère-versie, hoe lang het opstarten duurde en hoe lang de trage schermen duurden (de wijzigingsgeschiedenis, *Alle games*, de controle van de geïnstalleerde games, de tabbladen die zichzelf vernieuwen), klokken, opslag, de status van het afschermen van het serienummer en van de gamepatches, het ruwe resultaat van elke opvraging van het ouderlijk toezicht, en de logs: hoe de laatste sessie eindigde, het geheugen en de ruimte op de SD-kaart die nog vrij zijn, de nieuwste crashbestanden en de laatste 80 gelogde regels. **Het bevat nooit de pincode of het serienummer.**
 2. [Open een issue](https://github.com/JigSawFr/PlayGuard/issues/new) en voeg het toe.
 
-Of, met de console online, *Info › Hulp en diagnose › Rapport online versturen* (Ⓧ op het diagnoserapport in ontwikkelaarsmodus) verstuurt het, met de nieuwste crashrapporten (de laatste 3 van PlayGuard in `logs/crashes/`, en de laatste 2 van Atmosphère van een homebrew van de afgelopen week, in `sd:/atmosphere/crash_reports/`: de crash van een andere homebrew kan daarbij zitten, de lijst die vóór het versturen wordt getoond, zegt welke), de logs van deze sessie en de vorige (`logs/sessions/`; bij een lang log: het begin en de laatste 64 KiB) en de debugbestanden (de referentie van het speeltijdblok, het einde van de opname van de speeltijdtimer zolang *Speeltijdtimer vastleggen* aan staat, de laatste 20 wijzigingen uit de wijzigingsgeschiedenis, zonder namen (van games, accounts of profielen) en met alleen hun datum, en de instellingen van PlayGuard), naar een geheime gist in je GitHub-account (het rapport en elk bestand als een apart bestand; ben je afgemeld, dan biedt PlayGuard eerst aan om je aan te melden; *GitHub-account*, eronder zodra je bent aangemeld, meldt je af; als GitHub de gist weigert, biedt PlayGuard aan om opnieuw aan te melden), nadat het precies heeft gezegd wat er wordt verstuurd. Het toont de link en twee QR-codes: het rapport, en het formulier voor een bugmelding met de link, je versies, hoe PlayGuard werd gestart (boven een game of vanuit het album; voeg het menu toe) en het systeem (sysMMC of emuMMC) al ingevuld. Iedereen met de link kan het rapport lezen, tot je de gist op GitHub verwijdert, en een bugmelding die ermee wordt geopend, is openbaar: de bevestiging zegt dat. Elke link wordt in `logs/uploads/` bewaard als internetsnelkoppeling (`.url`) die een computer in zijn browser opent. Een rapport dat eerder in `logs/reports/` is opgeslagen, kan op dezelfde manier worden verstuurd.
+### Een rapport online versturen
+
+Met de console online verstuurt *Info › Hulp en diagnose › Rapport online versturen* (Ⓧ op het diagnoserapport in ontwikkelaarsmodus) het naar een geheime gist in je GitHub-account, nadat het precies heeft gezegd wat er wordt verstuurd. Een rapport dat eerder in `logs/reports/` is opgeslagen, kan op dezelfde manier worden verstuurd.
+
+- **Wat er wordt verstuurd:** het rapport en elk bestand als een apart bestand:
+  - de nieuwste crashrapporten: de laatste 3 van PlayGuard in `logs/crashes/`, en de laatste 2 van Atmosphère van een homebrew van de afgelopen week, in `sd:/atmosphere/crash_reports/` (de crash van een andere homebrew kan daarbij zitten: de lijst die vóór het versturen wordt getoond, zegt welke);
+  - de logs van deze sessie en de vorige (`logs/sessions/`; bij een lang log: het begin en de laatste 64 KiB);
+  - de debugbestanden: de referentie van het speeltijdblok, het einde van de opname van de speeltijdtimer zolang *Speeltijdtimer vastleggen* aan staat, de laatste 20 wijzigingen uit de wijzigingsgeschiedenis (zonder namen van games, accounts of profielen, en met alleen hun datum), en de instellingen van PlayGuard.
+- **Aanmelden:** ben je afgemeld, dan biedt PlayGuard eerst aan om je aan te melden; *GitHub-account*, eronder zodra je bent aangemeld, meldt je af; als GitHub de gist weigert, biedt PlayGuard aan om opnieuw aan te melden.
+- **Daarna:** het toont de link en twee QR-codes: het rapport, en het formulier voor een bugmelding met de link, je versies, hoe PlayGuard werd gestart (boven een game of vanuit het album; voeg het menu toe) en het systeem (sysMMC of emuMMC) al ingevuld. Elke link wordt in `logs/uploads/` bewaard als internetsnelkoppeling (`.url`) die een computer in zijn browser opent.
+
+> [!WARNING]
+> Iedereen met de link kan het rapport lezen, tot je de gist op GitHub verwijdert, en een bugmelding die ermee wordt geopend, is openbaar: de bevestiging zegt dat.
 
 ### Wat PlayGuard op de SD-kaart bewaart
 
@@ -57,8 +113,34 @@ Druk zeven keer op Ⓨ op *Info › Versie*; de ontwikkelaarstools verschijnen o
 
 - een schakelaar **alleen-lezen** — staat die aan, dan kan de app niets wijzigen: de veilige manier om een nieuwe firmware te onderzoeken (het firmwarescherm biedt hem direct aan);
 - het diagnoserapport op het scherm (Ⓨ slaat het op, Ⓧ verstuurt het online), en een snelkoppeling om het te exporteren vanuit het tabblad Speeltijdtimer;
-- **Andere build installeren** ter plekke, om een oplossing te testen voordat die wordt uitgebracht: een van de laatste 20 releases (inclusief voorlopige versies, met een label), een van de laatste 20 commits van `main`, of de nieuwste build van een open pull request vanuit een branch van deze repository (nooit vanuit een fork: die code is nog niet nagekeken), elke soort in een eigen tabblad (Ⓛ / Ⓡ, aan weerszijden van de tabbladen getoond, gaan van het ene naar het volgende; het scherm opent op het tabblad van de geïnstalleerde build, en elk tabblad telt de builds die nieuwer zijn dan de geïnstalleerde). Elke build toont zijn titel (het onderwerp van een commit of pull request; het volledige bericht van een commit is de beschrijving) boven labels: het soort wijziging (*Functie*, *Oplossing*, *Docs*…) en het bereik ervan, *Incompatibel*, de pull request waar een commit vandaan komt, hoe de controles afliepen (*CI OK*, *CI mislukt*, *CI bezig*), voorlopige versie, *geïnstalleerd* of *nieuw*; hoe oud hij is en zijn commit rechts. A op het tabblad van de pull requests, als dat wordt getoond, sorteert ze andersom (nieuwste build eerst, of op nummer). Een build opent eerst zijn pagina: labels (het soort, de controles, geïnstalleerd of nieuw), een kaart met gegevens (gebouwd, grootte, commit, checksum, wanneer GitHub hem verwijdert), **Installeren**, **Bekijken op GitHub** (de pagina als QR-code voor een telefoon), en dan de opmerkingen van een release of de beschrijving van een pull request, opgemaakt vanuit de Markdown van GitHub (koppen, lijsten, selectievakjes, code, citaten en waarschuwingen, tabellen). Alles wat van GitHub komt, wordt als platte tekst getoond: er wordt geen link geopend, geen HTML of script uitgevoerd, en onzichtbare tekens die een titel zouden kunnen vermommen (overschrijvingen van rechts naar links, tekens met nulbreedte, besturingstekens, ongeldige UTF-8) worden verwijderd. Aangemeld neemt Ⓨ (*Zoeken*) het nummer van een pull request (open of gesloten) of een commit (7 tot 40 hexadecimale tekens) en vindt de build ervan, alleen vanuit een branch van deze repository. De releases hebben niets nodig; de andere zijn de artefacten van de build-workflow, die GitHub alleen aan aangemelde gebruikers geeft: **GitHub-account** meldt aan met een code en een QR-code om met een telefoon te scannen (de enige gevraagde rechten zijn het lezen van de bestanden van de build-workflow (Actions) en het maken van gists, voor *Rapport online versturen*; verder kan het token alleen lezen wat openbaar is; het wordt bewaard in `github_token`, nooit met een rapport meegestuurd, en *GitHub-account* meldt af). PlayGuard downloadt de build, controleert hem (grootte, de SHA-256 die GitHub vastlegt, de NRO-header), zet hem in de plaats van zijn eigen `.nro` en herstart ermee (eerst wordt de pincode gevraagd als er een is ingesteld). De lijst wordt 10 minuten bewaard en meteen getoond, met hoe oud hij is (Ⓧ haalt hem opnieuw op); terwijl hij wordt opgehaald, toont een balk hoe ver het is. Een afgebroken download (netwerk weggevallen) gaat verder waar hij stopte de volgende keer dat dezelfde build wordt geïnstalleerd. De vervangen build blijft bewaard (`playguard.nro.previous`): **Terug naar de vorige build** in dezelfde lijst wisselt ze weer om. Als een build die hier (of via een update in PlayGuard zelf) is geïnstalleerd, crasht vóór zijn eerste scherm, biedt de volgende start van PlayGuard aan om terug te gaan naar de vorige build, op een eenvoudig tekstscherm, voordat er iets anders wordt geladen (A gaat terug, B start hem toch), zonder pincode, omdat juist het pincodescherm zelf kan crashen. Op elk ander moment doet *Terug naar de vorige build* (hierboven) het, na de pincode. Met dezelfde lijst kun je altijd terug naar elke release; *Info › Versie* toont de commit in ontwikkelaarsmodus. De kopregel van elk scherm toont de draaiende versie naast de titel: die van een release in een grijs label (`1.2.0`), die van elke andere build in een oranje label gevolgd door de commit, zodat een testbuild nooit voor de release wordt aangezien. Artefacten verlopen na 90 dagen;
+- **Andere build installeren** ter plekke, om een oplossing te testen voordat die wordt uitgebracht ([hieronder](#een-andere-build-installeren));
 - **Speeltijdblok vergelijken** (alleen zolang de app op de telefoon gekoppeld is en kan synchroniseren — niet met een hosts-bestand dat Nintendo blokkeert; ook in *Pincode*), om instellingen te ontcijferen die PlayGuard nog niet toont: sla het ruwe blok op als referentie, wijzig één instelling in de app op de telefoon, kom terug — PlayGuard toont de waarden die zijn veranderd (op verzoek opgeslagen in `logs/reports/`). Verschillende bedtijden per dag, ingesteld via de app op de telefoon, kunnen zo worden bevestigd. Voeg dat bestand toe aan een issue, of verstuur het met het rapport (*Rapport online versturen*).
 - **Speeltijdtimer vastleggen**: elke 30 s zolang PlayGuard open is, één regel met wat de speeltijdtimer meldt (resterende tijd, gespeelde tijd, het ruwe instellingenblok…) in `logs/play_timer/log.csv`, een bestand dat klaar is voor een spreadsheet, plus een regel direct na elke wijziging die PlayGuard doet, met welke (de laatste kolom, `event`), en een opmerking als de klok meer verschoof dan de tijd die verstreek. Laat je het open over middernacht heen, of tot de tijd om is, dan toont het wat één rapport niet kan: wanneer de gespeelde tijd wordt teruggezet, wat de console tegen het einde zegt. De schakelaar wordt onthouden; hij legt alleen vast in ontwikkelaarsmodus. Wat tot nu toe bekend is, staat in [parental-controls.md](../parental-controls.md) (in het Engels).
 - **Cache wissen** en **Logbestanden verwijderen**, elk na een bevestiging die zegt hoeveel bestanden en hoeveel ruimte: de cache (`cache/` en `nand/<system>/cache/` van elk systeem: namen en icoontjes van games, de laatste cijfers van Activiteit, de lijst van builds) wordt opnieuw van de console gelezen als dat nodig is; de logbestanden zijn de crashbestanden, de sessielogs (behalve dat van deze sessie, dat nog wordt geschreven), de opgeslagen rapporten en de opname van de speeltijdtimer, terwijl `uploads/` (de verwijderlinks van de online verstuurde rapporten) en de referentie van het blok blijven staan. Instellingen, geschiedenis, back-ups, profielen en exports worden nooit aangeraakt.
 - **Beeldstatistieken**: één regel per seconde in `logs/frame_stats.txt`, de tijd die het tekenen van het scherm kostte en de beelden die te laat kwamen, om op de console het ene scherm met het andere te vergelijken. **Achtergrondgloed** zet het zachte licht achter de schermen uit (de modus op de regel eindigt dan op `-noglow`), om te meten wat het kost.
+
+### Een andere build installeren
+
+*Andere build installeren* zet een build in de plaats van de eigen `.nro` van PlayGuard, om een oplossing te testen voordat die wordt uitgebracht.
+
+**Wat het toont**, elke soort in een eigen tabblad (Ⓛ / Ⓡ, aan weerszijden van de tabbladen getoond, gaan van het ene naar het volgende; het scherm opent op het tabblad van de geïnstalleerde build, en elk tabblad telt de builds die nieuwer zijn dan de geïnstalleerde):
+
+- een van de laatste 20 releases (inclusief voorlopige versies, met een label);
+- een van de laatste 20 commits van `main`;
+- de nieuwste build van een open pull request vanuit een branch van deze repository (nooit vanuit een fork: die code is nog niet nagekeken). A op het tabblad van de pull requests, als dat wordt getoond, sorteert ze andersom (nieuwste build eerst, of op nummer).
+
+**Elke build** toont zijn titel (het onderwerp van een commit of pull request; het volledige bericht van een commit is de beschrijving) boven labels: het soort wijziging (*Functie*, *Oplossing*, *Docs*…) en het bereik ervan, *Incompatibel*, de pull request waar een commit vandaan komt, hoe de controles afliepen (*CI OK*, *CI mislukt*, *CI bezig*), voorlopige versie, *geïnstalleerd* of *nieuw*; hoe oud hij is en zijn commit rechts. Een build opent eerst zijn pagina: labels (het soort, de controles, geïnstalleerd of nieuw), een kaart met gegevens (gebouwd, grootte, commit, checksum, wanneer GitHub hem verwijdert), **Installeren**, **Bekijken op GitHub** (de pagina als QR-code voor een telefoon), en dan de opmerkingen van een release of de beschrijving van een pull request, opgemaakt vanuit de Markdown van GitHub (koppen, lijsten, selectievakjes, code, citaten en waarschuwingen, tabellen).
+
+**Veilig om te lezen:** alles wat van GitHub komt, wordt als platte tekst getoond: er wordt geen link geopend, geen HTML of script uitgevoerd, en onzichtbare tekens die een titel zouden kunnen vermommen (overschrijvingen van rechts naar links, tekens met nulbreedte, besturingstekens, ongeldige UTF-8) worden verwijderd.
+
+**Aanmelden.** De releases hebben niets nodig; de andere zijn de artefacten van de build-workflow, die GitHub alleen aan aangemelde gebruikers geeft. **GitHub-account** meldt aan met een code en een QR-code om met een telefoon te scannen. De enige gevraagde rechten zijn het lezen van de bestanden van de build-workflow (Actions) en het maken van gists, voor *Rapport online versturen*; verder kan het token alleen lezen wat openbaar is. Het wordt bewaard in `github_token`, nooit met een rapport meegestuurd, en *GitHub-account* meldt af. Aangemeld neemt Ⓨ (*Zoeken*) het nummer van een pull request (open of gesloten) of een commit (7 tot 40 hexadecimale tekens) en vindt de build ervan, alleen vanuit een branch van deze repository.
+
+**Installeren:** PlayGuard downloadt de build, controleert hem (grootte, de SHA-256 die GitHub vastlegt, de NRO-header), zet hem in de plaats van zijn eigen `.nro` en herstart ermee (eerst wordt de pincode gevraagd als er een is ingesteld).
+
+- De lijst wordt 10 minuten bewaard en meteen getoond, met hoe oud hij is (Ⓧ haalt hem opnieuw op); terwijl hij wordt opgehaald, toont een balk hoe ver het is.
+- Een afgebroken download (netwerk weggevallen) gaat verder waar hij stopte de volgende keer dat dezelfde build wordt geïnstalleerd.
+- Artefacten verlopen na 90 dagen.
+
+**Teruggaan.** De vervangen build blijft bewaard (`playguard.nro.previous`): **Terug naar de vorige build** in dezelfde lijst wisselt ze weer om, na de pincode. Als een build die hier (of via een update in PlayGuard zelf) is geïnstalleerd, crasht vóór zijn eerste scherm, biedt de volgende start van PlayGuard aan om terug te gaan naar de vorige build, op een eenvoudig tekstscherm, voordat er iets anders wordt geladen (A gaat terug, B start hem toch), zonder pincode, omdat juist het pincodescherm zelf kan crashen. Met dezelfde lijst kun je altijd terug naar elke release.
+
+**Welke build draait:** *Info › Versie* toont de commit in ontwikkelaarsmodus. De kopregel van elk scherm toont de draaiende versie naast de titel: die van een release in een grijs label (`1.2.0`), die van elke andere build in een oranje label gevolgd door de commit, zodat een testbuild nooit voor de release wordt aangezien.
