@@ -81,6 +81,11 @@ bool TabBase::shown() const
     return s_shown == this;
 }
 
+std::string TabBase::shown_screen()
+{
+    return s_shown ? s_shown->screen : "";
+}
+
 void TabBase::refresh_shown()
 {
     if (!s_shown) return;

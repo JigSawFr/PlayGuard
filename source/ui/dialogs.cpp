@@ -6,6 +6,7 @@
 #include "ui/cadran_kit.hpp"
 #include "ui/cadran_modal.hpp"
 #include "ui/cadran_text.hpp"
+#include "ui/live_prefs.hpp"
 #include "ui/text_size.hpp"
 #include "util/config.hpp"
 #include "util/text.hpp"
@@ -351,14 +352,19 @@ int index_of(const char* const (&list)[N], const std::string& value)
     return 0;
 }
 
-// Saves `value` in `field`, then refreshes and asks to restart if it changed.
-void choose(std::string& field, const char* value, std::function<void()> after)
+// Saves `value` in `field`, then applies it (`live`: false when it needs a
+// restart, offered then) or refreshes when nothing changed.
+void choose(std::string& field, const char* value, std::function<void()> after, bool (*live)())
 {
-    const bool changed = field != value;
+    if (field == value) {
+        if (after) after();
+        return;
+    }
     field = value;
     save_config();
+    if (live()) return;   // every screen made again
     if (after) after();
-    if (changed) offer_restart();
+    offer_restart();
 }
 }   // namespace
 
@@ -367,7 +373,7 @@ void pick_language(std::function<void()> after)
     std::vector<std::string> labels;
     for (const char* l : config::LANGUAGES) labels.push_back(brls::getStr(std::string("playguard/tools/languages/") + l));
     pick("playguard/tools/language"_i18n, labels, index_of(config::LANGUAGES, config::get().language), [after](int i) {
-        choose(config::get().language, config::LANGUAGES[i], after);
+        choose(config::get().language, config::LANGUAGES[i], after, live_prefs::language_changed);
     });
 }
 
@@ -376,7 +382,7 @@ void pick_theme(std::function<void()> after)
     std::vector<std::string> labels;
     for (const char* t : config::THEMES) labels.push_back(brls::getStr(std::string("playguard/tools/themes/") + t));
     pick("playguard/tools/theme"_i18n, labels, index_of(config::THEMES, config::get().theme), [after](int i) {
-        choose(config::get().theme, config::THEMES[i], after);
+        choose(config::get().theme, config::THEMES[i], after, live_prefs::theme_changed);
     });
 }
 

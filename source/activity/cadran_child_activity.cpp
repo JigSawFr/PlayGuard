@@ -122,6 +122,7 @@ void CadranChildActivity::refresh()
     float frac = -1.0f;
     std::string left = "—", caption = "";
     int left_min = -1;   // counting down: the minutes left
+    bool free = false;   // no limit today: the bedtime alone stops play
     if (pt.fw_supported && pt.valid && pt.enabled_valid) {
         const uint16_t limit = pt.day_min[today];
         // Unlocked first, as on Today: the console reports the timer off
@@ -134,6 +135,7 @@ void CadranChildActivity::refresh()
         } else if (limit == PT_DAY_NOLIMIT || !pt.enabled) {
             left = "playguard/cadran/today/free"_i18n;
             caption = "playguard/cadran/today/no_limit"_i18n;
+            free = true;
         } else if (pt.restricted_valid && pt.restricted) {
             frac = 1.0f;
             left = ui::fmt_played(0);
@@ -150,15 +152,22 @@ void CadranChildActivity::refresh()
             caption = "playguard/cadran/today/today"_i18n;
         }
     }
-    ring->setFraction(frac);
-    ring->setValue(left);
-    ring->setCaption(caption);
     // When it ends, by the clock, as Today says it (not after the bedtime
     // alarm: its chip says when); amber and the ring beating near the end.
     const LocalTime now = ui::local_now();
     const pt_logic::NextStop n = pt_logic::next_stop(now.hour * 60 + now.minute, left_min, pt.bed[today]);
     const bool ending = n.kind == pt_logic::NextStop::TIME_UP;
-    const bool last = ending && n.in <= LAST_MINUTES;
+    // The bedtime before the time is up (or on a day without a limit, its
+    // last hour): the ring counts down to it instead.
+    const bool to_bed = n.kind == pt_logic::NextStop::BEDTIME && (left_min >= 0 || (free && n.in <= 60));
+    if (to_bed) {
+        left = ui::fmt_played((uint16_t)n.in);
+        caption = "playguard/cadran/child/until_bed"_i18n;
+    }
+    const bool last = (ending || to_bed) && n.in <= LAST_MINUTES;
+    ring->setFraction(frac);
+    ring->setValue(left);
+    ring->setCaption(caption);
     if (ending) ui::set_text(end_text, brls::getStr("playguard/cadran/child/end", fmt::format("{:02d}:{:02d}", n.at / 60, n.at % 60)));
     brls::Theme theme = brls::Application::getTheme();
     end_icon->setColor(theme[last ? "cadran/amber" : "cadran/teal"]);

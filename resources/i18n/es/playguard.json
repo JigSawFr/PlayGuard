@@ -1542,6 +1542,7 @@
         "sd_space_detail": "Quedan {} MB: PlayGuard podría no poder guardar sus ajustes, su historial ni sus registros.",
         "week": "Últimos 7 días: {} de juego",
         "week_detail": "{} al día de media.",
+        "week_qr": "Mostrar su código QR",
         "week_top": "Lo más jugado: {} ({}).",
         "over_limit": "Se superó el límite {} de los últimos 7 días",
         "over_limit_detail": "Cuando se acaba el tiempo, la consola solo avisa: se sigue jugando pasado el límite (Tiempo de juego › Cuando se acaba el tiempo).",
@@ -1568,6 +1569,7 @@
         },
         "today": {
             "kicker": "Hoy · límite del {}",
+            "kicker_short": "{} · {}",
             "free": "libre",
             "no_limit": "sin límite",
             "unlocked": "desbloqueado",
@@ -1718,6 +1720,7 @@
             "back": "Volver al adulto · PIN",
             "play": "Entregar la consola y jugar",
             "on_hold": "límite en pausa",
+            "until_bed": "antes de dormir",
             "end": "Termina hacia las {}",
             "extra": "Tiempo extra",
             "no_extra": "Ahora no cuenta ningún límite: no hay nada que ampliar."

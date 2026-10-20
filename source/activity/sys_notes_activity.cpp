@@ -2,6 +2,7 @@
 #include "activity/sys_notes_activity.hpp"
 
 #include "action/sys_notes_flow.hpp"
+#include "ui/live_prefs.hpp"
 #include "ui/ui.hpp"
 #include "util/markdown.hpp"
 #include "util/text.hpp"
@@ -190,7 +191,7 @@ void SysNotesActivity::fill()
             header->setSubtitle(date);
             release_notes::fill_release(notes, lines);
         }
-        const bool english = text::starts_with(brls::Application::getLocale(), "en");
+        const bool english = text::starts_with(live_prefs::locale(), "en");
         ui::set_visible_all({ { header.getView(), !lines.empty() },
                               { language.getView(), !lines.empty() && !english },
                               { tags.getView(), !lines.empty() } });
@@ -215,7 +216,7 @@ void SysNotesActivity::fill()
         header->setSubtitle(r.date);
         ui::set_visible(header.getView(), true);
         // Notes as published: in English, said when the console is not.
-        const bool english = text::starts_with(brls::Application::getLocale(), "en");
+        const bool english = text::starts_with(live_prefs::locale(), "en");
         bool any = !r.notes.empty();
         if (own) {
             auto lines = changelog::parse(r.notes, 0);

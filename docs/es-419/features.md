@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 86931c8e4205 -->
+<!-- translated from docs/features.md, sha256 e1805c25bee2 -->
 # Funciones
 
 Qué hace cada pestaña, cómo escribe PlayGuard sin riesgos y qué cuenta la consola como tiempo de juego. ¿Es nuevo en PlayGuard? Empiece por [primeros pasos](getting-started.md). Volver al [README](../../README.md).
@@ -61,7 +61,7 @@ El aspecto de PlayGuard se llama Cadran: una barra de íconos para las pestañas
 
 Una campana en el encabezado, a la izquierda de la versión, reúne lo que requiere la intervención del adulto; Ⓨ abre la lista desde cualquier pestaña (el contador de la campana indica *2* cuando hay dos cosas pendientes).
 
-A la izquierda de la campana, el idioma (su código, *FR*, *EN*…) y el tema (un sol para el claro, una luna para el oscuro, un círculo medio lleno cuando sigue a la consola), y luego el tamaño del texto (**AA**, con su A grande en turquesa mientras el texto está agrandado): al tocarlos se abre la misma lista que en *Preferencias*, y **−** los ofrece desde cualquier pestaña. Un nuevo idioma o tema se aplica cuando PlayGuard se vuelve a iniciar; el tamaño del texto, de inmediato.
+A la izquierda de la campana, el idioma (su código, *FR*, *EN*…) y el tema (un sol para el claro, una luna para el oscuro, un círculo medio lleno cuando sigue a la consola), y luego el tamaño del texto (**AA**, con su A grande en turquesa mientras el texto está agrandado): al tocarlos se abre la misma lista que en *Preferencias*, y **−** los ofrece desde cualquier pestaña. Un nuevo tema o idioma se aplica de inmediato, y cada pantalla se vuelve a crear en la misma pestaña; solo un cambio al chino o desde el chino, o el regreso al idioma de la consola cuando PlayGuard se inició en otro, espera a que PlayGuard se vuelva a iniciar.
 
 ### Pendiente
 
@@ -83,7 +83,7 @@ Cada uno con una “i”, un punto en la campana; se puede marcar como leído:
 - un límite que sigue reducido por *No jugar más hoy* de un día anterior (*Restablecer*);
 - una nueva versión instalada (*Novedades*; tras una actualización en su lugar, la compilación anterior conservada), o una versión más reciente de PlayGuard;
 - un informe enviado en línea (*Mostrar el enlace*), o PlayGuard cerrado de forma inesperada la última vez (*Enviar un informe*);
-- el tiempo de juego de la semana (cada 7 días hasta que se lea; con la comparación por día con la semana anterior), y un límite superado dos o más de los últimos 7 días cuando la consola solo avisa;
+- el tiempo de juego de la semana (cada 7 días hasta que se lea; con la comparación por día con la semana anterior; *Mostrar su código QR* abre el resumen de la semana en *Actividad*), y un límite superado dos o más de los últimos 7 días cuando la consola solo avisa;
 - un respaldo de la configuración por hacer (ninguno todavía, o ninguno en 30 días);
 - todos los juegos bloqueados durante una semana;
 - una nueva cuenta de usuario;
@@ -180,13 +180,13 @@ La consola muestra “Se acabó el tiempo” y luego suspende el juego (sin “c
 
 *Mostrar al niño* en *Hoy*, para entregar la consola:
 
-- solo el tiempo restante (mientras el control parental está desbloqueado, el límite de hoy, en pausa), cuándo termina el juego (*Termina hacia las 16:40*; no cuando la alarma de hora de dormir llega antes), la hora de dormir y lo que pasa cuando se acaba el tiempo;
+- solo el tiempo restante (mientras el control parental está desbloqueado, el límite de hoy, en pausa), cuándo termina el juego (*Termina hacia las 16:40*; cuando la alarma de hora de dormir llega antes, el anillo hace la cuenta regresiva hasta ella, *45 min antes de dormir*, como en la última hora de un día sin límite), la hora de dormir y lo que pasa cuando se acaba el tiempo;
 - pensada para leerse desde el otro lado de la habitación, en la TV; su texto conserva su tamaño, sea cual sea el tamaño del texto;
-- en los últimos 5 minutos, el final se vuelve ámbar y el anillo late lentamente; la hora de dormir se vuelve ámbar en sus últimos 30;
+- en los últimos 5 minutos (de juego o antes de la hora de dormir), el final se vuelve ámbar y el anillo late lentamente; la hora de dormir se vuelve ámbar en sus últimos 30;
 - Ⓐ y Ⓨ, los botones del adulto, aparecen en pequeño arriba a la derecha, para que el pie de página muestre solo el del niño;
 - Ⓐ vuelve a las pantallas del adulto con el PIN; Ⓨ da tiempo extra desde ahí, tras el PIN (las cantidades de *Tiempo extra*, sin salir de la pantalla del niño); Ⓑ sale de PlayGuard (y antes pregunta si reactivar el control parental, como al salir).
 
-Con el texto más grande, la pestaña Hoy sigue cabiendo en una sola pantalla: la línea encima del título desaparece, y los botones y las tarjetas se ajustan un poco. Se actualiza cada 5 s (Ⓧ actualiza ahora).
+Con el texto más grande, la pestaña Hoy sigue cabiendo en una sola pantalla: la línea encima del título solo indica el día y su límite (*JUEVES · 2 h*), y los botones y las tarjetas se ajustan un poco. Se actualiza cada 5 s (Ⓧ actualiza ahora).
 
 ## Tiempo de juego — la semana es el editor
 
@@ -203,7 +203,7 @@ Con el texto más grande, la pestaña Hoy sigue cabiendo en una sola pantalla: l
 | Ⓛ | Lo copia de lunes a viernes |
 | Ⓡ | Lo copia al fin de semana |
 | Ⓨ | Sin límite |
-| Ⓧ | Una duración exacta (*Ingresar una duración…*: ↑/↓ de 15 en 15 min, Ⓛ/Ⓡ de 5 en 5 min, con OK seleccionado) |
+| Ⓧ | Una duración exacta (*Ingresar una duración…*: ↑/↓ de 15 en 15 min, de hora en hora al mantenerlos presionados, Ⓛ/Ⓡ de 5 en 5 min, con OK seleccionado) |
 | Ⓐ o Ⓑ | Termina la edición |
 
 - En la pantalla táctil, al tocar un día se edita, y luego un toque en su parte de arriba o de abajo lo cambia en 15 min.
@@ -217,7 +217,7 @@ Con el texto más grande, la pestaña Hoy sigue cabiendo en una sola pantalla: l
 
 **Chips** encima y debajo de la semana abren directamente sus opciones: los perfiles (cuántos hay guardados), el mismo límite todos los días, la alarma de hora de dormir, *Cuando se acabe el tiempo* y quitar el límite.
 
-- **Mismo límite todos los días:** una lista rápida o una duración exacta (*Ingresar una duración…*: ↑/↓ de 15 en 15 min, Ⓛ/Ⓡ de 5 en 5 min).
+- **Mismo límite todos los días:** una lista rápida o una duración exacta (*Ingresar una duración…*: ↑/↓ de 15 en 15 min, de hora en hora al mantenerlos presionados, Ⓛ/Ⓡ de 5 en 5 min).
 - **Entre semana y fin de semana ›:** el editor, que pide el límite de lunes a viernes y luego el del fin de semana.
 - **Tiempo extra hoy** y **no jugar más hoy**, como en *Hoy*. Una nota debajo indica qué hace la consola al llegar al límite. Mientras el control parental está desbloqueado temporalmente, es *posible* que el tiempo de juego no se cuente: todavía es una pregunta abierta ([documentación](../parental-controls.md#still-open), en inglés).
 - Cada confirmación enumera los días que cambian, antes → después.
@@ -424,7 +424,7 @@ En una consola sin Internet, *Ajustar el reloj de red al reloj de la consola* ap
 *[Probarlo en el simulador ›](https://playguard.link/simulator/?tab=preferences)*
 
 - Lo que configura al propio PlayGuard:
-  - Idioma (todos los idiomas de la consola, o el de la propia consola), tema (oscuro de forma predeterminada, claro o el de la consola), tamaño del texto (automático / normal / más grande, de inmediato); los demás, con la opción de reiniciar.
+  - Idioma (todos los idiomas de la consola, o el de la propia consola), tema (oscuro de forma predeterminada, claro o el de la consola), tamaño del texto (automático / normal / más grande): los tres de inmediato.
   - La pestaña con la que se abre.
   - **La intro** al iniciar: la pantalla de carga durante 2 segundos (activada de forma predeterminada; Ⓐ o Ⓑ la saltan; desactivada, PlayGuard se abre en cuanto está listo).
 - Los mensajes que muestra:

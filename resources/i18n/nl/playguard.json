@@ -1542,6 +1542,7 @@
         "sd_space_detail": "Nog {} MB vrij: PlayGuard kan zijn instellingen, geschiedenis en logboeken misschien niet meer opslaan.",
         "week": "Afgelopen 7 dagen: {} gespeeld",
         "week_detail": "Gemiddeld {} per dag.",
+        "week_qr": "QR-code tonen",
         "week_top": "Meest gespeeld: {} ({}).",
         "over_limit": "De limiet is overschreden op {} van de afgelopen 7 dagen",
         "over_limit_detail": "Als de tijd om is, waarschuwt de console alleen: er wordt verder gespeeld na de limiet (Speeltijd › Als de tijd om is).",
@@ -1568,6 +1569,7 @@
         },
         "today": {
             "kicker": "Vandaag · limiet voor {}",
+            "kicker_short": "{} · {}",
             "free": "vrij",
             "no_limit": "geen limiet",
             "unlocked": "ontgrendeld",
@@ -1718,6 +1720,7 @@
             "back": "Terug naar de ouder · pincode",
             "play": "Console geven en spelen",
             "on_hold": "limiet gepauzeerd",
+            "until_bed": "tot bedtijd",
             "end": "Eindigt rond {}",
             "extra": "Extra tijd",
             "no_extra": "Er telt nu geen limiet: er valt niets te verlengen."

@@ -26,6 +26,8 @@ class TabBase : public brls::Box
     // Re-reads the tab on screen, if any (after the read-only or developer
     // mode changed).
     static void refresh_shown();
+    // The shown tab's screen ("tab/dashboard"), "" for none.
+    static std::string shown_screen();
 
     // Entered from the sidebar for the first time: the first row marked with
     // something to do (mark), else the first row.

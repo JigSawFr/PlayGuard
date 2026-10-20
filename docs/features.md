@@ -60,7 +60,7 @@ PlayGuard's look is called Cadran: an icon rail for the tabs, a navy or cool-whi
 
 A bell in the header, left of the version, gathers what needs the parent; Ⓨ opens the list from any tab (the bell's badge says *2* when two things are to do).
 
-Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun for light, a moon for dark, a half-filled circle when it follows the console), then the text size (**AA**, its large A in teal while the text is larger): a tap opens the same list as *Preferences*, and **−** offers them from any tab. A new language or theme takes effect once PlayGuard is started again; the text size at once.
+Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun for light, a moon for dark, a half-filled circle when it follows the console), then the text size (**AA**, its large A in teal while the text is larger): a tap opens the same list as *Preferences*, and **−** offers them from any tab. A new theme or language takes effect at once, every screen made again on the same tab; only a change to or from Chinese, or back to the console's language when PlayGuard started in another one, waits for PlayGuard to start again.
 
 ### To do
 
@@ -82,7 +82,7 @@ Each with an "i", a dot on the bell; it can be marked as read:
 - a limit still lowered by *No more play today* on an earlier day (*Put back*);
 - a new version installed (*What's new*; after an update in place, the previous build kept), or a newer version of PlayGuard;
 - a report sent online (*Show the link*), or PlayGuard closed unexpectedly last time (*Send a report*);
-- the week's play time (every 7 days until read; with how it compares with the week before, per day), and a limit passed on two or more of the last 7 days while the console only warns;
+- the week's play time (every 7 days until read; with how it compares with the week before, per day; *Show its QR code* opens the week's summary on *Activity*), and a limit passed on two or more of the last 7 days while the console only warns;
 - a settings backup to make (none yet, or none for 30 days);
 - all games blocked for a week;
 - a new user account;
@@ -179,13 +179,13 @@ The console shows "Time's up", then suspends the game (no "continue") or only wa
 
 *Show the child* on *Today*, to hand the console over:
 
-- only the time left (while parental controls are unlocked, today's limit, on hold), when play ends (*Ends around 16:40*; not when the bedtime alarm comes first), the bedtime and what happens when time is up;
+- only the time left (while parental controls are unlocked, today's limit, on hold), when play ends (*Ends around 16:40*; when the bedtime alarm comes first, the ring counts down to it instead, *45 min until bedtime*, as it does in the last hour of a day without a limit), the bedtime and what happens when time is up;
 - sized to be read from across the room, on the TV; its text keeps its size whatever the text size;
-- in the last 5 minutes, the end turns amber and the ring pulses slowly; the bedtime turns amber in its last 30;
+- in the last 5 minutes (of play or before the bedtime), the end turns amber and the ring pulses slowly; the bedtime turns amber in its last 30;
 - Ⓐ and Ⓨ, the parent's keys, are said small at the top right, so the footer shows the child's alone;
 - Ⓐ goes back to the parent's screens with the PIN; Ⓨ gives extra time from there, after the PIN (the amounts of *Extra time*, the child screen staying); Ⓑ leaves PlayGuard (asking first to turn parental controls back on, as quitting does).
 
-In larger text, Today still fits on one screen: the line above the headline goes, the buttons and the cards are a little tighter. It refreshes every 5 s (Ⓧ refreshes now).
+In larger text, Today still fits on one screen: the line above the headline says only the day and its limit (*THURSDAY · 2 h*), the buttons and the cards are a little tighter. It refreshes every 5 s (Ⓧ refreshes now).
 
 ## Play timer — the week is the editor
 
@@ -202,7 +202,7 @@ In larger text, Today still fits on one screen: the line above the headline goes
 | Ⓛ | Copy it to Monday–Friday |
 | Ⓡ | Copy it to the weekend |
 | Ⓨ | No limit |
-| Ⓧ | An exact time (*Enter a duration…*: ↑/↓ by 15 min, Ⓛ/Ⓡ by 5 min, OK focused) |
+| Ⓧ | An exact time (*Enter a duration…*: ↑/↓ by 15 min, by the hour once held, Ⓛ/Ⓡ by 5 min, OK focused) |
 | Ⓐ or Ⓑ | End the edit |
 
 - By touch, a day tapped is edited, then a tap on its top or bottom changes it by 15 min.
@@ -216,7 +216,7 @@ In larger text, Today still fits on one screen: the line above the headline goes
 
 **Chips** above and below the week open their choices at once: the profiles (how many are saved), the same limit every day, the bedtime alarm, *When the time is up* and the removal.
 
-- **Same limit every day:** a quick list or an exact duration (*Enter a duration…*: ↑/↓ by 15 min, Ⓛ/Ⓡ by 5 min).
+- **Same limit every day:** a quick list or an exact duration (*Enter a duration…*: ↑/↓ by 15 min, by the hour once held, Ⓛ/Ⓡ by 5 min).
 - **Weekdays and weekend ›:** the editor, asking for Monday–Friday then for the weekend.
 - **Extra time today** and **no more play today**, as on *Today*. A note under them says what the console does at the limit. While parental controls are temporarily unlocked, play time *may* not be counted: that is still open ([docs](parental-controls.md#still-open)).
 - Every confirmation lists the days that change, before → after.
@@ -423,7 +423,7 @@ On a console without Internet, *Set the network clock to the console clock* appe
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=preferences)*
 
 - What sets PlayGuard itself up:
-  - Language (every console language, or the console's own), theme (dark by default, light, or the console's), text size (automatic / normal / larger, at once); the others with an offer to restart.
+  - Language (every console language, or the console's own), theme (dark by default, light, or the console's), text size (automatic / normal / larger): all three at once.
   - The tab to start on.
   - **The intro** at start-up: the loading screen for 2 seconds (on by default; Ⓐ or Ⓑ skips it; off, PlayGuard opens as soon as it is ready).
 - The messages it shows:

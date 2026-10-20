@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 86931c8e4205 -->
+<!-- translated from docs/features.md, sha256 e1805c25bee2 -->
 # Funktionen
 
 Was jeder Tab macht, wie PlayGuard sicher schreibt, und was die Konsole als Spielzeit zählt. Neu bei PlayGuard? Beginne mit dem [Einstieg](getting-started.md). Zurück zum [README](../../README.md).
@@ -61,7 +61,7 @@ Das Aussehen von PlayGuard heißt Cadran: eine schmale Leiste mit Symbolen für 
 
 Eine Glocke in der Kopfzeile, links von der Version, sammelt, was den Elternteil braucht; Ⓨ öffnet die Liste aus jedem Tab (der Zähler an der Glocke zeigt *2*, wenn zwei Dinge zu tun sind).
 
-Links von der Glocke die Sprache (ihr Kürzel, *FR*, *EN*…) und das Design (eine Sonne für hell, ein Mond für dunkel, ein halb gefüllter Kreis, wenn es der Konsole folgt), dann die Textgröße (**AA**, dessen großes A in Petrol, solange der Text vergrößert ist): Ein Tippen öffnet dieselbe Liste wie in *Optionen*, und **−** bietet sie aus jedem Tab an. Eine neue Sprache oder ein neues Design wirkt, sobald PlayGuard neu gestartet wird; die Textgröße sofort.
+Links von der Glocke die Sprache (ihr Kürzel, *FR*, *EN*…) und das Design (eine Sonne für hell, ein Mond für dunkel, ein halb gefüllter Kreis, wenn es der Konsole folgt), dann die Textgröße (**AA**, dessen großes A in Petrol, solange der Text vergrößert ist): Ein Tippen öffnet dieselbe Liste wie in *Optionen*, und **−** bietet sie aus jedem Tab an. Ein neues Design oder eine neue Sprache wirkt sofort, jeder Bildschirm wird auf demselben Tab neu aufgebaut; nur ein Wechsel zu oder von Chinesisch, oder zurück zur Sprache der Konsole, wenn PlayGuard in einer anderen gestartet wurde, wartet, bis PlayGuard neu gestartet wird.
 
 ### Zu erledigen
 
@@ -83,7 +83,7 @@ Jeweils mit einem „i“, ein Punkt auf der Glocke; kann als gelesen markiert w
 - ein Limit, das an einem früheren Tag durch *Heute nicht mehr spielen* noch gesenkt ist (*Wiederherstellen*);
 - eine neue installierte Version (*Neuigkeiten*; nach einem Update an Ort und Stelle der aufbewahrte vorherige Build), oder eine neuere Version von PlayGuard;
 - ein online gesendeter Bericht (*Link anzeigen*), oder PlayGuard wurde beim letzten Mal unerwartet beendet (*Bericht senden*);
-- die Spielzeit der Woche (alle 7 Tage, bis sie gelesen ist; mit dem Vergleich zur Vorwoche, pro Tag) und ein Limit, das an zwei oder mehr der letzten 7 Tage überschritten wurde, während die Konsole nur warnt;
+- die Spielzeit der Woche (alle 7 Tage, bis sie gelesen ist; mit dem Vergleich zur Vorwoche, pro Tag; *QR-Code zeigen* öffnet die Wochenübersicht in *Aktivität*) und ein Limit, das an zwei oder mehr der letzten 7 Tage überschritten wurde, während die Konsole nur warnt;
 - eine Sicherung der Einstellungen, die fällig ist (noch keine, oder keine seit 30 Tagen);
 - alle Spiele seit einer Woche gesperrt;
 - ein neues Benutzerkonto;
@@ -180,13 +180,13 @@ Die Konsole zeigt „Zeit ist um“ an und unterbricht dann das Spiel (ohne „W
 
 *Dem Kind zeigen* in *Heute*, um die Konsole zu übergeben:
 
-- nur die verbleibende Zeit (solange der Jugendschutz aufgehoben ist, das heutige Limit, ausgesetzt), wann das Spielen endet (*Ende gegen 16:40*; nicht, wenn der Gute-Nacht-Alarm zuerst kommt), die Schlafenszeit und was passiert, wenn die Zeit um ist;
+- nur die verbleibende Zeit (solange der Jugendschutz aufgehoben ist, das heutige Limit, ausgesetzt), wann das Spielen endet (*Ende gegen 16:40*; kommt der Gute-Nacht-Alarm zuerst, zählt der Ring stattdessen bis zu ihm herunter, *45 min bis zum Schlafen*, wie in der letzten Stunde eines Tages ohne Limit), die Schlafenszeit und was passiert, wenn die Zeit um ist;
 - so groß, dass er quer durch den Raum lesbar ist, am Fernseher; sein Text behält seine Größe, egal welche Textgröße eingestellt ist;
-- in den letzten 5 Minuten wird das Ende bernsteinfarben und der Ring pulsiert langsam; die Schlafenszeit wird in ihren letzten 30 bernsteinfarben;
+- in den letzten 5 Minuten (des Spielens oder vor der Schlafenszeit) wird das Ende bernsteinfarben und der Ring pulsiert langsam; die Schlafenszeit wird in ihren letzten 30 bernsteinfarben;
 - Ⓐ und Ⓨ, die Tasten der Eltern, stehen klein oben rechts, sodass die Fußzeile nur die des Kindes zeigt;
 - Ⓐ kehrt mit der Geheimzahl zu den Bildschirmen der Eltern zurück; Ⓨ gibt von dort aus Zusatzzeit, nach der Geheimzahl (die Mengen von *Zusatzzeit*, der Kinderbildschirm bleibt stehen); Ⓑ verlässt PlayGuard (und fragt zuerst, ob der Jugendschutz wieder aktiviert werden soll, wie beim Beenden).
 
-Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile über der Überschrift entfällt, die Schaltflächen und die Karten rücken etwas enger zusammen. Aktualisiert sich alle 5 s (Ⓧ aktualisiert sofort).
+Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile über der Überschrift nennt nur noch den Tag und sein Limit (*DONNERSTAG · 2 h*), die Schaltflächen und die Karten rücken etwas enger zusammen. Aktualisiert sich alle 5 s (Ⓧ aktualisiert sofort).
 
 ## Spielzeit — die Woche ist der Editor
 
@@ -203,7 +203,7 @@ Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile übe
 | Ⓛ | Auf Montag–Freitag kopieren |
 | Ⓡ | Aufs Wochenende kopieren |
 | Ⓨ | Kein Limit |
-| Ⓧ | Eine genaue Dauer (*Dauer eingeben…*: ↑/↓ in 15-min-Schritten, Ⓛ/Ⓡ in 5-min-Schritten, OK ausgewählt) |
+| Ⓧ | Eine genaue Dauer (*Dauer eingeben…*: ↑/↓ in 15-min-Schritten, gehalten in Stundenschritten, Ⓛ/Ⓡ in 5-min-Schritten, OK ausgewählt) |
 | Ⓐ oder Ⓑ | Die Bearbeitung beenden |
 
 - Per Touch wird ein angetippter Tag bearbeitet, dann ändert ein Tippen auf sein oberes oder unteres Ende ihn um 15 min.
@@ -217,7 +217,7 @@ Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile übe
 
 **Chips** über und unter der Woche öffnen ihre Auswahl sofort: die Profile (wie viele gespeichert sind), jeden Tag gleiches Limit, der Gute-Nacht-Alarm, *Wenn die Zeit um ist* und das Entfernen.
 
-- **Jeden Tag gleiches Limit:** eine Schnellliste oder eine genaue Dauer (*Dauer eingeben…*: ↑/↓ in 15-min-Schritten, Ⓛ/Ⓡ in 5-min-Schritten).
+- **Jeden Tag gleiches Limit:** eine Schnellliste oder eine genaue Dauer (*Dauer eingeben…*: ↑/↓ in 15-min-Schritten, gehalten in Stundenschritten, Ⓛ/Ⓡ in 5-min-Schritten).
 - **Wochentage und Wochenende ›:** der Editor, der nach Montag–Freitag und dann nach dem Wochenende fragt.
 - **Zusatzzeit für heute** und **heute nicht mehr spielen**, wie in *Heute*. Ein Hinweis darunter sagt, was die Konsole beim Limit tut. Während der Jugendschutz vorübergehend aufgehoben ist, wird die Spielzeit *möglicherweise* nicht gezählt: Das ist noch offen ([Doku, auf Englisch](../parental-controls.md#still-open)).
 - Jede Bestätigung listet die Tage auf, die sich ändern, vorher → nachher.
@@ -424,7 +424,7 @@ Auf einer Konsole ohne Internet erscheint *Netzwerkuhr auf die Konsolenuhr stell
 *[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=preferences)*
 
 - Was PlayGuard selbst einrichtet:
-  - Sprache (jede Sprache der Konsole, oder die der Konsole), Design (standardmäßig dunkel, hell oder das der Konsole), Textgröße (automatisch / normal / größer, sofort); die anderen mit dem Angebot eines Neustarts.
+  - Sprache (jede Sprache der Konsole, oder die der Konsole), Design (standardmäßig dunkel, hell oder das der Konsole), Textgröße (automatisch / normal / größer): alle drei sofort.
   - Der Tab, mit dem gestartet wird.
   - **Das Intro** beim Start: der Ladebildschirm für 2 Sekunden (standardmäßig an; Ⓐ oder Ⓑ überspringt es; aus öffnet PlayGuard, sobald es bereit ist).
 - Die Meldungen, die es zeigt:

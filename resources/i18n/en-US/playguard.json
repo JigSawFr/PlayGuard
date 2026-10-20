@@ -1542,6 +1542,7 @@
         "sd_space_detail": "{} MB left: PlayGuard may fail to save its settings, its history and its logs.",
         "week": "Last 7 days: {} played",
         "week_detail": "{} a day on average.",
+        "week_qr": "Show its QR code",
         "week_top": "Most played: {} ({}).",
         "over_limit": "The limit was passed on {} of the last 7 days",
         "over_limit_detail": "When the time is up, the console only warns: play goes on past the limit (Play timer › When the time is up).",
@@ -1568,6 +1569,7 @@
         },
         "today": {
             "kicker": "Today · {}'s limit",
+            "kicker_short": "{} · {}",
             "free": "free",
             "no_limit": "no limit",
             "unlocked": "unlocked",
@@ -1718,6 +1720,7 @@
             "back": "Back to the parent · PIN",
             "play": "Hand the console over and play",
             "on_hold": "limit on hold",
+            "until_bed": "until bedtime",
             "end": "Ends around {}",
             "extra": "Extra time",
             "no_extra": "No limit counts right now: there is nothing to add to."

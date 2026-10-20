@@ -77,7 +77,18 @@ void DashboardTab::show_ring(bool unlocked)
 {
     const PtState& pt = this->pt;
     const int today = ui::today_weekday();
-    kicker->setText(cadran::upper(brls::getStr("playguard/cadran/today/kicker", ui::day_name_in_text(today))));
+    // Larger text: the day and its limit only ("THURSDAY · 2 h"), on one line.
+    if (brls::Label::getFontScale() > 1.0f) {
+        const uint16_t limit = pt.valid ? pt.day_min[today] : PT_DAY_NOLIMIT;
+        const std::string value = !pt.valid ? "—"
+                                  : limit == 0 ? "playguard/cadran/today/no_play"_i18n
+                                  : limit == PT_DAY_NOLIMIT || !pt.enabled ? "playguard/cadran/today/free"_i18n
+                                                                           : ui::fmt_minutes(limit);
+        // The day in capitals, as the kicker; the limit as everywhere else.
+        kicker->setText(brls::getStr("playguard/cadran/today/kicker_short", cadran::upper(ui::day_name(today)), value));
+    } else {
+        kicker->setText(cadran::upper(brls::getStr("playguard/cadran/today/kicker", ui::day_name_in_text(today))));
+    }
     float frac = -1.0f;
     std::string left = "—", caption;
     if (pt.fw_supported && pt.valid && pt.enabled_valid) {
@@ -196,17 +207,17 @@ void DashboardTab::show_next(bool unlocked)
 void DashboardTab::fit_text_size()
 {
     // Larger text (on the TV): the same screen in the same height. The kicker
-    // goes (the headline and the line under it say the day's limit), the
-    // buttons and the cards are a little tighter.
+    // shortened to the day and its limit (show_ring()), the buttons and the
+    // cards a little tighter.
     const bool larger = brls::Label::getFontScale() > 1.0f;
-    ui::set_visible(kicker.getView(), !larger);
-    actions->setMarginTop(larger ? 10 : 14);
-    actions->setMarginBottom(larger ? 8 : 12);
+    kicker->setMarginBottom(larger ? 2 : 10);
+    actions->setMarginTop(larger ? 6 : 14);
+    actions->setMarginBottom(larger ? 4 : 12);
     for (brls::View* button : { stop.getView(), child.getView(), limit.getView(), profile.getView() })
-        button->setHeight(larger ? 44 : 48);
+        button->setHeight(larger ? 40 : 48);
     for (brls::View* card : { bed_card.getView(), pc_card.getView(), clock_card.getView() }) {
-        static_cast<brls::Box*>(card)->setPaddingTop(larger ? 14 : 20);
-        static_cast<brls::Box*>(card)->setPaddingBottom(larger ? 14 : 20);
+        static_cast<brls::Box*>(card)->setPaddingTop(larger ? 10 : 20);
+        static_cast<brls::Box*>(card)->setPaddingBottom(larger ? 10 : 20);
     }
 }
 

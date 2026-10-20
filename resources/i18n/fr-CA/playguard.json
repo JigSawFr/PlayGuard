@@ -1542,6 +1542,7 @@
         "sd_space_detail": "Il reste {} Mo : PlayGuard risque de ne plus pouvoir enregistrer ses réglages, son historique et ses journaux.",
         "week": "7 derniers jours : {} de jeu",
         "week_detail": "{} par jour en moyenne.",
+        "week_qr": "Afficher son code QR",
         "week_top": "Le plus joué : {} ({}).",
         "over_limit": "La limite a été dépassée {} jours sur les 7 derniers",
         "over_limit_detail": "Quand le temps est écoulé, la console se contente de prévenir : le jeu continue au-delà de la limite (Temps de jeu › Quand le temps est écoulé).",
@@ -1568,6 +1569,7 @@
         },
         "today": {
             "kicker": "Aujourd'hui · limite du {}",
+            "kicker_short": "{} · {}",
             "free": "libre",
             "no_limit": "pas de limite",
             "unlocked": "déverrouillé",
@@ -1718,6 +1720,7 @@
             "back": "Retour parent · code PIN",
             "play": "Rendre la console et jouer",
             "on_hold": "limite en pause",
+            "until_bed": "avant le coucher",
             "end": "Fin vers {}",
             "extra": "Temps en plus",
             "no_extra": "Aucune limite ne compte en ce moment : rien à prolonger."

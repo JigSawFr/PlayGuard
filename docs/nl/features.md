@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 86931c8e4205 -->
+<!-- translated from docs/features.md, sha256 e1805c25bee2 -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Nieuw met PlayGuard? Begin met [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
@@ -61,7 +61,7 @@ Het uiterlijk van PlayGuard heet Cadran: een smalle balk met iconen voor de tabb
 
 Een bel in de kopregel, links van de versie, verzamelt wat de ouder moet doen; Ⓨ opent de lijst vanuit elk tabblad (de teller op de bel toont *2* als er twee dingen te doen zijn).
 
-Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon voor licht, een maan voor donker, een half gevulde cirkel als het de console volgt), en daarna de tekstgrootte (**AA**, met de grote A in blauwgroen zolang de tekst groter is): een tik opent dezelfde lijst als in *Voorkeuren*, en **−** biedt ze aan vanuit elk tabblad. Een nieuwe taal of een nieuw thema geldt zodra PlayGuard opnieuw is gestart; de tekstgrootte meteen.
+Links van de bel staan de taal (de code, *FR*, *EN*…) en het thema (een zon voor licht, een maan voor donker, een half gevulde cirkel als het de console volgt), en daarna de tekstgrootte (**AA**, met de grote A in blauwgroen zolang de tekst groter is): een tik opent dezelfde lijst als in *Voorkeuren*, en **−** biedt ze aan vanuit elk tabblad. Een nieuw thema of een nieuwe taal geldt meteen, en elk scherm wordt op hetzelfde tabblad opnieuw opgebouwd; alleen een wissel naar of van Chinees, of terug naar de taal van de console als PlayGuard in een andere is gestart, wacht tot PlayGuard opnieuw is gestart.
 
 ### Te doen
 
@@ -83,7 +83,7 @@ Elk met een "i", een stip op de bel; kan als gelezen worden gemarkeerd:
 - een limiet die op een eerdere dag met *Vandaag niet meer spelen* is verlaagd en nog laag staat (*Terugzetten*);
 - een nieuwe versie geïnstalleerd (*Wat is er nieuw*; na een update ter plekke blijft de vorige build bewaard), of een nieuwere versie van PlayGuard;
 - een online verstuurd rapport (*Link tonen*), of PlayGuard de vorige keer onverwacht gesloten (*Rapport versturen*);
-- de speeltijd van de week (elke 7 dagen tot je het leest; met de vergelijking met de week ervoor, per dag), en een limiet die op twee of meer van de afgelopen 7 dagen is overschreden terwijl de console alleen waarschuwt;
+- de speeltijd van de week (elke 7 dagen tot je het leest; met de vergelijking met de week ervoor, per dag; *QR-code tonen* opent het weekoverzicht op *Activiteit*), en een limiet die op twee of meer van de afgelopen 7 dagen is overschreden terwijl de console alleen waarschuwt;
 - een back-up van de instellingen die nog moet worden gemaakt (nog geen, of geen in 30 dagen);
 - alle games al een week geblokkeerd;
 - een nieuw gebruikersaccount;
@@ -180,13 +180,13 @@ De console toont "Tijd is om" en onderbreekt daarna de game (geen "doorgaan") of
 
 *Aan het kind tonen* op *Vandaag*, om de console over te dragen:
 
-- alleen de resterende tijd (zolang ouderlijk toezicht ontgrendeld is, de limiet van vandaag, gepauzeerd), wanneer het spelen eindigt (*Eindigt rond 16:40*; niet als het bedtijdalarm eerst komt), de bedtijd en wat er gebeurt als de tijd om is;
+- alleen de resterende tijd (zolang ouderlijk toezicht ontgrendeld is, de limiet van vandaag, gepauzeerd), wanneer het spelen eindigt (*Eindigt rond 16:40*; als het bedtijdalarm eerst komt, telt de ring in plaats daarvan daarnaar af, *45 min tot bedtijd*, zoals in het laatste uur van een dag zonder limiet), de bedtijd en wat er gebeurt als de tijd om is;
 - groot genoeg om vanaf de andere kant van de kamer op de tv te lezen; de tekst houdt zijn grootte, welke tekstgrootte ook is ingesteld;
-- in de laatste 5 minuten wordt het einde oranje en pulseert de ring langzaam; de bedtijd wordt oranje in de laatste 30;
+- in de laatste 5 minuten (van het spelen of vóór de bedtijd) wordt het einde oranje en pulseert de ring langzaam; de bedtijd wordt oranje in de laatste 30;
 - Ⓐ en Ⓨ, de knoppen van de ouder, staan klein rechtsboven, zodat de voettekst alleen die van het kind toont;
 - Ⓐ gaat met de pincode terug naar de schermen van de ouder; Ⓨ geeft van daaruit extra tijd, na de pincode (de hoeveelheden van *Extra tijd*, terwijl het kinderscherm blijft staan); Ⓑ sluit PlayGuard af (en vraagt eerst of ouderlijk toezicht weer moet worden ingeschakeld, zoals bij afsluiten).
 
-Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de kop verdwijnt, de knoppen en de kaarten staan iets dichter op elkaar. Het wordt elke 5 s vernieuwd (Ⓧ vernieuwt nu).
+Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de kop noemt alleen nog de dag en zijn limiet (*DONDERDAG · 2 u*), de knoppen en de kaarten staan iets dichter op elkaar. Het wordt elke 5 s vernieuwd (Ⓧ vernieuwt nu).
 
 ## Speeltijdtimer — de week is de editor
 
@@ -203,7 +203,7 @@ Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de k
 | Ⓛ | Naar maandag–vrijdag kopiëren |
 | Ⓡ | Naar het weekend kopiëren |
 | Ⓨ | Geen limiet |
-| Ⓧ | Een exacte duur (*Een duur invoeren…*: ↑/↓ per 15 min, Ⓛ/Ⓡ per 5 min, met OK geselecteerd) |
+| Ⓧ | Een exacte duur (*Een duur invoeren…*: ↑/↓ per 15 min, per uur zodra je ze ingedrukt houdt, Ⓛ/Ⓡ per 5 min, met OK geselecteerd) |
 | Ⓐ of Ⓑ | Het bewerken beëindigen |
 
 - Met aanraken wordt een aangetikte dag bewerkt, waarna een tik op de boven- of onderkant hem met 15 min wijzigt.
@@ -217,7 +217,7 @@ Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de k
 
 **Chips** boven en onder de week openen meteen hun keuzes: de profielen (hoeveel er zijn opgeslagen), elke dag dezelfde limiet, het bedtijdalarm, *Als de tijd om is* en het verwijderen.
 
-- **Elke dag dezelfde limiet:** een snelle lijst of een exacte duur (*Een duur invoeren…*: ↑/↓ per 15 min, Ⓛ/Ⓡ per 5 min).
+- **Elke dag dezelfde limiet:** een snelle lijst of een exacte duur (*Een duur invoeren…*: ↑/↓ per 15 min, per uur zodra je ze ingedrukt houdt, Ⓛ/Ⓡ per 5 min).
 - **Doordeweeks en weekend ›:** de editor, die eerst om maandag–vrijdag en daarna om het weekend vraagt.
 - **Extra tijd vandaag** en **vandaag niet meer spelen**, zoals op *Vandaag*. Een opmerking eronder zegt wat de console bij de limiet doet. Zolang ouderlijk toezicht tijdelijk ontgrendeld is, wordt speeltijd *mogelijk* niet geteld: dat is nog een open vraag ([docs, in het Engels](../parental-controls.md#still-open)).
 - Elke bevestiging toont de dagen die veranderen, voor → na.
@@ -424,7 +424,7 @@ Op een console zonder internet verschijnt *Netwerkklok instellen op de consolekl
 *[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=preferences)*
 
 - Wat PlayGuard zelf instelt:
-  - Taal (elke taal van de console, of die van de console zelf), thema (standaard donker, licht of dat van de console), tekstgrootte (automatisch / normaal / groter, meteen); de andere met het aanbod om opnieuw te starten.
+  - Taal (elke taal van de console, of die van de console zelf), thema (standaard donker, licht of dat van de console), tekstgrootte (automatisch / normaal / groter): alle drie meteen.
   - Het tabblad om mee te starten.
   - **De intro** bij het opstarten: het laadscherm gedurende 2 seconden (standaard aan; Ⓐ of Ⓑ slaat het over; uit, dan opent PlayGuard zodra het klaar is).
 - De berichten die het toont:
