@@ -121,7 +121,12 @@ mode; there is no `return_to`, so PlayGuard exits when done.
 | `return_to` | no | The `.nro` to launch when done. It must exist, end in `.nro` and be under `sdmc:/switch/`; anything else is ignored (and said in the response). |
 | `response` | no | Where to write the response: a `.json` path under `sdmc:/switch/` or `sdmc:/config/`. Default `sdmc:/config/playguard/api/response.json`. |
 | `caller` | no | A name to show and record in the history, at most 64 characters. Not checked, so not trusted. |
+| `lang` | no | The language of the errors' `title`, as the console names it (`fr`, `en-US`, `ja` …). Default: the console's language. |
 | `dry_run` | no | `true`: check the request and its permission, answer `200` (or the error it would get) with `"dry_run": true`, and do nothing. No PIN asked, no history, not kept in `handled.json`. |
+
+The caller writes the request file **in one go**: to a temporary name, then
+renamed to the name it passes. A file PlayGuard reads half written is not
+JSON, gets `400 bad_request`, and is gone.
 
 The request file is **deleted as soon as it is read**, before anything is
 done, so a request left on the card is never replayed at the next start (if
@@ -180,6 +185,15 @@ launched, so the caller finds it at its next start:
 A caller should check that `id` is the one it sent: a response from an earlier
 request may still be on the card.
 
+A response that carries the child's play (the **activity** routes) is a file
+anything can read, so it does not stay on the card:
+
+- the caller deletes it once read (`playguard_api.h` does);
+- at its next start, PlayGuard deletes any such response still there (it
+  remembers where it wrote them, in `handled.json`), and logs that it did.
+
+Other responses (the clock, the status) may stay; the next one replaces them.
+
 PlayGuard launches `return_to` with two arguments, so the caller knows it is
 coming back from PlayGuard and where to look:
 
@@ -217,7 +231,7 @@ console's language, ready to show:
 | `400` | `bad_request`, `unsupported_api` | The request cannot be read. |
 | `403` | `api_disabled`, `permission_denied` | The API is off, or the route's group lacks the permission (`detail` names the group and the permission needed). |
 | `403` | `pin_refused` | The PIN screen was cancelled or the PIN was wrong. |
-| `404` | `no_route`, `no_game` | Unknown path, or no such game installed. |
+| `404` | `no_route`, `no_game`, `no_measure` | Unknown or planned path, no such game installed, or no clock measure to give from cache. |
 | `422` | `bad_body` | A parameter is missing or out of range. |
 | `423` | `read_only` | The firmware is newer than PlayGuard supports: it [opens read only](compatibility.md#newer-firmware) and changes nothing. |
 | `424` | `not_done` | Several requests with `stop_on_error`: an earlier one failed. |
@@ -240,38 +254,43 @@ cannot give the extra time twice.
 The group in brackets is the one the parent sets (*Preferences › Other
 homebrews*); a route needs *Read* for `GET` and `OPEN`, *Read and write* for
 `POST`. **PIN** means the route goes through the PIN screen, whatever the
-lock setting.
+lock setting. **Since** is the API version a route came with: the first
+release (v1.0) answers `GET /v1` and the two clock routes, and *planned* routes get
+`404 no_route` until the changelog says otherwise (`GET /v1` lists the routes
+a build answers). Everything else on this page (the request file, several
+requests, `dry_run`, the response and the relaunch arguments, the
+permissions) comes with the first release.
 
 ### Discovery
 
-| Method | Path | | Answer |
-|---|---|---|---|
-| `GET` | `/v1` | always answers | PlayGuard's version, the API versions, whether the API is on, each group's permission, the routes it opens, and whether the firmware is read only. |
+| Method | Path | | Answer | Since |
+|---|---|---|---|---|
+| `GET` | `/v1` | always answers | PlayGuard's version, the API versions, whether the API is on, each group's permission, the routes it opens, and whether the firmware is read only. | v1.0 |
 
 `GET /v1` answers even while the API is off (with `"enabled": false` and no
 routes), so a caller can tell the parent what to turn on.
 
 ### Clock [clock]
 
-| Method | Path | | Answer |
-|---|---|---|---|
-| `GET` | `/v1/clock` | | The offset of the network clock, measured with NTP, without changing it: `offset_ms`, `server`, `measured_at`. |
-| `POST` | `/v1/clock/sync` | | Sets the network clock from NTP, as *Console › Network clock*: `offset_ms_before`, `offset_ms_after`, `server`. Recorded in the history. |
-| `OPEN` | `/v1/clock` | | The *Network clock* screen. |
+| Method | Path | | Answer | Since |
+|---|---|---|---|---|
+| `GET` | `/v1/clock` | | The offset of the network clock, measured with NTP, without changing it: `offset_ms`, `server`, `measured_at`, `"cached": false`. With `?cached=1`, no network: the last offset PlayGuard measured, with its `measured_at` and `"cached": true` (`404 no_measure` if it never measured one). `?timeout_ms=` as for the sync. | v1.0 |
+| `POST` | `/v1/clock/sync` | | Sets the network clock from NTP, as *Console › Network clock*: `offset_ms_before`, `offset_ms_after`, `server`. Recorded in the history. The body may set `timeout_ms` (1000 to 30000, default 10000): the longest the NTP servers are waited for in all. | v1.0 |
+| `OPEN` | `/v1/clock` | | The *Network clock* screen. | planned |
 
 ### Status [status]
 
-| Method | Path | | Answer |
-|---|---|---|---|
-| `GET` | `/v1/status` | | Whether controls are set, the limit and time played today, the time left, whether play is suspended, a temporary unlock. |
+| Method | Path | | Answer | Since |
+|---|---|---|---|---|
+| `GET` | `/v1/status` | | Whether controls are set, the limit and time played today, the time left, whether play is suspended, a temporary unlock; `next_reset_at`, when the day's count starts again; `bedtime`, when play stops and starts again tonight, if the alarm is set. | planned |
 
 ### Activity [activity]
 
-| Method | Path | | Answer |
-|---|---|---|---|
-| `GET` | `/v1/activity?day=YYYY-MM-DD` | PIN | Time per game and per account that day (today by default). |
-| `GET` | `/v1/games/{program_id}/activity?from=…&to=…` | PIN | One game's time per day and per account. |
-| `OPEN` | `/v1/games/{program_id}` | | The game's page: its activity and what PlayGuard knows of it. |
+| Method | Path | | Answer | Since |
+|---|---|---|---|---|
+| `GET` | `/v1/activity?day=YYYY-MM-DD` | PIN | Time per game and per account that day (today by default). | planned |
+| `GET` | `/v1/games/{program_id}/activity?from=…&to=…` | PIN | One game's time per day and per account. | planned |
+| `OPEN` | `/v1/games/{program_id}` | | The game's page: its activity and what PlayGuard knows of it. | planned |
 
 What a child plays is the family's business, so reading it takes the PIN even
 when the group is set to *Read*. Opening the game's page does not: it shows what
@@ -279,10 +298,10 @@ the app shows, behind its own lock (`pin_lock`).
 
 ### Games [games]
 
-| Method | Path | | Answer |
-|---|---|---|---|
-| `OPEN` | `/v1/games/{program_id}/check` | | Checks that one game is installed whole, as *Console › Check the installed games*, and shows the result with its repairs. |
-| `GET` | `/v1/games/{program_id}/check` | | The same check without the screen: `ok`, and the problems found (`missing_content`, `ticket`, …). Repairs stay on the screen. |
+| Method | Path | | Answer | Since |
+|---|---|---|---|---|
+| `OPEN` | `/v1/games/{program_id}/check` | | Checks that one game is installed whole, as *Console › Check the installed games*, and shows the result with its repairs. | planned |
+| `GET` | `/v1/games/{program_id}/check` | | The same check without the screen: `ok`, and the problems found (`missing_content`, `ticket`, …). Repairs stay on the screen. | planned |
 
 `{program_id}` is the 16 hex digits of the game's program ID.
 
@@ -293,7 +312,7 @@ planned once the routes above have shipped. Both need *Read and write* on **play
 
 ## Reading without launching PlayGuard
 
-When the **status** group is set to *Read*, PlayGuard writes
+*Planned, with `GET /v1/status`.* When the **status** group is set to *Read*, PlayGuard writes
 `sdmc:/config/playguard/api/snapshot.json` each time it closes:
 
 ```json
@@ -321,6 +340,8 @@ also read it from the system itself (`pctl`), as PlayGuard does.
 - The changelog says which PlayGuard version added each route.
 
 ## Trying it
+
+*Both planned, soon after the first routes.*
 
 - **In the browser.** The [simulator](https://playguard.link/simulator/)
   takes the short form as a parameter, against its simulated console, and
