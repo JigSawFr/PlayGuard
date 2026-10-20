@@ -21,8 +21,9 @@ bool gate_argv_parse(const char *raw, char *nro, size_t nro_size, const char **a
         if (!p) return false;
     }
     static const char flag[] = " " GATE_FLAG " ";
-    if (strncmp(p, flag, sizeof(flag) - 1) != 0) return false;
-    const char *rest = p + sizeof(flag) - 1;
+    const size_t flag_len = strlen(flag);
+    if (strncmp(p, flag, flag_len) != 0) return false;
+    const char *rest = p + flag_len;
     // Its path: its first word, or what its quotes hold.
     const char *start = rest, *end;
     if (*rest == '"') {

@@ -2,8 +2,10 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "gate_nx.h"
 
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <strings.h>
 #include <switch.h>
@@ -69,8 +71,13 @@ static void log_try(const char *when, GateResult r, const char *nro)
     char line[FS_MAX_PATH + 64];
     const size_t n = gate_log_format(when, r, nro, line, sizeof(line));
     if (n == 0) return;
-    FILE *f = fopen(GATE_DIR GATE_LOG_NAME, "ab");
-    if (!f) return;
+    // Owner-writable only (fopen would ask for 0666), as the rescue module's files.
+    const int fd = open(GATE_DIR GATE_LOG_NAME, O_WRONLY | O_CREAT | O_APPEND, 0644);
+    FILE *f = fd >= 0 ? fdopen(fd, "ab") : NULL;
+    if (!f) {
+        if (fd >= 0) close(fd);
+        return;
+    }
     // Not past its size: PlayGuard empties it at its next start.
     if (ftell(f) < GATE_LOG_MAX) fwrite(line, 1, n, f);
     fclose(f);
