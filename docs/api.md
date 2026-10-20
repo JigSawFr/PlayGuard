@@ -27,10 +27,38 @@ the little that is worth reading without it, see
 ## Off until a parent turns it on
 
 The API answers nothing until *Preferences › Other homebrews* is turned on,
-from a parent's session (behind the PIN, like every setting). Each group of
-routes can be allowed on its own: **clock**, **status**, **activity**,
-**games**. While it is off, every request gets `403 api_disabled` and nothing
-else is done (the request file is still consumed).
+from a parent's session (behind the PIN, like every setting). While it is
+off, every request gets `403 api_disabled` and nothing else is done (the
+request file is still consumed).
+
+Once it is on, each group of routes gets its own permission:
+
+| Permission | Allows |
+|---|---|
+| **None** | Nothing: `403 permission_denied`. |
+| **Read** | The routes that change nothing: `GET`, and `OPEN` (a screen, where any change goes through the app as usual). |
+| **Read and write** | Those, and the routes that change something (`POST`). |
+
+| Group | Read | Write | Default |
+|---|---|---|---|
+| **clock** | measure the offset, open *Network clock* | set the clock from NTP | None |
+| **status** | the time left today, the snapshot | (none) | None |
+| **activity** | time per game and per account (PIN), a game's page | (none) | None |
+| **games** | check a game, open its check | (none in v1; repairs stay on the screen) | None |
+| **play time** (later) | (none) | extra time, stop for today (PIN) | None |
+
+A group with nothing to write only offers *None* and *Read*. Turning the API
+on changes no permission: the parent picks each one. Each route below says
+which permission it needs. In `config.json` (`api`):
+
+```json
+"api": {
+  "enabled": true,
+  "permissions": { "clock": "read_write", "status": "read", "activity": "none", "games": "read" }
+}
+```
+
+A missing or unknown value is `"none"`.
 
 Whatever the request says, it **never authorises anything**: an action that
 changes parental controls goes through the PIN screen, the `caller` field is
@@ -134,7 +162,7 @@ console's language, ready to show:
 |---|---|---|
 | `200` | | Done (or, for `open`, the screen was shown). |
 | `400` | `bad_request`, `unsupported_api` | The request cannot be read. |
-| `403` | `api_disabled`, `route_disabled` | The parent has not allowed it. |
+| `403` | `api_disabled`, `permission_denied` | The API is off, or the route's group lacks the permission (`detail` names the group and the permission needed). |
 | `403` | `pin_refused` | The PIN screen was cancelled or the PIN was wrong. |
 | `404` | `no_route`, `no_game` | Unknown path, or no such game installed. |
 | `422` | `bad_body` | A parameter is missing or out of range. |
@@ -155,15 +183,16 @@ cannot give the extra time twice.
 
 ## Routes
 
-The group in brackets is the one the parent allows (*Preferences › Other
-homebrews*). **PIN** means the route goes through the PIN screen, whatever the
+The group in brackets is the one the parent sets (*Preferences › Other
+homebrews*); a route needs *Read* for `GET` and `OPEN`, *Read and write* for
+`POST`. **PIN** means the route goes through the PIN screen, whatever the
 lock setting.
 
 ### Discovery
 
 | Method | Path | | Answer |
 |---|---|---|---|
-| `GET` | `/v1` | always answers | PlayGuard's version, the API versions, whether the API is on, the groups allowed, the routes, and whether the firmware is read only. |
+| `GET` | `/v1` | always answers | PlayGuard's version, the API versions, whether the API is on, each group's permission, the routes it opens, and whether the firmware is read only. |
 
 `GET /v1` answers even while the API is off (with `"enabled": false` and no
 routes), so a caller can tell the parent what to turn on.
@@ -191,7 +220,7 @@ routes), so a caller can tell the parent what to turn on.
 | `OPEN` | `/v1/games/{program_id}` | | The game's page: its activity and what PlayGuard knows of it. |
 
 What a child plays is the family's business, so reading it takes the PIN even
-when the group is allowed. Opening the game's page does not: it shows what
+when the group is set to *Read*. Opening the game's page does not: it shows what
 the app shows, behind its own lock (`pin_lock`).
 
 ### Games [games]
@@ -199,18 +228,18 @@ the app shows, behind its own lock (`pin_lock`).
 | Method | Path | | Answer |
 |---|---|---|---|
 | `OPEN` | `/v1/games/{program_id}/check` | | Checks that one game is installed whole, as *Console › Check the installed games*, and shows the result with its repairs. |
-| `POST` | `/v1/games/{program_id}/check` | | The same check without the screen: `ok`, and the problems found (`missing_content`, `ticket`, …). Repairs stay on the screen. |
+| `GET` | `/v1/games/{program_id}/check` | | The same check without the screen: `ok`, and the problems found (`missing_content`, `ticket`, …). Repairs stay on the screen. |
 
 `{program_id}` is the 16 hex digits of the game's program ID.
 
 ### Play time (later)
 
 `POST /v1/playtime/extra` (`{"minutes": 30}`) and `POST /v1/playtime/stop` are
-planned once the routes above have shipped. Both always take the PIN.
+planned once the routes above have shipped. Both need *Read and write* on **play time**, and always take the PIN.
 
 ## Reading without launching PlayGuard
 
-When the **status** group is allowed, PlayGuard writes
+When the **status** group is set to *Read*, PlayGuard writes
 `sdmc:/config/playguard/api/snapshot.json` each time it closes:
 
 ```json
