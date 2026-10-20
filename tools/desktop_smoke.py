@@ -396,7 +396,7 @@ hbmenu_state = os.path.join(run_dir, "playguard_data", "hbmenu_lock.txt")
 if HBMENU:
     # The homebrew menu never locked in an earlier run; the signature patches
     # forwarders need (sigpatch files for fs and the loader).
-    for f in (sd_override, hbmenu_state):
+    for f in (sd_override, hbmenu_state, os.path.join(run_dir, "playguard_data", "gate_rules.txt")):
         if os.path.exists(f):
             os.remove(f)
     # What the rescue sysmodule leaves after lifting it at boot (Atmosphère
@@ -404,6 +404,11 @@ if HBMENU:
     os.makedirs(os.path.join(run_dir, "playguard_data"), exist_ok=True)
     open(os.path.join(run_dir, "playguard_data", "hbmenu_lock_report.txt"), "w").write(
         "reason=atmosphere\nresult=ok\nfrom=1.9.4\nto=1.9.5\n")
+    # The gate's log of a try (refused), and the lock PlayGuard held taken
+    # away from the file outside it: both told and recorded at start-up.
+    open(os.path.join(run_dir, "playguard_data", "gate_log.txt"), "w").write(
+        "2026-10-19 21:03\trefused\tsdmc:/switch/sphaira/sphaira.nro\n")
+    open(hbmenu_state, "w").write("ams=1.9.4\n")
     for kind in ("fs_patches", "loader_patches"):
         d = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "kip_patches", kind)
         os.makedirs(d, exist_ok=True)
@@ -1182,7 +1187,7 @@ if FORWARDERS:
         fail("the protection is not in the change history: " + repr(recorded("protect_forwarder")))
     shot("12_protected")       # Star Atlas: On the HOME menu · PIN, the focus on it
     key("Return")
-    key("Down", 5)             # Delete
+    key("Down", 6)             # Delete (after Hours without the PIN, Install again)
     key("Return")
     key("Right")               # Delete, in the confirmation
     key("Return")
@@ -1202,10 +1207,12 @@ if FORWARDERS:
     finish()
 if HBMENU:
     # Console › Forwarders › Lock the homebrew menu: refused with no way back,
-    # then PlayGuard's forwarder and sphaira's (protected with the PIN) made,
-    # locked, unlocked.
+    # then PlayGuard's forwarder and sphaira's (protected with the PIN, free
+    # hours on the weekend) made, Star Atlas left unprotected and protected
+    # on the way to the lock, the check, unlocked.
     made_file = os.path.join(nand_dir, "forwarders.json")
     history_file = os.path.join(nand_dir, "history.json")
+    rules_file = os.path.join(run_dir, "playguard_data", "gate_rules.txt")
     def recorded(kind):
         try:
             return [e for e in json.load(open(history_file)).get("entries", []) if e.get("kind") == kind]
@@ -1216,21 +1223,28 @@ if HBMENU:
             return open(sd_override).read()
         except OSError:
             return ""
+    def pinned():
+        return [e.get("name") for e in json.load(open(made_file)).get("forwarders", []) if e.get("pin")]
     restored = recorded("hbmenu_restored")
     if len(restored) != 1 or restored[0].get("detail") != "Atmosphère 1.9.4 → 1.9.5" or \
             os.path.exists(os.path.join(run_dir, "playguard_data", "hbmenu_lock_report.txt")):
         fail("the sysmodule's report was not taken: " + repr(restored))
+    refused = recorded("gate_refused")
+    if len(refused) != 1 or refused[0].get("detail") != "sphaira" or refused[0].get("when") != "2026-10-19 21:03":
+        fail("the gate's log was not taken: " + repr(refused))
+    if len(recorded("hbmenu_lock_removed")) != 1 or os.path.exists(hbmenu_state):
+        fail("the lock taken away outside PlayGuard was not told")
     key("Down", steps("dashboard", "console"))
     key("Right")               # Network clock
     key("Down", 2)             # Forwarders, under Homebrew
     key("Return")
-    key("Down", 3)             # PlayGuard's line, Another homebrew, Lock the homebrew menu
+    key("Down", 4)             # PlayGuard's line, Another homebrew, Install them all again, Lock the homebrew menu
     key("Return")
     shot("01_not_ready")       # what it takes first: PlayGuard's forwarder, a protected menu
     if override():
         fail("the homebrew menu was locked without a way back: " + repr(override()))
     key("Return")              # OK
-    key("Up", 2)               # PlayGuard's line
+    key("Up", 3)               # PlayGuard's line
     key("Return")
     key("Right")               # Add
     key("Return")
@@ -1250,21 +1264,51 @@ if HBMENU:
     key("Right")
     key("Return")
     time.sleep(3)
-    pinned = [e.get("name") for e in json.load(open(made_file)).get("forwarders", []) if e.get("pin")]
-    if pinned != ["sphaira"]:
-        fail("sphaira was not protected with the PIN: " + repr(pinned))
-    key("Down", 3)             # PlayGuard's line, Another homebrew, Lock the homebrew menu
+    if pinned() != ["sphaira"]:
+        fail("sphaira was not protected with the PIN: " + repr(pinned()))
+    key("Return")              # sphaira's actions
+    key("Down", 4)             # Hours without the PIN
     key("Return")
-    shot("02_confirm")         # what it changes, Save Keeper still open, the way back from a computer
+    key("Down", 3)             # Saturday and Sunday
+    key("Return")
+    key("Return")              # from 09:00
+    key("Return")              # until 20:00
+    time.sleep(3)
+    rules = open(rules_file).read() if os.path.exists(rules_file) else ""
+    if rules != "41\t540\t1200\tsdmc:/switch/sphaira/sphaira.nro\n" or len(recorded("gate_hours")) != 1:
+        fail("sphaira's free hours were not written: " + repr(rules))
+    shot("02_hours")           # sphaira: On the HOME menu · PIN, not asked Sat–Sun 09:00–20:00
+    key("Down", 2)             # PlayGuard's line, Another homebrew
+    key("Return")
+    key("Down", 5)             # Star Atlas, after sphaira
+    key("Return")
+    key("Return")
+    key("Right")
+    key("Return")
+    time.sleep(3)
+    key("Down", 7)             # Save Keeper, sphaira, Star Atlas, PlayGuard's line, Another homebrew, Install them all again, Lock
+    key("Return")
+    shot("03_unprotected")     # Star Atlas not protected: protect them all first, or lock as it is
+    key("Return")              # Protect them all, then lock
+    key("Right")               # Protect, in its confirmation
+    key("Return")
+    time.sleep(3)
+    shot("04_confirm")         # what it changes, Save Keeper still open, the way back from a computer
     key("Right")               # Lock
     key("Return")
     time.sleep(3)
+    if sorted(pinned()) != ["Star Atlas", "sphaira"]:
+        fail("Star Atlas was not protected on the way to the lock: " + repr(pinned()))
     text = override()
     if "; >>> PlayGuard: the homebrew menu is locked" not in text or "override_any_app=false" not in text:
         fail("override_config.ini is not locked: " + repr(text))
     if not os.path.exists(hbmenu_state) or len(recorded("lock_hbmenu")) != 1:
         fail("the lock's state file or its history entry is missing")
-    shot("03_locked")          # Lock the homebrew menu: Locked
+    key("Down", 2)             # Protect every forwarder, Check the homebrew menu
+    key("Return")
+    shot("05_check")           # the album and R closed, the ways back, the module
+    key("Return")              # OK
+    key("Up", 2)               # Lock the homebrew menu: Locked
     key("Return")              # unlocked at once (the PIN asked)
     time.sleep(3)
     text = override()
@@ -1272,7 +1316,7 @@ if HBMENU:
         fail("override_config.ini is not unlocked: " + repr(text))
     if os.path.exists(hbmenu_state) or len(recorded("unlock_hbmenu")) != 1:
         fail("the state file stayed, or the unlock is not in the history")
-    shot("04_unlocked")
+    shot("06_unlocked")
     finish()
 if LIBRARY:
     def listed():

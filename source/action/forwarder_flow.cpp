@@ -10,6 +10,7 @@
 #include "core/forwarder.h"
 #include "core/pctl_ops.h"
 #include "ui/ui.hpp"
+#include "core/gate.h"
 #include "util/forwarder_gate.hpp"
 #include "util/forwarder_icon.hpp"
 #include "util/forwarders.hpp"
@@ -96,11 +97,32 @@ bool assets_of(const std::string& sdmc, bool self, nro::Info& info, std::string&
     return true;
 }
 
+forwarders::Made made_of(const forwarders_logic::Row& row);
+void write_rules();
+
+// The gate a protected forwarder starts first: config/playguard/gate.nro,
+// written from the romfs when this build carries it (again when PlayGuard
+// was updated); else PlayGuard's own .nro (the desktop, or the card refused
+// the write), which is a gate too (main.cpp).
+std::string gate_nro()
+{
+    std::string bundled;
+    if (paths::read_file(BRLS_ASSET("gate/gate.nro"), bundled) && !bundled.empty()) {
+        const std::string path = paths::data_dir() + "/" + GATE_NRO_NAME;
+        std::string on_card, err;
+        if ((paths::read_file(path, on_card) && on_card == bundled) ||
+            (paths::ensure_dir(paths::data_dir()) && paths::atomic_write(path, bundled, &err)))
+            return nro::sdmc_path(path);
+        brls::Logger::warning("forwarders: {} not written ({}): PlayGuard is the gate", GATE_NRO_NAME, err);
+    }
+    return self_nro();
+}
+
 // Builds and installs `m` from its .nro; says how it went (`done_text`, the
-// change history's `kind`). Protected with the PIN, it goes through
-// PlayGuard's .nro as it is now.
+// change history's `kind`), only when it fails with `quiet`. Protected with
+// the PIN, it goes through the gate as it is now (gate_nro).
 bool install(const forwarders::Made& m, bool self, const char* kind = "add_forwarder",
-             const std::string& done_text = "")
+             const std::string& done_text = "", bool quiet = false)
 {
     nro::Info info;
     std::string error;
@@ -111,7 +133,7 @@ bool install(const forwarders::Made& m, bool self, const char* kind = "add_forwa
     forwarders::Made made = m;
     std::string gate_argv;
     if (made.pin) {
-        made.gate = self_nro();
+        made.gate = gate_nro();
         if (made.gate.empty() || !nro_exists(made.gate)) {
             ui::error("playguard/forwarders/add_err"_i18n, "playguard/forwarders/self_unknown"_i18n);
             return false;
@@ -119,6 +141,7 @@ bool install(const forwarders::Made& m, bool self, const char* kind = "add_forwa
         gate_argv = forwarder_gate::argv_for(made.gate, made.argv);
     } else {
         made.gate.clear();
+        made.free_days = 0;
     }
     const ForwarderSpec spec = {
         made.nro.c_str(), made.argv.c_str(), made.pin ? made.gate.c_str() : nullptr,
@@ -133,12 +156,31 @@ bool install(const forwarders::Made& m, bool self, const char* kind = "add_forwa
         std::string werr;
         if (!forwarders::save(made, &werr)) brls::Logger::warning("forwarders: not remembered ({})", werr);
         history_flow::record_event(kind, "", history_label(made.name, id));
+        write_rules();
     } else {
         brls::Logger::warning("forwarders: {} not installed ({})", made.nro, ui::rc_text(rc, false));
     }
-    ui::notify_result(rc, done_text.empty() ? brls::getStr("playguard/forwarders/added", made.name) : done_text,
-                      "playguard/forwarders/add_err"_i18n);
+    if (!quiet || R_FAILED(rc))
+        ui::notify_result(rc, done_text.empty() ? brls::getStr("playguard/forwarders/added", made.name) : done_text,
+                          "playguard/forwarders/add_err"_i18n);
     return R_SUCCEEDED(rc);
+}
+
+// Each of `rows` made again (`pin`: protected too), one after the other,
+// quietly; one toast for them all. `kind` for each in the change history.
+void install_many(const std::vector<forwarders_logic::Row>& rows, bool pin, const char* kind,
+                  const std::string& done_text, std::function<void(bool)> done)
+{
+    int ok = 0;
+    for (const auto& r : rows) {
+        forwarders::Made m = made_of(r);
+        if (m.nro.empty()) continue;
+        if (pin) m.pin = true;
+        if (m.name.empty()) m.name = r.name;
+        if (install(m, r.self || m.nro == self_nro(), kind, "", true)) ok++;
+    }
+    if (ok > 0) ui::notify(brls::getStr(done_text, ok), ui::Toast::Done);
+    if (done) done(ok > 0);
 }
 
 // The forwarder `row` remembered, or as the row says it (made here before
@@ -152,6 +194,35 @@ forwarders::Made made_of(const forwarders_logic::Row& row)
         m.argv = argv_of(row.nro);
     }
     return m;
+}
+
+// The free hours of every protected forwarder, for the gate (GATE_RULES_NAME).
+void write_rules()
+{
+    std::string text;
+    for (const forwarders::Made& m : forwarders::list()) {
+        if (!m.pin || !m.free_days) continue;
+        const GateHours h = { (uint8_t)m.free_days, (uint16_t)m.free_from, (uint16_t)m.free_to };
+        char line[0x400];
+        if (gate_rule_format(&h, m.nro.c_str(), line, sizeof(line))) text += line;
+    }
+    const std::string path = paths::data_dir() + "/" + GATE_RULES_NAME;
+    if (text.empty()) {
+        std::remove(path.c_str());
+        return;
+    }
+    std::string err;
+    if (!paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(path, text, &err))
+        brls::Logger::warning("forwarders: {} not written ({})", GATE_RULES_NAME, err);
+}
+
+// Made here, still known (not PlayGuard's own when `with_self` is false).
+std::vector<forwarders_logic::Row> made_rows(bool with_self)
+{
+    std::vector<forwarders_logic::Row> out;
+    for (const auto& r : rows())
+        if (r.state != forwarders_logic::State::Elsewhere && !r.nro.empty() && (with_self || !r.self)) out.push_back(r);
+    return out;
 }
 
 }   // namespace
@@ -328,6 +399,133 @@ void forget(const forwarders_logic::Row& row, std::function<void(bool)> done)
     if (ok) ui::notify(brls::getStr("playguard/forwarders/forgotten", row.name), ui::Toast::Done);
     else ui::error("playguard/forwarders/delete_err"_i18n, err);
     if (done) done(ok);
+}
+
+std::vector<forwarders_logic::Row> unprotected()
+{
+    std::vector<forwarders_logic::Row> out;
+    for (const auto& r : made_rows(false))
+        if (!r.pin && r.state != forwarders_logic::State::NotInstalled) out.push_back(r);
+    return out;
+}
+
+void protect_all(std::function<void(bool)> done)
+{
+    const std::vector<forwarders_logic::Row> todo = unprotected();
+    if (todo.empty()) {
+        ui::info("playguard/forwarders/all_protected"_i18n);
+        if (done) done(false);
+        return;
+    }
+    u32 pin_length = 0;
+    if (R_SUCCEEDED(pctl_lock_state(&pin_length, nullptr)) && pin_length == 0) {
+        ui::info("playguard/forwarders/pin_no_pin"_i18n);
+        if (done) done(false);
+        return;
+    }
+    std::string names;
+    for (const auto& r : todo) names += (names.empty() ? "" : ", ") + r.name;
+    ui::confirm(brls::getStr("playguard/forwarders/protect_all_confirm", names), "playguard/forwarders/protect_all"_i18n,
+                [todo, done]() {
+                    install_many(todo, true, "protect_forwarder", "playguard/forwarders/protected_n", done);
+                },
+                [done]() {
+                    if (done) done(false);
+                });
+}
+
+void reinstall_all(std::function<void(bool)> done)
+{
+    const std::vector<forwarders_logic::Row> todo = made_rows(true);
+    if (todo.empty()) {
+        if (done) done(false);
+        return;
+    }
+    ui::confirm(brls::getStr("playguard/forwarders/reinstall_all_confirm", (int)todo.size()),
+                "playguard/forwarders/reinstall_all"_i18n,
+                [todo, done]() { install_many(todo, false, "add_forwarder", "playguard/forwarders/reinstalled_n", done); },
+                [done]() {
+                    if (done) done(false);
+                });
+}
+
+void set_hours(const forwarders_logic::Row& row, int days, int from, int to, std::function<void(bool)> done)
+{
+    forwarders::Made m = made_of(row);
+    if (!m.pin || !forwarders::find(row.id, nullptr)) {
+        if (done) done(false);
+        return;
+    }
+    // The PIN first: free hours let the homebrew start without it.
+    if (ui::refuse_read_only() || !pin_lock::confirm() || R_FAILED(core_change_allowed())) {
+        if (done) done(false);
+        return;
+    }
+    m.free_days = days;
+    m.free_from = days ? from : 0;
+    m.free_to = days ? to : 0;
+    std::string err;
+    if (!forwarders::save(m, &err)) {
+        ui::error("playguard/forwarders/hours_err"_i18n, err);
+        if (done) done(false);
+        return;
+    }
+    write_rules();
+    history_flow::record_event("gate_hours", "", history_label(m.name, m.id) +
+                                                     (days ? " · " + hours_label(days, from, to) : std::string()));
+    ui::notify(days ? brls::getStr("playguard/forwarders/hours_set", m.name, hours_label(days, from, to))
+                    : brls::getStr("playguard/forwarders/hours_none", m.name),
+               ui::Toast::Done);
+    if (done) done(true);
+}
+
+std::string hours_label(int days, int from, int to)
+{
+    const std::vector<std::string> names = {
+        "playguard/forwarders/day_sun"_i18n, "playguard/forwarders/day_mon"_i18n, "playguard/forwarders/day_tue"_i18n,
+        "playguard/forwarders/day_wed"_i18n, "playguard/forwarders/day_thu"_i18n, "playguard/forwarders/day_fri"_i18n,
+        "playguard/forwarders/day_sat"_i18n,
+    };
+    return forwarders_logic::hours_text(days, from, to, names);
+}
+
+void at_start()
+{
+    // The gate as this PlayGuard carries it, and the free hours, while a
+    // forwarder is protected.
+    bool any = false;
+    for (const forwarders::Made& m : forwarders::list()) any = any || m.pin;
+    if (any) {
+        gate_nro();
+        write_rules();
+    }
+    // Each try the gate logged since: into the change history, then gone.
+    const std::string path = paths::data_dir() + "/" + GATE_LOG_NAME;
+    std::string text;
+    if (!paths::read_file(path, text)) return;
+    std::remove(path.c_str());
+    const std::vector<forwarders::Made> made = forwarders::list();
+    size_t at = 0;
+    int n = 0;
+    while (at < text.size() && n < 200) {
+        size_t end = text.find('\n', at);
+        if (end == std::string::npos) end = text.size();
+        const char *when, *nro;
+        size_t wn, nn;
+        GateResult r;
+        if (gate_log_parse(text.data() + at, end - at, &when, &wn, &r, &nro, &nn)) {
+            const std::string path_s(nro, nn);
+            std::string name = forwarders_logic::file_title(path_s);
+            for (const auto& m : made)
+                if (m.nro == path_s) name = m.name;
+            const char* kind = r == GateResult_Pin ? "gate_open" : r == GateResult_Free ? "gate_free" : "gate_refused";
+            std::string w(when, wn);
+            if (w == "?") w.clear();
+            history_flow::record_seen(kind, w, r == GateResult_Error ? name + " (error)" : name);
+            n++;
+        }
+        at = end + 1;
+    }
 }
 
 }   // namespace forwarder_flow

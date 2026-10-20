@@ -212,6 +212,22 @@ static void test_registry()
     b.pin = false;
     CHECK(forwarders::save(b));
     CHECK(forwarders::find(b.id, &found) && !found.pin && found.gate.empty());
+    // Free hours: kept while protected, as the gate reads them; a broken span is none.
+    b.pin = true;
+    b.gate = "sdmc:/config/playguard/gate.nro";
+    b.free_days = 0x41;
+    b.free_from = 540;
+    b.free_to = 1200;
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.free_days == 0x41 && found.free_from == 540 && found.free_to == 1200);
+    b.free_to = 540;
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.free_days == 0);
+    b.pin = false;
+    b.gate.clear();
+    b.free_days = 0;
+    CHECK(forwarders::save(b));
+
     // Told gone once: kept, and dropped once it is false again.
     b.gone = true;
     CHECK(forwarders::save(b));
@@ -363,6 +379,27 @@ static void test_lock_check()
     other.state = State::Elsewhere;
     c = lock_check({ self, menu, other }, true, Patches::Ready);
     CHECK(c.ready() && c.open_doors == std::vector<std::string>{ "Save Keeper" });
+
+    // Made here and not protected: told, and those that write to the SD card apart.
+    Row installer;
+    installer.id = 5;
+    installer.name = "CyberFoil";
+    installer.nro = "sdmc:/switch/CyberFoil/CyberFoil.nro";
+    c = lock_check({ self, menu, game, installer }, true, Patches::Ready);
+    CHECK(c.ready() && (c.unprotected == std::vector<std::string>{ "Cyberfoil", "CyberFoil" }));
+    CHECK((c.sd_writers == std::vector<std::string>{ "Cyberfoil", "CyberFoil" }));   // both are Cyberfoil
+    installer.pin = true;
+    c = lock_check({ self, menu, installer }, true, Patches::Ready);
+    CHECK(c.unprotected.empty() && c.sd_writers.empty());
+    CHECK(writes_sd("sdmc:/switch/Goldleaf.nro") && writes_sd("sdmc:/switch/NX-Shell/NX-Shell.nro"));
+    CHECK(!writes_sd("sdmc:/switch/StarAtlas.nro") && !writes_sd(""));
+
+    // The hours as the rows say them.
+    const std::vector<std::string> days = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+    CHECK(hours_text(0x41, 540, 1200, days) == "Sat–Sun 09:00–20:00");
+    CHECK(hours_text(0x3E, 0, 1440, days) == "Mon–Fri 00:00–24:00");
+    CHECK(hours_text(0x7F, 1320, 120, days) == "Mon–Sun 22:00–02:00");
+    CHECK(hours_text(0x0A, 600, 660, days) == "Mon, Wed 10:00–11:00");
 }
 
 static void test_gate()

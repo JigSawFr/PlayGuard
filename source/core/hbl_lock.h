@@ -65,8 +65,16 @@ bool hbl_lock_has_defaults(const char *ini, size_t len);
 // not fit (out then holds "").
 bool hbl_lock_apply(const char *ini, size_t len, HblLockOp op, char *out, size_t size, size_t *out_len);
 
-// The state file: "ams=1.9.4\n". Length written, or 0 when it does not fit.
+// What Atmosphère makes of `ini` from its own defaults (as after a restart):
+// whether the album opens the homebrew menu (a program_id_N slot is the
+// album's) and whether R on any game does (override_any_app). PlayGuard's
+// check of the lock (Console › Forwarders) and its diagnostic report.
+void hbl_lock_effective(const char *ini, size_t len, bool *album, bool *any_app);
+
+// The state file: "ams=1.9.4\n", or "ams=unknown\n" when the version could
+// not be read (it is there while PlayGuard holds the lock, whatever it says). Length written, or 0 when it does not fit.
 size_t hbl_lock_state_format(uint8_t major, uint8_t minor, uint8_t micro, char *buf, size_t size);
+size_t hbl_lock_state_format_unknown(char *buf, size_t size);
 // Back from it; false (the outputs unchanged) for anything else.
 bool hbl_lock_state_parse(const char *text, size_t len, uint8_t *major, uint8_t *minor, uint8_t *micro);
 

@@ -3,6 +3,7 @@
 #include "hbl_lock.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 // The first words of each block's first line, and of its last.
@@ -249,6 +250,67 @@ bool hbl_lock_apply(const char *ini, size_t len, HblLockOp op, char *out, size_t
     return true;
 }
 
+void hbl_lock_effective(const char *ini, size_t len, bool *album, bool *any_app)
+{
+    static const unsigned long long ALBUM = 0x010000000000100DULL;
+    unsigned long long slots[8] = { ALBUM, 0, 0, 0, 0, 0, 0, 0 };
+    bool any = true, hbl = false;
+    for (size_t at = 0; ini && at < len;) {
+        const char *line;
+        size_t n;
+        at = line_at(ini, len, at, &line, &n);
+        trim_start(&line, &n);
+        while (n > 0 && blank(line[n - 1])) n--;
+        if (n == 0 || line[0] == ';' || line[0] == '#') continue;
+        if (line[0] == '[') {
+            size_t e = 1;
+            while (e < n && line[e] != ']') e++;
+            const char *name = line + 1;
+            size_t k = e - 1;
+            while (k > 0 && blank(*name)) name++, k--;
+            while (k > 0 && blank(name[k - 1])) k--;
+            hbl = same_word(name, k, "hbl_config");
+            continue;
+        }
+        if (!hbl) continue;
+        size_t eq = 0;
+        while (eq < n && line[eq] != '=') eq++;
+        if (eq == n) continue;
+        size_t k = eq;
+        while (k > 0 && blank(line[k - 1])) k--;
+        const char *v = line + eq + 1;
+        size_t vn = n - eq - 1;
+        while (vn > 0 && blank(*v)) v++, vn--;
+        // An inline comment ends the value, as inih reads it.
+        for (size_t i = 0; i < vn; i++)
+            if (v[i] == ';' && (i == 0 || blank(v[i - 1]))) {
+                vn = i;
+                break;
+            }
+        while (vn > 0 && blank(v[vn - 1])) vn--;
+        char value[32];
+        if (vn >= sizeof(value)) continue;
+        memcpy(value, v, vn);
+        value[vn] = '\0';
+        int slot = -1;
+        if (same_word(line, k, "program_id") || same_word(line, k, "program_id_0")) slot = 0;
+        for (int i = 1; i < 8; i++) {
+            char key[16];
+            snprintf(key, sizeof(key), "program_id_%d", i);
+            if (same_word(line, k, key)) slot = i;
+        }
+        if (slot >= 0) slots[slot] = strtoull(value, NULL, 16);
+        if (same_word(line, k, "override_any_app")) {
+            if (same_word(value, vn, "true") || same_word(value, vn, "1")) any = true;
+            else if (same_word(value, vn, "false") || same_word(value, vn, "0")) any = false;
+        }
+    }
+    bool open = false;
+    for (int i = 0; i < 8; i++) open = open || slots[i] == ALBUM;
+    if (album) *album = open;
+    if (any_app) *any_app = any;
+}
+
 // ---------------------------------------------------------------- state
 
 static bool parse_version(const char *s, size_t n, uint8_t v[3])
@@ -296,6 +358,17 @@ size_t hbl_lock_state_format(uint8_t major, uint8_t minor, uint8_t micro, char *
 {
     if (!buf || size == 0) return 0;
     const int n = snprintf(buf, size, "ams=%u.%u.%u\n", major, minor, micro);
+    if (n < 0 || (size_t)n >= size) {
+        buf[0] = '\0';
+        return 0;
+    }
+    return (size_t)n;
+}
+
+size_t hbl_lock_state_format_unknown(char *buf, size_t size)
+{
+    if (!buf || size == 0) return 0;
+    const int n = snprintf(buf, size, "ams=unknown\n");
     if (n < 0 || (size_t)n >= size) {
         buf[0] = '\0';
         return 0;

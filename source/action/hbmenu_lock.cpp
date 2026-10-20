@@ -10,10 +10,13 @@
 #include "action/history_flow.hpp"
 #include "action/notices.hpp"
 #include "action/pin_lock.hpp"
+#include "action/rescue.hpp"
 #include "app.hpp"
+#include "core/gate.h"
 #include "core/hbl_lock.h"
 #include "core/rescue.h"
 #include "ui/ui.hpp"
+#include "util/diagnostics.hpp"
 #include "util/forwarders.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -73,7 +76,9 @@ bool apply(const std::string& text, HblLockOp op, std::string& out)
     return true;
 }
 
-// The Atmosphère version, for the sysmodule to tell an update.
+// The Atmosphère version, for the sysmodule to tell an update; the file
+// also says PlayGuard holds the lock (one gone from override_config.ini
+// while it is there was taken away outside PlayGuard).
 void write_state()
 {
     SysInfo si;
@@ -81,10 +86,11 @@ void write_state()
     std::string error;
     char text[32];
     const std::string path = in_data(HBL_LOCK_STATE_NAME);
-    if (!si.ams_valid || !hbl_lock_state_format(si.ams_major, si.ams_minor, si.ams_micro, text, sizeof(text))) {
-        std::remove(path.c_str());
+    // The file is there while PlayGuard holds the lock, the version or not
+    // (without one, the sysmodule lifts nothing for an update).
+    if (!(si.ams_valid && hbl_lock_state_format(si.ams_major, si.ams_minor, si.ams_micro, text, sizeof(text))) &&
+        !hbl_lock_state_format_unknown(text, sizeof(text)))
         return;
-    }
     if (!paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(path, text, &error))
         brls::Logger::warning("hbmenu lock: {} not written: {}", HBL_LOCK_STATE_NAME, error);
 }
@@ -160,12 +166,43 @@ bool locked()
     return hbl_lock_locked(text.data(), text.size());
 }
 
-void lock(std::function<void(bool)> done)
+namespace
 {
-    const auto finish = [done](bool changed) {
-        if (done) done(changed);
-    };
-    if (ui::refuse_read_only()) return finish(false);
+
+// Writes the lock, the checks done and confirmed.
+void apply_lock(std::function<void(bool)> finish)
+{
+    // The PIN whatever PlayGuard's own lock says, then the change check
+    // (read-only mode).
+    if (!pin_lock::confirm() || R_FAILED(core_change_allowed())) return finish(false);
+    const std::string before = read_config();
+    std::string after, error;
+    if (!apply(before, HblLock_Lock, after)) {
+        ui::error("playguard/hbmenu/lock_err"_i18n, "playguard/hbmenu/too_large"_i18n);
+        return finish(false);
+    }
+    // The file as it was, once: not one already locked.
+    if (!before.empty() && !hbl_lock_locked(before.data(), before.size())) {
+        std::string berr;
+        if (!paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(in_data(HBL_LOCK_BACKUP_NAME), before, &berr))
+            brls::Logger::warning("hbmenu lock: the backup was not written: {}", berr);
+    }
+    if (!write_config(after, &error)) {
+        ui::error("playguard/hbmenu/lock_err"_i18n, error);
+        return finish(false);
+    }
+    write_state();
+    notices::clear("hbmenu_lifted");
+    notices::clear("hbmenu_removed");
+    history_flow::record_event("lock_hbmenu");
+    brls::Logger::info("hbmenu lock: locked");
+    ui::notify("playguard/hbmenu/locked_done"_i18n, ui::Toast::Done);
+    finish(true);
+}
+
+// What it changes, what it leaves open, confirmed.
+void confirm_lock(std::function<void(bool)> finish)
+{
     const forwarders_logic::LockCheck c = check();
     if (!c.ready()) {
         ui::info("playguard/hbmenu/not_ready"_i18n + missing(c));
@@ -173,36 +210,35 @@ void lock(std::function<void(bool)> done)
     }
     std::string body = brls::getStr("playguard/hbmenu/confirm", joined(c.menus));
     if (!c.open_doors.empty()) body += "\n\n" + brls::getStr("playguard/hbmenu/open_doors", joined(c.open_doors));
+    if (!c.sd_writers.empty()) body += "\n\n" + brls::getStr("playguard/hbmenu/sd_writers", joined(c.sd_writers));
     if (ulaunch_present()) body += "\n\n" + "playguard/hbmenu/ulaunch"_i18n;
     body += "\n\n" + brls::getStr("playguard/hbmenu/escape", HBL_LOCK_CONFIG_PATH);
-    ui::confirm(body, "playguard/hbmenu/lock"_i18n, [finish]() {
-        // The PIN whatever PlayGuard's own lock says, then the change check
-        // (read-only mode).
-        if (!pin_lock::confirm() || R_FAILED(core_change_allowed())) return finish(false);
-        const std::string before = read_config();
-        std::string after, error;
-        if (!apply(before, HblLock_Lock, after)) {
-            ui::error("playguard/hbmenu/lock_err"_i18n, "playguard/hbmenu/too_large"_i18n);
-            return finish(false);
-        }
-        // The file as it was, once: not one already locked.
-        if (!before.empty() && !hbl_lock_locked(before.data(), before.size())) {
-            std::string berr;
-            if (!paths::ensure_dir(paths::data_dir()) ||
-                !paths::atomic_write(in_data(HBL_LOCK_BACKUP_NAME), before, &berr))
-                brls::Logger::warning("hbmenu lock: the backup was not written: {}", berr);
-        }
-        if (!write_config(after, &error)) {
-            ui::error("playguard/hbmenu/lock_err"_i18n, error);
-            return finish(false);
-        }
-        write_state();
-        notices::clear("hbmenu_lifted");
-        history_flow::record_event("lock_hbmenu");
-        brls::Logger::info("hbmenu lock: locked");
-        ui::notify("playguard/hbmenu/locked_done"_i18n, ui::Toast::Done);
-        finish(true);
-    }, [finish]() { finish(false); });
+    ui::confirm(body, "playguard/hbmenu/lock"_i18n, [finish]() { apply_lock(finish); }, [finish]() { finish(false); });
+}
+
+}   // namespace
+
+void lock(std::function<void(bool)> done)
+{
+    const auto finish = [done](bool changed) {
+        if (done) done(changed);
+    };
+    if (ui::refuse_read_only()) return finish(false);
+    // Forwarders made here and not protected: each starts its homebrew
+    // without the PIN, and one that writes to the SD card could change the
+    // lock's file. Protected first, in one go, when the parent wants.
+    const std::vector<forwarders_logic::Row> open = forwarder_flow::unprotected();
+    if (open.empty() || !check().ready()) return confirm_lock(finish);
+    std::string names;
+    for (const auto& r : open) names += (names.empty() ? "" : ", ") + r.name;
+    std::vector<ui::Choice> choices;
+    choices.push_back({ "playguard/hbmenu/protect_then_lock"_i18n, [finish]() {
+                           forwarder_flow::protect_all([finish](bool) {
+                               brls::sync([finish]() { confirm_lock(finish); });
+                           });
+                       } });
+    choices.push_back({ "playguard/hbmenu/lock_anyway"_i18n, [finish]() { confirm_lock(finish); } });
+    ui::pick_actions(brls::getStr("playguard/hbmenu/unprotected", names), choices);
 }
 
 void unlock(std::function<void(bool)> done)
@@ -231,8 +267,22 @@ void unlock(std::function<void(bool)> done)
 
 void at_start(std::function<void()> open)
 {
+    diagnostic::set_homebrew_lock(&report);
     take_report(open);
+    forwarder_flow::at_start();
     const bool is_locked = locked();
+    // PlayGuard held the lock and the file no longer says so: taken away
+    // outside PlayGuard (a computer, a file manager). Told, recorded once;
+    // never put back by itself (deleting the file is the way back from a
+    // computer).
+    const std::string state = in_data(HBL_LOCK_STATE_NAME);
+    if (!is_locked && paths::exists_or_pending(state)) {
+        std::remove(state.c_str());
+        std::remove((state + ".tmp").c_str());
+        history_flow::record_seen("hbmenu_lock_removed", "");
+        notices::set("hbmenu_removed", notices::Level::Info, "playguard/hbmenu/removed"_i18n,
+                     "playguard/hbmenu/removed_detail"_i18n, "playguard/hbmenu/open"_i18n, open);
+    }
     // Nothing made here and nothing locked: the HOME menu is not read.
     if (!is_locked && forwarders::list().empty()) {
         notices::clear("hbmenu_route");
@@ -275,6 +325,89 @@ void at_start(std::function<void()> open)
     }
     notices::set("hbmenu_route", notices::Level::Action, "playguard/hbmenu/route"_i18n,
                  "playguard/hbmenu/route_detail"_i18n + missing(c), "playguard/hbmenu/open"_i18n, open);
+}
+
+namespace
+{
+// What the check reads, once for both the dialog and the report.
+struct State
+{
+    bool file = false, lock_block = false, defaults = false, album = true, any_app = true, state = false;
+    std::string locked_on, ams, patches, module, gate;
+    forwarders_logic::LockCheck c;
+};
+
+State read_state()
+{
+    State st;
+    std::string text;
+    st.file = paths::read_file(config_path(), text);
+    st.lock_block = hbl_lock_locked(text.data(), text.size());
+    st.defaults = hbl_lock_has_defaults(text.data(), text.size());
+    hbl_lock_effective(text.data(), text.size(), &st.album, &st.any_app);
+    std::string s;
+    st.state = paths::read_file(in_data(HBL_LOCK_STATE_NAME), s);
+    uint8_t a, b, c;
+    if (st.state && hbl_lock_state_parse(s.data(), s.size(), &a, &b, &c)) st.locked_on = fmt::format("{}.{}.{}", a, b, c);
+    SysInfo si;
+    sysinfo_get(&si);
+    if (si.ams_valid) st.ams = fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro);
+    const auto p = forwarders_logic::patches_state(ui::patch_report());
+    st.patches = p == forwarders_logic::Patches::Ready ? "ready" : p == forwarders_logic::Patches::Unknown ? "unknown" : "missing";
+    st.module = !rescue::installed() ? "none" : rescue::outdated() ? "outdated" : "current";
+    st.gate = paths::file_exists(in_data(GATE_NRO_NAME)) ? "present" : "none";
+    st.c = check();
+    return st;
+}
+
+std::string yes_no(bool v)
+{
+    return v ? "playguard/hbmenu/yes"_i18n : "playguard/hbmenu/no"_i18n;
+}
+}   // namespace
+
+void show_check()
+{
+    const State st = read_state();
+    const std::string unknown = "playguard/forwarders/unknown"_i18n;
+    std::string body = brls::getStr("playguard/hbmenu/check_file", HBL_LOCK_CONFIG_PATH,
+                                    !st.file ? "playguard/hbmenu/check_none"_i18n
+                                             : st.lock_block ? "playguard/hbmenu/state_locked"_i18n
+                                                             : "playguard/hbmenu/state_open"_i18n);
+    body += "\n" + brls::getStr("playguard/hbmenu/check_album", yes_no(st.album));
+    body += "\n" + brls::getStr("playguard/hbmenu/check_r", yes_no(st.any_app));
+    body += "\n" + brls::getStr("playguard/hbmenu/check_self", yes_no(st.c.self));
+    body += "\n" + brls::getStr("playguard/hbmenu/check_menus", st.c.menus.empty() ? "playguard/hbmenu/check_none"_i18n
+                                                                                      : joined(st.c.menus));
+    body += "\n" + brls::getStr("playguard/hbmenu/check_patches", yes_no(st.c.patches));
+    body += "\n" + brls::getStr("playguard/hbmenu/check_ams", st.ams.empty() ? unknown : st.ams,
+                                 st.locked_on.empty() ? unknown : st.locked_on);
+    body += "\n" + brls::getStr("playguard/hbmenu/check_module",
+                                 st.module == "none"      ? "playguard/hbmenu/check_none"_i18n
+                                 : st.module == "current" ? "playguard/hbmenu/check_current"_i18n
+                                                          : "playguard/hbmenu/check_outdated"_i18n);
+    if (!st.c.open_doors.empty() || !st.c.unprotected.empty())
+        body += "\n" + brls::getStr("playguard/hbmenu/check_open", joined(st.c.open_doors.empty() ? st.c.unprotected
+                                                                                              : st.c.open_doors));
+    ui::info(body);
+}
+
+std::string report()
+{
+    const State st = read_state();
+    return fmt::format(
+        "=== homebrew menu ===\n"
+        "override_config: {} (PlayGuard lock={} defaults={})\n"
+        "as read        : album opens hbmenu={} R on a game={}\n"
+        "state file     : {} (locked on {})\n"
+        "atmosphere     : {}\n"
+        "ways back      : playguard forwarder={} protected menus={}\n"
+        "open doors     : {} (unprotected {}, writing the SD card {})\n"
+        "patches={} rescue module={} gate={}\n\n",
+        st.file ? "present" : "none", st.lock_block ? 1 : 0, st.defaults ? 1 : 0, st.album ? 1 : 0, st.any_app ? 1 : 0,
+        st.state ? "present" : "none", st.locked_on.empty() ? "unknown" : st.locked_on,
+        st.ams.empty() ? "unknown" : st.ams, st.c.self ? 1 : 0, st.c.menus.size(), st.c.open_doors.size(),
+        st.c.unprotected.size(), st.c.sd_writers.size(), st.patches, st.module, st.gate);
 }
 
 }   // namespace hbmenu_lock

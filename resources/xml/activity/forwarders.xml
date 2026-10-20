@@ -37,9 +37,12 @@
             <brls:Header title="@i18n/playguard/forwarders/section_add" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="fw_self" title="PlayGuard"/>
             <brls:DetailCell id="fw_other" title="@i18n/playguard/forwarders/other"/>
+            <brls:DetailCell id="fw_reinstall" title="@i18n/playguard/forwarders/reinstall_all"/>
             <brls:Label id="fw_game_note" text="@i18n/playguard/forwarders/game_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:Header id="fw_lock_header" title="@i18n/playguard/hbmenu/section" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="fw_lock" title="@i18n/playguard/hbmenu/cell"/>
+            <brls:DetailCell id="fw_protect_all" title="@i18n/playguard/forwarders/protect_all"/>
+            <brls:DetailCell id="fw_lock_check" title="@i18n/playguard/hbmenu/check"/>
             <brls:Label id="fw_lock_note" text="@i18n/playguard/hbmenu/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
         </brls:Box>

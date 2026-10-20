@@ -184,6 +184,7 @@ else ()
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/calendar.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gamecheck_rules.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/forwarder_pack.c
+                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gate.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/hbl_lock.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/rescue.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/write_guard.c)
@@ -354,7 +355,14 @@ if (PLATFORM_SWITCH)
         COMMAND ${PLAYGUARD_MAKE} --no-print-directory -C ${CMAKE_CURRENT_SOURCE_DIR}/forwarder
         BYPRODUCTS ${FORWARDER_OUT}/forwarder.nso ${FORWARDER_OUT}/forwarder.npdm
         COMMENT "Building the NRO forwarders' loader")
-    add_custom_target(${PROJECT_NAME}.nro ALL DEPENDS ${PROJECT_NAME} playguard_rescue playguard_forwarder
+    # The gate a forwarder protected with the PIN starts first (core/gate.h):
+    # romfs:/gate/gate.nro, written to config/playguard/ when one is made.
+    set(GATE_NRO ${CMAKE_CURRENT_SOURCE_DIR}/gate/out/gate.nro)
+    add_custom_target(playguard_gate
+        COMMAND ${PLAYGUARD_MAKE} --no-print-directory -C ${CMAKE_CURRENT_SOURCE_DIR}/gate
+        BYPRODUCTS ${GATE_NRO}
+        COMMENT "Building the forwarders' PIN gate")
+    add_custom_target(${PROJECT_NAME}.nro ALL DEPENDS ${PROJECT_NAME} playguard_rescue playguard_forwarder playguard_gate
         COMMAND ${NX_NACPTOOL_EXE} --create "PlayGuard" "${PROJECT_AUTHOR}"
                 "${APP_VERSION}" ${PROJECT_NAME}.nacp --titleid=${PROJECT_TITLEID}
         ${ASSEMBLE_RESOURCES}
@@ -364,6 +372,8 @@ if (PLATFORM_SWITCH)
         COMMAND ${CMAKE_COMMAND} -E make_directory ${MERGED_RESOURCES}/forwarder
         COMMAND ${CMAKE_COMMAND} -E copy ${FORWARDER_OUT}/forwarder.nso ${MERGED_RESOURCES}/forwarder/main
         COMMAND ${CMAKE_COMMAND} -E copy ${FORWARDER_OUT}/forwarder.npdm ${MERGED_RESOURCES}/forwarder/main.npdm
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${MERGED_RESOURCES}/gate
+        COMMAND ${CMAKE_COMMAND} -E copy ${GATE_NRO} ${MERGED_RESOURCES}/gate/gate.nro
         COMMAND ${CMAKE_COMMAND} -E remove -f ${MERGED_RESOURCES}/font/switch_font.ttf ${MERGED_RESOURCES}/font/switch_icons.ttf
         COMMAND ${NX_ELF2NRO_EXE} ${PROJECT_NAME}.elf ${PROJECT_NAME}.nro
                 --icon=${PROJECT_ICON} --nacp=${PROJECT_NAME}.nacp

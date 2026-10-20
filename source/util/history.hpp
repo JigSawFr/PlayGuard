@@ -37,7 +37,12 @@ struct Entry
     //   not made; detail: its name and program ID): no values
     //   "lock_hbmenu", "unlock_hbmenu" (the homebrew menu, action/hbmenu_lock):
     //   no values; "hbmenu_restored" (unlocked at boot by the rescue
-    //   sysmodule: seen, not made; detail: why): no values
+    //   sysmodule: seen, not made; detail: why), "hbmenu_lock_removed" (the
+    //   lock gone from the file outside PlayGuard: seen): no values
+    //   "gate_open", "gate_free", "gate_refused" (a protected forwarder
+    //   started after the PIN, in its free hours or with no PIN on the
+    //   console, or not: seen, at the gate's time; detail: its name),
+    //   "gate_hours" (its free hours set; detail: its name, the hours): no values
     std::string kind;
     // Where from: "uniform", "day", "per_day", "extra", "stop", "restore_extra",
     // "profile", "remove", "backup", "undo", "first_steps" … ("" when plain).

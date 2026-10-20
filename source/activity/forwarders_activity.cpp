@@ -32,10 +32,13 @@ std::string state_only(const Row& r)
     return "";
 }
 
-// Its state, and whether it asks for the PIN.
+// Its state, and whether it asks for the PIN (and when it does not).
 std::string state_text(const Row& r)
 {
-    return r.pin ? state_only(r) + " · " + "playguard/forwarders/state_pin"_i18n : state_only(r);
+    if (!r.pin) return state_only(r);
+    if (!r.free_days) return state_only(r) + " · " + "playguard/forwarders/state_pin"_i18n;
+    return state_only(r) + " · " +
+           brls::getStr("playguard/forwarders/state_pin_hours", forwarder_flow::hours_label(r.free_days, r.free_from, r.free_to));
 }
 
 }   // namespace
@@ -76,8 +79,27 @@ void ForwardersActivity::onContentAvailable()
         else hbmenu_lock::lock(after);
         return true;
     });
+    reinstall->setDetailText(ui::opens());
+    reinstall->registerClickAction([this](brls::View*) {
+        if (ui::refuse_read_only()) return true;
+        forwarder_flow::reinstall_all(this->then_rebuild());
+        return true;
+    });
+    protect_all->registerClickAction([this](brls::View*) {
+        if (ui::refuse_read_only()) return true;
+        forwarder_flow::protect_all(this->then_rebuild());
+        return true;
+    });
+    lock_check->setDetailText(ui::opens());
+    lock_check->registerClickAction([](brls::View*) {
+        hbmenu_lock::show_check();
+        return true;
+    });
+    ui::show_writable(reinstall, !app::read_only());
+    ui::show_writable(protect_all, !app::read_only());
     cadran::List(this->getContentView(), true)
-        .apply({ { "fw_self", "home" }, { "fw_other", "plus" }, { "fw_lock", "lock" } });
+        .apply({ { "fw_self", "home" }, { "fw_other", "plus" }, { "fw_reinstall", "refresh" }, { "fw_lock", "lock" },
+                 { "fw_protect_all", "shield" }, { "fw_lock_check", "eye" } });
     // Without the forwarders' program (a build from elsewhere), nothing can
     // be added: said instead of the two lines.
     if (!forwarder_flow::loader_present()) {
@@ -88,6 +110,9 @@ void ForwardersActivity::onContentAvailable()
         ui::set_visible(lock_header.getView(), false);
         ui::set_visible(lock_cell.getView(), false);
         ui::set_visible(lock_note.getView(), false);
+        ui::set_visible(reinstall.getView(), false);
+        ui::set_visible(protect_all.getView(), false);
+        ui::set_visible(lock_check.getView(), false);
     } else {
         this->show_patches();
     }
@@ -203,6 +228,8 @@ void ForwardersActivity::actions(const Row& row)
         if (!r.self)
             choices.push_back({ r.pin ? "playguard/forwarders/action_pin_off"_i18n : "playguard/forwarders/action_pin_on"_i18n,
                                 [this, r]() { forwarder_flow::set_pin(r, !r.pin, this->then_rebuild(r.id)); } });
+        if (!r.self && r.pin)
+            choices.push_back({ "playguard/forwarders/action_hours"_i18n, [this, r]() { this->pick_hours(r); } });
         choices.push_back({ "playguard/forwarders/action_rebuild"_i18n,
                             [this, r]() { forwarder_flow::rebuild(r, "", "", this->then_rebuild(r.id)); } });
     }
@@ -245,6 +272,47 @@ void ForwardersActivity::change_author(const Row& row)
         const std::string author = forwarders::clean_text(typed, forwarders::MAX_AUTHOR);
         if (author.empty() || author == r.author) return;
         forwarder_flow::rebuild(r, "", author, this->then_rebuild(r.id));
+    });
+}
+
+void ForwardersActivity::pick_hours(const Row& row)
+{
+    const Row r = row;
+    // Never, every day, the school days, the weekend.
+    static const int DAYS[] = { 0, 0x7F, 0x3E, 0x41 };
+    const std::vector<std::string> names = { "playguard/forwarders/hours_never"_i18n, "playguard/forwarders/hours_every_day"_i18n,
+                                             "playguard/forwarders/hours_weekdays"_i18n, "playguard/forwarders/hours_weekend"_i18n };
+    int current = 0;
+    for (int i = 1; i < 4; i++)
+        if (r.free_days == DAYS[i]) current = i;
+    std::weak_ptr<bool> weak = this->alive;
+    ui::pick("playguard/forwarders/hours_title"_i18n, names, current, [this, weak, r](int index) {
+        if (weak.expired() || index < 0 || index > 3) return;
+        if (index == 0) {
+            forwarder_flow::set_hours(r, 0, 0, 0, this->then_rebuild(r.id));
+            return;
+        }
+        const int days = DAYS[index];
+        std::vector<std::string> hours;
+        for (int h = 0; h < 24; h++) hours.push_back(fmt::format("{:02}:00", h));
+        const int from_now = r.free_days ? r.free_from / 60 : 9;
+        brls::sync([this, weak, r, days, hours, from_now]() {
+            ui::pick("playguard/forwarders/hours_from"_i18n, hours, from_now, [this, weak, r, days](int from) {
+                if (weak.expired() || from < 0 || from > 23) return;
+                std::vector<std::string> ends;
+                for (int h = 1; h <= 24; h++) ends.push_back(fmt::format("{:02}:00", h));
+                const int to_now = r.free_days ? std::max(0, r.free_to / 60 - 1) : 19;
+                brls::sync([this, weak, r, days, from, ends, to_now]() {
+                    ui::pick("playguard/forwarders/hours_to"_i18n, ends, to_now, [this, weak, r, days, from](int to) {
+                        if (weak.expired() || to < 0 || to > 23) return;
+                        const int end = (to + 1) * 60, start = from * 60;
+                        if (end == start) return;
+                        // An end before the start runs past midnight.
+                        forwarder_flow::set_hours(r, days, start, end, this->then_rebuild(r.id));
+                    });
+                });
+            });
+        });
     });
 }
 

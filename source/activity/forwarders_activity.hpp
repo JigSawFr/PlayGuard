@@ -39,6 +39,8 @@ class ForwardersActivity : public brls::Activity
     void rename(const forwarders_logic::Row& row);
     void change_author(const forwarders_logic::Row& row);
     void pick_homebrew();
+    // Hours when a protected one starts without the PIN: the days, then the span.
+    void pick_hours(const forwarders_logic::Row& row);
     // After a change: the list again, the focus on `id` when it is there.
     std::function<void(bool)> then_rebuild(uint64_t id = 0);
 
@@ -52,4 +54,7 @@ class ForwardersActivity : public brls::Activity
     BRLS_BIND(brls::Header,     lock_header, "fw_lock_header");
     BRLS_BIND(brls::DetailCell, lock_cell, "fw_lock");
     BRLS_BIND(brls::Label,      lock_note, "fw_lock_note");
+    BRLS_BIND(brls::DetailCell, reinstall, "fw_reinstall");
+    BRLS_BIND(brls::DetailCell, protect_all, "fw_protect_all");
+    BRLS_BIND(brls::DetailCell, lock_check, "fw_lock_check");
 };

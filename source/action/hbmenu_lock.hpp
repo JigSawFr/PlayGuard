@@ -12,6 +12,11 @@
 // (HBL_LOCK_BACKUP_NAME); from a computer, deleting override_config.ini (or
 // putting the backup back) and restarting undoes it.
 //
+// Before locking, the forwarders made here and not protected are offered to
+// be protected in one go (one that writes to the SD card could change the
+// file). While locked, the lock gone from the file (a computer, a file
+// manager) is told at the next start, never put back by itself.
+//
 // The rescue sysmodule, when it is installed, can lift it at boot (a RESCUE
 // request; Atmosphère updated since, whose signature patches may lag): it
 // leaves a report, told here at the next start. Nothing of the lock needs it.
@@ -20,6 +25,7 @@
 #pragma once
 
 #include <functional>
+#include <string>
 
 namespace hbmenu_lock
 {
@@ -37,5 +43,11 @@ void unlock(std::function<void(bool)> done);
 // PlayGuard made that is no longer on the HOME menu told once (the change
 // history, the bell). `open` opens Console › Forwarders, from the bell.
 void at_start(std::function<void()> open);
+
+// What Atmosphère will read and what the lock rests on, in a dialog
+// (Console › Forwarders › Check the homebrew menu).
+void show_check();
+// The same for the diagnostic report (util/diagnostics), in English.
+std::string report();
 
 }   // namespace hbmenu_lock

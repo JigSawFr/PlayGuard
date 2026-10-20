@@ -22,6 +22,7 @@ namespace diagnostic
 namespace
 {
 std::string (*s_firmware_choice)() = nullptr;
+std::string (*s_homebrew_lock)() = nullptr;
 
 // "1.5 GiB", "312.4 MiB", "18 KiB".
 std::string bytes(uint64_t n)
@@ -84,6 +85,7 @@ std::string logs_section()
 }   // namespace
 
 void set_firmware_choice(std::string (*summary)()) { s_firmware_choice = summary; }
+void set_homebrew_lock(std::string (*section)()) { s_homebrew_lock = section; }
 
 const char* storage_name(SysStorage storage)
 {
@@ -155,6 +157,7 @@ std::string current_report()
     out += "\n";
     // How long the slow work of the screens took in this run (util/perf.hpp).
     out += perf::report() + "\n";
+    if (s_homebrew_lock) out += s_homebrew_lock();
     out += logs_section();
 
     time_clock_dump(buf.data(), buf.size());

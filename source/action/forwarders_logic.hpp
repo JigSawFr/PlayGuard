@@ -42,6 +42,7 @@ struct Row
     bool        self = false;   // PlayGuard's own
     bool        pin = false;    // made here, protected with the PIN
     bool        gone_seen = false;   // NotInstalled, and already told (forwarders::Made::gone)
+    int         free_days = 0, free_from = 0, free_to = 0;   // protected: when the PIN is not asked
 };
 
 // One row per forwarder on the HOME menu and per one remembered that is no
@@ -79,6 +80,14 @@ Patches patches_state(const patches::Report& report);
 // it elsewhere) or sphaira, by their file names.
 bool is_menu(const std::string& nro);
 
+// Whether `nro` is a homebrew known to write anywhere on the SD card (a
+// file manager, an installer, an FTP server…), by its file name.
+bool writes_sd(const std::string& nro);
+
+// "Sat–Sun 09:00–20:00"-like: the days (`days`, bit 0 Sunday) as the
+// names in `day_names` (Sunday first, 7 of them), and the span.
+std::string hours_text(int days, int from, int to, const std::vector<std::string>& day_names);
+
 // What locking the homebrew menu (core/hbl_lock.h) needs: two ways back to
 // PlayGuard, each starting from the HOME menu: its own forwarder, and a menu
 // of homebrew protected with the PIN, which starts PlayGuard's .nro too (and
@@ -92,6 +101,10 @@ struct LockCheck
     // Forwarders that would open the homebrew menu without the PIN: a menu
     // not protected, and those another app made (what they start is unknown).
     std::vector<std::string> open_doors;
+    // Made here, not protected (and not PlayGuard's own): each starts only
+    // its homebrew, but one that writes to the SD card (sd_writers, among
+    // them: a file manager, an installer) could change the lock's file.
+    std::vector<std::string> unprotected, sd_writers;
     bool ready() const { return this->pin && this->patches && this->self && !this->menus.empty(); }
     // While locked: both ways still there (else the parent is told).
     bool routes() const { return this->self && !this->menus.empty(); }

@@ -127,8 +127,10 @@ static void store(history::Entry e)
     // A change PlayGuard made: what it reads next is not a change made
     // outside (the outside_* entries are those, and a new account; a refused
     // change changed nothing).
-    if (!text::starts_with(e.kind, "outside_") && e.kind != "new_account" && e.result.empty()) outside_watch::own_change();
-    e.when = ui::now_stamp();
+    if (!text::starts_with(e.kind, "outside_") && !text::starts_with(e.kind, "gate_") && e.kind != "new_account" &&
+        e.result.empty())
+        outside_watch::own_change();
+    if (e.when.empty()) e.when = ui::now_stamp();
     e.version = app::version();
     s_last    = e;
     s_last_at = std::chrono::steady_clock::now();
@@ -182,6 +184,15 @@ void record_event(const char* kind, const std::string& source, const std::string
     e.kind   = kind;
     e.source = source;
     e.detail = detail;
+    store(e);
+}
+
+void record_seen(const char* kind, const std::string& when, const std::string& detail)
+{
+    history::Entry e;
+    e.kind   = kind;
+    e.detail = detail;
+    e.when   = when;
     store(e);
 }
 

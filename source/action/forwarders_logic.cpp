@@ -2,6 +2,7 @@
 #include "action/forwarders_logic.hpp"
 
 #include <algorithm>
+#include <cstdio>
 
 #include "util/text.hpp"
 
@@ -31,6 +32,9 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
             if (r.name.empty()) r.name = m->name;
             if (r.author.empty()) r.author = m->author;
             r.pin = m->pin;
+            r.free_days = m->free_days;
+            r.free_from = m->free_from;
+            r.free_to = m->free_to;
             r.state = !nro_exists(m->nro)            ? State::NroMissing
                       : m->pin && !nro_exists(m->gate) ? State::GateMissing
                                                        : State::Ready;
@@ -50,6 +54,9 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
         r.nro = m.nro;
         r.pin = m.pin;
         r.gone_seen = m.gone;
+        r.free_days = m.free_days;
+        r.free_from = m.free_from;
+        r.free_to = m.free_to;
         r.state = State::NotInstalled;
         rows.push_back(r);
     }
@@ -111,6 +118,35 @@ bool is_menu(const std::string& nro)
     return name == "hbmenu" || name == "sphaira";
 }
 
+bool writes_sd(const std::string& nro)
+{
+    static const char* const NAMES[] = { "nx-shell", "nxshell", "goldleaf", "dbi", "tinfoil", "awoo", "cyberfoil",
+                                         "appstore", "ftpd", "jksv", "edizon", "nxthemesinstaller", "nxmtp" };
+    const std::string name = text::lower_ascii(file_title(nro));
+    for (const char* n : NAMES)
+        if (name == n) return true;
+    return false;
+}
+
+std::string hours_text(int days, int from, int to, const std::vector<std::string>& day_names)
+{
+    const auto hm = [](int m) {
+        char b[16];
+        std::snprintf(b, sizeof(b), "%02d:%02d", m / 60, m % 60);
+        return std::string(b);
+    };
+    std::string d;
+    if (day_names.size() == 7) {
+        if ((days & 0x7F) == 0x7F) d = day_names[1] + "–" + day_names[0];   // Monday to Sunday
+        else if ((days & 0x7F) == 0x3E) d = day_names[1] + "–" + day_names[5];
+        else if ((days & 0x7F) == 0x41) d = day_names[6] + "–" + day_names[0];
+        else
+            for (int i = 1; i <= 7; i++)
+                if (days >> (i % 7) & 1) d += (d.empty() ? "" : ", ") + day_names[i % 7];
+    }
+    return d + " " + hm(from) + "–" + hm(to);
+}
+
 LockCheck lock_check(const std::vector<Row>& rows, bool pin_set, Patches patches)
 {
     LockCheck c;
@@ -120,7 +156,13 @@ LockCheck lock_check(const std::vector<Row>& rows, bool pin_set, Patches patches
         if (r.state == State::NotInstalled) continue;
         if (r.self && r.state == State::Ready) c.self = true;
         if (r.state == State::Elsewhere) c.open_doors.push_back(r.name);
-        if (!is_menu(r.nro)) continue;
+        if (!is_menu(r.nro)) {
+            if (!r.pin && !r.self && r.state != State::Elsewhere) {
+                c.unprotected.push_back(r.name);
+                if (writes_sd(r.nro)) c.sd_writers.push_back(r.name);
+            }
+            continue;
+        }
         if (!r.pin) c.open_doors.push_back(r.name);
         else if (r.state == State::Ready) c.menus.push_back(r.name);
     }

@@ -266,6 +266,31 @@ static void test_boot_lift(void)
     CHECK(!hbl_lock_boot_lift(false, true, v194, true, v195, NULL));
 }
 
+static void test_effective(void)
+{
+    bool album = false, any = false;
+    hbl_lock_effective(NULL, 0, &album, &any);
+    CHECK(album && any);   // no file: Atmosphère's defaults
+    char *locked = copy(apply(NULL, HblLock_Lock));
+    hbl_lock_effective(locked, strlen(locked), &album, &any);
+    CHECK(!album && !any);
+    const char *open = apply(locked, HblLock_Unlock);
+    hbl_lock_effective(open, strlen(open), &album, &any);
+    CHECK(album && any);
+    free(locked);
+    static const char MOVED[] = "[hbl_config]\nprogram_id_0=0100000000010000 ; a game\nprogram_id_3=010000000000100d\n"
+                                "override_any_app = 0\n[other]\noverride_any_app=1\n";
+    hbl_lock_effective(MOVED, strlen(MOVED), &album, &any);
+    CHECK(album && !any);   // the album in another slot; any-app off, the other section ignored
+    static const char ODD[] = "[hbl_config]\nprogram_id=0000000000000000\noverride_any_app=maybe\n";
+    hbl_lock_effective(ODD, strlen(ODD), &album, &any);
+    CHECK(!album && any);   // a value it does not know changes nothing
+    char buf[32];
+    CHECK(hbl_lock_state_format_unknown(buf, sizeof(buf)) && strcmp(buf, "ams=unknown\n") == 0);
+    uint8_t a, b, c;
+    CHECK(!hbl_lock_state_parse(buf, strlen(buf), &a, &b, &c));   // no version: the sysmodule lifts nothing
+}
+
 int main(void)
 {
     test_no_file();
@@ -273,5 +298,6 @@ int main(void)
     test_blocks();
     test_state_report();
     test_boot_lift();
+    test_effective();
     return CHECK_DONE("hbl_lock lock, unlock, defaults, kept lines, state, report and boot assertions passed");
 }

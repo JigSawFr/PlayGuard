@@ -49,6 +49,28 @@ void rebuild(const forwarders_logic::Row& row, const std::string& name, const st
 // PlayGuard's own, which has its own lock (pin_lock).
 void set_pin(const forwarders_logic::Row& row, bool on, std::function<void(bool)> done);
 
+// The forwarders made here (not PlayGuard's own) not protected yet.
+std::vector<forwarders_logic::Row> unprotected();
+
+// Every one of them protected with the PIN (confirmed first). `done(any)`.
+void protect_all(std::function<void(bool)> done);
+
+// Every forwarder made here built again (confirmed first): a new .nro's
+// icon and version, the gate as PlayGuard carries it now, one no longer on
+// the HOME menu put back.
+void reinstall_all(std::function<void(bool)> done);
+
+// Hours when a protected forwarder starts without the PIN (core/gate.h):
+// `days` (bit 0 Sunday) from `from` to `to` (minutes); days 0 for none. The
+// PIN asked first; in the change history.
+void set_hours(const forwarders_logic::Row& row, int days, int from, int to, std::function<void(bool)> done);
+// "Sat–Sun 09:00–20:00", in the UI's language.
+std::string hours_label(int days, int from, int to);
+
+// Once per start (hbmenu_lock::at_start): the gate and its rules written
+// again while a forwarder is protected; the gate's log into the history.
+void at_start();
+
 // Deletes it from the HOME menu (asked first), and from what PlayGuard
 // remembers.
 void remove(const forwarders_logic::Row& row, std::function<void(bool)> done);

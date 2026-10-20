@@ -123,6 +123,8 @@ calendar_SRC   := source/core/calendar.c tests/calendar/test.c
 calendar_FLAGS := -std=gnu11 -Isource/core
 rescue_SRC   := source/core/rescue.c tests/rescue/test.c
 rescue_FLAGS := -std=c11 -Isource/core
+gate_SRC   := source/core/gate.c tests/gate/test.c
+gate_FLAGS := -std=gnu11 -Isource/core
 hbl_lock_SRC   := source/core/hbl_lock.c tests/hbl_lock/test.c
 hbl_lock_FLAGS := -std=gnu11 -Isource/core
 forwarder_pack_SRC   := source/core/forwarder_pack.c tests/forwarder_pack/test.c
@@ -187,8 +189,8 @@ config_SRC   := source/util/paths.cpp source/util/date.cpp source/util/config.cp
 profiles_SRC   := source/util/paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
 forwarders_SRC    := source/util/paths.cpp source/util/nro.cpp source/util/forwarders.cpp source/util/forwarder_icon.cpp source/util/forwarder_gate.cpp source/util/patches.cpp source/action/forwarders_logic.cpp tests/forwarders/test.cpp
 forwarders_FLAGS  := $(TEST_CXXFLAGS) -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
-forwarders_CSRC   := tests/forwarders/stb.c extern/stb/stb_image_write.c
-forwarders_CFLAGS := -std=c11 -w -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
+forwarders_CSRC   := tests/forwarders/stb.c extern/stb/stb_image_write.c source/core/gate.c
+forwarders_CFLAGS := -std=c11 -w -Isource/core -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
 forwarders_LIBS   := -lm
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
 launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp

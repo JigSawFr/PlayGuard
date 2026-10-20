@@ -34,6 +34,7 @@
 #include "activity/main_activity.hpp"
 #include "activity/rescue_activity.hpp"
 #include "app.hpp"
+#include "core/gate_nx.h"
 #include "core/platform.h"
 #include "core/sim_env.h"
 #include "tab/about_tab.hpp"
@@ -54,7 +55,6 @@
 #include "util/crash_dump.h"
 #include "util/crash_report.hpp"
 #include "util/diagnostics.hpp"
-#include "util/forwarder_gate.hpp"
 #include "util/http.hpp"
 #include "util/nand.hpp"
 #include "util/paths.hpp"
@@ -138,24 +138,6 @@ std::string build_name()
     return fmt::format("PlayGuard {} ({})", app::version(), app::commit().empty() ? "?" : app::commit());
 }
 
-#ifdef __SWITCH__
-// Started by a forwarder protected with the PIN (util/forwarder_gate.hpp):
-// the system's PIN screen and nothing else of PlayGuard, then the homebrew
-// once PlayGuard exits, or the HOME menu. A PIN refused, left with B or not
-// asked (an error) keeps the homebrew closed; none on the console lets it
-// start, as there is nothing to ask for.
-bool pin_gate()
-{
-    std::string nro, next;
-    if (!envHasArgv() || !forwarder_gate::parse(static_cast<const char*>(envGetArgv()), nro, next)) return false;
-    const Result rc = pctl_ask_pin();
-    if ((R_SUCCEEDED(rc) || rc == NXM_RC_NO_PIN) && envHasNextLoad() &&
-        R_SUCCEEDED(envSetNextLoad(nro.c_str(), next.c_str())))
-        return true;
-    platform_exit_to_home();
-    return true;
-}
-#endif
 
 // Every line logged, also in this run's session file (util/session_log.hpp).
 void keep_log_lines()
@@ -417,7 +399,10 @@ int main(int argc, char* argv[])
 {
     startup_mark(StartupStep_Main);
 #ifdef __SWITCH__
-    if (pin_gate()) return EXIT_SUCCESS;
+    // Started by a forwarder protected with the PIN as its gate (one made
+    // before the gate had its own .nro, core/gate_nx.h): the PIN screen and
+    // nothing else of PlayGuard, then the homebrew or the HOME menu.
+    if (gate_nx_run()) return EXIT_SUCCESS;
 #endif
     keep_log_lines();
     std::set_terminate(on_terminate);
