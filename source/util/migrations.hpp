@@ -74,9 +74,11 @@ struct Step
 // it is missing or unreadable), another build seen since (earlier or later),
 // each step run (entries moved, time taken) or that they were all done, what
 // was written or why it could not be. Returns how many steps ran. A step
-// runs again at the next start when the file could not be written.
+// runs again at the next start when the file could not be written. `all`:
+// every step of `steps`, whatever level is recorded (the developer tools'
+// "Run the migrations again").
 size_t run(const std::string& file, const std::vector<Step>& steps, const std::string& version,
-           const Log& log = nullptr);
+           const Log& log = nullptr, bool all = false);
 
 // An earlier build (or one whose layout is not known) is about to replace
 // this one: the level set to 0, so that this build, or a later one, runs

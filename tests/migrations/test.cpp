@@ -198,6 +198,20 @@ static void test_is_earlier()
     CHECK(mg::is_earlier("garbage", "1.2.0"));
 }
 
+static void test_all()
+{
+    TempDir tmp("migrations");
+    const std::string file = tmp.path() + "/migrations.json";
+    CHECK(mg::write(file, { mg::Latest, "1.2.0" }));
+    g_ran.clear();
+    g_lines.clear();
+    CHECK(mg::run(file, start_steps(), "1.2.0", log_line, true) == 2);
+    CHECK((g_ran == std::vector<int>{ mg::DataDir, mg::LogsDirs }));
+    CHECK(logged("migrations: steps 1 to 2 run again, whatever level is recorded"));
+    // The level reached by the steps run: the system's step again next time.
+    CHECK(state(file).level == mg::LogsDirs);
+}
+
 int main()
 {
     test_first_and_next();
@@ -206,5 +220,6 @@ int main()
     test_later_then_earlier();
     test_earlier_build_next();
     test_is_earlier();
+    test_all();
     return CHECK_DONE("migrations tests passed");
 }

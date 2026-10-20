@@ -48,4 +48,5 @@ class HelpTab : public TabBase
     BRLS_BIND(brls::DetailCell,  dev_build,   "hp_dev_build");
     BRLS_BIND(brls::DetailCell,  dev_gate,    "hp_dev_gate");
     BRLS_BIND(brls::DetailCell,  dev_forget,  "hp_dev_forget");
+    BRLS_BIND(brls::DetailCell,  dev_migrations, "hp_dev_migrations");
 };

@@ -86,7 +86,8 @@ bool write(const std::string& file, const State& state)
     return write_logged(file, state, nullptr);
 }
 
-size_t run(const std::string& file, const std::vector<Step>& steps, const std::string& version, const Log& log)
+size_t run(const std::string& file, const std::vector<Step>& steps, const std::string& version, const Log& log,
+           bool all)
 {
     State was;
     const Found found = read_state(file, &was);
@@ -115,6 +116,10 @@ size_t run(const std::string& file, const std::vector<Step>& steps, const std::s
                            std::to_string(Latest) + "): back to " + std::to_string(Latest) +
                            ", so that build runs the steps above it again");
         s.level = Latest;
+    }
+    if (all) {
+        if (log) log(false, "migrations: " + span(steps) + " run again, whatever level is recorded");
+        s.level = None;
     }
     size_t ran = 0;
     for (const Step& st : steps) {
