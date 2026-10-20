@@ -25,7 +25,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 - ⏱️ **Play-time limit** — the same every day or one per day, profiles, extra time or no more play today in one press.
 - 📊 **Activity** — time per game and per account, charts, export to CSV, JSON, XLSX or PDF.
 - 🔒 **Restrictions and PIN** — restriction level, age rating, PIN, temporary unlock, *Block all games* in one switch.
-- 🕒 **Console** — the network clock set from public NTP servers, so the timer counts right on a console that never reaches Nintendo, and a check of the installed games.
+- 🕒 **Console** — the network clock set from public NTP servers, so the timer counts right on a console that never reaches Nintendo, a check of the installed games, and homebrew (PlayGuard first) put on the HOME menu as games, with their icon (NRO forwarders).
 - 📱 **Companion app** — unlink it, even on a second-hand console.
 - ↩️ **History and backups** — every change is logged and can be undone.
 - 🔔 **Notifications** — a bell gathers what needs you (an alarm off, a clock drifting, changes made elsewhere), with the fix one press away.
@@ -45,22 +45,22 @@ Search for *PlayGuard* in the Homebrew App Store or sphaira, or extract `playgua
 
 ## Quick start
 
-1. Open PlayGuard: the *First steps* guide sets the PIN and the daily limit.
+1. Open PlayGuard over a game, with a parent's user: the *First steps* guide sets the PIN and the daily limit.
 2. Still linked to the phone app? *PIN › Unlink the companion app*, or its next sync overwrites what you set.
-3. Network clock inaccurate? *Console › Network clock › Measure the time difference*, then set it. Without Internet, read [this first](docs/compatibility.md#supported-versions).
+3. Network clock inaccurate? *Console › Network clock › Measure the time difference*, then set it. Without Internet, read [this first](docs/compatibility.md#a-console-without-internet).
 
-Forgotten PIN or second-hand console: [Locked out?](docs/troubleshooting.md#locked-out)
+The whole walk-through, and the everyday tasks: [getting started](docs/getting-started.md). Forgotten PIN or second-hand console: [Locked out?](docs/troubleshooting.md#locked-out)
 
 ## Documentation
 
 - **Website:** [playguard.link](https://playguard.link/) — this documentation in the console's 15 languages, and [PlayGuard in your browser](https://playguard.link/simulator/) against a simulated console
-- **User guide:** [features](docs/features.md) · [install](docs/install.md) · [compatibility](docs/compatibility.md) · [troubleshooting](docs/troubleshooting.md)
+- **User guide:** [getting started](docs/getting-started.md) · [features](docs/features.md) · [install](docs/install.md) · [compatibility](docs/compatibility.md) · [troubleshooting](docs/troubleshooting.md)
 - **Reference:** [companion app](docs/companion-app.md) · [`config.json`](docs/config.md) · [how parental controls work](docs/parental-controls.md) · [recovery sysmodule](sysmodule/README.md)
 - **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md) · [roadmap](ROADMAP.md) · [changelog](CHANGELOG.md)
 
 ## License and credits
 
-GPLv3, see [`LICENSE`](LICENSE). Maintained by [JigSawFr](https://github.com/JigSawFr). A fork of [Pctl Manager](https://github.com/tailiang2008) by Taylor; fw 22.5 fixes and NTP sync from [anbingxi/NX-Pctl-Manager](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly). Built with [borealis](https://github.com/xfangfang/borealis) (Apache 2.0), [QR Code generator](https://github.com/nayuki/QR-Code-generator) (MIT), [Twemoji](https://github.com/jdecked/twemoji) (CC-BY 4.0) and the [Sora](https://github.com/sora-xor/sora-font) typeface (OFL 1.1); command reference from [switchbrew](https://switchbrew.org/wiki/Parental_Control_services). The installed games check and its repairs follow [Goldleaf](https://github.com/XorTroll/Goldleaf) and [sphaira](https://github.com/ITotalJustice/sphaira) (GPLv3), with the ns and es command numbers of [libnx-ext](https://github.com/XorTroll/libnx-ext) (MIT).
+GPLv3, see [`LICENSE`](LICENSE). Maintained by [JigSawFr](https://github.com/JigSawFr). A fork of [Pctl Manager](https://github.com/tailiang2008) by Taylor; fw 22.5 fixes and NTP sync from [anbingxi/NX-Pctl-Manager](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly). Built with [borealis](https://github.com/xfangfang/borealis) (Apache 2.0), [QR Code generator](https://github.com/nayuki/QR-Code-generator) (MIT), [Twemoji](https://github.com/jdecked/twemoji) (CC-BY 4.0) and the [Sora](https://github.com/sora-xor/sora-font) typeface (OFL 1.1); command reference from [switchbrew](https://switchbrew.org/wiki/Parental_Control_services). The installed games check and its repairs follow [Goldleaf](https://github.com/XorTroll/Goldleaf) and [sphaira](https://github.com/ITotalJustice/sphaira) (GPLv3), with the ns and es command numbers of [libnx-ext](https://github.com/XorTroll/libnx-ext) (MIT). The NRO forwarders are built as sphaira builds them, their program sphaira's hbl, after [nx-hbloader](https://github.com/switchbrew/nx-hbloader) (ISC).
 
 AI coding assistants help with development; every change is reviewed, unit-tested and checked on a real console before release.
 

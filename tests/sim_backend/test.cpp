@@ -31,6 +31,8 @@
 #include <thread>
 #include <vector>
 
+#include "core/forwarder.h"
+#include "core/forwarder_pack.h"
 #include "core/gamecheck.h"
 #include "core/pctl_ops.h"
 #include "core/playstats.h"
@@ -38,7 +40,9 @@
 #include "core/time_ops.h"
 #include "core/write_guard.h"
 #include "sim/sim_games.h"
+#include "sim/sim_homebrew.hpp"
 #include "sim/sim_state.h"
+#include "util/nro.hpp"
 
 // 2026-10-21, a Wednesday (a limit of 120 minutes), 10:00 and 23:30 UTC.
 static const char* const WED_10H = "1792576800";
@@ -132,7 +136,7 @@ static void test_keep()
                pctl_unlock_restriction_temporarily() == 0 && pctl_set_rating_org(2) == 0 &&
                gamecheck_remove(0x0100A1B2C3D47000ULL) == 0;
     });
-    CHECK(read_all(file).compare(0, 8, std::string("PGSIM03", 8)) == 0);
+    CHECK(read_all(file).compare(0, 8, std::string("PGSIM04", 8)) == 0);
     // The next one starts from it, whatever the variables say.
     in_child([&] {
         setenv("PLAYGUARD_SIM_UNLOCKED", "0", 1);
@@ -345,6 +349,60 @@ static void test_games()
           NXM_RC_CANCELLED);
 }
 
+// ---------------------------------------------------------------- forwarders
+
+static void test_forwarders()
+{
+    // The one another tool made, with its icon.
+    ForwarderRecord list[FORWARDER_MAX];
+    u32 count = 0;
+    CHECK(forwarder_list(list, FORWARDER_MAX, &count) == 0 && count == 1);
+    CHECK(std::strcmp(list[0].name, "Save Keeper") == 0 && forwarder_is_one(list[0].id));
+    PlayIcon icon = {};
+    icon.app_id = list[0].id;
+    playstats_icons(&icon, 1);
+    CHECK(icon.jpeg && icon.size > 0);
+    std::free(icon.jpeg);
+
+    // Installed: listed with its name and the NACP's version, its icon the
+    // one given; installed again, replaced; deleted, gone.
+    const char* path = "sdmc:/switch/playguard/playguard.nro";
+    std::vector<unsigned char> nacp(FWD_NACP_SIZE, 0);
+    std::memcpy(nacp.data() + 0x3060, "1.4.0", 5);
+    const unsigned char jpeg[] = { 0xFF, 0xD8, 0xFF, 0xD9 };
+    ForwarderSpec spec = { path, path, "PlayGuard", "JigSawFr", nacp.data(), jpeg, sizeof(jpeg) };
+    u64 id = 0;
+    CHECK(forwarder_install(&spec, &id) == 0 && id == forwarder_id(path, path));
+    spec.name = "Parental";
+    CHECK(forwarder_install(&spec, &id) == 0);
+    CHECK(forwarder_list(list, FORWARDER_MAX, &count) == 0 && count == 2);
+    CHECK(list[1].id == id && std::strcmp(list[1].name, "Parental") == 0 && std::strcmp(list[1].version, "1.4.0") == 0);
+    icon = {};
+    icon.app_id = id;
+    playstats_icons(&icon, 1);
+    CHECK(icon.jpeg && icon.size == sizeof(jpeg) && std::memcmp(icon.jpeg, jpeg, sizeof(jpeg)) == 0);
+    std::free(icon.jpeg);
+    sim_env_set("PLAYGUARD_SIM_FAIL", "forwarder");
+    CHECK(forwarder_remove(id) == SIM_FAIL_RC && forwarder_install(&spec, &id) == SIM_FAIL_RC);
+    sim_env_set("PLAYGUARD_SIM_FAIL", nullptr);
+    CHECK(forwarder_remove(id) == 0);
+    CHECK(forwarder_remove(id) != 0);   // gone already
+    CHECK(forwarder_remove(0x0100A1B2C3D40000ULL) == NXM_RC_INVALID_ARGUMENT);   // a game, not a forwarder
+    CHECK(forwarder_list(list, FORWARDER_MAX, &count) == 0 && count == 1);
+    core_set_read_only(true);
+    CHECK(forwarder_install(&spec, &id) == NXM_RC_READ_ONLY);
+    core_set_read_only(false);
+
+    // The made-up homebrew, as .nro files the forwarders' screen can read.
+    TempDir sd("sim_sd");
+    sim_homebrew::seed(sd.path());
+    const auto found = nro::find(sd.path());
+    CHECK(found.size() == 5);   // and PlayGuard's own
+    nro::Info info;
+    CHECK(nro::read(sd.path() + "/switch/StarAtlas.nro", info) && info.name == "Star Atlas" && info.version == "0.9.4");
+    CHECK(nro::icon_usable(info.icon));
+}
+
 // ---------------------------------------------------------------- threads
 
 static void test_threads()
@@ -381,6 +439,7 @@ int main()
     test_time_left();
     test_changes();
     test_games();
+    test_forwarders();
     test_threads();
     return CHECK_DONE("sim_backend: all tests passed");
 }

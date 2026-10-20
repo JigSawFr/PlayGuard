@@ -25,7 +25,7 @@ PlayGuard ramène sur une console modifiée les réglages de l'application mobil
 - ⏱️ **Limite de temps de jeu** — la même tous les jours ou une par jour, des profils, du temps en plus ou l'arrêt du jeu pour aujourd'hui en un appui.
 - 📊 **Activité** — temps par jeu et par compte, graphiques, export en CSV, JSON, XLSX ou PDF.
 - 🔒 **Restrictions et code PIN** — niveau de restriction, classification par âge, code PIN, déverrouillage temporaire, *Bloquer tous les jeux* en un interrupteur.
-- 🕒 **Console** — l'horloge réseau réglée depuis des serveurs NTP publics, pour que le minuteur compte juste sur une console qui n'atteint jamais Nintendo, et une vérification des jeux installés.
+- 🕒 **Console** — l'horloge réseau réglée depuis des serveurs NTP publics, pour que le minuteur compte juste sur une console qui n'atteint jamais Nintendo, une vérification des jeux installés, et des homebrews (PlayGuard en premier) placés sur le menu HOME comme des jeux, avec leur icône (forwarders de NRO).
 - 📱 **Application mobile** — la dissocier, même sur une console d'occasion.
 - ↩️ **Historique et sauvegardes** — chaque modification est consignée et peut être annulée.
 - 🔔 **Notifications** — une cloche regroupe ce qui demande votre attention (alarme désactivée, horloge décalée, modifications faites ailleurs), avec la correction à portée d'un appui.
@@ -45,22 +45,22 @@ Cherchez *PlayGuard* dans le Homebrew App Store ou sphaira, ou extrayez `playgua
 
 ## Premiers pas
 
-1. Ouvrez PlayGuard : le guide *Premiers pas* règle le code PIN et la limite quotidienne.
+1. Ouvrez PlayGuard par-dessus un jeu, avec le compte d'un parent : le guide *Premiers pas* règle le code PIN et la limite quotidienne.
 2. Encore associé à l'application mobile ? *Code PIN › Dissocier l'application mobile*, sinon sa prochaine synchronisation écrase vos réglages.
-3. Horloge réseau imprécise ? *Console › Horloge réseau › Mesurer l'écart*, puis réglez-la. Sans Internet, lisez d'abord [ceci](docs/fr/compatibility.md#versions-prises-en-charge).
+3. Horloge réseau imprécise ? *Console › Horloge réseau › Mesurer l'écart*, puis réglez-la. Sans Internet, lisez d'abord [ceci](docs/fr/compatibility.md#une-console-sans-internet).
 
-Code PIN oublié ou console d'occasion : [Console bloquée ?](docs/fr/troubleshooting.md#console-bloquée-)
+Le pas-à-pas complet, et les tâches du quotidien : [prise en main](docs/fr/getting-started.md). Code PIN oublié ou console d'occasion : [Console bloquée ?](docs/fr/troubleshooting.md#console-bloquée-)
 
 ## Documentation
 
 - **Site :** [playguard.link](https://playguard.link/fr/) — cette documentation dans les 15 langues de la console, et [PlayGuard dans le navigateur](https://playguard.link/simulator/?lang=fr) face à une console simulée
-- **Guide :** [fonctions](docs/fr/features.md) · [installation](docs/fr/install.md) · [compatibilité](docs/fr/compatibility.md) · [dépannage](docs/fr/troubleshooting.md)
+- **Guide :** [prise en main](docs/fr/getting-started.md) · [fonctions](docs/fr/features.md) · [installation](docs/fr/install.md) · [compatibilité](docs/fr/compatibility.md) · [dépannage](docs/fr/troubleshooting.md)
 - **Référence (en anglais) :** [application mobile](docs/companion-app.md) · [`config.json`](docs/config.md) · [fonctionnement du contrôle parental](docs/parental-controls.md) · [module de récupération](sysmodule/README.md)
 - **Contribuer (en anglais) :** [CONTRIBUTING.md](CONTRIBUTING.md) · [feuille de route](ROADMAP.md) · [changelog](CHANGELOG.md)
 
 ## Licence et remerciements
 
-GPLv3, voir [`LICENSE`](LICENSE). Maintenu par [JigSawFr](https://github.com/JigSawFr). Fork de [Pctl Manager](https://github.com/tailiang2008) de Taylor ; correctifs fw 22.5 et synchronisation NTP repris de [anbingxi/NX-Pctl-Manager](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly). Construit avec [borealis](https://github.com/xfangfang/borealis) (Apache 2.0), [QR Code generator](https://github.com/nayuki/QR-Code-generator) (MIT), [Twemoji](https://github.com/jdecked/twemoji) (CC-BY 4.0) et la police [Sora](https://github.com/sora-xor/sora-font) (OFL 1.1) ; référence des commandes : [switchbrew](https://switchbrew.org/wiki/Parental_Control_services). La vérification des jeux installés et ses réparations suivent [Goldleaf](https://github.com/XorTroll/Goldleaf) et [sphaira](https://github.com/ITotalJustice/sphaira) (GPLv3), avec les numéros de commandes ns et es de [libnx-ext](https://github.com/XorTroll/libnx-ext) (MIT).
+GPLv3, voir [`LICENSE`](LICENSE). Maintenu par [JigSawFr](https://github.com/JigSawFr). Fork de [Pctl Manager](https://github.com/tailiang2008) de Taylor ; correctifs fw 22.5 et synchronisation NTP repris de [anbingxi/NX-Pctl-Manager](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly). Construit avec [borealis](https://github.com/xfangfang/borealis) (Apache 2.0), [QR Code generator](https://github.com/nayuki/QR-Code-generator) (MIT), [Twemoji](https://github.com/jdecked/twemoji) (CC-BY 4.0) et la police [Sora](https://github.com/sora-xor/sora-font) (OFL 1.1) ; référence des commandes : [switchbrew](https://switchbrew.org/wiki/Parental_Control_services). La vérification des jeux installés et ses réparations suivent [Goldleaf](https://github.com/XorTroll/Goldleaf) et [sphaira](https://github.com/ITotalJustice/sphaira) (GPLv3), avec les numéros de commandes ns et es de [libnx-ext](https://github.com/XorTroll/libnx-ext) (MIT). Les forwarders de NRO sont construits comme sphaira les construit, leur programme étant le hbl de sphaira, d'après [nx-hbloader](https://github.com/switchbrew/nx-hbloader) (ISC).
 
 Des assistants de code à base d'IA aident au développement ; chaque changement est relu, couvert par les tests unitaires et vérifié sur une vraie console avant publication.
 

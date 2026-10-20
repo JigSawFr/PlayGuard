@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 1fe10bbb78d4 -->
+<!-- translated from docs/compatibility.md, sha256 33251c660faf -->
 # Compatibilidad
 
 Firmware, Atmosphère y lanzadores compatibles, emuMMC y sysMMC, y cómo se compara PlayGuard con un sysmodule de sustitución. Volver al [README](../../README.md).
@@ -30,19 +30,35 @@ Firmware, Atmosphère y lanzadores compatibles, emuMMC y sysMMC, y cómo se comp
 
 PlayGuard comprueba que Atmosphère está en marcha, no su versión: lo que cuenta es el firmware que arranca. *Consola* muestra ambos.
 
-**Lanzadores.** Se recomienda abrirlo sobre un juego (title override). La aplicación indica si se ejecuta como aplicación o como applet (álbum). Sobre un juego, la consola cuenta el tiempo de PlayGuard como el de ese juego. En la actividad, va al usuario elegido al iniciar: ábrelo con el usuario de un padre o una madre, no con el de un niño. El temporizador de juego es el de la consola, el mismo para todos los usuarios: cuenta ese tiempo sea quien sea quien haya abierto PlayGuard (salvo si el temporizador está desactivado).
+## Lo que hay que saber
 
-**Nintendo Switch 2.** No es compatible: no existe Atmosphère para ella.
+### Lanzadores
 
-<a id="firmware-más-reciente"></a>**¿Un firmware más reciente?** Por encima del firmware más reciente probado en una consola, PlayGuard se abre en **solo lectura** y comprueba si una versión más reciente lo admite. Si es así, propone actualizar (en el propio PlayGuard, con sphaira o con la Homebrew App Store). Si no, tú eliges: solo lectura, solo lectura con las herramientas de desarrollador (para investigar el firmware) o todas las funciones bajo tu propia responsabilidad. La elección se puede recordar para ese firmware y esa versión de la aplicación; *Consola › Compatibilidad* vuelve a mostrar la pantalla.
+Se recomienda abrirlo sobre un juego (title override). La aplicación indica si se ejecuta como aplicación o como applet (álbum). Sobre un juego, la consola cuenta el tiempo de PlayGuard como el de ese juego. En la actividad, va al usuario elegido al iniciar: ábrelo con el usuario de un padre o una madre, no con el de un niño. El temporizador de juego es el de la consola, el mismo para todos los usuarios: cuenta ese tiempo sea quien sea quien haya abierto PlayGuard (salvo si el temporizador está desactivado).
 
-**emuMMC y sysMMC.** Cada una tiene su propio control parental, y PlayGuard solo ve el del sistema en el que se ejecuta. En la emuMMC, *Consola* y *Primeros pasos* lo indican; en la sysMMC también, cuando hay una emuMMC configurada en la tarjeta SD. Configura el control parental en ambas, u oculta el menú de arranque de hekate para que un niño no pueda elegir el otro sistema. PlayGuard guarda por separado el historial, las copias de seguridad y el estado de cada sistema (la sysMMC y la emuMMC, en `nand/`); las preferencias y los perfiles son comunes.
+### Nintendo Switch 2
 
-**¿Puede provocar un baneo de la consola?** PlayGuard nunca contacta con Nintendo: en línea, solo llega a servidores de hora públicos y a GitHub (actualizaciones, y los informes que envíes). Lo que hace que baneen una consola es un firmware personalizado o una emuMMC que se conecta a Nintendo ([FAQ de switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), en inglés). No hay ningún baneo documentado por cambios del control parental o del reloj; no es una garantía.
+No es compatible: no existe Atmosphère para ella.
 
-**¿Una consola sin Internet?** Para eso está PlayGuard, y el temporizador de juego sigue necesitando un reloj de red ajustado. Sin ningún servidor de hora al que preguntar, *Consola › Reloj de red › Medir el desfase del reloj* ofrece ajustarlo al reloj de la consola: comprueba antes el reloj de la consola, con *Sincronizar el reloj por Internet* desactivado, y activa ese ajuste solo después (consulta [Consola](features.md#consola--el-reloj-de-red-los-juegos-instalados-lo-que-ejecuta-la-consola)).
+### Firmware más reciente
 
-**Notificaciones en el móvil.** Desde 22.0.0, una consola que sigue vinculada a la aplicación móvil puede avisar al padre o a la madre cuando se introduce el PIN en la consola ([switchbrew](https://switchbrew.org/wiki/22.0.0), en inglés). No se sabe si los desbloqueos del propio PlayGuard lo provocan.
+Por encima del firmware más reciente probado en una consola, PlayGuard se abre en **solo lectura** y comprueba si una versión más reciente lo admite. Si es así, propone actualizar (en el propio PlayGuard, con sphaira o con la Homebrew App Store). Si no, tú eliges: solo lectura, solo lectura con las herramientas de desarrollador (para investigar el firmware) o todas las funciones bajo tu propia responsabilidad. La elección se puede recordar para ese firmware y esa versión de la aplicación; *Consola › Compatibilidad* vuelve a mostrar la pantalla.
+
+### emuMMC y sysMMC
+
+Cada una tiene su propio control parental, y PlayGuard solo ve el del sistema en el que se ejecuta. En la emuMMC, *Consola* y *Primeros pasos* lo indican; en la sysMMC también, cuando hay una emuMMC configurada en la tarjeta SD. Configura el control parental en ambas, u oculta el menú de arranque de hekate para que un niño no pueda elegir el otro sistema. PlayGuard guarda por separado el historial, las copias de seguridad y el estado de cada sistema (la sysMMC y la emuMMC, en `nand/`); las preferencias y los perfiles son comunes.
+
+### ¿Puede provocar un baneo de la consola?
+
+PlayGuard nunca contacta con Nintendo: en línea, solo llega a servidores de hora públicos y a GitHub (actualizaciones, y los informes que envíes). Lo que hace que baneen una consola es un firmware personalizado o una emuMMC que se conecta a Nintendo ([FAQ de switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), en inglés). No hay ningún baneo documentado por cambios del control parental o del reloj; no es una garantía.
+
+### Una consola sin Internet
+
+Para eso está PlayGuard, y el temporizador de juego sigue necesitando un reloj de red ajustado. Sin ningún servidor de hora al que preguntar, *Consola › Reloj de red › Medir el desfase del reloj* ofrece ajustarlo al reloj de la consola: comprueba antes el reloj de la consola, con *Sincronizar el reloj por Internet* desactivado, y activa ese ajuste solo después (consulta [reloj de red](features.md#ningún-servidor-responde)).
+
+### Notificaciones en el móvil
+
+Desde 22.0.0, una consola que sigue vinculada a la aplicación móvil puede avisar al padre o a la madre cuando se introduce el PIN en la consola ([switchbrew](https://switchbrew.org/wiki/22.0.0), en inglés). No se sabe si los desbloqueos del propio PlayGuard lo provocan.
 
 ## Por qué PlayGuard
 
@@ -56,10 +72,12 @@ Manejar el control parental de la propia consola abre además la puerta a mucho 
 
 PlayGuard maneja el control parental integrado en la consola (el servicio `pctl`), sin conexión. El otro enfoque lo sustituye por un sysmodule, por ejemplo [NS Parental Control](https://github.com/TristanIsrael/NSParentalControl) (un sysmodule y un overlay de Tesla / Ultrahand).
 
-- **Límite de tiempo de juego** — PlayGuard: uno para la consola (el temporizador de la propia consola). Un sysmodule de sustitución: uno por cuenta de usuario.
-- **PIN, avisos, suspensión** — PlayGuard: los de la consola. Un sysmodule de sustitución: los suyos.
-- **En segundo plano** — PlayGuard: nada (el sysmodule de recuperación opcional solo actúa al arrancar, cuando un archivo `RESCUE` se lo pide). Un sysmodule de sustitución: un sysmodule, desde el arranque.
-- **Tras una actualización del firmware** — PlayGuard: el control parental de la consola sigue funcionando; PlayGuard se abre en solo lectura hasta que una versión admita el firmware. Un sysmodule de sustitución: el control depende de que el sysmodule siga funcionando.
-- **Eliminado de la tarjeta SD** — PlayGuard: los límites se quedan en la consola. Un sysmodule de sustitución: el control desaparece con él.
+| | PlayGuard | Un sysmodule de sustitución |
+|---|---|---|
+| **Límite de tiempo de juego** | Uno para la consola (el temporizador de la propia consola) | Uno por cuenta de usuario |
+| **PIN, avisos, suspensión** | Los de la consola | Los suyos |
+| **En segundo plano** | Nada (el sysmodule de recuperación opcional solo actúa al arrancar, cuando un archivo `RESCUE` se lo pide) | Un sysmodule, desde el arranque |
+| **Tras una actualización del firmware** | El control parental de la consola sigue funcionando; PlayGuard se abre en solo lectura hasta que una versión admita el firmware | El control depende de que el sysmodule siga funcionando |
+| **Eliminado de la tarjeta SD** | Los límites se quedan en la consola | El control desaparece con él |
 
 **¿Necesitas un límite distinto para cada niño?** Elige un sysmodule de sustitución: el temporizador de la consola tiene un solo límite para toda la consola. Si no, PlayGuard conserva el control parental de Nintendo y simplemente lleva sus ajustes a la consola.
