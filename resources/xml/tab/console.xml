@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Console: under Diagnostics, the network clock (its own screen, the
-     former tab) and the installed games check, then what the console runs
+     former tab) and the installed games check; under Homebrew, the
+     forwarders (homebrew on the HOME menu); then what the console runs
      (firmware, Atmosphère, hekate: A on each opens its release notes),
      compatibility, storage, the serial number and the game patches. -->
 
@@ -27,6 +28,9 @@
             <brls:Header title="@i18n/playguard/tools/section_diag" marginBottom="8"/>
             <brls:DetailCell id="cn_clock" title="@i18n/playguard/tabs/clock"/>
             <brls:DetailCell id="cn_games" title="@i18n/playguard/games/open"/>
+            <!-- Homebrew on the HOME menu (activity/forwarders_activity.hpp). -->
+            <brls:Header title="@i18n/playguard/forwarders/section" marginTop="24" marginBottom="8"/>
+            <brls:DetailCell id="cn_forwarders" title="@i18n/playguard/forwarders/open"/>
             <brls:Header title="@i18n/playguard/tools/section_console" marginTop="24" marginBottom="8"/>
             <!-- A on each: its release notes (activity/sys_notes_activity.hpp). -->
             <brls:DetailCell id="cn_fw" title="@i18n/playguard/tools/firmware"/>

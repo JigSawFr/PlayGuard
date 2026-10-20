@@ -50,7 +50,7 @@
   {"name": "dev_builds_delay", "live": true, "group": "updates", "type": "number", "min": 0},
   {"name": "github_login", "live": true, "group": "updates", "type": "select", "options": ["", "ok", "denied", "offline"]},
   {"name": "paste", "live": true, "group": "updates", "type": "text", "placeholder": "https://gist.github.com/u/ab12", "suggestions": ["offline"]},
-  {"name": "fail", "live": true, "group": "failures", "type": "multi", "options": ["unlock", "unverified", "relock", "write", "timer", "clock", "pin", "pin_entry", "bedtime", "remove", "launch", "verify"]},
+  {"name": "fail", "live": true, "group": "failures", "type": "multi", "options": ["unlock", "unverified", "relock", "write", "timer", "clock", "pin", "pin_entry", "bedtime", "remove", "launch", "verify", "forwarder"]},
   {"name": "still_focus", "group": "capture", "type": "bool"},
   {"name": "version", "group": "capture", "type": "text", "placeholder": "1.0.0:1a2b3c4"},
   {"name": "hold_loading", "group": "capture", "type": "bool"},

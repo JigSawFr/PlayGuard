@@ -183,21 +183,24 @@ else ()
     list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/source/core/pure.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/calendar.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gamecheck_rules.c
+                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/forwarder_pack.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/rescue.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/write_guard.c)
 endif ()
 
 # QR codes of the funding links in About (MIT, vendored: extern/qrcodegen).
 list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/extern/qrcodegen/qrcodegen.cpp)
+# JPEG writing for the NRO forwarders' icons (public domain, vendored: extern/stb).
+list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/extern/stb/stb_image_write.c)
 
 program_target(${PROJECT_NAME} "${PLAYGUARD_SRC}")
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 
-target_include_directories(${PROJECT_NAME} PRIVATE source extern/qrcodegen ${APP_PLATFORM_INCLUDE})
+target_include_directories(${PROJECT_NAME} PRIVATE source extern/qrcodegen extern/stb ${APP_PLATFORM_INCLUDE})
 # -ffunction-sections / -fdata-sections come from borealis (PUBLIC) and
 # --gc-sections from libnx's switch.specs.
 # Warnings on PlayGuard's own sources (not borealis, not the vendored
-# qrcodegen); CI turns them into errors with -DPLAYGUARD_WERROR=ON.
+# qrcodegen and stb); CI turns them into errors with -DPLAYGUARD_WERROR=ON.
 option(PLAYGUARD_WERROR "Treat PlayGuard's compiler warnings as errors" OFF)
 set(PLAYGUARD_WARNINGS -Wall -Wextra)
 if (PLAYGUARD_WERROR)
@@ -205,6 +208,7 @@ if (PLAYGUARD_WERROR)
 endif ()
 target_compile_options(${PROJECT_NAME} PRIVATE ${APP_PLATFORM_OPTION} ${PLAYGUARD_WARNINGS})
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/qrcodegen/qrcodegen.cpp PROPERTIES COMPILE_OPTIONS "-w")
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/stb/stb_image_write.c PROPERTIES COMPILE_OPTIONS "-w")
 # The commit built (at configure time): development builds are told apart by
 # it (util/dev_builds.hpp). PLAYGUARD_COMMIT (CI: a pull request's head)
 # wins over the checkout's. Empty outside a git checkout.
@@ -341,13 +345,24 @@ if (PLATFORM_SWITCH)
         COMMAND ${PLAYGUARD_MAKE} --no-print-directory -C ${CMAKE_CURRENT_SOURCE_DIR}/sysmodule
         BYPRODUCTS ${RESCUE_NSP}
         COMMENT "Building the recovery sysmodule")
-    add_custom_target(${PROJECT_NAME}.nro ALL DEPENDS ${PROJECT_NAME} playguard_rescue
+    # The program of the NRO forwarders PlayGuard installs (core/forwarder.h)
+    # rides in it too (romfs:/forwarder/main and main.npdm), built by
+    # forwarder/'s Makefile.
+    set(FORWARDER_OUT ${CMAKE_CURRENT_SOURCE_DIR}/forwarder/out)
+    add_custom_target(playguard_forwarder
+        COMMAND ${PLAYGUARD_MAKE} --no-print-directory -C ${CMAKE_CURRENT_SOURCE_DIR}/forwarder
+        BYPRODUCTS ${FORWARDER_OUT}/forwarder.nso ${FORWARDER_OUT}/forwarder.npdm
+        COMMENT "Building the NRO forwarders' loader")
+    add_custom_target(${PROJECT_NAME}.nro ALL DEPENDS ${PROJECT_NAME} playguard_rescue playguard_forwarder
         COMMAND ${NX_NACPTOOL_EXE} --create "PlayGuard" "${PROJECT_AUTHOR}"
                 "${APP_VERSION}" ${PROJECT_NAME}.nacp --titleid=${PROJECT_TITLEID}
         ${ASSEMBLE_RESOURCES}
         ${PLAYGUARD_COPY_SHADERS}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${MERGED_RESOURCES}/rescue
         COMMAND ${CMAKE_COMMAND} -E copy ${RESCUE_NSP} ${MERGED_RESOURCES}/rescue/exefs.nsp
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${MERGED_RESOURCES}/forwarder
+        COMMAND ${CMAKE_COMMAND} -E copy ${FORWARDER_OUT}/forwarder.nso ${MERGED_RESOURCES}/forwarder/main
+        COMMAND ${CMAKE_COMMAND} -E copy ${FORWARDER_OUT}/forwarder.npdm ${MERGED_RESOURCES}/forwarder/main.npdm
         COMMAND ${CMAKE_COMMAND} -E remove -f ${MERGED_RESOURCES}/font/switch_font.ttf ${MERGED_RESOURCES}/font/switch_icons.ttf
         COMMAND ${NX_ELF2NRO_EXE} ${PROJECT_NAME}.elf ${PROJECT_NAME}.nro
                 --icon=${PROJECT_ICON} --nacp=${PROJECT_NAME}.nacp

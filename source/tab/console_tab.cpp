@@ -7,6 +7,7 @@
 #include "action/sys_notes_flow.hpp"
 #include "action/sys_update_flow.hpp"
 #include "activity/firmware_gate_activity.hpp"
+#include "activity/forwarders_activity.hpp"
 #include "activity/game_check_activity.hpp"
 #include "core/sysinfo.h"
 #include "tab/clock_tab.hpp"
@@ -30,6 +31,11 @@ ConsoleTab::ConsoleTab()
     games->setDetailText(ui::opens());
     games->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new GameCheckActivity());
+        return true;
+    });
+    forwarders->setDetailText(ui::opens());
+    forwarders->registerClickAction([](brls::View*) {
+        brls::Application::pushActivity(new ForwardersActivity());
         return true;
     });
 
@@ -102,8 +108,9 @@ ConsoleTab::ConsoleTab()
             column->addView(tiles, 0);
         }
     }
-    this->list.apply({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_compat", "check" }, { "cn_storage", "folder" },
-                       { "cn_blank", "code" }, { "cn_serial", "tag" }, { "cn_patches", "shield" } });
+    this->list.apply({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_forwarders", "home" },
+                       { "cn_compat", "check" }, { "cn_storage", "folder" }, { "cn_blank", "code" },
+                       { "cn_serial", "tag" }, { "cn_patches", "shield" } });
 }
 
 void ConsoleTab::refresh()

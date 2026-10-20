@@ -70,6 +70,18 @@ u64 sim_played_today_s(void)
 unsigned char *sim_game_icon(u64 id, size_t *size)
 {
     *size = 0;
+    // A forwarder's: the icon it was installed with in this run, else one of
+    // the made-up ones (sim_forwarder.cpp).
+    if ((id >> 56) == 0x05) {
+        unsigned char *own = sim_forwarder_icon(id, size);
+        if (own) return own;
+        const size_t k = (size_t)(id >> 12) % (sizeof(SIM_ICONS) / sizeof(SIM_ICONS[0]));
+        unsigned char *jpeg = (unsigned char *)malloc(SIM_ICON_SIZES[k]);
+        if (!jpeg) return NULL;
+        memcpy(jpeg, SIM_ICONS[k], SIM_ICON_SIZES[k]);
+        *size = SIM_ICON_SIZES[k];
+        return jpeg;
+    }
     const SimGame *g = sim_game(id);
     if (!g || g->icon < 0) return NULL;
     unsigned char *jpeg = (unsigned char *)malloc(SIM_ICON_SIZES[g->icon]);
