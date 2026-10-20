@@ -38,8 +38,8 @@ static bool local_time(int *wday, int *minute, char *when, size_t size)
     return true;
 }
 
-// Whether `nro` is in its free hours now (GATE_RULES_NAME).
-static bool free_now(const char *nro, int wday, int minute)
+// `nro`'s free hours (GATE_RULES_NAME); false when it has none.
+static bool hours_of(const char *nro, GateHours *h)
 {
     static char text[4096];
     FILE *f = fopen(GATE_DIR GATE_RULES_NAME, "rb");
@@ -47,8 +47,19 @@ static bool free_now(const char *nro, int wday, int minute)
     const size_t n = fread(text, 1, sizeof(text) - 1, f);
     fclose(f);
     text[n] = '\0';
-    GateHours h;
-    return gate_rule_find(text, n, nro, &h) && gate_hours_free(&h, wday, minute);
+    return gate_rule_find(text, n, nro, h);
+}
+
+// The tries `nro` was refused on `day` ("2026-10-20"), as the log has them
+// since PlayGuard last read it.
+static int refused_on(const char *nro, const char *day)
+{
+    static char text[GATE_LOG_MAX];
+    FILE *f = fopen(GATE_DIR GATE_LOG_NAME, "rb");
+    if (!f) return 0;
+    const size_t n = fread(text, 1, sizeof(text), f);
+    fclose(f);
+    return gate_log_count(text, n, nro, day, GateResult_Refused);
 }
 
 // The system's PIN screen, unless the console has no PIN.
@@ -198,7 +209,7 @@ static void screen_open(Screen *sc, const char *nro, const char *when)
     sc->on = true;
 }
 
-static void screen_show(Screen *sc, GateScreenState state)
+static void screen_show(Screen *sc, GateScreenState state, const char *note, int note_warn)
 {
     if (!sc->on) return;
     static const GateText STATUS[] = { GateText_Asking, GateText_Opening, GateText_Free, GateText_Refused, GateText_Error };
@@ -209,7 +220,7 @@ static void screen_show(Screen *sc, GateScreenState state)
     snprintf(footer, sizeof(footer), "PlayGuard \xC2\xB7 %s", gate_text(sc->language, GateText_Tagline));
     const GateScreen s = {
         sc->brand, sc->text, sc->icon, sc->icon_size, sc->name, gate_text(sc->language, STATUS[state]),
-        hint == GateText_Count ? NULL : gate_text(sc->language, hint), footer, sc->clock, state,
+        hint == GateText_Count ? NULL : gate_text(sc->language, hint), footer, sc->clock, state, note, note_warn,
     };
     u32 stride = 0;
     uint32_t *px = (uint32_t *)framebufferBegin(&sc->fb, &stride);
@@ -239,17 +250,30 @@ bool gate_nx_run(void)
     const bool timed = local_time(&wday, &minute, when, sizeof(when));
     Screen sc;
     screen_open(&sc, nro, when);
+    GateHours hours;
+    const bool has_hours = hours_of(nro, &hours);
+    // The day's refusals so far ("2026-10-20 21:03": its day), and when it
+    // starts without the PIN: said while it asks.
+    char day[11] = "";
+    if (timed) snprintf(day, sizeof(day), "%.10s", when);
+    const int refused = timed ? refused_on(nro, day) : 0;
+    char note[256] = "", span[200];
+    if (refused > 0) snprintf(note, sizeof(note), gate_text(sc.language, GateText_Tried), refused);
+    else if (has_hours && gate_hours_text(&hours, gate_text(sc.language, GateText_Days), span, sizeof(span)))
+        snprintf(note, sizeof(note), gate_text(sc.language, GateText_FreeHours), span);
     GateResult r;
-    if (timed && free_now(nro, wday, minute)) {
+    if (timed && has_hours && gate_hours_free(&hours, wday, minute)) {
         r = GateResult_Free;
     } else {
-        screen_show(&sc, GateScreen_Asking);
+        screen_show(&sc, GateScreen_Asking, note, refused > 0);
         r = ask_pin();
     }
     log_try(when, r, nro);
-    // How it went, a moment: longer when it does not start.
+    // How it went, a moment: longer when it does not start. Refused, the
+    // day's count with this one.
+    if (r == GateResult_Refused && timed) snprintf(note, sizeof(note), gate_text(sc.language, GateText_Tried), refused + 1);
     static const GateScreenState SHOWN[] = { GateScreen_Opening, GateScreen_Free, GateScreen_Refused, GateScreen_Error };
-    screen_show(&sc, SHOWN[r]);
+    screen_show(&sc, SHOWN[r], r == GateResult_Refused ? note : NULL, 1);
     if (sc.on) svcSleepThread(r == GateResult_Pin || r == GateResult_Free ? 700000000ULL : 1800000000ULL);
     screen_close(&sc);
     if ((r == GateResult_Pin || r == GateResult_Free) && envHasNextLoad() && R_SUCCEEDED(envSetNextLoad(nro, argv)))

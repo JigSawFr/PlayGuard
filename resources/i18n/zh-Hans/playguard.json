@@ -1048,7 +1048,20 @@
         "day_wed": "三",
         "day_thu": "四",
         "day_fri": "五",
-        "day_sat": "六"
+        "day_sat": "六",
+        "tries_grouped": "{} · {}次（{}）",
+        "preview_note": "在HOME菜单上的样子",
+        "no_menu": "SD卡上没有自制软件菜单：请先将sphaira（或hbmenu）放入/switch，然后重试。",
+        "put_back": "{}已恢复",
+        "help": "帮助",
+        "help_body": "此界面的用途（指南）：",
+        "fix_delete": "删除{}",
+        "fix_protect": "用PIN保护{}",
+        "group_protected": "已用PIN保护",
+        "group_open": "无需PIN",
+        "group_elsewhere": "由其他应用创建",
+        "group_gone": "已不在HOME菜单",
+        "state_verified": "已验证"
     },
     "hbmenu": {
         "section": "自制软件菜单",
@@ -1056,7 +1069,6 @@
         "note": "锁定后，相册和按住R启动的游戏都不会打开自制软件菜单：自制软件只能从HOME菜单上的转发器启动，而转发器可以询问PIN。需要PlayGuard的转发器，以及一个用PIN保护的菜单（sphaira或hbmenu），让家长仍能使用所有自制软件。",
         "state_locked": "已锁定",
         "state_open": "已开放",
-        "not_ready": "要锁定自制软件菜单，首先需要：",
         "need_pin": "主机上的家长控制PIN（PIN › 设置或更改PIN）",
         "need_patches": "转发器需要的签名补丁（sys-patch：见 主机 › 游戏补丁）",
         "need_self": "HOME菜单上PlayGuard的转发器（上方）",
@@ -1121,7 +1133,18 @@
         "summary_routes": "返回途径：{}",
         "summary_untried": "{}（从未从HOME菜单启动）",
         "summary_module": "已安装救援模块",
-        "summary_no_module": "未安装救援模块（可选）"
+        "summary_no_module": "未安装救援模块（可选）",
+        "step_pin": "主机上设置了家长控制PIN",
+        "step_patches": "转发器所需的签名补丁",
+        "step_self": "HOME菜单上的PlayGuard",
+        "step_menu": "用PIN保护的自制软件菜单（sphaira或hbmenu）",
+        "step_verify": "从HOME菜单启动该菜单一次",
+        "step_verify_named": "从HOME菜单启动{}一次（先PIN，再菜单）",
+        "step_lock": "锁定自制软件菜单",
+        "setup_title": "逐步锁定自制软件菜单",
+        "setup_note": "已完成的步骤会保留：随时可回到这里。全部完成后，锁定需按住A 2秒。",
+        "setup_next": "下一步",
+        "card_fix": "A：处理"
     },
     "about": {
         "section_changelog": "{} 更新内容",
@@ -1515,7 +1538,8 @@
             "2": "限制",
             "3": "PIN",
             "4": "在 PlayGuard 之外发现",
-            "5": "被主机拒绝"
+            "5": "被主机拒绝",
+            "6": "自制软件与转发器"
         },
         "columns": {
             "change": "更改",

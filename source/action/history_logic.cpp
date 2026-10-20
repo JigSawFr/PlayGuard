@@ -47,6 +47,9 @@ Category category(const history::Entry& e)
         k == "rescue")
         return Category::Security;
     if (text::starts_with(k, "outside_") || k == "new_account") return Category::Outside;
+    if (text::ends_with(k, "_forwarder") || k == "forwarder_gone" || text::starts_with(k, "gate_") ||
+        k == "lock_hbmenu" || k == "unlock_hbmenu" || text::starts_with(k, "hbmenu_"))
+        return Category::Homebrew;
     return Category::Other;
 }
 
@@ -59,6 +62,7 @@ bool matches(const history::Entry& e, Filter f)
     case Filter::Security: return category(e) == Category::Security;
     case Filter::Outside: return category(e) == Category::Outside;
     case Filter::Failed: return !e.result.empty();
+    case Filter::Homebrew: return category(e) == Category::Homebrew;
     case Filter::Count: break;
     }
     return false;

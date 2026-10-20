@@ -30,7 +30,17 @@ class ForwardersActivity : public brls::Activity
     std::vector<std::pair<uint64_t, GameCell*>> cells;   // for their icons
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
 
-    void rebuild(uint64_t focus_id = 0);
+    // The list again: the focus on `keep`, else on the forwarder `focus_id`.
+    void rebuild(uint64_t focus_id = 0, brls::View* keep = nullptr);
+    // A on the card: what it says, each a press away.
+    void fixes();
+    // Deleted, then ZR a few seconds to put it back.
+    void remove_with_undo(const forwarders_logic::Row& row);
+    // ZR for a few seconds runs `undo` (as the change history's).
+    void offer_undo(std::function<void()> undo);
+    void withdraw_undo();
+    brls::ActionIdentifier undo_action = 0;
+    size_t                 undo_timer = 0;
     void show_patches();
     void show_self();
     // The lock's cell and the card at the top.
@@ -43,6 +53,8 @@ class ForwardersActivity : public brls::Activity
     void pick_homebrew();
     // Hours when a protected one starts without the PIN: the days, then the span.
     void pick_hours(const forwarders_logic::Row& row);
+    // Sets them, then ZR a few seconds to put the ones before back.
+    void hours(const forwarders_logic::Row& row, int days, int from, int to);
     // After a change: the list again, the focus on `id` when it is there.
     std::function<void(bool)> then_rebuild(uint64_t id = 0);
 

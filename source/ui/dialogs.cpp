@@ -227,6 +227,8 @@ struct Held
 {
     int64_t start = -1, last = 0;
     bool    done = false;
+    bool    touching = false;          // a finger held on the button
+    std::function<void()> full;        // held long enough
 };
 constexpr int64_t HOLD_US = 2000000;
 // borealis repeats a held key's action after 250 ms, then every 100 ms: a
@@ -259,7 +261,15 @@ class HoldBar : public brls::View
         nvgRoundedRect(vg, x, y, width, height, height / 2);
         nvgFillColor(vg, theme["cadran/track"]);
         nvgFill(vg);
-        const double part = held_part(*this->held, brls::getCPUTimeUsec());
+        const int64_t now = brls::getCPUTimeUsec();
+        // A finger on the button: held as long as it stays (no key repeats).
+        if (this->held->touching) this->held->last = now;
+        const double part = held_part(*this->held, now);
+        if (part >= 1 && !this->held->done && this->held->full) {
+            this->held->done = true;
+            // Not while drawing: closing the dialog changes the views drawn.
+            brls::sync([held = this->held]() { held->full(); });
+        }
         if (part <= 0) return;
         nvgBeginPath(vg);
         nvgRoundedRect(vg, x, y, std::max((float)height, (float)(width * part)), height, height / 2);
@@ -285,18 +295,29 @@ void hold_confirm(brls::Box* body, const std::string& hold_label, std::function<
     dialog->addButton(hold_label, []() {});
     on_cancel(dialog, on_no);
     cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
-    if (brls::View* yes = dialog->getView("brls/dialog/button2"))
-        yes->registerAction(hold_label, brls::BUTTON_A, [dialog, held, on_yes](brls::View*) {
+    held->full = [dialog, on_yes]() { dialog->close([on_yes]() { if (on_yes) on_yes(); }); };
+    if (brls::View* yes = dialog->getView("brls/dialog/button2")) {
+        yes->registerAction(hold_label, brls::BUTTON_A, [held](brls::View*) {
             const int64_t now = brls::getCPUTimeUsec();
             if (held->done) return true;
             if (held->start < 0 || now - held->last > LET_GO_US) held->start = now;
             held->last = now;
             if (now - held->start >= HOLD_US) {
                 held->done = true;
-                dialog->close([on_yes]() { if (on_yes) on_yes(); });
+                held->full();
             }
             return true;
         }, false, true, brls::SOUND_NONE);
+        // A finger held on it does the same; lifted or moved away, it stops.
+        yes->addGestureRecognizer(new brls::TapGestureRecognizer([held](brls::TapGestureStatus status, brls::Sound*) {
+            const bool down = status.state == brls::GestureState::UNSURE || status.state == brls::GestureState::START ||
+                              status.state == brls::GestureState::STAY;
+            if (down && !held->touching) {
+                held->start = held->last = brls::getCPUTimeUsec();
+            }
+            held->touching = down;
+        }));
+    }
     dialog->open();
 }
 

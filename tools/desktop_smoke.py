@@ -1168,14 +1168,14 @@ if FORWARDERS:
     key("Return")
     shot("07_name")            # its name from its .nro, to change or keep
     key("Return")              # kept
-    shot("08_confirm")
+    shot("08_confirm")         # what the HOME menu will show: its icon, name and publisher
     key("Right")               # Add
     key("Return")
     time.sleep(3)
     if [n for _, n in made()] != ["PlayGuard", "Star Atlas"]:
         fail("Star Atlas's forwarder was not remembered: " + repr(made()))
-    shot("09_two")             # PlayGuard, Save Keeper, Star Atlas
-    key("Down", 2)             # Star Atlas
+    shot("09_two")             # by group: PlayGuard, Star Atlas (without the PIN), Save Keeper (another app's)
+    key("Down")                # Star Atlas
     key("Return")
     shot("10_actions")         # Details, Rename, Change the publisher, Protect with the PIN, Install again, Delete
     key("Down", 3)             # Protect with the PIN
@@ -1232,8 +1232,9 @@ if HBMENU:
     if len(restored) != 1 or restored[0].get("detail") != "Atmosphère 1.9.4 → 1.9.5" or \
             os.path.exists(os.path.join(run_dir, "playguard_data", "hbmenu_lock_report.txt")):
         fail("the sysmodule's report was not taken: " + repr(restored))
-    refused = recorded("gate_refused")
-    if len(refused) != 3 or refused[0].get("detail") != "sphaira" or refused[0].get("when") != "2026-10-19 21:03":
+    refused = recorded("gate_refused")   # the evening's three in one entry
+    if len(refused) != 1 or refused[0].get("detail") != "sphaira · 3 times (21:03, 21:04, 21:05)" or \
+            refused[0].get("when") != "2026-10-19 21:03":
         fail("the gate's log was not taken: " + repr(refused))
     if len(recorded("hbmenu_lock_removed")) != 1 or os.path.exists(hbmenu_state):
         fail("the lock taken away outside PlayGuard was not told")
@@ -1243,32 +1244,24 @@ if HBMENU:
     key("Return")
     key("Down", 4)             # PlayGuard's line, Another homebrew, Install them all again, Lock the homebrew menu
     key("Return")
-    shot("01_not_ready")       # what it takes first: PlayGuard's forwarder, a protected menu
+    shot("01_not_ready")       # the steps: PlayGuard's forwarder next, then a protected menu, then started once
     if override():
         fail("the homebrew menu was locked without a way back: " + repr(override()))
-    key("Return")              # OK
-    key("Up", 3)               # PlayGuard's line
-    key("Return")
+    key("Return")              # Next step: PlayGuard on the HOME menu
     key("Right")               # Add
     key("Return")
-    time.sleep(3)
-    key("Down", 3)             # Save Keeper, PlayGuard's line, Another homebrew
-    key("Return")
-    key("Down", 4)             # sphaira (by name: Pixel Paint, PlayGuard, Quick Notes, Save Keeper, sphaira)
-    key("Return")
+    time.sleep(3)              # the steps again, a protected menu next
+    key("Return")              # Next step: sphaira, found in /switch, made protected
     key("Return")              # its name kept
+    shot("01_preview")         # sphaira as the HOME menu will show it, the PIN it asks
     key("Right")               # Add
-    key("Return")
-    time.sleep(3)
-    key("Down", 2)             # PlayGuard, Save Keeper, sphaira
-    key("Return")
-    key("Down", 3)             # Protect with the PIN
-    key("Return")
-    key("Right")
     key("Return")
     time.sleep(3)
     if pinned() != ["sphaira"]:
-        fail("sphaira was not protected with the PIN: " + repr(pinned()))
+        fail("sphaira was not made protected with the PIN: " + repr(pinned()))
+    shot("01_steps")           # the steps again: sphaira to start once from the HOME menu
+    key("Escape")              # later
+    key("Up", 5)               # Install them all again, Another homebrew, PlayGuard's line, Save Keeper, sphaira
     key("Return")              # sphaira's actions
     key("Down", 4)             # Hours without the PIN
     key("Return")
@@ -1281,10 +1274,11 @@ if HBMENU:
     if rules != "41\t540\t1200\tsdmc:/switch/sphaira/sphaira.nro\n" or len(recorded("gate_hours")) != 1:
         fail("sphaira's free hours were not written: " + repr(rules))
     shot("02_hours")           # sphaira: On the HOME menu · PIN, not asked Sat–Sun 09:00–20:00
-    key("Down", 4)             # PlayGuard's line, Another homebrew, Install them all again, Lock the homebrew menu
-    key("Return")              # refused: sphaira never started from the HOME menu
+    key("Down", 5)             # Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock
+    key("Return")              # the steps: sphaira never started from the HOME menu
     if override():
         fail("the homebrew menu was locked before sphaira was seen working: " + repr(override()))
+    key("Return")              # Next step: how
     key("Return")              # OK
     # sphaira started from the HOME menu, the PIN entered at its gate: the
     # gate's log, read on the way to the lock.
@@ -1298,7 +1292,7 @@ if HBMENU:
     key("Right")
     key("Return")
     time.sleep(3)
-    key("Down", 7)             # Save Keeper, sphaira, Star Atlas, PlayGuard's line, Another homebrew, Install them all again, Lock
+    key("Down", 7)             # sphaira, Star Atlas, Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock
     key("Return")
     shot("03_unprotected")     # Star Atlas not protected: protect them all first, or lock as it is
     key("Return")              # Protect them all, then lock
@@ -1329,7 +1323,7 @@ if HBMENU:
     key("Return")
     shot("05_check")           # the album and R closed, the ways back, the module
     key("Return")              # OK
-    key("Up", 7)               # Protect every forwarder, Lock, Install them all again, Another homebrew, PlayGuard's line, Star Atlas, sphaira
+    key("Up", 8)               # Protect every forwarder, Lock, Install them all again, Another homebrew, PlayGuard's line, Save Keeper, Star Atlas, sphaira
     key("Return")
     key("Down", 6)             # Delete
     key("Return")              # refused: the last way back through a menu
@@ -1337,7 +1331,7 @@ if HBMENU:
     key("Return")              # OK
     if "sphaira" not in pinned():
         fail("sphaira, the last way back, was deleted while locked: " + repr(pinned()))
-    key("Down", 5)             # Star Atlas, PlayGuard's line, Another homebrew, Install them all again, Lock
+    key("Down", 6)             # Star Atlas, Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock
     key("Return")              # unlocked at once (the PIN asked)
     time.sleep(3)
     text = override()

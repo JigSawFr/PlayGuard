@@ -1048,7 +1048,20 @@
         "day_wed": "qua",
         "day_thu": "qui",
         "day_fri": "sex",
-        "day_sat": "sáb"
+        "day_sat": "sáb",
+        "tries_grouped": "{} · {} vezes ({})",
+        "preview_note": "Tal como o menu HOME o vai mostrar",
+        "no_menu": "Não há nenhum menu homebrew no cartão SD: ponha primeiro o sphaira (ou o hbmenu) em /switch e tente novamente.",
+        "put_back": "{} voltou",
+        "help": "Ajuda",
+        "help_body": "O que este ecrã faz, no guia:",
+        "fix_delete": "Eliminar {}",
+        "fix_protect": "Proteger {} com o PIN",
+        "group_protected": "Protegidos com o PIN",
+        "group_open": "Sem o PIN",
+        "group_elsewhere": "Criados por outra aplicação",
+        "group_gone": "Já não estão no menu HOME",
+        "state_verified": "verificado"
     },
     "hbmenu": {
         "section": "Menu homebrew",
@@ -1056,7 +1069,6 @@
         "note": "Bloqueado, nem o álbum nem um jogo iniciado com R premido abrem o menu homebrew: um homebrew só inicia a partir do seu forwarder no menu HOME, que pode pedir o PIN. É preciso o forwarder do PlayGuard e um menu (sphaira ou hbmenu) protegido com o PIN, para que o adulto mantenha o acesso a todos os homebrew.",
         "state_locked": "Bloqueado",
         "state_open": "Aberto",
-        "not_ready": "Para bloquear o menu homebrew, primeiro é preciso:",
         "need_pin": "um PIN do controlo parental na consola (PIN › Definir ou alterar o PIN)",
         "need_patches": "os patches de assinatura de que os forwarders precisam (sys-patch: ver Consola › Patches de jogos)",
         "need_self": "o forwarder do PlayGuard no menu HOME (acima)",
@@ -1121,7 +1133,18 @@
         "summary_routes": "Caminhos de volta: {}",
         "summary_untried": "{} (nunca iniciado a partir do menu HOME)",
         "summary_module": "Módulo de recuperação instalado",
-        "summary_no_module": "Módulo de recuperação não instalado (opcional)"
+        "summary_no_module": "Módulo de recuperação não instalado (opcional)",
+        "step_pin": "Um PIN do controlo parental na consola",
+        "step_patches": "Os patches de assinatura de que os forwarders precisam",
+        "step_self": "O PlayGuard no menu HOME",
+        "step_menu": "Um menu homebrew (sphaira ou hbmenu) protegido com o PIN",
+        "step_verify": "Iniciar esse menu uma vez a partir do menu HOME",
+        "step_verify_named": "Iniciar {} uma vez a partir do menu HOME (o PIN e depois o menu)",
+        "step_lock": "Bloquear o menu homebrew",
+        "setup_title": "Bloquear o menu homebrew, passo a passo",
+        "setup_note": "Cada passo fica feito: volte aqui quando quiser. Feitos todos, bloquear pede para manter A premido 2 segundos.",
+        "setup_next": "Passo seguinte",
+        "card_fix": "A: o que fazer"
     },
     "about": {
         "section_changelog": "Novidades da {}",
@@ -1515,7 +1538,8 @@
             "2": "Restrições",
             "3": "PIN",
             "4": "Visto fora do PlayGuard",
-            "5": "Recusado pela consola"
+            "5": "Recusado pela consola",
+            "6": "Homebrew e forwarders"
         },
         "columns": {
             "change": "Alteração",

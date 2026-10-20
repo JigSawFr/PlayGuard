@@ -358,6 +358,11 @@ void gate_screen_draw(uint32_t *px, int w, int h, int stride, const GateScreen *
     text(&cv, s->text_font, 32, s->state == GateScreen_Asking ? tx : tx + 28, 454, s->status, line, 1,
          (float)w - tx - 80);
     text(&cv, s->text_font, 26, tx, 500, s->hint, TEXT3, 1, (float)w - tx - 80);
+    if (s->note && *s->note) {
+        const Rgb tone = s->note_warn ? AMBER : TEAL;
+        fill_circle(&cv, tx + 7, 539, 5, tone, 1);
+        text(&cv, s->text_font, 24, tx + 22, 548, s->note, tone, 1, (float)w - tx - 102);
+    }
 
     // The footer: a hairline, PlayGuard's tagline and site.
     for (int x = 64; x < w - 64; x++) blend(&cv, x, h - 82, WHITE, 0.08f);

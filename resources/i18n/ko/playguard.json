@@ -1048,7 +1048,20 @@
         "day_wed": "수",
         "day_thu": "목",
         "day_fri": "금",
-        "day_sat": "토"
+        "day_sat": "토",
+        "tries_grouped": "{} · {}번 ({})",
+        "preview_note": "HOME 메뉴에 표시될 모습",
+        "no_menu": "SD 카드에 Homebrew 메뉴가 없습니다: 먼저 sphaira(또는 hbmenu)를 /switch에 넣고 다시 시도하세요.",
+        "put_back": "{}을(를) 되돌렸습니다",
+        "help": "도움말",
+        "help_body": "이 화면의 기능(가이드):",
+        "fix_delete": "{} 삭제",
+        "fix_protect": "{}을(를) PIN으로 보호",
+        "group_protected": "PIN으로 보호됨",
+        "group_open": "PIN 없음",
+        "group_elsewhere": "다른 앱이 만듦",
+        "group_gone": "HOME 메뉴에 없음",
+        "state_verified": "확인됨"
     },
     "hbmenu": {
         "section": "Homebrew 메뉴",
@@ -1056,7 +1069,6 @@
         "note": "잠그면 앨범이나 R을 누른 채 시작한 게임에서 Homebrew 메뉴가 열리지 않습니다. Homebrew는 HOME 메뉴의 포워더에서만 시작되고, 포워더는 PIN을 물을 수 있습니다. 보호자가 모든 Homebrew에 접근할 수 있도록 PlayGuard의 포워더와 PIN으로 보호한 메뉴(sphaira 또는 hbmenu)가 필요합니다.",
         "state_locked": "잠김",
         "state_open": "열림",
-        "not_ready": "Homebrew 메뉴를 잠그려면 먼저 다음이 필요합니다:",
         "need_pin": "본체의 자녀 보호 PIN (PIN › PIN 설정 또는 변경)",
         "need_patches": "포워더에 필요한 서명 패치 (sys-patch: 본체 › 게임 패치 참고)",
         "need_self": "HOME 메뉴에 있는 PlayGuard의 포워더 (위)",
@@ -1121,7 +1133,18 @@
         "summary_routes": "돌아오는 길: {}",
         "summary_untried": "{} (HOME 메뉴에서 시작한 적 없음)",
         "summary_module": "복구 모듈 설치됨",
-        "summary_no_module": "복구 모듈 설치 안 됨(선택)"
+        "summary_no_module": "복구 모듈 설치 안 됨(선택)",
+        "step_pin": "본체에 자녀 보호 기능 PIN",
+        "step_patches": "포워더에 필요한 서명 패치",
+        "step_self": "HOME 메뉴에 PlayGuard",
+        "step_menu": "PIN으로 보호한 Homebrew 메뉴(sphaira 또는 hbmenu)",
+        "step_verify": "그 메뉴를 HOME 메뉴에서 한 번 시작",
+        "step_verify_named": "{}을(를) HOME 메뉴에서 한 번 시작(PIN 다음 메뉴)",
+        "step_lock": "Homebrew 메뉴 잠그기",
+        "setup_title": "Homebrew 메뉴를 단계별로 잠그기",
+        "setup_note": "끝낸 단계는 그대로 남습니다: 언제든 여기로 돌아오세요. 모두 끝나면 잠글 때 A를 2초간 눌러야 합니다.",
+        "setup_next": "다음 단계",
+        "card_fix": "A: 할 일"
     },
     "about": {
         "section_changelog": "{}의 새로운 기능",
@@ -1515,7 +1538,8 @@
             "2": "제한",
             "3": "PIN",
             "4": "PlayGuard 밖에서 감지됨",
-            "5": "본체가 거부함"
+            "5": "본체가 거부함",
+            "6": "Homebrew와 포워더"
         },
         "columns": {
             "change": "변경",

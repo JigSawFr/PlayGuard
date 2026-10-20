@@ -168,3 +168,59 @@ bool gate_log_parse(const char *line, size_t len, const char **when, size_t *whe
     *nro_len = path_len;
     return true;
 }
+
+int gate_log_count(const char *text, size_t len, const char *nro, const char *day, GateResult r)
+{
+    if (!text || !nro || !day || strlen(day) != 10) return 0;
+    const size_t want = strlen(nro);
+    int n = 0;
+    for (size_t at = 0; at < len;) {
+        const char *line = text + at;
+        size_t m = 0;
+        while (at + m < len && line[m] != '\n') m++;
+        at += m + 1;
+        const char *when, *path;
+        size_t wn, pn;
+        GateResult got;
+        if (!gate_log_parse(line, m, &when, &wn, &got, &path, &pn)) continue;
+        if (got == r && wn >= 10 && memcmp(when, day, 10) == 0 && pn == want && memcmp(path, nro, want) == 0) n++;
+    }
+    return n;
+}
+
+size_t gate_hours_text(const GateHours *h, const char *days, char *buf, size_t size)
+{
+    if (!buf || size == 0) return 0;
+    buf[0] = '\0';
+    if (!valid(h) || !days) return 0;
+    // The 7 names, Sunday first.
+    char names[7][24];
+    const char *p = days;
+    for (int i = 0; i < 7; i++) {
+        const char *end = strchr(p, ',');
+        const size_t n = end ? (size_t)(end - p) : strlen(p);
+        if (n == 0 || n >= sizeof(names[i]) || (!end && i < 6)) return 0;
+        memcpy(names[i], p, n);
+        names[i][n] = '\0';
+        p = end ? end + 1 : p + n;
+    }
+    char d[200] = "";
+    const unsigned days7 = h->days & 0x7F;
+    // Monday to Sunday, Monday to Friday, Saturday and Sunday: as spans.
+    if (days7 == 0x7F) snprintf(d, sizeof(d), "%s\xE2\x80\x93%s", names[1], names[0]);
+    else if (days7 == 0x3E) snprintf(d, sizeof(d), "%s\xE2\x80\x93%s", names[1], names[5]);
+    else if (days7 == 0x41) snprintf(d, sizeof(d), "%s\xE2\x80\x93%s", names[6], names[0]);
+    else
+        for (int i = 1; i <= 7; i++) {
+            if (!(days7 >> (i % 7) & 1)) continue;
+            const size_t used = strlen(d);
+            snprintf(d + used, sizeof(d) - used, "%s%s", used ? ", " : "", names[i % 7]);
+        }
+    const int n = snprintf(buf, size, "%s %02u:%02u\xE2\x80\x93%02u:%02u", d, h->from / 60u, h->from % 60u, h->to / 60u,
+                           h->to % 60u);
+    if (n < 0 || (size_t)n >= size) {
+        buf[0] = '\0';
+        return 0;
+    }
+    return (size_t)n;
+}

@@ -40,11 +40,18 @@ static int count_near(int x0, int y0, int x1, int y1, int r, int g, int b, int t
     return n;
 }
 
-static void draw(GateScreenState state, const unsigned char *icon, size_t icon_n, const unsigned char *f)
+static void draw_note(GateScreenState state, const unsigned char *icon, size_t icon_n, const unsigned char *f,
+                      const char *note, int warn)
 {
     for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0x12345678u;
-    const GateScreen s = { f, f, icon, icon_n, "Star Atlas", "Status line", "A hint", "PlayGuard · tagline", "21:03", state };
+    const GateScreen s = { f, f, icon, icon_n, "Star Atlas", "Status line", "A hint", "PlayGuard · tagline", "21:03", state,
+                           note, warn };
     gate_screen_draw(px, W, H, STRIDE, &s);
+}
+
+static void draw(GateScreenState state, const unsigned char *icon, size_t icon_n, const unsigned char *f)
+{
+    draw_note(state, icon, icon_n, f, NULL, 0);
 }
 
 static void test_screen(void)
@@ -67,6 +74,13 @@ static void test_screen(void)
     CHECK(count_near(400, 420, 700, 460, 0xFF, 0x7A, 0x7A, 40) > 150);
     draw(GateScreen_Error, NULL, 0, font);
     CHECK(count_near(400, 420, 700, 460, 0xFF, 0xB5, 0x47, 40) > 150);
+    // A note under the hint: amber for the day's refusals, teal for the free hours; none, nothing there.
+    CHECK(count_near(400, 525, 800, 556, 0xFF, 0xB5, 0x47, 40) == 0);
+    draw_note(GateScreen_Refused, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, "Refused today: 3", 1);
+    CHECK(count_near(400, 525, 800, 556, 0xFF, 0xB5, 0x47, 40) > 100);
+    draw_note(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, "Without the PIN: Sat-Sun", 0);
+    CHECK(count_near(400, 525, 800, 556, 0x2E, 0xC4, 0xA6, 40) > 100);
+    draw(GateScreen_Error, NULL, 0, font);
     // No icon: PlayGuard's mark in its place (its teal ring).
     CHECK(count_near(112, 214, 344, 446, 0x2E, 0xC4, 0xA6, 30) > 2000);
 

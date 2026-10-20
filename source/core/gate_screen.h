@@ -37,6 +37,10 @@ typedef struct {
     const char          *footer;       // PlayGuard's tagline, bottom left
     const char          *clock;        // "21:03", top right, or NULL
     GateScreenState      state;
+    // A line under the hint, or NULL: the tries refused today (`note_warn`,
+    // amber), or when it starts without the PIN (teal).
+    const char          *note;
+    int                  note_warn;
 } GateScreen;
 
 // Draws `s` into `px` (`w` x `h` pixels, `stride` pixels a row, RGBA: R in

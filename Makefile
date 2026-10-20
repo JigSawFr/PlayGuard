@@ -77,7 +77,7 @@ rescue:
 # The PIN gate's screen as PNG files, one per state (tools/gate_preview.c).
 gate-preview:
 	@mkdir -p build/gate-preview
-	@$(CC) -std=gnu11 -O2 -Isource/core -Iextern/stb -isystem extern/borealis/library/include tools/gate_preview.c \
+	@$(CC) -std=gnu11 -O2 -Isource/core -Iextern/stb -isystem extern/borealis/library/include tools/gate_preview.c source/core/gate.c \
 		source/core/gate_screen.c source/core/gate_text.c extern/stb/pg_stb.c extern/stb/stb_image_write.c -lm \
 		-o build/gate-preview/gate_preview
 	@build/gate-preview/gate_preview build/gate-preview $(or $(GATE_LANG),1)

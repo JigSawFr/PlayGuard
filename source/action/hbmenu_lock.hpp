@@ -31,6 +31,7 @@
 
 #include <functional>
 #include <string>
+#include <vector>
 
 #include "action/forwarders_logic.hpp"
 
@@ -39,6 +40,29 @@ namespace hbmenu_lock
 
 // Whether override_config.ini holds PlayGuard's lock.
 bool locked();
+
+// The way to a lock, step by step: a PIN, the patches, PlayGuard's
+// forwarder, a protected menu, that menu started once from the HOME menu.
+struct SetupStep
+{
+    enum Kind
+    {
+        Pin,
+        Patches,
+        Self,
+        Menu,
+        Verify,
+    } kind;
+    std::string label;
+    bool        done = false;
+};
+std::vector<SetupStep> setup_steps(const forwarders_logic::LockCheck& c);
+// A step done (`done(changed)`), or said how (a dialog, no `done`).
+void run_step(SetupStep::Kind kind, std::function<void(bool)> done);
+// The steps in a dialog, the next one a press away, again after each that
+// makes a forwarder; the lock's confirmation once they are all done.
+// `done(changed)` after each change.
+void setup(std::function<void(bool)> done);
 
 // Locks it (the checks, what it changes, confirmed) or unlocks it.
 // `done(changed)` once it is over, also when refused or cancelled.

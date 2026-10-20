@@ -1048,7 +1048,20 @@
         "day_wed": "Mi",
         "day_thu": "Do",
         "day_fri": "Fr",
-        "day_sat": "Sa"
+        "day_sat": "Sa",
+        "tries_grouped": "{} · {}-mal ({})",
+        "preview_note": "So, wie das HOME-Menü es zeigen wird",
+        "no_menu": "Kein Homebrew-Menü auf der SD-Karte: lege zuerst sphaira (oder hbmenu) in /switch ab und versuche es erneut.",
+        "put_back": "{} ist wieder da",
+        "help": "Hilfe",
+        "help_body": "Was dieser Bildschirm macht, in der Anleitung:",
+        "fix_delete": "{} löschen",
+        "fix_protect": "{} mit der Geheimzahl schützen",
+        "group_protected": "Mit der Geheimzahl geschützt",
+        "group_open": "Ohne Geheimzahl",
+        "group_elsewhere": "Von einer anderen App erstellt",
+        "group_gone": "Nicht mehr im HOME-Menü",
+        "state_verified": "geprüft"
     },
     "hbmenu": {
         "section": "Homebrew-Menü",
@@ -1056,7 +1069,6 @@
         "note": "Gesperrt öffnet weder das Album noch ein mit gedrückter R-Taste gestartetes Spiel das Homebrew-Menü: Eine Homebrew-App startet nur noch über ihren Forwarder im HOME-Menü, der nach der Geheimzahl fragen kann. Dafür braucht es den Forwarder von PlayGuard und ein mit der Geheimzahl geschütztes Menü (sphaira oder hbmenu), damit Eltern weiter an jede Homebrew-App kommen.",
         "state_locked": "Gesperrt",
         "state_open": "Offen",
-        "not_ready": "Damit das Homebrew-Menü gesperrt werden kann, braucht es zuerst:",
         "need_pin": "eine Geheimzahl auf der Konsole (Geheimzahl › Geheimzahl festlegen oder ändern)",
         "need_patches": "die Signatur-Patches, die Forwarder brauchen (sys-patch: siehe Konsole › Spiel-Patches)",
         "need_self": "den Forwarder von PlayGuard im HOME-Menü (oben)",
@@ -1121,7 +1133,18 @@
         "summary_routes": "Rückwege: {}",
         "summary_untried": "{} (nie über das HOME-Menü gestartet)",
         "summary_module": "Rettungsmodul installiert",
-        "summary_no_module": "Rettungsmodul nicht installiert (optional)"
+        "summary_no_module": "Rettungsmodul nicht installiert (optional)",
+        "step_pin": "Eine Geheimzahl der Jugendschutzeinstellungen auf der Konsole",
+        "step_patches": "Die Signatur-Patches, die Forwarder brauchen",
+        "step_self": "PlayGuard im HOME-Menü",
+        "step_menu": "Ein mit der Geheimzahl geschütztes Homebrew-Menü (sphaira oder hbmenu)",
+        "step_verify": "Dieses Menü einmal über das HOME-Menü starten",
+        "step_verify_named": "{} einmal über das HOME-Menü starten (die Geheimzahl, dann das Menü)",
+        "step_lock": "Das Homebrew-Menü sperren",
+        "setup_title": "Das Homebrew-Menü Schritt für Schritt sperren",
+        "setup_note": "Jeder Schritt bleibt erledigt: komm jederzeit hierher zurück. Sind alle erledigt, verlangt das Sperren, A 2 Sekunden lang zu halten.",
+        "setup_next": "Nächster Schritt",
+        "card_fix": "A: was tun"
     },
     "about": {
         "section_changelog": "Neu in {}",
@@ -1515,7 +1538,8 @@
             "2": "Einschränkungen",
             "3": "Geheimzahl",
             "4": "Außerhalb von PlayGuard bemerkt",
-            "5": "Von der Konsole abgelehnt"
+            "5": "Von der Konsole abgelehnt",
+            "6": "Homebrew und Forwarder"
         },
         "columns": {
             "change": "Änderung",

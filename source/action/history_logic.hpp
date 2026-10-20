@@ -44,6 +44,7 @@ enum class Category
     Restrictions,   // the level, the rating organisation, custom settings, VR
     Security,       // the PIN, unlocks, the companion app, deleting, recovery
     Outside,        // what PlayGuard saw changed outside it, a new account
+    Homebrew,       // the forwarders, their PIN gate's tries, the homebrew menu's lock
     Other,          // the network clock, a backup restored, settings reset, a kind unknown
 };
 Category category(const history::Entry& e);
@@ -58,6 +59,7 @@ enum class Filter
     Security,
     Outside,
     Failed,
+    Homebrew,
     Count
 };
 bool matches(const history::Entry& e, Filter f);

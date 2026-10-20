@@ -19,6 +19,9 @@ typedef enum {
     GateText_RefusedHint,
     GateText_Error,
     GateText_Tagline,      // "Parental controls, right on the console"
+    GateText_Tried,        // "Refused today: %d" (printf: an int)
+    GateText_FreeHours,    // "Without the PIN: %s" (printf: gate_hours_text's)
+    GateText_Days,         // "Sun,Mon,…,Sat": the days' short names, Sunday first, by commas
     GateText_Count,
 } GateText;
 

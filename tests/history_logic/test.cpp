@@ -103,6 +103,11 @@ static void test_categories()
     CHECK(history_logic::category(entry("pin_shown", {}, {})) == Category::Security);
     CHECK(history_logic::category(entry("outside_clock", {}, {})) == Category::Outside);
     CHECK(history_logic::category(entry("new_account", {}, {})) == Category::Outside);
+    for (const char* k : { "add_forwarder", "protect_forwarder", "forwarder_gone", "gate_refused", "lock_hbmenu",
+                           "hbmenu_restored", "hbmenu_lock_removed" })
+        CHECK(history_logic::category(entry(k, {}, {})) == Category::Homebrew);
+    CHECK(history_logic::matches(entry("gate_open", {}, {}), history_logic::Filter::Homebrew));
+    CHECK(!history_logic::matches(entry("limits", {}, {}), history_logic::Filter::Homebrew));
     CHECK(history_logic::category(entry("clock", {}, {})) == Category::Other);
     CHECK(history_logic::category(entry("from_a_newer_version", {}, {})) == Category::Other);
 

@@ -66,6 +66,16 @@ bool gate_log_parse(const char *line, size_t len, const char **when, size_t *whe
 
 const char *gate_result_name(GateResult r);   // "pin", "free", "refused", "error"
 
+// How many lines of the log's `text` say `r` for `nro` on `day` ("2026-10-20",
+// the first ten characters of their time): the gate tells the tries of the day.
+int gate_log_count(const char *text, size_t len, const char *nro, const char *day, GateResult r);
+
+// "Sat–Sun 09:00–20:00": the days of `h` by the names in `days` (Sunday
+// first, 7 of them by commas: GateText_Days), then the span, as Console ›
+// Forwarders writes it (forwarders_logic::hours_text). Length, 0 when it
+// does not fit or `h` has no day.
+size_t gate_hours_text(const GateHours *h, const char *days, char *buf, size_t size);
+
 #ifdef __cplusplus
 }
 #endif

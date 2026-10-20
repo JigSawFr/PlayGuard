@@ -12,6 +12,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "gate.h"
 #include "gate_screen.h"
 #include "gate_text.h"
 #include "stb_image_write.h"
@@ -58,12 +59,21 @@ int main(int argc, char **argv)
     };
     char footer[160];
     snprintf(footer, sizeof(footer), "PlayGuard \xC2\xB7 %s", gate_text(lang, GateText_Tagline));
+    // Asking: its free hours (the weekend, 09:00 to 20:00); refused: the
+    // day's second refusal.
+    const GateHours weekend = { 0x41, 540, 1200 };
+    char span[200], hours[256] = "", tried[128];
+    if (gate_hours_text(&weekend, gate_text(lang, GateText_Days), span, sizeof(span)))
+        snprintf(hours, sizeof(hours), gate_text(lang, GateText_FreeHours), span);
+    snprintf(tried, sizeof(tried), gate_text(lang, GateText_Tried), 2);
     uint32_t *px = (uint32_t *)malloc(sizeof(uint32_t) * GATE_SCREEN_W * GATE_SCREEN_H);
     for (size_t i = 0; i < sizeof(SHOTS) / sizeof(SHOTS[0]); i++) {
         const GateScreen s = { font, font, i == 4 ? NULL : SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS),
                                "Star Atlas", gate_text(lang, SHOTS[i].status),
                                SHOTS[i].hint == GateText_Count ? NULL : gate_text(lang, SHOTS[i].hint), footer, "21:03",
-                               SHOTS[i].state };
+                               SHOTS[i].state,
+                               SHOTS[i].state == GateScreen_Asking ? hours : SHOTS[i].state == GateScreen_Refused ? tried : NULL,
+                               SHOTS[i].state == GateScreen_Refused };
         gate_screen_draw(px, GATE_SCREEN_W, GATE_SCREEN_H, GATE_SCREEN_W, &s);
         char path[512];
         snprintf(path, sizeof(path), "%s/%s.png", out, SHOTS[i].file);

@@ -17,6 +17,9 @@
 #include "util/forwarders.hpp"
 #include "util/nro.hpp"
 #include "util/paths.hpp"
+#include "util/text.hpp"
+#include "ui/cadran_kit.hpp"
+#include "ui/cadran_modal.hpp"
 #ifndef __SWITCH__
 #include "sim/sim_homebrew.hpp"
 #endif
@@ -293,39 +296,148 @@ bool loader_present()
 #endif
 }
 
-void create(const std::string& sd_path, std::function<void(bool)> done)
+namespace
+{
+// The question before a forwarder is made, with what the HOME menu will
+// show: its icon, its name, its publisher.
+void confirm_preview(const std::vector<uint8_t>& icon, const std::string& name, const std::string& author,
+                     const std::string& body, std::function<void()> yes, std::function<void()> no)
+{
+    namespace kit = cadran::kit;
+    brls::Theme theme = brls::Application::getTheme();
+    auto* box = new brls::Box(brls::Axis::COLUMN);
+    box->setAlignItems(brls::AlignItems::STRETCH);
+    box->setPadding(28, 36, 22, 36);
+    auto* tile = new brls::Box(brls::Axis::ROW);
+    tile->setAlignItems(brls::AlignItems::CENTER);
+    tile->setBackgroundColor(theme["cadran/surf2"]);
+    tile->setCornerRadius(18);
+    tile->setPadding(14, 18, 14, 14);
+    if (!icon.empty()) {
+        auto* image = new brls::Image();
+        image->setWidth(96);
+        image->setHeight(96);
+        image->setCornerRadius(14);
+        image->setScalingType(brls::ImageScalingType::FIT);
+        image->setImageFromMem(const_cast<unsigned char*>(icon.data()), (int)icon.size());
+        image->setMarginRight(18);
+        image->setShrink(0);
+        tile->addView(image);
+    }
+    auto* words = new brls::Box(brls::Axis::COLUMN);
+    words->setGrow(1.0f);
+    words->setWidth(0);
+    words->addView(kit::label(name, 22, "cadran/text"));
+    if (!author.empty()) words->addView(kit::label(author, 16, "cadran/text3"));
+    brls::Label* as = kit::label("playguard/forwarders/preview_note"_i18n, 14, "cadran/text3");
+    as->setMarginTop(6);
+    words->addView(as);
+    tile->addView(words);
+    box->addView(tile);
+    brls::Label* text = kit::label(body, 18, "cadran/text2");
+    text->setMarginTop(16);
+    box->addView(text);
+    auto* dialog = new brls::Dialog(box);
+    dialog->addButton("hints/cancel"_i18n, [no]() { if (no) no(); });
+    dialog->addButton("playguard/forwarders/add"_i18n, [yes]() { if (yes) yes(); });
+    ui::on_cancel(dialog, no);
+    cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
+    dialog->open();
+}
+}   // namespace
+
+void create(const std::string& sd_path, std::function<void(bool)> done, bool pin)
 {
     nro::Info info;
     std::string error;
-    const std::string sdmc = nro::sdmc_path(sd_path);
+    const std::string sdmc = nro::sd_path(sd_path).empty() ? nro::sdmc_path(sd_path) : sd_path;
     if (!assets_of(sdmc, false, info, error)) {
         ui::error("playguard/forwarders/add_err"_i18n, error);
         if (done) done(false);
         return;
     }
-    const std::string initial = forwarders_logic::default_name(info.name, sd_path);
+    // Protected: a PIN on the console to ask for.
+    u32 pin_length = 0;
+    if (pin && R_SUCCEEDED(pctl_lock_state(&pin_length, nullptr)) && pin_length == 0) {
+        ui::info("playguard/forwarders/pin_no_pin"_i18n);
+        if (done) done(false);
+        return;
+    }
+    const std::string shown = nro::sd_path(sdmc);
+    const std::string initial = forwarders_logic::default_name(info.name, shown);
     const std::string author = forwarders::clean_text(info.author, forwarders::MAX_AUTHOR);
+    const std::vector<uint8_t> icon = info.icon;
     ui::prompt_text("playguard/forwarders/name"_i18n, initial, (int)forwarders::MAX_NAME,
-                    [sdmc, sd_path, author, done](std::string typed) {
+                    [sdmc, shown, author, icon, pin, done](std::string typed) {
         const std::string name = forwarders::clean_text(typed, forwarders::MAX_NAME);
         if (name.empty()) {
             if (done) done(false);
             return;
         }
-        ui::confirm(brls::getStr("playguard/forwarders/confirm_add", name, sd_path), "playguard/forwarders/add"_i18n,
-                    [sdmc, name, author, done]() {
-                        forwarders::Made m;
-                        m.nro = sdmc;
-                        m.argv = argv_of(sdmc);
-                        m.name = name;
-                        m.author = author;
-                        const bool ok = install(m, false);
-                        if (done) done(ok);
-                    },
-                    [done]() {
-                        if (done) done(false);
-                    });
+        std::string body = brls::getStr("playguard/forwarders/confirm_add", name, shown);
+        if (pin) body += "\n\n" + brls::getStr("playguard/forwarders/pin_confirm", name);
+        brls::sync([icon, name, author, body, sdmc, pin, done]() {
+            confirm_preview(icon, name, author, body,
+                            [sdmc, name, author, pin, done]() {
+                                forwarders::Made m;
+                                m.nro = sdmc;
+                                m.argv = argv_of(sdmc);
+                                m.name = name;
+                                m.author = author;
+                                m.pin = pin;
+                                const bool ok = pin ? install(m, false, "protect_forwarder",
+                                                              brls::getStr("playguard/forwarders/pin_added", name))
+                                                    : install(m, false);
+                                if (done) done(ok);
+                            },
+                            [done]() {
+                                if (done) done(false);
+                            });
+        });
     });
+}
+
+std::string menu_nro()
+{
+    std::string sphaira, hbmenu;
+    for (const std::string& p : homebrew()) {
+        const std::string sdmc = nro::sdmc_path(p);
+        const std::string name = text::lower_ascii(forwarders_logic::file_title(sdmc));
+        if (name == "sphaira" && sphaira.empty()) sphaira = p;
+        if (name == "hbmenu" && hbmenu.empty()) hbmenu = p;
+    }
+    if (hbmenu.empty() && paths::file_exists(on_sd("/hbmenu.nro"))) hbmenu = "/hbmenu.nro";
+    return sphaira.empty() ? hbmenu : sphaira;
+}
+
+void protect_a_menu(std::function<void(bool)> done)
+{
+    // One made here already: its PIN.
+    for (const auto& r : rows())
+        if (forwarders_logic::is_menu(r.nro) && !r.pin && r.state == forwarders_logic::State::Ready) return set_pin(r, true, done);
+    const std::string path = menu_nro();
+    if (path.empty()) {
+        ui::info("playguard/forwarders/no_menu"_i18n);
+        if (done) done(false);
+        return;
+    }
+    create(path, done, true);
+}
+
+void put_back(const forwarders::Made& m, bool reinstall, std::function<void(bool)> done)
+{
+    bool ok;
+    if (reinstall) {
+        ok = install(m, m.nro == self_nro(), m.pin ? "protect_forwarder" : "add_forwarder",
+                     brls::getStr("playguard/forwarders/put_back", m.name));
+    } else {
+        std::string err;
+        ok = forwarders::save(m, &err);
+        write_rules();
+        if (ok) ui::notify(brls::getStr("playguard/forwarders/put_back", m.name), ui::Toast::Done);
+        else ui::error("playguard/forwarders/delete_err"_i18n, err);
+    }
+    if (done) done(ok);
 }
 
 void create_self(std::function<void(bool)> done)
@@ -486,15 +598,16 @@ void reinstall_all(std::function<void(bool)> done)
                 });
 }
 
-void set_hours(const forwarders_logic::Row& row, int days, int from, int to, std::function<void(bool)> done)
+void set_hours(const forwarders_logic::Row& row, int days, int from, int to, std::function<void(bool)> done, bool ask)
 {
     forwarders::Made m = made_of(row);
     if (!m.pin || !forwarders::find(row.id, nullptr)) {
         if (done) done(false);
         return;
     }
-    // The PIN first: free hours let the homebrew start without it.
-    if (ui::refuse_read_only() || !pin_lock::confirm() || R_FAILED(core_change_allowed())) {
+    // The PIN first: free hours let the homebrew start without it (not to
+    // put back the hours as they were a moment ago: ask false).
+    if (ui::refuse_read_only() || (ask && !pin_lock::confirm()) || R_FAILED(core_change_allowed())) {
         if (done) done(false);
         return;
     }
@@ -537,6 +650,13 @@ std::vector<forwarders_logic::Refusals> take_log()
     std::vector<forwarders::Made> made = forwarders::list();
     std::vector<std::pair<std::string, std::string>> refused;
     std::vector<size_t> seen_working;
+    struct Tries
+    {
+        const char*              kind;
+        std::string              when, detail;
+        std::vector<std::string> times;
+    };
+    std::vector<Tries> tries;
     size_t at = 0;
     int n = 0;
     while (at < text.size() && n < 200) {
@@ -559,10 +679,28 @@ std::vector<forwarders_logic::Refusals> take_log()
             std::string w(when, wn);
             if (w == "?") w.clear();
             if (r == GateResult_Refused) refused.push_back({ name, w });
-            history_flow::record_seen(kind, w, r == GateResult_Error ? name + " (error)" : name);
+            const std::string detail = r == GateResult_Error ? name + " (error)" : name;
+            // One entry per kind, forwarder and day: the times in it.
+            bool joined = false;
+            for (Tries& t : tries)
+                if (t.kind == kind && t.detail == detail && t.when.substr(0, 10) == w.substr(0, 10) && !w.empty()) {
+                    t.times.push_back(w.size() > 11 ? w.substr(11) : w);
+                    joined = true;
+                }
+            if (!joined) tries.push_back({ kind, w, detail, { w.size() > 11 ? w.substr(11) : w } });
             n++;
         }
         at = end + 1;
+    }
+    for (const Tries& t : tries) {
+        if (t.times.size() < 2) {
+            history_flow::record_seen(t.kind, t.when, t.detail);
+            continue;
+        }
+        std::string times;
+        for (const std::string& h : t.times) times += (times.empty() ? "" : ", ") + h;
+        history_flow::record_seen(t.kind, t.when,
+                                  brls::getStr("playguard/forwarders/tries_grouped", t.detail, (int)t.times.size(), times));
     }
     for (const size_t i : seen_working) {
         if (made[i].verified) continue;

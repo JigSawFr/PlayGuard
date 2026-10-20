@@ -16,6 +16,12 @@ class GameCell : public brls::DetailCell
     // cache). Nothing happens without an icon slot or with no image.
     void set_icon_texture(int texture, bool owned);
 
+    // A small round mark on the icon's corner: `icon_name` (a Cadran icon)
+    // in `color_key`; nullptr takes it away. Nothing without an icon slot.
+    void set_badge(const char* icon_name, const char* color_key = "cadran/teal");
+
   private:
     brls::Image* icon = nullptr;
+    brls::Box*   slot = nullptr;    // the icon and its badge
+    brls::Box*   badge = nullptr;
 };

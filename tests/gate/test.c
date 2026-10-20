@@ -105,8 +105,39 @@ static void test_log(void)
     CHECK(strcmp(gate_result_name(GateResult_Free), "free") == 0 && strcmp(gate_result_name((GateResult)9), "error") == 0);
 }
 
+static void test_counts(void)
+{
+    static const char LOG[] = "2026-10-20 21:03\trefused\tsdmc:/s.nro\n"
+                              "2026-10-20 21:04\trefused\tsdmc:/s.nro\r\n"
+                              "2026-10-19 21:05\trefused\tsdmc:/s.nro\n"
+                              "2026-10-20 21:06\tpin\tsdmc:/s.nro\n"
+                              "2026-10-20 21:07\trefused\tsdmc:/s.nro.bak\n"
+                              "garbage\n"
+                              "2026-10-20 21:08\trefused\tsdmc:/s.nro";
+    const size_t n = sizeof(LOG) - 1;
+    CHECK(gate_log_count(LOG, n, "sdmc:/s.nro", "2026-10-20", GateResult_Refused) == 3);
+    CHECK(gate_log_count(LOG, n, "sdmc:/s.nro", "2026-10-19", GateResult_Refused) == 1);
+    CHECK(gate_log_count(LOG, n, "sdmc:/s.nro", "2026-10-20", GateResult_Pin) == 1);
+    CHECK(gate_log_count(LOG, n, "sdmc:/s.nro", "?", GateResult_Refused) == 0);
+    CHECK(gate_log_count(NULL, 0, "sdmc:/s.nro", "2026-10-20", GateResult_Refused) == 0);
+
+    static const char DAYS[] = "Sun,Mon,Tue,Wed,Thu,Fri,Sat";
+    char buf[96];
+    GateHours h = { 0x41, 540, 1200 };
+    CHECK(gate_hours_text(&h, DAYS, buf, sizeof(buf)) && strcmp(buf, "Sat\xE2\x80\x93Sun 09:00\xE2\x80\x93" "20:00") == 0);
+    h = (GateHours){ 0x7F, 1320, 120 };
+    CHECK(gate_hours_text(&h, DAYS, buf, sizeof(buf)) && strcmp(buf, "Mon\xE2\x80\x93Sun 22:00\xE2\x80\x93" "02:00") == 0);
+    h = (GateHours){ 0x0A, 600, 660 };
+    CHECK(gate_hours_text(&h, DAYS, buf, sizeof(buf)) && strcmp(buf, "Mon, Wed 10:00\xE2\x80\x93" "11:00") == 0);
+    CHECK(!gate_hours_text(&h, "Sun,Mon", buf, sizeof(buf)) && buf[0] == '\0');   // not 7 names
+    CHECK(!gate_hours_text(&h, DAYS, buf, 8));                                     // too long
+    h.days = 0;
+    CHECK(!gate_hours_text(&h, DAYS, buf, sizeof(buf)));
+}
+
 int main(void)
 {
+    test_counts();
     test_argv();
     test_hours();
     test_rules();

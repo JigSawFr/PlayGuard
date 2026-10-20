@@ -311,16 +311,85 @@ void apply_lock(std::function<void(bool)> finish)
 void confirm_lock(std::function<void(bool)> finish)
 {
     const forwarders_logic::LockCheck c = check();
-    if (!c.ready()) {
-        ui::info("playguard/hbmenu/not_ready"_i18n + missing(c));
-        return finish(false);
-    }
+    if (!c.ready()) return setup(finish);
     ui::hold_confirm(ui::checklist_body("playguard/hbmenu/confirm"_i18n, check_lines(c),
                                         brls::getStr("playguard/hbmenu/escape", HBL_LOCK_CONFIG_PATH)),
                      "playguard/hbmenu/lock"_i18n, [finish]() { apply_lock(finish); }, [finish]() { finish(false); });
 }
 
 }   // namespace
+
+std::vector<SetupStep> setup_steps(const forwarders_logic::LockCheck& c)
+{
+    return {
+        { SetupStep::Pin, "playguard/hbmenu/step_pin"_i18n, c.pin },
+        { SetupStep::Patches, "playguard/hbmenu/step_patches"_i18n, c.patches },
+        { SetupStep::Self, "playguard/hbmenu/step_self"_i18n, c.self },
+        { SetupStep::Menu, "playguard/hbmenu/step_menu"_i18n, !c.menus.empty() },
+        { SetupStep::Verify, c.menus.empty() ? "playguard/hbmenu/step_verify"_i18n
+                                             : brls::getStr("playguard/hbmenu/step_verify_named", joined(c.menus)),
+          !c.verified.empty() },
+    };
+}
+
+void run_step(SetupStep::Kind kind, std::function<void(bool)> done)
+{
+    const auto finish = [done](bool changed) {
+        if (done) done(changed);
+    };
+    // Said only (nothing changes): no `done`, which would rebuild the screen
+    // under the dialog.
+    switch (kind) {
+        case SetupStep::Pin: ui::info("playguard/hbmenu/need_pin"_i18n); return;
+        case SetupStep::Patches: ui::info("playguard/hbmenu/need_patches"_i18n); return;
+        case SetupStep::Self: return forwarder_flow::create_self(finish);
+        case SetupStep::Menu: return forwarder_flow::protect_a_menu(finish);
+        case SetupStep::Verify: {
+            const forwarders_logic::LockCheck c = check();
+            ui::info(c.menus.empty() ? "playguard/hbmenu/need_menu"_i18n
+                                     : brls::getStr("playguard/hbmenu/need_verified", joined(c.menus)));
+            return;
+        }
+    }
+    finish(false);
+}
+
+void setup(std::function<void(bool)> done)
+{
+    const auto finish = [done](bool changed) {
+        if (done) done(changed);
+    };
+    const forwarders_logic::LockCheck c = check();
+    if (c.ready()) return confirm_lock(finish);
+    // Each step, numbered: done (a check), the next one (amber), the rest.
+    const std::vector<SetupStep> steps = setup_steps(c);
+    std::vector<ui::CheckLine> lines;
+    int next = -1;
+    for (size_t i = 0; i < steps.size(); i++) {
+        if (!steps[i].done && next < 0) next = (int)i;
+        const ui::Check mark = steps[i].done ? ui::Check::Ok : (int)i == next ? ui::Check::Warn : ui::Check::Info;
+        lines.push_back({ mark, fmt::format("{}. {}", i + 1, steps[i].label) });
+    }
+    lines.push_back({ ui::Check::Info, fmt::format("{}. {}", steps.size() + 1, "playguard/hbmenu/step_lock"_i18n) });
+    const SetupStep::Kind kind = steps[(size_t)next].kind;
+    auto* dialog = new brls::Dialog(ui::checklist_body("playguard/hbmenu/setup_title"_i18n, lines,
+                                                       "playguard/hbmenu/setup_note"_i18n));
+    dialog->addButton("hints/cancel"_i18n, [finish]() { finish(false); });
+    dialog->addButton("playguard/hbmenu/setup_next"_i18n, [kind, done, finish]() {
+        brls::sync([kind, done, finish]() {
+            run_step(kind, [kind, done, finish](bool changed) {
+                // A step made (a forwarder): the list again, and the next step.
+                finish(changed);
+                if (changed && (kind == SetupStep::Self || kind == SetupStep::Menu))
+                    brls::sync([done]() { setup(done); });
+            });
+        });
+    });
+    ui::on_cancel(dialog, [finish]() { finish(false); });
+    cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
+    if (brls::View* go = dialog->getView("brls/dialog/button2")) dialog->setLastFocusedView(go);
+    dialog->open();
+}
 
 void lock(std::function<void(bool)> done)
 {

@@ -17,6 +17,9 @@ static const Lines DE = { {
     "Bitte einen Elternteil, die Geheimzahl einzugeben.",
     "Die Geheimzahl-Eingabe konnte nicht geöffnet werden: zurück zum HOME-Menü.",
     "Altersbeschränkungen direkt auf der Konsole",
+    "Heute abgelehnt: %d",
+    "Ohne Geheimzahl: %s",
+    "So,Mo,Di,Mi,Do,Fr,Sa",
 } };
 
 static const Lines EN_US = { {
@@ -28,6 +31,9 @@ static const Lines EN_US = { {
     "Ask a parent to enter the PIN.",
     "The PIN screen could not open: back to the HOME menu.",
     "Parental controls, right on the console",
+    "Refused today: %d",
+    "Without the PIN: %s",
+    "Sun,Mon,Tue,Wed,Thu,Fri,Sat",
 } };
 
 static const Lines ES = { {
@@ -39,6 +45,9 @@ static const Lines ES = { {
     "Pide a un adulto que introduzca el PIN.",
     "No se pudo abrir la pantalla del PIN: vuelta al menú HOME.",
     "El control parental, directamente en la consola",
+    "Rechazos de hoy: %d",
+    "Sin el PIN: %s",
+    "dom,lun,mar,mié,jue,vie,sáb",
 } };
 
 static const Lines ES_419 = { {
@@ -50,6 +59,9 @@ static const Lines ES_419 = { {
     "Pide a un adulto que ingrese el PIN.",
     "No se pudo abrir la pantalla del PIN: regreso al menú HOME.",
     "El control parental, directamente en la consola",
+    "Rechazos de hoy: %d",
+    "Sin el PIN: %s",
+    "dom,lun,mar,mié,jue,vie,sáb",
 } };
 
 static const Lines FR = { {
@@ -61,6 +73,9 @@ static const Lines FR = { {
     "Demandez à un parent de saisir le code PIN.",
     "L'écran du code PIN n'a pas pu s'ouvrir : retour au menu HOME.",
     "Le contrôle parental, directement sur la console",
+    "Refus aujourd'hui : %d",
+    "Sans code PIN : %s",
+    "dim.,lun.,mar.,mer.,jeu.,ven.,sam.",
 } };
 
 static const Lines FR_CA = { {
@@ -72,6 +87,9 @@ static const Lines FR_CA = { {
     "Demandez à un parent d'entrer le NIP.",
     "L'écran du NIP n'a pas pu s'ouvrir : retour au menu HOME.",
     "Le contrôle parental, directement sur la console",
+    "Refus aujourd'hui : %d",
+    "Sans NIP : %s",
+    "dim.,lun.,mar.,mer.,jeu.,ven.,sam.",
 } };
 
 static const Lines IT = { {
@@ -83,6 +101,9 @@ static const Lines IT = { {
     "Chiedi a un genitore di inserire il PIN.",
     "Impossibile aprire la schermata del PIN: ritorno al menu HOME.",
     "Il filtro famiglia, direttamente sulla console",
+    "Rifiuti di oggi: %d",
+    "Senza PIN: %s",
+    "dom,lun,mar,mer,gio,ven,sab",
 } };
 
 static const Lines JA = { {
@@ -94,6 +115,9 @@ static const Lines JA = { {
     "保護者に暗証番号を入力してもらってください。",
     "暗証番号画面を開けませんでした：HOMEメニューに戻ります。",
     "本体だけで使える、みまもり設定",
+    "今日の拒否：%d回",
+    "暗証番号なし：%s",
+    "日,月,火,水,木,金,土",
 } };
 
 static const Lines KO = { {
@@ -105,6 +129,9 @@ static const Lines KO = { {
     "보호자에게 PIN을 입력해 달라고 하세요.",
     "PIN 화면을 열 수 없었습니다: HOME 메뉴로 돌아갑니다.",
     "본체에서 바로 쓰는 자녀 보호 기능",
+    "오늘 거부: %d번",
+    "PIN 없이: %s",
+    "일,월,화,수,목,금,토",
 } };
 
 static const Lines NL = { {
@@ -116,6 +143,9 @@ static const Lines NL = { {
     "Vraag een ouder om de pincode in te voeren.",
     "Het pincodescherm kon niet openen: terug naar het HOME-menu.",
     "Ouderlijk toezicht, rechtstreeks op de console",
+    "Vandaag geweigerd: %d",
+    "Zonder pincode: %s",
+    "zo,ma,di,wo,do,vr,za",
 } };
 
 static const Lines PT = { {
@@ -127,6 +157,9 @@ static const Lines PT = { {
     "Peça a um adulto para introduzir o PIN.",
     "Não foi possível abrir o ecrã do PIN: regresso ao menu HOME.",
     "O controlo parental, diretamente na consola",
+    "Recusas hoje: %d",
+    "Sem o PIN: %s",
+    "dom,seg,ter,qua,qui,sex,sáb",
 } };
 
 static const Lines PT_BR = { {
@@ -138,6 +171,9 @@ static const Lines PT_BR = { {
     "Peça a um responsável para digitar o PIN.",
     "Não foi possível abrir a tela do PIN: de volta ao menu HOME.",
     "Controle dos pais direto no console",
+    "Recusas hoje: %d",
+    "Sem o PIN: %s",
+    "dom,seg,ter,qua,qui,sex,sáb",
 } };
 
 static const Lines RU = { {
@@ -149,6 +185,9 @@ static const Lines RU = { {
     "Попросите взрослого ввести PIN-код.",
     "Не удалось открыть экран PIN-кода: возврат в меню HOME.",
     "Родительский контроль прямо на консоли",
+    "Отказов сегодня: %d",
+    "Без PIN-кода: %s",
+    "вс,пн,вт,ср,чт,пт,сб",
 } };
 
 static const Lines ZH_HANS = { {
@@ -160,6 +199,9 @@ static const Lines ZH_HANS = { {
     "请家长输入PIN。",
     "无法打开PIN界面：返回HOME菜单。",
     "直接在主机上使用的家长控制",
+    "今日拒绝：%d次",
+    "无需PIN：%s",
+    "日,一,二,三,四,五,六",
 } };
 
 static const Lines ZH_HANT = { {
@@ -171,6 +213,9 @@ static const Lines ZH_HANT = { {
     "請家長輸入PIN碼。",
     "無法開啟PIN碼畫面：返回HOME選單。",
     "直接在主機上使用的家長監護",
+    "今日拒絕：%d次",
+    "無需PIN碼：%s",
+    "日,一,二,三,四,五,六",
 } };
 
 // libnx's SetLanguage order (ja, en-US, fr, de, it, es, zh-CN, ko, nl, pt, ru,

@@ -1048,7 +1048,20 @@
         "day_wed": "mer.",
         "day_thu": "jeu.",
         "day_fri": "ven.",
-        "day_sat": "sam."
+        "day_sat": "sam.",
+        "tries_grouped": "{} · {} fois ({})",
+        "preview_note": "Tel que le menu HOME l'affichera",
+        "no_menu": "Aucun menu homebrew sur la carte SD : mettez d'abord sphaira (ou hbmenu) dans /switch, puis réessayez.",
+        "put_back": "{} est de retour",
+        "help": "Aide",
+        "help_body": "Ce que fait cet écran, dans le guide :",
+        "fix_delete": "Supprimer {}",
+        "fix_protect": "Protéger {} par le NIP",
+        "group_protected": "Protégés par le NIP",
+        "group_open": "Sans NIP",
+        "group_elsewhere": "Créés par une autre application",
+        "group_gone": "Plus sur le menu HOME",
+        "state_verified": "vérifié"
     },
     "hbmenu": {
         "section": "Menu homebrew",
@@ -1056,7 +1069,6 @@
         "note": "Une fois verrouillé, ni l'album ni un jeu lancé en maintenant R n'ouvrent le menu homebrew : un homebrew ne se lance plus que depuis son forwarder sur le menu HOME, qui peut demander le NIP. Il faut le forwarder de PlayGuard et un menu (sphaira ou hbmenu) protégé par le NIP, pour que le parent garde un accès à tous les homebrews.",
         "state_locked": "Verrouillé",
         "state_open": "Ouvert",
-        "not_ready": "Pour verrouiller le menu homebrew, il faut d'abord :",
         "need_pin": "un NIP parental sur la console (NIP › Définir ou changer le NIP)",
         "need_patches": "les patchs de signature dont les forwarders ont besoin (sys-patch : voir Console › Patchs de jeux)",
         "need_self": "le forwarder de PlayGuard sur le menu HOME (plus haut)",
@@ -1121,7 +1133,18 @@
         "summary_routes": "Chemins de retour : {}",
         "summary_untried": "{} (jamais lancé depuis le menu HOME)",
         "summary_module": "Module rescue installé",
-        "summary_no_module": "Module rescue non installé (facultatif)"
+        "summary_no_module": "Module rescue non installé (facultatif)",
+        "step_pin": "Un NIP de contrôle parental sur la console",
+        "step_patches": "Les patchs de signature dont les forwarders ont besoin",
+        "step_self": "PlayGuard sur le menu HOME",
+        "step_menu": "Un menu homebrew (sphaira ou hbmenu) protégé par le NIP",
+        "step_verify": "Lancer ce menu une fois depuis le menu HOME",
+        "step_verify_named": "Lancer {} une fois depuis le menu HOME (le NIP, puis le menu)",
+        "step_lock": "Verrouiller le menu homebrew",
+        "setup_title": "Verrouiller le menu homebrew, étape par étape",
+        "setup_note": "Chaque étape reste faite : revenez ici quand vous voulez. Une fois toutes faites, le verrouillage demande de maintenir A 2 secondes.",
+        "setup_next": "Étape suivante",
+        "card_fix": "A : que faire"
     },
     "about": {
         "section_changelog": "Nouveautés de la {}",
@@ -1515,7 +1538,8 @@
             "2": "Restrictions",
             "3": "NIP",
             "4": "Vu en dehors de PlayGuard",
-            "5": "Refusé par la console"
+            "5": "Refusé par la console",
+            "6": "Homebrews et forwarders"
         },
         "columns": {
             "change": "Modification",

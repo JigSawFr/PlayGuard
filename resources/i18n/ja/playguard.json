@@ -1048,7 +1048,20 @@
         "day_wed": "水",
         "day_thu": "木",
         "day_fri": "金",
-        "day_sat": "土"
+        "day_sat": "土",
+        "tries_grouped": "{}・{}回（{}）",
+        "preview_note": "HOMEメニューでの表示",
+        "no_menu": "SDカードにHomebrewメニューがありません：先にsphaira（またはhbmenu）を/switchに入れてから、もう一度お試しください。",
+        "put_back": "{}を元に戻しました",
+        "help": "ヘルプ",
+        "help_body": "この画面の説明（ガイド）：",
+        "fix_delete": "{}を削除",
+        "fix_protect": "{}を暗証番号で保護",
+        "group_protected": "暗証番号で保護",
+        "group_open": "暗証番号なし",
+        "group_elsewhere": "ほかのアプリで作成",
+        "group_gone": "HOMEメニューにない",
+        "state_verified": "確認済み"
     },
     "hbmenu": {
         "section": "Homebrewメニュー",
@@ -1056,7 +1069,6 @@
         "note": "ロック中は、アルバムもRを押しながら起動したゲームもHomebrewメニューを開きません。HomebrewはHOMEメニューのフォワーダーからのみ起動し、フォワーダーは暗証番号を求められます。保護者がすべてのHomebrewを使えるよう、PlayGuardのフォワーダーと、暗証番号で保護したメニュー（sphairaまたはhbmenu）が必要です。",
         "state_locked": "ロック中",
         "state_open": "オープン",
-        "not_ready": "Homebrewメニューをロックするには、先に次のものが必要です：",
         "need_pin": "本体のみまもり設定の暗証番号（暗証番号 › 暗証番号を設定・変更）",
         "need_patches": "フォワーダーに必要な署名パッチ（sys-patch：本体 › ゲーム用パッチを参照）",
         "need_self": "HOMEメニューにあるPlayGuardのフォワーダー（上記）",
@@ -1121,7 +1133,18 @@
         "summary_routes": "戻り道：{}",
         "summary_untried": "{}（HOMEメニューから未起動）",
         "summary_module": "レスキューモジュール：インストール済み",
-        "summary_no_module": "レスキューモジュール：未インストール（任意）"
+        "summary_no_module": "レスキューモジュール：未インストール（任意）",
+        "step_pin": "本体に保護者による使用制限の暗証番号",
+        "step_patches": "フォワーダーに必要な署名パッチ",
+        "step_self": "HOMEメニューにPlayGuard",
+        "step_menu": "暗証番号で保護したHomebrewメニュー（sphairaまたはhbmenu）",
+        "step_verify": "そのメニューをHOMEメニューから一度起動",
+        "step_verify_named": "{}をHOMEメニューから一度起動（暗証番号のあとメニュー）",
+        "step_lock": "Homebrewメニューをロック",
+        "setup_title": "Homebrewメニューを順番にロック",
+        "setup_note": "済んだ手順はそのままです：いつでもここに戻れます。すべて済むと、ロックにはAを2秒押し続ける必要があります。",
+        "setup_next": "次の手順",
+        "card_fix": "A：対処"
     },
     "about": {
         "section_changelog": "{}の更新内容",
@@ -1515,7 +1538,8 @@
             "2": "制限",
             "3": "暗証番号",
             "4": "PlayGuard の外で検出",
-            "5": "本体が拒否"
+            "5": "本体が拒否",
+            "6": "Homebrewとフォワーダー"
         },
         "columns": {
             "change": "変更",

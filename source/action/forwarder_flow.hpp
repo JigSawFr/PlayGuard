@@ -30,9 +30,22 @@ std::string self_nro();
 // build from this repository).
 bool loader_present();
 
-// Asks the name (the .nro's own first), confirms, installs. `sd_path`:
-// "/switch/…". `done(installed)` once it is over, also when cancelled.
-void create(const std::string& sd_path, std::function<void(bool)> done);
+// Asks the name (the .nro's own first), confirms with what the HOME menu
+// will show (its icon, name, publisher), installs; `pin`: protected with the
+// PIN too (refused without one on the console). `sd_path`: "/switch/…".
+// `done(installed)` once it is over, also when cancelled.
+void create(const std::string& sd_path, std::function<void(bool)> done, bool pin = false);
+
+// A homebrew menu on the SD card ("/switch/…": sphaira first, else hbmenu);
+// "" when there is none.
+std::string menu_nro();
+// A menu protected with the PIN, for the lock: the PIN on one made here, or
+// one made for menu_nro() and protected.
+void protect_a_menu(std::function<void(bool)> done);
+
+// What was deleted or forgotten a moment ago put back (an undo): installed
+// again (`reinstall`), or only remembered again.
+void put_back(const forwarders::Made& m, bool reinstall, std::function<void(bool)> done);
 
 // PlayGuard's own, named "PlayGuard": confirmed, then installed.
 void create_self(std::function<void(bool)> done);
@@ -63,7 +76,8 @@ void reinstall_all(std::function<void(bool)> done);
 // Hours when a protected forwarder starts without the PIN (core/gate.h):
 // `days` (bit 0 Sunday) from `from` to `to` (minutes); days 0 for none. The
 // PIN asked first; in the change history.
-void set_hours(const forwarders_logic::Row& row, int days, int from, int to, std::function<void(bool)> done);
+void set_hours(const forwarders_logic::Row& row, int days, int from, int to, std::function<void(bool)> done,
+               bool ask = true);
 // "Sat–Sun 09:00–20:00", in the UI's language.
 std::string hours_label(int days, int from, int to);
 
