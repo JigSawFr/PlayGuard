@@ -410,6 +410,9 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <meta name="theme-color" content="#111d31" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="{to_root}assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="{to_root}assets/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="PlayGuard">
+  <meta name="application-name" content="PlayGuard">
+  <link rel="manifest" href="{to_root}assets/site.webmanifest">
   <link rel="sitemap" type="application/xml" href="{SITE_URL}sitemap.xml">
   <link rel="alternate" type="application/atom+xml" title="PlayGuard releases" href="{SITE_URL}releases.atom">
 {"".join(json_ld(d) for d in structured)}  <script src="{to_root}assets/theme.js"></script>
@@ -1099,6 +1102,14 @@ def main():
     # An iPhone's home screen takes a PNG, not the SVG (tools/render_branding.mjs).
     touch = os.path.join(ROOT, "images", "apple-touch-icon.png")
     shutil.copy(touch, os.path.join(out, "assets", "apple-touch-icon.png"))
+    # Added to a phone's home screen: "PlayGuard", not the page's whole title
+    # (Android reads the manifest, iOS apple-mobile-web-app-title). The site
+    # opens in the browser, at its root (the visitor's language from there).
+    write(out, "assets/site.webmanifest", json.dumps({
+        "name": "PlayGuard", "short_name": "PlayGuard", "start_url": "../", "scope": "../", "display": "browser",
+        "background_color": "#ffffff", "theme_color": "#0a705f",
+        "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml"},
+                  {"src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png"}]}, indent=1) + "\n")
     # At a domain's root (as robots.txt), what browsers, bookmarks, iOS and
     # link previews ask for there without reading the page.
     if urlsplit(SITE_URL).path == "/":

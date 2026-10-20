@@ -59,7 +59,9 @@ PlayGuard's website, on GitHub Pages: <https://playguard.link/>.
   whole documentation in one file), and `robots.txt`, `favicon.ico` and
   `apple-touch-icon.png` when the site is at its domain's root (a custom
   domain: they count nowhere else; browsers, bookmarks and link previews ask
-  for the icons there without reading the page). `docs/` itself, in each
+  for the icons there without reading the page). Added to a phone's home
+  screen, the site is named "PlayGuard" (`assets/site.webmanifest`,
+  `apple-mobile-web-app-title`), not by its page's title. `docs/` itself, in each
   language, sends its visitor on to the guide's first page. A pull request's
   preview says `noindex`.
 - **The web simulator** in `/simulator/` ([`web/README.md`](../web/README.md)).
