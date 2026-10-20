@@ -75,8 +75,10 @@ void wrap(brls::View* row);
 // Over the foot of a scrolling frame drawn at (x, y, width, height): the
 // background (`color_key`) fading in over 32 px while there is more below,
 // so a line cut by the frame's edge reads as "more", not as the end.
+// `corner`: the radius of the card whose foot the frame's is (a picker's
+// list), the fade then inside its rounded corners and its 1 px border.
 void draw_more_below(NVGcontext* vg, brls::ScrollingFrame* frame, float x, float y, float width, float height,
-                     const char* color_key);
+                     const char* color_key, float corner = 0.0f);
 
 // "12 changes  ›" -> "12 changes"; "›" -> "".
 std::string without_chevron(const std::string& value);

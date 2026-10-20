@@ -498,7 +498,7 @@ void cadran::style_picker(brls::Dropdown* dropdown)
         content->setMarginLeft(200);
         content->setMarginRight(200);
         content->setMarginBottom(20);
-        content->setCornerRadius(24);
+        content->setCornerRadius(PICKER_CORNER);
         content->setBackgroundColor(theme["cadran/surf"]);
         content->setBorderColor(theme["cadran/line"]);
         content->setBorderThickness(1);
