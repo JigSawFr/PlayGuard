@@ -105,11 +105,19 @@ jobs:
             gh run download "$main" -R "$REPO" -n site -D site
             echo "main: run $main" >> "$GITHUB_STEP_SUMMARY"
           fi
-          # Each release's simulator (the job above) in simulator/<tag>/, its
-          # header naming the release, and their list for the simulator's
-          # Version (simulator/releases.json, the newest first).
+          # The simulator as the documentation: simulator/ is the latest
+          # release's (main's while no release has one), simulator/dev/ main's,
+          # simulator/<tag>/ each release's (the job above), its header naming
+          # the release; their list for the simulator's Version
+          # (simulator/releases.json, the newest first). main's screenshots
+          # stay in simulator/shots/, which pull requests compare with.
           if [ -d site/simulator ]; then
+            mv site/simulator main-simulator
+            mkdir -p site/simulator
+            cp -r main-simulator site/simulator/dev
+            rm -rf site/simulator/dev/shots
             releases='[]'
+            latest=""
             for tag in $(gh release list -R "$REPO" --limit 20 --exclude-drafts --json tagName --jq '.[].tagName'); do
               gh release download "$tag" -R "$REPO" -p playguard-simulator.zip -D "release-$tag" 2>/dev/null || continue
               mkdir -p "site/simulator/$tag"
@@ -118,9 +126,18 @@ jobs:
                 jq --arg tag "$tag" '.ref = $tag | .pr = null' "site/simulator/$tag/build.json" > build.json
                 mv build.json "site/simulator/$tag/build.json"
               fi
+              latest=${latest:-$tag}
               releases=$(jq -c --arg tag "$tag" '. + [{tag: $tag}]' <<< "$releases")
               echo "simulator/$tag: its release's" >> "$GITHUB_STEP_SUMMARY"
             done
+            # simulator/ itself: the latest release's files, else main's.
+            src=main-simulator
+            if [ -n "$latest" ]; then src="site/simulator/$latest"; fi
+            for f in "$src"/*; do
+              if [ "$(basename "$f")" != shots ]; then cp -r "$f" site/simulator/; fi
+            done
+            echo "simulator/: ${latest:-main}" >> "$GITHUB_STEP_SUMMARY"
+            if [ -d main-simulator/shots ]; then cp -r main-simulator/shots site/simulator/shots; fi
             echo "$releases" > site/simulator/releases.json
           fi
           previews=""
