@@ -30,6 +30,8 @@
   "copied": "Link copied",
   "reset": "Reset",
   "pad": "Pad",
+  "version": "Version",
+  "version_dev": "In development",
   "fullscreen": "Full screen",
   "fullscreen_exit": "Exit full screen",
   "screenshot": "Screenshot",

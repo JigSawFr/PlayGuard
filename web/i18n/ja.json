@@ -30,6 +30,8 @@
   "copied": "リンクをコピーしました",
   "reset": "リセット",
   "pad": "コントローラー",
+  "version": "バージョン",
+  "version_dev": "開発中",
   "fullscreen": "全画面",
   "fullscreen_exit": "全画面を終了",
   "screenshot": "スクリーンショット",

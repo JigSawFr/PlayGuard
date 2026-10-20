@@ -65,7 +65,30 @@ PlayGuard's website, on GitHub Pages: <https://playguard.link/>.
   Android's icon offers the simulator. `docs/` itself, in each
   language, sends its visitor on to the guide's first page. A pull request's
   preview says `noindex`.
+- **The documentation in two versions**: the latest release's, made from
+  the Markdown and the screenshots of its tag (read with `git show`: no
+  file kept for it in the repository, the next release's taken the same
+  way), and main's. `docs/<page>/` (the site's, indexed) is the release's
+  where it has the page in that language (what a console runs), main's
+  otherwise; each is also at its own address, `docs/<tag>/<page>/` (in a
+  language it was not written in, the English page, which a note says) and
+  `docs/dev/<page>/` (`noindex`). A switch above each page's list goes from
+  one to the other. Main's pages that are not the release's (new, or their
+  English changed) say so, link to the release's page and to the
+  changelog's **In development** (main's commits since the tag, under the
+  sections the next release's notes will have, `release-please-config.json`,
+  with a link to install a development build), and mark **New** the
+  sections the release had not. The changelog shows what changed since a
+  version typed (a console's): the releases after it, open, the others
+  hidden. Without git's history (a tarball), the site has main's
+  documentation alone; CI clones the history without old files' contents
+  (`fetch-depth: 0`, `filter: blob:none`).
 - **The web simulator** in `/simulator/` ([`web/README.md`](../web/README.md)).
+- **Each release's simulator** in `/simulator/<tag>/` (from 1.3.0 on):
+  `pages.yml` attaches the simulator web.yml built for the release's commit
+  to the release (`playguard-simulator.zip`: an artifact lasts 30 days, a
+  release's asset stays), then publishes each release's beside main's, with
+  their list in `simulator/releases.json` for the simulator's **Version**.
 - **Each open pull request's preview** in `/pr-<number>/`: its website and
   its simulator, linked in a comment on the pull request.
 

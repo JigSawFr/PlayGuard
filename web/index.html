@@ -168,6 +168,12 @@
       </div>
 
       <div class="tab-body" data-body="settings">
+        <!-- Main's or a release's simulator (simulator/<tag>/, pages.yml's
+             releases.json): shown when there is a release's. -->
+        <label class="field version" id="version-field" hidden>
+          <span data-i18n="version">Version</span>
+          <select id="version-select"></select>
+        </label>
         <label class="field preset">
           <span data-i18n="preset">Preset</span>
           <select id="preset"></select>

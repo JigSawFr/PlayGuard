@@ -30,6 +30,8 @@
   "copied": "Enlace copiado",
   "reset": "Restablecer",
   "pad": "Control",
+  "version": "Versión",
+  "version_dev": "En desarrollo",
   "fullscreen": "Pantalla completa",
   "fullscreen_exit": "Salir de pantalla completa",
   "screenshot": "Captura",
