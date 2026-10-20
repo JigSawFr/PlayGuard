@@ -63,8 +63,12 @@ A missing or unknown value is `"none"`.
 Whatever the request says, it **never authorises anything**: an action that
 changes parental controls goes through the PIN screen, the `caller` field is
 only shown and recorded, and there is no route that sets the clock to a given
-time (one that moved the day forward would hand the child a new daily limit).
-`POST /clock/sync` only puts back the time NTP servers give.
+time. Even setting it right is not harmless: **any change of the network
+clock starts the day's play time over** (measured on a console,
+[parental-controls.md](parental-controls.md)), so a sync the child could start
+at will would give a new daily limit each time. `POST /clock/sync` therefore
+takes the PIN whenever it has something to write; a clock already right
+(within 2 s) is left alone, without the PIN.
 
 A PIN asked for by a request is the same PIN screen as anywhere else: a wrong
 PIN counts towards the same lockout, so an app that opens the PIN screen again
@@ -174,8 +178,9 @@ launched, so the caller finds it at its next start:
   "id": "8f14e45f",
   "status": 200,
   "body": {
-    "offset_ms_before": -183000,
-    "offset_ms_after": 12,
+    "offset_s_before": -183,
+    "offset_s_after": 0,
+    "written": true,
     "server": "pool.ntp.org"
   },
   "playguard": "1.9.0"
@@ -233,6 +238,7 @@ console's language, ready to show:
 | `403` | `pin_refused` | The PIN screen was cancelled or the PIN was wrong. |
 | `404` | `no_route`, `no_game`, `no_measure` | Unknown or planned path, no such game installed, or no clock measure to give from cache. |
 | `422` | `bad_body` | A parameter is missing or out of range. |
+| `409` | `auto_correction_off` | The console's *Synchronize clock via Internet* is off: the network clock is not written. |
 | `423` | `read_only` | The firmware is newer than PlayGuard supports: it [opens read only](compatibility.md#newer-firmware) and changes nothing. |
 | `424` | `not_done` | Several requests with `stop_on_error`: an earlier one failed. |
 | `500` | `request_not_consumed`, `failed` | The request file could not be deleted, or the system refused (the `detail` says which call and its result). |
@@ -274,8 +280,8 @@ routes), so a caller can tell the parent what to turn on.
 
 | Method | Path | | Answer | Since |
 |---|---|---|---|---|
-| `GET` | `/v1/clock` | | The offset of the network clock, measured with NTP, without changing it: `offset_ms`, `server`, `measured_at`, `"cached": false`. With `?cached=1`, no network: the last offset PlayGuard measured, with its `measured_at` and `"cached": true` (`404 no_measure` if it never measured one). `?timeout_ms=` as for the sync. | v1.0 |
-| `POST` | `/v1/clock/sync` | | Sets the network clock from NTP, as *Console › Network clock*: `offset_ms_before`, `offset_ms_after`, `server`. Recorded in the history. The body may set `timeout_ms` (1000 to 30000, default 10000): the longest the NTP servers are waited for in all. | v1.0 |
+| `GET` | `/v1/clock` | | The offset of the network clock, measured with NTP, without changing it: `offset_s`, `server`, `measured_at`, `"cached": false`. With `?cached=1`, no network: the last offset PlayGuard measured, with its `measured_at` and `"cached": true` (`404 no_measure` if it never measured one). `?timeout_ms=` as for the sync. No PIN: it changes nothing. | v1.0 |
+| `POST` | `/v1/clock/sync` | PIN | Measures, then sets the network clock from NTP, as *Console › Network clock*: `offset_s_before`, `offset_s_after`, `written`, `server`. Off by 2 s or less: nothing written, `"written": false`, no PIN. Otherwise the PIN first, since the change starts the day's play time over; recorded in the history. `409 auto_correction_off` when the console's *Synchronize clock via Internet* is off (the console clock would not follow). The body may set `timeout_ms` (1000 to 30000, default 5000): the longest each NTP server is waited for. | v1.0 |
 | `OPEN` | `/v1/clock` | | The *Network clock* screen. | planned |
 
 ### Status [status]
@@ -320,7 +326,7 @@ planned once the routes above have shipped. Both need *Read and write* on **play
   "api": "v1",
   "written_at": "2026-10-20T18:42:07+02:00",
   "status": { "limit_min": 90, "played_min": 55, "left_min": 35, "suspended": false },
-  "clock": { "offset_ms": 12, "measured_at": "2026-10-20T18:40:51+02:00" }
+  "clock": { "offset_s": 0, "measured_at": "2026-10-20T18:40:51+02:00" }
 }
 ```
 
