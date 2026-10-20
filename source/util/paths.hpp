@@ -23,6 +23,8 @@ std::string play_timer_dir();
 std::string profiles_dir();
 std::string exports_dir();
 std::string config_file();
+// The last migration done (util/migrations.hpp).
+std::string migrations_file();
 // What can be fetched or read again (data_cleanup::cache empties it): the
 // whole console's (lists fetched, icons) and, in nand_dir(), the system's
 // own (its play data).

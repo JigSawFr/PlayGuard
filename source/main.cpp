@@ -55,6 +55,7 @@
 #include "util/diagnostics.hpp"
 #include "util/http.hpp"
 #include "util/log_files.hpp"
+#include "util/migrations.hpp"
 #include "util/nand.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -148,27 +149,45 @@ void keep_log_lines()
     });
 }
 
+// One line in the log for each step of util/migrations.hpp that ran.
+void log_migration(const migrations::Step& step, size_t moved)
+{
+    brls::Logger::info("start-up: migration {} ({}): {} entries moved", step.level, step.name, moved);
+}
+
 // The shims for the layouts of earlier versions (util/data_move.hpp,
 // log_files::migrate), before anything is written to the data folder: the
-// session file goes to the logs/ they leave. What one system keeps waits for
-// its key: nand_migration().
+// session file goes to the logs/ they leave. Only the ones not done yet
+// (util/migrations.hpp). What one system keeps waits for its key:
+// nand_migration().
 void start_up_migrations()
 {
+    migrations::run(paths::migrations_file(),
+                    {
+                        // The data folder of the versions that kept it next to the .nro.
+                        { migrations::DataDir, "data folder",
+                          []() -> size_t {
 #ifdef __SWITCH__
-    // The data folder of the versions that kept it next to the .nro.
-    if (const size_t moved = data_move::run(data_move::old_dir(), paths::data_dir()))
-        brls::Logger::info("start-up: {} entries moved from {} to {}", moved, data_move::old_dir(), paths::data_dir());
+                              return data_move::run(data_move::old_dir(), paths::data_dir());
+#else
+                              return 0;
 #endif
-    // logs/ before its subfolders (reports/, crashes/, uploads/, play_timer/).
-    log_files::migrate(paths::logs_dir());
+                          } },
+                        // logs/ before its subfolders (reports/, crashes/, uploads/, play_timer/).
+                        { migrations::LogsDirs, "logs subfolders", []() { return log_files::migrate(paths::logs_dir()); } },
+                    },
+                    log_migration);
 }
 
 // What the versions before the per-system folders kept for every system,
-// to this one's: the first system started takes it. After paths::set_nand().
+// to this one's: the first system started takes it, once. After
+// paths::set_nand().
 void nand_migration()
 {
-    if (const size_t moved = data_move::to_nand(paths::data_dir(), paths::nand_dir()))
-        brls::Logger::info("start-up: {} entries moved to {}", moved, paths::nand_dir());
+    migrations::run(paths::migrations_file(),
+                    { { migrations::NandDirs, "per-system folder",
+                        []() { return data_move::to_nand(paths::data_dir(), paths::nand_dir()); } } },
+                    log_migration);
 }
 
 // This run's session file, and a crash file for the run before it when it
