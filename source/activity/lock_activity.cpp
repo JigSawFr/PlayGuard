@@ -2,6 +2,7 @@
 #include "activity/lock_activity.hpp"
 
 #include "action/pin_lock.hpp"
+#include "activity/api_activity.hpp"
 #include "activity/main_activity.hpp"
 #include "activity/rescue_activity.hpp"
 #include "ui/ui.hpp"
@@ -36,9 +37,10 @@ void LockActivity::try_unlock()
 
 void LockActivity::lock_again()
 {
-    // The recovery screen is where a forgotten PIN is fixed: never covered.
+    // The recovery screen is where a forgotten PIN is fixed, and a request
+    // from another homebrew asks for the PIN itself when it needs it: never covered.
     for (brls::Activity* a : brls::Application::getActivitiesStack())
-        if (dynamic_cast<LockActivity*>(a) || dynamic_cast<RescueActivity*>(a)) return;
+        if (dynamic_cast<LockActivity*>(a) || dynamic_cast<RescueActivity*>(a) || dynamic_cast<ApiActivity*>(a)) return;
     brls::Logger::info("pin_lock: back after a while away, locked again");
     brls::Application::pushActivity(new LockActivity(true), brls::TransitionAnimation::NONE);
 }

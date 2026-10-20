@@ -1,0 +1,1 @@
+{"api":"v1","id":"c4","stop_on_error":true,"requests":[{"method":"POST","path":"/clock/sync"},{"method":"GET","path":"/v1"},{"method":"OPEN","path":"/v1/games/0100000000010000"}]}

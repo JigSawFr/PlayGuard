@@ -39,6 +39,7 @@ struct Row
     std::string nro;    // "sdmc:/…"; empty for one made elsewhere
     State       state = State::Ready;
     bool        self = false;   // PlayGuard's own
+    bool        request = false;   // PlayGuard with a launch-API request (--api): not "its own"
 };
 
 // One row per forwarder on the HOME menu and per one remembered that is no

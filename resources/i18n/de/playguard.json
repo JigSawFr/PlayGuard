@@ -1014,7 +1014,8 @@
         "forgotten": "{} vergessen",
         "details": "{}\n\nHerausgeber: {}\nVersion: {}\n.nro: {}\nProgramm-ID: {}\n{}",
         "made_here": "Von PlayGuard erstellt",
-        "unknown": "unbekannt"
+        "unknown": "unbekannt",
+        "confirm_request": "„{}“ ins HOME-Menü legen? Es startet PlayGuard, das die Netzwerkuhr stellt (nachdem Sie gefragt wurden, dann nach der Geheimzahl) und sich beendet."
     },
     "about": {
         "section_changelog": "Neu in {}",
@@ -1055,7 +1056,9 @@
         "effects_values": {
             "auto": "Sparsamer im Akkubetrieb",
             "full": "Immer vollständig"
-        }
+        },
+        "section_other": "Andere Homebrew-Apps",
+        "api": "Was sie von PlayGuard anfragen dürfen"
     },
     "backup": {
         "saved": "Einstellungen gesichert: {}",
@@ -1753,5 +1756,141 @@
         "change": "Ändern...",
         "remove": "Entfernen",
         "removed": "Geplantes Profil entfernt."
+    },
+    "api": {
+        "screen_title": "Eine Anfrage von einer anderen Homebrew-App",
+        "from": "Angefragt von „{}“ (der Name, den sie sich selbst gibt)",
+        "unnamed": "eine Homebrew-App ohne Namen",
+        "working": "Wird ausgeführt…",
+        "closing": "PlayGuard wird in {} s beendet.",
+        "returning": "Zurück zu {} in {} s.",
+        "settings_title": "Andere Homebrew-Apps",
+        "settings_note": "Andere Homebrew-Apps können PlayGuard starten, um etwas anzufragen, zum Beispiel das Stellen der Netzwerkuhr. Nichts ist erlaubt, bis Sie es unten auswählen. Bei jeder Änderung werden Sie zuerst gefragt, dann nach der Geheimzahl, außer bei einer Homebrew-App, der Sie für 30 Tage vertrauen.",
+        "enabled": "Anderen Homebrew-Apps erlauben, PlayGuard aufzurufen",
+        "section_permissions": "Was sie dürfen",
+        "section_calls": "Letzte Aufrufe",
+        "all_off": "Alles ausschalten",
+        "all_off_done": "Alle Gruppen stehen wieder auf Nicht erlaubt.",
+        "no_calls": "Noch keine Homebrew-App hat PlayGuard aufgerufen.",
+        "on": "An",
+        "off": "Aus",
+        "result": {
+            "clock": "Die Netzwerkuhr {}.",
+            "clock_right": "Die Netzwerkuhr geht richtig: Es gibt nichts zu ändern.",
+            "clock_set": "Netzwerkuhr gestellt.",
+            "discovery": "Erledigt.",
+            "dry_run": "Erlaubt (nur Test: Es wurde nichts ausgeführt).",
+            "replayed": "Bereits erledigt: dieselbe Antwort noch einmal.",
+            "clock_set_trusted": "Netzwerkuhr gestellt (im Voraus erlaubt)."
+        },
+        "groups": {
+            "clock": "Netzwerkuhr",
+            "status": "Status",
+            "activity": "Aktivität",
+            "games": "Spiele",
+            "playtime": "Spielzeit"
+        },
+        "levels": {
+            "none": "Nicht erlaubt",
+            "read": "Lesen",
+            "read_write": "Lesen und ändern"
+        },
+        "errors": {
+            "bad_request": "Die Anfrage konnte nicht gelesen werden.",
+            "unsupported_api": "Diese Version der Anfrage wird von diesem PlayGuard nicht unterstützt.",
+            "api_disabled": "Andere Homebrew-Apps dürfen PlayGuard nicht aufrufen (Optionen › Andere Homebrew-Apps).",
+            "permission_denied": "Nicht erlaubt unter Optionen › Andere Homebrew-Apps.",
+            "pin_refused": "Die Geheimzahl wurde nicht eingegeben: Es wurde nichts geändert. Frag deine Eltern.",
+            "no_route": "Dieser PlayGuard kennt diese Anfrage nicht.",
+            "bad_body": "Ein Wert der Anfrage fehlt oder liegt außerhalb des gültigen Bereichs.",
+            "auto_correction_off": "„Uhr mithilfe des Internets synchronisieren“ ist in den Systemeinstellungen deaktiviert: Die Netzwerkuhr wurde nicht gestellt.",
+            "read_only": "Diese Firmware ist schreibgeschützt geöffnet: Es wurde nichts geändert.",
+            "request_not_consumed": "Die Anfragedatei konnte nicht gelöscht werden, daher wurde die Anfrage nicht ausgeführt.",
+            "failed": "Die Konsole hat abgelehnt: Es wurde nichts geändert.",
+            "no_network": "Kein Zeitserver hat geantwortet: Prüfen Sie die Internetverbindung.",
+            "no_measure": "Die Netzwerkuhr wurde auf dieser Konsole noch nie gemessen.",
+            "not_done": "Nicht ausgeführt: Eine vorherige Anfrage ist fehlgeschlagen.",
+            "declined": "Anfrage abgelehnt. Sprich mit deinen Eltern darüber."
+        },
+        "unnamed_from": "Angefragt von einer Homebrew-App ohne Namen",
+        "continue": "Weiter",
+        "allow": "Erlauben…",
+        "closing_wait": "PlayGuard wird beendet, wenn Sie Weiter drücken.",
+        "returning_wait": "Zurück zu {}, wenn Sie Weiter drücken.",
+        "routes": {
+            "discovery": "Sehen, was PlayGuard kann",
+            "clock": "Netzwerkuhr messen",
+            "clock_sync": "Netzwerkuhr stellen"
+        },
+        "home_icon": "„Uhr stellen“ zum HOME-Menü hinzufügen",
+        "home_icon_name": "Uhr stellen",
+        "home_icon_allow": "Dieses Symbol startet PlayGuard, um die Netzwerkuhr zu stellen. Dafür müssen Andere Homebrew-Apps aktiviert sein und Netzwerkuhr auf Lesen und ändern stehen. Jetzt erlauben?",
+        "home_icon_allow_yes": "Erlauben und hinzufügen",
+        "all_off_confirm": "Alle Gruppen wieder auf Nicht erlaubt setzen? Andere Homebrew-Apps werden abgelehnt, bis Sie sie wieder erlauben.",
+        "all_back": "Berechtigungen wiederherstellen",
+        "all_back_done": "Die Berechtigungen sind wieder wie vorher.",
+        "docs": "Für Entwickler: die Start-API",
+        "docs_body": "Wie eine andere Homebrew-App PlayGuard aufruft: die Anfragen, die Antworten, die Fehler.",
+        "level_details": {
+            "clock": {
+                "none": "Jede Anfrage zur Uhr wird abgelehnt.",
+                "read": "Sie darf messen, wie stark die Netzwerkuhr abweicht.",
+                "read_write": "Sie darf die Netzwerkuhr auch stellen: Sie werden zuerst gefragt, dann nach der Geheimzahl."
+            }
+        },
+        "outcome": {
+            "done": "Erledigt",
+            "tested": "Erlaubt (nur Test)",
+            "refused": "Abgelehnt",
+            "unknown": "Unbekannte Anfrage",
+            "skipped": "Nicht ausgeführt",
+            "failed": "Nicht ausgeführt"
+        },
+        "call_details": "{}\n{}\n{}\n\n{}\nStatus: {}",
+        "notice_changes": "Änderungen durch andere Homebrew-Apps",
+        "notice_line": "{}: {}",
+        "notice_open": "Aufrufe ansehen",
+        "notice_refused": "Andere Homebrew-Apps wurden abgelehnt",
+        "notice_refused_line": "{}: {}-mal abgelehnt",
+        "nothing_allowed": "nichts erlaubt",
+        "notice_line_many": "{} ({}-mal)",
+        "measuring": "Netzwerkuhr wird mit {} gemessen…",
+        "on_time": "geht richtig",
+        "span_s": "{} s",
+        "span_min": "{} min",
+        "span_h_min": "{} h {} min",
+        "span_days": "{} Tage",
+        "behind": "geht {} nach",
+        "ahead": "geht {} vor",
+        "turn_on_first": "Aktivieren Sie zuerst „Anderen Homebrew-Apps erlauben, PlayGuard aufzurufen“.",
+        "clear_calls": "Liste leeren",
+        "clear_calls_confirm": "Die Liste der Aufrufe leeren? Auch die Benachrichtigungsglocke vergisst sie.",
+        "clear_calls_done": "Die Liste der Aufrufe ist leer.",
+        "clear_calls_err": "Die Liste der Aufrufe konnte nicht geleert werden.",
+        "consent": {
+            "question": "{} erlauben, die Netzwerkuhr zu stellen?",
+            "question_unnamed": "Einer Homebrew-App ohne Namen erlauben, die Netzwerkuhr zu stellen?",
+            "restarts": "Die heutige Spielzeit beginnt von vorn (jetzt noch {}, danach {}).",
+            "no_limit": "Heute gilt kein Limit: Die Spielzeit ist nicht betroffen.",
+            "no_play": "Heute ist kein Spielen erlaubt: Daran ändert sich nichts.",
+            "unknown": "Das Stellen der Uhr setzt die heutige Spielzeit zurück: Das ganze Tageslimit steht wieder zur Verfügung.",
+            "trust": "30 Tage lang nicht mehr fragen",
+            "details": "Details",
+            "allow": "Erlauben (Geheimzahl)",
+            "refuse": "Ablehnen",
+            "version": "v{}",
+            "by": "von {}",
+            "says_it_is": "Gibt sich als „{}“ aus",
+            "says_unchecked": "Gibt sich als „{}“ aus (nicht geprüft: Ihre Datei konnte nicht gelesen werden)",
+            "unnamed": "Eine Homebrew-App ohne Namen"
+        },
+        "section_trust": "Vertrauenswürdige Homebrew-Apps",
+        "trust_line": "{} · {}",
+        "trust_until": "bis {}",
+        "trust_revoke": "Nicht mehr vertrauen",
+        "trust_revoke_confirm": "{} nicht mehr vertrauen? Sie fragt beim nächsten Mal wieder.",
+        "trust_revoked": "{} fragt wieder nach.",
+        "no_trust": "Keiner Homebrew-App wird vertraut. Bei einer Anfrage fügt „30 Tage lang nicht mehr fragen“ eine hinzu.",
+        "notice_line_trusted": "{}: {} (im Voraus erlaubt)"
     }
 }

@@ -1014,7 +1014,8 @@
         "forgotten": "已忘記{}",
         "details": "{}\n\n發行商：{}\n版本：{}\n.nro：{}\n程式ID：{}\n{}",
         "made_here": "由PlayGuard建立",
-        "unknown": "未知"
+        "unknown": "未知",
+        "confirm_request": "要將「{}」放到HOME選單上嗎？它會啟動PlayGuard來設定網路時鐘（先詢問您，然後要求輸入PIN碼），完成後關閉。"
     },
     "about": {
         "section_changelog": "{} 更新內容",
@@ -1055,7 +1056,9 @@
         "effects_values": {
             "auto": "電池供電時精簡",
             "full": "始終完整"
-        }
+        },
+        "section_other": "其他Homebrew",
+        "api": "它們可以向PlayGuard要求的操作"
     },
     "backup": {
         "saved": "已備份設定：{}",
@@ -1753,5 +1756,141 @@
         "change": "變更…",
         "remove": "移除",
         "removed": "已移除排定的設定檔。"
+    },
+    "api": {
+        "screen_title": "來自另一個Homebrew的請求",
+        "from": "請求者：「{}」（其自稱的名稱）",
+        "unnamed": "未提供名稱的Homebrew",
+        "working": "處理中…",
+        "closing": "PlayGuard將在{}秒後關閉。",
+        "returning": "即將返回{}（{}秒後）。",
+        "settings_title": "其他Homebrew",
+        "settings_note": "其他Homebrew可以啟動PlayGuard來請求某項操作，例如設定網路時鐘。在您於下方選擇之前，任何操作都不會被允許。每次變更都會先詢問您，然後要求輸入PIN碼，但您已信任30天的Homebrew除外。",
+        "enabled": "允許其他Homebrew呼叫PlayGuard",
+        "section_permissions": "允許的操作",
+        "section_calls": "最近的呼叫",
+        "all_off": "全部關閉",
+        "all_off_done": "所有類別皆已改回「不允許」。",
+        "no_calls": "還沒有Homebrew呼叫過PlayGuard。",
+        "on": "開啟",
+        "off": "關閉",
+        "result": {
+            "clock": "網路時鐘{}。",
+            "clock_right": "網路時鐘準確：不需要變更。",
+            "clock_set": "已設定網路時鐘。",
+            "discovery": "完成。",
+            "dry_run": "允許（僅測試：未執行任何操作）。",
+            "replayed": "先前已完成：再次傳回相同的結果。",
+            "clock_set_trusted": "已設定網路時鐘（已事先允許）。"
+        },
+        "groups": {
+            "clock": "網路時鐘",
+            "status": "狀態",
+            "activity": "活動紀錄",
+            "games": "遊戲",
+            "playtime": "遊玩時間"
+        },
+        "levels": {
+            "none": "不允許",
+            "read": "讀取",
+            "read_write": "讀取與變更"
+        },
+        "errors": {
+            "bad_request": "無法讀取此請求。",
+            "unsupported_api": "此版本的PlayGuard不支援該請求的版本。",
+            "api_disabled": "不允許其他Homebrew呼叫PlayGuard（偏好設定 › 其他Homebrew）。",
+            "permission_denied": "「偏好設定 › 其他Homebrew」中未允許此操作。",
+            "pin_refused": "沒有輸入PIN碼，所以什麼都沒有改變。去問問爸爸媽媽吧。",
+            "no_route": "此版本的PlayGuard無法識別此請求。",
+            "bad_body": "請求中缺少某個值，或某個值超出範圍。",
+            "auto_correction_off": "系統設定中的「透過網際網路同步時鐘」已關閉：未設定網路時鐘。",
+            "read_only": "PlayGuard在此韌體上以唯讀模式執行：未變更任何設定。",
+            "request_not_consumed": "無法刪除請求檔案，因此未執行此請求。",
+            "failed": "主機拒絕了此操作：未變更任何設定。",
+            "no_network": "沒有時間伺服器回應：請確認網際網路連線。",
+            "no_measure": "這台主機從未測量過網路時鐘。",
+            "not_done": "未執行：先前的請求失敗了。",
+            "declined": "請求被拒絕了。去和爸爸媽媽商量一下吧。"
+        },
+        "unnamed_from": "請求者：未提供名稱的Homebrew",
+        "continue": "繼續",
+        "allow": "允許…",
+        "closing_wait": "按下「繼續」後，PlayGuard將會關閉。",
+        "returning_wait": "按下「繼續」後返回{}。",
+        "routes": {
+            "discovery": "查看PlayGuard能做什麼",
+            "clock": "測量網路時鐘",
+            "clock_sync": "設定網路時鐘"
+        },
+        "home_icon": "將「設定時鐘」新增到HOME選單",
+        "home_icon_name": "設定時鐘",
+        "home_icon_allow": "此圖示會啟動PlayGuard來設定網路時鐘。必須開啟「其他Homebrew」，並將「網路時鐘」設為「讀取與變更」。要立即允許嗎？",
+        "home_icon_allow_yes": "允許並新增",
+        "all_off_confirm": "要將所有類別改回「不允許」嗎？在您再次允許之前，其他Homebrew的請求都會被拒絕。",
+        "all_back": "還原先前的權限",
+        "all_back_done": "權限已還原。",
+        "docs": "開發者資訊：啟動API",
+        "docs_body": "其他Homebrew如何呼叫PlayGuard：請求、回應與錯誤。",
+        "level_details": {
+            "clock": {
+                "none": "所有與時鐘相關的請求都會被拒絕。",
+                "read": "可以測量網路時鐘的偏差。",
+                "read_write": "也可以設定網路時鐘：會先詢問您，然後要求輸入PIN碼。"
+            }
+        },
+        "outcome": {
+            "done": "已完成",
+            "tested": "允許（僅測試）",
+            "refused": "已拒絕",
+            "unknown": "未知的請求",
+            "skipped": "未執行",
+            "failed": "未執行"
+        },
+        "call_details": "{}\n{}\n{}\n\n{}\n狀態：{}",
+        "notice_changes": "其他Homebrew所做的變更",
+        "notice_line": "{}：{}",
+        "notice_open": "查看呼叫",
+        "notice_refused": "已拒絕其他Homebrew的請求",
+        "notice_refused_line": "{}：被拒絕{}次",
+        "nothing_allowed": "未允許任何操作",
+        "notice_line_many": "{}（{}次）",
+        "measuring": "正在以{}測量網路時鐘…",
+        "on_time": "準確",
+        "span_s": "{}秒",
+        "span_min": "{}分鐘",
+        "span_h_min": "{}小時{}分",
+        "span_days": "{}天",
+        "behind": "慢了{}",
+        "ahead": "快了{}",
+        "turn_on_first": "請先開啟「允許其他Homebrew呼叫PlayGuard」。",
+        "clear_calls": "清除清單",
+        "clear_calls_confirm": "要清除呼叫清單嗎？通知鈴鐺中的相關紀錄也會一併清除。",
+        "clear_calls_done": "呼叫清單已清空。",
+        "clear_calls_err": "無法清除呼叫清單。",
+        "consent": {
+            "question": "要允許{}設定網路時鐘嗎？",
+            "question_unnamed": "要允許一個未提供名稱的Homebrew設定網路時鐘嗎？",
+            "restarts": "今天的遊玩時間將重新計算（目前剩餘{}，之後為{}）。",
+            "no_limit": "今天沒有時間限制：遊玩時間不受影響。",
+            "no_play": "今天不允許遊玩：這一點不會改變。",
+            "unknown": "變更時鐘會讓今天的遊玩時間重新計算：整天的限制時間將可再次使用。",
+            "trust": "30天內不再詢問",
+            "details": "詳細資訊",
+            "allow": "允許（PIN碼）",
+            "refuse": "拒絕",
+            "version": "v{}",
+            "by": "作者：{}",
+            "says_it_is": "自稱「{}」",
+            "says_unchecked": "自稱「{}」（未驗證：無法讀取其檔案）",
+            "unnamed": "未提供名稱的Homebrew"
+        },
+        "section_trust": "受信任的Homebrew",
+        "trust_line": "{} · {}",
+        "trust_until": "有效至{}",
+        "trust_revoke": "取消信任",
+        "trust_revoke_confirm": "要取消對{}的信任嗎？下次它會再次詢問。",
+        "trust_revoked": "{}將再次詢問。",
+        "no_trust": "沒有受信任的Homebrew。收到請求時，選擇「30天內不再詢問」即可新增。",
+        "notice_line_trusted": "{}：{}（已事先允許）"
     }
 }

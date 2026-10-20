@@ -1014,7 +1014,8 @@
         "forgotten": "{}を忘れました",
         "details": "{}\n\n発売元：{}\nバージョン：{}\n.nro：{}\nプログラムID：{}\n{}",
         "made_here": "PlayGuardで作成",
-        "unknown": "不明"
+        "unknown": "不明",
+        "confirm_request": "「{}」をHOMEメニューに置きますか？ PlayGuardを起動してネットワーク時計を合わせ（確認のあと暗証番号を入力）、終了します。"
     },
     "about": {
         "section_changelog": "{}の更新内容",
@@ -1055,7 +1056,9 @@
         "effects_values": {
             "auto": "バッテリー時は軽く",
             "full": "常にすべて"
-        }
+        },
+        "section_other": "ほかのHomebrew",
+        "api": "PlayGuardに依頼できること"
     },
     "backup": {
         "saved": "設定をバックアップしました：{}",
@@ -1753,5 +1756,141 @@
         "change": "変更…",
         "remove": "取り消す",
         "removed": "予約したプリセットを取り消しました。"
+    },
+    "api": {
+        "screen_title": "ほかのHomebrewからのリクエスト",
+        "from": "依頼元：「{}」（Homebrew自身が名乗っている名前）",
+        "unnamed": "名前を名乗らなかったHomebrew",
+        "working": "処理しています…",
+        "closing": "PlayGuardはあと{}秒で終了します。",
+        "returning": "{}に戻ります（あと{}秒）。",
+        "settings_title": "ほかのHomebrew",
+        "settings_note": "ほかのHomebrewは、ネットワーク時計を合わせるなどの依頼のためにPlayGuardを起動できます。下で選ぶまでは何も許可されません。変更の前には確認があり、そのあと暗証番号を入力します。ただし、30日間信頼したHomebrewは除きます。",
+        "enabled": "ほかのHomebrewからPlayGuardを呼び出せるようにする",
+        "section_permissions": "許可すること",
+        "section_calls": "最近の呼び出し",
+        "all_off": "すべてOFFにする",
+        "all_off_done": "すべてのグループを「許可しない」に戻しました。",
+        "no_calls": "PlayGuardを呼び出したHomebrewはまだありません。",
+        "on": "ON",
+        "off": "OFF",
+        "result": {
+            "clock": "ネットワーク時計は{}。",
+            "clock_right": "ネットワーク時計は合っています。変更の必要はありません。",
+            "clock_set": "ネットワーク時計を合わせました。",
+            "discovery": "完了しました。",
+            "dry_run": "許可されています（テストのみ：何も実行していません）。",
+            "replayed": "実行済みです。同じ応答をもう一度返しました。",
+            "clock_set_trusted": "ネットワーク時計を合わせました（事前に許可済み）。"
+        },
+        "groups": {
+            "clock": "ネットワーク時計",
+            "status": "状態",
+            "activity": "プレイ記録",
+            "games": "ゲーム",
+            "playtime": "プレイ時間"
+        },
+        "levels": {
+            "none": "許可しない",
+            "read": "読み取り",
+            "read_write": "読み取りと変更"
+        },
+        "errors": {
+            "bad_request": "リクエストを読み込めませんでした。",
+            "unsupported_api": "このバージョンのリクエストには、このPlayGuardは対応していません。",
+            "api_disabled": "ほかのHomebrewからPlayGuardを呼び出すことは許可されていません（オプション › ほかのHomebrew）。",
+            "permission_denied": "「オプション › ほかのHomebrew」で許可されていません。",
+            "pin_refused": "暗証番号が入力されなかったので、何も変わっていません。おうちの人に聞いてね。",
+            "no_route": "このPlayGuardはこのリクエストに対応していません。",
+            "bad_body": "リクエストの値が足りないか、範囲外です。",
+            "auto_correction_off": "設定の「インターネットで時計を合わせる」がOFFです。ネットワーク時計は合わせていません。",
+            "read_only": "このファームウェアでは閲覧のみモードで開いています。何も変更していません。",
+            "request_not_consumed": "リクエストファイルを削除できなかったため、実行していません。",
+            "failed": "本体に拒否されました。何も変更していません。",
+            "no_network": "どのタイムサーバーからも応答がありません。インターネット接続を確認してください。",
+            "no_measure": "この本体では、ネットワーク時計がまだ一度も測定されていません。",
+            "not_done": "実行していません。前のリクエストが失敗しました。",
+            "declined": "リクエストは断られました。おうちの人に相談してね。"
+        },
+        "unnamed_from": "依頼元：名前を名乗らなかったHomebrew",
+        "continue": "続ける",
+        "allow": "許可…",
+        "closing_wait": "「続ける」を押すとPlayGuardは終了します。",
+        "returning_wait": "{}に戻ります（「続ける」を押したとき）。",
+        "routes": {
+            "discovery": "PlayGuardでできることを確認",
+            "clock": "ネットワーク時計を測定",
+            "clock_sync": "ネットワーク時計を合わせる"
+        },
+        "home_icon": "「時計を合わせる」をHOMEメニューに追加",
+        "home_icon_name": "時計を合わせる",
+        "home_icon_allow": "このアイコンはPlayGuardを起動してネットワーク時計を合わせます。「ほかのHomebrew」をONにし、ネットワーク時計を「読み取りと変更」にする必要があります。今すぐ許可しますか？",
+        "home_icon_allow_yes": "許可して追加",
+        "all_off_confirm": "すべてのグループを「許可しない」に戻しますか？ もう一度許可するまで、ほかのHomebrewからの依頼は拒否されます。",
+        "all_back": "許可を元に戻す",
+        "all_back_done": "許可を元の状態に戻しました。",
+        "docs": "開発者向け：起動API",
+        "docs_body": "ほかのHomebrewからPlayGuardを呼び出す方法：リクエスト、応答、エラー。",
+        "level_details": {
+            "clock": {
+                "none": "時計に関するリクエストはすべて拒否されます。",
+                "read": "ネットワーク時計のずれを測定できます。",
+                "read_write": "ネットワーク時計を合わせることもできます。まず確認があり、そのあと暗証番号を入力します。"
+            }
+        },
+        "outcome": {
+            "done": "完了",
+            "tested": "許可（テストのみ）",
+            "refused": "拒否",
+            "unknown": "不明なリクエスト",
+            "skipped": "未実行",
+            "failed": "未実行"
+        },
+        "call_details": "{}\n{}\n{}\n\n{}\n状態：{}",
+        "notice_changes": "ほかのHomebrewによる変更",
+        "notice_line": "{}：{}",
+        "notice_open": "呼び出しを見る",
+        "notice_refused": "ほかのHomebrewからの依頼を拒否しました",
+        "notice_refused_line": "{}：{}回拒否",
+        "nothing_allowed": "何も許可していません",
+        "notice_line_many": "{}（{}回）",
+        "measuring": "{}でネットワーク時計を測定しています…",
+        "on_time": "合っています",
+        "span_s": "{}秒",
+        "span_min": "{}分",
+        "span_h_min": "{}時間{}分",
+        "span_days": "{}日",
+        "behind": "{}遅れています",
+        "ahead": "{}進んでいます",
+        "turn_on_first": "先に「ほかのHomebrewからPlayGuardを呼び出せるようにする」をONにしてください。",
+        "clear_calls": "リストを消去",
+        "clear_calls_confirm": "呼び出しのリストを消去しますか？ お知らせのベルからも消えます。",
+        "clear_calls_done": "呼び出しのリストは空です。",
+        "clear_calls_err": "呼び出しのリストを消去できませんでした。",
+        "consent": {
+            "question": "{}にネットワーク時計を合わせることを許可しますか？",
+            "question_unnamed": "名前を名乗らなかったHomebrewに、ネットワーク時計を合わせることを許可しますか？",
+            "restarts": "今日のプレイ時間が最初からになります（今は残り{}、変更後は{}）。",
+            "no_limit": "今日は制限がないため、プレイ時間に影響はありません。",
+            "no_play": "今日はプレイできない日です。これは変わりません。",
+            "unknown": "時計を変えると今日のプレイ時間が最初からになり、1日の制限時間がすべて使えるようになります。",
+            "trust": "30日間は確認しない",
+            "details": "詳細",
+            "allow": "許可（暗証番号）",
+            "refuse": "拒否",
+            "version": "v{}",
+            "by": "作者：{}",
+            "says_it_is": "「{}」と名乗っています",
+            "says_unchecked": "「{}」と名乗っています（未確認：ファイルを読み込めませんでした）",
+            "unnamed": "名前を名乗らなかったHomebrew"
+        },
+        "section_trust": "信頼したHomebrew",
+        "trust_line": "{} · {}",
+        "trust_until": "{}まで",
+        "trust_revoke": "信頼をやめる",
+        "trust_revoke_confirm": "{}の信頼をやめますか？ 次回からまた確認されます。",
+        "trust_revoked": "{}は次回からまた確認されます。",
+        "no_trust": "信頼したHomebrewはありません。依頼のときに「30日間は確認しない」を選ぶと追加されます。",
+        "notice_line_trusted": "{}：{}（事前に許可済み）"
     }
 }

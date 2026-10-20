@@ -1,8 +1,9 @@
 # The launch API (draft, v1)
 
 > [!NOTE]
-> **A proposal, not implemented yet.** This page is the contract to build
-> against; nothing below exists in a release until the changelog says so.
+> **v1.0 answers `GET /v1`, `GET /v1/clock` and `POST /v1/clock/sync`.** The
+> routes marked *planned* below get `404 no_route` until the changelog says
+> otherwise; `GET /v1` lists what a build answers.
 
 Other homebrews can ask PlayGuard to do something (set the network clock),
 tell them something (the time left today), or open on a given screen (a
@@ -76,10 +77,32 @@ and again gains no extra attempts.
 
 ### What the parent sees
 
-*Preferences › Other homebrews* lists the last 20 calls: when, the `caller`,
-the route, and the status (`200`, `403 permission_denied` …). **Turn it all
-off** sets every group back to *None* in one press. Calls that changed
-something (`POST`) are also in the change history, as every change is.
+*Preferences › Other homebrews* lists the last 20 calls, by day: when, the
+`caller`, what was asked and how it went (a press shows the route, the
+status and the error). **Turn it all off** sets every group back to *None*
+in one press. Calls that changed something (`POST`) are also in the change
+history, as every change is, and in the notification bell (the last 7 days),
+as are 3 refusals or more.
+
+Before a change, a card over the request's screen asks the parent: the
+app's own icon and name read from its `.nro` (`return_to`; the `caller` is
+only shown apart when it differs, said to be the name it gives itself), what
+changes and what it costs. *Refuse* is focused (`403 declined`); *Allow* asks
+for the PIN after.
+
+**Trusted apps.** On that card, *Don't ask again for 30 days* trusts this app
+for this action: the same `.nro` file (its path and SHA-256: another file at
+that path is asked again), until a day 30 days on. A trusted app's clock
+sync is done without asking only when the clock is off by more than a
+minute, and once a day at most: setting the clock starts the day's play
+time over, and an app the child can start must not hand a new day each
+time. Otherwise the card comes as usual. The response says `"trusted": true`,
+and the change is in the calls, the history and the notification bell
+(*allowed in advance*). The settings list the trusted apps and their day;
+one press stops trusting one. Kept in `sdmc:/config/playguard/api/trust.json`. A request refused for want of a
+permission offers *Allow…* on its screen, which opens these settings behind
+the PIN. The settings can also put a *Set the clock* icon on the HOME menu:
+a forwarder of PlayGuard with `--api "POST /v1/clock/sync"`.
 
 ## Launching PlayGuard
 
@@ -123,7 +146,7 @@ mode; there is no `return_to`, so PlayGuard exits when done.
 | `method`, `path` | yes | The route, below. The path may carry a query (`?day=2026-10-20`). |
 | `body` | no | A JSON object, the route's parameters. |
 | `return_to` | no | The `.nro` to launch when done. It must exist, end in `.nro` and be under `sdmc:/switch/`; anything else is ignored (and said in the response). |
-| `response` | no | Where to write the response: a `.json` path under `sdmc:/switch/` or `sdmc:/config/`. Default `sdmc:/config/playguard/api/response.json`. |
+| `response` | no | Where to write the response: a `.json` path under `sdmc:/switch/` or `sdmc:/config/playguard/api/` (never PlayGuard's own files). Default `sdmc:/config/playguard/api/response.json`. |
 | `caller` | no | A name to show and record in the history, at most 64 characters. Not checked, so not trusted. |
 | `lang` | no | The language of the errors' `title`, as the console names it (`fr`, `en-US`, `ja` …). Default: the console's language. |
 | `dry_run` | no | `true`: check the request and its permission, answer `200` (or the error it would get) with `"dry_run": true`, and do nothing. No PIN asked, no history, not kept in `handled.json`. |
@@ -131,6 +154,10 @@ mode; there is no `return_to`, so PlayGuard exits when done.
 The caller writes the request file **in one go**: to a temporary name, then
 renamed to the name it passes. A file PlayGuard reads half written is not
 JSON, gets `400 bad_request`, and is gone.
+
+The request file itself must be where a response could be (a `.json` under
+`sdmc:/switch/` or `sdmc:/config/playguard/api/`): one named anywhere else is
+neither read nor deleted, and gets `400 bad_request`.
 
 The request file is **deleted as soon as it is read**, before anything is
 done, so a request left on the card is never replayed at the next start (if
@@ -236,21 +263,24 @@ console's language, ready to show:
 | `400` | `bad_request`, `unsupported_api` | The request cannot be read. |
 | `403` | `api_disabled`, `permission_denied` | The API is off, or the route's group lacks the permission (`detail` names the group and the permission needed). |
 | `403` | `pin_refused` | The PIN screen was cancelled or the PIN was wrong. |
+| `403` | `declined` | The parent declined the change when asked (before the PIN). |
 | `404` | `no_route`, `no_game`, `no_measure` | Unknown or planned path, no such game installed, or no clock measure to give from cache. |
 | `422` | `bad_body` | A parameter is missing or out of range. |
 | `409` | `auto_correction_off` | The console's *Synchronize clock via Internet* is off: the network clock is not written. |
 | `423` | `read_only` | The firmware is newer than PlayGuard supports: it [opens read only](compatibility.md#newer-firmware) and changes nothing. |
 | `424` | `not_done` | Several requests with `stop_on_error`: an earlier one failed. |
 | `500` | `request_not_consumed`, `failed` | The request file could not be deleted, or the system refused (the `detail` says which call and its result). |
-| `503` | `no_network`, `applet_mode` | No network, or not enough memory: PlayGuard was started from the Album instead of over a game. |
+| `503` | `no_network` | No time server answered. |
 
 There is no `202`: PlayGuard is on screen while it works, so by the time it
 answers, the parent has typed the PIN or not.
 
 ### Each request acts once
 
-PlayGuard keeps the `id` and response of the last 32 requests in
-`sdmc:/config/playguard/api/handled.json`. A request with an `id` already
+PlayGuard keeps the `id` and response of the last 32 requests that did
+something (at least one request answered `200`, not a dry run) in
+`sdmc:/config/playguard/api/handled.json`; a refusal is not kept, so asking
+again once the parent allowed it works. A request with an `id` already
 there is not done again; its response is written again. A crash in the middle
 of `POST /playtime/extra` and a relaunch with the same request therefore
 cannot give the extra time twice.
@@ -347,15 +377,16 @@ also read it from the system itself (`pctl`), as PlayGuard does.
 
 ## Trying it
 
-*Both planned, soon after the first routes.*
+*The simulator's parameters are there; the example homebrew is planned.*
 
 - **In the browser.** The [simulator](https://playguard.link/simulator/)
-  takes the short form as a parameter, against its simulated console, and
-  shows the response it would write:
+  takes the short form as a parameter, against its simulated console
+  (`PLAYGUARD_SIM_API` and `PLAYGUARD_SIM_API_PERMISSIONS` on the desktop
+  build); the browser has no time server, so the clock routes answer
+  `503 no_network` there:
   `https://playguard.link/simulator/?api=POST%20/v1/clock/sync` (add
   `&api_permissions=clock:read_write` to set the permissions, which are
-  *None* there too by default). The site's smoke test plays every route this
-  way, so the simulator and this page stay in step.
+  *None* there too by default).
 - **On a console.** `examples/api-caller/` is a small homebrew, built by CI,
   that calls each route with `playguard_api.h` and shows the response. Use
   `dry_run` first: it says whether the permission is there without doing
@@ -376,16 +407,17 @@ also read it from the system itself (`pctl`), as PlayGuard does.
   follow: handy, but it would leave on the card what happens to the child's
   play, readable by anything. Not without a real need.
 
-## In the code (when built)
+## In the code
 
-- `source/action/api_logic.cpp`: the router, pure (a request in, a response
-  and an action out), tested on the host (`tests/api`).
-- `source/action/api_flow.cpp`: reading the request, running the existing
-  flows (`clock_flow`, `game_verify_flow`, …), writing the response,
-  `envSetNextLoad()` for `return_to`.
-- `docs/api.schema.json`: the request and response schemas the tests check
-  the router against.
-- `playguard_api.h`: a single-header C helper for callers (write a request,
-  launch PlayGuard, read the response, read `--playguard-response`).
-- `examples/api-caller/`: the example homebrew, built by CI.
-- `web/`: the simulator's `?api=` parameter, and the routes in its smoke test.
+- `source/action/api_logic.cpp`: the launch arguments, the requests, the
+  routes and their permissions, the responses and the files kept between
+  launches; plain C++, tested on the host (`tests/api_logic`).
+- `source/action/api_flow.cpp`: reading and deleting the request, running the
+  existing flows (`clock_flow`), writing the response, starting `return_to`
+  (`envSetNextLoad()`); its screen is `source/activity/api_activity.cpp`.
+- `source/activity/api_settings_activity.cpp`: *Preferences › Other homebrews*.
+- Planned: `playguard_api.h`, a single-header C helper for callers (write a
+  request, launch PlayGuard, read the response); `examples/api-caller/`, the
+  example homebrew.
+- The simulators' `?api=` and `?api_permissions=` (`web/params.json`):
+  `PLAYGUARD_SIM_API` and `PLAYGUARD_SIM_API_PERMISSIONS`, read in `api_flow`.

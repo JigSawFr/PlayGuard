@@ -184,6 +184,17 @@ void sanitize(Config& c)
         c.notices_acked = acked;
     }
 
+    // A group's permission: one of the three levels, for a name that could
+    // be a group (api_logic fits it to what the group offers).
+    for (auto it = c.api_permissions.begin(); it != c.api_permissions.end();) {
+        const std::string& g = it->first;
+        const std::string& v = it->second;
+        bool name_ok = !g.empty() && g.size() <= 16;
+        for (char ch : g) name_ok = name_ok && ch >= 'a' && ch <= 'z';
+        if (name_ok && (v == "none" || v == "read" || v == "read_write")) ++it;
+        else it = c.api_permissions.erase(it);
+    }
+
     std::vector<std::string> servers;
     for (const auto& s : c.custom_servers)
         if (!s.empty() && s.size() <= MAX_HOST && servers.size() < MAX_CUSTOM_SERVERS) servers.push_back(s);
@@ -342,6 +353,14 @@ static void load_shared()
     read_string(j, "pin_lock", c.pin_lock);
     read_bool(j, "pin_ask_again", c.pin_ask_again);
     read_bool(j, "onboarding_at_start", c.onboarding_at_start);
+    auto api = j.find("api");
+    if (api != j.end() && api->is_object()) {
+        read_bool(*api, "enabled", c.api_enabled);
+        auto perms = api->find("permissions");
+        if (perms != api->end() && perms->is_object())
+            for (const auto& [group, level] : perms->items())
+                if (level.is_string()) c.api_permissions[group] = level.get<std::string>();
+    }
     read_bool(j, "support_reminder", c.support_reminder);
     read_string(j, "support_reminded", c.support_reminded);
     read_string(j, "seen_version", c.seen_version);
@@ -455,6 +474,7 @@ bool snapshot(Snapshot& snap)
     j["pin_lock"]        = s_config.pin_lock;
     j["pin_ask_again"]   = s_config.pin_ask_again;
     j["onboarding_at_start"] = s_config.onboarding_at_start;
+    j["api"] = { { "enabled", s_config.api_enabled }, { "permissions", s_config.api_permissions } };
     j["support_reminder"] = s_config.support_reminder;
     j["support_reminded"] = s_config.support_reminded;
     j["seen_version"]    = s_config.seen_version;

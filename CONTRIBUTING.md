@@ -69,6 +69,8 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_BOOT_CHOICE=a` | The answer of the start-up screen that offers the previous build after a start that did not finish (`a`: A, else B) |
 | `PLAYGUARD_SIM_GITHUB_LOGIN=ok` | The GitHub device flow of *GitHub account*: `ok` approves at once, `denied` refuses, `offline` fails |
 | `PLAYGUARD_SIM_HBLOADER=1` | A homebrew loader that can hand an update over to a store |
+| `PLAYGUARD_SIM_API=<METHOD> <path>` | A launch-API request at start-up, as `--api` gives it (`POST /v1/clock/sync`, docs/api.md) |
+| `PLAYGUARD_SIM_API_PERMISSIONS=<group:level,…>` | *Other homebrews* on, with these levels (`clock:read_write`), for that run only |
 | `PLAYGUARD_SIM_NOW=<POSIX seconds>` | A frozen console time (with `TZ=` for its time zone) |
 | `PLAYGUARD_SIM_STILL_FOCUS=1` | Not the console: the focus highlight without its moving glow, and the loading screen's ring still, for screenshots that compare |
 | `PLAYGUARD_SIM_VERSION=1.0.0:1a2b3c4` | Not the console: the version and commit the header's badge shows (`1.0.0:` for a release), not the build's own, for screenshots that compare |

@@ -2,7 +2,8 @@
 
 <!-- Preferences: only what sets PlayGuard itself up — the app (language,
      theme, start tab, the intro) and the messages it shows (the kinds of
-     notifications, the monthly "Support PlayGuard" reminder). A setting
+     notifications, the monthly "Support PlayGuard" reminder), and what other
+     homebrews may ask of it (docs/api.md). A setting
      that shapes one feature sits with it (extra time in Play timer,
      relocking in PIN, the clock check in Console › Network clock); the
      updates and Help & diagnostics are in About. -->
@@ -39,6 +40,8 @@
             <brls:BooleanCell id="pf_notices_reminders"/>
             <brls:BooleanCell id="pf_notices_ack_remind"/>
             <brls:BooleanCell id="pf_support_reminder"/>
+            <brls:Header title="@i18n/playguard/prefs/section_other" marginTop="24" marginBottom="8"/>
+            <brls:DetailCell id="pf_api" title="@i18n/playguard/prefs/api"/>
 
         </brls:Box>
 

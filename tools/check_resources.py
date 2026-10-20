@@ -296,6 +296,14 @@ DYNAMIC_KEYS = {
     "pin_lock/again_on/": [m for m in array_of("source/action/pin_lock_logic.cpp", "MODES") if m != "off"],   # pin_lock.cpp, note_text
     "tabs/": array_of("source/util/config.hpp", "START_TABS") +
     re.findall(r'open_label\("(\w+)"\)', read(f"{ROOT}/source/action/notices.cpp")),
+    "api/groups/": array_of("source/action/api_logic.hpp", "GROUPS"),
+    "api/levels/": returned_by("source/action/api_logic.cpp", "level_name"),
+    "api/routes/": array_of("source/action/api_logic.hpp", "ROUTE_KEYS"),
+    # api_settings_activity.cpp: the groups this build answers (only the clock), each level.
+    "api/level_details/": ["clock/" + l for l in returned_by("source/action/api_logic.cpp", "level_name")],
+    # Every code a problem() of the launch API can carry (api_flow.cpp: the title).
+    "api/errors/": sorted(set(re.findall(r'problem\(\d+, "(\w+)"', read(f"{ROOT}/source/action/api_logic.cpp") +
+                                         read(f"{ROOT}/source/action/api_flow.cpp")))),
     "tools/languages/": array_of("source/util/config.hpp", "LANGUAGES"),
     "tools/themes/": array_of("source/util/config.hpp", "THEMES"),
     "prefs/text_sizes/": array_of("source/util/config.hpp", "TEXT_SIZES"),

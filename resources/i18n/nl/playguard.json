@@ -1014,7 +1014,8 @@
         "forgotten": "{} vergeten",
         "details": "{}\n\nUitgever: {}\nVersie: {}\n.nro: {}\nProgramma-ID: {}\n{}",
         "made_here": "Gemaakt door PlayGuard",
-        "unknown": "onbekend"
+        "unknown": "onbekend",
+        "confirm_request": "‘{}’ in het HOME-menu zetten? Het start PlayGuard, dat de netwerkklok instelt (na het jou te vragen, daarna de pincode) en dan sluit."
     },
     "about": {
         "section_changelog": "Nieuw in {}",
@@ -1055,7 +1056,9 @@
         "effects_values": {
             "auto": "Lichter op de accu",
             "full": "Altijd volledig"
-        }
+        },
+        "section_other": "Andere homebrews",
+        "api": "Wat ze aan PlayGuard mogen vragen"
     },
     "backup": {
         "saved": "Back-up van instellingen gemaakt: {}",
@@ -1753,5 +1756,141 @@
         "change": "Wijzigen...",
         "remove": "Verwijderen",
         "removed": "Gepland profiel verwijderd."
+    },
+    "api": {
+        "screen_title": "Een verzoek van een andere homebrew",
+        "from": "Gevraagd door ‘{}’ (de naam die hij zichzelf geeft)",
+        "unnamed": "een homebrew zonder naam",
+        "working": "Bezig…",
+        "closing": "PlayGuard sluit over {} s.",
+        "returning": "Terug naar {} over {} s.",
+        "settings_title": "Andere homebrews",
+        "settings_note": "Andere homebrews kunnen PlayGuard starten om iets te vragen, zoals het instellen van de netwerkklok. Niets is toegestaan totdat je het hieronder kiest. Bij een wijziging wordt het jou eerst gevraagd, daarna de pincode, behalve voor een homebrew die je 30 dagen vertrouwt.",
+        "enabled": "Andere homebrews PlayGuard laten aanroepen",
+        "section_permissions": "Wat ze mogen doen",
+        "section_calls": "Laatste aanroepen",
+        "all_off": "Alles uitzetten",
+        "all_off_done": "Elke groep staat weer op Niet toegestaan.",
+        "no_calls": "Nog geen enkele homebrew heeft PlayGuard aangeroepen.",
+        "on": "Aan",
+        "off": "Uit",
+        "result": {
+            "clock": "De netwerkklok {}.",
+            "clock_right": "De netwerkklok loopt gelijk: er hoeft niets te veranderen.",
+            "clock_set": "Netwerkklok ingesteld.",
+            "discovery": "Klaar.",
+            "dry_run": "Toegestaan (alleen test: er is niets gedaan).",
+            "replayed": "Al uitgevoerd: hetzelfde antwoord nog een keer.",
+            "clock_set_trusted": "Netwerkklok ingesteld (vooraf toegestaan)."
+        },
+        "groups": {
+            "clock": "Netwerkklok",
+            "status": "Status",
+            "activity": "Activiteit",
+            "games": "Games",
+            "playtime": "Speeltijd"
+        },
+        "levels": {
+            "none": "Niet toegestaan",
+            "read": "Lezen",
+            "read_write": "Lezen en wijzigen"
+        },
+        "errors": {
+            "bad_request": "Het verzoek kon niet worden gelezen.",
+            "unsupported_api": "Deze versie van het verzoek wordt niet ondersteund door deze PlayGuard.",
+            "api_disabled": "Andere homebrews mogen PlayGuard niet aanroepen (Voorkeuren › Andere homebrews).",
+            "permission_denied": "Niet toegestaan in Voorkeuren › Andere homebrews.",
+            "pin_refused": "De pincode is niet ingevoerd: er is niets gewijzigd. Vraag het aan een ouder.",
+            "no_route": "Deze PlayGuard kent dit verzoek niet.",
+            "bad_body": "Een waarde van het verzoek ontbreekt of valt buiten het bereik.",
+            "auto_correction_off": "\"Klok synchroniseren via internet\" staat uit in de systeeminstellingen: de netwerkklok is niet ingesteld.",
+            "read_only": "Deze firmware is in alleen-lezenmodus geopend: er is niets gewijzigd.",
+            "request_not_consumed": "Het verzoekbestand kon niet worden verwijderd, dus het verzoek is niet uitgevoerd.",
+            "failed": "De console heeft het geweigerd: er is niets gewijzigd.",
+            "no_network": "Geen enkele tijdserver heeft geantwoord: controleer de internetverbinding.",
+            "no_measure": "De netwerkklok is op deze console nog nooit gemeten.",
+            "not_done": "Niet uitgevoerd: een eerder verzoek is mislukt.",
+            "declined": "Verzoek geweigerd. Praat er met een ouder over."
+        },
+        "unnamed_from": "Gevraagd door een homebrew zonder naam",
+        "continue": "Doorgaan",
+        "allow": "Toestaan…",
+        "closing_wait": "PlayGuard sluit als je op Doorgaan drukt.",
+        "returning_wait": "Terug naar {} als je op Doorgaan drukt.",
+        "routes": {
+            "discovery": "Zien wat PlayGuard kan",
+            "clock": "De netwerkklok meten",
+            "clock_sync": "De netwerkklok instellen"
+        },
+        "home_icon": "‘Klok instellen’ toevoegen aan het HOME-menu",
+        "home_icon_name": "Klok instellen",
+        "home_icon_allow": "Dit pictogram start PlayGuard om de netwerkklok in te stellen. Daarvoor moet Andere homebrews aan staan, met Netwerkklok op Lezen en wijzigen. Nu toestaan?",
+        "home_icon_allow_yes": "Toestaan en toevoegen",
+        "all_off_confirm": "Elke groep terugzetten op Niet toegestaan? Andere homebrews worden geweigerd totdat je ze weer toestaat.",
+        "all_back": "De rechten terugzetten",
+        "all_back_done": "De rechten zijn weer zoals ze waren.",
+        "docs": "Voor ontwikkelaars: de start-API",
+        "docs_body": "Hoe een andere homebrew PlayGuard aanroept: de verzoeken, de antwoorden, de fouten.",
+        "level_details": {
+            "clock": {
+                "none": "Elk verzoek over de klok wordt geweigerd.",
+                "read": "Hij mag meten hoeveel de netwerkklok afwijkt.",
+                "read_write": "Hij mag de netwerkklok ook instellen: het wordt jou eerst gevraagd, daarna de pincode."
+            }
+        },
+        "outcome": {
+            "done": "Uitgevoerd",
+            "tested": "Toegestaan (alleen test)",
+            "refused": "Geweigerd",
+            "unknown": "Onbekend verzoek",
+            "skipped": "Niet uitgevoerd",
+            "failed": "Niet uitgevoerd"
+        },
+        "call_details": "{}\n{}\n{}\n\n{}\nStatus: {}",
+        "notice_changes": "Wijzigingen door andere homebrews",
+        "notice_line": "{}: {}",
+        "notice_open": "De aanroepen bekijken",
+        "notice_refused": "Andere homebrews zijn geweigerd",
+        "notice_refused_line": "{}: {} keer geweigerd",
+        "nothing_allowed": "niets toegestaan",
+        "notice_line_many": "{} ({} keer)",
+        "measuring": "De netwerkklok meten met {}…",
+        "on_time": "loopt gelijk",
+        "span_s": "{} s",
+        "span_min": "{} min",
+        "span_h_min": "{} u {} min",
+        "span_days": "{} dagen",
+        "behind": "loopt {} achter",
+        "ahead": "loopt {} voor",
+        "turn_on_first": "Zet eerst ‘Andere homebrews PlayGuard laten aanroepen’ aan.",
+        "clear_calls": "De lijst wissen",
+        "clear_calls_confirm": "De lijst met aanroepen wissen? De meldingenbel vergeet ze dan ook.",
+        "clear_calls_done": "De lijst met aanroepen is leeg.",
+        "clear_calls_err": "De lijst met aanroepen kon niet worden gewist.",
+        "consent": {
+            "question": "{} toestaan de netwerkklok in te stellen?",
+            "question_unnamed": "Een homebrew zonder naam toestaan de netwerkklok in te stellen?",
+            "restarts": "De speeltijd van vandaag begint opnieuw (nu nog {}, daarna {}).",
+            "no_limit": "Vandaag geldt geen limiet: de speeltijd verandert niet.",
+            "no_play": "Vandaag mag er niet gespeeld worden: dat blijft zo.",
+            "unknown": "De klok wijzigen laat de speeltijd van vandaag opnieuw beginnen: de hele daglimiet is weer beschikbaar.",
+            "trust": "30 dagen niet meer vragen",
+            "details": "Details",
+            "allow": "Toestaan (pincode)",
+            "refuse": "Weigeren",
+            "version": "v{}",
+            "by": "door {}",
+            "says_it_is": "Stelt zich voor als ‘{}’",
+            "says_unchecked": "Stelt zich voor als ‘{}’ (niet gecontroleerd: het bestand kon niet worden gelezen)",
+            "unnamed": "Een homebrew zonder naam"
+        },
+        "section_trust": "Vertrouwde homebrews",
+        "trust_line": "{} · {}",
+        "trust_until": "tot {}",
+        "trust_revoke": "Niet meer vertrouwen",
+        "trust_revoke_confirm": "{} niet meer vertrouwen? Hij vraagt het dan de volgende keer weer.",
+        "trust_revoked": "{} vraagt het weer.",
+        "no_trust": "Geen enkele homebrew wordt vertrouwd. Bij een verzoek voegt ‘30 dagen niet meer vragen’ er een toe.",
+        "notice_line_trusted": "{}: {} (vooraf toegestaan)"
     }
 }

@@ -1014,7 +1014,8 @@
         "forgotten": "{} forgotten",
         "details": "{}\n\nPublisher: {}\nVersion: {}\n.nro: {}\nProgram ID: {}\n{}",
         "made_here": "Made by PlayGuard",
-        "unknown": "unknown"
+        "unknown": "unknown",
+        "confirm_request": "Put “{}” on the HOME menu? It starts PlayGuard, which sets the network clock (after asking you, then the PIN) and closes."
     },
     "about": {
         "section_changelog": "What's new in {}",
@@ -1055,7 +1056,9 @@
         "effects_values": {
             "auto": "Lighter on battery",
             "full": "Always full"
-        }
+        },
+        "section_other": "Other homebrews",
+        "api": "What they may ask of PlayGuard"
     },
     "backup": {
         "saved": "Settings backed up: {}",
@@ -1753,5 +1756,141 @@
         "change": "Change...",
         "remove": "Remove it",
         "removed": "Scheduled profile removed."
+    },
+    "api": {
+        "screen_title": "A request from another homebrew",
+        "from": "Asked by “{}” (the name it gives itself)",
+        "unnamed": "a homebrew that gave no name",
+        "working": "Working…",
+        "closing": "PlayGuard closes in {} s.",
+        "returning": "Back to {} in {} s.",
+        "settings_title": "Other homebrews",
+        "settings_note": "Other homebrews can start PlayGuard to ask it something, such as setting the network clock. Nothing is allowed until you choose it below. A change asks you first, then the PIN, except for an app you trusted for 30 days.",
+        "enabled": "Let other homebrews call PlayGuard",
+        "section_permissions": "What they may do",
+        "section_calls": "Last calls",
+        "all_off": "Turn it all off",
+        "all_off_done": "Every group is back to Not allowed.",
+        "no_calls": "No homebrew has called PlayGuard yet.",
+        "on": "On",
+        "off": "Off",
+        "result": {
+            "clock": "The network clock is {}.",
+            "clock_right": "The network clock is right: nothing to change.",
+            "clock_set": "Network clock set.",
+            "discovery": "Done.",
+            "dry_run": "Allowed (test only: nothing done).",
+            "replayed": "Already done: the same answer again.",
+            "clock_set_trusted": "Network clock set (allowed in advance)."
+        },
+        "groups": {
+            "clock": "Network clock",
+            "status": "Status",
+            "activity": "Activity",
+            "games": "Games",
+            "playtime": "Play time"
+        },
+        "levels": {
+            "none": "Not allowed",
+            "read": "Read",
+            "read_write": "Read and change"
+        },
+        "errors": {
+            "bad_request": "The request could not be read.",
+            "unsupported_api": "This version of the request is not supported by this PlayGuard.",
+            "api_disabled": "Other homebrews are not allowed to call PlayGuard (Preferences › Other homebrews).",
+            "permission_denied": "Not allowed in Preferences › Other homebrews.",
+            "pin_refused": "The PIN was not entered: nothing was changed. Ask a parent.",
+            "no_route": "This PlayGuard does not know this request.",
+            "bad_body": "A value of the request is missing or out of range.",
+            "auto_correction_off": "\"Synchronize clock via Internet\" is off in System Settings: the network clock was not set.",
+            "read_only": "This firmware is open read only: nothing was changed.",
+            "request_not_consumed": "The request file could not be deleted, so it was not done.",
+            "failed": "The console refused: nothing was changed.",
+            "no_network": "No time server answered: check the Internet connection.",
+            "no_measure": "The network clock was never measured on this console.",
+            "not_done": "Not done: an earlier request failed.",
+            "declined": "Request refused. Talk to a parent about it."
+        },
+        "unnamed_from": "Asked by a homebrew that gave no name",
+        "continue": "Continue",
+        "allow": "Allow…",
+        "closing_wait": "PlayGuard closes when you press Continue.",
+        "returning_wait": "Back to {} when you press Continue.",
+        "routes": {
+            "discovery": "See what PlayGuard can do",
+            "clock": "Measure the network clock",
+            "clock_sync": "Set the network clock"
+        },
+        "home_icon": "Add “Set the clock” to the HOME menu",
+        "home_icon_name": "Set the clock",
+        "home_icon_allow": "This icon starts PlayGuard to set the network clock. It needs Other homebrews on, with Network clock on Read and change. Allow it now?",
+        "home_icon_allow_yes": "Allow and add",
+        "all_off_confirm": "Set every group back to Not allowed? Other homebrews will be refused until you allow them again.",
+        "all_back": "Put the permissions back",
+        "all_back_done": "The permissions are back as they were.",
+        "docs": "For developers: the launch API",
+        "docs_body": "How another homebrew calls PlayGuard: the requests, the answers, the errors.",
+        "level_details": {
+            "clock": {
+                "none": "Every request about the clock is refused.",
+                "read": "It may measure how far off the network clock is.",
+                "read_write": "It may also set the network clock: you are asked first, then the PIN."
+            }
+        },
+        "outcome": {
+            "done": "Done",
+            "tested": "Allowed (test only)",
+            "refused": "Refused",
+            "unknown": "Unknown request",
+            "skipped": "Not done",
+            "failed": "Not done"
+        },
+        "call_details": "{}\n{}\n{}\n\n{}\nStatus: {}",
+        "notice_changes": "Changes made by other homebrews",
+        "notice_line": "{}: {}",
+        "notice_open": "See the calls",
+        "notice_refused": "Other homebrews were refused",
+        "notice_refused_line": "{}: refused {} times",
+        "nothing_allowed": "nothing allowed",
+        "notice_line_many": "{} ({} times)",
+        "measuring": "Measuring the network clock with {}…",
+        "on_time": "on time",
+        "span_s": "{} s",
+        "span_min": "{} min",
+        "span_h_min": "{} h {} min",
+        "span_days": "{} days",
+        "behind": "{} behind",
+        "ahead": "{} ahead",
+        "turn_on_first": "Turn on “Let other homebrews call PlayGuard” first.",
+        "clear_calls": "Clear the list",
+        "clear_calls_confirm": "Clear the list of calls? The notification bell forgets them too.",
+        "clear_calls_done": "The list of calls is empty.",
+        "clear_calls_err": "The list of calls could not be cleared.",
+        "consent": {
+            "question": "Allow {} to set the network clock?",
+            "question_unnamed": "Allow a homebrew that gave no name to set the network clock?",
+            "restarts": "Today's play time will start over ({} left now, {} after).",
+            "no_limit": "No limit counts today: play time is not affected.",
+            "no_play": "Today allows no play: that does not change.",
+            "unknown": "Changing the clock starts today's play time over: the whole daily limit is available again.",
+            "trust": "Don't ask again for 30 days",
+            "details": "Details",
+            "allow": "Allow (PIN)",
+            "refuse": "Refuse",
+            "version": "v{}",
+            "by": "by {}",
+            "says_it_is": "Presents itself as “{}”",
+            "says_unchecked": "Presents itself as “{}” (not checked: its file could not be read)",
+            "unnamed": "A homebrew that gave no name"
+        },
+        "section_trust": "Trusted apps",
+        "trust_line": "{} · {}",
+        "trust_until": "until {}",
+        "trust_revoke": "Stop trusting",
+        "trust_revoke_confirm": "Stop trusting {}? It will ask again next time.",
+        "trust_revoked": "{} will ask again.",
+        "no_trust": "No app is trusted. On a request, “Don't ask again for 30 days” adds one.",
+        "notice_line_trusted": "{}: {} (allowed in advance)"
     }
 }

@@ -32,6 +32,9 @@ bool platform_can_launch(void);
 // hbloader starts `path` (an "sdmc:/…" path; also its argv[0]) when PlayGuard
 // exits. False when it cannot.
 bool platform_set_next_load(const char *path);
+// The same with its whole argument string (`args`, argv[0] first: the
+// launch API's relaunch, action/api_flow).
+bool platform_set_next_load_args(const char *path, const char *args);
 // PlayGuard's exit closes the game it was started over (title override) and
 // returns to the HOME menu, rather than to hbloader's next homebrew (hbmenu).
 // Nothing in applet (album) mode, where there is no game to close.

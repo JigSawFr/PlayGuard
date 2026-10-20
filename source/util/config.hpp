@@ -4,6 +4,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -77,6 +78,13 @@ struct Config
     // First steps opens by itself at start-up while no PIN is set, unless
     // its "Show at start-up" switch was turned off.
     bool onboarding_at_start = true;
+
+    // Preferences › Other homebrews (action/api_flow, docs/api.md): whether
+    // other homebrews may call PlayGuard, and each group of routes'
+    // permission ("none", "read" or "read_write"; a group not there is
+    // "none"). In config.json as "api": {"enabled", "permissions"}.
+    bool api_enabled = false;
+    std::map<std::string, std::string> api_permissions;
 
     // "Support PlayGuard" once a month at start-up (Preferences; off stays
     // off, updates included), and "What's new" once after each update. See

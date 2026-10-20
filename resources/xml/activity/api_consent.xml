@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Another homebrew asks for a change (docs/api.md): one card over the
+     request's screen, dimmed: the app's icon, the question, what it costs,
+     "Allow for 30 days", Allow with the PIN, Refuse (focused), Details.
+     Filled by source/activity/api_consent_activity.cpp. -->
+
+<brls:Box
+    width="auto"
+    height="auto"
+    axis="column"
+    justifyContent="center"
+    alignItems="center"
+    grow="1.0"
+    backgroundColor="@theme/brls/backdrop">
+
+    <brls:Box
+        id="ac_card"
+        width="600"
+        height="auto"
+        axis="column"
+        alignItems="center"
+        paddingTop="36"
+        paddingRight="44"
+        paddingBottom="28"
+        paddingLeft="44"
+        cornerRadius="28"
+        borderThickness="1"
+        borderColor="@theme/cadran/line"
+        backgroundColor="@theme/cadran/surf">
+
+        <brls:Image id="ac_icon" width="88" height="88" cornerRadius="22" scalingType="fit"/>
+        <brls:Label id="ac_title" width="512" fontSize="27" horizontalAlign="center" marginTop="22"/>
+        <brls:Label id="ac_text" width="512" fontSize="19" horizontalAlign="center" marginTop="12" textColor="@theme/cadran/text2"/>
+        <brls:Label id="ac_claim" width="512" fontSize="16" horizontalAlign="center" marginTop="10" textColor="@theme/cadran/amber"/>
+        <brls:BooleanCell id="ac_trust" width="512" marginTop="18"/>
+        <brls:Button id="ac_allow" style="primary" width="512" height="60" marginTop="18" text="@i18n/playguard/api/consent/allow"/>
+        <brls:Button id="ac_refuse" style="bordered" width="512" height="60" marginTop="12" text="@i18n/playguard/api/consent/refuse"/>
+        <brls:Button id="ac_details" style="borderless" width="200" height="44" marginTop="8" text="@i18n/playguard/api/consent/details"/>
+
+    </brls:Box>
+
+</brls:Box>

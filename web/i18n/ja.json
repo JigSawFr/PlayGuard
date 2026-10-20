@@ -92,6 +92,8 @@
   "applet": {"label": "アプレットモード（アルバムから起動）"},
   "background": {"label": "PlayGuard がバックグラウンド"},
   "hbloader": {"label": "更新をストアに引き継げるローダー"},
+  "api": {"label": "起動時の起動APIリクエスト(ほかのhomebrewから)"},
+  "api_permissions": {"label": "許可するほかのhomebrew(グループ:レベル)"},
   "docked": {"label": "ドックに挿している（テレビ）"},
   "battery": {"label": "バッテリーで動作（充電器なし）"},
   "boot_choice": {"label": "起動時の「前のビルド？」への回答", "options": {"": "B", "a": "A"}},

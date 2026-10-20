@@ -37,6 +37,12 @@ void create(const std::string& sd_path, std::function<void(bool)> done);
 // PlayGuard's own, named "PlayGuard": confirmed, then installed.
 void create_self(std::function<void(bool)> done);
 
+// PlayGuard's own with a launch-API request (docs/api.md) as its argument,
+// under `name`: "Set the clock" starts PlayGuard with
+// --api "POST /v1/clock/sync". Confirmed, then installed (its own program
+// ID: the same .nro, other arguments).
+void create_request(const std::string& name, const std::string& request, std::function<void(bool)> done);
+
 // The forwarder `row` made again from its .nro with this name and publisher
 // (its own when empty), or as it was (`name` and `author` its own): the same
 // program ID, the HOME menu's entry replaced.

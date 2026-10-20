@@ -28,6 +28,7 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
         r.version = i.version;
         if (const forwarders::Made* m = made_of(i.id)) {
             r.nro = m->nro;
+            r.request = m->argv.find(" --api ") != std::string::npos;
             if (r.name.empty()) r.name = m->name;
             if (r.author.empty()) r.author = m->author;
             r.state = nro_exists(m->nro) ? State::Ready : State::NroMissing;
@@ -45,12 +46,13 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
         r.name = m.name;
         r.author = m.author;
         r.nro = m.nro;
+        r.request = m.argv.find(" --api ") != std::string::npos;
         r.state = State::NotInstalled;
         rows.push_back(r);
     }
     for (Row& r : rows) {
         if (r.name.empty()) r.name = r.nro.empty() ? forwarders::hex_id(r.id) : file_title(r.nro);
-        r.self = !self_nro.empty() && r.nro == self_nro;
+        r.self = !self_nro.empty() && r.nro == self_nro && !r.request;
     }
     std::sort(rows.begin(), rows.end(), [](const Row& a, const Row& b) {
         const std::string la = text::lower_ascii(a.name), lb = text::lower_ascii(b.name);

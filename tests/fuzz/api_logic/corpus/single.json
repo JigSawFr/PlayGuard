@@ -1,0 +1,1 @@
+{"api":"v1","id":"8f14e45f","method":"POST","path":"/clock/sync","body":{"timeout_ms":3000},"return_to":"sdmc:/switch/myapp/myapp.nro","response":"sdmc:/switch/myapp/r.json","caller":"MyApp 1.2","lang":"fr","dry_run":true}

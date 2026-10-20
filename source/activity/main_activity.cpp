@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 
+#include "action/api_flow.hpp"
 #include "action/clock_check.hpp"
 #include "action/data_notice.hpp"
 #include "action/fw_gate.hpp"
@@ -177,6 +178,7 @@ void MainActivity::onContentAvailable()
     // Settings, history or a recovery report found damaged, a build gone back
     // from: in the notification bell.
     data_notice::at_start();
+    api_flow::note_calls();   // what other homebrews changed or were refused
     rollback_flow::note_went_back();
     notices::note_crash();
     rescue::note_version();
