@@ -214,6 +214,18 @@ class Picker : public brls::Dropdown
         cadran::style_picker(this);
     }
 
+    // The list's foot fades into the card while more rows follow, as a
+    // screen's and a dialog's text.
+    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
+              brls::FrameContext* ctx) override
+    {
+        brls::Dropdown::draw(vg, x, y, width, height, style, ctx);
+        auto* list = dynamic_cast<brls::ScrollingFrame*>(this->getView("brls/dropdown/recycler"));
+        if (list)
+            cadran::kit::draw_more_below(vg, list, list->getX(), list->getY(), list->getWidth(), list->getHeight(),
+                                         "cadran/surf", cadran::PICKER_CORNER);
+    }
+
   private:
     std::vector<std::string> labels;
     std::vector<std::string> details;

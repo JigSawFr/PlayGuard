@@ -230,7 +230,7 @@ void wrap(brls::View* row)
 }
 
 void draw_more_below(NVGcontext* vg, brls::ScrollingFrame* frame, float x, float y, float width, float height,
-                     const char* color_key)
+                     const char* color_key, float corner)
 {
     // The content: the frame's tallest child (the other is its scroll bar).
     brls::View* content = nullptr;
@@ -247,7 +247,10 @@ void draw_more_below(NVGcontext* vg, brls::ScrollingFrame* frame, float x, float
     clear.a = 0.0f;
     const float top = y + height - FADE;
     nvgBeginPath(vg);
-    nvgRect(vg, x, top, width, FADE);
+    if (corner > 0.0f)
+        nvgRoundedRectVarying(vg, x + 1, top, width - 2, FADE - 1, 0, 0, corner - 1, corner - 1);
+    else
+        nvgRect(vg, x, top, width, FADE);
     nvgFillPaint(vg, nvgLinearGradient(vg, x, top, x, y + height, clear, solid));
     nvgFill(vg);
 }
