@@ -30,6 +30,8 @@
   "copied": "Link kopiert",
   "reset": "Zurücksetzen",
   "pad": "Controller",
+  "fullscreen": "Vollbild",
+  "fullscreen_exit": "Vollbild beenden",
   "screenshot": "Screenshot",
   "note": "Anwenden startet PlayGuard mit diesen Einstellungen frisch neu; was du darin änderst, bleibt nicht erhalten, außer mit „Zustand behalten“. Die Konsole übernimmt Sprache und Design der Seite.",
   "keys": "<kbd>↑↓←→</kbd> bewegen · <kbd>Eingabe</kbd> A · <kbd>Esc</kbd> B · <kbd>X</kbd> <kbd>Y</kbd> · <kbd>L</kbd> <kbd>R</kbd> · <kbd>⇧L</kbd> ZL · <kbd>⇧R</kbd> ZR · <kbd>+</kbd> <kbd>−</kbd> · ein Klick ist eine Berührung",

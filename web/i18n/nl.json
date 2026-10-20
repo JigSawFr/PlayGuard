@@ -30,6 +30,8 @@
   "copied": "Link gekopieerd",
   "reset": "Herstellen",
   "pad": "Controller",
+  "fullscreen": "Volledig scherm",
+  "fullscreen_exit": "Volledig scherm sluiten",
   "screenshot": "Schermafbeelding",
   "note": "Toepassen start PlayGuard opnieuw vanaf een schone staat met deze instellingen; wat je erin wijzigt, wordt niet bewaard, tenzij ‘Staat bewaren’ aan staat. De console neemt de taal en het thema van de pagina over.",
   "keys": "<kbd>↑↓←→</kbd> bewegen · <kbd>Enter</kbd> A · <kbd>Esc</kbd> B · <kbd>X</kbd> <kbd>Y</kbd> · <kbd>L</kbd> <kbd>R</kbd> · <kbd>⇧L</kbd> ZL · <kbd>⇧R</kbd> ZR · <kbd>+</kbd> <kbd>−</kbd> · een klik is een aanraking",

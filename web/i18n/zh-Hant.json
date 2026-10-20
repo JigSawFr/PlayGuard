@@ -30,6 +30,8 @@
   "copied": "已複製連結",
   "reset": "重設",
   "pad": "控制器",
+  "fullscreen": "全螢幕",
+  "fullscreen_exit": "結束全螢幕",
   "screenshot": "截圖",
   "note": "「套用」會用這些設定從全新狀態重新啟動 PlayGuard；在其中做的變更不會保留，除非開啟「保留狀態」。主機使用頁面的語言和主題。",
   "keys": "<kbd>↑↓←→</kbd> 移動 · <kbd>Enter</kbd> A · <kbd>Esc</kbd> B · <kbd>X</kbd> <kbd>Y</kbd> · <kbd>L</kbd> <kbd>R</kbd> · <kbd>⇧L</kbd> ZL · <kbd>⇧R</kbd> ZR · <kbd>+</kbd> <kbd>−</kbd> · 點擊即觸控",
