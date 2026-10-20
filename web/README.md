@@ -186,7 +186,9 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   still running after 5 minutes is stopped and fails: about a minute in all
   on a CI runner. `WEB_SMOKE_ONLY=tour,keep` runs some of them. Its screens
   (`shots/`) and the time each start took (`shots/timings.json`, in the
-  run's summary) go with the site.
+  run's summary) go with the site; each is taken once borealis lets go of
+  the input (`playguard_web_busy()`, `source/sim/web_page.cpp`), not while a
+  screen is still opening.
 - **The screens against main's** (CI, pull requests only): each screen is
   compared with main's, published with its site, by `tools/visual_check.py`
   (the footer clock masked); `shots/compare.json` lists the ones that
