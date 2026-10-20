@@ -388,6 +388,7 @@ static void test_nacp(void)
     CHECK(u64_at(nacp + 0x3070) == (0x0512345678ABC000ull ^ 0x1000));
     CHECK(u64_at(nacp + 0x30B0) == 0x0512345678ABC000ull && u64_at(nacp + 0x30E8) == 0x0512345678ABC000ull);
     CHECK(memcmp(nacp + 0x30A8, "PlayGrd", 8) == 0);
+    CHECK(u32_at(nacp + 0x302C) == 1);   // American English alone: the one icon there is
 
     // A name too long for its field: cut, terminated.
     char longname[0x300];

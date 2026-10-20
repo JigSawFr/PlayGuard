@@ -36,7 +36,14 @@ bool read(const std::string& path, Info& out);
 // A JPEG's size, from its frame header; false when it is not a JPEG.
 bool jpeg_size(const std::vector<uint8_t>& jpeg, int& width, int& height);
 
-// The icon is one the HOME menu draws: a 256 x 256 JPEG, at most ICON_MAX.
+// A JPEG with nothing but what any decoder reads before its image data:
+// JFIF, its tables, a comment, a baseline (or extended) frame. Not one with
+// EXIF data or progressive coding, which the HOME menu draws as a "?" where
+// the album shows it (switch-nsp-forwarder's issue #1, GBAtemp).
+bool jpeg_plain(const std::vector<uint8_t>& jpeg);
+
+// The icon is one the HOME menu draws: a plain 256 x 256 JPEG, at most
+// ICON_MAX.
 bool icon_usable(const std::vector<uint8_t>& icon);
 
 // The .nro files of `root`'s /switch folder and of its sub-folders one level

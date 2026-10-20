@@ -155,10 +155,34 @@ bool jpeg_size(const std::vector<uint8_t>& jpeg, int& width, int& height)
     return false;
 }
 
+bool jpeg_plain(const std::vector<uint8_t>& jpeg)
+{
+    if (jpeg.size() < 4 || jpeg[0] != 0xFF || jpeg[1] != 0xD8) return false;
+    bool frame = false;
+    for (size_t i = 2; i + 4 <= jpeg.size();) {
+        if (jpeg[i] != 0xFF) return false;
+        const uint8_t marker = jpeg[i + 1];
+        if (marker == 0xFF) {
+            i++;
+            continue;
+        }
+        if (marker == 0xDA) return frame;   // the image data: all seen
+        const size_t len = (size_t)jpeg[i + 2] << 8 | jpeg[i + 3];
+        if (len < 2 || i + 2 + len > jpeg.size()) return false;
+        // JFIF, the tables, a comment, and a baseline or extended frame:
+        // nothing else (no EXIF, no progressive or arithmetic coding).
+        if (marker == 0xC0 || marker == 0xC1) frame = true;
+        else if (marker != 0xE0 && marker != 0xDB && marker != 0xC4 && marker != 0xDD && marker != 0xFE) return false;
+        i += 2 + len;
+    }
+    return false;
+}
+
 bool icon_usable(const std::vector<uint8_t>& icon)
 {
     int w = 0, h = 0;
-    return !icon.empty() && icon.size() <= ICON_MAX && jpeg_size(icon, w, h) && w == ICON_PX && h == ICON_PX;
+    return !icon.empty() && icon.size() <= ICON_MAX && jpeg_size(icon, w, h) && w == ICON_PX && h == ICON_PX &&
+           jpeg_plain(icon);
 }
 
 std::vector<std::string> find(const std::string& root)
