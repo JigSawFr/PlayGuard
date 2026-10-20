@@ -36,3 +36,12 @@ extern "C" EMSCRIPTEN_KEEPALIVE int playguard_web_cjk_font(const char* path)
     brls::Logger::info("Using {} font: {}", brls::FONT_CHINESE_SIMPLIFIED, path);
     return 1;
 }
+
+// The smoke test (tools/web_smoke.py) before a screenshot: 1 while borealis
+// holds the input, a screen still opening or closing (the footer's hints
+// greyed until it lets go). On a busy runner, SwiftShader's frames can make
+// that last longer than the test's pause.
+extern "C" EMSCRIPTEN_KEEPALIVE int playguard_web_busy()
+{
+    return brls::Application::isInputBlocks() ? 1 : 0;
+}

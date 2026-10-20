@@ -147,9 +147,10 @@ about ten minutes) when the app, its resources, the simulator or the workflow
 changed; the screenshots and tours for a release or by hand (above); the
 website itself, every time, in seconds. A change to the docs or the site
 takes a few minutes. A pull request that changes the site, its documentation or its texts
-also has its layout checked (`tools/site_layout.py`, about half a minute): no
+also has its layout checked (`tools/site_layout.py`, under a minute): no
 page wider than the screen on a phone, a tablet or a desktop, no field iOS
-zooms into, no script that throws. main's builds run one at a time, each from the last. `.github/workflows/pages.yml` publishes them, with GitHub
+zooms into, no script that throws, and nothing axe-core finds against WCAG 2.2
+AA (contrast, names, labels, keyboard; `SITE_AXE=<axe.min.js>` locally). main's builds run one at a time, each from the last. `.github/workflows/pages.yml` publishes them, with GitHub
 Actions as the source of GitHub Pages: main's at the root, each open pull
 request's in `pr-<number>/` (not a fork's: its pages would be served from this
 site), then edits the pull request's comment with the links. It runs where

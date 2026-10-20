@@ -37,8 +37,7 @@ rather than the job's timeout.
 The screens are written to <out-dir>/<name>.png (1280x720, the canvas), for
 the pull request's preview comment (.github/workflows/pages.yml), and the
 time each start took to <out-dir>/timings.json. The screens show one frozen
-moment (PLAYGUARD_SIM_NOW) with the focus glow still and the footer's hints
-as once a dialog has opened (still_focus: PLAYGUARD_SIM_STILL_FOCUS).
+moment (PLAYGUARD_SIM_NOW) with the focus glow still.
 
 Usage: tools/web_smoke.py <simulator-dir> <out-dir>   (needs Playwright for
 Python with Chromium; PLAYWRIGHT_CHROMIUM=<path> for a browser of its own)
@@ -184,11 +183,15 @@ def steps(page, text):
 
 def shot(page, name):
     # A moment for the screen to settle (borealis' animations last 300 ms),
-    # then two more display refreshes, so that PlayGuard has drawn a frame
-    # since (its main loop runs one per refresh; on a busy runner they can
-    # come far apart), then the canvas as PlayGuard drew it.
+    # and as long again as borealis still holds the input (a screen opening
+    # on a busy runner: the footer's hints greyed), up to 5 s; then, two
+    # frames later, the canvas as PlayGuard drew it.
     time.sleep(1.5)
-    data = page.evaluate("frame().then(frame).then(() => canvas.toDataURL('image/png'))")
+    end = time.time() + 5
+    while time.time() < end and page.evaluate("Module.ccall('playguard_web_busy', 'number', [], [])"):
+        time.sleep(0.1)
+    page.evaluate("new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))")
+    data = page.evaluate("canvas.toDataURL('image/png')")
     with open(os.path.join(OUT, name + ".png"), "wb") as f:
         f.write(base64.b64decode(data.split(",", 1)[1]))
 

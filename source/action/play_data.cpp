@@ -152,11 +152,16 @@ void fetch(const PlayAccount* account)
             done.busy    = false;
             done.stats   = data;
             done.read_at = std::chrono::steady_clock::now();
-            // A copy: a listener may unlisten (its tab closed) while called.
-            const auto listeners = s_listeners;
-            for (const auto& l : listeners) l.second();
+            notify();
         });
     });
+}
+
+void notify()
+{
+    // A copy: a listener may unlisten (its tab closed) while called.
+    const auto listeners = s_listeners;
+    for (const auto& l : listeners) l.second();
 }
 
 int listen(std::function<void()> on_read)

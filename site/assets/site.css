@@ -259,6 +259,8 @@ pre code { background: none; padding: 0; }
 .tab-list button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgb(11 20 36 / 0.12); }
 .tab-title { font-size: 16px; margin: 18px 0 0; }
 .size { font-weight: 400; opacity: 0.8; white-space: nowrap; }
+/* On the accent, faded text falls under 4.5:1 (WCAG AA): its weight alone sets it apart. */
+.button.primary .size { opacity: 1; }
 .steps li { margin: 6px 0; }
 
 .doc-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
