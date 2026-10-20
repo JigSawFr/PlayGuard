@@ -8,6 +8,7 @@
 #include "action/github_login_flow.hpp"
 #include "action/fw_gate.hpp"
 #include "action/log_prune_flow.hpp"
+#include "action/migration_flow.hpp"
 #include "action/pairing_state.hpp"
 #include "action/pt_block_flow.hpp"
 #include "action/pt_flow.hpp"
@@ -204,6 +205,10 @@ HelpTab::HelpTab()
         });
         return true;
     });
+    dev_migrations->registerClickAction([](brls::View*) {
+        migration_flow::replay();
+        return true;
+    });
 
     // An icon per line (the screen's skin would dress it without).
     cadran::List(this, true).apply({ { "hp_first_steps", "sparkle" }, { "hp_export", "file" }, { "hp_upload", "upload" },
@@ -212,7 +217,8 @@ HelpTab::HelpTab()
                                          { "hp_dev_pt_log", "list" }, { "hp_dev_frame_stats", "activity" }, { "hp_dev_glow", "sparkle" },
                                          { "hp_dev_clear_cache", "trash" }, { "hp_dev_clear_logs", "trash" },
                                          { "hp_dev_report", "file" }, { "hp_dev_pt_block", "timer" }, { "hp_dev_gate", "shield" },
-                                         { "hp_dev_forget", "refresh" }, { "hp_dev_build", "download" } });
+                                         { "hp_dev_forget", "refresh" }, { "hp_dev_build", "download" },
+                                         { "hp_dev_migrations", "folder" } });
 }
 
 void HelpTab::refresh()
@@ -254,7 +260,8 @@ void HelpTab::refresh()
                           { dev_pt_block.getView(), dev && phone_syncs },
                           { dev_build.getView(), dev },
                           { dev_gate.getView(), dev && fw_gate::needed() },
-                          { dev_forget.getView(), dev } });
+                          { dev_forget.getView(), dev },
+                          { dev_migrations.getView(), dev } });
     github->setDetailText(signed_in ? "playguard/github/signed_in_short"_i18n : "playguard/github/not_signed_in"_i18n);
 }
 

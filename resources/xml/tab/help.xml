@@ -52,6 +52,7 @@
             <brls:DetailCell id="hp_dev_gate" title="@i18n/playguard/dev/gate"/>
             <brls:DetailCell id="hp_dev_forget" title="@i18n/playguard/dev/forget"/>
             <brls:DetailCell id="hp_dev_build" title="@i18n/playguard/dev_build/open"/>
+            <brls:DetailCell id="hp_dev_migrations" title="@i18n/playguard/dev/migrations"/>
 
         </brls:Box>
 

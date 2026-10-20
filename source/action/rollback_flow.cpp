@@ -11,6 +11,7 @@
 #include "core/platform.h"
 #include "ui/ui.hpp"
 #include "util/launcher.hpp"
+#include "util/migrations.hpp"
 #include "util/paths.hpp"
 #include "util/rollback.hpp"
 
@@ -32,10 +33,22 @@ std::string running_label()
     return app::commit().empty() ? app::version() : app::version() + " (" + app::commit() + ")";
 }
 
+// util/migrations.hpp's lines, in the log.
+void log_migration(bool warning, const std::string& line)
+{
+    if (warning)
+        brls::Logger::warning("rollback: {}", line);
+    else
+        brls::Logger::info("rollback: {}", line);
+}
+
 // The swap, the running build's name kept for the one now previous. romfs:/
 // is read from the running .nro and holds it open: released around it.
 bool swap(const std::string& nro, std::string* error, bool crashed)
 {
+    // The previous build may write the data in an earlier layout: the
+    // migrations run again when this one is back (util/migrations.hpp).
+    migrations::earlier_build_next(paths::migrations_file(), log_migration);
     platform_romfs_release();
     const bool ok = rollback::swap(nro, error);
     platform_romfs_mount();

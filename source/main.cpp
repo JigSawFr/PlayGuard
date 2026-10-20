@@ -22,6 +22,7 @@
 #include "action/frame_stats_flow.hpp"
 #include "action/fw_gate.hpp"
 #include "action/log_prune_flow.hpp"
+#include "action/migration_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_log_flow.hpp"
@@ -51,10 +52,8 @@
 #include "util/config.hpp"
 #include "util/crash_dump.h"
 #include "util/crash_report.hpp"
-#include "util/data_move.hpp"
 #include "util/diagnostics.hpp"
 #include "util/http.hpp"
-#include "util/log_files.hpp"
 #include "util/nand.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -146,29 +145,6 @@ void keep_log_lines()
         const unsigned l = (unsigned)level;
         session_log::add(std::chrono::system_clock::to_time_t(when), (int)ms, l < 5 ? LEVELS[l] : '?', text);
     });
-}
-
-// The shims for the layouts of earlier versions (util/data_move.hpp,
-// log_files::migrate), before anything is written to the data folder: the
-// session file goes to the logs/ they leave. What one system keeps waits for
-// its key: nand_migration().
-void start_up_migrations()
-{
-#ifdef __SWITCH__
-    // The data folder of the versions that kept it next to the .nro.
-    if (const size_t moved = data_move::run(data_move::old_dir(), paths::data_dir()))
-        brls::Logger::info("start-up: {} entries moved from {} to {}", moved, data_move::old_dir(), paths::data_dir());
-#endif
-    // logs/ before its subfolders (reports/, crashes/, uploads/, play_timer/).
-    log_files::migrate(paths::logs_dir());
-}
-
-// What the versions before the per-system folders kept for every system,
-// to this one's: the first system started takes it. After paths::set_nand().
-void nand_migration()
-{
-    if (const size_t moved = data_move::to_nand(paths::data_dir(), paths::nand_dir()))
-        brls::Logger::info("start-up: {} entries moved to {}", moved, paths::nand_dir());
 }
 
 // This run's session file, and a crash file for the run before it when it
@@ -317,7 +293,7 @@ void select_nand_and_log_system()
     paths::set_nand(nand::key(storage == SysStorage_SysMMC   ? nand::Storage::SysMMC
                               : storage == SysStorage_EmuMMC ? nand::Storage::EmuMMC
                                                              : nand::Storage::Unknown));
-    nand_migration();
+    migration_flow::for_system();
     const std::string system = system_line(si);
     brls::Logger::info("start-up: {}, {}", build_name(), system);
     crash_report::prepare(paths::crashes_dir(), build_name(), system, session_log::current_name());
@@ -445,7 +421,7 @@ int main(int argc, char* argv[])
     std::set_terminate(on_terminate);
     app::set_self_path(argc > 0 ? argv[0] : nullptr);
 
-    start_up_migrations();
+    migration_flow::at_start();
     startup_mark(StartupStep_Migrations);
     start_session();
     startup_mark(StartupStep_Session);

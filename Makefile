@@ -237,6 +237,7 @@ sim_backend_CFLAGS := -std=gnu11 -Isource/core -fprofile-update=atomic
 sim_backend_LIBS   := -pthread
 frame_stats_SRC   := source/util/paths.cpp source/util/frame_stats.cpp tests/frame_stats/test.cpp
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
+migrations_SRC   := source/util/paths.cpp source/util/date.cpp source/util/update.cpp source/util/migrations.cpp tests/migrations/test.cpp
 
 TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))
 TEST_PROGRAMS := $(addprefix $(TESTOUT)/,$(TESTS))

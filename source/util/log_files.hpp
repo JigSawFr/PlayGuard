@@ -98,7 +98,7 @@ size_t prune(const std::string& dir, const char* prefix, const Limits& limits, s
 //
 // A shim for the builds before 1.0.0 (October 2026), the only ones that
 // wrote this layout: it can go with data_move's (util/data_move.hpp), in the
-// first release after April 2027.
+// first release after April 2027. Run once, as a step of util/migrations.hpp.
 size_t migrate(const std::string& logs_dir);
 
 }   // namespace log_files
