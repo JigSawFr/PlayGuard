@@ -28,7 +28,7 @@
             text="@i18n/playguard/pin_lock/locked_body"
             horizontalAlign="center"
             marginBottom="32"
-            textColor="@theme/brand/note"/>
+            textColor="@theme/cadran/text3"/>
 
         <brls:Button
             id="lock_enter"

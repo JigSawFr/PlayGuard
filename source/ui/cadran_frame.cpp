@@ -65,8 +65,8 @@ void cadran::install_theme()
         t->addColor("brls/highlight/color1", p->hl1);
         t->addColor("brls/highlight/color2", p->hl2);
 #ifndef __SWITCH__
-        // The smoke test's still focus (ui::register_theme_colors): the glow
-        // in the stroke's own colour, so a screenshot does not depend on when.
+        // The smoke test's still focus (PLAYGUARD_SIM_STILL_FOCUS): the glow in
+        // the stroke's own colour, so a screenshot does not depend on when.
         if (sim_env_flag("PLAYGUARD_SIM_STILL_FOCUS")) t->addColor("brls/highlight/color2", p->hl1);
 #endif
         t->addColor("brls/click_pulse", nvgRGBA(0x2E, 0xC4, 0xA6, 38));
@@ -76,12 +76,8 @@ void cadran::install_theme()
         t->addColor("brls/button/default_enabled_text", p->text);
         t->addColor("brls/button/enabled_border_color", p->border);
         t->addColor("brls/button/highlight_enabled_text", p->teal);
-        // The app's status colours and plain values in the boards' inks, so the
-        // list screens (cadran::List) take them as they are.
-        t->addColor("brand/ok", p->teal);
-        t->addColor("brand/warn", p->amber);
-        t->addColor("brand/bad", p->coral);
-        t->addColor("brand/note", p->text3);
+        // A list line's plain value in the second ink, so the list screens
+        // (cadran::List) take it as it is.
         t->addColor("brls/list/listItem_value_color", p->text2);
         t->addColor("cadran/navy", navy);
         t->addColor("cadran/text", p->text);
@@ -110,6 +106,8 @@ void cadran::install_theme()
         t->addColor("cadran/key_bg", p->key_bg);
         t->addColor("cadran/key_fg", p->key_fg);
         t->addColor("cadran/none", nvgRGBA(0, 0, 0, 0));
+        // The empty part of a progress bar, behind a game's missing cover.
+        t->addColor("cadran/well", p == &dark ? nvgRGBA(255, 255, 255, 46) : nvgRGBA(0, 0, 0, 34));
         t->addColor("cadran/bar", p == &dark ? nvgRGB(0x33, 0x48, 0x6B) : nvgRGB(0xB9, 0xC6, 0xDA));
         t->addColor("cadran/bar_today", p == &dark ? nvgRGB(0x5A, 0x71, 0x96) : nvgRGB(0x7E, 0x90, 0xAE));
         // Behind a dialog or a picker: the navy, dimmed. A toast: a card of
@@ -118,6 +116,10 @@ void cadran::install_theme()
         t->addColor("brls/notification/background", p == &dark ? nvgRGBA(0x1A, 0x2A, 0x45, 250) : nvgRGBA(0x0B, 0x14, 0x24, 240));
         t->addColor("brls/notification/text", p == &dark ? p->text : nvgRGB(0xEE, 0xF2, 0xF8));
     }
+#ifndef __SWITCH__
+    // And held where it is (patches/borealis/0009).
+    if (sim_env_flag("PLAYGUARD_SIM_STILL_FOCUS")) brls::setHighlightAnimationStill(true);
+#endif
     brls::Style style = brls::getStyle();
     style.addMetric("brls/applet_frame/header_height", 84.0f);
     // 232 px, not the boards' 196: the console's font is wider than the

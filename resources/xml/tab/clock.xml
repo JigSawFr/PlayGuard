@@ -24,7 +24,7 @@
             <brls:Header title="@i18n/playguard/clock/section_now" marginBottom="8"/>
             <brls:DetailCell id="ck_auto" title="@i18n/playguard/clock/auto"/>
             <brls:DetailCell id="ck_zone" focusable="false" title="@i18n/playguard/clock/zone"/>
-            <brls:Label id="ck_why" text="@i18n/playguard/clock/why" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:Label id="ck_why" text="@i18n/playguard/clock/why" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:Header title="@i18n/playguard/clock/section_server" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="ck_region" title="@i18n/playguard/clock/region"/>
             <brls:DetailCell id="ck_server" title="@i18n/playguard/clock/server"/>
@@ -33,13 +33,13 @@
             <brls:DetailCell id="ck_measure" title="@i18n/playguard/clock/measure"/>
             <brls:Box id="ck_progress" axis="row" alignItems="center" marginTop="10" marginBottom="6" marginLeft="16" marginRight="16">
                 <brls:ProgressSpinner width="30" height="30" marginRight="14"/>
-                <brls:Label id="ck_progress_text" text="" fontSize="20" grow="1.0" textColor="@theme/brand/note"/>
+                <brls:Label id="ck_progress_text" text="" fontSize="20" grow="1.0" textColor="@theme/cadran/text3"/>
             </brls:Box>
             <brls:Box id="ck_result_card" axis="column" alignItems="stretch" marginTop="8" marginBottom="8" marginLeft="10" marginRight="10" cornerRadius="18">
                 <brls:Label id="ck_result_title" text="" fontSize="18" textColor="@theme/cadran/amber" marginBottom="8" visibility="gone"/>
                 <brls:Label id="ck_result" text="" fontSize="16.5"/>
             </brls:Box>
-            <brls:Label id="ck_warning" text="" fontSize="20" marginBottom="8" marginLeft="16" marginRight="16" textColor="@theme/brand/warn"/>
+            <brls:Label id="ck_warning" text="" fontSize="20" marginBottom="8" marginLeft="16" marginRight="16" textColor="@theme/cadran/amber"/>
             <brls:DetailCell id="ck_apply" title="@i18n/playguard/clock/apply"/>
             <brls:DetailCell id="ck_copy" title="@i18n/playguard/clock/copy"/>
             <brls:BooleanCell id="ck_check_at_start" marginTop="24"/>

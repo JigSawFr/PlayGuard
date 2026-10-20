@@ -1679,16 +1679,12 @@
             "custom": "각 설정은 아래에서 선택",
             "up_to": "{}까지의 소프트웨어",
             "any_age": "모든 연령의 소프트웨어",
-            "sns_blocked": "SNS · 제한",
-            "sns_allowed": "SNS · 허용",
-            "sns_unknown": "SNS · —",
-            "comm_blocked": "커뮤니케이션 · 제한",
-            "comm_allowed": "커뮤니케이션 · 허용",
-            "comm_unknown": "커뮤니케이션 · —",
+            "sns": "SNS",
+            "comm": "커뮤니케이션",
             "none": "모든 연령의 소프트웨어, SNS와 커뮤니케이션 허용",
             "to_settings": "설정 보기",
-            "games_blocked": "제한되는 게임 · {}",
-            "games_none": "제한되는 게임 · 없음"
+            "games": "제한되는 게임",
+            "games_none": "없음"
         },
         "clock": {
             "console": "본체",

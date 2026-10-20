@@ -153,6 +153,25 @@ brls::Box* pill(const std::string& text, const char* dot_key)
     return box;
 }
 
+brls::Box* key(const char* letter, float size)
+{
+    brls::Theme theme = brls::Application::getTheme();
+    auto* bubble = new brls::Box(brls::Axis::ROW);
+    bubble->setWidth(size);
+    bubble->setHeight(size);
+    bubble->setCornerRadius(size / 2);
+    bubble->setShrink(0);
+    bubble->setBackgroundColor(theme["cadran/key_bg"]);
+    bubble->setAlignItems(brls::AlignItems::CENTER);
+    bubble->setJustifyContent(brls::JustifyContent::CENTER);
+    auto* text = new CadranDigits();
+    text->setFontSize(12);
+    text->setTextColor(theme["cadran/key_fg"]);
+    text->setText(letter);
+    bubble->addView(text);
+    return bubble;
+}
+
 brls::Box* chip(const std::string& text, float height)
 {
     brls::Theme theme = brls::Application::getTheme();

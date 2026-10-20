@@ -1,8 +1,6 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/console_tab.hpp"
 
-#include <yoga/Yoga.h>
-
 #include "action/fw_gate.hpp"
 #include "action/sys_notes_flow.hpp"
 #include "action/sys_update_flow.hpp"
@@ -14,7 +12,6 @@
 #include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/patches.hpp"
-#include "view/cadran_icon.hpp"
 #include "view/row_icon.hpp"
 
 using namespace brls::literals;
@@ -98,16 +95,9 @@ ConsoleTab::ConsoleTab()
         else ui::info("playguard/tools/compat_ok_info"_i18n);
         return true;
     });
-    if (brls::Box* tiles = this->list.tiles({ { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_hekate", "flag" } }, true)) {
-        // Spaced by the row, not by their margins: hekate's tile comes and goes.
-        for (brls::View* tile : tiles->getChildren()) tile->setMarginRight(0);
-        YGNodeStyleSetGap(tiles->getYGNode(), YGGutterColumn, 12);
+    // What the console runs, as tiles above the rest (first in the XML).
+    if (brls::Box* tiles = this->list.tiles({ { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_hekate", "flag" } }, true))
         tiles->setMarginBottom(20);
-        if (brls::Box* column = tiles->getParent()) {
-            column->removeView(tiles, false);
-            column->addView(tiles, 0);
-        }
-    }
     this->list.apply({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_forwarders", "home" },
                        { "cn_compat", "check" }, { "cn_storage", "folder" }, { "cn_blank", "code" },
                        { "cn_serial", "tag" }, { "cn_patches", "shield" } });
@@ -140,17 +130,13 @@ void ConsoleTab::refresh()
     const std::string compat_value = ui::compat_text(si, &c);
     // Checked: the line's icon says it (a teal check) and no word is needed;
     // anything else, a warning in the value's colour and the words.
-    const bool compat_ok = sysinfo_compat(&si) == SysCompat_Ok;
+    const SysCompat compat_state = sysinfo_compat(&si);
+    const bool compat_ok = compat_state == SysCompat_Ok;
     compat->setDetailText(compat_ok ? "" : compat_value);
     compat->setDetailTextColor(c);
-    if (auto* square = compat->getChildren().empty() ? nullptr : dynamic_cast<brls::Box*>(compat->getChildren()[0])) {
-        brls::Theme theme = brls::Application::getTheme();
-        for (brls::View* v : square->getChildren())
-            if (auto* icon = dynamic_cast<CadranIcon*>(v)) {
-                icon->setIcon(compat_ok ? "check" : "alert");
-                icon->setColor(compat_ok ? theme["cadran/teal"] : c);
-            }
-    }
+    const bool compat_warns = compat_state == SysCompat_UntestedNewer || compat_state == SysCompat_PlayTimerUnsupported;
+    cadran::List::recolor_icon(compat, compat_ok ? "check" : "alert",
+                           compat_ok ? "cadran/teal" : compat_warns ? "cadran/amber" : "cadran/coral");
 
     storage->setDetailText(ui::storage_text(si));
     this->storage_note = ui::other_storage_note(si);

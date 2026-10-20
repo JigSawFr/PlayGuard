@@ -29,7 +29,7 @@ void choose(const char* what, const std::string& stem, std::function<table_expor
         ui::write_later(what, [t, format, failed, stem]() {
             std::string err;
             const std::string path = table_export::save(t, format, paths::exports_dir(), stem, &err);
-            if (path.empty()) ui::error(failed + ": " + err);
+            if (path.empty()) ui::error(failed, err);
             else ui::notify(brls::getStr("playguard/activity/exported", path));
         });
     });

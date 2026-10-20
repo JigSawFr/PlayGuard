@@ -1,10 +1,11 @@
-// cadran_text — the words the Cadran screens take apart before drawing them,
-// with no view: a restriction's line and its state, a week's identical lines
-// as one, a failure's title, reason and code. Translated through ui/tr.hpp, so
-// a host suite checks them against the real catalogs (tests/cadran_text).
+// cadran_text — the words the Cadran screens lay out, with no view: a
+// dialog's table, a week's identical lines as one, a failure's title, reason
+// and code. Translated through ui/tr.hpp, so a host suite checks them against
+// the real catalogs (tests/cadran_text).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
@@ -12,25 +13,33 @@
 namespace cadran_text
 {
 
-// "Communication · restricted" (or "交流・制限") as what it is about and its
-// state: { "Communication", "restricted" }; the whole text and "" when it has
-// no separator. The last separator splits ("A · B · C": { "A · B", "C" }).
-std::pair<std::string, std::string> split_state(const std::string& text);
+// A dialog paragraph that is a table, as its caller built it: the rows, each
+// a label and its value, after a mark that tells cadran::dialog_body (no
+// guessing from the words). `table_rows` reads one back: false for a
+// paragraph that is not one.
+using Rows = std::vector<std::pair<std::string, std::string>>;
+std::string table(const Rows& rows);
+bool table_rows(const std::string& paragraph, Rows* rows);
 
 // A table of five lines or more (a week): the lines that follow each other
 // with the same value as one, their labels joined with " – " ("Monday –
 // Friday"). Fewer lines are kept as they are.
 std::vector<std::pair<std::string, std::string>> group_rows(const std::vector<std::pair<std::string, std::string>>& rows);
 
-// A failure as ui::error() words it: "Could not unlock — error 0x0000C88E:
-// refused by …\n\nIf it happens again, send a report: …" (playguard/error/*).
+// A failure as its dialog shows it (ui::error): what failed as the title, why
+// as the text (the error's hint, first letter in capitals), the code small
+// ("error 0x0000C88E", playguard/error/code) and Send a report when the
+// console's own code says nothing more (not one of PlayGuard's results).
 struct Failure
 {
-    std::string title;    // what failed, before " — " ("" when there is none)
-    std::string reason;   // why, its first letter in capitals
-    std::string code;     // "error 0x0000C88E" ("" when there is none)
-    bool report = false;  // the text said to send a report
+    std::string title;    // "" when there is none
+    std::string reason;
+    std::string code;     // "" for none
+    bool report = false;
 };
-Failure failure(const std::string& text);
+// `what` failed with `rc`; `hint` its words (playguard/error/<key>, "" when
+// none is known); `app_result`: one of PlayGuard's own results (NXM_*),
+// which explain themselves and have no code to show.
+Failure failure(const std::string& what, const std::string& hint, uint32_t rc, bool app_result);
 
 }   // namespace cadran_text

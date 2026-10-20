@@ -38,7 +38,7 @@ void PlayTimerAdvancedActivity::onContentAvailable()
     diag->registerClickAction([](brls::View*) {
         std::string err;
         const std::string path = diagnostic::save(diagnostic::current_report(), &err);
-        if (path.empty()) ui::error("playguard/toast/diag_err"_i18n + ": " + err);
+        if (path.empty()) ui::error("playguard/toast/diag_err"_i18n, err);
         else ui::notify(brls::getStr("playguard/toast/diag_saved", path));
         return true;
     });

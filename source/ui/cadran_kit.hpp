@@ -54,6 +54,10 @@ class Mark : public brls::View
 // border.
 brls::Box* pill(const std::string& text, const char* dot_key);
 
+// A controller key as the boards draw it: its letter ("A", "Y", "L") in a
+// round bubble, `size` px across, no margins.
+brls::Box* key(const char* letter, float size = 24);
+
 // A rounded chip with a text in the display face (an amount, a period…).
 brls::Box* chip(const std::string& text, float height = 48);
 

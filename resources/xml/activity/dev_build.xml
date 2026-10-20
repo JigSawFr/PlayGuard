@@ -33,7 +33,7 @@
             <brls:Box id="dbd_facts" width="auto" height="auto" axis="column" alignItems="stretch"
                 cornerRadius="10" paddingTop="10" paddingBottom="10" paddingLeft="18" paddingRight="18"
                 marginBottom="14"/>
-            <brls:Label id="dbd_warning" text="" fontSize="18" marginBottom="18" textColor="@theme/brand/note"/>
+            <brls:Label id="dbd_warning" text="" fontSize="18" marginBottom="18" textColor="@theme/cadran/text3"/>
             <brls:Box width="auto" height="auto" axis="row">
                 <brls:Button id="dbd_install" style="primary" text="@i18n/playguard/dev_build/install" grow="1.0" marginRight="12"/>
                 <brls:Button id="dbd_github" style="default" text="@i18n/playguard/dev_build/open_github"/>

@@ -29,14 +29,14 @@
             paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
             paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
 
-            <brls:Label id="dash_applet" text="@i18n/playguard/dashboard/applet" fontSize="20" marginBottom="12" textColor="@theme/brand/warn"/>
+            <brls:Label id="dash_applet" text="@i18n/playguard/dashboard/applet" fontSize="20" marginBottom="12" textColor="@theme/cadran/amber"/>
             <brls:Box id="dash_top" axis="column" alignItems="stretch">
                 <brls:Box axis="row" alignItems="center" marginBottom="18">
                     <PtRing id="dash_ring" width="248" height="248" marginRight="36"/>
                     <brls:Box id="dash_today_text" axis="column" alignItems="flexStart" grow="1.0" width="0">
                         <brls:Label id="dash_kicker" text="" fontSize="16" textColor="@theme/cadran/text2" marginBottom="10"/>
                         <brls:Label id="dash_gauge_text" text="" fontSize="30" textColor="@theme/cadran/text"/>
-                        <brls:Label id="dash_not_counting" text="@i18n/playguard/play_timer/not_counting" fontSize="16.5" marginTop="6" textColor="@theme/brand/warn"/>
+                        <brls:Label id="dash_not_counting" text="@i18n/playguard/play_timer/not_counting" fontSize="16.5" marginTop="6" textColor="@theme/cadran/amber"/>
                         <brls:Box id="dash_actions" axis="row" alignItems="center" alignSelf="stretch" marginTop="14" marginBottom="12">
                             <brls:Button id="dash_relock" style="primary" text="@i18n/playguard/security/banner_action" fontSize="19" height="56" cornerRadius="28" highlightCornerRadius="30" paddingLeft="22" paddingRight="22" grow="1.0" visibility="gone"/>
                             <brls:Button id="dash_setup" style="primary" text="@i18n/playguard/cadran/today/setup" fontSize="19" height="56" cornerRadius="28" highlightCornerRadius="30" paddingLeft="22" paddingRight="22" grow="1.0" visibility="gone"/>

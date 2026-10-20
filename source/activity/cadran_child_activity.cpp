@@ -12,7 +12,7 @@
 #include "activity/main_activity.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
-#include "view/cadran_digits.hpp"
+#include "ui/cadran_kit.hpp"
 
 using namespace brls::literals;
 
@@ -44,20 +44,9 @@ void CadranChildActivity::onContentAvailable()
         keys->setMarginRight(16);
         for (const auto& [letter, text] : { std::pair<const char*, std::string>{ "A", "playguard/cadran/child/back"_i18n },
                                             { "Y", "playguard/cadran/child/extra"_i18n } }) {
-            auto* bubble = new brls::Box(brls::Axis::ROW);
-            bubble->setWidth(24);
-            bubble->setHeight(24);
-            bubble->setCornerRadius(12);
-            bubble->setBackgroundColor(theme["cadran/key_bg"]);
-            bubble->setAlignItems(brls::AlignItems::CENTER);
-            bubble->setJustifyContent(brls::JustifyContent::CENTER);
+            brls::Box* bubble = cadran::kit::key(letter);
             bubble->setMarginLeft(18);
             bubble->setMarginRight(8);
-            auto* key = new CadranDigits();
-            key->setFontSize(12);
-            key->setTextColor(theme["cadran/key_fg"]);
-            key->setText(letter);
-            bubble->addView(key);
             keys->addView(bubble);
             auto* label = new brls::Label();
             label->setText(text);

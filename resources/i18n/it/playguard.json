@@ -1679,16 +1679,12 @@
             "custom": "ogni impostazione si sceglie sotto",
             "up_to": "software fino a {}",
             "any_age": "software per tutte le età",
-            "sns_blocked": "Social network · limitati",
-            "sns_allowed": "Social network · consentiti",
-            "sns_unknown": "Social network · —",
-            "comm_blocked": "Comunicazione · limitata",
-            "comm_allowed": "Comunicazione · consentita",
-            "comm_unknown": "Comunicazione · —",
+            "sns": "Social network",
+            "comm": "Comunicazione",
             "none": "software per tutte le età, social network e comunicazione consentiti",
             "to_settings": "Le sue impostazioni",
-            "games_blocked": "Giochi bloccati · {}",
-            "games_none": "Giochi bloccati · nessuno"
+            "games": "Giochi bloccati",
+            "games_none": "nessuno"
         },
         "clock": {
             "console": "Console",

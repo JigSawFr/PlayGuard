@@ -14,6 +14,7 @@
 #include "action/pt_flow_internal.hpp"
 #include "action/pt_logic.hpp"
 #include "core/platform.h"
+#include "ui/cadran_text.hpp"
 #include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -65,17 +66,16 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
     const bool unlock = pt_logic::needs_unlock(pt);
     if (!body.empty() || unlock) body = with_link_note(body);
 
-    // The days that change as a table ("Monday: 2 h → 2 h 30") in place of
-    // the week (cadran::dialog_body draws "label: value" lines so).
-    std::string changes;
+    // The days that change as a table (Monday | 2 h → 2 h 30) in place of
+    // the week.
+    cadran_text::Rows rows;
     if (new_days && pt.valid)
         for (int i = 1; i <= 7; i++) {
             const int d = i % 7;   // Monday first
             if (new_days[d] == pt.day_min[d]) continue;
-            changes += (changes.empty() ? "" : "\n") +
-                       brls::getStr("playguard/common/line", ui::day_name(d),
-                                    ui::fmt_minutes(pt.day_min[d]) + " → " + ui::fmt_minutes(new_days[d]));
+            rows.push_back({ ui::day_name(d), ui::fmt_minutes(pt.day_min[d]) + " → " + ui::fmt_minutes(new_days[d]) });
         }
+    const std::string changes = rows.empty() ? "" : cadran_text::table(rows);
     const auto titled = [&title, &changes](const std::string& text) {
         const std::string with = changes.empty() ? text : text.empty() ? changes : text + "\n\n" + changes;
         return title.empty() ? with : title + "\n\n" + with;
@@ -100,13 +100,13 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
         // without that record saved, no unlock (as for the extra time).
         if (!set_relock_pending(true)) {
             config::get().relock_pending = false;   // not on the card: not in memory either
-            ui::error("playguard/play_timer/gate/failed"_i18n + " — " + ui::rc_text(NXM_RC_NOT_SAVED));
+            ui::error("playguard/play_timer/gate/failed"_i18n, NXM_RC_NOT_SAVED);
             return;
         }
         Result rc = pctl_unlock_restriction_temporarily();
         if (R_FAILED(rc)) {
             settle_failed_unlock();   // not unlocked, or locked again by the service layer
-            ui::error("playguard/play_timer/gate/failed"_i18n + " — " + ui::rc_text(rc));
+            ui::error("playguard/play_timer/gate/failed"_i18n, rc);
             return;
         }
         write(true);
@@ -191,11 +191,10 @@ void finish_write(Result rc, bool did_unlock, const std::string& ok_text,
             ui::notify(ok_text + " " + "playguard/toast/relocked"_i18n, ui::Toast::Done);
         } else {
             // One dialog says it all: what failed, and what went through.
-            std::string text;
-            if (R_FAILED(rc)) text = error_prefix + " — " + ui::rc_text(rc);
-            else if (!ok_text.empty()) text = ok_text;
-            if (R_FAILED(relock)) text += (text.empty() ? "" : "\n\n") + "playguard/toast/relock_err"_i18n + " — " + ui::rc_text(relock);
-            ui::error(text);
+            if (R_FAILED(relock))
+                ui::error("playguard/toast/relock_err"_i18n, relock,
+                          R_FAILED(rc) ? error_prefix + " — " + ui::rc_text(rc, false) : ok_text);
+            else ui::error(error_prefix, rc);
         }
         if (refresh) refresh();
         return;

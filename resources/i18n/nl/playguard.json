@@ -1679,16 +1679,12 @@
             "custom": "elke instelling kies je hieronder",
             "up_to": "software tot {}",
             "any_age": "software voor elke leeftijd",
-            "sns_blocked": "Sociale media · beperkt",
-            "sns_allowed": "Sociale media · toegestaan",
-            "sns_unknown": "Sociale media · —",
-            "comm_blocked": "Communicatie · beperkt",
-            "comm_allowed": "Communicatie · toegestaan",
-            "comm_unknown": "Communicatie · —",
+            "sns": "Sociale media",
+            "comm": "Communicatie",
             "none": "software voor elke leeftijd, sociale media en communicatie toegestaan",
             "to_settings": "De instellingen",
-            "games_blocked": "Geblokkeerde games · {}",
-            "games_none": "Geblokkeerde games · geen"
+            "games": "Geblokkeerde games",
+            "games_none": "geen"
         },
         "clock": {
             "console": "Console",

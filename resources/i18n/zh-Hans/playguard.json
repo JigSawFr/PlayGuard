@@ -1679,16 +1679,12 @@
             "custom": "每项设置在下方选择",
             "up_to": "至 {} 的软件",
             "any_age": "所有年龄的软件",
-            "sns_blocked": "社交媒体 · 受限",
-            "sns_allowed": "社交媒体 · 允许",
-            "sns_unknown": "社交媒体 · —",
-            "comm_blocked": "交流 · 受限",
-            "comm_allowed": "交流 · 允许",
-            "comm_unknown": "交流 · —",
+            "sns": "社交媒体",
+            "comm": "交流",
             "none": "所有年龄的软件，允许社交媒体与交流",
             "to_settings": "查看设置",
-            "games_blocked": "被限制的游戏 · {}",
-            "games_none": "被限制的游戏 · 无"
+            "games": "被限制的游戏",
+            "games_none": "无"
         },
         "clock": {
             "console": "主机",

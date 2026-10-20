@@ -266,9 +266,9 @@ void RestrictionsTab::choose_level(int index)
 std::string RestrictionsTab::settings_text(const PctlCustomSettings& s) const
 {
     const std::string org = this->st.rating_org_ok ? std::string(" (") + pctl_rating_org_name(this->st.rating_org) + ")" : "";
-    return brls::getStr("playguard/common/line", "playguard/restrictions/age"_i18n, ui::age_text(s.rating_age) + org) + "\n" +
-           brls::getStr("playguard/common/line", "playguard/restrictions/sns"_i18n, ui::yes_no(s.sns_post_restriction)) + "\n" +
-           brls::getStr("playguard/common/line", "playguard/restrictions/comm"_i18n, ui::yes_no(s.free_communication_restriction));
+    return cadran_text::table({ { "playguard/restrictions/age"_i18n, ui::age_text(s.rating_age) + org },
+                                { "playguard/restrictions/sns"_i18n, ui::yes_no(s.sns_post_restriction) },
+                                { "playguard/restrictions/comm"_i18n, ui::yes_no(s.free_communication_restriction) } });
 }
 
 void RestrictionsTab::write_custom(const PctlCustomSettings& s, const std::string& loosens)
@@ -342,16 +342,14 @@ void RestrictionsTab::refresh()
 
 namespace
 {
-// "Communication · restricted" (or "交流・制限"): what it is about in
-// `name`; its state as `icon` (a padlock in coral when `restricts`, a check
-// in teal), the words after the separator kept only when `words` (a count,
-// or "—" when unknown, the icon then hidden).
-void line(brls::Label* name, brls::Label* state, CadranIcon* icon, const std::string& text, bool known,
-          bool restricts, bool words)
+// What a line is about in `name`; its state as `icon` (a padlock in coral
+// when `restricts`, a check in teal) and `words` beside it ("—" when not
+// `known`, the icon then hidden; a count; "" for none).
+void line(brls::Label* name, brls::Label* state, CadranIcon* icon, const std::string& what, bool known,
+          bool restricts, const std::string& words = "")
 {
-    const auto [what, how] = cadran_text::split_state(text);
     name->setText(what);
-    state->setText(!known || words ? how : "");
+    state->setText(known ? words : "\u2014");
     ui::set_visible(state, !state->getFullText().empty());
     icon->setIcon(restricts ? "lock" : "check");
     icon->setColor(brls::Application::getTheme()[restricts ? "cadran/coral_fill" : "cadran/teal_fill"]);
@@ -395,25 +393,16 @@ void RestrictionsTab::show_tiles(bool custom)
             ? brls::getStr("playguard/cadran/restrictions/up_to", (org.empty() ? "—" : org) + "\u00A0" + std::to_string((int)s.rating_age))
             : "playguard/cadran/restrictions/any_age"_i18n;
         t.note->setText(t.level == PctlSafetyLevel_Custom ? rated + "\n" + "playguard/cadran/restrictions/custom"_i18n : rated);
-        line(t.sns, t.sns_state, t.sns_icon,
-             !known ? "playguard/cadran/restrictions/sns_unknown"_i18n
-             : s.sns_post_restriction ? "playguard/cadran/restrictions/sns_blocked"_i18n
-                                      : "playguard/cadran/restrictions/sns_allowed"_i18n,
-             known, s.sns_post_restriction, false);
-        line(t.comm, t.comm_state, t.comm_icon,
-             !known ? "playguard/cadran/restrictions/comm_unknown"_i18n
-             : s.free_communication_restriction ? "playguard/cadran/restrictions/comm_blocked"_i18n
-                                                : "playguard/cadran/restrictions/comm_allowed"_i18n,
-             known, s.free_communication_restriction, false);
+        line(t.sns, t.sns_state, t.sns_icon, "playguard/cadran/restrictions/sns"_i18n, known, s.sns_post_restriction);
+        line(t.comm, t.comm_state, t.comm_icon, "playguard/cadran/restrictions/comm"_i18n, known,
+             s.free_communication_restriction);
         // The installed games it blocks, once a game check was made.
         size_t n = 0, of = 0;
         const bool counted = known && rating_flow::count_blocked(st, s.rating_age, &n, &of);
         ui::set_visible(t.games_row, counted);
         if (counted) {
-            line(t.games, t.games_state, t.games_icon,
-                 n ? brls::getStr("playguard/cadran/restrictions/games_blocked", (int)n)
-                   : "playguard/cadran/restrictions/games_none"_i18n,
-                 true, n > 0, true);
+            line(t.games, t.games_state, t.games_icon, "playguard/cadran/restrictions/games"_i18n, true, n > 0,
+                 n ? std::to_string(n) : "playguard/cadran/restrictions/games_none"_i18n);
         }
     }
 }

@@ -29,7 +29,7 @@
             fontSize="20"
             horizontalAlign="center"
             marginBottom="12"
-            textColor="@theme/brand/note"/>
+            textColor="@theme/cadran/text3"/>
 
         <brls:Label
             id="error_fw"
@@ -37,7 +37,7 @@
             fontSize="20"
             horizontalAlign="center"
             marginBottom="32"
-            textColor="@theme/brand/note"/>
+            textColor="@theme/cadran/text3"/>
 
         <brls:Label
             text="@i18n/playguard/init_error/body"

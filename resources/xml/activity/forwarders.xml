@@ -27,15 +27,15 @@
             paddingBottom="@style/brls/sidebar/padding_bottom"
             paddingLeft="@style/brls/sidebar/padding_left">
 
-            <brls:Label id="fw_note" text="@i18n/playguard/forwarders/intro" fontSize="20" marginBottom="10" textColor="@theme/brand/note"/>
-            <brls:Label id="fw_patches" text="" fontSize="20" marginBottom="10" visibility="gone" textColor="@theme/brand/warn"/>
+            <brls:Label id="fw_note" text="@i18n/playguard/forwarders/intro" fontSize="20" marginBottom="10" textColor="@theme/cadran/text3"/>
+            <brls:Label id="fw_patches" text="" fontSize="20" marginBottom="10" visibility="gone" textColor="@theme/cadran/amber"/>
             <brls:Header title="@i18n/playguard/forwarders/section_list" marginTop="14" marginBottom="8"/>
             <brls:Box id="fw_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
-            <brls:Label id="fw_empty" text="@i18n/playguard/forwarders/none" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:Label id="fw_empty" text="@i18n/playguard/forwarders/none" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:Header title="@i18n/playguard/forwarders/section_add" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="fw_self" title="PlayGuard"/>
             <brls:DetailCell id="fw_other" title="@i18n/playguard/forwarders/other"/>
-            <brls:Label id="fw_game_note" text="@i18n/playguard/forwarders/game_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/brand/note"/>
+            <brls:Label id="fw_game_note" text="@i18n/playguard/forwarders/game_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
         </brls:Box>
 

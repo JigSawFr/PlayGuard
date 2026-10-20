@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "ui/cadran_text.hpp"
 
+#include <fmt/format.h>
+
 #include "ui/tr.hpp"
 
 using namespace brls::literals;
@@ -8,13 +10,35 @@ using namespace brls::literals;
 namespace cadran_text
 {
 
-std::pair<std::string, std::string> split_state(const std::string& text)
+namespace
 {
-    for (const char* sep : { " · ", "・" }) {
-        const size_t at = text.rfind(sep);
-        if (at != std::string::npos) return { text.substr(0, at), text.substr(at + std::string(sep).size()) };
+// ASCII's record and unit separators: in no catalog's words.
+constexpr char TABLE_MARK = '\x1E';
+constexpr char CELL_MARK  = '\x1F';
+}   // namespace
+
+std::string table(const Rows& rows)
+{
+    std::string out(1, TABLE_MARK);
+    for (size_t i = 0; i < rows.size(); i++)
+        out += (i ? "\n" : "") + rows[i].first + CELL_MARK + rows[i].second;
+    return out;
+}
+
+bool table_rows(const std::string& paragraph, Rows* rows)
+{
+    if (paragraph.empty() || paragraph[0] != TABLE_MARK) return false;
+    rows->clear();
+    size_t from = 1;
+    while (from <= paragraph.size()) {
+        size_t end = paragraph.find('\n', from);
+        if (end == std::string::npos) end = paragraph.size();
+        const std::string line = paragraph.substr(from, end - from);
+        const size_t cell = line.find(CELL_MARK);
+        if (cell != std::string::npos) rows->push_back({ line.substr(0, cell), line.substr(cell + 1) });
+        from = end + 1;
     }
-    return { text, "" };
+    return !rows->empty();
 }
 
 std::vector<std::pair<std::string, std::string>> group_rows(const std::vector<std::pair<std::string, std::string>>& rows)
@@ -30,35 +54,16 @@ std::vector<std::pair<std::string, std::string>> group_rows(const std::vector<st
     return runs;
 }
 
-Failure failure(const std::string& text)
+Failure failure(const std::string& what, const std::string& hint, uint32_t rc, bool app_result)
 {
     Failure f;
-    std::string rest = text;
-    const std::string next = "\n\n" + "playguard/error/next_step"_i18n;
-    const size_t step = rest.find(next);
-    f.report = step != std::string::npos;
-    if (f.report) rest.erase(step, next.size());
-    const std::string dash = " — ";
-    const size_t at = rest.find(dash);
-    if (at != std::string::npos && at <= 120) {
-        f.title = rest.substr(0, at);
-        rest = rest.substr(at + dash.size());
+    f.title = what;
+    f.reason = hint;
+    if (!f.reason.empty() && f.reason[0] >= 'a' && f.reason[0] <= 'z') f.reason[0] = (char)(f.reason[0] - 'a' + 'A');
+    if (!app_result) {
+        f.code = brls::getStr("playguard/error/code", fmt::format("0x{:08X}", (unsigned)rc));
+        f.report = true;
     }
-    const size_t hex = rest.find("0x");
-    if (hex != std::string::npos && hex + 10 <= rest.size()) {
-        const std::string number = rest.substr(hex, 10);
-        const std::string with_hint = brls::getStr("playguard/error/code_hint", number, "");
-        const std::string alone = brls::getStr("playguard/error/code", number);
-        if (rest.compare(0, with_hint.size(), with_hint) == 0 && rest.size() > with_hint.size()) {
-            f.code = alone;
-            rest = rest.substr(with_hint.size());
-            if (rest[0] >= 'a' && rest[0] <= 'z') rest[0] = (char)(rest[0] - 'a' + 'A');
-        } else if (rest == alone) {
-            f.code = alone;
-            rest.clear();
-        }
-    }
-    f.reason = rest;
     return f;
 }
 

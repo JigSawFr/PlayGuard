@@ -11,7 +11,7 @@
     alignItems="stretch"
     marginBottom="16">
 
-    <brls:Label id="pt_alert" text="" fontSize="20" marginTop="6" textColor="@theme/brand/bad"/>
-    <brls:Label id="pt_health" text="@i18n/playguard/play_timer/not_counting" fontSize="20" marginTop="6" textColor="@theme/brand/warn"/>
+    <brls:Label id="pt_alert" text="" fontSize="20" marginTop="6" textColor="@theme/cadran/coral"/>
+    <brls:Label id="pt_health" text="@i18n/playguard/play_timer/not_counting" fontSize="20" marginTop="6" textColor="@theme/cadran/amber"/>
 
 </brls:Box>

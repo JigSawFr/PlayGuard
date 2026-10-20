@@ -279,6 +279,9 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
     auto* row = new brls::Box(brls::Axis::ROW);
     row->setAlignItems(brls::AlignItems::STRETCH);
     row->setMarginBottom(12);
+    // Spaced by the row, not by the tiles' margins: a hidden tile (hekate
+    // without its update.bin) leaves no gap behind.
+    YGNodeStyleSetGap(row->getYGNode(), YGGutterColumn, 12);
     this->box->addView(row, at);
     for (size_t i = 0; i < cells.size(); i++) {
         auto* cell = dynamic_cast<brls::DetailCell*>(this->tab->getView(cells[i].first));
@@ -294,7 +297,7 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         cell->setMinHeight(status ? 128 : 120);
         if (status) this->readings.push_back(cell);
         cell->setPadding(20, 22, 18, 22);
-        cell->setMarginRight(i + 1 < cells.size() ? 12 : 0);
+        cell->setMarginRight(0);
         cell->setCornerRadius(18);
         cell->setHighlightCornerRadius(18);
         cell->setBackgroundColor(theme["cadran/surf"]);
@@ -438,6 +441,19 @@ void cadran::List::row(brls::DetailCell* cell, const char* icon, bool alone)
         cell->setBorderThickness(1);
         cell->setMarginBottom(8);
     }
+}
+
+void cadran::List::recolor_icon(brls::DetailCell* cell, const char* icon, const char* color_key, const char* square_key)
+{
+    auto* square = cell && !cell->getChildren().empty() ? dynamic_cast<brls::Box*>(cell->getChildren()[0]) : nullptr;
+    if (!square) return;   // a row without its icon
+    brls::Theme theme = brls::Application::getTheme();
+    square->setBackgroundColor(theme[square_key ? square_key : "cadran/surf2"]);
+    for (brls::View* v : square->getChildren())
+        if (auto* glyph = dynamic_cast<CadranIcon*>(v)) {
+            if (icon) glyph->setIcon(icon);
+            glyph->setColor(theme[color_key]);
+        }
 }
 
 brls::Box* cadran::List::rows_in(brls::Box* list)

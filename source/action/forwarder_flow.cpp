@@ -93,7 +93,7 @@ bool install(const forwarders::Made& m, bool self)
     nro::Info info;
     std::string error;
     if (!assets_of(m.nro, self, info, error)) {
-        ui::error("playguard/forwarders/add_err"_i18n + " — " + error);
+        ui::error("playguard/forwarders/add_err"_i18n, error);
         return false;
     }
     const ForwarderSpec spec = {
@@ -165,7 +165,7 @@ void create(const std::string& sd_path, std::function<void(bool)> done)
     std::string error;
     const std::string sdmc = nro::sdmc_path(sd_path);
     if (!assets_of(sdmc, false, info, error)) {
-        ui::error("playguard/forwarders/add_err"_i18n + " — " + error);
+        ui::error("playguard/forwarders/add_err"_i18n, error);
         if (done) done(false);
         return;
     }
@@ -198,7 +198,7 @@ void create_self(std::function<void(bool)> done)
 {
     const std::string sdmc = self_nro();
     if (sdmc.empty()) {
-        ui::error("playguard/forwarders/add_err"_i18n + " — " + "playguard/forwarders/self_unknown"_i18n);
+        ui::error("playguard/forwarders/add_err"_i18n, "playguard/forwarders/self_unknown"_i18n);
         if (done) done(false);
         return;
     }
@@ -252,7 +252,7 @@ void forget(const forwarders_logic::Row& row, std::function<void(bool)> done)
     std::string err;
     const bool ok = forwarders::forget(row.id, &err);
     if (ok) ui::notify(brls::getStr("playguard/forwarders/forgotten", row.name), ui::Toast::Done);
-    else ui::error("playguard/forwarders/delete_err"_i18n + " — " + err);
+    else ui::error("playguard/forwarders/delete_err"_i18n, err);
     if (done) done(ok);
 }
 

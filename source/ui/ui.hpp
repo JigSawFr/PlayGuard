@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "ui/format_text.hpp"
+#include "ui/cadran_text.hpp"
 #include "util/patches.hpp"
 #include "util/pctl_ops_c.hpp"
 
@@ -20,12 +21,9 @@ class MainActivity;
 namespace ui
 {
 
-// The colours cadran::install_theme() leaves out (brand/gauge_track) and the
-// smoke test's still focus. The status colours below are the boards' inks,
-// one shade per theme (>= 4.5:1). register_theme_colors() and
-// cadran::install_theme() must run before the first lookup (borealis aborts
-// on an unknown theme key).
-void     register_theme_colors();
+// The status colours below are the boards' inks (cadran::install_theme(),
+// which must run before the first lookup: borealis aborts on an unknown
+// theme key), one shade per theme (>= 4.5:1).
 // On the console: the system's Latin / Japanese font as the default font of
 // every label, the Chinese one only as a fallback (except for Chinese). Right
 // after createWindow(), before the first label exists.
@@ -108,9 +106,16 @@ void notify(const std::string& text, Toast kind = Toast::Info);
 // toast (a toast is gone before "error 0x…" is read). Next frame, so it can
 // be called from a dialog button. Logged as "error: " for the smoke test.
 void error(const std::string& text);
-// The dialog error() opens: what failed as its title (before " — "), why as
-// its text, the error code small, "Send a report" when the text says to.
-void failure(const std::string& text);
+// `what` failed with `rc`: `what` as the dialog's title, the error's hint as
+// its text, its code small, and Send a report for a console code ("" for
+// `what`: the hint alone). `before`: what else happened, said first (what
+// went through, or another failure).
+void error(const std::string& what, Result rc, const std::string& before = "");
+// `what` failed because of `why` (a path, a message from the network…).
+void error(const std::string& what, const std::string& why);
+// The dialog the three open, now: the title, the reason, the code small, and
+// Send a report (OK focused) when `f.report`.
+void show_failure(const cadran_text::Failure& f);
 // Saves the settings (config::snapshot, then config::write off the UI
 // thread: write_later): `saved_text` as a toast once it is on the SD card,
 // `failed_text` (default: the config_err toast) when the card refused it.

@@ -80,7 +80,7 @@ HelpTab::HelpTab()
     export_cell->registerClickAction([](brls::View*) {
         std::string err;
         std::string path = diagnostic::save(diagnostic::current_report(), &err);
-        if (path.empty()) ui::error("playguard/toast/diag_err"_i18n + ": " + err);
+        if (path.empty()) ui::error("playguard/toast/diag_err"_i18n, err);
         else ui::notify(brls::getStr("playguard/toast/diag_saved", path));
         return true;
     });

@@ -11,6 +11,7 @@
 #include "activity/main_activity.hpp"
 #include "tab/tab_base.hpp"
 #include "ui/cadran_modal.hpp"
+#include "ui/cadran_text.hpp"
 #include "util/config.hpp"
 #include "util/worker_threads.hpp"
 
@@ -143,7 +144,28 @@ void notify(const std::string& text, Toast kind)
 void error(const std::string& text)
 {
     brls::Logger::info("error: {}", text);
-    brls::sync([text]() { failure(text); });
+    cadran_text::Failure f;
+    f.reason = text;
+    brls::sync([f]() { show_failure(f); });
+}
+
+void error(const std::string& what, Result rc, const std::string& before)
+{
+    // Logged as the text the dialog says, for the smoke test.
+    brls::Logger::info("error: {}{}", before.empty() ? "" : before + " / ",
+                       what.empty() ? rc_text(rc) : what + " \u2014 " + rc_text(rc));
+    cadran_text::Failure f = cadran_text::failure(what, hint_for(rc), (uint32_t)rc, NXM_IS_APP_RESULT(rc));
+    if (!before.empty()) f.reason = f.reason.empty() ? before : before + "\n\n" + f.reason;
+    brls::sync([f]() { show_failure(f); });
+}
+
+void error(const std::string& what, const std::string& why)
+{
+    brls::Logger::info("error: {}: {}", what, why);
+    cadran_text::Failure f;
+    f.title = what;
+    f.reason = why;
+    brls::sync([f]() { show_failure(f); });
 }
 
 void replace_screen(brls::Activity* next)
