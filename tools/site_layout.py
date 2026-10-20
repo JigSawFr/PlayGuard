@@ -15,6 +15,12 @@ on a small phone (320), a phone in landscape (874x402), a tablet (1024) and
 a desktop (1440). The images and the video are not loaded: their boxes are
 in the pages (width, height), and the check takes seconds, not minutes.
 
+With SITE_AXE set to axe-core's axe.min.js, also what axe finds against WCAG
+2.2 A and AA (contrast, names, labels, landmarks, keyboard), on an iPhone:
+every English page in both themes, and each other language's home page (its
+texts, not its layout nor its colours, differ). Every page in every language
+would take a minute more; this, about fifteen seconds.
+
 Usage: tools/site_layout.py <site-dir>   (needs Playwright for Python with
 Chromium; SITE_LAYOUT_JOBS pages at once, 6 by default)
 """
@@ -29,6 +35,8 @@ from playwright.async_api import async_playwright
 
 SITE = sys.argv[1]
 JOBS = int(os.environ.get("SITE_LAYOUT_JOBS", "6"))
+AXE = os.environ.get("SITE_AXE")
+AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
 
 # (name, width, height, a phone): the screens.
 PHONE = ("iPhone", 402, 874, True)
@@ -74,7 +82,8 @@ def pages():
             every.append(os.path.relpath(root, SITE).replace(os.sep, "/").removeprefix(".") + "/")
     every = sorted(p.lstrip("/") for p in every)
     widest = [f + p for f in folders for p in WIDEST if os.path.isfile(os.path.join(SITE, f + p, "index.html"))]
-    return every, widest
+    english = [p for p in every if p.split("/", 1)[0] + "/" not in folders[1:]]
+    return every, widest, english
 
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
@@ -119,8 +128,36 @@ async def check(browser, base, screen, paths, failures):
     return len(paths)
 
 
+async def accessible(browser, base, theme, paths, failures):
+    """axe's violations on each page, in the light or the dark theme."""
+    name, width, height, phone = PHONE
+    # axe is a script added to the page, which the site's CSP refuses.
+    context = await browser.new_context(viewport={"width": width, "height": height}, is_mobile=phone,
+                                        has_touch=phone, color_scheme=theme, bypass_csp=True)
+    await context.route("**/*.{png,webp,jpg,jpeg,gif,mp4}", lambda route: route.abort())
+    source = open(AXE, encoding="utf-8").read()
+    queue = list(paths)
+
+    async def worker():
+        page = await context.new_page()
+        while queue:
+            path = queue.pop()
+            await page.goto(base + path, wait_until="load")
+            await page.add_script_tag(content=source)
+            found = await page.evaluate("""(tags) => axe.run(document, {
+                runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })
+              .then((r) => r.violations.map((v) => ({ id: v.id, help: v.help,
+                where: v.nodes.slice(0, 3).map((n) => n.target.join(' ')) })))""", AXE_TAGS)
+            for v in found:
+                failures.append(f"axe, {theme} theme, /{path}: {v['id']} ({v['help']}): {', '.join(v['where'])}")
+
+    await asyncio.gather(*(worker() for _ in range(min(JOBS, len(paths)))))
+    await context.close()
+    return len(paths)
+
+
 async def main():
-    every, widest = pages()
+    every, widest, english = pages()
     base = serve()
     failures = []
     async with async_playwright() as p:
@@ -128,11 +165,15 @@ async def main():
         count = await check(browser, base, PHONE, every, failures)
         for screen in OTHERS:
             count += await check(browser, base, screen, widest, failures)
+        if AXE:
+            others = [f for f in widest if f.count("/") == 1 and f not in english]   # "fr/": a home page
+            checked = await accessible(browser, base, "light", english + others, failures)
+            checked += await accessible(browser, base, "dark", english, failures)
         await browser.close()
     for f in failures:
         print(f"::error::{f}" if os.environ.get("GITHUB_ACTIONS") else f)
-    print(f"site layout: {count} pages checked ({len(every)} on an iPhone, {len(widest)} on each of {len(OTHERS)} other screens), "
-          f"{len(failures)} problem(s)")
+    print(f"site layout: {count} pages checked ({len(every)} on an iPhone, {len(widest)} on each of {len(OTHERS)} other screens)"
+          + (f", {checked} with axe" if AXE else "") + f", {len(failures)} problem(s)")
     return 1 if failures else 0
 
 

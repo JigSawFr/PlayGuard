@@ -95,6 +95,20 @@
     for (const f of figures) seen.observe(f);
   }
 
+  // A table wider than its column scrolls on its own: reachable with the
+  // keyboard (Tab, then the arrows) while it does.
+  const tables = [...document.querySelectorAll('.table')];
+  const scrollable = () => {
+    for (const t of tables) {
+      if (t.scrollWidth > t.clientWidth + 1) t.tabIndex = 0;
+      else t.removeAttribute('tabindex');
+    }
+  };
+  if (tables.length) {
+    addEventListener('resize', scrollable);
+    scrollable();
+  }
+
   // What the simulator downloads, on its buttons: "· 4 MB" in the page's
   // language (build_site.py's simulator_size()).
   for (const size of document.querySelectorAll('.size[data-bytes]')) {
