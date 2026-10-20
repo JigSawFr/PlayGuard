@@ -64,6 +64,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `logs_keep` | integer | saved reports kept, crash files kept, session logs kept and links of reports sent online kept (`logs/reports/`, `logs/crashes/`, `logs/sessions/`, `logs/uploads/`, each on its own): the newest `5`, `10`, `20` or `50`; `0` all of them. A file goes when any of the three `logs_keep*` says so, at start-up and when one changes; the newest file of each folder always stays | `20` | About › Help & diagnostics |
 | `logs_keep_days` | integer | the same, by age: those of the last `7`, `30`, `90` or `365` days (from the date in the file name); `0` no limit | `0` | About › Help & diagnostics |
 | `logs_keep_mb` | integer | the same, by size: the newest that fit in `1`, `5` or `20` MB together; `0` no limit | `0` | About › Help & diagnostics |
+| `api` | object | what other homebrews may ask of PlayGuard ([launch API](api.md)): `enabled` (boolean, `false` by default: every request but `GET /v1` gets `403 api_disabled`) and `permissions`, one per group of requests (`clock`, `status`, `activity`, `games`, `playtime`): `"none"`, `"read"` or `"read_write"`. A group not there, an unknown value or a name that is no group reads as `"none"`; a level a group does not offer reads as the nearest it does (`status` has nothing to change: `"read_write"` reads; `playtime` nothing to read: `"read"` is `"none"`) | `{"enabled": false, "permissions": {}}` | Preferences › Other homebrews (behind the PIN) |
 | `extra_amounts` | array of 3 integers | the *Extra time today* choices, in minutes: `[15, 30, 60]`, `[10, 20, 30]`, `[30, 60, 90]` or `[5, 10, 15]` | `[15, 30, 60]` | Play timer |
 
 ## `pin_lock`
@@ -262,6 +263,7 @@ line; the order does not matter when it reads them:
   "logs_keep_mb": 0,
   "extra_amounts": [15, 30, 60],
   "pin_lock": "open",
+  "api": { "enabled": true, "permissions": { "clock": "read_write" } },
   "ntp_server": "",
   "custom_servers": [],
   "update_via": "",

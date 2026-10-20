@@ -37,6 +37,14 @@ bool platform_set_next_load(const char* path)
     return true;
 }
 
+bool platform_set_next_load_args(const char* path, const char* args)
+{
+    if (!path || !args || !platform_can_launch()) return false;
+    std::printf("next load: %s (arguments: %s)\n", path, args);
+    std::fflush(stdout);
+    return true;
+}
+
 void platform_exit_to_home(void)
 {
     if (sim_env_flag("PLAYGUARD_SIM_APPLET")) return;

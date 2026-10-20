@@ -15,8 +15,10 @@
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
+#include "util/json_util.hpp"
 #include "util/ntp_client.hpp"
 #include "util/ntp_servers.hpp"
+#include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 
 using namespace brls::literals;
@@ -113,6 +115,24 @@ void with_before_report(std::function<void(const std::string& before)> write)
     write(before);
 }
 
+std::string last_measure_file()
+{
+    return paths::nand_cache_dir() + "/clock_measure.json";
+}
+
+// Kept for GET /v1/clock?cached=1 (off the UI thread; a failure only logged).
+void keep_measure(const Measurement& m)
+{
+    if (!m.ok || !m.offset_known) return;
+    const nlohmann::json j = { { "offset_s", m.offset_s }, { "server", m.server }, { "at_utc", m.unix_seconds } };
+    const std::string text = j.dump(2) + "\n";
+    ui::write_later("clock measure", [text]() {
+        std::string err;
+        if (!paths::ensure_dir(paths::nand_cache_dir()) || !paths::atomic_write(last_measure_file(), text, &err))
+            brls::Logger::warning("clock: the last measurement was not kept ({})", err);
+    }, last_measure_file());
+}
+
 // A spinner and what is being asked; Cancel (or B) sets `cancelled`.
 brls::Dialog* progress_dialog(const std::string& text, std::shared_ptr<std::atomic<bool>> cancelled)
 {
@@ -139,8 +159,23 @@ std::string current_server()
     return cfg.ntp_server.empty() ? ntp::default_server_for_console() : cfg.ntp_server;
 }
 
-void measure(const std::string& server, std::function<void(const Measurement&)> done)
+bool last_measure(LastMeasure* out)
 {
+    std::string text;
+    nlohmann::json j;
+    if (!paths::read_file(last_measure_file(), text) || !json_util::parse(text, &j) || !j.is_object()) return false;
+    auto off = j.find("offset_s");
+    auto at  = j.find("at_utc");
+    if (off == j.end() || !off->is_number_integer() || at == j.end() || !at->is_number_unsigned()) return false;
+    out->offset_s = off->get<int64_t>();
+    out->at_utc   = at->get<uint64_t>();
+    out->server   = json_util::string_at(j, "server");
+    return true;
+}
+
+void measure(const std::string& server, std::function<void(const Measurement&)> done, int timeout_ms)
+{
+    const int per_address = timeout_ms / 2;
     std::vector<std::string> hosts = { server };
     for (auto& h : ntp::cross_check_servers(server)) hosts.push_back(h);
     // In applet mode (opened from the album) borealis opens only two network
@@ -148,7 +183,7 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
     SysInfo si;
     sysinfo_get(&si);
     const bool in_series = si.applet_mode;
-    auto run = [hosts, done, in_series]() {
+    auto run = [hosts, done, in_series, per_address]() {
         // Query the servers in parallel so an unreachable one costs a single
         // timeout (one after the other in applet mode, or when no thread can
         // be had).
@@ -158,14 +193,16 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
         for (size_t i = 0; i < hosts.size(); i++) {
             if (in_series) {
                 if (ui::quitting()) break;
-                replies[i] = ntp::fetch(hosts[i], 2500, 2, ui::quitting);
+                replies[i] = ntp::fetch(hosts[i], per_address, 2, ui::quitting);
                 continue;
             }
             try {
-                workers.emplace_back([&replies, &hosts, i]() { replies[i] = ntp::fetch(hosts[i], 2500, 2, ui::quitting); });
+                workers.emplace_back([&replies, &hosts, i, per_address]() {
+                    replies[i] = ntp::fetch(hosts[i], per_address, 2, ui::quitting);
+                });
             } catch (const std::system_error& e) {
                 brls::Logger::warning("NTP: no thread for {} ({}), querying it here", hosts[i], e.what());
-                replies[i] = ntp::fetch(hosts[i], 2500, 2, ui::quitting);
+                replies[i] = ntp::fetch(hosts[i], per_address, 2, ui::quitting);
             }
         }
         for (auto& w : workers) w.join();
@@ -214,6 +251,9 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
             }
             m.unix_seconds = (uint64_t)median;
             m.spread       = estimates.back() - estimates.front();
+            m.offset_known = R_SUCCEEDED(s.network_rc);
+            if (m.offset_known) m.offset_s = (int64_t)m.unix_seconds - (int64_t)s.network_time;
+            keep_measure(m);
             const std::string diff = R_SUCCEEDED(s.network_rc) ? signed_seconds((int64_t)m.unix_seconds - (int64_t)s.network_time) : "?";
             m.report += brls::getStr("playguard/clock/result_summary", ui::time_text(m.unix_seconds), diff);
             if (m.spread > 5) m.warning = brls::getStr("playguard/clock/result_spread", (int)m.spread);
@@ -270,6 +310,18 @@ void apply(const Measurement& m, std::function<void(const std::string& message)>
     ui::confirm(body, "playguard/clock/apply_confirm"_i18n, [m, finish]() {
         with_before_report([m, finish](const std::string& before) { write_clock(m, before, finish); });
     });
+}
+
+void write(const Measurement& m, std::function<void(const TimeApply& a, const std::string& message)> done)
+{
+    const std::string before = diagnostic::current_report();
+    std::string err;
+    if (diagnostic::save("=== Before network clock change (launch API) ===\n" + before, &err).empty())
+        brls::Logger::warning("clock: the report before the change was not saved ({})", err);
+    TimeApply a;
+    time_clock_apply(projected_now(m), &a);
+    written(m.server + " (launch API)", a, before, result_message(a),
+            [a, done](const std::string& message) { done(a, message); });
 }
 
 void apply_console_clock(std::function<void(const std::string& message)> done)

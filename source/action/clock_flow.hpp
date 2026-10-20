@@ -12,6 +12,8 @@
 #include <functional>
 #include <string>
 
+#include "core/time_ops.h"
+
 namespace clock_flow
 {
 
@@ -27,14 +29,28 @@ struct Measurement
     std::string server;            // the primary server
     std::string report;            // one line per server, then the median and the offset
     std::string warning;           // "" or the servers-disagree line
+    bool offset_known = false;     // the network clock could be read
+    int64_t offset_s = 0;          // the server time minus the network clock, at `at`
 };
+
+// The last measurement any screen made (or the launch API), kept in
+// nand_cache_dir()/clock_measure.json: for GET /v1/clock?cached=1.
+struct LastMeasure
+{
+    int64_t offset_s = 0;
+    std::string server;
+    uint64_t at_utc = 0;   // the server time when it was measured
+};
+bool last_measure(LastMeasure* out);
 
 // The NTP server the preferences name (or the console region's default).
 std::string current_server();
 
 // Queries `server` and two cross-check servers in parallel, off the UI thread;
 // `done(m)` runs on the UI thread (m.ok false when no server answered).
-void measure(const std::string& server, std::function<void(const Measurement&)> done);
+// `timeout_ms`: the longest each server is waited for (half per address,
+// two addresses at most).
+void measure(const std::string& server, std::function<void(const Measurement&)> done, int timeout_ms = 5000);
 
 int64_t  seconds_left(const Measurement& m);   // <= 0: expired
 uint64_t projected_now(const Measurement& m);  // the server time, now
@@ -43,6 +59,11 @@ uint64_t projected_now(const Measurement& m);  // the server time, now
 // clock, verifies it and saves the "after" report. `done(message)` gets the
 // sentence for the user (also shown in a dialog); nothing when cancelled.
 void apply(const Measurement& m, std::function<void(const std::string& message)> done);
+
+// The launch API's write (action/api_flow): no question (the PIN was asked
+// before), the same reports and history entry as apply(). `done(a, message)`
+// on the UI thread.
+void write(const Measurement& m, std::function<void(const TimeApply& a, const std::string& message)> done);
 
 // For a console no server answers (offline_clock_logic): asks "Set the
 // network clock to the console clock, …?" with what the parent must check

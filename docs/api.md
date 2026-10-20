@@ -1,8 +1,9 @@
 # The launch API (draft, v1)
 
 > [!NOTE]
-> **A proposal, not implemented yet.** This page is the contract to build
-> against; nothing below exists in a release until the changelog says so.
+> **v1.0 answers `GET /v1`, `GET /v1/clock` and `POST /v1/clock/sync`.** The
+> routes marked *planned* below get `404 no_route` until the changelog says
+> otherwise; `GET /v1` lists what a build answers.
 
 Other homebrews can ask PlayGuard to do something (set the network clock),
 tell them something (the time left today), or open on a given screen (a
@@ -123,7 +124,7 @@ mode; there is no `return_to`, so PlayGuard exits when done.
 | `method`, `path` | yes | The route, below. The path may carry a query (`?day=2026-10-20`). |
 | `body` | no | A JSON object, the route's parameters. |
 | `return_to` | no | The `.nro` to launch when done. It must exist, end in `.nro` and be under `sdmc:/switch/`; anything else is ignored (and said in the response). |
-| `response` | no | Where to write the response: a `.json` path under `sdmc:/switch/` or `sdmc:/config/`. Default `sdmc:/config/playguard/api/response.json`. |
+| `response` | no | Where to write the response: a `.json` path under `sdmc:/switch/` or `sdmc:/config/playguard/api/` (never PlayGuard's own files). Default `sdmc:/config/playguard/api/response.json`. |
 | `caller` | no | A name to show and record in the history, at most 64 characters. Not checked, so not trusted. |
 | `lang` | no | The language of the errors' `title`, as the console names it (`fr`, `en-US`, `ja` …). Default: the console's language. |
 | `dry_run` | no | `true`: check the request and its permission, answer `200` (or the error it would get) with `"dry_run": true`, and do nothing. No PIN asked, no history, not kept in `handled.json`. |
@@ -131,6 +132,10 @@ mode; there is no `return_to`, so PlayGuard exits when done.
 The caller writes the request file **in one go**: to a temporary name, then
 renamed to the name it passes. A file PlayGuard reads half written is not
 JSON, gets `400 bad_request`, and is gone.
+
+The request file itself must be where a response could be (a `.json` under
+`sdmc:/switch/` or `sdmc:/config/playguard/api/`): one named anywhere else is
+neither read nor deleted, and gets `400 bad_request`.
 
 The request file is **deleted as soon as it is read**, before anything is
 done, so a request left on the card is never replayed at the next start (if
@@ -242,15 +247,17 @@ console's language, ready to show:
 | `423` | `read_only` | The firmware is newer than PlayGuard supports: it [opens read only](compatibility.md#newer-firmware) and changes nothing. |
 | `424` | `not_done` | Several requests with `stop_on_error`: an earlier one failed. |
 | `500` | `request_not_consumed`, `failed` | The request file could not be deleted, or the system refused (the `detail` says which call and its result). |
-| `503` | `no_network`, `applet_mode` | No network, or not enough memory: PlayGuard was started from the Album instead of over a game. |
+| `503` | `no_network` | No time server answered. |
 
 There is no `202`: PlayGuard is on screen while it works, so by the time it
 answers, the parent has typed the PIN or not.
 
 ### Each request acts once
 
-PlayGuard keeps the `id` and response of the last 32 requests in
-`sdmc:/config/playguard/api/handled.json`. A request with an `id` already
+PlayGuard keeps the `id` and response of the last 32 requests that did
+something (at least one request answered `200`, not a dry run) in
+`sdmc:/config/playguard/api/handled.json`; a refusal is not kept, so asking
+again once the parent allowed it works. A request with an `id` already
 there is not done again; its response is written again. A crash in the middle
 of `POST /playtime/extra` and a relaunch with the same request therefore
 cannot give the extra time twice.
@@ -376,16 +383,15 @@ also read it from the system itself (`pctl`), as PlayGuard does.
   follow: handy, but it would leave on the card what happens to the child's
   play, readable by anything. Not without a real need.
 
-## In the code (when built)
+## In the code
 
-- `source/action/api_logic.cpp`: the router, pure (a request in, a response
-  and an action out), tested on the host (`tests/api`).
-- `source/action/api_flow.cpp`: reading the request, running the existing
-  flows (`clock_flow`, `game_verify_flow`, …), writing the response,
-  `envSetNextLoad()` for `return_to`.
-- `docs/api.schema.json`: the request and response schemas the tests check
-  the router against.
-- `playguard_api.h`: a single-header C helper for callers (write a request,
-  launch PlayGuard, read the response, read `--playguard-response`).
-- `examples/api-caller/`: the example homebrew, built by CI.
-- `web/`: the simulator's `?api=` parameter, and the routes in its smoke test.
+- `source/action/api_logic.cpp`: the launch arguments, the requests, the
+  routes and their permissions, the responses and the files kept between
+  launches; plain C++, tested on the host (`tests/api_logic`).
+- `source/action/api_flow.cpp`: reading and deleting the request, running the
+  existing flows (`clock_flow`), writing the response, starting `return_to`
+  (`envSetNextLoad()`); its screen is `source/activity/api_activity.cpp`.
+- `source/activity/api_settings_activity.cpp`: *Preferences › Other homebrews*.
+- Planned: `playguard_api.h`, a single-header C helper for callers (write a
+  request, launch PlayGuard, read the response); `examples/api-caller/`, the
+  example homebrew; the simulator's `?api=` parameter.

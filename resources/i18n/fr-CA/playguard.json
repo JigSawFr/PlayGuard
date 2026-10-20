@@ -1055,7 +1055,9 @@
         "effects_values": {
             "auto": "Allégés sur batterie",
             "full": "Toujours complets"
-        }
+        },
+        "section_other": "Autres homebrews",
+        "api": "Ce qu'ils peuvent demander à PlayGuard"
     },
     "backup": {
         "saved": "Réglages sauvegardés : {}",
@@ -1753,5 +1755,61 @@
         "change": "Modifier...",
         "remove": "La retirer",
         "removed": "Profil programmé retiré."
+    },
+    "api": {
+        "screen_title": "Une demande d'un autre homebrew",
+        "from": "Demandée par {}",
+        "unnamed": "un homebrew qui ne s'est pas nommé",
+        "working": "En cours…",
+        "closing": "PlayGuard se ferme dans un instant (A ou B : tout de suite).",
+        "returning": "Retour à {} dans un instant (A ou B : tout de suite).",
+        "settings_title": "Autres homebrews",
+        "settings_note": "D'autres homebrews peuvent lancer PlayGuard pour lui demander quelque chose, comme régler l'horloge réseau. Rien n'est permis tant que vous ne le choisissez pas ci-dessous, groupe par groupe. Quoi que demande un homebrew, une modification qui demande le code PIN le demande. Les détails : playguard.link, API de lancement.",
+        "enabled": "Permettre aux autres homebrews d'appeler PlayGuard",
+        "section_permissions": "Ce qu'ils peuvent faire",
+        "section_calls": "Derniers appels",
+        "all_off": "Tout couper",
+        "all_off_done": "Chaque groupe est revenu à Non autorisé.",
+        "no_calls": "Aucun homebrew n'a encore appelé PlayGuard.",
+        "call_line": "{} · {} · {} · {}",
+        "call_dry_run": " (test seulement)",
+        "on": "Activé",
+        "off": "Désactivé",
+        "result": {
+            "clock": "L'horloge réseau est décalée de {}.",
+            "clock_right": "L'horloge réseau est à l'heure : rien à changer.",
+            "clock_set": "Horloge réseau réglée.",
+            "discovery": "Fait.",
+            "dry_run": "Autorisé (test seulement : rien n'a été fait).",
+            "replayed": "Déjà fait : la même réponse à nouveau."
+        },
+        "groups": {
+            "clock": "Horloge réseau",
+            "status": "État",
+            "activity": "Activité",
+            "games": "Jeux",
+            "playtime": "Temps de jeu"
+        },
+        "levels": {
+            "none": "Non autorisé",
+            "read": "Lecture",
+            "read_write": "Lecture et modification"
+        },
+        "errors": {
+            "bad_request": "La demande n'a pas pu être lue.",
+            "unsupported_api": "Cette version de la demande n'est pas prise en charge par ce PlayGuard.",
+            "api_disabled": "Les autres homebrews ne sont pas autorisés à appeler PlayGuard (Préférences › Autres homebrews).",
+            "permission_denied": "Non autorisé dans Préférences › Autres homebrews.",
+            "pin_refused": "Le code PIN n'a pas été saisi : rien n'a été modifié.",
+            "no_route": "Ce PlayGuard ne connaît pas cette demande.",
+            "bad_body": "Une valeur de la demande manque ou est hors limites.",
+            "auto_correction_off": "« Synchroniser l'horloge via Internet » est désactivé dans les paramètres de la console : l'horloge réseau n'a pas été réglée.",
+            "read_only": "Ce firmware est ouvert en lecture seule : rien n'a été modifié.",
+            "request_not_consumed": "Le fichier de la demande n'a pas pu être supprimé, elle n'a donc pas été faite.",
+            "failed": "La console a refusé : rien n'a été modifié.",
+            "no_network": "Aucun serveur de temps n'a répondu : vérifiez la connexion Internet.",
+            "no_measure": "L'horloge réseau n'a jamais été mesurée sur cette console.",
+            "not_done": "Pas fait : une demande précédente a échoué."
+        }
     }
 }

@@ -431,6 +431,7 @@ Sur une console sans Internet, *Régler l'horloge réseau sur l'horloge de la co
 - Les messages qu'il affiche :
   - Les types de notifications (voir [plus haut](#comportement-des-entrées)).
   - Un **rappel mensuel pour soutenir PlayGuard** (activé par défaut, jamais le premier mois ni juste après une mise à jour ; *Ne plus afficher* sur le rappel ou cet interrupteur le désactive pour de bon, mises à jour comprises).
+- **Autres homebrews** (derrière le code PIN) : si d'autres homebrews peuvent lancer PlayGuard pour lui demander quelque chose, comme régler l'horloge réseau, et ce que chaque groupe de demandes peut faire (*Non autorisé*, *Lecture*, *Lecture et modification* ; rien tant que vous ne le choisissez pas). En dessous, les derniers appels (qui, quoi, comment ça s'est passé) et *Tout couper*. Quoi qui soit autorisé, une modification qui demande le code PIN le demande, et régler l'horloge le demande toujours, puisque cela remet à zéro le temps de jeu du jour. Pour les développeurs : l'[API de lancement](../api.md) (en anglais).
 - Un réglage qui ne concerne qu'une fonction est à côté d'elle : le temps en plus dans *Temps de jeu*, la réactivation dans *Code PIN*, la vérification de l'horloge dans *Console › Horloge réseau*. Les mises à jour et *Aide et diagnostic* sont dans *À propos*.
 
 ## À propos

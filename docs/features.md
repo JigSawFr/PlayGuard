@@ -430,6 +430,7 @@ On a console without Internet, *Set the network clock to the console clock* appe
 - The messages it shows:
   - The kinds of notifications (see [above](#how-entries-behave)).
   - A **monthly reminder to support PlayGuard** (on by default, never in the first month nor right after an update; *Don't show again* on the reminder or this switch turns it off for good, updates included).
+- **Other homebrews** (behind the PIN): whether other homebrews may start PlayGuard to ask it something, such as setting the network clock, and what each group of requests may do (*Not allowed*, *Read*, *Read and change*; nothing until you choose it). Below, the last calls (who, what, how it went) and *Turn it all off*. Whatever is allowed, a change that needs the PIN asks for it, and setting the clock always does, since it starts the day's play time over. For developers: the [launch API](api.md).
 - A setting that shapes one feature sits with it: extra time in *Play timer*, turning parental controls back on in *PIN*, the clock check in *Console › Network clock*. The updates and *Help & diagnostics* are in *About*.
 
 ## About

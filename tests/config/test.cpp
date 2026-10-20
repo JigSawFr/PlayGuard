@@ -408,6 +408,36 @@ static void test_preferences()
     CHECK(!config::get().support_reminder && config::get().seen_version == "1.2.0");
 }
 
+// Preferences › Other homebrews: off with no permission by default; the
+// permissions read one by one, anything else dropped.
+static void test_api()
+{
+    write_config("{}");
+    config::load();
+    CHECK(!config::get().api_enabled && config::get().api_permissions.empty());
+
+    write_config(R"({"api": {"enabled": true, "permissions": {"clock": "read_write", "status": "read",
+        "games": "write", "Activity": "read", "toolongforagroupname": "read", "playtime": 1}}})");
+    config::load();
+    const auto& c = config::get();
+    CHECK(c.api_enabled && c.api_permissions.size() == 2);
+    CHECK(c.api_permissions.at("clock") == "read_write" && c.api_permissions.at("status") == "read");
+
+    write_config(R"({"api": {"enabled": 1, "permissions": []}})");
+    config::load();
+    CHECK(!config::get().api_enabled && config::get().api_permissions.empty());
+    write_config(R"({"api": true})");
+    config::load();
+    CHECK(!config::get().api_enabled);
+
+    config::get().api_enabled = true;
+    config::get().api_permissions["clock"] = "read";
+    CHECK(save_config());
+    config::get() = config::Config{};
+    config::load();
+    CHECK(config::get().api_enabled && config::get().api_permissions.at("clock") == "read");
+}
+
 static void test_tmp_recovery()
 {
     // Stopped after removing config.json, before renaming config.json.tmp.
@@ -536,6 +566,7 @@ int main()
     test_round_trip();
     test_console_lock();
     test_preferences();
+    test_api();
     test_tmp_recovery();
     test_systems();
 

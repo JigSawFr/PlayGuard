@@ -1055,7 +1055,9 @@
         "effects_values": {
             "auto": "電池供電時精簡",
             "full": "始終完整"
-        }
+        },
+        "section_other": "Other homebrews",
+        "api": "What they may ask of PlayGuard"
     },
     "backup": {
         "saved": "已備份設定：{}",
@@ -1753,5 +1755,61 @@
         "change": "變更…",
         "remove": "移除",
         "removed": "已移除排定的設定檔。"
+    },
+    "api": {
+        "screen_title": "A request from another homebrew",
+        "from": "Asked by {}",
+        "unnamed": "a homebrew that gave no name",
+        "working": "Working…",
+        "closing": "PlayGuard closes in a moment (A or B: now).",
+        "returning": "Back to {} in a moment (A or B: now).",
+        "settings_title": "Other homebrews",
+        "settings_note": "Other homebrews can start PlayGuard to ask it something, such as setting the network clock. Nothing is allowed until you choose it below, group by group. Whatever a homebrew asks, a change that needs the PIN asks for it. The details: playguard.link, Launch API.",
+        "enabled": "Let other homebrews call PlayGuard",
+        "section_permissions": "What they may do",
+        "section_calls": "Last calls",
+        "all_off": "Turn it all off",
+        "all_off_done": "Every group is back to Not allowed.",
+        "no_calls": "No homebrew has called PlayGuard yet.",
+        "call_line": "{} · {} · {} · {}",
+        "call_dry_run": " (test only)",
+        "on": "On",
+        "off": "Off",
+        "result": {
+            "clock": "The network clock is {} off.",
+            "clock_right": "The network clock is right: nothing to change.",
+            "clock_set": "Network clock set.",
+            "discovery": "Done.",
+            "dry_run": "Allowed (test only: nothing done).",
+            "replayed": "Already done: the same answer again."
+        },
+        "groups": {
+            "clock": "Network clock",
+            "status": "Status",
+            "activity": "Activity",
+            "games": "Games",
+            "playtime": "Play time"
+        },
+        "levels": {
+            "none": "Not allowed",
+            "read": "Read",
+            "read_write": "Read and change"
+        },
+        "errors": {
+            "bad_request": "The request could not be read.",
+            "unsupported_api": "This version of the request is not supported by this PlayGuard.",
+            "api_disabled": "Other homebrews are not allowed to call PlayGuard (Preferences › Other homebrews).",
+            "permission_denied": "Not allowed in Preferences › Other homebrews.",
+            "pin_refused": "The PIN was not entered: nothing was changed.",
+            "no_route": "This PlayGuard does not know this request.",
+            "bad_body": "A value of the request is missing or out of range.",
+            "auto_correction_off": "\"Synchronize clock via Internet\" is off in System Settings: the network clock was not set.",
+            "read_only": "This firmware is open read only: nothing was changed.",
+            "request_not_consumed": "The request file could not be deleted, so it was not done.",
+            "failed": "The console refused: nothing was changed.",
+            "no_network": "No time server answered: check the Internet connection.",
+            "no_measure": "The network clock was never measured on this console.",
+            "not_done": "Not done: an earlier request failed."
+        }
     }
 }

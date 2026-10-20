@@ -19,6 +19,7 @@
 #include <emscripten.h>
 #endif
 
+#include "action/api_flow.hpp"
 #include "action/frame_stats_flow.hpp"
 #include "action/fw_gate.hpp"
 #include "action/log_prune_flow.hpp"
@@ -246,6 +247,9 @@ brls::Activity* choose_first()
     // unlocked. Not after a confirmed recovery unlock: that one is wanted.
     if (!(confirmed && report->mode == RescueMode_Unlock)) pt_flow::relock_if_interrupted();
     if (report) return new RescueActivity(*report, confirmed, old_module);
+    // Another homebrew's request (docs/api.md): answered on its own screen,
+    // which asks for the PIN itself when a request needs it.
+    if (api_flow::pending()) return api_flow::activity();
     if (pin_lock::at_start()) return new LockActivity();
     return new MainActivity();
 }
@@ -254,7 +258,7 @@ void start(LoadingActivity* loading)
 {
     startup_mark(StartupStep_LoadingDrawn);
     brls::Logger::info("start-up: loading screen drawn after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_LoadingDrawn));
-    if (config::get().intro) {
+    if (config::get().intro && !api_flow::pending()) {
         loading->startIntro();
         brls::Logger::info("start-up: intro, {} ms at least", LoadingActivity::INTRO_US / 1000);
     }
@@ -309,6 +313,10 @@ void apply_locale()
         brls::Platform::APP_LOCALE_DEFAULT = cfg.language;
     else
         brls::Platform::APP_LOCALE_DEFAULT = brls::LOCALE_AUTO;
+    // A request from another homebrew may name the language of its answer.
+    const std::string asked = api_flow::lang();
+    for (const char* l : config::LANGUAGES)
+        if (asked == l && asked != "system") brls::Platform::APP_LOCALE_DEFAULT = asked;
 }
 
 // The views the XML layouts name, and what goes in every screen's header.
@@ -430,6 +438,7 @@ int main(int argc, char* argv[])
 
     // Preferences first: the locale must be chosen before borealis loads i18n.
     config::load();
+    api_flow::at_start(argc, argv);
     startup_mark(StartupStep_Preferences);
     apply_locale();
 
