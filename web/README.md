@@ -93,9 +93,10 @@ them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
   page's theme. While the tour or a steps link plays, nobody touches the
   phone: its screen is kept on (Wake Lock).
 - **Version** (Settings, at the top, when a release has its own): main's
-  simulator or a release's (`simulator/<tag>/`, `releases.json`, published
-  by `pages.yml`), opened with the same settings; a release's leads back to
-  the site two folders up.
+  simulator (`simulator/dev/`) or a release's (`simulator/<tag>/`;
+  `simulator/` itself is the latest release's, its `build.json` naming it),
+  opened with the same settings (`releases.json`, laid out by `pages.yml`);
+  from `dev/` or a release's folder, the site is two folders up.
 - **Screenshot** saves the screen as it is (1280×720); **Record** saves a
   video of it (WebM) until **Stop**; **Log** shows what PlayGuard logs.
 - **Steps**: from the first screen on, the page notes each button pressed

@@ -56,10 +56,11 @@ const KEYS = {
 };
 const NAME = /^[a-z0-9_]+$/;
 
-// A release's simulator is in simulator/<tag>/ (pages.yml), main's in
-// simulator/: the site one or two folders up.
-const RELEASE_TAG = /\/simulator\/(v\d+\.\d+\.\d+)\/$/.exec(location.pathname)?.[1] ?? null;
-const SITE_UP = RELEASE_TAG ? '../../' : '../';
+// As the documentation (pages.yml): simulator/ is the latest release's
+// (main's while no release has one), simulator/dev/ main's, simulator/<tag>/
+// a release's. The site one or two folders up.
+const VERSION_DIR = /\/simulator\/(dev|v\d+\.\d+\.\d+)\/$/.exec(location.pathname)?.[1] ?? null;
+const SITE_UP = VERSION_DIR ? '../../' : '../';
 
 const $ = (id) => document.getElementById(id);
 const canvas = $('canvas');
@@ -952,21 +953,24 @@ async function showBuild() {
 }
 
 // The simulator of each release beside main's (releases.json, pages.yml):
-// the one chosen opens with the same settings.
-async function setUpVersions() {
+// the one chosen opens with the same settings. simulator/ itself says which
+// it is in its build.json (a release's: its tag, put there by pages.yml).
+async function setUpVersions(build) {
   const field = $('version-field');
   const select = $('version-select');
-  const up = RELEASE_TAG ? '../' : '';
+  const up = VERSION_DIR ? '../' : '';
   let tags = [];
   try {
     const res = await fetch(`${up}releases.json`, { cache: 'no-cache' });
     if (res.ok) tags = (await res.json()).map((r) => r.tag).filter((tag) => /^v\d+\.\d+\.\d+$/.test(tag));
   } catch { /* none: main's alone */ }
   if (!tags.length) return;
-  select.append(el('option', { value: '', text: t('version_dev') }), ...tags.map((tag) => el('option', { value: tag, text: tag })));
-  select.value = RELEASE_TAG ?? '';
+  await build;
+  const here = VERSION_DIR ?? (tags.includes(buildInfo?.ref) ? buildInfo.ref : 'dev');
+  select.append(el('option', { value: 'dev', text: t('version_dev') }), ...tags.map((tag) => el('option', { value: tag, text: tag })));
+  select.value = here;
   select.addEventListener('change', () => {
-    location.href = `${up}${select.value ? `${select.value}/` : ''}${location.search}`;
+    location.href = `${up}${select.value}/${location.search}`;
   });
   field.hidden = false;
 }
@@ -1039,7 +1043,7 @@ async function main() {
   homeLink();
   setUpHeader();
   setUpPanel();
-  setUpVersions();
+  setUpVersions(build);
   setUpKeys();
   setUpPad();
   setUpFullscreen();
