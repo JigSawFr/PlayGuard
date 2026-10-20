@@ -161,8 +161,21 @@ void update_in_place()
     });
 }
 
+void hand_over(const launcher::Target& target, const std::string& manual)
+{
+    const std::string name = store_name(target.store);
+    ui::confirm(brls::getStr("playguard/update/open_body", name), brls::getStr("playguard/update/open_confirm", name),
+                [target, manual]() {
+                    if (launcher::launch(target)) brls::Application::quit();
+                    else ui::info(manual);
+                });
+}
+
 // Hands over to sphaira or the App Store; explains how to update by hand
-// when neither can be opened.
+// when neither can be opened. When the App Store installed PlayGuard, its
+// catalogue is asked first: it publishes a release after a review, days
+// after GitHub, and a store that still has the version installed would show
+// nothing to update. Then PlayGuard offers to update itself instead.
 void open_store()
 {
     const launcher::Target target = launcher::find(config::get().update_via);
@@ -171,12 +184,27 @@ void open_store()
         ui::info(manual);
         return;
     }
-    const std::string name = store_name(target.store);
-    ui::confirm(brls::getStr("playguard/update/open_body", name), brls::getStr("playguard/update/open_confirm", name),
-                [target, manual]() {
-                    if (launcher::launch(target)) brls::Application::quit();
-                    else ui::info(manual);
-                });
+    const std::string latest = config::get().update_latest;
+    if (latest.empty() || !launcher::installed_by_store() || s_checking) {
+        hand_over(target, manual);
+        return;
+    }
+    s_checking = true;
+    ui::in_background("store version", [target, manual, latest]() {
+        std::string err;
+        const std::string listed = launcher::store_version(&err);
+        brls::sync([target, manual, latest, listed, err]() {
+            s_checking = false;
+            // Not known (offline, not listed yet): the store, as asked.
+            if (listed.empty() || update::compare_versions(listed, latest) >= 0) {
+                if (listed.empty()) brls::Logger::warning("update: the store's version unknown ({})", err);
+                hand_over(target, manual);
+                return;
+            }
+            ui::confirm(brls::getStr("playguard/update/store_behind", store_name(launcher::Store::AppStore), listed, latest),
+                        "playguard/update/store_behind_confirm"_i18n, []() { update_in_place(); });
+        });
+    });
 }
 }   // namespace
 
@@ -216,15 +244,18 @@ void update_now()
 
 void choose_method(std::function<void()> then, bool first)
 {
+    // Installed by the App Store: updated where it came from, so the store's
+    // record follows (sphaira, else the App Store: both read its catalogue).
+    const std::string recommended = launcher::installed_by_store() ? "auto" : METHODS[0];
     std::vector<std::string> labels;
     for (const std::string& m : METHODS) {
         std::string label = brls::getStr("playguard/tools/update_via_values/" + m);
-        if (first && m == METHODS[0]) label = brls::getStr("playguard/update/recommended", label);
+        if (first && m == recommended) label = brls::getStr("playguard/update/recommended", label);
         labels.push_back(label);
     }
     int selected = 0;
     for (size_t i = 0; i < METHODS.size(); i++)
-        if (METHODS[i] == config::get().update_via) selected = (int)i;
+        if (METHODS[i] == (config::get().update_via.empty() ? recommended : config::get().update_via)) selected = (int)i;
     ui::pick(first ? "playguard/update/method_title"_i18n : "playguard/tools/update_via"_i18n, labels, selected,
              [then](int i) {
                  config::get().update_via = METHODS[i];

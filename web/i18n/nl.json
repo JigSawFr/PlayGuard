@@ -114,6 +114,7 @@
   "games_ok": {"label": "Alle geïnstalleerde games in orde"},
   "check_ms": {"label": "Eén game controleren duurt (ms)"},
   "latest": {"label": "Nieuwste versie : nieuwste ondersteunde firmware"},
+  "store": { "label": "Versie in de Homebrew App Store (met zijn gegevens op de SD-kaart)" },
   "sys_latest": {"label": "Nieuwste Atmosphère : hekate : firmware"},
   "sys_notes": {"label": "Versie-informatie (GitHub, switchbrew)", "options": {"": "Onbereikbaar", "sample": "Voorbeeldantwoorden", "offline": "Offline"}},
   "dev_builds": {"label": "Ontwikkelbuilds (GitHub-API)", "options": {"": "Onbereikbaar", "sample": "Voorbeeldantwoorden", "offline": "Offline"}},

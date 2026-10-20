@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 01608fa279a5 -->
+<!-- translated from docs/features.md, sha256 6467e1a9cf5c -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.fr.md).
@@ -442,7 +442,7 @@ Sur une console sans Internet, *Régler l'horloge réseau sur l'horloge de la co
 
 - PlayGuard installé : version (en ambre quand une plus récente est sortie ; Ⓐ ouvre ses **notes de version**), mode de lancement et dossier des données.
 - **Recherche d'une mise à jour** maintenant ; *Rechercher les mises à jour chaque jour* au lancement.
-- *Mettre à jour avec* : dans PlayGuard, qui télécharge la version, la vérifie, se remplace et redémarre, ou sphaira, le Homebrew App Store ou à la main (demandé à la première mise à jour si rien n'est choisi).
+- *Mettre à jour avec* : dans PlayGuard, qui télécharge la version, la vérifie, se remplace et redémarre, ou sphaira, le Homebrew App Store ou à la main (demandé à la première mise à jour si rien n'est choisi). Installé depuis le Homebrew App Store ou l'App Store de sphaira, c'est le store qui est recommandé, pour qu'il suive la version ; quand son catalogue n'a pas encore la nouvelle version (il la publie après une vérification, souvent quelques jours plus tard), PlayGuard le dit et propose de se mettre à jour lui-même.
 - Tant qu'une version plus récente est connue, PlayGuard s'ouvre sur **PlayGuard X.Y.Z est disponible** (sa date et ses notes) : *Mettre à jour*, ou *Plus tard* pour 1 jour, 1 semaine ou 30 jours au plus.
 - Les notes de version sont celles de PlayGuard, sur le même écran que celles d'Atmosphère et de hekate dans *Console* : depuis ses versions GitHub, un onglet par version (l'installée, les plus récentes, les plus anciennes), chacune avec ses points forts en cartes et tous ses changements, gardées sur la carte SD pour une lecture hors ligne (celles de la version installée sont aussi dans l'application, quand rien n'a encore été récupéré).
 - Après une mise à jour, PlayGuard s'ouvre une fois sur **Nouveautés de la X.Y.Z** (les mêmes points forts, puis les QR codes).
