@@ -29,6 +29,7 @@ languages, English at the root and the others in /<language>/.
 
 Usage: tools/build_site.py <out-dir> [repo-root]          (needs Python-Markdown)
 """
+import gzip
 import hashlib
 import html
 import json
@@ -43,14 +44,17 @@ import markdown
 REPO_URL = "https://github.com/JigSawFr/PlayGuard"
 # The site's address, for the links that must be absolute (the canonical
 # page, the other languages, the preview image, the sitemap, llms.txt).
-SITE_URL = os.environ.get("SITE_URL", "https://jigsawfr.github.io/PlayGuard/").rstrip("/") + "/"
+SITE_URL = os.environ.get("SITE_URL", "https://playguard.link/").rstrip("/") + "/"
 # A pull request's preview: not for search engines (main's site is the one).
 NOINDEX = os.environ.get("SITE_NOINDEX") == "1"
 # The screenshots of tools/site_screenshots.mjs: <folder>/<language>/<screen>.webp.
 SCREENSHOT_DIR = os.environ.get("SITE_SCREENSHOTS", "")
+# The built simulator (CI's build-web/simulator), to say on its buttons how
+# much it downloads; none for a local build.
+SIMULATOR_DIR = os.environ.get("SITE_SIMULATOR", "")
 # The documentation's "Try it in the simulator" links (main's simulator, as
 # GitHub shows them): the site's own simulator on the site, in its language.
-SIMULATOR_URL = "https://jigsawfr.github.io/PlayGuard/simulator/"
+SIMULATOR_URL = "https://playguard.link/simulator/"
 # The console's languages: config.json's code, the site's folder ('' for the
 # root), the name in its own words, the html lang.
 LANGUAGES = [
@@ -385,6 +389,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#111d31" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="{to_root}assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{to_root}assets/apple-touch-icon.png">
   <link rel="sitemap" type="application/xml" href="{SITE_URL}sitemap.xml">
   <link rel="alternate" type="application/atom+xml" title="PlayGuard releases" href="{SITE_URL}releases.atom">
 {"".join(json_ld(d) for d in structured)}  <script src="{to_root}assets/theme.js"></script>
@@ -468,6 +473,8 @@ def home_body(t, lang, to_root):
         f'          <tr><th scope="row">{t(f"compare_{row}")}</th>{mark(t, pg)}{mark(t, not pg)}</tr>'
         for row, pg in (("phone", True), ("account", True), ("internet", True), ("cfw", False)))
     version, date, _ = changelog_releases()[0]
+    weight = simulator_size()
+    size = f' <span class="size" data-bytes="{weight}"></span>' if weight else ""
     shots = "\n".join(
         f'      <figure><a href="{to_root}assets/{screenshot(lang, s)}">{gallery_image(t, lang, to_root, s)}</a>'
         f'<figcaption>{t(f"shot_{s}")}</figcaption></figure>'
@@ -485,10 +492,11 @@ def home_body(t, lang, to_root):
         <p>{t('hero_text')}</p>
         <div class="actions">
           <a class="button primary" href="#install">{t('install_cta')}</a>
-          <a class="button" href="{to_root}simulator/?lang={code}">{t('try')}</a>
+          <a class="button" href="{to_root}simulator/?lang={code}">{t('try')}{size}</a>
         </div>
         <p class="source"><a href="{REPO_URL}/releases/latest">{t('download')}</a>
-          · <time class="release-date" datetime="{date}">{date}</time></p>
+          · <a href="{home}changelog/#v{version}"><time class="release-date" datetime="{date}">{date}</time></a></p>
+        <p class="source"><a href="{home}docs/troubleshooting/#{locked_out_anchor(lang)}">{t('locked_out_link')}</a></p>
       </div>
       <div class="hero-video">
         <video src="{to_root}assets/{tour_video(lang)}" muted loop playsinline preload="none"
@@ -534,17 +542,29 @@ def home_body(t, lang, to_root):
         <h2>{t('simulator_title')}</h2>
         <p>{t('simulator_text')}</p>
       </div>
-      <a class="button primary" href="{to_root}simulator/?lang={code}">{t('simulator_button')}</a>
+      <a class="button primary" href="{to_root}simulator/?lang={code}">{t('simulator_button')}{size}</a>
     </section>
 
     <section id="install" class="section columns">
       <div>
         <h2>{t('install_title')}</h2>
-        <ol class="steps">
-          <li>{t('install_1')}</li>
-          <li>{t('install_2')} <a href="{REPO_URL}/releases/latest">{t('download')}</a></li>
-          <li>{t('install_3')}</li>
-        </ol>
+        <!-- One way or the other: tabs (site.js), else both under their names. -->
+        <div class="tabs">
+          <div class="tab-panel" id="install-store">
+            <h3 class="tab-title">{t('tab_store')}</h3>
+            <ol class="steps">
+              <li>{t('install_1')}</li>
+              <li>{t('install_3')}</li>
+            </ol>
+          </div>
+          <div class="tab-panel" id="install-manual">
+            <h3 class="tab-title">{t('tab_manual')}</h3>
+            <ol class="steps">
+              <li>{t('install_2')} <a href="{REPO_URL}/releases/latest">{t('download')}</a></li>
+              <li>{t('install_3')}</li>
+            </ol>
+          </div>
+        </div>
       </div>
       <div>
         <h2>{t('start_title')}</h2>
@@ -574,6 +594,45 @@ def home_body(t, lang, to_root):
 {docs}
     </section>
 """
+
+
+def firmware(macro):
+    """A firmware version of source/core/sysinfo.h ('21.0.0'), as tools/gen_compat.py reads it."""
+    with open(os.path.join(ROOT, "source", "core", "sysinfo.h"), encoding="utf-8") as f:
+        m = re.search(rf"#define {macro}\s+MAKEHOSVERSION\((\d+),\s*(\d+),\s*(\d+)\)", f.read())
+    if not m:
+        raise SystemExit(f"site: {macro} not found in source/core/sysinfo.h")
+    return ".".join(m.groups())
+
+
+def compat_check(t):
+    """The compatibility page's check: a firmware typed, what PlayGuard does
+    on it (site.js), from the app's own limits so that it never disagrees."""
+    low, high = firmware("PCTL_FW_MIN_PLAYTIMER"), firmware("PCTL_FW_TESTED_MAX")
+    def text(key):
+        return t(key).replace("{{min}}", low).replace("{{max}}", high)
+    return (f'<div class="compat-check" hidden data-min="{low}" data-max="{high}" data-full="{text("compat_full")}"'
+            f' data-no-timer="{text("compat_no_timer")}" data-newer="{text("compat_newer")}"'
+            f' data-invalid="{text("compat_invalid")}">'
+            f'<p><strong>{t("compat_check")}</strong></p>'
+            f'<label for="compat-fw">{t("compat_field")}</label>'
+            f'<input id="compat-fw" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="{high}">'
+            f'<p class="compat-result" aria-live="polite"></p></div>\n')
+
+
+def simulator_size():
+    """What a first visit to the simulator downloads, compressed as GitHub
+    Pages sends it (bytes; 0 without a built simulator): PlayGuard, its data
+    and its script. The CJK font, for Japanese, Korean and Chinese only, is not
+    counted."""
+    total = 0
+    for name in ("playguard.wasm", "playguard.data", "playguard.js"):
+        path = os.path.join(SIMULATOR_DIR, name)
+        if not SIMULATOR_DIR or not os.path.isfile(path):
+            return 0
+        with open(path, "rb") as f:
+            total += len(gzip.compress(f.read(), 6))
+    return total
 
 
 def mark(t, yes):
@@ -642,6 +701,8 @@ def doc_body(t, lang, to_root, page_name, assets):
         if start >= 0 and not re.sub(r"<!--.*?-->", "", body[:start], flags=re.S).strip():
             end = body.find("</p>", start) + len("</p>")
             end += body[end:end + 1] == "\n"
+        if page_name == "compatibility":
+            folded = compat_check(t) + folded
         shown = body[:end] + folded + body[end:]
     # A link to each section, to share it.
     shown = re.sub(r'<(h[23]) id="([^"]+)">(.*?)</h[23]>',
@@ -664,7 +725,7 @@ def doc_body(t, lang, to_root, page_name, assets):
 {docs_search(t, lang, to_root)}
 {docs_list(t, lang, to_root, page_name)}
       </nav>
-      <article class="prose">
+      <article class="prose" data-copy="{t('copy')}" data-copied="{t('copied')}">
         <h1>{html.escape(title)}</h1>
 {note}{shown}
         <nav class="pager" aria-label="{t('docs_title')}">{pager}</nav>
@@ -982,6 +1043,8 @@ def main():
     shutil.copytree(os.path.join(ROOT, "site", "assets"), os.path.join(out, "assets"), dirs_exist_ok=True)
     for name in ("icon.svg", "mark.svg"):
         shutil.copy(os.path.join(ROOT, "branding", name), os.path.join(out, "assets", name))
+    # An iPhone's home screen takes a PNG, not the SVG (tools/render_branding.mjs).
+    shutil.copy(os.path.join(ROOT, "images", "apple-touch-icon.png"), os.path.join(out, "assets", "apple-touch-icon.png"))
     for path in sorted(assets):
         os.makedirs(os.path.dirname(os.path.join(out, "assets", path)), exist_ok=True)
         if path.startswith("images/screenshots/") and path.count("/") == 3:

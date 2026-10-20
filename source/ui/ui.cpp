@@ -143,7 +143,7 @@ void notify(const std::string& text, Toast kind)
 void error(const std::string& text)
 {
     brls::Logger::info("error: {}", text);
-    brls::sync([text]() { info(text); });
+    brls::sync([text]() { failure(text); });
 }
 
 void replace_screen(brls::Activity* next)

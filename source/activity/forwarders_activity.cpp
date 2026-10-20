@@ -190,7 +190,7 @@ void ForwardersActivity::details(const Row& r)
                                                          : "playguard/forwarders/made_here"_i18n;
     ui::info(brls::getStr("playguard/forwarders/details", r.name, r.author.empty() ? unknown : r.author,
                           r.version.empty() ? unknown : r.version, nro, forwarders::hex_id(r.id),
-                          made + " · " + state_text(r)));
+                          r.state == State::Elsewhere ? made : made + " · " + state_text(r)));
 }
 
 void ForwardersActivity::rename(const Row& row)

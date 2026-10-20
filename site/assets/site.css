@@ -253,6 +253,12 @@ pre code { background: none; padding: 0; }
 .band p { margin: 0; color: var(--muted); }
 .columns { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
 .steps { padding-left: 1.3em; }
+/* Tabs (site.js): one way to do something, then another. */
+.tab-list { display: flex; gap: 4px; padding: 4px; margin: 0 0 4px; border-radius: 12px; background: var(--surface-2); width: fit-content; max-width: 100%; }
+.tab-list button { min-height: 40px; padding: 8px 14px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); font: 600 15px system-ui, sans-serif; cursor: pointer; }
+.tab-list button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgb(11 20 36 / 0.12); }
+.tab-title { font-size: 16px; margin: 18px 0 0; }
+.size { font-weight: 400; opacity: 0.8; white-space: nowrap; }
 .steps li { margin: 6px 0; }
 
 .doc-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
@@ -267,6 +273,7 @@ pre code { background: none; padding: 0; }
                     background: var(--surface); color: var(--text); font: inherit; font-size: 15px; }
 .doc-search input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 .doc-results { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; }
+.doc-results[hidden] { display: none; }
 .doc-results a { display: block; padding: 6px 10px; border-radius: 8px; text-decoration: none; color: var(--text); font-size: 14px; }
 .doc-results a:focus { background: var(--surface-2); }
 .doc-results strong { display: block; }
@@ -310,6 +317,20 @@ h2:hover > .anchor, h3:hover > .anchor, .anchor:focus-visible { opacity: 1; }
 .pager .prev span::before { content: "← "; }
 .pager .next { grid-column: 2; text-align: right; }
 .pager .next span::after { content: " →"; }
+/* A copy button on a block of code (site.js). */
+pre.has-copy { position: relative; padding-right: 76px; }
+.copy { position: absolute; top: 8px; right: 8px; padding: 4px 10px; min-height: 32px; border-radius: 8px; border: 1px solid var(--line);
+        background: var(--surface); color: var(--text); font: 600 13px system-ui, sans-serif; cursor: pointer; }
+/* The compatibility page's check (site.js). */
+.compat-check { margin: 20px 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.compat-check p { margin: 0 0 8px; }
+.compat-check label { display: block; font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+.compat-check input { width: 12em; max-width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px;
+                      background: var(--bg); color: var(--text); font: inherit; font-size: 16px; }
+.compat-result:empty { display: none; }
+.compat-result { margin: 10px 0 0 !important; padding: 8px 12px; border-radius: 8px; }
+.compat-result.ok { background: var(--accent-soft); }
+.compat-result.warn { background: var(--amber-soft); }
 /* The changelog's older releases. */
 .release { border: 1px solid var(--line); border-radius: 12px; padding: 0 16px; margin: 10px 0; background: var(--surface); scroll-margin-top: 100px; }
 .release summary { font: 600 18px var(--display); }
@@ -480,4 +501,17 @@ h2:hover > .anchor, h3:hover > .anchor, .anchor:focus-visible { opacity: 1; }
   .shots { grid-template-columns: minmax(0, 1fr); }
   .pager { grid-template-columns: minmax(0, 1fr); }
   .pager .next { grid-column: 1; }
+}
+/* Printed (the troubleshooting's steps, a page to keep): the text alone,
+   every folded part open, the links' addresses after them. */
+@media print {
+  .top, .footer, .doc-nav, .toc, .toc-mobile, .pager, .edit, .to-top, .lightbox, .copy, .anchor, .video-toggle,
+  .gallery-dots, .doc-search, .skip, .compat-check { display: none !important; }
+  :root { --bg: #fff; --surface: #fff; --text: #000; --muted: #333; }
+  body { background: #fff; color: #000; font-size: 12pt; }
+  .doc { display: block; padding: 0; }
+  .prose a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; color: #333; word-break: break-all; }
+  .prose h2, .prose h3 { break-after: avoid; }
+  .prose pre, .prose table, .shots figure, .callout { break-inside: avoid; }
+  .card, .compare table { box-shadow: none; }
 }

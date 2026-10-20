@@ -15,7 +15,7 @@ PlayGuard ramène sur une console modifiée les réglages de l'application mobil
 
 [![PlayGuard en 30 secondes](images/video/playguard-tour.gif)](images/video/playguard-tour.gif)
 
-▶️ **[L'essayer dans le navigateur](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr)**, la vraie app face à une console simulée : [déverrouillé pour l'instant](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr&unlocked=1) · [temps écoulé](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr&restricted=1) · [premier lancement, sans code PIN](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr&not_set_up=1) · [sur la TV, texte plus grand](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr&docked=1).
+▶️ **[L'essayer dans le navigateur](https://playguard.link/simulator/?lang=fr)**, la vraie app face à une console simulée : [déverrouillé pour l'instant](https://playguard.link/simulator/?lang=fr&unlocked=1) · [temps écoulé](https://playguard.link/simulator/?lang=fr&restricted=1) · [premier lancement, sans code PIN](https://playguard.link/simulator/?lang=fr&not_set_up=1) · [sur la TV, texte plus grand](https://playguard.link/simulator/?lang=fr&docked=1).
 
 > [!WARNING]
 > **Nécessite un firmware personnalisé (Atmosphère).** PlayGuard utilise le service restreint `pctl`, en partie via des commandes `*ForDebug`. **À utiliser à vos risques.**
@@ -53,14 +53,14 @@ Code PIN oublié ou console d'occasion : [Console bloquée ?](docs/fr/troublesho
 
 ## Documentation
 
-- **Site :** [jigsawfr.github.io/PlayGuard](https://jigsawfr.github.io/PlayGuard/fr/) — cette documentation dans les 15 langues de la console, et [PlayGuard dans le navigateur](https://jigsawfr.github.io/PlayGuard/simulator/?lang=fr) face à une console simulée
+- **Site :** [playguard.link](https://playguard.link/fr/) — cette documentation dans les 15 langues de la console, et [PlayGuard dans le navigateur](https://playguard.link/simulator/?lang=fr) face à une console simulée
 - **Guide :** [fonctions](docs/fr/features.md) · [installation](docs/fr/install.md) · [compatibilité](docs/fr/compatibility.md) · [dépannage](docs/fr/troubleshooting.md)
 - **Référence (en anglais) :** [application mobile](docs/companion-app.md) · [`config.json`](docs/config.md) · [fonctionnement du contrôle parental](docs/parental-controls.md) · [module de récupération](sysmodule/README.md)
 - **Contribuer (en anglais) :** [CONTRIBUTING.md](CONTRIBUTING.md) · [feuille de route](ROADMAP.md) · [changelog](CHANGELOG.md)
 
 ## Licence et remerciements
 
-GPLv3, voir [`LICENSE`](LICENSE). Maintenu par [JigSawFr](https://github.com/JigSawFr). Fork de [Pctl Manager](https://github.com/tailiang2008) de Taylor ; correctifs fw 22.5 et synchronisation NTP repris de [anbingxi/NX-Pctl-Manager](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly). Construit avec [borealis](https://github.com/xfangfang/borealis) (Apache 2.0), [QR Code generator](https://github.com/nayuki/QR-Code-generator) (MIT) et [Twemoji](https://github.com/jdecked/twemoji) (CC-BY 4.0) ; référence des commandes : [switchbrew](https://switchbrew.org/wiki/Parental_Control_services). La vérification des jeux installés et ses réparations suivent [Goldleaf](https://github.com/XorTroll/Goldleaf) et [sphaira](https://github.com/ITotalJustice/sphaira) (GPLv3), avec les numéros de commandes ns et es de [libnx-ext](https://github.com/XorTroll/libnx-ext) (MIT). Les forwarders de NRO sont construits comme sphaira les construit, leur programme étant le hbl de sphaira, d'après [nx-hbloader](https://github.com/switchbrew/nx-hbloader) (ISC).
+GPLv3, voir [`LICENSE`](LICENSE). Maintenu par [JigSawFr](https://github.com/JigSawFr). Fork de [Pctl Manager](https://github.com/tailiang2008) de Taylor ; correctifs fw 22.5 et synchronisation NTP repris de [anbingxi/NX-Pctl-Manager](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly). Construit avec [borealis](https://github.com/xfangfang/borealis) (Apache 2.0), [QR Code generator](https://github.com/nayuki/QR-Code-generator) (MIT), [Twemoji](https://github.com/jdecked/twemoji) (CC-BY 4.0) et la police [Sora](https://github.com/sora-xor/sora-font) (OFL 1.1) ; référence des commandes : [switchbrew](https://switchbrew.org/wiki/Parental_Control_services). La vérification des jeux installés et ses réparations suivent [Goldleaf](https://github.com/XorTroll/Goldleaf) et [sphaira](https://github.com/ITotalJustice/sphaira) (GPLv3), avec les numéros de commandes ns et es de [libnx-ext](https://github.com/XorTroll/libnx-ext) (MIT). Les forwarders de NRO sont construits comme sphaira les construit, leur programme étant le hbl de sphaira, d'après [nx-hbloader](https://github.com/switchbrew/nx-hbloader) (ISC).
 
 Des assistants de code à base d'IA aident au développement ; chaque changement est relu, couvert par les tests unitaires et vérifié sur une vraie console avant publication.
 

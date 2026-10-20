@@ -5,6 +5,8 @@
 #include <cmath>
 #include <functional>
 
+#include "ui/cadran_kit.hpp"
+
 ScrollView::ScrollView()
 {
     // "centered" turns borealis' natural scrolling off; the scrolling itself
@@ -40,6 +42,7 @@ void ScrollView::draw(NVGcontext* vg, float x, float y, float width, float heigh
         if (this->owns(focus)) this->reveal(focus, false);
     }
     brls::ScrollingFrame::draw(vg, x, y, width, height, style, ctx);
+    cadran::kit::draw_more_below(vg, this, x, y, width, height, "brls/background");
 }
 
 brls::View* ScrollView::getDefaultFocus()

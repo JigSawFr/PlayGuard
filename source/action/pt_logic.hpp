@@ -180,7 +180,7 @@ const std::vector<uint16_t>& quick_values();
 
 // "Same limit every day": the row selected first (one of quick_values(), or
 // the "Custom…" row after them when the days differ or the value is not in
-// the list), and the number pad's first value.
+// the list), and the duration picker's first value.
 struct UniformPick
 {
     bool     uniform;    // the seven limits were read and are the same
@@ -196,7 +196,7 @@ struct LimitPick
     int selected, custom, no_limit;
 };
 LimitPick limit_pick(uint16_t current);
-// The number pad's first value for that day.
+// The duration picker's first value for that day.
 uint16_t limit_seed(uint16_t current);
 
 // The bedtime picker's times in minutes after midnight: -1 (off), then 16:00

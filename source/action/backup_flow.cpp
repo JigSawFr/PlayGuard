@@ -93,7 +93,7 @@ std::string summary(const backup::Snapshot& s, backup::RestoreTally* tally)
     std::string out = brls::getStr(tally->nothing_to_write() ? "playguard/backup/backed_up_on" : "playguard/backup/restore_body",
                                    created) + "\n";
     out += changes.empty() ? "\n" + "playguard/backup/nothing_differs"_i18n : changes;
-    if (tally->same > 0 && !changes.empty()) out += "\n\n" + brls::getStr("playguard/backup/same_count", tally->same);
+    if (tally->same > 0 && !changes.empty()) out += "\n\n" + (tally->same == 1 ? "playguard/backup/same_count_one"_i18n : brls::getStr("playguard/backup/same_count", tally->same));
     // The PIN is not in the backup (after "Delete all", there is none).
     if (st.pin_length_ok && st.pin_length == 0) out += "\n\n" + "playguard/backup/no_pin_note"_i18n;
     // The bedtime is kept in the backup's raw block, but not written back:

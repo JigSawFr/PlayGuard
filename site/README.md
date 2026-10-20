@@ -1,6 +1,6 @@
 # The website
 
-PlayGuard's website, on GitHub Pages: <https://jigsawfr.github.io/PlayGuard/>.
+PlayGuard's website, on GitHub Pages: <https://playguard.link/>.
 
 - **A home page and the documentation in the console's 15 languages**:
   English at the root, the others in `/fr/`, `/fr-ca/`, `/de/`, `/es/`,
@@ -27,6 +27,18 @@ PlayGuard's website, on GitHub Pages: <https://jigsawfr.github.io/PlayGuard/>.
   names become captioned figures (`screenshot_table()`), one per row on a
   phone. Each section of the documentation has a link to share it, each
   page the previous and next ones; the changelog folds the older releases.
+- **For a parent in a hurry**: *Locked out?* under the home page's
+  buttons; a check on the compatibility page (a firmware typed, what
+  PlayGuard does on it, from `source/core/sysinfo.h`'s limits as
+  `tools/gen_compat.py` reads them); a copy button on each block of code; a
+  page that prints as its text alone (its folded parts open); an icon for an
+  iPhone's home screen (`images/apple-touch-icon.png`,
+  `tools/render_branding.mjs`).
+- **The home page's install**: two tabs (`site.js`, both under their names
+  without it), the app store or by hand; the release's date links to its notes.
+  The buttons to the simulator say what it downloads (`SITE_SIMULATOR`, the
+  built simulator: its files compressed as GitHub Pages sends them; nothing for
+  a local build without it).
 - **The documentation's search**: a box above its pages (`site.js`), over
   `docs/search.json`, each section of the language's pages; every word typed
   must be in the section, accents or not, and is marked in the results; `/` to search, the
@@ -104,7 +116,7 @@ pages; no framework, nothing to install but that.
   (1280×720), the home page's video in that language; English keeps
   `images/video/playguard-tour.mp4`. A few minutes each: rendered with the
   screenshots (a release, or by hand), else main's.
-- **The site's address**: `SITE_URL` (`https://jigsawfr.github.io/PlayGuard/`
+- **The site's address**: `SITE_URL` (`https://playguard.link/`
   by default). CI asks GitHub Pages for it (its custom domain, when it has
   one) and adds a preview's folder; `SITE_BASE` is its path, for 404.html;
   `SITE_NOINDEX=1` for a preview.
@@ -131,7 +143,10 @@ since the commit that one was built from: the simulator (and its smoke test,
 about ten minutes) when the app, its resources, the simulator or the workflow
 changed; the screenshots and tours for a release or by hand (above); the
 website itself, every time, in seconds. A change to the docs or the site
-takes a few minutes. main's builds run one at a time, each from the last. `.github/workflows/pages.yml` publishes them, with GitHub
+takes a few minutes. A pull request that changes the site, its documentation or its texts
+also has its layout checked (`tools/site_layout.py`, about half a minute): no
+page wider than the screen on a phone, a tablet or a desktop, no field iOS
+zooms into, no script that throws. main's builds run one at a time, each from the last. `.github/workflows/pages.yml` publishes them, with GitHub
 Actions as the source of GitHub Pages: main's at the root, each open pull
 request's in `pr-<number>/` (not a fork's: its pages would be served from this
 site), then edits the pull request's comment with the links. It runs where

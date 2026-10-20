@@ -15,7 +15,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 
 [![PlayGuard in 30 seconds](images/video/playguard-tour.gif)](images/video/playguard-tour.gif)
 
-▶️ **[Try it in your browser](https://jigsawfr.github.io/PlayGuard/simulator/)**, the real app against a simulated console: [unlocked for now](https://jigsawfr.github.io/PlayGuard/simulator/?unlocked=1) · [time's up](https://jigsawfr.github.io/PlayGuard/simulator/?restricted=1) · [first start, no PIN](https://jigsawfr.github.io/PlayGuard/simulator/?not_set_up=1) · [on the TV, larger text](https://jigsawfr.github.io/PlayGuard/simulator/?docked=1).
+▶️ **[Try it in your browser](https://playguard.link/simulator/)**, the real app against a simulated console: [unlocked for now](https://playguard.link/simulator/?unlocked=1) · [time's up](https://playguard.link/simulator/?restricted=1) · [first start, no PIN](https://playguard.link/simulator/?not_set_up=1) · [on the TV, larger text](https://playguard.link/simulator/?docked=1).
 
 > [!WARNING]
 > **Requires custom firmware (Atmosphère).** PlayGuard uses the restricted `pctl` service, some of it through `*ForDebug` commands. **Use at your own risk.**
@@ -53,14 +53,14 @@ Forgotten PIN or second-hand console: [Locked out?](docs/troubleshooting.md#lock
 
 ## Documentation
 
-- **Website:** [jigsawfr.github.io/PlayGuard](https://jigsawfr.github.io/PlayGuard/) — this documentation in the console's 15 languages, and [PlayGuard in your browser](https://jigsawfr.github.io/PlayGuard/simulator/) against a simulated console
+- **Website:** [playguard.link](https://playguard.link/) — this documentation in the console's 15 languages, and [PlayGuard in your browser](https://playguard.link/simulator/) against a simulated console
 - **User guide:** [features](docs/features.md) · [install](docs/install.md) · [compatibility](docs/compatibility.md) · [troubleshooting](docs/troubleshooting.md)
 - **Reference:** [companion app](docs/companion-app.md) · [`config.json`](docs/config.md) · [how parental controls work](docs/parental-controls.md) · [recovery sysmodule](sysmodule/README.md)
 - **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md) · [roadmap](ROADMAP.md) · [changelog](CHANGELOG.md)
 
 ## License and credits
 
-GPLv3, see [`LICENSE`](LICENSE). Maintained by [JigSawFr](https://github.com/JigSawFr). A fork of [Pctl Manager](https://github.com/tailiang2008) by Taylor; fw 22.5 fixes and NTP sync from [anbingxi/NX-Pctl-Manager](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly). Built with [borealis](https://github.com/xfangfang/borealis) (Apache 2.0), [QR Code generator](https://github.com/nayuki/QR-Code-generator) (MIT) and [Twemoji](https://github.com/jdecked/twemoji) (CC-BY 4.0); command reference from [switchbrew](https://switchbrew.org/wiki/Parental_Control_services). The installed games check and its repairs follow [Goldleaf](https://github.com/XorTroll/Goldleaf) and [sphaira](https://github.com/ITotalJustice/sphaira) (GPLv3), with the ns and es command numbers of [libnx-ext](https://github.com/XorTroll/libnx-ext) (MIT). The NRO forwarders are built as sphaira builds them, their program sphaira's hbl, after [nx-hbloader](https://github.com/switchbrew/nx-hbloader) (ISC).
+GPLv3, see [`LICENSE`](LICENSE). Maintained by [JigSawFr](https://github.com/JigSawFr). A fork of [Pctl Manager](https://github.com/tailiang2008) by Taylor; fw 22.5 fixes and NTP sync from [anbingxi/NX-Pctl-Manager](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly). Built with [borealis](https://github.com/xfangfang/borealis) (Apache 2.0), [QR Code generator](https://github.com/nayuki/QR-Code-generator) (MIT), [Twemoji](https://github.com/jdecked/twemoji) (CC-BY 4.0) and the [Sora](https://github.com/sora-xor/sora-font) typeface (OFL 1.1); command reference from [switchbrew](https://switchbrew.org/wiki/Parental_Control_services). The installed games check and its repairs follow [Goldleaf](https://github.com/XorTroll/Goldleaf) and [sphaira](https://github.com/ITotalJustice/sphaira) (GPLv3), with the ns and es command numbers of [libnx-ext](https://github.com/XorTroll/libnx-ext) (MIT). The NRO forwarders are built as sphaira builds them, their program sphaira's hbl, after [nx-hbloader](https://github.com/switchbrew/nx-hbloader) (ISC).
 
 AI coding assistants help with development; every change is reviewed, unit-tested and checked on a real console before release.
 

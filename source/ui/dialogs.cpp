@@ -2,6 +2,8 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
+#include "action/upload_flow.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/cadran_modal.hpp"
 #include "ui/text_size.hpp"
 #include "util/config.hpp"
@@ -60,6 +62,22 @@ static void scroll_with(brls::Dialog* dialog, brls::ScrollingFrame* frame, brls:
     }
 }
 
+namespace
+{
+// A dialog's text that scrolls: its foot fades into the card while more
+// follows below the buttons' row.
+class DialogScroll : public brls::ScrollingFrame
+{
+  public:
+    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
+              brls::FrameContext* ctx) override
+    {
+        brls::ScrollingFrame::draw(vg, x, y, width, height, style, ctx);
+        cadran::kit::draw_more_below(vg, this, x, y, width, height, "cadran/surf");
+    }
+};
+}   // namespace
+
 // The text laid out by cadran::dialog_body, scrolling when taller than the
 // dialog's room.
 static brls::Dialog* body_dialog(const std::string& text)
@@ -68,7 +86,7 @@ static brls::Dialog* body_dialog(const std::string& text)
     YGNodeCalculateLayout(body->getYGNode(), 720, YGUndefined, YGDirectionLTR);
     const float room = content_height();
     if (YGNodeLayoutGetHeight(body->getYGNode()) <= room) return new brls::Dialog(body);
-    auto* frame = new brls::ScrollingFrame();
+    auto* frame = new DialogScroll();
     frame->setHeight(room);
     frame->setScrollingBehavior(brls::ScrollingBehavior::NATURAL);
     frame->setContentView(body);
@@ -105,6 +123,58 @@ void confirm(const std::string& body, const std::string& confirm_label,
 void confirm_danger(const std::string& body, const std::string& confirm_label, std::function<void()> on_yes)
 {
     open_confirm(body, confirm_label, std::move(on_yes), nullptr, true);
+}
+
+void failure(const std::string& text)
+{
+    // "Could not unlock — error 0x0000C88E: refused by …\n\nIf it happens
+    // again, send a report: …" as the boards' error: what failed as the
+    // title, why as the text, the code small under it, and the report as a
+    // button rather than a path through the menus.
+    std::string rest = text;
+    const std::string next = "\n\n" + "playguard/error/next_step"_i18n;
+    const size_t step = rest.find(next);
+    const bool report = step != std::string::npos;
+    if (report) rest.erase(step, next.size());
+    std::string title, code;
+    const size_t dash = rest.find(" \u2014 ");
+    if (dash != std::string::npos && dash <= 120) {
+        title = rest.substr(0, dash);
+        rest = rest.substr(dash + std::string(" \u2014 ").size());
+    }
+    const size_t hex = rest.find("0x");
+    if (hex != std::string::npos && hex + 10 <= rest.size()) {
+        const std::string number = rest.substr(hex, 10);
+        const std::string with_hint = brls::getStr("playguard/error/code_hint", number, "");
+        const std::string alone = brls::getStr("playguard/error/code", number);
+        if (rest.compare(0, with_hint.size(), with_hint) == 0 && rest.size() > with_hint.size()) {
+            code = alone;
+            rest = rest.substr(with_hint.size());
+            if (rest[0] >= 'a' && rest[0] <= 'z') rest[0] = (char)(rest[0] - 'a' + 'A');
+        } else if (rest == alone) {
+            code = alone;
+            rest.clear();
+        }
+    }
+    std::string body = title.empty() ? rest : rest.empty() ? title : title + "\n\n" + rest;
+    auto* dialog = body_dialog(body.empty() ? text : body);
+    if (!code.empty()) {
+        if (auto* box = dynamic_cast<brls::Box*>(dialog->getView("cadran_dialog_body"))) {
+            brls::Label* small = cadran::kit::label(code, 15, "cadran/text3");
+            small->setMarginTop(10);
+            box->addView(small);
+        }
+    }
+    if (report) {
+        dialog->addButton("playguard/notices/send_report"_i18n, []() { upload_flow::choose(); });
+    }
+    dialog->addButton("hints/ok"_i18n, []() {});
+    dialog->setCancelable(true);
+    cadran::style_dialog(dialog, cadran::Emphasis::FAILURE);
+    // A closes it, as before: the report is a choice, not the default.
+    if (report)
+        if (brls::View* ok = dialog->getView("brls/dialog/button2")) dialog->setLastFocusedView(ok);
+    dialog->open();
 }
 
 void info(const std::string& body)

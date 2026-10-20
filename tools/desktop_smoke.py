@@ -351,10 +351,11 @@ if FORGED:
     open(report, "w").write("mode=unlock\nresult=ok\nrc=0x00000000\nunlocks=1\n")
     json.dump({"schema": 1, "pin_lock": "open"}, open(config_file, "w"))
 if CADRANUNLOCKED:
-    # A parent unlocked parental controls for now (1453 answers false).
+    # A parent unlocked parental controls for now (1453 answers false). In
+    # the light theme: every other scenario draws the default, dark one.
     env.setdefault("PLAYGUARD_SIM_UNLOCKED", "1")
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
-    json.dump({"schema": 1, "pin_lock": "open"}, open(config_file, "w"))
+    json.dump({"schema": 1, "pin_lock": "open", "theme": "light"}, open(config_file, "w"))
 if CADRANLARGE:
     # The text 25 % bigger, as the console docked draws it by default.
     os.makedirs(os.path.dirname(config_file), exist_ok=True)

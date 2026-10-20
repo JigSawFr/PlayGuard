@@ -25,12 +25,16 @@ void cadran::install_theme()
     // Dark: the boards' navy. Light: the style board's cool white, the inks
     // darkened to 4.5:1 on every surface they are drawn on, the rail's active
     // pill included (teal #0A705F, amber #8A5200, coral #B71C1C); the quiet
-    // text too, on both (text3 4.5:1 on the second surface).
+    // text too, on both (text3 4.5:1 on the second surface). The focus ring
+    // in the dark teal, its glow no lighter than the fill teal: 3:1 or more
+    // on the background at any point of its pulse (WCAG 1.4.11). The dark
+    // theme's hairline at 14 % white: the cards stay apart on a TV that
+    // crushes its blacks.
     struct P { NVGcolor bg, text, text2, text3, surf, surf2, line, teal, teal_fill, teal_soft, amber, amber_fill,
                coral, coral_fill, coral_line, track, glow, glow_strong, amber_surf, amber_line, pill_ok, pill_ok_ink,
                rail_active, key_bg, key_fg, hl1, hl2, border; };
     const P dark = { navy, nvgRGB(0xEE, 0xF2, 0xF8), nvgRGB(0xA9, 0xB5, 0xC9), nvgRGB(0x83, 0x92, 0xAA),
-                     nvgRGB(0x12, 0x1E, 0x33), nvgRGB(0x1A, 0x2A, 0x45), nvgRGBA(255, 255, 255, 20),
+                     nvgRGB(0x12, 0x1E, 0x33), nvgRGB(0x1A, 0x2A, 0x45), nvgRGBA(255, 255, 255, 36),
                      nvgRGB(0x2E, 0xC4, 0xA6), nvgRGB(0x2E, 0xC4, 0xA6), nvgRGBA(0x2E, 0xC4, 0xA6, 26),
                      nvgRGB(0xFF, 0xB5, 0x47), nvgRGB(0xFF, 0xB5, 0x47),
                      nvgRGB(0xFF, 0x7A, 0x7A), nvgRGB(0xFF, 0x7A, 0x7A), nvgRGBA(0xFF, 0x7A, 0x7A, 140),
@@ -46,7 +50,7 @@ void cadran::install_theme()
                       nvgRGBA(0x0B, 0x14, 0x24, 26), nvgRGBA(0x2E, 0xC4, 0xA6, 41), nvgRGBA(0x2E, 0xC4, 0xA6, 56),
                       nvgRGB(0xFF, 0xF3, 0xDF), nvgRGB(0xF3, 0xD5, 0x9C),
                       nvgRGB(0xD8, 0xF3, 0xEC), nvgRGB(0x0A, 0x6E, 0x5C), nvgRGBA(0x14, 0xA3, 0x8A, 36),
-                      navy, nvgRGB(0xFF, 0xFF, 0xFF), nvgRGB(0x14, 0xA3, 0x8A), nvgRGB(0x4A, 0xD6, 0xBA), nvgRGBA(0x0B, 0x14, 0x24, 60) };
+                      navy, nvgRGB(0xFF, 0xFF, 0xFF), nvgRGB(0x0A, 0x70, 0x5F), nvgRGB(0x0F, 0x8A, 0x74), nvgRGBA(0x0B, 0x14, 0x24, 60) };
     const std::pair<brls::Theme*, const P*> variants[] = { { &brls::Theme::getDarkTheme(), &dark }, { &brls::Theme::getLightTheme(), &light } };
     for (const auto& [t, p] : variants) {
         t->addColor("brls/background", p->bg);
@@ -407,7 +411,10 @@ void cadran::style_rail(brls::View* tab_frame)
         position++;
         auto* item = dynamic_cast<brls::SidebarItem*>(v);
         if (!item) {   // a separator: its line is drawn at mid-height
-            v->setHeight(17);
+            // 13 px: the nine items and three separators fit between the
+            // header and the footer (559 of 563 px), so the rail never
+            // scrolls, nor moves from one tab to the next.
+            v->setHeight(13);
             v->setMarginLeft(14);
             v->setMarginRight(14);
             continue;

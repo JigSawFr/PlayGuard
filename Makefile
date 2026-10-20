@@ -148,7 +148,6 @@ date_SRC    := source/util/date.cpp tests/date/test.cpp
 # The header-only helpers: utf8, emoji, text, json_util.
 text_util_SRC   := tests/text_util/test.cpp
 patches_SRC   := source/util/paths.cpp source/util/patches.cpp tests/patches/test.cpp
-duration_SRC   := source/util/duration.cpp tests/duration/test.cpp
 changelog_SRC   := source/util/changelog.cpp tests/changelog/test.cpp
 support_SRC   := source/util/date.cpp source/util/support.cpp tests/support/test.cpp
 pt_logic_SRC   := source/action/pt_logic.cpp source/util/date.cpp tests/pt_logic/test.cpp

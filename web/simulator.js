@@ -112,6 +112,8 @@ const effectiveTheme = (choice) => (choice === 'auto' ? (dark.matches ? 'dark' :
 
 function showTheme() {
   const effective = effectiveTheme(chosenTheme());
+  // The choice (the header's icon on a phone), then the theme it gives.
+  document.documentElement.dataset.themeChoice = chosenTheme();
   document.documentElement.dataset.theme = effective;
   // Started with the other one (Auto following a change of the system's):
   // PlayGuard reads its theme at start-up, so offer to start it again.
@@ -546,6 +548,19 @@ function setUpKeys() {
   });
 }
 
+// The tools under the screen: in a row where there is room, behind a
+// button on a phone (closed again once one is used).
+function setUpTools() {
+  const tools = $('tools');
+  const narrow = matchMedia('(max-width: 600px)');
+  const fit = () => { tools.open = !narrow.matches; };
+  fit();
+  narrow.addEventListener('change', fit);
+  tools.querySelector('.tool-list').addEventListener('click', (e) => {
+    if (narrow.matches && e.target.closest('button')) tools.open = false;
+  });
+}
+
 function setUpPad() {
   for (const button of $('pad').querySelectorAll('[data-button]')) {
     const code = Number(button.dataset.button);
@@ -805,10 +820,16 @@ function translatePage() {
   for (const node of document.querySelectorAll('[data-i18n-label]')) node.setAttribute('aria-label', t(node.dataset.i18nLabel));
 }
 
-// The website's home page in the page's language (tools/build_site.py's folders).
+// The website's pages in the page's language (tools/build_site.py's
+// folders): its home, and the header's links as on the website. The
+// language menu's face on a phone: the language's code.
 function homeLink() {
-  const folder = language === 'en-US' ? '' : `${language.toLowerCase()}/`;
-  $('home-link').href = `../${folder}`;
+  const home = `../${language === 'en-US' ? '' : `${language.toLowerCase()}/`}`;
+  $('home-link').href = home;
+  $('nav-features').href = `${home}#features`;
+  $('nav-install').href = `${home}#install`;
+  $('nav-docs').href = `${home}docs/features/`;
+  $('language-face').textContent = language.split('-')[0].toUpperCase();
 }
 
 function setUpHeader() {
@@ -919,12 +940,40 @@ async function main() {
   setUpPanel();
   setUpKeys();
   setUpPad();
+  setUpTools();
   buildPresets();
   buildForm(current);
   setUpTime();
   version = await build;
-  start();
+  if (await saveData()) waitForTap();
+  else start();
   showTheme();
+}
+
+// Data saver on (navigator.connection.saveData, where the browser says so)
+// and PlayGuard not kept yet by the service worker: a few megabytes to
+// download, so on a touch, not by itself.
+async function saveData() {
+  if (!navigator.connection?.saveData) return false;
+  try {
+    const kept = await (await caches.open('playguard-simulator')).keys();
+    return !kept.some((r) => r.url.includes('playguard.wasm'));
+  } catch {
+    return true;
+  }
+}
+
+function waitForTap() {
+  const overlay = $('overlay');
+  overlay.classList.add('waiting');
+  showStatus(t('save_data'));
+  const button = el('button', { type: 'button', class: 'btn primary', text: t('start') });
+  button.addEventListener('click', () => {
+    button.remove();
+    overlay.classList.remove('waiting');
+    start();
+  });
+  overlay.append(button);
 }
 
 document.body.dataset.playguard = 'loading';

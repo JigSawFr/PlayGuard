@@ -95,6 +95,55 @@
     for (const f of figures) seen.observe(f);
   }
 
+  // What the simulator downloads, on its buttons: "· 4 MB" in the page's
+  // language (build_site.py's simulator_size()).
+  for (const size of document.querySelectorAll('.size[data-bytes]')) {
+    try {
+      const mb = Math.max(1, Math.round(Number(size.dataset.bytes) / 1e6));
+      size.textContent = `· ${new Intl.NumberFormat(document.documentElement.lang, { style: 'unit', unit: 'megabyte' }).format(mb)}`;
+    } catch { /* no size then */ }
+  }
+
+  // Tabs: the panels' names become buttons, one panel shown at a time;
+  // without this script, every panel under its name.
+  for (const tabs of document.querySelectorAll('.tabs')) {
+    const panels = [...tabs.querySelectorAll(':scope > .tab-panel')];
+    const list = document.createElement('div');
+    list.className = 'tab-list';
+    list.setAttribute('role', 'tablist');
+    const buttons = panels.map((panel, i) => {
+      const title = panel.querySelector('.tab-title');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.id = `${panel.id}-tab`;
+      button.textContent = title.textContent;
+      button.setAttribute('role', 'tab');
+      button.setAttribute('aria-controls', panel.id);
+      panel.setAttribute('role', 'tabpanel');
+      panel.setAttribute('aria-labelledby', button.id);
+      title.hidden = true;
+      button.addEventListener('click', () => select(i, false));
+      return button;
+    });
+    const select = (n, focus) => {
+      buttons.forEach((b, i) => {
+        b.setAttribute('aria-selected', String(i === n));
+        b.tabIndex = i === n ? 0 : -1;
+        panels[i].hidden = i !== n;
+      });
+      if (focus) buttons[n].focus();
+    };
+    // The arrows from one tab to the next, as for any tab list.
+    list.addEventListener('keydown', (e) => {
+      const i = buttons.indexOf(document.activeElement);
+      if (e.key === 'ArrowRight') select((i + 1) % buttons.length, true);
+      if (e.key === 'ArrowLeft') select((i - 1 + buttons.length) % buttons.length, true);
+    });
+    list.append(...buttons);
+    tabs.prepend(list);
+    select(0, false);
+  }
+
   // Dates (a release's) as the page's language writes them.
   for (const time of document.querySelectorAll('time[datetime]')) {
     const date = new Date(`${time.dateTime}T12:00:00`);
@@ -178,6 +227,52 @@
       if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) step(dx < 0 ? 1 : -1);
       else if (dy > 80) box.close();
     });
+  }
+
+  // A copy button on each block of code (a path, a config.json).
+  const prose = document.querySelector('.prose[data-copy]');
+  if (prose && navigator.clipboard) {
+    for (const pre of prose.querySelectorAll('pre')) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'copy';
+      button.textContent = prose.dataset.copy;
+      button.addEventListener('click', () => {
+        navigator.clipboard.writeText(pre.querySelector('code')?.textContent ?? pre.textContent).then(() => {
+          button.textContent = prose.dataset.copied;
+          setTimeout(() => { button.textContent = prose.dataset.copy; }, 1500);
+        }, () => {});
+      });
+      pre.classList.add('has-copy');
+      pre.append(button);
+    }
+  }
+
+  // Printed: every folded part open (the questions, a page's details).
+  addEventListener('beforeprint', () => {
+    for (const d of document.querySelectorAll('details:not(.toc-mobile)')) d.open = true;
+  });
+
+  // The compatibility page's check: what PlayGuard does on the firmware typed.
+  const check = document.querySelector('.compat-check');
+  if (check) {
+    const field = check.querySelector('input');
+    const result = check.querySelector('.compat-result');
+    const parse = (v) => (/^\s*(\d{1,2})(?:\.(\d{1,2}))?(?:\.(\d{1,2}))?\s*$/.exec(v) || []).slice(1).map((n) => Number(n || 0));
+    const order = ([a, b, c]) => a * 10000 + b * 100 + c;
+    const min = order(parse(check.dataset.min));
+    const max = order(parse(check.dataset.max));
+    field.addEventListener('input', () => {
+      const v = parse(field.value);
+      result.className = 'compat-result';
+      if (!field.value.trim()) { result.textContent = ''; return; }
+      if (!v.length) { result.textContent = check.dataset.invalid; return; }
+      const n = order(v);
+      const [text, kind] = n > max ? [check.dataset.newer, 'warn'] : n < min ? [check.dataset.noTimer, 'warn'] : [check.dataset.full, 'ok'];
+      result.textContent = text;
+      result.classList.add(kind);
+    });
+    check.hidden = false;
   }
 
   // On a phone, the documentation's pages are a row to scroll: this one in view.

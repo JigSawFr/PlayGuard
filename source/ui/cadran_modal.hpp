@@ -23,6 +23,8 @@ enum class Emphasis
     NONE,      // OK in teal, any other button plain
     PRIMARY,   // the last button is the confirmation: teal
     DANGER,    // the same, in coral
+    FAILURE,   // something asked did not happen: the coral warning before the
+               // title, the buttons as NONE's
 };
 
 // A dialog's text laid out as the boards do (ui::dialog), left-aligned: its
@@ -35,8 +37,8 @@ brls::Box* dialog_body(const std::string& text);
 
 // `dialog` as a card, its buttons as pills. Once: a dressed dialog is left as
 // it is (every screen that takes the focus comes through here, see
-// install_screens). Call it after the dialog's last addButton. DANGER also
-// puts a coral warning before a dialog_body's title.
+// install_screens). Call it after the dialog's last addButton. DANGER and
+// FAILURE also put a coral warning before a dialog_body's title.
 void style_dialog(brls::Dialog* dialog, Emphasis emphasis = Emphasis::NONE);
 
 // A duration chosen with the stick, in place of the system number pad: up /

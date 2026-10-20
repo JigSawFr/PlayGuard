@@ -55,6 +55,9 @@ class ClockTab : public TabBase
     void measure();
     void apply();
     void copy();
+    // The result under Measure: plain text, or, no server answering, an
+    // amber card that says so first, the servers' lines under it.
+    void show_result(const std::string& text, bool offline = false);
     // Both clocks large, the network one amber while it is inaccurate
     // (`known` false: not read).
     void show_clocks(const std::string& user_text, const std::string& network_text, bool known, bool accurate);
@@ -69,6 +72,8 @@ class ClockTab : public TabBase
     BRLS_BIND(brls::Box,        progress, "ck_progress");
     BRLS_BIND(brls::Label,      progress_text, "ck_progress_text");
     BRLS_BIND(brls::Label,      result,   "ck_result");
+    BRLS_BIND(brls::Label,      result_title, "ck_result_title");
+    BRLS_BIND(brls::Box,        result_card,  "ck_result_card");
     BRLS_BIND(brls::Label,      warning,  "ck_warning");
     BRLS_BIND(brls::DetailCell, apply_cell, "ck_apply");
     BRLS_BIND(brls::DetailCell, copy_cell, "ck_copy");
