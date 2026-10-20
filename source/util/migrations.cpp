@@ -57,6 +57,15 @@ std::string span(const std::vector<Step>& steps)
     return "steps " + std::to_string(steps.front().level) + " to " + std::to_string(steps.back().level);
 }
 
+// "steps 1, 3": each of `steps`, for a choice that may skip some.
+std::string names(const std::vector<Step>& steps)
+{
+    if (steps.empty()) return "no step";
+    std::string out = steps.size() == 1 ? "step " : "steps ";
+    for (size_t i = 0; i < steps.size(); i++) out += (i ? ", " : "") + std::to_string(steps[i].level);
+    return out;
+}
+
 bool write_logged(const std::string& file, const State& state, const Log& log)
 {
     std::string err;
@@ -117,8 +126,9 @@ size_t run(const std::string& file, const std::vector<Step>& steps, const std::s
                            ", so that build runs the steps above it again");
         s.level = Latest;
     }
+    const int kept = s.level;
     if (all) {
-        if (log) log(false, "migrations: " + span(steps) + " run again, whatever level is recorded");
+        if (log) log(false, "migrations: " + names(steps) + " run again, whatever level is recorded");
         s.level = None;
     }
     size_t ran = 0;
@@ -134,6 +144,7 @@ size_t run(const std::string& file, const std::vector<Step>& steps, const std::s
         s.level = st.level;
         ran++;
     }
+    if (all && kept > s.level) s.level = kept;
     if (!ran && log && !steps.empty()) log(false, "migrations: " + span(steps) + " already done, nothing run");
     s.version = version;
     if (s.level != was.level || s.version != was.version || found != Found::Read) write_logged(file, s, log);

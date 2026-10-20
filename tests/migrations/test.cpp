@@ -207,9 +207,20 @@ static void test_all()
     g_lines.clear();
     CHECK(mg::run(file, start_steps(), "1.2.0", log_line, true) == 2);
     CHECK((g_ran == std::vector<int>{ mg::DataDir, mg::LogsDirs }));
-    CHECK(logged("migrations: steps 1 to 2 run again, whatever level is recorded"));
-    // The level reached by the steps run: the system's step again next time.
-    CHECK(state(file).level == mg::LogsDirs);
+    CHECK(logged("migrations: steps 1, 2 run again, whatever level is recorded"));
+    // The level recorded is not lowered.
+    CHECK(state(file).level == mg::Latest);
+
+    // One or a few of them.
+    g_ran.clear();
+    g_lines.clear();
+    CHECK(mg::run(file, { step(mg::DataDir), step(mg::NandDirs) }, "1.2.0", log_line, true) == 2);
+    CHECK((g_ran == std::vector<int>{ mg::DataDir, mg::NandDirs }));
+    CHECK(logged("migrations: steps 1, 3 run again") && state(file).level == mg::Latest);
+
+    // Over a file not there: the level the steps reached.
+    std::remove(file.c_str());
+    CHECK(mg::run(file, { step(mg::LogsDirs) }, "1.2.0", nullptr, true) == 1 && state(file).level == mg::LogsDirs);
 }
 
 int main()

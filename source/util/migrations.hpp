@@ -75,8 +75,8 @@ struct Step
 // each step run (entries moved, time taken) or that they were all done, what
 // was written or why it could not be. Returns how many steps ran. A step
 // runs again at the next start when the file could not be written. `all`:
-// every step of `steps`, whatever level is recorded (the developer tools'
-// "Run the migrations again").
+// every step of `steps`, whatever level is recorded, which it never lowers
+// (the developer tools' "Run the migrations again", one or a few of them).
 size_t run(const std::string& file, const std::vector<Step>& steps, const std::string& version,
            const Log& log = nullptr, bool all = false);
 

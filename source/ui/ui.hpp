@@ -168,6 +168,11 @@ void add_cancel(brls::Dialog* dialog, std::function<void()> cancel);
 // given, says more about each row, after its label and quieter.
 void pick(const std::string& title, const std::vector<std::string>& values, int selected,
           std::function<void(int)> on_pick, bool checked = true, const std::vector<std::string>& details = {});
+// The same with several rows checked: those `marks` sets (true). Choosing a
+// row closes the list as pick() does: to toggle one, the caller opens it
+// again with the row's mark changed and the focus on it (`focus`).
+void pick_marked(const std::string& title, const std::vector<std::string>& values, const std::vector<bool>& marks,
+                 int focus, std::function<void(int)> on_pick, const std::vector<std::string>& details = {});
 // A list of things to do: each line's label, and what it runs once the
 // list has closed. The first line is selected; none, no list.
 struct Choice

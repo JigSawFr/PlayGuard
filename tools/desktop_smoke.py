@@ -748,24 +748,34 @@ if GATE:
     key("Return")
     key_to_end("Down", hold=0.15) # the Developer section, down to its last cell
     shot("05_dev_tools")
-    # Run the migrations again (its last cell): a diagnostic report saved in
-    # the logs/ layout before its subfolders, left there while PlayGuard runs,
-    # goes to logs/reports/ (then away: the cleanup below counts its files).
+    # Run the migrations again (its last cell), two of the three chosen: a
+    # diagnostic report saved in the logs/ layout before its subfolders, left
+    # there while PlayGuard runs, goes to logs/reports/ (then away: the
+    # cleanup below counts its files).
     old_report = os.path.join(logs_dir, "20261009_141203.txt")
     with open(old_report, "w") as f:
         f.write("smoke test\n")
     key("Return")
-    shot("05b_migrations")     # what the migrations move, Run
+    shot("05b_migrations")     # a line per migration, all checked, then "Run the 3 chosen"
+    key("Return")              # the data folder unchecked: the list again, on it
+    shot("05c_migrations_two") # "Run the 2 chosen"
+    key("Down", 2)             # the system's folder unchecked too
+    key("Return")
+    key("Up", 2)               # the data folder checked again
+    key("Return")
+    key("Down", 3)             # Run the 2 chosen (the data folder and the logs' subfolders)
+    key("Return")
+    shot("05d_migrations_confirm")   # the migrations chosen, Run
     key("Right")               # Run
     key("Return")
-    shot("05c_migrations_done")
+    shot("05e_migrations_done")
     key("Return")              # OK
     moved_report = os.path.join(logs_dir, "reports", "report_20261009_141203.txt")
     if os.path.exists(old_report) or not os.path.exists(moved_report):
         fail("Run the migrations again did not move " + old_report)
     os.remove(moved_report)
     log.flush()
-    if "dev tools: migrations run again: 3 step(s), 1 entries moved" not in open(os.path.join(OUT, "app.log"), errors="replace").read():
+    if "dev tools: migrations run again: 2 step(s), 1 entries moved" not in open(os.path.join(OUT, "app.log"), errors="replace").read():
         fail("no migrations line in the log; messages: " + repr(messages()))
     # Turning a developer switch off asks first; B keeps it on (the end of
     # the scenario checks developer mode was saved on).

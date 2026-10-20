@@ -214,13 +214,14 @@ void qr_text_dialog(const std::string& body, const std::string& text)
     dialog->open();
 }
 
-// borealis' Dropdown with the row `checked` (−1: none) checked and the
-// focus on `focus`; in the Cadran look, a card and its rows (cadran_modal).
+// borealis' Dropdown with the row `checked` (−1: none) checked, or each row
+// `marks` sets (when given), and the focus on `focus`; in the Cadran look, a
+// card and its rows (cadran_modal).
 class Picker : public brls::Dropdown
 {
   public:
     Picker(const std::string& title, const std::vector<std::string>& values, int checked, int focus,
-           std::function<void(int)> on_pick, std::vector<std::string> details = {})
+           std::function<void(int)> on_pick, std::vector<std::string> details = {}, std::vector<bool> marks = {})
         : brls::Dropdown(
               title, values, [this](int index) { this->chosen = index; }, focus,
               [this, on_pick](int) {
@@ -229,7 +230,7 @@ class Picker : public brls::Dropdown
                       brls::sync([on_pick, index]() { on_pick(index); });
                   }
               }),
-          labels(values), details(std::move(details)), checked(checked)
+          labels(values), details(std::move(details)), marks(std::move(marks)), checked(checked)
     {
         // The rows Dropdown's constructor already made used its own
         // cellForRow (this one did not exist yet): set again here.
@@ -240,8 +241,15 @@ class Picker : public brls::Dropdown
   private:
     std::vector<std::string> labels;
     std::vector<std::string> details;
+    std::vector<bool> marks;
     int checked;
     int chosen = -1;
+
+    bool is_checked(size_t index) const
+    {
+        if (this->marks.empty()) return (int)index == this->checked;
+        return index < this->marks.size() && this->marks[index];
+    }
 
     void row(brls::RadioCell* cell, bool on)
     {
@@ -273,10 +281,14 @@ class Picker : public brls::Dropdown
     void restyle(brls::View* view)
     {
         if (auto* cell = dynamic_cast<brls::RadioCell*>(view)) {
-            this->row(cell, this->checked >= 0 && cell->getSelected());
             // A row made before this class existed: found by its label.
             const auto at = std::find(this->labels.begin(), this->labels.end(), cell->title->getFullText());
-            if (at != this->labels.end()) this->detail(cell, (size_t)(at - this->labels.begin()));
+            const size_t index = (size_t)(at - this->labels.begin());
+            if (!this->marks.empty())
+                this->row(cell, at != this->labels.end() && this->is_checked(index));
+            else
+                this->row(cell, this->checked >= 0 && cell->getSelected());
+            if (at != this->labels.end()) this->detail(cell, index);
         }
         if (auto* box = dynamic_cast<brls::Box*>(view))
             for (brls::View* child : box->getChildren()) this->restyle(child);
@@ -286,7 +298,7 @@ class Picker : public brls::Dropdown
     {
         auto* cell = (brls::RadioCell*)recycler->dequeueReusableCell("Cell");
         cell->title->setText(this->labels[index.row]);
-        this->row(cell, index.row == this->checked);
+        this->row(cell, this->is_checked((size_t)index.row));
         this->detail(cell, (size_t)index.row);
         return cell;
     }
@@ -298,6 +310,14 @@ void pick(const std::string& title, const std::vector<std::string>& values, int 
     if (values.empty()) return;
     const int focus = selected < 0 ? 0 : selected;
     auto* list = new Picker(title, values, checked ? focus : -1, focus, std::move(on_pick), details);
+    brls::Application::pushActivity(new brls::Activity(list));
+}
+
+void pick_marked(const std::string& title, const std::vector<std::string>& values, const std::vector<bool>& marks,
+                 int focus, std::function<void(int)> on_pick, const std::vector<std::string>& details)
+{
+    if (values.empty()) return;
+    auto* list = new Picker(title, values, -1, focus < 0 ? 0 : focus, std::move(on_pick), details, marks);
     brls::Application::pushActivity(new brls::Activity(list));
 }
 
