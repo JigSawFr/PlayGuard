@@ -145,5 +145,11 @@
  "doc_release_untranslated": "{{release}}의 문서는 이 언어로 제공되지 않았습니다. 영어로 표시합니다.",
  "changelog_dev": "개발 중",
  "changelog_dev_intro": "main에는 있지만 아직 {{release}}에는 없는 것: 다음 릴리스에서, 또는 지금 개발 빌드로.",
- "changelog_dev_try": "개발 빌드 설치"
+ "changelog_dev_try": "개발 빌드 설치",
+ "doc_dev_new_page": "이 페이지는 {{release}} 이후 새로 추가되었으며 개발 중인 버전을 설명합니다.",
+ "doc_new": "새로운",
+ "since_label": "사용 중인 버전",
+ "since_many": "사용 중인 버전 이후 릴리스 {n}개, 그다음 개발 중인 내용.",
+ "since_latest": "최신 릴리스를 사용 중입니다. 앞으로의 내용은 '개발 중'에 있습니다.",
+ "since_unknown": "PlayGuard 버전이 아닙니다 (1.0.0, 1.2.0…)."
 }

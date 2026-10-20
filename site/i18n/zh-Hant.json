@@ -145,5 +145,11 @@
  "doc_release_untranslated": "{{release}} 的文件沒有此語言版本：以下為英文版。",
  "changelog_dev": "開發中",
  "changelog_dev_intro": "已在 main 中、尚未進入 {{release}}：將在下一個版本中提供，或現在就透過開發版本體驗。",
- "changelog_dev_try": "安裝開發版本"
+ "changelog_dev_try": "安裝開發版本",
+ "doc_dev_new_page": "本頁是 {{release}} 之後新增的：介紹開發中的版本。",
+ "doc_new": "新",
+ "since_label": "你的版本",
+ "since_many": "你的版本之後有 {n} 個版本，然後是開發中的內容。",
+ "since_latest": "你使用的是最新版本：接下來的內容見「開發中」。",
+ "since_unknown": "不是 PlayGuard 的版本（1.0.0、1.2.0…）。"
 }

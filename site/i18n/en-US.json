@@ -145,5 +145,11 @@
  "doc_release_untranslated": "The documentation of {{release}} was not written in this language: here it is in English.",
  "changelog_dev": "In development",
  "changelog_dev_intro": "On main, not in {{release}} yet: in the next release, or now in a development build.",
- "changelog_dev_try": "Install a development build"
+ "changelog_dev_try": "Install a development build",
+ "doc_dev_new_page": "This page is new since {{release}}: it describes the development version.",
+ "doc_new": "New",
+ "since_label": "Your version",
+ "since_many": "{n} release(s) since yours, then what is in development.",
+ "since_latest": "You have the latest release: what comes next is under In development.",
+ "since_unknown": "Not a version of PlayGuard (1.0.0, 1.2.0…)."
 }

@@ -145,5 +145,11 @@
  "doc_release_untranslated": "De documentatie van {{release}} bestond niet in deze taal: hier in het Engels.",
  "changelog_dev": "In ontwikkeling",
  "changelog_dev_intro": "Op main, nog niet in {{release}}: in de volgende uitgave, of nu al in een ontwikkelbuild.",
- "changelog_dev_try": "Een ontwikkelbuild installeren"
+ "changelog_dev_try": "Een ontwikkelbuild installeren",
+ "doc_dev_new_page": "Deze pagina is nieuw sinds {{release}}: ze beschrijft de ontwikkelversie.",
+ "doc_new": "Nieuw",
+ "since_label": "Jouw versie",
+ "since_many": "{n} uitgave(n) na de jouwe, dan wat in ontwikkeling is.",
+ "since_latest": "Je hebt de nieuwste uitgave: wat er komt staat onder ‘In ontwikkeling’.",
+ "since_unknown": "Geen versie van PlayGuard (1.0.0, 1.2.0…)."
 }
