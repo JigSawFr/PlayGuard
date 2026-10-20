@@ -13,14 +13,20 @@
 #include "action/pin_lock.hpp"
 #include "action/notices.hpp"
 #include "activity/api_activity.hpp"
+#include "activity/api_consent_activity.hpp"
 #include "activity/api_settings_activity.hpp"
 #include "app.hpp"
 #include "core/platform.h"
 #include "core/sim_env.h"
 #include "core/time_ops.h"
+#include "ui/format_text.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/date.hpp"
+#include "util/nro.hpp"
 #include "util/paths.hpp"
+#include "util/sha256.hpp"
+#include "util/pctl_ops_c.hpp"
 #include "util/text.hpp"
 
 using namespace brls::literals;
@@ -42,6 +48,7 @@ std::string s_lang;
 std::string api_dir()       { return paths::data_dir() + "/api"; }
 std::string handled_file()  { return api_dir() + "/handled.json"; }
 std::string calls_file()    { return api_dir() + "/calls.json"; }
+std::string trust_file()    { return api_dir() + "/trust.json"; }
 
 // An "sdmc:/…" path as this build opens it: PlayGuard's own folder is
 // paths::data_dir() (./playguard_data on the desktop), the rest of the card
@@ -212,14 +219,68 @@ void get_clock(const Call& c, Done done)
     }, timeout);
 }
 
-// The parent said yes: the PIN, then the write.
-void approved_sync(const clock_flow::Measurement& m, Done done)
+// Today's play timer, for what a change costs (the consent screen).
+PlayToday play_today()
 {
-    if (!pin_lock::ask()) {
-        done(fail(problem(403, "pin_refused", "the PIN was not entered")), "");
-        return;
-    }
-    clock_flow::write(m, [m, done](const TimeApply& a, const std::string&) {
+    PtState pt{};
+    pctl_play_timer_query(&pt);
+    PlayToday p;
+    p.known = pt.fw_supported && pt.valid && pt.enabled_valid;
+    if (!p.known) return p;
+    const int today = ui::today_weekday();
+    p.enabled     = pt.enabled;
+    p.restricted  = pt.restricted_valid && pt.restricted;
+    p.limit_min   = pt.day_min[today];
+    p.remaining_s = pt.remaining_valid ? (int64_t)(pt.remaining_ns / 1000000000LL) : -1;
+    return p;
+}
+
+// The caller's .nro, as it is on the card: what it says of itself, and its
+// SHA-256 (an app the parent trusts is this file, not a name).
+struct Caller
+{
+    bool read = false;
+    nro::Info info;
+    std::string sha;
+};
+
+Caller read_caller()
+{
+    Caller c;
+    if (s_request.return_to.empty()) return c;
+    const std::string path = local(s_request.return_to);
+    if (!nro::read(path, c.info)) return c;
+    std::FILE* f = std::fopen(path.c_str(), "rb");
+    if (!f) return c;
+    Sha256 h;
+    std::vector<uint8_t> buf(64 * 1024);
+    size_t n;
+    while ((n = std::fread(buf.data(), 1, buf.size(), f)) > 0) h.update(buf.data(), n);
+    const bool ok = !std::ferror(f);
+    std::fclose(f);
+    if (!ok) return c;
+    c.sha  = h.hex();
+    c.read = true;
+    return c;
+}
+
+std::vector<Trust> load_trust()
+{
+    std::string text;
+    return paths::read_file(trust_file(), text) ? parse_trust(text) : std::vector<Trust>{};
+}
+
+void save_trust(const std::vector<Trust>& list)
+{
+    if (!paths::ensure_dir(api_dir()) || !paths::atomic_write(trust_file(), dump_trust(list)))
+        brls::Logger::warning("api: {} not written", trust_file());
+}
+
+// The write itself, then its answer. `trusted`: done without asking (an app
+// the parent trusts), said in the answer, the log and the bell.
+void write_sync(const clock_flow::Measurement& m, bool trusted, Done done)
+{
+    clock_flow::write(m, [m, trusted, done](const TimeApply& a, const std::string&) {
         if (a.refused_automatic) {
             done(fail(problem(409, "auto_correction_off", "System Settings > Synchronize clock via Internet is off")), "");
             return;
@@ -235,9 +296,34 @@ void approved_sync(const clock_flow::Measurement& m, Done done)
         ok.body = { { "offset_s_before", m.offset_known ? nlohmann::json(m.offset_s) : nlohmann::json(nullptr) },
                     { "offset_s_after", (int64_t)a.target - (int64_t)a.readback },
                     { "written", true },
+                    { "trusted", trusted },
                     { "server", m.server } };
-        done(ok, "playguard/api/result/clock_set"_i18n);
+        done(ok, trusted ? "playguard/api/result/clock_set_trusted"_i18n : "playguard/api/result/clock_set"_i18n);
     });
+}
+
+// The parent said yes: the PIN, then (with "Allow for 30 days") the app
+// trusted, then the write.
+void approved_sync(const clock_flow::Measurement& m, const Caller& caller, bool trust, Done done)
+{
+    if (!pin_lock::ask()) {
+        done(fail(problem(403, "pin_refused", "the PIN was not entered")), "");
+        return;
+    }
+    if (trust && caller.read) {
+        const std::string today = ui::today_date();
+        Trust t;
+        t.nro    = s_request.return_to;
+        t.sha    = caller.sha;
+        t.name   = caller.info.name.empty() ? s_request.caller : caller.info.name;
+        t.action = "clock_sync";
+        t.until  = date::add_days(today, TRUST_DAYS);
+        auto list = load_trust();
+        grant(list, t, today);
+        save_trust(list);
+        brls::Logger::info("api: {} trusted to set the clock until {}", t.nro, t.until);
+    }
+    write_sync(m, false, done);
 }
 
 // POST /v1/clock/sync: measured, left alone when right, else the PIN (the
@@ -268,15 +354,54 @@ void sync_clock(const Call& c, Done done)
             done(fail(problem(409, "auto_correction_off", "System Settings > Synchronize clock via Internet is off")), "");
             return;
         }
-        // Who asks, what changes and what it costs, before the PIN: the
-        // parent approves this change, not only "a PIN".
-        const std::string off = m.offset_known ? offset_text(m.offset_s) : "playguard/api/off_unknown"_i18n;
-        std::string body = s_request.caller.empty() ? brls::getStr("playguard/api/confirm_sync_unnamed", off)
-                                                    : brls::getStr("playguard/api/confirm_sync", s_request.caller, off);
-        body += "playguard/clock/confirm_apply_resets"_i18n;
-        ui::confirm(body, "playguard/api/confirm_sync_yes"_i18n,
-                    [m, done]() { brls::sync([m, done]() { approved_sync(m, done); }); },
-                    [done]() { done(fail(problem(403, "declined", "the parent declined the change")), ""); });
+        const Caller caller = read_caller();
+        // An app the parent trusts with this (its very file), the clock
+        // really off and not already set by it today: no question.
+        const std::string today = ui::today_date();
+        auto list = load_trust();
+        if (caller.read && m.offset_known)
+            if (const Trust* t = trusted(list, s_request.return_to, caller.sha, "clock_sync", today);
+                t && auto_sync_allowed(*t, m.offset_s, today)) {
+                used_today(list, s_request.return_to, "clock_sync", today);
+                save_trust(list);
+                brls::Logger::info("api: {} is trusted to set the clock: done without asking", s_request.return_to);
+                write_sync(m, true, done);
+                return;
+            }
+        // Else the parent's yes before the PIN: who asks, what it changes,
+        // what it costs.
+        ApiConsentActivity::Consent consent;
+        consent.declared  = s_request.caller;
+        consent.nro_shown = s_request.return_to;
+        consent.route     = "POST /v1/clock/sync";
+        consent.can_trust = caller.read;
+        if (caller.read) {
+            consent.app_name = caller.info.name;
+            consent.icon     = caller.info.icon;
+            if (!caller.info.version.empty()) consent.app_meta = brls::getStr("playguard/api/consent/version", caller.info.version);
+            if (!caller.info.author.empty())
+                consent.app_meta += (consent.app_meta.empty() ? "" : " · ") +
+                                    brls::getStr("playguard/api/consent/by", caller.info.author);
+        }
+        std::string who = consent.app_name.empty() ? s_request.caller : consent.app_name;
+        consent.question = who.empty() ? "playguard/api/consent/question_unnamed"_i18n
+                                       : brls::getStr("playguard/api/consent/question", who);
+        if (m.offset_known) consent.text = brls::getStr("playguard/api/result/clock", offset_text(m.offset_s)) + " ";
+        const Consequence effect = consequence(play_today());
+        switch (effect.effect) {
+            case Effect::Restarts:
+                consent.text += brls::getStr("playguard/api/consent/restarts",
+                                             ui::fmt_minutes((uint16_t)effect.left_before_min),
+                                             ui::fmt_minutes((uint16_t)effect.left_after_min));
+                break;
+            case Effect::NoLimit: consent.text += "playguard/api/consent/no_limit"_i18n; break;
+            case Effect::NoPlayDay: consent.text += "playguard/api/consent/no_play"_i18n; break;
+            default: consent.text += "playguard/api/consent/unknown"_i18n; break;
+        }
+        brls::Application::pushActivity(new ApiConsentActivity(consent, [m, caller, done](bool yes, bool trust) {
+            if (yes) approved_sync(m, caller, trust, done);
+            else done(fail(problem(403, "declined", "the parent declined the change")), "");
+        }), brls::TransitionAnimation::NONE);
     }, timeout);
 }
 
@@ -339,6 +464,7 @@ void save_calls(const std::vector<Answer>& answers)
         e.status  = i < answers.size() ? answers[i].status : 0;
         e.dry_run = s_request.calls[i].dry_run;
         if (i < answers.size() && answers[i].status != 200) e.code = answers[i].body.value("code", std::string());
+        if (i < answers.size()) e.trusted = answers[i].body.value("trusted", false);
         log_call(list, e);
     }
     if (s_request.calls.empty()) {
@@ -539,7 +665,8 @@ void note_calls()
         const std::string key = route_key(e.route);
         const std::string action = key.empty() ? e.route : brls::getStr("playguard/api/routes/" + key);
         if (e.status == 200 && !e.dry_run && e.route.rfind("POST ", 0) == 0) {
-            const std::string line = brls::getStr("playguard/api/notice_line", who, action);
+            const std::string line = brls::getStr(e.trusted ? "playguard/api/notice_line_trusted" : "playguard/api/notice_line",
+                                                  who, action);
             bool seen = false;
             for (auto& c : changes)
                 if (c.first == line) seen = ++c.second > 0;
@@ -599,6 +726,18 @@ void turn_all_off()
     auto& cfg = config::get();
     for (const char* g : GROUPS) cfg.api_permissions[g] = level_name(Level::None);
     ui::save_config();
+}
+
+std::vector<Trust> trusts()
+{
+    return load_trust();
+}
+
+void forget_trust(const Trust& t)
+{
+    auto list = load_trust();
+    revoke(list, t.nro, t.action);
+    save_trust(list);
 }
 
 bool clear_calls()

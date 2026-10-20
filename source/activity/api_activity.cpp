@@ -77,6 +77,14 @@ void ApiActivity::onContentAvailable()
             }
     });
     this->watching = true;
+    // A focus of its own from the start (the frame, no highlight drawn): a
+    // card opened over this screen (the parent's yes) gives the focus back
+    // there when it closes; with nothing focused, borealis would leave it on
+    // the card's freed button.
+    brls::View* root = this->getContentView();
+    root->setFocusable(true);
+    root->setHideHighlight(true);
+    brls::Application::giveFocus(root);
     brls::sync([this]() { this->start(this); });
 }
 

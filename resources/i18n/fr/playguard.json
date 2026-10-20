@@ -1765,7 +1765,7 @@
         "closing": "PlayGuard se ferme dans {} s.",
         "returning": "Retour à {} dans {} s.",
         "settings_title": "Autres homebrews",
-        "settings_note": "D'autres homebrews peuvent lancer PlayGuard pour lui demander quelque chose, comme régler l'horloge réseau. Rien n'est permis tant que vous ne le choisissez pas ci-dessous. Une modification vous est toujours demandée d'abord, puis le code PIN.",
+        "settings_note": "D'autres homebrews peuvent lancer PlayGuard pour lui demander quelque chose, comme régler l'horloge réseau. Rien n'est permis tant que vous ne le choisissez pas ci-dessous. Une modification vous est demandée d'abord, puis le code PIN, sauf pour une app à laquelle vous avez fait confiance pour 30 jours.",
         "enabled": "Permettre aux autres homebrews d'appeler PlayGuard",
         "section_permissions": "Ce qu'ils peuvent faire",
         "section_calls": "Derniers appels",
@@ -1780,7 +1780,8 @@
             "clock_set": "Horloge réseau réglée.",
             "discovery": "Fait.",
             "dry_run": "Autorisé (test seulement : rien n'a été fait).",
-            "replayed": "Déjà fait : la même réponse à nouveau."
+            "replayed": "Déjà fait : la même réponse à nouveau.",
+            "clock_set_trusted": "Horloge réseau réglée (autorisé d'avance)."
         },
         "groups": {
             "clock": "Horloge réseau",
@@ -1799,7 +1800,7 @@
             "unsupported_api": "Cette version de la demande n'est pas prise en charge par ce PlayGuard.",
             "api_disabled": "Les autres homebrews ne sont pas autorisés à appeler PlayGuard (Préférences › Autres homebrews).",
             "permission_denied": "Non autorisé dans Préférences › Autres homebrews.",
-            "pin_refused": "Le code PIN n'a pas été saisi : rien n'a été modifié.",
+            "pin_refused": "Le code PIN n'a pas été saisi : rien n'a été modifié. Demande à un parent.",
             "no_route": "Ce PlayGuard ne connaît pas cette demande.",
             "bad_body": "Une valeur de la demande manque ou est hors limites.",
             "auto_correction_off": "« Synchroniser l'horloge via Internet » est désactivé dans les paramètres de la console : l'horloge réseau n'a pas été réglée.",
@@ -1809,7 +1810,7 @@
             "no_network": "Aucun serveur de temps n'a répondu : vérifiez la connexion Internet.",
             "no_measure": "L'horloge réseau n'a jamais été mesurée sur cette console.",
             "not_done": "Pas fait : une demande précédente a échoué.",
-            "declined": "Vous avez refusé : rien n'a été modifié."
+            "declined": "Demande refusée. Parles-en à un parent."
         },
         "unnamed_from": "Demandée par un homebrew qui ne s'est pas nommé",
         "continue": "Continuer",
@@ -1821,8 +1822,6 @@
             "clock": "Mesurer l'horloge réseau",
             "clock_sync": "Régler l'horloge réseau"
         },
-        "confirm_sync": "« {} » demande à régler l'horloge réseau ({}).",
-        "confirm_sync_yes": "Régler (code PIN)",
         "home_icon": "Ajouter « Régler l'horloge » au menu HOME",
         "home_icon_name": "Régler l'horloge",
         "home_icon_allow": "Cette icône lance PlayGuard pour régler l'horloge réseau. Il faut que les autres homebrews soient autorisés, avec Horloge réseau sur Lecture et modification. L'autoriser maintenant ?",
@@ -1863,12 +1862,35 @@
         "span_days": "{} jours",
         "behind": "en retard de {}",
         "ahead": "en avance de {}",
-        "off_unknown": "décalage inconnu",
-        "confirm_sync_unnamed": "Un homebrew qui ne s'est pas nommé demande à régler l'horloge réseau ({}).",
         "turn_on_first": "Activez d'abord « Permettre aux autres homebrews d'appeler PlayGuard ».",
         "clear_calls": "Effacer la liste",
         "clear_calls_confirm": "Effacer la liste des appels ? La cloche de notifications les oublie aussi.",
         "clear_calls_done": "La liste des appels est vide.",
-        "clear_calls_err": "La liste des appels n'a pas pu être effacée."
+        "clear_calls_err": "La liste des appels n'a pas pu être effacée.",
+        "consent": {
+            "question": "Autoriser {} à régler l'horloge réseau ?",
+            "question_unnamed": "Autoriser un homebrew qui ne s'est pas nommé à régler l'horloge réseau ?",
+            "restarts": "Le temps de jeu du jour repartira de zéro ({} restant maintenant, {} après).",
+            "no_limit": "Aucune limite ne compte aujourd'hui : le temps de jeu n'est pas touché.",
+            "no_play": "Aujourd'hui ne permet pas de jouer : cela ne change pas.",
+            "unknown": "Changer l'horloge remet à zéro le temps de jeu du jour : toute la limite quotidienne est à nouveau disponible.",
+            "trust": "Ne plus demander pendant 30 jours",
+            "details": "Détails",
+            "allow": "Autoriser (code PIN)",
+            "refuse": "Refuser",
+            "version": "v{}",
+            "by": "par {}",
+            "says_it_is": "Se présente comme « {} »",
+            "says_unchecked": "Se présente comme « {} » (non vérifié : son fichier n'a pas pu être lu)",
+            "unnamed": "Un homebrew qui ne s'est pas nommé"
+        },
+        "section_trust": "Apps de confiance",
+        "trust_line": "{} · {}",
+        "trust_until": "jusqu'au {}",
+        "trust_revoke": "Retirer la confiance",
+        "trust_revoke_confirm": "Retirer la confiance à {} ? Il redemandera la prochaine fois.",
+        "trust_revoked": "{} redemandera.",
+        "no_trust": "Aucune app de confiance. Sur une demande, « Ne plus demander pendant 30 jours » en ajoute une.",
+        "notice_line_trusted": "{} : {} (autorisé d'avance)"
     }
 }

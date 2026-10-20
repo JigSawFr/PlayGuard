@@ -53,6 +53,9 @@ std::vector<api_logic::LogEntry> calls();
 void turn_all_off();
 // Forgets the last calls (calls.json): the list, and the bell's entries.
 bool clear_calls();
+// The apps the parent trusts (api/trust.json), and one no longer.
+std::vector<api_logic::Trust> trusts();
+void forget_trust(const api_logic::Trust& t);
 // "Network clock", "Status" …
 std::string group_name(const std::string& group);
 // "Not allowed", "Read", "Read and change".

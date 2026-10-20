@@ -1765,7 +1765,7 @@
         "closing": "O PlayGuard fecha dentro de {} s.",
         "returning": "Regresso a {} dentro de {} s.",
         "settings_title": "Outros homebrews",
-        "settings_note": "Outros homebrews podem abrir o PlayGuard para lhe pedir algo, como acertar o relógio de rede. Nada é permitido até o escolher abaixo. Qualquer alteração pede sempre primeiro a sua confirmação e depois o PIN.",
+        "settings_note": "Outros homebrews podem abrir o PlayGuard para lhe pedir algo, como acertar o relógio de rede. Nada é permitido até o escolher abaixo. Qualquer alteração pede primeiro a sua confirmação e depois o PIN, exceto para um homebrew em que confiou durante 30 dias.",
         "enabled": "Permitir que outros homebrews chamem o PlayGuard",
         "section_permissions": "O que podem fazer",
         "section_calls": "Últimas chamadas",
@@ -1780,7 +1780,8 @@
             "clock_set": "Relógio de rede acertado.",
             "discovery": "Concluído.",
             "dry_run": "Permitido (apenas teste: nada foi feito).",
-            "replayed": "Já tinha sido feito: a mesma resposta novamente."
+            "replayed": "Já tinha sido feito: a mesma resposta novamente.",
+            "clock_set_trusted": "Relógio de rede acertado (permitido antecipadamente)."
         },
         "groups": {
             "clock": "Relógio de rede",
@@ -1799,7 +1800,7 @@
             "unsupported_api": "Esta versão do pedido não é suportada por este PlayGuard.",
             "api_disabled": "Os outros homebrews não podem chamar o PlayGuard (Preferências › Outros homebrews).",
             "permission_denied": "Não permitido em Preferências › Outros homebrews.",
-            "pin_refused": "O PIN não foi introduzido: nada foi alterado.",
+            "pin_refused": "O PIN não foi introduzido: nada foi alterado. Pede ao teu pai ou à tua mãe.",
             "no_route": "Este PlayGuard não conhece este pedido.",
             "bad_body": "Um valor do pedido está em falta ou fora dos limites.",
             "auto_correction_off": "\"Sincronizar relógio através da Internet\" está desativado nas Definições da consola: o relógio de rede não foi acertado.",
@@ -1809,7 +1810,7 @@
             "no_network": "Nenhum servidor de hora respondeu: verifique a ligação à Internet.",
             "no_measure": "O relógio de rede nunca foi medido nesta consola.",
             "not_done": "Não executado: um pedido anterior falhou.",
-            "declined": "Recusou: nada foi alterado."
+            "declined": "Pedido recusado. Fala sobre isto com o teu pai ou a tua mãe."
         },
         "unnamed_from": "Pedido por um homebrew que não indicou nome",
         "continue": "Continuar",
@@ -1821,8 +1822,6 @@
             "clock": "Medir o relógio de rede",
             "clock_sync": "Acertar o relógio de rede"
         },
-        "confirm_sync": "\"{}\" pede para acertar o relógio de rede ({}).",
-        "confirm_sync_yes": "Acertar (PIN)",
         "home_icon": "Adicionar \"Acertar o relógio\" ao menu HOME",
         "home_icon_name": "Acertar o relógio",
         "home_icon_allow": "Este ícone abre o PlayGuard para acertar o relógio de rede. Requer Outros homebrews ativado, com Relógio de rede em Ler e alterar. Permitir agora?",
@@ -1863,12 +1862,35 @@
         "span_days": "{} dias",
         "behind": "{} atrasado",
         "ahead": "{} adiantado",
-        "off_unknown": "diferença desconhecida",
-        "confirm_sync_unnamed": "Um homebrew que não indicou nome pede para acertar o relógio de rede ({}).",
         "turn_on_first": "Ative primeiro \"Permitir que outros homebrews chamem o PlayGuard\".",
         "clear_calls": "Limpar a lista",
         "clear_calls_confirm": "Limpar a lista de chamadas? O sino de notificações também as esquece.",
         "clear_calls_done": "A lista de chamadas está vazia.",
-        "clear_calls_err": "Não foi possível limpar a lista de chamadas."
+        "clear_calls_err": "Não foi possível limpar a lista de chamadas.",
+        "consent": {
+            "question": "Permitir que {} acerte o relógio de rede?",
+            "question_unnamed": "Permitir que um homebrew que não indicou nome acerte o relógio de rede?",
+            "restarts": "O tempo de jogo de hoje vai recomeçar ({} restantes agora, {} depois).",
+            "no_limit": "Hoje não conta nenhum limite: o tempo de jogo não é afetado.",
+            "no_play": "Hoje não é permitido jogar: isso não muda.",
+            "unknown": "Alterar o relógio faz recomeçar o tempo de jogo de hoje: todo o limite diário fica novamente disponível.",
+            "trust": "Não voltar a perguntar durante 30 dias",
+            "details": "Detalhes",
+            "allow": "Permitir (PIN)",
+            "refuse": "Recusar",
+            "version": "v{}",
+            "by": "por {}",
+            "says_it_is": "Apresenta-se como \"{}\"",
+            "says_unchecked": "Apresenta-se como \"{}\" (não verificado: não foi possível ler o ficheiro)",
+            "unnamed": "Um homebrew que não indicou nome"
+        },
+        "section_trust": "Homebrews de confiança",
+        "trust_line": "{} · {}",
+        "trust_until": "até {}",
+        "trust_revoke": "Deixar de confiar",
+        "trust_revoke_confirm": "Deixar de confiar em {}? Voltará a perguntar da próxima vez.",
+        "trust_revoked": "{} voltará a perguntar.",
+        "no_trust": "Nenhum homebrew é de confiança. Num pedido, \"Não voltar a perguntar durante 30 dias\" adiciona um.",
+        "notice_line_trusted": "{}: {} (permitido antecipadamente)"
     }
 }

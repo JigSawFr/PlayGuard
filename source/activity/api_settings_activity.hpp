@@ -27,6 +27,7 @@ class ApiSettingsActivity : public brls::Activity
 
     void refresh();
     void refresh_calls();
+    void refresh_trust();
     void choose(const std::string& group);
     void turn_off_or_back();
     void add_clock_icon();
@@ -35,6 +36,7 @@ class ApiSettingsActivity : public brls::Activity
     BRLS_BIND(brls::Label,       note,    "as_note");
     BRLS_BIND(brls::Box,         perms,   "as_perms");
     BRLS_BIND(brls::Box,         actions, "as_actions");
+    BRLS_BIND(brls::Box,         trust,   "as_trust");
     BRLS_BIND(brls::Box,         calls,   "as_calls");
     BRLS_BIND(brls::Box,         more,    "as_more");
     brls::DetailCell* home    = nullptr;   // in `actions`

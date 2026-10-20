@@ -167,7 +167,39 @@ void ApiSettingsActivity::refresh()
     ui::set_visible(home, forwarder_flow::loader_present());
     all_off->setText(this->before_off.empty() ? "playguard/api/all_off"_i18n : "playguard/api/all_back"_i18n);
     ui::set_visible(all_off, s.enabled);
+    this->refresh_trust();
     this->refresh_calls();
+}
+
+// The apps the parent trusts: each a card, a press to stop trusting it.
+void ApiSettingsActivity::refresh_trust()
+{
+    trust->clearViews();
+    const auto list = api_flow::trusts();
+    if (list.empty()) {
+        trust->addView(ui::text_label("playguard/api/no_trust"_i18n, 20, ui::color_note()));
+        return;
+    }
+    for (const auto& t : list) {
+        const std::string key  = t.action;
+        const std::string what = brls::getStr("playguard/api/routes/" + key);
+        auto* cell = card_cell(trust, brls::getStr("playguard/api/trust_line", t.name.empty() ? t.nro : t.name, what), "lock");
+        cell->setDetailText(brls::getStr("playguard/api/trust_until", t.until));
+        cell->registerClickAction([this, t](brls::View*) {
+            const std::string name = t.name.empty() ? t.nro : t.name;
+            ui::confirm_danger(brls::getStr("playguard/api/trust_revoke_confirm", name), "playguard/api/trust_revoke"_i18n,
+                               [this, t, name]() {
+                                   api_flow::forget_trust(t);
+                                   ui::notify(brls::getStr("playguard/api/trust_revoked", name), ui::Toast::Done);
+                                   // The focus leaves the list first: its rows are made again.
+                                   brls::sync([this]() {
+                                       brls::Application::giveFocus(this->enabled.getView());
+                                       this->refresh();
+                                   });
+                               });
+            return true;
+        });
+    }
 }
 
 void ApiSettingsActivity::refresh_calls()

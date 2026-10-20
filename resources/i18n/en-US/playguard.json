@@ -1765,7 +1765,7 @@
         "closing": "PlayGuard closes in {} s.",
         "returning": "Back to {} in {} s.",
         "settings_title": "Other homebrews",
-        "settings_note": "Other homebrews can start PlayGuard to ask it something, such as setting the network clock. Nothing is allowed until you choose it below. A change always asks you first, then the PIN.",
+        "settings_note": "Other homebrews can start PlayGuard to ask it something, such as setting the network clock. Nothing is allowed until you choose it below. A change asks you first, then the PIN, except for an app you trusted for 30 days.",
         "enabled": "Let other homebrews call PlayGuard",
         "section_permissions": "What they may do",
         "section_calls": "Last calls",
@@ -1780,7 +1780,8 @@
             "clock_set": "Network clock set.",
             "discovery": "Done.",
             "dry_run": "Allowed (test only: nothing done).",
-            "replayed": "Already done: the same answer again."
+            "replayed": "Already done: the same answer again.",
+            "clock_set_trusted": "Network clock set (allowed in advance)."
         },
         "groups": {
             "clock": "Network clock",
@@ -1799,7 +1800,7 @@
             "unsupported_api": "This version of the request is not supported by this PlayGuard.",
             "api_disabled": "Other homebrews are not allowed to call PlayGuard (Preferences › Other homebrews).",
             "permission_denied": "Not allowed in Preferences › Other homebrews.",
-            "pin_refused": "The PIN was not entered: nothing was changed.",
+            "pin_refused": "The PIN was not entered: nothing was changed. Ask a parent.",
             "no_route": "This PlayGuard does not know this request.",
             "bad_body": "A value of the request is missing or out of range.",
             "auto_correction_off": "\"Synchronize clock via Internet\" is off in System Settings: the network clock was not set.",
@@ -1809,7 +1810,7 @@
             "no_network": "No time server answered: check the Internet connection.",
             "no_measure": "The network clock was never measured on this console.",
             "not_done": "Not done: an earlier request failed.",
-            "declined": "You declined: nothing was changed."
+            "declined": "Request refused. Talk to a parent about it."
         },
         "unnamed_from": "Asked by a homebrew that gave no name",
         "continue": "Continue",
@@ -1821,8 +1822,6 @@
             "clock": "Measure the network clock",
             "clock_sync": "Set the network clock"
         },
-        "confirm_sync": "“{}” asks to set the network clock ({}).",
-        "confirm_sync_yes": "Set it (PIN)",
         "home_icon": "Add “Set the clock” to the HOME menu",
         "home_icon_name": "Set the clock",
         "home_icon_allow": "This icon starts PlayGuard to set the network clock. It needs Other homebrews on, with Network clock on Read and change. Allow it now?",
@@ -1863,12 +1862,35 @@
         "span_days": "{} days",
         "behind": "{} behind",
         "ahead": "{} ahead",
-        "off_unknown": "how far off is unknown",
-        "confirm_sync_unnamed": "A homebrew that gave no name asks to set the network clock ({}).",
         "turn_on_first": "Turn on “Let other homebrews call PlayGuard” first.",
         "clear_calls": "Clear the list",
         "clear_calls_confirm": "Clear the list of calls? The notification bell forgets them too.",
         "clear_calls_done": "The list of calls is empty.",
-        "clear_calls_err": "The list of calls could not be cleared."
+        "clear_calls_err": "The list of calls could not be cleared.",
+        "consent": {
+            "question": "Allow {} to set the network clock?",
+            "question_unnamed": "Allow a homebrew that gave no name to set the network clock?",
+            "restarts": "Today's play time will start over ({} left now, {} after).",
+            "no_limit": "No limit counts today: play time is not affected.",
+            "no_play": "Today allows no play: that does not change.",
+            "unknown": "Changing the clock starts today's play time over: the whole daily limit is available again.",
+            "trust": "Don't ask again for 30 days",
+            "details": "Details",
+            "allow": "Allow (PIN)",
+            "refuse": "Refuse",
+            "version": "v{}",
+            "by": "by {}",
+            "says_it_is": "Presents itself as “{}”",
+            "says_unchecked": "Presents itself as “{}” (not checked: its file could not be read)",
+            "unnamed": "A homebrew that gave no name"
+        },
+        "section_trust": "Trusted apps",
+        "trust_line": "{} · {}",
+        "trust_until": "until {}",
+        "trust_revoke": "Stop trusting",
+        "trust_revoke_confirm": "Stop trusting {}? It will ask again next time.",
+        "trust_revoked": "{} will ask again.",
+        "no_trust": "No app is trusted. On a request, “Don't ask again for 30 days” adds one.",
+        "notice_line_trusted": "{}: {} (allowed in advance)"
     }
 }

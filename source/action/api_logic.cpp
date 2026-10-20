@@ -470,6 +470,115 @@ bool clock_needs_write(int64_t offset_s)
     return offset_s > CLOCK_SLACK_S || offset_s < -CLOCK_SLACK_S;
 }
 
+// ---- What a change costs ---------------------------------------------------
+
+Consequence consequence(const PlayToday& p)
+{
+    Consequence c;
+    if (!p.known) return c;
+    if (!p.enabled || p.limit_min == PlayToday::NO_LIMIT) {
+        c.effect = Effect::NoLimit;
+        return c;
+    }
+    if (p.limit_min <= 0) {
+        c.effect = Effect::NoPlayDay;
+        return c;
+    }
+    if (!p.restricted && p.remaining_s < 0) return c;
+    c.effect          = Effect::Restarts;
+    const int64_t left = p.restricted ? 0 : p.remaining_s / 60;
+    c.left_before_min = (int)std::min<int64_t>(left, p.limit_min);
+    c.left_after_min  = p.limit_min;
+    c.used_before     = 1.0f - (float)c.left_before_min / (float)p.limit_min;
+    return c;
+}
+
+// ---- Apps the parent trusts -------------------------------------------------
+
+namespace
+{
+bool day_ok(const std::string& d)
+{
+    return d.size() == 10 && d[4] == '-' && d[7] == '-' &&
+           std::all_of(d.begin(), d.end(), [](unsigned char ch) { return std::isdigit(ch) || ch == '-'; });
+}
+
+bool sha_ok(const std::string& s)
+{
+    return s.size() == 64 && std::all_of(s.begin(), s.end(), [](unsigned char ch) { return std::isxdigit(ch); });
+}
+}   // namespace
+
+std::vector<Trust> parse_trust(const std::string& text)
+{
+    std::vector<Trust> out;
+    const nlohmann::json j = nlohmann::json::parse(text, nullptr, false);
+    if (j.is_discarded() || !j.is_object()) return out;
+    auto list = j.find("trusted");
+    if (list == j.end() || !list->is_array()) return out;
+    for (const auto& e : *list) {
+        if (!e.is_object()) continue;
+        Trust t;
+        t.nro       = string_at(e, "nro");
+        t.sha       = string_at(e, "sha");
+        t.name      = cut_utf8(string_at(e, "name"), 64);
+        t.action    = string_at(e, "action");
+        t.until     = string_at(e, "until");
+        t.last_auto = string_at(e, "last_auto");
+        if (!return_to_ok(t.nro) || !sha_ok(t.sha) || !day_ok(t.until) || t.action.empty() || t.action.size() > 32) continue;
+        if (!t.last_auto.empty() && !day_ok(t.last_auto)) t.last_auto.clear();
+        out.push_back(t);
+    }
+    if (out.size() > MAX_TRUST) out.erase(out.begin(), out.end() - MAX_TRUST);
+    return out;
+}
+
+std::string dump_trust(const std::vector<Trust>& list)
+{
+    nlohmann::json arr = nlohmann::json::array();
+    for (const auto& t : list)
+        arr.push_back({ { "nro", t.nro }, { "sha", t.sha }, { "name", t.name }, { "action", t.action },
+                        { "until", t.until }, { "last_auto", t.last_auto } });
+    nlohmann::json j = { { "schema", 1 }, { "trusted", arr } };
+    return j.dump(2, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
+}
+
+const Trust* trusted(const std::vector<Trust>& list, const std::string& nro, const std::string& sha,
+                     const std::string& action, const std::string& today)
+{
+    for (const auto& t : list)
+        if (t.nro == nro && t.sha == sha && t.action == action && today <= t.until) return &t;
+    return nullptr;
+}
+
+bool auto_sync_allowed(const Trust& t, int64_t offset_s, const std::string& today)
+{
+    const bool worth = offset_s > TRUST_MIN_OFFSET_S || offset_s < -TRUST_MIN_OFFSET_S;
+    return worth && t.last_auto != today;
+}
+
+void grant(std::vector<Trust>& list, const Trust& t, const std::string& today)
+{
+    list.erase(std::remove_if(list.begin(), list.end(),
+                              [&](const Trust& x) { return (x.nro == t.nro && x.action == t.action) || x.until < today; }),
+               list.end());
+    list.push_back(t);
+    if (list.size() > MAX_TRUST) list.erase(list.begin(), list.end() - MAX_TRUST);
+}
+
+void used_today(std::vector<Trust>& list, const std::string& nro, const std::string& action, const std::string& today)
+{
+    for (auto& t : list)
+        if (t.nro == nro && t.action == action) t.last_auto = today;
+}
+
+void revoke(std::vector<Trust>& list, const std::string& nro, const std::string& action)
+{
+    list.erase(std::remove_if(list.begin(), list.end(),
+                              [&](const Trust& x) { return x.nro == nro && x.action == action; }),
+               list.end());
+}
+
 // ---- Responses -----------------------------------------------------------
 
 Answer error_answer(const Problem& p, const std::string& title)
@@ -612,6 +721,8 @@ std::vector<LogEntry> parse_log(const std::string& text)
         auto d = e.find("dry_run");
         l.dry_run = d != e.end() && d->is_boolean() && d->get<bool>();
         l.code    = string_at(e, "code");
+        auto tr = e.find("trusted");
+        l.trusted = tr != e.end() && tr->is_boolean() && tr->get<bool>();
         if (l.code.size() > 32 || !std::all_of(l.code.begin(), l.code.end(), [](unsigned char ch) { return std::islower(ch) || ch == '_'; }))
             l.code.clear();
         out.push_back(l);
@@ -625,7 +736,7 @@ std::string dump_log(const std::vector<LogEntry>& list)
     nlohmann::json arr = nlohmann::json::array();
     for (const auto& l : list)
         arr.push_back({ { "at", l.at }, { "caller", l.caller }, { "route", l.route }, { "status", l.status },
-                        { "code", l.code }, { "dry_run", l.dry_run } });
+                        { "code", l.code }, { "dry_run", l.dry_run }, { "trusted", l.trusted } });
     nlohmann::json j = { { "schema", 1 }, { "calls", arr } };
     return j.dump(2, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
 }

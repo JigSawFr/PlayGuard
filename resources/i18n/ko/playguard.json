@@ -1765,7 +1765,7 @@
         "closing": "{}초 후에 PlayGuard가 종료됩니다.",
         "returning": "{}(으)로 돌아갑니다({}초 후).",
         "settings_title": "다른 Homebrew",
-        "settings_note": "다른 Homebrew는 네트워크 시계 맞추기 같은 요청을 하려고 PlayGuard를 실행할 수 있습니다. 아래에서 선택하기 전에는 아무것도 허용되지 않습니다. 변경할 때는 항상 먼저 확인한 다음 PIN을 입력받습니다.",
+        "settings_note": "다른 Homebrew는 네트워크 시계 맞추기 같은 요청을 하려고 PlayGuard를 실행할 수 있습니다. 아래에서 선택하기 전에는 아무것도 허용되지 않습니다. 변경할 때는 먼저 확인한 다음 PIN을 입력받습니다. 단, 30일 동안 신뢰한 Homebrew는 예외입니다.",
         "enabled": "다른 Homebrew가 PlayGuard를 호출할 수 있게 허용",
         "section_permissions": "허용할 작업",
         "section_calls": "최근 호출",
@@ -1780,7 +1780,8 @@
             "clock_set": "네트워크 시계를 맞췄습니다.",
             "discovery": "완료했습니다.",
             "dry_run": "허용됨(테스트만: 아무것도 실행하지 않음).",
-            "replayed": "이미 처리했습니다: 같은 응답을 다시 보냈습니다."
+            "replayed": "이미 처리했습니다: 같은 응답을 다시 보냈습니다.",
+            "clock_set_trusted": "네트워크 시계를 맞췄습니다(미리 허용됨)."
         },
         "groups": {
             "clock": "네트워크 시계",
@@ -1799,7 +1800,7 @@
             "unsupported_api": "이 PlayGuard는 이 버전의 요청을 지원하지 않습니다.",
             "api_disabled": "다른 Homebrew는 PlayGuard를 호출할 수 없습니다(환경 설정 › 다른 Homebrew).",
             "permission_denied": "환경 설정 › 다른 Homebrew에서 허용되지 않았습니다.",
-            "pin_refused": "PIN을 입력하지 않았습니다: 아무것도 변경되지 않았습니다.",
+            "pin_refused": "PIN을 입력하지 않아서 아무것도 바뀌지 않았어요. 부모님께 물어보세요.",
             "no_route": "이 PlayGuard는 이 요청을 알지 못합니다.",
             "bad_body": "요청의 값이 없거나 범위를 벗어났습니다.",
             "auto_correction_off": "설정에서 \"인터넷으로 시계 맞추기\"가 꺼져 있습니다: 네트워크 시계를 맞추지 않았습니다.",
@@ -1809,7 +1810,7 @@
             "no_network": "응답한 시간 서버가 없습니다: 인터넷 연결을 확인하세요.",
             "no_measure": "이 본체에서 네트워크 시계를 측정한 적이 없습니다.",
             "not_done": "처리하지 않음: 이전 요청이 실패했습니다.",
-            "declined": "거절하셨습니다: 아무것도 변경되지 않았습니다."
+            "declined": "요청이 거절되었어요. 부모님께 이야기해 보세요."
         },
         "unnamed_from": "요청한 곳: 이름을 밝히지 않은 Homebrew",
         "continue": "계속",
@@ -1821,8 +1822,6 @@
             "clock": "네트워크 시계 측정",
             "clock_sync": "네트워크 시계 맞추기"
         },
-        "confirm_sync": "“{}”이(가) 네트워크 시계를 맞추려고 합니다({}).",
-        "confirm_sync_yes": "맞추기(PIN)",
         "home_icon": "HOME 메뉴에 \"시계 맞추기\" 추가",
         "home_icon_name": "시계 맞추기",
         "home_icon_allow": "이 아이콘은 PlayGuard를 실행해 네트워크 시계를 맞춥니다. '다른 Homebrew'를 켜고 네트워크 시계를 '읽기 및 변경'으로 설정해야 합니다. 지금 허용할까요?",
@@ -1863,12 +1862,35 @@
         "span_days": "{}일",
         "behind": "{} 느림",
         "ahead": "{} 빠름",
-        "off_unknown": "차이를 알 수 없음",
-        "confirm_sync_unnamed": "이름을 밝히지 않은 Homebrew가 네트워크 시계를 맞추려고 합니다({}).",
         "turn_on_first": "먼저 \"다른 Homebrew가 PlayGuard를 호출할 수 있게 허용\"을 켜세요.",
         "clear_calls": "목록 지우기",
         "clear_calls_confirm": "호출 목록을 지울까요? 알림 벨에서도 사라집니다.",
         "clear_calls_done": "호출 목록이 비어 있습니다.",
-        "clear_calls_err": "호출 목록을 지울 수 없습니다."
+        "clear_calls_err": "호출 목록을 지울 수 없습니다.",
+        "consent": {
+            "question": "{}에서 네트워크 시계를 맞추도록 허용할까요?",
+            "question_unnamed": "이름을 밝히지 않은 Homebrew가 네트워크 시계를 맞추도록 허용할까요?",
+            "restarts": "오늘의 플레이 시간이 처음부터 다시 시작됩니다(현재 {} 남음, 변경 후 {}).",
+            "no_limit": "오늘은 적용되는 제한이 없습니다: 플레이 시간에는 영향이 없습니다.",
+            "no_play": "오늘은 플레이할 수 없는 날입니다: 이 점은 바뀌지 않습니다.",
+            "unknown": "시계를 바꾸면 오늘의 플레이 시간이 처음부터 다시 시작됩니다: 하루 제한 시간을 다시 모두 쓸 수 있게 됩니다.",
+            "trust": "30일 동안 다시 묻지 않기",
+            "details": "자세히",
+            "allow": "허용(PIN)",
+            "refuse": "거부",
+            "version": "v{}",
+            "by": "제작: {}",
+            "says_it_is": "“{}”(이)라고 소개함",
+            "says_unchecked": "“{}”(이)라고 소개함(확인 안 됨: 파일을 읽을 수 없음)",
+            "unnamed": "이름을 밝히지 않은 Homebrew"
+        },
+        "section_trust": "신뢰하는 Homebrew",
+        "trust_line": "{} · {}",
+        "trust_until": "{}까지",
+        "trust_revoke": "신뢰 해제",
+        "trust_revoke_confirm": "{}의 신뢰를 해제할까요? 다음부터 다시 묻게 됩니다.",
+        "trust_revoked": "{}은(는) 다시 묻게 됩니다.",
+        "no_trust": "신뢰하는 Homebrew가 없습니다. 요청이 오면 \"30일 동안 다시 묻지 않기\"로 추가할 수 있습니다.",
+        "notice_line_trusted": "{}: {}(미리 허용됨)"
     }
 }

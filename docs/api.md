@@ -84,9 +84,22 @@ in one press. Calls that changed something (`POST`) are also in the change
 history, as every change is, and in the notification bell (the last 7 days),
 as are 3 refusals or more.
 
-Before a change, the parent is told who asks (the `caller`, said to be the
-name it gives itself), what changes and what it costs, and may decline
-(`403 declined`); the PIN comes after. A request refused for want of a
+Before a change, a card over the request's screen asks the parent: the
+app's own icon and name read from its `.nro` (`return_to`; the `caller` is
+only shown apart when it differs, said to be the name it gives itself), what
+changes and what it costs. *Refuse* is focused (`403 declined`); *Allow* asks
+for the PIN after.
+
+**Trusted apps.** On that card, *Don't ask again for 30 days* trusts this app
+for this action: the same `.nro` file (its path and SHA-256: another file at
+that path is asked again), until a day 30 days on. A trusted app's clock
+sync is done without asking only when the clock is off by more than a
+minute, and once a day at most: setting the clock starts the day's play
+time over, and an app the child can start must not hand a new day each
+time. Otherwise the card comes as usual. The response says `"trusted": true`,
+and the change is in the calls, the history and the notification bell
+(*allowed in advance*). The settings list the trusted apps and their day;
+one press stops trusting one. Kept in `sdmc:/config/playguard/api/trust.json`. A request refused for want of a
 permission offers *Allow…* on its screen, which opens these settings behind
 the PIN. The settings can also put a *Set the clock* icon on the HOME menu:
 a forwarder of PlayGuard with `--api "POST /v1/clock/sync"`.

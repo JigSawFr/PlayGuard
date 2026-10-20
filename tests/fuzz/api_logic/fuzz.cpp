@@ -1,6 +1,6 @@
 // libFuzzer target: source/action/api_logic.cpp reading what another
 // homebrew hands PlayGuard (docs/api.md): the request file, the short form,
-// and the two files kept between launches (handled.json, calls.json), all on
+// and the files kept between launches (handled.json, calls.json, trust.json), all on
 // the SD card. Beyond the sanitizers: every path a request keeps is one a
 // caller may name, every call a known method with a path from "/",
 // at most 8 calls, and a refused request says why with a 4xx or 5xx; the
@@ -51,6 +51,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     const auto handled = parse_handled(text);
     FUZZ_ASSERT(handled.size() <= MAX_HANDLED);
     FUZZ_ASSERT(parse_handled(dump_handled(handled)).size() == handled.size());
+    const auto trust = parse_trust(text);
+    FUZZ_ASSERT(trust.size() <= MAX_TRUST);
+    for (const auto& t : trust) FUZZ_ASSERT(return_to_ok(t.nro) && t.sha.size() == 64 && t.until.size() == 10);
+    FUZZ_ASSERT(dump_trust(parse_trust(dump_trust(trust))) == dump_trust(trust));
     const auto log = parse_log(text);
     FUZZ_ASSERT(log.size() <= MAX_LOG);
     FUZZ_ASSERT(dump_log(parse_log(dump_log(log))) == dump_log(log));

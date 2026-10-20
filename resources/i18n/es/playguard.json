@@ -1765,7 +1765,7 @@
         "closing": "PlayGuard se cerrará en {} s.",
         "returning": "Volviendo a {} en {} s.",
         "settings_title": "Otros homebrews",
-        "settings_note": "Otros homebrews pueden abrir PlayGuard para pedirle algo, como ajustar el reloj de red. No se permite nada hasta que lo elija abajo. Cualquier cambio le pide confirmación primero y después el PIN.",
+        "settings_note": "Otros homebrews pueden abrir PlayGuard para pedirle algo, como ajustar el reloj de red. No se permite nada hasta que lo elija abajo. Cualquier cambio le pide confirmación primero y después el PIN, salvo para un homebrew en el que haya confiado durante 30 días.",
         "enabled": "Permitir que otros homebrews llamen a PlayGuard",
         "section_permissions": "Qué pueden hacer",
         "section_calls": "Últimas llamadas",
@@ -1780,7 +1780,8 @@
             "clock_set": "Reloj de red ajustado.",
             "discovery": "Hecho.",
             "dry_run": "Permitido (solo de prueba: no se ha hecho nada).",
-            "replayed": "Ya estaba hecho: se repite la misma respuesta."
+            "replayed": "Ya estaba hecho: se repite la misma respuesta.",
+            "clock_set_trusted": "Reloj de red ajustado (permitido de antemano)."
         },
         "groups": {
             "clock": "Reloj de red",
@@ -1799,7 +1800,7 @@
             "unsupported_api": "Este PlayGuard no admite esta versión de la solicitud.",
             "api_disabled": "Los otros homebrews no tienen permiso para llamar a PlayGuard (Preferencias › Otros homebrews).",
             "permission_denied": "No permitido en Preferencias › Otros homebrews.",
-            "pin_refused": "No se ha introducido el PIN: no se ha cambiado nada.",
+            "pin_refused": "No se ha introducido el PIN: no se ha cambiado nada. Pídeselo a tu padre o tu madre.",
             "no_route": "Este PlayGuard no conoce esta solicitud.",
             "bad_body": "Falta un valor de la solicitud o está fuera de rango.",
             "auto_correction_off": "«Sincronizar el reloj por Internet» está desactivado en la configuración de la consola: no se ha ajustado el reloj de red.",
@@ -1809,7 +1810,7 @@
             "no_network": "Ningún servidor de hora ha respondido: compruebe la conexión a Internet.",
             "no_measure": "El reloj de red nunca se ha medido en esta consola.",
             "not_done": "No realizado: ha fallado una solicitud anterior.",
-            "declined": "Lo ha rechazado: no se ha cambiado nada."
+            "declined": "Solicitud rechazada. Háblalo con tu padre o tu madre."
         },
         "unnamed_from": "Solicitada por un homebrew que no ha dado su nombre",
         "continue": "Continuar",
@@ -1821,8 +1822,6 @@
             "clock": "Medir el reloj de red",
             "clock_sync": "Ajustar el reloj de red"
         },
-        "confirm_sync": "«{}» pide ajustar el reloj de red ({}).",
-        "confirm_sync_yes": "Ajustarlo (PIN)",
         "home_icon": "Añadir «Ajustar el reloj» al menú HOME",
         "home_icon_name": "Ajustar el reloj",
         "home_icon_allow": "Este icono abre PlayGuard para ajustar el reloj de red. Requiere Otros homebrews activado, con Reloj de red en Leer y cambiar. ¿Permitirlo ahora?",
@@ -1863,12 +1862,35 @@
         "span_days": "{} días",
         "behind": "{} atrasado",
         "ahead": "{} adelantado",
-        "off_unknown": "desfase desconocido",
-        "confirm_sync_unnamed": "Un homebrew que no ha dado su nombre pide ajustar el reloj de red ({}).",
         "turn_on_first": "Active primero «Permitir que otros homebrews llamen a PlayGuard».",
         "clear_calls": "Vaciar la lista",
         "clear_calls_confirm": "¿Vaciar la lista de llamadas? La campana de notificaciones también las olvidará.",
         "clear_calls_done": "La lista de llamadas está vacía.",
-        "clear_calls_err": "No se ha podido vaciar la lista de llamadas."
+        "clear_calls_err": "No se ha podido vaciar la lista de llamadas.",
+        "consent": {
+            "question": "¿Permitir que {} ajuste el reloj de red?",
+            "question_unnamed": "¿Permitir que un homebrew que no ha dado su nombre ajuste el reloj de red?",
+            "restarts": "El tiempo de juego de hoy volverá a empezar (quedan {} ahora, {} después).",
+            "no_limit": "Hoy no cuenta ningún límite: el tiempo de juego no se ve afectado.",
+            "no_play": "Hoy no se permite jugar: eso no cambia.",
+            "unknown": "Cambiar el reloj hace que el tiempo de juego de hoy vuelva a empezar: vuelve a estar disponible todo el límite diario.",
+            "trust": "No volver a preguntar durante 30 días",
+            "details": "Detalles",
+            "allow": "Permitir (PIN)",
+            "refuse": "Rechazar",
+            "version": "v{}",
+            "by": "de {}",
+            "says_it_is": "Se presenta como «{}»",
+            "says_unchecked": "Se presenta como «{}» (sin comprobar: no se ha podido leer su archivo)",
+            "unnamed": "Un homebrew que no ha dado su nombre"
+        },
+        "section_trust": "Homebrews de confianza",
+        "trust_line": "{} · {}",
+        "trust_until": "hasta el {}",
+        "trust_revoke": "Dejar de confiar",
+        "trust_revoke_confirm": "¿Dejar de confiar en {}? Volverá a preguntar la próxima vez.",
+        "trust_revoked": "{} volverá a preguntar.",
+        "no_trust": "Ningún homebrew es de confianza. En una solicitud, «No volver a preguntar durante 30 días» añade uno.",
+        "notice_line_trusted": "{}: {} (permitido de antemano)"
     }
 }

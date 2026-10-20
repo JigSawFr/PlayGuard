@@ -144,6 +144,65 @@ bool cached(const Call& c);
 // Whether a measured offset is worth a write (and the PIN): more than CLOCK_SLACK_S.
 bool clock_needs_write(int64_t offset_s);
 
+// ---- What a change costs ---------------------------------------------------
+
+// Today's play timer, as the consent screen needs it (from PtState).
+struct PlayToday
+{
+    bool known = false;          // the timer could be read
+    bool enabled = false;        // a limit counts today
+    bool restricted = false;     // the limit is reached
+    int  limit_min = 0;          // today's limit; NO_LIMIT for none
+    int64_t remaining_s = -1;    // what is left; < 0 unknown
+    static constexpr int NO_LIMIT = 0xFFFF;
+};
+
+// What setting the clock does to today's play time: it starts the day over
+// (docs/parental-controls.md), which matters only with a limit.
+enum class Effect { Unknown, NoLimit, NoPlayDay, Restarts };
+struct Consequence
+{
+    Effect effect = Effect::Unknown;
+    int left_before_min = 0;     // Restarts: what is left now
+    int left_after_min = 0;      // Restarts: the whole limit again
+    float used_before = 0.0f;    // Restarts: 0..1 of the limit played
+};
+Consequence consequence(const PlayToday& p);
+
+// ---- Apps the parent trusts -------------------------------------------------
+
+// "Allow MyApp for 30 days": an app (its .nro, by path and SHA-256: the same
+// file, not only the same name) may do one action without asking, until a
+// day. For a change, only when it is worth one and once a day at most
+// (setting the clock starts the day's play time over: an app the child can
+// start must not hand a new day each time). Kept in api/trust.json.
+constexpr int TRUST_DAYS = 30;
+constexpr int64_t TRUST_MIN_OFFSET_S = 60;   // the clock sync: further off than this
+constexpr size_t MAX_TRUST = 16;
+struct Trust
+{
+    std::string nro;          // "sdmc:/switch/myapp/myapp.nro"
+    std::string sha;          // its SHA-256, 64 hex digits
+    std::string name;         // its NACP name, for the settings
+    std::string action;       // a route key: "clock_sync"
+    std::string until;        // the last day it holds, "YYYY-MM-DD"
+    std::string last_auto;    // the day it last acted without asking ("" never)
+};
+std::vector<Trust> parse_trust(const std::string& text);
+std::string        dump_trust(const std::vector<Trust>& list);
+// The entry for this file and action, still valid on `today` ("YYYY-MM-DD").
+const Trust* trusted(const std::vector<Trust>& list, const std::string& nro, const std::string& sha,
+                     const std::string& action, const std::string& today);
+// May it set the clock without asking now: off by more than a minute, and
+// not already done today.
+bool auto_sync_allowed(const Trust& t, int64_t offset_s, const std::string& today);
+// Adds or replaces (same file and action), keeping the MAX_TRUST newest;
+// entries past their day are dropped.
+void grant(std::vector<Trust>& list, const Trust& t, const std::string& today);
+// It acted without asking today.
+void used_today(std::vector<Trust>& list, const std::string& nro, const std::string& action, const std::string& today);
+void revoke(std::vector<Trust>& list, const std::string& nro, const std::string& action);
+
 // ---- Responses -----------------------------------------------------------
 
 struct Answer
@@ -189,6 +248,7 @@ struct LogEntry
     std::string at, caller, route;   // route: "POST /v1/clock/sync"
     int status = 0;
     std::string code;                // the error's code ("" when it went through)
+    bool trusted = false;            // done without asking: an app the parent trusts
     bool dry_run = false;
 };
 std::vector<LogEntry> parse_log(const std::string& text);

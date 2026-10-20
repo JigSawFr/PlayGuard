@@ -33,6 +33,8 @@
             <brls:Header title="@i18n/playguard/api/section_permissions" marginTop="24" marginBottom="8"/>
             <brls:Box id="as_perms" width="auto" height="auto" axis="column" alignItems="stretch"/>
             <brls:Box id="as_actions" width="auto" height="auto" axis="column" alignItems="stretch"/>
+            <brls:Header title="@i18n/playguard/api/section_trust" marginTop="24" marginBottom="8"/>
+            <brls:Box id="as_trust" width="auto" height="auto" axis="column" alignItems="stretch"/>
             <brls:Header title="@i18n/playguard/api/section_calls" marginTop="24" marginBottom="8"/>
             <brls:Box id="as_calls" width="auto" height="auto" axis="column" alignItems="stretch"/>
             <brls:Box id="as_more" width="auto" height="auto" axis="column" alignItems="stretch" marginTop="16"/>

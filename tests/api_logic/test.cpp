@@ -238,6 +238,87 @@ static void test_timeout_and_clock()
     CHECK(clock_needs_write(3) && clock_needs_write(-183));
 }
 
+static void test_consequence()
+{
+    PlayToday p;
+    CHECK(consequence(p).effect == Effect::Unknown);
+    p.known = true;
+    CHECK(consequence(p).effect == Effect::NoLimit);   // the timer off
+    p.enabled   = true;
+    p.limit_min = PlayToday::NO_LIMIT;
+    CHECK(consequence(p).effect == Effect::NoLimit);
+    p.limit_min = 0;
+    CHECK(consequence(p).effect == Effect::NoPlayDay);
+    p.limit_min = 180;
+    CHECK(consequence(p).effect == Effect::Unknown);   // what is left unknown
+    p.remaining_s = 80 * 60 + 30;
+    Consequence c = consequence(p);
+    CHECK(c.effect == Effect::Restarts && c.left_before_min == 80 && c.left_after_min == 180);
+    CHECK(c.used_before > 0.55f && c.used_before < 0.56f);
+    p.restricted = true;   // reached: nothing left, the whole limit after
+    c = consequence(p);
+    CHECK(c.left_before_min == 0 && c.left_after_min == 180 && c.used_before == 1.0f);
+    p.restricted  = false;
+    p.remaining_s = 500 * 60;   // more than the limit (extra time): capped
+    CHECK(consequence(p).left_before_min == 180 && consequence(p).used_before == 0.0f);
+}
+
+static void test_trust()
+{
+    const std::string sha(64, 'a'), other(64, 'b');
+    Trust t;
+    t.nro    = "sdmc:/switch/myapp/myapp.nro";
+    t.sha    = sha;
+    t.name   = "MyApp";
+    t.action = "clock_sync";
+    t.until  = "2026-11-19";
+    std::vector<Trust> list;
+    grant(list, t, "2026-10-20");
+    CHECK(trusted(list, t.nro, sha, "clock_sync", "2026-10-20"));
+    CHECK(trusted(list, t.nro, sha, "clock_sync", "2026-11-19"));
+    CHECK(!trusted(list, t.nro, sha, "clock_sync", "2026-11-20"));     // past its day
+    CHECK(!trusted(list, t.nro, other, "clock_sync", "2026-10-20"));   // another file at that path
+    CHECK(!trusted(list, "sdmc:/switch/x/x.nro", sha, "clock_sync", "2026-10-20"));
+    CHECK(!trusted(list, t.nro, sha, "clock", "2026-10-20"));
+
+    // A change worth one, once a day.
+    const Trust* e = trusted(list, t.nro, sha, "clock_sync", "2026-10-20");
+    CHECK(auto_sync_allowed(*e, 300, "2026-10-20") && auto_sync_allowed(*e, -61, "2026-10-20"));
+    CHECK(!auto_sync_allowed(*e, 60, "2026-10-20") && !auto_sync_allowed(*e, 3, "2026-10-20"));
+    used_today(list, t.nro, "clock_sync", "2026-10-20");
+    CHECK(!auto_sync_allowed(*trusted(list, t.nro, sha, "clock_sync", "2026-10-20"), 300, "2026-10-20"));
+    CHECK(auto_sync_allowed(*trusted(list, t.nro, sha, "clock_sync", "2026-10-21"), 300, "2026-10-21"));
+
+    // Read back the same; a damaged entry dropped, not the others.
+    const auto back = parse_trust(dump_trust(list));
+    CHECK(back.size() == 1 && back[0].last_auto == "2026-10-20" && back[0].name == "MyApp");
+    CHECK(parse_trust(R"({"trusted":[{"nro":"sdmc:/atmosphere/x.nro","sha":"aa","action":"clock_sync","until":"2026-11-19"}]})").empty());
+    CHECK(parse_trust("{}").empty() && parse_trust("no").empty());
+
+    // Granted again: replaced, not doubled; expired ones go.
+    t.until = "2026-11-20";
+    grant(list, t, "2026-10-21");
+    CHECK(list.size() == 1 && list[0].until == "2026-11-20");
+    Trust old = t;
+    old.nro   = "sdmc:/switch/old/old.nro";
+    old.until = "2026-10-01";
+    list.push_back(old);
+    Trust fresh = t;
+    fresh.nro = "sdmc:/switch/new/new.nro";
+    grant(list, fresh, "2026-10-21");
+    CHECK(list.size() == 2);
+    revoke(list, fresh.nro, "clock_sync");
+    CHECK(list.size() == 1 && list[0].nro == t.nro);
+
+    LogEntry l;
+    l.route   = "POST /v1/clock/sync";
+    l.status  = 200;
+    l.trusted = true;
+    std::vector<LogEntry> log;
+    log_call(log, l);
+    CHECK(parse_log(dump_log(log)).front().trusted);
+}
+
 static void test_response()
 {
     Request r;
@@ -357,6 +438,8 @@ int main()
     test_routes();
     test_levels();
     test_timeout_and_clock();
+    test_consequence();
+    test_trust();
     test_response();
     test_discovery();
     test_handled();
