@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 91481ad14111 -->
+<!-- translated from docs/features.md, sha256 0adcb09f77ee -->
 # Funzioni
 
 Cosa fa ogni scheda, come PlayGuard scrive senza rischi, e cosa la console conta come tempo di gioco. Nuovo su PlayGuard? Comincia da [Per iniziare](getting-started.md). Torna al [README](../../README.md).
@@ -389,6 +389,7 @@ Su una console senza Internet, *Imposta l'orologio di rete sull'orologio della c
 - **PlayGuard** con una sola pressione: la sua icona e il suo nome, con il forwarder che avvia il `.nro` da cui è stato aperto PlayGuard.
 - **Un altro homebrew**: qualsiasi `.nro` della cartella `/switch` della scheda SD (e di una cartella più sotto), con il suo nome chiesto prima (quello del `.nro`, da tenere o cambiare). La sua icona è quella del `.nro`, convertita nel JPEG 256 × 256 che mostra il menu HOME quando ha un'altra dimensione o è un PNG (un controller al suo posto quando il `.nro` non ne ha), come fa sphaira. Un percorso con uno spazio viene passato all'homebrew tra virgolette.
 - **I forwarder del menu HOME**, ognuno con la sua icona: quelli creati da PlayGuard (Ⓐ: dettagli, rinomina, cambia l'editore, reinstalla, elimina) e quelli di un'altra app (dettagli, elimina). Uno il cui `.nro` non c'è più lo dice; uno eliminato nelle Impostazioni di sistema resta in elenco finché non viene reinstallato o dimenticato. Reinstallare mantiene il suo ID programma, così la voce del menu HOME viene sostituita, non raddoppiata; anche un forwarder creato da un altro strumento per lo stesso `.nro` viene sostituito.
+- **Icone e lingue:** un'icona di un'altra dimensione, un PNG, o un JPEG con dati EXIF o codifica progressiva (il menu HOME li mostra come un "?") diventa un semplice JPEG 256 × 256. I dati di controllo del forwarder dichiarano solo l'inglese americano, la lingua della sua unica icona: così l'icona compare su una console impostata in qualsiasi lingua.
 - **Patch di firma:** la console avvia un forwarder solo con le patch di firma di fs e del loader (sys-patch, o file sigpatch): senza di esse, la schermata lo dice sopra l'elenco (*Console › Patch dei giochi* dà i dettagli). Il `.nro` resta dov'è; eliminare un forwarder non lo tocca mai.
 - **Tempo di gioco:** avviato dalla sua icona, un homebrew funziona come un gioco: il timer lo conta e lo sospende come qualsiasi gioco quando il tempo è scaduto, e *Attività* lo elenca. PlayGuard resta a portata di mano dal menu homebrew.
 - Ogni modifica chiede il PIN quando lo prevede *Proteggi PlayGuard con il PIN*, viene rifiutata in modalità sola lettura e compare nella cronologia delle modifiche. Ciò che PlayGuard ha creato viene conservato per sistema (sysMMC / emuMMC), in `forwarders.json`.
