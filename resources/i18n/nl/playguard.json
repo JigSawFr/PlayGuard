@@ -1260,6 +1260,8 @@
         "manual_body": "Om bij te werken open je sphaira (het GitHub-menu daarvan kent PlayGuard al) of de Homebrew App Store, of download je playguard.nro van {} en kopieer je het naar /switch/playguard/ op de SD-kaart.",
         "open_body": "PlayGuard wordt gesloten en {} wordt geopend. Zoek daar PlayGuard op om het bij te werken.",
         "open_confirm": "{} openen",
+        "store_behind": "{} heeft nog PlayGuard {}: versie {} verschijnt daar pas na een controle, vaak een paar dagen later. PlayGuard kan zichzelf nu bijwerken. Je instellingen blijven behouden.",
+        "store_behind_confirm": "Bijwerken in PlayGuard",
         "update_with": "Bijwerken met {}",
         "update_manual": "Zo werk je bij",
         "appstore": "Homebrew App Store",

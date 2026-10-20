@@ -56,6 +56,12 @@ const KEYS = {
 };
 const NAME = /^[a-z0-9_]+$/;
 
+// As the documentation (pages.yml): simulator/ is the latest release's
+// (main's while no release has one), simulator/dev/ main's, simulator/<tag>/
+// a release's. The site one or two folders up.
+const VERSION_DIR = /\/simulator\/(dev|v\d+\.\d+\.\d+)\/$/.exec(location.pathname)?.[1] ?? null;
+const SITE_UP = VERSION_DIR ? '../../' : '../';
+
 const $ = (id) => document.getElementById(id);
 const canvas = $('canvas');
 let manifest = { groups: [], params: [], presets: [] };
@@ -117,9 +123,16 @@ function showTheme() {
   // The choice (the header's icon on a phone), then the theme it gives.
   document.documentElement.dataset.themeChoice = chosenTheme();
   document.documentElement.dataset.theme = effective;
+  barColour(effective);
   // Started with the other one (Auto following a change of the system's):
   // PlayGuard reads its theme at start-up, so offer to start it again.
   $('theme-notice').hidden = !started || effective === consoleTheme;
+}
+
+// The browser's bar (Android) and the home-screen app's, in the page's
+// theme: the header's colour (simulator.css' --surface).
+function barColour(theme) {
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#111d31' : '#ffffff');
 }
 
 function chooseTheme(choice) {
@@ -507,6 +520,14 @@ function start() {
     onAbort: (what) => showError(`${t('error')} ${what ?? ''}`),
   };
   window.addEventListener('error', (e) => {
+    // Not the page's: "Script error." and nothing else (a script the page
+    // may not read: iOS' share sheet, an extension), or another site's
+    // script. PlayGuard still runs: noted in the log, not shown as its end.
+    const elsewhere = e.filename && new URL(e.filename, location.href).origin !== location.origin;
+    if (elsewhere || (!e.error && !e.filename && /^Script error\.?$/.test(e.message ?? ''))) {
+      log(`page: ${e.message || 'an error'}${e.filename ? ` (${e.filename})` : ''}, not PlayGuard's`, true);
+      return;
+    }
     if (started) showError(`${t('error')} ${e.message ?? e.error ?? ''}`);
   });
   started = true;
@@ -563,6 +584,29 @@ function setUpTools() {
   });
 }
 
+// Full screen, where the browser allows it (Android, a computer; not an
+// iPhone's Safari, whose home-screen app plays in landscape instead):
+// only the screen and the pad (html.game), turned to landscape on a phone.
+function setUpFullscreen() {
+  const root = document.documentElement;
+  if (!document.fullscreenEnabled || !root.requestFullscreen) return;
+  const button = $('fullscreen');
+  button.hidden = false;
+  button.addEventListener('click', async () => {
+    try {
+      await root.requestFullscreen({ navigationUI: 'hide' });
+      if (matchMedia('(pointer: coarse)').matches) await screen.orientation?.lock?.('landscape');
+    } catch { /* refused, or no orientation lock: full screen as it is */ }
+  });
+  $('fs-exit').addEventListener('click', () => document.exitFullscreen().catch(() => {}));
+  document.addEventListener('fullscreenchange', () => {
+    const on = document.fullscreenElement === root;
+    root.classList.toggle('game', on);
+    if (!on) screen.orientation?.unlock?.();
+    canvas.focus();
+  });
+}
+
 function setUpPad() {
   for (const button of $('pad').querySelectorAll('[data-button]')) {
     const code = Number(button.dataset.button);
@@ -570,6 +614,8 @@ function setUpPad() {
     button.addEventListener('pointerdown', (e) => {
       button.setPointerCapture(e.pointerId);
       button.classList.add('active');
+      // A finger's press felt, as on a controller (Android; iOS has no vibration).
+      if (e.pointerType === 'touch') navigator.vibrate?.(10);
       noteButton(code);
       press(code, true);
       e.preventDefault();
@@ -709,6 +755,8 @@ async function runSteps(text, onStep) {
   const list = SimLogic.parseSteps(text);
   const run = { stopped: false };
   replaying = run;
+  // Nobody touches the phone while the tour plays: its screen kept on.
+  const awake = keepAwake();
   try {
     for (let i = 0; i < list.length && !run.stopped; i++) {
       const step = list[i];
@@ -743,8 +791,32 @@ async function runSteps(text, onStep) {
       }
     }
   } finally {
+    awake.release();
     if (replaying === run) replaying = null;
   }
+}
+
+// The screen kept on (Wake Lock: Android, iOS 16.4+) until release(); taken
+// again when the page comes back into view, which drops it.
+function keepAwake() {
+  let lock = null;
+  let done = false;
+  const take = () => {
+    if (done || document.visibilityState !== 'visible' || !navigator.wakeLock) return;
+    navigator.wakeLock.request('screen').then((l) => {
+      if (done) l.release().catch(() => {});
+      else lock = l;
+    }, () => { /* refused (battery saver, a page without focus): no matter */ });
+  };
+  document.addEventListener('visibilitychange', take);
+  take();
+  return {
+    release() {
+      done = true;
+      document.removeEventListener('visibilitychange', take);
+      lock?.release().catch(() => {});
+    },
+  };
 }
 
 // Replays steps with the notice above the screen, and Stop.
@@ -835,7 +907,7 @@ function translatePage() {
 // folders): its home, and the header's links as on the website. The
 // language menu's face on a phone: the language's code.
 function homeLink() {
-  const home = `../${language === 'en-US' ? '' : `${language.toLowerCase()}/`}`;
+  const home = `${SITE_UP}${language === 'en-US' ? '' : `${language.toLowerCase()}/`}`;
   $('home-link').href = home;
   $('nav-features').href = `${home}#features`;
   $('nav-install').href = `${home}#install`;
@@ -878,6 +950,29 @@ async function showBuild() {
     box.textContent = t('unknown_build');
     return '';
   }
+}
+
+// The simulator of each release beside main's (releases.json, pages.yml):
+// the one chosen opens with the same settings. simulator/ itself says which
+// it is in its build.json (a release's: its tag, put there by pages.yml).
+async function setUpVersions(build) {
+  const field = $('version-field');
+  const select = $('version-select');
+  const up = VERSION_DIR ? '../' : '';
+  let tags = [];
+  try {
+    const res = await fetch(`${up}releases.json`, { cache: 'no-cache' });
+    if (res.ok) tags = (await res.json()).map((r) => r.tag).filter((tag) => /^v\d+\.\d+\.\d+$/.test(tag));
+  } catch { /* none: main's alone */ }
+  if (!tags.length) return;
+  await build;
+  const here = VERSION_DIR ?? (tags.includes(buildInfo?.ref) ? buildInfo.ref : 'dev');
+  select.append(el('option', { value: 'dev', text: t('version_dev') }), ...tags.map((tag) => el('option', { value: tag, text: tag })));
+  select.value = here;
+  select.addEventListener('change', () => {
+    location.href = `${up}${select.value}/${location.search}`;
+  });
+  field.hidden = false;
 }
 
 function setUpPanel() {
@@ -948,8 +1043,10 @@ async function main() {
   homeLink();
   setUpHeader();
   setUpPanel();
+  setUpVersions(build);
   setUpKeys();
   setUpPad();
+  setUpFullscreen();
   setUpTools();
   buildPresets();
   buildForm(current);

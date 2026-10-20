@@ -134,5 +134,22 @@
  "changelog_english": "リリースノートは英語で書かれています。",
  "not_found_title": "ページが見つかりません",
  "not_found_text": "このページは存在しないか、なくなりました。",
- "home": "ホーム"
+ "home": "ホーム",
+ "doc_version": "バージョン",
+ "doc_dev": "開発中",
+ "doc_dev_note": "このページは開発中のバージョンについて説明しています。一部はまだ {{release}} に含まれていません。",
+ "doc_dev_see_release": "{{release}} のこのページ",
+ "doc_dev_whats_new": "今後の予定",
+ "doc_release_note": "このページは最新リリースの {{release}} について説明しています。",
+ "doc_release_see_dev": "開発中のバージョン",
+ "doc_release_untranslated": "{{release}} のドキュメントはこの言語ではありませんでした。英語版を表示しています。",
+ "changelog_dev": "開発中",
+ "changelog_dev_intro": "main にあり、まだ {{release}} には含まれていないもの：次のリリース、または今すぐ開発ビルドで。",
+ "changelog_dev_try": "開発ビルドをインストール",
+ "doc_dev_new_page": "このページは {{release}} 以降に追加されました。開発中のバージョンについて説明しています。",
+ "doc_new": "新着",
+ "since_label": "お使いのバージョン",
+ "since_many": "お使いのバージョン以降のリリース：{n} 件。続いて開発中の内容。",
+ "since_latest": "最新リリースをお使いです。今後の内容は「開発中」にあります。",
+ "since_unknown": "PlayGuard のバージョンではありません（1.0.0、1.2.0…）。"
 }

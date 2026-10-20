@@ -1260,6 +1260,8 @@
         "manual_body": "若要更新，請開啟sphaira（其GitHub選單已包含PlayGuard）或Homebrew App Store，或從{}下載playguard.nro，並複製到SD卡的/switch/playguard/。",
         "open_body": "PlayGuard將關閉並開啟{}。請在其中找到PlayGuard進行更新。",
         "open_confirm": "開啟{}",
+        "store_behind": "{}中仍是 PlayGuard {}:{} 需經審核後才會上架,通常要幾天。PlayGuard 現在就可以自行更新。你的設定會保留。",
+        "store_behind_confirm": "在 PlayGuard 中更新",
         "update_with": "使用{}更新",
         "update_manual": "更新方式",
         "appstore": "Homebrew App Store",

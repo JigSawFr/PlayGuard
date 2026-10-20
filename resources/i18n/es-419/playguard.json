@@ -1260,6 +1260,8 @@
         "manual_body": "Para actualizar, abra sphaira (su menú GitHub ya conoce PlayGuard) o la Homebrew App Store, o descargue playguard.nro desde {} y cópielo en /switch/playguard/ de la tarjeta SD.",
         "open_body": "PlayGuard se cerrará y abrirá {}. Busque allí PlayGuard para actualizarlo.",
         "open_confirm": "Abrir {}",
+        "store_behind": "{} aún tiene PlayGuard {}: publica la {} después de una revisión, a menudo unos días más tarde. PlayGuard puede actualizarse por sí mismo ahora. Tu configuración se conserva.",
+        "store_behind_confirm": "Actualizar en PlayGuard",
         "update_with": "Actualizar con {}",
         "update_manual": "Cómo actualizar",
         "appstore": "Homebrew App Store",

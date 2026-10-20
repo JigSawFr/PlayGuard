@@ -13,6 +13,10 @@ namespace
 // first two (sphaira/source/app.cpp); hb-appstore unzips to /switch/appstore/.
 const char* const SPHAIRA[]  = { "/switch/sphaira/sphaira.nro", "/switch/sphaira.nro" };
 const char* const APPSTORE[] = { "/switch/appstore/appstore.nro" };
+// libget's folder for PlayGuard: hb-appstore runs from /switch/appstore/
+// with its records in ./.get/packages/; sphaira's App Store writes the same
+// one for the official catalogue (sphaira's ui/menus/appstore.cpp).
+const char* const STORE_RECORD = "/switch/appstore/.get/packages/PlayGuard/";
 
 bool exists(const std::string& sd_path)
 {
@@ -37,6 +41,11 @@ Target find(const std::string& preference)
     if (preference == "appstore") return first_existing(Store::AppStore, APPSTORE);
     Target t = first_existing(Store::Sphaira, SPHAIRA);
     return t.store != Store::None ? t : first_existing(Store::AppStore, APPSTORE);
+}
+
+bool installed_by_store()
+{
+    return exists(std::string(STORE_RECORD) + "manifest.install");
 }
 
 bool can_launch()

@@ -45,6 +45,7 @@
   {"name": "games_ok", "live": true, "group": "games", "type": "bool"},
   {"name": "check_ms", "live": true, "group": "games", "type": "number", "min": 0},
   {"name": "latest", "live": true, "group": "updates", "type": "text", "placeholder": "1.1.0:24.0.0", "suggestions": ["offline"]},
+  { "name": "store", "live": true, "group": "updates", "type": "text", "placeholder": "1.1.0", "suggestions": ["none", "offline"] },
   {"name": "sys_latest", "live": true, "group": "updates", "type": "text", "placeholder": "1.12.1:6.5.4:23.0.1", "suggestions": ["offline"]},
   {"name": "sys_notes", "live": true, "group": "updates", "type": "select", "options": ["", "sample", "offline"], "values": {"sample": "/app/samples/sys_notes"}},
   {"name": "dev_builds", "live": true, "group": "updates", "type": "select", "options": ["", "sample", "offline"], "values": {"sample": "/app/samples/dev_builds"}},

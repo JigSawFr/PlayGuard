@@ -8,13 +8,47 @@
        'wasm-unsafe-eval' compiles PlayGuard; blob: workers are Emscripten's
        threads. GitHub Pages sends no headers, so the policy is here. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>PlayGuard simulator</title>
   <meta name="description" content="PlayGuard running in the browser against a simulated console.">
   <link rel="icon" href="icon.jpg">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#0a705f">
+  <!-- From a phone's home screen: "PlayGuard", in a window of its own (the
+       manifest's standalone, which older iOS reads here); no version number
+       taken for a phone number. -->
+  <meta name="apple-mobile-web-app-title" content="PlayGuard">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- What an iPhone shows while it starts from the home screen: one image per
+       iPhone and orientation (tools/render_branding.mjs' SPLASH), else white. -->
+  <link rel="apple-touch-startup-image" href="splash/iphone-375x667@2-portrait.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-375x667@2-landscape.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-414x736@3-portrait.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-414x736@3-landscape.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-375x812@3-portrait.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-375x812@3-landscape.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-414x896@2-portrait.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-414x896@2-landscape.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-414x896@3-portrait.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-414x896@3-landscape.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-390x844@3-portrait.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-390x844@3-landscape.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-428x926@3-portrait.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-428x926@3-landscape.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-393x852@3-portrait.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-393x852@3-landscape.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-430x932@3-portrait.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-430x932@3-landscape.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-402x874@3-portrait.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-402x874@3-landscape.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-420x912@3-portrait.png" media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-420x912@3-landscape.png" media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-440x956@3-portrait.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/iphone-440x956@3-landscape.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="theme-color" content="#111d31">
   <link rel="stylesheet" href="simulator.css">
   <!-- The theme before the first paint (theme.js). -->
   <script src="theme.js"></script>
@@ -62,6 +96,7 @@
         </div>
         <div class="toast" id="toast" role="status" hidden></div>
       </div>
+      <button type="button" class="fs-exit" id="fs-exit" data-i18n-label="fullscreen_exit" aria-label="Exit full screen">✕</button>
 
       <!-- Steps being replayed (rec=, the tour): what, and a way out. -->
       <div class="notice" id="steps-notice" role="status" hidden>
@@ -78,6 +113,8 @@
         <p class="keys" data-i18n-html="keys"></p>
         <div class="control-actions">
           <button type="button" class="btn ghost" id="pad-toggle" aria-pressed="false" data-i18n="pad">Pad</button>
+          <!-- Where the browser allows it (not an iPhone's Safari). -->
+          <button type="button" class="btn ghost" id="fullscreen" data-i18n="fullscreen" hidden>Full screen</button>
           <!-- The tools: in a row on a large screen, behind a button on a phone
                (simulator.js opens it where there is room). -->
           <details class="tools" id="tools">
@@ -131,6 +168,12 @@
       </div>
 
       <div class="tab-body" data-body="settings">
+        <!-- Main's or a release's simulator (simulator/<tag>/, pages.yml's
+             releases.json): shown when there is a release's. -->
+        <label class="field version" id="version-field" hidden>
+          <span data-i18n="version">Version</span>
+          <select id="version-select"></select>
+        </label>
         <label class="field preset">
           <span data-i18n="preset">Preset</span>
           <select id="preset"></select>
