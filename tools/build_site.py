@@ -36,6 +36,7 @@ import json
 import os
 import re
 import shutil
+import struct
 import sys
 from urllib.parse import urlsplit
 
@@ -991,6 +992,22 @@ def sitemap(paths):
             + "\n".join(entries) + "\n</urlset>\n")
 
 
+def redirect_page(to, canonical, html_lang):
+    """A page that sends its visitor on at once (GitHub Pages has no
+    redirects of its own): no script, which the CSP refuses inline."""
+    return (f'<!doctype html>\n<html lang="{html_lang}">\n<meta charset="utf-8">\n'
+            f'<meta name="robots" content="noindex">\n<meta http-equiv="refresh" content="0; url={to}">\n'
+            f'<link rel="canonical" href="{canonical}">\n<title>PlayGuard</title>\n<a href="{to}">{canonical}</a>\n')
+
+
+def favicon_ico(png):
+    """An ICO holding one PNG, which every browser reads: what a domain's
+    root is asked for without the page's <link rel="icon">."""
+    width, height = struct.unpack(">II", png[16:24])   # the PNG's IHDR
+    return (struct.pack("<HHH", 0, 1, 1)
+            + struct.pack("<BBBBHHII", width % 256, height % 256, 0, 0, 1, 32, len(png), 22) + png)
+
+
 def write(out, rel, text):
     path = os.path.join(out, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -1010,7 +1027,7 @@ def main():
     assets = {"images/social-preview.png", "images/video/playguard-tour.mp4"}
     pages = 0
     md_langs = markdown_langs()
-    for lang, folder, _, _ in LANGUAGES:
+    for lang, folder, _, html_lang in LANGUAGES:
         t = Texts(lang, version)
         base = f"{folder}/" if folder else ""
         to_root = "../" if folder else ""
@@ -1039,6 +1056,10 @@ def main():
                 write(out, f"{base}docs/{name}.md", text)
                 markdown.append(text)
             pages += 1
+        # docs/ itself (an address typed or cut short by hand): the guide's
+        # first page, not the page not found.
+        first = DOCS[0][0]
+        write(out, f"{base}docs/index.html", redirect_page(f"{first}/", f"{SITE_URL}{base}docs/{first}/", html_lang))
         index += other_entries(t)
         write(out, f"{base}docs/search.json", json.dumps(index, ensure_ascii=False, separators=(",", ":")))
         write(out, f"{base}changelog/index.html",
@@ -1076,7 +1097,14 @@ def main():
     for name in ("icon.svg", "mark.svg"):
         shutil.copy(os.path.join(ROOT, "branding", name), os.path.join(out, "assets", name))
     # An iPhone's home screen takes a PNG, not the SVG (tools/render_branding.mjs).
-    shutil.copy(os.path.join(ROOT, "images", "apple-touch-icon.png"), os.path.join(out, "assets", "apple-touch-icon.png"))
+    touch = os.path.join(ROOT, "images", "apple-touch-icon.png")
+    shutil.copy(touch, os.path.join(out, "assets", "apple-touch-icon.png"))
+    # At a domain's root (as robots.txt), what browsers, bookmarks, iOS and
+    # link previews ask for there without reading the page.
+    if urlsplit(SITE_URL).path == "/":
+        shutil.copy(touch, os.path.join(out, "apple-touch-icon.png"))
+        with open(touch, "rb") as f, open(os.path.join(out, "favicon.ico"), "wb") as ico:
+            ico.write(favicon_ico(f.read()))
     for path in sorted(assets):
         os.makedirs(os.path.dirname(os.path.join(out, "assets", path)), exist_ok=True)
         if path.startswith("images/screenshots/") and path.count("/") == 3:

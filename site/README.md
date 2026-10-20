@@ -56,8 +56,11 @@ PlayGuard's website, on GitHub Pages: <https://playguard.link/>.
   language (the site's title over the console's dashboard), each page of the
   documentation in Markdown next to it (`docs/<page>.md`, in English and in
   `/fr/`), listed in [`llms.txt`](https://llmstxt.org) (`llms-full.txt`: the
-  whole documentation in one file), and `robots.txt` when the site is at its
-  domain's root (a custom domain: it counts nowhere else). A pull request's
+  whole documentation in one file), and `robots.txt`, `favicon.ico` and
+  `apple-touch-icon.png` when the site is at its domain's root (a custom
+  domain: they count nowhere else; browsers, bookmarks and link previews ask
+  for the icons there without reading the page). `docs/` itself, in each
+  language, sends its visitor on to the guide's first page. A pull request's
   preview says `noindex`.
 - **The web simulator** in `/simulator/` ([`web/README.md`](../web/README.md)).
 - **Each open pull request's preview** in `/pr-<number>/`: its website and
