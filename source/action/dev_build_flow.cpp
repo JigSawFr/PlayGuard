@@ -184,8 +184,20 @@ void installed_now(const dev_builds::Build& b)
     rollback_flow::installed(label(b));
     // Not a newer release: its layout may be an earlier one, the migrations
     // run again when a later build is back (util/migrations.hpp).
-    if (migrations::is_earlier(b.kind == dev_builds::Kind::Release ? b.version : "", app::version()))
-        migrations::earlier_build_next(paths::migrations_file());
+    const std::string version = b.kind == dev_builds::Kind::Release ? b.version : "";
+    if (migrations::is_earlier(version, app::version())) {
+        brls::Logger::info("dev builds: {} is not a newer release than {}: the migrations run again after it",
+                           version.empty() ? "a build of a branch, a pull request or a commit" : version, app::version());
+        migrations::earlier_build_next(paths::migrations_file(), [](bool warning, const std::string& line) {
+            if (warning)
+                brls::Logger::warning("dev builds: {}", line);
+            else
+                brls::Logger::info("dev builds: {}", line);
+        });
+    } else {
+        brls::Logger::info("dev builds: {} is a newer release than {}: the migrations recorded are kept", version,
+                           app::version());
+    }
     if (launcher::can_launch() && launcher::launch_nro(sd_path())) {
         // hbloader starts the new .nro as soon as this one exits.
         brls::Application::quit();

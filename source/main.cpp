@@ -149,10 +149,14 @@ void keep_log_lines()
     });
 }
 
-// The log's lines of util/migrations.hpp: each step that ran, a later build seen.
-void log_migration(const std::string& line)
+// The log's lines of util/migrations.hpp: what migrations.json holds, the
+// builds seen, each step run or skipped, what was written.
+void log_migration(bool warning, const std::string& line)
 {
-    brls::Logger::info("start-up: {}", line);
+    if (warning)
+        brls::Logger::warning("start-up: {}", line);
+    else
+        brls::Logger::info("start-up: {}", line);
 }
 
 // The shims for the layouts of earlier versions (util/data_move.hpp,

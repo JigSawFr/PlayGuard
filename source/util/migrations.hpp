@@ -56,6 +56,10 @@ struct State
 bool read(const std::string& file, State* out);
 bool write(const std::string& file, const State& state);
 
+// A line for the log (English), and whether it is a warning (else
+// information). Every call below that takes one logs what it found and did.
+using Log = std::function<void(bool warning, const std::string& line)>;
+
 struct Step
 {
     int                     level;
@@ -66,17 +70,20 @@ struct Step
 // Each step of `steps` (in ascending order) above the level `file` records,
 // after a level above Latest (a later build's) is lowered to Latest; then
 // the level reached and `version` (this build's) written to `file`, when
-// either changed. `log(line)` for each step run and for a later build seen,
-// when given (English). Returns how many steps ran. A step runs again at
-// the next start when the file could not be written.
+// either changed. Logged, when `log` is given: what the file holds (or that
+// it is missing or unreadable), another build seen since (earlier or later),
+// each step run (entries moved, time taken) or that they were all done, what
+// was written or why it could not be. Returns how many steps ran. A step
+// runs again at the next start when the file could not be written.
 size_t run(const std::string& file, const std::vector<Step>& steps, const std::string& version,
-           const std::function<void(const std::string&)>& log = nullptr);
+           const Log& log = nullptr);
 
 // An earlier build (or one whose layout is not known) is about to replace
 // this one: the level set to 0, so that this build, or a later one, runs
 // every step again at its next start. Nothing when there is no file (they
-// run anyway). False when the file could not be written.
-bool earlier_build_next(const std::string& file);
+// run anyway). Logged, when `log` is given. False when the file could not be
+// written.
+bool earlier_build_next(const std::string& file, const Log& log = nullptr);
 
 // Whether installing `version` (a release's, "1.2.0"; "" for a build of a
 // branch, a pull request or a commit) replaces `running` with an earlier
