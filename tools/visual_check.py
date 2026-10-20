@@ -22,8 +22,10 @@ SD-card content that piles up between local runs.
 
 A change to the UI that is meant: run the smoke test, then
   tools/visual_check.py <shots-dir> <reference-dir> --update
-which copies the new screenshots over the references (--add NAME ... adds
-screens to the set), and look at the images before committing them.
+which copies over the references the screenshots of the screens that
+changed (more than --max-pixels), leaving the others' files untouched, and
+adds those of --add NAME ... that have no reference yet; then look at the
+images before committing them.
 
 Usage: tools/visual_check.py <shots-dir> <reference-dir> [--update] [--add NAME ...]
                              [--fuzz PERCENT] [--max-pixels N]     (needs ImageMagick)
@@ -102,11 +104,23 @@ def changed_pixels(ref, new, fuzz, diff):
     return int(float(out.stderr.split()[0]))
 
 
+def compare(ref, new, tmp, args):
+    """(changed pixels, why not comparable). Both images are masked into
+    `tmp` (ref.png, new.png), the changes drawn in tmp/diff.png. Images of
+    different sizes are not compared: every pixel counts as changed."""
+    if size(ref) != size(new):
+        return float("inf"), f"{size(new)} instead of {size(ref)}"
+    ref_m, new_m = os.path.join(tmp, "ref.png"), os.path.join(tmp, "new.png")
+    masked(ref, ref_m)
+    masked(new, new_m)
+    return changed_pixels(ref_m, new_m, args.fuzz, os.path.join(tmp, "diff.png")), None
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("shots")
     ap.add_argument("reference")
-    ap.add_argument("--update", action="store_true", help="copy the screenshots over the references")
+    ap.add_argument("--update", action="store_true", help="replace the references of the screens that changed")
     ap.add_argument("--add", nargs="*", default=[], metavar="NAME", help="with --update: screens to add")
     ap.add_argument("--fuzz", type=float, default=15.0)
     ap.add_argument("--max-pixels", type=int, default=100)
@@ -115,14 +129,20 @@ def main():
     names = sorted(os.path.splitext(os.path.basename(p))[0] for p in glob.glob(os.path.join(args.reference, "*.png")))
     if args.update:
         os.makedirs(args.reference, exist_ok=True)
-        for name in sorted(set(names) | set(args.add)):
-            src = os.path.join(args.shots, name + ".png")
-            if not os.path.exists(src):
-                sys.exit(f"no {src}")
-            # Stored with the footer clock at CLOCK_TEXT, never the host's time.
-            masked(src, os.path.join(args.reference, name + ".png"))
-            subprocess.run(IM + ["mogrify", "-strip", os.path.join(args.reference, name + ".png")], check=True)
-            print("updated", name)
+        with tempfile.TemporaryDirectory() as tmp:
+            for name in sorted(set(names) | set(args.add)):
+                src = os.path.join(args.shots, name + ".png")
+                if not os.path.exists(src):
+                    sys.exit(f"no {src}")
+                ref = os.path.join(args.reference, name + ".png")
+                # A screen that did not change keeps its reference as it is,
+                # byte for byte: only the changed ones and the new ones are written.
+                if os.path.exists(ref) and compare(ref, src, tmp, args)[0] <= args.max_pixels:
+                    continue
+                # Stored with the footer clock at CLOCK_TEXT, never the host's time.
+                masked(src, ref)
+                subprocess.run(IM + ["mogrify", "-strip", ref], check=True)
+                print("updated", name)
         return 0
     if not names:
         sys.exit(f"no reference image in {args.reference}")
@@ -137,22 +157,20 @@ def main():
                 print(f"FAIL {name}: no screenshot {new}")
                 failed.append(name)
                 continue
-            if size(ref) != size(new):
-                print(f"FAIL {name}: {size(new)} instead of {size(ref)}")
+            n, why = compare(ref, new, tmp, args)
+            if why:
+                print(f"FAIL {name}: {why}")
                 failed.append(name)
                 continue
-            ref_m, new_m = os.path.join(tmp, "ref.png"), os.path.join(tmp, "new.png")
-            masked(ref, ref_m)
-            masked(new, new_m)
-            diff = os.path.join(tmp, "diff.png")
-            n = changed_pixels(ref_m, new_m, args.fuzz, diff)
             if n <= args.max_pixels:
                 print(f"ok   {name} ({n} px)")
                 continue
             print(f"FAIL {name}: {n} pixels changed (at most {args.max_pixels})")
             failed.append(name)
             os.makedirs(diff_dir, exist_ok=True)
-            subprocess.run(IM + ["convert", ref_m, new_m, diff, "+append", os.path.join(diff_dir, name + ".png")], check=True)
+            subprocess.run(IM + ["convert", os.path.join(tmp, "ref.png"), os.path.join(tmp, "new.png"),
+                                 os.path.join(tmp, "diff.png"), "+append", os.path.join(diff_dir, name + ".png")],
+                           check=True)
 
     if failed:
         print(f"\nvisual check: {len(failed)} screen(s) changed: {', '.join(failed)}")

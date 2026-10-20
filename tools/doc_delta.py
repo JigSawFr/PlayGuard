@@ -9,13 +9,16 @@ changed it, newest first, each version hashed as doc_stamp.py does), and
 prints the diff from that version to the page as it is now, or "up to date".
 
 --all does it for every translation of every page and lists the stale ones
-(without the diffs; give a page to see its diff).
+(without the diffs; give a page to see its diff). With --github as well, it
+also prints a GitHub Actions warning per English page that has translations
+behind, naming their languages (CI's warning on a pull request; one per page
+keeps them under GitHub's limit of ten per step).
 
 Exits 1 when a page is stale, has no stamp or was stamped from a version
 the history does not have (a shallow clone: `git fetch --unshallow`).
 
 Usage: tools/doc_delta.py docs/<language>/<page>.md ...
-       tools/doc_delta.py --all
+       tools/doc_delta.py --all [--github]
 """
 import glob
 import hashlib
@@ -89,8 +92,25 @@ def describe(path, state, english, commit, diff):
     return f"{path}: stale, {english} changed since {commit[:7]} ({lines} line(s) added or removed)"
 
 
+def annotations(results):
+    """One ::warning line per English page with translations behind."""
+    behind = {}
+    for path, state, english, _commit, _diff in results:
+        if state != "up to date":
+            # A page with no stamp names no English page: the one of its name.
+            page = english or "docs/" + os.path.basename(path)
+            behind.setdefault(page, []).append((path.split("/")[1], state))
+    lines = []
+    for page, langs in sorted(behind.items()):
+        names = ", ".join(lang if state == "stale" else f"{lang} ({state})" for lang, state in langs)
+        lines.append(f"::warning file={page},title=Translations behind {page}::"
+                     f"{names}: {page} changed since they were stamped "
+                     f"(tools/doc_delta.py docs/<language>/{os.path.basename(page)} shows what)")
+    return lines
+
+
 def main(args):
-    if args == ["--all"]:
+    if args and args[0] == "--all" and set(args[1:]) <= {"--github"}:
         results = [(p,) + delta(p) for p in translations()]
         for r in results:
             print(describe(*r))
@@ -98,6 +118,9 @@ def main(args):
         print(f"\n{len(stale)} of {len(results)} translation(s) to update" + (":" if stale else ""))
         for p in stale:
             print(" ", p)
+        if "--github" in args:
+            for line in annotations(results):
+                print(line)
         return 1 if stale else 0
     if not args or any(a.startswith("-") for a in args):
         print(__doc__)

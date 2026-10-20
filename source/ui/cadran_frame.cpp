@@ -117,8 +117,14 @@ void cadran::install_theme()
         t->addColor("brls/notification/text", p == &dark ? p->text : nvgRGB(0xEE, 0xF2, 0xF8));
     }
 #ifndef __SWITCH__
-    // And held where it is (patches/borealis/0009).
-    if (sim_env_flag("PLAYGUARD_SIM_STILL_FOCUS")) brls::setHighlightAnimationStill(true);
+    // And held where it is (patches/borealis/0009). The footer's hints too:
+    // drawn as once a screen or a dialog has opened, not greyed while its
+    // fade blocks the input (0014). A slow frame (the web simulator's
+    // software WebGL) could otherwise catch them greyed.
+    if (sim_env_flag("PLAYGUARD_SIM_STILL_FOCUS")) {
+        brls::setHighlightAnimationStill(true);
+        brls::setHintsSteady(true);
+    }
 #endif
     brls::Style style = brls::getStyle();
     style.addMetric("brls/applet_frame/header_height", 84.0f);

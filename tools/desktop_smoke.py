@@ -76,6 +76,11 @@ unlocked: "Turn back on" first on Today, the header's pill saying so. The
 with Preferences › Text size › Larger (as on a TV): Today on one screen, the
 child screen keeping its own sizes.
 
+The "bedtime" scenario starts at 20:00 with 90 minutes left
+(PLAYGUARD_SIM_NOW, PLAYGUARD_SIM_LEFT_MIN): the bedtime, at 21:00, comes
+before the time is up, so the child screen's ring counts down the hour to
+the bedtime ("until bedtime"), not the time left.
+
 The "forwarders" scenario opens Console › Forwarders: the forwarder another
 app made (its details), PlayGuard itself put on the HOME menu in one press,
 a homebrew of the simulated /switch folder picked from the list and protected
@@ -87,7 +92,7 @@ The "loading" scenario stops the start-up on the loading screen
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge|forwarders]   (needs DISPLAY, xdotool, ImageMagick)
+Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge|bedtime|forwarders]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -124,6 +129,7 @@ CADRAN = SCENARIO == "cadran"
 CADRANSTATES = SCENARIO == "cadranstates"
 CADRANUNLOCKED = SCENARIO == "cadranunlocked"
 CADRANLARGE = SCENARIO == "cadranlarge"
+BEDTIME = SCENARIO == "bedtime"
 FORWARDERS = SCENARIO == "forwarders"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
@@ -162,8 +168,8 @@ env = dict(os.environ, LIBGL_ALWAYS_SOFTWARE="1")
 IM = ["magick"] if shutil.which("magick") else []
 # One console time and time zone for every run, so the screenshots can be
 # compared with the reference ones (tools/visual_check.py): Thursday
-# 8 October 2026, 16:00 UTC. Only the footer clock follows the host.
-env.setdefault("PLAYGUARD_SIM_NOW", "1791475200")
+# 8 October 2026, 16:00 UTC (20:00 for "bedtime"). Only the footer clock follows the host.
+env.setdefault("PLAYGUARD_SIM_NOW", "1791489600" if BEDTIME else "1791475200")
 env.setdefault("TZ", "UTC")
 # And the focus highlight without its moving glow (ui/cadran_frame.cpp).
 env.setdefault("PLAYGUARD_SIM_STILL_FOCUS", "1")
@@ -365,6 +371,10 @@ if CADRANLARGE:
     # The text 25 % bigger, as the console docked draws it by default.
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
     json.dump({"schema": 1, "text_size": "large"}, open(config_file, "w"))
+if BEDTIME:
+    # 20:00 (above), an hour before the simulated bedtime (21:00 every day),
+    # with 90 minutes left: the bedtime stops play first.
+    env.setdefault("PLAYGUARD_SIM_LEFT_MIN", "90")
 if FORWARDERS:
     # Nothing made in an earlier local run: the simulated HOME menu starts
     # with the one another app made (PLAYGUARD_SIM_KEEP is off), PlayGuard's
@@ -1418,6 +1428,15 @@ if CADRANLARGE:
     key("Return")
     time.sleep(1)              # the screen's own entrance over
     shot("04_child")
+    finish()
+if BEDTIME:
+    shot("01_today")
+    key("Right")               # Extra time, the hero's first action
+    key("Down")                # Stop for today
+    key("Right")               # Show the child
+    key("Return")
+    time.sleep(1)              # the screen's own entrance over
+    shot("02_child")           # the ring: 1 h until bedtime
     finish()
 if ALARM:
     shot("01_overview_over")   # Today: the time over the limit, not a time left

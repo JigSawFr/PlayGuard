@@ -66,7 +66,13 @@ void sample()
     last = now;
     const auto& stack = brls::Application::getActivitiesStack();
     if (stack.empty()) return;
-    walk(stack.back()->getContentView(), frame_stats_flow::screen(), out);
+    // A dialog or a picker keeps the name of the screen it opened over, with
+    // what it is after it ("dashboard › dialog").
+    brls::View* top = stack.back()->getContentView();
+    std::string screen = frame_stats_flow::screen();
+    if (dynamic_cast<brls::Dialog*>(top)) screen += " › dialog";
+    else if (dynamic_cast<brls::Dropdown*>(top)) screen += " › picker";
+    walk(top, screen, out);
 #endif
 }
 }   // namespace cut_text

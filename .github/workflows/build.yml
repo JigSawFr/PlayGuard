@@ -200,6 +200,26 @@ jobs:
           check "compat.json generator" python3 tools/gen_compat.py . build/compat.json
           check "Python tools compile" python3 -m py_compile tools/*.py
           exit $status
+      # A translation of the user guide whose English page changed since it
+      # was stamped (tools/doc_delta.py) gets a warning on the pull request,
+      # not a failure: the other languages may lag. doc_delta.py reads the
+      # English pages' past versions, and the checkout is one commit deep:
+      # the rest of the history comes without the files' contents (a few MB),
+      # then the English pages' versions in one request, a few seconds in all.
+      - name: Translations of the user guide behind their English page
+        if: ${{ !cancelled() }}
+        run: |
+          if [ "$(git rev-parse --is-shallow-repository)" = true ]; then
+            # A failed fetch is no failure either: the pages behind then read
+            # "stamped from a version … this clone's history does not have".
+            git fetch -q --no-tags --filter=blob:none --unshallow origin "$(git rev-parse HEAD)" || true
+            blobs=$(git log --format= --raw --no-abbrev -- 'docs/*.md' ':(exclude)docs/*/*' | awk '{print $4}' | sort -u | grep -v '^0*$' || true)
+            [ -z "$blobs" ] || git fetch -q --no-tags --no-write-fetch-head origin $blobs || true
+          fi
+          # --github: one warning per English page, naming the languages behind.
+          if out=$(python3 tools/doc_delta.py --all --github); then mark=✅; else mark=⚠️; fi
+          printf '%s\n' "$out"
+          echo "$mark **Translations of the user guide** — $(grep -E 'translation\(s\) to update' <<< "$out" | tr -d :)" >> "$GITHUB_STEP_SUMMARY"
 
   # The same host tests built by clang (other warnings, other sanitizer
   # runtime), then once more by gcc with --coverage for a line coverage
@@ -381,16 +401,17 @@ jobs:
           # The other scenarios in three shards of about 170 s each, by their
           # times on a runner (s): cadran 125, gate 93, devbuild 79, outside 62,
           # forwarders 40 (locally; to check on a runner), library 27, update
-          # 25, errors 23, sysnotes 22, the others 15 or less.
+          # 25, errors 23, sysnotes 22, the others 15 or less (bedtime 10).
           - shard: cadran
             scenarios: cadran rescue cadranlarge cadranunlocked forged lock loading
           - shard: states
-            scenarios: gate outside alarm cadranstates rollback
+            scenarios: gate outside alarm cadranstates rollback bedtime
           - shard: developer
             scenarios: devbuild library update errors sysnotes forwarders
-          # Every Cadran tab in the 15 languages, normal and larger text: no
-          # text cut short (tools/cut_text_check.py, tests/cut_text/), five
-          # languages a shard (about 3 minutes each).
+          # Every Cadran tab, a few common dialogs and the child screen in
+          # the 15 languages, normal and larger text: no text cut short
+          # (tools/cut_text_check.py, tests/cut_text/), five languages a
+          # shard (about 5 minutes each).
           - shard: languages-1
             scenarios: cuttext
             languages: en-US fr fr-CA de es
