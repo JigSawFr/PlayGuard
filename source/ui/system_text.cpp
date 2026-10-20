@@ -4,6 +4,10 @@
 
 #include "util/diagnostics.hpp"
 #include "util/paths.hpp"
+#ifndef __SWITCH__
+#include "core/sim_env.h"
+#include "sim/sim_homebrew.hpp"
+#endif
 
 #include <fmt/format.h>
 
@@ -109,6 +113,11 @@ const patches::Report& patch_report()
         SysInfo si;
         sysinfo_get(&si);
         const std::string fw = hos_text(si.hos_version);
+#ifndef __SWITCH__
+        // The simulated SD card's files first (PLAYGUARD_SIM_FORWARDERS
+        // puts the patches forwarders need there).
+        if (sim_env_flag("PLAYGUARD_SIM_FORWARDERS")) sim_homebrew::seed(paths::sd_root());
+#endif
         report = patches::detect(paths::sd_root(), fw, si.emummc);
         read = true;
     }

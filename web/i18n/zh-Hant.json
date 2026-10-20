@@ -92,6 +92,7 @@
   "applet": {"label": "小程式模式（從相簿啟動）"},
   "background": {"label": "PlayGuard 在背景"},
   "hbloader": {"label": "能把更新交給商店的載入器"},
+  "forwarders": {"label": "已建立的轉發器（主機 › 轉發器）"},
   "docked": {"label": "插在底座上（電視）"},
   "battery": {"label": "電池供電（未接充電器）"},
   "boot_choice": {"label": "啟動時對「上一個版本？」的回答", "options": {"": "B", "a": "A"}},
@@ -140,6 +141,7 @@
   "first_emummc": "在 emuMMC 上首次啟動",
   "fw_old": "系統版本太舊，無法使用遊玩時間限制",
   "updates": "有可安裝的更新",
+  "homebrew": "轉發器使用中",
   "family": "五口之家",
   "no_account": "沒有使用者帳號"
  }

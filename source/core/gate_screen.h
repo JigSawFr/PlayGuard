@@ -24,6 +24,8 @@ typedef enum {
     GateScreen_Free,         // in its free hours (or no PIN on the console): it starts
     GateScreen_Refused,      // left with B: back to the HOME menu
     GateScreen_Error,        // the PIN screen did not open: back to the HOME menu
+    GateScreen_Paused,       // paused after refusals: back to the HOME menu, the PIN not asked
+    GateScreen_Closed,       // in its hours without any access: back to the HOME menu
 } GateScreenState;
 
 typedef struct {

@@ -26,6 +26,7 @@
   {"name": "applet", "group": "console", "type": "bool"},
   {"name": "background", "live": true, "group": "console", "type": "bool"},
   {"name": "hbloader", "live": true, "group": "console", "type": "bool"},
+  {"name": "forwarders", "group": "console", "type": "bool"},
   {"name": "docked", "group": "console", "type": "bool"},
   {"name": "battery", "live": true, "group": "console", "type": "bool"},
   {"name": "boot_choice", "group": "console", "type": "select", "options": ["", "a"]},
@@ -78,6 +79,7 @@
   {"id": "first_emummc", "params": {"not_set_up": "1", "emummc": "1"}},
   {"id": "fw_old", "params": {"fw": "20.5.0"}},
   {"id": "updates", "params": {"fw": "22.5.0", "latest": "1.1.0:24.0.0", "sys_latest": "1.12.1:6.5.4:23.0.1", "sys_notes": "sample", "dev_builds": "sample", "github_login": "ok", "hbloader": "1"}},
+  {"id": "homebrew", "params": {"forwarders": "1", "tab": "console"}},
   {"id": "family", "params": {"accounts": "5"}},
   {"id": "no_account", "params": {"accounts": "0"}}
  ]

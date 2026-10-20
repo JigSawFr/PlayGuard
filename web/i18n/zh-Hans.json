@@ -92,6 +92,7 @@
   "applet": {"label": "小程序模式（从相册启动）"},
   "background": {"label": "PlayGuard 在后台"},
   "hbloader": {"label": "能把更新交给商店的加载器"},
+  "forwarders": {"label": "已创建的转发器（主机 › 转发器）"},
   "docked": {"label": "插在底座上（电视）"},
   "battery": {"label": "电池供电（未接充电器）"},
   "boot_choice": {"label": "启动时对“上一个版本？”的回答", "options": {"": "B", "a": "A"}},
@@ -140,6 +141,7 @@
   "first_emummc": "在 emuMMC 上首次启动",
   "fw_old": "系统版本太旧，无法使用游戏时间",
   "updates": "有可安装的更新",
+  "homebrew": "转发器使用中",
   "family": "五口之家",
   "no_account": "没有用户账户"
  }

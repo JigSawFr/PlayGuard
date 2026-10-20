@@ -75,9 +75,16 @@ std::string state_text(const Row& r)
 // Protected: the PIN, and when it is not asked.
 std::string state_text_pin(const Row& r)
 {
-    if (!r.free_days) return state_only(r) + " · " + "playguard/forwarders/state_pin"_i18n;
-    return state_only(r) + " · " +
-           brls::getStr("playguard/forwarders/state_pin_hours", forwarder_flow::hours_label(r.free_days, r.free_from, r.free_to));
+    std::string out = state_only(r) + " · ";
+    // Paused after refused PINs: that first, it is what the child sees now.
+    if (r.paused_until) return out + brls::getStr("playguard/forwarders/state_paused", forwarder_flow::until_label(r.paused_until));
+    out += !r.free_days ? "playguard/forwarders/state_pin"_i18n
+                        : brls::getStr("playguard/forwarders/state_pin_hours",
+                                       forwarder_flow::hours_label(r.free_days, r.free_from, r.free_to));
+    if (r.closed_days)
+        out += " · " + brls::getStr("playguard/forwarders/state_closed",
+                                    forwarder_flow::hours_label(r.closed_days, r.closed_from, r.closed_to));
+    return out;
 }
 
 }   // namespace
@@ -130,6 +137,12 @@ void ForwardersActivity::onContentAvailable()
         forwarder_flow::protect_all(this->then_rebuild());
         return true;
     });
+    pause_cell->registerClickAction([this](brls::View*) {
+        if (ui::refuse_read_only()) return true;
+        this->pick_pause();
+        return true;
+    });
+    ui::show_writable(pause_cell, !app::read_only());
     lock_check->setDetailText(ui::opens());
     lock_check->registerClickAction([](brls::View*) {
         hbmenu_lock::show_check();
@@ -139,7 +152,7 @@ void ForwardersActivity::onContentAvailable()
     ui::show_writable(protect_all, !app::read_only());
     cadran::List(this->getContentView(), true)
         .apply({ { "fw_self", "home" }, { "fw_other", "plus" }, { "fw_reinstall", "refresh" }, { "fw_lock", "lock" },
-                 { "fw_protect_all", "shield" }, { "fw_lock_check", "eye" } });
+                 { "fw_protect_all", "shield" }, { "fw_pause", "timer" }, { "fw_lock_check", "eye" } });
     // Without the forwarders' program (a build from elsewhere), nothing can
     // be added: said instead of the two lines.
     if (!forwarder_flow::loader_present()) {
@@ -153,6 +166,7 @@ void ForwardersActivity::onContentAvailable()
         ui::set_visible(reinstall.getView(), false);
         ui::set_visible(protect_all.getView(), false);
         ui::set_visible(lock_check.getView(), false);
+        ui::set_visible(pause_cell.getView(), false);
     } else {
         this->show_patches();
     }
@@ -245,6 +259,8 @@ void ForwardersActivity::show_lock()
     const bool on = s.locked;
     lock_cell->setDetailText(on ? "playguard/hbmenu/state_locked"_i18n : "playguard/hbmenu/state_open"_i18n);
     ui::show_writable(lock_cell, !app::read_only(), ui::color_text(), on ? ui::color_ok() : ui::color_neutral());
+    const GatePauseRule rule = forwarder_flow::pause_rule();
+    pause_cell->setDetailText(forwarder_flow::pause_label(rule.tries, rule.minutes));
     if (!forwarder_flow::loader_present()) {
         ui::set_visible(summary.getView(), false);
         return;
@@ -392,7 +408,8 @@ void ForwardersActivity::rebuild(uint64_t focus_id, brls::View* keep)
                 auto* cell = new GameCell(game_icons::wanted());
                 cell->setText(r.name);
                 cell->setDetailText(state_text(r));
-                cell->setDetailTextColor(r.state == State::Ready       ? ui::color_ok()
+                cell->setDetailTextColor(r.paused_until                ? ui::color_warn()
+                                         : r.state == State::Ready     ? ui::color_ok()
                                          : r.state == State::Elsewhere ? ui::color_neutral()
                                                                        : ui::color_warn());
                 // On its icon: protected (a lock; a check for a menu seen
@@ -460,8 +477,14 @@ void ForwardersActivity::actions(const Row& row)
         if (!r.self)
             choices.push_back({ r.pin ? "playguard/forwarders/action_pin_off"_i18n : "playguard/forwarders/action_pin_on"_i18n,
                                 [this, r]() { forwarder_flow::set_pin(r, !r.pin, this->then_rebuild(r.id)); } });
-        if (!r.self && r.pin)
-            choices.push_back({ "playguard/forwarders/action_hours"_i18n, [this, r]() { this->pick_hours(r); } });
+        if (!r.self && r.pin) {
+            choices.push_back({ "playguard/forwarders/action_hours"_i18n, [this, r]() { this->pick_hours(r, false); } });
+            choices.push_back({ "playguard/forwarders/action_closed"_i18n, [this, r]() { this->pick_hours(r, true); } });
+        }
+        if (r.paused_until)
+            choices.push_back({ "playguard/forwarders/action_lift"_i18n,
+                                [this, r]() { forwarder_flow::lift_pause(r, this->then_rebuild(r.id)); } });
+        choices.push_back({ "playguard/forwarders/action_icon"_i18n, [this, r]() { this->pick_icon(r); } });
         choices.push_back({ "playguard/forwarders/action_rebuild"_i18n,
                             [this, r]() { forwarder_flow::rebuild(r, "", "", this->then_rebuild(r.id)); } });
     }
@@ -519,56 +542,109 @@ void ForwardersActivity::change_author(const Row& row)
     });
 }
 
-void ForwardersActivity::hours(const Row& r, int days, int from, int to)
+void ForwardersActivity::hours(const Row& r, bool closed, int days, int from, int to)
 {
     std::weak_ptr<bool> weak = this->alive;
-    forwarder_flow::set_hours(r, days, from, to, [this, weak, r](bool ok) {
-        brls::sync([this, weak, r, ok]() {
+    const auto after = [this, weak, r, closed](bool ok) {
+        brls::sync([this, weak, r, ok, closed]() {
             if (weak.expired()) return;
             this->rebuild(r.id);
             // The hours as they were, without the PIN again.
             if (ok)
-                this->offer_undo([this, r]() {
-                    forwarder_flow::set_hours(r, r.free_days, r.free_from, r.free_to, this->then_rebuild(r.id), false);
+                this->offer_undo([this, r, closed]() {
+                    if (closed)
+                        forwarder_flow::set_closed(r, r.closed_days, r.closed_from, r.closed_to, this->then_rebuild(r.id), false);
+                    else
+                        forwarder_flow::set_hours(r, r.free_days, r.free_from, r.free_to, this->then_rebuild(r.id), false);
                 });
         });
+    };
+    if (closed) forwarder_flow::set_closed(r, days, from, to, after);
+    else forwarder_flow::set_hours(r, days, from, to, after);
+}
+
+void ForwardersActivity::pick_pause()
+{
+    // Never, then tries in a row and how long: the default (5, 15 min) among them.
+    static const unsigned TRIES[] = { 0, 3, 5, 5, 10 }, MINUTES[] = { 0, 15, 15, 60, 60 };
+    const GatePauseRule now = forwarder_flow::pause_rule();
+    std::vector<std::string> names;
+    int current = -1;
+    for (size_t i = 0; i < 5; i++) {
+        names.push_back(forwarder_flow::pause_label(TRIES[i], MINUTES[i]));
+        if (now.tries == TRIES[i] && (!now.tries || now.minutes == MINUTES[i])) current = (int)i;
+    }
+    std::weak_ptr<bool> weak = this->alive;
+    ui::pick("playguard/forwarders/pause_cell"_i18n, names, current, [this, weak](int index) {
+        if (weak.expired() || index < 0 || index > 4) return;
+        forwarder_flow::set_pause_rule(TRIES[index], MINUTES[index], [this, weak](bool) {
+            brls::sync([this, weak]() {
+                if (!weak.expired()) this->show_lock();
+            });
+        });
+    }, true, { "", "", "playguard/forwarders/pause_default"_i18n, "", "" });
+}
+
+void ForwardersActivity::pick_icon(const Row& row)
+{
+    const Row r = row;
+    const std::vector<std::string> shots = forwarder_flow::album_shots();
+    // Its .nro's own first, then the album's screenshots, the newest first.
+    std::vector<std::string> names = { "playguard/forwarders/icon_own"_i18n };
+    for (const std::string& p : shots) {
+        const std::string label = forwarders_logic::shot_label(p);
+        names.push_back(label.empty() ? forwarders_logic::file_title(p) : label);
+    }
+    if (shots.empty()) {
+        ui::notice("eye", ui::Check::Info, "playguard/forwarders/action_icon"_i18n, "playguard/forwarders/icon_none"_i18n);
+        return;
+    }
+    std::weak_ptr<bool> weak = this->alive;
+    ui::pick("playguard/forwarders/icon_title"_i18n, names, r.custom_icon ? -1 : 0, [this, weak, r, shots](int index) {
+        if (weak.expired() || index < 0 || (size_t)index > shots.size()) return;
+        if (index == 0 && !r.custom_icon) return;
+        forwarder_flow::set_icon(r, index == 0 ? "" : shots[(size_t)index - 1], this->then_rebuild(r.id));
     });
 }
 
-void ForwardersActivity::pick_hours(const Row& row)
+void ForwardersActivity::pick_hours(const Row& row, bool closed)
 {
     const Row r = row;
+    const int cur_days = closed ? r.closed_days : r.free_days, cur_from = closed ? r.closed_from : r.free_from,
+              cur_to = closed ? r.closed_to : r.free_to;
     // Never, every day, the school days, the weekend.
     static const int DAYS[] = { 0, 0x7F, 0x3E, 0x41 };
     const std::vector<std::string> names = { "playguard/forwarders/hours_never"_i18n, "playguard/forwarders/hours_every_day"_i18n,
                                              "playguard/forwarders/hours_weekdays"_i18n, "playguard/forwarders/hours_weekend"_i18n };
     int current = 0;
     for (int i = 1; i < 4; i++)
-        if (r.free_days == DAYS[i]) current = i;
+        if (cur_days == DAYS[i]) current = i;
     std::weak_ptr<bool> weak = this->alive;
-    ui::pick("playguard/forwarders/hours_title"_i18n, names, current, [this, weak, r](int index) {
+    ui::pick(closed ? "playguard/forwarders/closed_title"_i18n : "playguard/forwarders/hours_title"_i18n, names, current,
+             [this, weak, r, closed, cur_days, cur_from, cur_to](int index) {
         if (weak.expired() || index < 0 || index > 3) return;
         if (index == 0) {
-            this->hours(r, 0, 0, 0);
+            this->hours(r, closed, 0, 0, 0);
             return;
         }
         const int days = DAYS[index];
         std::vector<std::string> hours;
         for (int h = 0; h < 24; h++) hours.push_back(fmt::format("{:02}:00", h));
-        const int from_now = r.free_days ? r.free_from / 60 : 9;
-        brls::sync([this, weak, r, days, hours, from_now]() {
-            ui::pick("playguard/forwarders/hours_from"_i18n, hours, from_now, [this, weak, r, days](int from) {
+        // Free: 09:00 to 20:00 at first; closed: 21:00 to 07:00.
+        const int from_now = cur_days ? cur_from / 60 : closed ? 21 : 9;
+        brls::sync([this, weak, r, days, hours, from_now, closed, cur_days, cur_to]() {
+            ui::pick("playguard/forwarders/hours_from"_i18n, hours, from_now, [this, weak, r, days, closed, cur_days, cur_to](int from) {
                 if (weak.expired() || from < 0 || from > 23) return;
                 std::vector<std::string> ends;
                 for (int h = 1; h <= 24; h++) ends.push_back(fmt::format("{:02}:00", h));
-                const int to_now = r.free_days ? std::max(0, r.free_to / 60 - 1) : 19;
-                brls::sync([this, weak, r, days, from, ends, to_now]() {
-                    ui::pick("playguard/forwarders/hours_to"_i18n, ends, to_now, [this, weak, r, days, from](int to) {
+                const int to_now = cur_days ? std::max(0, cur_to / 60 - 1) : closed ? 6 : 19;
+                brls::sync([this, weak, r, days, from, ends, to_now, closed]() {
+                    ui::pick("playguard/forwarders/hours_to"_i18n, ends, to_now, [this, weak, r, days, from, closed](int to) {
                         if (weak.expired() || to < 0 || to > 23) return;
                         const int end = (to + 1) * 60, start = from * 60;
                         if (end == start) return;
                         // An end before the start runs past midnight.
-                        this->hours(r, days, start, end);
+                        this->hours(r, closed, days, start, end);
                     });
                 });
             });

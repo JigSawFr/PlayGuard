@@ -20,6 +20,12 @@ static const Lines DE = { {
     "Heute abgelehnt: %d",
     "Ohne Geheimzahl: %s",
     "So,Mo,Di,Mi,Do,Fr,Sa",
+    "Nach zu vielen Versuchen pausiert: zurück zum HOME-Menü.",
+    "Es fragt um %s wieder.",
+    "Ein Elternteil kann die Pause in PlayGuard aufheben.",
+    "Nicht zu dieser Zeit: zurück zum HOME-Menü.",
+    "Gesperrt: %s",
+    "Ein Elternteil kann diese Zeiten in PlayGuard ändern.",
 } };
 
 static const Lines EN_US = { {
@@ -34,6 +40,12 @@ static const Lines EN_US = { {
     "Refused today: %d",
     "Without the PIN: %s",
     "Sun,Mon,Tue,Wed,Thu,Fri,Sat",
+    "Paused after too many tries: back to the HOME menu.",
+    "It asks again at %s.",
+    "A parent can lift the pause in PlayGuard.",
+    "Not at this time: back to the HOME menu.",
+    "Closed: %s",
+    "A parent can change these hours in PlayGuard.",
 } };
 
 static const Lines ES = { {
@@ -48,6 +60,12 @@ static const Lines ES = { {
     "Rechazos de hoy: %d",
     "Sin el PIN: %s",
     "dom,lun,mar,mié,jue,vie,sáb",
+    "En pausa tras demasiados intentos: vuelta al menú HOME.",
+    "Volverá a pedirlo a las %s.",
+    "Un adulto puede quitar la pausa en PlayGuard.",
+    "No a esta hora: vuelta al menú HOME.",
+    "Cerrado: %s",
+    "Un adulto puede cambiar estos horarios en PlayGuard.",
 } };
 
 static const Lines ES_419 = { {
@@ -62,6 +80,12 @@ static const Lines ES_419 = { {
     "Rechazos de hoy: %d",
     "Sin el PIN: %s",
     "dom,lun,mar,mié,jue,vie,sáb",
+    "En pausa tras demasiados intentos: vuelta al menú HOME.",
+    "Volverá a pedirlo a las %s.",
+    "Un adulto puede quitar la pausa en PlayGuard.",
+    "No a esta hora: vuelta al menú HOME.",
+    "Cerrado: %s",
+    "Un adulto puede cambiar estos horarios en PlayGuard.",
 } };
 
 static const Lines FR = { {
@@ -76,6 +100,12 @@ static const Lines FR = { {
     "Refus aujourd'hui : %d",
     "Sans code PIN : %s",
     "dim.,lun.,mar.,mer.,jeu.,ven.,sam.",
+    "En pause après trop d'essais : retour au menu HOME.",
+    "Il redemandera à %s.",
+    "Un parent peut lever la pause dans PlayGuard.",
+    "Pas à cette heure-ci : retour au menu HOME.",
+    "Fermé : %s",
+    "Un parent peut changer ces horaires dans PlayGuard.",
 } };
 
 static const Lines FR_CA = { {
@@ -90,6 +120,12 @@ static const Lines FR_CA = { {
     "Refus aujourd'hui : %d",
     "Sans NIP : %s",
     "dim.,lun.,mar.,mer.,jeu.,ven.,sam.",
+    "En pause après trop d'essais : retour au menu HOME.",
+    "Il redemandera à %s.",
+    "Un parent peut lever la pause dans PlayGuard.",
+    "Pas à cette heure-ci : retour au menu HOME.",
+    "Fermé : %s",
+    "Un parent peut changer ces horaires dans PlayGuard.",
 } };
 
 static const Lines IT = { {
@@ -104,6 +140,12 @@ static const Lines IT = { {
     "Rifiuti di oggi: %d",
     "Senza PIN: %s",
     "dom,lun,mar,mer,gio,ven,sab",
+    "In pausa dopo troppi tentativi: ritorno al menu HOME.",
+    "Lo richiederà alle %s.",
+    "Un genitore può togliere la pausa in PlayGuard.",
+    "Non a quest'ora: ritorno al menu HOME.",
+    "Chiuso: %s",
+    "Un genitore può cambiare questi orari in PlayGuard.",
 } };
 
 static const Lines JA = { {
@@ -118,6 +160,12 @@ static const Lines JA = { {
     "今日の拒否：%d回",
     "暗証番号なし：%s",
     "日,月,火,水,木,金,土",
+    "試行回数が多すぎるため一時停止中：HOMEメニューに戻ります。",
+    "%sに再度入力できます。",
+    "保護者はPlayGuardで一時停止を解除できます。",
+    "この時間は使えません：HOMEメニューに戻ります。",
+    "利用不可：%s",
+    "保護者はPlayGuardでこの時間を変更できます。",
 } };
 
 static const Lines KO = { {
@@ -132,6 +180,12 @@ static const Lines KO = { {
     "오늘 거부: %d번",
     "PIN 없이: %s",
     "일,월,화,수,목,금,토",
+    "시도가 너무 많아 일시 정지됨: HOME 메뉴로 돌아갑니다.",
+    "%s에 다시 묻습니다.",
+    "보호자가 PlayGuard에서 일시 정지를 해제할 수 있습니다.",
+    "지금은 사용할 수 없습니다: HOME 메뉴로 돌아갑니다.",
+    "사용 불가: %s",
+    "보호자가 PlayGuard에서 이 시간을 바꿀 수 있습니다.",
 } };
 
 static const Lines NL = { {
@@ -146,6 +200,12 @@ static const Lines NL = { {
     "Vandaag geweigerd: %d",
     "Zonder pincode: %s",
     "zo,ma,di,wo,do,vr,za",
+    "Gepauzeerd na te veel pogingen: terug naar het HOME-menu.",
+    "Het vraagt opnieuw om %s.",
+    "Een ouder kan de pauze opheffen in PlayGuard.",
+    "Niet op dit moment: terug naar het HOME-menu.",
+    "Gesloten: %s",
+    "Een ouder kan deze tijden wijzigen in PlayGuard.",
 } };
 
 static const Lines PT = { {
@@ -160,6 +220,12 @@ static const Lines PT = { {
     "Recusas hoje: %d",
     "Sem o PIN: %s",
     "dom,seg,ter,qua,qui,sex,sáb",
+    "Em pausa após demasiadas tentativas: regresso ao menu HOME.",
+    "Volta a pedir às %s.",
+    "Um adulto pode levantar a pausa no PlayGuard.",
+    "Não a esta hora: regresso ao menu HOME.",
+    "Fechado: %s",
+    "Um adulto pode mudar estes horários no PlayGuard.",
 } };
 
 static const Lines PT_BR = { {
@@ -174,6 +240,12 @@ static const Lines PT_BR = { {
     "Recusas hoje: %d",
     "Sem o PIN: %s",
     "dom,seg,ter,qua,qui,sex,sáb",
+    "Em pausa após muitas tentativas: de volta ao menu HOME.",
+    "Vai pedir de novo às %s.",
+    "Um adulto pode tirar a pausa no PlayGuard.",
+    "Não neste horário: de volta ao menu HOME.",
+    "Fechado: %s",
+    "Um adulto pode mudar estes horários no PlayGuard.",
 } };
 
 static const Lines RU = { {
@@ -188,6 +260,12 @@ static const Lines RU = { {
     "Отказов сегодня: %d",
     "Без PIN-кода: %s",
     "вс,пн,вт,ср,чт,пт,сб",
+    "Пауза после слишком многих попыток: возврат в меню HOME.",
+    "Снова спросит в %s.",
+    "Родитель может снять паузу в PlayGuard.",
+    "Не в это время: возврат в меню HOME.",
+    "Закрыто: %s",
+    "Родитель может изменить эти часы в PlayGuard.",
 } };
 
 static const Lines ZH_HANS = { {
@@ -202,6 +280,12 @@ static const Lines ZH_HANS = { {
     "今日拒绝：%d次",
     "无需PIN：%s",
     "日,一,二,三,四,五,六",
+    "尝试次数过多，已暂停：返回HOME菜单。",
+    "将在%s再次询问。",
+    "家长可在PlayGuard中解除暂停。",
+    "此时不可使用：返回HOME菜单。",
+    "关闭时段：%s",
+    "家长可在PlayGuard中更改这些时间。",
 } };
 
 static const Lines ZH_HANT = { {
@@ -216,6 +300,12 @@ static const Lines ZH_HANT = { {
     "今日拒絕：%d次",
     "無需PIN碼：%s",
     "日,一,二,三,四,五,六",
+    "嘗試次數過多，已暫停：返回HOME選單。",
+    "將在%s再次詢問。",
+    "家長可在PlayGuard中解除暫停。",
+    "此時不可使用：返回HOME選單。",
+    "關閉時段：%s",
+    "家長可在PlayGuard中變更這些時間。",
 } };
 
 // libnx's SetLanguage order (ja, en-US, fr, de, it, es, zh-CN, ko, nl, pt, ru,

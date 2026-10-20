@@ -92,6 +92,7 @@
   "applet": {"label": "애플릿 모드(앨범에서 실행)"},
   "background": {"label": "PlayGuard가 백그라운드에 있음"},
   "hbloader": {"label": "업데이트를 스토어에 넘길 수 있는 로더"},
+  "forwarders": {"label": "이미 만든 포워더 (본체 › 포워더)"},
   "docked": {"label": "독에 연결(TV)"},
   "battery": {"label": "배터리 사용(충전기 없음)"},
   "boot_choice": {"label": "시작할 때 '이전 빌드?'에 대한 답", "options": {"": "B", "a": "A"}},
@@ -140,6 +141,7 @@
   "first_emummc": "emuMMC에서 첫 시작",
   "fw_old": "플레이 타이머에 너무 오래된 펌웨어",
   "updates": "설치할 업데이트",
+  "homebrew": "포워더 사용 중",
   "family": "5인 가족",
   "no_account": "사용자 계정 없음"
  }

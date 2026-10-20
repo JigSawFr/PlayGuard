@@ -92,6 +92,7 @@
   "applet": {"label": "Modo applet (a partir do álbum)"},
   "background": {"label": "PlayGuard em segundo plano"},
   "hbloader": {"label": "Um carregador que pode passar uma atualização a uma loja"},
+  "forwarders": {"label": "Forwarders já criados (Consola › Forwarders)"},
   "docked": {"label": "Na base (na TV)"},
   "battery": {"label": "Na bateria (sem carregador)"},
   "boot_choice": {"label": "Resposta a «build anterior?» ao iniciar", "options": {"": "B", "a": "A"}},
@@ -140,6 +141,7 @@
   "first_emummc": "Primeiro arranque em emuMMC",
   "fw_old": "Firmware demasiado antigo para o tempo de jogo",
   "updates": "Atualizações por instalar",
+  "homebrew": "Forwarders em uso",
   "family": "Uma família de cinco",
   "no_account": "Nenhuma conta de utilizador"
  }

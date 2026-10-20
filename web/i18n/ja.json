@@ -92,6 +92,7 @@
   "applet": {"label": "アプレットモード（アルバムから起動）"},
   "background": {"label": "PlayGuard がバックグラウンド"},
   "hbloader": {"label": "更新をストアに引き継げるローダー"},
+  "forwarders": {"label": "作成済みのフォワーダー（本体 › フォワーダー）"},
   "docked": {"label": "ドックに挿している（テレビ）"},
   "battery": {"label": "バッテリーで動作（充電器なし）"},
   "boot_choice": {"label": "起動時の「前のビルド？」への回答", "options": {"": "B", "a": "A"}},
@@ -140,6 +141,7 @@
   "first_emummc": "emuMMC で初回起動",
   "fw_old": "プレイ時間には古すぎるシステムバージョン",
   "updates": "インストールできる更新",
+  "homebrew": "フォワーダー使用中",
   "family": "5 人家族",
   "no_account": "ユーザーなし"
  }

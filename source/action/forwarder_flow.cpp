@@ -2,6 +2,7 @@
 #include "action/forwarder_flow.hpp"
 
 #include <algorithm>
+#include <ctime>
 #include <borealis.hpp>
 
 #include "action/hbmenu_lock.hpp"
@@ -134,6 +135,16 @@ bool install(const forwarders::Made& m, bool self, const char* kind = "add_forwa
         ui::error("playguard/forwarders/add_err"_i18n, error);
         return false;
     }
+    // Its icon from the album, when it has one still there.
+    if (!m.icon.empty()) {
+        std::string shot;
+        const std::string p = nro::sd_path(m.icon);
+        std::vector<uint8_t> icon;
+        if (!p.empty() && paths::read_file(on_sd(p), shot))
+            icon = forwarder_icon::from_screenshot(std::vector<uint8_t>(shot.begin(), shot.end()));
+        if (nro::icon_usable(icon)) info.icon = icon;
+        else brls::Logger::warning("forwarders: {} unreadable, the .nro's icon instead", m.icon);
+    }
     forwarders::Made made = m;
     std::string gate_argv;
     if (made.pin) {
@@ -201,24 +212,42 @@ forwarders::Made made_of(const forwarders_logic::Row& row)
     return m;
 }
 
-// The free hours of every protected forwarder, for the gate (GATE_RULES_NAME).
+// The free hours of every protected forwarder, and the hours it never
+// opens, for the gate (GATE_RULES_NAME, GATE_CLOSED_NAME).
 void write_rules()
 {
-    std::string text;
+    std::string free_text, closed_text;
     for (const forwarders::Made& m : forwarders::list()) {
-        if (!m.pin || !m.free_days) continue;
-        const GateHours h = { (uint8_t)m.free_days, (uint16_t)m.free_from, (uint16_t)m.free_to };
+        if (!m.pin) continue;
         char line[0x400];
-        if (gate_rule_format(&h, m.nro.c_str(), line, sizeof(line))) text += line;
+        const GateHours f = { (uint8_t)m.free_days, (uint16_t)m.free_from, (uint16_t)m.free_to };
+        if (m.free_days && gate_rule_format(&f, m.nro.c_str(), line, sizeof(line))) free_text += line;
+        const GateHours c = { (uint8_t)m.closed_days, (uint16_t)m.closed_from, (uint16_t)m.closed_to };
+        if (m.closed_days && gate_rule_format(&c, m.nro.c_str(), line, sizeof(line))) closed_text += line;
     }
-    const std::string path = paths::data_dir() + "/" + GATE_RULES_NAME;
-    if (text.empty()) {
-        std::remove(path.c_str());
-        return;
+    for (const auto& [name, text] : { std::pair<const char*, std::string>{ GATE_RULES_NAME, free_text },
+                                      { GATE_CLOSED_NAME, closed_text } }) {
+        const std::string path = paths::data_dir() + "/" + name;
+        if (text.empty()) {
+            std::remove(path.c_str());
+            continue;
+        }
+        std::string err;
+        if (!paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(path, text, &err))
+            brls::Logger::warning("forwarders: {} not written ({})", name, err);
     }
-    std::string err;
-    if (!paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(path, text, &err))
-        brls::Logger::warning("forwarders: {} not written ({})", GATE_RULES_NAME, err);
+}
+
+std::string pause_path()
+{
+    return paths::data_dir() + "/" + GATE_PAUSE_NAME;
+}
+
+std::string read_pause()
+{
+    std::string text;
+    if (!paths::read_file(pause_path(), text)) text.clear();
+    return text;
 }
 
 // Made here, still known (not PlayGuard's own when `with_self` is false).
@@ -267,7 +296,16 @@ std::vector<forwarders_logic::Row> rows()
     std::vector<forwarders_logic::Installed> installed;
     for (u32 i = 0; i < count; i++)
         installed.push_back({ records[i].id, records[i].name, records[i].author, records[i].version });
-    return forwarders_logic::merge(forwarders::list(), installed, nro_exists, self_nro());
+    std::vector<forwarders_logic::Row> out = forwarders_logic::merge(forwarders::list(), installed, nro_exists, self_nro());
+    // Paused after refusals (the gate's file), until a time still to come.
+    const std::string pause = read_pause();
+    const uint64_t now = (uint64_t)std::time(nullptr);
+    for (auto& r : out) {
+        uint64_t until = 0;
+        if (r.pin && gate_pause_find(pause.data(), pause.size(), r.nro.c_str(), nullptr, &until) && until > now)
+            r.paused_until = until;
+    }
+    return out;
 }
 
 std::vector<std::string> homebrew()
@@ -599,22 +637,30 @@ void reinstall_all(std::function<void(bool)> done)
                 });
 }
 
-void set_hours(const forwarders_logic::Row& row, int days, int from, int to, std::function<void(bool)> done, bool ask)
+namespace
+{
+// Free hours (`closed` false) or the hours it never opens: saved, the
+// gate's files written, in the change history.
+void set_span(const forwarders_logic::Row& row, bool closed, int days, int from, int to, std::function<void(bool)> done,
+              bool ask)
 {
     forwarders::Made m = made_of(row);
     if (!m.pin || !forwarders::find(row.id, nullptr)) {
         if (done) done(false);
         return;
     }
-    // The PIN first: free hours let the homebrew start without it (not to
-    // put back the hours as they were a moment ago: ask false).
+    // The PIN first: these hours change when it starts (not to put them back
+    // as they were a moment ago: ask false).
     if (ui::refuse_read_only() || (ask && !pin_lock::confirm()) || R_FAILED(core_change_allowed())) {
         if (done) done(false);
         return;
     }
-    m.free_days = days;
-    m.free_from = days ? from : 0;
-    m.free_to = days ? to : 0;
+    int& d = closed ? m.closed_days : m.free_days;
+    int& f = closed ? m.closed_from : m.free_from;
+    int& t = closed ? m.closed_to : m.free_to;
+    d = days;
+    f = days ? from : 0;
+    t = days ? to : 0;
     std::string err;
     if (!forwarders::save(m, &err)) {
         const std::string hint = hbmenu_lock::write_hint(paths::nand_dir());
@@ -623,12 +669,152 @@ void set_hours(const forwarders_logic::Row& row, int days, int from, int to, std
         return;
     }
     write_rules();
-    history_flow::record_event("gate_hours", "", history_label(m.name, m.id) +
-                                                     (days ? " · " + hours_label(days, from, to) : std::string()));
-    ui::notify(days ? brls::getStr("playguard/forwarders/hours_set", m.name, hours_label(days, from, to))
-                    : brls::getStr("playguard/forwarders/hours_none", m.name),
-               ui::Toast::Done);
+    history_flow::record_event(closed ? "gate_closed_hours" : "gate_hours", "",
+                               history_label(m.name, m.id) + (days ? " · " + hours_label(days, from, to) : std::string()));
+    if (closed)
+        ui::notify(days ? brls::getStr("playguard/forwarders/closed_set", m.name, hours_label(days, from, to))
+                        : brls::getStr("playguard/forwarders/closed_none", m.name),
+                   ui::Toast::Done);
+    else
+        ui::notify(days ? brls::getStr("playguard/forwarders/hours_set", m.name, hours_label(days, from, to))
+                        : brls::getStr("playguard/forwarders/hours_none", m.name),
+                   ui::Toast::Done);
     if (done) done(true);
+}
+}   // namespace
+
+void set_hours(const forwarders_logic::Row& row, int days, int from, int to, std::function<void(bool)> done, bool ask)
+{
+    set_span(row, false, days, from, to, std::move(done), ask);
+}
+
+void set_closed(const forwarders_logic::Row& row, int days, int from, int to, std::function<void(bool)> done, bool ask)
+{
+    set_span(row, true, days, from, to, std::move(done), ask);
+}
+
+GatePauseRule pause_rule()
+{
+    const std::string text = read_pause();
+    return gate_pause_rule(text.data(), text.size());
+}
+
+void set_pause_rule(unsigned tries, unsigned minutes, std::function<void(bool)> done)
+{
+    if (ui::refuse_read_only() || !pin_lock::confirm() || R_FAILED(core_change_allowed())) {
+        if (done) done(false);
+        return;
+    }
+    const std::string text = read_pause();
+    const GatePauseRule rule = { tries, tries ? minutes : 0 };
+    std::string out(GATE_PAUSE_MAX, '\0');
+    const size_t n = gate_pause_edit(text.data(), text.size(), &rule, nullptr, &out[0], out.size());
+    std::string err;
+    if (n == 0 || !paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(pause_path(), out.substr(0, n), &err)) {
+        const std::string hint = hbmenu_lock::write_hint(paths::data_dir());
+        ui::error("playguard/forwarders/pause_err"_i18n, hint.empty() ? err : err + "\n\n" + hint);
+        if (done) done(false);
+        return;
+    }
+    history_flow::record_event("gate_pause", "", pause_label(rule.tries, rule.minutes));
+    ui::notify(brls::getStr("playguard/forwarders/pause_set", pause_label(rule.tries, rule.minutes)), ui::Toast::Done);
+    if (done) done(true);
+}
+
+std::string until_label(uint64_t posix)
+{
+    // The time alone today, else the day too ("2026-10-21 07:00").
+    const std::string full = ui::time_text(posix);
+    const std::string today = ui::today_date();
+    if (full.size() >= 16 && full.compare(0, 10, today) == 0) return full.substr(11, 5);
+    return full.size() >= 16 ? full.substr(0, 16) : full;
+}
+
+std::string pause_label(unsigned tries, unsigned minutes)
+{
+    if (!tries) return "playguard/forwarders/pause_off"_i18n;
+    return brls::getStr("playguard/forwarders/pause_rule", (int)tries, ui::fmt_played((uint16_t)minutes));
+}
+
+void lift_pause(const forwarders_logic::Row& row, std::function<void(bool)> done)
+{
+    // The PIN first: lifting it lets the PIN be tried again at once.
+    if (ui::refuse_read_only() || !pin_lock::confirm()) {
+        if (done) done(false);
+        return;
+    }
+    const std::string text = read_pause();
+    std::string out(GATE_PAUSE_MAX, '\0');
+    const size_t n = gate_pause_edit(text.data(), text.size(), nullptr, row.nro.c_str(), &out[0], out.size());
+    std::string err;
+    if ((n == 0 && !text.empty() && std::remove(pause_path().c_str()) != 0) ||
+        (n > 0 && !paths::atomic_write(pause_path(), out.substr(0, n), &err))) {
+        ui::error("playguard/forwarders/pause_err"_i18n, err);
+        if (done) done(false);
+        return;
+    }
+    history_flow::record_event("gate_pause_lifted", "", history_label(row.name, row.id));
+    ui::notify(brls::getStr("playguard/forwarders/pause_lifted", row.name), ui::Toast::Done);
+    if (done) done(true);
+}
+
+void set_icon(const forwarders_logic::Row& row, const std::string& shot, std::function<void(bool)> done)
+{
+    forwarders::Made m = made_of(row);
+    if (m.nro.empty()) {
+        if (done) done(false);
+        return;
+    }
+    m.icon = shot;
+    const bool ok = install(m, row.self || m.nro == self_nro(), "add_forwarder",
+                            brls::getStr("playguard/forwarders/icon_set", row.name));
+    if (done) done(ok);
+}
+
+std::vector<forwarders::Made> missing_from(const std::vector<forwarders::Made>& made)
+{
+    std::vector<forwarders::Made> out;
+    const std::vector<forwarders_logic::Row> now = rows();
+    for (const forwarders::Made& m : made) {
+        bool there = false;
+        for (const auto& r : now) there = there || (r.id == m.id && r.state != forwarders_logic::State::NotInstalled);
+        if (!there && !m.nro.empty()) out.push_back(m);
+    }
+    return out;
+}
+
+void put_back_all(const std::vector<forwarders::Made>& made, std::function<void(bool)> done)
+{
+    if (ui::refuse_read_only()) {
+        if (done) done(false);
+        return;
+    }
+    int ok = 0;
+    for (const forwarders::Made& m : made)
+        if (install(m, m.nro == self_nro(), m.pin ? "protect_forwarder" : "add_forwarder", "", true)) ok++;
+    if (ok > 0) ui::notify(brls::getStr("playguard/forwarders/reinstalled_n", ok), ui::Toast::Done);
+    if (done) done(ok > 0);
+}
+
+std::vector<std::string> album_shots()
+{
+    std::vector<std::string> found;
+    // The album's folders: year, month, day; a JPEG per screenshot.
+    std::function<void(const std::string&, int)> walk = [&found, &walk](const std::string& dir, int depth) {
+        for (const std::string& name : paths::list_dirs(dir)) {
+            if (depth < 3) walk(dir + "/" + name, depth + 1);
+        }
+        if (depth == 3)
+            for (const std::string& f : paths::list_files(dir, ".jpg")) found.push_back(dir + "/" + f);
+    };
+    walk(on_sd("/Nintendo/Album"), 0);
+    // As "sdmc:/…", the newest first.
+    std::vector<std::string> out;
+    for (const std::string& p : forwarders_logic::newest_shots(found, 30)) {
+        const std::string root = paths::sd_root() == "/" ? "" : paths::sd_root();
+        out.push_back(nro::sdmc_path(root.empty() ? p : p.substr(root.size())));
+    }
+    return out;
 }
 
 std::string hours_label(int days, int from, int to)
@@ -676,7 +862,11 @@ std::vector<forwarders_logic::Refusals> take_log()
                 if ((r == GateResult_Pin || r == GateResult_Free) && made[i].pin && !made[i].verified)
                     seen_working.push_back(i);
             }
-            const char* kind = r == GateResult_Pin ? "gate_open" : r == GateResult_Free ? "gate_free" : "gate_refused";
+            const char* kind = r == GateResult_Pin      ? "gate_open"
+                               : r == GateResult_Free   ? "gate_free"
+                               : r == GateResult_Paused ? "gate_paused"
+                               : r == GateResult_Closed ? "gate_closed"
+                                                        : "gate_refused";
             std::string w(when, wn);
             if (w == "?") w.clear();
             if (r == GateResult_Refused) refused.push_back({ name, w });

@@ -264,6 +264,17 @@ def limit_reached(new_page):
         print("ok   limit_reached")
 
 
+# Console › Forwarders in use (PLAYGUARD_SIM_FORWARDERS): the card, the
+# groups and badges, then the steps to the lock.
+@scenario
+def forwarders(new_page):
+    page = new_page()
+    if open_page(page, FIXED + "&forwarders=1&tab=console", "forwarders"):
+        steps(page, "right.down*2.a")   # Network clock, then Forwarders, under Homebrew
+        shot(page, "forwarders")
+        print("ok   forwarders")
+
+
 @scenario
 def init_error(new_page):
     page = new_page()

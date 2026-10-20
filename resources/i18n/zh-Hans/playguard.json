@@ -1061,7 +1061,28 @@
         "group_open": "无需PIN",
         "group_elsewhere": "由其他应用创建",
         "group_gone": "已不在HOME菜单",
-        "state_verified": "已验证"
+        "state_verified": "已验证",
+        "closed_set": "{}从不打开：{}",
+        "closed_none": "{}不再有禁止使用的时段",
+        "pause_err": "PIN被拒后的暂停未更改",
+        "pause_set": "PIN被拒后：{}",
+        "pause_off": "从不",
+        "pause_rule": "连续{}次：暂停{}",
+        "pause_lifted": "{}再次要求PIN",
+        "icon_set": "{}已使用新图标",
+        "icon_own": "其.nro的图标",
+        "icon_none": "相册中没有截图：请先截一张（截图键），再回到这里。",
+        "icon_title": "在HOME菜单上的图标",
+        "action_closed": "禁止使用的时段",
+        "action_lift": "解除暂停",
+        "action_icon": "更换图标",
+        "closed_title": "禁止使用的时段（无论有无PIN）",
+        "state_paused": "暂停至{}",
+        "state_closed": "关闭 {}",
+        "pause_cell": "PIN被拒后暂停",
+        "pause_default": "默认",
+        "paused_line": "{}：至{}",
+        "paused_title": "一个转发器因PIN被拒而暂停"
     },
     "hbmenu": {
         "section": "自制软件菜单",
@@ -1158,7 +1179,9 @@
         "setup_progress": "第{}步，共{}步",
         "verify_title": "从HOME菜单启动{}一次",
         "verify_how": "退出PlayGuard，在HOME菜单点{}的图标启动并输入PIN：菜单打开后，PlayGuard就知道这条返回途径可用。然后回到这里。",
-        "summary_doors": "无需PIN即可打开：{}"
+        "summary_doors": "无需PIN即可打开：{}",
+        "rescue_written": "写于{}",
+        "rescue_print": "打印用：SD卡上的{}"
     },
     "about": {
         "section_changelog": "{} 更新内容",
@@ -1222,7 +1245,11 @@
         "before_delete_err": "无法事先保存备份（{}）。\n\n仍要删除全部内容吗？",
         "delete_anyway": "仍要删除",
         "bedtime_not_restored": "此备份中开启了就寝提醒：不会恢复，如有需要请在“游戏时间”中重新设置。",
-        "backed_up_on": "{}备份的设置。"
+        "backed_up_on": "{}备份的设置。",
+        "forwarders_body": "此备份中还有{}个已不在HOME菜单上的转发器：{}。要恢复吗？",
+        "forwarders_put_back": "恢复",
+        "forwarders_lock_title": "自制软件菜单曾被锁定",
+        "forwarders_lock": "制作此备份时它处于锁定状态。请在主机 › 转发器中重新锁定：先进行检查。"
     },
     "update": {
         "checking": "正在检查更新…",
@@ -1502,7 +1529,12 @@
             "gate_open": "已用PIN打开转发器",
             "gate_free": "在时段内免PIN打开转发器",
             "gate_refused": "转发器被拒绝（未输入PIN）",
-            "gate_hours": "转发器的免PIN时段"
+            "gate_hours": "转发器的免PIN时段",
+            "gate_paused": "转发器暂停（PIN被拒次数过多）",
+            "gate_closed": "转发器关闭（禁止使用的时段）",
+            "gate_closed_hours": "转发器的禁止使用时段",
+            "gate_pause": "PIN被拒后暂停",
+            "gate_pause_lifted": "转发器暂停已解除"
         },
         "sources": {
             "uniform": "每天相同的限制",

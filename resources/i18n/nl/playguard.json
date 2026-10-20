@@ -1061,7 +1061,28 @@
         "group_open": "Zonder pincode",
         "group_elsewhere": "Gemaakt door een andere app",
         "group_gone": "Niet meer in het HOME-menu",
-        "state_verified": "gecontroleerd"
+        "state_verified": "gecontroleerd",
+        "closed_set": "{} opent nooit: {}",
+        "closed_none": "{} heeft geen uren zonder toegang meer",
+        "pause_err": "De pauze na geweigerde pincodes is niet gewijzigd",
+        "pause_set": "Na geweigerde pincodes: {}",
+        "pause_off": "Nooit",
+        "pause_rule": "{} keer geweigerd: een pauze van {}",
+        "pause_lifted": "{} vraagt weer om de pincode",
+        "icon_set": "{} heeft zijn nieuwe pictogram",
+        "icon_own": "Dat van zijn .nro",
+        "icon_none": "Geen schermafbeelding in het album: maak er een (de opnameknop) en kom hier terug.",
+        "icon_title": "Zijn pictogram in het HOME-menu",
+        "action_closed": "Uren waarop het nooit opent",
+        "action_lift": "Pauze opheffen",
+        "action_icon": "Pictogram wijzigen",
+        "closed_title": "Uren waarop het nooit opent, met of zonder pincode",
+        "state_paused": "gepauzeerd tot {}",
+        "state_closed": "gesloten {}",
+        "pause_cell": "Pauze na geweigerde pincodes",
+        "pause_default": "standaard",
+        "paused_line": "{}: tot {}",
+        "paused_title": "Een forwarder is gepauzeerd na geweigerde pincodes"
     },
     "hbmenu": {
         "section": "Homebrewmenu",
@@ -1158,7 +1179,9 @@
         "setup_progress": "Stap {} van {}",
         "verify_title": "{} één keer vanuit het HOME-menu starten",
         "verify_how": "Verlaat PlayGuard, start {} via het pictogram in het HOME-menu en voer de pincode in: zodra het menu opent, weet PlayGuard dat deze weg terug werkt. Kom daarna hier terug.",
-        "summary_doors": "Opent zonder pincode: {}"
+        "summary_doors": "Opent zonder pincode: {}",
+        "rescue_written": "Geschreven op {}",
+        "rescue_print": "Om af te drukken: {} op de SD-kaart"
     },
     "about": {
         "section_changelog": "Nieuw in {}",
@@ -1222,7 +1245,11 @@
         "before_delete_err": "Er kon vooraf geen back-up worden opgeslagen ({}).\n\nToch alles verwijderen?",
         "delete_anyway": "Toch verwijderen",
         "bedtime_not_restored": "In deze back-up stond een bedtijdalarm aan: dat wordt niet teruggezet. Stel het zo nodig opnieuw in bij Speeltijdtimer.",
-        "backed_up_on": "Back-up van de instellingen van {}."
+        "backed_up_on": "Back-up van de instellingen van {}.",
+        "forwarders_body": "Deze back-up heeft ook {} forwarders die niet meer in het HOME-menu staan: {}. Terugzetten?",
+        "forwarders_put_back": "Terugzetten",
+        "forwarders_lock_title": "Het homebrewmenu was vergrendeld",
+        "forwarders_lock": "Het was vergrendeld toen deze back-up werd gemaakt. Vergrendel het opnieuw via Console › Forwarders: eerst komen de controles."
     },
     "update": {
         "checking": "Controleren op updates...",
@@ -1502,7 +1529,12 @@
             "gate_open": "Forwarder geopend met de pincode",
             "gate_free": "Forwarder zonder pincode geopend binnen zijn uren",
             "gate_refused": "Forwarder geweigerd (pincode niet ingevoerd)",
-            "gate_hours": "Uren zonder pincode van een forwarder"
+            "gate_hours": "Uren zonder pincode van een forwarder",
+            "gate_paused": "Forwarder gepauzeerd (te veel geweigerde pincodes)",
+            "gate_closed": "Forwarder gesloten (uren zonder toegang)",
+            "gate_closed_hours": "Uren zonder toegang van een forwarder",
+            "gate_pause": "Pauze na geweigerde pincodes",
+            "gate_pause_lifted": "Pauze van een forwarder opgeheven"
         },
         "sources": {
             "uniform": "Elke dag dezelfde limiet",

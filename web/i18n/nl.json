@@ -92,6 +92,7 @@
   "applet": {"label": "Appletmodus (vanuit het album)"},
   "background": {"label": "PlayGuard op de achtergrond"},
   "hbloader": {"label": "Een loader die een update aan een store kan doorgeven"},
+  "forwarders": {"label": "Al gemaakte forwarders (Console › Forwarders)"},
   "docked": {"label": "In het dock (op de tv)"},
   "battery": {"label": "Op de accu (geen lader)"},
   "boot_choice": {"label": "Antwoord op 'vorige build?' bij het opstarten", "options": {"": "B", "a": "A"}},
@@ -140,6 +141,7 @@
   "first_emummc": "Eerste start op emuMMC",
   "fw_old": "Firmware te oud voor de speeltijdtimer",
   "updates": "Updates om te installeren",
+  "homebrew": "Forwarders in gebruik",
   "family": "Een gezin van vijf",
   "no_account": "Geen gebruikersaccount"
  }
