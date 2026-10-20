@@ -396,7 +396,7 @@ void cadran::install_screens()
     brls::Application::getGlobalFocusChangeEvent()->subscribe(skin_screen_of);
 }
 
-void cadran::style_rail(brls::View* tab_frame)
+void cadran::style_rail(brls::View* tab_frame, const std::vector<const char*>& icons)
 {
     brls::Theme theme = brls::Application::getTheme();
     auto* sidebar = tab_frame ? dynamic_cast<brls::Sidebar*>(tab_frame->getView("brls/tab_frame/sidebar")) : nullptr;
@@ -405,11 +405,12 @@ void cadran::style_rail(brls::View* tab_frame)
     if (!list) return;
     list->setPadding(6, 8, 10, 16);
     // main.xml's order: Today | timer, activity, restrictions, PIN | console | history, preferences, about.
-    static const char* icons[] = { "today", "", "timer", "activity", "shield", "lock", "", "chip", "", "history", "settings", "info" };
+    static const std::vector<const char*> MAIN = { "today", "", "timer", "activity", "shield", "lock", "", "chip", "", "history", "settings", "info" };
+    const std::vector<const char*>& names = icons.empty() ? MAIN : icons;
     std::vector<brls::SidebarItem*> items;
     int position = 0;
     for (brls::View* v : list->getChildren()) {
-        const char* name = position < (int)(sizeof(icons) / sizeof(icons[0])) ? icons[position] : "";
+        const char* name = position < (int)names.size() ? names[position] : "";
         position++;
         auto* item = dynamic_cast<brls::SidebarItem*>(v);
         if (!item) {   // a separator: its line is drawn at mid-height

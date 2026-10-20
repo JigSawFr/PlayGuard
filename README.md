@@ -29,6 +29,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 - 📱 **Companion app** — unlink it, even on a second-hand console.
 - ↩️ **History and backups** — every change is logged and can be undone.
 - 🔔 **Notifications** — a bell gathers what needs you (an alarm off, a clock drifting, changes made elsewhere), with the fix one press away.
+- 🏠 **Home Assistant (optional)** — over MQTT on your local network: the state and play time in Home Assistant, orders from it (extra time, limits, lock). Off by default. [Guide](docs/home-assistant.md).
 - 🌍 Every console language, light and dark themes, larger text on the TV; cards, today's time as a ring, the week edited with the stick.
 
 ## Compatibility
@@ -54,8 +55,8 @@ The whole walk-through, and the everyday tasks: [getting started](docs/getting-s
 ## Documentation
 
 - **Website:** [playguard.link](https://playguard.link/) — this documentation in the console's 15 languages, and [PlayGuard in your browser](https://playguard.link/simulator/) against a simulated console
-- **User guide:** [getting started](docs/getting-started.md) · [features](docs/features.md) · [install](docs/install.md) · [compatibility](docs/compatibility.md) · [troubleshooting](docs/troubleshooting.md)
-- **Reference:** [companion app](docs/companion-app.md) · [`config.json`](docs/config.md) · [how parental controls work](docs/parental-controls.md) · [recovery sysmodule](sysmodule/README.md)
+- **User guide:** [getting started](docs/getting-started.md) · [features](docs/features.md) · [install](docs/install.md) · [compatibility](docs/compatibility.md) · [troubleshooting](docs/troubleshooting.md) · [Home Assistant](docs/home-assistant.md)
+- **Reference:** [companion app](docs/companion-app.md) · [`config.json`](docs/config.md) · [how parental controls work](docs/parental-controls.md) · [optional sysmodules](sysmodule/README.md)
 - **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md) · [roadmap](ROADMAP.md) · [changelog](CHANGELOG.md)
 
 ## License and credits

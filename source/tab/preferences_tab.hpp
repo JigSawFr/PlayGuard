@@ -1,7 +1,8 @@
 // PreferencesTab — PlayGuard itself: language, theme, text size, visual
 // effects, start tab and the intro; the kinds of notifications and the
 // monthly "Support PlayGuard" reminder. A setting that shapes one feature lives in that feature's tab;
-// the updates and Help & diagnostics are in About.
+// the updates and Help & diagnostics are in About. Last, the remote link's
+// screen (MQTT, Home Assistant).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -30,4 +31,5 @@ class PreferencesTab : public TabBase
     BRLS_BIND(brls::BooleanCell, notices_summary, "pf_notices_summary");
     BRLS_BIND(brls::BooleanCell, notices_reminders, "pf_notices_reminders");
     BRLS_BIND(brls::BooleanCell, notices_ack_remind, "pf_notices_ack_remind");
+    BRLS_BIND(brls::DetailCell,  remote,        "pf_remote");
 };

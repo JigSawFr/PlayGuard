@@ -41,6 +41,8 @@
             <brls:DetailCell id="cn_blank" focusable="false" title="@i18n/playguard/tools/blank"/>
             <brls:DetailCell id="cn_serial" title="@i18n/playguard/tools/serial"/>
             <brls:DetailCell id="cn_patches" title="@i18n/playguard/tools/patches"/>
+            <brls:Header title="@i18n/playguard/modules/section" marginTop="24" marginBottom="8"/>
+            <brls:DetailCell id="cn_modules" title="@i18n/playguard/modules/open"/>
 
         </brls:Box>
 

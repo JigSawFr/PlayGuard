@@ -4,6 +4,8 @@
 #include <cctype>
 #include <vector>
 
+#include "core/console_info.h"
+
 namespace sys_updates
 {
 
@@ -40,18 +42,8 @@ std::string tag_of_url(const std::string& url)
 
 std::string hekate_version(const std::string& bytes)
 {
-    const size_t limit = bytes.size() < 1024 ? bytes.size() : 1024;
-    for (size_t i = 0; i + 7 <= limit; i++) {
-        if (bytes.compare(i, 4, "ICTC") != 0) continue;
-        int v[3];
-        bool ok = true;
-        for (int k = 0; k < 3; k++) {
-            v[k] = (unsigned char)bytes[i + 4 + k] - '0';
-            ok = ok && v[k] >= 0 && v[k] <= 40;
-        }
-        if (ok) return std::to_string(v[0]) + "." + std::to_string(v[1]) + "." + std::to_string(v[2]);
-    }
-    return "";
+    char v[16];
+    return console_hekate_version((const uint8_t*)bytes.data(), bytes.size(), v) ? v : "";
 }
 
 std::string to_text(const Latest& latest)

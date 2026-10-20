@@ -2,7 +2,8 @@
 // screen, ClockTab), the installed games check, the forwarders (homebrew on
 // the HOME menu, ForwardersActivity), the firmware, Atmosphère and
 // hekate (A on each opens its release notes), compatibility, storage, the
-// serial number and the game patches.
+// serial number and the game patches; last, the optional sysmodules
+// (ModulesActivity).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -41,4 +42,5 @@ class ConsoleTab : public TabBase
     BRLS_BIND(brls::DetailCell,  blank,        "cn_blank");
     BRLS_BIND(brls::DetailCell,  serial,       "cn_serial");
     BRLS_BIND(brls::DetailCell,  game_patches, "cn_patches");
+    BRLS_BIND(brls::DetailCell,  modules_cell, "cn_modules");
 };

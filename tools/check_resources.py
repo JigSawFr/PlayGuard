@@ -67,7 +67,7 @@ errors = []
 warnings = []
 # Names that read the same in every language.
 SAME_IN_EVERY_LANGUAGE = {"about/made_in_france", "tools/update_via_values/appstore", "update/appstore",
-                          "tools/storage_emummc", "tools/storage_sysmmc", "init_error/firmware"}
+                          "tools/storage_emummc", "tools/storage_sysmmc", "init_error/firmware", "prefs/remote"}
 
 
 def flatten(d, prefix=""):
@@ -302,6 +302,19 @@ DYNAMIC_KEYS = {
     "prefs/effects_values/": array_of("source/util/config.hpp", "EFFECTS"),
     "restrictions/org_where/": array_of("source/tab/restrictions_tab.cpp", "ORG_WHERE"),
     "tools/update_via_values/": array_of("source/action/update_flow.cpp", "METHODS"),
+    # The remote link (sync_activity.cpp, sync_orders.cpp) and the optional
+    # modules (modules_activity.cpp, agent_update.cpp).
+    "sync/mqtt_versions/": array_of("source/activity/sync_activity.cpp", "KEYS"),
+    "sync/policies/": returned_by("source/sync/sync_conf.c", "sync_policy_name"),
+    # "unknown": an enumerator out of range, never in an outcome.
+    "sync/reasons/": [r for r in returned_by("source/sync/sync_apply.c", "sync_reason_name") if r != "unknown"],
+    "modules/": [f"{name}/{what}"
+                 for name in re.findall(r'\{\s*Id::\w+,\s*"(\w+)"', read(f"{ROOT}/source/util/modules.cpp"))
+                 for call in re.findall(r"\bkey\(m,\s*([^;)]*)\)", read(f"{ROOT}/source/activity/modules_activity.cpp"))
+                 for what in strings_of(call)],
+    "modules/done/": [v for path in ("source/activity/modules_activity.cpp", "source/action/agent_update.cpp")
+                      for call in re.findall(r"\brecord\(([^;{]*?)\);", read(f"{ROOT}/{path}"))
+                      for v in strings_of(call)],
 }
 for prefix, values in sorted(DYNAMIC_KEYS.items()):
     values = [v for v in values if v]
@@ -522,8 +535,11 @@ for v in sorted(sim_read - sim_documented):
     warnings.append(f"the code reads {v}, which CONTRIBUTING.md does not document (the simulator's table)")
 for v in sorted(sim_documented - sim_read):
     warnings.append(f"CONTRIBUTING.md documents {v}, which the code does not read")
-scenarios = set(re.findall(r'SCENARIO\s*==\s*"(\w+)"', read(f"{ROOT}/tools/desktop_smoke.py")))
-m = re.search(r"desktop_smoke\.py\s+<out-dir>\s+\[([\w|]+)\]", contributing)
+smoke_text = read(f"{ROOT}/tools/desktop_smoke.py")
+scenarios = set(re.findall(r'SCENARIO\s*==\s*"([\w-]+)"', smoke_text))
+for group in re.findall(r"SCENARIO\s+in\s+\(([^)]*)\)", smoke_text):   # a flag for two scenarios
+    scenarios |= set(strings_of(group))
+m = re.search(r"desktop_smoke\.py\s+<out-dir>\s+\[([\w|-]+)\]", contributing)
 listed_scenarios = set(m.group(1).split("|")) if m else set()
 if not scenarios or not listed_scenarios:
     errors.append("no smoke scenario found in tools/desktop_smoke.py, or no list of them in CONTRIBUTING.md")

@@ -287,6 +287,7 @@ static void test_preferences()
     CHECK(d.onboarding_at_start && d.intro && d.dev_builds_order == "newest");
     CHECK(d.effects == "auto");
     CHECK(d.support_reminder && d.support_reminded.empty() && d.seen_version.empty());
+    CHECK(d.agent_update_skipped.empty());
     write_config(R"({"support_reminder": false, "support_reminded": "2026-10-09", "seen_version": "1.1.0"})");
     config::load();
     CHECK(!config::get().support_reminder && config::get().support_reminded == "2026-10-09");
@@ -399,6 +400,9 @@ static void test_preferences()
     config::get().logs_keep_mb = 20;
     config::get().support_reminder = false;
     config::get().seen_version = "1.2.0";
+    config::get().agent_update_skipped = std::string(64, 'a');
+    config::get().ha_latest = "0.2.0";
+    config::get().ha_checked = "2026-10-18";
     CHECK(save_config());
     config::get() = config::Config{};
     config::load();
@@ -406,6 +410,15 @@ static void test_preferences()
     CHECK(config::get().backup_keep == 20);
     CHECK(config::get().logs_keep == 50 && config::get().logs_keep_days == 365 && config::get().logs_keep_mb == 20);
     CHECK(!config::get().support_reminder && config::get().seen_version == "1.2.0");
+    CHECK(config::get().agent_update_skipped == std::string(64, 'a'));
+    // The Home Assistant integration's newer release and the day it was checked.
+    CHECK(config::get().ha_latest == "0.2.0" && config::get().ha_checked == "2026-10-18");
+    write_config(R"({"ha_latest": ")" + std::string(33, '9') + R"(", "ha_checked": "18/10/2026"})");
+    config::load();
+    CHECK(config::get().ha_latest.empty() && config::get().ha_checked.empty());   // too long; not a date
+    write_config(R"({"agent_update_skipped": ")" + std::string(65, 'b') + R"("})");
+    config::load();
+    CHECK(config::get().agent_update_skipped.empty());
 }
 
 static void test_tmp_recovery()

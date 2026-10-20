@@ -14,6 +14,9 @@ class SecurityTab : public TabBase
 
   protected:
     void refresh() override;
+    // The recovery module's note and line (Locked out?): read from the SD card
+    // when the tab appears (after Optional modules closes), not every 5 s.
+    void willAppear(bool resetState = false) override;
 
   private:
     cadran::List list;
@@ -43,4 +46,6 @@ class SecurityTab : public TabBase
     BRLS_BIND(brls::Label,      pr_note,        "pr_note");
     BRLS_BIND(brls::Header,     danger_header,  "sc_danger_header");
     BRLS_BIND(brls::DetailCell, del,            "sc_delete");
+    BRLS_BIND(brls::DetailCell, rescue,         "sc_rescue");
+    BRLS_BIND(brls::Label,      rescue_about,   "sc_rescue_about");
 };

@@ -7,11 +7,14 @@
 #include "activity/firmware_gate_activity.hpp"
 #include "activity/forwarders_activity.hpp"
 #include "activity/game_check_activity.hpp"
+#include "activity/modules_activity.hpp"
 #include "core/sysinfo.h"
 #include "tab/clock_tab.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
+#include "util/modules.hpp"
 #include "util/patches.hpp"
+#include "util/paths.hpp"
 #include "view/row_icon.hpp"
 
 using namespace brls::literals;
@@ -33,6 +36,10 @@ ConsoleTab::ConsoleTab()
     forwarders->setDetailText(ui::opens());
     forwarders->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new ForwardersActivity());
+        return true;
+    });
+    modules_cell->registerClickAction([](brls::View*) {
+        brls::Application::pushActivity(new ModulesActivity());
         return true;
     });
 
@@ -100,11 +107,19 @@ ConsoleTab::ConsoleTab()
         tiles->setMarginBottom(20);
     this->list.apply({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_forwarders", "home" },
                        { "cn_compat", "check" }, { "cn_storage", "folder" }, { "cn_blank", "code" },
-                       { "cn_serial", "tag" }, { "cn_patches", "shield" } });
+                       { "cn_serial", "tag" }, { "cn_patches", "shield" }, { "cn_modules", "tools" } });
 }
 
 void ConsoleTab::refresh()
 {
+    // The optional sysmodules on the SD card: whether each exefs.nsp is there
+    // (a stat, not its hash: the screen itself reads the rest).
+    int installed = 0;
+    for (const auto& m : modules::all())
+        installed += paths::file_exists(modules::dir(paths::sd_root(), m) + "/exefs.nsp") ? 1 : 0;
+    modules_cell->setDetailText(ui::opens(installed == 1 ? "playguard/modules/count_one"_i18n
+                                          : installed ? brls::getStr("playguard/modules/count", installed)
+                                                      : "playguard/modules/state/none"_i18n));
     SysInfo si;
     sysinfo_get(&si);
     // With the newer release the last update check found (sys_update_flow),

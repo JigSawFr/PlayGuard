@@ -99,7 +99,7 @@ The entries about the console rather than the parental controls come last, on on
 - the recovery sysmodule out of date (not the one this version ships with, or installed before it said its version; *Update* puts in the one this version carries), then the console to restart for it, until it has;
 - a build that did not finish starting and was gone back from (*Send a report*).
 
-Those for information: a build gone back from, a firmware not tested with this version, a newer Atmosphère, hekate or firmware (checked with *Check for updates every day*; the firmware's entry says to wait until Atmosphère supports it), the serial number not blanked on emuMMC, the other system's own parental controls, one of PlayGuard's own files found damaged and put aside (a toast at start-up points to it).
+Those for information: a build gone back from, a firmware not tested with this version, a newer Atmosphère, hekate or firmware (checked with *Check for updates every day*; the firmware's entry says to wait until Atmosphère supports it), a newer release of the Home Assistant integration (once it said which version Home Assistant runs: *What's new* shows what changed since and the QR code that opens it in HACS), the serial number not blanked on emuMMC, the other system's own parental controls, one of PlayGuard's own files found damaged and put aside (a toast at start-up points to it).
 
 ### How entries behave
 
@@ -333,6 +333,10 @@ One switch that sets every day's limit to 0, so a PIN is needed to start a game 
 
 Two confirmations, irreversible; a backup of the settings is saved first.
 
+### Locked out?
+
+Installs the optional recovery module, for a forgotten PIN with a 0-minute limit.
+
 ## Console — the network clock, the installed games, what the console runs
 
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=console)*
@@ -402,6 +406,10 @@ On a console without Internet, *Set the network clock to the console clock* appe
 - Whether Atmosphère **blanks the serial number** (partly hidden until Ⓐ; on emuMMC, when it is not, a warning icon on the row above, which Ⓐ explains).
 - **Game patches** (sys-patch or sigpatch files, recommending sys-patch when only files are used: an info icon, or a warning one when something needs a look, which Ⓐ explains).
 
+### Optional modules
+
+*Optional modules ›*, a screen of its own, last in the tab: install, update, start at boot or remove the recovery module and the remote link's agent, each in its own tab, from the copies PlayGuard carries (no computer needed). Every change asks for the PIN when *Protect PlayGuard with the PIN* does.
+
 ## History — changes and backups
 
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=history)*
@@ -431,6 +439,7 @@ On a console without Internet, *Set the network clock to the console clock* appe
 - The messages it shows:
   - The kinds of notifications (see [above](#how-entries-behave)).
   - A **monthly reminder to support PlayGuard** (on by default, never in the first month nor right after an update; *Don't show again* on the reminder or this switch turns it off for good, updates included).
+- **Remote access (MQTT / Home Assistant):** the broker and its MQTT version, the console's name, what to do with orders (ask on the console, carry them out, refuse them), whether they may change the play timer (off by default), Home Assistant's discovery, the console's own information (model, versions, storage, battery, network, games; the serial number only with *Publish the serial number*), QR codes that install the PlayGuard integration from HACS and add the console (once installed, its version, and its newer release), the live status, *Sync now* and the log. See [the Home Assistant guide](home-assistant.md).
 - A setting that shapes one feature sits with it: extra time in *Play timer*, turning parental controls back on in *PIN*, the clock check in *Console › Network clock*. The updates and *Help & diagnostics* are in *About*.
 
 ## About
@@ -466,7 +475,7 @@ The credits, how to **support PlayGuard** ([GitHub Sponsors](https://github.com/
 
 **No more 22.5 crashes.** `pctl:a`, the privileged parental-control service, accepts a **single session**. Older builds of the original app kept it open, so the HOME-menu PIN prompt (or the PIN applet) could not get it and Atmosphère could crash. PlayGuard opens the session for each action and releases it immediately; periodic refreshes pause while the app is in the background. *(Diagnosis by [anbingxi's fork](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly).)*
 
-**Nothing runs in the background.** The limit, the PIN, the warnings and the suspension are the console's own; PlayGuard only changes their settings.
+**Nothing runs in the background.** The limit, the PIN, the warnings and the suspension are the console's own; PlayGuard only changes their settings. The optional remote link runs while PlayGuard is open, or all the time once its optional agent is installed, and carries out an order exactly like a change made on the console (the same unlock, relock, read-only mode and history); it can never delete parental controls, unlink the phone app or touch the PIN.
 
 ## What counts as play time
 

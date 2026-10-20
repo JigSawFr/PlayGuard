@@ -4,7 +4,9 @@
 #include <vector>
 
 #include "action/notices.hpp"
+#include "action/sync_flow.hpp"
 #include "action/sys_update_flow.hpp"
+#include "activity/sync_activity.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -96,11 +98,15 @@ PreferencesTab::PreferencesTab()
         config::get().support_reminder = on;
         ui::save_config();
     });
+    remote->registerClickAction([](brls::View*) {
+        brls::Application::pushActivity(new SyncActivity());
+        return true;
+    });
     this->list.tiles({ { "pf_language", "language" }, { "pf_theme", "contrast" }, { "pf_text_size", "eye" },
                        { "pf_start_tab", "home" } }, false);
     this->list.apply({ { "pf_effects", "sparkle" }, { "pf_intro", "bolt" }, { "pf_notices_system", "chip" }, { "pf_notices_summary", "calendar" },
                        { "pf_notices_reminders", "bell" }, { "pf_notices_ack_remind", "alert" },
-                       { "pf_support_reminder", "heart" } });
+                       { "pf_support_reminder", "heart" }, { "pf_remote", "server" } });
 }
 
 void PreferencesTab::refresh()
@@ -117,6 +123,10 @@ void PreferencesTab::refresh()
     notices_reminders->setOn(cfg.notices_reminders, false);
     notices_ack_remind->setOn(cfg.notices_ack_remind, false);
     support_reminder->setOn(cfg.support_reminder, false);
+    const sync_flow::Status link = sync_flow::status();
+    remote->setDetailText(ui::opens(!link.enabled ? "playguard/sync/state_off"_i18n
+                                    : link.running && link.link.state == SyncLink_Online ? "playguard/sync/state_online"_i18n
+                                                                                        : "playguard/sync/state_offline"_i18n));
     this->list.sync();
     cadran::set_pill("");
 }

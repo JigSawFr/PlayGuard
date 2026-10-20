@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 01608fa279a5 -->
+<!-- translated from docs/features.md, sha256 a24d5dc327ed -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.fr.md).
@@ -100,7 +100,7 @@ Les entrées qui concernent la console plutôt que le contrôle parental viennen
 - le sysmodule de récupération pas à jour (pas celui fourni avec cette version, ou installé avant qu'il n'indique sa version ; *Mettre à jour* installe celui que cette version contient), puis la console à redémarrer pour qu'il serve, jusqu'à ce qu'elle l'ait été ;
 - une version qui n'a pas fini de démarrer et dont PlayGuard est revenu (*Envoyer un rapport*).
 
-Celles pour information : un retour à la version précédente, un firmware non testé avec cette version, une nouvelle version d'Atmosphère, de hekate ou du firmware (vérifiée avec *Rechercher les mises à jour chaque jour* ; l'entrée du firmware conseille d'attendre qu'Atmosphère le prenne en charge), le numéro de série non masqué sur emuMMC, le contrôle parental propre à l'autre système, un fichier de PlayGuard trouvé endommagé et mis de côté (une notification au lancement y renvoie).
+Celles pour information : un retour à la version précédente, un firmware non testé avec cette version, une nouvelle version d'Atmosphère, de hekate ou du firmware (vérifiée avec *Rechercher les mises à jour chaque jour* ; l'entrée du firmware conseille d'attendre qu'Atmosphère le prenne en charge), une nouvelle version de l'intégration Home Assistant (une fois qu'elle a indiqué la version que Home Assistant utilise : *Nouveautés* montre ce qui a changé depuis et le QR code qui l'ouvre dans HACS), le numéro de série non masqué sur emuMMC, le contrôle parental propre à l'autre système, un fichier de PlayGuard trouvé endommagé et mis de côté (une notification au lancement y renvoie).
 
 ### Comportement des entrées
 
@@ -334,6 +334,10 @@ Un interrupteur qui met la limite de chaque jour à 0, donc un code PIN est néc
 
 Deux confirmations, irréversible ; une sauvegarde des réglages est d'abord enregistrée.
 
+### Bloqué ?
+
+Installe le module de secours facultatif, pour un code PIN oublié avec une limite de 0 minute.
+
 ## Console — l'horloge réseau, les jeux installés, ce que fait tourner la console
 
 *[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=console)*
@@ -403,6 +407,10 @@ Sur une console sans Internet, *Régler l'horloge réseau sur l'horloge de la co
 - Le **masquage du numéro de série** par Atmosphère (en partie caché jusqu'à Ⓐ ; en emuMMC, s'il n'est pas masqué, une icône d'avertissement sur la ligne au-dessus, que Ⓐ explique).
 - **Patchs de jeux** (sys-patch ou fichiers sigpatches, avec une recommandation de sys-patch quand seuls des fichiers sont utilisés : une icône d'information, ou d'avertissement quand quelque chose est à vérifier, que Ⓐ explique).
 
+### Modules facultatifs
+
+*Modules facultatifs ›*, un écran à part, le dernier de l'onglet : installer, mettre à jour, lancer au démarrage ou supprimer le module de secours et l'agent du lien à distance, chacun dans son onglet, depuis les copies que contient PlayGuard (sans ordinateur). Chaque modification demande le code PIN quand *Protéger PlayGuard par le code PIN* le prévoit.
+
 ## Historique — modifications et sauvegardes
 
 *[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=history)*
@@ -432,6 +440,7 @@ Sur une console sans Internet, *Régler l'horloge réseau sur l'horloge de la co
 - Les messages qu'il affiche :
   - Les types de notifications (voir [plus haut](#comportement-des-entrées)).
   - Un **rappel mensuel pour soutenir PlayGuard** (activé par défaut, jamais le premier mois ni juste après une mise à jour ; *Ne plus afficher* sur le rappel ou cet interrupteur le désactive pour de bon, mises à jour comprises).
+- **Accès à distance (MQTT / Home Assistant) :** le broker et sa version MQTT, le nom de la console, que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, les informations de la console elle-même (modèle, versions, stockage, batterie, réseau, jeux ; le numéro de série seulement avec *Publier le numéro de série*), des QR codes qui installent l'intégration PlayGuard depuis HACS et ajoutent la console (une fois installée, sa version et sa nouvelle version), l'état en direct, *Synchroniser maintenant* et le journal. Voir [le guide Home Assistant](../home-assistant.fr.md).
 - Un réglage qui ne concerne qu'une fonction est à côté d'elle : le temps en plus dans *Temps de jeu*, la réactivation dans *Code PIN*, la vérification de l'horloge dans *Console › Horloge réseau*. Les mises à jour et *Aide et diagnostic* sont dans *À propos*.
 
 ## À propos
@@ -467,7 +476,7 @@ Les crédits, comment **soutenir PlayGuard** ([GitHub Sponsors](https://github.c
 
 **Plus de plantage en 22.5.** `pctl:a`, le service privilégié du contrôle parental, n'accepte **qu'une seule session**. Les anciennes versions de l'application d'origine la gardaient ouverte : l'écran PIN du menu HOME (ou l'applet PIN) ne pouvait pas l'obtenir et Atmosphère pouvait planter. PlayGuard ouvre la session pour chaque action et la libère aussitôt ; les rafraîchissements périodiques s'arrêtent quand l'application est en arrière-plan. *(Diagnostic du [fork d'anbingxi](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly).)*
 
-**Rien ne tourne en arrière-plan.** La limite, le code PIN, les avertissements et la suspension sont ceux de la console ; PlayGuard ne change que leurs réglages.
+**Rien ne tourne en arrière-plan.** La limite, le code PIN, les avertissements et la suspension sont ceux de la console ; PlayGuard ne change que leurs réglages. Le lien à distance facultatif fonctionne tant que PlayGuard est ouvert, ou en permanence une fois son agent facultatif installé, et exécute un ordre exactement comme un changement fait sur la console (même déverrouillage, reverrouillage, mode lecture seule et historique) ; il ne peut jamais supprimer le contrôle parental, délier l'appli mobile ni toucher au code PIN.
 
 ## Ce qui compte comme temps de jeu
 

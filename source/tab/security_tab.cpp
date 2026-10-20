@@ -9,6 +9,7 @@
 #include "action/pt_block_flow.hpp"
 #include "action/pt_flow.hpp"
 #include "action/rescue.hpp"
+#include "activity/modules_activity.hpp"
 #include "app.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
@@ -27,8 +28,6 @@ SecurityTab::SecurityTab()
     this->mark(relock.getView(), { "unlocked" });
     pr_note->setSingleLine(false);
     rescue_note->setSingleLine(false);
-    // Checked once: the sysmodule only comes and goes with the SD card out.
-    ui::set_visible(rescue_note.getView(), rescue::installed());
     pin_lock_note->setSingleLine(false);
     console_lock_note->setSingleLine(false);
     console_lock_cell->registerClickAction([this](brls::View*) {
@@ -116,6 +115,11 @@ SecurityTab::SecurityTab()
         config::get().auto_relock = on;
         ui::save_config();
     });
+    rescue_about->setSingleLine(false);
+    rescue->registerClickAction([](brls::View*) {
+        brls::Application::pushActivity(new ModulesActivity(ModulesActivity::Tab::Rescue));
+        return true;
+    });
     del->registerClickAction([this](brls::View*) {
         console_actions::delete_all("", [this]() { this->refresh(); });
         return true;
@@ -124,7 +128,8 @@ SecurityTab::SecurityTab()
     this->list.apply({ { "sc_set_pin", "key" }, { "sc_pin_lock", "lock" }, { "sc_pin_ask_again", "timer" },
                        { "sc_show_pin", "eye" }, { "sc_unlock", "unlock" }, { "sc_relock", "lock" },
                        { "sc_auto_relock", "refresh" }, { "sc_console_lock", "gamepad" }, { "pr_active", "phone" },
-                       { "pr_updated", "refresh" }, { "pr_decode", "code" }, { "pr_unlink", "stop" }, { "sc_delete", "trash" } });
+                       { "pr_updated", "refresh" }, { "pr_decode", "code" }, { "pr_unlink", "stop" }, { "sc_delete", "trash" },
+                       { "sc_rescue", "tools" } });
     if (cadran::Card* danger = this->list.card_of("sc_delete"))
         danger->setAccent(brls::Application::getTheme()["cadran/coral_line"]);
 }
@@ -132,6 +137,15 @@ SecurityTab::SecurityTab()
 void SecurityTab::change_pin()
 {
     console_actions::set_pin("", [this]() { this->refresh(); });
+}
+
+void SecurityTab::willAppear(bool resetState)
+{
+    // Locked out? › Optional modules installs and removes the sysmodule while
+    // PlayGuard runs: checked as the tab comes back.
+    ui::set_visible(rescue_note.getView(), rescue::installed());
+    rescue->setDetailText(ui::opens(ModulesActivity::summary(modules::Id::Rescue)));
+    TabBase::willAppear(resetState);
 }
 
 void SecurityTab::refresh()

@@ -13,6 +13,7 @@
 #include "action/pairing_state.hpp"
 #include "action/pt_flow_internal.hpp"
 #include "action/pt_logic.hpp"
+#include "action/sync_flow.hpp"
 #include "core/platform.h"
 #include "ui/cadran_text.hpp"
 #include "ui/cadran_modal.hpp"
@@ -175,6 +176,7 @@ static void offer_relock(std::function<void()> after)
 void finish_write(Result rc, bool did_unlock, const std::string& ok_text,
                   const std::string& error_prefix, std::function<void()> refresh)
 {
+    sync_flow::changed();
     if (R_SUCCEEDED(rc)) history_flow::offer_undo(refresh);
     if (!did_unlock) {
         ui::notify_result(rc, ok_text, error_prefix);

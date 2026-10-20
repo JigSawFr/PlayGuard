@@ -195,6 +195,7 @@ jobs:
             echo "$mark **$label**${last:+ — $last}" >> "$GITHUB_STEP_SUMMARY"
           }
           check "Resources (i18n keys, translations, XML layouts)" python3 tools/check_resources.py .
+          check "Remote link documents (Home Assistant discovery, state)" python3 tools/check_sync_json.py build/host-tests/sync
           check "Web simulator's settings (every PLAYGUARD_SIM_* variable)" python3 tools/check_web_params.py .
           check "Web simulator's page logic (web/sim_logic.js)" node --test tests/web_page/*.test.js
           check "compat.json generator" python3 tools/gen_compat.py . build/compat.json
@@ -388,6 +389,11 @@ jobs:
             scenarios: gate outside alarm cadranstates rollback
           - shard: developer
             scenarios: devbuild library update errors sysnotes forwarders
+          # The remote link against a real broker (Mosquitto, MQTT 5.0 and
+          # 3.1.1), a simulated agent sysmodule, and the optional modules.
+          - shard: link
+            scenarios: sync sync-311 agent agent-update agent-rollback modules
+            packages: mosquitto mosquitto-clients
           # Every Cadran tab in the 15 languages, normal and larger text: no
           # text cut short (tools/cut_text_check.py, tests/cut_text/), five
           # languages a shard (about 3 minutes each).
@@ -431,7 +437,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install $archives -y --no-install-recommends libgl1-mesa-dev libgl1-mesa-dri \
             libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxkbcommon-dev libwayland-dev \
-            libdbus-1-dev libcurl4-openssl-dev zlib1g-dev xvfb xauth xdotool imagemagick dbus
+            libdbus-1-dev libcurl4-openssl-dev zlib1g-dev xvfb xauth xdotool imagemagick dbus \
+            ${{ matrix.packages }}
       # Each scenario writes its screenshots (and a contact sheet of them) to
       # smoke/ (the default one) or smoke-<scenario>/. Every scenario of the
       # shard runs; the step fails at the end if one did. smoke-results.tsv
@@ -495,6 +502,8 @@ jobs:
           path: |
             smoke*/*.png
             smoke*/app.log
+            smoke*/*.txt
+            smoke*/mosquitto.log
             smoke*/visual_diff/*.png
           retention-days: 14
       - name: Shard summary
@@ -601,8 +610,10 @@ jobs:
           # PlayGuard's warnings as errors, as on the desktop: the libnx code
           # (source/core/*.c, the __SWITCH__ paths) is only built here.
           make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
-          # The optional recovery sysmodule, as its own asset (sysmodule/).
-          make dist-rescue
+          # make dist builds the optional sysmodules first and bundles them in
+          # the romfs (Console › Optional modules); each is also its own asset
+          # (sysmodule/rescue/, sysmodule/agent/).
+          make dist-rescue dist-agent
           # This build's hit rate, for the summary (the second build below hits every time).
           ccache --print-stats > ccache-stats.txt
           ccache --show-stats
@@ -613,22 +624,23 @@ jobs:
           # to the RomFS file, and a failed check uploads both builds.
           keep() {
             mkdir -p "$1/dksh"
-            cp playguard.zip playguard-rescue.zip build/playguard.nro build/playguard.nacp "$1/"
+            cp playguard.zip playguard-rescue.zip playguard-agent.zip build/playguard.nro build/playguard.nacp "$1/"
             cp build/dksh/*.dksh "$1/dksh/"
             (cd build/resources && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > "$1/resources.sha256"
           }
           if [ "$REPRO" = 1 ]; then
             keep repro/first
             make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
-            make dist-rescue
+            make dist-rescue dist-agent
             keep repro/second
             if ! python3 tools/repro_diff.py repro/first repro/second; then
               echo "::error title=Reproducible zips::the second build differs from the first (what differs is above; both builds are in the repro-diff artifact)"
               exit 1
             fi
           fi
-          # The raw sysmodule next to its zip, for the rescue artifact.
-          cp sysmodule/out/playguard-rescue.nsp playguard-rescue.nsp
+          # The raw sysmodules next to their zips, for their artifacts.
+          cp sysmodule/rescue/out/playguard-rescue.nsp playguard-rescue.nsp
+          cp sysmodule/agent/out/playguard-agent.nsp playguard-agent.nsp
           # Only what these builds used goes back to the cache (a hit refreshes
           # an object's date), not 350 MB of builds gone by.
           ccache --evict-older-than "$(( $(date +%s) - start + 60 ))s"
@@ -653,7 +665,7 @@ jobs:
             exit 1
           fi
           # libnx's 21.0.0 marker (LNY2 after MOD0), which hbmenu checks.
-          python3 tools/check_nro.py playguard.nro sysmodule/out/playguard-rescue.elf
+          python3 tools/check_nro.py playguard.nro sysmodule/rescue/out/playguard-rescue.elf sysmodule/agent/out/playguard-agent.elf
       - name: compat.json
         run: python3 tools/gen_compat.py . compat.json
       - name: Build identity
@@ -668,15 +680,17 @@ jobs:
             git submodule status
             cat toolchain.txt
           } > build-info.txt
-          sha256sum playguard.nro playguard.zip playguard-rescue.zip compat.json > SHA256SUMS.txt
+          sha256sum playguard.nro playguard.zip playguard-rescue.zip playguard-agent.zip compat.json > SHA256SUMS.txt
           cat build-info.txt
           unzip -l playguard.zip
           unzip -l playguard-rescue.zip
+          unzip -l playguard-agent.zip
       # One artifact per component, named after the build (playguard-<label>-…):
       # -nro is what Developer › Install another build downloads on the
       # console (source/util/dev_builds.hpp: the raw .nro and the small text
       # files only, never the zip too); -rescue the recovery sysmodule, as the
-      # zip the release attaches (SD-card layout) and the raw .nsp; -sdcard the
+      # zip the release attaches (SD-card layout) and the raw .nsp; -agent the
+      # remote link's sysmodule, the same way; -sdcard the
       # store zip, only on a release build (the release job attaches it; a
       # pull request's .nro is enough to try); -linker-map what makes the .nro big.
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -696,6 +710,14 @@ jobs:
           path: |
             playguard-rescue.zip
             playguard-rescue.nsp
+          if-no-files-found: error
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        id: agent
+        with:
+          name: playguard-${{ env.LABEL }}-agent
+          path: |
+            playguard-agent.zip
+            playguard-agent.nsp
           if-no-files-found: error
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         id: sdcard
@@ -724,11 +746,13 @@ jobs:
         env:
           NRO_URL: ${{ steps.nro.outputs.artifact-url }}
           RESCUE_URL: ${{ steps.rescue.outputs.artifact-url }}
+          AGENT_URL: ${{ steps.agent.outputs.artifact-url }}
           SDCARD_URL: ${{ steps.sdcard.outputs.artifact-url }}
           MAP_URL: ${{ steps.map.outputs.artifact-url }}
         run: |
           set -- --artifact "playguard-$LABEL-nro|$NRO_URL|playguard.nro · compat.json · build-info.txt · SHA256SUMS.txt — what the console's *Install another build* downloads" \
-                 --artifact "playguard-$LABEL-rescue|$RESCUE_URL|playguard-rescue.zip (unzip at the SD-card root) · playguard-rescue.nsp"
+                 --artifact "playguard-$LABEL-rescue|$RESCUE_URL|playguard-rescue.zip (unzip at the SD-card root) · playguard-rescue.nsp" \
+                 --artifact "playguard-$LABEL-agent|$AGENT_URL|playguard-agent.zip (unzip at the SD-card root) · playguard-agent.nsp"
           if [ -n "$SDCARD_URL" ]; then set -- "$@" --artifact "playguard-$LABEL-sdcard|$SDCARD_URL|playguard.zip (the store package: unzip at the SD-card root)"; fi
           set -- "$@" --artifact "playguard-$LABEL-linker-map|$MAP_URL|borealis.map (14 days)"
           python3 tools/ci_summary.py build --version "${{ needs.meta.outputs.version }}" --ref "${{ needs.meta.outputs.ref }}" \
@@ -782,6 +806,10 @@ jobs:
           path: dist
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
+          name: playguard-${{ env.LABEL }}-agent
+          path: dist
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
           name: playguard-${{ env.LABEL }}-sdcard
           path: dist
       # Anyone can then check that a download came from this repository's CI, unchanged:
@@ -794,6 +822,7 @@ jobs:
             dist/playguard.nro
             dist/playguard.zip
             dist/playguard-rescue.zip
+            dist/playguard-agent.zip
             dist/compat.json
       # The release exists (release-please created it with the tag): the
       # assets are added to it. --clobber: a re-run replaces its own files.
@@ -804,7 +833,7 @@ jobs:
           TAG: ${{ inputs.tag }}
         run: |
           gh release upload "$TAG" --clobber dist/playguard.nro dist/playguard.zip dist/playguard-rescue.zip \
-            dist/compat.json dist/build-info.txt dist/SHA256SUMS.txt
+            dist/playguard-agent.zip dist/compat.json dist/build-info.txt dist/SHA256SUMS.txt
       # The release page laid out (tools/release_page.sh): "PlayGuard X.Y.Z",
       # a summary, the figures, the commit list release-please wrote folded
       # (what users notice, what contributors do), the screens that changed,
