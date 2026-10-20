@@ -26,7 +26,9 @@ python3 tools/visual_check.py smoke tests/visual/smoke --update
 ```
 
 (`smoke-games … games`, `smoke-errors … errors`, `smoke-gate … gate`, `smoke-rescue … rescue`, `smoke-forged … forged`, `smoke-lock … lock`, `smoke-outside … outside`, `smoke-library … library`, `smoke-devbuild … devbuild`, `smoke-alarm … alarm` `smoke-cadran … cadran`, `smoke-cadranstates … cadranstates` `smoke-cadranunlocked … cadranunlocked`, `smoke-cadranlarge … cadranlarge` and `smoke-forwarders … forwarders` the same way), then look at
-the new images before committing them. `--add NAME …` adds a screen to a set;
+the new images before committing them. `--update` rewrites only the references
+of the screens that changed (by more than the check allows) and leaves the
+other files as they are, byte for byte. `--add NAME …` adds a screen to a set;
 keep out screens with a toast, a held-key scroll that can stop anywhere
 (one held to the end of a list stops on its last row: `library/`), the app
 version (`devbuild/` keeps the build list, not the install confirmation) or
