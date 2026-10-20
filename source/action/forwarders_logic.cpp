@@ -30,7 +30,10 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
             r.nro = m->nro;
             if (r.name.empty()) r.name = m->name;
             if (r.author.empty()) r.author = m->author;
-            r.state = nro_exists(m->nro) ? State::Ready : State::NroMissing;
+            r.pin = m->pin;
+            r.state = !nro_exists(m->nro)            ? State::NroMissing
+                      : m->pin && !nro_exists(m->gate) ? State::GateMissing
+                                                       : State::Ready;
         } else {
             r.state = State::Elsewhere;
         }
@@ -45,6 +48,7 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
         r.name = m.name;
         r.author = m.author;
         r.nro = m.nro;
+        r.pin = m.pin;
         r.state = State::NotInstalled;
         rows.push_back(r);
     }

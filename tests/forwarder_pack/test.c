@@ -465,6 +465,7 @@ static void test_pack(void)
             CHECK(f && n == strlen(PATH) && memcmp(f, PATH, n) == 0);
             f = romfs_file(romfs, size, "nextArgv", &n);
             CHECK(f && n == strlen(PATH) && memcmp(f, PATH, n) == 0);
+            CHECK(!romfs_file(romfs, size, "returnNroPath", &n));   // no gate
         }
     }
     CHECK(u32_at(p.contents[0].nca.data + 0x240 + 2 * 0x10) == 0);   // no logo section
@@ -535,6 +536,58 @@ static void test_pack(void)
     free(nacp);
 }
 
+// Protected with the PIN: PlayGuard first, the .nro where the loader
+// returns; the same program ID as without.
+static void test_gate(void)
+{
+#define NRO "sdmc:/switch/cyber foil/cyberfoil.nro"
+    static const char NRO_ARGV[] = "\"" NRO "\"";
+    static const char GATE[] = PATH;
+    static const char GATE_ARGV[] = PATH " --pin-gate \"" NRO "\"";
+    uint8_t npdm[NPDM_SIZE];
+    make_npdm(npdm);
+    FwdInput in = input(npdm, NULL);
+    in.nro_path = NRO;
+    in.argv = NRO_ARGV;
+    in.gate_path = GATE;
+    in.gate_argv = GATE_ARGV;
+    FwdPackage p;
+    if (!CHECK(forwarder_pack(&in, &p) == FWD_OK)) {
+        forwarder_package_free(&p);
+        return;
+    }
+    CHECK(p.id == forwarder_id(NRO, NRO_ARGV));
+    unseal(&p.contents[0]);
+    Section s;
+    uint64_t size = 0, n = 0;
+    const uint8_t *f;
+    if (CHECK(section(&p.contents[0], 1, &s))) {
+        const uint8_t *romfs = romfs_of(&s, &size);
+        if (CHECK(romfs)) {
+            f = romfs_file(romfs, size, "nextNroPath", &n);
+            CHECK(f && n == strlen(GATE) && memcmp(f, GATE, n) == 0);
+            f = romfs_file(romfs, size, "nextArgv", &n);
+            CHECK(f && n == strlen(GATE_ARGV) && memcmp(f, GATE_ARGV, n) == 0);
+            f = romfs_file(romfs, size, "returnNroPath", &n);
+            CHECK(f && n == strlen(NRO) && memcmp(f, NRO, n) == 0);
+            f = romfs_file(romfs, size, "returnArgv", &n);
+            CHECK(f && n == strlen(NRO_ARGV) && memcmp(f, NRO_ARGV, n) == 0);
+            CHECK(romfs_hashed(romfs, "returnNroPath") && romfs_hashed(romfs, "nextNroPath"));
+        }
+    }
+    forwarder_package_free(&p);
+
+    // A gate without its argv, or with an empty path: refused.
+    in.gate_argv = NULL;
+    CHECK(forwarder_pack(&in, &p) == FWD_BAD_INPUT);
+    forwarder_package_free(&p);
+    in.gate_argv = GATE_ARGV;
+    in.gate_path = "";
+    CHECK(forwarder_pack(&in, &p) == FWD_BAD_INPUT);
+    forwarder_package_free(&p);
+#undef NRO
+}
+
 static void test_refused(void)
 {
     uint8_t npdm[NPDM_SIZE];
@@ -582,6 +635,7 @@ int main(void)
     test_npdm();
     test_nacp();
     test_pack();
+    test_gate();
     test_refused();
     return CHECK_DONE("forwarder_pack tests passed");
 }

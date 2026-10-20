@@ -1013,7 +1013,15 @@
         "forgotten": "{} vergeten",
         "details": "{}\n\nUitgever: {}\nVersie: {}\n.nro: {}\nProgramma-ID: {}\n{}",
         "made_here": "Gemaakt door PlayGuard",
-        "unknown": "onbekend"
+        "unknown": "onbekend",
+        "state_gate_missing": "De .nro van PlayGuard is verplaatst: installeer opnieuw",
+        "state_pin": "Pincode",
+        "action_pin_on": "Beveiligen met de pincode",
+        "action_pin_off": "Niet meer om de pincode vragen",
+        "pin_confirm": "Elke keer dat {} vanuit het HOME-menu start om de pincode van het ouderlijk toezicht vragen? PlayGuard opent eerst, met het pincodescherm van de console, dus zijn .nro moet blijven waar hij is. Vanuit het homebrewmenu start de .nro nog steeds zonder pincode.",
+        "pin_added": "{} vraagt om de pincode",
+        "pin_removed": "{} vraagt niet meer om de pincode",
+        "pin_no_pin": "Stel eerst een pincode voor ouderlijk toezicht in (Pincode › Pincode instellen of wijzigen): zonder pincode valt er niets te vragen."
     },
     "about": {
         "section_changelog": "Nieuw in {}",
@@ -1346,7 +1354,9 @@
             "launch_version": "Startversie hersteld",
             "countdown": "Aftellen van de speeltijd",
             "add_forwarder": "Forwarder aan het HOME-menu toegevoegd",
-            "remove_forwarder": "Forwarder uit het HOME-menu verwijderd"
+            "remove_forwarder": "Forwarder uit het HOME-menu verwijderd",
+            "protect_forwarder": "Forwarder beveiligd met de pincode",
+            "unprotect_forwarder": "Forwarder niet meer beveiligd met de pincode"
         },
         "sources": {
             "uniform": "Elke dag dezelfde limiet",

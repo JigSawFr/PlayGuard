@@ -28,6 +28,7 @@ enum class State
 {
     Ready,         // on the HOME menu, its .nro there
     NroMissing,    // on the HOME menu, its .nro gone: it would not start
+    GateMissing,   // protected with the PIN, PlayGuard's .nro it starts first gone: install it again
     NotInstalled,  // made here, no longer on the HOME menu (deleted in System Settings)
     Elsewhere,     // on the HOME menu, made by another tool: PlayGuard knows not its .nro
 };
@@ -39,6 +40,7 @@ struct Row
     std::string nro;    // "sdmc:/…"; empty for one made elsewhere
     State       state = State::Ready;
     bool        self = false;   // PlayGuard's own
+    bool        pin = false;    // made here, protected with the PIN
 };
 
 // One row per forwarder on the HOME menu and per one remembered that is no

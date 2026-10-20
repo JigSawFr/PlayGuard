@@ -25,7 +25,7 @@ PlayGuard ramène sur une console modifiée les réglages de l'application mobil
 - ⏱️ **Limite de temps de jeu** — la même tous les jours ou une par jour, des profils, du temps en plus ou l'arrêt du jeu pour aujourd'hui en un appui.
 - 📊 **Activité** — temps par jeu et par compte, graphiques, export en CSV, JSON, XLSX ou PDF.
 - 🔒 **Restrictions et code PIN** — niveau de restriction, classification par âge, code PIN, déverrouillage temporaire, *Bloquer tous les jeux* en un interrupteur.
-- 🕒 **Console** — l'horloge réseau réglée depuis des serveurs NTP publics, pour que le minuteur compte juste sur une console qui n'atteint jamais Nintendo, une vérification des jeux installés, et des homebrews (PlayGuard en premier) placés sur le menu HOME comme des jeux, avec leur icône (forwarders de NRO).
+- 🕒 **Console** — l'horloge réseau réglée depuis des serveurs NTP publics, pour que le minuteur compte juste sur une console qui n'atteint jamais Nintendo, une vérification des jeux installés, et des homebrews (PlayGuard en premier) placés sur le menu HOME comme des jeux, avec leur icône (forwarders de NRO), le code PIN demandé à leur lancement si on le souhaite.
 - 📱 **Application mobile** — la dissocier, même sur une console d'occasion.
 - ↩️ **Historique et sauvegardes** — chaque modification est consignée et peut être annulée.
 - 🔔 **Notifications** — une cloche regroupe ce qui demande votre attention (alarme désactivée, horloge décalée, modifications faites ailleurs), avec la correction à portée d'un appui.

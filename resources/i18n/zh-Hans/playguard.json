@@ -1013,7 +1013,15 @@
         "forgotten": "已忘记{}",
         "details": "{}\n\n发行商：{}\n版本：{}\n.nro：{}\n程序ID：{}\n{}",
         "made_here": "由PlayGuard创建",
-        "unknown": "未知"
+        "unknown": "未知",
+        "state_gate_missing": "PlayGuard的.nro已移动：请重新安装",
+        "state_pin": "PIN",
+        "action_pin_on": "用PIN保护",
+        "action_pin_off": "不再询问PIN",
+        "pin_confirm": "每次从HOME菜单启动{}时都询问家长控制PIN吗？PlayGuard会先打开主机的PIN界面，因此它的.nro必须留在原位置。从自制软件菜单启动时，.nro仍然无需PIN。",
+        "pin_added": "{}会询问PIN",
+        "pin_removed": "{}不再询问PIN",
+        "pin_no_pin": "请先设置家长控制PIN（PIN › 设置或更改PIN）：没有PIN就无从询问。"
     },
     "about": {
         "section_changelog": "{} 更新内容",
@@ -1346,7 +1354,9 @@
             "launch_version": "已重置启动版本",
             "countdown": "游戏时间倒计时",
             "add_forwarder": "已将转发器添加到HOME菜单",
-            "remove_forwarder": "已将转发器从HOME菜单移除"
+            "remove_forwarder": "已将转发器从HOME菜单移除",
+            "protect_forwarder": "转发器已用PIN保护",
+            "unprotect_forwarder": "转发器不再受PIN保护"
         },
         "sources": {
             "uniform": "每天相同的限制",

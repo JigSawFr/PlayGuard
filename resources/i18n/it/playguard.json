@@ -1013,7 +1013,15 @@
         "forgotten": "{} dimenticato",
         "details": "{}\n\nEditore: {}\nVersione: {}\n.nro: {}\nID del programma: {}\n{}",
         "made_here": "Creato da PlayGuard",
-        "unknown": "sconosciuto"
+        "unknown": "sconosciuto",
+        "state_gate_missing": "Il .nro di PlayGuard è stato spostato: reinstallalo",
+        "state_pin": "PIN",
+        "action_pin_on": "Proteggi con il PIN",
+        "action_pin_off": "Non chiedere più il PIN",
+        "pin_confirm": "Chiedere il PIN del filtro famiglia ogni volta che {} viene avviato dal menu HOME? PlayGuard si apre prima, con la schermata del PIN della console, quindi il suo .nro deve restare dov'è. Dal menu homebrew, il .nro si avvia ancora senza PIN.",
+        "pin_added": "{} chiede il PIN",
+        "pin_removed": "{} non chiede più il PIN",
+        "pin_no_pin": "Imposta prima un PIN del filtro famiglia (PIN › Imposta o cambia il PIN): senza, non c'è niente da chiedere."
     },
     "about": {
         "section_changelog": "Novità della {}",
@@ -1346,7 +1354,9 @@
             "launch_version": "Versione di avvio ripristinata",
             "countdown": "Conto alla rovescia del tempo di gioco",
             "add_forwarder": "Forwarder aggiunto al menu HOME",
-            "remove_forwarder": "Forwarder tolto dal menu HOME"
+            "remove_forwarder": "Forwarder tolto dal menu HOME",
+            "protect_forwarder": "Forwarder protetto con il PIN",
+            "unprotect_forwarder": "Forwarder non più protetto con il PIN"
         },
         "sources": {
             "uniform": "Stesso limite ogni giorno",

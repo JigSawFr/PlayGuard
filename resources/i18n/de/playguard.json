@@ -1013,7 +1013,15 @@
         "forgotten": "{} vergessen",
         "details": "{}\n\nHerausgeber: {}\nVersion: {}\n.nro: {}\nProgramm-ID: {}\n{}",
         "made_here": "Von PlayGuard erstellt",
-        "unknown": "unbekannt"
+        "unknown": "unbekannt",
+        "state_gate_missing": "Die .nro von PlayGuard wurde verschoben: neu installieren",
+        "state_pin": "Geheimzahl",
+        "action_pin_on": "Mit der Geheimzahl schützen",
+        "action_pin_off": "Nicht mehr nach der Geheimzahl fragen",
+        "pin_confirm": "Bei jedem Start von {} aus dem HOME-Menü nach der Geheimzahl der Jugendschutzeinstellungen fragen? PlayGuard öffnet sich zuerst, mit der Geheimzahl-Eingabe der Konsole: Seine .nro muss daher bleiben, wo sie ist. Aus dem Homebrew-Menü startet die .nro weiterhin ohne Geheimzahl.",
+        "pin_added": "{} fragt nach der Geheimzahl",
+        "pin_removed": "{} fragt nicht mehr nach der Geheimzahl",
+        "pin_no_pin": "Lege zuerst eine Geheimzahl fest (Geheimzahl › Geheimzahl festlegen oder ändern): ohne sie gibt es nichts abzufragen."
     },
     "about": {
         "section_changelog": "Neu in {}",
@@ -1346,7 +1354,9 @@
             "launch_version": "Startversion zurückgesetzt",
             "countdown": "Spielzeit-Countdown",
             "add_forwarder": "Forwarder zum HOME-Menü hinzugefügt",
-            "remove_forwarder": "Forwarder aus dem HOME-Menü entfernt"
+            "remove_forwarder": "Forwarder aus dem HOME-Menü entfernt",
+            "protect_forwarder": "Forwarder mit der Geheimzahl geschützt",
+            "unprotect_forwarder": "Forwarder nicht mehr mit der Geheimzahl geschützt"
         },
         "sources": {
             "uniform": "Jeden Tag gleiches Limit",

@@ -78,8 +78,9 @@ child screen keeping its own sizes.
 
 The "forwarders" scenario opens Console › Forwarders: the forwarder another
 app made (its details), PlayGuard itself put on the HOME menu in one press,
-a homebrew of the simulated /switch folder picked from the list, then both
-deleted; forwarders.json and the change history must follow each step.
+a homebrew of the simulated /switch folder picked from the list and protected
+with the PIN, then both deleted; forwarders.json and the change history must
+follow each step.
 
 The "loading" scenario stops the start-up on the loading screen
 (PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
@@ -1074,13 +1075,19 @@ def main_opened():
 if FORWARDERS:
     # Console › Forwarders: the one another app made (its details), PlayGuard
     # itself put on the HOME menu in one press, a homebrew of /switch from the
-    # list (named as its .nro names itself), then both deleted; each change in
+    # list (named as its .nro names itself) and protected with the PIN, then
+    # both deleted; each change in
     # forwarders.json (PlayGuard's own) and in the change history.
     made_file = os.path.join(nand_dir, "forwarders.json")
     history_file = os.path.join(nand_dir, "history.json")
     def made():
         try:
             return [(e.get("id"), e.get("name")) for e in json.load(open(made_file)).get("forwarders", [])]
+        except (OSError, ValueError):
+            return []
+    def protected():
+        try:
+            return [(e.get("name"), e.get("gate")) for e in json.load(open(made_file)).get("forwarders", []) if e.get("pin")]
         except (OSError, ValueError):
             return []
     def recorded(kind):
@@ -1127,8 +1134,20 @@ if FORWARDERS:
     shot("09_two")             # PlayGuard, Save Keeper, Star Atlas
     key("Down", 2)             # Star Atlas
     key("Return")
-    shot("10_actions")         # Details, Rename, Change the publisher, Install again, Delete
-    key("Down", 4)             # Delete
+    shot("10_actions")         # Details, Rename, Change the publisher, Protect with the PIN, Install again, Delete
+    key("Down", 3)             # Protect with the PIN
+    key("Return")
+    shot("11_pin_confirm")     # what it asks, and the homebrew menu still starting it
+    key("Right")               # Protect with the PIN
+    key("Return")
+    time.sleep(3)
+    if protected() != [("Star Atlas", "sdmc:/switch/playguard/playguard.nro")]:
+        fail("Star Atlas was not protected with the PIN: " + repr(protected()))
+    if len(recorded("protect_forwarder")) != 1 or [n for _, n in made()] != ["PlayGuard", "Star Atlas"]:
+        fail("the protection is not in the change history: " + repr(recorded("protect_forwarder")))
+    shot("12_protected")       # Star Atlas: On the HOME menu · PIN, the focus on it
+    key("Return")
+    key("Down", 5)             # Delete
     key("Return")
     key("Right")               # Delete, in the confirmation
     key("Return")
@@ -1144,7 +1163,7 @@ if FORWARDERS:
     time.sleep(3)
     if len(recorded("remove_forwarder")) != 2 or made() != [(self_id, "PlayGuard")]:
         fail("the other app's forwarder was not deleted: " + repr(recorded("remove_forwarder")))
-    shot("11_left")            # PlayGuard alone
+    shot("13_left")            # PlayGuard alone
     finish()
 if LIBRARY:
     def listed():

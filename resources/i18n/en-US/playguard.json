@@ -1013,7 +1013,15 @@
         "forgotten": "{} forgotten",
         "details": "{}\n\nPublisher: {}\nVersion: {}\n.nro: {}\nProgram ID: {}\n{}",
         "made_here": "Made by PlayGuard",
-        "unknown": "unknown"
+        "unknown": "unknown",
+        "state_gate_missing": "PlayGuard's .nro has moved: install it again",
+        "state_pin": "PIN",
+        "action_pin_on": "Protect with the PIN",
+        "action_pin_off": "No longer ask for the PIN",
+        "pin_confirm": "Ask for the parental-control PIN each time {} starts from the HOME menu? PlayGuard opens first, with the console's PIN screen, so its .nro must stay where it is. From the homebrew menu, the .nro still starts without the PIN.",
+        "pin_added": "{} asks for the PIN",
+        "pin_removed": "{} no longer asks for the PIN",
+        "pin_no_pin": "Set a parental-control PIN first (PIN › Set or change the PIN): without one, there is nothing to ask for."
     },
     "about": {
         "section_changelog": "What's new in {}",
@@ -1346,7 +1354,9 @@
             "launch_version": "Launch version reset",
             "countdown": "Play-time countdown",
             "add_forwarder": "Forwarder added to the HOME menu",
-            "remove_forwarder": "Forwarder removed from the HOME menu"
+            "remove_forwarder": "Forwarder removed from the HOME menu",
+            "protect_forwarder": "Forwarder protected with the PIN",
+            "unprotect_forwarder": "Forwarder no longer protected with the PIN"
         },
         "sources": {
             "uniform": "Same limit every day",

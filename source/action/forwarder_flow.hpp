@@ -43,6 +43,12 @@ void create_self(std::function<void(bool)> done);
 void rebuild(const forwarders_logic::Row& row, const std::string& name, const std::string& author,
              std::function<void(bool)> done);
 
+// Protects it with the PIN (`on`, confirmed first; refused without a PIN on
+// the console), or no longer: made again, the same program ID, starting
+// PlayGuard first, which asks for the PIN (util/forwarder_gate.hpp). Not for
+// PlayGuard's own, which has its own lock (pin_lock).
+void set_pin(const forwarders_logic::Row& row, bool on, std::function<void(bool)> done);
+
 // Deletes it from the HOME menu (asked first), and from what PlayGuard
 // remembers.
 void remove(const forwarders_logic::Row& row, std::function<void(bool)> done);

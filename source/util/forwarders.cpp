@@ -23,8 +23,13 @@ bool write_all(const std::vector<Made>& all, std::string* error)
 {
     nlohmann::json list = nlohmann::json::array();
     for (const Made& m : all) {
-        list.push_back({ { "id", hex_id(m.id) }, { "nro", m.nro }, { "argv", m.argv }, { "name", m.name },
-                         { "author", m.author } });
+        nlohmann::json e = { { "id", hex_id(m.id) }, { "nro", m.nro }, { "argv", m.argv }, { "name", m.name },
+                             { "author", m.author } };
+        if (m.pin) {
+            e["pin"] = true;
+            e["gate"] = m.gate;
+        }
+        list.push_back(e);
     }
     const nlohmann::json doc = { { "forwarders", list } };
     if (!paths::ensure_dir(paths::nand_dir())) {
@@ -56,6 +61,8 @@ std::vector<Made> list()
         m.name   = clean_text(json_util::string_at(e, "name"), MAX_NAME);
         m.author = clean_text(json_util::string_at(e, "author"), MAX_AUTHOR);
         if (m.argv.empty()) m.argv = m.nro;
+        m.gate = json_util::string_at(e, "gate");
+        m.pin  = json_util::flag_at(e, "pin") && !m.gate.empty();
         bool seen = false;
         for (const Made& o : out) seen = seen || o.id == m.id;
         if (!seen) out.push_back(m);

@@ -1013,7 +1013,15 @@
         "forgotten": "{} oublié",
         "details": "{}\n\nÉditeur : {}\nVersion : {}\n.nro : {}\nID du programme : {}\n{}",
         "made_here": "Créé par PlayGuard",
-        "unknown": "inconnu"
+        "unknown": "inconnu",
+        "state_gate_missing": "Le .nro de PlayGuard a été déplacé : réinstaller",
+        "state_pin": "Code PIN",
+        "action_pin_on": "Protéger par le code PIN",
+        "action_pin_off": "Ne plus demander le code PIN",
+        "pin_confirm": "Demander le code PIN parental à chaque lancement de {} depuis le menu HOME ? PlayGuard s'ouvre d'abord, avec l'écran du code PIN de la console : son .nro doit donc rester où il est. Depuis le menu homebrew, le .nro se lance toujours sans le code PIN.",
+        "pin_added": "{} demande le code PIN",
+        "pin_removed": "{} ne demande plus le code PIN",
+        "pin_no_pin": "Définissez d'abord un code PIN parental (Code PIN › Définir ou changer le code PIN) : sans lui, il n'y a rien à demander."
     },
     "about": {
         "section_changelog": "Nouveautés de la {}",
@@ -1346,7 +1354,9 @@
             "launch_version": "Version de lancement rétablie",
             "countdown": "Décompte du temps de jeu",
             "add_forwarder": "Forwarder ajouté au menu HOME",
-            "remove_forwarder": "Forwarder retiré du menu HOME"
+            "remove_forwarder": "Forwarder retiré du menu HOME",
+            "protect_forwarder": "Forwarder protégé par le code PIN",
+            "unprotect_forwarder": "Forwarder plus protégé par le code PIN"
         },
         "sources": {
             "uniform": "Même limite tous les jours",

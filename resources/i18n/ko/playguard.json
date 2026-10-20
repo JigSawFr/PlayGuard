@@ -1013,7 +1013,15 @@
         "forgotten": "{}을(를) 잊었습니다",
         "details": "{}\n\n배급사: {}\n버전: {}\n.nro: {}\n프로그램 ID: {}\n{}",
         "made_here": "PlayGuard로 만듦",
-        "unknown": "알 수 없음"
+        "unknown": "알 수 없음",
+        "state_gate_missing": "PlayGuard의 .nro가 이동됨: 다시 설치하세요",
+        "state_pin": "PIN",
+        "action_pin_on": "PIN으로 보호",
+        "action_pin_off": "더 이상 PIN 묻지 않기",
+        "pin_confirm": "HOME 메뉴에서 {}을(를) 시작할 때마다 자녀 보호 PIN을 물을까요? PlayGuard가 먼저 본체의 PIN 화면으로 열리므로, 그 .nro는 지금 위치에 두어야 합니다. 홈브루 메뉴에서는 .nro가 여전히 PIN 없이 시작됩니다.",
+        "pin_added": "{}이(가) PIN을 묻습니다",
+        "pin_removed": "{}이(가) 더 이상 PIN을 묻지 않습니다",
+        "pin_no_pin": "먼저 자녀 보호 PIN을 설정하세요(PIN › PIN 설정 또는 변경). PIN이 없으면 물을 것이 없습니다."
     },
     "about": {
         "section_changelog": "{}의 새로운 기능",
@@ -1346,7 +1354,9 @@
             "launch_version": "실행 버전 재설정",
             "countdown": "플레이 시간 카운트다운",
             "add_forwarder": "HOME 메뉴에 포워더 추가",
-            "remove_forwarder": "HOME 메뉴에서 포워더 제거"
+            "remove_forwarder": "HOME 메뉴에서 포워더 제거",
+            "protect_forwarder": "포워더를 PIN으로 보호",
+            "unprotect_forwarder": "포워더의 PIN 보호 해제"
         },
         "sources": {
             "uniform": "매일 같은 제한",

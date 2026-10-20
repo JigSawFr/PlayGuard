@@ -1013,7 +1013,15 @@
         "forgotten": "{}を忘れました",
         "details": "{}\n\n発売元：{}\nバージョン：{}\n.nro：{}\nプログラムID：{}\n{}",
         "made_here": "PlayGuardで作成",
-        "unknown": "不明"
+        "unknown": "不明",
+        "state_gate_missing": "PlayGuardの.nroが移動しました：再インストールしてください",
+        "state_pin": "暗証番号",
+        "action_pin_on": "暗証番号で保護",
+        "action_pin_off": "暗証番号を求めない",
+        "pin_confirm": "HOMEメニューから{}を起動するたびに、みまもり設定の暗証番号を求めますか？先にPlayGuardが本体の暗証番号画面で開くため、その.nroは今の場所から動かさないでください。ホームブリューメニューからは、.nroは暗証番号なしで起動します。",
+        "pin_added": "{}は暗証番号を求めます",
+        "pin_removed": "{}は暗証番号を求めなくなりました",
+        "pin_no_pin": "先にみまもり設定の暗証番号を設定してください（暗証番号 › 暗証番号を設定・変更）。暗証番号がないと、求めるものがありません。"
     },
     "about": {
         "section_changelog": "{}の更新内容",
@@ -1346,7 +1354,9 @@
             "launch_version": "起動バージョンをリセット",
             "countdown": "プレイ時間のカウントダウン",
             "add_forwarder": "フォワーダーをHOMEメニューに追加",
-            "remove_forwarder": "フォワーダーをHOMEメニューから削除"
+            "remove_forwarder": "フォワーダーをHOMEメニューから削除",
+            "protect_forwarder": "フォワーダーを暗証番号で保護",
+            "unprotect_forwarder": "フォワーダーの暗証番号保護を解除"
         },
         "sources": {
             "uniform": "毎日同じ上限",

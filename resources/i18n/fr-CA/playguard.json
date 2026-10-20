@@ -1013,7 +1013,15 @@
         "forgotten": "{} oublié",
         "details": "{}\n\nÉditeur : {}\nVersion : {}\n.nro : {}\nID du programme : {}\n{}",
         "made_here": "Créé par PlayGuard",
-        "unknown": "inconnu"
+        "unknown": "inconnu",
+        "state_gate_missing": "Le .nro de PlayGuard a été déplacé : réinstaller",
+        "state_pin": "NIP",
+        "action_pin_on": "Protéger par le NIP",
+        "action_pin_off": "Ne plus demander le NIP",
+        "pin_confirm": "Demander le NIP parental à chaque lancement de {} depuis le menu HOME? PlayGuard s'ouvre d'abord, avec l'écran du NIP de la console : son .nro doit donc rester où il est. Depuis le menu homebrew, le .nro se lance toujours sans le NIP.",
+        "pin_added": "{} demande le NIP",
+        "pin_removed": "{} ne demande plus le NIP",
+        "pin_no_pin": "Définissez d'abord un NIP parental (NIP › Définir ou changer le NIP) : sans lui, il n'y a rien à demander."
     },
     "about": {
         "section_changelog": "Nouveautés de la {}",
@@ -1346,7 +1354,9 @@
             "launch_version": "Version de lancement rétablie",
             "countdown": "Décompte du temps de jeu",
             "add_forwarder": "Forwarder ajouté au menu HOME",
-            "remove_forwarder": "Forwarder retiré du menu HOME"
+            "remove_forwarder": "Forwarder retiré du menu HOME",
+            "protect_forwarder": "Forwarder protégé par le NIP",
+            "unprotect_forwarder": "Forwarder plus protégé par le NIP"
         },
         "sources": {
             "uniform": "Même limite tous les jours",
