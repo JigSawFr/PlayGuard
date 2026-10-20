@@ -1706,7 +1706,7 @@
             "back": "Torna al genitore · PIN",
             "play": "Consegna la console e gioca",
             "on_hold": "limite in pausa",
-            "until_bed": "fino all'ora di andare a letto",
+            "until_bed": "prima di dormire",
             "end": "Finisce verso le {}",
             "extra": "Tempo extra",
             "no_extra": "Al momento non conta nessun limite: non c'è niente da prolungare."

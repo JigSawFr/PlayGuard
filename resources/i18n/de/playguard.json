@@ -1706,7 +1706,7 @@
             "back": "Zurück zu den Eltern · PIN",
             "play": "Konsole übergeben und spielen",
             "on_hold": "Limit ausgesetzt",
-            "until_bed": "bis zur Schlafenszeit",
+            "until_bed": "bis zum Schlafen",
             "end": "Ende gegen {}",
             "extra": "Zusatzzeit",
             "no_extra": "Gerade zählt kein Limit: Es gibt nichts zu verlängern."

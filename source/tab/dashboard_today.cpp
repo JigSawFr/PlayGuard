@@ -210,14 +210,14 @@ void DashboardTab::fit_text_size()
     // shortened to the day and its limit (show_ring()), the buttons and the
     // cards a little tighter.
     const bool larger = brls::Label::getFontScale() > 1.0f;
-    kicker->setMarginBottom(larger ? 6 : 10);
-    actions->setMarginTop(larger ? 10 : 14);
-    actions->setMarginBottom(larger ? 8 : 12);
+    kicker->setMarginBottom(larger ? 2 : 10);
+    actions->setMarginTop(larger ? 6 : 14);
+    actions->setMarginBottom(larger ? 4 : 12);
     for (brls::View* button : { stop.getView(), child.getView(), limit.getView(), profile.getView() })
-        button->setHeight(larger ? 44 : 48);
+        button->setHeight(larger ? 40 : 48);
     for (brls::View* card : { bed_card.getView(), pc_card.getView(), clock_card.getView() }) {
-        static_cast<brls::Box*>(card)->setPaddingTop(larger ? 14 : 20);
-        static_cast<brls::Box*>(card)->setPaddingBottom(larger ? 14 : 20);
+        static_cast<brls::Box*>(card)->setPaddingTop(larger ? 10 : 20);
+        static_cast<brls::Box*>(card)->setPaddingBottom(larger ? 10 : 20);
     }
 }
 

@@ -1706,7 +1706,7 @@
             "back": "Voltar ao adulto · PIN",
             "play": "Entregar o console e jogar",
             "on_hold": "limite em pausa",
-            "until_bed": "até a hora de dormir",
+            "until_bed": "antes de dormir",
             "end": "Termina por volta das {}",
             "extra": "Tempo extra",
             "no_extra": "Nenhum limite está contando agora: não há nada a prolongar."
