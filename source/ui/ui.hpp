@@ -152,6 +152,30 @@ void qr_dialog(const std::string& body, const std::string& url);
 // line under the code.
 void qr_text_dialog(const std::string& body, const std::string& text);
 
+// A list of checks in a dialog: each line with its mark (a teal check for
+// what is ready, an amber or coral triangle for what is not, a grey dot for
+// what is only said), under `title`, `note` small at the end (may be empty).
+enum class Check
+{
+    Ok,
+    Warn,
+    Bad,
+    Info,
+};
+struct CheckLine
+{
+    Check       state = Check::Info;
+    std::string text;
+};
+// One of them: the mark, then the text (`size` px).
+brls::Box* check_row(const CheckLine& line, float size = 17);
+brls::Box* checklist_body(const std::string& title, const std::vector<CheckLine>& lines, const std::string& note = "");
+// `body` with Cancel and `hold_label`: A held on it for 2 s, a bar under
+// the body filling meanwhile, runs `on_yes`; let go sooner, the bar empties
+// and nothing happens. For what is hard to undo from the console.
+void hold_confirm(brls::Box* body, const std::string& hold_label, std::function<void()> on_yes,
+                  std::function<void()> on_no = nullptr);
+
 // Reads the stored PIN (pctl_get_pin) and shows it in large digits, or a
 // dialog with the error. The app's copies are wiped as soon as the label
 // holds the text. True when it was shown; `on_close` then runs once it is

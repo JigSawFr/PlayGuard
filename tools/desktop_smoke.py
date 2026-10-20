@@ -90,9 +90,11 @@ follow each step.
 The "hbmenu" scenario locks the homebrew menu (with signature patches on the
 simulated SD card), the rescue sysmodule's report of a lift at boot taken at
 start-up: refused first (no way back yet), then PlayGuard's own
-forwarder and sphaira's, protected with the PIN, made; locked, then
-unlocked: override_config.ini, the state file and the change history must
-follow.
+forwarder and sphaira's, protected with the PIN, made; refused again until
+sphaira is seen working through its gate (its log); locked with A held on
+the checklist, the rescue sheet after it; deleting sphaira refused while
+locked; then unlocked: override_config.ini, the state file and the change
+history must follow.
 
 The "loading" scenario stops the start-up on the loading screen
 (PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
@@ -404,10 +406,11 @@ if HBMENU:
     os.makedirs(os.path.join(run_dir, "playguard_data"), exist_ok=True)
     open(os.path.join(run_dir, "playguard_data", "hbmenu_lock_report.txt"), "w").write(
         "reason=atmosphere\nresult=ok\nfrom=1.9.4\nto=1.9.5\n")
-    # The gate's log of a try (refused), and the lock PlayGuard held taken
-    # away from the file outside it: both told and recorded at start-up.
+    # The gate's log of three tries the same evening (refused: the bell
+    # tells it), and the lock PlayGuard held taken away from the file
+    # outside it: both told and recorded at start-up.
     open(os.path.join(run_dir, "playguard_data", "gate_log.txt"), "w").write(
-        "2026-10-19 21:03\trefused\tsdmc:/switch/sphaira/sphaira.nro\n")
+        "".join("2026-10-19 21:0%d\trefused\tsdmc:/switch/sphaira/sphaira.nro\n" % m for m in (3, 4, 5)))
     open(hbmenu_state, "w").write("ams=1.9.4\n")
     for kind in ("fs_patches", "loader_patches"):
         d = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "kip_patches", kind)
@@ -1223,14 +1226,14 @@ if HBMENU:
             return open(sd_override).read()
         except OSError:
             return ""
-    def pinned():
-        return [e.get("name") for e in json.load(open(made_file)).get("forwarders", []) if e.get("pin")]
+    def pinned(flag="pin"):
+        return [e.get("name") for e in json.load(open(made_file)).get("forwarders", []) if e.get(flag)]
     restored = recorded("hbmenu_restored")
     if len(restored) != 1 or restored[0].get("detail") != "Atmosphère 1.9.4 → 1.9.5" or \
             os.path.exists(os.path.join(run_dir, "playguard_data", "hbmenu_lock_report.txt")):
         fail("the sysmodule's report was not taken: " + repr(restored))
     refused = recorded("gate_refused")
-    if len(refused) != 1 or refused[0].get("detail") != "sphaira" or refused[0].get("when") != "2026-10-19 21:03":
+    if len(refused) != 3 or refused[0].get("detail") != "sphaira" or refused[0].get("when") != "2026-10-19 21:03":
         fail("the gate's log was not taken: " + repr(refused))
     if len(recorded("hbmenu_lock_removed")) != 1 or os.path.exists(hbmenu_state):
         fail("the lock taken away outside PlayGuard was not told")
@@ -1278,7 +1281,16 @@ if HBMENU:
     if rules != "41\t540\t1200\tsdmc:/switch/sphaira/sphaira.nro\n" or len(recorded("gate_hours")) != 1:
         fail("sphaira's free hours were not written: " + repr(rules))
     shot("02_hours")           # sphaira: On the HOME menu · PIN, not asked Sat–Sun 09:00–20:00
-    key("Down", 2)             # PlayGuard's line, Another homebrew
+    key("Down", 4)             # PlayGuard's line, Another homebrew, Install them all again, Lock the homebrew menu
+    key("Return")              # refused: sphaira never started from the HOME menu
+    if override():
+        fail("the homebrew menu was locked before sphaira was seen working: " + repr(override()))
+    key("Return")              # OK
+    # sphaira started from the HOME menu, the PIN entered at its gate: the
+    # gate's log, read on the way to the lock.
+    open(os.path.join(run_dir, "playguard_data", "gate_log.txt"), "w").write(
+        "2026-10-20 18:00\tpin\tsdmc:/switch/sphaira/sphaira.nro\n")
+    key("Up", 2)               # Install them all again, Another homebrew
     key("Return")
     key("Down", 5)             # Star Atlas, after sphaira
     key("Return")
@@ -1293,12 +1305,21 @@ if HBMENU:
     key("Right")               # Protect, in its confirmation
     key("Return")
     time.sleep(3)
-    shot("04_confirm")         # what it changes, Save Keeper still open, the way back from a computer
+    time.sleep(3)              # the toast of the protection gone
+    shot("04_confirm")         # the checks, Save Keeper still open, the way back from a computer
     key("Right")               # Lock
-    key("Return")
+    key("Return")              # a press is not enough
+    time.sleep(1)
+    if override():
+        fail("the homebrew menu was locked without A held: " + repr(override()))
+    key("Return", hold=2.6)    # held 2 s
     time.sleep(3)
+    shot("04_rescue")          # the rescue sheet: a computer, the rescue module, the help's QR code
+    key("Return")              # OK
     if sorted(pinned()) != ["Star Atlas", "sphaira"]:
         fail("Star Atlas was not protected on the way to the lock: " + repr(pinned()))
+    if pinned("verified") != ["sphaira"]:
+        fail("sphaira was not seen working through its gate: " + repr(pinned("verified")))
     text = override()
     if "; >>> PlayGuard: the homebrew menu is locked" not in text or "override_any_app=false" not in text:
         fail("override_config.ini is not locked: " + repr(text))
@@ -1308,7 +1329,15 @@ if HBMENU:
     key("Return")
     shot("05_check")           # the album and R closed, the ways back, the module
     key("Return")              # OK
-    key("Up", 2)               # Lock the homebrew menu: Locked
+    key("Up", 7)               # Protect every forwarder, Lock, Install them all again, Another homebrew, PlayGuard's line, Star Atlas, sphaira
+    key("Return")
+    key("Down", 6)             # Delete
+    key("Return")              # refused: the last way back through a menu
+    shot("06_guard")
+    key("Return")              # OK
+    if "sphaira" not in pinned():
+        fail("sphaira, the last way back, was deleted while locked: " + repr(pinned()))
+    key("Down", 5)             # Star Atlas, PlayGuard's line, Another homebrew, Install them all again, Lock
     key("Return")              # unlocked at once (the PIN asked)
     time.sleep(3)
     text = override()
@@ -1316,7 +1345,7 @@ if HBMENU:
         fail("override_config.ini is not unlocked: " + repr(text))
     if os.path.exists(hbmenu_state) or len(recorded("unlock_hbmenu")) != 1:
         fail("the state file stayed, or the unlock is not in the history")
-    shot("06_unlocked")
+    shot("07_unlocked")
     finish()
 if LIBRARY:
     def listed():

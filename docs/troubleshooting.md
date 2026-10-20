@@ -22,6 +22,13 @@ PlayGuard itself cannot start then. Install the optional recovery sysmodule (`pl
 
 The module must follow PlayGuard's version: with each PlayGuard update, extract that release's `playguard-rescue.zip` again (or *Update* on the notification bell's *The recovery sysmodule is out of date*), then restart the console. An older module leaves a report PlayGuard cannot check: the recovery screen then offers nothing, says the module is older, and doing `RESCUE` again gives the same until it is updated.
 
+### Homebrew menu locked
+
+*Console › Forwarders › Lock the homebrew menu* keeps the album and a game started with R from opening the homebrew menu. If PlayGuard's forwarder and the protected menu are both gone (deleted in System Settings, or on the other system: the lock is on the SD card, read by sysMMC and emuMMC both):
+
+- **From a computer:** delete `atmosphere/config/override_config.ini` on the SD card (or put back `config/playguard/override_config.ini.backup`, the file as it was), then restart the console.
+- **With the rescue module installed** (optional): drop an empty `config/playguard/RESCUE` file on the SD card and restart; the module lifts the lock at boot, and PlayGuard says so at its next start. An update of Atmosphère since it was locked lifts it the same way.
+
 ### Console not modded
 
 PlayGuard cannot help: it needs Atmosphère. Nintendo support's master-key procedure is the official way.

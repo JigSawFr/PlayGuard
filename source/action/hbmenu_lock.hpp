@@ -12,6 +12,11 @@
 // (HBL_LOCK_BACKUP_NAME); from a computer, deleting override_config.ini (or
 // putting the backup back) and restarting undoes it.
 //
+// The menu's way back counts once the gate has opened it (its log): started
+// from the HOME menu once. While locked, deleting PlayGuard's own forwarder,
+// or the last protected menu or its PIN, is refused (forwarder_flow::remove).
+// Locking is held 2 s on a list of the checks; the rescue sheet follows.
+//
 // Before locking, the forwarders made here and not protected are offered to
 // be protected in one go (one that writes to the SD card could change the
 // file). While locked, the lock gone from the file (a computer, a file
@@ -26,6 +31,8 @@
 
 #include <functional>
 #include <string>
+
+#include "action/forwarders_logic.hpp"
 
 namespace hbmenu_lock
 {
@@ -49,5 +56,23 @@ void at_start(std::function<void()> open);
 void show_check();
 // The same for the diagnostic report (util/diagnostics), in English.
 std::string report();
+
+// How to undo the lock without the console (a computer, the rescue module),
+// a QR code to the help: shown once it is locked, and from the check.
+void show_rescue();
+
+// What Console › Forwarders' card says.
+struct Summary
+{
+    bool                        locked = false;
+    bool                        module = false;   // the rescue module installed
+    forwarders_logic::LockCheck check;
+};
+Summary summary();
+
+// After a write under `dir` (an absolute path) failed: why, read now (the SD
+// card full, or written to by nothing: a locked card, or the archive bit
+// hekate fixes), in the UI's language; "" when neither shows.
+std::string write_hint(const std::string& dir);
 
 }   // namespace hbmenu_lock

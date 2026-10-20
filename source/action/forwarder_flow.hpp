@@ -67,12 +67,20 @@ void set_hours(const forwarders_logic::Row& row, int days, int from, int to, std
 // "Sat–Sun 09:00–20:00", in the UI's language.
 std::string hours_label(int days, int from, int to);
 
+// The gate's log into the change history (then removed): a protected
+// forwarder it opened is marked a way back seen working
+// (forwarders::Made::verified). What it refused three times or more on one
+// day, for the bell (forwarders_logic::repeated_refusals).
+std::vector<forwarders_logic::Refusals> take_log();
+
 // Once per start (hbmenu_lock::at_start): the gate and its rules written
-// again while a forwarder is protected; the gate's log into the history.
-void at_start();
+// again while a forwarder is protected; then take_log.
+std::vector<forwarders_logic::Refusals> at_start();
 
 // Deletes it from the HOME menu (asked first), and from what PlayGuard
-// remembers.
+// remembers. While the homebrew menu is locked, PlayGuard's own and the last
+// protected menu are refused (forwarders_logic::way_back_guard), as is
+// set_pin's `on` false for that menu.
 void remove(const forwarders_logic::Row& row, std::function<void(bool)> done);
 
 // Forgets one no longer on the HOME menu (nothing on the console changes).

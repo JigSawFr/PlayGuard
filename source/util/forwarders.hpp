@@ -33,6 +33,9 @@ struct Made
     // No longer on the HOME menu, and the parent told so (the change
     // history, the bell): told once (action/hbmenu_lock.hpp).
     bool        gone = false;
+    // Protected, and started through the gate once since (its log said
+    // so): a way back seen working (forwarders_logic::LockCheck::verified).
+    bool        verified = false;
     // Protected: hours when the PIN is not asked (core/gate.h's GateHours):
     // days 0 for none.
     int         free_days = 0;

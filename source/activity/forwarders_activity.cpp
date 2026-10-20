@@ -1,11 +1,14 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/forwarders_activity.hpp"
 
+#include <algorithm>
+
 #include "action/forwarder_flow.hpp"
 #include "action/game_icons.hpp"
 #include "action/hbmenu_lock.hpp"
 #include "app.hpp"
 #include "tab/cadran_list.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/format_text.hpp"
 #include "ui/ui.hpp"
 #include "util/forwarders.hpp"
@@ -117,14 +120,53 @@ void ForwardersActivity::onContentAvailable()
         this->show_patches();
     }
     this->rebuild();
-    this->show_lock();
 }
 
 void ForwardersActivity::show_lock()
 {
-    const bool on = hbmenu_lock::locked();
+    using ui::Check;
+    const hbmenu_lock::Summary s = hbmenu_lock::summary();
+    const bool on = s.locked;
     lock_cell->setDetailText(on ? "playguard/hbmenu/state_locked"_i18n : "playguard/hbmenu/state_open"_i18n);
     ui::show_writable(lock_cell, !app::read_only(), ui::color_text(), on ? ui::color_ok() : ui::color_neutral());
+    if (!forwarder_flow::loader_present()) {
+        ui::set_visible(summary.getView(), false);
+        return;
+    }
+    // The ways back: PlayGuard's own, the menus seen working, those not started yet.
+    const forwarders_logic::LockCheck& c = s.check;
+    std::string routes;
+    const auto add = [&routes](const std::string& n) { routes += (routes.empty() ? "" : ", ") + n; };
+    if (c.self) add("PlayGuard");
+    for (const std::string& m : c.menus) {
+        const bool seen = std::find(c.verified.begin(), c.verified.end(), m) != c.verified.end();
+        add(seen ? m : brls::getStr("playguard/hbmenu/summary_untried", m));
+    }
+    const bool both = c.self && !c.verified.empty();
+    std::vector<ui::CheckLine> lines = {
+        { on ? Check::Ok : Check::Info, on ? "playguard/hbmenu/summary_locked"_i18n : "playguard/hbmenu/summary_open"_i18n },
+        { both ? Check::Ok : on ? Check::Bad : Check::Warn,
+          brls::getStr("playguard/hbmenu/summary_routes", routes.empty() ? "playguard/hbmenu/check_none"_i18n : routes) },
+    };
+    if (c.open_doors.empty()) lines.push_back({ Check::Ok, "playguard/hbmenu/line_no_doors"_i18n });
+    else {
+        std::string doors;
+        for (const std::string& d : c.open_doors) doors += (doors.empty() ? "" : ", ") + d;
+        lines.push_back({ Check::Warn, brls::getStr("playguard/hbmenu/open_doors", doors) });
+    }
+    lines.push_back({ Check::Info, s.module ? "playguard/hbmenu/summary_module"_i18n : "playguard/hbmenu/summary_no_module"_i18n });
+    ui::batch_layout(summary.getView(), [this, &lines, on]() {
+        summary->clearViews();
+        brls::Box* card = cadran::kit::top_card(false);
+        card->addView(cadran::kit::kicker(on ? "lock" : "unlock", "playguard/hbmenu/section"_i18n));
+        for (const ui::CheckLine& l : lines) {
+            brls::Box* row = ui::check_row(l);
+            row->setMarginTop(10);
+            card->addView(row);
+        }
+        summary->addView(card);
+    });
+    ui::set_visible(summary.getView(), true);
 }
 
 void ForwardersActivity::show_patches()
@@ -186,6 +228,7 @@ void ForwardersActivity::rebuild(uint64_t focus_id)
     ui::set_visible(list.getView(), !this->list_rows.empty());
     ui::set_visible(empty.getView(), this->list_rows.empty());
     this->show_self();
+    this->show_lock();
     this->load_icons();
     // The forwarder asked for, else the first one, else PlayGuard's line.
     if (!focus && !this->list_rows.empty() && !focus_id) focus = rows->getChildren().front();

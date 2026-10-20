@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <borealis.hpp>
 
+#include "action/hbmenu_lock.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "app.hpp"
@@ -142,6 +143,7 @@ bool install(const forwarders::Made& m, bool self, const char* kind = "add_forwa
     } else {
         made.gate.clear();
         made.free_days = 0;
+        made.verified = false;   // seen working through the gate: again once protected again
     }
     const ForwarderSpec spec = {
         made.nro.c_str(), made.argv.c_str(), made.pin ? made.gate.c_str() : nullptr,
@@ -223,6 +225,28 @@ std::vector<forwarders_logic::Row> made_rows(bool with_self)
     for (const auto& r : rows())
         if (r.state != forwarders_logic::State::Elsewhere && !r.nro.empty() && (with_self || !r.self)) out.push_back(r);
     return out;
+}
+
+// While the homebrew menu is locked, taking `row` away (deleting it, or its
+// PIN: `what`) from the ways back: refused when it is the last one or
+// PlayGuard's own (unlock first), confirmed in coral when others remain.
+// `go` runs when it may go on.
+void guard_way_back(const forwarders_logic::Row& row, const std::string& what, std::function<void()> go,
+                    std::function<void()> stop)
+{
+    const std::vector<forwarders_logic::Row> all = rows();
+    switch (forwarders_logic::way_back_guard(all, row, hbmenu_lock::locked())) {
+        case forwarders_logic::Guard::Allowed: return go();
+        case forwarders_logic::Guard::Refused:
+            ui::info(brls::getStr(row.self ? "playguard/hbmenu/guard_self" : "playguard/hbmenu/guard_last", row.name));
+            return stop();
+        case forwarders_logic::Guard::Confirm: {
+            std::string others;
+            for (const std::string& n : forwarders_logic::other_menus(all, row)) others += (others.empty() ? "" : ", ") + n;
+            ui::confirm(brls::getStr("playguard/hbmenu/guard_confirm", row.name, others), what, go, stop, true);
+            return;
+        }
+    }
 }
 
 }   // namespace
@@ -345,16 +369,21 @@ void set_pin(const forwarders_logic::Row& row, bool on, std::function<void(bool)
         return;
     }
     if (!on) {
-        // The PIN first, whatever PlayGuard's own lock says: the protection
-        // is the parent's to lift.
-        if (!pin_lock::confirm()) {
+        const std::string name = row.name;
+        guard_way_back(row, "playguard/forwarders/action_pin_off"_i18n, [m, name, done]() mutable {
+            // The PIN first, whatever PlayGuard's own lock says: the
+            // protection is the parent's to lift.
+            if (!pin_lock::confirm()) {
+                if (done) done(false);
+                return;
+            }
+            m.pin = false;
+            const bool ok =
+                install(m, false, "unprotect_forwarder", brls::getStr("playguard/forwarders/pin_removed", name));
+            if (done) done(ok);
+        }, [done]() {
             if (done) done(false);
-            return;
-        }
-        m.pin = false;
-        const bool ok =
-            install(m, false, "unprotect_forwarder", brls::getStr("playguard/forwarders/pin_removed", row.name));
-        if (done) done(ok);
+        });
         return;
     }
     // Without a PIN on the console, there is nothing to ask for.
@@ -380,7 +409,7 @@ void set_pin(const forwarders_logic::Row& row, bool on, std::function<void(bool)
 void remove(const forwarders_logic::Row& row, std::function<void(bool)> done)
 {
     const forwarders_logic::Row r = row;
-    ui::confirm_danger(brls::getStr("playguard/forwarders/delete_body", r.name), "playguard/common/delete"_i18n, [r, done]() {
+    const auto go = [r, done]() {
         const Result rc = forwarder_remove(r.id);
         if (R_SUCCEEDED(rc)) {
             std::string err;
@@ -389,7 +418,15 @@ void remove(const forwarders_logic::Row& row, std::function<void(bool)> done)
         }
         ui::notify_result(rc, brls::getStr("playguard/forwarders/deleted", r.name), "playguard/forwarders/delete_err"_i18n);
         if (done) done(R_SUCCEEDED(rc));
-    });
+    };
+    const auto stop = []() {};   // left as it was: the list too
+    // One of the ways back while locked: its own warning stands for the
+    // usual question.
+    if (forwarders_logic::way_back_guard(rows(), r, hbmenu_lock::locked()) != forwarders_logic::Guard::Allowed) {
+        guard_way_back(r, "playguard/common/delete"_i18n, go, stop);
+        return;
+    }
+    ui::confirm(brls::getStr("playguard/forwarders/delete_body", r.name), "playguard/common/delete"_i18n, go, stop, true);
 }
 
 void forget(const forwarders_logic::Row& row, std::function<void(bool)> done)
@@ -466,7 +503,8 @@ void set_hours(const forwarders_logic::Row& row, int days, int from, int to, std
     m.free_to = days ? to : 0;
     std::string err;
     if (!forwarders::save(m, &err)) {
-        ui::error("playguard/forwarders/hours_err"_i18n, err);
+        const std::string hint = hbmenu_lock::write_hint(paths::nand_dir());
+        ui::error("playguard/forwarders/hours_err"_i18n, hint.empty() ? err : err + "\n\n" + hint);
         if (done) done(false);
         return;
     }
@@ -489,22 +527,16 @@ std::string hours_label(int days, int from, int to)
     return forwarders_logic::hours_text(days, from, to, names);
 }
 
-void at_start()
+std::vector<forwarders_logic::Refusals> take_log()
 {
-    // The gate as this PlayGuard carries it, and the free hours, while a
-    // forwarder is protected.
-    bool any = false;
-    for (const forwarders::Made& m : forwarders::list()) any = any || m.pin;
-    if (any) {
-        gate_nro();
-        write_rules();
-    }
     // Each try the gate logged since: into the change history, then gone.
     const std::string path = paths::data_dir() + "/" + GATE_LOG_NAME;
     std::string text;
-    if (!paths::read_file(path, text)) return;
+    if (!paths::read_file(path, text)) return {};
     std::remove(path.c_str());
-    const std::vector<forwarders::Made> made = forwarders::list();
+    std::vector<forwarders::Made> made = forwarders::list();
+    std::vector<std::pair<std::string, std::string>> refused;
+    std::vector<size_t> seen_working;
     size_t at = 0;
     int n = 0;
     while (at < text.size() && n < 200) {
@@ -516,16 +548,42 @@ void at_start()
         if (gate_log_parse(text.data() + at, end - at, &when, &wn, &r, &nro, &nn)) {
             const std::string path_s(nro, nn);
             std::string name = forwarders_logic::file_title(path_s);
-            for (const auto& m : made)
-                if (m.nro == path_s) name = m.name;
+            for (size_t i = 0; i < made.size(); i++) {
+                if (made[i].nro != path_s) continue;
+                name = made[i].name;
+                // The gate opened it: this way back works.
+                if ((r == GateResult_Pin || r == GateResult_Free) && made[i].pin && !made[i].verified)
+                    seen_working.push_back(i);
+            }
             const char* kind = r == GateResult_Pin ? "gate_open" : r == GateResult_Free ? "gate_free" : "gate_refused";
             std::string w(when, wn);
             if (w == "?") w.clear();
+            if (r == GateResult_Refused) refused.push_back({ name, w });
             history_flow::record_seen(kind, w, r == GateResult_Error ? name + " (error)" : name);
             n++;
         }
         at = end + 1;
     }
+    for (const size_t i : seen_working) {
+        if (made[i].verified) continue;
+        made[i].verified = true;
+        std::string err;
+        if (!forwarders::save(made[i], &err)) brls::Logger::warning("forwarders: not remembered ({})", err);
+    }
+    return forwarders_logic::repeated_refusals(refused);
+}
+
+std::vector<forwarders_logic::Refusals> at_start()
+{
+    // The gate as this PlayGuard carries it, and the free hours, while a
+    // forwarder is protected.
+    bool any = false;
+    for (const forwarders::Made& m : forwarders::list()) any = any || m.pin;
+    if (any) {
+        gate_nro();
+        write_rules();
+    }
+    return take_log();
 }
 
 }   // namespace forwarder_flow

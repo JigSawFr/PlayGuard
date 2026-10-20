@@ -4,8 +4,9 @@
 // it; one made by another app can be seen and deleted. Below: PlayGuard
 // itself on the HOME menu in one press, or another homebrew of /switch.
 // Above the list, whether the console can start them (its signature
-// patches). The list is rebuilt after every change. Last, the homebrew menu
-// locked (action/hbmenu_lock.hpp).
+// patches), and a card: the homebrew menu locked or open, its ways back,
+// what opens it without the PIN, the rescue module. The list is rebuilt
+// after every change. Last, the homebrew menu locked (action/hbmenu_lock.hpp).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -32,6 +33,7 @@ class ForwardersActivity : public brls::Activity
     void rebuild(uint64_t focus_id = 0);
     void show_patches();
     void show_self();
+    // The lock's cell and the card at the top.
     void show_lock();
     void load_icons();
     void actions(const forwarders_logic::Row& row);
@@ -46,6 +48,7 @@ class ForwardersActivity : public brls::Activity
 
     BRLS_BIND(brls::Label,      note,      "fw_note");
     BRLS_BIND(brls::Label,      warning,   "fw_patches");
+    BRLS_BIND(brls::Box,        summary,   "fw_summary");
     BRLS_BIND(brls::Box,        list,      "fw_list");
     BRLS_BIND(brls::Label,      empty,     "fw_empty");
     BRLS_BIND(brls::DetailCell, self_cell, "fw_self");

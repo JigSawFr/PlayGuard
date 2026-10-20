@@ -30,6 +30,7 @@ bool write_all(const std::vector<Made>& all, std::string* error)
             e["gate"] = m.gate;
         }
         if (m.gone) e["gone"] = true;
+        if (m.pin && m.verified) e["verified"] = true;
         if (m.pin && m.free_days)
             e["free"] = { { "days", m.free_days }, { "from", m.free_from }, { "to", m.free_to } };
         list.push_back(e);
@@ -67,6 +68,7 @@ std::vector<Made> list()
         m.gate = json_util::string_at(e, "gate");
         m.pin  = json_util::flag_at(e, "pin") && !m.gate.empty();
         m.gone = json_util::flag_at(e, "gone");
+        m.verified = m.pin && json_util::flag_at(e, "verified");
         if (const nlohmann::json* f = json_util::object_at(e, "free")) {
             const int64_t days = json_util::integer_or(*f, "days"), from = json_util::integer_or(*f, "from"),
                           to = json_util::integer_or(*f, "to");

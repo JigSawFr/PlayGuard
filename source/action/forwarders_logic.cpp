@@ -2,6 +2,7 @@
 #include "action/forwarders_logic.hpp"
 
 #include <algorithm>
+#include <cerrno>
 #include <cstdio>
 
 #include "util/text.hpp"
@@ -32,6 +33,7 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
             if (r.name.empty()) r.name = m->name;
             if (r.author.empty()) r.author = m->author;
             r.pin = m->pin;
+            r.verified = m->pin && m->verified;
             r.free_days = m->free_days;
             r.free_from = m->free_from;
             r.free_to = m->free_to;
@@ -54,6 +56,7 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
         r.nro = m.nro;
         r.pin = m.pin;
         r.gone_seen = m.gone;
+        r.verified = m.pin && m.verified;
         r.free_days = m.free_days;
         r.free_from = m.free_from;
         r.free_to = m.free_to;
@@ -164,9 +167,71 @@ LockCheck lock_check(const std::vector<Row>& rows, bool pin_set, Patches patches
             continue;
         }
         if (!r.pin) c.open_doors.push_back(r.name);
-        else if (r.state == State::Ready) c.menus.push_back(r.name);
+        else if (r.state == State::Ready) {
+            c.menus.push_back(r.name);
+            if (r.verified) c.verified.push_back(r.name);
+        }
     }
     return c;
+}
+
+namespace
+{
+bool way_back_menu(const Row& r)
+{
+    return r.pin && r.state == State::Ready && is_menu(r.nro);
+}
+}   // namespace
+
+std::vector<std::string> other_menus(const std::vector<Row>& rows, const Row& row)
+{
+    std::vector<std::string> out;
+    for (const Row& r : rows)
+        if (r.id != row.id && way_back_menu(r)) out.push_back(r.name);
+    return out;
+}
+
+Guard way_back_guard(const std::vector<Row>& rows, const Row& row, bool locked)
+{
+    if (!locked || row.state == State::NotInstalled) return Guard::Allowed;
+    if (row.self) return Guard::Refused;
+    if (!way_back_menu(row)) return Guard::Allowed;
+    return other_menus(rows, row).empty() ? Guard::Refused : Guard::Confirm;
+}
+
+std::vector<Refusals> repeated_refusals(const std::vector<std::pair<std::string, std::string>>& refused, int at_least)
+{
+    // Per name and day, in the order first seen.
+    std::vector<Refusals> days;
+    for (const auto& [name, when] : refused) {
+        const std::string day = when.substr(0, 10);
+        bool seen = false;
+        for (Refusals& d : days)
+            if (d.name == name && d.day == day) {
+                d.count++;
+                seen = true;
+            }
+        if (!seen) days.push_back({ name, day, 1 });
+    }
+    std::vector<Refusals> out;
+    for (const Refusals& d : days) {
+        if (d.count < at_least) continue;
+        bool merged = false;
+        for (Refusals& o : out)
+            if (o.name == d.name) {
+                if (d.count > o.count) o = d;
+                merged = true;
+            }
+        if (!merged) out.push_back(d);
+    }
+    return out;
+}
+
+WriteHint write_hint(int err, uint64_t free_bytes)
+{
+    if (err == ENOSPC || free_bytes < 64 * 1024) return WriteHint::Full;
+    if (err == EROFS || err == EACCES || err == EPERM) return WriteHint::ReadOnly;
+    return WriteHint::None;
 }
 
 }   // namespace forwarders_logic

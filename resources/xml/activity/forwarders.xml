@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Console › Forwarders: the homebrew on the HOME menu as games, A on one
+<!-- Console › Forwarders: a card first (the homebrew menu locked or not,
+     the ways back, what opens it without the PIN, the rescue module); the homebrew on the HOME menu as games, A on one
      for its details, a new name or publisher, installing it again or
      deleting it; below, PlayGuard itself on the HOME menu, or another
      homebrew; last, the homebrew menu locked, so that a homebrew starts only
@@ -31,6 +32,7 @@
 
             <brls:Label id="fw_note" text="@i18n/playguard/forwarders/intro" fontSize="20" marginBottom="10" textColor="@theme/cadran/text3"/>
             <brls:Label id="fw_patches" text="" fontSize="20" marginBottom="10" visibility="gone" textColor="@theme/cadran/amber"/>
+            <brls:Box id="fw_summary" width="auto" height="auto" axis="column" alignItems="stretch" marginTop="6" marginBottom="6"/>
             <brls:Header title="@i18n/playguard/forwarders/section_list" marginTop="14" marginBottom="8"/>
             <brls:Box id="fw_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
             <brls:Label id="fw_empty" text="@i18n/playguard/forwarders/none" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>

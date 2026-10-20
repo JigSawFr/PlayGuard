@@ -177,6 +177,129 @@ void qr_dialog(const std::string& body, const std::string& url)
     dialog->open();
 }
 
+brls::Box* check_row(const CheckLine& line, float size)
+{
+    namespace kit = cadran::kit;
+    auto* row = new brls::Box(brls::Axis::ROW);
+    row->setAlignItems(brls::AlignItems::FLEX_START);
+    const char* color = line.state == Check::Ok     ? "cadran/teal"
+                        : line.state == Check::Warn ? "cadran/amber"
+                        : line.state == Check::Bad  ? "cadran/coral"
+                                                    : "cadran/text3";
+    auto* mark = new kit::Mark(color);
+    mark->setMarginTop(size * 0.3f);
+    mark->setMarginRight(14);
+    mark->setShrink(0);
+    row->addView(mark);
+    brls::Label* text = kit::label(line.text, size, line.state == Check::Info ? "cadran/text2" : "cadran/text");
+    text->setGrow(1.0f);
+    text->setWidth(0);
+    row->addView(text);
+    return row;
+}
+
+brls::Box* checklist_body(const std::string& title, const std::vector<CheckLine>& lines, const std::string& note)
+{
+    namespace kit = cadran::kit;
+    auto* body = new brls::Box(brls::Axis::COLUMN);
+    body->setAlignItems(brls::AlignItems::STRETCH);
+    body->setPadding(28, 36, 18, 36);
+    brls::Label* head = kit::label(title, 22, "cadran/text");
+    head->setMarginBottom(14);
+    body->addView(head);
+    for (const CheckLine& line : lines) {
+        brls::Box* row = check_row(line);
+        row->setMarginTop(8);
+        body->addView(row);
+    }
+    if (!note.empty()) {
+        brls::Label* small = kit::label(note, 15, "cadran/text3");
+        small->setMarginTop(16);
+        body->addView(small);
+    }
+    return body;
+}
+
+namespace
+{
+// How long A is held so far (hold_confirm); 0 once let go.
+struct Held
+{
+    int64_t start = -1, last = 0;
+    bool    done = false;
+};
+constexpr int64_t HOLD_US = 2000000;
+// borealis repeats a held key's action after 250 ms, then every 100 ms: a
+// longer gap is a key let go.
+constexpr int64_t LET_GO_US = 350000;
+
+double held_part(Held& h, int64_t now)
+{
+    if (h.start < 0) return 0;
+    if (now - h.last > LET_GO_US) {
+        h.start = -1;
+        return 0;
+    }
+    return std::min(1.0, (double)(now - h.start) / HOLD_US);
+}
+
+class HoldBar : public brls::View
+{
+  public:
+    explicit HoldBar(std::shared_ptr<Held> held) : held(std::move(held))
+    {
+        this->setFocusable(false);
+        this->setHeight(8);
+        this->setMarginTop(18);
+    }
+    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style, brls::FrameContext*) override
+    {
+        brls::Theme theme = brls::Application::getTheme();
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, x, y, width, height, height / 2);
+        nvgFillColor(vg, theme["cadran/track"]);
+        nvgFill(vg);
+        const double part = held_part(*this->held, brls::getCPUTimeUsec());
+        if (part <= 0) return;
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, x, y, std::max((float)height, (float)(width * part)), height, height / 2);
+        nvgFillColor(vg, theme["cadran/teal"]);
+        nvgFill(vg);
+    }
+
+  private:
+    std::shared_ptr<Held> held;
+};
+}   // namespace
+
+void hold_confirm(brls::Box* body, const std::string& hold_label, std::function<void()> on_yes,
+                  std::function<void()> on_no)
+{
+    auto held = std::make_shared<Held>();
+    body->addView(new HoldBar(held));
+    brls::Label* how = cadran::kit::label(brls::getStr("playguard/common/hold_to", hold_label), 15, "cadran/text3");
+    how->setMarginTop(8);
+    body->addView(how);
+    auto* dialog = new brls::Dialog(body);
+    dialog->addButton("hints/cancel"_i18n, [on_no]() { if (on_no) on_no(); });
+    dialog->addButton(hold_label, []() {});
+    on_cancel(dialog, on_no);
+    cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
+    if (brls::View* yes = dialog->getView("brls/dialog/button2"))
+        yes->registerAction(hold_label, brls::BUTTON_A, [dialog, held, on_yes](brls::View*) {
+            const int64_t now = brls::getCPUTimeUsec();
+            if (held->done) return true;
+            if (held->start < 0 || now - held->last > LET_GO_US) held->start = now;
+            held->last = now;
+            if (now - held->start >= HOLD_US) {
+                held->done = true;
+                dialog->close([on_yes]() { if (on_yes) on_yes(); });
+            }
+            return true;
+        }, false, true, brls::SOUND_NONE);
+    dialog->open();
+}
+
 void qr_text_dialog(const std::string& body, const std::string& text)
 {
     auto* box = new brls::Box(brls::Axis::COLUMN);

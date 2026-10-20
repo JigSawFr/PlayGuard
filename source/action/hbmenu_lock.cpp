@@ -2,8 +2,12 @@
 #include "action/hbmenu_lock.hpp"
 
 #include <borealis.hpp>
+#include <cerrno>
 #include <cstdio>
+#include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/statvfs.h>
+#include <unistd.h>
 
 #include "action/forwarder_flow.hpp"
 #include "action/forwarders_logic.hpp"
@@ -15,6 +19,8 @@
 #include "core/gate.h"
 #include "core/hbl_lock.h"
 #include "core/rescue.h"
+#include "ui/cadran_kit.hpp"
+#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/diagnostics.hpp"
 #include "util/forwarders.hpp"
@@ -46,6 +52,9 @@ std::string in_data(const char* name)
 {
     return paths::data_dir() + "/" + name;
 }
+
+// What Console › Forwarders opens from the bell (at_start's `open`).
+std::function<void()> s_open;
 
 // uLaunch, which replaces the HOME menu and starts homebrew its own way:
 // the lock does not reach it.
@@ -95,9 +104,13 @@ void write_state()
         brls::Logger::warning("hbmenu lock: {} not written: {}", HBL_LOCK_STATE_NAME, error);
 }
 
-// The checks, read now.
-forwarders_logic::LockCheck check()
+void tell_refusals(const std::vector<forwarders_logic::Refusals>& refusals);
+
+// The checks, read now (with `take_log`, the gate's log first: a menu it
+// opened is a way back seen working; UI thread only then).
+forwarders_logic::LockCheck check(bool take_log = true)
 {
+    if (take_log) tell_refusals(forwarder_flow::take_log());
     u32 pin_length = 0;
     const bool pin = R_SUCCEEDED(pctl_lock_state(&pin_length, nullptr)) && pin_length > 0;
     return forwarders_logic::lock_check(forwarder_flow::rows(), pin,
@@ -120,12 +133,83 @@ std::string missing(const forwarders_logic::LockCheck& c)
     if (!c.patches) add("playguard/hbmenu/need_patches"_i18n);
     if (!c.self) add("playguard/hbmenu/need_self"_i18n);
     if (c.menus.empty()) add("playguard/hbmenu/need_menu"_i18n);
+    else if (c.verified.empty()) add(brls::getStr("playguard/hbmenu/need_verified", joined(c.menus)));
     return out;
+}
+
+// Tried and refused at the gate three times or more on one day: the bell.
+// A later read with none leaves it, until it is put away.
+void tell_refusals(const std::vector<forwarders_logic::Refusals>& refusals)
+{
+    if (refusals.empty()) return;
+    std::string detail;
+    for (const auto& r : refusals)
+        detail += (detail.empty() ? "" : "\n") + brls::getStr("playguard/hbmenu/refusals_line", r.name,
+                                                              cadran::kit::long_date(r.day), r.count);
+    notices::set("gate_refusals", notices::Level::Info, "playguard/hbmenu/refusals"_i18n, detail,
+                 s_open ? "playguard/hbmenu/open"_i18n : "", s_open);
+}
+
+// Locking on emuMMC, or on a sysMMC with an emuMMC set up: the lock is on
+// the SD card, both systems read it; the forwarders are each system's.
+bool other_system()
+{
+    SysInfo si;
+    sysinfo_get(&si);
+    return !ui::other_storage_note(si).empty();
+}
+
+// The checks as a dialog's lines (the lock's confirmation, the check).
+std::vector<ui::CheckLine> check_lines(const forwarders_logic::LockCheck& c)
+{
+    using ui::Check;
+    std::vector<ui::CheckLine> out;
+    out.push_back({ c.pin ? Check::Ok : Check::Bad, c.pin ? "playguard/hbmenu/line_pin"_i18n : "playguard/hbmenu/need_pin"_i18n });
+    out.push_back({ c.patches ? Check::Ok : Check::Bad,
+                    c.patches ? "playguard/hbmenu/line_patches"_i18n : "playguard/hbmenu/need_patches"_i18n });
+    out.push_back({ c.self ? Check::Ok : Check::Bad, c.self ? "playguard/hbmenu/line_self"_i18n : "playguard/hbmenu/need_self"_i18n });
+    if (!c.verified.empty())
+        out.push_back({ Check::Ok, brls::getStr("playguard/hbmenu/line_menu", joined(c.verified)) });
+    else if (!c.menus.empty())
+        out.push_back({ Check::Bad, brls::getStr("playguard/hbmenu/need_verified", joined(c.menus)) });
+    else
+        out.push_back({ Check::Bad, "playguard/hbmenu/need_menu"_i18n });
+    if (c.open_doors.empty()) out.push_back({ Check::Ok, "playguard/hbmenu/line_no_doors"_i18n });
+    else out.push_back({ Check::Warn, brls::getStr("playguard/hbmenu/open_doors", joined(c.open_doors)) });
+    if (!c.sd_writers.empty()) out.push_back({ Check::Warn, brls::getStr("playguard/hbmenu/sd_writers", joined(c.sd_writers)) });
+    if (ulaunch_present()) out.push_back({ Check::Warn, "playguard/hbmenu/ulaunch"_i18n });
+    if (other_system()) out.push_back({ Check::Warn, "playguard/hbmenu/other_system"_i18n });
+    return out;
+}
+
+// Why a write under `dir` failed, read now: the SD card full, or written to
+// by nothing (forwarders_logic::write_hint); "" when neither shows.
+std::string hint_for(const std::string& dir)
+{
+    uint64_t room = UINT64_MAX;
+    struct statvfs v;
+    if (statvfs(dir.c_str(), &v) == 0) room = (uint64_t)v.f_bavail * (v.f_frsize ? v.f_frsize : v.f_bsize);
+    int err = 0;
+    const std::string probe = dir + "/.playguard_write_test";
+    const int fd = open(probe.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    if (fd < 0) err = errno;
+    else {
+        close(fd);
+        unlink(probe.c_str());
+    }
+    switch (forwarders_logic::write_hint(err, room)) {
+        case forwarders_logic::WriteHint::Full: return "playguard/hbmenu/hint_full"_i18n;
+        case forwarders_logic::WriteHint::ReadOnly: return "playguard/hbmenu/hint_read_only"_i18n;
+        default: return "";
+    }
 }
 
 bool write_config(const std::string& text, std::string* error)
 {
-    return paths::ensure_dir(on_sd("atmosphere/config")) && paths::atomic_write(config_path(), text, error);
+    if (paths::ensure_dir(on_sd("atmosphere/config")) && paths::atomic_write(config_path(), text, error)) return true;
+    const std::string hint = write_hint(on_sd("atmosphere/config"));
+    if (error && !hint.empty()) *error += "\n\n" + hint;
+    return false;
 }
 
 // The sysmodule's report, told and recorded, then removed.
@@ -159,6 +243,27 @@ void take_report(const std::function<void()>& open)
 }
 
 }   // namespace
+
+std::string write_hint(const std::string& dir)
+{
+    struct stat st;
+    // The folder itself missing: its parent says it.
+    std::string at = dir;
+    while (at.size() > 1 && stat(at.c_str(), &st) != 0) {
+        const size_t slash = at.find_last_of('/');
+        if (slash == std::string::npos || slash == 0) break;
+        at.resize(slash);
+    }
+    return hint_for(at);
+}
+
+void show_rescue()
+{
+    std::string body = brls::getStr("playguard/hbmenu/rescue_body", HBL_LOCK_CONFIG_PATH);
+    body += "\n\n" + (rescue::installed() ? brls::getStr("playguard/hbmenu/rescue_module", RESCUE_REQUEST_NAME)
+                                           : "playguard/hbmenu/rescue_no_module"_i18n);
+    ui::qr_dialog(body, std::string(app::repo_url()) + "/blob/main/docs/troubleshooting.md#homebrew-menu-locked");
+}
 
 bool locked()
 {
@@ -197,6 +302,8 @@ void apply_lock(std::function<void(bool)> finish)
     history_flow::record_event("lock_hbmenu");
     brls::Logger::info("hbmenu lock: locked");
     ui::notify("playguard/hbmenu/locked_done"_i18n, ui::Toast::Done);
+    // How to undo it without the console, while it is fresh.
+    brls::sync([]() { show_rescue(); });
     finish(true);
 }
 
@@ -208,12 +315,9 @@ void confirm_lock(std::function<void(bool)> finish)
         ui::info("playguard/hbmenu/not_ready"_i18n + missing(c));
         return finish(false);
     }
-    std::string body = brls::getStr("playguard/hbmenu/confirm", joined(c.menus));
-    if (!c.open_doors.empty()) body += "\n\n" + brls::getStr("playguard/hbmenu/open_doors", joined(c.open_doors));
-    if (!c.sd_writers.empty()) body += "\n\n" + brls::getStr("playguard/hbmenu/sd_writers", joined(c.sd_writers));
-    if (ulaunch_present()) body += "\n\n" + "playguard/hbmenu/ulaunch"_i18n;
-    body += "\n\n" + brls::getStr("playguard/hbmenu/escape", HBL_LOCK_CONFIG_PATH);
-    ui::confirm(body, "playguard/hbmenu/lock"_i18n, [finish]() { apply_lock(finish); }, [finish]() { finish(false); });
+    ui::hold_confirm(ui::checklist_body("playguard/hbmenu/confirm"_i18n, check_lines(c),
+                                        brls::getStr("playguard/hbmenu/escape", HBL_LOCK_CONFIG_PATH)),
+                     "playguard/hbmenu/lock"_i18n, [finish]() { apply_lock(finish); }, [finish]() { finish(false); });
 }
 
 }   // namespace
@@ -267,9 +371,10 @@ void unlock(std::function<void(bool)> done)
 
 void at_start(std::function<void()> open)
 {
+    s_open = open;
     diagnostic::set_homebrew_lock(&report);
     take_report(open);
-    forwarder_flow::at_start();
+    tell_refusals(forwarder_flow::at_start());
     const bool is_locked = locked();
     // PlayGuard held the lock and the file no longer says so: taken away
     // outside PlayGuard (a computer, a file manager). Told, recorded once;
@@ -337,7 +442,7 @@ struct State
     forwarders_logic::LockCheck c;
 };
 
-State read_state()
+State read_state(bool take_log)
 {
     State st;
     std::string text;
@@ -356,7 +461,7 @@ State read_state()
     st.patches = p == forwarders_logic::Patches::Ready ? "ready" : p == forwarders_logic::Patches::Unknown ? "unknown" : "missing";
     st.module = !rescue::installed() ? "none" : rescue::outdated() ? "outdated" : "current";
     st.gate = paths::file_exists(in_data(GATE_NRO_NAME)) ? "present" : "none";
-    st.c = check();
+    st.c = check(take_log);
     return st;
 }
 
@@ -368,45 +473,59 @@ std::string yes_no(bool v)
 
 void show_check()
 {
-    const State st = read_state();
+    using ui::Check;
+    const State st = read_state(true);
     const std::string unknown = "playguard/forwarders/unknown"_i18n;
-    std::string body = brls::getStr("playguard/hbmenu/check_file", HBL_LOCK_CONFIG_PATH,
-                                    !st.file ? "playguard/hbmenu/check_none"_i18n
-                                             : st.lock_block ? "playguard/hbmenu/state_locked"_i18n
-                                                             : "playguard/hbmenu/state_open"_i18n);
-    body += "\n" + brls::getStr("playguard/hbmenu/check_album", yes_no(st.album));
-    body += "\n" + brls::getStr("playguard/hbmenu/check_r", yes_no(st.any_app));
-    body += "\n" + brls::getStr("playguard/hbmenu/check_self", yes_no(st.c.self));
-    body += "\n" + brls::getStr("playguard/hbmenu/check_menus", st.c.menus.empty() ? "playguard/hbmenu/check_none"_i18n
-                                                                                      : joined(st.c.menus));
-    body += "\n" + brls::getStr("playguard/hbmenu/check_patches", yes_no(st.c.patches));
-    body += "\n" + brls::getStr("playguard/hbmenu/check_ams", st.ams.empty() ? unknown : st.ams,
-                                 st.locked_on.empty() ? unknown : st.locked_on);
-    body += "\n" + brls::getStr("playguard/hbmenu/check_module",
-                                 st.module == "none"      ? "playguard/hbmenu/check_none"_i18n
-                                 : st.module == "current" ? "playguard/hbmenu/check_current"_i18n
-                                                          : "playguard/hbmenu/check_outdated"_i18n);
-    if (!st.c.open_doors.empty() || !st.c.unprotected.empty())
-        body += "\n" + brls::getStr("playguard/hbmenu/check_open", joined(st.c.open_doors.empty() ? st.c.unprotected
-                                                                                              : st.c.open_doors));
-    ui::info(body);
+    std::vector<ui::CheckLine> lines;
+    lines.push_back({ st.lock_block ? Check::Ok : Check::Info,
+                      brls::getStr("playguard/hbmenu/check_file", HBL_LOCK_CONFIG_PATH,
+                                   !st.file ? "playguard/hbmenu/check_none"_i18n
+                                   : st.lock_block ? "playguard/hbmenu/state_locked"_i18n
+                                                   : "playguard/hbmenu/state_open"_i18n) });
+    lines.push_back({ Check::Info, brls::getStr("playguard/hbmenu/check_album", yes_no(st.album)) + " · " +
+                                       brls::getStr("playguard/hbmenu/check_r", yes_no(st.any_app)) });
+    for (const ui::CheckLine& l : check_lines(st.c)) lines.push_back(l);
+    lines.push_back({ Check::Info, brls::getStr("playguard/hbmenu/check_ams", st.ams.empty() ? unknown : st.ams,
+                                                st.locked_on.empty() ? unknown : st.locked_on) });
+    lines.push_back({ st.module == "outdated" ? Check::Warn : Check::Info,
+                      brls::getStr("playguard/hbmenu/check_module",
+                                   st.module == "none"      ? "playguard/hbmenu/check_none"_i18n
+                                   : st.module == "current" ? "playguard/hbmenu/check_current"_i18n
+                                                            : "playguard/hbmenu/check_outdated"_i18n) });
+    auto* dialog = new brls::Dialog(ui::checklist_body("playguard/hbmenu/check"_i18n, lines));
+    dialog->addButton("playguard/hbmenu/rescue"_i18n, []() { brls::sync([]() { show_rescue(); }); });
+    dialog->addButton("hints/ok"_i18n, []() {});
+    dialog->setCancelable(true);
+    cadran::style_dialog(dialog, cadran::Emphasis::NONE);
+    if (brls::View* ok = dialog->getView("brls/dialog/button2")) dialog->setLastFocusedView(ok);
+    dialog->open();
+}
+
+Summary summary()
+{
+    Summary out;
+    out.locked = locked();
+    out.check = check();
+    out.module = rescue::installed();
+    return out;
 }
 
 std::string report()
 {
-    const State st = read_state();
+    // What is on the card as it is: the report may be built off the UI thread.
+    const State st = read_state(false);
     return fmt::format(
         "=== homebrew menu ===\n"
         "override_config: {} (PlayGuard lock={} defaults={})\n"
         "as read        : album opens hbmenu={} R on a game={}\n"
         "state file     : {} (locked on {})\n"
         "atmosphere     : {}\n"
-        "ways back      : playguard forwarder={} protected menus={}\n"
+        "ways back      : playguard forwarder={} protected menus={} (seen working {})\n"
         "open doors     : {} (unprotected {}, writing the SD card {})\n"
         "patches={} rescue module={} gate={}\n\n",
         st.file ? "present" : "none", st.lock_block ? 1 : 0, st.defaults ? 1 : 0, st.album ? 1 : 0, st.any_app ? 1 : 0,
         st.state ? "present" : "none", st.locked_on.empty() ? "unknown" : st.locked_on,
-        st.ams.empty() ? "unknown" : st.ams, st.c.self ? 1 : 0, st.c.menus.size(), st.c.open_doors.size(),
+        st.ams.empty() ? "unknown" : st.ams, st.c.self ? 1 : 0, st.c.menus.size(), st.c.verified.size(), st.c.open_doors.size(),
         st.c.unprotected.size(), st.c.sd_writers.size(), st.patches, st.module, st.gate);
 }
 
