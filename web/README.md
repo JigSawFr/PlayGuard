@@ -83,7 +83,11 @@ them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
   landscape there, only the screen and the pad too, everything back when
   turned upright. An iPhone takes `apple-touch-icon.png`, Android
   `icon-192.png` and `icon-512.png` (maskable: the logo stays inside the
-  part Android may crop), both from `tools/render_branding.mjs`; a long
+  part Android may crop), both from `tools/render_branding.mjs`, which also
+  renders what an iPhone shows while it starts (`images/splash/`: each
+  iPhone since iOS 16 in both orientations, linked with its media query,
+  checked by `tests/web_page/splash.test.js`; Android makes its own from
+  the manifest's icon and background); a long
   press on Android's icon offers four states (limit reached, unlocked, no
   PIN yet, the tour). The browser's bar takes the header's colour in the
   page's theme. While the tour or a steps link plays, nobody touches the
