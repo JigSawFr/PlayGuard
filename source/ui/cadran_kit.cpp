@@ -1,14 +1,17 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "ui/cadran_kit.hpp"
 
+#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 #include <fmt/format.h>
+#include <tuple>
 #include <yoga/Yoga.h>
 
 #include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
 #include "view/cadran_digits.hpp"
+#include "view/qr_view.hpp"
 
 namespace cadran::kit
 {
@@ -16,6 +19,29 @@ namespace cadran::kit
 brls::Label* label(const std::string& text, float size, const char* color_key)
 {
     auto* l = new brls::Label();
+    l->setText(text);
+    l->setFontSize(size);
+    l->setTextColor(brls::Application::getTheme()[color_key]);
+    return l;
+}
+
+namespace
+{
+// A label in the display face: Sora, the other scripts from the app's fonts.
+class DisplayLabel : public brls::Label
+{
+  public:
+    DisplayLabel()
+    {
+        const int face = brls::Application::getFont("cadran/digits");
+        if (face != brls::FONT_INVALID) this->font = face;
+    }
+};
+}   // namespace
+
+brls::Label* display(const std::string& text, float size, const char* color_key)
+{
+    auto* l = new DisplayLabel();
     l->setText(text);
     l->setFontSize(size);
     l->setTextColor(brls::Application::getTheme()[color_key]);
@@ -193,6 +219,51 @@ brls::Box* chip(const std::string& text, float height)
     digits->setFollowsTextSize(true);
     box->addView(digits);
     return box;
+}
+
+brls::Box* qr(const std::string& payload, float side, const std::string& title, const std::string& caption, float width)
+{
+    auto* box = new brls::Box(brls::Axis::COLUMN);
+    box->setAlignItems(brls::AlignItems::CENTER);
+    if (width > 0) box->setWidth(width);
+    box->addView(new QrView(payload, side));
+    for (const auto& [text, size, key] : { std::tuple<const std::string&, float, const char*>{ title, 18, "cadran/text" },
+                                           { caption, 15.5f, "cadran/text3" } }) {
+        if (text.empty()) continue;
+        brls::Label* l = label(text, size, key);
+        l->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+        l->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the box's width
+        l->setMarginTop(&text == &title ? 10 : 2);
+        box->addView(l);
+    }
+    return box;
+}
+
+Bar::Bar()
+{
+    this->setHeight(12);
+    this->setFocusable(false);
+}
+
+void Bar::set(float value)
+{
+    this->fraction = value < 0 ? 0 : value > 1 ? 1 : value;
+}
+
+void Bar::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style, brls::FrameContext*)
+{
+    brls::Theme theme = brls::Application::getTheme();
+    const float radius = height / 2.0f;
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, x, y, width, height, radius);
+    nvgFillColor(vg, this->a(theme["cadran/well"]));
+    nvgFill(vg);
+    if (this->fraction <= 0) return;
+    const float w = std::max(width * this->fraction, height);
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, x, y, w, height, radius);
+    nvgFillColor(vg, this->a(theme["cadran/teal_fill"]));
+    nvgFill(vg);
 }
 
 Empty empty(const char* icon_name)

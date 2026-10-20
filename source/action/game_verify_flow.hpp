@@ -17,11 +17,10 @@
 
 #include "action/game_check_text.hpp"
 #include "core/gamecheck.h"
+#include "ui/cadran_kit.hpp"
 
 namespace game_verify_flow
 {
-
-class ProgressBar;
 
 // The dialog and what its thread shares with it.
 struct State
@@ -32,7 +31,7 @@ struct State
     brls::Image* image = nullptr;
     brls::Label* title = nullptr;   // "Checking the data", with the game's place in a batch
     brls::Label* name = nullptr;
-    ProgressBar* bar = nullptr;
+    cadran::kit::Bar* bar = nullptr;
     brls::Label* percent = nullptr;
     brls::Label* detail = nullptr;
     std::chrono::steady_clock::time_point started = std::chrono::steady_clock::now();

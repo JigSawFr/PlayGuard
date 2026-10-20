@@ -43,6 +43,15 @@ brls::Box* dialog_body(const std::string& text);
 // FAILURE also put a coral warning before a dialog_body's title.
 void style_dialog(brls::Dialog* dialog, Emphasis emphasis = Emphasis::NONE);
 
+// A button of a dialog's own, not of its row (one that must act before the
+// dialog closes): a pill as style_dialog draws them, plain unless PRIMARY or
+// DANGER.
+void style_button(brls::Button* button, Emphasis emphasis = Emphasis::NONE);
+
+// A dialog's body while something is under way: a spinner, and what is being
+// done under it, centred.
+brls::Box* wait_body(const std::string& text);
+
 // A duration chosen with the stick, in place of the system number pad: up /
 // down 15 min, L / R 5 min (or a tap on the arrows), from 0 to 24:00, OK
 // or Cancel; `on_value` runs once the dialog has closed.

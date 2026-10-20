@@ -15,6 +15,10 @@ namespace cadran::kit
 // several lines when it has to.
 brls::Label* label(const std::string& text, float size, const char* color_key = "cadran/text");
 
+// The same in the boards' display face (Sora; the other scripts from the
+// app's fonts): a dialog's title, a code to read out, a figure.
+brls::Label* display(const std::string& text, float size, const char* color_key = "cadran/text");
+
 // An icon of the boards, `size` px square.
 CadranIcon* icon(const char* name, float size, const char* color_key = "cadran/text2");
 
@@ -57,6 +61,25 @@ brls::Box* pill(const std::string& text, const char* dot_key);
 // A controller key as the boards draw it: its letter ("A", "Y", "L") in a
 // round bubble, `size` px across, no margins.
 brls::Box* key(const char* letter, float size = 24);
+
+// A QR code of `payload`, `side` px (dark on white whatever the theme, as
+// phones read it best), its `title` under it and a `caption` smaller (either
+// may be empty), centred; `width` (0: the code's own) keeps cards alike.
+brls::Box* qr(const std::string& payload, float side, const std::string& title, const std::string& caption,
+              float width = 0);
+
+// A progress bar, 12 px high: the well, filled in teal up to `set`.
+class Bar : public brls::View
+{
+  public:
+    Bar();
+    void set(float fraction);   // 0..1
+    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
+              brls::FrameContext* ctx) override;
+
+  private:
+    float fraction = 0;
+};
 
 // A rounded chip with a text in the display face (an amount, a period…).
 brls::Box* chip(const std::string& text, float height = 48);

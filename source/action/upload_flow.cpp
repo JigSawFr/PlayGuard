@@ -10,6 +10,7 @@
 #include "action/github_login_flow.hpp"
 #include "action/notices.hpp"
 #include "app.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
@@ -20,7 +21,6 @@
 #include "util/pctl_ops_c.hpp"
 #include "util/session_log.hpp"
 #include "util/text.hpp"
-#include "view/qr_view.hpp"
 
 using namespace brls::literals;
 
@@ -44,19 +44,6 @@ struct Kind
     std::string what = "diagnostic report";   // the gist's description, in English
 };
 
-brls::Box* qr_card(const std::string& title, const std::string& url, const std::string& caption)
-{
-    auto* card = new brls::Box(brls::Axis::COLUMN);
-    card->setAlignItems(brls::AlignItems::CENTER);
-    card->setWidth(300);
-    card->addView(new QrView(url, 220));
-    brls::Label* name = ui::centered_label(title, 20, ui::color_text());
-    name->setMarginTop(6);
-    card->addView(name);
-    card->addView(ui::centered_label(caption, 18, ui::color_note()));
-    return card;
-}
-
 // Keeps the link in a file of its own, logs/uploads/upload_<date>.url
 // (util/log_files.hpp): an Internet shortcut, so one can be found again after
 // the dialog is closed, and opened from a computer.
@@ -69,15 +56,9 @@ void remember(const log_upload::Result& r)
 void show_link(const log_upload::Result& r, bool report)
 {
     if (!report) {
-        auto* box = new brls::Box(brls::Axis::COLUMN);
-        box->setAlignItems(brls::AlignItems::CENTER);
-        box->setPadding(24, 24, 12, 24);
-        box->addView(ui::centered_label(brls::getStr("playguard/upload/done_list", text::short_url(r.url)), 20,
-                                    ui::color_text()));
-        brls::Box* card = qr_card("playguard/upload/qr_list"_i18n, r.url, text::short_url(r.url));
-        card->setMarginTop(14);
-        box->addView(card);
-        auto* dialog = new brls::Dialog(box);
+        brls::Box* code = cadran::kit::qr(r.url, 220, "playguard/upload/qr_list"_i18n, text::short_url(r.url), 300);
+        code->setAlignSelf(brls::AlignSelf::CENTER);
+        auto* dialog = ui::dialog(brls::getStr("playguard/upload/done_list", text::short_url(r.url)), code);
         dialog->addButton("hints/ok"_i18n, []() {});
         dialog->open();
         return;
@@ -97,17 +78,11 @@ void show_link(const log_upload::Result& r, bool report)
 
     std::string text = brls::getStr("playguard/upload/done", text::short_url(r.url));
 
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::CENTER);
-    box->setPadding(16, 24, 12, 24);   // the two cards and their captions at 18 px fit above OK
-    box->addView(ui::centered_label(text, 20, ui::color_text()));
     auto* row = new brls::Box(brls::Axis::ROW);
     row->setJustifyContent(brls::JustifyContent::SPACE_EVENLY);
-    row->setMarginTop(8);
-    row->addView(qr_card("playguard/upload/qr_report"_i18n, r.url, text::short_url(r.url)));
-    row->addView(qr_card("playguard/upload/qr_issue"_i18n, issue, "playguard/upload/qr_issue_note"_i18n));
-    box->addView(row);
-    auto* dialog = new brls::Dialog(box);
+    row->addView(cadran::kit::qr(r.url, 200, "playguard/upload/qr_report"_i18n, text::short_url(r.url), 300));
+    row->addView(cadran::kit::qr(issue, 200, "playguard/upload/qr_issue"_i18n, "playguard/upload/qr_issue_note"_i18n, 300));
+    auto* dialog = ui::dialog(text, row);
     dialog->addButton("hints/ok"_i18n, []() {});
     dialog->open();
 }

@@ -21,24 +21,8 @@ constexpr long START_DELAY_MS = 1500;
 
 void show_reminder()
 {
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::STRETCH);
-    box->setPadding(28, 32, 12, 32);
-    auto* title = new brls::Label();
-    title->setFontSize(26);
-    title->setText("playguard/about/reminder_title"_i18n);
-    box->addView(title);
-    auto* body = new brls::Label();
-    body->setSingleLine(false);
-    body->setFontSize(20);
-    body->setMarginTop(10);
-    body->setText("playguard/about/support_body"_i18n);
-    box->addView(body);
-    brls::Box* codes = funding::cards(160, false);
-    codes->setMarginTop(12);
-    box->addView(codes);
-
-    auto* dialog = new brls::Dialog(box);
+    // Its title, then the note and both codes.
+    auto* dialog = funding::dialog("playguard/about/reminder_title"_i18n + "\n\n" + "playguard/about/support_body"_i18n, 160);
     dialog->addButton("playguard/common/later"_i18n, []() {});
     dialog->addButton("playguard/about/reminder_never"_i18n, []() {
         config::get().support_reminder = false;
