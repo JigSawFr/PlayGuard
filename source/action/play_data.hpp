@@ -38,6 +38,8 @@ void fetch(const PlayAccount* account);
 // Called on the UI thread after each read; returns an id for unlisten().
 int  listen(std::function<void()> on_read);
 void unlisten(int id);
+// Calls every listener now, as at the end of a read.
+void notify();
 
 // The console's user accounts, read once per run (acc:u0 is quick).
 const std::vector<PlayAccount>& accounts();

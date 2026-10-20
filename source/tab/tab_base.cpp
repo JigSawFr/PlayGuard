@@ -3,7 +3,9 @@
 
 #include "action/notices.hpp"
 #include "action/frame_stats_flow.hpp"
+#include "action/play_data.hpp"
 #include "app.hpp"
+#include "core/sim_env.h"
 #include "ui/ui.hpp"
 #include "view/tab_badge.hpp"
 
@@ -74,6 +76,10 @@ void TabBase::willAppear(bool resetState)
     frame_stats_flow::set_screen(this->screen);
     this->update_ro_note();
     this->refresh();
+    // The smoke test's "alarm" (PLAYGUARD_SIM_TAB_RACE): a read of the play
+    // data ending as a tab replaces another, the one replaced not freed yet.
+    // Only the new tab may answer (the header's pill, #251).
+    if (sim_env_flag("PLAYGUARD_SIM_TAB_RACE")) play_data::notify();
 }
 
 bool TabBase::shown() const

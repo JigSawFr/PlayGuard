@@ -37,6 +37,11 @@ void FooterHints::fit()
     brls::Box* row = this->getParent();
     if (!row || this->getChildren().empty())
         return;
+    // A footer that is not shown (a dialog's, footerHidden) is never drawn:
+    // its clock stays empty, and the wait below would come back every frame
+    // for as long as the dialog is open.
+    for (brls::View* v = this; v; v = v->getParent())
+        if (v->getVisibility() != brls::Visibility::VISIBLE) return;
     brls::View* status = nullptr;   // battery, Wi-Fi and clock
     for (brls::View* v : row->getChildren())
         if (v != this) status = v;
