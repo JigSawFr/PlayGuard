@@ -35,9 +35,16 @@ class TabBase : public brls::Box
   protected:
     virtual void refresh() = 0;
 
-    // Calls refresh() every `period_ms` while the app is in the foreground and
-    // this tab's screen is the top one (not under a dialog or the per-day
-    // editor). Tabs are deleted when another one is opened, which stops it.
+    // This tab is the one on screen. A tab replaced by another is freed a
+    // little later (borealis' free queue): until then, its timer and its
+    // listeners must not refresh it, or what it sets for the whole screen
+    // (the header's pill) would cover the new tab's.
+    bool shown() const;
+
+    // Calls refresh() every `period_ms` while the app is in the foreground,
+    // this tab is the one shown and its screen is the top one (not under a
+    // dialog or the per-day editor). Tabs are deleted when another one is
+    // opened, which stops it.
     void enable_auto_refresh(int period_ms);
 
     // `row` (a DetailCell) is where the notification bell's entries `ids`

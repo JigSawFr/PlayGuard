@@ -76,6 +76,11 @@ void TabBase::willAppear(bool resetState)
     this->refresh();
 }
 
+bool TabBase::shown() const
+{
+    return s_shown == this;
+}
+
 void TabBase::refresh_shown()
 {
     if (!s_shown) return;
@@ -88,6 +93,7 @@ void TabBase::enable_auto_refresh(int period_ms)
     this->auto_timer.setPeriod(period_ms);
     this->auto_timer.setCallback([this]() {
         if (!app::in_focus()) return;
+        if (!this->shown()) return;   // replaced, waiting to be freed
         if (!ui::on_top(this->getParentActivity())) return;
         this->refresh();
     });
