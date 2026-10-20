@@ -32,7 +32,6 @@ Usage: tools/build_site.py <out-dir> [repo-root]          (needs Python-Markdown
 import gzip
 import hashlib
 import html
-import io
 import json
 import os
 import re
@@ -40,7 +39,6 @@ import shutil
 import struct
 import subprocess
 import sys
-import tarfile
 import tempfile
 from urllib.parse import urlsplit
 
@@ -205,16 +203,21 @@ def latest_tag():
 def release_docs(tag, into):
     """The release's documentation, its Markdown and screenshots out of its
     tag into `into`: a DocSet of the pages it had, or None."""
-    try:
-        archive = subprocess.run(["git", "-C", ROOT, "archive", "--format=tar", tag, "docs", "images/screenshots"],
-                                 capture_output=True, check=True).stdout
-    except (OSError, subprocess.CalledProcessError):
+    listing = git("ls-tree", "-r", "--name-only", tag, "docs", "images/screenshots")
+    if not listing:
         return None
-    with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
+    root = os.path.realpath(into)
+    for path in listing.splitlines():
+        target = os.path.realpath(os.path.join(root, path))
+        if not target.startswith(root + os.sep):   # nothing outside `into`
+            continue
         try:
-            tar.extractall(into, filter="data")
-        except TypeError:   # a Python before 3.12: the archive is git's own
-            tar.extractall(into)
+            data = subprocess.run(["git", "-C", ROOT, "show", f"{tag}:{path}"], capture_output=True, check=True).stdout
+        except (OSError, subprocess.CalledProcessError):
+            return None
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        with open(target, "wb") as f:
+            f.write(data)
     pages = [(p, s) for p, s in DOCS if os.path.exists(os.path.join(into, "docs", f"{p}.md"))]
     return DocSet(into, pages, tag) if pages else None
 
