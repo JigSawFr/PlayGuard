@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- A request from another homebrew (docs/api.md): who asks, one row per
-     request with how it went, then where PlayGuard goes next. Filled by
-     source/activity/api_activity.cpp. -->
+     request (its name, its route small, how it went), then where PlayGuard
+     goes next, Continue and, for a request the parent has not allowed,
+     Allow…. Filled by source/activity/api_activity.cpp. -->
 
 <brls:AppletFrame
     iconInterpolation="linear">
@@ -41,8 +42,32 @@
         <brls:Label
             id="api_next"
             horizontalAlign="center"
-            marginTop="28"
+            marginTop="24"
+            marginBottom="20"
             textColor="@theme/cadran/text3"/>
+
+        <brls:Box
+            width="auto"
+            height="auto"
+            axis="row"
+            justifyContent="center">
+
+            <brls:Button
+                id="api_continue"
+                style="primary"
+                width="300"
+                visibility="gone"
+                text="@i18n/playguard/api/continue"/>
+
+            <brls:Button
+                id="api_allow"
+                style="bordered"
+                width="300"
+                marginLeft="20"
+                visibility="gone"
+                text="@i18n/playguard/api/allow"/>
+
+        </brls:Box>
 
     </brls:Box>
 

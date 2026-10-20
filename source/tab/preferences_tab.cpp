@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "action/api_flow.hpp"
 #include "action/notices.hpp"
 #include "action/pin_lock.hpp"
 #include "action/sys_update_flow.hpp"
@@ -10,6 +11,7 @@
 #include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/text.hpp"
 
 using namespace brls::literals;
 
@@ -129,7 +131,17 @@ void PreferencesTab::refresh()
     notices_reminders->setOn(cfg.notices_reminders, false);
     notices_ack_remind->setOn(cfg.notices_ack_remind, false);
     support_reminder->setOn(cfg.support_reminder, false);
-    api->setDetailText(cfg.api_enabled ? "playguard/api/on"_i18n : "playguard/api/off"_i18n);
+    // On, and what is allowed: "On · Network clock".
+    std::string api_text = "playguard/api/off"_i18n;
+    if (cfg.api_enabled) {
+        std::vector<std::string> allowed;
+        const auto s = api_flow::settings();
+        for (const auto& g : api_logic::groups_in_build())
+            if (s.level(g) != api_logic::Level::None) allowed.push_back(api_flow::group_name(g));
+        api_text = "playguard/api/on"_i18n + " · " +
+                   (allowed.empty() ? "playguard/api/nothing_allowed"_i18n : text::join(allowed, ", "));
+    }
+    api->setDetailText(api_text);
     this->list.sync();
     cadran::set_pill("");
 }

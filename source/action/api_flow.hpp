@@ -36,6 +36,16 @@ std::string lang();
 bool pending();
 brls::Activity* activity();
 
+// The main screen, once at start-up: in the notification bell, what other
+// homebrews changed in the last 7 days, and the calls refused for want of a
+// permission when there were 3 or more (an app the parent may want to allow,
+// or one trying again and again).
+void note_calls();
+
+// Preferences › Other homebrews, behind the PIN (from the bell, the request
+// screen's Allow…).
+void open_settings();
+
 // Preferences › Other homebrews.
 api_logic::Settings settings();
 std::vector<api_logic::LogEntry> calls();

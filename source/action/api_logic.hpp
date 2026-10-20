@@ -188,6 +188,7 @@ struct LogEntry
 {
     std::string at, caller, route;   // route: "POST /v1/clock/sync"
     int status = 0;
+    std::string code;                // the error's code ("" when it went through)
     bool dry_run = false;
 };
 std::vector<LogEntry> parse_log(const std::string& text);
@@ -196,5 +197,11 @@ void                  log_call(std::vector<LogEntry>& list, const LogEntry& e);
 
 // "POST /v1/clock/sync" for the log and the screen.
 std::string route_text(const Call& c);
+// What a route is called on screen (its key under playguard/api/routes/):
+// "discovery", "clock", "clock_sync"; "" for one this build does not answer.
+// From a call, or from route_text()'s text (the log).
+std::string route_key(const Call& c);
+std::string route_key(const std::string& route_text);
+constexpr const char* ROUTE_KEYS[] = { "discovery", "clock", "clock_sync" };
 
 }   // namespace api_logic

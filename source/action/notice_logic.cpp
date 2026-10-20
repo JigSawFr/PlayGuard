@@ -18,15 +18,15 @@ namespace
 // then releases and notes. An id given with a trailing "_" is a prefix.
 const char* const RANKS[] = {
     // Parental controls.
-    "pin_missing", "unlocked", "alarm_off", "not_counting", "outside", "clock", "extra_restore",
+    "pin_missing", "unlocked", "alarm_off", "not_counting", "outside", "api_changes", "clock", "extra_restore",
     "pin_weak", "pin_lock_off", "new_account", "pairing", "over_limit", "week", "clock_off",
-    "console_lock_long", "backup", "update", "installed", "crash", "upload",
+    "console_lock_long", "api_refused", "backup", "update", "installed", "crash", "upload",
     // The console (CONSOLE below).
     "games", "patches", "sd_space", "sd_", "data_", "rescue_old", "rescue_restart", "went_back",
     "compat", "sys_firmware", "sys_atmosphere", "sys_hekate", "serial", "other_system",
 };
 // The first of RANKS about the console: it and every one after it.
-const int CONSOLE = 20;
+const int CONSOLE = 22;
 
 bool matches(const std::string& id, const std::string& key)
 {

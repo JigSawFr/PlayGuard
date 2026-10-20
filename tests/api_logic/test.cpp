@@ -331,6 +331,20 @@ static void test_log()
     c.method = "POST";
     c.path   = "/clock/sync";
     CHECK(route_text(c) == "POST /v1/clock/sync");
+    CHECK(route_key(c) == "clock_sync");
+    CHECK(route_key("GET /v1") == "discovery" && route_key("GET /v1/clock") == "clock");
+    CHECK(route_key("POST /v1/clock/sync") == "clock_sync");
+    CHECK(route_key("GET /v1/status").empty() && route_key("?").empty() && route_key("").empty());
+
+    // The error's code is kept, a strange one dropped.
+    LogEntry e;
+    e.route  = "POST /v1/clock/sync";
+    e.status = 403;
+    e.code   = "pin_refused";
+    std::vector<LogEntry> one;
+    log_call(one, e);
+    CHECK(parse_log(dump_log(one)).front().code == "pin_refused");
+    CHECK(parse_log(R"({"calls":[{"route":"x","status":403,"code":"<b>"}]})").front().code.empty());
 }
 
 int main()

@@ -268,6 +268,22 @@ static void test_merge()
     CHECK(self && self->id == 3);
     CHECK(!self_row(merge({}, on, exists, "")));
 
+    // PlayGuard with a launch-API request (Set the clock): the same .nro,
+    // not PlayGuard's own.
+    forwarders::Made clock;
+    clock.id = 8;
+    clock.nro = "sdmc:/switch/playguard/playguard.nro";
+    clock.argv = clock.nro + " --api \"POST /v1/clock/sync\"";
+    clock.name = "Set the clock";
+    on.push_back({ 8, "Set the clock", "PlayGuard", "" });
+    const auto with_clock = merge({ own, gone, moved, clock }, on, exists, "sdmc:/switch/playguard/playguard.nro");
+    const Row* own_row = self_row(with_clock);
+    CHECK(own_row && own_row->id == 3 && !own_row->request);
+    bool found = false;
+    for (const Row& r : with_clock)
+        if (r.id == 8) found = CHECK(r.request && !r.self && r.state == State::Ready);
+    CHECK(found);
+
     CHECK(file_title("sdmc:/switch/ftpd/ftpd.nro") == "ftpd");
     CHECK(file_title("x.NRO") == "x");
     CHECK(file_title("sdmc:/a/b.txt") == "b.txt");

@@ -223,6 +223,29 @@ void create_self(std::function<void(bool)> done)
                 });
 }
 
+void create_request(const std::string& name, const std::string& request, std::function<void(bool)> done)
+{
+    const std::string sdmc = self_nro();
+    if (sdmc.empty()) {
+        ui::error("playguard/forwarders/add_err"_i18n, "playguard/forwarders/self_unknown"_i18n);
+        if (done) done(false);
+        return;
+    }
+    ui::confirm(brls::getStr("playguard/forwarders/confirm_request", name), "playguard/forwarders/add"_i18n,
+                [sdmc, name, request, done]() {
+                    forwarders::Made m;
+                    m.nro    = sdmc;
+                    m.argv   = argv_of(sdmc) + " --api \"" + request + "\"";
+                    m.name   = name;
+                    m.author = "PlayGuard";
+                    const bool ok = install(m, true);
+                    if (done) done(ok);
+                },
+                [done]() {
+                    if (done) done(false);
+                });
+}
+
 void rebuild(const forwarders_logic::Row& row, const std::string& name, const std::string& author,
              std::function<void(bool)> done)
 {

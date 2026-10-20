@@ -1014,7 +1014,8 @@
         "forgotten": "{} esquecido",
         "details": "{}\n\nEditora: {}\nVersão: {}\n.nro: {}\nID do programa: {}\n{}",
         "made_here": "Criado pelo PlayGuard",
-        "unknown": "desconhecido"
+        "unknown": "desconhecido",
+        "confirm_request": "Put “{}” on the HOME menu? It starts PlayGuard, which sets the network clock (after asking you, then the PIN) and closes."
     },
     "about": {
         "section_changelog": "Novidades da {}",
@@ -1758,11 +1759,11 @@
     },
     "api": {
         "screen_title": "A request from another homebrew",
-        "from": "Asked by {}",
+        "from": "Asked by “{}” (the name it gives itself)",
         "unnamed": "a homebrew that gave no name",
         "working": "Working…",
-        "closing": "PlayGuard closes in a moment (A or B: now).",
-        "returning": "Back to {} in a moment (A or B: now).",
+        "closing": "PlayGuard closes in {} s.",
+        "returning": "Back to {} in {} s.",
         "settings_title": "Other homebrews",
         "settings_note": "Other homebrews can start PlayGuard to ask it something, such as setting the network clock. Nothing is allowed until you choose it below, group by group. Whatever a homebrew asks, a change that needs the PIN asks for it. The details: playguard.link, Launch API.",
         "enabled": "Let other homebrews call PlayGuard",
@@ -1771,8 +1772,6 @@
         "all_off": "Turn it all off",
         "all_off_done": "Every group is back to Not allowed.",
         "no_calls": "No homebrew has called PlayGuard yet.",
-        "call_line": "{} · {} · {} · {}",
-        "call_dry_run": " (test only)",
         "on": "On",
         "off": "Off",
         "result": {
@@ -1809,7 +1808,52 @@
             "failed": "The console refused: nothing was changed.",
             "no_network": "No time server answered: check the Internet connection.",
             "no_measure": "The network clock was never measured on this console.",
-            "not_done": "Not done: an earlier request failed."
-        }
+            "not_done": "Not done: an earlier request failed.",
+            "declined": "You declined: nothing was changed."
+        },
+        "unnamed_from": "Asked by a homebrew that gave no name",
+        "continue": "Continue",
+        "allow": "Allow…",
+        "closing_wait": "PlayGuard closes when you press Continue.",
+        "returning_wait": "Back to {} when you press Continue.",
+        "routes": {
+            "discovery": "See what PlayGuard can do",
+            "clock": "Measure the network clock",
+            "clock_sync": "Set the network clock"
+        },
+        "confirm_sync": "“{}” asks to set the network clock (off by {}).",
+        "confirm_sync_yes": "Set it (PIN)",
+        "home_icon": "Add “Set the clock” to the HOME menu",
+        "home_icon_name": "Set the clock",
+        "home_icon_allow": "This icon starts PlayGuard to set the network clock. It needs Other homebrews on, with Network clock on Read and change. Allow it now?",
+        "home_icon_allow_yes": "Allow and add",
+        "all_off_confirm": "Set every group back to Not allowed? Other homebrews will be refused until you allow them again.",
+        "all_back": "Put the permissions back",
+        "all_back_done": "The permissions are back as they were.",
+        "docs": "For developers: the launch API",
+        "docs_body": "How another homebrew calls PlayGuard: the requests, the answers, the errors.",
+        "level_details": {
+            "clock": {
+                "none": "Every request about the clock is refused.",
+                "read": "It may measure how far off the network clock is.",
+                "read_write": "It may also set the network clock: you are asked first, then the PIN."
+            }
+        },
+        "outcome": {
+            "done": "Done",
+            "tested": "Allowed (test only)",
+            "refused": "Refused",
+            "unknown": "Unknown request",
+            "skipped": "Not done",
+            "failed": "Not done"
+        },
+        "call_details": "{}\n{}\n{}\n\n{}\nStatus: {}",
+        "notice_changes": "Changes made by other homebrews",
+        "notice_line": "{}: {}",
+        "notice_open": "See the calls",
+        "notice_refused": "Other homebrews were refused",
+        "notice_refused_line": "{}: refused {} times",
+        "nothing_allowed": "nothing allowed",
+        "notice_line_many": "{} ({} times)"
     }
 }

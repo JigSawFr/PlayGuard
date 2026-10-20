@@ -611,6 +611,9 @@ std::vector<LogEntry> parse_log(const std::string& text)
         l.status = static_cast<int>(st);
         auto d = e.find("dry_run");
         l.dry_run = d != e.end() && d->is_boolean() && d->get<bool>();
+        l.code    = string_at(e, "code");
+        if (l.code.size() > 32 || !std::all_of(l.code.begin(), l.code.end(), [](unsigned char ch) { return std::islower(ch) || ch == '_'; }))
+            l.code.clear();
         out.push_back(l);
     }
     if (out.size() > MAX_LOG) out.erase(out.begin(), out.end() - MAX_LOG);
@@ -622,7 +625,7 @@ std::string dump_log(const std::vector<LogEntry>& list)
     nlohmann::json arr = nlohmann::json::array();
     for (const auto& l : list)
         arr.push_back({ { "at", l.at }, { "caller", l.caller }, { "route", l.route }, { "status", l.status },
-                        { "dry_run", l.dry_run } });
+                        { "code", l.code }, { "dry_run", l.dry_run } });
     nlohmann::json j = { { "schema", 1 }, { "calls", arr } };
     return j.dump(2, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
 }
@@ -636,6 +639,20 @@ void log_call(std::vector<LogEntry>& list, const LogEntry& e)
 std::string route_text(const Call& c)
 {
     return c.method + " /v1" + c.path;
+}
+
+std::string route_key(const Call& c)
+{
+    for (size_t i = 0; i < routes().size() && i < sizeof(ROUTE_KEYS) / sizeof(ROUTE_KEYS[0]); i++)
+        if (c.method == routes()[i].method && c.path == routes()[i].path) return ROUTE_KEYS[i];
+    return "";
+}
+
+std::string route_key(const std::string& text)
+{
+    Request r;
+    Problem p;
+    return parse_short(text, &r, &p) ? route_key(r.calls.front()) : std::string();
 }
 
 }   // namespace api_logic

@@ -77,10 +77,19 @@ and again gains no extra attempts.
 
 ### What the parent sees
 
-*Preferences › Other homebrews* lists the last 20 calls: when, the `caller`,
-the route, and the status (`200`, `403 permission_denied` …). **Turn it all
-off** sets every group back to *None* in one press. Calls that changed
-something (`POST`) are also in the change history, as every change is.
+*Preferences › Other homebrews* lists the last 20 calls, by day: when, the
+`caller`, what was asked and how it went (a press shows the route, the
+status and the error). **Turn it all off** sets every group back to *None*
+in one press. Calls that changed something (`POST`) are also in the change
+history, as every change is, and in the notification bell (the last 7 days),
+as are 3 refusals or more.
+
+Before a change, the parent is told who asks (the `caller`, said to be the
+name it gives itself), what changes and what it costs, and may decline
+(`403 declined`); the PIN comes after. A request refused for want of a
+permission offers *Allow…* on its screen, which opens these settings behind
+the PIN. The settings can also put a *Set the clock* icon on the HOME menu:
+a forwarder of PlayGuard with `--api "POST /v1/clock/sync"`.
 
 ## Launching PlayGuard
 
@@ -241,6 +250,7 @@ console's language, ready to show:
 | `400` | `bad_request`, `unsupported_api` | The request cannot be read. |
 | `403` | `api_disabled`, `permission_denied` | The API is off, or the route's group lacks the permission (`detail` names the group and the permission needed). |
 | `403` | `pin_refused` | The PIN screen was cancelled or the PIN was wrong. |
+| `403` | `declined` | The parent declined the change when asked (before the PIN). |
 | `404` | `no_route`, `no_game`, `no_measure` | Unknown or planned path, no such game installed, or no clock measure to give from cache. |
 | `422` | `bad_body` | A parameter is missing or out of range. |
 | `409` | `auto_correction_off` | The console's *Synchronize clock via Internet* is off: the network clock is not written. |

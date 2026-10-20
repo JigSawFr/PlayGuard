@@ -1014,7 +1014,8 @@
         "forgotten": "{} oublié",
         "details": "{}\n\nÉditeur : {}\nVersion : {}\n.nro : {}\nID du programme : {}\n{}",
         "made_here": "Créé par PlayGuard",
-        "unknown": "inconnu"
+        "unknown": "inconnu",
+        "confirm_request": "Placer « {} » sur le menu HOME ? Elle lance PlayGuard, qui règle l'horloge réseau (après vous l'avoir demandé, puis le code PIN) et se ferme."
     },
     "about": {
         "section_changelog": "Nouveautés de la {}",
@@ -1758,11 +1759,11 @@
     },
     "api": {
         "screen_title": "Une demande d'un autre homebrew",
-        "from": "Demandée par {}",
+        "from": "Demandée par « {} » (le nom qu'il se donne)",
         "unnamed": "un homebrew qui ne s'est pas nommé",
         "working": "En cours…",
-        "closing": "PlayGuard se ferme dans un instant (A ou B : tout de suite).",
-        "returning": "Retour à {} dans un instant (A ou B : tout de suite).",
+        "closing": "PlayGuard se ferme dans {} s.",
+        "returning": "Retour à {} dans {} s.",
         "settings_title": "Autres homebrews",
         "settings_note": "D'autres homebrews peuvent lancer PlayGuard pour lui demander quelque chose, comme régler l'horloge réseau. Rien n'est permis tant que vous ne le choisissez pas ci-dessous, groupe par groupe. Quoi que demande un homebrew, une modification qui demande le code PIN le demande. Les détails : playguard.link, API de lancement.",
         "enabled": "Permettre aux autres homebrews d'appeler PlayGuard",
@@ -1771,8 +1772,6 @@
         "all_off": "Tout couper",
         "all_off_done": "Chaque groupe est revenu à Non autorisé.",
         "no_calls": "Aucun homebrew n'a encore appelé PlayGuard.",
-        "call_line": "{} · {} · {} · {}",
-        "call_dry_run": " (test seulement)",
         "on": "Activé",
         "off": "Désactivé",
         "result": {
@@ -1809,7 +1808,52 @@
             "failed": "La console a refusé : rien n'a été modifié.",
             "no_network": "Aucun serveur de temps n'a répondu : vérifiez la connexion Internet.",
             "no_measure": "L'horloge réseau n'a jamais été mesurée sur cette console.",
-            "not_done": "Pas fait : une demande précédente a échoué."
-        }
+            "not_done": "Pas fait : une demande précédente a échoué.",
+            "declined": "Vous avez refusé : rien n'a été modifié."
+        },
+        "unnamed_from": "Demandée par un homebrew qui ne s'est pas nommé",
+        "continue": "Continuer",
+        "allow": "Autoriser…",
+        "closing_wait": "PlayGuard se ferme quand vous appuyez sur Continuer.",
+        "returning_wait": "Retour à {} quand vous appuyez sur Continuer.",
+        "routes": {
+            "discovery": "Voir ce que PlayGuard sait faire",
+            "clock": "Mesurer l'horloge réseau",
+            "clock_sync": "Régler l'horloge réseau"
+        },
+        "confirm_sync": "« {} » demande à régler l'horloge réseau (décalée de {}).",
+        "confirm_sync_yes": "Régler (code PIN)",
+        "home_icon": "Ajouter « Régler l'horloge » au menu HOME",
+        "home_icon_name": "Régler l'horloge",
+        "home_icon_allow": "Cette icône lance PlayGuard pour régler l'horloge réseau. Il faut que les autres homebrews soient autorisés, avec Horloge réseau sur Lecture et modification. L'autoriser maintenant ?",
+        "home_icon_allow_yes": "Autoriser et ajouter",
+        "all_off_confirm": "Remettre chaque groupe sur Non autorisé ? Les autres homebrews seront refusés jusqu'à ce que vous les autorisiez à nouveau.",
+        "all_back": "Remettre les autorisations",
+        "all_back_done": "Les autorisations sont revenues comme avant.",
+        "docs": "Pour les développeurs : l'API de lancement",
+        "docs_body": "Comment un autre homebrew appelle PlayGuard : les demandes, les réponses, les erreurs.",
+        "level_details": {
+            "clock": {
+                "none": "Toute demande sur l'horloge est refusée.",
+                "read": "Il peut mesurer le décalage de l'horloge réseau.",
+                "read_write": "Il peut aussi régler l'horloge réseau : on vous le demande d'abord, puis le code PIN."
+            }
+        },
+        "outcome": {
+            "done": "Fait",
+            "tested": "Autorisé (test seulement)",
+            "refused": "Refusé",
+            "unknown": "Demande inconnue",
+            "skipped": "Pas fait",
+            "failed": "Pas fait"
+        },
+        "call_details": "{}\n{}\n{}\n\n{}\nStatut : {}",
+        "notice_changes": "Modifications faites par d'autres homebrews",
+        "notice_line": "{} : {}",
+        "notice_open": "Voir les appels",
+        "notice_refused": "D'autres homebrews ont été refusés",
+        "notice_refused_line": "{} : refusé {} fois",
+        "nothing_allowed": "rien d'autorisé",
+        "notice_line_many": "{} ({} fois)"
     }
 }

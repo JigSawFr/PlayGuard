@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Preferences › Other homebrews: the switch, one permission per group of
-     routes (added by the code: the groups this build answers), the last
-     calls, and "Turn it all off". Filled by
+     routes (added by the code: the groups this build answers), the HOME-menu
+     icon that sets the clock, "Turn it all off", the last calls (cards by
+     day, added by the code) and the API's page for developers. Filled by
      source/activity/api_settings_activity.cpp. -->
 
 <brls:AppletFrame
@@ -31,9 +32,10 @@
             <brls:Label id="as_note" text="@i18n/playguard/api/settings_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:Header title="@i18n/playguard/api/section_permissions" marginTop="24" marginBottom="8"/>
             <brls:Box id="as_perms" width="auto" height="auto" axis="column" alignItems="stretch"/>
-            <brls:DetailCell id="as_all_off" title="@i18n/playguard/api/all_off" marginTop="8"/>
+            <brls:Box id="as_actions" width="auto" height="auto" axis="column" alignItems="stretch"/>
             <brls:Header title="@i18n/playguard/api/section_calls" marginTop="24" marginBottom="8"/>
             <brls:Box id="as_calls" width="auto" height="auto" axis="column" alignItems="stretch"/>
+            <brls:Box id="as_more" width="auto" height="auto" axis="column" alignItems="stretch" marginTop="16"/>
 
         </brls:Box>
 

@@ -5,18 +5,22 @@
 #include <cstdio>
 #include <ctime>
 #include <functional>
+#include <map>
 #include <memory>
 #include <sys/stat.h>
 
 #include "action/clock_flow.hpp"
 #include "action/pin_lock.hpp"
+#include "action/notices.hpp"
 #include "activity/api_activity.hpp"
+#include "activity/api_settings_activity.hpp"
 #include "app.hpp"
 #include "core/platform.h"
 #include "core/time_ops.h"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
+#include "util/text.hpp"
 
 using namespace brls::literals;
 using namespace api_logic;
@@ -143,6 +147,13 @@ Answer fail(const Problem& p)
     return error_answer(p, error_title(p));
 }
 
+// "Set the network clock"; the route itself for one this build does not answer.
+std::string call_name(const Call& c)
+{
+    const std::string key = route_key(c);
+    return key.empty() ? route_text(c) : brls::getStr("playguard/api/routes/" + key);
+}
+
 std::string signed_seconds(int64_t s)
 {
     return brls::getStr("playguard/clock/seconds", (s > 0 ? "+" : "") + std::to_string(s));
@@ -187,6 +198,34 @@ void get_clock(const Call& c, Done done)
     }, timeout);
 }
 
+// The parent said yes: the PIN, then the write.
+void approved_sync(const clock_flow::Measurement& m, Done done)
+{
+    if (!pin_lock::ask()) {
+        done(fail(problem(403, "pin_refused", "the PIN was not entered")), "");
+        return;
+    }
+    clock_flow::write(m, [m, done](const TimeApply& a, const std::string&) {
+        if (a.refused_automatic) {
+            done(fail(problem(409, "auto_correction_off", "System Settings > Synchronize clock via Internet is off")), "");
+            return;
+        }
+        if (!a.write_attempted || R_FAILED(a.write_rc) || !a.verified) {
+            const Result rc = !a.write_attempted ? a.open_rc : R_FAILED(a.write_rc) ? a.write_rc : a.verify_rc;
+            char detail[96];
+            std::snprintf(detail, sizeof(detail), "time:s refused the write (0x%08X)", (unsigned)rc);
+            done(fail(problem(500, "failed", detail)), "");
+            return;
+        }
+        Answer ok;
+        ok.body = { { "offset_s_before", m.offset_known ? nlohmann::json(m.offset_s) : nlohmann::json(nullptr) },
+                    { "offset_s_after", (int64_t)a.target - (int64_t)a.readback },
+                    { "written", true },
+                    { "server", m.server } };
+        done(ok, "playguard/api/result/clock_set"_i18n);
+    });
+}
+
 // POST /v1/clock/sync: measured, left alone when right, else the PIN (the
 // change starts the day's play time over) and the write.
 void sync_clock(const Call& c, Done done)
@@ -215,29 +254,15 @@ void sync_clock(const Call& c, Done done)
             done(fail(problem(409, "auto_correction_off", "System Settings > Synchronize clock via Internet is off")), "");
             return;
         }
-        if (!pin_lock::ask()) {
-            done(fail(problem(403, "pin_refused", "the PIN was not entered")), "");
-            return;
-        }
-        clock_flow::write(m, [m, done](const TimeApply& a, const std::string&) {
-            if (a.refused_automatic) {
-                done(fail(problem(409, "auto_correction_off", "System Settings > Synchronize clock via Internet is off")), "");
-                return;
-            }
-            if (!a.write_attempted || R_FAILED(a.write_rc) || !a.verified) {
-                const Result rc = !a.write_attempted ? a.open_rc : R_FAILED(a.write_rc) ? a.write_rc : a.verify_rc;
-                char detail[96];
-                std::snprintf(detail, sizeof(detail), "time:s refused the write (0x%08X)", (unsigned)rc);
-                done(fail(problem(500, "failed", detail)), "");
-                return;
-            }
-            Answer ok;
-            ok.body = { { "offset_s_before", m.offset_known ? nlohmann::json(m.offset_s) : nlohmann::json(nullptr) },
-                        { "offset_s_after", (int64_t)a.target - (int64_t)a.readback },
-                        { "written", true },
-                        { "server", m.server } };
-            done(ok, "playguard/api/result/clock_set"_i18n);
-        });
+        // Who asks, what changes and what it costs, before the PIN: the
+        // parent approves this change, not only "a PIN".
+        const std::string who = s_request.caller.empty() ? "playguard/api/unnamed"_i18n : s_request.caller;
+        const std::string off = m.offset_known ? signed_seconds(m.offset_s) : "?";
+        std::string body = brls::getStr("playguard/api/confirm_sync", who, off);
+        body += "playguard/clock/confirm_apply_resets"_i18n;
+        ui::confirm(body, "playguard/api/confirm_sync_yes"_i18n,
+                    [m, done]() { brls::sync([m, done]() { approved_sync(m, done); }); },
+                    [done]() { done(fail(problem(403, "declined", "the parent declined the change")), ""); });
     }, timeout);
 }
 
@@ -299,6 +324,7 @@ void save_calls(const std::vector<Answer>& answers)
         e.route   = route_text(s_request.calls[i]);
         e.status  = i < answers.size() ? answers[i].status : 0;
         e.dry_run = s_request.calls[i].dry_run;
+        if (i < answers.size() && answers[i].status != 200) e.code = answers[i].body.value("code", std::string());
         log_call(list, e);
     }
     if (s_request.calls.empty()) {
@@ -307,6 +333,7 @@ void save_calls(const std::vector<Answer>& answers)
         e.caller = s_request.caller;
         e.route  = "?";
         e.status = s_problem.status;
+        e.code   = s_problem.code;
         log_call(list, e);
     }
     if (!paths::ensure_dir(api_dir()) || !paths::atomic_write(calls_file(), dump_log(list)))
@@ -365,7 +392,13 @@ void step(std::shared_ptr<Run> run, size_t i)
 {
     if (i >= s_request.calls.size()) {
         const int status = finish(run->answers, nullptr);
-        run->screen->done(status == 200, s_request.return_to);
+        (void)status;
+        bool refused = false;
+        for (const auto& a : run->answers) {
+            const std::string code = a.body.value("code", std::string());
+            refused |= code == "api_disabled" || code == "permission_denied";
+        }
+        run->screen->done(s_request.return_to, refused);
         return;
     }
     const Call& c = s_request.calls[i];
@@ -422,31 +455,83 @@ bool pending()
 
 brls::Activity* activity()
 {
-    std::vector<std::string> lines;
-    for (const auto& c : s_request.calls) lines.push_back(route_text(c));
-    return new ApiActivity(s_request.caller, lines, [screen_lines = lines.size()](ApiActivity* screen) {
+    std::vector<ApiActivity::Row> rows;
+    for (const auto& c : s_request.calls) rows.push_back({ call_name(c), route_text(c) });
+    return new ApiActivity(s_request.caller, rows, [screen_lines = rows.size()](ApiActivity* screen) {
         // The same id again: its response again, nothing done twice.
         if (!s_problem && !s_request.id.empty()) {
             std::string text;
             const auto list = paths::read_file(handled_file(), text) ? parse_handled(text) : std::vector<Handled>{};
             if (const Handled* h = find_handled(list, s_request.id)) {
                 brls::Logger::info("api: {} was already handled at {}: its response again", s_request.id, h->at);
-                const int status = finish({}, &h->response);
-                for (size_t i = 0; i < screen_lines; i++) screen->set_line(i, "playguard/api/result/replayed"_i18n);
-                screen->done(status == 200, s_request.return_to);
+                finish({}, &h->response);
+                for (size_t i = 0; i < screen_lines; i++) screen->set_line(i, "playguard/api/result/replayed"_i18n, true);
+                screen->done(s_request.return_to, false);
                 return;
             }
         }
         if (s_problem) {
-            const int status = finish({ fail(s_problem) }, nullptr);
+            finish({ fail(s_problem) }, nullptr);
             screen->set_message(error_title(s_problem));
-            screen->done(status == 200, s_request.return_to);
+            screen->done(s_request.return_to, false);
             return;
         }
         auto run    = std::make_shared<Run>();
         run->screen = screen;
         step(run, 0);
     });
+}
+
+void note_calls()
+{
+    u64 now = 0;
+    LocalTime lt;
+    time_local_now(&now, &lt);
+    const std::string since = iso_utc(now > 7 * 86400 ? now - 7 * 86400 : 0);
+    std::vector<std::pair<std::string, int>> changes;   // "who: what", how many times, first seen first
+    std::map<std::string, int> refused;   // by caller
+    int refused_total = 0;
+    for (const auto& e : calls()) {
+        if (e.at < since) continue;
+        const std::string who = e.caller.empty() ? "playguard/api/unnamed"_i18n : e.caller;
+        const std::string key = route_key(e.route);
+        const std::string action = key.empty() ? e.route : brls::getStr("playguard/api/routes/" + key);
+        if (e.status == 200 && !e.dry_run && e.route.rfind("POST ", 0) == 0) {
+            const std::string line = brls::getStr("playguard/api/notice_line", who, action);
+            bool seen = false;
+            for (auto& c : changes)
+                if (c.first == line) seen = ++c.second > 0;
+            if (!seen) changes.push_back({ line, 1 });
+        }
+        if (e.code == "api_disabled" || e.code == "permission_denied") {
+            refused[who]++;
+            refused_total++;
+        }
+    }
+    std::vector<std::string> change_lines;
+    for (const auto& [line, n] : changes)
+        change_lines.push_back(n == 1 ? line : brls::getStr("playguard/api/notice_line_many", line, n));
+    if (changes.empty()) notices::clear("api_changes");
+    else
+        notices::set("api_changes", notices::Level::Info, "playguard/api/notice_changes"_i18n, text::join(change_lines, "\n"),
+                     "playguard/api/notice_open"_i18n, []() { open_settings(); });
+    if (refused_total < 3) {
+        notices::clear("api_refused");
+        return;
+    }
+    std::vector<std::string> lines;
+    for (const auto& [who, n] : refused) lines.push_back(brls::getStr("playguard/api/notice_refused_line", who, n));
+    notices::set("api_refused", notices::Level::Info, "playguard/api/notice_refused"_i18n, text::join(lines, "\n"),
+                 "playguard/api/allow"_i18n, []() { open_settings(); });
+}
+
+void open_settings()
+{
+    if (!pin_lock::confirm()) {
+        ui::notify(pin_lock::refusal_text(), ui::Toast::Refused);
+        return;
+    }
+    brls::Application::pushActivity(new ApiSettingsActivity());
 }
 
 Settings settings()

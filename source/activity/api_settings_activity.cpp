@@ -4,6 +4,9 @@
 #include <cstdio>
 
 #include "action/api_flow.hpp"
+#include "action/forwarder_flow.hpp"
+#include "action/history_flow.hpp"
+#include "app.hpp"
 #include "core/calendar.h"
 #include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
@@ -14,15 +17,43 @@ using namespace api_logic;
 
 namespace
 {
-// "2026-10-20T18:42:07Z" (calls.json) in the console's time.
-std::string when(const std::string& iso)
+// "2026-10-20T18:42:07Z" (calls.json) in the console's time,
+// "2026-10-20 20:42:07"; "" when it cannot be read.
+std::string local_time(const std::string& iso)
 {
     int y = 0;
     unsigned mo = 0, d = 0, h = 0, mi = 0, s = 0;
     if (iso.size() != 20 || std::sscanf(iso.c_str(), "%4d-%2u-%2uT%2u:%2u:%2uZ", &y, &mo, &d, &h, &mi, &s) != 6 ||
         y < 1970 || mo < 1 || mo > 12 || d < 1 || d > 31 || h > 23 || mi > 59 || s > 60)
-        return iso;
+        return "";
     return ui::time_text((uint64_t)calendar_days_from_civil(y, mo, d) * 86400 + h * 3600 + mi * 60 + s);
+}
+
+// A row as a card of its own, added to `box`.
+brls::DetailCell* card_cell(brls::Box* box, const std::string& title, const char* icon)
+{
+    auto* cell = new brls::DetailCell();
+    cell->setText(title);
+    cell->setDetailTextColor(ui::color_neutral());
+    cadran::List::row(cell, icon, true);
+    cell->setMarginBottom(8);
+    box->addView(cell);
+    return cell;
+}
+
+std::string who(const LogEntry& e)
+{
+    return e.caller.empty() ? "playguard/api/unnamed"_i18n : e.caller;
+}
+
+// A call's outcome in words: done, allowed (a test), or why not.
+std::string outcome(const LogEntry& e)
+{
+    if (e.status == 200) return e.dry_run ? "playguard/api/outcome/tested"_i18n : "playguard/api/outcome/done"_i18n;
+    if (e.status == 403) return "playguard/api/outcome/refused"_i18n;
+    if (e.status == 400 || e.status == 404 || e.status == 422) return "playguard/api/outcome/unknown"_i18n;
+    if (e.status == 424) return "playguard/api/outcome/skipped"_i18n;
+    return "playguard/api/outcome/failed"_i18n;
 }
 }   // namespace
 
@@ -35,23 +66,28 @@ void ApiSettingsActivity::onContentAvailable()
         this->refresh();
     });
     for (const auto& g : groups_in_build()) {
-        auto* cell = new brls::DetailCell();
-        cell->setText(api_flow::group_name(g));
-        cell->setDetailTextColor(ui::color_neutral());
-        cadran::List::row(cell, g == "clock" ? "globe" : nullptr, true);
-        cell->setMarginBottom(8);
+        auto* cell = card_cell(perms, api_flow::group_name(g), g == "clock" ? "globe" : nullptr);
         cell->registerClickAction([this, g](brls::View*) {
             this->choose(g);
             return true;
         });
-        perms->addView(cell);
         this->groups.push_back({ g, cell });
     }
-    cadran::List::row(all_off, "stop", true);
+    home    = card_cell(actions, "playguard/api/home_icon"_i18n, "home");
+    all_off = card_cell(actions, "playguard/api/all_off"_i18n, "stop");
+    docs    = card_cell(more, "playguard/api/docs"_i18n, "code");
+    home->setDetailText(ui::opens());
+    home->registerClickAction([this](brls::View*) {
+        this->add_clock_icon();
+        return true;
+    });
     all_off->registerClickAction([this](brls::View*) {
-        api_flow::turn_all_off();
-        ui::notify("playguard/api/all_off_done"_i18n, ui::Toast::Done);
-        this->refresh();
+        this->turn_off_or_back();
+        return true;
+    });
+    docs->setDetailText(ui::opens());
+    docs->registerClickAction([](brls::View*) {
+        ui::qr_dialog("playguard/api/docs_body"_i18n, std::string(app::repo_url()) + "/blob/main/docs/api.md");
         return true;
     });
     this->refresh();
@@ -60,17 +96,61 @@ void ApiSettingsActivity::onContentAvailable()
 void ApiSettingsActivity::choose(const std::string& group)
 {
     const auto levels = levels_for(group);
-    std::vector<std::string> labels;
+    std::vector<std::string> labels, details;
     int selected = 0;
     const Level now = api_flow::settings().level(group);
     for (size_t i = 0; i < levels.size(); i++) {
         labels.push_back(api_flow::level_text(levels[i]));
+        details.push_back(brls::getStr("playguard/api/level_details/" + group + "/" + level_name(levels[i])));
         if (levels[i] == now) selected = (int)i;
     }
     ui::pick(api_flow::group_name(group), labels, selected, [this, group, levels](int i) {
         config::get().api_permissions[group] = level_name(levels[(size_t)i]);
         ui::save_config();
+        this->before_off.clear();
         this->refresh();
+    }, true, details);
+}
+
+void ApiSettingsActivity::turn_off_or_back()
+{
+    if (!this->before_off.empty()) {
+        config::get().api_permissions = this->before_off;
+        this->before_off.clear();
+        ui::save_config();
+        ui::notify("playguard/api/all_back_done"_i18n, ui::Toast::Done);
+        this->refresh();
+        return;
+    }
+    ui::confirm_danger("playguard/api/all_off_confirm"_i18n, "playguard/api/all_off"_i18n, [this]() {
+        this->before_off = config::get().api_permissions;
+        if (this->before_off.empty()) this->before_off["clock"] = level_name(Level::None);
+        api_flow::turn_all_off();
+        ui::notify("playguard/api/all_off_done"_i18n, ui::Toast::Done);
+        this->refresh();
+    });
+}
+
+void ApiSettingsActivity::add_clock_icon()
+{
+    if (ui::refuse_read_only()) return;
+    auto create = [this]() {
+        forwarder_flow::create_request("playguard/api/home_icon_name"_i18n, "POST /v1/clock/sync",
+                                       [this](bool) { brls::sync([this]() { this->refresh(); }); });
+    };
+    const Settings s = api_flow::settings();
+    if (s.enabled && s.level("clock") == Level::ReadWrite) {
+        create();
+        return;
+    }
+    // The icon would only be refused: allowed in the same go, said first.
+    ui::confirm("playguard/api/home_icon_allow"_i18n, "playguard/api/home_icon_allow_yes"_i18n, [this, create]() {
+        config::get().api_enabled = true;
+        config::get().api_permissions["clock"] = level_name(Level::ReadWrite);
+        ui::save_config();
+        this->before_off.clear();
+        this->refresh();
+        brls::sync(create);
     });
 }
 
@@ -82,15 +162,46 @@ void ApiSettingsActivity::refresh()
         cell->setDetailText(api_flow::level_text(s.level(group)));
         ui::set_visible(cell, s.enabled);
     }
-    ui::set_visible(all_off.getView(), s.enabled);
+    ui::set_visible(home, forwarder_flow::loader_present());
+    all_off->setText(this->before_off.empty() ? "playguard/api/all_off"_i18n : "playguard/api/all_back"_i18n);
+    ui::set_visible(all_off, s.enabled);
+    this->refresh_calls();
+}
 
+void ApiSettingsActivity::refresh_calls()
+{
     calls->clearViews();
     const auto list = api_flow::calls();
-    if (list.empty()) calls->addView(ui::text_label("playguard/api/no_calls"_i18n, 20, ui::color_note()));
+    if (list.empty()) {
+        calls->addView(ui::text_label("playguard/api/no_calls"_i18n, 20, ui::color_note()));
+        return;
+    }
+    std::string day;
     for (auto it = list.rbegin(); it != list.rend(); ++it) {
-        const std::string who = it->caller.empty() ? "playguard/api/unnamed"_i18n : it->caller;
-        std::string line = brls::getStr("playguard/api/call_line", when(it->at), who, it->route, std::to_string(it->status));
-        if (it->dry_run) line += "playguard/api/call_dry_run"_i18n;
-        calls->addView(ui::text_label(line, 20, it->status == 200 ? ui::color_text() : ui::color_bad()));
+        const LogEntry e = *it;
+        const std::string when = local_time(e.at);
+        const std::string this_day = when.size() >= 10 ? when.substr(0, 10) : "";
+        if (this_day != day || it == list.rbegin()) {
+            day = this_day;
+            auto* header = new brls::Header();
+            header->setTitle(history_flow::day_title(day));
+            header->setMarginTop(8);
+            header->setMarginBottom(4);
+            cadran::List::section(header);
+            calls->addView(header);
+        }
+        const std::string key = route_key(e.route);
+        const std::string action = key.empty() ? e.route : brls::getStr("playguard/api/routes/" + key);
+        auto* cell = card_cell(calls, who(e) + " · " + action, e.status == 200 ? "check" : "alert");
+        cell->setDetailText((when.size() >= 16 ? when.substr(11, 5) + " · " : "") + outcome(e));
+        cell->setDetailTextColor(e.status == 200 ? ui::color_ok() : ui::color_bad());
+        cell->registerClickAction([e, when, action](brls::View*) {
+            std::string body = brls::getStr("playguard/api/call_details", who(e), action, e.route,
+                                            when.empty() ? e.at : when, std::to_string(e.status));
+            if (!e.code.empty()) body += "\n\n" + brls::getStr("playguard/api/errors/" + e.code);
+            if (e.dry_run) body += "\n\n" + "playguard/api/outcome/tested"_i18n;
+            ui::info(body);
+            return true;
+        });
     }
 }
