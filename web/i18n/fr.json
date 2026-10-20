@@ -114,6 +114,7 @@
   "games_ok": {"label": "Tous les jeux installés sont sains"},
   "check_ms": {"label": "Vérifier un jeu prend (ms)"},
   "latest": {"label": "Dernière version : firmware le plus récent pris en charge"},
+  "store": { "label": "Version du Homebrew App Store (avec sa fiche sur la carte SD)" },
   "sys_latest": {"label": "Derniers Atmosphère : hekate : firmware"},
   "sys_notes": {"label": "Notes de version (GitHub, switchbrew)", "options": {"": "Injoignables", "sample": "Réponses d’exemple", "offline": "Hors ligne"}},
   "dev_builds": {"label": "Builds de développement (API GitHub)", "options": {"": "Injoignable", "sample": "Réponses d’exemple", "offline": "Hors ligne"}},

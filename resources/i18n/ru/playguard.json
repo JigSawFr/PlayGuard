@@ -1096,6 +1096,8 @@
         "manual_body": "Чтобы обновить, откройте sphaira (PlayGuard уже есть в её меню GitHub) или Homebrew App Store либо скачайте playguard.nro с {} и скопируйте его в /switch/playguard/ на SD-карте.",
         "open_body": "PlayGuard закроется и откроет {}. Найдите там PlayGuard, чтобы обновить его.",
         "open_confirm": "Открыть {}",
+        "store_behind": "В {} пока PlayGuard {}: версия {} появляется там после проверки, обычно через несколько дней. PlayGuard может обновиться сам прямо сейчас. Настройки сохранятся.",
+        "store_behind_confirm": "Обновить в PlayGuard",
         "update_with": "Обновить через {}",
         "update_manual": "Как обновить",
         "appstore": "Homebrew App Store",

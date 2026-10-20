@@ -114,6 +114,7 @@
   "games_ok": {"label": "Every installed game fine"},
   "check_ms": {"label": "Checking one game takes (ms)"},
   "latest": {"label": "Latest release : newest firmware it supports"},
+  "store": { "label": "The Homebrew App Store's version (with its record on the SD card)" },
   "sys_latest": {"label": "Latest Atmosphère : hekate : firmware"},
   "sys_notes": {"label": "Release notes (GitHub, switchbrew)", "options": {"": "Unreachable", "sample": "Sample answers", "offline": "Offline"}},
   "dev_builds": {"label": "Development builds (GitHub API)", "options": {"": "Unreachable", "sample": "Sample answers", "offline": "Offline"}},

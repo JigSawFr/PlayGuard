@@ -114,6 +114,7 @@
   "games_ok": {"label": "Все установленные игры в порядке"},
   "check_ms": {"label": "Проверка одной игры занимает (мс)"},
   "latest": {"label": "Последняя версия : новейшая поддерживаемая прошивка"},
+  "store": { "label": "Версия в Homebrew App Store (с её записью на SD-карте)" },
   "sys_latest": {"label": "Последние Atmosphère : hekate : прошивка"},
   "sys_notes": {"label": "Примечания к выпуску (GitHub, switchbrew)", "options": {"": "Недоступны", "sample": "Примеры ответов", "offline": "Нет сети"}},
   "dev_builds": {"label": "Сборки для разработки (API GitHub)", "options": {"": "Недоступен", "sample": "Примеры ответов", "offline": "Нет сети"}},

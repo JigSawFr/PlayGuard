@@ -114,6 +114,7 @@
   "games_ok": {"label": "所有已安裝的遊戲都正常"},
   "check_ms": {"label": "檢查一個遊戲耗時（毫秒）"},
   "latest": {"label": "最新版本 : 支援的最新系統版本"},
+  "store": { "label": "Homebrew App Store 中的版本（SD 卡上有其紀錄）" },
   "sys_latest": {"label": "最新的 Atmosphère : hekate : 系統版本"},
   "sys_notes": {"label": "版本說明（GitHub、switchbrew）", "options": {"": "無法連線", "sample": "範例回應", "offline": "離線"}},
   "dev_builds": {"label": "開發版本（GitHub API）", "options": {"": "無法連線", "sample": "範例回應", "offline": "離線"}},

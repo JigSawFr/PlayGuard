@@ -114,6 +114,7 @@
   "games_ok": {"label": "Todos os jogos instalados estão bem"},
   "check_ms": {"label": "Verificar um jogo demora (ms)"},
   "latest": {"label": "Versão mais recente : firmware mais recente suportado"},
+  "store": { "label": "Versão da Homebrew App Store (com o seu registo no cartão SD)" },
   "sys_latest": {"label": "Últimos Atmosphère : hekate : firmware"},
   "sys_notes": {"label": "Notas da versão (GitHub, switchbrew)", "options": {"": "Inacessíveis", "sample": "Respostas de exemplo", "offline": "Sem ligação"}},
   "dev_builds": {"label": "Builds de desenvolvimento (API do GitHub)", "options": {"": "Inacessível", "sample": "Respostas de exemplo", "offline": "Sem ligação"}},

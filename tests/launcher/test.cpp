@@ -1,6 +1,7 @@
 // Host tests for source/util/launcher.cpp against a fake core/platform.h:
 // which store is found on the SD card for each preference, and what reaches
-// hbloader (an "sdmc:/" path, nothing when PlayGuard was not started by it).
+// hbloader (an "sdmc:/" path, nothing when PlayGuard was not started by it),
+// and the Homebrew App Store's record of PlayGuard.
 #include "check.h"
 #include "temp_dir.hpp"
 #include <cstdio>
@@ -76,6 +77,18 @@ int main()
     const int nro_calls = g_calls;
     CHECK(!launcher::launch_nro("") && !launcher::launch_nro("switch/playguard.nro") && g_calls == nro_calls);
 
+    // The App Store's record of PlayGuard (libget's): its manifest, not its info.json alone.
+    const std::string record = "/switch/appstore/.get/packages/PlayGuard/";
+    CHECK(!launcher::installed_by_store());
+    install(record + "info.json");
+    CHECK(!launcher::installed_by_store());
+    install(record + "manifest.install");
+    CHECK(launcher::installed_by_store());
+    // Another package's record is not PlayGuard's.
+    CHECK(std::system("rm -r playguard_data/sd/switch/appstore/.get/packages/PlayGuard") == 0);
+    install("/switch/appstore/.get/packages/PctlManager/manifest.install");
+    CHECK(!launcher::installed_by_store());
+
     CHECK(tmp.remove());
-    return CHECK_DONE("launcher store search and hbloader hand-off assertions passed");
+    return CHECK_DONE("launcher store search, App Store record and hbloader hand-off assertions passed");
 }

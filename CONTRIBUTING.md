@@ -63,6 +63,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_BACKGROUND=1` | PlayGuard out of focus |
 | `PLAYGUARD_SIM_REGION=2` | The console region |
 | `PLAYGUARD_SIM_LATEST=1.1.0:24.0.0` | The latest release and the newest firmware it supports, for the update check (`offline` for no network) |
+| `PLAYGUARD_SIM_STORE=1.1.0` | The version of PlayGuard the Homebrew App Store's catalogue has (`none`: not listed, `offline` for no network): with its record on the simulated SD card (`playguard_data/sd/switch/appstore/.get/packages/PlayGuard/manifest.install`), an update through a store first checks the catalogue has the new version |
 | `PLAYGUARD_SIM_SYS_LATEST=1.12.1:6.5.4:23.0.1` | The latest Atmosphère, hekate and firmware the daily update check finds (Atmosphère : hekate : firmware; `offline` for no network) |
 | `PLAYGUARD_SIM_SYS_NOTES=<folder>` | What GitHub and switchbrew return for the release notes in *Console*: `atmosphere.json` and `hekate.json` (GitHub's release lists), `System_Versions.wiki` and `<version>.wiki` (switchbrew's pages, as wikitext); `offline` for no network |
 | `PLAYGUARD_SIM_PASTE=https://gist.github.com/u/ab12` | What GitHub answers to *Send a report online* (`offline` for no network) |
