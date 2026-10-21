@@ -227,31 +227,36 @@ void ForwardersActivity::fixes()
     // What the card says is missing or open, each a press away; then the check.
     const hbmenu_lock::Summary s = hbmenu_lock::summary();
     const forwarders_logic::LockCheck& c = s.check;
+    using Tone = ui::Choice::Tone;
+    static const char* const STEP_ICONS[] = { "key", "chip", "home", "lock", "check" };   // SetupStep::Kind's order
     std::vector<ui::Choice> choices;
     const bool writable = !app::read_only();
     if (writable && !s.locked)
         for (const hbmenu_lock::SetupStep& step : hbmenu_lock::setup_steps(c))
             if (!step.done) {
                 const hbmenu_lock::SetupStep::Kind kind = step.kind;
-                choices.push_back({ step.label, [this, kind]() { hbmenu_lock::run_step(kind, this->then_rebuild()); } });
+                choices.push_back({ step.label, [this, kind]() { hbmenu_lock::run_step(kind, this->then_rebuild()); },
+                                    STEP_ICONS[kind], "", "", Tone::WARN });
             }
     for (const Row& r : this->list_rows) {
         if (!writable || r.state == State::NotInstalled || r.self) continue;
         const Row copy = r;
         if (r.state == State::Elsewhere)
             choices.push_back({ brls::getStr("playguard/forwarders/fix_delete", r.name),
-                                [this, copy]() { this->remove_with_undo(copy); } });
+                                [this, copy]() { this->remove_with_undo(copy); }, "trash", "", "", Tone::DANGER });
         else if (!r.pin && (forwarders_logic::is_menu(r.nro) || !s.locked))
             choices.push_back({ brls::getStr("playguard/forwarders/fix_protect", r.name),
-                                [this, copy]() { forwarder_flow::set_pin(copy, true, this->then_rebuild(copy.id)); } });
+                                [this, copy]() { forwarder_flow::set_pin(copy, true, this->then_rebuild(copy.id)); }, "key" });
     }
     // Made before they carried their rules: made again, in one go.
     if (writable && !forwarder_flow::to_remake().empty())
-        choices.push_back({ "playguard/forwarders/fix_remake"_i18n, [this]() { forwarder_flow::remake(this->then_rebuild()); } });
+        choices.push_back({ "playguard/forwarders/fix_remake"_i18n, [this]() { forwarder_flow::remake(this->then_rebuild()); },
+                            "refresh" });
     if (writable && !s.locked && c.ready())
-        choices.push_back({ "playguard/hbmenu/cell"_i18n, [this]() { hbmenu_lock::lock(this->then_rebuild()); } });
-    choices.push_back({ "playguard/hbmenu/check"_i18n, []() { hbmenu_lock::show_check(); } });
-    choices.push_back({ "playguard/hbmenu/rescue"_i18n, []() { hbmenu_lock::show_rescue(); } });
+        choices.push_back({ "playguard/hbmenu/cell"_i18n, [this]() { hbmenu_lock::lock(this->then_rebuild()); }, "lock", "", "",
+                            Tone::ON });
+    choices.push_back({ "playguard/hbmenu/check"_i18n, []() { hbmenu_lock::show_check(); }, "list" });
+    choices.push_back({ "playguard/hbmenu/rescue"_i18n, []() { hbmenu_lock::show_rescue(); }, "file" });
     ui::pick_actions("playguard/hbmenu/section"_i18n, choices);
 }
 
@@ -522,30 +527,43 @@ void ForwardersActivity::actions(const Row& row)
         this->details(r);
         return;
     }
+    using Tone = ui::Choice::Tone;
+    // By group: the forwarder itself, its protection, installing and deleting.
+    const std::string own = "playguard/forwarders/sheet_forwarder"_i18n;
+    const std::string guard = "playguard/forwarders/sheet_protection"_i18n;
+    const std::string files = "playguard/forwarders/sheet_install"_i18n;
     std::vector<ui::Choice> choices;
-    choices.push_back({ "playguard/forwarders/action_details"_i18n, [this, r]() { this->details(r); } });
+    choices.push_back({ "playguard/forwarders/action_details"_i18n, [this, r]() { this->details(r); }, "info", "", own });
+    const auto rebuild = [this, r]() { forwarder_flow::rebuild(r, "", "", this->then_rebuild(r.id)); };
     if (r.state == State::Ready || r.state == State::NroMissing || r.state == State::GateMissing) {
-        choices.push_back({ "playguard/forwarders/action_rename"_i18n, [this, r]() { this->rename(r); } });
-        choices.push_back({ "playguard/forwarders/action_author"_i18n, [this, r]() { this->change_author(r); } });
+        choices.push_back({ "playguard/forwarders/action_rename"_i18n, [this, r]() { this->rename(r); }, "pencil", "", own });
+        choices.push_back({ "playguard/forwarders/action_author"_i18n, [this, r]() { this->change_author(r); }, "user", "", own });
+        choices.push_back({ "playguard/forwarders/action_icon"_i18n, [this, r]() { this->pick_icon(r); }, "sparkle", "", own });
         if (!r.self)
             choices.push_back({ r.pin ? "playguard/forwarders/action_pin_off"_i18n : "playguard/forwarders/action_pin_on"_i18n,
-                                [this, r]() { forwarder_flow::set_pin(r, !r.pin, this->then_rebuild(r.id)); } });
-        if (!r.self && r.pin) {
-            choices.push_back({ "playguard/forwarders/action_hours"_i18n, [this, r]() { this->pick_hours(r, false); } });
-            choices.push_back({ "playguard/forwarders/action_closed"_i18n, [this, r]() { this->pick_hours(r, true); } });
-            choices.push_back({ r.limit ? "playguard/forwarders/action_limit_off"_i18n : "playguard/forwarders/action_limit_on"_i18n,
-                                [this, r]() { this->limit(r, !r.limit); } });
-        }
+                                [this, r]() { forwarder_flow::set_pin(r, !r.pin, this->then_rebuild(r.id)); },
+                                r.pin ? "unlock" : "key", "", guard });
         if (r.paused_until)
             choices.push_back({ "playguard/forwarders/action_lift"_i18n,
-                                [this, r]() { forwarder_flow::lift_pause(r, this->then_rebuild(r.id)); } });
-        choices.push_back({ "playguard/forwarders/action_icon"_i18n, [this, r]() { this->pick_icon(r); } });
-        choices.push_back({ "playguard/forwarders/action_rebuild"_i18n,
-                            [this, r]() { forwarder_flow::rebuild(r, "", "", this->then_rebuild(r.id)); } });
+                                [this, r]() { forwarder_flow::lift_pause(r, this->then_rebuild(r.id)); }, "pause",
+                                forwarder_flow::until_label(r.paused_until), guard, Tone::WARN });
+        if (!r.self && r.pin) {
+            // What is set now at each line's end.
+            const forwarder_flow::Hours free = { r.free_days, r.free_from, r.free_to, r.free2_days, r.free2_from, r.free2_to };
+            const std::string off = "playguard/common/off"_i18n;
+            choices.push_back({ "playguard/forwarders/action_hours"_i18n, [this, r]() { this->pick_hours(r, false); }, "unlock",
+                                r.free_days ? forwarder_flow::hours_label(free) : off, guard,
+                                r.free_days ? Tone::ON : Tone::PLAIN });
+            choices.push_back({ "playguard/forwarders/action_closed"_i18n, [this, r]() { this->pick_hours(r, true); }, "stop",
+                                r.closed_days ? forwarder_flow::hours_label(r.closed_days, r.closed_from, r.closed_to) : off,
+                                guard, r.closed_days ? Tone::ON : Tone::PLAIN });
+            choices.push_back({ r.limit ? "playguard/forwarders/action_limit_off"_i18n : "playguard/forwarders/action_limit_on"_i18n,
+                                [this, r]() { this->limit(r, !r.limit); }, "timer", "", guard });
+        }
+        choices.push_back({ "playguard/forwarders/action_rebuild"_i18n, rebuild, "refresh", "", files });
     }
     if (r.state == State::NotInstalled) {
-        choices.push_back({ "playguard/forwarders/action_rebuild"_i18n,
-                            [this, r]() { forwarder_flow::rebuild(r, "", "", this->then_rebuild(r.id)); } });
+        choices.push_back({ "playguard/forwarders/action_rebuild"_i18n, rebuild, "refresh", "", files });
         choices.push_back({ "playguard/forwarders/action_forget"_i18n,
                             [this, r]() {
                                 forwarders::Made m;
@@ -559,11 +577,13 @@ void ForwardersActivity::actions(const Row& row)
                                             this->offer_undo([this, m]() { forwarder_flow::put_back(m, false, this->then_rebuild(m.id)); });
                                     });
                                 });
-                            } });
+                            },
+                            "trash", "", files, Tone::DANGER });
     } else {
-        choices.push_back({ "playguard/common/delete"_i18n, [this, r]() { this->remove_with_undo(r); } });
+        choices.push_back({ "playguard/common/delete"_i18n, [this, r]() { this->remove_with_undo(r); }, "trash", "", files,
+                            Tone::DANGER });
     }
-    ui::pick_actions(r.name, choices);
+    ui::pick_actions(r.name, choices, state_text(r));
 }
 
 void ForwardersActivity::details(const Row& r)

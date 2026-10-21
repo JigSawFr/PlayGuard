@@ -547,15 +547,6 @@ void pick_marked(const std::string& title, const std::vector<std::string>& value
     brls::Application::pushActivity(new brls::Activity(list));
 }
 
-void pick_actions(const std::string& title, const std::vector<Choice>& choices)
-{
-    std::vector<std::string> labels;
-    for (const Choice& c : choices) labels.push_back(c.label);
-    pick(title, labels, 0, [choices](int i) {
-        if (i >= 0 && i < (int)choices.size()) choices[i].run();
-    }, false);
-}
-
 void prompt_minutes(const std::string& header, uint16_t current, std::function<void(uint16_t)> on_value)
 {
     // The stick, not the number pad.

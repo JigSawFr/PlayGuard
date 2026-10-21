@@ -209,14 +209,30 @@ void pick(const std::string& title, const std::vector<std::string>& values, int 
 // again with the row's mark changed and the focus on it (`focus`).
 void pick_marked(const std::string& title, const std::vector<std::string>& values, const std::vector<bool>& marks,
                  int focus, std::function<void(int)> on_pick, const std::vector<std::string>& details = {});
-// A list of things to do: each line's label, and what it runs once the
-// list has closed. The first line is selected; none, no list.
+// A list of things to do, as a sheet (ui/action_sheet.cpp): each line's
+// label, and what it runs once the sheet has closed; its icon (a Cadran
+// icon, nullptr: none), what is set now at its end (`detail`), its group
+// (a section starts where it changes, its name the kicker above it) and its
+// tone (ON: the detail in teal, WARN: amber, DANGER: a removal, in coral).
+// `subtitle`, under the title: what it is about now. The first line is
+// selected; none, no sheet.
 struct Choice
 {
+    enum class Tone { PLAIN, ON, WARN, DANGER };
+    Choice(std::string label, std::function<void()> run, const char* icon = nullptr, std::string detail = "",
+           std::string group = "", Tone tone = Tone::PLAIN)
+        : label(std::move(label)), run(std::move(run)), icon(icon), detail(std::move(detail)), group(std::move(group)),
+          tone(tone)
+    {
+    }
     std::string           label;
     std::function<void()> run;
+    const char*           icon;
+    std::string           detail;
+    std::string           group;
+    Tone                  tone;
 };
-void pick_actions(const std::string& title, const std::vector<Choice>& choices);
+void pick_actions(const std::string& title, const std::vector<Choice>& choices, const std::string& subtitle = "");
 
 // A duration set with the stick (cadran::prompt_minutes: 15 min a step, 5
 // with L and R, up to 24:00; "no limit" starts at 1 h), and the system
