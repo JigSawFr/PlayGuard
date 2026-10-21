@@ -9,6 +9,7 @@
 #include "activity/main_activity.hpp"
 #include "core/sim_env.h"
 #include "tab/cadran_list.hpp"
+#include "tab/tab_base.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/cadran_modal.hpp"
 #include "ui/cadran_palette.hpp"
@@ -402,6 +403,42 @@ const std::vector<std::pair<const char*, const char*>> SCREEN_ICONS = {
     { "wn_full", "list" }, { "wn_close", "check" },
 };
 
+// Where `frame` was opened from: the title of the screen under it, or the
+// main screen's tab; "" when it is not known.
+std::string crumb_of(brls::AppletFrame* frame)
+{
+    // A new screen takes the focus before it is on the stack: the one under
+    // it is then the top one.
+    const std::vector<brls::Activity*> stack = brls::Application::getActivitiesStack();
+    brls::View* below = nullptr;
+    for (size_t i = 0; i < stack.size(); i++)
+        if (stack[i]->getContentView() == frame) below = i > 0 ? stack[i - 1]->getContentView() : nullptr;
+    if (!below && !stack.empty() && stack.back()->getContentView() != frame) below = stack.back()->getContentView();
+    if (!below) return "";
+    if (below->getView("main_tabs")) {
+        const std::string tab = TabBase::main_screen();   // "tab/console"
+        return tab.rfind("tab/", 0) == 0 ? brls::getStr("playguard/tabs/" + tab.substr(4)) : "";
+    }
+    auto* title = dynamic_cast<brls::Label*>(below->getView("brls/applet_frame/title_label"));
+    return title ? title->getFullText() : "";
+}
+
+// Before a screen's title, small: where it was opened from ("Console ›").
+void add_crumb(brls::AppletFrame* frame)
+{
+    auto* title = dynamic_cast<brls::Label*>(frame->getView("brls/applet_frame/title_label"));
+    auto* row = title ? dynamic_cast<brls::Box*>(title->getParent()) : nullptr;
+    // Not on the child screen: it is the child's, not a step of the parent's.
+    const std::string crumb = row && !frame->getView("child_root") ? crumb_of(frame) : "";
+    // Nothing said twice (a game's screen is titled as its tab: Activity).
+    if (crumb.empty() || title->getFullText().empty() || crumb == title->getFullText()) return;
+    brls::Label* label = cadran::kit::label(crumb + "  ›", cadran::kit::TEXT_LEAD, "cadran/text3");
+    label->setSingleLine(true);
+    label->setMarginRight(10);
+    const auto& views = row->getChildren();
+    row->addView(label, std::find(views.begin(), views.end(), title) - views.begin());
+}
+
 // Every screen but the main one (MainActivity styles that one, rail and all):
 // the header after the boards, and its list in cards; a dialog as a card.
 // Once per screen: the mark it adds says it is done.
@@ -417,6 +454,7 @@ void skin_screen_of(brls::View* focus)
     if (!frame || frame->getView("main_tabs") || frame->getView("cadran_mark")) return;
     if (!frame->getView("brls/applet_frame/header")) return;
     cadran::style_header(frame, nullptr, "", false, false);
+    add_crumb(frame);
     if (!frame->getView("cadran_list")) cadran::List(frame, true).apply(SCREEN_ICONS);   // a Cadran screen dresses itself
 }
 }   // namespace

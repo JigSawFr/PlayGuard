@@ -57,7 +57,11 @@ brls::Box* card(bool focusable, bool grow);
 // A card at the top of a screen (not a list: no rows), larger, `grow`
 // shares a row.
 brls::Box* top_card(bool grow);
-// A kicker: an icon and a title in capitals.
+// A kicker's look, the one every section title and board's line above its
+// headline takes: TEXT_KICKER, the second ink, `text` in capitals (none:
+// the label's text kept, its look only).
+void set_kicker(brls::Label* label, const std::string& text = "");
+// A kicker with an icon before it, in a card: an icon and a title in capitals.
 brls::Box* kicker(const char* icon_name, const std::string& title);
 
 // A pill's mark: its colour, and a shape that says the same to whom the

@@ -3,6 +3,7 @@
 
 #include "action/sys_notes_flow.hpp"
 #include "ui/cadran_kit.hpp"
+#include "ui/cadran_modal.hpp"
 #include "ui/live_prefs.hpp"
 #include "ui/ui.hpp"
 #include "util/markdown.hpp"
@@ -103,6 +104,7 @@ void SysNotesActivity::onContentAvailable()
         sys_notes_flow::refresh(w, true);
         return true;
     });
+    cadran::style_button(online.getView());   // a pill, as every button of the boards
     online->registerClickAction([this](brls::View*) {
         this->show_page();
         return true;

@@ -700,6 +700,7 @@
         "headline_one": "1 item para verificar",
         "headline": "{} itens para verificar",
         "section_diag": "Diagnóstico",
+        "section_reports": "Relatórios",
         "section_system": "Sistema",
         "export": "Exportar relatório de diagnóstico",
         "export_note": "Salvo em {}. Anexe-o a um relato de bug. Ele nunca contém o PIN nem o número de série.",

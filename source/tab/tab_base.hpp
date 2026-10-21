@@ -28,6 +28,9 @@ class TabBase : public brls::Box
     static void refresh_shown();
     // The shown tab's screen ("tab/dashboard"), "" for none.
     static std::string shown_screen();
+    // The main screen's tab last shown ("tab/console"): not a tab's view on a
+    // screen of its own (the network clock, Help). A sub-screen's way back.
+    static std::string main_screen();
 
     // Entered from the sidebar for the first time: the first row marked with
     // something to do (mark), else the first row.
