@@ -77,11 +77,17 @@ std::string build_title(const dev_builds::Build& b)
 
 brls::Box* tag_view(const BuildTag& tag, float font_size)
 {
+    // A pill of the boards, tinted with its ink.
+    const float height = font_size + 10;
     auto* box = new brls::Box(brls::Axis::ROW);
-    box->setBackgroundColor(nvgTransRGBA(tag.color, 38));
-    box->setCornerRadius(5);
-    box->setPadding(2, 8, 2, 8);
-    box->setMarginRight(6);
+    box->setAlignItems(brls::AlignItems::CENTER);
+    box->setHeight(height);
+    box->setBackgroundColor(nvgTransRGBA(tag.color, 30));
+    box->setBorderColor(nvgTransRGBA(tag.color, 90));
+    box->setBorderThickness(1);
+    box->setCornerRadius(height / 2);
+    box->setPadding(0, 10, 0, 10);
+    box->setMarginRight(8);
     box->setShrink(0.0f);
     auto* l = new brls::Label();
     l->setSingleLine(true);

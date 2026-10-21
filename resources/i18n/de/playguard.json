@@ -595,7 +595,6 @@
         "section_status": "Status",
         "pin": "Geheimzahl",
         "restrictions": "Einschränkungen aktiv",
-        "temporary": "Vorübergehend aufgehoben",
         "section_actions": "Aktionen",
         "set_pin": "Geheimzahl festlegen oder ändern",
         "show_pin": "Geheimzahl anzeigen...",
@@ -694,6 +693,7 @@
     },
     "tools": {
         "section_diag": "Diagnose",
+        "section_system": "System",
         "export": "Diagnosebericht exportieren",
         "export_note": "Gespeichert in {}. Hängen Sie ihn an einen Fehlerbericht an. Er enthält nie die Geheimzahl oder die Seriennummer.",
         "section_start": "Erste Schritte",

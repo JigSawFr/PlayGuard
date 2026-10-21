@@ -309,6 +309,33 @@ Empty empty(const char* icon_name)
     return e;
 }
 
+brls::Box* empty_around(brls::Label* label, const char* icon_name)
+{
+    auto* parent = label ? dynamic_cast<brls::Box*>(label->getParent()) : nullptr;
+    if (!parent) return nullptr;
+    Empty e = empty(icon_name);
+    e.box->setId("cadran_empty_card");
+    const YGValue top = YGNodeStyleGetMargin(label->getYGNode(), YGEdgeTop);
+    e.box->setMargins(top.unit == YGUnitPoint && top.value > 10 ? top.value : 10, 0, 16, 0);
+    const auto& children = parent->getChildren();
+    const size_t at = (size_t)(std::find(children.begin(), children.end(), label) - children.begin());
+    // The label in the title's place, laid out as it.
+    parent->removeView(label, false);
+    e.box->removeView(e.title);
+    label->setFontSize(TEXT_LEAD);
+    label->setTextColor(color("cadran/text"));
+    label->setSingleLine(false);
+    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    label->setAlignSelf(brls::AlignSelf::STRETCH);
+    label->setMargins(16, 0, 0, 0);
+    e.box->addView(label, 1);
+    e.box->removeView(e.text);   // the screen's label says it all
+    parent->addView(e.box, at);
+    e.box->setVisibility(label->getVisibility());
+    label->setVisibility(brls::Visibility::VISIBLE);
+    return e.box;
+}
+
 void wrap(brls::View* row)
 {
     if (row) YGNodeStyleSetFlexWrap(row->getYGNode(), YGWrapWrap);

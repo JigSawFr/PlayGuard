@@ -1,5 +1,6 @@
-// LoadingBar — the loading screen's progress bar: a rounded navy track, filled
-// in the brand teal up to the start-up step reached. The fill eases to each
+// LoadingBar — a progress bar that eases: the loading screen's (a rounded navy
+// track, filled in the brand teal up to the start-up step reached), and a
+// screen's while its list loads, in the theme's colours. The fill eases to each
 // new value instead of jumping (the next step's frames show it moving), or,
 // for the intro, fills at a steady pace over a given time. Brand colours, not
 // the theme's (see LoadingMark).
@@ -19,6 +20,9 @@ class LoadingBar : public brls::View
     void fillOver(float value, brls::Time duration_us);
     // Empty again at once (a bar shown anew, not easing back down).
     void reset();
+    // In the brand's colours whatever the theme (the loading screen's); else
+    // the theme's well and teal (a screen's, while its list loads).
+    void setBrand(bool brand) { this->brand = brand; }
 
     void draw(NVGcontext* vg, float x, float y, float width, float height,
               brls::Style style, brls::FrameContext* ctx) override;
@@ -33,4 +37,5 @@ class LoadingBar : public brls::View
     brls::Time since = 0;           // ... starting then (µs) ...
     float duration = 0.0f;          // ... in that long (µs) ...
     bool  steady = false;           // ... at a steady pace, or easing out
+    bool  brand = false;
 };

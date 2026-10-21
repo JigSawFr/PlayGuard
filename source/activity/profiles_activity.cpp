@@ -14,7 +14,7 @@ using namespace brls::literals;
 
 void ProfilesActivity::onContentAvailable()
 {
-    empty->setSingleLine(false);
+    cadran::kit::empty_around(empty, "calendar");
     hint->setSingleLine(false);
     save_cell->registerClickAction([this](brls::View*) {
         this->save_current();

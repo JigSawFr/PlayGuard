@@ -149,8 +149,9 @@ void SecurityTab::refresh()
 
     ui::set_detail(restrictions, ui::bool_text(s.restriction_enabled_ok, s.restriction_enabled,
                                                "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
+    // Said as a state, not as "unlocked: no" under a check.
     ui::set_detail(temp, ui::bool_text(s.temp_unlocked_ok, s.temp_unlocked,
-                                       "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
+                                       "playguard/cadran/pill/unlocked"_i18n, "playguard/dashboard/pc_active"_i18n));
     temp->setDetailTextColor(s.temp_unlocked_ok && s.temp_unlocked ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     // Each tile's state at a glance: a check when it is as it should be, a
     // warning when it needs the parent; nothing when it could not be read.

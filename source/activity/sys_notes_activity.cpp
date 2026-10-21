@@ -69,7 +69,7 @@ void SysNotesActivity::onContentAvailable()
     loading_text->setSingleLine(false);
     advice->setSingleLine(false);
     language->setSingleLine(false);
-    empty->setSingleLine(false);
+    cadran::kit::empty_around(empty, "file");
     more->setSingleLine(false);
     checked->setSingleLine(false);
     // A button per tab, made once and reused (one of them may have the focus).

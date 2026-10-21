@@ -595,7 +595,6 @@
         "section_status": "Status",
         "pin": "PIN",
         "restrictions": "Restrictions enabled",
-        "temporary": "Temporarily unlocked",
         "section_actions": "Actions",
         "set_pin": "Set or change the PIN",
         "show_pin": "Show the PIN...",
@@ -694,6 +693,7 @@
     },
     "tools": {
         "section_diag": "Diagnostics",
+        "section_system": "System",
         "export": "Export a diagnostic report",
         "export_note": "Saved in {}. Attach it to a bug report. It never contains the PIN or the serial number.",
         "section_start": "Getting started",

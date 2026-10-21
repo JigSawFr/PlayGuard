@@ -595,7 +595,6 @@
         "section_status": "Status",
         "pin": "Pincode",
         "restrictions": "Beperkingen ingeschakeld",
-        "temporary": "Tijdelijk ontgrendeld",
         "section_actions": "Acties",
         "set_pin": "Pincode instellen of wijzigen",
         "show_pin": "Pincode tonen...",
@@ -694,6 +693,7 @@
     },
     "tools": {
         "section_diag": "Diagnose",
+        "section_system": "Systeem",
         "export": "Een diagnoserapport exporteren",
         "export_note": "Opgeslagen in {}. Voeg het toe aan een bugmelding. Het bevat nooit de pincode of het serienummer.",
         "section_start": "Aan de slag",

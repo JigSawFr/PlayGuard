@@ -401,6 +401,30 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
 
 namespace
 {
+// The icons of the lines of the screens dressed here, by id (the screens
+// with a list of their own pass theirs to cadran::List).
+const std::vector<std::pair<const char*, const char*>> SCREEN_ICONS = {
+    // First steps
+    { "ob_pin", "key" }, { "ob_limit", "timer" }, { "ob_clock", "globe" }, { "ob_unlink", "phone" },
+    { "ob_alarm", "bell" }, { "ob_protect", "lock" }, { "ob_at_start", "sparkle" }, { "ob_close", "check" },
+    { "ob_support", "heart" },
+    // An update
+    { "up_update", "download" }, { "up_method", "settings" }, { "up_later", "calendar" },
+    // A firmware not checked yet
+    { "fg_update", "download" }, { "fg_read_only", "eye" }, { "fg_probe", "tools" }, { "fg_risk", "alert" },
+    { "fg_remember", "save" }, { "fg_quit", "stop" },
+    // Recovery
+    { "rc_reset_pin", "key" }, { "rc_delete", "trash" }, { "rc_continue", "chevron-right" },
+    // The play timer's Advanced
+    { "pa_show", "eye" }, { "pa_alarm", "bell" }, { "pa_pause", "pause" }, { "pa_resume", "today" },
+    { "pa_diag", "code" },
+    // A game
+    { "ga_today", "today" }, { "ga_week", "calendar" }, { "ga_total", "history" }, { "ga_launches", "gamepad" },
+    { "ga_first", "flag" }, { "ga_last", "timer" }, { "ga_rating", "shield" },
+    // What's new
+    { "wn_full", "list" }, { "wn_close", "check" },
+};
+
 // Every screen but the main one (MainActivity styles that one, rail and all):
 // the header after the boards, and its list in cards; a dialog as a card.
 // Once per screen: the mark it adds says it is done.
@@ -416,7 +440,7 @@ void skin_screen_of(brls::View* focus)
     if (!frame || frame->getView("main_tabs") || frame->getView("cadran_mark")) return;
     if (!frame->getView("brls/applet_frame/header")) return;
     cadran::style_header(frame, nullptr, "", false, false);
-    if (!frame->getView("cadran_list")) cadran::List(frame, true).apply({});   // a Cadran screen dresses itself
+    if (!frame->getView("cadran_list")) cadran::List(frame, true).apply(SCREEN_ICONS);   // a Cadran screen dresses itself
 }
 }   // namespace
 

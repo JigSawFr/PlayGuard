@@ -31,7 +31,7 @@
             <brls:Box id="dbd_tags" width="auto" height="auto" axis="row" marginBottom="10"/>
             <brls:Label id="dbd_headline" text="" fontSize="26" marginBottom="16"/>
             <brls:Box id="dbd_facts" width="auto" height="auto" axis="column" alignItems="stretch"
-                cornerRadius="10" paddingTop="10" paddingBottom="10" paddingLeft="18" paddingRight="18"
+                paddingTop="6" paddingBottom="6" paddingLeft="24" paddingRight="24"
                 marginBottom="14"/>
             <brls:Label id="dbd_warning" text="" fontSize="18" marginBottom="18" textColor="@theme/cadran/text3"/>
             <brls:Box width="auto" height="auto" axis="row">

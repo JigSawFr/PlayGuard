@@ -595,7 +595,6 @@
         "section_status": "État",
         "pin": "Code PIN",
         "restrictions": "Restrictions activées",
-        "temporary": "Déverrouillé temporairement",
         "section_actions": "Actions",
         "set_pin": "Définir ou changer le code PIN",
         "show_pin": "Afficher le code PIN...",
@@ -694,6 +693,7 @@
     },
     "tools": {
         "section_diag": "Diagnostic",
+        "section_system": "Système",
         "export": "Exporter un rapport de diagnostic",
         "export_note": "Enregistré dans {}. Joignez-le à un signalement de bug. Il ne contient jamais le code PIN ni le numéro de série.",
         "section_start": "Pour commencer",

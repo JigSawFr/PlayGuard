@@ -6,6 +6,7 @@
 #include "action/dev_build_flow.hpp"
 #include "app.hpp"
 #include "ui/cadran_kit.hpp"
+#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/changelog.hpp"
 #include "util/markdown.hpp"
@@ -24,16 +25,16 @@ void DevBuildActivity::add_fact(const std::string& name, const std::string& valu
 {
     auto* row = new brls::Box(brls::Axis::ROW);
     row->setAlignItems(brls::AlignItems::FLEX_START);
-    row->setPadding(6, 0, 6, 0);
+    row->setPadding(10, 0, 10, 0);
     if (!facts->getChildren().empty()) {
         row->setLineTop(1);
-        row->setLineColor(nvgTransRGBA(cadran::kit::color("cadran/text3"), 60));
+        row->setLineColor(cadran::kit::color("cadran/line"));
     }
-    brls::Label* n = cadran::kit::label(name, 18, "cadran/text3");
+    brls::Label* n = cadran::kit::label(name, cadran::kit::TEXT_BODY, "cadran/text2");
     n->setWidth(230);
     n->setShrink(0.0f);
     row->addView(n);
-    brls::Label* v = cadran::kit::label(value, 18);
+    brls::Label* v = cadran::kit::label(value, cadran::kit::TEXT_BODY);
     v->setTextColor(color);
     v->setGrow(1.0f);
     v->setShrink(1.0f);
@@ -66,7 +67,13 @@ void DevBuildActivity::onContentAvailable()
     const dev_builds::Build& b = this->build;
     headline->setSingleLine(false);
     warning->setSingleLine(false);
-    facts->setBackgroundColor(nvgTransRGBA(cadran::kit::color("cadran/text"), 12));
+    // The facts as a card of the boards, the buttons as their pills.
+    facts->setBackgroundColor(cadran::kit::color("cadran/surf"));
+    facts->setBorderColor(cadran::kit::color("cadran/line"));
+    facts->setBorderThickness(1);
+    facts->setCornerRadius(cadran::kit::RADIUS_CARD);
+    cadran::style_button(install.getView(), cadran::Emphasis::PRIMARY);
+    cadran::style_button(github.getView());
 
     // Tags: its kind, then the list's (kind of change, scope, pull request,
     // checks, pre-release, installed or new).

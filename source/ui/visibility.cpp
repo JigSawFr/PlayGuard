@@ -52,6 +52,8 @@ void guard_switch(brls::BooleanCell* cell)
 void set_visible(brls::View* view, bool visible)
 {
     if (!view) return;
+    // An empty state's label (kit::empty_around): its whole card.
+    if (brls::View* card = view->getParent(); card && card->getId() == "cadran_empty_card") view = card;
     const bool had_focus = !visible && view->isFocused();
     view->setVisibility(visible ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
     if (!had_focus) return;

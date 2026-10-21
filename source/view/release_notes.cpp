@@ -2,6 +2,7 @@
 #include "view/release_notes.hpp"
 
 #include "app.hpp"
+#include "tab/cadran_list.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
@@ -24,49 +25,46 @@ brls::Image* icon(const std::string& hex, float size)
     return image;
 }
 
-// "🚀 Features": its icon and its title in the accent colour, over a rule.
+namespace kit = cadran::kit;
+
+// "🚀 Features": its icon and its title in the display face, a card of its
+// items to follow.
 brls::View* section(const changelog::Line& l, bool first)
 {
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setMarginTop(first ? 0 : 22);
-    box->setMarginBottom(8);
     auto* row = new brls::Box(brls::Axis::ROW);
     row->setAlignItems(brls::AlignItems::CENTER);
-    if (brls::Image* image = icon(l.icon, 28)) {
+    row->setMarginTop(first ? 0 : 26);
+    row->setMarginBottom(10);
+    if (brls::Image* image = icon(l.icon, 24)) {
         image->setMarginRight(10);
         row->addView(image);
     }
-    row->addView(cadran::kit::label(l.text, 23, "cadran/teal"));
-    box->addView(row);
-    auto* rule = new brls::Rectangle(nvgTransRGBA(cadran::kit::color("cadran/teal"), 90));
-    rule->setHeight(2);
-    rule->setMarginTop(6);
-    box->addView(rule);
-    return box;
+    row->addView(kit::display(l.text, 20));
+    return row;
 }
 
-// "activity" before an item of the full list: a small tinted tag.
+// "activity" before an item of the full list: a small pill, as the boards'.
 brls::View* tag(const std::string& text)
 {
     auto* box = new brls::Box(brls::Axis::ROW);
-    box->setBackgroundColor(nvgTransRGBA(cadran::kit::color("cadran/teal"), 34));
-    box->setCornerRadius(4);
-    box->setPadding(1, 7, 1, 7);
-    box->setMarginRight(8);
-    box->setMarginTop(3);
+    box->setAlignItems(brls::AlignItems::CENTER);
+    box->setBackgroundColor(kit::color("cadran/surf2"));
+    box->setBorderColor(kit::color("cadran/line"));
+    box->setBorderThickness(1);
+    box->setHeight(24);
+    box->setCornerRadius(12);
+    box->setPadding(0, 10, 0, 10);
+    box->setMarginRight(10);
     box->setShrink(0.0f);
-    auto* label = new brls::Label();
+    brls::Label* label = kit::label(text, kit::TEXT_META, "cadran/text2");
     label->setSingleLine(true);
-    label->setFontSize(18);
-    label->setTextColor(cadran::kit::color("cadran/teal"));
-    label->setText(text);
     box->addView(label);
     return box;
 }
 
-// One highlight: a tinted card, its icon on the left (an accent bar when it
-// has none), its title in the accent colour over its text; in half the row
-// (`left`: the first half), the gap between the two split over both.
+// One highlight: a card of the boards, its icon on the left (a teal bar
+// when it has none), its title over its text; in half the row (`left`: the
+// first half), the gap between the two split over both.
 brls::Box* card(const changelog::Line& l, bool left)
 {
     auto* half = new brls::Box(brls::Axis::ROW);
@@ -74,18 +72,16 @@ brls::Box* card(const changelog::Line& l, bool left)
     half->setAlignItems(brls::AlignItems::STRETCH);
     if (left) half->setPaddingRight(6);
     else half->setPaddingLeft(6);
-    auto* box = new brls::Box(brls::Axis::ROW);
-    box->setGrow(1.0f);
-    box->setBackgroundColor(nvgTransRGBA(cadran::kit::color("cadran/teal"), 22));
-    box->setCornerRadius(10);
+    brls::Box* box = kit::card(false, true);
+    box->setAxis(brls::Axis::ROW);
     box->setAlignItems(brls::AlignItems::FLEX_START);
-    box->setPadding(14, 16, 14, 14);
+    box->setPadding(16, 20, 16, 18);
     if (brls::Image* image = icon(l.icon, 36)) {
         image->setMarginRight(14);
         box->addView(image);
     } else {
         box->setAlignItems(brls::AlignItems::STRETCH);
-        auto* bar = new brls::Rectangle(cadran::kit::color("cadran/teal"));
+        auto* bar = new brls::Rectangle(kit::color("cadran/teal"));
         bar->setWidth(4);
         bar->setCornerRadius(2);
         bar->setMarginRight(14);
@@ -95,12 +91,12 @@ brls::Box* card(const changelog::Line& l, bool left)
     body->setGrow(1.0f);
     body->setShrink(1.0f);
     if (l.title.empty()) {
-        body->addView(cadran::kit::label(l.text, 21, "cadran/teal"));   // no lead-in: the line is the title
+        body->addView(kit::label(l.text, kit::TEXT_LEAD, "cadran/text"));   // no lead-in: the line is the title
     } else {
-        brls::Label* title = cadran::kit::label(l.title, 21, "cadran/teal");
+        brls::Label* title = kit::display(l.title, kit::TEXT_LEAD);
         title->setMarginBottom(4);
         body->addView(title);
-        body->addView(cadran::kit::label(text::capitalise_ascii(l.text), 18, "cadran/text"));
+        body->addView(kit::label(text::capitalise_ascii(l.text), kit::TEXT_BODY, "cadran/text2"));
     }
     box->addView(body);
     half->addView(box);
@@ -132,37 +128,44 @@ std::vector<changelog::Line> bundled()
 void fill(brls::Box* box, const std::vector<changelog::Line>& lines)
 {
     bool first = true;
+    brls::Box* items = nullptr;   // the card the next items join, as a list's rows
     for (const changelog::Line& l : lines) {
         brls::View* view = nullptr;
         switch (l.kind) {
             case changelog::Line::Release:   // not under one version's heading
             case changelog::Line::Section:
                 view = section(l, first);
+                items = nullptr;
                 break;
             case changelog::Line::Item: {
                 auto* row = new brls::Box(brls::Axis::ROW);
                 row->setAlignItems(brls::AlignItems::FLEX_START);   // bullet and tag on the first line
-                row->setMarginLeft(8 + 24 * l.depth);
-                row->setMarginTop(6);
+                row->setPadding(12, 22, 12, 20 + 24 * l.depth);
                 brls::View* bullet = icon(l.icon, 20);
                 if (!bullet) {
-                    bullet = cadran::kit::label("•", 20, "cadran/teal");
+                    bullet = kit::label(l.depth ? "–" : "•", 19, "cadran/teal");
                     bullet->setWidth(20);
                 }
-                bullet->setMarginRight(8);
+                bullet->setMarginRight(10);
                 bullet->setShrink(0.0f);
                 row->addView(bullet);
                 if (!l.title.empty()) row->addView(tag(l.title));
-                brls::Label* text = cadran::kit::label(text::capitalise_ascii(l.text), 20, "cadran/text");
+                brls::Label* text = kit::label(text::capitalise_ascii(l.text), 18, "cadran/text");
                 text->setGrow(1.0f);
                 text->setShrink(1.0f);
                 row->addView(text);
-                view = row;
-                break;
+                if (!items) {
+                    items = new cadran::Card();
+                    box->addView(items);
+                }
+                items->addView(row);
+                first = false;
+                continue;
             }
             case changelog::Line::Text:
-                view = cadran::kit::label(l.text, 20, "cadran/text3");
-                view->setMarginTop(6);
+                view = kit::label(l.text, kit::TEXT_NOTE, "cadran/text3");
+                view->setMarginTop(8);
+                items = nullptr;
                 break;
         }
         box->addView(view);
@@ -192,7 +195,7 @@ void fill_highlights(brls::Box* box, const std::vector<changelog::Line>& lines)
         if (l.kind == changelog::Line::Item) continue;   // a nested item: not on a card
         brls::View* view = nullptr;
         if (l.kind == changelog::Line::Text) {
-            view = after_items ? cadran::kit::label(l.text, 18, "cadran/text3") : cadran::kit::label(l.text, 21, "cadran/text");
+            view = after_items ? kit::label(l.text, kit::TEXT_NOTE, "cadran/text3") : kit::label(l.text, kit::TEXT_LEAD, "cadran/text2");
             view->setMarginTop(after_items ? 16 : 2);
         } else {
             view = section(l, box->getChildren().empty());
