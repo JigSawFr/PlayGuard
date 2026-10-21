@@ -7,7 +7,7 @@
 //   somewhere else than a release tag, or to a tag that is not a version,
 //   leaves it empty too.
 // - sys_updates_sim (the desktop build): PLAYGUARD_SIM_SYS_LATEST
-//   ("1.12.0:6.5.4:23.0.1") in place of the network, nothing without it or
+//   ("1.12.0:6.5.4:23.0.1", sys-patch's after a fourth colon) in place of the network, nothing without it or
 //   with "offline", a malformed value refused.
 #include "check.h"
 #include <cstdlib>
@@ -42,6 +42,7 @@ bool redirect(const std::string& url, std::string* target, std::string* error, c
 static const std::string ATMOSPHERE = "https://github.com/Atmosphere-NX/Atmosphere/releases/latest";
 static const std::string HEKATE     = "https://github.com/CTCaer/hekate/releases/latest";
 static const std::string FIRMWARE   = "https://github.com/THZoria/NX_Firmware/releases/latest";
+static const std::string SYSPATCH   = "https://github.com/impeeza/sys-patch/releases/latest";
 
 static void test_fetch()
 {
@@ -49,13 +50,14 @@ static void test_fetch()
         { ATMOSPHERE, "https://github.com/Atmosphere-NX/Atmosphere/releases/tag/1.12.0" },
         { HEKATE, "https://github.com/CTCaer/hekate/releases/tag/v6.5.4" },
         { FIRMWARE, "https://github.com/THZoria/NX_Firmware/releases/tag/23.0.1?x=1" },
+        { SYSPATCH, "https://github.com/impeeza/sys-patch/releases/tag/v1.6.3.0" },
     };
     s_asked.clear();
     std::string error;
     sys_updates::Latest l = sys_updates::fetch(&error);
-    CHECK(l.atmosphere == "1.12.0" && l.hekate == "6.5.4" && l.firmware == "23.0.1");
+    CHECK(l.atmosphere == "1.12.0" && l.hekate == "6.5.4" && l.firmware == "23.0.1" && l.syspatch == "1.6.3.0");
     CHECK(error.empty());
-    CHECK(s_asked == std::vector<std::string>({ ATMOSPHERE, HEKATE, FIRMWARE }));
+    CHECK(s_asked == std::vector<std::string>({ ATMOSPHERE, HEKATE, FIRMWARE, SYSPATCH }));
     CHECK(sys_updates::fetch(nullptr).hekate == "6.5.4");   // no error wanted
 
     // hekate's page does not redirect: its version only is missing, and the
@@ -64,15 +66,15 @@ static void test_fetch()
     s_asked.clear();
     error.clear();
     l = sys_updates::fetch(&error);
-    CHECK(l.atmosphere == "1.12.0" && l.hekate.empty() && l.firmware == "23.0.1");
+    CHECK(l.atmosphere == "1.12.0" && l.hekate.empty() && l.firmware == "23.0.1" && l.syspatch == "1.6.3.0");
     CHECK(error == "CTCaer/hekate: no redirect");
-    CHECK(s_asked.size() == 3);
+    CHECK(s_asked.size() == 4);
 
     // Every page failing: the first failure is the one kept.
     s_redirects.clear();
     error.clear();
     l = sys_updates::fetch(&error);
-    CHECK(l.atmosphere.empty() && l.hekate.empty() && l.firmware.empty());
+    CHECK(l.atmosphere.empty() && l.hekate.empty() && l.firmware.empty() && l.syspatch.empty());
     CHECK(error == "Atmosphere-NX/Atmosphere: no redirect");
     // An error already there is not replaced.
     error = "earlier";
@@ -85,10 +87,11 @@ static void test_fetch()
         { ATMOSPHERE, "https://github.com/login?return_to=/releases" },
         { HEKATE, "https://github.com/CTCaer/hekate/releases" },
         { FIRMWARE, "https://github.com/THZoria/NX_Firmware/releases/tag/nightly" },
+        { SYSPATCH, "https://github.com/impeeza/sys-patch/releases/tag/v1.6.3.0.1" },
     };
     error.clear();
     l = sys_updates::fetch(&error);
-    CHECK(l.atmosphere.empty() && l.hekate.empty() && l.firmware.empty());
+    CHECK(l.atmosphere.empty() && l.hekate.empty() && l.firmware.empty() && l.syspatch.empty());
     CHECK(error.empty());
     s_redirects = { { ATMOSPHERE, "https://github.com/Atmosphere-NX/Atmosphere/releases/tag/1.12.0-prerelease" },
                     { HEKATE, "https://github.com/CTCaer/hekate/releases/tag/v6.5.4/" },
@@ -109,8 +112,11 @@ static void test_fetch()
 {
     std::string error;
     sys_updates::Latest l = fetch_sim("1.12.0:v6.5.4:23.0.1", &error);
-    CHECK(l.atmosphere == "1.12.0" && l.hekate == "6.5.4" && l.firmware == "23.0.1");
+    CHECK(l.atmosphere == "1.12.0" && l.hekate == "6.5.4" && l.firmware == "23.0.1" && l.syspatch.empty());
     CHECK(error.empty());
+    // sys-patch's after a fourth colon.
+    l = fetch_sim("1.12.0:6.5.4:23.0.1:v1.6.3.0", &error);
+    CHECK(l.firmware == "23.0.1" && l.syspatch == "1.6.3.0");
 
     // Nothing set, or "offline": no connection, and the network never asked.
     for (const char* none : { (const char*)nullptr, "offline" }) {
@@ -126,7 +132,7 @@ static void test_fetch()
     }
     // Three parts, each read as a release tag: a bad one left empty.
     l = fetch_sim("junk::23.0.1:extra", &error);
-    CHECK(l.atmosphere.empty() && l.hekate.empty() && l.firmware.empty());   // "23.0.1:extra" is no version
+    CHECK(l.atmosphere.empty() && l.hekate.empty() && l.firmware == "23.0.1" && l.syspatch.empty());
     CHECK(error.empty());
     l = fetch_sim("1.12.0::23.0.1", &error);
     CHECK(l.atmosphere == "1.12.0" && l.hekate.empty() && l.firmware == "23.0.1");

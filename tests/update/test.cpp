@@ -27,6 +27,10 @@ static void test_versions()
     CHECK(update::compare_versions("2.0.0", "10.0.0") < 0);
     CHECK(update::compare_versions("v1.2.0", "1.2.0") == 0);
     CHECK(update::compare_versions("1.0.0-dev", "1.0.0") < 0);
+    CHECK(update::compare_versions("1.6.2.3", "1.6.2.1") > 0);   // sys-patch's fourth number
+    CHECK(update::compare_versions("1.6.2.0", "1.6.2") == 0);
+    CHECK(update::compare_versions("1.6.3", "1.6.2.3") > 0);
+    CHECK(update::compare_versions("1.6.2.", "1.6.2") < 0);    // not a version
     CHECK(update::compare_versions("1.0.0", "0.0.0-dev") > 0);
     CHECK(update::compare_versions("garbage", "0.0.1") < 0);
     CHECK(update::compare_versions("0.0.1", "garbage") > 0);

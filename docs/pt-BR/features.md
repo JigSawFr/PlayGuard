@@ -35,14 +35,14 @@ As capturas de tela mostram o tema escuro, o padrão do PlayGuard (em inglês).
 O app é organizado em abas, como as Configurações do console; cada uma tem sua seção abaixo.
 
 - **O que falhou é dito em uma caixa de diálogo, o que deu certo em uma mensagem rápida.** Uma caixa de diálogo só diz o que vale para este console agora: que o jogo em andamento seria suspenso, só quando há um jogo aberto; que o app do celular poderia substituir uma mudança, só enquanto ele estiver vinculado e puder sincronizar.
-- **O cabeçalho** indica, em todas as abas, quando o controle parental está desbloqueado temporariamente (a etiqueta dele), e mostra um lápis riscado à direita do título quando o app está somente leitura; um toque em qualquer um deles leva aonde isso é desfeito (*PIN › Reativar o controle dos pais*, a tela de firmware).
+- **O cabeçalho** indica, em todas as abas, quando o controle parental está desbloqueado temporariamente (a etiqueta dele), e mostra um lápis riscado à direita do título quando o app está somente leitura; um toque em qualquer um deles leva aonde isso é desfeito (*Hoje › Reativar*, a tela de firmware).
 - **No modo somente leitura**, as ações continuam no lugar, em cinza, e dizem por quê quando pressionadas.
 
 ## O visual: Cadran
 
 O visual do PlayGuard se chama Cadran: uma barra de ícones para as abas, uma paleta azul-marinho ou branco frio (conforme o tema), cartões em vez de listas. Cada aba abre no que mais importa (um anel, blocos, cartões, botões), com as outras configurações embaixo.
 
-- **A etiqueta do cabeçalho** diz do que trata a aba (*Controle dos pais ativo*, *Temporizador ativo*…); enquanto o controle parental estiver desbloqueado, ela avisa isso em todas as abas, e um toque nela abre *PIN › Reativar o controle dos pais*. O texto secundário nunca fica abaixo de 15 px, para ser lido do sofá em uma TV.
+- **A etiqueta do cabeçalho** diz do que trata a aba (*Controle dos pais ativo*, *Temporizador ativo*…); enquanto o controle parental estiver desbloqueado, ela avisa isso em todas as abas, e um toque nela abre *Hoje › Reativar*. O texto secundário nunca fica abaixo de 15 px, para ser lido do sofá em uma TV.
 - **As caixas de diálogo** são cartões com botões em forma de pílula, a confirmação em verde-azulado (em coral quando ela remove ou interrompe algo).
   - As escolhas abrem em um cartão acima das indicações dos botões, a atual sobre um verde-azulado suave com a marca de seleção. O contorno verde-azulado é só do foco, em todo lugar: um nível, uma conta, uma escolha em vigor mantém o fundo suave.
   - Uma caixa de diálogo longa vai esmaecendo na parte de baixo enquanto há mais conteúdo, e o aviso dela (um jogo prestes a ser suspenso) vem primeiro, em um cartão âmbar.
@@ -106,7 +106,7 @@ As para informação: uma volta para a compilação anterior, um firmware não t
 
 - Cada seção lista suas entradas em uma ordem fixa, seja qual for a verificação que terminou primeiro.
 - **Na barra lateral**, um selo âmbar ao lado do nome de uma aba conta as entradas a fazer dela, onde elas são resolvidas: a aba PIN (sem PIN, um PIN fraco, o PlayGuard sem o PIN, desbloqueado temporariamente), Tempo de jogo (o alarme desativado, o console sem contar), *Hoje* (mudanças feitas fora do PlayGuard, tempo extra a desfazer), o Console (as entradas acima, e o relógio de rede). As entradas ignoradas e as para informação não são contadas.
-- Na aba, o mesmo selo fica na linha onde cada uma é resolvida (*Relógio de rede*, *Verificar os jogos instalados*, *Armazenamento*, *Patches de jogos*; *Definir ou alterar o PIN*, *Proteger o PlayGuard com o PIN*, *Reativar o controle dos pais*; *Avançado* do Tempo de jogo para o alarme), e a aba abre na primeira delas.
+- Na aba, o mesmo selo fica na linha onde cada uma é resolvida (*Relógio de rede*, *Verificar os jogos instalados*, *Armazenamento*, *Patches de jogos*; *Definir ou alterar o PIN*, *Proteger o PlayGuard com o PIN*; *Avançado* do Tempo de jogo para o alarme), e a aba abre na primeira delas.
 - **Ⓐ** em uma entrada aplica a solução (*Ativar*, *Acertar*, *Atualizar*…) ou abre a aba onde ela é feita. Uma entrada some sozinha quando o que ela diz é resolvido.
 - **Ⓧ** marca uma entrada para informação como lida; **Ⓨ** marca todas. Uma entrada marcada como lida continua lida na próxima abertura, até o texto dela mudar.
 - **Ignorar:** algumas entradas a fazer podem ser ignoradas com Ⓧ, depois de uma confirmação e do PIN: um PIN que qualquer pessoa tentaria primeiro, o PlayGuard abrindo sem o PIN, o alarme "Tempo esgotado" desativado, o cartão SD quase cheio (nunca a falta de PIN, o controle desbloqueado, o relógio, o temporizador sem contar ou os arquivos do próprio PlayGuard). Uma entrada ignorada deixa de ser contada e aparece por último em *Ignorados*, onde Ⓐ volta a contá-la. Ela volta sozinha 30 dias depois (a menos que *Contar de novo os avisos ignorados após 30 dias* esteja desativado), quando o que ela diz é resolvido e depois acontece de novo, ou, para o PIN, com um novo PIN de outro tamanho.
@@ -300,7 +300,7 @@ Tempo por jogo **hoje**, nos **últimos 7 dias** e **desde sempre**, do próprio
 - **No topo**, três blocos: o PIN, as restrições e o desbloqueio temporário, cada um com uma marca de seleção verde-azulada quando está como deveria (um PIN definido, restrições ativas, bloqueado) ou um sinal de alerta âmbar quando é preciso agir.
 - **Definir ou alterar o PIN** (tela de PIN do sistema).
 - **Mostrar o PIN**: depois de um aviso e do próprio PIN, pedido toda vez; registrado no histórico, e depois é oferecido um novo PIN.
-- **Desbloquear temporariamente**, **reativar o controle dos pais**, e se o PlayGuard o reativa sozinho logo depois de uma mudança que precisou do desbloqueio (ativado por padrão).
+- **Desbloquear temporariamente**, e se o PlayGuard o reativa sozinho logo depois de uma mudança que precisou do desbloqueio (ativado por padrão).
 
 ### Proteger o PlayGuard com o PIN
 

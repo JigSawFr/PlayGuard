@@ -46,7 +46,7 @@
   {"name": "check_ms", "live": true, "group": "games", "type": "number", "min": 0},
   {"name": "latest", "live": true, "group": "updates", "type": "text", "placeholder": "1.1.0:24.0.0", "suggestions": ["offline"]},
   { "name": "store", "live": true, "group": "updates", "type": "text", "placeholder": "1.1.0", "suggestions": ["none", "offline"] },
-  {"name": "sys_latest", "live": true, "group": "updates", "type": "text", "placeholder": "1.12.1:6.5.4:23.0.1", "suggestions": ["offline"]},
+  {"name": "sys_latest", "live": true, "group": "updates", "type": "text", "placeholder": "1.12.1:6.5.4:23.0.1:1.6.3.0", "suggestions": ["offline"]},
   {"name": "sys_notes", "live": true, "group": "updates", "type": "select", "options": ["", "sample", "offline"], "values": {"sample": "/app/samples/sys_notes"}},
   {"name": "dev_builds", "live": true, "group": "updates", "type": "select", "options": ["", "sample", "offline"], "values": {"sample": "/app/samples/dev_builds"}},
   {"name": "dev_builds_delay", "live": true, "group": "updates", "type": "number", "min": 0},
@@ -80,7 +80,7 @@
   {"id": "wrong_clock", "params": {"autosync_off": "1", "network_offset": "1411"}},
   {"id": "first_emummc", "params": {"not_set_up": "1", "emummc": "1"}},
   {"id": "fw_old", "params": {"fw": "20.5.0"}},
-  {"id": "updates", "params": {"fw": "22.5.0", "latest": "1.1.0:24.0.0", "sys_latest": "1.12.1:6.5.4:23.0.1", "sys_notes": "sample", "dev_builds": "sample", "github_login": "ok", "hbloader": "1"}},
+  {"id": "updates", "params": {"fw": "22.5.0", "latest": "1.1.0:24.0.0", "sys_latest": "1.12.1:6.5.4:23.0.1:1.6.3.0", "sys_notes": "sample", "dev_builds": "sample", "github_login": "ok", "hbloader": "1"}},
   {"id": "homebrew", "params": {"forwarders": "1", "tab": "console"}},
   {"id": "family", "params": {"accounts": "5"}},
   {"id": "no_account", "params": {"accounts": "0"}}

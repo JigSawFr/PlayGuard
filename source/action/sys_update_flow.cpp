@@ -10,6 +10,7 @@
 #include "action/sys_notes_flow.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/patches.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/sys_updates.hpp"
@@ -76,7 +77,9 @@ void check()
             if (!found.atmosphere.empty()) kept.atmosphere = found.atmosphere;
             if (!found.hekate.empty()) kept.hekate = found.hekate;
             if (!found.firmware.empty()) kept.firmware = found.firmware;
-            const bool any = !found.atmosphere.empty() || !found.hekate.empty() || !found.firmware.empty();
+            if (!found.syspatch.empty()) kept.syspatch = found.syspatch;
+            const bool any = !found.atmosphere.empty() || !found.hekate.empty() || !found.firmware.empty() ||
+                             !found.syspatch.empty();
             if (any) {
                 cfg.sys_latest  = sys_updates::to_text(kept);
                 cfg.sys_checked = ui::today_date();
@@ -107,11 +110,20 @@ std::string installed_hekate()
     return version;
 }
 
+std::string installed_syspatch()
+{
+    const patches::Report& r = ui::patch_report();
+    return r.syspatch_installed ? sys_updates::syspatch_version(r.log_version) : "";
+}
+
 std::string with_latest(const char* which, const std::string& running, bool* newer)
 {
     const sys_updates::Latest l = sys_updates::from_text(config::get().sys_latest);
     const std::string w = which;
-    const std::string& latest = w == "atmosphere" ? l.atmosphere : w == "hekate" ? l.hekate : l.firmware;
+    const std::string& latest = w == "atmosphere" ? l.atmosphere
+                                : w == "hekate"   ? l.hekate
+                                : w == "syspatch" ? l.syspatch
+                                                  : l.firmware;
     *newer = !latest.empty() && !running.empty() && update::compare_versions(latest, running) > 0;
     return *newer ? brls::getStr("playguard/tools/available", running, latest) : running;
 }

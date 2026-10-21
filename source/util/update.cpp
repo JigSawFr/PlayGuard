@@ -9,7 +9,9 @@
 namespace update
 {
 
-static bool parse_triplet(const std::string& text, int out[3], bool* suffixed)
+// `fourth`: a fourth number allowed ("1.6.3.0", sys-patch's), 0 when absent;
+// without it, a fourth number is refused.
+static bool parse_triplet(const std::string& text, int out[3], bool* suffixed, int* fourth = nullptr)
 {
     size_t i = (!text.empty() && (text[0] == 'v' || text[0] == 'V')) ? 1 : 0;
     for (int part = 0; part < 3; part++) {
@@ -26,7 +28,18 @@ static bool parse_triplet(const std::string& text, int out[3], bool* suffixed)
         }
         out[part] = (int)v;
     }
-    // Anything after the third number must be a suffix ("-dev", "+abc").
+    if (fourth) {
+        *fourth = 0;
+        if (i + 1 < text.size() && text[i] == '.' && text[i + 1] >= '0' && text[i + 1] <= '9') {
+            long v = 0;
+            for (i++; i < text.size() && text[i] >= '0' && text[i] <= '9'; i++) {
+                v = v * 10 + (text[i] - '0');
+                if (v > 0xFFFF) return false;
+            }
+            *fourth = (int)v;
+        }
+    }
+    // Anything after the numbers must be a suffix ("-dev", "+abc").
     if (i < text.size() && text[i] != '-' && text[i] != '+') return false;
     if (suffixed) *suffixed = i < text.size();
     return true;
@@ -39,12 +52,12 @@ bool parse_version(const std::string& text, int out[3])
 
 int compare_versions(const std::string& a, const std::string& b)
 {
-    int va[3], vb[3];
+    int va[4], vb[4];
     bool sa = false, sb = false;
-    const bool oka = parse_triplet(a, va, &sa);
-    const bool okb = parse_triplet(b, vb, &sb);
+    const bool oka = parse_triplet(a, va, &sa, &va[3]);
+    const bool okb = parse_triplet(b, vb, &sb, &vb[3]);
     if (!oka || !okb) return (int)oka - (int)okb;
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
         if (va[i] != vb[i]) return va[i] < vb[i] ? -1 : 1;
     return (int)sb - (int)sa;   // "1.0.0-dev" < "1.0.0"
 }

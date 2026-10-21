@@ -18,7 +18,8 @@ static void test_version_of_tag()
     CHECK(version_of_tag("").empty());
     CHECK(version_of_tag("v").empty());
     CHECK(version_of_tag("6").empty());          // one number: not a version
-    CHECK(version_of_tag("1.2.3.4").empty());
+    CHECK(version_of_tag("v1.6.3.0") == "1.6.3.0");   // sys-patch's
+    CHECK(version_of_tag("1.2.3.4.5").empty());
     CHECK(version_of_tag("1.2.").empty());
     CHECK(version_of_tag(".1.2").empty());
     CHECK(version_of_tag("1..2").empty());
@@ -66,10 +67,12 @@ static void test_text()
     l.atmosphere = "1.12.0";
     l.hekate     = "6.5.4";
     l.firmware   = "23.0.1";
+    l.syspatch   = "1.6.3.0";
     const std::string t = to_text(l);
-    CHECK(t == "atmosphere=1.12.0;hekate=6.5.4;firmware=23.0.1");
+    CHECK(t == "atmosphere=1.12.0;hekate=6.5.4;firmware=23.0.1;syspatch=1.6.3.0");
     const Latest back = from_text(t);
-    CHECK(back.atmosphere == "1.12.0" && back.hekate == "6.5.4" && back.firmware == "23.0.1");
+    CHECK(back.atmosphere == "1.12.0" && back.hekate == "6.5.4" && back.firmware == "23.0.1" &&
+          back.syspatch == "1.6.3.0");
     // Missing ones are left out, unknown keys and bad versions ignored.
     Latest some;
     some.hekate = "6.5.4";
@@ -78,7 +81,20 @@ static void test_text()
     CHECK(odd.firmware.empty() && odd.hekate == "6.5.4" && odd.atmosphere.empty());
     CHECK(to_text(Latest{}).empty());
     const Latest none = from_text("");
-    CHECK(none.atmosphere.empty() && none.hekate.empty() && none.firmware.empty());
+    CHECK(none.atmosphere.empty() && none.hekate.empty() && none.firmware.empty() && none.syspatch.empty());
+    // A sys_latest kept before sys-patch was checked: it is just unknown.
+    CHECK(from_text("atmosphere=1.12.0;hekate=6.5.4;firmware=23.0.1").syspatch.empty());
+}
+
+static void test_syspatch_version()
+{
+    CHECK(syspatch_version("v1.6.3.0") == "1.6.3.0");
+    CHECK(syspatch_version("v1.5.9") == "1.5.9");
+    CHECK(syspatch_version("v1.6.3.0-b962f75") == "1.6.3.0");   // with its commit
+    CHECK(syspatch_version("1.5.8") == "1.5.8");
+    CHECK(syspatch_version("").empty());
+    CHECK(syspatch_version("unknown").empty());
+    CHECK(syspatch_version("-1.5.8").empty());
 }
 
 int main()
@@ -87,5 +103,6 @@ int main()
     test_tag_of_url();
     test_hekate_version();
     test_text();
+    test_syspatch_version();
     return CHECK_DONE("sys_updates tests passed");
 }

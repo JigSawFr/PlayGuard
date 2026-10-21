@@ -35,14 +35,14 @@ Las capturas muestran el tema oscuro, el predeterminado de PlayGuard (en inglés
 La aplicación está organizada en pestañas, como la configuración de la consola; cada una tiene su sección a continuación.
 
 - **Lo que ha fallado se indica en un cuadro de diálogo; lo que ha funcionado, en un aviso breve.** Un cuadro de diálogo solo dice lo que se aplica a esta consola en ese momento: que el juego en curso se suspendería, solo mientras hay un juego abierto; que la aplicación móvil podría sobrescribir un cambio, solo mientras está vinculada y puede sincronizarse.
-- **La cabecera** indica, en todas las pestañas, cuándo el control parental está desbloqueado temporalmente (su píldora), y muestra un lápiz tachado a la derecha del título cuando la aplicación está en solo lectura; al tocar cualquiera de los dos, lleva a donde se deshace (*PIN › Reactivar el control parental*, la pantalla del firmware).
+- **La cabecera** indica, en todas las pestañas, cuándo el control parental está desbloqueado temporalmente (su píldora), y muestra un lápiz tachado a la derecha del título cuando la aplicación está en solo lectura; al tocar cualquiera de los dos, lleva a donde se deshace (*Hoy › Reactivar*, la pantalla del firmware).
 - **En solo lectura**, las acciones siguen en su sitio, en gris, y explican por qué al pulsarlas.
 
 ## El aspecto: Cadran
 
 El aspecto de PlayGuard se llama Cadran: una barra de iconos para las pestañas, una paleta azul marino o blanco frío (según el tema), tarjetas en lugar de listas. Cada pestaña se abre con lo más importante (un anillo, mosaicos, tarjetas, chips) y sus demás ajustes debajo.
 
-- **La píldora de la cabecera** indica de qué trata la pestaña (*Control parental activo*, *Temporizador activo*…); mientras el control parental está desbloqueado, lo indica en todas las pestañas, y al tocarla se abre *PIN › Reactivar el control parental*. El texto secundario nunca baja de 15 px, para poder leerlo desde el sofá en una tele.
+- **La píldora de la cabecera** indica de qué trata la pestaña (*Control parental activo*, *Temporizador activo*…); mientras el control parental está desbloqueado, lo indica en todas las pestañas, y al tocarla se abre *Hoy › Reactivar*. El texto secundario nunca baja de 15 px, para poder leerlo desde el sofá en una tele.
 - **Los cuadros de diálogo** son tarjetas con los botones en forma de píldora, la confirmación en turquesa (en coral cuando quita o detiene algo).
   - Las opciones se abren como una tarjeta encima de las indicaciones de los botones, con la actual sobre un turquesa suave con su marca de verificación. El contorno turquesa es solo del foco, en todas partes: un nivel, una cuenta, una opción en vigor conserva el fondo suave.
   - Un cuadro de diálogo largo se difumina en su parte inferior mientras sigue habiendo más, y su advertencia (un juego a punto de suspenderse) va primero, en una tarjeta ámbar.
@@ -106,7 +106,7 @@ Las de información: una compilación de la que se volvió atrás, un firmware n
 
 - Cada sección enumera sus entradas en un orden fijo, sea cual sea la comprobación que terminó primero.
 - **En la barra lateral**, una insignia ámbar junto al nombre de una pestaña cuenta sus entradas por hacer, allí donde se resuelven: la pestaña PIN (sin PIN, un PIN débil, PlayGuard sin su PIN, desbloqueado temporalmente), Tiempo de juego (la alarma desactivada, la consola que no cuenta), Hoy (cambios hechos fuera de PlayGuard, tiempo extra por retirar), Consola (sus entradas de arriba, y el reloj de red). Las entradas ignoradas y las de información no se cuentan.
-- En la pestaña, la misma insignia está en la fila donde se resuelve cada una (*Reloj de red*, *Comprobar los juegos instalados*, *Almacenamiento*, *Parches de juegos*; *Definir o cambiar el PIN*, *Proteger PlayGuard con el PIN*, *Reactivar el control parental*; *Avanzado* de Tiempo de juego para la alarma), y la pestaña se abre en la primera de ellas.
+- En la pestaña, la misma insignia está en la fila donde se resuelve cada una (*Reloj de red*, *Comprobar los juegos instalados*, *Almacenamiento*, *Parches de juegos*; *Definir o cambiar el PIN*, *Proteger PlayGuard con el PIN*; *Avanzado* de Tiempo de juego para la alarma), y la pestaña se abre en la primera de ellas.
 - **Ⓐ** en una entrada aplica la solución (*Activarla*, *Ajustarlo*, *Actualizar*…) o abre la pestaña donde se hace. Una entrada desaparece sola en cuanto se resuelve lo que indica.
 - **Ⓧ** marca como leída una entrada de información; **Ⓨ** las marca todas. Una entrada marcada como leída sigue leída en el siguiente inicio, hasta que cambie su texto.
 - **Ignorar:** algunas entradas por hacer se pueden ignorar con Ⓧ, tras una confirmación y el PIN: un PIN que cualquiera probaría primero, PlayGuard abriéndose sin el PIN, la alarma de «Se acabó el tiempo» desactivada, la tarjeta SD casi llena (nunca la falta de PIN, el control desbloqueado, el reloj, el temporizador que no cuenta ni los archivos del propio PlayGuard). Una entrada ignorada deja de contarse y aparece al final, en *Ignorados*, donde Ⓐ hace que vuelva a contarse. Vuelve sola 30 días después (salvo si *Volver a contar los avisos ignorados tras 30 días* está desactivado), cuando lo que indica se resuelve y luego vuelve a ocurrir, o, en el caso del PIN, con un PIN nuevo de otra longitud.
@@ -300,7 +300,7 @@ Tiempo por juego **hoy**, en los **últimos 7 días** y **en total**, a partir d
 - **Arriba**, tres mosaicos: el PIN, las restricciones y el desbloqueo temporal, cada uno con una marca de verificación turquesa cuando está como debe (un PIN definido, las restricciones activas, bloqueado) o una señal de advertencia ámbar cuando hay que intervenir.
 - **Definir / cambiar el PIN** (pantalla de PIN del sistema).
 - **Mostrar el PIN**: tras un aviso y el propio PIN, que se pide cada vez; se anota en el historial, y luego se ofrece un PIN nuevo.
-- **Desbloquear temporalmente**, **reactivar el control parental**, y si PlayGuard lo reactiva solo justo después de un cambio que necesitó el desbloqueo (activado de forma predeterminada).
+- **Desbloquear temporalmente**, y si PlayGuard lo reactiva solo justo después de un cambio que necesitó el desbloqueo (activado de forma predeterminada).
 
 ### Proteger PlayGuard con el PIN
 

@@ -34,14 +34,14 @@ The screenshots show the dark theme, PlayGuard's default.
 The app is organised in tabs, like System Settings; each has its section below.
 
 - **What failed is said in a dialog, what worked in a toast.** A dialog only says what applies to this console now: that the game in progress would be suspended, only while a game is open; that the companion app could overwrite a change, only while it is linked and can sync.
-- **The header** says, on every tab, while parental controls are temporarily unlocked (its pill), and shows a crossed-out pencil right of the title when the app is read-only; a tap on either goes where it is undone (*PIN › Turn parental controls back on*, the firmware screen).
+- **The header** says, on every tab, while parental controls are temporarily unlocked (its pill), and shows a crossed-out pencil right of the title when the app is read-only; a tap on either goes where it is undone (*Today › Turn back on*, the firmware screen).
 - **In read-only mode**, actions stay in place, greyed, and say why when pressed.
 
 ## The look: Cadran
 
 PlayGuard's look is called Cadran: an icon rail for the tabs, a navy or cool-white palette (with the theme), cards instead of lists. Each tab opens on what matters most (a ring, tiles, cards, chips), its other settings underneath.
 
-- **The header's pill** says what the tab is about (*Parental controls on*, *Play timer on*…); while parental controls are unlocked it says so on every tab, and a tap on it opens *PIN › Turn parental controls back on*. Secondary text is never under 15 px, to read from the couch on a TV.
+- **The header's pill** says what the tab is about (*Parental controls on*, *Play timer on*…); while parental controls are unlocked it says so on every tab, and a tap on it opens *Today › Turn back on*. Secondary text is never under 15 px, to read from the couch on a TV.
 - **Dialogs** are cards with their buttons as pills, the confirmation in teal (in coral when it removes or stops something).
   - The choices open as a card above the hints, the current one on a soft teal with its check. The teal ring is the focus's alone, everywhere: a level, an account, a choice in force keeps the soft fill.
   - A long dialog fades at its foot while more follows, and its warning (a game about to be suspended) comes first, in an amber card.
@@ -105,7 +105,7 @@ Those for information: a build gone back from, a firmware not tested with this v
 
 - Each section lists its entries in a fixed order, whichever check finished first.
 - **In the sidebar**, an amber badge by a tab's name counts its entries to do, where they are fixed: the PIN tab (no PIN, a weak PIN, PlayGuard without its PIN, temporarily unlocked), the Play timer (the alarm off, the console not counting), Today (changes made outside PlayGuard, extra time to put back), the Console (its entries above, and the network clock). Ignored entries and those for information are not counted.
-- In the tab, the same badge is on the row where each is fixed (*Network clock*, *Check the installed games*, *Storage*, *Game patches*; *Set or change the PIN*, *Protect PlayGuard with the PIN*, *Turn parental controls back on*; the Play timer's *Advanced* for the alarm), and the tab opens on the first of them.
+- In the tab, the same badge is on the row where each is fixed (*Network clock*, *Check the installed games*, *Storage*, *Game patches*; *Set or change the PIN*, *Protect PlayGuard with the PIN*; the Play timer's *Advanced* for the alarm), and the tab opens on the first of them.
 - **Ⓐ** on an entry does the fix (*Turn it on*, *Set it*, *Update*…) or opens the tab where it is made. An entry goes by itself once what it says is fixed.
 - **Ⓧ** marks an entry for information as read; **Ⓨ** marks them all. An entry marked as read stays read at the next start, until its text changes.
 - **Ignoring:** a few entries to do can be ignored with Ⓧ, after a confirmation and the PIN: a PIN anyone would try first, PlayGuard opening without the PIN, the "time's up" alarm off, the SD card almost full (never no PIN, unlocked controls, the clock, the play timer not counting or PlayGuard's own files). An ignored entry is no longer counted, and is listed last under *Ignored*, where Ⓐ counts it again. It comes back by itself 30 days later (unless *Count ignored warnings again after 30 days* is off), once what it says is fixed and then happens again, or, for the PIN, for a new PIN of another length.
@@ -299,7 +299,7 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 - **At the top**, three tiles: the PIN, the restrictions and the temporary unlock, each with a teal check when it is as it should be (a PIN set, restrictions on, locked) or an amber warning when it needs you.
 - **Set / change the PIN** (system PIN screen).
 - **Show the PIN**: after a warning and the PIN itself, asked every time; recorded in the history, then a new PIN is offered.
-- **Unlock temporarily**, **turn parental controls back on**, and whether PlayGuard turns them back on by itself right after a change that needed the unlock (on by default).
+- **Unlock temporarily**, and whether PlayGuard turns them back on by itself right after a change that needed the unlock (on by default).
 
 ### Protect PlayGuard with the PIN
 
@@ -337,7 +337,7 @@ Two confirmations, irreversible; a backup of the settings is saved first.
 
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=console)*
 
-**At the top**, what the console runs as tiles (the firmware, Atmosphère, and hekate when it is on the SD card; Ⓐ opens its release notes), then the diagnostics, then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
+**At the top**, what the console runs as tiles (the firmware, Atmosphère, hekate when it is on the SD card and sys-patch when it is installed; Ⓐ opens its release notes), then the diagnostics, then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
 
 ### Network clock
 
@@ -426,10 +426,10 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 ### The console's lines
 
-- **Firmware, Atmosphère and hekate** (when its `bootloader/update.bin` is on the SD card), each with the newer release the last update check found, in amber (*22.0.0 · 23.0.1 available*, and how many versions behind when more than one), and a warning icon on the firmware's row when the newest firmware needs a newer Atmosphère or hekate first, or is not supported by them yet (the firmware's release notes say why: their release notes say which firmware they support).
-- **Release notes:** Ⓐ on each opens them: a tab for the installed version, one for each newer one (at most five) and older ones in the tabs left (six in all; Ⓛ / Ⓡ move between them), opening on the next one, with tags (installed or newer, the newest firmware it supports, security fixes, parental controls changed), the notes as published (in English), *See online* (a QR code) and when they were fetched. Atmosphère's and hekate's come from their GitHub releases, the firmware's from switchbrew; they are kept on the SD card for offline reading, fetched again once a day (Ⓧ now).
+- **Firmware, Atmosphère, hekate** (when its `bootloader/update.bin` is on the SD card) **and sys-patch** (when it is installed; its version from its `config/sys-patch/log.ini`), each a tile with the installed version, then the newer release the last update check found in an amber pill (*23.0.1 available*, the tile outlined in amber, and how many versions behind under it when more than one), or *Up to date*; a warning in the firmware tile's corner when the newest firmware needs a newer Atmosphère or hekate first, or is not supported by them yet (the firmware's release notes say why: their release notes say which firmware they support).
+- **Release notes:** Ⓐ on each opens them: a tab for the installed version, one for each newer one (at most five) and older ones in the tabs left (six in all; Ⓛ / Ⓡ move between them), opening on the next one, with tags (installed or newer, the newest firmware it supports, security fixes, parental controls changed), the notes as published (in English), *See online* (a QR code) and when they were fetched. Atmosphère's, hekate's and sys-patch's come from their GitHub releases (sys-patch's from `impeeza/sys-patch`), the firmware's from switchbrew; they are kept on the SD card for offline reading, fetched again once a day (Ⓧ now).
 - **Compatibility**, then **storage** (emuMMC or sysMMC, with an info icon when the other system has its own parental controls: Ⓐ explains).
-- Whether Atmosphère **blanks the serial number** (partly hidden until Ⓐ; on emuMMC, when it is not, a warning icon on the row above, which Ⓐ explains).
+- Whether Atmosphère **blanks the serial number** (*Yes (XAW00000000000)*, the number the system then sees; on emuMMC, when it is not, a warning icon, which Ⓐ explains), then the console's **real serial number**, its middle masked: when blanked, read from the PRODINFO backup Atmosphère keeps in `atmosphere/automatic_backups/` (the one of this console, by its device ID, when the SD card holds several). Ⓐ on its info icon shows it whole and where it comes from.
 - **Game patches** (sys-patch or sigpatch files, recommending sys-patch when only files are used: an info icon, or a warning one when something needs a look, which Ⓐ explains).
 
 ## Preferences
@@ -455,7 +455,7 @@ At the end of *Preferences* (the History tab of earlier versions).
 - A change the console **refused** is listed too, in amber, with the console's error and what was tried (never put back: nothing changed).
 - *Show* keeps one kind (play time, restrictions, security and app, seen outside PlayGuard, refused by the console); *Export what is shown* writes it to `exports/` as CSV, JSON, XLSX or PDF.
 - Ⓐ on a change shows it and, for a value, **puts the previous one back** — through the same unlock and PIN as any change, saying if it changed since.
-- Each change keeps the PlayGuard version that made it; a change recorded by a newer version of PlayGuard shows as *Other change*.
+- Each change keeps the PlayGuard version that made it (a development build: said so, with its commit and, for a pull request's build, its number); a change recorded by a newer version of PlayGuard shows as *Other change*.
 
 #### Backups
 
