@@ -3,7 +3,8 @@ name: pages
 # Publishes PlayGuard's website on GitHub Pages (site/README.md), with GitHub
 # Actions as its source (Settings › Pages › Source: GitHub Actions): main's
 # `site` artifact (web.yml) at the root, and each open pull request's in
-# pr-<number>/, with its link in a comment on the pull request.
+# pr-<number>/, with its link in a comment on the pull request (which says
+# the preview is gone once the pull request is closed).
 #
 # It runs where main's workflows run (workflow_run, pull_request_target), so
 # the github-pages environment, which deploys from main only, takes it; it
@@ -225,3 +226,36 @@ jobs:
             gh api -X POST "repos/$REPO/issues/$pr/comments" -f body="$body" > /dev/null
           fi
           echo "[pr-$pr]($sim)" >> "$GITHUB_STEP_SUMMARY"
+      # The pull request just closed: its preview is gone with this
+      # deployment, so its comment no longer links to it (nor to its screens).
+      - name: Comment of the closed pull request
+        if: >-
+          github.event_name == 'pull_request_target' &&
+          github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          MERGED: ${{ github.event.pull_request.merged }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          SITE: ${{ steps.deploy.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          marker='<!-- playguard-web-simulator -->'
+          id=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+                 --jq "[.[] | select(.user.login == \"github-actions[bot]\" and (.body | contains(\"$marker\")))][0].id // empty" | head -n 1)
+          [ -n "$id" ] || exit 0
+          if [ "$MERGED" = true ]; then
+            what="Merged: its changes are in [main's simulator](${SITE%/}/simulator/dev/) once main's build is published."
+          else
+            what="Closed without merging."
+          fi
+          body=$(cat <<EOF
+          $marker
+          ### 🕹️ Preview of this pull request
+
+          No longer online (last commit \`${SHA::7}\`): the preview goes when the pull request is closed. ${what}
+          EOF
+          )
+          gh api -X PATCH "repos/$REPO/issues/comments/$id" -f body="$body" > /dev/null
+          echo "pr-$PR: its comment updated (closed)" >> "$GITHUB_STEP_SUMMARY"
