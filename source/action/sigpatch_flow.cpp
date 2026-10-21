@@ -6,6 +6,7 @@
 
 #include "action/pin_lock.hpp"
 #include "ui/ui.hpp"
+#include "util/date.hpp"
 #include "util/patches.hpp"
 #include "util/paths.hpp"
 
@@ -26,16 +27,14 @@ void set_aside(std::function<void(bool)> done, const std::string& intro)
     };
     if (!offered() || ui::refuse_read_only()) return finish(false);
     // config/playguard/sigpatches-aside/<when>/, the same paths under it.
-    char when[32];
-    const std::time_t now = std::time(nullptr);
-    std::strftime(when, sizeof(when), "%Y%m%d_%H%M%S", std::localtime(&now));
+    const std::string when = date::local_time(std::time(nullptr), "%Y%m%d_%H%M%S");
     const std::string dest = paths::data_dir() + "/sigpatches-aside/" + when;
     const bool hekate = [] {
         for (const std::string& f : ui::patch_report().files)
             if (f == "hekate") return true;
         return false;
     }();
-    std::string body = brls::getStr("playguard/sigpatch/confirm", "config/playguard/sigpatches-aside/" + std::string(when));
+    std::string body = brls::getStr("playguard/sigpatch/confirm", "config/playguard/sigpatches-aside/" + when);
     if (hekate) body += "\n\n" + "playguard/sigpatch/hekate"_i18n;
     if (!intro.empty()) body = intro + "\n\n" + body;
     ui::confirm(body, "playguard/sigpatch/set_aside"_i18n,

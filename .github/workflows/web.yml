@@ -337,8 +337,13 @@ jobs:
           fi
           curl -sfL --retry 3 -o "$RUNNER_TEMP/axe.tgz" "https://registry.npmjs.org/axe-core/-/axe-core-$AXE_VERSION.tgz"
           echo "$AXE_SHA256  $RUNNER_TEMP/axe.tgz" | sha256sum -c --quiet
-          tar -xzf "$RUNNER_TEMP/axe.tgz" -C "$RUNNER_TEMP" package/axe.min.js
-          SITE_AXE="$RUNNER_TEMP/package/axe.min.js" "$py" -u tools/site_layout.py out
+          # axe.min.js alone, read out of the package by Python rather than
+          # tar: CodeQL takes a tar after "What to build"'s `gh run download`
+          # for that artifact's extraction (its cache poisoning query), and
+          # flags each step after it. That artifact is main's own (above).
+          python3 -c 'import sys, tarfile; open(sys.argv[2], "wb").write(tarfile.open(sys.argv[1]).extractfile("package/axe.min.js").read())' \
+            "$RUNNER_TEMP/axe.tgz" "$RUNNER_TEMP/axe.min.js"
+          SITE_AXE="$RUNNER_TEMP/axe.min.js" "$py" -u tools/site_layout.py out
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: site

@@ -24,7 +24,11 @@ bool offline(std::string* error)
 
 bool get(const char* folder, const std::string& name, std::string* body, std::string* error)
 {
-    if (!folder || std::strcmp(folder, "offline") == 0 || !paths::read_file(std::string(folder) + "/" + name, *body))
+    // A file of the folder itself: `name` can come from an answer (a
+    // version read in a page), and "../x" or "a/b" would leave it.
+    const bool plain = !name.empty() && name[0] != '.' && name.find_first_of("/\\:") == std::string::npos;
+    if (!folder || std::strcmp(folder, "offline") == 0 || !plain
+        || !paths::read_file(std::string(folder) + "/" + name, *body))
         return offline(error);
     return true;
 }
