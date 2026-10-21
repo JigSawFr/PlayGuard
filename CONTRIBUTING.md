@@ -124,7 +124,7 @@ Each job writes a summary on the run page (`tools/ci_summary.py`): what is being
 | `branding/` | SVG sources of the icon and banners |
 | `docs/` | [`parental-controls.md`](docs/parental-controls.md): what is known of the parental-control service, the play-timer block and the clocks, and how sure each fact is; [`companion-app.md`](docs/companion-app.md): what PlayGuard covers of Nintendo's phone app, and the gaps still to close |
 
-**Branding:** `branding/*.svg` are rendered to `icon.jpg`, `images/store/*.png`, `images/social-preview.png` (the repository's social preview) and `resources/img/wordmark.png` (the loading screen's) by `node tools/render_branding.mjs` (Node + Playwright).
+**Branding:** `branding/*.svg` are rendered to `icon.jpg`, `images/store/*.png`, `images/social-preview.png` (the repository's social preview) and `resources/img/wordmark.png` / `wordmark-light.png` (the loading screen's, dark and light theme) by `node tools/render_branding.mjs` (Node + Playwright).
 
 ### The Cadran look
 
