@@ -105,6 +105,11 @@ size_t total_bytes(const std::vector<Part>& files);
 // gist.github.com link.
 bool parse_gist(const std::string& body, std::string* url);
 
+// A gist's link under its QR code, to read out or type by hand: the address
+// without its scheme on a line, then the id in groups of four, so that a
+// line breaks between groups ("gist.github.com/u/\nd9ad 36f7 65d7").
+std::string link_caption(const std::string& url);
+
 // What the console knows of the bug-report form's fields; empty ones are
 // left for the reporter.
 struct IssueFields
