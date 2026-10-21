@@ -29,7 +29,12 @@
 - every sidebar tab name (playguard/tabs/) fits on one line: at most
   TAB_WIDTH columns, a wide (CJK) character counting as two;
 - every key ending in "_one" (the text for exactly one) has the key without
-  it next to it (the text for any other count), in every language.
+  it next to it (the text for any other count), in every language;
+- every page of the documentation the app links to (app::doc_url("page",
+  "anchor"), a QR code on the console) is docs/<page>.md, with a heading
+  whose anchor is that one: an app already installed keeps the link, so a
+  page renamed or a heading reworded breaks it; and the app links to the
+  documentation only through doc_url (the website), never GitHub's Markdown.
 
 It also warns, without failing:
 - about sentence-like values a catalog still has in English (English is a
@@ -52,7 +57,9 @@ It also warns, without failing:
 - about a PLAYGUARD_SIM_* variable the code reads that CONTRIBUTING.md does
   not document, or one it documents that nothing reads, and about a
   tools/desktop_smoke.py scenario its list leaves out, or one it lists that
-  the script does not have.
+  the script does not have;
+- about a translation of a page the app links to whose sections are not the
+  English page's (the website then opens the page, not the section).
 """
 import glob
 import json
@@ -531,6 +538,39 @@ for v in sorted(scenarios - listed_scenarios):
     warnings.append(f"tools/desktop_smoke.py has the scenario {v}, which CONTRIBUTING.md does not list")
 for v in sorted(listed_scenarios - scenarios):
     warnings.append(f"CONTRIBUTING.md lists the smoke scenario {v}, which tools/desktop_smoke.py does not have")
+
+# The documentation the app links to (app::doc_url): the page, and the
+# heading's anchor as the website makes it (tools/build_site.py's
+# github_slug). A translation answers to the English anchors when it has the
+# English page's sections, in the same order (build_site.py's data-en).
+def heading_slugs(text):
+    return [re.sub(r"[^\w\- ]", "", re.sub(r"<[^>]+>", "", h).strip().lower()).replace(" ", "-")
+            for h in re.findall(r"^#{2,3} (.+?)\s*$", text, re.M)]
+
+
+doc_links = set()
+for path, text in sorted(code_text.items()):
+    rel = os.path.relpath(path, ROOT)
+    for page, anchor in re.findall(r'doc_url\(\s*"([\w-]+)"\s*(?:,\s*"([^"]*)")?\s*\)', text):
+        doc_links.add((page, anchor, rel))
+    if "/blob/main/docs/" in text:
+        errors.append(f"{rel} links to docs/ on GitHub: app::doc_url() links to the website")
+if not doc_links:
+    errors.append("no app::doc_url(\"page\", ...) found in the code")
+for page, anchor, rel in sorted(doc_links):
+    english = read(f"{ROOT}/docs/{page}.md")
+    if not english:
+        errors.append(f"{rel} links to the page {page}, which docs/{page}.md is not")
+        continue
+    slugs = heading_slugs(english)
+    if anchor and anchor not in slugs:
+        errors.append(f"{rel} links to {page}#{anchor}, a heading docs/{page}.md does not have "
+                      "(an installed app keeps the link: keep the heading, or its anchor)")
+        continue
+    for translation in sorted(glob.glob(f"{ROOT}/docs/*/{page}.md")):
+        if anchor and len(heading_slugs(read(translation))) != len(slugs):
+            warnings.append(f"{os.path.relpath(translation, ROOT)} has not the sections of docs/{page}.md: "
+                            f"the app's link to #{anchor} opens the page, not the section")
 
 for w in warnings:
     print("WARNING:", w)
