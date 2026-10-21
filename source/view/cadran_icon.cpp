@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/cadran_icon.hpp"
 
+#include <cmath>
+
 CadranIcon::CadranIcon()
 {
     this->color = brls::Application::getTheme()["brls/text"];
@@ -121,6 +123,16 @@ void CadranIcon::draw(NVGcontext* vg, float x, float y, float width, float heigh
         nvgBezierTo(vg, 6, 19, 2, 12, 2, 12);
         nvgClosePath(vg); nvgStroke(vg);
         nvgBeginPath(vg); nvgCircle(vg, 12, 12, 3); nvgStroke(vg);
+    } else if (i == "sun") {
+        // The header's light theme: a disc and eight rays.
+        nvgBeginPath(vg); nvgCircle(vg, 12, 12, 4); nvgStroke(vg);
+        nvgBeginPath(vg);
+        for (int k = 0; k < 8; k++) {
+            const float a = (float)k * NVG_PI / 4;
+            nvgMoveTo(vg, 12 + std::cos(a) * 7, 12 + std::sin(a) * 7);
+            nvgLineTo(vg, 12 + std::cos(a) * 9.5f, 12 + std::sin(a) * 9.5f);
+        }
+        nvgStroke(vg);
     } else if (i == "moon") {
         nvgBeginPath(vg);
         nvgArc(vg, 12, 12, 9, 0.11f, 4.60f, NVG_CW);

@@ -31,8 +31,8 @@ constexpr float CARD_GAP = 14;
 struct Line
 {
     std::string label, detail, group;
-    const char* icon = nullptr;
-    std::string image;         // a picture in the icon's place (pick()'s `images`)
+    std::string icon;          // a Cadran icon's name; empty: none
+    std::string image;         // a picture in the icon's place (pick()'s `icons`)
     Choice::Tone tone = Choice::Tone::PLAIN;
     int  toggle = -1;          // a switch: 0 off, 1 on; -1 none
     bool checked = false;      // the value chosen (pick())
@@ -226,8 +226,8 @@ class Sheet : public brls::Box
             cell->setText(l.label);
             cell->setDetailText(l.detail);
         }
-        if (!l.image.empty() && !l.icon) cadran::List::row_image(cell, l.image);
-        else cadran::List::row(cell, l.icon);
+        if (!l.image.empty()) cadran::List::row_image(cell, l.image);
+        else cadran::List::row(cell, l.icon.empty() ? nullptr : l.icon.c_str());
         if (l.toggle < 0) {
             cell->detail->setMaxWidth(340);
             cell->detail->setSingleLine(true);
@@ -248,7 +248,7 @@ class Sheet : public brls::Box
                 break;
         }
         if (l.toggle < 0) cell->detail->setTextColor(theme[tint ? tint : "cadran/text2"]);
-        if (tint && l.icon)
+        if (tint && !l.icon.empty())
             cadran::List::recolor_icon(cell, nullptr, tint,
                                        l.tone == Choice::Tone::DANGER ? "cadran/coral_soft"
                                        : l.tone == Choice::Tone::WARN ? "cadran/amber_surf"
@@ -283,7 +283,7 @@ void open(const std::string& title, const std::string& subtitle, int image, std:
 
 std::vector<Line> value_lines(const std::vector<std::string>& values, const std::vector<std::string>& details,
                               std::function<bool(size_t)> checked, std::function<void(int)> on_pick,
-                              const std::vector<std::string>& images = {})
+                              const std::vector<std::string>& icons = {})
 {
     std::vector<Line> lines;
     auto pick = std::make_shared<std::function<void(int)>>(std::move(on_pick));
@@ -291,7 +291,9 @@ std::vector<Line> value_lines(const std::vector<std::string>& values, const std:
         Line l;
         l.label = values[i];
         l.detail = i < details.size() ? details[i] : "";
-        l.image = i < images.size() ? images[i] : "";
+        // A picture ("img/…png") or a Cadran icon's name.
+        const std::string icon = i < icons.size() ? icons[i] : "";
+        (icon.rfind("img/", 0) == 0 ? l.image : l.icon) = icon;
         l.checked = checked(i);
         const int index = (int)i;
         l.run = [pick, index]() {
@@ -316,7 +318,7 @@ void pick_actions(const std::string& title, const std::vector<Choice>& choices, 
         l.label = c.label;
         l.detail = c.detail;
         l.group = c.group;
-        l.icon = c.icon;
+        l.icon = c.icon ? c.icon : "";
         l.tone = c.tone;
         l.toggle = c.toggle;
         l.run = c.run;
@@ -327,12 +329,12 @@ void pick_actions(const std::string& title, const std::vector<Choice>& choices, 
 
 void pick(const std::string& title, const std::vector<std::string>& values, int selected,
           std::function<void(int)> on_pick, bool checked, const std::vector<std::string>& details,
-          const std::vector<std::string>& images)
+          const std::vector<std::string>& icons)
 {
     const size_t focus = selected < 0 ? 0 : (size_t)selected;
     open(title, "", 0,
          value_lines(values, details, [checked, focus](size_t i) { return checked && i == focus; }, std::move(on_pick),
-                     images),
+                     icons),
          focus);
 }
 

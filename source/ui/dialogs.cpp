@@ -489,9 +489,12 @@ void pick_theme(std::function<void()> after)
 {
     std::vector<std::string> labels;
     for (const char* t : config::THEMES) labels.push_back(brls::getStr(std::string("playguard/tools/themes/") + t));
+    // As the header's button draws them (view/header_settings.cpp).
+    const std::vector<std::string> icons = { "contrast", "sun", "moon" };
+    static_assert(std::size(config::THEMES) == 3, "an icon for each theme");
     pick("playguard/tools/theme"_i18n, labels, index_of(config::THEMES, config::get().theme), [after](int i) {
         choose(config::get().theme, config::THEMES[i], after, live_prefs::theme_changed);
-    });
+    }, true, {}, icons);
 }
 
 void pick_text_size(std::function<void()> after)
