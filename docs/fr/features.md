@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 5937bf90a82a -->
+<!-- translated from docs/features.md, sha256 64bd09aacd8e -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -35,14 +35,14 @@ Les captures montrent le thème sombre, celui par défaut (en anglais).
 L'application est organisée en onglets, comme les paramètres de la console ; chacun a sa section ci-dessous.
 
 - **Ce qui a échoué est dit dans une boîte de dialogue, ce qui a réussi dans une notification.** Un dialogue ne dit que ce qui s'applique à cette console maintenant : que le jeu en cours serait suspendu, seulement quand un jeu est ouvert ; que l'application compagnon pourrait écraser une modification, seulement quand elle est associée et peut se synchroniser.
-- **L'en-tête** indique, sur chaque onglet, que le contrôle parental est déverrouillé temporairement (sa pastille), et affiche un crayon barré à droite du titre quand l'application est en lecture seule ; toucher l'un ou l'autre mène là où on l'annule (*Code PIN › Réactiver le contrôle parental*, l'écran du firmware).
+- **L'en-tête** indique, sur chaque onglet, que le contrôle parental est déverrouillé temporairement (sa pastille), et affiche un crayon barré à droite du titre quand l'application est en lecture seule ; toucher l'un ou l'autre mène là où on l'annule (*Aujourd'hui › Réactiver*, l'écran du firmware).
 - **En lecture seule**, les actions restent à leur place, grisées, et disent pourquoi quand on les choisit.
 
 ## L'apparence : Cadran
 
 L'apparence de PlayGuard s'appelle Cadran : une barre d'icônes pour les onglets, une palette bleu nuit ou blanc froid (selon le thème), des cartes au lieu des listes. Chaque onglet s'ouvre sur l'essentiel (un anneau, des tuiles, des cartes, des puces), ses autres réglages en dessous.
 
-- **La pastille de l'en-tête** dit de quoi parle l'onglet (*Contrôle parental actif*, *Minuteur actif*…) ; contrôle parental déverrouillé, elle le dit sur chaque onglet, et la toucher ouvre *Code PIN › Réactiver le contrôle parental*. Le texte secondaire ne descend jamais sous 15 px, pour se lire depuis le canapé sur une télé.
+- **La pastille de l'en-tête** dit de quoi parle l'onglet (*Contrôle parental actif*, *Minuteur actif*…) ; contrôle parental déverrouillé, elle le dit sur chaque onglet, et la toucher ouvre *Aujourd'hui › Réactiver*. Le texte secondaire ne descend jamais sous 15 px, pour se lire depuis le canapé sur une télé.
 - **Les dialogues** sont des cartes aux boutons en pilules, la confirmation en turquoise (en corail quand elle supprime ou arrête quelque chose).
   - Les choix s'ouvrent en carte au-dessus des aides, le choix actuel sur un turquoise léger avec sa coche. Le contour turquoise n'est qu'au focus, partout : un niveau, un compte, un choix en vigueur garde le fond léger.
   - Un long dialogue s'estompe en bas tant que la suite continue, et son avertissement (une partie sur le point d'être suspendue) vient en premier, dans une carte orange.
@@ -106,7 +106,7 @@ Celles pour information : un retour à la version précédente, un firmware non 
 
 - Chaque section liste ses entrées dans un ordre fixe, quelle que soit la vérification qui a fini la première.
 - **Dans la barre latérale**, une pastille ambre à côté du nom d'un onglet compte ses entrées à faire, là où elles se règlent : l'onglet Code PIN (pas de code PIN, un code PIN trop simple, PlayGuard sans son code PIN, déverrouillé temporairement), Temps de jeu (l'alarme désactivée, la console qui ne compte pas), *Aujourd'hui* (des changements faits hors de PlayGuard, du temps en plus à retirer), la Console (ses entrées ci-dessus, et l'horloge réseau). Les entrées ignorées et celles pour information ne sont pas comptées.
-- Dans l'onglet, la même pastille est sur la ligne où chacune se règle (*Horloge réseau*, *Vérifier les jeux installés*, *Stockage*, *Patchs de jeux* ; *Définir ou changer le code PIN*, *Protéger PlayGuard par le code PIN*, *Réactiver le contrôle parental* ; *Avancé* du Temps de jeu pour l'alarme), et l'onglet s'ouvre sur la première d'entre elles.
+- Dans l'onglet, la même pastille est sur la ligne où chacune se règle (*Horloge réseau*, *Vérifier les jeux installés*, *Stockage*, *Patchs de jeux* ; *Définir ou changer le code PIN*, *Protéger PlayGuard par le code PIN* ; *Avancé* du Temps de jeu pour l'alarme), et l'onglet s'ouvre sur la première d'entre elles.
 - **Ⓐ** sur une entrée fait la correction (*L'activer*, *La régler*, *Mettre à jour*…) ou ouvre l'onglet où elle se fait. Une entrée disparaît d'elle-même une fois réglé ce qu'elle signale.
 - **Ⓧ** marque une entrée pour information comme lue ; **Ⓨ** les marque toutes. Une entrée marquée comme lue le reste au lancement suivant, jusqu'à ce que son texte change.
 - **Ignorer :** quelques entrées à faire peuvent être ignorées avec Ⓧ, après une confirmation et le code PIN : un code PIN que tout le monde essaierait en premier, PlayGuard qui s'ouvre sans le code PIN, l'alarme « temps écoulé » désactivée, la carte SD presque pleine (jamais l'absence de PIN, le contrôle parental déverrouillé, l'horloge, le minuteur qui ne compte pas ni les fichiers de PlayGuard). Une entrée ignorée n'est plus comptée et s'affiche en dernier sous *Ignorés*, où Ⓐ la fait compter de nouveau. Elle revient d'elle-même 30 jours plus tard (sauf si *Rappeler les avertissements ignorés après 30 jours* est désactivé), dès que le problème a été corrigé puis se reproduit, ou, pour le code PIN, avec un nouveau code d'une autre longueur.
@@ -300,7 +300,7 @@ Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **d
 - **En haut**, trois tuiles : le code PIN, les restrictions et le déverrouillage temporaire, chacune avec une coche turquoise quand tout est comme il faut (code PIN défini, restrictions actives, verrouillé) ou un triangle orange quand il faut intervenir.
 - **Définir ou changer le code PIN** (écran système).
 - **Afficher le code PIN** : après un avertissement et le code PIN lui-même, demandé à chaque fois ; noté dans l'historique, puis un nouveau code PIN est proposé.
-- **Déverrouiller temporairement**, **réactiver le contrôle parental**, et si PlayGuard le réactive de lui-même juste après une modification qui a demandé le déverrouillage (activé par défaut).
+- **Déverrouiller temporairement**, et si PlayGuard le réactive de lui-même juste après une modification qui a demandé le déverrouillage (activé par défaut).
 
 ### Protéger PlayGuard par le code PIN
 
@@ -338,7 +338,7 @@ Deux confirmations, irréversible ; une sauvegarde des réglages est d'abord enr
 
 *[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=console)*
 
-**En haut**, ce que fait tourner la console en tuiles (le firmware, Atmosphère, et hekate quand il est sur la carte SD ; Ⓐ ouvre ses notes de version), puis le diagnostic, puis les lignes de la console, la compatibilité en premier (une coche turquoise seule quand PlayGuard a été vérifié sur ce firmware, sinon un triangle et ce qui ne va pas).
+**En haut**, ce que fait tourner la console en tuiles (le firmware, Atmosphère, hekate quand il est sur la carte SD et sys-patch quand il est installé ; Ⓐ ouvre ses notes de version), puis le diagnostic, puis les lignes de la console, la compatibilité en premier (une coche turquoise seule quand PlayGuard a été vérifié sur ce firmware, sinon un triangle et ce qui ne va pas).
 
 ### Horloge réseau
 
@@ -427,10 +427,10 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 
 ### Les lignes de la console
 
-- **Firmware, Atmosphère et hekate** (quand son `bootloader/update.bin` est sur la carte SD), chacun avec la version plus récente trouvée par la dernière recherche de mises à jour, en orange (*22.0.0 · 23.0.1 disponible*, et le nombre de versions de retard quand il y en a plus d'une), et une icône d'avertissement sur la ligne du firmware quand le firmware le plus récent demande d'abord un Atmosphère ou un hekate plus récent, ou n'est pas encore pris en charge (les notes de version du firmware disent pourquoi, d'après celles d'Atmosphère et de hekate).
-- **Notes de version :** Ⓐ sur chacun les ouvre : un onglet pour la version installée, un pour chaque version plus récente (cinq au plus) et des versions plus anciennes dans les onglets restants (six en tout ; Ⓛ / Ⓡ pour passer de l'un à l'autre), ouvert sur la suivante, avec des étiquettes (installée ou plus récente, le firmware le plus récent pris en charge, correctifs de sécurité, contrôle parental modifié), les notes telles que publiées (en anglais), *Voir en ligne* (un QR code) et leur date de récupération. Celles d'Atmosphère et de hekate viennent de leurs releases GitHub, celles du firmware de switchbrew ; elles sont gardées sur la carte SD pour une lecture hors ligne et récupérées à nouveau une fois par jour (Ⓧ pour le faire tout de suite).
+- **Firmware, Atmosphère, hekate** (quand son `bootloader/update.bin` est sur la carte SD) **et sys-patch** (quand il est installé ; sa version d'après son `config/sys-patch/log.ini`), chacun avec la version plus récente trouvée par la dernière recherche de mises à jour, en orange (*22.0.0 · 23.0.1 disponible*, et le nombre de versions de retard quand il y en a plus d'une), et une icône d'avertissement sur la ligne du firmware quand le firmware le plus récent demande d'abord un Atmosphère ou un hekate plus récent, ou n'est pas encore pris en charge (les notes de version du firmware disent pourquoi, d'après celles d'Atmosphère et de hekate).
+- **Notes de version :** Ⓐ sur chacun les ouvre : un onglet pour la version installée, un pour chaque version plus récente (cinq au plus) et des versions plus anciennes dans les onglets restants (six en tout ; Ⓛ / Ⓡ pour passer de l'un à l'autre), ouvert sur la suivante, avec des étiquettes (installée ou plus récente, le firmware le plus récent pris en charge, correctifs de sécurité, contrôle parental modifié), les notes telles que publiées (en anglais), *Voir en ligne* (un QR code) et leur date de récupération. Celles d'Atmosphère, de hekate et de sys-patch viennent de leurs releases GitHub (celles de sys-patch de `impeeza/sys-patch`), celles du firmware de switchbrew ; elles sont gardées sur la carte SD pour une lecture hors ligne et récupérées à nouveau une fois par jour (Ⓧ pour le faire tout de suite).
 - **Compatibilité**, puis **stockage** (emuMMC ou sysMMC, avec une icône d'information quand l'autre système a son propre contrôle parental : Ⓐ explique).
-- Le **masquage du numéro de série** par Atmosphère (en partie caché jusqu'à Ⓐ ; en emuMMC, s'il n'est pas masqué, une icône d'avertissement sur la ligne au-dessus, que Ⓐ explique).
+- Le **masquage du numéro de série** par Atmosphère (*Oui (XAW00000000000)*, le numéro que le système voit alors ; en emuMMC, s'il n'est pas masqué, une icône d'avertissement, que Ⓐ explique), puis le **vrai numéro de série** de la console, le milieu caché : s'il est masqué, lu dans la sauvegarde du PRODINFO qu'Atmosphère garde dans `atmosphere/automatic_backups/` (celle de cette console, d'après son identifiant, quand la carte SD en contient plusieurs). Ⓐ sur son icône d'info l'affiche en entier et dit d'où il vient.
 - **Patchs de jeux** (sys-patch ou fichiers sigpatches, avec une recommandation de sys-patch quand seuls des fichiers sont utilisés : une icône d'information, ou d'avertissement quand quelque chose est à vérifier, que Ⓐ explique).
 
 ## Préférences
@@ -456,7 +456,7 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 - Une modification **refusée** par la console apparaît aussi, en orange, avec l'erreur de la console et ce qui était demandé (jamais remise : rien n'a changé).
 - *Afficher* ne garde qu'un type (temps de jeu, restrictions, sécurité et appli, vu en dehors de PlayGuard, refusé par la console) ; *Exporter ce qui est affiché* l'écrit dans `exports/` en CSV, JSON, XLSX ou PDF.
 - Ⓐ sur une modification l'affiche et, pour une valeur, **remet la précédente** — avec le même déverrouillage et le même code PIN que toute modification, en signalant si elle a changé depuis.
-- Chaque modification garde la version de PlayGuard qui l'a faite ; une modification enregistrée par une version plus récente de PlayGuard apparaît comme *Autre modification*.
+- Chaque modification garde la version de PlayGuard qui l'a faite (une version de développement : dite telle, avec son commit et, pour la version d'une pull request, son numéro) ; une modification enregistrée par une version plus récente de PlayGuard apparaît comme *Autre modification*.
 
 #### Sauvegardes
 

@@ -35,14 +35,14 @@ Le schermate mostrano il tema scuro, quello predefinito di PlayGuard (in inglese
 L'app è organizzata in schede, come le Impostazioni di sistema; ognuna ha la sua sezione qui sotto.
 
 - **Ciò che non è riuscito viene detto in una finestra di dialogo, ciò che è riuscito in un avviso a comparsa.** Una finestra di dialogo dice solo ciò che vale per questa console adesso: che il gioco in corso verrebbe sospeso, solo mentre un gioco è aperto; che l'app Filtro famiglia potrebbe sovrascrivere una modifica, solo mentre è collegata e può sincronizzarsi.
-- **L'intestazione** indica, su ogni scheda, quando il filtro famiglia è sbloccato temporaneamente (la sua pillola), e mostra una matita barrata a destra del titolo quando l'app è in sola lettura; toccare l'una o l'altra porta dove si annulla (*PIN › Riattiva il filtro famiglia*, la schermata del firmware).
+- **L'intestazione** indica, su ogni scheda, quando il filtro famiglia è sbloccato temporaneamente (la sua pillola), e mostra una matita barrata a destra del titolo quando l'app è in sola lettura; toccare l'una o l'altra porta dove si annulla (*Oggi › Riattiva*, la schermata del firmware).
 - **In sola lettura**, le azioni restano al loro posto, in grigio, e dicono perché quando le premi.
 
 ## L'aspetto: Cadran
 
 L'aspetto di PlayGuard si chiama Cadran: una barra di icone per le schede, una tavolozza blu notte o bianco freddo (a seconda del tema), riquadri al posto degli elenchi. Ogni scheda si apre su ciò che conta di più (un anello, tessere, riquadri, chip), con le altre impostazioni sotto.
 
-- **La pillola dell'intestazione** dice di cosa tratta la scheda (*Filtro famiglia attivo*, *Timer attivo*…); mentre il filtro famiglia è sbloccato lo dice su ogni scheda, e toccarla apre *PIN › Riattiva il filtro famiglia*. Il testo secondario non scende mai sotto i 15 px, per poterlo leggere dal divano su una TV.
+- **La pillola dell'intestazione** dice di cosa tratta la scheda (*Filtro famiglia attivo*, *Timer attivo*…); mentre il filtro famiglia è sbloccato lo dice su ogni scheda, e toccarla apre *Oggi › Riattiva*. Il testo secondario non scende mai sotto i 15 px, per poterlo leggere dal divano su una TV.
 - **Le finestre di dialogo** sono riquadri con i pulsanti a pillola, la conferma in verde acqua (in corallo quando rimuove o ferma qualcosa).
   - Le scelte si aprono in un riquadro sopra i suggerimenti dei tasti, quella attuale su un verde acqua tenue con la sua spunta. Il contorno verde acqua è solo del focus, ovunque: un livello, un utente, una scelta in vigore mantiene lo sfondo tenue.
   - Una finestra di dialogo lunga sfuma in fondo finché c'è altro sotto, e il suo avviso (un gioco sul punto di essere sospeso) viene per primo, in un riquadro ambra.
@@ -106,7 +106,7 @@ Quelle per informazione: un ritorno alla build precedente, un firmware non testa
 
 - Ogni sezione elenca le sue voci in un ordine fisso, qualunque sia il controllo finito per primo.
 - **Nella barra laterale**, un badge ambra accanto al nome di una scheda conta le sue voci da fare, là dove si risolvono: la scheda PIN (nessun PIN, un PIN debole, PlayGuard senza il suo PIN, sbloccato temporaneamente), Tempo di gioco (l'avviso disattivato, la console che non conta), Oggi (modifiche fatte fuori da PlayGuard, tempo extra da togliere), la Console (le sue voci qui sopra, e l'orologio di rete). Le voci ignorate e quelle per informazione non vengono contate.
-- Nella scheda, lo stesso badge è sulla riga dove ognuna si risolve (*Orologio di rete*, *Controlla i giochi installati*, *Memoria*, *Patch dei giochi*; *Imposta o cambia il PIN*, *Proteggi PlayGuard con il PIN*, *Riattiva il filtro famiglia*; *Avanzate* di Tempo di gioco per l'avviso), e la scheda si apre sulla prima di esse.
+- Nella scheda, lo stesso badge è sulla riga dove ognuna si risolve (*Orologio di rete*, *Controlla i giochi installati*, *Memoria*, *Patch dei giochi*; *Imposta o cambia il PIN*, *Proteggi PlayGuard con il PIN*; *Avanzate* di Tempo di gioco per l'avviso), e la scheda si apre sulla prima di esse.
 - **Ⓐ** su una voce applica la soluzione (*Attivalo*, *Regolalo*, *Aggiorna*…) o apre la scheda dove si applica. Una voce sparisce da sola una volta risolto ciò che segnala.
 - **Ⓧ** segna come letta una voce per informazione; **Ⓨ** le segna tutte. Una voce segnata come letta resta letta all'avvio successivo, finché il suo testo non cambia.
 - **Ignorare:** alcune voci da fare si possono ignorare con Ⓧ, dopo una conferma e il PIN: un PIN che chiunque proverebbe per primo, PlayGuard che si apre senza il PIN, l'avviso "Tempo scaduto" disattivato, la scheda SD quasi piena (mai l'assenza di PIN, il filtro famiglia sbloccato, l'orologio, il tempo di gioco non contato o i file di PlayGuard). Una voce ignorata non viene più contata, e compare per ultima sotto *Ignorati*, dove Ⓐ la fa contare di nuovo. Torna da sola 30 giorni dopo (a meno che *Conta di nuovo gli avvisi ignorati dopo 30 giorni* non sia disattivato), una volta risolto ciò che segnala e poi ripresentatosi, oppure, per il PIN, con un nuovo PIN di un'altra lunghezza.
@@ -300,7 +300,7 @@ Tempo per gioco **oggi**, negli **ultimi 7 giorni** e **in totale**, dal registr
 - **In alto**, tre tessere: il PIN, le limitazioni e lo sblocco temporaneo, ognuna con una spunta verde acqua quando è come deve essere (un PIN impostato, limitazioni attive, bloccato) o un segnale di avviso ambra quando serve intervenire.
 - **Imposta o cambia il PIN** (schermata PIN del sistema).
 - **Mostra il PIN**: dopo un avviso e il PIN stesso, chiesto ogni volta; registrato nella cronologia, poi viene proposto un nuovo PIN.
-- **Sblocca temporaneamente**, **riattiva il filtro famiglia**, e se PlayGuard lo riattiva da solo subito dopo una modifica che ha richiesto lo sblocco (attivo per impostazione predefinita).
+- **Sblocca temporaneamente**, e se PlayGuard lo riattiva da solo subito dopo una modifica che ha richiesto lo sblocco (attivo per impostazione predefinita).
 
 ### Proteggi PlayGuard con il PIN
 

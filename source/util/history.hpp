@@ -54,6 +54,12 @@ struct Entry
     // was asked).
     std::string result;
     std::string version;  // the PlayGuard version that recorded it ("" in older entries)
+    // A development build recorded it (not a release; false in older entries):
+    // its commit ("1a2b3c4", "" when unknown) and, built by CI for a pull
+    // request, its number (0 otherwise).
+    bool        dev = false;
+    std::string commit;
+    int         pr = 0;
 };
 
 // A history.json that is there but cannot be read or parsed is put aside as

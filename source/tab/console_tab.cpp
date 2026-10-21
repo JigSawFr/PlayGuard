@@ -38,18 +38,22 @@ ConsoleTab::ConsoleTab()
         return true;
     });
 
-    // Ⓐ on the serial number shows / hides the masked digits.
-    serial->registerAction("playguard/tools/serial_show"_i18n, brls::BUTTON_A, [this](brls::View*) {
-        this->serial_revealed = !this->serial_revealed;
-        this->refresh();
+    // The real serial number, whole, and where it comes from: a press away
+    // (the row masks its middle).
+    serial_info = RowIcon::on_row(serial.getView(), RowIcon::Kind::Info);
+    serial->registerClickAction([this](brls::View*) {
+        SysInfo si;
+        sysinfo_get(&si);
+        ui::info(ui::real_serial(si).note);
         return true;
-    }, false, false, brls::SOUND_CLICK);
+    });
 
     // The release notes of each (installed and newer versions).
     const std::pair<brls::DetailCell*, sys_notes::Which> notes_cells[] = {
         { fw.getView(), sys_notes::Which::Firmware },
         { ams.getView(), sys_notes::Which::Atmosphere },
         { hekate.getView(), sys_notes::Which::Hekate },
+        { syspatch.getView(), sys_notes::Which::SysPatch },
     };
     for (const auto& n : notes_cells) {
         const sys_notes::Which which = n.second;
@@ -73,7 +77,7 @@ ConsoleTab::ConsoleTab()
         return true;
     });
     // A warning icon for the serial number not blanked on emuMMC, on the row that
-    // says so (A on the serial number's row shows / hides its digits).
+    // says so.
     blank_warn = RowIcon::on_row(blank.getView(), RowIcon::Kind::Warning);
     blank->registerClickAction([](brls::View*) {
         ui::info("playguard/tools/serial_note_emummc"_i18n);
@@ -87,18 +91,13 @@ ConsoleTab::ConsoleTab()
     // look), the text by A.
     patches_icon = RowIcon::on_row(game_patches.getView(), RowIcon::Kind::Info);
     game_patches->registerClickAction([this](brls::View*) {
-        // sigpatch files beside sys-patch: A also offers to set them aside
-        // (action/sigpatch_flow.hpp).
+        // sigpatch files beside sys-patch: what was found and, in the same
+        // question, whether to set them aside (action/sigpatch_flow.hpp).
         if (!sigpatch_flow::offered()) {
             if (!this->patches_note.empty()) ui::info(this->patches_note);
             return true;
         }
-        const std::string note = this->patches_note;
-        ui::pick_actions("playguard/tools/patches"_i18n,
-                         { { "playguard/sigpatch/details"_i18n, [note]() { ui::info(note); }, "info" },
-                           { "playguard/sigpatch/set_aside"_i18n, [this]() {
-                                 sigpatch_flow::set_aside([this](bool) { this->refresh(); });
-                             }, "folder" } });
+        sigpatch_flow::set_aside([this](bool) { this->refresh(); }, this->patches_note);
         return true;
     });
 
@@ -109,7 +108,8 @@ ConsoleTab::ConsoleTab()
         return true;
     });
     // What the console runs, as tiles above the rest (first in the XML).
-    if (brls::Box* tiles = this->list.tiles({ { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_hekate", "flag" } }, true))
+    if (brls::Box* tiles = this->list.tiles(
+            { { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_hekate", "flag" }, { "cn_syspatch", "shield" } }, true))
         tiles->setMarginBottom(20);
     this->list.apply({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_forwarders", "home" },
                        { "cn_compat", "check" }, { "cn_storage", "folder" }, { "cn_blank", "code" },
@@ -136,6 +136,17 @@ void ConsoleTab::refresh()
     hekate->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::Hekate, &newer)));
     hekate->setDetailTextColor(newer ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     ui::set_visible(hekate.getView(), !hk.empty());
+    // sys-patch: when it is installed; its version from its log.ini (none
+    // when it does not log).
+    const patches::Report& report = ui::patch_report();
+    if (!sys_update_flow::installed_syspatch().empty()) {
+        syspatch->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::SysPatch, &newer)));
+        syspatch->setDetailTextColor(newer ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
+    } else {
+        syspatch->setDetailText(ui::opens("playguard/common/unavailable"_i18n));
+        syspatch->setDetailTextColor(cadran::kit::color("cadran/text2"));
+    }
+    ui::set_visible(syspatch.getView(), report.syspatch_installed);
     // A newer firmware Atmosphère or hekate does not support yet, or only in
     // a newer release (their notes say).
     fw_warn->set_shown(!sys_notes_flow::firmware_advice().empty());
@@ -160,15 +171,10 @@ void ConsoleTab::refresh()
     blank->setDetailTextColor(c);
     blank->setFocusable(ui::serial_warning(si));
     blank_warn->set_shown(ui::serial_warning(si));
-    const bool maskable = si.serial_valid && si.serial[0] && !(si.blank_valid && si.blank);
-    serial->setDetailText(ui::serial_text(si, this->serial_revealed));
+    serial->setDetailText(ui::serial_text(si));
     serial->setDetailTextColor(ui::serial_warning(si) ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
-    serial->setActionAvailable(brls::BUTTON_A, maskable);
-    serial->updateActionHint(brls::BUTTON_A, this->serial_revealed ? "playguard/tools/serial_hide"_i18n
-                                                                   : "playguard/tools/serial_show"_i18n);
-    brls::Application::getGlobalHintsUpdateEvent()->fire();   // redraw the footer hints
+    serial_info->set_shown(!ui::real_serial(si).note.empty());
 
-    const patches::Report& report = ui::patch_report();
     c = cadran::kit::color("cadran/text2");
     game_patches->setDetailText(ui::patches_text(report, &c));
     game_patches->setDetailTextColor(c);

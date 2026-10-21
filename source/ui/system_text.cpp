@@ -5,6 +5,7 @@
 #include "ui/cadran_kit.hpp"
 #include "util/diagnostics.hpp"
 #include "util/paths.hpp"
+#include "util/prodinfo.hpp"
 #ifndef __SWITCH__
 #include "core/sim_env.h"
 #include "sim/sim_homebrew.hpp"
@@ -91,16 +92,53 @@ std::string blank_text(const SysInfo& info, NVGcolor* color)
         return "playguard/common/unavailable"_i18n;
     }
     if (color) *color = info.blank ? cadran::kit::color("cadran/teal") : (serial_warning(info) ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
-    return info.blank ? "playguard/common/yes"_i18n : "playguard/common/no"_i18n;
+    if (!info.blank) return "playguard/common/no"_i18n;
+    // With what the system sees instead.
+    return info.serial_valid && info.serial[0] ? brls::getStr("playguard/tools/blank_yes", std::string(info.serial))
+                                               : "playguard/common/yes"_i18n;
 }
 
-std::string serial_text(const SysInfo& info, bool reveal)
+const RealSerial& real_serial(const SysInfo& info)
 {
-    if (!info.serial_valid || !info.serial[0]) return "playguard/common/unavailable"_i18n;
-    std::string s = info.serial;
-    if (info.blank_valid && info.blank) return brls::getStr("playguard/tools/serial_blanked", s);
-    if (reveal || s.size() < 8) return s;
-    // Keep the prefix (model / region) and the last two digits.
+    // Read once: the backups only change with a reboot (or the SD card out).
+    static bool       read = false;
+    static RealSerial r;
+    if (read) return r;
+    read = true;
+    if (!(info.blank_valid && info.blank)) {
+        // Not blanked: the system gives the real one.
+        if (info.serial_valid && info.serial[0]) {
+            r.serial = info.serial;
+            r.note   = brls::getStr("playguard/tools/serial_how_system", r.serial);
+        } else {
+            r.note = "playguard/tools/serial_how_unread"_i18n;
+        }
+        return r;
+    }
+    const prodinfo::Found f = prodinfo::find(paths::sd_root(), info.device_id_valid, info.device_id);
+    r.source = f.source;
+    r.serial = f.serial;
+    switch (f.source) {
+        case prodinfo::Source::Matched:
+            r.note = brls::getStr("playguard/tools/serial_how_backup", r.serial, f.file);
+            break;
+        case prodinfo::Source::Single:
+            r.note = brls::getStr("playguard/tools/serial_how_backup_single", r.serial, f.file);
+            break;
+        case prodinfo::Source::Ambiguous: r.note = "playguard/tools/serial_how_ambiguous"_i18n; break;
+        case prodinfo::Source::Others: r.note = "playguard/tools/serial_how_others"_i18n; break;
+        case prodinfo::Source::None: r.note = "playguard/tools/serial_how_none"_i18n; break;
+    }
+    return r;
+}
+
+std::string serial_text(const SysInfo& info)
+{
+    const std::string& s = real_serial(info).serial;
+    if (s.empty()) return "playguard/common/unavailable"_i18n;
+    if (s.size() < 8) return s;
+    // Keep the prefix (model / region) and the last two digits; the whole
+    // number is in the note (Ⓐ).
     std::string masked = s.substr(0, 7);
     for (size_t i = 7; i + 2 < s.size(); i++) masked += "•";
     return masked + s.substr(s.size() - 2);

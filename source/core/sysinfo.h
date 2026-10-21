@@ -42,6 +42,8 @@ typedef struct {
     bool blank;          // PRODINFO blanked for this boot: the system sees SYSINFO_BLANK_SERIAL
     bool serial_valid;   // set:sys GetSerialNumber succeeded
     char serial[0x19];   // as the system reports it; NUL-terminated. Never written to reports.
+    bool device_id_valid; // spl DeviceId read (Atmosphère running)
+    u64  device_id;       // names the console in its PRODINFO backups (util/prodinfo.hpp)
 } SysInfo;
 
 typedef enum {

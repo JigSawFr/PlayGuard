@@ -23,6 +23,8 @@ std::string commit();
 // True for a published release (built from its vX.Y.Z tag), false for any
 // other build (main, a pull request, a local one): a development build.
 bool        is_release();
+// The pull request this build was made for by CI (306), 0 for any other build.
+int         pr();
 // Where the running .nro is, from the SD card root ("/switch/playguard/playguard.nro"),
 // as hbloader gave it in argv[0]; empty when unknown (nxlink, desktop).
 std::string self_path();

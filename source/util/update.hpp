@@ -38,7 +38,8 @@ struct Result
 
 // "1.2.3" (optionally "v1.2.3" or "1.2.3-dev") -> major, minor, micro.
 bool     parse_version(const std::string& text, int out[3]);
-// <0, 0 or >0 like strcmp. A suffixed version ("1.0.0-dev") sorts before the
+// <0, 0 or >0 like strcmp. A fourth number counts ("1.6.2.3" > "1.6.2",
+// sys-patch's tags); a suffixed version ("1.0.0-dev") sorts before the
 // plain release with the same numbers; unparsable versions sort first.
 int      compare_versions(const std::string& a, const std::string& b);
 // "24.0.0" -> MAKEHOSVERSION(24, 0, 0); 0 when malformed.

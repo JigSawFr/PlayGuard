@@ -8,7 +8,6 @@
 #include "action/pin_lock.hpp"
 #include "action/pt_block_flow.hpp"
 #include "action/pt_flow.hpp"
-#include "action/rescue.hpp"
 #include "app.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/cadran_kit.hpp"
@@ -25,11 +24,7 @@ SecurityTab::SecurityTab()
     // What the notification bell says is to do here, on its row.
     this->mark(set_pin.getView(), { "pin_missing", "pin_weak" });
     this->mark(pin_lock_cell.getView(), { "pin_lock_off" });
-    this->mark(relock.getView(), { "unlocked" });
     pr_note->setSingleLine(false);
-    rescue_note->setSingleLine(false);
-    // Checked once: the sysmodule only comes and goes with the SD card out.
-    ui::set_visible(rescue_note.getView(), rescue::installed());
     pin_lock_note->setSingleLine(false);
     console_lock_note->setSingleLine(false);
     console_lock_cell->registerClickAction([this](brls::View*) {
@@ -107,10 +102,6 @@ SecurityTab::SecurityTab()
         });
         return true;
     });
-    relock->registerClickAction([this](brls::View*) {
-        console_actions::relock("", [this]() { this->refresh(); });
-        return true;
-    });
     // After a change PlayGuard made with a temporary unlock: on at once, or offered.
     ui::guard_switch(auto_relock);
     auto_relock->init("playguard/tools/auto_relock"_i18n, config::get().auto_relock, [](bool on) {
@@ -123,7 +114,7 @@ SecurityTab::SecurityTab()
     });
     this->list.tiles({ { "sc_pin", "key" }, { "sc_restrictions", "shield" }, { "sc_temp", "unlock" } }, true);
     this->list.apply({ { "sc_set_pin", "key" }, { "sc_pin_lock", "lock" }, { "sc_pin_ask_again", "timer" },
-                       { "sc_show_pin", "eye" }, { "sc_unlock", "unlock" }, { "sc_relock", "lock" },
+                       { "sc_show_pin", "eye" }, { "sc_unlock", "unlock" },
                        { "sc_auto_relock", "refresh" }, { "sc_console_lock", "gamepad" }, { "pr_active", "phone" },
                        { "pr_updated", "refresh" }, { "pr_decode", "code" }, { "pr_unlink", "stop" }, { "sc_delete", "trash" } });
     if (cadran::Card* danger = this->list.card_of("sc_delete"))
@@ -188,13 +179,12 @@ void SecurityTab::refresh()
     // Read-only: the actions stay in sight, greyed (A says why).
     ui::set_visible_all({ { show_pin.getView(), has_pin },
                           { unlock.getView(), has_pin && !unlocked },
-                          { relock.getView(), unlocked },
                           // Nothing to unlink when the read says not linked.
                           { pr_unlink.getView(), !s.pairing_active_ok || paired },
                           // The block comparison needs the app to sync.
                           { pr_decode.getView(), syncs } });
     for (brls::DetailCell* c : { (brls::DetailCell*)set_pin.getView(), (brls::DetailCell*)show_pin.getView(),
-                                 (brls::DetailCell*)unlock.getView(), (brls::DetailCell*)relock.getView(),
+                                 (brls::DetailCell*)unlock.getView(),
                                  (brls::DetailCell*)console_lock_cell.getView(), (brls::DetailCell*)pr_unlink.getView(),
                                  (brls::DetailCell*)auto_relock.getView() })
         ui::show_writable(c, writable);

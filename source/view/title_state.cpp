@@ -16,8 +16,8 @@ static constexpr const char* READ_ONLY_ID = "title_state_read_only";
 // Where the state is undone.
 static void open_unlocked()
 {
-    // The PIN tab, on "Lock again".
-    if (MainActivity* main = ui::main_activity()) main->open_tab(ui::tab::security, "sc_relock");
+    // Today, on "Turn back on".
+    if (MainActivity* main = ui::main_activity()) main->open_tab(ui::tab::dashboard, "dash_relock");
 }
 
 static void open_read_only()

@@ -148,6 +148,8 @@ jobs:
         if: env.BUILD_SIMULATOR == '1'
         env:
           PLAYGUARD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+          # Its pull request's number (app::pr()), empty for any other build.
+          PLAYGUARD_PR: ${{ github.event.pull_request.number }}
         run: |
           # After emsdk_env.sh, which unsets EM_CACHE (emsdk.py's
           # construct_env_with_vars()): set before, the ports were built in
