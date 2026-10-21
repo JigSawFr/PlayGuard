@@ -45,7 +45,7 @@ void ForwardersActivity::onContentAvailable()
 {
     note->setSingleLine(false);
     warning->setSingleLine(false);
-    empty->setSingleLine(false);
+    cadran::kit::empty_around(empty, "home");
     game_note->setSingleLine(false);
     self_cell->registerClickAction([this](brls::View*) {
         if (const Row* own = forwarders_logic::self_row(this->list_rows)) {

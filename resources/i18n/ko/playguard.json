@@ -595,7 +595,6 @@
         "section_status": "상태",
         "pin": "PIN",
         "restrictions": "제한 사용 중",
-        "temporary": "일시 해제 중",
         "section_actions": "작업",
         "set_pin": "PIN 설정 또는 변경",
         "show_pin": "PIN 표시...",
@@ -694,6 +693,7 @@
     },
     "tools": {
         "section_diag": "진단",
+        "section_system": "시스템",
         "export": "진단 보고서 내보내기",
         "export_note": "{}에 저장됩니다. 버그 보고에 첨부하세요. PIN이나 시리얼 번호는 절대 포함되지 않습니다.",
         "section_start": "시작하기",

@@ -595,7 +595,6 @@
         "section_status": "狀態",
         "pin": "PIN碼",
         "restrictions": "限制已啟用",
-        "temporary": "已暫時解除",
         "section_actions": "操作",
         "set_pin": "設定或變更PIN碼",
         "show_pin": "顯示PIN碼…",
@@ -694,6 +693,7 @@
     },
     "tools": {
         "section_diag": "診斷",
+        "section_system": "系統",
         "export": "匯出診斷報告",
         "export_note": "儲存於{}。請附加在錯誤回報中。報告絕不包含PIN碼或序號。",
         "section_start": "開始使用",

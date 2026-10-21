@@ -595,7 +595,6 @@
         "section_status": "Estado",
         "pin": "PIN",
         "restrictions": "Restrições ativas",
-        "temporary": "Desbloqueado temporariamente",
         "section_actions": "Ações",
         "set_pin": "Definir ou alterar o PIN",
         "show_pin": "Mostrar o PIN...",
@@ -694,6 +693,7 @@
     },
     "tools": {
         "section_diag": "Diagnóstico",
+        "section_system": "Sistema",
         "export": "Exportar relatório de diagnóstico",
         "export_note": "Guardado em {}. Anexe-o a um relatório de erro. Nunca contém o PIN nem o número de série.",
         "section_start": "Para começar",

@@ -595,7 +595,6 @@
         "section_status": "État",
         "pin": "NIP",
         "restrictions": "Restrictions activées",
-        "temporary": "Déverrouillé temporairement",
         "section_actions": "Actions",
         "set_pin": "Définir ou changer le NIP",
         "show_pin": "Afficher le NIP...",
@@ -694,6 +693,7 @@
     },
     "tools": {
         "section_diag": "Diagnostic",
+        "section_system": "Système",
         "export": "Exporter un rapport de diagnostic",
         "export_note": "Enregistré dans {}. Joignez-le à un signalement de bogue. Il ne contient jamais le NIP ni le numéro de série.",
         "section_start": "Pour commencer",

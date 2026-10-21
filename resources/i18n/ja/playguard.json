@@ -595,7 +595,6 @@
         "section_status": "状態",
         "pin": "暗証番号",
         "restrictions": "制限が有効",
-        "temporary": "一時解除中",
         "section_actions": "操作",
         "set_pin": "暗証番号を設定・変更",
         "show_pin": "暗証番号を表示…",
@@ -694,6 +693,7 @@
     },
     "tools": {
         "section_diag": "診断",
+        "section_system": "システム",
         "export": "診断レポートをエクスポート",
         "export_note": "{}に保存されます。不具合報告に添付してください。暗証番号やシリアル番号は含まれません。",
         "section_start": "はじめに",

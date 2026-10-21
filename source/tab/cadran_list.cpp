@@ -164,7 +164,8 @@ void cadran::Card::draw(NVGcontext* vg, float x, float y, float width, float hei
     brls::View* previous = nullptr;
     for (brls::View* row : this->getChildren()) {
         if (row->getVisibility() == brls::Visibility::GONE) continue;
-        if (previous) {
+        // No line above a card's foot (a note): it belongs to the rows.
+        if (previous && !dynamic_cast<brls::Label*>(row)) {
             const float inset = has_icon(previous) ? ROW_PAD_ICON + ICON_SQUARE + ICON_GAP : ROW_PAD;
             nvgBeginPath(vg);
             nvgRect(vg, x + inset, row->getY() - 0.5f, width - inset - ROW_PAD_END, 1);
@@ -374,14 +375,19 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
             // A note (a headline, larger, keeps its size).
             if (auto* note = dynamic_cast<brls::Label*>(line); note && note->getFontSize() <= 20.5f) {
                 note->setFontSize(kit::TEXT_NOTE);
-                note->setMarginLeft(10);
-                note->setMarginRight(10);
+                note->setMarginLeft(0);
+                note->setMarginRight(0);
                 if (margin_top(note) >= 10) note->setMarginTop(10);
-                // Right under a card it explains: close to it, and the next
-                // card further away, so it reads as that card's.
+                // Right under a card it explains: the card's foot, in it,
+                // so it reads as that card's (and the next card stays apart).
                 if (above) {
-                    note->setMarginTop(6);
-                    note->setMarginBottom(std::max(margin_bottom(note), 18.0f));
+                    const float below = std::max(margin_bottom(note), 18.0f);
+                    note->setMarginTop(2);
+                    note->setMarginBottom(0);
+                    note->setMargins(2, ROW_PAD_END, 16, ROW_PAD);
+                    note->setTextColor(brls::Application::getTheme()["cadran/text3"]);
+                    move_to(note, above);
+                    above->setMarginBottom(std::max(margin_bottom(above), below));
                 }
             }
             continue;
@@ -404,7 +410,7 @@ void cadran::List::section(brls::Header* header)
     header->setLineBottom(0);
     header->setPaddingTop(0);
     header->setPaddingBottom(0);
-    header->setMarginLeft(8);
+    header->setMarginLeft(0);   // flush with the cards, as the boards' kickers
     header->setMarginBottom(10);
     if (margin_top(header) > 0) header->setMarginTop(26);
     if (!header->getChildren().empty()) header->getChildren()[0]->setVisibility(brls::Visibility::GONE);   // the bar

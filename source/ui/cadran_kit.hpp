@@ -122,6 +122,10 @@ struct Empty
     brls::Label* text  = nullptr;
 };
 Empty empty(const char* icon_name);
+// The same around a screen's own label (its XML's, which it fills and shows):
+// the label becomes the card's title, in place, and ui::set_visible on it
+// shows or hides the whole card. Returns the card.
+brls::Box* empty_around(brls::Label* label, const char* icon_name);
 
 // A row whose items go on to the next line when they do not fit (the XML
 // has no attribute for it).

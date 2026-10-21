@@ -6,6 +6,7 @@
 #include "action/play_data.hpp"
 #include "app.hpp"
 #include "core/sim_env.h"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "view/tab_badge.hpp"
 
@@ -46,7 +47,14 @@ void TabBase::mark(brls::Box* row, std::vector<std::string> ids)
 
 void TabBase::update_marks()
 {
-    for (const auto& m : this->marks) m.badge->set_count(notices::count_of(m.ids));
+    for (const auto& m : this->marks) {
+        const int count = notices::count_of(m.ids);
+        m.badge->set_count(count);
+        // A row whose value is only its "›": the badge says the way in.
+        if (auto* cell = dynamic_cast<brls::DetailCell*>(m.row))
+            if (cadran::kit::without_chevron(cell->detail->getFullText()).empty())
+                cell->detail->setVisibility(count > 0 ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
+    }
 }
 
 brls::View* TabBase::getDefaultFocus()
