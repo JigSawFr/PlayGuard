@@ -253,7 +253,7 @@ static PtState query()
 
 static void test_time_left()
 {
-    setenv("PLAYGUARD_SIM_NOW", WED_10H, 1);
+    sim_env_set("PLAYGUARD_SIM_NOW", WED_10H);   // not setenv: test_living left it set (to none) here
     sim_env_set("PLAYGUARD_SIM_NOT_COUNTING", "1");   // no PlayGuard's own seconds
 
     // 120 minutes on a Wednesday, 80 played: 40 left, and the 20 s the
