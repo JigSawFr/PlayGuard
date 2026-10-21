@@ -452,6 +452,27 @@ void cadran::List::row(brls::DetailCell* cell, const char* icon, bool alone)
     }
 }
 
+void cadran::List::row_image(brls::DetailCell* cell, const std::string& image)
+{
+    row(cell);
+    cell->setPaddingLeft(ROW_PAD_ICON);
+    // In a box as row_icon()'s square, so the rows' lines start after it too.
+    auto* square = new brls::Box(brls::Axis::ROW);
+    square->setWidth(ICON_SQUARE);
+    square->setHeight(ICON_SQUARE);
+    square->setShrink(0);
+    square->setAlignItems(brls::AlignItems::CENTER);
+    square->setJustifyContent(brls::JustifyContent::CENTER);
+    square->setMarginRight(ICON_GAP);
+    auto* picture = new brls::Image();
+    picture->setScalingType(brls::ImageScalingType::FIT);
+    picture->setImageFromRes(image);
+    picture->setWidth(30);
+    picture->setHeight(30);
+    square->addView(picture);
+    cell->addView(square, 0);
+}
+
 void cadran::List::recolor_icon(brls::DetailCell* cell, const char* icon, const char* color_key, const char* square_key)
 {
     auto* square = cell && !cell->getChildren().empty() ? dynamic_cast<brls::Box*>(cell->getChildren()[0]) : nullptr;

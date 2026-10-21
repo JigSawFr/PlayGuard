@@ -254,6 +254,10 @@ static void test_bodies()
 
 static void test_urls()
 {
+    CHECK(log_upload::link_caption("https://gist.github.com/JigSawFr/d9ad36f765d7e0e791f20202a7d93712") ==
+           "gist.github.com/JigSawFr/\nd9ad 36f7 65d7 e0e7 91f2 0202 a7d9 3712");
+    CHECK(log_upload::link_caption("https://gist.github.com/aa5a315") == "gist.github.com/\naa5a 315");
+    CHECK(log_upload::link_caption("gist.github.com") == "gist.github.com");
     log_upload::IssueFields fields;
     CHECK(log_upload::issue_url("https://github.com/o/r", "https://gist.github.com/aa5a", fields) ==
            "https://github.com/o/r/issues/new?template=1-bug.yml&report=https%3A%2F%2Fgist.github.com%2Faa5a");

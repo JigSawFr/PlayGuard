@@ -11,12 +11,23 @@
 #include <cstdint>
 #include <functional>
 #include <string>
+#include <vector>
 
 namespace clock_flow
 {
 
 // A measurement stays usable this long (the clock drifts, the user walks away).
 constexpr int64_t LIFETIME_S = 120;
+
+// One server's answer, for the result's table.
+struct ServerLine
+{
+    std::string host;
+    bool ok = false;
+    uint64_t unix_seconds = 0;     // its time at the measurement's `at`
+    std::string offset;            // "-12 s" against the network clock, "?" unread
+    std::string error;             // what went wrong, when not ok
+};
 
 struct Measurement
 {
@@ -27,7 +38,15 @@ struct Measurement
     std::string server;            // the primary server
     std::string report;            // one line per server, then the median and the offset
     std::string warning;           // "" or the servers-disagree line
+    std::vector<ServerLine> lines; // the servers asked, the primary first
+    bool offset_known = false;     // the network clock was read
+    int64_t offset = 0;            // median - network clock, seconds (< 0: ahead)
+    uint64_t network_seconds = 0;  // the network clock at `at`
 };
+
+// What the network clock's offset amounts to, in words: "12 s ahead",
+// "1 min 5 s behind", "on time" (within a second).
+std::string offset_text(int64_t offset);
 
 // The NTP server the preferences name (or the console region's default).
 std::string current_server();
