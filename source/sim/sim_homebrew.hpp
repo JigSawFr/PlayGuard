@@ -12,5 +12,8 @@ namespace sim_homebrew
 
 // Writes those of them that are not there yet under `sd_root`/switch.
 void seed(const std::string& sd_root);
+// The album's screenshots of PLAYGUARD_SIM_FORWARDERS (sim_album.cpp), those
+// not there yet, under `sd_root`/Nintendo/Album.
+void seed_album(const std::string& sd_root);
 
 }   // namespace sim_homebrew

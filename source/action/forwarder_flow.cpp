@@ -387,7 +387,7 @@ void reinstall_all(std::function<void(bool)> done)
                 });
 }
 
-void set_icon(const forwarders_logic::Row& row, const std::string& shot, std::function<void(bool)> done)
+void set_icon(const forwarders_logic::Row& row, const std::string& shot, int x, std::function<void(bool)> done)
 {
     forwarders::Made m = made_of(row);
     if (m.nro.empty()) {
@@ -395,6 +395,7 @@ void set_icon(const forwarders_logic::Row& row, const std::string& shot, std::fu
         return;
     }
     m.icon = shot;
+    m.icon_x = shot.empty() ? forwarders::ICON_X_MIDDLE : std::clamp(x, 0, 100);
     const bool ok = install(m, row.self || m.nro == self_nro(), "add_forwarder",
                             brls::getStr("playguard/forwarders/icon_set", row.name));
     if (done) done(ok);
@@ -444,6 +445,22 @@ std::vector<std::string> album_shots()
         out.push_back(nro::sdmc_path(root.empty() ? p : p.substr(root.size())));
     }
     return out;
+}
+
+std::vector<uint8_t> shot_bytes(const std::string& shot)
+{
+    std::string bytes;
+    const std::string p = nro::sd_path(shot);
+    if (p.empty() || !paths::read_file(on_sd(p), bytes)) return {};
+    return std::vector<uint8_t>(bytes.begin(), bytes.end());
+}
+
+std::vector<uint8_t> own_icon(const forwarders_logic::Row& row)
+{
+    nro::Info info;
+    std::string error;
+    if (!assets_of(row.nro, row.self, info, error)) return {};
+    return info.icon;
 }
 
 }   // namespace forwarder_flow

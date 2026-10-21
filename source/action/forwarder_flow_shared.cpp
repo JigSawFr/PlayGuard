@@ -155,7 +155,7 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
         const std::string p = nro::sd_path(m.icon);
         std::vector<uint8_t> icon;
         if (!p.empty() && paths::read_file(on_sd(p), shot))
-            icon = forwarder_icon::from_screenshot(std::vector<uint8_t>(shot.begin(), shot.end()));
+            icon = forwarder_icon::from_screenshot(std::vector<uint8_t>(shot.begin(), shot.end()), m.icon_x);
         if (nro::icon_usable(icon)) info.icon = icon;
         else brls::Logger::warning("forwarders: {} unreadable, the .nro's icon instead", m.icon);
     }

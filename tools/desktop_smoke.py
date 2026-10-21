@@ -1492,13 +1492,30 @@ if HOMEBREW:
     key("Return")
     go_to("Change the icon")
     key("Return")
-    shot("04_icon")            # its .nro's own, then the album's screenshots, the newest first
-    key("Down")                # 2026-10-20 18:30
+    time.sleep(2)              # the screenshots read and drawn
+    shot("04_icon")            # a grid: its .nro's own (checked, in focus), the album's screenshots newest first; now and after
+    key("Right", 2)            # today 09:12:00, Star Kart Racers (another the same minute: its seconds)
+    time.sleep(1)
+    key("e")                   # the keyboard's R: its square a quarter to the right
+    time.sleep(1)
+    shot("04_icon_moved")      # the cell and the "after" moved along the screenshot
     key("Return")
     time.sleep(3)
-    icons = [e.get("icon") for e in json.load(open(made_file)).get("forwarders", []) if e.get("name") == "Star Atlas"]
-    if icons != ["sdmc:/Nintendo/Album/2026/10/20/2026102018300000-57B4628D2267231D57E0FC1078C0596D.jpg"]:
-        fail("Star Atlas's icon from the album was not kept: " + repr(icons))
+    made = [e for e in json.load(open(made_file)).get("forwarders", []) if e.get("name") == "Star Atlas"]
+    today = time.strftime("%Y/%m/%d/%Y%m%d", time.gmtime(int(env["PLAYGUARD_SIM_NOW"])))
+    if [(e.get("icon"), e.get("icon_x")) for e in made] != [
+            ("sdmc:/Nintendo/Album/" + today + "09120000-57B4628D2267231D57E0FC1078C0596D.jpg", 75)]:
+        fail("Star Atlas's icon from the album was not kept, its square moved: " + repr(made))
+    key("Return")              # Star Atlas's sheet again
+    go_to("Change the icon")
+    key("Return")
+    time.sleep(2)
+    shot("04_icon_in_use")     # the screenshot in use checked, in focus, its square where it was left
+    key("y")                   # the keyboard's Y: its .nro's own again
+    time.sleep(3)
+    made = [e for e in json.load(open(made_file)).get("forwarders", []) if e.get("name") == "Star Atlas"]
+    if [e.get("icon") for e in made] != [None]:
+        fail("Star Atlas's own icon was not put back: " + repr(made))
     key("Down", 9)             # Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock, Protect every forwarder, Pause after refused PINs, Tries this week, Check
     key("Return")
     key("Left")                # Rescue sheet

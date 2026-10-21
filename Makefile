@@ -204,7 +204,7 @@ config_SRC   := source/util/paths.cpp source/util/date.cpp source/util/config.cp
 profiles_SRC   := source/util/paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
 forwarders_SRC    := source/util/paths.cpp source/util/nro.cpp source/util/forwarders.cpp source/util/forwarder_icon.cpp source/util/forwarder_gate.cpp source/util/patches.cpp source/action/forwarders_logic.cpp tests/forwarders/test.cpp
 forwarders_FLAGS  := $(TEST_CXXFLAGS) -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
-forwarders_CSRC   := tests/forwarders/stb.c extern/stb/stb_image_write.c source/core/gate.c
+forwarders_CSRC   := tests/forwarders/stb.c extern/stb/stb_image_write.c source/core/gate.c source/core/calendar.c
 forwarders_CFLAGS := -std=c11 -w -Isource/core -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
 forwarders_LIBS   := -lm
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
@@ -246,15 +246,16 @@ crash_dump_FLAGS := -std=c11 -Isource/util
 # The desktop and web simulators' console (source/sim/*.c, sim_state.h) and
 # their PLAYGUARD_SIM_* variables (core/sim_env.h), with the console-free
 # parts of the service layer they share with the console.
-sim_backend_SRC    := source/sim/sim_env.cpp source/sim/sim_platform.cpp source/sim/sim_forwarder.cpp source/util/forwarders.cpp source/util/paths.cpp source/util/sha256.cpp source/util/nro.cpp tests/sim_backend/test.cpp
+sim_backend_SRC    := source/sim/sim_env.cpp source/sim/sim_platform.cpp source/sim/sim_forwarder.cpp source/sim/sim_album.cpp source/util/forwarder_icon.cpp source/util/forwarders.cpp source/util/paths.cpp source/util/sha256.cpp source/util/nro.cpp tests/sim_backend/test.cpp
 sim_backend_CSRC   := $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c sim_time.c sim_playstats.c sim_gamecheck.c) \
-                      $(addprefix source/core/,pure.c calendar.c write_guard.c forwarder_pack.c) source/util/playlog.c
+                      $(addprefix source/core/,pure.c calendar.c write_guard.c forwarder_pack.c) source/util/playlog.c \
+                      tests/forwarders/stb.c extern/stb/stb_image_write.c
 # Atomic coverage counters: the suite runs the same code from several threads
 # at once, and gcov's plain counters then come out wrong (negative ones, that
 # gcovr refuses).
-sim_backend_FLAGS  := $(TEST_CXXFLAGS) -fprofile-update=atomic
-sim_backend_CFLAGS := -std=gnu11 -Isource/core -fprofile-update=atomic
-sim_backend_LIBS   := -pthread
+sim_backend_FLAGS  := $(TEST_CXXFLAGS) -fprofile-update=atomic -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
+sim_backend_CFLAGS := -std=gnu11 -Isource/core -fprofile-update=atomic -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
+sim_backend_LIBS   := -pthread -lm
 frame_stats_SRC   := source/util/paths.cpp source/util/frame_stats.cpp tests/frame_stats/test.cpp
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
 migrations_SRC   := source/util/paths.cpp source/util/date.cpp source/util/update.cpp source/util/migrations.cpp tests/migrations/test.cpp

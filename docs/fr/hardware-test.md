@@ -15,7 +15,7 @@ Chaque étape : ce qu'il faut faire, puis ce qui doit se passer. ☐ est à coch
 - ☐ *Un autre homebrew › sphaira* : l'aperçu montre l'icône et le nom de sphaira ; une fois ajouté, le menu HOME a la même icône et le même nom, et il lance sphaira.
 - ☐ Un homebrew dont le `.nro` a une icône PNG, ou d'une autre taille : son icône sur le menu HOME (pas un « ? »).
 - ☐ La console dans une autre langue (Paramètres de la console › Console › Langue) : les icônes restent.
-- ☐ *Changer l'icône* sur l'un d'eux, une capture de l'album : le menu HOME montre le carré central de la capture.
+- ☐ *Changer l'icône* sur l'un d'eux : la grille montre aussitôt les captures de l'album, leurs vignettes arrivant au fur et à mesure, chacune avec le jeu où elle a été prise (caps:a ; *Prise hors d'un jeu* pour celles du menu HOME). Une capture déplacée avec R, puis A : le menu HOME montre le carré qu'affichait *Après*.
 - ☐ *Supprimer*, puis ZR dans les 8 secondes : de retour sur le menu HOME, avec la même icône.
 
 ## 2. La porte du code PIN
