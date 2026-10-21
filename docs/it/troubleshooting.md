@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 498fbfed802c -->
+<!-- translated from docs/troubleshooting.md, sha256 5b0b1b94198f -->
 # Risoluzione dei problemi
 
 Riprendere il controllo di una console bloccata, i problemi comuni, segnalare un bug, e la modalità sviluppatore. Torna al [README](../../README.md).
@@ -74,6 +74,10 @@ La console usa un firmware più recente del più recente testato: PlayGuard cont
 
 *Console › Controlla i giochi installati* dice cosa non va in ognuno e cosa fare; i dati di salvataggio restano sempre ([giochi installati](features.md#giochi-installati)).
 
+### Un forwarder protetto mostra l'errore 2347-0100
+
+Il suo cancello (`config/playguard/gate-….nro`) non è più il file con cui è stato creato il forwarder: è stato modificato o sostituito sulla scheda SD, quindi il forwarder non lo avvia. Apri PlayGuard dal suo forwarder: riscrive il cancello all'avvio; *Console › Forwarder › Reinstalla tutti* rifà ogni forwarder con esso.
+
 ### La campanella o una scheda mostra un badge ambra
 
 Qualcosa richiede la tua attenzione: Ⓨ apre l'elenco, e Ⓐ su una voce applica la soluzione o apre dove si applica ([notifiche](features.md#notifiche--ciò-che-richiede-la-tua-attenzione-da-qualsiasi-scheda)).
@@ -120,6 +124,7 @@ Premi Ⓨ sette volte su *Informazioni › Versione*; gli strumenti per sviluppa
 
 - un interruttore **sola lettura** — quando è attivo, l'app non può modificare nulla: il modo sicuro per esaminare un nuovo firmware (la schermata del firmware lo propone direttamente);
 - il rapporto di diagnostica sullo schermo (Ⓨ lo salva, Ⓧ lo invia online), e una scorciatoia per esportarlo dalla scheda Tempo di gioco;
+- **Autotest della console**: ciò che PlayGuard controlla da solo su questa console prima di percorrere a mano [la checklist sulla console](../hardware-test.md) (in inglese) — il PIN, le patch di firma, la cartella dei dati, ogni forwarder creato da PlayGuard (nel menu HOME, protetto, visto funzionare attraverso il suo cancello), il cancello sulla scheda SD, ciò che Atmosphère legge del blocco del menu homebrew, le vie di ritorno, il sysmodule di ripristino. Non cambia nulla, e scrive il suo risultato in Markdown in `config/playguard/self-test.md`, da incollare nella pull request;
 - **Installa un'altra build** al posto di quella attuale, per provare una correzione prima che venga pubblicata ([sotto](#installare-unaltra-build));
 - **Confronta blocco tempo di gioco** (solo mentre l'app Filtro famiglia è collegata e può sincronizzarsi — non con un file hosts che blocca Nintendo; anche in *PIN*), per decifrare le impostazioni che PlayGuard non mostra ancora: salva il blocco grezzo come riferimento, cambia un'impostazione nell'app Filtro famiglia, torna qui — PlayGuard elenca i valori che sono cambiati (salvati in `logs/reports/` su richiesta). Orari diversi di Sogni d'oro per ogni giorno, impostati dall'app Filtro famiglia, potrebbero essere confermati così. Allega quel file a una issue, o invialo con il rapporto (*Invia un rapporto online*).
 - **Registra il tempo di gioco**: ogni 30 s mentre PlayGuard è aperto, una riga di ciò che riporta il timer (tempo rimanente, tempo trascorso, il blocco grezzo delle impostazioni…) in `logs/play_timer/log.csv`, un file pronto per un foglio di calcolo, più una riga subito dopo ogni modifica fatta da PlayGuard, che dice quale (la sua ultima colonna, `event`), e una nota quando l'orologio si è spostato più del tempo trascorso. Lasciato aperto oltre la mezzanotte, o fino allo scadere del tempo, mostra ciò che un solo rapporto non può mostrare: quando il tempo trascorso si azzera, cosa dice la console verso la fine. L'interruttore viene ricordato; registra solo in modalità sviluppatore. Ciò che si sa finora è in [parental-controls.md](../parental-controls.md) (in inglese).

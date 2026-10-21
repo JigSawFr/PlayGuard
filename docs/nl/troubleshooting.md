@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 498fbfed802c -->
+<!-- translated from docs/troubleshooting.md, sha256 5b0b1b94198f -->
 # Problemen oplossen
 
 Weer toegang krijgen tot een vergrendelde console, de veelvoorkomende problemen, een bug melden, en de ontwikkelaarsmodus. Terug naar de [README](../../README.md).
@@ -74,6 +74,10 @@ De console draait een firmware die nieuwer is dan de nieuwste geteste: PlayGuard
 
 *Console › Geïnstalleerde games controleren* zegt wat er met elke game mis is en wat je moet doen; opgeslagen spelgegevens blijven altijd staan ([geïnstalleerde games](features.md#geïnstalleerde-games)).
 
+### Een beveiligde forwarder toont fout 2347-0100
+
+Zijn poort (`config/playguard/gate-….nro`) is niet meer het bestand waarmee de forwarder is gemaakt: hij is op de SD-kaart gewijzigd of vervangen, dus de forwarder start hem niet. Open PlayGuard via zijn eigen forwarder: die schrijft de poort bij het starten terug; *Console › Forwarders › Alles opnieuw installeren* maakt elke forwarder er opnieuw mee.
+
 ### De bel of een tabblad toont een oranje badge
 
 Er moet iets gebeuren: Ⓨ opent de lijst, en Ⓐ op een melding voert de oplossing uit of opent de plek waar je het oplost ([meldingen](features.md#meldingen--wat-je-aandacht-vraagt-vanuit-elk-tabblad)).
@@ -120,6 +124,7 @@ Druk zeven keer op Ⓨ op *Info › Versie*; de ontwikkelaarstools verschijnen o
 
 - een schakelaar **alleen-lezen** — staat die aan, dan kan de app niets wijzigen: de veilige manier om een nieuwe firmware te onderzoeken (het firmwarescherm biedt hem direct aan);
 - het diagnoserapport op het scherm (Ⓨ slaat het op, Ⓧ verstuurt het online), en een snelkoppeling om het te exporteren vanuit het tabblad Speeltijdtimer;
+- **Zelftest van de console**: wat PlayGuard zelf op deze console controleert voordat [de consolechecklist](../hardware-test.md) (in het Engels) met de hand wordt doorlopen — de pincode, de signaturepatches, de gegevensmap, elke forwarder die PlayGuard heeft gemaakt (in het HOME-menu, beveiligd, werkend gezien via zijn poort), de poort op de SD-kaart, wat Atmosphère leest van de vergrendeling van het homebrew-menu, de wegen terug, de herstel-sysmodule. Hij wijzigt niets, en schrijft zijn resultaat als Markdown naar `config/playguard/self-test.md`, om in de pull request te plakken;
 - **Andere build installeren** ter plekke, om een oplossing te testen voordat die wordt uitgebracht ([hieronder](#een-andere-build-installeren));
 - **Speeltijdblok vergelijken** (alleen zolang de app op de telefoon gekoppeld is en kan synchroniseren — niet met een hosts-bestand dat Nintendo blokkeert; ook in *Pincode*), om instellingen te ontcijferen die PlayGuard nog niet toont: sla het ruwe blok op als referentie, wijzig één instelling in de app op de telefoon, kom terug — PlayGuard toont de waarden die zijn veranderd (op verzoek opgeslagen in `logs/reports/`). Verschillende bedtijden per dag, ingesteld via de app op de telefoon, kunnen zo worden bevestigd. Voeg dat bestand toe aan een issue, of verstuur het met het rapport (*Rapport online versturen*).
 - **Speeltijdtimer vastleggen**: elke 30 s zolang PlayGuard open is, één regel met wat de speeltijdtimer meldt (resterende tijd, gespeelde tijd, het ruwe instellingenblok…) in `logs/play_timer/log.csv`, een bestand dat klaar is voor een spreadsheet, plus een regel direct na elke wijziging die PlayGuard doet, met welke (de laatste kolom, `event`), en een opmerking als de klok meer verschoof dan de tijd die verstreek. Laat je het open over middernacht heen, of tot de tijd om is, dan toont het wat één rapport niet kan: wanneer de gespeelde tijd wordt teruggezet, wat de console tegen het einde zegt. De schakelaar wordt onthouden; hij legt alleen vast in ontwikkelaarsmodus. Wat tot nu toe bekend is, staat in [parental-controls.md](../parental-controls.md) (in het Engels).
