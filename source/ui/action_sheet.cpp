@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cmath>
 #include <memory>
+#include <yoga/Yoga.h>
 
 #include "tab/cadran_list.hpp"
 #include "ui/cadran_kit.hpp"
@@ -27,6 +28,8 @@ namespace kit = cadran::kit;
 
 constexpr float SIDE = 200;           // the panel's margins: 880 px wide
 constexpr float CARD_GAP = 14;
+constexpr float TILE_HEIGHT = 116;    // a grid's tiles (pick_grid())
+constexpr float TILE_GAP = 12;
 
 struct Line
 {
@@ -90,7 +93,8 @@ class Panel : public brls::Box
 class Sheet : public brls::Box
 {
   public:
-    Sheet(const std::string& title, const std::string& subtitle, int image, std::vector<Line> lines, size_t focus)
+    Sheet(const std::string& title, const std::string& subtitle, int image, std::vector<Line> lines, size_t focus,
+          int columns = 0)
         : brls::Box(brls::Axis::COLUMN), lines(std::move(lines)), focus(focus)
     {
         brls::Theme theme = brls::Application::getTheme();
@@ -115,25 +119,28 @@ class Sheet : public brls::Box
         auto* column = new Column();
         column->setAlignItems(brls::AlignItems::STRETCH);
         column->setPadding(18, 28, 22, 28);
-        cadran::Card* card = nullptr;
-        for (size_t i = 0; i < this->lines.size(); i++) {
-            const Line& l = this->lines[i];
-            // A new group: its kicker (when named) and its card.
-            if (!card || l.group != this->lines[i - 1].group) {
-                if (!l.group.empty()) {
-                    auto* kicker = new brls::Label();
-                    kit::set_kicker(kicker, l.group);
-                    kicker->setSingleLine(true);
-                    kicker->setMarginLeft(6);
-                    kicker->setMarginTop(card ? CARD_GAP + 4 : 0);
-                    kicker->setMarginBottom(10);
-                    column->addView(kicker);
+        if (columns > 0) this->grid(column, (size_t)columns);
+        else {
+            cadran::Card* card = nullptr;
+            for (size_t i = 0; i < this->lines.size(); i++) {
+                const Line& l = this->lines[i];
+                // A new group: its kicker (when named) and its card.
+                if (!card || l.group != this->lines[i - 1].group) {
+                    if (!l.group.empty()) {
+                        auto* kicker = new brls::Label();
+                        kit::set_kicker(kicker, l.group);
+                        kicker->setSingleLine(true);
+                        kicker->setMarginLeft(6);
+                        kicker->setMarginTop(card ? CARD_GAP + 4 : 0);
+                        kicker->setMarginBottom(10);
+                        column->addView(kicker);
+                    }
+                    card = new cadran::Card();
+                    if (l.group.empty() && !column->getChildren().empty()) card->setMarginTop(CARD_GAP);
+                    column->addView(card);
                 }
-                card = new cadran::Card();
-                if (l.group.empty() && !column->getChildren().empty()) card->setMarginTop(CARD_GAP);
-                column->addView(card);
+                card->addView(this->line(l, i));
             }
-            card->addView(this->line(l, i));
         }
         frame->setContentView(column);
         panel->frame = frame;
@@ -142,7 +149,10 @@ class Sheet : public brls::Box
         // As tall as its lines, up to most of the screen; the rest scrolls.
         // A first guess, then the lines' own height once laid out.
         const float most = brls::Application::contentHeight * 0.8f;
-        panel->setHeight(std::min((subtitle.empty() ? 70.0f : 92.0f) + 60.0f * (float)this->lines.size() + 40, most));
+        const float body = columns > 0
+            ? (TILE_HEIGHT + TILE_GAP) * (float)((this->lines.size() + columns - 1) / columns)
+            : 60.0f * (float)this->lines.size();
+        panel->setHeight(std::min((subtitle.empty() ? 70.0f : 92.0f) + body + 40, most));
         column->measured = [panel, head, most](float lines) {
             const float want = std::min(head->getHeight() + lines + 2, most);
             if (std::abs(want - panel->getHeight()) > 1) brls::sync([panel, want]() { panel->setHeight(want); });
@@ -213,6 +223,78 @@ class Sheet : public brls::Box
         return head;
     }
 
+    // The lines as tiles, `columns` to a row: the icon large above the
+    // label, the value chosen in teal. Up and down keep the column.
+    void grid(brls::Box* column, size_t columns)
+    {
+        brls::Box* row = nullptr;
+        for (size_t i = 0; i < this->lines.size(); i++) {
+            if (i % columns == 0) {
+                row = new brls::Box(brls::Axis::ROW);
+                row->setAlignItems(brls::AlignItems::STRETCH);
+                if (i > 0) row->setMarginTop(TILE_GAP);
+                YGNodeStyleSetGap(row->getYGNode(), YGGutterColumn, TILE_GAP);
+                column->addView(row);
+            }
+            row->addView(this->tile(this->lines[i], i));
+        }
+        // The last row's empty places, so its tiles keep their width.
+        for (size_t i = this->lines.size(); row && i % columns != 0; i++) {
+            auto* gap = new brls::Box();
+            gap->setGrow(1);
+            gap->setWidth(0);
+            row->addView(gap);
+        }
+        for (size_t i = 0; i < this->cells.size(); i++) {
+            if (i >= columns) this->cells[i]->setCustomNavigationRoute(brls::FocusDirection::UP, this->cells[i - columns]);
+            if (i + columns < this->cells.size())
+                this->cells[i]->setCustomNavigationRoute(brls::FocusDirection::DOWN, this->cells[i + columns]);
+        }
+    }
+
+    brls::DetailCell* tile(const Line& l, size_t index)
+    {
+        brls::Theme theme = brls::Application::getTheme();
+        auto* cell = new brls::DetailCell();
+        cell->setText(l.label);
+        cell->setDetailText("");
+        cell->detail->setVisibility(brls::Visibility::GONE);
+        cell->setAxis(brls::Axis::COLUMN);
+        cell->setAlignItems(brls::AlignItems::CENTER);
+        cell->setJustifyContent(brls::JustifyContent::CENTER);
+        cell->setGrow(1);
+        cell->setWidth(0);
+        cell->setHeight(TILE_HEIGHT);
+        cell->setPadding(14, 6, 14, 6);
+        cell->setMarginRight(0);
+        cell->setLineBottom(0);
+        cell->setLineTop(0);
+        cell->setCornerRadius(kit::RADIUS_CARD);
+        cell->setHighlightCornerRadius(kit::RADIUS_CARD);
+        cell->setBackgroundColor(theme[l.checked ? "cadran/teal_soft" : "cadran/surf2"]);
+        cell->title->setGrow(0);
+        cell->title->setMarginRight(0);
+        cell->title->setFontSize(kit::TEXT_NOTE);
+        // On one line: a tile's width holds the longest name ("Einschränkungen")
+        // at the larger text size.
+        cell->title->setSingleLine(true);
+        cell->title->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+        if (l.checked) cell->title->setTextColor(theme["cadran/teal"]);
+        if (!l.icon.empty()) {
+            CadranIcon* icon = kit::icon(l.icon.c_str(), 32, l.checked ? "cadran/teal" : "cadran/text2");
+            icon->setMarginBottom(12);
+            icon->setShrink(0);
+            cell->addView(icon, 0);
+        }
+        const std::function<void()> run = l.run;
+        cell->registerClickAction([run](brls::View*) {
+            close_sheet(run);
+            return true;
+        });
+        if (this->cells.size() == index) this->cells.push_back(cell);
+        return cell;
+    }
+
     brls::DetailCell* line(const Line& l, size_t index)
     {
         brls::Theme theme = brls::Application::getTheme();
@@ -273,11 +355,12 @@ class Sheet : public brls::Box
     }
 };
 
-void open(const std::string& title, const std::string& subtitle, int image, std::vector<Line> lines, size_t focus)
+void open(const std::string& title, const std::string& subtitle, int image, std::vector<Line> lines, size_t focus,
+          int columns = 0)
 {
     if (lines.empty()) return;
     if (focus >= lines.size()) focus = 0;
-    brls::Application::pushActivity(new brls::Activity(new Sheet(title, subtitle, image, std::move(lines), focus)),
+    brls::Application::pushActivity(new brls::Activity(new Sheet(title, subtitle, image, std::move(lines), focus, columns)),
                                     brls::TransitionAnimation::FADE);
 }
 
@@ -336,6 +419,15 @@ void pick(const std::string& title, const std::vector<std::string>& values, int 
          value_lines(values, details, [checked, focus](size_t i) { return checked && i == focus; }, std::move(on_pick),
                      icons),
          focus);
+}
+
+void pick_grid(const std::string& title, const std::vector<std::string>& values, const std::vector<std::string>& icons,
+               int selected, std::function<void(int)> on_pick, int columns)
+{
+    const size_t focus = selected < 0 ? 0 : (size_t)selected;
+    open(title, "", 0,
+         value_lines(values, {}, [focus](size_t i) { return i == focus; }, std::move(on_pick), icons), focus,
+         columns < 1 ? 1 : columns);
 }
 
 void pick_marked(const std::string& title, const std::vector<std::string>& values, const std::vector<bool>& marks,

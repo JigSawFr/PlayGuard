@@ -1693,6 +1693,14 @@ if CADRAN:
     key("Return")
     shot("17_text_size")
     key("Escape")
+    # Start on: the tabs as a grid of tiles; down keeps the column.
+    key("Right")               # Start on, after Text size
+    key("Return")
+    key("Down")                # PIN, under Today
+    key("Right", 2)            # Preferences
+    shot("17_start_on")
+    key("Escape")
+    key("Left")                # back on Text size
 
     # Console › Network clock: both clocks large.
     key("Left", 3)
