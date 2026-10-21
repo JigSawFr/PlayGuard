@@ -19,7 +19,7 @@ bool offered()
     return patches::can_set_aside(ui::patch_report());
 }
 
-void set_aside(std::function<void(bool)> done)
+void set_aside(std::function<void(bool)> done, const std::string& intro)
 {
     const auto finish = [done](bool moved) {
         if (done) done(moved);
@@ -37,6 +37,7 @@ void set_aside(std::function<void(bool)> done)
     }();
     std::string body = brls::getStr("playguard/sigpatch/confirm", "config/playguard/sigpatches-aside/" + std::string(when));
     if (hekate) body += "\n\n" + "playguard/sigpatch/hekate"_i18n;
+    if (!intro.empty()) body = intro + "\n\n" + body;
     ui::confirm(body, "playguard/sigpatch/set_aside"_i18n,
                 [dest, finish]() {
                     // Patch files decide what the console will run: the PIN,

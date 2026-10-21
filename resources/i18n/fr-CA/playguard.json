@@ -2021,7 +2021,6 @@
         "removed": "Profil programmé retiré."
     },
     "sigpatch": {
-        "details": "Ce qui a été trouvé",
         "set_aside": "Mettre les sigpatches de côté",
         "confirm": "Déplacer les fichiers sigpatches (.ips pour es, fs et le loader) dans {} ? Rien n'est supprimé : les remettre en place annule tout. sys-patch patche ensuite seul dès le prochain démarrage ; redémarrez la console.",
         "hekate": "Le bootloader/patches.ini de hekate reste : si hekate_ipl.ini contient encore kip1patch=nosigchk, retirez cette ligne avant de démarrer avec le fss0 de hekate.",
