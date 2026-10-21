@@ -400,6 +400,10 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
             }
             continue;
         }
+        // A cell set apart from the one above (a top margin, as Advanced
+        // under the extra time) starts a card of its own: in the same card,
+        // the margin is an empty band across it.
+        if (card && margin_top(cell) > 0) card = nullptr;
         if (!card) {
             card = new Card();
             card->setMarginTop(margin_top(cell));
