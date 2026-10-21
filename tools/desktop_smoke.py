@@ -1219,6 +1219,8 @@ if FORWARDERS:
         fail("a touch outside the details did not close them: the focus on " + repr(focused()))
     key("Down")                # PlayGuard, to add
     key("Return")
+    shot("04_patches_first")   # no signature patches here: it would not start yet; Add it anyway, Cancel
+    key("Return")              # Add it anyway
     shot("04_add_self")        # the confirmation, with its .nro
     key("Right")               # Add
     key("Return")
@@ -1233,6 +1235,7 @@ if FORWARDERS:
     shot("06_pick")            # the made-up homebrew of /switch, PlayGuard's own among them
     key("Down", 5)             # Star Atlas, after sphaira
     key("Return")
+    key("Return")              # Add it anyway (no signature patches here, as for PlayGuard's)
     shot("07_name")            # its name from its .nro, to change or keep
     key("Return")              # kept
     shot("08_confirm")         # what the HOME menu will show: its icon, name and publisher
