@@ -81,6 +81,16 @@ class List
     // "cadran/amber_fill" a warning (needs the parent); nullptr: none.
     void state(const char* id, const char* color_key);
 
+    // A status tile's pill under its value ("23.0.1 available"; empty: none):
+    // in amber on its amber ground, the tile outlined in amber, when `warn`
+    // (something to do), else in the calm pill colours ("Up to date"); and
+    // `note` under it, smaller ("2 versions behind"; empty: none).
+    void tag(const char* id, const std::string& text, bool warn, const std::string& note = "");
+
+    // A status tile's head (its icon's row), for a sign at its far end
+    // (RowIcon): the tile's corner, not under its value.
+    brls::Box* head(const char* id) const;
+
     // These cells as amber banners, each a card of its own (after apply()).
     void banners(const std::vector<const char*>& ids);
 
@@ -127,5 +137,6 @@ class List
     std::vector<brls::Header*> headers;
     std::vector<brls::DetailCell*> readings;   // the status tiles
     std::vector<std::pair<brls::DetailCell*, brls::View*>> marks;   // each one's state (a kit::Mark)
+    std::vector<std::pair<brls::DetailCell*, brls::Box*>>  tags;    // each one's pill (tag())
 };
 }   // namespace cadran
