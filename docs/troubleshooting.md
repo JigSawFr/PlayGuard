@@ -40,7 +40,7 @@ PlayGuard cannot help: it needs Atmosphère. Nintendo support's master-key proce
 ### My limits changed by themselves
 
 - **The phone app is still linked.** Its next sync overwrites what PlayGuard set: *PIN › Unlink the companion app*.
-- **Another tool, or a profile.** *Today* shows an amber card for limits that differ from the ones PlayGuard last saw, and *History › Change history* lists each change seen outside PlayGuard. Ⓐ on one puts the previous value back.
+- **Another tool, or a profile.** *Today* shows an amber card for limits that differ from the ones PlayGuard last saw, and *Preferences › Change history* lists each change seen outside PlayGuard. Ⓐ on one puts the previous value back.
 - **A scheduled profile:** put in force when its period began, or the limits it replaced put back once it ended (*Play timer › Profiles › Scheduled profile*).
 
 ### The child played past the limit

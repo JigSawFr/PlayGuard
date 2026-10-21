@@ -356,6 +356,10 @@ static void test_preferences()
         config::load();
         CHECK(config::get().start_tab == "console");
     }
+    // The History tab, now in Preferences.
+    write_config(R"({"start_tab": "history"})");
+    config::load();
+    CHECK(config::get().start_tab == "preferences");
     write_config(R"({"extra_amounts": "15,30,60", "backup_keep": "all"})");
     config::load();
     CHECK(config::get().extra_amounts == std::vector<int>({ 15, 30, 60 }) && config::get().backup_keep == 0);
@@ -391,7 +395,7 @@ static void test_preferences()
 
     // Round trip.
     config::get() = config::Config{};
-    config::get().start_tab = "history";
+    config::get().start_tab = "about";
     config::get().extra_amounts = { 5, 10, 15 };
     config::get().backup_keep = 20;
     config::get().logs_keep = 50;
@@ -402,7 +406,7 @@ static void test_preferences()
     CHECK(save_config());
     config::get() = config::Config{};
     config::load();
-    CHECK(config::get().start_tab == "history" && config::get().extra_amounts == std::vector<int>({ 5, 10, 15 }));
+    CHECK(config::get().start_tab == "about" && config::get().extra_amounts == std::vector<int>({ 5, 10, 15 }));
     CHECK(config::get().backup_keep == 20);
     CHECK(config::get().logs_keep == 50 && config::get().logs_keep_days == 365 && config::get().logs_keep_mb == 20);
     CHECK(!config::get().support_reminder && config::get().seen_version == "1.2.0");

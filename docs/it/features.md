@@ -404,7 +404,7 @@ Su una console senza Internet, *Imposta l'orologio di rete sull'orologio della c
 
 ## Cronologia — modifiche e backup
 
-*[Provalo nel simulatore ›](https://playguard.link/simulator/?tab=history)*
+*[Provalo nel simulatore ›](https://playguard.link/simulator/?tab=preferences)*
 
 ### Cronologia delle modifiche
 

@@ -125,6 +125,12 @@ Each job writes a summary on the run page (`tools/ci_summary.py`): what is being
 
 **Branding:** `branding/*.svg` are rendered to `icon.jpg`, `images/store/*.png`, `images/social-preview.png` (the repository's social preview) and `resources/img/wordmark.png` (the loading screen's) by `node tools/render_branding.mjs` (Node + Playwright).
 
+### The Cadran look
+
+The pieces every screen builds with are in `source/ui/` (`cadran_kit`, `cadran_modal`, `cadran_frame`) and `source/tab/cadran_list`: a colour is always a key of the palettes (`kit::color("cadran/teal")`, `@theme/cadran/…` in the XML), never a value of its own, so both themes follow; corners and type sizes are the kit's tokens (`kit::RADIUS_*`, `@style/cadran/radius/*`, `kit::TEXT_*`). A dialog is `ui::dialog` / `ui::confirm` / `ui::confirm_danger` / `ui::info` (anything under its text through `ui::dialog(text, below)`), a failure `ui::error` (a dialog: it stays until read), a refusal `ui::refuse` (a toast), a list to pick from `ui::pick` (`checked` false for things to do, or `ui::pick_actions`). What deletes, discards or stops confirms in coral (`confirm_danger`, `Emphasis::DANGER`); the confirmation is the last button.
+
+The controller's keys mean the same everywhere: Ⓐ opens or confirms, Ⓑ goes back or cancels, Ⓧ reads again (*Refresh*) or the screen's own second action, said in the footer; Ⓨ is the notification bell from the main screen (a screen of its own may give it its main action, said in its footer); Ⓛ / Ⓡ move between a screen's tabs or by 5 min; **ZR** *Undo*; ⊖ the language, theme and text size.
+
 ## Pull requests and releases
 
 Releases are automated with [release-please](https://github.com/googleapis/release-please), which reads [conventional commits](https://www.conventionalcommits.org/):

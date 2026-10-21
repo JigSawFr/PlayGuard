@@ -404,7 +404,7 @@ PlayGuard 自体の暗証番号です。
 
 ## 履歴 — 変更とバックアップ
 
-*[シミュレーターで試す ›](https://playguard.link/simulator/?tab=history)*
+*[シミュレーターで試す ›](https://playguard.link/simulator/?tab=preferences)*
 
 ### 変更履歴
 

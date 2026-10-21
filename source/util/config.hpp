@@ -170,7 +170,7 @@ constexpr const char* TEXT_SIZES[] = { "auto", "normal", "large" };
 constexpr const char* EFFECTS[] = { "auto", "full" };
 // What start_tab may be, in the sidebar's order.
 constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "restrictions",
-                                       "security", "console", "history", "preferences", "about" };
+                                       "security", "console", "preferences", "about" };
 // What extra_amounts may be (the Preferences picker offers these sets).
 constexpr int EXTRA_SETS[][3] = { { 15, 30, 60 }, { 10, 20, 30 }, { 30, 60, 90 }, { 5, 10, 15 } };
 constexpr int BACKUP_KEEP[]   = { 0, 5, 10, 20 };

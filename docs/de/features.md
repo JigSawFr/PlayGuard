@@ -404,7 +404,7 @@ Auf einer Konsole ohne Internet erscheint *Netzwerkuhr auf die Konsolenuhr stell
 
 ## Verlauf — Änderungen und Sicherungen
 
-*[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=history)*
+*[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=preferences)*
 
 ### Änderungsverlauf
 

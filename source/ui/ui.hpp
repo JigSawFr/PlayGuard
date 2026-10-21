@@ -308,13 +308,12 @@ constexpr int activity     = 3;   // play time per game
 constexpr int restrictions = 4;
 constexpr int security     = 5;   // the PIN tab: PIN, unlock, blocking games, companion app, delete
 constexpr int console      = 7;   // the network clock, installed games, firmware, storage, serial, patches
-constexpr int history      = 9;   // changes and settings backups
-constexpr int preferences  = 10;
-constexpr int about        = 11;  // version, credits, changelog
+constexpr int preferences  = 9;   // the app's settings, the change history and settings backups
+constexpr int about        = 10;  // version, credits, changelog
 // The n-th tab (0 = Today) as a sidebar position (separators count).
 constexpr int of(int n)
 {
-    constexpr int positions[] = { dashboard, play_timer, activity, restrictions, security, console, history, preferences, about };
+    constexpr int positions[] = { dashboard, play_timer, activity, restrictions, security, console, preferences, about };
     return n >= 0 && n < (int)(sizeof(positions) / sizeof(positions[0])) ? positions[n] : dashboard;
 }
 }   // namespace tab
