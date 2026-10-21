@@ -12,6 +12,14 @@ note can open on any of these without a new file. `tools/check_resources.py`
 leaves the unused ones alone, and warns about an emoji the notes open on that
 has no file here.
 
+The flags (two code points, joined by a dash as Twemoji names them:
+`1f1eb-1f1f7.png` for 🇫🇷) are the language picker's
+(`source/ui/dialogs.cpp`): 🇺🇸 🇫🇷 🇨🇦 🇩🇪 🇪🇸 🇲🇽 🇮🇹 🇳🇱 🇵🇹 🇧🇷 🇷🇺 🇯🇵 🇰🇷 🇨🇳 🇹🇼,
+the console's own language a 🌐; the network clock's regions and servers take
+the flag of their country (`ntp::host_emoji()`, `source/util/ntp_servers.cpp`:
+🇬🇧 🇧🇪 🇨🇭 🇵🇱 🇸🇪 🇦🇷 🇭🇰 🇸🇬 🇮🇳 🇦🇺 🇳🇿 🇿🇦 🇦🇪 🇮🇱 besides the ones above),
+🇪🇺, or the globe turned to their continent (🌎 🌏 🌍).
+
 To add one, take its 72×72 PNG from the same Twemoji release:
 
     curl -fO https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/<hex>.png

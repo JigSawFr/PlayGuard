@@ -110,6 +110,9 @@ class List
     // of a card (apply()'s own), or as a card of its own (`alone`).
     static void section(brls::Header* header);
     static void row(brls::DetailCell* cell, const char* icon = nullptr, bool alone = false);
+    // The same with a picture in its icon's place (a resource, "img/…png":
+    // a language's flag), drawn as it is, without the square.
+    static void row_image(brls::DetailCell* cell, const std::string& image);
     // A row's icon (row()'s, at its start) changed: another `icon` (nullptr:
     // the same), in `color_key`, on `square_key` (nullptr: the usual square).
     static void recolor_icon(brls::DetailCell* cell, const char* icon, const char* color_key,

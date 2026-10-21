@@ -2,9 +2,13 @@
 // console region (an unknown region, or one that cannot be read, giving
 // pool.ntp.org), the built-in list (region ids and hosts unique, every host a
 // plain host name config.json can keep, each region's default in it), and
-// the two cross-check servers (never the primary, always two).
+// the two cross-check servers (never the primary, always two), and each
+// server's emoji in the picker (a flag, a globe, none for a big provider; a
+// file in resources/img/emoji/ for every built-in one, read from the
+// repository root as `make test` runs).
 #include "check.h"
 #include <cstring>
+#include <fstream>
 #include <set>
 #include <string>
 
@@ -102,10 +106,40 @@ static void test_cross_check()
     CHECK(ntp::cross_check_servers("POOL.NTP.ORG") == V({ "time.cloudflare.com", "pool.ntp.org" }));
 }
 
+static void test_host_emoji()
+{
+    CHECK(ntp::host_emoji("fr.pool.ntp.org") == "1f1eb-1f1f7");
+    CHECK(ntp::host_emoji("uk.pool.ntp.org") == "1f1ec-1f1e7");   // Great Britain's flag
+    CHECK(ntp::host_emoji("pool.ntp.org") == "1f310");
+    CHECK(ntp::host_emoji("2.pool.ntp.org") == "1f310");
+    CHECK(ntp::host_emoji("europe.pool.ntp.org") == "1f1ea-1f1fa");
+    CHECK(ntp::host_emoji("south-america.pool.ntp.org") == "1f30e");
+    CHECK(ntp::host_emoji("oceania.pool.ntp.org") == "1f30f");
+    CHECK(ntp::host_emoji("africa.pool.ntp.org") == "1f30d");
+    CHECK(ntp::host_emoji("ntp.nict.jp") == "1f1ef-1f1f5");
+    CHECK(ntp::host_emoji("ntp.ntsc.ac.cn") == "1f1e8-1f1f3");
+    CHECK(ntp::host_emoji("ntp.aliyun.com") == "1f1e8-1f1f3");
+    // A big provider's, a name without a country, nothing.
+    CHECK(ntp::host_emoji("time.cloudflare.com").empty());
+    CHECK(ntp::host_emoji("time.nist.gov").empty());
+    CHECK(ntp::host_emoji("ntp-server").empty());
+    CHECK(ntp::host_emoji("192.168.1.1").empty());
+    CHECK(ntp::host_emoji("").empty());
+    // Each built-in server's emoji has its picture.
+    for (const auto& r : ntp::regions())
+        for (const char* h : r.hosts) {
+            const std::string hex = ntp::host_emoji(h);
+            if (hex.empty()) continue;
+            std::ifstream in("resources/img/emoji/" + hex + ".png");
+            CHECK(in.good());
+        }
+}
+
 int main()
 {
     test_default_server();
     test_regions();
     test_cross_check();
+    test_host_emoji();
     return CHECK_DONE("ntp_servers tests passed");
 }
