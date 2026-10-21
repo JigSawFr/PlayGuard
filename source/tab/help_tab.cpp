@@ -71,7 +71,7 @@ HelpTab::HelpTab()
 {
     export_note->setSingleLine(false);
 
-    first_steps->setDetailText(ui::opens());
+    // A tile: no "›" under its title (the tile is the way in).
     first_steps->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new OnboardingActivity());
         return true;
