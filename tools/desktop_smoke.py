@@ -191,6 +191,7 @@ env.setdefault("PLAYGUARD_SIM_NOW", "1791489600" if BEDTIME else "1791475200")
 env.setdefault("TZ", "UTC")
 # And the focus highlight without its moving glow (ui/cadran_frame.cpp).
 env.setdefault("PLAYGUARD_SIM_STILL_FOCUS", "1")
+env["PLAYGUARD_SIM_FOCUS_LOG"] = "1"     # each line focused, by its words (go_to())
 # And one made-up development build, not this build's version and commit
 # (app.cpp): the header's version badge, and the update offers (1.1.0 below)
 # stay the same once this build is 1.1.0 or later.
@@ -607,6 +608,31 @@ def key(name, n=1, hold=0.02):
         time.sleep(KEY_BEFORE)
         subprocess.run(["xdotool", "keydown", name, "sleep", str(hold), "keyup", name], env=env)
         time.sleep(KEY_AFTER)
+
+
+def focused():
+    """The words of the line that has the focus now (PLAYGUARD_SIM_FOCUS_LOG:
+    source/ui/focus_log.cpp), or None."""
+    log.flush()
+    last = None
+    for l in open(os.path.join(OUT, "app.log"), errors="replace"):
+        at = l.find("focus: ")
+        if at >= 0:
+            last = l[at + len("focus: "):].rstrip("\n")
+    return last
+
+
+def go_to(label, direction="Down", most=25):
+    """Presses `direction` until the line `label` has the focus (its words, in
+    English), `most` times at most: a list or a sheet whose lines move keeps
+    its tests right."""
+    time.sleep(KEY_BEFORE)     # the sheet just opened has its focus
+    for _ in range(most):
+        if focused() == label:
+            return
+        key(direction)
+    if focused() != label:
+        fail(f"no line {label!r} reached with {direction} (the focus on {focused()!r})")
 
 
 def screen(name):
@@ -1207,8 +1233,8 @@ if FORWARDERS:
     shot("09_two")             # by group: PlayGuard, Star Atlas (without the PIN), Save Keeper (another app's)
     key("Down")                # Star Atlas
     key("Return")
-    shot("10_actions")         # the sheet: Details, Rename, Change the publisher, Change the icon; Protect with the PIN; Install again, Delete
-    key("Down", 4)             # Protect with the PIN
+    shot("10_actions")         # the sheet: its icon; Details, Rename, Change the publisher, Change the icon; Ask for the PIN (off); Install again, Delete
+    go_to("Ask for the PIN")   # its switch, off
     key("Return")
     shot("11_pin_confirm")     # what it asks, and the homebrew menu still starting it
     key("Right")               # Protect with the PIN
@@ -1220,7 +1246,7 @@ if FORWARDERS:
         fail("the protection is not in the change history: " + repr(recorded("protect_forwarder")))
     shot("12_protected")       # Star Atlas: On the HOME menu · PIN, the focus on it
     key("Return")
-    key("Down", 9)             # Delete (after No longer ask for the PIN, Hours without the PIN, Hours it never opens, the day's limit, Install again)
+    go_to("Delete")
     key("Return")
     key("Right")               # Delete, in the confirmation
     key("Return")
@@ -1229,7 +1255,7 @@ if FORWARDERS:
         fail("Star Atlas's forwarder was not deleted: " + repr(made()) + " " + repr(recorded("remove_forwarder")))
     key("Down")                # Save Keeper
     key("Return")
-    key("Down")                # Delete
+    go_to("Delete")
     key("Return")
     key("Right")
     key("Return")
@@ -1293,7 +1319,7 @@ if HBMENU:
     key("Escape")              # later
     key("Up", 5)               # Install them all again, Another homebrew, PlayGuard's line, Save Keeper, sphaira
     key("Return")              # sphaira's actions
-    key("Down", 5)             # Hours without the PIN (after the forwarder's four and No longer ask for the PIN)
+    go_to("Hours without the PIN")
     key("Return")
     key("Down", 3)             # Saturday and Sunday
     key("Return")
@@ -1363,7 +1389,7 @@ if HBMENU:
     key("Return")              # OK
     key("Up", 9)               # Pause after refused PINs, Protect every forwarder, Lock, Install them all again, Another homebrew, PlayGuard's line, Save Keeper, Star Atlas, sphaira
     key("Return")
-    key("Down", 9)             # Delete (after the forwarder's four, the protection's four, Install again)
+    go_to("Delete")
     key("Return")              # refused: the last way back through a menu
     shot("06_guard")
     key("Return")              # OK
@@ -1403,13 +1429,13 @@ if HOMEBREW:
     key("Down")                # sphaira
     key("Return")
     shot("02_actions")         # the sheet: this forwarder, its protection (Lift the pause until …, the hours set), Install and delete
-    key("Down", 5)             # Lift the pause (after the forwarder's four and No longer ask for the PIN)
+    go_to("Lift the pause")
     key("Return")
     time.sleep(3)
     if "sphaira" in data("gate_pause.txt") or len(recorded("gate_pause_lifted")) != 1:
         fail("sphaira's pause was not lifted: " + repr(data("gate_pause.txt")))
     key("Return")              # sphaira's actions again
-    key("Down", 6)             # Hours it never opens
+    go_to("Hours it never opens")
     key("Return")
     key("Down")                # every day
     key("Return")
@@ -1424,7 +1450,7 @@ if HOMEBREW:
             len(recorded("gate_closed_hours")) != 1:
         fail("sphaira's closed hours were not set: " + repr(made("sphaira")))
     key("Return")              # sphaira's actions again
-    key("Down", 5)             # Hours without the PIN
+    go_to("Hours without the PIN")
     key("Return")
     key("Down", 4)             # Monday to Friday, and the weekend apart
     key("Return")
@@ -1437,7 +1463,7 @@ if HOMEBREW:
             made("sphaira").get("free2") != {"days": 65, "from": 540, "to": 1200}:
         fail("sphaira's two spans were not set: " + repr(made("sphaira")))
     key("Return")              # sphaira's actions again
-    key("Down", 7)             # Close it once today's play time is used up
+    go_to("Closed once today's play time is used up")   # its switch, off
     key("Return")
     time.sleep(3)
     if not made("sphaira").get("limit") or len(recorded("gate_limit_set")) != 1:
@@ -1454,7 +1480,7 @@ if HOMEBREW:
         fail("the pause's rule was not written: " + repr(data("gate_pause.txt")))
     key("Up", 7)               # Protect every forwarder, Lock, Install them all again, Another homebrew, PlayGuard's line, Save Keeper, Star Atlas
     key("Return")
-    key("Down", 3)             # Change the icon (the forwarder's fourth line)
+    go_to("Change the icon")
     key("Return")
     shot("04_icon")            # its .nro's own, then the album's screenshots, the newest first
     key("Down")                # 2026-10-20 18:30

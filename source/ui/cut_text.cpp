@@ -14,6 +14,7 @@
 
 #include "action/frame_stats_flow.hpp"
 #include "core/sim_env.h"
+#include "ui/ui.hpp"
 
 namespace cut_text
 {
@@ -71,7 +72,7 @@ void sample()
     brls::View* top = stack.back()->getContentView();
     std::string screen = frame_stats_flow::screen();
     if (dynamic_cast<brls::Dialog*>(top)) screen += " › dialog";
-    else if (dynamic_cast<brls::Dropdown*>(top)) screen += " › picker";
+    else if (ui::is_sheet(top)) screen += " › picker";
     walk(top, screen, out);
 #endif
 }

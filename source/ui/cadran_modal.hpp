@@ -103,9 +103,4 @@ void prompt_minutes(const std::string& header, uint16_t initial, std::function<v
 // done.
 brls::View* toast_icon(bool done);
 
-// A picker's frame as a card above the hints.
-void style_picker(brls::Dropdown* dropdown);
-
-// A picker's row; `checked`, the current value's.
-void style_pick_row(brls::RadioCell* cell, bool checked);
 }   // namespace cadran

@@ -16,6 +16,8 @@ class GameCell : public brls::DetailCell
     // frees it; otherwise someone else owns and keeps it (the icon
     // cache). Nothing happens without an icon slot or with no image.
     void set_icon_texture(int texture, bool owned);
+    // The image it shows now (0: none, or no icon slot).
+    int icon_texture() const { return this->icon ? this->icon->getTexture() : 0; }
 
     // A small round mark on the icon's corner: `icon_name` (a Cadran icon)
     // in `color_key`; nullptr takes it away. Nothing without an icon slot.

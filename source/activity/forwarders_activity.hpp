@@ -58,6 +58,8 @@ class ForwardersActivity : public brls::Activity
     // span (the weekdays' then the weekend's, when apart). `closed`: the
     // hours it never opens instead.
     void pick_hours(const forwarders_logic::Row& row, bool closed);
+    // The icon its line in the list shows (0: none yet).
+    int icon_of(uint64_t id) const;
     // A span: its start, then its end, under `title`; `done(from, to)` in
     // minutes (an end before the start runs past midnight).
     void pick_span(const std::string& title, int from_hour, int to_hour, std::function<void(int, int)> done);
