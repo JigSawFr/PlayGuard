@@ -190,8 +190,46 @@ static void test_tally()
     CHECK(u.same == 0 && u.differ == 1 && !u.nothing_to_write());
 }
 
+static void test_forwarders()
+{
+    // Without the part (an older backup): none, nothing else changed.
+    backup::Snapshot out;
+    CHECK(backup::from_json(backup::to_json(full()), out) && !out.forwarders_ok && out.forwarders.empty());
+    // With it: what PlayGuard made, protected or not, and the lock.
+    backup::Snapshot in = full();
+    in.forwarders_ok = true;
+    in.hbmenu_locked = true;
+    forwarders::Made a;
+    a.id = 0x050537E2542E2000ull;
+    a.nro = a.argv = "sdmc:/switch/sphaira/sphaira.nro";
+    a.name = "sphaira";
+    a.pin = true;
+    a.gate = "sdmc:/config/playguard/gate.nro";
+    a.verified = true;
+    a.closed_days = 0x7F;
+    a.closed_from = 1260;
+    a.closed_to = 420;
+    forwarders::Made b;
+    b.id = 0x0512345678ABC000ull;
+    b.nro = b.argv = "sdmc:/switch/StarAtlas.nro";
+    b.name = "Star Atlas";
+    b.icon = "sdmc:/Nintendo/Album/2026/10/20/2026102018300000-0.jpg";
+    in.forwarders = { a, b };
+    CHECK(backup::from_json(backup::to_json(in), out) && out.forwarders_ok && out.hbmenu_locked && same(in, out));
+    CHECK(out.forwarders.size() == 2);
+    if (out.forwarders.size() == 2) {
+        CHECK(out.forwarders[0].pin && out.forwarders[0].verified && out.forwarders[0].closed_days == 0x7F &&
+              out.forwarders[0].closed_to == 420);
+        CHECK(!out.forwarders[1].pin && out.forwarders[1].icon == b.icon);
+    }
+    // A damaged part: left out, the rest still read.
+    CHECK(backup::from_json(with("\"restrictions\"", "\"forwarders\": {\"made\": 7}, \"restrictions\""), out) &&
+          !out.forwarders_ok);
+}
+
 int main()
 {
+    test_forwarders();
     test_round_trip();
     test_validation();
     test_files();

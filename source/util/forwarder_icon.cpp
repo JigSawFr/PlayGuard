@@ -5,6 +5,7 @@
 #include <stb_image_write.h>
 
 #include <algorithm>
+#include <cstring>
 #include <cmath>
 
 #include "util/nro.hpp"
@@ -104,6 +105,23 @@ std::vector<uint8_t> normalize(const std::vector<uint8_t>& image)
     std::vector<uint8_t> out = jpeg_from_rgba(rgba, w, h);
     stbi_image_free(rgba);
     return out;
+}
+
+std::vector<uint8_t> from_screenshot(const std::vector<uint8_t>& image)
+{
+    if (image.empty() || image.size() > 16u * 1024 * 1024) return {};
+    int w = 0, h = 0, comp = 0;
+    if (!stbi_info_from_memory(image.data(), (int)image.size(), &w, &h, &comp) || w > MAX_SIDE || h > MAX_SIDE)
+        return {};
+    uint8_t* rgba = stbi_load_from_memory(image.data(), (int)image.size(), &w, &h, &comp, 4);
+    if (!rgba) return {};
+    // The square in its middle, the shorter side's.
+    const int side = std::min(w, h), x0 = (w - side) / 2, y0 = (h - side) / 2;
+    std::vector<uint8_t> square((size_t)side * side * 4);
+    for (int y = 0; y < side; y++)
+        std::memcpy(&square[(size_t)y * side * 4], rgba + ((size_t)(y0 + y) * w + x0) * 4, (size_t)side * 4);
+    stbi_image_free(rgba);
+    return jpeg_from_rgba(square.data(), side, side);
 }
 
 std::vector<uint8_t> placeholder(const std::vector<uint8_t>& png)

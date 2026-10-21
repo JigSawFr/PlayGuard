@@ -1060,7 +1060,28 @@
         "group_open": "Without the PIN",
         "group_elsewhere": "Made by another app",
         "group_gone": "No longer on the HOME menu",
-        "state_verified": "seen working"
+        "state_verified": "seen working",
+        "closed_set": "{} never opens: {}",
+        "closed_none": "{} has no hours without any access",
+        "pause_err": "The pause after refused PINs was not changed",
+        "pause_set": "After refused PINs: {}",
+        "pause_off": "Never",
+        "pause_rule": "{} refused in a row: a pause of {}",
+        "pause_lifted": "{} asks for the PIN again",
+        "icon_set": "{} has its new icon",
+        "icon_own": "Its .nro's own",
+        "icon_none": "No screenshot in the album: take one (the Capture button), then come back here.",
+        "icon_title": "Its HOME menu icon",
+        "action_closed": "Hours it never opens",
+        "action_lift": "Lift the pause",
+        "action_icon": "Change the icon",
+        "closed_title": "Hours it never opens, the PIN or not",
+        "state_paused": "paused until {}",
+        "state_closed": "closed {}",
+        "pause_cell": "Pause after refused PINs",
+        "pause_default": "the default",
+        "paused_line": "{}: until {}",
+        "paused_title": "A forwarder is paused after refused PINs"
     },
     "hbmenu": {
         "section": "Homebrew menu",
@@ -1157,7 +1178,9 @@
         "setup_progress": "Step {} of {}",
         "verify_title": "Start {} once from the HOME menu",
         "verify_how": "Leave PlayGuard, start {} from its icon on the HOME menu and enter the PIN: once the menu opens, PlayGuard knows this way back works. Then come back here.",
-        "summary_doors": "Opens without the PIN: {}"
+        "summary_doors": "Opens without the PIN: {}",
+        "rescue_written": "Written on {}",
+        "rescue_print": "To print: {} on the SD card"
     },
     "about": {
         "section_changelog": "What's new in {}",
@@ -1220,7 +1243,11 @@
         "before_delete_err": "No backup could be saved first ({}).\n\nDelete everything anyway?",
         "delete_anyway": "Delete anyway",
         "bedtime_not_restored": "This backup had a bedtime alarm on: it is not restored, set it again in Play timer if needed.",
-        "backed_up_on": "Settings backed up on {}."
+        "backed_up_on": "Settings backed up on {}.",
+        "forwarders_body": "This backup also has {} forwarders that are no longer on the HOME menu: {}. Put them back?",
+        "forwarders_put_back": "Put them back",
+        "forwarders_lock_title": "The homebrew menu was locked",
+        "forwarders_lock": "It was locked when this backup was made. Lock it again from Console › Forwarders: its checks come first."
     },
     "update": {
         "checking": "Checking for updates...",
@@ -1502,7 +1529,12 @@
             "gate_open": "Forwarder opened with the PIN",
             "gate_free": "Forwarder opened in its hours without the PIN",
             "gate_refused": "Forwarder refused (PIN not entered)",
-            "gate_hours": "Forwarder hours without the PIN"
+            "gate_hours": "Forwarder hours without the PIN",
+            "gate_paused": "Forwarder paused (too many refused PINs)",
+            "gate_closed": "Forwarder closed (hours without any access)",
+            "gate_closed_hours": "Forwarder hours without any access",
+            "gate_pause": "Pause after refused PINs",
+            "gate_pause_lifted": "Forwarder's pause lifted"
         },
         "sources": {
             "uniform": "Same limit every day",

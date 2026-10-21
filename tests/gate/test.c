@@ -135,8 +135,88 @@ static void test_counts(void)
     CHECK(!gate_hours_text(&h, DAYS, buf, sizeof(buf)));
 }
 
+static void test_pause(void)
+{
+    char out[1024], next[1024];
+    // No file: 5 tries, 15 minutes.
+    GatePauseRule rule = gate_pause_rule(NULL, 0);
+    CHECK(rule.tries == GATE_PAUSE_TRIES && rule.minutes == GATE_PAUSE_MINUTES);
+    // Refused four times: counted; the fifth pauses it from then, the count back to 0.
+    size_t n = 0;
+    out[0] = '\0';
+    for (int i = 0; i < 4; i++) {
+        n = gate_pause_update(out, n, "sdmc:/s.nro", GateResult_Refused, 1000 + (uint64_t)i, next, sizeof(next));
+        CHECK(n > 0);
+        memcpy(out, next, n + 1);
+    }
+    unsigned streak;
+    uint64_t until;
+    CHECK(gate_pause_find(out, n, "sdmc:/s.nro", &streak, &until) && streak == 4 && until == 0);
+    n = gate_pause_update(out, n, "sdmc:/s.nro", GateResult_Refused, 2000, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    CHECK(gate_pause_find(out, n, "sdmc:/s.nro", &streak, &until) && streak == 0 && until == 2000 + 15 * 60);
+    // A try while paused leaves it; another forwarder has its own line.
+    n = gate_pause_update(out, n, "sdmc:/s.nro", GateResult_Paused, 2100, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    CHECK(gate_pause_find(out, n, "sdmc:/s.nro", &streak, &until) && until == 2900);
+    n = gate_pause_update(out, n, "sdmc:/o.nro", GateResult_Refused, 2100, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    CHECK(gate_pause_find(out, n, "sdmc:/o.nro", &streak, &until) && streak == 1);
+    // Refused after the pause: counted again from 1.
+    n = gate_pause_update(out, n, "sdmc:/s.nro", GateResult_Refused, 3000, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    CHECK(gate_pause_find(out, n, "sdmc:/s.nro", &streak, &until) && streak == 1 && until == 0);
+    // Opened: its line gone, the other's kept.
+    n = gate_pause_update(out, n, "sdmc:/s.nro", GateResult_Pin, 3100, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    CHECK(!gate_pause_find(out, n, "sdmc:/s.nro", &streak, &until) && gate_pause_find(out, n, "sdmc:/o.nro", NULL, NULL));
+
+    // PlayGuard's rule: 3 tries, an hour; written first, the lines kept.
+    const GatePauseRule three = { 3, 60 };
+    n = gate_pause_edit(out, n, &three, NULL, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    CHECK(strncmp(out, "rule\t3\t60\n", 10) == 0 && gate_pause_find(out, n, "sdmc:/o.nro", NULL, NULL));
+    rule = gate_pause_rule(out, n);
+    CHECK(rule.tries == 3 && rule.minutes == 60);
+    n = gate_pause_update(out, n, "sdmc:/o.nro", GateResult_Refused, 5000, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    n = gate_pause_update(out, n, "sdmc:/o.nro", GateResult_Refused, 5001, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    CHECK(gate_pause_find(out, n, "sdmc:/o.nro", &streak, &until) && until == 5001 + 3600);
+    CHECK(strncmp(out, "rule\t3\t60\n", 10) == 0);   // the rule kept by the gate
+    // Lifted: its line gone, the rule kept.
+    n = gate_pause_edit(out, n, NULL, "sdmc:/o.nro", next, sizeof(next));
+    memcpy(out, next, n + 1);
+    CHECK(!gate_pause_find(out, n, "sdmc:/o.nro", NULL, NULL) && gate_pause_rule(out, n).tries == 3);
+    // Off: never paused.
+    const GatePauseRule off = { 0, 0 };
+    n = gate_pause_edit(out, n, &off, NULL, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    for (int i = 0; i < 20; i++) {
+        n = gate_pause_update(out, n, "sdmc:/o.nro", GateResult_Refused, 6000, next, sizeof(next));
+        memcpy(out, next, n + 1);
+    }
+    CHECK(gate_pause_find(out, n, "sdmc:/o.nro", &streak, &until) && streak == 20 && until == 0);
+    // Damaged lines dropped, a tiny buffer refused.
+    static const char BAD[] = "rule\tx\t5\nzz\tq\tsdmc:/a.nro\n1\t0\tsdmc:/b.nro\n";
+    CHECK(gate_pause_rule(BAD, sizeof(BAD) - 1).tries == GATE_PAUSE_TRIES);
+    n = gate_pause_edit(BAD, sizeof(BAD) - 1, NULL, NULL, next, sizeof(next));
+    CHECK(strcmp(next, "1\t0\tsdmc:/b.nro\n") == 0);
+    CHECK(gate_pause_update(BAD, sizeof(BAD) - 1, "sdmc:/b.nro", GateResult_Refused, 1, next, 4) == 0);
+    // The two new results in the log.
+    char line[128];
+    const char *when, *nro;
+    size_t wn, nn;
+    GateResult r;
+    CHECK(gate_log_format("2026-10-20 21:00", GateResult_Paused, "sdmc:/a.nro", line, sizeof(line)));
+    CHECK(gate_log_parse(line, strlen(line) - 1, &when, &wn, &r, &nro, &nn) && r == GateResult_Paused);
+    CHECK(gate_log_format("2026-10-20 21:00", GateResult_Closed, "sdmc:/a.nro", line, sizeof(line)));
+    CHECK(gate_log_parse(line, strlen(line) - 1, &when, &wn, &r, &nro, &nn) && r == GateResult_Closed);
+}
+
 int main(void)
 {
+    test_pause();
     test_counts();
     test_argv();
     test_hours();

@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+#include "util/forwarders.hpp"
+
 namespace backup
 {
 
@@ -56,6 +58,14 @@ struct Snapshot
     // (136 hex digits), to tell later what the fields PlayGuard does not
     // decode held.
     std::string raw_block;
+
+    // Console › Forwarders, not on the console's side: what PlayGuard made
+    // (forwarders.json's, as util/forwarders.hpp keeps it) and whether the
+    // homebrew menu was locked. Restored apart, after the rest (backup_flow):
+    // the ones missing remembered again, then installed again if wanted.
+    bool                          forwarders_ok = false;
+    std::vector<forwarders::Made> forwarders;
+    bool                          hbmenu_locked = false;
 
     // Nothing a restore would write.
     bool empty() const { return !level_ok && !custom_ok && !vr_ok && !days_ok && !rating_org_ok; }

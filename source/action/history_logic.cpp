@@ -95,7 +95,8 @@ const char* const KINDS[] = { "limits", "level", "custom", "org", "vr", "alarm",
                               "remove_update", "remove_addon", "launch_version", "add_forwarder",
                               "remove_forwarder", "protect_forwarder", "unprotect_forwarder",
                               "forwarder_gone", "lock_hbmenu", "unlock_hbmenu", "hbmenu_restored",
-                              "hbmenu_lock_removed", "gate_open", "gate_free", "gate_refused", "gate_hours" };
+                              "hbmenu_lock_removed", "gate_open", "gate_free", "gate_refused", "gate_hours", "gate_paused", "gate_closed",
+                              "gate_closed_hours", "gate_pause", "gate_pause_lifted" };
 const char* const SOURCES[] = { "uniform", "day", "per_day", "extra", "stop", "restore_extra", "bonus", "restore_bonus", "schedule_end",
                                 "remove", "backup", "undo", "first_steps", "overview", "console_lock", "notices",
                                 "rescue" };

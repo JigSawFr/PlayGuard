@@ -19,7 +19,7 @@ std::string file_path()
     return paths::nand_dir() + "/forwarders.json";
 }
 
-bool write_all(const std::vector<Made>& all, std::string* error)
+nlohmann::json array_of(const std::vector<Made>& all)
 {
     nlohmann::json list = nlohmann::json::array();
     for (const Made& m : all) {
@@ -33,9 +33,19 @@ bool write_all(const std::vector<Made>& all, std::string* error)
         if (m.pin && m.verified) e["verified"] = true;
         if (m.pin && m.free_days)
             e["free"] = { { "days", m.free_days }, { "from", m.free_from }, { "to", m.free_to } };
+        if (m.pin && m.closed_days)
+            e["closed"] = { { "days", m.closed_days }, { "from", m.closed_from }, { "to", m.closed_to } };
+        if (!m.icon.empty()) e["icon"] = m.icon;
         list.push_back(e);
     }
-    const nlohmann::json doc = { { "forwarders", list } };
+    return list;
+}
+
+std::vector<Made> from_array(const nlohmann::json& list);
+
+bool write_all(const std::vector<Made>& all, std::string* error)
+{
+    const nlohmann::json doc = { { "forwarders", array_of(all) } };
     if (!paths::ensure_dir(paths::nand_dir())) {
         if (error) *error = "cannot create " + paths::nand_dir();
         return false;
@@ -49,13 +59,33 @@ bool write_all(const std::vector<Made>& all, std::string* error)
 
 std::vector<Made> list()
 {
-    std::vector<Made> out;
     std::string text;
     nlohmann::json doc;
-    if (!paths::read_file(file_path(), text) || !json_util::parse(text, &doc) || !doc.is_object()) return out;
+    if (!paths::read_file(file_path(), text) || !json_util::parse(text, &doc) || !doc.is_object()) return {};
     const auto it = doc.find("forwarders");
-    if (it == doc.end() || !it->is_array()) return out;
-    for (const auto& e : *it) {
+    if (it == doc.end()) return {};
+    return from_array(*it);
+}
+
+std::string list_text(const std::vector<Made>& all)
+{
+    return array_of(all).dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);
+}
+
+std::vector<Made> parse_list(const std::string& text)
+{
+    nlohmann::json doc;
+    if (!json_util::parse(text, &doc)) return {};
+    return from_array(doc);
+}
+
+namespace
+{
+std::vector<Made> from_array(const nlohmann::json& list)
+{
+    std::vector<Made> out;
+    if (!list.is_array()) return out;
+    for (const auto& e : list) {
         if (!e.is_object()) continue;
         Made m;
         if (!parse_id(json_util::string_at(e, "id"), &m.id)) continue;
@@ -69,22 +99,29 @@ std::vector<Made> list()
         m.pin  = json_util::flag_at(e, "pin") && !m.gate.empty();
         m.gone = json_util::flag_at(e, "gone");
         m.verified = m.pin && json_util::flag_at(e, "verified");
-        if (const nlohmann::json* f = json_util::object_at(e, "free")) {
+        // Kept only as the gate reads them (gate_rule_find): days of a week,
+        // minutes of a day, a span.
+        const auto span = [&e, &m](const char* key, int& days_out, int& from_out, int& to_out) {
+            const nlohmann::json* f = json_util::object_at(e, key);
+            if (!f) return;
             const int64_t days = json_util::integer_or(*f, "days"), from = json_util::integer_or(*f, "from"),
                           to = json_util::integer_or(*f, "to");
-            // Kept only as the gate reads it (gate_rule_find): days of a week, minutes of a day, a span.
             if (m.pin && days > 0 && days <= 0x7F && from >= 0 && from <= 1440 && to >= 0 && to <= 1440 && from != to) {
-                m.free_days = (int)days;
-                m.free_from = (int)from;
-                m.free_to = (int)to;
+                days_out = (int)days;
+                from_out = (int)from;
+                to_out = (int)to;
             }
-        }
+        };
+        span("free", m.free_days, m.free_from, m.free_to);
+        span("closed", m.closed_days, m.closed_from, m.closed_to);
+        m.icon = json_util::string_at(e, "icon");
         bool seen = false;
         for (const Made& o : out) seen = seen || o.id == m.id;
         if (!seen) out.push_back(m);
     }
     return out;
 }
+}   // namespace
 
 bool save(const Made& m, std::string* error)
 {

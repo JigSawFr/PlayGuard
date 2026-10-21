@@ -8,9 +8,12 @@
 #include <vector>
 
 #include "action/backup_logic.hpp"
+#include "action/forwarder_flow.hpp"
+#include "action/hbmenu_lock.hpp"
 #include "action/history_flow.hpp"
 #include "action/notices.hpp"
 #include "action/pt_flow.hpp"
+#include "app.hpp"
 #include "ui/cadran_text.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -155,17 +158,49 @@ void write_all(const backup::Snapshot& s, bool did_unlock, std::function<void()>
                           brls::getStr("playguard/backup/restore_err", tally.failed_list()), refresh);
 }
 
+// The backup's forwarders that are not on the HOME menu now: offered to be
+// put back (remembered again, installed again), after the rest. The lock
+// is the parent's to put back (its checks first): only said.
+void offer_forwarders(const backup::Snapshot& s)
+{
+    if (!s.forwarders_ok || app::read_only()) return;
+    const std::vector<forwarders::Made> missing = forwarder_flow::missing_from(s.forwarders);
+    const bool relock = s.hbmenu_locked && !hbmenu_lock::locked();
+    const auto tell_lock = [relock]() {
+        if (relock)
+            brls::sync([]() {
+                ui::notice("lock", ui::Check::Info, "playguard/backup/forwarders_lock_title"_i18n,
+                           "playguard/backup/forwarders_lock"_i18n);
+            });
+    };
+    if (missing.empty()) return tell_lock();
+    std::string names;
+    for (const auto& m : missing) names += (names.empty() ? "" : ", ") + m.name;
+    brls::sync([missing, names, tell_lock]() {
+        ui::confirm(brls::getStr("playguard/backup/forwarders_body", (int)missing.size(), names),
+                    "playguard/backup/forwarders_put_back"_i18n,
+                    [missing, tell_lock]() { forwarder_flow::put_back_all(missing, [tell_lock](bool) { tell_lock(); }); },
+                    [tell_lock]() { tell_lock(); });
+    });
+}
+
 void restore(const backup::Snapshot& s, std::function<void()> refresh)
 {
     backup::RestoreTally tally;
     const std::string body = summary(s, &tally);
     // The console already has these values: say so, and touch nothing (no
-    // unlock, no write, no "restored" in the history).
+    // unlock, no write, no "restored" in the history); its forwarders may
+    // still be missing.
     if (tally.nothing_to_write()) {
-        ui::info(body);
+        if (s.forwarders_ok && !forwarder_flow::missing_from(s.forwarders).empty()) offer_forwarders(s);
+        else ui::info(body);
         return;
     }
-    auto run = [s, refresh](bool did_unlock) { write_all(s, did_unlock, refresh); };
+    const auto then = [s, refresh]() {
+        if (refresh) refresh();
+        offer_forwarders(s);
+    };
+    auto run = [s, then](bool did_unlock) { write_all(s, did_unlock, then); };
     // Limits to write: through the play-timer gate (unlock first when the
     // timer is counting down). Restrictions only: a plain confirmation, as in
     // the Restrictions tab.
@@ -219,6 +254,10 @@ backup::Snapshot capture()
     s.firmware = fw;
 
     s.created = ui::now_stamp();
+    // What Console › Forwarders made, and the lock, when there is any.
+    s.forwarders = forwarders::list();
+    s.hbmenu_locked = hbmenu_lock::locked();
+    s.forwarders_ok = !s.forwarders.empty() || s.hbmenu_locked;
     return s;
 }
 
