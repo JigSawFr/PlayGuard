@@ -455,7 +455,7 @@ At the end of *Preferences* (the History tab of earlier versions).
 - A change the console **refused** is listed too, in amber, with the console's error and what was tried (never put back: nothing changed).
 - *Show* keeps one kind (play time, restrictions, security and app, seen outside PlayGuard, refused by the console); *Export what is shown* writes it to `exports/` as CSV, JSON, XLSX or PDF.
 - Ⓐ on a change shows it and, for a value, **puts the previous one back** — through the same unlock and PIN as any change, saying if it changed since.
-- Each change keeps the PlayGuard version that made it; a change recorded by a newer version of PlayGuard shows as *Other change*.
+- Each change keeps the PlayGuard version that made it (a development build: said so, with its commit and, for a pull request's build, its number); a change recorded by a newer version of PlayGuard shows as *Other change*.
 
 #### Backups
 

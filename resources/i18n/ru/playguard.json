@@ -1657,6 +1657,9 @@
         "failed_title": "Отклонено: {}",
         "failed_note": "Консоль отклонила это изменение ({}): ничего не изменилось.",
         "version": "Версия PlayGuard",
+        "version_dev": "{} (версия для разработки)",
+        "commit": "Коммит",
+        "pr": "Pull request",
         "counting": "Отсчёт идёт",
         "paused": "На паузе",
         "filters": {

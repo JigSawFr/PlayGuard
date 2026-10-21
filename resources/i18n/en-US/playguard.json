@@ -1657,6 +1657,9 @@
         "failed_title": "Refused: {}",
         "failed_note": "The console refused this change ({}): nothing was changed.",
         "version": "PlayGuard version",
+        "version_dev": "{} (development build)",
+        "commit": "Commit",
+        "pr": "Pull request",
         "counting": "Counting down",
         "paused": "Paused",
         "filters": {

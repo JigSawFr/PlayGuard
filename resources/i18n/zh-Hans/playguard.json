@@ -1657,6 +1657,9 @@
         "failed_title": "被拒绝：{}",
         "failed_note": "主机拒绝了此更改（{}）：未做任何更改。",
         "version": "PlayGuard 版本",
+        "version_dev": "{}（开发版）",
+        "commit": "提交",
+        "pr": "拉取请求",
         "counting": "倒计时中",
         "paused": "已暂停",
         "filters": {

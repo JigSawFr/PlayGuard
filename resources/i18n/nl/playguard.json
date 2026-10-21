@@ -1657,6 +1657,9 @@
         "failed_title": "Geweigerd: {}",
         "failed_note": "De console heeft deze wijziging geweigerd ({}): er is niets veranderd.",
         "version": "PlayGuard-versie",
+        "version_dev": "{} (ontwikkelversie)",
+        "commit": "Commit",
+        "pr": "Pull request",
         "counting": "Aftellen loopt",
         "paused": "Gepauzeerd",
         "filters": {

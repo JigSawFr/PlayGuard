@@ -1657,6 +1657,9 @@
         "failed_title": "거부됨: {}",
         "failed_note": "본체가 이 변경을 거부했습니다({}). 아무것도 바뀌지 않았습니다.",
         "version": "PlayGuard 버전",
+        "version_dev": "{} (개발 빌드)",
+        "commit": "커밋",
+        "pr": "풀 리퀘스트",
         "counting": "카운트다운 중",
         "paused": "일시 정지됨",
         "filters": {

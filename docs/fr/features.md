@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 5937bf90a82a -->
+<!-- translated from docs/features.md, sha256 64bd09aacd8e -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -456,7 +456,7 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 - Une modification **refusée** par la console apparaît aussi, en orange, avec l'erreur de la console et ce qui était demandé (jamais remise : rien n'a changé).
 - *Afficher* ne garde qu'un type (temps de jeu, restrictions, sécurité et appli, vu en dehors de PlayGuard, refusé par la console) ; *Exporter ce qui est affiché* l'écrit dans `exports/` en CSV, JSON, XLSX ou PDF.
 - Ⓐ sur une modification l'affiche et, pour une valeur, **remet la précédente** — avec le même déverrouillage et le même code PIN que toute modification, en signalant si elle a changé depuis.
-- Chaque modification garde la version de PlayGuard qui l'a faite ; une modification enregistrée par une version plus récente de PlayGuard apparaît comme *Autre modification*.
+- Chaque modification garde la version de PlayGuard qui l'a faite (une version de développement : dite telle, avec son commit et, pour la version d'une pull request, son numéro) ; une modification enregistrée par une version plus récente de PlayGuard apparaît comme *Autre modification*.
 
 #### Sauvegardes
 
