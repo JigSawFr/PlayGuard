@@ -72,9 +72,10 @@ Play timer in the states "alarm" and "outside" set up, together: the time
 over the limit (a warning only) and the changes made outside PlayGuard. The
 "cadranunlocked" one shows them while parental controls are temporarily
 unlocked: "Turn back on" first on Today, the header's pill saying so. The
-"cadranlarge" one shows Today, the Play timer, Activity and the child screen
-with Preferences › Text size › Larger (as on a TV): Today on one screen, the
-child screen keeping its own sizes.
+"cadranlarge" one shows Today, the Play timer, Activity, Console,
+Preferences, About, Help and the child screen with Preferences › Text size ›
+Larger (as on a TV): Today on one screen, the lists' tiles and cards laid out
+again, the child screen keeping its own sizes.
 
 The "bedtime" scenario starts at 20:00 with 90 minutes left
 (PLAYGUARD_SIM_NOW, PLAYGUARD_SIM_LEFT_MIN): the bedtime, at 21:00, comes
@@ -1587,7 +1588,26 @@ if CADRANLARGE:
     key("Right")
     shot("03_activity")
     key("Left")
-    key("Up", 2)               # Today
+    # The list screens' tiles, cards and notes, and a screen of its own.
+    key("Down", steps("activity", "console"))
+    key("Right")
+    shot("05_console")
+    key("Left")
+    key("Down", steps("console", "preferences"))
+    key("Right")
+    shot("06_preferences")
+    key("Left")
+    key("Down", steps("preferences", "about"))
+    key("Right")
+    shot("07_about")
+    key_to_end("Down", hold=0.15) # its last line: the funding QR codes
+    key("Up", 2)               # past Source: Help & diagnostics
+    key("Return")
+    time.sleep(0.6)
+    shot("08_help")            # its title after where it opened from
+    key("Escape")
+    key("Left")
+    key("Up", steps("dashboard", "about"))   # Today
     key("Right")               # Extra time, the hero's first action
     key("Down")                # Stop for today
     key("Right")               # Show the child
