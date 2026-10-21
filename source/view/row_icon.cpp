@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/row_icon.hpp"
 
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 
 static constexpr float SIZE = 26;
@@ -45,15 +46,15 @@ void RowIcon::draw(NVGcontext* vg, float x, float y, float width, float height, 
         nvgClosePath(vg);
         nvgLineJoin(vg, NVG_ROUND);
         nvgStrokeWidth(vg, inset * 2);
-        nvgStrokeColor(vg, ui::color_warn());
+        nvgStrokeColor(vg, cadran::kit::color("cadran/amber"));
         nvgStroke(vg);
-        nvgFillColor(vg, ui::color_warn());
+        nvgFillColor(vg, cadran::kit::color("cadran/amber"));
         nvgFontSize(vg, height * 0.72f);
         text_y = y + height * 0.62f;
     } else {
         // In the value's colour: something to read, not something wrong.
         nvgCircle(vg, cx, y + height * 0.5f, height * 0.5f);
-        nvgFillColor(vg, ui::color_neutral());
+        nvgFillColor(vg, cadran::kit::color("cadran/text2"));
         nvgFontSize(vg, height * 0.7f);
         text_y = y + height * 0.53f;
     }

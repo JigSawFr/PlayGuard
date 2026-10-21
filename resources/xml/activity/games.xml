@@ -32,7 +32,7 @@
             lineBottom="1"
             lineColor="@theme/brls/header/border">
 
-            <brls:Image id="gs_icon" width="96" height="96" cornerRadius="12" marginRight="24" backgroundColor="@theme/cadran/well"/>
+            <brls:Image id="gs_icon" width="96" height="96" cornerRadius="@style/cadran/radius/icon" marginRight="24" backgroundColor="@theme/cadran/well"/>
             <brls:Box axis="column" alignItems="stretch" grow="1.0">
                 <brls:Label id="gs_name" text=" " fontSize="26" singleLine="true"/>
                 <brls:Box axis="row" alignItems="flexStart" marginTop="10">

@@ -18,6 +18,7 @@
 #include "view/title_state.hpp"
 
 using namespace brls::literals;
+namespace kit = cadran::kit;
 
 void cadran::install_theme()
 {
@@ -69,7 +70,9 @@ void cadran::install_theme()
         // the stroke's own colour, so a screenshot does not depend on when.
         if (sim_env_flag("PLAYGUARD_SIM_STILL_FOCUS")) t->addColor("brls/highlight/color2", p->hl1);
 #endif
-        t->addColor("brls/click_pulse", nvgRGBA(0x2E, 0xC4, 0xA6, 38));
+        NVGcolor pulse = p->teal_fill;
+        pulse.a = 38 / 255.0f;
+        t->addColor("brls/click_pulse", pulse);
         t->addColor("brls/button/primary_enabled_background", p->teal_fill);
         t->addColor("brls/button/primary_enabled_text", navy);
         t->addColor("brls/button/default_enabled_background", p->surf2);
@@ -108,6 +111,20 @@ void cadran::install_theme()
         t->addColor("cadran/none", nvgRGBA(0, 0, 0, 0));
         // The empty part of a progress bar, behind a game's missing cover.
         t->addColor("cadran/well", p == &dark ? nvgRGBA(255, 255, 255, 46) : nvgRGBA(0, 0, 0, 34));
+        // The inks the palettes have no use for elsewhere: a release note's
+        // alerts and a build's tags (blue, violet), each as dark on the
+        // light theme as the other inks (4.5:1 on white).
+        t->addColor("cadran/blue", p == &dark ? nvgRGB(0x4F, 0xA3, 0xFF) : nvgRGB(0x1F, 0x5F, 0xC4));
+        t->addColor("cadran/violet", p == &dark ? nvgRGB(0x9B, 0x8C, 0xF5) : nvgRGB(0x5B, 0x47, 0xC9));
+        // The accounts' avatars, in turn: fills under a navy initial, alike
+        // on both themes.
+        t->addColor("cadran/avatar0", nvgRGB(0x7C, 0x6C, 0xF2));
+        t->addColor("cadran/avatar1", nvgRGB(0xFF, 0xB5, 0x47));
+        t->addColor("cadran/avatar2", nvgRGB(0x4F, 0xA3, 0xFF));
+        t->addColor("cadran/avatar3", nvgRGB(0xE9, 0x6A, 0xA8));
+        // A switch's knob, white on either track, and its edge while off.
+        t->addColor("cadran/knob", nvgRGB(0xFF, 0xFF, 0xFF));
+        t->addColor("cadran/knob_line", nvgRGBA(0x0B, 0x14, 0x24, 40));
         t->addColor("cadran/bar", p == &dark ? nvgRGB(0x33, 0x48, 0x6B) : nvgRGB(0xB9, 0xC6, 0xDA));
         t->addColor("cadran/bar_today", p == &dark ? nvgRGB(0x5A, 0x71, 0x96) : nvgRGB(0x7E, 0x90, 0xAE));
         // Behind a dialog or a picker: the navy, dimmed. A toast: a card of
@@ -127,6 +144,12 @@ void cadran::install_theme()
     }
 #endif
     brls::Style style = brls::getStyle();
+    // The corners of the kit, for the XML (@style/cadran/radius/card…).
+    style.addMetric("cadran/radius/row", kit::RADIUS_ROW);
+    style.addMetric("cadran/radius/icon", kit::RADIUS_ICON);
+    style.addMetric("cadran/radius/card", kit::RADIUS_CARD);
+    style.addMetric("cadran/radius/top", kit::RADIUS_TOP);
+    style.addMetric("cadran/radius/modal", kit::RADIUS_MODAL);
     style.addMetric("brls/applet_frame/header_height", 84.0f);
     // 232 px, not the boards' 196: the console's font is wider than the
     // boards' (Nunito Sans), and the longest names must stay whole
@@ -457,6 +480,6 @@ void cadran::style_rail(brls::View* tab_frame)
 void cadran::style_frame(brls::AppletFrame* frame, brls::View* tab_frame)
 {
     if (frame) frame->addView(make_glow(300.0f, -80.0f, 640.0f, "cadran/glow"), 0);
-    style_header(frame, "check", "Contrôle parental actif", true, true);
+    style_header(frame, "check", "playguard/cadran/pill/pc_on"_i18n, true, true);
     style_rail(tab_frame);
 }

@@ -7,6 +7,7 @@
 #include "action/schedule_flow.hpp"
 #include "activity/play_timer_perday_activity.hpp"
 #include "tab/cadran_list.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -65,7 +66,7 @@ void ProfilesActivity::rebuild(const std::string& focus_file)
         const std::string summary = ui::days_summary(p.days.data());
         if (p.name == current) {
             cell->setDetailText(brls::getStr("playguard/play_timer/profile_current", summary));
-            cell->setDetailTextColor(ui::color_ok());
+            cell->setDetailTextColor(cadran::kit::color("cadran/teal"));
         } else {
             cell->setDetailText(summary);
         }

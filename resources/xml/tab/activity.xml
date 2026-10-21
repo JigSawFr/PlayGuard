@@ -40,12 +40,12 @@
                 </brls:Box>
 
                 <brls:Box axis="row" alignItems="stretch" marginBottom="14">
-                    <brls:Box axis="column" alignItems="flexStart" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24" marginRight="14">
+                    <brls:Box axis="column" alignItems="flexStart" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="@style/cadran/radius/card" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24" marginRight="14">
                         <brls:Label text="@i18n/playguard/activity/today" fontSize="15" textColor="@theme/cadran/text2" singleLine="true"/>
                         <CadranDigits id="ac_today" text="—" fontSize="36" marginTop="6" marginBottom="6"/>
                         <brls:Label id="ac_today_sub" text="" fontSize="15" textColor="@theme/cadran/text2" alignSelf="stretch"/>
                     </brls:Box>
-                    <brls:Box axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24" marginRight="14">
+                    <brls:Box axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="@style/cadran/radius/card" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24" marginRight="14">
                         <brls:Box axis="row" alignItems="flexEnd">
                             <brls:Box axis="column" alignItems="flexStart" grow="1.0" width="0">
                                 <brls:Label text="@i18n/playguard/activity/week" fontSize="15" textColor="@theme/cadran/text2" singleLine="true"/>
@@ -68,7 +68,7 @@
                             <brls:Label id="ac_week_trend" text="" fontSize="15" textColor="@theme/cadran/text3"/>
                         </brls:Box>
                     </brls:Box>
-                    <brls:Box axis="column" alignItems="flexStart" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24">
+                    <brls:Box axis="column" alignItems="flexStart" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="@style/cadran/radius/card" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24">
                         <brls:Label text="@i18n/playguard/activity/all_time" fontSize="15" textColor="@theme/cadran/text2" singleLine="true"/>
                         <CadranDigits id="ac_total" text="—" fontSize="36" marginTop="6" marginBottom="6"/>
                         <brls:Label id="ac_total_sub" text="" fontSize="15" textColor="@theme/cadran/text2" alignSelf="stretch"/>

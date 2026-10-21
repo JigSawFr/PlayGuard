@@ -5,6 +5,7 @@
 #include "action/game_icons.hpp"
 #include "app.hpp"
 #include "tab/cadran_list.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/cadran_text.hpp"
 #include "ui/format_text.hpp"
 #include "ui/ui.hpp"
@@ -92,8 +93,8 @@ void ForwardersActivity::show_self()
     const bool on = own && own->state != State::NotInstalled;
     self_cell->setDetailText(on ? state_text(*own) : "playguard/forwarders/add"_i18n);
     // Read-only: greyed when it would add it (its details stay a press away).
-    ui::show_writable(self_cell, on || !app::read_only(), ui::color_text(),
-                      on && own->state == State::Ready ? ui::color_ok() : ui::color_neutral());
+    ui::show_writable(self_cell, on || !app::read_only(), cadran::kit::color("cadran/text"),
+                      on && own->state == State::Ready ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/text2"));
 }
 
 std::function<void(bool)> ForwardersActivity::then_rebuild(uint64_t id)
@@ -121,9 +122,9 @@ void ForwardersActivity::rebuild(uint64_t focus_id)
         auto* cell = new GameCell(game_icons::wanted());
         cell->setText(r.name);
         cell->setDetailText(state_text(r));
-        cell->setDetailTextColor(r.state == State::Ready ? ui::color_ok()
-                                 : r.state == State::Elsewhere ? ui::color_neutral()
-                                                               : ui::color_warn());
+        cell->setDetailTextColor(r.state == State::Ready ? cadran::kit::color("cadran/teal")
+                                 : r.state == State::Elsewhere ? cadran::kit::color("cadran/text2")
+                                                               : cadran::kit::color("cadran/amber"));
         const Row copy = r;
         cell->registerClickAction([this, copy](brls::View*) {
             this->actions(copy);

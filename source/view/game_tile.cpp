@@ -2,6 +2,7 @@
 #include "view/game_tile.hpp"
 
 #include "action/game_icons.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 
 namespace
@@ -26,7 +27,7 @@ GameTile::GameTile()
     this->icon->setWidth(COVER);
     this->icon->setHeight(COVER);
     this->icon->setCornerRadius(8);
-    this->icon->setBackgroundColor(ui::color_track());
+    this->icon->setBackgroundColor(cadran::kit::color("cadran/well"));
     // Until the icon arrives (or for a game without one): the placeholder,
     // its own size in the middle of the cover.
     if (const int waiting = game_icons::placeholder()) {
@@ -45,7 +46,7 @@ GameTile::GameTile()
     this->detail = new brls::Label();
     this->detail->setFontSize(15);
     this->detail->setSingleLine(true);
-    this->detail->setTextColor(ui::color_note());
+    this->detail->setTextColor(cadran::kit::color("cadran/text3"));
     this->detail->setMarginTop(2);
     this->addView(this->detail);
 }

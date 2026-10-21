@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 
 static constexpr float SIZE = 26;
@@ -36,7 +37,7 @@ void TabBadge::draw(NVGcontext* vg, float x, float y, float width, float height,
     const float r = height * 0.5f, cx = x + width * 0.5f, cy = y + height * 0.5f;
     nvgBeginPath(vg);
     nvgCircle(vg, cx, cy, r);
-    nvgFillColor(vg, ui::color_warn());
+    nvgFillColor(vg, cadran::kit::color("cadran/amber"));
     nvgFill(vg);
     nvgFontFaceId(vg, brls::Application::getDefaultFont());
     nvgFontSize(vg, r * 1.3f);

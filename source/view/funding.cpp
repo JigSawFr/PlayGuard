@@ -29,7 +29,7 @@ brls::Box* card(const std::string& name, const std::string& url, float qr_side, 
     if (focusable) {
         card->setFocusable(true);
         card->setHideHighlightBackground(true);
-        card->setHighlightCornerRadius(20);
+        card->setHighlightCornerRadius(cadran::kit::RADIUS_CARD);
         card->registerClickAction([name, url](brls::View*) {
             open_large(name, url);
             return true;

@@ -147,7 +147,7 @@ void AboutTab::refresh()
     // With the newer release the last update check found, as in Console.
     bool newer = false;
     version->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::PlayGuard, &newer) + commit + flags));
-    version->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
+    version->setDetailTextColor(newer ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     mode->setDetailText(si.applet_mode ? "playguard/tools/mode_applet"_i18n : "playguard/tools/mode_app"_i18n);
     data->setDetailText(paths::data_dir());
     this->list.sync();

@@ -11,6 +11,7 @@
 #include "action/rescue.hpp"
 #include "app.hpp"
 #include "ui/cadran_frame.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/perf.hpp"
@@ -150,7 +151,7 @@ void SecurityTab::refresh()
                                                "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
     ui::set_detail(temp, ui::bool_text(s.temp_unlocked_ok, s.temp_unlocked,
                                        "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
-    temp->setDetailTextColor(s.temp_unlocked_ok && s.temp_unlocked ? ui::color_warn() : ui::color_neutral());
+    temp->setDetailTextColor(s.temp_unlocked_ok && s.temp_unlocked ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     // Each tile's state at a glance: a check when it is as it should be, a
     // warning when it needs the parent; nothing when it could not be read.
     constexpr const char* OK = "cadran/teal_fill";
@@ -166,10 +167,10 @@ void SecurityTab::refresh()
     std::string active = ui::bool_text(s.pairing_active_ok, s.pairing_active, "playguard/common/yes"_i18n, "playguard/common/no"_i18n);
     if (paired && !syncs) active += " · " + "playguard/pairing/dns_blocked"_i18n;
     ui::set_detail(pr_active, active);
-    pr_active->setDetailTextColor(syncs ? ui::color_warn() : ui::color_neutral());
+    pr_active->setDetailTextColor(syncs ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     ui::set_detail(pr_updated, s.last_updated_ok ? ui::time_text(s.last_updated) : "playguard/common/unavailable"_i18n);
     ui::set_text(pr_note, paired && !syncs ? "playguard/pairing/dns_note"_i18n : "playguard/pairing/note"_i18n);
-    pr_note->setTextColor(syncs ? ui::color_warn() : ui::color_note());
+    pr_note->setTextColor(syncs ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text3"));
 
     ui::set_detail(pin_lock_cell, pin_lock::mode_text());
     ui::set_text(pin_lock_note, pin_lock::note_text());
@@ -177,7 +178,7 @@ void SecurityTab::refresh()
 
     const bool locked = console_lock::active();
     ui::set_detail(console_lock_cell, locked ? "playguard/common/on"_i18n : "playguard/common/off"_i18n);
-    console_lock_cell->setDetailTextColor(locked ? ui::color_warn() : ui::color_neutral());
+    console_lock_cell->setDetailTextColor(locked ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     ui::set_text(console_lock_note, locked ? "playguard/console_lock/note_on"_i18n : "playguard/console_lock/note_off"_i18n);
 
     const bool writable = !app::read_only();
@@ -197,7 +198,7 @@ void SecurityTab::refresh()
                                  (brls::DetailCell*)auto_relock.getView() })
         ui::show_writable(c, writable);
     auto_relock->setOn(config::get().auto_relock, false);
-    ui::show_writable(del, writable, ui::color_bad(), ui::color_neutral());
+    ui::show_writable(del, writable, cadran::kit::color("cadran/coral"), cadran::kit::color("cadran/text2"));
     this->list.sync();
     if (unlocked) cadran::set_pill("playguard/cadran/pill/unlocked"_i18n, "unlock", true);
     else if (has_pin) cadran::set_pill("playguard/cadran/pill/pin_set"_i18n, "key");

@@ -154,7 +154,7 @@ void cadran::Card::draw(NVGcontext* vg, float x, float y, float width, float hei
 {
     if (height < 1) return;   // every row hidden
     nvgBeginPath(vg);
-    nvgRoundedRect(vg, x + 0.5f, y + 0.5f, width - 1, height - 1, 18);
+    nvgRoundedRect(vg, x + 0.5f, y + 0.5f, width - 1, height - 1, kit::RADIUS_CARD);
     nvgFillColor(vg, this->a(this->fill));
     nvgFill(vg);
     nvgStrokeColor(vg, this->a(this->border));
@@ -185,8 +185,8 @@ cadran::Switch::Switch(brls::BooleanCell* cell)
     this->on = theme["cadran/teal_fill"];
     this->off = theme["cadran/track"];
     // A white knob either way: the track's colour says on or off.
-    this->knob_on = nvgRGB(0xFF, 0xFF, 0xFF);
-    this->knob_off = nvgRGB(0xFF, 0xFF, 0xFF);
+    this->knob_on = theme["cadran/knob"];
+    this->knob_off = theme["cadran/knob"];
     this->setFocusable(false);
     this->setWidth(50);
     this->setHeight(28);
@@ -207,7 +207,7 @@ void cadran::Switch::draw(NVGcontext* vg, float x, float y, float width, float h
     nvgFill(vg);
     // Off on a light track, a hairline keeps the knob's edge.
     if (!state) {
-        nvgStrokeColor(vg, this->a(nvgRGBA(0x0B, 0x14, 0x24, 40)));
+        nvgStrokeColor(vg, this->a(brls::Application::getTheme()["cadran/knob_line"]));
         nvgStrokeWidth(vg, 1.0f);
         nvgStroke(vg);
     }
@@ -298,8 +298,8 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         if (status) this->readings.push_back(cell);
         cell->setPadding(20, 22, 18, 22);
         cell->setMarginRight(0);
-        cell->setCornerRadius(18);
-        cell->setHighlightCornerRadius(18);
+        cell->setCornerRadius(kit::RADIUS_CARD);
+        cell->setHighlightCornerRadius(kit::RADIUS_CARD);
         cell->setBackgroundColor(theme["cadran/surf"]);
         cell->setBorderColor(theme["cadran/line"]);
         cell->setBorderThickness(1);
@@ -312,11 +312,11 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         cell->title->setGrow(0);
         cell->title->setMarginRight(0);
         cell->title->setSingleLine(false);
-        cell->title->setFontSize(status ? 15.0f : 17.0f);
+        cell->title->setFontSize(status ? kit::TEXT_META : kit::TEXT_BODY);
         if (status) cell->title->setTextColor(theme["cadran/text3"]);
         cell->detail->setHorizontalAlign(brls::HorizontalAlign::LEFT);
         cell->detail->setMaxWidth(10000);
-        cell->detail->setFontSize(status ? 22.0f : 15.0f);
+        cell->detail->setFontSize(status ? 22.0f : kit::TEXT_META);
         cell->detail->setMarginTop(status ? 4 : 2);
         // A status tile's value is a figure, on one line; another's words
         // (a language's name, "Español (Latinoamérica)") take two rather than
@@ -373,7 +373,7 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
             card = nullptr;
             // A note (a headline, larger, keeps its size).
             if (auto* note = dynamic_cast<brls::Label*>(line); note && note->getFontSize() <= 20.5f) {
-                note->setFontSize(16.5f);
+                note->setFontSize(kit::TEXT_NOTE);
                 note->setMarginLeft(10);
                 note->setMarginRight(10);
                 if (margin_top(note) >= 10) note->setMarginTop(10);
@@ -411,7 +411,7 @@ void cadran::List::section(brls::Header* header)
     for (const char* part : { "brls/header/title", "brls/header/subtitle" }) {
         if (auto* text = dynamic_cast<brls::Label*>(header->getView(part))) {
             // 16 px in the second ink: read from across the room.
-            text->setFontSize(16);
+            text->setFontSize(kit::TEXT_KICKER);
             text->setTextColor(theme["cadran/text2"]);
         }
     }
@@ -424,9 +424,9 @@ void cadran::List::row(brls::DetailCell* cell, const char* icon, bool alone)
     cell->setPaddingRight(ROW_PAD_END);
     cell->setLineBottom(0);
     cell->setLineTop(0);
-    cell->setHighlightCornerRadius(14);
+    cell->setHighlightCornerRadius(kit::RADIUS_ROW);
     cell->title->setFontSize(18);
-    cell->detail->setFontSize(16.5f);
+    cell->detail->setFontSize(kit::TEXT_NOTE);
     if (icon) cell->addView(row_icon(icon), 0);
     else cell->setPaddingLeft(ROW_PAD);
     if (auto* toggle = dynamic_cast<brls::BooleanCell*>(cell)) {
@@ -435,7 +435,7 @@ void cadran::List::row(brls::DetailCell* cell, const char* icon, bool alone)
     }
     if (alone) {
         brls::Theme theme = brls::Application::getTheme();
-        cell->setCornerRadius(14);
+        cell->setCornerRadius(kit::RADIUS_ROW);
         cell->setBackgroundColor(theme["cadran/surf"]);
         cell->setBorderColor(theme["cadran/line"]);
         cell->setBorderThickness(1);

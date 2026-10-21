@@ -2,6 +2,7 @@
 #include "view/release_notes.hpp"
 
 #include "app.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
 #include "util/text.hpp"
@@ -35,9 +36,9 @@ brls::View* section(const changelog::Line& l, bool first)
         image->setMarginRight(10);
         row->addView(image);
     }
-    row->addView(ui::text_label(l.text, 23, ui::color_accent()));
+    row->addView(cadran::kit::label(l.text, 23, "cadran/teal"));
     box->addView(row);
-    auto* rule = new brls::Rectangle(nvgTransRGBA(ui::color_accent(), 90));
+    auto* rule = new brls::Rectangle(nvgTransRGBA(cadran::kit::color("cadran/teal"), 90));
     rule->setHeight(2);
     rule->setMarginTop(6);
     box->addView(rule);
@@ -48,7 +49,7 @@ brls::View* section(const changelog::Line& l, bool first)
 brls::View* tag(const std::string& text)
 {
     auto* box = new brls::Box(brls::Axis::ROW);
-    box->setBackgroundColor(nvgTransRGBA(ui::color_accent(), 34));
+    box->setBackgroundColor(nvgTransRGBA(cadran::kit::color("cadran/teal"), 34));
     box->setCornerRadius(4);
     box->setPadding(1, 7, 1, 7);
     box->setMarginRight(8);
@@ -57,7 +58,7 @@ brls::View* tag(const std::string& text)
     auto* label = new brls::Label();
     label->setSingleLine(true);
     label->setFontSize(18);
-    label->setTextColor(ui::color_accent());
+    label->setTextColor(cadran::kit::color("cadran/teal"));
     label->setText(text);
     box->addView(label);
     return box;
@@ -75,7 +76,7 @@ brls::Box* card(const changelog::Line& l, bool left)
     else half->setPaddingLeft(6);
     auto* box = new brls::Box(brls::Axis::ROW);
     box->setGrow(1.0f);
-    box->setBackgroundColor(nvgTransRGBA(ui::color_accent(), 22));
+    box->setBackgroundColor(nvgTransRGBA(cadran::kit::color("cadran/teal"), 22));
     box->setCornerRadius(10);
     box->setAlignItems(brls::AlignItems::FLEX_START);
     box->setPadding(14, 16, 14, 14);
@@ -84,7 +85,7 @@ brls::Box* card(const changelog::Line& l, bool left)
         box->addView(image);
     } else {
         box->setAlignItems(brls::AlignItems::STRETCH);
-        auto* bar = new brls::Rectangle(ui::color_accent());
+        auto* bar = new brls::Rectangle(cadran::kit::color("cadran/teal"));
         bar->setWidth(4);
         bar->setCornerRadius(2);
         bar->setMarginRight(14);
@@ -94,12 +95,12 @@ brls::Box* card(const changelog::Line& l, bool left)
     body->setGrow(1.0f);
     body->setShrink(1.0f);
     if (l.title.empty()) {
-        body->addView(ui::text_label(l.text, 21, ui::color_accent()));   // no lead-in: the line is the title
+        body->addView(cadran::kit::label(l.text, 21, "cadran/teal"));   // no lead-in: the line is the title
     } else {
-        brls::Label* title = ui::text_label(l.title, 21, ui::color_accent());
+        brls::Label* title = cadran::kit::label(l.title, 21, "cadran/teal");
         title->setMarginBottom(4);
         body->addView(title);
-        body->addView(ui::text_label(text::capitalise_ascii(l.text), 18, ui::color_text()));
+        body->addView(cadran::kit::label(text::capitalise_ascii(l.text), 18, "cadran/text"));
     }
     box->addView(body);
     half->addView(box);
@@ -145,14 +146,14 @@ void fill(brls::Box* box, const std::vector<changelog::Line>& lines)
                 row->setMarginTop(6);
                 brls::View* bullet = icon(l.icon, 20);
                 if (!bullet) {
-                    bullet = ui::text_label("•", 20, ui::color_accent());
+                    bullet = cadran::kit::label("•", 20, "cadran/teal");
                     bullet->setWidth(20);
                 }
                 bullet->setMarginRight(8);
                 bullet->setShrink(0.0f);
                 row->addView(bullet);
                 if (!l.title.empty()) row->addView(tag(l.title));
-                brls::Label* text = ui::text_label(text::capitalise_ascii(l.text), 20, ui::color_text());
+                brls::Label* text = cadran::kit::label(text::capitalise_ascii(l.text), 20, "cadran/text");
                 text->setGrow(1.0f);
                 text->setShrink(1.0f);
                 row->addView(text);
@@ -160,7 +161,7 @@ void fill(brls::Box* box, const std::vector<changelog::Line>& lines)
                 break;
             }
             case changelog::Line::Text:
-                view = ui::text_label(l.text, 20, ui::color_note());
+                view = cadran::kit::label(l.text, 20, "cadran/text3");
                 view->setMarginTop(6);
                 break;
         }
@@ -191,7 +192,7 @@ void fill_highlights(brls::Box* box, const std::vector<changelog::Line>& lines)
         if (l.kind == changelog::Line::Item) continue;   // a nested item: not on a card
         brls::View* view = nullptr;
         if (l.kind == changelog::Line::Text) {
-            view = after_items ? ui::text_label(l.text, 18, ui::color_note()) : ui::text_label(l.text, 21, ui::color_text());
+            view = after_items ? cadran::kit::label(l.text, 18, "cadran/text3") : cadran::kit::label(l.text, 21, "cadran/text");
             view->setMarginTop(after_items ? 16 : 2);
         } else {
             view = section(l, box->getChildren().empty());

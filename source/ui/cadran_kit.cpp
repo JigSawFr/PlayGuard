@@ -16,6 +16,19 @@
 namespace cadran::kit
 {
 
+NVGcolor color(const char* key)
+{
+    return brls::Application::getTheme()[key];
+}
+
+brls::Label* centered(const std::string& text, float size, const char* color_key)
+{
+    brls::Label* l = label(text, size, color_key);
+    l->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    l->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the box's width
+    return l;
+}
+
 brls::Label* label(const std::string& text, float size, const char* color_key)
 {
     auto* l = new brls::Label();
@@ -66,12 +79,12 @@ brls::Box* card(bool focusable, bool grow)
     box->setBackgroundColor(theme["cadran/surf"]);
     box->setBorderColor(theme["cadran/line"]);
     box->setBorderThickness(1);
-    box->setCornerRadius(20);
+    box->setCornerRadius(RADIUS_CARD);
     box->setPadding(20, 24, 20, 24);
     if (focusable) {
         box->setFocusable(true);
         box->setHideHighlightBackground(true);
-        box->setHighlightCornerRadius(20);
+        box->setHighlightCornerRadius(RADIUS_CARD);
     }
     if (grow) {
         box->setGrow(1.0f);
@@ -83,7 +96,8 @@ brls::Box* card(bool focusable, bool grow)
 brls::Box* top_card(bool grow)
 {
     brls::Box* box = card(false, grow);
-    box->setCornerRadius(22);
+    box->setCornerRadius(RADIUS_TOP);
+    box->setHighlightCornerRadius(RADIUS_TOP);
     box->setPadding(22, 26, 22, 26);
     return box;
 }
@@ -93,7 +107,7 @@ brls::Box* kicker(const char* icon_name, const std::string& title)
     auto* head = new brls::Box(brls::Axis::ROW);
     head->setAlignItems(brls::AlignItems::CENTER);
     head->addView(icon(icon_name, 18, "cadran/text2"));
-    brls::Label* text = label(cadran::upper(title), 16, "cadran/text2");
+    brls::Label* text = label(cadran::upper(title), TEXT_KICKER, "cadran/text2");
     text->setSingleLine(true);
     text->setMarginLeft(8);
     head->addView(text);
@@ -173,7 +187,7 @@ brls::Box* pill(const std::string& text, const char* dot_key)
     auto* mark = new Mark(dot_key);
     mark->setMarginRight(7);
     box->addView(mark);
-    brls::Label* l = label(text, 15, "cadran/text2");
+    brls::Label* l = label(text, TEXT_META, "cadran/text2");
     l->setSingleLine(true);
     box->addView(l);
     return box;
@@ -228,7 +242,7 @@ brls::Box* qr(const std::string& payload, float side, const std::string& title, 
     if (width > 0) box->setWidth(width);
     box->addView(new QrView(payload, side));
     for (const auto& [text, size, key] : { std::tuple<const std::string&, float, const char*>{ title, 18, "cadran/text" },
-                                           { caption, 15.5f, "cadran/text3" } }) {
+                                           { caption, TEXT_META, "cadran/text3" } }) {
         if (text.empty()) continue;
         brls::Label* l = label(text, size, key);
         l->setHorizontalAlign(brls::HorizontalAlign::CENTER);
@@ -282,12 +296,12 @@ Empty empty(const char* icon_name)
     circle->setJustifyContent(brls::JustifyContent::CENTER);
     circle->addView(icon(icon_name, 28, "cadran/teal"));
     e.box->addView(circle);
-    e.title = label("", 19, "cadran/text");
+    e.title = label("", TEXT_LEAD, "cadran/text");
     e.title->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     e.title->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the card's width
     e.title->setMarginTop(16);
     e.box->addView(e.title);
-    e.text = label("", 15.5f, "cadran/text2");
+    e.text = label("", TEXT_META, "cadran/text2");
     e.text->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     e.text->setAlignSelf(brls::AlignSelf::STRETCH);
     e.text->setMarginTop(6);
@@ -339,9 +353,9 @@ std::string without_chevron(const std::string& value)
 const char* dot_of(NVGcolor c)
 {
     const auto same = [&c](NVGcolor o) { return c.r == o.r && c.g == o.g && c.b == o.b; };
-    if (same(ui::color_ok())) return "cadran/teal_fill";
-    if (same(ui::color_warn())) return "cadran/amber_fill";
-    if (same(ui::color_bad())) return "cadran/coral_fill";
+    if (same(cadran::kit::color("cadran/teal"))) return "cadran/teal_fill";
+    if (same(cadran::kit::color("cadran/amber"))) return "cadran/amber_fill";
+    if (same(cadran::kit::color("cadran/coral"))) return "cadran/coral_fill";
     return "cadran/text3";
 }
 
