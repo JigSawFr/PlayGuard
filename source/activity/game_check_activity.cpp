@@ -25,7 +25,6 @@
 #include "util/paths.hpp"
 #include "util/perf.hpp"
 #include "util/table_export.hpp"
-#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "view/game_tile.hpp"
 
@@ -868,8 +867,8 @@ void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current
     }
 
     // Two buttons at most, side by side (a third goes on a row of its own):
-    // the other actions, then the fix, last as every confirmation, in teal
-    // and with the focus; B closes. With no fix: OK, then the actions.
+    // the fix first ("its first button", the texts say), with the focus, then
+    // the other actions; B closes. With no fix: OK, then the actions.
     auto* dialog = new brls::Dialog(box);
     const GameFacts g = game;
     const u32 others = actions & ~recommended;
@@ -877,12 +876,8 @@ void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current
         GameContent update = {};
         for (u32 i = 0; i < g.content_count; i++)
             if (g.contents[i].type == GC_META_PATCH) update = g.contents[i];
-        if (others) dialog->addButton("playguard/games/other_actions"_i18n, [this, g, others]() { this->choose(g, others); });
         dialog->addButton(fix_button(recommended), [this, g, recommended, update]() { this->run(g, recommended, update); });
-        dialog->setCancelable(true);
-        cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
-        if (others)
-            if (brls::View* fix = dialog->getView("brls/dialog/button2")) dialog->setLastFocusedView(fix);
+        if (others) dialog->addButton("playguard/games/other_actions"_i18n, [this, g, others]() { this->choose(g, others); });
     } else {
         dialog->addButton("hints/ok"_i18n, []() {});
         if (others) dialog->addButton("playguard/games/actions"_i18n, [this, g, others]() { this->choose(g, others); });
