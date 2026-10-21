@@ -604,9 +604,6 @@
         "dns_note": "O redirecionamento DNS do Atmosphère (atmosphere/hosts) desvia o servidor do controle parental da Nintendo: o app do celular não consegue sincronizar, então não substitui as configurações feitas aqui."
     },
     "security": {
-        "headline_none": "Ainda sem PIN: qualquer pessoa pode mudar as configurações",
-        "headline_unlocked": "Desbloqueado por enquanto",
-        "headline_active": "Protegido pelo PIN",
         "section_status": "Status",
         "pin": "PIN",
         "restrictions": "Restrições ativadas",

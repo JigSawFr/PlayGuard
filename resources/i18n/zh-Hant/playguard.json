@@ -604,9 +604,6 @@
         "dns_note": "Atmosphère 的 DNS 重新導向（atmosphere/hosts）將任天堂的家長監護伺服器導向別處：手機應用程式無法同步，因此不會覆蓋在此所做的設定。"
     },
     "security": {
-        "headline_none": "尚未設定PIN碼：任何人都能變更設定",
-        "headline_unlocked": "暫時已解鎖",
-        "headline_active": "已受PIN碼保護",
         "section_status": "狀態",
         "pin": "PIN碼",
         "restrictions": "限制已啟用",

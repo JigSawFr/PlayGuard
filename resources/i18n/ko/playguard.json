@@ -604,9 +604,6 @@
         "dns_note": "Atmosphère의 DNS 리디렉션(atmosphere/hosts)이 닌텐도 자녀 보호 서버를 다른 곳으로 돌리고 있습니다. 스마트폰 앱이 동기화할 수 없으므로 여기에서 변경한 설정을 덮어쓰지 않습니다."
     },
     "security": {
-        "headline_none": "아직 PIN 없음: 누구나 설정을 바꿀 수 있습니다",
-        "headline_unlocked": "일시적으로 해제됨",
-        "headline_active": "PIN으로 보호됨",
         "section_status": "상태",
         "pin": "PIN",
         "restrictions": "제한 사용 중",

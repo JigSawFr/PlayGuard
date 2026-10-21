@@ -604,9 +604,6 @@
         "dns_note": "Il reindirizzamento DNS di Atmosphère (atmosphere/hosts) devia il server del filtro famiglia di Nintendo: l'app non può sincronizzarsi, quindi non sovrascrive le impostazioni fatte qui."
     },
     "security": {
-        "headline_none": "Ancora nessun PIN: chiunque può cambiare le impostazioni",
-        "headline_unlocked": "Sbloccato per ora",
-        "headline_active": "Protetto dal PIN",
         "section_status": "Stato",
         "pin": "PIN",
         "restrictions": "Limitazioni attive",

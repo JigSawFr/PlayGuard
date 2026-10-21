@@ -604,9 +604,6 @@
         "dns_note": "Die DNS-Umleitung von Atmosphère (atmosphere/hosts) leitet Nintendos Jugendschutz-Server um: Die Smart-Geräte-App kann sich nicht synchronisieren und überschreibt die hier vorgenommenen Einstellungen daher nicht."
     },
     "security": {
-        "headline_none": "Noch keine Geheimzahl: Jeder kann die Einstellungen ändern",
-        "headline_unlocked": "Vorübergehend entsperrt",
-        "headline_active": "Durch die Geheimzahl geschützt",
         "section_status": "Status",
         "pin": "Geheimzahl",
         "restrictions": "Einschränkungen aktiv",

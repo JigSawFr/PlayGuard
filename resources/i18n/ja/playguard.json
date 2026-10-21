@@ -604,9 +604,6 @@
         "dns_note": "Atmosphère の DNS リダイレクト（atmosphere/hosts）が任天堂のみまもり設定サーバーをほかへ向けています。スマホアプリは同期できないため、ここでの設定は上書きされません。"
     },
     "security": {
-        "headline_none": "暗証番号が未設定：誰でも設定を変更できます",
-        "headline_unlocked": "一時的に解除中",
-        "headline_active": "暗証番号で保護されています",
         "section_status": "状態",
         "pin": "暗証番号",
         "restrictions": "制限が有効",

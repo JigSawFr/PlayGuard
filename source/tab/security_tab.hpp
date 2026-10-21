@@ -17,7 +17,6 @@ class SecurityTab : public TabBase
 
   private:
     cadran::List list;
-    brls::Label* headline = nullptr;   // the state in one line, at the top (List::headline)
     // Set or change the PIN (the system PIN screen), recorded in the history.
     void change_pin();
 

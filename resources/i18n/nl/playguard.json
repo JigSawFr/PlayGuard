@@ -604,9 +604,6 @@
         "dns_note": "De DNS-omleiding van Atmosphère (atmosphere/hosts) stuurt de server voor ouderlijk toezicht van Nintendo ergens anders heen: de smartphone-app kan niet synchroniseren en overschrijft de instellingen hier dus niet."
     },
     "security": {
-        "headline_none": "Nog geen pincode: iedereen kan de instellingen wijzigen",
-        "headline_unlocked": "Voorlopig ontgrendeld",
-        "headline_active": "Beschermd met de pincode",
         "section_status": "Status",
         "pin": "Pincode",
         "restrictions": "Beperkingen ingeschakeld",

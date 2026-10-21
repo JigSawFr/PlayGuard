@@ -604,9 +604,6 @@
         "dns_note": "Atmosphère's DNS redirection (atmosphere/hosts) sends Nintendo's parental-control server elsewhere: the companion app cannot synchronize, so it does not overwrite what is set here."
     },
     "security": {
-        "headline_none": "No PIN yet: anyone can change the settings",
-        "headline_unlocked": "Unlocked for now",
-        "headline_active": "Protected by the PIN",
         "section_status": "Status",
         "pin": "PIN",
         "restrictions": "Restrictions enabled",

@@ -604,9 +604,6 @@
         "dns_note": "Atmosphère 的 DNS 重定向（atmosphere/hosts）将任天堂的家长控制服务器指向了别处：手机应用无法同步，因此不会覆盖在此进行的设置。"
     },
     "security": {
-        "headline_none": "尚未设置PIN：任何人都能更改设置",
-        "headline_unlocked": "暂时已解锁",
-        "headline_active": "已受PIN保护",
         "section_status": "状态",
         "pin": "PIN",
         "restrictions": "限制已启用",
