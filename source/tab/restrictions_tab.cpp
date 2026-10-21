@@ -143,8 +143,8 @@ RestrictionsTab::Tile RestrictionsTab::make_tile(uint32_t level, bool last)
         t.box = kit::card(true, false);
         t.box->setAxis(brls::Axis::ROW);
         t.box->setAlignItems(brls::AlignItems::CENTER);
-        t.box->setCornerRadius(18);
-        t.box->setHighlightCornerRadius(18);
+        t.box->setCornerRadius(cadran::kit::RADIUS_CARD);
+        t.box->setHighlightCornerRadius(cadran::kit::RADIUS_CARD);
         t.box->setPadding(14, 22, 14, 24);
         t.box->setBorderThickness(2);
         t.box->setMarginTop(12);
@@ -161,8 +161,8 @@ RestrictionsTab::Tile RestrictionsTab::make_tile(uint32_t level, bool last)
     } else {
         t.box = kit::card(true, true);
         t.box->setMinHeight(226);
-        t.box->setCornerRadius(22);
-        t.box->setHighlightCornerRadius(22);
+        t.box->setCornerRadius(cadran::kit::RADIUS_TOP);
+        t.box->setHighlightCornerRadius(cadran::kit::RADIUS_TOP);
         t.box->setPadding(18, 18, 16, 18);
         t.box->setBorderThickness(2);
         if (!last) t.box->setMarginRight(12);

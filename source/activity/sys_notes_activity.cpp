@@ -2,6 +2,7 @@
 #include "activity/sys_notes_activity.hpp"
 
 #include "action/sys_notes_flow.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/live_prefs.hpp"
 #include "ui/ui.hpp"
 #include "util/markdown.hpp"
@@ -205,11 +206,11 @@ void SysNotesActivity::fill()
         if ((int)this->shown[this->tab] == installed_at)
             tags->addView(tag_view({ "playguard/sys_notes/tag_installed"_i18n, accent }, 18));
         else if (!mine.empty() && this->tab >= newer_from)
-            tags->addView(tag_view({ "playguard/sys_notes/tag_new"_i18n, ui::color_warn() }, 18));
+            tags->addView(tag_view({ "playguard/sys_notes/tag_new"_i18n, cadran::kit::color("cadran/amber") }, 18));
         if (!r.supports.empty())
-            tags->addView(tag_view({ brls::getStr("playguard/sys_notes/tag_supports", r.supports), ui::color_neutral() }, 18));
-        if (r.security) tags->addView(tag_view({ "playguard/sys_notes/tag_security"_i18n, ui::color_warn() }, 18));
-        if (r.pctl) tags->addView(tag_view({ "playguard/sys_notes/tag_pctl"_i18n, ui::color_warn() }, 18));
+            tags->addView(tag_view({ brls::getStr("playguard/sys_notes/tag_supports", r.supports), cadran::kit::color("cadran/text2") }, 18));
+        if (r.security) tags->addView(tag_view({ "playguard/sys_notes/tag_security"_i18n, cadran::kit::color("cadran/amber") }, 18));
+        if (r.pctl) tags->addView(tag_view({ "playguard/sys_notes/tag_pctl"_i18n, cadran::kit::color("cadran/amber") }, 18));
         ui::set_visible(tags.getView(), !tags->getChildren().empty());
 
         header->setTitle(title_of(this->which) + " " + r.version);

@@ -7,6 +7,7 @@
 
 #include "tab/cadran_list.hpp"
 #include "tab/tab_base.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/live_prefs.hpp"
 #include "ui/text_size.hpp"
 #include "ui/ui.hpp"
@@ -70,7 +71,7 @@ void HeaderSetting::draw(NVGcontext* vg, float x, float y, float width, float he
 void HeaderSetting::draw_language(NVGcontext* vg, float x, float y, float width, float height)
 {
     // The code in the header's text colour, in a thin rounded frame.
-    const NVGcolor ink = ui::color_text();
+    const NVGcolor ink = cadran::kit::color("cadran/text");
     const float inset = height * 0.16f;
     nvgBeginPath(vg);
     nvgRoundedRect(vg, x + 1, y + inset, width - 2, height - 2 * inset, 6);
@@ -87,7 +88,7 @@ void HeaderSetting::draw_language(NVGcontext* vg, float x, float y, float width,
 
 void HeaderSetting::draw_theme(NVGcontext* vg, float x, float y, float width, float height)
 {
-    const NVGcolor ink = ui::color_text();
+    const NVGcolor ink = cadran::kit::color("cadran/text");
     const float cx = x + width / 2, cy = y + height / 2;
     const std::string& theme = config::get().theme;
     if (theme == "light") {
@@ -144,7 +145,7 @@ void HeaderSetting::draw_text_size(NVGcontext* vg, float x, float y, float width
 {
     // "AA": a small A, then a large one on the same baseline, teal while
     // the text is larger.
-    const NVGcolor ink = ui::color_text();
+    const NVGcolor ink = cadran::kit::color("cadran/text");
     const float base = y + height * 0.78f;
     nvgFontFaceId(vg, brls::Application::getDefaultFont());
     nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE);

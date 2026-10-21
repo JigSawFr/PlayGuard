@@ -181,7 +181,7 @@ class IssueCell : public brls::DetailCell
     void set_selected(bool on)
     {
         ui::set_visible(this->check, on);
-        this->setTextColor(on ? brls::Application::getTheme()["brls/list/listItem_value_color"] : ui::color_text());
+        this->setTextColor(on ? brls::Application::getTheme()["brls/list/listItem_value_color"] : cadran::kit::color("cadran/text"));
     }
 
   private:
@@ -206,7 +206,7 @@ class IssueTile : public GameTile
     void set_selected(bool on)
     {
         ui::set_visible(this->check, on);
-        this->set_name_color(on ? brls::Application::getTheme()["brls/list/listItem_value_color"] : ui::color_text());
+        this->set_name_color(on ? brls::Application::getTheme()["brls/list/listItem_value_color"] : cadran::kit::color("cadran/text"));
     }
 
     u64 app_id = 0;
@@ -356,7 +356,7 @@ void GameCheckActivity::build_group(GameCategory category)
     group.title->setMarginBottom(4);
     group.title->setMarginTop(category == GROUPS[0] ? 10 : 20);
     group.box->addView(group.title);
-    group.note = ui::text_label(brls::getStr(std::string("playguard/games/group_note/") + category_key(category)), 18, ui::color_note());
+    group.note = cadran::kit::label(brls::getStr(std::string("playguard/games/group_note/") + category_key(category)), 18, "cadran/text3");
     group.note->setMarginBottom(8);
     group.box->addView(group.note);
     cadran::List::section(group.title);
@@ -395,7 +395,7 @@ void GameCheckActivity::build_group(GameCategory category)
         actions->addView(group.send);
         group.remove_all = new brls::Button();
         group.remove_all->setGrow(1.0f);
-        group.remove_all->setTextColor(ui::color_bad());
+        group.remove_all->setTextColor(cadran::kit::color("cadran/coral"));
         group.remove_all->registerClickAction([this, category](brls::View*) {
             this->remove_games(this->groups[category].games);
             return true;
@@ -585,7 +585,7 @@ void GameCheckActivity::status_text(const std::string& text, NVGcolor color)
 
 void GameCheckActivity::status_text(const std::string& text)
 {
-    this->status_text(text, ui::color_text());
+    this->status_text(text, cadran::kit::color("cadran/text"));
 }
 
 void GameCheckActivity::show()
@@ -628,7 +628,7 @@ void GameCheckActivity::show()
         for (size_t i = 0; i < shown.size(); i++) {
             const Broken b = shown[i];
             const bool picked = this->selected.count(b.game.app_id) != 0;
-            const NVGcolor color = warn_only(b.issue) ? ui::color_warn() : ui::color_bad();
+            const NVGcolor color = warn_only(b.issue) ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/coral");
             group.games.push_back(b.game);
             brls::View* view;
             if (this->grid) {
@@ -690,7 +690,7 @@ void GameCheckActivity::show()
     }
     // Above the sections from two games on: what is picked, or how to pick.
     this->selection->setText(this->selection_text());
-    this->selection->setTextColor(this->selected.empty() ? ui::color_text()
+    this->selection->setTextColor(this->selected.empty() ? cadran::kit::color("cadran/text")
                                                          : brls::Application::getTheme()["brls/list/listItem_value_color"]);
     ui::set_visible(this->selection, broken.size() >= 2 || !this->selected.empty());
 
@@ -719,7 +719,7 @@ void GameCheckActivity::show()
     } else if (this->checking) {
         this->status_text("playguard/games/searching"_i18n);
     } else if (R_FAILED(this->list_rc)) {
-        this->status_text("playguard/games/err_list"_i18n + " — " + ui::rc_text(this->list_rc), ui::color_bad());
+        this->status_text("playguard/games/err_list"_i18n + " — " + ui::rc_text(this->list_rc), cadran::kit::color("cadran/coral"));
     } else {
         const std::string found = broken.empty() ? brls::getStr("playguard/games/none", (int)count)
                                                  : brls::getStr("playguard/games/section_count", (int)broken.size(), (int)count);
@@ -729,7 +729,7 @@ void GameCheckActivity::show()
         const std::string truncated = this->cache.truncated ? brls::getStr("playguard/games/truncated", (int)count) : "";
         this->status_text(game_check_text::result_line(found, broken.empty(), age,
                                                        { truncated, app::dev_mode() ? this->timing : "" }),
-                          broken.empty() ? ui::color_ok() : ui::color_note());
+                          broken.empty() ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/text3"));
     }
     hint->setText(brls::getStr("playguard/games/many", ui::storage_short(si)));
     ui::set_visible(hint.getView(), broken.size() >= MANY);

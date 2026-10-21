@@ -11,9 +11,37 @@
 
 namespace cadran::kit
 {
+// The boards' corners, and the XML's (@style/cadran/radius/<name>,
+// cadran::install_theme): a row on its own, a table, a picker's row (ROW); a
+// game's icon (ICON); a card of a list, a tile (CARD); a screen's top card
+// (TOP); a dialog's and a picker's card (MODAL). A pill is round: half its
+// height.
+constexpr float RADIUS_ROW   = 14;
+constexpr float RADIUS_ICON  = 12;
+constexpr float RADIUS_CARD  = 20;
+constexpr float RADIUS_TOP   = 22;
+constexpr float RADIUS_MODAL = 24;
+
+// The boards' type scale: what is said in passing (a code, a caption, a
+// pill), a section's kicker in capitals, a note under the lines, a line's
+// text, a dialog's paragraph, a dialog's title (in the display face).
+constexpr float TEXT_META   = 15;
+constexpr float TEXT_KICKER = 16;
+constexpr float TEXT_NOTE   = 16.5f;
+constexpr float TEXT_BODY   = 17;
+constexpr float TEXT_LEAD   = 19;
+constexpr float TEXT_TITLE  = 23;
+
+// A theme colour of the boards ("cadran/teal"…), for what draws itself or
+// sets a colour: always a key of the palettes, never a value of its own, so
+// it follows the theme.
+NVGcolor color(const char* key);
+
 // A label of `size` px in the theme colour `color_key` ("cadran/text2"…);
-// several lines when it has to.
+// several lines when it has to. centered(): the same, centred, wrapping at
+// its box's width.
 brls::Label* label(const std::string& text, float size, const char* color_key = "cadran/text");
+brls::Label* centered(const std::string& text, float size, const char* color_key = "cadran/text");
 
 // The same in the boards' display face (Sora; the other scripts from the
 // app's fonts): a dialog's title, a code to read out, a figure.

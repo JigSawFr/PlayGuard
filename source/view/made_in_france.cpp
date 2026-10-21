@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/made_in_france.hpp"
 
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -40,7 +41,7 @@ MadeInFrance::MadeInFrance()
     auto* label = new brls::Label();
     label->setText("playguard/about/made_in_france"_i18n);
     label->setFontSize(20);
-    label->setTextColor(ui::color_note());
+    label->setTextColor(cadran::kit::color("cadran/text3"));
     label->setMarginLeft(10);
     this->addView(new FrenchFlag());
     this->addView(label);

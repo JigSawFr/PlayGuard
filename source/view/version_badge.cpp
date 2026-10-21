@@ -2,6 +2,7 @@
 #include "view/version_badge.hpp"
 
 #include "app.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 
 #include <algorithm>
@@ -26,7 +27,7 @@ VersionBadge::VersionBadge()
 
     // The tag: filled (the amber of the warnings, or the notes' grey for a
     // release), the version in the background's colour.
-    const NVGcolor ink = release ? ui::color_note() : ui::color_warn();
+    const NVGcolor ink = release ? cadran::kit::color("cadran/text3") : cadran::kit::color("cadran/amber");
     auto* tag = new brls::Box(brls::Axis::ROW);
     tag->setBackgroundColor(ink);
     tag->setCornerRadius(4);

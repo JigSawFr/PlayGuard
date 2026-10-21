@@ -30,18 +30,6 @@ namespace ui
 // createWindow(), before the first label exists, then again when the language
 // changes while PlayGuard runs (live_prefs, which builds the screens again).
 void     use_font_for(const std::string& locale);
-NVGcolor color_ok();
-NVGcolor color_warn();
-NVGcolor color_bad();
-NVGcolor color_track();     // empty part of a progress bar, a missing cover
-NVGcolor color_note();      // explanatory notes under a section
-NVGcolor color_neutral();   // DetailCell value colour
-NVGcolor color_text();      // plain label text colour
-NVGcolor color_accent();    // the theme's highlight (the sidebar's active item)
-// A label of `size` in `color` that wraps (not single-line).
-brls::Label* text_label(const std::string& text, float size, NVGcolor color);
-// The same, centred, wrapping at the width of the box it is in (a dialog's).
-brls::Label* centered_label(const std::string& text, float size, NVGcolor color);
 
 // "error 0x00001234" followed by a human explanation when one is known.
 // PlayGuard's own results (read-only, invalid value …) are just the sentence:

@@ -18,7 +18,7 @@ namespace cadran
 constexpr float DIALOG_BUTTONS = 80;
 constexpr float DIALOG_MARGIN  = 24;
 // A picker's card: the radius of its corners.
-constexpr float PICKER_CORNER = 24;
+constexpr float PICKER_CORNER = 24;   // kit::RADIUS_MODAL
 
 enum class Emphasis
 {

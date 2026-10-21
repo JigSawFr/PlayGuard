@@ -14,6 +14,7 @@
 #include "activity/game_activity.hpp"
 #include "activity/games_activity.hpp"
 #include "ui/cadran_frame.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
 #include "util/config.hpp"
@@ -31,7 +32,7 @@ constexpr float  WEEK_BAR_MAX = 56.0f;
 constexpr float  SPARK_MAX = 40.0f;
 constexpr long   GREW_MIN = 30;    // a game card says "+1 h vs last week" from half an hour more
 // The accounts' avatars, in turn (no picture of theirs is read).
-const NVGcolor AVATARS[] = { nvgRGB(0x7C, 0x6C, 0xF2), nvgRGB(0xFF, 0xB5, 0x47), nvgRGB(0x4F, 0xA3, 0xFF), nvgRGB(0xE9, 0x6A, 0xA8) };
+const char* const AVATARS[] = { "cadran/avatar0", "cadran/avatar1", "cadran/avatar2", "cadran/avatar3" };
 
 
 // Shared by every ActivityTab (borealis rebuilds the tab each time the
@@ -312,7 +313,7 @@ void ActivityTab::show_status(const PlayStats& s, bool empty)
         error = false;
     }
     status->setText(text);
-    status->setTextColor(error ? ui::color_warn() : ui::color_note());
+    status->setTextColor(error ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text3"));
     ui::set_visible(status, !text.empty());
 }
 
@@ -411,14 +412,14 @@ void ActivityTab::build_cards()
         c.icon_fallback = new brls::Box();
         c.icon_fallback->setWidth(60);
         c.icon_fallback->setHeight(60);
-        c.icon_fallback->setCornerRadius(14);
+        c.icon_fallback->setCornerRadius(cadran::kit::RADIUS_ICON);
         c.icon_fallback->setBackgroundColor(theme["cadran/surf2"]);
         c.icon_fallback->setMarginRight(16);
         c.box->addView(c.icon_fallback);
         c.icon = new brls::Image();
         c.icon->setWidth(60);
         c.icon->setHeight(60);
-        c.icon->setCornerRadius(14);
+        c.icon->setCornerRadius(cadran::kit::RADIUS_ICON);
         c.icon->setMarginRight(16);
         c.icon->setScalingType(brls::ImageScalingType::FIT);
         c.icon->setVisibility(brls::Visibility::GONE);
@@ -549,7 +550,7 @@ void ActivityTab::build_chips()
             avatar->setWidth(32);
             avatar->setHeight(32);
             avatar->setCornerRadius(16);
-            avatar->setBackgroundColor(AVATARS[i % 4]);
+            avatar->setBackgroundColor(cadran::kit::color(AVATARS[i % 4]));
             avatar->setAlignItems(brls::AlignItems::CENTER);
             avatar->setJustifyContent(brls::JustifyContent::CENTER);
             avatar->setMarginRight(10);

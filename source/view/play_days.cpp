@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <fmt/format.h>
 
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -51,11 +52,11 @@ PlayDaysView::PlayDaysView()
         lane->setHeight(BAR_MAX);
         lane->setAlignItems(brls::AlignItems::CENTER);
         lane->setJustifyContent(brls::JustifyContent::FLEX_END);
-        c.bar = new brls::Rectangle(ui::color_neutral());
+        c.bar = new brls::Rectangle(cadran::kit::color("cadran/text2"));
         c.bar->setWidth(BAR_WIDTH);
         c.bar->setHeight(BAR_MIN);
         c.bar->setCornerRadius(4);
-        c.limit = new brls::Rectangle(ui::color_text());
+        c.limit = new brls::Rectangle(cadran::kit::color("cadran/text"));
         c.limit->setWidth(LANE_WIDTH);
         c.limit->setHeight(2);
         c.limit->setPositionType(brls::PositionType::ABSOLUTE);
@@ -68,7 +69,7 @@ PlayDaysView::PlayDaysView()
         c.day->setFontSize(LABEL_FONT);
         c.day->setHorizontalAlign(brls::HorizontalAlign::CENTER);
         c.day->setMarginTop(6);
-        c.mark = new brls::Rectangle(ui::color_neutral());
+        c.mark = new brls::Rectangle(cadran::kit::color("cadran/text2"));
         c.mark->setWidth(BAR_WIDTH);
         c.mark->setHeight(3);
         c.mark->setCornerRadius(1.5f);
@@ -84,7 +85,7 @@ PlayDaysView::PlayDaysView()
     this->legend = new brls::Label();
     this->legend->setFontSize(LEGEND_FONT);
     this->legend->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    this->legend->setTextColor(ui::color_note());
+    this->legend->setTextColor(cadran::kit::color("cadran/text3"));
     this->legend->setMarginTop(10);
     this->addView(this->legend);
 }
@@ -114,7 +115,7 @@ void PlayDaysView::show(const uint32_t day_s[7], const uint8_t day_wday[7], cons
         const bool over = has_limit && day_s[k] > (uint64_t)limits[k] * 60;
         c.bar->setHeight(bar_height(day_s[k], top));
         // Played in the teal it is everywhere else (the week, Activity's cards).
-        NVGcolor colour = over ? ui::color_warn() : brls::Application::getTheme()["cadran/teal_fill"];
+        NVGcolor colour = over ? cadran::kit::color("cadran/amber") : brls::Application::getTheme()["cadran/teal_fill"];
         if (!day_s[k]) colour = nvgTransRGBA(colour, 40);   // nothing played: a faint stub
         else if (!today && !over) colour = nvgTransRGBA(colour, 120);
         c.bar->setColor(colour);
@@ -123,16 +124,16 @@ void PlayDaysView::show(const uint32_t day_s[7], const uint8_t day_wday[7], cons
             // 0 min (no play) sits on the floor of the lane.
             const float h = limits[k] ? bar_height((uint64_t)limits[k] * 60, top) : 0.0f;
             c.limit->setPositionBottom(std::max(0.0f, h - 1.0f));
-            c.limit->setColor(over ? ui::color_warn() : nvgTransRGBA(ui::color_text(), 150));
+            c.limit->setColor(over ? cadran::kit::color("cadran/amber") : nvgTransRGBA(cadran::kit::color("cadran/text"), 150));
         }
         any_over = any_over || over;
         // Over the limit is marked by "!", not by the colour alone.
         const std::string played = day_s[k] ? ui::fmt_play_time(day_s[k]) : "—";
         c.value->setText(over ? "! " + played : played);
-        c.value->setTextColor(over ? ui::color_warn() : today ? ui::color_text() : ui::color_note());
+        c.value->setTextColor(over ? cadran::kit::color("cadran/amber") : today ? cadran::kit::color("cadran/text") : cadran::kit::color("cadran/text3"));
         c.day->setText(brls::getStr(fmt::format("playguard/days_short/{}", (int)day_wday[k])));
-        c.day->setTextColor(today ? ui::color_neutral() : ui::color_note());
-        c.mark->setColor(today ? ui::color_neutral() : nvgTransRGBA(ui::color_neutral(), 0));
+        c.day->setTextColor(today ? cadran::kit::color("cadran/text2") : cadran::kit::color("cadran/text3"));
+        c.mark->setColor(today ? cadran::kit::color("cadran/text2") : nvgTransRGBA(cadran::kit::color("cadran/text2"), 0));
     }
 
     // The order differs from the play timer's week (Monday first): say so,

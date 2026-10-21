@@ -53,7 +53,7 @@
                 </brls:Box>
 
                 <brls:Box axis="row" alignItems="stretch" marginBottom="14">
-                    <brls:Box id="dash_bed_card" focusable="true" hideHighlightBackground="true" highlightCornerRadius="20" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="20" paddingBottom="20" paddingLeft="24" paddingRight="24" marginRight="16">
+                    <brls:Box id="dash_bed_card" focusable="true" hideHighlightBackground="true" highlightCornerRadius="@style/cadran/radius/card" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="@style/cadran/radius/card" paddingTop="20" paddingBottom="20" paddingLeft="24" paddingRight="24" marginRight="16">
                         <brls:Box axis="row" justifyContent="spaceBetween" alignItems="center">
                             <brls:Label text="@i18n/playguard/cadran/today/bed_title" fontSize="16" textColor="@theme/cadran/text2"/>
                             <brls:Label id="dash_bed_state" text="" fontSize="15" textColor="@theme/cadran/teal"/>
@@ -66,7 +66,7 @@
                             <brls:Label id="dash_bed_sub" text="" fontSize="15" textColor="@theme/cadran/text2"/>
                         </brls:Box>
                     </brls:Box>
-                    <brls:Box id="dash_pc_card" focusable="true" hideHighlightBackground="true" highlightCornerRadius="20" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="20" paddingBottom="20" paddingLeft="24" paddingRight="24" marginRight="16">
+                    <brls:Box id="dash_pc_card" focusable="true" hideHighlightBackground="true" highlightCornerRadius="@style/cadran/radius/card" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="@style/cadran/radius/card" paddingTop="20" paddingBottom="20" paddingLeft="24" paddingRight="24" marginRight="16">
                         <brls:Box axis="row" justifyContent="spaceBetween" alignItems="center">
                             <brls:Label text="@i18n/playguard/cadran/today/pc_title" fontSize="16" textColor="@theme/cadran/text2"/>
                             <brls:Label id="dash_pc_state" text="" fontSize="15" textColor="@theme/cadran/teal"/>
@@ -74,7 +74,7 @@
                         <CadranDigits id="dash_pc_value" text="—" fontSize="32" marginTop="6" marginBottom="6" fitWidth="250"/>
                         <brls:Label id="dash_pc_sub" text="" fontSize="15" textColor="@theme/cadran/text2"/>
                     </brls:Box>
-                    <brls:Box id="dash_clock_card" focusable="true" hideHighlightBackground="true" highlightCornerRadius="20" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="20" paddingTop="20" paddingBottom="20" paddingLeft="24" paddingRight="24">
+                    <brls:Box id="dash_clock_card" focusable="true" hideHighlightBackground="true" highlightCornerRadius="@style/cadran/radius/card" axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="@style/cadran/radius/card" paddingTop="20" paddingBottom="20" paddingLeft="24" paddingRight="24">
                         <brls:Box axis="row" justifyContent="spaceBetween" alignItems="center">
                             <brls:Label id="dash_clock_title" text="@i18n/playguard/cadran/today/clock_title" fontSize="16" textColor="@theme/cadran/text2"/>
                             <brls:Label id="dash_clock_state" text="" fontSize="15" textColor="@theme/cadran/teal"/>

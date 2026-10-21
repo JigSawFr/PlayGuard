@@ -29,7 +29,7 @@ void style_rail(brls::View* tab_frame);
 // Both, for the main screen.
 void style_frame(brls::AppletFrame* frame, brls::View* tab_frame);
 // The main screen's header pill: its text, or hidden when empty (each
-// screen says what it has to: "Contrôle parental actif", "Minuteur actif"…),
+// screen says what it has to: "Parental controls on", "Play timer on"…),
 // its icon, and amber for a state that needs the parent ("Pas de code PIN").
 // While parental controls are known to be unlocked (ui::known_unlocked), it
 // says that instead, whatever the screen, and a tap goes where that is undone.
