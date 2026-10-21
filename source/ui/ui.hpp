@@ -14,6 +14,7 @@
 #include "ui/format_text.hpp"
 #include "ui/cadran_text.hpp"
 #include "util/patches.hpp"
+#include "util/prodinfo.hpp"
 #include "util/pctl_ops_c.hpp"
 
 class MainActivity;
@@ -300,8 +301,19 @@ std::string other_storage_note(const SysInfo& info);
 // is normal (online play), blanking it would cut Nintendo's services.
 bool        serial_warning(const SysInfo& info);
 std::string blank_text(const SysInfo& info, NVGcolor* color = nullptr);
-// As the system sees it; `reveal` false masks the middle ("XAW1000•••••01").
-std::string serial_text(const SysInfo& info, bool reveal);
+// The console's real serial number: the system's when Atmosphère does not
+// blank it, else read from its PRODINFO backup on the SD card
+// (util/prodinfo.hpp). `note` says where it comes from, the whole number in
+// it ("" serial: not found, and why). Looked up once per run.
+struct RealSerial
+{
+    std::string      serial;
+    std::string      note;
+    prodinfo::Source source = prodinfo::Source::None;   // when blanked
+};
+const RealSerial& real_serial(const SysInfo& info);
+// real_serial() with the middle masked ("XAW1000•••••01"), or "Unavailable".
+std::string serial_text(const SysInfo& info);
 bool        patches_warning(const patches::Report& report);
 // The game-patch report of this boot, read from the SD card once per run (it
 // only changes with a reboot): Today and the Console tab no longer rescan it

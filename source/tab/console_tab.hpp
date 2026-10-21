@@ -23,10 +23,10 @@ class ConsoleTab : public TabBase
   private:
     cadran::List list;
     brls::Label* headline = nullptr;   // the state in one line, at the top (List::headline)
-    bool        serial_revealed = false;   // until the tab is left (tabs are rebuilt when reopened)
     std::string storage_note;              // the other system's, shown by A on the storage row
     RowIcon*    storage_info = nullptr;
     RowIcon*    blank_warn   = nullptr;    // the serial number not blanked on emuMMC, by A
+    RowIcon*    serial_info  = nullptr;    // where the real serial number comes from, by A
     std::string patches_note;              // what the game patches found, shown by A on their row
     RowIcon*    patches_icon = nullptr;
     RowIcon*    fw_warn      = nullptr;    // a newer firmware not supported yet (its notes say why)

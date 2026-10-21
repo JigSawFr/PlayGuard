@@ -39,12 +39,15 @@ ConsoleTab::ConsoleTab()
         return true;
     });
 
-    // Ⓐ on the serial number shows / hides the masked digits.
-    serial->registerAction("playguard/tools/serial_show"_i18n, brls::BUTTON_A, [this](brls::View*) {
-        this->serial_revealed = !this->serial_revealed;
-        this->refresh();
+    // The real serial number, whole, and where it comes from: a press away
+    // (the row masks its middle).
+    serial_info = RowIcon::on_row(serial.getView(), RowIcon::Kind::Info);
+    serial->registerClickAction([this](brls::View*) {
+        SysInfo si;
+        sysinfo_get(&si);
+        ui::info(ui::real_serial(si).note);
         return true;
-    }, false, false, brls::SOUND_CLICK);
+    });
 
     // The release notes of each (installed and newer versions).
     const std::pair<brls::DetailCell*, sys_notes::Which> notes_cells[] = {
@@ -74,7 +77,7 @@ ConsoleTab::ConsoleTab()
         return true;
     });
     // A warning icon for the serial number not blanked on emuMMC, on the row that
-    // says so (A on the serial number's row shows / hides its digits).
+    // says so.
     blank_warn = RowIcon::on_row(blank.getView(), RowIcon::Kind::Warning);
     blank->registerClickAction([](brls::View*) {
         ui::info("playguard/tools/serial_note_emummc"_i18n);
@@ -170,13 +173,9 @@ void ConsoleTab::refresh()
     blank->setDetailTextColor(c);
     blank->setFocusable(ui::serial_warning(si));
     blank_warn->set_shown(ui::serial_warning(si));
-    const bool maskable = si.serial_valid && si.serial[0] && !(si.blank_valid && si.blank);
-    serial->setDetailText(ui::serial_text(si, this->serial_revealed));
+    serial->setDetailText(ui::serial_text(si));
     serial->setDetailTextColor(ui::serial_warning(si) ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
-    serial->setActionAvailable(brls::BUTTON_A, maskable);
-    serial->updateActionHint(brls::BUTTON_A, this->serial_revealed ? "playguard/tools/serial_hide"_i18n
-                                                                   : "playguard/tools/serial_show"_i18n);
-    brls::Application::getGlobalHintsUpdateEvent()->fire();   // redraw the footer hints
+    serial_info->set_shown(!ui::real_serial(si).note.empty());
 
     const patches::Report& report = ui::patch_report();
     c = cadran::kit::color("cadran/text2");
