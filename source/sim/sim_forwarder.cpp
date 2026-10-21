@@ -5,7 +5,11 @@
 // (forwarder_pack.c, which the host tests cover), the IDs the same.
 // PLAYGUARD_SIM_FAIL=forwarder makes installing and deleting fail. And the
 // made-up homebrew a forwarder can be made for, as .nro files on the
-// simulated SD card (sim_homebrew.hpp).
+// simulated SD card (sim_homebrew.hpp). PLAYGUARD_SIM_FORWARDERS=1 starts
+// with a few made already (PlayGuard's own, sphaira protected and seen
+// working, Star Atlas without the PIN), the signature patches forwarders
+// need, and two screenshots in the album: Console › Forwarders as it looks
+// once in use (the web simulator's "homebrew" preset).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "core/forwarder.h"
 
@@ -16,11 +20,13 @@
 #include <vector>
 
 #include "core/forwarder_pack.h"
+#include "core/sim_env.h"
 #include "core/write_guard.h"
 #include "sim/sim_games.h"
 #include "sim/sim_homebrew.hpp"
 #include "sim/sim_homebrew_icons.h"
 #include "sim/sim_state.h"
+#include "util/forwarders.hpp"
 #include "util/paths.hpp"
 #include "util/sha256.hpp"
 
@@ -57,6 +63,14 @@ const Homebrew HOMEBREW[] = {
     { "/switch/sphaira/sphaira.nro", "sphaira", "ITotalJustice", "1.0.0", SIM_HB_ICON_NOTES, sizeof(SIM_HB_ICON_NOTES) },
 };
 const Homebrew& KEPT = HOMEBREW[3];
+// PLAYGUARD_SIM_FORWARDERS's: PlayGuard's own, sphaira, Star Atlas.
+const Homebrew* const SAMPLE[] = { &HOMEBREW[4], &HOMEBREW[5], &HOMEBREW[1] };
+
+u64 id_of(const Homebrew& h)
+{
+    const std::string p = std::string("sdmc:") + h.path;
+    return forwarder_id(p.c_str(), p.c_str());
+}
 
 u64 kept_id()
 {
@@ -97,6 +111,44 @@ std::vector<unsigned char> make_nro(const Homebrew& h)
 namespace sim_homebrew
 {
 
+namespace
+{
+void write_file(const std::string& path, const unsigned char* data, size_t size)
+{
+    if (paths::file_exists(path)) return;
+    const size_t slash = path.find_last_of('/');
+    if (paths::ensure_dir(path.substr(0, slash))) paths::atomic_write(path, std::string((const char*)data, size));
+}
+
+// PLAYGUARD_SIM_FORWARDERS: what PlayGuard remembers making (once), the
+// patches, the album.
+void seed_sample(const std::string& sd_root)
+{
+    static const unsigned char PATCH[] = { 'P', 'A', 'T', 'C', 'H', 'E', 'O', 'F' };
+    for (const char* kind : { "fs_patches", "loader_patches" })
+        write_file(sd_root + "/atmosphere/kip_patches/" + kind + "/0000000000000000.ips", PATCH, sizeof(PATCH));
+    write_file(sd_root + "/Nintendo/Album/2026/10/20/2026102018300000-57B4628D2267231D57E0FC1078C0596D.jpg",
+               SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS));
+    write_file(sd_root + "/Nintendo/Album/2026/10/19/2026101917050000-57B4628D2267231D57E0FC1078C0596D.jpg",
+               SIM_HB_ICON_PAINT, sizeof(SIM_HB_ICON_PAINT));
+    if (!forwarders::list().empty()) return;
+    for (const Homebrew* h : SAMPLE) {
+        forwarders::Made m;
+        m.id = id_of(*h);
+        m.nro = m.argv = std::string("sdmc:") + h->path;
+        m.name = h->name;
+        m.author = h->author;
+        // sphaira protected, its gate PlayGuard's own .nro (the desktop's).
+        if (h == SAMPLE[1]) {
+            m.pin = true;
+            m.gate = std::string("sdmc:") + SAMPLE[0]->path;
+            m.verified = true;
+        }
+        forwarders::save(m);
+    }
+}
+}   // namespace
+
 void seed(const std::string& sd_root)
 {
     for (const Homebrew& h : HOMEBREW) {
@@ -107,6 +159,7 @@ void seed(const std::string& sd_root)
         const std::vector<unsigned char> nro = make_nro(h);
         paths::atomic_write(path, std::string(nro.begin(), nro.end()));
     }
+    if (sim_env_flag("PLAYGUARD_SIM_FORWARDERS")) seed_sample(sd_root);
 }
 
 }   // namespace sim_homebrew
@@ -128,6 +181,14 @@ extern "C" void sim_forwarder_defaults(SimForwarders* f)
     copy(s.author, sizeof(s.author), KEPT.author);
     copy(s.version, sizeof(s.version), KEPT.version);
     f->count = 1;
+    if (!sim_env_flag("PLAYGUARD_SIM_FORWARDERS")) return;
+    for (const Homebrew* h : SAMPLE) {
+        SimForwarder& x = f->list[f->count++];
+        x.id = id_of(*h);
+        copy(x.name, sizeof(x.name), h->name);
+        copy(x.author, sizeof(x.author), h->author);
+        copy(x.version, sizeof(x.version), h->version);
+    }
 }
 
 extern "C" unsigned char* sim_forwarder_icon(u64 id, size_t* size)
@@ -138,6 +199,9 @@ extern "C" unsigned char* sim_forwarder_icon(u64 id, size_t* size)
     std::vector<unsigned char> icon;
     if (it != g_icons.end()) icon = it->second;
     else if (id == kept_id()) icon.assign(KEPT.icon, KEPT.icon + KEPT.icon_size);
+    else
+        for (const Homebrew* h : SAMPLE)
+            if (id == id_of(*h) && h->icon) icon.assign(h->icon, h->icon + h->icon_size);
     if (icon.empty()) return nullptr;
     auto* out = static_cast<unsigned char*>(std::malloc(icon.size()));
     if (!out) return nullptr;

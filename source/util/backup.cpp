@@ -63,7 +63,12 @@ std::string to_json(const Snapshot& s)
         if (!s.raw_block.empty()) pt["raw_0x44"] = s.raw_block;
         j["play_timer"] = pt;
     }
-    return j.dump(2) + "\n";
+    if (s.forwarders_ok) {
+        nlohmann::json list;
+        if (!json_util::parse(forwarders::list_text(s.forwarders), &list)) list = nlohmann::json::array();
+        j["forwarders"] = { { "made", list }, { "hbmenu_locked", s.hbmenu_locked } };
+    }
+    return j.dump(2, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
 }
 
 bool from_json(const std::string& text, Snapshot& out)
@@ -132,6 +137,16 @@ bool from_json(const std::string& text, Snapshot& out)
                 const std::string hex = raw.get<std::string>();
                 if (hex.size() != 136 || hex.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos) return false;
                 s.raw_block = hex;
+            }
+        }
+        // Optional: an older backup has none, and a damaged part is left
+        // out (it writes nothing to the console).
+        if (const nlohmann::json* f = json_util::object_at(j, "forwarders")) {
+            const auto made = f->find("made");
+            if (made != f->end() && made->is_array()) {
+                s.forwarders = forwarders::parse_list(made->dump());
+                s.forwarders_ok = true;
+                s.hbmenu_locked = json_util::flag_at(*f, "hbmenu_locked");
             }
         }
         return true;

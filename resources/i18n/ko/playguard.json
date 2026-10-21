@@ -1060,7 +1060,28 @@
         "group_open": "PIN 없음",
         "group_elsewhere": "다른 앱이 만듦",
         "group_gone": "HOME 메뉴에 없음",
-        "state_verified": "확인됨"
+        "state_verified": "확인됨",
+        "closed_set": "{}은(는) 열리지 않습니다: {}",
+        "closed_none": "{}의 사용 불가 시간을 없앴습니다",
+        "pause_err": "PIN 거부 후 일시 정지가 바뀌지 않았습니다",
+        "pause_set": "PIN 거부 후: {}",
+        "pause_off": "안 함",
+        "pause_rule": "{}번 연속: {} 일시 정지",
+        "pause_lifted": "{}이(가) 다시 PIN을 묻습니다",
+        "icon_set": "{}의 새 아이콘이 적용되었습니다",
+        "icon_own": ".nro의 아이콘",
+        "icon_none": "앨범에 스크린샷이 없습니다: 캡처 버튼으로 찍은 뒤 여기로 돌아오세요.",
+        "icon_title": "HOME 메뉴 아이콘",
+        "action_closed": "열리지 않는 시간",
+        "action_lift": "일시 정지 해제",
+        "action_icon": "아이콘 변경",
+        "closed_title": "열리지 않는 시간(PIN과 관계없이)",
+        "state_paused": "{}까지 일시 정지",
+        "state_closed": "사용 불가 {}",
+        "pause_cell": "PIN 거부 후 일시 정지",
+        "pause_default": "기본값",
+        "paused_line": "{}: {}까지",
+        "paused_title": "포워더가 PIN 거부로 일시 정지됨"
     },
     "hbmenu": {
         "section": "Homebrew 메뉴",
@@ -1157,7 +1178,9 @@
         "setup_progress": "{}/{}단계",
         "verify_title": "{}을(를) HOME 메뉴에서 한 번 시작",
         "verify_how": "PlayGuard를 나가 HOME 메뉴의 {} 아이콘으로 시작하고 PIN을 입력하세요. 메뉴가 열리면 PlayGuard가 이 돌아오는 길이 작동함을 알게 됩니다. 그런 다음 여기로 돌아오세요.",
-        "summary_doors": "PIN 없이 열림: {}"
+        "summary_doors": "PIN 없이 열림: {}",
+        "rescue_written": "{}에 작성",
+        "rescue_print": "인쇄용: SD 카드의 {}"
     },
     "about": {
         "section_changelog": "{}의 새로운 기능",
@@ -1220,7 +1243,11 @@
         "before_delete_err": "먼저 백업을 저장할 수 없었습니다({}).\n\n그래도 모두 삭제하시겠습니까?",
         "delete_anyway": "그래도 삭제",
         "bedtime_not_restored": "이 백업에는 취침 알람이 켜져 있었지만 복원되지 않습니다. 필요하면 플레이 타이머에서 다시 설정하세요.",
-        "backed_up_on": "{}에 백업한 설정입니다."
+        "backed_up_on": "{}에 백업한 설정입니다.",
+        "forwarders_body": "이 백업에는 HOME 메뉴에 더 이상 없는 포워더 {}개도 있습니다: {}. 되돌릴까요?",
+        "forwarders_put_back": "되돌리기",
+        "forwarders_lock_title": "Homebrew 메뉴가 잠겨 있었습니다",
+        "forwarders_lock": "이 백업을 만들 때 잠겨 있었습니다. 본체 › 포워더에서 다시 잠그세요: 먼저 확인이 진행됩니다."
     },
     "update": {
         "checking": "업데이트 확인 중...",
@@ -1502,7 +1529,12 @@
             "gate_open": "PIN으로 포워더 열림",
             "gate_free": "시간 내에 PIN 없이 포워더 열림",
             "gate_refused": "포워더 거부됨(PIN 미입력)",
-            "gate_hours": "포워더의 PIN 없는 시간"
+            "gate_hours": "포워더의 PIN 없는 시간",
+            "gate_paused": "포워더 일시 정지(PIN 거부 과다)",
+            "gate_closed": "포워더 사용 불가(사용 불가 시간)",
+            "gate_closed_hours": "포워더의 사용 불가 시간",
+            "gate_pause": "PIN 거부 후 일시 정지",
+            "gate_pause_lifted": "포워더 일시 정지 해제"
         },
         "sources": {
             "uniform": "매일 같은 제한",

@@ -37,6 +37,10 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
             r.free_days = m->free_days;
             r.free_from = m->free_from;
             r.free_to = m->free_to;
+            r.closed_days = m->closed_days;
+            r.closed_from = m->closed_from;
+            r.closed_to = m->closed_to;
+            r.custom_icon = !m->icon.empty();
             r.state = !nro_exists(m->nro)            ? State::NroMissing
                       : m->pin && !nro_exists(m->gate) ? State::GateMissing
                                                        : State::Ready;
@@ -60,6 +64,10 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
         r.free_days = m.free_days;
         r.free_from = m.free_from;
         r.free_to = m.free_to;
+        r.closed_days = m.closed_days;
+        r.closed_from = m.closed_from;
+        r.closed_to = m.closed_to;
+        r.custom_icon = !m.icon.empty();
         r.state = State::NotInstalled;
         rows.push_back(r);
     }
@@ -225,6 +233,30 @@ std::vector<Refusals> repeated_refusals(const std::vector<std::pair<std::string,
         if (!merged) out.push_back(d);
     }
     return out;
+}
+
+std::vector<std::string> newest_shots(std::vector<std::string> paths, size_t max)
+{
+    std::vector<std::string> out;
+    for (std::string& p : paths) {
+        const std::string name = p.substr(p.find_last_of('/') + 1);
+        if (name.size() > 4 && text::lower_ascii(name.substr(name.size() - 4)) == ".jpg") out.push_back(std::move(p));
+    }
+    // The album's names start with their time: by name, the newest first.
+    std::sort(out.begin(), out.end(), [](const std::string& a, const std::string& b) {
+        return a.substr(a.find_last_of('/') + 1) > b.substr(b.find_last_of('/') + 1);
+    });
+    if (out.size() > max) out.resize(max);
+    return out;
+}
+
+std::string shot_label(const std::string& path)
+{
+    const std::string n = path.substr(path.find_last_of('/') + 1);
+    if (n.size() < 12) return "";
+    for (size_t i = 0; i < 12; i++)
+        if (n[i] < '0' || n[i] > '9') return "";
+    return n.substr(0, 4) + "-" + n.substr(4, 2) + "-" + n.substr(6, 2) + " " + n.substr(8, 2) + ":" + n.substr(10, 2);
 }
 
 WriteHint write_hint(int err, uint64_t free_bytes)

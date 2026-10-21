@@ -40,11 +40,22 @@ struct Made
     // days 0 for none.
     int         free_days = 0;
     int         free_from = 0, free_to = 0;
+    // Protected: hours when it never opens, the PIN or not (GATE_CLOSED_NAME).
+    int         closed_days = 0;
+    int         closed_from = 0, closed_to = 0;
+    // Its HOME menu icon from a screenshot of the album ("sdmc:/Nintendo/
+    // Album/…jpg"), else the .nro's own.
+    std::string icon;
 };
 
 // Every one remembered, in the file's order. A damaged file reads as none;
 // an entry without an ID or an .nro is skipped.
 std::vector<Made> list();
+
+// The list as a JSON array (a settings backup's), and back: entries as
+// list() keeps them; anything else, none.
+std::string       list_text(const std::vector<Made>& all);
+std::vector<Made> parse_list(const std::string& text);
 
 // Adds `m`, or replaces the one with its ID. A short English reason in
 // *error when the file cannot be written.

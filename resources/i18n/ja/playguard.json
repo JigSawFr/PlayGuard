@@ -1060,7 +1060,28 @@
         "group_open": "暗証番号なし",
         "group_elsewhere": "ほかのアプリで作成",
         "group_gone": "HOMEメニューにない",
-        "state_verified": "確認済み"
+        "state_verified": "確認済み",
+        "closed_set": "{}は開きません：{}",
+        "closed_none": "{}の利用不可の時間をなくしました",
+        "pause_err": "暗証番号の拒否後の一時停止は変更されませんでした",
+        "pause_set": "暗証番号の拒否後：{}",
+        "pause_off": "しない",
+        "pause_rule": "{}回連続：{}の一時停止",
+        "pause_lifted": "{}は再び暗証番号を求めます",
+        "icon_set": "{}のアイコンを変更しました",
+        "icon_own": ".nroのアイコン",
+        "icon_none": "アルバムに画面写真がありません：撮影ボタンで撮ってから、ここに戻ってください。",
+        "icon_title": "HOMEメニューのアイコン",
+        "action_closed": "利用不可の時間",
+        "action_lift": "一時停止を解除",
+        "action_icon": "アイコンを変更",
+        "closed_title": "利用不可の時間（暗証番号があっても）",
+        "state_paused": "{}まで一時停止",
+        "state_closed": "利用不可 {}",
+        "pause_cell": "暗証番号の拒否後の一時停止",
+        "pause_default": "標準",
+        "paused_line": "{}：{}まで",
+        "paused_title": "フォワーダーが暗証番号の拒否で一時停止中"
     },
     "hbmenu": {
         "section": "Homebrewメニュー",
@@ -1157,7 +1178,9 @@
         "setup_progress": "手順 {}/{}",
         "verify_title": "{}をHOMEメニューから一度起動",
         "verify_how": "PlayGuardを終了し、HOMEメニューの{}のアイコンから起動して暗証番号を入力してください。メニューが開けば、PlayGuardはこの戻り道が使えることを確認できます。その後ここに戻ってください。",
-        "summary_doors": "暗証番号なしで開く：{}"
+        "summary_doors": "暗証番号なしで開く：{}",
+        "rescue_written": "{}に作成",
+        "rescue_print": "印刷用：SDカードの{}"
     },
     "about": {
         "section_changelog": "{}の更新内容",
@@ -1220,7 +1243,11 @@
         "before_delete_err": "先にバックアップを保存できませんでした（{}）。\n\nそれでもすべて削除しますか？",
         "delete_anyway": "それでも削除",
         "bedtime_not_restored": "このバックアップではおやすみアラームがオンでしたが、復元されません。必要ならプレイ時間でもう一度設定してください。",
-        "backed_up_on": "{}にバックアップした設定です。"
+        "backed_up_on": "{}にバックアップした設定です。",
+        "forwarders_body": "このバックアップには、HOMEメニューにないフォワーダーが{}個あります：{}。元に戻しますか？",
+        "forwarders_put_back": "元に戻す",
+        "forwarders_lock_title": "Homebrewメニューはロックされていました",
+        "forwarders_lock": "このバックアップの作成時はロックされていました。本体 › フォワーダーから再度ロックしてください：先に確認が行われます。"
     },
     "update": {
         "checking": "アップデートを確認しています…",
@@ -1502,7 +1529,12 @@
             "gate_open": "暗証番号でフォワーダーを起動",
             "gate_free": "時間帯内に暗証番号なしでフォワーダーを起動",
             "gate_refused": "フォワーダーを拒否（暗証番号未入力）",
-            "gate_hours": "フォワーダーの暗証番号なしの時間帯"
+            "gate_hours": "フォワーダーの暗証番号なしの時間帯",
+            "gate_paused": "フォワーダー一時停止（暗証番号の拒否が多すぎ）",
+            "gate_closed": "フォワーダー利用不可（利用不可の時間）",
+            "gate_closed_hours": "フォワーダーの利用不可の時間",
+            "gate_pause": "暗証番号の拒否後の一時停止",
+            "gate_pause_lifted": "フォワーダーの一時停止を解除"
         },
         "sources": {
             "uniform": "毎日同じ上限",
