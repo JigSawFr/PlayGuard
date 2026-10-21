@@ -5,9 +5,11 @@
 #include "action/notices.hpp"
 #include "action/sys_notes_flow.hpp"
 #include "action/sys_update_flow.hpp"
+#include "action/syspatch_flow.hpp"
 #include "activity/firmware_gate_activity.hpp"
 #include "activity/forwarders_activity.hpp"
 #include "activity/game_check_activity.hpp"
+#include "app.hpp"
 #include "core/sysinfo.h"
 #include "tab/clock_tab.hpp"
 #include "ui/cadran_frame.hpp"
@@ -84,10 +86,21 @@ ConsoleTab::ConsoleTab()
     // icon on the firmware's row, the advice in its release notes (A).
     fw_warn = RowIcon::on_row(fw.getView(), RowIcon::Kind::Warning);
     // What the game patches found: an icon (a warning when something needs a
-    // look), the text by A.
+    // look), the text by A; in developer mode, A also offers to update
+    // sys-patch (action/syspatch_flow.hpp).
     patches_icon = RowIcon::on_row(game_patches.getView(), RowIcon::Kind::Info);
     game_patches->registerClickAction([this](brls::View*) {
-        if (!this->patches_note.empty()) ui::info(this->patches_note);
+        if (!app::dev_mode()) {
+            if (!this->patches_note.empty()) ui::info(this->patches_note);
+            return true;
+        }
+        std::vector<ui::Choice> choices;
+        if (!this->patches_note.empty()) {
+            const std::string note = this->patches_note;
+            choices.emplace_back("playguard/syspatch/details"_i18n, [note]() { ui::info(note); }, "info");
+        }
+        choices.emplace_back("playguard/syspatch/update"_i18n, []() { syspatch_flow::open(); }, "download");
+        ui::pick_actions("playguard/tools/patches"_i18n, choices);
         return true;
     });
 

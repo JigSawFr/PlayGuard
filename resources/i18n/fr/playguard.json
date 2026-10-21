@@ -1988,5 +1988,17 @@
         "change": "Modifier...",
         "remove": "La retirer",
         "removed": "Profil programmé retiré."
+    },
+    "syspatch": {
+        "details": "Ce qui a été trouvé",
+        "update": "Mettre à jour sys-patch",
+        "checking": "Recherche de la dernière version de sys-patch…",
+        "no_release": "Impossible de trouver la dernière version de sys-patch : {}",
+        "up_to_date": "sys-patch {} est installé, et {} est la dernière version publiée.",
+        "confirm": "Installer sys-patch {} (installé : {}) depuis github.com/impeeza/sys-patch ?\n\nSon module système et son overlay remplacent ceux de la carte SD ; ceux-ci sont gardés dans config/playguard/sys-patch-backups/. La console doit redémarrer pour que sys-patch applique ses patchs.",
+        "install": "Installer",
+        "downloading": "Téléchargement de sys-patch {}…",
+        "failed": "sys-patch n'a pas été installé : {}",
+        "done": "sys-patch {} est installé. Redémarrez la console : il applique ses patchs au démarrage. Relancez ensuite le forwarder."
     }
 }

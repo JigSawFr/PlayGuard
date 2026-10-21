@@ -176,6 +176,8 @@ gate_tally_SRC   := source/util/date.cpp source/util/gate_tally.cpp tests/gate_t
 timer_health_logic_SRC   := source/action/timer_health_logic.cpp tests/timer_health_logic/test.cpp
 notice_logic_SRC   := source/util/date.cpp source/action/notice_logic.cpp tests/notice_logic/test.cpp
 sys_updates_SRC   := source/util/sys_updates.cpp tests/sys_updates/test.cpp
+syspatch_update_SRC  := source/util/paths.cpp source/util/sha256.cpp source/util/date.cpp source/util/update.cpp source/util/safe_text.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/zip_write.cpp source/util/github_auth.cpp source/util/syspatch_update.cpp tests/syspatch_update/test.cpp
+syspatch_update_LIBS := -lz
 # The network half twice from one test: -D__SWITCH__ for the console's path
 # (a fake http::redirect in the test), without it for the desktop's simulation.
 sys_updates_net_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp tests/sys_updates_net/test.cpp

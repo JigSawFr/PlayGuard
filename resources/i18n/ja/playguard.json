@@ -1988,5 +1988,17 @@
         "change": "変更…",
         "remove": "取り消す",
         "removed": "予約したプリセットを取り消しました。"
+    },
+    "syspatch": {
+        "details": "What was found",
+        "update": "Update sys-patch",
+        "checking": "Looking for the latest sys-patch…",
+        "no_release": "The latest sys-patch could not be found: {}",
+        "up_to_date": "sys-patch {} is installed, and {} is the latest release.",
+        "confirm": "Install sys-patch {} (installed: {}) from github.com/impeeza/sys-patch?\n\nIts sysmodule and overlay replace the ones on the SD card; those are kept in config/playguard/sys-patch-backups/. The console must restart for sys-patch to patch.",
+        "install": "Install",
+        "downloading": "Downloading sys-patch {}…",
+        "failed": "sys-patch was not installed: {}",
+        "done": "sys-patch {} is installed. Restart the console: it patches at boot. Then try the forwarder again."
     }
 }
