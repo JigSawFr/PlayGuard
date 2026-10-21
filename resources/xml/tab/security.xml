@@ -26,14 +26,12 @@
             <brls:DetailCell id="sc_pin" focusable="false" title="@i18n/playguard/security/pin"/>
             <brls:DetailCell id="sc_restrictions" focusable="false" title="@i18n/playguard/security/restrictions"/>
             <brls:DetailCell id="sc_temp" focusable="false" title="@i18n/playguard/cadran/today/pc_title"/>
-            <brls:Label id="sc_rescue_note" text="@i18n/playguard/security/rescue_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/amber"/>
             <brls:Header id="sc_actions_header" title="@i18n/playguard/security/section_actions" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="sc_set_pin" title="@i18n/playguard/security/set_pin"/>
             <brls:DetailCell id="sc_pin_lock" title="@i18n/playguard/pin_lock/title"/>
             <brls:BooleanCell id="sc_pin_ask_again"/>
             <brls:DetailCell id="sc_show_pin" title="@i18n/playguard/security/show_pin"/>
             <brls:DetailCell id="sc_unlock" title="@i18n/playguard/security/unlock"/>
-            <brls:DetailCell id="sc_relock" title="@i18n/playguard/security/relock"/>
             <brls:BooleanCell id="sc_auto_relock"/>
             <brls:Label id="sc_pin_lock_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:Header id="sc_lock_header" title="@i18n/playguard/console_lock/section" marginTop="24" marginBottom="8"/>

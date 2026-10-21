@@ -229,6 +229,12 @@ elseif (GIT_FOUND)
                     OUTPUT_VARIABLE APP_COMMIT OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 endif()
 message(STATUS "PlayGuard commit: ${APP_COMMIT}")
+# The pull request built (CI: PLAYGUARD_PR, its number), 0 for any other build:
+# the change history says which pull request's build made a change.
+set(APP_PR 0)
+if ("$ENV{PLAYGUARD_PR}" MATCHES "^[1-9][0-9]*$")
+    set(APP_PR "$ENV{PLAYGUARD_PR}")
+endif ()
 # A published release (CI: the build release-please.yml calls for a vX.Y.Z tag,
 # PLAYGUARD_RELEASE=1). Anything else is a development build: the version
 # badge in the header (view/version_badge.hpp) says so, with the commit.
@@ -242,7 +248,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/tools/rescue_rev.cmake)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${RESCUE_REV_SOURCES})
 message(STATUS "PlayGuard recovery sysmodule revision: ${RESCUE_REV}")
 target_compile_definitions(${PROJECT_NAME} PRIVATE APP_VERSION="${APP_VERSION}" APP_COMMIT="${APP_COMMIT}"
-                           APP_RELEASE=${APP_RELEASE} APP_RESCUE_REV="${RESCUE_REV}")
+                           APP_PR=${APP_PR} APP_RELEASE=${APP_RELEASE} APP_RESCUE_REV="${RESCUE_REV}")
 target_link_libraries(${PROJECT_NAME} PRIVATE borealis ${APP_PLATFORM_LIB})
 # borealis' headers as system headers: their warnings are not PlayGuard's.
 get_target_property(BOREALIS_INCLUDES borealis INTERFACE_INCLUDE_DIRECTORIES)

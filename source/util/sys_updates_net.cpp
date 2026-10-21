@@ -33,7 +33,8 @@ Latest fetch(std::string* error)
 {
     Latest out;
 #ifndef __SWITCH__
-    // Desktop simulation: "1.12.0:6.5.4:23.0.1" (Atmosphère : hekate : firmware).
+    // Desktop simulation: "1.12.0:6.5.4:23.0.1" (Atmosphère : hekate : firmware),
+    // then ":1.6.3.0" for sys-patch.
     // Without it, nothing: a smoke test never depends on the network.
     const char* sim = sim_env("PLAYGUARD_SIM_SYS_LATEST");
     if (!sim || std::strcmp(sim, "offline") == 0) {
@@ -48,12 +49,15 @@ Latest fetch(std::string* error)
     }
     out.atmosphere = version_of_tag(s.substr(0, a));
     out.hekate     = version_of_tag(s.substr(a + 1, b - a - 1));
-    out.firmware   = version_of_tag(s.substr(b + 1));
+    const size_t c = s.find(':', b + 1);
+    out.firmware   = version_of_tag(s.substr(b + 1, c == std::string::npos ? c : c - b - 1));
+    if (c != std::string::npos) out.syspatch = version_of_tag(s.substr(c + 1));
     return out;
 #else
     out.atmosphere = latest_of("Atmosphere-NX/Atmosphere", error);
     out.hekate     = latest_of("CTCaer/hekate", error);
     out.firmware   = latest_of("THZoria/NX_Firmware", error);
+    out.syspatch   = latest_of("impeeza/sys-patch", error);
     return out;
 #endif
 }

@@ -89,6 +89,9 @@ std::vector<Entry> entries_of(const nlohmann::json& entries)
             e.detail = j.value("detail", std::string());
             e.result = j.value("result", std::string());
             e.version = j.value("version", std::string());
+            e.dev     = j.value("dev", false);
+            e.commit  = j.value("commit", std::string());
+            e.pr      = j.value("pr", 0);
         } catch (...) {
             continue;   // a field of the wrong type
         }
@@ -134,6 +137,9 @@ bool append(const Entry& e, std::string* error, bool* put_aside)
     if (!e.after.empty()) j["after"] = e.after;
     if (!e.result.empty()) j["result"] = e.result;
     if (!e.version.empty()) j["version"] = e.version;
+    if (e.dev) j["dev"] = true;
+    if (!e.commit.empty()) j["commit"] = e.commit;
+    if (e.pr > 0) j["pr"] = e.pr;
     entries.push_back(j);
     while (entries.size() > MAX_ENTRIES) entries.erase(entries.begin());
     // One change per line: 500 of them stay small (about 50 KB) and readable.

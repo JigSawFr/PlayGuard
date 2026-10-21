@@ -107,6 +107,7 @@ std::string installed(Which which)
 {
     if (which == Which::PlayGuard) return app::version();
     if (which == Which::Hekate) return sys_update_flow::installed_hekate();
+    if (which == Which::SysPatch) return sys_update_flow::installed_syspatch();
     SysInfo si;
     sysinfo_get(&si);
     if (which == Which::Atmosphere)
@@ -120,7 +121,10 @@ std::string latest(Which which)
     // PlayGuard's own update check (action/update_flow) keeps what it found.
     if (which == Which::PlayGuard) return config::get().update_latest;
     const sys_updates::Latest l = sys_updates::from_text(config::get().sys_latest);
-    return which == Which::Atmosphere ? l.atmosphere : which == Which::Hekate ? l.hekate : l.firmware;
+    return which == Which::Atmosphere ? l.atmosphere
+           : which == Which::Hekate   ? l.hekate
+           : which == Which::SysPatch ? l.syspatch
+                                      : l.firmware;
 }
 
 const sys_notes::Cache& cache()
@@ -188,7 +192,7 @@ void refresh(Which which, bool force)
 sys_notes::Cache fetch_lists()
 {
     sys_notes::Cache fresh;
-    for (Which w : { Which::Atmosphere, Which::Hekate, Which::Firmware }) {
+    for (Which w : { Which::Atmosphere, Which::Hekate, Which::Firmware, Which::SysPatch }) {
         std::string error;
         sys_notes::List l;
         if (sys_notes::fetch(w, "", false, &l, &error)) fresh.of(w) = l;
@@ -202,7 +206,7 @@ void keep(const sys_notes::Cache& fresh)
     // Merged into what was kept once that is read (a newer list replacing one
     // still waiting).
     if (!ready()) {
-        for (Which w : { Which::Atmosphere, Which::Hekate, Which::Firmware }) {
+        for (Which w : { Which::Atmosphere, Which::Hekate, Which::Firmware, Which::SysPatch }) {
             if (fresh.of(w).releases.empty()) continue;
             s_waiting.of(w) = fresh.of(w);
             s_waiting_any = true;
@@ -210,7 +214,7 @@ void keep(const sys_notes::Cache& fresh)
         return;
     }
     bool any = false;
-    for (Which w : { Which::Atmosphere, Which::Hekate, Which::Firmware }) {
+    for (Which w : { Which::Atmosphere, Which::Hekate, Which::Firmware, Which::SysPatch }) {
         if (fresh.of(w).releases.empty()) continue;
         sys_notes::List dated = fresh.of(w);
         // A list without the firmware's pages: not "fetched" for the screen.
@@ -221,6 +225,17 @@ void keep(const sys_notes::Cache& fresh)
     if (!any) return;
     save();
     brls::Logger::info("release notes: lists kept");
+}
+
+Status status(Which which)
+{
+    Status s;
+    s.installed = installed(which);
+    s.latest = latest(which);
+    s.newer = !s.latest.empty() && !s.installed.empty() && update::compare_versions(s.latest, s.installed) > 0;
+    // How many (the list kept knows; once it is read, the tab is refreshed).
+    if (s.newer && ready()) s.behind = sys_notes::newer_count(s_cache.of(which), s.installed);
+    return s;
 }
 
 std::string status_text(Which which, bool* newer)

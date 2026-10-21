@@ -24,7 +24,7 @@ std::string version_of_tag(const std::string& tag)
             return "";
         }
     }
-    return digit && (numbers == 2 || numbers == 3) ? t : "";
+    return digit && numbers >= 2 && numbers <= 4 ? t : "";
 }
 
 std::string tag_of_url(const std::string& url)
@@ -54,6 +54,12 @@ std::string hekate_version(const std::string& bytes)
     return "";
 }
 
+std::string syspatch_version(const std::string& logged)
+{
+    // Cut at a suffix: "v1.6.3.0-b962f75" (its commit) -> "v1.6.3.0".
+    return version_of_tag(logged.substr(0, logged.find_first_of("-+ ")));
+}
+
 std::string to_text(const Latest& latest)
 {
     std::string out;
@@ -64,6 +70,7 @@ std::string to_text(const Latest& latest)
     add("atmosphere", latest.atmosphere);
     add("hekate", latest.hekate);
     add("firmware", latest.firmware);
+    add("syspatch", latest.syspatch);
     return out;
 }
 
@@ -81,6 +88,7 @@ Latest from_text(const std::string& text)
             if (key == "atmosphere") out.atmosphere = value;
             else if (key == "hekate") out.hekate = value;
             else if (key == "firmware") out.firmware = value;
+            else if (key == "syspatch") out.syspatch = value;
         }
         start = end + 1;
     }

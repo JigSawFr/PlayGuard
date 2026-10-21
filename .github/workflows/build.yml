@@ -601,6 +601,8 @@ jobs:
           # merge commit checked out. Developer › Install another build
           # tells the installed build by it.
           PLAYGUARD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+          # Its pull request's number (app::pr()), empty for any other build.
+          PLAYGUARD_PR: ${{ github.event.pull_request.number }}
           # A release (a vX.Y.Z tag, from release-please.yml): the header's
           # version badge shows it as stable; every other build as a development one.
           PLAYGUARD_RELEASE: ${{ inputs.tag && '1' || '0' }}

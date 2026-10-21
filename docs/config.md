@@ -110,7 +110,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `update_daily` | boolean | checks for an update at start-up, once a day | `false` |
 | `update_checked` | string | `"YYYY-MM-DD"` of the last check; anything else is cleared | `""` |
 | `update_latest` | string | the latest release the last check found; while newer than the running version, start-up checks again and opens the update screen | `""` |
-| `sys_latest` | string | the latest Atmosphère, hekate and firmware the last check found (`"atmosphere=1.12.0;hekate=6.5.4;firmware=23.0.1"`); the notification bell says which are newer than what the console runs; at most 96 characters | `""` |
+| `sys_latest` | string | the latest Atmosphère, hekate, firmware and sys-patch the last check found (`"atmosphere=1.12.0;hekate=6.5.4;firmware=23.0.1;syspatch=1.6.3.0"`); the notification bell says which of the first three are newer than what the console runs; at most 96 characters | `""` |
 | `sys_checked` | string | `"YYYY-MM-DD"` of that check (once a day, with *Check for updates every day*); anything else is cleared | `""` |
 | `update_snooze_version` | string | the release whose screen *Later* postponed (cleared with `update_snooze_until` when either is malformed) | `""` |
 | `update_snooze_until` | string | `"YYYY-MM-DD"`: that release is offered again from that day (30 days at most; a farther date is ignored) | `""` |

@@ -9,6 +9,7 @@
 #pragma once
 
 #include <functional>
+#include <string>
 
 namespace sigpatch_flow
 {
@@ -17,6 +18,7 @@ namespace sigpatch_flow
 bool offered();
 
 // Asks, then moves them. `done(moved)` once it is over, also when cancelled.
-void set_aside(std::function<void(bool)> done = nullptr);
+// `intro`, when given, is said first in the same question (what was found).
+void set_aside(std::function<void(bool)> done = nullptr, const std::string& intro = "");
 
 }   // namespace sigpatch_flow
