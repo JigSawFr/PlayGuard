@@ -105,17 +105,22 @@ std::string current_report()
 
     // Game patches: sys-patch state and sigpatch files (no personal data).
     const patches::Report pr = patches::detect(paths::sd_root(), fw, si.emummc);
-    std::string files;
+    std::string files, gaps;
     for (const auto& f : pr.files) files += (files.empty() ? "" : ",") + f;
+    for (const auto& g : pr.gaps) gaps += (gaps.empty() ? " (not patched: " : ", ") + g;
+    if (!gaps.empty()) gaps += ")";
     static const char* const STATUS[] = { "none", "sys-patch", "sys-patch incomplete", "sigpatch files only" };
     static const char* const ISSUE[]  = { "none", "not at boot", "no log", "stale log", "skipped", "not patched" };
     const std::string patch_line = fmt::format(
-        "{} (issue: {}; sys-patch installed={} boot2={} log={}{}; fs={} ldr={} es={}; files={})",
+        "{} (issue: {}; sys-patch installed={} boot2={} log={}{}; fs={} ldr={} es={}{}; files={})",
         STATUS[(int)patches::status(pr)], ISSUE[(int)patches::issue(pr)],
         pr.syspatch_installed ? 1 : 0, pr.syspatch_at_boot ? 1 : 0,
         !pr.log_present ? "none" : (pr.log_current ? "current" : "stale"),
-        pr.log_present ? fmt::format(" fw={} emummc={}", pr.log_fw, pr.log_emummc ? 1 : 0) : std::string(),
+        pr.log_present ? fmt::format(" fw={} emummc={} version={}", pr.log_fw, pr.log_emummc ? 1 : 0,
+                                     pr.log_version.empty() ? std::string("?") : pr.log_version)
+                       : std::string(),
         patches::module_name(pr.fs), patches::module_name(pr.ldr), patches::module_name(pr.es),
+        gaps,
         files.empty() ? std::string("none") : files);
 
     // The serial number itself is never written: reports are attached to

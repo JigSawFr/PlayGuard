@@ -77,6 +77,10 @@ The console runs a firmware newer than the newest one tested: PlayGuard checks w
 
 Its gate (`config/playguard/gate-….nro`) is no longer the file the forwarder was made with: it was changed or replaced on the SD card, so the forwarder does not start it. Open PlayGuard from its own forwarder: it writes the gate back at start; *Console › Forwarders › Install them all again* makes every forwarder again with it.
 
+### A forwarder shows "The software could not be started"
+
+The console refused to start it: a signature check is still in place. Forwarders need sys-patch's fs and loader patches, and every pattern sys-patch has for this firmware must have applied, not only one per module. *About › Help & diagnostics › Export a diagnostic report* lists, on its `game patches` line, sys-patch's version and each pattern left out (`not patched: fs:nocntchk_19.0.0+=Unpatched`, for instance); `sd:/config/sys-patch/log.ini` holds the same. Update sys-patch to a version that supports the firmware, restart the console, then try the forwarder again: it does not need making again.
+
 ### The bell or a tab shows an amber badge
 
 Something needs you: Ⓨ opens the list, and Ⓐ on an entry does the fix or opens where it is made ([notifications](features.md#notifications--what-needs-you-from-any-tab)).

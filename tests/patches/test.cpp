@@ -77,6 +77,61 @@ int main()
         CHECK(module_state(other, "c") == Module::Failed);
     }
 
+    // Patterns named with their firmware range, as sys-patch names them.
+    {
+        CHECK(pattern_for("nocntchk_19.0.0+", "23.0.1"));
+        CHECK(pattern_for("es_19.0.0-21.2.0", "21.2.0") && pattern_for("es_19.0.0-21.2.0", "19.0.0"));
+        CHECK(!pattern_for("es_19.0.0-21.2.0", "22.0.0"));
+        CHECK(!pattern_for("noncasigchk_4.0.0-16.1.0", "23.0.1"));
+        CHECK(pattern_for("noncasigchk_17.0.0+", "17.0.0") && !pattern_for("noncasigchk_17.0.0+", "16.1.0"));
+        CHECK(!pattern_for("noncasigchk_new", "23.0.1") && !pattern_for("noacidsigchk", "23.0.1"));
+        CHECK(!pattern_for("nocntchk_19.0.0+", "") && !pattern_for("x_1.0-2.0", "1.5.0"));
+    }
+
+    // One pattern patched, another meant for this firmware not: the check
+    // it removes stays (a forwarder "could not be started").
+    {
+        const char* log =
+            "[fs]\n"
+            "noacidsigchk_1.0.0-9.2.0=Skipped\n"
+            "noncasigchk_4.0.0-16.1.0=Unpatched\n"
+            "noncasigchk_17.0.0+=Patched (sys-patch)\n"
+            "nocntchk_1.0.0-18.1.0=Unpatched\n"
+            "nocntchk_19.0.0+=Unpatched\n"
+            "[ldr]\n"
+            "noacidsigchk_10.0.0+=Failed (svcWriteDebugProcessMemory)\n"
+            "[es]\n"
+            "es_19.0.0-21.2.0=Unpatched\n"
+            "es_22.0.0+=Patched (sys-patch)\n"
+            "[stats]\nversion=v1.6.2\nfw_version=23.0.1\nis_emummc=1\n";
+        Ini ini = parse_ini(log);
+        std::vector<std::string> gaps;
+        CHECK(module_state(ini, "fs", "23.0.1", &gaps) == Module::Partial);
+        CHECK((gaps == std::vector<std::string>{ "fs:nocntchk_19.0.0+=Unpatched" }));
+        CHECK(module_state(ini, "fs") == Module::SysPatch);   // no firmware: any pattern
+        CHECK(module_state(ini, "es", "23.0.1") == Module::SysPatch);
+        CHECK(module_state(ini, "ldr", "23.0.1") == Module::Failed);
+
+        std::string root = fresh_root();
+        install_syspatch(root, true);
+        put(root, "config/sys-patch/log.ini", log);
+        Report r = detect(root, "23.0.1", true);
+        CHECK(r.log_version == "v1.6.2" && r.fs == Module::Partial && !patched(r.fs));
+        CHECK(issue(r) == Issue::NotPatched && status(r) == Status::SysPatchIncomplete);
+        CHECK((unpatched(r) == std::vector<std::string>{ "fs", "ldr" }));
+        CHECK((r.gaps == std::vector<std::string>{ "fs:nocntchk_19.0.0+=Unpatched" }));
+        CHECK(std::string(module_name(r.fs)) == "partial");
+
+        // A pattern turned off in config.ini, meant for this firmware: a gap too.
+        put(root, "config/sys-patch/log.ini",
+            "[fs]\nnoncasigchk_17.0.0+=Patched (sys-patch)\nnocntchk_19.0.0+=Disabled\n"
+            "[ldr]\nnoacidsigchk_10.0.0+=Patched (sys-patch)\n[es]\nes_22.0.0+=Patched (file)\n"
+            "[stats]\nfw_version=23.0.1\nis_emummc=1\n");
+        r = detect(root, "23.0.1", true);
+        CHECK(r.fs == Module::Partial && r.ldr == Module::SysPatch && r.es == Module::File);
+        CHECK((r.gaps == std::vector<std::string>{ "fs:nocntchk_19.0.0+=Disabled" }));
+    }
+
     // Nothing at all.
     {
         Report r = detect(fresh_root(), "23.0.1", true);

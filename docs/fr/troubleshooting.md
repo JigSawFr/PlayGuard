@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 5b0b1b94198f -->
+<!-- translated from docs/troubleshooting.md, sha256 c90afd04af03 -->
 # Dépannage
 
 Reprendre la main sur une console bloquée, les problèmes courants, signaler un bug, et le mode développeur. Retour au [README](../../README.md).
@@ -77,6 +77,10 @@ La console fait tourner un firmware plus récent que le plus récent testé : Pl
 ### Un forwarder protégé affiche l'erreur 2347-0100
 
 Sa porte (`config/playguard/gate-….nro`) n'est plus le fichier avec lequel le forwarder a été fait : elle a été modifiée ou remplacée sur la carte SD, et le forwarder ne la lance pas. Ouvrez PlayGuard depuis son propre forwarder : il réécrit la porte au démarrage ; *Console › Forwarders › Tout réinstaller* refait chaque forwarder avec elle.
+
+### Un forwarder affiche « Le logiciel n'a pas pu être démarré »
+
+La console a refusé de le lancer : une vérification de signature est toujours en place. Les forwarders ont besoin des patchs fs et loader de sys-patch, et chaque motif que sys-patch prévoit pour ce firmware doit avoir été appliqué, pas seulement un par module. *À propos › Aide et diagnostic › Exporter un rapport de diagnostic* indique, sur sa ligne `game patches`, la version de sys-patch et chaque motif non appliqué (par exemple `not patched: fs:nocntchk_19.0.0+=Unpatched`) ; `sd:/config/sys-patch/log.ini` contient la même chose. Mettez sys-patch à jour vers une version qui prend en charge le firmware, redémarrez la console, puis relancez le forwarder : inutile de le refaire.
 
 ### La cloche ou un onglet affiche une pastille orange
 

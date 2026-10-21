@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/patches.hpp"
 
+#include <cstdio>
+
 #include "util/paths.hpp"
 #include "util/text.hpp"
 
@@ -12,6 +14,16 @@ namespace
 bool has_ips(const std::string& dir)
 {
     return !paths::list_files(dir, ".ips").empty() || !paths::list_files(dir, ".IPS").empty();
+}
+
+// "23.0.1" as one number; false when it is not three dotted numbers.
+bool parse_version(const std::string& text, unsigned long* out)
+{
+    unsigned a = 0, b = 0, c = 0;
+    char end = 0;
+    if (std::sscanf(text.c_str(), "%u.%u.%u%c", &a, &b, &c, &end) != 3) return false;
+    *out = (unsigned long)a << 16 | (b & 0xFF) << 8 | (c & 0xFF);
+    return true;
 }
 
 std::string join(const std::string& root, const char* rel)
@@ -40,7 +52,25 @@ Ini parse_ini(const std::string& text)
     return ini;
 }
 
-Module module_state(const Ini& ini, const std::string& name)
+bool pattern_for(const std::string& name, const std::string& fw)
+{
+    const size_t us = name.rfind('_');
+    unsigned long v = 0, lo = 0, hi = 0;
+    if (us == std::string::npos || !parse_version(fw, &v)) return false;
+    std::string range = name.substr(us + 1);
+    if (!range.empty() && range.back() == '+') {
+        if (!parse_version(range.substr(0, range.size() - 1), &lo)) return false;
+        hi = ~0ul;
+    } else {
+        const size_t dash = range.find('-');
+        if (dash == std::string::npos || !parse_version(range.substr(0, dash), &lo) ||
+            !parse_version(range.substr(dash + 1), &hi))
+            return false;
+    }
+    return lo <= v && v <= hi;
+}
+
+Module module_state(const Ini& ini, const std::string& name, const std::string& fw, std::vector<std::string>* gaps)
 {
     auto it = ini.find(name);
     if (it == ini.end() || it->second.empty()) return Module::Missing;
@@ -54,8 +84,20 @@ Module module_state(const Ini& ini, const std::string& name)
         all_skipped  &= text::starts_with(v, "Skipped");
         all_disabled &= text::starts_with(v, "Disabled");
     }
-    if (syspatch) return Module::SysPatch;
-    if (file) return Module::File;
+    if (syspatch || file) {
+        bool partial = false;
+        for (const auto& kv : it->second) {
+            const std::string& v = kv.second;
+            // Skipped: out of its Atmosphère range, or patching turned off.
+            if (text::starts_with(v, "Patched") || text::starts_with(v, "Skipped") || fw.empty() ||
+                !pattern_for(kv.first, fw))
+                continue;
+            partial = true;
+            if (gaps) gaps->push_back(name + ":" + kv.first + "=" + v);
+        }
+        if (partial) return Module::Partial;
+        return syspatch ? Module::SysPatch : Module::File;
+    }
     if (failed) return Module::Failed;
     if (all_skipped) return Module::Skipped;
     if (all_disabled) return Module::Disabled;
@@ -78,12 +120,14 @@ Report detect(const std::string& root, const std::string& fw, bool emummc)
             auto e = stats->second.find("is_emummc");
             if (f != stats->second.end()) r.log_fw = f->second;
             if (e != stats->second.end()) r.log_emummc = e->second == "1";
+            auto v = stats->second.find("version");
+            if (v != stats->second.end()) r.log_version = v->second;
             r.log_current = f != stats->second.end() && e != stats->second.end() &&
                             r.log_fw == fw && r.log_emummc == emummc;
         }
-        r.fs  = module_state(ini, "fs");
-        r.ldr = module_state(ini, "ldr");
-        r.es  = module_state(ini, "es");
+        r.fs  = module_state(ini, "fs", fw, &r.gaps);
+        r.ldr = module_state(ini, "ldr", fw, &r.gaps);
+        r.es  = module_state(ini, "es", fw, &r.gaps);
     }
 
     if (has_ips(join(root, "atmosphere/exefs_patches/es_patches")))     r.files.push_back("es");
@@ -146,6 +190,7 @@ const char* module_name(Module m)
         case Module::Skipped:   return "skipped";
         case Module::Disabled:  return "disabled";
         case Module::Unpatched: return "unpatched";
+        case Module::Partial:   return "partial";
     }
     return "?";
 }
