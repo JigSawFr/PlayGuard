@@ -564,8 +564,10 @@ FwdError forwarder_pack(const FwdInput *in, FwdPackage *out)
     const FwdFile args[] = { { "nextArgv", first_argv, strlen(first_argv) },
                              { "nextNroPath", first, strlen(first) },
                              { "returnArgv", in->argv, strlen(in->argv) },
-                             { "returnNroPath", in->nro_path, strlen(in->nro_path) } };
-    bool ok = nca_begin(&n) && nca_pfs0(&n, 0, exefs, 2, PFS0_EXEFS_BLOCK) && nca_romfs(&n, 1, args, gate ? 4 : 2) &&
+                             { "returnNroPath", in->nro_path, strlen(in->nro_path) },
+                             { "nextNroSha256", in->gate_sha256, 32 } };
+    const uint32_t nargs = !gate ? 2 : in->gate_sha256 ? 5 : 4;
+    bool ok = nca_begin(&n) && nca_pfs0(&n, 0, exefs, 2, PFS0_EXEFS_BLOCK) && nca_romfs(&n, 1, args, nargs) &&
               nca_finish(&n, in, id, NCA_PROGRAM, FWD_CONTENT_PROGRAM, &out->contents[0]);
     free(npdm);
     fwd_buf_free(&n.body);

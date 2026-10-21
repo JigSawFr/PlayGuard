@@ -417,7 +417,7 @@ if HBMENU:
     # tells it), and the lock PlayGuard held taken away from the file
     # outside it: both told and recorded at start-up.
     open(os.path.join(run_dir, "playguard_data", "gate_log.txt"), "w").write(
-        "".join("2026-10-19 21:0%d\trefused\tsdmc:/switch/sphaira/sphaira.nro\n" % m for m in (3, 4, 5)))
+        "".join("2026-10-07 21:0%d\trefused\tsdmc:/switch/sphaira/sphaira.nro\n" % m for m in (3, 4, 5)))
     open(hbmenu_state, "w").write("ams=1.9.4\n")
     for kind in ("fs_patches", "loader_patches"):
         d = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "kip_patches", kind)
@@ -862,7 +862,7 @@ if GATE:
         fail("no migrations line in the log; messages: " + repr(messages()))
     # Turning a developer switch off asks first; B keeps it on (the end of
     # the scenario checks developer mode was saved on).
-    key("Up", 11)              # past Install another build, the cleanup cells, the glow and statistics switches and the recorder: Read-only mode
+    key("Up", 12)              # past Install another build, the self-test, the cleanup cells, the glow and statistics switches and the recorder: Read-only mode
     key("Return")
     shot("06a_read_only_off")  # untested firmware: the "own risk" warning
     key("Escape")
@@ -874,6 +874,14 @@ if GATE:
     key("Return")
     shot("06_dev_report")
     key("Escape")
+    key("Down")                # Console self-test
+    key("Return")
+    time.sleep(1)
+    shot("06_self_test")       # the console, the forwarders, the homebrew menu: each checked; the report written
+    self_test = os.path.join(run_dir, "playguard_data", "self-test.md")
+    if not os.path.exists(self_test) or not open(self_test).read().startswith("## PlayGuard console self-test"):
+        fail("the self-test's report was not written in " + self_test)
+    key("Return")              # OK
     key("Down")                # Compare the play-timer block: none saved yet
     key("Return")
     shot("06_dev_block")
@@ -886,7 +894,7 @@ if GATE:
     # nothing on the console changes): a confirmation, then a result screen.
     # The log files go but the upload links and the block reference just saved;
     # the cache's files go, its folder stays.
-    key("Up", 2)               # Delete the log files
+    key("Up", 3)               # the self-test, the report: Delete the log files
     key("Return")
     shot("06c_clear_logs")     # how many files, what goes, what stays; Delete in red
     key("Right")               # Delete
@@ -910,7 +918,7 @@ if GATE:
     app_log = open(os.path.join(OUT, "app.log"), errors="replace").read()
     if "cleanup (clear cache)" not in app_log or "cleanup (clear logs)" not in app_log:
         fail("no cleanup line in the log; messages: " + repr(messages()))
-    key("Down", 5)             # the report, the block, the firmware screen: Forget the firmware choice
+    key("Down", 6)             # the report, the self-test, the block, the firmware screen: Forget the firmware choice
     key("Return")
     shot("06g_forget")
     key("Right")               # Forget
@@ -1211,7 +1219,7 @@ if FORWARDERS:
         fail("the protection is not in the change history: " + repr(recorded("protect_forwarder")))
     shot("12_protected")       # Star Atlas: On the HOME menu · PIN, the focus on it
     key("Return")
-    key("Down", 8)             # Delete (after Hours without the PIN, Hours it never opens, Change the icon, Install again)
+    key("Down", 9)             # Delete (after Hours without the PIN, Hours it never opens, the day's limit, Change the icon, Install again)
     key("Return")
     key("Right")               # Delete, in the confirmation
     key("Return")
@@ -1255,7 +1263,7 @@ if HBMENU:
         fail("the sysmodule's report was not taken: " + repr(restored))
     refused = recorded("gate_refused")   # the evening's three in one entry
     if len(refused) != 1 or refused[0].get("detail") != "sphaira · 3 times (21:03, 21:04, 21:05)" or \
-            refused[0].get("when") != "2026-10-19 21:03":
+            refused[0].get("when") != "2026-10-07 21:03":
         fail("the gate's log was not taken: " + repr(refused))
     if len(recorded("hbmenu_lock_removed")) != 1 or os.path.exists(hbmenu_state):
         fail("the lock taken away outside PlayGuard was not told")
@@ -1291,9 +1299,11 @@ if HBMENU:
     key("Return")              # from 09:00
     key("Return")              # until 20:00
     time.sleep(3)
-    rules = open(rules_file).read() if os.path.exists(rules_file) else ""
-    if rules != "41\t540\t1200\tsdmc:/switch/sphaira/sphaira.nro\n" or len(recorded("gate_hours")) != 1:
-        fail("sphaira's free hours were not written: " + repr(rules))
+    # In the forwarder, made again (its gate's argv): the SD card's rules file is gone.
+    sphaira = [e for e in json.load(open(made_file)).get("forwarders", []) if e.get("name") == "sphaira"]
+    if not sphaira or sphaira[0].get("free") != {"days": 65, "from": 540, "to": 1200} or \
+            not sphaira[0].get("carried") or os.path.exists(rules_file) or len(recorded("gate_hours")) != 1:
+        fail("sphaira's free hours were not set: " + repr(sphaira))
     shot("02_hours")           # sphaira: On the HOME menu · PIN, not asked Sat–Sun 09:00–20:00
     key("Down", 5)             # Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock
     key("Return")              # the steps: sphaira never started from the HOME menu
@@ -1304,7 +1314,7 @@ if HBMENU:
     # sphaira started from the HOME menu, the PIN entered at its gate: the
     # gate's log, read on the way to the lock.
     open(os.path.join(run_dir, "playguard_data", "gate_log.txt"), "w").write(
-        "2026-10-20 18:00\tpin\tsdmc:/switch/sphaira/sphaira.nro\n")
+        "2026-10-07 18:00\tpin\tsdmc:/switch/sphaira/sphaira.nro\n")
     key("Up", 2)               # Install them all again, Another homebrew
     key("Return")
     key("Down", 5)             # Star Atlas, after sphaira
@@ -1342,13 +1352,17 @@ if HBMENU:
         fail("override_config.ini is not locked: " + repr(text))
     if not os.path.exists(hbmenu_state) or len(recorded("lock_hbmenu")) != 1:
         fail("the lock's state file or its history entry is missing")
-    key("Down", 3)             # Protect every forwarder, Pause after refused PINs, Check the homebrew menu
+    key("Down", 4)             # Protect every forwarder, Pause after refused PINs, Tries this week, Check the homebrew menu
     key("Return")
     shot("05_check")           # the album and R closed, the ways back, the module
     key("Return")              # OK
+    key("Up")                  # Tries this week
+    key("Return")
+    shot("08_week")            # sphaira: refused 3 times on the 7th, opened once
+    key("Return")              # OK
     key("Up", 9)               # Pause after refused PINs, Protect every forwarder, Lock, Install them all again, Another homebrew, PlayGuard's line, Save Keeper, Star Atlas, sphaira
     key("Return")
-    key("Down", 8)             # Delete (after Hours it never opens, Change the icon, Install again)
+    key("Down", 9)             # Delete (after Hours it never opens, the day's limit, Change the icon, Install again)
     key("Return")              # refused: the last way back through a menu
     shot("06_guard")
     key("Return")              # OK
@@ -1387,8 +1401,8 @@ if HOMEBREW:
     shot("01_in_use")          # the card, the groups, the badges, sphaira paused
     key("Down")                # sphaira
     key("Return")
-    shot("02_actions")         # … Hours without the PIN, Hours it never opens, Lift the pause, Change the icon …
-    key("Down", 6)             # Lift the pause
+    shot("02_actions")         # … Hours without the PIN, Hours it never opens, the day's limit, Lift the pause, Change the icon …
+    key("Down", 7)             # Lift the pause
     key("Return")
     time.sleep(3)
     if "sphaira" in data("gate_pause.txt") or len(recorded("gate_pause_lifted")) != 1:
@@ -1401,8 +1415,34 @@ if HOMEBREW:
     key("Return")              # from 21:00
     key("Return")              # until 07:00
     time.sleep(3)
-    if data("gate_closed.txt") != "7f\t1260\t420\tsdmc:/switch/sphaira/sphaira.nro\n" or len(recorded("gate_closed_hours")) != 1:
-        fail("sphaira's closed hours were not written: " + repr(data("gate_closed.txt")))
+    def made(name):
+        found = [e for e in json.load(open(made_file)).get("forwarders", []) if e.get("name") == name]
+        return found[0] if found else {}
+    # In the forwarder (it carries its rules): not in the SD card's file.
+    if made("sphaira").get("closed") != {"days": 127, "from": 1260, "to": 420} or data("gate_closed.txt") or \
+            len(recorded("gate_closed_hours")) != 1:
+        fail("sphaira's closed hours were not set: " + repr(made("sphaira")))
+    key("Return")              # sphaira's actions again
+    key("Down", 4)             # Hours without the PIN
+    key("Return")
+    key("Down", 4)             # Monday to Friday, and the weekend apart
+    key("Return")
+    key("Return")              # Monday to Friday: from 16:00
+    key("Return")              # until 19:00
+    key("Return")              # the weekend: from 09:00
+    key("Return")              # until 20:00
+    time.sleep(3)
+    if made("sphaira").get("free") != {"days": 62, "from": 960, "to": 1140} or \
+            made("sphaira").get("free2") != {"days": 65, "from": 540, "to": 1200}:
+        fail("sphaira's two spans were not set: " + repr(made("sphaira")))
+    key("Return")              # sphaira's actions again
+    key("Down", 6)             # Close it once today's play time is used up
+    key("Return")
+    time.sleep(3)
+    if not made("sphaira").get("limit") or len(recorded("gate_limit_set")) != 1:
+        fail("sphaira's limit was not set: " + repr(made("sphaira")))
+    time.sleep(3)              # the toast gone
+    shot("05_rules")           # sphaira: PIN, not asked Mon–Fri 16:00–19:00, Sat–Sun 09:00–20:00 · closed … · closed once today's time is used up
     key("Down", 8)             # Star Atlas, Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock, Protect every forwarder, Pause after refused PINs
     key("Return")
     shot("03_pause")           # never, 3 tries, 5 tries (the default), 5 tries for an hour, 10 tries
@@ -1422,7 +1462,7 @@ if HOMEBREW:
     icons = [e.get("icon") for e in json.load(open(made_file)).get("forwarders", []) if e.get("name") == "Star Atlas"]
     if icons != ["sdmc:/Nintendo/Album/2026/10/20/2026102018300000-57B4628D2267231D57E0FC1078C0596D.jpg"]:
         fail("Star Atlas's icon from the album was not kept: " + repr(icons))
-    key("Down", 8)             # Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock, Protect every forwarder, Pause after refused PINs, Check
+    key("Down", 9)             # Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock, Protect every forwarder, Pause after refused PINs, Tries this week, Check
     key("Return")
     key("Left")                # Rescue sheet
     key("Return")

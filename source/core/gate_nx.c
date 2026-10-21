@@ -63,11 +63,12 @@ static size_t pause_read(void)
     return n;
 }
 
-// The pause file after this try (owner-writable only, as the log).
-static void pause_write(size_t len, const char *nro, GateResult r, uint64_t now)
+// The pause file after this try (owner-writable only, as the log), by
+// `rule` (the forwarder's), else the file's.
+static void pause_write(size_t len, const char *nro, GateResult r, uint64_t now, const GatePauseRule *rule)
 {
     static char next[GATE_PAUSE_MAX];
-    const size_t n = gate_pause_update(pause_text, len, nro, r, now, next, sizeof(next));
+    const size_t n = gate_pause_update_with(pause_text, len, nro, r, now, rule, next, sizeof(next));
     if (n == 0 && len == 0) return;
     const int fd = open(GATE_DIR GATE_PAUSE_NAME, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     FILE *f = fd >= 0 ? fdopen(fd, "wb") : NULL;
@@ -250,12 +251,13 @@ static void screen_open(Screen *sc, const char *nro, const char *when)
 static void screen_show(Screen *sc, GateScreenState state, const char *note, int note_warn)
 {
     if (!sc->on) return;
-    static const GateText STATUS[] = { GateText_Asking, GateText_Opening, GateText_Free, GateText_Refused,
-                                       GateText_Error,  GateText_Paused,  GateText_Closed };
+    static const GateText STATUS[] = { GateText_Asking, GateText_Opening, GateText_Free,  GateText_Refused,
+                                       GateText_Error,  GateText_Paused,  GateText_Closed, GateText_Limit };
     const GateText hint = state == GateScreen_Asking    ? GateText_AskingHint
                           : state == GateScreen_Refused ? GateText_RefusedHint
                           : state == GateScreen_Paused  ? GateText_PausedHint
                           : state == GateScreen_Closed  ? GateText_ClosedHint
+                          : state == GateScreen_Limit   ? GateText_LimitHint
                                                         : GateText_Count;
     char footer[160];
     snprintf(footer, sizeof(footer), "PlayGuard \xC2\xB7 %s", gate_text(sc->language, GateText_Tagline));
@@ -279,21 +281,54 @@ static void screen_close(Screen *sc)
     plExit();
 }
 
+// The console's play timer: on, and today's time used up (or the console
+// restricting play now). False when it cannot be read: the PIN then.
+static bool play_time_used_up(void)
+{
+    if (R_FAILED(pctlInitialize())) return false;
+    Service *srv = pctlGetServiceSession_Service();
+    bool on = false, restricted = false;
+    u64 remaining = 1;   // a TimeSpan in nanoseconds, signed: below 0 once past
+    const bool read = R_SUCCEEDED(rd_bool(srv, 1453, &on)) && R_SUCCEEDED(rd_u64(srv, 1454, &remaining));
+    if (read && on) rd_bool(srv, 1455, &restricted);
+    pctlExit();
+    return read && on && ((s64)remaining <= 0 || restricted);
+}
+
 bool gate_nx_run(void)
 {
     if (!envHasArgv()) return false;
     char nro[FS_MAX_PATH];
     const char *argv = NULL;
-    if (!gate_argv_parse((const char *)envGetArgv(), nro, sizeof(nro), &argv)) return false;
+    GateRules rules;
+    if (!gate_argv_rules((const char *)envGetArgv(), nro, sizeof(nro), &argv, &rules)) return false;
 
     int wday = -1, minute = -1;
     char when[32] = "?";
     const bool timed = local_time(&wday, &minute, when, sizeof(when));
     Screen sc;
     screen_open(&sc, nro, when);
-    GateHours hours, closed;
-    const bool has_hours = hours_of(GATE_DIR GATE_RULES_NAME, nro, &hours);
-    const bool has_closed = hours_of(GATE_DIR GATE_CLOSED_NAME, nro, &closed);
+    // The rules: those the forwarder carries (its RomFS, on the console's
+    // storage). One made before carries none: no free hours then (the SD
+    // card's file is not trusted), its closed hours and its pause from the
+    // files, until PlayGuard makes it again.
+    GateHours free_spans[GATE_SPANS], closed_spans[GATE_SPANS];
+    unsigned free_n = 0, closed_n = 0;
+    GatePauseRule carried_pause = { 0, 0 };
+    const GatePauseRule *pause_rule = NULL;
+    if (rules.carried) {
+        memcpy(free_spans, rules.free, sizeof(free_spans));
+        memcpy(closed_spans, rules.closed, sizeof(closed_spans));
+        free_n = rules.free_n;
+        closed_n = rules.closed_n;
+        if (rules.has_pause) {
+            carried_pause.tries = rules.pause_tries;
+            carried_pause.minutes = rules.pause_minutes;
+            pause_rule = &carried_pause;
+        }
+    } else if (hours_of(GATE_DIR GATE_CLOSED_NAME, nro, &closed_spans[0])) {
+        closed_n = 1;
+    }
     u64 now = 0;
     const bool clocked = R_SUCCEEDED(timeGetCurrentTime(TimeType_LocalSystemClock, &now));
     const size_t pause_len = pause_read();
@@ -304,36 +339,41 @@ bool gate_nx_run(void)
     char day[11] = "";
     if (timed) snprintf(day, sizeof(day), "%.10s", when);
     const int refused = timed ? refused_on(nro, day) : 0;
-    char note[256] = "", span[200];
+    char note[256] = "", span[256];
+    const char *days = gate_text(sc.language, GateText_Days);
     if (refused > 0) snprintf(note, sizeof(note), gate_text(sc.language, GateText_Tried), refused);
-    else if (has_hours && gate_hours_text(&hours, gate_text(sc.language, GateText_Days), span, sizeof(span)))
+    else if (free_n && gate_spans_text(free_spans, free_n, days, span, sizeof(span)))
         snprintf(note, sizeof(note), gate_text(sc.language, GateText_FreeHours), span);
     GateResult r;
-    // Its hours without any access first (the PIN changes nothing then), then
-    // a pause after refusals, then its free hours; else the PIN.
-    if (timed && has_closed && gate_hours_free(&closed, wday, minute)) {
+    // Its hours without any access first (the PIN changes nothing then),
+    // then the day's time used up, then a pause after refusals, then its
+    // free hours; else the PIN.
+    if (timed && gate_spans_hold(closed_spans, closed_n, wday, minute)) {
         r = GateResult_Closed;
         note[0] = '\0';
-        if (gate_hours_text(&closed, gate_text(sc.language, GateText_Days), span, sizeof(span)))
+        if (gate_spans_text(closed_spans, closed_n, days, span, sizeof(span)))
             snprintf(note, sizeof(note), gate_text(sc.language, GateText_ClosedHours), span);
+    } else if (rules.limit && play_time_used_up()) {
+        r = GateResult_Limit;
     } else if (clocked && until > now) {
         r = GateResult_Paused;
         char at[16];
         clock_of(until, at, sizeof(at));
         snprintf(note, sizeof(note), gate_text(sc.language, GateText_PausedUntil), at);
-    } else if (timed && has_hours && gate_hours_free(&hours, wday, minute)) {
+    } else if (timed && gate_spans_hold(free_spans, free_n, wday, minute)) {
         r = GateResult_Free;
     } else {
         screen_show(&sc, GateScreen_Asking, note, refused > 0);
         r = ask_pin();
     }
     log_try(when, r, nro);
-    if (clocked) pause_write(pause_len, nro, r, now);
+    if (clocked) pause_write(pause_len, nro, r, now, pause_rule);
     // Refused: the day's count with this one, or the pause it starts now.
     if (r == GateResult_Refused) {
         uint64_t next_until = 0;
         static char after[GATE_PAUSE_MAX];
-        const size_t n = clocked ? gate_pause_update(pause_text, pause_len, nro, r, now, after, sizeof(after)) : 0;
+        const size_t n =
+            clocked ? gate_pause_update_with(pause_text, pause_len, nro, r, now, pause_rule, after, sizeof(after)) : 0;
         if (n && gate_pause_find(after, n, nro, NULL, &next_until) && next_until > now) {
             char at[16];
             clock_of(next_until, at, sizeof(at));
@@ -343,8 +383,8 @@ bool gate_nx_run(void)
         }
     }
     // How it went, a moment: longer when it does not start.
-    static const GateScreenState SHOWN[] = { GateScreen_Opening, GateScreen_Free,   GateScreen_Refused,
-                                             GateScreen_Error,   GateScreen_Paused, GateScreen_Closed };
+    static const GateScreenState SHOWN[] = { GateScreen_Opening, GateScreen_Free,   GateScreen_Refused, GateScreen_Error,
+                                             GateScreen_Paused,  GateScreen_Closed, GateScreen_Limit };
     const bool noted = r == GateResult_Refused || r == GateResult_Paused || r == GateResult_Closed;
     screen_show(&sc, SHOWN[r], noted ? note : NULL, 1);
     if (sc.on) svcSleepThread(r == GateResult_Pin || r == GateResult_Free ? 700000000ULL : 2500000000ULL);

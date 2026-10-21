@@ -44,7 +44,10 @@ struct Row
     bool        gone_seen = false;   // NotInstalled, and already told (forwarders::Made::gone)
     bool        verified = false;    // protected, and started through the gate once (forwarders::Made::verified)
     int         free_days = 0, free_from = 0, free_to = 0;   // protected: when the PIN is not asked
+    int         free2_days = 0, free2_from = 0, free2_to = 0;   // a second span of them (the weekend's)
     int         closed_days = 0, closed_from = 0, closed_to = 0;   // protected: when it never opens
+    bool        limit = false;     // protected: closed once the day's play time is used up
+    bool        carried = false;   // protected: its rules in it (forwarders::Made::carried)
     uint64_t    paused_until = 0;   // paused after refusals until then (POSIX; 0: not paused), read by forwarder_flow
     bool        custom_icon = false;   // its icon from the album (forwarders::Made::icon)
 };

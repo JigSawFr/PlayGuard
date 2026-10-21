@@ -58,6 +58,7 @@ int main(int argc, char **argv)
         { "error", GateText_Error, GateText_Count, GateScreen_Error },
         { "paused", GateText_Paused, GateText_PausedHint, GateScreen_Paused },
         { "closed", GateText_Closed, GateText_ClosedHint, GateScreen_Closed },
+        { "limit", GateText_Limit, GateText_LimitHint, GateScreen_Limit },
     };
     char footer[160];
     snprintf(footer, sizeof(footer), "PlayGuard \xC2\xB7 %s", gate_text(lang, GateText_Tagline));
