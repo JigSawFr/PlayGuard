@@ -1402,7 +1402,11 @@
         "presses_left": "Pressione mais {} vezes para ativar o modo de desenvolvedor.",
         "presses_left_one": "Pressione mais 1 vez para ativar o modo de desenvolvedor.",
         "report_upload": "Enviar online",
-        "glow": "Halo de fundo"
+        "glow": "Halo de fundo",
+        "self_test": "Autoteste do console",
+        "self_test_written": "Salvo em {}: cole no pull request.",
+        "self_test_not_written": "Não salvo: {}",
+        "self_test_tally": "{} aprovados, {} para saber, {} com falha, {} não verificados"
     },
     "dev_build": {
         "open": "Instalar outra compilação",

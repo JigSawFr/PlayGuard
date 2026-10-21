@@ -1402,7 +1402,11 @@
         "presses_left": "Premi ancora {} volte per attivare la modalità sviluppatore.",
         "presses_left_one": "Premi ancora una volta per attivare la modalità sviluppatore.",
         "report_upload": "Invia online",
-        "glow": "Alone di sfondo"
+        "glow": "Alone di sfondo",
+        "self_test": "Autotest della console",
+        "self_test_written": "Salvato in {}: incollalo nella pull request.",
+        "self_test_not_written": "Non salvato: {}",
+        "self_test_tally": "{} superati, {} da sapere, {} falliti, {} non verificati"
     },
     "dev_build": {
         "open": "Installa un'altra build",

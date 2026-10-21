@@ -1402,7 +1402,11 @@
         "presses_left": "Prima mais {} vezes para ativar o modo de programador.",
         "presses_left_one": "Prima mais 1 vez para ativar o modo de programador.",
         "report_upload": "Enviar online",
-        "glow": "Halo de fundo"
+        "glow": "Halo de fundo",
+        "self_test": "Autoteste da consola",
+        "self_test_written": "Guardado em {}: cole-o no pull request.",
+        "self_test_not_written": "Não guardado: {}",
+        "self_test_tally": "{} aprovados, {} a saber, {} falhados, {} não verificados"
     },
     "dev_build": {
         "open": "Instalar outra compilação",

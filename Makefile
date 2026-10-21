@@ -171,6 +171,7 @@ pt_logic_SRC   := source/action/pt_logic.cpp source/util/date.cpp tests/pt_logic
 pin_lock_logic_SRC   := source/action/pin_lock_logic.cpp tests/pin_lock_logic/test.cpp
 console_lock_logic_SRC   := source/action/console_lock_logic.cpp tests/console_lock_logic/test.cpp
 history_logic_SRC   := source/util/date.cpp source/action/history_logic.cpp tests/history_logic/test.cpp
+self_test_logic_SRC   := source/action/self_test_logic.cpp tests/self_test_logic/test.cpp
 gate_tally_SRC   := source/util/date.cpp source/util/gate_tally.cpp tests/gate_tally/test.cpp
 timer_health_logic_SRC   := source/action/timer_health_logic.cpp tests/timer_health_logic/test.cpp
 notice_logic_SRC   := source/util/date.cpp source/action/notice_logic.cpp tests/notice_logic/test.cpp

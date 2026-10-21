@@ -1402,7 +1402,11 @@
         "presses_left": "Encore {} appuis pour activer le mode développeur.",
         "presses_left_one": "Encore 1 appui pour activer le mode développeur.",
         "report_upload": "Envoyer en ligne",
-        "glow": "Halo d'arrière-plan"
+        "glow": "Halo d'arrière-plan",
+        "self_test": "Auto-test de la console",
+        "self_test_written": "Écrit dans {} : à coller dans la pull request.",
+        "self_test_not_written": "Non écrit : {}",
+        "self_test_tally": "{} réussis, {} à savoir, {} en échec, {} non vérifiés"
     },
     "dev_build": {
         "open": "Installer un autre build",

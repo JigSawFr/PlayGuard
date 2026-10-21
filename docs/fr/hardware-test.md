@@ -1,9 +1,11 @@
-<!-- translated from docs/hardware-test.md, sha256 0f3ca7f84a71 -->
+<!-- translated from docs/hardware-test.md, sha256 a1b9f6ca74a3 -->
 # Tester sur une console : forwarders et menu homebrew
 
 Ce que les simulateurs desktop et web ne peuvent pas montrer : le vrai menu HOME de la console, son écran du code PIN, Atmosphère qui lit `override_config.ini`, le module rescue au démarrage. À dérouler sur une console après une modification de *Console › Forwarders* (les fichiers `source/action/forwarder*`, `hbmenu_lock*`, `source/core/gate*`, `hbl_lock*`, `gate/`, `sysmodule/`), en notant dans la pull request ce qui a été vérifié, et sur quels firmware et Atmosphère.
 
 Avant de commencer : un code PIN sur la console, sys-patch (ou des fichiers sigpatch), sphaira dans `/switch/sphaira/`, un ordinateur avec un lecteur de carte SD à portée de main, et de préférence le module rescue installé (`playguard-rescue.zip`). Utilisez une console que vous pouvez remettre dans son état d'origine.
+
+D'abord, *Aide et diagnostic › Auto-test de la console* (mode développeur, [dépannage](troubleshooting.md#mode-développeur-examiner-un-nouveau-firmware)) : il vérifie ce que PlayGuard peut vérifier seul et écrit `config/playguard/self-test.md` ; collez-le dans la pull request. Les étapes ci-dessous sont ce qu'il ne peut pas vérifier : elles demandent une main sur la console.
 
 Chaque étape : ce qu'il faut faire, puis ce qui doit se passer. ☐ est à cocher.
 

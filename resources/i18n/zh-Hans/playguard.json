@@ -1402,7 +1402,11 @@
         "presses_left": "再按{}次即可开启开发者模式。",
         "presses_left_one": "再按1次即可开启开发者模式。",
         "report_upload": "在线发送",
-        "glow": "背景光晕"
+        "glow": "背景光晕",
+        "self_test": "主机自检",
+        "self_test_written": "已写入{}：请粘贴到拉取请求中。",
+        "self_test_not_written": "未写入：{}",
+        "self_test_tally": "通过{}，需注意{}，失败{}，未检查{}"
     },
     "dev_build": {
         "open": "安装其他构建",

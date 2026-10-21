@@ -862,7 +862,7 @@ if GATE:
         fail("no migrations line in the log; messages: " + repr(messages()))
     # Turning a developer switch off asks first; B keeps it on (the end of
     # the scenario checks developer mode was saved on).
-    key("Up", 11)              # past Install another build, the cleanup cells, the glow and statistics switches and the recorder: Read-only mode
+    key("Up", 12)              # past Install another build, the self-test, the cleanup cells, the glow and statistics switches and the recorder: Read-only mode
     key("Return")
     shot("06a_read_only_off")  # untested firmware: the "own risk" warning
     key("Escape")
@@ -874,6 +874,14 @@ if GATE:
     key("Return")
     shot("06_dev_report")
     key("Escape")
+    key("Down")                # Console self-test
+    key("Return")
+    time.sleep(1)
+    shot("06_self_test")       # the console, the forwarders, the homebrew menu: each checked; the report written
+    self_test = os.path.join(run_dir, "playguard_data", "self-test.md")
+    if not os.path.exists(self_test) or not open(self_test).read().startswith("## PlayGuard console self-test"):
+        fail("the self-test's report was not written in " + self_test)
+    key("Return")              # OK
     key("Down")                # Compare the play-timer block: none saved yet
     key("Return")
     shot("06_dev_block")
@@ -886,7 +894,7 @@ if GATE:
     # nothing on the console changes): a confirmation, then a result screen.
     # The log files go but the upload links and the block reference just saved;
     # the cache's files go, its folder stays.
-    key("Up", 2)               # Delete the log files
+    key("Up", 3)               # the self-test, the report: Delete the log files
     key("Return")
     shot("06c_clear_logs")     # how many files, what goes, what stays; Delete in red
     key("Right")               # Delete
@@ -910,7 +918,7 @@ if GATE:
     app_log = open(os.path.join(OUT, "app.log"), errors="replace").read()
     if "cleanup (clear cache)" not in app_log or "cleanup (clear logs)" not in app_log:
         fail("no cleanup line in the log; messages: " + repr(messages()))
-    key("Down", 5)             # the report, the block, the firmware screen: Forget the firmware choice
+    key("Down", 6)             # the report, the self-test, the block, the firmware screen: Forget the firmware choice
     key("Return")
     shot("06g_forget")
     key("Right")               # Forget

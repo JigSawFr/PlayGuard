@@ -4,6 +4,8 @@ What the desktop and web simulators cannot show: the console's own HOME menu, it
 
 Before starting: a PIN on the console, sys-patch (or sigpatch files), sphaira in `/switch/sphaira/`, a computer with an SD card reader at hand, and preferably the rescue module installed (`playguard-rescue.zip`). Use a console you can put back as it was.
 
+First, *Help & diagnostics › Console self-test* (developer mode, [troubleshooting](troubleshooting.md#developer-mode-investigating-a-new-firmware)): it checks what PlayGuard can by itself and writes `config/playguard/self-test.md`; paste it in the pull request. The steps below are what it cannot check: they need a hand on the console.
+
 Each step: what to do, then what must happen. ☐ is to tick.
 
 ## 1. Forwarders
