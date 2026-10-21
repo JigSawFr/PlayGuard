@@ -22,7 +22,8 @@ class GameCell : public brls::DetailCell
     void set_badge(const char* icon_name, const char* color_key = "cadran/teal");
 
     // Small Cadran icons in a row before the detail text, one per thing
-    // turned on (a forwarder's rules); an empty list takes them away.
+    // turned on (a forwarder's rules), after setDetailText(): without text
+    // they end the line. An empty list takes them away.
     struct Mark
     {
         const char* icon;

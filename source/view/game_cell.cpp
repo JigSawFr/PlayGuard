@@ -66,9 +66,11 @@ void GameCell::set_marks(const std::vector<Mark>& list)
         view->setMarginLeft(this->marks->getChildren().empty() ? 0 : 12);
         this->marks->addView(view);
     }
-    // Before the detail text, the cell's last view; a space between them
-    // only when there is text.
-    if (!this->detail->getFullText().empty()) this->marks->setMarginRight(12);
+    // Before the detail text, the cell's last view; without text, the
+    // label goes, and its room with it.
+    const bool text = !this->detail->getFullText().empty();
+    this->detail->setVisibility(text ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    if (text) this->marks->setMarginRight(12);
     this->addView(this->marks, this->getChildren().size() - 1);
 }
 
