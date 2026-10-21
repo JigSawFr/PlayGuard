@@ -700,6 +700,7 @@
         "headline_one": "1 punt te controleren",
         "headline": "{} punten te controleren",
         "section_diag": "Diagnose",
+        "section_reports": "Rapporten",
         "section_system": "Systeem",
         "export": "Een diagnoserapport exporteren",
         "export_note": "Opgeslagen in {}. Voeg het toe aan een bugmelding. Het bevat nooit de pincode of het serienummer.",

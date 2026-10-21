@@ -700,6 +700,7 @@
         "headline_one": "1 cosa da controllare",
         "headline": "{} cose da controllare",
         "section_diag": "Diagnostica",
+        "section_reports": "Report",
         "section_system": "Sistema",
         "export": "Esporta un rapporto di diagnostica",
         "export_note": "Salvato in {}. Allegalo a una segnalazione di bug. Non contiene mai il PIN né il numero di serie.",

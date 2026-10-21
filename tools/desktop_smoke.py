@@ -2065,7 +2065,7 @@ key("Right")
 key_to_end("Down", hold=0.15) # its last line: the funding QR codes
 key("Up", 2)               # past Source: Help & diagnostics
 key("Return")
-key("Down", 2)             # past First steps, Export: Send a report online
+key("Right")               # past First steps: Send a report online, the tile beside it
 key("Return")
 if saved:                  # reports saved by an earlier local run: this report is the first choice
     key("Return")

@@ -700,6 +700,7 @@
         "headline_one": "確認が必要な項目：1件",
         "headline": "確認が必要な項目：{}件",
         "section_diag": "診断",
+        "section_reports": "レポート",
         "section_system": "システム",
         "export": "診断レポートをエクスポート",
         "export_note": "{}に保存されます。不具合報告に添付してください。暗証番号やシリアル番号は含まれません。",
