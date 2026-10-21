@@ -693,6 +693,7 @@
     },
     "tools": {
         "section_diag": "诊断",
+        "section_reports": "报告",
         "section_system": "系统",
         "export": "导出诊断报告",
         "export_note": "保存在{}。请在报告问题时附上此文件。其中绝不包含PIN或序列号。",

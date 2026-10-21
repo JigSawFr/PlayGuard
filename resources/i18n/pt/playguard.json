@@ -693,6 +693,7 @@
     },
     "tools": {
         "section_diag": "Diagnóstico",
+        "section_reports": "Relatórios",
         "section_system": "Sistema",
         "export": "Exportar relatório de diagnóstico",
         "export_note": "Guardado em {}. Anexe-o a um relatório de erro. Nunca contém o PIN nem o número de série.",

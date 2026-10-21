@@ -693,6 +693,7 @@
     },
     "tools": {
         "section_diag": "Diagnostic",
+        "section_reports": "Rapports",
         "section_system": "Système",
         "export": "Exporter un rapport de diagnostic",
         "export_note": "Enregistré dans {}. Joignez-le à un signalement de bogue. Il ne contient jamais le NIP ni le numéro de série.",

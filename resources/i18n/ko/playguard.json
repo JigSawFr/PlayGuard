@@ -693,6 +693,7 @@
     },
     "tools": {
         "section_diag": "진단",
+        "section_reports": "보고서",
         "section_system": "시스템",
         "export": "진단 보고서 내보내기",
         "export_note": "{}에 저장됩니다. 버그 보고에 첨부하세요. PIN이나 시리얼 번호는 절대 포함되지 않습니다.",

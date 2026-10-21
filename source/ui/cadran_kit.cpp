@@ -102,12 +102,21 @@ brls::Box* top_card(bool grow)
     return box;
 }
 
+void set_kicker(brls::Label* label, const std::string& text)
+{
+    if (!label) return;
+    label->setFontSize(TEXT_KICKER);
+    label->setTextColor(color("cadran/text2"));
+    if (!text.empty()) label->setText(cadran::upper(text));
+}
+
 brls::Box* kicker(const char* icon_name, const std::string& title)
 {
     auto* head = new brls::Box(brls::Axis::ROW);
     head->setAlignItems(brls::AlignItems::CENTER);
     head->addView(icon(icon_name, 18, "cadran/text2"));
-    brls::Label* text = label(cadran::upper(title), TEXT_KICKER, "cadran/text2");
+    auto* text = new brls::Label();
+    set_kicker(text, title);
     text->setSingleLine(true);
     text->setMarginLeft(8);
     head->addView(text);

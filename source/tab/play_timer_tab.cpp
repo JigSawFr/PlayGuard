@@ -375,7 +375,7 @@ void PlayTimerTab::rerender()
 {
     brls::Theme theme = brls::Application::getTheme();
     const PtState& pt = this->pt;
-    kicker->setText(cadran::upper("playguard/play_timer/week_title"_i18n));
+    cadran::kit::set_kicker(kicker, "playguard/play_timer/week_title"_i18n);
     summary->setText(pt.valid ? summary_of(this->pending) : "playguard/common/unavailable"_i18n);
     if (pt.valid) week_editor->show(this->pending, pt.day_min);
 

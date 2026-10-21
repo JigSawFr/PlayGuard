@@ -693,6 +693,7 @@
     },
     "tools": {
         "section_diag": "Diagnose",
+        "section_reports": "Berichte",
         "section_system": "System",
         "export": "Diagnosebericht exportieren",
         "export_note": "Gespeichert in {}. Hängen Sie ihn an einen Fehlerbericht an. Er enthält nie die Geheimzahl oder die Seriennummer.",
