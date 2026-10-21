@@ -2,6 +2,8 @@
 #include "action/forwarders_logic.hpp"
 
 #include <algorithm>
+#include <cerrno>
+#include <cstdio>
 
 #include "util/text.hpp"
 
@@ -31,6 +33,10 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
             if (r.name.empty()) r.name = m->name;
             if (r.author.empty()) r.author = m->author;
             r.pin = m->pin;
+            r.verified = m->pin && m->verified;
+            r.free_days = m->free_days;
+            r.free_from = m->free_from;
+            r.free_to = m->free_to;
             r.state = !nro_exists(m->nro)            ? State::NroMissing
                       : m->pin && !nro_exists(m->gate) ? State::GateMissing
                                                        : State::Ready;
@@ -49,6 +55,11 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
         r.author = m.author;
         r.nro = m.nro;
         r.pin = m.pin;
+        r.gone_seen = m.gone;
+        r.verified = m.pin && m.verified;
+        r.free_days = m.free_days;
+        r.free_from = m.free_from;
+        r.free_to = m.free_to;
         r.state = State::NotInstalled;
         rows.push_back(r);
     }
@@ -101,6 +112,126 @@ Patches patches_state(const patches::Report& r)
         }
         default: return Patches::Missing;
     }
+}
+
+bool is_menu(const std::string& nro)
+{
+    if (nro.empty()) return false;
+    const std::string name = text::lower_ascii(file_title(nro));
+    return name == "hbmenu" || name == "sphaira";
+}
+
+bool writes_sd(const std::string& nro)
+{
+    static const char* const NAMES[] = { "nx-shell", "nxshell", "goldleaf", "dbi", "tinfoil", "awoo", "cyberfoil",
+                                         "appstore", "ftpd", "jksv", "edizon", "nxthemesinstaller", "nxmtp" };
+    const std::string name = text::lower_ascii(file_title(nro));
+    for (const char* n : NAMES)
+        if (name == n) return true;
+    return false;
+}
+
+std::string hours_text(int days, int from, int to, const std::vector<std::string>& day_names)
+{
+    const auto hm = [](int m) {
+        char b[16];
+        std::snprintf(b, sizeof(b), "%02d:%02d", m / 60, m % 60);
+        return std::string(b);
+    };
+    std::string d;
+    if (day_names.size() == 7) {
+        if ((days & 0x7F) == 0x7F) d = day_names[1] + "–" + day_names[0];   // Monday to Sunday
+        else if ((days & 0x7F) == 0x3E) d = day_names[1] + "–" + day_names[5];
+        else if ((days & 0x7F) == 0x41) d = day_names[6] + "–" + day_names[0];
+        else
+            for (int i = 1; i <= 7; i++)
+                if (days >> (i % 7) & 1) d += (d.empty() ? "" : ", ") + day_names[i % 7];
+    }
+    return d + " " + hm(from) + "–" + hm(to);
+}
+
+LockCheck lock_check(const std::vector<Row>& rows, bool pin_set, Patches patches)
+{
+    LockCheck c;
+    c.pin = pin_set;
+    c.patches = patches != Patches::Missing;
+    for (const Row& r : rows) {
+        if (r.state == State::NotInstalled) continue;
+        if (r.self && r.state == State::Ready) c.self = true;
+        if (r.state == State::Elsewhere) c.open_doors.push_back(r.name);
+        if (!is_menu(r.nro)) {
+            if (!r.pin && !r.self && r.state != State::Elsewhere) {
+                c.unprotected.push_back(r.name);
+                if (writes_sd(r.nro)) c.sd_writers.push_back(r.name);
+            }
+            continue;
+        }
+        if (!r.pin) c.open_doors.push_back(r.name);
+        else if (r.state == State::Ready) {
+            c.menus.push_back(r.name);
+            if (r.verified) c.verified.push_back(r.name);
+        }
+    }
+    return c;
+}
+
+namespace
+{
+bool way_back_menu(const Row& r)
+{
+    return r.pin && r.state == State::Ready && is_menu(r.nro);
+}
+}   // namespace
+
+std::vector<std::string> other_menus(const std::vector<Row>& rows, const Row& row)
+{
+    std::vector<std::string> out;
+    for (const Row& r : rows)
+        if (r.id != row.id && way_back_menu(r)) out.push_back(r.name);
+    return out;
+}
+
+Guard way_back_guard(const std::vector<Row>& rows, const Row& row, bool locked)
+{
+    if (!locked || row.state == State::NotInstalled) return Guard::Allowed;
+    if (row.self) return Guard::Refused;
+    if (!way_back_menu(row)) return Guard::Allowed;
+    return other_menus(rows, row).empty() ? Guard::Refused : Guard::Confirm;
+}
+
+std::vector<Refusals> repeated_refusals(const std::vector<std::pair<std::string, std::string>>& refused, int at_least)
+{
+    // Per name and day, in the order first seen.
+    std::vector<Refusals> days;
+    for (const auto& [name, when] : refused) {
+        const std::string day = when.substr(0, 10);
+        bool seen = false;
+        for (Refusals& d : days)
+            if (d.name == name && d.day == day) {
+                d.count++;
+                seen = true;
+            }
+        if (!seen) days.push_back({ name, day, 1 });
+    }
+    std::vector<Refusals> out;
+    for (const Refusals& d : days) {
+        if (d.count < at_least) continue;
+        bool merged = false;
+        for (Refusals& o : out)
+            if (o.name == d.name) {
+                if (d.count > o.count) o = d;
+                merged = true;
+            }
+        if (!merged) out.push_back(d);
+    }
+    return out;
+}
+
+WriteHint write_hint(int err, uint64_t free_bytes)
+{
+    if (err == ENOSPC || free_bytes < 64 * 1024) return WriteHint::Full;
+    if (err == EROFS || err == EACCES || err == EPERM) return WriteHint::ReadOnly;
+    return WriteHint::None;
 }
 
 }   // namespace forwarders_logic

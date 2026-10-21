@@ -52,6 +52,34 @@ goes through the lock screen as on any start. The PIN itself is never
 written; the proof is made from it, so like the report it is removed at the
 next start of PlayGuard.
 
+## The homebrew menu's lock
+
+When PlayGuard has locked the homebrew menu (*Console › Forwarders ›
+Homebrew menu*: the album and a game started while R is held no longer open
+it, see `source/core/hbl_lock.h`), the module is also a way out of it. At
+boot it lifts the lock — PlayGuard's block taken away from
+`atmosphere/config/override_config.ini`, the rest of the file left as it is —
+when:
+
+- **a `RESCUE` request is there** (either mode): the request that unlocks
+  parental controls opens the homebrew menu too;
+- **Atmosphère was updated since it was locked** (the version PlayGuard wrote
+  in `config/playguard/hbmenu_lock.txt` is not the one running, read from
+  exosphère): its signature patches may lag behind, and no forwarder starts
+  without them, PlayGuard's own included.
+
+Neither is something a child can do from the console. Deleting a forwarder,
+which anyone can do in System Settings, lifts nothing. The outcome goes to
+`config/playguard/hbmenu_lock_report.txt`; PlayGuard tells it at its next
+start, records it in the change history, offers to lock again and removes
+the report. A file without PlayGuard's block is never written. At the boot
+after an unlock, the module also takes away the block of Atmosphère's
+defaults the unlock wrote back (needed only until the console restarts).
+
+The lock does not need the module: without it, deleting the file from a
+computer (or putting PlayGuard's backup, `config/playguard/override_config.ini.backup`,
+back) and restarting undoes it.
+
 ## How to use it
 
 1. Install the module once: extract `playguard-rescue.zip` to the SD-card root
@@ -94,7 +122,9 @@ make dist-rescue           # -> playguard-rescue.zip  (SD-card layout, from the 
 ```
 
 The module shares `source/core/rescue.c` with the app (the request / report
-file format, host-tested in `tests/rescue/`). Its pctl calls are the app's,
+file format, host-tested in `tests/rescue/`), and `source/core/hbl_lock.c`
+(the homebrew menu's lock, its state and report files, the boot decision,
+host-tested in `tests/hbl_lock/`). Its pctl calls are the app's,
 from `source/core/pctl_ops_internal.h` (the typed reads, the PIN read and the
 unlock with it, all `static inline`): the sysmodule links nothing else of the
 app's service layer.

@@ -25,6 +25,10 @@ std::string current_report();
 // this one does not reach up to it. "unknown" until then.
 void set_firmware_choice(std::string (*summary)());
 
+// The homebrew menu's section (action/hbmenu_lock's report()), given the
+// same way; none until then.
+void set_homebrew_lock(std::string (*section)());
+
 // Saves as logs/reports/report_<timestamp>.txt (util/log_files.hpp). Returns the
 // saved path, or an empty string (and *error set) on failure.
 std::string save(const std::string& report, std::string* error = nullptr);

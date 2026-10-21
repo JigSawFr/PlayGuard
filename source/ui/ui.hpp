@@ -144,6 +144,37 @@ void qr_dialog(const std::string& body, const std::string& url);
 // line under the code.
 void qr_text_dialog(const std::string& body, const std::string& text);
 
+// A list of checks in a dialog: each line with its mark (a teal check for
+// what is ready, an amber or coral triangle for what is not, a grey dot for
+// what is only said), under `title`, `note` small at the end (may be empty).
+enum class Check
+{
+    Ok,
+    Warn,
+    Bad,
+    Info,
+    Header,   // not a check: the name of the panel of lines after it
+};
+struct CheckLine
+{
+    Check       state = Check::Info;
+    std::string text;
+};
+// One of them: the mark, then the text (`size` px).
+brls::Box* check_row(const CheckLine& line, float size = 17);
+// Under `title` (and `subtitle`), the lines in rounded panels, one per
+// Header line (its name small above it); `note` with an info icon last.
+brls::Box* checklist_body(const std::string& title, const std::vector<CheckLine>& lines, const std::string& note = "",
+                          const std::string& subtitle = "");
+// A dialog that only says something: a badge (`icon` in `tone`'s colour),
+// `title`, `text`, OK.
+void notice(const char* icon, Check tone, const std::string& title, const std::string& text);
+// `body` with Cancel and `hold_label`: A (or a finger) held on it for 2 s,
+// the button filling meanwhile, runs `on_yes`; let go sooner, it empties
+// and nothing happens. For what is hard to undo from the console.
+void hold_confirm(brls::Box* body, const std::string& hold_label, std::function<void()> on_yes,
+                  std::function<void()> on_no = nullptr);
+
 // Reads the stored PIN (pctl_get_pin) and shows it in large digits, or a
 // dialog with the error. The app's copies are wiped as soon as the label
 // holds the text. True when it was shown; `on_close` then runs once it is
@@ -157,6 +188,9 @@ brls::Dialog* dialog(const std::string& text);
 // The same with `below` under the text, the card's width unless it aligns
 // itself: a QR code, a code to read out, the cards to support the app.
 brls::Dialog* dialog(const std::string& text, brls::View* below);
+// The same for a body already laid out (a checklist, a sheet): as it is, or
+// in a scrolling frame when taller than the dialog's room.
+brls::Dialog* box_dialog(brls::Box* body);
 
 // B closes `dialog` and runs `on_cancel` (borealis' own B only closes it).
 void on_cancel(brls::Dialog* dialog, std::function<void()> on_cancel);

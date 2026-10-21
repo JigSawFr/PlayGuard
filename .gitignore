@@ -93,3 +93,5 @@ toolchain.txt
 __pycache__/
 /forwarder/build
 /forwarder/out
+/gate/build
+/gate/out

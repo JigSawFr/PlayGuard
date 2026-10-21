@@ -1,0 +1,41 @@
+// gate_text — the PIN gate's few lines (core/gate_screen.h), in the
+// console's language: by libnx's SetLanguage, whose values this takes as
+// they are (0 Japanese, 1 American English … 17 Brazilian Portuguese);
+// American English for any other. And which of the console's own fonts
+// draws that language. Plain C (tests/gate_screen).
+// Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
+#pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef enum {
+    GateText_Asking = 0,   // "Enter the parental-control PIN to start it."
+    GateText_AskingHint,
+    GateText_Opening,
+    GateText_Free,
+    GateText_Refused,
+    GateText_RefusedHint,
+    GateText_Error,
+    GateText_Tagline,      // "Parental controls, right on the console"
+    GateText_Tried,        // "Refused today: %d" (printf: an int)
+    GateText_FreeHours,    // "Without the PIN: %s" (printf: gate_hours_text's)
+    GateText_Days,         // "Sun,Mon,…,Sat": the days' short names, Sunday first, by commas
+    GateText_Count,
+} GateText;
+
+const char *gate_text(int language, GateText which);
+
+// The console's shared fonts (pl): the standard one has Latin and Japanese.
+typedef enum {
+    GateFont_Standard = 0,
+    GateFont_ChineseSimplified,
+    GateFont_ChineseTraditional,
+    GateFont_Korean,
+} GateFont;
+GateFont gate_text_font(int language);
+
+#ifdef __cplusplus
+}
+#endif

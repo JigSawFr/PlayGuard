@@ -41,6 +41,9 @@ struct Row
     State       state = State::Ready;
     bool        self = false;   // PlayGuard's own
     bool        pin = false;    // made here, protected with the PIN
+    bool        gone_seen = false;   // NotInstalled, and already told (forwarders::Made::gone)
+    bool        verified = false;    // protected, and started through the gate once (forwarders::Made::verified)
+    int         free_days = 0, free_from = 0, free_to = 0;   // protected: when the PIN is not asked
 };
 
 // One row per forwarder on the HOME menu and per one remembered that is no
@@ -72,5 +75,81 @@ enum class Patches
     Missing,
 };
 Patches patches_state(const patches::Report& report);
+
+// Whether `nro` ("sdmc:/…") is a homebrew menu, which starts any other
+// .nro: hbmenu (sdmc:/hbmenu.nro, the one the album starts, or a copy of
+// it elsewhere) or sphaira, by their file names.
+bool is_menu(const std::string& nro);
+
+// Whether `nro` is a homebrew known to write anywhere on the SD card (a
+// file manager, an installer, an FTP server…), by its file name.
+bool writes_sd(const std::string& nro);
+
+// "Sat–Sun 09:00–20:00"-like: the days (`days`, bit 0 Sunday) as the
+// names in `day_names` (Sunday first, 7 of them), and the span.
+std::string hours_text(int days, int from, int to, const std::vector<std::string>& day_names);
+
+// What locking the homebrew menu (core/hbl_lock.h) needs: two ways back to
+// PlayGuard, each starting from the HOME menu: its own forwarder, and a menu
+// of homebrew protected with the PIN, which starts PlayGuard's .nro too (and
+// keeps a homebrew store usable). And what it should warn of.
+struct LockCheck
+{
+    bool pin = false;       // a PIN on the console (to ask for)
+    bool patches = false;   // forwarders can start: signature patches not missing
+    bool self = false;      // PlayGuard's own forwarder ready
+    std::vector<std::string> menus;   // the protected menus ready, by name
+    // Those of them started from the HOME menu through the gate once: a way
+    // back seen working, not only made (the PIN screen opened, the menu after).
+    std::vector<std::string> verified;
+    // Forwarders that would open the homebrew menu without the PIN: a menu
+    // not protected, and those another app made (what they start is unknown).
+    std::vector<std::string> open_doors;
+    // Made here, not protected (and not PlayGuard's own): each starts only
+    // its homebrew, but one that writes to the SD card (sd_writers, among
+    // them: a file manager, an installer) could change the lock's file.
+    std::vector<std::string> unprotected, sd_writers;
+    bool ready() const { return this->pin && this->patches && this->self && !this->verified.empty(); }
+    // While locked: both ways still there (else the parent is told).
+    bool routes() const { return this->self && !this->menus.empty(); }
+};
+LockCheck lock_check(const std::vector<Row>& rows, bool pin_set, Patches patches);
+
+// While the homebrew menu is locked, what taking `row` away (deleting it, or
+// its PIN) does to the ways back: nothing (Allowed); one of several
+// protected menus (Confirm: the others remain); PlayGuard's own forwarder,
+// or the last protected menu (Refused: unlock first).
+enum class Guard
+{
+    Allowed,
+    Confirm,
+    Refused,
+};
+Guard way_back_guard(const std::vector<Row>& rows, const Row& row, bool locked);
+// The protected menus ready other than `row`, by name (Confirm's).
+std::vector<std::string> other_menus(const std::vector<Row>& rows, const Row& row);
+
+// Refused at the gate: the name and the day ("2026-10-19", the first ten
+// characters of the log's time) of each. Those refused at least `at_least`
+// times on one day, with their most on a day and that day, in the order first
+// seen: someone trying the PIN.
+struct Refusals
+{
+    std::string name, day;
+    int         count = 0;
+};
+std::vector<Refusals> repeated_refusals(const std::vector<std::pair<std::string, std::string>>& refused, int at_least = 3);
+
+// Why writing to the SD card failed, from what a test write there said
+// (`err`, an errno; 0 when it worked) and the room left: full, or written
+// to by nothing (a card locked, or its folders' archive bit, which hekate's
+// Tools › Arch bit fixes); None when neither shows.
+enum class WriteHint
+{
+    None,
+    Full,
+    ReadOnly,
+};
+WriteHint write_hint(int err, uint64_t free_bytes);
 
 }   // namespace forwarders_logic

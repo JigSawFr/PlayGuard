@@ -47,6 +47,9 @@ Category category(const history::Entry& e)
         k == "rescue")
         return Category::Security;
     if (text::starts_with(k, "outside_") || k == "new_account") return Category::Outside;
+    if (text::ends_with(k, "_forwarder") || k == "forwarder_gone" || text::starts_with(k, "gate_") ||
+        k == "lock_hbmenu" || k == "unlock_hbmenu" || text::starts_with(k, "hbmenu_"))
+        return Category::Homebrew;
     return Category::Other;
 }
 
@@ -59,6 +62,7 @@ bool matches(const history::Entry& e, Filter f)
     case Filter::Security: return category(e) == Category::Security;
     case Filter::Outside: return category(e) == Category::Outside;
     case Filter::Failed: return !e.result.empty();
+    case Filter::Homebrew: return category(e) == Category::Homebrew;
     case Filter::Count: break;
     }
     return false;
@@ -89,7 +93,9 @@ const char* const KINDS[] = { "limits", "level", "custom", "org", "vr", "alarm",
                               "console_lock", "bedtime", "config_reset", "outside_reset", "outside_clock",
                               "outside_limits", "new_account", "time_up", "countdown", "remove_game",
                               "remove_update", "remove_addon", "launch_version", "add_forwarder",
-                              "remove_forwarder", "protect_forwarder", "unprotect_forwarder" };
+                              "remove_forwarder", "protect_forwarder", "unprotect_forwarder",
+                              "forwarder_gone", "lock_hbmenu", "unlock_hbmenu", "hbmenu_restored",
+                              "hbmenu_lock_removed", "gate_open", "gate_free", "gate_refused", "gate_hours" };
 const char* const SOURCES[] = { "uniform", "day", "per_day", "extra", "stop", "restore_extra", "bonus", "restore_bonus", "schedule_end",
                                 "remove", "backup", "undo", "first_steps", "overview", "console_lock", "notices",
                                 "rescue" };

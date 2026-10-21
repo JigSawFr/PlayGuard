@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Console › Forwarders: the homebrew on the HOME menu as games, A on one
+<!-- Console › Forwarders: a card first (the homebrew menu locked or not,
+     the ways back, what opens it without the PIN, the rescue module); the homebrew on the HOME menu as games, A on one
      for its details, a new name or publisher, installing it again or
      deleting it; below, PlayGuard itself on the HOME menu, or another
-     homebrew. The list is rebuilt by source/activity/forwarders_activity.cpp. -->
+     homebrew; last, the homebrew menu locked, so that a homebrew starts only
+     from its forwarder. The list is rebuilt by
+     source/activity/forwarders_activity.cpp. -->
 
 <brls:AppletFrame
     iconInterpolation="linear">
@@ -29,13 +32,20 @@
 
             <brls:Label id="fw_note" text="@i18n/playguard/forwarders/intro" fontSize="20" marginBottom="10" textColor="@theme/cadran/text3"/>
             <brls:Label id="fw_patches" text="" fontSize="20" marginBottom="10" visibility="gone" textColor="@theme/cadran/amber"/>
+            <brls:Box id="fw_summary" width="auto" height="auto" axis="column" alignItems="stretch" marginTop="6" marginBottom="6"/>
             <brls:Header title="@i18n/playguard/forwarders/section_list" marginTop="14" marginBottom="8"/>
             <brls:Box id="fw_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
             <brls:Label id="fw_empty" text="@i18n/playguard/forwarders/none" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:Header title="@i18n/playguard/forwarders/section_add" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="fw_self" title="PlayGuard"/>
             <brls:DetailCell id="fw_other" title="@i18n/playguard/forwarders/other"/>
+            <brls:DetailCell id="fw_reinstall" title="@i18n/playguard/forwarders/reinstall_all"/>
             <brls:Label id="fw_game_note" text="@i18n/playguard/forwarders/game_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <brls:Header id="fw_lock_header" title="@i18n/playguard/hbmenu/section" marginTop="24" marginBottom="8"/>
+            <brls:DetailCell id="fw_lock" title="@i18n/playguard/hbmenu/cell"/>
+            <brls:DetailCell id="fw_protect_all" title="@i18n/playguard/forwarders/protect_all"/>
+            <brls:DetailCell id="fw_lock_check" title="@i18n/playguard/hbmenu/check"/>
+            <brls:Label id="fw_lock_note" text="@i18n/playguard/hbmenu/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
         </brls:Box>
 

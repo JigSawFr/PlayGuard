@@ -29,6 +29,10 @@ bool write_all(const std::vector<Made>& all, std::string* error)
             e["pin"] = true;
             e["gate"] = m.gate;
         }
+        if (m.gone) e["gone"] = true;
+        if (m.pin && m.verified) e["verified"] = true;
+        if (m.pin && m.free_days)
+            e["free"] = { { "days", m.free_days }, { "from", m.free_from }, { "to", m.free_to } };
         list.push_back(e);
     }
     const nlohmann::json doc = { { "forwarders", list } };
@@ -63,6 +67,18 @@ std::vector<Made> list()
         if (m.argv.empty()) m.argv = m.nro;
         m.gate = json_util::string_at(e, "gate");
         m.pin  = json_util::flag_at(e, "pin") && !m.gate.empty();
+        m.gone = json_util::flag_at(e, "gone");
+        m.verified = m.pin && json_util::flag_at(e, "verified");
+        if (const nlohmann::json* f = json_util::object_at(e, "free")) {
+            const int64_t days = json_util::integer_or(*f, "days"), from = json_util::integer_or(*f, "from"),
+                          to = json_util::integer_or(*f, "to");
+            // Kept only as the gate reads it (gate_rule_find): days of a week, minutes of a day, a span.
+            if (m.pin && days > 0 && days <= 0x7F && from >= 0 && from <= 1440 && to >= 0 && to <= 1440 && from != to) {
+                m.free_days = (int)days;
+                m.free_from = (int)from;
+                m.free_to = (int)to;
+            }
+        }
         bool seen = false;
         for (const Made& o : out) seen = seen || o.id == m.id;
         if (!seen) out.push_back(m);

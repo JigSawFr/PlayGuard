@@ -184,6 +184,8 @@ else ()
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/calendar.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gamecheck_rules.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/forwarder_pack.c
+                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gate.c
+                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/hbl_lock.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/rescue.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/write_guard.c)
 endif ()
@@ -192,6 +194,10 @@ endif ()
 list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/extern/qrcodegen/qrcodegen.cpp)
 # JPEG writing for the NRO forwarders' icons (public domain, vendored: extern/stb).
 list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/extern/stb/stb_image_write.c)
+# Fonts and JPEGs for the PIN gate's screen (core/gate_screen.c), on the console.
+if (PLATFORM_SWITCH)
+    list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/extern/stb/pg_stb.c)
+endif ()
 
 program_target(${PROJECT_NAME} "${PLAYGUARD_SRC}")
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
@@ -209,6 +215,7 @@ endif ()
 target_compile_options(${PROJECT_NAME} PRIVATE ${APP_PLATFORM_OPTION} ${PLAYGUARD_WARNINGS})
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/qrcodegen/qrcodegen.cpp PROPERTIES COMPILE_OPTIONS "-w")
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/stb/stb_image_write.c PROPERTIES COMPILE_OPTIONS "-w")
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/stb/pg_stb.c PROPERTIES COMPILE_OPTIONS "-w")
 # The commit built (at configure time): development builds are told apart by
 # it (util/dev_builds.hpp). PLAYGUARD_COMMIT (CI: a pull request's head)
 # wins over the checkout's. Empty outside a git checkout.
@@ -353,7 +360,14 @@ if (PLATFORM_SWITCH)
         COMMAND ${PLAYGUARD_MAKE} --no-print-directory -C ${CMAKE_CURRENT_SOURCE_DIR}/forwarder
         BYPRODUCTS ${FORWARDER_OUT}/forwarder.nso ${FORWARDER_OUT}/forwarder.npdm
         COMMENT "Building the NRO forwarders' loader")
-    add_custom_target(${PROJECT_NAME}.nro ALL DEPENDS ${PROJECT_NAME} playguard_rescue playguard_forwarder
+    # The gate a forwarder protected with the PIN starts first (core/gate.h):
+    # romfs:/gate/gate.nro, written to config/playguard/ when one is made.
+    set(GATE_NRO ${CMAKE_CURRENT_SOURCE_DIR}/gate/out/gate.nro)
+    add_custom_target(playguard_gate
+        COMMAND ${PLAYGUARD_MAKE} --no-print-directory -C ${CMAKE_CURRENT_SOURCE_DIR}/gate
+        BYPRODUCTS ${GATE_NRO}
+        COMMENT "Building the forwarders' PIN gate")
+    add_custom_target(${PROJECT_NAME}.nro ALL DEPENDS ${PROJECT_NAME} playguard_rescue playguard_forwarder playguard_gate
         COMMAND ${NX_NACPTOOL_EXE} --create "PlayGuard" "${PROJECT_AUTHOR}"
                 "${APP_VERSION}" ${PROJECT_NAME}.nacp --titleid=${PROJECT_TITLEID}
         ${ASSEMBLE_RESOURCES}
@@ -363,6 +377,8 @@ if (PLATFORM_SWITCH)
         COMMAND ${CMAKE_COMMAND} -E make_directory ${MERGED_RESOURCES}/forwarder
         COMMAND ${CMAKE_COMMAND} -E copy ${FORWARDER_OUT}/forwarder.nso ${MERGED_RESOURCES}/forwarder/main
         COMMAND ${CMAKE_COMMAND} -E copy ${FORWARDER_OUT}/forwarder.npdm ${MERGED_RESOURCES}/forwarder/main.npdm
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${MERGED_RESOURCES}/gate
+        COMMAND ${CMAKE_COMMAND} -E copy ${GATE_NRO} ${MERGED_RESOURCES}/gate/gate.nro
         COMMAND ${CMAKE_COMMAND} -E remove -f ${MERGED_RESOURCES}/font/switch_font.ttf ${MERGED_RESOURCES}/font/switch_icons.ttf
         COMMAND ${NX_ELF2NRO_EXE} ${PROJECT_NAME}.elf ${PROJECT_NAME}.nro
                 --icon=${PROJECT_ICON} --nacp=${PROJECT_NAME}.nacp

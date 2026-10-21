@@ -7,6 +7,7 @@
 #include "action/data_notice.hpp"
 #include "action/fw_gate.hpp"
 #include "action/game_notice.hpp"
+#include "action/hbmenu_lock.hpp"
 #include "action/notices.hpp"
 #include "action/pt_flow.hpp"
 #include "action/rescue.hpp"
@@ -14,6 +15,7 @@
 #include "action/schedule_flow.hpp"
 #include "action/support_flow.hpp"
 #include "action/update_flow.hpp"
+#include "activity/forwarders_activity.hpp"
 #include "activity/loading_activity.hpp"
 #include "activity/notices_activity.hpp"
 #include "activity/onboarding_activity.hpp"
@@ -180,6 +182,8 @@ void MainActivity::onContentAvailable()
     rollback_flow::note_went_back();
     notices::note_crash();
     rescue::note_version();
+    // The homebrew menu's lock and the forwarders made here (the bell).
+    hbmenu_lock::at_start([]() { brls::Application::pushActivity(new ForwardersActivity()); });
     // Then, with nothing else in front: "What's new" after an update, else the
     // monthly "Support PlayGuard" reminder.
     support_flow::at_start(this);

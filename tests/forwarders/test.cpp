@@ -9,6 +9,7 @@
 #include "check.h"
 #include "fs.hpp"
 #include "temp_dir.hpp"
+#include <cerrno>
 #include <cstring>
 #include <string>
 #include <vector>
@@ -212,6 +213,41 @@ static void test_registry()
     b.pin = false;
     CHECK(forwarders::save(b));
     CHECK(forwarders::find(b.id, &found) && !found.pin && found.gate.empty());
+    // Free hours: kept while protected, as the gate reads them; a broken span is none.
+    b.pin = true;
+    b.gate = "sdmc:/config/playguard/gate.nro";
+    b.free_days = 0x41;
+    b.free_from = 540;
+    b.free_to = 1200;
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.free_days == 0x41 && found.free_from == 540 && found.free_to == 1200);
+    b.free_to = 540;
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.free_days == 0);
+    b.pin = false;
+    b.gate.clear();
+    b.free_days = 0;
+    CHECK(forwarders::save(b));
+
+    // Seen working through the gate: kept while protected.
+    b.pin = true;
+    b.gate = "sdmc:/config/playguard/gate.nro";
+    b.verified = true;
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.verified);
+    b.pin = false;
+    b.gate.clear();
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && !found.verified);
+    b.verified = false;
+
+    // Told gone once: kept, and dropped once it is false again.
+    b.gone = true;
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.gone);
+    b.gone = false;
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && !found.gone);
 
     CHECK(forwarders::forget(a.id));
     all = forwarders::list();
@@ -289,7 +325,10 @@ static void test_merge()
     pinned = merge({ locked }, one, exists, "");
     CHECK(pinned.size() == 1 && pinned[0].pin && pinned[0].state == State::Ready);
     pinned = merge({ locked }, {}, exists, "");
-    CHECK(pinned.size() == 1 && pinned[0].pin && pinned[0].state == State::NotInstalled);
+    CHECK(pinned.size() == 1 && pinned[0].pin && pinned[0].state == State::NotInstalled && !pinned[0].gone_seen);
+    locked.gone = true;
+    pinned = merge({ locked }, {}, exists, "");
+    CHECK(pinned.size() == 1 && pinned[0].gone_seen);
     const Row* self = self_row(rows);
     CHECK(self && self->id == 3);
     CHECK(!self_row(merge({}, on, exists, "")));
@@ -300,6 +339,147 @@ static void test_merge()
     CHECK(default_name("  Goldleaf ", "sdmc:/switch/Goldleaf.nro") == "Goldleaf");
     CHECK(default_name("", "sdmc:/switch/hb/hb-menu.nro") == "hb-menu");
     CHECK(default_name(std::string(100, 'n'), "x").size() == forwarders::MAX_NAME);
+}
+
+static void test_lock_check()
+{
+    using namespace forwarders_logic;
+    CHECK(is_menu("sdmc:/hbmenu.nro") && is_menu("sdmc:/switch/sphaira/sphaira.nro") && is_menu("sdmc:/x/HBMENU.NRO"));
+    CHECK(!is_menu("sdmc:/switch/cyberfoil.nro") && !is_menu("") && !is_menu("sdmc:/switch/sphaira/old_sphaira.nro"));
+
+    Row self;
+    self.id = 1;
+    self.name = "PlayGuard";
+    self.nro = "sdmc:/switch/playguard/playguard.nro";
+    self.self = true;
+    Row menu;
+    menu.id = 2;
+    menu.name = "sphaira";
+    menu.nro = "sdmc:/switch/sphaira/sphaira.nro";
+    menu.pin = true;
+    menu.verified = true;
+    Row game;
+    game.id = 3;
+    game.name = "Cyberfoil";
+    game.nro = "sdmc:/switch/cyberfoil.nro";
+    LockCheck c = lock_check({ self, menu, game }, true, Patches::Ready);
+    CHECK(c.ready() && c.routes() && c.menus == std::vector<std::string>{ "sphaira" } && c.open_doors.empty());
+    CHECK(c.verified == std::vector<std::string>{ "sphaira" });
+    // Protected, never started through the gate: a way back made, not seen working.
+    Row untried = menu;
+    untried.verified = false;
+    c = lock_check({ self, untried }, true, Patches::Ready);
+    CHECK(!c.ready() && c.routes() && c.menus.size() == 1 && c.verified.empty());
+    // Each missing piece refuses it.
+    CHECK(!lock_check({ self, menu }, false, Patches::Ready).ready());
+    CHECK(!lock_check({ self, menu }, true, Patches::Missing).ready());
+    CHECK(lock_check({ self, menu }, true, Patches::Unknown).ready());   // sys-patch there, its log silent
+    c = lock_check({ menu, game }, true, Patches::Ready);
+    CHECK(!c.ready() && !c.self && !c.routes());
+    c = lock_check({ self, game }, true, Patches::Ready);
+    CHECK(!c.ready() && c.menus.empty());
+    // A menu not protected, or not there: no way back, and an open door.
+    Row open_menu = menu;
+    open_menu.pin = false;
+    c = lock_check({ self, open_menu }, true, Patches::Ready);
+    CHECK(c.menus.empty() && c.open_doors == std::vector<std::string>{ "sphaira" });
+    Row gone_menu = menu;
+    gone_menu.state = State::NroMissing;
+    CHECK(lock_check({ self, gone_menu }, true, Patches::Ready).menus.empty());
+    gone_menu.state = State::NotInstalled;
+    c = lock_check({ self, gone_menu }, true, Patches::Ready);
+    CHECK(c.menus.empty() && c.open_doors.empty());
+    Row self_broken = self;
+    self_broken.state = State::GateMissing;
+    CHECK(!lock_check({ self_broken, menu }, true, Patches::Ready).self);
+    // Another app's forwarder: what it starts is unknown, it is told.
+    Row other;
+    other.id = 4;
+    other.name = "Save Keeper";
+    other.state = State::Elsewhere;
+    c = lock_check({ self, menu, other }, true, Patches::Ready);
+    CHECK(c.ready() && c.open_doors == std::vector<std::string>{ "Save Keeper" });
+
+    // Made here and not protected: told, and those that write to the SD card apart.
+    Row installer;
+    installer.id = 5;
+    installer.name = "CyberFoil";
+    installer.nro = "sdmc:/switch/CyberFoil/CyberFoil.nro";
+    c = lock_check({ self, menu, game, installer }, true, Patches::Ready);
+    CHECK(c.ready() && (c.unprotected == std::vector<std::string>{ "Cyberfoil", "CyberFoil" }));
+    CHECK((c.sd_writers == std::vector<std::string>{ "Cyberfoil", "CyberFoil" }));   // both are Cyberfoil
+    installer.pin = true;
+    c = lock_check({ self, menu, installer }, true, Patches::Ready);
+    CHECK(c.unprotected.empty() && c.sd_writers.empty());
+    CHECK(writes_sd("sdmc:/switch/Goldleaf.nro") && writes_sd("sdmc:/switch/NX-Shell/NX-Shell.nro"));
+    CHECK(!writes_sd("sdmc:/switch/StarAtlas.nro") && !writes_sd(""));
+
+    // The hours as the rows say them.
+    const std::vector<std::string> days = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+    CHECK(hours_text(0x41, 540, 1200, days) == "Sat–Sun 09:00–20:00");
+    CHECK(hours_text(0x3E, 0, 1440, days) == "Mon–Fri 00:00–24:00");
+    CHECK(hours_text(0x7F, 1320, 120, days) == "Mon–Sun 22:00–02:00");
+    CHECK(hours_text(0x0A, 600, 660, days) == "Mon, Wed 10:00–11:00");
+}
+
+static void test_guard()
+{
+    using namespace forwarders_logic;
+    Row self;
+    self.id = 1;
+    self.name = "PlayGuard";
+    self.nro = "sdmc:/switch/playguard/playguard.nro";
+    self.self = true;
+    Row sphaira;
+    sphaira.id = 2;
+    sphaira.name = "sphaira";
+    sphaira.nro = "sdmc:/switch/sphaira/sphaira.nro";
+    sphaira.pin = true;
+    Row hbmenu = sphaira;
+    hbmenu.id = 3;
+    hbmenu.name = "hbmenu";
+    hbmenu.nro = "sdmc:/hbmenu.nro";
+    Row game;
+    game.id = 4;
+    game.name = "ftpd";
+    game.nro = "sdmc:/switch/ftpd.nro";
+    game.pin = true;
+    // Not locked: anything goes.
+    CHECK(way_back_guard({ self, sphaira }, self, false) == Guard::Allowed);
+    CHECK(way_back_guard({ self, sphaira }, sphaira, false) == Guard::Allowed);
+    // Locked: PlayGuard's own and the last menu refused, one of two confirmed.
+    CHECK(way_back_guard({ self, sphaira, game }, self, true) == Guard::Refused);
+    CHECK(way_back_guard({ self, sphaira, game }, sphaira, true) == Guard::Refused);
+    CHECK(way_back_guard({ self, sphaira, hbmenu }, sphaira, true) == Guard::Confirm);
+    CHECK(other_menus({ self, sphaira, hbmenu }, sphaira) == std::vector<std::string>{ "hbmenu" });
+    CHECK(way_back_guard({ self, sphaira, game }, game, true) == Guard::Allowed);
+    // Another menu not ready is no way back: the last one stays.
+    Row broken = hbmenu;
+    broken.state = State::NroMissing;
+    CHECK(way_back_guard({ self, sphaira, broken }, sphaira, true) == Guard::Refused);
+    CHECK(way_back_guard({ self, sphaira, broken }, broken, true) == Guard::Allowed);
+    // Not on the HOME menu any more: forgetting it changes nothing.
+    Row gone = self;
+    gone.state = State::NotInstalled;
+    CHECK(way_back_guard({ gone, sphaira }, gone, true) == Guard::Allowed);
+
+    // Refused three times on one day: told, with its worst day.
+    const std::vector<std::pair<std::string, std::string>> refused = {
+        { "sphaira", "2026-10-19 21:03" }, { "ftpd", "2026-10-19 21:04" }, { "sphaira", "2026-10-19 21:05" },
+        { "sphaira", "2026-10-20 08:00" }, { "sphaira", "2026-10-19 22:00" }, { "ftpd", "2026-10-20 10:00" },
+        { "ftpd", "?" },
+    };
+    const auto r = repeated_refusals(refused);
+    CHECK(r.size() == 1 && r[0].name == "sphaira" && r[0].day == "2026-10-19" && r[0].count == 3);
+    CHECK(repeated_refusals(refused, 2).size() == 1);
+    CHECK(repeated_refusals(refused, 1).size() == 2);
+    CHECK(repeated_refusals({}).empty());
+
+    // Why a write failed.
+    CHECK(write_hint(ENOSPC, 1u << 30) == WriteHint::Full);
+    CHECK(write_hint(0, 1000) == WriteHint::Full);
+    CHECK(write_hint(EROFS, 1u << 30) == WriteHint::ReadOnly && write_hint(EACCES, 1u << 30) == WriteHint::ReadOnly);
+    CHECK(write_hint(0, 1u << 30) == WriteHint::None && write_hint(EIO, 1u << 30) == WriteHint::None);
 }
 
 static void test_gate()
@@ -431,6 +611,8 @@ int main()
     test_text();
     test_merge();
     test_gate();
+    test_lock_check();
+    test_guard();
     test_patches();
     return CHECK_DONE("forwarders tests passed");
 }

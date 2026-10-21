@@ -10,3 +10,11 @@ without stdio.
 PlayGuard writes an NRO forwarder's icon with it, when the `.nro`'s own is
 not the 256 × 256 JPEG the HOME menu wants (`source/util/forwarder_icon.cpp`);
 reading images is borealis' stb_image (nanovg).
+
+# pg_stb
+
+`pg_stb.c` builds borealis' own copies of `stb_truetype.h` and `stb_image.h`
+(JPEG only; nanovg's folder, public domain) a second time, static, behind the
+few functions of `pg_stb.h`: the PIN gate of a protected forwarder draws its
+screen with them (`source/core/gate_screen.c`, in `gate/` and in PlayGuard).
+nanovg's own copies use its allocator, which these do not touch.

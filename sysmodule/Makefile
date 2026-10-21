@@ -22,7 +22,7 @@ APP_JSON    := $(TOPDIR)/playguard-rescue.json
 
 # Only these sources — ../source/core also holds the app's libnx service layer,
 # which this sysmodule must not pull in.
-CFILES      := main.c rescue.c
+CFILES      := main.c rescue.c hbl_lock.c
 
 ARCH    := -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 CFLAGS  := -g -Wall -Wextra -Werror -O2 -ffunction-sections $(ARCH) $(INCLUDE) -D__SWITCH__ -std=gnu11

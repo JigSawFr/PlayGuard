@@ -5,6 +5,7 @@
 #include "action/upload_flow.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/cadran_modal.hpp"
+#include "tab/cadran_list.hpp"
 #include "ui/cadran_text.hpp"
 #include "ui/live_prefs.hpp"
 #include "ui/text_size.hpp"
@@ -79,18 +80,20 @@ class DialogScroll : public brls::ScrollingFrame
 };
 }   // namespace
 
-// The text laid out by cadran::dialog_body, `below` under it (the card's
-// width unless it aligns itself), scrolling when taller than the dialog's room.
-static brls::Dialog* body_dialog(const std::string& text, brls::View* below = nullptr)
+brls::Dialog* box_dialog(brls::Box* body)
 {
-    brls::Box* body = cadran::dialog_body(text);
-    if (below) {
-        if (!body->getChildren().empty()) below->setMarginTop(18);
-        body->addView(below);
-    }
     YGNodeCalculateLayout(body->getYGNode(), 720, YGUndefined, YGDirectionLTR);
     const float room = content_height();
     if (YGNodeLayoutGetHeight(body->getYGNode()) <= room) return new brls::Dialog(body);
+    // In a scrolling frame, each line keeps the height of its text (borealis
+    // caps a label at its parent's, which a scrolling body does not settle).
+    std::function<void(brls::View*)> unbounded = [&unbounded](brls::View* view) {
+        view->setShrink(0);
+        if (dynamic_cast<brls::Label*>(view)) YGNodeStyleSetMaxHeight(view->getYGNode(), YGUndefined);
+        if (auto* box = dynamic_cast<brls::Box*>(view))
+            for (brls::View* child : box->getChildren()) unbounded(child);
+    };
+    for (brls::View* child : body->getChildren()) unbounded(child);
     auto* frame = new DialogScroll();
     frame->setHeight(room);
     frame->setScrollingBehavior(brls::ScrollingBehavior::NATURAL);
@@ -101,6 +104,18 @@ static brls::Dialog* body_dialog(const std::string& text, brls::View* below = nu
     auto* dialog = new brls::Dialog(box);
     scroll_with(dialog, frame, body);
     return dialog;
+}
+
+// The text laid out by cadran::dialog_body, `below` under it (the card's
+// width unless it aligns itself), scrolling when taller than the dialog's room.
+static brls::Dialog* body_dialog(const std::string& text, brls::View* below = nullptr)
+{
+    brls::Box* body = cadran::dialog_body(text);
+    if (below) {
+        if (!body->getChildren().empty()) below->setMarginTop(18);
+        body->addView(below);
+    }
+    return box_dialog(body);
 }
 
 brls::Dialog* dialog(const std::string& text)
@@ -175,6 +190,232 @@ void qr_dialog(const std::string& body, const std::string& url)
     code->setAlignSelf(brls::AlignSelf::CENTER);
     auto* dialog = body_dialog(body, code);
     dialog->addButton("hints/ok"_i18n, []() {});
+    dialog->open();
+}
+
+brls::Box* check_row(const CheckLine& line, float size)
+{
+    namespace kit = cadran::kit;
+    auto* row = new brls::Box(brls::Axis::ROW);
+    row->setAlignItems(brls::AlignItems::FLEX_START);
+    const char* color = line.state == Check::Ok     ? "cadran/teal"
+                        : line.state == Check::Warn ? "cadran/amber"
+                        : line.state == Check::Bad  ? "cadran/coral"
+                                                    : "cadran/text3";
+    auto* mark = new kit::Mark(color);
+    mark->setMarginTop(size * 0.3f);
+    mark->setMarginRight(14);
+    mark->setShrink(0);
+    row->addView(mark);
+    brls::Label* text = kit::label(line.text, size, line.state == Check::Info ? "cadran/text2" : "cadran/text");
+    text->setGrow(1.0f);
+    text->setWidth(0);
+    row->addView(text);
+    return row;
+}
+
+namespace
+{
+// A panel of check lines, as dialog_body's tables: the surface, rounded.
+brls::Box* check_panel()
+{
+    auto* panel = new brls::Box(brls::Axis::COLUMN);
+    panel->setAlignItems(brls::AlignItems::STRETCH);
+    panel->setBackgroundColor(brls::Application::getTheme()["cadran/surf2"]);
+    panel->setCornerRadius(14);
+    panel->setPadding(12, 18, 14, 18);
+    return panel;
+}
+}   // namespace
+
+brls::Box* checklist_body(const std::string& title, const std::vector<CheckLine>& lines, const std::string& note,
+                          const std::string& subtitle)
+{
+    namespace kit = cadran::kit;
+    auto* body = new brls::Box(brls::Axis::COLUMN);
+    body->setAlignItems(brls::AlignItems::STRETCH);
+    body->setPadding(30, 40, 20, 40);
+    body->addView(cadran::dialog_title(title));
+    if (!subtitle.empty()) {
+        brls::Label* sub = kit::label(subtitle, 17, "cadran/text2");
+        sub->setMarginTop(6);
+        body->addView(sub);
+    }
+    // A Header line starts a panel of its own, its name small above it.
+    brls::Box* panel = nullptr;
+    for (const CheckLine& line : lines) {
+        if (line.state == Check::Header) {
+            brls::Label* head = kit::label(cadran::upper(line.text), 13, "cadran/text3");
+            head->setMarginTop(16);
+            head->setMarginBottom(6);
+            head->setMarginLeft(4);
+            body->addView(head);
+            panel = check_panel();
+            body->addView(panel);
+            continue;
+        }
+        if (!panel) {
+            panel = check_panel();
+            panel->setMarginTop(16);
+            body->addView(panel);
+        }
+        brls::Box* row = check_row(line, 16.5f);
+        row->setMarginTop(panel->getChildren().empty() ? 0 : 8);
+        panel->addView(row);
+    }
+    if (!note.empty()) {
+        auto* foot = new brls::Box(brls::Axis::ROW);
+        foot->setAlignItems(brls::AlignItems::FLEX_START);
+        foot->setMarginTop(14);
+        CadranIcon* icon = kit::icon("info", 16, "cadran/text3");
+        icon->setMarginTop(2);
+        icon->setMarginRight(10);
+        icon->setShrink(0);
+        foot->addView(icon);
+        brls::Label* small = kit::label(note, 15, "cadran/text3");
+        small->setGrow(1.0f);
+        small->setWidth(0);
+        foot->addView(small);
+        body->addView(foot);
+    }
+    return body;
+}
+
+void notice(const char* icon, Check tone, const std::string& title, const std::string& text)
+{
+    namespace kit = cadran::kit;
+    const char* color = tone == Check::Ok ? "cadran/teal" : tone == Check::Bad ? "cadran/coral" : tone == Check::Warn ? "cadran/amber" : "cadran/text2";
+    const char* soft = tone == Check::Ok ? "cadran/teal_soft" : tone == Check::Bad ? "cadran/coral_soft" : tone == Check::Warn ? "cadran/amber_surf" : "cadran/surf2";
+    auto* body = new brls::Box(brls::Axis::COLUMN);
+    body->setAlignItems(brls::AlignItems::STRETCH);
+    body->setPadding(30, 40, 22, 40);
+    auto* head = new brls::Box(brls::Axis::ROW);
+    head->setAlignItems(brls::AlignItems::CENTER);
+    brls::Box* badge = cadran::dialog_badge(icon, color, soft);
+    badge->setMarginRight(16);
+    head->addView(badge);
+    brls::Label* label = cadran::dialog_title(title);
+    label->setGrow(1.0f);
+    label->setWidth(0);
+    head->addView(label);
+    body->addView(head);
+    brls::Label* words = kit::label(text, 18, "cadran/text2");
+    words->setMarginTop(14);
+    body->addView(words);
+    auto* dialog = box_dialog(body);
+    dialog->addButton("hints/ok"_i18n, []() {});
+    dialog->setCancelable(true);
+    cadran::style_dialog(dialog, cadran::Emphasis::NONE);
+    dialog->open();
+}
+
+namespace
+{
+// How long A is held so far (hold_confirm); 0 once let go.
+struct Held
+{
+    int64_t start = -1, last = 0;
+    bool    done = false;
+    bool    touching = false;          // a finger held on the button
+    std::function<void()> full;        // held long enough
+};
+constexpr int64_t HOLD_US = 2000000;
+// borealis repeats a held key's action after 250 ms, then every 100 ms: a
+// longer gap is a key let go.
+constexpr int64_t LET_GO_US = 350000;
+
+double held_part(Held& h, int64_t now)
+{
+    if (h.start < 0) return 0;
+    if (now - h.last > LET_GO_US) {
+        h.start = -1;
+        return 0;
+    }
+    return std::min(1.0, (double)(now - h.start) / HOLD_US);
+}
+
+// Over the button held: a lighter fill from its left edge as it is held,
+// within its pill; gone when it is let go.
+class HoldFill : public brls::View
+{
+  public:
+    explicit HoldFill(std::shared_ptr<Held> held) : held(std::move(held))
+    {
+        this->setFocusable(false);
+        this->setPositionType(brls::PositionType::ABSOLUTE);
+        this->setPositionTop(0);
+        this->setPositionLeft(0);
+        this->setWidthPercentage(100);
+        this->setHeightPercentage(100);
+    }
+    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style, brls::FrameContext*) override
+    {
+        const int64_t now = brls::getCPUTimeUsec();
+        // A finger on the button: held as long as it stays (no key repeats).
+        if (this->held->touching) this->held->last = now;
+        const double part = held_part(*this->held, now);
+        if (part >= 1 && !this->held->done && this->held->full) {
+            this->held->done = true;
+            // Not while drawing: closing the dialog changes the views drawn.
+            brls::sync([held = this->held]() { held->full(); });
+        }
+        if (part <= 0) return;
+        nvgSave(vg);
+        nvgIntersectScissor(vg, x, y, (float)(width * part), height);
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, x, y, width, height, height / 2);
+        nvgFillColor(vg, nvgRGBA(255, 255, 255, 70));
+        nvgFill(vg);
+        nvgRestore(vg);
+    }
+
+  private:
+    std::shared_ptr<Held> held;
+};
+}   // namespace
+
+void hold_confirm(brls::Box* body, const std::string& hold_label, std::function<void()> on_yes,
+                  std::function<void()> on_no)
+{
+    namespace kit = cadran::kit;
+    auto held = std::make_shared<Held>();
+    // How: the A key's bubble, then the words.
+    auto* how = new brls::Box(brls::Axis::ROW);
+    how->setAlignItems(brls::AlignItems::CENTER);
+    how->setJustifyContent(brls::JustifyContent::CENTER);
+    how->setMarginTop(16);
+    brls::Box* a = kit::key("A", 22);
+    a->setMarginRight(8);
+    how->addView(a);
+    how->addView(kit::label(brls::getStr("playguard/common/hold_hint", hold_label), 15, "cadran/text2"));
+    body->addView(how);
+    auto* dialog = box_dialog(body);
+    dialog->addButton("hints/cancel"_i18n, [on_no]() { if (on_no) on_no(); });
+    dialog->addButton(hold_label, []() {});
+    on_cancel(dialog, on_no);
+    cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
+    held->full = [dialog, on_yes]() { dialog->close([on_yes]() { if (on_yes) on_yes(); }); };
+    if (auto* yes = dynamic_cast<brls::Box*>(dialog->getView("brls/dialog/button2"))) {
+        yes->addView(new HoldFill(held));
+        yes->registerAction(hold_label, brls::BUTTON_A, [held](brls::View*) {
+            const int64_t now = brls::getCPUTimeUsec();
+            if (held->done) return true;
+            if (held->start < 0 || now - held->last > LET_GO_US) held->start = now;
+            held->last = now;
+            if (now - held->start >= HOLD_US) {
+                held->done = true;
+                held->full();
+            }
+            return true;
+        }, false, true, brls::SOUND_NONE);
+        // A finger held on it does the same; lifted or moved away, it stops.
+        yes->addGestureRecognizer(new brls::TapGestureRecognizer([held](brls::TapGestureStatus status, brls::Sound*) {
+            const bool down = status.state == brls::GestureState::UNSURE || status.state == brls::GestureState::START ||
+                              status.state == brls::GestureState::STAY;
+            if (down && !held->touching) held->start = held->last = brls::getCPUTimeUsec();
+            held->touching = down;
+        }));
+    }
     dialog->open();
 }
 

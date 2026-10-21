@@ -15,6 +15,8 @@ set(RESCUE_REV_SOURCES
     sysmodule/playguard-rescue.json
     source/core/rescue.c
     source/core/rescue.h
+    source/core/hbl_lock.c
+    source/core/hbl_lock.h
     source/core/pctl_ops_internal.h)
 set(_rescue_all "")
 foreach (_f ${RESCUE_REV_SOURCES})
