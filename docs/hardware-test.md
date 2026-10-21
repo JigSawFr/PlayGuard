@@ -16,18 +16,21 @@ Each step: what to do, then what must happen. ☐ is to tick.
 - ☐ The console set to another language (System Settings › System › Language): the icons stay.
 - ☐ *Change the icon* on one: the grid shows the album's screenshots at once, their thumbnails filling in, each with the game it was taken in (caps:a; *Taken outside a game* for the HOME menu's). A screenshot moved with R, then A: the HOME menu shows the square *After* showed.
 - ☐ *Delete*, then ZR within 8 seconds: back on the HOME menu, with the same icon.
+- ☐ Ⓐ on a forwarder: the sheet over the list, its icon and state at the top, its sections; a touch on the screen outside it closes it, as B does. A long list (*Pause after refused PINs*, a day's limit in *Play timer*) scrolls with the stick and with a finger, the value set checked.
+- ☐ *Details* on a protected one: a line per rule with its icon; Ⓐ on *Hours without the PIN* opens its hours, on *Publisher* its keyboard.
 
 ## 2. The PIN gate
 
-- ☐ *Protect with the PIN* on sphaira, then start it from the HOME menu: the gate's screen (night blue, *Protected by PlayGuard*, sphaira's icon and name, in the console's language), then the console's PIN screen.
-- ☐ The PIN entered: sphaira starts. In PlayGuard: *History* has *Forwarder opened with the PIN*, and sphaira's row says *seen working*.
+- ☐ *Ask for the PIN* switched on for sphaira, then start it from the HOME menu: the gate's screen (night blue, *Protected by PlayGuard*, sphaira's icon and name, in the console's language), then the console's PIN screen.
+- ☐ The switch turned off, then ZR within 8 seconds: protected again (the PIN asked first when turning it off).
+- ☐ The PIN entered: sphaira starts. In PlayGuard: *History* has *Forwarder opened with the PIN*, and sphaira's icon has a check.
 - ☐ B on the PIN screen: back to the HOME menu, the gate saying *PIN not entered*, then *Refused today: 1*; once more: *Refused today: 2* while it asks.
 - ☐ Refused five times in a row (the default pause): the fifth says *It asks again at …*; started again before then, it says it is paused and never shows the PIN screen. In PlayGuard: the bell has the pause; *Lift the pause* (the PIN asked) and it asks again at once.
-- ☐ *Hours without the PIN* now included: it starts without the PIN, the gate saying so; its row and the gate's screen name the hours.
+- ☐ *Hours without the PIN* now included: it starts without the PIN, the gate saying so; the gate's screen names the hours and shows an open padlock after *Protected by PlayGuard*, sphaira's row in PlayGuard the same icon, *Details* the hours.
 - ☐ *Hours it never opens* now included: the gate says *Not at this time* and the hours, even with a PIN on the console; outside them, the PIN again.
 - ☐ *Pause after refused PINs › Never*: refused ten times, no pause.
 - ☐ *Hours without the PIN › Monday to Friday, and the weekend apart*: on a weekday in its span, no PIN; at the weekend, the weekend's span.
-- ☐ *Close it once today's play time is used up*, a play timer with no time left today: the gate says *Today's play time is used up*, even with a PIN entered; time added (PlayGuard or the parent's app), it asks for the PIN again.
+- ☐ *Closed once today's play time is used up* switched on, a play timer with no time left today: the gate says *Today's play time is used up*, even with a PIN entered; time added (PlayGuard or the parent's app), it asks for the PIN again.
 - ☐ From a computer, `config/playguard/gate_rules.txt` written with a line giving sphaira every hour: the gate still asks for the PIN (its rules are in the forwarder).
 - ☐ From a computer, `config/playguard/gate-….nro` replaced by another `.nro` (hbmenu's): sphaira's forwarder ends with error 2347-0100 and does not start it; PlayGuard's next start writes the gate back.
 - ☐ A forwarder protected by the previous PlayGuard: the bell says to make it again; *Make again*, then its hours without the PIN work.

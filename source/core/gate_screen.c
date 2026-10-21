@@ -173,6 +173,31 @@ static void padlock(Canvas *cv, float x, float y, float s, Rgb c)
     fill_circle(cv, x + w / 2, y + s - body * 0.55f, s * 0.08f, NAVY, 1);
 }
 
+// The rules' icons (GATE_RULE_*), each `s` square, its top left at (x, y),
+// drawn as the app's (view/cadran_icon.cpp): an open padlock, a square, a timer.
+static void open_padlock(Canvas *cv, float x, float y, float s, Rgb c)
+{
+    const float w = s * 0.78f, body = s * 0.5f, bx = x + (s - w) / 2, top = y + s - body;
+    // The shackle up and to the left, its right leg out of the body: open.
+    arc(cv, bx + w * 0.35f, top - s * 0.12f, w * 0.26f, s * 0.11f, -3.1415927f, 3.1415927f, c, 1);
+    fill_rrect(cv, bx + w * 0.35f - w * 0.26f - s * 0.055f, top - s * 0.12f, s * 0.11f, s * 0.14f, s * 0.03f, c, 1);
+    fill_rrect(cv, bx, top, w, body, s * 0.1f, c, 1);
+    fill_circle(cv, bx + w / 2, top + body * 0.48f, s * 0.07f, NAVY, 1);
+}
+
+static void stop_square(Canvas *cv, float x, float y, float s, Rgb c)
+{
+    fill_rrect(cv, x + s * 0.2f, y + s * 0.2f, s * 0.6f, s * 0.6f, s * 0.1f, c, 1);
+}
+
+static void timer(Canvas *cv, float x, float y, float s, Rgb c)
+{
+    const float cx = x + s / 2, cy = y + s * 0.56f, r = s * 0.36f;
+    arc(cv, cx, cy, r, s * 0.1f, 0, 6.2831853f, c, 1);
+    fill_rrect(cv, cx - s * 0.04f, cy - r * 0.72f, s * 0.08f, r * 0.8f, s * 0.04f, c, 1);   // the hand, at 12
+    fill_rrect(cv, cx - s * 0.12f, y + s * 0.02f, s * 0.24f, s * 0.08f, s * 0.04f, c, 1);   // the button
+}
+
 // ---------------------------------------------------------------- text
 
 static int utf8_next(const char **s)
@@ -353,6 +378,16 @@ void gate_screen_draw(uint32_t *px, int w, int h, int stride, const GateScreen *
     stroke_rrect(&cv, tx, 322, bw, 54, 27, 2, TEAL, 0.55f);
     padlock(&cv, tx + 26, 334, 30, TEAL);
     text(&cv, s->brand_font, 26, tx + 70, 358, BADGE, TEAL, 1, 0);
+    // After it, the rules it carries, a round chip each.
+    float rx = tx + bw + 14;
+    void (*const DRAW[])(Canvas *, float, float, float, Rgb) = { open_padlock, stop_square, timer };
+    for (unsigned i = 0; i < 3; i++) {
+        if (!(s->rules & (1u << i))) continue;
+        fill_circle(&cv, rx + 27, 349, 27, TEAL, 0.14f);
+        arc(&cv, rx + 27, 349, 26, 2, 0, 6.2831853f, TEAL, 0.55f);
+        DRAW[i](&cv, rx + 12, 334, 30, TEAL);
+        rx += 54 + 10;
+    }
 
     // How it goes.
     const Rgb line = s->state == GateScreen_Asking ? TEXT2 : accent;

@@ -2,8 +2,9 @@
 // it is inaccurate, and sets the network clock from a public NTP server (the
 // play timer relies on the network clock). The measurement and the write are
 // clock_flow's; this screen adds the server choice, the result text, the
-// 2-minute countdown, a spinner while measuring and, when no server answers,
-// "Set the network clock to the console clock".
+// 2-minute countdown, the measurement in a dialog (a spinner, then the
+// result) and, when no server answers, "Set the network clock to the console
+// clock".
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -52,7 +53,14 @@ class ClockTab : public TabBase
     void choose_server();
     void enter_custom();
     void set_server(const std::string& host, const std::string& region);
+    // Measures with a spinner in a dialog, then shows the result in another
+    // (show_measurement); the screen keeps it in one line.
     void measure();
+    // The result as a dialog: the offset in words, large; the servers' time
+    // against the network clock; each server's answer; what needs the parent
+    // in amber; then Set the clock (or, no server answering, the console clock).
+    void show_measurement(const clock_flow::Measurement& m, const std::string& warn);
+    static size_t answered(const clock_flow::Measurement& m);   // servers that answered
     void apply();
     void copy();
     // The result under Measure: plain text, or, no server answering, an
@@ -69,8 +77,6 @@ class ClockTab : public TabBase
     BRLS_BIND(brls::DetailCell, server_cell, "ck_server");
     BRLS_BIND(brls::DetailCell, custom,   "ck_custom");
     BRLS_BIND(brls::DetailCell, measure_cell, "ck_measure");
-    BRLS_BIND(brls::Box,        progress, "ck_progress");
-    BRLS_BIND(brls::Label,      progress_text, "ck_progress_text");
     BRLS_BIND(brls::Label,      result,   "ck_result");
     BRLS_BIND(brls::Label,      result_title, "ck_result_title");
     BRLS_BIND(brls::Box,        result_card,  "ck_result_card");

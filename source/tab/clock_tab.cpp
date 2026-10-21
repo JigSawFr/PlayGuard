@@ -12,6 +12,7 @@
 #include "core/sim_env.h"
 #include "ui/cadran_frame.hpp"
 #include "ui/cadran_kit.hpp"
+#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/ntp_servers.hpp"
@@ -63,7 +64,6 @@ ClockTab::ClockTab()
     result->setSingleLine(false);
     result_title->setSingleLine(false);
     warning->setSingleLine(false);
-    progress_text->setSingleLine(false);
     // Only a notification at start-up (it never sets the clock): PlayGuard's own setting.
     check_at_start->init("playguard/tools/clock_check"_i18n, config::get().clock_check_at_start, [](bool on) {
         config::get().clock_check_at_start = on;
@@ -93,7 +93,6 @@ ClockTab::ClockTab()
         if (!ui::refuse_read_only()) this->copy();
         return true;
     });
-    ui::set_visible(progress.getView(), false);
     ui::set_visible(warning.getView(), false);
     // Clocks tick and a measurement expires: keep the screen current.
     this->enable_auto_refresh(1000);
@@ -302,25 +301,216 @@ void ClockTab::measure()
     ui::set_visible(copy_cell.getView(), false);
     ui::set_visible(warning.getView(), false);
     this->show_result("");
-    // A spinner says it is working; the text says with whom.
-    ui::set_text(progress_text, brls::getStr("playguard/clock/measuring", this->server));
-    ui::set_visible(progress.getView(), true);
-
+    // A spinner says it is working, the text with whom; Cancel (or B) drops
+    // the late answer.
+    auto cancelled = std::make_shared<bool>(false);
+    auto* progress = new brls::Dialog(cadran::wait_body(brls::getStr("playguard/clock/measuring", this->server)));
     std::weak_ptr<bool> weak = this->alive;
-    clock_flow::measure(this->server, [this, weak](const clock_flow::Measurement& m) {
-        if (weak.expired()) return;   // the tab was closed meanwhile
+    ui::add_cancel(progress, [this, weak, cancelled]() {
+        *cancelled = true;
+        if (!weak.expired()) this->busy = false;
+    });
+    progress->open();
+
+    clock_flow::measure(this->server, [this, weak, progress, cancelled](const clock_flow::Measurement& m) {
+        if (weak.expired() || *cancelled) return;   // the tab or the dialog was closed meanwhile
+        *cancelled = true;
         this->busy = false;
-        ui::set_visible(progress.getView(), false);
         this->last = m;
         this->offline = offline_clock_logic::offer(m.ok, this->snap) != offline_clock_logic::Offer::None;
-        this->show_result(m.report, this->offline);
+        // On the screen, the outcome in one line (the details are the dialog's).
+        if (m.ok) {
+            const std::string offset = m.offset_known ? clock_flow::offset_text(m.offset) : "playguard/common/unavailable"_i18n;
+            this->show_result(brls::getStr("playguard/clock/last_result", offset, (int)this->answered(m), (int)m.lines.size()));
+        } else {
+            this->show_result(m.report, this->offline);
+        }
         // The servers disagreeing, and a write that would be refused, in amber.
         std::string warn = m.warning;
         if (m.ok && this->autosync_off) warn += (warn.empty() ? "" : "\n") + "playguard/clock/autosync_off_note"_i18n;
         ui::set_text(warning, warn);
         ui::set_visible(warning.getView(), !warn.empty());
         this->refresh();   // shows "Set the network clock"
+        progress->close([this, weak, m, warn]() {
+            brls::sync([this, weak, m, warn]() {
+                if (!weak.expired()) this->show_measurement(m, warn);
+            });
+        });
     });
+}
+
+size_t ClockTab::answered(const clock_flow::Measurement& m)
+{
+    return (size_t)std::count_if(m.lines.begin(), m.lines.end(), [](const clock_flow::ServerLine& l) { return l.ok; });
+}
+
+void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::string& warn)
+{
+    namespace kit = cadran::kit;
+    brls::Theme theme = brls::Application::getTheme();
+    // Within a second: nothing to set (the servers answer to the second).
+    const bool on_time = m.ok && m.offset_known && m.offset >= -1 && m.offset <= 1;
+    const char* tone = !m.ok ? "cadran/amber" : on_time ? "cadran/teal" : m.offset_known ? "cadran/amber" : "cadran/text2";
+
+    auto* body = new brls::Box(brls::Axis::COLUMN);
+    body->setAlignItems(brls::AlignItems::STRETCH);
+    body->setPadding(30, 40, 22, 40);
+
+    // The answer first, large: how far off the network clock is.
+    auto* head = new brls::Box(brls::Axis::ROW);
+    head->setAlignItems(brls::AlignItems::CENTER);
+    brls::Box* badge = !m.ok    ? cadran::dialog_badge("alert", "cadran/amber", "cadran/amber_surf")
+                       : on_time ? cadran::dialog_badge("check", "cadran/teal", "cadran/teal_soft")
+                                 : cadran::dialog_badge("timer", tone, m.offset_known ? "cadran/amber_surf" : "cadran/surf2");
+    badge->setMarginRight(18);
+    head->addView(badge);
+    auto* words = new brls::Box(brls::Axis::COLUMN);
+    words->setGrow(1.0f);
+    words->setWidth(0);
+    brls::Label* kicker = kit::label("", kit::TEXT_KICKER, "cadran/text2");
+    kit::set_kicker(kicker, "playguard/clock/dialog_kicker"_i18n);
+    words->addView(kicker);
+    std::string headline = !m.ok            ? "playguard/clock/dialog_none"_i18n
+                           : m.offset_known ? clock_flow::offset_text(m.offset)
+                                            : "playguard/common/unavailable"_i18n;
+    brls::Label* title = kit::display(headline, m.ok ? 34 : kit::TEXT_TITLE, tone);
+    title->setMarginTop(4);
+    words->addView(title);
+    head->addView(words);
+    body->addView(head);
+
+    // A rounded panel of rows: a key, a value (and, quieter, what follows it).
+    auto panel = [&](const std::string& name) {
+        if (!name.empty()) {
+            brls::Label* label = kit::label("", kit::TEXT_KICKER, "cadran/text2");
+            kit::set_kicker(label, name);
+            label->setMarginTop(20);
+            label->setMarginBottom(8);
+            body->addView(label);
+        }
+        auto* table = new brls::Box(brls::Axis::COLUMN);
+        table->setAlignItems(brls::AlignItems::STRETCH);
+        table->setBackgroundColor(theme["cadran/surf2"]);
+        table->setCornerRadius(kit::RADIUS_ROW);
+        table->setPadding(6, 20, 6, 20);
+        if (name.empty()) table->setMarginTop(20);
+        body->addView(table);
+        return table;
+    };
+    auto row = [&](brls::Box* table, const char* mark, const std::string& key, const std::string& value,
+                   const char* value_key, const std::string& extra) {
+        if (!table->getChildren().empty()) {
+            brls::View* above = table->getChildren().back();
+            above->setLineBottom(1);
+            above->setLineColor(theme["cadran/line"]);
+        }
+        auto* line = new brls::Box(brls::Axis::ROW);
+        line->setAlignItems(brls::AlignItems::CENTER);
+        line->setPaddingTop(9);
+        line->setPaddingBottom(9);
+        if (mark) {
+            auto* dot = new kit::Mark(mark);
+            dot->setMarginRight(12);
+            line->addView(dot);
+        }
+        brls::Label* k = kit::label(key, kit::TEXT_BODY, "cadran/text2");
+        k->setGrow(1.0f);
+        k->setWidth(0);
+        k->setMarginRight(16);
+        line->addView(k);
+        brls::Label* v = kit::label(value, kit::TEXT_BODY, value_key);
+        v->setHorizontalAlign(brls::HorizontalAlign::RIGHT);
+        v->setShrink(0);
+        line->addView(v);
+        if (!extra.empty()) {
+            brls::Label* e = kit::label(extra, kit::TEXT_META, "cadran/text3");
+            e->setMinWidth(64);
+            e->setHorizontalAlign(brls::HorizontalAlign::RIGHT);
+            e->setMarginLeft(12);
+            e->setShrink(0);
+            line->addView(e);
+        }
+        table->addView(line);
+    };
+    // A time with its date only when it is not the console's day.
+    const std::string today = split_time(ui::time_text(this->snap.user_time)).first;
+    auto when = [&today](uint64_t t) {
+        const auto parts = split_time(ui::time_text(t));
+        return parts.first.empty() || parts.first == today ? parts.second : parts.first + " " + parts.second;
+    };
+
+    if (m.ok) {
+        // The two times side by side: what the servers say, what the network clock says.
+        brls::Box* compare = panel("");
+        row(compare, nullptr, "playguard/clock/dialog_servers_time"_i18n, when(m.unix_seconds), "cadran/text", "");
+        if (m.offset_known)
+            row(compare, nullptr, "playguard/clock/dialog_network_time"_i18n, when(m.network_seconds),
+                on_time ? "cadran/text" : "cadran/amber", "");
+    }
+    // Each server asked: its time, or why it did not answer.
+    brls::Box* servers = panel(brls::getStr("playguard/clock/dialog_asked", (int)this->answered(m), (int)m.lines.size()));
+    for (const auto& l : m.lines) {
+        if (l.ok) row(servers, "cadran/teal", l.host, when(l.unix_seconds), "cadran/text", l.offset);
+        else row(servers, "cadran/amber", l.host, l.error, "cadran/amber", "");
+    }
+
+    // What needs the parent, in an amber card: the servers disagreeing, a
+    // write that would be refused, no server (and the console clock instead).
+    std::string notes = warn;
+    if (!m.ok) notes = this->offline ? "playguard/clock/offline_hint"_i18n : "";
+    if (!notes.empty()) {
+        auto* card = new brls::Box(brls::Axis::ROW);
+        card->setAlignItems(brls::AlignItems::FLEX_START);
+        card->setBackgroundColor(theme["cadran/amber_surf"]);
+        card->setBorderColor(theme["cadran/amber_line"]);
+        card->setBorderThickness(1);
+        card->setCornerRadius(kit::RADIUS_ROW);
+        card->setPadding(12, 18, 12, 16);
+        card->setMarginTop(16);
+        CadranIcon* icon = kit::icon("alert", 20, "cadran/amber");
+        icon->setMarginTop(2);
+        icon->setMarginRight(12);
+        icon->setShrink(0);
+        card->addView(icon);
+        brls::Label* label = kit::label(notes, 17, "cadran/amber");
+        label->setGrow(1.0f);
+        label->setWidth(0);
+        card->addView(label);
+        body->addView(card);
+    }
+    // How long the result can be used to set the clock.
+    const bool can_set = m.ok && !this->autosync_off && !app::read_only();
+    if (can_set) {
+        brls::Label* note = kit::label(brls::getStr("playguard/clock/dialog_valid", (int)(clock_flow::LIFETIME_S / 60)),
+                                       kit::TEXT_META, "cadran/text3");
+        note->setMarginTop(14);
+        body->addView(note);
+    }
+
+    auto* dialog = ui::box_dialog(body);
+    std::weak_ptr<bool> weak = this->alive;
+    if (can_set) {
+        // On time: closing is the answer, setting stays offered.
+        dialog->addButton(on_time ? "hints/ok"_i18n : "hints/cancel"_i18n, []() {});
+        dialog->addButton(on_time ? "playguard/clock/dialog_set_anyway"_i18n : "playguard/clock/apply_confirm"_i18n,
+                          [this, weak]() {
+            brls::sync([this, weak]() { if (!weak.expired()) this->apply(); });
+        });
+        dialog->setCancelable(true);
+        cadran::style_dialog(dialog, on_time ? cadran::Emphasis::NONE : cadran::Emphasis::PRIMARY);
+    } else if (!m.ok && this->offline && !app::read_only()) {
+        dialog->addButton("hints/cancel"_i18n, []() {});
+        dialog->addButton("playguard/clock/guided_copy"_i18n, [this, weak]() {
+            brls::sync([this, weak]() { if (!weak.expired()) this->copy(); });
+        });
+        dialog->setCancelable(true);
+        cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
+    } else {
+        dialog->addButton("hints/ok"_i18n, []() {});
+        dialog->setCancelable(true);
+        cadran::style_dialog(dialog, cadran::Emphasis::NONE);
+    }
+    dialog->open();
 }
 
 void ClockTab::show_result(const std::string& text, bool offline)

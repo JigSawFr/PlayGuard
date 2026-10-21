@@ -29,6 +29,12 @@ typedef enum {
     GateScreen_Limit,        // the day's play time used up: back to the HOME menu
 } GateScreenState;
 
+// The rules a forwarder carries (GateScreen.rules), each an icon by the
+// badge, as PlayGuard's list of forwarders shows them.
+#define GATE_RULE_FREE   1u   // hours without the PIN: an open padlock
+#define GATE_RULE_CLOSED 2u   // hours it never opens: a square (stop)
+#define GATE_RULE_LIMIT  4u   // closed once today's play time is used up: a timer
+
 typedef struct {
     const unsigned char *brand_font;   // Sora (Latin): "PlayGuard", the badge, the clock
     const unsigned char *text_font;    // any language (the console's own font): the name, the lines
@@ -44,6 +50,7 @@ typedef struct {
     // amber), or when it starts without the PIN (teal).
     const char          *note;
     int                  note_warn;
+    unsigned             rules;        // GATE_RULE_*, 0: none shown
 } GateScreen;
 
 // Draws `s` into `px` (`w` x `h` pixels, `stride` pixels a row, RGBA: R in
