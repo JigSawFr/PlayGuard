@@ -348,7 +348,7 @@
         "limit_note": "达到限制时，主机会显示“时间到”，然后按照“时间到时”的设置中断游戏或仅提醒。",
         "unsaved": "未保存的进度可能会丢失：请先让孩子存档。",
         "profile_already": "配置“{}”已经应用。",
-        "bedtime_by_day": "按星期设置…",
+        "bedtime_by_day": "按星期",
         "bedtime_by_day_title": "就寝提醒（按星期）",
         "bedtime_weekdays": "周一至周五",
         "bedtime_weekend": "周六和周日",

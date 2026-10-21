@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <functional>
 #include <string>
+#include <vector>
 
 #include "ui/cadran_kit.hpp"
 
@@ -78,6 +79,20 @@ struct Progress
     void show(float fraction, const std::string& detail);
 };
 Progress progress_body(const std::string& heading, const std::string& title, const std::string& note = "");
+
+// A time of day chosen with the stick among `times` (minutes after midnight,
+// in order, evenly apart): up / down the next or the one before, L / R an
+// hour (or a tap on the arrows), shown from the first at or after `initial`;
+// OK gives `on_value` the time. `off` (when it has an action) is the button
+// before OK, else Cancel; `other` (when it has one) is on Y, shown with the
+// keys (a tap works too): the dialog closes, then it runs. B cancels.
+struct TimeButton
+{
+    std::string label;
+    std::function<void()> action;
+};
+void prompt_time(const std::string& header, std::vector<int> times, int initial, TimeButton off, TimeButton other,
+                 std::function<void(int)> on_value);
 
 // A duration chosen with the stick, in place of the system number pad: up /
 // down 15 min, L / R 5 min (or a tap on the arrows), from 0 to 24:00, OK

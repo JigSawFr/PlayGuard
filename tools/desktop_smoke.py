@@ -1961,13 +1961,13 @@ if not GAMES:
     shot("23_time_up_confirm") # the text wraps inside the dialog (ui::dialog measures it)
     key("Escape")              # cancelled: nothing written
 
-    # Bedtime: the alarm picker (on 21:00), 21:30, confirmed with the unlock the
-    # running timer needs; the tab must then show it.
+    # Bedtime: the alarm set with the stick (from 21:00), 21:30, confirmed with
+    # the unlock the running timer needs; the tab must then show it.
     key("Left")                # the bedtime chip
     key("Return")
     shot("23_bedtime_picker")
-    key("Down", 2)             # 21:30
-    key("Return")
+    key("Up", 2)               # 21:30
+    key("Return")              # OK
     shot("23_bedtime_confirm")
     key("Right")               # Unlock and apply
     key("Return")
@@ -1975,19 +1975,24 @@ if not GAMES:
     if not any(m.startswith("Bedtime alarm changed.") for m in messages()):
         fail("the bedtime alarm was not changed: " + repr(messages()[-3:]))
 
-    # By day of the week (the list's last line): the weekend alone at 22:30;
-    # the weekdays keep 21:30, and the tab says the days differ.
+    # By day (Y in the bedtime dialog): the weekend alone at 22:30; the
+    # weekdays keep 21:30, and the tab says the days differ.
     key("Return")
-    key("Down", 12)            # By day of the week...
-    key("Return")
+    key("y")                   # By day
     shot("23_bedtime_by_day")  # each set of days with its time
     key("Down")                # Saturday and Sunday
     key("Return")
-    key("Down", 4)             # 21:30 → 22:30
-    key("Return")
+    key("Up", 4)               # 21:30 → 22:30
+    key("Return")              # OK
     key("Right")               # Unlock and apply
     key("Return")
-    if sum(m.startswith("Bedtime alarm changed.") for m in messages()) < 2:
+    # The write and its toast come after the unlock, off the UI thread: a
+    # slow runner may not have logged it yet.
+    for _ in range(20):
+        if sum(m.startswith("Bedtime alarm changed.") for m in messages()) >= 2:
+            break
+        time.sleep(0.5)
+    else:
         fail("the weekend's bedtime alarm was not changed: " + repr(messages()[-3:]))
     time.sleep(4.5)            # its toast gone: the next screens are references
 

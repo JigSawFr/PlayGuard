@@ -348,7 +348,7 @@
         "limit_note": "Bij de limiet toont de console \"Tijd is om\" en onderbreekt hij daarna de game of waarschuwt hij alleen, volgens \"Als de tijd om is\".",
         "unsaved": "Niet-opgeslagen voortgang kan verloren gaan: laat het kind eerst opslaan.",
         "profile_already": "Het profiel ‘{}’ is al toegepast.",
-        "bedtime_by_day": "Per dag van de week...",
+        "bedtime_by_day": "Per dag",
         "bedtime_by_day_title": "Bedtijdalarm, per dag",
         "bedtime_weekdays": "Maandag tot en met vrijdag",
         "bedtime_weekend": "Zaterdag en zondag",

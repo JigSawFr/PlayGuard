@@ -232,8 +232,8 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 ### Bedtime alarm
 
-- The alarm time (16:00 to 23:45, or off) and when play is allowed again (05:00 to 09:00), the same every day.
-- Or, from *By day of the week…* at the end of the alarm's list, Monday to Friday, the weekend or one day, the other days keeping theirs (each set of days listed with its time). When the days differ, the tab says *Varies by day*, and the week on *Play timer* shows each day's alarm under its name.
+- The alarm time (16:00 to 23:45, or *Off*) and when play is allowed again (05:00 to 09:00), the same every day, set with the stick: up and down a quarter of an hour, L and R an hour.
+- Or, with Ⓨ *By day* in the alarm's dialog, Monday to Friday, the weekend or one day, the other days keeping theirs (each set of days listed with its time). When the days differ, the tab says *Varies by day*, and the week on *Play timer* shows each day's alarm under its name.
 - Its place in the play-timer settings, worked out from the companion app's settings, is verified on a console (22.0.0); PlayGuard still changes it only once the console reports what PlayGuard reads there, checks the console's answer after the change and puts the previous settings back if it differs.
 
 ### Extra time settings and Advanced

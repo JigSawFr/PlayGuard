@@ -348,7 +348,7 @@
         "limit_note": "À la limite, la console affiche « temps écoulé », puis suspend le jeu ou se contente de prévenir, selon « Quand le temps est écoulé ».",
         "unsaved": "La progression non sauvegardée peut être perdue : laissez l'enfant sauvegarder d'abord.",
         "profile_already": "Le profil « {} » est déjà appliqué.",
-        "bedtime_by_day": "Par jour de la semaine...",
+        "bedtime_by_day": "Par jour",
         "bedtime_by_day_title": "Alarme du coucher, par jour",
         "bedtime_weekdays": "Du lundi au vendredi",
         "bedtime_weekend": "Samedi et dimanche",

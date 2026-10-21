@@ -348,7 +348,7 @@
         "limit_note": "At the limit the console shows \"Time's up\", then suspends the game or only warns, as set in \"When the time is up\".",
         "unsaved": "Unsaved progress may be lost: let the child save first.",
         "profile_already": "The profile \"{}\" is already in place.",
-        "bedtime_by_day": "By day of the week...",
+        "bedtime_by_day": "By day",
         "bedtime_by_day_title": "Bedtime alarm, by day",
         "bedtime_weekdays": "Monday to Friday",
         "bedtime_weekend": "Saturday and Sunday",

@@ -348,7 +348,7 @@
         "limit_note": "Al llegar al límite, la consola muestra «Se acabó el tiempo» y luego suspende el juego o solo avisa, según «Cuando se acabe el tiempo».",
         "unsaved": "Se puede perder el progreso no guardado: deja que el niño guarde antes.",
         "profile_already": "El perfil «{}» ya está aplicado.",
-        "bedtime_by_day": "Por día de la semana...",
+        "bedtime_by_day": "Por día",
         "bedtime_by_day_title": "Alarma de hora de dormir, por día",
         "bedtime_weekdays": "De lunes a viernes",
         "bedtime_weekend": "Sábado y domingo",

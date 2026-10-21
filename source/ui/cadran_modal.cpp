@@ -536,6 +536,107 @@ void cadran::prompt_minutes(const std::string& header, uint16_t initial, std::fu
     dialog->open();
 }
 
+void cadran::prompt_time(const std::string& header, std::vector<int> times, int initial, TimeButton off,
+                         TimeButton other, std::function<void(int)> on_value)
+{
+    namespace kit = cadran::kit;
+    if (times.empty()) return;
+    brls::Theme theme = brls::Application::getTheme();
+    // The time shown: its place in `times`, the first at or after `initial`.
+    size_t first = 0;
+    while (first + 1 < times.size() && times[first] < initial) first++;
+    auto at = std::make_shared<size_t>(first);
+    auto* body = new brls::Box(brls::Axis::COLUMN);
+    body->setAlignItems(brls::AlignItems::CENTER);
+    body->setPadding(30, 40, 22, 40);
+    brls::Label* title = kit::display(header, kit::TEXT_TITLE);
+    title->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    body->addView(title);
+    CadranIcon* up = kit::icon("caret-up", 30, "cadran/teal");
+    up->setMarginTop(18);
+    body->addView(up);
+    auto* value = new CadranDigits();
+    value->setFontSize(56);
+    value->setTextColor(theme["cadran/text"]);
+    const auto text = [](int t) { return fmt::format("{:02d}:{:02d}", t / 60, t % 60); };
+    value->setText(text(times[first]));
+    body->addView(value);
+    CadranIcon* down = kit::icon("caret-down", 30, "cadran/teal");
+    body->addView(down);
+    // The keys, as prompt_minutes': the arrows a step, L and R an hour, Y the
+    // other way to choose.
+    auto* keys = new brls::Box(brls::Axis::ROW);
+    keys->setAlignItems(brls::AlignItems::CENTER);
+    keys->setMarginTop(16);
+    const auto key = [](const char* letter) {
+        brls::Box* bubble = kit::key(letter);
+        bubble->setMarginRight(4);
+        return bubble;
+    };
+    keys->addView(kit::icon("caret-up", 18, "cadran/text3"));
+    keys->addView(kit::icon("caret-down", 18, "cadran/text3"));
+    const int step_min = times.size() > 1 ? std::max(1, times[1] - times[0]) : 15;
+    brls::Label* step_text = kit::label(ui::fmt_played((uint16_t)step_min), 16, "cadran/text3");
+    step_text->setMarginLeft(6);
+    step_text->setMarginRight(22);
+    keys->addView(step_text);
+    keys->addView(key("L"));
+    keys->addView(key("R"));
+    keys->addView(kit::label(ui::fmt_played(60), 16, "cadran/text3"));
+    brls::Box* other_key = nullptr;
+    if (other.action) {
+        other_key = new brls::Box(brls::Axis::ROW);
+        other_key->setAlignItems(brls::AlignItems::CENTER);
+        other_key->setMarginLeft(22);
+        other_key->addView(key("Y"));
+        other_key->addView(kit::label(other.label, 16, "cadran/text3"));
+        keys->addView(other_key);
+    }
+    body->addView(keys);
+
+    auto* dialog = new brls::Dialog(body);
+    const auto move = [at, value, times, text](int delta) {
+        *at = (size_t)std::max(0, std::min((int)times.size() - 1, (int)*at + delta));
+        value->setText(text(times[*at]));
+    };
+    const int per_hour = std::max(1, 60 / step_min);
+    brls::View* frame = dialog->getAppletFrame();
+    for (const auto& [button, delta] : { std::pair<brls::ControllerButton, int>{ brls::BUTTON_NAV_UP, 1 },
+                                         { brls::BUTTON_NAV_DOWN, -1 }, { brls::BUTTON_RB, per_hour },
+                                         { brls::BUTTON_LB, -per_hour } })
+        frame->registerAction("", button, [move, delta = delta](brls::View*) {
+            move(delta);
+            return true;
+        }, true, true, brls::SOUND_FOCUS_CHANGE);
+    up->addGestureRecognizer(new brls::TapGestureRecognizer(up, [move]() { move(1); }));
+    down->addGestureRecognizer(new brls::TapGestureRecognizer(down, [move]() { move(-1); }));
+    if (other.action) {
+        const auto open_other = [dialog, action = other.action]() { dialog->close(action); };
+        frame->registerAction(other.label, brls::BUTTON_Y, [open_other](brls::View*) {
+            open_other();
+            return true;
+        });
+#if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
+        // The desktop build: the keyboard has no Ⓨ, so the Y key (as the main screen).
+        frame->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Y), [open_other](brls::View*) {
+            open_other();
+            return true;
+        });
+#endif
+        other_key->addGestureRecognizer(new brls::TapGestureRecognizer(other_key, open_other));
+    }
+    if (off.action) dialog->addButton(off.label, off.action);
+    else dialog->addButton("hints/cancel"_i18n, []() {});
+    dialog->addButton("hints/ok"_i18n, [at, times, on_value]() {
+        if (on_value) on_value(times[*at]);
+    });
+    dialog->setCancelable(true);
+    style_dialog(dialog, Emphasis::PRIMARY);
+    // A time is set, then confirmed: A right after the arrows is OK.
+    if (brls::View* ok = dialog->getView("brls/dialog/button2")) dialog->setLastFocusedView(ok);
+    dialog->open();
+}
+
 brls::View* cadran::toast_icon(bool done)
 {
     CadranIcon* icon = cadran::kit::icon(done ? "check" : "alert", 22, done ? "cadran/teal_fill" : "cadran/amber_fill");
