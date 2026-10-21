@@ -2021,7 +2021,6 @@
         "removed": "Scheduled profile removed."
     },
     "sigpatch": {
-        "details": "What was found",
         "set_aside": "Set the sigpatch files aside",
         "confirm": "Move the sigpatch files (.ips for es, fs and the loader) to {}? Nothing is deleted: moving them back undoes it. sys-patch then patches alone from the next start; restart the console.",
         "hekate": "hekate's bootloader/patches.ini stays: if hekate_ipl.ini still has kip1patch=nosigchk, remove that line before you boot with hekate's fss0.",
