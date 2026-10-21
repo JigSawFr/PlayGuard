@@ -27,6 +27,7 @@ Result splGetConfig(SplConfigItem item, u64 *out)
     if (item == 65000) { *out = (1ULL << 56) | (12ULL << 48) | (0ULL << 40) | 0x17000000ULL; return 0; }
     if (item == 65007) { if (m.emummc_fail) return 1; *out = m.emummc; return 0; }
     if (item == 65005) { if (m.blank_fail) return 1; *out = m.blank; return 0; }
+    if (item == 15) { *out = 0x0123456789ABCDEFULL; return 0; }
     return 1;
 }
 AppletType appletGetAppletType(void) { return m.applet; }
@@ -73,6 +74,7 @@ int main(void)
     CHECK(si.emummc_valid && !si.emummc && sysinfo_storage(&si) == SysStorage_SysMMC);
     CHECK(si.blank_valid && !si.blank);
     CHECK(si.serial_valid && strcmp(si.serial, "XAW10000000001") == 0);
+    CHECK(si.device_id_valid && si.device_id == 0x0123456789ABCDEFULL);
     sysinfo_get(&si);
     CHECK(m.spl_inits == 1); /* cached */
     CHECK(si.hos_version >= MAKEHOSVERSION(21, 0, 0));
@@ -124,6 +126,7 @@ int main(void)
     m.spl_fail = true;
     si = get();
     CHECK(!si.ams_valid && !si.emummc_valid && sysinfo_storage(&si) == SysStorage_Unknown);
+    CHECK(!si.device_id_valid);
 
     char buf[16];
     sysinfo_version_string(MAKEHOSVERSION(22, 5, 0), buf, sizeof(buf));
