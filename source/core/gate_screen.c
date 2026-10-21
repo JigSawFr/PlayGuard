@@ -307,7 +307,7 @@ void gate_screen_draw(uint32_t *px, int w, int h, int stride, const GateScreen *
     }
 
     // Cadran's dial on the right: its glow, two rings, the minutes, the day's arc.
-    const Rgb accent = s->state == GateScreen_Refused || s->state == GateScreen_Closed ? CORAL
+    const Rgb accent = s->state == GateScreen_Refused || s->state == GateScreen_Closed || s->state == GateScreen_Limit ? CORAL
                        : s->state == GateScreen_Error || s->state == GateScreen_Paused ? AMBER
                                                                                          : TEAL;
     const float dx = 1130, dy = 340;

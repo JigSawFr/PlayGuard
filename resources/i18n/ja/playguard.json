@@ -592,6 +592,9 @@
         "dns_note": "Atmosphère の DNS リダイレクト（atmosphere/hosts）が任天堂のみまもり設定サーバーをほかへ向けています。スマホアプリは同期できないため、ここでの設定は上書きされません。"
     },
     "security": {
+        "headline_none": "暗証番号が未設定：誰でも設定を変更できます",
+        "headline_unlocked": "一時的に解除中",
+        "headline_active": "暗証番号で保護されています",
         "section_status": "状態",
         "pin": "暗証番号",
         "restrictions": "制限が有効",
@@ -692,6 +695,10 @@
         "note_old_module": "暗証番号なしではここから何も変更できません。PlayGuardは通常どおり起動します。パソコンでモジュールを更新してください：PlayGuard {}のplayguard-rescue.zipをSDカードのルートに展開し、RESCUEファイルを置き直してから本体を再起動します。"
     },
     "tools": {
+        "headline_kicker": "このゲーム機",
+        "headline_ok": "確認することはありません",
+        "headline_one": "確認が必要な項目：1件",
+        "headline": "確認が必要な項目：{}件",
         "section_diag": "診断",
         "section_system": "システム",
         "export": "診断レポートをエクスポート",
@@ -1039,7 +1046,6 @@
         "hours_to": "終了",
         "hours_set": "{}は暗証番号なしで起動します：{}",
         "hours_none": "{}はいつでも暗証番号を求めます",
-        "hours_err": "時間帯を保存できませんでした",
         "state_pin_hours": "暗証番号（{}を除く）",
         "day_sun": "日",
         "day_mon": "月",
@@ -1081,7 +1087,36 @@
         "pause_cell": "暗証番号の拒否後の一時停止",
         "pause_default": "標準",
         "paused_line": "{}：{}まで",
-        "paused_title": "フォワーダーが暗証番号の拒否で一時停止中"
+        "paused_title": "フォワーダーが暗証番号の拒否で一時停止中",
+        "state_limit": "今日の時間が終わると利用不可",
+        "state_remake": "作り直しが必要",
+        "action_limit_on": "今日のプレイ時間が終わったら閉じる",
+        "action_limit_off": "今日のプレイ時間の後も開けるようにする",
+        "limit_on": "今日の時間が終わると利用不可",
+        "limit_off": "今日の時間の後も開けます",
+        "limit_set": "{}は今日のプレイ時間が終わると閉じます",
+        "limit_unset": "{}は今日のプレイ時間の後も閉じなくなりました",
+        "hours_apart": "月曜〜金曜と、週末を別に",
+        "hours_from_of": "{}：開始",
+        "hours_to_of": "{}：終了",
+        "remake": "作り直す",
+        "remake_confirm": "保護されたこれらのフォワーダーを作り直しますか？{}。ルール（時間、一時停止）はフォワーダー自体に入り、SDカードからは変更できません。また、起動前にゲートのファイルが確認されます。",
+        "remade_n": "作り直しました：{}",
+        "fix_remake": "以前に保護したフォワーダーを作り直す",
+        "remake_title": "作り直しが必要な保護されたフォワーダー",
+        "remake_detail": "{}：以前のPlayGuardで作成されました。作り直すまでは、暗証番号なしの時間は使われず（暗証番号を求めます）、SDカード上で変更されたゲートも起動してしまいます。",
+        "state_pin_rules": "暗証番号、独自のルールあり",
+        "week_cell": "今週の試行",
+        "week_title": "今週のゲートでの試行",
+        "week_sub": "今日を含む過去7日間",
+        "week_opened": "開いた回数：{}",
+        "week_refused": "拒否：{}（{}）",
+        "week_none_refused": "拒否された暗証番号はありません",
+        "week_blocked": "開かなかった回数（一時停止、利用不可、時間切れ）：{}",
+        "week_empty": "過去7日間に試されたフォワーダーはありません。",
+        "week_note": "今週の拒否：{}、その前の週：{}。",
+        "climb_title": "いつもより多くの暗証番号が拒否されました",
+        "climb_detail": "過去7日間にゲートで{}回暗証番号が拒否されました（その前の週は{}回）。"
     },
     "hbmenu": {
         "section": "Homebrewメニュー",
@@ -1367,7 +1402,11 @@
         "presses_left": "あと{}回押すと開発者モードになります。",
         "presses_left_one": "あと1回押すと開発者モードになります。",
         "report_upload": "オンラインで送信",
-        "glow": "背景のグロー"
+        "glow": "背景のグロー",
+        "self_test": "本体のセルフテスト",
+        "self_test_written": "{}に保存しました：プルリクエストに貼り付けてください。",
+        "self_test_not_written": "保存できませんでした：{}",
+        "self_test_tally": "成功{}、注意{}、失敗{}、未確認{}"
     },
     "dev_build": {
         "open": "別のビルドをインストール",
@@ -1387,7 +1426,8 @@
         "busy": "すでに実行中です…",
         "list_failed": "ビルドの一覧を取得できませんでした: {}",
         "list_stale": "リストを更新できませんでした ({})。前回のリストを表示します。",
-        "downloading": "ビルドをダウンロードしています…\n{} / {} MB",
+        "downloading": "ビルドをダウンロードしています",
+        "downloaded_mb": "{} / {} MB",
         "failed": "ビルドをインストールできませんでした: {}\n\nインストール済みの PlayGuard は変更されていません。",
         "done_manual": "{} をインストールしました。PlayGuard を閉じて、もう一度開いてください。",
         "no_path": "PlayGuard は自身の .nro ファイルの場所を把握していないため（hbloader を使わずに起動しましたか？）、置き換えられません。GitHub から手動でインストールしてください。",
@@ -1534,7 +1574,9 @@
             "gate_closed": "フォワーダー利用不可（利用不可の時間）",
             "gate_closed_hours": "フォワーダーの利用不可の時間",
             "gate_pause": "暗証番号の拒否後の一時停止",
-            "gate_pause_lifted": "フォワーダーの一時停止を解除"
+            "gate_pause_lifted": "フォワーダーの一時停止を解除",
+            "gate_limit": "フォワーダー利用不可（今日のプレイ時間が終了）",
+            "gate_limit_set": "今日のプレイ時間後はフォワーダー利用不可"
         },
         "sources": {
             "uniform": "毎日同じ上限",

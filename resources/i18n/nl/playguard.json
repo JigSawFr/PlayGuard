@@ -592,6 +592,9 @@
         "dns_note": "De DNS-omleiding van Atmosphère (atmosphere/hosts) stuurt de server voor ouderlijk toezicht van Nintendo ergens anders heen: de smartphone-app kan niet synchroniseren en overschrijft de instellingen hier dus niet."
     },
     "security": {
+        "headline_none": "Nog geen pincode: iedereen kan de instellingen wijzigen",
+        "headline_unlocked": "Voorlopig ontgrendeld",
+        "headline_active": "Beschermd met de pincode",
         "section_status": "Status",
         "pin": "Pincode",
         "restrictions": "Beperkingen ingeschakeld",
@@ -692,6 +695,10 @@
         "note_old_module": "Zonder de pincode kan hier niets worden gewijzigd, en PlayGuard opent zoals gewoonlijk. Werk de module bij vanaf een computer: pak playguard-rescue.zip van PlayGuard {} uit in de hoofdmap van de SD-kaart, zet het RESCUE-bestand terug en start de console opnieuw."
     },
     "tools": {
+        "headline_kicker": "Deze console",
+        "headline_ok": "Niets te controleren",
+        "headline_one": "1 punt te controleren",
+        "headline": "{} punten te controleren",
         "section_diag": "Diagnose",
         "section_system": "Systeem",
         "export": "Een diagnoserapport exporteren",
@@ -1039,7 +1046,6 @@
         "hours_to": "Tot",
         "hours_set": "{} start zonder pincode: {}",
         "hours_none": "{} vraagt op elk uur om de pincode",
-        "hours_err": "De uren konden niet worden opgeslagen",
         "state_pin_hours": "pincode, behalve {}",
         "day_sun": "zo",
         "day_mon": "ma",
@@ -1081,7 +1087,36 @@
         "pause_cell": "Pauze na geweigerde pincodes",
         "pause_default": "standaard",
         "paused_line": "{}: tot {}",
-        "paused_title": "Een forwarder is gepauzeerd na geweigerde pincodes"
+        "paused_title": "Een forwarder is gepauzeerd na geweigerde pincodes",
+        "state_limit": "gesloten zodra de tijd van vandaag op is",
+        "state_remake": "opnieuw te maken",
+        "action_limit_on": "Sluiten zodra de speeltijd van vandaag op is",
+        "action_limit_off": "Ook na de speeltijd van vandaag laten openen",
+        "limit_on": "gesloten zodra de tijd van vandaag op is",
+        "limit_off": "opent ook na de tijd van vandaag",
+        "limit_set": "{} sluit zodra de speeltijd van vandaag op is",
+        "limit_unset": "{} sluit niet meer na de speeltijd van vandaag",
+        "hours_apart": "Maandag tot vrijdag, en het weekend apart",
+        "hours_from_of": "{}: vanaf",
+        "hours_to_of": "{}: tot",
+        "remake": "Opnieuw maken",
+        "remake_confirm": "Deze beveiligde forwarders opnieuw maken? {}. Hun regels (de uren, de pauze) gaan in de forwarder zelf, waar de SD-kaart ze niet kan wijzigen, en het bestand van de poort wordt vóór de start gecontroleerd.",
+        "remade_n": "Opnieuw gemaakt: {}",
+        "fix_remake": "De eerder beveiligde forwarders opnieuw maken",
+        "remake_title": "Beveiligde forwarders om opnieuw te maken",
+        "remake_detail": "{}: gemaakt door een oudere PlayGuard. Tot ze opnieuw gemaakt zijn, gelden hun uren zonder pincode niet (de pincode wordt gevraagd) en zou een op de SD-kaart gewijzigde poort toch starten.",
+        "state_pin_rules": "Pincode, met eigen regels",
+        "week_cell": "Pogingen deze week",
+        "week_title": "De pogingen bij de poort deze week",
+        "week_sub": "De laatste zeven dagen, vandaag meegerekend",
+        "week_opened": "Geopend: {}",
+        "week_refused": "Geweigerd: {} ({})",
+        "week_none_refused": "Geen pincode geweigerd",
+        "week_blocked": "Niet geopend (gepauzeerd, gesloten, tijd op): {}",
+        "week_empty": "De laatste zeven dagen is geen forwarder geprobeerd.",
+        "week_note": "Geweigerd deze week: {}; de week ervoor: {}.",
+        "climb_title": "Meer geweigerde pincodes dan normaal",
+        "climb_detail": "{} pincodes geweigerd bij de poort in de laatste zeven dagen, {} de week ervoor."
     },
     "hbmenu": {
         "section": "Homebrewmenu",
@@ -1367,7 +1402,11 @@
         "presses_left": "Nog {} keer drukken om de ontwikkelaarsmodus aan te zetten.",
         "presses_left_one": "Nog 1 keer drukken om de ontwikkelaarsmodus aan te zetten.",
         "report_upload": "Online versturen",
-        "glow": "Achtergrondgloed"
+        "glow": "Achtergrondgloed",
+        "self_test": "Zelftest van de console",
+        "self_test_written": "Opgeslagen in {}: plak het in de pull request.",
+        "self_test_not_written": "Niet opgeslagen: {}",
+        "self_test_tally": "{} geslaagd, {} om te weten, {} mislukt, {} niet gecontroleerd"
     },
     "dev_build": {
         "open": "Andere build installeren",
@@ -1387,7 +1426,8 @@
         "busy": "Al bezig...",
         "list_failed": "Kon de builds niet ophalen: {}",
         "list_stale": "Kan de lijst niet vernieuwen ({}): de laatste wordt getoond.",
-        "downloading": "Build downloaden...\n{} van {} MB",
+        "downloading": "Build downloaden",
+        "downloaded_mb": "{} van {} MB",
         "failed": "Kon de build niet installeren: {}\n\nDe geïnstalleerde PlayGuard is ongewijzigd.",
         "done_manual": "{} is geïnstalleerd. Sluit PlayGuard en open het opnieuw om hem te gebruiken.",
         "no_path": "PlayGuard weet niet waar zijn .nro-bestand staat (gestart zonder hbloader?) en kan het dus niet vervangen. Installeer de build handmatig vanaf GitHub.",
@@ -1534,7 +1574,9 @@
             "gate_closed": "Forwarder gesloten (uren zonder toegang)",
             "gate_closed_hours": "Uren zonder toegang van een forwarder",
             "gate_pause": "Pauze na geweigerde pincodes",
-            "gate_pause_lifted": "Pauze van een forwarder opgeheven"
+            "gate_pause_lifted": "Pauze van een forwarder opgeheven",
+            "gate_limit": "Forwarder gesloten (speeltijd van vandaag op)",
+            "gate_limit_set": "Forwarder gesloten na de speeltijd van vandaag"
         },
         "sources": {
             "uniform": "Elke dag dezelfde limiet",

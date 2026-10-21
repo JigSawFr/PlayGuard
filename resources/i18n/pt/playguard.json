@@ -592,6 +592,9 @@
         "dns_note": "O redirecionamento DNS do Atmosphère (atmosphere/hosts) desvia o servidor do controlo parental da Nintendo: a aplicação móvel não consegue sincronizar, por isso não substitui as definições feitas aqui."
     },
     "security": {
+        "headline_none": "Ainda sem PIN: qualquer pessoa pode alterar as definições",
+        "headline_unlocked": "Desbloqueado por agora",
+        "headline_active": "Protegido pelo PIN",
         "section_status": "Estado",
         "pin": "PIN",
         "restrictions": "Restrições ativas",
@@ -692,6 +695,10 @@
         "note_old_module": "Sem o PIN não é possível alterar nada aqui, e o PlayGuard abre como habitualmente. Atualize o módulo a partir de um computador: extraia o playguard-rescue.zip do PlayGuard {} na raiz do cartão SD, volte a colocar o ficheiro RESCUE e reinicie a consola."
     },
     "tools": {
+        "headline_kicker": "Esta consola",
+        "headline_ok": "Nada a verificar",
+        "headline_one": "1 coisa a verificar",
+        "headline": "{} coisas a verificar",
         "section_diag": "Diagnóstico",
         "section_system": "Sistema",
         "export": "Exportar relatório de diagnóstico",
@@ -1039,7 +1046,6 @@
         "hours_to": "Até",
         "hours_set": "{} inicia sem o PIN: {}",
         "hours_none": "{} pede o PIN a qualquer hora",
-        "hours_err": "Não foi possível guardar as horas",
         "state_pin_hours": "PIN, exceto {}",
         "day_sun": "dom",
         "day_mon": "seg",
@@ -1081,7 +1087,36 @@
         "pause_cell": "Pausa após PIN recusados",
         "pause_default": "predefinição",
         "paused_line": "{}: até às {}",
-        "paused_title": "Um forwarder está em pausa após PIN recusados"
+        "paused_title": "Um forwarder está em pausa após PIN recusados",
+        "state_limit": "fechado quando o tempo de hoje acabar",
+        "state_remake": "a refazer",
+        "action_limit_on": "Fechá-lo quando o tempo de jogo de hoje acabar",
+        "action_limit_off": "Deixá-lo abrir também depois do tempo de jogo de hoje",
+        "limit_on": "fechado quando o tempo de hoje acabar",
+        "limit_off": "abre também depois do tempo de hoje",
+        "limit_set": "{} fecha quando o tempo de jogo de hoje acabar",
+        "limit_unset": "{} já não fecha depois do tempo de jogo de hoje",
+        "hours_apart": "De segunda a sexta, e o fim de semana à parte",
+        "hours_from_of": "{}: a partir das",
+        "hours_to_of": "{}: até às",
+        "remake": "Refazer",
+        "remake_confirm": "Refazer estes forwarders protegidos? {}. As regras (as horas, a pausa) passam para o próprio forwarder, onde o cartão SD não as pode alterar, e o ficheiro da porta é verificado antes de arrancar.",
+        "remade_n": "Refeitos: {}",
+        "fix_remake": "Refazer os forwarders protegidos antes",
+        "remake_title": "Forwarders protegidos a refazer",
+        "remake_detail": "{}: feitos por um PlayGuard anterior. Até serem refeitos, as horas sem PIN não são respeitadas (o PIN é pedido) e uma porta alterada no cartão SD arrancaria na mesma.",
+        "state_pin_rules": "PIN, com regras próprias",
+        "week_cell": "Tentativas da semana",
+        "week_title": "As tentativas na porta esta semana",
+        "week_sub": "Os últimos sete dias, hoje incluído",
+        "week_opened": "Aberto: {}",
+        "week_refused": "Recusado: {} ({})",
+        "week_none_refused": "Nenhum PIN recusado",
+        "week_blocked": "Não aberto (em pausa, fechado, tempo esgotado): {}",
+        "week_empty": "Nenhum forwarder foi tentado nos últimos sete dias.",
+        "week_note": "Recusas esta semana: {}; a semana anterior: {}.",
+        "climb_title": "Mais PIN recusados do que o habitual",
+        "climb_detail": "{} PIN recusados na porta nos últimos sete dias, {} na semana anterior."
     },
     "hbmenu": {
         "section": "Menu homebrew",
@@ -1367,7 +1402,11 @@
         "presses_left": "Prima mais {} vezes para ativar o modo de programador.",
         "presses_left_one": "Prima mais 1 vez para ativar o modo de programador.",
         "report_upload": "Enviar online",
-        "glow": "Halo de fundo"
+        "glow": "Halo de fundo",
+        "self_test": "Autoteste da consola",
+        "self_test_written": "Guardado em {}: cole-o no pull request.",
+        "self_test_not_written": "Não guardado: {}",
+        "self_test_tally": "{} aprovados, {} a saber, {} falhados, {} não verificados"
     },
     "dev_build": {
         "open": "Instalar outra compilação",
@@ -1387,7 +1426,8 @@
         "busy": "Já em curso...",
         "list_failed": "Não foi possível listar as compilações: {}",
         "list_stale": "Não foi possível atualizar a lista ({}): é mostrada a última.",
-        "downloading": "A transferir a versão...\n{} de {} MB",
+        "downloading": "A transferir a versão",
+        "downloaded_mb": "{} de {} MB",
         "failed": "Não foi possível instalar a compilação: {}\n\nO PlayGuard instalado não mudou.",
         "done_manual": "{} está instalada. Feche o PlayGuard e abra-o de novo para a usar.",
         "no_path": "O PlayGuard não sabe onde está o seu ficheiro .nro (iniciado sem hbloader?), por isso não o pode substituir. Instale a compilação manualmente a partir do GitHub.",
@@ -1534,7 +1574,9 @@
             "gate_closed": "Forwarder fechado (horas sem acesso)",
             "gate_closed_hours": "Horas sem acesso de um forwarder",
             "gate_pause": "Pausa após PIN recusados",
-            "gate_pause_lifted": "Pausa de um forwarder levantada"
+            "gate_pause_lifted": "Pausa de um forwarder levantada",
+            "gate_limit": "Forwarder fechado (tempo de jogo de hoje esgotado)",
+            "gate_limit_set": "Forwarder fechado depois do tempo de jogo de hoje"
         },
         "sources": {
             "uniform": "Mesmo limite todos os dias",

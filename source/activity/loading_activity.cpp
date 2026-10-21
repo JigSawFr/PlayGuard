@@ -5,7 +5,19 @@ using namespace brls::literals;
 
 void LoadingActivity::onContentAvailable()
 {
-    this->bar->setBrand(true);   // the brand's screen, whatever the theme
+    // The light theme: its cool white, the wordmark and the bar in its inks,
+    // so the screen does not flash navy before the first one (the icon keeps
+    // its tile). Else the brand's navy, as the store banner.
+    const bool light = brls::Application::getPlatform()->getThemeVariant() == brls::ThemeVariant::LIGHT;
+    this->bar->setBrand(!light);
+    if (light) {
+        brls::Theme theme = brls::Application::getTheme();
+        this->root->setBackgroundColor(theme["brls/background"]);
+        this->anchor->setColor(theme["brls/background"]);
+        this->wordmark->setImageFromRes("img/wordmark-light.png");
+        this->tagline->setTextColor(theme["cadran/text2"]);
+        this->step_text->setTextColor(theme["cadran/text2"]);
+    }
     if (this->mode == Mode::Closing) {
         this->step_text->setText("playguard/loading/step_closing"_i18n);
         this->bar->setProgress(1.0f);

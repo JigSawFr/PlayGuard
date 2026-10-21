@@ -40,9 +40,20 @@ struct Made
     // days 0 for none.
     int         free_days = 0;
     int         free_from = 0, free_to = 0;
+    // A second span of them (the weekend's, the first one the weekdays'):
+    // days 0 for none.
+    int         free2_days = 0;
+    int         free2_from = 0, free2_to = 0;
     // Protected: hours when it never opens, the PIN or not (GATE_CLOSED_NAME).
     int         closed_days = 0;
     int         closed_from = 0, closed_to = 0;
+    // Protected: closed once the day's play time is used up (the console's
+    // play timer), the PIN or not (core/gate.h's GateRules.limit).
+    bool        limit = false;
+    // Protected, built with its rules in its gate's argv and the gate's
+    // SHA-256 for its loader (GateRules.carried): one made before reads them
+    // from the SD card, and is made again (forwarder_flow::at_start).
+    bool        carried = false;
     // Its HOME menu icon from a screenshot of the album ("sdmc:/Nintendo/
     // Album/…jpg"), else the .nro's own.
     std::string icon;

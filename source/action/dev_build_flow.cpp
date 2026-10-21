@@ -81,7 +81,8 @@ std::string file_path(const std::string& sd)
     return root == "/" ? sd : root + sd;
 }
 
-// The download's dialog: a bar, "3 of 7 MB" and Cancel (B too), updated
+// The download's dialog (cadran::progress_body): the build, a bar, the share
+// and "3 of 7 MB", and Cancel (B too), updated
 // from the download thread (at most once per percent, through brls::sync).
 // Cancel sets the flag the download checks (it stops within a second) and
 // closes the dialog at once; nothing touches the dialog after it closed,
@@ -89,14 +90,9 @@ std::string file_path(const std::string& sd)
 class DownloadProgress
 {
   public:
-    explicit DownloadProgress(uint64_t size) : size(size)
+    DownloadProgress(const std::string& name, uint64_t size) : size(size)
     {
-        this->label = cadran::kit::label("", 19, "cadran/text");
-        this->label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-        this->label->setAlignSelf(brls::AlignSelf::STRETCH);
-        this->label->setMarginBottom(20);
-        this->bar = new cadran::kit::Bar();
-        this->bar->setWidth(BAR_WIDTH);
+        this->body = cadran::progress_body("playguard/dev_build/downloading"_i18n, name);
         // Its own button, not the dialog's: a dialog's button acts once the
         // dialog is gone, and the download must stop updating it before.
         auto* cancel = new brls::Button();
@@ -104,18 +100,13 @@ class DownloadProgress
         cadran::style_button(cancel);
         cancel->setWidth(260);
         cancel->setMarginTop(28);
+        cancel->setAlignSelf(brls::AlignSelf::CENTER);
         cancel->registerClickAction([this](brls::View*) {
             this->cancel();
             return true;
         });
-        auto* box = new brls::Box(brls::Axis::COLUMN);
-        box->setAlignItems(brls::AlignItems::CENTER);
-        box->setJustifyContent(brls::JustifyContent::CENTER);
-        box->setPadding(40, 40, 32, 40);
-        box->addView(this->label);
-        box->addView(this->bar);
-        box->addView(cancel);
-        this->dialog = new brls::Dialog(box);
+        this->body.box->addView(cancel);
+        this->dialog = new brls::Dialog(this->body.box);
         this->dialog->setCancelable(false);   // B: below, through cancel()
         this->dialog->getAppletFrame()->registerAction(
             "hints/cancel"_i18n, brls::BUTTON_B, [this](brls::View*) {
@@ -149,13 +140,11 @@ class DownloadProgress
     }
 
   private:
-    static constexpr float BAR_WIDTH = 480.0f;
     const uint64_t size;
     std::atomic<int> percent{ -1 };
     std::atomic<bool> cancelled{ false };
     brls::Dialog* dialog = nullptr;   // null once it is closing: never touched again
-    brls::Label* label = nullptr;
-    cadran::kit::Bar* bar = nullptr;
+    cadran::Progress body;
 
     void cancel()
     {
@@ -168,10 +157,9 @@ class DownloadProgress
     {
         if (!this->dialog) return;
         const float part = total ? std::min(1.0f, (float)done / (float)total) : 0.0f;
-        this->bar->set(part);
         // Whole MB, the total rounded up (never "0 of 0"), what came in down.
         const uint64_t mb = 1024 * 1024;
-        this->label->setText(brls::getStr("playguard/dev_build/downloading", (int)(done / mb), (int)((total + mb - 1) / mb)));
+        this->body.show(part, brls::getStr("playguard/dev_build/downloaded_mb", (int)(done / mb), (int)((total + mb - 1) / mb)));
     }
 };
 
@@ -212,7 +200,7 @@ void install(const dev_builds::Build& b)
     if (s_busy) return;
     s_busy = true;
     const std::string target = file_path(sd_path());
-    auto progress = std::make_shared<DownloadProgress>(b.size);
+    auto progress = std::make_shared<DownloadProgress>(label(b), b.size);
     // Not behind the play log or the game icons (ui::in_background).
     ui::in_background("dev build download", [b, target, progress]() {
         std::string err;

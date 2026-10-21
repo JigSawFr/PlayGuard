@@ -125,7 +125,7 @@ Each job writes a summary on the run page (`tools/ci_summary.py`): what is being
 | `branding/` | SVG sources of the icon and banners |
 | `docs/` | [`parental-controls.md`](docs/parental-controls.md): what is known of the parental-control service, the play-timer block and the clocks, and how sure each fact is; [`companion-app.md`](docs/companion-app.md): what PlayGuard covers of Nintendo's phone app, and the gaps still to close |
 
-**Branding:** `branding/*.svg` are rendered to `icon.jpg`, `images/store/*.png`, `images/social-preview.png` (the repository's social preview) and `resources/img/wordmark.png` (the loading screen's) by `node tools/render_branding.mjs` (Node + Playwright).
+**Branding:** `branding/*.svg` are rendered to `icon.jpg`, `images/store/*.png`, `images/social-preview.png` (the repository's social preview) and `resources/img/wordmark.png` / `wordmark-light.png` (the loading screen's, dark and light theme) by `node tools/render_branding.mjs` (Node + Playwright).
 
 ### The Cadran look
 
@@ -139,6 +139,7 @@ Releases are automated with [release-please](https://github.com/googleapis/relea
 
 - Give each pull request a conventional title with a scope, the part of the app it changes (`feat(history): …`, `fix(play-timer): …`, `docs(install): …`, `feat(notices)!: …` for a breaking change); CI checks it. release-please sorts each section of the changelog by scope, so a title without one lands apart from the rest.
 - **Squash-merge** pull requests, so each one lands as a single commit carrying that title. A plain merge commit makes release-please apply a PR's `BEGIN_COMMIT_OVERRIDE` block to every commit of the PR.
+- **Stacked pull requests** (one branched from another's): with squash merges, the second one meets its base's changes again as a single new commit on main, and every file both touched conflicts, though nothing differs. Prefer one pull request with its commits readable one at a time (a refactor first, then the feature), or wait for the first to be merged and start the second from main. When a stack is there anyway: once the first is merged, merge main into the second and keep the second's side of each conflict — main then holds exactly the first's final tree (`git diff <first's last commit> origin/main` shows nothing) — then let GitHub point it at main.
 - release-please keeps a `chore(main): release X.Y.Z` PR open; merging it tags the release and attaches the `.nro` / `.zip`.
 - release-please runs with a token of the *PlayGuard Release* GitHub App (variable `RELEASE_APP_ID`, secret `RELEASE_APP_PRIVATE_KEY`; permissions Contents, Pull requests and Issues: write), not `GITHUB_TOKEN`: the app is on the tag ruleset's bypass list, so it can create the `vX.Y.Z` tag, and its pushes to the release PR run the required checks.
 - **The release page** is laid out by the release job: a summary (`.github/release-notes/X.Y.Z.md`, merged before the release PR; else, with an `OPENROUTER_API_KEY` secret, one written by a language model), the figures, the commit list folded (users, then contributors), the screens that changed, the install section, the build report, and a discussion. [`.github/release-notes/README.md`](.github/release-notes/README.md) says how; *release-page* in Actions does it again for an existing release.

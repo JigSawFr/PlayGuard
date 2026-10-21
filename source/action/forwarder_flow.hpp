@@ -75,14 +75,23 @@ void protect_all(std::function<void(bool)> done);
 void reinstall_all(std::function<void(bool)> done);
 
 // Hours when a protected forwarder starts without the PIN (core/gate.h):
-// `days` (bit 0 Sunday) from `from` to `to` (minutes); days 0 for none. The
-// PIN asked first; in the change history.
-void set_hours(const forwarders_logic::Row& row, int days, int from, int to, std::function<void(bool)> done,
-               bool ask = true);
-// Hours when it never opens, the PIN or not (GATE_CLOSED_NAME); as
-// set_hours.
+// `days` (bit 0 Sunday) from `from` to `to` (minutes), and a second span
+// (`days2`: the weekend's beside the weekdays'); days 0 for none.
+struct Hours
+{
+    int days = 0, from = 0, to = 0;
+    int days2 = 0, from2 = 0, to2 = 0;
+};
+// Each of these: the PIN asked first (not with `ask` false: put back as it
+// was a moment ago), the forwarder made again with its rules in it (the
+// gate reads them there, not from the SD card), in the change history.
+void set_hours(const forwarders_logic::Row& row, const Hours& hours, std::function<void(bool)> done, bool ask = true);
+// Hours when it never opens, the PIN or not.
 void set_closed(const forwarders_logic::Row& row, int days, int from, int to, std::function<void(bool)> done,
                 bool ask = true);
+// Closed once the day's play time is used up (the console's play timer),
+// the PIN or not.
+void set_limit(const forwarders_logic::Row& row, bool on, std::function<void(bool)> done, bool ask = true);
 
 // The pause after refused PINs (GATE_PAUSE_NAME), for every protected
 // forwarder: its rule, set with the PIN (`tries` 0: never); "5 tries in a
@@ -105,8 +114,9 @@ void put_back_all(const std::vector<forwarders::Made>& made, std::function<void(
 // The album's screenshots, the newest first (30 at most), as "sdmc:/…".
 std::vector<std::string> album_shots();
 
-// "Sat–Sun 09:00–20:00", in the UI's language.
+// "Sat–Sun 09:00–20:00", in the UI's language; both spans of `hours`.
 std::string hours_label(int days, int from, int to);
+std::string hours_label(const Hours& hours);
 
 // The gate's log into the change history (then removed): a protected
 // forwarder it opened is marked a way back seen working
@@ -115,8 +125,23 @@ std::string hours_label(int days, int from, int to);
 std::vector<forwarders_logic::Refusals> take_log();
 
 // Once per start (hbmenu_lock::at_start): the gate and its rules written
-// again while a forwarder is protected; then take_log.
+// again while a forwarder is protected, the gates no longer used removed;
+// then take_log.
 std::vector<forwarders_logic::Refusals> at_start();
+
+// The gate's tries of the last seven days (util/gate_tally.hpp), by
+// forwarder: opened, refused (on which days), not opened. has_week: there
+// are some. week_climb: the bell's line when the refusals climb (many more
+// than the week before), else "".
+void        show_week();
+bool        has_week();
+std::string week_climb();
+
+// Protected forwarders made before they carried their rules and their
+// gate's hash: their free hours are not honoured, a gate changed on the SD
+// card would start. Made again (confirmed first) by remake.
+std::vector<forwarders_logic::Row> to_remake();
+void remake(std::function<void(bool)> done);
 
 // Deletes it from the HOME menu (asked first), and from what PlayGuard
 // remembers. While the homebrew menu is locked, PlayGuard's own and the last
