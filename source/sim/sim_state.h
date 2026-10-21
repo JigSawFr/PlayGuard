@@ -64,10 +64,22 @@ typedef struct {
     u32 count, reserved;
 } SimForwarders;
 
+// The time spent today as the console counts it (1952), with
+// PLAYGUARD_SIM_KEEP only (sim_games.c): a count that goes on in real time and
+// with PLAYGUARD_SIM_SKIP, kept from one run to the next. Without it, the
+// made-up log and PLAYGUARD_SIM_SKIP say it, the same at every run.
+typedef struct {
+    s64 day;          // the user clock's day it counts for (year * 10000 + month * 100 + day); 0 before the first count
+    u64 spent_s;      // seconds spent that day
+    u64 skip_s;       // PLAYGUARD_SIM_SKIP when last counted
+    u64 hold_until;   // the user clock set back from this time: nothing counts until it passes it again
+} SimSpent;
+
 typedef struct {
     SimConsole    console;
     SimFixes      fixes;
     SimForwarders forwarders;
+    SimSpent      spent;
 } SimState;
 
 // The state as it is now (a copy: read it without the lock).
@@ -76,6 +88,14 @@ SimState sim_state(void);
 // anything else in between. sim_end() saves it (PLAYGUARD_SIM_KEEP).
 SimState *sim_begin(void);
 void sim_end(void);
+
+// True with PLAYGUARD_SIM_KEEP: the state is kept, and the console lives on
+// from one run to the next (its time spent counting, SimSpent).
+bool sim_keeping(void);
+
+// The console restarted (the web page's Restart the console): it comes back
+// locked, a temporary unlock ended (docs/parental-controls.md).
+void sim_restart(void);
 
 // The forwarders a first run starts with (sim_forwarder.cpp).
 void sim_forwarder_defaults(SimForwarders *f);

@@ -80,6 +80,32 @@ test('the time moved on, as the page shows it', () => {
   assert.equal(L.skipText(3900), '+1 h 5 min');
 });
 
+test('the console\'s line under the screen', () => {
+  assert.equal(L.durationText(0), '0 s');
+  assert.equal(L.durationText(59.9), '59 s');
+  assert.equal(L.durationText(2700), '45 min');
+  assert.equal(L.durationText(7200), '2 h');
+  assert.equal(L.durationText(4830), '1 h 20 min');
+  const base = { game: 'Star Kart Racers', spent: 4800, limit: 120, left: 2420, restricted: false, alarm_only: false, unlocked: false };
+  const line = (c) => L.consoleLine({ ...base, ...c });
+  const keys = (c) => line(c).parts.map(([k]) => k);
+  assert.deepEqual(line({}), {
+    parts: [['console_game', { game: 'Star Kart Racers' }], ['console_spent', { t: '1 h 20 min' }], ['console_left', { t: '40 min' }]],
+    tone: 'ok',
+  });
+  assert.deepEqual(keys({ game: '' }), ['console_no_game', 'console_spent', 'console_left']);
+  // Past the limit: suspended, or a warning only and the time over it.
+  assert.equal(line({ restricted: true, left: 0 }).tone, 'stop');
+  assert.deepEqual(line({ alarm_only: true, left: -600 }).parts[2], ['console_warning', { t: '10 min' }]);
+  assert.equal(line({ alarm_only: true, left: -600 }).tone, 'warn');
+  // Unlocked first, whatever the timer says.
+  assert.deepEqual(line({ unlocked: true, restricted: true, limit: -1 }).parts[2], ['console_unlocked', {}]);
+  assert.equal(line({ unlocked: true }).tone, 'free');
+  assert.deepEqual(keys({ limit: -1, left: 0 }), ['console_game', 'console_spent', 'console_no_limit']);
+  // No game running: the timer has no time left to say.
+  assert.deepEqual(keys({ game: '', left: 0 }), ['console_no_game', 'console_spent']);
+});
+
 test('steps: read before any is played', () => {
   assert.deepEqual(L.parseSteps('down*3.w15.t640,360.s:skip=3600.say:end.a').map((s) => {
     const { step, ...rest } = s;

@@ -44,11 +44,24 @@ static void set_network(u64 utc, TimeApply *o)
         o->write_rc = SIM_FAIL_RC;
         return;
     }
-    const s64 network = (s64)utc - (s64)sim_base_now();
-    SimConsole *c = &sim_begin()->console;
+    const u64 now = sim_base_now();
+    const s64 network = (s64)utc - (s64)now;
+    SimState *s = sim_begin();
+    SimConsole *c = &s->console;
+    const u64 user_before = now + c->clock_offset + (c->autosync_off ? 0 : c->network_offset);
     if (!c->autosync_off) c->clock_offset = network;
     c->network_offset = network - c->clock_offset;
     c->network_set = true;
+    // The user clock moved: the time spent starts over, and the clock set
+    // back counts nothing until it passes the time it was set back from
+    // (docs/parental-controls.md, Time spent and time left). The console
+    // that lives on only (PLAYGUARD_SIM_KEEP): without it, the made-up log
+    // says the time spent.
+    const u64 user_after = now + c->clock_offset + (c->autosync_off ? 0 : c->network_offset);
+    if (sim_keeping() && user_after != user_before) {
+        s->spent.spent_s = 0;
+        s->spent.hold_until = user_after < user_before ? user_before : 0;
+    }
     sim_end();
     o->write_attempted = o->verify_attempted = o->verified = true;
     o->readback = utc;

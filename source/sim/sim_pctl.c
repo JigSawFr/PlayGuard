@@ -281,10 +281,11 @@ Result pctl_play_timer_stop(void)
 // The time left goes down as on a console that counts PlayGuard's own time,
 // but only by 1 to 20 s around the minute it starts on, then back up: the
 // screens show the same minutes at every run (visual check) and the timer
-// health check (action/timer_health_logic) sees it count.
+// health check (action/timer_health_logic) sees it count. The console that
+// lives on (PLAYGUARD_SIM_KEEP) counts for real instead (sim_games.c).
 static u64 counting_ns(void)
 {
-    if (sim_env_flag("PLAYGUARD_SIM_NOT_COUNTING")) return 0;
+    if (sim_env_flag("PLAYGUARD_SIM_NOT_COUNTING") || sim_keeping()) return 0;
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (u64)(ts.tv_sec % 20) * 1000000000ULL;
