@@ -36,7 +36,9 @@ forwarders_logic::LockCheck check(bool take_log = true);
 // What locking still needs, one line each.
 std::string missing(const forwarders_logic::LockCheck& c);
 // The checks as a dialog's lines (the lock's confirmation, the check).
-std::vector<ui::CheckLine> check_lines(const forwarders_logic::LockCheck& c);
+// With `open_now` (the check, not locked), the album and R said open first
+// under what is still open.
+std::vector<ui::CheckLine> check_lines(const forwarders_logic::LockCheck& c, bool open_now = false);
 
 // The rescue sheet; `locked`: just locked, said in its title. Its page to
 // print written again (the language, the module, as they are now).

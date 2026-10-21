@@ -220,8 +220,8 @@ void ForwardersActivity::onContentAvailable()
         return true;
     });
     lock_check->setDetailText(ui::opens());
-    lock_check->registerClickAction([](brls::View*) {
-        hbmenu_lock::show_check();
+    lock_check->registerClickAction([this](brls::View*) {
+        hbmenu_lock::show_check(this->then_rebuild());
         return true;
     });
     ui::show_writable(reinstall, !app::read_only());
@@ -293,7 +293,7 @@ void ForwardersActivity::fixes()
     if (writable && !s.locked && c.ready())
         choices.push_back({ "playguard/hbmenu/cell"_i18n, [this]() { hbmenu_lock::lock(this->then_rebuild()); }, "lock", "", "",
                             Tone::ON });
-    choices.push_back({ "playguard/hbmenu/check"_i18n, []() { hbmenu_lock::show_check(); }, "list" });
+    choices.push_back({ "playguard/hbmenu/check"_i18n, [this]() { hbmenu_lock::show_check(this->then_rebuild()); }, "list" });
     choices.push_back({ "playguard/hbmenu/rescue"_i18n, []() { hbmenu_lock::show_rescue(); }, "file" });
     ui::pick_actions("playguard/hbmenu/section"_i18n, choices);
 }
