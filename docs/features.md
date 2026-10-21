@@ -34,14 +34,14 @@ The screenshots show the dark theme, PlayGuard's default.
 The app is organised in tabs, like System Settings; each has its section below.
 
 - **What failed is said in a dialog, what worked in a toast.** A dialog only says what applies to this console now: that the game in progress would be suspended, only while a game is open; that the companion app could overwrite a change, only while it is linked and can sync.
-- **The header** says, on every tab, while parental controls are temporarily unlocked (its pill), and shows a crossed-out pencil right of the title when the app is read-only; a tap on either goes where it is undone (*PIN › Turn parental controls back on*, the firmware screen).
+- **The header** says, on every tab, while parental controls are temporarily unlocked (its pill), and shows a crossed-out pencil right of the title when the app is read-only; a tap on either goes where it is undone (*Today › Turn back on*, the firmware screen).
 - **In read-only mode**, actions stay in place, greyed, and say why when pressed.
 
 ## The look: Cadran
 
 PlayGuard's look is called Cadran: an icon rail for the tabs, a navy or cool-white palette (with the theme), cards instead of lists. Each tab opens on what matters most (a ring, tiles, cards, chips), its other settings underneath.
 
-- **The header's pill** says what the tab is about (*Parental controls on*, *Play timer on*…); while parental controls are unlocked it says so on every tab, and a tap on it opens *PIN › Turn parental controls back on*. Secondary text is never under 15 px, to read from the couch on a TV.
+- **The header's pill** says what the tab is about (*Parental controls on*, *Play timer on*…); while parental controls are unlocked it says so on every tab, and a tap on it opens *Today › Turn back on*. Secondary text is never under 15 px, to read from the couch on a TV.
 - **Dialogs** are cards with their buttons as pills, the confirmation in teal (in coral when it removes or stops something).
   - The choices open as a card above the hints, the current one on a soft teal with its check. The teal ring is the focus's alone, everywhere: a level, an account, a choice in force keeps the soft fill.
   - A long dialog fades at its foot while more follows, and its warning (a game about to be suspended) comes first, in an amber card.
@@ -105,7 +105,7 @@ Those for information: a build gone back from, a firmware not tested with this v
 
 - Each section lists its entries in a fixed order, whichever check finished first.
 - **In the sidebar**, an amber badge by a tab's name counts its entries to do, where they are fixed: the PIN tab (no PIN, a weak PIN, PlayGuard without its PIN, temporarily unlocked), the Play timer (the alarm off, the console not counting), Today (changes made outside PlayGuard, extra time to put back), the Console (its entries above, and the network clock). Ignored entries and those for information are not counted.
-- In the tab, the same badge is on the row where each is fixed (*Network clock*, *Check the installed games*, *Storage*, *Game patches*; *Set or change the PIN*, *Protect PlayGuard with the PIN*, *Turn parental controls back on*; the Play timer's *Advanced* for the alarm), and the tab opens on the first of them.
+- In the tab, the same badge is on the row where each is fixed (*Network clock*, *Check the installed games*, *Storage*, *Game patches*; *Set or change the PIN*, *Protect PlayGuard with the PIN*; the Play timer's *Advanced* for the alarm), and the tab opens on the first of them.
 - **Ⓐ** on an entry does the fix (*Turn it on*, *Set it*, *Update*…) or opens the tab where it is made. An entry goes by itself once what it says is fixed.
 - **Ⓧ** marks an entry for information as read; **Ⓨ** marks them all. An entry marked as read stays read at the next start, until its text changes.
 - **Ignoring:** a few entries to do can be ignored with Ⓧ, after a confirmation and the PIN: a PIN anyone would try first, PlayGuard opening without the PIN, the "time's up" alarm off, the SD card almost full (never no PIN, unlocked controls, the clock, the play timer not counting or PlayGuard's own files). An ignored entry is no longer counted, and is listed last under *Ignored*, where Ⓐ counts it again. It comes back by itself 30 days later (unless *Count ignored warnings again after 30 days* is off), once what it says is fixed and then happens again, or, for the PIN, for a new PIN of another length.
@@ -299,7 +299,7 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 - **At the top**, three tiles: the PIN, the restrictions and the temporary unlock, each with a teal check when it is as it should be (a PIN set, restrictions on, locked) or an amber warning when it needs you.
 - **Set / change the PIN** (system PIN screen).
 - **Show the PIN**: after a warning and the PIN itself, asked every time; recorded in the history, then a new PIN is offered.
-- **Unlock temporarily**, **turn parental controls back on**, and whether PlayGuard turns them back on by itself right after a change that needed the unlock (on by default).
+- **Unlock temporarily**, and whether PlayGuard turns them back on by itself right after a change that needed the unlock (on by default).
 
 ### Protect PlayGuard with the PIN
 

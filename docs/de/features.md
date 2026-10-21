@@ -35,14 +35,14 @@ Die Screenshots zeigen das dunkle Design, die Voreinstellung von PlayGuard (auf 
 Die App ist in Tabs gegliedert, wie die Systemeinstellungen; jeder hat unten seinen Abschnitt.
 
 - **Was fehlgeschlagen ist, steht in einem Dialog, was geklappt hat, in einer kurzen Meldung.** Ein Dialog sagt nur, was jetzt für diese Konsole gilt: dass das laufende Spiel unterbrochen würde, nur solange ein Spiel offen ist; dass die Smart-Geräte-App eine Änderung überschreiben könnte, nur solange sie verknüpft ist und synchronisieren kann.
-- **Die Kopfzeile** zeigt in jedem Tab an, solange der Jugendschutz vorübergehend aufgehoben ist (ihre Kapsel), und einen durchgestrichenen Stift rechts vom Titel, wenn die App schreibgeschützt ist; ein Tippen auf eines von beiden führt dorthin, wo es rückgängig gemacht wird (*Geheimzahl › Altersbeschränkungen wieder aktivieren*, der Firmware-Bildschirm).
+- **Die Kopfzeile** zeigt in jedem Tab an, solange der Jugendschutz vorübergehend aufgehoben ist (ihre Kapsel), und einen durchgestrichenen Stift rechts vom Titel, wenn die App schreibgeschützt ist; ein Tippen auf eines von beiden führt dorthin, wo es rückgängig gemacht wird (*Heute › Wieder aktivieren*, der Firmware-Bildschirm).
 - **Im schreibgeschützten Modus** bleiben die Aktionen an ihrem Platz, ausgegraut, und sagen beim Drücken, warum.
 
 ## Das Aussehen: Cadran
 
 Das Aussehen von PlayGuard heißt Cadran: eine schmale Leiste mit Symbolen für die Tabs, eine Palette in Marineblau oder kühlem Weiß (je nach Design), Karten statt Listen. Jeder Tab öffnet mit dem Wichtigsten (ein Ring, Kacheln, Karten, Chips), seine übrigen Einstellungen darunter.
 
-- **Die Kapsel in der Kopfzeile** sagt, worum es im Tab geht (*Jugendschutz aktiv*, *Spielzeit aktiv*…); solange der Jugendschutz aufgehoben ist, sagt sie das in jedem Tab, und ein Tippen darauf öffnet *Geheimzahl › Altersbeschränkungen wieder aktivieren*. Nebentext ist nie kleiner als 15 px, damit er vom Sofa aus auf einem Fernseher lesbar ist.
+- **Die Kapsel in der Kopfzeile** sagt, worum es im Tab geht (*Jugendschutz aktiv*, *Spielzeit aktiv*…); solange der Jugendschutz aufgehoben ist, sagt sie das in jedem Tab, und ein Tippen darauf öffnet *Heute › Wieder aktivieren*. Nebentext ist nie kleiner als 15 px, damit er vom Sofa aus auf einem Fernseher lesbar ist.
 - **Dialoge** sind Karten mit Schaltflächen als Kapseln, die Bestätigung in Petrol (in Korallenrot, wenn sie etwas entfernt oder beendet).
   - Die Auswahl öffnet sich als Karte über den Tastenhinweisen, die aktuelle Wahl auf hellem Petrol mit ihrem Häkchen. Der Ring in Petrol gehört überall allein dem Fokus: eine Kategorie, ein Benutzer, eine geltende Wahl behält die helle Füllung.
   - Ein langer Dialog wird an seinem unteren Rand ausgeblendet, solange noch etwas folgt, und seine Warnung (ein Spiel, das gleich unterbrochen wird) steht zuerst, in einer bernsteinfarbenen Karte.
@@ -106,7 +106,7 @@ Die zur Information: ein Build, von dem zurückgekehrt wurde, eine mit dieser Ve
 
 - Jeder Abschnitt listet seine Einträge in einer festen Reihenfolge, egal welche Prüfung zuerst fertig war.
 - **In der Seitenleiste** zählt ein bernsteinfarbenes Abzeichen neben dem Namen eines Tabs dessen zu erledigende Einträge, dort, wo sie behoben werden: der Tab Geheimzahl (keine Geheimzahl, eine schwache Geheimzahl, PlayGuard ohne seine Geheimzahl, vorübergehend aufgehoben), die Spielzeit (der Alarm aus, die Konsole zählt nicht), *Heute* (Änderungen außerhalb von PlayGuard, Zusatzzeit zum Zurücknehmen), die Konsole (ihre Einträge oben und die Netzwerkuhr). Ignorierte Einträge und die zur Information werden nicht gezählt.
-- Im Tab steht dasselbe Abzeichen in der Zeile, in der jeder behoben wird (*Netzwerkuhr*, *Installierte Spiele prüfen*, *Speicher*, *Spiel-Patches*; *Geheimzahl festlegen oder ändern*, *PlayGuard mit der Geheimzahl schützen*, *Altersbeschränkungen wieder aktivieren*; *Erweitert* der Spielzeit für den Alarm), und der Tab öffnet beim ersten davon.
+- Im Tab steht dasselbe Abzeichen in der Zeile, in der jeder behoben wird (*Netzwerkuhr*, *Installierte Spiele prüfen*, *Speicher*, *Spiel-Patches*; *Geheimzahl festlegen oder ändern*, *PlayGuard mit der Geheimzahl schützen*; *Erweitert* der Spielzeit für den Alarm), und der Tab öffnet beim ersten davon.
 - **Ⓐ** auf einem Eintrag führt die Lösung aus (*Einschalten*, *Stellen*, *Aktualisieren*…) oder öffnet den Tab, in dem sie gemacht wird. Ein Eintrag verschwindet von selbst, sobald behoben ist, was er meldet.
 - **Ⓧ** markiert einen Eintrag zur Information als gelesen; **Ⓨ** markiert alle. Ein als gelesen markierter Eintrag bleibt beim nächsten Start gelesen, bis sich sein Text ändert.
 - **Ignorieren:** Einige zu erledigende Einträge können mit Ⓧ ignoriert werden, nach einer Bestätigung und der Geheimzahl: eine Geheimzahl, die jeder zuerst ausprobieren würde, PlayGuard, das ohne die Geheimzahl öffnet, der Alarm „Zeit ist um“ ausgeschaltet, die SD-Karte fast voll (nie die fehlende Geheimzahl, der aufgehobene Jugendschutz, die Uhr, die Spielzeit, die nicht gezählt wird, oder PlayGuards eigene Dateien). Ein ignorierter Eintrag wird nicht mehr gezählt und steht zuletzt unter *Ignoriert*, wo Ⓐ ihn wieder zählen lässt. Er kommt von selbst 30 Tage später zurück (außer *Ignorierte Warnungen nach 30 Tagen wieder zählen* ist aus), sobald das Gemeldete behoben ist und dann erneut auftritt, oder, bei der Geheimzahl, bei einer neuen Geheimzahl mit anderer Länge.
@@ -300,7 +300,7 @@ Zeit pro Spiel **heute**, in den **letzten 7 Tagen** und **insgesamt**, aus dem 
 - **Oben** drei Kacheln: die Geheimzahl, die Einschränkungen und das vorübergehende Aufheben, jede mit einem Häkchen in Petrol, wenn alles ist, wie es sein soll (eine Geheimzahl festgelegt, Einschränkungen aktiv, gesperrt), oder einem bernsteinfarbenen Warnzeichen, wenn etwas zu tun ist.
 - **Geheimzahl festlegen oder ändern** (Geheimzahl-Bildschirm des Systems).
 - **Geheimzahl anzeigen**: nach einer Warnung und der Geheimzahl selbst, jedes Mal abgefragt; im Verlauf festgehalten, dann wird eine neue Geheimzahl angeboten.
-- **Vorübergehend aufheben**, **Altersbeschränkungen wieder aktivieren**, und ob PlayGuard sie direkt nach einer Änderung, die das Aufheben brauchte, von selbst wieder aktiviert (standardmäßig an).
+- **Vorübergehend aufheben**, und ob PlayGuard sie direkt nach einer Änderung, die das Aufheben brauchte, von selbst wieder aktiviert (standardmäßig an).
 
 ### PlayGuard mit der Geheimzahl schützen
 
