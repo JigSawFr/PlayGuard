@@ -22,6 +22,7 @@ enum class Module
     Skipped,     // "Skipped": patching turned off for this storage (patch_sysmmc / patch_emummc)
     Disabled,    // "Disabled": every pattern turned off in config.ini
     Unpatched,   // "Unpatched": no pattern matched this firmware
+    Partial,     // patched, but a pattern meant for this firmware was not (see Report::gaps)
 };
 
 struct Report
@@ -32,10 +33,16 @@ struct Report
     bool log_current        = false;   // written for this firmware and storage
     std::string log_fw;                // [stats] fw_version
     bool log_emummc         = false;   // [stats] is_emummc
+    std::string log_version;           // [stats] version: sys-patch's own
     Module fs  = Module::Missing;
     Module ldr = Module::Missing;
     Module es  = Module::Missing;
     std::vector<std::string> files;    // sigpatch sets found: "es", "fs", "loader", "nifm", "hekate"
+    // Patterns of fs, ldr and es meant for this firmware and not patched,
+    // as "fs:nocntchk_19.0.0+=Unpatched": a module patched by one of its
+    // patterns can still leave a check in place (a forwarder then "could
+    // not be started").
+    std::vector<std::string> gaps;
 };
 
 enum class Status
@@ -59,7 +66,16 @@ enum class Issue
 using Ini = std::map<std::string, std::map<std::string, std::string>>;
 
 Ini    parse_ini(const std::string& text);
-Module module_state(const Ini& ini, const std::string& section);
+// With `fw` ("23.0.1"), a module whose patterns are not all patched is
+// Partial when one left out names a range covering `fw` (sys-patch names
+// them so: "noncasigchk_17.0.0+", "nocntchk_1.0.0-18.1.0"); `gaps` gets
+// those. A pattern named without a range is an alternative to the others.
+Module module_state(const Ini& ini, const std::string& section, const std::string& fw = "",
+                    std::vector<std::string>* gaps = nullptr);
+
+// Whether pattern `name` is meant for firmware `fw`: false when its name
+// gives no range, or a range without `fw`.
+bool pattern_for(const std::string& name, const std::string& fw);
 
 // `root` is the SD card root ("/" on the console). `fw` is "23.0.1".
 Report detect(const std::string& root, const std::string& fw, bool emummc);
