@@ -14,9 +14,11 @@
 // the list. What the integrity check found is kept with the game (corrupt:
 // to install again; intact: out of the list) until another version is
 // installed. Ⓨ selects games, for one action on them all: check their data
-// one after the other, or remove them; "Check these games" does the same for
-// the whole section to check. "Display" above them shows the games as a list
-// or as covers (kept in the config), as Activity › All games does.
+// one after the other, or remove them (the line that says so shows from the
+// first game picked); "Check these games" does the same for the whole
+// section to check. Ⓡ shows the games as a list or as covers (kept in the
+// config), as Ⓨ does in Activity › All games. Above the games, a single
+// short line: the result of the check.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -80,12 +82,19 @@ class GameCheckActivity : public brls::Activity
     Group groups[GC_CAT_COUNT];
     bool removing = false;              // remove_games() under way
     std::set<u64> selected;             // the games picked with Ⓨ
-    brls::DetailCell* selection = nullptr;   // above the sections: what is picked, A for what to do
-    brls::DetailCell* view_cell = nullptr;   // above it: a list or covers
+    brls::DetailCell* selection = nullptr;   // above the sections, once a game is picked: A for what to do
     bool grid = false;
 
-    // A list or covers: every section's games built again, next frame.
+    // A list or covers: every section's games built again, next frame, the
+    // game with the focus keeping it.
     void switch_view();
+    void set_view_hint();   // Ⓡ says what it switches to (registered once, in onContentAvailable)
+    // The views of the games are deleted when rebuilt, and borealis keeps a
+    // pointer to the one with the focus: the focus waits on the status line
+    // meanwhile (focusable only then), and leaves it in show().
+    void park_focus();
+    u64 focused_game() const;            // the game whose cell or cover has the focus (0: none)
+    brls::View* game_view(u64 id) const;   // its cell or cover (nullptr: not shown)
     // A section's games as covers: rebuilt when their number changes (the
     // up and down routes go with it), else updated in place.
     void show_tiles(Group& group, size_t count);

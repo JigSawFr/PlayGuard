@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 74b3acd1bd54 -->
+<!-- translated from docs/features.md, sha256 0b72c6fa5efa -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -374,13 +374,13 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 | **Firmware ou carte SD** | Le jeu va bien, la console non |
 
 - **Vérifier les données :** le résultat de la vérification des données reste attaché au jeu tant que la même version est installée : corrompues, il passe dans *À réinstaller* en *Corrompu (vérifié)*, avec la date et le code de la console ; intactes, il quitte la liste. *Vérifier ces jeux* vérifie toute la section *À vérifier*, un jeu après l'autre dans un seul dialogue (*jeu 2 sur 5*), puis dit combien sont corrompus, intacts ou n'ont pas pu être vérifiés, avec la suppression des jeux corrompus à portée de main.
-- **Plusieurs jeux à la fois :** Ⓨ sélectionne des jeux (une coche devant), et *Plusieurs jeux à la fois*, au-dessus des sections, sélectionne une section entière ; puis une seule action pour tous : vérifier leurs données, ou les supprimer (leur liste enregistrée d'abord, une seule question, un seul code PIN).
+- **Plusieurs jeux à la fois :** Ⓨ sélectionne des jeux (une coche devant) ; dès le premier, une ligne au-dessus des sections dit combien, et A dessus sélectionne aussi une section entière, puis une seule action pour tous : vérifier leurs données, ou les supprimer (leur liste enregistrée d'abord, une seule question, un seul code PIN).
 - **Sous *À réinstaller*,** leur liste peut être enregistrée (JSON et texte, dans le dossier des exports : nom, Title ID, version, problème), et tous peuvent être supprimés d'un coup après une seule question et un seul code PIN : la liste est d'abord enregistrée, puis les jeux sont supprimés pour qu'un installeur ne les compte plus comme installés.
 - **Les actions :** quand une action est la solution, c'est le premier bouton du dialogue ; les autres suivent : accepter à nouveau la version installée (quand la console réclame une mise à jour retirée), supprimer seulement la mise à jour ou un contenu additionnel, vérifier si les données sont corrompues (la vérification de la console, avec sa progression et un bouton Annuler), ou supprimer le jeu.
 - Les versions sont affichées comme le jeu les affiche (*version 1.4.0*, *mise à jour n°4*) ; après une réparation, un message dit si le jeu fonctionne de nouveau. Les sauvegardes restent toujours ; chaque modification figure dans l'historique.
 - **Quand il vérifie :** la dernière vérification s'affiche tout de suite ; seuls les jeux dont l'entrée a changé sont ensuite revérifiés (tous une fois par jour, après une mise à jour du firmware, ou avec Ⓧ *Vérifier à nouveau*), chacun affiché dès qu'il est vérifié.
 - Plusieurs jeux cassés à la fois orientent vers la carte SD ou vers un jeu installé depuis l'autre mémoire (sysMMC / emuMMC).
-- *Affichage*, au-dessus des sections, présente les jeux en **liste** ou en **jaquettes** (icône, nom et problème ; le choix est gardé), comme *Tous les jeux*.
+- Ⓡ présente les jeux en **liste** ou en **jaquettes** (icône, nom et problème ; le choix est gardé), comme *Tous les jeux*.
 
 ### Forwarders
 
