@@ -1713,7 +1713,7 @@ if CADRAN:
     shot("21_live_theme")      # the focus back on Theme
     key("Left")                # Language
     key("Return")
-    go_to("Français")
+    go_to("Français (France)")
     key("Return")
     time.sleep(1)
     shot("22_live_language")
