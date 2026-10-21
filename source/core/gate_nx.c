@@ -147,6 +147,7 @@ typedef struct {
     char           name[0x201];
     char           clock[8];
     int            language;
+    unsigned       rules;    // GATE_RULE_*: its icons by the badge
 } Screen;
 
 static unsigned char *read_all(const char *path, size_t max, size_t *n)
@@ -264,6 +265,7 @@ static void screen_show(Screen *sc, GateScreenState state, const char *note, int
     const GateScreen s = {
         sc->brand, sc->text, sc->icon, sc->icon_size, sc->name, gate_text(sc->language, STATUS[state]),
         hint == GateText_Count ? NULL : gate_text(sc->language, hint), footer, sc->clock, state, note, note_warn,
+        sc->rules,
     };
     u32 stride = 0;
     uint32_t *px = (uint32_t *)framebufferBegin(&sc->fb, &stride);
@@ -329,6 +331,7 @@ bool gate_nx_run(void)
     } else if (hours_of(GATE_DIR GATE_CLOSED_NAME, nro, &closed_spans[0])) {
         closed_n = 1;
     }
+    sc.rules = (free_n ? GATE_RULE_FREE : 0u) | (closed_n ? GATE_RULE_CLOSED : 0u) | (rules.limit ? GATE_RULE_LIMIT : 0u);
     u64 now = 0;
     const bool clocked = R_SUCCEEDED(timeGetCurrentTime(TimeType_LocalSystemClock, &now));
     const size_t pause_len = pause_read();

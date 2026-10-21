@@ -67,6 +67,8 @@ class ForwardersActivity : public brls::Activity
     void hours(const forwarders_logic::Row& row, bool closed, const forwarder_flow::Hours& h);
     // Closed once the day's play time is used up, or no longer; ZR to undo.
     void limit(const forwarders_logic::Row& row, bool on);
+    // Asks for the PIN or no longer, ZR then putting it back for a few seconds.
+    void pin(const forwarders_logic::Row& row, bool on);
     // Its icon: its .nro's, or a screenshot of the album.
     void pick_icon(const forwarders_logic::Row& row);
     // The pause after refused PINs: its rule.
