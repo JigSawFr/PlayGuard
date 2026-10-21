@@ -5,6 +5,8 @@
 // - PLAYGUARD_SIM_KEEP: a change reaches playguard_data/sim_console.bin and
 //   the next run starts from it; a file of another layout is not read (each
 //   run in a process of its own, the state being set up once per process);
+//   with it, the console lives on: its time spent counted in real time and
+//   kept, to the limit, started over by a clock change;
 // - the time left today, frozen by PLAYGUARD_SIM_NOW (UTC): the made-up
 //   80 minutes against the day's limit, moved on by PLAYGUARD_SIM_SKIP (to
 //   the limit and past it, and past midnight), PLAYGUARD_SIM_IDLE,
@@ -136,7 +138,7 @@ static void test_keep()
                pctl_unlock_restriction_temporarily() == 0 && pctl_set_rating_org(2) == 0 &&
                gamecheck_remove(0x0100A1B2C3D47000ULL) == 0;
     });
-    CHECK(read_all(file).compare(0, 8, std::string("PGSIM04", 8)) == 0);
+    CHECK(read_all(file).compare(0, 8, std::string("PGSIM05", 8)) == 0);
     // The next one starts from it, whatever the variables say.
     in_child([&] {
         setenv("PLAYGUARD_SIM_UNLOCKED", "0", 1);
@@ -156,6 +158,87 @@ static void test_keep()
     std::remove(file);
     unsetenv("PLAYGUARD_SIM_KEEP");
     in_child([&] { return pctl_relock() == 0 && read_all(file).empty(); });
+    CHECK(tmp.remove());
+}
+
+static PtState query();
+
+// The console that lives on (PLAYGUARD_SIM_KEEP): its time spent counted for
+// real and kept, each run in a process of its own, PLAYGUARD_SIM_NOW standing
+// in for the time that passes.
+static void test_living()
+{
+    TempDir tmp("sim", TempDir::Enter);
+    REQUIRE(mkdir("playguard_data", 0700) == 0);
+    setenv("PLAYGUARD_SIM_KEEP", "1", 1);
+    const long long wed_10h = std::atoll(WED_10H);
+    const auto at = [](long long t) { sim_env_set("PLAYGUARD_SIM_NOW", std::to_string(t).c_str()); };
+    // A check in the child: says which one failed, the child's status the rest.
+    bool ok = true;
+    const auto step = [&ok](bool cond, const char* what) {
+        if (!cond) std::fprintf(stderr, "living: %s\n", what);
+        ok = ok && cond;
+    };
+
+    in_child([&] {
+        at(wed_10h);
+        step(sim_played_today_s() == 80 * 60, "the made-up 80 minutes first");
+        at(wed_10h + 60);
+        step(sim_played_today_s() == 80 * 60 + 60, "a minute later, a minute more");
+        at(wed_10h + 60 + 30 * 60);
+        step(sim_played_today_s() == 80 * 60 + 60, "a jump of half an hour is not play");
+        sim_env_set("PLAYGUARD_SIM_SKIP", "600");
+        step(sim_played_today_s() == 90 * 60 + 60, "the skip's 10 minutes, played");
+        sim_env_set("PLAYGUARD_SIM_IDLE", "1");
+        at(wed_10h + 60 + 30 * 60 + 30);
+        step(sim_played_today_s() == 90 * 60 + 60, "no game: nothing counts");
+        sim_env_set("PLAYGUARD_SIM_IDLE", nullptr);
+        // The play timer counts down from it, without the made-up seconds.
+        sim_env_set("PLAYGUARD_SIM_NOT_COUNTING", nullptr);
+        step(query().remaining_ns == (29 * 60 + 20) * S, "the time left from it");
+        return ok;
+    });
+    // The next run: from the kept count, the time the page was closed not
+    // counted, the skip already counted not counted again.
+    in_child([&] {
+        sim_env_set("PLAYGUARD_SIM_SKIP", "600");
+        at(wed_10h + 3 * 3600);
+        step(sim_played_today_s() == 90 * 60 + 60, "kept, the hours closed not counted");
+        at(wed_10h + 3 * 3600 + 40);
+        step(sim_played_today_s() == 90 * 60 + 100, "and counting again");
+        // To the limit and no further: the console suspends the game.
+        sim_env_set("PLAYGUARD_SIM_SKIP", "4200");
+        step(sim_played_today_s() == 120 * 60, "suspended at the limit");
+        const PtState pt = query();
+        step(pt.restricted && pt.remaining_ns == 0, "restricted at the limit");
+        // The network clock set: the user clock moves, the time spent starts
+        // over; set back, nothing counts until it passes the old time again.
+        TimeSnapshot t;
+        time_clock_snapshot(&t);
+        TimeApply apply;
+        time_clock_apply(t.user_time - 120, &apply);
+        step(apply.verified && sim_played_today_s() == 0, "the clock changed: started over");
+        at(wed_10h + 3 * 3600 + 100);
+        step(sim_played_today_s() == 0, "set back: not counting yet");
+        at(wed_10h + 3 * 3600 + 160);
+        step(sim_played_today_s() == 0, "the old time reached");
+        at(wed_10h + 3 * 3600 + 200);
+        step(sim_played_today_s() == 40, "counting again past it");
+        return ok;
+    });
+    // Without the file's count: the made-up one, the same at every run.
+    std::remove("playguard_data/sim_console.bin");
+    unsetenv("PLAYGUARD_SIM_KEEP");
+    in_child([&] {
+        sim_env_set("PLAYGUARD_SIM_SKIP", nullptr);
+        at(wed_10h);
+        step(sim_played_today_s() == 80 * 60, "made up");
+        at(wed_10h + 60);
+        step(sim_played_today_s() == 80 * 60, "and still");
+        return ok;
+    });
+    sim_env_set("PLAYGUARD_SIM_NOW", nullptr);
+    sim_env_set("PLAYGUARD_SIM_SKIP", nullptr);
     CHECK(tmp.remove());
 }
 
@@ -436,6 +519,7 @@ int main()
     tzset();
     test_flags_and_numbers();
     test_keep();   // before any use of the state in this process
+    test_living();   // as well
     test_time_left();
     test_changes();
     test_games();

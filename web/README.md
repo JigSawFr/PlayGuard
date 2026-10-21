@@ -61,7 +61,20 @@ them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
   `sim_console.bin`, `PLAYGUARD_SIM_KEEP`) is kept in the browser's IndexedDB,
   written every 3 s and when the page is left. The console settings of the
   panel then count for a first start only; **Forget the kept state** starts
-  over.
+  over. The console then lives on: its time played today counts in real time
+  while the page is open (not while it is closed), stays from one visit to
+  the next, starts over with a new day or a clock change
+  ([CONTRIBUTING.md](../CONTRIBUTING.md#the-desktop-simulator)), and
+  **Restart the console** ends a temporary unlock, as a restart does on a
+  console, then reloads the page.
+- **The console's line**, under the time: what the simulated console does
+  now, read once a second from the first screen on
+  (`playguard_web_console()`, `source/sim/web_page.cpp`; its words from
+  `SimLogic.consoleLine`): the game running, the time played today, the time
+  left, or the limit reached and the game suspended, a warning only and the
+  time over it, parental controls unlocked; a notice above the screen when
+  the time runs out. Without *Keep the state*, the time played moves only
+  with the buttons above, the same at every start.
 - **Controls**: the arrows, Enter (Ⓐ) and Esc (Ⓑ) reach SDL directly; the
   page presses the other buttons by what the key says, on any layout: X, Y,
   L, R, Shift+L (ZL), Shift+R (ZR), + or P, − or M, Backspace (Ⓑ). A click is
@@ -117,6 +130,10 @@ them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
   (as much as a URL takes).
 - The network is a console without a connection: GitHub and switchbrew send
   no CORS headers, so a page cannot reach them (`source/sim/web_http.cpp`).
+  The time servers answer, though, with the simulated world's time
+  (`source/util/ntp_client.cpp`: a page sends no UDP), so *Console › Network
+  clock* measures and sets the clock as on a console with Internet;
+  `ntp=offline` is one without.
   The `PLAYGUARD_SIM_*` folders the desktop reads its answers from are
   packaged instead (`web/samples/`, at `/app/samples`): `sys_notes=sample`
   gives the release notes of Atmosphère 1.12.1, hekate 6.5.4 and firmware
@@ -201,8 +218,9 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   play desktop smoke scenarios as steps (every tab, its screens the comment's
   Play timer, Activity and Console; *alarm*, the first half of *errors*); move the time on and take a live setting without a restart;
   note keys and replay their steps link, play the tour, fill a report link;
-  add the CJK font after the start; keep `sim_console.bin` across a reload
-  with `keep=1`; and, served without the headers as GitHub Pages does, be
+  add the CJK font after the start; keep the data folder across a reload
+  with `keep=1`; show the console's line, the game suspended at the limit,
+  and a restart that locks it again; and, served without the headers as GitHub Pages does, be
   isolated by `sw.js`, keep PlayGuard's files and start offline. A page
   error fails it. Its scenarios run a few at once, each in a process and
   browser of its own (`WEB_SMOKE_JOBS`: the processors by default), and one

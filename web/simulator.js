@@ -702,6 +702,67 @@ function setUpTime() {
   showSkip();
 }
 
+// ---- The console ------------------------------------------------------------
+//
+// The line under the screen, once a second from the first screen on: what the
+// simulated console does (playguard_web_console(), source/sim/web_page.cpp).
+// With keep=1 it lives on: its time played counts in real time and stays from
+// one visit to the next, and Restart the console ends a temporary unlock.
+
+const fill = (s, vars) => s.replace(/\{(\w+)\}/g, (m, k) => vars[k] ?? m);
+let consoleWas = null;          // the last reading, for what changed since
+
+function readConsole() {
+  if (!running) return;
+  let c;
+  try {
+    c = JSON.parse(window.Module.ccall('playguard_web_console', 'string', [], []));
+  } catch (e) {
+    log(`console: ${e}`, true);
+    return;
+  }
+  const { parts, tone } = SimLogic.consoleLine(c);
+  $('console-text').textContent = parts.map(([key, vars]) => fill(t(key), vars)).join(' · ');
+  $('console-living').textContent = t(c.living ? 'console_living' : 'console_frozen');
+  $('console-living').hidden = false;
+  $('console-restart').hidden = !c.living;
+  const line = $('console-line');
+  line.dataset.tone = tone;
+  line.hidden = false;
+  const was = consoleWas;
+  consoleWas = c;
+  if (!was) return;
+  const game = c.game || was.game;
+  if (c.restricted && !was.restricted) {
+    toast(fill(t(game ? 'console_suspended_toast' : 'console_restricted_toast'), { game }));
+    log(`console: time's up, ${game || 'play'} suspended`);
+  } else if (c.alarm_only && c.left < 0 && was.left >= 0 && !c.unlocked) {
+    toast(t('console_warning_toast'));
+    log("console: time's up, a warning only");
+  }
+}
+
+// The data folder to IndexedDB first, then the page again: PlayGuard starts
+// on the console as the restart left it.
+function restartConsole() {
+  const FS = window.Module?.FS;
+  if (!running || !FS) return;
+  window.Module.ccall('playguard_web_console_restart', null, [], []);
+  log('console: restarted');
+  running = false;
+  forgetting = true;   // no other write of the folder meanwhile
+  FS.syncfs(false, (e) => {
+    if (e) log(`keep: ${e}`, true);
+    location.reload();
+  });
+}
+
+function setUpConsole() {
+  $('console-restart').addEventListener('click', restartConsole);
+  readConsole();
+  setInterval(readConsole, 1000);
+}
+
 // ---- Steps ------------------------------------------------------------
 //
 // Their format is SimLogic's (sim_logic.js): buttons, waits, touches, live
@@ -842,6 +903,7 @@ async function replay(text, tour) {
 // the URL (rec=, tour=1) played. They leave the URL: a reload starts plain.
 function ready() {
   lastStep = performance.now();
+  setUpConsole();
   const rec = current.get('rec');
   const tour = isOn(current.get('tour'));
   if (rec || tour) {
@@ -1052,7 +1114,7 @@ async function main() {
   buildForm(current);
   setUpTime();
   version = await build;
-  if (await saveData()) waitForTap();
+  if (await dataSaverWaits()) waitForTap();
   else start();
   showTheme();
 }
@@ -1060,7 +1122,7 @@ async function main() {
 // Data saver on (navigator.connection.saveData, where the browser says so)
 // and PlayGuard not kept yet by the service worker: a few megabytes to
 // download, so on a touch, not by itself.
-async function saveData() {
+async function dataSaverWaits() {
   if (!navigator.connection?.saveData) return false;
   try {
     const kept = await (await caches.open('playguard-simulator')).keys();

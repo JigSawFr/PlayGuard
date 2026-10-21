@@ -96,12 +96,12 @@ static void sim_defaults(SimConsole *c)
 // another layout is not read: SIM_KEEP_MAGIC changes with it.
 
 #define SIM_KEEP_FILE "./playguard_data/sim_console.bin"
-static const char SIM_KEEP_MAGIC[8] = "PGSIM04";
+static const char SIM_KEEP_MAGIC[8] = "PGSIM05";
 // Change SIM_KEEP_MAGIC with any change to SimState (a field added, removed,
 // moved or resized), then this size: the same size can hide another layout.
-_Static_assert(sizeof(SimState) == 5064, "SimState changed: change SIM_KEEP_MAGIC, then this size");
+_Static_assert(sizeof(SimState) == 5096, "SimState changed: change SIM_KEEP_MAGIC, then this size");
 
-static bool sim_keeping(void)
+bool sim_keeping(void)
 {
     return sim_env_flag("PLAYGUARD_SIM_KEEP");
 }
@@ -208,4 +208,10 @@ void sim_end(void)
     atomic_fetch_add(&s_changes, 1);
     pthread_mutex_unlock(&s_lock);
     sim_keep_flush();
+}
+
+void sim_restart(void)
+{
+    sim_begin()->console.temp_unlocked = false;
+    sim_end();
 }

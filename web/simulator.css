@@ -18,6 +18,8 @@
   --line: #dbe2ec;
   --accent: #0a705f;
   --accent-text: #ffffff;
+  --warn: #a8720a;
+  --stop: #c62a2f;
   --frame: #0f1724;
   --radius: 10px;
   --display: "Sora", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -32,6 +34,8 @@
   --line: #22324f;
   --accent: #2ec4a6;
   --accent-text: #05140f;
+  --warn: #f0b429;
+  --stop: #ff7a7e;
   --frame: #05090f;
   color-scheme: dark;
 }
@@ -193,6 +197,37 @@ kbd {
 .time .btn:disabled { opacity: 0.45; cursor: default; }
 .skip-shown { color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
 
+/* What the simulated console does now, under the time. */
+.console-line {
+  width: 100%;
+  max-width: calc((100vh - 236px) * 16 / 9);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+.console-line[hidden] { display: none; }
+.console-label { color: var(--muted); }
+.console-text { font-variant-numeric: tabular-nums; }
+.console-text::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  vertical-align: 1px;
+}
+.console-line[data-tone="warn"] .console-text::before { background: var(--warn); }
+.console-line[data-tone="stop"] .console-text { color: var(--stop); font-weight: 600; }
+.console-line[data-tone="stop"] .console-text::before { background: var(--stop); }
+.console-line[data-tone="free"] .console-text::before { background: var(--muted); }
+.console-living { color: var(--muted); font-size: 12px; }
+.console-line .btn { padding: 4px 10px; font-size: 13px; }
+
 .overlay progress { width: min(260px, 70%); accent-color: #22b39a; }
 .toast {
   position: absolute;
@@ -349,7 +384,7 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
   html, body { height: auto; }
   .layout { display: block; }
   .stage { padding: 12px 16px; overflow: visible; }
-  .screen, .controls, .time { max-width: none; }
+  .screen, .controls, .time, .console-line { max-width: none; }
   .screen { padding: 6px; border-radius: 10px; }
   .overlay { inset: 6px; }
   .panel { border-left: 0; border-top: 1px solid var(--line); }
@@ -389,7 +424,7 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
   input:not([type="checkbox"]), select, textarea, .header-settings select { font-size: 16px; }
   /* The pad right under the screen, the time and the tools after it. */
   .pad { order: 1; }
-  .time { order: 2; }
+  .time, .console-line { order: 2; }
   .controls { order: 3; }
 }
 
@@ -413,7 +448,7 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
   .stage:has(> .pad[hidden]) { grid-template-columns: 0 minmax(0, 1fr) 0; column-gap: 0; }
   .screen { grid-area: screen; width: 100%; max-width: calc((100dvh - 76px) * 16 / 9); padding: 6px; border-radius: 10px; }
   .overlay { inset: 6px; }
-  .stage > .notice, .stage > .controls, .stage > .time { grid-column: 1 / -1; max-width: none; }
+  .stage > .notice, .stage > .controls, .stage > .time, .stage > .console-line { grid-column: 1 / -1; max-width: none; }
   .pad, .pad-row { display: contents; }
   .dpad, .face { grid-template: repeat(3, 44px) / repeat(3, 44px); }
   .dpad { grid-area: dpad; }
@@ -431,13 +466,13 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
    as on a Switch; turned back upright (or out of full screen), the rest is
    there again. */
 @media (display-mode: standalone) and (pointer: coarse) and (orientation: landscape) and (max-height: 540px) {
-  .top, .panel, .stage > .notice:not(#steps-notice), .stage > .controls, .stage > .time { display: none !important; }
+  .top, .panel, .stage > .notice:not(#steps-notice), .stage > .controls, .stage > .time, .stage > .console-line { display: none !important; }
   .stage { min-height: 100dvh; align-content: center; }
   .screen { max-width: calc((100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 16 / 9); }
 }
 html.game, html.game body { background: #000; }
 html.game .top, html.game .panel, html.game .stage > .notice:not(#steps-notice),
-html.game .stage > .controls, html.game .stage > .time { display: none !important; }
+html.game .stage > .controls, html.game .stage > .time, html.game .stage > .console-line { display: none !important; }
 html.game .layout { display: block; }
 html.game .stage { min-height: 100dvh; justify-content: center; align-content: center; }
 html.game .screen { max-width: calc((100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 16 / 9); }

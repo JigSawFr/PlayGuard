@@ -18,6 +18,9 @@
 #ifndef __SWITCH__
 #include "sim/sim_net.hpp"
 #endif
+#ifdef __EMSCRIPTEN__
+#include "sim/sim_state.h"
+#endif
 
 namespace ntp {
 namespace {
@@ -74,6 +77,16 @@ Reply fetch(const std::string& host, int timeout_ms, unsigned max_addresses, boo
         sim_net::offline(&reply.error);
         return reply;
     }
+#endif
+#ifdef __EMSCRIPTEN__
+    // The web simulator: a page sends no UDP, so the time servers answer with
+    // the simulated world's time, the console's before any clock change
+    // (sim_base_now(): the browser's, PLAYGUARD_SIM_NOW, PLAYGUARD_SIM_SKIP).
+    reply.ok = true;
+    reply.kind = Error::None;
+    reply.unix_seconds = sim_base_now();
+    reply.received_at = std::chrono::steady_clock::now();
+    return reply;
 #endif
 
     addrinfo hints{};

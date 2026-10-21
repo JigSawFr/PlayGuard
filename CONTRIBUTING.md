@@ -41,7 +41,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_ACCURATE=1` | An accurate network clock |
 | `PLAYGUARD_SIM_AUTOSYNC_OFF=1` | *Synchronise Clock via Internet* off |
 | `PLAYGUARD_SIM_NETWORK_OFFSET=1411` | A network clock that many seconds ahead of the console clock until it is set (the console clock follows it while *Synchronise* is on) |
-| `PLAYGUARD_SIM_NTP=offline` | No time server answers (a console without Internet) |
+| `PLAYGUARD_SIM_NTP=offline` | No time server answers (a console without Internet). In a browser, which sends no UDP, they answer otherwise with the simulated world's time (the console's before any clock change) |
 | `PLAYGUARD_SIM_FAIL=timer,clock,unverified,bedtime,remove,launch,verify,forwarder` | Failures: the play-timer write, setting the clock, an unlock the system does not confirm, a bedtime the console does not take, removing a game or a content, resetting a launch version, the integrity check, installing or removing a forwarder (*Console › Forwarders*) |
 | `PLAYGUARD_SIM_CHECK_MS=150` | How long checking one installed game takes (*Console › Check the installed games*) |
 | `PLAYGUARD_SIM_GAMES_OK=1` | Every installed game fine (*Console › Check the installed games*; by default one of each problem) |
@@ -59,7 +59,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_IDLE=1` | No game running |
 | `PLAYGUARD_SIM_SKIP=900` | The console's time that many seconds later, a game played all along (unless `IDLE`): the time left goes down by as much, to the limit and past it, and the Activity tab counts it on the first game (read at each call: the web page's time buttons move it while PlayGuard runs) |
 | `PLAYGUARD_SIM_ACCOUNTS=5` | That many user accounts, 0 to 8 (default 2: Alice and Léo), each playing twice as much as the next |
-| `PLAYGUARD_SIM_KEEP=1` | The simulated console's settings (PIN, limits, bedtime, clocks) and what *Console › Check the installed games* changed (removed games, launch versions reset) kept in `playguard_data/sim_console.bin` from one run to the next; the variables that set its starting state then count for the first run only |
+| `PLAYGUARD_SIM_KEEP=1` | The simulated console's settings (PIN, limits, bedtime, clocks) and what *Console › Check the installed games* changed (removed games, launch versions reset) kept in `playguard_data/sim_console.bin` from one run to the next; the variables that set its starting state then count for the first run only. The console then lives on (`source/sim/sim_games.c`): its time spent today counts in real time while a game runs (and with `PLAYGUARD_SIM_SKIP`'s steps), to the limit when it suspends the game, from 0 on a new day, kept too; the user clock moved by the network clock starts it over, set back it counts nothing until it passes the old time again (as observed, `docs/parental-controls.md`). A run counts from its own start: the time between two runs, or a step of more than 10 minutes, is not play |
 | `PLAYGUARD_SIM_BACKGROUND=1` | PlayGuard out of focus |
 | `PLAYGUARD_SIM_REGION=2` | The console region |
 | `PLAYGUARD_SIM_LATEST=1.1.0:24.0.0` | The latest release and the newest firmware it supports, for the update check (`offline` for no network) |

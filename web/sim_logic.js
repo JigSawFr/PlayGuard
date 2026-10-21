@@ -113,6 +113,34 @@
     return s ? `+${h ? `${h} h ` : ''}${min || !h ? `${min} min` : ''}`.trim() : '';
   }
 
+  // ---- The console ----------------------------------------------------
+  //
+  // The line under the screen: what the simulated console does now, from
+  // PlayGuard's playguard_web_console() (source/sim/web_page.cpp).
+
+  // A time spent or left: "1 h 20 min", "2 h", "45 min", "30 s".
+  function durationText(seconds) {
+    const s = Math.max(0, Math.floor(Number(seconds) || 0));
+    if (s < 60) return `${s} s`;
+    const h = Math.floor(s / 3600), min = Math.floor((s % 3600) / 60);
+    return `${h ? `${h} h ` : ''}${min || !h ? `${min} min` : ''}`.trim();
+  }
+
+  // The line's parts, each a page text and what fills it ({game}, {t}), and
+  // its tone: `free` unlocked, `stop` the game suspended, `warn` past the
+  // limit while the console only warns, `ok` otherwise.
+  function consoleLine(c) {
+    const parts = [c.game ? ['console_game', { game: c.game }] : ['console_no_game', {}],
+                   ['console_spent', { t: durationText(c.spent) }]];
+    let tone = 'ok';
+    if (c.unlocked) { parts.push(['console_unlocked', {}]); tone = 'free'; }
+    else if (c.restricted) { parts.push(['console_suspended', {}]); tone = 'stop'; }
+    else if (c.alarm_only && c.left < 0) { parts.push(['console_warning', { t: durationText(-c.left) }]); tone = 'warn'; }
+    else if (c.limit >= 0 && c.left > 0) parts.push(['console_left', { t: durationText(c.left) }]);
+    else if (c.limit < 0) parts.push(['console_no_limit', {}]);
+    return { parts, tone };
+  }
+
   // ---- Steps ----------------------------------------------------------
   //
   // One step per dot: a button (up, down, left, right, a, b, x, y, l, r, zl,
@@ -159,7 +187,7 @@
 
   const SimLogic = {
     LANGUAGES, FALSY, STEP_BUTTONS, isOn, consoleLanguage, firstConsoleLanguage, readQuery, toQuery, changedNames,
-    envValue, envName, startEnvironment, skipText, parseSteps, stepValue, stepsText,
+    envValue, envName, startEnvironment, skipText, durationText, consoleLine, parseSteps, stepValue, stepsText,
   };
   if (typeof module === 'object' && module.exports) module.exports = SimLogic;
   else root.SimLogic = SimLogic;
