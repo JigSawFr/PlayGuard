@@ -51,6 +51,29 @@ void GameCell::set_badge(const char* icon_name, const char* color_key)
     this->slot->addView(this->badge);
 }
 
+void GameCell::set_marks(const std::vector<Mark>& list)
+{
+    if (this->marks) {
+        this->removeView(this->marks);
+        this->marks = nullptr;
+    }
+    if (list.empty()) return;
+    this->marks = new brls::Box(brls::Axis::ROW);
+    this->marks->setAlignItems(brls::AlignItems::CENTER);
+    this->marks->setShrink(0);
+    for (const Mark& m : list) {
+        CadranIcon* view = cadran::kit::icon(m.icon, 22, m.color_key);
+        view->setMarginLeft(this->marks->getChildren().empty() ? 0 : 12);
+        this->marks->addView(view);
+    }
+    // Before the detail text, the cell's last view; without text, the
+    // label goes, and its room with it.
+    const bool text = !this->detail->getFullText().empty();
+    this->detail->setVisibility(text ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    if (text) this->marks->setMarginRight(12);
+    this->addView(this->marks, this->getChildren().size() - 1);
+}
+
 void GameCell::set_icon_texture(int texture, bool owned)
 {
     if (!this->icon || texture == 0) return;

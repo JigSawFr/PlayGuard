@@ -5,6 +5,7 @@
 #pragma once
 
 #include <borealis.hpp>
+#include <vector>
 
 class GameCell : public brls::DetailCell
 {
@@ -20,8 +21,19 @@ class GameCell : public brls::DetailCell
     // in `color_key`; nullptr takes it away. Nothing without an icon slot.
     void set_badge(const char* icon_name, const char* color_key = "cadran/teal");
 
+    // Small Cadran icons in a row before the detail text, one per thing
+    // turned on (a forwarder's rules), after setDetailText(): without text
+    // they end the line. An empty list takes them away.
+    struct Mark
+    {
+        const char* icon;
+        const char* color_key;
+    };
+    void set_marks(const std::vector<Mark>& marks);
+
   private:
     brls::Image* icon = nullptr;
     brls::Box*   slot = nullptr;    // the icon and its badge
     brls::Box*   badge = nullptr;
+    brls::Box*   marks = nullptr;   // set_marks()'s row
 };

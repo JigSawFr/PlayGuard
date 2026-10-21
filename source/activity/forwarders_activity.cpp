@@ -94,6 +94,36 @@ std::string state_text_pin(const Row& r, bool full)
     return out + remake;
 }
 
+// In the list, a protected forwarder's rules are icons (list_marks), so its
+// text is only what they cannot say: a state other than ready, the pause's
+// end, made before it carried its rules.
+std::string list_text(const Row& r)
+{
+    if (!r.pin) return state_only(r);
+    std::string out = r.state == State::Ready ? "" : state_only(r);
+    const auto add = [&out](const std::string& part) { out += (out.empty() ? "" : " · ") + part; };
+    if (r.paused_until) add(brls::getStr("playguard/forwarders/state_paused", forwarder_flow::until_label(r.paused_until)));
+    else if (!r.carried) add("playguard/forwarders/state_remake"_i18n);
+    return out;
+}
+
+// One icon per thing turned on: the PIN (a key), hours without it (open
+// lock), hours it never opens (stop), closed once today's time is used up
+// (timer); paused after refused PINs, only that, as state_text_pin says.
+std::vector<GameCell::Mark> list_marks(const Row& r)
+{
+    if (!r.pin) return {};
+    std::vector<GameCell::Mark> out = { { "key", "cadran/teal" } };
+    if (r.paused_until) {
+        out.push_back({ "pause", "cadran/amber" });
+        return out;
+    }
+    if (r.free_days) out.push_back({ "unlock", "cadran/teal" });
+    if (r.closed_days) out.push_back({ "stop", "cadran/teal" });
+    if (r.limit) out.push_back({ "timer", "cadran/teal" });
+    return out;
+}
+
 }   // namespace
 
 void ForwardersActivity::onContentAvailable()
@@ -429,8 +459,9 @@ void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
                 }
                 auto* cell = new GameCell(game_icons::wanted());
                 cell->setText(r.name);
-                cell->setDetailText(state_text(r));
-                cell->setDetailTextColor(r.paused_until                ? cadran::kit::color("cadran/amber")
+                cell->setDetailText(list_text(r));
+                cell->set_marks(list_marks(r));
+                cell->setDetailTextColor(r.paused_until || (r.pin && !r.carried) ? cadran::kit::color("cadran/amber")
                                          : r.state == State::Ready     ? cadran::kit::color("cadran/teal")
                                          : r.state == State::Elsewhere ? cadran::kit::color("cadran/text2")
                                                                        : cadran::kit::color("cadran/amber"));

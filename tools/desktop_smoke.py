@@ -1443,7 +1443,7 @@ if HOMEBREW:
     if not made("sphaira").get("limit") or len(recorded("gate_limit_set")) != 1:
         fail("sphaira's limit was not set: " + repr(made("sphaira")))
     time.sleep(3)              # the toast gone
-    shot("05_rules")           # sphaira: PIN, not asked Mon–Fri 16:00–19:00, Sat–Sun 09:00–20:00 · closed … · closed once today's time is used up
+    shot("05_rules")           # sphaira: its rules as icons: the PIN (key), hours without it (open lock), closed hours (stop), the day's time (timer)
     key("Down", 8)             # Star Atlas, Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock, Protect every forwarder, Pause after refused PINs
     key("Return")
     shot("03_pause")           # never, 3 tries, 5 tries (the default), 5 tries for an hour, 10 tries
