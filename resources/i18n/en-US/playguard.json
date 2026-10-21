@@ -619,7 +619,6 @@
         "unlock_confirm": "Unlock",
         "unlocked": "Parental controls temporarily unlocked.",
         "unlock_err": "Could not unlock",
-        "banner_title": "Parental controls are temporarily unlocked",
         "banner_action": "Turn back on",
         "section_danger": "Danger zone",
         "delete": "Delete all parental controls...",
@@ -1915,8 +1914,8 @@
         },
         "pill": {
             "pc_on": "Parental controls on",
-            "pc_off": "Parental controls not set up",
-            "unlocked": "Unlocked for now",
+            "pc_off": "Off",
+            "unlocked": "Unlocked",
             "timer_on": "Play timer on",
             "timer_off": "Countdown paused",
             "timer_none": "No play-time limit",

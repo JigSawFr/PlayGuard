@@ -83,10 +83,9 @@ PlayTimerTab::PlayTimerTab()
     // The keys and the bars' key on two lines when the text is larger.
     kit::wrap(this->getView("cpt_keys_idle"));
     kit::wrap(this->getView("pt_chips"));
-    this->list.apply({ { "pt_unlocked_banner", "unlock" }, { "pt_extra", "plus" }, { "pt_stop", "stop" },
+    this->list.apply({ { "pt_extra", "plus" }, { "pt_stop", "stop" },
                        { "pt_split", "calendar" }, { "pt_bedtime_reset", "moon" }, { "pt_extra_amounts", "plus" },
                        { "pt_extra_auto", "refresh" }, { "pt_advanced", "settings" } });
-    this->list.banners({ "pt_unlocked_banner" });
 
     // The week: edited here, saved together (+ or Save), as in the per-day editor.
     week_editor->set_can_edit([this]() {
@@ -159,7 +158,6 @@ PlayTimerTab::PlayTimerTab()
     fw_note->setSingleLine(false);
     bedtime_note->setSingleLine(false);
     limit_note->setSingleLine(false);
-    ui::init_unlock_banner(unlocked_banner, [this]() { this->refresh(); });
     // The "time's up" alarm is a switch of Advanced.
     this->mark(advanced.getView(), { "alarm_off" });
     this->enable_auto_refresh(5000);
@@ -226,7 +224,6 @@ void PlayTimerTab::refresh()
     const bool writable = fw_ok && !app::read_only();
 
     ui::note_unlocked(this->pt.temporary_unlocked_valid, this->pt.temporary_unlocked);
-    ui::show_unlock_banner(unlocked_banner, this->pt.temporary_unlocked_valid && this->pt.temporary_unlocked);
     ui::set_visible(fw_note.getView(), !fw_ok);
     for (brls::View* v : { (brls::View*)limit_header.getView(), (brls::View*)split.getView(),
                            (brls::View*)limit_note.getView() })
@@ -271,10 +268,10 @@ void PlayTimerTab::refresh()
     if (this->pt.valid && !keep)
         for (int d = 0; d < 7; d++) this->pending[d] = this->pt.day_min[d];
     ui::set_visible(top.getView(), this->pt.fw_supported);
-    if (!this->pt.fw_supported) cadran::set_pill("playguard/play_timer/fw_too_old_short"_i18n, "alert", true);
+    if (!this->pt.fw_supported) cadran::set_pill("playguard/play_timer/fw_too_old_short"_i18n, "alert", cadran::Tone::WARN);
     else if (!this->pt.valid || !pt_configured(this->pt.block)) cadran::set_pill("playguard/cadran/pill/timer_none"_i18n, "timer");
     else if (this->pt.enabled_valid && this->pt.enabled) cadran::set_pill("playguard/cadran/pill/timer_on"_i18n, "timer");
-    else cadran::set_pill("playguard/cadran/pill/timer_off"_i18n, "pause", true);
+    else cadran::set_pill("playguard/cadran/pill/timer_off"_i18n, "pause", cadran::Tone::WARN);
     this->rerender();
     if (this->play_listener < 0) this->play_listener = play_data::listen([this]() { this->show_played(); });
     this->show_played();

@@ -94,9 +94,6 @@ class List
     // (RowIcon): the tile's corner, not under its value.
     brls::Box* head(const char* id) const;
 
-    // These cells as amber banners, each a card of its own (after apply()).
-    void banners(const std::vector<const char*>& ids);
-
     // Puts this line (not a cell: a box of text) in a card of its own.
     Card* wrap(const char* id);
 

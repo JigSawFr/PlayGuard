@@ -271,14 +271,14 @@ CadranIcon*  s_main_pill_icon = nullptr;
 // What the screen shown last asked the pill to say.
 std::string s_pill_text;
 std::string s_pill_glyph = "check";
-bool        s_pill_warn  = false;
+cadran::Tone s_pill_tone = cadran::Tone::OK;
 }   // namespace
 
-void cadran::set_pill(const std::string& text, const char* glyph, bool warn)
+void cadran::set_pill(const std::string& text, const char* glyph, Tone tone)
 {
     s_pill_text  = text;
     s_pill_glyph = glyph ? glyph : "check";
-    s_pill_warn  = warn;
+    s_pill_tone  = tone;
     refresh_pill();
 }
 
@@ -290,16 +290,20 @@ void cadran::refresh_pill()
     const bool unlocked = ui::known_unlocked();
     const std::string text = unlocked ? "playguard/cadran/pill/unlocked"_i18n : s_pill_text;
     const char* glyph = unlocked ? "unlock" : s_pill_glyph.c_str();
-    const bool warn = unlocked || s_pill_warn;
+    const Tone tone = unlocked ? Tone::WARN : s_pill_tone;
     brls::Theme theme = brls::Application::getTheme();
-    const NVGcolor ink = warn ? theme["cadran/amber"] : theme["cadran/pill_ok_ink"];
+    const NVGcolor ink = tone == Tone::DANGER ? theme["cadran/coral"]
+                         : tone == Tone::WARN ? theme["cadran/amber"]
+                                              : theme["cadran/pill_ok_ink"];
     s_main_pill_label->setText(text);
     s_main_pill_label->setTextColor(ink);
     s_main_pill_icon->setIcon(glyph);
     s_main_pill_icon->setColor(ink);
-    s_main_pill->setBackgroundColor(warn ? theme["cadran/amber_surf"] : theme["cadran/pill_ok"]);
-    s_main_pill->setBorderColor(theme["cadran/amber_line"]);
-    s_main_pill->setBorderThickness(warn ? 1 : 0);
+    s_main_pill->setBackgroundColor(tone == Tone::DANGER ? theme["cadran/coral_soft"]
+                                    : tone == Tone::WARN ? theme["cadran/amber_surf"]
+                                                         : theme["cadran/pill_ok"]);
+    s_main_pill->setBorderColor(tone == Tone::DANGER ? theme["cadran/coral_line"] : theme["cadran/amber_line"]);
+    s_main_pill->setBorderThickness(tone == Tone::OK ? 0 : 1);
     s_main_pill->setVisibility(text.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
 }
 

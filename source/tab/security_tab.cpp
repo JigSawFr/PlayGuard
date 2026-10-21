@@ -191,9 +191,9 @@ void SecurityTab::refresh()
     auto_relock->setOn(config::get().auto_relock, false);
     ui::show_writable(del, writable, cadran::kit::color("cadran/coral"), cadran::kit::color("cadran/text2"));
     this->list.sync();
-    if (unlocked) cadran::set_pill("playguard/cadran/pill/unlocked"_i18n, "unlock", true);
+    if (unlocked) cadran::set_pill("playguard/cadran/pill/unlocked"_i18n, "unlock", cadran::Tone::WARN);
     else if (has_pin) cadran::set_pill("playguard/cadran/pill/pin_set"_i18n, "key");
-    else if (s.pin_length_ok) cadran::set_pill("playguard/cadran/pill/pin_none"_i18n, "key", true);
+    else if (s.pin_length_ok) cadran::set_pill("playguard/cadran/pill/pin_none"_i18n, "key", cadran::Tone::WARN);
     else cadran::set_pill("");
 }
 

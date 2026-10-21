@@ -30,10 +30,12 @@ void style_rail(brls::View* tab_frame);
 void style_frame(brls::AppletFrame* frame, brls::View* tab_frame);
 // The main screen's header pill: its text, or hidden when empty (each
 // screen says what it has to: "Parental controls on", "Play timer on"…),
-// its icon, and amber for a state that needs the parent ("Pas de code PIN").
+// its icon, and its tone: amber for a state that needs the parent ("Pas de
+// code PIN"), coral for parental controls off.
 // While parental controls are known to be unlocked (ui::known_unlocked), it
 // says that instead, whatever the screen, and a tap goes where that is undone.
-void set_pill(const std::string& text, const char* icon = "check", bool warn = false);
+enum class Tone { OK, WARN, DANGER };
+void set_pill(const std::string& text, const char* icon = "check", Tone tone = Tone::OK);
 // The pill again after the unlocked state changed (MainActivity::update_title).
 void refresh_pill();
 // The soft glow of the boards, an absolute full-screen view to add first in

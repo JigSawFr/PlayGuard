@@ -619,7 +619,6 @@
         "unlock_confirm": "Aufheben",
         "unlocked": "Altersbeschränkungen vorübergehend aufgehoben.",
         "unlock_err": "Aufheben fehlgeschlagen",
-        "banner_title": "Beschränkungen vorübergehend aufgehoben",
         "banner_action": "Wieder aktivieren",
         "section_danger": "Gefahrenbereich",
         "delete": "Alle Altersbeschränkungen löschen...",
@@ -1915,8 +1914,8 @@
         },
         "pill": {
             "pc_on": "Jugendschutz aktiv",
-            "pc_off": "Jugendschutz nicht eingerichtet",
-            "unlocked": "Vorübergehend aufgehoben",
+            "pc_off": "Deaktiviert",
+            "unlocked": "Aufgehoben",
             "timer_on": "Spielzeit aktiv",
             "timer_off": "Zählung pausiert",
             "timer_none": "Kein Spielzeitlimit",

@@ -289,9 +289,9 @@ void DashboardTab::refresh()
 
     this->list.sync();
     if (!s.restriction_enabled_ok) cadran::set_pill("");
-    else if (unlocked) cadran::set_pill("playguard/cadran/pill/unlocked"_i18n, "unlock", true);
+    else if (unlocked) cadran::set_pill("playguard/cadran/pill/unlocked"_i18n, "unlock", cadran::Tone::WARN);
     else if (s.restriction_enabled) cadran::set_pill("playguard/cadran/pill/pc_on"_i18n);
-    else cadran::set_pill("playguard/cadran/pill/pc_off"_i18n, "alert", true);
+    else cadran::set_pill("playguard/cadran/pill/pc_off"_i18n, "alert", cadran::Tone::DANGER);
     this->show_ring(unlocked);
     this->show_next(unlocked);
     this->show_cards(unlocked, has_pin);

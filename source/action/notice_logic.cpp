@@ -57,7 +57,7 @@ std::string tab_of(const std::string& id)
     // The network clock is a screen of the Console tab, and Today
     // says the changes seen outside and the limits to put back.
     if (group_of(id) == Group::Console || id == "clock" || id == "clock_off") return "console";
-    if (id == "pin_missing" || id == "unlocked" || id == "pin_weak" || id == "pin_lock_off" || id == "pairing" ||
+    if (id == "pin_missing" || id == "pin_weak" || id == "pin_lock_off" || id == "pairing" ||
         id == "console_lock_long")
         return "security";
     if (id == "alarm_off" || id == "not_counting" || id == "over_limit") return "play_timer";

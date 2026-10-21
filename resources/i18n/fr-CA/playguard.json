@@ -619,7 +619,6 @@
         "unlock_confirm": "Déverrouiller",
         "unlocked": "Contrôle parental déverrouillé temporairement.",
         "unlock_err": "Impossible de déverrouiller",
-        "banner_title": "Contrôle parental déverrouillé",
         "banner_action": "Réactiver",
         "section_danger": "Zone dangereuse",
         "delete": "Supprimer tout le contrôle parental...",
@@ -1915,8 +1914,8 @@
         },
         "pill": {
             "pc_on": "Contrôle parental actif",
-            "pc_off": "Contrôle parental non configuré",
-            "unlocked": "Déverrouillé temporairement",
+            "pc_off": "Désactivé",
+            "unlocked": "Déverrouillé",
             "timer_on": "Minuteur actif",
             "timer_off": "Décompte en pause",
             "timer_none": "Pas de limite de temps de jeu",

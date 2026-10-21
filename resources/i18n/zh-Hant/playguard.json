@@ -619,7 +619,6 @@
         "unlock_confirm": "解除",
         "unlocked": "已暫時解除家長監護。",
         "unlock_err": "無法解除",
-        "banner_title": "家長監護已暫時解除",
         "banner_action": "重新啟用",
         "section_danger": "危險區域",
         "delete": "刪除所有家長監護設定…",
@@ -1915,8 +1914,8 @@
         },
         "pill": {
             "pc_on": "家長監護已開啟",
-            "pc_off": "家長監護未設定",
-            "unlocked": "已暫時解除",
+            "pc_off": "已關閉",
+            "unlocked": "已解除",
             "timer_on": "計時中",
             "timer_off": "計時已暫停",
             "timer_none": "無遊玩時間限制",
