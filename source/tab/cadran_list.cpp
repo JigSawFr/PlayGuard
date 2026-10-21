@@ -487,6 +487,23 @@ cadran::Card* cadran::List::wrap(const char* id)
     return card;
 }
 
+brls::Label* cadran::List::headline(const std::string& kicker)
+{
+    if (!this->box) return nullptr;
+    auto* head = new brls::Box(brls::Axis::COLUMN);
+    head->setAlignItems(brls::AlignItems::STRETCH);
+    head->setMarginBottom(18);
+    brls::Label* title = kit::label(upper(kicker), kit::TEXT_KICKER, "cadran/text2");
+    title->setMarginBottom(6);
+    head->addView(title);
+    brls::Label* line = kit::display("", 28);
+    head->addView(line);
+    brls::View* note = this->tab->getView("tab_ro_note");
+    const int at = note ? index_in(this->box, note) : -1;
+    this->box->addView(head, at < 0 ? 0 : at + 1);
+    return line;
+}
+
 cadran::Card* cadran::List::card_of(const char* id) const
 {
     brls::View* view = this->tab->getView(id);

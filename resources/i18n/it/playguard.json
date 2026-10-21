@@ -592,6 +592,9 @@
         "dns_note": "Il reindirizzamento DNS di Atmosphère (atmosphere/hosts) devia il server del filtro famiglia di Nintendo: l'app non può sincronizzarsi, quindi non sovrascrive le impostazioni fatte qui."
     },
     "security": {
+        "headline_none": "Ancora nessun PIN: chiunque può cambiare le impostazioni",
+        "headline_unlocked": "Sbloccato per ora",
+        "headline_active": "Protetto dal PIN",
         "section_status": "Stato",
         "pin": "PIN",
         "restrictions": "Limitazioni attive",
@@ -692,6 +695,10 @@
         "note_old_module": "Senza il PIN qui non si può modificare nulla, e PlayGuard si apre come al solito. Aggiorna il modulo da un computer: estrai playguard-rescue.zip di PlayGuard {} nella radice della scheda SD, rimetti il file RESCUE, poi riavvia la console."
     },
     "tools": {
+        "headline_kicker": "Questa console",
+        "headline_ok": "Niente da controllare",
+        "headline_one": "1 cosa da controllare",
+        "headline": "{} cose da controllare",
         "section_diag": "Diagnostica",
         "section_reports": "Report",
         "section_system": "Sistema",

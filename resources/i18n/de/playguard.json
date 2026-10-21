@@ -592,6 +592,9 @@
         "dns_note": "Die DNS-Umleitung von Atmosphère (atmosphere/hosts) leitet Nintendos Jugendschutz-Server um: Die Smart-Geräte-App kann sich nicht synchronisieren und überschreibt die hier vorgenommenen Einstellungen daher nicht."
     },
     "security": {
+        "headline_none": "Noch keine Geheimzahl: Jeder kann die Einstellungen ändern",
+        "headline_unlocked": "Vorübergehend entsperrt",
+        "headline_active": "Durch die Geheimzahl geschützt",
         "section_status": "Status",
         "pin": "Geheimzahl",
         "restrictions": "Einschränkungen aktiv",
@@ -692,6 +695,10 @@
         "note_old_module": "Ohne Geheimzahl kann hier nichts geändert werden, und PlayGuard öffnet sich wie gewohnt. Aktualisieren Sie das Modul an einem Computer: Entpacken Sie playguard-rescue.zip von PlayGuard {} ins Stammverzeichnis der SD-Karte, legen Sie die RESCUE-Datei wieder darauf und starten Sie die Konsole neu."
     },
     "tools": {
+        "headline_kicker": "Diese Konsole",
+        "headline_ok": "Nichts zu prüfen",
+        "headline_one": "1 Punkt zu prüfen",
+        "headline": "{} Punkte zu prüfen",
         "section_diag": "Diagnose",
         "section_reports": "Berichte",
         "section_system": "System",

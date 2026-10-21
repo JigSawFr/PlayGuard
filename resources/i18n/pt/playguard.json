@@ -592,6 +592,9 @@
         "dns_note": "O redirecionamento DNS do Atmosphère (atmosphere/hosts) desvia o servidor do controlo parental da Nintendo: a aplicação móvel não consegue sincronizar, por isso não substitui as definições feitas aqui."
     },
     "security": {
+        "headline_none": "Ainda sem PIN: qualquer pessoa pode alterar as definições",
+        "headline_unlocked": "Desbloqueado por agora",
+        "headline_active": "Protegido pelo PIN",
         "section_status": "Estado",
         "pin": "PIN",
         "restrictions": "Restrições ativas",
@@ -692,6 +695,10 @@
         "note_old_module": "Sem o PIN não é possível alterar nada aqui, e o PlayGuard abre como habitualmente. Atualize o módulo a partir de um computador: extraia o playguard-rescue.zip do PlayGuard {} na raiz do cartão SD, volte a colocar o ficheiro RESCUE e reinicie a consola."
     },
     "tools": {
+        "headline_kicker": "Esta consola",
+        "headline_ok": "Nada a verificar",
+        "headline_one": "1 coisa a verificar",
+        "headline": "{} coisas a verificar",
         "section_diag": "Diagnóstico",
         "section_reports": "Relatórios",
         "section_system": "Sistema",
