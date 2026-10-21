@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 291d4702e4db -->
+<!-- translated from docs/install.md, sha256 3b35bfa7ef3d -->
 # 安裝
 
 如何安裝、更新和移除 PlayGuard，以及它會在 SD 卡上寫入哪些檔案。安裝之後：[開始使用](getting-started.md)。返回 [README](../../README.md)。
@@ -7,7 +7,7 @@
 
 任選一種：
 
-- **Homebrew App Store** / **sphaira 的 App Store**（同一個目錄）——商店頁面通過審核後，搜尋 *PlayGuard* 即可。新版本會自動提供。
+- **Homebrew App Store** / **sphaira 的 App Store**（同一個目錄）——商店頁面通過審核後，搜尋 *PlayGuard* 即可。新版本會在審核後自動提供：通常比 GitHub 晚幾天。PlayGuard 知道自己是從那裡安裝的，會建議透過商店更新。
 - **sphaira › GitHub**——版本的 zip 檔已包含對應的項目（`/config/sphaira/github/playguard.json`）：第一次安裝之後，在 sphaira 中從 *GitHub* 更新即可。
 - **手動**——從[最新版本](https://github.com/JigSawFr/PlayGuard/releases/latest)下載 `playguard.zip`，解壓縮到 SD 卡的**根目錄**。應用程式會放在 `sd:/switch/playguard/`，它的檔案則在 `sd:/config/playguard/`。
 

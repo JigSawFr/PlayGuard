@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 86382aa8effc -->
+<!-- translated from docs/troubleshooting.md, sha256 498fbfed802c -->
 # Resolução de problemas
 
 Voltar a entrar numa consola bloqueada, os problemas comuns, comunicar um erro e o modo de programador. Voltar ao [README](../../README.md).
@@ -23,6 +23,13 @@ Nesse caso, o próprio PlayGuard não consegue arrancar. Instale **antecipadamen
 
 O módulo tem de acompanhar a versão do PlayGuard: a cada atualização do PlayGuard, extraia de novo o `playguard-rescue.zip` dessa versão (ou *Atualizar* na entrada *O sysmodule de recuperação está desatualizado* do sino de notificações) e depois reinicie a consola. Um módulo mais antigo deixa um relatório que o PlayGuard não consegue verificar: o ecrã de recuperação não propõe então nada, diz que o módulo é mais antigo, e voltar a fazer `RESCUE` dá o mesmo resultado até ele ser atualizado.
 
+### Menu homebrew bloqueado
+
+*Consola › Forwarders › Bloquear o menu homebrew* impede que o álbum e um jogo iniciado com R abram o menu homebrew. Se o forwarder do PlayGuard e o menu protegido tiverem ambos desaparecido (eliminados nas Definições da consola, ou no outro sistema: o bloqueio está no cartão SD, lido tanto pelo sysMMC como pelo emuMMC):
+
+- **A partir de um computador:** elimine `atmosphere/config/override_config.ini` no cartão SD (ou reponha `config/playguard/override_config.ini.backup`, o ficheiro tal como estava) e depois reinicie a consola.
+- **Com o módulo de recuperação instalado** (opcional): coloque um ficheiro vazio `config/playguard/RESCUE` no cartão SD e reinicie; o módulo levanta o bloqueio no arranque, e o PlayGuard indica-o no arranque seguinte. Uma atualização do Atmosphère desde que foi bloqueado levanta-o da mesma forma.
+
 ### Consola não modificada
 
 O PlayGuard não pode ajudar: precisa do Atmosphère. O procedimento da chave mestra do apoio ao cliente da Nintendo é a via oficial.
@@ -41,7 +48,7 @@ O PlayGuard não pode ajudar: precisa do Atmosphère. O procedimento da chave me
 ### Os meus limites mudaram sozinhos
 
 - **A aplicação móvel continua associada.** A sua próxima sincronização substitui o que o PlayGuard definiu: *PIN › Desvincular a aplicação móvel*.
-- **Outra ferramenta, ou um perfil.** *Hoje* mostra um cartão âmbar para limites diferentes dos que o PlayGuard viu da última vez, e *Histórico › Histórico de alterações* lista cada alteração vista fora do PlayGuard. Ⓐ numa delas repõe o valor anterior.
+- **Outra ferramenta, ou um perfil.** *Hoje* mostra um cartão âmbar para limites diferentes dos que o PlayGuard viu da última vez, e *Preferências › Histórico de alterações* lista cada alteração vista fora do PlayGuard. Ⓐ numa delas repõe o valor anterior.
 - **Um perfil agendado** posto em vigor, ou reposto quando o seu período terminou (*Tempo de jogo › Perfis › Perfil agendado*).
 
 ### A criança jogou para além do limite

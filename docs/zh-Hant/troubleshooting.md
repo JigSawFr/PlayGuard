@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 86382aa8effc -->
+<!-- translated from docs/troubleshooting.md, sha256 498fbfed802c -->
 # 疑難排解
 
 重新取得被鎖住的主機的控制權、常見問題、回報錯誤，以及開發者模式。返回 [README](../../README.md)。
@@ -23,6 +23,13 @@ PlayGuard 只能看到它所執行的那個系統的家長監護：**emuMMC 和 
 
 這個模組必須跟上 PlayGuard 的版本：每次更新 PlayGuard，都要重新解壓縮該版本的 `playguard-rescue.zip`（或在通知鈴鐺的*復原 sysmodule 不是最新版本*上選*更新*），然後重新啟動主機。舊版模組留下的報告 PlayGuard 無法驗證：這時復原畫面不會提供任何操作，只會說明模組版本較舊；在更新模組之前，再次使用 `RESCUE` 也會得到相同的結果。
 
+### Homebrew 選單已鎖定
+
+*主機 › 轉發器 › 鎖定自製軟體選單*會讓相簿和按住 R 啟動的遊戲不再開啟 Homebrew 選單。如果 PlayGuard 的轉發器和受保護的選單都不見了（在主機的「設定」中被刪除，或是在另一個系統上：鎖定寫在 SD 卡上，sysMMC 和 emuMMC 都會讀取）：
+
+- **用電腦：** 刪除 SD 卡上的 `atmosphere/config/override_config.ini`（或放回 `config/playguard/override_config.ini.backup`，也就是原本的檔案），然後重新啟動主機。
+- **已安裝復原 sysmodule 時**（選用）：在 SD 卡上放一個空的 `config/playguard/RESCUE` 檔案後重新啟動；模組會在開機時解除鎖定，PlayGuard 下次啟動時會說明。鎖定之後更新了 Atmosphère，也會以同樣的方式解除鎖定。
+
 ### 未改機的主機
 
 PlayGuard 幫不上忙：它需要 Atmosphère。官方的做法是向任天堂客服申請主密鑰（master key）。
@@ -41,7 +48,7 @@ PlayGuard 幫不上忙：它需要 Atmosphère。官方的做法是向任天堂�
 ### 上限自己改變了
 
 - **手機應用程式仍然連動著。** 它下次同步會覆蓋 PlayGuard 設定的內容：*PIN碼 › 解除手機應用程式的連動*。
-- **其他工具，或設定檔。** 上限與 PlayGuard 上次看到的不同時，*今天*會顯示一張琥珀色的卡片，*紀錄 › 變更紀錄*會列出在 PlayGuard 之外發現的每一項變更。在其中一項上按 Ⓐ 可以改回先前的值。
+- **其他工具，或設定檔。** 上限與 PlayGuard 上次看到的不同時，*今天*會顯示一張琥珀色的卡片，*偏好設定 › 變更紀錄*會列出在 PlayGuard 之外發現的每一項變更。在其中一項上按 Ⓐ 可以改回先前的值。
 - **排定的設定檔**已套用，或在期間結束後改回（*遊玩時間限制 › 設定檔 › 排定的設定檔*）。
 
 ### 孩子玩超過了上限
