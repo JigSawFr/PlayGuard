@@ -52,12 +52,15 @@ bool ulaunch_present()
 }
 
 // Locking on emuMMC, or on a sysMMC with an emuMMC set up: the lock is on
-// the SD card, both systems read it; the forwarders are each system's.
-bool other_system()
+// the SD card, both systems read it; the forwarders are each system's. What
+// to say, from the system it runs on ("" when there is no other one).
+std::string other_system()
 {
     SysInfo si;
     sysinfo_get(&si);
-    return !ui::other_storage_note(si).empty();
+    if (ui::other_storage_note(si).empty()) return "";
+    return sysinfo_storage(&si) == SysStorage_EmuMMC ? "playguard/hbmenu/other_system_emummc"_i18n
+                                                     : "playguard/hbmenu/other_system_sysmmc"_i18n;
 }
 
 // Why a write under `dir` failed, read now: the SD card full, or written to
@@ -99,7 +102,7 @@ forwarders_logic::LockCheck check(bool take_log)
 }
 
 // The checks as a dialog's lines (the lock's confirmation, the check).
-std::vector<ui::CheckLine> check_lines(const forwarders_logic::LockCheck& c)
+std::vector<ui::CheckLine> check_lines(const forwarders_logic::LockCheck& c, bool open_now)
 {
     using ui::Check;
     std::vector<ui::CheckLine> out;
@@ -115,11 +118,13 @@ std::vector<ui::CheckLine> check_lines(const forwarders_logic::LockCheck& c)
     else
         out.push_back({ Check::Bad, "playguard/hbmenu/need_menu"_i18n });
     out.push_back({ Check::Header, "playguard/hbmenu/sec_open"_i18n });
+    if (open_now) out.push_back({ Check::Warn, "playguard/hbmenu/line_open_now"_i18n });
     if (c.open_doors.empty()) out.push_back({ Check::Ok, "playguard/hbmenu/line_no_doors"_i18n });
     else out.push_back({ Check::Warn, brls::getStr("playguard/hbmenu/open_doors", joined(c.open_doors)) });
     if (!c.sd_writers.empty()) out.push_back({ Check::Warn, brls::getStr("playguard/hbmenu/sd_writers", joined(c.sd_writers)) });
     if (ulaunch_present()) out.push_back({ Check::Warn, "playguard/hbmenu/ulaunch"_i18n });
-    if (other_system()) out.push_back({ Check::Warn, "playguard/hbmenu/other_system"_i18n });
+    const std::string other = other_system();
+    if (!other.empty()) out.push_back({ Check::Warn, other });
     return out;
 }
 
@@ -144,7 +149,7 @@ namespace
 struct State
 {
     bool file = false, lock_block = false, defaults = false, album = true, any_app = true, state = false;
-    std::string locked_on, ams, patches, module, gate;
+    std::string locked_on, ams, patches, module, module_version, gate;
     forwarders_logic::LockCheck c;
 };
 
@@ -169,6 +174,7 @@ State read_state(bool take_log)
                  : p == forwarders_logic::Patches::Incomplete ? "incomplete"
                                                               : "missing";
     st.module = !rescue::installed() ? "none" : rescue::outdated() ? "outdated" : "current";
+    st.module_version = rescue::installed_version();
     st.gate = paths::file_exists(in_data(GATE_NRO_NAME)) ? "present" : "none";
     st.c = check(take_log);
     return st;
@@ -178,14 +184,41 @@ std::string yes_no(bool v)
 {
     return v ? "playguard/hbmenu/yes"_i18n : "playguard/hbmenu/no"_i18n;
 }
+
+// The check's third button: Lock while it is not, else Update the module.
+bool lock_offered(const State& st)
+{
+    return !st.lock_block && !app::read_only();
+}
+bool update_offered(const State& st)
+{
+    return !lock_offered(st) && st.module == "outdated" && rescue::bundled() && !app::read_only();
+}
+
+// The rescue module's line: whether it is installed and, when it is not
+// the one this PlayGuard comes with, which version it came with and which
+// one replaces it.
+std::string module_text(const State& st)
+{
+    if (st.module == "none") return "playguard/hbmenu/check_none"_i18n;
+    if (st.module == "current") return "playguard/hbmenu/check_current"_i18n;
+    const std::string how = update_offered(st) ? "playguard/hbmenu/module_how_update"_i18n
+                                               : brls::getStr("playguard/hbmenu/module_how_zip", app::version());
+    return st.module_version.empty()
+        ? brls::getStr("playguard/hbmenu/check_outdated_unknown", app::version(), how)
+        : brls::getStr("playguard/hbmenu/check_outdated", st.module_version, app::version(), how);
+}
+
 }   // namespace
 
-void show_check()
+void show_check(std::function<void(bool)> done)
 {
     using ui::Check;
     const State st = read_state(true);
     const std::string unknown = "playguard/forwarders/unknown"_i18n;
     std::vector<ui::CheckLine> lines;
+    // Not locked: said first, before what Atmosphère reads.
+    if (!st.lock_block) lines.push_back({ Check::Warn, "playguard/hbmenu/check_not_locked"_i18n });
     // What Atmosphère will read, then the checks, then the system's.
     lines.push_back({ Check::Header, "playguard/hbmenu/sec_reads"_i18n });
     lines.push_back({ st.lock_block ? Check::Ok : Check::Info,
@@ -195,18 +228,28 @@ void show_check()
                                                    : "playguard/hbmenu/state_open"_i18n) });
     lines.push_back({ st.album ? Check::Info : Check::Ok, brls::getStr("playguard/hbmenu/check_album", yes_no(st.album)) });
     lines.push_back({ st.any_app ? Check::Info : Check::Ok, brls::getStr("playguard/hbmenu/check_r", yes_no(st.any_app)) });
-    for (const ui::CheckLine& l : check_lines(st.c)) lines.push_back(l);
+    for (const ui::CheckLine& l : check_lines(st.c, !st.lock_block)) lines.push_back(l);
     lines.push_back({ Check::Header, "playguard/hbmenu/sec_system"_i18n });
-    lines.push_back({ Check::Info, brls::getStr("playguard/hbmenu/check_ams", st.ams.empty() ? unknown : st.ams,
-                                                st.locked_on.empty() ? unknown : st.locked_on) });
+    const std::string ams = st.ams.empty() ? unknown : st.ams;
+    // The version it was locked under, only while it is.
+    lines.push_back({ Check::Info, st.lock_block && !st.locked_on.empty()
+                                       ? brls::getStr("playguard/hbmenu/check_ams", ams, st.locked_on)
+                                       : brls::getStr("playguard/hbmenu/check_ams_plain", ams) });
     lines.push_back({ st.module == "outdated" ? Check::Warn : Check::Info,
-                      brls::getStr("playguard/hbmenu/check_module",
-                                   st.module == "none"      ? "playguard/hbmenu/check_none"_i18n
-                                   : st.module == "current" ? "playguard/hbmenu/check_current"_i18n
-                                                            : "playguard/hbmenu/check_outdated"_i18n) });
+                      brls::getStr("playguard/hbmenu/check_module", module_text(st)) });
+    const auto finish = [done](bool changed) {
+        if (done) done(changed);
+    };
     auto* dialog = ui::box_dialog(ui::checklist_body("playguard/hbmenu/check"_i18n, lines));
+    // The rescue sheet and OK; alone above them, the way to the lock while it
+    // is not locked, else an outdated module's update.
     dialog->addButton("playguard/hbmenu/rescue"_i18n, []() { brls::sync([]() { show_rescue(); }); });
     dialog->addButton("hints/ok"_i18n, []() {});
+    if (lock_offered(st))
+        dialog->addButton("playguard/hbmenu/lock"_i18n, [finish]() { brls::sync([finish]() { lock(finish); }); });
+    else if (update_offered(st))
+        dialog->addButton("playguard/hbmenu/module_update"_i18n,
+                          [finish]() { brls::sync([finish]() { rescue::update_now(finish); }); });
     dialog->setCancelable(true);
     cadran::style_dialog(dialog, cadran::Emphasis::NONE);
     if (brls::View* ok = dialog->getView("brls/dialog/button2")) dialog->setLastFocusedView(ok);

@@ -29,6 +29,10 @@ void set_firmware_choice(std::string (*summary)());
 // same way; none until then.
 void set_homebrew_lock(std::string (*section)());
 
+// Atmosphère's DNS.mitm section (action/nintendo_dns's report()), given the
+// same way; none until then.
+void set_dns(std::string (*section)());
+
 // Saves as logs/reports/report_<timestamp>.txt (util/log_files.hpp). Returns the
 // saved path, or an empty string (and *error set) on failure.
 std::string save(const std::string& report, std::string* error = nullptr);

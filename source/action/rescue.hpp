@@ -5,6 +5,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <functional>
 #include <optional>
 #include <string>
 
@@ -45,6 +46,9 @@ const char* revision();
 // Whether the module is installed and is not the one this PlayGuard comes
 // with: its playguard-rescue.txt says another revision, or there is none.
 bool outdated();
+// The version of PlayGuard the installed module came with (its
+// playguard-rescue.txt): "" when there is none or no module.
+std::string installed_version();
 // MainActivity, once per start: when the module is installed and is not the
 // one this PlayGuard comes with (its playguard-rescue.txt says another
 // revision, or there is none: installed before it was written), an entry of
@@ -63,5 +67,8 @@ bool bundled();
 // RESCUE_RESTART_PATH says so until then.
 // False, with a short English reason in *error, when it could not.
 bool update(std::string* error);
+// update(), as the bell's Update does: the failure said, else the notice
+// cleared, the restart asked and said. `done(updated)` after.
+void update_now(std::function<void(bool)> done = nullptr);
 
 }   // namespace rescue

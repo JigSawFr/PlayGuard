@@ -7,6 +7,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -28,6 +29,10 @@ bool matches(const std::string& pattern, const std::string& host);
 // name name …" naming it ("#" starts a comment).
 bool redirects(const std::string& text, const std::string& host);
 
+// The first line of `text` that sends `host` elsewhere, its comment and the
+// spaces around it left out; "" when none does.
+std::string redirecting_line(const std::string& text, const std::string& host);
+
 // Whether system_settings.ini turns DNS.mitm off ([atmosphere]
 // enable_dns_mitm = u8!0x0). On by default.
 bool mitm_disabled(const std::string& ini);
@@ -39,5 +44,29 @@ int emummc_id(const std::string& ini);
 // for `nand` ("sysmmc", "emummc", anything else: none, no Atmosphère seen):
 // it reads the first one there.
 std::vector<std::string> candidates(const std::string& nand, int emummc_id);
+
+// What was read on the SD card: DNS.mitm turned off, and the hosts file
+// Atmosphère reads ("" for none, its defaults only) with its text.
+struct Seen
+{
+    bool mitm_off = false;
+    std::string file, text;
+};
+
+// Where Atmosphère writes, at each start, the hosts file it loaded and every
+// redirection it keeps, relative to the SD card's root.
+constexpr const char* STARTUP_LOG = "atmosphere/logs/dns_mitm_startup.log";
+// The last lines of that log the report keeps.
+constexpr size_t STARTUP_LOG_LINES = 40;
+
+// One line for the session log: "DNS.mitm on, hosts file
+// atmosphere/hosts/default.txt: parental-control server redirected, time
+// server reachable".
+std::string summary(const Seen& seen);
+
+// The diagnostic report's section: the same, the line that redirects each
+// server, and the end of Atmosphère's start-up log (`startup_log`, "" when
+// `has_startup_log` is false: not on the SD card).
+std::string report(const Seen& seen, bool has_startup_log, const std::string& startup_log);
 
 }   // namespace dns_hosts

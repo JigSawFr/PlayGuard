@@ -76,8 +76,10 @@ void unlock(std::function<void(bool)> done);
 void at_start(std::function<void()> open);
 
 // What Atmosphère will read and what the lock rests on, in a dialog
-// (Console › Forwarders › Check the homebrew menu).
-void show_check();
+// (Console › Forwarders › Check the homebrew menu). Not locked, it offers
+// the way to the lock; an outdated rescue module, its update. `done(changed)`
+// after either.
+void show_check(std::function<void(bool)> done = nullptr);
 // The same for the diagnostic report (util/diagnostics), in English.
 std::string report();
 
