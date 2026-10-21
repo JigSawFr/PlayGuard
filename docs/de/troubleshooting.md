@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 498fbfed802c -->
+<!-- translated from docs/troubleshooting.md, sha256 5b0b1b94198f -->
 # Fehlerbehebung
 
 Wieder Zugang zu einer gesperrten Konsole bekommen, die häufigen Probleme, einen Fehler melden, und der Entwicklermodus. Zurück zum [README](../../README.md).
@@ -74,6 +74,10 @@ Auf der Konsole läuft eine Firmware, die neuer ist als die neueste getestete: P
 
 *Konsole › Installierte Spiele prüfen* sagt, was bei jedem nicht stimmt und was zu tun ist; Spielstände bleiben immer erhalten ([installierte Spiele](features.md#installierte-spiele)).
 
+### Ein geschützter Forwarder zeigt Fehler 2347-0100
+
+Sein Tor (`config/playguard/gate-….nro`) ist nicht mehr die Datei, mit der der Forwarder erstellt wurde: Es wurde auf der SD-Karte verändert oder ersetzt, also startet der Forwarder es nicht. Öffne PlayGuard über seinen eigenen Forwarder: Es schreibt das Tor beim Start zurück; *Konsole › Forwarder › Alle neu installieren* erstellt damit jeden Forwarder neu.
+
 ### Die Glocke oder ein Tab zeigt ein bernsteinfarbenes Abzeichen
 
 Etwas braucht dich: Ⓨ öffnet die Liste, und Ⓐ auf einem Eintrag führt die Lösung aus oder öffnet, wo sie gemacht wird ([Benachrichtigungen](features.md#benachrichtigungen--was-dich-braucht-aus-jedem-tab)).
@@ -120,6 +124,7 @@ Drücke siebenmal Ⓨ auf *Info › Version*; die Entwicklerwerkzeuge erscheinen
 
 - einen Schalter **schreibgeschützt** — ist er an, kann die App nichts ändern: der sichere Weg, eine neue Firmware zu untersuchen (der Firmware-Bildschirm bietet ihn direkt an);
 - den Diagnosebericht auf dem Bildschirm (Ⓨ speichert ihn, Ⓧ sendet ihn online) und eine Abkürzung, um ihn aus dem Tab Spielzeit zu exportieren;
+- **Selbsttest der Konsole**: was PlayGuard auf dieser Konsole von selbst prüft, bevor [die Konsolen-Checkliste](../hardware-test.md) (auf Englisch) von Hand durchgegangen wird — die Geheimzahl, die Signatur-Patches, den Datenordner, jeden von PlayGuard erstellten Forwarder (im HOME-Menü, geschützt, durch sein Tor funktionierend gesehen), das Tor auf der SD-Karte, was Atmosphère von der Sperre des Homebrew-Menüs liest, die Rückwege, das Rettungsmodul. Er ändert nichts und schreibt sein Ergebnis als Markdown nach `config/playguard/self-test.md`, zum Einfügen in den Pull Request;
 - **Anderen Build installieren** an Ort und Stelle, um eine Korrektur zu testen, bevor sie veröffentlicht wird ([unten](#einen-anderen-build-installieren));
 - **Spielzeit-Block vergleichen** (nur solange die Smart-Geräte-App verknüpft ist und synchronisieren kann — nicht mit einer Hosts-Datei, die Nintendo blockiert; auch in *Geheimzahl*), um Einstellungen zu entschlüsseln, die PlayGuard noch nicht anzeigt: Speichere den rohen Block als Referenz, ändere eine Einstellung in der Smart-Geräte-App, komm zurück — PlayGuard listet die Werte auf, die sich geändert haben (auf Wunsch in `logs/reports/` gespeichert). Unterschiedliche Schlafenszeiten pro Tag, in der Smart-Geräte-App eingestellt, könnten so bestätigt werden. Hänge diese Datei an ein Issue an oder sende sie mit dem Bericht (*Bericht online senden*).
 - **Spielzeit aufzeichnen**: alle 30 s, solange PlayGuard offen ist, eine Zeile mit dem, was der Timer meldet (verbleibende Zeit, gespielte Zeit, der rohe Einstellungsblock…), in `logs/play_timer/log.csv`, einer Datei, die sich in einer Tabellenkalkulation öffnen lässt, dazu eine Zeile direkt nach jeder Änderung von PlayGuard, die sagt, welche (ihre letzte Spalte, `event`), und ein Vermerk, wenn sich die Uhr um mehr bewegt hat als die vergangene Zeit. Über Mitternacht offen gelassen, oder bis die Zeit um ist, zeigt es, was ein einzelner Bericht nicht kann: wann die gespielte Zeit zurückgesetzt wird, was die Konsole kurz vor dem Ende sagt. Der Schalter wird gemerkt; er zeichnet nur im Entwicklermodus auf. Was bisher bekannt ist, steht in [parental-controls.md](../parental-controls.md) (auf Englisch).
