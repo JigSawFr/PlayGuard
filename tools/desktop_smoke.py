@@ -95,7 +95,8 @@ forwarder and sphaira's, protected with the PIN, made; refused again until
 sphaira is seen working through its gate (its log); locked with A held on
 the checklist, the rescue sheet after it; deleting sphaira refused while
 locked; then unlocked: override_config.ini, the state file and the change
-history must follow.
+history must follow; the check then says first that it is not locked, and
+which PlayGuard the outdated rescue module came with.
 
 The "homebrew" scenario starts with Console › Forwarders in use
 (PLAYGUARD_SIM_FORWARDERS) and sphaira paused by its gate: the pause lifted,
@@ -421,6 +422,12 @@ if HBMENU:
     open(os.path.join(run_dir, "playguard_data", "gate_log.txt"), "w").write(
         "".join("2026-10-07 21:0%d\trefused\tsdmc:/switch/sphaira/sphaira.nro\n" % m for m in (3, 4, 5)))
     open(hbmenu_state, "w").write("ams=1.9.4\n")
+    # The rescue module of an older PlayGuard: the check says which, and how
+    # to replace it.
+    module = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "contents", "4200000000505247")
+    os.makedirs(module, exist_ok=True)
+    open(os.path.join(module, "exefs.nsp"), "w").write("NSP0")
+    open(os.path.join(module, "playguard-rescue.txt"), "w").write("1.2.0 000000000000\n")
     for kind in ("fs_patches", "loader_patches"):
         d = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "kip_patches", kind)
         os.makedirs(d, exist_ok=True)
@@ -1418,6 +1425,9 @@ if HBMENU:
     if os.path.exists(hbmenu_state) or len(recorded("unlock_hbmenu")) != 1:
         fail("the state file stayed, or the unlock is not in the history")
     shot("07_unlocked")
+    key("Down", 4)             # Protect every forwarder, Pause after refused PINs, Tries this week, Check the homebrew menu
+    key("Return")
+    shot("09_check_open")      # not locked, said first; the album and R open; Lock offered; the module of PlayGuard 1.2.0
     finish()
 if HOMEBREW:
     # A pause lifted, hours it never opens, the pause's rule, an icon from the

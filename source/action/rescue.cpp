@@ -157,16 +157,28 @@ void note_version()
         ? brls::getStr("playguard/notices/rescue_unknown_update", app::version())
         : brls::getStr("playguard/notices/rescue_old_update", version, app::version());
     notices::set("rescue_old", notices::Level::Action, "playguard/notices/rescue_old"_i18n, detail,
-                 "playguard/notices/rescue_update"_i18n, []() {
-                     std::string error;
-                     if (!update(&error)) {
-                         ui::error(brls::getStr("playguard/notices/rescue_update_failed", error));
-                         return;
-                     }
-                     notices::clear("rescue_old");
-                     note_restart(true);
-                     ui::info("playguard/notices/rescue_updated"_i18n);
-                 });
+                 "playguard/notices/rescue_update"_i18n, []() { update_now(); });
+}
+
+std::string installed_version()
+{
+    std::string version;
+    if (installed()) installed_revision(&version);
+    return version;
+}
+
+void update_now(std::function<void(bool)> done)
+{
+    std::string error;
+    if (!update(&error)) {
+        ui::error(brls::getStr("playguard/notices/rescue_update_failed", error));
+        if (done) done(false);
+        return;
+    }
+    notices::clear("rescue_old");
+    note_restart(true);
+    ui::info("playguard/notices/rescue_updated"_i18n);
+    if (done) done(true);
 }
 
 bool bundled()
