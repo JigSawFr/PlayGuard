@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 34671f8ad715 -->
+<!-- translated from docs/features.md, sha256 1cf484ad9b39 -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.fr.md).
@@ -426,24 +426,6 @@ Sur une console sans Internet, *Régler l'horloge réseau sur l'horloge de la co
 - Le **masquage du numéro de série** par Atmosphère (en partie caché jusqu'à Ⓐ ; en emuMMC, s'il n'est pas masqué, une icône d'avertissement sur la ligne au-dessus, que Ⓐ explique).
 - **Patchs de jeux** (sys-patch ou fichiers sigpatches, avec une recommandation de sys-patch quand seuls des fichiers sont utilisés : une icône d'information, ou d'avertissement quand quelque chose est à vérifier, que Ⓐ explique).
 
-## Historique — modifications et sauvegardes
-
-*[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=history)*
-
-### Historique des modifications
-
-- Les 500 dernières modifications faites par PlayGuard (limites, niveau de restriction, code PIN, déverrouillages, dissociation, horloge, restaurations, mise en pause ou reprise du décompte…) et ce qu'il a vu changer en dehors de lui, regroupées par jour (*Aujourd'hui*, *Hier*, puis le jour et la date), avec l'heure et depuis où ; une limite changée pour un seul jour nomme ce jour.
-- Une modification **refusée** par la console apparaît aussi, en orange, avec l'erreur de la console et ce qui était demandé (jamais remise : rien n'a changé).
-- *Afficher* ne garde qu'un type (temps de jeu, restrictions, sécurité et appli, vu en dehors de PlayGuard, refusé par la console) ; *Exporter ce qui est affiché* l'écrit dans `exports/` en CSV, JSON, XLSX ou PDF.
-- Ⓐ sur une modification l'affiche et, pour une valeur, **remet la précédente** — avec le même déverrouillage et le même code PIN que toute modification, en signalant si elle a changé depuis.
-- Chaque modification garde la version de PlayGuard qui l'a faite ; une modification enregistrée par une version plus récente de PlayGuard apparaît comme *Autre modification*.
-
-### Sauvegardes
-
-- **Sauvegarder / restaurer les réglages** sur la carte SD : niveau de restriction, réglages personnalisés, mode VR, organisme de classification, limites quotidiennes, alarme « temps écoulé » (avec les actions avancées activées), et pour mémoire le bloc brut du minuteur — jamais le code PIN.
-- La restauration ne liste que ce qui changerait (rien à changer : elle le dit simplement, sans déverrouillage ni écriture), et signale quand la sauvegarde avait une alarme du coucher (elle n'est pas réécrite).
-- Nombre de sauvegardes conservées au choix.
-
 ## Préférences
 
 *[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=preferences)*
@@ -456,6 +438,24 @@ Sur une console sans Internet, *Régler l'horloge réseau sur l'horloge de la co
   - Les types de notifications (voir [plus haut](#comportement-des-entrées)).
   - Un **rappel mensuel pour soutenir PlayGuard** (activé par défaut, jamais le premier mois ni juste après une mise à jour ; *Ne plus afficher* sur le rappel ou cet interrupteur le désactive pour de bon, mises à jour comprises).
 - Un réglage qui ne concerne qu'une fonction est à côté d'elle : le temps en plus dans *Temps de jeu*, la réactivation dans *Code PIN*, la vérification de l'horloge dans *Console › Horloge réseau*. Les mises à jour et *Aide et diagnostic* sont dans *À propos*.
+
+### Modifications et sauvegardes
+
+À la fin de *Préférences* (l'onglet Historique des versions précédentes).
+
+#### Historique des modifications
+
+- Les 500 dernières modifications faites par PlayGuard (limites, niveau de restriction, code PIN, déverrouillages, dissociation, horloge, restaurations, mise en pause ou reprise du décompte…) et ce qu'il a vu changer en dehors de lui, regroupées par jour (*Aujourd'hui*, *Hier*, puis le jour et la date), avec l'heure et depuis où ; une limite changée pour un seul jour nomme ce jour.
+- Une modification **refusée** par la console apparaît aussi, en orange, avec l'erreur de la console et ce qui était demandé (jamais remise : rien n'a changé).
+- *Afficher* ne garde qu'un type (temps de jeu, restrictions, sécurité et appli, vu en dehors de PlayGuard, refusé par la console) ; *Exporter ce qui est affiché* l'écrit dans `exports/` en CSV, JSON, XLSX ou PDF.
+- Ⓐ sur une modification l'affiche et, pour une valeur, **remet la précédente** — avec le même déverrouillage et le même code PIN que toute modification, en signalant si elle a changé depuis.
+- Chaque modification garde la version de PlayGuard qui l'a faite ; une modification enregistrée par une version plus récente de PlayGuard apparaît comme *Autre modification*.
+
+#### Sauvegardes
+
+- **Sauvegarder / restaurer les réglages** sur la carte SD : niveau de restriction, réglages personnalisés, mode VR, organisme de classification, limites quotidiennes, alarme « temps écoulé » (avec les actions avancées activées), et pour mémoire le bloc brut du minuteur — jamais le code PIN.
+- La restauration ne liste que ce qui changerait (rien à changer : elle le dit simplement, sans déverrouillage ni écriture), et signale quand la sauvegarde avait une alarme du coucher (elle n'est pas réécrite).
+- Nombre de sauvegardes conservées au choix.
 
 ## À propos
 

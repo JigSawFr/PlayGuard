@@ -2,6 +2,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
+#include "ui/cadran_kit.hpp"
 #include "util/diagnostics.hpp"
 #include "util/paths.hpp"
 
@@ -32,16 +33,16 @@ std::string compat_text(const SysInfo& info, NVGcolor* color)
     const std::string tested = hos_text(PCTL_FW_TESTED_MAX);
     switch (sysinfo_compat(&info)) {
         case SysCompat_Ok:
-            if (color) *color = color_ok();
+            if (color) *color = cadran::kit::color("cadran/teal");
             return "playguard/compat/ok"_i18n;
         case SysCompat_UntestedNewer:
-            if (color) *color = color_warn();
+            if (color) *color = cadran::kit::color("cadran/amber");
             return brls::getStr("playguard/compat/untested", std::string(tested));
         case SysCompat_PlayTimerUnsupported:
-            if (color) *color = color_warn();
+            if (color) *color = cadran::kit::color("cadran/amber");
             return "playguard/compat/too_old"_i18n;
         default:
-            if (color) *color = color_bad();
+            if (color) *color = cadran::kit::color("cadran/coral");
             return "playguard/compat/not_ams"_i18n;
     }
 }
@@ -82,10 +83,10 @@ bool serial_warning(const SysInfo& info)
 std::string blank_text(const SysInfo& info, NVGcolor* color)
 {
     if (!info.blank_valid) {
-        if (color) *color = color_neutral();
+        if (color) *color = cadran::kit::color("cadran/text2");
         return "playguard/common/unavailable"_i18n;
     }
-    if (color) *color = info.blank ? color_ok() : (serial_warning(info) ? color_warn() : color_neutral());
+    if (color) *color = info.blank ? cadran::kit::color("cadran/teal") : (serial_warning(info) ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     return info.blank ? "playguard/common/yes"_i18n : "playguard/common/no"_i18n;
 }
 
@@ -132,16 +133,16 @@ std::string patches_text(const patches::Report& report, NVGcolor* color)
 {
     switch (patches::status(report)) {
         case patches::Status::SysPatch:
-            if (color) *color = color_ok();
+            if (color) *color = cadran::kit::color("cadran/teal");
             return "playguard/tools/patches_syspatch"_i18n;
         case patches::Status::SysPatchIncomplete:
-            if (color) *color = color_warn();
+            if (color) *color = cadran::kit::color("cadran/amber");
             return "playguard/tools/patches_incomplete"_i18n;
         case patches::Status::FilesOnly:
-            if (color) *color = color_warn();
+            if (color) *color = cadran::kit::color("cadran/amber");
             return brls::getStr("playguard/tools/patches_files", join_list(report.files));
         default:
-            if (color) *color = color_neutral();
+            if (color) *color = cadran::kit::color("cadran/text2");
             return "playguard/tools/patches_none"_i18n;
     }
 }

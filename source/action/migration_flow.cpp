@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "app.hpp"
+#include "ui/cadran_text.hpp"
 #include "ui/ui.hpp"
 #include "util/data_move.hpp"
 #include "util/log_files.hpp"
@@ -125,10 +126,10 @@ void choose(std::vector<bool> chosen, int focus)
             return;
         }
         // What each one moves, as a table.
-        std::string list;
+        cadran_text::Rows rows;
         for (size_t i = 0; i < chosen.size(); i++)
-            if (chosen[i]) list += "\n" + brls::getStr("playguard/common/line", labels[i], details[i]);
-        ui::confirm(brls::getStr("playguard/dev/migrations_body", list), "playguard/dev/migrations_confirm"_i18n,
+            if (chosen[i]) rows.push_back({ labels[i], details[i] });
+        ui::confirm(brls::getStr("playguard/dev/migrations_body", cadran_text::table(rows)), "playguard/dev/migrations_confirm"_i18n,
                     [chosen]() { run_chosen(chosen); });
     });
 }

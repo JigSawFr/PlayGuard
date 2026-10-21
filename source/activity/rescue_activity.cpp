@@ -6,6 +6,7 @@
 #include "activity/lock_activity.hpp"
 #include "activity/main_activity.hpp"
 #include "app.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/pctl_ops_c.hpp"
 
@@ -74,9 +75,9 @@ void RescueActivity::refresh()
                     : report.result == RescueResult_Refused ? "playguard/rescue/outcome/refused"
                                                             : "playguard/rescue/outcome/failed";
     outcome->setText(brls::getStr(key));
-    outcome->setTextColor(ok ? ui::color_ok()
-                             : old_module || (report.result == RescueResult_NoPin && !doubted) ? ui::color_warn()
-                                                                                               : ui::color_bad());
+    outcome->setTextColor(ok ? cadran::kit::color("cadran/teal")
+                             : old_module || (report.result == RescueResult_NoPin && !doubted) ? cadran::kit::color("cadran/amber")
+                                                                                               : cadran::kit::color("cadran/coral"));
 
     std::string n = old_module                            ? brls::getStr("playguard/rescue/note_old_module", app::version())
                   : doubted                               ? "playguard/rescue/note_unconfirmed"_i18n
@@ -105,7 +106,7 @@ void RescueActivity::refresh()
     reset_pin->setDetailText("playguard/rescue/hint/reset_pin"_i18n);
     del->setDetailText("playguard/rescue/hint/delete"_i18n);
     for (brls::DetailCell* c : { (brls::DetailCell*)reset_pin.getView(), (brls::DetailCell*)del.getView() })
-        c->setDetailTextColor(ui::color_note());
+        c->setDetailTextColor(cadran::kit::color("cadran/text3"));
 
     // After the sysmodule deleted everything, only "Open PlayGuard" is left.
     // Otherwise: delete needs a PIN to exist; "Set a new PIN" is always
@@ -116,7 +117,7 @@ void RescueActivity::refresh()
                           { reset_pin.getView(), actions },
                           { del.getView(), actions && has_pin } });
     ui::show_writable(reset_pin, writable);
-    ui::show_writable(del, writable, ui::color_bad(), ui::color_neutral());
+    ui::show_writable(del, writable, cadran::kit::color("cadran/coral"), cadran::kit::color("cadran/text2"));
 }
 
 void RescueActivity::proceed()

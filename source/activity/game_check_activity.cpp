@@ -25,6 +25,8 @@
 #include "util/paths.hpp"
 #include "util/perf.hpp"
 #include "util/table_export.hpp"
+#include "ui/cadran_kit.hpp"
+#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "view/game_tile.hpp"
 
@@ -179,7 +181,7 @@ class IssueCell : public brls::DetailCell
     void set_selected(bool on)
     {
         ui::set_visible(this->check, on);
-        this->setTextColor(on ? brls::Application::getTheme()["brls/list/listItem_value_color"] : ui::color_text());
+        this->setTextColor(on ? brls::Application::getTheme()["brls/list/listItem_value_color"] : cadran::kit::color("cadran/text"));
     }
 
   private:
@@ -204,7 +206,7 @@ class IssueTile : public GameTile
     void set_selected(bool on)
     {
         ui::set_visible(this->check, on);
-        this->set_name_color(on ? brls::Application::getTheme()["brls/list/listItem_value_color"] : ui::color_text());
+        this->set_name_color(on ? brls::Application::getTheme()["brls/list/listItem_value_color"] : cadran::kit::color("cadran/text"));
     }
 
     u64 app_id = 0;
@@ -222,9 +224,9 @@ std::string view_label(bool grid)
 // in two blocks read from the left, the ID and version underneath.
 brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, const std::vector<unsigned char>& icon)
 {
+    namespace kit = cadran::kit;
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::STRETCH);
-    box->setPadding(26, 36, 18, 36);
 
     auto* head = new brls::Box(brls::Axis::ROW);
     head->setAlignItems(brls::AlignItems::CENTER);
@@ -240,20 +242,27 @@ brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, co
     auto* titles = new brls::Box(brls::Axis::COLUMN);
     titles->setGrow(1.0f);
     titles->setShrink(1.0f);
-    titles->addView(ui::text_label(game_name(g), 24, ui::color_text()));
-    auto* problem = ui::text_label(short_text(g, issue), 19, warn_only(issue) ? ui::color_warn() : ui::color_bad());
+    titles->addView(kit::display(game_name(g), 23));
+    auto* problem = kit::label(short_text(g, issue), 17, warn_only(issue) ? "cadran/amber" : "cadran/coral");
     problem->setMarginTop(4);
     titles->addView(problem);
     head->addView(titles);
     box->addView(head);
 
-    auto block = [box](const std::string& title, const std::string& text) {
-        auto* t = ui::text_label(title, 18, ui::color_note());
-        t->setMarginTop(18);
-        box->addView(t);
-        auto* body = ui::text_label(text, 20, ui::color_text());
+    // Each block on the second surface, its title a kicker.
+    brls::Theme theme = brls::Application::getTheme();
+    auto block = [box, &theme](const std::string& title, const std::string& text) {
+        auto* card = new brls::Box(brls::Axis::COLUMN);
+        card->setBackgroundColor(theme["cadran/surf2"]);
+        card->setCornerRadius(14);
+        card->setPadding(12, 18, 14, 18);
+        card->setMarginTop(14);
+        brls::Label* t = kit::label(cadran::upper(title), 15, "cadran/text3");
+        card->addView(t);
+        brls::Label* body = kit::label(text, 18, "cadran/text");
         body->setMarginTop(4);
-        box->addView(body);
+        card->addView(body);
+        box->addView(card);
     };
     block("playguard/games/cause"_i18n, cause_text(g, issue, current_hos));
     block("playguard/games/fix"_i18n, fix_text(g, issue, current_hos));
@@ -262,8 +271,8 @@ brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, co
     if (g.display_version[0]) footer += " · " + brls::getStr("playguard/games/version", std::string(g.display_version));
     if (g.verified == GC_VERIFIED_INTACT) footer += "\n" + brls::getStr("playguard/games/verified_intact", ui::time_text(g.verified_at));
     if (app::dev_mode()) footer += "\n" + developer_text(g);
-    auto* foot = ui::text_label(footer, 18, ui::color_note());
-    foot->setMarginTop(18);
+    brls::Label* foot = kit::label(footer, 15.5f, "cadran/text3");
+    foot->setMarginTop(14);
     box->addView(foot);
     return box;
 }
@@ -347,7 +356,7 @@ void GameCheckActivity::build_group(GameCategory category)
     group.title->setMarginBottom(4);
     group.title->setMarginTop(category == GROUPS[0] ? 10 : 20);
     group.box->addView(group.title);
-    group.note = ui::text_label(brls::getStr(std::string("playguard/games/group_note/") + category_key(category)), 18, ui::color_note());
+    group.note = cadran::kit::label(brls::getStr(std::string("playguard/games/group_note/") + category_key(category)), 18, "cadran/text3");
     group.note->setMarginBottom(8);
     group.box->addView(group.note);
     cadran::List::section(group.title);
@@ -386,7 +395,7 @@ void GameCheckActivity::build_group(GameCategory category)
         actions->addView(group.send);
         group.remove_all = new brls::Button();
         group.remove_all->setGrow(1.0f);
-        group.remove_all->setTextColor(ui::color_bad());
+        group.remove_all->setTextColor(cadran::kit::color("cadran/coral"));
         group.remove_all->registerClickAction([this, category](brls::View*) {
             this->remove_games(this->groups[category].games);
             return true;
@@ -576,7 +585,7 @@ void GameCheckActivity::status_text(const std::string& text, NVGcolor color)
 
 void GameCheckActivity::status_text(const std::string& text)
 {
-    this->status_text(text, ui::color_text());
+    this->status_text(text, cadran::kit::color("cadran/text"));
 }
 
 void GameCheckActivity::show()
@@ -619,7 +628,7 @@ void GameCheckActivity::show()
         for (size_t i = 0; i < shown.size(); i++) {
             const Broken b = shown[i];
             const bool picked = this->selected.count(b.game.app_id) != 0;
-            const NVGcolor color = warn_only(b.issue) ? ui::color_warn() : ui::color_bad();
+            const NVGcolor color = warn_only(b.issue) ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/coral");
             group.games.push_back(b.game);
             brls::View* view;
             if (this->grid) {
@@ -681,7 +690,7 @@ void GameCheckActivity::show()
     }
     // Above the sections from two games on: what is picked, or how to pick.
     this->selection->setText(this->selection_text());
-    this->selection->setTextColor(this->selected.empty() ? ui::color_text()
+    this->selection->setTextColor(this->selected.empty() ? cadran::kit::color("cadran/text")
                                                          : brls::Application::getTheme()["brls/list/listItem_value_color"]);
     ui::set_visible(this->selection, broken.size() >= 2 || !this->selected.empty());
 
@@ -710,7 +719,7 @@ void GameCheckActivity::show()
     } else if (this->checking) {
         this->status_text("playguard/games/searching"_i18n);
     } else if (R_FAILED(this->list_rc)) {
-        this->status_text("playguard/games/err_list"_i18n + " — " + ui::rc_text(this->list_rc), ui::color_bad());
+        this->status_text("playguard/games/err_list"_i18n + " — " + ui::rc_text(this->list_rc), cadran::kit::color("cadran/coral"));
     } else {
         const std::string found = broken.empty() ? brls::getStr("playguard/games/none", (int)count)
                                                  : brls::getStr("playguard/games/section_count", (int)broken.size(), (int)count);
@@ -720,7 +729,7 @@ void GameCheckActivity::show()
         const std::string truncated = this->cache.truncated ? brls::getStr("playguard/games/truncated", (int)count) : "";
         this->status_text(game_check_text::result_line(found, broken.empty(), age,
                                                        { truncated, app::dev_mode() ? this->timing : "" }),
-                          broken.empty() ? ui::color_ok() : ui::color_note());
+                          broken.empty() ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/text3"));
     }
     hint->setText(brls::getStr("playguard/games/many", ui::storage_short(si)));
     ui::set_visible(hint.getView(), broken.size() >= MANY);
@@ -861,15 +870,16 @@ void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current
     }
     auto* box = details_view(game, issue, current_hos, icon_of(game.app_id));
     if (app::read_only() && gamecheck_actions(&game, issue) & ~GA_VERIFY) {
-        auto* note_ro = ui::text_label("playguard/common/read_only_note"_i18n, 18, ui::color_note());
+        brls::Label* note_ro = cadran::kit::label("playguard/common/read_only_note"_i18n, 15.5f, "cadran/text3");
         note_ro->setMarginTop(8);
         box->addView(note_ro);
     }
 
     // Two buttons at most, side by side (a third goes on a row of its own):
-    // the fix first, with the focus, then the other actions; B closes. With
-    // no fix: Back, then the actions.
-    auto* dialog = new brls::Dialog(box);
+    // the fix first ("its first button", the texts say), in teal, with the
+    // focus, then the other actions; B closes. With no fix: OK, then the
+    // actions.
+    auto* dialog = ui::dialog("", box);   // scrolls when its text is long
     const GameFacts g = game;
     const u32 others = actions & ~recommended;
     if (recommended) {
@@ -878,8 +888,11 @@ void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current
             if (g.contents[i].type == GC_META_PATCH) update = g.contents[i];
         dialog->addButton(fix_button(recommended), [this, g, recommended, update]() { this->run(g, recommended, update); });
         if (others) dialog->addButton("playguard/games/other_actions"_i18n, [this, g, others]() { this->choose(g, others); });
+        cadran::style_dialog(dialog);
+        if (auto* fix = dynamic_cast<brls::Button*>(dialog->getView("brls/dialog/button1")))
+            cadran::style_button(fix, cadran::Emphasis::PRIMARY);
     } else {
-        dialog->addButton("hints/back"_i18n, []() {});
+        dialog->addButton("hints/ok"_i18n, []() {});
         if (others) dialog->addButton("playguard/games/actions"_i18n, [this, g, others]() { this->choose(g, others); });
     }
     dialog->open();
@@ -921,17 +934,18 @@ void GameCheckActivity::run(const GameFacts& g, u32 action, const GameContent& c
     }
 }
 
-void GameCheckActivity::remove(const GameFacts& g)
+void GameCheckActivity::remove(const GameFacts& g, bool asked)
 {
     const std::string label = history_label(g), name = game_name(g);
     std::weak_ptr<bool> weak = this->alive;
-    ui::confirm_danger(name + "\n\n" + "playguard/games/remove_body"_i18n, "playguard/games/remove"_i18n,
-                       [this, weak, id = g.app_id, label, name]() {
-                           const Result rc = gamecheck_remove(id);
-                           if (R_SUCCEEDED(rc)) history_flow::record_event("remove_game", "", label);
-                           ui::notify_result(rc, brls::getStr("playguard/games/removed", name), "playguard/games/remove_err"_i18n);
-                           if (R_SUCCEEDED(rc) && !weak.expired()) this->refresh(false, id);
-                       });
+    auto now = [this, weak, id = g.app_id, label, name]() {
+        const Result rc = gamecheck_remove(id);
+        if (R_SUCCEEDED(rc)) history_flow::record_event("remove_game", "", label);
+        ui::notify_result(rc, brls::getStr("playguard/games/removed", name), "playguard/games/remove_err"_i18n);
+        if (R_SUCCEEDED(rc) && !weak.expired()) this->refresh(false, id);
+    };
+    if (asked) now();
+    else ui::confirm_danger(name + "\n\n" + "playguard/games/remove_body"_i18n, "playguard/games/remove"_i18n, now);
 }
 
 // The games to install again in a JSON table (exports/, as the Activity
@@ -967,13 +981,13 @@ void GameCheckActivity::save_list(const std::vector<GameFacts>& games,
     });
 }
 
-void GameCheckActivity::remove_games(std::vector<GameFacts> games)
+void GameCheckActivity::remove_games(std::vector<GameFacts> games, bool asked)
 {
     if (games.empty() || this->removing) return;
     const std::string body = brls::getStr("playguard/games/remove_all_body", (int)games.size()) + "\n" +
                              game_check_text::name_lines(games, words());
     std::weak_ptr<bool> weak = this->alive;
-    ui::confirm_danger(body, "playguard/games/remove"_i18n, [this, weak, games]() {
+    auto now = [this, weak, games]() {
         if (weak.expired()) return;
         // The list first: nothing is removed without it.
         this->save_list(games, [this, weak, games](const std::string& path, const std::string& error) {
@@ -991,7 +1005,9 @@ void GameCheckActivity::remove_games(std::vector<GameFacts> games)
             this->removing = true;
             this->remove_next(games, 0, 0, path);
         });
-    });
+    };
+    if (asked) now();
+    else ui::confirm_danger(body, "playguard/games/remove"_i18n, now);
 }
 
 // One game a frame, the count above the list in between.
@@ -1151,8 +1167,10 @@ void GameCheckActivity::report_verified(GameCheckActivity* self, const std::weak
             std::string body = brls::getStr("playguard/games/verify_bad", name);
             if (v.found) body += "\n\n" + brls::getStr("playguard/games/verify_code", console_code(v.found));
             if (app::read_only() || weak.expired()) ui::info(body);
-            else ui::confirm(body, "playguard/games/fix_button/remove"_i18n, [self, weak, g = v.game]() {
-                if (!weak.expired()) self->remove(g);   // closed while the question was open
+            // One question: what removing does is said here, in coral.
+            else ui::confirm_danger(body + "\n\n" + "playguard/games/remove_body"_i18n,
+                                    "playguard/games/fix_button/remove"_i18n, [self, weak, g = v.game]() {
+                if (!weak.expired()) self->remove(g, true);   // closed while the question was open
             });
         }
         return;
@@ -1167,12 +1185,12 @@ void GameCheckActivity::report_verified(GameCheckActivity* self, const std::weak
     if (t.failed) body += "\n" + brls::getStr("playguard/games/verify_count_err", (int)t.failed);
     if (t.corrupt.empty() || app::read_only() || weak.expired()) ui::info(body);
     else
-        ui::confirm(body,
-                    t.corrupt.size() == 1 ? "playguard/games/remove_corrupt_one"_i18n
-                                          : brls::getStr("playguard/games/remove_corrupt", (int)t.corrupt.size()),
-                    [self, weak, corrupt = t.corrupt]() {
-                        if (!weak.expired()) self->remove_games(corrupt);   // closed while the question was open
-                    });
+        ui::confirm_danger(body + "\n\n" + "playguard/games/remove_body"_i18n,
+                           t.corrupt.size() == 1 ? "playguard/games/remove_corrupt_one"_i18n
+                                                 : brls::getStr("playguard/games/remove_corrupt", (int)t.corrupt.size()),
+                           [self, weak, corrupt = t.corrupt]() {
+                               if (!weak.expired()) self->remove_games(corrupt, true);   // closed while the question was open
+                           });
 }
 
 void GameCheckActivity::verify(std::vector<GameFacts> games)

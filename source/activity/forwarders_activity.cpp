@@ -9,6 +9,7 @@
 #include "app.hpp"
 #include "tab/cadran_list.hpp"
 #include "ui/cadran_kit.hpp"
+#include "ui/cadran_text.hpp"
 #include "ui/format_text.hpp"
 #include "ui/ui.hpp"
 #include "util/forwarders.hpp"
@@ -86,7 +87,7 @@ void ForwardersActivity::onContentAvailable()
 {
     note->setSingleLine(false);
     warning->setSingleLine(false);
-    empty->setSingleLine(false);
+    cadran::kit::empty_around(empty, "home");
     game_note->setSingleLine(false);
     self_cell->registerClickAction([this](brls::View*) {
         if (const Row* own = forwarders_logic::self_row(this->list_rows)) {
@@ -245,7 +246,7 @@ void ForwardersActivity::show_lock()
     const hbmenu_lock::Summary s = hbmenu_lock::summary();
     const bool on = s.locked;
     lock_cell->setDetailText(on ? "playguard/hbmenu/state_locked"_i18n : "playguard/hbmenu/state_open"_i18n);
-    ui::show_writable(lock_cell, !app::read_only(), ui::color_text(), on ? ui::color_ok() : ui::color_neutral());
+    ui::show_writable(lock_cell, !app::read_only(), cadran::kit::color("cadran/text"), on ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/text2"));
     if (!forwarder_flow::loader_present()) {
         ui::set_visible(summary.getView(), false);
         return;
@@ -318,8 +319,8 @@ void ForwardersActivity::show_self()
     const bool on = own && own->state != State::NotInstalled;
     self_cell->setDetailText(on ? state_text(*own) : "playguard/forwarders/add"_i18n);
     // Read-only: greyed when it would add it (its details stay a press away).
-    ui::show_writable(self_cell, on || !app::read_only(), ui::color_text(),
-                      on && own->state == State::Ready ? ui::color_ok() : ui::color_neutral());
+    ui::show_writable(self_cell, on || !app::read_only(), cadran::kit::color("cadran/text"),
+                      on && own->state == State::Ready ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/text2"));
 }
 
 std::function<void(bool)> ForwardersActivity::then_rebuild(uint64_t id)
@@ -398,9 +399,9 @@ void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
                 auto* cell = new GameCell(game_icons::wanted());
                 cell->setText(r.name);
                 cell->setDetailText(state_text(r));
-                cell->setDetailTextColor(r.state == State::Ready       ? ui::color_ok()
-                                         : r.state == State::Elsewhere ? ui::color_neutral()
-                                                                       : ui::color_warn());
+                cell->setDetailTextColor(r.state == State::Ready       ? cadran::kit::color("cadran/teal")
+                                         : r.state == State::Elsewhere ? cadran::kit::color("cadran/text2")
+                                                                       : cadran::kit::color("cadran/amber"));
                 // On its icon: protected (a lock; a check for a menu seen
                 // working), or made here and starting without the PIN.
                 if (r.pin) cell->set_badge(r.verified && forwarders_logic::is_menu(r.nro) ? "check" : "lock");
@@ -500,9 +501,12 @@ void ForwardersActivity::details(const Row& r)
     const std::string nro = r.nro.empty() ? unknown : nro::sd_path(r.nro);
     const std::string made = r.state == State::Elsewhere ? "playguard/forwarders/state_elsewhere"_i18n
                                                          : "playguard/forwarders/made_here"_i18n;
-    ui::info(brls::getStr("playguard/forwarders/details", r.name, r.author.empty() ? unknown : r.author,
-                          r.version.empty() ? unknown : r.version, nro, forwarders::hex_id(r.id),
-                          r.state == State::Elsewhere ? made : made + " · " + state_text(r)));
+    ui::info(r.name + "\n\n" +
+             cadran_text::table({ { "playguard/forwarders/author"_i18n, r.author.empty() ? unknown : r.author },
+                                  { "playguard/tools/version"_i18n, r.version.empty() ? unknown : r.version },
+                                  { ".nro", nro },
+                                  { "playguard/forwarders/program_id"_i18n, forwarders::hex_id(r.id) } }) +
+             "\n\n" + (r.state == State::Elsewhere ? made : made + " · " + state_text(r)));
 }
 
 void ForwardersActivity::rename(const Row& row)

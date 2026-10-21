@@ -53,7 +53,8 @@ void QrView::draw(NVGcontext* vg, float x, float y, float width, float height,
     const float code = module * pixels;
     const float left = std::round(x + (width - code) / 2), top = std::round(y + (height - code) / 2);
     nvgBeginPath(vg);
-    nvgRect(vg, left, top, code, code);
+    // Rounded within the quiet zone, as the boards' cards: no module is cut.
+    nvgRoundedRect(vg, left, top, code, code, module * quiet / 2);
     nvgFillPaint(vg, nvgImagePattern(vg, left, top, code, code, 0, this->image, 1.0f));
     nvgFill(vg);
 }

@@ -425,24 +425,6 @@ On a console without Internet, *Set the network clock to the console clock* appe
 - Whether Atmosphère **blanks the serial number** (partly hidden until Ⓐ; on emuMMC, when it is not, a warning icon on the row above, which Ⓐ explains).
 - **Game patches** (sys-patch or sigpatch files, recommending sys-patch when only files are used: an info icon, or a warning one when something needs a look, which Ⓐ explains).
 
-## History — changes and backups
-
-*[Try it in the simulator ›](https://playguard.link/simulator/?tab=history)*
-
-### Change history
-
-- The newest 500 changes PlayGuard made (limits, restriction level, PIN, unlocks, unlinking, the clock, restores, pausing or resuming the countdown …) and what it saw changed outside it, grouped by day (*Today*, *Yesterday*, then the day and date), with the time and from where; a limit changed on one day names that day.
-- A change the console **refused** is listed too, in amber, with the console's error and what was tried (never put back: nothing changed).
-- *Show* keeps one kind (play time, restrictions, security and app, seen outside PlayGuard, refused by the console); *Export what is shown* writes it to `exports/` as CSV, JSON, XLSX or PDF.
-- Ⓐ on a change shows it and, for a value, **puts the previous one back** — through the same unlock and PIN as any change, saying if it changed since.
-- Each change keeps the PlayGuard version that made it; a change recorded by a newer version of PlayGuard shows as *Other change*.
-
-### Backups
-
-- **Back up / restore the settings** on the SD card: restriction level, custom settings, VR mode, rating organisation, daily limits, the "time's up" alarm (with the advanced actions on), and the raw play-timer block for the record — never the PIN.
-- A restore lists only what would change (nothing to change: it just says so, with no unlock and nothing written), and says when the backup had a bedtime alarm on (it is not written back).
-- Choose how many backups to keep.
-
 ## Preferences
 
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=preferences)*
@@ -455,6 +437,24 @@ On a console without Internet, *Set the network clock to the console clock* appe
   - The kinds of notifications (see [above](#how-entries-behave)).
   - A **monthly reminder to support PlayGuard** (on by default, never in the first month nor right after an update; *Don't show again* on the reminder or this switch turns it off for good, updates included).
 - A setting that shapes one feature sits with it: extra time in *Play timer*, turning parental controls back on in *PIN*, the clock check in *Console › Network clock*. The updates and *Help & diagnostics* are in *About*.
+
+### Changes and backups
+
+At the end of *Preferences* (the History tab of earlier versions).
+
+#### Change history
+
+- The newest 500 changes PlayGuard made (limits, restriction level, PIN, unlocks, unlinking, the clock, restores, pausing or resuming the countdown …) and what it saw changed outside it, grouped by day (*Today*, *Yesterday*, then the day and date), with the time and from where; a limit changed on one day names that day.
+- A change the console **refused** is listed too, in amber, with the console's error and what was tried (never put back: nothing changed).
+- *Show* keeps one kind (play time, restrictions, security and app, seen outside PlayGuard, refused by the console); *Export what is shown* writes it to `exports/` as CSV, JSON, XLSX or PDF.
+- Ⓐ on a change shows it and, for a value, **puts the previous one back** — through the same unlock and PIN as any change, saying if it changed since.
+- Each change keeps the PlayGuard version that made it; a change recorded by a newer version of PlayGuard shows as *Other change*.
+
+#### Backups
+
+- **Back up / restore the settings** on the SD card: restriction level, custom settings, VR mode, rating organisation, daily limits, the "time's up" alarm (with the advanced actions on), and the raw play-timer block for the record — never the PIN.
+- A restore lists only what would change (nothing to change: it just says so, with no unlock and nothing written), and says when the backup had a bedtime alarm on (it is not written back).
+- Choose how many backups to keep.
 
 ## About
 

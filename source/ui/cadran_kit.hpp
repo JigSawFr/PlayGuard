@@ -11,9 +11,41 @@
 
 namespace cadran::kit
 {
+// The boards' corners, and the XML's (@style/cadran/radius/<name>,
+// cadran::install_theme): a row on its own, a table, a picker's row (ROW); a
+// game's icon (ICON); a card of a list, a tile (CARD); a screen's top card
+// (TOP); a dialog's and a picker's card (MODAL). A pill is round: half its
+// height.
+constexpr float RADIUS_ROW   = 14;
+constexpr float RADIUS_ICON  = 12;
+constexpr float RADIUS_CARD  = 20;
+constexpr float RADIUS_TOP   = 22;
+constexpr float RADIUS_MODAL = 24;
+
+// The boards' type scale: what is said in passing (a code, a caption, a
+// pill), a section's kicker in capitals, a note under the lines, a line's
+// text, a dialog's paragraph, a dialog's title (in the display face).
+constexpr float TEXT_META   = 15;
+constexpr float TEXT_KICKER = 16;
+constexpr float TEXT_NOTE   = 16.5f;
+constexpr float TEXT_BODY   = 17;
+constexpr float TEXT_LEAD   = 19;
+constexpr float TEXT_TITLE  = 23;
+
+// A theme colour of the boards ("cadran/teal"…), for what draws itself or
+// sets a colour: always a key of the palettes, never a value of its own, so
+// it follows the theme.
+NVGcolor color(const char* key);
+
 // A label of `size` px in the theme colour `color_key` ("cadran/text2"…);
-// several lines when it has to.
+// several lines when it has to. centered(): the same, centred, wrapping at
+// its box's width.
 brls::Label* label(const std::string& text, float size, const char* color_key = "cadran/text");
+brls::Label* centered(const std::string& text, float size, const char* color_key = "cadran/text");
+
+// The same in the boards' display face (Sora; the other scripts from the
+// app's fonts): a dialog's title, a code to read out, a figure.
+brls::Label* display(const std::string& text, float size, const char* color_key = "cadran/text");
 
 // An icon of the boards, `size` px square.
 CadranIcon* icon(const char* name, float size, const char* color_key = "cadran/text2");
@@ -58,6 +90,25 @@ brls::Box* pill(const std::string& text, const char* dot_key);
 // round bubble, `size` px across, no margins.
 brls::Box* key(const char* letter, float size = 24);
 
+// A QR code of `payload`, `side` px (dark on white whatever the theme, as
+// phones read it best), its `title` under it and a `caption` smaller (either
+// may be empty), centred; `width` (0: the code's own) keeps cards alike.
+brls::Box* qr(const std::string& payload, float side, const std::string& title, const std::string& caption,
+              float width = 0);
+
+// A progress bar, 12 px high: the well, filled in teal up to `set`.
+class Bar : public brls::View
+{
+  public:
+    Bar();
+    void set(float fraction);   // 0..1
+    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
+              brls::FrameContext* ctx) override;
+
+  private:
+    float fraction = 0;
+};
+
 // A rounded chip with a text in the display face (an amount, a period…).
 brls::Box* chip(const std::string& text, float height = 48);
 
@@ -71,6 +122,10 @@ struct Empty
     brls::Label* text  = nullptr;
 };
 Empty empty(const char* icon_name);
+// The same around a screen's own label (its XML's, which it fills and shows):
+// the label becomes the card's title, in place, and ui::set_visible on it
+// shows or hides the whole card. Returns the card.
+brls::Box* empty_around(brls::Label* label, const char* icon_name);
 
 // A row whose items go on to the next line when they do not fit (the XML
 // has no attribute for it).

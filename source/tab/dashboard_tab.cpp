@@ -19,6 +19,7 @@
 #include "core/platform.h"
 #include "tab/clock_tab.hpp"
 #include "ui/cadran_frame.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/perf.hpp"
@@ -72,7 +73,7 @@ DashboardTab::DashboardTab()
     });
     // Shown only while the alarm is off: A turns it back on (the dialog says why).
     ui::set_detail(alarm, "playguard/dashboard/alarm_off"_i18n);
-    alarm->setDetailTextColor(ui::color_warn());
+    alarm->setDetailTextColor(cadran::kit::color("cadran/amber"));
     alarm->registerClickAction([this](brls::View*) {
         pt_flow::turn_alarm_on("overview", [this]() { this->refresh(); });
         return true;

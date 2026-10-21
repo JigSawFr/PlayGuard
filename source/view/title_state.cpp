@@ -5,6 +5,7 @@
 #include "activity/firmware_gate_activity.hpp"
 #include "activity/main_activity.hpp"
 #include "tab/help_tab.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -81,7 +82,7 @@ void TitleState::draw(NVGcontext* vg, float x, float y, float width, float heigh
 void TitleState::draw_read_only(NVGcontext* vg, float x, float y, float width, float height)
 {
     // A pencil (writing) crossed out, in the header's text colour.
-    const NVGcolor ink = ui::color_text();
+    const NVGcolor ink = cadran::kit::color("cadran/text");
     const float cx = x + width / 2, cy = y + height / 2;
     nvgSave(vg);
     nvgTranslate(vg, cx, cy);

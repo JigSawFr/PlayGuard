@@ -7,10 +7,10 @@
 #include <memory>
 #include <thread>
 
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/github_auth.hpp"
 #include "util/text.hpp"
-#include "view/qr_view.hpp"
 
 using namespace brls::literals;
 
@@ -27,19 +27,16 @@ void show_code(const github_auth::DeviceCode& code, std::function<void()> done)
 {
     auto cancelled = std::make_shared<std::atomic<bool>>(false);
 
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::CENTER);
-    box->setPadding(20, 32, 10, 32);
-    box->addView(ui::centered_label(brls::getStr("playguard/github/code_body", text::short_url(code.verification_uri)), 20,
-                                    ui::color_text()));
-    brls::Label* user_code = ui::centered_label(code.user_code, 44, ui::color_text());
-    user_code->setMarginTop(10);
-    box->addView(user_code);
-    auto* qr = new QrView(code.verification_uri, 200);
-    qr->setMarginTop(8);
-    box->addView(qr);
-    box->addView(ui::centered_label("playguard/github/code_note"_i18n, 18, ui::color_note()));
-    auto* dialog = new brls::Dialog(box);
+    // The code to type in the display face, large, its address's QR code
+    // beside it to open the page from a phone.
+    auto* row = new brls::Box(brls::Axis::ROW);
+    row->setAlignItems(brls::AlignItems::CENTER);
+    row->setJustifyContent(brls::JustifyContent::CENTER);
+    brls::Label* user_code = cadran::kit::display(code.user_code, 44);
+    user_code->setMarginRight(32);
+    row->addView(user_code);
+    row->addView(cadran::kit::qr(code.verification_uri, 200, "", "playguard/github/code_note"_i18n, 260));
+    auto* dialog = ui::dialog(brls::getStr("playguard/github/code_body", text::short_url(code.verification_uri)), row);
     ui::add_cancel(dialog, [cancelled]() { *cancelled = true; });
     dialog->open();
 
@@ -70,17 +67,17 @@ void show_code(const github_auth::DeviceCode& code, std::function<void()> done)
                         ui::notify("playguard/github/signed_in"_i18n);
                         if (done) done();
                     } else {
-                        ui::info(brls::getStr("playguard/github/failed", err));
+                        ui::error(brls::getStr("playguard/github/failed", err));
                     }
                     break;
                 case github_auth::Poll::Denied:
                     ui::info("playguard/github/denied"_i18n);
                     break;
                 case github_auth::Poll::Failed:
-                    ui::info(brls::getStr("playguard/github/failed", err));
+                    ui::error(brls::getStr("playguard/github/failed", err));
                     break;
                 default:   // expired (or still pending at the deadline)
-                    ui::info("playguard/github/expired"_i18n);
+                    ui::error("playguard/github/expired"_i18n);
                     break;
             }
         });
@@ -100,7 +97,7 @@ void sign_in(std::function<void()> done)
         brls::sync([ok, code, err, done]() {
             if (!ok) {
                 s_busy = false;
-                ui::info(brls::getStr("playguard/github/failed", err));
+                ui::error(brls::getStr("playguard/github/failed", err));
                 return;
             }
             show_code(code, done);   // s_busy until it ends
@@ -118,7 +115,7 @@ void open(std::function<void()> done)
         github_auth::forget_token();
         ui::notify("playguard/github/signed_out"_i18n);
         if (done) done();
-    });
+    }, nullptr, true);
 }
 
 }   // namespace github_login_flow

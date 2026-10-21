@@ -114,7 +114,7 @@ bool confirm()
 bool before_show_pin()
 {
     if (!ask()) {
-        ui::notify(refusal_text());
+        ui::refuse(refusal_text());
         return false;
     }
     // The read that follows at once does not ask a second time.
@@ -160,7 +160,7 @@ void choose(std::function<void()> done)
             return;
         }
         if (change == pin_lock_logic::Change::AskPin && !confirm()) {
-            ui::notify(refusal_text());
+            ui::refuse(refusal_text());
             return;
         }
         config::get().pin_lock = to;
@@ -174,7 +174,7 @@ void set_ask_again(bool on, std::function<void()> done)
     if (on == config::get().pin_ask_again) return;
     // Less protection: only the parent may choose it.
     if (!on && !confirm()) {
-        ui::notify(refusal_text());
+        ui::refuse(refusal_text());
         if (done) done();   // the switch shows the setting again
         return;
     }

@@ -6,6 +6,7 @@
 #include <fmt/format.h>
 
 #include "ui/cadran_frame.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 
 namespace
@@ -49,7 +50,7 @@ void PlayHoursView::draw(NVGcontext* vg, float x, float y, float width, float he
     (void)ctx;
     (void)height;
     const float s = this->scale();
-    const NVGcolor ink = ui::color_text();
+    const NVGcolor ink = cadran::kit::color("cadran/text");
     const NVGcolor fill = brls::Application::getTheme()["cadran/teal"];
     const float name_w = NAME_W * s;
     const float cell_w = (width - name_w) / 24.0f;

@@ -404,7 +404,7 @@ PIN-код в самом PlayGuard:
 
 ## История — изменения и резервные копии
 
-*[Попробовать в симуляторе ›](https://playguard.link/simulator/?tab=history)*
+*[Попробовать в симуляторе ›](https://playguard.link/simulator/?tab=preferences)*
 
 ### История изменений
 

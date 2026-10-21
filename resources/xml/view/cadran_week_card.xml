@@ -7,7 +7,7 @@
      (tab/play_timer.xml's pt_week_card) and the per-day editor of a
      profile (activity/play_timer_perday_activity.cpp) show it. -->
 
-<brls:Box axis="column" alignItems="stretch" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="24" paddingTop="16" paddingBottom="14" paddingLeft="22" paddingRight="22" marginBottom="10">
+<brls:Box axis="column" alignItems="stretch" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="@style/cadran/radius/top" paddingTop="16" paddingBottom="14" paddingLeft="22" paddingRight="22" marginBottom="10">
     <CadranWeekView id="cpt_week" width="auto" height="262" marginBottom="8"/>
     <brls:Box id="cpt_keys_idle" axis="row" alignItems="center" paddingTop="8" lineColor="@theme/cadran/line" lineTop="1px">
         <brls:Box axis="row" alignItems="center" justifyContent="center" width="26" height="26" cornerRadius="13" backgroundColor="@theme/cadran/key_bg" marginRight="8">

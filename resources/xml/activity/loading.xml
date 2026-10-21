@@ -26,7 +26,7 @@
         text="@i18n/playguard/loading/tagline"
         fontSize="22"
         horizontalAlign="center"
-        textColor="#A9B6CC"
+        textColor="#A9B5C9"
         marginBottom="64"/>
 
     <LoadingBar
@@ -40,7 +40,7 @@
         text=" "
         fontSize="18"
         horizontalAlign="center"
-        textColor="#A9B6CC"/>
+        textColor="#A9B5C9"/>
 
     <!-- Holds the focus while this screen is the top one (nothing to press
          here): pushed over it, the first screen hands it back to a view of

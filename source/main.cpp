@@ -41,7 +41,6 @@
 #include "tab/activity_tab.hpp"
 #include "tab/console_tab.hpp"
 #include "tab/dashboard_tab.hpp"
-#include "tab/history_tab.hpp"
 #include "tab/play_timer_tab.hpp"
 #include "tab/preferences_tab.hpp"
 #include "tab/restrictions_tab.hpp"
@@ -317,7 +316,6 @@ void register_views()
     brls::Application::registerXMLView("RestrictionsTab", RestrictionsTab::create);
     brls::Application::registerXMLView("SecurityTab",     SecurityTab::create);
     brls::Application::registerXMLView("ConsoleTab",      ConsoleTab::create);
-    brls::Application::registerXMLView("HistoryTab",      HistoryTab::create);
     brls::Application::registerXMLView("PreferencesTab",  PreferencesTab::create);
     brls::Application::registerXMLView("AboutTab",        AboutTab::create);
 

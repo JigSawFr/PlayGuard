@@ -11,6 +11,7 @@
 #include "action/play_data.hpp"
 #include "activity/game_activity.hpp"
 #include "tab/cadran_list.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
 #include "util/config.hpp"
@@ -80,7 +81,7 @@ void GamesActivity::onContentAvailable()
     head->setLineBottom(0);
     head->setMargins(16, 60, 0, 60);
     head->setPadding(18, 24, 18, 24);
-    head->setCornerRadius(20);
+    head->setCornerRadius(cadran::kit::RADIUS_CARD);
     head->setBackgroundColor(theme["cadran/surf"]);
     head->setBorderColor(theme["cadran/line"]);
     head->setBorderThickness(1);
@@ -432,7 +433,7 @@ void GamesActivity::show_status()
         error = false;
     }
     status->setText(text);
-    status->setTextColor(error ? ui::color_warn() : ui::color_note());
+    status->setTextColor(error ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text3"));
     ui::set_visible(status, !text.empty());
 }
 

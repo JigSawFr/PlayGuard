@@ -48,8 +48,8 @@ void run(const char* what, std::function<data_cleanup::Plan()> make_plan, const 
                                        out.bytes, out.failed);
                     brls::sync([out]() {
                         const std::string done = files_text(out.removed, out.bytes);
-                        ui::info(out.failed ? brls::getStr("playguard/dev/clear_failed", done, std::to_string(out.failed))
-                                            : brls::getStr("playguard/dev/cleared", done));
+                        if (out.failed) ui::error(brls::getStr("playguard/dev/clear_failed", done, std::to_string(out.failed)));
+                        else ui::info(brls::getStr("playguard/dev/cleared", done));
                     });
                 });
             });

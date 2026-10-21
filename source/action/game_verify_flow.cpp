@@ -3,49 +3,13 @@
 
 #include <fmt/format.h>
 
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
 
 namespace game_verify_flow
 {
-
-// A plain progress bar: the track, then the part done in the icon's teal.
-class ProgressBar : public brls::View
-{
-  public:
-    ProgressBar()
-        : track(ui::color_track()), done(ui::color_ok())
-    {
-        this->setHeight(12);
-        this->setFocusable(false);
-    }
-
-    void set(float fraction)
-    {
-        this->fraction = fraction < 0 ? 0 : fraction > 1 ? 1 : fraction;
-    }
-
-    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style, brls::FrameContext*) override
-    {
-        const float radius = height / 2.0f;
-        nvgBeginPath(vg);
-        nvgRoundedRect(vg, x, y, width, height, radius);
-        nvgFillColor(vg, this->track);
-        nvgFill(vg);
-        if (this->fraction <= 0) return;
-        float w = width * this->fraction;
-        if (w < height) w = height;
-        nvgBeginPath(vg);
-        nvgRoundedRect(vg, x, y, w, height, radius);
-        nvgFillColor(vg, this->done);
-        nvgFill(vg);
-    }
-
-  private:
-    float fraction = 0;
-    NVGcolor track, done;
-};
 
 namespace
 {
@@ -113,26 +77,26 @@ std::shared_ptr<State> make_dialog()
     auto* titles = new brls::Box(brls::Axis::COLUMN);
     titles->setGrow(1.0f);
     titles->setShrink(1.0f);
-    state->title = ui::text_label("playguard/games/verify_title"_i18n, 18, ui::color_note());
+    state->title = cadran::kit::label("playguard/games/verify_title"_i18n, 18, "cadran/text3");
     titles->addView(state->title);
-    state->name = ui::text_label("", 22, ui::color_text());
+    state->name = cadran::kit::label("", 22, "cadran/text");
     state->name->setSingleLine(true);   // a long name is cut, not wrapped over the dialog
     state->name->setMarginTop(2);
     titles->addView(state->name);
     head->addView(titles);
     box->addView(head);
 
-    state->bar = new ProgressBar();
+    state->bar = new cadran::kit::Bar();
     state->bar->setMarginTop(22);
     box->addView(state->bar);
     auto* numbers = new brls::Box(brls::Axis::ROW);
     numbers->setAlignItems(brls::AlignItems::CENTER);
     numbers->setMarginTop(10);
-    state->percent = ui::text_label("", 22, ui::color_text());
+    state->percent = cadran::kit::label("", 22, "cadran/text");
     state->percent->setSingleLine(true);
     state->percent->setMarginRight(14);
     numbers->addView(state->percent);
-    state->detail = ui::text_label("", 18, ui::color_note());
+    state->detail = cadran::kit::label("", 18, "cadran/text3");
     state->detail->setSingleLine(true);
     state->detail->setGrow(1.0f);
     state->detail->setShrink(1.0f);
@@ -140,7 +104,7 @@ std::shared_ptr<State> make_dialog()
     numbers->addView(state->detail);
     box->addView(numbers);
 
-    auto* note_label = ui::text_label("playguard/games/verify_note"_i18n, 18, ui::color_note());
+    auto* note_label = cadran::kit::label("playguard/games/verify_note"_i18n, 18, "cadran/text3");
     note_label->setMarginTop(16);
     box->addView(note_label);
     state->dialog = new brls::Dialog(box);

@@ -1,21 +1,60 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "ui/cadran_kit.hpp"
 
+#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 #include <fmt/format.h>
+#include <tuple>
 #include <yoga/Yoga.h>
 
 #include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
 #include "view/cadran_digits.hpp"
+#include "view/qr_view.hpp"
 
 namespace cadran::kit
 {
 
+NVGcolor color(const char* key)
+{
+    return brls::Application::getTheme()[key];
+}
+
+brls::Label* centered(const std::string& text, float size, const char* color_key)
+{
+    brls::Label* l = label(text, size, color_key);
+    l->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    l->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the box's width
+    return l;
+}
+
 brls::Label* label(const std::string& text, float size, const char* color_key)
 {
     auto* l = new brls::Label();
+    l->setText(text);
+    l->setFontSize(size);
+    l->setTextColor(brls::Application::getTheme()[color_key]);
+    return l;
+}
+
+namespace
+{
+// A label in the display face: Sora, the other scripts from the app's fonts.
+class DisplayLabel : public brls::Label
+{
+  public:
+    DisplayLabel()
+    {
+        const int face = brls::Application::getFont("cadran/digits");
+        if (face != brls::FONT_INVALID) this->font = face;
+    }
+};
+}   // namespace
+
+brls::Label* display(const std::string& text, float size, const char* color_key)
+{
+    auto* l = new DisplayLabel();
     l->setText(text);
     l->setFontSize(size);
     l->setTextColor(brls::Application::getTheme()[color_key]);
@@ -40,12 +79,12 @@ brls::Box* card(bool focusable, bool grow)
     box->setBackgroundColor(theme["cadran/surf"]);
     box->setBorderColor(theme["cadran/line"]);
     box->setBorderThickness(1);
-    box->setCornerRadius(20);
+    box->setCornerRadius(RADIUS_CARD);
     box->setPadding(20, 24, 20, 24);
     if (focusable) {
         box->setFocusable(true);
         box->setHideHighlightBackground(true);
-        box->setHighlightCornerRadius(20);
+        box->setHighlightCornerRadius(RADIUS_CARD);
     }
     if (grow) {
         box->setGrow(1.0f);
@@ -57,7 +96,8 @@ brls::Box* card(bool focusable, bool grow)
 brls::Box* top_card(bool grow)
 {
     brls::Box* box = card(false, grow);
-    box->setCornerRadius(22);
+    box->setCornerRadius(RADIUS_TOP);
+    box->setHighlightCornerRadius(RADIUS_TOP);
     box->setPadding(22, 26, 22, 26);
     return box;
 }
@@ -67,7 +107,7 @@ brls::Box* kicker(const char* icon_name, const std::string& title)
     auto* head = new brls::Box(brls::Axis::ROW);
     head->setAlignItems(brls::AlignItems::CENTER);
     head->addView(icon(icon_name, 18, "cadran/text2"));
-    brls::Label* text = label(cadran::upper(title), 16, "cadran/text2");
+    brls::Label* text = label(cadran::upper(title), TEXT_KICKER, "cadran/text2");
     text->setSingleLine(true);
     text->setMarginLeft(8);
     head->addView(text);
@@ -147,7 +187,7 @@ brls::Box* pill(const std::string& text, const char* dot_key)
     auto* mark = new Mark(dot_key);
     mark->setMarginRight(7);
     box->addView(mark);
-    brls::Label* l = label(text, 15, "cadran/text2");
+    brls::Label* l = label(text, TEXT_META, "cadran/text2");
     l->setSingleLine(true);
     box->addView(l);
     return box;
@@ -195,6 +235,51 @@ brls::Box* chip(const std::string& text, float height)
     return box;
 }
 
+brls::Box* qr(const std::string& payload, float side, const std::string& title, const std::string& caption, float width)
+{
+    auto* box = new brls::Box(brls::Axis::COLUMN);
+    box->setAlignItems(brls::AlignItems::CENTER);
+    if (width > 0) box->setWidth(width);
+    box->addView(new QrView(payload, side));
+    for (const auto& [text, size, key] : { std::tuple<const std::string&, float, const char*>{ title, 18, "cadran/text" },
+                                           { caption, TEXT_META, "cadran/text3" } }) {
+        if (text.empty()) continue;
+        brls::Label* l = label(text, size, key);
+        l->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+        l->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the box's width
+        l->setMarginTop(&text == &title ? 10 : 2);
+        box->addView(l);
+    }
+    return box;
+}
+
+Bar::Bar()
+{
+    this->setHeight(12);
+    this->setFocusable(false);
+}
+
+void Bar::set(float value)
+{
+    this->fraction = value < 0 ? 0 : value > 1 ? 1 : value;
+}
+
+void Bar::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style, brls::FrameContext*)
+{
+    brls::Theme theme = brls::Application::getTheme();
+    const float radius = height / 2.0f;
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, x, y, width, height, radius);
+    nvgFillColor(vg, this->a(theme["cadran/well"]));
+    nvgFill(vg);
+    if (this->fraction <= 0) return;
+    const float w = std::max(width * this->fraction, height);
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, x, y, w, height, radius);
+    nvgFillColor(vg, this->a(theme["cadran/teal_fill"]));
+    nvgFill(vg);
+}
+
 Empty empty(const char* icon_name)
 {
     brls::Theme theme = brls::Application::getTheme();
@@ -211,17 +296,44 @@ Empty empty(const char* icon_name)
     circle->setJustifyContent(brls::JustifyContent::CENTER);
     circle->addView(icon(icon_name, 28, "cadran/teal"));
     e.box->addView(circle);
-    e.title = label("", 19, "cadran/text");
+    e.title = label("", TEXT_LEAD, "cadran/text");
     e.title->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     e.title->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the card's width
     e.title->setMarginTop(16);
     e.box->addView(e.title);
-    e.text = label("", 15.5f, "cadran/text2");
+    e.text = label("", TEXT_META, "cadran/text2");
     e.text->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     e.text->setAlignSelf(brls::AlignSelf::STRETCH);
     e.text->setMarginTop(6);
     e.box->addView(e.text);
     return e;
+}
+
+brls::Box* empty_around(brls::Label* label, const char* icon_name)
+{
+    auto* parent = label ? dynamic_cast<brls::Box*>(label->getParent()) : nullptr;
+    if (!parent) return nullptr;
+    Empty e = empty(icon_name);
+    e.box->setId("cadran_empty_card");
+    const YGValue top = YGNodeStyleGetMargin(label->getYGNode(), YGEdgeTop);
+    e.box->setMargins(top.unit == YGUnitPoint && top.value > 10 ? top.value : 10, 0, 16, 0);
+    const auto& children = parent->getChildren();
+    const size_t at = (size_t)(std::find(children.begin(), children.end(), label) - children.begin());
+    // The label in the title's place, laid out as it.
+    parent->removeView(label, false);
+    e.box->removeView(e.title);
+    label->setFontSize(TEXT_LEAD);
+    label->setTextColor(color("cadran/text"));
+    label->setSingleLine(false);
+    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    label->setAlignSelf(brls::AlignSelf::STRETCH);
+    label->setMargins(16, 0, 0, 0);
+    e.box->addView(label, 1);
+    e.box->removeView(e.text);   // the screen's label says it all
+    parent->addView(e.box, at);
+    e.box->setVisibility(label->getVisibility());
+    label->setVisibility(brls::Visibility::VISIBLE);
+    return e.box;
 }
 
 void wrap(brls::View* row)
@@ -268,9 +380,9 @@ std::string without_chevron(const std::string& value)
 const char* dot_of(NVGcolor c)
 {
     const auto same = [&c](NVGcolor o) { return c.r == o.r && c.g == o.g && c.b == o.b; };
-    if (same(ui::color_ok())) return "cadran/teal_fill";
-    if (same(ui::color_warn())) return "cadran/amber_fill";
-    if (same(ui::color_bad())) return "cadran/coral_fill";
+    if (same(cadran::kit::color("cadran/teal"))) return "cadran/teal_fill";
+    if (same(cadran::kit::color("cadran/amber"))) return "cadran/amber_fill";
+    if (same(cadran::kit::color("cadran/coral"))) return "cadran/coral_fill";
     return "cadran/text3";
 }
 

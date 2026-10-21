@@ -10,6 +10,7 @@
 #include "core/sysinfo.h"
 #include "tab/clock_tab.hpp"
 #include "ui/cadran_frame.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/patches.hpp"
 #include "view/row_icon.hpp"
@@ -111,22 +112,22 @@ void ConsoleTab::refresh()
     // and how many releases behind when more than one.
     bool newer = false;
     fw->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::Firmware, &newer)));
-    fw->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
+    fw->setDetailTextColor(newer ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     if (si.ams_valid) {
         ams->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::Atmosphere, &newer)));
-        ams->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
+        ams->setDetailTextColor(newer ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     } else {
         ams->setDetailText("playguard/common/unavailable"_i18n);
     }
     // hekate: only when its bootloader/update.bin is on the SD card.
     const std::string hk = sys_update_flow::installed_hekate();
     hekate->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::Hekate, &newer)));
-    hekate->setDetailTextColor(newer ? ui::color_warn() : ui::color_neutral());
+    hekate->setDetailTextColor(newer ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     ui::set_visible(hekate.getView(), !hk.empty());
     // A newer firmware Atmosphère or hekate does not support yet, or only in
     // a newer release (their notes say).
     fw_warn->set_shown(!sys_notes_flow::firmware_advice().empty());
-    NVGcolor c = ui::color_neutral();
+    NVGcolor c = cadran::kit::color("cadran/text2");
     const std::string compat_value = ui::compat_text(si, &c);
     // Checked: the line's icon says it (a teal check) and no word is needed;
     // anything else, a warning in the value's colour and the words.
@@ -142,21 +143,21 @@ void ConsoleTab::refresh()
     this->storage_note = ui::other_storage_note(si);
     storage->setFocusable(!this->storage_note.empty());
     storage_info->set_shown(!this->storage_note.empty());
-    c = ui::color_neutral();
+    c = cadran::kit::color("cadran/text2");
     blank->setDetailText(ui::blank_text(si, &c));
     blank->setDetailTextColor(c);
     blank->setFocusable(ui::serial_warning(si));
     blank_warn->set_shown(ui::serial_warning(si));
     const bool maskable = si.serial_valid && si.serial[0] && !(si.blank_valid && si.blank);
     serial->setDetailText(ui::serial_text(si, this->serial_revealed));
-    serial->setDetailTextColor(ui::serial_warning(si) ? ui::color_warn() : ui::color_neutral());
+    serial->setDetailTextColor(ui::serial_warning(si) ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     serial->setActionAvailable(brls::BUTTON_A, maskable);
     serial->updateActionHint(brls::BUTTON_A, this->serial_revealed ? "playguard/tools/serial_hide"_i18n
                                                                    : "playguard/tools/serial_show"_i18n);
     brls::Application::getGlobalHintsUpdateEvent()->fire();   // redraw the footer hints
 
     const patches::Report& report = ui::patch_report();
-    c = ui::color_neutral();
+    c = cadran::kit::color("cadran/text2");
     game_patches->setDetailText(ui::patches_text(report, &c));
     game_patches->setDetailTextColor(c);
     bool warn = false;

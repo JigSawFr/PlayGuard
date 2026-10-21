@@ -2,10 +2,10 @@
 // their tops, every other screen) without rewriting them: the original
 // tab is built as usual (its XML, its i18n strings, its actions), then its
 // lines are restyled after the boards' settings lists. A section header
-// becomes a kicker (16 px, capitals, text2); each run of cells a card (surf,
-// 1 px border, 18 px corners, a line between rows); a cell gets an icon in a
-// soft square before its title, a chevron when it opens something, a switch
-// for a BooleanCell; the notes go to 15.5 px. tiles() turns a few cells into
+// becomes a kicker (kit::TEXT_KICKER, capitals, text2); each run of cells a
+// card (surf, 1 px border, kit::RADIUS_CARD, a line between rows); a cell
+// gets an icon in a soft square before its title, a chevron when it opens
+// something, a switch for a BooleanCell; the notes go to kit::TEXT_NOTE. tiles() turns a few cells into
 // the boards' tiles instead (a row of cards, the icon on top).
 //
 // The tab keeps every view it binds (they move, they are not rebuilt), and

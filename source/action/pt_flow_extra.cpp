@@ -12,6 +12,7 @@
 #include "action/pt_flow_internal.hpp"
 #include "action/pt_logic.hpp"
 #include "app.hpp"
+#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 
@@ -182,7 +183,7 @@ static void plan_bonus(std::function<void()> refresh)
     pctl_play_timer_query(&pt);
     const std::vector<pt_logic::PlanDay> days = pt_logic::bonus_days(ui::today_date(), ui::today_weekday());
     if (!pt.valid || days.empty()) {
-        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN), ui::Toast::Refused);
+        ui::refuse(NXM_RC_STATE_UNKNOWN);
         return;
     }
     std::vector<std::string> labels, details;
@@ -416,7 +417,7 @@ static void put_back_by_itself(const pt_logic::ExtraRecord& rec, const PtState& 
 {
     if (!pt_logic::state_known(pt)) {
         s_restore_retry = true;
-        if (asked) ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN), ui::Toast::Refused);
+        if (asked) ui::refuse(NXM_RC_STATE_UNKNOWN);
         return;
     }
     const int wd = rec.weekday;
@@ -515,7 +516,7 @@ void offer_extra_time_restore(std::function<void()> refresh, bool asked)
         case pt_logic::Restore::None:   return;
         case pt_logic::Restore::Later:                                  // not read: again soon
             s_restore_retry = pt.fw_supported;
-            if (asked) ui::notify(ui::rc_text(pt.fw_supported ? NXM_RC_STATE_UNKNOWN : NXM_RC_FW_UNSUPPORTED), ui::Toast::Refused);
+            if (asked) ui::refuse(pt.fw_supported ? NXM_RC_STATE_UNKNOWN : NXM_RC_FW_UNSUPPORTED);
             return;
         case pt_logic::Restore::Forget:                                 // changed since
             clear_extra_record();
@@ -553,6 +554,7 @@ void offer_extra_time_restore(std::function<void()> refresh, bool asked)
     });
     // B: decide later (the record stays; Today keeps a line for it).
     dialog->setCancelable(true);
+    cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
     dialog->open();
 }
 

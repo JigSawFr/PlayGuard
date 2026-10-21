@@ -404,7 +404,7 @@ PlayGuard 作为应用运行时，它自己的时间也会计入，所以今天�
 
 ## 历史记录——更改和备份
 
-*[在模拟器中试试 ›](https://playguard.link/simulator/?tab=history)*
+*[在模拟器中试试 ›](https://playguard.link/simulator/?tab=preferences)*
 
 ### 更改历史
 
