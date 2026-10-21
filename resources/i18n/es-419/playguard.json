@@ -707,10 +707,6 @@
         "note_old_module": "Aquí no se puede cambiar nada sin el PIN, y PlayGuard se abre como de costumbre. Actualiza el módulo desde una computadora: extrae playguard-rescue.zip de PlayGuard {} en la raíz de la tarjeta SD, vuelve a poner el archivo RESCUE y reinicia la consola."
     },
     "tools": {
-        "headline_kicker": "Esta consola",
-        "headline_ok": "Nada que revisar",
-        "headline_one": "1 cosa que revisar",
-        "headline": "{} cosas que revisar",
         "section_diag": "Diagnóstico",
         "section_reports": "Informes",
         "section_system": "Sistema",

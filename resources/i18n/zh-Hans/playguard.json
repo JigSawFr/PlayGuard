@@ -707,10 +707,6 @@
         "note_old_module": "没有 PIN 无法在此更改任何内容，PlayGuard 会照常打开。请在电脑上更新该模块：将 PlayGuard {} 的 playguard-rescue.zip 解压到 SD 卡根目录，放回 RESCUE 文件，然后重启主机。"
     },
     "tools": {
-        "headline_kicker": "本主机",
-        "headline_ok": "无需检查",
-        "headline_one": "1 项待检查",
-        "headline": "{} 项待检查",
         "section_diag": "诊断",
         "section_reports": "报告",
         "section_system": "系统",

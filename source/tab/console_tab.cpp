@@ -2,7 +2,6 @@
 #include "tab/console_tab.hpp"
 
 #include "action/fw_gate.hpp"
-#include "action/notices.hpp"
 #include "action/sys_notes_flow.hpp"
 #include "action/sigpatch_flow.hpp"
 #include "action/sys_update_flow.hpp"
@@ -115,19 +114,10 @@ ConsoleTab::ConsoleTab()
     this->list.apply({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_forwarders", "home" },
                        { "cn_compat", "check" }, { "cn_storage", "folder" }, { "cn_blank", "code" },
                        { "cn_serial", "tag" }, { "cn_patches", "shield" } });
-    this->headline = this->list.headline("playguard/tools/headline_kicker"_i18n);
 }
 
 void ConsoleTab::refresh()
 {
-    // As many to check as its badge counts (notices::tab_count).
-    if (this->headline) {
-        const int n = notices::tab_count("console");
-        this->headline->setText(n == 0 ? "playguard/tools/headline_ok"_i18n
-                                : n == 1 ? "playguard/tools/headline_one"_i18n
-                                         : brls::getStr("playguard/tools/headline", n));
-        this->headline->setTextColor(cadran::kit::color(n == 0 ? "cadran/text" : "cadran/amber"));
-    }
     SysInfo si;
     sysinfo_get(&si);
     // With the newer release the last update check found (sys_update_flow),

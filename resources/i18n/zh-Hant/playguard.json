@@ -707,10 +707,6 @@
         "note_old_module": "沒有 PIN碼 無法在此變更任何內容，PlayGuard 會照常開啟。請在電腦上更新該模組：將 PlayGuard {} 的 playguard-rescue.zip 解壓縮到 SD 卡根目錄，放回 RESCUE 檔案，然後重新啟動主機。"
     },
     "tools": {
-        "headline_kicker": "本主機",
-        "headline_ok": "無需檢查",
-        "headline_one": "1 項待檢查",
-        "headline": "{} 項待檢查",
         "section_diag": "診斷",
         "section_reports": "報告",
         "section_system": "系統",

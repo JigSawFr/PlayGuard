@@ -707,10 +707,6 @@
         "note_old_module": "Без PIN-кода здесь ничего нельзя изменить, PlayGuard откроется как обычно. Обновите модуль с компьютера: распакуйте playguard-rescue.zip из PlayGuard {} в корень SD-карты, верните файл RESCUE и перезапустите консоль."
     },
     "tools": {
-        "headline_kicker": "Эта консоль",
-        "headline_ok": "Проверять нечего",
-        "headline_one": "Проверить: 1",
-        "headline": "Проверить: {}",
         "section_diag": "Диагностика",
         "section_reports": "Отчёты",
         "section_system": "Система",

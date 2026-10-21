@@ -707,10 +707,6 @@
         "note_old_module": "Zonder de pincode kan hier niets worden gewijzigd, en PlayGuard opent zoals gewoonlijk. Werk de module bij vanaf een computer: pak playguard-rescue.zip van PlayGuard {} uit in de hoofdmap van de SD-kaart, zet het RESCUE-bestand terug en start de console opnieuw."
     },
     "tools": {
-        "headline_kicker": "Deze console",
-        "headline_ok": "Niets te controleren",
-        "headline_one": "1 punt te controleren",
-        "headline": "{} punten te controleren",
         "section_diag": "Diagnose",
         "section_reports": "Rapporten",
         "section_system": "Systeem",

@@ -22,7 +22,6 @@ class ConsoleTab : public TabBase
 
   private:
     cadran::List list;
-    brls::Label* headline = nullptr;   // the state in one line, at the top (List::headline)
     bool        serial_revealed = false;   // until the tab is left (tabs are rebuilt when reopened)
     std::string storage_note;              // the other system's, shown by A on the storage row
     RowIcon*    storage_info = nullptr;

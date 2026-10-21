@@ -707,10 +707,6 @@
         "note_old_module": "Rien ne peut être modifié ici sans le code PIN, et PlayGuard s'ouvre comme d'habitude. Mettez le module à jour depuis un ordinateur : extrayez playguard-rescue.zip de PlayGuard {} à la racine de la carte SD, remettez le fichier RESCUE, puis redémarrez la console."
     },
     "tools": {
-        "headline_kicker": "Cette console",
-        "headline_ok": "Rien à vérifier",
-        "headline_one": "1 point à vérifier",
-        "headline": "{} points à vérifier",
         "section_diag": "Diagnostic",
         "section_reports": "Rapports",
         "section_system": "Système",

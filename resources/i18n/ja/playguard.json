@@ -707,10 +707,6 @@
         "note_old_module": "暗証番号なしではここから何も変更できません。PlayGuardは通常どおり起動します。パソコンでモジュールを更新してください：PlayGuard {}のplayguard-rescue.zipをSDカードのルートに展開し、RESCUEファイルを置き直してから本体を再起動します。"
     },
     "tools": {
-        "headline_kicker": "このゲーム機",
-        "headline_ok": "確認することはありません",
-        "headline_one": "確認が必要な項目：1件",
-        "headline": "確認が必要な項目：{}件",
         "section_diag": "診断",
         "section_reports": "レポート",
         "section_system": "システム",
