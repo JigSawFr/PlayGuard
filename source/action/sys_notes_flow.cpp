@@ -227,6 +227,17 @@ void keep(const sys_notes::Cache& fresh)
     brls::Logger::info("release notes: lists kept");
 }
 
+Status status(Which which)
+{
+    Status s;
+    s.installed = installed(which);
+    s.latest = latest(which);
+    s.newer = !s.latest.empty() && !s.installed.empty() && update::compare_versions(s.latest, s.installed) > 0;
+    // How many (the list kept knows; once it is read, the tab is refreshed).
+    if (s.newer && ready()) s.behind = sys_notes::newer_count(s_cache.of(which), s.installed);
+    return s;
+}
+
 std::string status_text(Which which, bool* newer)
 {
     const std::string mine = installed(which);

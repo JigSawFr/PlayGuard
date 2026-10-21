@@ -50,8 +50,19 @@ sys_notes::Cache fetch_lists();
 // (encoded off the UI thread).
 void keep(const sys_notes::Cache& fresh);
 
-// "22.0.0 · 23.0.1 available (4 versions behind)" for a line of the
-// Console tab (or About's, for PlayGuard); *newer when a newer one is out.
+// Where `which` stands: what runs, the newest release the last check found
+// ("" none), whether that one is newer and, once the lists kept are read,
+// how many listed releases are (0 unknown).
+struct Status
+{
+    std::string installed, latest;
+    bool        newer = false;
+    size_t      behind = 0;
+};
+Status status(sys_notes::Which which);
+
+// "22.0.0 · 23.0.1 available (4 versions behind)" for About's line (PlayGuard);
+// *newer when a newer one is out.
 std::string status_text(sys_notes::Which which, bool* newer);
 
 // What updating to the newest firmware needs first, from the notes of

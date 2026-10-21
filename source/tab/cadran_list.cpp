@@ -250,6 +250,37 @@ void cadran::List::state(const char* id, const char* color_key)
     }
 }
 
+void cadran::List::tag(const char* id, const std::string& text, bool warn, const std::string& note)
+{
+    brls::Theme theme = brls::Application::getTheme();
+    for (auto& [cell, pill] : this->tags) {
+        if (cell != this->tab->getView(id)) continue;
+        auto* words = static_cast<brls::Label*>(pill->getChildren()[0]);
+        words->setText(text);
+        words->setTextColor(theme[warn ? "cadran/amber" : "cadran/pill_ok_ink"]);
+        pill->setBackgroundColor(theme[warn ? "cadran/amber_surf" : "cadran/pill_ok"]);
+        pill->setBorderColor(theme[warn ? "cadran/amber_line" : "cadran/none"]);
+        pill->setVisibility(text.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
+        cell->setBorderColor(theme[warn && !text.empty() ? "cadran/amber_line" : "cadran/line"]);
+        // The note: the view right after the pill (tiles()).
+        const auto& children = cell->getChildren();
+        const auto at = std::find(children.begin(), children.end(), pill);
+        if (at != children.end() && at + 1 != children.end())
+            if (auto* under = dynamic_cast<brls::Label*>(*(at + 1))) {
+                under->setText(note);
+                under->setVisibility(note.empty() || text.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
+            }
+    }
+}
+
+brls::Box* cadran::List::head(const char* id) const
+{
+    for (brls::DetailCell* cell : this->readings)
+        if (cell == this->tab->getView(id) && !cell->getChildren().empty())
+            return dynamic_cast<brls::Box*>(cell->getChildren()[0]);
+    return nullptr;
+}
+
 void cadran::List::banners(const std::vector<const char*>& ids)
 {
     brls::Theme theme = brls::Application::getTheme();
@@ -348,6 +379,26 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
             value->addView(cell->detail);
             cell->addView(value, at);
             this->marks.push_back({ cell, mark });
+            // Its pill under the value (tag()), hidden until set: as wide as
+            // its words, which wrap rather than end in "…".
+            auto* pill = new brls::Box(brls::Axis::ROW);
+            pill->setAlignSelf(brls::AlignSelf::FLEX_START);
+            pill->setAlignItems(brls::AlignItems::CENTER);
+            pill->setMarginTop(10);
+            pill->setPadding(4, 12, 5, 12);
+            pill->setCornerRadius(13);
+            pill->setBorderThickness(1);
+            pill->setVisibility(brls::Visibility::GONE);
+            brls::Label* words = kit::label("", kit::TEXT_META, "cadran/text2");
+            words->setSingleLine(false);
+            pill->addView(words);
+            cell->addView(pill, at + 1);
+            brls::Label* note = kit::label("", kit::TEXT_META, "cadran/text3");
+            note->setSingleLine(false);
+            note->setMarginTop(6);
+            note->setVisibility(brls::Visibility::GONE);
+            cell->addView(note, at + 2);
+            this->tags.push_back({ cell, pill });
         }
     }
     return row;
