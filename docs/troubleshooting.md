@@ -94,7 +94,7 @@ Something needs you: Ⓨ opens the list, and Ⓐ on an entry does the fix or ope
 
 An error shows the system's code (such as `0x0001088E`) with what is known about it: what to do for the codes whose meaning is documented, otherwise a report helps.
 
-1. *About › Help & diagnostics › Export a diagnostic report* saves a text file in `sd:/config/playguard/logs/reports/`: firmware, Atmosphère version, how long the start-up took and how long the slow screens took (the change history, *All games*, the installed games check, the tabs that refresh themselves), clocks, storage, serial-blanking and game-patch status, the raw result of every parental-control query, and the logs: how the last run ended, the memory and SD-card space left, the newest crash files and the last 80 lines logged. **It never contains the PIN or the serial number.**
+1. *About › Help & diagnostics › Export a diagnostic report* saves a text file in `sd:/config/playguard/logs/reports/`: firmware, Atmosphère version, how long the start-up took and how long the slow screens took (the change history, *All games*, the installed games check, the tabs that refresh themselves), clocks, storage, serial-blanking and game-patch status, what Atmosphère's DNS redirection does with Nintendo's parental-control and time servers (read from its hosts file on the SD card, not a network test, with the end of Atmosphère's own `atmosphere/logs/dns_mitm_startup.log`), the raw result of every parental-control query, and the logs: how the last run ended, the memory and SD-card space left, the newest crash files and the last 80 lines logged. **It never contains the PIN or the serial number.**
 2. [Open an issue](https://github.com/JigSawFr/PlayGuard/issues/new) and attach it.
 
 ### Sending a report online

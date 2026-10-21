@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 2eb3bbe2ddb0 -->
+<!-- translated from docs/troubleshooting.md, sha256 5bda4f81d562 -->
 # Dépannage
 
 Reprendre la main sur une console bloquée, les problèmes courants, signaler un bug, et le mode développeur. Retour au [README](../../README.md).
@@ -95,7 +95,7 @@ Quelque chose demande votre attention : Ⓨ ouvre la liste, et Ⓐ sur une entr�
 
 Une erreur affiche le code du système (par exemple `0x0001088E`) avec ce que l'on en sait : quoi faire pour les codes dont le sens est documenté, sinon un rapport aide.
 
-1. *À propos › Aide et diagnostic › Exporter un rapport de diagnostic* enregistre un fichier texte dans `sd:/config/playguard/logs/reports/` : firmware, version d'Atmosphère, durée du démarrage et des écrans les plus lents (l'historique des changements, *Tous les jeux*, la vérification des jeux installés, les onglets qui se rafraîchissent seuls), horloges, stockage, masquage du numéro de série, état des patchs de jeux, le résultat brut de chaque requête au contrôle parental, et les journaux : comment la dernière session s'est terminée, la mémoire et la place libre sur la carte SD, les derniers fichiers de plantage et les 80 dernières lignes journalisées. **Il ne contient jamais le code PIN ni le numéro de série.**
+1. *À propos › Aide et diagnostic › Exporter un rapport de diagnostic* enregistre un fichier texte dans `sd:/config/playguard/logs/reports/` : firmware, version d'Atmosphère, durée du démarrage et des écrans les plus lents (l'historique des changements, *Tous les jeux*, la vérification des jeux installés, les onglets qui se rafraîchissent seuls), horloges, stockage, masquage du numéro de série, état des patchs de jeux, ce que la redirection DNS d'Atmosphère fait des serveurs de contrôle parental et d'heure de Nintendo (lu dans son fichier hosts sur la carte SD, pas un test réseau, avec la fin du journal d'Atmosphère lui-même, `atmosphere/logs/dns_mitm_startup.log`), le résultat brut de chaque requête au contrôle parental, et les journaux : comment la dernière session s'est terminée, la mémoire et la place libre sur la carte SD, les derniers fichiers de plantage et les 80 dernières lignes journalisées. **Il ne contient jamais le code PIN ni le numéro de série.**
 2. [Ouvrez un ticket](https://github.com/JigSawFr/PlayGuard/issues/new) (en anglais ou en français) et joignez-le.
 
 ### Envoyer un rapport en ligne
