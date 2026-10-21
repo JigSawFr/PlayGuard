@@ -35,14 +35,14 @@ As capturas de ecrã mostram o tema escuro, o predefinido do PlayGuard (em ingl�
 A aplicação está organizada em separadores, como as Definições da consola; cada um tem a sua secção abaixo.
 
 - **O que falhou é dito numa caixa de diálogo, o que correu bem numa mensagem breve.** Uma caixa de diálogo só diz o que se aplica a esta consola neste momento: que o jogo em curso seria suspenso, só enquanto há um jogo aberto; que a aplicação móvel poderia substituir uma alteração, só enquanto está associada e consegue sincronizar.
-- **O cabeçalho** indica, em todos os separadores, quando o controlo parental está desbloqueado temporariamente (a sua etiqueta), e mostra um lápis riscado à direita do título quando a aplicação está só de leitura; tocar num ou noutro leva ao sítio onde isso se desfaz (*PIN › Reativar o controlo parental*, o ecrã do firmware).
+- **O cabeçalho** indica, em todos os separadores, quando o controlo parental está desbloqueado temporariamente (a sua etiqueta), e mostra um lápis riscado à direita do título quando a aplicação está só de leitura; tocar num ou noutro leva ao sítio onde isso se desfaz (*Hoje › Reativar*, o ecrã do firmware).
 - **No modo só de leitura**, as ações ficam no lugar, a cinzento, e dizem porquê quando são premidas.
 
 ## O aspeto: Cadran
 
 O aspeto do PlayGuard chama-se Cadran: uma barra de ícones para os separadores, uma paleta azul-marinho ou branco frio (consoante o tema), cartões em vez de listas. Cada separador abre no que mais importa (um anel, mosaicos, cartões, botões), com as outras definições por baixo.
 
-- **A etiqueta do cabeçalho** diz de que trata o separador (*Controlo parental ativo*, *Temporizador ativo*…); enquanto o controlo parental está desbloqueado, di-lo em todos os separadores, e tocar-lhe abre *PIN › Reativar o controlo parental*. O texto secundário nunca fica abaixo de 15 px, para se ler do sofá numa TV.
+- **A etiqueta do cabeçalho** diz de que trata o separador (*Controlo parental ativo*, *Temporizador ativo*…); enquanto o controlo parental está desbloqueado, di-lo em todos os separadores, e tocar-lhe abre *Hoje › Reativar*. O texto secundário nunca fica abaixo de 15 px, para se ler do sofá numa TV.
 - **As caixas de diálogo** são cartões com os botões em forma de pílula, a confirmação a verde-azulado (a coral quando remove ou interrompe alguma coisa).
   - As escolhas abrem-se num cartão por cima das indicações dos botões, a atual sobre um verde-azulado suave com a sua marca de verificação. O contorno verde-azulado é só do foco, em todo o lado: um nível, uma conta, uma escolha em vigor mantém o fundo suave.
   - Uma caixa de diálogo longa esbate-se em baixo enquanto há mais a seguir, e o seu aviso (um jogo prestes a ser suspenso) vem primeiro, num cartão âmbar.
@@ -106,7 +106,7 @@ As de informação: uma compilação da qual se voltou atrás, um firmware não 
 
 - Cada secção lista as suas entradas por uma ordem fixa, seja qual for a verificação que terminou primeiro.
 - **Na barra lateral**, um distintivo âmbar junto do nome de um separador conta as suas entradas a fazer, onde se resolvem: o separador PIN (sem PIN, um PIN fraco, o PlayGuard sem o seu PIN, desbloqueado temporariamente), o Tempo de jogo (o alarme desativado, a consola a não contar), *Hoje* (alterações feitas fora do PlayGuard, tempo extra por retirar), a Consola (as suas entradas acima, e o relógio de rede). As entradas ignoradas e as de informação não são contadas.
-- No separador, o mesmo distintivo está na linha onde cada uma se resolve (*Relógio de rede*, *Verificar os jogos instalados*, *Armazenamento*, *Patches de jogos*; *Definir ou alterar o PIN*, *Proteger o PlayGuard com o PIN*, *Reativar o controlo parental*; *Avançado* do Tempo de jogo para o alarme), e o separador abre na primeira delas.
+- No separador, o mesmo distintivo está na linha onde cada uma se resolve (*Relógio de rede*, *Verificar os jogos instalados*, *Armazenamento*, *Patches de jogos*; *Definir ou alterar o PIN*, *Proteger o PlayGuard com o PIN*; *Avançado* do Tempo de jogo para o alarme), e o separador abre na primeira delas.
 - **Ⓐ** numa entrada faz a correção (*Ligá-lo*, *Acertá-lo*, *Atualizar*…) ou abre o separador onde ela se faz. Uma entrada desaparece sozinha assim que o que ela indica fica resolvido.
 - **Ⓧ** marca uma entrada de informação como lida; **Ⓨ** marca-as todas. Uma entrada marcada como lida continua lida no arranque seguinte, até o seu texto mudar.
 - **Ignorar:** algumas entradas a fazer podem ser ignoradas com Ⓧ, depois de uma confirmação e do PIN: um PIN que qualquer pessoa experimentaria primeiro, o PlayGuard a abrir sem o PIN, o alarme "Tempo esgotado" desativado, o cartão SD quase cheio (nunca a falta de PIN, o controlo desbloqueado, o relógio, o temporizador a não contar nem os ficheiros do próprio PlayGuard). Uma entrada ignorada deixa de ser contada e aparece no fim em *Ignorados*, onde Ⓐ a volta a contar. Regressa sozinha 30 dias depois (a menos que *Voltar a contar os avisos ignorados após 30 dias* esteja desativado), quando o que ela indica fica resolvido e depois volta a acontecer, ou, para o PIN, com um novo PIN de outro comprimento.
@@ -300,7 +300,7 @@ Tempo por jogo **hoje**, nos **últimos 7 dias** e **no total**, a partir do pr�
 - **No topo**, três mosaicos: o PIN, as restrições e o desbloqueio temporário, cada um com uma marca de verificação verde-azulada quando está como deve estar (um PIN definido, restrições ativas, bloqueado) ou um sinal de aviso âmbar quando é preciso intervir.
 - **Definir ou alterar o PIN** (ecrã de PIN do sistema).
 - **Mostrar o PIN**: depois de um aviso e do próprio PIN, pedido sempre; registado no histórico, e depois é proposto um novo PIN.
-- **Desbloquear temporariamente**, **reativar o controlo parental**, e se o PlayGuard o reativa sozinho logo depois de uma alteração que precisou do desbloqueio (ativo por predefinição).
+- **Desbloquear temporariamente**, e se o PlayGuard o reativa sozinho logo depois de uma alteração que precisou do desbloqueio (ativo por predefinição).
 
 ### Proteger o PlayGuard com o PIN
 

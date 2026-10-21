@@ -35,14 +35,14 @@ Les captures montrent le thème sombre, celui par défaut (en anglais).
 L'application est organisée en onglets, comme les paramètres de la console ; chacun a sa section ci-dessous.
 
 - **Ce qui a échoué est dit dans une boîte de dialogue, ce qui a réussi dans une notification.** Un dialogue ne dit que ce qui s'applique à cette console maintenant : que le jeu en cours serait suspendu, seulement quand un jeu est ouvert ; que l'application compagnon pourrait écraser une modification, seulement quand elle est associée et peut se synchroniser.
-- **L'en-tête** indique, sur chaque onglet, que le contrôle parental est déverrouillé temporairement (sa pastille), et affiche un crayon barré à droite du titre quand l'application est en lecture seule ; toucher l'un ou l'autre mène là où on l'annule (*Code PIN › Réactiver le contrôle parental*, l'écran du firmware).
+- **L'en-tête** indique, sur chaque onglet, que le contrôle parental est déverrouillé temporairement (sa pastille), et affiche un crayon barré à droite du titre quand l'application est en lecture seule ; toucher l'un ou l'autre mène là où on l'annule (*Aujourd'hui › Réactiver*, l'écran du firmware).
 - **En lecture seule**, les actions restent à leur place, grisées, et disent pourquoi quand on les choisit.
 
 ## L'apparence : Cadran
 
 L'apparence de PlayGuard s'appelle Cadran : une barre d'icônes pour les onglets, une palette bleu nuit ou blanc froid (selon le thème), des cartes au lieu des listes. Chaque onglet s'ouvre sur l'essentiel (un anneau, des tuiles, des cartes, des puces), ses autres réglages en dessous.
 
-- **La pastille de l'en-tête** dit de quoi parle l'onglet (*Contrôle parental actif*, *Minuteur actif*…) ; contrôle parental déverrouillé, elle le dit sur chaque onglet, et la toucher ouvre *Code PIN › Réactiver le contrôle parental*. Le texte secondaire ne descend jamais sous 15 px, pour se lire depuis le canapé sur une télé.
+- **La pastille de l'en-tête** dit de quoi parle l'onglet (*Contrôle parental actif*, *Minuteur actif*…) ; contrôle parental déverrouillé, elle le dit sur chaque onglet, et la toucher ouvre *Aujourd'hui › Réactiver*. Le texte secondaire ne descend jamais sous 15 px, pour se lire depuis le canapé sur une télé.
 - **Les dialogues** sont des cartes aux boutons en pilules, la confirmation en turquoise (en corail quand elle supprime ou arrête quelque chose).
   - Les choix s'ouvrent en carte au-dessus des aides, le choix actuel sur un turquoise léger avec sa coche. Le contour turquoise n'est qu'au focus, partout : un niveau, un compte, un choix en vigueur garde le fond léger.
   - Un long dialogue s'estompe en bas tant que la suite continue, et son avertissement (une partie sur le point d'être suspendue) vient en premier, dans une carte orange.
@@ -106,7 +106,7 @@ Celles pour information : un retour à la version précédente, un firmware non 
 
 - Chaque section liste ses entrées dans un ordre fixe, quelle que soit la vérification qui a fini la première.
 - **Dans la barre latérale**, une pastille ambre à côté du nom d'un onglet compte ses entrées à faire, là où elles se règlent : l'onglet Code PIN (pas de code PIN, un code PIN trop simple, PlayGuard sans son code PIN, déverrouillé temporairement), Temps de jeu (l'alarme désactivée, la console qui ne compte pas), *Aujourd'hui* (des changements faits hors de PlayGuard, du temps en plus à retirer), la Console (ses entrées ci-dessus, et l'horloge réseau). Les entrées ignorées et celles pour information ne sont pas comptées.
-- Dans l'onglet, la même pastille est sur la ligne où chacune se règle (*Horloge réseau*, *Vérifier les jeux installés*, *Stockage*, *Patchs de jeux* ; *Définir ou changer le code PIN*, *Protéger PlayGuard par le code PIN*, *Réactiver le contrôle parental* ; *Avancé* du Temps de jeu pour l'alarme), et l'onglet s'ouvre sur la première d'entre elles.
+- Dans l'onglet, la même pastille est sur la ligne où chacune se règle (*Horloge réseau*, *Vérifier les jeux installés*, *Stockage*, *Patchs de jeux* ; *Définir ou changer le code PIN*, *Protéger PlayGuard par le code PIN* ; *Avancé* du Temps de jeu pour l'alarme), et l'onglet s'ouvre sur la première d'entre elles.
 - **Ⓐ** sur une entrée fait la correction (*L'activer*, *La régler*, *Mettre à jour*…) ou ouvre l'onglet où elle se fait. Une entrée disparaît d'elle-même une fois réglé ce qu'elle signale.
 - **Ⓧ** marque une entrée pour information comme lue ; **Ⓨ** les marque toutes. Une entrée marquée comme lue le reste au lancement suivant, jusqu'à ce que son texte change.
 - **Ignorer :** quelques entrées à faire peuvent être ignorées avec Ⓧ, après une confirmation et le code PIN : un code PIN que tout le monde essaierait en premier, PlayGuard qui s'ouvre sans le code PIN, l'alarme « temps écoulé » désactivée, la carte SD presque pleine (jamais l'absence de PIN, le contrôle parental déverrouillé, l'horloge, le minuteur qui ne compte pas ni les fichiers de PlayGuard). Une entrée ignorée n'est plus comptée et s'affiche en dernier sous *Ignorés*, où Ⓐ la fait compter de nouveau. Elle revient d'elle-même 30 jours plus tard (sauf si *Rappeler les avertissements ignorés après 30 jours* est désactivé), dès que le problème a été corrigé puis se reproduit, ou, pour le code PIN, avec un nouveau code d'une autre longueur.
@@ -300,7 +300,7 @@ Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **d
 - **En haut**, trois tuiles : le code PIN, les restrictions et le déverrouillage temporaire, chacune avec une coche turquoise quand tout est comme il faut (code PIN défini, restrictions actives, verrouillé) ou un triangle orange quand il faut intervenir.
 - **Définir ou changer le code PIN** (écran système).
 - **Afficher le code PIN** : après un avertissement et le code PIN lui-même, demandé à chaque fois ; noté dans l'historique, puis un nouveau code PIN est proposé.
-- **Déverrouiller temporairement**, **réactiver le contrôle parental**, et si PlayGuard le réactive de lui-même juste après une modification qui a demandé le déverrouillage (activé par défaut).
+- **Déverrouiller temporairement**, et si PlayGuard le réactive de lui-même juste après une modification qui a demandé le déverrouillage (activé par défaut).
 
 ### Protéger PlayGuard par le code PIN
 
