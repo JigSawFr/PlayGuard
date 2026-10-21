@@ -81,18 +81,6 @@ void hide(brls::View* parent, const char* id)
 
 namespace
 {
-// A label in the boards' display face (Sora, the other scripts from the
-// app's fonts): a dialog's title.
-class DisplayLabel : public brls::Label
-{
-  public:
-    DisplayLabel()
-    {
-        const int face = brls::Application::getFont("cadran/digits");
-        if (face != brls::FONT_INVALID) this->font = face;
-    }
-};
-
 std::string trim(const std::string& text)
 {
     const size_t first = text.find_first_not_of(" \n");
@@ -178,10 +166,7 @@ brls::Box* cadran::dialog_body(const std::string& text)
         auto* head = new brls::Box(brls::Axis::ROW);
         head->setId("cadran_dialog_head");
         head->setAlignItems(brls::AlignItems::CENTER);
-        auto* label = new DisplayLabel();
-        label->setText(title);
-        label->setFontSize(23);
-        label->setTextColor(theme["cadran/text"]);
+        brls::Label* label = kit::display(title, 23);
         label->setGrow(1.0f);
         label->setWidth(0);
         head->addView(label);
@@ -373,6 +358,30 @@ void cadran::style_dialog(brls::Dialog* dialog, Emphasis emphasis)
     }
 }
 
+void cadran::style_button(brls::Button* button, Emphasis emphasis)
+{
+    pill(button, emphasis == Emphasis::PRIMARY ? &PRIMARY : emphasis == Emphasis::DANGER ? &DANGER : &PLAIN);
+    button->setHeight(PILL);
+}
+
+brls::Box* cadran::wait_body(const std::string& text)
+{
+    auto* spinner = new brls::ProgressSpinner(brls::ProgressSpinnerSize::LARGE);
+    spinner->setWidth(60);
+    spinner->setHeight(60);
+    spinner->setMarginBottom(24);
+    brls::Label* label = kit::label(text, 19, "cadran/text");
+    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    label->setAlignSelf(brls::AlignSelf::STRETCH);
+    auto* box = new brls::Box(brls::Axis::COLUMN);
+    box->setAlignItems(brls::AlignItems::CENTER);
+    box->setJustifyContent(brls::JustifyContent::CENTER);
+    box->setPadding(40, 40, 32, 40);
+    box->addView(spinner);
+    box->addView(label);
+    return box;
+}
+
 void cadran::prompt_minutes(const std::string& header, uint16_t initial, std::function<void(uint16_t)> on_value)
 {
     namespace kit = cadran::kit;
@@ -381,10 +390,7 @@ void cadran::prompt_minutes(const std::string& header, uint16_t initial, std::fu
     auto* body = new brls::Box(brls::Axis::COLUMN);
     body->setAlignItems(brls::AlignItems::CENTER);
     body->setPadding(30, 40, 22, 40);
-    auto* title = new DisplayLabel();
-    title->setText(header);
-    title->setFontSize(23);
-    title->setTextColor(theme["cadran/text"]);
+    brls::Label* title = kit::display(header, 23);
     title->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     body->addView(title);
     CadranIcon* up = kit::icon("caret-up", 30, "cadran/teal");

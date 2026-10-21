@@ -25,6 +25,8 @@
 #include "util/paths.hpp"
 #include "util/perf.hpp"
 #include "util/table_export.hpp"
+#include "ui/cadran_kit.hpp"
+#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "view/game_tile.hpp"
 
@@ -222,9 +224,9 @@ std::string view_label(bool grid)
 // in two blocks read from the left, the ID and version underneath.
 brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, const std::vector<unsigned char>& icon)
 {
+    namespace kit = cadran::kit;
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::STRETCH);
-    box->setPadding(26, 36, 18, 36);
 
     auto* head = new brls::Box(brls::Axis::ROW);
     head->setAlignItems(brls::AlignItems::CENTER);
@@ -240,20 +242,27 @@ brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, co
     auto* titles = new brls::Box(brls::Axis::COLUMN);
     titles->setGrow(1.0f);
     titles->setShrink(1.0f);
-    titles->addView(ui::text_label(game_name(g), 24, ui::color_text()));
-    auto* problem = ui::text_label(short_text(g, issue), 19, warn_only(issue) ? ui::color_warn() : ui::color_bad());
+    titles->addView(kit::display(game_name(g), 23));
+    auto* problem = kit::label(short_text(g, issue), 17, warn_only(issue) ? "cadran/amber" : "cadran/coral");
     problem->setMarginTop(4);
     titles->addView(problem);
     head->addView(titles);
     box->addView(head);
 
-    auto block = [box](const std::string& title, const std::string& text) {
-        auto* t = ui::text_label(title, 18, ui::color_note());
-        t->setMarginTop(18);
-        box->addView(t);
-        auto* body = ui::text_label(text, 20, ui::color_text());
+    // Each block on the second surface, its title a kicker.
+    brls::Theme theme = brls::Application::getTheme();
+    auto block = [box, &theme](const std::string& title, const std::string& text) {
+        auto* card = new brls::Box(brls::Axis::COLUMN);
+        card->setBackgroundColor(theme["cadran/surf2"]);
+        card->setCornerRadius(14);
+        card->setPadding(12, 18, 14, 18);
+        card->setMarginTop(14);
+        brls::Label* t = kit::label(cadran::upper(title), 15, "cadran/text3");
+        card->addView(t);
+        brls::Label* body = kit::label(text, 18, "cadran/text");
         body->setMarginTop(4);
-        box->addView(body);
+        card->addView(body);
+        box->addView(card);
     };
     block("playguard/games/cause"_i18n, cause_text(g, issue, current_hos));
     block("playguard/games/fix"_i18n, fix_text(g, issue, current_hos));
@@ -262,8 +271,8 @@ brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, co
     if (g.display_version[0]) footer += " · " + brls::getStr("playguard/games/version", std::string(g.display_version));
     if (g.verified == GC_VERIFIED_INTACT) footer += "\n" + brls::getStr("playguard/games/verified_intact", ui::time_text(g.verified_at));
     if (app::dev_mode()) footer += "\n" + developer_text(g);
-    auto* foot = ui::text_label(footer, 18, ui::color_note());
-    foot->setMarginTop(18);
+    brls::Label* foot = kit::label(footer, 15.5f, "cadran/text3");
+    foot->setMarginTop(14);
     box->addView(foot);
     return box;
 }
@@ -861,15 +870,16 @@ void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current
     }
     auto* box = details_view(game, issue, current_hos, icon_of(game.app_id));
     if (app::read_only() && gamecheck_actions(&game, issue) & ~GA_VERIFY) {
-        auto* note_ro = ui::text_label("playguard/common/read_only_note"_i18n, 18, ui::color_note());
+        brls::Label* note_ro = cadran::kit::label("playguard/common/read_only_note"_i18n, 15.5f, "cadran/text3");
         note_ro->setMarginTop(8);
         box->addView(note_ro);
     }
 
     // Two buttons at most, side by side (a third goes on a row of its own):
-    // the fix first ("its first button", the texts say), with the focus, then
-    // the other actions; B closes. With no fix: OK, then the actions.
-    auto* dialog = new brls::Dialog(box);
+    // the fix first ("its first button", the texts say), in teal, with the
+    // focus, then the other actions; B closes. With no fix: OK, then the
+    // actions.
+    auto* dialog = ui::dialog("", box);   // scrolls when its text is long
     const GameFacts g = game;
     const u32 others = actions & ~recommended;
     if (recommended) {
@@ -878,6 +888,9 @@ void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current
             if (g.contents[i].type == GC_META_PATCH) update = g.contents[i];
         dialog->addButton(fix_button(recommended), [this, g, recommended, update]() { this->run(g, recommended, update); });
         if (others) dialog->addButton("playguard/games/other_actions"_i18n, [this, g, others]() { this->choose(g, others); });
+        cadran::style_dialog(dialog);
+        if (auto* fix = dynamic_cast<brls::Button*>(dialog->getView("brls/dialog/button1")))
+            cadran::style_button(fix, cadran::Emphasis::PRIMARY);
     } else {
         dialog->addButton("hints/ok"_i18n, []() {});
         if (others) dialog->addButton("playguard/games/actions"_i18n, [this, g, others]() { this->choose(g, others); });

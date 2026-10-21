@@ -18,6 +18,8 @@
 #include "app.hpp"
 #include "core/platform.h"
 #include "core/sim_env.h"
+#include "ui/cadran_kit.hpp"
+#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/dev_builds.hpp"
 #include "util/github_auth.hpp"
@@ -89,22 +91,17 @@ class DownloadProgress
   public:
     explicit DownloadProgress(uint64_t size) : size(size)
     {
-        this->label = ui::centered_label("", 22, ui::color_text());
-        this->label->setMarginBottom(24);
-        auto* track = new brls::Box(brls::Axis::ROW);
-        track->setWidth(BAR_WIDTH);
-        track->setHeight(12);
-        track->setCornerRadius(6);
-        track->setBackgroundColor(nvgTransRGBA(ui::color_neutral(), 50));
-        this->fill = new brls::Rectangle(ui::color_neutral());
-        this->fill->setWidth(0);
-        this->fill->setHeight(12);
-        this->fill->setCornerRadius(6);
-        track->addView(this->fill);
+        this->label = cadran::kit::label("", 19, "cadran/text");
+        this->label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+        this->label->setAlignSelf(brls::AlignSelf::STRETCH);
+        this->label->setMarginBottom(20);
+        this->bar = new cadran::kit::Bar();
+        this->bar->setWidth(BAR_WIDTH);
         // Its own button, not the dialog's: a dialog's button acts once the
         // dialog is gone, and the download must stop updating it before.
         auto* cancel = new brls::Button();
         cancel->setText("hints/cancel"_i18n);
+        cadran::style_button(cancel);
         cancel->setWidth(260);
         cancel->setMarginTop(28);
         cancel->registerClickAction([this](brls::View*) {
@@ -116,7 +113,7 @@ class DownloadProgress
         box->setJustifyContent(brls::JustifyContent::CENTER);
         box->setPadding(40, 40, 32, 40);
         box->addView(this->label);
-        box->addView(track);
+        box->addView(this->bar);
         box->addView(cancel);
         this->dialog = new brls::Dialog(box);
         this->dialog->setCancelable(false);   // B: below, through cancel()
@@ -158,7 +155,7 @@ class DownloadProgress
     std::atomic<bool> cancelled{ false };
     brls::Dialog* dialog = nullptr;   // null once it is closing: never touched again
     brls::Label* label = nullptr;
-    brls::Rectangle* fill = nullptr;
+    cadran::kit::Bar* bar = nullptr;
 
     void cancel()
     {
@@ -171,7 +168,7 @@ class DownloadProgress
     {
         if (!this->dialog) return;
         const float part = total ? std::min(1.0f, (float)done / (float)total) : 0.0f;
-        this->fill->setWidth(BAR_WIDTH * part);
+        this->bar->set(part);
         // Whole MB, the total rounded up (never "0 of 0"), what came in down.
         const uint64_t mb = 1024 * 1024;
         this->label->setText(brls::getStr("playguard/dev_build/downloading", (int)(done / mb), (int)((total + mb - 1) / mb)));

@@ -12,6 +12,7 @@
 
 #include "action/history_flow.hpp"
 #include "action/offline_clock_logic.hpp"
+#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
@@ -116,18 +117,7 @@ void with_before_report(std::function<void(const std::string& before)> write)
 // A spinner and what is being asked; Cancel (or B) sets `cancelled`.
 brls::Dialog* progress_dialog(const std::string& text, std::shared_ptr<std::atomic<bool>> cancelled)
 {
-    auto* spinner = new brls::ProgressSpinner(brls::ProgressSpinnerSize::LARGE);
-    spinner->setWidth(60);
-    spinner->setHeight(60);
-    spinner->setMarginBottom(24);
-    brls::Label* label = ui::centered_label(text, 22, ui::color_text());
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::CENTER);
-    box->setJustifyContent(brls::JustifyContent::CENTER);
-    box->setPadding(40, 40, 40, 40);
-    box->addView(spinner);
-    box->addView(label);
-    auto* dialog = new brls::Dialog(box);
+    auto* dialog = new brls::Dialog(cadran::wait_body(text));
     ui::add_cancel(dialog, [cancelled]() { *cancelled = true; });
     return dialog;
 }

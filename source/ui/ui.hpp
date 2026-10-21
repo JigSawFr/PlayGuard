@@ -162,10 +162,13 @@ void qr_text_dialog(const std::string& body, const std::string& text);
 // closed (OK or B). Used by PIN › Show the PIN.
 bool show_pin_dialog(std::function<void()> on_close = nullptr);
 
-// A dialog showing `text`. borealis' own text dialog does not scroll: a text
-// taller than the screen collapses into one cut line. A long one is laid out
-// with a smaller font and narrower margins instead, so it fits.
+// A dialog showing `text`, laid out by cadran::dialog_body (its question as
+// the title, its tables, its notes), the caller adding its buttons; a text
+// taller than the dialog's room scrolls.
 brls::Dialog* dialog(const std::string& text);
+// The same with `below` under the text, the card's width unless it aligns
+// itself: a QR code, a code to read out, the cards to support the app.
+brls::Dialog* dialog(const std::string& text, brls::View* below);
 
 // B closes `dialog` and runs `on_cancel` (borealis' own B only closes it).
 void on_cancel(brls::Dialog* dialog, std::function<void()> on_cancel);

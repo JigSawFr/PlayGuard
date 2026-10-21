@@ -2,9 +2,9 @@
 #include "view/funding.hpp"
 
 #include "app.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/text.hpp"
-#include "view/qr_view.hpp"
 
 using namespace brls::literals;
 
@@ -12,43 +12,24 @@ namespace funding
 {
 namespace
 {
-brls::Label* centered_label(const std::string& text, int font_size, NVGcolor color)
-{
-    auto* label = new brls::Label();
-    label->setFontSize(font_size);
-    label->setTextColor(color);
-    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    label->setText(text);
-    return label;
-}
-
 void open_large(const std::string& name, const std::string& url)
 {
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::CENTER);
-    box->setPadding(24, 24, 16, 24);
-    box->addView(new QrView(url, 340));
-    brls::Label* caption = centered_label(name + " — " + text::short_url(url), 22, ui::color_text());
-    caption->setMarginTop(12);
-    box->addView(caption);
-    auto* dialog = new brls::Dialog(box);
+    brls::Box* code = cadran::kit::qr(url, 340, name, text::short_url(url));
+    code->setAlignSelf(brls::AlignSelf::CENTER);
+    auto* dialog = ui::dialog("", code);
     dialog->addButton("hints/ok"_i18n, []() {});
     dialog->open();
 }
 
 brls::Box* card(const std::string& name, const std::string& url, float qr_side, bool focusable)
 {
-    auto* card = new brls::Box(brls::Axis::COLUMN);
-    card->setAlignItems(brls::AlignItems::CENTER);
-    card->setWidth(qr_side + 160);   // both cards alike, whatever their address
+    // Both cards alike, whatever their address.
+    brls::Box* card = cadran::kit::qr(url, qr_side, name, text::short_url(url), qr_side + 160);
     card->setPadding(12, 16, 12, 16);
-    card->addView(new QrView(url, qr_side));
-    brls::Label* title = centered_label(name, 22, ui::color_text());
-    title->setMarginTop(8);
-    card->addView(title);
-    card->addView(centered_label(text::short_url(url), 18, ui::color_note()));
     if (focusable) {
         card->setFocusable(true);
+        card->setHideHighlightBackground(true);
+        card->setHighlightCornerRadius(20);
         card->registerClickAction([name, url](brls::View*) {
             open_large(name, url);
             return true;
@@ -67,24 +48,18 @@ brls::Box* cards(float qr_side, bool focusable)
     return row;
 }
 
+brls::Dialog* dialog(const std::string& text, float qr_side)
+{
+    return ui::dialog(text, cards(qr_side, false));
+}
+
 void open_dialog(std::function<void()> then)
 {
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::STRETCH);
-    box->setPadding(28, 32, 12, 32);
-    auto* note = new brls::Label();
-    note->setSingleLine(false);
-    note->setFontSize(20);
-    note->setText("playguard/about/support_body"_i18n);
-    box->addView(note);
-    brls::Box* row = cards(180, false);
-    row->setMarginTop(12);
-    box->addView(row);
-    auto* dialog = new brls::Dialog(box);
-    dialog->addButton("hints/ok"_i18n, [then]() {
+    auto* d = dialog("playguard/about/support_body"_i18n, 180);
+    d->addButton("hints/ok"_i18n, [then]() {
         if (then) then();
     });
-    dialog->open();
+    d->open();
 }
 
 }   // namespace funding
