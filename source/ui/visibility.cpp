@@ -4,6 +4,7 @@
 
 #include "activity/main_activity.hpp"
 #include "app.hpp"
+#include "tab/cadran_list.hpp"
 #include "ui/cadran_kit.hpp"
 
 #include <algorithm>
@@ -55,6 +56,7 @@ void set_visible(brls::View* view, bool visible)
     if (brls::View* card = view->getParent(); card && card->getId() == "cadran_empty_card") view = card;
     const bool had_focus = !visible && view->isFocused();
     view->setVisibility(visible ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    if (auto* card = dynamic_cast<cadran::Card*>(view->getParent())) card->follow_rows();
     if (!had_focus) return;
 
     // Never leave the focus on a view that just disappeared: prefer the

@@ -26,6 +26,23 @@
 
 using namespace brls::literals;
 
+namespace
+{
+// "Turn back on": the primary button, in the warning colour of the unlock it ends.
+const brls::ButtonStyle RELOCK = {
+    .shadowType              = brls::ShadowType::GENERIC,
+    .hideHighlightBackground = true,
+    .highlightPadding        = "brls/button/primary_highlight_padding",
+    .borderThickness         = "",
+    .enabledBackgroundColor  = "cadran/amber_fill",
+    .enabledLabelColor       = "cadran/navy",
+    .enabledBorderColor      = "",
+    .disabledBackgroundColor = "brls/button/primary_disabled_background",
+    .disabledLabelColor      = "brls/button/primary_disabled_text",
+    .disabledBorderColor     = "",
+};
+}   // namespace
+
 DashboardTab::DashboardTab()
     : TabBase("xml/tab/dashboard.xml"), list(this)
 {
@@ -99,6 +116,7 @@ DashboardTab::DashboardTab()
     child->setAlignItems(brls::AlignItems::CENTER);
     CadranIcon* lock = kit::icon("lock", 20, "cadran/navy");
     lock->setMarginRight(10);
+    relock->setStyle(&RELOCK);
     relock->addView(lock, 0);
     relock->setAlignItems(brls::AlignItems::CENTER);
     CadranIcon* week = kit::icon("timer", 20, "cadran/navy");

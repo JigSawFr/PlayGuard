@@ -132,6 +132,9 @@ static void store(history::Entry e)
         outside_watch::own_change();
     if (e.when.empty()) e.when = ui::now_stamp();
     e.version = app::version();
+    e.dev     = !app::is_release();
+    e.commit  = e.dev ? app::commit() : "";
+    e.pr      = e.dev ? app::pr() : 0;
     s_last    = e;
     s_last_at = std::chrono::steady_clock::now();
     // Off the UI thread: append() reads and rewrites the whole file.
@@ -275,7 +278,12 @@ std::string details(const history::Entry& e)
     const std::string before = value_text(e.kind, e.before), after = value_text(e.kind, e.after);
     if (!before.empty()) rows.push_back({ "playguard/history/before"_i18n, before });
     if (!after.empty()) rows.push_back({ "playguard/history/after"_i18n, after });
-    if (!e.version.empty()) rows.push_back({ "playguard/history/version"_i18n, e.version });
+    if (!e.version.empty())
+        rows.push_back({ "playguard/history/version"_i18n,
+                         e.dev ? brls::getStr("playguard/history/version_dev", e.version) : e.version });
+    // A development build: which one, to find the change it was made with.
+    if (!e.commit.empty()) rows.push_back({ "playguard/history/commit"_i18n, e.commit });
+    if (e.pr > 0) rows.push_back({ "playguard/history/pr"_i18n, "#" + std::to_string(e.pr) });
     std::string out = kind_label(e.kind) + "\n\n" + cadran_text::table(rows);
     if (from.empty() && !e.detail.empty()) out += "\n\n" + e.detail;
     // The week's limits: each day that changed, as it was and became.
@@ -332,6 +340,8 @@ table_export::Table table(const std::vector<history::Entry>& entries)
         { "result", "playguard/history/columns/result"_i18n, false },
         { "kind", "playguard/history/columns/kind"_i18n, false },
         { "version", "playguard/history/version"_i18n, false },
+        { "commit", "playguard/history/commit"_i18n, false },
+        { "pr", "playguard/history/pr"_i18n, false },
     };
     for (const history::Entry& e : entries) {
         std::string from = source_label(e);
@@ -341,7 +351,8 @@ table_export::Table table(const std::vector<history::Entry>& entries)
         t.rows.push_back({ e.when, kind_label(e.kind), from, detail, value_text(e.kind, e.before), value_text(e.kind, e.after),
                            e.result.empty() ? "playguard/history/columns/done"_i18n
                                             : brls::getStr("playguard/history/columns/refused", e.result),
-                           e.kind, e.version });
+                           e.kind, e.dev ? brls::getStr("playguard/history/version_dev", e.version) : e.version, e.commit,
+                           e.pr > 0 ? "#" + std::to_string(e.pr) : "" });
     }
     return t;
 }

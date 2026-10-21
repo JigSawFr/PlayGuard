@@ -2,7 +2,6 @@
 #include "tab/console_tab.hpp"
 
 #include "action/fw_gate.hpp"
-#include "action/notices.hpp"
 #include "action/sys_notes_flow.hpp"
 #include "action/sigpatch_flow.hpp"
 #include "action/sys_update_flow.hpp"
@@ -39,18 +38,22 @@ ConsoleTab::ConsoleTab()
         return true;
     });
 
-    // Ⓐ on the serial number shows / hides the masked digits.
-    serial->registerAction("playguard/tools/serial_show"_i18n, brls::BUTTON_A, [this](brls::View*) {
-        this->serial_revealed = !this->serial_revealed;
-        this->refresh();
+    // The real serial number, whole, and where it comes from: a press away
+    // (the row masks its middle).
+    serial_info = RowIcon::on_row(serial.getView(), RowIcon::Kind::Info);
+    serial->registerClickAction([this](brls::View*) {
+        SysInfo si;
+        sysinfo_get(&si);
+        ui::info(ui::real_serial(si).note);
         return true;
-    }, false, false, brls::SOUND_CLICK);
+    });
 
     // The release notes of each (installed and newer versions).
     const std::pair<brls::DetailCell*, sys_notes::Which> notes_cells[] = {
         { fw.getView(), sys_notes::Which::Firmware },
         { ams.getView(), sys_notes::Which::Atmosphere },
         { hekate.getView(), sys_notes::Which::Hekate },
+        { syspatch.getView(), sys_notes::Which::SysPatch },
     };
     for (const auto& n : notes_cells) {
         const sys_notes::Which which = n.second;
@@ -74,32 +77,24 @@ ConsoleTab::ConsoleTab()
         return true;
     });
     // A warning icon for the serial number not blanked on emuMMC, on the row that
-    // says so (A on the serial number's row shows / hides its digits).
+    // says so.
     blank_warn = RowIcon::on_row(blank.getView(), RowIcon::Kind::Warning);
     blank->registerClickAction([](brls::View*) {
         ui::info("playguard/tools/serial_note_emummc"_i18n);
         return true;
     });
 
-    // A newer firmware Atmosphère or hekate does not support yet: a warning
-    // icon on the firmware's row, the advice in its release notes (A).
-    fw_warn = RowIcon::on_row(fw.getView(), RowIcon::Kind::Warning);
     // What the game patches found: an icon (a warning when something needs a
     // look), the text by A.
     patches_icon = RowIcon::on_row(game_patches.getView(), RowIcon::Kind::Info);
     game_patches->registerClickAction([this](brls::View*) {
-        // sigpatch files beside sys-patch: A also offers to set them aside
-        // (action/sigpatch_flow.hpp).
+        // sigpatch files beside sys-patch: what was found and, in the same
+        // question, whether to set them aside (action/sigpatch_flow.hpp).
         if (!sigpatch_flow::offered()) {
             if (!this->patches_note.empty()) ui::info(this->patches_note);
             return true;
         }
-        const std::string note = this->patches_note;
-        ui::pick_actions("playguard/tools/patches"_i18n,
-                         { { "playguard/sigpatch/details"_i18n, [note]() { ui::info(note); }, "info" },
-                           { "playguard/sigpatch/set_aside"_i18n, [this]() {
-                                 sigpatch_flow::set_aside([this](bool) { this->refresh(); });
-                             }, "folder" } });
+        sigpatch_flow::set_aside([this](bool) { this->refresh(); }, this->patches_note);
         return true;
     });
 
@@ -110,45 +105,58 @@ ConsoleTab::ConsoleTab()
         return true;
     });
     // What the console runs, as tiles above the rest (first in the XML).
-    if (brls::Box* tiles = this->list.tiles({ { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_hekate", "flag" } }, true))
+    if (brls::Box* tiles = this->list.tiles(
+            { { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_hekate", "flag" }, { "cn_syspatch", "shield" } }, true))
         tiles->setMarginBottom(20);
+    // A newer firmware Atmosphère or hekate does not support yet: a warning
+    // in the firmware tile's corner, the advice in its release notes (A).
+    fw_warn = new RowIcon(RowIcon::Kind::Warning);
+    if (brls::Box* head = this->list.head("cn_fw")) {
+        auto* push = new brls::Box();
+        push->setGrow(1.0f);
+        head->addView(push);
+        head->addView(fw_warn);
+    }
     this->list.apply({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_forwarders", "home" },
                        { "cn_compat", "check" }, { "cn_storage", "folder" }, { "cn_blank", "code" },
                        { "cn_serial", "tag" }, { "cn_patches", "shield" } });
-    this->headline = this->list.headline("playguard/tools/headline_kicker"_i18n);
 }
 
 void ConsoleTab::refresh()
 {
-    // As many to check as its badge counts (notices::tab_count).
-    if (this->headline) {
-        const int n = notices::tab_count("console");
-        this->headline->setText(n == 0 ? "playguard/tools/headline_ok"_i18n
-                                : n == 1 ? "playguard/tools/headline_one"_i18n
-                                         : brls::getStr("playguard/tools/headline", n));
-        this->headline->setTextColor(cadran::kit::color(n == 0 ? "cadran/text" : "cadran/amber"));
-    }
     SysInfo si;
     sysinfo_get(&si);
-    // With the newer release the last update check found (sys_update_flow),
-    // and how many releases behind when more than one.
-    bool newer = false;
-    fw->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::Firmware, &newer)));
-    fw->setDetailTextColor(newer ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
-    if (si.ams_valid) {
-        ams->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::Atmosphere, &newer)));
-        ams->setDetailTextColor(newer ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
-    } else {
-        ams->setDetailText("playguard/common/unavailable"_i18n);
-    }
+    // Each tile: the installed version, then a pill with the newer release
+    // the last update check found (sys_update_flow) and how many releases
+    // behind, in amber, or "Up to date" once a check knows the newest.
+    const auto version_tile = [this](brls::DetailCell* cell, const char* id, sys_notes::Which which) {
+        const sys_notes_flow::Status s = sys_notes_flow::status(which);
+        cell->setDetailText(s.installed.empty() ? "playguard/common/unavailable"_i18n : s.installed);
+        cell->setDetailTextColor(cadran::kit::color(s.installed.empty() ? "cadran/text2" : "cadran/text"));
+        std::string tag, note;
+        if (s.newer) {
+            tag = brls::getStr("playguard/tools/tile_newer", s.latest);
+            if (s.behind > 1) note = brls::getStr("playguard/tools/tile_behind", (int)s.behind);
+        } else if (!s.installed.empty() && !s.latest.empty()) {
+            tag = "playguard/tools/tile_current"_i18n;
+        }
+        this->list.tag(id, tag, s.newer, note);
+    };
+    version_tile(fw, "cn_fw", sys_notes::Which::Firmware);
+    version_tile(ams, "cn_ams", sys_notes::Which::Atmosphere);
     // hekate: only when its bootloader/update.bin is on the SD card.
-    const std::string hk = sys_update_flow::installed_hekate();
-    hekate->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::Hekate, &newer)));
-    hekate->setDetailTextColor(newer ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
-    ui::set_visible(hekate.getView(), !hk.empty());
+    version_tile(hekate, "cn_hekate", sys_notes::Which::Hekate);
+    ui::set_visible(hekate.getView(), !sys_update_flow::installed_hekate().empty());
+    // sys-patch: when it is installed; its version from its log.ini
+    // (unavailable when it does not log).
+    const patches::Report& report = ui::patch_report();
+    version_tile(syspatch, "cn_syspatch", sys_notes::Which::SysPatch);
+    ui::set_visible(syspatch.getView(), report.syspatch_installed);
     // A newer firmware Atmosphère or hekate does not support yet, or only in
-    // a newer release (their notes say).
-    fw_warn->set_shown(!sys_notes_flow::firmware_advice().empty());
+    // a newer release (their notes say): its corner's warning, the tile in amber.
+    const bool fw_advice = !sys_notes_flow::firmware_advice().empty();
+    fw_warn->set_shown(fw_advice);
+    if (fw_advice) fw->setBorderColor(cadran::kit::color("cadran/amber_line"));
     NVGcolor c = cadran::kit::color("cadran/text2");
     const std::string compat_value = ui::compat_text(si, &c);
     // Checked: the line's icon says it (a teal check) and no word is needed;
@@ -170,15 +178,10 @@ void ConsoleTab::refresh()
     blank->setDetailTextColor(c);
     blank->setFocusable(ui::serial_warning(si));
     blank_warn->set_shown(ui::serial_warning(si));
-    const bool maskable = si.serial_valid && si.serial[0] && !(si.blank_valid && si.blank);
-    serial->setDetailText(ui::serial_text(si, this->serial_revealed));
+    serial->setDetailText(ui::serial_text(si));
     serial->setDetailTextColor(ui::serial_warning(si) ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
-    serial->setActionAvailable(brls::BUTTON_A, maskable);
-    serial->updateActionHint(brls::BUTTON_A, this->serial_revealed ? "playguard/tools/serial_hide"_i18n
-                                                                   : "playguard/tools/serial_show"_i18n);
-    brls::Application::getGlobalHintsUpdateEvent()->fire();   // redraw the footer hints
+    serial_info->set_shown(!ui::real_serial(si).note.empty());
 
-    const patches::Report& report = ui::patch_report();
     c = cadran::kit::color("cadran/text2");
     game_patches->setDetailText(ui::patches_text(report, &c));
     game_patches->setDetailTextColor(c);

@@ -15,6 +15,9 @@
 #ifndef APP_VERSION
 #define APP_VERSION "0.0.0-dev"
 #endif
+#ifndef APP_PR
+#define APP_PR 0
+#endif
 #ifndef APP_RELEASE
 #define APP_RELEASE 0
 #endif
@@ -58,10 +61,12 @@ static std::string sim_part(bool want_commit)
 std::string version()    { return sim_version() ? sim_part(false) : APP_VERSION; }
 std::string commit()     { return sim_version() ? sim_part(true) : APP_COMMIT; }
 bool        is_release() { return sim_version() ? commit().empty() : APP_RELEASE != 0; }
+int         pr()         { return sim_version() ? 0 : APP_PR; }
 #else
 std::string version()          { return APP_VERSION; }
 std::string commit()           { return APP_COMMIT; }
 bool        is_release()       { return APP_RELEASE != 0; }
+int         pr()               { return APP_PR; }
 #endif
 
 namespace

@@ -71,11 +71,11 @@ PreferencesTab::PreferencesTab()
         const std::vector<std::string> icons = { "today", "timer", "activity", "shield",
                                                  "lock",  "chip",  "settings", "info" };
         static_assert(sizeof(config::START_TABS) / sizeof(config::START_TABS[0]) == 8, "an icon for each tab");
-        ui::pick("playguard/tools/start_tab"_i18n, labels, index_of(config::START_TABS, config::get().start_tab), [this](int i) {
+        ui::pick_grid("playguard/tools/start_tab"_i18n, labels, icons, index_of(config::START_TABS, config::get().start_tab), [this](int i) {
             config::get().start_tab = config::START_TABS[i];
             ui::save_config();
             this->refresh();
-        }, true, {}, icons);
+        });
         return true;
     });
 

@@ -35,6 +35,12 @@ void sysinfo_get(SysInfo *out)
                 s_info.blank       = blank != 0;
                 s_info.blank_valid = true;
             }
+            // 15 == DeviceId (fuses: blanking leaves it as it is).
+            u64 id = 0;
+            if (R_SUCCEEDED(splGetConfig((SplConfigItem)15, &id))) {
+                s_info.device_id       = id;
+                s_info.device_id_valid = true;
+            }
             splExit();
         }
 

@@ -14,6 +14,7 @@
 #include "ui/format_text.hpp"
 #include "ui/cadran_text.hpp"
 #include "util/patches.hpp"
+#include "util/prodinfo.hpp"
 #include "util/pctl_ops_c.hpp"
 
 class MainActivity;
@@ -208,6 +209,11 @@ void add_cancel(brls::Dialog* dialog, std::function<void()> cancel);
 void pick(const std::string& title, const std::vector<std::string>& values, int selected,
           std::function<void(int)> on_pick, bool checked = true, const std::vector<std::string>& details = {},
           const std::vector<std::string>& icons = {});
+// The same as tiles, `columns` to a row, each its Cadran icon (`icons`, a
+// name) large above its label: a few values that read better side by side
+// (the tabs of Start on).
+void pick_grid(const std::string& title, const std::vector<std::string>& values, const std::vector<std::string>& icons,
+               int selected, std::function<void(int)> on_pick, int columns = 4);
 // The same with several rows checked: those `marks` sets (true). Choosing a
 // row closes the list as pick() does: to toggle one, the caller opens it
 // again with the row's mark changed and the focus on it (`focus`).
@@ -295,8 +301,19 @@ std::string other_storage_note(const SysInfo& info);
 // is normal (online play), blanking it would cut Nintendo's services.
 bool        serial_warning(const SysInfo& info);
 std::string blank_text(const SysInfo& info, NVGcolor* color = nullptr);
-// As the system sees it; `reveal` false masks the middle ("XAW1000•••••01").
-std::string serial_text(const SysInfo& info, bool reveal);
+// The console's real serial number: the system's when Atmosphère does not
+// blank it, else read from its PRODINFO backup on the SD card
+// (util/prodinfo.hpp). `note` says where it comes from, the whole number in
+// it ("" serial: not found, and why). Looked up once per run.
+struct RealSerial
+{
+    std::string      serial;
+    std::string      note;
+    prodinfo::Source source = prodinfo::Source::None;   // when blanked
+};
+const RealSerial& real_serial(const SysInfo& info);
+// real_serial() with the middle masked ("XAW1000•••••01"), or "Unavailable".
+std::string serial_text(const SysInfo& info);
 bool        patches_warning(const patches::Report& report);
 // The game-patch report of this boot, read from the SD card once per run (it
 // only changes with a reboot): Today and the Console tab no longer rescan it

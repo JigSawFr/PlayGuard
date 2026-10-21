@@ -1,4 +1,4 @@
-// sys_notes_flow — the release notes of Atmosphère, hekate and the firmware
+// sys_notes_flow — the release notes of Atmosphère, hekate, the firmware and sys-patch
 // (util/sys_notes.hpp): the Console tab opens them (A on a line), About
 // PlayGuard's, the screen
 // showing what was kept on the SD card at once and fetching them again in
@@ -16,8 +16,8 @@ namespace sys_notes_flow
 {
 
 // What the console runs: "1.12.0", "6.5.4" (bootloader/update.bin), "22.0.0",
-// PlayGuard's own version; "" when unknown (no Atmosphère, no hekate on the
-// SD card).
+// PlayGuard's own version, "1.6.3.0" (sys-patch's log.ini); "" when unknown
+// (no Atmosphère, no hekate on the SD card, no sys-patch or no log).
 std::string installed(sys_notes::Which which);
 // The newest release the update check found (sys_updates; PlayGuard's
 // update check for PlayGuard), "" none.
@@ -42,7 +42,7 @@ void refresh(sys_notes::Which which, bool force);
 // read (a refresh asked meanwhile waits for them).
 bool fetching(sys_notes::Which which);
 
-// After the daily update check: the three lists again, without the
+// After the daily update check: the four lists again, without the
 // firmware's pages (one request each). Blocking: from a background task.
 // Returns the fresh cache to keep(), through brls::sync.
 sys_notes::Cache fetch_lists();
@@ -50,8 +50,19 @@ sys_notes::Cache fetch_lists();
 // (encoded off the UI thread).
 void keep(const sys_notes::Cache& fresh);
 
-// "22.0.0 · 23.0.1 available (4 versions behind)" for a line of the
-// Console tab (or About's, for PlayGuard); *newer when a newer one is out.
+// Where `which` stands: what runs, the newest release the last check found
+// ("" none), whether that one is newer and, once the lists kept are read,
+// how many listed releases are (0 unknown).
+struct Status
+{
+    std::string installed, latest;
+    bool        newer = false;
+    size_t      behind = 0;
+};
+Status status(sys_notes::Which which);
+
+// "22.0.0 · 23.0.1 available (4 versions behind)" for About's line (PlayGuard);
+// *newer when a newer one is out.
 std::string status_text(sys_notes::Which which, bool* newer);
 
 // What updating to the newest firmware needs first, from the notes of

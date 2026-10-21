@@ -34,6 +34,8 @@ void sysinfo_get(SysInfo *out)
     out->blank = sim_env_flag("PLAYGUARD_SIM_BLANK");
     out->applet_mode = sim_env_flag("PLAYGUARD_SIM_APPLET");
     out->serial_valid = true;
+    out->device_id_valid = true;
+    out->device_id = 0x0010000000000001ULL;
     snprintf(out->serial, sizeof(out->serial), "%s", out->blank ? SYSINFO_BLANK_SERIAL : "XAW10000000001");
 }
 void sysinfo_version_string(u32 v, char *buf, size_t size)

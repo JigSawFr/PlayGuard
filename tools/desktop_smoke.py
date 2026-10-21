@@ -60,7 +60,7 @@ GitHub and switchbrew (PLAYGUARD_SIM_SYS_LATEST, PLAYGUARD_SIM_SYS_NOTES),
 hekate 6.5.3 on the SD card: Console must say how far behind each
 one is and that the newest firmware needs a newer hekate, then show the
 release notes of the firmware (the closest newer version, then the
-installed one), of Atmosphère, of hekate and, from About, of PlayGuard
+installed one), of Atmosphère, of hekate, of sys-patch and, from About, of PlayGuard
 itself, and keep them in the cache.
 
 The "cadran" scenario tours the boards on top of the tabs: every tab, then
@@ -496,6 +496,12 @@ if SYSNOTES:
     json.dump([release("CTCaer/hekate", "v6.5.4", "2026-09-28T00:06:10Z", hekate_notes("6.5.4", "23.0.1")),
                release("CTCaer/hekate", "v6.5.3", "2026-06-16T22:14:44Z", hekate_notes("6.5.3", "22.5.0"))],
               open(os.path.join(sim_notes, "hekate.json"), "w"))
+    sp = "impeeza/sys-patch"
+    json.dump([release(sp, "v1.6.3.0", "2026-10-19T05:33:00Z",
+                       "Thanks to @borntohonk for adding the am hbxfix for firmware 22.0.0"),
+               release(sp, "v1.6.2.3", "2026-06-17T08:03:00Z",
+                       "Merge pull request #38 from borntohonk/master\n\nerpt fix - latest ams only")],
+              open(os.path.join(sim_notes, "syspatch.json"), "w"))
     # PlayGuard's own releases, as its release workflow writes their pages:
     # 1.0.0 runs (the simulated version), 1.1.0 is out.
     def playguard_notes(v, highlight, change):
@@ -535,13 +541,21 @@ if SYSNOTES:
             "==Change-log==\n[https://en-americas-support.nintendo.com/ Official] ALL change-log:\n"
             f"{log_text}\n\n==System Titles==\n* The following titles were updated:\n** Sysmodules: {sysmodules}.\n")
     env.setdefault("PLAYGUARD_SIM_SYS_NOTES", sim_notes)
-    env.setdefault("PLAYGUARD_SIM_SYS_LATEST", "1.12.1:6.5.4:23.0.1")
+    env.setdefault("PLAYGUARD_SIM_SYS_LATEST", "1.12.1:6.5.4:23.0.1:1.6.3.0")
     # No PlayGuard update offered over the Console tab by the same check.
     env.setdefault("PLAYGUARD_SIM_LATEST", "offline")
     env.setdefault("PLAYGUARD_SIM_FW", "22.5.0")   # behind 23.0.0 and 23.0.1
     update_bin = os.path.join(run_dir, "playguard_data", "sd", "bootloader", "update.bin")
     os.makedirs(os.path.dirname(update_bin), exist_ok=True)
     open(update_bin, "wb").write(b"\0" * 0x40 + b"ICTC" + bytes([ord("0") + 6, ord("0") + 5, ord("0") + 3, 0]))
+    # sys-patch 1.6.2.3 installed, its log.ini naming it (1.6.3.0 is out).
+    sd = os.path.join(run_dir, "playguard_data", "sd")
+    os.makedirs(os.path.join(sd, "atmosphere", "contents", "420000000000000B", "flags"), exist_ok=True)
+    open(os.path.join(sd, "atmosphere", "contents", "420000000000000B", "exefs.nsp"), "wb").write(b"PFS0")
+    open(os.path.join(sd, "atmosphere", "contents", "420000000000000B", "flags", "boot2.flag"), "wb").close()
+    os.makedirs(os.path.join(sd, "config", "sys-patch"), exist_ok=True)
+    open(os.path.join(sd, "config", "sys-patch", "log.ini"), "w").write(
+        "[stats]\nversion=v1.6.2.3\nfw_version=22.5.0\nis_emummc=1\n")
     notes_cache = os.path.join(run_dir, "playguard_data", "cache", "sys_notes.json")
     if os.path.exists(notes_cache):
         os.remove(notes_cache)   # fetched in this run
@@ -1693,6 +1707,14 @@ if CADRAN:
     key("Return")
     shot("17_text_size")
     key("Escape")
+    # Start on: the tabs as a grid of tiles; down keeps the column.
+    key("Right")               # Start on, after Text size
+    key("Return")
+    key("Down")                # PIN, under Today
+    key("Right", 2)            # Preferences
+    shot("17_start_on")
+    key("Escape")
+    key("Left")                # back on Text size
 
     # Console › Network clock: both clocks large.
     key("Left", 3)
@@ -1849,6 +1871,11 @@ if SYSNOTES:
     key("Return")
     wait_logged("release notes: hekate opened", "hekate notes")
     shot("05_hekate")
+    key("Escape")
+    key("Right")               # sys-patch
+    key("Return")
+    wait_logged("release notes: syspatch opened", "sys-patch notes")
+    shot("05_syspatch")        # 1.6.3.0, newer than the installed 1.6.2.3
     # PlayGuard's own, from About › Version (its first line): the closest
     # newer one first.
     key("Escape")
@@ -1864,8 +1891,9 @@ if SYSNOTES:
     shot("07_playguard_installed")
 
     def check_cache():
-        if logged("release notes: atmosphere fetched") or logged("release notes: hekate fetched"):
-            fail("Atmosphère's or hekate's notes fetched again on the day of the start-up check")
+        if logged("release notes: atmosphere fetched") or logged("release notes: hekate fetched") or \
+                logged("release notes: syspatch fetched"):
+            fail("Atmosphère's, hekate's or sys-patch's notes fetched again on the day of the start-up check")
         try:
             kept = json.load(open(notes_cache))
         except (OSError, ValueError) as e:
@@ -1882,6 +1910,9 @@ if SYSNOTES:
                 fail(f"no notes kept for firmware {v}")
         if not fw["23.0.0"].get("security") or not fw["23.0.0"].get("pctl") or fw["23.0.1"].get("security"):
             fail("firmware 23.0.0 / 23.0.1 flags kept wrong")
+        sp = {r["version"]: r for r in kept.get("syspatch", {}).get("releases", [])}
+        if "1.6.3.0" not in sp or "1.6.2.3" not in sp:
+            fail("sys-patch releases kept wrong: " + repr(sorted(sp)))
         pg_kept = {r["version"]: r for r in kept.get("playguard", {}).get("releases", [])}
         pg_notes = pg_kept.get("1.1.0", {}).get("notes", "")
         if "When time is up" not in pg_notes or "Download" in pg_notes or "Install" in pg_notes or "#134" in pg_notes:

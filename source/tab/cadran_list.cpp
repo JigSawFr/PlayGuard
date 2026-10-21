@@ -150,6 +150,14 @@ cadran::Card::Card()
 void cadran::Card::setAccent(NVGcolor color) { this->border = color; }
 void cadran::Card::setFill(NVGcolor color) { this->fill = color; }
 
+void cadran::Card::follow_rows()
+{
+    bool shown = false;
+    for (brls::View* row : this->getChildren()) shown |= row->getVisibility() != brls::Visibility::GONE;
+    const brls::Visibility v = shown ? brls::Visibility::VISIBLE : brls::Visibility::GONE;
+    if (this->getVisibility() != v) this->setVisibility(v);
+}
+
 void cadran::Card::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style, brls::FrameContext* ctx)
 {
     if (height < 1) return;   // every row hidden
@@ -250,6 +258,37 @@ void cadran::List::state(const char* id, const char* color_key)
     }
 }
 
+void cadran::List::tag(const char* id, const std::string& text, bool warn, const std::string& note)
+{
+    brls::Theme theme = brls::Application::getTheme();
+    for (auto& [cell, pill] : this->tags) {
+        if (cell != this->tab->getView(id)) continue;
+        auto* words = static_cast<brls::Label*>(pill->getChildren()[0]);
+        words->setText(text);
+        words->setTextColor(theme[warn ? "cadran/amber" : "cadran/pill_ok_ink"]);
+        pill->setBackgroundColor(theme[warn ? "cadran/amber_surf" : "cadran/pill_ok"]);
+        pill->setBorderColor(theme[warn ? "cadran/amber_line" : "cadran/none"]);
+        pill->setVisibility(text.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
+        cell->setBorderColor(theme[warn && !text.empty() ? "cadran/amber_line" : "cadran/line"]);
+        // The note: the view right after the pill (tiles()).
+        const auto& children = cell->getChildren();
+        const auto at = std::find(children.begin(), children.end(), pill);
+        if (at != children.end() && at + 1 != children.end())
+            if (auto* under = dynamic_cast<brls::Label*>(*(at + 1))) {
+                under->setText(note);
+                under->setVisibility(note.empty() || text.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
+            }
+    }
+}
+
+brls::Box* cadran::List::head(const char* id) const
+{
+    for (brls::DetailCell* cell : this->readings)
+        if (cell == this->tab->getView(id) && !cell->getChildren().empty())
+            return dynamic_cast<brls::Box*>(cell->getChildren()[0]);
+    return nullptr;
+}
+
 brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const char*>>& cells, bool status)
 {
     if (!this->box || cells.empty()) return nullptr;
@@ -320,6 +359,26 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
             value->addView(cell->detail);
             cell->addView(value, at);
             this->marks.push_back({ cell, mark });
+            // Its pill under the value (tag()), hidden until set: as wide as
+            // its words, which wrap rather than end in "…".
+            auto* pill = new brls::Box(brls::Axis::ROW);
+            pill->setAlignSelf(brls::AlignSelf::FLEX_START);
+            pill->setAlignItems(brls::AlignItems::CENTER);
+            pill->setMarginTop(10);
+            pill->setPadding(4, 12, 5, 12);
+            pill->setCornerRadius(13);
+            pill->setBorderThickness(1);
+            pill->setVisibility(brls::Visibility::GONE);
+            brls::Label* words = kit::label("", kit::TEXT_META, "cadran/text2");
+            words->setSingleLine(false);
+            pill->addView(words);
+            cell->addView(pill, at + 1);
+            brls::Label* note = kit::label("", kit::TEXT_META, "cadran/text3");
+            note->setSingleLine(false);
+            note->setMarginTop(6);
+            note->setVisibility(brls::Visibility::GONE);
+            cell->addView(note, at + 2);
+            this->tags.push_back({ cell, pill });
         }
     }
     return row;
@@ -372,6 +431,10 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
             }
             continue;
         }
+        // A cell set apart from the one above (a top margin, as Advanced
+        // under the extra time) starts a card of its own: in the same card,
+        // the margin is an empty band across it.
+        if (card && margin_top(cell) > 0) card = nullptr;
         if (!card) {
             card = new Card();
             card->setMarginTop(margin_top(cell));
@@ -381,6 +444,8 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
         move_to(cell, card);
         row(cell, icon_of(cell));
     }
+    for (brls::View* line : this->box->getChildren())
+        if (auto* c = dynamic_cast<Card*>(line)) c->follow_rows();
     this->sync();
 }
 
@@ -478,23 +543,6 @@ cadran::Card* cadran::List::wrap(const char* id)
     this->box->addView(card, at);
     move_to(line, card);
     return card;
-}
-
-brls::Label* cadran::List::headline(const std::string& kicker)
-{
-    if (!this->box) return nullptr;
-    auto* head = new brls::Box(brls::Axis::COLUMN);
-    head->setAlignItems(brls::AlignItems::STRETCH);
-    head->setMarginBottom(18);
-    brls::Label* title = kit::label(upper(kicker), kit::TEXT_KICKER, "cadran/text2");
-    title->setMarginBottom(6);
-    head->addView(title);
-    brls::Label* line = kit::display("", 28);
-    head->addView(line);
-    brls::View* note = this->tab->getView("tab_ro_note");
-    const int at = note ? index_in(this->box, note) : -1;
-    this->box->addView(head, at < 0 ? 0 : at + 1);
-    return line;
 }
 
 cadran::Card* cadran::List::card_of(const char* id) const

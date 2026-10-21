@@ -34,6 +34,9 @@ class Card : public brls::Box
     Card();
     void setAccent(NVGcolor color);
     void setFill(NVGcolor color);
+    // Gone with its last row (and back with its first), so that its top
+    // margin leaves no gap between the cards around it.
+    void follow_rows();
     void draw(NVGcontext* vg, float x, float y, float width, float height,
               brls::Style style, brls::FrameContext* ctx) override;
 
@@ -81,18 +84,22 @@ class List
     // "cadran/amber_fill" a warning (needs the parent); nullptr: none.
     void state(const char* id, const char* color_key);
 
+    // A status tile's pill under its value ("23.0.1 available"; empty: none):
+    // in amber on its amber ground, the tile outlined in amber, when `warn`
+    // (something to do), else in the calm pill colours ("Up to date"); and
+    // `note` under it, smaller ("2 versions behind"; empty: none).
+    void tag(const char* id, const std::string& text, bool warn, const std::string& note = "");
+
+    // A status tile's head (its icon's row), for a sign at its far end
+    // (RowIcon): the tile's corner, not under its value.
+    brls::Box* head(const char* id) const;
+
     // Puts this line (not a cell: a box of text) in a card of its own.
     Card* wrap(const char* id);
 
     // Restyles every other line; `icons`: cell id -> icon name. A line that
     // opens a screen keeps the app's own "›" at the end of its value.
     void apply(const std::vector<std::pair<const char*, const char*>>& icons);
-
-    // A tab's state in one line at its top, as the Play timer's week: a
-    // kicker (`kicker`, in capitals) and the line in the display face, under
-    // the read-only note when the tab has one. After apply(); the tab sets
-    // the line's text and colour as its state changes.
-    brls::Label* headline(const std::string& kicker);
 
     // The card holding this cell (after apply()).
     Card* card_of(const char* id) const;
@@ -124,5 +131,6 @@ class List
     std::vector<brls::Header*> headers;
     std::vector<brls::DetailCell*> readings;   // the status tiles
     std::vector<std::pair<brls::DetailCell*, brls::View*>> marks;   // each one's state (a kit::Mark)
+    std::vector<std::pair<brls::DetailCell*, brls::Box*>>  tags;    // each one's pill (tag())
 };
 }   // namespace cadran

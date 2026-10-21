@@ -35,14 +35,14 @@ De schermafbeeldingen tonen het donkere thema, de standaard van PlayGuard (in he
 De app is in tabbladen ingedeeld, zoals de systeeminstellingen; elk tabblad heeft hieronder een eigen sectie.
 
 - **Wat mislukt, staat in een dialoogvenster; wat lukt, in een korte melding.** Een dialoogvenster zegt alleen wat nu voor deze console geldt: dat de lopende game zou worden onderbroken, alleen zolang er een game open is; dat de smartphone-app een wijziging zou kunnen overschrijven, alleen zolang die gekoppeld is en kan synchroniseren.
-- **De kopregel** geeft op elk tabblad aan wanneer ouderlijk toezicht tijdelijk ontgrendeld is (met de pil), en toont een doorgestreept potlood rechts van de titel wanneer de app alleen-lezen is; op een van beide tikken brengt je naar de plek waar je het ongedaan maakt (*Pincode › Ouderlijk toezicht weer inschakelen*, het firmwarescherm).
+- **De kopregel** geeft op elk tabblad aan wanneer ouderlijk toezicht tijdelijk ontgrendeld is (met de pil), en toont een doorgestreept potlood rechts van de titel wanneer de app alleen-lezen is; op een van beide tikken brengt je naar de plek waar je het ongedaan maakt (*Vandaag › Weer inschakelen*, het firmwarescherm).
 - **In alleen-lezenmodus** blijven de acties op hun plaats, grijs, en zeggen ze waarom als je erop drukt.
 
 ## Het uiterlijk: Cadran
 
 Het uiterlijk van PlayGuard heet Cadran: een smalle balk met iconen voor de tabbladen, een palet in marineblauw of koel wit (volgens het thema), kaarten in plaats van lijsten. Elk tabblad opent op wat het belangrijkst is (een ring, tegels, kaarten, chips), met de overige instellingen eronder.
 
-- **De pil in de kopregel** zegt waar het tabblad over gaat (*Ouderlijk toezicht actief*, *Timer actief*…); zolang ouderlijk toezicht ontgrendeld is, zegt ze dat op elk tabblad, en erop tikken opent *Pincode › Ouderlijk toezicht weer inschakelen*. Secundaire tekst is nooit kleiner dan 15 px, zodat je hem vanaf de bank op een tv kunt lezen.
+- **De pil in de kopregel** zegt waar het tabblad over gaat (*Ouderlijk toezicht actief*, *Timer actief*…); zolang ouderlijk toezicht ontgrendeld is, zegt ze dat op elk tabblad, en erop tikken opent *Vandaag › Weer inschakelen*. Secundaire tekst is nooit kleiner dan 15 px, zodat je hem vanaf de bank op een tv kunt lezen.
 - **Dialoogvensters** zijn kaarten met hun knoppen als pillen, de bevestiging in blauwgroen (in koraalrood als ze iets verwijdert of stopt).
   - De keuzes openen als een kaart boven de knopaanwijzingen, de huidige keuze op zacht blauwgroen met een vinkje. De blauwgroene rand hoort overal alleen bij de focus: een niveau, een account, een geldende keuze houdt de zachte vulling.
   - Een lang dialoogvenster vervaagt onderaan zolang er meer volgt, en de waarschuwing erin (een game die op het punt staat te worden onderbroken) komt eerst, in een oranje kaart.
@@ -106,7 +106,7 @@ Ter informatie: een build waarvan is teruggegaan, een firmware die niet met deze
 
 - Elke sectie toont haar meldingen in een vaste volgorde, welke controle ook als eerste klaar was.
 - **In de zijbalk** telt een oranje badge naast de naam van een tabblad de meldingen die te doen zijn, op de plek waar ze worden opgelost: het tabblad Pincode (geen pincode, een zwakke pincode, PlayGuard zonder pincode, tijdelijk ontgrendeld), de Speeltijdtimer (het alarm uit, de console die niet telt), *Vandaag* (wijzigingen buiten PlayGuard, extra tijd om terug te zetten), de Console (de meldingen hierboven, en de netwerkklok). Genegeerde meldingen en meldingen ter informatie worden niet geteld.
-- In het tabblad staat dezelfde badge op de regel waar elke melding wordt opgelost (*Netwerkklok*, *Geïnstalleerde games controleren*, *Opslag*, *Gamepatches*; *Pincode instellen of wijzigen*, *PlayGuard beveiligen met de pincode*, *Ouderlijk toezicht weer inschakelen*; *Geavanceerd* van de Speeltijdtimer voor het alarm), en het tabblad opent op de eerste daarvan.
+- In het tabblad staat dezelfde badge op de regel waar elke melding wordt opgelost (*Netwerkklok*, *Geïnstalleerde games controleren*, *Opslag*, *Gamepatches*; *Pincode instellen of wijzigen*, *PlayGuard beveiligen met de pincode*; *Geavanceerd* van de Speeltijdtimer voor het alarm), en het tabblad opent op de eerste daarvan.
 - **Ⓐ** op een melding voert de oplossing uit (*Inschakelen*, *Instellen*, *Bijwerken*…) of opent het tabblad waar je het oplost. Een melding verdwijnt vanzelf zodra wat ze meldt is opgelost.
 - **Ⓧ** markeert een melding ter informatie als gelezen; **Ⓨ** markeert ze allemaal. Een melding die als gelezen is gemarkeerd, blijft gelezen bij de volgende start, tot de tekst ervan verandert.
 - **Negeren:** een paar meldingen die te doen zijn, kun je met Ⓧ negeren, na een bevestiging en de pincode: een pincode die iedereen als eerste zou proberen, PlayGuard dat zonder pincode opent, het alarm "Tijd is om" uit, een bijna volle SD-kaart (nooit: geen pincode, ontgrendeld toezicht, de klok, de speeltijdtimer die niet telt of de bestanden van PlayGuard zelf). Een genegeerde melding telt niet meer mee en staat als laatste onder *Genegeerd*, waar Ⓐ hem weer laat meetellen. Hij komt vanzelf terug na 30 dagen (tenzij *Genegeerde waarschuwingen na 30 dagen weer meetellen* uit staat), zodra wat hij meldt is opgelost en daarna opnieuw gebeurt, of, voor de pincode, bij een nieuwe pincode met een andere lengte.
@@ -300,7 +300,7 @@ Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het
 - **Bovenaan** drie tegels: de pincode, de beperkingen en het tijdelijk ontgrendelen, elk met een blauwgroen vinkje als het is zoals het hoort (een pincode ingesteld, beperkingen aan, vergrendeld) of een oranje waarschuwingsteken als er iets moet gebeuren.
 - **Pincode instellen of wijzigen** (pincodescherm van het systeem).
 - **Pincode tonen**: na een waarschuwing en de pincode zelf, die elke keer wordt gevraagd; vastgelegd in de geschiedenis, daarna wordt een nieuwe pincode voorgesteld.
-- **Tijdelijk ontgrendelen**, **ouderlijk toezicht weer inschakelen**, en of PlayGuard het vanzelf weer inschakelt meteen na een wijziging waarvoor het ontgrendeld moest worden (standaard aan).
+- **Tijdelijk ontgrendelen**, en of PlayGuard het vanzelf weer inschakelt meteen na een wijziging waarvoor het ontgrendeld moest worden (standaard aan).
 
 ### PlayGuard beveiligen met de pincode
 
