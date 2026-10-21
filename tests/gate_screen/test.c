@@ -40,18 +40,38 @@ static int count_near(int x0, int y0, int x1, int y1, int r, int g, int b, int t
     return n;
 }
 
-static void draw_note(GateScreenState state, const unsigned char *icon, size_t icon_n, const unsigned char *f,
-                      const char *note, int warn)
+static void draw_rules(GateScreenState state, const unsigned char *icon, size_t icon_n, const unsigned char *f,
+                       const char *note, int warn, unsigned rules)
 {
     for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0x12345678u;
     const GateScreen s = { f, f, icon, icon_n, "Star Atlas", "Status line", "A hint", "PlayGuard · tagline", "21:03", state,
-                           note, warn };
+                           note, warn, rules };
     gate_screen_draw(px, W, H, STRIDE, &s);
+}
+
+static void draw_note(GateScreenState state, const unsigned char *icon, size_t icon_n, const unsigned char *f,
+                      const char *note, int warn)
+{
+    draw_rules(state, icon, icon_n, f, note, warn, 0);
 }
 
 static void draw(GateScreenState state, const unsigned char *icon, size_t icon_n, const unsigned char *f)
 {
     draw_note(state, icon, icon_n, f, NULL, 0);
+}
+
+// The rules' chips after the badge: teal there with them, none without.
+static void test_rules(void)
+{
+    draw_rules(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, NULL, 0, 0);
+    const int none = count_near(750, 322, 1000, 376, 0x2E, 0xC4, 0xA6, 40);
+    draw_rules(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, NULL, 0,
+               GATE_RULE_FREE | GATE_RULE_CLOSED | GATE_RULE_LIMIT);
+    const int three = count_near(750, 322, 1000, 376, 0x2E, 0xC4, 0xA6, 40);
+    draw_rules(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, NULL, 0, GATE_RULE_LIMIT);
+    const int one = count_near(750, 322, 1000, 376, 0x2E, 0xC4, 0xA6, 40);
+    CHECK(none < 20);
+    CHECK(one > 150 && three > 2 * one);
 }
 
 static void test_screen(void)
@@ -118,6 +138,7 @@ int main(void)
     fclose(f);
     px = (uint32_t *)malloc(sizeof(uint32_t) * STRIDE * H);
     test_screen();
+    test_rules();
     test_text();
     free(px);
     free(font);

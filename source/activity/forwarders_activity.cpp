@@ -127,8 +127,9 @@ std::vector<GameCell::Mark> list_marks(const Row& r)
     return out;
 }
 
-// Under the protected ones: what each icon at their lines' end says.
-brls::Box* legend()
+// Under the protected ones: what each icon at their lines' end says, those
+// shown only (`used`: their icons' names).
+brls::Box* legend(const std::vector<std::string>& used)
 {
     static const std::pair<const char*, const char*> MARKS[] = {
         { "key", "playguard/forwarders/state_pin" },          { "unlock", "playguard/forwarders/action_hours" },
@@ -140,6 +141,7 @@ brls::Box* legend()
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setMargins(8, 8, 0, 10);
     for (const auto& [icon, key] : MARKS) {
+        if (std::find(used.begin(), used.end(), icon) == used.end()) continue;
         auto* item = new brls::Box(brls::Axis::ROW);
         item->setAlignItems(brls::AlignItems::CENTER);
         item->setMarginRight(22);
@@ -517,7 +519,13 @@ void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
                 if (r.id == focus_id) focus = cell;
                 if (!first) first = cell;
             }
-            if (g == 1 && card) groups_box->addView(legend());
+            if (g == 1 && card) {
+                std::vector<std::string> used;
+                for (const Row& r : this->list_rows)
+                    if (group_of(r) == 1)
+                        for (const GameCell::Mark& m : list_marks(r)) used.push_back(m.icon);
+                groups_box->addView(legend(used));
+            }
         }
     });
     ui::set_visible(list.getView(), !this->list_rows.empty());
@@ -573,7 +581,7 @@ void ForwardersActivity::actions(const Row& row)
         choices.push_back({ "playguard/forwarders/action_icon"_i18n, [this, r]() { this->pick_icon(r); }, "sparkle", "", own });
         if (!r.self)
             choices.push_back(ui::Choice("playguard/forwarders/action_pin"_i18n,
-                                         [this, r]() { forwarder_flow::set_pin(r, !r.pin, this->then_rebuild(r.id)); }, "key",
+                                         [this, r]() { this->pin(r, !r.pin); }, "key",
                                          "", guard)
                                   .switched(r.pin));
         if (r.paused_until)
@@ -639,29 +647,35 @@ void ForwardersActivity::details(const Row& r)
     if (r.pin && r.verified && forwarders_logic::is_menu(r.nro)) made += " · " + "playguard/forwarders/state_verified"_i18n;
     if (r.pin && !r.carried) made += " · " + "playguard/forwarders/state_remake"_i18n;
     // Its rules, one a line, each with the icon of its row in the list;
-    // then what it is. Each line only closes the sheet.
+    // then what it is. A rule's line opens its editor, as the actions do (in
+    // read-only mode, or for another app's, each line only closes the sheet).
+    const bool edit = !app::read_only() && r.state != State::Elsewhere && r.state != State::NotInstalled;
+    const auto open = [edit](std::function<void()> run) { return edit ? run : std::function<void()>(); };
     std::vector<ui::Choice> lines;
     const std::string guard = "playguard/forwarders/sheet_protection"_i18n;
     if (!r.self && r.state != State::Elsewhere) {
-        lines.push_back({ "playguard/forwarders/state_pin"_i18n, nullptr, "key", r.pin ? on : off, guard,
-                          r.pin ? Tone::ON : Tone::PLAIN });
+        lines.push_back({ "playguard/forwarders/state_pin"_i18n, open([this, r]() { this->pin(r, !r.pin); }), "key",
+                          r.pin ? on : off, guard, r.pin ? Tone::ON : Tone::PLAIN });
         if (r.pin) {
             const forwarder_flow::Hours free = { r.free_days, r.free_from, r.free_to, r.free2_days, r.free2_from, r.free2_to };
             if (r.paused_until)
-                lines.push_back({ "playguard/forwarders/detail_paused"_i18n, nullptr, "pause",
+                lines.push_back({ "playguard/forwarders/detail_paused"_i18n,
+                                  open([this, r]() { forwarder_flow::lift_pause(r, this->then_rebuild(r.id)); }), "pause",
                                   forwarder_flow::until_label(r.paused_until), guard, Tone::WARN });
-            lines.push_back({ "playguard/forwarders/action_hours"_i18n, nullptr, "unlock",
-                              r.free_days ? forwarder_flow::hours_label(free) : off, guard,
+            lines.push_back({ "playguard/forwarders/action_hours"_i18n, open([this, r]() { this->pick_hours(r, false); }),
+                              "unlock", r.free_days ? forwarder_flow::hours_label(free) : off, guard,
                               r.free_days ? Tone::ON : Tone::PLAIN });
-            lines.push_back({ "playguard/forwarders/action_closed"_i18n, nullptr, "stop",
+            lines.push_back({ "playguard/forwarders/action_closed"_i18n, open([this, r]() { this->pick_hours(r, true); }),
+                              "stop",
                               r.closed_days ? forwarder_flow::hours_label(r.closed_days, r.closed_from, r.closed_to) : off,
                               guard, r.closed_days ? Tone::ON : Tone::PLAIN });
-            lines.push_back({ "playguard/forwarders/action_limit"_i18n, nullptr, "timer", r.limit ? on : off, guard,
-                              r.limit ? Tone::ON : Tone::PLAIN });
+            lines.push_back({ "playguard/forwarders/action_limit"_i18n, open([this, r]() { this->limit(r, !r.limit); }),
+                              "timer", r.limit ? on : off, guard, r.limit ? Tone::ON : Tone::PLAIN });
         }
     }
     const std::string facts = "playguard/forwarders/sheet_forwarder"_i18n;
-    lines.push_back({ "playguard/forwarders/author"_i18n, nullptr, "user", r.author.empty() ? unknown : r.author, facts });
+    lines.push_back({ "playguard/forwarders/author"_i18n, open([this, r]() { this->change_author(r); }), "user",
+                      r.author.empty() ? unknown : r.author, facts });
     lines.push_back({ "playguard/tools/version"_i18n, nullptr, "tag", r.version.empty() ? unknown : r.version, facts });
     lines.push_back({ ".nro", nullptr, "file", r.nro.empty() ? unknown : nro::sd_path(r.nro), facts });
     lines.push_back({ "playguard/forwarders/program_id"_i18n, nullptr, "chip", forwarders::hex_id(r.id), facts });
@@ -718,6 +732,19 @@ void ForwardersActivity::limit(const Row& r, bool on)
             if (weak.expired()) return;
             this->rebuild(r.id);
             if (ok) this->offer_undo([this, r, on]() { forwarder_flow::set_limit(r, !on, this->then_rebuild(r.id), false); });
+        });
+    });
+}
+
+void ForwardersActivity::pin(const Row& r, bool on)
+{
+    std::weak_ptr<bool> weak = this->alive;
+    forwarder_flow::set_pin(r, on, [this, weak, r, on](bool ok) {
+        brls::sync([this, weak, r, ok, on]() {
+            if (weak.expired()) return;
+            this->rebuild(r.id);
+            // Put back as it was: asked for again (or no longer) the usual way.
+            if (ok) this->offer_undo([this, r, on]() { forwarder_flow::set_pin(r, !on, this->then_rebuild(r.id)); });
         });
     });
 }
