@@ -403,6 +403,7 @@ static void test_lock_check()
     CHECK(!lock_check({ self, menu }, false, Patches::Ready).ready());
     CHECK(!lock_check({ self, menu }, true, Patches::Missing).ready());
     CHECK(lock_check({ self, menu }, true, Patches::Unknown).ready());   // sys-patch there, its log silent
+    CHECK(!lock_check({ self, menu }, true, Patches::Incomplete).ready());   // the menus would not start
     c = lock_check({ menu, game }, true, Patches::Ready);
     CHECK(!c.ready() && !c.self && !c.routes());
     c = lock_check({ self, game }, true, Patches::Ready);
@@ -589,10 +590,20 @@ static void test_patches()
     CHECK(patches_state(s) == Patches::Ready);
     s.es = patches::Module::Failed;   // es does not matter to a forwarder
     CHECK(patches_state(s) == Patches::Ready);
+    // sys-patch ran, and left part of what a forwarder needs: incomplete
+    // (an update of sys-patch is the fix), with what is missing said.
     s.ldr = patches::Module::Unpatched;
-    CHECK(patches_state(s) == Patches::Missing);
+    CHECK(patches_state(s) == Patches::Incomplete);
+    CHECK(forwarders_logic::patch_gaps(s) == "ldr");
+    s.ldr = patches::Module::SysPatch;
+    s.fs = patches::Module::Partial;
+    s.gaps = { "fs:nocntchk_19.0.0+=Unpatched", "es:es_22.0.0+=Unpatched" };
+    CHECK(patches_state(s) == Patches::Incomplete);
+    CHECK(forwarders_logic::patch_gaps(s) == "fs:nocntchk_19.0.0+=Unpatched");   // es left out
+    s.gaps.clear();
     s.fs = s.ldr = s.es = patches::Module::Skipped;
     CHECK(patches_state(s) == Patches::Missing);
+    CHECK(forwarders_logic::patch_gaps(s) == "fs, ldr");
 }
 
 static void append(void* ctx, void* data, int size)

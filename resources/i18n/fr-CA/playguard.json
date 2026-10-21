@@ -1121,7 +1121,10 @@
         "week_empty": "Aucun forwarder essayé ces sept derniers jours.",
         "week_note": "Refus cette semaine : {}; la semaine d'avant : {}.",
         "climb_title": "Plus de NIP refusés que d'habitude",
-        "climb_detail": "{} NIP refusés à la porte ces sept derniers jours, {} la semaine d'avant."
+        "climb_detail": "{} NIP refusés à la porte ces sept derniers jours, {} la semaine d'avant.",
+        "patches_incomplete": "La console ne lance un forwarder qu'avec des patchs de signature, et sys-patch {} ne les a pas tous appliqués pour ce firmware (non appliqués : {}). Mettez sys-patch à jour, puis redémarrez la console.",
+        "patches_title": "Ce forwarder ne démarrerait pas encore",
+        "patches_anyway": "L'ajouter quand même (il démarrera une fois les patchs en place)"
     },
     "hbmenu": {
         "section": "Menu homebrew",

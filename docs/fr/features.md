@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 733c8f08dff8 -->
+<!-- translated from docs/features.md, sha256 7e857e38d537 -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -421,7 +421,7 @@ Sur une console sans Internet, *Régler l'horloge réseau sur l'horloge de la co
 - **Un forwarder supprimé en dehors de PlayGuard** (dans les Paramètres) : noté une fois dans l'historique, et dans la cloche tant que ça dure, avec *Réinstaller* ou *Oublier* sur sa ligne.
 - **Son icône depuis l'album** (Ⓐ › *Changer l'icône*) : une capture de l'album (les 30 plus récentes, par date), son carré central converti dans le JPEG de 256 × 256 du menu HOME ; ou de nouveau celle du `.nro`. La réinstallation la garde.
 - **Dans les sauvegardes des réglages** (*Historique › Sauvegardes*) : ce que PlayGuard a créé et si le menu homebrew était verrouillé. Restaurer une sauvegarde propose, après le reste, de remettre les forwarders qui ne sont plus sur le menu HOME (protégés comme avant, avec leurs heures et leur icône) ; le verrou est seulement signalé, à refaire depuis cet écran.
-- **Patchs de signature :** la console ne lance un forwarder qu'avec des patchs de signature de fs et du loader (sys-patch, ou des fichiers sigpatch) : sans eux, l'écran le dit au-dessus de la liste (*Console › Patchs de jeux* donne le détail). Le `.nro` reste où il est ; supprimer un forwarder n'y touche jamais.
+- **Patchs de signature :** la console ne lance un forwarder qu'avec des patchs de signature de fs et du loader (sys-patch, ou des fichiers sigpatch), chaque motif que sys-patch prévoit pour ce firmware étant appliqué. Quand ils manquent, ou que sys-patch en a laissé un de côté (un sys-patch plus ancien que le firmware), l'écran le dit au-dessus de la liste en nommant ce qui n'est pas patché, et ajouter un forwarder, créer celui de PlayGuard ou tout réinstaller préviennent d'abord que le forwarder ne démarrerait pas encore : l'ajouter quand même (il démarrera une fois les patchs en place), ou annuler. Le verrouillage du menu homebrew les attend aussi (*Console › Patchs de jeux* donne le détail). Le `.nro` reste où il est ; supprimer un forwarder n'y touche jamais.
 - **Temps de jeu :** lancé depuis son icône, un homebrew tourne comme un jeu : le temps de jeu le compte et le suspend comme n'importe quel jeu une fois le temps écoulé, et Activité le liste. PlayGuard reste accessible depuis le menu des homebrews.
 - Chaque modification demande le code PIN quand *Protéger PlayGuard par le code PIN* le prévoit, est refusée en lecture seule et figure dans l'historique. Ce que PlayGuard a créé est gardé par système (sysMMC / emuMMC), dans `forwarders.json`.
 

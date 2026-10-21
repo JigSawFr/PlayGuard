@@ -1121,7 +1121,10 @@
         "week_empty": "No se intentó ningún forwarder en los últimos siete días.",
         "week_note": "Rechazos esta semana: {}; la semana anterior: {}.",
         "climb_title": "Más PIN rechazados de lo normal",
-        "climb_detail": "{} PIN rechazados en la puerta en los últimos siete días, {} la semana anterior."
+        "climb_detail": "{} PIN rechazados en la puerta en los últimos siete días, {} la semana anterior.",
+        "patches_incomplete": "The console starts a forwarder only with signature patches, and sys-patch {} did not apply all of them for this firmware (not patched: {}). Update sys-patch, then restart the console.",
+        "patches_title": "This forwarder would not start yet",
+        "patches_anyway": "Add it anyway (it starts once the patches are in place)"
     },
     "hbmenu": {
         "section": "Menú homebrew",

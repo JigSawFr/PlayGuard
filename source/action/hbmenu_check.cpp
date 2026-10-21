@@ -164,7 +164,10 @@ State read_state(bool take_log)
     sysinfo_get(&si);
     if (si.ams_valid) st.ams = fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro);
     const auto p = forwarders_logic::patches_state(ui::patch_report());
-    st.patches = p == forwarders_logic::Patches::Ready ? "ready" : p == forwarders_logic::Patches::Unknown ? "unknown" : "missing";
+    st.patches = p == forwarders_logic::Patches::Ready        ? "ready"
+                 : p == forwarders_logic::Patches::Unknown    ? "unknown"
+                 : p == forwarders_logic::Patches::Incomplete ? "incomplete"
+                                                              : "missing";
     st.module = !rescue::installed() ? "none" : rescue::outdated() ? "outdated" : "current";
     st.gate = paths::file_exists(in_data(GATE_NRO_NAME)) ? "present" : "none";
     st.c = check(take_log);

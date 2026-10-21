@@ -31,6 +31,11 @@ std::string self_nro();
 // build from this repository).
 bool loader_present();
 
+// Why a forwarder would not start on this console now (its signature
+// patches: forwarders_logic::patches_state), in the user's language, the
+// fix included; "" when they are in place.
+std::string patches_problem();
+
 // Asks the name (the .nro's own first), confirms with what the HOME menu
 // will show (its icon, name, publisher), installs; `pin`: protected with the
 // PIN too (refused without one on the console). `sd_path`: "/switch/…".

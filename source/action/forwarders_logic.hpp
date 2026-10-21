@@ -77,10 +77,15 @@ std::string default_name(const std::string& nacp_name, const std::string& path);
 enum class Patches
 {
     Ready,
-    Unknown,   // sys-patch is there, its log does not say for this boot
+    Unknown,      // sys-patch is there, its log does not say for this boot
     Missing,
+    Incomplete,   // sys-patch ran, but left a pattern of fs or ldr for this firmware unpatched (patch_gaps)
 };
 Patches patches_state(const patches::Report& report);
+// What sys-patch left unpatched that a forwarder needs (fs and ldr, not es):
+// "fs:nocntchk_19.0.0+=Unpatched, ldr:…"; a whole module when it logged
+// none of its patterns as patched ("ldr"). Empty when nothing is known missing.
+std::string patch_gaps(const patches::Report& report);
 
 // Whether `nro` ("sdmc:/…") is a homebrew menu, which starts any other
 // .nro: hbmenu (sdmc:/hbmenu.nro, the one the album starts, or a copy of
@@ -102,7 +107,7 @@ std::string hours_text(int days, int from, int to, const std::vector<std::string
 struct LockCheck
 {
     bool pin = false;       // a PIN on the console (to ask for)
-    bool patches = false;   // forwarders can start: signature patches not missing
+    bool patches = false;   // forwarders can start: signature patches neither missing nor incomplete
     bool self = false;      // PlayGuard's own forwarder ready
     std::vector<std::string> menus;   // the protected menus ready, by name
     // Those of them started from the HOME menu through the gate once: a way

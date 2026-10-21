@@ -1121,7 +1121,10 @@
         "week_empty": "最近七天沒有嘗試任何轉發器。",
         "week_note": "本週被拒絕：{}；前一週：{}。",
         "climb_title": "被拒絕的PIN碼比平時多",
-        "climb_detail": "最近七天門禁拒絕了{}次PIN碼，前一週為{}次。"
+        "climb_detail": "最近七天門禁拒絕了{}次PIN碼，前一週為{}次。",
+        "patches_incomplete": "The console starts a forwarder only with signature patches, and sys-patch {} did not apply all of them for this firmware (not patched: {}). Update sys-patch, then restart the console.",
+        "patches_title": "This forwarder would not start yet",
+        "patches_anyway": "Add it anyway (it starts once the patches are in place)"
     },
     "hbmenu": {
         "section": "自製軟體選單",

@@ -55,6 +55,11 @@ void console(std::vector<Item>& out)
         case forwarders_logic::Patches::Unknown:
             out.push_back({ S, Res::Warn, "Signature patches: sys-patch at boot, its log not read" });
             break;
+        case forwarders_logic::Patches::Incomplete:
+            out.push_back({ S, Res::Fail,
+                            "Signature patches: incomplete, a forwarder would not start (not patched: " +
+                                forwarders_logic::patch_gaps(ui::patch_report()) + ")" });
+            break;
         default: out.push_back({ S, Res::Fail, "Signature patches: missing (a forwarder would not start)" });
     }
     const std::string self = app::self_path();

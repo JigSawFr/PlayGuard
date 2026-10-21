@@ -406,10 +406,9 @@ void ForwardersActivity::show_lock()
 
 void ForwardersActivity::show_patches()
 {
-    const auto state = forwarders_logic::patches_state(ui::patch_report());
-    if (state == forwarders_logic::Patches::Missing) warning->setText("playguard/forwarders/patches_missing"_i18n);
-    if (state == forwarders_logic::Patches::Unknown) warning->setText("playguard/forwarders/patches_unknown"_i18n);
-    ui::set_visible(warning.getView(), state != forwarders_logic::Patches::Ready);
+    const std::string problem = forwarder_flow::patches_problem();
+    if (!problem.empty()) warning->setText(problem);
+    ui::set_visible(warning.getView(), !problem.empty());
 }
 
 void ForwardersActivity::show_self()

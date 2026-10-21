@@ -8,6 +8,7 @@
 #include "action/hbmenu_lock.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
+#include "action/forwarders_logic.hpp"
 #include "app.hpp"
 #include "core/forwarder.h"
 #include "core/pctl_ops.h"
@@ -135,7 +136,48 @@ void confirm_preview(const std::vector<uint8_t>& icon, const std::string& name, 
 }
 }   // namespace
 
+std::string patches_problem()
+{
+    const patches::Report& report = ui::patch_report();
+    switch (forwarders_logic::patches_state(report)) {
+        case forwarders_logic::Patches::Ready: return "";
+        case forwarders_logic::Patches::Unknown: return "playguard/forwarders/patches_unknown"_i18n;
+        case forwarders_logic::Patches::Incomplete:
+            return brls::getStr("playguard/forwarders/patches_incomplete",
+                                report.log_version.empty() ? std::string("?") : report.log_version,
+                                forwarders_logic::patch_gaps(report));
+        case forwarders_logic::Patches::Missing: break;
+    }
+    return "playguard/forwarders/patches_missing"_i18n;
+}
+
+void create_checked(const std::string& sd_path, std::function<void(bool)> done, bool pin);
+void create_self_checked(std::function<void(bool)> done);
+
+namespace
+{
+// Before a forwarder is made: said when it would not start (its patches),
+// with the choice to make it anyway (it starts once they are in place).
+// `go` makes it; `done(false)` when the user stops there.
+void patches_first(std::function<void()> go, std::function<void(bool)> done)
+{
+    const std::string problem = patches_problem();
+    if (problem.empty()) return go();
+    std::vector<ui::Choice> choices;
+    choices.emplace_back("playguard/forwarders/patches_anyway"_i18n, go, "plus");
+    choices.emplace_back("hints/cancel"_i18n, [done]() {
+        if (done) done(false);
+    });
+    ui::pick_actions("playguard/forwarders/patches_title"_i18n, choices, problem);
+}
+}   // namespace
+
 void create(const std::string& sd_path, std::function<void(bool)> done, bool pin)
+{
+    patches_first([sd_path, done, pin]() { create_checked(sd_path, done, pin); }, done);
+}
+
+void create_checked(const std::string& sd_path, std::function<void(bool)> done, bool pin)
 {
     nro::Info info;
     std::string error;
@@ -230,6 +272,11 @@ void put_back(const forwarders::Made& m, bool reinstall, std::function<void(bool
 }
 
 void create_self(std::function<void(bool)> done)
+{
+    patches_first([done]() { create_self_checked(done); }, done);
+}
+
+void create_self_checked(std::function<void(bool)> done)
 {
     const std::string sdmc = self_nro();
     if (sdmc.empty()) {
@@ -379,12 +426,14 @@ void reinstall_all(std::function<void(bool)> done)
         if (done) done(false);
         return;
     }
-    ui::confirm(brls::getStr("playguard/forwarders/reinstall_all_confirm", (int)todo.size()),
-                "playguard/forwarders/reinstall_all"_i18n,
-                [todo, done]() { install_many(todo, false, "add_forwarder", "playguard/forwarders/reinstalled_n", done); },
-                [done]() {
-                    if (done) done(false);
-                });
+    patches_first([todo, done]() {
+        ui::confirm(brls::getStr("playguard/forwarders/reinstall_all_confirm", (int)todo.size()),
+                    "playguard/forwarders/reinstall_all"_i18n,
+                    [todo, done]() { install_many(todo, false, "add_forwarder", "playguard/forwarders/reinstalled_n", done); },
+                    [done]() {
+                        if (done) done(false);
+                    });
+    }, done);
 }
 
 void set_icon(const forwarders_logic::Row& row, const std::string& shot, std::function<void(bool)> done)
