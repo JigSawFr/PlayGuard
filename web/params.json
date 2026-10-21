@@ -60,6 +60,7 @@
   {"name": "cadran_noring", "group": "capture", "type": "bool"},
   {"name": "stats", "group": "capture", "type": "text", "panel": false},
   {"name": "cut_text", "group": "capture", "type": "text", "panel": false},
+  {"name": "focus_log", "group": "capture", "type": "bool", "panel": false},
   {"name": "stall_s", "group": "capture", "type": "number", "min": 1, "panel": false},
   {"name": "tab_race", "group": "capture", "type": "bool", "panel": false}
  ],
