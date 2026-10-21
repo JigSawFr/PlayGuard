@@ -1,6 +1,6 @@
 // sys_notes — the release notes of what the console runs on, for the
 // Console tab (activity/sys_notes_activity.hpp), and of PlayGuard itself, for
-// About: Atmosphère's, hekate's and PlayGuard's from their GitHub releases (GET /repos/…/releases: one request, each release's
+// About: Atmosphère's, hekate's, sys-patch's and PlayGuard's from their GitHub releases (GET /repos/…/releases: one request, each release's
 // notes included), the firmware's from switchbrew (its System_Versions table,
 // then one page per version, as wikitext). Each release keeps the newest
 // firmware its notes say it supports, so the Console tab can say when a firmware is
@@ -23,14 +23,16 @@ enum class Which
     Hekate,
     Firmware,
     PlayGuard,
+    SysPatch,
 };
-constexpr Which ALL[] = { Which::Atmosphere, Which::Hekate, Which::Firmware, Which::PlayGuard };
+constexpr Which ALL[] = { Which::Atmosphere, Which::Hekate, Which::Firmware, Which::PlayGuard, Which::SysPatch };
 constexpr size_t COUNT = sizeof(ALL) / sizeof(ALL[0]);
 
-// "atmosphere", "hekate", "firmware", "playguard" (the keys of the cache and,
-// but for PlayGuard, of sys_updates).
+// "atmosphere", "hekate", "firmware", "playguard", "syspatch" (the keys of
+// the cache and, but for PlayGuard, of sys_updates).
 const char* key(Which which);
-// "Atmosphère", "hekate", "", "PlayGuard" (the firmware's name is translated).
+// "Atmosphère", "hekate", "", "PlayGuard", "sys-patch" (the firmware's name
+// is translated).
 const char* product(Which which);
 
 // The releases kept per product, the newer ones a screen shows at most
@@ -41,7 +43,7 @@ constexpr size_t MAX_NOTES = 32 * 1024;
 
 struct Release
 {
-    std::string version;    // "1.12.1"
+    std::string version;    // "1.12.1" (sys-patch's: "1.6.3.0")
     std::string date;       // "2026-10-16" ("" unknown)
     std::string notes;      // GitHub Markdown, cleaned; "" not read yet (a firmware's page)
     std::string page;       // its page, https ("" none)
@@ -58,14 +60,15 @@ struct List
 
 struct Cache
 {
-    List atmosphere, hekate, firmware, playguard;
+    List atmosphere, hekate, firmware, playguard, syspatch;
     List&       of(Which which);
     const List& of(Which which) const;
 };
 
 // --- GitHub -------------------------------------------------------------------
 
-// The repository of Atmosphère, hekate or PlayGuard ("Atmosphere-NX/Atmosphere").
+// The repository of Atmosphère, hekate, sys-patch or PlayGuard
+// ("Atmosphere-NX/Atmosphere").
 const char* repo(Which which);
 
 // A release list (GET /repos/…/releases) into `out`, newest first as listed:

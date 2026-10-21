@@ -407,6 +407,39 @@ static void test_cache()
     CHECK(kept.releases[0].notes.empty());
 }
 
+// sys-patch's: four numbers to a tag ("v1.6.3.0"), compared in full.
+static void test_syspatch()
+{
+    CHECK(std::string(key(Which::SysPatch)) == "syspatch" && std::string(repo(Which::SysPatch)) == "impeeza/sys-patch");
+    CHECK(std::string(product(Which::SysPatch)) == "sys-patch");
+    std::vector<Release> out;
+    const std::string json = "[" + release_json("v1.6.3.0", "Thanks for adding the am hbxfix for firmware 22.0.0") + "," +
+                             release_json("v1.6.2.3", "erpt fix - latest ams only") + "," +
+                             release_json("v1.6.2.0", "Am homebrew fix") + "," + release_json("v1.6.0", "22.0.0 es fix") +
+                             "]";
+    CHECK(parse_github(json, Which::SysPatch, &out));
+    if (!CHECK(out.size() == 4)) return;
+    CHECK(out[0].version == "1.6.3.0" && out[1].version == "1.6.2.3" && out[3].version == "1.6.0");
+    CHECK(out[0].notes == "Thanks for adding the am hbxfix for firmware 22.0.0");
+    List l;
+    l.releases = out;
+    // 1.6.2.0 runs: two newer (1.6.2.3, 1.6.3.0), the fourth number counted.
+    CHECK(newer_count(l, "1.6.2.0") == 2 && newer_count(l, "1.6.3.0") == 0 && newer_count(l, "1.6.2") == 2);
+    size_t hidden = 0;
+    int at = -1;
+    size_t newer_from = 0;
+    const std::vector<size_t> t = tabs(l, "1.6.2.0", &hidden, &at, &newer_from);
+    CHECK(at == 2 && t.size() == 4 && t[1] == 2 && newer_from == 2 && t[3] == 0 && hidden == 0);
+    // Kept in the cache with the others.
+    Cache c;
+    c.syspatch = l;
+    c.syspatch.fetched = "2026-10-21";
+    Cache back;
+    CHECK(decode(encode(c), &back));
+    CHECK(back.syspatch.fetched == "2026-10-21" && back.of(Which::SysPatch).releases.size() == 4);
+    CHECK(back.syspatch.releases[1].version == "1.6.2.3" && back.atmosphere.releases.empty());
+}
+
 int main()
 {
     test_parse_github();
@@ -418,5 +451,6 @@ int main()
     test_tabs();
     test_support();
     test_cache();
+    test_syspatch();
     return CHECK_DONE("sys_notes GitHub and switchbrew parsing, tabs, support and cache assertions passed");
 }

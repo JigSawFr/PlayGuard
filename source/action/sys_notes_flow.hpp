@@ -1,4 +1,4 @@
-// sys_notes_flow — the release notes of Atmosphère, hekate and the firmware
+// sys_notes_flow — the release notes of Atmosphère, hekate, the firmware and sys-patch
 // (util/sys_notes.hpp): the Console tab opens them (A on a line), About
 // PlayGuard's, the screen
 // showing what was kept on the SD card at once and fetching them again in
@@ -16,8 +16,8 @@ namespace sys_notes_flow
 {
 
 // What the console runs: "1.12.0", "6.5.4" (bootloader/update.bin), "22.0.0",
-// PlayGuard's own version; "" when unknown (no Atmosphère, no hekate on the
-// SD card).
+// PlayGuard's own version, "1.6.3.0" (sys-patch's log.ini); "" when unknown
+// (no Atmosphère, no hekate on the SD card, no sys-patch or no log).
 std::string installed(sys_notes::Which which);
 // The newest release the update check found (sys_updates; PlayGuard's
 // update check for PlayGuard), "" none.
@@ -42,7 +42,7 @@ void refresh(sys_notes::Which which, bool force);
 // read (a refresh asked meanwhile waits for them).
 bool fetching(sys_notes::Which which);
 
-// After the daily update check: the three lists again, without the
+// After the daily update check: the four lists again, without the
 // firmware's pages (one request each). Blocking: from a background task.
 // Returns the fresh cache to keep(), through brls::sync.
 sys_notes::Cache fetch_lists();
