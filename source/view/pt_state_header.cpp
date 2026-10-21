@@ -19,9 +19,12 @@ PtStateHeader::PtStateHeader()
 void PtStateHeader::show(const PtState& pt)
 {
     // Reached: the console restricts (suspending), or the time left went
-    // below 0 (played past the limit: a warning only, or while unlocked).
+    // below 0 (played past the limit: a warning only). Not while unlocked:
+    // the console then neither warns nor suspends, and the header's pill
+    // says so already.
     const int over = pt.fw_supported ? pt_logic::over_limit_min(pt, ui::today_weekday()) : -1;
-    const bool reached = pt.fw_supported && ((pt.restricted_valid && pt.restricted) || over >= 0);
+    const bool unlocked = pt.temporary_unlocked_valid && pt.temporary_unlocked;
+    const bool reached = pt.fw_supported && !unlocked && ((pt.restricted_valid && pt.restricted) || over >= 0);
 
     // What the console does at the limit, once the block says (pure.h).
     alert->setText(!reached    ? ""

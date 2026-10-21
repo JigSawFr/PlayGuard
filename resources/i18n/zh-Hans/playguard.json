@@ -623,7 +623,6 @@
         "unlocked": "已暂时解除家长控制。",
         "unlock_err": "无法解除",
         "relock": "重新启用家长控制",
-        "banner_title": "家长控制已暂时解除",
         "banner_action": "重新启用",
         "section_danger": "危险操作",
         "delete": "删除所有家长控制…",
@@ -1905,8 +1904,8 @@
         },
         "pill": {
             "pc_on": "家长控制已开启",
-            "pc_off": "家长控制未设置",
-            "unlocked": "已暂时解除",
+            "pc_off": "已关闭",
+            "unlocked": "已解除",
             "timer_on": "计时中",
             "timer_off": "计时已暂停",
             "timer_none": "无游戏时间限制",

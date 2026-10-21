@@ -623,7 +623,6 @@
         "unlocked": "Controlo parental desbloqueado temporariamente.",
         "unlock_err": "Não foi possível desbloquear",
         "relock": "Reativar o controlo parental",
-        "banner_title": "Controlo parental desbloqueado por agora",
         "banner_action": "Reativar",
         "section_danger": "Zona de perigo",
         "delete": "Eliminar todo o controlo parental...",
@@ -1905,8 +1904,8 @@
         },
         "pill": {
             "pc_on": "Controlo parental ativo",
-            "pc_off": "Controlo parental por configurar",
-            "unlocked": "Desbloqueado por agora",
+            "pc_off": "Desativado",
+            "unlocked": "Desbloqueado",
             "timer_on": "Temporizador ativo",
             "timer_off": "Contagem em pausa",
             "timer_none": "Sem limite de tempo de jogo",

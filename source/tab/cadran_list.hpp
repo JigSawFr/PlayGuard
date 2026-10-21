@@ -81,9 +81,6 @@ class List
     // "cadran/amber_fill" a warning (needs the parent); nullptr: none.
     void state(const char* id, const char* color_key);
 
-    // These cells as amber banners, each a card of its own (after apply()).
-    void banners(const std::vector<const char*>& ids);
-
     // Puts this line (not a cell: a box of text) in a card of its own.
     Card* wrap(const char* id);
 

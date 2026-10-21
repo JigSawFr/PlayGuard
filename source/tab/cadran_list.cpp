@@ -250,34 +250,6 @@ void cadran::List::state(const char* id, const char* color_key)
     }
 }
 
-void cadran::List::banners(const std::vector<const char*>& ids)
-{
-    brls::Theme theme = brls::Application::getTheme();
-    for (const char* id : ids) {
-        auto* cell = dynamic_cast<brls::DetailCell*>(this->tab->getView(id));
-        Card* card = cell ? dynamic_cast<Card*>(cell->getParent()) : nullptr;
-        if (!card) continue;
-        // On its own: out of the card it shares, into a card of its own colours.
-        if (card->getChildren().size() > 1) {
-            auto* own = new Card();
-            const int at = index_in(this->box, card);
-            const int row = index_in(card, cell);
-            this->box->addView(own, row == 0 ? at : at + 1);
-            move_to(cell, own);
-            card = own;
-        }
-        card->setFill(theme["cadran/amber_surf"]);
-        card->setAccent(theme["cadran/amber_line"]);
-        // The line's own margin under the card, not in it: the card ends
-        // where the line and its focus do.
-        card->setMarginBottom(12);
-        cell->setMarginBottom(0);
-        cell->setBackgroundColor(theme["cadran/none"]);
-        cell->title->setTextColor(theme["cadran/amber"]);
-        cell->detail->setTextColor(theme["cadran/amber"]);
-    }
-}
-
 brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const char*>>& cells, bool status)
 {
     if (!this->box || cells.empty()) return nullptr;

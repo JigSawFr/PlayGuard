@@ -623,7 +623,6 @@
         "unlocked": "Filtro famiglia sbloccato temporaneamente.",
         "unlock_err": "Impossibile sbloccare",
         "relock": "Riattiva il filtro famiglia",
-        "banner_title": "Il filtro famiglia è sbloccato temporaneamente",
         "banner_action": "Riattiva",
         "section_danger": "Zona pericolosa",
         "delete": "Elimina il filtro famiglia...",
@@ -1905,8 +1904,8 @@
         },
         "pill": {
             "pc_on": "Filtro famiglia attivo",
-            "pc_off": "Filtro famiglia non configurato",
-            "unlocked": "Sbloccato per ora",
+            "pc_off": "Disattivato",
+            "unlocked": "Sbloccato",
             "timer_on": "Timer attivo",
             "timer_off": "Conteggio in pausa",
             "timer_none": "Nessun limite di tempo di gioco",

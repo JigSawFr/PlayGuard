@@ -393,12 +393,6 @@ void go_to_tab(brls::View* from, int position);
 // over the current one, titled `title`; B closes it.
 void open_screen(brls::View* content, const std::string& title);
 
-// "Parental controls are temporarily unlocked — Lock now" cell shown at the
-// top of the Play timer tab (no "Lock now" in read-only mode).
-// `after` runs once it relocked.
-void init_unlock_banner(brls::DetailCell* cell, std::function<void()> after);
-void show_unlock_banner(brls::DetailCell* cell, bool unlocked);
-
 // The language and theme pickers, shared by Preferences and the main
 // screen's header: save the choice and apply it at once (a language or a
 // theme makes every screen again, live_prefs; the text size runs `after`, a

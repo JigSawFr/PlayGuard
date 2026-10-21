@@ -623,7 +623,6 @@
         "unlocked": "Ouderlijk toezicht tijdelijk ontgrendeld.",
         "unlock_err": "Kan niet ontgrendelen",
         "relock": "Ouderlijk toezicht weer inschakelen",
-        "banner_title": "Ouderlijk toezicht is tijdelijk ontgrendeld",
         "banner_action": "Weer inschakelen",
         "section_danger": "Gevarenzone",
         "delete": "Ouderlijk toezicht wissen...",
@@ -1905,8 +1904,8 @@
         },
         "pill": {
             "pc_on": "Ouderlijk toezicht actief",
-            "pc_off": "Ouderlijk toezicht niet ingesteld",
-            "unlocked": "Tijdelijk ontgrendeld",
+            "pc_off": "Uitgeschakeld",
+            "unlocked": "Ontgrendeld",
             "timer_on": "Timer actief",
             "timer_off": "Aftellen gepauzeerd",
             "timer_none": "Geen speeltijdlimiet",

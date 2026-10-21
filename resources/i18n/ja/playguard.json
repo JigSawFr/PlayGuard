@@ -623,7 +623,6 @@
         "unlocked": "みまもり設定を一時解除しました。",
         "unlock_err": "解除できませんでした",
         "relock": "みまもり設定を再び有効にする",
-        "banner_title": "みまもり設定は一時解除中です",
         "banner_action": "再び有効にする",
         "section_danger": "危険な操作",
         "delete": "みまもり設定をすべて削除…",
@@ -1905,8 +1904,8 @@
         },
         "pill": {
             "pc_on": "みまもり設定 有効",
-            "pc_off": "みまもり設定 未設定",
-            "unlocked": "一時解除中",
+            "pc_off": "無効",
+            "unlocked": "解除中",
             "timer_on": "タイマー作動中",
             "timer_off": "カウント一時停止",
             "timer_none": "プレイ時間の制限なし",

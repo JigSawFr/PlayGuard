@@ -623,7 +623,6 @@
         "unlocked": "자녀 보호 기능을 일시 해제했습니다.",
         "unlock_err": "해제할 수 없습니다",
         "relock": "자녀 보호 기능 다시 켜기",
-        "banner_title": "자녀 보호 기능이 일시 해제되어 있습니다",
         "banner_action": "다시 켜기",
         "section_danger": "위험한 작업",
         "delete": "자녀 보호 기능 모두 삭제...",
@@ -1905,8 +1904,8 @@
         },
         "pill": {
             "pc_on": "자녀 보호 켜짐",
-            "pc_off": "자녀 보호 미설정",
-            "unlocked": "일시 해제됨",
+            "pc_off": "꺼짐",
+            "unlocked": "해제됨",
             "timer_on": "타이머 작동 중",
             "timer_off": "카운트 일시 정지",
             "timer_none": "플레이 시간 제한 없음",

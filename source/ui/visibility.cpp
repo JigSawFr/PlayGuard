@@ -2,7 +2,6 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
-#include "action/console_actions.hpp"
 #include "activity/main_activity.hpp"
 #include "app.hpp"
 #include "ui/cadran_kit.hpp"
@@ -175,27 +174,6 @@ void open_screen(brls::View* content, const std::string& title)
     frame->setTitle(title);
     frame->setIcon(brls::View::getFilePathXMLAttributeValue("@res/img/app_icon.jpg"));
     brls::Application::pushActivity(new brls::Activity(frame));
-}
-
-void init_unlock_banner(brls::DetailCell* cell, std::function<void()> after)
-{
-    cell->setText("playguard/security/banner_title"_i18n);
-    cell->title->setTextColor(cadran::kit::color("cadran/amber"));
-    cell->setBackgroundColor(nvgTransRGBA(cadran::kit::color("cadran/amber"), 28));
-    cell->setCornerRadius(6);
-    cell->setDetailText("playguard/security/banner_action"_i18n);
-    cell->registerClickAction([after](brls::View*) {
-        console_actions::relock("", after);
-        return true;
-    });
-}
-
-void show_unlock_banner(brls::DetailCell* cell, bool unlocked)
-{
-    // Read-only: no action, so the title gets the whole width (an empty detail
-    // label still reserves its space).
-    cell->detail->setVisibility(app::read_only() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
-    set_visible(cell, unlocked);
 }
 
 }   // namespace ui

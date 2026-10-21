@@ -56,9 +56,11 @@ static void test_tabs()
 {
     // Each entry where it is fixed: the console's and the network clock on
     // the Console tab, the PIN's on the PIN tab, the alarm on the Play timer.
+    // Unlocked on none: the header's pill and the bell say it already.
     for (const char* id : { "games", "sd_space", "data_history", "rescue_old", "clock", "clock_off" })
         CHECK(tab_of(id) == "console");
-    for (const char* id : { "pin_missing", "unlocked", "pin_weak", "pin_lock_off" }) CHECK(tab_of(id) == "security");
+    for (const char* id : { "pin_missing", "pin_weak", "pin_lock_off" }) CHECK(tab_of(id) == "security");
+    CHECK(tab_of("unlocked") == "");
     for (const char* id : { "alarm_off", "not_counting" }) CHECK(tab_of(id) == "play_timer");
     CHECK(tab_of("outside") == "dashboard" && tab_of("extra_restore") == "dashboard");
     CHECK(tab_of("backup") == "preferences");
@@ -67,7 +69,7 @@ static void test_tabs()
     // A tab counts its entries to do only: not those for information, put
     // away or ignored.
     Store s;
-    s.set("unlocked", Level::Action, "Unlocked", "");
+    s.set("pin_missing", Level::Action, "No PIN", "");
     s.set("pin_weak", Level::Action, "PIN", "");
     s.set("pairing", Level::Info, "App", "");
     s.set("games", Level::Action, "9 games", "");
@@ -78,7 +80,7 @@ static void test_tabs()
     CHECK(s.tab_count("play_timer") == 0);
     CHECK(s.ack("pin_weak"));
     CHECK(s.tab_count("security") == 1);
-    s.clear("unlocked");
+    s.clear("pin_missing");
     CHECK(s.tab_count("security") == 0);
 
     // A row's badge: the entries to do among its ids.

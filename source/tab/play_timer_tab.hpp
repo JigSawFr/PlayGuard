@@ -43,7 +43,6 @@ class PlayTimerTab : public TabBase
     void save();
     void discard();
 
-    BRLS_BIND(brls::DetailCell,  unlocked_banner, "pt_unlocked_banner");
     BRLS_BIND(PtStateHeader,     state_header,    "pt_state_header");
     BRLS_BIND(brls::Box,         top,             "pt_top");
     BRLS_BIND(brls::Label,       fw_note,         "pt_fw_note");

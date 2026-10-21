@@ -623,7 +623,6 @@
         "unlocked": "Controle dos pais desbloqueado temporariamente.",
         "unlock_err": "Não foi possível desbloquear",
         "relock": "Reativar o controle dos pais",
-        "banner_title": "Controle dos pais desbloqueado por enquanto",
         "banner_action": "Reativar",
         "section_danger": "Zona de perigo",
         "delete": "Excluir todo o controle dos pais...",
@@ -1905,8 +1904,8 @@
         },
         "pill": {
             "pc_on": "Controle dos pais ativo",
-            "pc_off": "Controle dos pais não configurado",
-            "unlocked": "Desbloqueado por enquanto",
+            "pc_off": "Desativado",
+            "unlocked": "Desbloqueado",
             "timer_on": "Temporizador ativo",
             "timer_off": "Contagem em pausa",
             "timer_none": "Sem limite de tempo de jogo",
