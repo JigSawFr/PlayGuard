@@ -501,13 +501,15 @@ void pick_text_size(std::function<void()> after)
 {
     std::vector<std::string> labels;
     for (const char* t : config::TEXT_SIZES) labels.push_back(brls::getStr(std::string("playguard/prefs/text_sizes/") + t));
+    const std::vector<std::string> icons = { "tv", "text-normal", "text-large" };
+    static_assert(std::size(config::TEXT_SIZES) == 3, "an icon for each text size");
     pick("playguard/prefs/text_size"_i18n, labels, index_of(config::TEXT_SIZES, config::get().text_size), [after](int i) {
         // At once, no restart: every screen is laid out again.
         config::get().text_size = config::TEXT_SIZES[i];
         save_config();
         text_size::apply();
         if (after) after();
-    });
+    }, true, {}, icons);
 }
 
 std::string text_size_name()

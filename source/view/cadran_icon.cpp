@@ -133,6 +133,18 @@ void CadranIcon::draw(NVGcontext* vg, float x, float y, float width, float heigh
             nvgLineTo(vg, 12 + std::cos(a) * 9.5f, 12 + std::sin(a) * 9.5f);
         }
         nvgStroke(vg);
+    } else if (i == "tv") {
+        // The automatic text size, larger on the TV: a screen on its stand.
+        nvgBeginPath(vg); nvgRoundedRect(vg, 3, 5, 18, 12, 2); nvgStroke(vg);
+        nvgBeginPath(vg); nvgMoveTo(vg, 9, 21); nvgLineTo(vg, 15, 21); nvgMoveTo(vg, 12, 17); nvgLineTo(vg, 12, 21);
+        nvgStroke(vg);
+    } else if (i == "text-normal" || i == "text-large") {
+        // A text size: an A, small or large, on the same baseline (as the
+        // header's button).
+        nvgFontFaceId(vg, brls::Application::getDefaultFont());
+        nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
+        nvgFontSize(vg, i == "text-large" ? 28 : 18);
+        nvgText(vg, 12, 20.5f, "A", nullptr);
     } else if (i == "moon") {
         nvgBeginPath(vg);
         nvgArc(vg, 12, 12, 9, 0.11f, 4.60f, NVG_CW);
