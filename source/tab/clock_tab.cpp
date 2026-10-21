@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
+#include <utility>
 #include <vector>
 
 #include "action/nintendo_dns.hpp"
@@ -26,6 +27,21 @@ constexpr auto SNAPSHOT_EVERY = std::chrono::seconds(10);
 std::string region_label(const std::string& id)
 {
     return brls::getStr("playguard/clock/region_names/" + id);
+}
+
+// The region's icon in its picker: a globe or a flag from the Twemoji set of
+// img/emoji/, or a Cadran icon (the big providers, the saved servers).
+std::string region_icon(const std::string& id)
+{
+    static const std::pair<const char*, const char*> icons[] = {
+        { "global", "img/emoji/1f310.png" },      { "public", "server" },
+        { "europe", "img/emoji/1f1ea-1f1fa.png" }, { "americas", "img/emoji/1f30e.png" },
+        { "asia", "img/emoji/1f30f.png" },         { "china", "img/emoji/1f1e8-1f1f3.png" },
+        { "africa", "img/emoji/1f30d.png" },       { "custom", "save" },
+    };
+    for (const auto& [region, icon] : icons)
+        if (id == region) return icon;
+    return "";
 }
 
 std::string find_region(const std::string& host)
@@ -246,6 +262,8 @@ void ClockTab::choose_region()
     std::vector<std::string> ids, labels;
     for (const auto& r : ntp::regions()) { ids.push_back(r.id); labels.push_back(region_label(r.id)); }
     if (!config::get().custom_servers.empty()) { ids.push_back("custom"); labels.push_back(region_label("custom")); }
+    std::vector<std::string> icons;
+    for (const std::string& id : ids) icons.push_back(region_icon(id));
     int selected = (int)(std::find(ids.begin(), ids.end(), this->region_id) - ids.begin());
     if (selected >= (int)ids.size()) selected = 0;
     ui::pick("playguard/clock/region"_i18n, labels, selected, [this, ids](int index) {
@@ -256,7 +274,7 @@ void ClockTab::choose_region()
         }
         for (const auto& r : ntp::regions())
             if (id == r.id) this->set_server(r.hosts.front(), id);
-    });
+    }, true, {}, icons);
 }
 
 void ClockTab::choose_server()

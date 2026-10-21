@@ -15,7 +15,8 @@ has no file here.
 The flags (two code points, joined by a dash as Twemoji names them:
 `1f1eb-1f1f7.png` for 🇫🇷) are the language picker's
 (`source/ui/dialogs.cpp`): 🇺🇸 🇫🇷 🇨🇦 🇩🇪 🇪🇸 🇲🇽 🇮🇹 🇳🇱 🇵🇹 🇧🇷 🇷🇺 🇯🇵 🇰🇷 🇨🇳 🇹🇼,
-the console's own language a 🌐.
+the console's own language a 🌐; the network clock's regions take 🇪🇺 🌎 🌏
+🇨🇳 🌍 and 🌐 (`source/tab/clock_tab.cpp`).
 
 To add one, take its 72×72 PNG from the same Twemoji release:
 
