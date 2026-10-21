@@ -141,6 +141,16 @@ void notify(const std::string& text, Toast kind)
     });
 }
 
+void refuse(const std::string& text)
+{
+    notify(text, Toast::Refused);
+}
+
+void refuse(Result rc)
+{
+    refuse(rc_text(rc));
+}
+
 void error(const std::string& text)
 {
     brls::Logger::info("error: {}", text);
@@ -182,7 +192,7 @@ static bool queue_config(const std::string& saved_text, const std::string& faile
     const std::string failed = failed_text.empty() ? "playguard/toast/config_err"_i18n : failed_text;
     config::Snapshot text;
     if (!config::snapshot(text)) {
-        notify(failed);
+        notify(failed, Toast::Refused);
         return false;
     }
     // Ahead of the writes still waiting (an export, the history): what the
@@ -192,7 +202,7 @@ static bool queue_config(const std::string& saved_text, const std::string& faile
         const bool saved = config::write(text);
         s_config_saved = saved;
         brls::sync([saved]() { notices::note_write("config", saved); });
-        if (!saved) notify(failed);
+        if (!saved) notify(failed, Toast::Refused);
         else if (!saved_text.empty()) notify(saved_text, Toast::Done);
     }, "config", Write::Whole, true);
     return true;

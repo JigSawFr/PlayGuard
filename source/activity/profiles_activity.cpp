@@ -7,13 +7,14 @@
 #include "action/schedule_flow.hpp"
 #include "activity/play_timer_perday_activity.hpp"
 #include "tab/cadran_list.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
 
 void ProfilesActivity::onContentAvailable()
 {
-    empty->setSingleLine(false);
+    cadran::kit::empty_around(empty, "calendar");
     hint->setSingleLine(false);
     save_cell->registerClickAction([this](brls::View*) {
         this->save_current();
@@ -65,7 +66,7 @@ void ProfilesActivity::rebuild(const std::string& focus_file)
         const std::string summary = ui::days_summary(p.days.data());
         if (p.name == current) {
             cell->setDetailText(brls::getStr("playguard/play_timer/profile_current", summary));
-            cell->setDetailTextColor(ui::color_ok());
+            cell->setDetailTextColor(cadran::kit::color("cadran/teal"));
         } else {
             cell->setDetailText(summary);
         }
@@ -95,7 +96,7 @@ void ProfilesActivity::actions(const profiles::Profile& p)
             case 2: this->rename(p); break;
             default: this->remove(p); break;
         }
-    });
+    }, false);
 }
 
 void ProfilesActivity::apply(const profiles::Profile& p)
@@ -188,7 +189,7 @@ void ProfilesActivity::ask_name(const std::string& initial, const std::string& e
             // FAT ignores case (and the file name drops accents): this would
             // overwrite another profile.
             ui::confirm(brls::getStr("playguard/play_timer/profile_replace", existing.name),
-                        "playguard/play_timer/profile_replace_confirm"_i18n, [done, name]() { done(name); });
+                        "playguard/play_timer/profile_replace_confirm"_i18n, [done, name]() { done(name); }, nullptr, true);
             return;
         }
         done(name);
@@ -199,7 +200,7 @@ void ProfilesActivity::save_current()
 {
     pctl_play_timer_query(&this->live);
     if (!this->live.valid) {
-        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN), ui::Toast::Refused);
+        ui::refuse(NXM_RC_STATE_UNKNOWN);
         return;
     }
     std::array<uint16_t, 7> days;

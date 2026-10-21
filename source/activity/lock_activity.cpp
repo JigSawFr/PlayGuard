@@ -25,7 +25,7 @@ void LockActivity::onContentAvailable()
 void LockActivity::try_unlock()
 {
     if (!pin_lock::ask()) {
-        ui::notify(pin_lock::refusal_text());
+        ui::refuse(pin_lock::refusal_text());
         return;
     }
     // Back to the screens it covered, or the main screen in place of this

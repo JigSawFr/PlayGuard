@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 629d9dfda705 -->
+<!-- translated from docs/getting-started.md, sha256 7eb08acd197b -->
 # Prise en main
 
 De la carte SD à une console réglée pour votre enfant, en une dizaine de minutes, puis les tâches du quotidien. Retour au [README](../../README.fr.md).
@@ -73,8 +73,8 @@ Une console sans Internet : quand aucun serveur ne répond, PlayGuard propose de
 | Passer de la période scolaire aux vacances | *Temps de jeu › Profils* ; *Profil programmé* pour une période choisie à l'avance. |
 | Voir qui a joué à quoi | *Activité* : par jeu, par compte, aujourd'hui, 7 jours, depuis toujours ; export ou QR code. |
 | Bloquer tous les jeux pour l'instant | *Code PIN › Bloquer tous les jeux*. Une fois désactivé, les limites précédentes reviennent. |
-| Annuler une modification | **ZR** *Annuler* juste après, ou *Historique › Historique des modifications* à tout moment. |
-| Garder une copie des réglages | *Historique › Sauvegarder les réglages* (jamais le code PIN). |
+| Annuler une modification | **ZR** *Annuler* juste après, ou *Préférences › Historique des modifications* à tout moment. |
+| Garder une copie des réglages | *Préférences › Sauvegarder les réglages* (jamais le code PIN). |
 | Savoir ce qui demande votre attention | La cloche (Ⓨ) : ce qu'il faut faire en orange, ce qu'il faut savoir avec un « i ». |
 
 ## Ensuite

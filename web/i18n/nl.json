@@ -76,7 +76,7 @@
   "capture": "Schermafbeeldingen"
  },
  "params": {
-  "tab": {"label": "Opent op", "options": {"": "Vandaag", "play_timer": "Speeltijdtimer", "activity": "Activiteit", "restrictions": "Beperkingen", "security": "Pincode", "console": "Console", "history": "Geschiedenis", "preferences": "Voorkeuren", "about": "Info"}},
+  "tab": {"label": "Opent op", "options": {"": "Vandaag", "play_timer": "Speeltijdtimer", "activity": "Activiteit", "restrictions": "Beperkingen", "security": "Pincode", "console": "Console", "preferences": "Voorkeuren", "about": "Info"}},
   "keep": {"label": "Staat bewaren tussen bezoeken", "help": "De gegevens van PlayGuard en de instellingen van de gesimuleerde console (pincode, limieten, klokken) blijven in deze browser; de console-instellingen van dit paneel tellen dan alleen bij de eerste start."},
   "not_set_up": {"label": "Nooit ingesteld (geen pincode)"},
   "unlocked": {"label": "Tijdelijk ontgrendeld"},

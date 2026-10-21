@@ -11,7 +11,6 @@
 #include "ui/text_size.hpp"
 #include "util/config.hpp"
 #include "util/text.hpp"
-#include "view/qr_view.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -107,16 +106,26 @@ brls::Dialog* box_dialog(brls::Box* body)
     return dialog;
 }
 
-// The text laid out by cadran::dialog_body, scrolling when taller than the
-// dialog's room.
-static brls::Dialog* body_dialog(const std::string& text)
+// The text laid out by cadran::dialog_body, `below` under it (the card's
+// width unless it aligns itself), scrolling when taller than the dialog's room.
+static brls::Dialog* body_dialog(const std::string& text, brls::View* below = nullptr)
 {
-    return box_dialog(cadran::dialog_body(text));
+    brls::Box* body = cadran::dialog_body(text);
+    if (below) {
+        if (!body->getChildren().empty()) below->setMarginTop(18);
+        body->addView(below);
+    }
+    return box_dialog(body);
 }
 
 brls::Dialog* dialog(const std::string& text)
 {
     return body_dialog(text);
+}
+
+brls::Dialog* dialog(const std::string& text, brls::View* below)
+{
+    return body_dialog(text, below);
 }
 
 static void open_confirm(const std::string& body, const std::string& confirm_label,
@@ -177,16 +186,9 @@ void info(const std::string& body)
 
 void qr_dialog(const std::string& body, const std::string& url)
 {
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::CENTER);
-    box->setPadding(20, 32, 10, 32);
-    box->addView(centered_label(body, 20, color_text()));
-    auto* qr = new QrView(url, 240);
-    qr->setMarginTop(12);
-    qr->setMarginBottom(10);
-    box->addView(qr);
-    box->addView(centered_label(text::short_url(url), 18, color_note()));
-    auto* dialog = new brls::Dialog(box);
+    brls::Box* code = cadran::kit::qr(url, 240, "", text::short_url(url));
+    code->setAlignSelf(brls::AlignSelf::CENTER);
+    auto* dialog = body_dialog(body, code);
     dialog->addButton("hints/ok"_i18n, []() {});
     dialog->open();
 }
@@ -419,14 +421,9 @@ void hold_confirm(brls::Box* body, const std::string& hold_label, std::function<
 
 void qr_text_dialog(const std::string& body, const std::string& text)
 {
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::CENTER);
-    box->setPadding(20, 32, 16, 32);
-    box->addView(centered_label(body, 20, color_text()));
-    auto* qr = new QrView(text, 400);
-    qr->setMarginTop(12);
-    box->addView(qr);
-    auto* dialog = new brls::Dialog(box);
+    brls::Box* code = cadran::kit::qr(text, 400, "", "");
+    code->setAlignSelf(brls::AlignSelf::CENTER);
+    auto* dialog = body_dialog(body, code);
     dialog->addButton("hints/ok"_i18n, []() {});
     dialog->open();
 }
@@ -556,7 +553,7 @@ void pick_actions(const std::string& title, const std::vector<Choice>& choices)
     for (const Choice& c : choices) labels.push_back(c.label);
     pick(title, labels, 0, [choices](int i) {
         if (i >= 0 && i < (int)choices.size()) choices[i].run();
-    });
+    }, false);
 }
 
 void prompt_minutes(const std::string& header, uint16_t current, std::function<void(uint16_t)> on_value)
@@ -652,7 +649,7 @@ void quick_settings(std::function<void()> after)
         if (i == 0) pick_language(after);
         else if (i == 1) pick_theme(after);
         else pick_text_size(after);
-    });
+    }, false);
 }
 
 namespace
@@ -681,28 +678,13 @@ bool show_pin_dialog(std::function<void()> on_close)
     }
     wipe(pin, sizeof(pin));
 
-    auto* title = new brls::Label();
-    title->setText("playguard/security/show_pin_title"_i18n);
-    title->setFontSize(22);
-    title->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    title->setTextColor(color_note());
-    title->setSingleLine(false);
-    title->setAlignSelf(brls::AlignSelf::STRETCH);   // the dialog's width, not a guess (dialog())
-    auto* digits = new brls::Label();
-    digits->setText(spaced);
-    digits->setFontSize(56);
+    // The digits in the display face, large, under what they are.
+    brls::Label* digits = cadran::kit::display(spaced, 56);
     digits->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    digits->setMarginTop(16);
+    digits->setMarginBottom(8);
     wipe(&spaced[0], spaced.size());
 
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::CENTER);
-    box->setJustifyContent(brls::JustifyContent::CENTER);
-    box->setPadding(40, 40, 40, 40);
-    box->addView(title);
-    box->addView(digits);
-
-    auto* d = new brls::Dialog(box);
+    auto* d = body_dialog("playguard/security/show_pin_title"_i18n, digits);
     d->addButton("hints/ok"_i18n, [on_close]() { if (on_close) on_close(); });
     on_cancel(d, on_close);
     d->open();

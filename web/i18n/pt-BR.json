@@ -76,7 +76,7 @@
   "capture": "Capturas"
  },
  "params": {
-  "tab": {"label": "Abre em", "options": {"": "Hoje", "play_timer": "Tempo de jogo", "activity": "Atividade", "restrictions": "Restrições", "security": "PIN", "console": "Console", "history": "Histórico", "preferences": "Preferências", "about": "Sobre"}},
+  "tab": {"label": "Abre em", "options": {"": "Hoje", "play_timer": "Tempo de jogo", "activity": "Atividade", "restrictions": "Restrições", "security": "PIN", "console": "Console", "preferences": "Preferências", "about": "Sobre"}},
   "keep": {"label": "Manter o estado entre visitas", "help": "Os dados do PlayGuard e as configurações do console simulado (PIN, limites, relógios) ficam neste navegador; as configurações de console deste painel só valem na primeira inicialização."},
   "not_set_up": {"label": "Nunca configurado (sem PIN)"},
   "unlocked": {"label": "Desbloqueado temporariamente"},

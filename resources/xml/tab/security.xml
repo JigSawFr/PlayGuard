@@ -25,7 +25,7 @@
             <brls:Header title="@i18n/playguard/security/section_status" marginBottom="8"/>
             <brls:DetailCell id="sc_pin" focusable="false" title="@i18n/playguard/security/pin"/>
             <brls:DetailCell id="sc_restrictions" focusable="false" title="@i18n/playguard/security/restrictions"/>
-            <brls:DetailCell id="sc_temp" focusable="false" title="@i18n/playguard/security/temporary"/>
+            <brls:DetailCell id="sc_temp" focusable="false" title="@i18n/playguard/cadran/today/pc_title"/>
             <brls:Label id="sc_rescue_note" text="@i18n/playguard/security/rescue_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/amber"/>
             <brls:Header id="sc_actions_header" title="@i18n/playguard/security/section_actions" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="sc_set_pin" title="@i18n/playguard/security/set_pin"/>

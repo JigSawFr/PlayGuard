@@ -28,7 +28,7 @@
             paddingLeft="@style/brls/sidebar/padding_left">
 
             <brls:Box axis="row" alignItems="center" marginBottom="16">
-                <brls:Image id="ga_icon" width="72" height="72" cornerRadius="12" marginRight="20"/>
+                <brls:Image id="ga_icon" width="72" height="72" cornerRadius="@style/cadran/radius/icon" marginRight="20"/>
                 <brls:Label id="ga_name" text="" fontSize="28" grow="1.0"/>
             </brls:Box>
             <brls:Header title="@i18n/playguard/activity/week" marginBottom="8"/>

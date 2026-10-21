@@ -5,6 +5,7 @@
 #include "action/console_actions.hpp"
 #include "activity/main_activity.hpp"
 #include "app.hpp"
+#include "ui/cadran_kit.hpp"
 
 #include <algorithm>
 #include <yoga/Yoga.h>
@@ -17,13 +18,13 @@ namespace ui
 bool refuse_read_only()
 {
     if (!app::read_only()) return false;
-    notify(rc_text(NXM_RC_READ_ONLY), Toast::Refused);
+    refuse(NXM_RC_READ_ONLY);
     return true;
 }
 
 void show_writable(brls::DetailCell* cell, bool writable, NVGcolor title, NVGcolor detail)
 {
-    const NVGcolor grey = nvgTransRGBA(color_text(), 110);
+    const NVGcolor grey = nvgTransRGBA(cadran::kit::color("cadran/text"), 110);
     cell->title->setTextColor(writable ? title : grey);
     if (auto* sw = dynamic_cast<brls::BooleanCell*>(cell)) {
         if (writable) sw->setOn(sw->isOn(), false);   // its own value colours back
@@ -35,7 +36,7 @@ void show_writable(brls::DetailCell* cell, bool writable, NVGcolor title, NVGcol
 
 void show_writable(brls::DetailCell* cell, bool writable)
 {
-    show_writable(cell, writable, color_text(), color_neutral());
+    show_writable(cell, writable, cadran::kit::color("cadran/text"), cadran::kit::color("cadran/text2"));
 }
 
 void guard_switch(brls::BooleanCell* cell)
@@ -51,6 +52,8 @@ void guard_switch(brls::BooleanCell* cell)
 void set_visible(brls::View* view, bool visible)
 {
     if (!view) return;
+    // An empty state's label (kit::empty_around): its whole card.
+    if (brls::View* card = view->getParent(); card && card->getId() == "cadran_empty_card") view = card;
     const bool had_focus = !visible && view->isFocused();
     view->setVisibility(visible ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
     if (!had_focus) return;
@@ -177,8 +180,8 @@ void open_screen(brls::View* content, const std::string& title)
 void init_unlock_banner(brls::DetailCell* cell, std::function<void()> after)
 {
     cell->setText("playguard/security/banner_title"_i18n);
-    cell->title->setTextColor(color_warn());
-    cell->setBackgroundColor(nvgTransRGBA(color_warn(), 28));
+    cell->title->setTextColor(cadran::kit::color("cadran/amber"));
+    cell->setBackgroundColor(nvgTransRGBA(cadran::kit::color("cadran/amber"), 28));
     cell->setCornerRadius(6);
     cell->setDetailText("playguard/security/banner_action"_i18n);
     cell->registerClickAction([after](brls::View*) {

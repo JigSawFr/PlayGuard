@@ -18,7 +18,7 @@ namespace cadran
 constexpr float DIALOG_BUTTONS = 80;
 constexpr float DIALOG_MARGIN  = 24;
 // A picker's card: the radius of its corners.
-constexpr float PICKER_CORNER = 24;
+constexpr float PICKER_CORNER = 24;   // kit::RADIUS_MODAL
 
 enum class Emphasis
 {
@@ -30,8 +30,8 @@ enum class Emphasis
 };
 
 // A dialog's text laid out as the boards do (ui::dialog), left-aligned: its
-// question as a title, a paragraph of "label: value" lines
-// (playguard/common/line) as a table, the notes the app adds (the linked
+// question as a title, a paragraph made with cadran_text::table as a table
+// (its mark says so, not its words), the notes the app adds (the linked
 // phone app and its help before unlinking, the temporary unlock, a game about
 // to be suspended) at the bottom, small, each with its icon; any other
 // paragraph as text.
@@ -47,6 +47,15 @@ brls::Box* dialog_badge(const char* icon, const char* color_key, const char* sof
 // install_screens). Call it after the dialog's last addButton. DANGER and
 // FAILURE also put a coral warning before a dialog_body's title.
 void style_dialog(brls::Dialog* dialog, Emphasis emphasis = Emphasis::NONE);
+
+// A button of a dialog's own, not of its row (one that must act before the
+// dialog closes): a pill as style_dialog draws them, plain unless PRIMARY or
+// DANGER.
+void style_button(brls::Button* button, Emphasis emphasis = Emphasis::NONE);
+
+// A dialog's body while something is under way: a spinner, and what is being
+// done under it, centred.
+brls::Box* wait_body(const std::string& text);
 
 // A duration chosen with the stick, in place of the system number pad: up /
 // down 15 min, L / R 5 min (or a tap on the arrows), from 0 to 24:00, OK

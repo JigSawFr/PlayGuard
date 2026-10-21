@@ -76,7 +76,7 @@
   "capture": "截图"
  },
  "params": {
-  "tab": {"label": "打开时显示", "options": {"": "今天", "play_timer": "游戏时间", "activity": "游玩记录", "restrictions": "限制", "security": "PIN", "console": "主机", "history": "历史记录", "preferences": "偏好设置", "about": "关于"}},
+  "tab": {"label": "打开时显示", "options": {"": "今天", "play_timer": "游戏时间", "activity": "游玩记录", "restrictions": "限制", "security": "PIN", "console": "主机", "preferences": "偏好设置", "about": "关于"}},
   "keep": {"label": "在访问之间保留状态", "help": "PlayGuard 的数据和模拟主机的设置（PIN、限制、时钟）保留在此浏览器中；此面板中的主机设置只在首次启动时生效。"},
   "not_set_up": {"label": "从未设置（没有 PIN）"},
   "unlocked": {"label": "暂时解除"},

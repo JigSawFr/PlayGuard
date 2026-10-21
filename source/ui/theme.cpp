@@ -58,31 +58,4 @@ void use_font_for(const std::string& locale)
 #endif
 }
 
-NVGcolor color_ok()      { return brls::Application::getTheme()["cadran/teal"]; }
-NVGcolor color_warn()    { return brls::Application::getTheme()["cadran/amber"]; }
-NVGcolor color_bad()     { return brls::Application::getTheme()["cadran/coral"]; }
-NVGcolor color_track()   { return brls::Application::getTheme()["cadran/well"]; }
-NVGcolor color_note()    { return brls::Application::getTheme()["cadran/text3"]; }
-NVGcolor color_neutral() { return brls::Application::getTheme()["brls/list/listItem_value_color"]; }
-NVGcolor color_text()    { return brls::Application::getTheme()["brls/text"]; }
-NVGcolor color_accent()  { return brls::Application::getTheme()["brls/sidebar/active_item"]; }
-
-brls::Label* text_label(const std::string& text, float size, NVGcolor color)
-{
-    auto* l = new brls::Label();
-    l->setSingleLine(false);
-    l->setFontSize(size);
-    l->setTextColor(color);
-    l->setText(text);
-    return l;
-}
-
-brls::Label* centered_label(const std::string& text, float size, NVGcolor color)
-{
-    brls::Label* l = text_label(text, size, color);
-    l->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    l->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the box's width (ui::dialog)
-    return l;
-}
-
 }   // namespace ui

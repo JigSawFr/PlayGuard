@@ -63,7 +63,7 @@ std::string tab_of(const std::string& id)
     if (id == "alarm_off" || id == "not_counting" || id == "over_limit") return "play_timer";
     if (id == "outside" || id == "extra_restore") return "dashboard";
     if (id == "week" || id == "new_account") return "activity";
-    if (id == "backup") return "history";
+    if (id == "backup") return "preferences";
     if (id == "update" || id == "installed" || id == "crash" || id == "upload") return "about";
     return "";
 }

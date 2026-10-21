@@ -39,6 +39,14 @@
             <brls:BooleanCell id="pf_notices_reminders"/>
             <brls:BooleanCell id="pf_notices_ack_remind"/>
             <brls:BooleanCell id="pf_support_reminder"/>
+            <!-- What PlayGuard changed, and the settings backups (the History tab before). -->
+            <brls:Header title="@i18n/playguard/tools/section_history" marginTop="24" marginBottom="8"/>
+            <brls:DetailCell id="hs_history" title="@i18n/playguard/history/open"/>
+            <brls:Header title="@i18n/playguard/tools/section_backup" marginTop="24" marginBottom="8"/>
+            <brls:DetailCell id="hs_backup_save" title="@i18n/playguard/tools/backup_save"/>
+            <brls:DetailCell id="hs_backup_restore" title="@i18n/playguard/tools/backup_restore"/>
+            <brls:DetailCell id="hs_backup_keep" title="@i18n/playguard/tools/backup_keep"/>
+            <brls:Label id="hs_backup_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
         </brls:Box>
 

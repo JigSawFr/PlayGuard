@@ -5,6 +5,7 @@ using namespace brls::literals;
 
 void LoadingActivity::onContentAvailable()
 {
+    this->bar->setBrand(true);   // the brand's screen, whatever the theme
     if (this->mode == Mode::Closing) {
         this->step_text->setText("playguard/loading/step_closing"_i18n);
         this->bar->setProgress(1.0f);

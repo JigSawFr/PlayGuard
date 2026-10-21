@@ -404,7 +404,7 @@ PlayGuard 本身的PIN碼：
 
 ## 紀錄——變更與備份
 
-*[在模擬器中試用 ›](https://playguard.link/simulator/?tab=history)*
+*[在模擬器中試用 ›](https://playguard.link/simulator/?tab=preferences)*
 
 ### 變更紀錄
 

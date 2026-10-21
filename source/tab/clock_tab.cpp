@@ -174,7 +174,7 @@ void ClockTab::refresh()
     ui::set_detail(autosync, ui::bool_text(R_SUCCEEDED(s.automatic_rc), s.automatic,
                                            "playguard/common/on"_i18n, "playguard/common/off"_i18n));
     this->autosync_off = R_SUCCEEDED(s.automatic_rc) && !s.automatic;
-    autosync->setDetailTextColor(this->autosync_off ? ui::color_warn() : ui::color_neutral());
+    autosync->setDetailTextColor(this->autosync_off ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     ui::set_detail(zone, R_SUCCEEDED(s.location_rc) && s.location[0] ? std::string(s.location) : na);
 
     ui::set_detail(region, region_label(this->region_id));
@@ -278,7 +278,7 @@ void ClockTab::enter_custom()
 {
     ui::prompt_text("playguard/clock/custom_header"_i18n, this->server, 253, [this](std::string host) {
         if (!plausible_host(host)) {
-            ui::notify(ui::rc_text(NXM_RC_INVALID_ARGUMENT), ui::Toast::Refused);
+            ui::refuse(NXM_RC_INVALID_ARGUMENT);
             return;
         }
         auto& list = config::get().custom_servers;

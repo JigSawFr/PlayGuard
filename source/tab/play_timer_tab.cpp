@@ -319,7 +319,7 @@ void PlayTimerTab::discard()
     ui::confirm("playguard/play_timer/perday/discard_body"_i18n, "playguard/play_timer/perday/discard_confirm"_i18n, [this]() {
         for (int d = 0; d < 7; d++) this->pending[d] = this->pt.day_min[d];
         this->rerender();
-    });
+    }, nullptr, true);
 }
 
 PlayTimerTab::~PlayTimerTab()

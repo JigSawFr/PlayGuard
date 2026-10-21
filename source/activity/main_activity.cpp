@@ -22,6 +22,7 @@
 #include "app.hpp"
 #include "tab/tab_base.hpp"
 #include "ui/cadran_frame.hpp"
+#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -77,9 +78,8 @@ void MainActivity::quit_or_relock()
         pt_flow::keep_unlocked();   // chosen: the next start does not lock again
         brls::Application::quit();
     });
-    // The risky choice in the warning colour, as ui::confirm_danger draws it.
-    if (auto* button = dynamic_cast<brls::Button*>(dialog->getView("brls/dialog/button2")))
-        button->setTextColor(ui::color_bad());
+    // The risky choice in coral, as ui::confirm_danger draws it.
+    cadran::style_dialog(dialog, cadran::Emphasis::DANGER);
     dialog->open();
 }
 
@@ -108,7 +108,7 @@ void MainActivity::onContentAvailable()
             return true;
         }
         last_press = now;
-        brls::Application::notify("playguard/hints/exit_again"_i18n);
+        ui::notify("playguard/hints/exit_again"_i18n);
         return true;
     });
 
@@ -234,7 +234,7 @@ void MainActivity::update_notice_hint()
     if (!sidebar) return;
     static const std::pair<int, const char*> TABS[] = {
         { ui::tab::dashboard, "dashboard" }, { ui::tab::play_timer, "play_timer" }, { ui::tab::activity, "activity" },
-        { ui::tab::security, "security" },   { ui::tab::console, "console" },       { ui::tab::history, "history" },
+        { ui::tab::security, "security" },   { ui::tab::console, "console" },       { ui::tab::preferences, "preferences" },
         { ui::tab::about, "about" },
     };
     for (const auto& t : TABS)

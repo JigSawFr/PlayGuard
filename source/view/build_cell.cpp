@@ -2,6 +2,7 @@
 #include "view/build_cell.hpp"
 
 #include "action/dev_build_flow.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/text.hpp"
 
@@ -28,8 +29,8 @@ BuildTag type_tag(const std::string& type)
             text = brls::getStr(k.key);
             color = k.color;
         }
-    const NVGcolor colors[] = { ui::color_accent(), ui::color_warn(), nvgRGB(0x2F, 0x81, 0xF7), nvgRGB(0x89, 0x57, 0xE5),
-                                ui::color_bad(), ui::color_note() };
+    const NVGcolor colors[] = { cadran::kit::color("cadran/teal"), cadran::kit::color("cadran/amber"), cadran::kit::color("cadran/blue"), cadran::kit::color("cadran/violet"),
+                                cadran::kit::color("cadran/coral"), cadran::kit::color("cadran/text3") };
     return { text, colors[color] };
 }
 }   // namespace
@@ -38,22 +39,22 @@ std::vector<BuildTag> build_tags(const dev_builds::Build& b, bool newer)
 {
     std::vector<BuildTag> tags;
     const dev_builds::Subject s = dev_builds::parse_subject(b.title);
-    if (b.kind == dev_builds::Kind::PullRequest) tags.push_back({ "#" + std::to_string(b.pr), ui::color_accent() });
+    if (b.kind == dev_builds::Kind::PullRequest) tags.push_back({ "#" + std::to_string(b.pr), cadran::kit::color("cadran/teal") });
     if (b.kind != dev_builds::Kind::Release) {
         if (!s.type.empty()) tags.push_back(type_tag(s.type));
-        if (!s.scope.empty()) tags.push_back({ s.scope, ui::color_note() });
-        if (s.breaking) tags.push_back({ "playguard/dev_build/breaking"_i18n, ui::color_bad() });
-        if (s.pr && b.kind != dev_builds::Kind::PullRequest) tags.push_back({ "#" + std::to_string(s.pr), ui::color_note() });
+        if (!s.scope.empty()) tags.push_back({ s.scope, cadran::kit::color("cadran/text3") });
+        if (s.breaking) tags.push_back({ "playguard/dev_build/breaking"_i18n, cadran::kit::color("cadran/coral") });
+        if (s.pr && b.kind != dev_builds::Kind::PullRequest) tags.push_back({ "#" + std::to_string(s.pr), cadran::kit::color("cadran/text3") });
     }
-    if (b.prerelease) tags.push_back({ "playguard/dev_build/kind_prerelease"_i18n, ui::color_warn() });
+    if (b.prerelease) tags.push_back({ "playguard/dev_build/kind_prerelease"_i18n, cadran::kit::color("cadran/amber") });
     switch (b.ci) {
-        case dev_builds::Ci::Passed: tags.push_back({ "playguard/dev_build/tag_ci_passed"_i18n, ui::color_ok() }); break;
-        case dev_builds::Ci::Failed: tags.push_back({ "playguard/dev_build/tag_ci_failed"_i18n, ui::color_bad() }); break;
-        case dev_builds::Ci::Running: tags.push_back({ "playguard/dev_build/tag_ci_running"_i18n, ui::color_warn() }); break;
+        case dev_builds::Ci::Passed: tags.push_back({ "playguard/dev_build/tag_ci_passed"_i18n, cadran::kit::color("cadran/teal") }); break;
+        case dev_builds::Ci::Failed: tags.push_back({ "playguard/dev_build/tag_ci_failed"_i18n, cadran::kit::color("cadran/coral") }); break;
+        case dev_builds::Ci::Running: tags.push_back({ "playguard/dev_build/tag_ci_running"_i18n, cadran::kit::color("cadran/amber") }); break;
         case dev_builds::Ci::Unknown: break;
     }
-    if (dev_build_flow::installed(b)) tags.push_back({ "playguard/dev_build/installed"_i18n, ui::color_ok() });
-    else if (newer) tags.push_back({ "playguard/dev_build/new"_i18n, ui::color_accent() });
+    if (dev_build_flow::installed(b)) tags.push_back({ "playguard/dev_build/installed"_i18n, cadran::kit::color("cadran/teal") });
+    else if (newer) tags.push_back({ "playguard/dev_build/new"_i18n, cadran::kit::color("cadran/teal") });
     return tags;
 }
 
@@ -76,11 +77,17 @@ std::string build_title(const dev_builds::Build& b)
 
 brls::Box* tag_view(const BuildTag& tag, float font_size)
 {
+    // A pill of the boards, tinted with its ink.
+    const float height = font_size + 10;
     auto* box = new brls::Box(brls::Axis::ROW);
-    box->setBackgroundColor(nvgTransRGBA(tag.color, 38));
-    box->setCornerRadius(5);
-    box->setPadding(2, 8, 2, 8);
-    box->setMarginRight(6);
+    box->setAlignItems(brls::AlignItems::CENTER);
+    box->setHeight(height);
+    box->setBackgroundColor(nvgTransRGBA(tag.color, 30));
+    box->setBorderColor(nvgTransRGBA(tag.color, 90));
+    box->setBorderThickness(1);
+    box->setCornerRadius(height / 2);
+    box->setPadding(0, 10, 0, 10);
+    box->setMarginRight(8);
     box->setShrink(0.0f);
     auto* l = new brls::Label();
     l->setSingleLine(true);
@@ -120,13 +127,13 @@ BuildCell::BuildCell()
     this->age = new brls::Label();
     this->age->setSingleLine(true);
     this->age->setFontSize(18);
-    this->age->setTextColor(ui::color_neutral());
+    this->age->setTextColor(cadran::kit::color("cadran/text2"));
     this->age->setHorizontalAlign(brls::HorizontalAlign::RIGHT);
     right->addView(this->age);
     this->commit = new brls::Label();
     this->commit->setSingleLine(true);
     this->commit->setFontSize(18);
-    this->commit->setTextColor(ui::color_note());
+    this->commit->setTextColor(cadran::kit::color("cadran/text3"));
     this->commit->setHorizontalAlign(brls::HorizontalAlign::RIGHT);
     this->commit->setMarginTop(4);
     right->addView(this->commit);

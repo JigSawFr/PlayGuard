@@ -12,6 +12,7 @@
 
 #include "action/history_flow.hpp"
 #include "action/offline_clock_logic.hpp"
+#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
@@ -116,18 +117,7 @@ void with_before_report(std::function<void(const std::string& before)> write)
 // A spinner and what is being asked; Cancel (or B) sets `cancelled`.
 brls::Dialog* progress_dialog(const std::string& text, std::shared_ptr<std::atomic<bool>> cancelled)
 {
-    auto* spinner = new brls::ProgressSpinner(brls::ProgressSpinnerSize::LARGE);
-    spinner->setWidth(60);
-    spinner->setHeight(60);
-    spinner->setMarginBottom(24);
-    brls::Label* label = ui::centered_label(text, 22, ui::color_text());
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::CENTER);
-    box->setJustifyContent(brls::JustifyContent::CENTER);
-    box->setPadding(40, 40, 40, 40);
-    box->addView(spinner);
-    box->addView(label);
-    auto* dialog = new brls::Dialog(box);
+    auto* dialog = new brls::Dialog(cadran::wait_body(text));
     ui::add_cancel(dialog, [cancelled]() { *cancelled = true; });
     return dialog;
 }
@@ -243,7 +233,7 @@ void apply(const Measurement& m, std::function<void(const std::string& message)>
     time_clock_snapshot(&s);
     // Setting the clock would be refused: say so now, not after the confirmation.
     if (R_SUCCEEDED(s.automatic_rc) && !s.automatic) {
-        ui::info(ui::rc_text(NXM_RC_AUTOCORRECT_OFF));
+        ui::refuse(NXM_RC_AUTOCORRECT_OFF);
         return;
     }
     if (!m.ok) {
@@ -278,7 +268,7 @@ void apply_console_clock(std::function<void(const std::string& message)> done)
     time_clock_snapshot(&s);
     switch (offline_clock_logic::offer(false, s)) {
         case offline_clock_logic::Offer::Unreadable:
-            ui::info("playguard/clock/applied_err"_i18n + " — " + ui::rc_text(R_FAILED(s.service_rc) ? s.service_rc : s.user_rc));
+            ui::error("playguard/clock/applied_err"_i18n, R_FAILED(s.service_rc) ? s.service_rc : s.user_rc);
             return;
         case offline_clock_logic::Offer::Implausible:
             ui::info(brls::getStr("playguard/clock/copy_implausible", ui::time_text(s.user_time)));
@@ -323,13 +313,10 @@ void offer_console_clock(const Measurement& m, std::function<void()> done)
         ui::info(m.report);
         return;
     }
-    auto* ask = ui::dialog(m.report + "\n\n" + brls::getStr("playguard/clock/offline_guided", ui::time_text(s.user_time)));
-    ask->addButton("hints/cancel"_i18n, []() {});
-    ask->addButton("playguard/clock/guided_copy"_i18n, [done]() {
+    ui::confirm(m.report + "\n\n" + brls::getStr("playguard/clock/offline_guided", ui::time_text(s.user_time)),
+                "playguard/clock/guided_copy"_i18n, [done]() {
         brls::sync([done]() { apply_console_clock([done](const std::string&) { if (done) done(); }); });
     });
-    ask->setCancelable(true);
-    ask->open();
 }
 }   // namespace
 
@@ -337,9 +324,7 @@ void guided(std::function<void()> done)
 {
     if (ui::refuse_read_only()) return;
     const std::string server = current_server();
-    auto* ask = ui::dialog(brls::getStr("playguard/clock/guided_body", server));
-    ask->addButton("hints/cancel"_i18n, []() {});
-    ask->addButton("playguard/clock/guided_measure"_i18n, [server, done]() {
+    ui::confirm(brls::getStr("playguard/clock/guided_body", server), "playguard/clock/guided_measure"_i18n, [server, done]() {
         brls::sync([server, done]() {
             auto cancelled = std::make_shared<std::atomic<bool>>(false);
             auto* progress = progress_dialog(brls::getStr("playguard/clock/measuring", server), cancelled);
@@ -359,8 +344,6 @@ void guided(std::function<void()> done)
             });
         });
     });
-    ask->setCancelable(true);
-    ask->open();
 }
 
 }   // namespace clock_flow

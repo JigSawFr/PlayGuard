@@ -76,7 +76,7 @@
   "capture": "截圖"
  },
  "params": {
-  "tab": {"label": "開啟時顯示", "options": {"": "今天", "play_timer": "遊玩時間限制", "activity": "活動紀錄", "restrictions": "限制", "security": "PIN碼", "console": "主機", "history": "紀錄", "preferences": "偏好設定", "about": "關於"}},
+  "tab": {"label": "開啟時顯示", "options": {"": "今天", "play_timer": "遊玩時間限制", "activity": "活動紀錄", "restrictions": "限制", "security": "PIN碼", "console": "主機", "preferences": "偏好設定", "about": "關於"}},
   "keep": {"label": "在造訪之間保留狀態", "help": "PlayGuard 的資料和模擬主機的設定（PIN碼、限制、時鐘）保留在此瀏覽器中；此面板中的主機設定只在首次啟動時生效。"},
   "not_set_up": {"label": "從未設定（沒有 PIN碼）"},
   "unlocked": {"label": "暫時解除"},

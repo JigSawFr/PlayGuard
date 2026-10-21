@@ -404,7 +404,7 @@ PlayGuard 자체의 PIN입니다.
 
 ## 변경 기록 — 변경 내용과 백업
 
-*[시뮬레이터에서 체험하기 ›](https://playguard.link/simulator/?tab=history)*
+*[시뮬레이터에서 체험하기 ›](https://playguard.link/simulator/?tab=preferences)*
 
 ### 변경 기록
 

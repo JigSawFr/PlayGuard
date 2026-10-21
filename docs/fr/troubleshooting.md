@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 580b7eeae8c9 -->
+<!-- translated from docs/troubleshooting.md, sha256 498fbfed802c -->
 # Dépannage
 
 Reprendre la main sur une console bloquée, les problèmes courants, signaler un bug, et le mode développeur. Retour au [README](../../README.fr.md).
@@ -48,7 +48,7 @@ PlayGuard ne peut rien faire : il nécessite Atmosphère. La procédure officiel
 ### Mes limites ont changé toutes seules
 
 - **L'application mobile est encore associée.** Sa prochaine synchronisation écrase ce que PlayGuard a réglé : *Code PIN › Dissocier l'application mobile*.
-- **Un autre outil, ou un profil.** *Aujourd'hui* affiche une carte orange pour des limites différentes de celles que PlayGuard a vues en dernier, et *Historique › Historique des modifications* liste chaque modification vue en dehors de PlayGuard. Ⓐ sur l'une remet la valeur précédente.
+- **Un autre outil, ou un profil.** *Aujourd'hui* affiche une carte orange pour des limites différentes de celles que PlayGuard a vues en dernier, et *Préférences › Historique des modifications* liste chaque modification vue en dehors de PlayGuard. Ⓐ sur l'une remet la valeur précédente.
 - **Un profil programmé** appliqué, ou les limites qu'il avait remplacées remises une fois sa période finie (*Temps de jeu › Profils › Profil programmé*).
 
 ### L'enfant a joué au-delà de la limite

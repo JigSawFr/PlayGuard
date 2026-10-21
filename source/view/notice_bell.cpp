@@ -5,6 +5,7 @@
 
 #include "action/notices.hpp"
 #include "activity/notices_activity.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "view/version_badge.hpp"
 
@@ -49,7 +50,7 @@ void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float heigh
     (void)ctx;
     // The bell: a dome over a flared rim, and the clapper under it, in the
     // header's text colour (the notes' grey while nothing is there).
-    const NVGcolor ink = this->actions || this->infos ? ui::color_text() : ui::color_note();
+    const NVGcolor ink = this->actions || this->infos ? cadran::kit::color("cadran/text") : cadran::kit::color("cadran/text3");
     const float cx = x + width * 0.42f, top = y + height * 0.14f;
     const float w = width * 0.62f, h = height * 0.6f;
     nvgBeginPath(vg);
@@ -73,7 +74,7 @@ void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float heigh
         const float r = height * 0.24f;
         nvgBeginPath(vg);
         nvgCircle(vg, bx, by, r);
-        nvgFillColor(vg, ui::color_warn());
+        nvgFillColor(vg, cadran::kit::color("cadran/amber"));
         nvgFill(vg);
         nvgFontFaceId(vg, brls::Application::getDefaultFont());
         nvgFontSize(vg, r * 1.45f);
@@ -83,7 +84,7 @@ void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float heigh
     } else if (this->infos > 0) {
         nvgBeginPath(vg);
         nvgCircle(vg, bx, by, height * 0.12f);
-        nvgFillColor(vg, ui::color_note());
+        nvgFillColor(vg, cadran::kit::color("cadran/text3"));
         nvgFill(vg);
     }
 }

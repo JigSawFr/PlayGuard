@@ -9,6 +9,7 @@
 
 #include "action/pt_flow.hpp"
 #include "tab/cadran_list.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "view/cadran_week.hpp"
 
@@ -77,7 +78,7 @@ void PlayTimerPerDayActivity::bind_cells()
                     [this]() {
                         for (int i = 0; i < 7; i++) this->pending[i] = this->live.day_min[i];
                         this->rerender();
-                    });
+                    }, nullptr, true);
         return true;
     });
     pt_save->registerClickAction([this](brls::View*) {
@@ -120,7 +121,7 @@ void PlayTimerPerDayActivity::bind_buttons()
             return true;
         }
         ui::confirm("playguard/play_timer/perday/discard_body"_i18n, "playguard/play_timer/perday/discard_confirm"_i18n,
-                    []() { brls::sync([]() { brls::Application::popActivity(); }); });
+                    []() { brls::sync([]() { brls::Application::popActivity(); }); }, nullptr, true);
         return true;
     });
 }
@@ -217,7 +218,7 @@ void PlayTimerPerDayActivity::rerender()
     int unsaved = 0;
     for (int d = 0; d < 7 && this->live.valid; d++) unsaved += this->pending[d] != this->live.day_min[d];
     pt_save->setDetailText(unsaved ? (unsaved == 1 ? "playguard/play_timer/perday/unsaved_count_one"_i18n : brls::getStr("playguard/play_timer/perday/unsaved_count", unsaved)) : "");
-    pt_save->setDetailTextColor(unsaved ? ui::color_warn() : ui::color_neutral());
+    pt_save->setDetailTextColor(unsaved ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     // The footer's + hint carries the count too: it is visible from any row.
     this->getContentView()->updateActionHint(brls::BUTTON_START, unsaved ? brls::getStr("playguard/play_timer/perday/save_hint", unsaved)
                                                                      : "hints/save"_i18n);

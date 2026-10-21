@@ -108,13 +108,15 @@ class GameCheckActivity : public brls::Activity
     void open(const GameFacts& game, GameIssue issue, u32 current_hos);
     void choose(const GameFacts& game, u32 actions);
     void run(const GameFacts& game, u32 action, const GameContent& content);
-    void remove(const GameFacts& game);
+    // `asked`: the parent already said yes (a check's result offered it):
+    // removed without asking again.
+    void remove(const GameFacts& game, bool asked = false);
     // `games`' list saved off the UI thread, then `done` on it with the
     // JSON's path ("" and why on failure); and all of them removed after one
     // question (the list saved first).
     void save_list(const std::vector<GameFacts>& games,
                    std::function<void(const std::string& path, const std::string& error)> done) const;
-    void remove_games(std::vector<GameFacts> games);
+    void remove_games(std::vector<GameFacts> games, bool asked = false);
     void remove_next(std::vector<GameFacts> games, size_t at, u32 removed, std::string path);
     // Ⓨ on a game; the actions on the games picked.
     void toggle(u64 id);

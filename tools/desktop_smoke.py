@@ -773,7 +773,7 @@ if not LOADING and not LOCK:
     if not m or int(m.group(1)) < 2000:
         fail("the first screen came before the end of the intro: " + (ready[0].strip() if ready else "no line"))
 
-tabs = ["dashboard", "play_timer", "activity", "restrictions", "security", "console", "history", "preferences", "about"]
+tabs = ["dashboard", "play_timer", "activity", "restrictions", "security", "console", "preferences", "about"]
 
 
 def steps(a, b):
@@ -1957,9 +1957,9 @@ if not GAMES:
 
     # Settings backup: save one, open the list and the restore summary (cancelled).
     key("Left")                # back to the sidebar
-    key("Down", steps("play_timer", "history"))
-    key("Right")               # Changes made with PlayGuard
-    key("Down")                # Back up the settings, the first tile
+    key("Down", steps("play_timer", "preferences"))
+    key("Right")               # Language, the first tile
+    key("Down", 9)             # past the effects, the intro and the notifications: Changes made with PlayGuard, then Back up the settings, the first tile
     backups = os.path.join(nand_dir, "backups")
     before = len(os.listdir(backups)) if os.path.isdir(backups) else 0
     key("Return")              # Back up the settings

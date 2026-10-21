@@ -30,18 +30,6 @@ namespace ui
 // createWindow(), before the first label exists, then again when the language
 // changes while PlayGuard runs (live_prefs, which builds the screens again).
 void     use_font_for(const std::string& locale);
-NVGcolor color_ok();
-NVGcolor color_warn();
-NVGcolor color_bad();
-NVGcolor color_track();     // empty part of a progress bar, a missing cover
-NVGcolor color_note();      // explanatory notes under a section
-NVGcolor color_neutral();   // DetailCell value colour
-NVGcolor color_text();      // plain label text colour
-NVGcolor color_accent();    // the theme's highlight (the sidebar's active item)
-// A label of `size` in `color` that wraps (not single-line).
-brls::Label* text_label(const std::string& text, float size, NVGcolor color);
-// The same, centred, wrapping at the width of the box it is in (a dialog's).
-brls::Label* centered_label(const std::string& text, float size, NVGcolor color);
 
 // "error 0x00001234" followed by a human explanation when one is known.
 // PlayGuard's own results (read-only, invalid value …) are just the sentence:
@@ -104,6 +92,10 @@ enum class Toast
     Refused,
 };
 void notify(const std::string& text, Toast kind = Toast::Info);
+// Something asked that was not done, and why, as a Refused toast (its
+// warning icon): a refusal is said and gone, a failure is a dialog (error).
+void refuse(const std::string& text);
+void refuse(Result rc);   // its rc_text
 // A failure the user asked for something and did not get: a dialog, not a
 // toast (a toast is gone before "error 0x…" is read). Next frame, so it can
 // be called from a dialog button. Logged as "error: " for the smoke test.
@@ -189,10 +181,13 @@ void hold_confirm(brls::Box* body, const std::string& hold_label, std::function<
 // closed (OK or B). Used by PIN › Show the PIN.
 bool show_pin_dialog(std::function<void()> on_close = nullptr);
 
-// A dialog showing `text`. borealis' own text dialog does not scroll: a text
-// taller than the screen collapses into one cut line. A long one is laid out
-// with a smaller font and narrower margins instead, so it fits.
+// A dialog showing `text`, laid out by cadran::dialog_body (its question as
+// the title, its tables, its notes), the caller adding its buttons; a text
+// taller than the dialog's room scrolls.
 brls::Dialog* dialog(const std::string& text);
+// The same with `below` under the text, the card's width unless it aligns
+// itself: a QR code, a code to read out, the cards to support the app.
+brls::Dialog* dialog(const std::string& text, brls::View* below);
 // The same for a body already laid out (a checklist, a sheet): as it is, or
 // in a scrolling frame when taller than the dialog's room.
 brls::Dialog* box_dialog(brls::Box* body);
@@ -347,13 +342,12 @@ constexpr int activity     = 3;   // play time per game
 constexpr int restrictions = 4;
 constexpr int security     = 5;   // the PIN tab: PIN, unlock, blocking games, companion app, delete
 constexpr int console      = 7;   // the network clock, installed games, firmware, storage, serial, patches
-constexpr int history      = 9;   // changes and settings backups
-constexpr int preferences  = 10;
-constexpr int about        = 11;  // version, credits, changelog
+constexpr int preferences  = 9;   // the app's settings, the change history and settings backups
+constexpr int about        = 10;  // version, credits, changelog
 // The n-th tab (0 = Today) as a sidebar position (separators count).
 constexpr int of(int n)
 {
-    constexpr int positions[] = { dashboard, play_timer, activity, restrictions, security, console, history, preferences, about };
+    constexpr int positions[] = { dashboard, play_timer, activity, restrictions, security, console, preferences, about };
     return n >= 0 && n < (int)(sizeof(positions) / sizeof(positions[0])) ? positions[n] : dashboard;
 }
 }   // namespace tab

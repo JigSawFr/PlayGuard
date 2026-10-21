@@ -14,6 +14,7 @@
 #include "action/notices.hpp"
 #include "action/pt_flow.hpp"
 #include "app.hpp"
+#include "ui/cadran_text.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -55,12 +56,12 @@ std::string summary(const backup::Snapshot& s, backup::RestoreTally* tally)
     PtState pt;
     pctl_play_timer_query(&pt);
     const std::string unknown = "?";
-    std::string changes;
+    cadran_text::Rows rows;   // what differs: now → backed up
     auto compare = [&](const std::string& label, bool known, const std::string& now, const std::string& then,
                        bool restored = true) {
         tally->add(known, now == then, restored);
         if (known && now == then) return;
-        changes += "\n" + brls::getStr("playguard/backup/change_line", label, known ? now : unknown, then);
+        rows.push_back({ label, (known ? now : unknown) + " → " + then });
     };
 
     if (s.level_ok)
@@ -95,8 +96,8 @@ std::string summary(const backup::Snapshot& s, backup::RestoreTally* tally)
     const std::string created = s.created.empty() ? "?" : s.created;
     std::string out = brls::getStr(tally->nothing_to_write() ? "playguard/backup/backed_up_on" : "playguard/backup/restore_body",
                                    created) + "\n";
-    out += changes.empty() ? "\n" + "playguard/backup/nothing_differs"_i18n : changes;
-    if (tally->same > 0 && !changes.empty()) out += "\n\n" + (tally->same == 1 ? "playguard/backup/same_count_one"_i18n : brls::getStr("playguard/backup/same_count", tally->same));
+    out += "\n" + (rows.empty() ? "playguard/backup/nothing_differs"_i18n : cadran_text::table(rows));
+    if (tally->same > 0 && !rows.empty()) out += "\n\n" + (tally->same == 1 ? "playguard/backup/same_count_one"_i18n : brls::getStr("playguard/backup/same_count", tally->same));
     // The PIN is not in the backup (after "Delete all", there is none).
     if (st.pin_length_ok && st.pin_length == 0) out += "\n\n" + "playguard/backup/no_pin_note"_i18n;
     // The bedtime is kept in the backup's raw block, but not written back:
@@ -292,7 +293,7 @@ void choose_and_restore(std::function<void()> refresh)
         const auto& entry = (*loaded)[(size_t)index];
         if (!entry.first) ui::notify("playguard/backup/unreadable_file"_i18n);
         else restore(entry.second, refresh);
-    });
+    }, false);
 }
 
 void backup_then(std::function<void()> next)

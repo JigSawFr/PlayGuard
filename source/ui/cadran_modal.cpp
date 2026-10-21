@@ -81,18 +81,6 @@ void hide(brls::View* parent, const char* id)
 
 namespace
 {
-// A label in the boards' display face (Sora, the other scripts from the
-// app's fonts): a dialog's title.
-class DisplayLabel : public brls::Label
-{
-  public:
-    DisplayLabel()
-    {
-        const int face = brls::Application::getFont("cadran/digits");
-        if (face != brls::FONT_INVALID) this->font = face;
-    }
-};
-
 std::string trim(const std::string& text)
 {
     const size_t first = text.find_first_not_of(" \n");
@@ -178,10 +166,7 @@ brls::Box* cadran::dialog_body(const std::string& text)
         auto* head = new brls::Box(brls::Axis::ROW);
         head->setId("cadran_dialog_head");
         head->setAlignItems(brls::AlignItems::CENTER);
-        auto* label = new DisplayLabel();
-        label->setText(title);
-        label->setFontSize(23);
-        label->setTextColor(theme["cadran/text"]);
+        brls::Label* label = kit::display(title, kit::TEXT_TITLE);
         label->setGrow(1.0f);
         label->setWidth(0);
         head->addView(label);
@@ -211,7 +196,7 @@ brls::Box* cadran::dialog_body(const std::string& text)
             auto* table = new brls::Box(brls::Axis::COLUMN);
             table->setAlignItems(brls::AlignItems::STRETCH);
             table->setBackgroundColor(theme["cadran/surf2"]);
-            table->setCornerRadius(14);
+            table->setCornerRadius(kit::RADIUS_ROW);
             table->setPadding(12, 20, 12, 20);
             table->setMarginTop(body->getChildren().empty() ? 0 : 18);
             for (size_t i = 0; i < rows.size(); i++) {
@@ -223,12 +208,12 @@ brls::Box* cadran::dialog_body(const std::string& text)
                     row->setLineBottom(1);
                     row->setLineColor(theme["cadran/line"]);
                 }
-                brls::Label* key = kit::label(rows[i].first, 17, "cadran/text2");
+                brls::Label* key = kit::label(rows[i].first, kit::TEXT_BODY, "cadran/text2");
                 key->setGrow(1.0f);
                 key->setWidth(0);
                 key->setMarginRight(16);
                 row->addView(key);
-                brls::Label* value = kit::label(rows[i].second, 17, "cadran/text");
+                brls::Label* value = kit::label(rows[i].second, kit::TEXT_BODY, "cadran/text");
                 value->setHorizontalAlign(brls::HorizontalAlign::RIGHT);
                 value->setMaxWidth(300);
                 value->setShrink(0);
@@ -238,7 +223,7 @@ brls::Box* cadran::dialog_body(const std::string& text)
             body->addView(table);
             continue;
         }
-        brls::Label* label = kit::label(paragraph, 19, "cadran/text2");
+        brls::Label* label = kit::label(paragraph, kit::TEXT_LEAD, "cadran/text2");
         label->setMarginTop(body->getChildren().empty() ? 0 : 14);
         body->addView(label);
     }
@@ -253,7 +238,7 @@ brls::Box* cadran::dialog_body(const std::string& text)
         card->setBackgroundColor(theme["cadran/amber_surf"]);
         card->setBorderColor(theme["cadran/amber_line"]);
         card->setBorderThickness(1);
-        card->setCornerRadius(14);
+        card->setCornerRadius(kit::RADIUS_ROW);
         card->setPadding(12, 18, 12, 16);
         card->setMarginTop(at > 0 ? 14 : 0);
         CadranIcon* icon = kit::icon(note.icon, 20, "cadran/amber");
@@ -308,11 +293,7 @@ brls::Box* cadran::dialog_body(const std::string& text)
 
 brls::Label* cadran::dialog_title(const std::string& text)
 {
-    auto* label = new DisplayLabel();
-    label->setText(text);
-    label->setFontSize(23);
-    label->setTextColor(brls::Application::getTheme()["cadran/text"]);
-    return label;
+    return cadran::kit::display(text, cadran::kit::TEXT_TITLE);
 }
 
 brls::Box* cadran::dialog_badge(const char* icon, const char* color_key, const char* soft_key)
@@ -335,7 +316,7 @@ void cadran::style_dialog(brls::Dialog* dialog, Emphasis emphasis)
     if (!dialog || dialog->getView("cadran_dialog")) return;
     brls::Theme theme = brls::Application::getTheme();
     brls::AppletFrame* card = dialog->getAppletFrame();
-    card->setCornerRadius(24);
+    card->setCornerRadius(kit::RADIUS_MODAL);
     card->setBackgroundColor(theme["cadran/surf"]);
     card->setBorderColor(theme["cadran/line"]);
     card->setBorderThickness(1);
@@ -397,6 +378,30 @@ void cadran::style_dialog(brls::Dialog* dialog, Emphasis emphasis)
     }
 }
 
+void cadran::style_button(brls::Button* button, Emphasis emphasis)
+{
+    pill(button, emphasis == Emphasis::PRIMARY ? &PRIMARY : emphasis == Emphasis::DANGER ? &DANGER : &PLAIN);
+    button->setHeight(PILL);
+}
+
+brls::Box* cadran::wait_body(const std::string& text)
+{
+    auto* spinner = new brls::ProgressSpinner(brls::ProgressSpinnerSize::LARGE);
+    spinner->setWidth(60);
+    spinner->setHeight(60);
+    spinner->setMarginBottom(24);
+    brls::Label* label = kit::label(text, kit::TEXT_LEAD, "cadran/text");
+    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    label->setAlignSelf(brls::AlignSelf::STRETCH);
+    auto* box = new brls::Box(brls::Axis::COLUMN);
+    box->setAlignItems(brls::AlignItems::CENTER);
+    box->setJustifyContent(brls::JustifyContent::CENTER);
+    box->setPadding(40, 40, 32, 40);
+    box->addView(spinner);
+    box->addView(label);
+    return box;
+}
+
 void cadran::prompt_minutes(const std::string& header, uint16_t initial, std::function<void(uint16_t)> on_value)
 {
     namespace kit = cadran::kit;
@@ -405,10 +410,7 @@ void cadran::prompt_minutes(const std::string& header, uint16_t initial, std::fu
     auto* body = new brls::Box(brls::Axis::COLUMN);
     body->setAlignItems(brls::AlignItems::CENTER);
     body->setPadding(30, 40, 22, 40);
-    auto* title = new DisplayLabel();
-    title->setText(header);
-    title->setFontSize(23);
-    title->setTextColor(theme["cadran/text"]);
+    brls::Label* title = kit::display(header, kit::TEXT_TITLE);
     title->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     body->addView(title);
     CadranIcon* up = kit::icon("caret-up", 30, "cadran/teal");
@@ -487,7 +489,7 @@ void cadran::style_picker(brls::Dropdown* dropdown)
         content->setMarginLeft(200);
         content->setMarginRight(200);
         content->setMarginBottom(20);
-        content->setCornerRadius(PICKER_CORNER);
+        content->setCornerRadius(PICKER_CORNER);   // kit::RADIUS_MODAL
         content->setBackgroundColor(theme["cadran/surf"]);
         content->setBorderColor(theme["cadran/line"]);
         content->setBorderThickness(1);
@@ -507,8 +509,8 @@ void cadran::style_picker(brls::Dropdown* dropdown)
 void cadran::style_pick_row(brls::RadioCell* cell, bool checked)
 {
     brls::Theme theme = brls::Application::getTheme();
-    cell->setCornerRadius(14);
-    cell->setHighlightCornerRadius(14);
+    cell->setCornerRadius(cadran::kit::RADIUS_ROW);
+    cell->setHighlightCornerRadius(cadran::kit::RADIUS_ROW);
     // The row chosen: a soft fill and its check, the text as the others'
     // (borealis gives the focused row the teal).
     cell->setBackgroundColor(checked ? theme["cadran/teal_soft"] : theme["cadran/none"]);

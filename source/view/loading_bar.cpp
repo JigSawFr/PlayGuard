@@ -66,9 +66,10 @@ void LoadingBar::draw(NVGcontext* vg, float x, float y, float width, float heigh
     (void)style;
     (void)ctx;
     const float radius = height / 2.0f;
+    brls::Theme theme = brls::Application::getTheme();
     nvgBeginPath(vg);
     nvgRoundedRect(vg, x, y, width, height, radius);
-    nvgFillColor(vg, TRACK);
+    nvgFillColor(vg, this->a(this->brand ? TRACK : theme["cadran/well"]));
     nvgFill(vg);
 
     const float value = this->drawn(brls::getCPUTimeUsec());
@@ -77,7 +78,8 @@ void LoadingBar::draw(NVGcontext* vg, float x, float y, float width, float heigh
     // Teal, lighter toward its end: the end that moves.
     nvgBeginPath(vg);
     nvgRoundedRect(vg, x, y, w, height, radius);
-    nvgFillPaint(vg, nvgLinearGradient(vg, x, y, x + w, y, TEAL, TEAL_LIGHT));
+    nvgFillPaint(vg, nvgLinearGradient(vg, x, y, x + w, y, this->a(this->brand ? TEAL : theme["cadran/teal_fill"]),
+                                       this->a(this->brand ? TEAL_LIGHT : theme["brls/highlight/color2"])));
     nvgFill(vg);
 }
 

@@ -7,6 +7,7 @@
 
 #include "action/nintendo_dns.hpp"
 #include "action/pairing_state.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/cadran_text.hpp"
 #include "ui/ui.hpp"
 
@@ -97,7 +98,7 @@ void DashboardTab::show_pills()
         ui::set_visible(p.box, !text.empty());
     };
     // The firmware's compatibility: the firmware with it when all is fine.
-    NVGcolor c = ui::color_neutral();
+    NVGcolor c = cadran::kit::color("cadran/text2");
     const std::string compat = ui::compat_text(si, &c);
     show(this->compat_pill, sysinfo_compat(&si) != SysCompat_Ok, "playguard/dashboard/compat"_i18n, compat, c,
          ui::fw_text(si) + " · " + compat);
@@ -106,13 +107,13 @@ void DashboardTab::show_pills()
     show(this->pairing_pill, pairing_state::syncs(s), "playguard/dashboard/pairing"_i18n,
          ui::bool_text(s.pairing_active_ok, s.pairing_active, "playguard/dashboard/pairing_on"_i18n,
                        "playguard/dashboard/pairing_off"_i18n),
-         ui::color_warn(), "");
+         cadran::kit::color("cadran/amber"), "");
     // The serial number visible on emuMMC.
     show(this->serial_pill, ui::serial_warning(si), "playguard/dashboard/serial"_i18n, "playguard/dashboard/serial_visible"_i18n,
-         ui::color_warn(), "playguard/cadran/today/serial_hidden"_i18n);
+         cadran::kit::color("cadran/amber"), "playguard/cadran/today/serial_hidden"_i18n);
     // Sigpatch files only, or sys-patch incomplete.
     const patches::Report& report = ui::patch_report();
-    c = ui::color_neutral();
+    c = cadran::kit::color("cadran/text2");
     const std::string patches_text = ui::patches_text(report, &c);
     show(this->patches_pill, ui::patches_warning(report), "playguard/dashboard/patches"_i18n, patches_text, c, "");
     const bool sync = nintendo_dns::pctl_blocked(), time = nintendo_dns::time_blocked();

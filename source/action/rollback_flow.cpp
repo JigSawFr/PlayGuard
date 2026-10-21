@@ -149,7 +149,7 @@ void go_back_now()
     std::string label, err;
     if (!previous(&label)) return;
     if (!swap(dev_build_flow::nro_file(), &err, false)) {
-        ui::info(brls::getStr("playguard/dev_build/back_failed", err));
+        ui::error(brls::getStr("playguard/dev_build/back_failed", err));
         return;
     }
     if (launcher::can_launch() && launcher::launch_nro(dev_build_flow::nro_sd_path())) {

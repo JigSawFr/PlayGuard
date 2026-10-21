@@ -35,7 +35,7 @@
                 <brls:ProgressSpinner width="30" height="30" marginRight="14"/>
                 <brls:Label id="ck_progress_text" text="" fontSize="20" grow="1.0" textColor="@theme/cadran/text3"/>
             </brls:Box>
-            <brls:Box id="ck_result_card" axis="column" alignItems="stretch" marginTop="8" marginBottom="8" marginLeft="10" marginRight="10" cornerRadius="18">
+            <brls:Box id="ck_result_card" axis="column" alignItems="stretch" marginTop="8" marginBottom="8" marginLeft="10" marginRight="10" cornerRadius="@style/cadran/radius/card">
                 <brls:Label id="ck_result_title" text="" fontSize="18" textColor="@theme/cadran/amber" marginBottom="8" visibility="gone"/>
                 <brls:Label id="ck_result" text="" fontSize="16.5"/>
             </brls:Box>
