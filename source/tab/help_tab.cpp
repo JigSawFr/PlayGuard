@@ -202,7 +202,7 @@ HelpTab::HelpTab()
         ui::confirm("playguard/dev/forget_body"_i18n, "playguard/dev/forget_confirm"_i18n, []() {
             fw_gate::forget();
             ui::notify("playguard/dev/forgotten"_i18n);
-        });
+        }, nullptr, true);
         return true;
     });
     dev_migrations->registerClickAction([](brls::View*) {

@@ -147,7 +147,7 @@ brls::DetailCell* NoticesActivity::entry_cell(const notices::Entry& e, bool todo
             ui::confirm(body, "playguard/notices/ignore"_i18n, [id]() {
                 // A choice about the parental controls: the parent's.
                 if (!pin_lock::confirm()) {
-                    ui::notify(pin_lock::refusal_text());
+                    ui::refuse(pin_lock::refusal_text());
                     return;
                 }
                 notices::acknowledge(id);

@@ -62,7 +62,7 @@ void show_result(const Offer& o)
             ui::info(brls::getStr("playguard/update/no_release", app::version()));
             break;
         default:
-            ui::info(brls::getStr("playguard/update/failed", o.result.error));
+            ui::error(brls::getStr("playguard/update/failed", o.result.error));
             break;
     }
 }
@@ -153,7 +153,7 @@ void update_in_place()
         const bool ok = dev_builds::fetch_release(&b, &err);
         brls::sync([ok, b, err]() {
             s_checking = false;
-            if (!ok) ui::info(brls::getStr("playguard/update/failed", err));
+            if (!ok) ui::error(brls::getStr("playguard/update/failed", err));
             else if (update::compare_versions(b.version, app::version()) <= 0)
                 ui::info(brls::getStr("playguard/update/up_to_date", app::version()));
             else install_in_place(b);
@@ -284,7 +284,7 @@ void postpone(const std::string& version, std::function<void()> done)
         cfg.update_snooze_until   = until;
         ui::save_config(brls::getStr("playguard/update/later_done", until));
         if (done) done();
-    });
+    }, false);
 }
 
 std::string status_text(const update::Result& r, const std::string& firmware)

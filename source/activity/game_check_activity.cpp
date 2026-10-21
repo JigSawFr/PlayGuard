@@ -867,8 +867,8 @@ void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current
     }
 
     // Two buttons at most, side by side (a third goes on a row of its own):
-    // the fix first, with the focus, then the other actions; B closes. With
-    // no fix: Back, then the actions.
+    // the fix first ("its first button", the texts say), with the focus, then
+    // the other actions; B closes. With no fix: OK, then the actions.
     auto* dialog = new brls::Dialog(box);
     const GameFacts g = game;
     const u32 others = actions & ~recommended;
@@ -879,7 +879,7 @@ void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current
         dialog->addButton(fix_button(recommended), [this, g, recommended, update]() { this->run(g, recommended, update); });
         if (others) dialog->addButton("playguard/games/other_actions"_i18n, [this, g, others]() { this->choose(g, others); });
     } else {
-        dialog->addButton("hints/back"_i18n, []() {});
+        dialog->addButton("hints/ok"_i18n, []() {});
         if (others) dialog->addButton("playguard/games/actions"_i18n, [this, g, others]() { this->choose(g, others); });
     }
     dialog->open();
@@ -921,17 +921,18 @@ void GameCheckActivity::run(const GameFacts& g, u32 action, const GameContent& c
     }
 }
 
-void GameCheckActivity::remove(const GameFacts& g)
+void GameCheckActivity::remove(const GameFacts& g, bool asked)
 {
     const std::string label = history_label(g), name = game_name(g);
     std::weak_ptr<bool> weak = this->alive;
-    ui::confirm_danger(name + "\n\n" + "playguard/games/remove_body"_i18n, "playguard/games/remove"_i18n,
-                       [this, weak, id = g.app_id, label, name]() {
-                           const Result rc = gamecheck_remove(id);
-                           if (R_SUCCEEDED(rc)) history_flow::record_event("remove_game", "", label);
-                           ui::notify_result(rc, brls::getStr("playguard/games/removed", name), "playguard/games/remove_err"_i18n);
-                           if (R_SUCCEEDED(rc) && !weak.expired()) this->refresh(false, id);
-                       });
+    auto now = [this, weak, id = g.app_id, label, name]() {
+        const Result rc = gamecheck_remove(id);
+        if (R_SUCCEEDED(rc)) history_flow::record_event("remove_game", "", label);
+        ui::notify_result(rc, brls::getStr("playguard/games/removed", name), "playguard/games/remove_err"_i18n);
+        if (R_SUCCEEDED(rc) && !weak.expired()) this->refresh(false, id);
+    };
+    if (asked) now();
+    else ui::confirm_danger(name + "\n\n" + "playguard/games/remove_body"_i18n, "playguard/games/remove"_i18n, now);
 }
 
 // The games to install again in a JSON table (exports/, as the Activity
@@ -967,13 +968,13 @@ void GameCheckActivity::save_list(const std::vector<GameFacts>& games,
     });
 }
 
-void GameCheckActivity::remove_games(std::vector<GameFacts> games)
+void GameCheckActivity::remove_games(std::vector<GameFacts> games, bool asked)
 {
     if (games.empty() || this->removing) return;
     const std::string body = brls::getStr("playguard/games/remove_all_body", (int)games.size()) + "\n" +
                              game_check_text::name_lines(games, words());
     std::weak_ptr<bool> weak = this->alive;
-    ui::confirm_danger(body, "playguard/games/remove"_i18n, [this, weak, games]() {
+    auto now = [this, weak, games]() {
         if (weak.expired()) return;
         // The list first: nothing is removed without it.
         this->save_list(games, [this, weak, games](const std::string& path, const std::string& error) {
@@ -991,7 +992,9 @@ void GameCheckActivity::remove_games(std::vector<GameFacts> games)
             this->removing = true;
             this->remove_next(games, 0, 0, path);
         });
-    });
+    };
+    if (asked) now();
+    else ui::confirm_danger(body, "playguard/games/remove"_i18n, now);
 }
 
 // One game a frame, the count above the list in between.
@@ -1151,8 +1154,10 @@ void GameCheckActivity::report_verified(GameCheckActivity* self, const std::weak
             std::string body = brls::getStr("playguard/games/verify_bad", name);
             if (v.found) body += "\n\n" + brls::getStr("playguard/games/verify_code", console_code(v.found));
             if (app::read_only() || weak.expired()) ui::info(body);
-            else ui::confirm(body, "playguard/games/fix_button/remove"_i18n, [self, weak, g = v.game]() {
-                if (!weak.expired()) self->remove(g);   // closed while the question was open
+            // One question: what removing does is said here, in coral.
+            else ui::confirm_danger(body + "\n\n" + "playguard/games/remove_body"_i18n,
+                                    "playguard/games/fix_button/remove"_i18n, [self, weak, g = v.game]() {
+                if (!weak.expired()) self->remove(g, true);   // closed while the question was open
             });
         }
         return;
@@ -1167,12 +1172,12 @@ void GameCheckActivity::report_verified(GameCheckActivity* self, const std::weak
     if (t.failed) body += "\n" + brls::getStr("playguard/games/verify_count_err", (int)t.failed);
     if (t.corrupt.empty() || app::read_only() || weak.expired()) ui::info(body);
     else
-        ui::confirm(body,
-                    t.corrupt.size() == 1 ? "playguard/games/remove_corrupt_one"_i18n
-                                          : brls::getStr("playguard/games/remove_corrupt", (int)t.corrupt.size()),
-                    [self, weak, corrupt = t.corrupt]() {
-                        if (!weak.expired()) self->remove_games(corrupt);   // closed while the question was open
-                    });
+        ui::confirm_danger(body + "\n\n" + "playguard/games/remove_body"_i18n,
+                           t.corrupt.size() == 1 ? "playguard/games/remove_corrupt_one"_i18n
+                                                 : brls::getStr("playguard/games/remove_corrupt", (int)t.corrupt.size()),
+                           [self, weak, corrupt = t.corrupt]() {
+                               if (!weak.expired()) self->remove_games(corrupt, true);   // closed while the question was open
+                           });
 }
 
 void GameCheckActivity::verify(std::vector<GameFacts> games)

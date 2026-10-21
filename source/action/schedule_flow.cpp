@@ -13,6 +13,7 @@
 #include "action/schedule_logic.hpp"
 #include "app.hpp"
 #include "ui/cadran_kit.hpp"
+#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/profiles.hpp"
@@ -88,7 +89,7 @@ void apply(std::function<void()> after)
     PtState live;
     pctl_play_timer_query(&live);
     if (!live.valid) {
-        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN), ui::Toast::Refused);
+        ui::refuse(NXM_RC_STATE_UNKNOWN);
         return;
     }
     auto& c = config::get();
@@ -133,6 +134,7 @@ void ask_apply(const schedule_logic::Schedule& s, std::function<void()> after)
     dialog->addButton("playguard/schedule/not_now"_i18n, []() {});
     dialog->addButton("playguard/schedule/apply"_i18n, [after]() { brls::sync([after]() { apply(after); }); });
     dialog->setCancelable(true);
+    cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
     dialog->open();
 }
 
@@ -146,6 +148,7 @@ void ask_put_back(const schedule_logic::Schedule& s, std::function<void()> after
     });
     dialog->addButton("playguard/schedule/put_back"_i18n, [after]() { brls::sync([after]() { put_back(after); }); });
     dialog->setCancelable(true);
+    cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
     dialog->open();
 }
 

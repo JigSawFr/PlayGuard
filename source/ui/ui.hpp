@@ -104,6 +104,10 @@ enum class Toast
     Refused,
 };
 void notify(const std::string& text, Toast kind = Toast::Info);
+// Something asked that was not done, and why, as a Refused toast (its
+// warning icon): a refusal is said and gone, a failure is a dialog (error).
+void refuse(const std::string& text);
+void refuse(Result rc);   // its rc_text
 // A failure the user asked for something and did not get: a dialog, not a
 // toast (a toast is gone before "error 0x…" is read). Next frame, so it can
 // be called from a dialog button. Logged as "error: " for the smoke test.

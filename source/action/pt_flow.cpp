@@ -45,11 +45,11 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
     PtState pt;
     pctl_play_timer_query(&pt);
     if (!pt.fw_supported) {
-        ui::notify(ui::rc_text(NXM_RC_FW_UNSUPPORTED), ui::Toast::Refused);
+        ui::refuse(NXM_RC_FW_UNSUPPORTED);
         return;
     }
     if (!pt_logic::state_known(pt)) {
-        ui::notify(ui::rc_text(NXM_RC_STATE_UNKNOWN), ui::Toast::Refused);
+        ui::refuse(NXM_RC_STATE_UNKNOWN);
         return;
     }
 
@@ -169,6 +169,7 @@ static void offer_relock(std::function<void()> after)
         if (after) after();
     });
     ui::on_cancel(dialog, later);   // B: "Later"
+    cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
     dialog->open();
 }
 
