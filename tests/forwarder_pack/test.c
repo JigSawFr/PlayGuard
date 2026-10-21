@@ -217,12 +217,12 @@ static const uint8_t *romfs_of(const Section *s, uint64_t *size)
 
 // ------------------------------------------------------------------ fixtures
 
-#define NPDM_SIZE 0x348
+#define NPDM_SIZE 0x350
 
 // An NPDM laid out as npdmtool writes the loader's (forwarder/out/
 // forwarder.npdm, its sizes made smaller): META, ACI0 at 0x80 with two kernel
 // capabilities (the kernel flags, the debug flags), ACID at 0x100 with the
-// kernel flags only.
+// same two (npdmtool copies them), its services' list before them.
 static void make_npdm(uint8_t *n)
 {
     memset(n, 0, NPDM_SIZE);
@@ -231,7 +231,7 @@ static void make_npdm(uint8_t *n)
     n[0x74] = 0x48;
     n[0x78] = 0x00;
     n[0x79] = 0x01;
-    n[0x7C] = 0x48;
+    n[0x7C] = 0x50;
     n[0x7D] = 0x02;
     memcpy(n + 0x80, "ACI0", 4);
     n[0x80 + 0x30] = 0x40;
@@ -239,10 +239,14 @@ static void make_npdm(uint8_t *n)
     const uint32_t kc[2] = { 0x020073B7u, 0x0004FFFFu };   // 3 cores; ForceDebugProd
     memcpy(n + 0xC0, kc, 8);
     memcpy(n + 0x100 + 0x200, "ACID", 4);
-    n[0x100 + 0x228] = 0x40;
+    n[0x100 + 0x228] = 0x40;   // the services' list, which holds no capability
     n[0x100 + 0x229] = 0x02;
-    n[0x100 + 0x22C] = 4;
-    memcpy(n + 0x340, kc, 4);
+    n[0x100 + 0x22C] = 8;
+    memset(n + 0x340, 0x2A, 8);
+    n[0x100 + 0x230] = 0x48;
+    n[0x100 + 0x231] = 0x02;
+    n[0x100 + 0x234] = 8;
+    memcpy(n + 0x348, kc, 8);
 }
 
 static int s_seals;
@@ -353,7 +357,9 @@ static void test_npdm(void)
     CHECK(u32_at(n + 0xC4) == 0x0004FFFFu);   // the debug flags kept
     CHECK(fwd_patch_npdm(n, sizeof(n), 0x0500000000002000ull, true));
     CHECK(u32_at(n + 0xC4) == 0x0008FFFFu);   // ForceDebug, as sphaira
-    CHECK(u32_at(n + 0x340) == 0x020073B7u && u32_at(n + 0x344) == 0);   // the ACID's flags left alone
+    CHECK(u32_at(n + 0x34C) == 0x0008FFFFu);  // and in the ACID: the loader refuses a flag it does not grant
+    CHECK(u32_at(n + 0x348) == 0x020073B7u);
+    CHECK(u64_at(n + 0x340) == 0x2A2A2A2A2A2A2A2Aull);   // the services untouched
     CHECK(u32_at(n + 0xC0) == 0x020073B7u);   // the kernel flags untouched
 
     uint8_t bad[NPDM_SIZE];
@@ -366,6 +372,9 @@ static void test_npdm(void)
     make_npdm(bad);
     memset(bad + 0xC4, 0, 4);   // no debug flags to set
     CHECK(fwd_patch_npdm(bad, sizeof(bad), 1, false));
+    CHECK(!fwd_patch_npdm(bad, sizeof(bad), 1, true));
+    make_npdm(bad);
+    memset(bad + 0x34C, 0, 4);  // none in the ACID: ForceDebug would be refused
     CHECK(!fwd_patch_npdm(bad, sizeof(bad), 1, true));
     CHECK(!fwd_patch_npdm(bad, 0x40, 1, false));
 }
