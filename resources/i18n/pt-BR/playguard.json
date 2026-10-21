@@ -819,7 +819,8 @@
         "upload": "Enviar um relatório online...",
         "upload_note": "Envia um relatório para um gist secreto da sua conta do GitHub (faça login antes, se precisar) e mostra o link com um QR code: passe-o para quem está ajudando ou abra um relatório de bug com ele.",
         "storage_note_emummc": "Você está na emuMMC: a sysMMC tem seu próprio controle dos pais, que o PlayGuard não consegue ver daqui. Configure-o lá também ou oculte o menu de inicialização do hekate.",
-        "storage_note_sysmmc": "Você está na sysMMC e há uma emuMMC configurada neste cartão SD: ela tem seu próprio controle dos pais, que o PlayGuard não consegue ver daqui. Configure-o lá também ou oculte o menu de inicialização do hekate."
+        "storage_note_sysmmc": "Você está na sysMMC e há uma emuMMC configurada neste cartão SD: ela tem seu próprio controle dos pais, que o PlayGuard não consegue ver daqui. Configure-o lá também ou oculte o menu de inicialização do hekate.",
+        "patches_note_mixed": "sys-patch is active, and sigpatch files ({}) are on the SD card too: two tools patching the same checks, a known cause of forwarders that could not be started. Set them aside (A), then restart the console."
     },
     "games": {
         "open": "Verificar os jogos instalados",
@@ -1143,7 +1144,15 @@
         "week_empty": "Nenhum forwarder foi tentado nos últimos sete dias.",
         "week_note": "Recusas nesta semana: {}; na semana anterior: {}.",
         "climb_title": "Mais PINs recusados do que o normal",
-        "climb_detail": "{} PINs recusados na porta nos últimos sete dias, {} na semana anterior."
+        "climb_detail": "{} PINs recusados na porta nos últimos sete dias, {} na semana anterior.",
+        "patches_incomplete": "The console starts a forwarder only with signature patches, and sys-patch {} did not apply all of them for this firmware (not patched: {}). Update sys-patch, then restart the console.",
+        "patches_title": "This forwarder would not start yet",
+        "patches_anyway": "Add it anyway (it starts once the patches are in place)",
+        "patches_mixed": "sys-patch is active, but sigpatch files ({}) are on the SD card too: a known cause of forwarders that could not be started. Set them aside (Console › Game patches), then restart the console.",
+        "refresh": "Make the forwarders again with this loader",
+        "refresh_confirm": "Make these forwarders again with the loader of this PlayGuard? {}. They keep their name, icon and PIN rules.",
+        "refresh_title": "Forwarders made with an older loader",
+        "refresh_detail": "{}: made by an older PlayGuard. Made again, they start their homebrew with this build's loader."
     },
     "hbmenu": {
         "section": "Menu homebrew",
@@ -2010,5 +2019,13 @@
         "change": "Alterar...",
         "remove": "Removê-lo",
         "removed": "Perfil agendado removido."
+    },
+    "sigpatch": {
+        "details": "What was found",
+        "set_aside": "Set the sigpatch files aside",
+        "confirm": "Move the sigpatch files (.ips for es, fs and the loader) to {}? Nothing is deleted: moving them back undoes it. sys-patch then patches alone from the next start; restart the console.",
+        "hekate": "hekate's bootloader/patches.ini stays: if hekate_ipl.ini still has kip1patch=nosigchk, remove that line before you boot with hekate's fss0.",
+        "failed": "The sigpatch files were not all moved: {}",
+        "done": "The sigpatch files are set aside. Restart the console, then try the forwarder again."
     }
 }

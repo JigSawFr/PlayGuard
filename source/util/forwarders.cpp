@@ -40,6 +40,7 @@ nlohmann::json array_of(const std::vector<Made>& all)
         if (m.pin && m.limit) e["limit"] = true;
         if (m.pin && m.carried) e["carried"] = true;
         if (!m.icon.empty()) e["icon"] = m.icon;
+        if (!m.loader.empty()) e["loader"] = m.loader;
         if (!m.icon.empty() && m.icon_x != ICON_X_MIDDLE) e["icon_x"] = m.icon_x;
         list.push_back(e);
     }
@@ -123,6 +124,7 @@ std::vector<Made> from_array(const nlohmann::json& list)
         m.limit = m.pin && json_util::flag_at(e, "limit");
         m.carried = m.pin && json_util::flag_at(e, "carried");
         m.icon = json_util::string_at(e, "icon");
+        m.loader = json_util::string_at(e, "loader");
         const int64_t x = json_util::integer_or(e, "icon_x", ICON_X_MIDDLE);
         m.icon_x = !m.icon.empty() && x >= 0 && x <= 100 ? (int)x : ICON_X_MIDDLE;
         bool seen = false;

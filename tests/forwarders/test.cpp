@@ -225,7 +225,9 @@ static void test_registry()
     b.free_days = 0x3E, b.free_from = 960, b.free_to = 1140;
     b.free2_days = 0x41, b.free2_from = 540, b.free2_to = 1200;
     b.limit = b.carried = true;
+    b.loader = "0123456789abcdef";
     CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.loader == "0123456789abcdef");   // the loader it was built with
     CHECK(forwarders::find(b.id, &found) && found.free_days == 0x3E && found.free2_days == 0x41 &&
           found.free2_from == 540 && found.free2_to == 1200 && found.limit && found.carried);
     b.free_days = 0x41, b.free_from = 540, b.free_to = 1200;
@@ -420,6 +422,7 @@ static void test_lock_check()
     CHECK(!lock_check({ self, menu }, false, Patches::Ready).ready());
     CHECK(!lock_check({ self, menu }, true, Patches::Missing).ready());
     CHECK(lock_check({ self, menu }, true, Patches::Unknown).ready());   // sys-patch there, its log silent
+    CHECK(!lock_check({ self, menu }, true, Patches::Incomplete).ready());   // the menus would not start
     c = lock_check({ menu, game }, true, Patches::Ready);
     CHECK(!c.ready() && !c.self && !c.routes());
     c = lock_check({ self, game }, true, Patches::Ready);
@@ -603,6 +606,15 @@ static void test_gate()
     CHECK(s.free_n == 0 && !s.limit && s.has_pause && s.pause_tries == 0);
 }
 
+static void test_stale_loader()
+{
+    using forwarders_logic::stale_loader;
+    CHECK(!stale_loader("0123456789abcdef", "0123456789abcdef"));
+    CHECK(stale_loader("0123456789abcdef", "fedcba9876543210"));
+    CHECK(stale_loader("", "fedcba9876543210"));   // made before it was kept
+    CHECK(!stale_loader("", "") && !stale_loader("0123456789abcdef", ""));   // unknown here: none
+}
+
 static void test_patches()
 {
     using forwarders_logic::Patches;
@@ -626,10 +638,20 @@ static void test_patches()
     CHECK(patches_state(s) == Patches::Ready);
     s.es = patches::Module::Failed;   // es does not matter to a forwarder
     CHECK(patches_state(s) == Patches::Ready);
+    // sys-patch ran, and left part of what a forwarder needs: incomplete
+    // (an update of sys-patch is the fix), with what is missing said.
     s.ldr = patches::Module::Unpatched;
-    CHECK(patches_state(s) == Patches::Missing);
+    CHECK(patches_state(s) == Patches::Incomplete);
+    CHECK(forwarders_logic::patch_gaps(s) == "ldr");
+    s.ldr = patches::Module::SysPatch;
+    s.fs = patches::Module::Partial;
+    s.gaps = { "fs:nocntchk_19.0.0+=Unpatched", "es:es_22.0.0+=Unpatched" };
+    CHECK(patches_state(s) == Patches::Incomplete);
+    CHECK(forwarders_logic::patch_gaps(s) == "fs:nocntchk_19.0.0+=Unpatched");   // es left out
+    s.gaps.clear();
     s.fs = s.ldr = s.es = patches::Module::Skipped;
     CHECK(patches_state(s) == Patches::Missing);
+    CHECK(forwarders_logic::patch_gaps(s) == "fs, ldr");
 }
 
 static void append(void* ctx, void* data, int size)
@@ -756,5 +778,6 @@ int main()
     test_lock_check();
     test_guard();
     test_patches();
+    test_stale_loader();
     return CHECK_DONE("forwarders tests passed");
 }

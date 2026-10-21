@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 c90afd04af03 -->
+<!-- translated from docs/troubleshooting.md, sha256 2eb3bbe2ddb0 -->
 # Dépannage
 
 Reprendre la main sur une console bloquée, les problèmes courants, signaler un bug, et le mode développeur. Retour au [README](../../README.md).
@@ -80,7 +80,12 @@ Sa porte (`config/playguard/gate-….nro`) n'est plus le fichier avec lequel le 
 
 ### Un forwarder affiche « Le logiciel n'a pas pu être démarré »
 
-La console a refusé de le lancer : une vérification de signature est toujours en place. Les forwarders ont besoin des patchs fs et loader de sys-patch, et chaque motif que sys-patch prévoit pour ce firmware doit avoir été appliqué, pas seulement un par module. *À propos › Aide et diagnostic › Exporter un rapport de diagnostic* indique, sur sa ligne `game patches`, la version de sys-patch et chaque motif non appliqué (par exemple `not patched: fs:nocntchk_19.0.0+=Unpatched`) ; `sd:/config/sys-patch/log.ini` contient la même chose. Mettez sys-patch à jour vers une version qui prend en charge le firmware, redémarrez la console, puis relancez le forwarder : inutile de le refaire.
+La console a refusé de le lancer : une vérification de signature est toujours en place. Dans l'ordre :
+
+- **Des fichiers sigpatches à côté de sys-patch.** Des fichiers `.ips` dans `atmosphere/kip_patches/fs_patches`, `loader_patches` ou `atmosphere/exefs_patches/es_patches` alors que sys-patch tourne : deux outils patchent les mêmes vérifications, la cause que les fils sys-patch et sigpatches de GBAtemp citent le plus. *Console › Patchs de jeux* le signale, et Ⓐ y met ces fichiers de côté (déplacés dans `config/playguard/sigpatches-aside/`, jamais supprimés ; le `bootloader/patches.ini` de hekate reste). Redémarrez la console.
+- **Un motif que sys-patch n'a pas appliqué.** Les forwarders ont besoin de ses patchs fs et loader, de chaque motif qu'il prévoit pour ce firmware (`noncasigchk_17.0.0+`, `nocntchk_19.0.0+`, `noacidsigchk_10.0.0+`), pas seulement d'un par module. *À propos › Aide et diagnostic › Exporter un rapport de diagnostic* indique, sur sa ligne `game patches`, la version de sys-patch et chaque motif non appliqué ; `sd:/config/sys-patch/log.ini` contient la même chose. Vérifiez que `config/sys-patch/config.ini` patche ce système (`patch_emummc=1` sur emuMMC) et n'en désactive aucun ; selon le mainteneur de sys-patch, la 23.0.x ne demande pas de version plus récente que la 1.6.2.3.
+- **Pas de redémarrage depuis le changement de patchs.** sys-patch patche au démarrage.
+- **Un forwarder fait par un PlayGuard plus ancien.** La cloche et *Console › Forwarders* proposent de refaire ceux construits avec un ancien chargeur.
 
 ### La cloche ou un onglet affiche une pastille orange
 

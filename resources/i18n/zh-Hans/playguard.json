@@ -819,7 +819,8 @@
         "upload": "在线发送报告…",
         "upload_note": "将报告发送到你 GitHub 账号中的私密 gist（如需要先登录），并显示其链接和二维码：把它交给帮助你的人，或用它提交错误报告。",
         "storage_note_emummc": "当前为emuMMC：sysMMC有自己的家长控制，PlayGuard在这里无法看到。请在那边也进行设置，或隐藏hekate的启动菜单。",
-        "storage_note_sysmmc": "当前为sysMMC，且此SD卡上设置了emuMMC：它有自己的家长控制，PlayGuard在这里无法看到。请在那边也进行设置，或隐藏hekate的启动菜单。"
+        "storage_note_sysmmc": "当前为sysMMC，且此SD卡上设置了emuMMC：它有自己的家长控制，PlayGuard在这里无法看到。请在那边也进行设置，或隐藏hekate的启动菜单。",
+        "patches_note_mixed": "sys-patch is active, and sigpatch files ({}) are on the SD card too: two tools patching the same checks, a known cause of forwarders that could not be started. Set them aside (A), then restart the console."
     },
     "games": {
         "open": "检查已安装的游戏",
@@ -1143,7 +1144,15 @@
         "week_empty": "最近七天没有尝试任何转发器。",
         "week_note": "本周被拒绝：{}；前一周：{}。",
         "climb_title": "被拒绝的PIN比平时多",
-        "climb_detail": "最近七天门禁拒绝了{}次PIN，前一周为{}次。"
+        "climb_detail": "最近七天门禁拒绝了{}次PIN，前一周为{}次。",
+        "patches_incomplete": "The console starts a forwarder only with signature patches, and sys-patch {} did not apply all of them for this firmware (not patched: {}). Update sys-patch, then restart the console.",
+        "patches_title": "This forwarder would not start yet",
+        "patches_anyway": "Add it anyway (it starts once the patches are in place)",
+        "patches_mixed": "sys-patch is active, but sigpatch files ({}) are on the SD card too: a known cause of forwarders that could not be started. Set them aside (Console › Game patches), then restart the console.",
+        "refresh": "Make the forwarders again with this loader",
+        "refresh_confirm": "Make these forwarders again with the loader of this PlayGuard? {}. They keep their name, icon and PIN rules.",
+        "refresh_title": "Forwarders made with an older loader",
+        "refresh_detail": "{}: made by an older PlayGuard. Made again, they start their homebrew with this build's loader."
     },
     "hbmenu": {
         "section": "自制软件菜单",
@@ -2010,5 +2019,13 @@
         "change": "更改…",
         "remove": "移除",
         "removed": "已移除计划的配置。"
+    },
+    "sigpatch": {
+        "details": "What was found",
+        "set_aside": "Set the sigpatch files aside",
+        "confirm": "Move the sigpatch files (.ips for es, fs and the loader) to {}? Nothing is deleted: moving them back undoes it. sys-patch then patches alone from the next start; restart the console.",
+        "hekate": "hekate's bootloader/patches.ini stays: if hekate_ipl.ini still has kip1patch=nosigchk, remove that line before you boot with hekate's fss0.",
+        "failed": "The sigpatch files were not all moved: {}",
+        "done": "The sigpatch files are set aside. Restart the console, then try the forwarder again."
     }
 }

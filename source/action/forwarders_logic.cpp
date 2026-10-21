@@ -123,8 +123,15 @@ Patches patches_state(const patches::Report& r)
     switch (patches::status(r)) {
         case patches::Status::SysPatch: return Patches::Ready;
         case patches::Status::SysPatchIncomplete:
-            if (patches::issue(r) == patches::Issue::NotPatched)
-                return patches::patched(r.fs) && patches::patched(r.ldr) ? Patches::Ready : Patches::Missing;
+            if (patches::issue(r) == patches::Issue::NotPatched) {
+                if (patches::patched(r.fs) && patches::patched(r.ldr)) return Patches::Ready;
+                // sys-patch ran and patched some of what a forwarder needs, not all.
+                const auto tried = [](patches::Module m) {
+                    return m == patches::Module::Partial || m == patches::Module::Failed ||
+                           m == patches::Module::Unpatched || patches::patched(m);
+                };
+                return tried(r.fs) && tried(r.ldr) ? Patches::Incomplete : Patches::Missing;
+            }
             if (patches::issue(r) == patches::Issue::Skipped || patches::issue(r) == patches::Issue::NotAtBoot)
                 return Patches::Missing;
             return Patches::Unknown;
@@ -173,11 +180,27 @@ std::string hours_text(int days, int from, int to, const std::vector<std::string
     return d + " " + hm(from) + "–" + hm(to);
 }
 
+bool stale_loader(const std::string& made, const std::string& current)
+{
+    return !current.empty() && made != current;
+}
+
+std::string patch_gaps(const patches::Report& r)
+{
+    std::string out;
+    const auto add = [&out](const std::string& g) { out += (out.empty() ? "" : ", ") + g; };
+    for (const std::string& g : r.gaps)
+        if (text::starts_with(g, "fs:") || text::starts_with(g, "ldr:")) add(g);
+    if (r.fs != patches::Module::Partial && !patches::patched(r.fs)) add("fs");
+    if (r.ldr != patches::Module::Partial && !patches::patched(r.ldr)) add("ldr");
+    return out;
+}
+
 LockCheck lock_check(const std::vector<Row>& rows, bool pin_set, Patches patches)
 {
     LockCheck c;
     c.pin = pin_set;
-    c.patches = patches != Patches::Missing;
+    c.patches = patches == Patches::Ready || patches == Patches::Unknown;
     for (const Row& r : rows) {
         if (r.state == State::NotInstalled) continue;
         if (r.self && r.state == State::Ready) c.self = true;

@@ -282,6 +282,10 @@ void ForwardersActivity::fixes()
             choices.push_back({ brls::getStr("playguard/forwarders/fix_protect", r.name),
                                 [this, copy]() { forwarder_flow::set_pin(copy, true, this->then_rebuild(copy.id)); }, "key" });
     }
+    // Built with an older loader: made again, in one go.
+    if (writable && !forwarder_flow::to_refresh().empty())
+        choices.push_back({ "playguard/forwarders/refresh"_i18n, [this]() { forwarder_flow::refresh(this->then_rebuild()); },
+                            "refresh" });
     // Made before they carried their rules: made again, in one go.
     if (writable && !forwarder_flow::to_remake().empty())
         choices.push_back({ "playguard/forwarders/fix_remake"_i18n, [this]() { forwarder_flow::remake(this->then_rebuild()); },
@@ -407,10 +411,9 @@ void ForwardersActivity::show_lock()
 
 void ForwardersActivity::show_patches()
 {
-    const auto state = forwarders_logic::patches_state(ui::patch_report());
-    if (state == forwarders_logic::Patches::Missing) warning->setText("playguard/forwarders/patches_missing"_i18n);
-    if (state == forwarders_logic::Patches::Unknown) warning->setText("playguard/forwarders/patches_unknown"_i18n);
-    ui::set_visible(warning.getView(), state != forwarders_logic::Patches::Ready);
+    const std::string problem = forwarder_flow::patches_problem();
+    if (!problem.empty()) warning->setText(problem);
+    ui::set_visible(warning.getView(), !problem.empty());
 }
 
 void ForwardersActivity::show_self()

@@ -58,6 +58,11 @@ struct Made
     // Its HOME menu icon from a screenshot of the album ("sdmc:/Nintendo/
     // Album/…jpg"), else the .nro's own.
     std::string icon;
+    // The loader it was built with (forwarder_flow::loader_id: 16 hex
+    // digits of its SHA-256); empty for one made before it was kept. One
+    // built with another loader is offered to be made again
+    // (forwarders_logic::stale_loader).
+    std::string loader;
     // Where its square sits along the screenshot: 0 its left edge, 100 its
     // right one (forwarder_icon::from_screenshot).
     int         icon_x = ICON_X_MIDDLE;

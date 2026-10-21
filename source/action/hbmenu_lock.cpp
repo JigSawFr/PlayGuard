@@ -432,6 +432,15 @@ void at_start(std::function<void()> open)
         notices::set("gate_remake", notices::Level::Action, "playguard/forwarders/remake_title"_i18n,
                      brls::getStr("playguard/forwarders/remake_detail", old), "playguard/forwarders/remake"_i18n,
                      []() { forwarder_flow::remake([](bool) {}); });
+    // Built with an older loader than this build's (or before it was kept):
+    // made again from the bell (or Console › Forwarders).
+    std::string stale;
+    for (const auto& r : forwarder_flow::to_refresh()) stale += (stale.empty() ? "" : ", ") + r.name;
+    if (stale.empty()) notices::clear("forwarder_loader");
+    else
+        notices::set("forwarder_loader", notices::Level::Action, "playguard/forwarders/refresh_title"_i18n,
+                     brls::getStr("playguard/forwarders/refresh_detail", stale), "playguard/forwarders/refresh"_i18n,
+                     []() { forwarder_flow::refresh([](bool) {}); });
     if (gone.empty()) notices::clear("forwarder_gone");
     else
         notices::set("forwarder_gone", notices::Level::Info, "playguard/hbmenu/gone"_i18n,
