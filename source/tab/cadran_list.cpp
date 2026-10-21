@@ -153,6 +153,14 @@ void cadran::Card::setFill(NVGcolor color) { this->fill = color; }
 void cadran::Card::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style, brls::FrameContext* ctx)
 {
     if (height < 1) return;   // every row hidden
+    // Its rows hidden, its foot (a note) still shown: the note alone, no card.
+    bool rows = false;
+    for (brls::View* row : this->getChildren())
+        rows |= row->getVisibility() != brls::Visibility::GONE && !dynamic_cast<brls::Label*>(row);
+    if (!rows) {
+        brls::Box::draw(vg, x, y, width, height, style, ctx);
+        return;
+    }
     nvgBeginPath(vg);
     nvgRoundedRect(vg, x + 0.5f, y + 0.5f, width - 1, height - 1, kit::RADIUS_CARD);
     nvgFillColor(vg, this->a(this->fill));
