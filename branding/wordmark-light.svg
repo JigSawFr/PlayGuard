@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="176" viewBox="0 0 360 88">
+  <!-- wordmark.svg in the light theme's inks (navy, the dark teal): the loading
+       screen draws it on the cool white (resources/img/wordmark-light.png). -->
+  <text x="180" y="64" text-anchor="middle" font-family="Sora" font-weight="700" font-size="64" letter-spacing="-1.5" fill="#0B1424">Play<tspan fill="#0A705F">Guard</tspan></text>
+</svg>
