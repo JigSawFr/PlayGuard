@@ -134,6 +134,33 @@ static void test_refused_and_version()
                               R"({"entries": [{"when": "2026-10-08 18:30", "kind": "level", "before": [1], "after": [2]}]})"));
     all = history::load();
     CHECK(all.size() == 1 && all[0].result.empty() && all[0].version.empty() && history::undoable(all[0]));
+    CHECK(!all[0].dev && all[0].commit.empty() && all[0].pr == 0);
+    CHECK(std::remove(paths::history_file().c_str()) == 0);
+}
+
+// A development build says which one it is: its commit and pull request.
+static void test_dev_build()
+{
+    CHECK(paths::atomic_write(paths::history_file(), "{\"entries\": []}"));
+    history::Entry release = limits(60, 90);
+    release.version = "1.3.0";
+    history::Entry dev = limits(90, 120);
+    dev.version = "1.3.0";
+    dev.dev     = true;
+    dev.commit  = "066b7e5";
+    dev.pr      = 306;
+    CHECK(history::append(release) && history::append(dev));
+    auto all = history::load();
+    REQUIRE(all.size() == 2);
+    CHECK(all[0].dev && all[0].commit == "066b7e5" && all[0].pr == 306);
+    CHECK(!all[1].dev && all[1].commit.empty() && all[1].pr == 0);
+    // A release's entry carries none of it.
+    std::string text;
+    CHECK(paths::read_file(paths::history_file(), text));
+    CHECK(text.find("\"dev\":true") != std::string::npos && text.find("\"pr\":306") != std::string::npos);
+    size_t devs = 0;
+    for (size_t at = text.find("\"dev\""); at != std::string::npos; at = text.find("\"dev\"", at + 1)) devs++;
+    CHECK(devs == 1);
     CHECK(std::remove(paths::history_file().c_str()) == 0);
 }
 
@@ -218,6 +245,7 @@ int main()
 
     test_round_trip();
     test_refused_and_version();
+    test_dev_build();
     test_trim_and_damage();
     test_value_ranges();
 

@@ -1654,6 +1654,9 @@
         "failed_title": "拒否：{}",
         "failed_note": "本体がこの変更を拒否しました（{}）。何も変更されていません。",
         "version": "PlayGuard のバージョン",
+        "version_dev": "{}（開発版）",
+        "commit": "コミット",
+        "pr": "プルリクエスト",
         "counting": "カウントダウン中",
         "paused": "一時停止中",
         "filters": {

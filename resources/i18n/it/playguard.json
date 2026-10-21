@@ -1654,6 +1654,9 @@
         "failed_title": "Rifiutato: {}",
         "failed_note": "La console ha rifiutato questa modifica ({}): non è cambiato nulla.",
         "version": "Versione di PlayGuard",
+        "version_dev": "{} (versione di sviluppo)",
+        "commit": "Commit",
+        "pr": "Pull request",
         "counting": "Conto alla rovescia in corso",
         "paused": "In pausa",
         "filters": {

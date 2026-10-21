@@ -1654,6 +1654,9 @@
         "failed_title": "Abgelehnt: {}",
         "failed_note": "Die Konsole hat diese Änderung abgelehnt ({}): Es wurde nichts geändert.",
         "version": "PlayGuard-Version",
+        "version_dev": "{} (Entwicklungsversion)",
+        "commit": "Commit",
+        "pr": "Pull-Request",
         "counting": "Countdown läuft",
         "paused": "Pausiert",
         "filters": {
