@@ -39,19 +39,27 @@ void GameCheckActivity::onContentAvailable()
     note->setSingleLine(false);
     status->setSingleLine(false);
     hint->setSingleLine(false);
-    // A list or covers, as All games.
+    // A list or covers, as All games: Ⓡ, out of the way of the games.
     this->grid = config::get().check_grid;
-    this->view_cell = new brls::DetailCell();
-    this->view_cell->setText("playguard/library/view"_i18n);
-    this->view_cell->setDetailText(view_label(this->grid));
-    this->view_cell->registerClickAction([this](brls::View*) {
+    this->getContentView()->registerAction(view_label(!this->grid), brls::BUTTON_RB, [this](brls::View*) {
         this->switch_view();
         return true;
     });
-    list->addView(this->view_cell);
+#if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
+    // The desktop build: the keyboard has no Ⓡ nor Ⓨ, so the R and Y keys
+    // (smoke test), Y for the game with the focus.
+    this->getContentView()->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_R), [this](brls::View*) {
+        this->switch_view();
+        return true;
+    });
+    this->getContentView()->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Y), [this](brls::View*) {
+        if (const u64 id = this->focused_game()) this->toggle(id);
+        return true;
+    });
+#endif
     // The games picked with Ⓨ: how many, and A for what to do with them.
     this->selection = new brls::DetailCell();
-    this->selection->setMarginTop(10);
+    this->selection->setMarginBottom(6);
     this->selection->setDetailText("playguard/games/actions"_i18n);
     this->selection->registerClickAction([this](brls::View*) {
         this->selection_menu();
@@ -59,7 +67,6 @@ void GameCheckActivity::onContentAvailable()
     });
     list->addView(this->selection);
     ui::set_visible(this->selection, false);
-    cadran::List::row(this->view_cell, "list", true);
     cadran::List::row(this->selection, "check", true);
     // A section per way out, under its title and what to do; each hidden
     // while it has no game.
@@ -136,7 +143,7 @@ void GameCheckActivity::build_group(GameCategory category)
     // other, above the games as the Reinstall actions are.
     if (category == GC_CAT_VERIFY) {
         group.verify_all = new brls::Button();
-        group.verify_all->setGrow(1.0f);
+        group.verify_all->setAlignSelf(brls::AlignSelf::FLEX_START);   // as wide as its text: the covers first
         group.verify_all->setMarginBottom(12);
         group.verify_all->registerClickAction([this, category](brls::View*) {
             this->verify(this->groups[category].games);
@@ -416,11 +423,11 @@ void GameCheckActivity::show()
         }
         ui::set_visible(group.box, !shown.empty());
     }
-    // Above the sections from two games on: what is picked, or how to pick.
+    // Above the sections once a game is picked (Ⓨ, in the footer on each
+    // game): how many, A for what to do with them.
     this->selection->setText(this->selection_text());
-    this->selection->setTextColor(this->selected.empty() ? cadran::kit::color("cadran/text")
-                                                         : brls::Application::getTheme()["brls/list/listItem_value_color"]);
-    ui::set_visible(this->selection, broken.size() >= 2 || !this->selected.empty());
+    this->selection->setTextColor(brls::Application::getTheme()["brls/list/listItem_value_color"]);
+    ui::set_visible(this->selection, !this->selected.empty());
 
     // Nothing had the focus before the first game with a problem; and never
     // the focus left in a section that went (its last game repaired). While
@@ -428,7 +435,7 @@ void GameCheckActivity::show()
     // first game: the games found later go into the sections above and would
     // push the cell it was given below the screen (the scroll does not follow).
     brls::View* focus = brls::Application::getCurrentFocus();
-    bool lost = false;
+    bool lost = focus == status.getView();   // parked there while the games were rebuilt
     for (brls::View* v = focus; v && !lost; v = v->getParent()) lost = v->getVisibility() != brls::Visibility::VISIBLE;
     brls::View* first = this->first_game();
     const bool untouched = this->auto_focus && focus == this->auto_focus;
@@ -439,6 +446,8 @@ void GameCheckActivity::show()
     }
     // The check over (this was its last show): the focus is the user's.
     if (!this->checking) this->auto_focus = nullptr;
+    // Never a stop of its own: only while the games are rebuilt.
+    if (brls::Application::getCurrentFocus() != status.getView()) status->setFocusable(false);
 
     // The line above the list: the check under way, an error, or the result
     // and when it was made.
@@ -459,6 +468,9 @@ void GameCheckActivity::show()
                                                        { truncated, app::dev_mode() ? this->timing : "" }),
                           broken.empty() ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/text3"));
     }
+    // What this screen is for, while there is no game above which it would
+    // push the games down.
+    ui::set_visible(note.getView(), broken.empty());
     hint->setText(brls::getStr("playguard/games/many", ui::storage_short(si)));
     ui::set_visible(hint.getView(), broken.size() >= MANY);
     this->load_icons();
@@ -476,7 +488,7 @@ void GameCheckActivity::show_tiles(Group& group, size_t count)
     if (focus_in) {
         const auto it = std::find(group.tiles.begin(), group.tiles.end(), brls::Application::getCurrentFocus());
         if (it != group.tiles.end()) at = (size_t)(it - group.tiles.begin());
-        brls::Application::giveFocus(this->view_cell);
+        this->park_focus();
     }
     const bool was_auto = focus_in && this->auto_focus;
     group.list->clearViews();
@@ -507,16 +519,25 @@ void GameCheckActivity::show_tiles(Group& group, size_t count)
     }
 }
 
+void GameCheckActivity::set_view_hint()
+{
+    // Its text only: borealis goes through these actions while one runs.
+    this->getContentView()->updateActionHint(brls::BUTTON_RB, view_label(!this->grid));
+    brls::Application::getGlobalHintsUpdateEvent()->fire();
+}
+
 void GameCheckActivity::switch_view()
 {
+    const u64 id = this->focused_game();   // found in the look it has now
     this->grid = !this->grid;
     config::get().check_grid = this->grid;   // the next visit opens on it
     ui::save_config();
-    this->view_cell->setDetailText(view_label(this->grid));
-    // Next frame: the focus is on this cell, out of the sections rebuilt.
+    this->set_view_hint();
+    // Next frame, out of the action under way: every game rebuilt.
     std::weak_ptr<bool> weak = this->alive;
-    brls::sync([this, weak]() {
+    brls::sync([this, weak, id]() {
         if (weak.expired()) return;
+        if (id) this->park_focus();
         this->auto_focus = nullptr;
         for (Group& group : this->groups) {
             if (!group.list) continue;
@@ -526,7 +547,48 @@ void GameCheckActivity::switch_view()
             card_look(group.list, this->grid);
         }
         this->show();
+        // The same game, in the other look.
+        if (brls::View* to = id ? this->game_view(id) : nullptr) {
+            brls::Application::giveFocus(to);
+            this->auto_focus = nullptr;
+        }
     });
+}
+
+void GameCheckActivity::park_focus()
+{
+    status->setFocusable(true);
+    brls::Application::giveFocus(status.getView());
+}
+
+u64 GameCheckActivity::focused_game() const
+{
+    const brls::View* focus = brls::Application::getCurrentFocus();
+    for (const Group& group : this->groups) {
+        if (!group.list) continue;
+        if (this->grid) {
+            for (brls::View* tile : group.tiles)
+                if (tile == focus) return ((IssueTile*)tile)->app_id;
+            continue;
+        }
+        const auto& cells = group.list->getChildren();
+        for (size_t i = 0; i < cells.size() && i < group.games.size(); i++)
+            if (cells[i] == focus) return group.games[i].app_id;
+    }
+    return 0;
+}
+
+brls::View* GameCheckActivity::game_view(u64 id) const
+{
+    for (const Group& group : this->groups) {
+        for (size_t i = 0; i < group.games.size(); i++) {
+            if (group.games[i].app_id != id) continue;
+            if (this->grid) return i < group.tiles.size() ? group.tiles[i] : nullptr;
+            const auto& cells = group.list->getChildren();
+            return i < cells.size() ? cells[i] : nullptr;
+        }
+    }
+    return nullptr;
 }
 
 void GameCheckActivity::load_icons()

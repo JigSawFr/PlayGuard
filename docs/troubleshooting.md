@@ -106,7 +106,7 @@ With the console online, *About › Help & diagnostics › Send a report online*
   - the logs of this run and the one before (`logs/sessions/`; a long one: its start and its last 64 KiB);
   - the debug files: the play-timer block reference, the end of the play-timer recording while *Record the play timer* is on, the last 20 changes of the change history (without names of games, accounts or profiles, and with their date only), and PlayGuard's settings.
 - **Signing in:** signed out, PlayGuard offers to sign in first; *GitHub account*, just below once signed in, signs out; when GitHub refuses the gist, PlayGuard offers to sign in again.
-- **Afterwards:** it shows the link and two QR codes: the report, and the bug-report form with the link, your versions, how PlayGuard was started (over a game or from the Album; add the menu) and the system (sysMMC or emuMMC) already filled in. Each link is kept in `logs/uploads/` as an Internet shortcut (`.url`) that a computer opens in its browser.
+- **Afterwards:** it shows two QR codes, with the link under the first one, its id in groups of four to read out or type: the report, for whoever already helps you, and the bug-report form with the link, your versions, how PlayGuard was started (over a game or from the Album; add the menu) and the system (sysMMC or emuMMC) already filled in, to scan to report a bug. The link also stays in the notifications, and each one is kept in `logs/uploads/` as an Internet shortcut (`.url`) that a computer opens in its browser.
 
 > [!WARNING]
 > Anyone with the link can read the report, until you delete the gist on GitHub, and a bug report opened with it is public: the confirmation says so.

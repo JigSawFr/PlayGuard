@@ -5,6 +5,7 @@
 #include <cerrno>
 #include <cstdio>
 
+#include "core/calendar.h"
 #include "util/text.hpp"
 
 namespace forwarders_logic
@@ -46,6 +47,8 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
             r.limit = m->pin && m->limit;
             r.carried = m->pin && m->carried;
             r.custom_icon = !m->icon.empty();
+            r.icon = m->icon;
+            r.icon_x = m->icon_x;
             r.state = !nro_exists(m->nro)            ? State::NroMissing
                       : m->pin && !nro_exists(m->gate) ? State::GateMissing
                                                        : State::Ready;
@@ -78,6 +81,8 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
         r.limit = m.pin && m.limit;
         r.carried = m.pin && m.carried;
         r.custom_icon = !m.icon.empty();
+        r.icon = m.icon;
+        r.icon_x = m.icon_x;
         r.state = State::NotInstalled;
         rows.push_back(r);
     }
@@ -290,6 +295,64 @@ std::string shot_label(const std::string& path)
     for (size_t i = 0; i < 12; i++)
         if (n[i] < '0' || n[i] > '9') return "";
     return n.substr(0, 4) + "-" + n.substr(4, 2) + "-" + n.substr(6, 2) + " " + n.substr(8, 2) + ":" + n.substr(10, 2);
+}
+
+bool shot_time(const std::string& path, ShotTime& out)
+{
+    const std::string n = path.substr(path.find_last_of('/') + 1);
+    if (n.size() < 14) return false;
+    for (size_t i = 0; i < 14; i++)
+        if (n[i] < '0' || n[i] > '9') return false;
+    auto num = [&n](size_t at, size_t len) { return std::stoi(n.substr(at, len)); };
+    ShotTime t;
+    t.year = num(0, 4);
+    t.month = num(4, 2);
+    t.day = num(6, 2);
+    t.hour = num(8, 2);
+    t.minute = num(10, 2);
+    t.second = num(12, 2);
+    if (t.month < 1 || t.month > 12 || t.day < 1 || t.day > 31 || t.hour > 23 || t.minute > 59 || t.second > 60)
+        return false;
+    out = t;
+    return true;
+}
+
+std::string shot_stamp(const std::string& path)
+{
+    const std::string n = path.substr(path.find_last_of('/') + 1);
+    if (n.size() < 16) return "";
+    for (size_t i = 0; i < 16; i++)
+        if (n[i] < '0' || n[i] > '9') return "";
+    return n.substr(0, 16);
+}
+
+int days_before(const ShotTime& t, int year, int month, int day)
+{
+    return (int)(calendar_days_from_civil(year, (unsigned)month, (unsigned)day) -
+                 calendar_days_from_civil(t.year, (unsigned)t.month, (unsigned)t.day));
+}
+
+std::vector<bool> same_minute(const std::vector<std::string>& paths)
+{
+    std::vector<std::string> minutes;
+    for (const std::string& p : paths) {
+        const std::string n = p.substr(p.find_last_of('/') + 1);
+        ShotTime t;
+        minutes.push_back(shot_time(p, t) ? n.substr(0, 12) : "");
+    }
+    std::vector<bool> out(paths.size(), false);
+    for (size_t i = 0; i < paths.size(); i++)
+        for (size_t j = 0; j < paths.size() && !out[i]; j++)
+            out[i] = j != i && !minutes[i].empty() && minutes[i] == minutes[j];
+    return out;
+}
+
+int icon_x_step(int x, int step)
+{
+    // To the next quarter that way (from between two, the one on that side).
+    x = std::clamp(x, 0, 100);
+    const int quarter = step < 0 ? (x - 1) / 25 : x / 25 + 1;
+    return std::clamp(step < 0 ? (x <= 0 ? 0 : quarter * 25) : quarter * 25, 0, 100);
 }
 
 WriteHint write_hint(int err, uint64_t free_bytes)

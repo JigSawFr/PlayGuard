@@ -18,6 +18,7 @@ namespace forwarders
 
 constexpr size_t MAX_NAME   = 64;   // characters (code points) of a name or an author
 constexpr size_t MAX_AUTHOR = 64;
+constexpr int    ICON_X_MIDDLE = 50;   // an icon from the album: the screenshot's middle square
 
 struct Made
 {
@@ -62,6 +63,9 @@ struct Made
     // built with another loader is offered to be made again
     // (forwarders_logic::stale_loader).
     std::string loader;
+    // Where its square sits along the screenshot: 0 its left edge, 100 its
+    // right one (forwarder_icon::from_screenshot).
+    int         icon_x = ICON_X_MIDDLE;
 };
 
 // Every one remembered, in the file's order. A damaged file reads as none;

@@ -50,6 +50,8 @@ struct Row
     bool        carried = false;   // protected: its rules in it (forwarders::Made::carried)
     uint64_t    paused_until = 0;   // paused after refusals until then (POSIX; 0: not paused), read by forwarder_flow
     bool        custom_icon = false;   // its icon from the album (forwarders::Made::icon)
+    std::string icon;                  // that screenshot, "sdmc:/Nintendo/Album/…"
+    int         icon_x = forwarders::ICON_X_MIDDLE;   // where its square sits (forwarders::Made::icon_x)
 };
 
 // One row per forwarder on the HOME menu and per one remembered that is no
@@ -163,6 +165,27 @@ std::vector<Refusals> repeated_refusals(const std::vector<std::pair<std::string,
 // it is not one).
 std::vector<std::string> newest_shots(std::vector<std::string> paths, size_t max);
 std::string shot_label(const std::string& path);
+
+// A screenshot's time, from its name's first 14 digits; false when it is not
+// one of the album's.
+struct ShotTime
+{
+    int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
+};
+bool shot_time(const std::string& path, ShotTime& out);
+// Its name's first 16 digits (its time, then the number of that second), as
+// caps:a names it (core/album.h's AlbumShot); "" when it is not one.
+std::string shot_stamp(const std::string& path);
+// How many days the day of `t` is before `year`-`month`-`day`: 0 that day,
+// 1 the day before; below 0 after it.
+int days_before(const ShotTime& t, int year, int month, int day);
+// For each of `paths`, whether another of them was taken the same minute:
+// its seconds then tell them apart.
+std::vector<bool> same_minute(const std::vector<std::string>& paths);
+// Where an icon's square goes next along its screenshot (0 its left edge,
+// 100 its right one, by quarters): `step` -1 to the left, 1 to the right;
+// it stays at an edge.
+int icon_x_step(int x, int step);
 
 // Why writing to the SD card failed, from what a test write there said
 // (`err`, an errno; 0 when it worked) and the room left: full, or written

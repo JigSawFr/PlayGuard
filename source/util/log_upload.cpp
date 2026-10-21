@@ -232,6 +232,19 @@ bool parse_gist(const std::string& body, std::string* url)
     });
 }
 
+std::string link_caption(const std::string& url)
+{
+    const std::string link = text::short_url(url);
+    const size_t slash = link.rfind('/');
+    if (slash == std::string::npos || slash + 1 == link.size()) return link;
+    std::string out = link.substr(0, slash + 1) + "\n";
+    for (size_t i = slash + 1; i < link.size(); i += 4) {
+        if (i > slash + 1) out += ' ';
+        out += link.substr(i, 4);
+    }
+    return out;
+}
+
 std::string issue_url(const std::string& repo_url, const std::string& paste_url, const IssueFields& fields)
 {
     // Issue forms take each field's id as a query parameter.

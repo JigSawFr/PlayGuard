@@ -345,12 +345,12 @@ Two confirmations, irreversible; a backup of the settings is saved first.
 
 - **Console and network clocks**, time zone, accuracy. When Atmosphère's DNS redirection (`atmosphere/hosts`) sends Nintendo's time server (`aauth-lp1.ndas.srv.nintendo.net`) elsewhere, the console can no longer set its network clock itself: this screen, the bell's entry and *Today*'s card say so and point to the measurement below.
 - **Pick a public NTP server** (≈ 50 built in, by region, or your own).
-- **Measure** against 3 servers (median; an amber warning when they disagree), then **set the network clock** — a measurement stays usable for 2 minutes, with a countdown. The confirmation says it: changing the clock starts today's play time over, so the whole limit is available again.
+- **Measure** against 3 servers (median; an amber warning when they disagree): a dialog shows the result — how far the network clock is ahead or behind, in large, the servers' time beside the network clock's, each server's answer — and sets the network clock from there. A measurement stays usable for 2 minutes, with a countdown under *Set the network clock*. The confirmation says it: changing the clock starts today's play time over, so the whole limit is available again.
 - **A network-clock check at start-up**: a toast when it is more than a minute off; it never sets the clock.
 
 #### No server answers
 
-On a console without Internet, *Set the network clock to the console clock* appears under the result (and on *Today*'s network clock card, after its measurement fails), behind the same confirmation.
+On a console without Internet, *Use the console clock* is offered in the result's dialog, *Set the network clock to the console clock* under the measurement (and on *Today*'s network clock card, after its measurement fails), behind the same confirmation.
 
 - PlayGuard has nothing else to compare the console clock with: the confirmation shows its time and asks you to check it against a phone or a watch first, and a console clock before 2026 (never set) is refused.
 - With *Synchronize Clock via Internet* off, the console clock stays where it is, and turning the setting on afterwards no longer makes it jump; with it on, the console clock already follows the network clock, so the confirmation says to turn it off and set the time by hand if it is wrong.
@@ -373,13 +373,13 @@ On a console without Internet, *Set the network clock to the console clock* appe
 | **Firmware or SD card** | The game is fine, the console is not |
 
 - **Checking data:** what the data check found is kept with the game until another version is installed: corrupt, it moves to *Reinstall* as *Corrupt (checked)*, with the date and the console's code; intact, it leaves the list. *Check these games* checks the whole of *To check* one game after the other in one dialog (*game 2 of 5*), then says how many are corrupt, intact or could not be checked, with removing the corrupt ones at hand.
-- **Several games at once:** Ⓨ picks games (a check mark in front), and *Several games at once*, above the sections, picks a whole section; then one action for all of them: check their data, or remove them (their list saved first, one question, one PIN).
+- **Several games at once:** Ⓨ picks games (a check mark in front); from the first one picked, a line above the sections says how many, and A on it picks a whole section too, then one action for all of them: check their data, or remove them (their list saved first, one question, one PIN).
 - **Under *Reinstall*,** their list can be saved (JSON and text, in the exports folder: name, title ID, version, problem), and all of them removed at once after one question and one PIN: the list is saved first, then the games are removed so an installer no longer counts them as installed.
 - **The actions:** when one action is the fix, it is the dialog's first button; the others follow: accept the installed version again (when the console asks for a removed update), remove only the update or an add-on, check the data for corruption (the console's own check, with its progress and Cancel), or remove the game.
 - Versions are shown as the game shows them (*version 1.4.0*, *update #4*); after a repair, a toast says whether the game works again. Save data always stays; every change is in the change history.
 - **When it checks:** the last check shows at once; then only the games whose entry changed are checked again (every game once a day, after a firmware update, or with Ⓧ *Check again*), each shown as soon as it is checked.
 - Several broken games at once points to the SD card or to a game installed from the other storage (sysMMC / emuMMC).
-- *View*, above the sections, shows the games as a **list** or as **covers** (icon, name and problem; the choice is kept), as *All games* does.
+- Ⓡ shows the games as a **list** or as **covers** (icon, name and problem; the choice is kept), as *All games* does.
 
 ### Forwarders
 
@@ -400,7 +400,7 @@ On a console without Internet, *Set the network clock to the console clock* appe
   - **Every try is in the change history**: opened with the PIN, opened in its hours, or refused (B on the PIN screen), at the time it happened; the tries of one kind on one day for one forwarder make one entry, with their times. The gate notes them on the SD card; PlayGuard reads them at its next start. *History › Show › Homebrew and forwarders* lists only these, the forwarders and the lock.
   - **Tries this week** (in *History* and under *Homebrew menu*): for the last seven days, each forwarder's openings, its refusals and on which days, and the times it did not open; kept four weeks. When this week's refusals are more than twice the week before's (five at least), the bell says so.
   - **The gate's screen says more:** its hours without the PIN while it asks, and the day's refusals so far (in amber) while it asks and once refused, under *Ask a parent to enter the PIN*. After *Protected by PlayGuard*, an icon for each rule it carries, as its row in PlayGuard: an open padlock (hours without the PIN), a square (hours it never opens), a timer (today's play time).
-- **Its icon from the album** (Ⓐ › *Change the icon*): a screenshot of the album (the newest 30, by date), its middle square made the HOME menu's 256 × 256 JPEG; or the `.nro`'s own again. Installing again keeps it.
+- **Its icon from the album** (Ⓐ › *Change the icon*): the album's newest 30 screenshots as a grid of the icons they would make, the `.nro`'s own first and the one in use checked; beside it, the icon the HOME menu shows now and the one it will show, the game the screenshot was taken in and when (*Today*, *Yesterday*, to the second when two were taken the same minute). L and R move the icon's square along the screenshot (five places, from its left edge to its right one), Y takes the `.nro`'s own back, A the one in focus: it becomes the HOME menu's 256 × 256 JPEG. Installing again keeps it, its square too.
 - **Icons and languages:** an icon of another size, a PNG, or a JPEG with EXIF data or progressive coding (the HOME menu shows those as a “?”) is made a plain 256 × 256 JPEG. The forwarder's control data lists American English alone, the language of its one icon: so the icon shows on a console set to any language.
 - **Protect every forwarder with the PIN** and **Install them all again** (a new `.nro`'s icon and version, the gate as this PlayGuard carries it, one deleted from the HOME menu put back): in one press each.
 - **Lock the homebrew menu** (*Homebrew menu*, last on the screen): neither the album nor a game started while R is held opens the homebrew menu any more, so a homebrew starts only from its forwarder, which can ask for the PIN.

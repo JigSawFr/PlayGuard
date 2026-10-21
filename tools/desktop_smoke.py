@@ -1159,8 +1159,8 @@ if ERRORS:
     key("Down", 4)             # past Region, Server, Enter a server name: Measure
     key("Return")
     time.sleep(1)
-    key("Down")                # Set the network clock to the console clock
-    shot("06_clock_offline")   # "No server answered", then the console clock offered
+    shot("06_clock_offline")   # the result's dialog: "No server answered", the console clock offered
+    key("Right")               # Use the console clock
     key("Return")
     shot("07_clock_copy_confirm")
     key("Right")               # Set the clock
@@ -1496,13 +1496,30 @@ if HOMEBREW:
     key("Return")
     go_to("Change the icon")
     key("Return")
-    shot("04_icon")            # its .nro's own, then the album's screenshots, the newest first
-    key("Down")                # 2026-10-20 18:30
+    time.sleep(2)              # the screenshots read and drawn
+    shot("04_icon")            # a grid: its .nro's own (checked, in focus), the album's screenshots newest first; now and after
+    key("Right", 2)            # today 09:12:00, Star Kart Racers (another the same minute: its seconds)
+    time.sleep(1)
+    key("e")                   # the keyboard's R: its square a quarter to the right
+    time.sleep(1)
+    shot("04_icon_moved")      # the cell and the "after" moved along the screenshot
     key("Return")
     time.sleep(3)
-    icons = [e.get("icon") for e in json.load(open(made_file)).get("forwarders", []) if e.get("name") == "Star Atlas"]
-    if icons != ["sdmc:/Nintendo/Album/2026/10/20/2026102018300000-57B4628D2267231D57E0FC1078C0596D.jpg"]:
-        fail("Star Atlas's icon from the album was not kept: " + repr(icons))
+    made = [e for e in json.load(open(made_file)).get("forwarders", []) if e.get("name") == "Star Atlas"]
+    today = time.strftime("%Y/%m/%d/%Y%m%d", time.gmtime(int(env["PLAYGUARD_SIM_NOW"])))
+    if [(e.get("icon"), e.get("icon_x")) for e in made] != [
+            ("sdmc:/Nintendo/Album/" + today + "09120000-57B4628D2267231D57E0FC1078C0596D.jpg", 75)]:
+        fail("Star Atlas's icon from the album was not kept, its square moved: " + repr(made))
+    key("Return")              # Star Atlas's sheet again
+    go_to("Change the icon")
+    key("Return")
+    time.sleep(2)
+    shot("04_icon_in_use")     # the screenshot in use checked, in focus, its square where it was left
+    key("y")                   # the keyboard's Y: its .nro's own again
+    time.sleep(3)
+    made = [e for e in json.load(open(made_file)).get("forwarders", []) if e.get("name") == "Star Atlas"]
+    if [e.get("icon") for e in made] != [None]:
+        fail("Star Atlas's own icon was not put back: " + repr(made))
     key("Down", 9)             # Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock, Protect every forwarder, Pause after refused PINs, Tries this week, Check
     key("Return")
     key("Left")                # Rescue sheet
@@ -2176,16 +2193,15 @@ key("Escape")
 key("Return")
 time.sleep(0.6)
 shot("27_games_cached")
-# The same games as covers, then back to the list.
-key("Up", 7)               # Display, above the sections
-key("Return")
+# The same games as covers, then back to the list (Ⓡ: the R key), the
+# focus kept on the first game.
+key("r")
 time.sleep(0.6)
 shot("27_games_grid")      # covers with their problem, by section
-key("Return")
+key("r")
 time.sleep(0.6)
 # Robot Factory (the first game): only its update needs a newer firmware;
 # removing the update (the fix, the first button) makes it work again.
-key("Down", 2)             # past Several games at once
 key("Return")
 shot("27_games_update")    # Remove the update (version 2.1.0)
 key("Return")              # the fix
@@ -2197,8 +2213,7 @@ if not any(m.endswith("works again.") and m.startswith("Robot Factory") for m in
     fail("the update removal did not fix the game: " + repr(messages()[-3:]))
 # Moon Racer: the console asks for a removed update; accepting the installed
 # version again (the fix, no question) makes it work again.
-key("Up", 7)               # Display, above the sections
-key("Down", 2)             # past Several games at once: the first game
+key("Up", 7)               # the first game, at the top
 key("Return")
 shot("27_games_launch")
 key("Return")              # Accept the installed version again
@@ -2207,8 +2222,8 @@ if not any(m.endswith("works again.") and m.startswith("Moon Racer") for m in me
     fail("the launch version reset did not fix the game: " + repr(messages()[-3:]))
 # Forest Tales: the console found corrupt data; its check runs in a dialog
 # with its progress and Cancel, here cancelled.
-key("Up", 7)
-key("Down", 3)             # past Several games at once, Check these 2 games: the first game of To check
+key("Up", 7)               # Check these 2 games, at the top
+key("Down")                # the first game of To check
 key("Return")              # icon, why, what to do
 shot("27_games_details")   # Check the data (the fix, focused), Other actions
 key("Return")              # Check the data (the fix)
@@ -2216,15 +2231,16 @@ key("Escape")              # B: cancel, well before its 4 s end
 time.sleep(1)
 if not any(m == "Check cancelled." for m in messages()):
     fail("the check was not cancelled: " + repr(messages()[-3:]))
-# Both games of To check picked at once (the keyboard has no Y), then their
-# data checked one after the other: Forest Tales corrupt, the unnamed game
-# intact; both kept as such, out of To check.
-key("Up", 7)               # Display, above the sections
-key("Down")                # Several games at once
-key("Return")
-shot("27_games_select_menu")   # Select all of: To check (2), Reinstall (4), Firmware or SD card (1)
-key("Return")
-shot("27_games_selected")  # 2 games selected, their check marks
+# Both games of To check picked (Ⓨ: the Y key), then their data checked
+# one after the other: Forest Tales corrupt, the unnamed game intact; both
+# kept as such, out of To check.
+key("Up", 7)               # Check these 2 games, at the top
+key("Down")                # Forest Tales
+key("y")
+key("Down")                # the unnamed game
+key("y")
+shot("27_games_selected")  # 2 games selected, their check marks, the line above the sections
+key("Up", 7)               # 2 games selected, at the top
 key("Return")
 shot("27_games_selection_menu")   # Check their data (2), Remove these games (2), …
 key("Return")              # Check their data
@@ -2239,8 +2255,7 @@ with open(games_cache, "rb") as f:
     if f.read(8)[4:8] != (2).to_bytes(4, "little"):
         fail("the games cache is not the version that keeps what the check found")
 # The two games picked, removed at once (their list saved first).
-key("Up", 7)
-key("Down")                # 2 games selected
+key("Up", 7)               # 2 games selected, at the top
 key("Return")
 key("Down")                # Remove these games (2)
 key("Return")
@@ -2251,8 +2266,8 @@ time.sleep(2)
 if not any(m.startswith("2 games removed.") for m in messages()):
     fail("the games picked were not removed: " + repr(messages()[-3:]))
 # To reinstall: Garden Defenders (an update without its game), removed.
-key("Up", 7)               # Display, above the sections
-key("Down", 4)             # past Several games at once, Reinstall's buttons: Hedgehog Rush
+key("Up", 7)               # Reinstall's buttons, at the top
+key("Down", 2)             # Hedgehog Rush
 shot("27_games_reinstall")
 key("Return")
 shot("27_games_actions")   # Remove the game (the fix), Other actions

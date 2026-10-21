@@ -15,7 +15,7 @@ Chaque étape : ce qu'il faut faire, puis ce qui doit se passer. ☐ est à coch
 - ☐ *Un autre homebrew › sphaira* : l'aperçu montre l'icône et le nom de sphaira ; une fois ajouté, le menu HOME a la même icône et le même nom, et il lance sphaira.
 - ☐ Un homebrew dont le `.nro` a une icône PNG, ou d'une autre taille : son icône sur le menu HOME (pas un « ? »).
 - ☐ La console dans une autre langue (Paramètres de la console › Console › Langue) : les icônes restent.
-- ☐ *Changer l'icône* sur l'un d'eux, une capture de l'album : le menu HOME montre le carré central de la capture.
+- ☐ *Changer l'icône* sur l'un d'eux : la grille montre aussitôt les captures de l'album, leurs vignettes arrivant au fur et à mesure, chacune avec le jeu où elle a été prise (caps:a ; *Prise hors d'un jeu* pour celles du menu HOME). Une capture déplacée avec R, puis A : le menu HOME montre le carré qu'affichait *Après*.
 - ☐ *Supprimer*, puis ZR dans les 8 secondes : de retour sur le menu HOME, avec la même icône.
 - ☐ Ⓐ sur un forwarder : la fiche par-dessus la liste, son icône et son état en haut, ses sections ; un toucher sur l'écran en dehors la ferme, comme B. Une longue liste (*Pause après des codes PIN refusés*, la limite d'un jour dans *Temps de jeu*) défile au stick et au doigt, la valeur réglée cochée.
 - ☐ *Détails* sur un forwarder protégé : une ligne par règle avec son icône ; Ⓐ sur *Horaires sans code PIN* ouvre ses horaires, sur *Éditeur* son clavier.
