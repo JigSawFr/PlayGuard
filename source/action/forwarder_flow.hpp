@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "action/forwarders_logic.hpp"
+#include "core/gate.h"
 
 namespace forwarder_flow
 {
@@ -78,6 +79,32 @@ void reinstall_all(std::function<void(bool)> done);
 // PIN asked first; in the change history.
 void set_hours(const forwarders_logic::Row& row, int days, int from, int to, std::function<void(bool)> done,
                bool ask = true);
+// Hours when it never opens, the PIN or not (GATE_CLOSED_NAME); as
+// set_hours.
+void set_closed(const forwarders_logic::Row& row, int days, int from, int to, std::function<void(bool)> done,
+                bool ask = true);
+
+// The pause after refused PINs (GATE_PAUSE_NAME), for every protected
+// forwarder: its rule, set with the PIN (`tries` 0: never); "5 tries in a
+// row: 15 min" or "Never"; a forwarder's pause lifted (the PIN first).
+GatePauseRule pause_rule();
+void set_pause_rule(unsigned tries, unsigned minutes, std::function<void(bool)> done);
+std::string pause_label(unsigned tries, unsigned minutes);
+// When a pause ends: "21:30" today, else with its day.
+std::string until_label(uint64_t posix);
+void lift_pause(const forwarders_logic::Row& row, std::function<void(bool)> done);
+
+// Its HOME menu icon from a screenshot (`shot`, "sdmc:/Nintendo/Album/…"),
+// or its .nro's again (""): made again, the same program ID.
+void set_icon(const forwarders_logic::Row& row, const std::string& shot, std::function<void(bool)> done);
+// Of `made` (a settings backup's), those not on the HOME menu now; and
+// those installed again, as they were (protected, their hours, their icon).
+std::vector<forwarders::Made> missing_from(const std::vector<forwarders::Made>& made);
+void put_back_all(const std::vector<forwarders::Made>& made, std::function<void(bool)> done);
+
+// The album's screenshots, the newest first (30 at most), as "sdmc:/…".
+std::vector<std::string> album_shots();
+
 // "Sat–Sun 09:00–20:00", in the UI's language.
 std::string hours_label(int days, int from, int to);
 

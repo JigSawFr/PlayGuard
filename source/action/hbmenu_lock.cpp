@@ -25,6 +25,7 @@
 #include "util/diagnostics.hpp"
 #include "util/forwarders.hpp"
 #include "util/paths.hpp"
+#include "util/rescue_page.hpp"
 #include "view/qr_view.hpp"
 #include "util/pctl_ops_c.hpp"
 
@@ -283,9 +284,40 @@ brls::Box* rescue_step(const char* number, const std::string& title, const std::
     return row;
 }
 
-// The rescue sheet; `locked`: just locked, said in its title.
+constexpr const char* RESCUE_PAGE_NAME = "rescue.html";
+std::string help_url()
+{
+    return std::string(app::repo_url()) + "/blob/main/docs/troubleshooting.md#homebrew-menu-locked";
+}
+
+// The rescue sheet as a page to print, in the data directory; false when it
+// could not be written.
+bool write_rescue_page()
+{
+    rescue_page::Text t;
+    t.lang = brls::Application::getLocale();
+    t.title = "playguard/hbmenu/rescue"_i18n;
+    t.subtitle = "playguard/hbmenu/rescue_sub"_i18n;
+    t.pc_title = "playguard/hbmenu/rescue_pc_title"_i18n;
+    t.pc_text = brls::getStr("playguard/hbmenu/rescue_pc", HBL_LOCK_CONFIG_PATH);
+    t.mod_title = "playguard/hbmenu/rescue_mod_title"_i18n;
+    t.mod_text = rescue::installed() ? brls::getStr("playguard/hbmenu/rescue_mod", RESCUE_REQUEST_NAME)
+                                     : "playguard/hbmenu/rescue_mod_none"_i18n;
+    t.qr_caption = "playguard/hbmenu/rescue_qr"_i18n;
+    t.footer = brls::getStr("playguard/hbmenu/rescue_written", ui::now_stamp());
+    std::string err;
+    if (paths::ensure_dir(paths::data_dir()) &&
+        paths::atomic_write(in_data(RESCUE_PAGE_NAME), rescue_page::html(t, help_url()), &err))
+        return true;
+    brls::Logger::warning("hbmenu lock: {} not written: {}", RESCUE_PAGE_NAME, err);
+    return false;
+}
+
+// The rescue sheet; `locked`: just locked, said in its title. Its page to
+// print written again (the language, the module, as they are now).
 void rescue_sheet(bool locked)
 {
+    const bool page = write_rescue_page();
     namespace kit = cadran::kit;
     auto* body = new brls::Box(brls::Axis::COLUMN);
     body->setAlignItems(brls::AlignItems::STRETCH);
@@ -328,7 +360,7 @@ void rescue_sheet(bool locked)
     side->setAlignItems(brls::AlignItems::CENTER);
     side->setMarginLeft(20);
     side->setShrink(0);
-    auto* qr = new QrView(std::string(app::repo_url()) + "/blob/main/docs/troubleshooting.md#homebrew-menu-locked", 168);
+    auto* qr = new QrView(help_url(), 168);
     side->addView(qr);
     brls::Label* caption = kit::label("playguard/hbmenu/rescue_qr"_i18n, 13.5f, "cadran/text3");
     caption->setHorizontalAlign(brls::HorizontalAlign::CENTER);
@@ -337,6 +369,18 @@ void rescue_sheet(bool locked)
     side->addView(caption);
     main->addView(side);
     body->addView(main);
+    // A copy to print, on the SD card.
+    if (page) {
+        auto* foot = new brls::Box(brls::Axis::ROW);
+        foot->setAlignItems(brls::AlignItems::CENTER);
+        foot->setMarginTop(14);
+        CadranIcon* icon = kit::icon("file", 16, "cadran/text3");
+        icon->setMarginRight(10);
+        foot->addView(icon);
+        foot->addView(kit::label(brls::getStr("playguard/hbmenu/rescue_print", "config/playguard/" + std::string(RESCUE_PAGE_NAME)),
+                                 15, "cadran/text3"));
+        body->addView(foot);
+    }
 
     auto* dialog = ui::box_dialog(body);
     dialog->addButton("hints/ok"_i18n, []() {});
@@ -576,6 +620,16 @@ void at_start(std::function<void()> open)
         }
         history_flow::record_event("forwarder_gone", "", r.name + " (" + forwarders::hex_id(r.id) + ")");
     }
+    // Paused after refused PINs, until a time still to come.
+    std::string paused;
+    for (const auto& r : rows)
+        if (r.paused_until)
+            paused += (paused.empty() ? "" : "\n") +
+                      brls::getStr("playguard/forwarders/paused_line", r.name, forwarder_flow::until_label(r.paused_until));
+    if (paused.empty()) notices::clear("gate_paused");
+    else
+        notices::set("gate_paused", notices::Level::Info, "playguard/forwarders/paused_title"_i18n, paused,
+                     "playguard/hbmenu/open"_i18n, open);
     if (gone.empty()) notices::clear("forwarder_gone");
     else
         notices::set("forwarder_gone", notices::Level::Info, "playguard/hbmenu/gone"_i18n,

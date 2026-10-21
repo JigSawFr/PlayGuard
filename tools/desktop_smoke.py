@@ -96,12 +96,18 @@ the checklist, the rescue sheet after it; deleting sphaira refused while
 locked; then unlocked: override_config.ini, the state file and the change
 history must follow.
 
+The "homebrew" scenario starts with Console › Forwarders in use
+(PLAYGUARD_SIM_FORWARDERS) and sphaira paused by its gate: the pause lifted,
+hours sphaira never opens, the pause's rule, Star Atlas's icon from the
+album, the rescue sheet's page to print; the gate's files, forwarders.json
+and the change history must follow.
+
 The "loading" scenario stops the start-up on the loading screen
 (PLAYGUARD_SIM_HOLD_LOADING), at its last step, for its screenshot. Every
 other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
-Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge|bedtime|forwarders|hbmenu]   (needs DISPLAY, xdotool, ImageMagick)
+Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge|bedtime|forwarders|hbmenu|homebrew]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
@@ -141,6 +147,7 @@ CADRANLARGE = SCENARIO == "cadranlarge"
 BEDTIME = SCENARIO == "bedtime"
 FORWARDERS = SCENARIO == "forwarders"
 HBMENU = SCENARIO == "hbmenu"
+HOMEBREW = SCENARIO == "homebrew"
 os.makedirs(OUT, exist_ok=True)
 run_dir = os.path.join(OUT, "run")
 os.makedirs(run_dir, exist_ok=True)
@@ -385,7 +392,7 @@ if BEDTIME:
     # 20:00 (above), an hour before the simulated bedtime (21:00 every day),
     # with 90 minutes left: the bedtime stops play first.
     env.setdefault("PLAYGUARD_SIM_LEFT_MIN", "90")
-if FORWARDERS or HBMENU:
+if FORWARDERS or HBMENU or HOMEBREW:
     # Nothing made in an earlier local run: the simulated HOME menu starts
     # with the one another app made (PLAYGUARD_SIM_KEEP is off), PlayGuard's
     # file with none, the made-up .nro files written again.
@@ -416,6 +423,20 @@ if HBMENU:
         d = os.path.join(run_dir, "playguard_data", "sd", "atmosphere", "kip_patches", kind)
         os.makedirs(d, exist_ok=True)
         open(os.path.join(d, "0000000000000000.ips"), "wb").write(b"PATCHEOF")
+data_dir = os.path.join(run_dir, "playguard_data")
+if HOMEBREW:
+    # Console › Forwarders in use (PLAYGUARD_SIM_FORWARDERS: PlayGuard's,
+    # sphaira protected, Star Atlas without the PIN, two screenshots), the
+    # gate's files from no earlier run, sphaira paused for an hour by its gate.
+    env["PLAYGUARD_SIM_FORWARDERS"] = "1"
+    for f in ("gate_rules.txt", "gate_closed.txt", "rescue.html", "hbmenu_lock.txt"):
+        if os.path.exists(os.path.join(data_dir, f)):
+            os.remove(os.path.join(data_dir, f))
+    if os.path.exists(sd_override):
+        os.remove(sd_override)
+    os.makedirs(data_dir, exist_ok=True)
+    open(os.path.join(data_dir, "gate_pause.txt"), "w").write(
+        "0\t%d\tsdmc:/switch/sphaira/sphaira.nro\n" % (int(time.time()) + 3600))
 if LIBRARY:
     # A large library: All games builds its first covers, then the rest on
     # "Show every game".
@@ -1190,7 +1211,7 @@ if FORWARDERS:
         fail("the protection is not in the change history: " + repr(recorded("protect_forwarder")))
     shot("12_protected")       # Star Atlas: On the HOME menu · PIN, the focus on it
     key("Return")
-    key("Down", 6)             # Delete (after Hours without the PIN, Install again)
+    key("Down", 8)             # Delete (after Hours without the PIN, Hours it never opens, Change the icon, Install again)
     key("Return")
     key("Right")               # Delete, in the confirmation
     key("Return")
@@ -1310,6 +1331,8 @@ if HBMENU:
     time.sleep(3)
     shot("04_rescue")          # the rescue sheet: a computer, the rescue module, the help's QR code
     key("Return")              # OK
+    if "<svg" not in open(os.path.join(run_dir, "playguard_data", "rescue.html")).read():
+        fail("the rescue sheet's page to print was not written")
     if sorted(pinned()) != ["Star Atlas", "sphaira"]:
         fail("Star Atlas was not protected on the way to the lock: " + repr(pinned()))
     if pinned("verified") != ["sphaira"]:
@@ -1319,13 +1342,13 @@ if HBMENU:
         fail("override_config.ini is not locked: " + repr(text))
     if not os.path.exists(hbmenu_state) or len(recorded("lock_hbmenu")) != 1:
         fail("the lock's state file or its history entry is missing")
-    key("Down", 2)             # Protect every forwarder, Check the homebrew menu
+    key("Down", 3)             # Protect every forwarder, Pause after refused PINs, Check the homebrew menu
     key("Return")
     shot("05_check")           # the album and R closed, the ways back, the module
     key("Return")              # OK
-    key("Up", 8)               # Protect every forwarder, Lock, Install them all again, Another homebrew, PlayGuard's line, Save Keeper, Star Atlas, sphaira
+    key("Up", 9)               # Pause after refused PINs, Protect every forwarder, Lock, Install them all again, Another homebrew, PlayGuard's line, Save Keeper, Star Atlas, sphaira
     key("Return")
-    key("Down", 6)             # Delete
+    key("Down", 8)             # Delete (after Hours it never opens, Change the icon, Install again)
     key("Return")              # refused: the last way back through a menu
     shot("06_guard")
     key("Return")              # OK
@@ -1340,6 +1363,75 @@ if HBMENU:
     if os.path.exists(hbmenu_state) or len(recorded("unlock_hbmenu")) != 1:
         fail("the state file stayed, or the unlock is not in the history")
     shot("07_unlocked")
+    finish()
+if HOMEBREW:
+    # A pause lifted, hours it never opens, the pause's rule, an icon from the
+    # album, the rescue sheet's page to print: each in the gate's files,
+    # forwarders.json and the change history.
+    made_file = os.path.join(nand_dir, "forwarders.json")
+    history_file = os.path.join(nand_dir, "history.json")
+    def recorded(kind):
+        try:
+            return [e for e in json.load(open(history_file)).get("entries", []) if e.get("kind") == kind]
+        except (OSError, ValueError):
+            return []
+    def data(name):
+        try:
+            return open(os.path.join(data_dir, name)).read()
+        except OSError:
+            return ""
+    key("Down", steps("dashboard", "console"))
+    key("Right")               # Network clock
+    key("Down", 2)             # Forwarders, under Homebrew
+    key("Return")
+    shot("01_in_use")          # the card, the groups, the badges, sphaira paused
+    key("Down")                # sphaira
+    key("Return")
+    shot("02_actions")         # … Hours without the PIN, Hours it never opens, Lift the pause, Change the icon …
+    key("Down", 6)             # Lift the pause
+    key("Return")
+    time.sleep(3)
+    if "sphaira" in data("gate_pause.txt") or len(recorded("gate_pause_lifted")) != 1:
+        fail("sphaira's pause was not lifted: " + repr(data("gate_pause.txt")))
+    key("Return")              # sphaira's actions again
+    key("Down", 5)             # Hours it never opens
+    key("Return")
+    key("Down")                # every day
+    key("Return")
+    key("Return")              # from 21:00
+    key("Return")              # until 07:00
+    time.sleep(3)
+    if data("gate_closed.txt") != "7f\t1260\t420\tsdmc:/switch/sphaira/sphaira.nro\n" or len(recorded("gate_closed_hours")) != 1:
+        fail("sphaira's closed hours were not written: " + repr(data("gate_closed.txt")))
+    key("Down", 8)             # Star Atlas, Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock, Protect every forwarder, Pause after refused PINs
+    key("Return")
+    shot("03_pause")           # never, 3 tries, 5 tries (the default), 5 tries for an hour, 10 tries
+    key("Down")                # 5 tries in a row: 1 h
+    key("Return")
+    time.sleep(3)
+    if not data("gate_pause.txt").startswith("rule\t5\t60\n") or len(recorded("gate_pause")) != 1:
+        fail("the pause's rule was not written: " + repr(data("gate_pause.txt")))
+    key("Up", 7)               # Protect every forwarder, Lock, Install them all again, Another homebrew, PlayGuard's line, Save Keeper, Star Atlas
+    key("Return")
+    key("Down", 4)             # Change the icon (after Protect with the PIN)
+    key("Return")
+    shot("04_icon")            # its .nro's own, then the album's screenshots, the newest first
+    key("Down")                # 2026-10-20 18:30
+    key("Return")
+    time.sleep(3)
+    icons = [e.get("icon") for e in json.load(open(made_file)).get("forwarders", []) if e.get("name") == "Star Atlas"]
+    if icons != ["sdmc:/Nintendo/Album/2026/10/20/2026102018300000-57B4628D2267231D57E0FC1078C0596D.jpg"]:
+        fail("Star Atlas's icon from the album was not kept: " + repr(icons))
+    key("Down", 8)             # Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock, Protect every forwarder, Pause after refused PINs, Check
+    key("Return")
+    key("Left")                # Rescue sheet
+    key("Return")
+    time.sleep(2)
+    shot("05_rescue")          # the sheet, its page to print on the SD card
+    page = data("rescue.html")
+    if "<svg" not in page or "override_config.ini" not in page:
+        fail("the rescue sheet's page was not written: " + repr(page[:200]))
+    key("Return")              # OK
     finish()
 if LIBRARY:
     def listed():

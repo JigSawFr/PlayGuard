@@ -229,6 +229,25 @@ static void test_registry()
     b.free_days = 0;
     CHECK(forwarders::save(b));
 
+    // Hours it never opens: kept while protected; an icon from the album kept.
+    b.pin = true;
+    b.gate = "sdmc:/config/playguard/gate.nro";
+    b.closed_days = 0x7F;
+    b.closed_from = 1260;
+    b.closed_to = 420;
+    b.icon = "sdmc:/Nintendo/Album/2026/10/20/2026102018300000-0.jpg";
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.closed_days == 0x7F && found.closed_from == 1260 &&
+          found.closed_to == 420 && found.icon == b.icon);
+    CHECK(forwarders::parse_list(forwarders::list_text(forwarders::list())).size() == forwarders::list().size());
+    CHECK(forwarders::parse_list("{not json").empty() && forwarders::parse_list("{}").empty());
+    b.closed_days = 0;
+    b.icon.clear();
+    b.pin = false;
+    b.gate.clear();
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.closed_days == 0 && found.icon.empty());
+
     // Seen working through the gate: kept while protected.
     b.pin = true;
     b.gate = "sdmc:/config/playguard/gate.nro";
@@ -475,6 +494,13 @@ static void test_guard()
     CHECK(repeated_refusals(refused, 1).size() == 2);
     CHECK(repeated_refusals({}).empty());
 
+    // The album: its JPEGs, the newest first, their time from their name.
+    const auto shots = newest_shots({ "/a/2026101917050000-X.jpg", "/a/2026102018300000-X.jpg", "/a/2026102018300000-X.mp4",
+                                      "/a/notes.txt", "/b/2026102009000000-Y.JPG" }, 2);
+    CHECK(shots.size() == 2 && shots[0] == "/a/2026102018300000-X.jpg" && shots[1] == "/b/2026102009000000-Y.JPG");
+    CHECK(shot_label("sdmc:/Nintendo/Album/2026/10/20/2026102018300000-57B4.jpg") == "2026-10-20 18:30");
+    CHECK(shot_label("sdmc:/x/holiday.jpg").empty());
+
     // Why a write failed.
     CHECK(write_hint(ENOSPC, 1u << 30) == WriteHint::Full);
     CHECK(write_hint(0, 1000) == WriteHint::Full);
@@ -572,6 +598,21 @@ static void test_icon()
     const std::vector<uint8_t> made = forwarder_icon::normalize(png);
     CHECK(nro::icon_usable(made));
     CHECK(colour_near(made, 40, 128, 220, 30, 30) && colour_near(made, 216, 128, 255, 255, 255));
+
+    // A screenshot (here 160 x 90): its middle square, the sides left out.
+    std::vector<uint8_t> shot(160 * 90 * 3);
+    for (int y = 0; y < 90; y++)
+        for (int x = 0; x < 160; x++) {
+            uint8_t* p = &shot[((size_t)y * 160 + x) * 3];
+            const bool middle = x >= 35 && x < 125;
+            p[0] = middle ? 30 : 220, p[1] = middle ? 180 : 30, p[2] = 30;
+        }
+    std::vector<uint8_t> shot_jpg;
+    REQUIRE(stbi_write_jpg_to_func(append, &shot_jpg, 160, 90, 3, shot.data(), 95));
+    const std::vector<uint8_t> cropped = forwarder_icon::from_screenshot(shot_jpg);
+    CHECK(nro::icon_usable(cropped));
+    CHECK(colour_near(cropped, 8, 128, 30, 180, 30) && colour_near(cropped, 248, 128, 30, 180, 30));
+    CHECK(forwarder_icon::from_screenshot({ 1, 2, 3 }).empty());
 
     // A JPEG of another size, shrunk: 512 x 300 of blue.
     std::vector<uint8_t> blue(512 * 300 * 3);

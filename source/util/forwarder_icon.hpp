@@ -22,6 +22,10 @@ std::vector<uint8_t> normalize(const std::vector<uint8_t>& image);
 // up; transparency over white), as a JPEG. Empty when it cannot be written.
 std::vector<uint8_t> jpeg_from_rgba(const uint8_t* rgba, int w, int h);
 
+// A screenshot (1280 x 720, any size) as an icon: its middle square,
+// scaled to 256 x 256, as a JPEG. Empty when it cannot be decoded.
+std::vector<uint8_t> from_screenshot(const std::vector<uint8_t>& image);
+
 // The icon of a homebrew that has none: `png` (an emoji of img/emoji/)
 // drawn large in the middle of a pale square. Empty when `png` cannot be
 // decoded.

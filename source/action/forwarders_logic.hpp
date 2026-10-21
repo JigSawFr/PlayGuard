@@ -44,6 +44,9 @@ struct Row
     bool        gone_seen = false;   // NotInstalled, and already told (forwarders::Made::gone)
     bool        verified = false;    // protected, and started through the gate once (forwarders::Made::verified)
     int         free_days = 0, free_from = 0, free_to = 0;   // protected: when the PIN is not asked
+    int         closed_days = 0, closed_from = 0, closed_to = 0;   // protected: when it never opens
+    uint64_t    paused_until = 0;   // paused after refusals until then (POSIX; 0: not paused), read by forwarder_flow
+    bool        custom_icon = false;   // its icon from the album (forwarders::Made::icon)
 };
 
 // One row per forwarder on the HOME menu and per one remembered that is no
@@ -139,6 +142,13 @@ struct Refusals
     int         count = 0;
 };
 std::vector<Refusals> repeated_refusals(const std::vector<std::pair<std::string, std::string>>& refused, int at_least = 3);
+
+// Screenshots of the album (`paths`, "…/Nintendo/Album/2026/10/20/
+// 2026102018300000-<id>.jpg"), the newest first, at most `max`; anything
+// but a .jpg is left out. And "2026-10-20 18:30" from such a name ("" when
+// it is not one).
+std::vector<std::string> newest_shots(std::vector<std::string> paths, size_t max);
+std::string shot_label(const std::string& path);
 
 // Why writing to the SD card failed, from what a test write there said
 // (`err`, an errno; 0 when it worked) and the room left: full, or written

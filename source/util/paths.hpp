@@ -93,5 +93,7 @@ bool put_aside(const std::string& path);
 
 // Names (not paths) of regular files in `dir` ending with `suffix`, sorted.
 std::vector<std::string> list_files(const std::string& dir, const std::string& suffix);
+// The folders in `dir` (not "." or ".."), by name.
+std::vector<std::string> list_dirs(const std::string& dir);
 
 }   // namespace paths

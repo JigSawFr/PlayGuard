@@ -151,7 +151,7 @@ static void test_known()
         CHECK(history_logic::known_kind(k));
     // Written by a newer version, or nothing: unknown.
     CHECK(!history_logic::known_kind("") && !history_logic::known_kind("teleport") && !history_logic::known_kind("Limits"));
-    CHECK(history_logic::known_kinds().size() == 41);
+    CHECK(history_logic::known_kinds().size() == 46);
     for (const std::string& k : history_logic::known_kinds()) CHECK(history_logic::known_kind(k));
 
     for (const char* s : { "uniform", "per_day", "extra", "stop", "undo", "backup", "overview", "console_lock" })

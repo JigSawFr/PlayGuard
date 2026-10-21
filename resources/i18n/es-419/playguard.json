@@ -1061,7 +1061,28 @@
         "group_open": "Sin el PIN",
         "group_elsewhere": "Creados por otra aplicación",
         "group_gone": "Ya no están en el menú HOME",
-        "state_verified": "comprobado"
+        "state_verified": "comprobado",
+        "closed_set": "{} nunca se abre: {}",
+        "closed_none": "{} ya no tiene horas sin acceso",
+        "pause_err": "No se cambió la pausa tras PIN rechazados",
+        "pause_set": "Tras PIN rechazados: {}",
+        "pause_off": "Nunca",
+        "pause_rule": "{} rechazos seguidos: una pausa de {}",
+        "pause_lifted": "{} vuelve a pedir el PIN",
+        "icon_set": "{} tiene su nuevo icono",
+        "icon_own": "El de su .nro",
+        "icon_none": "No hay capturas en el álbum: haz una (el botón de captura) y vuelve aquí.",
+        "icon_title": "Su icono en el menú HOME",
+        "action_closed": "Horas en que nunca se abre",
+        "action_lift": "Quitar la pausa",
+        "action_icon": "Cambiar el icono",
+        "closed_title": "Horas en que nunca se abre, con PIN o sin él",
+        "state_paused": "en pausa hasta las {}",
+        "state_closed": "cerrado {}",
+        "pause_cell": "Pausa tras PIN rechazados",
+        "pause_default": "predeterminado",
+        "paused_line": "{}: hasta las {}",
+        "paused_title": "Un forwarder está en pausa tras PIN rechazados"
     },
     "hbmenu": {
         "section": "Menú homebrew",
@@ -1158,7 +1179,9 @@
         "setup_progress": "Paso {} de {}",
         "verify_title": "Iniciar {} una vez desde el menú HOME",
         "verify_how": "Sal de PlayGuard, inicia {} desde su icono en el menú HOME e ingresa el PIN: cuando se abra el menú, PlayGuard sabrá que este camino de vuelta funciona. Luego vuelve aquí.",
-        "summary_doors": "Se abre sin el PIN: {}"
+        "summary_doors": "Se abre sin el PIN: {}",
+        "rescue_written": "Creada el {}",
+        "rescue_print": "Para imprimir: {} en la tarjeta SD"
     },
     "about": {
         "section_changelog": "Novedades de la {}",
@@ -1221,7 +1244,11 @@
         "before_delete_err": "No se pudo guardar antes ningún respaldo ({}).\n\n¿Eliminarlo todo de todos modos?",
         "delete_anyway": "Eliminar de todos modos",
         "bedtime_not_restored": "Esta copia tenía activada una alarma de hora de dormir: no se restablece; vuelve a configurarla en Tiempo de juego si hace falta.",
-        "backed_up_on": "Configuración guardada el {}."
+        "backed_up_on": "Configuración guardada el {}.",
+        "forwarders_body": "Esta copia también tiene {} forwarders que ya no están en el menú HOME: {}. ¿Volver a ponerlos?",
+        "forwarders_put_back": "Volver a ponerlos",
+        "forwarders_lock_title": "El menú homebrew estaba bloqueado",
+        "forwarders_lock": "Lo estaba cuando se hizo esta copia. Vuelve a bloquearlo desde Consola › Forwarders: primero pasan sus comprobaciones."
     },
     "update": {
         "checking": "Buscando actualizaciones...",
@@ -1503,7 +1530,12 @@
             "gate_open": "Forwarder abierto con el PIN",
             "gate_free": "Forwarder abierto sin PIN en su horario",
             "gate_refused": "Forwarder rechazado (PIN no introducido)",
-            "gate_hours": "Horas sin PIN de un forwarder"
+            "gate_hours": "Horas sin PIN de un forwarder",
+            "gate_paused": "Forwarder en pausa (demasiados PIN rechazados)",
+            "gate_closed": "Forwarder cerrado (horas sin acceso)",
+            "gate_closed_hours": "Horas sin acceso de un forwarder",
+            "gate_pause": "Pausa tras PIN rechazados",
+            "gate_pause_lifted": "Pausa de un forwarder quitada"
         },
         "sources": {
             "uniform": "Mismo límite todos los días",
