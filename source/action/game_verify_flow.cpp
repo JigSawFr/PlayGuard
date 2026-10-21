@@ -30,14 +30,11 @@ std::string size_text(u64 bytes)
 void show_progress(State* s, u64 current, u64 total)
 {
     if (!total) {
-        s->bar->set(0);
-        s->percent->setText("playguard/games/verify_preparing"_i18n);
-        s->detail->setText("");
+        s->body.show(0, "");
+        s->body.percent->setText("playguard/games/verify_preparing"_i18n);
         return;
     }
     if (current > total) current = total;
-    s->bar->set((float)((double)current / (double)total));
-    s->percent->setText(fmt::format("{} %", (int)(current * 100 / total)));
     std::string detail = brls::getStr("playguard/games/verify_amount", size_text(current), size_text(total));
     const double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now() - s->started).count();
     if (current > 0 && elapsed >= 3) {
@@ -45,7 +42,7 @@ void show_progress(State* s, u64 current, u64 total)
         detail += " · " + (left < 60 ? "playguard/games/verify_left_less"_i18n
                                       : brls::getStr("playguard/games/verify_left_min", (int)(left / 60 + 0.5)));
     }
-    s->detail->setText(detail);
+    s->body.show((float)((double)current / (double)total), detail);
 }
 
 bool on_verify_progress(void* ctx, u64 current, u64 total)
@@ -62,52 +59,8 @@ bool on_verify_progress(void* ctx, u64 current, u64 total)
 std::shared_ptr<State> make_dialog()
 {
     auto state = std::make_shared<State>();
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::STRETCH);
-    box->setPadding(26, 36, 20, 36);
-
-    auto* head = new brls::Box(brls::Axis::ROW);
-    head->setAlignItems(brls::AlignItems::CENTER);
-    state->image = new brls::Image();
-    state->image->setScalingType(brls::ImageScalingType::FIT);
-    state->image->setWidth(56);
-    state->image->setHeight(56);
-    state->image->setMarginRight(16);
-    head->addView(state->image);
-    auto* titles = new brls::Box(brls::Axis::COLUMN);
-    titles->setGrow(1.0f);
-    titles->setShrink(1.0f);
-    state->title = cadran::kit::label("playguard/games/verify_title"_i18n, 18, "cadran/text3");
-    titles->addView(state->title);
-    state->name = cadran::kit::label("", 22, "cadran/text");
-    state->name->setSingleLine(true);   // a long name is cut, not wrapped over the dialog
-    state->name->setMarginTop(2);
-    titles->addView(state->name);
-    head->addView(titles);
-    box->addView(head);
-
-    state->bar = new cadran::kit::Bar();
-    state->bar->setMarginTop(22);
-    box->addView(state->bar);
-    auto* numbers = new brls::Box(brls::Axis::ROW);
-    numbers->setAlignItems(brls::AlignItems::CENTER);
-    numbers->setMarginTop(10);
-    state->percent = cadran::kit::label("", 22, "cadran/text");
-    state->percent->setSingleLine(true);
-    state->percent->setMarginRight(14);
-    numbers->addView(state->percent);
-    state->detail = cadran::kit::label("", 18, "cadran/text3");
-    state->detail->setSingleLine(true);
-    state->detail->setGrow(1.0f);
-    state->detail->setShrink(1.0f);
-    state->detail->setHorizontalAlign(brls::HorizontalAlign::RIGHT);
-    numbers->addView(state->detail);
-    box->addView(numbers);
-
-    auto* note_label = cadran::kit::label("playguard/games/verify_note"_i18n, 18, "cadran/text3");
-    note_label->setMarginTop(16);
-    box->addView(note_label);
-    state->dialog = new brls::Dialog(box);
+    state->body = cadran::progress_body("playguard/games/verify_title"_i18n, "", "playguard/games/verify_note"_i18n);
+    state->dialog = new brls::Dialog(state->body.box);
     auto cancel = [state]() {
         state->cancel = true;
         state->open = false;   // the dialog closes itself
@@ -118,11 +71,11 @@ std::shared_ptr<State> make_dialog()
 
 void show_game(State* s, const std::vector<unsigned char>& icon, const std::string& name, size_t at, size_t total)
 {
-    if (!icon.empty()) s->image->setImageFromMem(icon.data(), (int)icon.size());
-    ui::set_visible(s->image, !icon.empty());
-    s->title->setText(total == 1 ? "playguard/games/verify_title"_i18n
+    if (!icon.empty()) s->body.image->setImageFromMem(icon.data(), (int)icon.size());
+    ui::set_visible(s->body.image, !icon.empty());
+    s->body.heading->setText(total == 1 ? "playguard/games/verify_title"_i18n
                                  : brls::getStr("playguard/games/verify_title_n", (int)at + 1, (int)total));
-    s->name->setText(name);
+    s->body.title->setText(name);
     s->started = std::chrono::steady_clock::now();
     show_progress(s, 0, 0);
 }

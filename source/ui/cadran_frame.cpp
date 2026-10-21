@@ -12,6 +12,7 @@
 #include "tab/tab_base.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/cadran_modal.hpp"
+#include "ui/cadran_palette.hpp"
 #include "ui/effects.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -23,100 +24,76 @@ namespace kit = cadran::kit;
 
 void cadran::install_theme()
 {
-    const NVGcolor navy = nvgRGB(0x0B, 0x14, 0x24);
-    // Dark: the boards' navy. Light: the style board's cool white, the inks
-    // darkened to 4.5:1 on every surface they are drawn on, the rail's active
-    // pill included (teal #0A705F, amber #8A5200, coral #B71C1C); the quiet
-    // text too, on both (text3 4.5:1 on the second surface). The focus ring
-    // in the dark teal, its glow no lighter than the fill teal: 3:1 or more
-    // on the background at any point of its pulse (WCAG 1.4.11). The dark
-    // theme's hairline at 14 % white: the cards stay apart on a TV that
-    // crushes its blacks.
-    struct P { NVGcolor bg, text, text2, text3, surf, surf2, line, teal, teal_fill, teal_soft, amber, amber_fill,
-               coral, coral_fill, coral_line, track, glow, glow_strong, amber_surf, amber_line, pill_ok, pill_ok_ink,
-               rail_active, key_bg, key_fg, hl1, hl2, border; };
-    const P dark = { navy, nvgRGB(0xEE, 0xF2, 0xF8), nvgRGB(0xA9, 0xB5, 0xC9), nvgRGB(0x83, 0x92, 0xAA),
-                     nvgRGB(0x12, 0x1E, 0x33), nvgRGB(0x1A, 0x2A, 0x45), nvgRGBA(255, 255, 255, 36),
-                     nvgRGB(0x2E, 0xC4, 0xA6), nvgRGB(0x2E, 0xC4, 0xA6), nvgRGBA(0x2E, 0xC4, 0xA6, 26),
-                     nvgRGB(0xFF, 0xB5, 0x47), nvgRGB(0xFF, 0xB5, 0x47),
-                     nvgRGB(0xFF, 0x7A, 0x7A), nvgRGB(0xFF, 0x7A, 0x7A), nvgRGBA(0xFF, 0x7A, 0x7A, 140),
-                     nvgRGBA(255, 255, 255, 23), nvgRGBA(0x2E, 0xC4, 0xA6, 31), nvgRGBA(0x2E, 0xC4, 0xA6, 51),
-                     nvgRGBA(0xFF, 0xB5, 0x47, 26), nvgRGBA(0xFF, 0xB5, 0x47, 90),
-                     nvgRGBA(0x2E, 0xC4, 0xA6, 41), nvgRGB(0x2E, 0xC4, 0xA6), nvgRGBA(0x2E, 0xC4, 0xA6, 36),
-                     nvgRGB(0xEE, 0xF2, 0xF8), navy, nvgRGB(0x2E, 0xC4, 0xA6), nvgRGB(0x9A, 0xF0, 0xDC), nvgRGBA(255, 255, 255, 60) };
-    const P light = { nvgRGB(0xED, 0xF0, 0xF4), navy, nvgRGB(0x3F, 0x4C, 0x63), nvgRGB(0x5F, 0x6E, 0x88),
-                      nvgRGB(0xFF, 0xFF, 0xFF), nvgRGB(0xF3, 0xF5, 0xF8), nvgRGBA(0x0B, 0x14, 0x24, 26),
-                      nvgRGB(0x0A, 0x70, 0x5F), nvgRGB(0x14, 0xA3, 0x8A), nvgRGBA(0x14, 0xA3, 0x8A, 26),
-                      nvgRGB(0x8A, 0x52, 0x00), nvgRGB(0xE0, 0x93, 0x1B),
-                      nvgRGB(0xB7, 0x1C, 0x1C), nvgRGB(0xE5, 0x48, 0x4D), nvgRGB(0xE3, 0x9A, 0x9A),
-                      nvgRGBA(0x0B, 0x14, 0x24, 26), nvgRGBA(0x2E, 0xC4, 0xA6, 41), nvgRGBA(0x2E, 0xC4, 0xA6, 56),
-                      nvgRGB(0xFF, 0xF3, 0xDF), nvgRGB(0xF3, 0xD5, 0x9C),
-                      nvgRGB(0xD8, 0xF3, 0xEC), nvgRGB(0x0A, 0x6E, 0x5C), nvgRGBA(0x14, 0xA3, 0x8A, 36),
-                      navy, nvgRGB(0xFF, 0xFF, 0xFF), nvgRGB(0x0A, 0x70, 0x5F), nvgRGB(0x0F, 0x8A, 0x74), nvgRGBA(0x0B, 0x14, 0x24, 60) };
-    const std::pair<brls::Theme*, const P*> variants[] = { { &brls::Theme::getDarkTheme(), &dark }, { &brls::Theme::getLightTheme(), &light } };
+    namespace pal = cadran::palette;
+    const NVGcolor navy = nvgRGB(pal::NAVY.r, pal::NAVY.g, pal::NAVY.b);
+    // The palettes and why they are what they are: ui/cadran_palette.hpp.
+    const pal::Palette* dark = &pal::DARK;
+    const pal::Palette* light = &pal::LIGHT;
+    const std::pair<brls::Theme*, const pal::Palette*> variants[] = { { &brls::Theme::getDarkTheme(), dark }, { &brls::Theme::getLightTheme(), light } };
+    const auto c = [](pal::Rgba x) { return nvgRGBA(x.r, x.g, x.b, x.a); };
     for (const auto& [t, p] : variants) {
-        t->addColor("brls/background", p->bg);
-        t->addColor("brls/clear", p->bg);
-        t->addColor("brls/text", p->text);
-        t->addColor("brls/sidebar/background", p->bg);
-        t->addColor("brls/sidebar/separator", p->line);
-        t->addColor("brls/sidebar/active_item", p->teal);
-        t->addColor("brls/applet_frame/separator", p->line);
-        t->addColor("brls/header/border", p->line);
-        t->addColor("brls/highlight/background", p->surf);
-        t->addColor("brls/highlight/color1", p->hl1);
-        t->addColor("brls/highlight/color2", p->hl2);
+        t->addColor("brls/background", c(p->bg));
+        t->addColor("brls/clear", c(p->bg));
+        t->addColor("brls/text", c(p->text));
+        t->addColor("brls/sidebar/background", c(p->bg));
+        t->addColor("brls/sidebar/separator", c(p->line));
+        t->addColor("brls/sidebar/active_item", c(p->teal));
+        t->addColor("brls/applet_frame/separator", c(p->line));
+        t->addColor("brls/header/border", c(p->line));
+        t->addColor("brls/highlight/background", c(p->surf));
+        t->addColor("brls/highlight/color1", c(p->hl1));
+        t->addColor("brls/highlight/color2", c(p->hl2));
 #ifndef __SWITCH__
         // The smoke test's still focus (PLAYGUARD_SIM_STILL_FOCUS): the glow in
         // the stroke's own colour, so a screenshot does not depend on when.
-        if (sim_env_flag("PLAYGUARD_SIM_STILL_FOCUS")) t->addColor("brls/highlight/color2", p->hl1);
+        if (sim_env_flag("PLAYGUARD_SIM_STILL_FOCUS")) t->addColor("brls/highlight/color2", c(p->hl1));
 #endif
-        NVGcolor pulse = p->teal_fill;
+        NVGcolor pulse = c(p->teal_fill);
         pulse.a = 38 / 255.0f;
         t->addColor("brls/click_pulse", pulse);
-        t->addColor("brls/button/primary_enabled_background", p->teal_fill);
+        t->addColor("brls/button/primary_enabled_background", c(p->teal_fill));
         t->addColor("brls/button/primary_enabled_text", navy);
-        t->addColor("brls/button/default_enabled_background", p->surf2);
-        t->addColor("brls/button/default_enabled_text", p->text);
-        t->addColor("brls/button/enabled_border_color", p->border);
-        t->addColor("brls/button/highlight_enabled_text", p->teal);
+        t->addColor("brls/button/default_enabled_background", c(p->surf2));
+        t->addColor("brls/button/default_enabled_text", c(p->text));
+        t->addColor("brls/button/enabled_border_color", c(p->border));
+        t->addColor("brls/button/highlight_enabled_text", c(p->teal));
         // A list line's plain value in the second ink, so the list screens
         // (cadran::List) take it as it is.
-        t->addColor("brls/list/listItem_value_color", p->text2);
+        t->addColor("brls/list/listItem_value_color", c(p->text2));
         t->addColor("cadran/navy", navy);
-        t->addColor("cadran/text", p->text);
-        t->addColor("cadran/text2", p->text2);
-        t->addColor("cadran/text3", p->text3);
-        t->addColor("cadran/teal", p->teal);
-        t->addColor("cadran/teal_fill", p->teal_fill);
-        t->addColor("cadran/teal_soft", p->teal_soft);
-        t->addColor("cadran/amber", p->amber);
-        t->addColor("cadran/amber_fill", p->amber_fill);
-        t->addColor("cadran/coral", p->coral);
-        t->addColor("cadran/coral_fill", p->coral_fill);
-        t->addColor("cadran/coral_line", p->coral_line);
-        t->addColor("cadran/coral_soft", p == &dark ? nvgRGBA(0xFF, 0x7A, 0x7A, 36) : nvgRGBA(0xE5, 0x48, 0x4D, 28));
-        t->addColor("cadran/track", p->track);
-        t->addColor("cadran/surf", p->surf);
-        t->addColor("cadran/surf2", p->surf2);
-        t->addColor("cadran/line", p->line);
-        t->addColor("cadran/glow", p->glow);
-        t->addColor("cadran/glow_strong", p->glow_strong);
-        t->addColor("cadran/amber_surf", p->amber_surf);
-        t->addColor("cadran/amber_line", p->amber_line);
-        t->addColor("cadran/pill_ok", p->pill_ok);
-        t->addColor("cadran/pill_ok_ink", p->pill_ok_ink);
-        t->addColor("cadran/rail_active", p->rail_active);
-        t->addColor("cadran/key_bg", p->key_bg);
-        t->addColor("cadran/key_fg", p->key_fg);
+        t->addColor("cadran/text", c(p->text));
+        t->addColor("cadran/text2", c(p->text2));
+        t->addColor("cadran/text3", c(p->text3));
+        t->addColor("cadran/teal", c(p->teal));
+        t->addColor("cadran/teal_fill", c(p->teal_fill));
+        t->addColor("cadran/teal_soft", c(p->teal_soft));
+        t->addColor("cadran/amber", c(p->amber));
+        t->addColor("cadran/amber_fill", c(p->amber_fill));
+        t->addColor("cadran/coral", c(p->coral));
+        t->addColor("cadran/coral_fill", c(p->coral_fill));
+        t->addColor("cadran/coral_line", c(p->coral_line));
+        t->addColor("cadran/coral_soft", p == dark ? nvgRGBA(0xFF, 0x7A, 0x7A, 36) : nvgRGBA(0xE5, 0x48, 0x4D, 28));
+        t->addColor("cadran/track", c(p->track));
+        t->addColor("cadran/surf", c(p->surf));
+        t->addColor("cadran/surf2", c(p->surf2));
+        t->addColor("cadran/line", c(p->line));
+        t->addColor("cadran/glow", c(p->glow));
+        t->addColor("cadran/glow_strong", c(p->glow_strong));
+        t->addColor("cadran/amber_surf", c(p->amber_surf));
+        t->addColor("cadran/amber_line", c(p->amber_line));
+        t->addColor("cadran/pill_ok", c(p->pill_ok));
+        t->addColor("cadran/pill_ok_ink", c(p->pill_ok_ink));
+        t->addColor("cadran/rail_active", c(p->rail_active));
+        t->addColor("cadran/key_bg", c(p->key_bg));
+        t->addColor("cadran/key_fg", c(p->key_fg));
         t->addColor("cadran/none", nvgRGBA(0, 0, 0, 0));
         // The empty part of a progress bar, behind a game's missing cover.
-        t->addColor("cadran/well", p == &dark ? nvgRGBA(255, 255, 255, 46) : nvgRGBA(0, 0, 0, 34));
+        t->addColor("cadran/well", p == dark ? nvgRGBA(255, 255, 255, 46) : nvgRGBA(0, 0, 0, 34));
         // The inks the palettes have no use for elsewhere: a release note's
         // alerts and a build's tags (blue, violet), each as dark on the
         // light theme as the other inks (4.5:1 on white).
-        t->addColor("cadran/blue", p == &dark ? nvgRGB(0x4F, 0xA3, 0xFF) : nvgRGB(0x1F, 0x5F, 0xC4));
-        t->addColor("cadran/violet", p == &dark ? nvgRGB(0x9B, 0x8C, 0xF5) : nvgRGB(0x5B, 0x47, 0xC9));
+        t->addColor("cadran/blue", c(p->blue));
+        t->addColor("cadran/violet", c(p->violet));
         // The accounts' avatars, in turn: fills under a navy initial, alike
         // on both themes.
         t->addColor("cadran/avatar0", nvgRGB(0x7C, 0x6C, 0xF2));
@@ -126,13 +103,13 @@ void cadran::install_theme()
         // A switch's knob, white on either track, and its edge while off.
         t->addColor("cadran/knob", nvgRGB(0xFF, 0xFF, 0xFF));
         t->addColor("cadran/knob_line", nvgRGBA(0x0B, 0x14, 0x24, 40));
-        t->addColor("cadran/bar", p == &dark ? nvgRGB(0x33, 0x48, 0x6B) : nvgRGB(0xB9, 0xC6, 0xDA));
-        t->addColor("cadran/bar_today", p == &dark ? nvgRGB(0x5A, 0x71, 0x96) : nvgRGB(0x7E, 0x90, 0xAE));
+        t->addColor("cadran/bar", p == dark ? nvgRGB(0x33, 0x48, 0x6B) : nvgRGB(0xB9, 0xC6, 0xDA));
+        t->addColor("cadran/bar_today", p == dark ? nvgRGB(0x5A, 0x71, 0x96) : nvgRGB(0x7E, 0x90, 0xAE));
         // Behind a dialog or a picker: the navy, dimmed. A toast: a card of
         // the second surface on the dark theme, navy on the light one.
-        t->addColor("brls/backdrop", p == &dark ? nvgRGBA(3, 8, 18, 190) : nvgRGBA(0x0B, 0x14, 0x24, 115));
-        t->addColor("brls/notification/background", p == &dark ? nvgRGBA(0x1A, 0x2A, 0x45, 250) : nvgRGBA(0x0B, 0x14, 0x24, 240));
-        t->addColor("brls/notification/text", p == &dark ? p->text : nvgRGB(0xEE, 0xF2, 0xF8));
+        t->addColor("brls/backdrop", p == dark ? nvgRGBA(3, 8, 18, 190) : nvgRGBA(0x0B, 0x14, 0x24, 115));
+        t->addColor("brls/notification/background", p == dark ? nvgRGBA(0x1A, 0x2A, 0x45, 250) : nvgRGBA(0x0B, 0x14, 0x24, 240));
+        t->addColor("brls/notification/text", p == dark ? c(p->text) : nvgRGB(0xEE, 0xF2, 0xF8));
     }
 #ifndef __SWITCH__
     // And held where it is (patches/borealis/0009). The footer's hints too:

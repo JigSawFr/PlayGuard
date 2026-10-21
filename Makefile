@@ -229,6 +229,7 @@ activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summar
 format_text_SRC   := source/ui/format_text.cpp tests/format_text/test.cpp
 format_text_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DPLAYGUARD_HOST_I18N
 cadran_text_SRC   := source/ui/cadran_text.cpp tests/cadran_text/test.cpp
+contrast_SRC      := tests/contrast/test.cpp
 cadran_text_FLAGS := $(format_text_FLAGS)
 game_check_text_SRC   := source/action/game_check_text.cpp tests/game_check_text/test.cpp
 game_check_text_CSRC   := source/core/gamecheck_rules.c
