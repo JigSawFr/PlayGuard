@@ -619,7 +619,8 @@ def focused():
         at = l.find("focus: ")
         if at >= 0:
             last = l[at + len("focus: "):].rstrip("\n")
-    return last
+    # A no-break space ("1\u00a0h") as a plain one, as the test writes it.
+    return last.replace("\u00a0", " ") if last is not None else None
 
 
 def go_to(label, direction="Down", most=25):
@@ -1092,7 +1093,7 @@ if UPDATE:
     key("Down", 2)             # Later
     key("Return")
     shot("02_update_later")    # 1 day, 1 week, 30 days
-    key("Down")                # 1 week
+    go_to("1 week")
     key("Return")
     time.sleep(1)
     cfg = json.load(open(config_file))
@@ -1331,7 +1332,7 @@ if HBMENU:
     key("Return")              # sphaira's actions
     go_to("Hours without the PIN")
     key("Return")
-    key("Down", 3)             # Saturday and Sunday
+    go_to("Saturday and Sunday")
     key("Return")
     key("Return")              # from 09:00
     key("Return")              # until 20:00
@@ -1447,7 +1448,7 @@ if HOMEBREW:
     key("Return")              # sphaira's actions again
     go_to("Hours it never opens")
     key("Return")
-    key("Down")                # every day
+    go_to("Every day")
     key("Return")
     key("Return")              # from 21:00
     key("Return")              # until 07:00
@@ -1462,7 +1463,7 @@ if HOMEBREW:
     key("Return")              # sphaira's actions again
     go_to("Hours without the PIN")
     key("Return")
-    key("Down", 4)             # Monday to Friday, and the weekend apart
+    go_to("Monday to Friday, and the weekend apart")
     key("Return")
     key("Return")              # Monday to Friday: from 16:00
     key("Return")              # until 19:00
@@ -1483,7 +1484,7 @@ if HOMEBREW:
     key("Down", 8)             # Star Atlas, Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock, Protect every forwarder, Pause after refused PINs
     key("Return")
     shot("03_pause")           # never, 3 tries, 5 tries (the default), 5 tries for an hour, 10 tries
-    key("Down")                # 5 tries in a row: 1 h
+    go_to("5 refused in a row: a pause of 1 h")
     key("Return")
     time.sleep(3)
     if not data("gate_pause.txt").startswith("rule\t5\t60\n") or len(recorded("gate_pause")) != 1:
@@ -1712,14 +1713,14 @@ if CADRAN:
     shot("21_live_theme")      # the focus back on Theme
     key("Left")                # Language
     key("Return")
-    key("Down", 2)             # Français, after the console's and English
+    go_to("Français (France)")
     key("Return")
     time.sleep(1)
     shot("22_live_language")
     # To Chinese, with its own font on the console, still without a restart
     # (no screenshot: the desktop's font has no simplified han).
     key("Return")
-    key("Down", 12)            # 简体中文, after Français
+    go_to("简体中文")
     key("Return")
     time.sleep(1)
     if json.load(open(config_file)).get("language") != "zh-Hans":
@@ -1992,7 +1993,7 @@ if not GAMES:
     key("Right")               # When the time is up
     key("Return")
     shot("23_time_up_picker")
-    key("Down")                # Warning only: a long confirmation, with the unlock
+    go_to("Warning only")      # a long confirmation, with the unlock
     key("Return")
     shot("23_time_up_confirm") # the text wraps inside the dialog (ui::dialog measures it)
     key("Escape")              # cancelled: nothing written
@@ -2322,7 +2323,7 @@ key("Escape")
 key_to_end("Up", hold=0.15)   # the top: the accounts' chips
 key_to_end("Right")        # the row's last chip: Export
 key("Return")
-key("Down", 3)             # PDF
+go_to("PDF")
 key("Return")
 shot("29_activity_export")
 if not pdfs() - pdfs_before:

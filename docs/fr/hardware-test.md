@@ -1,4 +1,4 @@
-<!-- translated from docs/hardware-test.md, sha256 a1b9f6ca74a3 -->
+<!-- translated from docs/hardware-test.md, sha256 1ae3738bc1e6 -->
 # Tester sur une console : forwarders et menu homebrew
 
 Ce que les simulateurs desktop et web ne peuvent pas montrer : le vrai menu HOME de la console, son écran du code PIN, Atmosphère qui lit `override_config.ini`, le module rescue au démarrage. À dérouler sur une console après une modification de *Console › Forwarders* (les fichiers `source/action/forwarder*`, `hbmenu_lock*`, `source/core/gate*`, `hbl_lock*`, `gate/`, `sysmodule/`), en notant dans la pull request ce qui a été vérifié, et sur quels firmware et Atmosphère.
@@ -17,18 +17,21 @@ Chaque étape : ce qu'il faut faire, puis ce qui doit se passer. ☐ est à coch
 - ☐ La console dans une autre langue (Paramètres de la console › Console › Langue) : les icônes restent.
 - ☐ *Changer l'icône* sur l'un d'eux, une capture de l'album : le menu HOME montre le carré central de la capture.
 - ☐ *Supprimer*, puis ZR dans les 8 secondes : de retour sur le menu HOME, avec la même icône.
+- ☐ Ⓐ sur un forwarder : la fiche par-dessus la liste, son icône et son état en haut, ses sections ; un toucher sur l'écran en dehors la ferme, comme B. Une longue liste (*Pause après des codes PIN refusés*, la limite d'un jour dans *Temps de jeu*) défile au stick et au doigt, la valeur réglée cochée.
+- ☐ *Détails* sur un forwarder protégé : une ligne par règle avec son icône ; Ⓐ sur *Horaires sans code PIN* ouvre ses horaires, sur *Éditeur* son clavier.
 
 ## 2. La porte du code PIN
 
-- ☐ *Protéger par le code PIN* sur sphaira, puis le lancer depuis le menu HOME : l'écran de la porte (bleu nuit, *Protected by PlayGuard*, l'icône et le nom de sphaira, dans la langue de la console), puis l'écran du code PIN de la console.
-- ☐ Le code PIN saisi : sphaira se lance. Dans PlayGuard : l'*Historique* a *Forwarder ouvert avec le code PIN*, et la ligne de sphaira dit *vérifié*.
+- ☐ *Demander le code PIN* activé pour sphaira, puis le lancer depuis le menu HOME : l'écran de la porte (bleu nuit, *Protected by PlayGuard*, l'icône et le nom de sphaira, dans la langue de la console), puis l'écran du code PIN de la console.
+- ☐ L'interrupteur désactivé, puis ZR dans les 8 secondes : de nouveau protégé (le code PIN demandé d'abord pour le désactiver).
+- ☐ Le code PIN saisi : sphaira se lance. Dans PlayGuard : l'*Historique* a *Forwarder ouvert avec le code PIN*, et l'icône de sphaira porte une coche.
 - ☐ B sur l'écran du code PIN : retour au menu HOME, la porte disant *Code PIN non saisi*, puis *Refus aujourd'hui : 1* ; encore une fois : *Refus aujourd'hui : 2* pendant qu'il le demande.
 - ☐ Refusé cinq fois de suite (la pause par défaut) : la cinquième dit *Il redemandera à …* ; relancé avant, il dit qu'il est en pause et n'affiche jamais l'écran du code PIN. Dans PlayGuard : la cloche signale la pause ; *Lever la pause* (code PIN demandé) et il le redemande aussitôt.
-- ☐ *Heures sans code PIN* incluant l'heure actuelle : il se lance sans code PIN, la porte le disant ; sa ligne et l'écran de la porte nomment les heures.
+- ☐ *Heures sans code PIN* incluant l'heure actuelle : il se lance sans code PIN, la porte le disant ; l'écran de la porte nomme les heures et montre un cadenas ouvert après *Protected by PlayGuard*, la ligne de sphaira dans PlayGuard la même icône, *Détails* les heures.
 - ☐ *Heures où il ne s'ouvre jamais* incluant l'heure actuelle : la porte dit *Pas à cette heure-ci* et les heures, même avec un code PIN sur la console ; en dehors, le code PIN de nouveau.
 - ☐ *Pause après des codes PIN refusés › Jamais* : refusé dix fois, pas de pause.
 - ☐ *Heures sans code PIN › Du lundi au vendredi, et le week-end à part* : un jour de semaine dans sa plage, pas de code PIN ; le week-end, la plage du week-end.
-- ☐ *Le fermer une fois le temps de jeu du jour écoulé*, une minuterie sans temps restant aujourd'hui : la porte dit *Le temps de jeu du jour est écoulé*, même avec le code PIN saisi ; du temps ajouté (PlayGuard ou l'appli du parent), il redemande le code PIN.
+- ☐ *Fermé une fois le temps de jeu du jour écoulé* activé, une minuterie sans temps restant aujourd'hui : la porte dit *Le temps de jeu du jour est écoulé*, même avec le code PIN saisi ; du temps ajouté (PlayGuard ou l'appli du parent), il redemande le code PIN.
 - ☐ Depuis un ordinateur, `config/playguard/gate_rules.txt` écrit avec une ligne donnant toutes les heures à sphaira : la porte demande toujours le code PIN (ses règles sont dans le forwarder).
 - ☐ Depuis un ordinateur, `config/playguard/gate-….nro` remplacé par un autre `.nro` (celui de hbmenu) : le forwarder de sphaira s'arrête sur l'erreur 2347-0100 et ne le lance pas ; l'ouverture suivante de PlayGuard réécrit la porte.
 - ☐ Un forwarder protégé par le PlayGuard précédent : la cloche dit de le refaire ; *Refaire*, puis ses heures sans code PIN fonctionnent.
