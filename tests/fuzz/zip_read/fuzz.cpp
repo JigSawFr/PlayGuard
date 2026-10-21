@@ -5,6 +5,7 @@
 // the size allowed, and one that fails leaves none and says why.
 #include <cstdio>
 #include <cstdlib>
+#include <fcntl.h>
 #include <string>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -25,7 +26,10 @@ extern "C" int LLVMFuzzerInitialize(int*, char***)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     const std::string zip = s_dir + "/a.zip", out = s_dir + "/playguard.nro";
-    FILE* f = std::fopen(zip.c_str(), "wb");
+    // Read and written by this process alone (0600).
+    const int fd = open(zip.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    FUZZ_ASSERT(fd >= 0);
+    FILE* f = fdopen(fd, "wb");
     FUZZ_ASSERT(f != nullptr);
     FUZZ_ASSERT(std::fwrite(data, 1, size, f) == size);
     std::fclose(f);
