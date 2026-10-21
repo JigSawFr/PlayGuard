@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 86382aa8effc -->
+<!-- translated from docs/troubleshooting.md, sha256 498fbfed802c -->
 # Problemen oplossen
 
 Weer toegang krijgen tot een vergrendelde console, de veelvoorkomende problemen, een bug melden, en de ontwikkelaarsmodus. Terug naar de [README](../../README.md).
@@ -23,6 +23,13 @@ PlayGuard zelf kan dan niet starten. Installeer de optionele herstel-sysmodule (
 
 De module moet de versie van PlayGuard volgen: pak bij elke update van PlayGuard de `playguard-rescue.zip` van die release opnieuw uit (of *Bijwerken* bij *De herstel-sysmodule is verouderd* onder de meldingenbel), en start de console daarna opnieuw op. Een oudere module laat een rapport achter dat PlayGuard niet kan controleren: het herstelscherm biedt dan niets aan, zegt dat de module ouder is, en `RESCUE` opnieuw doen geeft hetzelfde tot de module is bijgewerkt.
 
+### Homebrewmenu vergrendeld
+
+*Console › Forwarders › Homebrewmenu vergrendelen* zorgt ervoor dat het album en een game die met R is gestart het homebrew-menu niet meer openen. Als de forwarder van PlayGuard en het beveiligde menu allebei weg zijn (verwijderd in de systeeminstellingen, of op het andere systeem: de vergrendeling staat op de SD-kaart en wordt door sysMMC en emuMMC allebei gelezen):
+
+- **Vanaf een computer:** verwijder `atmosphere/config/override_config.ini` op de SD-kaart (of zet `config/playguard/override_config.ini.backup` terug, het bestand zoals het was), en start de console daarna opnieuw op.
+- **Met de herstel-sysmodule geïnstalleerd** (optioneel): zet een leeg bestand `config/playguard/RESCUE` op de SD-kaart en start opnieuw op; de module heft de vergrendeling op bij het opstarten, en PlayGuard meldt dat bij zijn volgende start. Een update van Atmosphère sinds de vergrendeling heft haar op dezelfde manier op.
+
 ### Console niet gemod
 
 PlayGuard kan niet helpen: het heeft Atmosphère nodig. De master-key-procedure van de klantenservice van Nintendo is de officiële weg.
@@ -41,7 +48,7 @@ PlayGuard kan niet helpen: het heeft Atmosphère nodig. De master-key-procedure 
 ### Mijn limieten zijn vanzelf veranderd
 
 - **De app op de telefoon is nog gekoppeld.** De volgende synchronisatie overschrijft wat PlayGuard heeft ingesteld: *Pincode › Smartphone-app ontkoppelen*.
-- **Een ander hulpmiddel, of een profiel.** *Vandaag* toont een oranje kaart voor limieten die afwijken van wat PlayGuard het laatst zag, en *Geschiedenis › Wijzigingsgeschiedenis* toont elke wijziging die buiten PlayGuard is gezien. Ⓐ op een wijziging zet de vorige waarde terug.
+- **Een ander hulpmiddel, of een profiel.** *Vandaag* toont een oranje kaart voor limieten die afwijken van wat PlayGuard het laatst zag, en *Voorkeuren › Wijzigingsgeschiedenis* toont elke wijziging die buiten PlayGuard is gezien. Ⓐ op een wijziging zet de vorige waarde terug.
 - **Een gepland profiel** dat is toegepast, of teruggezet zodra zijn periode voorbij was (*Speeltijdtimer › Profielen › Gepland profiel*).
 
 ### Het kind speelde langer dan de limiet

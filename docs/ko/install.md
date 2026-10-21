@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 291d4702e4db -->
+<!-- translated from docs/install.md, sha256 3b35bfa7ef3d -->
 # 설치
 
 PlayGuard를 설치, 업데이트, 삭제하는 방법과 PlayGuard가 SD 카드에 저장하는 파일을 설명합니다. 설치한 뒤에는 [시작하기](getting-started.md)를 보세요. 처음으로 돌아가기: [README](../../README.md).
@@ -7,7 +7,7 @@ PlayGuard를 설치, 업데이트, 삭제하는 방법과 PlayGuard가 SD 카드
 
 다음 중 하나를 고르세요.
 
-- **Homebrew App Store** / **sphaira의 App Store**(같은 카탈로그) — 등록이 승인되면 *PlayGuard*를 검색하세요. 새 버전은 자동으로 반영됩니다.
+- **Homebrew App Store** / **sphaira의 App Store**(같은 카탈로그) — 등록이 승인되면 *PlayGuard*를 검색하세요. 새 버전은 검토를 거친 뒤 자동으로 반영되며, 보통 GitHub보다 며칠 늦습니다. PlayGuard는 그곳에서 설치되었다는 것을 알고 스토어를 통해 업데이트하도록 권장합니다.
 - **sphaira › GitHub** — 배포 zip에 항목(`/config/sphaira/github/playguard.json`)이 이미 들어 있습니다. 처음 설치한 뒤에는 sphaira의 *GitHub*에서 업데이트하세요.
 - **수동 설치** — [최신 버전](https://github.com/JigSawFr/PlayGuard/releases/latest)에서 `playguard.zip`을 내려받아 SD 카드의 **루트**에 압축을 푸세요. 앱은 `sd:/switch/playguard/`에, 앱의 파일은 `sd:/config/playguard/`에 들어갑니다.
 
