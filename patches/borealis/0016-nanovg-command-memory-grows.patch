@@ -1,0 +1,77 @@
+diff --git a/library/include/borealis/extern/nanovg/dk_renderer.hpp b/library/include/borealis/extern/nanovg/dk_renderer.hpp
+index 93e4095e..2f7defbb 100644
+--- a/library/include/borealis/extern/nanovg/dk_renderer.hpp
++++ b/library/include/borealis/extern/nanovg/dk_renderer.hpp
+@@ -166,6 +166,11 @@ namespace nvg {
+             /* State. */
+             dk::UniqueCmdBuf m_dyn_cmd_buf;
+             CCmdMemRing<1> m_dyn_cmd_mem;
++            /* PlayGuard: more command memory, when a frame's calls need more than DynamicCmdSize
++               (a long page of text). Kept for the next frames; m_extra_cmd_used of them taken in this one. */
++            std::vector<CMemPool::Handle> m_extra_cmd_mem;
++            size_t m_extra_cmd_used = 0;
++            static void AddCmdMemory(void *user_data, DkCmdBuf cmdbuf, size_t min_size);
+             std::optional<CMemPool::Handle> m_vertex_buffer;
+             CShader m_vertex_shader;
+             CShader m_fragment_shader;
+diff --git a/library/lib/extern/nanovg/deko3d/dk_renderer.cpp b/library/lib/extern/nanovg/deko3d/dk_renderer.cpp
+index 9b3d8dc6..4ef34058 100644
+--- a/library/lib/extern/nanovg/deko3d/dk_renderer.cpp
++++ b/library/lib/extern/nanovg/deko3d/dk_renderer.cpp
+@@ -1,5 +1,6 @@
+ #include <nanovg/dk_renderer.hpp>
+ 
++#include <algorithm>
+ #include <stdarg.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+@@ -110,7 +111,7 @@ namespace nvg {
+     {
+         printf("DkRenderer create\n");
+         /* Create a dynamic command buffer and allocate memory for it. */
+-        m_dyn_cmd_buf = dk::CmdBufMaker{m_device}.create();
++        m_dyn_cmd_buf = dk::CmdBufMaker{m_device}.setUserData(this).setCbAddMem(AddCmdMemory).create();
+         m_dyn_cmd_mem.allocate(m_data_mem_pool, DynamicCmdSize);
+ 
+         m_image_descriptor_set.allocate(m_data_mem_pool);
+@@ -159,6 +160,32 @@ namespace nvg {
+         m_view_uniform_buffer.destroy();
+         m_frag_uniform_buffer.destroy();
+         m_textures.clear();
++        for (CMemPool::Handle &mem : m_extra_cmd_mem) {
++            mem.destroy();
++        }
++    }
++
++    /* PlayGuard: deko3d calls this when the command buffer is full. Without it, a frame of more
++       calls than DynamicCmdSize holds aborted the app (a long changelog). Another chunk is
++       given, one kept from an earlier frame when it is large enough: the frame's fence was
++       waited for in Flush(), so the GPU is done with it. */
++    void DkRenderer::AddCmdMemory(void *user_data, DkCmdBuf cmdbuf, size_t min_size) {
++        DkRenderer *self = static_cast<DkRenderer *>(user_data);
++        while (self->m_extra_cmd_used < self->m_extra_cmd_mem.size()) {
++            CMemPool::Handle &mem = self->m_extra_cmd_mem[self->m_extra_cmd_used++];
++            if (mem.getSize() >= min_size) {
++                dkCmdBufAddMemory(cmdbuf, mem.getMemBlock(), mem.getOffset(), mem.getSize());
++                return;
++            }
++        }
++        const size_t size = std::max(min_size, DynamicCmdSize);
++        CMemPool::Handle mem = self->m_data_mem_pool.allocate(static_cast<uint32_t>(size), DK_CMDMEM_ALIGNMENT);
++        if (!mem) {
++            return;   /* deko3d raises its out-of-memory error, as before */
++        }
++        self->m_extra_cmd_mem.push_back(mem);
++        self->m_extra_cmd_used = self->m_extra_cmd_mem.size();
++        dkCmdBufAddMemory(cmdbuf, mem.getMemBlock(), mem.getOffset(), mem.getSize());
+     }
+ 
+     int DkRenderer::AcquireImageDescriptor(std::shared_ptr<Texture> texture, int image) {
+@@ -529,6 +556,7 @@ namespace nvg {
+         if (ctx.ncalls > 0) {
+             /* Prepare dynamic command buffer. */
+             m_dyn_cmd_mem.begin(m_dyn_cmd_buf);
++            m_extra_cmd_used = 0;   /* PlayGuard: the last frame's extra memory is free again */
+ 
+             /* Update buffers with data. */
+             this->UpdateVertexBuffer(ctx.verts, ctx.nverts * sizeof(NVGvertex));
