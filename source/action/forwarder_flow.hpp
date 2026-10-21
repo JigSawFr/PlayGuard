@@ -32,7 +32,8 @@ std::string self_nro();
 bool loader_present();
 
 // The forwarders' loader this build carries (romfs:/forwarder/main and
-// main.npdm), as 16 hex digits of their SHA-256; "" when unknown (the
+// main.npdm) and the way it patches them, as 16 hex digits of their
+// SHA-256; "" when unknown (the
 // desktop build). Kept in each forwarder made (forwarders::Made::loader).
 std::string loader_id();
 

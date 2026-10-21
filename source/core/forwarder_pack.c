@@ -155,7 +155,7 @@ bool fwd_patch_npdm(uint8_t *npdm, size_t size, uint64_t id, bool force_debug)
 {
     // META: ACI0 at 0x70, ACID at 0x78 (offset, size). ACI0: its program ID
     // at 0x10, kernel capabilities at 0x30. ACID: the program ID range at
-    // 0x210, kernel capabilities at 0x228.
+    // 0x210, kernel capabilities at 0x230 (0x228 holds the services').
     if (size < 0x80 || get_u32(npdm) != 0x4154454Du) return false;   // "META"
     const uint32_t aci0 = get_u32(npdm + 0x70), acid = get_u32(npdm + 0x78);
     if (aci0 > size || size - aci0 < 0x40 || acid > size || size - acid < 0x240) return false;
@@ -165,13 +165,14 @@ bool fwd_patch_npdm(uint8_t *npdm, size_t size, uint64_t id, bool force_debug)
     put_u64(npdm + acid + 0x218, id);
     if (force_debug) {
         // The debug flags (kind 16): Atmosphère 1.8.0 moved ForceDebug to
-        // bit 19 for 19.0.0's layout, which sphaira sets in its place. The
-        // ACI0 has them; npdmtool's ACID lists the kernel flags only, so
-        // there they are set when present, as sphaira does.
+        // bit 19 for 19.0.0's layout, which sphaira sets in its place. Both
+        // lists have them (npdmtool copies the ACI0's into the ACID), and
+        // both take it: the loader refuses an ACI0 asking for a flag its
+        // ACID does not grant ("The software could not be started").
         const uint32_t debug = 1u << 19;
-        if (!patch_capability(npdm, size, aci0 + get_u32(npdm + aci0 + 0x30), get_u32(npdm + aci0 + 0x34), 16, debug))
+        if (!patch_capability(npdm, size, aci0 + get_u32(npdm + aci0 + 0x30), get_u32(npdm + aci0 + 0x34), 16, debug) ||
+            !patch_capability(npdm, size, acid + get_u32(npdm + acid + 0x230), get_u32(npdm + acid + 0x234), 16, debug))
             return false;
-        patch_capability(npdm, size, acid + get_u32(npdm + acid + 0x228), get_u32(npdm + acid + 0x22C), 16, debug);
     }
     return true;
 }
