@@ -1,7 +1,7 @@
 <!-- translated from docs/install.md, sha256 3b35bfa7ef3d -->
 # Installation
 
-Comment installer, mettre à jour et supprimer PlayGuard, et ce qu'il écrit sur la carte SD. Une fois installé : [prise en main](getting-started.md). Retour au [README](../../README.fr.md).
+Comment installer, mettre à jour et supprimer PlayGuard, et ce qu'il écrit sur la carte SD. Une fois installé : [prise en main](getting-started.md). Retour au [README](../../README.md).
 
 ## Où le trouver
 

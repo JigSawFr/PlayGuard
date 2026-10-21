@@ -168,15 +168,22 @@
     }
   }
 
-  // A link to a question or an older release opens it.
+  // A link to a question or an older release opens it; a translated page's
+  // section answers to its English anchor too (data-en: the app's links).
   const reveal = () => {
-    let target = null;
-    try { target = location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null; } catch { /* a bad address */ }
+    let target = null, english = false;
+    try {
+      const id = location.hash ? decodeURIComponent(location.hash.slice(1)) : '';
+      target = id ? document.getElementById(id) : null;
+      if (id && !target) {
+        target = document.querySelector(`[data-en="${CSS.escape(id)}"]`);
+        english = !!target;
+      }
+    } catch { /* a bad address */ }
     const folded = target?.closest('details');
-    if (folded && !folded.open) {
-      folded.open = true;
-      target.scrollIntoView();
-    }
+    const opened = folded && !folded.open;
+    if (opened) folded.open = true;
+    if (opened || english) target.scrollIntoView();
   };
   addEventListener('hashchange', reveal);
   reveal();

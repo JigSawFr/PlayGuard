@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 291d4702e4db -->
+<!-- translated from docs/install.md, sha256 3b35bfa7ef3d -->
 # Installatie
 
 Hoe je PlayGuard installeert, bijwerkt en verwijdert, en wat het op de SD-kaart schrijft. Eenmaal geïnstalleerd: [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
@@ -7,7 +7,7 @@ Hoe je PlayGuard installeert, bijwerkt en verwijdert, en wat het op de SD-kaart 
 
 Kies er één:
 
-- **Homebrew App Store** / **App Store van sphaira** (dezelfde catalogus) — Zoek naar *PlayGuard* zodra de vermelding is goedgekeurd. Nieuwe versies worden automatisch opgepikt.
+- **Homebrew App Store** / **App Store van sphaira** (dezelfde catalogus) — Zoek naar *PlayGuard* zodra de vermelding is goedgekeurd. Nieuwe versies worden automatisch opgepikt, na een controle: vaak een paar dagen na GitHub. PlayGuard weet dat het daarvandaan is geïnstalleerd en raadt aan om via de store bij te werken.
 - **sphaira › GitHub** — De zip van de release bevat de vermelding al (`/config/sphaira/github/playguard.json`): werk na een eerste installatie bij via *GitHub* in sphaira.
 - **Handmatig** — Download `playguard.zip` van de [nieuwste release](https://github.com/JigSawFr/PlayGuard/releases/latest) en pak het uit in de **hoofdmap** van de SD-kaart. De app komt in `sd:/switch/playguard/`, zijn bestanden in `sd:/config/playguard/`.
 

@@ -1,7 +1,7 @@
 <!-- translated from docs/troubleshooting.md, sha256 5b0b1b94198f -->
 # Dépannage
 
-Reprendre la main sur une console bloquée, les problèmes courants, signaler un bug, et le mode développeur. Retour au [README](../../README.fr.md).
+Reprendre la main sur une console bloquée, les problèmes courants, signaler un bug, et le mode développeur. Retour au [README](../../README.md).
 
 ## Console bloquée ?
 

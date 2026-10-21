@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 86382aa8effc -->
+<!-- translated from docs/troubleshooting.md, sha256 5b0b1b94198f -->
 # Solução de problemas
 
 Como voltar a ter acesso a um console bloqueado, os problemas comuns, relatar um bug e o modo de desenvolvedor. Volte ao [README](../../README.md).
@@ -23,6 +23,13 @@ Nesse caso, o próprio PlayGuard não consegue abrir. Instale **com antecedênci
 
 O módulo precisa acompanhar a versão do PlayGuard: a cada atualização do PlayGuard, extraia de novo o `playguard-rescue.zip` dessa versão (ou *Atualizar* na entrada *O sysmodule de recuperação está desatualizado* do sino de notificações) e depois reinicie o console. Um módulo mais antigo deixa um relatório que o PlayGuard não consegue verificar: a tela de recuperação então não oferece nada, diz que o módulo é mais antigo, e repetir o `RESCUE` dá o mesmo resultado até ele ser atualizado.
 
+### Menu homebrew bloqueado
+
+*Console › Forwarders › Bloquear o menu homebrew* impede que o álbum e um jogo aberto com R abram o menu homebrew. Se o forwarder do PlayGuard e o menu protegido tiverem sumido os dois (excluídos nas Configurações do console, ou no outro sistema: o bloqueio fica no cartão SD, lido tanto pelo sysMMC quanto pelo emuMMC):
+
+- **Por um computador:** exclua `atmosphere/config/override_config.ini` no cartão SD (ou recoloque `config/playguard/override_config.ini.backup`, o arquivo como era) e depois reinicie o console.
+- **Com o módulo de resgate instalado** (opcional): coloque um arquivo vazio `config/playguard/RESCUE` no cartão SD e reinicie; o módulo desfaz o bloqueio na inicialização, e o PlayGuard avisa isso na próxima abertura. Uma atualização do Atmosphère desde o bloqueio o desfaz do mesmo jeito.
+
 ### Console não desbloqueado
 
 O PlayGuard não pode ajudar: ele precisa do Atmosphère. O procedimento da chave mestra do suporte da Nintendo é o caminho oficial.
@@ -41,7 +48,7 @@ O PlayGuard não pode ajudar: ele precisa do Atmosphère. O procedimento da chav
 ### Meus limites mudaram sozinhos
 
 - **O app do celular continua vinculado.** A próxima sincronização dele substitui o que o PlayGuard definiu: *PIN › Desvincular o app do celular*.
-- **Outra ferramenta, ou um perfil.** *Hoje* mostra um cartão âmbar para limites diferentes dos que o PlayGuard viu por último, e *Histórico › Histórico de alterações* lista cada mudança vista fora do PlayGuard. Ⓐ em uma delas restaura o valor anterior.
+- **Outra ferramenta, ou um perfil.** *Hoje* mostra um cartão âmbar para limites diferentes dos que o PlayGuard viu por último, e *Preferências › Histórico de alterações* lista cada mudança vista fora do PlayGuard. Ⓐ em uma delas restaura o valor anterior.
 - **Um perfil agendado** aplicado, ou desfeito quando o período dele terminou (*Tempo de jogo › Perfis › Perfil agendado*).
 
 ### A criança jogou além do limite
@@ -66,6 +73,10 @@ O console roda um firmware mais recente que o mais recente testado: o PlayGuard 
 ### Um jogo não abre, ou mostra um "!" no menu HOME
 
 *Console › Verificar os jogos instalados* diz o que está errado com cada um e o que fazer; os dados salvos sempre ficam ([jogos instalados](features.md#jogos-instalados)).
+
+### Um forwarder protegido mostra o erro 2347-0100
+
+O portão dele (`config/playguard/gate-….nro`) não é mais o arquivo com que o forwarder foi feito: ele foi alterado ou substituído no cartão SD, então o forwarder não o abre. Abra o PlayGuard pelo forwarder dele próprio: ele grava o portão de novo ao iniciar; *Console › Forwarders › Reinstalar todos* refaz todos os forwarders com ele.
 
 ### O sino ou uma aba mostra um selo âmbar
 
@@ -113,6 +124,7 @@ Pressione Ⓨ sete vezes em *Sobre › Versão*; as ferramentas de desenvolvedor
 
 - uma chave **somente leitura** — com ela ativada, o app não pode alterar nada: o jeito seguro de investigar um novo firmware (a tela de firmware oferece isso diretamente);
 - o relatório de diagnóstico na tela (Ⓨ salva, Ⓧ envia online), e um atalho para exportá-lo na aba Tempo de jogo;
+- **Autoteste do console**: o que o PlayGuard verifica sozinho neste console antes que [a lista de verificação do console](../hardware-test.md) (em inglês) seja percorrida à mão — o PIN, os patches de assinatura, a pasta de dados, cada forwarder criado pelo PlayGuard (no menu HOME, protegido, visto funcionando pelo portão dele), o portão no cartão SD, o que o Atmosphère lê do bloqueio do menu homebrew, os caminhos de volta, o módulo de resgate. Ele não altera nada, e grava o resultado em Markdown em `config/playguard/self-test.md`, para colar na pull request;
 - **Instalar outra compilação** no lugar da atual, para testar uma correção antes de ela ser publicada ([abaixo](#instalar-outra-compilação));
 - **Comparar bloco do tempo de jogo** (só enquanto o app do celular estiver vinculado e puder sincronizar — não com um arquivo hosts bloqueando a Nintendo; também em *PIN*), para decifrar configurações que o PlayGuard ainda não mostra: salve o bloco bruto como referência, mude uma configuração no app do celular, volte — o PlayGuard lista os valores que mudaram (salvos em `logs/reports/` se você pedir). Horários de dormir diferentes por dia, definidos pelo app do celular, poderiam ser confirmados assim. Anexe esse arquivo a uma issue, ou envie-o com o relatório (*Enviar um relatório online*).
 - **Registrar o limite de tempo de jogo**: a cada 30 s enquanto o PlayGuard estiver aberto, uma linha com o que o temporizador informa (tempo restante, tempo gasto, o bloco bruto de configurações…) em `logs/play_timer/log.csv`, um arquivo pronto para planilha, mais uma linha logo depois de cada alteração feita pelo PlayGuard, dizendo qual (a última coluna, `event`), e uma nota quando o relógio andou mais do que o tempo que passou. Deixado aberto depois da meia-noite, ou até o tempo acabar, ele mostra o que um único relatório não mostra: quando o tempo gasto é zerado, o que o console diz perto do fim. A chave é lembrada; ela só grava no modo de desenvolvedor. O que já se sabe está em [parental-controls.md](../parental-controls.md) (em inglês).

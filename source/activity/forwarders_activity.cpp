@@ -185,7 +185,7 @@ void ForwardersActivity::onContentAvailable()
     }
     // Y: what this screen does, in the guide (a QR code).
     this->getContentView()->registerAction("playguard/forwarders/help"_i18n, brls::BUTTON_Y, [](brls::View*) {
-        ui::qr_dialog("playguard/forwarders/help_body"_i18n, std::string(app::repo_url()) + "/blob/main/docs/features.md#forwarders");
+        ui::qr_dialog("playguard/forwarders/help_body"_i18n, app::doc_url("features", "forwarders"));
         return true;
     });
     // The first list at once: the screen is not on top yet while it opens.

@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 291d4702e4db -->
+<!-- translated from docs/install.md, sha256 3b35bfa7ef3d -->
 # Installation
 
 Wie du PlayGuard installierst, aktualisierst und entfernst, und was es auf die SD-Karte schreibt. Nach der Installation: [Einstieg](getting-started.md). Zurück zum [README](../../README.md).
@@ -7,7 +7,7 @@ Wie du PlayGuard installierst, aktualisierst und entfernst, und was es auf die S
 
 Wähle eine Möglichkeit:
 
-- **Homebrew App Store** / **App Store von sphaira** (derselbe Katalog) — Suche nach *PlayGuard*, sobald der Eintrag freigegeben ist. Neue Versionen werden automatisch übernommen.
+- **Homebrew App Store** / **App Store von sphaira** (derselbe Katalog) — Suche nach *PlayGuard*, sobald der Eintrag freigegeben ist. Neue Versionen werden automatisch übernommen, nach einer Prüfung: oft ein paar Tage nach GitHub. PlayGuard weiß, dass es von dort installiert wurde, und empfiehlt, über den Store zu aktualisieren.
 - **sphaira › GitHub** — Das Zip der Version enthält den Eintrag bereits (`/config/sphaira/github/playguard.json`): Nach einer ersten Installation aktualisierst du in sphaira über *GitHub*.
 - **Manuell** — Lade `playguard.zip` aus der [neuesten Version](https://github.com/JigSawFr/PlayGuard/releases/latest) herunter und entpacke es ins **Hauptverzeichnis** der SD-Karte. Die App landet in `sd:/switch/playguard/`, ihre Dateien in `sd:/config/playguard/`.
 

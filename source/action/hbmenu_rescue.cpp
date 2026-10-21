@@ -66,7 +66,7 @@ brls::Box* rescue_step(const char* number, const std::string& title, const std::
 constexpr const char* RESCUE_PAGE_NAME = "rescue.html";
 std::string help_url()
 {
-    return std::string(app::repo_url()) + "/blob/main/docs/troubleshooting.md#homebrew-menu-locked";
+    return app::doc_url("troubleshooting", "homebrew-menu-locked");
 }
 
 // The rescue sheet as a page to print, in the data directory; false when it

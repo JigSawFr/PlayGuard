@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 629d9dfda705 -->
+<!-- translated from docs/getting-started.md, sha256 7eb08acd197b -->
 # Primeiros passos
 
 Do cartão SD a um console configurado para a sua criança, em cerca de dez minutos, e depois as tarefas do dia a dia. Volte ao [README](../../README.md).
@@ -73,8 +73,8 @@ Um console sem internet: quando nenhum servidor responde, o PlayGuard oferece aj
 | Alternar entre período de aulas e férias | *Tempo de jogo › Perfis*; *Perfil agendado* para um período escolhido com antecedência. |
 | Ver quem jogou o quê | *Atividade*: por jogo, por conta, hoje, 7 dias, desde sempre; exportação ou um QR code. |
 | Bloquear todos os jogos por enquanto | *PIN › Bloquear todos os jogos*. Ao desativar, os limites anteriores voltam. |
-| Desfazer uma mudança | **ZR** *Desfazer* logo depois dela, ou *Histórico › Histórico de alterações* a qualquer momento. |
-| Guardar uma cópia das configurações | *Histórico › Fazer backup das configurações* (nunca o PIN). |
+| Desfazer uma mudança | **ZR** *Desfazer* logo depois dela, ou *Preferências › Histórico de alterações* a qualquer momento. |
+| Guardar uma cópia das configurações | *Preferências › Fazer backup das configurações* (nunca o PIN). |
 | Saber o que precisa de você | O sino (Ⓨ): o que fazer em âmbar, o que saber com um "i". |
 
 ## Próximos passos

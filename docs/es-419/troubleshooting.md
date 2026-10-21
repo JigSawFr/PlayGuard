@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 86382aa8effc -->
+<!-- translated from docs/troubleshooting.md, sha256 5b0b1b94198f -->
 # Solución de problemas
 
 Recuperar el acceso a una consola bloqueada, los problemas frecuentes, reportar un error y el modo desarrollador. Volver al [README](../../README.md).
@@ -23,6 +23,13 @@ En ese caso, PlayGuard ni siquiera puede iniciarse. Instale **de antemano** el s
 
 El módulo debe ir a la par de la versión de PlayGuard: con cada actualización de PlayGuard, vuelva a extraer el `playguard-rescue.zip` de esa versión (o use *Actualizar* en *El sysmodule de recuperación no está actualizado*, en la campana de notificaciones) y luego reinicie la consola. Un módulo más antiguo deja un informe que PlayGuard no puede verificar: la pantalla de recuperación entonces no ofrece nada, indica que el módulo es más antiguo, y volver a usar `RESCUE` da el mismo resultado hasta que se actualice.
 
+### Menú homebrew bloqueado
+
+*Consola › Forwarders › Bloquear el menú homebrew* impide que el álbum y un juego iniciado con R abran el menú homebrew. Si el forwarder de PlayGuard y el menú protegido ya no están (eliminados en la Configuración de la consola, o en el otro sistema: el bloqueo está en la tarjeta SD, y lo leen tanto la sysMMC como la emuMMC):
+
+- **Desde una computadora:** elimine `atmosphere/config/override_config.ini` de la tarjeta SD (o vuelva a poner `config/playguard/override_config.ini.backup`, el archivo como estaba) y luego reinicie la consola.
+- **Con el módulo de rescate instalado** (opcional): coloque un archivo vacío `config/playguard/RESCUE` en la tarjeta SD y reinicie; el módulo quita el bloqueo al arrancar, y PlayGuard lo indica la siguiente vez que se inicia. Una actualización de Atmosphère desde que se bloqueó lo quita de la misma manera.
+
 ### Consola sin modificar
 
 PlayGuard no puede ayudar: necesita Atmosphère. El procedimiento de la clave maestra del soporte de Nintendo es la vía oficial.
@@ -41,7 +48,7 @@ PlayGuard no puede ayudar: necesita Atmosphère. El procedimiento de la clave ma
 ### Mis límites cambiaron solos
 
 - **La app para celular sigue vinculada.** Su próxima sincronización sobrescribe lo que configuró PlayGuard: *PIN › Desvincular la app para celular*.
-- **Otra herramienta, o un perfil.** *Hoy* muestra una tarjeta ámbar para los límites distintos de los que PlayGuard vio la última vez, y *Historial › Historial de cambios* enumera cada cambio visto fuera de PlayGuard. Ⓐ en uno restablece el valor anterior.
+- **Otra herramienta, o un perfil.** *Hoy* muestra una tarjeta ámbar para los límites distintos de los que PlayGuard vio la última vez, y *Preferencias › Historial de cambios* enumera cada cambio visto fuera de PlayGuard. Ⓐ en uno restablece el valor anterior.
 - **Un perfil programado** que se aplicó, o que se revirtió al terminar su período (*Tiempo de juego › Perfiles › Perfil programado*).
 
 ### El niño jugó más allá del límite
@@ -66,6 +73,10 @@ La consola ejecuta un firmware más reciente que el más reciente probado: PlayG
 ### Un juego no se inicia, o muestra un “!” en el menú HOME
 
 *Consola › Comprobar los juegos instalados* indica qué falla en cada uno y qué hacer; los datos de guardado siempre se conservan ([juegos instalados](features.md#juegos-instalados)).
+
+### Un forwarder protegido muestra el error 2347-0100
+
+Su puerta (`config/playguard/gate-….nro`) ya no es el archivo con el que se creó el forwarder: se modificó o se reemplazó en la tarjeta SD, así que el forwarder no la inicia. Abra PlayGuard desde su propio forwarder: vuelve a escribir la puerta al iniciarse; *Consola › Forwarders › Reinstalar todos* vuelve a crear todos los forwarders con ella.
 
 ### La campana o una pestaña muestra una insignia ámbar
 
@@ -113,6 +124,7 @@ Presione Ⓨ siete veces en *Información › Versión*; las herramientas de des
 
 - un interruptor de **solo lectura**: activado, la aplicación no puede cambiar nada; es la forma segura de investigar un firmware nuevo (la pantalla del firmware lo ofrece directamente);
 - el informe de diagnóstico en pantalla (Ⓨ lo guarda, Ⓧ lo envía en línea), y un acceso directo para exportarlo desde la pestaña Tiempo de juego;
+- **Autoprueba de la consola**: lo que PlayGuard comprueba por sí solo en esta consola antes de recorrer a mano [la lista de verificación en consola](../hardware-test.md) (en inglés): el PIN, los parches de firma, la carpeta de datos, cada forwarder creado por PlayGuard (en el menú HOME, protegido, visto funcionar a través de su puerta), la puerta en la tarjeta SD, lo que Atmosphère lee del bloqueo del menú homebrew, los caminos de vuelta, el módulo de rescate. No cambia nada, y escribe su resultado en Markdown en `config/playguard/self-test.md`, para pegarlo en la pull request;
 - **Instalar otra compilación** en su lugar, para probar una corrección antes de que se publique ([más abajo](#instalar-otra-compilación));
 - **Comparar bloque del temporizador** (solo mientras la app para celular está vinculada y puede sincronizarse, no con un archivo hosts que bloquee a Nintendo; también en *PIN*), para descifrar ajustes que PlayGuard todavía no muestra: guarde el bloque sin procesar como referencia, cambie un ajuste en la app para celular, vuelva: PlayGuard enumera los valores que cambiaron (guardados en `logs/reports/` si lo pide). Así se podrían confirmar horas de dormir distintas para cada día, configuradas desde la app para celular. Adjunte ese archivo a un issue, o envíelo con el informe (*Enviar un informe en línea*).
 - **Registrar el temporizador de juego**: cada 30 s mientras PlayGuard está abierto, una línea de lo que informa el temporizador de juego (tiempo restante, tiempo jugado, el bloque de configuración sin procesar…) en `logs/play_timer/log.csv`, un archivo listo para una hoja de cálculo, más una línea justo después de cada cambio que hace PlayGuard, que indica cuál (su última columna, `event`), y una nota cuando el reloj se movió más que el tiempo transcurrido. Si se deja abierto pasada la medianoche, o hasta que se acaba el tiempo, muestra lo que un solo informe no puede: cuándo se reinicia el tiempo jugado, qué dice la consola cerca del final. El interruptor se recuerda; solo registra en modo desarrollador. Lo que se sabe hasta ahora está en [parental-controls.md](../parental-controls.md) (en inglés).

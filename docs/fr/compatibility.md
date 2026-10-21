@@ -1,7 +1,7 @@
 <!-- translated from docs/compatibility.md, sha256 33251c660faf -->
 # Compatibilité
 
-Firmwares, Atmosphère et lanceurs pris en charge, emuMMC et sysMMC, et la comparaison avec un sysmodule de remplacement. Retour au [README](../../README.fr.md).
+Firmwares, Atmosphère et lanceurs pris en charge, emuMMC et sysMMC, et la comparaison avec un sysmodule de remplacement. Retour au [README](../../README.md).
 
 ## Versions prises en charge
 

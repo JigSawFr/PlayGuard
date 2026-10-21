@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 629d9dfda705 -->
+<!-- translated from docs/getting-started.md, sha256 7eb08acd197b -->
 # Einstieg
 
 Von der SD-Karte zu einer Konsole, die für dein Kind eingerichtet ist, in etwa zehn Minuten, dann die alltäglichen Aufgaben. Zurück zum [README](../../README.md).
@@ -73,8 +73,8 @@ Eine Konsole ohne Internet: Wenn kein Server antwortet, bietet PlayGuard an, die
 | Zwischen Schulzeit und Ferien zu wechseln | *Spielzeit › Profile*; *Geplantes Profil* für einen im Voraus gewählten Zeitraum. |
 | Zu sehen, wer was gespielt hat | *Aktivität*: pro Spiel, pro Benutzerkonto, heute, 7 Tage, insgesamt; Export oder ein QR-Code. |
 | Vorerst alle Spiele zu sperren | *Geheimzahl › Alle Spiele sperren*. Ausgeschaltet kommen die vorherigen Limits zurück. |
-| Eine Änderung rückgängig zu machen | **ZR** *Rückgängig* direkt danach, oder jederzeit *Verlauf › Änderungsverlauf*. |
-| Eine Kopie der Einstellungen zu behalten | *Verlauf › Einstellungen sichern* (nie die Geheimzahl). |
+| Eine Änderung rückgängig zu machen | **ZR** *Rückgängig* direkt danach, oder jederzeit *Optionen › Änderungsverlauf*. |
+| Eine Kopie der Einstellungen zu behalten | *Optionen › Einstellungen sichern* (nie die Geheimzahl). |
 | Zu wissen, was dich braucht | Die Glocke (Ⓨ): was zu tun ist in Bernstein, was zu wissen ist mit einem „i“. |
 
 ## Weiter

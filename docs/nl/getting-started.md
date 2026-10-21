@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 629d9dfda705 -->
+<!-- translated from docs/getting-started.md, sha256 7eb08acd197b -->
 # Aan de slag
 
 Van de SD-kaart tot een console die voor je kind is ingesteld, in ongeveer tien minuten, en daarna de dagelijkse taken. Terug naar de [README](../../README.md).
@@ -73,8 +73,8 @@ Een console zonder internet: als geen enkele server antwoordt, biedt PlayGuard a
 | Te wisselen tussen schooltijd en vakantie | *Speeltijdtimer › Profielen*; *Gepland profiel* voor een vooraf gekozen periode. |
 | Te zien wie wat speelde | *Activiteit*: per game, per account, vandaag, 7 dagen, altijd; exporteren of een QR-code. |
 | Voorlopig alle games te blokkeren | *Pincode › Alle games blokkeren*. Zet je het uit, dan komen de vorige limieten terug. |
-| Een wijziging ongedaan te maken | **ZR** *Ongedaan maken* er direct na, of *Geschiedenis › Wijzigingsgeschiedenis* op elk moment. |
-| Een kopie van de instellingen te bewaren | *Geschiedenis › Back-up van de instellingen maken* (nooit de pincode). |
+| Een wijziging ongedaan te maken | **ZR** *Ongedaan maken* er direct na, of *Voorkeuren › Wijzigingsgeschiedenis* op elk moment. |
+| Een kopie van de instellingen te bewaren | *Voorkeuren › Back-up van de instellingen maken* (nooit de pincode). |
 | Te weten wat je aandacht vraagt | De bel (Ⓨ): wat te doen is in oranje, wat je moet weten met een "i". |
 
 ## Verder

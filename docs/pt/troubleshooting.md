@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 86382aa8effc -->
+<!-- translated from docs/troubleshooting.md, sha256 5b0b1b94198f -->
 # Resolução de problemas
 
 Voltar a entrar numa consola bloqueada, os problemas comuns, comunicar um erro e o modo de programador. Voltar ao [README](../../README.md).
@@ -23,6 +23,13 @@ Nesse caso, o próprio PlayGuard não consegue arrancar. Instale **antecipadamen
 
 O módulo tem de acompanhar a versão do PlayGuard: a cada atualização do PlayGuard, extraia de novo o `playguard-rescue.zip` dessa versão (ou *Atualizar* na entrada *O sysmodule de recuperação está desatualizado* do sino de notificações) e depois reinicie a consola. Um módulo mais antigo deixa um relatório que o PlayGuard não consegue verificar: o ecrã de recuperação não propõe então nada, diz que o módulo é mais antigo, e voltar a fazer `RESCUE` dá o mesmo resultado até ele ser atualizado.
 
+### Menu homebrew bloqueado
+
+*Consola › Forwarders › Bloquear o menu homebrew* impede que o álbum e um jogo iniciado com R abram o menu homebrew. Se o forwarder do PlayGuard e o menu protegido tiverem ambos desaparecido (eliminados nas Definições da consola, ou no outro sistema: o bloqueio está no cartão SD, lido tanto pelo sysMMC como pelo emuMMC):
+
+- **A partir de um computador:** elimine `atmosphere/config/override_config.ini` no cartão SD (ou reponha `config/playguard/override_config.ini.backup`, o ficheiro tal como estava) e depois reinicie a consola.
+- **Com o módulo de recuperação instalado** (opcional): coloque um ficheiro vazio `config/playguard/RESCUE` no cartão SD e reinicie; o módulo levanta o bloqueio no arranque, e o PlayGuard indica-o no arranque seguinte. Uma atualização do Atmosphère desde que foi bloqueado levanta-o da mesma forma.
+
 ### Consola não modificada
 
 O PlayGuard não pode ajudar: precisa do Atmosphère. O procedimento da chave mestra do apoio ao cliente da Nintendo é a via oficial.
@@ -41,7 +48,7 @@ O PlayGuard não pode ajudar: precisa do Atmosphère. O procedimento da chave me
 ### Os meus limites mudaram sozinhos
 
 - **A aplicação móvel continua associada.** A sua próxima sincronização substitui o que o PlayGuard definiu: *PIN › Desvincular a aplicação móvel*.
-- **Outra ferramenta, ou um perfil.** *Hoje* mostra um cartão âmbar para limites diferentes dos que o PlayGuard viu da última vez, e *Histórico › Histórico de alterações* lista cada alteração vista fora do PlayGuard. Ⓐ numa delas repõe o valor anterior.
+- **Outra ferramenta, ou um perfil.** *Hoje* mostra um cartão âmbar para limites diferentes dos que o PlayGuard viu da última vez, e *Preferências › Histórico de alterações* lista cada alteração vista fora do PlayGuard. Ⓐ numa delas repõe o valor anterior.
 - **Um perfil agendado** posto em vigor, ou reposto quando o seu período terminou (*Tempo de jogo › Perfis › Perfil agendado*).
 
 ### A criança jogou para além do limite
@@ -66,6 +73,10 @@ A consola tem um firmware mais recente do que o mais recente testado: o PlayGuar
 ### Um jogo não arranca, ou mostra um "!" no menu HOME
 
 *Consola › Verificar os jogos instalados* diz o que está errado com cada um e o que fazer; os dados guardados ficam sempre ([jogos instalados](features.md#jogos-instalados)).
+
+### Um forwarder protegido mostra o erro 2347-0100
+
+A sua porta (`config/playguard/gate-….nro`) já não é o ficheiro com que o forwarder foi criado: foi alterada ou substituída no cartão SD, por isso o forwarder não a inicia. Abra o PlayGuard a partir do seu próprio forwarder: ele volta a escrever a porta ao arrancar; *Consola › Forwarders › Reinstalar todos* refaz todos os forwarders com ela.
 
 ### O sino ou um separador mostra um distintivo âmbar
 
@@ -113,6 +124,7 @@ Prima Ⓨ sete vezes em *Sobre › Versão*; as ferramentas de programador apare
 
 - um interruptor **só de leitura** — com ele ativo, a aplicação não pode alterar nada: a forma segura de investigar um novo firmware (o ecrã do firmware propõe-no diretamente);
 - o relatório de diagnóstico no ecrã (Ⓨ guarda-o, Ⓧ envia-o online), e um atalho para o exportar a partir do separador Tempo de jogo;
+- **Autoteste da consola**: o que o PlayGuard verifica sozinho nesta consola antes de [a lista de verificação na consola](../hardware-test.md) (em inglês) ser percorrida à mão — o PIN, os patches de assinatura, a pasta de dados, cada forwarder criado pelo PlayGuard (no menu HOME, protegido, visto a funcionar através da sua porta), a porta no cartão SD, o que o Atmosphère lê do bloqueio do menu homebrew, os caminhos de volta, o sysmodule de recuperação. Não altera nada, e escreve o resultado em Markdown em `config/playguard/self-test.md`, para colar no pull request;
 - **Instalar outra compilação** no lugar da atual, para testar uma correção antes de ser publicada ([abaixo](#instalar-outra-compilação));
 - **Comparar o bloco do temporizador** (só enquanto a aplicação móvel está associada e consegue sincronizar — não com um ficheiro hosts que bloqueie a Nintendo; também em *PIN*), para decifrar definições que o PlayGuard ainda não mostra: guarde o bloco em bruto como referência, altere uma definição na aplicação móvel, volte — o PlayGuard lista os valores que mudaram (guardados em `logs/reports/` a pedido). Horas de dormir diferentes por dia, definidas na aplicação móvel, poderiam ser confirmadas assim. Anexe esse ficheiro a uma issue, ou envie-o com o relatório (*Enviar um relatório online*).
 - **Registar o temporizador de jogo**: a cada 30 s enquanto o PlayGuard está aberto, uma linha com o que o temporizador de jogo indica (tempo restante, tempo gasto, o bloco de definições em bruto…) em `logs/play_timer/log.csv`, um ficheiro pronto para uma folha de cálculo, mais uma linha logo depois de cada alteração feita pelo PlayGuard, a dizer qual (a última coluna, `event`), e uma nota quando o relógio avançou mais do que o tempo que passou. Deixado aberto durante a meia-noite, ou até o tempo acabar, mostra o que um só relatório não consegue: quando o tempo gasto é reposto, o que a consola diz perto do fim. O interruptor é memorizado; só regista no modo de programador. O que já se sabe está em [parental-controls.md](../parental-controls.md) (em inglês).

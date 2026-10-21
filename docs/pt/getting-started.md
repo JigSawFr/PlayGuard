@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 629d9dfda705 -->
+<!-- translated from docs/getting-started.md, sha256 7eb08acd197b -->
 # Como começar
 
 Do cartão SD a uma consola configurada para o seu filho, em cerca de dez minutos, e depois as tarefas do dia a dia. Voltar ao [README](../../README.md).
@@ -73,8 +73,8 @@ Uma consola sem Internet: quando nenhum servidor responde, o PlayGuard propõe a
 | Alternar entre o tempo de aulas e as férias | *Tempo de jogo › Perfis*; *Perfil agendado* para um período escolhido com antecedência. |
 | Ver quem jogou a quê | *Atividade*: por jogo, por conta, hoje, 7 dias, desde sempre; uma exportação ou um código QR. |
 | Bloquear todos os jogos por agora | *PIN › Bloquear todos os jogos*. Quando é desativado, os limites anteriores voltam. |
-| Anular uma alteração | **ZR** *Anular* logo a seguir, ou *Histórico › Histórico de alterações* a qualquer momento. |
-| Guardar uma cópia das definições | *Histórico › Criar uma cópia de segurança* (nunca o PIN). |
+| Anular uma alteração | **ZR** *Anular* logo a seguir, ou *Preferências › Histórico de alterações* a qualquer momento. |
+| Guardar uma cópia das definições | *Preferências › Criar uma cópia de segurança* (nunca o PIN). |
 | Saber o que precisa de si | O sino (Ⓨ): o que fazer a âmbar, o que saber com um "i". |
 
 ## A seguir

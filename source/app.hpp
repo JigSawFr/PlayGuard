@@ -28,6 +28,11 @@ bool        is_release();
 std::string self_path();
 void        set_self_path(const char* argv0);
 const char* repo_url();
+// The website (https://playguard.link/, tools/build_site.py) and a page of its
+// documentation in the console's language ("troubleshooting", "locked-out"):
+// a release's as published (docs/), main's for a development build (docs/dev/).
+const char* site_url();
+std::string doc_url(const std::string& page, const std::string& anchor = "");
 // Funding links (.github/FUNDING.yml), shown in About.
 constexpr const char* SPONSORS_URL = "https://github.com/sponsors/JigSawFr";
 constexpr const char* KOFI_URL     = "https://ko-fi.com/jigsawfr";
