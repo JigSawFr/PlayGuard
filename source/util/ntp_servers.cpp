@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "util/ntp_servers.hpp"
 
+#include <cstdio>
+
 #include "core/platform.h"
 
 namespace ntp
@@ -41,6 +43,50 @@ std::string default_server_for_console()
         }
     }
     return "pool.ntp.org";
+}
+
+namespace
+{
+// A country's flag: its code's two regional indicator letters ("fr").
+std::string flag(std::string code)
+{
+    if (code == "uk") code = "gb";   // the pool's name for Great Britain
+    if (code.size() != 2) return "";
+    std::string out;
+    for (char c : code) {
+        if (c < 'a' || c > 'z') return "";
+        char hex[8];
+        std::snprintf(hex, sizeof hex, "%x", 0x1F1E6 + (c - 'a'));
+        if (!out.empty()) out += '-';
+        out += hex;
+    }
+    return out;
+}
+
+bool ends_with(const std::string& s, const std::string& end)
+{
+    return s.size() >= end.size() && s.compare(s.size() - end.size(), end.size(), end) == 0;
+}
+}   // namespace
+
+std::string host_emoji(const std::string& host)
+{
+    static const std::string POOL = "pool.ntp.org";
+    if (host == POOL || ends_with(host, "." + POOL)) {
+        const std::string zone = host.size() > POOL.size() ? host.substr(0, host.size() - POOL.size() - 1) : "";
+        if (zone.empty() || (zone.size() == 1 && zone[0] >= '0' && zone[0] <= '9')) return "1f310";   // 🌐
+        if (zone == "europe") return "1f1ea-1f1fa";                                                   // 🇪🇺
+        if (zone == "north-america" || zone == "south-america") return "1f30e";                       // 🌎
+        if (zone == "asia" || zone == "oceania") return "1f30f";                                      // 🌏
+        if (zone == "africa") return "1f30d";                                                         // 🌍
+        return flag(zone);
+    }
+    // China's own servers, under .com.
+    for (const char* cn : { "aliyun.com", "tencent.com" })
+        if (ends_with(host, std::string(".") + cn)) return flag("cn");
+    // A country's domain: ntp.nict.jp, ntp.ntsc.ac.cn.
+    const size_t dot = host.rfind('.');
+    return dot == std::string::npos ? "" : flag(host.substr(dot + 1));
 }
 
 std::vector<std::string> cross_check_servers(const std::string& primary)

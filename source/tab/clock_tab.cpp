@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
-#include <utility>
 #include <vector>
 
 #include "action/nintendo_dns.hpp"
@@ -16,6 +15,7 @@
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/ntp_servers.hpp"
+#include "util/paths.hpp"
 #include "util/perf.hpp"
 
 using namespace brls::literals;
@@ -29,19 +29,23 @@ std::string region_label(const std::string& id)
     return brls::getStr("playguard/clock/region_names/" + id);
 }
 
-// The region's icon in its picker: a globe or a flag from the Twemoji set of
-// img/emoji/, or a Cadran icon (the big providers, the saved servers).
+// A server's icon in the pickers: its flag or globe from the Twemoji set of
+// img/emoji/ (ntp::host_emoji()); a big provider's, or one whose picture the
+// set lacks, a server.
+std::string host_icon(const std::string& host)
+{
+    const std::string hex = ntp::host_emoji(host);
+    if (hex.empty() || !paths::file_exists(std::string(BRLS_ASSET("img/emoji/")) + hex + ".png")) return "server";
+    return "img/emoji/" + hex + ".png";
+}
+
+// A region's: its first server's (Europe's flag, the globe turned to the
+// Americas…); the saved servers, the save icon.
 std::string region_icon(const std::string& id)
 {
-    static const std::pair<const char*, const char*> icons[] = {
-        { "global", "img/emoji/1f310.png" },      { "public", "server" },
-        { "europe", "img/emoji/1f1ea-1f1fa.png" }, { "americas", "img/emoji/1f30e.png" },
-        { "asia", "img/emoji/1f30f.png" },         { "china", "img/emoji/1f1e8-1f1f3.png" },
-        { "africa", "img/emoji/1f30d.png" },       { "custom", "save" },
-    };
-    for (const auto& [region, icon] : icons)
-        if (id == region) return icon;
-    return "";
+    for (const auto& r : ntp::regions())
+        if (id == r.id) return host_icon(r.hosts.front());
+    return "save";
 }
 
 std::string find_region(const std::string& host)
@@ -287,9 +291,11 @@ void ClockTab::choose_server()
     if (hosts.empty()) return;
     int selected = (int)(std::find(hosts.begin(), hosts.end(), this->server) - hosts.begin());
     if (selected >= (int)hosts.size()) selected = 0;
+    std::vector<std::string> icons;
+    for (const std::string& h : hosts) icons.push_back(host_icon(h));
     ui::pick("playguard/clock/server"_i18n, hosts, selected, [this, hosts](int index) {
         this->set_server(hosts[index], this->region_id);
-    });
+    }, true, {}, icons);
 }
 
 void ClockTab::enter_custom()
