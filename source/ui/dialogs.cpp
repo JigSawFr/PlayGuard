@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iterator>
 #include <memory>
 #include <yoga/Yoga.h>
 
@@ -466,13 +467,22 @@ void choose(std::string& field, const char* value, std::function<void()> after, 
 }
 }   // namespace
 
+// Each language's flag (config::LANGUAGES' order), from the Twemoji set of
+// img/emoji/: the console's own a globe; Latin American Spanish, Mexico's.
+constexpr const char* LANGUAGE_FLAGS[] = { "1f310",       "1f1fa-1f1f8", "1f1eb-1f1f7", "1f1e8-1f1e6",
+                                           "1f1e9-1f1ea", "1f1ea-1f1f8", "1f1f2-1f1fd", "1f1ee-1f1f9",
+                                           "1f1f3-1f1f1", "1f1f5-1f1f9", "1f1e7-1f1f7", "1f1f7-1f1fa",
+                                           "1f1ef-1f1f5", "1f1f0-1f1f7", "1f1e8-1f1f3", "1f1f9-1f1fc" };
+static_assert(std::size(LANGUAGE_FLAGS) == std::size(config::LANGUAGES), "a flag for each language");
+
 void pick_language(std::function<void()> after)
 {
-    std::vector<std::string> labels;
+    std::vector<std::string> labels, flags;
     for (const char* l : config::LANGUAGES) labels.push_back(brls::getStr(std::string("playguard/tools/languages/") + l));
+    for (const char* f : LANGUAGE_FLAGS) flags.push_back(std::string("img/emoji/") + f + ".png");
     pick("playguard/tools/language"_i18n, labels, index_of(config::LANGUAGES, config::get().language), [after](int i) {
         choose(config::get().language, config::LANGUAGES[i], after, live_prefs::language_changed);
-    });
+    }, true, {}, flags);
 }
 
 void pick_theme(std::function<void()> after)

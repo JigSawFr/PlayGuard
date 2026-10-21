@@ -202,9 +202,11 @@ void add_cancel(brls::Dialog* dialog, std::function<void()> cancel);
 // after it has closed. The row
 // `selected` has the focus and is checked as the current value, unless
 // `checked` is false (a list of things to do, not of values). `details`, when
-// given, says more about each row, after its label and quieter.
+// given, says more about each row, after its label and quieter; `images`, a
+// picture before each row's label (a resource, "img/…png"; empty: none).
 void pick(const std::string& title, const std::vector<std::string>& values, int selected,
-          std::function<void(int)> on_pick, bool checked = true, const std::vector<std::string>& details = {});
+          std::function<void(int)> on_pick, bool checked = true, const std::vector<std::string>& details = {},
+          const std::vector<std::string>& images = {});
 // The same with several rows checked: those `marks` sets (true). Choosing a
 // row closes the list as pick() does: to toggle one, the caller opens it
 // again with the row's mark changed and the focus on it (`focus`).
