@@ -198,7 +198,8 @@ void on_cancel(brls::Dialog* dialog, std::function<void()> on_cancel);
 // dialog that waits for something (a check, an answer from the network).
 void add_cancel(brls::Dialog* dialog, std::function<void()> cancel);
 
-// Dropdown list; `on_pick(index)` runs after the list has closed. The row
+// A list of values, as a sheet (ui/action_sheet.cpp); `on_pick(index)` runs
+// after it has closed. The row
 // `selected` has the focus and is checked as the current value, unless
 // `checked` is false (a list of things to do, not of values). `details`, when
 // given, says more about each row, after its label and quieter.
@@ -209,14 +210,41 @@ void pick(const std::string& title, const std::vector<std::string>& values, int 
 // again with the row's mark changed and the focus on it (`focus`).
 void pick_marked(const std::string& title, const std::vector<std::string>& values, const std::vector<bool>& marks,
                  int focus, std::function<void(int)> on_pick, const std::vector<std::string>& details = {});
-// A list of things to do: each line's label, and what it runs once the
-// list has closed. The first line is selected; none, no list.
+// A list of things to do, as a sheet (ui/action_sheet.cpp): each line's
+// label, and what it runs once the sheet has closed; its icon (a Cadran
+// icon, nullptr: none), what is set now at its end (`detail`), its group
+// (a section starts where it changes, its name the kicker above it) and its
+// tone (ON: the detail in teal, WARN: amber, DANGER: a removal, in coral);
+// switched(): a switch at its end, on or off, instead of the detail. A line
+// without `run` only closes the sheet. `subtitle`, under the title: what it
+// is about now; `image`, an NVG image before the title (someone else's,
+// kept). The first line is selected; none, no sheet.
 struct Choice
 {
+    enum class Tone { PLAIN, ON, WARN, DANGER };
+    Choice(std::string label, std::function<void()> run, const char* icon = nullptr, std::string detail = "",
+           std::string group = "", Tone tone = Tone::PLAIN)
+        : label(std::move(label)), run(std::move(run)), icon(icon), detail(std::move(detail)), group(std::move(group)),
+          tone(tone)
+    {
+    }
+    Choice& switched(bool on)
+    {
+        this->toggle = on ? 1 : 0;
+        return *this;
+    }
     std::string           label;
     std::function<void()> run;
+    const char*           icon;
+    std::string           detail;
+    std::string           group;
+    Tone                  tone;
+    int                   toggle = -1;   // switched(): 1 on, 0 off
 };
-void pick_actions(const std::string& title, const std::vector<Choice>& choices);
+void pick_actions(const std::string& title, const std::vector<Choice>& choices, const std::string& subtitle = "",
+                  int image = 0);
+// The sheet those open: its view, on top of the activities' stack.
+bool is_sheet(brls::View* view);
 
 // A duration set with the stick (cadran::prompt_minutes: 15 min a step, 5
 // with L and R, up to 24:00; "no limit" starts at 1 h), and the system

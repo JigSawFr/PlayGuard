@@ -47,6 +47,7 @@
 #include "tab/security_tab.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/cut_text.hpp"
+#include "ui/focus_log.hpp"
 #include "ui/live_prefs.hpp"
 #include "ui/text_size.hpp"
 #include "ui/ui.hpp"
@@ -332,6 +333,7 @@ void register_views()
     // screen's title.
     VersionBadge::install();
     NoticeBell::install();   // the bell goes in the header's row at the right
+    focus_log::install();   // the smoke test's lines by their words (PLAYGUARD_SIM_FOCUS_LOG)
     HeaderSetting::install();   // after the bell: the language and theme go left of it
     cadran::install_screens();   // the other screens after the boards
 }

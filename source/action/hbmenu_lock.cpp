@@ -334,8 +334,10 @@ void lock(std::function<void(bool)> done)
                            forwarder_flow::protect_all([finish](bool) {
                                brls::sync([finish]() { confirm_lock(finish); });
                            });
-                       } });
-    choices.push_back({ "playguard/hbmenu/lock_anyway"_i18n, [finish]() { confirm_lock(finish); } });
+                       },
+                       "lock" });
+    choices.push_back({ "playguard/hbmenu/lock_anyway"_i18n, [finish]() { confirm_lock(finish); }, "alert", "", "",
+                        ui::Choice::Tone::WARN });
     ui::pick_actions(brls::getStr("playguard/hbmenu/unprotected", names), choices);
 }
 

@@ -82,7 +82,11 @@ void GameCheckActivity::choose(const GameFacts& g, u32 actions)
     // game at the very end.
     std::vector<ui::Choice> choices;
     auto add = [&](u32 action, const GameContent& c) {
-        choices.push_back({ action_label(g, action, &c), [this, g, action, c]() { this->run(g, action, c); } });
+        // Removals in coral, the others as they are.
+        const bool removal = action == GA_REMOVE || action == GA_REMOVE_UPDATE || action == GA_REMOVE_ADDON;
+        const char* icon = action == GA_RESET_LAUNCH ? "restore" : action == GA_VERIFY ? "check" : "trash";
+        choices.push_back({ action_label(g, action, &c), [this, g, action, c]() { this->run(g, action, c); }, icon, "", "",
+                            removal ? ui::Choice::Tone::DANGER : ui::Choice::Tone::PLAIN });
     };
     const GameContent none = {};
     if (actions & GA_RESET_LAUNCH) add(GA_RESET_LAUNCH, none);
@@ -255,10 +259,11 @@ void GameCheckActivity::selection_menu()
     std::vector<ui::Choice> choices;
     if (!to_verify.empty())
         choices.push_back({ brls::getStr("playguard/games/selection/verify", (int)to_verify.size()),
-                            [this, to_verify]() { this->verify(to_verify); } });
+                            [this, to_verify]() { this->verify(to_verify); }, "check" });
     if (!to_remove.empty() && !app::read_only())
         choices.push_back({ brls::getStr("playguard/games/selection/remove", (int)to_remove.size()),
-                            [this, to_remove]() { this->remove_games(to_remove); } });
+                            [this, to_remove]() { this->remove_games(to_remove); }, "trash", "", "",
+                            ui::Choice::Tone::DANGER });
     for (GameCategory category : GROUPS) {
         const Group& group = this->groups[category];
         bool all = true;
@@ -270,13 +275,15 @@ void GameCheckActivity::selection_menu()
                             [this, category]() {
                                 for (const GameFacts& g : this->groups[category].games) this->selected.insert(g.app_id);
                                 this->show();
-                            } });
+                            },
+                            "list" });
     }
     if (!this->selected.empty())
         choices.push_back({ "playguard/games/selection/clear"_i18n, [this]() {
                                this->selected.clear();
                                this->show();
-                           } });
+                           },
+                           "stop" });
     ui::pick_actions(this->selection_text(), choices);
 }
 

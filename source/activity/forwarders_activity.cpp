@@ -15,7 +15,10 @@
 #include "util/forwarders.hpp"
 #include "util/nro.hpp"
 #include "util/paths.hpp"
+#include "view/cadran_icon.hpp"
 #include "view/game_cell.hpp"
+
+#include <yoga/Yoga.h>
 
 using namespace brls::literals;
 using forwarders_logic::Row;
@@ -124,6 +127,34 @@ std::vector<GameCell::Mark> list_marks(const Row& r)
     return out;
 }
 
+// Under the protected ones: what each icon at their lines' end says.
+brls::Box* legend()
+{
+    static const std::pair<const char*, const char*> MARKS[] = {
+        { "key", "playguard/forwarders/state_pin" },          { "unlock", "playguard/forwarders/action_hours" },
+        { "stop", "playguard/forwarders/action_closed" },     { "timer", "playguard/forwarders/action_limit" },
+        { "pause", "playguard/forwarders/detail_paused" },
+    };
+    auto* box = new brls::Box(brls::Axis::ROW);
+    YGNodeStyleSetFlexWrap(box->getYGNode(), YGWrapWrap);   // on two lines when the words are long
+    box->setAlignItems(brls::AlignItems::CENTER);
+    box->setMargins(8, 8, 0, 10);
+    for (const auto& [icon, key] : MARKS) {
+        auto* item = new brls::Box(brls::Axis::ROW);
+        item->setAlignItems(brls::AlignItems::CENTER);
+        item->setMarginRight(22);
+        item->setMarginBottom(4);
+        CadranIcon* glyph = cadran::kit::icon(icon, 16, std::string(icon) == "pause" ? "cadran/amber" : "cadran/teal");
+        glyph->setMarginRight(6);
+        item->addView(glyph);
+        brls::Label* word = cadran::kit::label(brls::getStr(key), cadran::kit::TEXT_META, "cadran/text3");
+        word->setSingleLine(true);
+        item->addView(word);
+        box->addView(item);
+    }
+    return box;
+}
+
 }   // namespace
 
 void ForwardersActivity::onContentAvailable()
@@ -227,31 +258,36 @@ void ForwardersActivity::fixes()
     // What the card says is missing or open, each a press away; then the check.
     const hbmenu_lock::Summary s = hbmenu_lock::summary();
     const forwarders_logic::LockCheck& c = s.check;
+    using Tone = ui::Choice::Tone;
+    static const char* const STEP_ICONS[] = { "key", "chip", "home", "lock", "check" };   // SetupStep::Kind's order
     std::vector<ui::Choice> choices;
     const bool writable = !app::read_only();
     if (writable && !s.locked)
         for (const hbmenu_lock::SetupStep& step : hbmenu_lock::setup_steps(c))
             if (!step.done) {
                 const hbmenu_lock::SetupStep::Kind kind = step.kind;
-                choices.push_back({ step.label, [this, kind]() { hbmenu_lock::run_step(kind, this->then_rebuild()); } });
+                choices.push_back({ step.label, [this, kind]() { hbmenu_lock::run_step(kind, this->then_rebuild()); },
+                                    STEP_ICONS[kind], "", "", Tone::WARN });
             }
     for (const Row& r : this->list_rows) {
         if (!writable || r.state == State::NotInstalled || r.self) continue;
         const Row copy = r;
         if (r.state == State::Elsewhere)
             choices.push_back({ brls::getStr("playguard/forwarders/fix_delete", r.name),
-                                [this, copy]() { this->remove_with_undo(copy); } });
+                                [this, copy]() { this->remove_with_undo(copy); }, "trash", "", "", Tone::DANGER });
         else if (!r.pin && (forwarders_logic::is_menu(r.nro) || !s.locked))
             choices.push_back({ brls::getStr("playguard/forwarders/fix_protect", r.name),
-                                [this, copy]() { forwarder_flow::set_pin(copy, true, this->then_rebuild(copy.id)); } });
+                                [this, copy]() { forwarder_flow::set_pin(copy, true, this->then_rebuild(copy.id)); }, "key" });
     }
     // Made before they carried their rules: made again, in one go.
     if (writable && !forwarder_flow::to_remake().empty())
-        choices.push_back({ "playguard/forwarders/fix_remake"_i18n, [this]() { forwarder_flow::remake(this->then_rebuild()); } });
+        choices.push_back({ "playguard/forwarders/fix_remake"_i18n, [this]() { forwarder_flow::remake(this->then_rebuild()); },
+                            "refresh" });
     if (writable && !s.locked && c.ready())
-        choices.push_back({ "playguard/hbmenu/cell"_i18n, [this]() { hbmenu_lock::lock(this->then_rebuild()); } });
-    choices.push_back({ "playguard/hbmenu/check"_i18n, []() { hbmenu_lock::show_check(); } });
-    choices.push_back({ "playguard/hbmenu/rescue"_i18n, []() { hbmenu_lock::show_rescue(); } });
+        choices.push_back({ "playguard/hbmenu/cell"_i18n, [this]() { hbmenu_lock::lock(this->then_rebuild()); }, "lock", "", "",
+                            Tone::ON });
+    choices.push_back({ "playguard/hbmenu/check"_i18n, []() { hbmenu_lock::show_check(); }, "list" });
+    choices.push_back({ "playguard/hbmenu/rescue"_i18n, []() { hbmenu_lock::show_rescue(); }, "file" });
     ui::pick_actions("playguard/hbmenu/section"_i18n, choices);
 }
 
@@ -481,6 +517,7 @@ void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
                 if (r.id == focus_id) focus = cell;
                 if (!first) first = cell;
             }
+            if (g == 1 && card) groups_box->addView(legend());
         }
     });
     ui::set_visible(list.getView(), !this->list_rows.empty());
@@ -522,30 +559,45 @@ void ForwardersActivity::actions(const Row& row)
         this->details(r);
         return;
     }
+    using Tone = ui::Choice::Tone;
+    // By group: the forwarder itself, its protection, installing and deleting.
+    const std::string own = "playguard/forwarders/sheet_forwarder"_i18n;
+    const std::string guard = "playguard/forwarders/sheet_protection"_i18n;
+    const std::string files = "playguard/forwarders/sheet_install"_i18n;
     std::vector<ui::Choice> choices;
-    choices.push_back({ "playguard/forwarders/action_details"_i18n, [this, r]() { this->details(r); } });
+    choices.push_back({ "playguard/forwarders/action_details"_i18n, [this, r]() { this->details(r); }, "info", "", own });
+    const auto rebuild = [this, r]() { forwarder_flow::rebuild(r, "", "", this->then_rebuild(r.id)); };
     if (r.state == State::Ready || r.state == State::NroMissing || r.state == State::GateMissing) {
-        choices.push_back({ "playguard/forwarders/action_rename"_i18n, [this, r]() { this->rename(r); } });
-        choices.push_back({ "playguard/forwarders/action_author"_i18n, [this, r]() { this->change_author(r); } });
+        choices.push_back({ "playguard/forwarders/action_rename"_i18n, [this, r]() { this->rename(r); }, "pencil", "", own });
+        choices.push_back({ "playguard/forwarders/action_author"_i18n, [this, r]() { this->change_author(r); }, "user", "", own });
+        choices.push_back({ "playguard/forwarders/action_icon"_i18n, [this, r]() { this->pick_icon(r); }, "sparkle", "", own });
         if (!r.self)
-            choices.push_back({ r.pin ? "playguard/forwarders/action_pin_off"_i18n : "playguard/forwarders/action_pin_on"_i18n,
-                                [this, r]() { forwarder_flow::set_pin(r, !r.pin, this->then_rebuild(r.id)); } });
-        if (!r.self && r.pin) {
-            choices.push_back({ "playguard/forwarders/action_hours"_i18n, [this, r]() { this->pick_hours(r, false); } });
-            choices.push_back({ "playguard/forwarders/action_closed"_i18n, [this, r]() { this->pick_hours(r, true); } });
-            choices.push_back({ r.limit ? "playguard/forwarders/action_limit_off"_i18n : "playguard/forwarders/action_limit_on"_i18n,
-                                [this, r]() { this->limit(r, !r.limit); } });
-        }
+            choices.push_back(ui::Choice("playguard/forwarders/action_pin"_i18n,
+                                         [this, r]() { forwarder_flow::set_pin(r, !r.pin, this->then_rebuild(r.id)); }, "key",
+                                         "", guard)
+                                  .switched(r.pin));
         if (r.paused_until)
             choices.push_back({ "playguard/forwarders/action_lift"_i18n,
-                                [this, r]() { forwarder_flow::lift_pause(r, this->then_rebuild(r.id)); } });
-        choices.push_back({ "playguard/forwarders/action_icon"_i18n, [this, r]() { this->pick_icon(r); } });
-        choices.push_back({ "playguard/forwarders/action_rebuild"_i18n,
-                            [this, r]() { forwarder_flow::rebuild(r, "", "", this->then_rebuild(r.id)); } });
+                                [this, r]() { forwarder_flow::lift_pause(r, this->then_rebuild(r.id)); }, "pause",
+                                forwarder_flow::until_label(r.paused_until), guard, Tone::WARN });
+        if (!r.self && r.pin) {
+            // What is set now at each line's end.
+            const forwarder_flow::Hours free = { r.free_days, r.free_from, r.free_to, r.free2_days, r.free2_from, r.free2_to };
+            const std::string off = "playguard/common/off"_i18n;
+            choices.push_back({ "playguard/forwarders/action_hours"_i18n, [this, r]() { this->pick_hours(r, false); }, "unlock",
+                                r.free_days ? forwarder_flow::hours_label(free) : off, guard,
+                                r.free_days ? Tone::ON : Tone::PLAIN });
+            choices.push_back({ "playguard/forwarders/action_closed"_i18n, [this, r]() { this->pick_hours(r, true); }, "stop",
+                                r.closed_days ? forwarder_flow::hours_label(r.closed_days, r.closed_from, r.closed_to) : off,
+                                guard, r.closed_days ? Tone::ON : Tone::PLAIN });
+            choices.push_back(ui::Choice("playguard/forwarders/action_limit"_i18n, [this, r]() { this->limit(r, !r.limit); },
+                                         "timer", "", guard)
+                                  .switched(r.limit));
+        }
+        choices.push_back({ "playguard/forwarders/action_rebuild"_i18n, rebuild, "refresh", "", files });
     }
     if (r.state == State::NotInstalled) {
-        choices.push_back({ "playguard/forwarders/action_rebuild"_i18n,
-                            [this, r]() { forwarder_flow::rebuild(r, "", "", this->then_rebuild(r.id)); } });
+        choices.push_back({ "playguard/forwarders/action_rebuild"_i18n, rebuild, "refresh", "", files });
         choices.push_back({ "playguard/forwarders/action_forget"_i18n,
                             [this, r]() {
                                 forwarders::Made m;
@@ -559,25 +611,61 @@ void ForwardersActivity::actions(const Row& row)
                                             this->offer_undo([this, m]() { forwarder_flow::put_back(m, false, this->then_rebuild(m.id)); });
                                     });
                                 });
-                            } });
+                            },
+                            "trash", "", files, Tone::DANGER });
     } else {
-        choices.push_back({ "playguard/common/delete"_i18n, [this, r]() { this->remove_with_undo(r); } });
+        choices.push_back({ "playguard/common/delete"_i18n, [this, r]() { this->remove_with_undo(r); }, "trash", "", files,
+                            Tone::DANGER });
     }
-    ui::pick_actions(r.name, choices);
+    ui::pick_actions(r.name, choices, state_text(r), this->icon_of(r.id));
+}
+
+int ForwardersActivity::icon_of(uint64_t id) const
+{
+    for (const auto& c : this->cells)
+        if (c.first == id) return c.second->icon_texture();
+    return 0;
 }
 
 void ForwardersActivity::details(const Row& r)
 {
+    using Tone = ui::Choice::Tone;
     const std::string unknown = "playguard/forwarders/unknown"_i18n;
-    const std::string nro = r.nro.empty() ? unknown : nro::sd_path(r.nro);
-    const std::string made = r.state == State::Elsewhere ? "playguard/forwarders/state_elsewhere"_i18n
-                                                         : "playguard/forwarders/made_here"_i18n;
-    ui::info(r.name + "\n\n" +
-             cadran_text::table({ { "playguard/forwarders/author"_i18n, r.author.empty() ? unknown : r.author },
-                                  { "playguard/tools/version"_i18n, r.version.empty() ? unknown : r.version },
-                                  { ".nro", nro },
-                                  { "playguard/forwarders/program_id"_i18n, forwarders::hex_id(r.id) } }) +
-             "\n\n" + (r.state == State::Elsewhere ? made : made + " · " + state_text(r, true)));
+    const std::string on = "playguard/common/on"_i18n, off = "playguard/common/off"_i18n;
+    // Under its name: who made it, and its state.
+    std::string made = r.state == State::Elsewhere ? "playguard/forwarders/state_elsewhere"_i18n
+                                                   : "playguard/forwarders/made_here"_i18n;
+    if (r.state != State::Elsewhere) made += " · " + state_only(r);
+    if (r.pin && r.verified && forwarders_logic::is_menu(r.nro)) made += " · " + "playguard/forwarders/state_verified"_i18n;
+    if (r.pin && !r.carried) made += " · " + "playguard/forwarders/state_remake"_i18n;
+    // Its rules, one a line, each with the icon of its row in the list;
+    // then what it is. Each line only closes the sheet.
+    std::vector<ui::Choice> lines;
+    const std::string guard = "playguard/forwarders/sheet_protection"_i18n;
+    if (!r.self && r.state != State::Elsewhere) {
+        lines.push_back({ "playguard/forwarders/state_pin"_i18n, nullptr, "key", r.pin ? on : off, guard,
+                          r.pin ? Tone::ON : Tone::PLAIN });
+        if (r.pin) {
+            const forwarder_flow::Hours free = { r.free_days, r.free_from, r.free_to, r.free2_days, r.free2_from, r.free2_to };
+            if (r.paused_until)
+                lines.push_back({ "playguard/forwarders/detail_paused"_i18n, nullptr, "pause",
+                                  forwarder_flow::until_label(r.paused_until), guard, Tone::WARN });
+            lines.push_back({ "playguard/forwarders/action_hours"_i18n, nullptr, "unlock",
+                              r.free_days ? forwarder_flow::hours_label(free) : off, guard,
+                              r.free_days ? Tone::ON : Tone::PLAIN });
+            lines.push_back({ "playguard/forwarders/action_closed"_i18n, nullptr, "stop",
+                              r.closed_days ? forwarder_flow::hours_label(r.closed_days, r.closed_from, r.closed_to) : off,
+                              guard, r.closed_days ? Tone::ON : Tone::PLAIN });
+            lines.push_back({ "playguard/forwarders/action_limit"_i18n, nullptr, "timer", r.limit ? on : off, guard,
+                              r.limit ? Tone::ON : Tone::PLAIN });
+        }
+    }
+    const std::string facts = "playguard/forwarders/sheet_forwarder"_i18n;
+    lines.push_back({ "playguard/forwarders/author"_i18n, nullptr, "user", r.author.empty() ? unknown : r.author, facts });
+    lines.push_back({ "playguard/tools/version"_i18n, nullptr, "tag", r.version.empty() ? unknown : r.version, facts });
+    lines.push_back({ ".nro", nullptr, "file", r.nro.empty() ? unknown : nro::sd_path(r.nro), facts });
+    lines.push_back({ "playguard/forwarders/program_id"_i18n, nullptr, "chip", forwarders::hex_id(r.id), facts });
+    ui::pick_actions(r.name, lines, made, this->icon_of(r.id));
 }
 
 void ForwardersActivity::rename(const Row& row)
