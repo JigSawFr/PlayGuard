@@ -172,6 +172,7 @@ const char* key(Which which)
         case Which::Hekate: return "hekate";
         case Which::Firmware: return "firmware";
         case Which::PlayGuard: return "playguard";
+        case Which::SysPatch: return "syspatch";
     }
     return "";
 }
@@ -183,6 +184,7 @@ const char* product(Which which)
         case Which::Hekate: return "hekate";
         case Which::Firmware: return "";
         case Which::PlayGuard: return "PlayGuard";
+        case Which::SysPatch: return "sys-patch";
     }
     return "";
 }
@@ -193,6 +195,7 @@ List& Cache::of(Which which)
         case Which::Atmosphere: return atmosphere;
         case Which::Hekate: return hekate;
         case Which::PlayGuard: return playguard;
+        case Which::SysPatch: return syspatch;
         case Which::Firmware: break;
     }
     return firmware;
@@ -209,6 +212,7 @@ const char* repo(Which which)
         case Which::Atmosphere: return "Atmosphere-NX/Atmosphere";
         case Which::Hekate: return "CTCaer/hekate";
         case Which::PlayGuard: return "JigSawFr/PlayGuard";
+        case Which::SysPatch: return "impeeza/sys-patch";
         case Which::Firmware: break;
     }
     return "";

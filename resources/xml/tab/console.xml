@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Console: what it runs (firmware, Atmosphère, hekate: tiles, A on each
+<!-- Console: what it runs (firmware, Atmosphère, hekate, sys-patch: tiles, A on each
      opens its release notes), under Diagnostics the network clock (its own
      screen, the former tab) and the installed games check, under Homebrew
      the forwarders (homebrew on the HOME menu), then
@@ -30,6 +30,7 @@
             <brls:DetailCell id="cn_fw" title="@i18n/playguard/tools/firmware"/>
             <brls:DetailCell id="cn_ams" title="@i18n/playguard/tools/atmosphere"/>
             <brls:DetailCell id="cn_hekate" title="hekate"/>
+            <brls:DetailCell id="cn_syspatch" title="sys-patch"/>
             <brls:Header title="@i18n/playguard/tools/section_diag" marginBottom="8"/>
             <brls:DetailCell id="cn_clock" title="@i18n/playguard/tabs/clock"/>
             <brls:DetailCell id="cn_games" title="@i18n/playguard/games/open"/>

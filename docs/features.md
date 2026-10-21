@@ -337,7 +337,7 @@ Two confirmations, irreversible; a backup of the settings is saved first.
 
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=console)*
 
-**At the top**, what the console runs as tiles (the firmware, Atmosphère, and hekate when it is on the SD card; Ⓐ opens its release notes), then the diagnostics, then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
+**At the top**, what the console runs as tiles (the firmware, Atmosphère, hekate when it is on the SD card and sys-patch when it is installed; Ⓐ opens its release notes), then the diagnostics, then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
 
 ### Network clock
 
@@ -426,8 +426,8 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 ### The console's lines
 
-- **Firmware, Atmosphère and hekate** (when its `bootloader/update.bin` is on the SD card), each with the newer release the last update check found, in amber (*22.0.0 · 23.0.1 available*, and how many versions behind when more than one), and a warning icon on the firmware's row when the newest firmware needs a newer Atmosphère or hekate first, or is not supported by them yet (the firmware's release notes say why: their release notes say which firmware they support).
-- **Release notes:** Ⓐ on each opens them: a tab for the installed version, one for each newer one (at most five) and older ones in the tabs left (six in all; Ⓛ / Ⓡ move between them), opening on the next one, with tags (installed or newer, the newest firmware it supports, security fixes, parental controls changed), the notes as published (in English), *See online* (a QR code) and when they were fetched. Atmosphère's and hekate's come from their GitHub releases, the firmware's from switchbrew; they are kept on the SD card for offline reading, fetched again once a day (Ⓧ now).
+- **Firmware, Atmosphère, hekate** (when its `bootloader/update.bin` is on the SD card) **and sys-patch** (when it is installed; its version from its `config/sys-patch/log.ini`), each with the newer release the last update check found, in amber (*22.0.0 · 23.0.1 available*, and how many versions behind when more than one), and a warning icon on the firmware's row when the newest firmware needs a newer Atmosphère or hekate first, or is not supported by them yet (the firmware's release notes say why: their release notes say which firmware they support).
+- **Release notes:** Ⓐ on each opens them: a tab for the installed version, one for each newer one (at most five) and older ones in the tabs left (six in all; Ⓛ / Ⓡ move between them), opening on the next one, with tags (installed or newer, the newest firmware it supports, security fixes, parental controls changed), the notes as published (in English), *See online* (a QR code) and when they were fetched. Atmosphère's, hekate's and sys-patch's come from their GitHub releases (sys-patch's from `impeeza/sys-patch`), the firmware's from switchbrew; they are kept on the SD card for offline reading, fetched again once a day (Ⓧ now).
 - **Compatibility**, then **storage** (emuMMC or sysMMC, with an info icon when the other system has its own parental controls: Ⓐ explains).
 - Whether Atmosphère **blanks the serial number** (partly hidden until Ⓐ; on emuMMC, when it is not, a warning icon on the row above, which Ⓐ explains).
 - **Game patches** (sys-patch or sigpatch files, recommending sys-patch when only files are used: an info icon, or a warning one when something needs a look, which Ⓐ explains).

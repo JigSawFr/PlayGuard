@@ -51,6 +51,7 @@ ConsoleTab::ConsoleTab()
         { fw.getView(), sys_notes::Which::Firmware },
         { ams.getView(), sys_notes::Which::Atmosphere },
         { hekate.getView(), sys_notes::Which::Hekate },
+        { syspatch.getView(), sys_notes::Which::SysPatch },
     };
     for (const auto& n : notes_cells) {
         const sys_notes::Which which = n.second;
@@ -110,7 +111,8 @@ ConsoleTab::ConsoleTab()
         return true;
     });
     // What the console runs, as tiles above the rest (first in the XML).
-    if (brls::Box* tiles = this->list.tiles({ { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_hekate", "flag" } }, true))
+    if (brls::Box* tiles = this->list.tiles(
+            { { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_hekate", "flag" }, { "cn_syspatch", "shield" } }, true))
         tiles->setMarginBottom(20);
     this->list.apply({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_forwarders", "home" },
                        { "cn_compat", "check" }, { "cn_storage", "folder" }, { "cn_blank", "code" },
@@ -146,6 +148,17 @@ void ConsoleTab::refresh()
     hekate->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::Hekate, &newer)));
     hekate->setDetailTextColor(newer ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     ui::set_visible(hekate.getView(), !hk.empty());
+    // sys-patch: when it is installed; its version from its log.ini (none
+    // when it does not log).
+    const patches::Report& report = ui::patch_report();
+    if (!sys_update_flow::installed_syspatch().empty()) {
+        syspatch->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::SysPatch, &newer)));
+        syspatch->setDetailTextColor(newer ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
+    } else {
+        syspatch->setDetailText(ui::opens("playguard/common/unavailable"_i18n));
+        syspatch->setDetailTextColor(cadran::kit::color("cadran/text2"));
+    }
+    ui::set_visible(syspatch.getView(), report.syspatch_installed);
     // A newer firmware Atmosphère or hekate does not support yet, or only in
     // a newer release (their notes say).
     fw_warn->set_shown(!sys_notes_flow::firmware_advice().empty());
@@ -178,7 +191,6 @@ void ConsoleTab::refresh()
                                                                    : "playguard/tools/serial_show"_i18n);
     brls::Application::getGlobalHintsUpdateEvent()->fire();   // redraw the footer hints
 
-    const patches::Report& report = ui::patch_report();
     c = cadran::kit::color("cadran/text2");
     game_patches->setDetailText(ui::patches_text(report, &c));
     game_patches->setDetailTextColor(c);
