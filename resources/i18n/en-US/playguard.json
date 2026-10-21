@@ -592,6 +592,9 @@
         "dns_note": "Atmosphère's DNS redirection (atmosphere/hosts) sends Nintendo's parental-control server elsewhere: the companion app cannot synchronize, so it does not overwrite what is set here."
     },
     "security": {
+        "headline_none": "No PIN yet: anyone can change the settings",
+        "headline_unlocked": "Unlocked for now",
+        "headline_active": "Protected by the PIN",
         "section_status": "Status",
         "pin": "PIN",
         "restrictions": "Restrictions enabled",
@@ -692,6 +695,10 @@
         "note_old_module": "Nothing can be changed from here without the PIN, and PlayGuard opens as usual. Update the module from a computer: extract playguard-rescue.zip of PlayGuard {} at the SD card root, put the RESCUE file back, then restart the console."
     },
     "tools": {
+        "headline_kicker": "This console",
+        "headline_ok": "Nothing to check",
+        "headline_one": "1 thing to check",
+        "headline": "{} things to check",
         "section_diag": "Diagnostics",
         "section_reports": "Reports",
         "section_system": "System",
@@ -1040,7 +1047,6 @@
         "hours_to": "Until",
         "hours_set": "{} starts without the PIN: {}",
         "hours_none": "{} asks for the PIN at all hours",
-        "hours_err": "The hours could not be saved",
         "state_pin_hours": "PIN, not asked {}",
         "day_sun": "Sun",
         "day_mon": "Mon",
@@ -1082,7 +1088,36 @@
         "pause_cell": "Pause after refused PINs",
         "pause_default": "the default",
         "paused_line": "{}: until {}",
-        "paused_title": "A forwarder is paused after refused PINs"
+        "paused_title": "A forwarder is paused after refused PINs",
+        "state_limit": "closed once today's time is used up",
+        "state_remake": "to make again",
+        "action_limit_on": "Close it once today's play time is used up",
+        "action_limit_off": "Let it open after today's play time too",
+        "limit_on": "closed once today's time is used up",
+        "limit_off": "opens after today's time too",
+        "limit_set": "{} closes once today's play time is used up",
+        "limit_unset": "{} no longer closes after today's play time",
+        "hours_apart": "Monday to Friday, and the weekend apart",
+        "hours_from_of": "{}: from",
+        "hours_to_of": "{}: until",
+        "remake": "Make again",
+        "remake_confirm": "Make these protected forwarders again? {}. Their rules (the hours, the pause) go into the forwarder itself, where the SD card cannot change them, and the gate's file is checked before it starts.",
+        "remade_n": "Made again: {}",
+        "fix_remake": "Make again the forwarders protected before",
+        "remake_title": "Protected forwarders to make again",
+        "remake_detail": "{}: made by an older PlayGuard. Until they are made again, their hours without the PIN are not honoured (the PIN is asked) and a gate changed on the SD card would still start.",
+        "state_pin_rules": "PIN, with its own rules",
+        "week_cell": "Tries this week",
+        "week_title": "The gate's tries this week",
+        "week_sub": "The last seven days, today included",
+        "week_opened": "Opened: {}",
+        "week_refused": "Refused: {} ({})",
+        "week_none_refused": "No PIN refused",
+        "week_blocked": "Not opened (paused, closed, time used up): {}",
+        "week_empty": "No forwarder was tried in the last seven days.",
+        "week_note": "Refused this week: {}; the week before: {}.",
+        "climb_title": "More refused PINs than usual",
+        "climb_detail": "{} PINs refused at the gate in the last seven days, {} the week before."
     },
     "hbmenu": {
         "section": "Homebrew menu",
@@ -1368,7 +1403,11 @@
         "presses_left": "{} more presses to turn on developer mode.",
         "presses_left_one": "1 more press to turn on developer mode.",
         "report_upload": "Send online",
-        "glow": "Background glow"
+        "glow": "Background glow",
+        "self_test": "Console self-test",
+        "self_test_written": "Written to {}: paste it in the pull request.",
+        "self_test_not_written": "Not written: {}",
+        "self_test_tally": "{} passed, {} to know, {} failed, {} not checked"
     },
     "dev_build": {
         "open": "Install another build",
@@ -1535,7 +1574,9 @@
             "gate_closed": "Forwarder closed (hours without any access)",
             "gate_closed_hours": "Forwarder hours without any access",
             "gate_pause": "Pause after refused PINs",
-            "gate_pause_lifted": "Forwarder's pause lifted"
+            "gate_pause_lifted": "Forwarder's pause lifted",
+            "gate_limit": "Forwarder closed (today's play time used up)",
+            "gate_limit_set": "Forwarder closed after today's play time"
         },
         "sources": {
             "uniform": "Same limit every day",

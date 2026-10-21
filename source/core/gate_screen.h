@@ -26,6 +26,7 @@ typedef enum {
     GateScreen_Error,        // the PIN screen did not open: back to the HOME menu
     GateScreen_Paused,       // paused after refusals: back to the HOME menu, the PIN not asked
     GateScreen_Closed,       // in its hours without any access: back to the HOME menu
+    GateScreen_Limit,        // the day's play time used up: back to the HOME menu
 } GateScreenState;
 
 typedef struct {

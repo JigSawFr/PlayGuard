@@ -592,6 +592,9 @@
         "dns_note": "Die DNS-Umleitung von Atmosphère (atmosphere/hosts) leitet Nintendos Jugendschutz-Server um: Die Smart-Geräte-App kann sich nicht synchronisieren und überschreibt die hier vorgenommenen Einstellungen daher nicht."
     },
     "security": {
+        "headline_none": "Noch keine Geheimzahl: Jeder kann die Einstellungen ändern",
+        "headline_unlocked": "Vorübergehend entsperrt",
+        "headline_active": "Durch die Geheimzahl geschützt",
         "section_status": "Status",
         "pin": "Geheimzahl",
         "restrictions": "Einschränkungen aktiv",
@@ -692,6 +695,10 @@
         "note_old_module": "Ohne Geheimzahl kann hier nichts geändert werden, und PlayGuard öffnet sich wie gewohnt. Aktualisieren Sie das Modul an einem Computer: Entpacken Sie playguard-rescue.zip von PlayGuard {} ins Stammverzeichnis der SD-Karte, legen Sie die RESCUE-Datei wieder darauf und starten Sie die Konsole neu."
     },
     "tools": {
+        "headline_kicker": "Diese Konsole",
+        "headline_ok": "Nichts zu prüfen",
+        "headline_one": "1 Punkt zu prüfen",
+        "headline": "{} Punkte zu prüfen",
         "section_diag": "Diagnose",
         "section_reports": "Berichte",
         "section_system": "System",
@@ -1040,7 +1047,6 @@
         "hours_to": "Bis",
         "hours_set": "{} startet ohne Geheimzahl: {}",
         "hours_none": "{} fragt zu jeder Zeit nach der Geheimzahl",
-        "hours_err": "Die Zeiten konnten nicht gespeichert werden",
         "state_pin_hours": "Geheimzahl, außer {}",
         "day_sun": "So",
         "day_mon": "Mo",
@@ -1082,7 +1088,36 @@
         "pause_cell": "Pause nach abgelehnten Geheimzahlen",
         "pause_default": "Standard",
         "paused_line": "{}: bis {}",
-        "paused_title": "Ein Forwarder pausiert nach abgelehnten Geheimzahlen"
+        "paused_title": "Ein Forwarder pausiert nach abgelehnten Geheimzahlen",
+        "state_limit": "gesperrt, sobald die heutige Zeit aufgebraucht ist",
+        "state_remake": "neu zu erstellen",
+        "action_limit_on": "Sperren, sobald die heutige Spielzeit aufgebraucht ist",
+        "action_limit_off": "Auch nach der heutigen Spielzeit öffnen lassen",
+        "limit_on": "gesperrt, sobald die heutige Zeit aufgebraucht ist",
+        "limit_off": "öffnet auch nach der heutigen Zeit",
+        "limit_set": "{} wird gesperrt, sobald die heutige Spielzeit aufgebraucht ist",
+        "limit_unset": "{} wird nach der heutigen Spielzeit nicht mehr gesperrt",
+        "hours_apart": "Montag bis Freitag, und das Wochenende getrennt",
+        "hours_from_of": "{}: ab",
+        "hours_to_of": "{}: bis",
+        "remake": "Neu erstellen",
+        "remake_confirm": "Diese geschützten Forwarder neu erstellen? {}. Ihre Regeln (die Zeiten, die Pause) kommen in den Forwarder selbst, wo die SD-Karte sie nicht ändern kann, und die Datei des Tors wird vor dem Start geprüft.",
+        "remade_n": "Neu erstellt: {}",
+        "fix_remake": "Die zuvor geschützten Forwarder neu erstellen",
+        "remake_title": "Geschützte Forwarder neu zu erstellen",
+        "remake_detail": "{}: von einem älteren PlayGuard erstellt. Bis sie neu erstellt sind, gelten ihre Zeiten ohne Geheimzahl nicht (die Geheimzahl wird verlangt), und ein auf der SD-Karte geändertes Tor würde trotzdem starten.",
+        "state_pin_rules": "Geheimzahl, mit eigenen Regeln",
+        "week_cell": "Versuche dieser Woche",
+        "week_title": "Die Versuche am Tor diese Woche",
+        "week_sub": "Die letzten sieben Tage, heute eingeschlossen",
+        "week_opened": "Geöffnet: {}",
+        "week_refused": "Abgelehnt: {} ({})",
+        "week_none_refused": "Keine Geheimzahl abgelehnt",
+        "week_blocked": "Nicht geöffnet (pausiert, gesperrt, Zeit aufgebraucht): {}",
+        "week_empty": "In den letzten sieben Tagen wurde kein Forwarder versucht.",
+        "week_note": "Abgelehnt diese Woche: {}; die Woche davor: {}.",
+        "climb_title": "Mehr abgelehnte Geheimzahlen als sonst",
+        "climb_detail": "{} Geheimzahlen in den letzten sieben Tagen am Tor abgelehnt, {} in der Woche davor."
     },
     "hbmenu": {
         "section": "Homebrew-Menü",
@@ -1368,7 +1403,11 @@
         "presses_left": "Noch {} Mal drücken, um den Entwicklermodus zu aktivieren.",
         "presses_left_one": "Noch 1 Mal drücken, um den Entwicklermodus zu aktivieren.",
         "report_upload": "Online senden",
-        "glow": "Hintergrundschein"
+        "glow": "Hintergrundschein",
+        "self_test": "Selbsttest der Konsole",
+        "self_test_written": "Gespeichert in {}: in den Pull-Request einfügen.",
+        "self_test_not_written": "Nicht gespeichert: {}",
+        "self_test_tally": "{} bestanden, {} zu beachten, {} fehlgeschlagen, {} nicht geprüft"
     },
     "dev_build": {
         "open": "Anderen Build installieren",
@@ -1535,7 +1574,9 @@
             "gate_closed": "Forwarder gesperrt (Zeiten ohne Zugang)",
             "gate_closed_hours": "Zeiten ohne Zugang eines Forwarders",
             "gate_pause": "Pause nach abgelehnten Geheimzahlen",
-            "gate_pause_lifted": "Pause eines Forwarders aufgehoben"
+            "gate_pause_lifted": "Pause eines Forwarders aufgehoben",
+            "gate_limit": "Forwarder gesperrt (heutige Spielzeit aufgebraucht)",
+            "gate_limit_set": "Forwarder nach der heutigen Spielzeit gesperrt"
         },
         "sources": {
             "uniform": "Jeden Tag gleiches Limit",

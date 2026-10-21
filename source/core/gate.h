@@ -30,9 +30,9 @@ extern "C" {
 #define GATE_PAUSE_MAX  0x4000
 
 // The homebrew to start, from the gate's argv as one string ("<gate path>
-// --pin-gate <argv>"): its path ("sdmc:/…", unquoted, into `nro`) and its
-// argv (*argv, pointing into `raw`). False when it is not a gate's argv, or
-// the path does not fit.
+// --pin-gate [rules] <argv>"): its path ("sdmc:/…", unquoted, into `nro`)
+// and its argv (*argv, pointing into `raw`). False when it is not a gate's
+// argv, or the path does not fit. The rules (GateRules) are skipped.
 bool gate_argv_parse(const char *raw, char *nro, size_t nro_size, const char **argv);
 
 // Free hours: on the days of `days` (bit 0 Sunday … bit 6 Saturday), from
@@ -53,6 +53,40 @@ size_t gate_rule_format(const GateHours *h, const char *nro, char *buf, size_t s
 // The hours for `nro` in the rules file's text; false when it has none.
 bool gate_rule_find(const char *text, size_t len, const char *nro, GateHours *out);
 
+// The rules a forwarder carries, in its gate's argv: PlayGuard writes them
+// into the forwarder's RomFS, on the console's own storage, where the SD
+// card cannot change them (a forwarder made again when they change). One
+// made before carries none: its free hours are not honoured then (the PIN
+// asked), its hours without any access and its pause read from the files
+// below. Tokens between "--pin-gate" and the homebrew's path:
+//   --gate-rules              it carries them (always first)
+//   --gate-free=<days hex>,<from>,<to>    free hours, up to GATE_SPANS
+//   --gate-closed=<days hex>,<from>,<to>  hours it never opens, as many
+//   --gate-pause=<tries>,<minutes>        the pause after refusals (0,0: never)
+//   --gate-limit              closed once the day's play time is used up
+#define GATE_SPANS 4
+typedef struct {
+    bool      carried;
+    GateHours free[GATE_SPANS];
+    unsigned  free_n;
+    GateHours closed[GATE_SPANS];
+    unsigned  closed_n;
+    bool      has_pause;
+    unsigned  pause_tries, pause_minutes;
+    bool      limit;
+} GateRules;
+
+// As gate_argv_parse, with the rules read into *rules (zeroed first; may be
+// NULL). A token it does not know, or one it cannot read, is skipped: a
+// span dropped asks the PIN more often, never less.
+bool gate_argv_rules(const char *raw, char *nro, size_t nro_size, const char **argv, GateRules *rules);
+// The tokens for `r`, each after a space (" --gate-rules --gate-free=41,540,1200"),
+// "--gate-rules" always; spans that are not valid left out. Length, 0 when
+// it does not fit.
+size_t gate_rules_format(const GateRules *r, char *buf, size_t size);
+// Whether one of `spans` (n of them) holds `wday` and `minute` (gate_hours_free).
+bool gate_spans_hold(const GateHours *spans, unsigned n, int wday, int minute);
+
 typedef enum {
     GateResult_Pin = 0,     // the PIN entered: started
     GateResult_Free = 1,    // in its free hours, or no PIN on the console: started
@@ -60,16 +94,17 @@ typedef enum {
     GateResult_Error = 3,   // the PIN screen did not open: not started
     GateResult_Paused = 4,  // paused after refusals: the PIN not asked, not started
     GateResult_Closed = 5,  // in its hours without any access: not started
+    GateResult_Limit = 6,   // the day's play time used up (GateRules.limit): not started
 } GateResult;
 
-// A line of the log: "<YYYY-MM-DD HH:MM>\t<pin|free|refused|error>\t<nro>\n".
+// A line of the log: "<YYYY-MM-DD HH:MM>\t<gate_result_name>\t<nro>\n".
 size_t gate_log_format(const char *when, GateResult r, const char *nro, char *buf, size_t size);
 // One line back (without its "\n"); false for anything else. `when` and
 // `nro` point into `line`, with their lengths.
 bool gate_log_parse(const char *line, size_t len, const char **when, size_t *when_len, GateResult *r,
                     const char **nro, size_t *nro_len);
 
-const char *gate_result_name(GateResult r);   // "pin", "free", "refused", "error", "paused", "closed"
+const char *gate_result_name(GateResult r);   // "pin", "free", "refused", "error", "paused", "closed", "limit"
 
 // The pause after refusals (GATE_PAUSE_NAME): `tries` refused in a row (the
 // PIN screen left with B) and the forwarder does not ask again for
@@ -91,6 +126,10 @@ bool gate_pause_find(const char *text, size_t len, const char *nro, unsigned *st
 // not fit in `size`.
 size_t gate_pause_update(const char *text, size_t len, const char *nro, GateResult r, uint64_t now, char *out,
                          size_t size);
+// As gate_pause_update, with `rule` in place of the file's (a forwarder
+// that carries its own, GateRules); NULL: the file's.
+size_t gate_pause_update_with(const char *text, size_t len, const char *nro, GateResult r, uint64_t now,
+                              const GatePauseRule *rule, char *out, size_t size);
 // The file with `rule` as its rule line, the forwarders' lines kept; or
 // without `nro`'s line (`rule` NULL, a pause lifted).
 size_t gate_pause_edit(const char *text, size_t len, const GatePauseRule *rule, const char *nro, char *out, size_t size);
@@ -104,6 +143,8 @@ int gate_log_count(const char *text, size_t len, const char *nro, const char *da
 // Forwarders writes it (forwarders_logic::hours_text). Length, 0 when it
 // does not fit or `h` has no day.
 size_t gate_hours_text(const GateHours *h, const char *days, char *buf, size_t size);
+// Each of `spans` so, joined by ", ". Length, 0 when none fits.
+size_t gate_spans_text(const GateHours *spans, unsigned n, const char *days, char *buf, size_t size);
 
 #ifdef __cplusplus
 }

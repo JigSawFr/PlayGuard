@@ -592,6 +592,9 @@
         "dns_note": "Il reindirizzamento DNS di Atmosphère (atmosphere/hosts) devia il server del filtro famiglia di Nintendo: l'app non può sincronizzarsi, quindi non sovrascrive le impostazioni fatte qui."
     },
     "security": {
+        "headline_none": "Ancora nessun PIN: chiunque può cambiare le impostazioni",
+        "headline_unlocked": "Sbloccato per ora",
+        "headline_active": "Protetto dal PIN",
         "section_status": "Stato",
         "pin": "PIN",
         "restrictions": "Limitazioni attive",
@@ -692,6 +695,10 @@
         "note_old_module": "Senza il PIN qui non si può modificare nulla, e PlayGuard si apre come al solito. Aggiorna il modulo da un computer: estrai playguard-rescue.zip di PlayGuard {} nella radice della scheda SD, rimetti il file RESCUE, poi riavvia la console."
     },
     "tools": {
+        "headline_kicker": "Questa console",
+        "headline_ok": "Niente da controllare",
+        "headline_one": "1 cosa da controllare",
+        "headline": "{} cose da controllare",
         "section_diag": "Diagnostica",
         "section_reports": "Report",
         "section_system": "Sistema",
@@ -1040,7 +1047,6 @@
         "hours_to": "Alle",
         "hours_set": "{} si avvia senza il PIN: {}",
         "hours_none": "{} chiede il PIN a ogni ora",
-        "hours_err": "Impossibile salvare gli orari",
         "state_pin_hours": "PIN, tranne {}",
         "day_sun": "dom",
         "day_mon": "lun",
@@ -1082,7 +1088,36 @@
         "pause_cell": "Pausa dopo PIN rifiutati",
         "pause_default": "predefinito",
         "paused_line": "{}: fino alle {}",
-        "paused_title": "Un forwarder è in pausa dopo PIN rifiutati"
+        "paused_title": "Un forwarder è in pausa dopo PIN rifiutati",
+        "state_limit": "chiuso quando il tempo di oggi è esaurito",
+        "state_remake": "da rifare",
+        "action_limit_on": "Chiuderlo quando il tempo di gioco di oggi è esaurito",
+        "action_limit_off": "Lasciarlo aprire anche dopo il tempo di gioco di oggi",
+        "limit_on": "chiuso quando il tempo di oggi è esaurito",
+        "limit_off": "si apre anche dopo il tempo di oggi",
+        "limit_set": "{} si chiude quando il tempo di gioco di oggi è esaurito",
+        "limit_unset": "{} non si chiude più dopo il tempo di gioco di oggi",
+        "hours_apart": "Dal lunedì al venerdì, e il fine settimana a parte",
+        "hours_from_of": "{}: dalle",
+        "hours_to_of": "{}: fino alle",
+        "remake": "Rifai",
+        "remake_confirm": "Rifare questi forwarder protetti? {}. Le loro regole (gli orari, la pausa) passano nel forwarder stesso, dove la scheda SD non può cambiarle, e il file del cancello viene verificato prima dell'avvio.",
+        "remade_n": "Rifatti: {}",
+        "fix_remake": "Rifai i forwarder protetti in precedenza",
+        "remake_title": "Forwarder protetti da rifare",
+        "remake_detail": "{}: creati da un PlayGuard precedente. Finché non vengono rifatti, i loro orari senza PIN non sono rispettati (viene chiesto il PIN) e un cancello modificato sulla scheda SD si avvierebbe comunque.",
+        "state_pin_rules": "PIN, con regole proprie",
+        "week_cell": "Tentativi della settimana",
+        "week_title": "I tentativi al cancello questa settimana",
+        "week_sub": "Gli ultimi sette giorni, oggi compreso",
+        "week_opened": "Aperto: {}",
+        "week_refused": "Rifiutato: {} ({})",
+        "week_none_refused": "Nessun PIN rifiutato",
+        "week_blocked": "Non aperto (in pausa, chiuso, tempo esaurito): {}",
+        "week_empty": "Nessun forwarder provato negli ultimi sette giorni.",
+        "week_note": "Rifiuti questa settimana: {}; la settimana prima: {}.",
+        "climb_title": "Più PIN rifiutati del solito",
+        "climb_detail": "{} PIN rifiutati al cancello negli ultimi sette giorni, {} la settimana prima."
     },
     "hbmenu": {
         "section": "Menu homebrew",
@@ -1368,7 +1403,11 @@
         "presses_left": "Premi ancora {} volte per attivare la modalità sviluppatore.",
         "presses_left_one": "Premi ancora una volta per attivare la modalità sviluppatore.",
         "report_upload": "Invia online",
-        "glow": "Alone di sfondo"
+        "glow": "Alone di sfondo",
+        "self_test": "Autotest della console",
+        "self_test_written": "Salvato in {}: incollalo nella pull request.",
+        "self_test_not_written": "Non salvato: {}",
+        "self_test_tally": "{} superati, {} da sapere, {} falliti, {} non verificati"
     },
     "dev_build": {
         "open": "Installa un'altra build",
@@ -1535,7 +1574,9 @@
             "gate_closed": "Forwarder chiuso (ore senza accesso)",
             "gate_closed_hours": "Ore senza accesso di un forwarder",
             "gate_pause": "Pausa dopo PIN rifiutati",
-            "gate_pause_lifted": "Pausa di un forwarder tolta"
+            "gate_pause_lifted": "Pausa di un forwarder tolta",
+            "gate_limit": "Forwarder chiuso (tempo di gioco di oggi esaurito)",
+            "gate_limit_set": "Forwarder chiuso dopo il tempo di gioco di oggi"
         },
         "sources": {
             "uniform": "Stesso limite ogni giorno",

@@ -77,6 +77,10 @@ typedef struct {
     // forwarder ends. The program ID stays the .nro's.
     const char *gate_path;
     const char *gate_argv;
+    // The gate's SHA-256 (32 bytes), or NULL: the loader starts the gate only
+    // when its file still has it (nextNroSha256 in the RomFS, on the
+    // console's storage), so one changed on the SD card is refused.
+    const uint8_t *gate_sha256;
     const char *name;       // the HOME menu's name, in every language (empty: the NACP's)
     const char *author;     // its publisher (empty: the NACP's)
     const void *nacp;       // the .nro's control.nacp (FWD_NACP_SIZE bytes), or NULL for a blank one

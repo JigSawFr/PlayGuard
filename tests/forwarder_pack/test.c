@@ -573,9 +573,25 @@ static void test_gate(void)
             f = romfs_file(romfs, size, "returnArgv", &n);
             CHECK(f && n == strlen(NRO_ARGV) && memcmp(f, NRO_ARGV, n) == 0);
             CHECK(romfs_hashed(romfs, "returnNroPath") && romfs_hashed(romfs, "nextNroPath"));
+            CHECK(!romfs_file(romfs, size, "nextNroSha256", &n));   // none given
         }
     }
     forwarder_package_free(&p);
+
+    // The gate's SHA-256, for the loader to check it: in the RomFS as given.
+    uint8_t sha[32];
+    for (int i = 0; i < 32; i++) sha[i] = (uint8_t)(0xA0 + i);
+    in.gate_sha256 = sha;
+    if (CHECK(forwarder_pack(&in, &p) == FWD_OK)) {
+        unseal(&p.contents[0]);
+        if (CHECK(section(&p.contents[0], 1, &s))) {
+            const uint8_t *romfs = romfs_of(&s, &size);
+            f = romfs ? romfs_file(romfs, size, "nextNroSha256", &n) : NULL;
+            CHECK(f && n == 32 && memcmp(f, sha, 32) == 0 && romfs_hashed(romfs, "nextNroSha256"));
+        }
+    }
+    forwarder_package_free(&p);
+    in.gate_sha256 = NULL;
 
     // A gate without its argv, or with an empty path: refused.
     in.gate_argv = NULL;

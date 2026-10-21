@@ -14,6 +14,7 @@
 #include <memory>
 #include <vector>
 
+#include "action/forwarder_flow.hpp"
 #include "action/forwarders_logic.hpp"
 
 class GameCell;
@@ -53,11 +54,17 @@ class ForwardersActivity : public brls::Activity
     void rename(const forwarders_logic::Row& row);
     void change_author(const forwarders_logic::Row& row);
     void pick_homebrew();
-    // Hours when a protected one starts without the PIN: the days, then the span.
-    // `closed`: the hours it never opens instead.
+    // Hours when a protected one starts without the PIN: the days, then the
+    // span (the weekdays' then the weekend's, when apart). `closed`: the
+    // hours it never opens instead.
     void pick_hours(const forwarders_logic::Row& row, bool closed);
+    // A span: its start, then its end, under `title`; `done(from, to)` in
+    // minutes (an end before the start runs past midnight).
+    void pick_span(const std::string& title, int from_hour, int to_hour, std::function<void(int, int)> done);
     // Sets them, then ZR a few seconds to put the ones before back.
-    void hours(const forwarders_logic::Row& row, bool closed, int days, int from, int to);
+    void hours(const forwarders_logic::Row& row, bool closed, const forwarder_flow::Hours& h);
+    // Closed once the day's play time is used up, or no longer; ZR to undo.
+    void limit(const forwarders_logic::Row& row, bool on);
     // Its icon: its .nro's, or a screenshot of the album.
     void pick_icon(const forwarders_logic::Row& row);
     // The pause after refused PINs: its rule.
@@ -80,4 +87,5 @@ class ForwardersActivity : public brls::Activity
     BRLS_BIND(brls::DetailCell, protect_all, "fw_protect_all");
     BRLS_BIND(brls::DetailCell, lock_check, "fw_lock_check");
     BRLS_BIND(brls::DetailCell, pause_cell, "fw_pause");
+    BRLS_BIND(brls::DetailCell, week_cell, "fw_week");
 };
