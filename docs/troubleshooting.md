@@ -73,6 +73,10 @@ The console runs a firmware newer than the newest one tested: PlayGuard checks w
 
 *Console › Check the installed games* says what is wrong with each one and what to do; save data always stays ([installed games](features.md#installed-games)).
 
+### A protected forwarder shows error 2347-0100
+
+Its gate (`config/playguard/gate-….nro`) is no longer the file the forwarder was made with: it was changed or replaced on the SD card, so the forwarder does not start it. Open PlayGuard from its own forwarder: it writes the gate back at start; *Console › Forwarders › Install them all again* makes every forwarder again with it.
+
 ### The bell or a tab shows an amber badge
 
 Something needs you: Ⓨ opens the list, and Ⓐ on an entry does the fix or opens where it is made ([notifications](features.md#notifications--what-needs-you-from-any-tab)).

@@ -33,8 +33,12 @@ nlohmann::json array_of(const std::vector<Made>& all)
         if (m.pin && m.verified) e["verified"] = true;
         if (m.pin && m.free_days)
             e["free"] = { { "days", m.free_days }, { "from", m.free_from }, { "to", m.free_to } };
+        if (m.pin && m.free_days && m.free2_days)
+            e["free2"] = { { "days", m.free2_days }, { "from", m.free2_from }, { "to", m.free2_to } };
         if (m.pin && m.closed_days)
             e["closed"] = { { "days", m.closed_days }, { "from", m.closed_from }, { "to", m.closed_to } };
+        if (m.pin && m.limit) e["limit"] = true;
+        if (m.pin && m.carried) e["carried"] = true;
         if (!m.icon.empty()) e["icon"] = m.icon;
         list.push_back(e);
     }
@@ -114,6 +118,9 @@ std::vector<Made> from_array(const nlohmann::json& list)
         };
         span("free", m.free_days, m.free_from, m.free_to);
         span("closed", m.closed_days, m.closed_from, m.closed_to);
+        if (m.free_days) span("free2", m.free2_days, m.free2_from, m.free2_to);
+        m.limit = m.pin && json_util::flag_at(e, "limit");
+        m.carried = m.pin && json_util::flag_at(e, "carried");
         m.icon = json_util::string_at(e, "icon");
         bool seen = false;
         for (const Made& o : out) seen = seen || o.id == m.id;

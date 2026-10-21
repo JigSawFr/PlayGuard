@@ -40,6 +40,11 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
             r.closed_days = m->closed_days;
             r.closed_from = m->closed_from;
             r.closed_to = m->closed_to;
+            r.free2_days = m->free2_days;
+            r.free2_from = m->free2_from;
+            r.free2_to = m->free2_to;
+            r.limit = m->pin && m->limit;
+            r.carried = m->pin && m->carried;
             r.custom_icon = !m->icon.empty();
             r.state = !nro_exists(m->nro)            ? State::NroMissing
                       : m->pin && !nro_exists(m->gate) ? State::GateMissing
@@ -67,6 +72,11 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
         r.closed_days = m.closed_days;
         r.closed_from = m.closed_from;
         r.closed_to = m.closed_to;
+        r.free2_days = m.free2_days;
+        r.free2_from = m.free2_from;
+        r.free2_to = m.free2_to;
+        r.limit = m.pin && m.limit;
+        r.carried = m.pin && m.carried;
         r.custom_icon = !m.icon.empty();
         r.state = State::NotInstalled;
         rows.push_back(r);

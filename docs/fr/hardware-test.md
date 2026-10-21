@@ -1,4 +1,4 @@
-<!-- translated from docs/hardware-test.md, sha256 b385894a39f7 -->
+<!-- translated from docs/hardware-test.md, sha256 0f3ca7f84a71 -->
 # Tester sur une console : forwarders et menu homebrew
 
 Ce que les simulateurs desktop et web ne peuvent pas montrer : le vrai menu HOME de la console, son écran du code PIN, Atmosphère qui lit `override_config.ini`, le module rescue au démarrage. À dérouler sur une console après une modification de *Console › Forwarders* (les fichiers `source/action/forwarder*`, `hbmenu_lock*`, `source/core/gate*`, `hbl_lock*`, `gate/`, `sysmodule/`), en notant dans la pull request ce qui a été vérifié, et sur quels firmware et Atmosphère.
@@ -25,6 +25,11 @@ Chaque étape : ce qu'il faut faire, puis ce qui doit se passer. ☐ est à coch
 - ☐ *Heures sans code PIN* incluant l'heure actuelle : il se lance sans code PIN, la porte le disant ; sa ligne et l'écran de la porte nomment les heures.
 - ☐ *Heures où il ne s'ouvre jamais* incluant l'heure actuelle : la porte dit *Pas à cette heure-ci* et les heures, même avec un code PIN sur la console ; en dehors, le code PIN de nouveau.
 - ☐ *Pause après des codes PIN refusés › Jamais* : refusé dix fois, pas de pause.
+- ☐ *Heures sans code PIN › Du lundi au vendredi, et le week-end à part* : un jour de semaine dans sa plage, pas de code PIN ; le week-end, la plage du week-end.
+- ☐ *Le fermer une fois le temps de jeu du jour écoulé*, une minuterie sans temps restant aujourd'hui : la porte dit *Le temps de jeu du jour est écoulé*, même avec le code PIN saisi ; du temps ajouté (PlayGuard ou l'appli du parent), il redemande le code PIN.
+- ☐ Depuis un ordinateur, `config/playguard/gate_rules.txt` écrit avec une ligne donnant toutes les heures à sphaira : la porte demande toujours le code PIN (ses règles sont dans le forwarder).
+- ☐ Depuis un ordinateur, `config/playguard/gate-….nro` remplacé par un autre `.nro` (celui de hbmenu) : le forwarder de sphaira s'arrête sur l'erreur 2347-0100 et ne le lance pas ; l'ouverture suivante de PlayGuard réécrit la porte.
+- ☐ Un forwarder protégé par le PlayGuard précédent : la cloche dit de le refaire ; *Refaire*, puis ses heures sans code PIN fonctionnent.
 
 ## 3. Verrouiller le menu homebrew
 
@@ -46,6 +51,7 @@ Chaque étape : ce qu'il faut faire, puis ce qui doit se passer. ☐ est à coch
 
 ## 5. Sauvegardes
 
+- ☐ *Historique › Essais de la semaine* : les refus de la section 2, par jour.
 - ☐ *Historique › Faire une sauvegarde* avec des forwarders créés : le fichier (`config/playguard/backups/`) a une partie `forwarders`.
 - ☐ Un forwarder supprimé dans les Paramètres, la sauvegarde restaurée : PlayGuard propose de le remettre ; une fois remis, il est sur le menu HOME, protégé comme avant.
 

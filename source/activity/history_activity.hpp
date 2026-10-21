@@ -37,6 +37,7 @@ class HistoryActivity : public brls::Activity
     BRLS_BIND(brls::Label,      note,   "hi_note");
     BRLS_BIND(brls::DetailCell, filter_cell, "hi_filter");
     BRLS_BIND(brls::DetailCell, export_cell, "hi_export");
+    BRLS_BIND(brls::DetailCell, week_cell, "hi_week");
     BRLS_BIND(brls::Box,        list,   "hi_list");
     BRLS_BIND(brls::Label,      empty,  "hi_empty");
 };
